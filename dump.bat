@@ -1,0 +1,1 @@
+objdump.exe -D -bbinary -marmv4t --adjust-vma=0x08000000 roms/2343.gba --start-address=0x08000000 --stop-address=0x08000100

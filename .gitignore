@@ -1,0 +1,12 @@
+# 构建输出
+*.o
+*.elf
+*.gba
+
+# IDE
+.vscode/
+.idea/
+
+# 临时文件
+*.tmp
+*.log
