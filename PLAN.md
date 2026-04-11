@@ -206,11 +206,55 @@ incbin [end, 0x1FFFF00]
   > ⚠️ **构建依赖**：`build.bat` 前须先运行 `python tools/export_gfx.py` 生成 `graphics/opponents/*.bin`，
   > 否则汇编器找不到 incbin 文件。详见 README。
 
-- [ ] **T3**：提取决斗场地图形地址表 → `data/duel-field-gfx-pointers.s`
-  - 依据：`duel-field.md`
+- [ ] **T3**：决斗场地图形导出管线
 
-- [ ] **T4**：提取主菜单/禁卡界面图形地址（体量小，可合并一个文件）
-  - 依据：`main-menu.md` + `banlist-code-breaking.md`
+  依据：`doc/um06-romhacking-resource/duel-field.md`
+
+  #### 数据概况
+
+  6 种决斗模式 × 内场（Inner）+ 外场（Outer）= 最多 12 张背景图。
+  外场有完整的 Image + Tilemap + Palette，内场只有 Image + Palette（无 Tilemap，可能以不同方式渲染）。
+
+  | 模式 | 内场图块 | 外场图块 | 外场 Tilemap | 调色板 |
+  |------|---------|---------|-------------|--------|
+  | Campaign | `0x185D720` | `0x185504C` | `0x185B650` | `0x18674A0` / `0x18593A8` |
+  | Link Duel | `0x185EDA0` | `0x185502C`... | `0x185BB00` | `0x18674C0` / `0x18593E8` |
+  | Duel Puzzle | `0x1860420` | `0x185600C` | `0x185BFB0` | `0x18674E0` / `0x1859428` |
+  | Limited | `0x1861AA0` | `0x18567EC` | `0x185C460` | `0x1867500` / `0x1859468` |
+  | Theme | `0x1863120` | `0x18575CC` | `0x185C910` | `0x1867520` / `0x18594A8` |
+  | Survival | `0x18647A0` | `0x18457FAC`... | `0x185CDC0` | `0x1867540` / `0x18594E8` |
+
+  此外 ROM 中还有指针表（Inner Field Images/Tilemap/Palette Pointer Table，
+  Outer Field 同理），位于 `0x1855030`、`0x185B634`、`0x185936C` 等。
+
+  #### 子任务（参照 T2 流程）
+
+  - [ ] **T3.1**：调查数据格式，确认尺寸（外场 Tilemap 宽高、图块数量）
+  - [ ] **T3.2**：扩展 `tools/export_gfx.py`，导出 PNG 预览和 `*.bin` 文件
+  - [ ] **T3.3**：拆分 `asm/rom.s` 对应 incbin 段，引用 `graphics/duel-field/*.bin`，byte-identical 验证
+
+  > **注意**：内场无 Tilemap，渲染方式待调查（可能是 BG mode 3/5 的全图模式，或由代码直接索引图块）。
+
+- [ ] **T4**：主菜单及其他杂项图形导出管线
+
+  依据：`doc/um06-romhacking-resource/main-menu.md` + `banlist-code-breaking.md`
+
+  #### 数据概况
+
+  | 资产 | 类型 | 图块偏移 | Tilemap | 调色板 |
+  |------|------|---------|---------|--------|
+  | 主菜单背景 | 4bpp | `0x1CF009C` | 未知 | 未知 |
+  | 主菜单图标 | **8bpp** | `0x1CF8B94` | 未知 | 未知 |
+  | 禁卡密码界面 | 4bpp | `0x1E22874` | `0x1E22874`（Tilemap start？） | `0x1E314B4` |
+
+  > **注意**：主菜单图标为 **8bpp**（256色），与大图的 4bpp 格式不同，
+  > 解码时每字节对应一个像素（不需要拆半字节），且使用完整的 256 色单一调色板。
+
+  #### 子任务
+
+  - [ ] **T4.1**：调查各资产尺寸与格式（尤其 8bpp 主菜单图标）
+  - [ ] **T4.2**：扩展/新建导出脚本，导出 PNG 预览和 `*.bin`
+  - [ ] **T4.3**：拆分对应 incbin，byte-identical 验证
 
 - [ ] **T5**：标题画面 LZ77 数据（特殊处理，暂缓）
   - 依据：`title-screen.md`，ROM 偏移 `0x1EC33DC`
