@@ -32,7 +32,7 @@ clean.bat    @ 清理编译产物
 │   ├── opponent-card-values.s  # 27 个对手卡值块（ROM 0x1E58D0E）
 │   ├── banlists.s              # 8 个版本禁卡表，487 条目（ROM 0x1E5EF30）
 │   ├── starter-deck.s          # 初始卡组，50 张（ROM 0x1E5F884）
-│   ├── struct-decks.s          # 6 套结构卡组 + 指针表（ROM 0x1E5FA58）
+│   ├── struct-decks.s          # 6 套预组 + 指针表（ROM 0x1E5FA58）
 │   └── opponent-decks.s        # 25 套对手卡组（ROM 0x1E6468E）
 ├── include/
 │   └── macros.inc        # 汇编宏：deck_entry、banlist_entry、deck_card
@@ -57,13 +57,13 @@ clean.bat    @ 清理编译产物
 | 对手卡值块 | `0x1E58D0E` | 864 B | 27 个对手的卡牌实力值 + 内部文件路径 |
 | 禁卡表（8版本）| `0x1E5EF30` | 1948 B | Sept03/Sept04/March05/Sept05 等 |
 | 初始卡组 | `0x1E5F884` | 102 B | 50 张牌 |
-| 结构卡组（6套）| `0x1E5FA58` | 812 B | Dragon's Roar、Zombie Madness 等 |
+| 预组（6套）| `0x1E5FA58` | 812 B | Dragon's Roar、Zombie Madness 等 |
 | 对手卡组（25套）| `0x1E6468E` | 5048 B | Kuriboh～Raviel 全部对手 |
 
 ### 数据格式示例
 
 ```asm
-@ 结构卡组（真红眼黑龙 ×1）
+@ 预组（真红眼黑龙 ×1）
 deck_entry 4088, 1    @ Red-Eyes B. Dragon (密码: 74677422)
 
 @ 禁卡表（限制 1 张）
@@ -81,6 +81,52 @@ deck_card 4088    @ Red-Eyes B. Dragon (密码: 74677422)
 - 指令集：ARM（32 位）与 THUMB（16 位）混合，游戏代码大部分为 THUMB
 - ROM 大小：`0x1FFFF00` 字节（33,554,176 B），构建时必须精确
 - `roms/2343.gba` 同时作为数据源和校验基准
+
+## 卡牌数据库（YGOCdb）
+
+`data/cards.json` 包含完整的游戏王卡牌中文数据，来自 [ygocdb.com](https://ygocdb.com)。  
+该文件体积较大（约 13 MB），不纳入版本控制，需手动下载。
+
+### 字段说明
+
+| 字段 | 含义 |
+|------|------|
+| `cid` | 官方数据库唯一标识符 |
+| `cn_name` | YGOPro 译名（中文） |
+| `sc_name` | 官方简体中文名称 |
+| `md_name` | Master Duel 中文名称 |
+| `nwbbs_n` | NWBBS 论坛译名 |
+| `cnocg_n` | CNOCG 论坛译名 |
+| `wiki_en` | Yugipedia 英文名（仅未正式发售的卡有此字段） |
+
+### 下载方法
+
+```powershell
+# 1. 获取最新 MD5 校验值
+$md5Url  = "https://ygocdb.com/api/v0/cards.zip.md5"
+$zipUrl  = "https://ygocdb.com/api/v0/cards.zip"
+$md5File = "data\cards.zip.md5"
+$jsonFile = "data\cards.json"
+
+# 2. 仅在远端有更新时重新下载
+$remote = (Invoke-WebRequest $md5Url).Content.Trim().Trim('"')
+$local  = if (Test-Path $md5File) { Get-Content $md5File } else { "" }
+
+if ($remote -ne $local) {
+    Invoke-WebRequest $zipUrl -OutFile "data\cards.zip"
+    Expand-Archive -Path "data\cards.zip" -DestinationPath "data\" -Force
+    Remove-Item "data\cards.zip"
+    Set-Content $md5File $remote -Encoding UTF8 -NoNewline
+    Write-Host "cards.json 已更新"
+} else {
+    Write-Host "cards.json 已是最新"
+}
+```
+
+> MD5 端点：`https://ygocdb.com/api/v0/cards.zip.md5`  
+> 建议在自动化脚本中先比对 MD5，仅有变化时才重新下载完整压缩包。
+
+---
 
 ## 参考文档
 

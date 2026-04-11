@@ -19,8 +19,15 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1E58D0D（对手卡值前）
-	.incbin "roms/2343.gba", 0x1000000, 0xE58D0E
+@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1DBF019（卡组名字符串表前）
+	.incbin "roms/2343.gba", 0x1000000, 0xDBF01A
+
+@ 卡组名字符串表（ROM偏移 0x1DBF01A - 0x1DFC851）
+@ 含 6 种语言（XX/EN/DE/FR/IT/ES）的预组/初始卡组名和对手卡组名，共 251960 字节
+	.include "data/deck-strings.s"
+
+@ 后 16MB 中间段：ROM偏移 0x1DFC852 - 0x1E58D0D（卡组名字符串表后，对手卡值前）
+	.incbin "roms/2343.gba", 0x1DFC852, 0x5C4BC
 
 @ 对手卡值块数据（ROM偏移 0x1E58D0E - 0x1E5906D）
 @ 27 个对手条目，每条 32 字节，共 0x360 字节
@@ -40,14 +47,14 @@ Start:
 @ 50 张牌 + 终止符，共 0x66 字节
 	.include "data/starter-deck.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1E5F8EA - 0x1E5FA57（初始卡组后，结构卡组前）
+@ 后 16MB 中间段：ROM偏移 0x1E5F8EA - 0x1E5FA57（初始卡组后，预组前）
 	.incbin "roms/2343.gba", 0x1E5F8EA, 0x16E
 
-@ 结构卡组数据（ROM偏移 0x1E5FA58 - 0x1E5FD83）
-@ 包含 6 个结构卡组及其指针表，共 0x32C 字节
+@ 预组数据（ROM偏移 0x1E5FA58 - 0x1E5FD83）
+@ 包含 6 个预组及其指针表，共 0x32C 字节
 	.include "data/struct-decks.s"
 
-@ 后 16MB 剩余部分：ROM偏移 0x1E5FD84 - 0x1E6468D（结构卡组后，对手卡组前）
+@ 后 16MB 剩余部分：ROM偏移 0x1E5FD84 - 0x1E6468D（预组后，对手卡组前）
 	.incbin "roms/2343.gba", 0x1E5FD84, 0x490A
 
 @ 对手卡组数据（ROM偏移 0x1E6468E - 0x1E65A45）

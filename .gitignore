@@ -13,3 +13,7 @@
 ghidra
 
 output/
+
+# YGOCdb 卡牌数据库（体积大，按需下载）
+data/cards.json
+data/cards.zip.md5
