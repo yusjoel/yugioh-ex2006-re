@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-从 roms/2343.gba 导出对手图形资产
+从 roms/2343.gba 导出图形资产
 
+== 对手图形 ==
 数据来源：doc/um06-romhacking-resource/opponents-coinflip-screen.md
 格式：标准 GBA 4bpp 平铺背景，无压缩
 
@@ -14,6 +15,22 @@ PNG 输出（供美术查看/编辑）：
   graphics/opponents/palette_copy1.bin    调色板块（Copy 1，7776 字节）
   graphics/opponents/<名称>_top_tilemap.bin    Top Tilemap（0x4B0 字节）
   graphics/opponents/<名称>_bottom_tilemap.bin Bottom Tilemap（0x4B0 字节）
+
+== 决斗场地图形 ==
+数据来源：doc/um06-romhacking-resource/duel-field.md
+格式：标准 GBA 4bpp 平铺背景，无压缩
+
+PNG 输出（供查看/编辑）：
+  graphics/duel-field/<模式>_outer.png    外场背景（240×160，RGBA）
+  graphics/duel-field/<模式>_inner.png    内场背景（240×160，RGBA）
+
+二进制输出（供 asm/rom.s 通过 .incbin 引用）：
+  graphics/duel-field/<模式>_outer_image.bin    外场图块数据（可变大小）
+  graphics/duel-field/<模式>_outer_tilemap.bin  外场 Tilemap（0x4B0 字节）
+  graphics/duel-field/<模式>_outer_lp_tilemap.bin LP/阶段 Tilemap（0x4B0 字节）
+  graphics/duel-field/<模式>_outer_palette.bin  外场调色板（0x40 字节，2个子调色板）
+  graphics/duel-field/<模式>_inner_image.bin    内场图块数据（0x1680 字节，180 图块）
+  graphics/duel-field/<模式>_inner_palette.bin  内场调色板（0x20 字节，1个子调色板）
 """
 
 import os
@@ -245,6 +262,202 @@ def export_bin_files(rom, opp_dir):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# 决斗场地数据表
+# 数据来源：doc/um06-romhacking-resource/duel-field.md
+# ──────────────────────────────────────────────────────────────────────────────
+
+DUEL_MODES = ['campaign', 'link', 'puzzle', 'limited', 'theme', 'survival']
+
+# 外场图块数据（每个模式独立大小）
+# 字段：(模式名, ROM偏移, 字节大小)
+# 大小从指针表推算（相邻指针差）：指针表位于 0x1855030，7条目（6+终止）
+DUEL_OUTER_IMAGES = [
+    ('campaign', 0x185504C, 0x9E0),
+    ('link',     0x1855A2C, 0x5E0),
+    ('puzzle',   0x185600C, 0x7E0),
+    ('limited',  0x18567EC, 0xDE0),
+    ('theme',    0x18575CC, 0x9E0),
+    ('survival', 0x1857FAC, 0x7E0),
+]
+
+# 外场 Tilemap：6 × 0x4B0 字节（30×20 图块，240×160 像素）
+# 指针表位于 0x185B634（7条目），数据从 0x185B650 开始
+DUEL_OUTER_TILEMAP_BASE = 0x185B650
+
+# LP/阶段 Tilemap（同一模式的外场图块与外场 tilemap 共用）
+# 指针表位于 0x1859548（7条目），数据从 0x1859564 开始
+DUEL_LP_TILEMAP_BASE = 0x1859564
+
+# 外场调色板：6 × 0x40 字节（2个子调色板，对应 BG 调色板槽位 9–10）
+# 指针表位于 0x185936C（7条目），数据从 0x1859388 开始
+DUEL_OUTER_PAL_BASE  = 0x1859388
+DUEL_OUTER_PAL_SIZE  = 0x40    # 2 × 16色子调色板
+
+# 内场图块数据：6 × 0x1680 字节（180 图块，30×6 排列）
+# 使用下方公共 tilemap（0x185D270）渲染
+DUEL_INNER_IMAGE_BASE = 0x185D720
+DUEL_INNER_IMAGE_SIZE = 0x1680  # 180 图块 × 32 字节
+
+# 内场公共 Tilemap（所有模式共享同一个 tilemap，位于内场图块块前 0x4B0 字节处）
+DUEL_INNER_TILEMAP_OFF = 0x185D270
+
+# 内场调色板：6 × 0x20 字节（1个子调色板，对应 BG 调色板槽位 9）
+DUEL_INNER_PAL_BASE  = 0x18674A0
+DUEL_INNER_PAL_SIZE  = 0x20    # 1 × 16色子调色板
+
+# 公共大小常量
+DUEL_TILEMAP_SIZE = 0x4B0      # 30×20 × 2字节 = 1200 字节
+
+
+def export_duel_field_bins(rom, df_dir):
+    """
+    导出决斗场地数据的二进制文件（供 asm/rom.s 通过 .incbin 引用）。
+
+    外场：
+      <模式>_outer_image.bin      外场图块数据（可变大小）
+      <模式>_outer_tilemap.bin    外场 Tilemap（0x4B0 字节）
+      <模式>_outer_lp_tilemap.bin LP/阶段 Tilemap（0x4B0 字节，与外场图块共用）
+      <模式>_outer_palette.bin    外场调色板（0x40 字节，2个子调色板）
+
+    内场：
+      <模式>_inner_image.bin      内场图块数据（0x1680 字节，180 图块）
+      <模式>_inner_palette.bin    内场调色板（0x20 字节，1个子调色板）
+    """
+    for i, (slug, img_off, img_size) in enumerate(DUEL_OUTER_IMAGES):
+        # 外场图块
+        with open(os.path.join(df_dir, f'{slug}_outer_image.bin'), 'wb') as f:
+            f.write(rom[img_off : img_off + img_size])
+
+        # 外场 Tilemap
+        tm_off = DUEL_OUTER_TILEMAP_BASE + i * DUEL_TILEMAP_SIZE
+        with open(os.path.join(df_dir, f'{slug}_outer_tilemap.bin'), 'wb') as f:
+            f.write(rom[tm_off : tm_off + DUEL_TILEMAP_SIZE])
+
+        # LP/阶段 Tilemap
+        lp_off = DUEL_LP_TILEMAP_BASE + i * DUEL_TILEMAP_SIZE
+        with open(os.path.join(df_dir, f'{slug}_outer_lp_tilemap.bin'), 'wb') as f:
+            f.write(rom[lp_off : lp_off + DUEL_TILEMAP_SIZE])
+
+        # 外场调色板
+        pal_off = DUEL_OUTER_PAL_BASE + i * DUEL_OUTER_PAL_SIZE
+        with open(os.path.join(df_dir, f'{slug}_outer_palette.bin'), 'wb') as f:
+            f.write(rom[pal_off : pal_off + DUEL_OUTER_PAL_SIZE])
+
+        # 内场图块
+        inner_img_off = DUEL_INNER_IMAGE_BASE + i * DUEL_INNER_IMAGE_SIZE
+        with open(os.path.join(df_dir, f'{slug}_inner_image.bin'), 'wb') as f:
+            f.write(rom[inner_img_off : inner_img_off + DUEL_INNER_IMAGE_SIZE])
+
+        # 内场调色板
+        inner_pal_off = DUEL_INNER_PAL_BASE + i * DUEL_INNER_PAL_SIZE
+        with open(os.path.join(df_dir, f'{slug}_inner_palette.bin'), 'wb') as f:
+            f.write(rom[inner_pal_off : inner_pal_off + DUEL_INNER_PAL_SIZE])
+
+    print(f'  → {len(DUEL_MODES)} 个模式 × 6种bin文件，共 {len(DUEL_MODES)*6} 个文件')
+
+
+def render_duel_outer(rom, mode_idx):
+    """
+    渲染外场背景，返回 RGBA PIL Image（240×160）。
+
+    外场调色板只有 2 个子调色板（0x40 字节），游戏将其加载到 BG 调色板槽位 9–10。
+    渲染时在 16 个子调色板槽中将块的两个子调色板放置于槽位 9 和 10。
+    """
+    _, img_off, img_size = DUEL_OUTER_IMAGES[mode_idx]
+    tm_off  = DUEL_OUTER_TILEMAP_BASE + mode_idx * DUEL_TILEMAP_SIZE
+    pal_off = DUEL_OUTER_PAL_BASE     + mode_idx * DUEL_OUTER_PAL_SIZE
+
+    n_tiles = img_size // 32
+
+    # 构建 16 个子调色板数组；槽 9 = 块子调色板 0，槽 10 = 块子调色板 1
+    palettes = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
+    for slot_offset, src_subpal_idx in [(9, 0), (10, 1)]:
+        src_off = pal_off + src_subpal_idx * 0x20
+        for c in range(16):
+            raw = struct.unpack_from('<H', rom, src_off + c * 2)[0]
+            r = (raw & 0x1F) << 3
+            g = ((raw >> 5) & 0x1F) << 3
+            b = ((raw >> 10) & 0x1F) << 3
+            a = 0 if c == 0 else 255
+            palettes[slot_offset][c] = (r, g, b, a)
+
+    # 预解码图块
+    tiles = [decode_tile(rom, img_off + t * 32) for t in range(n_tiles)]
+
+    img = Image.new('RGBA', (240, 160), (0, 0, 0, 0))
+    pixels = img.load()
+
+    for row in range(20):
+        for col in range(30):
+            entry   = struct.unpack_from('<H', rom, tm_off + (row * 30 + col) * 2)[0]
+            tile_idx = entry & 0x3FF
+            hflip    = bool(entry & 0x400)
+            vflip    = bool(entry & 0x800)
+            subpal   = (entry >> 12) & 0xF
+
+            if tile_idx >= n_tiles:
+                continue
+            tile_data = tiles[tile_idx]
+            for ty in range(8):
+                src_ty = 7 - ty if vflip else ty
+                for tx in range(8):
+                    src_tx = 7 - tx if hflip else tx
+                    color_idx = tile_data[src_ty * 8 + src_tx]
+                    pixels[col * 8 + tx, row * 8 + ty] = palettes[subpal][color_idx]
+
+    return img
+
+
+def render_duel_inner(rom, mode_idx):
+    """
+    渲染内场背景，返回 RGBA PIL Image（240×160）。
+
+    内场使用所有模式共享的 tilemap（0x185D270）和模式专属的图块数据、调色板。
+    内场调色板只有 1 个子调色板，游戏将其加载到 BG 调色板槽位 9。
+    """
+    inner_img_off = DUEL_INNER_IMAGE_BASE + mode_idx * DUEL_INNER_IMAGE_SIZE
+    inner_pal_off = DUEL_INNER_PAL_BASE   + mode_idx * DUEL_INNER_PAL_SIZE
+    n_tiles = DUEL_INNER_IMAGE_SIZE // 32  # = 180
+
+    # 构建 16 个子调色板数组；槽 9 = 内场调色板
+    palettes = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
+    src_off = inner_pal_off
+    for c in range(16):
+        raw = struct.unpack_from('<H', rom, src_off + c * 2)[0]
+        r = (raw & 0x1F) << 3
+        g = ((raw >> 5) & 0x1F) << 3
+        b = ((raw >> 10) & 0x1F) << 3
+        a = 0 if c == 0 else 255
+        palettes[9][c] = (r, g, b, a)
+
+    # 预解码图块
+    tiles = [decode_tile(rom, inner_img_off + t * 32) for t in range(n_tiles)]
+
+    img = Image.new('RGBA', (240, 160), (0, 0, 0, 0))
+    pixels = img.load()
+
+    for row in range(20):
+        for col in range(30):
+            entry    = struct.unpack_from('<H', rom, DUEL_INNER_TILEMAP_OFF + (row * 30 + col) * 2)[0]
+            tile_idx = entry & 0x3FF
+            hflip    = bool(entry & 0x400)
+            vflip    = bool(entry & 0x800)
+            subpal   = (entry >> 12) & 0xF
+
+            if tile_idx >= n_tiles:
+                continue
+            tile_data = tiles[tile_idx]
+            for ty in range(8):
+                src_ty = 7 - ty if vflip else ty
+                for tx in range(8):
+                    src_tx = 7 - tx if hflip else tx
+                    color_idx = tile_data[src_ty * 8 + src_tx]
+                    pixels[col * 8 + tx, row * 8 + ty] = palettes[subpal][color_idx]
+
+    return img
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # 主流程
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -253,14 +466,16 @@ def main():
 
     opp_dir  = os.path.join(GFX_DIR, 'opponents')
     icon_dir = os.path.join(GFX_DIR, 'icons')
+    df_dir   = os.path.join(GFX_DIR, 'duel-field')
     os.makedirs(opp_dir,  exist_ok=True)
     os.makedirs(icon_dir, exist_ok=True)
+    os.makedirs(df_dir,   exist_ok=True)
 
-    # 导出二进制文件（供 asm incbin）
-    print('导出二进制文件...')
+    # 导出对手二进制文件（供 asm incbin）
+    print('导出对手二进制文件...')
     export_bin_files(rom, opp_dir)
 
-    # 导出大图 PNG
+    # 导出对手大图 PNG
     print('导出对手大图 PNG...')
     for entry in LARGE_GFX:
         slug, top_tiles, top_tm, palette, bot_tiles, bot_tm = entry
@@ -279,6 +494,21 @@ def main():
         icon_img = render_icon(rom, tiles_off, pal_off)
         icon_img.save(os.path.join(icon_dir, f'{slug}_icon.png'))
         print(f'  {slug}')
+
+    # 导出决斗场地二进制文件（供 asm incbin）
+    print('导出决斗场地二进制文件...')
+    export_duel_field_bins(rom, df_dir)
+
+    # 导出决斗场地 PNG 预览
+    print('导出决斗场地 PNG 预览...')
+    for i, mode in enumerate(DUEL_MODES):
+        outer_img = render_duel_outer(rom, i)
+        outer_img.save(os.path.join(df_dir, f'{mode}_outer.png'))
+
+        inner_img = render_duel_inner(rom, i)
+        inner_img.save(os.path.join(df_dir, f'{mode}_inner.png'))
+
+        print(f'  {mode}')
 
     print(f'\n完成。图片保存在 {GFX_DIR}/')
 

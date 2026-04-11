@@ -19,8 +19,93 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1B101AB（图形数据前）
-	.incbin "roms/2343.gba", 0x1000000, 0xB101AC
+@ 后 16MB 第一段前半：ROM偏移 0x1000000 - 0x185504B
+@ 含外场图块指针表（0x1855030，7条目28字节），紧接着就是外场图块数据
+	.incbin "roms/2343.gba", 0x1000000, 0x85504C
+
+@ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
+@ 指针表在 0x1855030（7条目，末条目为终止指针指向 0x185878C），数据从 0x185504C 开始
+@ Campaign（战役）外场图块，ROM 0x185504C，0x9E0 字节（80 图块）
+	.incbin "graphics/duel-field/campaign_outer_image.bin"
+@ Link Duel（联机）外场图块，ROM 0x1855A2C，0x5E0 字节（47 图块）
+	.incbin "graphics/duel-field/link_outer_image.bin"
+@ Duel Puzzle（谜题）外场图块，ROM 0x185600C，0x7E0 字节（63 图块）
+	.incbin "graphics/duel-field/puzzle_outer_image.bin"
+@ Limited Duel（限定）外场图块，ROM 0x18567EC，0xDE0 字节（111 图块）
+	.incbin "graphics/duel-field/limited_outer_image.bin"
+@ Theme Duel（主题）外场图块，ROM 0x18575CC，0x9E0 字节（80 图块）
+	.incbin "graphics/duel-field/theme_outer_image.bin"
+@ Survival Mode（生存）外场图块，ROM 0x1857FAC，0x7E0 字节（63 图块）
+	.incbin "graphics/duel-field/survival_outer_image.bin"
+
+@ 未知图块数据 + 外场调色板指针表（7条目28字节，位于 0x185936C）
+@ ROM 0x185878C - 0x185938B，0xBFC 字节
+	.incbin "roms/2343.gba", 0x185878C, 0xBFC
+
+@ ── 外场调色板（6种模式，每个 0x40 字节 = 2个子调色板）────────────────
+@ 指针表在 0x185936C（7条目），数据从 0x1859388 开始
+@ 调色板槽位 9–10 加载进 BG 调色板 RAM；Tilemap 条目主要引用槽位 9
+	.incbin "graphics/duel-field/campaign_outer_palette.bin"
+	.incbin "graphics/duel-field/link_outer_palette.bin"
+	.incbin "graphics/duel-field/puzzle_outer_palette.bin"
+	.incbin "graphics/duel-field/limited_outer_palette.bin"
+	.incbin "graphics/duel-field/theme_outer_palette.bin"
+	.incbin "graphics/duel-field/survival_outer_palette.bin"
+
+@ 未知数据 + LP/阶段 Tilemap 指针表（7条目28字节，位于 0x1859548）
+@ ROM 0x1859508 - 0x1859563，0x5C 字节
+	.incbin "roms/2343.gba", 0x1859508, 0x5C
+
+@ ── LP/阶段显示区 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────
+@ 指针表在 0x1859548（7条目），数据从 0x1859564 开始
+@ 与外场 Tilemap 共用同一套外场图块数据和调色板
+	.incbin "graphics/duel-field/campaign_outer_lp_tilemap.bin"
+	.incbin "graphics/duel-field/link_outer_lp_tilemap.bin"
+	.incbin "graphics/duel-field/puzzle_outer_lp_tilemap.bin"
+	.incbin "graphics/duel-field/limited_outer_lp_tilemap.bin"
+	.incbin "graphics/duel-field/theme_outer_lp_tilemap.bin"
+	.incbin "graphics/duel-field/survival_outer_lp_tilemap.bin"
+
+@ "Phases Map?" 图块 + 外场 Tilemap 指针表（7条目28字节，位于 0x185B634）
+@ ROM 0x185B184 - 0x185B64F，0x4CC 字节
+	.incbin "roms/2343.gba", 0x185B184, 0x4CC
+
+@ ── 外场 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────────────
+@ 指针表在 0x185B634（7条目），数据从 0x185B650 开始
+	.incbin "graphics/duel-field/campaign_outer_tilemap.bin"
+	.incbin "graphics/duel-field/link_outer_tilemap.bin"
+	.incbin "graphics/duel-field/puzzle_outer_tilemap.bin"
+	.incbin "graphics/duel-field/limited_outer_tilemap.bin"
+	.incbin "graphics/duel-field/theme_outer_tilemap.bin"
+	.incbin "graphics/duel-field/survival_outer_tilemap.bin"
+
+@ 内场公共 Tilemap（所有模式共享，0x4B0 字节 = 30×20 图块）
+@ ROM 0x185D270 - 0x185D71F
+	.incbin "roms/2343.gba", 0x185D270, 0x4B0
+
+@ ── 内场图块数据（6种模式，每个 0x1680 字节 = 180 图块）────────────────
+@ 数据从 0x185D720 开始（紧接内场公共 Tilemap 后），6 × 0x1680 = 0x8D00 字节
+	.incbin "graphics/duel-field/campaign_inner_image.bin"
+	.incbin "graphics/duel-field/link_inner_image.bin"
+	.incbin "graphics/duel-field/puzzle_inner_image.bin"
+	.incbin "graphics/duel-field/limited_inner_image.bin"
+	.incbin "graphics/duel-field/theme_inner_image.bin"
+	.incbin "graphics/duel-field/survival_inner_image.bin"
+
+@ 未知第7内场图块数据，ROM 0x1865E20 - 0x186749F，0x1680 字节
+	.incbin "roms/2343.gba", 0x1865E20, 0x1680
+
+@ ── 内场调色板（6种模式，每个 0x20 字节 = 1个子调色板）────────────────
+@ 数据从 0x18674A0 开始，调色板加载到 BG 调色板槽位 9
+	.incbin "graphics/duel-field/campaign_inner_palette.bin"
+	.incbin "graphics/duel-field/link_inner_palette.bin"
+	.incbin "graphics/duel-field/puzzle_inner_palette.bin"
+	.incbin "graphics/duel-field/limited_inner_palette.bin"
+	.incbin "graphics/duel-field/theme_inner_palette.bin"
+	.incbin "graphics/duel-field/survival_inner_palette.bin"
+
+@ 后 16MB 第一段剩余：ROM 0x1867560 - 0x1B101AB
+	.incbin "roms/2343.gba", 0x1867560, 0x2A8C4C
 
 @ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
 @ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
@@ -95,7 +180,7 @@ Start:
 	.incbin "graphics/opponents/copycat_bottom_tilemap.bin"
 
 @ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019
-	.incbin "roms/2343.gba", 0x1B8FB8C, 0x2C438E
+	.incbin "roms/2343.gba", 0x1B8FB8C, 0x22F48E
 
 @ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
 @ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
@@ -140,5 +225,5 @@ Start:
 @ 25 个对手卡组，各含 40 张牌，共 0x13B8 字节
 	.include "data/opponent-decks.s"
 
-@ 尾段：ROM偏移 0x1E65A46 - 0x1FFFF00
-	.incbin "roms/2343.gba", 0x1E65A46, 0x19A4BA
+@ 尾段：ROM偏移 0x1E65A46 - 0x2000000
+	.incbin "roms/2343.gba", 0x1E65A46, 0x19A5BA
