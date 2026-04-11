@@ -2,7 +2,7 @@
 
 > **原始标题**: UM06 Deck Modification Tool 1.0
 > **原始网址**: https://docs.google.com/spreadsheets/d/1dXa8EyyL2ozM04TpZb_yAsYO7A98CfKIZacchXT2US8/edit
-> **原始作者**: 不详（Google Sheets 公开文档）
+> **原始作者**: Scrub Busted（YouTube: [@scrubbusted](https://www.youtube.com/@scrubbusted)）
 
 ---
 
