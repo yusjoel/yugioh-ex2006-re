@@ -1,122 +1,22 @@
-# UM06 Deck Modification Tool 1.0
+# Data
 
-> **原始标题**: UM06 Deck Modification Tool 1.0  
-> **原始网址**: https://docs.google.com/spreadsheets/d/1dXa8EyyL2ozM04TpZb_yAsYO7A98CfKIZacchXT2US8/edit?gid=667998836#gid=667998836  
-> **原始作者**: 不详（Google Sheets 公开文档，未标注作者）  
-
----
-
-## Sheet 1: Home（默认卡组位置）
-
-### Default Decks（预置卡组）
-
-| 卡组名 | 卡组地址 | 指针地址 | 槽位数 |
-|--------|----------|----------|--------|
-| Dragons Roar | 01E5FA58 | 01E5FD54 | 28 |
-| Zombie Madness | 01E5FAC8 | 01E5FD5C | 28 |
-| Molten Destruction | 01E5FB38 | 01E5FD64 | 31 |
-| Fury from the Deep | 01E5FBB4 | 01E5FD6C | 32 |
-| Warrior's Triumph | 01E5FC34 | 01E5FD74 | 36 |
-| Spellcaster's Judgement | 01E5FCC4 | 01E5FD7C | 36 |
-
-### True Starter Deck（初始卡组）
-
-> 备注：导出 .ydk 文件，用记事本打开后将内容粘贴到 Google Sheet 中。
-
-| 卡组名 | 卡组地址 | 指针地址 |
-|--------|----------|----------|
-| Starter Deck | 01E5F884 | 000F4558 |
-
-### Opponents（对手卡组）
-
-| 对手名 | 卡组地址 | 备注 |
-|--------|----------|------|
-| Kuriboh | 1E6468E |  |
-| Scapegoat | 1E6480E |  |
-| Skull Servant | 1E648CE |  |
-| Watapon | 1E6498E |  |
-| Pikeru | 1E6474E |  |
-| Batteryman C | 1E64A4E |  |
-| Ojama Yellow | 1E64D4E |  |
-| Goblin King | 1E64BCE |  |
-| Des Frog | 1E64B0E | Fusion Deck: 1 |
-| Water Dragon | 1E64E0E |  |
-| Red Eyes Darkness D | 1E64ECE |  |
-| Vampire Genesis | 1E651CE |  |
-| Infernal Flame Emperor | 1E6504E |  |
-| Ocean Dragon Lord Neo D | 1E64F8E |  |
-| Helios Duos Megiste | 1E6510E |  |
-| Gilford | 1E654EE |  |
-| Dark Eradicator Warlock | 1E655AE |  |
-| Guardian Exode | 1E6542E |  |
-| Goldd, Wu-Lord of the D | 1E6536E |  |
-| Elemental Hero Electrum | 1E6528E | Fusion Deck: 9 |
-| Raviel, Lord of Phantasms | 1E65986 |  |
-| Horus the Black Flame D | 1E65806 |  |
-| Stronghold | 1E65746 |  |
-| Sacred Phoenix of N | 1E658C6 |  |
-| Cyber End Dragon | 1E6566E | Fusion Deck: 7 |
+> 所属文档: [UM06 Deck Modification Tool 1.0](https://docs.google.com/spreadsheets/d/1dXa8EyyL2ozM04TpZb_yAsYO7A98CfKIZacchXT2US8/edit)
+> Sheet 编号: 4
+> 原始作者: 不详（公开文档）
 
 ---
 
-## Sheet 2: Starter & Opponent Paste Tool（卡组编辑工具）
-
-此 Sheet 是交互工具：在 A 列粘贴卡牌密码（Password），B、C 列自动查找卡名和所属对手/初始卡组的 Hex 编码。
-右侧（F-H 列）提供卡名搜索和卡组位置参考表（与 Home sheet 相同）。
-
-**列说明：**
-
-| 列 | 说明 |
-|----|------|
-| A (Paste Below) | 粘贴卡牌密码 (Password) |
-| B (Name) | 自动查找的卡名 |
-| C (Opponent & Starter Deck) | 该卡在对手/初始卡组中的 Hex 编码 |
-| F (Card Name Lookup) | 输入卡名可反查 |
-| G (Password) | 反查结果的密码 |
-
----
-
-## Sheet 3: Structure Deck Paste Tool（结构卡组编辑工具）
-
-此 Sheet 是交互工具：在 B 列粘贴卡牌密码，C 列输入数量，D、E 列自动查找卡名和结构卡组的 Hex 编码，F 列生成补零格式。
-
-**列说明：**
-
-| 列 | 说明 |
-|----|------|
-| A (行号) | 序号（最多 191 张，对应最大槽位总数）|
-| B (Paste Below) | 粘贴卡牌密码 |
-| C (Quantity) | 数量 |
-| D (Name) | 自动查找的卡名 |
-| E (Structure Decks) | 该卡在结构卡组中的 Hex 编码 |
-| F (0 Padder) | 补零后的 4 位 Hex（用于写入 ROM）|
-
-### 结构卡组指针表（Pointers）
-
-| 卡组名 | 槽位数 | 反转格式 (Reverse Format) | 槽位大小 (Hex) | 补零 |
-|--------|--------|---------------------------|----------------|------|
-| Dragon's Roar | 28 | 58FAE509 | 1C | 000000 |
-| Zombie Madness | 28 | C8FAE509 | 1C | 000000 |
-| Molten Destruction | 31 | 38FBE509 | 1F | 000000 |
-| Fury from the Deep | 32 | B4FBE509 | 20 | 000000 |
-| Warrior's Triumph | 36 | 34FCE509 | 24 | 000000 |
-| Spellcaster's Judgement | 36 | C4FCE509 | 24 | 000000 |
-
----
-
-## Sheet 4: Data（卡牌数据库）
-
-完整卡牌列表，包含每张卡的密码、卡名及其在结构卡组/对手卡组中的 Hex 编码。
-
-**列说明：**
+## 列说明
 
 | 列 | 说明 |
 |----|------|
 | Password | 卡牌密码（8位数字）|
 | Card Name | 卡名 |
-| Structure Decks | 该卡在结构卡组槽中的 Hex 编码（写入 ROM 用）|
-| Starter/Opponent | 该卡在初始/对手卡组槽中的 Hex 编码 |
-| Reverse Format | Starter/Opponent 的字节反转格式 |
+| Structure Decks | 结构卡组槽 Hex 编码（写入 ROM 用）|
+| Starter/Opponent | 初始/对手卡组槽 Hex 编码 |
+| Reverse Format | 字节反转格式 |
+
+## 卡牌数据库
 
 | Password | Card Name | Structure Decks | Starter/Opponent | Reverse Format |
 |----------|-----------|-----------------|------------------|----------------|
