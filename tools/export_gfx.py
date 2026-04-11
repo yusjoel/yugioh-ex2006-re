@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-从 roms/2343.gba 导出对手图形为 PNG 文件
+从 roms/2343.gba 导出对手图形资产
 
 数据来源：doc/um06-romhacking-resource/opponents-coinflip-screen.md
 格式：标准 GBA 4bpp 平铺背景，无压缩
 
-输出：
+PNG 输出（供美术查看/编辑）：
   graphics/opponents/<名称>_top.png     大图上半部分（240×160，RGBA）
   graphics/opponents/<名称>_bottom.png  大图下半部分（240×160，RGBA）
   graphics/icons/<名称>_icon.png        小图标（24×24，RGBA）
+
+二进制输出（供 asm/rom.s 通过 .incbin 引用，替代 ROM incbin）：
+  graphics/opponents/palette_copy1.bin    调色板块（Copy 1，7776 字节）
+  graphics/opponents/<名称>_top_tilemap.bin    Top Tilemap（0x4B0 字节）
+  graphics/opponents/<名称>_bottom_tilemap.bin Bottom Tilemap（0x4B0 字节）
 """
 
 import os
@@ -17,6 +22,20 @@ from PIL import Image
 
 ROM_PATH = 'roms/2343.gba'
 GFX_DIR  = 'graphics'
+
+# ──────────────────────────────────────────────────────────────────────────────
+# 调色板区块地址（ROM 文件偏移）
+# ──────────────────────────────────────────────────────────────────────────────
+# 调色板区（Copy 1）：27 × 288 B = 7776 B
+PALETTE_COPY1_OFF  = 0x1B101AC
+PALETTE_COPY1_SIZE = 7776   # 0x1E60
+
+# Top Tilemap 区：27 × 0x4B0 B = 32400 B
+TOP_TILEMAP_BASE   = 0x1B4800C
+# Bottom Tilemap 区：27 × 0x4B0 B = 32400 B
+BOT_TILEMAP_BASE   = 0x1B87CFC
+
+TILEMAP_SIZE       = 0x4B0  # 每个对手的 tilemap 字节数
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 对手大图数据表
@@ -195,6 +214,36 @@ def render_icon(rom, tiles_off, palette_off, cols=3, rows=3):
     return img
 
 
+def export_bin_files(rom, opp_dir):
+    """
+    导出供 asm/rom.s 使用的二进制文件：
+    - palette_copy1.bin：调色板块（7776 字节，Copy 1 和 Copy 2 内容相同，引用同一文件）
+    - <name>_top_tilemap.bin：每个对手的 Top Tilemap（0x4B0 字节）
+    - <name>_bottom_tilemap.bin：每个对手的 Bottom Tilemap（0x4B0 字节）
+    """
+    # 导出调色板块（Copy 1）
+    pal_bin = os.path.join(opp_dir, 'palette_copy1.bin')
+    with open(pal_bin, 'wb') as f:
+        f.write(rom[PALETTE_COPY1_OFF : PALETTE_COPY1_OFF + PALETTE_COPY1_SIZE])
+    print(f'  → {pal_bin}  ({PALETTE_COPY1_SIZE} 字节)')
+
+    # 导出每个对手的 tilemap（按 LARGE_GFX 顺序，与 ROM 排列顺序一致）
+    for i, entry in enumerate(LARGE_GFX):
+        slug = entry[0]
+        top_tm_off = TOP_TILEMAP_BASE + i * TILEMAP_SIZE
+        bot_tm_off = BOT_TILEMAP_BASE + i * TILEMAP_SIZE
+
+        top_bin = os.path.join(opp_dir, f'{slug}_top_tilemap.bin')
+        bot_bin = os.path.join(opp_dir, f'{slug}_bottom_tilemap.bin')
+
+        with open(top_bin, 'wb') as f:
+            f.write(rom[top_tm_off : top_tm_off + TILEMAP_SIZE])
+        with open(bot_bin, 'wb') as f:
+            f.write(rom[bot_tm_off : bot_tm_off + TILEMAP_SIZE])
+
+    print(f'  → {len(LARGE_GFX)} 个对手 × 2 tilemap（每个 {TILEMAP_SIZE} 字节）')
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # 主流程
 # ──────────────────────────────────────────────────────────────────────────────
@@ -207,27 +256,28 @@ def main():
     os.makedirs(opp_dir,  exist_ok=True)
     os.makedirs(icon_dir, exist_ok=True)
 
-    # 导出大图
-    print('导出对手大图...')
+    # 导出二进制文件（供 asm incbin）
+    print('导出二进制文件...')
+    export_bin_files(rom, opp_dir)
+
+    # 导出大图 PNG
+    print('导出对手大图 PNG...')
     for entry in LARGE_GFX:
         slug, top_tiles, top_tm, palette, bot_tiles, bot_tm = entry
 
         top_img = render_tilemap_image(rom, top_tiles, top_tm, palette)
-        top_path = os.path.join(opp_dir, f'{slug}_top.png')
-        top_img.save(top_path)
+        top_img.save(os.path.join(opp_dir, f'{slug}_top.png'))
 
         bot_img = render_tilemap_image(rom, bot_tiles, bot_tm, palette)
-        bot_path = os.path.join(opp_dir, f'{slug}_bottom.png')
-        bot_img.save(bot_path)
+        bot_img.save(os.path.join(opp_dir, f'{slug}_bottom.png'))
 
         print(f'  {slug}')
 
-    # 导出小图标
-    print('导出小图标...')
+    # 导出小图标 PNG
+    print('导出小图标 PNG...')
     for slug, tiles_off, pal_off in ICONS:
         icon_img = render_icon(rom, tiles_off, pal_off)
-        icon_path = os.path.join(icon_dir, f'{slug}_icon.png')
-        icon_img.save(icon_path)
+        icon_img.save(os.path.join(icon_dir, f'{slug}_icon.png'))
         print(f'  {slug}')
 
     print(f'\n完成。图片保存在 {GFX_DIR}/')

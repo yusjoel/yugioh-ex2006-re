@@ -19,8 +19,83 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1DBF019
-	.incbin "roms/2343.gba", 0x1000000, 0xDBF01A
+@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1B101AB（图形数据前）
+	.incbin "roms/2343.gba", 0x1000000, 0xB101AC
+
+@ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
+@ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
+	.incbin "graphics/opponents/palette_copy1.bin"
+
+@ Top 图块，ROM 0x1B1200C–0x1B4800B，221184 字节（27 × 0x2000，保留 ROM incbin）
+@ 注意：第 20 个对手 Elemental Hero Electrum 图块偏移不规则（0x1B3899C），整段统一保留
+	.incbin "roms/2343.gba", 0x1B1200C, 0x36000
+
+@ Top Tilemap（27 个对手），ROM 0x1B4800C–0x1B4FE9B，每个 0x4B0 字节
+	.incbin "graphics/opponents/kuriboh_top_tilemap.bin"
+	.incbin "graphics/opponents/scapegoat_top_tilemap.bin"
+	.incbin "graphics/opponents/skull_servant_top_tilemap.bin"
+	.incbin "graphics/opponents/watapon_top_tilemap.bin"
+	.incbin "graphics/opponents/pikeru_top_tilemap.bin"
+	.incbin "graphics/opponents/batteryman_c_top_tilemap.bin"
+	.incbin "graphics/opponents/ojama_yellow_top_tilemap.bin"
+	.incbin "graphics/opponents/goblin_king_top_tilemap.bin"
+	.incbin "graphics/opponents/des_frog_top_tilemap.bin"
+	.incbin "graphics/opponents/water_dragon_top_tilemap.bin"
+	.incbin "graphics/opponents/redd_top_tilemap.bin"
+	.incbin "graphics/opponents/vampire_genesis_top_tilemap.bin"
+	.incbin "graphics/opponents/infernal_flame_emperor_top_tilemap.bin"
+	.incbin "graphics/opponents/ocean_dragon_lord_top_tilemap.bin"
+	.incbin "graphics/opponents/helios_duo_megiste_top_tilemap.bin"
+	.incbin "graphics/opponents/gilford_the_legend_top_tilemap.bin"
+	.incbin "graphics/opponents/dark_eradicator_warlock_top_tilemap.bin"
+	.incbin "graphics/opponents/guardian_exode_top_tilemap.bin"
+	.incbin "graphics/opponents/goldd_top_tilemap.bin"
+	.incbin "graphics/opponents/elemental_hero_electrum_top_tilemap.bin"
+	.incbin "graphics/opponents/raviel_top_tilemap.bin"
+	.incbin "graphics/opponents/horus_top_tilemap.bin"
+	.incbin "graphics/opponents/stronghold_top_tilemap.bin"
+	.incbin "graphics/opponents/sacred_phoenix_top_tilemap.bin"
+	.incbin "graphics/opponents/cyber_end_dragon_top_tilemap.bin"
+	.incbin "graphics/opponents/mirror_match_top_tilemap.bin"
+	.incbin "graphics/opponents/copycat_top_tilemap.bin"
+
+@ 调色板块（Copy 2），ROM 0x1B4FE9C–0x1B51CFB，7776 字节（内容与 Copy 1 完全相同）
+	.incbin "graphics/opponents/palette_copy1.bin"
+
+@ Bottom 图块，ROM 0x1B51CFC–0x1B87CFB，221184 字节（27 × 0x2000，保留 ROM incbin）
+	.incbin "roms/2343.gba", 0x1B51CFC, 0x36000
+
+@ Bottom Tilemap（27 个对手），ROM 0x1B87CFC–0x1B8FB8B，每个 0x4B0 字节
+	.incbin "graphics/opponents/kuriboh_bottom_tilemap.bin"
+	.incbin "graphics/opponents/scapegoat_bottom_tilemap.bin"
+	.incbin "graphics/opponents/skull_servant_bottom_tilemap.bin"
+	.incbin "graphics/opponents/watapon_bottom_tilemap.bin"
+	.incbin "graphics/opponents/pikeru_bottom_tilemap.bin"
+	.incbin "graphics/opponents/batteryman_c_bottom_tilemap.bin"
+	.incbin "graphics/opponents/ojama_yellow_bottom_tilemap.bin"
+	.incbin "graphics/opponents/goblin_king_bottom_tilemap.bin"
+	.incbin "graphics/opponents/des_frog_bottom_tilemap.bin"
+	.incbin "graphics/opponents/water_dragon_bottom_tilemap.bin"
+	.incbin "graphics/opponents/redd_bottom_tilemap.bin"
+	.incbin "graphics/opponents/vampire_genesis_bottom_tilemap.bin"
+	.incbin "graphics/opponents/infernal_flame_emperor_bottom_tilemap.bin"
+	.incbin "graphics/opponents/ocean_dragon_lord_bottom_tilemap.bin"
+	.incbin "graphics/opponents/helios_duo_megiste_bottom_tilemap.bin"
+	.incbin "graphics/opponents/gilford_the_legend_bottom_tilemap.bin"
+	.incbin "graphics/opponents/dark_eradicator_warlock_bottom_tilemap.bin"
+	.incbin "graphics/opponents/guardian_exode_bottom_tilemap.bin"
+	.incbin "graphics/opponents/goldd_bottom_tilemap.bin"
+	.incbin "graphics/opponents/elemental_hero_electrum_bottom_tilemap.bin"
+	.incbin "graphics/opponents/raviel_bottom_tilemap.bin"
+	.incbin "graphics/opponents/horus_bottom_tilemap.bin"
+	.incbin "graphics/opponents/stronghold_bottom_tilemap.bin"
+	.incbin "graphics/opponents/sacred_phoenix_bottom_tilemap.bin"
+	.incbin "graphics/opponents/cyber_end_dragon_bottom_tilemap.bin"
+	.incbin "graphics/opponents/mirror_match_bottom_tilemap.bin"
+	.incbin "graphics/opponents/copycat_bottom_tilemap.bin"
+
+@ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019
+	.incbin "roms/2343.gba", 0x1B8FB8C, 0x2C438E
 
 @ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
 @ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
