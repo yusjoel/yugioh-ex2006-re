@@ -109,11 +109,16 @@ incbin [end, 0x1FFFF00]
 
 ### 下一步待办（按优先级）
 
-- [ ] **T1**：提取卡组名字符串表 + 指针表 → `data/deck-strings.s`
-  - 依据：`deck-string-name-tool.md`（主）+ `modifying-decks.md`（辅）
-  - 字符串表基址：ROM 偏移 `0x13B9C10`（GBA 地址 `0x1DB9C10`）
-  - 包含：25 对手卡组名 + 7 结构/初始卡组名 + 对应指针表
-  - 需从最大 incbin 块（`0x1000000~0x1E58D0D`）中拆分
+- [x] **T1**：提取游戏文本字符串表（含卡组名）→ `data/deck-strings.s` + `data/game-strings.s`
+  - `deck-strings.s`：未知语言（XX，自定义编码）的卡组名，ROM `0x1DBF01A~0x1DC461F`
+  - `game-strings.s`：EN/DE/FR/IT/ES 全部游戏文本，ROM `0x1DC4620~0x1DFF9D1`，8210行
+  - 字符编码：Latin-1，非ASCII字节用 `\xNN` 转义写入 `.ascii` 指令
+  - byte-identical 已验证
+
+  > ⚠️ **XX 语言待调查**：指针表第2槽（slot2）指向 ROM `0x1DBF01A`，
+  > 内容全为 2字节序列（高字节 `0xF0~0xFF`），疑似自定义字体表索引。
+  > 猜测为 GBA 日语版（BY7J）残留数据或某亚洲发行版本。
+  > 后续任务：调查游戏字体表，对照 BY7J ROM（如有）确认编码。
 
 - [ ] **T2**：提取对手图形地址指针表 → `data/opponent-gfx-pointers.s`
   - 依据：`opponents-coinflip-screen.md`

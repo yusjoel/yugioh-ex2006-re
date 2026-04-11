@@ -19,15 +19,19 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1DBF019（卡组名字符串表前）
+@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1DBF019
 	.incbin "roms/2343.gba", 0x1000000, 0xDBF01A
 
-@ 卡组名字符串表（ROM偏移 0x1DBF01A - 0x1DFC851）
-@ 含 6 种语言（XX/EN/DE/FR/IT/ES）的预组/初始卡组名和对手卡组名，共 251960 字节
+@ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
+@ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
 	.include "data/deck-strings.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1DFC852 - 0x1E58D0D（卡组名字符串表后，对手卡值前）
-	.incbin "roms/2343.gba", 0x1DFC852, 0x5C4BC
+@ 游戏文本字符串表（ROM偏移 0x1DC4620 - 0x1DFF9D1）
+@ 含 5 种语言（EN/DE/FR/IT/ES）的完整游戏文本，共 242610 字节
+	.include "data/game-strings.s"
+
+@ 后 16MB 中间段：ROM偏移 0x1DFF9D2 - 0x1E58D0D（游戏文本后，对手卡值前）
+	.incbin "roms/2343.gba", 0x1DFF9D2, 0x5933C
 
 @ 对手卡值块数据（ROM偏移 0x1E58D0E - 0x1E5906D）
 @ 27 个对手条目，每条 32 字节，共 0x360 字节
