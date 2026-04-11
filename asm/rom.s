@@ -16,5 +16,12 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB（GBA 地址 09000000-09FFFFFF），暂未反汇编，直接 incbin
-	.incbin "roms/2343.gba", 0x1000000, 0x1000000
+@ 后 16MB 第一段：ROM偏移 0x1000000 - 0x1E5FA57（结构卡组前）
+	.incbin "roms/2343.gba", 0x1000000, 0xE5FA58
+
+@ 结构卡组数据（ROM偏移 0x1E5FA58 - 0x1E5FD83）
+@ 包含 6 个结构卡组及其指针表，共 0x32C 字节
+	.include "data/struct-decks.s"
+
+@ 后 16MB 剩余部分：ROM偏移 0x1E5FD84 - 0x1FFFF00
+	.incbin "roms/2343.gba", 0x1E5FD84, 0x1A017C
