@@ -1,4 +1,4 @@
-# 游戏王 EX2006 ROM 数据汇编化计划
+# Yu-Gi-Oh! Ultimate Masters: WCT 2006 ROM 数据汇编化计划
 
 ## 目标
 
@@ -10,7 +10,7 @@
 | 区块 | ROM 偏移范围 | 大小 | 状态 |
 |------|------------|------|------|
 | XX语言卡组名（自定义编码） | `0x1DBF01A – 0x1DC461F` | ~10 KB | ✅ `data/deck-strings.s` |
-| 游戏文本（EN/DE/FR/IT/ES） | `0x1DC4620 – 0x1DFF9D1` | ~335 KB | ✅ `data/game-strings.s` |
+| 游戏文本（EN/DE/FR/IT/ES） | `0x1DC4620 – 0x1DFF9D1` | ~335 KB | ✅ `data/game-strings-{en,de,fr,it,es}.s` |
 | 对手卡值块（27条目×32字节）| `0x1E58D0E – 0x1E5906D` | 864 B | ✅ `data/opponent-card-values.s` |
 | 禁卡表（8个版本共487条目）  | `0x1E5EF30 – 0x1E5F6CB` | 1948 B | ✅ `data/banlists.s` |
 | 初始卡组（50张+终止符）    | `0x1E5F884 – 0x1E5F8E9` | 102 B | ✅ `data/starter-deck.s` |
@@ -27,7 +27,7 @@
 
 **对手卡值块**：每条 32 字节 = `card_value`(2) + `unk`(2) + 文件路径字符串(20字节null-padded) + padding(8)
 
-**游戏文本**：Latin-1 编码，null 终止字符串，用 `.string` 指令；见 `doc/dev/latin1-strings-in-gas.md`
+**游戏文本**：CP1252 编码，null 终止字符串，用 `.ascii` 指令；见 `doc/dev/cp1252-strings-in-gas.md`
 
 ## 宏定义（include/macros.inc）
 
@@ -48,7 +48,7 @@ deck_card so_code          @ 对手/初始卡组：so_code
 ```
 incbin [0x1000000, 0x1DBF019]
 data/deck-strings.s           @ 0x1DBF01A  XX语言卡组名 + 间隙
-data/game-strings.s           @ 0x1DC4620  EN/DE/FR/IT/ES 全部游戏文本
+data/game-strings-{en,de,fr,it,es}.s  @ 0x1DC4620  EN/DE/FR/IT/ES 全部游戏文本
 incbin [0x1DFF9D2, 0x1E58D0D]
 data/opponent-card-values.s   @ 0x1E58D0E  (+864 B)
 incbin [0x1E5906E, 0x1E5EF2F]
@@ -68,7 +68,7 @@ incbin [end, 0x1FFFF00]
 - `so_code` 统一用**十进制**整数写入 ASM 源码（如 `4088` 代替 `0x0FF8`）
 - 卡牌数据来源：`doc/um06-deck-modification-tool/data.md`
 - 对手卡值块中 `unk` 字段（0x1F40 起递增）原因未知，保留为 `.hword` 硬编码
-- 游戏文本（`data/game-strings.s`）文件编码为 **Latin-1**，勿以 UTF-8 打开覆盖保存
+- 游戏文本（`data/game-strings-*.s`）文件编码为 **CP1252**，勿以 UTF-8 打开覆盖保存
 
 ---
 
@@ -110,7 +110,7 @@ incbin [end, 0x1FFFF00]
 
 - [x] **T1**：提取游戏文本字符串表（含卡组名）→ `data/deck-strings.s` + `data/game-strings.s`
   - `deck-strings.s`：未知语言（XX，自定义编码）的卡组名，ROM `0x1DBF01A~0x1DC461F`
-  - `game-strings.s`：EN/DE/FR/IT/ES 全部游戏文本，ROM `0x1DC4620~0x1DFF9D1`，8218行，Latin-1编码
+  - `game-strings-*.s`：EN/DE/FR/IT/ES 全部游戏文本，ROM `0x1DC4620~0x1DFF9D1`，CP1252编码
   - 字符串用 `.string` 指令，Latin-1 扩展字符直接写出（如 `ü ö ä é`）
   - byte-identical 已验证
 

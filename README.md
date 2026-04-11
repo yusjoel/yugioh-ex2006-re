@@ -1,6 +1,6 @@
-# 游戏王 EX2006 反汇编项目
+# Yu-Gi-Oh! Ultimate Masters: WCT 2006 反汇编项目
 
-《游戏王 The Sacred Cards》（GBA，ROM 编号 2343，游戏代码 `BY7E`）的反汇编与数据提取项目。  
+《Yu-Gi-Oh! Ultimate Masters: World Championship Tournament 2006》（GBA，ROM 编号 2343，游戏代码 `BY7E`）的反汇编与数据提取项目。
 目标是将原始 ROM 逐步分解为结构清晰的汇编源文件，最终能重新汇编出与原始 ROM **完全一致**（byte-identical）的二进制文件。
 
 ## 环境要求
