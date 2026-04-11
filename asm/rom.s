@@ -14,5 +14,7 @@
 Start:
 	.include "asm/crt0.s"
 
-@ 从原始 ROM 载入剩余数据 (0xC0 开始)，直到 ROM 末尾（0x2000000）。
-    .incbin "roms/2343.gba", 0xC0, 0x2000000 - 0xC0
+	.include "asm/all.s"
+
+@ 后 16MB（GBA 地址 09000000-09FFFFFF），暂未反汇编，直接 incbin
+	.incbin "roms/2343.gba", 0x1000000, 0x1000000

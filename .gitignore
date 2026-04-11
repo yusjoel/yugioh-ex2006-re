@@ -10,3 +10,6 @@
 # 临时文件
 *.tmp
 *.log
+ghidra
+
+output/
