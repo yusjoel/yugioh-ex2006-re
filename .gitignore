@@ -17,3 +17,6 @@ output/
 # YGOCdb 卡牌数据库（体积大，按需下载）
 data/cards.json
 data/cards.zip.md5
+
+# 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
+graphics/
