@@ -12,7 +12,7 @@
 |----|------|
 | Password | 卡牌密码（8位数字）|
 | Card Name | 卡名 |
-| Structure Decks | 结构卡组槽 Hex 编码（写入 ROM 用）|
+| Structure Decks | 预组槽 Hex 编码（写入 ROM 用）|
 | Starter/Opponent | 初始/对手卡组槽 Hex 编码 |
 | Reverse Format | 字节反转格式 |
 

@@ -11,7 +11,7 @@
 | # | Sheet 名称 | 文件 | 说明 |
 |---|-----------|------|------|
 | 1 | Opponents & Coinflip Screen | [opponents-coinflip-screen.md](opponents-coinflip-screen.md) | 对手角色/翻硬币界面的图形地址（图块、调色板、字符串） |
-| 2 | Modifying Decks | [modifying-decks.md](modifying-decks.md) | 卡组数据修改方法（结构卡组、对手卡组位置） |
+| 2 | Modifying Decks | [modifying-decks.md](modifying-decks.md) | 卡组数据修改方法（预组、对手卡组位置） |
 | 3 | Deck String Name Tool | [deck-string-name-tool.md](deck-string-name-tool.md) | 卡组字符串名称查找工具（卡名与 Hex 编码对应） |
 | 4 | Duel Field | [duel-field.md](duel-field.md) | 决斗场地图形地址 |
 | 5 | Starter Deck Images & Player Ic | [starter-deck-images-player-icons.md](starter-deck-images-player-icons.md) | 初始卡组图片及玩家图标地址 |
