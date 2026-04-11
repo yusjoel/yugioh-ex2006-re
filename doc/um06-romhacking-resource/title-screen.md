@@ -2,7 +2,7 @@
 
 > 所属文档: [UM06 Romhacking Resource Ver 2.0](https://docs.google.com/spreadsheets/d/1AIXryyGPMKr43SheXUt_zkncmM9kfl_Xy1vZvJ6bQrg/edit)  
 > Sheet 编号: 7  
-> 原始作者: 不详（公开文档）
+> 原始作者: Scrub Busted（YouTube: [@scrubbusted](https://www.youtube.com/@scrubbusted)）
 
 ---
 
