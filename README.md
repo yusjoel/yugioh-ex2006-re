@@ -12,6 +12,14 @@
 
 ## 快速开始
 
+> ⚠️ **构建前置步骤**：`asm/rom.s` 引用了 `graphics/opponents/*.bin`（tilemap/palette 二进制），
+> 这些文件**不纳入版本控制**，需先从 ROM 导出：
+>
+> ```bat
+> python tools/export_gfx.py   @ 从 roms/2343.gba 导出图形二进制和 PNG 预览
+> build.bat                    @ 汇编、链接并生成 output/2343.gba
+> ```
+
 ```bat
 build.bat    @ 汇编、链接并生成 output/2343.gba
 clean.bat    @ 清理编译产物
@@ -34,6 +42,11 @@ clean.bat    @ 清理编译产物
 │   ├── starter-deck.s          # 初始卡组，50 张（ROM 0x1E5F884）
 │   ├── struct-decks.s          # 6 套预组 + 指针表（ROM 0x1E5FA58）
 │   └── opponent-decks.s        # 25 套对手卡组（ROM 0x1E6468E）
+├── graphics/             # 图形资产（不含于仓库，由 tools/export_gfx.py 生成）
+│   ├── opponents/        # 对手大图 PNG + tilemap.bin + palette_copy1.bin
+│   └── icons/            # 对手小图标 PNG
+├── tools/
+│   └── export_gfx.py     # ROM → PNG / tilemap.bin / palette.bin 导出脚本
 ├── include/
 │   └── macros.inc        # 汇编宏：deck_entry、banlist_entry、deck_card
 ├── constants/
@@ -75,7 +88,37 @@ deck_card 4088    @ Red-Eyes B. Dragon (密码: 74677422)
 
 宏在 `include/macros.inc` 中定义，`so_code` 使用十进制整数（如 `4088` = `0x0FF8`），编译时自动计算编码。
 
-## 技术说明
+## 图形资产管线
+
+对手图形（27 个对手的大图壁纸和小图标）采用以下管线管理：
+
+```
+roms/2343.gba
+  └─ tools/export_gfx.py ──► graphics/opponents/
+  │                              palette_copy1.bin   调色板块（7776 B）
+  │                              <name>_top_tilemap.bin   (1200 B × 27)
+  │                              <name>_bottom_tilemap.bin
+  │                              <name>_top.png      渲染合成图（240×160，仅预览）
+  │                              <name>_bottom.png
+  │                          graphics/icons/
+  │                              <name>_icon.png     图标（24×24）
+  └─ build.bat ──► output/2343.gba
+      （通过 asm/rom.s 中的 .incbin 引用 graphics/opponents/*.bin）
+```
+
+`graphics/` 目录下所有文件均**不纳入版本控制**，须在构建前运行导出脚本生成。
+
+### 图形数据 ROM 布局
+
+| ROM 偏移 | 内容 | 大小 |
+|---------|------|------|
+| `0x1B101AC` | 调色板块（Copy 1 & 2，内容相同） | 7776 B |
+| `0x1B1200C` | Top 图块（4bpp，27 个对手） | 221184 B |
+| `0x1B4800C` | Top Tilemap（27 × 1200 B） | 32400 B |
+| `0x1B51CFC` | Bottom 图块（4bpp，27 个对手） | 221184 B |
+| `0x1B87CFC` | Bottom Tilemap（27 × 1200 B） | 32400 B |
+
+
 
 - GBA ROM 基址：`0x08000000`，入口点：`0x080000C0`
 - 指令集：ARM（32 位）与 THUMB（16 位）混合，游戏代码大部分为 THUMB

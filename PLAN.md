@@ -119,9 +119,92 @@ incbin [end, 0x1FFFF00]
   > 猜测为 GBA 日语版（BY7J）残留数据或某亚洲发行版本。
   > 后续任务：调查游戏字体表，对照 BY7J ROM（如有）确认编码。
 
-- [ ] **T2**：提取对手图形地址指针表 → `data/opponent-gfx-pointers.s`
-  - 依据：`opponents-coinflip-screen.md`
-  - 包含：27 × (大图 Top/Bottom + 小图标) 的图块/Tilemap/调色板地址
+- [ ] **T2**：对手图形导入/导出管线（参考 pokeruby/gbagfx 设计）
+
+  #### 背景（调查结论，2026-04-11）
+
+  调查了 pokeruby 成熟 GBA 反编译项目的图形管线。其核心设计：
+  - 源文件为 **图块表 PNG**（tile sheet，非渲染合成图）+ **JASC-PAL 调色板**
+  - 构建时 `gbagfx` 将 PNG → `.4bpp` 二进制，再通过 `INCBIN_U8()` 链接进 ROM
+  - 优势：导入简单（直接逆向），无需重建 tilemap
+
+  本项目与 pokeruby 的关键不同：数据写回到固定 ROM 偏移（不走链接器），因此流程略有调整。
+
+  #### ROM 数据布局（已验证）
+
+  对手图形数据全部在 ROM `0x1B101AC ~ 0x1B8FB8C`，结构如下：
+
+  | 偏移范围 | 内容 | 大小 | 结构 |
+  |---------|------|------|------|
+  | `0x1B101AC ~ 0x1B1200B` | 调色板块（Copy 1） | 7776 B | 27 × 288 B |
+  | `0x1B1200C ~ 0x1B4800B` | 大图 Top 图块（4bpp） | 221184 B | 27 × 0x2000 B ⚠️ |
+  | `0x1B4800C ~ 0x1B4FE9B` | 大图 Top Tilemap | 32400 B | 27 × 0x4B0 B ✅ |
+  | `0x1B4FE9C ~ 0x1B51CFB` | 调色板块（Copy 2，与 Copy 1 **完全相同**）| 7776 B | 重复 |
+  | `0x1B51CFC ~ 0x1B87CFB` | 大图 Bottom 图块（4bpp） | 221184 B | 27 × 0x2000 B |
+  | `0x1B87CFC ~ 0x1B8FB8B` | 大图 Bottom Tilemap | 32400 B | 27 × 0x4B0 B ✅ |
+
+  > ⚠️ Top 图块中第 20 个对手（Elemental Hero Electrum）位于非对齐偏移 `0x1B3899C`（期望 `0x1B3800C`），
+  > 故 Top 图块整段作为一个 incbin 保留，不做每对手拆分。
+  > ⚠️ 每对手的 288 字节调色板条目内，doc 地址指向条目内特定子调色板偏移（不一定是条目起始），
+  > 且调色板有两份完全相同的拷贝；导出时两份均需保存，写回时必须同步。
+
+  此外，小图标数据（也在大 incbin 内）：
+
+  | 偏移 | 内容 | 大小 |
+  |------|------|------|
+  | `0x188DA70 ~ 0x188F8CF` | 图标图块（4bpp） | 7776 B = 27×9×32 |
+  | `0x18963D0 ~ 0x189672F` | 图标调色板 | 864 B = 27×32 |
+
+  #### 文件格式决策（实际实现）
+
+  | 文件 | 格式 | 大小 | 说明 |
+  |------|------|------|------|
+  | `palette_copy1.bin` | 原始二进制 | 7776 B | 完整调色板块，两份 Copy 引用同一文件 |
+  | `*_top_tilemap.bin` | 原始二进制 | 1200 B | 直接 `.incbin` 到 ASM |
+  | `*_bottom_tilemap.bin` | 原始二进制 | 1200 B | 同上 |
+  | `*_top.png` | 渲染合成图（240×160 RGBA） | — | 供查看/编辑，**不** incbin |
+  | `*_bottom.png` | 同上 | — | 同上 |
+  | `*_icon.png` | 图标（24×24 RGBA） | — | 同上 |
+
+  > 调色板块内部结构复杂（部分对手共享子调色板，间距不规则），
+  > 暂以整块 7776 字节作为单一 bin 文件；JASC-PAL 导出留待后续任务。
+
+  所有 `graphics/` 下文件均 **不提交 git**（已入 `.gitignore`），仅保留生成脚本。
+
+  #### 流程设计（实际实现）
+
+  ```
+  ── 导出（tools/export_gfx.py）────────────────────────────────────
+  roms/2343.gba  ──►  graphics/opponents/palette_copy1.bin     （7776 字节，整块）
+                  ──►  graphics/opponents/<name>_top_tilemap.bin  （1200 字节 × 27）
+                  ──►  graphics/opponents/<name>_bottom_tilemap.bin
+                  ──►  graphics/opponents/<name>_top.png          （渲染合成，供查看）
+                  ──►  graphics/opponents/<name>_bottom.png
+                  ──►  graphics/icons/<name>_icon.png
+
+  ── ASM（asm/rom.s 已拆分为 8 段）────────────────────────────────
+  incbin(rom, 0x1000000, 0xB101AC)           ← 图形数据前段
+  .incbin "graphics/opponents/palette_copy1.bin"   ← Copy 1（7776 B）
+  incbin(rom, 0x1B1200C, 0x36000)            ← Top 图块（保留 ROM incbin）
+  .incbin "<name>_top_tilemap.bin" × 27      ← Top Tilemap
+  .incbin "graphics/opponents/palette_copy1.bin"   ← Copy 2（同一文件）
+  incbin(rom, 0x1B51CFC, 0x36000)            ← Bottom 图块（保留 ROM incbin）
+  .incbin "<name>_bottom_tilemap.bin" × 27   ← Bottom Tilemap
+  incbin(rom, 0x1B8FB8C, 0x2C438E)           ← 剩余段
+
+  ── 导入（tools/import_gfx.py，T2.3 后续）────────────────────────
+  <name>_top.png  ──►  4bpp tiles → ROM 图块偏移
+  palette_copy1.bin  ──►  可由 JASC-PAL 重建（待实现）
+  ```
+
+  #### 子任务
+
+  - [x] **T2.1**：扩展 `tools/export_gfx.py`，新增导出 `palette_copy1.bin`、`*_tilemap.bin`
+  - [x] **T2.2**：拆分 `asm/rom.s` 大 incbin 为 8 段，tilemap/palette 改为 `.incbin` 文件引用，byte-identical 验证通过（commit b7a8ef6）
+  - [ ] **T2.3**（后续）：实现 `tools/import_gfx.py`，PNG → 4bpp tiles + tilemap.bin → 写回 ROM
+
+  > ⚠️ **构建依赖**：`build.bat` 前须先运行 `python tools/export_gfx.py` 生成 `graphics/opponents/*.bin`，
+  > 否则汇编器找不到 incbin 文件。详见 README。
 
 - [ ] **T3**：提取决斗场地图形地址表 → `data/duel-field-gfx-pointers.s`
   - 依据：`duel-field.md`
