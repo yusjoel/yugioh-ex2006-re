@@ -19,9 +19,23 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段前半：ROM偏移 0x1000000 - 0x185504B
+@ 后 16MB 第一段前半 seg-A：ROM偏移 0x1000000 - 0x15BB5AB（卡名字符串表前）
+	.incbin "roms/2343.gba", 0x1000000, 0x5BB5AC
+
+@ 卡牌名称字符串表（ROM偏移 0x15BB5AC - 0x15F3A5B）
+@ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐
+	.include "data/card-names.s"
+
+@ 后 16MB 第一段前半 seg-B：ROM偏移 0x15F3A5C - 0x18169B5（卡名后，属性表前）
+	.incbin "roms/2343.gba", 0x15F3A5C, 0x222F5A
+
+@ 卡牌属性数据表（ROM偏移 0x18169B6 - 0x18325FF）
+@ 5170 条记录，每条 22 字节（11 × uint16 LE），含 ATK/DEF/Level/属性/种族等
+	.include "data/card-stats.s"
+
+@ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x185504B（属性表后，外场图块前）
 @ 含外场图块指针表（0x1855030，7条目28字节），紧接着就是外场图块数据
-	.incbin "roms/2343.gba", 0x1000000, 0x85504C
+	.incbin "roms/2343.gba", 0x1832602, 0x22A4A
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
 @ 指针表在 0x1855030（7条目，末条目为终止指针指向 0x185878C），数据从 0x185504C 开始
