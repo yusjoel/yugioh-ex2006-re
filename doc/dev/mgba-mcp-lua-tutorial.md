@@ -141,9 +141,24 @@ callbacks:add("frame", function()
 end)
 ```
 
-### 3.3 帧回调的正确使用
+### 3.3 回调系统的设计限制
 
-`callbacks:add("write", ...)` 对 DMA 写入**无效**，不要依赖它监控 VRAM 变化。
+mGBA Lua 脚本引擎的 `callbacks` 对象**官方支持的事件类型**（来自 [mGBA 官方文档](https://mgba.io/docs/scripting.html)）：
+
+> `alarm` / `crashed` / **`frame`** / `keysRead` / `reset` / `savedataUpdated` / `sleep` / `shutdown` / `start` / `stop`
+
+**`read`、`write`、`exec` 根本不在此列**——这不是编译标志缺失的问题，而是 mGBA Lua API 本身就没有这些功能。
+
+| 行为 | 原因 |
+|------|------|
+| `callbacks:add("read", fn)` 注册不报错但从不触发 | `callbacks:add` 接受任意字符串，注册了一个永远不会触发的事件，静默失效 |
+| `callbacks:add("memory.read", fn, base, size)` 报错 | 参数数量不匹配 C 函数签名，直接抛出异常 |
+| `callbacks:add("frame", fn)` 有效 | 在官方支持列表中，有真实实现 |
+
+> **关于 CMake 标志**：mgba-live-mcp 文档要求的 `-DENABLE_SCRIPTING=ON -DUSE_LUA=ON`
+> 是启用 Lua **运行环境**的前提条件，不加这些标志则根本无法运行任何 Lua 脚本。
+> 但即使正确编译，内存读写回调也不是 mGBA Lua API 的功能，标志不影响这一限制。
+
 `callbacks:add("frame", ...)` **有效**，可以用于每帧轮询或监控内存。
 
 ```lua
