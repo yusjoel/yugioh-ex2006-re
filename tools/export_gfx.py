@@ -12,7 +12,9 @@ PNG 输出（供美术查看/编辑）：
   graphics/icons/<名称>_icon.png        小图标（24×24，RGBA）
 
 二进制输出（供 asm/rom.s 通过 .incbin 引用，替代 ROM incbin）：
-  graphics/opponents/palette_copy1.bin    调色板块（Copy 1，7776 字节）
+  graphics/opponents/palette_copy1.bin       调色板块（Copy 1，7776 字节）
+  graphics/opponents/top_tiles_all.bin       所有对手 Top 图块整块（0x36000 字节）
+  graphics/opponents/bottom_tiles_all.bin    所有对手 Bottom 图块整块（0x36000 字节）
   graphics/opponents/<名称>_top_tilemap.bin    Top Tilemap（0x4B0 字节）
   graphics/opponents/<名称>_bottom_tilemap.bin Bottom Tilemap（0x4B0 字节）
 
@@ -21,17 +23,22 @@ PNG 输出（供美术查看/编辑）：
 格式：标准 GBA 4bpp 平铺背景，无压缩
 
 PNG 输出（供查看/编辑）：
-  graphics/duel-field/<模式>_outer.png    外场背景（240×160，RGBA）
-  graphics/duel-field/<模式>_inner.png    内场背景（240×160，RGBA）
+  graphics/duel-field/<模式>_outer.png       外场背景（240×160，RGBA）
+  graphics/duel-field/<模式>_outer_lp.png    LP/阶段布局（同图块，lp tilemap，240×160，RGBA）
+  graphics/duel-field/<模式>_inner.png       内场背景（240×160，RGBA）
 
 二进制输出（供 asm/rom.s 通过 .incbin 引用）：
   graphics/duel-field/<模式>_outer_image.bin    外场图块数据（可变大小）
   graphics/duel-field/<模式>_outer_tilemap.bin  外场 Tilemap（0x4B0 字节）
   graphics/duel-field/<模式>_outer_lp_tilemap.bin LP/阶段 Tilemap（0x4B0 字节）
   graphics/duel-field/<模式>_outer_palette.bin  外场调色板（0x40 字节，2个子调色板）
-  graphics/duel-field/<模式>_inner_image.bin    内场图块数据（0x1680 字节，180 图块）
-  graphics/duel-field/<模式>_inner_palette.bin  内场调色板（0x20 字节，1个子调色板）
+== 小图标二进制 ==
+
+二进制输出：
+  graphics/icons/<名称>_icon_tiles.bin    图标图块数据（0x120 字节，9 图块）
+  graphics/icons/<名称>_icon_palette.bin  图标调色板（0x20 字节，1 子调色板）
 """
+
 
 import os
 import struct
@@ -244,6 +251,22 @@ def export_bin_files(rom, opp_dir):
         f.write(rom[PALETTE_COPY1_OFF : PALETTE_COPY1_OFF + PALETTE_COPY1_SIZE])
     print(f'  → {pal_bin}  ({PALETTE_COPY1_SIZE} 字节)')
 
+    # 导出 Top 图块整块（因 Electrum 偏移不规则，整段保留）
+    TOP_TILES_OFF  = 0x1B1200C
+    TOP_TILES_SIZE = 0x36000
+    top_bin = os.path.join(opp_dir, 'top_tiles_all.bin')
+    with open(top_bin, 'wb') as f:
+        f.write(rom[TOP_TILES_OFF : TOP_TILES_OFF + TOP_TILES_SIZE])
+    print(f'  → {top_bin}  ({TOP_TILES_SIZE} 字节)')
+
+    # 导出 Bottom 图块整块
+    BOT_TILES_OFF  = 0x1B51CFC
+    BOT_TILES_SIZE = 0x36000
+    bot_bin = os.path.join(opp_dir, 'bottom_tiles_all.bin')
+    with open(bot_bin, 'wb') as f:
+        f.write(rom[BOT_TILES_OFF : BOT_TILES_OFF + BOT_TILES_SIZE])
+    print(f'  → {bot_bin}  ({BOT_TILES_SIZE} 字节)')
+
     # 导出每个对手的 tilemap（按 LARGE_GFX 顺序，与 ROM 排列顺序一致）
     for i, entry in enumerate(LARGE_GFX):
         slug = entry[0]
@@ -261,8 +284,23 @@ def export_bin_files(rom, opp_dir):
     print(f'  → {len(LARGE_GFX)} 个对手 × 2 tilemap（每个 {TILEMAP_SIZE} 字节）')
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# 决斗场地数据表
+def export_icon_bins(rom, icon_dir):
+    """
+    导出小图标二进制文件：
+    - <slug>_icon_tiles.bin   图标图块（9 图块 × 32 字节 = 0x120 字节）
+    - <slug>_icon_palette.bin 图标调色板（1 子调色板 × 32 字节 = 0x20 字节）
+    """
+    ICON_TILE_SIZE = 9 * 32  # 0x120
+    ICON_PAL_SIZE  = 0x20
+    for slug, tiles_off, pal_off in ICONS:
+        with open(os.path.join(icon_dir, f'{slug}_icon_tiles.bin'), 'wb') as f:
+            f.write(rom[tiles_off : tiles_off + ICON_TILE_SIZE])
+        with open(os.path.join(icon_dir, f'{slug}_icon_palette.bin'), 'wb') as f:
+            f.write(rom[pal_off : pal_off + ICON_PAL_SIZE])
+    print(f'  → {len(ICONS)} 个图标 × 2 bin文件（tiles 0x120 + palette 0x20）')
+
+
+
 # 数据来源：doc/um06-romhacking-resource/duel-field.md
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -356,15 +394,21 @@ def export_duel_field_bins(rom, df_dir):
     print(f'  → {len(DUEL_MODES)} 个模式 × 6种bin文件，共 {len(DUEL_MODES)*6} 个文件')
 
 
-def render_duel_outer(rom, mode_idx):
+def render_duel_outer(rom, mode_idx, use_lp_tilemap=False):
     """
     渲染外场背景，返回 RGBA PIL Image（240×160）。
+
+    use_lp_tilemap=False 使用普通外场 tilemap；
+    use_lp_tilemap=True  使用 LP/阶段 tilemap（同一图块表和调色板）。
 
     外场调色板只有 2 个子调色板（0x40 字节），游戏将其加载到 BG 调色板槽位 9–10。
     渲染时在 16 个子调色板槽中将块的两个子调色板放置于槽位 9 和 10。
     """
     _, img_off, img_size = DUEL_OUTER_IMAGES[mode_idx]
-    tm_off  = DUEL_OUTER_TILEMAP_BASE + mode_idx * DUEL_TILEMAP_SIZE
+    if use_lp_tilemap:
+        tm_off = DUEL_LP_TILEMAP_BASE   + mode_idx * DUEL_TILEMAP_SIZE
+    else:
+        tm_off = DUEL_OUTER_TILEMAP_BASE + mode_idx * DUEL_TILEMAP_SIZE
     pal_off = DUEL_OUTER_PAL_BASE     + mode_idx * DUEL_OUTER_PAL_SIZE
 
     n_tiles = img_size // 32
@@ -475,6 +519,10 @@ def main():
     print('导出对手二进制文件...')
     export_bin_files(rom, opp_dir)
 
+    # 导出小图标二进制文件（供 asm incbin）
+    print('导出小图标二进制文件...')
+    export_icon_bins(rom, icon_dir)
+
     # 导出对手大图 PNG
     print('导出对手大图 PNG...')
     for entry in LARGE_GFX:
@@ -504,6 +552,9 @@ def main():
     for i, mode in enumerate(DUEL_MODES):
         outer_img = render_duel_outer(rom, i)
         outer_img.save(os.path.join(df_dir, f'{mode}_outer.png'))
+
+        outer_lp_img = render_duel_outer(rom, i, use_lp_tilemap=True)
+        outer_lp_img.save(os.path.join(df_dir, f'{mode}_outer_lp.png'))
 
         inner_img = render_duel_inner(rom, i)
         inner_img.save(os.path.join(df_dir, f'{mode}_inner.png'))

@@ -104,16 +104,82 @@ Start:
 	.incbin "graphics/duel-field/theme_inner_palette.bin"
 	.incbin "graphics/duel-field/survival_inner_palette.bin"
 
-@ 后 16MB 第一段剩余：ROM 0x1867560 - 0x1B101AB
-	.incbin "roms/2343.gba", 0x1867560, 0x2A8C4C
+@ 后 16MB 第一段剩余：ROM 0x1867560 - 0x188DA6F（内场调色板后，小图标图块前）
+	.incbin "roms/2343.gba", 0x1867560, 0x26510
+
+@ ── 小图标图块（27 个对手，每个 9 图块 × 32 字节 = 0x120 字节）────────────────
+@ ROM 0x188DA70 - 0x188F8CF，共 0x1E60 字节
+	.incbin "graphics/icons/kuriboh_icon_tiles.bin"
+	.incbin "graphics/icons/scapegoat_icon_tiles.bin"
+	.incbin "graphics/icons/skull_servant_icon_tiles.bin"
+	.incbin "graphics/icons/watapon_icon_tiles.bin"
+	.incbin "graphics/icons/pikeru_icon_tiles.bin"
+	.incbin "graphics/icons/batteryman_c_icon_tiles.bin"
+	.incbin "graphics/icons/ojama_yellow_icon_tiles.bin"
+	.incbin "graphics/icons/goblin_king_icon_tiles.bin"
+	.incbin "graphics/icons/des_frog_icon_tiles.bin"
+	.incbin "graphics/icons/water_dragon_icon_tiles.bin"
+	.incbin "graphics/icons/redd_icon_tiles.bin"
+	.incbin "graphics/icons/vampire_genesis_icon_tiles.bin"
+	.incbin "graphics/icons/infernal_flame_emperor_icon_tiles.bin"
+	.incbin "graphics/icons/ocean_dragon_lord_icon_tiles.bin"
+	.incbin "graphics/icons/helios_duo_megiste_icon_tiles.bin"
+	.incbin "graphics/icons/gilford_the_legend_icon_tiles.bin"
+	.incbin "graphics/icons/dark_eradicator_warlock_icon_tiles.bin"
+	.incbin "graphics/icons/guardian_exode_icon_tiles.bin"
+	.incbin "graphics/icons/goldd_icon_tiles.bin"
+	.incbin "graphics/icons/elemental_hero_electrum_icon_tiles.bin"
+	.incbin "graphics/icons/raviel_icon_tiles.bin"
+	.incbin "graphics/icons/horus_icon_tiles.bin"
+	.incbin "graphics/icons/stronghold_icon_tiles.bin"
+	.incbin "graphics/icons/sacred_phoenix_icon_tiles.bin"
+	.incbin "graphics/icons/cyber_end_dragon_icon_tiles.bin"
+	.incbin "graphics/icons/mirror_match_icon_tiles.bin"
+	.incbin "graphics/icons/copycat_icon_tiles.bin"
+
+@ 未知数据：ROM 0x188F8D0 - 0x18963CF，0x6B00 字节
+	.incbin "roms/2343.gba", 0x188F8D0, 0x6B00
+
+@ ── 小图标调色板（27 个对手，每个 0x20 字节 = 1 子调色板）────────────────────
+@ ROM 0x18963D0 - 0x189672F，共 0x360 字节
+	.incbin "graphics/icons/kuriboh_icon_palette.bin"
+	.incbin "graphics/icons/scapegoat_icon_palette.bin"
+	.incbin "graphics/icons/skull_servant_icon_palette.bin"
+	.incbin "graphics/icons/watapon_icon_palette.bin"
+	.incbin "graphics/icons/pikeru_icon_palette.bin"
+	.incbin "graphics/icons/batteryman_c_icon_palette.bin"
+	.incbin "graphics/icons/ojama_yellow_icon_palette.bin"
+	.incbin "graphics/icons/goblin_king_icon_palette.bin"
+	.incbin "graphics/icons/des_frog_icon_palette.bin"
+	.incbin "graphics/icons/water_dragon_icon_palette.bin"
+	.incbin "graphics/icons/redd_icon_palette.bin"
+	.incbin "graphics/icons/vampire_genesis_icon_palette.bin"
+	.incbin "graphics/icons/infernal_flame_emperor_icon_palette.bin"
+	.incbin "graphics/icons/ocean_dragon_lord_icon_palette.bin"
+	.incbin "graphics/icons/helios_duo_megiste_icon_palette.bin"
+	.incbin "graphics/icons/gilford_the_legend_icon_palette.bin"
+	.incbin "graphics/icons/dark_eradicator_warlock_icon_palette.bin"
+	.incbin "graphics/icons/guardian_exode_icon_palette.bin"
+	.incbin "graphics/icons/goldd_icon_palette.bin"
+	.incbin "graphics/icons/elemental_hero_electrum_icon_palette.bin"
+	.incbin "graphics/icons/raviel_icon_palette.bin"
+	.incbin "graphics/icons/horus_icon_palette.bin"
+	.incbin "graphics/icons/stronghold_icon_palette.bin"
+	.incbin "graphics/icons/sacred_phoenix_icon_palette.bin"
+	.incbin "graphics/icons/cyber_end_dragon_icon_palette.bin"
+	.incbin "graphics/icons/mirror_match_icon_palette.bin"
+	.incbin "graphics/icons/copycat_icon_palette.bin"
+
+@ ROM 0x1896730 - 0x1B101AB
+	.incbin "roms/2343.gba", 0x1896730, 0x279A7C
 
 @ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
 @ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
 	.incbin "graphics/opponents/palette_copy1.bin"
 
-@ Top 图块，ROM 0x1B1200C–0x1B4800B，221184 字节（27 × 0x2000，保留 ROM incbin）
+@ Top 图块整块，ROM 0x1B1200C–0x1B4800B，221184 字节（27 × 0x2000）
 @ 注意：第 20 个对手 Elemental Hero Electrum 图块偏移不规则（0x1B3899C），整段统一保留
-	.incbin "roms/2343.gba", 0x1B1200C, 0x36000
+	.incbin "graphics/opponents/top_tiles_all.bin"
 
 @ Top Tilemap（27 个对手），ROM 0x1B4800C–0x1B4FE9B，每个 0x4B0 字节
 	.incbin "graphics/opponents/kuriboh_top_tilemap.bin"
@@ -147,8 +213,8 @@ Start:
 @ 调色板块（Copy 2），ROM 0x1B4FE9C–0x1B51CFB，7776 字节（内容与 Copy 1 完全相同）
 	.incbin "graphics/opponents/palette_copy1.bin"
 
-@ Bottom 图块，ROM 0x1B51CFC–0x1B87CFB，221184 字节（27 × 0x2000，保留 ROM incbin）
-	.incbin "roms/2343.gba", 0x1B51CFC, 0x36000
+@ Bottom 图块整块，ROM 0x1B51CFC–0x1B87CFB，221184 字节（27 × 0x2000）
+	.incbin "graphics/opponents/bottom_tiles_all.bin"
 
 @ Bottom Tilemap（27 个对手），ROM 0x1B87CFC–0x1B8FB8B，每个 0x4B0 字节
 	.incbin "graphics/opponents/kuriboh_bottom_tilemap.bin"
