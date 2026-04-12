@@ -393,11 +393,52 @@ Bits  9-0 : tile 编号
 
 ---
 
-## 六、常见问题
+## 六、回调有效性汇总
+
+经过实测，mGBA 0.10.5 + mgba-live-mcp 环境下各回调类型的实际行为：
+
+| 回调类型 | 注册时报错 | 实际触发 | 说明 |
+|---------|-----------|---------|------|
+| `frame` | 否 | **有效** | 每帧触发，是唯一可靠的回调类型 |
+| `write` | 否 | 无效 | GBA DMA 写 VRAM 不经过 CPU 内存回调系统 |
+| `read` | 否 | 无效 | 即使 Lua 主动调用 `emu:read8()` 也不触发 |
+| `memory.read` | 否 | 无效 | 同上 |
+| `memory.write` | 否 | 无效 | 同上 |
+| `exec` | 否 | 无效 | 指令执行回调注册成功但不触发 |
+| `crashed` / `reset` | 否 | 未验证 | - |
+
+> **规律**：所有回调类型均可注册（不报错），但只有 `frame` 实际有效。
+> 这是 mgba-live-mcp 的桥接执行环境限制，非 mGBA 本身的全部能力。
+
+### 监控 ROM 读取的替代方案
+
+通过 MCP + Lua 无法监听 ROM 读取。如需追踪游戏从 ROM 的哪些地址读取数据，可用以下方法：
+
+1. **mGBA GUI 调试器**（推荐）  
+   菜单 → Tools → Debugger → Watchpoints，可设置读/写/读写断点，精确定位访问地址。  
+   但只能手动交互，无法自动化。
+
+2. **GDB 远程调试**  
+   启动 mGBA 时添加 `-g <port>` 参数开启 GDB stub，连接后可设置硬件 watchpoint：
+   ```
+   (gdb) watch -location *0x08114A90
+   (gdb) rwatch *0x02000000
+   ```
+
+3. **执行追踪（间接法）**  
+   用 frame 回调在关键时机拍摄 CPU 寄存器快照（`emu:read32(0x08000000)` 等），
+   间接推断当前执行位置及访问模式。
+
+---
+
+## 七、常见问题
 
 | 问题 | 原因 | 解决方案 |
 |------|------|----------|
 | `callbacks:add("write",...)` 无效 | GBA DMA 写 VRAM 不触发 CPU 内存回调 | 改用 frame 回调，每帧主动读取并对比 |
+| `callbacks:add("read",...)` 无效 | mGBA Lua 桥接环境未实现读取回调 | 用 mGBA GUI 调试器或 GDB stub 设置 watchpoint |
+| `exec` 回调无效 | 同上，桥接环境不支持指令级回调 | 需 GDB 或 mGBA 内置调试器逐步追踪 |
+| `emu:addWatchpoint` 不存在 | mGBA Lua API 未暴露该方法 | 使用 GUI 调试器或 GDB |
 | `emu:step()` 不推进帧 | 在 `run_lua` 一次性执行环境中无效 | 用 `input_tap` 或 `input_set` 推进帧 |
 | 在 ROM 中搜不到 tile 数据 | 数据在 ROM 中是压缩存储的（LZ77/Huffman） | 找压缩块起始地址（magic=0x10/0x20/0x30），用 BIOS SWI 解压后追踪 |
 | 全局变量丢失 | MCP server 或 mGBA 进程重启 | 重新初始化所需全局状态 |
