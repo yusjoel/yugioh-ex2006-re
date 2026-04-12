@@ -194,6 +194,72 @@ C:\Users\yushj\AppData\Local\uv\cache\archive-v0\
 
 ---
 
+### 问题 4：MCP server 进程未继承注册表新增的 PATH
+
+**现象**：将 mGBA 加入用户 PATH 注册表后，手动在终端运行 live_cli 成功，但 MCP 工具
+调用仍然超时（`No mGBA binary found`）。
+
+**原因**：Copilot CLI 及其 MCP server 子进程在启动时一次性读取环境变量。后续对注册表
+PATH 的修改对**已运行的 MCP server 进程不生效**，只有下次启动时才会读到新 PATH。
+但如果 PATH 变更与 Copilot CLI 安装/更新时机不同步，server 进程可能仍然使用旧 PATH。
+
+**解决方案**：在 `mcp-config.json` 的 `env` 字段中显式指定 PATH，确保 MCP server
+启动时一定能看到 mGBA 路径：
+
+**`C:\Users\<用户名>\.copilot\mcp-config.json`**
+
+```json
+{
+  "mcpServers": {
+    "mgba": {
+      "command": "uvx",
+      "args": ["mgba-live-mcp"],
+      "env": {
+        "PATH": "D:\\Software\\mGBA-build-latest-win64;<其余 PATH 内容>"
+      }
+    }
+  }
+}
+```
+
+> 将 mGBA 路径放在 PATH 最前面，修改后重启 Copilot CLI 生效。
+
+---
+
+### 问题 5：`live_controller.py` 子进程继承 MCP stdin 管道导致挂起
+
+**现象**：`mgba_live_start` 等工具调用持续超时（20 秒），STDOUT/STDERR 均为空，
+重启后手动执行 live_cli 正常。
+
+**原因**：`live_controller.py` 使用 `asyncio.create_subprocess_exec` 启动 live_cli
+子进程时，未指定 `stdin`，子进程默认**继承父进程（MCP server）的 stdin**。
+MCP server 的 stdin 是与 Copilot CLI 通信的 JSON-RPC 管道——live_cli 子进程继承后
+尝试从管道读取而永久阻塞，永远无法输出结果。
+
+**修复**：在 `live_controller.py` 的 `asyncio.create_subprocess_exec` 调用中
+添加 `stdin=asyncio.subprocess.DEVNULL`：
+
+```python
+proc = await asyncio.create_subprocess_exec(
+    *proc_args,
+    stdin=asyncio.subprocess.DEVNULL,   # ← 新增，防止继承 MCP 管道
+    stdout=asyncio.subprocess.PIPE,
+    stderr=asyncio.subprocess.PIPE,
+    env={**os.environ},
+)
+```
+
+**修改位置**：uv 缓存中的 `live_controller.py`（约第 39 行）：
+
+```
+C:\Users\yushj\AppData\Local\uv\cache\archive-v0\H-avPZ5DfJEF8r9VXxrqe\
+  Lib\site-packages\mgba_live_mcp\live_controller.py
+```
+
+> 此文件运行在 MCP server 持久进程中，修改后需重启 Copilot CLI 才能生效。
+
+---
+
 ### 附：uv 缓存文件修改的注意事项
 
 mgba-live-mcp 通过 `uvx` 运行时，代码存放在 uv 缓存目录：
