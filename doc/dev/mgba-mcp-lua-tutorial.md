@@ -265,7 +265,7 @@ end
 return table.concat(result, "\n")
 ```
 
-### 4.6 搜索 ROM 中的原始数据
+### 4.6 搜索 ROM 中的原始数据（未压缩）
 
 ```lua
 -- 在 ROM 中搜索特定字节序列（用于定位未压缩数据）
@@ -295,6 +295,65 @@ end
 -- 注意：若数据是压缩存储的，此方法无效
 return search_rom({0x22, 0x22, 0x22, 0x22}, 0, 0x200000)
 ```
+
+### 4.7 枚举 ROM 中的 GBA BIOS 压缩块
+
+当 tile 数据搜索失败（原始字节在 ROM 中找不到）时，说明数据是压缩存储的。
+此时应改为扫描 **GBA BIOS 压缩头**，而非数据本身。
+
+#### GBA BIOS 压缩格式规范
+
+所有通过 BIOS SWI 解压的数据块都以固定 4 字节头部开始：
+
+```
+字节 +0：压缩类型魔数
+    0x10 = LZ77（BIOS SWI 0x11）
+    0x20 = Huffman（BIOS SWI 0x13）
+    0x30 = RLE（BIOS SWI 0x14）
+字节 +1~+3：解压后大小（24位小端整数）
+```
+
+只要扫描 ROM 中所有4字节对齐位置，找到魔数 + 合理大小，即可枚举出全部压缩块。
+
+```lua
+-- 枚举 ROM 中所有 GBA BIOS 压缩块（按魔数扫描）
+-- scan_start: ROM 文件偏移起始（0 = 从头）
+-- scan_len:   扫描字节数（建议分段扫描，每次 0x200000）
+-- min_size / max_size: 过滤解压大小范围（字节）
+local function find_compressed_blocks(scan_start, scan_len, min_size, max_size)
+    local rom_base = 0x08000000
+    local magic_names = {[0x10]="LZ77", [0x20]="Huffman", [0x30]="RLE"}
+    local results = {}
+    for offset = scan_start, scan_start + scan_len - 4, 4 do
+        local b0 = emu:read8(rom_base + offset)
+        local magic = magic_names[b0]
+        if magic then
+            local sz = emu:read8(rom_base + offset + 1)
+                     + emu:read8(rom_base + offset + 2) * 0x100
+                     + emu:read8(rom_base + offset + 3) * 0x10000
+            if sz >= min_size and sz <= max_size then
+                table.insert(results, string.format(
+                    "ROM+0x%X  type=%-7s  decomp=%d bytes (%.1fKB)",
+                    offset, magic, sz, sz / 1024))
+            end
+        end
+    end
+    return #results > 0 and table.concat(results, "\n") or "未找到符合条件的压缩块"
+end
+
+-- 示例：在 ROM 前 2MB 中找所有解压后 > 32KB 的压缩块
+return find_compressed_blocks(0, 0x200000, 0x8000, 0x200000)
+```
+
+**实际发现**（游戏王 EX2006）：
+
+| ROM 偏移 | 类型 | 解压大小 | 推测内容 |
+|---------|------|---------|---------|
+| `0x114A90` | Huffman | ~528KB | 日文字体 tile 集（528KB ÷ 32字节/tile ≈ 16,512 个字符） |
+
+> **为什么推测是字体**：16色字体 tile 每个 32 字节，528,715 ÷ 32 ≈ 16,512 tiles。
+> 日文常用字符集（JIS第一/第二水准）约 6,000–10,000 字，加上假名/符号/数字，
+> 总量与此高度吻合。验证方法：解压该块后，搜索 BG3 VRAM 中卡名 tile 的32字节特征。
 
 ---
 
