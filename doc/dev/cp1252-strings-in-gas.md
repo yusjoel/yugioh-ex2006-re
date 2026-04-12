@@ -129,6 +129,59 @@ with open('data/game-strings-de.s', 'w', encoding='cp1252') as f:
 
 ---
 
+## 行尾（Line Endings）
+
+### 问题：CRLF 导致 GAS 续行失败
+
+在 Windows 上，Python 默认以 **CRLF**（`\r\n`）写入文本文件。  
+GAS（arm-none-eabi-as.exe）是基于 Unix 编译的工具，识别行续符 `\` 时要求其**紧跟 `\n`**（LF）。  
+若文件使用 CRLF，`\` 后实际跟着 `\r\n`，GAS 无法将 `\r` 识别为行结束，导致：
+
+```
+data/card-stats.s:29: Warning: stray '\'
+data/card-stats.s:92: Error: bad expression
+```
+
+这类错误在宏调用的参数列表中使用 `\` 续行时最为常见，例如：
+
+```asm
+@ 错误：文件为 CRLF，\后面有隐藏的 \r
+    card_stat \
+        0x0000, \
+        RACE_DRAGON, \
+        ...
+```
+
+### 解决方案：强制 LF 行尾
+
+Python 写文件时指定 `newline='\n'`：
+
+```python
+with open(out_path, 'w', encoding='utf-8', newline='\n') as f:
+    f.write(content)
+```
+
+> **规则：所有 Python 脚本生成的 `.s` 文件，`open()` 必须加 `newline='\n'`，无论目标编码是 UTF-8 还是 CP1252。**
+
+### 建议：避免宏参数列表中的续行
+
+续行语法对行尾非常敏感，且 `/* */` 注释在 ARM GAS 宏参数列表中也可能引发解析问题。  
+推荐改用**每字段独占一行的 `.hword` + `@` 注释**格式代替多行宏调用：
+
+```asm
+@ 推荐（无续行，无兼容性问题）
+card_0001:  @ Blue-Eyes White Dragon  slot=0x0FA7
+    .hword  RACE_DRAGON          @ race: 龙
+    .hword  ATTR_LIGHT           @ attr: 光
+
+@ 避免（续行+内联注释在 CRLF 或某些 GAS 版本下易出错）
+    card_stat \
+        /* race */ RACE_DRAGON, \
+        /* attr */ ATTR_LIGHT
+```
+
+---
+
 ## 相关文件
 
 | 文件 | 编码 | 说明 |
@@ -139,5 +192,6 @@ with open('data/game-strings-de.s', 'w', encoding='cp1252') as f:
 | `data/game-strings-it.s` | **CP1252** | 意大利语 |
 | `data/game-strings-es.s` | **CP1252** | 西班牙语 |
 | `data/deck-strings.s` | ASCII | 卡组名（自定义 2 字节编码） |
-| 其余 `.s` 文件 | ASCII | 纯 ASCII 内容 |
+| 其余 `.s` 文件 | ASCII / LF | 纯 ASCII 内容 |
 | `tools/export_game_strings.py` | — | 生成脚本，输出编码 `cp1252` |
+| `tools/export_card_data.py` | — | 生成脚本，输出编码 `utf-8`，行尾 LF |
