@@ -81,6 +81,13 @@ if ($remote -ne $local) {
 
 ---
 
+### mgba/
+
+**来源**：<https://github.com/mgba-emu/mgba>  
+**作用**：mGBA 模拟器源码，主要参考 GDB stub 实现（`src/debugger/gdb-stub.c`），用于理解模拟器与调试器之间的 RSP 协议交互细节，以及逆向调试工作流的搭建。
+
+---
+
 ## 注意事项
 
 - 首次克隆仓库后，以上子目录均为空（不存在）。根据实际需要手动下载或迁移。
