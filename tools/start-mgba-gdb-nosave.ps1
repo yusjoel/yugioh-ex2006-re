@@ -13,33 +13,11 @@
 
 $rom = "$projectRoot\roms\2343.gba"
 
-# UseShellExecute=$true 使进程独立于 PowerShell job object，session 退出后不被杀死
-$psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName  = $mgba
-$psi.Arguments = "-g `"$rom`""
-$psi.UseShellExecute = $true
-$p = [System.Diagnostics.Process]::Start($psi)
-Write-Host "[start] mGBA 已启动，PID: $($p.Id)"
-
-# 等待端口 2345 LISTENING
-Write-Host "[start] 等待端口 2345..."
-$timeout = 15; $elapsed = 0
-while ($elapsed -lt $timeout) {
-    Start-Sleep -Seconds 1; $elapsed++
-    if (netstat -ano | Select-String ":2345\s.*LISTEN") {
-        Write-Host "[start] 端口 2345 已就绪（${elapsed}s）"
-        break
-    }
-    if (-not (Get-Process -Id $p.Id -ErrorAction SilentlyContinue)) {
-        Write-Host "[start] 错误：mGBA 进程已退出！检查 ROM 路径或 mGBA 版本。"
-        exit 1
-    }
-}
-if (-not (netstat -ano | Select-String ":2345\s.*LISTEN")) {
-    Write-Host "[start] 警告：超时后端口 2345 仍未就绪"
-}
-
-# 额外等待 CPU 热身
-Write-Host "[start] 等待 8 秒，让游戏 CPU 进入 RSP 循环..."
-Start-Sleep -Seconds 8
-Write-Host "[start] 就绪！可运行 GDB：`n  tools\arm-none-eabi-gdb.exe --batch -x output\gdb_dma_watch.gdb"
+# 使用 cmd /c start 启动，彻底脱离当前 PowerShell Job Object
+# UseShellExecute 不足以保证在工具调用环境下子进程不被杀死
+# cmd start 会创建独立的新进程组，不受父 PS 会话 Job Object 约束
+$args = "/c start `"`" `"$mgba`" -g `"$rom`""
+$p = Start-Process -FilePath "cmd.exe" -ArgumentList $args -PassThru
+Write-Host "[start] mGBA 已启动（通过 cmd /c start），启动器 PID: $($p.Id)"
+Write-Host "[start] 脚本立即退出（保持 mGBA 独立存活）"
+Write-Host "[start] 下一步（新命令）：& tools\wait-mgba-ready.ps1"
