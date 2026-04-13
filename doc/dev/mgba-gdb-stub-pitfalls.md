@@ -75,6 +75,30 @@ grep "svc 0x12" all.s   # LZ77UnCompWram
 grep "svc 0x13" all.s   # HuffUnCompReadNormal
 ```
 
+### 坑 8：GDB stub watchpoint 强制 1 字节范围
+
+GDB 协议的 `Z2/Z3/Z4`（watchpoint）命令带有 address 和 size 两个参数。但 mGBA `gdb-stub.c` 的 `_setBreakpoint()` **忽略 size**，始终只监听 1 字节：
+
+```c
+struct mWatchpoint watchpoint = {
+    .minAddress = address,
+    .maxAddress = address + 1   // ← 硬编码，不读 size
+};
+```
+
+**影响**：`watch *(uint*)0x06000040` 只监 1 字节，而不是 4 字节；宽范围覆盖只能靠大量独立 watchpoint。
+
+**规避**：改用方案 A（ROM 离线搜索）；或不依赖 GDB watchpoint，改用 hbreak + 手动读寄存器。
+
+### 坑 9：VRAM/EWRAM watchpoint 失败是地址错，不是区域限制
+
+mGBA watchpoint 通过 CPU 内存访问 shim 实现，**理论上覆盖所有地址**，包括 VRAM（0x06xxxxxx）和 EWRAM（0x02xxxxxx）。过去实验失败的真实原因：
+
+1. 监听了 `0x06000000`（tile 0 / 背景色），而卡图从 `0x06000040`（tile 1）开始写
+2. 使用了存档快照（ss1），卡图在快照时已加载完毕，按 A 不触发新写入
+
+**规避**：不加载存档，从游戏启动重新进入；同时监听正确的地址范围。
+
 ### 坑 7：加载存档快照的参数格式
 
 ROM 文件和存档快照需分开传，ROM 路径放最后：

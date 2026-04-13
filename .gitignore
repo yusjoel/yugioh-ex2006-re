@@ -27,3 +27,6 @@ graphics/
 
 # 本地环境配置（路径因机器而异）
 LOCAL.md
+roms/*.sav
+roms/*.ss*
+tools/arm-none-eabi-gdb.exe

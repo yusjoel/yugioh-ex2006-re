@@ -63,16 +63,67 @@ new = 89（0x59）
 
 ---
 
-## mGBA GDB Stub Watchpoint 支持范围（总结）
+## mGBA GDB Stub Watchpoint 支持范围（修订）
+
+> **2026-04-13 修订**：经阅读 mGBA 源码，原先"VRAM/EWRAM 不支持"的结论是**误判**，见下方源码分析。
 
 | 地址范围 | 区域 | Watchpoint 支持 |
 |----------|------|----------------|
-| 0x04xxxxxx | I/O 寄存器 | ✅ 支持 |
+| 0x04xxxxxx | I/O 寄存器 | ✅ 支持（实验验证） |
 | 0x08xxxxxx | ROM | ✅ 支持（hbreak 测试过） |
-| 0x06xxxxxx | VRAM | ❌ 不支持 |
-| 0x02xxxxxx | EWRAM | ❌ 不支持（疑似） |
-| 0x03xxxxxx | IWRAM | 未测试 |
+| 0x06xxxxxx | VRAM | ✅ **理论支持**（失败另有原因，见下） |
+| 0x02xxxxxx | EWRAM | ✅ **理论支持**（失败另有原因，见下） |
+| 0x03xxxxxx | IWRAM | ✅ 理论支持（未测试） |
 | 0x00000008 | BIOS SWI 向量 | ❌ 不支持（hbreak 不工作） |
+
+---
+
+## 源码分析：Watchpoint 实现机制（2026-04-13）
+
+阅读 `src/arm/debugger/memory-debugger.c` 后，watchpoint 的实现方式已确认：
+
+**机制**：通过替换 CPU 的内存访问函数指针（shim）实现，**对所有地址均有效**。
+
+```c
+// ARMDebuggerInstallMemoryShim() — 将所有内存访问替换为带 watchpoint 检查的 shim
+debugger->cpu->memory.store32 = DebuggerShim_store32;
+debugger->cpu->memory.store16 = DebuggerShim_store16;
+debugger->cpu->memory.store8  = DebuggerShim_store8;
+// ... load 同理
+```
+
+每次内存读写都经过 `_checkWatchpoints()`，按地址范围匹配——**无任何区域白名单/黑名单**。  
+BIOS LZ77 解压（`src/gba/bios.c` `_unLz77`）同样使用 `cpu->memory.store8/store16`，**也会触发 watchpoint**。
+
+---
+
+## VRAM/EWRAM Watchpoint 失败的真实原因（修订）
+
+之前实验失败不是 mGBA 的限制，而是以下三重问题叠加：
+
+### 原因 1：监听地址错误 ⭐ 最可能
+
+- 之前监听 `0x06000000`（tile 0，背景色/调色板区域）
+- 卡图数据从 **tile 1** 开始写入：`0x06000040`
+- 如卡图占 tiles 1–36，写入范围是 `0x06000040`–`0x060008FF`
+
+### 原因 2：GDB stub 强制 1 字节范围
+
+阅读 `src/debugger/gdb-stub.c` `_setBreakpoint()` 源码：
+
+```c
+struct mWatchpoint watchpoint = {
+    .minAddress = address,
+    .maxAddress = address + 1   // ← 始终只监 1 字节，忽略 GDB 协议中的 size 参数
+};
+```
+
+GDB 的 `watch *(uint*)0x06000040` 命令会带 size=4，但 stub **丢弃 size**，只监 1 字节。  
+要覆盖 2304 字节的卡图区域，需要设 2304 个 watchpoint，不现实。
+
+### 原因 3：存档预加载
+
+使用 `2343.ss1` 快照启动时，卡图可能已在快照保存前解压到 VRAM，进入游戏后 VRAM 内容直接恢复，按 A 只是切换显示层，不触发新的写入。
 
 ---
 
@@ -82,9 +133,10 @@ new = 89（0x59）
 |------|------|------|
 | DMA3 watchpoint | ❌ 排除 | 卡图不走 DMA3 |
 | BIOS SWI 向量断点（0x8）| ❌ 排除 | mGBA stub 不支持 BIOS 地址 |
-| VRAM watchpoint | ❌ 排除 | mGBA stub 不支持 |
-| EWRAM watchpoint | ❌ 排除 | mGBA stub 不支持 |
+| GDB stub 宽范围 VRAM watchpoint | ❌ 实际不可行 | stub 强制 1 字节，无法覆盖 2304 字节卡图区 |
+| EWRAM watchpoint | ⚠️ 待重试 | 地址正确性未验证，stub 同样只监 1 字节 |
 | Lua memoryWrite 回调 | ❌ 排除 | mGBA Lua API 不可用 |
+| mGBA CLI 调试器（--debugCli）| ❌ 无效 | 当前构建版本（0.11-dev）传入后 mGBA 立即退出，该参数可能未编译进去 |
 
 ---
 
@@ -117,7 +169,7 @@ new = 89（0x59）
 
 ## 下一步方向
 
-### 方案 A：ROM 离线搜索（推荐）
+### 方案 A：ROM 离线搜索（推荐，不依赖运行时调试）
 
 LZ77 压缩块头格式：
 - 字节 0：`0x10`（LZ77 魔数）
@@ -135,11 +187,19 @@ for i in range(0, len(data)-4, 4):
         print(hex(i))  # 候选卡图压缩块
 ```
 
-### 方案 B：ROM 中搜索 SWI 调用点
+### 方案 B：GDB hbreak 全覆盖 SWI 调用点
 
-在 ROM 中找到调用 SWI 且 r1=0x06000000 的代码段，对这些 ROM 地址设 hbreak，按 A 触发后读 r0（ROM 压缩数据地址）。
+在 ROM 二进制中搜索所有 `svc 0x11`/`svc 0x12` 字节序列，对每个地址设 hbreak，**不带存档**启动游戏，操作到卡牌列表页，按 A 触发详情页加载，断点命中时读 r0（ROM 压缩数据地址）。
 
-SWI 0x11 THUMB 编码：`11 DF`（字节序列）
+- SWI 0x11 THUMB 编码：`11 DF`
+- SWI 0x12 THUMB 编码：`12 DF`
+- **关键**：不加载 ss1 存档，确保卡图加载发生在 GDB 监听期间内
+
+### ⚠️ mgba-sdl -g 的新坑（2026-04-13）
+
+当前 mGBA build-latest-win64 的 `mgba-sdl.exe` 使用 `-g` 时报 `Debugger: Couldn't open socket` 后仍能运行，但端口 2345 **不监听**。原因未明（可能是 Windows socket 权限或编译配置）。
+
+**临时规避**：改用 `mGBA.exe`（Qt 版）+ `-g`，或查明 mgba-sdl socket 失败原因。Qt 版之前成功用过（见 `doc/gdb-mgba-watchpoint.md`）。
 
 ---
 
