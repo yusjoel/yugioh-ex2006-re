@@ -286,3 +286,66 @@ incbin [end, 0x1FFFF00]
   | `0x1B8FB8C – 0x1DBF019` | ~2.3 MB | 游戏背景画面（LZ77 压缩） |
   | `0x1EC33DC` | — | 标题画面（LZ77，与 T5 重叠） |
 
+---
+
+## Ghidra 反向标注计划
+
+### 背景
+
+当前 Ghidra 仅用于导出 `asm/all.s`（Ghidra Script `ExportRangeToGasS_v6.py`），
+导出结果存在 ARM/THUMB 模式错误和 s-suffix 缺失，须由 `tools/inject_modes.py` 修正。
+这是对 Ghidra 能力的严重低估。
+
+Ghidra 的真正价值在于**交互式静态分析**：
+
+| 功能 | 说明 |
+|------|------|
+| 反编译器 | 把函数还原为伪 C，可直接阅读函数逻辑 |
+| 交叉引用（XREF） | 找到所有引用某地址的函数/数据 |
+| Struct 定义 | 反编译器把 `[r4,#0x8]` 显示为 `card->attack` |
+| 符号/函数命名 | 给函数起名后所有调用点自动更新 |
+| 调用图 | 快速了解函数依赖关系 |
+
+### 可写回 Ghidra 的已分析数据
+
+| 已有数据 | 能给 Ghidra 什么 | Ghidra 能反过来做什么 |
+|---------|----------------|---------------------|
+| `data/card-names.s` | 每个卡名地址打标签 | XREF 找到所有引用该卡名的函数 |
+| `data/card-stats.s` | 定义 `CardStats` struct | 反编译器显示字段名而非偏移量 |
+| `data/struct-decks.s` | 定义 `DeckEntry` struct | 读懂卡组加载函数 |
+| `data/game-strings-*.s` | 所有字符串地址打标签 | 找到显示每段文字的函数 |
+| `data/banlists.s` | 禁卡表地址标注 | 找到禁卡检查逻辑 |
+| `data/opponent-decks.s` | AI 卡组数据标注 | 找到 AI 决策函数 |
+| `data/opponent-card-values.s` | 对手卡值表标注 | 找到对手选卡权重计算函数 |
+
+### 实现方案
+
+写一个 Ghidra Script `ImportProjectLabels.py`，读取项目 `.s` 文件，
+批量调用 Ghidra API 创建标签、注释和数据类型：
+
+```python
+# 核心 API（GhidraScript Python）
+createLabel(toAddr(0x815BB5AC), "CardName_EN_0001", True)
+setComment(toAddr(0x815BB5AC), CodeUnit.EOL_COMMENT, "Blue-Eyes White Dragon")
+createData(toAddr(0x818169B6), CardStatsStruct)
+```
+
+**优先顺序**（效益最高优先）：
+
+1. **先定义 struct**（`CardStats` 22字节、`DeckEntry` 4字节）
+   → 反编译器立即能读懂涉及卡牌的所有函数
+2. **导入字符串标签**（`data/game-strings-*.s` 中的标签名）
+   → 快速用 XREF 定位显示逻辑
+3. **导入卡名标签**（`data/card-names.s`）
+   → 定位卡牌渲染/检索函数
+
+### 子任务
+
+- [ ] **TG.1**：确认 `CardStats` struct 字段布局（22字节，需对照 T6 调查结果）
+- [ ] **TG.2**：编写 `ghidra_scripts/ImportProjectLabels.py`，导入所有字符串和卡组标签
+- [ ] **TG.3**：在 Ghidra 中定义 `CardStats`、`DeckEntry` 数据类型并应用到数据区
+- [ ] **TG.4**（持续）：利用 XREF 从已知数据反向追踪，命名关键函数
+
+> **注意**：`all.s` 导出流程（`ExportRangeToGasS` 脚本 + `inject_modes.py`）可逐步退役，
+> 替换为直接用 `arm-none-eabi-objdump` 生成参考反汇编，Ghidra 专用于交互分析。
+
