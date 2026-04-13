@@ -24,3 +24,6 @@ refs/awesome-gbadev/
 
 # 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
 graphics/
+
+# 本地环境配置（路径因机器而异）
+LOCAL.md
