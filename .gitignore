@@ -20,6 +20,7 @@ refs/agbcc/
 refs/pokeruby/
 refs/WCT2006BATTLECITY/
 refs/mgba/
+refs/awesome-gbadev/
 
 # 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
 graphics/

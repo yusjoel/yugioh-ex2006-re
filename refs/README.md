@@ -81,6 +81,13 @@ if ($remote -ne $local) {
 
 ---
 
+### awesome-gbadev/
+
+**来源**：<https://github.com/gbadev-org/awesome-gbadev>  
+**作用**：GBA 开发资源精选列表，收录了工具链、文档、教程、示例项目等，作为反汇编和 ROM hack 工作的参考索引。
+
+---
+
 ### mgba/
 
 **来源**：<https://github.com/mgba-emu/mgba>  
