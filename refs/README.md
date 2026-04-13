@@ -17,7 +17,42 @@
 | `cards.json` | 完整卡牌数据（约 13 MB），按需下载 |
 | `cards.zip.md5` | 远端压缩包的 MD5，用于增量更新判断 |
 
-下载方法见主 [README.md](../README.md#卡牌数据库ygocdb)。
+#### 字段说明
+
+| 字段 | 含义 |
+|------|------|
+| `cid` | 官方数据库唯一标识符 |
+| `cn_name` | YGOPro 译名（中文） |
+| `sc_name` | 官方简体中文名称 |
+| `md_name` | Master Duel 中文名称 |
+| `nwbbs_n` | NWBBS 论坛译名 |
+| `cnocg_n` | CNOCG 论坛译名 |
+| `wiki_en` | Yugipedia 英文名（仅未正式发售的卡有此字段） |
+
+#### 下载方法
+
+```powershell
+$md5Url  = "https://ygocdb.com/api/v0/cards.zip.md5"
+$zipUrl  = "https://ygocdb.com/api/v0/cards.zip"
+$md5File = "refs\ygocdb\cards.zip.md5"
+$jsonFile = "refs\ygocdb\cards.json"
+
+$remote = (Invoke-WebRequest $md5Url).Content.Trim().Trim('"')
+$local  = if (Test-Path $md5File) { Get-Content $md5File } else { "" }
+
+if ($remote -ne $local) {
+    Invoke-WebRequest $zipUrl -OutFile "refs\ygocdb\cards.zip"
+    Expand-Archive -Path "refs\ygocdb\cards.zip" -DestinationPath "refs\ygocdb\" -Force
+    Remove-Item "refs\ygocdb\cards.zip"
+    Set-Content $md5File $remote -Encoding UTF8 -NoNewline
+    Write-Host "cards.json 已更新"
+} else {
+    Write-Host "cards.json 已是最新"
+}
+```
+
+> MD5 端点：`https://ygocdb.com/api/v0/cards.zip.md5`  
+> 建议先比对 MD5，仅有变化时才重新下载完整压缩包。
 
 ---
 

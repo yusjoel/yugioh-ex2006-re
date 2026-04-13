@@ -14,8 +14,11 @@ ghidra
 
 output/
 
-# refs/ 参考目录：所有子目录本地使用，不纳入版本控制
-refs/*/
+# refs/ 参考目录：子目录本地使用，不纳入版本控制；README.md 保留版本管理
+refs/ygocdb/
+refs/agbcc/
+refs/pokeruby/
+refs/WCT2006BATTLECITY/
 
 # 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
 graphics/
