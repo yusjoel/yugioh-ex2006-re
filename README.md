@@ -127,7 +127,7 @@ roms/2343.gba
 
 ## 卡牌数据库（YGOCdb）
 
-`data/cards.json` 包含完整的游戏王卡牌中文数据，来自 [ygocdb.com](https://ygocdb.com)。  
+`refs/ygocdb/cards.json` 包含完整的游戏王卡牌中文数据，来自 [ygocdb.com](https://ygocdb.com)。  
 该文件体积较大（约 13 MB），不纳入版本控制，需手动下载。
 
 ### 字段说明
@@ -148,17 +148,17 @@ roms/2343.gba
 # 1. 获取最新 MD5 校验值
 $md5Url  = "https://ygocdb.com/api/v0/cards.zip.md5"
 $zipUrl  = "https://ygocdb.com/api/v0/cards.zip"
-$md5File = "data\cards.zip.md5"
-$jsonFile = "data\cards.json"
+$md5File = "refs\ygocdb\cards.zip.md5"
+$jsonFile = "refs\ygocdb\cards.json"
 
 # 2. 仅在远端有更新时重新下载
 $remote = (Invoke-WebRequest $md5Url).Content.Trim().Trim('"')
 $local  = if (Test-Path $md5File) { Get-Content $md5File } else { "" }
 
 if ($remote -ne $local) {
-    Invoke-WebRequest $zipUrl -OutFile "data\cards.zip"
-    Expand-Archive -Path "data\cards.zip" -DestinationPath "data\" -Force
-    Remove-Item "data\cards.zip"
+    Invoke-WebRequest $zipUrl -OutFile "refs\ygocdb\cards.zip"
+    Expand-Archive -Path "refs\ygocdb\cards.zip" -DestinationPath "refs\ygocdb\" -Force
+    Remove-Item "refs\ygocdb\cards.zip"
     Set-Content $md5File $remote -Encoding UTF8 -NoNewline
     Write-Host "cards.json 已更新"
 } else {

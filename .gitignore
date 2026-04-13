@@ -14,9 +14,8 @@ ghidra
 
 output/
 
-# YGOCdb 卡牌数据库（体积大，按需下载）
-data/cards.json
-data/cards.zip.md5
+# refs/ 参考目录：所有子目录本地使用，不纳入版本控制
+refs/*/
 
 # 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
 graphics/
