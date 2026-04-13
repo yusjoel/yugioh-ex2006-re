@@ -1,5 +1,61 @@
 # Yu-Gi-Oh! Ultimate Masters: WCT 2006 ROM 数据汇编化计划
 
+---
+
+## 🔴 P0（最高优先级）：调试工具链完善
+
+> **当前阶段**：暂停卡图 ROM 定位，先打通完整调试工具链，建立可重复的调试工作流。
+
+### 目标
+
+建立一套完整、可重复的调试流程：从 mGBA 启动 → GDB 连接 → 监听内存 → 读取 ROM 数据 → 导出图片。
+
+### 子任务
+
+#### P0-1：纯命令行方式跑通完整调试流程（不依赖 MCP）
+
+- [ ] 启动 mGBA（带 `-g` GDB stub），等待端口就绪
+- [ ] 使用 `tools/arm-none-eabi-gdb.exe`（GDB 10.2）连接
+- [ ] 设置 DMA3 写入 watchpoint（`0x040000D4`），监听图形数据搬运
+- [ ] 触发卡图加载，记录 watchpoint 触发时的 ROM 源地址（r0）
+- [ ] 根据 ROM 地址读取压缩数据，导出并验证为合法 LZ77 或原始 4bpp 图像
+- [ ] 输出：GDB 脚本 `output/gdb_dma_watch.gdb` + 导出流程文档
+
+#### P0-2：使用 mGBA MCP 走通上述流程
+
+- [ ] 通过 mGBA MCP 启动 mGBA 并加载 ROM
+- [ ] 用 MCP Lua 接口读取内存，替代 GDB watchpoint 监听 DMA 写入
+- [ ] 记录 ROM 源地址，读取并导出图像数据
+- [ ] 输出：Lua 脚本或 MCP 调用记录
+
+#### P0-3：验证 mGBA MCP 各项功能
+
+- [ ] 截图功能（`mgba_live_export_screenshot`）
+- [ ] 模拟按键（`mgba_live_input_tap` / `mgba_live_input_set`）
+- [ ] 内存读取（`mgba_live_read_memory` / `mgba_live_read_range`）
+- [ ] Lua 脚本注入（`mgba_live_run_lua`）
+- [ ] 输出：功能验证报告，记录已知限制
+
+#### P0-4：验证 GDB 各种断点类型
+
+- [ ] 软件断点（`break`）
+- [ ] 硬件断点（`hbreak`）——已知 mGBA stub 支持
+- [ ] 读 watchpoint（`rwatch`）
+- [ ] 写 watchpoint（`watch`）
+- [ ] 访问 watchpoint（`awatch`）
+- [ ] 各类型在 ROM / EWRAM / VRAM / IWRAM 地址上的可用性矩阵
+- [ ] 输出：`doc/dev/gdb-breakpoint-matrix.md`
+
+#### P0-5：接入 GDB MCP，跑通完整调试流程
+
+- [ ] 通过 GDB MCP 工具连接 mGBA GDB stub
+- [ ] 用 MCP 接口设置断点 / watchpoint
+- [ ] 触发并读取寄存器
+- [ ] 端到端验证：从 MCP 调用到读出 ROM 地址全流程
+- [ ] 输出：MCP 调用记录 + 流程文档
+
+---
+
 ## 目标
 
 将 ROM 中已知数据区从 `.incbin` 替换为带结构注释的可读汇编代码，
