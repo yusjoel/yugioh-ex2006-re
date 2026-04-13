@@ -7,7 +7,7 @@
 
 - **devkitARM**（包含 `as`、`ld`、`objcopy`）  
   安装路径需在 `PATH` 中，或修改 `build.bat` 指向实际路径  
-  推荐安装目录：`D:\devkitPro\devkitARM\arm-none-eabi\bin\`
+  推荐安装目录：`<devkitPro安装目录>\devkitARM\arm-none-eabi\bin\`
 - **原始 ROM**：将未修改的原版 ROM 放置于 `roms/2343.gba`
 
 ## 快速开始

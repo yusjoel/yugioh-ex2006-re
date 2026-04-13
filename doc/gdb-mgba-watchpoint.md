@@ -248,4 +248,4 @@ EWRAM（`0x02000000`）watchpoint 成功触发。ROM（`0x08000000`）watchpoint
 
 - [mGBA GDB stub 源码](https://github.com/mgba-emu/mgba/blob/master/src/debugger/gdb-stub.c)
 - [GDB Remote Serial Protocol 规范](https://sourceware.org/gdb/current/onlinedocs/gdb.html/Remote-Protocol.html)
-- devkitARM `arm-none-eabi-gdb` 14.1，安装于 `D:\devkitPro\devkitARM\bin\`
+- devkitARM `arm-none-eabi-gdb` 14.1，安装于 `<devkitPro安装目录>\devkitARM\bin\`

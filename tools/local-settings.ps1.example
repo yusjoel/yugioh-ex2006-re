@@ -1,0 +1,9 @@
+# tools/local-settings.ps1.example
+# 复制为 local-settings.ps1 并修改为本机实际路径
+# local-settings.ps1 已在 .gitignore 中忽略，不会被提交
+
+# mGBA 可执行文件路径
+$mgba = "C:\path\to\mGBA.exe"
+
+# 项目根目录（包含 roms\ 子目录）
+$projectRoot = "C:\path\to\yugioh-ex2006-re"

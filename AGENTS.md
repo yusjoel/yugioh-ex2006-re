@@ -7,12 +7,12 @@
 ## 工具链
 
 - **反汇编工具**: devkitARM
-- **安装路径**: `D:\devkitPro\devkitARM\arm-none-eabi\bin\`
+- **安装路径**: 见 `LOCAL.md`（各机器路径不同）
 
 ## PowerShell 配置
 
 - **推荐版本**: PowerShell 7.5.4
-- **可执行文件路径**: `D:\Program Files\PowerShell\7\pwsh.exe`
+- **可执行文件路径**: 见 `LOCAL.md`（各机器路径不同）
 - **说明**: 系统自带的 PowerShell 版本较低，建议使用 PowerShell 7 版本执行脚本
 
 ## 目标文件
