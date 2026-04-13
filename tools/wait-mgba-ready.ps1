@@ -4,7 +4,7 @@
 # 使用方式：
 #   第一步：& tools\start-mgba-gdb-nosave.ps1   （或 ss1 版本）
 #   第二步：& tools\wait-mgba-ready.ps1          （本脚本）
-#   第三步：& tools\arm-none-eabi-gdb.exe --batch -x output\gdb_dma_watch.gdb
+#   第三步：& tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
 #
 # 等待逻辑（见 mgba-gdb-stub-pitfalls.md 坑2）：
 #   1. 轮询 netstat 直到端口 2345 LISTENING
@@ -36,4 +36,4 @@ Write-Host "[wait] 等待 ${CPU_WARMUP}s，让游戏 CPU 进入 RSP 循环..."
 Start-Sleep -Seconds $CPU_WARMUP
 
 Write-Host "[wait] 就绪！现在可以连接 GDB："
-Write-Host "  tools\arm-none-eabi-gdb.exe --batch -x output\gdb_dma_watch.gdb"
+Write-Host "  tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb"

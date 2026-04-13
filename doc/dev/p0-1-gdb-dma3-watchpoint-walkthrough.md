@@ -18,7 +18,7 @@
 | `tools/start-mgba-gdb-nosave.ps1` | 启动 mGBA（无存档冷启动） |
 | `tools/start-mgba-gdb-ss1.ps1` | 启动 mGBA（加载 `roms/2343.ss1` 存档） |
 | `tools/wait-mgba-ready.ps1` | 等待 GDB stub 端口就绪 + CPU 热身 |
-| `output/gdb_dma_watch.gdb` | GDB 自动化脚本：设置 watchpoint、捕获触发 |
+| `doc/dev/scripts/gdb_dma_watch.gdb` | GDB 自动化脚本：设置 watchpoint、捕获触发 |
 | `tools/arm-none-eabi-gdb.exe` | GDB 10.2，唯一兼容 mGBA stub 的版本 |
 
 ---
@@ -73,13 +73,13 @@ GBA 有 4 个 DMA 通道，DMA3 是通用 DMA：
 [wait] 端口 2345 已就绪（1s）
 [wait] 等待 8s，让游戏 CPU 进入 RSP 循环...
 [wait] 就绪！现在可以连接 GDB：
-  tools\arm-none-eabi-gdb.exe --batch -x output\gdb_dma_watch.gdb
+  tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
 ```
 
 ### 步骤 3：运行 GDB 脚本
 
 ```powershell
-& "tools\arm-none-eabi-gdb.exe" --batch -x "output\gdb_dma_watch.gdb"
+& "tools\arm-none-eabi-gdb.exe" --batch -x "doc\dev\scripts\gdb_dma_watch.gdb"
 ```
 
 预期输出（成功）：
@@ -107,7 +107,7 @@ r3   0x30055e0
 
 ---
 
-## GDB 脚本内容（`output/gdb_dma_watch.gdb`）
+## GDB 脚本内容（`doc/dev/scripts/gdb_dma_watch.gdb`）
 
 ```gdb
 set architecture armv4t

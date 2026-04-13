@@ -82,6 +82,14 @@ disassemble.bat
 - ROM 入口点通常在 `0x080000C0`
 - 构建前确保已安装 devkitARM 并正确配置路径
 
+## 调试脚本管理
+
+`doc/dev/scripts/` 目录存放调试用脚本（GDB 脚本、Lua 脚本等）。
+
+- 可以主动 `git add`（stage）这些文件
+- **不要主动 commit**，由用户决定何时提交
+- 修改后只 stage，不 commit，除非用户明确要求
+
 ## 语言偏好
 
 - **交流语言**: 简体中文

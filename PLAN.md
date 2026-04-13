@@ -19,7 +19,7 @@
 - [ ] 设置 DMA3 写入 watchpoint（`0x040000D4`），监听图形数据搬运
 - [ ] 触发卡图加载，记录 watchpoint 触发时的 ROM 源地址（r0）
 - [ ] 根据 ROM 地址读取压缩数据，导出并验证为合法 LZ77 或原始 4bpp 图像
-- [ ] 输出：GDB 脚本 `output/gdb_dma_watch.gdb` + 导出流程文档
+- [ ] 输出：GDB 脚本 `doc/dev/scripts/gdb_dma_watch.gdb` + 导出流程文档
 
 #### P0-2：使用 mGBA MCP 走通上述流程
 
