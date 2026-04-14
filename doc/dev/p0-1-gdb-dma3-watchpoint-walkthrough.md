@@ -14,10 +14,10 @@
 
 | 文件 | 用途 |
 |------|------|
-| `tools/_preflight-mgba.ps1` | 启动前预检：关闭已有 mGBA、确认端口空闲 |
-| `tools/start-mgba-gdb-nosave.ps1` | 启动 mGBA（无存档冷启动） |
-| `tools/start-mgba-gdb-ss1.ps1` | 启动 mGBA（加载 `roms/2343.ss1` 存档） |
-| `tools/wait-mgba-ready.ps1` | 等待 GDB stub 端口就绪 + CPU 热身 |
+| `tools/mgba-scripts/_preflight-mgba.ps1` | 启动前预检：关闭已有 mGBA、确认端口空闲 |
+| `tools/mgba-scripts/start-mgba-gdb-nosave.ps1` | 启动 mGBA（无存档冷启动） |
+| `tools/mgba-scripts/start-mgba-gdb-ss1.ps1` | 启动 mGBA（加载 `roms/2343.ss1` 存档） |
+| `tools/mgba-scripts/wait-mgba-ready.ps1` | 等待 GDB stub 端口就绪 + CPU 热身 |
 | `doc/dev/scripts/gdb_dma_watch.gdb` | GDB 自动化脚本：设置 watchpoint、捕获触发 |
 | `tools/arm-none-eabi-gdb.exe` | GDB 10.2，唯一兼容 mGBA stub 的版本 |
 
@@ -46,7 +46,8 @@ GBA 有 4 个 DMA 通道，DMA3 是通用 DMA：
 
 ```powershell
 # 必须使用 PowerShell 7 执行（系统自带 PS 5.1 对中文脚本有编码问题）
-& "D:\Program Files\PowerShell\7\pwsh.exe" -File tools\start-mgba-gdb-ss1.ps1
+# pwsh.exe 路径见 LOCAL.md
+pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1
 ```
 
 预期输出：
@@ -58,13 +59,13 @@ GBA 有 4 个 DMA 通道，DMA3 是通用 DMA：
 [preflight] 端口 2345 未被占用，OK
 [start] mGBA 已启动（+ss1 存档，通过 cmd /c start），启动器 PID: 7864
 [start] 脚本立即退出（保持 mGBA 独立存活）
-[start] 下一步（新命令）：& tools\wait-mgba-ready.ps1
+[start] 下一步（新命令）：& tools/mgba-scripts/wait-mgba-ready.ps1
 ```
 
 ### 步骤 2：等待 GDB stub 就绪
 
 ```powershell
-& "D:\Program Files\PowerShell\7\pwsh.exe" -File tools\wait-mgba-ready.ps1
+pwsh -File tools/mgba-scripts/wait-mgba-ready.ps1
 ```
 
 预期输出：
@@ -73,7 +74,7 @@ GBA 有 4 个 DMA 通道，DMA3 是通用 DMA：
 [wait] 端口 2345 已就绪（1s）
 [wait] 等待 8s，让游戏 CPU 进入 RSP 循环...
 [wait] 就绪！现在可以连接 GDB：
-  tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
+  tools/arm-none-eabi-gdb.exe --batch -x doc/dev/scripts/gdb_dma_watch.gdb
 ```
 
 ### 步骤 3：运行 GDB 脚本
@@ -278,4 +279,5 @@ DMA3DAD = 0xa101a101
 
 ## 下一步
 
-P0-1 完成后，下一阶段为 **P0-2：通过 mGBA MCP 重走上述流程**，验证 MCP 工具的截图、按键模拟、内存读取等功能。
+P0-1 已闭环，P0 全部阶段完成（见 `p0-3-mgba-mcp-feature-validation.md` / `p0-5-gdb-mcp-integration.md`）。
+基于本工具链的后续实战，见 P1 卡图定位：`p1-card-image-location-plan.md` 与 `p1-phase-b2-findings.md`。
