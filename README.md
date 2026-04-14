@@ -153,6 +153,10 @@ pwsh -File tools\start-mgba-gdb-ss1.ps1
 | `mgba_live_read_range` | 读取内存范围 |
 | `mgba_live_dump_oam` | 转储 OAM 精灵表 |
 
+> **mGBA MCP 与 GDB stub 可同时工作**（已验证）：两者通过不同端口通信，互不干扰。
+> `start-mgba-gdb-ss1.ps1` 启动后可直接附加 MCP 会话（`mgba_live_attach`），
+> 同时进行截图/内存读取/按键注入，GDB 连接不受影响。
+
 ### GDB MCP（断点 / 寄存器 / 单步执行）
 
 通过 [GDB MCP](https://github.com/pansila/gdb-mcp) 工具，以 MI 协议驱动 GDB 连接 mGBA GDB stub。
