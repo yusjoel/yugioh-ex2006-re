@@ -1,12 +1,21 @@
 # P1：卡牌信息页面内容定位——调试方案
 
+## 进度总览
+
+| Phase | 状态 | 完成日期 | 产出 |
+|-------|------|---------|------|
+| Phase A：VRAM 布局定位 | ✅ 已完成 | 2026-04-14 | [分析报告](../analysis/p1-card-image-location/README.md) |
+| Phase B2：GDB 写监视点追溯 | 🔲 待执行 | — | — |
+
+---
+
 ## 概述
 
 目标：通过 mGBA MCP（截图/内存读取）+ GDB MCP（VRAM 写监视点）联合调试，
 定位**卡牌信息页面**中各类显示内容在 ROM 中的存储位置。
 
 **页面组成**（待定位的目标）：
-- 卡牌大图（8bpp tiles，40×56px）
+- 卡牌大图
 - 卡牌图标（小图标，属性/种族等）
 - UI 框架（边框、背景底图）
 - 文本信息（卡名、攻防数值、效果描述）
@@ -73,51 +82,54 @@ pwsh -File tools\wait-mgba-ready.ps1
 
 ---
 
-## Phase A：mGBA MCP——读取 VRAM 布局
+## Phase A：mGBA MCP——读取 VRAM 布局　✅ 已完成
+
+> **分析报告**：[doc/analysis/p1-card-image-location/README.md](../analysis/p1-card-image-location/README.md)
 
 **目标**：拍摄三个状态的截图，并通过 VRAM diff 确定卡牌信息页各元素写入的 VRAM 偏移区间。
 
 ```
-步骤 A1. 截图确认状态1（卡组列表）
+✅ 步骤 A1. 截图确认状态1（卡组列表）
   → mgba_live_export_screenshot
 
-步骤 A2. 读取状态1的 VRAM + OAM 快照
+✅ 步骤 A2. 读取状态1的 VRAM + OAM 快照
   → mgba_live_read_range(start=0x06000000, length=0x18000)  ← 完整 VRAM（96KB）
   → mgba_live_dump_oam                                      ← OAM 精灵状态
   → 保存为 vram_state1
 
-步骤 A3. 模拟按键 A → 状态2（子菜单）
+✅ 步骤 A3. 模拟按键 A → 状态2（子菜单）
   → mgba_live_input_tap(key="A", wait_frames=10)
   → mgba_live_export_screenshot  ← 确认放大镜子菜单出现
 
-步骤 A4. 模拟按键 A → 状态3（卡牌信息页）
+✅ 步骤 A4. 模拟按键 A → 状态3（卡牌信息页）
   → mgba_live_input_tap(key="A", wait_frames=30)
   → mgba_live_export_screenshot  ← 确认卡牌信息页面
 
-步骤 A5. 状态3：读取 IO 寄存器
+✅ 步骤 A5. 状态3：读取 IO 寄存器
   → mgba_live_read_range(start=0x04000000, length=0x10)  ← DISPCNT + BG0-3 CNT
-  解析：
-    - DISPCNT[bit0-2]：BG mode
-    - DISPCNT[bit8-11]：BG0-3 启用位
-    - BGxCNT[bit2-3]：charblock（定位各 BG 层的 tile 数据区）
+  结果：
+    - DISPCNT = 0x1F40：mode=0，BG0+BG1+BG2+BG3+OBJ 全部启用
+    - BG0CNT = 0x0086：charblock=1（tile@0x06004000），sblk=0（map@0x06000000），256色
+    - BG1CNT = 0x4104：charblock=1（tile@0x06004000），sblk=1（map@0x06000800），16色
+    - BG2CNT = 0x0407：charblock=1（tile@0x06004000），sblk=4（map@0x06002000），16色
+    - BG3CNT = 0x0305：charblock=1（tile@0x06004000），sblk=3（map@0x06001800），16色
 
-步骤 A6. 状态3：读取 VRAM + OAM 快照
+✅ 步骤 A6. 状态3：读取 VRAM + OAM 快照
   → mgba_live_read_range(start=0x06000000, length=0x18000)
   → mgba_live_dump_oam
   → 保存为 vram_state3
 
-步骤 A7. 对比 vram_state1 vs vram_state3
-  分析差异区间，区分各内容类型：
-    - 连续 ~2240 字节变化 → 卡牌大图 tile 数据
-    - 较小块变化（几十~几百字节）→ 图标或 UI 元素
-    - Sprite tile 区（0x06010000+）变化 → OAM 精灵内容
-    - Tilemap 区变化 → 图层布局更新
-  记录：各区间的 VRAM 起始地址（供 Phase B2 使用）
+✅ 步骤 A7. 对比 vram_state1 vs vram_state3
+  结果（总变化 11,746 字节，合并后 16 个区间）：
+    - 0x06008040–0x0600933F  4,864B → 卡牌大图 tile 数据（Charblock 2）★ B2 首选目标
+    - 0x0600004C–0x06000933  2,280B → BG0/BG1 tilemap 全量重绘
+    - 0x06010005–0x060107FC  2,040B → Sprite tile（UI/图标，最大段）
+    - 0x06017260+  多段各 320–927B → 其余 sprite tile（星级/数字图标等）
 ```
 
 ---
 
-## Phase B2：GDB VRAM 写监视点——追溯 ROM 地址
+## Phase B2：GDB VRAM 写监视点——追溯 ROM 地址　🔲 待执行
 
 **目标**：对 Phase A 确定的 VRAM 地址下写监视点，捕获写入时的 PC 和源地址寄存器。
 
@@ -128,7 +140,7 @@ pwsh -File tools\wait-mgba-ready.ps1
 
 步骤 B2. 设置 VRAM 写监视点
   对 Phase A 确定的某个 VRAM 偏移（优先选卡牌大图区间起始）：
-  → gdb_command("watch *(unsigned char*)0x06XXXXXX")
+  → gdb_command("watch *(unsigned char*)0x06008040")  ← Phase A 已确认的卡图 tile 起始
 
 步骤 B3. 放行游戏执行
   → gdb_continue()

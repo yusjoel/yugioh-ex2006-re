@@ -31,3 +31,4 @@ roms/*.sav
 roms/*.ss*
 tools/arm-none-eabi-gdb.exe
 tools/local-settings.ps1
+env
