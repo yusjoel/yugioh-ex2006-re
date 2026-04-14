@@ -6,11 +6,11 @@
 
 2054 张卡牌图像的 ROM 存储方式与 ID 映射。Phase B2 动态追溯已完成，结果见 `doc/dev/p1-phase-b2-findings.md`；P1 子项状态待专题审阅后回填。
 
-- [ ] **P1-1**：用 GDB watchpoint 监听 DMA3 搬运，捕获卡图 ROM 源地址
-- [ ] **P1-2**：判断源数据是 LZ77（magic `0x10`）还是原始 tiles
-- [ ] **P1-3**：确认图像 index 与槽位 ID 的精确映射（参照 `doc/dev/card-data-structure.md`）
-- [ ] **P1-4**：确认调色板位置与格式（stride 是否 2752 字节）
-- [ ] **P1-5**：输出完整调查文档 + 导出脚本 `tools/rom-export/export_card_images.py`
+- [x] **P1-1**：~~GDB watchpoint 监听 DMA3~~ 改用静态 + mGBA Lua 确认加载函数 `FUN_0801d290` 与源地址 `0x08BD2140`（findings §二、§三）
+- [x] **P1-2**：源数据为**原始 6bpp 自写压缩**（非 LZ77），每 6 bytes → 8 像素；findings §3.4 给出解码公式
+- [x] **P1-3**：**card_id = `data/card-stats.s` 的 0-indexed 记录序号**。实测：idx 1323→slot 0x1653 (DESPAIR)、idx 672→slot 0x12EA (Monster Reborn)。同一 slot 可能有多条 copy=0 主记录，但通常只有第一条在 image table 有图，后续条目为 0xFFFF
+- [x] **P1-4**：调色板位置确认——**每卡 64 色独立调色板**，`pal = 0x004C76C0 + tile_block × 128`（非 stride 2752）；见 `card-image-export.md`
+- [x] **P1-5**：导出脚本 `tools/rom-export/export_card_images.py` + 文档 `doc/dev/card-image-export.md`，美版 flag=1 共 3134 条 card_id、2201 个独立 tile_block 已全量导出
 
 ---
 

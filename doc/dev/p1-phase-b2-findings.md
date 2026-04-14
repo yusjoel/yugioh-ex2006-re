@@ -233,7 +233,13 @@ VRAM_final = raw_6bit + 0x10
 1. **必须做 tile 重排**：线性排列出来是条纹（见 `doc/temp/despair_linear_80x80.png`）。正确顺序：按 10×10 tile 网格，每 tile 内 8×8 行优先。
 2. **总像素 6400，非 4864**：按 800 次循环 × 8 像素 = 6400 = 100 tiles 解码，别被 Phase A 的 76 tiles 误导。
 3. **调色板偏移 `+0x10`**：findings §3.5 的第二循环把 6bit 索引映射到 pal[16:80]。调色板从 `0x084C76C0` 读（256 色 BG 调色板）。
-4. **card_id 可能与 slot_id 不同**：findings 里的 card_id=1323 是 `FUN_0801e440` 从 EWRAM 卡片对象计算得到的值（word0>>3 & 0x1FFF），不一定等于 `data/card-stats.s` 里的 slot_id。批量导出时需要搞清两者映射（P1-3 的遗留问题）。
+4. **card_id = `data/card-stats.s` 0-indexed 记录序号**（2026-04-15 实测确认）：
+   - idx 1 → slot 0x0FA7 (Blue-Eyes)
+   - idx 672 → slot 0x12EA (Monster Reborn)
+   - idx 1323 → slot 0x1653 (DESPAIR)
+
+   EWRAM word0 的 `(word0 << 15) >> 18` 即是该数组下标。
+   从 card_id 取 slot_id：`rom[0x018169B6 + card_id * 22 + 2]` (u16 LE)。同一 slot 可能有多条 copy=0 主记录，仅第一条通常在 image table 有效，其余为 0xFFFF。
 
 ---
 
@@ -248,3 +254,35 @@ VRAM_final = raw_6bit + 0x10
 | `doc/dev/p1-card-image-location-plan.md` | Phase 总计划 |
 | `doc/dev/p1-phase-b2-preparation.md` | mGBA + GDB 启动操作说明 |
 | `doc/dev/analysis-card-image-loading-function.md` | 早期静态分析（FUN_08014fa8，BIOS SWI 路径，已证伪） |
+| `tools/rom-export/export_card_images.py` | 批量导出脚本（P1-5 完成） |
+| `doc/dev/card-image-export.md` | 批量导出状态与调色板策略 |
+
+---
+
+## 八、批量导出状态（2026-04-14 追加）
+
+`tools/rom-export/export_card_images.py` 已完成 P1-5，细节见 `card-image-export.md`。
+
+### 关键发现：**每张卡独立调色板**（本次调查确认）
+
+findings §3.1 给出 `DAT_0801d430 = 0x084C76C0` 并标注"BG 调色板 ROM 基址"——原文描述不够精确。
+批量导出时进一步验证得出：
+
+- **每张卡 64 色调色板**，stride = **128 字节**（64 × BGR555）
+- ROM 偏移公式：`pal_rom = 0x004C76C0 + tile_block × 128`
+- 运行时由 `FUN_080ee010` 拷入 VRAM BG palette 槽位（偏移由第 5 参数 0x10 决定，即拷到 palette[0x10..0x4F]）
+- 占用区间：`0x004C76C0` 至 `0x004C76C0 + 2331 × 128 = 0x510440`，正好抵在 tile 数据基址 `0x00510640` 前（256 字节安全间隔）
+- 实测：DESPAIR FROM THE DARK（tb=1476，pal@0x4F58C0）解出的暗红 + 紫色配色与游戏内一致
+
+原 findings §3.5 中说 `VRAM_final = raw_6bit + 0x10`，是游戏内**把 6bit 值映射到 256 色 BG palette 的 0x10..0x4F 槽**。
+离线导出时跳过 VRAM 模拟，直接用 raw_6bit 索引卡图自身的 64 色调色板即可（等价效果）。
+
+### 索引表规模
+
+- 起始：`0x015B5C00`
+- 末尾：`0x015B5C00 + 6846 × 2 = 0x015C33CC`（最后一条非 FFFF 条目）
+- 之后至 `0x015C37DC` 为 424 个 FFFF 填充
+- 有效 card_id 范围：**0–3422**（含 0xFFFF 占位）
+- BY6E（flag=1）有效条目：**3134 条**
+- 共 **2201 个独立 tile_block**（933 条为异画共享）
+- 条目成对排列：`(card_id, flag=0), (card_id, flag=1)`；日版与美版约 56% 完全相同、33% 不同 tile_block、其余仅某一版本有图
