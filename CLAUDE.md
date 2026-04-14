@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目性质
 
-GBA ROM 反汇编项目，目标是将《Yu-Gi-Oh! Ultimate Masters: WCT 2006》(`roms/2343.gba`，游戏代码 `BY7E`) 逐步从 `.incbin` 替换为带注释的结构化汇编，最终重新汇编出与原 ROM **byte-identical** 的 `output/2343.gba`（33,554,176 B / `0x1FFFF00`）。进度跟踪在 `PLAN.md`。
+GBA ROM 反汇编项目，目标是将《Yu-Gi-Oh! Ultimate Masters: WCT 2006》(`roms/2343.gba`，游戏代码 `BY6E`) 逐步从 `.incbin` 替换为带注释的结构化汇编，最终重新汇编出与原 ROM **byte-identical** 的 `output/2343.gba`（33,554,176 B / `0x1FFFF00`）。进度跟踪在 `PLAN.md`。
 
 ## 交流/文档语言
 
@@ -40,13 +40,13 @@ clean.bat
 
 两套 MCP 并存、可同时工作（不同端口）：
 
-- **mGBA MCP**：截图 / 内存读取 / Lua 注入 / 按键。启动 `pwsh -File tools\start-mgba-gdb-ss1.ps1`（加载 `roms/2343.ss1` 存档）。
+- **mGBA MCP**：截图 / 内存读取 / Lua 注入 / 按键。启动 `pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1`（加载 `roms/2343.ss1` 存档）。
 - **GDB MCP**：断点 / 寄存器 / 表达式求值。**必须**使用 `tools/arm-none-eabi-gdb.exe`（GDB 10.2），devkitPro 自带 14.1 与 mGBA stub 协议不兼容。`gdb_init` 调用时**不要**传 `architecture` 参数。
 
 ### mGBA GDB stub 的硬约束（踩坑已总结，见 `doc/dev/mgba-gdb-stub-pitfalls.md`）
 
 - `-g` 是开关、**不接受端口参数**，端口固定 2345
-- 端口 LISTEN ≠ CPU 就绪，启动后还需等 5–8 秒；用 `tools\wait-mgba-ready.ps1`
+- 端口 LISTEN ≠ CPU 就绪，启动后还需等 5–8 秒；用 `tools/mgba-scripts/wait-mgba-ready.ps1`
 - **stub 一次性消耗**：GDB 任意断开后 stub 永久关闭，每次调试必须重启 mGBA
 - `Start-Process mGBA` 与后续 Sleep 不要写在同一 PowerShell 命令块
 - GDB 脚本里 `echo` 只能 ASCII（中文会乱码）

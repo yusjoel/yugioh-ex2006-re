@@ -1,6 +1,6 @@
 # Yu-Gi-Oh! Ultimate Masters: WCT 2006 反汇编项目
 
-《Yu-Gi-Oh! Ultimate Masters: World Championship Tournament 2006》（GBA，ROM 编号 2343，游戏代码 `BY7E`）的反汇编与数据提取项目。
+《Yu-Gi-Oh! Ultimate Masters: World Championship Tournament 2006》（GBA，ROM 编号 2343，游戏代码 `BY6E`）的反汇编与数据提取项目。
 目标是将原始 ROM 逐步分解为结构清晰的汇编源文件，最终能重新汇编出与原始 ROM **完全一致**（byte-identical）的二进制文件。
 
 ## 环境要求
@@ -176,12 +176,12 @@ roms/2343.gba
 
 ### mGBA MCP（截图 / 内存读取 / Lua 注入）
 
-通过 [mGBA MCP](https://github.com/souldzin/mGBA-http) 提供的 MCP 工具直接控制 mGBA。
+通过 [mgba-live-mcp](https://github.com/penandlim/mgba-live-mcp) 提供的 MCP 工具直接控制 mGBA。
 
 **启动**：
 ```ps1
-# 启动 mGBA 并加载存档（工具位于 tools/）
-pwsh -File tools\start-mgba-gdb-ss1.ps1
+# 启动 mGBA 并加载存档
+pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1
 ```
 
 **已验证工具**（详见 `doc/dev/p0-3-mgba-mcp-feature-validation.md`）：
@@ -207,9 +207,9 @@ pwsh -File tools\start-mgba-gdb-ss1.ps1
 **启动顺序**：
 ```ps1
 # 1. 启动 mGBA（带 GDB stub，端口 2345）
-pwsh -File tools\start-mgba-gdb-ss1.ps1
+pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1
 # 2. 等待 stub 就绪（约 9 秒）
-pwsh -File tools\wait-mgba-ready.ps1
+pwsh -File tools/mgba-scripts/wait-mgba-ready.ps1
 # 3. 通过 MCP 工具连接（在 AI 助手中调用）
 # gdb_init(gdbPath: "tools/arm-none-eabi-gdb.exe")
 # gdb_connect(target: "localhost:2345")
