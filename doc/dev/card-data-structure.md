@@ -24,35 +24,71 @@
 
 | 字节偏移 | 字段名 | 说明 |
 |---------|--------|------|
-| +00 | `zero_0` | 恒为 `0x0000` |
+| +00 | `zero0`   | 恒为 `0x0000`（首条哑元记录除外） |
 | +02 | `slot_id` | 卡槽编号（与 `data.md` 中 Slot 列一致） |
-| +04 | `copy_index` | 副本索引（0=主记录，1/2/3=第几个副本） |
-| +06 | `one` | 恒为 `0x0001`（可能是"有效"标记） |
-| +08 | `atk` | 攻击力；Spell/Trap 卡为 `0xFFFF` |
-| +10 | `def` | 守备力；Spell/Trap 卡为 `0xFFFF` |
-| +12 | `level` | 星数（怪兽卡） |
-| +14 | `attribute` | 属性代码（见下表） |
-| +16 | `race` | 种族代码（见下表） |
-| +18 | `unknown` | 大部分为 0，Spell/Trap 有非零值 |
-| +20 | `zero_1` | 恒为 `0x0000` |
+| +04 | `copy`    | 異画索引（0=主图，1/2/3=异画） |
+| +06 | `flags`   | 标志（通常 1；0=哑元；3=含义待定） |
+| +08 | `atk`     | 攻击力；魔法/陷阱卡为 `0x0000` |
+| +0A | `def`     | 守备力；魔法/陷阱卡为 `0x0000` |
+| +0C | `level`   | 星数（怪兽卡；非怪兽为 0） |
+| +0E | `race`    | 种族代码（`RACE_*`，见下表） |
+| +10 | `attr`    | 属性代码（`ATTR_*`，见下表） |
+| +12 | `subtype` | 卡种类（`SUBTYPE_NORMAL/EFFECT/FUSION/...`） |
+| +14 | `spsub`   | 魔法/陷阱细分（`SPSUB_NORMAL/EQUIP/FIELD/...`；怪兽恒 0） |
 
-### 属性编码（部分确认）
+> 详细枚举定义见 `include/macros.inc`。
 
-| 值 | 属性 | 验证来源 |
-|----|------|---------|
-| 1 | LIGHT（光） | Blue-Eyes White Dragon |
-| 3 | DARK（暗） | Kuriboh |
+### 属性编码（已完全确认）
 
-> ⚠️ 完整属性/种族编码表尚未全部验证，需对照 `data.md` 进一步比对。
+枚举定义见 `include/macros.inc`（`ATTR_*`）。以 `tools/ad-hoc/verify_card_enums.py` 扫描
+5170 条记录核对，ROM 实际取值完全覆盖且仅覆盖下表，零未知值：
 
-### 种族编码（部分确认）
+| 值 | 宏 | 属性 | 代表卡 |
+|----|----|------|--------|
+| 1 | `ATTR_LIGHT` | LIGHT（光） | Blue-Eyes White Dragon |
+| 2 | `ATTR_DARK` | DARK（闇） | Ryu-Kishin / Kuriboh |
+| 3 | `ATTR_WATER` | WATER（水） | Great White / Fiend Kraken |
+| 4 | `ATTR_FIRE` | FIRE（炎） | Flame Swordsman |
+| 5 | `ATTR_EARTH` | EARTH（地） | Hitotsu-Me Giant |
+| 6 | `ATTR_WIND` | WIND（风） | Baby Dragon |
+| 7 | `ATTR_DIVINE` | DIVINE（神） | **BY6E 中未使用**（三幻神不在本作卡池） |
+| 8 | `ATTR_SPELL` | SPELL（魔法卡） | Axe of Despair |
+| 9 | `ATTR_TRAP` | TRAP（陷阱卡） | Dragon Capture Jar |
 
-| 值 | 种族 | 验证来源 |
-|----|------|---------|
-| 1 | Dragon（龙族） | Blue-Eyes White Dragon |
-| 2 | Fiend（恶魔族） | Kuriboh |
-| 8 | Spell（魔法卡） | 181 条记录 |
-| 9 | Trap（陷阱卡） | 114 条记录 |
+> 注：怪兽 copy=0 主记录中 `attribute=8/9` 仅用于魔法/陷阱卡（怪兽不会取 8/9）。
+
+### 种族编码（已完全确认）
+
+枚举定义见 `include/macros.inc`（`RACE_*`）。同脚本核对，23 种 ROM 取值全部已知：
+
+| 值 | 宏 | 种族 | 代表卡 |
+|----|----|------|--------|
+| 1  | `RACE_DRAGON`        | Dragon（龙） | Blue-Eyes White Dragon |
+| 2  | `RACE_ZOMBIE`        | Zombie（不死） | Skull Servant |
+| 3  | `RACE_FIEND`         | Fiend（恶魔） | Kuriboh / Summoned Skull |
+| 4  | `RACE_PYRO`          | Pyro（炎） | Charubin the Fire Knight |
+| 5  | `RACE_SEA_SERPENT`   | Sea Serpent（海龙） | Takriminos |
+| 6  | `RACE_ROCK`          | Rock（岩石） | Giant Soldier of Stone |
+| 7  | `RACE_MACHINE`       | Machine（机械） | Cyber Soldier of Darkworld |
+| 8  | `RACE_FISH`          | Fish（鱼） | Great White |
+| 9  | `RACE_DINOSAUR`      | Dinosaur（恐龙） | Two-Headed King Rex |
+| 10 | `RACE_INSECT`        | Insect（昆虫） | Basic Insect |
+| 11 | `RACE_BEAST`         | Beast（兽） | Griffore |
+| 12 | `RACE_BEAST_WARRIOR` | Beast-Warrior（兽战士） | Battle Ox |
+| 13 | `RACE_PLANT`         | Plant（植物） | Mushroom Man |
+| 14 | `RACE_AQUA`          | Aqua（水） | Jellyfish |
+| 15 | `RACE_WARRIOR`       | Warrior（战士） | Flame Swordsman / Gaia The Fierce Knight |
+| 16 | `RACE_WINGED_BEAST`  | Winged Beast（鸟兽） | Harpie Lady |
+| 17 | `RACE_FAIRY`         | Fairy（天使） | Gyakutenno Megami |
+| 18 | `RACE_SPELLCASTER`   | Spellcaster（魔法使） | Mystical Elf / Time Wizard |
+| 19 | `RACE_THUNDER`       | Thunder（雷） | LaLa Li-oon |
+| 20 | `RACE_REPTILE`       | Reptile（爬虫） | Armored Lizard |
+| 21 | `RACE_DIVINE_BEAST`  | Divine-Beast（幻神兽） | **BY6E 中未使用** |
+| 22 | `RACE_SPELL`         | Spell（魔法卡） | Axe of Despair（与 `attr=8` 成对） |
+| 23 | `RACE_TRAP`          | Trap（陷阱卡） | Dragon Capture Jar（与 `attr=9` 成对） |
+
+> 魔法/陷阱卡的 `race` 与 `attr` 是冗余配对：魔法恒 `(attr=8, race=22)`，
+> 陷阱恒 `(attr=9, race=23)`，未见其他组合。验证脚本：`tools/ad-hoc/verify_card_enums.py`。
 
 ### 已验证示例（Blue-Eyes White Dragon）
 
@@ -65,9 +101,13 @@ copy_index    = 0x0000 (主记录)
 atk           = 0x0BB8 (= 3000)
 def           = 0x09C4 (= 2500)
 level         = 0x0008 (= 8星)
+race          = 0x0001 (DRAGON)
 attribute     = 0x0001 (LIGHT)
-race          = 0x0001 (Dragon)
 ```
+
+> 注：字段字节顺序按 `include/macros.inc` 的 `card_stat_*` 宏布局为
+> `... level(+0C), race(+0E), attr(+10), subtype(+12), spsub(+14)`。
+> 本文早期版本将 +0E 命名为 `attribute`、+10 命名为 `race`，实际相反。
 
 ---
 

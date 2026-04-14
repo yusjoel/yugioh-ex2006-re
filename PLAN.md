@@ -83,7 +83,7 @@
 
 依据：`doc/dev/card-data-structure.md`
 
-- [ ] **T6.4**：完整属性/种族编码表（对照 `doc/um06-deck-modification-tool/data.md` 验证）
+- [x] **T6.4**：完整属性/种族编码表 — 2026-04-15 已完成（见 `doc/dev/card-data-structure.md` §一；验证脚本 `tools/ad-hoc/verify_card_enums.py`）
 
 > T6.1/T6.2 由 P1 完成（大卡图）；T6.3 并入 P2；T6.5（属性表汇编化）由
 > `data/card-stats.s` + `data/card-names.s` 已完成。
