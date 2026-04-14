@@ -72,8 +72,8 @@ BGxCNT 格式（16 位）：
 整个流程使用 ss1 存档启动（已在卡组列表界面），mGBA MCP 与 GDB stub 同时工作：
 
 ```ps1
-pwsh -File tools\start-mgba-gdb-ss1.ps1
-pwsh -File tools\wait-mgba-ready.ps1
+pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1
+pwsh -File tools/mgba-scripts/wait-mgba-ready.ps1
 ```
 
 启动后：

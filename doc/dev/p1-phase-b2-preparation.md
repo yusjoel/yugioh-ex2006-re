@@ -38,7 +38,7 @@ cmd = [
 执行停止脚本，确保环境干净：
 
 ```powershell
-pwsh -File tools\stop-mgba.ps1
+pwsh -File tools/mgba-scripts/stop-mgba.ps1
 ```
 
 同时确认端口 2345 未被占用：

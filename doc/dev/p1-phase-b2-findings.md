@@ -211,13 +211,40 @@ VRAM_final = raw_6bit + 0x10
 
 ---
 
-## 六、相关文件
+## 六、验证状态（2026-04-14）
+
+用 `tools/ad-hoc/decode_card_6bpp.py` 对 DESPAIR FROM THE DARK 做单卡验证：
+
+| 验证项 | 方法 | 结果 |
+|--------|------|------|
+| card_id → tile_block 查表 | `xxd -s 0x15B70AE -l 2 roms/2343.gba` | `c4 05` = 1476 ✅ |
+| 基址 + stride 公式 | `0x08510640 + 1476 × 4800 = 0x08BD2140` | ✅ |
+| 6bpp 解码公式（§3.4）| Python 实现，读 ROM[0x00BD2140:+4800]，按公式展开 6400 像素 | ✅ |
+| tile 排列 | **10×10 tiles = 80×80 像素**（100 tiles × 64 像素 = 6400） | ✅ |
+| tile 内部扫描 | 8×8 行优先 | ✅ |
+| 可识别性 | 灰度 PNG 可清晰辨认蝙蝠/恶魔形象，与暗属性恶魔卡吻合 | ✅ |
+
+**纠正 Phase A 的尺寸推测**：README 观察 VRAM diff 4864B 推测 76 tiles，**实际卡图为 100 tiles = 80×80**。差额可能是 Phase A diff 阈值漏了部分 tile，或某些 tile 与状态1相同未被计入。
+
+### 导出脚本要点（避免已知坑）
+
+从本次验证衍生的实现注意事项，供 `tools/export_card_images.py`（P1-5）参考：
+
+1. **必须做 tile 重排**：线性排列出来是条纹（见 `doc/temp/despair_linear_80x80.png`）。正确顺序：按 10×10 tile 网格，每 tile 内 8×8 行优先。
+2. **总像素 6400，非 4864**：按 800 次循环 × 8 像素 = 6400 = 100 tiles 解码，别被 Phase A 的 76 tiles 误导。
+3. **调色板偏移 `+0x10`**：findings §3.5 的第二循环把 6bit 索引映射到 pal[16:80]。调色板从 `0x084C76C0` 读（256 色 BG 调色板）。
+4. **card_id 可能与 slot_id 不同**：findings 里的 card_id=1323 是 `FUN_0801e440` 从 EWRAM 卡片对象计算得到的值（word0>>3 & 0x1FFF），不一定等于 `data/card-stats.s` 里的 slot_id。批量导出时需要搞清两者映射（P1-3 的遗留问题）。
+
+---
+
+## 七、相关文件
 
 | 文件 | 说明 |
 |------|------|
 | `asm/all.s` 行 15429 | FUN_0801d290 完整反汇编 |
 | `asm/all.s` 行 16336 | FUN_0801d998 完整反汇编 |
 | `asm/all.s` 行 17711 | FUN_0801e440 完整反汇编 |
+| `tools/ad-hoc/decode_card_6bpp.py` | 6bpp 解码验证脚本（单卡） |
 | `doc/dev/p1-card-image-location-plan.md` | Phase 总计划 |
 | `doc/dev/p1-phase-b2-preparation.md` | mGBA + GDB 启动操作说明 |
 | `doc/dev/analysis-card-image-loading-function.md` | 早期静态分析（FUN_08014fa8，BIOS SWI 路径，已证伪） |
