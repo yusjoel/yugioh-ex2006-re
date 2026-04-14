@@ -51,7 +51,12 @@ Start:
 
 @ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x185504B（属性表后，外场图块前）
 @ 含外场图块指针表（0x1855030，7条目28字节），紧接着就是外场图块数据
-	.incbin "roms/2343.gba", 0x1832602, 0x22A4A
+@ 内嵌 HUD 元素（Life Points Font / Phase Highlights Palette / Phases Highlight）已拆出
+	.incbin "roms/2343.gba", 0x1832602, 0x1E51A     @ seg-C 前段 0x1832602..0x1850B1C
+	.incbin "graphics/duel-field/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
+	.incbin "graphics/duel-field/hud_phase_highlights_palette.bin"  @ 0x18515DC, 0x20
+	.incbin "roms/2343.gba", 0x18515FC, 0x400       @ 未知 gap（0x18515FC..0x18519FC）
+	.incbin "graphics/duel-field/hud_phases_highlight.bin"          @ 0x18519FC, 0x3650（至 0x185504C）
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
 @ 指针表在 0x1855030（7条目，末条目为终止指针指向 0x185878C），数据从 0x185504C 开始
@@ -83,8 +88,9 @@ Start:
 	.incbin "graphics/duel-field/survival_outer_palette.bin"
 
 @ 未知数据 + LP/阶段 Tilemap 指针表（7条目28字节，位于 0x1859548）
-@ ROM 0x1859508 - 0x1859563，0x5C 字节
-	.incbin "roms/2343.gba", 0x1859508, 0x5C
+@ ROM 0x1859508 - 0x1859563，0x5C 字节；指针表拆为 HUD bin
+	.incbin "roms/2343.gba", 0x1859508, 0x40        @ 未知前段 0x1859508..0x1859548
+	.incbin "graphics/duel-field/hud_phases_tilemap_pointers.bin"   @ 0x1859548, 0x1C
 
 @ ── LP/阶段显示区 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────
 @ 指针表在 0x1859548（7条目），数据从 0x1859564 开始
@@ -97,8 +103,9 @@ Start:
 	.incbin "graphics/duel-field/survival_outer_lp_tilemap.bin"
 
 @ "Phases Map?" 图块 + 外场 Tilemap 指针表（7条目28字节，位于 0x185B634）
-@ ROM 0x185B184 - 0x185B64F，0x4CC 字节
-	.incbin "roms/2343.gba", 0x185B184, 0x4CC
+@ ROM 0x185B184 - 0x185B64F，0x4CC 字节；Phases Map 数据拆为 HUD bin
+	.incbin "graphics/duel-field/hud_phases_map.bin"                @ 0x185B184, 0x4B0
+	.incbin "roms/2343.gba", 0x185B634, 0x1C        @ 外场 Tilemap 指针表（7条目28字节）
 
 @ ── 外场 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────────────
 @ 指针表在 0x185B634（7条目），数据从 0x185B650 开始

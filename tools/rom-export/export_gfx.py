@@ -347,6 +347,29 @@ DUEL_INNER_PAL_SIZE  = 0x20    # 1 × 16色子调色板
 DUEL_TILEMAP_SIZE = 0x4B0      # 30×20 × 2字节 = 1200 字节
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# 决斗 HUD 元素（Life Points Font / Phases Highlight / Palette / Tilemap / Map）
+# 数据来源：doc/um06-romhacking-resource/duel-field.md HUD 段
+# 格式大多为 4bpp tile 或 16色子调色板，尺寸按 ROM 上相邻条目差值推定
+# ──────────────────────────────────────────────────────────────────────────────
+HUD_ITEMS = [
+    # (slug,                              rom_off,    size,      说明)
+    ('hud_life_points_font',              0x1850B1C,  0xAC0,    'LP 数字字体 tile（至下一 HUD 项）'),
+    ('hud_phase_highlights_palette',      0x18515DC,  0x20,     'Phase Highlight 对象调色板（md 明确 0x18515DC-0x18515FB）'),
+    ('hud_phases_highlight',              0x18519FC,  0x3650,   'Phases Highlight tile（含尾部未知区，至 Campaign outer image 起点）'),
+    ('hud_phases_tilemap_pointers',       0x1859548,  0x1C,     'LP/阶段 Tilemap 指针表（7 条 × 4 B）'),
+    ('hud_phases_map',                    0x185B184,  0x4B0,    'Phases Map tile（30×20 规模，0x4B0 字节）'),
+]
+
+
+def export_hud_bins(rom, df_dir):
+    """导出决斗 HUD 5 类二进制文件（供 asm/rom.s 通过 .incbin 引用）。"""
+    for slug, off, size, _desc in HUD_ITEMS:
+        with open(os.path.join(df_dir, f'{slug}.bin'), 'wb') as f:
+            f.write(rom[off : off + size])
+    print(f'  → {len(HUD_ITEMS)} 个 HUD bin 文件')
+
+
 def export_duel_field_bins(rom, df_dir):
     """
     导出决斗场地数据的二进制文件（供 asm/rom.s 通过 .incbin 引用）。
@@ -550,6 +573,10 @@ def main():
     # 导出决斗场地二进制文件（供 asm incbin）
     print('导出决斗场地二进制文件...')
     export_duel_field_bins(rom, df_dir)
+
+    # 导出决斗 HUD 二进制文件（供 asm incbin）
+    print('导出决斗 HUD 二进制文件...')
+    export_hud_bins(rom, df_dir)
 
     # 导出决斗场地 PNG 预览
     print('导出决斗场地 PNG 预览...')

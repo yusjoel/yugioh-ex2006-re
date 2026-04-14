@@ -45,6 +45,7 @@
 | `um06-romhacking-resource/deck-string-name-tool.md` | 卡组名字符串 + 指针表（EN） | `0x1DC9F48~0x1DCC7BF` | `data/game-strings-en.s`（含标签） |
 | `um06-romhacking-resource/modifying-decks.md` | 卡组名字符串 + 指针表（EN，同上） | 同上 | 同上 |
 | `um06-romhacking-resource/duel-field.md`（场地主图形） | 6 模式 × Inner/Outer × image/palette/tilemap/lp_tilemap | `0x1855030~0x1867540` | `graphics/duel-field/*.bin`（`asm/rom.s` L43–119 完成 incbin 拆分） |
+| `um06-romhacking-resource/duel-field.md`（HUD 元素） | Life Points Font / Phase Highlights Palette / Phases Highlight / Phases Tilemap 指针表 / Phases Map | `0x1850B1C` / `0x18515DC` / `0x18519FC` / `0x1859548` / `0x185B184` | `graphics/duel-field/hud_*.bin`（由 `tools/rom-export/export_gfx.py` 导出，`asm/rom.s` 对应段 incbin 拆分） |
 
 ### ⚠️ 有 ROM 数据但未落地
 
@@ -52,7 +53,6 @@
 |--------|------|----------|----------|------|
 | ⭐⭐ 中 | `um06-romhacking-resource/opponents-coinflip-screen.md`（Coinflip 界面） | Coinflip Top Bar / Coin & Box / Flipping Animation / "Coin Toss Selection" Text | `0x18977F8` / `0x194D71C` / `0x194F83C` + 对应 tilemap/palette | 翻硬币界面的 4 类图形资源 |
 | ⭐⭐ 中 | `um06-romhacking-resource/opponents-coinflip-screen.md`（Theme Duel 大图） | 27 对手 × Top/Bottom Large Wallpaper + palette | `0x1A1DFAC` 起（密集） | 主题决斗背景图，结构类似对手大图但属独立区段 |
-| ⭐ 低 | `um06-romhacking-resource/duel-field.md`（HUD 元素） | Life Points Font / Phases Highlight / Phase Highlights Palette / Phases Tilemap / Phases Map | `0x1850B1C` / `0x18519FC` / `0x18515DC` / `0x1859548` / `0x185B184` | 决斗界面 HUD 相关图形/调色板，场地主图形已落地但 HUD 未处理 |
 | ⭐ 低 | `um06-romhacking-resource/main-menu.md` | 主菜单背景（4bpp） + 主菜单图标（8bpp） | `0x1CF009C` / `0x1CF8B94` | 仅 2 条地址，图标为 8bpp 需特殊解码 |
 | ⭐ 低 | `um06-romhacking-resource/banlist-code-breaking.md` | 禁卡密码界面图形 | `0x1E22874`（Tilemap） / `0x1E314B4`（调色板） | 2 处地址 |
 | 🔧 特殊 | `um06-romhacking-resource/title-screen.md` | 标题画面 LZ77 压缩块 | `0x1EC33DC` | 需专门工具解压后处理 |
@@ -73,7 +73,7 @@
 - [ ] **T2.3**：实现 `tools/import_gfx.py`（PNG → 4bpp tiles + tilemap.bin → 写回 ROM）。依据 T2.1/T2.2 已完成的导出管线反向实现。
 - [ ] **T-COINFLIP**：Coinflip 界面图形（Top Bar / Coin & Box / Flipping Animation / "Coin Toss Selection" Text）管线与 incbin 拆分
 - [ ] **T-THEME**：Theme Duel 大图 27 对手 × Top/Bottom + palette，管线与 incbin 拆分
-- [ ] **T-HUD**：决斗 HUD 元素（Life Points Font / Phases Highlight / Phase Highlights Palette / Phases Tilemap / Phases Map）
+- [x] **T-HUD**：决斗 HUD 元素（Life Points Font / Phases Highlight / Phase Highlights Palette / Phases Tilemap 指针表 / Phases Map）— 2026-04-15 已落地（`graphics/duel-field/hud_*.bin`）
 - [ ] **T4**：主菜单图形（4bpp 背景 + 8bpp 图标）+ 禁卡密码界面图形。需先调查 8bpp 解码与尺寸
 - [ ] **T5**：标题画面 LZ77 数据（`0x1EC33DC`，需专门工具解压）
 
