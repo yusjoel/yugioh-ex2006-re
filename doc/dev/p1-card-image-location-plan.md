@@ -5,7 +5,7 @@
 | Phase | 状态 | 完成日期 | 产出 |
 |-------|------|---------|------|
 | Phase A：VRAM 布局定位 | ✅ 已完成 | 2026-04-14 | [分析报告](../analysis/p1-card-image-location/README.md) |
-| Phase B2：GDB 写监视点追溯 | 🔲 待执行 | — | — |
+| Phase B2：静态分析 + 动态验证 | ✅ 已完成 | 2026-04-14 | [详细分析](p1-phase-b2-findings.md) |
 
 ---
 
