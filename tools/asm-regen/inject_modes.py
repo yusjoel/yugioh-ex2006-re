@@ -214,19 +214,33 @@ def process(input_path: Path, output_path: Path):
 
 
 if __name__ == '__main__':
-    src = Path('asm/all.s')
-    tmp = Path('asm/all.s.tmp')
+    # 用法：
+    #   inject_modes.py                      → 处理 asm/all.s（原地）
+    #   inject_modes.py <input> [output]     → 从 input 读取，写到 output（默认原地）
+    args = sys.argv[1:]
+    if len(args) == 0:
+        src = Path('asm/all.s')
+        dst = src
+    elif len(args) == 1:
+        src = Path(args[0])
+        dst = src
+    else:
+        src = Path(args[0])
+        dst = Path(args[1])
 
     if not src.exists():
         print(f'错误：找不到 {src}')
         sys.exit(1)
 
-    print(f'开始处理 {src} ...')
+    tmp = dst.with_suffix(dst.suffix + '.tmp')
+
+    print(f'开始处理 {src} → {dst} ...')
     modes, fixed = process(src, tmp)
     print(f'完成！注入 {modes} 处模式切换，修复 {fixed} 处 s 后缀')
 
-    tmp.replace(src)
-    print(f'已写回 {src}')
+    tmp.replace(dst)
+    src = dst  # 后续补丁改在目标文件
+    print(f'已写回 {dst}')
 
     # ---------------------------------------------------------------------------
     # 手动补丁：无法用通用规则处理的特殊指令

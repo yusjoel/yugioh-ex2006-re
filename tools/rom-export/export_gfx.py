@@ -506,6 +506,10 @@ def render_duel_inner(rom, mode_idx):
 # ──────────────────────────────────────────────────────────────────────────────
 
 def main():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(os.path.dirname(script_dir))
+    os.chdir(project_root)
+
     rom = open(ROM_PATH, 'rb').read()
 
     opp_dir  = os.path.join(GFX_DIR, 'opponents')

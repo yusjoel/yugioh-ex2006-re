@@ -143,7 +143,7 @@ def render_tilemap_image(rom, tiles_off, tilemap_off, palette_off,
 
 #### 对手顺序
 
-Tilemap 在 ROM 中的顺序（与 `tools/export_gfx.py` 中 `LARGE_GFX` 列表顺序一致）：
+Tilemap 在 ROM 中的顺序（与 `tools/rom-export/export_gfx.py` 中 `LARGE_GFX` 列表顺序一致）：
 
 | 序号 | 英文 slug | 序号 | 英文 slug |
 |------|----------|------|----------|
@@ -226,7 +226,7 @@ ROM 文件偏移 = GBA 指针 - 0x08000000
 
 ---
 
-## 四、导出管线实现（tools/export_gfx.py）
+## 四、导出管线实现（tools/rom-export/export_gfx.py）
 
 ### 数据表
 
@@ -249,7 +249,7 @@ LARGE_GFX = [
 
 ### 输出文件
 
-运行 `python tools/export_gfx.py` 后生成：
+运行 `python tools/rom-export/export_gfx.py` 后生成：
 
 | 文件 | 描述 | 大小 |
 |------|------|------|
@@ -349,6 +349,6 @@ PNG（修改后的对手图）
 
 | 文件 | 说明 |
 |------|------|
-| `tools/export_gfx.py` | 完整导出实现，含所有对手的 ROM 偏移常量 |
+| `tools/rom-export/export_gfx.py` | 完整导出实现，含所有对手的 ROM 偏移常量 |
 | `asm/rom.s` | 已拆分的 incbin 段，直接引用 `graphics/opponents/*.bin` |
 | `doc/um06-romhacking-resource/opponents-coinflip-screen.md` | 原始地址文档（来自 Google Sheets） |

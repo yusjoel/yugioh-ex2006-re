@@ -197,7 +197,7 @@ incbin [end, 0x1FFFF00]
   #### 流程设计（实际实现）
 
   ```
-  ── 导出（tools/export_gfx.py）────────────────────────────────────
+  ── 导出（tools/rom-export/export_gfx.py）────────────────────────────────────
   roms/2343.gba  ──►  graphics/opponents/palette_copy1.bin     （7776 字节，整块）
                   ──►  graphics/opponents/<name>_top_tilemap.bin  （1200 字节 × 27）
                   ──►  graphics/opponents/<name>_bottom_tilemap.bin
@@ -222,11 +222,11 @@ incbin [end, 0x1FFFF00]
 
   #### 子任务
 
-  - [x] **T2.1**：扩展 `tools/export_gfx.py`，新增导出 `palette_copy1.bin`、`*_tilemap.bin`
+  - [x] **T2.1**：扩展 `tools/rom-export/export_gfx.py`，新增导出 `palette_copy1.bin`、`*_tilemap.bin`
   - [x] **T2.2**：拆分 `asm/rom.s` 大 incbin 为 8 段，tilemap/palette 改为 `.incbin` 文件引用，byte-identical 验证通过（commit b7a8ef6）
   - [ ] **T2.3**（后续）：实现 `tools/import_gfx.py`，PNG → 4bpp tiles + tilemap.bin → 写回 ROM
 
-  > ⚠️ **构建依赖**：`build.bat` 前须先运行 `python tools/export_gfx.py` 生成 `graphics/opponents/*.bin`，
+  > ⚠️ **构建依赖**：`build.bat` 前须先运行 `python tools/rom-export/export_gfx.py` 生成 `graphics/opponents/*.bin`，
   > 否则汇编器找不到 incbin 文件。详见 README。
 
 - [ ] **T3**：决斗场地图形导出管线
@@ -253,7 +253,7 @@ incbin [end, 0x1FFFF00]
   #### 子任务（参照 T2 流程）
 
   - [ ] **T3.1**：调查数据格式，确认尺寸（外场 Tilemap 宽高、图块数量）
-  - [ ] **T3.2**：扩展 `tools/export_gfx.py`，导出 PNG 预览和 `*.bin` 文件
+  - [ ] **T3.2**：扩展 `tools/rom-export/export_gfx.py`，导出 PNG 预览和 `*.bin` 文件
   - [ ] **T3.3**：拆分 `asm/rom.s` 对应 incbin 段，引用 `graphics/duel-field/*.bin`，byte-identical 验证
 
   > **注意**：内场无 Tilemap，渲染方式待调查（可能是 BG mode 3/5 的全图模式，或由代码直接索引图块）。
@@ -316,7 +316,7 @@ incbin [end, 0x1FFFF00]
 ### 背景
 
 当前 Ghidra 仅用于导出 `asm/all.s`（Ghidra Script `ExportRangeToGasS_v6.py`），
-导出结果存在 ARM/THUMB 模式错误和 s-suffix 缺失，须由 `tools/inject_modes.py` 修正。
+导出结果存在 ARM/THUMB 模式错误和 s-suffix 缺失，须由 `tools/asm-regen/inject_modes.py` 修正。
 这是对 Ghidra 能力的严重低估。
 
 Ghidra 的真正价值在于**交互式静态分析**：

@@ -6,11 +6,12 @@
 # IDE
 .vscode/
 .idea/
+.claude/
 
 # 临时文件
 *.tmp
 *.log
-ghidra
+/ghidra/
 
 output/
 
@@ -22,7 +23,7 @@ refs/WCT2006BATTLECITY/
 refs/mgba/
 refs/awesome-gbadev/
 
-# 导出的图形资产（由 tools/export_gfx.py 从 ROM 生成）
+# 导出的图形资产（由 tools/rom-export/export_gfx.py 从 ROM 生成）
 graphics/
 
 # 本地环境配置（路径因机器而异）
@@ -30,5 +31,5 @@ LOCAL.md
 roms/*.sav
 roms/*.ss*
 tools/arm-none-eabi-gdb.exe
-tools/local-settings.ps1
+tools/mgba-scripts/local-settings.ps1
 env

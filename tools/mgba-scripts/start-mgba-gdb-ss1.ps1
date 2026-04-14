@@ -22,4 +22,4 @@ $args = "/c start `"`" `"$mgba`" -g -t `"$save`" `"$rom`""
 $p = Start-Process -FilePath "cmd.exe" -ArgumentList $args -PassThru
 Write-Host "[start] mGBA 已启动（+ss1 存档，通过 cmd /c start），启动器 PID: $($p.Id)"
 Write-Host "[start] 脚本立即退出（保持 mGBA 独立存活）"
-Write-Host "[start] 下一步（新命令）：& tools\wait-mgba-ready.ps1"
+Write-Host "[start] 下一步（新命令）：& tools\mgba-scripts\wait-mgba-ready.ps1"

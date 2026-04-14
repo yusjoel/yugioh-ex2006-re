@@ -193,5 +193,5 @@ card_0001:  @ Blue-Eyes White Dragon  slot=0x0FA7
 | `data/game-strings-es.s` | **CP1252** | 西班牙语 |
 | `data/deck-strings.s` | ASCII | 卡组名（自定义 2 字节编码） |
 | 其余 `.s` 文件 | ASCII / LF | 纯 ASCII 内容 |
-| `tools/export_game_strings.py` | — | 生成脚本，输出编码 `cp1252` |
-| `tools/export_card_data.py` | — | 生成脚本，输出编码 `utf-8`，行尾 LF |
+| `tools/rom-export/export_game_strings.py` | — | 生成脚本，输出编码 `cp1252` |
+| `tools/rom-export/export_card_data.py` | — | 生成脚本，输出编码 `utf-8`，行尾 LF |

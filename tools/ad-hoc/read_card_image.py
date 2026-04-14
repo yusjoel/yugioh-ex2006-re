@@ -22,8 +22,9 @@ import sys
 import os
 import struct
 
-ROM_PATH = os.path.join(os.path.dirname(__file__), '..', 'roms', '2343.gba')
-OUT_DIR  = os.path.join(os.path.dirname(__file__), '..', 'output', 'card_images')
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+ROM_PATH = os.path.join(_REPO_ROOT, 'roms', '2343.gba')
+OUT_DIR  = os.path.join(_REPO_ROOT, 'output', 'card_images')
 
 GBA_ROM_BASE  = 0x08000000
 GBA_ROM2_BASE = 0x09000000

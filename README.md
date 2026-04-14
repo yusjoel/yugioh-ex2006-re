@@ -16,7 +16,7 @@
 > 这些文件**不纳入版本控制**，需先从 ROM 导出：
 >
 > ```bat
-> python tools/export_gfx.py   @ 从 roms/2343.gba 导出图形二进制和 PNG 预览
+> python tools/rom-export/export_gfx.py   @ 从 roms/2343.gba 导出图形二进制和 PNG 预览
 > build.bat                    @ 汇编、链接并生成 output/2343.gba
 > ```
 
@@ -42,11 +42,15 @@ clean.bat    @ 清理编译产物
 │   ├── starter-deck.s          # 初始卡组，50 张（ROM 0x1E5F884）
 │   ├── struct-decks.s          # 6 套预组 + 指针表（ROM 0x1E5FA58）
 │   └── opponent-decks.s        # 25 套对手卡组（ROM 0x1E6468E）
-├── graphics/             # 图形资产（不含于仓库，由 tools/export_gfx.py 生成）
+├── graphics/             # 图形资产（不含于仓库，由 tools/rom-export/export_gfx.py 生成）
 │   ├── opponents/        # 对手大图 PNG + tilemap.bin + palette_copy1.bin
 │   └── icons/            # 对手小图标 PNG
-├── tools/
-│   └── export_gfx.py     # ROM → PNG / tilemap.bin / palette.bin 导出脚本
+├── tools/                # 开发工具脚本（详见下文「工具脚本」）
+│   ├── arm-none-eabi-gdb.exe   # GDB 10.2（不入库，手动放入）
+│   ├── rom-export/       # ROM → data/*.s、graphics/
+│   ├── asm-regen/        # 汇编再生成流水线（Ghidra + inject_modes）
+│   ├── mgba-scripts/     # mGBA 环境管理脚本（pre-MCP 备选）
+│   └── ad-hoc/           # 探索性脚本，不保证稳定
 ├── include/
 │   └── macros.inc        # 汇编宏：deck_entry、banlist_entry、deck_card
 ├── constants/
@@ -60,6 +64,45 @@ clean.bat    @ 清理编译产物
 ├── clean.bat             # 清理脚本
 └── PLAN.md               # 数据汇编化进度计划
 ```
+
+## 工具脚本
+
+### 数据 / 图形导出
+
+| 脚本 | 作用 |
+|------|------|
+| `tools/rom-export/export_gfx.py` | ROM → `graphics/opponents/*.bin` + PNG + 调色板 + `graphics/icons/*.png`；构建前必跑 |
+| `tools/rom-export/export_card_data.py` | ROM → `data/card-names.s`、`data/card-stats.s`（2053 卡名、5170 统计条目） |
+| `tools/rom-export/export_game_strings.py` | ROM → `data/game-strings-{en,de,fr,it,es}.s`（CP1252 编码） |
+
+### 汇编再生成流水线
+
+| 脚本 | 作用 |
+|------|------|
+| `tools/asm-regen/ghidra-export-range.bat` | Headless 调 Ghidra 执行 `ExportRangeToGas.py`，把 ROM 指定地址范围导出为 GAS `.s` |
+| `tools/asm-regen/ghidra/ExportRangeToGas.py` | Jython 脚本，在 Ghidra 内遍历地址范围输出带 label/XREFS 的 `.s`，做 `ldr`/`adr`/`b/bl` 语法修正和 `DAT_` 合成；headless 通过 `getScriptArgs()` 传参，GUI 走交互 prompt |
+| `tools/asm-regen/inject_modes.py` | Python 后处理：注入 `.arm`/`.thumb` 模式切换（基于 hex 宽度判 THUMB/ARM），补 Thumb-1 设标志指令的 `s` 后缀（≈14 万处），应用少量硬编码补丁。支持 `<in> [out]` 参数 |
+
+完整工作流与踩坑记录见 [`doc/dev/asm-regeneration-workflow.md`](doc/dev/asm-regeneration-workflow.md)。
+
+### mGBA 环境脚本（`tools/mgba-scripts/`）
+
+MCP 接入之前用于手工管理 mGBA + GDB stub 生命周期，现在保留作为环境验证备选。
+
+| 脚本 | 作用 |
+|------|------|
+| `local-settings.ps1` | 本机路径（`$mgba`、`$projectRoot`），`.gitignore` 忽略；`.example` 是模板 |
+| `_preflight-mgba.ps1` | 公共库（dot-source）：加载 `local-settings.ps1`、关残留进程、检查端口 2345 |
+| `start-mgba-gdb-ss1.ps1` | 启动 mGBA + GDB stub + 加载 `roms/2343.ss1` 存档 |
+| `start-mgba-gdb-nosave.ps1` | 启动 mGBA + GDB stub，冷启动（不加存档） |
+| `wait-mgba-ready.ps1` | 等待端口 2345 LISTENING + 8 秒 CPU 热身（见 `mgba-gdb-stub-pitfalls.md` 坑 2） |
+| `stop-mgba.ps1` | 关所有 `mGBA.exe` 实例（不影响 `mgba-live-mcp`） |
+
+### 探索性脚本（`tools/ad-hoc/`）
+
+| 脚本 | 作用 |
+|------|------|
+| `read_card_image.py` | 从 ROM 给定 GBA 地址读取 BIOS 压缩头，LZ77 可解压并输出灰阶 PNG（无调色板集成，仅用于快速 sanity check） |
 
 ## 已完成的数据提取
 
@@ -94,7 +137,7 @@ deck_card 4088    @ Red-Eyes B. Dragon (密码: 74677422)
 
 ```
 roms/2343.gba
-  └─ tools/export_gfx.py ──► graphics/opponents/
+  └─ tools/rom-export/export_gfx.py ──► graphics/opponents/
   │                              palette_copy1.bin   调色板块（7776 B）
   │                              <name>_top_tilemap.bin   (1200 B × 27)
   │                              <name>_bottom_tilemap.bin
