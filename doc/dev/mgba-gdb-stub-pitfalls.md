@@ -8,7 +8,7 @@
 
 **必须使用 `tools/arm-none-eabi-gdb.exe`（GDB 10.2）**，不能用 devkitARM 自带的 GDB 14.1。
 
-GDB 14.1 与 mGBA stub 之间存在 7 处 RSP 协议不兼容（详见 `doc/gdb-mgba-watchpoint.md`），握手阶段就会失败。GDB 10.2 可直接连接，无需代理。
+GDB 14.1 与 mGBA stub 之间存在 RSP 协议不兼容，握手阶段就会失败。GDB 10.2 可直接连接，无需代理。
 
 ---
 
@@ -65,7 +65,7 @@ Start-Process $mgba -ArgumentList "-g $rom"
 Start-Process "cmd.exe" -ArgumentList "/c start `"`" `"$mgba`" -g `"$rom`""
 ```
 
-此外，启动脚本必须立即退出，等待端口就绪放到独立的第二条命令中执行（`tools\wait-mgba-ready.ps1`）。
+此外，启动脚本必须立即退出，等待端口就绪放到独立的第二条命令中执行（`tools/mgba-scripts/wait-mgba-ready.ps1`）。
 
 > 详细原理见 `doc/dev/powershell-job-object-mgba.md`
 
@@ -146,8 +146,7 @@ continue
 
 | 文件 | 说明 |
 |------|------|
-| `doc/gdb-mgba-watchpoint.md` | RSP 协议不兼容问题完整分析 |
 | `tools/arm-none-eabi-gdb.exe` | GDB 10.2（可直连 mGBA stub） |
-| `output/gdb_watch_dma.gdb` | DMA3 watchpoint 脚本 |
+| `doc/dev/scripts/gdb_dma_watch.gdb` | DMA3 watchpoint 脚本 |
 
 

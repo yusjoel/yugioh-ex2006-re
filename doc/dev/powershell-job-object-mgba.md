@@ -106,7 +106,7 @@ Get-Process -Name "mGBA" -ErrorAction SilentlyContinue | Select-Object Id, Name
 
 | 文件 | 说明 |
 |------|------|
-| `tools/start-mgba-gdb-nosave.ps1` | 使用 `cmd /c start` 启动 mGBA（无存档） |
-| `tools/start-mgba-gdb-ss1.ps1` | 使用 `cmd /c start` 启动 mGBA（带存档） |
-| `tools/wait-mgba-ready.ps1` | 独立等待端口 2345 就绪（必须在新命令中执行） |
+| `tools/mgba-scripts/start-mgba-gdb-nosave.ps1` | 使用 `cmd /c start` 启动 mGBA（无存档） |
+| `tools/mgba-scripts/start-mgba-gdb-ss1.ps1` | 使用 `cmd /c start` 启动 mGBA（带存档） |
+| `tools/mgba-scripts/wait-mgba-ready.ps1` | 独立等待端口 2345 就绪（必须在新命令中执行） |
 | `doc/dev/mgba-gdb-stub-pitfalls.md` | 坑 4：启动与等待必须分两步 |
