@@ -165,3 +165,36 @@ for (let i = 0; i < buffer.length; i++) {
 P0-5 核心功能验证完成，P0 全部子任务收尾。
 
 **下一步：P1 — 卡图 ROM 定位**（利用 MCP 工具链进行交互式调试）
+
+---
+
+## 附录：在 Claude Code CLI 中注册（2026-04-14）
+
+Claude Code CLI 不读 Copilot 的 `~/.copilot/mcp-config.json`，需要单独在
+`~/.claude.json` 中注册。使用 **project scope**，写入到
+`projects["E:/Workspace/yugioh-ex2006-re"].mcpServers`：
+
+```json
+"gdb": {
+  "command": "node",
+  "args": ["<gdb-mcp dist 目录>\\index.js"]
+}
+```
+
+> gdb-mcp dist 的具体本机路径见 `LOCAL.md`。
+
+### Smoke test（2026-04-14 通过）
+
+- `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")`
+  —— 返回 "GDB ... 已初始化完成"
+- `gdb_connect(target="localhost:2345")` —— 连接成功
+- `gdb_evaluate_expression("$pc")` —— 返回 `$pc = 0x0`（mGBA 启动后 `-g` 暂停在 reset vector）
+- `gdb_continue` —— 游戏开始运行，mGBA MCP 的 Lua bridge 心跳随之出现
+- `gdb_disconnect` —— 正常终止 GDB 进程
+
+### 关键约束（与 Copilot 一致）
+
+- **必须传 `gdbPath` 指向 `tools/arm-none-eabi-gdb.exe`（GDB 10.2）**。
+- **不传 `architecture` 参数**——传了会走 MCP 默认映射到另一条 GDB 路径。
+- 断开后 mGBA stub 永久关闭，需重启 mGBA 才能再连。
+- GDB MCP dist 本机路径见 `LOCAL.md`，含四个已修复 parser bug（见上文 Bug 1–4）。修改源码后必须 `npm run build` 并重启 Claude CLI。

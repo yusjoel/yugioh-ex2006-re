@@ -335,3 +335,59 @@ return emu:read32(0x03001234)
 - 大多数工具调用会自动返回截图（内嵌于响应中）
 - 需要持久化截图时使用 `mgba_live_export_screenshot` 并指定 `out` 路径
 
+---
+
+## 七、Claude Code CLI 注册（2026-04-14）
+
+Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.json`（全局或项目级）。
+本项目使用 **project scope**，配置块位于 `~/.claude.json` → `projects` → `E:/Workspace/yugioh-ex2006-re` → `mcpServers`。
+
+### 配置片段
+
+本机具体路径见 `LOCAL.md`（mGBA 目录、gdb-mcp dist 路径）。配置形态：
+
+```json
+"mcpServers": {
+  "mgba": {
+    "command": "uvx",
+    "args": ["mgba-live-mcp"],
+    "env": { "PATH": "<mGBA 目录>;<其余系统 PATH>" }
+  },
+  "gdb": {
+    "command": "node",
+    "args": ["<gdb-mcp dist 目录>\\index.js"]
+  }
+}
+```
+
+写入后 **必须退出并重启 Claude Code CLI**，MCP server 进程才会加载。
+
+### Smoke test（2026-04-14 验证通过）
+
+| 步骤 | 工具 | 结果 |
+|------|------|------|
+| 1 | `mgba_live_start(rom="roms/2343.gba")` | 超时报错（预期，因 `-g` patch 让游戏启动时暂停），但 session PID 已创建 |
+| 2 | `mgba_live_status` | `alive=true`, `heartbeat=null`（游戏待 GDB 放行） |
+| 3 | `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` | 初始化成功（**不传 `architecture` 参数**） |
+| 4 | `gdb_connect(target="localhost:2345")` | 连接成功 |
+| 5 | `gdb_evaluate_expression("$pc")` | `$pc = 0x0`（reset vector） |
+| 6 | `gdb_continue` | 游戏开始运行 |
+| 7 | `mgba_live_read_range(0x080000A0, 16)` | 返回 `YUGIOHWCT06\0BY6E` ✅ |
+| 8 | `mgba_live_status` | 有截图，标题画面 ✅ |
+
+### 与 Copilot CLI 并存
+
+两份配置各自独立：Copilot 读 `~/.copilot/mcp-config.json`，Claude Code 读 `~/.claude.json`。
+共用 uv cache（mgba-live-mcp 的 patches）和 `D:\Software\gdb-mcp\dist\`（GDB MCP 的 dist），
+无冲突。
+
+### 重要约束重申
+
+- **GDB 版本必须 10.2**（`tools/arm-none-eabi-gdb.exe`），devkitPro 14.1 与 mGBA stub 协议不兼容。
+- `gdb_init` **不要传 `architecture` 参数**，否则 GDB MCP 会用默认 aarch64 或走到 devkitPro 14.1。
+- mGBA `-g` stub **一次性**，GDB 断开后永久关闭，每次调试循环需 `mgba_live_stop` + 重新 `start`。
+- 本机 uv cache 中的 `live_cli.py` 包含手工插入的 `-g` 参数（在 `build_start_command`），
+  使 `mgba_live_start` 启动时自带 GDB stub；因此 `mgba_live_start` 总会超时（游戏被暂停），
+  需要 `gdb_connect` + `gdb_continue` 才能让 Lua bridge 初始化。如果只用 mGBA 不用 GDB，
+  仍需走一遍 GDB 放行流程，或回退 `live_cli.py` 的 patch。
+
