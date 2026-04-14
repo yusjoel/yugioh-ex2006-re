@@ -127,6 +127,76 @@ roms/2343.gba
 
 ---
 
+## 调试工具链
+
+项目已完成调试工具链验证（P0），可通过以下两种方式对运行中的游戏进行动态调试。
+
+### mGBA MCP（截图 / 内存读取 / Lua 注入）
+
+通过 [mGBA MCP](https://github.com/souldzin/mGBA-http) 提供的 MCP 工具直接控制 mGBA。
+
+**启动**：
+```ps1
+# 启动 mGBA 并加载存档（工具位于 tools/）
+pwsh -File tools\start-mgba-gdb-ss1.ps1
+```
+
+**已验证工具**（详见 `doc/dev/p0-3-mgba-mcp-feature-validation.md`）：
+
+| 工具 | 功能 |
+|------|------|
+| `mgba_live_start` | 启动 mGBA 会话 |
+| `mgba_live_export_screenshot` | 截图 |
+| `mgba_live_input_tap` | 模拟按键 |
+| `mgba_live_run_lua` | 注入 Lua 脚本 |
+| `mgba_live_read_memory` | 读取指定地址 |
+| `mgba_live_read_range` | 读取内存范围 |
+| `mgba_live_dump_oam` | 转储 OAM 精灵表 |
+
+### GDB MCP（断点 / 寄存器 / 单步执行）
+
+通过 [GDB MCP](https://github.com/pansila/gdb-mcp) 工具，以 MI 协议驱动 GDB 连接 mGBA GDB stub。
+
+**启动顺序**：
+```ps1
+# 1. 启动 mGBA（带 GDB stub，端口 2345）
+pwsh -File tools\start-mgba-gdb-ss1.ps1
+# 2. 等待 stub 就绪（约 9 秒）
+pwsh -File tools\wait-mgba-ready.ps1
+# 3. 通过 MCP 工具连接（在 AI 助手中调用）
+# gdb_init(gdbPath: "tools/arm-none-eabi-gdb.exe")
+# gdb_connect(target: "localhost:2345")
+```
+
+> ⚠️ 必须使用 `tools/arm-none-eabi-gdb.exe`（GDB 10.2），
+> `devkitPro` 自带的 GDB 14.1 与 mGBA stub 不兼容。
+> 调用 `gdb_init` 时**不要**使用 `architecture` 参数。
+
+> ⚠️ mGBA GDB stub 为一次性连接：GDB 断开后 stub 永久关闭，每次调试需重启 mGBA。
+
+**已验证工具**（详见 `doc/dev/p0-5-gdb-mcp-integration.md`）：
+
+| 工具 | 功能 |
+|------|------|
+| `gdb_init` / `gdb_connect` / `gdb_disconnect` | 连接管理 |
+| `gdb_set_breakpoint` | 设置断点（支持条件断点） |
+| `gdb_list_breakpoints` / `gdb_delete_breakpoint` | 断点管理 |
+| `gdb_continue` / `gdb_interrupt` | 执行控制 |
+| `gdb_evaluate_expression` | 表达式求值（可读取内存/寄存器） |
+| `gdb_command` | 直接执行 GDB MI 命令 |
+
+**已知限制**：mGBA THUMB 代码不支持栈回溯（`gdb_list_frames` 失败）；`gdb_read_memory` 存在解析 bug，可用 `gdb_evaluate_expression` 代替。
+
+### 纯 GDB 脚本方式
+
+适合已知流程的批处理场景（如固定 watchpoint 监听），详见 `doc/dev/scripts/`：
+
+```ps1
+tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
+```
+
+---
+
 ## 参考文档
 
 项目 `doc/` 目录下保存了以下研究文档（原始 Google Sheets，转存为 Markdown）：
