@@ -19,8 +19,24 @@ Start:
 
 	.include "asm/all.s"
 
-@ 后 16MB 第一段前半 seg-A：ROM偏移 0x1000000 - 0x15BB5AB（卡名字符串表前）
-	.incbin "roms/2343.gba", 0x1000000, 0x5BB5AC
+@ ── 大卡图数据段（原在 all.s 末尾，移出以保持 all.s 纯代码）───────────────
+@ ROM 偏移 0x4C7638 - 0x1000000，共约 11.5 MB
+	.incbin "roms/2343.gba", 0x4C7638, 0x88         @ 0x4C7638..0x4C76C0 未知小段
+	.include "data/card-image-palettes.s"           @ 0x4C76C0..0x510440  2331 × 128 B 卡图调色板
+	.incbin "roms/2343.gba", 0x510440, 0x200        @ 0x510440..0x510640 填充/未用
+	.include "data/card-image-tiles.s"              @ 0x510640..0xFBC080  2331 × 4800 B 6bpp tile 数据
+	.incbin "roms/2343.gba", 0xFBC080, 0x43F80      @ 0xFBC080..0x1000000 tile 区后剩余
+
+@ 后 16MB 第一段前半 seg-A-1：ROM偏移 0x1000000 - 0x15B5BFF（卡图索引表前）
+	.incbin "roms/2343.gba", 0x1000000, 0x5B5C00
+
+@ 卡牌大图索引表（ROM偏移 0x15B5C00 - 0x15B94CB）
+@ 7270 × u16 = 14540 B = 0x38CC
+@ 引用 graphics/card-images-rom/palettes.bin + tiles.bin（由同脚本从 ROM 导出，未入库）
+	.include "data/card-image-index.s"
+
+@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB5AB（索引表后至卡名表前）
+	.incbin "roms/2343.gba", 0x15B94CC, 0x20E0
 
 @ 卡牌名称字符串表（ROM偏移 0x15BB5AC - 0x15F3A5B）
 @ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐

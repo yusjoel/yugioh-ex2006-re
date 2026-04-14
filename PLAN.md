@@ -2,15 +2,27 @@
 
 ---
 
-## 🔴 P1（当前焦点）：卡图 ROM 定位
+## ✅ P1：卡图 ROM 定位（已完成 2026-04-15）
 
-2054 张卡牌图像的 ROM 存储方式与 ID 映射。Phase B2 动态追溯已完成，结果见 `doc/dev/p1-phase-b2-findings.md`；P1 子项状态待专题审阅后回填。
+成果：`tools/rom-export/export_card_images.py` + `doc/dev/card-image-export.md` + `doc/dev/p1-phase-b2-findings.md`；
+2331 张大卡图 PNG（card_id 0..2097，覆盖全部 2331 个独立 tile_block）。
 
-- [x] **P1-1**：~~GDB watchpoint 监听 DMA3~~ 改用静态 + mGBA Lua 确认加载函数 `FUN_0801d290` 与源地址 `0x08BD2140`（findings §二、§三）
-- [x] **P1-2**：源数据为**原始 6bpp 自写压缩**（非 LZ77），每 6 bytes → 8 像素；findings §3.4 给出解码公式
-- [x] **P1-3**：**card_id = `data/card-stats.s` 的 0-indexed 记录序号**。实测：idx 1323→slot 0x1653 (DESPAIR)、idx 672→slot 0x12EA (Monster Reborn)。同一 slot 可能有多条 copy=0 主记录，但通常只有第一条在 image table 有图，后续条目为 0xFFFF
-- [x] **P1-4**：调色板位置确认——**每卡 64 色独立调色板**，`pal = 0x004C76C0 + tile_block × 128`（非 stride 2752）；见 `card-image-export.md`
-- [x] **P1-5**：导出脚本 `tools/rom-export/export_card_images.py` + 文档 `doc/dev/card-image-export.md`，美版 flag=1 共 3134 条 card_id、2201 个独立 tile_block 已全量导出
+---
+
+## 🔴 P2（下一焦点）：卡牌列表小图调查
+
+卡牌选择界面的**小卡图区** `0x01000000..0x01463480`（2054 × 2240 B，8bpp tiles，40×56 像素），
+`doc/dev/card-data-structure.md` §三 记载其格式已知但**调色板未解决**，导出结果仅灰度可辨。
+沿用 P1 的方法（逆向加载函数 → 定位 palette 基址 → 批量导出）。
+
+- [ ] **P2-1**：在 mGBA 中定位卡选界面的小卡图 VRAM 地址与 BG 配置（DISPCNT/BGxCNT），
+      参照 findings §一 的做法截获 tilemap / char base
+- [ ] **P2-2**：静态追卡选页加载函数，找到小卡图对应的 ROM 地址 + 调色板基址
+- [ ] **P2-3**：确认小图 index 与 slot_id / card_id 的映射（§三 推测"顺序索引"需实锤）
+- [ ] **P2-4**：扩展 `tools/rom-export/export_card_images.py`（或新脚本），输出小图 PNG
+- [ ] **P2-5**：调查图像区起始的 UI 字体/数字占用多少 entry（原 T6.3）
+
+> 原 T6.1/T6.2（大卡图调色板与 index 映射）已由 P1 完成并覆盖。
 
 ---
 
@@ -71,12 +83,10 @@
 
 依据：`doc/dev/card-data-structure.md`
 
-- [ ] **T6.1**：确认卡牌图像的调色板位置与 stride（是否 2752 字节）
-- [ ] **T6.2**：确认图像 index 与槽位 ID 的精确映射
-- [ ] **T6.3**：确认图像区起始的 UI 图形（字体/数字）占用多少 entries
 - [ ] **T6.4**：完整属性/种族编码表（对照 `doc/um06-deck-modification-tool/data.md` 验证）
 
-> `data/card-stats.s`（5170 条 × 22 字节）和 `data/card-names.s`（卡名字符串表）已落地并由 `asm/rom.s` 引用，T6.5（属性表汇编化）视为完成。
+> T6.1/T6.2 由 P1 完成（大卡图）；T6.3 并入 P2；T6.5（属性表汇编化）由
+> `data/card-stats.s` + `data/card-names.s` 已完成。
 
 ---
 

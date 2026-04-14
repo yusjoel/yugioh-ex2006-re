@@ -35,6 +35,25 @@ STATS_BASE_ROM = 0x018169B6   # card-stats.s 起始 ROM 偏移
 STATS_STRIDE = 22             # 每条记录字节数
 EN_NAMES_BASE_ROM = 0x015BB5AC  # 欧洲卡名表 ROM 起始（每卡 5 个 CP1252 字符串）
 
+# ROM 中三段原始数据的精确范围（byte-identical 要求）
+PALETTES_ROM_START = 0x004C76C0
+PALETTES_ROM_END   = 0x00510440  # 2331 × 128 B = 0x48D80
+TILES_ROM_START    = 0x00510640
+TILES_ROM_END      = 0x00FBC080  # 2331 × 4800 B = 0xAABA40
+INDEX_ROM_START    = 0x015B5C00
+INDEX_ROM_END      = 0x015B94CC  # 7270 × u16 = 0x38CC（6846 实条目 + 424 FFFF 填充）
+
+BLOB_DIR = Path("graphics/card-images-rom")       # bin 根目录（已 .gitignore graphics/）
+PAL_BLOB_DIR = BLOB_DIR / "palettes"              # 2331 × 128 B
+TILE_BLOB_DIR = BLOB_DIR / "tiles"                # 2331 × 4800 B
+INDEX_S_PATH = Path("data/card-image-index.s")    # 索引表 .s（显式 .hword）
+PAL_S_PATH = Path("data/card-image-palettes.s")   # 调色板 incbin 列表
+TILE_S_PATH = Path("data/card-image-tiles.s")     # tile incbin 列表
+
+NUM_TILE_BLOCKS = 2331                             # tile_block 0..2330 全覆盖
+PAL_ENTRY_SIZE = 128                               # 64 × BGR555
+TILE_ENTRY_SIZE = 4800                             # 与 STRIDE 同值（6bpp，10×10 tiles）
+
 # 常量（均来自 findings）
 TILE_BASE_ROM = 0x00510640
 INDEX_TABLE_ROM = 0x015B5C00
@@ -186,6 +205,129 @@ def decode_and_arrange(rom: bytes, tb: int) -> bytes:
     return arrange_tiles(decode_6bpp(rom[src:src + STRIDE]))
 
 
+def dump_rom_blobs(rom: bytes) -> None:
+    """按 tile_block 拆分导出 2331 × palette + 2331 × tile 为独立 bin。
+
+    同时生成 data/card-image-palettes.s 和 data/card-image-tiles.s 两个
+    包装 .s，顺序 .incbin 全部小 bin 文件（asm/all.s 用 .include 引用）。
+    """
+    PAL_BLOB_DIR.mkdir(parents=True, exist_ok=True)
+    TILE_BLOB_DIR.mkdir(parents=True, exist_ok=True)
+
+    for tb in range(NUM_TILE_BLOCKS):
+        pal_off = PALETTES_ROM_START + tb * PAL_ENTRY_SIZE
+        tile_off = TILES_ROM_START + tb * TILE_ENTRY_SIZE
+        (PAL_BLOB_DIR / f"tb{tb:04d}.bin").write_bytes(
+            rom[pal_off:pal_off + PAL_ENTRY_SIZE])
+        (TILE_BLOB_DIR / f"tb{tb:04d}.bin").write_bytes(
+            rom[tile_off:tile_off + TILE_ENTRY_SIZE])
+
+    # 生成 palettes.s
+    pal_lines = [
+        "@ 卡牌大图调色板序列（由 tools/rom-export/export_card_images.py 生成）",
+        f"@ ROM 范围: 0x{PALETTES_ROM_START:X} - 0x{PALETTES_ROM_END:X}  "
+        f"({NUM_TILE_BLOCKS} × {PAL_ENTRY_SIZE} B = {NUM_TILE_BLOCKS * PAL_ENTRY_SIZE} B)",
+        "@ 每 tile_block 一段 64 色 BGR555 调色板。",
+        "",
+    ]
+    for tb in range(NUM_TILE_BLOCKS):
+        pal_lines.append(
+            f'    .incbin "graphics/card-images-rom/palettes/tb{tb:04d}.bin"')
+    PAL_S_PATH.write_text("\n".join(pal_lines) + "\n", encoding="utf-8")
+
+    # 生成 tiles.s
+    tile_lines = [
+        "@ 卡牌大图 tile 数据序列（由 tools/rom-export/export_card_images.py 生成）",
+        f"@ ROM 范围: 0x{TILES_ROM_START:X} - 0x{TILES_ROM_END:X}  "
+        f"({NUM_TILE_BLOCKS} × {TILE_ENTRY_SIZE} B = {NUM_TILE_BLOCKS * TILE_ENTRY_SIZE} B)",
+        "@ 每 tile_block 一张 80×80 6bpp 图（10×10 tiles × 8×8，4800 B）。",
+        "",
+    ]
+    for tb in range(NUM_TILE_BLOCKS):
+        tile_lines.append(
+            f'    .incbin "graphics/card-images-rom/tiles/tb{tb:04d}.bin"')
+    TILE_S_PATH.write_text("\n".join(tile_lines) + "\n", encoding="utf-8")
+
+    print(f"写入 {PAL_BLOB_DIR}/ 下 {NUM_TILE_BLOCKS} 个 tb*.bin"
+          f" ({NUM_TILE_BLOCKS * PAL_ENTRY_SIZE} B 总计)")
+    print(f"写入 {TILE_BLOB_DIR}/ 下 {NUM_TILE_BLOCKS} 个 tb*.bin"
+          f" ({NUM_TILE_BLOCKS * TILE_ENTRY_SIZE} B 总计)")
+    print(f"写入 {PAL_S_PATH} ({NUM_TILE_BLOCKS} 条 incbin)")
+    print(f"写入 {TILE_S_PATH} ({NUM_TILE_BLOCKS} 条 incbin)")
+
+
+def write_index_source(rom: bytes) -> None:
+    """生成 data/card-image-index.s —— 显式 .hword 配带注释（card_id/slot/卡名）。"""
+    slot_to_name = build_slot_to_en_name(rom)
+    import struct as _struct
+
+    # 读取原始 ROM 索引表
+    raw = rom[INDEX_ROM_START:INDEX_ROM_END]
+    total_u16 = len(raw) // 2
+    vals = _struct.unpack(f"<{total_u16}H", raw)
+    # entries[i] 对应 (card_id, flag) where i = card_id*2 + flag
+    # 前 6846 条为有效数据（其中仍有 FFFF 占位），后 424 条全部 FFFF
+    n_real = 6846  # 6846 = 3423 × 2（card_id 0..3422，每卡 flag=0/1 两条）
+    n_pad = total_u16 - n_real  # 424
+
+    out_lines = [
+        "@ 卡牌大图索引表（由 tools/rom-export/export_card_images.py 自动生成）",
+        f"@ ROM 范围: 0x{INDEX_ROM_START:X} - 0x{INDEX_ROM_END:X}  "
+        f"({INDEX_ROM_END - INDEX_ROM_START} B = {total_u16} × u16)",
+        "@",
+        "@ 结构：每个 card_id 占 2 条 u16（flag=0 OCG / flag=1 TCG），",
+        "@ 值为 tile_block（=> 大图 ROM 偏移 = 0x00510640 + tile_block × 4800；",
+        "@ 调色板 ROM 偏移 = 0x004C76C0 + tile_block × 128）。",
+        "@ 0xFFFF 表示该 card_id 在此 flag 下无大图。",
+        "@ card_id 是 data/card-stats.s 的 0-indexed 数组下标；1..2080 为正式卡，",
+        "@ 2081..2097 为 Token，0 为占位记录，2098+ 为未使用/表 B 数据。",
+        "",
+        "    .section .rodata",
+        "    .balign 2",
+        "    .global card_image_index",
+        "card_image_index:",
+        "",
+    ]
+
+    for card_id in range(n_real // 2):  # 0..3422
+        tb0 = vals[card_id * 2]
+        tb1 = vals[card_id * 2 + 1]
+
+        # 生成一行 .hword
+        def fmt(v: int) -> str:
+            return "0xFFFF" if v == 0xFFFF else f"0x{v:04X}"
+
+        # 注释
+        slot = card_id_to_slot(rom, card_id) if card_id < 5170 else 0
+        name = slot_to_name.get(slot, "") if slot else ""
+        name_part = f" {name}" if name else ""
+        c_note = ""
+        if card_id == 0:
+            c_note = "  @ [占位] "
+        elif 1 <= card_id <= 2080:
+            c_note = f"  @ [正式卡{card_id:04d}] slot=0x{slot:04X}{name_part}"
+        elif 2081 <= card_id <= 2097:
+            c_note = f"  @ [Token{card_id - 2080:02d}] slot=0x{slot:04X}{name_part}"
+        elif 2098 <= card_id <= 3422:
+            c_note = f"  @ [表B {card_id:04d}] slot=0x{slot:04X}{name_part}"
+        else:
+            c_note = f"  @ card_id={card_id}"
+
+        out_lines.append(f"    .hword {fmt(tb0)}, {fmt(tb1)}{c_note}")
+
+    # 填充段
+    out_lines.append("")
+    out_lines.append(f"    @ === 保留/填充区：{n_pad} × 0xFFFF ({n_pad * 2} B) ===")
+    out_lines.append(f"    .fill {n_pad * 2}, 1, 0xFF")
+    out_lines.append("")
+    out_lines.append("card_image_index_end:")
+    out_lines.append("")
+
+    INDEX_S_PATH.parent.mkdir(parents=True, exist_ok=True)
+    INDEX_S_PATH.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+    print(f"写入 {INDEX_S_PATH} ({total_u16} entries, {INDEX_ROM_END - INDEX_ROM_START} B)")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="导出卡牌详情页大卡图（6bpp）。card_id 1..2097，"
@@ -194,12 +336,23 @@ def main() -> int:
     parser.add_argument("--only", type=int, default=None, help="只处理指定 card_id（调试用）")
     parser.add_argument("--start", type=int, default=0, help="起始 card_id（默认 0；0 对应占位记录 tb=0，用途未知但数据有效）")
     parser.add_argument("--end", type=int, default=2097, help="末尾 card_id 含（默认 2097）")
+    parser.add_argument("--no-png", action="store_true", help="跳过 PNG 导出，仅生成 bin 与 .s")
+    parser.add_argument("--no-blobs", action="store_true", help="跳过 bin 与 .s 生成，仅导出 PNG")
     args = parser.parse_args()
 
     if not ROM_PATH.exists():
         print(f"ERROR: ROM not found at {ROM_PATH}", file=sys.stderr)
         return 1
     rom = ROM_PATH.read_bytes()
+
+    if not args.no_blobs:
+        print("=== 导出 ROM 原始数据块 + 索引 .s ===")
+        dump_rom_blobs(rom)
+        write_index_source(rom)
+        print()
+
+    if args.no_png:
+        return 0
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
