@@ -9,18 +9,23 @@
 
 ---
 
-## 🔴 P2（下一焦点）：卡牌列表小图调查
+## 🟡 P2：卡牌列表小图调查（2026-04-15 静态路径完成，palette 遗留）
 
-卡牌选择界面的**小卡图区** `0x01000000..0x01463480`（2054 × 2240 B，8bpp tiles，40×56 像素），
-`doc/dev/card-data-structure.md` §三 记载其格式已知但**调色板未解决**，导出结果仅灰度可辨。
-沿用 P1 的方法（逆向加载函数 → 定位 palette 基址 → 批量导出）。
+卡组构筑界面的**小卡图**实际位置 **`0x01326280`**（旧文档 `0x01000000` 错误），
+stride **1152 B**，3×6 tile row-major = **24×48 像素** 8bpp，目标 OBJ VRAM
+`0x06010000`。调查详情见 `doc/dev/card-list-image-export.md`。
 
-- [ ] **P2-1**：在 mGBA 中定位卡选界面的小卡图 VRAM 地址与 BG 配置（DISPCNT/BGxCNT），
-      参照 findings §一 的做法截获 tilemap / char base
-- [ ] **P2-2**：静态追卡选页加载函数，找到小卡图对应的 ROM 地址 + 调色板基址
-- [ ] **P2-3**：确认小图 index 与 slot_id / card_id 的映射（§三 推测"顺序索引"需实锤）
-- [ ] **P2-4**：扩展 `tools/rom-export/export_card_images.py`（或新脚本），输出小图 PNG
-- [ ] **P2-5**：调查图像区起始的 UI 字体/数字占用多少 entry（原 T6.3）
+- [x] **P2-1**：~~mGBA 动态~~ — MCP bridge 反复无法启动，改走纯静态
+- [x] **P2-2**：`FUN_080c33bc` @ `asm/all.s` L231102 完整反汇编；tile base +
+      index table + VRAM 目标全部定位
+- [x] **P2-3**：`card_id ↔ tile_block` 映射与大卡图**完全共享**同一索引表
+      `0x015B5C00` 同公式 `tile_block = u16[base+(card_id*2+flag)*2]`
+- [x] **P2-4**：`tools/rom-export/export_card_list_images.py`（2108 张灰度 PNG）
+- [x] **P2-5**：旧区 `0x01000000..0x01326280`（3.3 MB）**不是卡图**（是 UI/
+      字体/其他资产，结构未知）。真正的小卡图区从 0x01326280 起
+
+- [ ] **P2-palette**（遗留）：OBJ 256 色调色板 ROM 源未定位。候选路径
+      见 `card-list-image-export.md` §"未解决：调色板"
 
 > 原 T6.1/T6.2（大卡图调色板与 index 映射）已由 P1 完成并覆盖。
 
