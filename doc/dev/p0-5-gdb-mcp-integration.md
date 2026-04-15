@@ -44,6 +44,20 @@ if (caretIdx > 0 && /^\d+$/.test(line.slice(0, caretIdx))) {
 }
 ```
 
+> ⚠️ **重要操作陷阱（2026-04-15 复现）**：修改 `src/*.ts` 后**必须**执行
+> `cd D:/Software/gdb-mcp && npm run build` 重新产出 `dist/`，
+> 并**重启 Claude Code** 让 MCP server 重新加载。
+>
+> MCP server 入口是 `dist/index.js`（见 `package.json` 的 `"main"`），
+> Claude Code 启动时一次性加载并常驻，源码改动不会热生效。
+>
+> **验证命令**：`grep -c "caretIdx" D:/Software/gdb-mcp/dist/gdb/mi-parser.js`
+> 应返回 ≥ 1；为 0 说明 dist 是旧版，`gdb_connect` 会撞 Bug 1 超时。
+>
+> **症状识别**：如果 `gdb_connect(target="localhost:2345")` 稳定 30s 超时报错，
+> 且 mGBA 端口 2345 在连接尝试后立即关闭（stub 被消耗但 MCP 收不到响应），
+> 几乎可断定是 dist 未同步。
+
 ---
 
 ### Bug 2: `split(",", 2)` 截断值（导致 bkpt 解析为空对象）
