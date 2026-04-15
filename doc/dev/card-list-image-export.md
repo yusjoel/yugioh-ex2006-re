@@ -129,23 +129,54 @@ Blue-Eyes（tile_block=1）与 DESPAIR（tile_block=1476）灰度渲染可辨识
 2331 个 card_id 对应的 tile_block，批量导出唯一的 2108 张灰度 PNG（部分
 tile_block 被多个 card_id 共享，重复跳过）。
 
-## 未解决：调色板（palette）
+## 调色板路径（2026-04-15 第二轮静态追查）
 
-OBJ 8bpp 需 256 色调色板写入 `0x05000200..0x05000400`（512 B）。
-源 ROM 地址尚未定位。
+**阶段性结论**：小卡列表 OBJ 调色板**复用大卡图 per-card 64 色 palette**
+（ROM `0x084C76C0` 基址，stride 128 B），由 `FUN_080bff6c`（@ `0x080BFF6C`）
+在对应渲染路径里即时拷入 `0x05000200 + slot × 32`。
 
-**候选方向**（下次 session 推进）：
+### 证据：`FUN_080bff6c` 字面量池 + 关键指令
 
-1. **`[0x01000000, 0x01326280)` 区内嵌** — 3.3 MB 未知区可能含 palette 表
-2. **共享大卡图 palette** `0x084C76C0` — 但大卡图是 64 色 per-card，
-   小卡图要 256 色，不直接通用；可能有独立全局 palette
-3. **调用栈追踪** — 找 `FUN_080c33bc` 的调用者，它通常在调用前初始化 OBJ
-   palette。候选调用点：
-   - `asm/all.s` L221657 / L221672 / L229309 / L232503 / L232520 / L232778
-     / L233667 / L233676 / L254477 / L254486
-4. **mGBA 动态 dump `0x05000200..0x05000400`**（卡组构筑界面）
+`asm/all.s` L224294–L224489，字面量池（L224472 起）：
 
-定位后：`export_card_list_images.py --palette <bin>` 即可彩色输出。
+| 符号 | 值 | 角色 |
+|------|-----|------|
+| `DAT_080c00cc` | `0x095b5c00` | card-image-index 表（共用） |
+| `DAT_080c00dc` | `0x08510640` | 大卡图 tile 基址（P1 findings 相同） |
+| `DAT_080c00e4` | `0x05000200` | **OBJ palette VRAM dst** |
+| `DAT_080c00e8` | `0x084c76c0` | **palette ROM 基址**（per-card 128 B） |
+| `DAT_080c00ec` | `0x06010000` | OBJ char base VRAM（与小卡图相同） |
+
+关键指令（L224341–L224371 片段）：
+
+```asm
+adds r5, r0, r1        @ r5 = 0x05000200 + r6*32        (palette VRAM slot)
+...
+ldrh r0, [palette_tbl, idx*2]   @ 取 palette index
+lsls r1, r0, #0x7              @ r1 = idx * 128
+ldr  r0, DAT_080c00e8          @ r0 = 0x084c76c0
+adds r1, r1, r0                @ src = ROM palette
+adds r0, r5, #0x0              @ dst = VRAM
+movs r2, #0x80                 @ len = 128
+bl   FUN_080f4ea4              @ memcpy
+```
+
+### 限制
+
+`FUN_080bff6c` 自身用 `0x08510640` 读 tile（大卡图路径），本次静态分析**未严格证明**
+同一 palette 路径也被 `load_card_list_small_image`（`FUN_080c33bc`）的调用者
+（如 `FUN_080bea94` @ L221561）使用——后者只加载 tile 不涉及 palette。
+所以最终的"小卡图 palette == 大卡图 palette"仍需运行时验证：mGBA 在卡组构筑界面
+dump `0x05000200..0x05000400` 与 ROM `0x004C76C0 + tile_block × 128` 比对。
+
+定位后：`tools/rom-export/export_card_list_images.py` 可接 `--palette-base 0x004c76c0
+--palette-stride 128` 批量上色。
+
+### 候选继续点
+
+若上述复用猜想被 runtime 证伪，下一轮再尝试：
+- `[0x01000000, 0x01326280)` 区（3.3 MB 未知）里做 BGR555 模式扫描
+- 逆向 `FUN_080bea94` 的调用者是否在进卡组构筑界面前做独立 OBJ palette 初始化
 
 ## 相关文件
 
