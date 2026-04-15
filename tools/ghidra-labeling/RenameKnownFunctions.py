@@ -63,6 +63,9 @@ RENAMES = [
         "P1 findings: 卡列表小图 (OBJ 8bpp, 1152 B/条)"),
     ("FUN_080f2e4c", "commit_line_buffer_to_sprite_vram",
         "p2: line buffer -> 0x06010040+ sprite tile"),
+    # --- TG.4-next 轮（2026-04-15） ---
+    ("FUN_0801e640", "card_list_on_select_to_info_page",
+        "TG.4-next: 卡列表按 A 进详情页的派发, 首 bl 即 card_info_page_enter_with_card_id"),
 ]
 
 
