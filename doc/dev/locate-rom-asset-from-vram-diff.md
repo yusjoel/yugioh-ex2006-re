@@ -215,34 +215,140 @@ grep "bl <被命中函数>" asm/all.s   → 找直接调用者
 
 ---
 
-## 五、可复用脚本
+## 五、字库定位实战复盘（按六步对照）
+
+**日期**：2026-04-15（与卡图定位同日）
+**结果文档**：[`p2-font-location-findings.md`](p2-font-location-findings.md)
+
+| 步骤 | 实际产出 |
+|------|---------|
+| ① 快照 | **同卡图**使用 state1（卡组列表）/ state3（卡牌信息页 A→A 进入）；顺带 dump OAM + palette |
+| ② 差异 | 最大 BG 差异仍是卡图 4864 B 那段；**OBJ tile 区** 出现 `0x06010005–0x060107FC`（2040 B，≈64 tiles）大段连续差异 + 多个散布区间 |
+| ③ IO | DISPCNT=`0x1F40`（BG0/1/2/3+OBJ+1D 映射）；BG0CNT 仍是 `0x0086`（卡图层不变）；**文字不走 BG** |
+| ③.5 归属 | 差异地址 ≥ `0x06010000` ⇒ **唯一归属 OBJ sprite tile**；OAM 分析发现 indices 12-63 是 32×8 水平条 sprite，tile 索引从 2 起步进 4，palette F ⇒ 正是文字区块 |
+| ④ 指纹 | 两阶段：VRAM 字面量 + 代码字面量 |
+| ⑤ 爬升 | **复用卡图同一顶层**`FUN_0801e440`，走"卡图兄弟分支"`FUN_0801e000` → `FUN_080f2aa8` → `FUN_080f1b60` |
+| ⑥ 验证 | Python 离线 1bpp 8×8 解码 ASCII 0x21..0xFF，所有字形清晰可辨 |
+
+### 新发现一：OBJ 资源的 IO/VRAM 指纹选择
+
+本次在步骤 ④ 先后考察三个 VRAM 字面量，印证 §二·④ "grep 密度预估"原则：
+
+| 字面量 | 含义 | `asm/all.s` 出现次数 | 评级 |
+|--------|------|-----------------------|------|
+| `0x06010000` | OBJ tile VRAM 基址 | 59 | 中强，需联合过滤 |
+| **`0x06010040`** | **OBJ tile 2 起始（跳过图标槽）** | **4** | **极强，直接锁定** |
+| `0x06010020` | OBJ tile 1 起始（图标） | 0 | 不存在 |
+
+`0x06010040` 比 `0x06010000` 强 15 倍并非偶然：它隐含了"游戏保留 tile 0/1 做图标、文字从 tile 2 开始写"这一设计决策——把 **运行时的 layout 约定** 编进字面量后天然成为强指纹。这个技巧可推广：任何"基址 + 固定偏移"组合（调色板跳过 transparent 槽、tilemap 跳过边框行等）都比裸基址强。
+
+### 新发现二："合成产物 vs 原始素材"判别
+
+字库这次**不能**用卡图那种"VRAM tile 字节 → ROM 直搜"手法，原因非常关键：
+
+- **卡图**：6bpp ROM 数据 → 解码 → VRAM 4bpp；VRAM bytes 与 ROM bytes 有**可逆对应关系**，所以用 PIL `find` 反查 ROM tile 是可行的 debug 手段（实战中虽没用这条路，但理论上可行）。
+- **字库**：ROM 存 1bpp 变宽字形 → 渲染器**沿 X 轴把多个字符拼到一条 32×8 的 line buffer** → 切成 4 个 tile 写入 OBJ VRAM。一个 VRAM tile 的 8 列里混了 2–3 个字符的边缘，**这种合成产物不会在 ROM 中原样出现**。
+
+**判别方法**：拿几个显眼的 VRAM tile 原始字节在 ROM 做 byte search。
+- 命中 ≥ 1 且字节非全零 → 原始素材（卡图、图标、地图 tile），可直接搜字节定位
+- 全部未命中 → 合成产物（文本、HUD 数字、动画插值），必须沿"**渲染器 ← OAM / BGxCNT ← 顶层页面入口**"这条代码路径追
+
+本轮实测：
+```
+tile 1 @ 0x06010020 "ATK 图标" 字节 → ROM 0x09CCD2D0  ✓ 命中（原始素材）
+tile 2..20 @ 0x06010040+ 字形    → 0 hit           ✗ 未命中（合成产物）
+```
+判定字库走合成路径，**放弃字节反搜、改走 IO + 代码字面量**。这一判别环节值得写进六步流程作为步骤 ② 的可选子项。
+
+### 新发现三：相邻兄弟分支 = 天然强钩子
+
+卡图定位时爬升到顶层 `FUN_0801e440`，当时只分析了"卡图那支"。本轮发现：`FUN_0801e440` 是**整个卡牌信息页**的入口，它按序调用：
+
+```
+FUN_0801e440:
+  bl FUN_0801d45c    @ BG0 CNT=0x86（卡图层准备）
+  bl FUN_0801d998    @ → FUN_0801d290（卡图 6bpp 解码，p1 结果）
+  bl FUN_0801dbdc    @ ?
+  bl FUN_080eeb54    @ 卡片数据查询
+  bl FUN_0801e000    @ ★ 本轮入口：描述文本渲染
+  bl FUN_0801e100    @ 收尾
+```
+
+`FUN_0801e000` 字面量池含 `.word 0x06010040`（本轮关键指纹），沿调用链到 `FUN_080f1b60` 命中字库基址 `0x09CCCA90`。
+
+**一般化启示**：**定位一个资源后，顶层页面函数的相邻 `bl` 往往是同页面其它资源的加载入口**。卡图 → 描述文本 → 卡片属性图标 → 音效触发，这些"同页面、不同资源"的加载器大概率是兄弟关系。后续任务的优先策略：
+
+1. 先 `grep "bl FUN_<顶层>" asm/all.s` 找到所有调用点
+2. 读顶层函数字面量池 + 列出相邻 `bl` 序列
+3. 按资源类型筛选（写 VRAM OBJ 区的是文字/图标、写 palette RAM 的是配色、长循环 + 6bpp-like 算术的是位图解码）
+
+### 新发现四：1bpp 字形编码的识别指纹
+
+读到 `FUN_080f1b60` 字面量 `0x09ccca90` 后，靠循环结构反推编码格式：
+
+```asm
+movs r0, #0x4
+mov  r9, r0          @ r9 = 4（循环次数）
+loop:
+  ldrh r4, [r6]      @ 读 2 字节
+  adds r6, #0x2
+  lsls r0, r4, #0x18
+  lsrs r0, r0, #0x18 @ 取低字节
+  bl FUN_080f0f70    @ 渲染一行（低字节 = 8 像素）
+  lsrs r4, r4, #0x8  @ 取高字节
+  bl FUN_080f0f70    @ 渲染一行（高字节）
+  subs r9, #1
+  bne loop
+```
+
+**归纳**：`4 次 × 每次 2 字节 = 8 字节/字符`，每字节一行 × 8 行 = **1bpp 8×8**。
+相对于前一次"卡图 6bpp"归纳（每迭代 6 字节 → 8 像素，800 迭代），这次是"每迭代 2 字节 → 16 像素（两行）"。两者的共同模式：
+
+| 特征 | 定位步骤 |
+|------|----------|
+| 循环计数常量（此处 `r9=4`，卡图 `800`） | 决定"共多少字节"与"字形总尺寸" |
+| 每轮读取字节数（此处 2，卡图 6） | 决定编码密度（bpp） |
+| 每轮输出像素数（此处 16，卡图 8） | 验证：`每轮字节×8 / bpp = 每轮像素` |
+| 内层函数 `FUN_080f0f70` / 6bpp 展开算术 | 最终渲染/解码细节 |
+
+**通用公式**：看到 `ldr[bh] + 移位 + bl 渲染` 小循环，先算 `总字节 = 循环次数 × 每轮字节`，与资源尺寸反推 bpp。这是识别位图编码的**最快启发式**。
+
+---
+
+## 六、可复用脚本
 
 | 脚本 | 用途 |
 |------|------|
 | `doc/dev/scripts/find_vram_literal_owners.py` | 扫某个 32 位字面量在 asm/all.s 的归属函数及函数特征（大小/ROM 字面量数/循环数） |
 | `doc/dev/scripts/find_bg0cnt_86_writer.py` | 「IO 地址字面量 + movs 立即数 + 紧邻 strh」三条件联合筛选 |
 | `tools/ad-hoc/decode_card_6bpp.py` | 卡图 6bpp 解码单卡验证（离线 ROM 读取 + PGM 输出） |
+| `tools/ad-hoc/diff_vram_font.py` | state1/3 VRAM 二进制 diff + 按 gap ≤64 合并区间 |
+| `tools/ad-hoc/dump_font_tiles.py` | 从 VRAM dump 把 sprite tile 渲染为 ASCII art，快速识别是否字形 |
+| `tools/ad-hoc/search_font_bytes.py` | 在 ROM 内直接搜 VRAM tile 原始字节（判定"原始素材 vs 合成产物"） |
+| `tools/ad-hoc/decode_font.py` | 1bpp 8×8 字形离线解码验证 |
 
-两个通用筛选脚本可直接改常量适配新任务（修改 `TARGET` / `LIT_*` / `MOVS_*` 正则即可）。
+两个通用筛选脚本可直接改常量适配新任务（修改 `TARGET` / `LIT_*` / `MOVS_*` 正则即可）。字库四个脚本也可做模板：diff + tile dump + 字节反搜 + 编码验证。
 
 ---
 
-## 六、扩展建议
+## 七、扩展建议
 
 对后续待定位的资源（UI 边框、属性图标、星级图标等），直接套用六步流程。建议扩充指纹库：
 
 - **属性图标**：sprite tile 区 `0x06010000+`，OAM attr2 tile 编号 → 对应 VRAM tile 起始；sprite 相关 IO 寄存器（REG_DISPCNT bit 12 控制 sprite 映射方式）
 - **调色板加载**：写 `0x05000000+` palette RAM；常见"DMA 启动立即数" `0x84000000` / `0x80000000`（DMA 控制位）
-- **文本绘制**：如果走 BG，配合 `BG?CNT` 里的"16 色 + 特定 screenblock"组合过滤；字模数据通常是 4bpp，stride = 32 B/tile
+- **文本绘制**：✅ 已定位（本文 §五）。要点：走 OBJ 而非 BG、1bpp 8×8、比例宽度渲染走 line buffer → tile 切片合成
+- **"基址 + 固定偏移"强指纹**：优先搜 `0x06010040` 而非 `0x06010000`、`0x05000200` 而非 `0x05000000`；偏移暗含 layout 约定 ⇒ 出现次数骤降
 
 ---
 
-## 七、与现有文档的关系
+## 八、与现有文档的关系
 
 | 文档 | 关系 |
 |------|------|
 | [`p1-card-image-location-plan.md`](p1-card-image-location-plan.md) | 原计划（含未执行的 Phase B2 GDB 路线），保留作历史 |
-| [`p1-phase-b2-findings.md`](p1-phase-b2-findings.md) | 本次实战的详细结果报告 |
+| [`p1-phase-b2-findings.md`](p1-phase-b2-findings.md) | 卡图定位的详细结果报告（§四对应实战） |
+| [`p2-font-location-findings.md`](p2-font-location-findings.md) | 字库定位的详细结果报告（§五对应实战） |
 | [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) | 早期错误路径（BIOS SWI 假设）负面归档 |
 | [`card-image-export.md`](card-image-export.md) | P1-5 批量导出脚本与调色板策略 |
 | [`mgba-gdb-stub-pitfalls.md`](mgba-gdb-stub-pitfalls.md) | 解释本文为何弃用 watchpoint 路线 |
