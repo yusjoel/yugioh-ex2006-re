@@ -282,8 +282,14 @@ Start:
 	.incbin "graphics/opponents/mirror_match_bottom_tilemap.bin"
 	.incbin "graphics/opponents/copycat_bottom_tilemap.bin"
 
-@ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019
-	.incbin "roms/2343.gba", 0x1B8FB8C, 0x22F48E
+@ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019（内嵌英文字库已拆出）
+	.incbin "roms/2343.gba", 0x1B8FB8C, 0x13CF04   @ 0x1B8FB8C..0x1CCCA90 字库前段
+
+@ 英文字库（1bpp 8×8，256 字符，ASCII 直接索引），ROM 0x1CCCA90–0x1CCD28F，2048 B
+@ 加载函数 FUN_080f1b60 @ 0x080f1b60；详见 doc/dev/p2-font-location-findings.md
+	.include "data/font.s"
+
+	.incbin "roms/2343.gba", 0x1CCD290, 0xF1D8A    @ 0x1CCD290..0x1DBF01A 字库后段
 
 @ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
 @ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
