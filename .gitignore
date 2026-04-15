@@ -12,6 +12,7 @@
 *.tmp
 *.log
 /ghidra/
+doc/temp/
 
 output/
 
