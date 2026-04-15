@@ -149,6 +149,18 @@ def process(input_path: Path, output_path: Path):
          output_path.open('w', encoding='utf-8') as fout:
 
         for lineno, line in enumerate(fin, 1):
+            # 跟踪上游（ExportRangeToGas）已经发出的 .arm/.thumb 指令，
+            # 避免 inject_modes 基于自己的旧 current_mode 再插一条重复的。
+            stripped = line.strip()
+            if stripped == '.arm' or stripped == '.thumb':
+                new_mode = 'arm' if stripped == '.arm' else 'thumb'
+                if new_mode == current_mode:
+                    # 上游与我们都在同一模式——这是条冗余指令，丢弃.
+                    continue
+                current_mode = new_mode
+                fout.write(line)
+                continue
+
             m = INSTR_RE.match(line)
             if m:
                 indent    = m.group(1)

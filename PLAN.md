@@ -95,9 +95,20 @@ stride **1152 B**，3×6 tile row-major = **24×48 像素** 8bpp，目标 OBJ VR
 
 ---
 
-## Ghidra 反向标注
+## Ghidra 反向标注（2026-04-15 首轮落地）
 
-- [ ] **TG.1**：确认 `CardStats` struct 字段布局（对照 T6 调查结果）
-- [ ] **TG.2**：编写 `ghidra_scripts/ImportProjectLabels.py`，导入字符串和卡组标签
-- [ ] **TG.3**：在 Ghidra 中定义 `CardStats` / `DeckEntry` 并应用到数据区
-- [ ] **TG.4**（持续）：利用 XREF 反向命名关键函数
+脚本位于 `tools/ghidra-labeling/`，headless 驱动 `tools/asm-regen/ghidra-run-script.bat`。
+命名登记表：`doc/dev/ghidra-function-names.md`。
+
+- [x] **TG.1**：`CardStats`(22B) + `DeckEntry`(4B) 结构体 + `AttrCode/RaceCode/SubtypeCode/SpSubCode` 4 个 enum —— `CreateCardStatsType.py`
+- [x] **TG.2**：5170 条 `card_XXXX` + 25 对手卡组 + 12 个文件级锚点 —— `ImportProjectLabels.py`
+- [x] **TG.3**：`CardStats[5170]` / `DeckEntry[n]×6` / `byte[2048]` / `ushort[7270]` 应用到对应数据区 —— 与 TG.1 同脚本完成
+- [x] **TG.4**（首轮 18 项）：p1/p2 findings 里已知函数批量 rename —— `RenameKnownFunctions.py`
+- [x] 配套：`VerifyTgRun.py` 回读验证 + `ExportRangeToGas.py` 修了 Thumb BL 识别（路线 B）
+
+> **副产物**：重导出 `asm/all.s` 后 byte-identical 重建（SHA1 `9689337d…cad9b`）。
+> TG.4 的 plate comment 也带进了新 `all.s`，方便后续结合 MCP/mGBA 继续跟调用链。
+
+- [ ] **TG.4-next**（候选）：`FUN_080ee010` (`load_bg_palette_for_card`)、`FUN_0801e640`
+      (`card_list_on_select_to_info_page`)、`FUN_080f0cc0` (`clear_text_line_buffer`)、
+      `FUN_080f21e8` (`layout_string_row`) 等未命名相邻函数，见命名登记表末尾

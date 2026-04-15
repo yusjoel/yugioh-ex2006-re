@@ -49,6 +49,7 @@ clean.bat    @ 清理编译产物
 │   ├── arm-none-eabi-gdb.exe   # GDB 10.2（不入库，手动放入）
 │   ├── rom-export/       # ROM → data/*.s、graphics/
 │   ├── asm-regen/        # 汇编再生成流水线（Ghidra + inject_modes）
+│   ├── ghidra-labeling/  # 反向标注 Jython 脚本（CardStats/enum/label/函数名）
 │   ├── mgba-scripts/     # mGBA 环境管理脚本（pre-MCP 备选）
 │   └── ad-hoc/           # 探索性脚本，不保证稳定
 ├── include/
@@ -80,10 +81,24 @@ clean.bat    @ 清理编译产物
 | 脚本 | 作用 |
 |------|------|
 | `tools/asm-regen/ghidra-export-range.bat` | Headless 调 Ghidra 执行 `ExportRangeToGas.py`，把 ROM 指定地址范围导出为 GAS `.s` |
-| `tools/asm-regen/ghidra/ExportRangeToGas.py` | Jython 脚本，在 Ghidra 内遍历地址范围输出带 label/XREFS 的 `.s`，做 `ldr`/`adr`/`b/bl` 语法修正和 `DAT_` 合成；headless 通过 `getScriptArgs()` 传参，GUI 走交互 prompt |
-| `tools/asm-regen/inject_modes.py` | Python 后处理：注入 `.arm`/`.thumb` 模式切换（基于 hex 宽度判 THUMB/ARM），补 Thumb-1 设标志指令的 `s` 后缀（≈14 万处），应用少量硬编码补丁。支持 `<in> [out]` 参数 |
+| `tools/asm-regen/ghidra-run-script.bat` | 通用 headless 驱动，跑 `tools/ghidra-labeling/*.py`（非 `-readOnly`，改动自动保存） |
+| `tools/asm-regen/ghidra/ExportRangeToGas.py` | Jython 脚本，在 Ghidra 内遍历地址范围输出带 label/XREFS 的 `.s`，做 `ldr`/`adr`/`b/bl` 语法修正和 `DAT_` 合成；headless 通过 `getScriptArgs()` 传参。**Thumb BL 优先按 hex 指纹识别**（解决 ProgramContext 偶发误判）|
+| `tools/asm-regen/inject_modes.py` | Python 后处理：注入 `.arm`/`.thumb` 模式切换（基于 hex 宽度判 THUMB/ARM，并跟随上游已发出的 mode 指令避免冗余），补 Thumb-1 设标志指令的 `s` 后缀（≈14 万处），应用少量硬编码补丁。支持 `<in> [out]` 参数 |
 
-完整工作流与踩坑记录见 [`doc/dev/asm-regeneration-workflow.md`](doc/dev/asm-regeneration-workflow.md)。
+完整工作流（含 2026-04-15 Thumb BL 修正踩坑）见 [`doc/dev/ghidra-function-names.md`](doc/dev/ghidra-function-names.md) §与 asm/all.s 重导出的联动。
+
+### Ghidra 反向标注（`tools/ghidra-labeling/`）
+
+Jython 脚本，通过 `ghidra-run-script.bat` 以 headless 模式跑。命名登记：`doc/dev/ghidra-function-names.md`。
+
+| 脚本 | 作用 |
+|------|------|
+| `CreateCardStatsType.py` | 在 `/ygo_ex2006` category 下建 `CardStats`(22B) / `DeckEntry`(4B) + `AttrCode/RaceCode/SubtypeCode/SpSubCode` enum，并应用到 `0x098169B6`（CardStats[5170]）等数据区（TG.1+TG.3） |
+| `ImportProjectLabels.py` | 扫 `data/*.s` 生成 5170 条 `card_XXXX` + 25 对手卡组 + 12 个文件级锚点（TG.2） |
+| `RenameKnownFunctions.py` | 18 个 `FUN_xxx` 语义重命名（TG.4 首轮：p1/p2 findings 里已知函数） |
+| `VerifyTgRun.py` | 回读验证：types/arrays/labels/函数名抽样 |
+
+每个脚本支持 `dry` 参数预览改动不落盘。脚本首部必须带 `#@runtime Jython`（Ghidra 12 默认 `.py` 走 PyGhidra）。
 
 ### mGBA 环境脚本（`tools/mgba-scripts/`）
 

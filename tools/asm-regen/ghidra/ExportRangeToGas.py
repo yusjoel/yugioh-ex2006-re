@@ -271,15 +271,30 @@ def determine_thumb_mode(program, ins):
     """
     Thumb/ARM 判断顺序：
     1) addr % 4 != 0 => Thumb（ARM 指令必须 4 对齐）
-    2) ProgramContext: TMode/ISAMode（若能取到）
-    3) 指令长度==2 => Thumb（经验规则）
-    4) 默认 ARM
+    2) 4-byte 指令字节指纹：ARMv4T Thumb BL/BLX pair
+         first_hw  & 0xF800 == 0xF000
+         second_hw & 0xF800 ∈ {0xF800 (BL), 0xE800 (BLX)}
+       => 硬判 Thumb；解决 Ghidra ProgramContext 偶发把 Thumb BL 标成 ARM 的分析错误。
+    3) ProgramContext: TMode/ISAMode（若能取到）
+    4) 指令长度==2 => Thumb（经验规则）
+    5) 默认 ARM
     """
     addr = ins.getAddress()
     a = int(addr.getOffset())
 
     if (a & 3) != 0:
         return True
+
+    try:
+        bs = ins.getBytes()
+        if bs is not None and len(bs) == 4:
+            first_hw  = ((bs[1] & 0xff) << 8) | (bs[0] & 0xff)
+            second_hw = ((bs[3] & 0xff) << 8) | (bs[2] & 0xff)
+            if (first_hw & 0xF800) == 0xF000 and \
+               (second_hw & 0xF800) in (0xF800, 0xE800):
+                return True
+    except:
+        pass
 
     ct = get_context_thumb(program, addr)
     if ct is not None:
