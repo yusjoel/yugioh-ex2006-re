@@ -13,6 +13,7 @@
 *.log
 /ghidra/
 doc/temp/
+__pycache__/
 
 output/
 
