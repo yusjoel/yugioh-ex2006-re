@@ -312,8 +312,15 @@ Start:
 @ 27 个对手条目，每条 32 字节，共 0x360 字节
 	.include "data/opponent-card-values.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1E5906E - 0x1E5EF2F（对手卡值后，禁卡表前）
-	.incbin "roms/2343.gba", 0x1E5906E, 0x5EC2
+@ 后 16MB 中间段：ROM偏移 0x1E5906E - 0x1E5ABFB（对手卡值后，卡包卡牌列表前）
+	.incbin "roms/2343.gba", 0x1E5906E, 0x1B8E
+
+@ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
+@ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节
+	.include "data/pack-card-lists.s"
+
+@ 后 16MB 中间段：ROM偏移 0x1E5E618 - 0x1E5EF2F（卡包信息表后，禁卡表前）
+	.incbin "roms/2343.gba", 0x1E5E618, 0x918
 
 @ 禁卡表数据（ROM偏移 0x1E5EF30 - 0x1E5F6CB）
 @ 包含 8 个版本共 487 条目，共 0x79C 字节

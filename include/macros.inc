@@ -127,3 +127,16 @@
 .macro deck_card so_code:req
     .hword \so_code
 .endm
+
+@ 卡包卡牌列表条目宏
+@ 参数:
+@   slot_id - 卡槽编号（十六进制，与 card-names.s 标签一致）
+@   rarity  - 稀有度编码
+@             0x00=Common, 0x04=Secret, 0x05=Secret(alt art),
+@             0x08=Ultra, 0x0C=Super, 0x10=Rare
+@ 编码格式: [slot_id(u16)][rarity(u8)][0x00]（共 4 字节，小端序）
+@ 示例: pack_card_entry 0x0FA7, 0x08    @ Blue-Eyes White Dragon (Ultra)
+.macro pack_card_entry slot_id:req, rarity:req
+    .hword \slot_id
+    .byte  \rarity, 0
+.endm
