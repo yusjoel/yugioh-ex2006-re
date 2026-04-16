@@ -18,7 +18,7 @@ clean.bat
 ```
 
 - 使用 **devkitARM**（`as.exe`/`ld.exe`/`objcopy.exe` 需在 `PATH`，或改 `build.bat`）
-- 构建前必须先运行 `python tools/rom-export/export_gfx.py` 从 `roms/2343.gba` 导出 `graphics/opponents/*.bin`（不入库）
+- 构建前必须先运行 `python tools/rom-export/export_all.py` 从 `roms/2343.gba` 导出所有图形/数据文件（不入库）
 - 链接脚本 `ld_script.txt`，入口 `asm/rom.s`（`.include` header + crt0，其余 `.incbin`）
 - 验证 byte-identical：`fc /b roms\2343.gba output\2343.gba` 或比对 sha1
 

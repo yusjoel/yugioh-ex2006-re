@@ -16,9 +16,8 @@
 > 这些文件**不纳入版本控制**，需先从 ROM 导出：
 >
 > ```bat
-> python tools/rom-export/export_gfx.py            @ 对手图形 + 决斗场地 + 图标
-> python tools/rom-export/export_pack_banners.py    @ 卡包封面条幅图 (51张)
-> build.bat                                         @ 汇编、链接并生成 output/2343.gba
+> python tools/rom-export/export_all.py   @ 一键导出所有构建依赖 (图形+调色板+卡包封面)
+> build.bat                               @ 汇编、链接并生成 output/2343.gba
 > ```
 
 ```bat

@@ -178,6 +178,12 @@ def main():
     rom = open(ROM_PATH, 'rb').read()
     os.makedirs(GFX_DIR, exist_ok=True)
 
+    # 导出调色板 bin
+    pal_bin = os.path.join(GFX_DIR, 'pack_banner_palette.bin')
+    with open(pal_bin, 'wb') as f:
+        f.write(rom[PALETTE_OFF : PALETTE_OFF + 512])
+    print(f'调色板: {pal_bin} (512 bytes)')
+
     palette = load_palette(rom)
 
     # 导出每个 pack 的 tile bin + 彩色 PNG 预览
