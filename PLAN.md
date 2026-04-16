@@ -19,7 +19,7 @@
 
 ## Ghidra 反向标注
 
-已完成首轮 TG.1–TG.4：`doc/dev/ghidra-function-names.md` + `tools/ghidra-labeling/`。
+已完成首轮 TG.1–TG.4 + 卡包数据标注：`doc/dev/ghidra-function-names.md` + `tools/ghidra-labeling/`。
 
 - [ ] **TG.4-next**（候选）：从已命名函数 XREF 继续爬：
   - `FUN_080ee010` → `load_bg_palette_for_card`（`card_image_decode_wrapper` 内调用）
