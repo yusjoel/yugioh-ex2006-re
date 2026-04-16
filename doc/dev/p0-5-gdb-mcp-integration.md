@@ -16,7 +16,7 @@
 | GDB | `tools/arm-none-eabi-gdb.exe` (GDB 10.2) |
 | GDB MCP 源码 | `D:\Software\gdb-mcp\src\` |
 | GDB MCP dist | `D:\Software\gdb-mcp\dist\` |
-| mGBA | 通过 `tools/mgba-scripts/start-mgba-gdb-ss1.ps1` 启动，GDB stub 端口 2345 |
+| mGBA | 首选通过 `mgba_live_start` 启动（同一进程同时被 mGBA MCP 控制）；仅 GDB 场景可用 `tools/mgba-scripts/start-mgba-gdb-ss1.ps1`。GDB stub 端口 2345 |
 | MCP 配置 | `C:\Users\yushj\.copilot\mcp-config.json` |
 
 ---

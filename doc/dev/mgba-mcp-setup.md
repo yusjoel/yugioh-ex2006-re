@@ -350,7 +350,7 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
 "mcpServers": {
   "mgba": {
     "command": "uvx",
-    "args": ["mgba-live-mcp"],
+    "args": ["--from", "D:\\Software\\mgba-live-mcp", "mgba-live-mcp"],
     "env": { "PATH": "<mGBA 目录>;<其余系统 PATH>" }
   },
   "gdb": {
@@ -360,20 +360,28 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
 }
 ```
 
+> **不再走 PyPI `uvx mgba-live-mcp`**，改用本地 fork（见"本地 fork 方案"一节），避免 uv cache 更新丢失 `-g` / Windows pid_alive / stdin DEVNULL 三处 patch。
+
 写入后 **必须退出并重启 Claude Code CLI**，MCP server 进程才会加载。
 
-### Smoke test（2026-04-14 验证通过）
+### Smoke test（2026-04-16 再次验证通过）
 
 | 步骤 | 工具 | 结果 |
 |------|------|------|
-| 1 | `mgba_live_start(rom="roms/2343.gba")` | 超时报错（预期，因 `-g` patch 让游戏启动时暂停），但 session PID 已创建 |
-| 2 | `mgba_live_status` | `alive=true`, `heartbeat=null`（游戏待 GDB 放行） |
+| 1 | `mgba_live_start(rom="roms/2343.gba", savestate="roms/2343.ss1")` | **报错** "Session created but bridge did not become ready before timeout"（预期，因 `-g` patch 让 CPU 暂停在 reset vector）；session/PID 已创建，端口 2345 已 LISTEN |
+| 2 | `mgba_live_status(all=true)` | `alive=true`, `heartbeat=null`（Lua bridge 未启动） |
 | 3 | `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` | 初始化成功（**不传 `architecture` 参数**） |
 | 4 | `gdb_connect(target="localhost:2345")` | 连接成功 |
-| 5 | `gdb_evaluate_expression("$pc")` | `$pc = 0x0`（reset vector） |
-| 6 | `gdb_continue` | 游戏开始运行 |
-| 7 | `mgba_live_read_range(0x080000A0, 16)` | 返回 `YUGIOHWCT06\0BY6E` ✅ |
-| 8 | `mgba_live_status` | 有截图，标题画面 ✅ |
+| 5 | `gdb_evaluate_expression("$pc")` | `$pc = 0x3004fdc`（已加载 ss1 存档，不是 reset vector） |
+| 6 | `gdb_continue` | 游戏继续执行 |
+| 7 | `mgba_live_status` | `heartbeat.frame > 0`，截图正常 ✅ |
+
+对照失败路径（script + MCP attach）：
+- `pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1` 启动的 mGBA **无法**被 `mgba_live_attach` 接管：
+  ```
+  PID is not a managed live session. Only processes started with mgba_live.py can be live-controlled.
+  ```
+- 因此旧文档里"脚本启 mGBA + MCP 连 GDB"的写法只能单用 GDB MCP，不能同时使用 mGBA MCP 工具。要同时用两套 MCP，**必须走 `mgba_live_start` 路径**。
 
 ### 与 Copilot CLI 并存
 
@@ -390,4 +398,77 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
   使 `mgba_live_start` 启动时自带 GDB stub；因此 `mgba_live_start` 总会超时（游戏被暂停），
   需要 `gdb_connect` + `gdb_continue` 才能让 Lua bridge 初始化。如果只用 mGBA 不用 GDB，
   仍需走一遍 GDB 放行流程，或回退 `live_cli.py` 的 patch。
+
+### `-g` patch 回归问题（2026-04-16 踩坑）—— 已由本地 fork 根治
+
+**旧现象**：`mgba_live_start` 成功返回（不再超时），但 `netstat :2345` 无 LISTEN，
+`gdb_connect` 报 `Connection timed out`。
+
+**根因**：uv 缓存更新后，`archive-v0/` 下出现新的 archive（例如 `DkDYQ_siZWuiQsmZJ8b1A`），
+MCP server 切换使用新 archive 的 `live_cli.py`——**不再是打过 `-g` patch 的旧版本**。其他 archive 里仍保留 patch，但不再被加载。
+
+**根治方案**：见下节"本地 fork 方案"——把 patch 直接落到本地源码仓库，uvx 每次从该目录构建 wheel，不再受 PyPI 包或 uv cache 的影响。
+
+**若偶尔仍需直接改 uv cache**（比如调试第三方环境）：
+```bash
+for f in "C:/Users/yushj/AppData/Local/uv/cache/archive-v0"/*/Lib/site-packages/mgba_live_mcp/live_cli.py; do
+  echo "=== $f ==="; grep -n '"-g"' "$f" || echo "(no patch)"
+done
+```
+找到当前被加载的 archive（通过 `mgba_live_attach` 报错信息中的 Python 路径定位），在 `build_start_command()` 里重新插 `"-g"`。`live_cli.py` 改动由下次工具调用触发的新子进程加载，**无需重启 Claude Code CLI**；`live_controller.py` 改动则必须重启。
+
+---
+
+## 八、本地 fork 方案（2026-04-16 启用）
+
+为避免 uv cache 刷新反复丢 patch，本项目把 `mgba-live-mcp` fork 到本地，所有 patch 直接落在源码里，`uvx --from <本地路径>` 每次从该目录构建 wheel。
+
+### 目录与分支
+
+```
+D:\Software\mgba-live-mcp\       # git clone https://github.com/penandlim/mgba-live-mcp
+  branch: local-patches           # 所有 patch 都提交在这一支
+```
+
+### Patch 列表（均在 `local-patches` 分支，单 squash commit `af7dbc3`）
+
+| # | 位置 | 改动 | 作用 |
+|---|------|------|------|
+| 1 | `live_cli.py :: build_start_command` | `cmd = [mgba_path, ]` 后插 `"-g",` | 启用 GDB stub（端口 2345） |
+| 2 | `live_cli.py :: pid_alive` | Windows 分支改走 `GetExitCodeProcess` / `STILL_ACTIVE`；补 `import sys` | 修复 Windows 下死会话无法回收 |
+| 3 | `live_cli.py :: terminate_session_process` | Windows 分支改走 `taskkill /F /T /PID`（树杀） | 修复 `os.getpgid` / `os.killpg` 在 Windows 不存在导致 `mgba_live_stop` 崩溃 |
+| 4 | `live_controller.py :: _run_command` | `create_subprocess_exec` 添加 `stdin=asyncio.subprocess.DEVNULL` | 防止子进程继承 MCP JSON-RPC stdin 管道导致挂起 |
+| 5 | `pyproject.toml` | version bump 至 `0.3.2+local.1` | 触发 uv 缓存重建（见下文"迭代约束"） |
+
+### `~/.claude.json` 配置形态
+
+```json
+"mgba": {
+  "command": "uvx",
+  "args": ["--reinstall", "--from", "D:\\Software\\mgba-live-mcp", "mgba-live-mcp"],
+  "env": { "PATH": "<mGBA 目录>;..." }
+}
+```
+
+`--reinstall` 让每次启动 CLI 时 uvx 强制重装 tool 环境。但实测 uv 在版本号不变时仍可能复用旧 wheel，因此修改源码后还需 bump 版本号（见下文）。
+
+### 验证 fork 已生效
+
+```bash
+uvx --from "D:\Software\mgba-live-mcp" --with-editable "D:\Software\mgba-live-mcp" python -c "
+from mgba_live_mcp import live_cli; import inspect
+print('-g PATCH:', '\"-g\"' in inspect.getsource(live_cli.build_start_command))
+print('WIN32 PATCH:', 'GetExitCodeProcess' in inspect.getsource(live_cli.pid_alive))
+print('TASKKILL PATCH:', 'taskkill' in inspect.getsource(live_cli.terminate_session_process))
+"
+```
+三项都应为 `True`。
+
+### 迭代 patch 时的约束
+
+- **修改源码后必须 bump 版本号**：`pyproject.toml` 中 `version = "0.3.2+local.N"` 的 `N` 递增。`uvx --reinstall` 在版本号不变时可能复用旧 wheel 缓存，bump 版本是唯一可靠的触发重建手段。
+- 改 `live_controller.py` / `server.py`：这些代码运行在 MCP server 常驻进程内，bump 版本后还需**重启 Claude Code CLI** 才能加载。
+- 改 `live_cli.py`：bump 版本 + 重启后生效（live_cli 作为子进程被 server 每次调用时 spawn）。
+- 紧急热修：如需不重启立即生效，可直接 patch 当前 uv cache archive 里的 `live_cli.py`（通过错误信息中暴露的 Python 路径定位）。
+- 拉上游更新：`git fetch && git rebase origin/main` 到 `local-patches` 分支，冲突手工解决，bump 版本号。
 

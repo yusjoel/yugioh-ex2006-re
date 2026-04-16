@@ -38,10 +38,21 @@ clean.bat
 
 ## 调试工具链
 
-两套 MCP 并存、可同时工作（不同端口）：
+两套 MCP 并存、可同时工作（同一 mGBA 进程，stub 端口 2345 + Lua bridge 管道）：
 
-- **mGBA MCP**：截图 / 内存读取 / Lua 注入 / 按键。启动 `pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1`（加载 `roms/2343.ss1` 存档）。
-- **GDB MCP**：断点 / 寄存器 / 表达式求值。**必须**使用 `tools/arm-none-eabi-gdb.exe`（GDB 10.2），devkitPro 自带 14.1 与 mGBA stub 协议不兼容。`gdb_init` 调用时**不要**传 `architecture` 参数。
+推荐工作流（**MCP 启动 mGBA，MCP 连接 GDB**，2026-04-16 验证通过）：
+
+1. `mgba_live_start(rom, savestate?)` — 会因 `-g` 使 CPU 暂停在 reset vector，**预期返回超时错误** "Session created but bridge did not become ready before timeout"；此时 session 已创建、PID 记录、stub 已 LISTEN。
+2. `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` — **不要**传 `architecture` 参数。
+3. `gdb_connect(target="localhost:2345")` → `gdb_continue`，游戏开始运行，Lua bridge 初始化，mGBA MCP 的 `heartbeat` 开始跳动。
+
+备用工作流（仅用 GDB，无 mGBA MCP 控制）：
+- `pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1` → `wait-mgba-ready.ps1` → `gdb_init` → `gdb_connect`。
+- ⚠ 此方式启动的 mGBA **不是 managed session**，`mgba_live_attach` 会直接报错 "PID is not a managed live session"。
+
+要点：
+- **GDB 必须使用 `tools/arm-none-eabi-gdb.exe`（10.2）**，devkitPro 14.1 与 mGBA stub 协议不兼容。
+- `mgba_live_start` 的 `-g` 来自本机 uv cache 中 `live_cli.py` 的 patch（`build_start_command` 里插入 `"-g"`）。**uv cache 刷新或包更新会丢失此 patch，导致 stub 未启用**；此时 `mgba_live_start` 会成功返回但端口 2345 不 LISTEN，需重新打 patch（见 `doc/dev/mgba-mcp-setup.md`）。
 
 ### mGBA GDB stub 的硬约束（踩坑已总结，见 `doc/dev/mgba-gdb-stub-pitfalls.md`）
 
