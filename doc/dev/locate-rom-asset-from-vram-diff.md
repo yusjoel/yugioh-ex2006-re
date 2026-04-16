@@ -8,7 +8,7 @@
 
 ## 一、方法论一句话
 
-**动态工具确定「写到哪里」，静态工具确定「谁来写」。GDB watchpoint 反复向上溯源在本项目不可靠，用 IO 寄存器配置值或其它强语义指纹做全 ROM 搜索才是主路径。**
+**动态工具确定「写到哪里」，静态工具确定「谁来写」。IO 寄存器配置值或其它强语义指纹做全 ROM 搜索是效率最高的主路径；GDB VRAM watchpoint 是可行的备选路径（2 次 continue 即可命中解码器），已知函数地址时 GDB hbreak 是最快的参数验证手段。**
 
 ---
 
@@ -140,18 +140,41 @@ grep "bl <被命中函数>" asm/all.s   → 找直接调用者
 
 > **免责声明**：本节结论是**本次具体任务 + 本 ROM**的实测结果。不同 ROM、不同资源、不同 IO 取值下，各方向的强度可能互换。本节意在给出"如何评估一个方向"的框架，而不是给任一指纹打"好/坏"的标签。
 
-### A. GDB watchpoint 反复溯源（本次未走通）
+### A. GDB watchpoint / hbreak（2026-04-16 补充验证：可行）
 
-`p1-card-image-location-plan.md` 原本设计的 Phase B2 是"对 VRAM 目标地址下 watchpoint，读写指令触发后沿 r0/r1 源寄存器向上追踪"。**本次没走通**，主要受限于工具能力而非方法本身：
+`p1-card-image-location-plan.md` 原本设计的 Phase B2 是"对 VRAM 目标地址下 watchpoint，读写指令触发后沿 r0/r1 源寄存器向上追踪"。**本次卡图定位时未走此路**，但后续补充实验证明 **VRAM watchpoint 完全可以定位到解码器**（详见 [`gdb-breakpoint-card-image-report.md`](gdb-breakpoint-card-image-report.md)）。
 
-- mGBA GDB stub 是一次性连接，断开即永久关闭，迭代成本高
-- watchpoint 实际只监 1 字节（[`mgba-gdb-stub-pitfalls.md`](mgba-gdb-stub-pitfalls.md) 坑 8）
-- THUMB 代码 `gdb_list_frames` 失败（CLAUDE.md 已记载）
-- 游戏用自写 6bpp 解码（**非** BIOS SWI），watchpoint 触发点在紧循环内部，向上 3–4 层才能拿到卡 id + 基址组合
+**实测结果（2026-04-16）**：
 
-早期 Phase B1 基于"BIOS LZ77"假设在 `0x08015076` 等处下 `hbreak`，**全部未触发**（详见 [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) §四）。该文档作为"负面结果归档"保留。
+```
+watch *(unsigned char*)0x06004040    ← 解码器首次 VRAM 写入地址
 
-在 stub 更稳定、目标解码路径更浅的项目里，这条路仍然可能是首选。
+HIT 1 (continue ①): PC=0x080F4E86 (memclear), LR=0x0801D47D (init_bg0)
+HIT 2 (continue ②): PC=0x0801D406 (decode_card_image_6bpp 内部!)
+                     → 从 PC 向上找 push {r4..lr} 即可定位函数入口 0x0801D290
+```
+
+**GDB 工具组合（按场景选择）**：
+
+| 场景 | 工具 | 说明 |
+|------|------|------|
+| 从零定位未知函数 | **VRAM watchpoint**（GDB batch 脚本） | watch 写入地址 → 2 次 continue → 命中解码器内部 |
+| 已知函数，验证参数 | **hbreak**（GDB batch 脚本） | hbreak 函数入口 → 捕获全部寄存器 |
+| 暂停态求值/单步 | **GDB MCP 交互** | 不涉及 continue，同步响应正常 |
+
+**操作要点**：
+- 必须使用 **GDB batch 脚本**（`--batch -x script.gdb`）而非 GDB MCP 交互式 continue——GDB MCP 的 MI parser 不处理 `*stopped` 异步通知，continue 后所有命令超时
+- GDB batch 后台运行 + **mGBA MCP `input_set` 注入按键**触发转场
+- 每次 GDB `kill`/`quit` 后 stub 永久关闭，需 `mgba_live_stop` + 重新 `mgba_live_start`
+
+**早期失败的真正原因**（非工具限制）：
+- Phase B1 基于"BIOS LZ77"假设在 `0x08015076` 等处下 `hbreak`，**全部未触发**——因为游戏用自写 6bpp 解码，不走 BIOS SWI（详见 [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) §四）
+- 当时的 watchpoint 实验在 `0x06000000`（tile 0，不是卡图写入位置）设 watchpoint，且使用了 ss1 存档（卡图可能已预加载）——地址错 + 状态错，并非 watchpoint 机制本身的限制
+
+**与静态分析的对比**：
+- 静态分析（IO 指纹搜索）一步到位，不需要多轮调试循环——仍然是**效率最高的主路径**
+- VRAM watchpoint 需要 2 次 continue + 人工分析 PC 地址——可行但慢，适合作为**验证或备选路径**
+- 两者最佳搭配：静态分析定位函数 → GDB hbreak 验证参数签名和调用链
 
 ### B. VRAM 基址字面量搜索（本次作为粗筛可用）
 
@@ -369,5 +392,6 @@ loop:
 | [`p2-font-location-findings.md`](p2-font-location-findings.md) | 字库定位的详细结果报告（§五对应实战） |
 | [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) | 早期错误路径（BIOS SWI 假设）负面归档 |
 | [`card-image-export.md`](card-image-export.md) | P1-5 批量导出脚本与调色板策略 |
-| [`mgba-gdb-stub-pitfalls.md`](mgba-gdb-stub-pitfalls.md) | 解释本文为何弃用 watchpoint 路线 |
+| [`mgba-gdb-stub-pitfalls.md`](mgba-gdb-stub-pitfalls.md) | GDB stub 踩坑汇总（一次性消耗、1 字节 watchpoint 等） |
+| [`gdb-breakpoint-card-image-report.md`](gdb-breakpoint-card-image-report.md) | GDB 断点/watchpoint 补充验证（2026-04-16），证明 VRAM watchpoint 可行 |
 | **本文** | **方法论提取，供后续资源定位复用** |

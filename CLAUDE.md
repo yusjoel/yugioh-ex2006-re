@@ -30,6 +30,7 @@ clean.bat
 - `constants/gba_constants.inc`：GBA 硬件寄存器
 - `tools/`：Python 数据导出脚本（`export_gfx.py`、`export_card_data.py`、`export_game_strings.py` 等）+ GDB/mGBA 调试辅助
 - `doc/dev/`：所有逆向分析、调试笔记、阶段性计划（`p0-*`、`p1-*`）
+- `doc/dev/locate-rom-asset-from-vram-diff.md`：**核心方法论**——从 VRAM 差异定位 ROM 资产的六步流程（IO 指纹静态搜索 + GDB watchpoint/hbreak 动态验证），附卡图/字库两份实战复盘
 - `doc/um06-*`：外部参考（Google Sheets 转 Markdown）
 
 ## 本地机器路径
@@ -38,36 +39,49 @@ clean.bat
 
 ## 调试工具链
 
-两套 MCP 并存、可同时工作（同一 mGBA 进程，stub 端口 2345 + Lua bridge 管道）：
+两套 MCP 并存（同一 mGBA 进程，stub 端口 2345 + Lua bridge 管道），按场景选择组合：
 
-推荐工作流（**MCP 启动 mGBA，MCP 连接 GDB**，2026-04-16 验证通过）：
+### 场景 A：内存读取 / 截图 / Lua 注入（仅 mGBA MCP）
 
-1. `mgba_live_start(rom, savestate?)` — 会因 `-g` 使 CPU 暂停在 reset vector，**预期返回超时错误** "Session created but bridge did not become ready before timeout"；此时 session 已创建、PID 记录、stub 已 LISTEN。
-2. `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` — **不要**传 `architecture` 参数。
-3. `gdb_connect(target="localhost:2345")` → `gdb_continue`，游戏开始运行，Lua bridge 初始化，mGBA MCP 的 `heartbeat` 开始跳动。
+不需要 GDB。`mgba_live_start` 后直接使用 `read_range` / `run_lua` / `export_screenshot` 等。
 
-备用工作流（仅用 GDB，无 mGBA MCP 控制）：
+### 场景 B：暂停态寄存器检查 / 表达式求值（双 MCP 交互）
+
+1. `mgba_live_start(rom, savestate?)` — 预期超时错误 "Session created but bridge did not become ready before timeout"；session 已创建、stub 已 LISTEN。
+2. `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` — **不传 `architecture` 参数**。
+3. `gdb_connect(target="localhost:2345")` → `gdb_continue`，游戏放行，Lua bridge 初始化。
+4. 用 GDB MCP 读寄存器（`gdb_evaluate_expression`）、单步（`gdb_step`/`gdb_next`）等。
+5. ⚠ **不要在 `gdb_continue` 之后用 GDB MCP 发命令**——MI parser 不处理 `*stopped` 异步通知，所有后续命令会超时。
+
+### 场景 C：断点调试（GDB batch 脚本 + mGBA MCP 按键，推荐）
+
+GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
+
+```
+1. mgba_live_start(rom, savestate?)        ← mGBA MCP 启动（-g 暂停）
+2. tools\arm-none-eabi-gdb.exe --batch -x script.gdb &   ← 后台运行
+   脚本内容: target remote → hbreak *<addr> → continue（阻塞等待命中）
+   命中后: info registers / x/Ni $pc / x/Nx <addr> → kill + quit
+3. mgba_live_input_set(["A"])              ← mGBA MCP 注入按键触发转场
+4. GDB batch 自动捕获断点，打印寄存器后退出
+5. 读 GDB 输出文件提取数据
+```
+
+示例脚本：`doc/dev/scripts/gdb_card_bp_full.gdb`（卡图加载函数链全捕获）。
+
+### 场景 D：仅用 GDB（无 mGBA MCP 控制）
+
 - `pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1` → `wait-mgba-ready.ps1` → `gdb_init` → `gdb_connect`。
-- ⚠ 此方式启动的 mGBA **不是 managed session**，`mgba_live_attach` 会直接报错 "PID is not a managed live session"。
+- ⚠ 此方式启动的 mGBA **不是 managed session**，`mgba_live_attach` 会报错。
 
-要点：
+### 通用要点
+
 - **GDB 必须使用 `tools/arm-none-eabi-gdb.exe`（10.2）**，devkitPro 14.1 与 mGBA stub 协议不兼容。
-- `mgba_live_start` 的 `-g` 来自本机 uv cache 中 `live_cli.py` 的 patch（`build_start_command` 里插入 `"-g"`）。**uv cache 刷新或包更新会丢失此 patch，导致 stub 未启用**；此时 `mgba_live_start` 会成功返回但端口 2345 不 LISTEN，需重新打 patch（见 `doc/dev/mgba-mcp-setup.md`）。
-
-### mGBA GDB stub 的硬约束（踩坑已总结，见 `doc/dev/mgba-gdb-stub-pitfalls.md`）
-
-- `-g` 是开关、**不接受端口参数**，端口固定 2345
-- 端口 LISTEN ≠ CPU 就绪，启动后还需等 5–8 秒；用 `tools/mgba-scripts/wait-mgba-ready.ps1`
-- **stub 一次性消耗**：GDB 任意断开后 stub 永久关闭，每次调试必须重启 mGBA
-- `Start-Process mGBA` 与后续 Sleep 不要写在同一 PowerShell 命令块
-- GDB 脚本里 `echo` 只能 ASCII（中文会乱码）
-- 已知 GDB MCP 限制：THUMB 代码 `gdb_list_frames` 失败；`gdb_read_memory` 有解析 bug，改用 `gdb_evaluate_expression`
-
-### 纯 GDB 批处理
-
-```
-tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\<name>.gdb
-```
+- `-g` 来自本地 fork `D:\Software\mgba-live-mcp` 的 patch（`build_start_command` 里插入 `"-g"`）。见 `doc/dev/mgba-mcp-setup.md` 第八节。
+- **stub 一次性消耗**：GDB 断开（含 `kill`/`quit`/`--batch` 结束）后 stub 永久关闭，需 `mgba_live_stop` + 重新 `mgba_live_start`。
+- GDB 脚本里 `echo` 只能 ASCII（中文乱码）。
+- 已知 GDB MCP 限制：THUMB 代码 `gdb_list_frames` 失败；`gdb_read_memory` 有解析 bug，改用 `gdb_evaluate_expression`。
+- 踩坑汇总：`doc/dev/mgba-gdb-stub-pitfalls.md`
 
 ## Commit 规则
 
