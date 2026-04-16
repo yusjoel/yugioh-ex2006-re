@@ -289,7 +289,13 @@ Start:
 @ 加载函数 FUN_080f1b60 @ 0x080f1b60；详见 doc/dev/p2-font-location-findings.md
 	.include "data/font.s"
 
-	.incbin "roms/2343.gba", 0x1CCD290, 0xF1D8A    @ 0x1CCD290..0x1DBF01A 字库后段
+	.incbin "roms/2343.gba", 0x1CCD290, 0x16D0      @ 0x1CCD290..0x1CCE960 字库后段前部
+
+@ 卡包封面条幅图 (ROM 0x1CCE960..0x1CE822C, 0x198CC bytes)
+@ 指针表 (.word label) + 51 × 0x800 bytes 8bpp OBJ tile data
+	.include "data/pack-banners.s"
+
+	.incbin "roms/2343.gba", 0x1CE822C, 0xD6DEE     @ 0x1CE822C..0x1DBF01A 字库后段后部
 
 @ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
 @ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
