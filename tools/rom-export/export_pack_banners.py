@@ -14,9 +14,13 @@ ROM 布局:
 ROM 中连续存储 (每行 256B, 8 行)；加载时按 2D OBJ mapping 展开
 (dest stride 0x400, src stride 0x100)。
 
+调色板:
+  ROM 0x510440, 512 bytes (256色 BGR555, OBJ palette slots 0-8)
+  卡图调色板区末尾，紧接 card-image-palettes.s 之后
+
 产出:
   graphics/pack-banners/pack_XX_banner.bin   tile 二进制 (0x800B each, 不入库)
-  graphics/pack-banners/pack_XX_banner.png   灰阶预览 (不入库)
+  graphics/pack-banners/pack_XX_banner.png   彩色预览 (不入库)
   data/pack-banners.s                        指针表 + .incbin 汇编 (入库)
 """
 
@@ -32,6 +36,7 @@ ASM_OUT  = 'data/pack-banners.s'
 PTR_TABLE_OFF  = 0x1CCE960
 PACK_COUNT     = 51
 PACK_TILE_SIZE = 0x800   # 2048 bytes per pack
+PALETTE_OFF    = 0x510440 # 256-color OBJ palette (BGR555, 512 bytes)
 
 # 卡包名 (来自 data/game-strings-en.s, game_str_en_01046..01095 + 01096)
 PACK_NAMES = [
@@ -89,15 +94,28 @@ PACK_NAMES = [
 ]
 
 
-def render_pack_banner(rom, tile_off):
+def load_palette(rom):
+    """加载 256 色 OBJ 调色板 (BGR555 → RGB tuple)。index 0 透明。"""
+    colors = []
+    for i in range(256):
+        raw = struct.unpack_from('<H', rom, PALETTE_OFF + i * 2)[0]
+        r = (raw & 0x1F) << 3
+        g = ((raw >> 5) & 0x1F) << 3
+        b = ((raw >> 10) & 0x1F) << 3
+        a = 0 if i == 0 else 255
+        colors.append((r, g, b, a))
+    return colors
+
+
+def render_pack_banner(rom, tile_off, palette):
     """
-    渲染 32x64 8bpp pack banner 为灰阶 PIL Image。
+    渲染 32x64 8bpp pack banner 为彩色 RGBA PIL Image。
     ROM 数据按 GBA 8×8 tile 格式存储:
       4 tiles/row × 8 rows = 32 tiles, 每 tile 64 bytes (8bpp)
       每 tile-row = 4 × 64 = 256 bytes (0x100)
     """
     W, H = 32, 64  # 4 tiles wide × 8 tiles tall
-    img = Image.new('L', (W, H), 0)
+    img = Image.new('RGBA', (W, H), (0, 0, 0, 0))
     pixels = img.load()
     for tile_row in range(8):
         for tile_col in range(4):
@@ -105,7 +123,7 @@ def render_pack_banner(rom, tile_off):
             for py in range(8):
                 for px in range(8):
                     idx = rom[tile_data_off + py * 8 + px]
-                    pixels[tile_col * 8 + px, tile_row * 8 + py] = idx
+                    pixels[tile_col * 8 + px, tile_row * 8 + py] = palette[idx]
     return img
 
 
@@ -160,7 +178,9 @@ def main():
     rom = open(ROM_PATH, 'rb').read()
     os.makedirs(GFX_DIR, exist_ok=True)
 
-    # 导出每个 pack 的 tile bin + PNG 预览
+    palette = load_palette(rom)
+
+    # 导出每个 pack 的 tile bin + 彩色 PNG 预览
     print(f'导出 {PACK_COUNT} 个 pack banner bin + png...')
     for i in range(PACK_COUNT):
         ptr = struct.unpack_from('<I', rom, PTR_TABLE_OFF + i * 4)[0]
@@ -170,7 +190,7 @@ def main():
         with open(bin_path, 'wb') as f:
             f.write(rom[tile_off : tile_off + PACK_TILE_SIZE])
 
-        img = render_pack_banner(rom, tile_off)
+        img = render_pack_banner(rom, tile_off, palette)
         img.save(os.path.join(GFX_DIR, f'pack_{i:02d}_banner.png'))
 
         name = PACK_NAMES[i] if i < len(PACK_NAMES) else f'PACK {i}'
