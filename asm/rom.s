@@ -42,8 +42,12 @@ Start:
 @ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐
 	.include "data/card-names.s"
 
-@ 后 16MB 第一段前半 seg-B：ROM偏移 0x15F3A5C - 0x18169B5（卡名后，属性表前）
-	.incbin "roms/2343.gba", 0x15F3A5C, 0x222F5A
+@ 后 16MB 第一段前半 seg-B：ROM偏移 0x15F3A5C - 0x17FFFFF（卡名后，描述文本前）
+	.incbin "roms/2343.gba", 0x15F3A5C, 0x20C5A4
+
+@ 卡牌描述文本 + 数据表 + 指针表（ROM偏移 0x1800000 - 0x18169B5）
+@ 39 张卡效果描述（6 语言）+ u32 数据表 + 269 条指针表，共 0x169B6 字节
+	.include "data/card-descriptions.s"
 
 @ 卡牌属性数据表（ROM偏移 0x18169B6 - 0x18325FF）
 @ 5170 条记录，每条 22 字节（11 × uint16 LE），含 ATK/DEF/Level/属性/种族等
