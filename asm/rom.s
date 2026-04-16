@@ -42,8 +42,9 @@ Start:
 @ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐
 	.include "data/card-names.s"
 
-@ 后 16MB 第一段前半 seg-B：ROM偏移 0x15F3A5C - 0x17FFFFF（卡名后，描述文本前）
-	.incbin "roms/2343.gba", 0x15F3A5C, 0x20C5A4
+@ 卡牌效果描述全文（ROM偏移 0x15F3A5C - 0x17FFFFF）
+@ u32 数据表（12,612 条）+ 2014 张卡效果描述 × 6 语言，共 2,147,748 字节
+	.include "data/card-effect-text.s"
 
 @ 卡牌描述文本 + 数据表 + 指针表（ROM偏移 0x1800000 - 0x18169B5）
 @ 39 张卡效果描述（6 语言）+ u32 数据表 + 269 条指针表，共 0x169B6 字节
@@ -345,11 +346,24 @@ Start:
 	.include "data/struct-decks.s"
 
 @ 后 16MB 剩余部分：ROM偏移 0x1E5FD84 - 0x1E6468D（预组后，对手卡组前）
-	.incbin "roms/2343.gba", 0x1E5FD84, 0x490A
+	.incbin "roms/2343.gba", 0x1E5FD84, 0x1408     @ 0x1E5FD84..0x1E6118C 文件路径表前
+
+@ 内部文件路径表（ROM偏移 0x1E6118C - 0x1E63BE8）
+@ 339 条 null 终止 ASCII 文件路径（deck/*.ydc, titleEx/*.LZncgr 等），共 10,844 字节
+	.include "data/file-paths.s"
+
+	.incbin "roms/2343.gba", 0x1E63BE8, 0xAA6      @ 0x1E63BE8..0x1E6468E 文件路径表后
 
 @ 对手卡组数据（ROM偏移 0x1E6468E - 0x1E65A45）
 @ 25 个对手卡组，各含 40 张牌，共 0x13B8 字节
 	.include "data/opponent-decks.s"
 
-@ 尾段：ROM偏移 0x1E65A46 - 0x2000000
-	.incbin "roms/2343.gba", 0x1E65A46, 0x19A5BA
+@ 尾段前部：ROM偏移 0x1E65A46 - 0x1EB90D7
+	.incbin "roms/2343.gba", 0x1E65A46, 0x53692
+
+@ 决斗题目存档模板（ROM偏移 0x1EB90D8 - 0x1EC33D9）
+@ 35 块 DUEL QUESTION 数据，INI 风格键值对，CRLF 换行，共 41,729 字节
+	.include "data/duel-puzzles.s"
+
+@ 尾段后部：ROM偏移 0x1EC33D9 - 0x2000000
+	.incbin "roms/2343.gba", 0x1EC33D9, 0x13CC27
