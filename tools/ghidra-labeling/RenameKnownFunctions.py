@@ -66,6 +66,29 @@ RENAMES = [
     # --- TG.4-next 轮（2026-04-15） ---
     ("FUN_0801e640", "card_list_on_select_to_info_page",
         "TG.4-next: 卡列表按 A 进详情页的派发, 首 bl 即 card_info_page_enter_with_card_id"),
+    # --- pack banner 轮（2026-04-16） ---
+    ("FUN_080d971c", "pack_list_page_init",
+        "pack-banner: 卡包列表页初始化, 函数指针表 0x09E4948C[11]"),
+    ("FUN_080d8d84", "pack_list_bg_setup",
+        "pack-banner: BG0CNT=0x1C00, BG2CNT=0x1E0D, 清空 VRAM screenblocks"),
+    ("FUN_080d8f08", "pack_list_tilemap_load",
+        "pack-banner: 从 0x09CCE2B0/C0/D0 加载 BG tilemap + BG palette"),
+    ("FUN_080d8e98", "pack_entry_init",
+        "pack-banner: 逐 pack 初始化 (banner tile + name text + detail)"),
+    ("FUN_080d8f48", "pack_banner_obj_setup",
+        "pack-banner: 按 slot 计算 OBJ VRAM 地址, 调 pack_banner_tile_copy"),
+    ("FUN_080db860", "pack_banner_tile_copy",
+        "pack-banner: ROM 指针表 0x09CCE960[id] → OBJ VRAM, mode 1=2D stride"),
+    ("FUN_080dbbc0", "pack_name_text_render",
+        "pack-banner: ROM 0x09E5E2E8 查包名, text_render_wrapper x2"),
+    ("FUN_080bdfac", "pack_ui_state_machine",
+        "pack-banner: 卡包 UI 运行时状态机 (7 路 switch), overlay/动画"),
+    ("FUN_080d8ddc", "pack_visible_count",
+        "pack-banner: 返回当前可见 pack 数 (clamp 1..5)"),
+    ("FUN_080d8f84", "pack_detail_bg_tile_load",
+        "pack-banner: EWRAM 记录 → BG VRAM 0x06000240, 含 pack cost"),
+    ("FUN_080f74d4", "tile_2d_row_copy",
+        "pack-banner/通用: 按行拷贝 tile 到 2D OBJ VRAM (dest stride 0x400)"),
 ]
 
 

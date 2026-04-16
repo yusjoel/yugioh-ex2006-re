@@ -40,6 +40,22 @@
 
 > **未命名候选（调查后放弃本轮）**：`FUN_080ee010` / `FUN_080f0cc0` / `FUN_080f21e8` 都是通用的状态/bit 字段 setter（写 EWRAM `0x02006ED0` 附近的 struct），在全代码里被调用 40+ 次，不是特定功能的包装，留待更细的逆向。
 
+## 第三轮（2026-04-16）pack-banner
+
+| 原名 (FUN_*) | 新名称 | 地址 | 功能 | 证据 |
+|--------------|--------|------|------|------|
+| `FUN_080d971c` | `pack_list_page_init` | `0x080D971C` | 卡包列表页初始化（函数指针表 `0x09E4948C[11]`） | 方向 C: BG2CNT=0x1E0D 唯一命中 → 调用图爬升 |
+| `FUN_080d8d84` | `pack_list_bg_setup` | `0x080D8D84` | BG 配置（BG0CNT=0x1C00, BG2CNT=0x1E0D）+ 清空 VRAM | 方向 C 直接命中 |
+| `FUN_080d8f08` | `pack_list_tilemap_load` | `0x080D8F08` | 从 `0x09CCE2B0/C0/D0` 加载 BG tilemap + BG palette | page_init 第二个 bl |
+| `FUN_080d8e98` | `pack_entry_init` | `0x080D8E98` | 逐 pack 初始化（banner tile + name text + detail） | page_init 循环体, hbreak 验证 |
+| `FUN_080d8f48` | `pack_banner_obj_setup` | `0x080D8F48` | 按 slot 计算 OBJ VRAM 地址，调 `pack_banner_tile_copy` | 字面量 `0x06014000` |
+| `FUN_080db860` | `pack_banner_tile_copy` | `0x080DB860` | ROM 指针表 `0x09CCE960[id]` → OBJ VRAM，mode 1=2D stride | hbreak 验证 5 次调用 |
+| `FUN_080dbbc0` | `pack_name_text_render` | `0x080DBBC0` | ROM `0x09E5E2E8` 查包名，`text_render_wrapper` ×2 | 调用 commit_line_buffer |
+| `FUN_080bdfac` | `pack_ui_state_machine` | `0x080BDFAC` | 卡包 UI 运行时状态机（7 路 switch），overlay/动画 | 方向 B: `0x06016000` 命中 |
+| `FUN_080d8ddc` | `pack_visible_count` | `0x080D8DDC` | 返回当前可见 pack 数（clamp 1..5） | page_init 循环上界 |
+| `FUN_080d8f84` | `pack_detail_bg_tile_load` | `0x080D8F84` | EWRAM 记录 → BG VRAM `0x06000240`，含 pack cost | pack_entry_init 后续调用 |
+| `FUN_080f74d4` | `tile_2d_row_copy` | `0x080F74D4` | 按行拷贝 tile 到 2D OBJ VRAM（dest stride 0x400），130 次调用 | overlay 加载器使用 |
+
 ## 后续 TG.4 待定项（未命名占位）
 
 从已命名函数的 XREF 继续爬图时，期望命名的候选（优先度高→低）：
