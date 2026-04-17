@@ -5,10 +5,16 @@
 
 从 roms/2343.gba 中读取以下两张表，导出为可读汇编文件：
 
-  1. 卡名字符串表（ROM 0x015BB5AC）
-     每张卡 6 个 null 终止字符串，顺序：EN / DE / FR / IT / ES / XX
-     XX 语言使用自定义字节编码（0xF0-0xFF 等），用途待考证。
+  1. 卡名字符串表（ROM 0x015BB594, 真起点）
+     每张卡 6 个 null 终止字符串，顺序：XX / EN / DE / FR / IT / ES
+     XX = JP 自定义编码（每字符 2 字节，疑似含 sort key 或假名压缩），用途待考证。
      2 字节对齐：(strlen + 1) 为奇数时补一个 \\0。
+     第 0 张卡（cid=0）是占位记录：6 个空字符串，共 12 字节零。
+
+     依据 Data Crystal ROM map 的 card_name_pointer_table（0x080EE968 反汇编）
+     验证：lookup formula 为 [0x15BB594 + table[card_id*6 + lang_id]]，
+     且 lang_id=0 即对应 ROM 中 XX-encoded 的字符串（详见
+     doc/dev/datacrystal-cross-reference.md §XX 在最前的验证）。
 
   2. 卡牌属性数据表（ROM 0x018169B6 – 0x01832602）
      每条 22 字节（11 × uint16 LE），共 5170 条。
@@ -31,8 +37,9 @@ ROM_PATH    = 'roms/2343.gba'
 DATA_MD     = 'doc/um06-deck-modification-tool/data.md'
 OUT_DIR     = 'data'
 
-# 卡名字符串表起始偏移（含义见 doc/dev/card-data-structure.md）
-NAMES_START = 0x015BB5AC
+# 卡名字符串表起始偏移（真起点 = card_names_pool）
+# 参考 refs/datacrystal-um2006/rom-map.md
+NAMES_START = 0x015BB594
 
 # 卡牌属性数据表
 STATS_START = 0x018169B6
@@ -40,9 +47,10 @@ STATS_END   = 0x01832601         # 闭区间最后一字节（5170 × 22 = 11374
 RECORD_SIZE = 22                 # 字节/条
 STATS_COUNT = (STATS_END - STATS_START + 1) // RECORD_SIZE  # 5170
 
-# 每张卡的字符串语言数（EN/DE/FR/IT/ES/XX）
+# 每张卡的字符串语言数（XX/EN/DE/FR/IT/ES）
+# 顺序通过对比 lang=0 字节模式 (0xF0+ 高字节为主) vs lang=1..5 (Latin 文字) 验证
 LANGS_PER_CARD = 6
-LANG_NAMES = ['EN', 'DE', 'FR', 'IT', 'ES', 'XX']
+LANG_NAMES = ['XX', 'EN', 'DE', 'FR', 'IT', 'ES']
 
 
 # ---------------------------------------------------------------------------
@@ -109,9 +117,11 @@ def load_data_md(path: str) -> list[tuple[int, str, int]]:
 def scan_card_names(rom: bytes) -> tuple[list, int]:
     """扫描卡名字符串表，返回 (cards, end_offset)。
     cards = [(card_rom_off, [lang0_bytes, lang1_bytes, ...]), ...]
+        lang0 = XX 自定义编码, lang1..5 = EN/DE/FR/IT/ES
     end_offset = 表结束后第一个字节的偏移（下一个数据结构起始）。
 
-    停止条件：EN 字符串（第0个）为空，或含控制字符（< 0x20）。
+    第 0 张卡 (cid=0) 是占位记录：6 个空字符串（共 12 字节零）。
+    停止条件：EN 字符串（lang=1）为空且不是首张占位卡，或含控制字符（< 0x20）。
     """
     p = NAMES_START
     limit = STATS_START   # 不跨越属性表
@@ -129,8 +139,13 @@ def scan_card_names(rom: bytes) -> tuple[list, int]:
                 break
         if not ok:
             break
-        en_str = strs[0]
-        # EN 为空 → 已到表末尾的哑元或其他数据
+        en_str = strs[1]   # lang=1 是 EN
+        is_placeholder = (len(en_str) == 0 and len(strs[0]) == 0)
+        # 首张占位卡 cid=0：所有 lang 全空，长度 12B
+        if is_placeholder and len(cards) == 0:
+            cards.append((card_start, strs))
+            continue
+        # EN 为空 → 已到表末尾
         if len(en_str) == 0:
             break
         # EN 含控制字符 → 已离开字符串表
@@ -193,14 +208,19 @@ def export_card_names(rom: bytes, cards: list, slot_info: list, out_dir: str) ->
     )
 
     for i, (card_off, strs) in enumerate(cards):
-        # 槽位信息
-        if i < len(slot_info):
-            slot_id, en_name, pwd = slot_info[i]
-            label = f'card_name_{slot_id:04X}'
-            comment = f'{en_name}  (pw {pwd:08d})'
+        # cards[0] = cid=0 占位记录（6 个空字符串）；slot_info 从 cid=1 (Blue-Eyes) 开始
+        if i == 0:
+            label = 'card_name_placeholder'
+            comment = 'placeholder (cid=0): 6 empty strings, 12 bytes'
         else:
-            label = f'card_name_idx_{i:04d}'
-            comment = f'(index {i}, no data.md entry)'
+            slot_idx = i - 1
+            if slot_idx < len(slot_info):
+                slot_id, en_name, pwd = slot_info[slot_idx]
+                label = f'card_name_{slot_id:04X}'
+                comment = f'{en_name}  (pw {pwd:08d})'
+            else:
+                label = f'card_name_idx_{i:04d}'
+                comment = f'(index {i}, no data.md entry)'
 
         lines.append(f'\n{label}:  @ {comment}\n')
 

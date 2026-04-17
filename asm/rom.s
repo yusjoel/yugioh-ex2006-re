@@ -43,11 +43,12 @@ Start:
 @ Data Crystal ROM map function 0x080EE76C 验证
 	.include "data/cards-ids-array.s"
 
-@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB5AB（cards_ids_array 后至卡名表前）
-	.incbin "roms/2343.gba", 0x15B94CC, 0x20E0
+@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB593（cards_ids_array 后至卡名表前）
+	.incbin "roms/2343.gba", 0x15B94CC, 0x20C8
 
-@ 卡牌名称字符串表（ROM偏移 0x15BB5AC - 0x15F3A5B）
-@ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐
+@ 卡牌名称字符串表（ROM偏移 0x15BB594 - 0x15F3A5B）
+@ 2102 张卡（含 cid=0 占位）× 6 种语言（XX/EN/DE/FR/IT/ES），CP1252 编码，2 字节对齐
+@ XX = JP 自定义编码（每字符 2 字节），见 doc/dev/datacrystal-cross-reference.md
 	.include "data/card-names.s"
 
 @ 卡名指针表（ROM偏移 0x15F3A5C - 0x15FFF6B）

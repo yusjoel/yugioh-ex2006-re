@@ -95,6 +95,33 @@ if ($remote -ne $local) {
 
 ---
 
+### yugioh-card-search/
+
+**来源**：<https://github.com/ryosbsk/yugioh-card-search>
+**作用**：日文社区开发的 EX2006 网页版卡牌检索工具，含约 2,000 张卡的**日文名 + 所属卡包**。
+
+| 文件 | 内容 |
+|------|------|
+| `data/card_master.csv` | 卡片主表：`#,种,カード名,パック,...` (按五十音排序) |
+| `data/pack_master.csv` | 卡包主表：`#,パック名,出现内容,获取难易度` |
+| `data/query_results.csv` | 按 pack 拆分的查询结果（含每包卡的指针） |
+| `script.js` / `index.html` | 检索逻辑 + UI |
+
+**用途**：
+- **XX 语言编码研究**：`data/card-names.s` 的 `lang=0` 槽（XX）是变长自定义编码（6-32 字节），实测特征：
+  - 总是**偶数长度** → 每字符 2 字节定长
+  - 高字节集中在 `0xF0`–`0xFF`（最常见 `0xF1`/`0xF2`/`0xF0`）
+  - 低字节散布在 `0x80`–`0xFF`
+  - 字节对数 ≈ JP 卡名字符数（按汉字/假名/中点 1 字符 = 2 字节统计；不是按"读音假名"展开）
+  - 例：Blue-Eyes 青眼の白龍 (5 字) → `f8 f7 f4 8c f1 a9 fb d9 fe 91` (10B = 5 pairs) ✓
+  - 例：Mystical Elf ホーリー・エルフ (8 字含中点) → `f2 89 f0 8b f2 98 f0 8b f0 84 f1 d6 f2 99 f2 83` (16B = 8 pairs) ✓
+- **对照数据**：本仓库 CSV 按**五十音排序**（青眼の白龍 在 #0064 而非 #0001），可与 ROM XX 排序对照验证假说。
+- **日文名 → card_id 映射**：CSV `#` 是 CSV 内部序号（按五十音）非 ROM `card_id`；需要建立两表的对应关系才能用作日文卡名补全。
+
+抓取时间：2026-04-17。本目录已加入 `.gitignore`（与其他 repo 镜像一致），不入库。
+
+---
+
 ### datacrystal-um2006/
 
 **来源**：[TCRF Data Crystal](https://datacrystal.tcrf.net/wiki/Yu-Gi-Oh!_Ultimate_Masters:_World_Championship_Tournament_2006)  

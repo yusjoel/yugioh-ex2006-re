@@ -31,6 +31,8 @@ AREA_START    = 0x015FFF6C
 TEXT_START    = 0x015FFF6C
 AREA_END      = 0x01800000
 LANGS_PER_CARD = 6
+# 注意：effect-text 顺序与 card-names 不同！实测 slot 5 (最后) 才是 XX 编码
+# (slot 0..4 = EN/DE/FR/IT/ES，全 ASCII；slot 5 = F0+ 高字节自定义编码)
 LANG_NAMES    = ['EN', 'DE', 'FR', 'IT', 'ES', 'XX']
 
 

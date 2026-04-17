@@ -345,3 +345,5 @@ tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
 | RAM map | [datacrystal.tcrf.net](https://datacrystal.tcrf.net/wiki/Yu-Gi-Oh!_Ultimate_Masters:_World_Championship_Tournament_2006/RAM_map) |
 | Text table (TBL) | [datacrystal.tcrf.net](https://datacrystal.tcrf.net/wiki/Yu-Gi-Oh!_Ultimate_Masters:_World_Championship_Tournament_2006/TBL) |
 | Notes | [datacrystal.tcrf.net](https://datacrystal.tcrf.net/wiki/Yu-Gi-Oh!_Ultimate_Masters:_World_Championship_Tournament_2006/Notes) |
+
+感谢 **[ryosbsk/yugioh-card-search](https://github.com/ryosbsk/yugioh-card-search)** 整理的本作日文卡名 + 卡包归属（按五十音排序的 ~2,000 张卡），为 XX 自定义编码反向工程提供关键对照数据：通过将 ROM `card-names.s` 的 `lang=0` (XX) 字节对与已知 JP 卡名按位对齐，本项目识别出 XX 是 2 字节定长编码，确认 F1/F2 完整片假名表 + F1 平假名表 + F0 全角字母表，约 130+ 字符已映射，全 ROM 37.8% 卡名可完全解码。详见 [`doc/dev/xx-encoding-analysis.md`](doc/dev/xx-encoding-analysis.md) 与解码器 [`tools/xx_codec.py`](tools/xx_codec.py)。
