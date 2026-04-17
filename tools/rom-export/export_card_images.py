@@ -41,12 +41,16 @@ PALETTES_ROM_END   = 0x00510440  # 2331 × 128 B = 0x48D80
 TILES_ROM_START    = 0x00510640
 TILES_ROM_END      = 0x00FBC080  # 2331 × 4800 B = 0xAABA40
 INDEX_ROM_START    = 0x015B5C00
-INDEX_ROM_END      = 0x015B94CC  # 7270 × u16 = 0x38CC（6846 实条目 + 424 FFFF 填充）
+INDEX_ROM_END      = 0x015B7CCC  # 2099 × 4B = 0x20CC （card_id 0..2098 含 Token）
+CARDS_IDS_ARR_ROM_START = 0x015B7CCC  # internal_card_id (4007..7078) → card_id, u16 表
+CARDS_IDS_ARR_ROM_END   = 0x015B94CC  # 3072 × u16 = 0x1800
+CARDS_IDS_ARR_BASE_ID   = 4007        # internal_card_id 起始（0x0FA7 = Blue-Eyes）
 
 BLOB_DIR = Path("graphics/card-images-rom")       # bin 根目录（已 .gitignore graphics/）
 PAL_BLOB_DIR = BLOB_DIR / "palettes"              # 2331 × 128 B
 TILE_BLOB_DIR = BLOB_DIR / "tiles"                # 2331 × 4800 B
 INDEX_S_PATH = Path("data/card-image-index.s")    # 索引表 .s（显式 .hword）
+CARDS_IDS_ARR_S_PATH = Path("data/cards-ids-array.s")  # internal_card_id → card_id 反向映射表
 PAL_S_PATH = Path("data/card-image-palettes.s")   # 调色板 incbin 列表
 TILE_S_PATH = Path("data/card-image-tiles.s")     # tile incbin 列表
 
@@ -257,30 +261,35 @@ def dump_rom_blobs(rom: bytes) -> None:
 
 
 def write_index_source(rom: bytes) -> None:
-    """生成 data/card-image-index.s —— 显式 .hword 配带注释（card_id/slot/卡名）。"""
+    """生成 data/card-image-index.s —— card_id 0..2098（含 Token）的 tile_block 索引。
+
+    card_id 2099+ 区域虽然字节连续，但实际语义是
+    `cards_ids_array`（internal_card_id → card_id 的反向映射表），
+    已拆出至 data/cards-ids-array.s（依据 Data Crystal ROM map 反汇编验证）。
+    """
     slot_to_name = build_slot_to_en_name(rom)
     import struct as _struct
 
-    # 读取原始 ROM 索引表
+    # 读取原始 ROM 索引表（仅 card-image 部分）
     raw = rom[INDEX_ROM_START:INDEX_ROM_END]
-    total_u16 = len(raw) // 2
+    total_u16 = len(raw) // 2  # 4198
     vals = _struct.unpack(f"<{total_u16}H", raw)
-    # entries[i] 对应 (card_id, flag) where i = card_id*2 + flag
-    # 前 6846 条为有效数据（其中仍有 FFFF 占位），后 424 条全部 FFFF
-    n_real = 6846  # 6846 = 3423 × 2（card_id 0..3422，每卡 flag=0/1 两条）
-    n_pad = total_u16 - n_real  # 424
+    n_cards = total_u16 // 2  # 2099 (card_id 0..2098)
 
     out_lines = [
         "@ 卡牌大图索引表（由 tools/rom-export/export_card_images.py 自动生成）",
         f"@ ROM 范围: 0x{INDEX_ROM_START:X} - 0x{INDEX_ROM_END:X}  "
-        f"({INDEX_ROM_END - INDEX_ROM_START} B = {total_u16} × u16)",
+        f"({INDEX_ROM_END - INDEX_ROM_START} B = {total_u16} × u16 = {n_cards} cards × 2)",
         "@",
         "@ 结构：每个 card_id 占 2 条 u16（flag=0 OCG / flag=1 TCG），",
         "@ 值为 tile_block（=> 大图 ROM 偏移 = 0x00510640 + tile_block × 4800；",
         "@ 调色板 ROM 偏移 = 0x004C76C0 + tile_block × 128）。",
         "@ 0xFFFF 表示该 card_id 在此 flag 下无大图。",
         "@ card_id 是 data/card-stats.s 的 0-indexed 数组下标；1..2080 为正式卡，",
-        "@ 2081..2097 为 Token，0 为占位记录，2098+ 为未使用/表 B 数据。",
+        "@ 2081..2097 为 Token，0 为占位记录，2098 为最后一个 token slot。",
+        "@",
+        "@ 紧接其后 (ROM 0x15B7CCC) 的数据已拆至 data/cards-ids-array.s",
+        "@ （internal_card_id 4007..7078 → card_id 反向映射表）",
         "",
         "    .section .rodata",
         "    .balign 2",
@@ -289,36 +298,27 @@ def write_index_source(rom: bytes) -> None:
         "",
     ]
 
-    for card_id in range(n_real // 2):  # 0..3422
+    for card_id in range(n_cards):  # 0..2098
         tb0 = vals[card_id * 2]
         tb1 = vals[card_id * 2 + 1]
 
-        # 生成一行 .hword
         def fmt(v: int) -> str:
             return "0xFFFF" if v == 0xFFFF else f"0x{v:04X}"
 
-        # 注释
         slot = card_id_to_slot(rom, card_id) if card_id < 5170 else 0
         name = slot_to_name.get(slot, "") if slot else ""
         name_part = f" {name}" if name else ""
-        c_note = ""
         if card_id == 0:
             c_note = "  @ [占位] "
         elif 1 <= card_id <= 2080:
             c_note = f"  @ [正式卡{card_id:04d}] slot=0x{slot:04X}{name_part}"
         elif 2081 <= card_id <= 2097:
             c_note = f"  @ [Token{card_id - 2080:02d}] slot=0x{slot:04X}{name_part}"
-        elif 2098 <= card_id <= 3422:
-            c_note = f"  @ [表B {card_id:04d}] slot=0x{slot:04X}{name_part}"
-        else:
-            c_note = f"  @ card_id={card_id}"
+        else:  # 2098
+            c_note = f"  @ [Token{card_id - 2080:02d}] slot=0x{slot:04X}{name_part}"
 
         out_lines.append(f"    .hword {fmt(tb0)}, {fmt(tb1)}{c_note}")
 
-    # 填充段
-    out_lines.append("")
-    out_lines.append(f"    @ === 保留/填充区：{n_pad} × 0xFFFF ({n_pad * 2} B) ===")
-    out_lines.append(f"    .fill {n_pad * 2}, 1, 0xFF")
     out_lines.append("")
     out_lines.append("card_image_index_end:")
     out_lines.append("")
@@ -326,6 +326,64 @@ def write_index_source(rom: bytes) -> None:
     INDEX_S_PATH.parent.mkdir(parents=True, exist_ok=True)
     INDEX_S_PATH.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
     print(f"写入 {INDEX_S_PATH} ({total_u16} entries, {INDEX_ROM_END - INDEX_ROM_START} B)")
+
+
+def write_cards_ids_array_source(rom: bytes) -> None:
+    """生成 data/cards-ids-array.s —— internal_card_id (4007..7078) → card_id 反向映射。
+
+    依据 Data Crystal wiki 反汇编（function 0x080EE76C）验证：
+        card_id = cards_ids_array[(internal_card_id - 4007) << 1]
+        若值 = 0xFFFF 则该 internal_card_id 无对应卡。
+    """
+    slot_to_name = build_slot_to_en_name(rom)
+    import struct as _struct
+
+    raw = rom[CARDS_IDS_ARR_ROM_START:CARDS_IDS_ARR_ROM_END]
+    n_entries = len(raw) // 2  # 3072
+    vals = _struct.unpack(f"<{n_entries}H", raw)
+
+    out_lines = [
+        "@ Cards IDs Array（internal_card_id → card_id 反向映射表）",
+        "@ 由 tools/rom-export/export_card_images.py 自动生成",
+        f"@ ROM 范围: 0x{CARDS_IDS_ARR_ROM_START:X} - 0x{CARDS_IDS_ARR_ROM_END:X}  "
+        f"({CARDS_IDS_ARR_ROM_END - CARDS_IDS_ARR_ROM_START} B = {n_entries} × u16)",
+        "@",
+        "@ Lookup（per Data Crystal ROM map, function 0x080EE76C）:",
+        f"@   index = (internal_card_id - {CARDS_IDS_ARR_BASE_ID}) << 1",
+        "@   card_id = cards_ids_array[index]",
+        "@   若 card_id == 0xFFFF 则该 internal_card_id 无对应卡。",
+        "@",
+        f"@ internal_card_id 范围: 0x{CARDS_IDS_ARR_BASE_ID:04X}..0x{CARDS_IDS_ARR_BASE_ID + n_entries - 1:04X}"
+        f" ({CARDS_IDS_ARR_BASE_ID}..{CARDS_IDS_ARR_BASE_ID + n_entries - 1})",
+        "",
+        "    .section .rodata",
+        "    .balign 2",
+        "    .global cards_ids_array",
+        "cards_ids_array:",
+        "",
+    ]
+
+    for i, card_id in enumerate(vals):
+        icid = CARDS_IDS_ARR_BASE_ID + i
+        if card_id == 0xFFFF:
+            out_lines.append(
+                f"    .hword 0xFFFF  @ icid=0x{icid:04X} ({icid:5d})  -> (none)")
+        else:
+            slot = card_id_to_slot(rom, card_id) if card_id < 5170 else 0
+            name = slot_to_name.get(slot, "")
+            name_part = f"  {name}" if name else ""
+            out_lines.append(
+                f"    .hword 0x{card_id:04X}  @ icid=0x{icid:04X} ({icid:5d})"
+                f"  -> cid={card_id} slot=0x{slot:04X}{name_part}")
+
+    out_lines.append("")
+    out_lines.append("cards_ids_array_end:")
+    out_lines.append("")
+
+    CARDS_IDS_ARR_S_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CARDS_IDS_ARR_S_PATH.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
+    print(f"写入 {CARDS_IDS_ARR_S_PATH} ({n_entries} entries, "
+          f"{CARDS_IDS_ARR_ROM_END - CARDS_IDS_ARR_ROM_START} B)")
 
 
 def main() -> int:
@@ -349,6 +407,7 @@ def main() -> int:
         print("=== 导出 ROM 原始数据块 + 索引 .s ===")
         dump_rom_blobs(rom)
         write_index_source(rom)
+        write_cards_ids_array_source(rom)
         print()
 
     if args.no_png:

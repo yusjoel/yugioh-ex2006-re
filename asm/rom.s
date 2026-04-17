@@ -5,6 +5,10 @@
 @ 宏定义（deck_entry、banlist_entry、deck_card 等）
 	.include "include/macros.inc"
 
+@ 常量符号（EWRAM/IWRAM 变量地址，依据 Data Crystal RAM map）
+	.include "constants/ewram.inc"
+	.include "constants/iwram.inc"
+
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 
@@ -30,20 +34,29 @@ Start:
 @ 后 16MB 第一段前半 seg-A-1：ROM偏移 0x1000000 - 0x15B5BFF（卡图索引表前）
 	.incbin "roms/2343.gba", 0x1000000, 0x5B5C00
 
-@ 卡牌大图索引表（ROM偏移 0x15B5C00 - 0x15B94CB）
-@ 7270 × u16 = 14540 B = 0x38CC
-@ 引用 graphics/card-images-rom/palettes.bin + tiles.bin（由同脚本从 ROM 导出，未入库）
+@ 卡牌大图索引表（ROM偏移 0x15B5C00 - 0x15B7CCB）
+@ 2099 cards × 2 × u16 = 8396 B = 0x20CC（card_id 0..2098）
 	.include "data/card-image-index.s"
 
-@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB5AB（索引表后至卡名表前）
+@ Cards IDs Array（ROM偏移 0x15B7CCC - 0x15B94CB）
+@ 3072 × u16 = 6144 B = 0x1800（internal_card_id 4007..7078 → card_id）
+@ Data Crystal ROM map function 0x080EE76C 验证
+	.include "data/cards-ids-array.s"
+
+@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB5AB（cards_ids_array 后至卡名表前）
 	.incbin "roms/2343.gba", 0x15B94CC, 0x20E0
 
 @ 卡牌名称字符串表（ROM偏移 0x15BB5AC - 0x15F3A5B）
 @ 2053 张卡 × 6 种语言（EN/DE/FR/IT/ES/XX），CP1252 编码，2 字节对齐
 	.include "data/card-names.s"
 
-@ 卡牌效果描述全文（ROM偏移 0x15F3A5C - 0x17FFFFF）
-@ u32 数据表（12,612 条）+ 2014 张卡效果描述 × 6 语言，共 2,147,748 字节
+@ 卡名指针表（ROM偏移 0x15F3A5C - 0x15FFF6B）
+@ 12,612 × u32 = 50,448 字节，按 [card_id*6 + lang] 索引
+@ 取值后加 0x15BB594 即 card_names 字符串地址（Data Crystal 反汇编验证）
+	.include "data/card-name-pointer-table.s"
+
+@ 卡牌效果描述全文（ROM偏移 0x15FFF6C - 0x17FFFFF）
+@ 2014 张卡效果描述 × 6 语言，共 2,097,300 字节
 	.include "data/card-effect-text.s"
 
 @ 卡牌描述文本 + 数据表 + 指针表（ROM偏移 0x1800000 - 0x18169B5）

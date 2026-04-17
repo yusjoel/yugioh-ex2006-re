@@ -89,6 +89,17 @@ RENAMES = [
         "pack-banner: EWRAM 记录 → BG VRAM 0x06000240, 含 pack cost"),
     ("FUN_080f74d4", "tile_2d_row_copy",
         "pack-banner/通用: 按行拷贝 tile 到 2D OBJ VRAM (dest stride 0x400)"),
+    # --- Data Crystal wiki 揭示的函数（2026-04-17） ---
+    ("FUN_080143f0", "banlist_password_enter_char",
+        "datacrystal: 禁卡密码字符录入 [gBanlistPasswordBuffer]"),
+    ("FUN_0802387c", "draw_decimal_with_offset",
+        "datacrystal: 通用十进制绘制（被多处调用，含 0x080242c8 入口）"),
+    ("FUN_080ee76c", "internal_card_id_to_card_id",
+        "datacrystal: cards_ids_array 查表，icid 4007..7078 → card_id；越界返 0"),
+    ("FUN_080ee7ac", "select_charset_then_load_name",
+        "datacrystal: 按 game-region/language 选字符集，分支到对应 name 加载（含 JP 特例 0x1497..0x149A）；0x080ee968 是其内部 LAB"),
+    ("FUN_080eebfc", "card_name_lookup_by_internal_id",
+        "datacrystal: 包装：icid → cid → 读 gSettings 取 lang_id → 调 select_charset_then_load_name"),
 ]
 
 

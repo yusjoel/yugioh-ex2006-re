@@ -95,6 +95,27 @@ if ($remote -ne $local) {
 
 ---
 
+### datacrystal-um2006/
+
+**来源**：[TCRF Data Crystal](https://datacrystal.tcrf.net/wiki/Yu-Gi-Oh!_Ultimate_Masters:_World_Championship_Tournament_2006)  
+**作用**：Data Crystal 社区针对本游戏整理的 ROM/RAM 地图、文本编码表与杂项笔记，含若干段精简反汇编（`internal_card_id` → `card_id` 映射、卡名指针加载、字符集分支等）。
+
+| 文件 | 内容摘要 |
+|------|---------|
+| `rom-map.md` | 7 段 ARM Thumb 反汇编 + Cards IDs / Card name pointers / Cards names 三个数据表起始地址 |
+| `ram-map.md` | EWRAM (语言/DP/谜题进度/玩家名/胜场/LP/Banlist 缓冲) + IWRAM (PRNG/帧计数器) |
+| `text-table.md` | 文本编码 (ASCII + 拉丁扩展，含 `0x5C=¥`、`0x91/0x92` 闪电符号) |
+| `notes.md` | Player Icons ID 表（仅前 16 项；上游页面本身不完整） |
+
+**用途**：
+- `rom-map.md` 揭示 `0x15F3A5C` 是 *卡名指针表*（已据此拆出 `data/card-name-pointer-table.s`），`0x15B7CCC` 是 *internal_card_id → card_id 反向映射表*（已据此拆出 `data/cards-ids-array.s`）。
+- `ram-map.md` 提供的 RAM 地址已收录到 `constants/ewram.inc` / `constants/iwram.inc`，未来反汇编中可用符号常量替代裸 `.word`。
+- `text-table.md` 与 `data/font.s` / `game-strings-*.s` 互证编码假设。
+
+抓取时间：2026-04-17。Data Crystal 是 wiki 内容，可能持续更新；如发现新增条目，可重新跑 WebFetch 同步。
+
+---
+
 ## 注意事项
 
 - 首次克隆仓库后，以上子目录均为空（不存在）。根据实际需要手动下载或迁移。
