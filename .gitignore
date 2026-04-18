@@ -29,6 +29,9 @@ refs/yugioh-card-search/
 # 导出的图形资产（由 tools/rom-export/export_gfx.py 从 ROM 生成）
 graphics/
 
+# 导出的数据汇编（由 tools/rom-export/export_all.py 从 ROM 生成）
+data/
+
 # 本地环境配置（路径因机器而异）
 LOCAL.md
 roms/*.sav

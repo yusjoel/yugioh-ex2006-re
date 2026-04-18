@@ -12,11 +12,10 @@
 
 ## 快速开始
 
-> ⚠️ **构建前置步骤**：`asm/rom.s` 引用了 `graphics/` 下的二进制文件（tilemap/palette/tile），
-> 这些文件**不纳入版本控制**，需先从 ROM 导出：
+> ⚠️ **构建前置步骤**：`asm/rom.s` 引用 `data/*.s` 和 `graphics/*.bin`，两者**均不纳入版本控制**（由 ROM 脚本重新生成）。clone 仓库后必须先跑：
 >
 > ```bat
-> python tools/rom-export/export_all.py   @ 一键导出所有构建依赖 (图形+调色板+卡包封面)
+> python tools/rom-export/export_all.py   @ 一键导出 data/ (.s) + graphics/ (.bin/.png)
 > build.bat                               @ 汇编、链接并生成 output/2343.gba
 > ```
 
@@ -36,7 +35,7 @@ clean.bat    @ 清理编译产物
 │   ├── rom_header.s      # GBA ROM 头部（0x000–0x0BF）
 │   ├── crt0.s            # 启动代码（0x0C0–0x0FF）
 │   └── all.s             # 前 16MB 反汇编代码
-├── data/                 # 已结构化的数据区（.s 格式，含注释）
+├── data/                 # 结构化的数据区（不含于仓库，由 tools/rom-export/export_all.py 从 ROM 生成）
 │   ├── opponent-card-values.s  # 27 个对手卡值块（ROM 0x1E58D0E）
 │   ├── banlists.s              # 8 个版本禁卡表，487 条目（ROM 0x1E5EF30）
 │   ├── starter-deck.s          # 初始卡组，50 张（ROM 0x1E5F884）
