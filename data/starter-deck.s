@@ -6,6 +6,7 @@
 @ 重复相同 so_code 表示多张副本
 @
 @ 来源文档: doc/um06-deck-modification-tool/starter-opponent-paste-tool.md
+@ 由 tools/rom-export/export_starter_deck.py 生成
 @ =============================================================================
 
 starter_deck:

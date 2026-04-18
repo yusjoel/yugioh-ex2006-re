@@ -94,6 +94,12 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_card_images.py` | ROM → `data/card-image-index.s` + `data/cards-ids-array.s`（含 `internal_card_id → card_id` 反向映射）+ `graphics/card-images-rom/` |
 | `tools/rom-export/export_file_paths.py` | ROM → `data/file-paths.s`（339 条内部文件路径） |
 | `tools/rom-export/export_fs_tables.py` | ROM → `data/fs-tables.s`（offset_table 339×u32 + size_table 340×u32，FS 索引表） |
+| `tools/rom-export/export_banlists.py` | ROM → `data/banlists.s`（8 个版本禁卡表，487 条目） |
+| `tools/rom-export/export_starter_deck.py` | ROM → `data/starter-deck.s`（初始卡组 50 张） |
+| `tools/rom-export/export_struct_decks.py` | ROM → `data/struct-decks.s`（6 套预组 + 指针表） |
+| `tools/rom-export/export_opponent_card_values.py` | ROM → `data/opponent-card-values.s`（27 对手卡值块，32 B×27） |
+| `tools/rom-export/export_opponent_decks.py` | ROM → `data/opponent-decks.s`（25 对手卡组，块大小可变，含融合卡组） |
+| `tools/rom-export/export_deck_strings.py` | ROM → `data/deck-strings.s`（XX 编码预组/对手卡组名字符串） |
 | `tools/rom-export/export_duel_puzzles.py` | ROM → `data/duel-puzzles.s`（35 块决斗题目存档模板） |
 
 ### 汇编再生成流水线

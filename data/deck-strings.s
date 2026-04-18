@@ -1,6 +1,7 @@
 @ 卡组名字符串表
 @ 来源: doc/um06-romhacking-resource/deck-string-name-tool.md
 @        doc/um06-romhacking-resource/modifying-decks.md
+@ 由 tools/rom-export/export_deck_strings.py 生成
 @
 @ ROM 文件偏移范围: 0x1DBF01A ~ 0x1DFC852
 @ 字符串表基址（文件偏移）: 0x1DB9C10  (GBA地址 0x9DB9C10)

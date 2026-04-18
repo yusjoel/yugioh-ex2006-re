@@ -10,6 +10,7 @@
 @   +0x1E  2字节  unk_b（= unk + 1）
 @
 @ 来源文档: doc/um06-romhacking-resource/opponents-coinflip-screen.md
+@ 由 tools/rom-export/export_opponent_card_values.py 生成
 @ =============================================================================
 
 opponent_card_values:
