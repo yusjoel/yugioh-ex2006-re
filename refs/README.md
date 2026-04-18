@@ -143,6 +143,29 @@ if ($remote -ne $local) {
 
 ---
 
+### poptracker-ygo06/
+
+**来源**：<https://github.com/Rensen3/poptracker-ygo06>
+**作用**：Archipelago randomizer 的 PopTracker 进度追踪包（Lua + JSON）。**不含 ROM 偏移、不含 RAM 地址**——autotracking 完全走 AP 网络协议，不读 GBA 内存。
+
+对本项目（数据结构化/byte-identical 反汇编）直接帮助有限；**数据层面的内容我们都已从 ROM 拆出**：
+- 2080 条英文卡名 → 已有 `card-name-pointer-table.s` + `card-effect-text.s`
+- 45 个卡包内容 → 已有 `pack-card-lists.s`
+- 25 套对手卡组 → 已有 `opponent-decks.s` / `opponent-card-values.s`
+
+**未来逆向游戏机制时的参考价值**：
+- `scripts/autotracking/card_amount.lua`：45 种 Duelist Bonus 的触发条件 + 奖励配额 + 所需卡 archetype（Exodia Finish / Destiny Board Finish / Yata-Lock / Konami Bonus=5730 LP 等），属于**玩法规则文档**，不在 ROM 任何显式表中
+- `items/campaign_opponents.jsonc` + `images/campaign_opponents/*.png`：Tier×Column 战役网格 → 25 个对手角色名的映射（Tier1Col1=Kuriboh ... Tier5Col5=Cyber End Dragon），可反查我们 `opponent-decks.s` 里对手出现在战役菜单的哪个位置
+- `locations/challenges.jsonc` + `location_mapping.lua`：LD01–41 + TD01–50 共 91 个挑战的**官方英文标题**（"LD23 Refer to Mar 05 Banlist"、"TD37 Uria, Lord of Searing Flames"），可用于反向定位 ROM 中挑战描述字符串
+- `scripts/create_cards.lua`：关键卡 → `card_id` 对照（Exodia=21、Dark Magician=37、Raviel=2014、Uria=2012、Hamon=2013 等），可作为 ground truth 验证我们 `card_id` 索引基准
+- `items/boosterpacks.jsonc`：45 个卡包的官方大写命名，可回填 `pack-card-lists.s` 注释
+
+**Archipelago 侧**：独立的 ygo06 AP world + BizHawk Lua 连接器（不在此仓库）才真正读写 GBA RAM——如果将来需要 RAM 地址/写回协议，应去 Archipelago ygo06 world 仓库捡连接器脚本。
+
+抓取时间：2026-04-17。
+
+---
+
 ## 注意事项
 
 - 首次克隆仓库后，以上子目录均为空（不存在）。根据实际需要手动下载或迁移。

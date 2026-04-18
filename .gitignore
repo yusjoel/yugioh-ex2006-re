@@ -36,3 +36,7 @@ roms/*.ss*
 tools/arm-none-eabi-gdb.exe
 tools/mgba-scripts/local-settings.ps1
 env
+refs/NitroSDK
+refs/NitroSystem
+refs/poptracker-ygo06
+refs/stevexmh-nds-patch-walkthrough
