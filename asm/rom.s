@@ -366,7 +366,13 @@ Start:
 @ 339 条 null 终止 ASCII 文件路径（deck/*.ydc, titleEx/*.LZncgr 等），共 10,844 字节
 	.include "data/file-paths.s"
 
-	.incbin "roms/2343.gba", 0x1E63BE8, 0xAA6      @ 0x1E63BE8..0x1E6468E 文件路径表后
+@ 内嵌文件系统索引表（ROM偏移 0x1E63BE8 - 0x1E64684）
+@ offset_table (339 × u32) + size_table (340 × u32)，共 0xA9C 字节
+	.include "data/fs-tables.s"
+
+@ FS 数据区起点（ROM偏移 0x1E64684）
+@ file 0 "deck/LV1_kuriboh.ydc" 前 10 字节（.ydc 文件头，opponent-decks.s 从 0x1E6468E 开始）
+	.incbin "roms/2343.gba", 0x1E64684, 0xA
 
 @ 对手卡组数据（ROM偏移 0x1E6468E - 0x1E65A45）
 @ 25 个对手卡组，各含 40 张牌，共 0x13B8 字节

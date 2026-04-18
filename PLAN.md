@@ -13,6 +13,24 @@
 
 ---
 
+## 内嵌文件系统（2026-04-17 新识别）
+
+ROM 内有 Konami 自写的文件系统（NNS g2d 资源 + .ydc 卡组 + .ydq 谜题 + .LZ5bg 背景），基址 `0x1E64684`，共 `0x70420` 字节（339 个文件）。
+
+- ✓ 索引表已结构化：`data/fs-tables.s`（`offset_table` + `size_table`, 2716 B）
+- ✓ 解析器已完成：`tools/ad-hoc/nns_extract.py` 解压 63 个 NNS 资源到 `doc/temp/nns_out/`
+
+**后续可做的 FS 数据区拆分（按优先级）**：
+
+| 优先级 | 扩展名 | 数量 | 目标 |
+|---|---|---|---|
+| ⭐⭐ | `.LZnclr` | 18 | P2-palette 问题的直接依赖：定位各调色板在 PALRAM 中的使用点 |
+| ⭐ | `.ydc` / `.ydq` | ~230 / 35 | 现已被 `opponent-decks.s`、`duel-puzzles.s` 部分覆盖，可升级为统一 FS 层 |
+| ⭐ | `.LZ5bg` | 26 | 格式未解析（Konami 私有 BG 压缩，压缩头 `0x01`） |
+| ⭐ | NNS `.LZn*` tile/cell/anim | 45 | NCGR/NCER/NANR 数据解析 + PNG 渲染，需 palette 对齐 |
+
+---
+
 ## 遗留数据未调查
 
 - ROM `0x001FD568 – 0x0020A500`（~53 KB，被 `card_desc_ptr_table` 269 条文件偏移引用，格式/用途未确认）
