@@ -100,6 +100,11 @@ RENAMES = [
         "datacrystal: 按 game-region/language 选字符集，分支到对应 name 加载（含 JP 特例 0x1497..0x149A）；0x080ee968 是其内部 LAB"),
     ("FUN_080eebfc", "card_name_lookup_by_internal_id",
         "datacrystal: 包装：icid → cid → 读 gSettings 取 lang_id → 调 select_charset_then_load_name"),
+    # --- 卡列表小图调色板 + tile 数据定位（2026-04-18）---
+    ("FUN_080fdef4", "card_list_screen_init",
+        "card-list-palette: 屏幕初始化序列；4 次 memcpy 加载静态 OBJ 调色板 (0x09E31554/74/14)；调 card_list_tile_renderer"),
+    ("FUN_081011c4", "card_list_tile_renderer",
+        "card-list-palette: 卡列表小图 tile 渲染; 字面量池含 0x09326280(tile 基址) + 0x095B5C00(index 表)"),
 ]
 
 

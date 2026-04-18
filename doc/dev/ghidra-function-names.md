@@ -56,6 +56,13 @@
 | `FUN_080d8f84` | `pack_detail_bg_tile_load` | `0x080D8F84` | EWRAM 记录 → BG VRAM `0x06000240`，含 pack cost | pack_entry_init 后续调用 |
 | `FUN_080f74d4` | `tile_2d_row_copy` | `0x080F74D4` | 按行拷贝 tile 到 2D OBJ VRAM（dest stride 0x400），130 次调用 | overlay 加载器使用 |
 
+## 第四轮（2026-04-18）card-list-palette
+
+| 原名 (FUN_*) | 新名称 | 地址 | 功能 | 证据 |
+|--------------|--------|------|------|------|
+| `FUN_080fdef4` | `card_list_screen_init` | `0x080FDEF4` | 卡列表屏幕初始化序列；4 次 memcpy 加载静态 OBJ 调色板（ROM `0x09E31554/74/14`）；调 `card_list_tile_renderer` | asm/all.s L334094-L334111 静态分析 + PALRAM dump 全字节比对 |
+| `FUN_081011c4` | `card_list_tile_renderer` | `0x081011C4` | 卡列表小图 tile 渲染主函数；字面量池含 `0x09326280`（tile 基址）+ `0x095B5C00`（index 表） | 字面量池 DAT_08101290=0x09326280 静态识别 |
+
 ## 后续 TG.4 待定项（未命名占位）
 
 从已命名函数的 XREF 继续爬图时，期望命名的候选（优先度高→低）：
