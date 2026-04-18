@@ -45,7 +45,6 @@ import struct
 from PIL import Image
 
 ROM_PATH = 'roms/2343.gba'
-GFX_DIR  = 'graphics'
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 调色板区块地址（ROM 文件偏移）
@@ -238,15 +237,15 @@ def render_icon(rom, tiles_off, palette_off, cols=3, rows=3):
     return img
 
 
-def export_bin_files(rom, opp_dir):
+def export_bin_files(rom, dirs):
     """
     导出供 asm/rom.s 使用的二进制文件：
     - palette_copy1.bin：调色板块（7776 字节，Copy 1 和 Copy 2 内容相同，引用同一文件）
-    - <name>_top_tilemap.bin：每个对手的 Top Tilemap（0x4B0 字节）
-    - <name>_bottom_tilemap.bin：每个对手的 Bottom Tilemap（0x4B0 字节）
+    - <name>_top_tilemap.bin / <name>_bottom_tilemap.bin：每个对手的 tilemap
+    - top_tiles_all.bin / bottom_tiles_all.bin：整块 tile 数据
     """
     # 导出调色板块（Copy 1）
-    pal_bin = os.path.join(opp_dir, 'palette_copy1.bin')
+    pal_bin = os.path.join(dirs['palettes'], 'palette_copy1.bin')
     with open(pal_bin, 'wb') as f:
         f.write(rom[PALETTE_COPY1_OFF : PALETTE_COPY1_OFF + PALETTE_COPY1_SIZE])
     print(f'  → {pal_bin}  ({PALETTE_COPY1_SIZE} 字节)')
@@ -254,7 +253,7 @@ def export_bin_files(rom, opp_dir):
     # 导出 Top 图块整块（因 Electrum 偏移不规则，整段保留）
     TOP_TILES_OFF  = 0x1B1200C
     TOP_TILES_SIZE = 0x36000
-    top_bin = os.path.join(opp_dir, 'top_tiles_all.bin')
+    top_bin = os.path.join(dirs['tiles'], 'top_tiles_all.bin')
     with open(top_bin, 'wb') as f:
         f.write(rom[TOP_TILES_OFF : TOP_TILES_OFF + TOP_TILES_SIZE])
     print(f'  → {top_bin}  ({TOP_TILES_SIZE} 字节)')
@@ -262,7 +261,7 @@ def export_bin_files(rom, opp_dir):
     # 导出 Bottom 图块整块
     BOT_TILES_OFF  = 0x1B51CFC
     BOT_TILES_SIZE = 0x36000
-    bot_bin = os.path.join(opp_dir, 'bottom_tiles_all.bin')
+    bot_bin = os.path.join(dirs['tiles'], 'bottom_tiles_all.bin')
     with open(bot_bin, 'wb') as f:
         f.write(rom[BOT_TILES_OFF : BOT_TILES_OFF + BOT_TILES_SIZE])
     print(f'  → {bot_bin}  ({BOT_TILES_SIZE} 字节)')
@@ -273,8 +272,8 @@ def export_bin_files(rom, opp_dir):
         top_tm_off = TOP_TILEMAP_BASE + i * TILEMAP_SIZE
         bot_tm_off = BOT_TILEMAP_BASE + i * TILEMAP_SIZE
 
-        top_bin = os.path.join(opp_dir, f'{slug}_top_tilemap.bin')
-        bot_bin = os.path.join(opp_dir, f'{slug}_bottom_tilemap.bin')
+        top_bin = os.path.join(dirs['tilemaps'], f'{slug}_top_tilemap.bin')
+        bot_bin = os.path.join(dirs['tilemaps'], f'{slug}_bottom_tilemap.bin')
 
         with open(top_bin, 'wb') as f:
             f.write(rom[top_tm_off : top_tm_off + TILEMAP_SIZE])
@@ -284,7 +283,7 @@ def export_bin_files(rom, opp_dir):
     print(f'  → {len(LARGE_GFX)} 个对手 × 2 tilemap（每个 {TILEMAP_SIZE} 字节）')
 
 
-def export_icon_bins(rom, icon_dir):
+def export_icon_bins(rom, dirs):
     """
     导出小图标二进制文件：
     - <slug>_icon_tiles.bin   图标图块（9 图块 × 32 字节 = 0x120 字节）
@@ -293,9 +292,9 @@ def export_icon_bins(rom, icon_dir):
     ICON_TILE_SIZE = 9 * 32  # 0x120
     ICON_PAL_SIZE  = 0x20
     for slug, tiles_off, pal_off in ICONS:
-        with open(os.path.join(icon_dir, f'{slug}_icon_tiles.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tiles'], f'{slug}_icon_tiles.bin'), 'wb') as f:
             f.write(rom[tiles_off : tiles_off + ICON_TILE_SIZE])
-        with open(os.path.join(icon_dir, f'{slug}_icon_palette.bin'), 'wb') as f:
+        with open(os.path.join(dirs['palettes'], f'{slug}_icon_palette.bin'), 'wb') as f:
             f.write(rom[pal_off : pal_off + ICON_PAL_SIZE])
     print(f'  → {len(ICONS)} 个图标 × 2 bin文件（tiles 0x120 + palette 0x20）')
 
@@ -353,65 +352,56 @@ DUEL_TILEMAP_SIZE = 0x4B0      # 30×20 × 2字节 = 1200 字节
 # 格式大多为 4bpp tile 或 16色子调色板，尺寸按 ROM 上相邻条目差值推定
 # ──────────────────────────────────────────────────────────────────────────────
 HUD_ITEMS = [
-    # (slug,                              rom_off,    size,      说明)
-    ('hud_life_points_font',              0x1850B1C,  0xAC0,    'LP 数字字体 tile（至下一 HUD 项）'),
-    ('hud_phase_highlights_palette',      0x18515DC,  0x20,     'Phase Highlight 对象调色板（md 明确 0x18515DC-0x18515FB）'),
-    ('hud_phases_highlight',              0x18519FC,  0x3650,   'Phases Highlight tile（含尾部未知区，至 Campaign outer image 起点）'),
-    ('hud_phases_tilemap_pointers',       0x1859548,  0x1C,     'LP/阶段 Tilemap 指针表（7 条 × 4 B）'),
-    ('hud_phases_map',                    0x185B184,  0x4B0,    'Phases Map tile（30×20 规模，0x4B0 字节）'),
+    # (slug,                              rom_off,    size,     kind,       说明)
+    ('hud_life_points_font',              0x1850B1C,  0xAC0,    'tiles',    'LP 数字字体 tile（至下一 HUD 项）'),
+    ('hud_phase_highlights_palette',      0x18515DC,  0x20,     'palettes', 'Phase Highlight 对象调色板（md 明确 0x18515DC-0x18515FB）'),
+    ('hud_phases_highlight',              0x18519FC,  0x3650,   'tiles',    'Phases Highlight tile（含尾部未知区，至 Campaign outer image 起点）'),
+    ('hud_phases_tilemap_pointers',       0x1859548,  0x1C,     'tilemaps', 'LP/阶段 Tilemap 指针表（7 条 × 4 B）'),
+    ('hud_phases_map',                    0x185B184,  0x4B0,    'tiles',    'Phases Map tile（30×20 规模，0x4B0 字节）'),
 ]
 
 
-def export_hud_bins(rom, df_dir):
+def export_hud_bins(rom, dirs):
     """导出决斗 HUD 5 类二进制文件（供 asm/rom.s 通过 .incbin 引用）。"""
-    for slug, off, size, _desc in HUD_ITEMS:
-        with open(os.path.join(df_dir, f'{slug}.bin'), 'wb') as f:
+    for slug, off, size, kind, _desc in HUD_ITEMS:
+        with open(os.path.join(dirs[kind], f'{slug}.bin'), 'wb') as f:
             f.write(rom[off : off + size])
     print(f'  → {len(HUD_ITEMS)} 个 HUD bin 文件')
 
 
-def export_duel_field_bins(rom, df_dir):
+def export_duel_field_bins(rom, dirs):
     """
     导出决斗场地数据的二进制文件（供 asm/rom.s 通过 .incbin 引用）。
-
-    外场：
-      <模式>_outer_image.bin      外场图块数据（可变大小）
-      <模式>_outer_tilemap.bin    外场 Tilemap（0x4B0 字节）
-      <模式>_outer_lp_tilemap.bin LP/阶段 Tilemap（0x4B0 字节，与外场图块共用）
-      <模式>_outer_palette.bin    外场调色板（0x40 字节，2个子调色板）
-
-    内场：
-      <模式>_inner_image.bin      内场图块数据（0x1680 字节，180 图块）
-      <模式>_inner_palette.bin    内场调色板（0x20 字节，1个子调色板）
+    tiles/ 装 image，palettes/ 装 palette，tilemaps/ 装 tilemap。
     """
     for i, (slug, img_off, img_size) in enumerate(DUEL_OUTER_IMAGES):
         # 外场图块
-        with open(os.path.join(df_dir, f'{slug}_outer_image.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tiles'], f'{slug}_outer_image.bin'), 'wb') as f:
             f.write(rom[img_off : img_off + img_size])
 
         # 外场 Tilemap
         tm_off = DUEL_OUTER_TILEMAP_BASE + i * DUEL_TILEMAP_SIZE
-        with open(os.path.join(df_dir, f'{slug}_outer_tilemap.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tilemaps'], f'{slug}_outer_tilemap.bin'), 'wb') as f:
             f.write(rom[tm_off : tm_off + DUEL_TILEMAP_SIZE])
 
         # LP/阶段 Tilemap
         lp_off = DUEL_LP_TILEMAP_BASE + i * DUEL_TILEMAP_SIZE
-        with open(os.path.join(df_dir, f'{slug}_outer_lp_tilemap.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tilemaps'], f'{slug}_outer_lp_tilemap.bin'), 'wb') as f:
             f.write(rom[lp_off : lp_off + DUEL_TILEMAP_SIZE])
 
         # 外场调色板
         pal_off = DUEL_OUTER_PAL_BASE + i * DUEL_OUTER_PAL_SIZE
-        with open(os.path.join(df_dir, f'{slug}_outer_palette.bin'), 'wb') as f:
+        with open(os.path.join(dirs['palettes'], f'{slug}_outer_palette.bin'), 'wb') as f:
             f.write(rom[pal_off : pal_off + DUEL_OUTER_PAL_SIZE])
 
         # 内场图块
         inner_img_off = DUEL_INNER_IMAGE_BASE + i * DUEL_INNER_IMAGE_SIZE
-        with open(os.path.join(df_dir, f'{slug}_inner_image.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tiles'], f'{slug}_inner_image.bin'), 'wb') as f:
             f.write(rom[inner_img_off : inner_img_off + DUEL_INNER_IMAGE_SIZE])
 
         # 内场调色板
         inner_pal_off = DUEL_INNER_PAL_BASE + i * DUEL_INNER_PAL_SIZE
-        with open(os.path.join(df_dir, f'{slug}_inner_palette.bin'), 'wb') as f:
+        with open(os.path.join(dirs['palettes'], f'{slug}_inner_palette.bin'), 'wb') as f:
             f.write(rom[inner_pal_off : inner_pal_off + DUEL_INNER_PAL_SIZE])
 
     print(f'  → {len(DUEL_MODES)} 个模式 × 6种bin文件，共 {len(DUEL_MODES)*6} 个文件')
@@ -528,6 +518,16 @@ def render_duel_inner(rom, mode_idx):
 # 主流程
 # ──────────────────────────────────────────────────────────────────────────────
 
+def make_module_dirs(module, kinds):
+    """建立 graphics/bin/<module>/{tiles,palettes,tilemaps}/ + graphics/images/<module>/。"""
+    dirs = {'images': os.path.join('graphics/images', module)}
+    for k in kinds:
+        dirs[k] = os.path.join('graphics/bin', module, k)
+    for d in dirs.values():
+        os.makedirs(d, exist_ok=True)
+    return dirs
+
+
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(os.path.dirname(script_dir))
@@ -535,20 +535,17 @@ def main():
 
     rom = open(ROM_PATH, 'rb').read()
 
-    opp_dir  = os.path.join(GFX_DIR, 'opponents')
-    icon_dir = os.path.join(GFX_DIR, 'icons')
-    df_dir   = os.path.join(GFX_DIR, 'duel-field')
-    os.makedirs(opp_dir,  exist_ok=True)
-    os.makedirs(icon_dir, exist_ok=True)
-    os.makedirs(df_dir,   exist_ok=True)
+    opp_dirs  = make_module_dirs('opponents',  ['tiles', 'palettes', 'tilemaps'])
+    icon_dirs = make_module_dirs('icons',      ['tiles', 'palettes'])
+    df_dirs   = make_module_dirs('duel-field', ['tiles', 'palettes', 'tilemaps'])
 
     # 导出对手二进制文件（供 asm incbin）
     print('导出对手二进制文件...')
-    export_bin_files(rom, opp_dir)
+    export_bin_files(rom, opp_dirs)
 
     # 导出小图标二进制文件（供 asm incbin）
     print('导出小图标二进制文件...')
-    export_icon_bins(rom, icon_dir)
+    export_icon_bins(rom, icon_dirs)
 
     # 导出对手大图 PNG
     print('导出对手大图 PNG...')
@@ -556,10 +553,10 @@ def main():
         slug, top_tiles, top_tm, palette, bot_tiles, bot_tm = entry
 
         top_img = render_tilemap_image(rom, top_tiles, top_tm, palette)
-        top_img.save(os.path.join(opp_dir, f'{slug}_top.png'))
+        top_img.save(os.path.join(opp_dirs['images'], f'{slug}_top.png'))
 
         bot_img = render_tilemap_image(rom, bot_tiles, bot_tm, palette)
-        bot_img.save(os.path.join(opp_dir, f'{slug}_bottom.png'))
+        bot_img.save(os.path.join(opp_dirs['images'], f'{slug}_bottom.png'))
 
         print(f'  {slug}')
 
@@ -567,32 +564,32 @@ def main():
     print('导出小图标 PNG...')
     for slug, tiles_off, pal_off in ICONS:
         icon_img = render_icon(rom, tiles_off, pal_off)
-        icon_img.save(os.path.join(icon_dir, f'{slug}_icon.png'))
+        icon_img.save(os.path.join(icon_dirs['images'], f'{slug}_icon.png'))
         print(f'  {slug}')
 
     # 导出决斗场地二进制文件（供 asm incbin）
     print('导出决斗场地二进制文件...')
-    export_duel_field_bins(rom, df_dir)
+    export_duel_field_bins(rom, df_dirs)
 
     # 导出决斗 HUD 二进制文件（供 asm incbin）
     print('导出决斗 HUD 二进制文件...')
-    export_hud_bins(rom, df_dir)
+    export_hud_bins(rom, df_dirs)
 
     # 导出决斗场地 PNG 预览
     print('导出决斗场地 PNG 预览...')
     for i, mode in enumerate(DUEL_MODES):
         outer_img = render_duel_outer(rom, i)
-        outer_img.save(os.path.join(df_dir, f'{mode}_outer.png'))
+        outer_img.save(os.path.join(df_dirs['images'], f'{mode}_outer.png'))
 
         outer_lp_img = render_duel_outer(rom, i, use_lp_tilemap=True)
-        outer_lp_img.save(os.path.join(df_dir, f'{mode}_outer_lp.png'))
+        outer_lp_img.save(os.path.join(df_dirs['images'], f'{mode}_outer_lp.png'))
 
         inner_img = render_duel_inner(rom, i)
-        inner_img.save(os.path.join(df_dir, f'{mode}_inner.png'))
+        inner_img.save(os.path.join(df_dirs['images'], f'{mode}_inner.png'))
 
         print(f'  {mode}')
 
-    print(f'\n完成。图片保存在 {GFX_DIR}/')
+    print('\n完成。图片保存在 graphics/images/，bin 在 graphics/bin/')
 
 
 if __name__ == '__main__':

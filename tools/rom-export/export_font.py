@@ -10,8 +10,8 @@
 - **VRAM 提交起点**：`0x06010040`（OBJ sprite tile 2）
 
 输出：
-  - graphics/font/font.bin          （2048 B 原始字库）
-  - graphics/font/font_preview.png  （16×16 grid 字符预览）
+  - graphics/bin/font/tiles/font.bin   （2048 B 原始字库）
+  - graphics/images/font/font_preview.png  （16×16 grid 字符预览）
   - data/font.s                      （incbin + 全局标签）
 """
 from __future__ import annotations
@@ -29,9 +29,10 @@ FONT_SIZE = FONT_ROM_END - FONT_ROM_START  # 0x800 = 2048
 NUM_GLYPHS = 256
 GLYPH_BYTES = 8  # 1bpp 8×8
 
-OUT_DIR = Path("graphics/font")
-BIN_PATH = OUT_DIR / "font.bin"
-PNG_PATH = OUT_DIR / "font_preview.png"
+BIN_DIR = Path("graphics/bin/font/tiles")
+IMG_DIR = Path("graphics/images/font")
+BIN_PATH = BIN_DIR / "font.bin"
+PNG_PATH = IMG_DIR / "font_preview.png"
 S_PATH = Path("data/font.s")
 
 
@@ -72,7 +73,7 @@ def write_font_s() -> None:
         "    .balign 2",
         "    .global font_ascii_8x8",
         "font_ascii_8x8:",
-        '    .incbin "graphics/font/font.bin"',
+        '    .incbin "graphics/bin/font/tiles/font.bin"',
         "font_ascii_8x8_end:",
         "",
     ]
@@ -93,7 +94,8 @@ def main() -> int:
     font = rom[FONT_ROM_START:FONT_ROM_END]
     assert len(font) == FONT_SIZE, f"got {len(font)} B, expected {FONT_SIZE}"
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    BIN_DIR.mkdir(parents=True, exist_ok=True)
+    IMG_DIR.mkdir(parents=True, exist_ok=True)
     BIN_PATH.write_bytes(font)
     print(f"写入 {BIN_PATH} ({len(font)} B)")
 

@@ -27,7 +27,7 @@ Start:
 @ ROM 偏移 0x4C7638 - 0x1000000，共约 11.5 MB
 	.incbin "roms/2343.gba", 0x4C7638, 0x88         @ 0x4C7638..0x4C76C0 未知小段
 	.include "data/card-image-palettes.s"           @ 0x4C76C0..0x510440  2331 × 128 B 卡图调色板
-	.incbin "graphics/pack-banners/pack_banner_palette.bin"  @ 0x510440..0x510640 pack banner OBJ 调色板 (256色, 512B)
+	.incbin "graphics/bin/pack-banners/palettes/pack_banner_palette.bin"  @ 0x510440..0x510640 pack banner OBJ 调色板 (256色, 512B)
 	.include "data/card-image-tiles.s"              @ 0x510640..0xFBC080  2331 × 4800 B 6bpp tile 数据
 	.incbin "roms/2343.gba", 0xFBC080, 0x43F80      @ 0xFBC080..0x1000000 tile 区后剩余
 
@@ -72,25 +72,25 @@ Start:
 @ 含外场图块指针表（0x1855030，7条目28字节），紧接着就是外场图块数据
 @ 内嵌 HUD 元素（Life Points Font / Phase Highlights Palette / Phases Highlight）已拆出
 	.incbin "roms/2343.gba", 0x1832602, 0x1E51A     @ seg-C 前段 0x1832602..0x1850B1C
-	.incbin "graphics/duel-field/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
-	.incbin "graphics/duel-field/hud_phase_highlights_palette.bin"  @ 0x18515DC, 0x20
+	.incbin "graphics/bin/duel-field/tiles/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
+	.incbin "graphics/bin/duel-field/palettes/hud_phase_highlights_palette.bin"  @ 0x18515DC, 0x20
 	.incbin "roms/2343.gba", 0x18515FC, 0x400       @ 未知 gap（0x18515FC..0x18519FC）
-	.incbin "graphics/duel-field/hud_phases_highlight.bin"          @ 0x18519FC, 0x3650（至 0x185504C）
+	.incbin "graphics/bin/duel-field/tiles/hud_phases_highlight.bin"          @ 0x18519FC, 0x3650（至 0x185504C）
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
 @ 指针表在 0x1855030（7条目，末条目为终止指针指向 0x185878C），数据从 0x185504C 开始
 @ Campaign（战役）外场图块，ROM 0x185504C，0x9E0 字节（80 图块）
-	.incbin "graphics/duel-field/campaign_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/campaign_outer_image.bin"
 @ Link Duel（联机）外场图块，ROM 0x1855A2C，0x5E0 字节（47 图块）
-	.incbin "graphics/duel-field/link_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/link_outer_image.bin"
 @ Duel Puzzle（谜题）外场图块，ROM 0x185600C，0x7E0 字节（63 图块）
-	.incbin "graphics/duel-field/puzzle_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/puzzle_outer_image.bin"
 @ Limited Duel（限定）外场图块，ROM 0x18567EC，0xDE0 字节（111 图块）
-	.incbin "graphics/duel-field/limited_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/limited_outer_image.bin"
 @ Theme Duel（主题）外场图块，ROM 0x18575CC，0x9E0 字节（80 图块）
-	.incbin "graphics/duel-field/theme_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/theme_outer_image.bin"
 @ Survival Mode（生存）外场图块，ROM 0x1857FAC，0x7E0 字节（63 图块）
-	.incbin "graphics/duel-field/survival_outer_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/survival_outer_image.bin"
 
 @ 未知图块数据 + 外场调色板指针表（7条目28字节，位于 0x185936C）
 @ ROM 0x185878C - 0x185938B，0xBFC 字节
@@ -99,41 +99,41 @@ Start:
 @ ── 外场调色板（6种模式，每个 0x40 字节 = 2个子调色板）────────────────
 @ 指针表在 0x185936C（7条目），数据从 0x1859388 开始
 @ 调色板槽位 9–10 加载进 BG 调色板 RAM；Tilemap 条目主要引用槽位 9
-	.incbin "graphics/duel-field/campaign_outer_palette.bin"
-	.incbin "graphics/duel-field/link_outer_palette.bin"
-	.incbin "graphics/duel-field/puzzle_outer_palette.bin"
-	.incbin "graphics/duel-field/limited_outer_palette.bin"
-	.incbin "graphics/duel-field/theme_outer_palette.bin"
-	.incbin "graphics/duel-field/survival_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/campaign_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/link_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/puzzle_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/limited_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/theme_outer_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/survival_outer_palette.bin"
 
 @ 未知数据 + LP/阶段 Tilemap 指针表（7条目28字节，位于 0x1859548）
 @ ROM 0x1859508 - 0x1859563，0x5C 字节；指针表拆为 HUD bin
 	.incbin "roms/2343.gba", 0x1859508, 0x40        @ 未知前段 0x1859508..0x1859548
-	.incbin "graphics/duel-field/hud_phases_tilemap_pointers.bin"   @ 0x1859548, 0x1C
+	.incbin "graphics/bin/duel-field/tilemaps/hud_phases_tilemap_pointers.bin"   @ 0x1859548, 0x1C
 
 @ ── LP/阶段显示区 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────
 @ 指针表在 0x1859548（7条目），数据从 0x1859564 开始
 @ 与外场 Tilemap 共用同一套外场图块数据和调色板
-	.incbin "graphics/duel-field/campaign_outer_lp_tilemap.bin"
-	.incbin "graphics/duel-field/link_outer_lp_tilemap.bin"
-	.incbin "graphics/duel-field/puzzle_outer_lp_tilemap.bin"
-	.incbin "graphics/duel-field/limited_outer_lp_tilemap.bin"
-	.incbin "graphics/duel-field/theme_outer_lp_tilemap.bin"
-	.incbin "graphics/duel-field/survival_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/campaign_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/link_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/puzzle_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/limited_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/theme_outer_lp_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/survival_outer_lp_tilemap.bin"
 
 @ "Phases Map?" 图块 + 外场 Tilemap 指针表（7条目28字节，位于 0x185B634）
 @ ROM 0x185B184 - 0x185B64F，0x4CC 字节；Phases Map 数据拆为 HUD bin
-	.incbin "graphics/duel-field/hud_phases_map.bin"                @ 0x185B184, 0x4B0
+	.incbin "graphics/bin/duel-field/tiles/hud_phases_map.bin"                @ 0x185B184, 0x4B0
 	.incbin "roms/2343.gba", 0x185B634, 0x1C        @ 外场 Tilemap 指针表（7条目28字节）
 
 @ ── 外场 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────────────
 @ 指针表在 0x185B634（7条目），数据从 0x185B650 开始
-	.incbin "graphics/duel-field/campaign_outer_tilemap.bin"
-	.incbin "graphics/duel-field/link_outer_tilemap.bin"
-	.incbin "graphics/duel-field/puzzle_outer_tilemap.bin"
-	.incbin "graphics/duel-field/limited_outer_tilemap.bin"
-	.incbin "graphics/duel-field/theme_outer_tilemap.bin"
-	.incbin "graphics/duel-field/survival_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/campaign_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/link_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/puzzle_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/limited_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/theme_outer_tilemap.bin"
+	.incbin "graphics/bin/duel-field/tilemaps/survival_outer_tilemap.bin"
 
 @ 内场公共 Tilemap（所有模式共享，0x4B0 字节 = 30×20 图块）
 @ ROM 0x185D270 - 0x185D71F
@@ -141,165 +141,165 @@ Start:
 
 @ ── 内场图块数据（6种模式，每个 0x1680 字节 = 180 图块）────────────────
 @ 数据从 0x185D720 开始（紧接内场公共 Tilemap 后），6 × 0x1680 = 0x8D00 字节
-	.incbin "graphics/duel-field/campaign_inner_image.bin"
-	.incbin "graphics/duel-field/link_inner_image.bin"
-	.incbin "graphics/duel-field/puzzle_inner_image.bin"
-	.incbin "graphics/duel-field/limited_inner_image.bin"
-	.incbin "graphics/duel-field/theme_inner_image.bin"
-	.incbin "graphics/duel-field/survival_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/campaign_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/link_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/puzzle_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/limited_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/theme_inner_image.bin"
+	.incbin "graphics/bin/duel-field/tiles/survival_inner_image.bin"
 
 @ 未知第7内场图块数据，ROM 0x1865E20 - 0x186749F，0x1680 字节
 	.incbin "roms/2343.gba", 0x1865E20, 0x1680
 
 @ ── 内场调色板（6种模式，每个 0x20 字节 = 1个子调色板）────────────────
 @ 数据从 0x18674A0 开始，调色板加载到 BG 调色板槽位 9
-	.incbin "graphics/duel-field/campaign_inner_palette.bin"
-	.incbin "graphics/duel-field/link_inner_palette.bin"
-	.incbin "graphics/duel-field/puzzle_inner_palette.bin"
-	.incbin "graphics/duel-field/limited_inner_palette.bin"
-	.incbin "graphics/duel-field/theme_inner_palette.bin"
-	.incbin "graphics/duel-field/survival_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/campaign_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/link_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/puzzle_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/limited_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/theme_inner_palette.bin"
+	.incbin "graphics/bin/duel-field/palettes/survival_inner_palette.bin"
 
 @ 后 16MB 第一段剩余：ROM 0x1867560 - 0x188DA6F（内场调色板后，小图标图块前）
 	.incbin "roms/2343.gba", 0x1867560, 0x26510
 
 @ ── 小图标图块（27 个对手，每个 9 图块 × 32 字节 = 0x120 字节）────────────────
 @ ROM 0x188DA70 - 0x188F8CF，共 0x1E60 字节
-	.incbin "graphics/icons/kuriboh_icon_tiles.bin"
-	.incbin "graphics/icons/scapegoat_icon_tiles.bin"
-	.incbin "graphics/icons/skull_servant_icon_tiles.bin"
-	.incbin "graphics/icons/watapon_icon_tiles.bin"
-	.incbin "graphics/icons/pikeru_icon_tiles.bin"
-	.incbin "graphics/icons/batteryman_c_icon_tiles.bin"
-	.incbin "graphics/icons/ojama_yellow_icon_tiles.bin"
-	.incbin "graphics/icons/goblin_king_icon_tiles.bin"
-	.incbin "graphics/icons/des_frog_icon_tiles.bin"
-	.incbin "graphics/icons/water_dragon_icon_tiles.bin"
-	.incbin "graphics/icons/redd_icon_tiles.bin"
-	.incbin "graphics/icons/vampire_genesis_icon_tiles.bin"
-	.incbin "graphics/icons/infernal_flame_emperor_icon_tiles.bin"
-	.incbin "graphics/icons/ocean_dragon_lord_icon_tiles.bin"
-	.incbin "graphics/icons/helios_duo_megiste_icon_tiles.bin"
-	.incbin "graphics/icons/gilford_the_legend_icon_tiles.bin"
-	.incbin "graphics/icons/dark_eradicator_warlock_icon_tiles.bin"
-	.incbin "graphics/icons/guardian_exode_icon_tiles.bin"
-	.incbin "graphics/icons/goldd_icon_tiles.bin"
-	.incbin "graphics/icons/elemental_hero_electrum_icon_tiles.bin"
-	.incbin "graphics/icons/raviel_icon_tiles.bin"
-	.incbin "graphics/icons/horus_icon_tiles.bin"
-	.incbin "graphics/icons/stronghold_icon_tiles.bin"
-	.incbin "graphics/icons/sacred_phoenix_icon_tiles.bin"
-	.incbin "graphics/icons/cyber_end_dragon_icon_tiles.bin"
-	.incbin "graphics/icons/mirror_match_icon_tiles.bin"
-	.incbin "graphics/icons/copycat_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/kuriboh_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/scapegoat_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/skull_servant_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/watapon_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/pikeru_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/batteryman_c_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/ojama_yellow_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/goblin_king_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/des_frog_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/water_dragon_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/redd_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/vampire_genesis_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/infernal_flame_emperor_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/ocean_dragon_lord_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/helios_duo_megiste_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/gilford_the_legend_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/dark_eradicator_warlock_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/guardian_exode_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/goldd_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/elemental_hero_electrum_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/raviel_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/horus_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/stronghold_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/sacred_phoenix_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/cyber_end_dragon_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/mirror_match_icon_tiles.bin"
+	.incbin "graphics/bin/icons/tiles/copycat_icon_tiles.bin"
 
 @ 未知数据：ROM 0x188F8D0 - 0x18963CF，0x6B00 字节
 	.incbin "roms/2343.gba", 0x188F8D0, 0x6B00
 
 @ ── 小图标调色板（27 个对手，每个 0x20 字节 = 1 子调色板）────────────────────
 @ ROM 0x18963D0 - 0x189672F，共 0x360 字节
-	.incbin "graphics/icons/kuriboh_icon_palette.bin"
-	.incbin "graphics/icons/scapegoat_icon_palette.bin"
-	.incbin "graphics/icons/skull_servant_icon_palette.bin"
-	.incbin "graphics/icons/watapon_icon_palette.bin"
-	.incbin "graphics/icons/pikeru_icon_palette.bin"
-	.incbin "graphics/icons/batteryman_c_icon_palette.bin"
-	.incbin "graphics/icons/ojama_yellow_icon_palette.bin"
-	.incbin "graphics/icons/goblin_king_icon_palette.bin"
-	.incbin "graphics/icons/des_frog_icon_palette.bin"
-	.incbin "graphics/icons/water_dragon_icon_palette.bin"
-	.incbin "graphics/icons/redd_icon_palette.bin"
-	.incbin "graphics/icons/vampire_genesis_icon_palette.bin"
-	.incbin "graphics/icons/infernal_flame_emperor_icon_palette.bin"
-	.incbin "graphics/icons/ocean_dragon_lord_icon_palette.bin"
-	.incbin "graphics/icons/helios_duo_megiste_icon_palette.bin"
-	.incbin "graphics/icons/gilford_the_legend_icon_palette.bin"
-	.incbin "graphics/icons/dark_eradicator_warlock_icon_palette.bin"
-	.incbin "graphics/icons/guardian_exode_icon_palette.bin"
-	.incbin "graphics/icons/goldd_icon_palette.bin"
-	.incbin "graphics/icons/elemental_hero_electrum_icon_palette.bin"
-	.incbin "graphics/icons/raviel_icon_palette.bin"
-	.incbin "graphics/icons/horus_icon_palette.bin"
-	.incbin "graphics/icons/stronghold_icon_palette.bin"
-	.incbin "graphics/icons/sacred_phoenix_icon_palette.bin"
-	.incbin "graphics/icons/cyber_end_dragon_icon_palette.bin"
-	.incbin "graphics/icons/mirror_match_icon_palette.bin"
-	.incbin "graphics/icons/copycat_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/kuriboh_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/scapegoat_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/skull_servant_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/watapon_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/pikeru_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/batteryman_c_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/ojama_yellow_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/goblin_king_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/des_frog_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/water_dragon_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/redd_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/vampire_genesis_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/infernal_flame_emperor_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/ocean_dragon_lord_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/helios_duo_megiste_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/gilford_the_legend_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/dark_eradicator_warlock_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/guardian_exode_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/goldd_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/elemental_hero_electrum_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/raviel_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/horus_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/stronghold_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/sacred_phoenix_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/cyber_end_dragon_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/mirror_match_icon_palette.bin"
+	.incbin "graphics/bin/icons/palettes/copycat_icon_palette.bin"
 
 @ ROM 0x1896730 - 0x1B101AB
 	.incbin "roms/2343.gba", 0x1896730, 0x279A7C
 
 @ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
 @ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
-	.incbin "graphics/opponents/palette_copy1.bin"
+	.incbin "graphics/bin/opponents/palettes/palette_copy1.bin"
 
 @ Top 图块整块，ROM 0x1B1200C–0x1B4800B，221184 字节（27 × 0x2000）
 @ 注意：第 20 个对手 Elemental Hero Electrum 图块偏移不规则（0x1B3899C），整段统一保留
-	.incbin "graphics/opponents/top_tiles_all.bin"
+	.incbin "graphics/bin/opponents/tiles/top_tiles_all.bin"
 
 @ Top Tilemap（27 个对手），ROM 0x1B4800C–0x1B4FE9B，每个 0x4B0 字节
-	.incbin "graphics/opponents/kuriboh_top_tilemap.bin"
-	.incbin "graphics/opponents/scapegoat_top_tilemap.bin"
-	.incbin "graphics/opponents/skull_servant_top_tilemap.bin"
-	.incbin "graphics/opponents/watapon_top_tilemap.bin"
-	.incbin "graphics/opponents/pikeru_top_tilemap.bin"
-	.incbin "graphics/opponents/batteryman_c_top_tilemap.bin"
-	.incbin "graphics/opponents/ojama_yellow_top_tilemap.bin"
-	.incbin "graphics/opponents/goblin_king_top_tilemap.bin"
-	.incbin "graphics/opponents/des_frog_top_tilemap.bin"
-	.incbin "graphics/opponents/water_dragon_top_tilemap.bin"
-	.incbin "graphics/opponents/redd_top_tilemap.bin"
-	.incbin "graphics/opponents/vampire_genesis_top_tilemap.bin"
-	.incbin "graphics/opponents/infernal_flame_emperor_top_tilemap.bin"
-	.incbin "graphics/opponents/ocean_dragon_lord_top_tilemap.bin"
-	.incbin "graphics/opponents/helios_duo_megiste_top_tilemap.bin"
-	.incbin "graphics/opponents/gilford_the_legend_top_tilemap.bin"
-	.incbin "graphics/opponents/dark_eradicator_warlock_top_tilemap.bin"
-	.incbin "graphics/opponents/guardian_exode_top_tilemap.bin"
-	.incbin "graphics/opponents/goldd_top_tilemap.bin"
-	.incbin "graphics/opponents/elemental_hero_electrum_top_tilemap.bin"
-	.incbin "graphics/opponents/raviel_top_tilemap.bin"
-	.incbin "graphics/opponents/horus_top_tilemap.bin"
-	.incbin "graphics/opponents/stronghold_top_tilemap.bin"
-	.incbin "graphics/opponents/sacred_phoenix_top_tilemap.bin"
-	.incbin "graphics/opponents/cyber_end_dragon_top_tilemap.bin"
-	.incbin "graphics/opponents/mirror_match_top_tilemap.bin"
-	.incbin "graphics/opponents/copycat_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/kuriboh_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/scapegoat_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/skull_servant_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/watapon_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/pikeru_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/batteryman_c_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/ojama_yellow_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/goblin_king_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/des_frog_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/water_dragon_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/redd_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/vampire_genesis_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/infernal_flame_emperor_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/ocean_dragon_lord_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/helios_duo_megiste_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/gilford_the_legend_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/dark_eradicator_warlock_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/guardian_exode_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/goldd_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/elemental_hero_electrum_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/raviel_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/horus_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/stronghold_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/sacred_phoenix_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/cyber_end_dragon_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/mirror_match_top_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/copycat_top_tilemap.bin"
 
 @ 调色板块（Copy 2），ROM 0x1B4FE9C–0x1B51CFB，7776 字节（内容与 Copy 1 完全相同）
-	.incbin "graphics/opponents/palette_copy1.bin"
+	.incbin "graphics/bin/opponents/palettes/palette_copy1.bin"
 
 @ Bottom 图块整块，ROM 0x1B51CFC–0x1B87CFB，221184 字节（27 × 0x2000）
-	.incbin "graphics/opponents/bottom_tiles_all.bin"
+	.incbin "graphics/bin/opponents/tiles/bottom_tiles_all.bin"
 
 @ Bottom Tilemap（27 个对手），ROM 0x1B87CFC–0x1B8FB8B，每个 0x4B0 字节
-	.incbin "graphics/opponents/kuriboh_bottom_tilemap.bin"
-	.incbin "graphics/opponents/scapegoat_bottom_tilemap.bin"
-	.incbin "graphics/opponents/skull_servant_bottom_tilemap.bin"
-	.incbin "graphics/opponents/watapon_bottom_tilemap.bin"
-	.incbin "graphics/opponents/pikeru_bottom_tilemap.bin"
-	.incbin "graphics/opponents/batteryman_c_bottom_tilemap.bin"
-	.incbin "graphics/opponents/ojama_yellow_bottom_tilemap.bin"
-	.incbin "graphics/opponents/goblin_king_bottom_tilemap.bin"
-	.incbin "graphics/opponents/des_frog_bottom_tilemap.bin"
-	.incbin "graphics/opponents/water_dragon_bottom_tilemap.bin"
-	.incbin "graphics/opponents/redd_bottom_tilemap.bin"
-	.incbin "graphics/opponents/vampire_genesis_bottom_tilemap.bin"
-	.incbin "graphics/opponents/infernal_flame_emperor_bottom_tilemap.bin"
-	.incbin "graphics/opponents/ocean_dragon_lord_bottom_tilemap.bin"
-	.incbin "graphics/opponents/helios_duo_megiste_bottom_tilemap.bin"
-	.incbin "graphics/opponents/gilford_the_legend_bottom_tilemap.bin"
-	.incbin "graphics/opponents/dark_eradicator_warlock_bottom_tilemap.bin"
-	.incbin "graphics/opponents/guardian_exode_bottom_tilemap.bin"
-	.incbin "graphics/opponents/goldd_bottom_tilemap.bin"
-	.incbin "graphics/opponents/elemental_hero_electrum_bottom_tilemap.bin"
-	.incbin "graphics/opponents/raviel_bottom_tilemap.bin"
-	.incbin "graphics/opponents/horus_bottom_tilemap.bin"
-	.incbin "graphics/opponents/stronghold_bottom_tilemap.bin"
-	.incbin "graphics/opponents/sacred_phoenix_bottom_tilemap.bin"
-	.incbin "graphics/opponents/cyber_end_dragon_bottom_tilemap.bin"
-	.incbin "graphics/opponents/mirror_match_bottom_tilemap.bin"
-	.incbin "graphics/opponents/copycat_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/kuriboh_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/scapegoat_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/skull_servant_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/watapon_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/pikeru_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/batteryman_c_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/ojama_yellow_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/goblin_king_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/des_frog_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/water_dragon_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/redd_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/vampire_genesis_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/infernal_flame_emperor_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/ocean_dragon_lord_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/helios_duo_megiste_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/gilford_the_legend_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/dark_eradicator_warlock_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/guardian_exode_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/goldd_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/elemental_hero_electrum_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/raviel_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/horus_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/stronghold_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/sacred_phoenix_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/cyber_end_dragon_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/mirror_match_bottom_tilemap.bin"
+	.incbin "graphics/bin/opponents/tilemaps/copycat_bottom_tilemap.bin"
 
 @ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019（内嵌英文字库已拆出）
 	.incbin "roms/2343.gba", 0x1B8FB8C, 0x13CF04   @ 0x1B8FB8C..0x1CCCA90 字库前段

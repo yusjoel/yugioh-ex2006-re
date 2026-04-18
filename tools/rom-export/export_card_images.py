@@ -13,7 +13,10 @@
 用法：
     python tools/rom-export/export_card_images.py [--flag 1] [--gray]
 
-输出目录：graphics/card-images/（已 .gitignore）
+输出目录：
+  graphics/images/card-images/      PNG（已 .gitignore graphics/）
+  graphics/bin/card-images/palettes/tb{N:04d}.bin  调色板 bin
+  graphics/bin/card-images/tiles/tb{N:04d}.bin     tile bin
 文件命名：card_{card_id:04d}_tb{tile_block:04d}.png
       另：每个 tile_block 唯一数据只解码一次，异画卡共享同一 tile_block
       的情况下，会产出多个文件名指向同一图像（用软拷贝策略：第二个及以后
@@ -30,7 +33,7 @@ from pathlib import Path
 from PIL import Image
 
 ROM_PATH = Path("roms/2343.gba")
-OUT_DIR = Path("graphics/card-images")
+OUT_DIR = Path("graphics/images/card-images")
 STATS_BASE_ROM = 0x018169B6   # card-stats.s 起始 ROM 偏移
 STATS_STRIDE = 22             # 每条记录字节数
 EN_NAMES_BASE_ROM = 0x015BB5AC  # 欧洲卡名表 ROM 起始（每卡 5 个 CP1252 字符串）
@@ -46,7 +49,7 @@ CARDS_IDS_ARR_ROM_START = 0x015B7CCC  # internal_card_id (4007..7078) → card_i
 CARDS_IDS_ARR_ROM_END   = 0x015B94CC  # 3072 × u16 = 0x1800
 CARDS_IDS_ARR_BASE_ID   = 4007        # internal_card_id 起始（0x0FA7 = Blue-Eyes）
 
-BLOB_DIR = Path("graphics/card-images-rom")       # bin 根目录（已 .gitignore graphics/）
+BLOB_DIR = Path("graphics/bin/card-images")       # bin 根目录（已 .gitignore graphics/）
 PAL_BLOB_DIR = BLOB_DIR / "palettes"              # 2331 × 128 B
 TILE_BLOB_DIR = BLOB_DIR / "tiles"                # 2331 × 4800 B
 INDEX_S_PATH = Path("data/card-image-index.s")    # 索引表 .s（显式 .hword）
@@ -236,7 +239,7 @@ def dump_rom_blobs(rom: bytes) -> None:
     ]
     for tb in range(NUM_TILE_BLOCKS):
         pal_lines.append(
-            f'    .incbin "graphics/card-images-rom/palettes/tb{tb:04d}.bin"')
+            f'    .incbin "graphics/bin/card-images/palettes/tb{tb:04d}.bin"')
     PAL_S_PATH.write_text("\n".join(pal_lines) + "\n", encoding="utf-8")
 
     # 生成 tiles.s
@@ -249,7 +252,7 @@ def dump_rom_blobs(rom: bytes) -> None:
     ]
     for tb in range(NUM_TILE_BLOCKS):
         tile_lines.append(
-            f'    .incbin "graphics/card-images-rom/tiles/tb{tb:04d}.bin"')
+            f'    .incbin "graphics/bin/card-images/tiles/tb{tb:04d}.bin"')
     TILE_S_PATH.write_text("\n".join(tile_lines) + "\n", encoding="utf-8")
 
     print(f"写入 {PAL_BLOB_DIR}/ 下 {NUM_TILE_BLOCKS} 个 tb*.bin"

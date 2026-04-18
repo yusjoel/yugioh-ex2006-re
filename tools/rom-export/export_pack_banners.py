@@ -19,8 +19,9 @@ ROM 中连续存储 (每行 256B, 8 行)；加载时按 2D OBJ mapping 展开
   卡图调色板区末尾，紧接 card-image-palettes.s 之后
 
 产出:
-  graphics/pack-banners/pack_XX_banner.bin   tile 二进制 (0x800B each, 不入库)
-  graphics/pack-banners/pack_XX_banner.png   彩色预览 (不入库)
+  graphics/bin/pack-banners/tiles/pack_XX_banner.bin   tile 二进制 (0x800B each, 不入库)
+  graphics/bin/pack-banners/palettes/pack_banner_palette.bin  OBJ 调色板 (512B, 不入库)
+  graphics/images/pack-banners/pack_XX_banner.png      彩色预览 (不入库)
   data/pack-banners.s                        指针表 + .incbin 汇编 (入库)
 """
 
@@ -29,7 +30,9 @@ import struct
 from PIL import Image
 
 ROM_PATH = 'roms/2343.gba'
-GFX_DIR  = 'graphics/pack-banners'
+TILES_DIR    = 'graphics/bin/pack-banners/tiles'
+PALETTES_DIR = 'graphics/bin/pack-banners/palettes'
+IMAGES_DIR   = 'graphics/images/pack-banners'
 ASM_OUT  = 'data/pack-banners.s'
 
 # ROM 布局常量
@@ -165,7 +168,7 @@ def generate_asm(rom):
         rom_off = ptr - 0x08000000
         name = PACK_NAMES[i] if i < len(PACK_NAMES) else f'PACK {i}'
         lines.append(f'pack_banner_{i:02d}:                                     @ {name}')
-        lines.append(f'        .incbin "graphics/pack-banners/pack_{i:02d}_banner.bin"')
+        lines.append(f'        .incbin "graphics/bin/pack-banners/tiles/pack_{i:02d}_banner.bin"')
 
     return '\n'.join(lines) + '\n'
 
@@ -176,10 +179,11 @@ def main():
     os.chdir(project_root)
 
     rom = open(ROM_PATH, 'rb').read()
-    os.makedirs(GFX_DIR, exist_ok=True)
+    for d in (TILES_DIR, PALETTES_DIR, IMAGES_DIR):
+        os.makedirs(d, exist_ok=True)
 
     # 导出调色板 bin
-    pal_bin = os.path.join(GFX_DIR, 'pack_banner_palette.bin')
+    pal_bin = os.path.join(PALETTES_DIR, 'pack_banner_palette.bin')
     with open(pal_bin, 'wb') as f:
         f.write(rom[PALETTE_OFF : PALETTE_OFF + 512])
     print(f'调色板: {pal_bin} (512 bytes)')
@@ -192,12 +196,12 @@ def main():
         ptr = struct.unpack_from('<I', rom, PTR_TABLE_OFF + i * 4)[0]
         tile_off = ptr - 0x08000000
 
-        bin_path = os.path.join(GFX_DIR, f'pack_{i:02d}_banner.bin')
+        bin_path = os.path.join(TILES_DIR, f'pack_{i:02d}_banner.bin')
         with open(bin_path, 'wb') as f:
             f.write(rom[tile_off : tile_off + PACK_TILE_SIZE])
 
         img = render_pack_banner(rom, tile_off, palette)
-        img.save(os.path.join(GFX_DIR, f'pack_{i:02d}_banner.png'))
+        img.save(os.path.join(IMAGES_DIR, f'pack_{i:02d}_banner.png'))
 
         name = PACK_NAMES[i] if i < len(PACK_NAMES) else f'PACK {i}'
         print(f'  [{i:2d}] {name}')
@@ -207,13 +211,6 @@ def main():
     with open(ASM_OUT, 'w', encoding='utf-8') as f:
         f.write(asm_content)
     print(f'\n汇编文件: {ASM_OUT}')
-
-    # 清理不再需要的 ptrtable bin
-    ptrtable_bin = os.path.join(GFX_DIR, 'pack_banner_ptrtable.bin')
-    if os.path.exists(ptrtable_bin):
-        os.remove(ptrtable_bin)
-        print(f'已删除: {ptrtable_bin}')
-
     print(f'\n完成。')
 
 

@@ -51,9 +51,21 @@ clean.bat    @ 清理编译产物
 │   ├── file-paths.s         # 339 条内部文件路径（ROM 0x1E6118C）
 │   ├── fs-tables.s          # 内嵌 FS 索引表（offset_table+size_table, ROM 0x1E63BE8）
 │   └── duel-puzzles.s       # 35 块决斗题目存档模板（ROM 0x1EB90D8）
-├── graphics/             # 图形资产（不含于仓库，由 tools/rom-export/export_gfx.py 生成）
-│   ├── opponents/        # 对手大图 PNG + tilemap.bin + palette_copy1.bin
-│   └── icons/            # 对手小图标 PNG
+├── graphics/             # 图形资产（不含于仓库，由 tools/rom-export/export_all.py 生成）
+│   ├── bin/              # ROM 原始二进制，asm/rom.s + data/*.s 通过 .incbin 引用
+│   │   ├── card-images/    tiles/ + palettes/          (2331 tile_block × 2)
+│   │   ├── duel-field/     tiles/ + palettes/ + tilemaps/  (6 模式 + HUD)
+│   │   ├── font/           tiles/font.bin               (英文 1bpp 字库)
+│   │   ├── icons/          tiles/ + palettes/           (27 对手小图标)
+│   │   ├── opponents/      tiles/ + palettes/ + tilemaps/  (27 大图)
+│   │   └── pack-banners/   tiles/ + palettes/           (51 卡包封面)
+│   └── images/           # PNG 预览
+│       ├── card-images/    card_XXXX[_ocg|_tcg].png
+│       ├── duel-field/     <模式>_{inner,outer,outer_lp}.png
+│       ├── font/           font_preview.png
+│       ├── icons/          <对手>_icon.png
+│       ├── opponents/      <对手>_{top,bottom}.png
+│       └── pack-banners/   pack_XX_banner.png
 ├── tools/                # 开发工具脚本（详见下文「工具脚本」）
 │   ├── arm-none-eabi-gdb.exe   # GDB 10.2（不入库，手动放入）
 │   ├── rom-export/       # ROM → data/*.s、graphics/
