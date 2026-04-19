@@ -8,7 +8,7 @@
 
 | 优先级 | ID | 内容 | 备注 |
 |---|---|---|---|
-| ⭐⭐ | **P2-palette** | 卡列表小图 OBJ 256 色调色板 ROM 源未定位 | 候选路径见 `doc/dev/card-list-image-export.md` §"未解决：调色板"；可复用 `doc/temp/palram_state*.bin` 做 diff |
+| ~~⭐⭐~~ | ~~**P2-palette**~~ | ~~卡列表小图 OBJ 256 色调色板 ROM 源未定位~~ | ✓ **2026-04-19 完成**：card-mini-frame 有 OBJ + BG 两套调色板（ROM 0x09E31614 / 0x08510460），模块已从 `card-list-images` 重命名。详见 `doc/dev/card-mini-frame-export.md` |
 | ⭐ | **T2.3** | `tools/import_gfx.py`（PNG → 4bpp tiles + tilemap.bin → 回写 ROM） | 反向实现现有导出 |
 
 ---

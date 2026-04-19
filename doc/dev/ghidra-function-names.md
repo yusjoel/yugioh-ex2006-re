@@ -56,7 +56,7 @@
 | `FUN_080d8f84` | `pack_detail_bg_tile_load` | `0x080D8F84` | EWRAM 记录 → BG VRAM `0x06000240`，含 pack cost | pack_entry_init 后续调用 |
 | `FUN_080f74d4` | `tile_2d_row_copy` | `0x080F74D4` | 按行拷贝 tile 到 2D OBJ VRAM（dest stride 0x400），130 次调用 | overlay 加载器使用 |
 
-## 第四轮（2026-04-18）card-list-palette
+## 第四轮（2026-04-18）card-mini-frame
 
 | 原名 (FUN_*) | 新名称 | 地址 | 功能 | 证据 |
 |--------------|--------|------|------|------|

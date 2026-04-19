@@ -8,7 +8,6 @@
 注意事项:
 - export_card_data.py 必须最先跑（生成 card-names.s，其他 7 个脚本依赖它）。
 - 其余脚本相互独立，按稳定顺序执行。
-- 不含 stash 中的 export_card_list_images.py（card-list 小图仍在开发）。
 """
 
 import importlib.util
@@ -32,6 +31,7 @@ EXPORT_PIPELINE = [
     'export_duel_puzzles.py',           # data/duel-puzzles.s
     'export_font.py',                   # data/font.s + graphics/font/*
     'export_pack_banners.py',           # data/pack-banners.s + graphics/pack-banners/*
+    'export_card_mini_frame.py',        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
     'export_deck_strings.py',           # data/deck-strings.s
 
     # Step 3: 依赖 card-names.s 的脚本

@@ -173,11 +173,13 @@ card_name_ptr = string_pool_base + offsets[name_index]
 
 ---
 
-## 三、卡牌列表小图（OBJ sprite）
+## 三、card-mini-frame（带框小卡图，portrait + landscape）
 
-> **2026-04-15 重大修正**：旧版本本节基于仅凭"区间大小 / 2240 整除 = 2054"
-> 的推测，结论全错。实际通过 `asm/all.s` L231102 `FUN_080c33bc` 静态分析得出
-> 正确布局。详细调查见 `doc/dev/card-list-image-export.md`。
+> **2026-04-15 重大修正**：旧版本本节基于"区间大小 / 2240 整除 = 2054"的推测，
+> 结论全错。通过 `asm/all.s` L231102 `FUN_080c33bc` 静态分析得出正确布局。  
+> **2026-04-19 扩展**：发现 deck list 屏以 BG2 8bpp 渲染同一 tile 数据但用不同
+> 调色板（ROM 0x00510460），模块重命名为 card-mini-frame。详见
+> `doc/dev/card-mini-frame-export.md`。
 
 ### 图像区位置与格式（已验证）
 
@@ -196,17 +198,16 @@ card_name_ptr = string_pool_base + offsets[name_index]
 > 区间 `0x01000000..0x01326280`（3.3 MB）**不是卡图**，是 UI/字体/其他资产，
 > 具体结构待进一步调查（原 T6.3 议题）。
 
-### 调色板（调查中）
+### 调色板（两套，已确认）
 
-小卡图是 OBJ sprite，8bpp → 需 256 色 OBJ 调色板（`0x05000200..0x05000400`，
-512 B）。调色板 ROM 源地址尚未定位。候选方向：
+card-mini-frame 在不同屏幕使用不同调色板：
 
-- `[0x01000000, 0x01326280)` 区间内可能内嵌 palette
-- 调色板可能与大卡图共享 `0x084C76C0`（待验证）
-- 与大卡图类似的 per-card 128 B palette（未定位基址）
+- **OBJ 版**（card list selection 屏）：ROM 0x01E31614 主 256B + 0x01E31554/74
+  辅助段，合计 448B
+- **BG 版**（deck list 屏，BG2 8bpp）：ROM 0x00510460，256B（colors 16-143）；
+  colors 0-15 恒透明。该段物理位于 pack_banner_palette (0x510440..0x510640) 中。
 
-脚本 `tools/rom-export/export_card_list_images.py` 当前仅支持灰度输出，
-palette 解锁后 `--palette <bin>` 参数即可上色。
+详见 `doc/dev/card-mini-frame-export.md`。
 
 ### 图像索引映射
 
@@ -226,10 +227,10 @@ Blue-Eyes（card_id=1）、DESPAIR（card_id=1323）的 tile_block 与大卡图*
 
 ### 导出状态
 
-- 脚本：`tools/rom-export/export_card_list_images.py`
-- 输出：`graphics/card-images-list/card_NNNN_tbMMMM.png`
-- 首次运行：2108 张唯一 tile_block 导出为灰度 24×48 PNG
-- 待完成：**调色板定位**（当前纯灰度；palette 解锁后可直接上色）
+- 脚本：`tools/rom-export/export_card_mini_frame.py`
+- 输出：`graphics/images/card-mini-frame/{obj,bg}/card_NNNN[_ocg|_tcg].png`
+  （24×48 彩色 RGBA，OBJ + BG 两套调色板各一份）
+- .s：`data/card-mini-frame.s` + `data/card-mini-frame-palette.s`
 
 ---
 

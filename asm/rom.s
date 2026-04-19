@@ -31,8 +31,12 @@ Start:
 	.include "data/card-image-tiles.s"              @ 0x510640..0xFBC080  2331 × 4800 B 6bpp tile 数据
 	.incbin "roms/2343.gba", 0xFBC080, 0x43F80      @ 0xFBC080..0x1000000 tile 区后剩余
 
-@ 后 16MB 第一段前半 seg-A-1：ROM偏移 0x1000000 - 0x15B5BFF（卡图索引表前）
-	.incbin "roms/2343.gba", 0x1000000, 0x5B5C00
+@ 后 16MB 第一段前半 seg-A-1 前部：ROM偏移 0x1000000 - 0x132627F（卡列表 tile 前）
+	.incbin "roms/2343.gba", 0x1000000, 0x326280
+
+@ card-mini-frame tile 数据（ROM偏移 0x1326280 - 0x15B5BFF）
+@ 2331 tile_block × 1152 B = 0x28F980，末尾紧接 card-image-index.s
+	.include "data/card-mini-frame.s"
 
 @ 卡牌大图索引表（ROM偏移 0x15B5C00 - 0x15B7CCB）
 @ 2099 cards × 2 × u16 = 8396 B = 0x20CC（card_id 0..2098）
@@ -324,8 +328,14 @@ Start:
 @ 含 5 种语言（EN/DE/FR/IT/ES）的完整游戏文本，共 242610 字节
 	.include "data/game-strings.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1DFF9D2 - 0x1E58D0D（游戏文本后，对手卡值前）
-	.incbin "roms/2343.gba", 0x1DFF9D2, 0x5933C
+@ 后 16MB 中间段前部：ROM偏移 0x1DFF9D2 - 0x1E31553（游戏文本后，卡列表调色板前）
+	.incbin "roms/2343.gba", 0x1DFF9D2, 0x31B82
+
+@ card-mini-frame OBJ 调色板（ROM偏移 0x1E31554 - 0x1E31713，0x1C0 B）
+	.include "data/card-mini-frame-palette.s"
+
+@ 后 16MB 中间段后部：ROM偏移 0x1E31714 - 0x1E58D0D（调色板后，对手卡值前）
+	.incbin "roms/2343.gba", 0x1E31714, 0x275FA
 
 @ 对手卡值块数据（ROM偏移 0x1E58D0E - 0x1E5906D）
 @ 27 个对手条目，每条 32 字节，共 0x360 字节

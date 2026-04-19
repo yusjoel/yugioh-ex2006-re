@@ -44,6 +44,8 @@ clean.bat    @ 清理编译产物
 │   ├── pack-banners.s         # 51 张卡包封面指针表 + .incbin tile（ROM 0x1CCE960）
 │   ├── pack-card-lists.s      # 45 个 pack 卡牌列表 + 51 条 pack 信息表（ROM 0x1E5ABFC）
 │   ├── card-descriptions.s   # 39 张卡效果描述 + 数据表 + 指针表（ROM 0x1800000）
+│   ├── card-mini-frame.s          # 带框小卡图 tile 数据（card_mini_frame_tile_data, ROM 0x1326280, 2,685,312 B）
+│   ├── card-mini-frame-palette.s  # 带框小卡图 OBJ 调色板（card_mini_frame_pal_main 等, ROM 0x1E31554）
 │   ├── card-image-index.s   # 卡牌大图索引（card_id 0..2098, ROM 0x15B5C00）
 │   ├── cards-ids-array.s    # internal_card_id → card_id 反向映射表（ROM 0x15B7CCC）
 │   ├── card-name-pointer-table.s  # 12,612 × u32 卡名指针表（ROM 0x15F3A5C）
@@ -103,6 +105,7 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_card_name_pointer_table.py` | ROM → `data/card-name-pointer-table.s`（12,612 × u32 卡名指针表，按 `card_id*6 + lang` 索引） |
 | `tools/rom-export/export_card_effect_text.py` | ROM → `data/card-effect-text.s`（2014 张卡效果全文 × 6 语言） |
 | `tools/rom-export/export_card_images.py` | ROM → `data/card-image-index.s` + `data/cards-ids-array.s`（含 `internal_card_id → card_id` 反向映射）+ `graphics/card-images-rom/` |
+| `tools/rom-export/export_card_mini_frame.py` | ROM → `data/card-mini-frame{,-palette}.s` + `graphics/bin/card-mini-frame/` + 彩色 PNG 两套（OBJ 用 ROM 0x1E31614；BG 用 ROM 0x00510460） |
 | `tools/rom-export/export_file_paths.py` | ROM → `data/file-paths.s`（339 条内部文件路径） |
 | `tools/rom-export/export_fs_tables.py` | ROM → `data/fs-tables.s`（offset_table 339×u32 + size_table 340×u32，FS 索引表） |
 | `tools/rom-export/export_banlists.py` | ROM → `data/banlists.s`（8 个版本禁卡表，487 条目） |
