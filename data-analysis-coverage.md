@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**18,248,716 B（63.93%）**
-- 未分析：**10,294,716 B（36.07%）**
+- 已分析：**21,829,132 B（76.48%）**
+- 未分析：**6,714,300 B（23.52%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -18,12 +18,10 @@
 
 | 起址 | 大小 | 字节数 | 备注 |
 |---:|---:|---:|---|
-| `0x01000000` | `0x326280` | 3,302,016 | 后 16MB 第一段前半前部（卡列表 tile 前） |
 | `0x01896730` | `0x279A7C` | 2,595,452 | 小图标调色板后，对手调色板 Copy1 前 |
 | `0x01B8FB8C` | `0x13CF04` | 1,298,180 | 后 16MB 第一段剩余，字库前段 |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | FS 后尾段 |
 | `0x01CE822C` | `0xD6DEE` | 880,110 | 字库后段后部 |
-| `0x00FBC080` | `0x43F80` | 278,400 | 大卡图 tile 区后剩余 |
 | `0x01DFF9D2` | `0x31B82` | 203,650 | 游戏文本后，卡列表调色板前 |
 | `0x01E31714` | `0x275FA` | 161,274 | 调色板后，对手卡值前 |
 | `0x01867560` | `0x26510` | 156,944 | 内场调色板后，小图标图块前 |
@@ -44,7 +42,7 @@
 | `0x01859508` | `0x40` | 64 | LP/阶段 Tilemap 指针表前未知段 |
 | `0x0185B634` | `0x1C` | 28 | 外场 Tilemap 指针表 |
 
-**合计**：25 段，10,294,716 B（36.07% 数据区）
+**合计**：23 段，6,714,300 B（23.52% 数据区）
 
 ## 全部段（按 ROM 地址顺序）
 
@@ -54,8 +52,7 @@
 | `0x004C76C0` | `0x48D80` | 298,368 | ✓ 已分析 | card-image-palettes | `.include data/card-image-palettes.s` |
 | `0x00510440` | `0x200` | 512 | ✓ 已分析 | pack-banners (palette, shared) | `.incbin graphics/bin/pack-banners/palettes/pack_banner_palette.bin` |
 | `0x00510640` | `0xAABA40` | 11,188,800 | ✓ 已分析 | card-image-tiles | `.include data/card-image-tiles.s` |
-| `0x00FBC080` | `0x43F80` | 278,400 | ✗ 未分析 | 大卡图 tile 区后剩余 | raw `.incbin roms/2343.gba` |
-| `0x01000000` | `0x326280` | 3,302,016 | ✗ 未分析 | 后 16MB 第一段前半前部（卡列表 tile 前） | raw `.incbin roms/2343.gba` |
+| `0x00FBC080` | `0x36A200` | 3,580,416 | ✓ 已分析 | card-medium-frame | `.include data/card-medium-frame.s` |
 | `0x01326280` | `0x28F980` | 2,685,312 | ✓ 已分析 | card-mini-frame | `.include data/card-mini-frame.s` |
 | `0x015B5C00` | `0x20CC` | 8,396 | ✓ 已分析 | card-image-index | `.include data/card-image-index.s` |
 | `0x015B7CCC` | `0x1800` | 6,144 | ✓ 已分析 | cards-ids-array | `.include data/cards-ids-array.s` |
@@ -117,4 +114,4 @@
 | `0x01E64684` | `0x70350` | 459,600 | ✓ 已分析 | fs-payload (338 files via fs/) | `.include data/fs-payload.s` |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
 
-**合计**：66 段（41 已分析 + 25 未分析），28,543,432 B
+**合计**：65 段（42 已分析 + 23 未分析），28,543,432 B

@@ -29,10 +29,11 @@ Start:
 	.include "data/card-image-palettes.s"           @ 0x4C76C0..0x510440  2331 × 128 B 卡图调色板
 	.incbin "graphics/bin/pack-banners/palettes/pack_banner_palette.bin"  @ 0x510440..0x510640 pack banner OBJ 调色板 (256色, 512B)
 	.include "data/card-image-tiles.s"              @ 0x510640..0xFBC080  2331 × 4800 B 6bpp tile 数据
-	.incbin "roms/2343.gba", 0xFBC080, 0x43F80      @ 0xFBC080..0x1000000 tile 区后剩余
 
-@ 后 16MB 第一段前半 seg-A-1 前部：ROM偏移 0x1000000 - 0x132627F（卡列表 tile 前）
-	.incbin "roms/2343.gba", 0x1000000, 0x326280
+@ card-medium-frame tile 数据（ROM偏移 0x0FBC080 - 0x1326280）
+@ 2331 tile_block × 1536 B = 0x36A200；32×48 8bpp 带框卡 sprite
+@ 加载函数 FUN_080c2d24；与 card-mini-frame 共享索引表 0x095B5C00
+	.include "data/card-medium-frame.s"
 
 @ card-mini-frame tile 数据（ROM偏移 0x1326280 - 0x15B5BFF）
 @ 2331 tile_block × 1152 B = 0x28F980，末尾紧接 card-image-index.s
