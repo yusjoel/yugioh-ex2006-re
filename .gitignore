@@ -32,6 +32,9 @@ graphics/
 # 导出的数据汇编（由 tools/rom-export/export_all.py 从 ROM 生成）
 data/
 
+# 导出的 FS 文件（由 tools/rom-export/export_fs_files.py 从 ROM 重建）
+fs/
+
 # 本地环境配置（路径因机器而异）
 LOCAL.md
 roms/*.sav

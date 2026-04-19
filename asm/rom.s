@@ -380,20 +380,10 @@ Start:
 @ offset_table (339 × u32) + size_table (340 × u32)，共 0xA9C 字节
 	.include "data/fs-tables.s"
 
-@ FS 数据区起点（ROM偏移 0x1E64684）
-@ file 0 "deck/LV1_kuriboh.ydc" 前 10 字节（.ydc 文件头，opponent-decks.s 从 0x1E6468E 开始）
-	.incbin "roms/2343.gba", 0x1E64684, 0xA
+@ ROM 内嵌文件系统数据区（ROM偏移 0x1E64684 - 0x1ED49D4，0x70350 B = 459,600 B）
+@ 338 个文件 tight-pack 顺序：214 .ydc + 35 .ydq + 26 .LZ5bg + 18 .LZnclr + 17 .LZncgr + 14 .LZnanr + 14 .LZncer
+@ 索引：data/fs-tables.s；路径：data/file-paths.s；文件体：fs/<原始路径>
+	.include "data/fs-payload.s"
 
-@ 对手卡组数据（ROM偏移 0x1E6468E - 0x1E65A45）
-@ 25 个对手卡组，各含 40 张牌，共 0x13B8 字节
-	.include "data/opponent-decks.s"
-
-@ 尾段前部：ROM偏移 0x1E65A46 - 0x1EB90D7
-	.incbin "roms/2343.gba", 0x1E65A46, 0x53692
-
-@ 决斗题目存档模板（ROM偏移 0x1EB90D8 - 0x1EC33D9）
-@ 35 块 DUEL QUESTION 数据，INI 风格键值对，CRLF 换行，共 41,729 字节
-	.include "data/duel-puzzles.s"
-
-@ 尾段后部：ROM偏移 0x1EC33D9 - 0x2000000
-	.incbin "roms/2343.gba", 0x1EC33D9, 0x13CC27
+@ FS 后尾段：ROM 0x1ED49D4 - 0x2000000（0x12B62C = 1,225,772 B，暂未分析）
+	.incbin "roms/2343.gba", 0x1ED49D4, 0x12B62C

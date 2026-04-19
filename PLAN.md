@@ -18,16 +18,21 @@
 ROM 内有 Konami 自写的文件系统（NNS g2d 资源 + .ydc 卡组 + .ydq 谜题 + .LZ5bg 背景），基址 `0x1E64684`，共 `0x70420` 字节（339 个文件）。
 
 - ✓ 索引表已结构化：`data/fs-tables.s`（`offset_table` + `size_table`, 2716 B）
-- ✓ 解析器已完成：`tools/ad-hoc/nns_extract.py` 解压 63 个 NNS 资源到 `doc/temp/nns_out/`
+- ✓ 路径表已结构化：`data/file-paths.s`（339 条 null 终止 ASCII）
+- ✓ **FS 原始字节全量导出**（2026-04-19）：`tools/rom-export/export_fs_files.py` → `fs/<orig path>` +
+  `data/fs-payload.s`（338 个文件 FID 1..338 tight-pack，byte-identical）。详见
+  `doc/dev/fs-export-and-ocg-tcg.md`。98 组重名用 `_dup1` 消歧，确认为 OCG/TCG 变体（flag=ROM `0x080000AE`）。
+- ✓ NNS scratch 解析：`doc/temp/nns_out/` 含 63 个 NNS 资源（临时产物，未落地到 tools/）
 
-**后续可做的 FS 数据区拆分（按优先级）**：
+**后续可做的 FS 深化（按优先级）**：
 
 | 优先级 | 扩展名 | 数量 | 目标 |
 |---|---|---|---|
-| ⭐⭐ | `.LZnclr` | 18 | P2-palette 问题的直接依赖：定位各调色板在 PALRAM 中的使用点 |
-| ⭐ | `.ydc` / `.ydq` | ~230 / 35 | 现已被 `opponent-decks.s`、`duel-puzzles.s` 部分覆盖，可升级为统一 FS 层 |
+| ⭐⭐ | `.LZnclr` | 18 | PALRAM 对位；NNS NCLR 正式解析器落地到 `tools/` |
+| ⭐ | `.LZncgr` / `.LZncer` / `.LZnanr` | 17+14+14 | NCGR/NCER/NANR 数据解析 + PNG 渲染，需 palette 对齐 |
 | ⭐ | `.LZ5bg` | 26 | 格式未解析（Konami 私有 BG 压缩，压缩头 `0x01`） |
-| ⭐ | NNS `.LZn*` tile/cell/anim | 45 | NCGR/NCER/NANR 数据解析 + PNG 渲染，需 palette 对齐 |
+| ⭐ | `.ydc` / `.ydq` 解码器升级 | 214+35 | 重新用统一 FS 层替代 `opponent-decks.s` / `duel-puzzles.s`（脚本仍在，build 已解耦） |
+| — | 追 `.ydc` 加载器 | — | 硬证 OCG/TCG flag 选 FID 的具体函数（ghidra 未命名） |
 
 ---
 

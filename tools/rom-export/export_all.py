@@ -28,7 +28,7 @@ EXPORT_PIPELINE = [
     'export_game_strings.py',           # data/game-strings-{en,de,fr,it,es}.s
     'export_file_paths.py',             # data/file-paths.s
     'export_fs_tables.py',              # data/fs-tables.s
-    'export_duel_puzzles.py',           # data/duel-puzzles.s
+    'export_fs_files.py',               # fs/<orig path> + data/fs-payload.s（338 个 FS 文件）
     'export_font.py',                   # data/font.s + graphics/font/*
     'export_pack_banners.py',           # data/pack-banners.s + graphics/pack-banners/*
     'export_card_mini_frame.py',        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
@@ -41,7 +41,6 @@ EXPORT_PIPELINE = [
     'export_starter_deck.py',           # data/starter-deck.s
     'export_struct_decks.py',           # data/struct-decks.s
     'export_opponent_card_values.py',   # data/opponent-card-values.s
-    'export_opponent_decks.py',         # data/opponent-decks.s
 ]
 
 
