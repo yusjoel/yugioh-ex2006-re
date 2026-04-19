@@ -47,7 +47,7 @@ clean.bat
 
 ### 场景 B：暂停态寄存器检查 / 表达式求值（双 MCP 交互）
 
-1. `mgba_live_start(rom, savestate?)` — 预期超时错误 "Session created but bridge did not become ready before timeout"；session 已创建、stub 已 LISTEN。
+1. `mgba_live_start(rom, savestate?, gdb_stub=true)` — **必须显式传 `gdb_stub=true`**（默认关闭 `-g`）。预期超时错误 "Session created but bridge did not become ready before timeout"；session 已创建、stub 已 LISTEN。
 2. `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` — **不传 `architecture` 参数**。
 3. `gdb_connect(target="localhost:2345")` → `gdb_continue`，游戏放行，Lua bridge 初始化。
 4. 用 GDB MCP 读寄存器（`gdb_evaluate_expression`）、单步（`gdb_step`/`gdb_next`）等。
@@ -58,7 +58,7 @@ clean.bat
 GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 ```
-1. mgba_live_start(rom, savestate?)        ← mGBA MCP 启动（-g 暂停）
+1. mgba_live_start(rom, savestate?, gdb_stub=true)  ← mGBA MCP 启动（-g 暂停；需显式开启）
 2. tools\arm-none-eabi-gdb.exe --batch -x script.gdb &   ← 后台运行
    脚本内容: target remote → hbreak *<addr> → continue（阻塞等待命中）
    命中后: info registers / x/Ni $pc / x/Nx <addr> → kill + quit
@@ -77,7 +77,7 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 ### 通用要点
 
 - **GDB 必须使用 `tools/arm-none-eabi-gdb.exe`（10.2）**，devkitPro 14.1 与 mGBA stub 协议不兼容。
-- `-g` 来自本地 fork `D:\Software\mgba-live-mcp` 的 patch（`build_start_command` 里插入 `"-g"`）。见 `doc/dev/mgba-mcp-setup.md` 第八节。
+- `-g` 来自本地 fork `D:\Software\mgba-live-mcp` 的 patch：`build_start_command` 支持 `gdb_stub` 开关，对应 MCP 工具参数 `gdb_stub`（默认 `false`），CLI 参数 `--gdb-stub`。只在需要 GDB 时显式开启；场景 A 保持默认关闭以避免 stub 端口冲突。见 `doc/dev/mgba-mcp-setup.md` 第八节。
 - **stub 一次性消耗**：GDB 断开（含 `kill`/`quit`/`--batch` 结束）后 stub 永久关闭，需 `mgba_live_stop` + 重新 `mgba_live_start`。
 - GDB 脚本里 `echo` 只能 ASCII（中文乱码）。
 - 已知 GDB MCP 限制：THUMB 代码 `gdb_list_frames` 失败；`gdb_read_memory` 有解析 bug，改用 `gdb_evaluate_expression`。

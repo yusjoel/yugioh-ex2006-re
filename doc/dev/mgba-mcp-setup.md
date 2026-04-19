@@ -360,7 +360,7 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
 }
 ```
 
-> **不再走 PyPI `uvx mgba-live-mcp`**，改用本地 fork（见"本地 fork 方案"一节），避免 uv cache 更新丢失 `-g` / Windows pid_alive / stdin DEVNULL 三处 patch。
+> **不再走 PyPI `uvx mgba-live-mcp`**，改用本地 fork（见"本地 fork 方案"一节），避免 uv cache 更新丢失 `gdb_stub` / Windows pid_alive / stdin DEVNULL 三处 patch。
 
 写入后 **必须退出并重启 Claude Code CLI**，MCP server 进程才会加载。
 
@@ -368,7 +368,7 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
 
 | 步骤 | 工具 | 结果 |
 |------|------|------|
-| 1 | `mgba_live_start(rom="roms/2343.gba", savestate="roms/2343.ss1")` | **报错** "Session created but bridge did not become ready before timeout"（预期，因 `-g` patch 让 CPU 暂停在 reset vector）；session/PID 已创建，端口 2345 已 LISTEN |
+| 1 | `mgba_live_start(rom="roms/2343.gba", savestate="roms/2343.ss1", gdb_stub=true)` | **报错** "Session created but bridge did not become ready before timeout"（预期，`gdb_stub=true` 下加 `-g` 让 CPU 暂停在 reset vector）；session/PID 已创建，端口 2345 已 LISTEN。**默认 `gdb_stub=false` 不会报错、也不开 stub**。 |
 | 2 | `mgba_live_status(all=true)` | `alive=true`, `heartbeat=null`（Lua bridge 未启动） |
 | 3 | `gdb_init(gdbPath="tools/arm-none-eabi-gdb.exe")` | 初始化成功（**不传 `architecture` 参数**） |
 | 4 | `gdb_connect(target="localhost:2345")` | 连接成功 |
@@ -394,10 +394,7 @@ Claude Code CLI 的 MCP 配置不走 `settings.json`，而是写入 `~/.claude.j
 - **GDB 版本必须 10.2**（`tools/arm-none-eabi-gdb.exe`），devkitPro 14.1 与 mGBA stub 协议不兼容。
 - `gdb_init` **不要传 `architecture` 参数**，否则 GDB MCP 会用默认 aarch64 或走到 devkitPro 14.1。
 - mGBA `-g` stub **一次性**，GDB 断开后永久关闭，每次调试循环需 `mgba_live_stop` + 重新 `start`。
-- 本机 uv cache 中的 `live_cli.py` 包含手工插入的 `-g` 参数（在 `build_start_command`），
-  使 `mgba_live_start` 启动时自带 GDB stub；因此 `mgba_live_start` 总会超时（游戏被暂停），
-  需要 `gdb_connect` + `gdb_continue` 才能让 Lua bridge 初始化。如果只用 mGBA 不用 GDB，
-  仍需走一遍 GDB 放行流程，或回退 `live_cli.py` 的 patch。
+- 本地 fork 的 `live_cli.py :: build_start_command` 支持 `gdb_stub` 开关（MCP 工具参数 `gdb_stub`，CLI 参数 `--gdb-stub`），**默认关闭**。只在要用 GDB 时显式传 `gdb_stub=true`；一旦开启，`mgba_live_start` 会超时（游戏暂停在 reset vector），必须 `gdb_connect` + `gdb_continue` 才能让 Lua bridge 初始化。纯 mGBA（场景 A）保持默认关闭即可正常启动。
 
 ### `-g` patch 回归问题（2026-04-16 踩坑）—— 已由本地 fork 根治
 
@@ -434,7 +431,7 @@ D:\Software\mgba-live-mcp\       # git clone https://github.com/penandlim/mgba-l
 
 | # | 位置 | 改动 | 作用 |
 |---|------|------|------|
-| 1 | `live_cli.py :: build_start_command` | `cmd = [mgba_path, ]` 后插 `"-g",` | 启用 GDB stub（端口 2345） |
+| 1 | `live_cli.py :: build_start_command` | 新增 `gdb_stub: bool = False` 参数（默认关闭），为真时追加 `"-g"`；`cmd_start` 从 `args.gdb_stub` 读取；argparse 暴露 `--gdb-stub`；MCP server `_build_start_command_args` 同步转发，`mgba_live_start` / `mgba_live_start_with_lua` 工具 schema 暴露 `gdb_stub: boolean`。 | 可配置 GDB stub（端口 2345），默认不开 |
 | 2 | `live_cli.py :: pid_alive` | Windows 分支改走 `GetExitCodeProcess` / `STILL_ACTIVE`；补 `import sys` | 修复 Windows 下死会话无法回收 |
 | 3 | `live_cli.py :: terminate_session_process` | Windows 分支改走 `taskkill /F /T /PID`（树杀） | 修复 `os.getpgid` / `os.killpg` 在 Windows 不存在导致 `mgba_live_stop` 崩溃 |
 | 4 | `live_controller.py :: _run_command` | `create_subprocess_exec` 添加 `stdin=asyncio.subprocess.DEVNULL` | 防止子进程继承 MCP JSON-RPC stdin 管道导致挂起 |
@@ -457,7 +454,7 @@ D:\Software\mgba-live-mcp\       # git clone https://github.com/penandlim/mgba-l
 ```bash
 uvx --from "D:\Software\mgba-live-mcp" --with-editable "D:\Software\mgba-live-mcp" python -c "
 from mgba_live_mcp import live_cli; import inspect
-print('-g PATCH:', '\"-g\"' in inspect.getsource(live_cli.build_start_command))
+print('GDB_STUB PATCH:', 'gdb_stub' in inspect.getsource(live_cli.build_start_command))
 print('WIN32 PATCH:', 'GetExitCodeProcess' in inspect.getsource(live_cli.pid_alive))
 print('TASKKILL PATCH:', 'taskkill' in inspect.getsource(live_cli.terminate_session_process))
 "
