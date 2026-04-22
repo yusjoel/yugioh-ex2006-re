@@ -43,13 +43,14 @@ clean.bat    @ 清理编译产物
 │   ├── opponent-decks.s        # 25 套对手卡组（ROM 0x1E6468E）
 │   ├── pack-banners.s         # 51 张卡包封面指针表 + .incbin tile（ROM 0x1CCE960）
 │   ├── pack-card-lists.s      # 45 个 pack 卡牌列表 + 51 条 pack 信息表（ROM 0x1E5ABFC）
-│   ├── card-descriptions.s   # 39 张卡效果描述 + 数据表 + 指针表（ROM 0x1800000）
+│   ├── card-descriptions.s  # 所有卡描述文本 pool + 2098×6 u32 offset 表（ROM 0x15FFF0C, 2.19 MB）
+│   │                        #   合并了原 card-effect-text.s + card-descriptions.s；含宏 desc_offsets
+│   ├── card-names.s         # 卡名文本 pool + 2098×6 u32 指针表（ROM 0x15BB594, 280,952 B）
+│   │                        #   合并了原 card-names.s + card-name-pointer-table.s；含宏 name_offsets
 │   ├── card-mini-frame.s          # 带框小卡图 tile 数据（card_mini_frame_tile_data, ROM 0x1326280, 2,685,312 B）
 │   ├── card-mini-frame-palette.s  # 带框小卡图 OBJ 调色板（card_mini_frame_pal_main 等, ROM 0x1E31554）
 │   ├── card-image-index.s   # 卡牌大图索引（card_id 0..2098, ROM 0x15B5C00）
 │   ├── cards-ids-array.s    # internal_card_id → card_id 反向映射表（ROM 0x15B7CCC）
-│   ├── card-name-pointer-table.s  # 12,612 × u32 卡名指针表（ROM 0x15F3A5C）
-│   ├── card-effect-text.s   # 2014 张卡效果全文 × 6 语言（ROM 0x15FFF6C）
 │   ├── file-paths.s         # 339 条内部文件路径（ROM 0x1E6118C）
 │   ├── fs-tables.s          # 内嵌 FS 索引表（offset_table+size_table, ROM 0x1E63BE8）
 │   └── duel-puzzles.s       # 35 块决斗题目存档模板（ROM 0x1EB90D8）
@@ -99,11 +100,9 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_gfx.py` | ROM → `graphics/opponents/*.bin` + PNG + 调色板 + `graphics/icons/*.png`；构建前必跑 |
 | `tools/rom-export/export_pack_banners.py` | ROM → `graphics/pack-banners/*.bin` + 彩色 PNG + `data/pack-banners.s`；构建前必跑 |
 | `tools/rom-export/export_pack_card_lists.py` | ROM → `data/pack-card-lists.s`（45 个 pack 共 3,515 条卡牌条目 + 51 条 pack 信息） |
-| `tools/rom-export/export_card_descriptions.py` | ROM → `data/card-descriptions.s`（39 张卡效果描述 + 数据表 + 指针表） |
-| `tools/rom-export/export_card_data.py` | ROM → `data/card-names.s`、`data/card-stats.s`（2053 卡名、5170 统计条目） |
+| `tools/rom-export/export_card_descriptions.py` | ROM → `data/card-descriptions.s`（合并: text pool 2098 卡 × 6 lang + card_desc_data 12,588 × u32 offset 表；取代旧 export_card_effect_text.py） |
+| `tools/rom-export/export_card_data.py` | ROM → `data/card-names.s`（名字池 + 2098×6 u32 指针表，合并版）、`data/card-stats.s`（5170 统计条目；首条 20B 少 zero0 字段） |
 | `tools/rom-export/export_game_strings.py` | ROM → `data/game-strings-{en,de,fr,it,es}.s`（CP1252 编码） |
-| `tools/rom-export/export_card_name_pointer_table.py` | ROM → `data/card-name-pointer-table.s`（12,612 × u32 卡名指针表，按 `card_id*6 + lang` 索引） |
-| `tools/rom-export/export_card_effect_text.py` | ROM → `data/card-effect-text.s`（2014 张卡效果全文 × 6 语言） |
 | `tools/rom-export/export_card_images.py` | ROM → `data/card-image-index.s` + `data/cards-ids-array.s`（含 `internal_card_id → card_id` 反向映射）+ `graphics/card-images-rom/` |
 | `tools/rom-export/export_card_mini_frame.py` | ROM → `data/card-mini-frame{,-palette}.s` + `graphics/bin/card-mini-frame/` + 彩色 PNG 两套（OBJ 用 ROM 0x1E31614；BG 用 ROM 0x00510460） |
 | `tools/rom-export/export_file_paths.py` | ROM → `data/file-paths.s`（339 条内部文件路径） |
@@ -175,11 +174,10 @@ MCP 接入之前用于手工管理 mGBA + GDB stub 生命周期，现在保留�
 | 对手卡组（25套）| `0x1E6468E` | 5048 B | Kuriboh～Raviel 全部对手 |
 | 卡包封面图（51张）| `0x1CCE960` | 104,652 B | 指针表 + 51×2048 B 8bpp OBJ tile（32×64 像素） |
 | 卡包卡牌列表 + 信息表 | `0x1E5ABFC` | 14,876 B | 45 个 pack 共 3,515 条卡牌条目 + 51 条 pack 信息记录 |
-| 卡牌描述文本 + 数据表 | `0x1800000` | 92,598 B | 39 张卡效果描述（6 语言）+ u32 数据表 + 269 条指针表 |
+| 卡牌描述统一区 | `0x15FFF0C` | 2,189,996 B | 合并 effect-text + special-cards: text pool (2098 卡 × 6 lang 字串, XX/EN/DE/FR/IT/ES) + card_desc_data (12,588 × u32 offset 表，per-cid 6-lang，异画卡共享 labels，用 `desc_offsets <cid>` 宏) |
 | 卡牌大图索引 | `0x15B5C00` | 8,396 B | card_id 0..2098 的 OCG/TCG tile_block 索引 |
 | Cards IDs Array | `0x15B7CCC` | 6,144 B | 3072 × u16，`internal_card_id 4007..7078 → card_id` 反向映射 |
-| 卡名指针表 | `0x15F3A5C` | 50,448 B | 12,612 × u32，按 `card_id*6 + lang_id` 索引 |
-| 卡牌效果全文 | `0x15FFF6C` | 2,097,300 B | 2014 张卡效果描述（6 语言） |
+| 卡名指针表 | `0x15F3A5C` | 50,352 B | 12,588 × u32 = 2098 cards × 6 lang，按 `card_id*6 + lang` 索引，XX/EN/DE/FR/IT/ES |
 | 内部文件路径表 | `0x1E6118C` | 10,844 B | 339 条 null 终止路径（deck/*.ydc, titleEx/*.LZncgr 等）|
 | 文件系统索引表 | `0x1E63BE8` | 2,716 B | offset_table (339×u32) + size_table (340×u32)，path[i]↔table[i+1]；FS 数据起点 `0x1E64684` |
 | 决斗题目存档模板 | `0x1EB90D8` | 41,729 B | 35 块 DUEL QUESTION 数据（INI 风格键值对）|

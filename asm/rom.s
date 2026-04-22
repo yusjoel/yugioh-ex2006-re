@@ -51,26 +51,23 @@ Start:
 @ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB593（cards_ids_array 后至卡名表前）
 	.incbin "roms/2343.gba", 0x15B94CC, 0x20C8
 
-@ 卡牌名称字符串表（ROM偏移 0x15BB594 - 0x15F3A5B）
-@ 2102 张卡（含 cid=0 占位）× 6 种语言（XX/EN/DE/FR/IT/ES），CP1252 编码，2 字节对齐
-@ XX = JP 自定义编码（每字符 2 字节），见 doc/dev/datacrystal-cross-reference.md
+@ 卡牌名称统一区（ROM 偏移 0x15BB594 - 0x15FFF0B，共 280,952 字节）
+@ 合并 card-names + card-name-pointer-table:
+@   1. card_names_table        0x15BB594 - 0x15F3A5B (230,600 B)
+@      2054 master 条目 × 6 langs (XX/EN/DE/FR/IT/ES)，CP1252，2B 对齐；alt-art 共享 master
+@   2. card_name_pointer_table 0x15F3A5C - 0x15FFF0B (50,352 B = 2098 × 6 × u32)
+@      Lookup: name_addr = card_names_table + ptr[card_id*6 + lang_id]（Data Crystal 0x080EE968）
+@ 末 u32 指向 card-descriptions 文本池起点
 	.include "data/card-names.s"
 
-@ 卡名指针表（ROM偏移 0x15F3A5C - 0x15FFF6B）
-@ 12,612 × u32 = 50,448 字节，按 [card_id*6 + lang] 索引
-@ 取值后加 0x15BB594 即 card_names 字符串地址（Data Crystal 反汇编验证）
-	.include "data/card-name-pointer-table.s"
-
-@ 卡牌效果描述全文（ROM偏移 0x15FFF6C - 0x17FFFFF）
-@ 2014 张卡效果描述 × 6 语言，共 2,097,300 字节
-	.include "data/card-effect-text.s"
-
-@ 卡牌描述文本 + 数据表 + 指针表（ROM偏移 0x1800000 - 0x18169B5）
-@ 39 张卡效果描述（6 语言）+ u32 数据表 + 269 条指针表，共 0x169B6 字节
+@ 卡牌描述统一区（ROM偏移 0x15FFF0C - 0x18169B8，共 2,190,508 字节）
+@ 合并 card-effect-text + card-descriptions: text pool (2098 卡 × 6 langs null-terminated)
+@ + card_desc_data (cid=0..2052 × 6 u32) + card_desc_ptr_table (cid=2053..2097 × 6 u32)
+@ 末 u32 (cid=2097 ES offset) 高 2 B 与 card_stats[0].zero0 字节重叠
 	.include "data/card-descriptions.s"
 
-@ 卡牌属性数据表（ROM偏移 0x18169B6 - 0x18325FF）
-@ 5170 条记录，每条 22 字节（11 × uint16 LE），含 ATK/DEF/Level/属性/种族等
+@ 卡牌属性数据表（ROM偏移 0x18169B8 - 0x18325FF）
+@ 5170 条记录 (首条 20 B 少 zero0 字段由上游 Section C 提供; 其余 5169 条 × 22 B)
 	.include "data/card-stats.s"
 
 @ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x185504B（属性表后，外场图块前）

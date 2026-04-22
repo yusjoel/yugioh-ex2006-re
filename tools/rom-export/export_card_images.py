@@ -105,21 +105,23 @@ def card_id_to_slot(rom: bytes, card_id: int) -> int:
 
 
 def build_slot_to_en_name(_rom: bytes) -> dict[int, str]:
-    """解析 data/card-names.s 的 `card_name_XXXX:  @ <EN>  (pw ...)` 标签行。
-    比按字节扫描可靠得多（tools/rom-export/export_card_data.py 生成时已按 slot 对齐）。
+    """从 doc/um06-deck-modification-tool/data.md 加载 slot_id → EN 卡名。
+    data.md 是卡名/密码的真值源（card-names.s 用 cid 索引，无法直接反查 slot_id）。
     """
     import re
     result: dict[int, str] = {}
-    path = Path("data/card-names.s")
+    path = Path("doc/um06-deck-modification-tool/data.md")
     if not path.exists():
         return result
-    pat = re.compile(r"^card_name_([0-9A-Fa-f]{4}):\s*@\s*(.+?)\s*(?:\(pw\s+\d+\))?\s*$")
-    with path.open("r", encoding="cp1252", errors="replace") as fp:
+    pat = re.compile(
+        r'\|\s*(\d{7,9})\s*\|([^|]+)\|[^|]*\|\s*([0-9A-Fa-f]{4})\s*\|'
+    )
+    with path.open("r", encoding="utf-8") as fp:
         for line in fp:
-            m = pat.match(line.rstrip("\r\n"))
+            m = pat.match(line)
             if m:
-                slot = int(m.group(1), 16)
                 name = m.group(2).strip()
+                slot = int(m.group(3), 16)
                 result[slot] = name
     return result
 

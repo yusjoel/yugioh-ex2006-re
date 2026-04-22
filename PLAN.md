@@ -38,18 +38,28 @@ ROM 内有 Konami 自写的文件系统（NNS g2d 资源 + .ydc 卡组 + .ydq �
 
 ## 遗留数据未调查
 
-- ROM `0x001FD568 – 0x0020A500`（~53 KB，被 `card_desc_ptr_table` 269 条文件偏移引用，格式/用途未确认）
+- ~~ROM `0x001FD568 – 0x0020A500`（~53 KB，被 `card_desc_ptr_table` 269 条文件偏移引用）~~：
+  ✓ **2026-04-22 破解**：此"53KB 区"实际是 **card-descriptions pool 的一部分**（ROM `0x15FFF0C` 起的大文本池）。用户指出关键假设（pool 起点 `0x15FFF0C` + lang 顺序 XX/EN/DE/FR/IT/ES）后，验证 Section C 269 条指针加 ET 基址后精确落在 pool 内字符串起点（前一字节全是 null）。进一步发现 Section C 实为 **270 u32** (45 cards × 6 lang)，最末 u32 高 2B 与 card-stats[0].zero0 字节重叠。已合并 `card-effect-text.s` + `card-descriptions.s` 为单一 `card-descriptions.s`（2.14 MB），用 `desc_offsets <cid>` 宏 + label 减法统一表达 2098 卡 × 6 lang offset 表。
 - ~~ROM `0x1E58D0C` `deck_id_and_data_array`~~：核实后是项目已有 `data/opponent-card-values.s` (`0x1E58D0E`, 27×32B) 的同一段；wiki 的 "(opponent_id << 16)" stride 注释是 `lsr r4,0x16` (= r4>>22) 的误读，实际 stride 是 32B。无需拆分。
 
 ---
 
-## 数据 crystal 跟进事项（来自 2026-04-17 拆分）
+## 数据 crystal 跟进事项
 
 - ~~**card-names.s 双重偏差**~~：✓ 已修复（2026-04-17）：
   - 起点改为 `0x15BB594` (含 cid=0 6 langs 占位 12B)
   - lang 顺序改为 `XX/EN/DE/FR/IT/ES`（XX 在最前）
   - 验证：byte-identical SHA1 一致；Blue-Eyes XX = `f8 f7 f4 8c f1 a9 fb d9 fe 91` (5 字符对，匹配 JP "青眼の白龍" 5 字)
-  - 注：`card-effect-text.s` 是相反的 `EN/DE/FR/IT/ES/XX`（XX 在最后），与 card-names 不同
+
+- ~~**card-name-pointer-table 真实大小**~~：✓ 已修复（2026-04-22）：原以为 12,612 u32（2102 cards），实际是 **12,588 u32 (2098 cards)**；末尾 24 u32 (cid=2098..2101) 不是合法 name offsets，而是 card-descriptions pool 的前 96 字节（cid=0 dummy 12B + cid=1 XX 84B）。表尾修正为 `0x15FFF0C`，末卡 cid=2097 = Fluffy Token。
+
+- ~~**card-effect-text 合并**~~：✓ 完成（2026-04-22）：
+  - 原 `card-effect-text.s` (2 MB, 起 `0x15FFF6C`) + `card-descriptions.s` (起 `0x1800000`) 合并为单一 `card-descriptions.s`，起点 **`0x15FFF0C`**（原以为 `0x15FFF6C`，往前 96 字节才是真实 pool 起点）
+  - lang 顺序 **XX/EN/DE/FR/IT/ES**（与 card-names 一致；旧 `card-effect-text.s` 的 "EN/DE/FR/IT/ES/XX" 是错误理解）
+  - Section B + C 合并为统一 `card_desc_data`（12,588 u32 = 2098 cards × 6 lang），与 `card_name_pointer_table` 完全同构（都是 per-cid 6-lang offset 表）
+  - 用宏 `desc_offsets <cid>` + label 减法表达，异画卡共享 master cid 的 labels
+  - 字节重叠：Card 38 XX null / Section B u32[0] / Section A pad 共享 4 B；Section C 最末 u32 高 2B / card_stats[0].zero0 共享 2 B
+  - 删除 `tools/rom-export/export_card_effect_text.py` 和 `data/card-effect-text.s`
 
 ## 后续研究
 

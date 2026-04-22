@@ -18,13 +18,11 @@ import time
 # 按依赖顺序执行
 EXPORT_PIPELINE = [
     # Step 1: 前置依赖（card-names.s 是后续 7 个脚本的输入）
-    'export_card_data.py',              # data/card-names.s + card-stats.s
+    'export_card_data.py',              # data/card-names.s (名字池 + 指针表) + card-stats.s
 
     # Step 2: 独立脚本（只读 ROM）
     'export_gfx.py',                    # graphics/{opponents,icons,duel-field}/*
-    'export_card_name_pointer_table.py',# data/card-name-pointer-table.s
-    'export_card_effect_text.py',       # data/card-effect-text.s
-    'export_card_descriptions.py',      # data/card-descriptions.s
+    'export_card_descriptions.py',      # data/card-descriptions.s (merged: ET + special + offset table + anchors)
     'export_game_strings.py',           # data/game-strings-{en,de,fr,it,es}.s
     'export_file_paths.py',             # data/file-paths.s
     'export_fs_tables.py',              # data/fs-tables.s

@@ -57,11 +57,9 @@
 | `0x015B5C00` | `0x20CC` | 8,396 | ✓ 已分析 | card-image-index | `.include data/card-image-index.s` |
 | `0x015B7CCC` | `0x1800` | 6,144 | ✓ 已分析 | cards-ids-array | `.include data/cards-ids-array.s` |
 | `0x015B94CC` | `0x20C8` | 8,392 | ✗ 未分析 | cards_ids_array 后至卡名表前 | raw `.incbin roms/2343.gba` |
-| `0x015BB594` | `0x384C8` | 230,600 | ✓ 已分析 | card-names | `.include data/card-names.s` |
-| `0x015F3A5C` | `0xC510` | 50,448 | ✓ 已分析 | card-name-pointer-table | `.include data/card-name-pointer-table.s` |
-| `0x015FFF6C` | `0x200094` | 2,097,300 | ✓ 已分析 | card-effect-text | `.include data/card-effect-text.s` |
-| `0x01800000` | `0x169B6` | 92,598 | ✓ 已分析 | card-descriptions | `.include data/card-descriptions.s` |
-| `0x018169B6` | `0x1BC4C` | 113,740 | ✓ 已分析 | card-stats | `.include data/card-stats.s` |
+| `0x015BB594` | `0x44978` | 280,952 | ✓ 已分析 | card-names (pool + 2098×6 u32 指针表, 合并) | `.include data/card-names.s` |
+| `0x015FFF0C` | `0x216AAC` | 2,189,996 | ✓ 已分析 | card-descriptions (pool + offset 表, 合并 effect-text) | `.include data/card-descriptions.s` |
+| `0x018169B8` | `0x1BC4A` | 113,738 | ✓ 已分析 | card-stats (首条 20B, 其余 5169 × 22B) | `.include data/card-stats.s` |
 | `0x01832602` | `0x1E51A` | 124,186 | ✗ 未分析 | seg-C 前段（属性表后，HUD 图块前） | raw `.incbin roms/2343.gba` |
 | `0x01850B1C` | `0x4130` | 16,688 | ✓ 已分析 | duel-field HUD (tiles+palettes) | `.incbin graphics/bin/duel-field/{tiles,palettes}/hud_*.bin` |
 | `0x018515FC` | `0x400` | 1,024 | ✗ 未分析 | HUD 未知 gap | raw `.incbin roms/2343.gba` |
@@ -114,4 +112,28 @@
 | `0x01E64684` | `0x70350` | 459,600 | ✓ 已分析 | fs-payload (338 files via fs/) | `.include data/fs-payload.s` |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
 
-**合计**：65 段（42 已分析 + 23 未分析），28,543,432 B
+**合计**：63 段（40 已分析 + 23 未分析），28,543,432 B
+
+## 2026-04-22 合并：card-descriptions + card-effect-text
+
+合并前三个相邻表：
+- `card-name-pointer-table` (原认为 `0x15F3A5C - 0x15FFF6C`, 12,612 u32)
+- `card-effect-text`        (原认为 `0x15FFF6C - 0x1800000`, 2 MB)
+- `card-descriptions`       (原认为 `0x1800000 - 0x18169B6`, 92 KB)
+- `card-stats`              (原认为 `0x18169B6 - 0x1832602`, 113.7 KB)
+
+发现真实边界如下（含字节重叠）：
+- `card-name-pointer-table` 实际 **2098 × 6 = 12,588 u32** (末 `0x15FFF0C`)，末卡 cid=2097 = Fluffy Token
+- `card-descriptions` 起点 **`0x15FFF0C`** (原以为 `0x15FFF6C`，往前 96 字节)，合并了原 effect-text + 原 descriptions
+- `card-descriptions` 末 u32 (cid=2097 ES offset = `0x0020A532`) 高 2 B 与 `card_stats[0].zero0` (=`0x0020`) **字节重叠** → `card-stats` 起点顺延至 `0x18169B8`，首条少 zero0 字段 (20 B)
+
+结构现在完全统一：`card_name_pointer_table` 与 `card_desc_data` 都是 **per-cid 6-lang offset 表**（都 12,588 u32）。详见 `tools/rom-export/export_card_descriptions.py` 注释。
+
+## 2026-04-22 合并：card-names + card-name-pointer-table
+
+继 card-descriptions 合并之后，把相邻的 **名字池 + 名字指针表** 也合并到单文件 `data/card-names.s`（280,952 B, ROM `0x15BB594 - 0x15FFF0B`）：
+
+- 第 1 段 `card_names_table` 0x15BB594..0x15F3A5B（230,600 B）：2054 个 master 条目 × 6 langs，每 lang 独立子标签 `card_name_<suffix>_<lang>`；alt-art 共享 master 标签
+- 第 2 段 `card_name_pointer_table` 0x15F3A5C..0x15FFF0B（50,352 B）：2098 × 6 × u32 偏移，通过宏 `name_offsets <suffix>` 展开（与 `desc_offsets` 同构）
+
+生成器：`export_card_data.py`（接管了原 `export_card_name_pointer_table.py` 的职责，后者已删除）。

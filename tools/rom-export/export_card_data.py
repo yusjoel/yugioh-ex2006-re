@@ -3,18 +3,19 @@
 """
 卡牌数据导出脚本
 
-从 roms/2343.gba 中读取以下两张表，导出为可读汇编文件：
+从 roms/2343.gba 中读取以下表，导出为可读汇编文件：
 
-  1. 卡名字符串表（ROM 0x015BB594, 真起点）
-     每张卡 6 个 null 终止字符串，顺序：XX / EN / DE / FR / IT / ES
-     XX = JP 自定义编码（每字符 2 字节，疑似含 sort key 或假名压缩），用途待考证。
-     2 字节对齐：(strlen + 1) 为奇数时补一个 \\0。
-     第 0 张卡（cid=0）是占位记录：6 个空字符串，共 12 字节零。
-
-     依据 Data Crystal ROM map 的 card_name_pointer_table（0x080EE968 反汇编）
-     验证：lookup formula 为 [0x15BB594 + table[card_id*6 + lang_id]]，
-     且 lang_id=0 即对应 ROM 中 XX-encoded 的字符串（详见
-     doc/dev/datacrystal-cross-reference.md §XX 在最前的验证）。
+  1. 卡名字符串池 + 指针表（合并到 data/card-names.s）
+     字符串池: ROM 0x015BB594..0x015F3A5B  (230,600 B)
+              每 master cid 6 个 null 终止字符串，顺序 XX/EN/DE/FR/IT/ES
+              XX = JP 自定义编码（每字符 2 字节）
+              2 字节对齐：(strlen + 1) 为奇数时补一个 \\0
+              cid=0 是占位记录（6 × 空 = 12 B）；alt-art 卡共享 master 标签
+     指针表: ROM 0x015F3A5C..0x015FFF0B  (50,352 B = 2098 × 6 × u32)
+             Lookup (Data Crystal 0x080EE968):
+               name_addr = 0x015BB594 + ptr[card_id*6 + lang_id]
+             通过宏 name_offsets <suffix> 展开（与 card-descriptions 的
+             desc_offsets 同构）。末卡 cid=2097 = Fluffy Token。
 
   2. 卡牌属性数据表（ROM 0x018169B6 – 0x01832602）
      每条 22 字节（11 × uint16 LE），共 5170 条。
@@ -22,10 +23,10 @@
            atk / def / level / attribute / race / unknown / zero_1
 
 输出文件：
-  data/card-names.s     卡名字符串表
+  data/card-names.s     卡名字符串池 + 指针表（合并版）
   data/card-stats.s     卡牌属性数据表
 
-卡名来源：doc/um06-deck-modification-tool/data.md（2037 张，含槽位 ID 与密码）
+卡名来源：doc/um06-deck-modification-tool/data.md（2036 张，含槽位 ID 与密码）
 """
 
 import os
@@ -42,10 +43,11 @@ OUT_DIR     = 'data'
 NAMES_START = 0x015BB594
 
 # 卡牌属性数据表
-STATS_START = 0x018169B6
-STATS_END   = 0x01832601         # 闭区间最后一字节（5170 × 22 = 113740 字节）
-RECORD_SIZE = 22                 # 字节/条
-STATS_COUNT = (STATS_END - STATS_START + 1) // RECORD_SIZE  # 5170
+STATS_START = 0x018169B8         # 首条 zero0 字段与 card-descriptions Section C 最末 u32 字节重叠
+STATS_END   = 0x01832601         # 闭区间最后一字节
+RECORD_SIZE = 22                 # 字节/条 (首条除外：首条无 zero0 字段, 仅 20 B)
+# 首条 20 B + 后续 5169 × 22 B = 113,738 B = STATS_END - STATS_START + 1
+STATS_COUNT = 5170
 
 # 每张卡的字符串语言数（XX/EN/DE/FR/IT/ES）
 # 顺序通过对比 lang=0 字节模式 (0xF0+ 高字节为主) vs lang=1..5 (Latin 文字) 验证
@@ -56,40 +58,6 @@ LANG_NAMES = ['XX', 'EN', 'DE', 'FR', 'IT', 'ES']
 # ---------------------------------------------------------------------------
 # 工具函数
 # ---------------------------------------------------------------------------
-
-def asm_escape(raw: bytes) -> str:
-    """将字节序列转换为 GAS .ascii 字面量内容（CP1252 源文件）。"""
-    parts = []
-    for b in raw:
-        if   b == 0x22: parts.append('\\"')
-        elif b == 0x5C: parts.append('\\\\')
-        elif b == 0x0A: parts.append('\\n')
-        elif b == 0x0D: parts.append('\\r')
-        elif b == 0x09: parts.append('\\t')
-        elif b == 0x00: parts.append('\\0')
-        elif 0x20 <= b < 0x7F:  parts.append(chr(b))
-        elif 0x80 <= b <= 0x9F:
-            try:    parts.append(bytes([b]).decode('cp1252'))
-            except (UnicodeDecodeError, ValueError):
-                    parts.append(f'\\x{b:02x}')
-        elif 0xA0 <= b <= 0xFF: parts.append(chr(b))
-        else:                   parts.append(f'\\x{b:02x}')
-    return ''.join(parts)
-
-
-def read_null_str(rom: bytes, pos: int, limit: int) -> tuple[bytes, int]:
-    """读取一个 null 终止字符串，返回 (字节串, 下一个字符串的起始位置)。
-    下一个起始位置已对齐到 2 字节边界（含结尾 null 和可能的填充 null）。
-    """
-    j = pos
-    while j < limit and rom[j] != 0:
-        j += 1
-    s = rom[pos:j]
-    end = j + 1           # 跳过 null
-    if end % 2 == 1:      # 对齐到偶数地址
-        end += 1
-    return s, end
-
 
 def load_data_md(path: str) -> list[tuple[int, str, int]]:
     """解析 data.md，返回按出现顺序排列的 [(slot_id, en_name, password)] 列表。"""
@@ -111,136 +79,177 @@ def load_data_md(path: str) -> list[tuple[int, str, int]]:
 
 
 # ---------------------------------------------------------------------------
-# 卡名字符串表扫描
+# 导出：卡名字符串表 + 指针表（合并文件）
 # ---------------------------------------------------------------------------
 
-def scan_card_names(rom: bytes) -> tuple[list, int]:
-    """扫描卡名字符串表，返回 (cards, end_offset)。
-    cards = [(card_rom_off, [lang0_bytes, lang1_bytes, ...]), ...]
-        lang0 = XX 自定义编码, lang1..5 = EN/DE/FR/IT/ES
-    end_offset = 表结束后第一个字节的偏移（下一个数据结构起始）。
+# 卡名指针表（紧跟字符串池之后）
+NAME_PTR_START = 0x015F3A5C          # = 字符串池结束 = 指针表起点
+NAME_PTR_END   = 0x015FFF0C          # 指针表结束 = card-descriptions 起点
+N_CARDS_TOTAL  = 2098                # cid=0..2097
 
-    第 0 张卡 (cid=0) 是占位记录：6 个空字符串（共 12 字节零）。
-    停止条件：EN 字符串（lang=1）为空且不是首张占位卡，或含控制字符（< 0x20）。
+
+def _escape_string_oneline(data: bytes, lang: str) -> str:
+    """把字节序列编码为 .ascii 单行字面量内容。
+    XX 非打印 ASCII 用 \\NNN 八进制（与 card-descriptions.s 风格一致）；
+    其他 lang 优先 CP1252 字面，未定义字节用八进制。
     """
-    p = NAMES_START
-    limit = STATS_START   # 不跨越属性表
-    cards = []
-
-    while p < limit:
-        card_start = p
-        strs = []
-        ok = True
-        for _ in range(LANGS_PER_CARD):
-            s, p = read_null_str(rom, p, limit)
-            strs.append(s)
-            if p > limit:
-                ok = False
-                break
-        if not ok:
-            break
-        en_str = strs[1]   # lang=1 是 EN
-        is_placeholder = (len(en_str) == 0 and len(strs[0]) == 0)
-        # 首张占位卡 cid=0：所有 lang 全空，长度 12B
-        if is_placeholder and len(cards) == 0:
-            cards.append((card_start, strs))
-            continue
-        # EN 为空 → 已到表末尾
-        if len(en_str) == 0:
-            break
-        # EN 含控制字符 → 已离开字符串表
-        if any(b < 0x20 for b in en_str):
-            break
-        cards.append((card_start, strs))
-
-    # end_offset = 当前 p（上一次成功扫描后的位置），即下一个数据结构的起始
-    # 回退到最后一张有效卡结束后的对齐位置
-    if cards:
-        last_off, last_strs = cards[-1]
-        p2 = last_off
-        for s in last_strs:
-            a = len(s) + 1
-            if a % 2 == 1:
-                a += 1
-            p2 += a
-        return cards, p2
-    return cards, p
-
-
-# ---------------------------------------------------------------------------
-# 导出：卡名字符串表
-# ---------------------------------------------------------------------------
-
-def export_card_names(rom: bytes, cards: list, slot_info: list, out_dir: str) -> int:
-    """生成 data/card-names.s。返回表结束偏移（最后一个字节之后）。"""
-
-    # 建立 index → (slot_id, en_name, password) 映射
-    slot_map = {}
-    for i, (slot, name, pwd) in enumerate(slot_info):
-        slot_map[i] = (slot, name, pwd)
-
-    lines = []
-
-    # 计算精确结束偏移（最后一张卡的最后一字节+1）
-    last_card_off, last_strs = cards[-1]
-    p = last_card_off
-    for s in last_strs:
-        aligned_len = len(s) + 1
-        if aligned_len % 2 == 1:
-            aligned_len += 1
-        p += aligned_len
-    end_off = p - 1  # 闭区间
-
-    header = (
-        f'@ data/card-names.s\n'
-        f'@ ROM range: 0x{NAMES_START:08X} ~ 0x{end_off:08X}\n'
-        f'@ Generated by tools/rom-export/export_card_data.py\n'
-        f'@\n'
-        f'@ {LANGS_PER_CARD} strings per card: {" / ".join(LANG_NAMES)}\n'
-        f'@ XX: custom byte encoding (0xF0-0xFF range)\n'
-        f'@ File encoding: CP1252\n'
-        f'@ 2-byte alignment: (strlen+1) odd -> pad with one extra \\0\n'
-        f'@\n'
-        f'@ Labels: card_name_XXXX (XXXX = slot_id hex, uppercase)\n'
-        f'@   Tokens/unknowns use card_name_idx_NNNN\n'
-        f'\n'
-        f'card_names_table:\n'
-    )
-
-    for i, (card_off, strs) in enumerate(cards):
-        # cards[0] = cid=0 占位记录（6 个空字符串）；slot_info 从 cid=1 (Blue-Eyes) 开始
-        if i == 0:
-            label = 'card_name_placeholder'
-            comment = 'placeholder (cid=0): 6 empty strings, 12 bytes'
-        else:
-            slot_idx = i - 1
-            if slot_idx < len(slot_info):
-                slot_id, en_name, pwd = slot_info[slot_idx]
-                label = f'card_name_{slot_id:04X}'
-                comment = f'{en_name}  (pw {pwd:08d})'
+    pieces = []
+    for b in data:
+        if   b == 0x22: pieces.append('\\"')
+        elif b == 0x5C: pieces.append('\\\\')
+        elif b == 0x00: pieces.append('\\0')
+        elif lang == 'xx':
+            if 0x20 <= b < 0x7F:
+                pieces.append(chr(b))
             else:
-                label = f'card_name_idx_{i:04d}'
-                comment = f'(index {i}, no data.md entry)'
+                pieces.append(f'\\{b:03o}')
+        else:
+            if   0x20 <= b < 0x7F: pieces.append(chr(b))
+            elif b == 0x0A: pieces.append('\\n')
+            elif b == 0x0D: pieces.append('\\r')
+            elif b == 0x09: pieces.append('\\t')
+            elif 0xA0 <= b <= 0xFF: pieces.append(chr(b))
+            elif 0x80 <= b <= 0x9F:
+                try:
+                    pieces.append(bytes([b]).decode('cp1252'))
+                except (UnicodeDecodeError, ValueError):
+                    pieces.append(f'\\{b:03o}')
+            else:
+                pieces.append(f'\\{b:03o}')
+    return ''.join(pieces)
 
-        lines.append(f'\n{label}:  @ {comment}\n')
 
-        for lang_idx, s in enumerate(strs):
-            lang = LANG_NAMES[lang_idx]
-            # 计算对齐后的 null 数量
-            null_count = 1
-            if (len(s) + 1) % 2 == 1:
-                null_count = 2
-            content = asm_escape(s) + '\\0' * null_count
-            lines.append(f'\t.ascii "{content}"  @ {lang}\n')
+def export_card_names(rom: bytes, out_dir: str) -> int:
+    """生成合并版 data/card-names.s（字符串池 + 指针表）。
 
+    结构参照 data/card-descriptions.s，所有 label 均以 4 位十进制 cid 为后缀：
+      1. card_names_table        字符串池（master cid × 6 langs，每 lang 独立子标签）
+         card_name_<cid>:          @ <EN name>
+         card_name_<cid>_<lang>:
+             .ascii "..."
+      2. card_name_pointer_table 2098 × 6 × u32 偏移（通过 name_offsets 宏展开）
+         name_offsets <cid>    @ <EN name>[ (alt-art)]
+
+    返回指针表结束偏移（= card-descriptions 起点）。
+    """
+
+    pool_start = NAMES_START
+    pool_end   = NAME_PTR_START
+    pool_size  = pool_end - pool_start
+    ptr_start  = NAME_PTR_START
+    ptr_end    = NAME_PTR_END
+    ptr_size   = ptr_end - ptr_start
+
+    # 1. 读取指针表：12,588 × u32 = 2098 cards × 6 langs
+    ptrs = [struct.unpack_from('<I', rom, ptr_start + i * 4)[0]
+            for i in range(N_CARDS_TOTAL * LANGS_PER_CARD)]
+
+    # 2. 以 6-tuple 首次出现判定 master_cid（alt-art 共享 master）
+    group_to_master: dict[tuple, int] = {}
+    master_of: list[int] = [0] * N_CARDS_TOTAL
+    for cid in range(N_CARDS_TOTAL):
+        grp = tuple(ptrs[cid * 6:(cid + 1) * 6])
+        master_of[cid] = group_to_master.setdefault(grp, cid)
+
+    masters_sorted = sorted(set(master_of))
+    n_masters = len(masters_sorted)
+
+    # 3. 直接从 pool 抽取每个 master 的 EN 名字串（去尾 null）
+    en_name_of: dict[int, str] = {}
+    for idx, mc in enumerate(masters_sorted):
+        en_off  = ptrs[mc * 6 + 1]              # EN lang offset
+        next_off = ptrs[mc * 6 + 2]             # DE offset 为 EN 段尾
+        en_bytes = bytes(rom[pool_start + en_off:pool_start + next_off])
+        en_name  = en_bytes.rstrip(b'\0').decode('cp1252', errors='replace')
+        en_name_of[mc] = en_name if en_name else '(placeholder)' if mc == 0 else '(unknown)'
+
+    # 4. 生成输出
+    out: list[str] = []
+    out.append('@ =============================================================================')
+    out.append('@ Card Names (merged: name pool + pointer table)')
+    out.append(f'@ ROM 0x{pool_start:07X} - 0x{ptr_end:07X}  ({ptr_end - pool_start:,} B)')
+    out.append('@')
+    out.append(f'@  1. card_names_table         0x{pool_start:07X} - 0x{pool_end:07X}'
+               f'  ({pool_size:,} B)')
+    out.append(f'@     {n_masters} master entries × 6 langs (XX/EN/DE/FR/IT/ES),'
+               f' null-terminated, 2B-aligned')
+    out.append(f'@     alt-art cards share master label')
+    out.append(f'@  2. card_name_pointer_table  0x{ptr_start:07X} - 0x{ptr_end:07X}'
+               f'  ({ptr_size:,} B = {N_CARDS_TOTAL}×6 u32)')
+    out.append('@     Lookup (Data Crystal 0x080EE968):')
+    out.append('@       name_addr = card_names_table + ptr[card_id*6 + lang_id]')
+    out.append('@     lang_id: 0=XX 1=EN 2=DE 3=FR 4=IT 5=ES')
+    out.append('@')
+    out.append('@ File encoding: CP1252; XX bytes octal-escaped (\\NNN) for readability')
+    out.append('@ Labels: card_name_<cid>[_<lang>]; <cid> = master card id, 4-digit decimal')
+    out.append('@ Generated by tools/rom-export/export_card_data.py')
+    out.append('@ =============================================================================')
+    out.append('')
+
+    # 宏：6 lang 偏移（相对 card_names_table）
+    out.append('@ Macro: 6 lang offsets for cid (label - card_names_table)')
+    out.append('.macro name_offsets cid')
+    for lang in LANG_NAMES:
+        out.append(f'\t.word card_name_\\cid\\()_{lang.lower()} - card_names_table')
+    out.append('.endm')
+    out.append('')
+
+    # ---------- 1. 字符串池 ----------
+    out.append('@ -----------------------------------------------------------------------------')
+    out.append(f'@ 1. Name Pool ({n_masters} masters × 6 langs, null-terminated, 2B-aligned)')
+    out.append(f'@    ROM 0x{pool_start:07X} - 0x{pool_end:07X}  ({pool_size:,} B)')
+    out.append('@ -----------------------------------------------------------------------------')
+    out.append('card_names_table:')
+
+    for idx, mc in enumerate(masters_sorted):
+        suffix  = f'{mc:04d}'
+        out.append('')
+        out.append(f'card_name_{suffix}:  @ {en_name_of[mc]}')
+        for lang_idx, lang in enumerate(LANG_NAMES):
+            off = ptrs[mc * 6 + lang_idx]
+            # 段尾：同 master 下一 lang 的起点；最后一 lang 取下一 master XX 或 pool_size
+            if lang_idx < 5:
+                next_off = ptrs[mc * 6 + lang_idx + 1]
+            elif idx + 1 < n_masters:
+                next_mc  = masters_sorted[idx + 1]
+                next_off = ptrs[next_mc * 6 + 0]
+            else:
+                next_off = pool_size
+            chunk = bytes(rom[pool_start + off:pool_start + next_off])
+            out.append(f'card_name_{suffix}_{lang.lower()}:')
+            out.append(f'\t.ascii "{_escape_string_oneline(chunk, lang.lower())}"')
+
+    out.append('')
+
+    # ---------- 2. 指针表 ----------
+    out.append('@ -----------------------------------------------------------------------------')
+    out.append(f'@ 2. Pointer Table ({N_CARDS_TOTAL} cards × 6 langs × u32)')
+    out.append(f'@    ROM 0x{ptr_start:07X} - 0x{ptr_end:07X}  ({ptr_size:,} B)')
+    out.append('@ -----------------------------------------------------------------------------')
+    out.append('card_name_pointer_table:')
+    out.append('')
+
+    for cid in range(N_CARDS_TOTAL):
+        mc = master_of[cid]
+        suffix = f'{mc:04d}'
+        name = en_name_of[mc]
+        alt = '' if mc == cid else ' (alt-art)'
+        out.append(f'\tname_offsets {suffix}    @ {name}{alt}')
+
+    out.append('')
+
+    content = '\n'.join(out) + '\n'
     out_path = os.path.join(out_dir, 'card-names.s')
     with open(out_path, 'w', encoding='cp1252') as f:
-        f.write(header)
-        f.writelines(lines)
+        f.write(content)
 
-    print(f'[NAMES] {out_path}  卡数: {len(cards)}  '
-          f'ROM: 0x{NAMES_START:08X} ~ 0x{end_off:08X}')
-    return end_off + 1   # 开区间结束
+    print(f'[NAMES] {out_path}')
+    print(f'  Name pool:      ROM 0x{pool_start:08X} ~ 0x{pool_end-1:08X}'
+          f'  ({pool_size:,} B, {n_masters} masters)')
+    print(f'  Pointer table:  ROM 0x{ptr_start:08X} ~ 0x{ptr_end-1:08X}'
+          f'  ({ptr_size:,} B, {N_CARDS_TOTAL} cards)')
+    print(f'  Output:         {len(content):,} chars, {content.count(chr(10)):,} lines')
+    return ptr_end   # 开区间结束
 
 
 # ---------------------------------------------------------------------------
@@ -358,15 +367,37 @@ def export_card_stats(rom: bytes, slot_info: list, out_dir: str):
 
     lines = [header]
 
+    # 计算每条的 ROM 起点：首条 (i=0) 无 zero0 字段 (20 B)，其余 22 B
+    def entry_offset(i):
+        if i == 0:
+            return STATS_START  # 指向 slot_id 字段 (首条无 zero0)
+        return STATS_START + 20 + (i - 1) * RECORD_SIZE  # 首条 20 B + 后续
+
     for i in range(STATS_COUNT):
-        off = STATS_START + i * RECORD_SIZE
-        (zero0, slot_id, copy_idx, flags,
-         atk, def_, level, race, attr, subtype, spsub) = struct.unpack_from('<11H', rom, off)
+        off = entry_offset(i)
+        if i == 0:
+            # 首条: 无 zero0 字段, 只读 10 hwords (slot_id..spsub)
+            zero0 = 0x0020  # 字节重叠值 (由 Section C 最末 u32 的高 2 B 提供), 仅用于注释
+            (slot_id, copy_idx, flags,
+             atk, def_, level, race, attr, subtype, spsub) = struct.unpack_from('<10H', rom, off)
+        else:
+            (zero0, slot_id, copy_idx, flags,
+             atk, def_, level, race, attr, subtype, spsub) = struct.unpack_from('<11H', rom, off)
 
         label = f'card_{i:04d}'
 
         # ── 全零 / 哑元记录（slot_id == 0） ──────────────────────────────────
         if slot_id == 0:
+            if i == 0:
+                # 首条特殊：zero0 字段与 card-descriptions Section C 最末 u32 字节重叠
+                comment = ('@ 哑元记录（slot_id=0）；zero0 字段 (=0x0020) 字节归属'
+                           ' card-descriptions Section C 最末 u32')
+                lines.append(
+                    f'\n{label}:\t{comment}\n'
+                    f'\t.hword 0, 0, 0, 0, 0, 0, 0, 0, 0, 0\t'
+                    f'@ slot_id, copy, flags, atk, def, level, race, attr, subtype, spsub (20 B)\n'
+                )
+                continue
             zero0_s = f'0x{zero0:04X}' if zero0 else ''
             comment = f'@ 哑元记录（slot_id=0）'
             if zero0_s:
@@ -440,13 +471,8 @@ def main():
     slot_info = load_data_md(DATA_MD)
     print(f'  从 data.md 读取 {len(slot_info)} 张卡的槽位信息')
 
-    print(f'扫描卡名字符串表（ROM 0x{NAMES_START:08X}）...')
-    cards, names_table_end = scan_card_names(rom)
-    print(f'  找到 {len(cards)} 张卡，'
-          f'表结束于 ROM 0x{names_table_end - 1:08X}（含）')
-
-    print(f'导出卡名字符串表 → data/card-names.s ...')
-    export_card_names(rom, cards, slot_info, OUT_DIR)
+    print(f'导出合并卡名字符串表 + 指针表 → data/card-names.s ...')
+    names_table_end = export_card_names(rom, OUT_DIR)
 
     print(f'导出卡牌属性数据表 → data/card-stats.s ...')
     export_card_stats(rom, slot_info, OUT_DIR)

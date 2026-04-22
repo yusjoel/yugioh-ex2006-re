@@ -66,19 +66,20 @@ DECK_BLOCKS = [
 
 
 def load_card_info(project_root):
-    path = os.path.join(project_root, 'data', 'card-names.s')
-    with open(path, 'r', encoding='cp1252') as f:
-        text = f.read()
+    """从 doc/um06-deck-modification-tool/data.md 读 slot_id → (name_en, passcode)。"""
+    path = os.path.join(project_root, 'doc/um06-deck-modification-tool/data.md')
     mapping = {}
     pattern = re.compile(
-        r'card_name_([0-9A-F]{4}):\s+@\s+(.+?)(?:\s+\(pw\s+(\d+)\))?\s*$',
-        re.MULTILINE
+        r'\|\s*(\d{7,9})\s*\|([^|]+)\|[^|]*\|\s*([0-9A-Fa-f]{4})\s*\|'
     )
-    for m in pattern.finditer(text):
-        slot_id = int(m.group(1), 16)
-        name = m.group(2).strip()
-        pw = m.group(3) if m.group(3) else None
-        mapping[slot_id] = (name, pw)
+    with open(path, encoding='utf-8') as f:
+        for line in f:
+            m = pattern.match(line)
+            if m:
+                pw      = m.group(1)
+                name    = m.group(2).strip()
+                slot_id = int(m.group(3), 16)
+                mapping[slot_id] = (name, pw)
     return mapping
 
 
