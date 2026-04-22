@@ -355,9 +355,15 @@ HUD_ITEMS = [
     # (slug,                              rom_off,    size,     kind,       说明)
     ('hud_life_points_font',              0x1850B1C,  0xAC0,    'tiles',    'LP 数字字体 tile（至下一 HUD 项）'),
     ('hud_phase_highlights_palette',      0x18515DC,  0x20,     'palettes', 'Phase Highlight 对象调色板（md 明确 0x18515DC-0x18515FB）'),
+    ('hud_gap_tiles',                     0x18515FC,  0x400,    'tiles',    'HUD gap tile sheet（稀疏 4bpp，32 tiles）'),
     ('hud_phases_highlight',              0x18519FC,  0x3650,   'tiles',    'Phases Highlight tile（含尾部未知区，至 Campaign outer image 起点）'),
+    ('duel_field_outer_extra_tiles',      0x185878C,  0xBE0,    'tiles',    '外场 extra tile sheet（~95 tiles, 4bpp）'),
+    ('duel_field_outer_palette_pointers', 0x185936C,  0x1C,     'tilemaps', '外场调色板指针表（7 条 × 4 B，末条为 sentinel）'),
+    ('duel_field_extra_palette',          0x1859508,  0x40,     'palettes', '额外 palette 区 32 colors（2 × 16 色，primary/grey + 金色渐变）'),
     ('hud_phases_tilemap_pointers',       0x1859548,  0x1C,     'tilemaps', 'LP/阶段 Tilemap 指针表（7 条 × 4 B）'),
     ('hud_phases_map',                    0x185B184,  0x4B0,    'tiles',    'Phases Map tile（30×20 规模，0x4B0 字节）'),
+    ('duel_field_outer_tilemap_pointers', 0x185B634,  0x1C,     'tilemaps', '外场 Tilemap 指针表（7 条 × 4 B，末条为 sentinel 指 common_inner_tilemap）'),
+    ('duel_field_common_inner_tilemap',   0x185D270,  0x4B0,    'tilemaps', '内场公共 Tilemap（所有模式共享，30×20）'),
 ]
 
 

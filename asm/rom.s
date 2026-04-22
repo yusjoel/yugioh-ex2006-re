@@ -48,8 +48,11 @@ Start:
 @ Data Crystal ROM map function 0x080EE76C 验证
 	.include "data/cards-ids-array.s"
 
-@ 后 16MB 第一段前半 seg-A-2：ROM偏移 0x15B94CC - 0x15BB593（cards_ids_array 后至卡名表前）
-	.incbin "roms/2343.gba", 0x15B94CC, 0x20C8
+@ 卡牌密码表（加密）（ROM偏移 0x15B94CC - 0x15BB593）
+@ 2098 × u32 = 8,392 B；table[cid] XOR key(cid) = passcode_bcd
+@   key(cid) = ((cid * 0x343FD + 0x269EC3) >> 16) | 0x9EC30000  （Borland rand LCG）
+@ 解密器 FUN_080ef370 / 逆查 FUN_080ef38c
+	.include "data/card-passcodes.s"
 
 @ 卡牌名称统一区（ROM 偏移 0x15BB594 - 0x15FFF0B，共 280,952 字节）
 @ 合并 card-names + card-name-pointer-table:
@@ -76,7 +79,7 @@ Start:
 	.incbin "roms/2343.gba", 0x1832602, 0x1E51A     @ seg-C 前段 0x1832602..0x1850B1C
 	.incbin "graphics/bin/duel-field/tiles/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
 	.incbin "graphics/bin/duel-field/palettes/hud_phase_highlights_palette.bin"  @ 0x18515DC, 0x20
-	.incbin "roms/2343.gba", 0x18515FC, 0x400       @ 未知 gap（0x18515FC..0x18519FC）
+	.incbin "graphics/bin/duel-field/tiles/hud_gap_tiles.bin"                 @ 0x18515FC, 0x400（HUD gap 4bpp tile sheet）
 	.incbin "graphics/bin/duel-field/tiles/hud_phases_highlight.bin"          @ 0x18519FC, 0x3650（至 0x185504C）
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
@@ -94,9 +97,10 @@ Start:
 @ Survival Mode（生存）外场图块，ROM 0x1857FAC，0x7E0 字节（63 图块）
 	.incbin "graphics/bin/duel-field/tiles/survival_outer_image.bin"
 
-@ 未知图块数据 + 外场调色板指针表（7条目28字节，位于 0x185936C）
-@ ROM 0x185878C - 0x185938B，0xBFC 字节
-	.incbin "roms/2343.gba", 0x185878C, 0xBFC
+@ 外场 extra tile sheet + 外场调色板指针表
+@ ROM 0x185878C - 0x1859388，0xBFC 字节
+	.incbin "graphics/bin/duel-field/tiles/duel_field_outer_extra_tiles.bin"      @ 0x185878C, 0xBE0（~95 tiles 4bpp）
+	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_palette_pointers.bin"  @ 0x185936C, 0x1C（7 条 × 4 B）
 
 @ ── 外场调色板（6种模式，每个 0x40 字节 = 2个子调色板）────────────────
 @ 指针表在 0x185936C（7条目），数据从 0x1859388 开始
@@ -108,9 +112,9 @@ Start:
 	.incbin "graphics/bin/duel-field/palettes/theme_outer_palette.bin"
 	.incbin "graphics/bin/duel-field/palettes/survival_outer_palette.bin"
 
-@ 未知数据 + LP/阶段 Tilemap 指针表（7条目28字节，位于 0x1859548）
-@ ROM 0x1859508 - 0x1859563，0x5C 字节；指针表拆为 HUD bin
-	.incbin "roms/2343.gba", 0x1859508, 0x40        @ 未知前段 0x1859508..0x1859548
+@ 额外 palette (2×16 色) + LP/阶段 Tilemap 指针表
+@ ROM 0x1859508 - 0x1859563，0x5C 字节
+	.incbin "graphics/bin/duel-field/palettes/duel_field_extra_palette.bin"      @ 0x1859508, 0x40（2×16 色）
 	.incbin "graphics/bin/duel-field/tilemaps/hud_phases_tilemap_pointers.bin"   @ 0x1859548, 0x1C
 
 @ ── LP/阶段显示区 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────
@@ -123,10 +127,10 @@ Start:
 	.incbin "graphics/bin/duel-field/tilemaps/theme_outer_lp_tilemap.bin"
 	.incbin "graphics/bin/duel-field/tilemaps/survival_outer_lp_tilemap.bin"
 
-@ "Phases Map?" 图块 + 外场 Tilemap 指针表（7条目28字节，位于 0x185B634）
-@ ROM 0x185B184 - 0x185B64F，0x4CC 字节；Phases Map 数据拆为 HUD bin
-	.incbin "graphics/bin/duel-field/tiles/hud_phases_map.bin"                @ 0x185B184, 0x4B0
-	.incbin "roms/2343.gba", 0x185B634, 0x1C        @ 外场 Tilemap 指针表（7条目28字节）
+@ "Phases Map?" 图块 + 外场 Tilemap 指针表
+@ ROM 0x185B184 - 0x185B650，0x4CC 字节
+	.incbin "graphics/bin/duel-field/tiles/hud_phases_map.bin"                   @ 0x185B184, 0x4B0
+	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_tilemap_pointers.bin"  @ 0x185B634, 0x1C（7 条 × 4 B）
 
 @ ── 外场 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────────────
 @ 指针表在 0x185B634（7条目），数据从 0x185B650 开始
@@ -139,7 +143,7 @@ Start:
 
 @ 内场公共 Tilemap（所有模式共享，0x4B0 字节 = 30×20 图块）
 @ ROM 0x185D270 - 0x185D71F
-	.incbin "roms/2343.gba", 0x185D270, 0x4B0
+	.incbin "graphics/bin/duel-field/tilemaps/duel_field_common_inner_tilemap.bin"
 
 @ ── 内场图块数据（6种模式，每个 0x1680 字节 = 180 图块）────────────────
 @ 数据从 0x185D720 开始（紧接内场公共 Tilemap 后），6 × 0x1680 = 0x8D00 字节

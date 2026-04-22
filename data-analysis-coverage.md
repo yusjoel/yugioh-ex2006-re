@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**21,829,132 B（76.48%）**
-- 未分析：**6,714,300 B（23.52%）**
+- 已分析：**21,842,908 B（76.53%）**
+- 未分析：**6,700,524 B（23.47%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -27,22 +27,16 @@
 | `0x01867560` | `0x26510` | 156,944 | 内场调色板后，小图标图块前 |
 | `0x01832602` | `0x1E51A` | 124,186 | seg-C 前段（属性表后，HUD 图块前） |
 | `0x0188F8D0` | `0x6B00` | 27,392 | 小图标 tile 后，小图标调色板前 |
-| `0x015B94CC` | `0x20C8` | 8,392 | cards_ids_array 后至卡名表前 |
 | `0x01E5906E` | `0x1B8E` | 7,054 | 对手卡值后 |
 | `0x01CCD290` | `0x16D0` | 5,840 | 字库后段前部 |
 | `0x01865E20` | `0x1680` | 5,760 | 未知第 7 内场图块 |
 | `0x01E5FD84` | `0x1408` | 5,128 | 预组后，文件路径表前 |
-| `0x0185878C` | `0xBFC` | 3,068 | 外场图块后（含外场调色板指针表） |
 | `0x01E5E618` | `0x918` | 2,328 | 卡包信息表后，禁卡表前 |
-| `0x0185D270` | `0x4B0` | 1,200 | 内场公共 Tilemap |
-| `0x018515FC` | `0x400` | 1,024 | HUD 未知 gap |
 | `0x01E5F6CC` | `0x1B8` | 440 | 禁卡表后，初始卡组前 |
 | `0x01E5F8EA` | `0x16E` | 366 | 初始卡组后，预组前 |
 | `0x004C7638` | `0x88` | 136 | all.s 后 / 大卡图调色板前 |
-| `0x01859508` | `0x40` | 64 | LP/阶段 Tilemap 指针表前未知段 |
-| `0x0185B634` | `0x1C` | 28 | 外场 Tilemap 指针表 |
 
-**合计**：23 段，6,714,300 B（23.52% 数据区）
+**合计**：17 段，6,700,524 B（23.47% 数据区）
 
 ## 全部段（按 ROM 地址顺序）
 
@@ -56,23 +50,23 @@
 | `0x01326280` | `0x28F980` | 2,685,312 | ✓ 已分析 | card-mini-frame | `.include data/card-mini-frame.s` |
 | `0x015B5C00` | `0x20CC` | 8,396 | ✓ 已分析 | card-image-index | `.include data/card-image-index.s` |
 | `0x015B7CCC` | `0x1800` | 6,144 | ✓ 已分析 | cards-ids-array | `.include data/cards-ids-array.s` |
-| `0x015B94CC` | `0x20C8` | 8,392 | ✗ 未分析 | cards_ids_array 后至卡名表前 | raw `.incbin roms/2343.gba` |
+| `0x015B94CC` | `0x20C8` | 8,392 | ✓ 已分析 | card-passcodes (2098×u32, LCG-XOR 加密) | `.include data/card-passcodes.s` |
 | `0x015BB594` | `0x44978` | 280,952 | ✓ 已分析 | card-names (pool + 2098×6 u32 指针表, 合并) | `.include data/card-names.s` |
 | `0x015FFF0C` | `0x216AAC` | 2,189,996 | ✓ 已分析 | card-descriptions (pool + offset 表, 合并 effect-text) | `.include data/card-descriptions.s` |
 | `0x018169B8` | `0x1BC4A` | 113,738 | ✓ 已分析 | card-stats (首条 20B, 其余 5169 × 22B) | `.include data/card-stats.s` |
 | `0x01832602` | `0x1E51A` | 124,186 | ✗ 未分析 | seg-C 前段（属性表后，HUD 图块前） | raw `.incbin roms/2343.gba` |
 | `0x01850B1C` | `0x4130` | 16,688 | ✓ 已分析 | duel-field HUD (tiles+palettes) | `.incbin graphics/bin/duel-field/{tiles,palettes}/hud_*.bin` |
-| `0x018515FC` | `0x400` | 1,024 | ✗ 未分析 | HUD 未知 gap | raw `.incbin roms/2343.gba` |
+| `0x018515FC` | `0x400` | 1,024 | ✓ 已分析 | HUD gap tile sheet (稀疏 4bpp) | `.incbin graphics/bin/duel-field/tiles/hud_gap_tiles.bin` |
 | `0x0185504C` | `0x3740` | 14,144 | ✓ 已分析 | duel-field outer images (6 modes) | `.incbin graphics/bin/duel-field/tiles/*_outer_image.bin` |
-| `0x0185878C` | `0xBFC` | 3,068 | ✗ 未分析 | 外场图块后（含外场调色板指针表） | raw `.incbin roms/2343.gba` |
+| `0x0185878C` | `0xBFC` | 3,068 | ✓ 已分析 | 外场 extra tiles + 外场调色板指针表 | `.incbin graphics/bin/duel-field/{tiles,tilemaps}/duel_field_outer_{extra_tiles,palette_pointers}.bin` |
 | `0x01859388` | `0x180` | 384 | ✓ 已分析 | duel-field outer palettes (6 modes) | `.incbin graphics/bin/duel-field/palettes/*_outer_palette.bin` |
-| `0x01859508` | `0x40` | 64 | ✗ 未分析 | LP/阶段 Tilemap 指针表前未知段 | raw `.incbin roms/2343.gba` |
+| `0x01859508` | `0x40` | 64 | ✓ 已分析 | duel-field extra palette (2×16 色) | `.incbin graphics/bin/duel-field/palettes/duel_field_extra_palette.bin` |
 | `0x01859548` | `0x1C` | 28 | ✓ 已分析 | duel-field HUD tilemap pointers | `.incbin graphics/bin/duel-field/tilemaps/hud_phases_tilemap_pointers.bin` |
 | `0x01859564` | `0x1C20` | 7,200 | ✓ 已分析 | duel-field outer LP tilemap (6 modes) | `.incbin graphics/bin/duel-field/tilemaps/*_outer_lp_tilemap.bin` |
 | `0x0185B184` | `0x4B0` | 1,200 | ✓ 已分析 | duel-field phases map | `.incbin graphics/bin/duel-field/tiles/hud_phases_map.bin` |
-| `0x0185B634` | `0x1C` | 28 | ✗ 未分析 | 外场 Tilemap 指针表 | raw `.incbin roms/2343.gba` |
+| `0x0185B634` | `0x1C` | 28 | ✓ 已分析 | 外场 Tilemap 指针表 (7 × u32) | `.incbin graphics/bin/duel-field/tilemaps/duel_field_outer_tilemap_pointers.bin` |
 | `0x0185B650` | `0x1C20` | 7,200 | ✓ 已分析 | duel-field outer tilemap (6 modes) | `.incbin graphics/bin/duel-field/tilemaps/*_outer_tilemap.bin` |
-| `0x0185D270` | `0x4B0` | 1,200 | ✗ 未分析 | 内场公共 Tilemap | raw `.incbin roms/2343.gba` |
+| `0x0185D270` | `0x4B0` | 1,200 | ✓ 已分析 | 内场公共 Tilemap (30×20, 所有模式共享) | `.incbin graphics/bin/duel-field/tilemaps/duel_field_common_inner_tilemap.bin` |
 | `0x0185D720` | `0x8700` | 34,560 | ✓ 已分析 | duel-field inner images (6 modes) | `.incbin graphics/bin/duel-field/tiles/*_inner_image.bin` |
 | `0x01865E20` | `0x1680` | 5,760 | ✗ 未分析 | 未知第 7 内场图块 | raw `.incbin roms/2343.gba` |
 | `0x018674A0` | `0xC0` | 192 | ✓ 已分析 | duel-field inner palettes (6 modes) | `.incbin graphics/bin/duel-field/palettes/*_inner_palette.bin` |
@@ -112,7 +106,7 @@
 | `0x01E64684` | `0x70350` | 459,600 | ✓ 已分析 | fs-payload (338 files via fs/) | `.include data/fs-payload.s` |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
 
-**合计**：63 段（40 已分析 + 23 未分析），28,543,432 B
+**合计**：63 段（46 已分析 + 17 未分析），28,543,432 B
 
 ## 2026-04-22 合并：card-descriptions + card-effect-text
 
@@ -137,3 +131,24 @@
 - 第 2 段 `card_name_pointer_table` 0x15F3A5C..0x15FFF0B（50,352 B）：2098 × 6 × u32 偏移，通过宏 `name_offsets <suffix>` 展开（与 `desc_offsets` 同构）
 
 生成器：`export_card_data.py`（接管了原 `export_card_name_pointer_table.py` 的职责，后者已删除）。
+
+## 2026-04-22 小段清理：card-passcodes 破解 + duel-field 5 段结构化
+
+### 0x15B94CC / 8,392 B → 加密卡牌密码表
+反编译 `FUN_080ef370` 确认这是 **2098 × u32 加密密码表**：
+```
+table[cid] XOR key(cid) = passcode_bcd   （hex 数字直接读作十进制 = passcode）
+key(cid) = ((cid * 0x343FD + 0x269EC3) >> 16) | 0x9EC30000   （Borland rand LCG）
+```
+全表验证：2078/2080 与 data.md 一致；cid=0 + 17 张 token 解密出非十进制 → 占位/无密码。
+剩 2 张差异为 ROM 选用 Premium Pack 异画版密码：cid=689 Polymerization = 27847700 (PP6)，cid=911 Dark Magician = 36996508 (PP4 潘多拉版)。
+新文件 `data/card-passcodes.s`（2098 × `.word`），导出脚本 `tools/rom-export/export_card_passcodes.py`，逆查函数 `FUN_080ef38c` 全表线性扫描。
+
+### Duel-field 5 段 → gfx bin
+- `0x18515FC / 0x400` → `hud_gap_tiles.bin`（HUD gap 稀疏 4bpp tile sheet）
+- `0x185878C / 0xBFC` → 拆为 `duel_field_outer_extra_tiles.bin`（0xBE0, ~95 tiles）+ `duel_field_outer_palette_pointers.bin`（0x1C, 7 × u32）
+- `0x1859508 / 0x40` → `duel_field_extra_palette.bin`（2 × 16 色；第 1 半 primary+half 色板，第 2 半金色渐变）
+- `0x185B634 / 0x1C` → `duel_field_outer_tilemap_pointers.bin`（外场 Tilemap 指针表 7 × u32）
+- `0x185D270 / 0x4B0` → `duel_field_common_inner_tilemap.bin`（内场公共 Tilemap, 30×20）
+
+未分析段：23 → 17，未分析字节：6,714,300 → 6,700,524（清理 13,776 B；剩 5 段混合表 + 4 个大图形 bundle）。

@@ -22,6 +22,7 @@ EXPORT_PIPELINE = [
 
     # Step 2: 独立脚本（只读 ROM）
     'export_gfx.py',                    # graphics/{opponents,icons,duel-field}/*
+    'export_card_passcodes.py',         # data/card-passcodes.s（加密密码表, 2098×u32, LCG-XOR）
     'export_card_descriptions.py',      # data/card-descriptions.s (merged: ET + special + offset table + anchors)
     'export_game_strings.py',           # data/game-strings-{en,de,fr,it,es}.s
     'export_file_paths.py',             # data/file-paths.s
