@@ -81,15 +81,46 @@ clean.bat    @ 清理编译产物
 ├── constants/
 │   ├── ewram.inc         # EWRAM 变量符号常量（gPlayerName/gMoneyDp/gBanlistPasswordBuffer 等）
 │   └── iwram.inc         # IWRAM 变量符号常量（gPrng/gFrameCounter）
-├── doc/                  # 研究文档（来自 Google Sheets，转存为 Markdown）
-│   ├── um06-deck-modification-tool/   # 卡组修改工具数据
-│   └── um06-romhacking-resource/      # ROM 破解资源参考
+├── doc/                  # 项目文档（按 "是什么 / 如何得到" 分类组织，见下方"文档组织原则"）
+│   ├── dev/                           # 开发参考（入库，长期有效）
+│   │   ├── data-structure/            # Spec：ROM 数据结构最终规范（卡属性/卡名/三种卡图/详情页 UI）
+│   │   ├── methodology/               # 方法论：资产定位 + 构建流水线
+│   │   ├── tools/                     # 工具链：mGBA MCP + GDB 调试
+│   │   ├── scripts/                   # GDB / Python 辅助脚本
+│   │   ├── ghidra-function-names.md   # Ghidra 函数重命名登记
+│   │   ├── fs-*.md                    # 文件系统专题（待整理）
+│   │   ├── p2/p4-*.md                 # 阶段性发现（待整理）
+│   │   └── t-*.md                     # 游戏机制研究
+│   ├── analysis/                      # Narrative：调研叙事与案例研究（入库）
+│   │   ├── card-image-location.md     # 卡图加载函数逆向时间线（Phase A→B0→B1→B2→B3）
+│   │   └── pack-analysis/             # 抽卡流程 7 态动态分析（含 7 张截图）
+│   ├── temp/                          # 临时产物（gitignored，含版权敏感内容）
+│   ├── um06-deck-modification-tool/   # 外部参考：卡组修改工具数据（Google Sheets）
+│   └── um06-romhacking-resource/      # 外部参考：ROM 破解资源（Google Sheets）
 ├── roms/                 # 原始 ROM（不含于仓库）
 ├── output/               # 编译产物（不含于仓库）
 ├── build.bat             # 构建脚本
 ├── clean.bat             # 清理脚本
 └── PLAN.md               # 数据汇编化进度计划
 ```
+
+## 文档组织原则
+
+`doc/dev/` 和 `doc/analysis/` 的分工基于 **"是什么 / 如何得到" 分离**原则：
+
+| 目录 | 回答的问题 | 内容特征 | 风格 |
+|------|-----------|---------|------|
+| **`doc/dev/data-structure/`** | "ROM 里是什么" | ROM 地址、字节布局、编码公式、枚举值 | **Spec**：只写**最终确定**的数据结构；不引用他文、不讲调研过程、不记录旧版错误 |
+| **`doc/dev/methodology/`** | "该怎么做" | 工作流、决策树、checklist、可复用步骤 | **How-to**：可操作的方法论，配少量实战案例 |
+| **`doc/dev/tools/`** | "工具怎么用" | 安装配置、API 参考、坑与 workaround | **Reference**：能当字典查 |
+| **`doc/analysis/`** | "我们是**怎么搞清楚**的" | 按时间线展开的调研过程、失败路径、工具使用 | **Narrative**：日后同类任务的方法论样本；价值在于保留"为什么不是那条路"的历史 |
+
+**判断标准**：
+- 写一段内容时，若想用"（已证伪）""（已修正）""旧版本说…"等字眼 → 属于 narrative，写到 `doc/analysis/`
+- 若内容能用"ROM `0xXXXX` 是 XX 格式"直接陈述 → 属于 spec，写到 `doc/dev/data-structure/`
+- 若内容是"先做 A 再做 B 再做 C" → 属于 methodology，写到 `doc/dev/methodology/`
+
+**典型生命周期**：调研某资产 → 在 `doc/analysis/` 写时间线叙事 → 提炼最终结论到 `doc/dev/data-structure/` → 更新 `doc/dev/methodology/` 中的方法论（若发现新模式）。
 
 ## 工具脚本
 
