@@ -41,7 +41,7 @@
 |---|---|---|---|
 | ✅ | ~~工具链配置与调试~~（2026-04-23 完成） | 9 → 2 | `doc/dev/tools/mgba-mcp.md`（704 行）+ `doc/dev/tools/gdb-debugging.md`（626 行）|
 | ✅ | ~~卡牌系统~~（2026-04-23 完成） | 12 → 7 | `doc/dev/data-structure/` 6 个 spec + `doc/analysis/card-image-location.md` 叙事 |
-| — | 方法论与工作流 | 6 | 待定 |
+| 🟡 | 方法论与工作流（部分完成） | 4 → 2 | `doc/dev/methodology/asset-location.md` + `build-pipeline.md`；`ghidra-function-names.md` + `p4-unstructured-regions-survey.md` 延后 |
 | — | Pack 系统 | 5 | 待定 |
 | — | ROM 整体结构与参考 | 4 | 待定 |
 | — | 图像/UI 资源 | 3 | 待定 |
@@ -97,16 +97,21 @@ Narrative（`doc/analysis/`）：
 - [x] ~~`doc/analysis/card-detail-page.md`~~ → `data-structure/card-detail-page.md`
 - [x] ~~`doc/analysis/p1-card-image-location/`~~ → `card-image-location.md` Phase A + 附录 A
 
-### 批次 3：方法论与工作流（6 个）
+### 批次 3：方法论与工作流（部分完成 2026-04-23）
 
-长期参考的方法论文档，CLAUDE.md 反复引用。大概率只需轻度合并/编号，不大改。
+本轮合并 4 个核心方法论文档为 2 个（`ghidra-function-names.md` 与 `p4-unstructured-regions-survey.md` 延后处理——前者是函数名登记数据不适合方法论目录，后者是方法论的应用结果应迁入 `doc/analysis/`）。
 
-- [ ] `workflow-rom-asset-to-structured-asm.md` — 14 阶段端到端：资源发现 → 结构化 → byte-identical 构建
-- [ ] `asm-regeneration-workflow.md` — Ghidra → `asm/all.s` 再生成管线
-- [ ] `locate-rom-asset-from-vram-diff.md` — 6 步方法论：VRAM 差分 → ROM 资源定位（CLAUDE.md 核心引用）
-- [ ] `static-data-region-methodology.md` — 4 阶段：静态扫描 → XREF → 验证 → 提取
-- [ ] `p4-unstructured-regions-survey.md` — 熵 / magic byte 扫描识别未知区域
-- [ ] `ghidra-function-names.md` — 18+ 函数重命名候选 + pack/card/font 操作模板
+合并结果：`doc/dev/methodology/asset-location.md`（资产定位动态+静态双路径）+ `doc/dev/methodology/build-pipeline.md`（构建 + asm/all.s 再生成）。
+
+已合并并删除的源文档：
+- [x] ~~`locate-rom-asset-from-vram-diff.md`（406 行）~~ → `methodology/asset-location.md` §二 动态路径 + §四 方向对比 + §五 实战复盘
+- [x] ~~`static-data-region-methodology.md`（120 行）~~ → `methodology/asset-location.md` §三 静态路径
+- [x] ~~`workflow-rom-asset-to-structured-asm.md`（214 行）~~ → `methodology/build-pipeline.md` §一 端到端 14 阶段 + §三 checklist + §四 产出模板
+- [x] ~~`asm-regeneration-workflow.md`（184 行）~~ → `methodology/build-pipeline.md` §二 Phase 3 子流程
+
+延后处理：
+- [ ] `ghidra-function-names.md`（131 行）— 函数名登记数据，不属于"方法论"范畴；未来作为独立模块（或合并至 Ghidra 标注专题）
+- [ ] `p4-unstructured-regions-survey.md`（91 行）— 方法论的应用结果（3 个未结构化区域勘查）；未来迁入 `doc/analysis/`
 
 ### 批次 4：Pack 系统（5 个）
 

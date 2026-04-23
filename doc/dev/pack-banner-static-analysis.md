@@ -2,7 +2,7 @@
 
 **日期**: 2026-04-16
 **目标**: 定位 pack 列表页 5 张卡包封面条幅图 (32×64, 8bpp OBJ sprite) 的 ROM 数据来源
-**方法**: 参照 `doc/dev/locate-rom-asset-from-vram-diff.md` 六步流程，执行方向 B + C
+**方法**: 参照 `doc/dev/methodology/asset-location.md` §二 动态路径六步流程，执行方向 B + C
 
 ---
 

@@ -2,7 +2,7 @@
 
 **写作日期**：2026-04-17
 **前置依赖**：`refs/datacrystal-um2006/` (4 个 wiki 子页面抓取，2026-04-17)
-**遵循流程**：`doc/dev/workflow-rom-asset-to-structured-asm.md`（仅 Phase 2-4 适用，无新 ROM 资产 Phase 1 定位）
+**遵循流程**：`doc/dev/methodology/build-pipeline.md`（仅 Phase 2-4 适用，无新 ROM 资产 Phase 1 定位）
 
 ---
 

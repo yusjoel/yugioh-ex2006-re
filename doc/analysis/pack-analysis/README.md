@@ -35,7 +35,7 @@
 - **state3/4/5** 抽卡选择 / 确认: DISPCNT=0x1F00 (4 层全开), BG2=0x1E8A (**pri=2 CBB=2 8bpp SBB=30**) — **唯一 8bpp 层**, 承载 10 张卡背大图
 - **state6/7** 开包结果: BG1/BG2 优先级交换, BG1=0x1D86 变成 8bpp SBB=29 → 承载抽到的卡牌大图
 
-**DISPCNT=0x1F00 + BG2CNT=0x1E8A 是抽卡/开包页面的强指纹** — 可作为后续定位 "pack card decode" 函数的钩子 (参照 `locate-rom-asset-from-vram-diff.md` §四 方向 C).
+**DISPCNT=0x1F00 + BG2CNT=0x1E8A 是抽卡/开包页面的强指纹** — 可作为后续定位 "pack card decode" 函数的钩子 (参照 `doc/dev/methodology/asset-location.md` §四 方向 C).
 
 ---
 
@@ -146,7 +146,7 @@ Total 字段在 EWRAM/IWRAM 中**没有匹配到 u16/u32 对齐的 "0→1500" �
 | 确认对话框 tile/tilemap | `0x06014401-0x06014F7F` | state4→state5 | SBB 29/30/31 |
 
 **ROM 源地址尚未定位**. 要定位:
-1. 卡背小 tile (仅 64 个 tile, 4bpp) ROM 源  —  建议 state2→state3 对 `0x06008051` 下 watchpoint (但考虑到 stub 限制, 参照 `locate-rom-asset-from-vram-diff.md` §三 方向 C 用 BG2CNT=0x1E8A 做静态搜索).
+1. 卡背小 tile (仅 64 个 tile, 4bpp) ROM 源  —  建议 state2→state3 对 `0x06008051` 下 watchpoint (但考虑到 stub 限制, 参照 `doc/dev/methodology/asset-location.md` §四 方向 C 用 BG2CNT=0x1E8A 做静态搜索).
 2. 抽到卡牌大图 — 可能复用已经定位的 `FUN_0801d290` (6bpp 卡牌解码器), 但 CBB=1 8bpp 的数据应不同路径.
 
 ---

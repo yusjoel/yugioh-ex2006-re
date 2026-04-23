@@ -485,7 +485,7 @@ Rdn = bits [2:0] of byte 1
 |------|------|
 | [`doc/dev/data-structure/card-image-big.md`](../dev/data-structure/card-image-big.md) | 6bpp 解码规范 + ROM 地址 + 索引公式（最终结论） |
 | [`doc/dev/data-structure/card-detail-page.md`](../dev/data-structure/card-detail-page.md) | 详情页 UI VRAM 布局 |
-| [`doc/dev/locate-rom-asset-from-vram-diff.md`](../dev/locate-rom-asset-from-vram-diff.md) | 从 VRAM 差分到 ROM 资源定位的方法论（本文是其实战案例） |
+| [`doc/dev/methodology/asset-location.md`](../dev/methodology/asset-location.md) | 从 VRAM 差分到 ROM 资源定位的方法论（本文是其实战案例） |
 | [`doc/dev/tools/gdb-debugging.md`](../dev/tools/gdb-debugging.md) | GDB stub + GDB MCP 调试指南 |
 | `asm/all.s` 行 15429 | `FUN_0801d290` 完整反汇编 |
 | `asm/all.s` 行 16336 | `FUN_0801d998` |

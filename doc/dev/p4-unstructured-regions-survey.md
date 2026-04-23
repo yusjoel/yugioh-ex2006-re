@@ -1,6 +1,6 @@
 # 未结构化大块区勘查记录（2026-04-19）
 
-沿用 `doc/dev/static-data-region-methodology.md` 阶段 1-2 勘查两个大块区，
+沿用 `doc/dev/methodology/asset-location.md` §三 静态路径阶段 1-2 勘查两个大块区，
 确认**静态单轮不足以完整结构化**，需要后续专项（runtime 辅证 / 压缩逆向 / 分簇手工解析）。
 本文档记录现有线索，避免下次重复扫描。
 

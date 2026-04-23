@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 扫描 ROM 指定区间，按多种静态特征给出语义切分线索。
-用于 `doc/dev/static-data-region-methodology.md` 阶段 1。
+用于 `doc/dev/methodology/asset-location.md` §三 静态路径阶段 1。
 
 默认扫 0x00FBC080..0x01326280（card-image-tiles 尾 + 后 16MB 段前部共 3.6 MB）。
 """

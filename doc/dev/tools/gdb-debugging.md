@@ -621,6 +621,6 @@ gdb-mcp dist 的具体本机路径见 `LOCAL.md`。
 |------|------|
 | [`mgba-mcp.md`](mgba-mcp.md) | mGBA MCP（Lua bridge）调试指南 |
 | `CLAUDE.md` §调试工具链 | 顶层场景决策：何时用哪套 MCP / batch 脚本 |
-| `doc/dev/locate-rom-asset-from-vram-diff.md` | 从 VRAM 差分定位 ROM 资源的核心方法论（引用本文 §四、§五） |
+| `doc/dev/methodology/asset-location.md` | 从 VRAM 差分定位 ROM 资源的核心方法论（引用本文 §四、§五） |
 | `doc/dev/scripts/gdb_*.gdb` | GDB batch 脚本模板集合 |
 | `tools/mgba-scripts/*.ps1` | PowerShell 启动脚本 |
