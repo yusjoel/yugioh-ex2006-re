@@ -77,11 +77,11 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 ### 通用要点
 
 - **GDB 必须使用 `tools/arm-none-eabi-gdb.exe`（10.2）**，devkitPro 14.1 与 mGBA stub 协议不兼容。
-- `-g` 来自本地 fork `D:\Software\mgba-live-mcp` 的 patch：`build_start_command` 支持 `gdb_stub` 开关，对应 MCP 工具参数 `gdb_stub`（默认 `false`），CLI 参数 `--gdb-stub`。只在需要 GDB 时显式开启；场景 A 保持默认关闭以避免 stub 端口冲突。见 `doc/dev/mgba-mcp-setup.md` 第八节。
+- `-g` 来自本地 fork `D:\Software\mgba-live-mcp` 的 patch：`build_start_command` 支持 `gdb_stub` 开关，对应 MCP 工具参数 `gdb_stub`（默认 `false`），CLI 参数 `--gdb-stub`。只在需要 GDB 时显式开启；场景 A 保持默认关闭以避免 stub 端口冲突。见 `doc/dev/tools/mgba-mcp.md` §二。
 - **stub 一次性消耗**：GDB 断开（含 `kill`/`quit`/`--batch` 结束）后 stub 永久关闭，需 `mgba_live_stop` + 重新 `mgba_live_start`。
 - GDB 脚本里 `echo` 只能 ASCII（中文乱码）。
 - 已知 GDB MCP 限制：THUMB 代码 `gdb_list_frames` 失败；`gdb_read_memory` 有解析 bug，改用 `gdb_evaluate_expression`。
-- 踩坑汇总：`doc/dev/mgba-gdb-stub-pitfalls.md`
+- 踩坑汇总：`doc/dev/tools/gdb-debugging.md` §五（12 个坑）
 
 ## Commit 规则
 

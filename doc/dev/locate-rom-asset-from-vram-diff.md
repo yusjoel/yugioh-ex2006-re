@@ -404,6 +404,6 @@ loop:
 | [`p2-font-location-findings.md`](p2-font-location-findings.md) | 字库定位的详细结果报告（§五对应实战） |
 | [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) | 早期错误路径（BIOS SWI 假设）负面归档 |
 | [`card-image-export.md`](card-image-export.md) | P1-5 批量导出脚本与调色板策略 |
-| [`mgba-gdb-stub-pitfalls.md`](mgba-gdb-stub-pitfalls.md) | GDB stub 踩坑汇总（一次性消耗、1 字节 watchpoint 等） |
+| [`tools/gdb-debugging.md`](tools/gdb-debugging.md) | GDB stub + GDB MCP 调试指南（含 12 个坑、断点矩阵、工具链 PoC） |
 | [`gdb-breakpoint-card-image-report.md`](gdb-breakpoint-card-image-report.md) | GDB 断点/watchpoint 补充验证（2026-04-16），证明 VRAM watchpoint 可行 |
 | **本文** | **方法论提取，供后续资源定位复用** |

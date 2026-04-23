@@ -39,7 +39,7 @@
 
 | 优先级 | 批次 | 原始文档数 | 目标产出 |
 |---|---|---|---|
-| ⭐ | **工具链配置与调试**（进行中） | 9 | 2 个（`mgba-mcp.md` + `gdb-debugging.md`） |
+| ✅ | ~~工具链配置与调试~~（2026-04-23 完成） | 9 → 2 | `doc/dev/tools/mgba-mcp.md`（704 行）+ `doc/dev/tools/gdb-debugging.md`（626 行）|
 | — | 卡牌系统 | 11 | 待定 |
 | — | 方法论与工作流 | 6 | 待定 |
 | — | Pack 系统 | 5 | 待定 |
@@ -49,19 +49,20 @@
 | — | 文本/编码 | 2 | 待定 |
 | — | 游戏机制研究（T 系列） | 2 | 待定 |
 
-### 批次 1：工具链配置与调试（9 个）
+### 批次 1：工具链配置与调试（9 个 → 2 个，**已完成 2026-04-23**）
 
-合并目标：`doc/dev/mgba-mcp.md`（mGBA MCP：setup + lua + comparison + 工具验证）+ `doc/dev/gdb-debugging.md`（GDB：stub pitfalls + matrix + walkthrough + MCP 集成 + Windows 进程）
+合并结果：`doc/dev/tools/mgba-mcp.md`（mGBA MCP：setup + lua + comparison + 工具验证）+ `doc/dev/tools/gdb-debugging.md`（GDB：stub pitfalls + matrix + walkthrough + MCP 集成 + Windows 进程）
 
-- [ ] `mgba-mcp-setup.md`（471 行）— mGBA MCP 安装 + Windows 修复 + fork 方案
-- [ ] `mgba-mcp-lua-tutorial.md`（517 行）— Lua API 教程 + 内存速查 + 回调限制
-- [ ] `mgba-mcp-comparison.md`（163 行）— mgba-live-mcp vs pymgba-mcp 对比
-- [ ] `p0-3-mgba-mcp-feature-validation.md`（403 行）— 13 个 MCP 工具验证 + 3 个 Windows bug
-- [ ] `mgba-gdb-stub-pitfalls.md`（217 行）— GDB stub 12 个坑 + workaround
-- [ ] `powershell-job-object-mgba.md`（112 行）— Windows Job Object 原理 + `cmd /c start`
-- [ ] `gdb-breakpoint-matrix.md`（267 行）— 6 类断点 × 5 内存区域支持矩阵
-- [ ] `p0-1-gdb-dma3-watchpoint-walkthrough.md`（283 行）— GDB batch 工具链 PoC + DMA3 验证
-- [ ] `p0-5-gdb-mcp-integration.md`（214 行）— GDB MCP 4 个 parser bug 修复
+已合并并删除的源文档：
+- [x] ~~`mgba-mcp-setup.md`（471 行）~~ → `tools/mgba-mcp.md` §二 + §七
+- [x] ~~`mgba-mcp-lua-tutorial.md`（517 行）~~ → `tools/mgba-mcp.md` §四 + §五 + §六
+- [x] ~~`mgba-mcp-comparison.md`（163 行）~~ → `tools/mgba-mcp.md` §一
+- [x] ~~`p0-3-mgba-mcp-feature-validation.md`（403 行）~~ → `tools/mgba-mcp.md` §三 + §七
+- [x] ~~`mgba-gdb-stub-pitfalls.md`（217 行）~~ → `tools/gdb-debugging.md` §五
+- [x] ~~`powershell-job-object-mgba.md`（112 行）~~ → `tools/gdb-debugging.md` §三
+- [x] ~~`gdb-breakpoint-matrix.md`（267 行）~~ → `tools/gdb-debugging.md` §四
+- [x] ~~`p0-1-gdb-dma3-watchpoint-walkthrough.md`（283 行）~~ → `tools/gdb-debugging.md` §六
+- [x] ~~`p0-5-gdb-mcp-integration.md`（214 行）~~ → `tools/gdb-debugging.md` §七
 
 ### 批次 2：卡牌系统（11 个）
 

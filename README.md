@@ -152,7 +152,7 @@ MCP 接入之前用于手工管理 mGBA + GDB stub 生命周期，现在保留�
 | `_preflight-mgba.ps1` | 公共库（dot-source）：加载 `local-settings.ps1`、关残留进程、检查端口 2345 |
 | `start-mgba-gdb-ss1.ps1` | 启动 mGBA + GDB stub + 加载 `roms/2343.ss1` 存档 |
 | `start-mgba-gdb-nosave.ps1` | 启动 mGBA + GDB stub，冷启动（不加存档） |
-| `wait-mgba-ready.ps1` | 等待端口 2345 LISTENING + 8 秒 CPU 热身（见 `mgba-gdb-stub-pitfalls.md` 坑 2） |
+| `wait-mgba-ready.ps1` | 等待端口 2345 LISTENING + 8 秒 CPU 热身（见 `doc/dev/tools/gdb-debugging.md` 坑 2） |
 | `stop-mgba.ps1` | 关所有 `mGBA.exe` 实例（不影响 `mgba-live-mcp`） |
 
 ### 探索性脚本（`tools/ad-hoc/`）
@@ -265,7 +265,7 @@ ROM 布局：调色板 `0x510440`（512 B，256 色），指针表 `0x1CCE960`�
 pwsh -File tools/mgba-scripts/start-mgba-gdb-ss1.ps1
 ```
 
-**已验证工具**（详见 `doc/dev/p0-3-mgba-mcp-feature-validation.md`）：
+**已验证工具**（详见 `doc/dev/tools/mgba-mcp.md` §三）：
 
 | 工具 | 功能 |
 |------|------|
@@ -302,7 +302,7 @@ pwsh -File tools/mgba-scripts/wait-mgba-ready.ps1
 
 > ⚠️ mGBA GDB stub 为一次性连接：GDB 断开后 stub 永久关闭，每次调试需重启 mGBA。
 
-**已验证工具**（详见 `doc/dev/p0-5-gdb-mcp-integration.md`）：
+**已验证工具**（详见 `doc/dev/tools/gdb-debugging.md` §七.3）：
 
 | 工具 | 功能 |
 |------|------|

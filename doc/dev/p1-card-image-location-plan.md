@@ -186,8 +186,5 @@ pwsh -File tools/mgba-scripts/wait-mgba-ready.ps1
 
 | 文档 | 关联内容 |
 |------|---------|
-| `doc/dev/gdb-breakpoint-matrix.md` | T08：VRAM 写监视点可用；T09：VRAM 读监视点无效 |
-| `doc/dev/mgba-gdb-stub-pitfalls.md` | 坑 3（stub 一次性）、坑 8（watchpoint 只监 1 字节）|
-| `doc/dev/p0-3-mgba-mcp-feature-validation.md` | mGBA MCP 全部 13 个工具能力清单 |
-| `doc/dev/p0-5-gdb-mcp-integration.md` | GDB MCP 工具用法及 MI 解析器已知限制 |
-| `doc/dev/p0-1-gdb-dma3-watchpoint-walkthrough.md` | DMA3 watchpoint 方法参考（备选路线） |
+| `doc/dev/tools/gdb-debugging.md` | §四 断点矩阵（VRAM 写监视点可用、读监视点 PPU 路径不计入）、§五 坑 3/9（stub 一次性、1 字节 watchpoint）、§六 DMA3 walkthrough PoC、§七 GDB MCP 工具清单 |
+| `doc/dev/tools/mgba-mcp.md` | §三 mGBA MCP 15 个工具能力清单 |

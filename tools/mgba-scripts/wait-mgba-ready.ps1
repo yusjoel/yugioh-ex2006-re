@@ -6,7 +6,7 @@
 #   第二步：& tools\wait-mgba-ready.ps1          （本脚本）
 #   第三步：& tools\arm-none-eabi-gdb.exe --batch -x doc\dev\scripts\gdb_dma_watch.gdb
 #
-# 等待逻辑（见 mgba-gdb-stub-pitfalls.md 坑2）：
+# 等待逻辑（见 doc/dev/tools/gdb-debugging.md §五坑2）：
 #   1. 轮询 netstat 直到端口 2345 LISTENING
 #   2. 额外等待 8 秒（游戏 CPU 需要时间进入 RSP 循环，光有端口不够）
 

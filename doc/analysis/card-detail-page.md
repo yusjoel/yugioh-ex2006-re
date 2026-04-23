@@ -107,7 +107,7 @@
 ```
 
 对 ROM 中所有4字节对齐位置扫描魔数，过滤合理大小范围，即可枚举出全部压缩块。  
-详细 Lua 脚本见 `doc/dev/mgba-mcp-lua-tutorial.md` § 4.7。
+详细 Lua 脚本见 `doc/dev/tools/mgba-mcp.md` §六.7（枚举 GBA BIOS 压缩块）。
 
 ### 4.2 已知 ROM 数据位置
 

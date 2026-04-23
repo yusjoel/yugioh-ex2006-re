@@ -10,7 +10,7 @@
 #   - 确认端口 2345 未被占用
 # 启动后等待：
 #   - 等待端口 2345 进入 LISTENING 状态
-#   - 额外等待 8 秒，确保游戏 CPU 进入 RSP 循环（见 mgba-gdb-stub-pitfalls.md 坑2）
+#   - 额外等待 8 秒，确保游戏 CPU 进入 RSP 循环（见 doc/dev/tools/gdb-debugging.md §五坑2）
 
 . "$PSScriptRoot\_preflight-mgba.ps1"   # 加载 local-settings.ps1 + 预检
 

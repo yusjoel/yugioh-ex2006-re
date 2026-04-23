@@ -202,7 +202,7 @@ for i in range(0, len(data)-4, 4):
 
 当前 mGBA build-latest-win64 的 `mgba-sdl.exe` 使用 `-g` 时报 `Debugger: Couldn't open socket` 后仍能运行，但端口 2345 **不监听**。原因未明（可能是 Windows socket 权限或编译配置）。
 
-**临时规避**：改用 `mGBA.exe`（Qt 版）+ `-g`，或查明 mgba-sdl socket 失败原因。Qt 版之前成功用过（见 `doc/dev/p0-1-gdb-dma3-watchpoint-walkthrough.md`）。
+**临时规避**：改用 `mGBA.exe`（Qt 版）+ `-g`，或查明 mgba-sdl socket 失败原因。Qt 版之前成功用过（见 `doc/dev/tools/gdb-debugging.md` §六 DMA3 walkthrough PoC）。
 
 ---
 
@@ -213,5 +213,5 @@ for i in range(0, len(data)-4, 4):
 | `doc/dev/scripts/gdb_watch_dma3sad.gdb` | DMA3 源地址 watchpoint 脚本 |
 | `doc/dev/scripts/gdb_watch_vram_bg2.gdb` | VRAM BG2 watchpoint 脚本（已证不可用）|
 | `doc/dev/scripts/gdb_watch_ewram_02000000.gdb` | EWRAM watchpoint 脚本（已证不可用）|
-| `doc/dev/mgba-gdb-stub-pitfalls.md` | mGBA GDB stub 已知坑汇总 |
+| `doc/dev/tools/gdb-debugging.md` | GDB stub + GDB MCP 调试指南（含 12 个坑汇总）|
 | `doc/analysis/card-detail-page.md` | 卡牌详情页 VRAM 布局分析 |
