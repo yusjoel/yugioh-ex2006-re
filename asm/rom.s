@@ -449,10 +449,12 @@ Start:
 @ offset_table (339 × u32) + size_table (340 × u32)，共 0xA9C 字节
 	.include "data/fs-tables.s"
 
-@ ROM 内嵌文件系统数据区（ROM偏移 0x1E64684 - 0x1ED49D4，0x70350 B = 459,600 B）
-@ 338 个文件 tight-pack 顺序：214 .ydc + 35 .ydq + 26 .LZ5bg + 18 .LZnclr + 17 .LZncgr + 14 .LZnanr + 14 .LZncer
+@ ROM 内嵌文件系统数据区（ROM偏移 0x1E64684 - 0x1ED4AA4，0x70420 B = 459,808 B）
+@ 339 个文件 tight-pack 顺序：215 .ydc + 35 .ydq + 26 .LZ5bg + 18 .LZnclr + 17 .LZncgr + 14 .LZnanr + 14 .LZncer
+@ 含 FID 339 orphan palette (title_obj_s.LZnclr, 208 B @ 0x1ED49D4，位于 szs[0] 声称的 0x70350 外)
 @ 索引：data/fs-tables.s；路径：data/file-paths.s；文件体：fs/<原始路径>
+@ 映射：path[i] ↔ FID[i+1]（见 tools/rom-export/export_fs_files.py）
 	.include "data/fs-payload.s"
 
-@ FS 后尾段：ROM 0x1ED49D4 - 0x2000000（0x12B62C = 1,225,772 B，暂未分析）
-	.incbin "roms/2343.gba", 0x1ED49D4, 0x12B62C
+@ FS 后尾段：ROM 0x1ED4AA4 - 0x2000000（0x12B55C = 1,225,564 B，分析见 doc/dev/fs-tail-analysis.md）
+	.incbin "roms/2343.gba", 0x1ED4AA4, 0x12B55C

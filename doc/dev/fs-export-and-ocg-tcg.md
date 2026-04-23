@@ -10,56 +10,78 @@
 
 - 索引表：`data/fs-tables.s` @ ROM `0x01E63BE8`
   - `offset_table`：339 × u32（FID 相对 FS_BASE 偏移）
-  - `size_table`：340 × u32（最后一条 `0xD0` 未用 / 占位）
+  - `size_table`：**340 × u32**（最后一条 `0xD0 = 208` 是 FID 339 orphan 的大小，**不是占位**）
 - 路径表：`data/file-paths.s` @ ROM `0x01E6118C..0x01E63BE8`（339 条 null 终止 ASCII）
-- FS 数据区：`0x01E64684..0x01ED49D4`（0x70350 B）
+- FS 数据区：**`0x01E64684..0x01ED4AA4`（0x70420 B = 459,808 B）**
+  - 主区：0x01E64684..0x01ED49D4（0x70350 B）= FID 1..338
+  - Orphan：0x01ED49D4..0x01ED4AA4（208 B）= FID 339 (title_obj_s.LZnclr)
 
-### 关键发现
+### 关键发现（修订版）
 
-- **FID 0 是 FS 根 meta**：`off=0x00000, sz=0x70350`（覆盖整片 FS）
-- **FID 1..338 tight-pack 0x70350 B**，无 gap 无 overlap
-- 按扩展名分布：`.ydc` 214 + `.ydq` 35 + `.LZ5bg` 26 + `.LZnclr` 18 + `.LZncgr` 17 + `.LZnanr` 14 + `.LZncer` 14 = **338**（严丝合缝）
+- **映射**：`path[i] ↔ FID[i+1]`（`paths[0]` 对应 FID 1，以此类推）
+- **FID 0** 是 FS 根 meta：`off=0x00000, sz=0x70350`（覆盖 FID 1..338 那段，无独立路径）
+- **FID 1..338** tight-pack 0x70350 B 在 FS_MAIN 区
+- **FID 339** orphan：`paths[338] = "titleEx/title_obj_s.LZnclr"`，数据在 szs[0] 声称的
+  0x70350 B **之外**，紧跟 FID 338 后（ROM 0x01ED49D4+208 B）
+- 按扩展名分布（含 FID 339）：`.ydc` 215 + `.ydq` 35 + `.LZ5bg` 26 + `.LZnclr` 18 +
+  `.LZncgr` 17 + `.LZnanr` 14 + `.LZncer` 14 = **339**
 
-FID 0 在导出时跳过（避免与 FID 1..338 的 bytes 重复）；fs-payload.s 仅 .incbin FID 1..338 按顺序，总 0x70350 B，与 ROM 原始区一致。
+### 历史 off-by-one bug（已修，commit 待定）
+
+早期 `export_fs_files.py` 误用 `path[i] ↔ FID[i]`（shift=0），致 52/63 个 .LZn* 文件
+的 fs/ 文件名与内容错位，且漏掉 FID 339 orphan palette（被当作 "FS 后尾段" 的起 208 B
+打包进 `.incbin`）。修复后：
+- fs/ 下 63/63 NNS 文件扩展名和内部 magic 严格对齐（RNAN/RECN/RGCN/RLCN）
+- fs/puzzle/*.ydq 全 35 个以 `[DUEL QUESTION]\r\n` 开头
+- fs/deck/*.ydc 全 215 个首字节 0x01
+- fs/**/*.LZ5bg 全 26 个首字节 0x10（LZ77 magic）
+- 新增 fs/titleEx/title_obj_s.LZnclr（208 B，FID 339）
+
+fs-payload.s 由 338 条 `.incbin` 扩到 339 条，asm/rom.s 末尾 `.incbin` 起点从
+`0x1ED49D4` 后移到 `0x1ED4AA4`，长度减 208 B；build byte-identical 保持。
 
 ---
 
 ## 二、重名（duplicate path）现象
 
-FID 1..338 中有 **98 条路径出现 >1 次**，共 **198 个 FID**。
+FID 1..339 中有 **99 条路径出现 >1 次**（修正后统计），共 **200 个 FID**。
 
-- 全部 98 组的 dup FIDs bytes **都不同**（0 组 bytes 完全相同）
-- 所以 dup 不是冗余副本，而是真正独立的两份文件
+- 全部 99 组的 dup FIDs bytes **都不同**（除 exodia02 3-way 外）
+- 所以 2-way dup 不是冗余副本，而是真正独立的两份文件
 
 ### 重名样例
 
 | 路径 | FID | FS 偏移 | 大小 | 前 8 B |
 |---|---|---|---|---|
-| `deck/LV1_pikeru.ydc` | 2 | `0x000060` | 96 B | `01 cc cc cc 7f 21 77 41` |
-| `deck/LV1_pikeru.ydc` | 3 | `0x0000C0` | 96 B | `01 fc 12 00 4f 57 44 3f` |
+| `deck/LV1_kuriboh.ydc` | 1 | `0x000000` | 96 B | `01 cc cc cc 7f 21 77 41` |
+| `deck/LV1_kuriboh.ydc` | 2 | `0x000060` | 96 B | `01 fc 12 00 4f 57 44 3f` |
 
-96 字节里 **78 字节不同**，header 字节 `0x01` 相同但 body 差异极大——两个独立 .ydc。
+96 字节里 78 字节不同，header `0x01` 共享但 body 差异极大——两个独立 .ydc。
 
 ---
 
 ## 三、OCG/TCG 变体推断
 
-### 证据 1：FID 分布严格 (偶, 奇) 相邻
+### 证据 1：相邻 FID 对（修订）
 
-98 组 dup 中 **96 组** 是相邻 FID 对 `(N, N+1)`，且较小 FID 总是偶数：
+99 组 dup 中 **97 组** 是相邻 FID 对 `(N, N+1)`。在 shift=+1 修正映射下：
+- 41 组首 FID 为奇数（path 表开头段 `path[2k]=path[2k+1]` → FID `(2k+1, 2k+2)`）
+- 56 组首 FID 为偶数（path 表中段后 dup 起点偏移）
 
-| dup 组 | FID | parity |
+| dup 组 | FID | 首 FID parity |
 |---|---|---|
-| deck/LV1_pikeru.ydc | [2, 3] | [偶, 奇] |
-| deck/LV1_sukego.ydc | [4, 5] | [偶, 奇] |
-| deck/LV1_waito.ydc | [6, 7] | [偶, 奇] |
+| deck/LV1_kuriboh.ydc | [1, 2] | 奇 |
+| deck/LV1_pikeru.ydc  | [3, 4] | 奇 |
+| deck/LV1_sukego.ydc  | [5, 6] | 奇 |
 | … | … | … |
+| （中段）deck/theme_NNN.ydc | [M, M+1] | 混合 |
 
-剩下 2 组是 3-way（非 2-way flag 模型）：
-- `demo/exodia/exodia02_obj.LZncgr` FID [226, 227, 228]
-- `demo/exodia/exodia02_obj.LZnclr` FID [229, 230, 231]
+早期版本（shift=0 误算）声称 "首 FID 严格为偶"，修正后实际是 **奇偶混合**——
+dup 配对规律是 path 表上的 **连续两 slot 同串**，映射到 FID 后取决于 slot 索引奇偶。
 
-这 2 组可能是 3 语言版本（OCG/TCG/EU 或类似）。
+剩 2 组 3-way（语义见第七节）：
+- `demo/exodia/exodia02_obj.LZncgr` FID [227, 228, 229]（shift=+1 后）
+- `demo/exodia/exodia02_obj.LZnclr` FID [230, 231, 232]（shift=+1 后）
 
 ### 证据 2：与卡图查表机制同构
 
@@ -142,7 +164,8 @@ OCG_KEEP:
 - 第 1 次出现：`fs/<orig path>`（如 `fs/deck/LV1_pikeru.ydc`）
 - 第 N 次出现（N≥2）：basename 追加 `_dup{N-1}`（如 `fs/deck/LV1_pikeru_dup1.ydc`）
 
-`data/fs-payload.s` 按 FID 1..338 顺序 .incbin 这 338 个文件，byte-identical 构建 ✓。
+`data/fs-payload.s` 按 FID 1..339 顺序 .incbin 这 339 个文件（含 orphan palette），
+byte-identical 构建 ✓。
 
 ---
 
@@ -202,7 +225,8 @@ OCG_KEEP:
 | `exodia02_obj.LZnclr` | 231 | 0x01E89C6C | 124 B | 552 B | `a061862b…` |
 | `exodia02_obj.LZnclr` | 232 | 0x01E89CE8 | 124 B | 552 B | `a061862b…` |
 
-（注：此处 FID 标号按 "path[i] ↔ FID[i+1]" 正确对齐。task A1 中发现 `export_fs_files.py` 当前用的是 shift=0 误对齐，见任务 #12。）
+（FID 标号按 "path[i] ↔ FID[i+1]" 正确对齐。任务 #12 的 off-by-one bug 已于
+ `export_fs_files.py` 修复；fs/ 下文件名与内容现已严格对齐。）
 
 ### 观察
 

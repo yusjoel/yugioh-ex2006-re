@@ -4,7 +4,7 @@
 
 == 进度说明 ==
 B1 任务分为"基础结构化"与"语义解码"两部分。本脚本完成**第一阶段**：
-  ✓ 从 ROM 按 path[i]↔FID[i+1] 正确对齐读 215 个 .ydc
+  ✓ 从 ROM 按 path[i]↔FID[i+1] 对齐读 215 个 .ydc（bug #12 已修，fs/ 亦可读）
   ✓ 识别 10 字节 header（magic=0x01 + 3B metadata + 4B key + u16 count）
   ✓ 按 header.count 切出 body（u16 数组）和 tail（尾部可变字节）
   ✓ 生成 byte-identical 可重建的 data/ydc-all.s

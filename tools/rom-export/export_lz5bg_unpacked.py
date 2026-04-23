@@ -10,8 +10,8 @@
      magic `NTBG`（= C 字面 'GBTN'，疑似 Konami 扩展，非标准 NitroSDK）
      blocks: `PALT` (palette) + `BGDT` (BG tile data) + `DFPL` (screen/layout)
 
-之前 prompt 称 "`.LZ5bg` magic 0x01" 源于 `export_fs_files.py` 的 path/FID off-by-one
-错位（任务 #12），shift=+1 对齐后所有 26 个 .LZ5bg 首字节都是 0x10 LZ77。
+（早期 prompt 称 ".LZ5bg magic 0x01" 源于 `export_fs_files.py` 的 path/FID off-by-one
+错位，shift=+1 对齐后 26 个 .LZ5bg 首字节全部 0x10 LZ77。bug #12 已修。）
 
 == 输入 ==
   roms/2343.gba 内 FS 表，shift=+1 对齐读 26 个 .LZ5bg 路径。

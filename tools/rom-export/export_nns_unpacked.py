@@ -3,8 +3,8 @@
 批量解压 63 个 BIOS LZ77 压缩的 NNS 容器（.LZn{anr,cer,cgr,clr}）。
 
 == 输入 ==
-  直接从 ROM（roms/2343.gba）读取 FS 表与数据区，不依赖已导出的 fs/ 目录。
-  (当前 fs/ 目录的文件命名有 off-by-one bug，见下方 [FS 对齐] 说明。)
+  直接从 ROM（roms/2343.gba）读取 FS 表与数据区。
+  （亦可从已修复的 fs/ 目录读，bug #12 已修；此脚本保留 ROM 直读以最大化独立性。）
 
   过滤扩展名：.LZnanr × 14, .LZncer × 14, .LZncgr × 17, .LZnclr × 18
   合计 63 个，全部 BIOS LZ77 (magic=0x10，SWI 0x11/0x12 可解)。
@@ -47,12 +47,9 @@
       数据在 FS_BASE + 0x70350 = 0x01ED49D4，长度 szs[339] = 208 B
       位于 FS 尾段外（见任务 D2）
 
-  当前 `tools/rom-export/export_fs_files.py` 错误地用 path[i] ↔ FID[i]（shift=0），
-  导致 fs/ 下 52/63 个 .LZn* 文件名与实际内容不匹配（13+13+13+13 + 其他变体）。
-  已用实际 NNS magic 校验两种映射：shift=+1 下 .LZn* 全部 63/63 对齐，shift=0 仅 11/63。
-  本脚本绕开 fs/ 直接从 ROM 读，输出 fs-decompressed/ 用正确命名。
-
-  **TODO**（独立任务）：修复 export_fs_files.py 的 off-by-one，重建 fs/ + fs-payload.s。
+  `tools/rom-export/export_fs_files.py` 历史版本误用 path[i] ↔ FID[i]（shift=0），
+  致 52/63 个 .LZn* 文件名与实际内容不匹配。已于 bug #12 修复；fs/ 现 100% 对齐。
+  本脚本保留直读 ROM 的路径，独立于 fs/ 修复状态，易于单独运行验证。
 
 == 产物接入 ==
   fs-decompressed/ 由 build 重建，加入 .gitignore，不入库。

@@ -7,10 +7,8 @@ v1 按旧 ROM 区段 0x01EB90D8..0x01EC33D9 顺序读（FS 重构后此区已被
 现在从 FS 表直接定位 35 个 .ydq 文件。v1 已从 export_all.py 剔除。
 
 == FS 对齐 ==
-path[i] ↔ FID[i+1]（正确映射）。当前 `export_fs_files.py` 仍用 shift=0 错位，
-导致 fs/puzzle/<name>.ydq 字节内容是 FID i（邻居）的数据而非自己名字的数据——
-本脚本 **绕开 fs/**，直接从 ROM 按 shift=+1 读，保证输出正确。
-（上游 FS 对齐修复是独立任务 #12。）
+path[i] ↔ FID[i+1]（正确映射，已于 bug #12 在 `export_fs_files.py` 修复）。
+本脚本直读 ROM，独立于 fs/ 目录状态。
 
 == 输入 ==
   roms/2343.gba 内 FS 表 + 路径表
@@ -28,8 +26,8 @@ path[i] ↔ FID[i+1]（正确映射）。当前 `export_fs_files.py` 仍用 shif
     - 标签 `duel_puzzles_v2:`
     - 按 path[270..304] 顺序依次发射 35 个题目字节
     - 每题目以 label `duel_puzzle_NNN_<name>:` 开头
-    - 字节级精确（含 trailing null padding），理论可 `.include` 替换 FS .incbin
-      （需先修复 FS 对齐，见任务 #12）
+    - 字节级精确（含 trailing null padding），可 `.include` 替换 fs-payload.s 中的
+      35 条 .incbin（需手写路径映射；留作后续 refactor）
 
 用法:
     python tools/rom-export/export_duel_puzzles_v2.py
