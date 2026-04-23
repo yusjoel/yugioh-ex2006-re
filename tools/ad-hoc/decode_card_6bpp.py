@@ -1,5 +1,5 @@
 """
-验证 p1-phase-b2-findings.md 的 6bpp 解码公式。
+验证 doc/dev/data-structure/card-image-big.md 的 6bpp 解码公式。
 
 目标卡：DESPAIR FROM THE DARK (card_id=1323, tile_block=1476)
 ROM 源地址：0x08BD2140（= 0x08510640 + 1476 × 4800）

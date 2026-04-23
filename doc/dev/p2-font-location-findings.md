@@ -1,7 +1,7 @@
 # 字库定位结果（Phase 2 / 2026-04-15）
 
 **方法论**：`locate-rom-asset-from-vram-diff.md` 六步流程
-**前置**：卡牌大图定位 `p1-phase-b2-findings.md`
+**前置**：卡牌大图定位 [`doc/analysis/card-image-location.md`](../analysis/card-image-location.md)
 **目标**：定位《游戏王 EX2006》英文字库 ROM 位置、编码、加载函数
 
 ---

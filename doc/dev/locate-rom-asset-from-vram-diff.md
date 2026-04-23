@@ -1,7 +1,7 @@
 ﻿# 方法论：从 VRAM 差异到定位解压代码
 
 **写作日期**：2026-04-15
-**实战案例**：卡牌大图 6bpp 解码器 `FUN_0801d290`（详见 [`p1-phase-b2-findings.md`](p1-phase-b2-findings.md)）
+**实战案例**：卡牌大图 6bpp 解码器 `FUN_0801d290`（详见 [`doc/analysis/card-image-location.md`](../analysis/card-image-location.md)）
 **目的**：沉淀"mGBA 动态观察 + asm/all.s 静态搜索"的协同定位流程，作为后续定位其它资源（图标、UI、字体等）的可复用方法论。
 
 ---
@@ -154,7 +154,7 @@ grep "bl <被命中函数>" asm/all.s   → 找直接调用者
 
 ### A. GDB watchpoint / hbreak（2026-04-16 补充验证：可行）
 
-`p1-card-image-location-plan.md` 原本设计的 Phase B2 是"对 VRAM 目标地址下 watchpoint，读写指令触发后沿 r0/r1 源寄存器向上追踪"。**本次卡图定位时未走此路**，但后续补充实验证明 **VRAM watchpoint 完全可以定位到解码器**（详见 [`gdb-breakpoint-card-image-report.md`](gdb-breakpoint-card-image-report.md)）。
+卡图定位原本设计的 Phase B2 是"对 VRAM 目标地址下 watchpoint，读写指令触发后沿 r0/r1 源寄存器向上追踪"。**本次卡图定位时未走此路**，但后续补充实验证明 **VRAM watchpoint 完全可以定位到解码器**（详见 [`doc/analysis/card-image-location.md`](../analysis/card-image-location.md) Phase B3）。
 
 **实测结果（2026-04-16）**：
 
@@ -180,7 +180,7 @@ HIT 2 (continue ②): PC=0x0801D406 (decode_card_image_6bpp 内部!)
 - 每次 GDB `kill`/`quit` 后 stub 永久关闭，需 `mgba_live_stop` + 重新 `mgba_live_start`
 
 **早期失败的真正原因**（非工具限制）：
-- Phase B1 基于"BIOS LZ77"假设在 `0x08015076` 等处下 `hbreak`，**全部未触发**——因为游戏用自写 6bpp 解码，不走 BIOS SWI（详见 [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) §四）
+- Phase B1 基于"BIOS LZ77"假设在 `0x08015076` 等处下 `hbreak`，**全部未触发**——因为游戏用自写 6bpp 解码，不走 BIOS SWI（详见 [`doc/analysis/card-image-location.md`](../analysis/card-image-location.md) Phase B0）
 - 当时的 watchpoint 实验在 `0x06000000`（tile 0，不是卡图写入位置）设 watchpoint，且使用了 ss1 存档（卡图可能已预加载）——地址错 + 状态错，并非 watchpoint 机制本身的限制
 
 **与静态分析的对比**：
@@ -399,11 +399,8 @@ loop:
 
 | 文档 | 关系 |
 |------|------|
-| [`p1-card-image-location-plan.md`](p1-card-image-location-plan.md) | 原计划（含未执行的 Phase B2 GDB 路线），保留作历史 |
-| [`p1-phase-b2-findings.md`](p1-phase-b2-findings.md) | 卡图定位的详细结果报告（§四对应实战） |
+| [`doc/analysis/card-image-location.md`](../analysis/card-image-location.md) | 卡图加载函数逆向调研完整时间线（Phase A/B0/B1/B2/B3） |
+| [`data-structure/card-image-big.md`](data-structure/card-image-big.md) | 卡图 6bpp 解码规范 + ROM 地址（最终结论） |
 | [`p2-font-location-findings.md`](p2-font-location-findings.md) | 字库定位的详细结果报告（§五对应实战） |
-| [`analysis-card-image-loading-function.md`](analysis-card-image-loading-function.md) | 早期错误路径（BIOS SWI 假设）负面归档 |
-| [`card-image-export.md`](card-image-export.md) | P1-5 批量导出脚本与调色板策略 |
 | [`tools/gdb-debugging.md`](tools/gdb-debugging.md) | GDB stub + GDB MCP 调试指南（含 12 个坑、断点矩阵、工具链 PoC） |
-| [`gdb-breakpoint-card-image-report.md`](gdb-breakpoint-card-image-report.md) | GDB 断点/watchpoint 补充验证（2026-04-16），证明 VRAM watchpoint 可行 |
 | **本文** | **方法论提取，供后续资源定位复用** |

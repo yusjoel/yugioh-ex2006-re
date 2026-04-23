@@ -5,9 +5,9 @@
 #
 # TG.4  把已知 FUN_xxx 批量 rename.
 #   来源:
-#     - doc/dev/p1-phase-b2-findings.md  (卡图 6bpp 解码链)
+#     - doc/analysis/card-image-location.md  (卡图加载函数逆向叙事)
+#     - doc/dev/data-structure/card-attributes.md / card-image-big.md / card-image-mini.md
 #     - doc/dev/p2-font-location-findings.md (字体/文本渲染链)
-#     - doc/dev/card-data-structure.md  (name 查找)
 #
 # 同时往 plate comment 里写一条简短说明, 让 Listing/Decompiler 直接看见.
 #

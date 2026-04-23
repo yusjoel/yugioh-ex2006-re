@@ -8,7 +8,7 @@
 
 用于：
 - 验证 include/macros.inc 中 ATTR_* / RACE_* 枚举完整覆盖 ROM 实际取值
-- 为 doc/dev/card-data-structure.md §一 补全属性/种族编码表
+- 为 doc/dev/data-structure/card-attributes.md 补全属性/种族编码表
 
 输出：stdout（表格 + 代表卡）。
 """

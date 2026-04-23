@@ -40,7 +40,7 @@
 | 优先级 | 批次 | 原始文档数 | 目标产出 |
 |---|---|---|---|
 | ✅ | ~~工具链配置与调试~~（2026-04-23 完成） | 9 → 2 | `doc/dev/tools/mgba-mcp.md`（704 行）+ `doc/dev/tools/gdb-debugging.md`（626 行）|
-| — | 卡牌系统 | 11 | 待定 |
+| ✅ | ~~卡牌系统~~（2026-04-23 完成） | 12 → 7 | `doc/dev/data-structure/` 6 个 spec + `doc/analysis/card-image-location.md` 叙事 |
 | — | 方法论与工作流 | 6 | 待定 |
 | — | Pack 系统 | 5 | 待定 |
 | — | ROM 整体结构与参考 | 4 | 待定 |
@@ -64,21 +64,38 @@
 - [x] ~~`p0-1-gdb-dma3-watchpoint-walkthrough.md`（283 行）~~ → `tools/gdb-debugging.md` §六
 - [x] ~~`p0-5-gdb-mcp-integration.md`（214 行）~~ → `tools/gdb-debugging.md` §七
 
-### 批次 2：卡牌系统（11 个）
+### 批次 2：卡牌系统（12 个 → 7 个，**已完成 2026-04-23**）
 
-含卡数据结构、卡图导出管线、阶段性定位报告、卡详情页布局、2 个调试工具用于卡图定位的案例研究。
+**重要原则修订**：放弃原"卡牌系统"顶层分类（卡图只是逆向调研的一个子模块）。重构为：
+- **Spec** → `doc/dev/data-structure/`（只写最终确定的数据结构，不写过程/历史/旧版/引用）
+- **Narrative** → `doc/analysis/`（按时间线记录逆向调研，保留失败路径与方法论）
 
-- [ ] `card-data-structure.md` — 卡属性 + 6 语言名 + 6bpp 图像 + LZ77 压缩统一规范
-- [ ] `card-image-export.md` — 6bpp 解码 + card_id 映射 + 索引表 + 调色板
-- [ ] `card-mini-frame-export.md` — 带框小卡图 OBJ 调色板导出（P2-palette 结论）
-- [ ] `card-medium-frame-findings.md` — 32×48 中卡图精灵帧探索（1536B stride / 2331 tile block）
-- [ ] `analysis-card-image-loading-function.md` — 卡图加载函数静态分析（排除 BIOS SWI 错误路径）
-- [ ] `p1-card-image-location-plan.md` — 阶段 P1：两阶段定位计划（mGBA VRAM + GDB watchpoint）
-- [ ] `p1-phase-b2-findings.md` — 阶段 P1：`FUN_0801d290`（6bpp）80×80×4800B 确认
-- [ ] `gdb-watchpoint-card-image.md` — 卡图 watchpoint 失败路径记录（从工具链批次转入）
-- [ ] `gdb-breakpoint-card-image-report.md` — 卡图 hbreak 调用链验证成果（从工具链批次转入）
-- [ ] `doc/analysis/card-detail-page.md` — 卡牌详情页 VRAM 布局（BG2=卡图 / BG3=UI / OAM / 压缩字体）
-- [ ] `doc/analysis/p1-card-image-location/README.md` — 阶段 P1-A：VRAM 差分找到 4864B 卡图区间 `0x06008040`
+合并结果（**12 源 → 7 目标**，压缩 ~50%）：
+
+Spec（`doc/dev/data-structure/`）：
+- [x] `card-attributes.md`（134 行）— 5170 × 22B 属性表 + 属性/种族/副类别编码
+- [x] `card-names.md`（91 行）— 欧语 CP1252 + 日语 XX 双字节池
+- [x] `card-image-big.md`（189 行）— 大卡图 6bpp 80×80 + 解码公式 + 独立调色板
+- [x] `card-image-medium.md`（81 行）— 中卡图 8bpp 32×48 × 1536B stride
+- [x] `card-image-mini.md`（130 行）— 小带框卡图 8bpp 24×48 + 双调色板（OBJ/BG）
+- [x] `card-detail-page.md`（117 行）— 详情页 VRAM 布局（BG2/BG3/OAM/字体）
+
+Narrative（`doc/analysis/`）：
+- [x] `card-image-location.md`（495 行）— 卡图加载函数逆向时间线（Phase A/B0/B1/B2/B3）
+
+已合并并删除的源文档（12 个）：
+- [x] ~~`card-data-structure.md`~~（§四/五/六/七 非卡牌段落已在 FS/data-analysis-coverage 覆盖，整文件删除）
+- [x] ~~`card-image-export.md`~~ → `card-image-big.md`
+- [x] ~~`card-mini-frame-export.md`~~ → `card-image-mini.md`
+- [x] ~~`card-medium-frame-findings.md`~~ → `card-image-medium.md`
+- [x] ~~`analysis-card-image-loading-function.md`~~ → `card-image-location.md` Phase B0 + 附录 THUMB MOV 速查表
+- [x] ~~`p1-card-image-location-plan.md`~~ → `card-image-location.md`
+- [x] ~~`p1-phase-b2-findings.md`~~ → `card-image-big.md`（spec）+ `card-image-location.md`（叙事）
+- [x] ~~`p1-phase-b2-preparation.md`~~（mGBA+GDB 启动步骤，已由 `tools/mgba-mcp.md` + `tools/gdb-debugging.md` 完全覆盖）
+- [x] ~~`gdb-watchpoint-card-image.md`~~ → `card-image-location.md` Phase B1
+- [x] ~~`gdb-breakpoint-card-image-report.md`~~ → `card-image-location.md` Phase B3
+- [x] ~~`doc/analysis/card-detail-page.md`~~ → `data-structure/card-detail-page.md`
+- [x] ~~`doc/analysis/p1-card-image-location/`~~ → `card-image-location.md` Phase A + 附录 A
 
 ### 批次 3：方法论与工作流（6 个）
 

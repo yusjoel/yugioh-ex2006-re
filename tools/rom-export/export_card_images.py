@@ -1,7 +1,7 @@
 """
 批量导出《游戏王 EX2006》(BY6E, roms/2343.gba) 全部卡牌详情页大卡图为 PNG。
 
-对应 PLAN.md P1-5。依据 doc/dev/p1-phase-b2-findings.md 的逆向结论：
+对应 PLAN.md P1-5。依据 doc/dev/data-structure/card-image-big.md 的 spec：
   - tile 基址 0x08510640，ROM 文件偏移 0x00510640
   - 每张卡占 4800 字节，布局为 10×10 tiles × 8×8 像素 = 80×80
   - 6bpp 自写压缩（每 6 ROM bytes → 8 像素）

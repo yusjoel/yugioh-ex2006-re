@@ -27,7 +27,7 @@
 | `FUN_080f02a4` | `get_char_width_class` | `0x080F02A4` | jump table @ `0x080F02D4`，返回字符宽度类别 | p2 §⑤ |
 | `FUN_080f0200` | `char_width_narrow_5` | `0x080F0200` | 窄字宽度 5 px | p2 |
 | `FUN_080f0210` | `char_width_wide_10_or_12` | `0x080F0210` | 宽字宽度 10 或 12 px | p2 |
-| `FUN_080c33bc` | `load_card_list_small_image` | `0x080C33BC` | 卡牌列表小图加载（OBJ 8bpp, 1152 B / 条, 24×48） | card-data-structure §三 |
+| `FUN_080c33bc` | `load_card_list_small_image` | `0x080C33BC` | 卡牌列表小图加载（OBJ 8bpp, 1152 B / 条, 24×48） | data-structure/card-image-mini |
 | `FUN_080f2e4c` | `commit_line_buffer_to_sprite_vram` | `0x080F2E4C` | line buffer → `0x06010040+` sprite tile VRAM | p2 §⑤ |
 
 > 表里 18 行是因为 `load_card_list_small_image` 在 p1 表里未列出、实际为独立小图路径。
@@ -124,7 +124,8 @@ build.bat
 
 ## 参考
 
-- `doc/dev/p1-phase-b2-findings.md`
+- `doc/analysis/card-image-location.md`（卡图加载函数逆向叙事）
+- `doc/dev/data-structure/card-attributes.md`（卡属性表 spec）
+- `doc/dev/data-structure/card-image-big.md`（大卡图 6bpp spec）
+- `doc/dev/data-structure/card-image-mini.md`（小带框卡图 spec）
 - `doc/dev/p2-font-location-findings.md`
-- `doc/dev/card-data-structure.md` §一、§三
-- `doc/temp/next-session-ghidra-labeling.md`（本轮任务单）
