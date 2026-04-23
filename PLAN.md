@@ -13,26 +13,44 @@
 
 ---
 
-## 内嵌文件系统（2026-04-17 新识别）
+## 内嵌文件系统（2026-04-17 识别，2026-04-23 全解）
 
-ROM 内有 Konami 自写的文件系统（NNS g2d 资源 + .ydc 卡组 + .ydq 谜题 + .LZ5bg 背景），基址 `0x1E64684`，共 `0x70420` 字节（339 个文件）。
+ROM 内有 Konami 自写的文件系统（NNS g2d 资源 + .ydc 卡组 + .ydq 谜题 + .LZ5bg 背景），
+基址 `0x1E64684`，共 `0x70420` 字节（**339** 个文件，含 FID 339 orphan palette）。
 
 - ✓ 索引表已结构化：`data/fs-tables.s`（`offset_table` + `size_table`, 2716 B）
 - ✓ 路径表已结构化：`data/file-paths.s`（339 条 null 终止 ASCII）
-- ✓ **FS 原始字节全量导出**（2026-04-19）：`tools/rom-export/export_fs_files.py` → `fs/<orig path>` +
-  `data/fs-payload.s`（338 个文件 FID 1..338 tight-pack，byte-identical）。详见
-  `doc/dev/fs-export-and-ocg-tcg.md`。98 组重名用 `_dup1` 消歧，确认为 OCG/TCG 变体（flag=ROM `0x080000AE`）。
-- ✓ NNS scratch 解析：`doc/temp/nns_out/` 含 63 个 NNS 资源（临时产物，未落地到 tools/）
+- ✓ **FS 原始字节全量导出**（2026-04-23 修正后）：`tools/rom-export/export_fs_files.py` →
+  `fs/<orig path>` + `data/fs-payload.s`（339 文件 FID 1..339，byte-identical）。
+  path[i] ↔ FID[i+1] 正确映射；99 组重名用 `_dupN` 消歧（2-way 为 OCG/TCG 变体，
+  exodia02 的 2 组 3-way 经 A4 确认为字节相同冗余发布 bug）。
+- ✓ **所有 89 个 LZ77 容器（63 NNS + 26 LZ5bg）已解压**到 `fs-decompressed/`
+- ✓ **NNS 解析器**：`export_nns_parsed.py` 解 4 类格式 + 生成 palette/tile PNG，
+  共享库 `_nns_lib.py` 供 C 系列渲染脚本复用
+- ✓ **UI 静态帧渲染**：
+  - C1 title 6 语言 OBJ 层（`title_obj_{e,f,g,i,j,s}`）
+  - C2 name/pass input UI cells
+  - C3 demo cutscene cells + NANR 序列关键帧
+- ✓ **`.LZ5bg` 逆向完成**：并非私有压缩，实为 LZ77 + Konami wrapper + NitroSDK 风格
+  `NTBG` 容器（`PALT` / `BGDT` / `DFPL` 三块）。见 `doc/temp/nns-format-notes.md` §9.1。
+- ✓ **`.ydc` / `.ydq` 结构化**：215 ydc → `data/ydc-all.s`（header + body + tail），
+  35 ydq → `data/duel-puzzles-v2.s`（INI 结构化）；均 byte-identical 可重建。
+- ✓ **OCG/TCG flag 代码级确认**（D1）：`0x080000AE` 在 asm 有 24 处引用，14 处规范模板
+  `ldrh+lsrs+cmp 'J'+IRAM fallback`。BY6E 游戏代码第 4 字 `'E' ≠ 'J'` → flag=1 (TCG)。
+- ✓ **FS 尾段分段**（D2）：`0x1ED4AA4..0x2000000` = 1.17 MB。段 B 2 KB 稀疏 pointer table，
+  段 C 1.22 MB 均匀高熵（疑 ROM padding 或 PRNG），推翻 prompt "125 KB NitroSDK 串池" 假设。
+- ✓ **历史 bug #12 修复**（2026-04-23）：`export_fs_files.py` 的 path/FID off-by-one 修正，
+  fs/ 下 100% 文件名与内容对齐，新增 fs/titleEx/title_obj_s.LZnclr 捕获 FID 339 orphan。
 
-**后续可做的 FS 深化（按优先级）**：
+**后续 FS 深化（优先级较低）**：
 
-| 优先级 | 扩展名 | 数量 | 目标 |
-|---|---|---|---|
-| ⭐⭐ | `.LZnclr` | 18 | PALRAM 对位；NNS NCLR 正式解析器落地到 `tools/` |
-| ⭐ | `.LZncgr` / `.LZncer` / `.LZnanr` | 17+14+14 | NCGR/NCER/NANR 数据解析 + PNG 渲染，需 palette 对齐 |
-| ⭐ | `.LZ5bg` | 26 | 格式未解析（Konami 私有 BG 压缩，压缩头 `0x01`） |
-| ⭐ | `.ydc` / `.ydq` 解码器升级 | 214+35 | 重新用统一 FS 层替代 `opponent-decks.s` / `duel-puzzles.s`（脚本仍在，build 已解耦） |
-| — | 追 `.ydc` 加载器 | — | 硬证 OCG/TCG flag 选 FID 的具体函数（ghidra 未命名） |
+| 优先级 | 范围 | 目标 |
+|---|---|---|
+| ⭐ | `.LZ5bg` BGDT/DFPL 内部字段 | 逆 BG tile pixel 格式 + screen layout 映射；用于 C1 title BG 层 |
+| ⭐ | C1 title 画面 BG 合成 | 用 `.gbtn` 补 BG 层；当前 C1 仅 OBJ |
+| ⭐ | `.ydc` 语义解码（B1 第二阶段） | 解 3 种 4B key（`4f57443f`/`7f217741`/`39a7cf42`）含义、body `so_code*4\|qty` 编码验证、tail 字段用途（LV2_kaeru 等含非零数据）|
+| ⭐ | `.ydc` loader 追溯 | 反编译定位 OCG/TCG flag 选 FID 的具体函数；顺便可取代 ghidra 未命名 |
+| — | FS 尾段 B 区 2 KB pointer table | 追 consumer 反推 C struct；覆盖率收益仅 ~0.006% |
 
 ---
 

@@ -1,20 +1,25 @@
-# FS 尾段 (0x1ED49D4 .. 0x2000000) 分段分析 — 任务 D2
+# FS 尾段 (0x1ED4AA4 .. 0x2000000) 分段分析 — 任务 D2
 
-**日期**：2026-04-23
-**范围**：ROM `0x01ED49D4..0x02000000`（= 1,226,284 B = 1.17 MB）
+**日期**：2026-04-23（bug #12 修复后更新）
+**范围**：ROM `0x01ED4AA4..0x02000000`（= **1,225,564 B** = 1.17 MB）
 **任务目标**：prompt 声称此段含 "125 KB NitroSDK assertion 池"，要求进一步分段结构化
+
+> **注**：早期 FS 尾段起点是 `0x1ED49D4`（含 FID 339 orphan palette 208 B）。
+> bug #12 修复后 orphan 正式并入 `data/fs-payload.s`，尾段起点后移到 `0x1ED4AA4`，
+> 缩短 208 B。本文分段编号保留以利对照；段 A 现属 FS 内部，不再是尾段范围。
 
 ---
 
-## 一、宏观布局
+## 一、宏观布局（修订版）
 
 | 段 | 范围 | 大小 | 内容 | 熵（每字节比特） |
 |---|---|---|---|---|
-| **A** | `0x1ED49D4..0x1ED4AA4` | 208 B | **FID 339 orphan NCLR 调色板**（= `titleEx/title_obj_s.LZnclr`，LZ77 压缩形式；解压后 556 B，标准 NCLR）| 4.4 |
+| ~~**A**~~ | `0x1ED49D4..0x1ED4AA4` | 208 B | **已移入 fs-payload（FID 339 orphan NCLR 调色板）**，不再属尾段 | — |
 | **B** | `0x1ED4AA4..0x1ED52A4` | ~2 KB | 稀疏结构化（u32 指针 + 大量 0） | ≈ 0.7 |
 | **C** | `0x1ED52A4..0x2000000` | **1,222,188 B** | **均匀随机数据**，等同 ROM padding | 7.996 |
 
-**段 A** 已在任务 A1 中识别并解压（见 `fs-decompressed/titleEx/title_obj_s.nclr`），属 "FS 表 szs[339] 额外记录" 的孤儿条目。
+（段 A 现在就是 FID 339 orphan palette `title_obj_s.LZnclr`，见 `fs/titleEx/title_obj_s.LZnclr`
+与 `fs-decompressed/titleEx/title_obj_s.nclr`。）
 
 ---
 
@@ -106,7 +111,7 @@
   - 另一个 ROM 镜像的 junk data（如早期开发版的 leftover）
 
 不管是哪种，**不含可恢复的 game logic 或 asset**。D2 任务结束：
-- **段 A**：已解（A1 任务）
+- ~~**段 A**~~：已解（A1 任务），bug #12 修复后并入 fs-payload.s，不再属尾段
 - **段 B**：稀疏 pointer table；非关键；留待后续按需追 consumer
 - **段 C**：纯 padding / 噪声，无 asset 语义
 
@@ -115,10 +120,10 @@
 ## 四、对 PLAN.md 进度的影响
 
 原 PLAN.md 若认为 "FS 尾段全部可结构化"，应修正为：
-- 可结构化部分 ≈ 208 B (段 A) + 2 KB (段 B) ≈ 2.2 KB
-- 剩余 1.22 MB (= FS 尾段的 99.83%) 为**不可结构化随机填充**
+- 可结构化部分 ≈ 2 KB (段 B) — 段 A 208 B 已并入 FS
+- 剩余 1.22 MB (= 尾段的 99.84%) 为**不可结构化随机填充**
 
-覆盖率增益有限：新增 ≈ 2.2 KB 可标注 → 约 0.007% 百分比推进。
+覆盖率增益有限：新增 ≈ 2 KB 可标注 → 约 0.006% 百分比推进。
 
 ---
 
@@ -126,7 +131,7 @@
 
 若未来想完全消除 "unknown" 标记：
 1. **段 B 的 2 KB**：反编译找对 `0x09ED4C8C` 等指针的 consumer，推 C struct 布局，替换为带注释的 `.word` 数据
-2. **段 C 的 1.17 MB**：确认是否由 Konami build tool 生成的确定性填充（若是 PRNG，找 seed 后可程序化重建），或接受其为 `.incbin` 不入库的 blob
+2. **段 C 的 1.22 MB**：确认是否由 Konami build tool 生成的确定性填充（若是 PRNG，找 seed 后可程序化重建），或接受其为 `.incbin` 不入库的 blob
 
-当前方案：`asm/rom.s` 已用单个 `.incbin "roms/2343.gba", 0x1ED49D4, 0x12B62C` 覆盖整片
+当前方案：`asm/rom.s` 已用单个 `.incbin "roms/2343.gba", 0x1ED4AA4, 0x12B55C` 覆盖整片
 尾段——byte-identical 构建不受影响。
