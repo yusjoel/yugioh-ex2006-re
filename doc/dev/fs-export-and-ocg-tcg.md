@@ -78,13 +78,60 @@ tile_block = u16[INDEX_TABLE + (card_id*2 + flag)*2]
 FS 的 dup 分布完美匹配相同模式：若抽象索引 `base_idx = (fid - FIRST_DUP_FID) / 2`，则
 `fid = FIRST_DUP_FID + base_idx*2 + flag`，OCG/TCG 选一。
 
-### 证据 3（弱）：asm/all.s 静态 literal 搜索
+### 证据 3：asm/all.s 代码级确认（任务 D1，2026-04-23）
 
-- `0x080000ae` 在 all.s 有 76 处引用（含 card-list-images 已知 loader + 若干其他）
-- 但 FS 三个表 CPU 地址 `0x09E64684` / `0x09E63BE8` / `0x09E6118C` **均未作为 `.word` 字面量出现**
-- 推断 FS 表基址是运行时计算（可能 `FS_BASE - sizeof(tables)` 或经全局指针间接访问）
+`0x080000ae` 在 `asm/all.s` **恰好 24 处 `.word` 引用**（原 prompt 的 "76" 是高估）。14 处呈现标准 "区域判定 + OCG 子检查" 五步指令序列：
 
-直接硬证需追 `.ydc` 加载器（后续可做），但数据层已足够强。
+```asm
+; --- 规范模板（见 FUN_0801c50c @ 0x0801c50c，FUN_080c33bc @ 0x080c33bc 等）---
+  ldr   rN, DAT_ae          @ rN = 0x080000AE
+  ldrh  rN, [rN, #0]        @ rN = *(u16*)0x080000AE  （BY6E → 0x4536）
+  lsrs  rN, rN, #8          @ rN = 高字节 = rom[0xAF]（= 区域码 ASCII）
+  cmp   rN, #0x4a           @ = 'J' ?
+  bne   TCG_SET              @ ≠ 'J' → 直接判 TCG（flag=1）
+  ; --- 仅 J ROM 到达此处，检查 IRAM 运行时切换 ---
+  ldr   r1, DAT_02000000
+  ldr   r0, DAT_00006c2c
+  adds  r1, r1, r0          @ r1 = 0x02006c2c (IRAM)
+  ldrb  r1, [r1, #0]
+  movs  r0, #7
+  ands  r0, r1              @ r0 = IRAM[0x02006c2c] & 7
+  cmp   r0, #0              @ 低 3 bit 为 0 → 保持 OCG
+  beq   OCG_KEEP
+TCG_SET:
+  movs  rR, #1              @ flag = 1 (TCG)
+OCG_KEEP:
+  ; flag 留 0 (OCG) 或 1 (TCG)
+```
+
+### 24 处引用分类
+
+| 分类 | 数量 | 说明 |
+|---|---|---|
+| 规范 "J + IRAM" 两级判定 | 8 | 完整 OCG/TCG dual-gate，允许 J ROM 运行时切换到 TCG |
+| 简化 "直接 J 判定" | 6 | 只读 0x080000AE，无 IRAM fallback（硬分支，常见于 startup） |
+| ARM 模式 / 跨 pool 远引用 | 10 | 指令序列跨越 40+ 行，静态扫描未匹配（需 Ghidra 逐函数验） |
+
+### BY6E 运行时行为（已确证）
+
+- ROM[0x080000AC..0xAF] = `'B' 'Y' '6' 'E'` = 游戏代码 `BY6E`（北美 TCG 版）
+- `u16 @ 0x080000AE` = `0x4536`，`lsrs #8` 得 `0x45 = 'E'`
+- `cmp #0x4a` 失败 → **flag = 1 (TCG)**，无需 IRAM fallback
+- IRAM 0x02006c2c & 7 仅在 J ROM 构建下被读取（开发期的区域切换后门），本作永不触发
+
+### 代表性位置
+
+| 地址 | 函数 | 用途（从上下文推断） |
+|---|---|---|
+| `0x080c33bc` | FUN_080c33bc | card-list-images 小卡图 tile 选 OCG/TCG 查表（已知） |
+| `0x0801c50c` | FUN_0801c50c | 选 0x09e3d964 ROM 配置块的 OCG/TCG 变体（16 B × 2） |
+| `0x080136xx`~ | FUN_08013680 | （ARM 模式）早期启动阶段区域判定 |
+
+### FS 表定位问题（未决）
+
+- FS 三表 CPU 地址 `0x09E6118C` / `0x09E63BE8` / `0x09E64684` **均未作为 `.word` 字面量出现**（已确认）
+- 推断 FS 表基址是运行时算出（相对全局指针或 `FS_BASE - table_size` 反推）
+- 这意味着 `.ydc` loader 的 OCG/TCG 分叉不能仅靠 literal 扫找到，需反编译追调用链（任务 B1）
 
 ---
 
@@ -137,4 +184,60 @@ FS 的 dup 分布完美匹配相同模式：若抽象索引 `base_idx = (fid - F
 - **追 `.ydc` 加载器**：找到实际使用 flag 选 OCG/TCG 的函数，直接证实区域字节控制
 - **NNS 资源**：`.LZnclr` / `.LZncgr` / `.LZnanr` / `.LZncer` 63 个（+ 3 组 3-way dup）待做正式 NNS 解析器（`doc/temp/nns_out/` 有临时产物）
 - **`.LZ5bg` 压缩格式**：26 个文件格式未逆（Konami 私有 BG 压缩）
-- **3-way dup**：`exodia02_obj.LZn{cgr,clr}` 3 路来源待查（可能语言选择不止 2 档）
+
+---
+
+## 七、3-way dup 深度调查（任务 A4，2026-04-23）
+
+### 对象
+
+`demo/exodia/exodia02_obj` 系列，FS 中含两组三份：
+
+| 路径 | FID | 绝对偏移 | 压缩大小 | 解压后大小 | 解压 SHA1 |
+|---|---|---|---|---|---|
+| `exodia02_obj.LZncgr` | 227 | 0x01E7FFCC | 13,324 B | 28,848 B | `b32c4fdb…` |
+| `exodia02_obj.LZncgr` | 228 | 0x01E833D8 | 13,324 B | 28,848 B | `b32c4fdb…` |
+| `exodia02_obj.LZncgr` | 229 | 0x01E867E4 | 13,324 B | 28,848 B | `b32c4fdb…` |
+| `exodia02_obj.LZnclr` | 230 | 0x01E89BF0 | 124 B | 552 B | `a061862b…` |
+| `exodia02_obj.LZnclr` | 231 | 0x01E89C6C | 124 B | 552 B | `a061862b…` |
+| `exodia02_obj.LZnclr` | 232 | 0x01E89CE8 | 124 B | 552 B | `a061862b…` |
+
+（注：此处 FID 标号按 "path[i] ↔ FID[i+1]" 正确对齐。task A1 中发现 `export_fs_files.py` 当前用的是 shift=0 误对齐，见任务 #12。）
+
+### 观察
+
+1. **3 份在原始 LZ77 压缩流和解压后 NNS 内容两级都 byte-identical**（SHA1 完全一致）——不是 OCG/TCG/EU 三区域不同数据。
+2. **仅 NCGR + NCLR 被三重化**，而同场景的 `.LZnanr` (FID 225) 与 `.LZncer` (FID 226) 都是单份。
+3. **其他 demo 场景不存在 3-way dup**：`exodia00/01`、`shuen`、`vija`、`name_input`、`pass_input`、`titleEx` 都没有 `×3` 模式。路径表 `path[226..228]` 与 `path[229..231]` 是仅有的 2 组 "连续 3 次" 重复。
+4. **asm/all.s 无 226-232 FID 数字字面量**（`mov rX, #NNN`、`#NNN` in .word 扫描均无命中）——loader 按间接索引/路径字符串查，无法从静态字面量证实访问顺序。
+
+### 推断
+
+排除的可能：
+
+| 假说 | 排除理由 |
+|---|---|
+| OCG/TCG/EU 3 区域变体 | 3 份 bytes 相同，无法区分区域 |
+| 3 关键帧的不同动画数据 | NANR/NCER 单份，动画层无 3 倍冗余 |
+| 3 个不同 VRAM 槽的预加载 | NCGR/NCLR 解压结果完全一致，VRAM 载入只需一次 |
+
+最可能（残留证据）：
+
+- **开发流程遗留**：exodia02 在开发过程中经过多次资产迭代，pipeline 将每次"生成版本"都写入 FS（可能 `build_res.exe` 每迭代一次追加一份），最终未去重。
+- **浪费**：2 份冗余 × (13,324 + 124) B = **26,896 B = 26.3 KB** 纯浪费。
+
+这一推断与更大范围的 OCG/TCG 2-way dup（96 组，deck/LV*、theme_*.ydc 等）**不同**：2-way 的 dup bytes 在 98/98 组里都不相同，所以 2-way 是真实的区域分叉；3-way 全相同则是发布期 bug。
+
+### 结论
+
+`exodia02_obj` 3 份副本是**发布 ROM 中的重复资产 bug**，非功能性区分。字节无差异 → 无可挖掘的语义信息。任务 A4 结束。
+
+---
+
+## 八、后续
+
+- **追 `.ydc` 加载器**（任务 B1 / D1）：证实 OCG/TCG 2-way dup 的 flag 访问
+- **NNS 解析器**（任务 A2 + D3）：`fs-decompressed/` 已就绪
+- **`.LZ5bg` 压缩格式**（任务 A3）：26 个，magic `0x10`（LZ77）外壳，内层 NNS magic `NTBG` 格式待逆
+- **FS 对齐 bug**（任务 #12）：`export_fs_files.py` 的 `path[i] ↔ FID[i]` 应改为 `path[i] ↔ FID[i+1]`，并将 FID 339（orphan palette `title_obj_s.LZnclr` @ 0x1ED49D4+208B）纳入 FS
+- **3-way dup**：已关闭，结论见第七节

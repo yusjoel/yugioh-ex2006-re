@@ -35,6 +35,9 @@ data/
 # 导出的 FS 文件（由 tools/rom-export/export_fs_files.py 从 ROM 重建）
 fs/
 
+# 解压后的 NNS 容器（由 tools/rom-export/export_nns_unpacked.py 从 ROM 重建）
+fs-decompressed/
+
 # 本地环境配置（路径因机器而异）
 LOCAL.md
 roms/*.sav

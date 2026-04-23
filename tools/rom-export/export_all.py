@@ -28,6 +28,14 @@ EXPORT_PIPELINE = [
     'export_file_paths.py',             # data/file-paths.s
     'export_fs_tables.py',              # data/fs-tables.s
     'export_fs_files.py',               # fs/<orig path> + data/fs-payload.s（338 个 FS 文件）
+    'export_nns_unpacked.py',           # fs-decompressed/**/*.{nanr,ncer,ncgr,nclr}（63 个解压 NNS）
+    'export_lz5bg_unpacked.py',         # fs-decompressed/**/*.gbtn（26 个解压 NTBG BG 容器）
+    'export_nns_parsed.py',             # graphics/fs-nns/*.{json,png} (NNS parser + palette/tile PNG)
+    'export_fs_ui_name_pass.py',        # graphics/images/fs-ui/name_*, pass_* (cell 合成)
+    'export_fs_ui_demos.py',            # graphics/images/fs-ui/demo_* (cutscene cells + NANR 关键帧)
+    'export_fs_ui_titles.py',           # graphics/images/fs-ui/title_<lang>_* (6 语言 OBJ 层)
+    'export_duel_puzzles_v2.py',        # data/duel-puzzles-v2.s（35 个决斗谜题，结构化 INI 文本）
+    'export_ydc_structured.py',         # data/ydc-all.s + ydc-index.json（215 个 .ydc 头部+体+尾结构化）
     'export_font.py',                   # data/font.s + graphics/font/*
     'export_pack_banners.py',           # data/pack-banners.s + graphics/pack-banners/*
     'export_card_mini_frame.py',        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
