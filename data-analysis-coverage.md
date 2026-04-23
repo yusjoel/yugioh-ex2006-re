@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**21,842,908 B（76.53%）**
-- 未分析：**6,700,524 B（23.47%）**
+- 已分析：**21,886,684 B（76.68%）**（含 2026-04-23 的 43,776 B UI sheet 增量）
+- 未分析：**6,656,748 B（23.32%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -152,3 +152,38 @@ key(cid) = ((cid * 0x343FD + 0x269EC3) >> 16) | 0x9EC30000   （Borland rand LCG
 - `0x185D270 / 0x4B0` → `duel_field_common_inner_tilemap.bin`（内场公共 Tilemap, 30×20）
 
 未分析段：23 → 17，未分析字节：6,714,300 → 6,700,524（清理 13,776 B；剩 5 段混合表 + 4 个大图形 bundle）。
+
+## 2026-04-23 UI sheet 批量结构化（ss1 VRAM 反查 + all.s 代码引用）
+
+方法：在 `roms/2343.ss1`（卡列表视图 + 详情页）下 dump VRAM，按 stride-4 匹配 ROM；对命中位置回查 `asm/all.s` 的 DAT_ 指针和 tile_2d_row_copy / FUN_080f4ea4 尺寸参数，确定每块精确起止。
+
+### seg `0x1DFF9D2 / 0x31B82` — 新增 43,712 B 结构化
+
+拆出代码引用的子块，插入 `asm/rom.s`：
+
+- `0x1E246D4 / 0xE80` = **HUD 数字/图标 sheet**（116 tiles 4bpp, `FUN_08101068` 一次性装载，用于卡列表顶部计数器 + 小图标）
+- `0x1E25674 / 0x2C0` = state=1 small sheet（22 tiles 列优先, `FUN_081016c0`）
+- `0x1E25934 / 0x300` = state=1 big sheet（24 tiles 行优先 12×2, 水平滑动条）
+- `0x1E25C34 / 0x300` = state=3 sheet（24 tiles, 6 iter × 2×2, L/R 键提示 + 翻页 button）
+- `0x1E265B4 .. 0x1E2FEB4 / 0x9900` = **13 个 switch case sprite sheet**（`FUN_08109788`, 每 item 0x100 B = 8bpp 16×16 px sprite, 共 153 items）
+  - case 0: 5 菜单 action | case 1/3: 5+5 心形 HP 计数 | case 2: 11 杂项 UI
+  - case 4: 9 卡边框色 | case 5: 4 星计数
+  - **case 6/a: 10 属性图标**（闇/水/炎/光/風/地/魔/罠/神+彩虹, 双拷贝）
+  - **case 7/b: 22 种族图标**（Spellcaster/Warrior/Fiend/Dragon/...22 款, 双拷贝）
+  - case 8/c: 8 棕印章（双拷贝） | case 9: 33 状态/成就（真实边界靠字节直方图 item 33 处突变定出）
+- `0x1E310B4 / 0x200` = OBJ 4 方向箭头 × 4（16 tiles, `FUN_081066fc`）
+
+### seg `0x1E31714 / 0x275FA` — 新增 64 B 结构化
+
+- `0x1E31754 / 0x20` = 动画调色板（`FUN_081058c8` 16-halfword, rows 11-14 帧循环）
+- `0x1E31794 / 0x20` = OBJ 辅助 subpal（`FUN_081066fc` 单 subpal）
+
+### 产出
+- 导出脚本 `tools/rom-export/export_ui_sheets.py`（已接入 `export_all.py` 流水线）
+- 导出 bin + 预览 PNG → `graphics/bin/ui-misc/` + `graphics/images/ui-misc/`
+- 调研报告 `doc/dev/ss1-rom-image-survey.md` + `doc/dev/hud-sheet-references-in-code.md`
+
+### 剩余未分析
+- seg `0x1DFF9D2` 仍 raw：`0x1DFF9D2..0x1E246D4` (150,786 B) + `0x1E25554..0x1E25674` (288 B) + `0x1E25F34..0x1E265B4` (1,664 B) + `0x1E2FEB4..0x1E310B4` (4,608 B, post-case9 FF/AA-dominant 未知格式) + `0x1E312B4..0x1E31554` (672 B) = 合计 157,940 B
+- seg `0x1E31714` 仍 raw：共 161,210 B（64 B / 161,274 = 0.04% 已分析）
+- 本次总计：未分析字节 6,700,524 → 6,656,748（清理 43,776 B，数据区已分析占比 76.53% → 76.68%）

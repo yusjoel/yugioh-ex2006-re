@@ -32,6 +32,7 @@ EXPORT_PIPELINE = [
     'export_pack_banners.py',           # data/pack-banners.s + graphics/pack-banners/*
     'export_card_mini_frame.py',        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
     'export_card_medium_frame.py',      # data/card-medium-frame.s + graphics/{bin,images}/card-medium-frame/*
+    'export_ui_sheets.py',              # graphics/{bin,images}/ui-misc/* (HUD/state/switch sheets + aux palettes)
     'export_deck_strings.py',           # data/deck-strings.s
 
     # Step 3: 依赖 card-names.s 的脚本

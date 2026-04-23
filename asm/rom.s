@@ -330,14 +330,81 @@ Start:
 @ 含 5 种语言（EN/DE/FR/IT/ES）的完整游戏文本，共 242610 字节
 	.include "data/game-strings.s"
 
-@ 后 16MB 中间段前部：ROM偏移 0x1DFF9D2 - 0x1E31553（游戏文本后，卡列表调色板前）
-	.incbin "roms/2343.gba", 0x1DFF9D2, 0x31B82
+@ 后 16MB 中间段前部：ROM偏移 0x1DFF9D2 - 0x1E31553
+@ 已拆分：
+@   - 0x1DFF9D2..0x1E246D4 (0x24D02 B): 剩余未知
+@   - 0x1E246D4..0x1E25554 (0xE80 B):   HUD 数字/图标 sheet (FUN_08101068)
+@   - 0x1E25554..0x1E25674 (0x120 B):   gap
+@   - 0x1E25674..0x1E25F34 (0x8C0 B):   state sheets (FUN_081016c0 s1 small/big + s3)
+@   - 0x1E25F34..0x1E265B4 (0x680 B):   gap
+@   - 0x1E265B4..0x1E2FEB4 (0x9900 B):  switch sheets 13 cases (FUN_08109788)
+@   - 0x1E2FEB4..0x1E310B4 (0x1200 B):  post-case9 未知格式 (FF/AA-dominant)
+@   - 0x1E310B4..0x1E312B4 (0x200 B):   aux OBJ 箭头 (FUN_081066fc)
+@   - 0x1E312B4..0x1E31554 (0x2A0 B):   剩余未知
+	.incbin "roms/2343.gba", 0x1DFF9D2, 0x24D02
+
+@ HUD 数字/图标 sheet (FUN_08101068, 116 tiles 4bpp, 3712 B)
+	.incbin "graphics/bin/ui-misc/_MERGED_HUD_sheet_01E246D4_01E25554.bin"
+
+	.incbin "roms/2343.gba", 0x1E25554, 0x120
+
+@ state=1/3 sheets (FUN_081016c0)
+	.incbin "graphics/bin/ui-misc/FUN081016c0_s1_small_01E25674.bin"
+	.incbin "graphics/bin/ui-misc/FUN081016c0_s1_big_01E25934.bin"
+	.incbin "graphics/bin/ui-misc/FUN081016c0_s3_01E25C34.bin"
+
+	.incbin "roms/2343.gba", 0x1E25F34, 0x680
+
+@ 13 个 switch case sprite sheet (FUN_08109788, 8bpp 16×16 px item)
+@ case 0: 5 items 菜单 action
+@ case 1: 6 items 心形 HP 1-5
+@ case 2: 11 items 杂项 UI
+@ case 3: 5 items 心形↑ HP 1-5
+@ case 4: 9 items 卡边框色标
+@ case 5: 4 items 星计数徽章
+@ case 6: 10 items 属性（闇/水/炎/光/風/地/魔/罠/神+彩虹）
+@ case a: 10 items 属性 (dup)
+@ case 7: 22 items 种族
+@ case b: 22 items 种族 (dup)
+@ case 8: 8 items 棕印章
+@ case c: 8 items 棕印章 (dup)
+@ case 9: 33 items 状态/成就
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_0_0x01E265B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_1_0x01E26AB4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_2_0x01E270B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_3_0x01E27BB4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_4_0x01E280B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_5_0x01E289B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_6_0x01E28DB4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_a_0x01E297B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_7_0x01E2A1B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_b_0x01E2B7B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_8_0x01E2CDB4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_c_0x01E2D5B4.bin"
+	.incbin "graphics/bin/ui-misc/switch_sheets/case_9_0x01E2DDB4.bin"
+
+	.incbin "roms/2343.gba", 0x1E2FEB4, 0x1200
+
+@ aux OBJ 箭头 × 4 (FUN_081066fc, 16 tiles 4bpp)
+	.incbin "graphics/bin/ui-misc/FUN081066fc_obj_01E310B4.bin"
+
+	.incbin "roms/2343.gba", 0x1E312B4, 0x2A0
 
 @ card-mini-frame OBJ 调色板（ROM偏移 0x1E31554 - 0x1E31713，0x1C0 B）
 	.include "data/card-mini-frame-palette.s"
 
-@ 后 16MB 中间段后部：ROM偏移 0x1E31714 - 0x1E58D0D（调色板后，对手卡值前）
-	.incbin "roms/2343.gba", 0x1E31714, 0x275FA
+@ 后 16MB 中间段后部：ROM偏移 0x1E31714 - 0x1E58D0D
+@ 已拆分：
+@   - 0x1E31714..0x1E31754 (0x40 B): 未知
+@   - 0x1E31754..0x1E31774 (0x20 B): 动画调色板 (FUN_081058c8)
+@   - 0x1E31774..0x1E31794 (0x20 B): 未知
+@   - 0x1E31794..0x1E317B4 (0x20 B): OBJ 辅助调色板 (FUN_081066fc)
+@   - 0x1E317B4..0x1E58D0D (0x2755A B): 剩余未知
+	.incbin "roms/2343.gba", 0x1E31714, 0x40
+	.incbin "graphics/bin/ui-misc/FUN081058c8_anim_pal_01E31754.bin"
+	.incbin "roms/2343.gba", 0x1E31774, 0x20
+	.incbin "graphics/bin/ui-misc/FUN081066fc_obj_pal_01E31794.bin"
+	.incbin "roms/2343.gba", 0x1E317B4, 0x2755A
 
 @ 对手卡值块数据（ROM偏移 0x1E58D0E - 0x1E5906D）
 @ 27 个对手条目，每条 32 字节，共 0x360 字节
