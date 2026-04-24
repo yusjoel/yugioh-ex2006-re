@@ -57,6 +57,37 @@ LABELS = [
     (0x098567EC, "limited_outer_image"),        # Limited Duel 外场 (0xDE0 B)
     (0x098575CC, "theme_outer_image"),          # Theme Duel 外场 (0x9E0 B)
     (0x09857FAC, "survival_outer_image"),       # Survival Mode 外场 (0x7E0 B)
+    (0x0985878C, "duel_field_outer_extra_tiles"),    # ~95 tiles 4bpp (tile_pointers sentinel)
+
+    # 外场 palette + 调色板指针表 (每 palette 0x40 B, 2×16色)
+    (0x0985936C, "duel_field_outer_palette_pointers"),  # 7 × u32
+    (0x09859388, "campaign_outer_palette"),
+    (0x098593C8, "link_outer_palette"),
+    (0x09859408, "puzzle_outer_palette"),
+    (0x09859448, "limited_outer_palette"),
+    (0x09859488, "theme_outer_palette"),
+    (0x098594C8, "survival_outer_palette"),
+    (0x09859508, "duel_field_extra_palette"),   # 2×16色 (palette_pointers sentinel)
+
+    # LP/阶段 Tilemap + 指针表 (每 tilemap 0x4B0 B = 30×20)
+    (0x09859548, "hud_phases_tilemap_pointers"),    # 7 × u32
+    (0x09859564, "campaign_outer_lp_tilemap"),
+    (0x09859A14, "link_outer_lp_tilemap"),
+    (0x09859EC4, "puzzle_outer_lp_tilemap"),
+    (0x0985A374, "limited_outer_lp_tilemap"),
+    (0x0985A824, "theme_outer_lp_tilemap"),
+    (0x0985ACD4, "survival_outer_lp_tilemap"),
+    (0x0985B184, "hud_phases_map"),             # 0x4B0 B (lp_tilemap sentinel)
+
+    # 外场 Tilemap + 指针表 (每 tilemap 0x4B0 B = 30×20)
+    (0x0985B634, "duel_field_outer_tilemap_pointers"),  # 7 × u32
+    (0x0985B650, "campaign_outer_tilemap"),
+    (0x0985BB00, "link_outer_tilemap"),
+    (0x0985BFB0, "puzzle_outer_tilemap"),
+    (0x0985C460, "limited_outer_tilemap"),
+    (0x0985C910, "theme_outer_tilemap"),
+    (0x0985CDC0, "survival_outer_tilemap"),
+    (0x0985D270, "duel_field_common_inner_tilemap"),  # 0x4B0 B (outer_tilemap sentinel)
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表

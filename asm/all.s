@@ -244748,7 +244748,7 @@ LAB_080ca9ce:
     ble LAB_080ca9ce                         @ 080ca9e4 f3dd
     movs r0,#0xa0    @ 080ca9e6 a020
     lsls r0,r0,#0x13    @ 080ca9e8 c004
-    ldr r4, DAT_080caaf0                     @ 080ca9ea 414c
+    ldr r4, PTR_duel_field_outer_palette_pointers_080caaf0 @ 080ca9ea 414c
     ldr r6, DAT_080caaf4                     @ 080ca9ec 414e
     movs r2,#0x88    @ 080ca9ee 8822
     lsls r2,r2,#0x2    @ 080ca9f0 9200
@@ -244783,7 +244783,7 @@ LAB_080ca9ce:
     lsls r2,r2,#0x4    @ 080caa2e 1201
     bl FUN_080f4ea4                          @ 080caa30 2af038fa
     ldr r0, DAT_080cab04                     @ 080caa34 3348
-    ldr r2, DAT_080cab08                     @ 080caa36 344a
+    ldr r2, PTR_hud_phases_tilemap_pointers_080cab08 @ 080caa36 344a
     ldr r1,[r7,#0x0]                         @ 080caa38 3968
     lsls r1,r1,#0xe    @ 080caa3a 8903
     lsrs r1,r1,#0x18    @ 080caa3c 090e
@@ -244797,7 +244797,7 @@ LAB_080ca9ce:
     movs r3,#0x0    @ 080caa4c 0023
     bl FUN_080ee3a8                          @ 080caa4e 23f0abfc
     ldr r0, DAT_080cab10                     @ 080caa52 2f48
-    ldr r2, DAT_080cab14                     @ 080caa54 2f4a
+    ldr r2, PTR_duel_field_outer_tilemap_pointers_080cab14 @ 080caa54 2f4a
     ldr r1,[r7,#0x0]                         @ 080caa56 3968
     lsls r1,r1,#0xe    @ 080caa58 8903
     lsrs r1,r1,#0x18    @ 080caa5a 090e
@@ -244872,8 +244872,8 @@ PTR_gP1LifePoints_080caae8:
     .word  gP1LifePoints                  @ 080caae8 e0c40102
 DAT_080caaec:
     .word  0x00000868                     @ 080caaec 68080000
-DAT_080caaf0:
-    .word  0x0985936c                     @ 080caaf0 6c938509
+PTR_duel_field_outer_palette_pointers_080caaf0:
+    .word  duel_field_outer_palette_pointers @ 080caaf0 6c938509
 DAT_080caaf4:
     .word  0x02023130                     @ 080caaf4 30310202
 DAT_080caaf8:
@@ -244884,14 +244884,14 @@ PTR_duel_field_outer_tile_pointers_080cab00:
     .word  duel_field_outer_tile_pointers @ 080cab00 30508509
 DAT_080cab04:
     .word  0x0600f000                     @ 080cab04 00f00006
-DAT_080cab08:
-    .word  0x09859548                     @ 080cab08 48958509
+PTR_hud_phases_tilemap_pointers_080cab08:
+    .word  hud_phases_tilemap_pointers    @ 080cab08 48958509
 DAT_080cab0c:
     .word  0x0000141e                     @ 080cab0c 1e140000
 DAT_080cab10:
     .word  0x0600e000                     @ 080cab10 00e00006
-DAT_080cab14:
-    .word  0x0985b634                     @ 080cab14 34b68509
+PTR_duel_field_outer_tilemap_pointers_080cab14:
+    .word  duel_field_outer_tilemap_pointers @ 080cab14 34b68509
 DAT_080cab18:
     .word  0x0201e2a0                     @ 080cab18 a0e20102
 DAT_080cab1c:
