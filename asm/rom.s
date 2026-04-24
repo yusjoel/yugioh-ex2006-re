@@ -238,7 +238,8 @@ unused_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/unused_inner_image.bin"
 
 @ ── 内场调色板（6种模式，每个 0x20 字节 = 1个子调色板）────────────────
-@ 数据从 0x18674A0 开始，调色板加载到 BG 调色板槽位 9
+@ 代码用 campaign_inner_palette + mode * 0x20 访问,字面量池只引用 base
+campaign_inner_palette:
 	.incbin "graphics/bin/duel-field/palettes/campaign_inner_palette.bin"
 	.incbin "graphics/bin/duel-field/palettes/link_inner_palette.bin"
 	.incbin "graphics/bin/duel-field/palettes/puzzle_inner_palette.bin"

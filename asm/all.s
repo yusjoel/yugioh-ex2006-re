@@ -244935,7 +244935,7 @@ LAB_080cab40:
     lsls r0,r0,#0xe    @ 080cab66 8003
     lsrs r0,r0,#0x18    @ 080cab68 000e
     lsls r0,r0,#0x5    @ 080cab6a 4001
-    ldr r1, DAT_080cab80                     @ 080cab6c 0449
+    ldr r1, PTR_campaign_inner_palette_080cab80 @ 080cab6c 0449
     b LAB_080cab8c                           @ 080cab6e 0de0
 DAT_080cab70:
     .word  0x09867580                     @ 080cab70 80758609
@@ -244945,8 +244945,8 @@ DAT_080cab78:
     .word  0x02023130                     @ 080cab78 30310202
 DAT_080cab7c:
     .word  0x00000212                     @ 080cab7c 12020000
-DAT_080cab80:
-    .word  0x098674a0                     @ 080cab80 a0748609
+PTR_campaign_inner_palette_080cab80:
+    .word  campaign_inner_palette         @ 080cab80 a0748609
 LAB_080cab84:
     lsls r0,r1,#0x17    @ 080cab84 c805
     lsrs r0,r0,#0x18    @ 080cab86 000e
