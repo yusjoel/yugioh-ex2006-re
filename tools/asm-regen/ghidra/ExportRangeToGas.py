@@ -26,7 +26,7 @@
 import re
 from java.io import FileWriter, BufferedWriter
 from jarray import zeros
-from ghidra.program.model.symbol import SymbolType
+from ghidra.program.model.symbol import SymbolType, SourceType
 from ghidra.program.model.data import Structure
 
 # --------------------------
@@ -419,6 +419,55 @@ def fix_adr_immediate_to_label(program, text, start_addr, end_addr):
 def emit_data_line_with_addr_bytes(bw, mnemonic, operand_text, addr, bs_list):
     bw.write("    %-6s %-30s %s\n" % (mnemonic, operand_text, fmt_addr_bytes(addr, bytes_hex_from_list(bs_list))))
 
+def resolve_word_symbol(program, data_obj):
+    """
+    若 data_obj 的 outgoing reference 指向一个 USER_DEFINED symbol,
+    返回该 symbol 名；否则返回 None。
+
+    用于 .word 输出时用 symbol 名代替数字。前提：
+    1) Ghidra 里该 data 已有 outgoing reference（pointer/undefined* 类型都可）
+    2) 目标地址落在 EWRAM (0x02xxxxxx) / IWRAM (0x03xxxxxx) ——
+       这两段对应 constants/ewram.inc + iwram.inc 的 .equ 定义域。
+       不 include ROM (0x08xxxxxx) 是因为 THUMB 函数 label 缺 |1 位会破坏
+       byte-identical；不 include MMIO (0x04xxxxxx) 是因为 Ghidra loader
+       给的寄存器名（BLDCNT 等）在 asm 里无 .equ 定义。
+    3) 目标地址的 primary symbol 是 USER_DEFINED，排除 Ghidra auto-gen 前缀
+    GAS 端要能解析 symbol 值——全局 .equ（ewram.inc/iwram.inc）。
+    """
+    refs = data_obj.getReferencesFrom()
+    if refs is None or len(refs) == 0:
+        return None
+
+    primary = None
+    for r in refs:
+        if r.isPrimary():
+            primary = r
+            break
+    if primary is None:
+        primary = refs[0]
+
+    to = primary.getToAddress()
+    if to is None:
+        return None
+
+    to_off = to.getOffset()
+    if not (0x02000000 <= to_off <= 0x03FFFFFF):
+        return None
+
+    sym = program.getSymbolTable().getPrimarySymbol(to)
+    if sym is None:
+        return None
+    if sym.getSource() != SourceType.USER_DEFINED:
+        return None
+
+    name = sym.getName()
+    for prefix in ("DAT_", "LAB_", "FUN_", "PTR_", "SUB_", "UNK_", "SWITCH_"):
+        if name.startswith(prefix):
+            return None
+
+    return sanitize_label(name)
+
+
 def emit_defined_data(bw, program, data_obj, end_addr):
     memory = program.getMemory()
     addr = data_obj.getAddress()
@@ -434,7 +483,9 @@ def emit_defined_data(bw, program, data_obj, end_addr):
         return 1
 
     if max_len == 4:
-        emit_data_line_with_addr_bytes(bw, ".word", "0x%08x" % uval_le(bs), addr, bs)
+        sym = resolve_word_symbol(program, data_obj)
+        val_str = sym if sym is not None else ("0x%08x" % uval_le(bs))
+        emit_data_line_with_addr_bytes(bw, ".word", val_str, addr, bs)
         return 4
     if max_len == 2:
         emit_data_line_with_addr_bytes(bw, ".hword", "0x%04x" % uval_le(bs), addr, bs)
@@ -511,7 +562,9 @@ def emit_structure_fields(bw, program, data_obj, end_addr, emitted_addr_set, inc
             continue
 
         if max_len == 4:
-            emit_data_line_with_addr_bytes(bw, ".word", "0x%08x" % uval_le(bs), caddr, bs)
+            sym = resolve_word_symbol(program, c)
+            val_str = sym if sym is not None else ("0x%08x" % uval_le(bs))
+            emit_data_line_with_addr_bytes(bw, ".word", val_str, caddr, bs)
         elif max_len == 2:
             emit_data_line_with_addr_bytes(bw, ".hword", "0x%04x" % uval_le(bs), caddr, bs)
         elif max_len == 1:
