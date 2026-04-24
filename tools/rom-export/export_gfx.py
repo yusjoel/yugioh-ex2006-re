@@ -100,34 +100,16 @@ LARGE_GFX = [
 # 字段：(slug, tiles, palette)
 # 9 个图块（3×3 排列），1 个 16 色调色板，无 Tilemap
 # ──────────────────────────────────────────────────────────────────────────────
+# 修正后: 131 个 icon (玩家头像 + 对手头像 + 其他角色),
+# tile 段 0x188CF30..0x1896290 (131 × 0x120),
+# palette 段 0x1896290..0x18972F0 (131 × 0x20),
+# tile + palette 紧密相连。先按 icon_NNN 统一命名,具体语义待后续逆向 mapping
+ICON_TILE_BASE = 0x188CF30
+ICON_PAL_BASE  = 0x1896290
+ICON_COUNT     = 131
 ICONS = [
-    ('kuriboh',                  0x188DA70, 0x18963D0),
-    ('scapegoat',                0x188DB90, 0x18963F0),
-    ('skull_servant',            0x188DCB0, 0x1896410),
-    ('watapon',                  0x188DDD0, 0x1896430),
-    ('pikeru',                   0x188DEF0, 0x1896450),
-    ('batteryman_c',             0x188E010, 0x1896470),
-    ('ojama_yellow',             0x188E130, 0x1896490),
-    ('goblin_king',              0x188E250, 0x18964B0),
-    ('des_frog',                 0x188E370, 0x18964D0),
-    ('water_dragon',             0x188E490, 0x18964F0),
-    ('redd',                     0x188E5B0, 0x1896510),
-    ('vampire_genesis',          0x188E6D0, 0x1896530),
-    ('infernal_flame_emperor',   0x188E7F0, 0x1896550),
-    ('ocean_dragon_lord',        0x188E910, 0x1896570),
-    ('helios_duo_megiste',       0x188EA30, 0x1896590),
-    ('gilford_the_legend',       0x188EB50, 0x18965B0),
-    ('dark_eradicator_warlock',  0x188EC70, 0x18965D0),
-    ('guardian_exode',           0x188ED90, 0x18965F0),
-    ('goldd',                    0x188EEB0, 0x1896610),
-    ('elemental_hero_electrum',  0x188EFD0, 0x1896630),
-    ('raviel',                   0x188F0F0, 0x1896650),
-    ('horus',                    0x188F210, 0x1896670),
-    ('stronghold',               0x188F330, 0x1896690),
-    ('sacred_phoenix',           0x188F450, 0x18966B0),
-    ('cyber_end_dragon',         0x188F570, 0x18966D0),
-    ('mirror_match',             0x188F690, 0x18966F0),
-    ('copycat',                  0x188F7B0, 0x1896710),
+    (f'icon_{i:03d}', ICON_TILE_BASE + i * 0x120, ICON_PAL_BASE + i * 0x20)
+    for i in range(ICON_COUNT)
 ]
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -286,15 +268,15 @@ def export_bin_files(rom, dirs):
 def export_icon_bins(rom, dirs):
     """
     导出小图标二进制文件：
-    - <slug>_icon_tiles.bin   图标图块（9 图块 × 32 字节 = 0x120 字节）
-    - <slug>_icon_palette.bin 图标调色板（1 子调色板 × 32 字节 = 0x20 字节）
+    - <slug>.bin            图标图块（9 图块 × 32 字节 = 0x120 字节）
+    - palettes/<slug>.bin   图标调色板（1 子调色板 × 32 字节 = 0x20 字节）
     """
     ICON_TILE_SIZE = 9 * 32  # 0x120
     ICON_PAL_SIZE  = 0x20
     for slug, tiles_off, pal_off in ICONS:
-        with open(os.path.join(dirs['tiles'], f'{slug}_icon_tiles.bin'), 'wb') as f:
+        with open(os.path.join(dirs['tiles'], f'{slug}.bin'), 'wb') as f:
             f.write(rom[tiles_off : tiles_off + ICON_TILE_SIZE])
-        with open(os.path.join(dirs['palettes'], f'{slug}_icon_palette.bin'), 'wb') as f:
+        with open(os.path.join(dirs['palettes'], f'{slug}.bin'), 'wb') as f:
             f.write(rom[pal_off : pal_off + ICON_PAL_SIZE])
     print(f'  → {len(ICONS)} 个图标 × 2 bin文件（tiles 0x120 + palette 0x20）')
 
@@ -569,11 +551,10 @@ def main():
         print(f'  {slug}')
 
     # 导出小图标 PNG
-    print('导出小图标 PNG...')
+    print(f'导出 {len(ICONS)} 个小图标 PNG...')
     for slug, tiles_off, pal_off in ICONS:
         icon_img = render_icon(rom, tiles_off, pal_off)
-        icon_img.save(os.path.join(icon_dirs['images'], f'{slug}_icon.png'))
-        print(f'  {slug}')
+        icon_img.save(os.path.join(icon_dirs['images'], f'{slug}.png'))
 
     # 导出决斗场地二进制文件（供 asm incbin）
     print('导出决斗场地二进制文件...')
