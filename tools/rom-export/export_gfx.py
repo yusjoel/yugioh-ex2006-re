@@ -365,6 +365,7 @@ HUD_ITEMS = [
     ('hud_phases_map',                    0x185B184,  0x4B0,    'tiles',    'Phases Map tile（30×20 规模，0x4B0 字节）'),
     # 0x185B634..0x185B650 外场 Tilemap 指针表 — 不导出 .bin,.word <label>
     ('duel_field_common_inner_tilemap',   0x185D270,  0x4B0,    'tilemaps', '内场公共 Tilemap（所有模式共享，30×20）'),
+    ('unused_inner_image',                0x1865E20,  0x1680,   'tiles',    '第 7 inner tile 变体（0 代码/指针引用; 5×3 卡槽同构 survival_inner_image; 可能是未实装 mode）'),
 ]
 
 

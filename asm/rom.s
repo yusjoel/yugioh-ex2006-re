@@ -232,8 +232,10 @@ theme_inner_image:
 survival_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/survival_inner_image.bin"
 
-@ 未知第7内场图块数据，ROM 0x1865E20 - 0x186749F，0x1680 字节
-	.incbin "roms/2343.gba", 0x1865E20, 0x1680
+@ 第 7 inner tile 变体（0 代码/指针引用; 5×3 卡槽同构 survival_inner_image; 可能未实装 mode）
+@ ROM 0x1865E20 - 0x186749F，0x1680 字节
+unused_inner_image:
+	.incbin "graphics/bin/duel-field/tiles/unused_inner_image.bin"
 
 @ ── 内场调色板（6种模式，每个 0x20 字节 = 1个子调色板）────────────────
 @ 数据从 0x18674A0 开始，调色板加载到 BG 调色板槽位 9

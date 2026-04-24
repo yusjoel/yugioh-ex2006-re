@@ -97,6 +97,7 @@ LABELS = [
     (0x09861AA0, "limited_inner_image"),
     (0x09863120, "theme_inner_image"),
     (0x098647A0, "survival_inner_image"),
+    (0x09865E20, "unused_inner_image"),  # 第 7 inner tile 变体,0 ref (未实装 mode 推测)
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表
