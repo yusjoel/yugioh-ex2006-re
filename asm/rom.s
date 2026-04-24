@@ -91,8 +91,15 @@ hud_gap_tiles:
 	.incbin "graphics/bin/duel-field/tiles/hud_gap_tiles.bin"                 @ 0x18515FC, 0x400（HUD gap 4bpp tile sheet）
 hud_phases_highlight:
 	.incbin "graphics/bin/duel-field/tiles/hud_phases_highlight.bin"          @ 0x18519FC, 0x3634（至 0x1855030）
+@ 外场 tile image 指针表 @ 0x1855030, 7 × u32 (6 modes + sentinel)
 duel_field_outer_tile_pointers:
-	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_tile_pointers.bin"  @ 0x1855030, 0x1C（7 × u32 外场 tile image 指针,末条 sentinel）
+	.word campaign_outer_image          @ 0x0985504C
+	.word link_outer_image              @ 0x09855A2C
+	.word puzzle_outer_image            @ 0x0985600C
+	.word limited_outer_image           @ 0x098567EC
+	.word theme_outer_image             @ 0x098575CC
+	.word survival_outer_image          @ 0x09857FAC
+	.word duel_field_outer_extra_tiles  @ 0x0985878C (sentinel)
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
 @ duel_field_outer_tile_pointers @ 0x1855030 已拆出,指向本段 6 个 base + 1 sentinel
@@ -117,6 +124,7 @@ survival_outer_image:
 
 @ 外场 extra tile sheet + 外场调色板指针表
 @ ROM 0x185878C - 0x1859388，0xBFC 字节
+duel_field_outer_extra_tiles:
 	.incbin "graphics/bin/duel-field/tiles/duel_field_outer_extra_tiles.bin"      @ 0x185878C, 0xBE0（~95 tiles 4bpp）
 	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_palette_pointers.bin"  @ 0x185936C, 0x1C（7 条 × 4 B）
 
