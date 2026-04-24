@@ -12,6 +12,9 @@
 @ GBA MMIO 寄存器（依据 refs/gba-ghidra-loader mapIO()）
 	.include "constants/gba_io.inc"
 
+@ ROM 数据段 symbol（由 tools/ghidra-labeling/ExportRomLabelsToInc.py 从 Ghidra 导出）
+	.include "constants/rom_data.inc"
+
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 

@@ -35,6 +35,8 @@ except Exception:
 
 LABELS = [
     # ROM 数据区（GBA 视角地址 = ROM 偏移 + 0x08000000）
+    (0x084C76C0, "card_image_palettes"),  # 2331 × 128 B, data/card-image-palettes.s
+    (0x08510640, "card_image_tiles"),     # 2331 × 4800 B, data/card-image-tiles.s
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095BB594, "card_names_pool"),

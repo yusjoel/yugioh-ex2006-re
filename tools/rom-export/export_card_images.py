@@ -238,6 +238,7 @@ def dump_rom_blobs(rom: bytes) -> None:
         f"({NUM_TILE_BLOCKS} × {PAL_ENTRY_SIZE} B = {NUM_TILE_BLOCKS * PAL_ENTRY_SIZE} B)",
         "@ 每 tile_block 一段 64 色 BGR555 调色板。",
         "",
+        "card_image_palettes:",
     ]
     for tb in range(NUM_TILE_BLOCKS):
         pal_lines.append(
@@ -251,6 +252,7 @@ def dump_rom_blobs(rom: bytes) -> None:
         f"({NUM_TILE_BLOCKS} × {TILE_ENTRY_SIZE} B = {NUM_TILE_BLOCKS * TILE_ENTRY_SIZE} B)",
         "@ 每 tile_block 一张 80×80 6bpp 图（10×10 tiles × 8×8，4800 B）。",
         "",
+        "card_image_tiles:",
     ]
     for tb in range(NUM_TILE_BLOCKS):
         tile_lines.append(

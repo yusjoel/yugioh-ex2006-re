@@ -4,10 +4,10 @@
 # MarkRamIoPointers.py  (Jython 2.7 / Ghidra script)
 #
 # 扫 ROM 代码区 [0x080000C0, 0x084C7637] 所有 4-byte defined data:
-#   - 若 data 值 ∈ [0x02000000, 0x04FFFFFF] (EWRAM / IWRAM / MMIO)
-#   - 且目标地址 primary symbol 是 USER_DEFINED
-#     (LabelDataCrystalRomMap 刷的 gSettings 等 + gba-ghidra-loader mapIO()
-#     创建的 DISPCNT/BG0CNT/BLDCNT 等 MMIO 寄存器名)
+#   - 若 data 值落在:
+#     · EWRAM/IWRAM/MMIO (0x02xxxxxx..0x04xxxxxx): 目标有任意 USER_DEFINED symbol
+#     · ROM data (0x08xxxxxx..0x09xxxxxx): 目标 USER_DEFINED 且 SymbolType.LABEL
+#       (排除 FUNCTION, 因 THUMB 函数 addr|1 位会破坏 byte-identical)
 #   - 且当前类型不是 pointer
 #  则 clearCodeUnits + createData(Pointer), 让 Ghidra 自动建 outgoing reference。
 #
@@ -19,20 +19,21 @@
 #   "dry"    = 仅打印候选数量和示例,不改 Ghidra
 #
 # 白名单与 ExportRangeToGas.py resolve_word_symbol() 保持一致:
-#   - 处理 EWRAM/IWRAM (0x02xxxxxx/0x03xxxxxx) + MMIO (0x04xxxxxx);
-#     对应 constants/ewram.inc + iwram.inc + gba_io.inc;
-#   - ROM (0x08xxxxxx) 不处理,THUMB 函数 label 缺 |1 位会破坏 byte-identical;
+#   - EWRAM/IWRAM/MMIO 对应 constants/ewram.inc + iwram.inc + gba_io.inc;
+#   - ROM 段 label 对应 data/*.s 或 asm/all.s 里的 data base label;
 #   - PALRAM/VRAM/OAM (0x05-0x07) 不处理,loader 未定义 symbol。
 
 from jarray import zeros
 from ghidra.program.model.data import PointerDataType
-from ghidra.program.model.symbol import SourceType
+from ghidra.program.model.symbol import SourceType, SymbolType
 from ghidra.program.model.address import AddressSet
 
-SCAN_START = 0x080000C0
-SCAN_END   = 0x084C7637
-TARGET_LO  = 0x02000000
-TARGET_HI  = 0x04FFFFFF
+SCAN_START   = 0x080000C0
+SCAN_END     = 0x084C7637
+RAMIO_LO     = 0x02000000
+RAMIO_HI     = 0x04FFFFFF
+ROM_LABEL_LO = 0x08000000
+ROM_LABEL_HI = 0x09FFFFFF
 
 RUN_DRY = False
 try:
@@ -71,7 +72,9 @@ def main():
             continue
 
         val = read_u32_le(memory, d.getAddress())
-        if not (TARGET_LO <= val <= TARGET_HI):
+        in_ramio = (RAMIO_LO <= val <= RAMIO_HI)
+        in_rom   = (ROM_LABEL_LO <= val <= ROM_LABEL_HI)
+        if not (in_ramio or in_rom):
             continue
 
         target = toAddr(val)
@@ -79,6 +82,8 @@ def main():
         if sym is None:
             continue
         if sym.getSource() != SourceType.USER_DEFINED:
+            continue
+        if in_rom and sym.getSymbolType() != SymbolType.LABEL:
             continue
 
         dt = d.getDataType()
@@ -89,7 +94,7 @@ def main():
         candidates.append((d.getAddress(), val, sym.getName()))
 
     print("[scan] %d defined-data entries in range" % scanned)
-    print("[scan] %d candidates (EWRAM/IWRAM/MMIO + USER_DEFINED symbol)" % len(candidates))
+    print("[scan] %d candidates (RAM/IO USER_DEFINED + ROM LABEL)" % len(candidates))
     print("[scan] %d skipped (already Pointer type)" % skipped_already_pointer)
 
     for (addr, val, name) in candidates[:5]:

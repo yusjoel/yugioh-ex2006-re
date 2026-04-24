@@ -426,13 +426,19 @@ def resolve_word_symbol(program, data_obj):
 
     用于 .word 输出时用 symbol 名代替数字。前提：
     1) Ghidra 里该 data 已有 outgoing reference（pointer/undefined* 类型都可）
-    2) 目标地址落在 EWRAM (0x02xxxxxx) / IWRAM (0x03xxxxxx) / MMIO (0x04xxxxxx),
-       对应 constants/ewram.inc + iwram.inc + gba_io.inc 的 .equ 定义域。
-       不 include ROM (0x08xxxxxx) 是因为 THUMB 函数 label 缺 |1 位会破坏
-       byte-identical；不 include PALRAM/VRAM/OAM (0x05-0x07) 是因为 loader
-       未在这些段创建 symbol。
-    3) 目标地址的 primary symbol 是 USER_DEFINED，排除 Ghidra auto-gen 前缀
-    GAS 端要能解析 symbol 值——全局 .equ（ewram.inc/iwram.inc/gba_io.inc）。
+    2) 目标地址落在:
+       - EWRAM (0x02xxxxxx) / IWRAM (0x03xxxxxx) / MMIO (0x04xxxxxx):
+         对应 constants/ewram.inc + iwram.inc + gba_io.inc 的 .equ 定义域,放行任意
+         USER_DEFINED symbol
+       - ROM (0x08xxxxxx / 0x09xxxxxx): data base label (如 card_image_palettes)。
+         仅放行 SymbolType.LABEL,排除 SymbolType.FUNCTION
+         —— 因为 THUMB 函数字面量池里存的是 addr|1,而 GAS 解析 .word <func>
+         得到的是 addr (缺 |1 位),破坏 byte-identical
+       不 include PALRAM/VRAM/OAM (0x05-0x07) 是因为 loader 未在这些段创建 symbol。
+    3) 目标地址的 primary symbol 是 USER_DEFINED,排除 Ghidra auto-gen 前缀
+    GAS 端要能解析 symbol 值:
+       - RAM/MMIO 段靠全局 .equ
+       - ROM 段靠 data/*.s 或 asm/all.s 内部的 label 定义
     """
     refs = data_obj.getReferencesFrom()
     if refs is None or len(refs) == 0:
@@ -451,13 +457,17 @@ def resolve_word_symbol(program, data_obj):
         return None
 
     to_off = to.getOffset()
-    if not (0x02000000 <= to_off <= 0x04FFFFFF):
+    in_ram_io = (0x02000000 <= to_off <= 0x04FFFFFF)
+    in_rom    = (0x08000000 <= to_off <= 0x09FFFFFF)
+    if not (in_ram_io or in_rom):
         return None
 
     sym = program.getSymbolTable().getPrimarySymbol(to)
     if sym is None:
         return None
     if sym.getSource() != SourceType.USER_DEFINED:
+        return None
+    if in_rom and sym.getSymbolType() != SymbolType.LABEL:
         return None
 
     name = sym.getName()
