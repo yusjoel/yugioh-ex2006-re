@@ -304623,15 +304623,15 @@ LAB_080ee968:
     lsls r0,r0,#0x2    @ 080ee972 8000
     adds r0,r0,r1    @ 080ee974 4018
     ldr r0,[r0,#0x0]                         @ 080ee976 0068
-    ldr r1, PTR_card_names_pool_080ee984     @ 080ee978 0249
+    ldr r1, PTR_card_names_table_080ee984    @ 080ee978 0249
     adds r0,r0,r1    @ 080ee97a 4018
 LAB_080ee97c:
     bx lr                                    @ 080ee97c 7047
     .byte  0x00, 0x00
 PTR_card_name_pointer_table_080ee980:
     .word  card_name_pointer_table        @ 080ee980 5c3a5f09
-PTR_card_names_pool_080ee984:
-    .word  card_names_pool                @ 080ee984 94b55b09
+PTR_card_names_table_080ee984:
+    .word  card_names_table               @ 080ee984 94b55b09
 FUN_080ee988:
     adds r2,r0,#0x0    @ 080ee988 021c
     ldr r0, DAT_080ee9b4                     @ 080ee98a 0a48
@@ -305896,15 +305896,15 @@ FUN_080ef370:
     adds r1,r0,#0x0    @ 080ef372 011c
     lsls r1,r1,#0x10    @ 080ef374 0904
     lsrs r1,r1,#0x10    @ 080ef376 090c
-    ldr r2, DAT_080ef388                     @ 080ef378 034a
+    ldr r2, PTR_card_passcode_table_080ef388 @ 080ef378 034a
     lsls r0,r1,#0x2    @ 080ef37a 8800
     adds r0,r0,r2    @ 080ef37c 8018
     ldr r0,[r0,#0x0]                         @ 080ef37e 0068
     bl FUN_080ef35c                          @ 080ef380 fff7ecff
     pop {r1}                                 @ 080ef384 02bc
     bx r1                                    @ 080ef386 0847
-DAT_080ef388:
-    .word  0x095b94cc                     @ 080ef388 cc945b09
+PTR_card_passcode_table_080ef388:
+    .word  card_passcode_table            @ 080ef388 cc945b09
 FUN_080ef38c:
     push {r4,r5,r6,lr}                       @ 080ef38c 70b5
     adds r6,r0,#0x0    @ 080ef38e 061c

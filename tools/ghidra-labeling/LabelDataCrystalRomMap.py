@@ -6,7 +6,8 @@
 # 给 Data Crystal ROM map 揭示的几个数据区打标签：
 #   - card_image_index        @ 0x095B5C00  (card_id 0..2098)
 #   - cards_ids_array         @ 0x095B7CCC  (internal_card_id -> card_id, 3072 x u16)
-#   - card_names_pool         @ 0x095BB594  (cards names base, per Data Crystal)
+#   - card_passcode_table     @ 0x095B94CC  (2098 × u32 加密密码表)
+#   - card_names_table        @ 0x095BB594  (cards names base; 旧名 card_names_pool)
 #   - card_name_pointer_table @ 0x095F3A5C  (12612 x u32 = 2102 x 6 langs)
 #   - card_effect_text_pool   @ 0x095FFF6C  (2014 cards x 6 langs description text)
 #
@@ -41,7 +42,8 @@ LABELS = [
     (0x09326280, "card_mini_frame_tile_data"),  # data/card-mini-frame.s
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
-    (0x095BB594, "card_names_pool"),
+    (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表
+    (0x095BB594, "card_names_table"),     # 曾用名 card_names_pool; data 源统一叫 _table
     (0x095F3A5C, "card_name_pointer_table"),
     (0x095FFF6C, "card_effect_text_pool"),
     (0x09E58D0C, "deck_id_and_data_array"),  # = data/opponent-card-values.s (-2B); 27×32B
@@ -126,7 +128,34 @@ def set_label(gba_addr, name):
         return False
 
 
+# 历史命名迁移 (old -> new)。每次跑脚本都尝试清理,幂等。
+# 原因记录:
+#   card_names_pool -> card_names_table: data/card-names.s 注释明确正式名是 _table,
+#     _pool 是早期从 Data Crystal wiki 搬来的别名
+RENAMES = [
+    ("card_names_pool", "card_names_table"),
+]
+
+
+def apply_renames():
+    st = currentProgram.getSymbolTable()
+    for old_name, new_name in RENAMES:
+        syms = list(st.getSymbols(old_name))
+        if not syms:
+            continue
+        for s in syms:
+            if RUN_DRY:
+                print("[dry-rename] %s @ %s -> %s" % (old_name, s.getAddress(), new_name))
+                continue
+            try:
+                s.setName(new_name, SourceType.USER_DEFINED)
+                print("[rename] %s @ %s -> %s" % (old_name, s.getAddress(), new_name))
+            except Exception as e:
+                print("[rename-fail] %s: %s" % (old_name, e))
+
+
 def main():
+    apply_renames()
     ok = 0
     for gba_addr, name in LABELS:
         if set_label(gba_addr, name):

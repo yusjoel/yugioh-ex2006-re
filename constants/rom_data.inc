@@ -7,7 +7,6 @@
 @ Usage: .word <name> in asm; GAS substitutes via .equ
 @ =============================================================================
 
-.equ card_names_pool,                0x095BB594
 .equ file_card_names_start,          0x095BB5AC
 .equ card_effect_text_pool,          0x095FFF6C
 .equ card_desc_table,                0x09800000
