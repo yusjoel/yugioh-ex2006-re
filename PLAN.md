@@ -15,15 +15,27 @@
 ## 内嵌文件系统深化
 
 主骨架已全部打通（339 文件全量解包 + byte-identical，详见 `doc/dev/fs-export-and-ocg-tcg.md`）。
+
+**2026-04-24 新增**（`fs_load` + BIOS LZ77 离线解压 + `.gbtn` 渲染；见
+`doc/analysis/name-input-page-location.md` + `doc/dev/data-structure/gbtn-format.md`
++ commit `72e19b9`）：
+- ✅ `fs_load (FUN_08014FA8)` = `u8* fs_load(const char* path, int flag)`，fs_master_struct @ 0x09E61178 解码
+- ✅ BIOS LZ77/Huffman SWI 0x11/0x12 包装命名；`cpu_copy_auto` (SWI 0xB/0xC) 也一并纠正
+- ✅ `tools/fs-decompress.py`：Python 离线 LZ77 解压器，**89/89 .LZ* 文件 byte-identical** 于 mGBA 运行时
+- ✅ `.gbtn` (NTBG bundle) 完整 spec：PALT + BGDT + 4bpp/8bpp 自动推断 + 2B/4B tilemap entry
+- ✅ `tools/rom-export/render_gbtn.py`：**全 26 个 .gbtn 离线渲染为 PNG**（含 title、exodia 动画、name/pass input、vija 漩涡）
+
 余下深化任务按优先级：
 
 | 优先级 | 范围 | 目标 |
 |---|---|---|
-| ⭐ | `.LZ5bg` BGDT/DFPL 内部字段 | 逆 BG tile pixel 格式 + screen layout 映射；用于 C1 title BG 层 |
-| ⭐ | C1 title 画面 BG 合成 | 用 `.gbtn` 补 BG 层；当前 C1 仅 OBJ |
+| ✅ | ~~`.LZ5bg` BGDT/DFPL 内部字段~~（2026-04-24 完成） | NTBG bundle 完整 spec 落在 `doc/dev/data-structure/gbtn-format.md` |
+| 🟡 | C1 title 画面 BG 合成 | **单文件已 OK**（bg0_E/J/P/j_tri 各自可见），但多文件合成（bg0 + bg1 + bg3 → 完整标题画面）未做；需建加载清单机制 |
+| ⭐ | 其它 NNS 格式 spec + 渲染器 | 63 个 `.ncgr`/`.nclr`/`.ncer`/`.nanr`（OBJ sprite + 动画）未展开 |
 | ⭐ | `.ydc` 语义解码（B1 第二阶段） | 解 3 种 4B key（`4f57443f`/`7f217741`/`39a7cf42`）含义、body `so_code*4\|qty` 编码验证、tail 字段用途（LV2_kaeru 等含非零数据）|
-| ⭐ | `.ydc` loader 追溯 | 反编译定位 OCG/TCG flag 选 FID 的具体函数；顺便可取代 ghidra 未命名 |
+| ⭐ | `.ydc` loader 追溯 | 反编译定位 OCG/TCG flag 选 FID 的具体函数。**注意**：`fs_load` 已命名，可从 `grep "bl fs_load"` 19 处 XREF 反查各调用点 |
 | — | FS 尾段 B 区 2 KB pointer table | 追 consumer 反推 C struct；覆盖率收益仅 ~0.006% |
+| — | `NTBG.BGDT.flags` 字节 0 语义 | `0x00` vs `0x01` 变体功能待反向（palette variant 猜测未验证）|
 
 ---
 
