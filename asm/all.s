@@ -22088,7 +22088,7 @@ FUN_08023b6c:
     adds r4,r0,#0x0    @ 08023c3a 041c
     adds r1,r4,#0x0    @ 08023c3c 211c
     adds r1,#0xa    @ 08023c3e 0a31
-    ldr r2, DAT_08023cc4                     @ 08023c40 204a
+    ldr r2, PTR_icon_palettes_base_08023cc4  @ 08023c40 204a
     .hword 0x4690    @ 08023c42 9046
     lsls r0,r1,#0x3    @ 08023c44 c800
     adds r0,r0,r1    @ 08023c46 4018
@@ -22108,7 +22108,7 @@ LAB_08023c4e:
     lsls r2,r0,#0x3    @ 08023c60 c200
     adds r2,r2,r0    @ 08023c62 1218
     lsls r2,r2,#0x5    @ 08023c64 5201
-    ldr r0, DAT_08023cc8                     @ 08023c66 1848
+    ldr r0, PTR_icon_tiles_base_08023cc8     @ 08023c66 1848
     adds r2,r2,r0    @ 08023c68 1218
     movs r0,#0xa    @ 08023c6a 0a20
     bl FUN_08023b24                          @ 08023c6c fff75aff
@@ -22154,15 +22154,15 @@ DAT_08023cbc:
     .word  0x02023360                     @ 08023cbc 60330202
 PTR_gPlayerIcon_08023cc0:
     .word  gPlayerIcon                    @ 08023cc0 576e0002
-DAT_08023cc4:
-    .word  0x09896290                     @ 08023cc4 90628909
-DAT_08023cc8:
-    .word  0x0988cf30                     @ 08023cc8 30cf8809
+PTR_icon_palettes_base_08023cc4:
+    .word  icon_palettes_base             @ 08023cc4 90628909
+PTR_icon_tiles_base_08023cc8:
+    .word  icon_tiles_base                @ 08023cc8 30cf8809
 LAB_08023ccc:
     adds r0,r4,#0x0    @ 08023ccc 201c
     movs r1,#0xf    @ 08023cce 0f21
     bl FUN_0810e69c                          @ 08023cd0 eaf0e4fc
-    ldr r2, DAT_08023d14                     @ 08023cd4 0f4a
+    ldr r2, PTR_icon_tiles_base_08023d14     @ 08023cd4 0f4a
     adds r2,r7,r2    @ 08023cd6 ba18
     adds r1,r5,#0x0    @ 08023cd8 291c
     bl FUN_08023b24                          @ 08023cda fff723ff
@@ -22196,8 +22196,8 @@ LAB_08023cf6:
 LAB_08023d10:
     b LAB_08023ed8                           @ 08023d10 e2e0
     .byte  0x00, 0x00
-DAT_08023d14:
-    .word  0x0988cf30                     @ 08023d14 30cf8809
+PTR_icon_tiles_base_08023d14:
+    .word  icon_tiles_base                @ 08023d14 30cf8809
 DAT_08023d18:
     .word  0x02023360                     @ 08023d18 60330202
 LAB_08023d1c:
@@ -244165,7 +244165,7 @@ LAB_080ca566:
     adds r2,#0x20    @ 080ca588 2032
 LAB_080ca58a:
     ldr r3,[sp,#0x4]                         @ 080ca58a 019b
-    ldr r0, DAT_080ca5c0                     @ 080ca58c 0c48
+    ldr r0, PTR_icon_palettes_base_080ca5c0  @ 080ca58c 0c48
     adds r1,r3,r0    @ 080ca58e 1918
     adds r0,r2,#0x0    @ 080ca590 101c
     movs r2,#0x40    @ 080ca592 4022
@@ -244179,7 +244179,7 @@ LAB_080ca58a:
     ldr r1,[sp,#0x0]                         @ 080ca5a4 0099
     add r1,r10                               @ 080ca5a6 5144
     lsls r1,r1,#0x5    @ 080ca5a8 4901
-    ldr r2, DAT_080ca5c8                     @ 080ca5aa 074a
+    ldr r2, PTR_icon_tiles_base_080ca5c8     @ 080ca5aa 074a
     adds r1,r1,r2    @ 080ca5ac 8918
     movs r2,#0x90    @ 080ca5ae 9022
     lsls r2,r2,#0x1    @ 080ca5b0 5200
@@ -244189,18 +244189,18 @@ DAT_080ca5b8:
     .word  0x0201e2a0                     @ 080ca5b8 a0e20102
 DAT_080ca5bc:
     .word  0x05000180                     @ 080ca5bc 80010005
-DAT_080ca5c0:
-    .word  0x09896290                     @ 080ca5c0 90628909
+PTR_icon_palettes_base_080ca5c0:
+    .word  icon_palettes_base             @ 080ca5c0 90628909
 DAT_080ca5c4:
     .word  0x0600bae0                     @ 080ca5c4 e0ba0006
-DAT_080ca5c8:
-    .word  0x0988cf30                     @ 080ca5c8 30cf8809
+PTR_icon_tiles_base_080ca5c8:
+    .word  icon_tiles_base                @ 080ca5c8 30cf8809
 LAB_080ca5cc:
     ldr r0, DAT_080ca5f0                     @ 080ca5cc 0848
     ldr r1,[sp,#0x0]                         @ 080ca5ce 0099
     add r1,r10                               @ 080ca5d0 5144
     lsls r1,r1,#0x5    @ 080ca5d2 4901
-    ldr r2, DAT_080ca5f4                     @ 080ca5d4 074a
+    ldr r2, PTR_icon_tiles_base_080ca5f4     @ 080ca5d4 074a
     adds r1,r1,r2    @ 080ca5d6 8918
     movs r2,#0x90    @ 080ca5d8 9022
     lsls r2,r2,#0x1    @ 080ca5da 5200
@@ -244216,8 +244216,8 @@ LAB_080ca5e0:
     bx r0                                    @ 080ca5ee 0047
 DAT_080ca5f0:
     .word  0x0600b9c0                     @ 080ca5f0 c0b90006
-DAT_080ca5f4:
-    .word  0x0988cf30                     @ 080ca5f4 30cf8809
+PTR_icon_tiles_base_080ca5f4:
+    .word  icon_tiles_base                @ 080ca5f4 30cf8809
 FUN_080ca5f8:
     push {r4,r5,r6,lr}                       @ 080ca5f8 70b5
     adds r5,r1,#0x0    @ 080ca5fa 0d1c
@@ -327248,7 +327248,7 @@ LAB_080fc200:
     lsls r5,r2,#0x10    @ 080fc210 1504
     lsrs r5,r5,#0x10    @ 080fc212 2d0c
     lsls r1,r1,#0x5    @ 080fc214 4901
-    ldr r0, DAT_080fc2cc                     @ 080fc216 2d48
+    ldr r0, PTR_icon_palettes_base_080fc2cc  @ 080fc216 2d48
     adds r1,r1,r0    @ 080fc218 0918
     adds r0,r7,#0x0    @ 080fc21a 381c
     movs r2,#0x20    @ 080fc21c 2022
@@ -327257,7 +327257,7 @@ LAB_080fc200:
     lsls r0,r4,#0x5    @ 080fc224 6001
     ldr r1, DAT_080fc2d0                     @ 080fc226 2a49
     adds r0,r0,r1    @ 080fc228 4018
-    ldr r1, DAT_080fc2d4                     @ 080fc22a 2a49
+    ldr r1, PTR_icon_tiles_base_080fc2d4     @ 080fc22a 2a49
     ldr r3,[sp,#0x8]                         @ 080fc22c 029b
     adds r1,r3,r1    @ 080fc22e 5918
     movs r2,#0x90    @ 080fc230 9022
@@ -327337,12 +327337,12 @@ DAT_080fc2c4:
     .word  0x09dc9f24                     @ 080fc2c4 249fdc09
 DAT_080fc2c8:
     .word  0x06004200                     @ 080fc2c8 00420006
-DAT_080fc2cc:
-    .word  0x09896290                     @ 080fc2cc 90628909
+PTR_icon_palettes_base_080fc2cc:
+    .word  icon_palettes_base             @ 080fc2cc 90628909
 DAT_080fc2d0:
     .word  0x06004000                     @ 080fc2d0 00400006
-DAT_080fc2d4:
-    .word  0x0988cf30                     @ 080fc2d4 30cf8809
+PTR_icon_tiles_base_080fc2d4:
+    .word  icon_tiles_base                @ 080fc2d4 30cf8809
 DAT_080fc2d8:
     .word  0x06000800                     @ 080fc2d8 00080006
 PTR_DAT_080fc2dc:

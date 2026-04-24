@@ -99,6 +99,10 @@ LABELS = [
     (0x098647A0, "survival_inner_image"),
     (0x09865E20, "unused_inner_image"),  # 第 7 inner tile 变体,0 ref (未实装 mode 推测)
     (0x098674A0, "campaign_inner_palette"),  # 内场 palette base (6 modes × 0x20, base + mode * 0x20 访问)
+
+    # 小图标 (131 个: 玩家 + 对手 + 其他, 暂用 icon_NNN 命名)
+    (0x0988CF30, "icon_tiles_base"),     # 131 × 0x120 = 0x9360 B
+    (0x09896290, "icon_palettes_base"),  # 131 × 0x20  = 0x1060 B (紧跟 tiles)
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表
