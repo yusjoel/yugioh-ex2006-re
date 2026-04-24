@@ -359,11 +359,11 @@ HUD_ITEMS = [
     ('hud_phases_highlight',              0x18519FC,  0x3634,   'tiles',    'Phases Highlight tile（至 duel_field_outer_tile_pointers 起点 0x1855030）'),
     # 0x1855030..0x185504C 外场 tile image 指针表 — 不导出 .bin,asm/rom.s 用 .word <label> 列出
     ('duel_field_outer_extra_tiles',      0x185878C,  0xBE0,    'tiles',    '外场 extra tile sheet（~95 tiles, 4bpp）'),
-    ('duel_field_outer_palette_pointers', 0x185936C,  0x1C,     'tilemaps', '外场调色板指针表（7 条 × 4 B，末条为 sentinel）'),
+    # 0x185936C..0x1859388 外场调色板指针表 — 不导出 .bin,asm/rom.s 用 .word <label>
     ('duel_field_extra_palette',          0x1859508,  0x40,     'palettes', '额外 palette 区 32 colors（2 × 16 色，primary/grey + 金色渐变）'),
-    ('hud_phases_tilemap_pointers',       0x1859548,  0x1C,     'tilemaps', 'LP/阶段 Tilemap 指针表（7 条 × 4 B）'),
+    # 0x1859548..0x1859564 LP/阶段 Tilemap 指针表 — 不导出 .bin,.word <label>
     ('hud_phases_map',                    0x185B184,  0x4B0,    'tiles',    'Phases Map tile（30×20 规模，0x4B0 字节）'),
-    ('duel_field_outer_tilemap_pointers', 0x185B634,  0x1C,     'tilemaps', '外场 Tilemap 指针表（7 条 × 4 B，末条为 sentinel 指 common_inner_tilemap）'),
+    # 0x185B634..0x185B650 外场 Tilemap 指针表 — 不导出 .bin,.word <label>
     ('duel_field_common_inner_tilemap',   0x185D270,  0x4B0,    'tilemaps', '内场公共 Tilemap（所有模式共享，30×20）'),
 ]
 

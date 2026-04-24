@@ -126,49 +126,94 @@ survival_outer_image:
 @ ROM 0x185878C - 0x1859388，0xBFC 字节
 duel_field_outer_extra_tiles:
 	.incbin "graphics/bin/duel-field/tiles/duel_field_outer_extra_tiles.bin"      @ 0x185878C, 0xBE0（~95 tiles 4bpp）
-	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_palette_pointers.bin"  @ 0x185936C, 0x1C（7 条 × 4 B）
+
+@ 外场调色板指针表 @ 0x185936C, 7 × u32 (6 modes + sentinel)
+duel_field_outer_palette_pointers:
+	.word campaign_outer_palette        @ 0x09859388
+	.word link_outer_palette            @ 0x098593C8
+	.word puzzle_outer_palette          @ 0x09859408
+	.word limited_outer_palette         @ 0x09859448
+	.word theme_outer_palette           @ 0x09859488
+	.word survival_outer_palette        @ 0x098594C8
+	.word duel_field_extra_palette      @ 0x09859508 (sentinel)
 
 @ ── 外场调色板（6种模式，每个 0x40 字节 = 2个子调色板）────────────────
-@ 指针表在 0x185936C（7条目），数据从 0x1859388 开始
 @ 调色板槽位 9–10 加载进 BG 调色板 RAM；Tilemap 条目主要引用槽位 9
+campaign_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/campaign_outer_palette.bin"
+link_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/link_outer_palette.bin"
+puzzle_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/puzzle_outer_palette.bin"
+limited_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/limited_outer_palette.bin"
+theme_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/theme_outer_palette.bin"
+survival_outer_palette:
 	.incbin "graphics/bin/duel-field/palettes/survival_outer_palette.bin"
 
 @ 额外 palette (2×16 色) + LP/阶段 Tilemap 指针表
 @ ROM 0x1859508 - 0x1859563，0x5C 字节
+duel_field_extra_palette:
 	.incbin "graphics/bin/duel-field/palettes/duel_field_extra_palette.bin"      @ 0x1859508, 0x40（2×16 色）
-	.incbin "graphics/bin/duel-field/tilemaps/hud_phases_tilemap_pointers.bin"   @ 0x1859548, 0x1C
+
+@ LP/阶段 Tilemap 指针表 @ 0x1859548, 7 × u32 (6 modes + sentinel)
+hud_phases_tilemap_pointers:
+	.word campaign_outer_lp_tilemap     @ 0x09859564
+	.word link_outer_lp_tilemap         @ 0x09859A14
+	.word puzzle_outer_lp_tilemap       @ 0x09859EC4
+	.word limited_outer_lp_tilemap      @ 0x0985A374
+	.word theme_outer_lp_tilemap        @ 0x0985A824
+	.word survival_outer_lp_tilemap     @ 0x0985ACD4
+	.word hud_phases_map                @ 0x0985B184 (sentinel)
 
 @ ── LP/阶段显示区 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────
-@ 指针表在 0x1859548（7条目），数据从 0x1859564 开始
 @ 与外场 Tilemap 共用同一套外场图块数据和调色板
+campaign_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/campaign_outer_lp_tilemap.bin"
+link_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/link_outer_lp_tilemap.bin"
+puzzle_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/puzzle_outer_lp_tilemap.bin"
+limited_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/limited_outer_lp_tilemap.bin"
+theme_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/theme_outer_lp_tilemap.bin"
+survival_outer_lp_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/survival_outer_lp_tilemap.bin"
 
 @ "Phases Map?" 图块 + 外场 Tilemap 指针表
 @ ROM 0x185B184 - 0x185B650，0x4CC 字节
+hud_phases_map:
 	.incbin "graphics/bin/duel-field/tiles/hud_phases_map.bin"                   @ 0x185B184, 0x4B0
-	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_tilemap_pointers.bin"  @ 0x185B634, 0x1C（7 条 × 4 B）
+
+@ 外场 Tilemap 指针表 @ 0x185B634, 7 × u32 (6 modes + sentinel)
+duel_field_outer_tilemap_pointers:
+	.word campaign_outer_tilemap        @ 0x0985B650
+	.word link_outer_tilemap            @ 0x0985BB00
+	.word puzzle_outer_tilemap          @ 0x0985BFB0
+	.word limited_outer_tilemap         @ 0x0985C460
+	.word theme_outer_tilemap           @ 0x0985C910
+	.word survival_outer_tilemap        @ 0x0985CDC0
+	.word duel_field_common_inner_tilemap  @ 0x0985D270 (sentinel)
 
 @ ── 外场 Tilemap（6种模式，每个 0x4B0 字节 = 30×20 图块）──────────────
-@ 指针表在 0x185B634（7条目），数据从 0x185B650 开始
+campaign_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/campaign_outer_tilemap.bin"
+link_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/link_outer_tilemap.bin"
+puzzle_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/puzzle_outer_tilemap.bin"
+limited_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/limited_outer_tilemap.bin"
+theme_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/theme_outer_tilemap.bin"
+survival_outer_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/survival_outer_tilemap.bin"
 
 @ 内场公共 Tilemap（所有模式共享，0x4B0 字节 = 30×20 图块）
 @ ROM 0x185D270 - 0x185D71F
+duel_field_common_inner_tilemap:
 	.incbin "graphics/bin/duel-field/tilemaps/duel_field_common_inner_tilemap.bin"
 
 @ ── 内场图块数据（6种模式，每个 0x1680 字节 = 180 图块）────────────────
