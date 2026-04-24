@@ -218,11 +218,18 @@ duel_field_common_inner_tilemap:
 
 @ ── 内场图块数据（6种模式，每个 0x1680 字节 = 180 图块）────────────────
 @ 数据从 0x185D720 开始（紧接内场公共 Tilemap 后），6 × 0x1680 = 0x8D00 字节
+@ 代码用 campaign_inner_image + mode * 0x1680 访问,字面量池只引用 base
+campaign_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/campaign_inner_image.bin"
+link_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/link_inner_image.bin"
+puzzle_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/puzzle_inner_image.bin"
+limited_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/limited_inner_image.bin"
+theme_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/theme_inner_image.bin"
+survival_inner_image:
 	.incbin "graphics/bin/duel-field/tiles/survival_inner_image.bin"
 
 @ 未知第7内场图块数据，ROM 0x1865E20 - 0x186749F，0x1680 字节

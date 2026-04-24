@@ -88,6 +88,15 @@ LABELS = [
     (0x0985C910, "theme_outer_tilemap"),
     (0x0985CDC0, "survival_outer_tilemap"),
     (0x0985D270, "duel_field_common_inner_tilemap"),  # 0x4B0 B (outer_tilemap sentinel)
+
+    # 内场图块 (6 modes × 0x1680 B)
+    # 代码只字面量池引用 campaign base; 其他 mode 由 base + idx * 0x1680 计算
+    (0x0985D720, "campaign_inner_image"),
+    (0x0985EDA0, "link_inner_image"),
+    (0x09860420, "puzzle_inner_image"),
+    (0x09861AA0, "limited_inner_image"),
+    (0x09863120, "theme_inner_image"),
+    (0x098647A0, "survival_inner_image"),
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表
