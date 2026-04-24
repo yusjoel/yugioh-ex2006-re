@@ -19,7 +19,7 @@ FUN_080000c0:
     msr cpsr_cf,r0                           @ 080000d0 00f029e1
     ldr sp, DAT_080000f4                     @ 080000d4 18d09fe5
     ldr r1, DAT_0800022c                     @ 080000d8 4c119fe5
-    adr r0, DAT_080000fc                     @ 080000dc 18008fe2
+    adr r0, DWORD_080000fc                   @ 080000dc 18008fe2
     str r0,[r1,#0x0]                         @ 080000e0 000081e5
     ldr r1, DAT_08000230                     @ 080000e4 44119fe5
     mov lr,pc                                @ 080000e8 0fe0a0e1
@@ -29,8 +29,9 @@ DAT_080000f4:
     .word  0x03007800                     @ 080000f4 00780003
 DAT_080000f8:
     .word  0x03007e00                     @ 080000f8 007e0003
-DAT_080000fc:
-    ROM_INCBIN 0xfc, 0xf0
+DWORD_080000fc:
+    .word  0xe3a03301                     @ 080000fc 0133a0e3
+    ROM_INCBIN 0x100, 0xec
     ldr r0,[r1,#0x0]                         @ 080001ec 000091e5
     stmdb sp!,{lr}                           @ 080001f0 00402de9
     adr lr, LAB_080001fc                     @ 080001f4 00e08fe2
@@ -69,7 +70,13 @@ DAT_080008c2:
     .word  0x09c909c8                     @ 080008f4 c809c909
     .word  0x09cb09ca                     @ 080008f8 ca09cb09
     .word  0x09cd09cc                     @ 080008fc cc09cd09
-    ROM_INCBIN 0x900, 0xa70c
+    ROM_INCBIN 0x900, 0x640
+DWORD_08000f40:
+    .word  0x00000000                     @ 08000f40 00000000
+    ROM_INCBIN 0xf44, 0x9acc
+DWORD_0800aa10:
+    .word  0x00100010                     @ 0800aa10 10001000
+    ROM_INCBIN 0xaa14, 0x5f8
     .byte  0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44 @ 0800b00c 44444444444444444444444444444444
     .byte  0x44, 0x44, 0x44, 0x44, 0x00, 0x00, 0x00, 0x00 @ 0800b01c 4444444400000000
     ROM_INCBIN 0xb024, 0xc8
@@ -97,8 +104,9 @@ DAT_080008c2:
     .word  0x082e0e19                     @ 0800b57c 190e2e08
     .word  0x082e0e1a                     @ 0800b580 1a0e2e08
     .word  0x08360e1b                     @ 0800b584 1b0e3608
-DAT_0800b588:
-    ROM_INCBIN 0xb588, 0x73c
+DWORD_0800b588:
+    .word  0x00100010                     @ 0800b588 10001000
+    ROM_INCBIN 0xb58c, 0x738
     .byte  0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44 @ 0800bcc4 44444444444444444444444444444444
     .byte  0x44, 0x44, 0x44, 0x44, 0x00, 0x00, 0x00, 0x00 @ 0800bcd4 4444444400000000
     ROM_INCBIN 0xbcdc, 0xc8
@@ -126,8 +134,9 @@ DAT_0800b588:
     .word  0x08380e19                     @ 0800c234 190e3808
     .word  0x08380e1a                     @ 0800c238 1a0e3808
     .word  0x08400e1b                     @ 0800c23c 1b0e4008
-DAT_0800c240:
-    ROM_INCBIN 0xc240, 0x790
+DWORD_0800c240:
+    .word  0x00100010                     @ 0800c240 10001000
+    ROM_INCBIN 0xc244, 0x78c
     .word  0x08130900                     @ 0800c9d0 00091308
     .word  0x08140901                     @ 0800c9d4 01091408
     .word  0x08140902                     @ 0800c9d8 02091408
@@ -156,7 +165,16 @@ DAT_0800c240:
     .word  0x0814091a                     @ 0800ca38 1a091408
     .word  0x0814091b                     @ 0800ca3c 1b091408
     .word  0x0814091c                     @ 0800ca40 1c091408
-    ROM_INCBIN 0xca44, 0x4e74
+    ROM_INCBIN 0xca44, 0x2d4
+DWORD_0800cd18:
+    .word  0x00100010                     @ 0800cd18 10001000
+    ROM_INCBIN 0xcd1c, 0x1074
+DWORD_0800dd90:
+    .word  0x000083e0                     @ 0800dd90 e0830000
+    ROM_INCBIN 0xdd94, 0x1c
+DWORD_0800ddb0:
+    .word  0x00000000                     @ 0800ddb0 00000000
+    ROM_INCBIN 0xddb4, 0x3b04
     .byte  0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x00, 0x00, 0x00, 0x00 @ 080118b8 666666666666666600000000
     ROM_INCBIN 0x118c4, 0x14
     .byte  0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x00, 0x00, 0x00, 0x00 @ 080118d8 666666666666666600000000
@@ -186,8 +204,8 @@ FUN_08013510:
     str r0,[sp,#0x0]                         @ 08013518 0090
     ldr r2, DAT_08013568                     @ 0801351a 134a
     .hword 0x4668    @ 0801351c 6846
-    bl FUN_0810e3f8                          @ 0801351e faf06bff
-    bl FUN_08014638                          @ 08013522 01f089f8
+    bl bios_cpu_set                          @ 0801351e faf06bff
+    bl gl_clear_vram_palram_scroll           @ 08013522 01f089f8
     movs r1,#0x80    @ 08013526 8021
     lsls r1,r1,#0x13    @ 08013528 c904
     movs r0,#0x40    @ 0801352a 4020
@@ -208,9 +226,9 @@ FUN_08013510:
     movs r1,#0x10    @ 08013548 1021
     rsbs r1,r1,#0    @ 0801354a 4942
     movs r0,#0x3f    @ 0801354c 3f20
-    bl FUN_080146fc                          @ 0801354e 01f0d5f8
-    bl FUN_08015138                          @ 08013552 01f0f1fd
-    bl FUN_080156ac                          @ 08013556 02f0a9f8
+    bl gl_set_brightness                     @ 0801354e 01f0d5f8
+    bl gl_state_init                         @ 08013552 01f0f1fd
+    bl gl_clear_frame_callbacks              @ 08013556 02f0a9f8
     movs r0,#0x1    @ 0801355a 0120
     add sp,#0x4                              @ 0801355c 01b0
     pop {r1}                                 @ 0801355e 02bc
@@ -514,7 +532,7 @@ FUN_0801379c:
     push {r5,r6,r7}                          @ 080137a4 e0b4
     sub sp,#0x24                             @ 080137a6 89b0
     movs r1,#0x0    @ 080137a8 0021
-    bl FUN_08014fa8                          @ 080137aa 01f0fdfb
+    bl fs_load                               @ 080137aa 01f0fdfb
     adds r7,r0,#0x0    @ 080137ae 071c
     .hword 0x4668    @ 080137b0 6846
     bl FUN_08015fc8                          @ 080137b2 02f009fc
@@ -610,7 +628,7 @@ FUN_08013864:
     push {r5,r6,r7}                          @ 0801386c e0b4
     sub sp,#0x24                             @ 0801386e 89b0
     movs r1,#0x0    @ 08013870 0021
-    bl FUN_08014fa8                          @ 08013872 01f099fb
+    bl fs_load                               @ 08013872 01f099fb
     adds r7,r0,#0x0    @ 08013876 071c
     .hword 0x4668    @ 08013878 6846
     bl FUN_08015fc8                          @ 0801387a 02f0a5fb
@@ -967,7 +985,7 @@ FUN_08013af4:
     strh r0,[r2,#0x0]                        @ 08013b40 1080
     movs r0,#0x3f    @ 08013b42 3f20
     movs r1,#0x0    @ 08013b44 0021
-    bl FUN_080146fc                          @ 08013b46 00f0d9fd
+    bl gl_set_brightness                     @ 08013b46 00f0d9fd
     movs r1,#0x10    @ 08013b4a 1021
     rsbs r1,r1,#0    @ 08013b4c 4942
     movs r0,#0x3f    @ 08013b4e 3f20
@@ -1023,7 +1041,7 @@ FUN_08013b84:
     movs r1,#0x10    @ 08013bb2 1021
     rsbs r1,r1,#0    @ 08013bb4 4942
     movs r0,#0x3f    @ 08013bb6 3f20
-    bl FUN_080146fc                          @ 08013bb8 00f0a0fd
+    bl gl_set_brightness                     @ 08013bb8 00f0a0fd
     bl FUN_08014914                          @ 08013bbc 00f0aafe
     movs r0,#0x3f    @ 08013bc0 3f20
     movs r1,#0x0    @ 08013bc2 0021
@@ -1078,7 +1096,7 @@ switchD_08013bfa__caseD_0:
     bl FUN_0801379c                          @ 08013c2e fff7b5fd
     ldr r0, DAT_08013c9c                     @ 08013c32 1a48
     movs r1,#0x0    @ 08013c34 0021
-    bl FUN_08014fa8                          @ 08013c36 01f0b7f9
+    bl fs_load                               @ 08013c36 01f0b7f9
     .hword 0x4651    @ 08013c3a 5146
     adds r1,#0x88    @ 08013c3c 8831
     str r0,[r1,#0x0]                         @ 08013c3e 0860
@@ -1136,7 +1154,7 @@ LAB_08013cae:
     movs r1,#0x10    @ 08013cae 1021
     rsbs r1,r1,#0    @ 08013cb0 4942
     movs r0,#0x8    @ 08013cb2 0820
-    bl FUN_080146fc                          @ 08013cb4 00f022fd
+    bl gl_set_brightness                     @ 08013cb4 00f022fd
     movs r0,#0x8    @ 08013cb8 0820
     movs r1,#0x0    @ 08013cba 0021
     movs r2,#0x1e    @ 08013cbc 1e22
@@ -1469,7 +1487,7 @@ switchD_08013bfa__caseD_5:
     bl FUN_08013864                          @ 08013f4a fff78bfc
     ldr r0, DAT_08013fd8                     @ 08013f4e 2248
     movs r1,#0x0    @ 08013f50 0021
-    bl FUN_08014fa8                          @ 08013f52 01f029f8
+    bl fs_load                               @ 08013f52 01f029f8
     .hword 0x4651    @ 08013f56 5146
     adds r1,#0x88    @ 08013f58 8831
     str r0,[r1,#0x0]                         @ 08013f5a 0860
@@ -1626,7 +1644,7 @@ switchD_08013bfa__caseD_7:
     bne LAB_080140a2                         @ 0801408a 0ad1
     movs r0,#0x3f    @ 0801408c 3f20
     movs r1,#0x0    @ 0801408e 0021
-    bl FUN_080146fc                          @ 08014090 00f034fb
+    bl gl_set_brightness                     @ 08014090 00f034fb
     bl FUN_08014914                          @ 08014094 00f03efc
     movs r0,#0x3f    @ 08014098 3f20
     movs r1,#0x10    @ 0801409a 1021
@@ -1640,7 +1658,7 @@ LAB_080140a2:
     bne LAB_08014138                         @ 080140aa 45d1
     ldr r0, DAT_08014130                     @ 080140ac 2048
     movs r1,#0x0    @ 080140ae 0021
-    bl FUN_08014fa8                          @ 080140b0 00f07aff
+    bl fs_load                               @ 080140b0 00f07aff
     .hword 0x4651    @ 080140b4 5146
     adds r1,#0x88    @ 080140b6 8831
     str r0,[r1,#0x0]                         @ 080140b8 0860
@@ -1669,7 +1687,7 @@ LAB_080140a2:
     bl FUN_08013940                          @ 080140ec fff728fc
     movs r0,#0x3f    @ 080140f0 3f20
     movs r1,#0x10    @ 080140f2 1021
-    bl FUN_080146fc                          @ 080140f4 00f002fb
+    bl gl_set_brightness                     @ 080140f4 00f002fb
     movs r0,#0x3f    @ 080140f8 3f20
     movs r1,#0x0    @ 080140fa 0021
     movs r2,#0xf    @ 080140fc 0f22
@@ -1958,7 +1976,7 @@ LAB_08014322:
     adds r1,r0,#0x0    @ 08014332 011c
 LAB_08014334:
     movs r0,#0x3f    @ 08014334 3f20
-    bl FUN_080146fc                          @ 08014336 00f0e1f9
+    bl gl_set_brightness                     @ 08014336 00f0e1f9
     b LAB_0801435c                           @ 0801433a 0fe0
 LAB_0801433c:
     cmp r4,#0x1e                             @ 0801433c 1e2c
@@ -2304,7 +2322,7 @@ LAB_080145f8:
     pop {r1}                                 @ 080145fa 02bc
     bx r1                                    @ 080145fc 0847
     .byte  0x00, 0x00
-FUN_08014600:
+cpu_copy_auto:
     push {lr}                                @ 08014600 00b5
     adds r3,r0,#0x0    @ 08014602 031c
     cmp r2,#0x1f                             @ 08014604 1f2a
@@ -2317,7 +2335,7 @@ LAB_08014610:
     lsls r2,r0,#0x9    @ 08014610 4202
     lsrs r2,r2,#0xb    @ 08014612 d20a
     adds r0,r3,#0x0    @ 08014614 181c
-    bl FUN_0810e3f4                          @ 08014616 f9f0edfe
+    bl bios_cpu_fast_set                     @ 08014616 f9f0edfe
     b LAB_08014632                           @ 0801461a 0ae0
 LAB_0801461c:
     cmp r2,#0x0                              @ 0801461c 002a
@@ -2330,12 +2348,12 @@ LAB_08014622:
     lsls r0,r0,#0x13    @ 08014628 c004
     orrs r2,r0    @ 0801462a 0243
     adds r0,r3,#0x0    @ 0801462c 181c
-    bl FUN_0810e3f8                          @ 0801462e f9f0e3fe
+    bl bios_cpu_set                          @ 0801462e f9f0e3fe
 LAB_08014632:
     pop {r0}                                 @ 08014632 01bc
     bx r0                                    @ 08014634 0047
     .byte  0x00, 0x00
-FUN_08014638:
+gl_clear_vram_palram_scroll:
     push {r4,lr}                             @ 08014638 10b5
     sub sp,#0x8                              @ 0801463a 82b0
     ldr r0, DAT_0801468c                     @ 0801463c 1348
@@ -2349,13 +2367,13 @@ FUN_08014638:
     lsls r1,r1,#0x13    @ 0801464c c904
     ldr r2, DAT_08014690                     @ 0801464e 104a
     .hword 0x4668    @ 08014650 6846
-    bl FUN_0810e3f4                          @ 08014652 f9f0cffe
+    bl bios_cpu_fast_set                     @ 08014652 f9f0cffe
     str r4,[sp,#0x4]                         @ 08014656 0194
     add r0,sp,#0x4                           @ 08014658 01a8
     movs r1,#0xa0    @ 0801465a a021
     lsls r1,r1,#0x13    @ 0801465c c904
     ldr r2, DAT_08014694                     @ 0801465e 0d4a
-    bl FUN_0810e3f4                          @ 08014660 f9f0c8fe
+    bl bios_cpu_fast_set                     @ 08014660 f9f0c8fe
     ldr r0, DAT_08014698                     @ 08014664 0c48
     strh r4,[r0,#0x0]                        @ 08014666 0480
     adds r0,#0x4    @ 08014668 0430
@@ -2436,7 +2454,7 @@ LAB_080146f4:
     strb r0,[r2,#0x8]                        @ 080146f6 1072
     bx lr                                    @ 080146f8 7047
     .byte  0x00, 0x00
-FUN_080146fc:
+gl_set_brightness:
     push {r4,r5,r6,lr}                       @ 080146fc 70b5
     adds r6,r0,#0x0    @ 080146fe 061c
     adds r5,r1,#0x0    @ 08014700 0d1c
@@ -2672,7 +2690,7 @@ DAT_080148c8:
     .word  0xfffffc03                     @ 080148c8 03fcffff
 DAT_080148cc:
     .word  0xfffc03ff                     @ 080148cc ff03fcff
-FUN_080148d0:
+gl_fade_in:
     push {lr}                                @ 080148d0 00b5
     movs r0,#0x3f    @ 080148d2 3f20
     movs r1,#0x0    @ 080148d4 0021
@@ -2680,7 +2698,7 @@ FUN_080148d0:
     bl FUN_080147d8                          @ 080148d8 fff77eff
     pop {r0}                                 @ 080148dc 01bc
     bx r0                                    @ 080148de 0047
-FUN_080148e0:
+gl_fade_out:
     push {lr}                                @ 080148e0 00b5
     movs r1,#0x10    @ 080148e2 1021
     rsbs r1,r1,#0    @ 080148e4 4942
@@ -3125,7 +3143,7 @@ LAB_08014c32:
     lsls r2,r6,#0x9    @ 08014c3a 7202
     lsrs r2,r2,#0xb    @ 08014c3c d20a
     adds r0,r4,#0x0    @ 08014c3e 201c
-    bl FUN_0810e3f4                          @ 08014c40 f9f0d8fb
+    bl bios_cpu_fast_set                     @ 08014c40 f9f0d8fb
     pop {r4,r5,r6}                           @ 08014c44 70bc
     pop {r0}                                 @ 08014c46 01bc
     bx r0                                    @ 08014c48 0047
@@ -3155,7 +3173,7 @@ LAB_08014c70:
     lsls r2,r6,#0x9    @ 08014c78 7202
     lsrs r2,r2,#0xb    @ 08014c7a d20a
     adds r0,r4,#0x0    @ 08014c7c 201c
-    bl FUN_0810e3f4                          @ 08014c7e f9f0b9fb
+    bl bios_cpu_fast_set                     @ 08014c7e f9f0b9fb
     pop {r4,r5,r6}                           @ 08014c82 70bc
     pop {r0}                                 @ 08014c84 01bc
     bx r0                                    @ 08014c86 0047
@@ -3187,7 +3205,7 @@ LAB_08014cb2:
     lsls r2,r6,#0x9    @ 08014cba 7202
     lsrs r2,r2,#0xb    @ 08014cbc d20a
     adds r0,r4,#0x0    @ 08014cbe 201c
-    bl FUN_0810e3f4                          @ 08014cc0 f9f098fb
+    bl bios_cpu_fast_set                     @ 08014cc0 f9f098fb
     pop {r4,r5,r6}                           @ 08014cc4 70bc
     pop {r0}                                 @ 08014cc6 01bc
     bx r0                                    @ 08014cc8 0047
@@ -3217,7 +3235,7 @@ LAB_08014cf0:
     lsls r2,r6,#0x9    @ 08014cf8 7202
     lsrs r2,r2,#0xb    @ 08014cfa d20a
     adds r0,r4,#0x0    @ 08014cfc 201c
-    bl FUN_0810e3f4                          @ 08014cfe f9f079fb
+    bl bios_cpu_fast_set                     @ 08014cfe f9f079fb
     pop {r4,r5,r6}                           @ 08014d02 70bc
     pop {r0}                                 @ 08014d04 01bc
     bx r0                                    @ 08014d06 0047
@@ -3248,7 +3266,7 @@ LAB_08014d30:
     lsls r2,r6,#0xa    @ 08014d38 b202
     lsrs r2,r2,#0xb    @ 08014d3a d20a
     adds r0,r4,#0x0    @ 08014d3c 201c
-    bl FUN_0810e3f8                          @ 08014d3e f9f05bfb
+    bl bios_cpu_set                          @ 08014d3e f9f05bfb
     pop {r4,r5,r6}                           @ 08014d42 70bc
     pop {r0}                                 @ 08014d44 01bc
     bx r0                                    @ 08014d46 0047
@@ -3280,7 +3298,7 @@ LAB_08014d72:
     lsls r2,r6,#0xa    @ 08014d7a b202
     lsrs r2,r2,#0xb    @ 08014d7c d20a
     adds r0,r4,#0x0    @ 08014d7e 201c
-    bl FUN_0810e3f8                          @ 08014d80 f9f03afb
+    bl bios_cpu_set                          @ 08014d80 f9f03afb
     pop {r4,r5,r6}                           @ 08014d84 70bc
     pop {r0}                                 @ 08014d86 01bc
     bx r0                                    @ 08014d88 0047
@@ -3310,7 +3328,7 @@ LAB_08014db0:
     lsls r2,r6,#0xa    @ 08014db8 b202
     lsrs r2,r2,#0xb    @ 08014dba d20a
     adds r0,r4,#0x0    @ 08014dbc 201c
-    bl FUN_0810e3f8                          @ 08014dbe f9f01bfb
+    bl bios_cpu_set                          @ 08014dbe f9f01bfb
     pop {r4,r5,r6}                           @ 08014dc2 70bc
     pop {r0}                                 @ 08014dc4 01bc
     bx r0                                    @ 08014dc6 0047
@@ -3341,7 +3359,7 @@ LAB_08014df0:
     lsls r2,r6,#0xa    @ 08014df8 b202
     lsrs r2,r2,#0xb    @ 08014dfa d20a
     adds r0,r4,#0x0    @ 08014dfc 201c
-    bl FUN_0810e3f8                          @ 08014dfe f9f0fbfa
+    bl bios_cpu_set                          @ 08014dfe f9f0fbfa
     pop {r4,r5,r6}                           @ 08014e02 70bc
     pop {r0}                                 @ 08014e04 01bc
     bx r0                                    @ 08014e06 0047
@@ -3373,7 +3391,7 @@ LAB_08014e32:
     lsls r2,r6,#0xa    @ 08014e3a b202
     lsrs r2,r2,#0xb    @ 08014e3c d20a
     adds r0,r4,#0x0    @ 08014e3e 201c
-    bl FUN_0810e3f8                          @ 08014e40 f9f0dafa
+    bl bios_cpu_set                          @ 08014e40 f9f0dafa
     pop {r4,r5,r6}                           @ 08014e44 70bc
     pop {r0}                                 @ 08014e46 01bc
     bx r0                                    @ 08014e48 0047
@@ -3481,7 +3499,7 @@ LAB_08014f46:
     pop {r1}                                 @ 08014f4e 02bc
     bx r1                                    @ 08014f50 0847
     .byte  0x00, 0x00
-FUN_08014f54:
+fs_resolve_path_to_fid:
     push {r4,r5,r6,r7,lr}                    @ 08014f54 f0b5
     .hword 0x4647    @ 08014f56 4746
     push {r7}                                @ 08014f58 80b4
@@ -3522,7 +3540,7 @@ LAB_08014f90:
     pop {r1}                                 @ 08014f96 02bc
     bx r1                                    @ 08014f98 0847
     .byte  0x00, 0x00, 0x00, 0xb5, 0x00, 0x21, 0x00, 0xf0, 0x02, 0xf8, 0x02, 0xbc, 0x08, 0x47
-FUN_08014fa8:
+fs_load:
     push {r4,r5,r6,r7,lr}                    @ 08014fa8 f0b5
     .hword 0x4657    @ 08014faa 5746
     .hword 0x464e    @ 08014fac 4e46
@@ -3598,7 +3616,7 @@ LAB_0801503c:
     ldr r2,[r7,#0x0]                         @ 0801503c 3a68
     adds r0,r6,#0x0    @ 0801503e 301c
     ldr r1,[sp,#0x58]                        @ 08015040 1699
-    bl FUN_08014f54                          @ 08015042 fff787ff
+    bl fs_resolve_path_to_fid                @ 08015042 fff787ff
     adds r4,r0,#0x0    @ 08015046 041c
     cmp r4,r9                                @ 08015048 4c45
     beq LAB_080150f8                         @ 0801504a 55d0
@@ -3622,7 +3640,7 @@ LAB_0801503c:
     bls LAB_080150a4                         @ 08015070 18d9
     adds r0,r4,#0x0    @ 08015072 201c
     .hword 0x4641    @ 08015074 4146
-    bl FUN_0810e418                          @ 08015076 f9f0cff9
+    bl bios_huff_uncomp                      @ 08015076 f9f0cff9
     b LAB_080150f8                           @ 0801507a 3de0
 DAT_0801507c:
     .word  0x09e39980                     @ 0801507c 8099e309
@@ -3658,7 +3676,7 @@ LAB_080150a4:
 LAB_080150ba:
     adds r0,r4,#0x0    @ 080150ba 201c
     adds r1,r5,#0x0    @ 080150bc 291c
-    bl FUN_0810e41c                          @ 080150be f9f0adf9
+    bl bios_lz77_uncomp                      @ 080150be f9f0adf9
     adds r0,r5,#0x4    @ 080150c2 281d
     .hword 0x4641    @ 080150c4 4146
     cmp r1,#0x0                              @ 080150c6 0029
@@ -3667,7 +3685,7 @@ LAB_080150ba:
     beq LAB_080150f2                         @ 080150cc 11d0
     ldr r2,[r4,#0x0]                         @ 080150ce 2268
     lsrs r2,r2,#0x8    @ 080150d0 120a
-    bl FUN_08014600                          @ 080150d2 fff795fa
+    bl cpu_copy_auto                         @ 080150d2 fff795fa
     b LAB_080150f2                           @ 080150d6 0ce0
 DAT_080150d8:
     .word  0x09e3995c                     @ 080150d8 5c99e309
@@ -3682,7 +3700,7 @@ LAB_080150e4:
     beq LAB_080150f6                         @ 080150e8 05d0
     adds r0,r4,#0x0    @ 080150ea 201c
     .hword 0x4641    @ 080150ec 4146
-    bl FUN_08014600                          @ 080150ee fff787fa
+    bl cpu_copy_auto                         @ 080150ee fff787fa
 LAB_080150f2:
     .hword 0x46c2    @ 080150f2 c246
     b LAB_080150f8                           @ 080150f4 00e0
@@ -3722,7 +3740,7 @@ DAT_08015130:
     .word  0x09e39c50                     @ 08015130 509ce309
 DAT_08015134:
     .word  0x09e39c5c                     @ 08015134 5c9ce309
-FUN_08015138:
+gl_state_init:
     push {lr}                                @ 08015138 00b5
     sub sp,#0x4                              @ 0801513a 81b0
     ldr r1, DAT_08015154                     @ 0801513c 0549
@@ -3730,7 +3748,7 @@ FUN_08015138:
     str r0,[sp,#0x0]                         @ 08015140 0090
     ldr r2, DAT_08015158                     @ 08015142 054a
     .hword 0x4668    @ 08015144 6846
-    bl FUN_0810e3f8                          @ 08015146 f9f057f9
+    bl bios_cpu_set                          @ 08015146 f9f057f9
     bl FUN_08015160                          @ 0801514a 00f009f8
     add sp,#0x4                              @ 0801514e 01b0
     pop {r0}                                 @ 08015150 01bc
@@ -3775,7 +3793,7 @@ FUN_08015194:
     str r0,[sp,#0x0]                         @ 0801519c 0090
     ldr r2, DAT_080151b0                     @ 0801519e 044a
     .hword 0x4668    @ 080151a0 6846
-    bl FUN_0810e3f8                          @ 080151a2 f9f029f9
+    bl bios_cpu_set                          @ 080151a2 f9f029f9
     add sp,#0x4                              @ 080151a6 01b0
     pop {r0}                                 @ 080151a8 01bc
     bx r0                                    @ 080151aa 0047
@@ -3836,7 +3854,7 @@ LAB_080151f8:
     ldr r2, DAT_08015228                     @ 08015214 044a
     .hword 0x4668    @ 08015216 6846
     adds r1,r4,#0x0    @ 08015218 211c
-    bl FUN_0810e3f8                          @ 0801521a f9f0edf8
+    bl bios_cpu_set                          @ 0801521a f9f0edf8
     adds r0,r4,#0x0    @ 0801521e 201c
 LAB_08015220:
     add sp,#0x4                              @ 08015220 01b0
@@ -3904,7 +3922,7 @@ LAB_0801528a:
     movs r2,#0x80    @ 08015294 8022
     lsls r2,r2,#0x1    @ 08015296 5200
     .hword 0x4660    @ 08015298 6046
-    bl FUN_0810e3f4                          @ 0801529a f9f0abf8
+    bl bios_cpu_fast_set                     @ 0801529a f9f0abf8
     pop {r3,r4,r5}                           @ 0801529e 38bc
     .hword 0x4698    @ 080152a0 9846
     .hword 0x46a1    @ 080152a2 a146
@@ -4038,7 +4056,7 @@ FUN_08015384:
     ldr r2, DAT_08015410                     @ 0801539a 1d4a
     .hword 0x4668    @ 0801539c 6846
     adds r1,r4,#0x0    @ 0801539e 211c
-    bl FUN_0810e3f8                          @ 080153a0 f9f02af8
+    bl bios_cpu_set                          @ 080153a0 f9f02af8
     ldr r1, DAT_08015414                     @ 080153a4 1b49
     adds r0,r1,#0x0    @ 080153a6 081c
     ands r6,r0    @ 080153a8 0640
@@ -4408,7 +4426,7 @@ DAT_080156a4:
     .word  0x09e3a4b8                     @ 080156a4 b8a4e309
 DAT_080156a8:
     .word  0x03002c08                     @ 080156a8 082c0003
-FUN_080156ac:
+gl_clear_frame_callbacks:
     ldr r0, DAT_080156bc                     @ 080156ac 0348
     movs r1,#0x0    @ 080156ae 0021
     str r1,[r0,#0x0]                         @ 080156b0 0160
@@ -4469,11 +4487,11 @@ FUN_08015728:
     lsls r5,r5,#0x11    @ 0801573e 6d04
     adds r0,r5,#0x0    @ 08015740 281c
     adds r1,r6,#0x0    @ 08015742 311c
-    bl FUN_0810e3fc                          @ 08015744 f8f05afe
+    bl bios_div                              @ 08015744 f8f05afe
     .hword 0x4682    @ 08015748 8246
     adds r0,r5,#0x0    @ 0801574a 281c
     .hword 0x4641    @ 0801574c 4146
-    bl FUN_0810e3fc                          @ 0801574e f8f055fe
+    bl bios_div                              @ 0801574e f8f055fe
     .hword 0x4680    @ 08015752 8046
     ldr r5, DAT_08015814                     @ 08015754 2f4d
     movs r0,#0xff    @ 08015756 ff20
@@ -4948,7 +4966,7 @@ DAT_08015b00:
     .word  0x02027d40                     @ 08015b00 407d0202
 FUN_08015b04:
     push {lr}                                @ 08015b04 00b5
-    bl FUN_08014fa8                          @ 08015b06 fff74ffa
+    bl fs_load                               @ 08015b06 fff74ffa
     pop {r1}                                 @ 08015b0a 02bc
     bx r1                                    @ 08015b0c 0847
     .byte  0x00, 0x00
@@ -5176,7 +5194,7 @@ LAB_08015cba:
     ldr r2,[sp,#0x14]                        @ 08015cc4 059a
     lsls r2,r2,#0x9    @ 08015cc6 5202
     lsrs r2,r2,#0xb    @ 08015cc8 d20a
-    bl FUN_0810e3f4                          @ 08015cca f8f093fb
+    bl bios_cpu_fast_set                     @ 08015cca f8f093fb
     b LAB_08015cf4                           @ 08015cce 11e0
 DAT_08015cd0:
     .word  0x09e3a488                     @ 08015cd0 88a4e309
@@ -5549,7 +5567,7 @@ FUN_08015fc8:
     strh r0,[r2,#0x0]                        @ 08015fd2 1080
     ldr r2, DAT_08015fe4                     @ 08015fd4 034a
     .hword 0x4668    @ 08015fd6 6846
-    bl FUN_0810e3f8                          @ 08015fd8 f8f00efa
+    bl bios_cpu_set                          @ 08015fd8 f8f00efa
     movs r0,#0x0    @ 08015fdc 0020
     add sp,#0x4                              @ 08015fde 01b0
     pop {r1}                                 @ 08015fe0 02bc
@@ -5728,7 +5746,7 @@ LAB_08016282:
     lsls r2,r2,#0x9    @ 080162b0 5202
     lsrs r2,r2,#0xb    @ 080162b2 d20a
     adds r0,r4,#0x0    @ 080162b4 201c
-    bl FUN_0810e3f4                          @ 080162b6 f8f09df8
+    bl bios_cpu_fast_set                     @ 080162b6 f8f09df8
     b LAB_080162d4                           @ 080162ba 0be0
 DAT_080162bc:
     .word  0x05000200                     @ 080162bc 00020005
@@ -5741,7 +5759,7 @@ LAB_080162c0:
     lsls r2,r2,#0x9    @ 080162ca 5202
     lsrs r2,r2,#0xb    @ 080162cc d20a
     adds r0,r4,#0x0    @ 080162ce 201c
-    bl FUN_0810e3f4                          @ 080162d0 f8f090f8
+    bl bios_cpu_fast_set                     @ 080162d0 f8f090f8
 LAB_080162d4:
     movs r0,#0x0    @ 080162d4 0020
     pop {r4}                                 @ 080162d6 10bc
@@ -5760,7 +5778,7 @@ FUN_080162dc:
     lsrs r2,r2,#0xb    @ 080162ee d20a
     adds r0,r5,#0x0    @ 080162f0 281c
     adds r1,r4,#0x0    @ 080162f2 211c
-    bl FUN_0810e3f8                          @ 080162f4 f8f080f8
+    bl bios_cpu_set                          @ 080162f4 f8f080f8
     b LAB_0801633e                           @ 080162f8 21e0
     .byte  0x00, 0x00
 DAT_080162fc:
@@ -7239,7 +7257,7 @@ FUN_08017540:
     .byte  0x00, 0x00
 DAT_08017570:
     .word  0x02029250                     @ 08017570 50920202
-FUN_08017574:
+name_input_page_init:
     push {r4,lr}                             @ 08017574 10b5
     sub sp,#0x4                              @ 08017576 81b0
     ldr r1, DAT_080175d8                     @ 08017578 1749
@@ -7247,8 +7265,8 @@ FUN_08017574:
     str r4,[sp,#0x0]                         @ 0801757c 0094
     ldr r2, DAT_080175dc                     @ 0801757e 174a
     .hword 0x4668    @ 08017580 6846
-    bl FUN_0810e3f8                          @ 08017582 f6f039ff
-    bl FUN_08014638                          @ 08017586 fdf757f8
+    bl bios_cpu_set                          @ 08017582 f6f039ff
+    bl gl_clear_vram_palram_scroll           @ 08017586 fdf757f8
     movs r1,#0x80    @ 0801758a 8021
     lsls r1,r1,#0x13    @ 0801758c c904
     movs r0,#0xfa    @ 0801758e fa20
@@ -7269,10 +7287,10 @@ FUN_08017574:
     movs r1,#0x10    @ 080175ac 1021
     rsbs r1,r1,#0    @ 080175ae 4942
     movs r0,#0x3f    @ 080175b0 3f20
-    bl FUN_080146fc                          @ 080175b2 fdf7a3f8
-    bl FUN_080148d0                          @ 080175b6 fdf78bf9
-    bl FUN_08015138                          @ 080175ba fdf7bdfd
-    bl FUN_080156ac                          @ 080175be fef775f8
+    bl gl_set_brightness                     @ 080175b2 fdf7a3f8
+    bl gl_fade_in                            @ 080175b6 fdf78bf9
+    bl gl_state_init                         @ 080175ba fdf7bdfd
+    bl gl_clear_frame_callbacks              @ 080175be fef775f8
     movs r0,#0x0    @ 080175c2 0020
     bl FUN_08019554                          @ 080175c4 01f0c6ff
     ldr r0, DAT_080175f0                     @ 080175c8 0948
@@ -8259,14 +8277,14 @@ FUN_08017d64:
     adds r1,r0,#0x0    @ 08017da2 011c
     ldr r2, DAT_08017e40                     @ 08017da4 264a
     add r0,sp,#0x14                          @ 08017da6 05a8
-    bl FUN_0810e3f4                          @ 08017da8 f6f024fb
+    bl bios_cpu_fast_set                     @ 08017da8 f6f024fb
     str r5,[sp,#0x18]                        @ 08017dac 0695
     add r4,sp,#0x18                          @ 08017dae 06ac
     bl FUN_08014a10                          @ 08017db0 fcf72efe
     adds r1,r0,#0x0    @ 08017db4 011c
     ldr r2, DAT_08017e44                     @ 08017db6 234a
     adds r0,r4,#0x0    @ 08017db8 201c
-    bl FUN_0810e3f4                          @ 08017dba f6f01bfb
+    bl bios_cpu_fast_set                     @ 08017dba f6f01bfb
     movs r4,#0x2    @ 08017dbe 0224
 LAB_08017dc0:
     ldr r0,[sp,#0x1c]                        @ 08017dc0 0798
@@ -8397,7 +8415,7 @@ FUN_08017e9c:
     adds r1,r1,r0    @ 08017eb8 0918
     ldr r2, DAT_08017ef8                     @ 08017eba 0f4a
     add r0,sp,#0x4                           @ 08017ebc 01a8
-    bl FUN_0810e3f8                          @ 08017ebe f6f09bfa
+    bl bios_cpu_set                          @ 08017ebe f6f09bfa
     bl FUN_08017798                          @ 08017ec2 fff769fc
     ldr r1, DAT_08017efc                     @ 08017ec6 0d49
     ldr r0, DAT_08017f00                     @ 08017ec8 0d48
@@ -8648,7 +8666,7 @@ LAB_080180a6:
     adds r0,r1,#0x0    @ 080180a6 081c
     pop {r1}                                 @ 080180a8 02bc
     bx r1                                    @ 080180aa 0847
-FUN_080180ac:
+name_input_page_load_assets:
     push {r4,r5,r6,r7,lr}                    @ 080180ac f0b5
     .hword 0x464f    @ 080180ae 4f46
     .hword 0x4646    @ 080180b0 4646
@@ -8684,7 +8702,7 @@ FUN_080180ac:
     bl FUN_08015fc8                          @ 080180ee fdf76bff
     ldr r0, DAT_08018198                     @ 080180f2 2948
     movs r1,#0x0    @ 080180f4 0021
-    bl FUN_08014fa8                          @ 080180f6 fcf757ff
+    bl fs_load                               @ 080180f6 fcf757ff
     str r0,[sp,#0x24]                        @ 080180fa 0990
     movs r5,#0x10    @ 080180fc 1025
     rsbs r5,r5,#0    @ 080180fe 6d42
@@ -8719,7 +8737,7 @@ FUN_080180ac:
     bl FUN_08015fc8                          @ 0801813a fdf745ff
     ldr r0, DAT_080181a0                     @ 0801813e 1848
     movs r1,#0x0    @ 08018140 0021
-    bl FUN_08014fa8                          @ 08018142 fcf731ff
+    bl fs_load                               @ 08018142 fcf731ff
     str r0,[sp,#0x48]                        @ 08018146 1290
     ldrb r3,[r4,#0x14]                       @ 08018148 237d
     ands r5,r3    @ 0801814a 1d40
@@ -8742,7 +8760,7 @@ FUN_080180ac:
     bl FUN_08016a7c                          @ 0801816c fef786fc
     ldr r0, DAT_080181a4                     @ 08018170 0c48
     movs r1,#0x0    @ 08018172 0021
-    bl FUN_08014fa8                          @ 08018174 fcf718ff
+    bl fs_load                               @ 08018174 fcf718ff
     adds r1,r7,#0x0    @ 08018178 391c
     adds r1,#0x88    @ 0801817a 8831
     str r0,[r1,#0x0]                         @ 0801817c 0860
@@ -8778,11 +8796,11 @@ LAB_080181b0:
     ldr r5, DAT_08018230                     @ 080181bc 1c4d
     adds r0,r4,#0x0    @ 080181be 201c
     adds r2,r5,#0x0    @ 080181c0 2a1c
-    bl FUN_0810e3f8                          @ 080181c2 f6f019f9
+    bl bios_cpu_set                          @ 080181c2 f6f019f9
     ldr r1, DAT_08018234                     @ 080181c6 1b49
     adds r0,r4,#0x0    @ 080181c8 201c
     adds r2,r5,#0x0    @ 080181ca 2a1c
-    bl FUN_0810e3f8                          @ 080181cc f6f014f9
+    bl bios_cpu_set                          @ 080181cc f6f014f9
     bl FUN_08017830                          @ 080181d0 fff72efb
     ldr r1, DAT_08018238                     @ 080181d4 1849
     ldr r4, DAT_0801823c                     @ 080181d6 194c
@@ -8814,7 +8832,7 @@ LAB_080181f8:
     ldr r4, DAT_08018244                     @ 0801820a 0e4c
     adds r1,r7,r4    @ 0801820c 3919
     movs r2,#0x2    @ 0801820e 0222
-    bl FUN_0810e3f8                          @ 08018210 f6f0f2f8
+    bl bios_cpu_set                          @ 08018210 f6f0f2f8
     bl FUN_08017b44                          @ 08018214 fff796fc
     movs r0,#0x1    @ 08018218 0120
     add sp,#0x6c                             @ 0801821a 1bb0
@@ -9085,7 +9103,7 @@ FUN_08018400:
     orrs r2,r0    @ 0801841c 0243
     .hword 0x4668    @ 0801841e 6846
     adds r1,r3,#0x0    @ 08018420 191c
-    bl FUN_0810e3f8                          @ 08018422 f5f0e9ff
+    bl bios_cpu_set                          @ 08018422 f5f0e9ff
     add sp,#0x4                              @ 08018426 01b0
     pop {r0}                                 @ 08018428 01bc
     bx r0                                    @ 0801842a 0047
@@ -10379,7 +10397,7 @@ DAT_08018e2c:
 FUN_08018e30:
     push {r4,lr}                             @ 08018e30 10b5
     ldr r4, DAT_08018e4c                     @ 08018e32 064c
-    bl FUN_080148e0                          @ 08018e34 fbf754fd
+    bl gl_fade_out                           @ 08018e34 fbf754fd
     movs r0,#0xc5    @ 08018e38 c520
     lsls r0,r0,#0x2    @ 08018e3a 8000
     adds r4,r4,r0    @ 08018e3c 2418
@@ -10577,14 +10595,14 @@ switchD_08018fa0__caseD_0:
     adds r1,r1,r2    @ 08018fde 8918
     ldr r2, DAT_08019070                     @ 08018fe0 234a
     add r0,sp,#0x14                          @ 08018fe2 05a8
-    bl FUN_0810e3f4                          @ 08018fe4 f5f006fa
+    bl bios_cpu_fast_set                     @ 08018fe4 f5f006fa
     str r4,[sp,#0x18]                        @ 08018fe8 0694
     add r4,sp,#0x18                          @ 08018fea 06ac
     bl FUN_08014b8c                          @ 08018fec fbf7cefd
     adds r1,r0,#0x0    @ 08018ff0 011c
     ldr r2, DAT_08019074                     @ 08018ff2 204a
     adds r0,r4,#0x0    @ 08018ff4 201c
-    bl FUN_0810e3f4                          @ 08018ff6 f5f0fdf9
+    bl bios_cpu_fast_set                     @ 08018ff6 f5f0fdf9
     ldr r2, DAT_08019078                     @ 08018ffa 1f4a
     movs r4,#0x4    @ 08018ffc 0424
     rsbs r4,r4,#0    @ 08018ffe 6442
@@ -10708,7 +10726,7 @@ switchD_08018fa0__caseD_2:
     add r0,sp,#0x1c                          @ 080190ec 07a8
     ldr r1, DAT_08019220                     @ 080190ee 4c49
     ldr r2, DAT_08019224                     @ 080190f0 4c4a
-    bl FUN_0810e3f4                          @ 080190f2 f5f07ff9
+    bl bios_cpu_fast_set                     @ 080190f2 f5f07ff9
     ldr r0, DAT_08019228                     @ 080190f6 4c48
     bl FUN_080f4e18                          @ 080190f8 dbf08efe
     lsls r0,r0,#0x10    @ 080190fc 0004
@@ -10984,7 +11002,7 @@ switchD_08018fa0__caseD_5:
     add r0,sp,#0x24                          @ 08019320 09a8
     ldr r1, DAT_08019370                     @ 08019322 1349
     ldr r2, DAT_08019374                     @ 08019324 134a
-    bl FUN_0810e3f4                          @ 08019326 f5f065f8
+    bl bios_cpu_fast_set                     @ 08019326 f5f065f8
     str r4,[sp,#0x28]                        @ 0801932a 0a94
     add r4,sp,#0x28                          @ 0801932c 0aac
     bl FUN_08014bac                          @ 0801932e fbf73dfc
@@ -10994,7 +11012,7 @@ switchD_08018fa0__caseD_5:
     adds r1,r1,r3    @ 08019338 c918
     ldr r2, DAT_08019378                     @ 0801933a 0f4a
     adds r0,r4,#0x0    @ 0801933c 201c
-    bl FUN_0810e3f4                          @ 0801933e f5f059f8
+    bl bios_cpu_fast_set                     @ 0801933e f5f059f8
     movs r0,#0xc7    @ 08019342 c720
     lsls r0,r0,#0x2    @ 08019344 8000
     adds r1,r6,r0    @ 08019346 3118
@@ -11164,7 +11182,7 @@ DAT_0801948c:
     .word  0x00000319                     @ 0801948c 19030000
 DAT_08019490:
     .word  0x09e587ec                     @ 08019490 ec87e509
-FUN_08019494:
+name_input_page_tick:
     push {r4,lr}                             @ 08019494 10b5
     ldr r4, DAT_080194ac                     @ 08019496 054c
     ldr r1, DAT_080194b0                     @ 08019498 0549
@@ -11208,7 +11226,7 @@ LAB_080194e6:
     pop {r4}                                 @ 080194e6 10bc
     pop {r1}                                 @ 080194e8 02bc
     bx r1                                    @ 080194ea 0847
-FUN_080194ec:
+name_input_page_exit:
     push {lr}                                @ 080194ec 00b5
     ldr r0, DAT_08019500                     @ 080194ee 0448
     ldr r1, DAT_08019504                     @ 080194f0 0449
@@ -11252,7 +11270,7 @@ FUN_08019540:
     push {lr}                                @ 08019540 00b5
     ldr r0, DAT_08019550                     @ 08019542 0348
     movs r1,#0xb    @ 08019544 0b21
-    bl FUN_08019574                          @ 08019546 00f015f8
+    bl page_state_dispatcher                 @ 08019546 00f015f8
     pop {r1}                                 @ 0801954a 02bc
     bx r1                                    @ 0801954c 0847
     .byte  0x00, 0x00
@@ -11275,7 +11293,7 @@ DAT_0801956c:
     .word  0x03000040                     @ 0801956c 40000003
 DAT_08019570:
     .word  0x0000023a                     @ 08019570 3a020000
-FUN_08019574:
+page_state_dispatcher:
     push {r4,r5,r6,lr}                       @ 08019574 70b5
     adds r6,r0,#0x0    @ 08019576 061c
     adds r5,r1,#0x0    @ 08019578 0d1c
@@ -11478,7 +11496,74 @@ LAB_080197aa:
     pop {r4,r5,r6,r7}                        @ 080197c4 f0bc
     pop {r0}                                 @ 080197c6 01bc
     bx r0                                    @ 080197c8 0047
-    ROM_INCBIN 0x197ca, 0x9a
+    ROM_INCBIN 0x197ca, 0x12
+SUB_080197dc:
+    push {lr}                                @ 080197dc 00b5
+    bl FUN_08014a50                          @ 080197de fbf737f9
+    adds r0,#0x20    @ 080197e2 2030
+    movs r1,#0x1b    @ 080197e4 1b21
+    movs r2,#0x15    @ 080197e6 1522
+    bl FUN_080f42b4                          @ 080197e8 daf064fd
+    ldr r2, DWORD_08019818                   @ 080197ec 0a4a
+    movs r0,#0x20    @ 080197ee 2020
+    ldrb r1,[r2,#0x15]                       @ 080197f0 517d
+    orrs r0,r1    @ 080197f2 0843
+    strb r0,[r2,#0x15]                       @ 080197f4 5075
+    movs r0,#0x2    @ 080197f6 0220
+    ldrb r1,[r2,#0x8]                        @ 080197f8 117a
+    orrs r0,r1    @ 080197fa 0843
+    movs r1,#0x2    @ 080197fc 0221
+    rsbs r1,r1,#0    @ 080197fe 4942
+    ands r0,r1    @ 08019800 0840
+    strb r0,[r2,#0x8]                        @ 08019802 1072
+    ldr r1, DWORD_0801981c                   @ 08019804 0549
+    lsls r0,r0,#0x1e    @ 08019806 8007
+    lsrs r0,r0,#0x1f    @ 08019808 c00f
+    lsls r0,r0,#0x2    @ 0801980a 8000
+    adds r0,r0,r1    @ 0801980c 4018
+    ldr r0,[r0,#0x0]                         @ 0801980e 0068
+    str r0,[r2,#0x4]                         @ 08019810 5060
+    pop {r0}                                 @ 08019812 01bc
+    bx r0                                    @ 08019814 0047
+    .byte  0x00, 0x00
+DWORD_08019818:
+    .word  0x02006ed0                     @ 08019818 d06e0002
+DWORD_0801981c:
+    .word  0x09e5f854                     @ 0801981c 54f8e509
+SUB_08019820:
+    push {lr}                                @ 08019820 00b5
+    ldr r0, DWORD_08019858                   @ 08019822 0d48
+    movs r1,#0x19    @ 08019824 1921
+    movs r2,#0xb    @ 08019826 0b22
+    bl FUN_080f42b4                          @ 08019828 daf044fd
+    ldr r2, DWORD_0801985c                   @ 0801982c 0b4a
+    movs r0,#0x20    @ 0801982e 2020
+    ldrb r1,[r2,#0x15]                       @ 08019830 517d
+    orrs r0,r1    @ 08019832 0843
+    strb r0,[r2,#0x15]                       @ 08019834 5075
+    movs r0,#0x2    @ 08019836 0220
+    ldrb r1,[r2,#0x8]                        @ 08019838 117a
+    orrs r0,r1    @ 0801983a 0843
+    movs r1,#0x2    @ 0801983c 0221
+    rsbs r1,r1,#0    @ 0801983e 4942
+    ands r0,r1    @ 08019840 0840
+    strb r0,[r2,#0x8]                        @ 08019842 1072
+    ldr r1, DWORD_08019860                   @ 08019844 0649
+    lsls r0,r0,#0x1e    @ 08019846 8007
+    lsrs r0,r0,#0x1f    @ 08019848 c00f
+    lsls r0,r0,#0x2    @ 0801984a 8000
+    adds r0,r0,r1    @ 0801984c 4018
+    ldr r0,[r0,#0x0]                         @ 0801984e 0068
+    str r0,[r2,#0x4]                         @ 08019850 5060
+    pop {r0}                                 @ 08019852 01bc
+    bx r0                                    @ 08019854 0047
+    .byte  0x00, 0x00
+DWORD_08019858:
+    .word  0x06000020                     @ 08019858 20000006
+DWORD_0801985c:
+    .word  0x02006ed0                     @ 0801985c d06e0002
+DWORD_08019860:
+    .word  0x09e5f854                     @ 08019860 54f8e509
 FUN_08019864:
     push {r4,r5,lr}                          @ 08019864 30b5
     adds r4,r3,#0x0    @ 08019866 1c1c
@@ -11959,7 +12044,1029 @@ DAT_08019c3c:
     .word  0x00001039                     @ 08019c3c 39100000
 DAT_08019c40:
     .word  0x00000674                     @ 08019c40 74060000
-    ROM_INCBIN 0x19c44, 0x858
+SUB_08019c44:
+    movs r0,#0x0    @ 08019c44 0020
+    bx lr                                    @ 08019c46 7047
+FUN_08019c48:
+    push {r4,r5,r6,r7,lr}                    @ 08019c48 f0b5
+    ldr r7, DWORD_08019c80                   @ 08019c4a 0d4f
+    ldr r3, DWORD_08019c84                   @ 08019c4c 0d4b
+    movs r4,#0x0    @ 08019c4e 0024
+    ldr r2, DWORD_08019c88                   @ 08019c50 0d4a
+    ldrh r1,[r2,#0x0]                        @ 08019c52 1188
+    lsrs r0,r1,#0x8    @ 08019c54 080a
+    strb r0,[r3,#0x0]                        @ 08019c56 1870
+    strb r1,[r3,#0x1]                        @ 08019c58 5970
+    adds r3,#0x2    @ 08019c5a 0233
+    ldr r6, DWORD_08019c8c                   @ 08019c5c 0b4e
+    adds r5,r2,#0x0    @ 08019c5e 151c
+LAB_08019c60:
+    adds r5,#0x2    @ 08019c60 0235
+    adds r4,#0x1    @ 08019c62 0134
+    cmp r4,r7                                @ 08019c64 bc42
+    bge LAB_08019c78                         @ 08019c66 07da
+    lsls r2,r4,#0x1    @ 08019c68 6200
+    ldrh r1,[r5,#0x0]                        @ 08019c6a 2988
+    lsrs r0,r1,#0x8    @ 08019c6c 080a
+    strb r0,[r3,#0x0]                        @ 08019c6e 1870
+    strb r1,[r3,#0x1]                        @ 08019c70 5970
+    adds r3,#0x2    @ 08019c72 0233
+    cmp r2,r6                                @ 08019c74 b242
+    bls LAB_08019c60                         @ 08019c76 f3d9
+LAB_08019c78:
+    pop {r4,r5,r6,r7}                        @ 08019c78 f0bc
+    pop {r0}                                 @ 08019c7a 01bc
+    bx r0                                    @ 08019c7c 0047
+    .byte  0x00, 0x00
+DWORD_08019c80:
+    .word  0x0000029f                     @ 08019c80 9f020000
+DWORD_08019c84:
+    .word  0x02029810                     @ 08019c84 10980202
+DWORD_08019c88:
+    .word  0x09e3c044                     @ 08019c88 44c0e309
+DWORD_08019c8c:
+    .word  0x000005a2                     @ 08019c8c a2050000
+SUB_08019c90:
+    ldr r1, DWORD_08019ca0                   @ 08019c90 0349
+    subs r0,#0x10    @ 08019c92 1038
+    strh r0,[r1,#0x0]                        @ 08019c94 0880
+    subs r1,#0x2    @ 08019c96 0239
+    movs r0,#0x5    @ 08019c98 0520
+    rsbs r0,r0,#0    @ 08019c9a 4042
+    strh r0,[r1,#0x0]                        @ 08019c9c 0880
+    bx lr                                    @ 08019c9e 7047
+DWORD_08019ca0:
+    .word  0x0400001a                     @ 08019ca0 1a000004
+FUN_08019ca4:
+    push {r4,r5,r6,r7,lr}                    @ 08019ca4 f0b5
+    .hword 0x4657    @ 08019ca6 5746
+    .hword 0x464e    @ 08019ca8 4e46
+    .hword 0x4645    @ 08019caa 4546
+    push {r5,r6,r7}                          @ 08019cac e0b4
+    sub sp,#0xc                              @ 08019cae 83b0
+    .hword 0x4682    @ 08019cb0 8246
+    .hword 0x4691    @ 08019cb2 9146
+    .hword 0x4698    @ 08019cb4 9846
+    ldr r7,[sp,#0x2c]                        @ 08019cb6 0b9f
+    movs r6,#0x0    @ 08019cb8 0026
+    ldr r4,[r0,#0x0]                         @ 08019cba 0468
+    ldrb r0,[r4,#0x0]                        @ 08019cbc 2078
+    cmp r0,#0x0                              @ 08019cbe 0028
+    beq LAB_08019cfe                         @ 08019cc0 1dd0
+    cmp r6,r7                                @ 08019cc2 be42
+    bge LAB_08019cfe                         @ 08019cc4 1bda
+    adds r5,r1,#0x0    @ 08019cc6 0d1c
+LAB_08019cc8:
+    adds r0,r4,#0x0    @ 08019cc8 201c
+    add r1,sp,#0x8                           @ 08019cca 02a9
+    movs r2,#0x1    @ 08019ccc 0122
+    bl banlist_password_enter_char           @ 08019cce faf78ffb
+    adds r0,r4,#0x0    @ 08019cd2 201c
+    movs r1,#0x1    @ 08019cd4 0121
+    bl FUN_080144e8                          @ 08019cd6 faf707fc
+    adds r4,r0,#0x0    @ 08019cda 041c
+    movs r0,#0x8    @ 08019cdc 0820
+    str r0,[sp,#0x0]                         @ 08019cde 0090
+    movs r0,#0x20    @ 08019ce0 2020
+    str r0,[sp,#0x4]                         @ 08019ce2 0190
+    add r0,sp,#0x8                           @ 08019ce4 02a8
+    adds r1,r5,#0x0    @ 08019ce6 291c
+    .hword 0x464a    @ 08019ce8 4a46
+    movs r3,#0x7    @ 08019cea 0723
+    bl FUN_08019700                          @ 08019cec fff708fd
+    add r5,r8                                @ 08019cf0 4544
+    adds r6,#0x1    @ 08019cf2 0136
+    ldrb r0,[r4,#0x0]                        @ 08019cf4 2078
+    cmp r0,#0x0                              @ 08019cf6 0028
+    beq LAB_08019cfe                         @ 08019cf8 01d0
+    cmp r6,r7                                @ 08019cfa be42
+    blt LAB_08019cc8                         @ 08019cfc e4db
+LAB_08019cfe:
+    .hword 0x4650    @ 08019cfe 5046
+    str r4,[r0,#0x0]                         @ 08019d00 0460
+    add sp,#0xc                              @ 08019d02 03b0
+    pop {r3,r4,r5}                           @ 08019d04 38bc
+    .hword 0x4698    @ 08019d06 9846
+    .hword 0x46a1    @ 08019d08 a146
+    .hword 0x46aa    @ 08019d0a aa46
+    pop {r4,r5,r6,r7}                        @ 08019d0c f0bc
+    pop {r0}                                 @ 08019d0e 01bc
+    bx r0                                    @ 08019d10 0047
+    .byte  0x00, 0x00
+FUN_08019d14:
+    push {r4,r5,r6,r7,lr}                    @ 08019d14 f0b5
+    sub sp,#0x20                             @ 08019d16 88b0
+    adds r5,r0,#0x0    @ 08019d18 051c
+    ldr r0, DWORD_08019d98                   @ 08019d1a 1f48
+    str r0,[sp,#0x1c]                        @ 08019d1c 0790
+    movs r6,#0x0    @ 08019d1e 0026
+    movs r7,#0xe    @ 08019d20 0e27
+    str r6,[sp,#0x14]                        @ 08019d22 0596
+    bl FUN_08014b8c                          @ 08019d24 faf732ff
+    adds r1,r0,#0x0    @ 08019d28 011c
+    ldr r2, DWORD_08019d9c                   @ 08019d2a 1c4a
+    add r0,sp,#0x14                          @ 08019d2c 05a8
+    bl bios_cpu_fast_set                     @ 08019d2e f4f061fb
+    str r6,[sp,#0x18]                        @ 08019d32 0696
+    add r4,sp,#0x18                          @ 08019d34 06ac
+    bl FUN_08014a10                          @ 08019d36 faf76bfe
+    adds r1,r0,#0x0    @ 08019d3a 011c
+    adds r1,#0x20    @ 08019d3c 2031
+    ldr r2, DWORD_08019da0                   @ 08019d3e 184a
+    adds r0,r4,#0x0    @ 08019d40 201c
+    bl bios_cpu_fast_set                     @ 08019d42 f4f057fb
+    adds r0,r5,#0x0    @ 08019d46 281c
+    bl SUB_08019c44                          @ 08019d48 fff77cff
+    bl SUB_08019820                          @ 08019d4c fff768fd
+    movs r4,#0x3    @ 08019d50 0324
+LAB_08019d52:
+    ldr r0,[sp,#0x1c]                        @ 08019d52 0798
+    ldrb r0,[r0,#0x0]                        @ 08019d54 0078
+    cmp r0,#0x0                              @ 08019d56 0028
+    beq LAB_08019d72                         @ 08019d58 0bd0
+    movs r0,#0xf    @ 08019d5a 0f20
+    str r0,[sp,#0x0]                         @ 08019d5c 0090
+    add r0,sp,#0x1c                          @ 08019d5e 07a8
+    movs r1,#0x0    @ 08019d60 0021
+    adds r2,r4,#0x0    @ 08019d62 221c
+    adds r3,r7,#0x0    @ 08019d64 3b1c
+    bl FUN_08019ca4                          @ 08019d66 fff79dff
+    adds r4,r4,r7    @ 08019d6a e419
+    adds r6,#0x1    @ 08019d6c 0136
+    cmp r6,#0x6                              @ 08019d6e 062e
+    bne LAB_08019d52                         @ 08019d70 efd1
+LAB_08019d72:
+    bl FUN_08014b8c                          @ 08019d72 faf70bff
+    str r0,[sp,#0x0]                         @ 08019d76 0090
+    movs r1,#0x1    @ 08019d78 0121
+    str r1,[sp,#0x4]                         @ 08019d7a 0191
+    movs r0,#0x9    @ 08019d7c 0920
+    str r0,[sp,#0x8]                         @ 08019d7e 0290
+    str r1,[sp,#0xc]                         @ 08019d80 0391
+    str r1,[sp,#0x10]                        @ 08019d82 0491
+    movs r0,#0x0    @ 08019d84 0020
+    movs r1,#0x0    @ 08019d86 0021
+    movs r2,#0x19    @ 08019d88 1922
+    movs r3,#0xb    @ 08019d8a 0b23
+    bl FUN_080f00cc                          @ 08019d8c d6f09ef9
+    add sp,#0x20                             @ 08019d90 08b0
+    pop {r4,r5,r6,r7}                        @ 08019d92 f0bc
+    pop {r0}                                 @ 08019d94 01bc
+    bx r0                                    @ 08019d96 0047
+DWORD_08019d98:
+    .word  0x09e3bcb1                     @ 08019d98 b1bce309
+DWORD_08019d9c:
+    .word  0x01000200                     @ 08019d9c 00020001
+DWORD_08019da0:
+    .word  0x01000898                     @ 08019da0 98080001
+FUN_08019da4:
+    push {r4,r5,r6,r7,lr}                    @ 08019da4 f0b5
+    .hword 0x4657    @ 08019da6 5746
+    .hword 0x464e    @ 08019da8 4e46
+    .hword 0x4645    @ 08019daa 4546
+    push {r5,r6,r7}                          @ 08019dac e0b4
+    sub sp,#0x10                             @ 08019dae 84b0
+    str r0,[sp,#0xc]                         @ 08019db0 0390
+    .hword 0x4692    @ 08019db2 9246
+    adds r7,r3,#0x0    @ 08019db4 1f1c
+    ldr r0,[sp,#0x30]                        @ 08019db6 0c98
+    .hword 0x4681    @ 08019db8 8146
+    movs r5,#0x0    @ 08019dba 0025
+    ldr r0,[sp,#0xc]                         @ 08019dbc 0398
+    ldr r4,[r0,#0x0]                         @ 08019dbe 0468
+    .hword 0x46a8    @ 08019dc0 a846
+    ldrb r0,[r4,#0x0]                        @ 08019dc2 2078
+    cmp r0,#0x0                              @ 08019dc4 0028
+    beq LAB_08019e18                         @ 08019dc6 27d0
+    cmp r5,r9                                @ 08019dc8 4d45
+    bge LAB_08019e18                         @ 08019dca 25da
+    adds r6,r1,#0x0    @ 08019dcc 0e1c
+LAB_08019dce:
+    adds r0,r5,#0x0    @ 08019dce 281c
+    movs r1,#0x5    @ 08019dd0 0521
+    bl FUN_0810e69c                          @ 08019dd2 f4f063fc
+    cmp r0,#0x0                              @ 08019dd6 0028
+    bne LAB_08019de0                         @ 08019dd8 02d1
+    cmp r5,#0x0                              @ 08019dda 002d
+    beq LAB_08019de0                         @ 08019ddc 00d0
+    add r8,r7                                @ 08019dde b844
+LAB_08019de0:
+    adds r0,r4,#0x0    @ 08019de0 201c
+    add r1,sp,#0x8                           @ 08019de2 02a9
+    movs r2,#0x1    @ 08019de4 0122
+    bl banlist_password_enter_char           @ 08019de6 faf703fb
+    adds r0,r4,#0x0    @ 08019dea 201c
+    movs r1,#0x1    @ 08019dec 0121
+    bl FUN_080144e8                          @ 08019dee faf77bfb
+    adds r4,r0,#0x0    @ 08019df2 041c
+    .hword 0x4640    @ 08019df4 4046
+    adds r1,r6,r0    @ 08019df6 3118
+    movs r0,#0x8    @ 08019df8 0820
+    str r0,[sp,#0x0]                         @ 08019dfa 0090
+    movs r0,#0x0    @ 08019dfc 0020
+    str r0,[sp,#0x4]                         @ 08019dfe 0190
+    add r0,sp,#0x8                           @ 08019e00 02a8
+    .hword 0x4652    @ 08019e02 5246
+    movs r3,#0x7    @ 08019e04 0723
+    bl FUN_08019700                          @ 08019e06 fff77bfc
+    adds r6,r6,r7    @ 08019e0a f619
+    adds r5,#0x1    @ 08019e0c 0135
+    ldrb r0,[r4,#0x0]                        @ 08019e0e 2078
+    cmp r0,#0x0                              @ 08019e10 0028
+    beq LAB_08019e18                         @ 08019e12 01d0
+    cmp r5,r9                                @ 08019e14 4d45
+    blt LAB_08019dce                         @ 08019e16 dadb
+LAB_08019e18:
+    ldr r0,[sp,#0xc]                         @ 08019e18 0398
+    str r4,[r0,#0x0]                         @ 08019e1a 0460
+    add sp,#0x10                             @ 08019e1c 04b0
+    pop {r3,r4,r5}                           @ 08019e1e 38bc
+    .hword 0x4698    @ 08019e20 9846
+    .hword 0x46a1    @ 08019e22 a146
+    .hword 0x46aa    @ 08019e24 aa46
+    pop {r4,r5,r6,r7}                        @ 08019e26 f0bc
+    pop {r0}                                 @ 08019e28 01bc
+    bx r0                                    @ 08019e2a 0047
+FUN_08019e2c:
+    push {r4,r5,r6,lr}                       @ 08019e2c 70b5
+    .hword 0x464e    @ 08019e2e 4e46
+    .hword 0x4645    @ 08019e30 4546
+    push {r5,r6}                             @ 08019e32 60b4
+    sub sp,#0x1c                             @ 08019e34 87b0
+    .hword 0x4681    @ 08019e36 8146
+    ldr r5, DWORD_08019ec4                   @ 08019e38 224d
+    movs r4,#0xbd    @ 08019e3a bd24
+    lsls r4,r4,#0x5    @ 08019e3c 6401
+    movs r6,#0x0    @ 08019e3e 0026
+    str r6,[sp,#0x14]                        @ 08019e40 0596
+    bl FUN_08014bcc                          @ 08019e42 faf7c3fe
+    adds r1,r0,#0x0    @ 08019e46 011c
+    ldr r2, DWORD_08019ec8                   @ 08019e48 1f4a
+    add r0,sp,#0x14                          @ 08019e4a 05a8
+    bl bios_cpu_fast_set                     @ 08019e4c f4f0d2fa
+    str r6,[sp,#0x18]                        @ 08019e50 0696
+    add r0,sp,#0x18                          @ 08019e52 06a8
+    .hword 0x4680    @ 08019e54 8046
+    bl FUN_08014a50                          @ 08019e56 faf7fbfd
+    adds r1,r0,#0x0    @ 08019e5a 011c
+    .hword 0x4648    @ 08019e5c 4846
+    muls r0,r4    @ 08019e5e 6043
+    adds r0,#0x20    @ 08019e60 2030
+    adds r1,r1,r0    @ 08019e62 0918
+    asrs r4,r4,#0x2    @ 08019e64 a410
+    movs r0,#0x80    @ 08019e66 8020
+    lsls r0,r0,#0x11    @ 08019e68 4004
+    orrs r4,r0    @ 08019e6a 0443
+    .hword 0x4640    @ 08019e6c 4046
+    adds r2,r4,#0x0    @ 08019e6e 221c
+    bl bios_cpu_fast_set                     @ 08019e70 f4f0c0fa
+    ldr r1, DWORD_08019ecc                   @ 08019e74 1549
+    adds r0,r5,r1    @ 08019e76 6818
+    strb r6,[r0,#0x0]                        @ 08019e78 0670
+    ldr r0, DWORD_08019ed0                   @ 08019e7a 1548
+    adds r5,r5,r0    @ 08019e7c 2d18
+    ldrh r0,[r5,#0x0]                        @ 08019e7e 2888
+    adds r0,#0xe    @ 08019e80 0e30
+    movs r1,#0xf    @ 08019e82 0f21
+    bl FUN_0810e604                          @ 08019e84 f4f0befb
+    bl FUN_0801a718                          @ 08019e88 00f046fc
+    movs r0,#0x0    @ 08019e8c 0020
+    bl SUB_08019c90                          @ 08019e8e fff7fffe
+    movs r0,#0x0    @ 08019e92 0020
+    bl SUB_0801a484                          @ 08019e94 00f0f6fa
+    bl FUN_08014bcc                          @ 08019e98 faf798fe
+    str r0,[sp,#0x0]                         @ 08019e9c 0090
+    movs r0,#0x1    @ 08019e9e 0120
+    str r0,[sp,#0x4]                         @ 08019ea0 0190
+    str r6,[sp,#0x8]                         @ 08019ea2 0296
+    str r0,[sp,#0xc]                         @ 08019ea4 0390
+    str r0,[sp,#0x10]                        @ 08019ea6 0490
+    movs r0,#0x0    @ 08019ea8 0020
+    movs r1,#0x0    @ 08019eaa 0021
+    movs r2,#0x1b    @ 08019eac 1b22
+    movs r3,#0x15    @ 08019eae 1523
+    bl FUN_080f00cc                          @ 08019eb0 d6f00cf9
+    add sp,#0x1c                             @ 08019eb4 07b0
+    pop {r3,r4}                              @ 08019eb6 18bc
+    .hword 0x4698    @ 08019eb8 9846
+    .hword 0x46a1    @ 08019eba a146
+    pop {r4,r5,r6}                           @ 08019ebc 70bc
+    pop {r0}                                 @ 08019ebe 01bc
+    bx r0                                    @ 08019ec0 0047
+    .byte  0x00, 0x00
+DWORD_08019ec4:
+    .word  0x02029810                     @ 08019ec4 10980202
+DWORD_08019ec8:
+    .word  0x01000200                     @ 08019ec8 00020001
+DWORD_08019ecc:
+    .word  0x00000664                     @ 08019ecc 64060000
+DWORD_08019ed0:
+    .word  0x0000066e                     @ 08019ed0 6e060000
+FUN_08019ed4:
+    push {r4,lr}                             @ 08019ed4 10b5
+    adds r3,r0,#0x0    @ 08019ed6 031c
+    ldr r2, DWORD_08019f04                   @ 08019ed8 0a4a
+    ldr r0, DWORD_08019f08                   @ 08019eda 0b48
+    ldr r1, DWORD_08019f0c                   @ 08019edc 0b49
+    adds r0,r0,r1    @ 08019ede 4018
+    movs r1,#0x7    @ 08019ee0 0721
+    ldrb r0,[r0,#0x0]                        @ 08019ee2 0078
+    ands r1,r0    @ 08019ee4 0140
+    movs r4,#0x1    @ 08019ee6 0124
+    cmp r1,#0x0                              @ 08019ee8 0029
+    bne LAB_08019eee                         @ 08019eea 00d1
+    movs r4,#0x2    @ 08019eec 0224
+LAB_08019eee:
+    movs r1,#0x0    @ 08019eee 0021
+    ldrb r0,[r2,#0x0]                        @ 08019ef0 1078
+    cmp r0,#0x0                              @ 08019ef2 0028
+    beq LAB_08019f1a                         @ 08019ef4 11d0
+    lsls r0,r3,#0x4    @ 08019ef6 1801
+    subs r3,r0,r3    @ 08019ef8 c31a
+LAB_08019efa:
+    cmp r1,r3                                @ 08019efa 9942
+    bne LAB_08019f10                         @ 08019efc 08d1
+    adds r0,r2,#0x0    @ 08019efe 101c
+    b LAB_08019f1c                           @ 08019f00 0ce0
+    .byte  0x00, 0x00
+DWORD_08019f04:
+    .word  0x02029810                     @ 08019f04 10980202
+DWORD_08019f08:
+    .word  0x02000000                     @ 08019f08 00000002
+DWORD_08019f0c:
+    .word  0x00006c2c                     @ 08019f0c 2c6c0000
+LAB_08019f10:
+    adds r2,r2,r4    @ 08019f10 1219
+    adds r1,#0x1    @ 08019f12 0131
+    ldrb r0,[r2,#0x0]                        @ 08019f14 1078
+    cmp r0,#0x0                              @ 08019f16 0028
+    bne LAB_08019efa                         @ 08019f18 efd1
+LAB_08019f1a:
+    movs r0,#0x0    @ 08019f1a 0020
+LAB_08019f1c:
+    pop {r4}                                 @ 08019f1c 10bc
+    pop {r1}                                 @ 08019f1e 02bc
+    bx r1                                    @ 08019f20 0847
+    .byte  0x00, 0x00
+FUN_08019f24:
+    push {r4,r5,r6,r7,lr}                    @ 08019f24 f0b5
+    .hword 0x464f    @ 08019f26 4f46
+    .hword 0x4646    @ 08019f28 4646
+    push {r6,r7}                             @ 08019f2a c0b4
+    sub sp,#0x8                              @ 08019f2c 82b0
+    str r0,[sp,#0x4]                         @ 08019f2e 0190
+    adds r6,r1,#0x0    @ 08019f30 0e1c
+    movs r0,#0xc    @ 08019f32 0c20
+    .hword 0x4680    @ 08019f34 8046
+    movs r7,#0xe    @ 08019f36 0e27
+    bl SUB_080197dc                          @ 08019f38 fff750fc
+    adds r0,r6,#0x0    @ 08019f3c 301c
+    muls r0,r7    @ 08019f3e 7843
+    .hword 0x4681    @ 08019f40 8146
+    movs r5,#0x0    @ 08019f42 0025
+    movs r4,#0xe    @ 08019f44 0e24
+LAB_08019f46:
+    adds r0,r5,#0x0    @ 08019f46 281c
+    adds r1,r6,#0x0    @ 08019f48 311c
+    muls r1,r7    @ 08019f4a 7943
+    bl FUN_080f132c                          @ 08019f4c d7f0eef9
+    add r5,r8                                @ 08019f50 4544
+    subs r4,#0x1    @ 08019f52 013c
+    cmp r4,#0x0                              @ 08019f54 002c
+    bge LAB_08019f46                         @ 08019f56 f6da
+    movs r0,#0xf    @ 08019f58 0f20
+    str r0,[sp,#0x0]                         @ 08019f5a 0090
+    add r0,sp,#0x4                           @ 08019f5c 01a8
+    movs r1,#0x0    @ 08019f5e 0021
+    .hword 0x464a    @ 08019f60 4a46
+    .hword 0x4643    @ 08019f62 4346
+    bl FUN_08019da4                          @ 08019f64 fff71eff
+    add sp,#0x8                              @ 08019f68 02b0
+    pop {r3,r4}                              @ 08019f6a 18bc
+    .hword 0x4698    @ 08019f6c 9846
+    .hword 0x46a1    @ 08019f6e a146
+    pop {r4,r5,r6,r7}                        @ 08019f70 f0bc
+    pop {r0}                                 @ 08019f72 01bc
+    bx r0                                    @ 08019f74 0047
+    .byte  0x00, 0x00
+FUN_08019f78:
+    push {r4,r5,r6,r7,lr}                    @ 08019f78 f0b5
+    .hword 0x4647    @ 08019f7a 4746
+    push {r7}                                @ 08019f7c 80b4
+    sub sp,#0xc                              @ 08019f7e 83b0
+    adds r6,r1,#0x0    @ 08019f80 0e1c
+    movs r5,#0x0    @ 08019f82 0025
+    movs r1,#0xc    @ 08019f84 0c21
+    .hword 0x4688    @ 08019f86 8846
+    movs r7,#0xe    @ 08019f88 0e27
+    str r0,[sp,#0x8]                         @ 08019f8a 0290
+    movs r4,#0xbd    @ 08019f8c bd24
+    lsls r4,r4,#0x5    @ 08019f8e 6401
+    str r5,[sp,#0x4]                         @ 08019f90 0195
+    bl FUN_08014a50                          @ 08019f92 faf75dfd
+    adds r1,r0,#0x0    @ 08019f96 011c
+    adds r0,r6,#0x0    @ 08019f98 301c
+    muls r0,r4    @ 08019f9a 6043
+    adds r0,#0x20    @ 08019f9c 2030
+    adds r1,r1,r0    @ 08019f9e 0918
+    asrs r4,r4,#0x2    @ 08019fa0 a410
+    movs r0,#0x80    @ 08019fa2 8020
+    lsls r0,r0,#0x11    @ 08019fa4 4004
+    orrs r4,r0    @ 08019fa6 0443
+    add r0,sp,#0x4                           @ 08019fa8 01a8
+    adds r2,r4,#0x0    @ 08019faa 221c
+    bl bios_cpu_fast_set                     @ 08019fac f4f022fa
+    bl SUB_080197dc                          @ 08019fb0 fff714fc
+LAB_08019fb4:
+    ldr r0,[sp,#0x8]                         @ 08019fb4 0298
+    ldrb r0,[r0,#0x0]                        @ 08019fb6 0078
+    cmp r0,#0x0                              @ 08019fb8 0028
+    beq LAB_08019fd8                         @ 08019fba 0dd0
+    lsls r0,r6,#0x2    @ 08019fbc b000
+    adds r0,r0,r5    @ 08019fbe 4019
+    adds r2,r7,#0x0    @ 08019fc0 3a1c
+    muls r2,r0    @ 08019fc2 4243
+    movs r0,#0xf    @ 08019fc4 0f20
+    str r0,[sp,#0x0]                         @ 08019fc6 0090
+    add r0,sp,#0x8                           @ 08019fc8 02a8
+    movs r1,#0x0    @ 08019fca 0021
+    .hword 0x4643    @ 08019fcc 4346
+    bl FUN_08019da4                          @ 08019fce fff7e9fe
+    adds r5,#0x1    @ 08019fd2 0135
+    cmp r5,#0x4                              @ 08019fd4 042d
+    bne LAB_08019fb4                         @ 08019fd6 edd1
+LAB_08019fd8:
+    add sp,#0xc                              @ 08019fd8 03b0
+    pop {r3}                                 @ 08019fda 08bc
+    .hword 0x4698    @ 08019fdc 9846
+    pop {r4,r5,r6,r7}                        @ 08019fde f0bc
+    pop {r0}                                 @ 08019fe0 01bc
+    bx r0                                    @ 08019fe2 0047
+FUN_08019fe4:
+    push {r4,r5,r6,r7,lr}                    @ 08019fe4 f0b5
+    .hword 0x464f    @ 08019fe6 4f46
+    .hword 0x4646    @ 08019fe8 4646
+    push {r6,r7}                             @ 08019fea c0b4
+    .hword 0x4680    @ 08019fec 8046
+    ldr r7, DWORD_0801a00c                   @ 08019fee 074f
+    ldr r1, DWORD_0801a010                   @ 08019ff0 0749
+    adds r0,r7,r1    @ 08019ff2 7818
+    bl FUN_080154a4                          @ 08019ff4 fbf756fa
+    adds r5,r0,#0x0    @ 08019ff8 051c
+    .hword 0x46b9    @ 08019ffa b946
+    movs r0,#0x1    @ 08019ffc 0120
+    rsbs r0,r0,#0    @ 08019ffe 4042
+    cmp r8,r0                                @ 0801a000 8045
+    beq LAB_0801a014                         @ 0801a002 07d0
+    .hword 0x4642    @ 0801a004 4246
+    cmp r2,#0x1                              @ 0801a006 012a
+    beq LAB_0801a098                         @ 0801a008 46d0
+    b LAB_0801a142                           @ 0801a00a 9ae0
+DWORD_0801a00c:
+    .word  0x02029810                     @ 0801a00c 10980202
+DWORD_0801a010:
+    .word  0x0000064c                     @ 0801a010 4c060000
+LAB_0801a014:
+    ldr r0, DWORD_0801a064                   @ 0801a014 1348
+    adds r6,r7,r0    @ 0801a016 3e18
+    ldrb r1,[r6,#0x0]                        @ 0801a018 3178
+    lsls r0,r1,#0x1c    @ 0801a01a 0807
+    lsrs r0,r0,#0x1c    @ 0801a01c 000f
+    adds r0,#0x1    @ 0801a01e 0130
+    movs r1,#0x3    @ 0801a020 0321
+    bl FUN_0810e69c                          @ 0801a022 f4f03bfb
+    adds r4,r0,#0x0    @ 0801a026 041c
+    cmp r4,#0x0                              @ 0801a028 002c
+    bne LAB_0801a068                         @ 0801a02a 1dd1
+    cmp r5,#0x0                              @ 0801a02c 002d
+    beq LAB_0801a068                         @ 0801a02e 1bd0
+    subs r0,r5,#0x4    @ 0801a030 281f
+    lsls r1,r0,#0x4    @ 0801a032 0101
+    subs r1,r1,r0    @ 0801a034 091a
+    adds r0,r7,#0x0    @ 0801a036 381c
+    bl FUN_080144e8                          @ 0801a038 faf756fa
+    movs r1,#0x0    @ 0801a03c 0021
+    bl FUN_08019f78                          @ 0801a03e fff79bff
+    movs r0,#0x10    @ 0801a042 1020
+    rsbs r0,r0,#0    @ 0801a044 4042
+    ldrb r2,[r6,#0x0]                        @ 0801a046 3278
+    ands r0,r2    @ 0801a048 1040
+    movs r1,#0x1    @ 0801a04a 0121
+    orrs r0,r1    @ 0801a04c 0843
+    strb r0,[r6,#0x0]                        @ 0801a04e 3070
+    .hword 0x4640    @ 0801a050 4046
+    bl FUN_0801a16c                          @ 0801a052 00f08bf8
+    bl FUN_0801a1ac                          @ 0801a056 00f0a9f8
+    lsls r1,r5,#0x4    @ 0801a05a 2901
+    subs r1,r1,r5    @ 0801a05c 491b
+    adds r0,r7,#0x0    @ 0801a05e 381c
+    b LAB_0801a106                           @ 0801a060 51e0
+    .byte  0x00, 0x00
+DWORD_0801a064:
+    .word  0x00000663                     @ 0801a064 63060000
+LAB_0801a068:
+    lsls r1,r5,#0x4    @ 0801a068 2901
+    subs r1,r1,r5    @ 0801a06a 491b
+    .hword 0x4648    @ 0801a06c 4846
+    bl FUN_080144e8                          @ 0801a06e faf73bfa
+    adds r1,r4,#0x0    @ 0801a072 211c
+    bl FUN_08019f78                          @ 0801a074 fff780ff
+    ldr r0, DWORD_0801a094                   @ 0801a078 0648
+    adds r1,r7,r0    @ 0801a07a 3918
+    movs r0,#0xf    @ 0801a07c 0f20
+    ands r4,r0    @ 0801a07e 0440
+    movs r0,#0x10    @ 0801a080 1020
+    rsbs r0,r0,#0    @ 0801a082 4042
+    ldrb r2,[r1,#0x0]                        @ 0801a084 0a78
+    ands r0,r2    @ 0801a086 1040
+    orrs r0,r4    @ 0801a088 2043
+    strb r0,[r1,#0x0]                        @ 0801a08a 0870
+    .hword 0x4640    @ 0801a08c 4046
+    bl FUN_0801a16c                          @ 0801a08e 00f06df8
+    b LAB_0801a142                           @ 0801a092 56e0
+DWORD_0801a094:
+    .word  0x00000663                     @ 0801a094 63060000
+LAB_0801a098:
+    ldr r0, DWORD_0801a0b0                   @ 0801a098 0548
+    adds r3,r7,r0    @ 0801a09a 3b18
+    ldrb r2,[r3,#0x0]                        @ 0801a09c 1a78
+    lsls r0,r2,#0x1c    @ 0801a09e 1007
+    lsrs r0,r0,#0x1c    @ 0801a0a0 000f
+    cmp r0,#0x0                              @ 0801a0a2 0028
+    bne LAB_0801a0b4                         @ 0801a0a4 06d1
+    movs r0,#0x10    @ 0801a0a6 1020
+    rsbs r0,r0,#0    @ 0801a0a8 4042
+    ands r0,r2    @ 0801a0aa 1040
+    movs r1,#0x2    @ 0801a0ac 0221
+    b LAB_0801a0c0                           @ 0801a0ae 07e0
+DWORD_0801a0b0:
+    .word  0x00000663                     @ 0801a0b0 63060000
+LAB_0801a0b4:
+    subs r1,r0,#0x1    @ 0801a0b4 411e
+    movs r0,#0xf    @ 0801a0b6 0f20
+    ands r1,r0    @ 0801a0b8 0140
+    movs r0,#0x10    @ 0801a0ba 1020
+    rsbs r0,r0,#0    @ 0801a0bc 4042
+    ands r0,r2    @ 0801a0be 1040
+LAB_0801a0c0:
+    orrs r0,r1    @ 0801a0c0 0843
+    strb r0,[r3,#0x0]                        @ 0801a0c2 1870
+    ldr r1, DWORD_0801a114                   @ 0801a0c4 1349
+    adds r6,r7,r1    @ 0801a0c6 7e18
+    ldrb r2,[r6,#0x0]                        @ 0801a0c8 3278
+    lsls r0,r2,#0x1c    @ 0801a0ca 1007
+    lsrs r4,r0,#0x1c    @ 0801a0cc 040f
+    cmp r4,#0x2                              @ 0801a0ce 022c
+    bne LAB_0801a118                         @ 0801a0d0 22d1
+    cmp r5,#0x0                              @ 0801a0d2 002d
+    beq LAB_0801a118                         @ 0801a0d4 20d0
+    adds r0,r5,#0x4    @ 0801a0d6 281d
+    lsls r1,r0,#0x4    @ 0801a0d8 0101
+    subs r1,r1,r0    @ 0801a0da 091a
+    .hword 0x4648    @ 0801a0dc 4846
+    bl FUN_080144e8                          @ 0801a0de faf703fa
+    movs r1,#0x2    @ 0801a0e2 0221
+    bl FUN_08019f78                          @ 0801a0e4 fff748ff
+    movs r0,#0x10    @ 0801a0e8 1020
+    rsbs r0,r0,#0    @ 0801a0ea 4042
+    ldrb r1,[r6,#0x0]                        @ 0801a0ec 3178
+    ands r0,r1    @ 0801a0ee 0840
+    movs r1,#0x1    @ 0801a0f0 0121
+    orrs r0,r1    @ 0801a0f2 0843
+    strb r0,[r6,#0x0]                        @ 0801a0f4 3070
+    .hword 0x4640    @ 0801a0f6 4046
+    bl FUN_0801a16c                          @ 0801a0f8 00f038f8
+    bl FUN_0801a1ac                          @ 0801a0fc 00f056f8
+    lsls r1,r5,#0x4    @ 0801a100 2901
+    subs r1,r1,r5    @ 0801a102 491b
+    .hword 0x4648    @ 0801a104 4846
+LAB_0801a106:
+    bl FUN_080144e8                          @ 0801a106 faf7eff9
+    movs r1,#0x1    @ 0801a10a 0121
+    bl FUN_08019f78                          @ 0801a10c fff734ff
+    b LAB_0801a142                           @ 0801a110 17e0
+    .byte  0x00, 0x00
+DWORD_0801a114:
+    .word  0x00000663                     @ 0801a114 63060000
+LAB_0801a118:
+    lsls r1,r5,#0x4    @ 0801a118 2901
+    subs r1,r1,r5    @ 0801a11a 491b
+    .hword 0x4648    @ 0801a11c 4846
+    bl FUN_080144e8                          @ 0801a11e faf7e3f9
+    adds r1,r4,#0x0    @ 0801a122 211c
+    bl FUN_08019f78                          @ 0801a124 fff728ff
+    ldr r2, DWORD_0801a150                   @ 0801a128 094a
+    adds r1,r7,r2    @ 0801a12a b918
+    movs r0,#0xf    @ 0801a12c 0f20
+    ands r4,r0    @ 0801a12e 0440
+    movs r0,#0x10    @ 0801a130 1020
+    rsbs r0,r0,#0    @ 0801a132 4042
+    ldrb r2,[r1,#0x0]                        @ 0801a134 0a78
+    ands r0,r2    @ 0801a136 1040
+    orrs r0,r4    @ 0801a138 2043
+    strb r0,[r1,#0x0]                        @ 0801a13a 0870
+    .hword 0x4640    @ 0801a13c 4046
+    bl FUN_0801a16c                          @ 0801a13e 00f015f8
+LAB_0801a142:
+    pop {r3,r4}                              @ 0801a142 18bc
+    .hword 0x4698    @ 0801a144 9846
+    .hword 0x46a1    @ 0801a146 a146
+    pop {r4,r5,r6,r7}                        @ 0801a148 f0bc
+    pop {r0}                                 @ 0801a14a 01bc
+    bx r0                                    @ 0801a14c 0047
+    .byte  0x00, 0x00
+DWORD_0801a150:
+    .word  0x00000663                     @ 0801a150 63060000
+    ROM_INCBIN 0x1a154, 0x18
+FUN_0801a16c:
+    push {r4,r5,lr}                          @ 0801a16c 30b5
+    adds r4,r0,#0x0    @ 0801a16e 041c
+    ldr r5, DWORD_0801a198                   @ 0801a170 094d
+    cmp r4,#0x1                              @ 0801a172 012c
+    beq LAB_0801a18a                         @ 0801a174 09d0
+    movs r0,#0x1    @ 0801a176 0120
+    rsbs r0,r0,#0    @ 0801a178 4042
+    cmp r4,r0                                @ 0801a17a 8442
+    beq LAB_0801a18a                         @ 0801a17c 05d0
+    ldr r0, DWORD_0801a19c                   @ 0801a17e 0748
+    ldr r1, DWORD_0801a1a0                   @ 0801a180 0749
+    ldr r2, DWORD_0801a1a4                   @ 0801a182 084a
+    movs r3,#0x1    @ 0801a184 0123
+    bl FUN_080fa4dc                          @ 0801a186 e0f0a9f9
+LAB_0801a18a:
+    lsls r1,r4,#0x4    @ 0801a18a 2101
+    ldr r2, DWORD_0801a1a8                   @ 0801a18c 064a
+    adds r0,r5,r2    @ 0801a18e a818
+    strb r1,[r0,#0x0]                        @ 0801a190 0170
+    pop {r4,r5}                              @ 0801a192 30bc
+    pop {r0}                                 @ 0801a194 01bc
+    bx r0                                    @ 0801a196 0047
+DWORD_0801a198:
+    .word  0x02029810                     @ 0801a198 10980202
+DWORD_0801a19c:
+    .word  0x09e3c584                     @ 0801a19c 84c5e309
+DWORD_0801a1a0:
+    .word  0x000002cd                     @ 0801a1a0 cd020000
+DWORD_0801a1a4:
+    .word  0x09e3c59c                     @ 0801a1a4 9cc5e309
+DWORD_0801a1a8:
+    .word  0x00000666                     @ 0801a1a8 66060000
+FUN_0801a1ac:
+    push {r4,lr}                             @ 0801a1ac 10b5
+    ldr r2, DWORD_0801a1e4                   @ 0801a1ae 0d4a
+    ldr r1, DWORD_0801a1e8                   @ 0801a1b0 0d49
+    adds r0,r2,r1    @ 0801a1b2 5018
+    ldrb r0,[r0,#0x0]                        @ 0801a1b4 0078
+    lsls r0,r0,#0x1c    @ 0801a1b6 0007
+    lsrs r0,r0,#0x1c    @ 0801a1b8 000f
+    movs r1,#0x38    @ 0801a1ba 3821
+    adds r3,r0,#0x0    @ 0801a1bc 031c
+    muls r3,r1    @ 0801a1be 4b43
+    ldr r0, DWORD_0801a1ec                   @ 0801a1c0 0a48
+    adds r2,r2,r0    @ 0801a1c2 1218
+    ldrb r0,[r2,#0x0]                        @ 0801a1c4 1078
+    movs r1,#0x0    @ 0801a1c6 0021
+    ldrsb r1,[r2,r1]                         @ 0801a1c8 5156
+    cmp r1,#0x0                              @ 0801a1ca 0029
+    beq LAB_0801a214                         @ 0801a1cc 22d0
+    cmp r1,#0x0                              @ 0801a1ce 0029
+    ble LAB_0801a1f0                         @ 0801a1d0 0edd
+    cmp r1,#0x0                              @ 0801a1d2 0029
+    ble LAB_0801a1f0                         @ 0801a1d4 0cdd
+    subs r0,#0x1    @ 0801a1d6 0138
+    strb r0,[r2,#0x0]                        @ 0801a1d8 1070
+    adds r4,r1,#0x0    @ 0801a1da 0c1c
+    movs r2,#0x1    @ 0801a1dc 0122
+    rsbs r2,r2,#0    @ 0801a1de 5242
+    adds r3,#0x38    @ 0801a1e0 3833
+    b LAB_0801a1fa                           @ 0801a1e2 0ae0
+DWORD_0801a1e4:
+    .word  0x02029810                     @ 0801a1e4 10980202
+DWORD_0801a1e8:
+    .word  0x00000663                     @ 0801a1e8 63060000
+DWORD_0801a1ec:
+    .word  0x00000666                     @ 0801a1ec 66060000
+LAB_0801a1f0:
+    adds r0,#0x1    @ 0801a1f0 0130
+    strb r0,[r2,#0x0]                        @ 0801a1f2 1070
+    adds r4,r1,#0x0    @ 0801a1f4 0c1c
+    movs r2,#0x1    @ 0801a1f6 0122
+    subs r3,#0x38    @ 0801a1f8 383b
+LAB_0801a1fa:
+    movs r0,#0x38    @ 0801a1fa 3820
+    muls r2,r0    @ 0801a1fc 4243
+    cmp r1,#0x0                              @ 0801a1fe 0029
+    bge LAB_0801a204                         @ 0801a200 00da
+    rsbs r1,r4,#0    @ 0801a202 6142
+LAB_0801a204:
+    movs r0,#0x10    @ 0801a204 1020
+    subs r0,r0,r1    @ 0801a206 401a
+    muls r0,r2    @ 0801a208 5043
+    cmp r0,#0x0                              @ 0801a20a 0028
+    bge LAB_0801a210                         @ 0801a20c 00da
+    adds r0,#0xf    @ 0801a20e 0f30
+LAB_0801a210:
+    asrs r0,r0,#0x4    @ 0801a210 0011
+    adds r3,r3,r0    @ 0801a212 1b18
+LAB_0801a214:
+    adds r0,r3,#0x0    @ 0801a214 181c
+    movs r1,#0xff    @ 0801a216 ff21
+    bl FUN_0810e69c                          @ 0801a218 f4f040fa
+    adds r4,r0,#0x0    @ 0801a21c 041c
+    bl SUB_08019c90                          @ 0801a21e fff737fd
+    adds r0,r4,#0x0    @ 0801a222 201c
+    bl SUB_0801a484                          @ 0801a224 00f02ef9
+    pop {r4}                                 @ 0801a228 10bc
+    pop {r0}                                 @ 0801a22a 01bc
+    bx r0                                    @ 0801a22c 0047
+    .byte  0x00, 0x00
+FUN_0801a230:
+    push {r4,r5,r6,r7,lr}                    @ 0801a230 f0b5
+    .hword 0x4647    @ 0801a232 4746
+    push {r7}                                @ 0801a234 80b4
+    sub sp,#0x14                             @ 0801a236 85b0
+    ldr r0, DWORD_0801a308                   @ 0801a238 3348
+    bl FUN_080f4e18                          @ 0801a23a daf0edfd
+    ldr r3, DWORD_0801a30c                   @ 0801a23e 334b
+    lsls r0,r0,#0x10    @ 0801a240 0004
+    lsrs r0,r0,#0x10    @ 0801a242 000c
+    lsls r1,r0,#0x1    @ 0801a244 4100
+    adds r1,r1,r0    @ 0801a246 0918
+    lsls r1,r1,#0x1    @ 0801a248 4900
+    ldr r0, DWORD_0801a310                   @ 0801a24a 3148
+    ldr r2, DWORD_0801a314                   @ 0801a24c 314a
+    adds r0,r0,r2    @ 0801a24e 8018
+    ldrb r2,[r0,#0x0]                        @ 0801a250 0278
+    lsls r0,r2,#0x1d    @ 0801a252 5007
+    lsrs r0,r0,#0x1d    @ 0801a254 400f
+    adds r1,r1,r0    @ 0801a256 0918
+    lsls r1,r1,#0x2    @ 0801a258 8900
+    adds r1,r1,r3    @ 0801a25a c918
+    ldr r1,[r1,#0x0]                         @ 0801a25c 0968
+    ldr r0, DWORD_0801a318                   @ 0801a25e 2e48
+    adds r7,r1,r0    @ 0801a260 0f18
+    movs r0,#0x7    @ 0801a262 0720
+    .hword 0x4680    @ 0801a264 8046
+    ands r0,r2    @ 0801a266 1040
+    movs r6,#0xc    @ 0801a268 0c26
+    cmp r0,#0x0                              @ 0801a26a 0028
+    bne LAB_0801a270                         @ 0801a26c 00d1
+    movs r6,#0xa    @ 0801a26e 0a26
+LAB_0801a270:
+    rsbs r4,r0,#0    @ 0801a270 4442
+    orrs r4,r0    @ 0801a272 0443
+    lsrs r4,r4,#0x1f    @ 0801a274 e40f
+    adds r0,r7,#0x0    @ 0801a276 381c
+    bl FUN_0801455c                          @ 0801a278 faf770f9
+    adds r5,r0,#0x0    @ 0801a27c 051c
+    adds r0,r6,#0x0    @ 0801a27e 301c
+    bl SUB_0801b77c                          @ 0801a280 01f07cfa
+    muls r5,r0    @ 0801a284 4543
+    ldr r0, DWORD_0801a31c                   @ 0801a286 2548
+    movs r1,#0x18    @ 0801a288 1821
+    movs r2,#0x2    @ 0801a28a 0222
+    bl FUN_080f42b4                          @ 0801a28c daf012f8
+    ldr r2, DWORD_0801a320                   @ 0801a290 234a
+    movs r0,#0x20    @ 0801a292 2020
+    ldrb r1,[r2,#0x15]                       @ 0801a294 517d
+    orrs r0,r1    @ 0801a296 0843
+    strb r0,[r2,#0x15]                       @ 0801a298 5075
+    lsls r4,r4,#0x1    @ 0801a29a 6400
+    movs r0,#0x3    @ 0801a29c 0320
+    rsbs r0,r0,#0    @ 0801a29e 4042
+    ldrb r1,[r2,#0x8]                        @ 0801a2a0 117a
+    ands r0,r1    @ 0801a2a2 0840
+    orrs r0,r4    @ 0801a2a4 2043
+    strb r0,[r2,#0x8]                        @ 0801a2a6 1072
+    ldr r3, DWORD_0801a324                   @ 0801a2a8 1e4b
+    lsls r1,r0,#0x1e    @ 0801a2aa 8107
+    lsrs r1,r1,#0x1f    @ 0801a2ac c90f
+    lsls r1,r1,#0x2    @ 0801a2ae 8900
+    lsls r0,r0,#0x1f    @ 0801a2b0 c007
+    lsrs r0,r0,#0x1f    @ 0801a2b2 c00f
+    lsls r0,r0,#0x3    @ 0801a2b4 c000
+    adds r1,r1,r0    @ 0801a2b6 0918
+    adds r1,r1,r3    @ 0801a2b8 c918
+    ldr r0,[r1,#0x0]                         @ 0801a2ba 0868
+    str r0,[r2,#0x4]                         @ 0801a2bc 5060
+    lsrs r0,r5,#0x1f    @ 0801a2be e80f
+    adds r5,r5,r0    @ 0801a2c0 2d18
+    asrs r5,r5,#0x1    @ 0801a2c2 6d10
+    movs r1,#0x61    @ 0801a2c4 6121
+    subs r1,r1,r5    @ 0801a2c6 491b
+    .hword 0x4642    @ 0801a2c8 4246
+    str r2,[sp,#0x0]                         @ 0801a2ca 0092
+    movs r4,#0x0    @ 0801a2cc 0024
+    str r4,[sp,#0x4]                         @ 0801a2ce 0194
+    adds r0,r7,#0x0    @ 0801a2d0 381c
+    movs r2,#0x3    @ 0801a2d2 0322
+    movs r3,#0x8    @ 0801a2d4 0823
+    bl FUN_08019700                          @ 0801a2d6 fff713fa
+    bl FUN_08014b8c                          @ 0801a2da faf757fc
+    str r0,[sp,#0x0]                         @ 0801a2de 0090
+    movs r0,#0x3    @ 0801a2e0 0320
+    str r0,[sp,#0x4]                         @ 0801a2e2 0190
+    str r4,[sp,#0x8]                         @ 0801a2e4 0294
+    movs r0,#0x8a    @ 0801a2e6 8a20
+    lsls r0,r0,#0x1    @ 0801a2e8 4000
+    str r0,[sp,#0xc]                         @ 0801a2ea 0390
+    movs r0,#0x1    @ 0801a2ec 0120
+    str r0,[sp,#0x10]                        @ 0801a2ee 0490
+    movs r0,#0x0    @ 0801a2f0 0020
+    movs r1,#0x0    @ 0801a2f2 0021
+    movs r2,#0x18    @ 0801a2f4 1822
+    movs r3,#0x2    @ 0801a2f6 0223
+    bl FUN_080f00cc                          @ 0801a2f8 d5f0e8fe
+    add sp,#0x14                             @ 0801a2fc 05b0
+    pop {r3}                                 @ 0801a2fe 08bc
+    .hword 0x4698    @ 0801a300 9846
+    pop {r4,r5,r6,r7}                        @ 0801a302 f0bc
+    pop {r0}                                 @ 0801a304 01bc
+    bx r0                                    @ 0801a306 0047
+DWORD_0801a308:
+    .word  0x00001037                     @ 0801a308 37100000
+DWORD_0801a30c:
+    .word  0x08000f40                     @ 0801a30c 400f0008
+DWORD_0801a310:
+    .word  0x02000000                     @ 0801a310 00000002
+DWORD_0801a314:
+    .word  0x00006c2c                     @ 0801a314 2c6c0000
+DWORD_0801a318:
+    .word  0x09db9c10                     @ 0801a318 109cdb09
+DWORD_0801a31c:
+    .word  0x06002280                     @ 0801a31c 80220006
+DWORD_0801a320:
+    .word  0x02006ed0                     @ 0801a320 d06e0002
+DWORD_0801a324:
+    .word  0x09e5f854                     @ 0801a324 54f8e509
+FUN_0801a328:
+    push {r4,r5,r6,lr}                       @ 0801a328 70b5
+    .hword 0x4656    @ 0801a32a 5646
+    .hword 0x464d    @ 0801a32c 4d46
+    .hword 0x4644    @ 0801a32e 4446
+    push {r4,r5,r6}                          @ 0801a330 70b4
+    sub sp,#0x6c                             @ 0801a332 9bb0
+    ldr r0, DWORD_0801a454                   @ 0801a334 4748
+    .hword 0x4681    @ 0801a336 8146
+    add r1,sp,#0x14                          @ 0801a338 05a9
+    ldr r0, DWORD_0801a458                   @ 0801a33a 4748
+    ldmia r0!,{r2,r3,r4}                     @ 0801a33c 1cc8
+    stmia r1!,{r2,r3,r4}                     @ 0801a33e 1cc1
+    ldr r0,[r0,#0x0]                         @ 0801a340 0068
+    str r0,[r1,#0x0]                         @ 0801a342 0860
+    ldr r0, DWORD_0801a45c                   @ 0801a344 4548
+    add r0,r9                                @ 0801a346 4844
+    movs r1,#0xb5    @ 0801a348 b521
+    lsls r1,r1,#0x3    @ 0801a34a c900
+    add r1,r9                                @ 0801a34c 4944
+    ldr r2, DWORD_0801a460                   @ 0801a34e 444a
+    add r2,r9                                @ 0801a350 4a44
+    movs r3,#0x0    @ 0801a352 0023
+    .hword 0x469a    @ 0801a354 9a46
+    str r3,[sp,#0x0]                         @ 0801a356 0093
+    movs r3,#0x1    @ 0801a358 0123
+    str r3,[sp,#0x4]                         @ 0801a35a 0193
+    add r4,sp,#0x14                          @ 0801a35c 05ac
+    str r4,[sp,#0x8]                         @ 0801a35e 0294
+    .hword 0x4653    @ 0801a360 5346
+    str r3,[sp,#0xc]                         @ 0801a362 0393
+    movs r3,#0x80    @ 0801a364 8023
+    lsls r3,r3,#0x2    @ 0801a366 9b00
+    str r3,[sp,#0x10]                        @ 0801a368 0493
+    movs r3,#0x0    @ 0801a36a 0023
+    bl FUN_08015d30                          @ 0801a36c fbf7e0fc
+    add r4,sp,#0x24                          @ 0801a370 09ac
+    adds r0,r4,#0x0    @ 0801a372 201c
+    bl FUN_08015fc8                          @ 0801a374 fbf728fe
+    ldr r0, DWORD_0801a464                   @ 0801a378 3a48
+    movs r1,#0x0    @ 0801a37a 0021
+    bl fs_load                               @ 0801a37c faf714fe
+    str r0,[sp,#0x24]                        @ 0801a380 0990
+    movs r5,#0x10    @ 0801a382 1025
+    rsbs r5,r5,#0    @ 0801a384 6d42
+    adds r0,r5,#0x0    @ 0801a386 281c
+    ldrb r1,[r4,#0x14]                       @ 0801a388 217d
+    ands r0,r1    @ 0801a38a 0840
+    movs r1,#0x1    @ 0801a38c 0121
+    orrs r0,r1    @ 0801a38e 0843
+    strb r0,[r4,#0x14]                       @ 0801a390 2075
+    movs r2,#0x80    @ 0801a392 8022
+    rsbs r2,r2,#0    @ 0801a394 5242
+    .hword 0x4690    @ 0801a396 9046
+    .hword 0x4640    @ 0801a398 4046
+    ldrb r3,[r4,#0x18]                       @ 0801a39a 237e
+    ands r0,r3    @ 0801a39c 1840
+    strb r0,[r4,#0x18]                       @ 0801a39e 2076
+    ldr r6, DWORD_0801a468                   @ 0801a3a0 314e
+    adds r0,r6,#0x0    @ 0801a3a2 301c
+    ldrh r1,[r4,#0x18]                       @ 0801a3a4 218b
+    ands r0,r1    @ 0801a3a6 0840
+    strh r0,[r4,#0x18]                       @ 0801a3a8 2083
+    .hword 0x4652    @ 0801a3aa 5246
+    str r2,[r4,#0x8]                         @ 0801a3ac a260
+    movs r0,#0x40    @ 0801a3ae 4020
+    str r0,[r4,#0xc]                         @ 0801a3b0 e060
+    strh r0,[r4,#0x10]                       @ 0801a3b2 2082
+    adds r0,r4,#0x0    @ 0801a3b4 201c
+    bl FUN_08016a7c                          @ 0801a3b6 fcf761fb
+    add r4,sp,#0x48                          @ 0801a3ba 12ac
+    adds r0,r4,#0x0    @ 0801a3bc 201c
+    bl FUN_08015fc8                          @ 0801a3be fbf703fe
+    ldr r0, DWORD_0801a46c                   @ 0801a3c2 2a48
+    movs r1,#0x0    @ 0801a3c4 0021
+    bl fs_load                               @ 0801a3c6 faf7effd
+    str r0,[sp,#0x48]                        @ 0801a3ca 1290
+    ldrb r3,[r4,#0x14]                       @ 0801a3cc 237d
+    ands r5,r3    @ 0801a3ce 1d40
+    movs r0,#0x3    @ 0801a3d0 0320
+    orrs r5,r0    @ 0801a3d2 0543
+    strb r5,[r4,#0x14]                       @ 0801a3d4 2575
+    ldrb r0,[r4,#0x18]                       @ 0801a3d6 207e
+    .hword 0x4641    @ 0801a3d8 4146
+    ands r0,r1    @ 0801a3da 0840
+    strb r0,[r4,#0x18]                       @ 0801a3dc 2076
+    ldrh r2,[r4,#0x18]                       @ 0801a3de 228b
+    ands r6,r2    @ 0801a3e0 1640
+    strh r6,[r4,#0x18]                       @ 0801a3e2 2683
+    .hword 0x4653    @ 0801a3e4 5346
+    str r3,[r4,#0x8]                         @ 0801a3e6 a360
+    movs r0,#0xcc    @ 0801a3e8 cc20
+    lsls r0,r0,#0x4    @ 0801a3ea 0001
+    str r0,[r4,#0xc]                         @ 0801a3ec e060
+    strh r3,[r4,#0x10]                       @ 0801a3ee 2382
+    adds r0,r4,#0x0    @ 0801a3f0 201c
+    bl FUN_08016a7c                          @ 0801a3f2 fcf743fb
+    ldr r4, DWORD_0801a470                   @ 0801a3f6 1e4c
+    ldr r1, DWORD_0801a474                   @ 0801a3f8 1e49
+    ldr r5, DWORD_0801a478                   @ 0801a3fa 1f4d
+    adds r0,r4,#0x0    @ 0801a3fc 201c
+    adds r2,r5,#0x0    @ 0801a3fe 2a1c
+    bl bios_cpu_set                          @ 0801a400 f3f0faff
+    ldr r1, DWORD_0801a47c                   @ 0801a404 1d49
+    adds r0,r4,#0x0    @ 0801a406 201c
+    adds r2,r5,#0x0    @ 0801a408 2a1c
+    bl bios_cpu_set                          @ 0801a40a f3f0f5ff
+    bl FUN_080198d8                          @ 0801a40e fff763fa
+    movs r0,#0xcc    @ 0801a412 cc20
+    lsls r0,r0,#0x3    @ 0801a414 c000
+    add r0,r9                                @ 0801a416 4844
+    ldrb r0,[r0,#0x0]                        @ 0801a418 0078
+    lsls r0,r0,#0x1a    @ 0801a41a 8006
+    lsrs r0,r0,#0x1d    @ 0801a41c 400f
+    bl FUN_08019d14                          @ 0801a41e fff779fc
+    movs r0,#0x0    @ 0801a422 0020
+    movs r1,#0x0    @ 0801a424 0021
+    bl FUN_08019e2c                          @ 0801a426 fff701fd
+    ldr r0, DWORD_0801a480                   @ 0801a42a 1548
+    movs r4,#0xc6    @ 0801a42c c624
+    lsls r4,r4,#0x3    @ 0801a42e e400
+    add r9,r4                                @ 0801a430 a144
+    .hword 0x4649    @ 0801a432 4946
+    movs r2,#0x2    @ 0801a434 0222
+    bl bios_cpu_set                          @ 0801a436 f3f0dfff
+    bl FUN_08019b4c                          @ 0801a43a fff787fb
+    bl FUN_0801a230                          @ 0801a43e fff7f7fe
+    movs r0,#0x1    @ 0801a442 0120
+    add sp,#0x6c                             @ 0801a444 1bb0
+    pop {r3,r4,r5}                           @ 0801a446 38bc
+    .hword 0x4698    @ 0801a448 9846
+    .hword 0x46a1    @ 0801a44a a146
+    .hword 0x46aa    @ 0801a44c aa46
+    pop {r4,r5,r6}                           @ 0801a44e 70bc
+    pop {r1}                                 @ 0801a450 02bc
+    bx r1                                    @ 0801a452 0847
+DWORD_0801a454:
+    .word  0x02029810                     @ 0801a454 10980202
+DWORD_0801a458:
+    .word  0x09e3c624                     @ 0801a458 24c6e309
+DWORD_0801a45c:
+    .word  0x000005a4                     @ 0801a45c a4050000
+DWORD_0801a460:
+    .word  0x000005ac                     @ 0801a460 ac050000
+DWORD_0801a464:
+    .word  0x09e3c634                     @ 0801a464 34c6e309
+DWORD_0801a468:
+    .word  0xffffc07f                     @ 0801a468 7fc0ffff
+DWORD_0801a46c:
+    .word  0x09e3c650                     @ 0801a46c 50c6e309
+DWORD_0801a470:
+    .word  0x09ccd290                     @ 0801a470 90d2cc09
+DWORD_0801a474:
+    .word  0x05000020                     @ 0801a474 20000005
+DWORD_0801a478:
+    .word  0x04000008                     @ 0801a478 08000004
+DWORD_0801a47c:
+    .word  0x05000220                     @ 0801a47c 20020005
+DWORD_0801a480:
+    .word  0x05000202                     @ 0801a480 02020005
+SUB_0801a484:
+    ldr r1, DWORD_0801a48c                   @ 0801a484 0149
+    subs r0,#0xe    @ 0801a486 0e38
+    strh r0,[r1,#0x0]                        @ 0801a488 0880
+    bx lr                                    @ 0801a48a 7047
+DWORD_0801a48c:
+    .word  0x0400001e                     @ 0801a48c 1e000004
+    .byte  0x01, 0x49, 0x04, 0x38, 0x08, 0x80, 0x70, 0x47, 0x16, 0x00, 0x00, 0x04
 FUN_0801a49c:
     push {r4,r5,r6,r7,lr}                    @ 0801a49c f0b5
     sub sp,#0x2c                             @ 0801a49e 8bb0
@@ -12275,7 +13382,7 @@ FUN_0801a6e4:
     orrs r2,r0    @ 0801a700 0243
     .hword 0x4668    @ 0801a702 6846
     adds r1,r3,#0x0    @ 0801a704 191c
-    bl FUN_0810e3f8                          @ 0801a706 f3f077fe
+    bl bios_cpu_set                          @ 0801a706 f3f077fe
     add sp,#0x4                              @ 0801a70a 01b0
     pop {r0}                                 @ 0801a70c 01bc
     bx r0                                    @ 0801a70e 0047
@@ -12605,7 +13712,27 @@ LAB_0801b772:
     bx r1                                    @ 0801b776 0847
 DAT_0801b778:
     .word  0x0202348c                     @ 0801b778 8c340202
-    ROM_INCBIN 0x1b77c, 0x6c
+SUB_0801b77c:
+    adds r2,r0,#0x0    @ 0801b77c 021c
+    ldr r1, DWORD_0801b798                   @ 0801b77e 0649
+    ldr r0, DWORD_0801b79c                   @ 0801b780 0648
+    adds r1,r1,r0    @ 0801b782 0918
+    movs r0,#0x7    @ 0801b784 0720
+    ldrb r1,[r1,#0x0]                        @ 0801b786 0978
+    ands r0,r1    @ 0801b788 0840
+    cmp r0,#0x0                              @ 0801b78a 0028
+    beq LAB_0801b794                         @ 0801b78c 02d0
+    lsrs r0,r2,#0x1f    @ 0801b78e d00f
+    adds r0,r2,r0    @ 0801b790 1018
+    asrs r2,r0,#0x1    @ 0801b792 4210
+LAB_0801b794:
+    adds r0,r2,#0x0    @ 0801b794 101c
+    bx lr                                    @ 0801b796 7047
+DWORD_0801b798:
+    .word  0x02000000                     @ 0801b798 00000002
+DWORD_0801b79c:
+    .word  0x00006c2c                     @ 0801b79c 2c6c0000
+    ROM_INCBIN 0x1b7a0, 0x48
 FUN_0801b7e8:
     push {lr}                                @ 0801b7e8 00b5
     sub sp,#0x4                              @ 0801b7ea 81b0
@@ -12614,8 +13741,8 @@ FUN_0801b7e8:
     str r0,[sp,#0x0]                         @ 0801b7f0 0090
     ldr r2, DAT_0801b840                     @ 0801b7f2 134a
     .hword 0x4668    @ 0801b7f4 6846
-    bl FUN_0810e3f8                          @ 0801b7f6 f2f0fffd
-    bl FUN_08014638                          @ 0801b7fa f8f71dff
+    bl bios_cpu_set                          @ 0801b7f6 f2f0fffd
+    bl gl_clear_vram_palram_scroll           @ 0801b7fa f8f71dff
     movs r1,#0x80    @ 0801b7fe 8021
     lsls r1,r1,#0x13    @ 0801b800 c904
     movs r0,#0x40    @ 0801b802 4020
@@ -12636,9 +13763,9 @@ FUN_0801b7e8:
     movs r1,#0x10    @ 0801b820 1021
     rsbs r1,r1,#0    @ 0801b822 4942
     movs r0,#0x3f    @ 0801b824 3f20
-    bl FUN_080146fc                          @ 0801b826 f8f769ff
-    bl FUN_08015138                          @ 0801b82a f9f785fc
-    bl FUN_080156ac                          @ 0801b82e f9f73dff
+    bl gl_set_brightness                     @ 0801b826 f8f769ff
+    bl gl_state_init                         @ 0801b82a f9f785fc
+    bl gl_clear_frame_callbacks              @ 0801b82e f9f73dff
     movs r0,#0x1    @ 0801b832 0120
     add sp,#0x4                              @ 0801b834 01b0
     pop {r1}                                 @ 0801b836 02bc
@@ -12780,7 +13907,7 @@ FUN_0801b93c:
     push {r5,r6,r7}                          @ 0801b944 e0b4
     sub sp,#0x24                             @ 0801b946 89b0
     movs r1,#0x0    @ 0801b948 0021
-    bl FUN_08014fa8                          @ 0801b94a f9f72dfb
+    bl fs_load                               @ 0801b94a f9f72dfb
     adds r7,r0,#0x0    @ 0801b94e 071c
     .hword 0x4668    @ 0801b950 6846
     bl FUN_08015fc8                          @ 0801b952 faf739fb
@@ -13181,7 +14308,7 @@ FUN_0801bc28:
     strh r0,[r2,#0x0]                        @ 0801bc74 1080
     movs r0,#0x3f    @ 0801bc76 3f20
     movs r1,#0x0    @ 0801bc78 0021
-    bl FUN_080146fc                          @ 0801bc7a f8f73ffd
+    bl gl_set_brightness                     @ 0801bc7a f8f73ffd
     movs r1,#0x10    @ 0801bc7e 1021
     rsbs r1,r1,#0    @ 0801bc80 4942
     movs r0,#0x3f    @ 0801bc82 3f20
@@ -13237,7 +14364,7 @@ FUN_0801bcb8:
     movs r1,#0x10    @ 0801bce6 1021
     rsbs r1,r1,#0    @ 0801bce8 4942
     movs r0,#0x3f    @ 0801bcea 3f20
-    bl FUN_080146fc                          @ 0801bcec f8f706fd
+    bl gl_set_brightness                     @ 0801bcec f8f706fd
     bl FUN_08014914                          @ 0801bcf0 f8f710fe
     movs r0,#0x3f    @ 0801bcf4 3f20
     movs r1,#0x0    @ 0801bcf6 0021
@@ -13289,7 +14416,7 @@ switchD_0801bd2e__caseD_0:
     bl FUN_0801b93c                          @ 0801bd56 fff7f1fd
     ldr r0, DAT_0801bdd0                     @ 0801bd5a 1d48
     movs r1,#0x0    @ 0801bd5c 0021
-    bl FUN_08014fa8                          @ 0801bd5e f9f723f9
+    bl fs_load                               @ 0801bd5e f9f723f9
     adds r1,r6,#0x0    @ 0801bd62 311c
     adds r1,#0x88    @ 0801bd64 8831
     str r0,[r1,#0x0]                         @ 0801bd66 0860
@@ -13765,7 +14892,7 @@ LAB_0801c10c:
 LAB_0801c112:
     movs r0,#0x3f    @ 0801c112 3f20
     movs r1,#0x0    @ 0801c114 0021
-    bl FUN_080146fc                          @ 0801c116 f8f7f1fa
+    bl gl_set_brightness                     @ 0801c116 f8f7f1fa
     movs r0,#0x3f    @ 0801c11a 3f20
     movs r1,#0x10    @ 0801c11c 1021
     movs r2,#0x1e    @ 0801c11e 1e22
@@ -13805,7 +14932,7 @@ DAT_0801c160:
 LAB_0801c164:
     movs r0,#0x3f    @ 0801c164 3f20
     movs r1,#0x10    @ 0801c166 1021
-    bl FUN_080146fc                          @ 0801c168 f8f7c8fa
+    bl gl_set_brightness                     @ 0801c168 f8f7c8fa
     movs r0,#0x3f    @ 0801c16c 3f20
     movs r1,#0x0    @ 0801c16e 0021
     movs r2,#0x1e    @ 0801c170 1e22
@@ -13853,7 +14980,7 @@ DAT_0801c1c0:
 LAB_0801c1c4:
     movs r0,#0x3f    @ 0801c1c4 3f20
     movs r1,#0x0    @ 0801c1c6 0021
-    bl FUN_080146fc                          @ 0801c1c8 f8f798fa
+    bl gl_set_brightness                     @ 0801c1c8 f8f798fa
     movs r1,#0x10    @ 0801c1cc 1021
     rsbs r1,r1,#0    @ 0801c1ce 4942
     movs r0,#0x3f    @ 0801c1d0 3f20
@@ -13928,8 +15055,8 @@ FUN_0801c2ac:
     str r0,[sp,#0x0]                         @ 0801c2b4 0090
     ldr r2, DAT_0801c2fc                     @ 0801c2b6 114a
     .hword 0x4668    @ 0801c2b8 6846
-    bl FUN_0810e3f8                          @ 0801c2ba f2f09df8
-    bl FUN_08014638                          @ 0801c2be f8f7bbf9
+    bl bios_cpu_set                          @ 0801c2ba f2f09df8
+    bl gl_clear_vram_palram_scroll           @ 0801c2be f8f7bbf9
     movs r1,#0x80    @ 0801c2c2 8021
     lsls r1,r1,#0x13    @ 0801c2c4 c904
     ldr r0, DAT_0801c300                     @ 0801c2c6 0e48
@@ -13946,9 +15073,9 @@ FUN_0801c2ac:
     movs r1,#0x10    @ 0801c2dc 1021
     rsbs r1,r1,#0    @ 0801c2de 4942
     movs r0,#0x3f    @ 0801c2e0 3f20
-    bl FUN_080146fc                          @ 0801c2e2 f8f70bfa
-    bl FUN_08015138                          @ 0801c2e6 f8f727ff
-    bl FUN_080156ac                          @ 0801c2ea f9f7dff9
+    bl gl_set_brightness                     @ 0801c2e2 f8f70bfa
+    bl gl_state_init                         @ 0801c2e6 f8f727ff
+    bl gl_clear_frame_callbacks              @ 0801c2ea f9f7dff9
     movs r0,#0x1    @ 0801c2ee 0120
     add sp,#0x4                              @ 0801c2f0 01b0
     pop {r1}                                 @ 0801c2f2 02bc
@@ -14088,7 +15215,7 @@ FUN_0801c3f4:
     bl FUN_08015fc8                          @ 0801c400 f9f7e2fd
     ldr r0, DAT_0801c478                     @ 0801c404 1c48
     movs r1,#0x0    @ 0801c406 0021
-    bl FUN_08014fa8                          @ 0801c408 f8f7cefd
+    bl fs_load                               @ 0801c408 f8f7cefd
     str r0,[sp,#0x0]                         @ 0801c40c 0090
     .hword 0x4669    @ 0801c40e 6946
     movs r0,#0xf    @ 0801c410 0f20
@@ -14901,7 +16028,7 @@ LAB_0801cb86:
     adds r0,r0,r1    @ 0801cb8a 4018
     ldr r0,[r0,#0x0]                         @ 0801cb8c 0068
     movs r1,#0x0    @ 0801cb8e 0021
-    bl FUN_08014fa8                          @ 0801cb90 f8f70afa
+    bl fs_load                               @ 0801cb90 f8f70afa
     adds r1,r5,#0x0    @ 0801cb94 291c
     adds r1,#0x88    @ 0801cb96 8831
     str r0,[r1,#0x0]                         @ 0801cb98 0860
@@ -14923,7 +16050,7 @@ LAB_0801cb86:
     movs r1,#0x10    @ 0801cbbc 1021
     rsbs r1,r1,#0    @ 0801cbbe 4942
     movs r0,#0x3f    @ 0801cbc0 3f20
-    bl FUN_080146fc                          @ 0801cbc2 f7f79bfd
+    bl gl_set_brightness                     @ 0801cbc2 f7f79bfd
     movs r0,#0x3f    @ 0801cbc6 3f20
     movs r1,#0x0    @ 0801cbc8 0021
     movs r2,#0x1e    @ 0801cbca 1e22
@@ -15255,7 +16382,7 @@ switchD_0801cb1a__caseD_7:
 LAB_0801ce5c:
     movs r0,#0x3f    @ 0801ce5c 3f20
     movs r1,#0x0    @ 0801ce5e 0021
-    bl FUN_080146fc                          @ 0801ce60 f7f74cfc
+    bl gl_set_brightness                     @ 0801ce60 f7f74cfc
     movs r0,#0x3f    @ 0801ce64 3f20
     movs r1,#0x10    @ 0801ce66 1021
     b LAB_0801ce7e                           @ 0801ce68 09e0
@@ -15267,7 +16394,7 @@ LAB_0801ce6a:
 LAB_0801ce72:
     movs r0,#0x3f    @ 0801ce72 3f20
     movs r1,#0x10    @ 0801ce74 1021
-    bl FUN_080146fc                          @ 0801ce76 f7f741fc
+    bl gl_set_brightness                     @ 0801ce76 f7f741fc
     movs r0,#0x3f    @ 0801ce7a 3f20
     movs r1,#0x0    @ 0801ce7c 0021
 LAB_0801ce7e:
@@ -15279,7 +16406,7 @@ LAB_0801ce86:
     bne LAB_0801ceb0                         @ 0801ce88 12d1
     movs r0,#0x3f    @ 0801ce8a 3f20
     movs r1,#0x0    @ 0801ce8c 0021
-    bl FUN_080146fc                          @ 0801ce8e f7f735fc
+    bl gl_set_brightness                     @ 0801ce8e f7f735fc
     movs r0,#0x3f    @ 0801ce92 3f20
     movs r1,#0x10    @ 0801ce94 1021
     movs r2,#0xf    @ 0801ce96 0f22
@@ -15322,7 +16449,7 @@ switchD_0801cb1a__caseD_8:
 LAB_0801cee2:
     movs r0,#0x3f    @ 0801cee2 3f20
     movs r1,#0x10    @ 0801cee4 1021
-    bl FUN_080146fc                          @ 0801cee6 f7f709fc
+    bl gl_set_brightness                     @ 0801cee6 f7f709fc
     movs r0,#0x3f    @ 0801ceea 3f20
     movs r1,#0x0    @ 0801ceec 0021
     movs r2,#0x1e    @ 0801ceee 1e22
@@ -15342,7 +16469,7 @@ DAT_0801cf08:
 LAB_0801cf0c:
     movs r0,#0x3f    @ 0801cf0c 3f20
     movs r1,#0x0    @ 0801cf0e 0021
-    bl FUN_080146fc                          @ 0801cf10 f7f7f4fb
+    bl gl_set_brightness                     @ 0801cf10 f7f7f4fb
     movs r1,#0x10    @ 0801cf14 1021
     rsbs r1,r1,#0    @ 0801cf16 4942
     movs r0,#0x3f    @ 0801cf18 3f20
@@ -18172,7 +19299,7 @@ FUN_0801e7cc:
     adds r4,r2,r0    @ 0801e7d6 1418
     adds r0,r1,#0x0    @ 0801e7d8 081c
     movs r1,#0x0    @ 0801e7da 0021
-    bl FUN_08014fa8                          @ 0801e7dc f6f7e4fb
+    bl fs_load                               @ 0801e7dc f6f7e4fb
     adds r1,r0,#0x0    @ 0801e7e0 011c
     adds r1,#0x8    @ 0801e7e2 0831
     ldrh r0,[r1,#0x0]                        @ 0801e7e4 0888
@@ -19885,7 +21012,7 @@ switchD_0801fee8__caseD_0:
     adds r0,r0,r4    @ 0801ffaa 0019
     ldr r0,[r0,#0x0]                         @ 0801ffac 0068
     movs r1,#0x0    @ 0801ffae 0021
-    bl FUN_08014fa8                          @ 0801ffb0 f4f7faff
+    bl fs_load                               @ 0801ffb0 f4f7faff
     bl FUN_080937d4                          @ 0801ffb4 73f00efc
     bl FUN_080cc904                          @ 0801ffb8 acf0a4fc
     ldr r0, DAT_08020010                     @ 0801ffbc 1448
@@ -90327,7 +91454,7 @@ LAB_0804f7ec:
 DAT_0804f7f0:
     .word  0x000010d4                     @ 0804f7f0 d4100000
 LAB_0804f7f4:
-    ldr r0, LAB_0804f80c                     @ 0804f7f4 0548
+    ldr r0, DWORD_0804f80c                   @ 0804f7f4 0548
     cmp r2,r0                                @ 0804f7f6 8242
     bne LAB_0804f7fe                         @ 0804f7f8 01d1
     bl FUN_0804ff9a                          @ 0804f7fa 00f0cefb
@@ -90338,9 +91465,8 @@ LAB_0804f7fe:
 LAB_0804f806:
     bl FUN_0804ffd2                          @ 0804f806 00f0e4fb
     movs r0,r0    @ 0804f80a 0000
-LAB_0804f80c:
-    asrs r2,r3,#0x3    @ 0804f80c da10
-    movs r0,r0    @ 0804f80e 0000
+DWORD_0804f80c:
+    .word  0x000010da                     @ 0804f80c da100000
 LAB_0804f810:
     ldr r0, DAT_0804f834                     @ 0804f810 0848
     cmp r2,r0                                @ 0804f812 8242
@@ -116318,7 +117444,7 @@ FUN_080606cc:
     cmp r0,#0x0                              @ 080606de 0028
     beq LAB_08060708                         @ 080606e0 12d0
     ldr r0, DAT_08060700                     @ 080606e2 0748
-    ldr r1, DAT_08060704                     @ 080606e4 0749
+    ldr r1, DWORD_08060704                   @ 080606e4 0749
     adds r0,r0,r1    @ 080606e6 4018
     ldr r0,[r0,#0x0]                         @ 080606e8 0068
     cmp r0,#0x2                              @ 080606ea 0228
@@ -116333,9 +117459,8 @@ FUN_080606cc:
     b LAB_0806070a                           @ 080606fe 04e0
 DAT_08060700:
     .word  0x0201c4e0                     @ 08060700 e0c40102
-DAT_08060704:
-    .byte  0xf4, 0x1c
-    movs r0,r0    @ 08060706 0000
+DWORD_08060704:
+    .word  0x00001cf4                     @ 08060704 f41c0000
 LAB_08060708:
     movs r0,#0x0    @ 08060708 0020
 LAB_0806070a:
@@ -139437,7 +140562,7 @@ LAB_08080fec:
 DAT_08080ff0:
     .word  0x00001298                     @ 08080ff0 98120000
 LAB_08080ff4:
-    ldr r0, LAB_08081008                     @ 08080ff4 0448
+    ldr r0, DWORD_08081008                   @ 08080ff4 0448
     cmp r1,r0                                @ 08080ff6 8142
     bne LAB_08080ffe                         @ 08080ff8 01d1
     bl FUN_0808178c                          @ 08080ffa 00f0c7fb
@@ -139446,9 +140571,8 @@ LAB_08080ffe:
     bgt LAB_0808100c                         @ 08081000 04dc
     subs r0,#0x12    @ 08081002 1238
     bl FUN_08081758                          @ 08081004 00f0a8fb
-LAB_08081008:
-    asrs r3,r7,#0xa    @ 08081008 bb12
-    movs r0,r0    @ 0808100a 0000
+DWORD_08081008:
+    .word  0x000012bb                     @ 08081008 bb120000
 LAB_0808100c:
     ldr r0, DAT_08081010                     @ 0808100c 0048
     b LAB_08081462                           @ 0808100e 28e2
@@ -157500,7 +158624,7 @@ LAB_08091f2a:
     bl FUN_080931de                          @ 08091f36 01f052f9
 LAB_08091f3a:
     ldr r1,[r5,#0x1c]                        @ 08091f3a e969
-    ldr r2, LAB_08091f98                     @ 08091f3c 164a
+    ldr r2, DWORD_08091f98                   @ 08091f3c 164a
     .hword 0x4648    @ 08091f3e 4846
     bl FUN_0802fc90                          @ 08091f40 9df7a6fe
     cmp r0,#0x0                              @ 08091f44 0028
@@ -157515,7 +158639,7 @@ LAB_08091f4e:
     bl FUN_080931de                          @ 08091f54 01f043f9
 LAB_08091f58:
     ldr r1,[r5,#0x1c]                        @ 08091f58 e969
-    ldr r2, LAB_08091f9c                     @ 08091f5a 104a
+    ldr r2, DWORD_08091f9c                   @ 08091f5a 104a
     .hword 0x4648    @ 08091f5c 4846
     .hword 0x464b    @ 08091f5e 4b46
     bl FUN_0802f3e0                          @ 08091f60 9df73efa
@@ -157531,7 +158655,7 @@ LAB_08091f6e:
     bl FUN_080931de                          @ 08091f74 01f033f9
 LAB_08091f78:
     ldr r1,[r5,#0x1c]                        @ 08091f78 e969
-    ldr r2, LAB_08091fa0                     @ 08091f7a 094a
+    ldr r2, DWORD_08091fa0                   @ 08091f7a 094a
     .hword 0x4648    @ 08091f7c 4846
     bl FUN_0802fc90                          @ 08091f7e 9df787fe
     cmp r0,#0x0                              @ 08091f82 0028
@@ -157544,15 +158668,12 @@ LAB_08091f8a:
     movs r0,r0    @ 08091f92 0000
 DWORD_08091f94:
     .word  0x0201bb90                     @ 08091f94 90bb0102
-LAB_08091f98:
-    asrs r3,r4,#0x1a    @ 08091f98 a316
-    movs r0,r0    @ 08091f9a 0000
-LAB_08091f9c:
-    asrs r3,r4,#0x19    @ 08091f9c 6316
-    movs r0,r0    @ 08091f9e 0000
-LAB_08091fa0:
-    adds r0,r2,r2    @ 08091fa0 9018
-    movs r0,r0    @ 08091fa2 0000
+DWORD_08091f98:
+    .word  0x000016a3                     @ 08091f98 a3160000
+DWORD_08091f9c:
+    .word  0x00001663                     @ 08091f9c 63160000
+DWORD_08091fa0:
+    .word  0x00001890                     @ 08091fa0 90180000
 LAB_08091fa4:
     ldr r7,[sp,#0x14]                        @ 08091fa4 059f
     cmp r7,#0x0                              @ 08091fa6 002f
@@ -170444,11 +171565,11 @@ LAB_08098a76:
     lsls r0,r4,#0x2    @ 08098ac2 a000
     adds r0,r0,r4    @ 08098ac4 0019
     lsls r0,r0,#0x2    @ 08098ac6 8000
-    ldr r4, LAB_08098b1c                     @ 08098ac8 144c
+    ldr r4, DWORD_08098b1c                   @ 08098ac8 144c
     adds r1,r2,#0x0    @ 08098aca 111c
     muls r1,r4    @ 08098acc 6143
     adds r0,r0,r1    @ 08098ace 4018
-    ldr r4, LAB_08098b20                     @ 08098ad0 134c
+    ldr r4, DWORD_08098b20                   @ 08098ad0 134c
     adds r0,r0,r4    @ 08098ad2 0019
     ldr r0,[r0,#0x0]                         @ 08098ad4 0068
     lsls r0,r0,#0x13    @ 08098ad6 c004
@@ -170459,7 +171580,7 @@ LAB_08098a76:
     lsls r0,r3,#0x2    @ 08098ae0 9800
     adds r0,r0,r3    @ 08098ae2 c018
     lsls r0,r0,#0x2    @ 08098ae4 8000
-    ldr r2, LAB_08098b1c                     @ 08098ae6 0d4a
+    ldr r2, DWORD_08098b1c                   @ 08098ae6 0d4a
     muls r1,r2    @ 08098ae8 5143
     adds r0,r0,r1    @ 08098aea 4018
     adds r0,r0,r4    @ 08098aec 0019
@@ -170467,7 +171588,7 @@ LAB_08098a76:
     lsls r0,r0,#0x13    @ 08098af0 c004
     lsrs r0,r0,#0x13    @ 08098af2 c00c
     str r0,[sp,#0x8]                         @ 08098af4 0290
-    ldr r3, LAB_08098b24                     @ 08098af6 0b4b
+    ldr r3, DWORD_08098b24                   @ 08098af6 0b4b
     adds r6,r4,r3    @ 08098af8 e618
     ldr r0,[r6,#0x0]                         @ 08098afa 3068
     cmp r0,#0x1                              @ 08098afc 0128
@@ -170487,15 +171608,12 @@ LAB_08098b10:
     movs r0,r0    @ 08098b16 0000
 DWORD_08098b18:
     .word  0x0201bb90                     @ 08098b18 90bb0102
-LAB_08098b1c:
-    lsrs r0,r5,#0x1    @ 08098b1c 6808
-    movs r0,r0    @ 08098b1e 0000
-LAB_08098b20:
-    stmia r5!,{r4}                           @ 08098b20 10c5
-    lsls r1,r0,#0x8    @ 08098b22 0102
-LAB_08098b24:
-    adds r4,r7,#0x3    @ 08098b24 fc1c
-    movs r0,r0    @ 08098b26 0000
+DWORD_08098b1c:
+    .word  0x00000868                     @ 08098b1c 68080000
+DWORD_08098b20:
+    .word  0x0201c510                     @ 08098b20 10c50102
+DWORD_08098b24:
+    .word  0x00001cfc                     @ 08098b24 fc1c0000
 LAB_08098b28:
     movs r0,#0x0    @ 08098b28 0020
     movs r1,#0x1    @ 08098b2a 0121
@@ -173546,7 +174664,7 @@ DAT_0809a240:
 DAT_0809a244:
     .word  0x0201c510                     @ 0809a244 10c50102
 LAB_0809a248:
-    ldr r0, LAB_0809a330                     @ 0809a248 3948
+    ldr r0, DWORD_0809a330                   @ 0809a248 3948
     str r0,[sp,#0x2c]                        @ 0809a24a 0b90
     .hword 0x4651    @ 0809a24c 5146
     ldr r6,[r1,#0x4]                         @ 0809a24e 4e68
@@ -173560,7 +174678,7 @@ LAB_0809a250:
     ldr r0,[r3,#0x2c]                        @ 0809a25c d86a
     cmp r0,#0x0                              @ 0809a25e 0028
     beq LAB_0809a272                         @ 0809a260 07d0
-    ldr r0, LAB_0809a334                     @ 0809a262 3448
+    ldr r0, DWORD_0809a334                   @ 0809a262 3448
     ldrh r0,[r0,#0x0]                        @ 0809a264 0088
     lsls r1,r0,#0x13    @ 0809a266 c104
     lsrs r1,r1,#0x13    @ 0809a268 c90c
@@ -173577,7 +174695,7 @@ LAB_0809a272:
     bne LAB_0809a292                         @ 0809a27c 09d1
     cmp r5,#0x0                              @ 0809a27e 002d
     beq LAB_0809a292                         @ 0809a280 07d0
-    ldr r0, LAB_0809a330                     @ 0809a282 2b48
+    ldr r0, DWORD_0809a330                   @ 0809a282 2b48
     ldrh r0,[r0,#0x0]                        @ 0809a284 0088
     lsls r1,r0,#0x13    @ 0809a286 c104
     lsrs r1,r1,#0x13    @ 0809a288 c90c
@@ -173595,11 +174713,11 @@ LAB_0809a292:
     lsls r0,r4,#0x2    @ 0809a29e a000
     adds r0,r0,r4    @ 0809a2a0 0019
     lsls r0,r0,#0x2    @ 0809a2a2 8000
-    ldr r3, LAB_0809a338                     @ 0809a2a4 244b
+    ldr r3, DWORD_0809a338                   @ 0809a2a4 244b
     adds r1,r5,#0x0    @ 0809a2a6 291c
     muls r1,r3    @ 0809a2a8 5943
     adds r0,r0,r1    @ 0809a2aa 4018
-    ldr r7, LAB_0809a33c                     @ 0809a2ac 234f
+    ldr r7, DWORD_0809a33c                   @ 0809a2ac 234f
     adds r2,r0,r7    @ 0809a2ae c219
     ldr r1,[r2,#0x0]                         @ 0809a2b0 1168
     lsls r0,r1,#0x2    @ 0809a2b2 8800
@@ -173653,8 +174771,8 @@ LAB_0809a30c:
     ldr r0,[r1,#0x8]                         @ 0809a30e 8868
     cmp r0,#0x0                              @ 0809a310 0028
     bne LAB_0809a32a                         @ 0809a312 0ad1
-    ldr r2, LAB_0809a33c                     @ 0809a314 094a
-    ldr r3, LAB_0809a340                     @ 0809a316 0a4b
+    ldr r2, DWORD_0809a33c                   @ 0809a314 094a
+    ldr r3, DWORD_0809a340                   @ 0809a316 0a4b
     adds r0,r2,r3    @ 0809a318 d018
     ldr r0,[r0,#0x0]                         @ 0809a31a 0068
     cmp r0,#0x1                              @ 0809a31c 0128
@@ -173667,21 +174785,16 @@ LAB_0809a30c:
 LAB_0809a32a:
     movs r0,#0x1    @ 0809a32a 0120
     bl FUN_0809b14e                          @ 0809a32c 00f00fff
-LAB_0809a330:
-    pop {r3,r5,r6}                           @ 0809a330 68bc
-    lsls r1,r0,#0x8    @ 0809a332 0102
-LAB_0809a334:
-    pop {r2,r4,r6}                           @ 0809a334 54bc
-    lsls r1,r0,#0x8    @ 0809a336 0102
-LAB_0809a338:
-    lsrs r0,r5,#0x1    @ 0809a338 6808
-    movs r0,r0    @ 0809a33a 0000
-LAB_0809a33c:
-    stmia r5!,{r4}                           @ 0809a33c 10c5
-    lsls r1,r0,#0x8    @ 0809a33e 0102
-LAB_0809a340:
-    adds r4,r7,#0x3    @ 0809a340 fc1c
-    movs r0,r0    @ 0809a342 0000
+DWORD_0809a330:
+    .word  0x0201bc68                     @ 0809a330 68bc0102
+DWORD_0809a334:
+    .word  0x0201bc54                     @ 0809a334 54bc0102
+DWORD_0809a338:
+    .word  0x00000868                     @ 0809a338 68080000
+DWORD_0809a33c:
+    .word  0x0201c510                     @ 0809a33c 10c50102
+DWORD_0809a340:
+    .word  0x00001cfc                     @ 0809a340 fc1c0000
 LAB_0809a344:
     ldr r0,[sp,#0x24]                        @ 0809a344 0998
     bl FUN_080325dc                          @ 0809a346 98f749f9
@@ -173744,7 +174857,7 @@ LAB_0809a3ac:
     str r0,[r4,#0x30]                        @ 0809a3ba 2063
     b LAB_0809a3d0                           @ 0809a3bc 08e0
 LAB_0809a3be:
-    ldr r1, LAB_0809a3dc                     @ 0809a3be 0749
+    ldr r1, DWORD_0809a3dc                   @ 0809a3be 0749
     ldr r0,[sp,#0x20]                        @ 0809a3c0 0898
     bl FUN_08032c94                          @ 0809a3c2 98f767fc
     cmp r0,#0x0                              @ 0809a3c6 0028
@@ -173753,20 +174866,17 @@ LAB_0809a3be:
     .hword 0x4657    @ 0809a3cc 5746
     str r0,[r7,#0x30]                        @ 0809a3ce 3863
 LAB_0809a3d0:
-    ldr r1, LAB_0809a3e0                     @ 0809a3d0 0349
-    ldr r0, LAB_0809a3e4                     @ 0809a3d2 0448
+    ldr r1, DWORD_0809a3e0                   @ 0809a3d0 0349
+    ldr r0, DWORD_0809a3e4                   @ 0809a3d2 0448
     adds r1,r1,r0    @ 0809a3d4 0918
     bl FUN_0809b146                          @ 0809a3d6 00f0b6fe
     movs r0,r0    @ 0809a3da 0000
-LAB_0809a3dc:
-    asrs r7,r5,#0x11    @ 0809a3dc 6f14
-    movs r0,r0    @ 0809a3de 0000
-LAB_0809a3e0:
-    stmia r4!,{r5,r6,r7}                     @ 0809a3e0 e0c4
-    lsls r1,r0,#0x8    @ 0809a3e2 0102
-LAB_0809a3e4:
-    adds r4,r5,#0x4    @ 0809a3e4 2c1d
-    movs r0,r0    @ 0809a3e6 0000
+DWORD_0809a3dc:
+    .word  0x0000146f                     @ 0809a3dc 6f140000
+DWORD_0809a3e0:
+    .word  0x0201c4e0                     @ 0809a3e0 e0c40102
+DWORD_0809a3e4:
+    .word  0x00001d2c                     @ 0809a3e4 2c1d0000
 LAB_0809a3e8:
     ldr r1,[sp,#0x30]                        @ 0809a3e8 0c99
     cmp r1,#0x0                              @ 0809a3ea 0029
@@ -174285,29 +175395,26 @@ LAB_0809a7bc:
     beq LAB_0809a7d4                         @ 0809a7c0 08d0
     ldr r0, DWORD_0809a7e0                   @ 0809a7c2 0748
     ldr r1,[r0,#0x1c]                        @ 0809a7c4 c169
-    ldr r2, LAB_0809a7e4                     @ 0809a7c6 074a
+    ldr r2, DWORD_0809a7e4                   @ 0809a7c6 074a
     movs r0,#0x0    @ 0809a7c8 0020
     str r0,[sp,#0x0]                         @ 0809a7ca 0090
     ldr r0,[sp,#0x1c]                        @ 0809a7cc 0798
     movs r3,#0x2    @ 0809a7ce 0223
     bl FUN_08043054                          @ 0809a7d0 a8f740fc
 LAB_0809a7d4:
-    ldr r1, LAB_0809a7e8                     @ 0809a7d4 0449
-    ldr r2, LAB_0809a7ec                     @ 0809a7d6 054a
+    ldr r1, DWORD_0809a7e8                   @ 0809a7d4 0449
+    ldr r2, DWORD_0809a7ec                   @ 0809a7d6 054a
     adds r1,r1,r2    @ 0809a7d8 8918
     bl FUN_0809b146                          @ 0809a7da 00f0b4fc
     movs r0,r0    @ 0809a7de 0000
 DWORD_0809a7e0:
     .word  0x0201bb90                     @ 0809a7e0 90bb0102
-LAB_0809a7e4:
-    asrs r2,r2,#0x1f    @ 0809a7e4 d217
-    movs r0,r0    @ 0809a7e6 0000
-LAB_0809a7e8:
-    stmia r4!,{r5,r6,r7}                     @ 0809a7e8 e0c4
-    lsls r1,r0,#0x8    @ 0809a7ea 0102
-LAB_0809a7ec:
-    adds r4,r5,#0x4    @ 0809a7ec 2c1d
-    movs r0,r0    @ 0809a7ee 0000
+DWORD_0809a7e4:
+    .word  0x000017d2                     @ 0809a7e4 d2170000
+DWORD_0809a7e8:
+    .word  0x0201c4e0                     @ 0809a7e8 e0c40102
+DWORD_0809a7ec:
+    .word  0x00001d2c                     @ 0809a7ec 2c1d0000
 LAB_0809a7f0:
     bl FUN_0804a76c                          @ 0809a7f0 aff7bcff
     ldr r3,[sp,#0x24]                        @ 0809a7f4 099b
@@ -184912,7 +186019,7 @@ LAB_0809faec:
     .hword 0x4643    @ 0809faee 4346
     cmp r3,#0x0                              @ 0809faf0 002b
     beq LAB_0809faf6                         @ 0809faf2 00d0
-    ldr r0, LAB_0809fb1c                     @ 0809faf4 0948
+    ldr r0, DWORD_0809fb1c                   @ 0809faf4 0948
 LAB_0809faf6:
     movs r1,#0x0    @ 0809faf6 0021
     movs r2,#0x0    @ 0809faf8 0022
@@ -184926,18 +186033,16 @@ LAB_0809faf6:
     adds r0,r4,r1    @ 0809fb0a 6018
     ldr r2,[sp,#0x280]                       @ 0809fb0c a09a
     str r2,[r0,#0x0]                         @ 0809fb0e 0260
-    ldr r3, LAB_0809fb20                     @ 0809fb10 034b
+    ldr r3, DWORD_0809fb20                   @ 0809fb10 034b
     adds r0,r4,r3    @ 0809fb12 e018
     str r2,[r0,#0x0]                         @ 0809fb14 0260
 FUN_0809fb16:
     movs r0,#0x0    @ 0809fb16 0020
     bl FUN_080a06a6                          @ 0809fb18 00f0c5fd
-LAB_0809fb1c:
-    strh r5,[r1,#0x0]                        @ 0809fb1c 0d80
-    movs r0,r0    @ 0809fb1e 0000
-LAB_0809fb20:
-    .hword 0x1d24 @    @ 0809fb20 241d
-    movs r0,r0    @ 0809fb22 0000
+DWORD_0809fb1c:
+    .word  0x0000800d                     @ 0809fb1c 0d800000
+DWORD_0809fb20:
+    .word  0x00001d24                     @ 0809fb20 241d0000
 LAB_0809fb24:
     movs r6,#0x0    @ 0809fb24 0026
     ldr r4, DAT_0809fb84                     @ 0809fb26 174c
@@ -199900,7 +201005,7 @@ DAT_080ae204:
 DAT_080ae208:
     .word  0x00000fba                     @ 080ae208 ba0f0000
 LAB_080ae20c:
-    ldr r1, LAB_080ae230                     @ 080ae20c 0849
+    ldr r1, DWORD_080ae230                   @ 080ae20c 0849
     adds r0,r6,#0x0    @ 080ae20e 301c
     bl FUN_080adf40                          @ 080ae210 fff796fe
     adds r5,r0,#0x0    @ 080ae214 051c
@@ -199908,7 +201013,7 @@ LAB_080ae20c:
     blt LAB_080ae21e                         @ 080ae218 01db
     bl FUN_080aec7a                          @ 080ae21a 00f02efd
 LAB_080ae21e:
-    ldr r1, LAB_080ae234                     @ 080ae21e 0549
+    ldr r1, DWORD_080ae234                   @ 080ae21e 0549
     adds r0,r6,#0x0    @ 080ae220 301c
     bl FUN_080adf40                          @ 080ae222 fff78dfe
 LAB_080ae226:
@@ -199916,14 +201021,12 @@ LAB_080ae226:
     cmp r5,#0x0                              @ 080ae228 002d
     blt LAB_080ae274                         @ 080ae22a 23db
     bl FUN_080aec7a                          @ 080ae22c 00f025fd
-LAB_080ae230:
-    lsrs r6,r2,#0x1f    @ 080ae230 d60f
-    movs r0,r0    @ 080ae232 0000
-LAB_080ae234:
-    asrs r4,r4,#0x7    @ 080ae234 e411
-    movs r0,r0    @ 080ae236 0000
+DWORD_080ae230:
+    .word  0x00000fd6                     @ 080ae230 d60f0000
+DWORD_080ae234:
+    .word  0x000011e4                     @ 080ae234 e4110000
 LAB_080ae238:
-    ldr r1, LAB_080ae268                     @ 080ae238 0b49
+    ldr r1, DWORD_080ae268                   @ 080ae238 0b49
     adds r0,r6,#0x0    @ 080ae23a 301c
     bl FUN_080adf40                          @ 080ae23c fff780fe
     adds r5,r0,#0x0    @ 080ae240 051c
@@ -199931,7 +201034,7 @@ LAB_080ae238:
     blt LAB_080ae24a                         @ 080ae244 01db
     bl FUN_080aec7a                          @ 080ae246 00f018fd
 LAB_080ae24a:
-    ldr r1, LAB_080ae26c                     @ 080ae24a 0849
+    ldr r1, DWORD_080ae26c                   @ 080ae24a 0849
     adds r0,r6,#0x0    @ 080ae24c 301c
     bl FUN_080adf40                          @ 080ae24e fff777fe
 LAB_080ae252:
@@ -199940,19 +201043,16 @@ LAB_080ae252:
     blt LAB_080ae25c                         @ 080ae256 01db
     bl FUN_080aec7a                          @ 080ae258 00f00ffd
 LAB_080ae25c:
-    ldr r0, LAB_080ae270                     @ 080ae25c 0448
+    ldr r0, DWORD_080ae270                   @ 080ae25c 0448
     bl FUN_080ade8c                          @ 080ae25e fff715fe
     bl FUN_080aec7a                          @ 080ae262 00f00afd
     movs r0,r0    @ 080ae266 0000
-LAB_080ae268:
-    lsrs r6,r2,#0x1f    @ 080ae268 d60f
-    movs r0,r0    @ 080ae26a 0000
-LAB_080ae26c:
-    asrs r4,r4,#0x7    @ 080ae26c e411
-    movs r0,r0    @ 080ae26e 0000
-LAB_080ae270:
-    lsrs r3,r7,#0x1e    @ 080ae270 bb0f
-    movs r0,r0    @ 080ae272 0000
+DWORD_080ae268:
+    .word  0x00000fd6                     @ 080ae268 d60f0000
+DWORD_080ae26c:
+    .word  0x000011e4                     @ 080ae26c e4110000
+DWORD_080ae270:
+    .word  0x00000fbb                     @ 080ae270 bb0f0000
 LAB_080ae274:
     ldr r0, DAT_080ae2ac                     @ 080ae274 0d48
     cmp r7,r0                                @ 080ae276 8742
@@ -210763,7 +211863,7 @@ DAT_080b63e0:
 DAT_080b63e4:
     .word  0x000013f3                     @ 080b63e4 f3130000
 LAB_080b63e8:
-    ldr r0, LAB_080b63f8                     @ 080b63e8 0348
+    ldr r0, DWORD_080b63f8                   @ 080b63e8 0348
     cmp r1,r0                                @ 080b63ea 8142
     beq LAB_080b6428                         @ 080b63ec 1cd0
     adds r0,#0xaf    @ 080b63ee af30
@@ -210771,9 +211871,8 @@ LAB_080b63e8:
     beq LAB_080b6434                         @ 080b63f2 1fd0
     b LAB_080b645c                           @ 080b63f4 32e0
     .byte  0x00, 0x00
-LAB_080b63f8:
-    adds r1,r2,r3    @ 080b63f8 d118
-    movs r0,r0    @ 080b63fa 0000
+DWORD_080b63f8:
+    .word  0x000018d1                     @ 080b63f8 d1180000
 LAB_080b63fc:
     ldr r3, DAT_080b6420                     @ 080b63fc 084b
     movs r4,#0x1    @ 080b63fe 0124
@@ -256577,7 +257676,7 @@ LAB_080d4882:
 LAB_080d488c:
     lsls r0,r0,#0x8    @ 080d488c 0002
     adds r1,r2,#0x0    @ 080d488e 111c
-    bl FUN_0810e3fc                          @ 080d4890 39f0b4fd
+    bl bios_div                              @ 080d4890 39f0b4fd
     lsls r0,r0,#0x10    @ 080d4894 0004
     lsrs r6,r0,#0x10    @ 080d4896 060c
     ldr r0, DAT_080d48c0                     @ 080d4898 0948
@@ -256633,7 +257732,7 @@ LAB_080d48e8:
     muls r0,r1    @ 080d48fa 4843
     movs r2,#0x12    @ 080d48fc 1222
     ldrsh r1,[r4,r2]                         @ 080d48fe a15e
-    bl FUN_0810e3fc                          @ 080d4900 39f07cfd
+    bl bios_div                              @ 080d4900 39f07cfd
     ldrh r1,[r4,#0xa]                        @ 080d4904 6189
     adds r0,r1,r0    @ 080d4906 0818
     strh r0,[r4,#0x2]                        @ 080d4908 6080
@@ -256647,7 +257746,7 @@ LAB_080d48e8:
     muls r0,r1    @ 080d4918 4843
     movs r2,#0x12    @ 080d491a 1222
     ldrsh r1,[r4,r2]                         @ 080d491c a15e
-    bl FUN_0810e3fc                          @ 080d491e 39f06dfd
+    bl bios_div                              @ 080d491e 39f06dfd
     ldrh r1,[r4,#0xc]                        @ 080d4922 a189
     adds r0,r1,r0    @ 080d4924 0818
     strh r0,[r4,#0x4]                        @ 080d4926 a080
@@ -257163,11 +258262,11 @@ FUN_080d4d1c:
     ldr r0, DAT_080d4d44                     @ 080d4d1e 0948
     ldr r0,[r0,#0xc]                         @ 080d4d20 c068
     ldr r1, DAT_080d4d48                     @ 080d4d22 0949
-    bl FUN_0810e418                          @ 080d4d24 39f078fb
+    bl bios_huff_uncomp                      @ 080d4d24 39f078fb
     ldr r0, DAT_080d4d4c                     @ 080d4d28 0848
     ldr r0,[r0,#0xc]                         @ 080d4d2a c068
     ldr r1, DAT_080d4d50                     @ 080d4d2c 0849
-    bl FUN_0810e418                          @ 080d4d2e 39f073fb
+    bl bios_huff_uncomp                      @ 080d4d2e 39f073fb
     ldr r0, DAT_080d4d54                     @ 080d4d32 0848
     ldr r1, DAT_080d4d58                     @ 080d4d34 0849
     ldr r1,[r1,#0xc]                         @ 080d4d36 c968
@@ -257546,7 +258645,7 @@ LAB_080d4ffe:
     lsls r0,r0,#0x3    @ 080d5008 c000
     movs r1,#0xc0    @ 080d500a c021
     lsls r1,r1,#0x1    @ 080d500c 4900
-    bl FUN_0810e3fc                          @ 080d500e 39f0f5f9
+    bl bios_div                              @ 080d500e 39f0f5f9
     adds r2,r0,#0x0    @ 080d5012 021c
     movs r1,#0xb4    @ 080d5014 b421
     lsls r1,r1,#0x1    @ 080d5016 4900
@@ -257571,7 +258670,7 @@ FUN_080d5034:
     adds r5,r0,#0x0    @ 080d5040 051c
     adds r0,r4,#0x0    @ 080d5042 201c
     movs r1,#0x4    @ 080d5044 0421
-    bl FUN_0810e3fc                          @ 080d5046 39f0d9f9
+    bl bios_div                              @ 080d5046 39f0d9f9
     lsls r5,r5,#0x2    @ 080d504a ad00
     lsls r0,r0,#0x3    @ 080d504c c000
     adds r5,r5,r0    @ 080d504e 2d18
@@ -258020,7 +259119,7 @@ LAB_080d539a:
     subs r0,r0,r1    @ 080d53a2 401a
     lsls r0,r0,#0x4    @ 080d53a4 0001
     movs r1,#0x48    @ 080d53a6 4821
-    bl FUN_0810e3fc                          @ 080d53a8 39f028f8
+    bl bios_div                              @ 080d53a8 39f028f8
     ldr r2, DAT_080d53c4                     @ 080d53ac 054a
     lsls r0,r0,#0x18    @ 080d53ae 0006
     lsrs r0,r0,#0x18    @ 080d53b0 000e
@@ -258179,7 +259278,7 @@ LAB_080d54cc:
     bhi LAB_080d54fc                         @ 080d54d0 14d8
     lsls r0,r1,#0x6    @ 080d54d2 8801
     movs r1,#0xf    @ 080d54d4 0f21
-    bl FUN_0810e3fc                          @ 080d54d6 38f091ff
+    bl bios_div                              @ 080d54d6 38f091ff
     movs r2,#0x80    @ 080d54da 8022
     lsls r2,r2,#0x1    @ 080d54dc 5200
     adds r1,r2,#0x0    @ 080d54de 111c
@@ -258202,7 +259301,7 @@ LAB_080d54fc:
     subs r0,#0xf    @ 080d54fe 0f38
     lsls r0,r0,#0x6    @ 080d5500 8001
     movs r1,#0xf    @ 080d5502 0f21
-    bl FUN_0810e3fc                          @ 080d5504 38f07aff
+    bl bios_div                              @ 080d5504 38f07aff
     adds r0,#0xc0    @ 080d5508 c030
     lsls r0,r0,#0x10    @ 080d550a 0004
     lsrs r0,r0,#0x10    @ 080d550c 000c
@@ -258219,7 +259318,7 @@ LAB_080d5510:
     subs r0,r0,r1    @ 080d5520 401a
     lsls r0,r0,#0x3    @ 080d5522 c000
     movs r1,#0x1e    @ 080d5524 1e21
-    bl FUN_0810e3fc                          @ 080d5526 38f069ff
+    bl bios_div                              @ 080d5526 38f069ff
     adds r2,r0,#0x0    @ 080d552a 021c
     rsbs r2,r2,#0    @ 080d552c 5242
     lsls r2,r2,#0x10    @ 080d552e 1204
@@ -258670,7 +259769,7 @@ LAB_080d58ae:
     ldrsh r0,[r4,r1]                         @ 080d58b8 605e
     lsls r0,r0,#0x4    @ 080d58ba 0001
     movs r1,#0x14    @ 080d58bc 1421
-    bl FUN_0810e3fc                          @ 080d58be 38f09dfd
+    bl bios_div                              @ 080d58be 38f09dfd
     ldr r3, DAT_080d58d8                     @ 080d58c2 054b
     lsls r2,r0,#0x18    @ 080d58c4 0206
     lsrs r2,r2,#0x18    @ 080d58c6 120e
@@ -259228,7 +260327,7 @@ FUN_080d5cf0:
     ldrsh r1,[r4,r2]                         @ 080d5d10 a15e
     muls r0,r1    @ 080d5d12 4843
     movs r1,#0x8    @ 080d5d14 0821
-    bl FUN_0810e3fc                          @ 080d5d16 38f071fb
+    bl bios_div                              @ 080d5d16 38f071fb
     movs r2,#0x3c    @ 080d5d1a 3c22
     ldrsh r1,[r5,r2]                         @ 080d5d1c a95e
     adds r1,r1,r0    @ 080d5d1e 0918
@@ -259590,7 +260689,7 @@ LAB_080d5fa8:
     str r0,[r4,#0x0]                         @ 080d5fe6 2060
     lsls r0,r7,#0x9    @ 080d5fe8 7802
     movs r1,#0xa    @ 080d5fea 0a21
-    bl FUN_0810e3fc                          @ 080d5fec 38f006fa
+    bl bios_div                              @ 080d5fec 38f006fa
     movs r2,#0x80    @ 080d5ff0 8022
     lsls r2,r2,#0x1    @ 080d5ff2 5200
     adds r0,r0,r2    @ 080d5ff4 8018
@@ -259637,7 +260736,7 @@ LAB_080d6008:
     adds r0,#0x48    @ 080d6048 4830
     lsls r0,r0,#0x4    @ 080d604a 0001
     movs r1,#0x47    @ 080d604c 4721
-    bl FUN_0810e3fc                          @ 080d604e 38f0d5f9
+    bl bios_div                              @ 080d604e 38f0d5f9
     ldr r2, DAT_080d6178                     @ 080d6052 494a
     lsls r0,r0,#0x18    @ 080d6054 0006
     lsrs r0,r0,#0x18    @ 080d6056 000e
@@ -260057,7 +261156,7 @@ FUN_080d6374:
     ldrsh r0,[r1,r2]                         @ 080d6394 885e
     lsls r0,r0,#0x4    @ 080d6396 0001
     movs r1,#0x8    @ 080d6398 0821
-    bl FUN_0810e3fc                          @ 080d639a 38f02ff8
+    bl bios_div                              @ 080d639a 38f02ff8
     movs r1,#0x10    @ 080d639e 1021
     subs r1,r1,r0    @ 080d63a0 091a
     ldr r0, DAT_080d644c                     @ 080d63a2 2a48
@@ -260233,7 +261332,7 @@ FUN_080d64e4:
     ldrsh r0,[r4,r1]                         @ 080d64f6 605e
     lsls r0,r0,#0x4    @ 080d64f8 0001
     movs r1,#0x10    @ 080d64fa 1021
-    bl FUN_0810e3fc                          @ 080d64fc 37f07eff
+    bl bios_div                              @ 080d64fc 37f07eff
     ldr r2, DAT_080d6540                     @ 080d6500 0f4a
     strh r0,[r2,#0x0]                        @ 080d6502 1080
     movs r1,#0x6    @ 080d6504 0621
@@ -260285,7 +261384,7 @@ FUN_080d6548:
     ldrsh r0,[r1,r2]                         @ 080d6564 885e
     lsls r0,r0,#0x4    @ 080d6566 0001
     movs r1,#0x10    @ 080d6568 1021
-    bl FUN_0810e3fc                          @ 080d656a 37f047ff
+    bl bios_div                              @ 080d656a 37f047ff
     ldr r2, DAT_080d6588                     @ 080d656e 064a
     movs r1,#0x10    @ 080d6570 1021
     subs r1,r1,r0    @ 080d6572 091a
@@ -260402,7 +261501,7 @@ FUN_080d6628:
     ldrsh r0,[r4,r2]                         @ 080d6650 a05e
     lsls r0,r0,#0x2    @ 080d6652 8000
     movs r1,#0x8    @ 080d6654 0821
-    bl FUN_0810e3fc                          @ 080d6656 37f0d1fe
+    bl bios_div                              @ 080d6656 37f0d1fe
     ldr r5, PTR_BLDY_080d674c                @ 080d665a 3c4d
     .hword 0x46aa    @ 080d665c aa46
     movs r1,#0x4    @ 080d665e 0421
@@ -260414,7 +261513,7 @@ FUN_080d6628:
     ldrsh r0,[r4,r5]                         @ 080d666a 605f
     lsls r0,r0,#0x5    @ 080d666c 4001
     movs r1,#0x8    @ 080d666e 0821
-    bl FUN_0810e3fc                          @ 080d6670 37f0c4fe
+    bl bios_div                              @ 080d6670 37f0c4fe
     movs r2,#0x20    @ 080d6674 2022
     subs r2,r2,r0    @ 080d6676 121a
     ldr r0, PTR_WIN0H_080d6750               @ 080d6678 3548
@@ -261047,7 +262146,7 @@ FUN_080d6b50:
     ldrsh r0,[r4,r3]                         @ 080d6b7c e05e
     lsls r0,r0,#0x2    @ 080d6b7e 8000
     movs r1,#0x8    @ 080d6b80 0821
-    bl FUN_0810e3fc                          @ 080d6b82 37f03bfc
+    bl bios_div                              @ 080d6b82 37f03bfc
     ldr r1, PTR_BLDY_080d6c94                @ 080d6b86 4349
     .hword 0x468a    @ 080d6b88 8a46
     strh r0,[r1,#0x0]                        @ 080d6b8a 0880
@@ -261055,7 +262154,7 @@ FUN_080d6b50:
     ldrsh r0,[r4,r2]                         @ 080d6b8e a05e
     lsls r0,r0,#0x5    @ 080d6b90 4001
     movs r1,#0x8    @ 080d6b92 0821
-    bl FUN_0810e3fc                          @ 080d6b94 37f032fc
+    bl bios_div                              @ 080d6b94 37f032fc
     movs r5,#0xf0    @ 080d6b98 f025
     ldr r3, PTR_WIN0H_080d6c98               @ 080d6b9a 3f4b
     strh r5,[r3,#0x0]                        @ 080d6b9c 1d80
@@ -261726,11 +262825,11 @@ FUN_080d70f0:
     ldr r0, DAT_080d7128                     @ 080d70fe 0a48
     ldr r0,[r0,#0x8]                         @ 080d7100 8068
     adds r1,r4,#0x0    @ 080d7102 211c
-    bl FUN_0810e418                          @ 080d7104 37f088f9
+    bl bios_huff_uncomp                      @ 080d7104 37f088f9
     ldr r0, DAT_080d712c                     @ 080d7108 0848
     ldr r0,[r0,#0x8]                         @ 080d710a 8068
     ldr r1, DAT_080d7130                     @ 080d710c 0849
-    bl FUN_0810e418                          @ 080d710e 37f083f9
+    bl bios_huff_uncomp                      @ 080d710e 37f083f9
     ldr r0, DAT_080d7134                     @ 080d7112 0848
     ldr r1, DAT_080d7138                     @ 080d7114 0849
     ldr r1,[r1,#0x8]                         @ 080d7116 8968
@@ -261954,7 +263053,7 @@ LAB_080d72aa:
     adds r4,#0x18    @ 080d72c0 1834
     adds r0,r5,#0x0    @ 080d72c2 281c
     movs r1,#0x5    @ 080d72c4 0521
-    bl FUN_0810e3fc                          @ 080d72c6 37f099f8
+    bl bios_div                              @ 080d72c6 37f099f8
     lsls r0,r0,#0x6    @ 080d72ca 8001
     adds r0,#0x10    @ 080d72cc 1030
     lsls r4,r4,#0x10    @ 080d72ce 2404
@@ -262090,7 +263189,7 @@ LAB_080d73de:
     adds r4,#0x3    @ 080d73ea 0334
     adds r0,r5,#0x0    @ 080d73ec 281c
     movs r1,#0x5    @ 080d73ee 0521
-    bl FUN_0810e3fc                          @ 080d73f0 37f004f8
+    bl bios_div                              @ 080d73f0 37f004f8
     adds r1,r0,#0x0    @ 080d73f4 011c
     lsls r1,r1,#0x3    @ 080d73f6 c900
     adds r0,r4,#0x0    @ 080d73f8 201c
@@ -262198,7 +263297,7 @@ LAB_080d749e:
     adds r4,#0x28    @ 080d74c0 2834
     adds r0,r7,#0x0    @ 080d74c2 381c
     movs r1,#0x5    @ 080d74c4 0521
-    bl FUN_0810e3fc                          @ 080d74c6 36f099ff
+    bl bios_div                              @ 080d74c6 36f099ff
     lsls r0,r0,#0x6    @ 080d74ca 8001
     adds r0,#0x20    @ 080d74cc 2030
     lsls r4,r4,#0x10    @ 080d74ce 2404
@@ -262220,7 +263319,7 @@ LAB_080d74ec:
     bgt LAB_080d7536                         @ 080d74ee 22dc
     lsls r0,r6,#0x7    @ 080d74f0 f001
     movs r1,#0xa    @ 080d74f2 0a21
-    bl FUN_0810e3fc                          @ 080d74f4 36f082ff
+    bl bios_div                              @ 080d74f4 36f082ff
     movs r5,#0x80    @ 080d74f8 8025
     lsls r5,r5,#0x1    @ 080d74fa 6d00
     subs r5,r5,r0    @ 080d74fc 2d1a
@@ -262233,7 +263332,7 @@ LAB_080d74ec:
     adds r4,#0x28    @ 080d750c 2834
     adds r0,r7,#0x0    @ 080d750e 381c
     movs r1,#0x5    @ 080d7510 0521
-    bl FUN_0810e3fc                          @ 080d7512 36f073ff
+    bl bios_div                              @ 080d7512 36f073ff
     lsls r0,r0,#0x6    @ 080d7516 8001
     adds r0,#0x20    @ 080d7518 2030
     lsls r4,r4,#0x10    @ 080d751a 2404
@@ -262322,7 +263421,7 @@ LAB_080d7568:
     adds r4,#0x28    @ 080d75c8 2834
     movs r0,#0x0    @ 080d75ca 0020
     movs r1,#0x5    @ 080d75cc 0521
-    bl FUN_0810e3fc                          @ 080d75ce 36f015ff
+    bl bios_div                              @ 080d75ce 36f015ff
     adds r1,r0,#0x0    @ 080d75d2 011c
     lsls r1,r1,#0x6    @ 080d75d4 8901
     adds r1,#0x20    @ 080d75d6 2031
@@ -262478,7 +263577,7 @@ LAB_080d76ee:
     ldrsh r0,[r5,r1]                         @ 080d76f8 685e
     lsls r0,r0,#0x4    @ 080d76fa 0001
     movs r1,#0x14    @ 080d76fc 1421
-    bl FUN_0810e3fc                          @ 080d76fe 36f07dfe
+    bl bios_div                              @ 080d76fe 36f07dfe
     ldr r3, DAT_080d7718                     @ 080d7702 054b
     lsls r2,r0,#0x18    @ 080d7704 0206
     lsrs r2,r2,#0x18    @ 080d7706 120e
@@ -262751,7 +263850,7 @@ LAB_080d78e8:
     ldrh r2,[r5,#0x18]                       @ 080d7922 2a8b
     adds r0,r2,r0    @ 080d7924 1018
     movs r1,#0x5    @ 080d7926 0521
-    bl FUN_0810e3fc                          @ 080d7928 36f068fd
+    bl bios_div                              @ 080d7928 36f068fd
     adds r1,r0,#0x0    @ 080d792c 011c
     lsls r1,r1,#0x6    @ 080d792e 8901
     adds r1,#0x20    @ 080d7930 2031
@@ -262851,7 +263950,7 @@ LAB_080d79c6:
     ldrh r2,[r5,#0x18]                       @ 080d79ec 2a8b
     adds r0,r2,r0    @ 080d79ee 1018
     movs r1,#0x5    @ 080d79f0 0521
-    bl FUN_0810e3fc                          @ 080d79f2 36f003fd
+    bl bios_div                              @ 080d79f2 36f003fd
     adds r1,r0,#0x0    @ 080d79f6 011c
     lsls r1,r1,#0x6    @ 080d79f8 8901
     adds r1,#0x20    @ 080d79fa 2031
@@ -262939,7 +264038,7 @@ LAB_080d7a7a:
     ldrh r2,[r5,#0x18]                       @ 080d7aa0 2a8b
     adds r0,r2,r0    @ 080d7aa2 1018
     movs r1,#0x5    @ 080d7aa4 0521
-    bl FUN_0810e3fc                          @ 080d7aa6 36f0a9fc
+    bl bios_div                              @ 080d7aa6 36f0a9fc
     adds r1,r0,#0x0    @ 080d7aaa 011c
     lsls r1,r1,#0x6    @ 080d7aac 8901
     adds r1,#0x20    @ 080d7aae 2031
@@ -262998,7 +264097,7 @@ LAB_080d7ade:
     ldrh r2,[r5,#0x18]                       @ 080d7b1c 2a8b
     adds r0,r2,r0    @ 080d7b1e 1018
     movs r1,#0x5    @ 080d7b20 0521
-    bl FUN_0810e3fc                          @ 080d7b22 36f06bfc
+    bl bios_div                              @ 080d7b22 36f06bfc
     adds r1,r0,#0x0    @ 080d7b26 011c
     lsls r1,r1,#0x6    @ 080d7b28 8901
     adds r1,#0x20    @ 080d7b2a 2031
@@ -263043,7 +264142,7 @@ LAB_080d7b40:
     ldrh r2,[r5,#0x18]                       @ 080d7b7a 2a8b
     adds r0,r2,r0    @ 080d7b7c 1018
     movs r1,#0x5    @ 080d7b7e 0521
-    bl FUN_0810e3fc                          @ 080d7b80 36f03cfc
+    bl bios_div                              @ 080d7b80 36f03cfc
     adds r1,r0,#0x0    @ 080d7b84 011c
     lsls r1,r1,#0x6    @ 080d7b86 8901
     adds r1,#0x20    @ 080d7b88 2031
@@ -263889,7 +264988,7 @@ LAB_080d8238:
     ldrsh r0,[r4,r1]                         @ 080d823e 605e
     lsls r0,r0,#0x4    @ 080d8240 0001
     movs r1,#0xa    @ 080d8242 0a21
-    bl FUN_0810e3fc                          @ 080d8244 36f0daf8
+    bl bios_div                              @ 080d8244 36f0daf8
     ldr r2, DAT_080d8278                     @ 080d8248 0b4a
     movs r1,#0x10    @ 080d824a 1021
     subs r1,r1,r0    @ 080d824c 091a
@@ -264083,7 +265182,7 @@ LAB_080d83b8:
     ldrsh r0,[r4,r1]                         @ 080d83be 605e
     lsls r0,r0,#0x4    @ 080d83c0 0001
     movs r1,#0xa    @ 080d83c2 0a21
-    bl FUN_0810e3fc                          @ 080d83c4 36f01af8
+    bl bios_div                              @ 080d83c4 36f01af8
     ldr r2, DAT_080d83f8                     @ 080d83c8 0b4a
     movs r1,#0x10    @ 080d83ca 1021
     subs r1,r1,r0    @ 080d83cc 091a
@@ -265435,13 +266534,13 @@ LAB_080d8e0a:
     movs r0,#0x9a    @ 080d8e14 9a20
     lsls r0,r0,#0x8    @ 080d8e16 0002
     movs r1,#0x4    @ 080d8e18 0421
-    bl FUN_0810e3fc                          @ 080d8e1a 35f0effa
+    bl bios_div                              @ 080d8e1a 35f0effa
     b LAB_080d8e30                           @ 080d8e1e 07e0
 LAB_080d8e20:
     movs r0,#0xba    @ 080d8e20 ba20
     lsls r0,r0,#0x8    @ 080d8e22 0002
     adds r1,#0x1    @ 080d8e24 0131
-    bl FUN_0810e3fc                          @ 080d8e26 35f0e9fa
+    bl bios_div                              @ 080d8e26 35f0e9fa
     movs r1,#0xd8    @ 080d8e2a d821
     lsls r1,r1,#0x5    @ 080d8e2c 4901
     adds r5,r0,r1    @ 080d8e2e 4518
@@ -265560,11 +266659,11 @@ pack_list_tilemap_load:
     ldr r0, DAT_080d8f30                     @ 080d8f0a 0948
     ldr r0,[r0,#0x4]                         @ 080d8f0c 4068
     ldr r1, DAT_080d8f34                     @ 080d8f0e 0949
-    bl FUN_0810e418                          @ 080d8f10 35f082fa
+    bl bios_huff_uncomp                      @ 080d8f10 35f082fa
     ldr r0, DAT_080d8f38                     @ 080d8f14 0848
     ldr r0,[r0,#0x4]                         @ 080d8f16 4068
     ldr r1, DAT_080d8f3c                     @ 080d8f18 0849
-    bl FUN_0810e418                          @ 080d8f1a 35f07dfa
+    bl bios_huff_uncomp                      @ 080d8f1a 35f07dfa
     ldr r0, DAT_080d8f40                     @ 080d8f1e 0848
     ldr r1, DAT_080d8f44                     @ 080d8f20 0849
     ldr r1,[r1,#0x4]                         @ 080d8f22 4968
@@ -265601,7 +266700,7 @@ LAB_080d8f56:
     adds r5,r0,r5    @ 080d8f60 4519
     adds r0,r4,#0x0    @ 080d8f62 201c
     movs r1,#0x4    @ 080d8f64 0421
-    bl FUN_0810e3fc                          @ 080d8f66 35f049fa
+    bl bios_div                              @ 080d8f66 35f049fa
     lsls r0,r0,#0xd    @ 080d8f6a 4003
     adds r5,r5,r0    @ 080d8f6c 2d18
     adds r0,r6,#0x0    @ 080d8f6e 301c
@@ -265941,7 +267040,7 @@ FUN_080d9200:
     adds r5,r0,#0x0    @ 080d920e 051c
     adds r0,r6,#0x0    @ 080d9210 301c
     movs r1,#0x4    @ 080d9212 0421
-    bl FUN_0810e3fc                          @ 080d9214 35f0f2f8
+    bl bios_div                              @ 080d9214 35f0f2f8
     lsls r5,r5,#0x3    @ 080d9218 ed00
     lsls r0,r0,#0x8    @ 080d921a 0002
     movs r1,#0x80    @ 080d921c 8021
@@ -265989,7 +267088,7 @@ FUN_080d925c:
     adds r4,r0,#0x0    @ 080d9270 041c
     adds r0,r5,#0x0    @ 080d9272 281c
     movs r1,#0x4    @ 080d9274 0421
-    bl FUN_0810e3fc                          @ 080d9276 35f0c1f8
+    bl bios_div                              @ 080d9276 35f0c1f8
     lsls r4,r4,#0x3    @ 080d927a e400
     lsls r0,r0,#0x8    @ 080d927c 0002
     movs r1,#0x80    @ 080d927e 8021
@@ -266128,7 +267227,7 @@ LAB_080d9378:
     bhi LAB_080d9398                         @ 080d937c 0cd8
     lsls r0,r0,#0x6    @ 080d937e 8001
     movs r1,#0xf    @ 080d9380 0f21
-    bl FUN_0810e3fc                          @ 080d9382 35f03bf8
+    bl bios_div                              @ 080d9382 35f03bf8
     movs r2,#0x80    @ 080d9386 8022
     lsls r2,r2,#0x1    @ 080d9388 5200
     adds r1,r2,#0x0    @ 080d938a 111c
@@ -266143,7 +267242,7 @@ LAB_080d9398:
     subs r0,#0xf    @ 080d939a 0f38
     lsls r0,r0,#0x6    @ 080d939c 8001
     movs r1,#0xf    @ 080d939e 0f21
-    bl FUN_0810e3fc                          @ 080d93a0 35f02cf8
+    bl bios_div                              @ 080d93a0 35f02cf8
     adds r0,#0xc0    @ 080d93a4 c030
     lsls r0,r0,#0x10    @ 080d93a6 0004
     lsrs r7,r0,#0x10    @ 080d93a8 070c
@@ -266197,7 +267296,7 @@ LAB_080d93f2:
     subs r0,r0,r1    @ 080d9402 401a
     lsls r0,r0,#0x3    @ 080d9404 c000
     movs r1,#0x1e    @ 080d9406 1e21
-    bl FUN_0810e3fc                          @ 080d9408 34f0f8ff
+    bl bios_div                              @ 080d9408 34f0f8ff
     adds r2,r0,#0x0    @ 080d940c 021c
     rsbs r2,r2,#0    @ 080d940e 5242
     lsls r2,r2,#0x10    @ 080d9410 1204
@@ -266224,7 +267323,7 @@ LAB_080d9434:
     lsls r0,r0,#0x3    @ 080d943a c000
 LAB_080d943c:
     movs r1,#0xf    @ 080d943c 0f21
-    bl FUN_0810e3fc                          @ 080d943e 34f0ddff
+    bl bios_div                              @ 080d943e 34f0ddff
     lsls r0,r0,#0x10    @ 080d9442 0004
     lsrs r7,r0,#0x10    @ 080d9444 070c
     ldr r0, DAT_080d94f4                     @ 080d9446 2b48
@@ -266238,7 +267337,7 @@ LAB_080d943c:
     subs r0,r0,r1    @ 080d9456 401a
     lsls r0,r0,#0x3    @ 080d9458 c000
     movs r1,#0x1e    @ 080d945a 1e21
-    bl FUN_0810e3fc                          @ 080d945c 34f0ceff
+    bl bios_div                              @ 080d945c 34f0ceff
     adds r2,r0,#0x0    @ 080d9460 021c
     lsls r2,r2,#0x10    @ 080d9462 1204
     movs r0,#0xc    @ 080d9464 0c20
@@ -266886,7 +267985,7 @@ LAB_080d996e:
     subs r0,r0,r1    @ 080d9976 401a
     muls r0,r2    @ 080d9978 5043
     movs r1,#0x8    @ 080d997a 0821
-    bl FUN_0810e3fc                          @ 080d997c 34f03efd
+    bl bios_div                              @ 080d997c 34f03efd
     ldrh r1,[r4,#0xa]                        @ 080d9980 6189
     adds r0,r1,r0    @ 080d9982 0818
     strh r0,[r4,#0x2]                        @ 080d9984 6080
@@ -266898,7 +267997,7 @@ LAB_080d996e:
     ldr r0,[r4,#0x10]                        @ 080d9990 2069
     muls r0,r1    @ 080d9992 4843
     movs r1,#0x8    @ 080d9994 0821
-    bl FUN_0810e3fc                          @ 080d9996 34f031fd
+    bl bios_div                              @ 080d9996 34f031fd
     ldrh r1,[r4,#0xc]                        @ 080d999a a189
     adds r0,r1,r0    @ 080d999c 0818
     strh r0,[r4,#0x4]                        @ 080d999e a080
@@ -266907,7 +268006,7 @@ LAB_080d996e:
     adds r0,r0,r1    @ 080d99a4 4018
     lsls r0,r0,#0x8    @ 080d99a6 0002
     movs r1,#0x8    @ 080d99a8 0821
-    bl FUN_0810e3fc                          @ 080d99aa 34f027fd
+    bl bios_div                              @ 080d99aa 34f027fd
     movs r2,#0x80    @ 080d99ae 8022
     lsls r2,r2,#0x1    @ 080d99b0 5200
     adds r0,r0,r2    @ 080d99b2 8018
@@ -267098,7 +268197,7 @@ LAB_080d9b22:
     ldrsh r0,[r5,r1]                         @ 080d9b2c 685e
     lsls r0,r0,#0x4    @ 080d9b2e 0001
     movs r1,#0x14    @ 080d9b30 1421
-    bl FUN_0810e3fc                          @ 080d9b32 34f063fc
+    bl bios_div                              @ 080d9b32 34f063fc
     ldr r3, DAT_080d9b4c                     @ 080d9b36 054b
     lsls r2,r0,#0x18    @ 080d9b38 0206
     lsrs r2,r2,#0x18    @ 080d9b3a 120e
@@ -267825,7 +268924,7 @@ LAB_080da0f0:
     subs r0,r0,r1    @ 080da0f8 401a
     muls r0,r2    @ 080da0fa 5043
     movs r1,#0x8    @ 080da0fc 0821
-    bl FUN_0810e3fc                          @ 080da0fe 34f07df9
+    bl bios_div                              @ 080da0fe 34f07df9
     ldrh r1,[r4,#0xa]                        @ 080da102 6189
     adds r0,r1,r0    @ 080da104 0818
     strh r0,[r4,#0x2]                        @ 080da106 6080
@@ -267837,7 +268936,7 @@ LAB_080da0f0:
     ldr r0,[r4,#0x10]                        @ 080da112 2069
     muls r0,r1    @ 080da114 4843
     movs r1,#0x8    @ 080da116 0821
-    bl FUN_0810e3fc                          @ 080da118 34f070f9
+    bl bios_div                              @ 080da118 34f070f9
     ldrh r1,[r4,#0xc]                        @ 080da11c a189
     adds r0,r1,r0    @ 080da11e 0818
 LAB_080da120:
@@ -268064,7 +269163,7 @@ LAB_080da2c4:
     subs r0,r0,r1    @ 080da2cc 401a
     muls r0,r2    @ 080da2ce 5043
     movs r1,#0x8    @ 080da2d0 0821
-    bl FUN_0810e3fc                          @ 080da2d2 34f093f8
+    bl bios_div                              @ 080da2d2 34f093f8
     ldrh r1,[r4,#0xa]                        @ 080da2d6 6189
     adds r0,r1,r0    @ 080da2d8 0818
     strh r0,[r4,#0x2]                        @ 080da2da 6080
@@ -268076,7 +269175,7 @@ LAB_080da2c4:
     ldr r0,[r4,#0x10]                        @ 080da2e6 2069
     muls r0,r1    @ 080da2e8 4843
     movs r1,#0x8    @ 080da2ea 0821
-    bl FUN_0810e3fc                          @ 080da2ec 34f086f8
+    bl bios_div                              @ 080da2ec 34f086f8
     ldrh r1,[r4,#0xc]                        @ 080da2f0 a189
     adds r0,r1,r0    @ 080da2f2 0818
 LAB_080da2f4:
@@ -268384,7 +269483,7 @@ LAB_080da554:
     ldrsh r0,[r6,r1]                         @ 080da55a 705e
     lsls r0,r0,#0x4    @ 080da55c 0001
     movs r1,#0xa    @ 080da55e 0a21
-    bl FUN_0810e3fc                          @ 080da560 33f04cff
+    bl bios_div                              @ 080da560 33f04cff
     adds r5,r0,#0x0    @ 080da564 051c
     ldr r2, DAT_080da5b4                     @ 080da566 134a
     movs r0,#0x10    @ 080da568 1020
@@ -268410,7 +269509,7 @@ LAB_080da586:
     ldrsh r0,[r6,r1]                         @ 080da58e 705e
     lsls r0,r0,#0x7    @ 080da590 c001
     movs r1,#0xa    @ 080da592 0a21
-    bl FUN_0810e3fc                          @ 080da594 33f032ff
+    bl bios_div                              @ 080da594 33f032ff
     adds r0,#0x80    @ 080da598 8030
     strh r0,[r4,#0xe]                        @ 080da59a e081
     b LAB_080da5f4                           @ 080da59c 2ae0
@@ -268440,7 +269539,7 @@ LAB_080da5b8:
     subs r0,r0,r1    @ 080da5ca 401a
     muls r0,r2    @ 080da5cc 5043
     movs r1,#0x5    @ 080da5ce 0521
-    bl FUN_0810e3fc                          @ 080da5d0 33f014ff
+    bl bios_div                              @ 080da5d0 33f014ff
     ldrh r1,[r4,#0xa]                        @ 080da5d4 6189
     adds r0,r1,r0    @ 080da5d6 0818
     strh r0,[r4,#0x2]                        @ 080da5d8 6080
@@ -268452,7 +269551,7 @@ LAB_080da5b8:
     ldr r0,[r4,#0x10]                        @ 080da5e4 2069
     muls r0,r1    @ 080da5e6 4843
     movs r1,#0x5    @ 080da5e8 0521
-    bl FUN_0810e3fc                          @ 080da5ea 33f007ff
+    bl bios_div                              @ 080da5ea 33f007ff
     ldrh r1,[r4,#0xc]                        @ 080da5ee a189
     adds r0,r1,r0    @ 080da5f0 0818
     strh r0,[r4,#0x4]                        @ 080da5f2 a080
@@ -268719,7 +269818,7 @@ LAB_080da7e4:
     subs r0,r0,r1    @ 080da7ec 401a
     muls r0,r2    @ 080da7ee 5043
     movs r1,#0x8    @ 080da7f0 0821
-    bl FUN_0810e3fc                          @ 080da7f2 33f003fe
+    bl bios_div                              @ 080da7f2 33f003fe
     ldrh r1,[r4,#0xa]                        @ 080da7f6 6189
     adds r0,r1,r0    @ 080da7f8 0818
     strh r0,[r4,#0x2]                        @ 080da7fa 6080
@@ -268731,7 +269830,7 @@ LAB_080da7e4:
     ldr r0,[r4,#0x10]                        @ 080da806 2069
     muls r0,r1    @ 080da808 4843
     movs r1,#0x8    @ 080da80a 0821
-    bl FUN_0810e3fc                          @ 080da80c 33f0f6fd
+    bl bios_div                              @ 080da80c 33f0f6fd
     ldrh r1,[r4,#0xc]                        @ 080da810 a189
     adds r0,r1,r0    @ 080da812 0818
     strh r0,[r4,#0x4]                        @ 080da814 a080
@@ -268740,7 +269839,7 @@ LAB_080da7e4:
     adds r0,r0,r1    @ 080da81a 4018
     lsls r0,r0,#0x8    @ 080da81c 0002
     movs r1,#0x8    @ 080da81e 0821
-    bl FUN_0810e3fc                          @ 080da820 33f0ecfd
+    bl bios_div                              @ 080da820 33f0ecfd
     movs r2,#0x80    @ 080da824 8022
     lsls r2,r2,#0x3    @ 080da826 d200
     adds r1,r2,#0x0    @ 080da828 111c
@@ -268763,7 +269862,7 @@ LAB_080da836:
     ldrsh r0,[r7,r3]                         @ 080da844 f85e
     lsls r0,r0,#0x4    @ 080da846 0001
     .hword 0x4641    @ 080da848 4146
-    bl FUN_0810e3fc                          @ 080da84a 33f0d7fd
+    bl bios_div                              @ 080da84a 33f0d7fd
     movs r2,#0x10    @ 080da84e 1022
     subs r2,r2,r0    @ 080da850 121a
     ldr r3, DAT_080da868                     @ 080da852 054b
@@ -269315,7 +270414,7 @@ LAB_080dacb4:
     ldrsh r0,[r5,r2]                         @ 080dacba a85e
     lsls r0,r0,#0x4    @ 080dacbc 0001
     movs r1,#0xa    @ 080dacbe 0a21
-    bl FUN_0810e3fc                          @ 080dacc0 33f09cfb
+    bl bios_div                              @ 080dacc0 33f09cfb
     ldr r2, DAT_080dacf4                     @ 080dacc4 0b4a
     movs r1,#0x10    @ 080dacc6 1021
     subs r1,r1,r0    @ 080dacc8 091a
@@ -271077,11 +272176,11 @@ FUN_080db9fc:
     ldr r0, DAT_080dba3c                     @ 080dba0c 0b48
     ldr r0,[r0,#0x0]                         @ 080dba0e 0068
     ldr r1, DAT_080dba40                     @ 080dba10 0b49
-    bl FUN_0810e418                          @ 080dba12 32f001fd
+    bl bios_huff_uncomp                      @ 080dba12 32f001fd
     ldr r0, DAT_080dba44                     @ 080dba16 0b48
     ldr r0,[r0,#0x0]                         @ 080dba18 0068
     ldr r1, DAT_080dba48                     @ 080dba1a 0b49
-    bl FUN_0810e418                          @ 080dba1c 32f0fcfc
+    bl bios_huff_uncomp                      @ 080dba1c 32f0fcfc
     ldr r0, DAT_080dba4c                     @ 080dba20 0a48
     ldr r1, DAT_080dba50                     @ 080dba22 0b49
     ldr r1,[r1,#0x0]                         @ 080dba24 0968
@@ -271646,7 +272745,7 @@ LAB_080dbe88:
     movs r0,#0xb4    @ 080dbe8c b420
     muls r0,r1    @ 080dbe8e 4843
     movs r1,#0x4    @ 080dbe90 0421
-    bl FUN_0810e3fc                          @ 080dbe92 32f0b3fa
+    bl bios_div                              @ 080dbe92 32f0b3fa
     movs r1,#0xff    @ 080dbe96 ff21
     movs r2,#0xff    @ 080dbe98 ff22
     bl FUN_080dd980                          @ 080dbe9a 01f071fd
@@ -271678,7 +272777,7 @@ LAB_080dbec8:
     movs r0,#0xb4    @ 080dbecc b420
     muls r0,r1    @ 080dbece 4843
     movs r1,#0x4    @ 080dbed0 0421
-    bl FUN_0810e3fc                          @ 080dbed2 32f093fa
+    bl bios_div                              @ 080dbed2 32f093fa
     adds r0,r6,r0    @ 080dbed6 3018
     movs r1,#0xb4    @ 080dbed8 b421
     lsls r1,r1,#0x1    @ 080dbeda 4900
@@ -271698,7 +272797,7 @@ LAB_080dbec8:
     bgt LAB_080dbf0c                         @ 080dbefa 07dc
     lsls r0,r6,#0x7    @ 080dbefc f001
     movs r1,#0x80    @ 080dbefe 8021
-    bl FUN_0810e3fc                          @ 080dbf00 32f07cfa
+    bl bios_div                              @ 080dbf00 32f07cfa
     b LAB_080dbf1a                           @ 080dbf04 09e0
     .byte  0x00, 0x00
 DAT_080dbf08:
@@ -271709,7 +272808,7 @@ LAB_080dbf0c:
     subs r0,r0,r6    @ 080dbf10 801b
     lsls r0,r0,#0x7    @ 080dbf12 c001
     movs r1,#0x80    @ 080dbf14 8021
-    bl FUN_0810e3fc                          @ 080dbf16 32f071fa
+    bl bios_div                              @ 080dbf16 32f071fa
 LAB_080dbf1a:
     lsls r2,r0,#0x10    @ 080dbf1a 0204
     movs r0,#0x1    @ 080dbf1c 0120
@@ -271956,7 +273055,7 @@ LAB_080dc0fc:
     beq LAB_080dc118                         @ 080dc0fe 0bd0
     movs r0,#0x64    @ 080dc100 6420
     muls r0,r5    @ 080dc102 6843
-    bl FUN_0810e3fc                          @ 080dc104 32f07af9
+    bl bios_div                              @ 080dc104 32f07af9
     adds r2,r0,#0x0    @ 080dc108 021c
     cmp r2,#0x1                              @ 080dc10a 012a
     bcs LAB_080dc110                         @ 080dc10c 00d2
@@ -274644,7 +275743,7 @@ switchD_080dd610__caseD_1:
     ldrh r2,[r4,#0x1e]                       @ 080dd668 e28b
     muls r0,r2    @ 080dd66a 5043
     movs r1,#0xf    @ 080dd66c 0f21
-    bl FUN_0810e3fc                          @ 080dd66e 30f0c5fe
+    bl bios_div                              @ 080dd66e 30f0c5fe
     adds r0,#0x50    @ 080dd672 5030
     strh r0,[r4,#0x22]                       @ 080dd674 6084
     b LAB_080dd6f4                           @ 080dd676 3de0
@@ -274708,7 +275807,7 @@ switchD_080dd610__caseD_3:
     ldrh r2,[r4,#0x1e]                       @ 080dd6e0 e28b
     muls r0,r2    @ 080dd6e2 5043
     movs r1,#0xf    @ 080dd6e4 0f21
-    bl FUN_0810e3fc                          @ 080dd6e6 30f089fe
+    bl bios_div                              @ 080dd6e6 30f089fe
     ldrh r2,[r4,#0x10]                       @ 080dd6ea 228a
     lsls r1,r2,#0x2    @ 080dd6ec 9100
     subs r0,#0xa0    @ 080dd6ee a038
@@ -275001,7 +276100,7 @@ LAB_080dd902:
     beq LAB_080dd912                         @ 080dd906 04d0
     lsls r0,r7,#0x8    @ 080dd908 3802
     subs r0,r0,r7    @ 080dd90a c01b
-    bl FUN_0810e3fc                          @ 080dd90c 30f076fd
+    bl bios_div                              @ 080dd90c 30f076fd
     b LAB_080dd914                           @ 080dd910 00e0
 LAB_080dd912:
     movs r0,#0x0    @ 080dd912 0020
@@ -275018,7 +276117,7 @@ LAB_080dd914:
     subs r0,r5,r4    @ 080dd926 281b
     lsls r0,r0,#0x8    @ 080dd928 0002
     adds r1,r7,#0x0    @ 080dd92a 391c
-    bl FUN_0810e3fc                          @ 080dd92c 30f066fd
+    bl bios_div                              @ 080dd92c 30f066fd
     adds r1,r0,#0x0    @ 080dd930 011c
     b LAB_080dd95c                           @ 080dd932 13e0
 LAB_080dd934:
@@ -275027,7 +276126,7 @@ LAB_080dd934:
     subs r0,r4,r6    @ 080dd938 a01b
     lsls r0,r0,#0x8    @ 080dd93a 0002
     adds r1,r7,#0x0    @ 080dd93c 391c
-    bl FUN_0810e3fc                          @ 080dd93e 30f05dfd
+    bl bios_div                              @ 080dd93e 30f05dfd
     movs r2,#0x80    @ 080dd942 8022
     lsls r2,r2,#0x2    @ 080dd944 9200
     b LAB_080dd95a                           @ 080dd946 08e0
@@ -275037,7 +276136,7 @@ LAB_080dd948:
     subs r0,r6,r5    @ 080dd94c 701b
     lsls r0,r0,#0x8    @ 080dd94e 0002
     adds r1,r7,#0x0    @ 080dd950 391c
-    bl FUN_0810e3fc                          @ 080dd952 30f053fd
+    bl bios_div                              @ 080dd952 30f053fd
     movs r2,#0x80    @ 080dd956 8022
     lsls r2,r2,#0x3    @ 080dd958 d200
 LAB_080dd95a:
@@ -275084,7 +276183,7 @@ FUN_080dd980:
     lsls r4,r4,#0x8    @ 080dd9a6 2402
     adds r0,r4,#0x0    @ 080dd9a8 201c
     movs r1,#0x3c    @ 080dd9aa 3c21
-    bl FUN_0810e3fc                          @ 080dd9ac 30f026fd
+    bl bios_div                              @ 080dd9ac 30f026fd
     asrs r0,r0,#0x8    @ 080dd9b0 0012
     str r0,[sp,#0x0]                         @ 080dd9b2 0090
     movs r4,#0xff    @ 080dd9b4 ff24
@@ -275092,17 +276191,17 @@ FUN_080dd980:
     subs r0,r4,r1    @ 080dd9b8 601a
     muls r0,r7    @ 080dd9ba 7843
     movs r1,#0xff    @ 080dd9bc ff21
-    bl FUN_0810e3fc                          @ 080dd9be 30f01dfd
+    bl bios_div                              @ 080dd9be 30f01dfd
     adds r6,r0,#0x0    @ 080dd9c2 061c
     .hword 0x4640    @ 080dd9c4 4046
     muls r0,r5    @ 080dd9c6 6843
     movs r1,#0xb4    @ 080dd9c8 b421
     lsls r1,r1,#0x1    @ 080dd9ca 4900
-    bl FUN_0810e3fc                          @ 080dd9cc 30f016fd
+    bl bios_div                              @ 080dd9cc 30f016fd
     subs r0,r4,r0    @ 080dd9d0 201a
     muls r0,r7    @ 080dd9d2 7843
     movs r1,#0xff    @ 080dd9d4 ff21
-    bl FUN_0810e3fc                          @ 080dd9d6 30f011fd
+    bl bios_div                              @ 080dd9d6 30f011fd
     .hword 0x4681    @ 080dd9da 8146
     movs r2,#0xb4    @ 080dd9dc b422
     lsls r2,r2,#0x1    @ 080dd9de 5200
@@ -275110,12 +276209,12 @@ FUN_080dd980:
     .hword 0x4640    @ 080dd9e2 4046
     muls r0,r5    @ 080dd9e4 6843
     adds r1,r2,#0x0    @ 080dd9e6 111c
-    bl FUN_0810e3fc                          @ 080dd9e8 30f008fd
+    bl bios_div                              @ 080dd9e8 30f008fd
     subs r4,r4,r0    @ 080dd9ec 241a
     adds r0,r7,#0x0    @ 080dd9ee 381c
     muls r0,r4    @ 080dd9f0 6043
     movs r1,#0xff    @ 080dd9f2 ff21
-    bl FUN_0810e3fc                          @ 080dd9f4 30f002fd
+    bl bios_div                              @ 080dd9f4 30f002fd
     adds r3,r0,#0x0    @ 080dd9f8 031c
     ldr r0,[sp,#0x0]                         @ 080dd9fa 0098
     cmp r0,#0x5                              @ 080dd9fc 0528
@@ -275969,7 +277068,7 @@ LAB_080de084:
     movs r1,#0xa    @ 080de09a 0a21
     bl FUN_0810e400                          @ 080de09c 30f0b0f9
     movs r1,#0x5    @ 080de0a0 0521
-    bl FUN_0810e3fc                          @ 080de0a2 30f0abf9
+    bl bios_div                              @ 080de0a2 30f0abf9
     movs r1,#0x1a    @ 080de0a6 1a21
     muls r0,r1    @ 080de0a8 4843
     adds r0,#0x54    @ 080de0aa 5430
@@ -276223,11 +277322,11 @@ FUN_080de27c:
     ldr r0, DAT_080de2a4                     @ 080de27e 0948
     ldr r0,[r0,#0x0]                         @ 080de280 0068
     ldr r1, DAT_080de2a8                     @ 080de282 0949
-    bl FUN_0810e418                          @ 080de284 30f0c8f8
+    bl bios_huff_uncomp                      @ 080de284 30f0c8f8
     ldr r0, DAT_080de2ac                     @ 080de288 0848
     ldr r0,[r0,#0x0]                         @ 080de28a 0068
     ldr r1, DAT_080de2b0                     @ 080de28c 0849
-    bl FUN_0810e418                          @ 080de28e 30f0c3f8
+    bl bios_huff_uncomp                      @ 080de28e 30f0c3f8
     ldr r0, DAT_080de2b4                     @ 080de292 0848
     ldr r1, DAT_080de2b8                     @ 080de294 0849
     ldr r1,[r1,#0x0]                         @ 080de296 0968
@@ -277581,7 +278680,7 @@ FUN_080df664:
     muls r0,r1    @ 080df684 4843
     movs r3,#0xc    @ 080df686 0c23
     ldrsh r1,[r5,r3]                         @ 080df688 e95e
-    bl FUN_0810e3fc                          @ 080df68a 2ef0b7fe
+    bl bios_div                              @ 080df68a 2ef0b7fe
     adds r4,r0,#0x0    @ 080df68e 041c
     movs r1,#0x8    @ 080df690 0821
     ldrsh r0,[r5,r1]                         @ 080df692 685e
@@ -277596,7 +278695,7 @@ FUN_080df664:
     muls r0,r1    @ 080df6a4 4843
     movs r3,#0xc    @ 080df6a6 0c23
     ldrsh r1,[r5,r3]                         @ 080df6a8 e95e
-    bl FUN_0810e3fc                          @ 080df6aa 2ef0a7fe
+    bl bios_div                              @ 080df6aa 2ef0a7fe
     movs r2,#0xa    @ 080df6ae 0a22
     ldrsh r1,[r5,r2]                         @ 080df6b0 a95e
     adds r0,r0,r1    @ 080df6b2 4018
@@ -277651,7 +278750,7 @@ LAB_080df6fa:
     ldrsh r2,[r5,r3]                         @ 080df710 ea5e
     subs r0,r0,r2    @ 080df712 801a
     muls r0,r4    @ 080df714 6043
-    bl FUN_0810e3fc                          @ 080df716 2ef071fe
+    bl bios_div                              @ 080df716 2ef071fe
     movs r2,#0x4    @ 080df71a 0422
     ldrsh r1,[r5,r2]                         @ 080df71c a95e
     adds r6,r0,r1    @ 080df71e 4618
@@ -277667,7 +278766,7 @@ LAB_080df6fa:
     muls r0,r1    @ 080df732 4843
     asrs r1,r0,#0x1    @ 080df734 4110
     lsls r0,r2,#0x8    @ 080df736 1002
-    bl FUN_0810e3fc                          @ 080df738 2ef060fe
+    bl bios_div                              @ 080df738 2ef060fe
     adds r2,r0,#0x0    @ 080df73c 021c
     movs r0,#0x6    @ 080df73e 0620
     ldrsh r1,[r5,r0]                         @ 080df740 295e
@@ -277690,7 +278789,7 @@ LAB_080df750:
     muls r0,r1    @ 080df760 4843
     lsrs r1,r0,#0x1    @ 080df762 4108
     lsls r0,r2,#0x8    @ 080df764 1002
-    bl FUN_0810e3fc                          @ 080df766 2ef049fe
+    bl bios_div                              @ 080df766 2ef049fe
     adds r2,r0,#0x0    @ 080df76a 021c
     movs r0,#0x6    @ 080df76c 0620
     ldrsh r1,[r5,r0]                         @ 080df76e 295e
@@ -277795,7 +278894,7 @@ LAB_080df820:
     muls r0,r1    @ 080df82e 4843
     movs r3,#0xc    @ 080df830 0c23
     ldrsh r1,[r5,r3]                         @ 080df832 e95e
-    bl FUN_0810e3fc                          @ 080df834 2ef0e2fd
+    bl bios_div                              @ 080df834 2ef0e2fd
     adds r4,r0,#0x0    @ 080df838 041c
     movs r1,#0x8    @ 080df83a 0821
     ldrsh r0,[r5,r1]                         @ 080df83c 685e
@@ -277810,7 +278909,7 @@ LAB_080df820:
     muls r0,r1    @ 080df84e 4843
     movs r3,#0xc    @ 080df850 0c23
     ldrsh r1,[r5,r3]                         @ 080df852 e95e
-    bl FUN_0810e3fc                          @ 080df854 2ef0d2fd
+    bl bios_div                              @ 080df854 2ef0d2fd
     movs r2,#0xa    @ 080df858 0a22
     ldrsh r1,[r5,r2]                         @ 080df85a a95e
     adds r0,r0,r1    @ 080df85c 4018
@@ -277901,7 +279000,7 @@ LAB_080df900:
     adds r0,r0,r1    @ 080df902 4018
     lsls r0,r0,#0x6    @ 080df904 8001
     movs r1,#0x14    @ 080df906 1421
-    bl FUN_0810e3fc                          @ 080df908 2ef078fd
+    bl bios_div                              @ 080df908 2ef078fd
     lsls r0,r0,#0x10    @ 080df90c 0004
     lsrs r5,r0,#0x10    @ 080df90e 050c
     movs r0,#0x12    @ 080df910 1220
@@ -277964,7 +279063,7 @@ LAB_080df970:
     muls r0,r1    @ 080df97e 4843
     movs r5,#0xc    @ 080df980 0c25
     ldrsh r1,[r6,r5]                         @ 080df982 715f
-    bl FUN_0810e3fc                          @ 080df984 2ef03afd
+    bl bios_div                              @ 080df984 2ef03afd
     movs r2,#0x8    @ 080df988 0822
     ldrsh r1,[r6,r2]                         @ 080df98a b15e
     adds r0,r0,r1    @ 080df98c 4018
@@ -277979,7 +279078,7 @@ LAB_080df970:
     muls r0,r1    @ 080df99e 4843
     movs r2,#0xc    @ 080df9a0 0c22
     ldrsh r1,[r6,r2]                         @ 080df9a2 b15e
-    bl FUN_0810e3fc                          @ 080df9a4 2ef02afd
+    bl bios_div                              @ 080df9a4 2ef02afd
     movs r5,#0xa    @ 080df9a8 0a25
     ldrsh r1,[r6,r5]                         @ 080df9aa 715f
     adds r0,r0,r1    @ 080df9ac 4018
@@ -278082,7 +279181,7 @@ FUN_080dfa44:
     ldrh r1,[r1,#0x0]                        @ 080dfa6e 0988
     muls r0,r1    @ 080dfa70 4843
     ldrh r1,[r2,#0x0]                        @ 080dfa72 1188
-    bl FUN_0810e3fc                          @ 080dfa74 2ef0c2fc
+    bl bios_div                              @ 080dfa74 2ef0c2fc
     adds r0,r0,r4    @ 080dfa78 0019
     b LAB_080dfa84                           @ 080dfa7a 03e0
 DAT_080dfa7c:
@@ -279608,7 +280707,7 @@ FUN_080e063c:
     ldrh r1,[r1,#0x0]                        @ 080e066c 0988
     subs r0,r1,r0    @ 080e066e 081a
     lsls r0,r0,#0xb    @ 080e0670 c002
-    bl FUN_0810e3fc                          @ 080e0672 2df0c3fe
+    bl bios_div                              @ 080e0672 2df0c3fe
     movs r2,#0x90    @ 080e0676 9022
     lsls r2,r2,#0x4    @ 080e0678 1201
     subs r2,r2,r0    @ 080e067a 121a
@@ -279677,7 +280776,7 @@ FUN_080e06d8:
     lsls r3,r3,#0x1    @ 080e06f8 5b00
     adds r7,r4,r3    @ 080e06fa e718
     ldrh r1,[r7,#0x0]                        @ 080e06fc 3988
-    bl FUN_0810e3fc                          @ 080e06fe 2df07dfe
+    bl bios_div                              @ 080e06fe 2df07dfe
     ldr r2, DAT_080e0734                     @ 080e0702 0c4a
     ldr r3, DAT_080e0738                     @ 080e0704 0c4b
     adds r1,r3,#0x0    @ 080e0706 191c
@@ -280361,7 +281460,7 @@ FUN_080e0c58:
     subs r4,r4,r1    @ 080e0c6e 641a
     lsls r0,r4,#0xb    @ 080e0c70 e002
     movs r1,#0xf    @ 080e0c72 0f21
-    bl FUN_0810e3fc                          @ 080e0c74 2df0c2fb
+    bl bios_div                              @ 080e0c74 2df0c2fb
     movs r2,#0x80    @ 080e0c78 8022
     lsls r2,r2,#0x1    @ 080e0c7a 5200
     adds r3,r0,r2    @ 080e0c7c 8318
@@ -280387,7 +281486,7 @@ FUN_080e0c58:
     lsls r4,r4,#0x4    @ 080e0ca4 2401
     adds r0,r4,#0x0    @ 080e0ca6 201c
     movs r1,#0xf    @ 080e0ca8 0f21
-    bl FUN_0810e3fc                          @ 080e0caa 2df0a7fb
+    bl bios_div                              @ 080e0caa 2df0a7fb
     adds r3,r0,#0x0    @ 080e0cae 031c
     ldr r1, DAT_080e0d2c                     @ 080e0cb0 1e49
     ldr r2, DAT_080e0d30                     @ 080e0cb2 1f4a
@@ -280486,7 +281585,7 @@ FUN_080e0d40:
     subs r4,r4,r2    @ 080e0d6a a41a
     lsls r0,r4,#0x7    @ 080e0d6c e001
     movs r1,#0x3c    @ 080e0d6e 3c21
-    bl FUN_0810e3fc                          @ 080e0d70 2df044fb
+    bl bios_div                              @ 080e0d70 2df044fb
     movs r1,#0x80    @ 080e0d74 8021
     lsls r1,r1,#0x1    @ 080e0d76 4900
     subs r3,r1,r0    @ 080e0d78 0b1a
@@ -280519,7 +281618,7 @@ FUN_080e0d40:
     lsls r4,r4,#0x4    @ 080e0dae 2401
     adds r0,r4,#0x0    @ 080e0db0 201c
     movs r1,#0x3c    @ 080e0db2 3c21
-    bl FUN_0810e3fc                          @ 080e0db4 2df022fb
+    bl bios_div                              @ 080e0db4 2df022fb
     adds r3,r0,#0x0    @ 080e0db8 031c
     ldr r1, DAT_080e0ed4                     @ 080e0dba 4649
     ldr r2, DAT_080e0ed8                     @ 080e0dbc 464a
@@ -284477,7 +285576,7 @@ LAB_080e4096:
 DAT_080e409c:
     .word  0x00004e39                     @ 080e409c 394e0000
 LAB_080e40a0:
-    ldr r0, LAB_080e40c8                     @ 080e40a0 0948
+    ldr r0, DWORD_080e40c8                   @ 080e40a0 0948
     cmp r1,r0                                @ 080e40a2 8142
     bne LAB_080e40aa                         @ 080e40a4 01d1
     bl FUN_080e4abc                          @ 080e40a6 00f009fd
@@ -284486,8 +285585,8 @@ LAB_080e40aa:
     ble LAB_080e40b2                         @ 080e40ac 01dd
     bl FUN_080e4ad8                          @ 080e40ae 00f013fd
 LAB_080e40b2:
-    ldr r0, LAB_080e40cc                     @ 080e40b2 0648
-    ldr r1, LAB_080e40d0                     @ 080e40b4 0649
+    ldr r0, DWORD_080e40cc                   @ 080e40b2 0648
+    ldr r1, DWORD_080e40d0                   @ 080e40b4 0649
     adds r0,r0,r1    @ 080e40b6 4018
     ldrb r0,[r0,#0x0]                        @ 080e40b8 0078
     cmp r0,#0x3b                             @ 080e40ba 3b28
@@ -284496,15 +285595,12 @@ LAB_080e40b2:
 FUN_080e40c2:
     movs r0,#0x0    @ 080e40c2 0020
     bl FUN_080e560a                          @ 080e40c4 01f0a1fa
-LAB_080e40c8:
-    ldr r6, LAB_080e4184                     @ 080e40c8 2e4e
-    movs r0,r0    @ 080e40ca 0000
-LAB_080e40cc:
-    movs r0,r0    @ 080e40cc 0000
-    lsls r0,r0,#0x8    @ 080e40ce 0002
-LAB_080e40d0:
-    asrs r0,r2,#0x5    @ 080e40d0 5011
-    movs r0,r0    @ 080e40d2 0000
+DWORD_080e40c8:
+    .word  0x00004e2e                     @ 080e40c8 2e4e0000
+DWORD_080e40cc:
+    .word  0x02000000                     @ 080e40cc 00000002
+DWORD_080e40d0:
+    .word  0x00001150                     @ 080e40d0 50110000
 LAB_080e40d4:
     ldr r0, DAT_080e410c                     @ 080e40d4 0d48
     cmp r1,r0                                @ 080e40d6 8142
@@ -284594,11 +285690,8 @@ LAB_080e417a:
     ldr r4, DAT_080e4198                     @ 080e417e 064c
     adds r1,r0,r4    @ 080e4180 0119
     ldrb r1,[r1,#0x0]                        @ 080e4182 0978
-LAB_080e4184:
-    cmp r5,r1                                @ 080e4184 8d42
-    blt LAB_080e418c                         @ 080e4186 01db
+    .word  0xdb01428d                     @ 080e4184 8d4201db
     bl FUN_080e4f94                          @ 080e4188 00f004ff
-LAB_080e418c:
     bl FUN_080e4f58                          @ 080e418c 00f0e4fe
 DAT_080e4190:
     .word  0x00004e41                     @ 080e4190 414e0000
@@ -284706,35 +285799,35 @@ LAB_080e4252:
 DAT_080e4260:
     .word  0x00000fbb                     @ 080e4260 bb0f0000
 LAB_080e4264:
-    ldr r5, LAB_080e42b8                     @ 080e4264 144d
+    ldr r5, DWORD_080e42b8                   @ 080e4264 144d
     adds r0,r5,#0x0    @ 080e4266 281c
     bl FUN_080f9208                          @ 080e4268 14f0ceff
     cmp r0,#0x0                              @ 080e426c 0028
     bne LAB_080e4274                         @ 080e426e 01d1
     bl FUN_080e55fc                          @ 080e4270 01f0c4f9
 LAB_080e4274:
-    ldr r5, LAB_080e42bc                     @ 080e4274 114d
+    ldr r5, DWORD_080e42bc                   @ 080e4274 114d
     adds r0,r5,#0x0    @ 080e4276 281c
     bl FUN_080f9208                          @ 080e4278 14f0c6ff
     cmp r0,#0x0                              @ 080e427c 0028
     bne LAB_080e4284                         @ 080e427e 01d1
     bl FUN_080e55fc                          @ 080e4280 01f0bcf9
 LAB_080e4284:
-    ldr r5, LAB_080e42c0                     @ 080e4284 0e4d
+    ldr r5, DWORD_080e42c0                   @ 080e4284 0e4d
     adds r0,r5,#0x0    @ 080e4286 281c
     bl FUN_080f9208                          @ 080e4288 14f0beff
     cmp r0,#0x0                              @ 080e428c 0028
     bne LAB_080e4294                         @ 080e428e 01d1
     bl FUN_080e55fc                          @ 080e4290 01f0b4f9
 LAB_080e4294:
-    ldr r5, LAB_080e42c4                     @ 080e4294 0b4d
+    ldr r5, DWORD_080e42c4                   @ 080e4294 0b4d
     adds r0,r5,#0x0    @ 080e4296 281c
     bl FUN_080f9208                          @ 080e4298 14f0b6ff
     cmp r0,#0x0                              @ 080e429c 0028
     bne LAB_080e42a4                         @ 080e429e 01d1
     bl FUN_080e55fc                          @ 080e42a0 01f0acf9
 LAB_080e42a4:
-    ldr r5, LAB_080e42c8                     @ 080e42a4 084d
+    ldr r5, DWORD_080e42c8                   @ 080e42a4 084d
 LAB_080e42a6:
     adds r0,r5,#0x0    @ 080e42a6 281c
     bl FUN_080f9208                          @ 080e42a8 14f0aeff
@@ -284743,21 +285836,16 @@ LAB_080e42a6:
     bl FUN_080e5608                          @ 080e42b0 01f0aaf9
 LAB_080e42b4:
     bl FUN_080e55fc                          @ 080e42b4 01f0a2f9
-LAB_080e42b8:
-    asrs r0,r5,#0x11    @ 080e42b8 6814
-    movs r0,r0    @ 080e42ba 0000
-LAB_080e42bc:
-    asrs r7,r2,#0x12    @ 080e42bc 9714
-    movs r0,r0    @ 080e42be 0000
-LAB_080e42c0:
-    asrs r0,r3,#0x12    @ 080e42c0 9814
-    movs r0,r0    @ 080e42c2 0000
-LAB_080e42c4:
-    asrs r1,r3,#0x12    @ 080e42c4 9914
-    movs r0,r0    @ 080e42c6 0000
-LAB_080e42c8:
-    asrs r2,r3,#0x12    @ 080e42c8 9a14
-    movs r0,r0    @ 080e42ca 0000
+DWORD_080e42b8:
+    .word  0x00001468                     @ 080e42b8 68140000
+DWORD_080e42bc:
+    .word  0x00001497                     @ 080e42bc 97140000
+DWORD_080e42c0:
+    .word  0x00001498                     @ 080e42c0 98140000
+DWORD_080e42c4:
+    .word  0x00001499                     @ 080e42c4 99140000
+DWORD_080e42c8:
+    .word  0x0000149a                     @ 080e42c8 9a140000
 LAB_080e42cc:
     ldr r5, DAT_080e42d0                     @ 080e42cc 004d
     b LAB_080e42a6                           @ 080e42ce eae7
@@ -293459,7 +294547,7 @@ LAB_080e8650:
     movs r0,#0x80    @ 080e8650 8020
     lsls r0,r0,#0x11    @ 080e8652 4004
     adds r1,r2,#0x0    @ 080e8654 111c
-    bl FUN_0810e3fc                          @ 080e8656 25f0d1fe
+    bl bios_div                              @ 080e8656 25f0d1fe
     adds r4,r0,#0x0    @ 080e865a 041c
     asrs r5,r4,#0x1f    @ 080e865c e517
     ldr r0,[r7,#0xc]                         @ 080e865e f868
@@ -293517,7 +294605,7 @@ LAB_080e8650:
     ldr r2, DAT_080e86e8                     @ 080e86ce 064a
     .hword 0x4668    @ 080e86d0 6846
     .hword 0x4649    @ 080e86d2 4946
-    bl FUN_0810e3f8                          @ 080e86d4 25f090fe
+    bl bios_cpu_set                          @ 080e86d4 25f090fe
 LAB_080e86d8:
     movs r0,#0x0    @ 080e86d8 0020
 LAB_080e86da:
@@ -294322,7 +295410,7 @@ LAB_080e8d4c:
     ldr r1,[r4,#0x0]                         @ 080e8d50 2168
     ldrh r1,[r1,#0x4]                        @ 080e8d52 8988
     lsls r1,r1,#0xc    @ 080e8d54 0903
-    bl FUN_0810e3fc                          @ 080e8d56 25f051fb
+    bl bios_div                              @ 080e8d56 25f051fb
     pop {r4}                                 @ 080e8d5a 10bc
     pop {r1}                                 @ 080e8d5c 02bc
     bx r1                                    @ 080e8d5e 0847
@@ -297371,7 +298459,7 @@ LAB_080ea5b8:
     add r1,r8                                @ 080ea5c0 4144
     lsls r2,r6,#0x9    @ 080ea5c2 7202
     lsrs r2,r2,#0xb    @ 080ea5c4 d20a
-    bl FUN_0810e3f4                          @ 080ea5c6 23f015ff
+    bl bios_cpu_fast_set                     @ 080ea5c6 23f015ff
     b LAB_080ea5f6                           @ 080ea5ca 14e0
 DAT_080ea5cc:
     .word  0x09e4b61c                     @ 080ea5cc 1cb6e409
@@ -297574,7 +298662,7 @@ LAB_080ea72c:
     ldr r2, DAT_080ea76c                     @ 080ea750 064a
     .hword 0x4653    @ 080ea752 5346
     ands r2,r3    @ 080ea754 1a40
-    bl FUN_0810e3f4                          @ 080ea756 23f04dfe
+    bl bios_cpu_fast_set                     @ 080ea756 23f04dfe
     b LAB_080ea77e                           @ 080ea75a 10e0
 DAT_080ea75c:
     .word  0x09e4b61c                     @ 080ea75c 1cb6e409
@@ -298162,7 +299250,7 @@ LAB_080eac40:
     adds r1,r7,r2    @ 080eac48 b918
     lsls r2,r5,#0x9    @ 080eac4a 6a02
     lsrs r2,r2,#0xb    @ 080eac4c d20a
-    bl FUN_0810e3f4                          @ 080eac4e 23f0d1fb
+    bl bios_cpu_fast_set                     @ 080eac4e 23f0d1fb
     b LAB_080eac7a                           @ 080eac52 12e0
 DAT_080eac54:
     .word  0x09e4b61c                     @ 080eac54 1cb6e409
@@ -298337,7 +299425,7 @@ LAB_080ead7c:
     ldr r2, DAT_080eadbc                     @ 080ead9e 074a
     .hword 0x464b    @ 080eada0 4b46
     ands r2,r3    @ 080eada2 1a40
-    bl FUN_0810e3f4                          @ 080eada4 23f026fb
+    bl bios_cpu_fast_set                     @ 080eada4 23f026fb
     b LAB_080eadce                           @ 080eada8 11e0
     .byte  0x00, 0x00
 DAT_080eadac:
@@ -299945,7 +301033,7 @@ LAB_080eb9a0:
     adds r1,r4,#0x4    @ 080eb9a6 211d
     ldr r2, DAT_080eb9cc                     @ 080eb9a8 084a
     .hword 0x4668    @ 080eb9aa 6846
-    bl FUN_0810e3f8                          @ 080eb9ac 22f024fd
+    bl bios_cpu_set                          @ 080eb9ac 22f024fd
     movs r0,#0x80    @ 080eb9b0 8020
     lsls r0,r0,#0x5    @ 080eb9b2 4001
     str r0,[r4,#0x4]                         @ 080eb9b4 6060
@@ -303165,7 +304253,7 @@ FUN_080ee6c0:
     ands r0,r1    @ 080ee6d0 0840
     cmp r0,#0x0                              @ 080ee6d2 0028
     beq LAB_080ee6e6                         @ 080ee6d4 07d0
-    bl FUN_080148e0                          @ 080ee6d6 26f703f9
+    bl gl_fade_out                           @ 080ee6d6 26f703f9
     adds r1,r4,#0x0    @ 080ee6da 211c
     adds r1,#0x88    @ 080ee6dc 8831
     movs r0,#0x1    @ 080ee6de 0120
@@ -305235,7 +306323,7 @@ FUN_080ef65c:
     ldr r2, DAT_080ef760                     @ 080ef684 364a
     .hword 0x4668    @ 080ef686 6846
     adds r1,r4,#0x0    @ 080ef688 211c
-    bl FUN_0810e3f8                          @ 080ef68a 1ef0b5fe
+    bl bios_cpu_set                          @ 080ef68a 1ef0b5fe
     movs r0,#0xd4    @ 080ef68e d420
     lsls r0,r0,#0x2    @ 080ef690 8000
     adds r1,r4,r0    @ 080ef692 2118
@@ -305407,7 +306495,7 @@ FUN_080ef7cc:
     adds r2,#0x2    @ 080ef7d8 0232
     adds r1,r4,r2    @ 080ef7da a118
     ldr r2, DAT_080ef814                     @ 080ef7dc 0d4a
-    bl FUN_0810e3f8                          @ 080ef7de 1ef00bfe
+    bl bios_cpu_set                          @ 080ef7de 1ef00bfe
     movs r1,#0x0    @ 080ef7e2 0021
     movs r0,#0xd7    @ 080ef7e4 d720
     lsls r0,r0,#0x2    @ 080ef7e6 8000
@@ -305528,7 +306616,7 @@ LAB_080ef89e:
     lsls r1,r1,#0x4    @ 080ef8c4 0901
     add r1,r10                               @ 080ef8c6 5144
     movs r2,#0x8    @ 080ef8c8 0822
-    bl FUN_0810e3f8                          @ 080ef8ca 1ef095fd
+    bl bios_cpu_set                          @ 080ef8ca 1ef095fd
     ldr r1,[r4,#0x0]                         @ 080ef8ce 2168
     movs r0,#0x1    @ 080ef8d0 0120
     lsls r0,r1    @ 080ef8d2 8840
@@ -305568,7 +306656,7 @@ LAB_080ef908:
     adds r1,#0x4    @ 080ef912 0431
     .hword 0x4668    @ 080ef914 6846
     ldr r2, DAT_080ef94c                     @ 080ef916 0d4a
-    bl FUN_0810e3f8                          @ 080ef918 1ef06efd
+    bl bios_cpu_set                          @ 080ef918 1ef06efd
     ldr r0,[r4,#0x0]                         @ 080ef91c 2068
     adds r0,#0x1    @ 080ef91e 0130
     str r0,[r4,#0x0]                         @ 080ef920 2060
@@ -305817,7 +306905,7 @@ LAB_080efae2:
     lsrs r2,r2,#0xb    @ 080efaf0 d20a
     .hword 0x4660    @ 080efaf2 6046
     adds r1,r4,#0x0    @ 080efaf4 211c
-    bl FUN_0810e3f8                          @ 080efaf6 1ef07ffc
+    bl bios_cpu_set                          @ 080efaf6 1ef07ffc
     subs r4,#0x2    @ 080efafa 023c
     adds r0,r4,#0x0    @ 080efafc 201c
     bl FUN_080ef7cc                          @ 080efafe fff765fe
@@ -305978,7 +307066,7 @@ LAB_080efbfa:
     adds r2,r2,r3    @ 080efc20 d218
     adds r1,r1,r2    @ 080efc22 8918
     movs r2,#0x7    @ 080efc24 0722
-    bl FUN_0810e3f8                          @ 080efc26 1ef0e7fb
+    bl bios_cpu_set                          @ 080efc26 1ef0e7fb
     ldrh r2,[r4,#0x0]                        @ 080efc2a 2288
     adds r2,#0x1    @ 080efc2c 0132
     movs r3,#0x0    @ 080efc2e 0023
@@ -306045,7 +307133,7 @@ LAB_080efc94:
     .hword 0x4669    @ 080efca2 6946
     adds r1,#0x22    @ 080efca4 2231
     movs r2,#0x7    @ 080efca6 0722
-    bl FUN_0810e3f8                          @ 080efca8 1ef0a6fb
+    bl bios_cpu_set                          @ 080efca8 1ef0a6fb
     adds r0,r4,#0x0    @ 080efcac 201c
     bl FUN_080ef7cc                          @ 080efcae fff78dfd
 LAB_080efcb2:
@@ -306109,7 +307197,7 @@ LAB_080efcfe:
     adds r2,r2,r3    @ 080efd1e d218
     adds r1,r1,r2    @ 080efd20 8918
     movs r2,#0x7    @ 080efd22 0722
-    bl FUN_0810e3f8                          @ 080efd24 1ef068fb
+    bl bios_cpu_set                          @ 080efd24 1ef068fb
     ldrh r0,[r4,#0x0]                        @ 080efd28 2088
     adds r0,#0x1    @ 080efd2a 0130
     strh r0,[r4,#0x0]                        @ 080efd2c 2080
@@ -306185,7 +307273,7 @@ LAB_080efda2:
     .hword 0x4669    @ 080efdb0 6946
     adds r1,#0x22    @ 080efdb2 2231
     movs r2,#0x7    @ 080efdb4 0722
-    bl FUN_0810e3f8                          @ 080efdb6 1ef01ffb
+    bl bios_cpu_set                          @ 080efdb6 1ef01ffb
     adds r0,r4,#0x0    @ 080efdba 201c
     bl FUN_080ef7cc                          @ 080efdbc fff706fd
 LAB_080efdc0:
@@ -306217,7 +307305,7 @@ LAB_080efdc0:
     ldr r3,[sp,#0x44]                        @ 080efdf2 119b
     lsrs r2,r3,#0x1    @ 080efdf4 5a08
     ldr r1,[sp,#0x34]                        @ 080efdf6 0d99
-    bl FUN_0810e3f8                          @ 080efdf8 1ef0fefa
+    bl bios_cpu_set                          @ 080efdf8 1ef0fefa
 LAB_080efdfc:
     movs r0,#0x0    @ 080efdfc 0020
     strh r0,[r5,#0x0]                        @ 080efdfe 2880
@@ -306381,7 +307469,7 @@ LAB_080eff4c:
     lsls r2,r2,#0x2    @ 080effce 9200
     adds r1,r1,r2    @ 080effd0 8918
     movs r2,#0x7    @ 080effd2 0722
-    bl FUN_0810e3f8                          @ 080effd4 1ef010fa
+    bl bios_cpu_set                          @ 080effd4 1ef010fa
     ldrh r1,[r4,#0x0]                        @ 080effd8 2188
     lsls r0,r1,#0x1    @ 080effda 4800
     ldr r2, DAT_080f00a4                     @ 080effdc 314a
@@ -306422,7 +307510,7 @@ LAB_080eff4c:
     ldrh r5,[r7,#0x0]                        @ 080f0022 3d88
     lsrs r2,r5,#0x1    @ 080f0024 6a08
     ldr r1,[sp,#0x4]                         @ 080f0026 0199
-    bl FUN_0810e3f8                          @ 080f0028 1ef0e6f9
+    bl bios_cpu_set                          @ 080f0028 1ef0e6f9
 LAB_080f002c:
     ldrh r2,[r4,#0x0]                        @ 080f002c 2288
     add r2,r9                                @ 080f002e 4a44
@@ -313869,7 +314957,7 @@ FUN_080f42b4:
     ldr r2, DAT_080f43a4                     @ 080f42ca 364a
     .hword 0x4668    @ 080f42cc 6846
     adds r1,r5,#0x0    @ 080f42ce 291c
-    bl FUN_0810e3f8                          @ 080f42d0 1af092f8
+    bl bios_cpu_set                          @ 080f42d0 1af092f8
     .hword 0x4640    @ 080f42d4 4046
     str r0,[r5,#0x0]                         @ 080f42d6 2860
     movs r0,#0xff    @ 080f42d8 ff20
@@ -315343,7 +316431,7 @@ LAB_080f4f30:
     lsrs r2,r2,#0xb    @ 080f4f40 d20a
     adds r0,r1,#0x0    @ 080f4f42 081c
     adds r1,r5,#0x0    @ 080f4f44 291c
-    bl FUN_0810e3f8                          @ 080f4f46 19f057fa
+    bl bios_cpu_set                          @ 080f4f46 19f057fa
     b LAB_080f4fba                           @ 080f4f4a 36e0
 LAB_080f4f4c:
     ldr r0, DAT_080f4fc0                     @ 080f4f4c 1c48
@@ -321577,7 +322665,7 @@ LAB_080f868c:
     adds r0,r0,r4    @ 080f8694 0019
     lsls r0,r0,#0x8    @ 080f8696 0002
     ldr r1,[sp,#0x2c]                        @ 080f8698 0b99
-    bl FUN_0810e3fc                          @ 080f869a 15f0affe
+    bl bios_div                              @ 080f869a 15f0affe
     adds r5,r0,#0x0    @ 080f869e 051c
     .hword 0x4649    @ 080f86a0 4946
     movs r2,#0x4    @ 080f86a2 0422
@@ -321586,7 +322674,7 @@ LAB_080f868c:
     adds r0,r0,r3    @ 080f86a8 c018
     lsls r0,r0,#0x8    @ 080f86aa 0002
     ldr r1,[sp,#0x2c]                        @ 080f86ac 0b99
-    bl FUN_0810e3fc                          @ 080f86ae 15f0a5fe
+    bl bios_div                              @ 080f86ae 15f0a5fe
     adds r4,r0,#0x0    @ 080f86b2 041c
     ldr r0,[sp,#0x30]                        @ 080f86b4 0c98
     cmp r0,#0x0                              @ 080f86b6 0028
@@ -321887,7 +322975,7 @@ LAB_080f88c0:
     adds r0,r0,r5    @ 080f88ca 4019
     lsls r0,r0,#0x8    @ 080f88cc 0002
     ldr r1,[sp,#0x2c]                        @ 080f88ce 0b99
-    bl FUN_0810e3fc                          @ 080f88d0 15f094fd
+    bl bios_div                              @ 080f88d0 15f094fd
     adds r7,r0,#0x0    @ 080f88d4 071c
     movs r2,#0x4    @ 080f88d6 0422
     ldrsh r0,[r4,r2]                         @ 080f88d8 a05e
@@ -321896,7 +322984,7 @@ LAB_080f88c0:
     adds r0,r0,r4    @ 080f88de 0019
     lsls r0,r0,#0x8    @ 080f88e0 0002
     ldr r1,[sp,#0x2c]                        @ 080f88e2 0b99
-    bl FUN_0810e3fc                          @ 080f88e4 15f08afd
+    bl bios_div                              @ 080f88e4 15f08afd
     adds r6,r0,#0x0    @ 080f88e8 061c
     .hword 0x46a0    @ 080f88ea a046
     ldr r4,[sp,#0x30]                        @ 080f88ec 0c9c
@@ -325215,7 +326303,7 @@ LAB_080fb150:
     ldr r2, DAT_080fb2dc                     @ 080fb17a 584a
     .hword 0x4668    @ 080fb17c 6846
     adds r1,r4,#0x0    @ 080fb17e 211c
-    bl FUN_0810e3f4                          @ 080fb180 13f038f9
+    bl bios_cpu_fast_set                     @ 080fb180 13f038f9
     bl FUN_080ede5c                          @ 080fb184 f2f76afe
     ldr r0, DAT_080fb2e0                     @ 080fb188 5548
     bl FUN_080f42a0                          @ 080fb18a f9f789f8
@@ -326411,8 +327499,8 @@ FUN_080fd2da:
     ldr r2, DAT_080fd388                     @ 080fd2fa 234a
     .hword 0x4668    @ 080fd2fc 6846
     adds r1,r4,#0x0    @ 080fd2fe 211c
-    bl FUN_0810e3f8                          @ 080fd300 11f07af8
-    bl FUN_08014638                          @ 080fd304 17f798f9
+    bl bios_cpu_set                          @ 080fd300 11f07af8
+    bl gl_clear_vram_palram_scroll           @ 080fd304 17f798f9
     movs r1,#0x80    @ 080fd308 8021
     lsls r1,r1,#0x13    @ 080fd30a c904
     movs r0,#0x40    @ 080fd30c 4020
@@ -326433,9 +327521,9 @@ FUN_080fd2da:
     movs r1,#0x10    @ 080fd32a 1021
     rsbs r1,r1,#0    @ 080fd32c 4942
     movs r0,#0x3f    @ 080fd32e 3f20
-    bl FUN_080146fc                          @ 080fd330 17f7e4f9
-    bl FUN_08015138                          @ 080fd334 17f700ff
-    bl FUN_080156ac                          @ 080fd338 18f7b8f9
+    bl gl_set_brightness                     @ 080fd330 17f7e4f9
+    bl gl_state_init                         @ 080fd334 17f700ff
+    bl gl_clear_frame_callbacks              @ 080fd338 18f7b8f9
     bl FUN_080f9b98                          @ 080fd33c fcf72cfc
     movs r1,#0xe4    @ 080fd340 e421
     lsls r1,r1,#0x2    @ 080fd342 8900
@@ -327017,7 +328105,7 @@ FUN_080fd890:
     strh r0,[r2,#0x0]                        @ 080fd8dc 1080
     movs r0,#0x3f    @ 080fd8de 3f20
     movs r1,#0x0    @ 080fd8e0 0021
-    bl FUN_080146fc                          @ 080fd8e2 16f70bff
+    bl gl_set_brightness                     @ 080fd8e2 16f70bff
     movs r1,#0x10    @ 080fd8e6 1021
     rsbs r1,r1,#0    @ 080fd8e8 4942
     movs r0,#0x3f    @ 080fd8ea 3f20
@@ -327073,7 +328161,7 @@ FUN_080fd920:
     movs r1,#0x10    @ 080fd94e 1021
     rsbs r1,r1,#0    @ 080fd950 4942
     movs r0,#0x3f    @ 080fd952 3f20
-    bl FUN_080146fc                          @ 080fd954 16f7d2fe
+    bl gl_set_brightness                     @ 080fd954 16f7d2fe
     bl FUN_08014914                          @ 080fd958 16f7dcff
     movs r0,#0x3f    @ 080fd95c 3f20
     movs r1,#0x0    @ 080fd95e 0021
@@ -327147,7 +328235,7 @@ FUN_080fd9bc:
     adds r0,r0,r1    @ 080fd9e6 4018
     ldr r1, DAT_080fd9fc                     @ 080fd9e8 0449
     ldr r2, DAT_080fda00                     @ 080fd9ea 054a
-    bl FUN_0810e3f8                          @ 080fd9ec 10f004fd
+    bl bios_cpu_set                          @ 080fd9ec 10f004fd
     pop {r4,r5,r6}                           @ 080fd9f0 70bc
     pop {r0}                                 @ 080fd9f2 01bc
     bx r0                                    @ 080fd9f4 0047
@@ -327195,7 +328283,7 @@ switchD_080fda24__switchdataD_080fda34:
 switchD_080fda24__caseD_0:
     ldr r0, DAT_080fdb2c                     @ 080fda4c 3748
     movs r1,#0x0    @ 080fda4e 0021
-    bl FUN_08014fa8                          @ 080fda50 17f7aafa
+    bl fs_load                               @ 080fda50 17f7aafa
     movs r2,#0xe2    @ 080fda54 e222
     lsls r2,r2,#0x2    @ 080fda56 9200
     adds r6,r7,r2    @ 080fda58 be18
@@ -327218,10 +328306,10 @@ switchD_080fda24__caseD_0:
     adds r1,#0x88    @ 080fda7c 8831
     ldr r2, DAT_080fdb30                     @ 080fda7e 2c4a
     .hword 0x4691    @ 080fda80 9146
-    bl FUN_0810e3f8                          @ 080fda82 10f0b9fc
+    bl bios_cpu_set                          @ 080fda82 10f0b9fc
     ldr r0, DAT_080fdb34                     @ 080fda86 2b48
     movs r1,#0x0    @ 080fda88 0021
-    bl FUN_08014fa8                          @ 080fda8a 17f78dfa
+    bl fs_load                               @ 080fda8a 17f78dfa
     str r0,[r6,#0x0]                         @ 080fda8e 3060
     str r4,[sp,#0x0]                         @ 080fda90 0094
     str r5,[sp,#0x4]                         @ 080fda92 0195
@@ -327237,7 +328325,7 @@ switchD_080fda24__caseD_0:
     adds r1,r7,r0    @ 080fdaa8 3918
     .hword 0x4640    @ 080fdaaa 4046
     .hword 0x464a    @ 080fdaac 4a46
-    bl FUN_0810e3f8                          @ 080fdaae 10f0a3fc
+    bl bios_cpu_set                          @ 080fdaae 10f0a3fc
     movs r0,#0xf0    @ 080fdab2 f020
     lsls r0,r0,#0x1    @ 080fdab4 4000
     str r0,[sp,#0x0]                         @ 080fdab6 0090
@@ -327251,7 +328339,7 @@ switchD_080fda24__caseD_0:
     bl FUN_080fd49c                          @ 080fdac6 fff7e9fc
     ldr r0, DAT_080fdb38                     @ 080fdaca 1b48
     movs r1,#0x0    @ 080fdacc 0021
-    bl FUN_08014fa8                          @ 080fdace 17f76bfa
+    bl fs_load                               @ 080fdace 17f76bfa
     str r0,[r6,#0x0]                         @ 080fdad2 3060
     str r4,[sp,#0x0]                         @ 080fdad4 0094
     str r4,[sp,#0x4]                         @ 080fdad6 0194
@@ -327264,7 +328352,7 @@ switchD_080fda24__caseD_0:
     bl FUN_080fd49c                          @ 080fdae4 fff7dafc
     ldr r0, DAT_080fdb3c                     @ 080fdae8 1448
     movs r1,#0x0    @ 080fdaea 0021
-    bl FUN_08014fa8                          @ 080fdaec 17f75cfa
+    bl fs_load                               @ 080fdaec 17f75cfa
     str r0,[r6,#0x0]                         @ 080fdaf0 3060
     str r4,[sp,#0x0]                         @ 080fdaf2 0094
     movs r0,#0x1    @ 080fdaf4 0120
@@ -327471,7 +328559,7 @@ switchD_080fda24__caseD_5:
     strh r0,[r2,#0x0]                        @ 080fdc9e 1080
     movs r0,#0x3f    @ 080fdca0 3f20
     movs r1,#0x0    @ 080fdca2 0021
-    bl FUN_080146fc                          @ 080fdca4 16f72afd
+    bl gl_set_brightness                     @ 080fdca4 16f72afd
     movs r1,#0x10    @ 080fdca8 1021
     rsbs r1,r1,#0    @ 080fdcaa 4942
     movs r0,#0x3f    @ 080fdcac 3f20
@@ -327721,7 +328809,7 @@ DAT_080fde8c:
     pop {r1}                                 @ 080fde96 02bc
     bx r1                                    @ 080fde98 0847
     ROM_INCBIN 0xfde9a, 0x5a
-FUN_080fdef4:
+card_list_screen_init:
     push {r4,r5,r6,r7,lr}                    @ 080fdef4 f0b5
     .hword 0x4657    @ 080fdef6 5746
     .hword 0x464e    @ 080fdef8 4e46
@@ -328164,7 +329252,7 @@ LAB_080fe25a:
     adds r0,#0x11    @ 080fe264 1130
     bl FUN_0810017c                          @ 080fe266 01f089ff
 LAB_080fe26a:
-    bl FUN_081011c4                          @ 080fe26a 02f0abff
+    bl card_list_tile_renderer               @ 080fe26a 02f0abff
     bl FUN_0810133c                          @ 080fe26e 03f065f8
     movs r4,#0xa0    @ 080fe272 a024
     lsls r4,r4,#0x13    @ 080fe274 e404
@@ -328248,8 +329336,8 @@ FUN_080fe308:
     push {r5,r6,r7}                          @ 080fe310 e0b4
     sub sp,#0x1c                             @ 080fe312 87b0
     ldr r6, DWORD_080fe36c                   @ 080fe314 154e
-    ldr r7, LAB_080fe370                     @ 080fe316 164f
-    ldr r2, LAB_080fe374                     @ 080fe318 164a
+    ldr r7, DWORD_080fe370                   @ 080fe316 164f
+    ldr r2, DWORD_080fe374                   @ 080fe318 164a
     movs r1,#0xa4    @ 080fe31a a421
     lsls r1,r1,#0x1    @ 080fe31c 4900
     adds r0,r2,r1    @ 080fe31e 5018
@@ -328291,12 +329379,10 @@ LAB_080fe35c:
     movs r0,r0    @ 080fe36a 0000
 DWORD_080fe36c:
     .word  0x0202a4d0                     @ 080fe36c d0a40202
-LAB_080fe370:
-    .hword 0xf3c0    @ 080fe370 c0f3
-    lsls r2,r0,#0x8    @ 080fe372 0202
-LAB_080fe374:
-    lsls r0,r0,#0x1    @ 080fe374 4000
-    lsls r0,r0,#0xc    @ 080fe376 0003
+DWORD_080fe370:
+    .word  0x0202f3c0                     @ 080fe370 c0f30202
+DWORD_080fe374:
+    .word  0x03000040                     @ 080fe374 40000003
 LAB_080fe378:
     movs r0,#0x2    @ 080fe378 0220
     ands r0,r1    @ 080fe37a 0840
@@ -329545,7 +330631,7 @@ LAB_080fee6a:
     bne LAB_080fee72                         @ 080fee6e 00d1
     b FUN_080fefaa                           @ 080fee70 9be0
 LAB_080fee72:
-    bl FUN_081011c4                          @ 080fee72 02f0a7f9
+    bl card_list_tile_renderer               @ 080fee72 02f0a7f9
     movs r0,#0x1    @ 080fee76 0120
     ldrb r5,[r6,#0x16]                       @ 080fee78 b57d
     ands r0,r5    @ 080fee7a 2840
@@ -330390,7 +331476,7 @@ LAB_080ff4d4:
 DAT_080ff4e0:
     .word  0x0202a4d0                     @ 080ff4e0 d0a40202
 LAB_080ff4e4:
-    bl FUN_080fdef4                          @ 080ff4e4 fef706fd
+    bl card_list_screen_init                 @ 080ff4e4 fef706fd
     movs r0,#0x1    @ 080ff4e8 0120
 LAB_080ff4ea:
     pop {r1}                                 @ 080ff4ea 02bc
@@ -331893,7 +332979,7 @@ LAB_08100016:
     adds r0,#0x11    @ 0810001a 1130
     bl FUN_0810017c                          @ 0810001c 00f0aef8
 LAB_08100020:
-    bl FUN_081011c4                          @ 08100020 01f0d0f8
+    bl card_list_tile_renderer               @ 08100020 01f0d0f8
     bl FUN_0810133c                          @ 08100024 01f08af9
     movs r4,#0xf    @ 08100028 0f24
     strh r4,[r5,#0x0]                        @ 0810002a 2c80
@@ -334175,7 +335261,7 @@ DAT_081011bc:
     .word  0x05000200                     @ 081011bc 00020005
 DAT_081011c0:
     .word  0x09e31614                     @ 081011c0 1416e309
-FUN_081011c4:
+card_list_tile_renderer:
     push {r4,r5,r6,r7,lr}                    @ 081011c4 f0b5
     .hword 0x4657    @ 081011c6 5746
     .hword 0x464e    @ 081011c8 4e46
@@ -341464,10 +342550,10 @@ LAB_08104884:
     adds r2,#0x6c    @ 08104886 6c32
     b LAB_0810488c                           @ 08104888 00e0
 LAB_0810488a:
-    ldr r2, LAB_081048f8                     @ 0810488a 1b4a
+    ldr r2, DWORD_081048f8                   @ 0810488a 1b4a
 LAB_0810488c:
-    ldr r0, LAB_081048fc                     @ 0810488c 1b48
-    ldr r1, LAB_08104900                     @ 0810488e 1c49
+    ldr r0, DWORD_081048fc                   @ 0810488c 1b48
+    ldr r1, DWORD_08104900                   @ 0810488e 1c49
     adds r6,r0,r1    @ 08104890 4618
     movs r0,#0x7    @ 08104892 0720
     ldrb r3,[r6,#0x0]                        @ 08104894 3378
@@ -341478,15 +342564,15 @@ LAB_0810488c:
     movs r1,#0xb    @ 0810489e 0b21
 LAB_081048a0:
     adds r0,r2,#0x0    @ 081048a0 101c
-    bl FUN_08019574                          @ 081048a2 14f767fe
+    bl page_state_dispatcher                 @ 081048a2 14f767fe
     cmp r0,#0x0                              @ 081048a6 0028
     bne LAB_081048ae                         @ 081048a8 01d1
     bl FUN_0810573e                          @ 081048aa 00f048ff
 LAB_081048ae:
     movs r0,#0x24    @ 081048ae 2420
     ldrsh r4,[r5,r0]                         @ 081048b0 2c5e
-    ldr r2, LAB_08104904                     @ 081048b2 144a
-    ldr r3, LAB_08104908                     @ 081048b4 144b
+    ldr r2, DWORD_08104904                   @ 081048b2 144a
+    ldr r3, DWORD_08104908                   @ 081048b4 144b
     adds r1,r2,r3    @ 081048b6 d118
     movs r0,#0x1    @ 081048b8 0120
     ldrb r1,[r1,#0x0]                        @ 081048ba 0978
@@ -341503,9 +342589,9 @@ LAB_081048ae:
     lsrs r0,r0,#0x1d    @ 081048d2 400f
     strb r0,[r7,#0x0]                        @ 081048d4 3870
 LAB_081048d6:
-    ldr r0, LAB_0810490c                     @ 081048d6 0d48
+    ldr r0, DWORD_0810490c                   @ 081048d6 0d48
     bl FUN_080f7674                          @ 081048d8 f2f7ccfe
-    ldr r0, LAB_08104910                     @ 081048dc 0c48
+    ldr r0, DWORD_08104910                   @ 081048dc 0c48
     bl FUN_080f42a0                          @ 081048de eff7dffc
     bl FUN_081045c4                          @ 081048e2 fff76ffe
     bl FUN_08104318                          @ 081048e6 fff717fd
@@ -341515,27 +342601,20 @@ LAB_081048d6:
     ands r0,r4    @ 081048f0 2040
     bl FUN_08105702                          @ 081048f2 00f006ff
     movs r0,r0    @ 081048f6 0000
-LAB_081048f8:
-    cmp r0,#0x4                              @ 081048f8 0428
-    lsrs r5,r4,#0x7    @ 081048fa e509
-LAB_081048fc:
-    movs r0,r0    @ 081048fc 0000
-    lsls r0,r0,#0x8    @ 081048fe 0002
-LAB_08104900:
-    ldr r4,[r5,#0x40]                        @ 08104900 2c6c
-    movs r0,r0    @ 08104902 0000
-LAB_08104904:
-    lsls r0,r0,#0x1    @ 08104904 4000
-    lsls r0,r0,#0xc    @ 08104906 0003
-LAB_08104908:
-    lsls r2,r7,#0x8    @ 08104908 3a02
-    movs r0,r0    @ 0810490a 0000
-LAB_0810490c:
-    ldr r6,[sp,#0x2c0]                       @ 0810490c b09e
-    lsls r2,r0,#0x8    @ 0810490e 0202
-LAB_08104910:
-    .hword 0xf440    @ 08104910 40f4
-    lsls r2,r0,#0x8    @ 08104912 0202
+DWORD_081048f8:
+    .word  0x09e52804                     @ 081048f8 0428e509
+DWORD_081048fc:
+    .word  0x02000000                     @ 081048fc 00000002
+DWORD_08104900:
+    .word  0x00006c2c                     @ 08104900 2c6c0000
+DWORD_08104904:
+    .word  0x03000040                     @ 08104904 40000003
+DWORD_08104908:
+    .word  0x0000023a                     @ 08104908 3a020000
+DWORD_0810490c:
+    .word  0x02029eb0                     @ 0810490c b09e0202
+DWORD_08104910:
+    .word  0x0202f440                     @ 08104910 40f40202
 LAB_08104914:
     movs r6,#0x26    @ 08104914 2626
     ldrsh r1,[r5,r6]                         @ 08104916 a95f
@@ -341591,10 +342670,10 @@ LAB_08104964:
 DAT_08104974:
     .word  0x02001250                     @ 08104974 50120002
 LAB_08104978:
-    ldr r2, LAB_08104a10                     @ 08104978 254a
+    ldr r2, DWORD_08104a10                   @ 08104978 254a
 LAB_0810497a:
-    ldr r7, LAB_08104a14                     @ 0810497a 264f
-    ldr r0, LAB_08104a18                     @ 0810497c 2648
+    ldr r7, DWORD_08104a14                   @ 0810497a 264f
+    ldr r0, DWORD_08104a18                   @ 0810497c 2648
     adds r7,r7,r0    @ 0810497e 3f18
     .hword 0x46b9    @ 08104980 b946
     movs r0,#0x7    @ 08104982 0720
@@ -341606,7 +342685,7 @@ LAB_0810497a:
     movs r1,#0xb    @ 0810498e 0b21
 LAB_08104990:
     adds r0,r2,#0x0    @ 08104990 101c
-    bl FUN_08019574                          @ 08104992 14f7effd
+    bl page_state_dispatcher                 @ 08104992 14f7effd
     cmp r0,#0x0                              @ 08104996 0028
     bne LAB_0810499e                         @ 08104998 01d1
     bl FUN_0810573e                          @ 0810499a 00f0d0fe
@@ -341616,8 +342695,8 @@ LAB_0810499e:
     movs r0,#0x26    @ 081049a2 2620
     ldrsh r3,[r5,r0]                         @ 081049a4 2b5e
     .hword 0x4698    @ 081049a6 9846
-    ldr r2, LAB_08104a1c                     @ 081049a8 1c4a
-    ldr r3, LAB_08104a20                     @ 081049aa 1d4b
+    ldr r2, DWORD_08104a1c                   @ 081049a8 1c4a
+    ldr r3, DWORD_08104a20                   @ 081049aa 1d4b
     adds r1,r2,r3    @ 081049ac d118
     movs r0,#0x1    @ 081049ae 0120
     ldrb r1,[r1,#0x0]                        @ 081049b0 0978
@@ -341628,8 +342707,8 @@ LAB_0810499e:
     lsls r4,r4,#0x2    @ 081049ba a400
     subs r4,r4,r6    @ 081049bc a41b
     lsls r4,r4,#0x3    @ 081049be e400
-    ldr r6, LAB_08104a14                     @ 081049c0 144e
-    ldr r1, LAB_08104a24                     @ 081049c2 1849
+    ldr r6, DWORD_08104a14                   @ 081049c0 144e
+    ldr r1, DWORD_08104a24                   @ 081049c2 1849
     adds r0,r6,r1    @ 081049c4 7018
     adds r0,r4,r0    @ 081049c6 2018
     subs r3,#0x20    @ 081049c8 203b
@@ -341640,13 +342719,13 @@ LAB_0810499e:
     ldrb r6,[r6,#0x0]                        @ 081049d4 3678
     lsls r0,r6,#0x1d    @ 081049d6 7007
     lsrs r0,r0,#0x1d    @ 081049d8 400f
-    ldr r1, LAB_08104a28                     @ 081049da 1349
+    ldr r1, DWORD_08104a28                   @ 081049da 1349
     adds r4,r4,r1    @ 081049dc 6418
     strb r0,[r4,#0x0]                        @ 081049de 2070
 LAB_081049e0:
-    ldr r0, LAB_08104a2c                     @ 081049e0 1248
+    ldr r0, DWORD_08104a2c                   @ 081049e0 1248
     bl FUN_080f7674                          @ 081049e2 f2f747fe
-    ldr r0, LAB_08104a30                     @ 081049e6 1248
+    ldr r0, DWORD_08104a30                   @ 081049e6 1248
     bl FUN_080f42a0                          @ 081049e8 eff75afc
     bl FUN_081045c4                          @ 081049ec fff7eafd
     bl FUN_08104318                          @ 081049f0 fff792fc
@@ -341660,33 +342739,24 @@ LAB_081049e0:
     ldrb r3,[r5,#0x1f]                       @ 08104a08 eb7f
     ands r0,r3    @ 08104a0a 1840
     bl FUN_08105702                          @ 08104a0c 00f079fe
-LAB_08104a10:
-    cmp r0,#0x4                              @ 08104a10 0428
-    lsrs r5,r4,#0x7    @ 08104a12 e509
-LAB_08104a14:
-    movs r0,r0    @ 08104a14 0000
-    lsls r0,r0,#0x8    @ 08104a16 0002
-LAB_08104a18:
-    ldr r4,[r5,#0x40]                        @ 08104a18 2c6c
-    movs r0,r0    @ 08104a1a 0000
-LAB_08104a1c:
-    lsls r0,r0,#0x1    @ 08104a1c 4000
-    lsls r0,r0,#0xc    @ 08104a1e 0003
-LAB_08104a20:
-    lsls r2,r7,#0x8    @ 08104a20 3a02
-    movs r0,r0    @ 08104a22 0000
-LAB_08104a24:
-    asrs r0,r2,#0x9    @ 08104a24 5012
-    movs r0,r0    @ 08104a26 0000
-LAB_08104a28:
-    asrs r7,r4,#0x9    @ 08104a28 6712
-    movs r0,r0    @ 08104a2a 0000
-LAB_08104a2c:
-    ldr r6,[sp,#0x2c0]                       @ 08104a2c b09e
-    lsls r2,r0,#0x8    @ 08104a2e 0202
-LAB_08104a30:
-    .hword 0xf440    @ 08104a30 40f4
-    lsls r2,r0,#0x8    @ 08104a32 0202
+DWORD_08104a10:
+    .word  0x09e52804                     @ 08104a10 0428e509
+DWORD_08104a14:
+    .word  0x02000000                     @ 08104a14 00000002
+DWORD_08104a18:
+    .word  0x00006c2c                     @ 08104a18 2c6c0000
+DWORD_08104a1c:
+    .word  0x03000040                     @ 08104a1c 40000003
+DWORD_08104a20:
+    .word  0x0000023a                     @ 08104a20 3a020000
+DWORD_08104a24:
+    .word  0x00001250                     @ 08104a24 50120000
+DWORD_08104a28:
+    .word  0x00001267                     @ 08104a28 67120000
+DWORD_08104a2c:
+    .word  0x02029eb0                     @ 08104a2c b09e0202
+DWORD_08104a30:
+    .word  0x0202f440                     @ 08104a30 40f40202
 LAB_08104a34:
     ldrh r1,[r5,#0x2c]                       @ 08104a34 a98d
     movs r6,#0x2c    @ 08104a36 2c26
@@ -342018,7 +343088,7 @@ DAT_08104ec0:
 DAT_08104ec4:
     .word  0x00006c28                     @ 08104ec4 286c0000
 LAB_08104ec8:
-    ldr r1, LAB_08104f00                     @ 08104ec8 0d49
+    ldr r1, DWORD_08104f00                   @ 08104ec8 0d49
     adds r0,r4,#0x0    @ 08104eca 201c
     cmp r4,#0x0                              @ 08104ecc 002c
     bge LAB_08104ed2                         @ 08104ece 00da
@@ -342026,7 +343096,7 @@ LAB_08104ec8:
 LAB_08104ed2:
     asrs r0,r0,#0x5    @ 08104ed2 4011
     lsls r2,r0,#0x2    @ 08104ed4 8200
-    ldr r7, LAB_08104f04                     @ 08104ed6 0b4f
+    ldr r7, DWORD_08104f04                   @ 08104ed6 0b4f
     adds r1,r1,r7    @ 08104ed8 c919
     adds r2,r2,r1    @ 08104eda 5218
     lsls r0,r0,#0x5    @ 08104edc 4001
@@ -342046,12 +343116,10 @@ LAB_08104eee:
     strh r0,[r1,#0x20]                       @ 08104ef8 0884
     strh r4,[r1,#0x22]                       @ 08104efa 4c84
     bl FUN_08105740                          @ 08104efc 00f020fc
-LAB_08104f00:
-    movs r0,r0    @ 08104f00 0000
-    lsls r0,r0,#0x8    @ 08104f02 0002
-LAB_08104f04:
-    strh r0,[r6,r7]                          @ 08104f04 f053
-    movs r0,r0    @ 08104f06 0000
+DWORD_08104f00:
+    .word  0x02000000                     @ 08104f00 00000002
+DWORD_08104f04:
+    .word  0x000053f0                     @ 08104f04 f0530000
 LAB_08104f08:
     adds r0,r4,#0x0    @ 08104f08 201c
     .hword 0x4661    @ 08104f0a 6146
@@ -349433,7 +350501,7 @@ LAB_0810866a:
     bl FUN_0810236c                          @ 08108692 f9f76bfe
 LAB_08108696:
     bl FUN_080fe2b4                          @ 08108696 f5f70dfe
-    bl FUN_080fdef4                          @ 0810869a f5f72bfc
+    bl card_list_screen_init                 @ 0810869a f5f72bfc
     bl FUN_08104318                          @ 0810869e fbf73bfe
     bl FUN_08109034                          @ 081086a2 00f0c7fc
     bl FUN_08106eb4                          @ 081086a6 fef705fc
@@ -350109,7 +351177,7 @@ LAB_08108bc8:
     bl FUN_08102034                          @ 08108bde f9f729fa
 LAB_08108be2:
     bl FUN_080fe2b4                          @ 08108be2 f5f767fb
-    bl FUN_080fdef4                          @ 08108be6 f5f785f9
+    bl card_list_screen_init                 @ 08108be6 f5f785f9
     bl FUN_08104318                          @ 08108bea fbf795fb
     bl FUN_08109034                          @ 08108bee 00f021fa
     bl FUN_08106eb4                          @ 08108bf2 fef75ff9
@@ -350568,7 +351636,7 @@ LAB_08108f96:
     ldrsh r1,[r1,r3]                         @ 08108f98 c95e
     bl FUN_081021dc                          @ 08108f9a f9f71ff9
     bl FUN_080fe2b4                          @ 08108f9e f5f789f9
-    bl FUN_080fdef4                          @ 08108fa2 f4f7a7ff
+    bl card_list_screen_init                 @ 08108fa2 f4f7a7ff
     bl FUN_08104318                          @ 08108fa6 fbf7b7f9
     ldr r2, DAT_08108fcc                     @ 08108faa 084a
     movs r0,#0x81    @ 08108fac 8120
@@ -354674,7 +355742,7 @@ LAB_0810ae2e:
     bl FUN_08102124                          @ 0810ae44 f7f76ef9
 LAB_0810ae48:
     bl FUN_080fe2b4                          @ 0810ae48 f3f734fa
-    bl FUN_080fdef4                          @ 0810ae4c f3f752f8
+    bl card_list_screen_init                 @ 0810ae4c f3f752f8
     bl FUN_08104318                          @ 0810ae50 f9f762fa
     bl FUN_08109034                          @ 0810ae54 fef7eef8
     bl FUN_08106eb4                          @ 0810ae58 fcf72cf8
@@ -355696,7 +356764,7 @@ LAB_0810b704:
     ldrsh r1,[r5,r3]                         @ 0810b71e e95e
     subs r0,r0,r1    @ 0810b720 401a
     adds r1,r2,#0x0    @ 0810b722 111c
-    bl FUN_0810e3fc                          @ 0810b724 02f06afe
+    bl bios_div                              @ 0810b724 02f06afe
     strh r0,[r5,#0x16]                       @ 0810b728 e882
     adds r6,#0x3    @ 0810b72a 0336
     b LAB_0810bbb6                           @ 0810b72c 43e2
@@ -355926,7 +356994,7 @@ LAB_0810b8b6:
     lsls r2,r0,#0x8    @ 0810b8b8 0202
     ldrb r1,[r6,#0x1]                        @ 0810b8ba 7178
     adds r0,r2,#0x0    @ 0810b8bc 101c
-    bl FUN_0810e3fc                          @ 0810b8be 02f09dfd
+    bl bios_div                              @ 0810b8be 02f09dfd
     strh r0,[r5,#0x10]                       @ 0810b8c2 2882
     strh r4,[r5,#0x12]                       @ 0810b8c4 6c82
     b LAB_0810b8fe                           @ 0810b8c6 1ae0
@@ -356492,11 +357560,11 @@ LAB_0810bcae:
 LAB_0810bcbe:
     movs r5,#0x0    @ 0810bcbe 0025
 LAB_0810bcc0:
-    ldr r0, LAB_0810bd1c                     @ 0810bcc0 1648
+    ldr r0, DWORD_0810bd1c                   @ 0810bcc0 1648
     add r0,r9                                @ 0810bcc2 4844
     subs r1,r4,r5    @ 0810bcc4 611b
     strh r1,[r0,#0x0]                        @ 0810bcc6 0180
-    ldr r0, LAB_0810bd20                     @ 0810bcc8 1548
+    ldr r0, DWORD_0810bd20                   @ 0810bcc8 1548
     add r0,r9                                @ 0810bcca 4844
     ldrb r0,[r0,#0x0]                        @ 0810bccc 0078
     cmp r7,r0                                @ 0810bcce 8742
@@ -356539,12 +357607,10 @@ LAB_0810bd00:
     cmp r7,#0x0                              @ 0810bd14 002f
     bge LAB_0810bd00                         @ 0810bd16 f3da
     bl FUN_0810c6a6                          @ 0810bd18 00f0c5fc
-LAB_0810bd1c:
-    lsls r6,r7,#0xd    @ 0810bd1c 7e03
-    movs r0,r0    @ 0810bd1e 0000
-LAB_0810bd20:
-    lsls r7,r7,#0xd    @ 0810bd20 7f03
-    movs r0,r0    @ 0810bd22 0000
+DWORD_0810bd1c:
+    .word  0x0000037e                     @ 0810bd1c 7e030000
+DWORD_0810bd20:
+    .word  0x0000037f                     @ 0810bd20 7f030000
 LAB_0810bd24:
     ldr r3, DAT_0810bd80                     @ 0810bd24 164b
     ldr r0, DAT_0810bd84                     @ 0810bd26 1748
@@ -356664,11 +357730,11 @@ LAB_0810bdf0:
     .hword 0x4651    @ 0810bdf8 5146
     cmp r1,#0x1                              @ 0810bdfa 0129
     ble LAB_0810bd40                         @ 0810bdfc a0dd
-    ldr r3, LAB_0810bea0                     @ 0810bdfe 284b
+    ldr r3, DWORD_0810bea0                   @ 0810bdfe 284b
     ldr r2,[r3,#0x4]                         @ 0810be00 5a68
     ldr r1,[r3,#0x18]                        @ 0810be02 9969
     bics r2,r1    @ 0810be04 8a43
-    ldr r0, LAB_0810bea4                     @ 0810be06 2748
+    ldr r0, DWORD_0810bea4                   @ 0810be06 2748
     ands r2,r0    @ 0810be08 0240
     cmp r2,#0x0                              @ 0810be0a 002a
     bne LAB_0810be16                         @ 0810be0c 03d1
@@ -356681,7 +357747,7 @@ LAB_0810be16:
     lsls r0,r0,#0x17    @ 0810be18 c005
     orrs r2,r0    @ 0810be1a 0243
 LAB_0810be1c:
-    ldr r0, LAB_0810bea8                     @ 0810be1c 2248
+    ldr r0, DWORD_0810bea8                   @ 0810be1c 2248
     lsls r1,r1,#0x1    @ 0810be1e 4900
     orrs r1,r2    @ 0810be20 1143
     str r1,[r0,#0x0]                         @ 0810be22 0160
@@ -356711,7 +357777,7 @@ LAB_0810be42:
     movs r0,#0x0    @ 0810be52 0020
     movs r3,#0x1    @ 0810be54 0123
     movs r2,#0x40    @ 0810be56 4022
-    ldr r7, LAB_0810beac                     @ 0810be58 144f
+    ldr r7, DWORD_0810beac                   @ 0810be58 144f
     adds r1,r7,#0x0    @ 0810be5a 391c
 LAB_0810be5c:
     strb r0,[r6,#0x14]                       @ 0810be5c 3075
@@ -356745,18 +357811,14 @@ LAB_0810be5c:
     add r0,r9                                @ 0810be98 4844
     strh r4,[r0,#0x0]                        @ 0810be9a 0480
     bl FUN_0810c6a6                          @ 0810be9c 00f003fc
-LAB_0810bea0:
-    ldrsb r0,[r1,r0]                         @ 0810bea0 0856
-    lsls r0,r0,#0xc    @ 0810bea2 0003
-LAB_0810bea4:
-    .hword 0xffff    @ 0810bea4 ffff
-    lsls r7,r7,#0x3    @ 0810bea6 ff00
-LAB_0810bea8:
-    ldrsb r4,[r0,r1]                         @ 0810bea8 4456
-    lsls r0,r0,#0xc    @ 0810beaa 0003
-LAB_0810beac:
-    subs r7,#0x3f    @ 0810beac 3f3f
-    movs r0,r0    @ 0810beae 0000
+DWORD_0810bea0:
+    .word  0x03005608                     @ 0810bea0 08560003
+DWORD_0810bea4:
+    .word  0x00ffffff                     @ 0810bea4 ffffff00
+DWORD_0810bea8:
+    .word  0x03005644                     @ 0810bea8 44560003
+DWORD_0810beac:
+    .word  0x00003f3f                     @ 0810beac 3f3f0000
 DAT_0810beb0:
     .word  0xffffbf7e                     @ 0810beb0 7ebfffff
 LAB_0810beb4:
@@ -358368,7 +359430,7 @@ FUN_0810ca38:
     cmp r1,#0x0                              @ 0810ca6e 0029
     beq LAB_0810ca7a                         @ 0810ca70 03d0
     adds r0,r6,#0x0    @ 0810ca72 301c
-    bl FUN_0810e3fc                          @ 0810ca74 01f0c2fc
+    bl bios_div                              @ 0810ca74 01f0c2fc
     adds r2,r0,#0x0    @ 0810ca78 021c
 LAB_0810ca7a:
     strh r5,[r7,#0x0]                        @ 0810ca7a 3d80
@@ -359721,9 +360783,9 @@ LAB_0810df2e:
     pop {r1}                                 @ 0810df32 02bc
     bx r1                                    @ 0810df34 0847
     .byte  0x00, 0x00
-LAB_0810df38:
+DWORD_0810df38:
+    .word  0xe92d5ff0                     @ 0810df38 f05f2de9
 .arm
-    stmdb sp!,{r4,r5,r6,r7,r8,r9,r10,r11,r12,lr} @ 0810df38 f05f2de9
     sub sp,sp,#0xd8                          @ 0810df3c d8d04de2
     mov r0,#0x0                              @ 0810df40 0000a0e3
     mov r1,#0x30                             @ 0810df44 3010a0e3
@@ -360071,14 +361133,14 @@ DAT_0810e3ec:
     .word  0x00007fff                     @ 0810e3ec ff7f0000
 DAT_0810e3f0:
     .word  0x03005648                     @ 0810e3f0 48560003
-FUN_0810e3f4:
+bios_cpu_fast_set:
 .thumb
     svc 0xc                                  @ 0810e3f4 0cdf
     bx lr                                    @ 0810e3f6 7047
-FUN_0810e3f8:
+bios_cpu_set:
     svc 0xb                                  @ 0810e3f8 0bdf
     bx lr                                    @ 0810e3fa 7047
-FUN_0810e3fc:
+bios_div:
     svc 0x6                                  @ 0810e3fc 06df
     bx lr                                    @ 0810e3fe 7047
 FUN_0810e400:
@@ -360095,15 +361157,14 @@ FUN_0810e408:
     bx lr                                    @ 0810e412 7047
 DAT_0810e414:
     .word  0xbaae187f                     @ 0810e414 7f18aeba
-FUN_0810e418:
+bios_huff_uncomp:
     svc 0x12                                 @ 0810e418 12df
     bx lr                                    @ 0810e41a 7047
-FUN_0810e41c:
+bios_lz77_uncomp:
     svc 0x11                                 @ 0810e41c 11df
     bx lr                                    @ 0810e41e 7047
 FUN_0810e420:
-    push {r4,r5,lr}                          @ 0810e420 30b5
-    adds r5,r0,#0x0    @ 0810e422 051c
+    .word  0x1c05b530                     @ 0810e420 30b5051c
     adds r4,r1,#0x0    @ 0810e424 0c1c
     adds r3,r2,#0x0    @ 0810e426 131c
     ldr r2, DAT_0810e458                     @ 0810e428 0b4a
@@ -372884,7 +373945,19 @@ LAB_08114392:
     adds r1,r4,#0x0    @ 08114394 211c
     adds r0,r3,#0x0    @ 08114396 181c
     pop {r4,pc}                              @ 08114398 10bd
-    ROM_INCBIN 0x11439a, 0x6f6
+    .byte  0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+DWORD_081143a0:
+    .word  0x00000000                     @ 081143a0 00000000
+DWORD_081143a4:
+    .word  0x00000000                     @ 081143a4 00000000
+DWORD_081143a8:
+    .word  0x00000000                     @ 081143a8 00000000
+DWORD_081143ac:
+    .word  0x00000000                     @ 081143ac 00000000
+    .byte  0xa0, 0x49, 0x11, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+DWORD_081143c0:
+    .word  0x0b010808                     @ 081143c0 0808010b
+    ROM_INCBIN 0x1143c4, 0x6cc
 PTR_DAT_08114a90:
     .word  0x08114b20                     @ 08114a90 204b1108
     .word  0x081176bc                     @ 08114a94 bc761108
@@ -374141,7 +375214,12 @@ DAT_08114b20:
     .word  0x02020202                     @ 0818e998 02020202
     .word  0x02020202                     @ 0818e99c 02020202
     .word  0x02020202                     @ 0818e9a0 02020202
-    ROM_INCBIN 0x18e9a4, 0x8de8
+    ROM_INCBIN 0x18e9a4, 0x57dc
+DWORD_08194180:
+    .word  0x081944e0                     @ 08194180 e0441908
+DWORD_08194184:
+    .word  0x000e0000                     @ 08194184 00000e00
+    ROM_INCBIN 0x194188, 0x3604
     .word  0x09a916a8                     @ 0819778c a816a909
     .word  0x08a920a8                     @ 08197790 a820a908
     .word  0x09a622a8                     @ 08197794 a822a609
@@ -375102,7 +376180,10 @@ DAT_081d8244:
     .word  0x02020202                     @ 081dbb0c 02020202
     .word  0x02020202                     @ 081dbb10 02020202
     .word  0x02020202                     @ 081dbb14 02020202
-    ROM_INCBIN 0x1dbb18, 0x6fe0
+    ROM_INCBIN 0x1dbb18, 0x4ae8
+DWORD_081e0600:
+    .word  0xfef9f6f4                     @ 081e0600 f4f6f9fe
+    ROM_INCBIN 0x1e0604, 0x24f4
     .word  0x02020201                     @ 081e2af8 01020202
     .word  0x02020202                     @ 081e2afc 02020202
     .word  0x02020202                     @ 081e2b00 02020202
@@ -375877,7 +376958,19 @@ LAB_083615d2:
     .word  0x02020202                     @ 084bb744 02020202
     .word  0x02020202                     @ 084bb748 02020202
     .word  0x02020202                     @ 084bb74c 02020202
-    ROM_INCBIN 0x4bb750, 0x3ac0
+    ROM_INCBIN 0x4bb750, 0x2fc0
+DWORD_084be710:
+    .word  0x00000000                     @ 084be710 00000000
+DWORD_084be714:
+    .word  0x00000000                     @ 084be714 00000000
+DWORD_084be718:
+    .word  0x00000000                     @ 084be718 00000000
+DWORD_084be71c:
+    .word  0x00000000                     @ 084be71c 00000000
+    ROM_INCBIN 0x4be720, 0x9f0
+DWORD_084bf110:
+    .word  0x80208010                     @ 084bf110 10802080
+    ROM_INCBIN 0x4bf114, 0xfc
     .word  0x02020201                     @ 084bf210 01020202
     .word  0x02020202                     @ 084bf214 02020202
     .word  0x02020202                     @ 084bf218 02020202
@@ -376007,13 +377100,25 @@ LAB_083615d2:
     .word  0x09eb09e6                     @ 084c4b14 e609eb09
     .word  0x09f409ef                     @ 084c4b18 ef09f409
     .word  0x09fd09f9                     @ 084c4b1c f909fd09
-    ROM_INCBIN 0x4c4b20, 0x2a48
+    ROM_INCBIN 0x4c4b20, 0x208
+DWORD_084c4d28:
+    .word  0x10071000                     @ 084c4d28 00100710
+    ROM_INCBIN 0x4c4d2c, 0xbfc
+DWORD_084c5928:
+    .word  0x802f802c                     @ 084c5928 2c802f80
+    ROM_INCBIN 0x4c592c, 0x1a3c
+DWORD_084c7368:
+    .word  0x00640000                     @ 084c7368 00006400
+    ROM_INCBIN 0x4c736c, 0x1fc
 DAT_084c7568:
     .hword 0x1000                         @ 084c7568 0010
     .byte  0xd1, 0x0d, 0x00, 0x0c, 0x2e, 0x0a, 0x00, 0x08
 DAT_084c7572:
     .hword 0x0007                         @ 084c7572 0700
-    ROM_INCBIN 0x4c7574, 0xc0
+    ROM_INCBIN 0x4c7574, 0xb0
+DWORD_084c7624:
+    .word  0xffffffff                     @ 084c7624 ffffffff
+    .byte  0x02, 0x04, 0x06, 0x08, 0xff, 0xff, 0xff, 0xff, 0x02, 0x04, 0x06, 0x08
 DAT_084c7634:
     .word  0x0000fce2                     @ 084c7634 e2fc0000
 

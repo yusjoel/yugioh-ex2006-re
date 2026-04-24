@@ -63,6 +63,44 @@
 | `FUN_080fdef4` | `card_list_screen_init` | `0x080FDEF4` | 卡列表屏幕初始化序列；4 次 memcpy 加载静态 OBJ 调色板（ROM `0x09E31554/74/14`）；调 `card_list_tile_renderer` | asm/all.s L334094-L334111 静态分析 + PALRAM dump 全字节比对 |
 | `FUN_081011c4` | `card_list_tile_renderer` | `0x081011C4` | 卡列表小图 tile 渲染主函数；字面量池含 `0x09326280`（tile 基址）+ `0x095B5C00`（index 表） | 字面量池 DAT_08101290=0x09326280 静态识别 |
 
+## 第五轮（2026-04-24）FS loader + name_input
+
+| 原名 (FUN_*) | 新名称 | 地址 | 功能 | 证据 |
+|--------------|--------|------|------|------|
+| `FUN_08014fa8` | `fs_load` | `0x08014FA8` | **通用 FS 文件加载器**。签名 `u8* fs_load(const char* path, int flag)`；按路径字符串查找 → 解压 → 返回 buffer。内部读 FS master struct @ `0x09E61178`（offset_table/size_table/data_base），调 `fs_lz_decompress` 解压 | 静态分析 FUN_080180AC（name_input state[1]）DAT_08018198 = ASCII `"name_input/name_b_01.LZ5bg"` 等完整路径字符串直接入参 |
+| `FUN_08014600` | `fs_lz_decompress` | `0x08014600` | **FS 专用 LZ 解压器**（非 BIOS SWI 0x11）。被 fs_load 调两次，对应 `.LZncgr`/`.LZ5bg` 等压缩前缀的文件 | fs_load 内部 bl 目标 |
+| `FUN_08014f54` | `fs_resolve_path_to_fid` | `0x08014F54` | 在解析后的路径目录/文件名上做二次查表，返回 FID 索引 | fs_load 流程中 r4 出处 |
+| `FUN_08017574` | `name_input_page_init` | `0x08017574` | name_input 页 IO/BG 初始化（DISPCNT=0x1F40, BG0/1/2/3CNT=0x1C02/0x1D8C/0x1E8D/0x1F8F） | 字面量池 `0x1F8F` 全 ROM 唯一 .word；state table @ `0x09E588B8[0]` 指向此函数（THUMB `0x08017575`） |
+| `FUN_080180ac` | `name_input_page_load_assets` | `0x080180AC` | name_input 页资产装载，调 fs_load 加载 name_o_01.* OBJ 资源 + 其它 BG `.gbtn` 文件 | state table @ `0x09E588B8[1]`；DAT 字面量为完整 ASCII 路径 |
+| `FUN_08019494` | `name_input_page_tick` | `0x08019494` | name_input 页主循环（光标移动、字符选择、输入回显） | state table @ `0x09E588B8[2]` |
+| `FUN_080194ec` | `name_input_page_exit` | `0x080194EC` | name_input 页退出/清理 | state table @ `0x09E588B8[3]` |
+| `FUN_08019574` | `page_state_dispatcher` | `0x08019574` | **通用页面状态分派器**。`r0` = 状态表基址（例 `0x09E588B8`），`r1` = 状态 ID；从 IWRAM `[0x03000040]` 读取当前 state，索引表并跳转。跨页面复用 | 行 11280 `ldr r1, =0x09E588B8` 硬编码name_input 状态表，但函数结构通用 |
+| `FUN_08014638` | `gl_clear_vram_palram_scroll` | `0x08014638` | 清 VRAM (0x6000 u32) + PALRAM (0x100 u32) + 8 个 BG scroll 寄存器 `0x04000010..0x0400001E`；init 序列第 1 步 | name_input_page_init 第 2 个 bl；调用 DMA fill 助手 FUN_0810E3F4 两次 |
+| `FUN_080146fc` | `gl_set_brightness` | `0x080146FC` | **设置屏幕亮度/淡入淡出**。`r0 = mode (0x3F = 全目标)`，`r1 = bright (-16..16)`。写 BLDCNT 式状态到 EWRAM `0x02023480`。-16 = 全黑，+16 = 全白，0 = 正常 | 字符串字面量 `"GL/GL_Common.c"` @ `0x09E398DC` + assert `"bright >= -16 && bright <= 16"` @ `0x09E398EC` |
+| `FUN_080148d0` | `gl_fade_in` | `0x080148D0` | 启动淡入动画：`bright` 从 -16 渐回 0，持续 8 帧。包装 FUN_080147D8(r0=0x3F, r1=0, r2=8) | init 序列在 set_brightness(-16) 后调用它触发渐亮 |
+| `FUN_080148e0` | `gl_fade_out` | `0x080148E0` | 启动淡出动画：调 FUN_080147D8(r0=0x3F, r1=-16, r2=8) —— 渐变 8 帧到全黑 | 与 gl_fade_in 对称 |
+| `FUN_08015138` | `gl_state_init` | `0x08015138` | 初始化 GL state struct @ EWRAM `0x02023490`（0x22B B memset + 调 FUN_08015160 进一步填充子字段） | init 序列第 5 步 |
+| `FUN_080156ac` | `gl_clear_frame_callbacks` | `0x080156AC` | 清 IWRAM 回调指针槽 `[0x03000BF8]`/`[0x03000BFC]`/`[0x03000C00]` = 0（清 vblank/hblank 动画钩子） | init 序列第 6 步；函数体仅 4 条指令 |
+
+**FS master struct @ `0x09E61178`**（20 B header）：
+```
++0x00  u32  file_count              (0x00000153 = 339)
++0x04  u32  paths_off_from_header   (0x14 → 0x09E6118C)
++0x08  u32  offset_table_entry1_off (0x2A74 → 0x09E63BEC，skip sentinel)
++0x0C  u32  size_table_entry1_off   (0x2FC0 → 0x09E64138)
++0x10  u32  fs_data_base_off        (0x350C → 0x09E64684)
+```
+
+**FS 装载查找范式**（代码中大量出现）：
+```arm
+ldr r0, =<ptr to "dir/name.LZXX">    @ ASCII 完整路径
+movs r1, #0                          @ flag
+bl  fs_load                          @ FUN_08014FA8
+@ r0 = 解压后 buffer（调用方负责上传 VRAM/PALRAM）
+```
+
+→ 逆向新页面时，先在 asm/all.s 搜 `.word 0x09e3BXXX`（字符串在 ROM 0x09E39000-0x09E3C000 左右集中），人眼 ROM 反查 ASCII，就能秒级归纳"这个页面从 FS 拿哪些资源"。
+
 ## 后续 TG.4 待定项（未命名占位）
 
 从已命名函数的 XREF 继续爬图时，期望命名的候选（优先度高→低）：

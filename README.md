@@ -145,6 +145,8 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_opponent_decks.py` | ROM → `data/opponent-decks.s`（25 对手卡组，块大小可变，含融合卡组） |
 | `tools/rom-export/export_deck_strings.py` | ROM → `data/deck-strings.s`（XX 编码预组/对手卡组名字符串） |
 | `tools/rom-export/export_duel_puzzles.py` | ROM → `data/duel-puzzles.s`（35 块决斗题目存档模板） |
+| `tools/rom-export/render_gbtn.py` | `.gbtn` (NTBG bundle) → PNG 预览（支持 4bpp/8bpp + 2B/4B tilemap entry 自动推断）；`--all` 批量渲染 FS 全部 26 个 BG 资源到 `graphics/images/gbtn-previews/` |
+| `tools/fs-decompress.py` | BIOS LZ77 (SWI 0x11) 离线解压器：`.LZ*` → `.gbtn`/`.ncgr`/`.nclr`/etc. `--all` 全 FS 重建、`--verify` 与 mGBA 运行时 dump byte-identical 对比（验证 89/89 通过）。Spec: `doc/dev/data-structure/gbtn-format.md` |
 
 ### 汇编再生成流水线
 
@@ -165,7 +167,8 @@ Jython 脚本，通过 `ghidra-run-script.bat` 以 headless 模式跑。命名�
 |------|------|
 | `CreateCardStatsType.py` | 在 `/ygo_ex2006` category 下建 `CardStats`(22B) / `DeckEntry`(4B) + `AttrCode/RaceCode/SubtypeCode/SpSubCode` enum，并应用到 `0x098169B6`（CardStats[5170]）等数据区（TG.1+TG.3） |
 | `ImportProjectLabels.py` | 扫 `data/*.s` 生成 5170 条 `card_XXXX` + 25 对手卡组 + 12 个文件级锚点（TG.2） |
-| `RenameKnownFunctions.py` | 30 个 `FUN_xxx` 语义重命名（TG.4：p1/p2 findings + pack-banner 11 个函数） |
+| `RenameKnownFunctions.py` | 50+ 个 `FUN_xxx` 语义重命名（TG.4：p1/p2 findings + pack-banner + name_input + `fs_load`/`gl_*` 基础设施 + BIOS SWI 包装） |
+| `DisassembleNameInputRegion.py` | Force-disassemble 之前漏掉的 `ROM_INCBIN 0x19C44..0x1A49C`（pass_input 代码区）；`scan_region_define_data()` 扫全 code 范围批量 `createData(Dword)` 修复 PC-rel DAT 引用未定义坑（通用救灾函数）|
 | `LabelPackBanners.py` | 53 个数据标签：调色板 + 指针表 + 51 pack tile（从指针表动态读取地址） |
 | `LabelPackCardLists.py` | 46 个数据标签：信息表 + 45 个 pack 卡牌列表（从信息表指针动态读取） |
 | `LabelCardDescriptions.py` | 3 个数据标签：描述文本表 + 数据表 + 指针表 |
@@ -191,6 +194,9 @@ MCP 接入之前用于手工管理 mGBA + GDB stub 生命周期，现在保留�
 | 脚本 | 作用 |
 |------|------|
 | `read_card_image.py` | 从 ROM 给定 GBA 地址读取 BIOS 压缩头，LZ77 可解压并输出灰阶 PNG（无调色板集成，仅用于快速 sanity check） |
+| `diff_home_vs_name.py` | VRAM/PALRAM/OAM 二态 diff + DISPCNT/BG0-3CNT 解码（name_input 动态路径分析，见 `doc/analysis/name-input-page-location.md`）|
+| `match_name_input_vram.py` / `match_gbtn_segments.py` / `match_gbtn_tilemaps.py` | .gbtn 段切分 + 字节级匹配 VRAM / PALRAM（定位各 .gbtn 对应的 BG 层与 tile 基址）|
+| `find_name_input_bgcnt.py` | asm/all.s 扫特定 BGxCNT 立即数（`0x1F8F` 全 ROM 唯一 .word → `name_input_page_init`） |
 
 ## 已完成的数据提取
 
