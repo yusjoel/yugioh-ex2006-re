@@ -8,6 +8,9 @@
 #   - cards_ids_array         @ 0x095B7CCC  (internal_card_id -> card_id, 3072 x u16)
 #   - card_passcode_table     @ 0x095B94CC  (2098 × u32 加密密码表)
 #   - card_names_table        @ 0x095BB594  (cards names base; 旧名 card_names_pool)
+#   - card_desc_text_pool     @ 0x095FFF0C  (2098 × 6 lang 描述文本池; 修正旧 card_effect_text_pool @ 0x095FFF6C 地址错)
+#   - card_desc_data          @ 0x0980A508  (2098 × 6 × u32 offset 表)
+#   - card_stats_table        @ 0x098169B8  (5170 × 22 B, 首条 20B 少 zero0 字段)
 #   - card_name_pointer_table @ 0x095F3A5C  (12612 x u32 = 2102 x 6 langs)
 #   - card_effect_text_pool   @ 0x095FFF6C  (2014 cards x 6 langs description text)
 #
@@ -45,7 +48,9 @@ LABELS = [
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表
     (0x095BB594, "card_names_table"),     # 曾用名 card_names_pool; data 源统一叫 _table
     (0x095F3A5C, "card_name_pointer_table"),
-    (0x095FFF6C, "card_effect_text_pool"),
+    (0x095FFF0C, "card_desc_text_pool"),   # 曾用错误地址 card_effect_text_pool @ 0x095FFF6C
+    (0x0980A508, "card_desc_data"),        # 2098 × 6 × u32 per-cid offset 表
+    (0x098169B8, "card_stats_table"),      # 5170 × 22 B (首条 20B 少 zero0)
     (0x09E58D0C, "deck_id_and_data_array"),  # = data/opponent-card-values.s (-2B); 27×32B
                                               # wiki 标注的 << 16 stride 是 lsr r4,0x16 误读
 
@@ -136,6 +141,15 @@ RENAMES = [
     ("card_names_pool", "card_names_table"),
 ]
 
+# 需要从 Ghidra 彻底删除的错误 label (地址或名字错)。幂等。
+# 原因记录:
+#   card_effect_text_pool @ 0x095FFF6C 地址错 0x60 字节,实际应为
+#     card_desc_text_pool @ 0x095FFF0C (data/card-descriptions.s:29)。
+#     asm/all.s 0x095FFF6C 0 引用证实该地址不是任何字面量池目标。
+REMOVALS = [
+    (0x095FFF6C, "card_effect_text_pool"),
+]
+
 
 def apply_renames():
     st = currentProgram.getSymbolTable()
@@ -154,7 +168,29 @@ def apply_renames():
                 print("[rename-fail] %s: %s" % (old_name, e))
 
 
+def apply_removals():
+    st = currentProgram.getSymbolTable()
+    for gba_addr, name in REMOVALS:
+        addr = toAddr(gba_addr)
+        target = None
+        for s in st.getSymbols(name):
+            if s.getAddress().equals(addr):
+                target = s
+                break
+        if target is None:
+            continue
+        if RUN_DRY:
+            print("[dry-remove] %s @ 0x%08X" % (name, gba_addr))
+            continue
+        try:
+            target.delete()
+            print("[remove] %s @ 0x%08X" % (name, gba_addr))
+        except Exception as e:
+            print("[remove-fail] %s @ 0x%08X: %s" % (name, gba_addr, e))
+
+
 def main():
+    apply_removals()
     apply_renames()
     ok = 0
     for gba_addr, name in LABELS:

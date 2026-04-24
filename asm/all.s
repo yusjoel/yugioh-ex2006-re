@@ -16889,7 +16889,7 @@ FUN_0801d510:
     .hword 0x4689    @ 0801d526 8946
     movs r6,#0x8    @ 0801d528 0826
     str r6,[sp,#0x0]                         @ 0801d52a 0096
-    ldr r1, DAT_0801d5a4                     @ 0801d52c 1d49
+    ldr r1, PTR_card_stats_table_0801d5a4    @ 0801d52c 1d49
     movs r0,#0xb    @ 0801d52e 0b20
     muls r0,r4    @ 0801d530 6043
     adds r0,#0x6    @ 0801d532 0630
@@ -16949,8 +16949,8 @@ LAB_0801d546:
     bl FUN_080ee988                          @ 0801d59c d1f0f4f9
     b LAB_0801d5c6                           @ 0801d5a0 11e0
     .byte  0x00, 0x00
-DAT_0801d5a4:
-    .word  0x098169b8                     @ 0801d5a4 b8698109
+PTR_card_stats_table_0801d5a4:
+    .word  card_stats_table               @ 0801d5a4 b8698109
 DAT_0801d5a8:
     .word  0x02006ed0                     @ 0801d5a8 d06e0002
 DAT_0801d5ac:
@@ -17475,7 +17475,7 @@ card_image_decode_wrapper:
     lsls r2,r2,#0x10    @ 0801d9ae 1204
     lsrs r2,r2,#0x10    @ 0801d9b0 120c
     str r2,[sp,#0x8]                         @ 0801d9b2 0292
-    ldr r2, DAT_0801da8c                     @ 0801d9b4 354a
+    ldr r2, PTR_card_stats_table_0801da8c    @ 0801d9b4 354a
     movs r0,#0xb    @ 0801d9b6 0b20
     adds r1,r5,#0x0    @ 0801d9b8 291c
     muls r1,r0    @ 0801d9ba 4143
@@ -17576,8 +17576,8 @@ LAB_0801da7e:
     b LAB_0801dbca                           @ 0801da88 9fe0
 LAB_0801da8a:
     b LAB_0801dbb8                           @ 0801da8a 95e0
-DAT_0801da8c:
-    .word  0x098169b8                     @ 0801da8c b8698109
+PTR_card_stats_table_0801da8c:
+    .word  card_stats_table               @ 0801da8c b8698109
 DAT_0801da90:
     .word  0x0985004c                     @ 0801da90 4c008509
 DAT_0801da94:
@@ -18414,7 +18414,7 @@ card_info_page_finalize:
     push {r5,r6,r7}                          @ 0801e108 e0b4
     lsls r0,r0,#0x10    @ 0801e10a 0004
     lsrs r0,r0,#0x10    @ 0801e10c 000c
-    ldr r3, DAT_0801e18c                     @ 0801e10e 1f4b
+    ldr r3, PTR_card_stats_table_0801e18c    @ 0801e10e 1f4b
     movs r1,#0xb    @ 0801e110 0b21
     adds r2,r0,#0x0    @ 0801e112 021c
     muls r2,r1    @ 0801e114 4a43
@@ -18476,8 +18476,8 @@ LAB_0801e156:
     .hword 0x4646    @ 0801e186 4646
     strb r0,[r6,#0x2]                        @ 0801e188 b070
     b LAB_0801e1d0                           @ 0801e18a 21e0
-DAT_0801e18c:
-    .word  0x098169b8                     @ 0801e18c b8698109
+PTR_card_stats_table_0801e18c:
+    .word  card_stats_table               @ 0801e18c b8698109
 DAT_0801e190:
     .word  0x0201afb0                     @ 0801e190 b0af0102
 DAT_0801e194:
@@ -18874,7 +18874,7 @@ FUN_0801e490:
     push {r4,r5,r6,r7,lr}                    @ 0801e490 f0b5
     lsls r0,r0,#0x10    @ 0801e492 0004
     lsrs r0,r0,#0x10    @ 0801e494 000c
-    ldr r2, DAT_0801e4e0                     @ 0801e496 124a
+    ldr r2, PTR_card_stats_table_0801e4e0    @ 0801e496 124a
     movs r1,#0xb    @ 0801e498 0b21
     muls r1,r0    @ 0801e49a 4143
     adds r0,r1,#0x6    @ 0801e49c 881d
@@ -18909,8 +18909,8 @@ FUN_0801e490:
     bl FUN_080f616c                          @ 0801e4d8 d7f048fe
     b LAB_0801e538                           @ 0801e4dc 2ce0
     .byte  0x00, 0x00
-DAT_0801e4e0:
-    .word  0x098169b8                     @ 0801e4e0 b8698109
+PTR_card_stats_table_0801e4e0:
+    .word  card_stats_table               @ 0801e4e0 b8698109
 DAT_0801e4e4:
     .word  0x00060056                     @ 0801e4e4 56000600
 DAT_0801e4e8:
@@ -19109,7 +19109,7 @@ card_list_on_select_to_info_page:
     ands r0,r2    @ 0801e666 1040
     orrs r0,r1    @ 0801e668 0843
     str r0,[r3,#0x0]                         @ 0801e66a 1860
-    ldr r5, DAT_0801e6c4                     @ 0801e66c 154d
+    ldr r5, PTR_card_stats_table_0801e6c4    @ 0801e66c 154d
     movs r0,#0xb    @ 0801e66e 0b20
     muls r4,r0    @ 0801e670 4443
     adds r0,r4,#0x3    @ 0801e672 e01c
@@ -19155,8 +19155,8 @@ DAT_0801e6bc:
     .word  0x00003fff                     @ 0801e6bc ff3f0000
 DAT_0801e6c0:
     .word  0xfffe0007                     @ 0801e6c0 0700feff
-DAT_0801e6c4:
-    .word  0x098169b8                     @ 0801e6c4 b8698109
+PTR_card_stats_table_0801e6c4:
+    .word  card_stats_table               @ 0801e6c4 b8698109
 DAT_0801e6c8:
     .word  0x0000ffff                     @ 0801e6c8 ffff0000
 FUN_0801e6cc:
@@ -19389,7 +19389,7 @@ FUN_0801e850:
     ldrb r3,[r6,#0x18]                       @ 0801e87e 337e
     cmp r4,r3                                @ 0801e880 9c42
     bge LAB_0801e8ca                         @ 0801e882 22da
-    ldr r5, DAT_0801e96c                     @ 0801e884 394d
+    ldr r5, PTR_card_stats_table_0801e96c    @ 0801e884 394d
     .hword 0x46a8    @ 0801e886 a846
     ldr r1, DAT_0801e970                     @ 0801e888 3949
     ldr r7,[sp,#0x0]                         @ 0801e88a 009f
@@ -19433,7 +19433,7 @@ LAB_0801e8ca:
     .hword 0x4665    @ 0801e8d2 6546
     adds r5,#0xac    @ 0801e8d4 ac35
     str r5,[sp,#0x4]                         @ 0801e8d6 0195
-    ldr r7, DAT_0801e96c                     @ 0801e8d8 244f
+    ldr r7, PTR_card_stats_table_0801e96c    @ 0801e8d8 244f
     .hword 0x46ba    @ 0801e8da ba46
     movs r0,#0x16    @ 0801e8dc 1620
     .hword 0x4680    @ 0801e8de 8046
@@ -19464,7 +19464,7 @@ LAB_0801e90a:
     ldrb r2,[r6,#0x1a]                       @ 0801e90c b27e
     cmp r4,r2                                @ 0801e90e 9442
     bge LAB_0801e958                         @ 0801e910 22da
-    ldr r3, DAT_0801e96c                     @ 0801e912 164b
+    ldr r3, PTR_card_stats_table_0801e96c    @ 0801e912 164b
     .hword 0x4698    @ 0801e914 9846
     ldr r0, DAT_0801e970                     @ 0801e916 1648
     .hword 0x464d    @ 0801e918 4d46
@@ -19511,8 +19511,8 @@ LAB_0801e958:
     bx r0                                    @ 0801e966 0047
 DAT_0801e968:
     .word  0x0201e2b4                     @ 0801e968 b4e20102
-DAT_0801e96c:
-    .word  0x098169b8                     @ 0801e96c b8698109
+PTR_card_stats_table_0801e96c:
+    .word  card_stats_table               @ 0801e96c b8698109
 DAT_0801e970:
     .word  0x0201ff60                     @ 0801e970 60ff0102
 FUN_0801e974:
@@ -225624,7 +225624,7 @@ FUN_080c00f0:
     str r0,[r2,#0x4]                         @ 080c0136 5060
     adds r0,r4,#0x0    @ 080c0138 201c
     bl FUN_0801d510                          @ 080c013a 5df7e9f9
-    ldr r1, DAT_080c0170                     @ 080c013e 0c49
+    ldr r1, PTR_card_stats_table_080c0170    @ 080c013e 0c49
     movs r0,#0xb    @ 080c0140 0b20
     muls r0,r4    @ 080c0142 6043
     adds r0,#0x6    @ 080c0144 0630
@@ -225649,8 +225649,8 @@ DAT_080c0168:
     .word  0x00006c2c                     @ 080c0168 2c6c0000
 DAT_080c016c:
     .word  0x09e5f854                     @ 080c016c 54f8e509
-DAT_080c0170:
-    .word  0x098169b8                     @ 080c0170 b8698109
+PTR_card_stats_table_080c0170:
+    .word  card_stats_table               @ 080c0170 b8698109
 DAT_080c0174:
     .word  0x00000707                     @ 080c0174 07070000
 DAT_080c0178:
@@ -225661,7 +225661,7 @@ FUN_080c0180:
     push {r4,r5,r6,lr}                       @ 080c0180 70b5
     lsls r0,r0,#0x10    @ 080c0182 0004
     lsrs r4,r0,#0x10    @ 080c0184 040c
-    ldr r3, DAT_080c01dc                     @ 080c0186 154b
+    ldr r3, PTR_card_stats_table_080c01dc    @ 080c0186 154b
     movs r0,#0xb    @ 080c0188 0b20
     adds r1,r4,#0x0    @ 080c018a 211c
     muls r1,r0    @ 080c018c 4143
@@ -225701,8 +225701,8 @@ LAB_080c01b0:
     bl FUN_080ef454                          @ 080c01d2 2ff03ff9
     bl FUN_0801d830                          @ 080c01d6 5df72bfb
     b LAB_080c01ec                           @ 080c01da 07e0
-DAT_080c01dc:
-    .word  0x098169b8                     @ 080c01dc b8698109
+PTR_card_stats_table_080c01dc:
+    .word  card_stats_table               @ 080c01dc b8698109
 DAT_080c01e0:
     .word  0x0000ffff                     @ 080c01e0 ffff0000
 LAB_080c01e4:
@@ -226230,7 +226230,7 @@ FUN_080c05b4:
     .hword 0x4646    @ 080c05b8 4646
     push {r6,r7}                             @ 080c05ba c0b4
     adds r6,r0,#0x0    @ 080c05bc 061c
-    ldr r2, DAT_080c060c                     @ 080c05be 134a
+    ldr r2, PTR_card_stats_table_080c060c    @ 080c05be 134a
     movs r0,#0xb    @ 080c05c0 0b20
     adds r1,r6,#0x0    @ 080c05c2 311c
     muls r1,r0    @ 080c05c4 4143
@@ -226267,8 +226267,8 @@ FUN_080c05b4:
     movs r0,#0xd0    @ 080c0604 d020
     bl FUN_080c0394                          @ 080c0606 fff7c5fe
     b LAB_080c0624                           @ 080c060a 0be0
-DAT_080c060c:
-    .word  0x098169b8                     @ 080c060c b8698109
+PTR_card_stats_table_080c060c:
+    .word  card_stats_table               @ 080c060c b8698109
 DAT_080c0610:
     .word  0x00000246                     @ 080c0610 46020000
 DAT_080c0614:
@@ -245746,7 +245746,7 @@ FUN_080cb1cc:
     .hword 0x4681    @ 080cb1d8 8146
     adds r6,r1,#0x0    @ 080cb1da 0e1c
     str r2,[sp,#0x24]                        @ 080cb1dc 0992
-    ldr r2, DAT_080cb254                     @ 080cb1de 1d4a
+    ldr r2, PTR_card_stats_table_080cb254    @ 080cb1de 1d4a
     movs r0,#0xb    @ 080cb1e0 0b20
     .hword 0x4649    @ 080cb1e2 4946
     muls r1,r0    @ 080cb1e4 4143
@@ -245807,8 +245807,8 @@ LAB_080cb248:
 switchD_080cb250__switchD:
     .hword 0x4687    @ 080cb250 8746
     .byte  0x00, 0x00
-DAT_080cb254:
-    .word  0x098169b8                     @ 080cb254 b8698109
+PTR_card_stats_table_080cb254:
+    .word  card_stats_table               @ 080cb254 b8698109
 DAT_080cb258:
     .word  0x080cb25c                     @ 080cb258 5cb20c08
 switchD_080cb250__switchdataD_080cb25c:
@@ -245860,7 +245860,7 @@ switchD_080cb250__caseD_0:
     bl FUN_08030a30                          @ 080cb2d0 65f7aefb
     cmp r0,#0x0                              @ 080cb2d4 0028
     beq LAB_080cb2f0                         @ 080cb2d6 0bd0
-    ldr r1, DAT_080cb3f4                     @ 080cb2d8 4649
+    ldr r1, PTR_card_stats_table_080cb3f4    @ 080cb2d8 4649
     movs r0,#0x16    @ 080cb2da 1620
     .hword 0x464d    @ 080cb2dc 4d46
     muls r5,r0    @ 080cb2de 4543
@@ -246002,8 +246002,8 @@ LAB_080cb3ec:
     ldrh r0,[r7,#0x8]                        @ 080cb3ee 3889
     b LAB_080cb5ee                           @ 080cb3f0 fde0
     .byte  0x00, 0x00
-DAT_080cb3f4:
-    .word  0x098169b8                     @ 080cb3f4 b8698109
+PTR_card_stats_table_080cb3f4:
+    .word  card_stats_table               @ 080cb3f4 b8698109
 DAT_080cb3f8:
     .word  0x0202334e                     @ 080cb3f8 4e330202
 DAT_080cb3fc:
@@ -247644,7 +247644,7 @@ LAB_080cc0b8:
     muls r2,r0    @ 080cc0be 4243
     adds r0,r2,#0x6    @ 080cc0c0 901d
     lsls r0,r0,#0x1    @ 080cc0c2 4000
-    ldr r1, DAT_080cc174                     @ 080cc0c4 2b49
+    ldr r1, PTR_card_stats_table_080cc174    @ 080cc0c4 2b49
     adds r0,r0,r1    @ 080cc0c6 4018
     ldrh r0,[r0,#0x0]                        @ 080cc0c8 0088
     str r0,[r7,#0x4]                         @ 080cc0ca 7860
@@ -247658,7 +247658,7 @@ LAB_080cc0b8:
     str r0,[r7,#0xc]                         @ 080cc0da f860
     adds r0,r2,#0x5    @ 080cc0dc 501d
     lsls r0,r0,#0x1    @ 080cc0de 4000
-    ldr r3, DAT_080cc174                     @ 080cc0e0 244b
+    ldr r3, PTR_card_stats_table_080cc174    @ 080cc0e0 244b
     adds r0,r0,r3    @ 080cc0e2 c018
     ldrh r0,[r0,#0x0]                        @ 080cc0e4 0088
     str r0,[r7,#0x10]                        @ 080cc0e6 3861
@@ -247735,8 +247735,8 @@ LAB_080cc14e:
 LAB_080cc170:
     adds r0,r2,#0x0    @ 080cc170 101c
     b LAB_080cc1de                           @ 080cc172 34e0
-DAT_080cc174:
-    .word  0x098169b8                     @ 080cc174 b8698109
+PTR_card_stats_table_080cc174:
+    .word  card_stats_table               @ 080cc174 b8698109
 DAT_080cc178:
     .word  0x02020160                     @ 080cc178 60010202
 DAT_080cc17c:
@@ -256894,7 +256894,7 @@ FUN_080d3dc4:
     add r7,sp,#0x8                           @ 080d3dde 02af
     ldr r0, DAT_080d3e04                     @ 080d3de0 0848
     .hword 0x4682    @ 080d3de2 8246
-    ldr r1, DAT_080d3e08                     @ 080d3de4 0849
+    ldr r1, PTR_card_stats_table_080d3e08    @ 080d3de4 0849
     .hword 0x4689    @ 080d3de6 8946
     adds r5,r7,#0x0    @ 080d3de8 3d1c
     ldr r0, DAT_080d3e0c                     @ 080d3dea 0848
@@ -256912,8 +256912,8 @@ LAB_080d3dee:
     .byte  0x00, 0x00
 DAT_080d3e04:
     .word  0x09e4f1c4                     @ 080d3e04 c4f1e409
-DAT_080d3e08:
-    .word  0x098169b8                     @ 080d3e08 b8698109
+PTR_card_stats_table_080d3e08:
+    .word  card_stats_table               @ 080d3e08 b8698109
 DAT_080d3e0c:
     .word  0x02020160                     @ 080d3e0c 60010202
 LAB_080d3e10:
@@ -256972,7 +256972,7 @@ LAB_080d3e2e:
     ldr r3, DAT_080d3e98                     @ 080d3e76 084b
     .hword 0x464c    @ 080d3e78 4c46
     adds r6,r0,#0x0    @ 080d3e7a 061c
-    ldr r0, DAT_080d3e9c                     @ 080d3e7c 0748
+    ldr r0, PTR_card_stats_table_080d3e9c    @ 080d3e7c 0748
     .hword 0x4682    @ 080d3e7e 8246
 LAB_080d3e80:
     ldr r1,[sp,#0x40]                        @ 080d3e80 1099
@@ -256988,8 +256988,8 @@ LAB_080d3e80:
     b LAB_080d3f24                           @ 080d3e96 45e0
 DAT_080d3e98:
     .word  0x09e4f284                     @ 080d3e98 84f2e409
-DAT_080d3e9c:
-    .word  0x098169b8                     @ 080d3e9c b8698109
+PTR_card_stats_table_080d3e9c:
+    .word  card_stats_table               @ 080d3e9c b8698109
 LAB_080d3ea0:
     ldr r0,[r6,#0x0]                         @ 080d3ea0 3068
     lsls r1,r0,#0x2    @ 080d3ea2 8100
@@ -257105,7 +257105,7 @@ FUN_080d3f4c:
     .hword 0x46ba    @ 080d3f72 ba46
     .hword 0x4644    @ 080d3f74 4446
     adds r5,r0,#0x0    @ 080d3f76 051c
-    ldr r0, DAT_080d3f94                     @ 080d3f78 0648
+    ldr r0, PTR_card_stats_table_080d3f94    @ 080d3f78 0648
     .hword 0x4681    @ 080d3f7a 8146
 LAB_080d3f7c:
     ldr r0,[r5,#0x0]                         @ 080d3f7c 2868
@@ -257119,8 +257119,8 @@ LAB_080d3f7c:
     .byte  0x00, 0x00
 DAT_080d3f90:
     .word  0x02020160                     @ 080d3f90 60010202
-DAT_080d3f94:
-    .word  0x098169b8                     @ 080d3f94 b8698109
+PTR_card_stats_table_080d3f94:
+    .word  card_stats_table               @ 080d3f94 b8698109
 LAB_080d3f98:
     ldr r0,[r5,#0x0]                         @ 080d3f98 2868
     lsls r1,r0,#0x2    @ 080d3f9a 8100
@@ -270724,7 +270724,7 @@ switchD_080daef8__default:
     b LAB_080dafbe                           @ 080daf1a 50e0
 switchD_080daef8__caseD_2d:
     movs r2,#0x0    @ 080daf1c 0022
-    ldr r1, DAT_080daf34                     @ 080daf1e 0549
+    ldr r1, PTR_card_stats_table_080daf34    @ 080daf1e 0549
     movs r0,#0xb    @ 080daf20 0b20
     muls r0,r3    @ 080daf22 5843
     adds r0,#0x8    @ 080daf24 0830
@@ -270735,11 +270735,11 @@ switchD_080daef8__caseD_2d:
     bne LAB_080dafb2                         @ 080daf2e 40d1
     b LAB_080dafb0                           @ 080daf30 3ee0
     .byte  0x00, 0x00
-DAT_080daf34:
-    .word  0x098169b8                     @ 080daf34 b8698109
+PTR_card_stats_table_080daf34:
+    .word  card_stats_table               @ 080daf34 b8698109
 switchD_080daef8__caseD_2e:
     movs r2,#0x0    @ 080daf38 0022
-    ldr r1, DAT_080daf50                     @ 080daf3a 0549
+    ldr r1, PTR_card_stats_table_080daf50    @ 080daf3a 0549
     movs r0,#0xb    @ 080daf3c 0b20
     muls r0,r3    @ 080daf3e 5843
     adds r0,#0x8    @ 080daf40 0830
@@ -270750,12 +270750,12 @@ switchD_080daef8__caseD_2e:
     bne LAB_080dafb2                         @ 080daf4a 32d1
     b LAB_080dafb0                           @ 080daf4c 30e0
     .byte  0x00, 0x00
-DAT_080daf50:
-    .word  0x098169b8                     @ 080daf50 b8698109
+PTR_card_stats_table_080daf50:
+    .word  card_stats_table               @ 080daf50 b8698109
 switchD_080daef8__caseD_2f:
     movs r4,#0x0    @ 080daf54 0024
     ldr r2, DAT_080daf78                     @ 080daf56 084a
-    ldr r1, DAT_080daf7c                     @ 080daf58 0849
+    ldr r1, PTR_card_stats_table_080daf7c    @ 080daf58 0849
     movs r0,#0xb    @ 080daf5a 0b20
     muls r0,r3    @ 080daf5c 5843
     adds r0,#0x8    @ 080daf5e 0830
@@ -270774,11 +270774,11 @@ LAB_080daf72:
     .byte  0x00, 0x00
 DAT_080daf78:
     .word  0x09e4f1c4                     @ 080daf78 c4f1e409
-DAT_080daf7c:
-    .word  0x098169b8                     @ 080daf7c b8698109
+PTR_card_stats_table_080daf7c:
+    .word  card_stats_table               @ 080daf7c b8698109
 switchD_080daef8__caseD_30:
     movs r2,#0x0    @ 080daf80 0022
-    ldr r1, DAT_080daf98                     @ 080daf82 0549
+    ldr r1, PTR_card_stats_table_080daf98    @ 080daf82 0549
     movs r0,#0xb    @ 080daf84 0b20
     muls r0,r3    @ 080daf86 5843
     adds r0,#0x6    @ 080daf88 0630
@@ -270789,11 +270789,11 @@ switchD_080daef8__caseD_30:
     bne LAB_080dafb2                         @ 080daf92 0ed1
     b LAB_080dafb0                           @ 080daf94 0ce0
     .byte  0x00, 0x00
-DAT_080daf98:
-    .word  0x098169b8                     @ 080daf98 b8698109
+PTR_card_stats_table_080daf98:
+    .word  card_stats_table               @ 080daf98 b8698109
 switchD_080daef8__caseD_31:
     movs r2,#0x0    @ 080daf9c 0022
-    ldr r1, DAT_080dafb8                     @ 080daf9e 0649
+    ldr r1, PTR_card_stats_table_080dafb8    @ 080daf9e 0649
     movs r0,#0xb    @ 080dafa0 0b20
     muls r0,r3    @ 080dafa2 5843
     adds r0,#0x6    @ 080dafa4 0630
@@ -270808,8 +270808,8 @@ LAB_080dafb2:
     adds r0,r2,#0x0    @ 080dafb2 101c
     b LAB_080dafbe                           @ 080dafb4 03e0
     .byte  0x00, 0x00
-DAT_080dafb8:
-    .word  0x098169b8                     @ 080dafb8 b8698109
+PTR_card_stats_table_080dafb8:
+    .word  card_stats_table               @ 080dafb8 b8698109
 switchD_080daef8__caseD_32:
     movs r0,#0x1    @ 080dafbc 0120
 LAB_080dafbe:
@@ -271291,7 +271291,7 @@ FUN_080db368:
     ldrh r0,[r0,#0x0]                        @ 080db37c 0088
     cmp r2,r0                                @ 080db37e 8242
     bhi LAB_080db3fe                         @ 080db380 3dd8
-    ldr r3, DAT_080db3b0                     @ 080db382 0b4b
+    ldr r3, PTR_card_stats_table_080db3b0    @ 080db382 0b4b
     ldr r6, DAT_080db3b4                     @ 080db384 0b4e
     adds r5,r0,#0x0    @ 080db386 051c
 LAB_080db388:
@@ -271315,8 +271315,8 @@ DAT_080db3a8:
     .word  0x0000071c                     @ 080db3a8 1c070000
 DAT_080db3ac:
     .word  0x095b7cca                     @ 080db3ac ca7c5b09
-DAT_080db3b0:
-    .word  0x098169b8                     @ 080db3b0 b8698109
+PTR_card_stats_table_080db3b0:
+    .word  card_stats_table               @ 080db3b0 b8698109
 DAT_080db3b4:
     .word  0x09e4f1c4                     @ 080db3b4 c4f1e409
 LAB_080db3b8:
@@ -286265,7 +286265,7 @@ LAB_080e462c:
     ldrb r0,[r0,#0x0]                        @ 080e4634 0078
     cmp r5,r0                                @ 080e4636 8542
     bge LAB_080e4668                         @ 080e4638 16da
-    ldr r4, DAT_080e46ac                     @ 080e463a 1c4c
+    ldr r4, PTR_card_stats_table_080e46ac    @ 080e463a 1c4c
     adds r2,r0,#0x0    @ 080e463c 021c
     adds r3,r1,#0x0    @ 080e463e 0b1c
     ldr r6, DAT_080e46b0                     @ 080e4640 1b4e
@@ -286300,7 +286300,7 @@ LAB_080e4668:
     blt LAB_080e467a                         @ 080e4674 01db
     bl FUN_080e5608                          @ 080e4676 00f0c7ff
 LAB_080e467a:
-    ldr r4, DAT_080e46ac                     @ 080e467a 0c4c
+    ldr r4, PTR_card_stats_table_080e46ac    @ 080e467a 0c4c
     adds r2,r0,#0x0    @ 080e467c 021c
     ldr r3, DAT_080e46b0                     @ 080e467e 0c4b
     adds r1,r1,r3    @ 080e4680 c918
@@ -286326,8 +286326,8 @@ DAT_080e46a4:
     .word  0x02000000                     @ 080e46a4 00000002
 DAT_080e46a8:
     .word  0x00001150                     @ 080e46a8 50110000
-DAT_080e46ac:
-    .word  0x098169b8                     @ 080e46ac b8698109
+PTR_card_stats_table_080e46ac:
+    .word  card_stats_table               @ 080e46ac b8698109
 DAT_080e46b0:
     .word  0x00001154                     @ 080e46b0 54110000
 DAT_080e46b4:
@@ -286340,7 +286340,7 @@ LAB_080e46b8:
     ldrb r0,[r0,#0x0]                        @ 080e46c0 0078
     cmp r5,r0                                @ 080e46c2 8542
     bge LAB_080e46f2                         @ 080e46c4 15da
-    ldr r4, DAT_080e4738                     @ 080e46c6 1c4c
+    ldr r4, PTR_card_stats_table_080e4738    @ 080e46c6 1c4c
     adds r2,r0,#0x0    @ 080e46c8 021c
     adds r0,r1,#0x0    @ 080e46ca 081c
     ldr r3, DAT_080e473c                     @ 080e46cc 1b4b
@@ -286374,7 +286374,7 @@ LAB_080e46f2:
     blt LAB_080e4704                         @ 080e46fe 01db
     bl FUN_080e5608                          @ 080e4700 00f082ff
 LAB_080e4704:
-    ldr r4, DAT_080e4738                     @ 080e4704 0c4c
+    ldr r4, PTR_card_stats_table_080e4738    @ 080e4704 0c4c
     adds r2,r0,#0x0    @ 080e4706 021c
     ldr r3, DAT_080e473c                     @ 080e4708 0c4b
     adds r1,r7,r3    @ 080e470a f918
@@ -286401,8 +286401,8 @@ DAT_080e4730:
     .word  0x02000000                     @ 080e4730 00000002
 DAT_080e4734:
     .word  0x00001150                     @ 080e4734 50110000
-DAT_080e4738:
-    .word  0x098169b8                     @ 080e4738 b8698109
+PTR_card_stats_table_080e4738:
+    .word  card_stats_table               @ 080e4738 b8698109
 DAT_080e473c:
     .word  0x00001154                     @ 080e473c 54110000
 DAT_080e4740:
@@ -286415,7 +286415,7 @@ LAB_080e4744:
     ldrb r0,[r0,#0x0]                        @ 080e474c 0078
     cmp r5,r0                                @ 080e474e 8542
     bge LAB_080e477a                         @ 080e4750 13da
-    ldr r4, DAT_080e47c0                     @ 080e4752 1b4c
+    ldr r4, PTR_card_stats_table_080e47c0    @ 080e4752 1b4c
     adds r2,r0,#0x0    @ 080e4754 021c
     adds r0,r1,#0x0    @ 080e4756 081c
     ldr r3, DAT_080e47c4                     @ 080e4758 1a4b
@@ -286447,7 +286447,7 @@ LAB_080e477a:
     blt LAB_080e478c                         @ 080e4786 01db
     bl FUN_080e5608                          @ 080e4788 00f03eff
 LAB_080e478c:
-    ldr r4, DAT_080e47c0                     @ 080e478c 0c4c
+    ldr r4, PTR_card_stats_table_080e47c0    @ 080e478c 0c4c
     adds r2,r0,#0x0    @ 080e478e 021c
     ldr r3, DAT_080e47cc                     @ 080e4790 0e4b
     adds r1,r7,r3    @ 080e4792 f918
@@ -286474,8 +286474,8 @@ DAT_080e47b8:
     .word  0x02000000                     @ 080e47b8 00000002
 DAT_080e47bc:
     .word  0x00001150                     @ 080e47bc 50110000
-DAT_080e47c0:
-    .word  0x098169b8                     @ 080e47c0 b8698109
+PTR_card_stats_table_080e47c0:
+    .word  card_stats_table               @ 080e47c0 b8698109
 DAT_080e47c4:
     .word  0x00001154                     @ 080e47c4 54110000
 DAT_080e47c8:
@@ -286490,7 +286490,7 @@ FUN_080e47d0:
     ldrb r0,[r0,#0x0]                        @ 080e47d8 0078
     cmp r5,r0                                @ 080e47da 8542
     bge LAB_080e480e                         @ 080e47dc 17da
-    ldr r7, DAT_080e485c                     @ 080e47de 1f4f
+    ldr r7, PTR_card_stats_table_080e485c    @ 080e47de 1f4f
     ldr r6, DAT_080e4860                     @ 080e47e0 1f4e
     ldr r3, DAT_080e4864                     @ 080e47e2 204b
     adds r2,r1,r3    @ 080e47e4 ca18
@@ -286526,7 +286526,7 @@ LAB_080e480e:
     blt LAB_080e4820                         @ 080e481a 01db
     bl FUN_080e5608                          @ 080e481c 00f0f4fe
 LAB_080e4820:
-    ldr r7, DAT_080e485c                     @ 080e4820 0e4f
+    ldr r7, PTR_card_stats_table_080e485c    @ 080e4820 0e4f
     ldr r6, DAT_080e4860                     @ 080e4822 0f4e
     ldr r3, DAT_080e4870                     @ 080e4824 124b
     adds r1,r1,r3    @ 080e4826 c918
@@ -286557,8 +286557,8 @@ DAT_080e4854:
     .word  0x02000000                     @ 080e4854 00000002
 DAT_080e4858:
     .word  0x00001150                     @ 080e4858 50110000
-DAT_080e485c:
-    .word  0x098169b8                     @ 080e485c b8698109
+PTR_card_stats_table_080e485c:
+    .word  card_stats_table               @ 080e485c b8698109
 DAT_080e4860:
     .word  0x0000ffff                     @ 080e4860 ffff0000
 DAT_080e4864:
@@ -286577,7 +286577,7 @@ FUN_080e4874:
     ldrb r0,[r0,#0x0]                        @ 080e487c 0078
     cmp r5,r0                                @ 080e487e 8542
     bge LAB_080e48c6                         @ 080e4880 21da
-    ldr r3, DAT_080e4918                     @ 080e4882 254b
+    ldr r3, PTR_card_stats_table_080e4918    @ 080e4882 254b
     ldr r6, DAT_080e491c                     @ 080e4884 254e
     adds r4,r1,#0x0    @ 080e4886 0c1c
     ldr r7, DAT_080e4920                     @ 080e4888 254f
@@ -286622,7 +286622,7 @@ LAB_080e48c6:
     blt LAB_080e48d8                         @ 080e48d2 01db
     bl FUN_080e5608                          @ 080e48d4 00f098fe
 LAB_080e48d8:
-    ldr r6, DAT_080e4918                     @ 080e48d8 0f4e
+    ldr r6, PTR_card_stats_table_080e4918    @ 080e48d8 0f4e
     ldr r4, DAT_080e491c                     @ 080e48da 104c
     ldr r3, DAT_080e492c                     @ 080e48dc 134b
     adds r1,r1,r3    @ 080e48de c918
@@ -286654,8 +286654,8 @@ DAT_080e4910:
     .word  0x02000000                     @ 080e4910 00000002
 DAT_080e4914:
     .word  0x00001150                     @ 080e4914 50110000
-DAT_080e4918:
-    .word  0x098169b8                     @ 080e4918 b8698109
+PTR_card_stats_table_080e4918:
+    .word  card_stats_table               @ 080e4918 b8698109
 DAT_080e491c:
     .word  0x0000ffff                     @ 080e491c ffff0000
 DAT_080e4920:
@@ -286676,7 +286676,7 @@ FUN_080e4930:
     blt LAB_080e4942                         @ 080e493c 01db
     bl FUN_080e5608                          @ 080e493e 00f063fe
 LAB_080e4942:
-    ldr r7, DAT_080e497c                     @ 080e4942 0e4f
+    ldr r7, PTR_card_stats_table_080e497c    @ 080e4942 0e4f
     adds r6,r0,#0x0    @ 080e4944 061c
     adds r4,r1,#0x0    @ 080e4946 0c1c
 LAB_080e4948:
@@ -286704,8 +286704,8 @@ DAT_080e4974:
     .word  0x02000000                     @ 080e4974 00000002
 DAT_080e4978:
     .word  0x00001150                     @ 080e4978 50110000
-DAT_080e497c:
-    .word  0x098169b8                     @ 080e497c b8698109
+PTR_card_stats_table_080e497c:
+    .word  card_stats_table               @ 080e497c b8698109
 DAT_080e4980:
     .word  0x00001154                     @ 080e4980 54110000
 FUN_080e4984:
@@ -286716,7 +286716,7 @@ FUN_080e4984:
     ldrb r1,[r1,#0x0]                        @ 080e498c 0978
     cmp r5,r1                                @ 080e498e 8d42
     bge LAB_080e49c0                         @ 080e4990 16da
-    ldr r6, DAT_080e4a0c                     @ 080e4992 1e4e
+    ldr r6, PTR_card_stats_table_080e4a0c    @ 080e4992 1e4e
 LAB_080e4994:
     lsls r1,r5,#0x1    @ 080e4994 6900
     ldr r7, DAT_080e4a04                     @ 080e4996 1b4f
@@ -286749,7 +286749,7 @@ LAB_080e49c0:
     blt LAB_080e49d2                         @ 080e49cc 01db
     bl FUN_080e5608                          @ 080e49ce 00f01bfe
 LAB_080e49d2:
-    ldr r7, DAT_080e4a0c                     @ 080e49d2 0e4f
+    ldr r7, PTR_card_stats_table_080e4a0c    @ 080e49d2 0e4f
     adds r6,r2,#0x0    @ 080e49d4 161c
     adds r4,r0,#0x0    @ 080e49d6 041c
 LAB_080e49d8:
@@ -286777,8 +286777,8 @@ DAT_080e4a04:
     .word  0x02000000                     @ 080e4a04 00000002
 DAT_080e4a08:
     .word  0x00001150                     @ 080e4a08 50110000
-DAT_080e4a0c:
-    .word  0x098169b8                     @ 080e4a0c b8698109
+PTR_card_stats_table_080e4a0c:
+    .word  card_stats_table               @ 080e4a0c b8698109
 DAT_080e4a10:
     .word  0x00001154                     @ 080e4a10 54110000
 DAT_080e4a14:
@@ -286795,7 +286795,7 @@ FUN_080e4a1c:
     blt LAB_080e4a2e                         @ 080e4a28 01db
     bl FUN_080e5608                          @ 080e4a2a 00f0edfd
 LAB_080e4a2e:
-    ldr r4, DAT_080e4a64                     @ 080e4a2e 0d4c
+    ldr r4, PTR_card_stats_table_080e4a64    @ 080e4a2e 0d4c
     adds r2,r0,#0x0    @ 080e4a30 021c
     adds r6,r1,#0x0    @ 080e4a32 0e1c
     ldr r7, DAT_080e4a68                     @ 080e4a34 0c4f
@@ -286822,8 +286822,8 @@ DAT_080e4a5c:
     .word  0x02000000                     @ 080e4a5c 00000002
 DAT_080e4a60:
     .word  0x00001150                     @ 080e4a60 50110000
-DAT_080e4a64:
-    .word  0x098169b8                     @ 080e4a64 b8698109
+PTR_card_stats_table_080e4a64:
+    .word  card_stats_table               @ 080e4a64 b8698109
 DAT_080e4a68:
     .word  0x00001154                     @ 080e4a68 54110000
 FUN_080e4a6c:
@@ -286836,7 +286836,7 @@ FUN_080e4a6c:
     blt LAB_080e4a7e                         @ 080e4a78 01db
     bl FUN_080e5608                          @ 080e4a7a 00f0c5fd
 LAB_080e4a7e:
-    ldr r4, DAT_080e4ab4                     @ 080e4a7e 0d4c
+    ldr r4, PTR_card_stats_table_080e4ab4    @ 080e4a7e 0d4c
     adds r2,r0,#0x0    @ 080e4a80 021c
     adds r0,r1,#0x0    @ 080e4a82 081c
     ldr r3, DAT_080e4ab8                     @ 080e4a84 0c4b
@@ -286863,8 +286863,8 @@ DAT_080e4aac:
     .word  0x02000000                     @ 080e4aac 00000002
 DAT_080e4ab0:
     .word  0x00001150                     @ 080e4ab0 50110000
-DAT_080e4ab4:
-    .word  0x098169b8                     @ 080e4ab4 b8698109
+PTR_card_stats_table_080e4ab4:
+    .word  card_stats_table               @ 080e4ab4 b8698109
 DAT_080e4ab8:
     .word  0x00001154                     @ 080e4ab8 54110000
 FUN_080e4abc:
@@ -286896,7 +286896,7 @@ DAT_080e4aec:
 DAT_080e4af0:
     .word  0x00001150                     @ 080e4af0 50110000
 FUN_080e4af4:
-    ldr r2, DAT_080e4b3c                     @ 080e4af4 114a
+    ldr r2, PTR_card_stats_table_080e4b3c    @ 080e4af4 114a
     lsls r1,r5,#0x1    @ 080e4af6 6900
     ldr r3, DAT_080e4b40                     @ 080e4af8 114b
     ldr r4, DAT_080e4b44                     @ 080e4afa 124c
@@ -286930,8 +286930,8 @@ FUN_080e4b30:
     adds r0,r1,r2    @ 080e4b34 8818
     bl FUN_080e55b6                          @ 080e4b36 00f03efd
     .byte  0x00, 0x00
-DAT_080e4b3c:
-    .word  0x098169b8                     @ 080e4b3c b8698109
+PTR_card_stats_table_080e4b3c:
+    .word  card_stats_table               @ 080e4b3c b8698109
 DAT_080e4b40:
     .word  0x02000000                     @ 080e4b40 00000002
 DAT_080e4b44:
@@ -286948,7 +286948,7 @@ FUN_080e4b50:
     ldrb r0,[r0,#0x0]                        @ 080e4b58 0078
     cmp r5,r0                                @ 080e4b5a 8542
     bge LAB_080e4b98                         @ 080e4b5c 1cda
-    ldr r7, DAT_080e4bac                     @ 080e4b5e 134f
+    ldr r7, PTR_card_stats_table_080e4bac    @ 080e4b5e 134f
 LAB_080e4b60:
     lsls r1,r5,#0x1    @ 080e4b60 6900
     ldr r4, DAT_080e4bb0                     @ 080e4b62 134c
@@ -286986,8 +286986,8 @@ DAT_080e4ba4:
     .word  0x02000000                     @ 080e4ba4 00000002
 DAT_080e4ba8:
     .word  0x00001150                     @ 080e4ba8 50110000
-DAT_080e4bac:
-    .word  0x098169b8                     @ 080e4bac b8698109
+PTR_card_stats_table_080e4bac:
+    .word  card_stats_table               @ 080e4bac b8698109
 DAT_080e4bb0:
     .word  0x00001154                     @ 080e4bb0 54110000
 DAT_080e4bb4:
@@ -287002,7 +287002,7 @@ FUN_080e4bbc:
     ldrb r0,[r0,#0x0]                        @ 080e4bc4 0078
     cmp r5,r0                                @ 080e4bc6 8542
     bge LAB_080e4c04                         @ 080e4bc8 1cda
-    ldr r7, DAT_080e4c18                     @ 080e4bca 134f
+    ldr r7, PTR_card_stats_table_080e4c18    @ 080e4bca 134f
 LAB_080e4bcc:
     lsls r1,r5,#0x1    @ 080e4bcc 6900
     ldr r4, DAT_080e4c1c                     @ 080e4bce 134c
@@ -287040,8 +287040,8 @@ DAT_080e4c10:
     .word  0x02000000                     @ 080e4c10 00000002
 DAT_080e4c14:
     .word  0x00001150                     @ 080e4c14 50110000
-DAT_080e4c18:
-    .word  0x098169b8                     @ 080e4c18 b8698109
+PTR_card_stats_table_080e4c18:
+    .word  card_stats_table               @ 080e4c18 b8698109
 DAT_080e4c1c:
     .word  0x00001154                     @ 080e4c1c 54110000
 DAT_080e4c20:
@@ -287056,7 +287056,7 @@ FUN_080e4c28:
     ldrb r0,[r0,#0x0]                        @ 080e4c30 0078
     cmp r5,r0                                @ 080e4c32 8542
     bge LAB_080e4c70                         @ 080e4c34 1cda
-    ldr r7, DAT_080e4cbc                     @ 080e4c36 214f
+    ldr r7, PTR_card_stats_table_080e4cbc    @ 080e4c36 214f
 LAB_080e4c38:
     lsls r1,r5,#0x1    @ 080e4c38 6900
     ldr r4, DAT_080e4cc0                     @ 080e4c3a 214c
@@ -287094,7 +287094,7 @@ LAB_080e4c70:
     blt LAB_080e4c82                         @ 080e4c7c 01db
     bl FUN_080e5608                          @ 080e4c7e 00f0c3fc
 LAB_080e4c82:
-    ldr r7, DAT_080e4cbc                     @ 080e4c82 0e4f
+    ldr r7, PTR_card_stats_table_080e4cbc    @ 080e4c82 0e4f
     adds r6,r1,#0x0    @ 080e4c84 0e1c
     adds r4,r0,#0x0    @ 080e4c86 041c
 LAB_080e4c88:
@@ -287122,8 +287122,8 @@ DAT_080e4cb4:
     .word  0x02000000                     @ 080e4cb4 00000002
 DAT_080e4cb8:
     .word  0x00001150                     @ 080e4cb8 50110000
-DAT_080e4cbc:
-    .word  0x098169b8                     @ 080e4cbc b8698109
+PTR_card_stats_table_080e4cbc:
+    .word  card_stats_table               @ 080e4cbc b8698109
 DAT_080e4cc0:
     .word  0x00001154                     @ 080e4cc0 54110000
 DAT_080e4cc4:
@@ -287133,7 +287133,7 @@ DAT_080e4cc8:
 DAT_080e4ccc:
     .word  0x00001212                     @ 080e4ccc 12120000
 FUN_080e4cd0:
-    ldr r2, DAT_080e4d50                     @ 080e4cd0 1f4a
+    ldr r2, PTR_card_stats_table_080e4d50    @ 080e4cd0 1f4a
     lsls r1,r5,#0x1    @ 080e4cd2 6900
     ldr r4, DAT_080e4d54                     @ 080e4cd4 1f4c
     ldr r6, DAT_080e4d58                     @ 080e4cd6 204e
@@ -287171,7 +287171,7 @@ FUN_080e4d0c:
     blt LAB_080e4d1e                         @ 080e4d18 01db
     bl FUN_080e5608                          @ 080e4d1a 00f075fc
 LAB_080e4d1e:
-    ldr r7, DAT_080e4d50                     @ 080e4d1e 0c4f
+    ldr r7, PTR_card_stats_table_080e4d50    @ 080e4d1e 0c4f
     adds r6,r2,#0x0    @ 080e4d20 161c
     adds r4,r0,#0x0    @ 080e4d22 041c
 LAB_080e4d24:
@@ -287195,8 +287195,8 @@ LAB_080e4d42:
     blt LAB_080e4d24                         @ 080e4d48 ecdb
     bl FUN_080e5608                          @ 080e4d4a 00f05dfc
     .byte  0x00, 0x00
-DAT_080e4d50:
-    .word  0x098169b8                     @ 080e4d50 b8698109
+PTR_card_stats_table_080e4d50:
+    .word  card_stats_table               @ 080e4d50 b8698109
 DAT_080e4d54:
     .word  0x02000000                     @ 080e4d54 00000002
 DAT_080e4d58:
@@ -287215,7 +287215,7 @@ FUN_080e4d68:
     ldrb r0,[r0,#0x0]                        @ 080e4d70 0078
     cmp r5,r0                                @ 080e4d72 8542
     bge LAB_080e4db0                         @ 080e4d74 1cda
-    ldr r7, DAT_080e4dfc                     @ 080e4d76 214f
+    ldr r7, PTR_card_stats_table_080e4dfc    @ 080e4d76 214f
 LAB_080e4d78:
     lsls r1,r5,#0x1    @ 080e4d78 6900
     ldr r0, DAT_080e4e00                     @ 080e4d7a 2148
@@ -287253,7 +287253,7 @@ LAB_080e4db0:
     blt LAB_080e4dc2                         @ 080e4dbc 01db
     bl FUN_080e5608                          @ 080e4dbe 00f023fc
 LAB_080e4dc2:
-    ldr r7, DAT_080e4dfc                     @ 080e4dc2 0e4f
+    ldr r7, PTR_card_stats_table_080e4dfc    @ 080e4dc2 0e4f
     adds r6,r2,#0x0    @ 080e4dc4 161c
     adds r4,r0,#0x0    @ 080e4dc6 041c
 LAB_080e4dc8:
@@ -287281,8 +287281,8 @@ DAT_080e4df4:
     .word  0x02000000                     @ 080e4df4 00000002
 DAT_080e4df8:
     .word  0x00001150                     @ 080e4df8 50110000
-DAT_080e4dfc:
-    .word  0x098169b8                     @ 080e4dfc b8698109
+PTR_card_stats_table_080e4dfc:
+    .word  card_stats_table               @ 080e4dfc b8698109
 DAT_080e4e00:
     .word  0x00001154                     @ 080e4e00 54110000
 DAT_080e4e04:
@@ -287299,7 +287299,7 @@ FUN_080e4e10:
     ldrb r0,[r0,#0x0]                        @ 080e4e18 0078
     cmp r5,r0                                @ 080e4e1a 8542
     bge LAB_080e4e58                         @ 080e4e1c 1cda
-    ldr r7, DAT_080e4ea0                     @ 080e4e1e 204f
+    ldr r7, PTR_card_stats_table_080e4ea0    @ 080e4e1e 204f
 LAB_080e4e20:
     lsls r1,r5,#0x1    @ 080e4e20 6900
     ldr r0, DAT_080e4ea4                     @ 080e4e22 2048
@@ -287337,7 +287337,7 @@ LAB_080e4e58:
     blt LAB_080e4e68                         @ 080e4e64 00db
     b FUN_080e5608                           @ 080e4e66 cfe3
 LAB_080e4e68:
-    ldr r7, DAT_080e4ea0                     @ 080e4e68 0d4f
+    ldr r7, PTR_card_stats_table_080e4ea0    @ 080e4e68 0d4f
     adds r6,r2,#0x0    @ 080e4e6a 161c
     adds r4,r0,#0x0    @ 080e4e6c 041c
 LAB_080e4e6e:
@@ -287365,8 +287365,8 @@ DAT_080e4e98:
     .word  0x02000000                     @ 080e4e98 00000002
 DAT_080e4e9c:
     .word  0x00001150                     @ 080e4e9c 50110000
-DAT_080e4ea0:
-    .word  0x098169b8                     @ 080e4ea0 b8698109
+PTR_card_stats_table_080e4ea0:
+    .word  card_stats_table               @ 080e4ea0 b8698109
 DAT_080e4ea4:
     .word  0x00001154                     @ 080e4ea4 54110000
 DAT_080e4ea8:
@@ -287383,7 +287383,7 @@ FUN_080e4eb4:
     ldrb r0,[r0,#0x0]                        @ 080e4ebc 0078
     cmp r5,r0                                @ 080e4ebe 8542
     bge LAB_080e4efc                         @ 080e4ec0 1cda
-    ldr r7, DAT_080e4f44                     @ 080e4ec2 204f
+    ldr r7, PTR_card_stats_table_080e4f44    @ 080e4ec2 204f
 LAB_080e4ec4:
     lsls r1,r5,#0x1    @ 080e4ec4 6900
     ldr r0, DAT_080e4f48                     @ 080e4ec6 2048
@@ -287421,7 +287421,7 @@ LAB_080e4efc:
     blt LAB_080e4f0c                         @ 080e4f08 00db
     b FUN_080e5608                           @ 080e4f0a 7de3
 LAB_080e4f0c:
-    ldr r7, DAT_080e4f44                     @ 080e4f0c 0d4f
+    ldr r7, PTR_card_stats_table_080e4f44    @ 080e4f0c 0d4f
     adds r6,r2,#0x0    @ 080e4f0e 161c
     adds r4,r0,#0x0    @ 080e4f10 041c
 LAB_080e4f12:
@@ -287449,8 +287449,8 @@ DAT_080e4f3c:
     .word  0x02000000                     @ 080e4f3c 00000002
 DAT_080e4f40:
     .word  0x00001150                     @ 080e4f40 50110000
-DAT_080e4f44:
-    .word  0x098169b8                     @ 080e4f44 b8698109
+PTR_card_stats_table_080e4f44:
+    .word  card_stats_table               @ 080e4f44 b8698109
 DAT_080e4f48:
     .word  0x00001154                     @ 080e4f48 54110000
 DAT_080e4f4c:
@@ -287460,7 +287460,7 @@ DAT_080e4f50:
 DAT_080e4f54:
     .word  0x00001212                     @ 080e4f54 12120000
 FUN_080e4f58:
-    ldr r2, DAT_080e4fd4                     @ 080e4f58 1e4a
+    ldr r2, PTR_card_stats_table_080e4fd4    @ 080e4f58 1e4a
     lsls r1,r5,#0x1    @ 080e4f5a 6900
     ldr r4, DAT_080e4fd8                     @ 080e4f5c 1e4c
     ldr r6, DAT_080e4fdc                     @ 080e4f5e 1f4e
@@ -287498,7 +287498,7 @@ FUN_080e4f94:
     blt LAB_080e4fa4                         @ 080e4fa0 00db
     b FUN_080e5608                           @ 080e4fa2 31e3
 LAB_080e4fa4:
-    ldr r7, DAT_080e4fd4                     @ 080e4fa4 0b4f
+    ldr r7, PTR_card_stats_table_080e4fd4    @ 080e4fa4 0b4f
     adds r6,r2,#0x0    @ 080e4fa6 161c
     adds r4,r0,#0x0    @ 080e4fa8 041c
 LAB_080e4faa:
@@ -287522,8 +287522,8 @@ LAB_080e4fc8:
     blt LAB_080e4faa                         @ 080e4fce ecdb
     b FUN_080e5608                           @ 080e4fd0 1ae3
     .byte  0x00, 0x00
-DAT_080e4fd4:
-    .word  0x098169b8                     @ 080e4fd4 b8698109
+PTR_card_stats_table_080e4fd4:
+    .word  card_stats_table               @ 080e4fd4 b8698109
 DAT_080e4fd8:
     .word  0x02000000                     @ 080e4fd8 00000002
 DAT_080e4fdc:
@@ -287542,7 +287542,7 @@ FUN_080e4fec:
     ldrb r0,[r0,#0x0]                        @ 080e4ff4 0078
     cmp r5,r0                                @ 080e4ff6 8542
     bge LAB_080e5034                         @ 080e4ff8 1cda
-    ldr r7, DAT_080e507c                     @ 080e4ffa 204f
+    ldr r7, PTR_card_stats_table_080e507c    @ 080e4ffa 204f
 LAB_080e4ffc:
     lsls r1,r5,#0x1    @ 080e4ffc 6900
     ldr r0, DAT_080e5080                     @ 080e4ffe 2048
@@ -287580,7 +287580,7 @@ LAB_080e5034:
     blt LAB_080e5044                         @ 080e5040 00db
     b FUN_080e5608                           @ 080e5042 e1e2
 LAB_080e5044:
-    ldr r7, DAT_080e507c                     @ 080e5044 0d4f
+    ldr r7, PTR_card_stats_table_080e507c    @ 080e5044 0d4f
     adds r6,r2,#0x0    @ 080e5046 161c
     adds r4,r0,#0x0    @ 080e5048 041c
 LAB_080e504a:
@@ -287608,8 +287608,8 @@ DAT_080e5074:
     .word  0x02000000                     @ 080e5074 00000002
 DAT_080e5078:
     .word  0x00001150                     @ 080e5078 50110000
-DAT_080e507c:
-    .word  0x098169b8                     @ 080e507c b8698109
+PTR_card_stats_table_080e507c:
+    .word  card_stats_table               @ 080e507c b8698109
 DAT_080e5080:
     .word  0x00001154                     @ 080e5080 54110000
 DAT_080e5084:
@@ -287626,7 +287626,7 @@ FUN_080e5090:
     ldrb r0,[r0,#0x0]                        @ 080e5098 0078
     cmp r5,r0                                @ 080e509a 8542
     bge LAB_080e50d8                         @ 080e509c 1cda
-    ldr r7, DAT_080e5120                     @ 080e509e 204f
+    ldr r7, PTR_card_stats_table_080e5120    @ 080e509e 204f
 LAB_080e50a0:
     lsls r1,r5,#0x1    @ 080e50a0 6900
     ldr r0, DAT_080e5124                     @ 080e50a2 2048
@@ -287664,7 +287664,7 @@ LAB_080e50d8:
     blt LAB_080e50e8                         @ 080e50e4 00db
     b FUN_080e5608                           @ 080e50e6 8fe2
 LAB_080e50e8:
-    ldr r7, DAT_080e5120                     @ 080e50e8 0d4f
+    ldr r7, PTR_card_stats_table_080e5120    @ 080e50e8 0d4f
     adds r6,r2,#0x0    @ 080e50ea 161c
     adds r4,r0,#0x0    @ 080e50ec 041c
 LAB_080e50ee:
@@ -287692,8 +287692,8 @@ DAT_080e5118:
     .word  0x02000000                     @ 080e5118 00000002
 DAT_080e511c:
     .word  0x00001150                     @ 080e511c 50110000
-DAT_080e5120:
-    .word  0x098169b8                     @ 080e5120 b8698109
+PTR_card_stats_table_080e5120:
+    .word  card_stats_table               @ 080e5120 b8698109
 DAT_080e5124:
     .word  0x00001154                     @ 080e5124 54110000
 DAT_080e5128:
@@ -287710,7 +287710,7 @@ FUN_080e5134:
     ldrb r0,[r0,#0x0]                        @ 080e513c 0078
     cmp r5,r0                                @ 080e513e 8542
     bge LAB_080e517c                         @ 080e5140 1cda
-    ldr r7, DAT_080e51c4                     @ 080e5142 204f
+    ldr r7, PTR_card_stats_table_080e51c4    @ 080e5142 204f
 LAB_080e5144:
     lsls r1,r5,#0x1    @ 080e5144 6900
     ldr r0, DAT_080e51c8                     @ 080e5146 2048
@@ -287748,7 +287748,7 @@ LAB_080e517c:
     blt LAB_080e518c                         @ 080e5188 00db
     b FUN_080e5608                           @ 080e518a 3de2
 LAB_080e518c:
-    ldr r7, DAT_080e51c4                     @ 080e518c 0d4f
+    ldr r7, PTR_card_stats_table_080e51c4    @ 080e518c 0d4f
     adds r6,r2,#0x0    @ 080e518e 161c
     adds r4,r0,#0x0    @ 080e5190 041c
 LAB_080e5192:
@@ -287776,8 +287776,8 @@ DAT_080e51bc:
     .word  0x02000000                     @ 080e51bc 00000002
 DAT_080e51c0:
     .word  0x00001150                     @ 080e51c0 50110000
-DAT_080e51c4:
-    .word  0x098169b8                     @ 080e51c4 b8698109
+PTR_card_stats_table_080e51c4:
+    .word  card_stats_table               @ 080e51c4 b8698109
 DAT_080e51c8:
     .word  0x00001154                     @ 080e51c8 54110000
 DAT_080e51cc:
@@ -287787,7 +287787,7 @@ DAT_080e51d0:
 DAT_080e51d4:
     .word  0x00001212                     @ 080e51d4 12120000
 FUN_080e51d8:
-    ldr r2, DAT_080e5254                     @ 080e51d8 1e4a
+    ldr r2, PTR_card_stats_table_080e5254    @ 080e51d8 1e4a
     lsls r1,r5,#0x1    @ 080e51da 6900
     ldr r4, DAT_080e5258                     @ 080e51dc 1e4c
     ldr r6, DAT_080e525c                     @ 080e51de 1f4e
@@ -287825,7 +287825,7 @@ FUN_080e5214:
     blt LAB_080e5224                         @ 080e5220 00db
     b FUN_080e5608                           @ 080e5222 f1e1
 LAB_080e5224:
-    ldr r7, DAT_080e5254                     @ 080e5224 0b4f
+    ldr r7, PTR_card_stats_table_080e5254    @ 080e5224 0b4f
     adds r6,r2,#0x0    @ 080e5226 161c
     adds r4,r0,#0x0    @ 080e5228 041c
 LAB_080e522a:
@@ -287849,8 +287849,8 @@ LAB_080e5248:
     blt LAB_080e522a                         @ 080e524e ecdb
     b FUN_080e5608                           @ 080e5250 dae1
     .byte  0x00, 0x00
-DAT_080e5254:
-    .word  0x098169b8                     @ 080e5254 b8698109
+PTR_card_stats_table_080e5254:
+    .word  card_stats_table               @ 080e5254 b8698109
 DAT_080e5258:
     .word  0x02000000                     @ 080e5258 00000002
 DAT_080e525c:
@@ -287869,7 +287869,7 @@ FUN_080e526c:
     ldrb r0,[r0,#0x0]                        @ 080e5274 0078
     cmp r5,r0                                @ 080e5276 8542
     bge LAB_080e52b4                         @ 080e5278 1cda
-    ldr r7, DAT_080e52fc                     @ 080e527a 204f
+    ldr r7, PTR_card_stats_table_080e52fc    @ 080e527a 204f
 LAB_080e527c:
     lsls r1,r5,#0x1    @ 080e527c 6900
     ldr r0, DAT_080e5300                     @ 080e527e 2048
@@ -287907,7 +287907,7 @@ LAB_080e52b4:
     blt LAB_080e52c4                         @ 080e52c0 00db
     b FUN_080e5608                           @ 080e52c2 a1e1
 LAB_080e52c4:
-    ldr r7, DAT_080e52fc                     @ 080e52c4 0d4f
+    ldr r7, PTR_card_stats_table_080e52fc    @ 080e52c4 0d4f
     adds r6,r2,#0x0    @ 080e52c6 161c
     adds r4,r0,#0x0    @ 080e52c8 041c
 LAB_080e52ca:
@@ -287935,8 +287935,8 @@ DAT_080e52f4:
     .word  0x02000000                     @ 080e52f4 00000002
 DAT_080e52f8:
     .word  0x00001150                     @ 080e52f8 50110000
-DAT_080e52fc:
-    .word  0x098169b8                     @ 080e52fc b8698109
+PTR_card_stats_table_080e52fc:
+    .word  card_stats_table               @ 080e52fc b8698109
 DAT_080e5300:
     .word  0x00001154                     @ 080e5300 54110000
 DAT_080e5304:
@@ -287953,7 +287953,7 @@ FUN_080e5310:
     ldrb r0,[r0,#0x0]                        @ 080e5318 0078
     cmp r5,r0                                @ 080e531a 8542
     bge LAB_080e5358                         @ 080e531c 1cda
-    ldr r7, DAT_080e53a0                     @ 080e531e 204f
+    ldr r7, PTR_card_stats_table_080e53a0    @ 080e531e 204f
 LAB_080e5320:
     lsls r1,r5,#0x1    @ 080e5320 6900
     ldr r0, DAT_080e53a4                     @ 080e5322 2048
@@ -287991,7 +287991,7 @@ LAB_080e5358:
     blt LAB_080e5368                         @ 080e5364 00db
     b FUN_080e5608                           @ 080e5366 4fe1
 LAB_080e5368:
-    ldr r7, DAT_080e53a0                     @ 080e5368 0d4f
+    ldr r7, PTR_card_stats_table_080e53a0    @ 080e5368 0d4f
     adds r6,r2,#0x0    @ 080e536a 161c
     adds r4,r0,#0x0    @ 080e536c 041c
 LAB_080e536e:
@@ -288019,8 +288019,8 @@ DAT_080e5398:
     .word  0x02000000                     @ 080e5398 00000002
 DAT_080e539c:
     .word  0x00001150                     @ 080e539c 50110000
-DAT_080e53a0:
-    .word  0x098169b8                     @ 080e53a0 b8698109
+PTR_card_stats_table_080e53a0:
+    .word  card_stats_table               @ 080e53a0 b8698109
 DAT_080e53a4:
     .word  0x00001154                     @ 080e53a4 54110000
 DAT_080e53a8:
@@ -288101,7 +288101,7 @@ DAT_080e5430:
 DAT_080e5434:
     .word  0x00001212                     @ 080e5434 12120000
 FUN_080e5438:
-    ldr r2, DAT_080e5510                     @ 080e5438 354a
+    ldr r2, PTR_card_stats_table_080e5510    @ 080e5438 354a
     lsls r1,r5,#0x1    @ 080e543a 6900
     ldr r3, DAT_080e5514                     @ 080e543c 354b
     ldr r4, DAT_080e5518                     @ 080e543e 364c
@@ -288164,7 +288164,7 @@ FUN_080e549e:
     blt LAB_080e54b0                         @ 080e54ac 00db
     b FUN_080e5608                           @ 080e54ae abe0
 LAB_080e54b0:
-    ldr r2, DAT_080e5510                     @ 080e54b0 174a
+    ldr r2, PTR_card_stats_table_080e5510    @ 080e54b0 174a
     .hword 0x4691    @ 080e54b2 9146
     adds r2,r1,#0x0    @ 080e54b4 0a1c
     adds r3,r7,#0x0    @ 080e54b6 3b1c
@@ -288185,7 +288185,7 @@ LAB_080e54be:
     ldrb r0,[r2,#0x0]                        @ 080e54d2 1078
     cmp r5,r0                                @ 080e54d4 8542
     bge LAB_080e5504                         @ 080e54d6 15da
-    ldr r3, DAT_080e5510                     @ 080e54d8 0d4b
+    ldr r3, PTR_card_stats_table_080e5510    @ 080e54d8 0d4b
     adds r6,r1,#0x0    @ 080e54da 0e1c
 LAB_080e54dc:
     movs r0,#0x16    @ 080e54dc 1620
@@ -288214,8 +288214,8 @@ LAB_080e5504:
     blt LAB_080e54be                         @ 080e550a d8db
     b FUN_080e5608                           @ 080e550c 7ce0
     .byte  0x00, 0x00
-DAT_080e5510:
-    .word  0x098169b8                     @ 080e5510 b8698109
+PTR_card_stats_table_080e5510:
+    .word  card_stats_table               @ 080e5510 b8698109
 DAT_080e5514:
     .word  0x02000000                     @ 080e5514 00000002
 DAT_080e5518:
@@ -288234,7 +288234,7 @@ FUN_080e5528:
     ldrb r3,[r1,#0x0]                        @ 080e5530 0b78
     cmp r5,r3                                @ 080e5532 9d42
     bge FUN_080e5608                         @ 080e5534 68da
-    ldr r7, DAT_080e556c                     @ 080e5536 0d4f
+    ldr r7, PTR_card_stats_table_080e556c    @ 080e5536 0d4f
     adds r6,r0,#0x0    @ 080e5538 061c
     adds r4,r1,#0x0    @ 080e553a 0c1c
 LAB_080e553c:
@@ -288261,8 +288261,8 @@ DAT_080e5564:
     .word  0x02000000                     @ 080e5564 00000002
 DAT_080e5568:
     .word  0x00001150                     @ 080e5568 50110000
-DAT_080e556c:
-    .word  0x098169b8                     @ 080e556c b8698109
+PTR_card_stats_table_080e556c:
+    .word  card_stats_table               @ 080e556c b8698109
 DAT_080e5570:
     .word  0x00001154                     @ 080e5570 54110000
 FUN_080e5574:
@@ -288273,7 +288273,7 @@ FUN_080e5574:
     ldrb r1,[r1,#0x0]                        @ 080e557c 0978
     cmp r5,r1                                @ 080e557e 8d42
     bge LAB_080e55b0                         @ 080e5580 16da
-    ldr r6, DAT_080e55c8                     @ 080e5582 114e
+    ldr r6, PTR_card_stats_table_080e55c8    @ 080e5582 114e
 LAB_080e5584:
     lsls r1,r5,#0x1    @ 080e5584 6900
     ldr r7, DAT_080e55c0                     @ 080e5586 0e4f
@@ -288309,8 +288309,8 @@ DAT_080e55c0:
     .word  0x02000000                     @ 080e55c0 00000002
 DAT_080e55c4:
     .word  0x00001150                     @ 080e55c4 50110000
-DAT_080e55c8:
-    .word  0x098169b8                     @ 080e55c8 b8698109
+PTR_card_stats_table_080e55c8:
+    .word  card_stats_table               @ 080e55c8 b8698109
 DAT_080e55cc:
     .word  0x00001154                     @ 080e55cc 54110000
 DAT_080e55d0:
@@ -304379,7 +304379,7 @@ LAB_080ee7bc:
     beq LAB_080ee7c2                         @ 080ee7be 00d0
     b LAB_080ee968                           @ 080ee7c0 d2e0
 LAB_080ee7c2:
-    ldr r1, DAT_080ee7e4                     @ 080ee7c2 0849
+    ldr r1, PTR_card_stats_table_080ee7e4    @ 080ee7c2 0849
     movs r0,#0x16    @ 080ee7c4 1620
     muls r0,r2    @ 080ee7c6 5043
     adds r0,r0,r1    @ 080ee7c8 4018
@@ -304396,8 +304396,8 @@ LAB_080ee7c2:
     .byte  0x00, 0x00
 DAT_080ee7e0:
     .word  0x080000ae                     @ 080ee7e0 ae000008
-DAT_080ee7e4:
-    .word  0x098169b8                     @ 080ee7e4 b8698109
+PTR_card_stats_table_080ee7e4:
+    .word  card_stats_table               @ 080ee7e4 b8698109
 DAT_080ee7e8:
     .word  0x00001498                     @ 080ee7e8 98140000
 LAB_080ee7ec:
@@ -304641,7 +304641,7 @@ FUN_080ee988:
     bne LAB_080ee996                         @ 080ee992 00d1
     b LAB_080eeb3c                           @ 080ee994 d2e0
 LAB_080ee996:
-    ldr r1, DAT_080ee9b8                     @ 080ee996 0849
+    ldr r1, PTR_card_stats_table_080ee9b8    @ 080ee996 0849
     movs r0,#0x16    @ 080ee998 1620
     muls r0,r2    @ 080ee99a 5043
     adds r0,r0,r1    @ 080ee99c 4018
@@ -304658,8 +304658,8 @@ LAB_080ee996:
     .byte  0x00, 0x00
 DAT_080ee9b4:
     .word  0x080000ae                     @ 080ee9b4 ae000008
-DAT_080ee9b8:
-    .word  0x098169b8                     @ 080ee9b8 b8698109
+PTR_card_stats_table_080ee9b8:
+    .word  card_stats_table               @ 080ee9b8 b8698109
 DAT_080ee9bc:
     .word  0x00001498                     @ 080ee9bc 98140000
 LAB_080ee9c0:
@@ -304900,7 +304900,7 @@ card_data_query:
     beq LAB_080eebdc                         @ 080eeb60 3cd0
     cmp r3,#0x0                              @ 080eeb62 002b
     bne LAB_080eebdc                         @ 080eeb64 3ad1
-    ldr r1, DAT_080eeba4                     @ 080eeb66 0f49
+    ldr r1, PTR_card_stats_table_080eeba4    @ 080eeb66 0f49
     movs r0,#0x16    @ 080eeb68 1620
     muls r0,r2    @ 080eeb6a 5043
     adds r0,r0,r1    @ 080eeb6c 4018
@@ -304931,8 +304931,8 @@ card_data_query:
     .byte  0x00, 0x00
 DAT_080eeba0:
     .word  0x080000ae                     @ 080eeba0 ae000008
-DAT_080eeba4:
-    .word  0x098169b8                     @ 080eeba4 b8698109
+PTR_card_stats_table_080eeba4:
+    .word  card_stats_table               @ 080eeba4 b8698109
 DAT_080eeba8:
     .word  0x00001468                     @ 080eeba8 68140000
 DAT_080eebac:
@@ -304964,7 +304964,7 @@ LAB_080eebd4:
 DAT_080eebd8:
     .word  0x09dcf472                     @ 080eebd8 72f4dc09
 LAB_080eebdc:
-    ldr r1, DAT_080eebf4                     @ 080eebdc 0549
+    ldr r1, PTR_card_desc_data_080eebf4      @ 080eebdc 0549
     lsls r0,r2,#0x1    @ 080eebde 5000
     adds r0,r0,r2    @ 080eebe0 8018
     lsls r0,r0,#0x1    @ 080eebe2 4000
@@ -304972,15 +304972,15 @@ LAB_080eebdc:
     lsls r0,r0,#0x2    @ 080eebe6 8000
     adds r0,r0,r1    @ 080eebe8 4018
     ldr r0,[r0,#0x0]                         @ 080eebea 0068
-    ldr r1, DAT_080eebf8                     @ 080eebec 0249
+    ldr r1, PTR_card_desc_text_pool_080eebf8 @ 080eebec 0249
     adds r0,r0,r1    @ 080eebee 4018
 LAB_080eebf0:
     bx lr                                    @ 080eebf0 7047
     .byte  0x00, 0x00
-DAT_080eebf4:
-    .word  0x0980a508                     @ 080eebf4 08a58009
-DAT_080eebf8:
-    .word  0x095fff0c                     @ 080eebf8 0cff5f09
+PTR_card_desc_data_080eebf4:
+    .word  card_desc_data                 @ 080eebf4 08a58009
+PTR_card_desc_text_pool_080eebf8:
+    .word  card_desc_text_pool            @ 080eebf8 0cff5f09
 card_name_lookup_by_internal_id:
     push {lr}                                @ 080eebfc 00b5
     lsls r0,r0,#0x10    @ 080eebfe 0004
@@ -305466,7 +305466,7 @@ FUN_080ef02c:
     ldrb r1,[r1,#0x0]                        @ 080ef042 0978
     cmp r6,r1                                @ 080ef044 8e42
     bge LAB_080ef084                         @ 080ef046 1dda
-    ldr r0, DAT_080ef110                     @ 080ef048 3148
+    ldr r0, PTR_card_stats_table_080ef110    @ 080ef048 3148
     .hword 0x4682    @ 080ef04a 8246
 LAB_080ef04c:
     lsls r1,r6,#0x1    @ 080ef04c 7100
@@ -305502,7 +305502,7 @@ LAB_080ef084:
     ldrb r0,[r0,#0x0]                        @ 080ef08a 0078
     cmp r6,r0                                @ 080ef08c 8642
     bge LAB_080ef0cc                         @ 080ef08e 1dda
-    ldr r2, DAT_080ef110                     @ 080ef090 1f4a
+    ldr r2, PTR_card_stats_table_080ef110    @ 080ef090 1f4a
     .hword 0x4692    @ 080ef092 9246
 LAB_080ef094:
     lsls r1,r6,#0x1    @ 080ef094 7100
@@ -305540,7 +305540,7 @@ LAB_080ef0cc:
     bge LAB_080ef13a                         @ 080ef0d6 30da
     .hword 0x46ca    @ 080ef0d8 ca46
     .hword 0x4681    @ 080ef0da 8146
-    ldr r7, DAT_080ef110                     @ 080ef0dc 0c4f
+    ldr r7, PTR_card_stats_table_080ef110    @ 080ef0dc 0c4f
 LAB_080ef0de:
     lsls r1,r6,#0x1    @ 080ef0de 7100
     ldr r0, DAT_080ef12c                     @ 080ef0e0 1248
@@ -305566,8 +305566,8 @@ DAT_080ef108:
     .word  0x02000000                     @ 080ef108 00000002
 DAT_080ef10c:
     .word  0x00001150                     @ 080ef10c 50110000
-DAT_080ef110:
-    .word  0x098169b8                     @ 080ef110 b8698109
+PTR_card_stats_table_080ef110:
+    .word  card_stats_table               @ 080ef110 b8698109
 DAT_080ef114:
     .word  0x00001154                     @ 080ef114 54110000
 DAT_080ef118:
@@ -305607,7 +305607,7 @@ FUN_080ef14c:
     ldrh r0,[r0,#0x0]                        @ 080ef154 0088
     cmp r4,r0                                @ 080ef156 8442
     bhi LAB_080ef194                         @ 080ef158 1cd8
-    ldr r6, DAT_080ef1b8                     @ 080ef15a 174e
+    ldr r6, PTR_card_stats_table_080ef1b8    @ 080ef15a 174e
 LAB_080ef15c:
     movs r0,#0x16    @ 080ef15c 1620
     muls r0,r4    @ 080ef15e 6043
@@ -305655,8 +305655,8 @@ LAB_080ef194:
     .byte  0x00, 0x00
 DAT_080ef1b4:
     .word  0x095b7cca                     @ 080ef1b4 ca7c5b09
-DAT_080ef1b8:
-    .word  0x098169b8                     @ 080ef1b8 b8698109
+PTR_card_stats_table_080ef1b8:
+    .word  card_stats_table               @ 080ef1b8 b8698109
 DAT_080ef1bc:
     .word  0x02000006                     @ 080ef1bc 06000002
 DAT_080ef1c0:
@@ -305739,7 +305739,7 @@ FUN_080ef248:
     ldrh r0,[r0,#0x0]                        @ 080ef250 0088
     cmp r4,r0                                @ 080ef252 8442
     bhi LAB_080ef290                         @ 080ef254 1cd8
-    ldr r6, DAT_080ef2b8                     @ 080ef256 184e
+    ldr r6, PTR_card_stats_table_080ef2b8    @ 080ef256 184e
 LAB_080ef258:
     movs r0,#0x16    @ 080ef258 1620
     muls r0,r4    @ 080ef25a 6043
@@ -305789,8 +305789,8 @@ LAB_080ef290:
     .byte  0x00, 0x00
 DAT_080ef2b4:
     .word  0x095b7cca                     @ 080ef2b4 ca7c5b09
-DAT_080ef2b8:
-    .word  0x098169b8                     @ 080ef2b8 b8698109
+PTR_card_stats_table_080ef2b8:
+    .word  card_stats_table               @ 080ef2b8 b8698109
 DAT_080ef2bc:
     .word  0x02000006                     @ 080ef2bc 06000002
 DAT_080ef2c0:
@@ -305813,7 +305813,7 @@ DAT_080ef2dc:
 DAT_080ef2e0:
     .word  0x0984cfec                     @ 080ef2e0 eccf8409
 LAB_080ef2e4:
-    ldr r2, DAT_080ef300                     @ 080ef2e4 064a
+    ldr r2, PTR_card_stats_table_080ef300    @ 080ef2e4 064a
     movs r0,#0xb    @ 080ef2e6 0b20
     muls r1,r0    @ 080ef2e8 4143
     adds r0,r1,#0x6    @ 080ef2ea 881d
@@ -305827,8 +305827,8 @@ LAB_080ef2e4:
     ldr r0, DAT_080ef304                     @ 080ef2fa 0248
     b LAB_080ef356                           @ 080ef2fc 2be0
     .byte  0x00, 0x00
-DAT_080ef300:
-    .word  0x098169b8                     @ 080ef300 b8698109
+PTR_card_stats_table_080ef300:
+    .word  card_stats_table               @ 080ef300 b8698109
 DAT_080ef304:
     .word  0x0984cfcc                     @ 080ef304 cccf8409
 LAB_080ef308:
@@ -305936,7 +305936,7 @@ DAT_080ef3b8:
 FUN_080ef3bc:
     lsls r0,r0,#0x10    @ 080ef3bc 0004
     lsrs r0,r0,#0x10    @ 080ef3be 000c
-    ldr r2, DAT_080ef3e8                     @ 080ef3c0 094a
+    ldr r2, PTR_card_stats_table_080ef3e8    @ 080ef3c0 094a
     movs r1,#0x16    @ 080ef3c2 1621
     muls r0,r1    @ 080ef3c4 4843
     adds r0,r0,r2    @ 080ef3c6 8018
@@ -305956,8 +305956,8 @@ FUN_080ef3bc:
     bgt LAB_080ef450                         @ 080ef3e2 35dc
     subs r0,#0x1    @ 080ef3e4 0138
     b LAB_080ef442                           @ 080ef3e6 2ce0
-DAT_080ef3e8:
-    .word  0x098169b8                     @ 080ef3e8 b8698109
+PTR_card_stats_table_080ef3e8:
+    .word  card_stats_table               @ 080ef3e8 b8698109
 DAT_080ef3ec:
     .word  0x000018b4                     @ 080ef3ec b4180000
 DAT_080ef3f0:
@@ -306023,7 +306023,7 @@ FUN_080ef454:
     lsls r0,r0,#0x10    @ 080ef454 0004
     lsrs r0,r0,#0x10    @ 080ef456 000c
     movs r3,#0x0    @ 080ef458 0023
-    ldr r2, DAT_080ef470                     @ 080ef45a 054a
+    ldr r2, PTR_card_stats_table_080ef470    @ 080ef45a 054a
     movs r1,#0x16    @ 080ef45c 1621
     muls r0,r1    @ 080ef45e 4843
     adds r0,r0,r2    @ 080ef460 8018
@@ -306035,8 +306035,8 @@ LAB_080ef466:
     bne LAB_080ef478                         @ 080ef46a 05d1
     adds r0,r3,#0x0    @ 080ef46c 181c
     b LAB_080ef484                           @ 080ef46e 09e0
-DAT_080ef470:
-    .word  0x098169b8                     @ 080ef470 b8698109
+PTR_card_stats_table_080ef470:
+    .word  card_stats_table               @ 080ef470 b8698109
 DAT_080ef474:
     .word  0x09e5f71c                     @ 080ef474 1cf7e509
 LAB_080ef478:
@@ -324073,7 +324073,7 @@ FUN_080f914c:
     adds r6,r1,#0x0    @ 080f915a 0e1c
     cmp r4,r0                                @ 080f915c 8442
     bge LAB_080f9184                         @ 080f915e 11da
-    ldr r7, DAT_080f91f0                     @ 080f9160 234f
+    ldr r7, PTR_card_stats_table_080f91f0    @ 080f9160 234f
     .hword 0x46bc    @ 080f9162 bc46
     ldr r1, DAT_080f91f4                     @ 080f9164 2349
     adds r3,r6,r1    @ 080f9166 7318
@@ -324099,7 +324099,7 @@ LAB_080f9184:
     ldrb r0,[r0,#0x0]                        @ 080f9188 0078
     cmp r0,#0x0                              @ 080f918a 0028
     beq LAB_080f91b2                         @ 080f918c 11d0
-    ldr r2, DAT_080f91f0                     @ 080f918e 184a
+    ldr r2, PTR_card_stats_table_080f91f0    @ 080f918e 184a
     .hword 0x4694    @ 080f9190 9446
     ldr r7, DAT_080f91fc                     @ 080f9192 1a4f
     adds r3,r6,r7    @ 080f9194 f319
@@ -324125,7 +324125,7 @@ LAB_080f91b2:
     ldrb r0,[r0,#0x0]                        @ 080f91b6 0078
     cmp r0,#0x0                              @ 080f91b8 0028
     beq LAB_080f91de                         @ 080f91ba 10d0
-    ldr r7, DAT_080f91f0                     @ 080f91bc 0c4f
+    ldr r7, PTR_card_stats_table_080f91f0    @ 080f91bc 0c4f
     ldr r2, DAT_080f9204                     @ 080f91be 114a
     adds r1,r6,r2    @ 080f91c0 b118
     movs r3,#0x16    @ 080f91c2 1623
@@ -324154,8 +324154,8 @@ DAT_080f91e8:
     .word  0x02000000                     @ 080f91e8 00000002
 DAT_080f91ec:
     .word  0x00001150                     @ 080f91ec 50110000
-DAT_080f91f0:
-    .word  0x098169b8                     @ 080f91f0 b8698109
+PTR_card_stats_table_080f91f0:
+    .word  card_stats_table               @ 080f91f0 b8698109
 DAT_080f91f4:
     .word  0x00001154                     @ 080f91f4 54110000
 DAT_080f91f8:
@@ -324176,7 +324176,7 @@ FUN_080f9208:
     ldrb r0,[r0,#0x0]                        @ 080f9214 0078
     cmp r4,r0                                @ 080f9216 8442
     bge LAB_080f923e                         @ 080f9218 11da
-    ldr r7, DAT_080f927c                     @ 080f921a 184f
+    ldr r7, PTR_card_stats_table_080f927c    @ 080f921a 184f
     .hword 0x46bc    @ 080f921c bc46
     adds r2,#0x4    @ 080f921e 0432
     adds r3,r1,r2    @ 080f9220 8b18
@@ -324202,7 +324202,7 @@ LAB_080f923e:
     ldrb r0,[r0,#0x0]                        @ 080f9242 0078
     cmp r0,#0x0                              @ 080f9244 0028
     beq LAB_080f926a                         @ 080f9246 10d0
-    ldr r6, DAT_080f927c                     @ 080f9248 0c4e
+    ldr r6, PTR_card_stats_table_080f927c    @ 080f9248 0c4e
     ldr r7, DAT_080f9284                     @ 080f924a 0e4f
     adds r1,r1,r7    @ 080f924c c919
     movs r3,#0x16    @ 080f924e 1623
@@ -324231,8 +324231,8 @@ DAT_080f9274:
     .word  0x02000000                     @ 080f9274 00000002
 DAT_080f9278:
     .word  0x00001150                     @ 080f9278 50110000
-DAT_080f927c:
-    .word  0x098169b8                     @ 080f927c b8698109
+PTR_card_stats_table_080f927c:
+    .word  card_stats_table               @ 080f927c b8698109
 DAT_080f9280:
     .word  0x00001152                     @ 080f9280 52110000
 DAT_080f9284:
@@ -324824,7 +324824,7 @@ LAB_080f9d3a:
     movs r2,#0x7    @ 080f9d54 0722
     adds r3,r4,#0x0    @ 080f9d56 231c
     bl FUN_080f2c4c                          @ 080f9d58 f8f778ff
-    ldr r1, DAT_080f9dfc                     @ 080f9d5c 2749
+    ldr r1, PTR_card_stats_table_080f9dfc    @ 080f9d5c 2749
     movs r0,#0x16    @ 080f9d5e 1620
     muls r0,r4    @ 080f9d60 6043
     adds r0,r0,r1    @ 080f9d62 4018
@@ -324898,8 +324898,8 @@ DAT_080f9df4:
     .word  0x02000000                     @ 080f9df4 00000002
 DAT_080f9df8:
     .word  0x00006c2c                     @ 080f9df8 2c6c0000
-DAT_080f9dfc:
-    .word  0x098169b8                     @ 080f9dfc b8698109
+PTR_card_stats_table_080f9dfc:
+    .word  card_stats_table               @ 080f9dfc b8698109
 DAT_080f9e00:
     .word  0x06004200                     @ 080f9e00 00420006
 DAT_080f9e04:
@@ -325792,7 +325792,7 @@ LAB_080fad9a:
     movs r0,#0x80    @ 080fad9e 8020
     movs r1,#0x42    @ 080fada0 4221
     bl FUN_080facd8                          @ 080fada2 fff799ff
-    ldr r5, DAT_080fae20                     @ 080fada6 1e4d
+    ldr r5, PTR_card_stats_table_080fae20    @ 080fada6 1e4d
     movs r2,#0x16    @ 080fada8 1622
     .hword 0x4690    @ 080fadaa 9046
     ldrh r1,[r4,#0x4]                        @ 080fadac a188
@@ -325847,8 +325847,8 @@ LAB_080fad9a:
     bx r0                                    @ 080fae1a 0047
 DAT_080fae1c:
     .word  0x02039eb0                     @ 080fae1c b09e0302
-DAT_080fae20:
-    .word  0x098169b8                     @ 080fae20 b8698109
+PTR_card_stats_table_080fae20:
+    .word  card_stats_table               @ 080fae20 b8698109
 FUN_080fae24:
     push {r4,lr}                             @ 080fae24 10b5
     sub sp,#0x4                              @ 080fae26 81b0
@@ -331674,7 +331674,7 @@ LAB_080ff65c:
     lsls r0,r4,#0x1    @ 080ff66e 6000
     adds r1,r1,r0    @ 080ff670 0918
     ldr r3, DAT_080ff6a4                     @ 080ff672 0c4b
-    ldr r2, DAT_080ff6a8                     @ 080ff674 0c4a
+    ldr r2, PTR_card_stats_table_080ff6a8    @ 080ff674 0c4a
     ldr r0,[r1,#0x0]                         @ 080ff676 0868
     lsls r5,r0,#0x14    @ 080ff678 0505
     lsrs r1,r5,#0x14    @ 080ff67a 290d
@@ -331700,8 +331700,8 @@ LAB_080ff65c:
     .byte  0x00, 0x00
 DAT_080ff6a4:
     .word  0x09e4f1c4                     @ 080ff6a4 c4f1e409
-DAT_080ff6a8:
-    .word  0x098169b8                     @ 080ff6a8 b8698109
+PTR_card_stats_table_080ff6a8:
+    .word  card_stats_table               @ 080ff6a8 b8698109
 LAB_080ff6ac:
     movs r0,#0x40    @ 080ff6ac 4020
     ldrb r2,[r7,#0x16]                       @ 080ff6ae ba7d
@@ -333602,7 +333602,7 @@ LAB_0810043e:
     muls r1,r0    @ 081004be 4143
     adds r0,r1,#0x7    @ 081004c0 c81d
     lsls r0,r0,#0x1    @ 081004c2 4000
-    ldr r5, DAT_08100550                     @ 081004c4 224d
+    ldr r5, PTR_card_stats_table_08100550    @ 081004c4 224d
     adds r0,r0,r5    @ 081004c6 4019
     ldrh r2,[r0,#0x0]                        @ 081004c8 0288
     adds r0,r1,#0x6    @ 081004ca 881d
@@ -333670,8 +333670,8 @@ DAT_08100548:
     .word  0x09e5f854                     @ 08100548 54f8e509
 DAT_0810054c:
     .word  0x06008000                     @ 0810054c 00800006
-DAT_08100550:
-    .word  0x098169b8                     @ 08100550 b8698109
+PTR_card_stats_table_08100550:
+    .word  card_stats_table               @ 08100550 b8698109
 DAT_08100554:
     .word  0x06010000                     @ 08100554 00000106
 DAT_08100558:
@@ -333857,7 +333857,7 @@ LAB_081006b6:
     muls r4,r0    @ 081006ba 4443
     adds r0,r4,#0x6    @ 081006bc a01d
     lsls r0,r0,#0x1    @ 081006be 4000
-    ldr r5, DAT_081007c0                     @ 081006c0 3f4d
+    ldr r5, PTR_card_stats_table_081007c0    @ 081006c0 3f4d
     adds r0,r0,r5    @ 081006c2 4019
     ldrh r0,[r0,#0x0]                        @ 081006c4 0088
     .hword 0x4680    @ 081006c6 8046
@@ -333866,7 +333866,7 @@ LAB_081006b6:
     adds r3,r0,r5    @ 081006cc 4319
     ldr r5, DAT_081007c4                     @ 081006ce 3d4d
     movs r0,#0x0    @ 081006d0 0020
-    ldr r1, DAT_081007c0                     @ 081006d2 3b49
+    ldr r1, PTR_card_stats_table_081007c0    @ 081006d2 3b49
     ldrh r6,[r3,#0x0]                        @ 081006d4 1e88
     cmp r6,r5                                @ 081006d6 ae42
     beq LAB_081006dc                         @ 081006d8 00d0
@@ -333885,7 +333885,7 @@ LAB_081006ee:
     str r0,[sp,#0xc]                         @ 081006ee 0390
     ldrh r3,[r3,#0x0]                        @ 081006f0 1b88
     str r3,[sp,#0x10]                        @ 081006f2 0493
-    ldr r1, DAT_081007c0                     @ 081006f4 3249
+    ldr r1, PTR_card_stats_table_081007c0    @ 081006f4 3249
     adds r0,r2,r1    @ 081006f6 5018
     ldrh r0,[r0,#0x0]                        @ 081006f8 0088
     str r0,[sp,#0x14]                        @ 081006fa 0590
@@ -333983,8 +333983,8 @@ DAT_081007b8:
     .word  0x0000b22e                     @ 081007b8 2eb20000
 DAT_081007bc:
     .word  0x0000b22f                     @ 081007bc 2fb20000
-DAT_081007c0:
-    .word  0x098169b8                     @ 081007c0 b8698109
+PTR_card_stats_table_081007c0:
+    .word  card_stats_table               @ 081007c0 b8698109
 DAT_081007c4:
     .word  0x0000ffff                     @ 081007c4 ffff0000
 DAT_081007c8:
@@ -337869,7 +337869,7 @@ LAB_0810258a:
     adds r0,r0,r1    @ 08102590 4018
     ldrh r0,[r0,#0x0]                        @ 08102592 0088
     str r0,[sp,#0x0]                         @ 08102594 0090
-    ldr r1, DAT_0810261c                     @ 08102596 2149
+    ldr r1, PTR_card_stats_table_0810261c    @ 08102596 2149
     movs r0,#0x16    @ 08102598 1620
     muls r0,r3    @ 0810259a 5843
     adds r0,r0,r1    @ 0810259c 4018
@@ -337889,7 +337889,7 @@ LAB_081025ac:
     lsrs r0,r0,#0x14    @ 081025b6 000d
     movs r1,#0x16    @ 081025b8 1621
     muls r0,r1    @ 081025ba 4843
-    ldr r3, DAT_0810261c                     @ 081025bc 174b
+    ldr r3, PTR_card_stats_table_0810261c    @ 081025bc 174b
     adds r0,r0,r3    @ 081025be c018
     ldrh r1,[r0,#0x0]                        @ 081025c0 0188
     .hword 0x4650    @ 081025c2 5046
@@ -337940,8 +337940,8 @@ DAT_08102614:
     .word  0x0000180c                     @ 08102614 0c180000
 DAT_08102618:
     .word  0x00001a0c                     @ 08102618 0c1a0000
-DAT_0810261c:
-    .word  0x098169b8                     @ 0810261c b8698109
+PTR_card_stats_table_0810261c:
+    .word  card_stats_table               @ 0810261c b8698109
 FUN_08102620:
     push {r4,r5,r6,r7,lr}                    @ 08102620 f0b5
     .hword 0x4657    @ 08102622 5746
@@ -340614,7 +340614,7 @@ LAB_08103a1c:
     muls r0,r1    @ 08103a24 4843
     adds r0,#0x8    @ 08103a26 0830
     lsls r0,r0,#0x1    @ 08103a28 4000
-    ldr r1, DAT_08103a54                     @ 08103a2a 0a49
+    ldr r1, PTR_card_stats_table_08103a54    @ 08103a2a 0a49
     adds r0,r0,r1    @ 08103a2c 4018
     ldrh r0,[r0,#0x0]                        @ 08103a2e 0088
     lsls r0,r0,#0x2    @ 08103a30 8000
@@ -340636,8 +340636,8 @@ DAT_08103a4c:
     .word  0x00000fff                     @ 08103a4c ff0f0000
 DAT_08103a50:
     .word  0xfffff000                     @ 08103a50 00f0ffff
-DAT_08103a54:
-    .word  0x098169b8                     @ 08103a54 b8698109
+PTR_card_stats_table_08103a54:
+    .word  card_stats_table               @ 08103a54 b8698109
 DAT_08103a58:
     .word  0x09e4f1c4                     @ 08103a58 c4f1e409
 DAT_08103a5c:
@@ -340693,7 +340693,7 @@ LAB_08103ab6:
     muls r0,r1    @ 08103abe 4843
     adds r0,#0x5    @ 08103ac0 0530
     lsls r0,r0,#0x1    @ 08103ac2 4000
-    ldr r3, DAT_08103adc                     @ 08103ac4 054b
+    ldr r3, PTR_card_stats_table_08103adc    @ 08103ac4 054b
     adds r0,r0,r3    @ 08103ac6 c018
     ldrh r0,[r0,#0x0]                        @ 08103ac8 0088
     movs r3,#0x1    @ 08103aca 0123
@@ -340705,8 +340705,8 @@ LAB_08103ab6:
     .byte  0x00, 0x00
 DAT_08103ad8:
     .word  0x00001a24                     @ 08103ad8 241a0000
-DAT_08103adc:
-    .word  0x098169b8                     @ 08103adc b8698109
+PTR_card_stats_table_08103adc:
+    .word  card_stats_table               @ 08103adc b8698109
 LAB_08103ae0:
     cmp r0,#0x4                              @ 08103ae0 0428
     ble LAB_08103ae8                         @ 08103ae2 01dd
@@ -340769,7 +340769,7 @@ FUN_08103b3c:
     sub sp,#0x4                              @ 08103b46 81b0
     adds r5,r0,#0x0    @ 08103b48 051c
     .hword 0x4690    @ 08103b4a 9046
-    ldr r3, DAT_08103c38                     @ 08103b4c 3a4b
+    ldr r3, PTR_card_stats_table_08103c38    @ 08103b4c 3a4b
     movs r0,#0x16    @ 08103b4e 1620
     muls r0,r1    @ 08103b50 4843
     adds r0,r0,r3    @ 08103b52 c018
@@ -340815,7 +340815,7 @@ LAB_08103b9a:
     ldrb r1,[r5,#0x19]                       @ 08103b9c 697e
     cmp r6,r1                                @ 08103b9e 8e42
     bge LAB_08103be0                         @ 08103ba0 1eda
-    ldr r0, DAT_08103c38                     @ 08103ba2 2548
+    ldr r0, PTR_card_stats_table_08103c38    @ 08103ba2 2548
     .hword 0x4682    @ 08103ba4 8246
     lsls r0,r2,#0x2    @ 08103ba6 9000
     .hword 0x4641    @ 08103ba8 4146
@@ -340853,7 +340853,7 @@ LAB_08103be0:
     ldrb r0,[r5,#0x1a]                       @ 08103be2 a87e
     cmp r6,r0                                @ 08103be4 8642
     bge LAB_08103c26                         @ 08103be6 1eda
-    ldr r1, DAT_08103c38                     @ 08103be8 1349
+    ldr r1, PTR_card_stats_table_08103c38    @ 08103be8 1349
     .hword 0x468a    @ 08103bea 8a46
     lsls r0,r2,#0x2    @ 08103bec 9000
     .hword 0x4641    @ 08103bee 4146
@@ -340896,8 +340896,8 @@ LAB_08103c26:
     pop {r4,r5,r6,r7}                        @ 08103c32 f0bc
     pop {r1}                                 @ 08103c34 02bc
     bx r1                                    @ 08103c36 0847
-DAT_08103c38:
-    .word  0x098169b8                     @ 08103c38 b8698109
+PTR_card_stats_table_08103c38:
+    .word  card_stats_table               @ 08103c38 b8698109
 FUN_08103c3c:
     push {r4,lr}                             @ 08103c3c 10b5
     ldr r1, DAT_08103c88                     @ 08103c3e 1249
@@ -341010,7 +341010,7 @@ LAB_08103d00:
     cmp r0,#0x0                              @ 08103d0c 0028
     beq LAB_08103d4c                         @ 08103d0e 1dd0
     ldr r3, DAT_08103d44                     @ 08103d10 0c4b
-    ldr r2, DAT_08103d48                     @ 08103d12 0d4a
+    ldr r2, PTR_card_stats_table_08103d48    @ 08103d12 0d4a
     movs r1,#0xb    @ 08103d14 0b21
     adds r0,r6,#0x0    @ 08103d16 301c
     muls r0,r1    @ 08103d18 4843
@@ -341037,8 +341037,8 @@ LAB_08103d00:
     .byte  0x00, 0x00
 DAT_08103d44:
     .word  0x09e4f1c4                     @ 08103d44 c4f1e409
-DAT_08103d48:
-    .word  0x098169b8                     @ 08103d48 b8698109
+PTR_card_stats_table_08103d48:
+    .word  card_stats_table               @ 08103d48 b8698109
 LAB_08103d4c:
     movs r0,#0x4    @ 08103d4c 0420
     ldrh r1,[r7,#0x0]                        @ 08103d4e 3988
@@ -341046,7 +341046,7 @@ LAB_08103d4c:
     cmp r0,#0x0                              @ 08103d52 0028
     beq LAB_08103ddc                         @ 08103d54 42d0
     ldr r3, DAT_08103d90                     @ 08103d56 0e4b
-    ldr r1, DAT_08103d94                     @ 08103d58 0e49
+    ldr r1, PTR_card_stats_table_08103d94    @ 08103d58 0e49
     movs r2,#0xb    @ 08103d5a 0b22
     adds r0,r6,#0x0    @ 08103d5c 301c
     muls r0,r2    @ 08103d5e 5043
@@ -341076,8 +341076,8 @@ LAB_08103d4c:
     b LAB_08103d9a                           @ 08103d8e 04e0
 DAT_08103d90:
     .word  0x09e4f1c4                     @ 08103d90 c4f1e409
-DAT_08103d94:
-    .word  0x098169b8                     @ 08103d94 b8698109
+PTR_card_stats_table_08103d94:
+    .word  card_stats_table               @ 08103d94 b8698109
 LAB_08103d98:
     movs r1,#0xfe    @ 08103d98 fe21
 LAB_08103d9a:
@@ -341124,7 +341124,7 @@ LAB_08103ddc:
     cmp r0,#0x0                              @ 08103de2 0028
     beq LAB_08103e6c                         @ 08103de4 42d0
     ldr r3, DAT_08103e20                     @ 08103de6 0e4b
-    ldr r1, DAT_08103e24                     @ 08103de8 0e49
+    ldr r1, PTR_card_stats_table_08103e24    @ 08103de8 0e49
     movs r2,#0xb    @ 08103dea 0b22
     adds r0,r6,#0x0    @ 08103dec 301c
     muls r0,r2    @ 08103dee 5043
@@ -341154,8 +341154,8 @@ LAB_08103ddc:
     b LAB_08103e2a                           @ 08103e1e 04e0
 DAT_08103e20:
     .word  0x09e4f1c4                     @ 08103e20 c4f1e409
-DAT_08103e24:
-    .word  0x098169b8                     @ 08103e24 b8698109
+PTR_card_stats_table_08103e24:
+    .word  card_stats_table               @ 08103e24 b8698109
 LAB_08103e28:
     movs r1,#0xfe    @ 08103e28 fe21
 LAB_08103e2a:
@@ -341201,7 +341201,7 @@ LAB_08103e6c:
     ands r0,r1    @ 08103e70 0840
     cmp r0,#0x0                              @ 08103e72 0028
     beq LAB_08103eb0                         @ 08103e74 1cd0
-    ldr r2, DAT_08103ea8                     @ 08103e76 0c4a
+    ldr r2, PTR_card_stats_table_08103ea8    @ 08103e76 0c4a
     movs r1,#0xb    @ 08103e78 0b21
     adds r0,r6,#0x0    @ 08103e7a 301c
     muls r0,r1    @ 08103e7c 4843
@@ -341226,8 +341226,8 @@ LAB_08103e6c:
     subs r0,r3,r0    @ 08103ea2 181a
     b LAB_0810412a                           @ 08103ea4 41e1
     .byte  0x00, 0x00
-DAT_08103ea8:
-    .word  0x098169b8                     @ 08103ea8 b8698109
+PTR_card_stats_table_08103ea8:
+    .word  card_stats_table               @ 08103ea8 b8698109
 DAT_08103eac:
     .word  0x09e4f284                     @ 08103eac 84f2e409
 LAB_08103eb0:
@@ -341236,7 +341236,7 @@ LAB_08103eb0:
     ands r0,r2    @ 08103eb4 1040
     cmp r0,#0x0                              @ 08103eb6 0028
     beq LAB_08103ef4                         @ 08103eb8 1cd0
-    ldr r2, DAT_08103eec                     @ 08103eba 0c4a
+    ldr r2, PTR_card_stats_table_08103eec    @ 08103eba 0c4a
     movs r1,#0xb    @ 08103ebc 0b21
     adds r0,r6,#0x0    @ 08103ebe 301c
     muls r0,r1    @ 08103ec0 4843
@@ -341261,8 +341261,8 @@ LAB_08103eb0:
     subs r0,r3,r0    @ 08103ee6 181a
     b LAB_0810412a                           @ 08103ee8 1fe1
     .byte  0x00, 0x00
-DAT_08103eec:
-    .word  0x098169b8                     @ 08103eec b8698109
+PTR_card_stats_table_08103eec:
+    .word  card_stats_table               @ 08103eec b8698109
 DAT_08103ef0:
     .word  0x09e4f2ac                     @ 08103ef0 acf2e409
 LAB_08103ef4:
@@ -341271,7 +341271,7 @@ LAB_08103ef4:
     ands r0,r1    @ 08103ef8 0840
     cmp r0,#0x0                              @ 08103efa 0028
     beq LAB_08103f28                         @ 08103efc 14d0
-    ldr r2, DAT_08103f24                     @ 08103efe 094a
+    ldr r2, PTR_card_stats_table_08103f24    @ 08103efe 094a
     movs r1,#0xb    @ 08103f00 0b21
     adds r0,r6,#0x0    @ 08103f02 301c
     muls r0,r1    @ 08103f04 4843
@@ -341290,8 +341290,8 @@ LAB_08103ef4:
     subs r0,r0,r3    @ 08103f1e c01a
     b LAB_0810412a                           @ 08103f20 03e1
     .byte  0x00, 0x00
-DAT_08103f24:
-    .word  0x098169b8                     @ 08103f24 b8698109
+PTR_card_stats_table_08103f24:
+    .word  card_stats_table               @ 08103f24 b8698109
 LAB_08103f28:
     movs r0,#0x80    @ 08103f28 8020
     ldrh r2,[r7,#0x0]                        @ 08103f2a 3a88
@@ -341299,7 +341299,7 @@ LAB_08103f28:
     cmp r0,#0x0                              @ 08103f2e 0028
     beq LAB_08104008                         @ 08103f30 6ad0
     ldr r3, DAT_08103f70                     @ 08103f32 0f4b
-    ldr r1, DAT_08103f74                     @ 08103f34 0f49
+    ldr r1, PTR_card_stats_table_08103f74    @ 08103f34 0f49
     movs r2,#0xb    @ 08103f36 0b22
     adds r0,r6,#0x0    @ 08103f38 301c
     muls r0,r2    @ 08103f3a 5043
@@ -341331,8 +341331,8 @@ LAB_08103f28:
     .byte  0x00, 0x00
 DAT_08103f70:
     .word  0x09e4f1c4                     @ 08103f70 c4f1e409
-DAT_08103f74:
-    .word  0x098169b8                     @ 08103f74 b8698109
+PTR_card_stats_table_08103f74:
+    .word  card_stats_table               @ 08103f74 b8698109
 LAB_08103f78:
     movs r1,#0x2    @ 08103f78 0221
     rsbs r1,r1,#0    @ 08103f7a 4942
@@ -341492,7 +341492,7 @@ LAB_08104094:
     cmp r0,#0x0                              @ 0810409c 0028
     beq LAB_081040dc                         @ 0810409e 1dd0
     ldr r3, DAT_081040d4                     @ 081040a0 0c4b
-    ldr r2, DAT_081040d8                     @ 081040a2 0d4a
+    ldr r2, PTR_card_stats_table_081040d8    @ 081040a2 0d4a
     movs r1,#0xb    @ 081040a4 0b21
     adds r0,r6,#0x0    @ 081040a6 301c
     muls r0,r1    @ 081040a8 4843
@@ -341519,8 +341519,8 @@ LAB_08104094:
     .byte  0x00, 0x00
 DAT_081040d4:
     .word  0x09e4f1c4                     @ 081040d4 c4f1e409
-DAT_081040d8:
-    .word  0x098169b8                     @ 081040d8 b8698109
+PTR_card_stats_table_081040d8:
+    .word  card_stats_table               @ 081040d8 b8698109
 LAB_081040dc:
     movs r0,#0x80    @ 081040dc 8020
     lsls r0,r0,#0x8    @ 081040de 0002
@@ -341605,7 +341605,7 @@ LAB_08104168:
     cmp r0,#0x0                              @ 08104174 0028
     beq LAB_081041d4                         @ 08104176 2dd0
     ldr r2, DAT_081041bc                     @ 08104178 104a
-    ldr r1, DAT_081041c0                     @ 0810417a 1149
+    ldr r1, PTR_card_stats_table_081041c0    @ 0810417a 1149
     movs r0,#0xb    @ 0810417c 0b20
     muls r0,r5    @ 0810417e 6843
     adds r0,#0x8    @ 08104180 0830
@@ -341641,8 +341641,8 @@ DAT_081041b8:
     .word  0x02000006                     @ 081041b8 06000002
 DAT_081041bc:
     .word  0x09e4f1c4                     @ 081041bc c4f1e409
-DAT_081041c0:
-    .word  0x098169b8                     @ 081041c0 b8698109
+PTR_card_stats_table_081041c0:
+    .word  card_stats_table               @ 081041c0 b8698109
 DAT_081041c4:
     .word  0x000002a6                     @ 081041c4 a6020000
 LAB_081041c8:
@@ -341659,7 +341659,7 @@ LAB_081041d4:
     ands r0,r2    @ 081041d8 1040
     cmp r0,#0x0                              @ 081041da 0028
     beq LAB_0810422a                         @ 081041dc 25d0
-    ldr r1, DAT_0810420c                     @ 081041de 0b49
+    ldr r1, PTR_card_stats_table_0810420c    @ 081041de 0b49
     movs r0,#0xb    @ 081041e0 0b20
     muls r0,r5    @ 081041e2 6843
     adds r0,#0x5    @ 081041e4 0530
@@ -341682,8 +341682,8 @@ LAB_081041d4:
     cmp r0,#0x0                              @ 08104206 0028
     beq LAB_08104216                         @ 08104208 05d0
     b LAB_0810422a                           @ 0810420a 0ee0
-DAT_0810420c:
-    .word  0x098169b8                     @ 0810420c b8698109
+PTR_card_stats_table_0810420c:
+    .word  card_stats_table               @ 0810420c b8698109
 LAB_08104210:
     cmp r0,#0x2                              @ 08104210 0228
     beq LAB_08104226                         @ 08104212 08d0
@@ -341707,7 +341707,7 @@ LAB_0810422a:
     ands r0,r2    @ 0810422e 1040
     cmp r0,#0x0                              @ 08104230 0028
     beq LAB_08104256                         @ 08104232 10d0
-    ldr r1, DAT_08104308                     @ 08104234 3449
+    ldr r1, PTR_card_stats_table_08104308    @ 08104234 3449
     movs r0,#0xb    @ 08104236 0b20
     adds r2,r5,#0x0    @ 08104238 2a1c
     muls r2,r0    @ 0810423a 4243
@@ -341730,7 +341730,7 @@ LAB_08104256:
     ands r0,r1    @ 0810425a 0840
     cmp r0,#0x0                              @ 0810425c 0028
     beq LAB_08104284                         @ 0810425e 11d0
-    ldr r1, DAT_08104308                     @ 08104260 2949
+    ldr r1, PTR_card_stats_table_08104308    @ 08104260 2949
     movs r0,#0xb    @ 08104262 0b20
     adds r2,r5,#0x0    @ 08104264 2a1c
     muls r2,r0    @ 08104266 4243
@@ -341755,7 +341755,7 @@ LAB_08104284:
     cmp r0,#0x0                              @ 0810428a 0028
     beq LAB_081042ce                         @ 0810428c 1fd0
     ldr r3, DAT_08104310                     @ 0810428e 204b
-    ldr r2, DAT_08104308                     @ 08104290 1d4a
+    ldr r2, PTR_card_stats_table_08104308    @ 08104290 1d4a
     movs r0,#0xb    @ 08104292 0b20
     adds r1,r5,#0x0    @ 08104294 291c
     muls r1,r0    @ 08104296 4143
@@ -341793,7 +341793,7 @@ LAB_081042ce:
     ands r0,r6    @ 081042d2 3040
     cmp r0,#0x0                              @ 081042d4 0028
     beq LAB_081042fe                         @ 081042d6 12d0
-    ldr r1, DAT_08104308                     @ 081042d8 0b49
+    ldr r1, PTR_card_stats_table_08104308    @ 081042d8 0b49
     movs r0,#0x16    @ 081042da 1620
     muls r0,r5    @ 081042dc 6843
     adds r0,r0,r1    @ 081042de 4018
@@ -341818,8 +341818,8 @@ LAB_08104300:
     pop {r1}                                 @ 08104302 02bc
     bx r1                                    @ 08104304 0847
     .byte  0x00, 0x00
-DAT_08104308:
-    .word  0x098169b8                     @ 08104308 b8698109
+PTR_card_stats_table_08104308:
+    .word  card_stats_table               @ 08104308 b8698109
 DAT_0810430c:
     .word  0x000002aa                     @ 0810430c aa020000
 DAT_08104310:
@@ -349511,7 +349511,7 @@ LAB_08107ee0:
     bgt LAB_08107efa                         @ 08107ef6 00dc
     b switchD_08107f34__caseD_8              @ 08107ef8 42e1
 LAB_08107efa:
-    ldr r2, DAT_08107f40                     @ 08107efa 114a
+    ldr r2, PTR_card_stats_table_08107f40    @ 08107efa 114a
     movs r0,#0xb    @ 08107efc 0b20
     .hword 0x4651    @ 08107efe 5146
     muls r1,r0    @ 08107f00 4143
@@ -349547,8 +349547,8 @@ DAT_08107f38:
     .word  0x0202a4d0                     @ 08107f38 d0a40202
 DAT_08107f3c:
     .word  0x0202f3c0                     @ 08107f3c c0f30202
-DAT_08107f40:
-    .word  0x098169b8                     @ 08107f40 b8698109
+PTR_card_stats_table_08107f40:
+    .word  card_stats_table               @ 08107f40 b8698109
 PTR_switchdataD_08107f48_08107f44:
     .word  0x08107f48                     @ 08107f44 487f1008
 switchD_08107f34__switchdataD_08107f48:
@@ -349571,7 +349571,7 @@ switchD_08107f34__caseD_2:
     movs r0,#0xf    @ 08107f78 0f20
     b LAB_0810817a                           @ 08107f7a fee0
 LAB_08107f7c:
-    ldr r1, DAT_08107fac                     @ 08107f7c 0b49
+    ldr r1, PTR_card_stats_table_08107fac    @ 08107f7c 0b49
     movs r0,#0xb    @ 08107f7e 0b20
     .hword 0x4652    @ 08107f80 5246
     muls r2,r0    @ 08107f82 4243
@@ -349596,8 +349596,8 @@ LAB_08107f9c:
     adds r1,#0x5d    @ 08107fa6 5d31
     movs r0,#0xd    @ 08107fa8 0d20
     b LAB_0810817a                           @ 08107faa e6e0
-DAT_08107fac:
-    .word  0x098169b8                     @ 08107fac b8698109
+PTR_card_stats_table_08107fac:
+    .word  card_stats_table               @ 08107fac b8698109
 DAT_08107fb0:
     .word  0x0000ffff                     @ 08107fb0 ffff0000
 LAB_08107fb4:
@@ -349647,7 +349647,7 @@ switchD_08107f34__caseD_3:
     movs r0,#0xf    @ 08108008 0f20
     b LAB_0810817a                           @ 0810800a b6e0
 LAB_0810800c:
-    ldr r1, DAT_0810803c                     @ 0810800c 0b49
+    ldr r1, PTR_card_stats_table_0810803c    @ 0810800c 0b49
     movs r0,#0xb    @ 0810800e 0b20
     .hword 0x4652    @ 08108010 5246
     muls r2,r0    @ 08108012 4243
@@ -349672,8 +349672,8 @@ LAB_0810802c:
     adds r1,#0x5d    @ 08108036 5d31
     movs r0,#0xd    @ 08108038 0d20
     b LAB_0810817a                           @ 0810803a 9ee0
-DAT_0810803c:
-    .word  0x098169b8                     @ 0810803c b8698109
+PTR_card_stats_table_0810803c:
+    .word  card_stats_table               @ 0810803c b8698109
 DAT_08108040:
     .word  0x0000ffff                     @ 08108040 ffff0000
 LAB_08108044:
@@ -349723,7 +349723,7 @@ switchD_08107f34__caseD_6:
     movs r0,#0xf    @ 08108098 0f20
     b LAB_0810817a                           @ 0810809a 6ee0
 LAB_0810809c:
-    ldr r1, DAT_081080b4                     @ 0810809c 0549
+    ldr r1, PTR_card_stats_table_081080b4    @ 0810809c 0549
     movs r0,#0xb    @ 0810809e 0b20
     .hword 0x4652    @ 081080a0 5246
     muls r2,r0    @ 081080a2 4243
@@ -349735,8 +349735,8 @@ LAB_0810809c:
     .hword 0x4641    @ 081080ae 4146
     adds r1,#0x5d    @ 081080b0 5d31
     b LAB_0810817a                           @ 081080b2 62e0
-DAT_081080b4:
-    .word  0x098169b8                     @ 081080b4 b8698109
+PTR_card_stats_table_081080b4:
+    .word  card_stats_table               @ 081080b4 b8698109
 switchD_08107f34__caseD_a:
     .hword 0x4651    @ 081080b8 5146
     lsls r0,r1,#0x1    @ 081080ba 4800
@@ -354224,7 +354224,7 @@ LAB_0810a2c4:
     lsls r0,r0,#0x10    @ 0810a2d2 0004
     lsrs r5,r0,#0x10    @ 0810a2d4 050c
 LAB_0810a2d6:
-    ldr r2, DAT_0810a320                     @ 0810a2d6 124a
+    ldr r2, PTR_card_stats_table_0810a320    @ 0810a2d6 124a
     .hword 0x4640    @ 0810a2d8 4046
     adds r0,#0x50    @ 0810a2da 5030
     movs r3,#0x0    @ 0810a2dc 0023
@@ -354260,8 +354260,8 @@ DAT_0810a318:
     .word  0x0202f3c0                     @ 0810a318 c0f30202
 DAT_0810a31c:
     .word  0x0202f414                     @ 0810a31c 14f40202
-DAT_0810a320:
-    .word  0x098169b8                     @ 0810a320 b8698109
+PTR_card_stats_table_0810a320:
+    .word  card_stats_table               @ 0810a320 b8698109
 DAT_0810a324:
     .word  0x000097c7                     @ 0810a324 c7970000
 LAB_0810a328:
@@ -354546,7 +354546,7 @@ FUN_0810a52c:
     str r0,[sp,#0x80]                        @ 0810a538 2090
     ldr r0, DAT_0810a660                     @ 0810a53a 4948
     .hword 0x4680    @ 0810a53c 8046
-    ldr r1, DAT_0810a664                     @ 0810a53e 4949
+    ldr r1, PTR_card_stats_table_0810a664    @ 0810a53e 4949
     movs r0,#0x16    @ 0810a540 1620
     ldr r2,[sp,#0x80]                        @ 0810a542 209a
     muls r0,r2    @ 0810a544 5043
@@ -354624,7 +354624,7 @@ LAB_0810a5c6:
     beq LAB_0810a5d4                         @ 0810a5d0 00d0
     b LAB_0810a708                           @ 0810a5d2 99e0
 LAB_0810a5d4:
-    ldr r1, DAT_0810a664                     @ 0810a5d4 2349
+    ldr r1, PTR_card_stats_table_0810a664    @ 0810a5d4 2349
     movs r0,#0xb    @ 0810a5d6 0b20
     ldr r2,[sp,#0x80]                        @ 0810a5d8 209a
     muls r0,r2    @ 0810a5da 5043
@@ -354700,8 +354700,8 @@ LAB_0810a63a:
     .byte  0x00, 0x00
 DAT_0810a660:
     .word  0x0202f3c0                     @ 0810a660 c0f30202
-DAT_0810a664:
-    .word  0x098169b8                     @ 0810a664 b8698109
+PTR_card_stats_table_0810a664:
+    .word  card_stats_table               @ 0810a664 b8698109
 DAT_0810a668:
     .word  0x0202a4d0                     @ 0810a668 d0a40202
 DAT_0810a66c:
@@ -354804,7 +354804,7 @@ LAB_0810a716:
     ands r0,r3    @ 0810a724 1840
     cmp r0,#0x9                              @ 0810a726 0928
     bne LAB_0810a808                         @ 0810a728 6ed1
-    ldr r2, DAT_0810a7b0                     @ 0810a72a 214a
+    ldr r2, PTR_card_stats_table_0810a7b0    @ 0810a72a 214a
     movs r0,#0xb    @ 0810a72c 0b20
     ldr r3,[sp,#0x80]                        @ 0810a72e 209b
     adds r1,r3,#0x0    @ 0810a730 191c
@@ -354867,8 +354867,8 @@ LAB_0810a784:
     b LAB_0810a808                           @ 0810a7aa 2de0
 DAT_0810a7ac:
     .word  0x0202a4d0                     @ 0810a7ac d0a40202
-DAT_0810a7b0:
-    .word  0x098169b8                     @ 0810a7b0 b8698109
+PTR_card_stats_table_0810a7b0:
+    .word  card_stats_table               @ 0810a7b0 b8698109
 DAT_0810a7b4:
     .word  0x06011000                     @ 0810a7b4 00100106
 LAB_0810a7b8:
