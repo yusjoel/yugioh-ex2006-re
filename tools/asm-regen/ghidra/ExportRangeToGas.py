@@ -426,13 +426,13 @@ def resolve_word_symbol(program, data_obj):
 
     用于 .word 输出时用 symbol 名代替数字。前提：
     1) Ghidra 里该 data 已有 outgoing reference（pointer/undefined* 类型都可）
-    2) 目标地址落在 EWRAM (0x02xxxxxx) / IWRAM (0x03xxxxxx) ——
-       这两段对应 constants/ewram.inc + iwram.inc 的 .equ 定义域。
+    2) 目标地址落在 EWRAM (0x02xxxxxx) / IWRAM (0x03xxxxxx) / MMIO (0x04xxxxxx),
+       对应 constants/ewram.inc + iwram.inc + gba_io.inc 的 .equ 定义域。
        不 include ROM (0x08xxxxxx) 是因为 THUMB 函数 label 缺 |1 位会破坏
-       byte-identical；不 include MMIO (0x04xxxxxx) 是因为 Ghidra loader
-       给的寄存器名（BLDCNT 等）在 asm 里无 .equ 定义。
+       byte-identical；不 include PALRAM/VRAM/OAM (0x05-0x07) 是因为 loader
+       未在这些段创建 symbol。
     3) 目标地址的 primary symbol 是 USER_DEFINED，排除 Ghidra auto-gen 前缀
-    GAS 端要能解析 symbol 值——全局 .equ（ewram.inc/iwram.inc）。
+    GAS 端要能解析 symbol 值——全局 .equ（ewram.inc/iwram.inc/gba_io.inc）。
     """
     refs = data_obj.getReferencesFrom()
     if refs is None or len(refs) == 0:
@@ -451,7 +451,7 @@ def resolve_word_symbol(program, data_obj):
         return None
 
     to_off = to.getOffset()
-    if not (0x02000000 <= to_off <= 0x03FFFFFF):
+    if not (0x02000000 <= to_off <= 0x04FFFFFF):
         return None
 
     sym = program.getSymbolTable().getPrimarySymbol(to)

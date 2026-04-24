@@ -775,18 +775,18 @@ FUN_0801398c:
 FUN_0801399c:
     ldr r3, DAT_080139ac                     @ 0801399c 034b
     ands r0,r3    @ 0801399e 1840
-    ldr r2, DAT_080139b0                     @ 080139a0 034a
+    ldr r2, PTR_BG3HOFS_080139b0             @ 080139a0 034a
     strh r0,[r2,#0x0]                        @ 080139a2 1080
     ands r1,r3    @ 080139a4 1940
-    ldr r0, DAT_080139b4                     @ 080139a6 0348
+    ldr r0, PTR_BG3VOFS_080139b4             @ 080139a6 0348
     strh r1,[r0,#0x0]                        @ 080139a8 0180
     bx lr                                    @ 080139aa 7047
 DAT_080139ac:
     .word  0x000001ff                     @ 080139ac ff010000
-DAT_080139b0:
-    .word  0x0400001c                     @ 080139b0 1c000004
-DAT_080139b4:
-    .word  0x0400001e                     @ 080139b4 1e000004
+PTR_BG3HOFS_080139b0:
+    .word  BG3HOFS                        @ 080139b0 1c000004
+PTR_BG3VOFS_080139b4:
+    .word  BG3VOFS                        @ 080139b4 1e000004
 FUN_080139b8:
     push {r4,r5,lr}                          @ 080139b8 30b5
     ldr r0, DAT_08013a08                     @ 080139ba 1348
@@ -955,7 +955,7 @@ FUN_08013af4:
     adds r6,r0,#0x0    @ 08013b04 061c
     cmp r5,r4                                @ 08013b06 a542
     bne LAB_08013b56                         @ 08013b08 25d1
-    ldr r3, DAT_08013b74                     @ 08013b0a 1a4b
+    ldr r3, PTR_WININ_08013b74               @ 08013b0a 1a4b
     movs r2,#0x20    @ 08013b0c 2022
     rsbs r2,r2,#0    @ 08013b0e 5242
     ldrh r1,[r3,#0x0]                        @ 08013b10 1988
@@ -964,7 +964,7 @@ FUN_08013af4:
     movs r1,#0x3b    @ 08013b16 3b21
     orrs r0,r1    @ 08013b18 0843
     strh r0,[r3,#0x0]                        @ 08013b1a 1880
-    ldr r1, DAT_08013b78                     @ 08013b1c 1649
+    ldr r1, PTR_WINOUT_08013b78              @ 08013b1c 1649
     ldrh r0,[r1,#0x0]                        @ 08013b1e 0888
     ands r2,r0    @ 08013b20 0240
     strh r2,[r1,#0x0]                        @ 08013b22 0a80
@@ -1001,20 +1001,20 @@ LAB_08013b56:
     lsrs r0,r0,#0x8    @ 08013b62 000a
     orrs r0,r1    @ 08013b64 0843
     lsrs r0,r0,#0x10    @ 08013b66 000c
-    ldr r1, DAT_08013b80                     @ 08013b68 0549
+    ldr r1, PTR_WIN0V_08013b80               @ 08013b68 0549
     strh r0,[r1,#0x0]                        @ 08013b6a 0880
     pop {r4,r5,r6}                           @ 08013b6c 70bc
     pop {r0}                                 @ 08013b6e 01bc
     bx r0                                    @ 08013b70 0047
     .byte  0x00, 0x00
-DAT_08013b74:
-    .word  0x04000048                     @ 08013b74 48000004
-DAT_08013b78:
-    .word  0x0400004a                     @ 08013b78 4a000004
+PTR_WININ_08013b74:
+    .word  WININ                          @ 08013b74 48000004
+PTR_WINOUT_08013b78:
+    .word  WINOUT                         @ 08013b78 4a000004
 DAT_08013b7c:
     .word  0xffff9fff                     @ 08013b7c ff9fffff
-DAT_08013b80:
-    .word  0x04000044                     @ 08013b80 44000004
+PTR_WIN0V_08013b80:
+    .word  WIN0V                          @ 08013b80 44000004
 FUN_08013b84:
     push {r4,r5,lr}                          @ 08013b84 30b5
     adds r5,r0,#0x0    @ 08013b86 051c
@@ -1034,7 +1034,7 @@ FUN_08013b84:
     lsrs r1,r1,#0x8    @ 08013ba4 090a
     orrs r1,r2    @ 08013ba6 1143
     lsrs r1,r1,#0x10    @ 08013ba8 090c
-    ldr r0, DAT_08013bd0                     @ 08013baa 0948
+    ldr r0, PTR_WIN0V_08013bd0               @ 08013baa 0948
     strh r1,[r0,#0x0]                        @ 08013bac 0180
     cmp r5,r4                                @ 08013bae a542
     bne LAB_08013bca                         @ 08013bb0 0bd1
@@ -1051,8 +1051,8 @@ LAB_08013bca:
     pop {r4,r5}                              @ 08013bca 30bc
     pop {r0}                                 @ 08013bcc 01bc
     bx r0                                    @ 08013bce 0047
-DAT_08013bd0:
-    .word  0x04000044                     @ 08013bd0 44000004
+PTR_WIN0V_08013bd0:
+    .word  WIN0V                          @ 08013bd0 44000004
 FUN_08013bd4:
     push {r4,r5,r6,r7,lr}                    @ 08013bd4 f0b5
     .hword 0x4657    @ 08013bd6 5746
@@ -1475,7 +1475,7 @@ switchD_08013bfa__caseD_5:
     adds r0,r4,#0x0    @ 08013f32 201c
     ands r0,r1    @ 08013f34 0840
     strh r0,[r6,#0x0]                        @ 08013f36 3080
-    ldr r2, DAT_08013fcc                     @ 08013f38 244a
+    ldr r2, PTR_BG3CNT_08013fcc              @ 08013f38 244a
     movs r3,#0x80    @ 08013f3a 8023
     lsls r3,r3,#0x7    @ 08013f3c db01
     ldr r0, DAT_08013fd0                     @ 08013f3e 2448
@@ -1545,8 +1545,8 @@ LAB_08013fc2:
     b switchD_08013bfa__default              @ 08013fc6 cbe1
 DAT_08013fc8:
     .word  0xffffe0ff                     @ 08013fc8 ffe0ffff
-DAT_08013fcc:
-    .word  0x0400000e                     @ 08013fcc 0e000004
+PTR_BG3CNT_08013fcc:
+    .word  BG3CNT                         @ 08013fcc 0e000004
 DAT_08013fd0:
     .word  0xffff3fff                     @ 08013fd0 ff3fffff
 DAT_08013fd4:
@@ -2374,7 +2374,7 @@ gl_clear_vram_palram_scroll:
     lsls r1,r1,#0x13    @ 0801465c c904
     ldr r2, DAT_08014694                     @ 0801465e 0d4a
     bl bios_cpu_fast_set                     @ 08014660 f9f0c8fe
-    ldr r0, DAT_08014698                     @ 08014664 0c48
+    ldr r0, PTR_BG0HOFS_08014698             @ 08014664 0c48
     strh r4,[r0,#0x0]                        @ 08014666 0480
     adds r0,#0x4    @ 08014668 0430
     strh r4,[r0,#0x0]                        @ 0801466a 0480
@@ -2400,8 +2400,8 @@ DAT_08014690:
     .word  0x01006000                     @ 08014690 00600001
 DAT_08014694:
     .word  0x01000100                     @ 08014694 00010001
-DAT_08014698:
-    .word  0x04000010                     @ 08014698 10000004
+PTR_BG0HOFS_08014698:
+    .word  BG0HOFS                        @ 08014698 10000004
 FUN_0801469c:
     ldr r2, DAT_080146c0                     @ 0801469c 084a
     movs r0,#0x4    @ 0801469e 0420
@@ -2809,11 +2809,11 @@ LAB_08014966:
     adds r4,r4,r0    @ 080149b0 2418
     lsls r4,r4,#0x18    @ 080149b2 2406
     orrs r5,r4    @ 080149b4 2543
-    ldr r0, DAT_080149bc                     @ 080149b6 0148
+    ldr r0, PTR_BLDCNT_080149bc              @ 080149b6 0148
     str r5,[r0,#0x0]                         @ 080149b8 0560
     b LAB_080149fe                           @ 080149ba 20e0
-DAT_080149bc:
-    .word  0x04000050                     @ 080149bc 50000004
+PTR_BLDCNT_080149bc:
+    .word  BLDCNT                         @ 080149bc 50000004
 LAB_080149c0:
     movs r5,#0x1    @ 080149c0 0125
     rsbs r5,r5,#0    @ 080149c2 6d42
@@ -2826,7 +2826,7 @@ LAB_080149c4:
     ldrb r2,[r7,#0x6]                        @ 080149ce ba79
     lsls r1,r2,#0x8    @ 080149d0 1102
     orrs r0,r1    @ 080149d2 0843
-    ldr r1, DAT_08014a08                     @ 080149d4 0c49
+    ldr r1, PTR_BLDCNT_08014a08              @ 080149d4 0c49
     strh r0,[r1,#0x0]                        @ 080149d6 0880
     movs r4,#0x0    @ 080149d8 0024
     ldrsb r4,[r7,r4]                         @ 080149da 3c57
@@ -2844,7 +2844,7 @@ LAB_080149c4:
     adds r4,r4,r0    @ 080149f4 2418
     adds r1,r5,#0x0    @ 080149f6 291c
     muls r1,r4    @ 080149f8 6143
-    ldr r0, DAT_08014a0c                     @ 080149fa 0448
+    ldr r0, PTR_BLDY_08014a0c                @ 080149fa 0448
     strh r1,[r0,#0x0]                        @ 080149fc 0180
 LAB_080149fe:
     add sp,#0x4                              @ 080149fe 01b0
@@ -2852,13 +2852,13 @@ LAB_080149fe:
     pop {r0}                                 @ 08014a02 01bc
     bx r0                                    @ 08014a04 0047
     .byte  0x00, 0x00
-DAT_08014a08:
-    .word  0x04000050                     @ 08014a08 50000004
-DAT_08014a0c:
-    .word  0x04000054                     @ 08014a0c 54000004
+PTR_BLDCNT_08014a08:
+    .word  BLDCNT                         @ 08014a08 50000004
+PTR_BLDY_08014a0c:
+    .word  BLDY                           @ 08014a0c 54000004
 FUN_08014a10:
     sub sp,#0x4                              @ 08014a10 81b0
-    ldr r0, DAT_08014a2c                     @ 08014a12 0648
+    ldr r0, PTR_BG0CNT_08014a2c              @ 08014a12 0648
     ldrh r1,[r0,#0x0]                        @ 08014a14 0188
     .hword 0x4668    @ 08014a16 6846
     strh r1,[r0,#0x0]                        @ 08014a18 0180
@@ -2871,11 +2871,11 @@ FUN_08014a10:
     adds r0,r0,r1    @ 08014a26 4018
     add sp,#0x4                              @ 08014a28 01b0
     bx lr                                    @ 08014a2a 7047
-DAT_08014a2c:
-    .word  0x04000008                     @ 08014a2c 08000004
+PTR_BG0CNT_08014a2c:
+    .word  BG0CNT                         @ 08014a2c 08000004
 FUN_08014a30:
     sub sp,#0x4                              @ 08014a30 81b0
-    ldr r0, DAT_08014a4c                     @ 08014a32 0648
+    ldr r0, PTR_BG1CNT_08014a4c              @ 08014a32 0648
     ldrh r1,[r0,#0x0]                        @ 08014a34 0188
     .hword 0x4668    @ 08014a36 6846
     strh r1,[r0,#0x0]                        @ 08014a38 0180
@@ -2888,11 +2888,11 @@ FUN_08014a30:
     adds r0,r0,r1    @ 08014a46 4018
     add sp,#0x4                              @ 08014a48 01b0
     bx lr                                    @ 08014a4a 7047
-DAT_08014a4c:
-    .word  0x0400000a                     @ 08014a4c 0a000004
+PTR_BG1CNT_08014a4c:
+    .word  BG1CNT                         @ 08014a4c 0a000004
 FUN_08014a50:
     sub sp,#0x4                              @ 08014a50 81b0
-    ldr r0, DAT_08014a6c                     @ 08014a52 0648
+    ldr r0, PTR_BG2CNT_08014a6c              @ 08014a52 0648
     ldrh r1,[r0,#0x0]                        @ 08014a54 0188
     .hword 0x4668    @ 08014a56 6846
     strh r1,[r0,#0x0]                        @ 08014a58 0180
@@ -2905,11 +2905,11 @@ FUN_08014a50:
     adds r0,r0,r1    @ 08014a66 4018
     add sp,#0x4                              @ 08014a68 01b0
     bx lr                                    @ 08014a6a 7047
-DAT_08014a6c:
-    .word  0x0400000c                     @ 08014a6c 0c000004
+PTR_BG2CNT_08014a6c:
+    .word  BG2CNT                         @ 08014a6c 0c000004
 FUN_08014a70:
     sub sp,#0x4                              @ 08014a70 81b0
-    ldr r0, DAT_08014a8c                     @ 08014a72 0648
+    ldr r0, PTR_BG3CNT_08014a8c              @ 08014a72 0648
     ldrh r1,[r0,#0x0]                        @ 08014a74 0188
     .hword 0x4668    @ 08014a76 6846
     strh r1,[r0,#0x0]                        @ 08014a78 0180
@@ -2922,11 +2922,11 @@ FUN_08014a70:
     adds r0,r0,r1    @ 08014a86 4018
     add sp,#0x4                              @ 08014a88 01b0
     bx lr                                    @ 08014a8a 7047
-DAT_08014a8c:
-    .word  0x0400000e                     @ 08014a8c 0e000004
+PTR_BG3CNT_08014a8c:
+    .word  BG3CNT                         @ 08014a8c 0e000004
 FUN_08014a90:
     sub sp,#0x4                              @ 08014a90 81b0
-    ldr r0, DAT_08014aa4                     @ 08014a92 0448
+    ldr r0, PTR_BG0CNT_08014aa4              @ 08014a92 0448
     ldrh r1,[r0,#0x0]                        @ 08014a94 0188
     .hword 0x4668    @ 08014a96 6846
     strh r1,[r0,#0x0]                        @ 08014a98 0180
@@ -2935,11 +2935,11 @@ FUN_08014a90:
     lsrs r0,r0,#0x1e    @ 08014a9e 800f
     add sp,#0x4                              @ 08014aa0 01b0
     bx lr                                    @ 08014aa2 7047
-DAT_08014aa4:
-    .word  0x04000008                     @ 08014aa4 08000004
+PTR_BG0CNT_08014aa4:
+    .word  BG0CNT                         @ 08014aa4 08000004
 FUN_08014aa8:
     sub sp,#0x4                              @ 08014aa8 81b0
-    ldr r0, DAT_08014abc                     @ 08014aaa 0448
+    ldr r0, PTR_BG1CNT_08014abc              @ 08014aaa 0448
     ldrh r1,[r0,#0x0]                        @ 08014aac 0188
     .hword 0x4668    @ 08014aae 6846
     strh r1,[r0,#0x0]                        @ 08014ab0 0180
@@ -2948,11 +2948,11 @@ FUN_08014aa8:
     lsrs r0,r0,#0x1e    @ 08014ab6 800f
     add sp,#0x4                              @ 08014ab8 01b0
     bx lr                                    @ 08014aba 7047
-DAT_08014abc:
-    .word  0x0400000a                     @ 08014abc 0a000004
+PTR_BG1CNT_08014abc:
+    .word  BG1CNT                         @ 08014abc 0a000004
 FUN_08014ac0:
     sub sp,#0x4                              @ 08014ac0 81b0
-    ldr r0, DAT_08014ad4                     @ 08014ac2 0448
+    ldr r0, PTR_BG2CNT_08014ad4              @ 08014ac2 0448
     ldrh r1,[r0,#0x0]                        @ 08014ac4 0188
     .hword 0x4668    @ 08014ac6 6846
     strh r1,[r0,#0x0]                        @ 08014ac8 0180
@@ -2961,11 +2961,11 @@ FUN_08014ac0:
     lsrs r0,r0,#0x1e    @ 08014ace 800f
     add sp,#0x4                              @ 08014ad0 01b0
     bx lr                                    @ 08014ad2 7047
-DAT_08014ad4:
-    .word  0x0400000c                     @ 08014ad4 0c000004
+PTR_BG2CNT_08014ad4:
+    .word  BG2CNT                         @ 08014ad4 0c000004
 FUN_08014ad8:
     sub sp,#0x4                              @ 08014ad8 81b0
-    ldr r0, DAT_08014aec                     @ 08014ada 0448
+    ldr r0, PTR_BG3CNT_08014aec              @ 08014ada 0448
     ldrh r1,[r0,#0x0]                        @ 08014adc 0188
     .hword 0x4668    @ 08014ade 6846
     strh r1,[r0,#0x0]                        @ 08014ae0 0180
@@ -2974,8 +2974,8 @@ FUN_08014ad8:
     lsrs r0,r0,#0x1e    @ 08014ae6 800f
     add sp,#0x4                              @ 08014ae8 01b0
     bx lr                                    @ 08014aea 7047
-DAT_08014aec:
-    .word  0x0400000e                     @ 08014aec 0e000004
+PTR_BG3CNT_08014aec:
+    .word  BG3CNT                         @ 08014aec 0e000004
 FUN_08014af0:
     push {r4,r5,r6,lr}                       @ 08014af0 70b5
     adds r6,r1,#0x0    @ 08014af2 0e1c
@@ -3050,7 +3050,7 @@ LAB_08014b62:
     ROM_INCBIN 0x14b6a, 0x22
 FUN_08014b8c:
     sub sp,#0x4                              @ 08014b8c 81b0
-    ldr r0, DAT_08014ba8                     @ 08014b8e 0648
+    ldr r0, PTR_BG0CNT_08014ba8              @ 08014b8e 0648
     ldrh r1,[r0,#0x0]                        @ 08014b90 0188
     .hword 0x4668    @ 08014b92 6846
     strh r1,[r0,#0x0]                        @ 08014b94 0180
@@ -3063,11 +3063,11 @@ FUN_08014b8c:
     adds r0,r0,r1    @ 08014ba2 4018
     add sp,#0x4                              @ 08014ba4 01b0
     bx lr                                    @ 08014ba6 7047
-DAT_08014ba8:
-    .word  0x04000008                     @ 08014ba8 08000004
+PTR_BG0CNT_08014ba8:
+    .word  BG0CNT                         @ 08014ba8 08000004
 FUN_08014bac:
     sub sp,#0x4                              @ 08014bac 81b0
-    ldr r0, DAT_08014bc8                     @ 08014bae 0648
+    ldr r0, PTR_BG1CNT_08014bc8              @ 08014bae 0648
     ldrh r1,[r0,#0x0]                        @ 08014bb0 0188
     .hword 0x4668    @ 08014bb2 6846
     strh r1,[r0,#0x0]                        @ 08014bb4 0180
@@ -3080,11 +3080,11 @@ FUN_08014bac:
     adds r0,r0,r1    @ 08014bc2 4018
     add sp,#0x4                              @ 08014bc4 01b0
     bx lr                                    @ 08014bc6 7047
-DAT_08014bc8:
-    .word  0x0400000a                     @ 08014bc8 0a000004
+PTR_BG1CNT_08014bc8:
+    .word  BG1CNT                         @ 08014bc8 0a000004
 FUN_08014bcc:
     sub sp,#0x4                              @ 08014bcc 81b0
-    ldr r0, DAT_08014be8                     @ 08014bce 0648
+    ldr r0, PTR_BG2CNT_08014be8              @ 08014bce 0648
     ldrh r1,[r0,#0x0]                        @ 08014bd0 0188
     .hword 0x4668    @ 08014bd2 6846
     strh r1,[r0,#0x0]                        @ 08014bd4 0180
@@ -3097,11 +3097,11 @@ FUN_08014bcc:
     adds r0,r0,r1    @ 08014be2 4018
     add sp,#0x4                              @ 08014be4 01b0
     bx lr                                    @ 08014be6 7047
-DAT_08014be8:
-    .word  0x0400000c                     @ 08014be8 0c000004
+PTR_BG2CNT_08014be8:
+    .word  BG2CNT                         @ 08014be8 0c000004
 FUN_08014bec:
     sub sp,#0x4                              @ 08014bec 81b0
-    ldr r0, DAT_08014c08                     @ 08014bee 0648
+    ldr r0, PTR_BG3CNT_08014c08              @ 08014bee 0648
     ldrh r1,[r0,#0x0]                        @ 08014bf0 0188
     .hword 0x4668    @ 08014bf2 6846
     strh r1,[r0,#0x0]                        @ 08014bf4 0180
@@ -3114,8 +3114,8 @@ FUN_08014bec:
     adds r0,r0,r1    @ 08014c02 4018
     add sp,#0x4                              @ 08014c04 01b0
     bx lr                                    @ 08014c06 7047
-DAT_08014c08:
-    .word  0x0400000e                     @ 08014c08 0e000004
+PTR_BG3CNT_08014c08:
+    .word  BG3CNT                         @ 08014c08 0e000004
 FUN_08014c0c:
     ldr r0, DAT_08014c10                     @ 08014c0c 0048
     bx lr                                    @ 08014c0e 7047
@@ -4666,7 +4666,7 @@ LAB_0801588c:
     adds r0,r0,r1    @ 080158b2 4018
     asrs r0,r0,#0x4    @ 080158b4 0011
     lsls r2,r7,#0x1    @ 080158b6 7a00
-    ldr r7, DAT_0801591c                     @ 080158b8 184f
+    ldr r7, PTR_BG2X_0801591c                @ 080158b8 184f
     adds r1,r2,r7    @ 080158ba d119
     str r0,[r1,#0x0]                         @ 080158bc 0860
     ldr r0,[r5,#0x8]                         @ 080158be a868
@@ -4685,7 +4685,7 @@ LAB_0801588c:
     lsls r0,r0,#0xc    @ 080158d8 0003
     asrs r0,r0,#0x10    @ 080158da 0014
     lsls r2,r6,#0x4    @ 080158dc 3201
-    ldr r3, DAT_08015920                     @ 080158de 104b
+    ldr r3, PTR_BG2PA_08015920               @ 080158de 104b
     adds r1,r2,r3    @ 080158e0 d118
     strh r0,[r1,#0x0]                        @ 080158e2 0880
     ldr r0,[r5,#0x4]                         @ 080158e4 6868
@@ -4716,10 +4716,10 @@ DAT_08015914:
     .word  0x09e3a488                     @ 08015914 88a4e309
 DAT_08015918:
     .word  0x09e3a4e4                     @ 08015918 e4a4e309
-DAT_0801591c:
-    .word  0x04000028                     @ 0801591c 28000004
-DAT_08015920:
-    .word  0x04000020                     @ 08015920 20000004
+PTR_BG2X_0801591c:
+    .word  BG2X                           @ 0801591c 28000004
+PTR_BG2PA_08015920:
+    .word  BG2PA                          @ 08015920 20000004
 FUN_08015924:
     push {lr}                                @ 08015924 00b5
     cmp r0,#0x1                              @ 08015926 0128
@@ -8161,12 +8161,12 @@ LAB_08017cbc:
     bx r1                                    @ 08017cc0 0847
     .byte  0x00, 0x00
 FUN_08017cc4:
-    ldr r1, DAT_08017ccc                     @ 08017cc4 0149
+    ldr r1, PTR_BG0VOFS_08017ccc             @ 08017cc4 0149
     subs r0,#0x28    @ 08017cc6 2838
     strh r0,[r1,#0x0]                        @ 08017cc8 0880
     bx lr                                    @ 08017cca 7047
-DAT_08017ccc:
-    .word  0x04000012                     @ 08017ccc 12000004
+PTR_BG0VOFS_08017ccc:
+    .word  BG0VOFS                        @ 08017ccc 12000004
 FUN_08017cd0:
     push {r4,r5,r6,r7,lr}                    @ 08017cd0 f0b5
     .hword 0x4657    @ 08017cd2 5746
@@ -8793,7 +8793,7 @@ LAB_080181b0:
     bl FUN_0801778c                          @ 080181b4 fff7eafa
     ldr r4, DAT_08018228                     @ 080181b8 1b4c
     ldr r1, DAT_0801822c                     @ 080181ba 1c49
-    ldr r5, DAT_08018230                     @ 080181bc 1c4d
+    ldr r5, PTR_BG0CNT_08018230              @ 080181bc 1c4d
     adds r0,r4,#0x0    @ 080181be 201c
     adds r2,r5,#0x0    @ 080181c0 2a1c
     bl bios_cpu_set                          @ 080181c2 f6f019f9
@@ -8846,8 +8846,8 @@ DAT_08018228:
     .word  0x09ccd290                     @ 08018228 90d2cc09
 DAT_0801822c:
     .word  0x05000020                     @ 0801822c 20000005
-DAT_08018230:
-    .word  0x04000008                     @ 08018230 08000004
+PTR_BG0CNT_08018230:
+    .word  BG0CNT                         @ 08018230 08000004
 DAT_08018234:
     .word  0x05000220                     @ 08018234 20020005
 DAT_08018238:
@@ -8859,19 +8859,19 @@ DAT_08018240:
 DAT_08018244:
     .word  0x000002be                     @ 08018244 be020000
 FUN_08018248:
-    ldr r1, DAT_08018250                     @ 08018248 0149
+    ldr r1, PTR_BG3VOFS_08018250             @ 08018248 0149
     subs r0,#0x8    @ 0801824a 0838
     strh r0,[r1,#0x0]                        @ 0801824c 0880
     bx lr                                    @ 0801824e 7047
-DAT_08018250:
-    .word  0x0400001e                     @ 08018250 1e000004
+PTR_BG3VOFS_08018250:
+    .word  BG3VOFS                        @ 08018250 1e000004
 FUN_08018254:
-    ldr r1, DAT_0801825c                     @ 08018254 0149
+    ldr r1, PTR_BG1VOFS_0801825c             @ 08018254 0149
     subs r0,#0x4    @ 08018256 0438
     strh r0,[r1,#0x0]                        @ 08018258 0880
     bx lr                                    @ 0801825a 7047
-DAT_0801825c:
-    .word  0x04000016                     @ 0801825c 16000004
+PTR_BG1VOFS_0801825c:
+    .word  BG1VOFS                        @ 0801825c 16000004
 FUN_08018260:
     push {r4,r5,r6,r7,lr}                    @ 08018260 f0b5
     sub sp,#0x28                             @ 08018262 8ab0
@@ -10603,7 +10603,7 @@ switchD_08018fa0__caseD_0:
     ldr r2, DAT_08019074                     @ 08018ff2 204a
     adds r0,r4,#0x0    @ 08018ff4 201c
     bl bios_cpu_fast_set                     @ 08018ff6 f5f0fdf9
-    ldr r2, DAT_08019078                     @ 08018ffa 1f4a
+    ldr r2, PTR_BG0CNT_08019078              @ 08018ffa 1f4a
     movs r4,#0x4    @ 08018ffc 0424
     rsbs r4,r4,#0    @ 08018ffe 6442
     ldrh r1,[r2,#0x0]                        @ 08019000 1188
@@ -10619,7 +10619,7 @@ switchD_08018fa0__caseD_0:
     bl FUN_08017cc4                          @ 08019014 fef756fe
     movs r0,#0x0    @ 08019018 0020
     bl FUN_08018248                          @ 0801901a fff715f9
-    ldr r3, DAT_08019080                     @ 0801901e 184b
+    ldr r3, PTR_WININ_08019080               @ 0801901e 184b
     movs r1,#0x20    @ 08019020 2021
     rsbs r1,r1,#0    @ 08019022 4942
     ldrh r2,[r3,#0x0]                        @ 08019024 1a88
@@ -10628,13 +10628,13 @@ switchD_08018fa0__caseD_0:
     movs r2,#0x3b    @ 0801902a 3b22
     orrs r0,r2    @ 0801902c 1043
     strh r0,[r3,#0x0]                        @ 0801902e 1880
-    ldr r2, DAT_08019084                     @ 08019030 144a
+    ldr r2, PTR_WINOUT_08019084              @ 08019030 144a
     ldrh r0,[r2,#0x0]                        @ 08019032 1088
     ands r1,r0    @ 08019034 0140
     movs r0,#0x3f    @ 08019036 3f20
     orrs r1,r0    @ 08019038 0143
     strh r1,[r2,#0x0]                        @ 0801903a 1180
-    ldr r1, DAT_08019088                     @ 0801903c 1249
+    ldr r1, PTR_WIN0H_08019088               @ 0801903c 1249
     movs r0,#0xf0    @ 0801903e f020
     strh r0,[r1,#0x0]                        @ 08019040 0880
     adds r1,#0x4    @ 08019042 0431
@@ -10664,16 +10664,16 @@ DAT_08019070:
     .word  0x01000020                     @ 08019070 20000001
 DAT_08019074:
     .word  0x01000200                     @ 08019074 00020001
-DAT_08019078:
-    .word  0x04000008                     @ 08019078 08000004
+PTR_BG0CNT_08019078:
+    .word  BG0CNT                         @ 08019078 08000004
 DAT_0801907c:
     .word  0x0000031d                     @ 0801907c 1d030000
-DAT_08019080:
-    .word  0x04000048                     @ 08019080 48000004
-DAT_08019084:
-    .word  0x0400004a                     @ 08019084 4a000004
-DAT_08019088:
-    .word  0x04000040                     @ 08019088 40000004
+PTR_WININ_08019080:
+    .word  WININ                          @ 08019080 48000004
+PTR_WINOUT_08019084:
+    .word  WINOUT                         @ 08019084 4a000004
+PTR_WIN0H_08019088:
+    .word  WIN0H                          @ 08019088 40000004
 DAT_0801908c:
     .word  0x00002878                     @ 0801908c 78280000
 DAT_08019090:
@@ -11106,7 +11106,7 @@ switchD_08018fa0__caseD_7:
     bl FUN_08017cc4                          @ 080193ea fef76bfc
     movs r0,#0x0    @ 080193ee 0020
     bl FUN_08018248                          @ 080193f0 fef72aff
-    ldr r2, DAT_08019484                     @ 080193f4 234a
+    ldr r2, PTR_BG0CNT_08019484              @ 080193f4 234a
     movs r0,#0x4    @ 080193f6 0420
     rsbs r0,r0,#0    @ 080193f8 4042
     ldrh r1,[r2,#0x0]                        @ 080193fa 1188
@@ -11174,8 +11174,8 @@ switchD_08018fa0__caseD_4:
     bx r0                                    @ 0801947e 0047
 DAT_08019480:
     .word  0xffff9fff                     @ 08019480 ff9fffff
-DAT_08019484:
-    .word  0x04000008                     @ 08019484 08000004
+PTR_BG0CNT_08019484:
+    .word  BG0CNT                         @ 08019484 08000004
 DAT_08019488:
     .word  0x00000316                     @ 08019488 16030000
 DAT_0801948c:
@@ -12087,7 +12087,7 @@ DWORD_08019c88:
 DWORD_08019c8c:
     .word  0x000005a2                     @ 08019c8c a2050000
 SUB_08019c90:
-    ldr r1, DWORD_08019ca0                   @ 08019c90 0349
+    ldr r1, PTR_BG2VOFS_08019ca0             @ 08019c90 0349
     subs r0,#0x10    @ 08019c92 1038
     strh r0,[r1,#0x0]                        @ 08019c94 0880
     subs r1,#0x2    @ 08019c96 0239
@@ -12095,8 +12095,8 @@ SUB_08019c90:
     rsbs r0,r0,#0    @ 08019c9a 4042
     strh r0,[r1,#0x0]                        @ 08019c9c 0880
     bx lr                                    @ 08019c9e 7047
-DWORD_08019ca0:
-    .word  0x0400001a                     @ 08019ca0 1a000004
+PTR_BG2VOFS_08019ca0:
+    .word  BG2VOFS                        @ 08019ca0 1a000004
 FUN_08019ca4:
     push {r4,r5,r6,r7,lr}                    @ 08019ca4 f0b5
     .hword 0x4657    @ 08019ca6 5746
@@ -12998,7 +12998,7 @@ FUN_0801a328:
     bl FUN_08016a7c                          @ 0801a3f2 fcf743fb
     ldr r4, DWORD_0801a470                   @ 0801a3f6 1e4c
     ldr r1, DWORD_0801a474                   @ 0801a3f8 1e49
-    ldr r5, DWORD_0801a478                   @ 0801a3fa 1f4d
+    ldr r5, PTR_BG0CNT_0801a478              @ 0801a3fa 1f4d
     adds r0,r4,#0x0    @ 0801a3fc 201c
     adds r2,r5,#0x0    @ 0801a3fe 2a1c
     bl bios_cpu_set                          @ 0801a400 f3f0faff
@@ -13053,19 +13053,19 @@ DWORD_0801a470:
     .word  0x09ccd290                     @ 0801a470 90d2cc09
 DWORD_0801a474:
     .word  0x05000020                     @ 0801a474 20000005
-DWORD_0801a478:
-    .word  0x04000008                     @ 0801a478 08000004
+PTR_BG0CNT_0801a478:
+    .word  BG0CNT                         @ 0801a478 08000004
 DWORD_0801a47c:
     .word  0x05000220                     @ 0801a47c 20020005
 DWORD_0801a480:
     .word  0x05000202                     @ 0801a480 02020005
 SUB_0801a484:
-    ldr r1, DWORD_0801a48c                   @ 0801a484 0149
+    ldr r1, PTR_BG3VOFS_0801a48c             @ 0801a484 0149
     subs r0,#0xe    @ 0801a486 0e38
     strh r0,[r1,#0x0]                        @ 0801a488 0880
     bx lr                                    @ 0801a48a 7047
-DWORD_0801a48c:
-    .word  0x0400001e                     @ 0801a48c 1e000004
+PTR_BG3VOFS_0801a48c:
+    .word  BG3VOFS                        @ 0801a48c 1e000004
     .byte  0x01, 0x49, 0x04, 0x38, 0x08, 0x80, 0x70, 0x47, 0x16, 0x00, 0x00, 0x04
 FUN_0801a49c:
     push {r4,r5,r6,r7,lr}                    @ 0801a49c f0b5
@@ -14042,18 +14042,18 @@ FUN_0801ba4c:
 FUN_0801ba5c:
     ldr r3, DAT_0801ba6c                     @ 0801ba5c 034b
     ands r0,r3    @ 0801ba5e 1840
-    ldr r2, DAT_0801ba70                     @ 0801ba60 034a
+    ldr r2, PTR_BG3HOFS_0801ba70             @ 0801ba60 034a
     strh r0,[r2,#0x0]                        @ 0801ba62 1080
     ands r1,r3    @ 0801ba64 1940
-    ldr r0, DAT_0801ba74                     @ 0801ba66 0348
+    ldr r0, PTR_BG3VOFS_0801ba74             @ 0801ba66 0348
     strh r1,[r0,#0x0]                        @ 0801ba68 0180
     bx lr                                    @ 0801ba6a 7047
 DAT_0801ba6c:
     .word  0x000001ff                     @ 0801ba6c ff010000
-DAT_0801ba70:
-    .word  0x0400001c                     @ 0801ba70 1c000004
-DAT_0801ba74:
-    .word  0x0400001e                     @ 0801ba74 1e000004
+PTR_BG3HOFS_0801ba70:
+    .word  BG3HOFS                        @ 0801ba70 1c000004
+PTR_BG3VOFS_0801ba74:
+    .word  BG3VOFS                        @ 0801ba74 1e000004
 FUN_0801ba78:
     push {r4,r5,lr}                          @ 0801ba78 30b5
     ldr r0, DAT_0801bac8                     @ 0801ba7a 1348
@@ -14278,7 +14278,7 @@ FUN_0801bc28:
     adds r6,r0,#0x0    @ 0801bc38 061c
     cmp r5,r4                                @ 0801bc3a a542
     bne LAB_0801bc8a                         @ 0801bc3c 25d1
-    ldr r3, DAT_0801bca8                     @ 0801bc3e 1a4b
+    ldr r3, PTR_WININ_0801bca8               @ 0801bc3e 1a4b
     movs r2,#0x20    @ 0801bc40 2022
     rsbs r2,r2,#0    @ 0801bc42 5242
     ldrh r1,[r3,#0x0]                        @ 0801bc44 1988
@@ -14287,7 +14287,7 @@ FUN_0801bc28:
     movs r1,#0x3b    @ 0801bc4a 3b21
     orrs r0,r1    @ 0801bc4c 0843
     strh r0,[r3,#0x0]                        @ 0801bc4e 1880
-    ldr r1, DAT_0801bcac                     @ 0801bc50 1649
+    ldr r1, PTR_WINOUT_0801bcac              @ 0801bc50 1649
     ldrh r0,[r1,#0x0]                        @ 0801bc52 0888
     ands r2,r0    @ 0801bc54 0240
     strh r2,[r1,#0x0]                        @ 0801bc56 0a80
@@ -14324,20 +14324,20 @@ LAB_0801bc8a:
     lsrs r0,r0,#0x8    @ 0801bc96 000a
     orrs r0,r1    @ 0801bc98 0843
     lsrs r0,r0,#0x10    @ 0801bc9a 000c
-    ldr r1, DAT_0801bcb4                     @ 0801bc9c 0549
+    ldr r1, PTR_WIN0V_0801bcb4               @ 0801bc9c 0549
     strh r0,[r1,#0x0]                        @ 0801bc9e 0880
     pop {r4,r5,r6}                           @ 0801bca0 70bc
     pop {r0}                                 @ 0801bca2 01bc
     bx r0                                    @ 0801bca4 0047
     .byte  0x00, 0x00
-DAT_0801bca8:
-    .word  0x04000048                     @ 0801bca8 48000004
-DAT_0801bcac:
-    .word  0x0400004a                     @ 0801bcac 4a000004
+PTR_WININ_0801bca8:
+    .word  WININ                          @ 0801bca8 48000004
+PTR_WINOUT_0801bcac:
+    .word  WINOUT                         @ 0801bcac 4a000004
 DAT_0801bcb0:
     .word  0xffff9fff                     @ 0801bcb0 ff9fffff
-DAT_0801bcb4:
-    .word  0x04000044                     @ 0801bcb4 44000004
+PTR_WIN0V_0801bcb4:
+    .word  WIN0V                          @ 0801bcb4 44000004
 FUN_0801bcb8:
     push {r4,r5,lr}                          @ 0801bcb8 30b5
     adds r5,r0,#0x0    @ 0801bcba 051c
@@ -14357,7 +14357,7 @@ FUN_0801bcb8:
     lsrs r1,r1,#0x8    @ 0801bcd8 090a
     orrs r1,r2    @ 0801bcda 1143
     lsrs r1,r1,#0x10    @ 0801bcdc 090c
-    ldr r0, DAT_0801bd04                     @ 0801bcde 0948
+    ldr r0, PTR_WIN0V_0801bd04               @ 0801bcde 0948
     strh r1,[r0,#0x0]                        @ 0801bce0 0180
     cmp r5,r4                                @ 0801bce2 a542
     bne LAB_0801bcfe                         @ 0801bce4 0bd1
@@ -14374,8 +14374,8 @@ LAB_0801bcfe:
     pop {r4,r5}                              @ 0801bcfe 30bc
     pop {r0}                                 @ 0801bd00 01bc
     bx r0                                    @ 0801bd02 0047
-DAT_0801bd04:
-    .word  0x04000044                     @ 0801bd04 44000004
+PTR_WIN0V_0801bd04:
+    .word  WIN0V                          @ 0801bd04 44000004
 FUN_0801bd08:
     push {r4,r5,r6,r7,lr}                    @ 0801bd08 f0b5
     .hword 0x4657    @ 0801bd0a 5746
@@ -15515,7 +15515,7 @@ FUN_0801c6b0:
     movs r2,#0x0    @ 0801c6ec 0022
     movs r3,#0x0    @ 0801c6ee 0023
     bl FUN_0801c484                          @ 0801c6f0 fff7c8fe
-    ldr r1, DAT_0801c70c                     @ 0801c6f4 0549
+    ldr r1, PTR_BG0VOFS_0801c70c             @ 0801c6f4 0549
     movs r0,#0x4    @ 0801c6f6 0420
     strh r0,[r1,#0x0]                        @ 0801c6f8 0880
 LAB_0801c6fa:
@@ -15528,8 +15528,8 @@ DAT_0801c704:
     .word  0x02029eb0                     @ 0801c704 b09e0202
 DAT_0801c708:
     .word  0x09e3d9cf                     @ 0801c708 cfd9e309
-DAT_0801c70c:
-    .word  0x04000012                     @ 0801c70c 12000004
+PTR_BG0VOFS_0801c70c:
+    .word  BG0VOFS                        @ 0801c70c 12000004
 FUN_0801c710:
     push {lr}                                @ 0801c710 00b5
     ldr r1, DAT_0801c724                     @ 0801c712 0449
@@ -16817,7 +16817,7 @@ card_info_page_init_bg0:
     bl FUN_080f7674                          @ 0801d48c daf0f2f8
     ldr r0,[r4,#0x2c]                        @ 0801d490 e06a
     bl FUN_080f42a0                          @ 0801d492 d6f005ff
-    ldr r1, DAT_0801d4f0                     @ 0801d496 1649
+    ldr r1, PTR_BG0CNT_0801d4f0              @ 0801d496 1649
     movs r0,#0x86    @ 0801d498 8620
     strh r0,[r1,#0x0]                        @ 0801d49a 0880
     adds r1,#0x2    @ 0801d49c 0231
@@ -16858,8 +16858,8 @@ DAT_0801d4e8:
     .word  0x06004000                     @ 0801d4e8 00400006
 DAT_0801d4ec:
     .word  0x0201afb0                     @ 0801d4ec b0af0102
-DAT_0801d4f0:
-    .word  0x04000008                     @ 0801d4f0 08000004
+PTR_BG0CNT_0801d4f0:
+    .word  BG0CNT                         @ 0801d4f0 08000004
 DAT_0801d4f4:
     .word  0x00004104                     @ 0801d4f4 04410000
 DAT_0801d4f8:
@@ -22014,7 +22014,7 @@ FUN_08023b6c:
     bl FUN_080f7674                          @ 08023b8c d3f072fd
     ldr r0, DAT_08023c80                     @ 08023b90 3b48
     bl FUN_080f42a0                          @ 08023b92 d0f085fb
-    ldr r1, DAT_08023c84                     @ 08023b96 3b49
+    ldr r1, PTR_BG0CNT_08023c84              @ 08023b96 3b49
     movs r0,#0x4    @ 08023b98 0420
     strh r0,[r1,#0x0]                        @ 08023b9a 0880
     adds r1,#0x2    @ 08023b9c 0231
@@ -22122,8 +22122,8 @@ DAT_08023c7c:
     .word  0x0203eeb0                     @ 08023c7c b0ee0302
 DAT_08023c80:
     .word  0x02029eb0                     @ 08023c80 b09e0202
-DAT_08023c84:
-    .word  0x04000008                     @ 08023c84 08000004
+PTR_BG0CNT_08023c84:
+    .word  BG0CNT                         @ 08023c84 08000004
 DAT_08023c88:
     .word  0x00000105                     @ 08023c88 05010000
 DAT_08023c8c:
@@ -24568,7 +24568,7 @@ FUN_0802b590:
     bl FUN_080f7674                          @ 0802b5ac ccf062f8
     ldr r0, DAT_0802b6d4                     @ 0802b5b0 4848
     bl FUN_080f42a0                          @ 0802b5b2 c8f075fe
-    ldr r1, DAT_0802b6d8                     @ 0802b5b6 4849
+    ldr r1, PTR_BG0CNT_0802b6d8              @ 0802b5b6 4849
     movs r0,#0x5    @ 0802b5b8 0520
     strh r0,[r1,#0x0]                        @ 0802b5ba 0880
     adds r1,#0x2    @ 0802b5bc 0231
@@ -24697,8 +24697,8 @@ DAT_0802b6d0:
     .word  0x0203eeb0                     @ 0802b6d0 b0ee0302
 DAT_0802b6d4:
     .word  0x02029eb0                     @ 0802b6d4 b09e0202
-DAT_0802b6d8:
-    .word  0x04000008                     @ 0802b6d8 08000004
+PTR_BG0CNT_0802b6d8:
+    .word  BG0CNT                         @ 0802b6d8 08000004
 DAT_0802b6dc:
     .word  0x0000820a                     @ 0802b6dc 0a820000
 DAT_0802b6e0:
@@ -27536,7 +27536,7 @@ LAB_0802cc7c:
     bl FUN_080f7674                          @ 0802cc92 caf0effc
     ldr r0, DAT_0802cd8c                     @ 0802cc96 3d48
     bl FUN_080f42a0                          @ 0802cc98 c7f002fb
-    ldr r1, DAT_0802cd90                     @ 0802cc9c 3c49
+    ldr r1, PTR_BG0CNT_0802cd90              @ 0802cc9c 3c49
     movs r0,#0x5    @ 0802cc9e 0520
     strh r0,[r1,#0x0]                        @ 0802cca0 0880
     adds r1,#0x2    @ 0802cca2 0231
@@ -27647,8 +27647,8 @@ DAT_0802cd88:
     .word  0x0203eeb0                     @ 0802cd88 b0ee0302
 DAT_0802cd8c:
     .word  0x02029eb0                     @ 0802cd8c b09e0202
-DAT_0802cd90:
-    .word  0x04000008                     @ 0802cd90 08000004
+PTR_BG0CNT_0802cd90:
+    .word  BG0CNT                         @ 0802cd90 08000004
 DAT_0802cd94:
     .word  0x00008208                     @ 0802cd94 08820000
 DAT_0802cd98:
@@ -218459,7 +218459,7 @@ LAB_080bc9bc:
     adds r0,r4,#0x0    @ 080bc9fc 201c
     movs r2,#0x0    @ 080bc9fe 0022
     bl FUN_080f7e48                          @ 080bca00 3bf022fa
-    ldr r1, DAT_080bca70                     @ 080bca04 1a49
+    ldr r1, PTR_WIN0H_080bca70               @ 080bca04 1a49
     ldr r2, DAT_080bca74                     @ 080bca06 1b4a
     adds r0,r2,#0x0    @ 080bca08 101c
     strh r0,[r1,#0x0]                        @ 080bca0a 0880
@@ -218513,17 +218513,17 @@ DAT_080bca68:
     .word  0x0990c4ac                     @ 080bca68 acc49009
 DAT_080bca6c:
     .word  0x01c00003                     @ 080bca6c 0300c001
-DAT_080bca70:
-    .word  0x04000040                     @ 080bca70 40000004
+PTR_WIN0H_080bca70:
+    .word  WIN0H                          @ 080bca70 40000004
 DAT_080bca74:
     .word  0x000028f0                     @ 080bca74 f0280000
 switchD_080bc938__caseD_1:
-    ldr r1, DAT_080bca80                     @ 080bca78 0149
+    ldr r1, PTR_BLDY_080bca80                @ 080bca78 0149
     ldrb r0,[r2,#0x11]                       @ 080bca7a 507c
     strh r0,[r1,#0x0]                        @ 080bca7c 0880
     b LAB_080bcb0e                           @ 080bca7e 46e0
-DAT_080bca80:
-    .word  0x04000054                     @ 080bca80 54000004
+PTR_BLDY_080bca80:
+    .word  BLDY                           @ 080bca80 54000004
 switchD_080bc938__caseD_2:
     ldr r4, DAT_080bcab0                     @ 080bca84 0a4c
     ldr r1, DAT_080bcab4                     @ 080bca86 0b49
@@ -218587,7 +218587,7 @@ LAB_080bcaf8:
     bl FUN_080f7e48                          @ 080bcafe 3bf0a3f9
     b LAB_080bcb9a                           @ 080bcb02 4ae0
 switchD_080bc938__caseD_4:
-    ldr r0, DAT_080bcb28                     @ 080bcb04 0848
+    ldr r0, PTR_BLDY_080bcb28                @ 080bcb04 0848
     movs r1,#0x8    @ 080bcb06 0821
     ldrb r3,[r2,#0x11]                       @ 080bcb08 537c
     subs r1,r1,r3    @ 080bcb0a c91a
@@ -218606,8 +218606,8 @@ LAB_080bcb0e:
     movs r0,#0x0    @ 080bcb22 0020
     strb r0,[r2,#0x11]                       @ 080bcb24 5074
     b LAB_080bcb9a                           @ 080bcb26 38e0
-DAT_080bcb28:
-    .word  0x04000054                     @ 080bcb28 54000004
+PTR_BLDY_080bcb28:
+    .word  BLDY                           @ 080bcb28 54000004
 switchD_080bc938__caseD_5:
     bl FUN_080f55d4                          @ 080bcb2c 38f052fd
     movs r2,#0x80    @ 080bcb30 8022
@@ -218863,7 +218863,7 @@ LAB_080bcd0c:
     movs r2,#0x18    @ 080bcd1a 1822
     movs r3,#0x8    @ 080bcd1c 0823
     bl tile_2d_row_copy                      @ 080bcd1e 3af0d9fb
-    ldr r1, DAT_080bcd88                     @ 080bcd22 1949
+    ldr r1, PTR_BLDCNT_080bcd88              @ 080bcd22 1949
     movs r2,#0xfd    @ 080bcd24 fd22
     lsls r2,r2,#0x6    @ 080bcd26 9201
     adds r0,r2,#0x0    @ 080bcd28 101c
@@ -218915,12 +218915,12 @@ DAT_080bcd80:
     .word  0x05000280                     @ 080bcd80 80020005
 DAT_080bcd84:
     .word  0x06016000                     @ 080bcd84 00600106
-DAT_080bcd88:
-    .word  0x04000050                     @ 080bcd88 50000004
+PTR_BLDCNT_080bcd88:
+    .word  BLDCNT                         @ 080bcd88 50000004
 DAT_080bcd8c:
     .word  0x0201fec0                     @ 080bcd8c c0fe0102
 switchD_080bcc8e__caseD_1:
-    ldr r3, DAT_080bcdf0                     @ 080bcd90 174b
+    ldr r3, PTR_BLDALPHA_080bcdf0            @ 080bcd90 174b
     ldrb r1,[r2,#0x12]                       @ 080bcd92 917c
     lsls r2,r1,#0x1    @ 080bcd94 4a00
     movs r0,#0x10    @ 080bcd96 1020
@@ -218968,8 +218968,8 @@ LAB_080bcdac:
     movs r0,#0x0    @ 080bcdea 0020
     strh r0,[r1,#0x12]                       @ 080bcdec 4882
     b LAB_080bcd6a                           @ 080bcdee bce7
-DAT_080bcdf0:
-    .word  0x04000052                     @ 080bcdf0 52000004
+PTR_BLDALPHA_080bcdf0:
+    .word  BLDALPHA                       @ 080bcdf0 52000004
 DAT_080bcdf4:
     .word  0x0201fec0                     @ 080bcdf4 c0fe0102
 switchD_080bcc8e__caseD_2:
@@ -218978,7 +218978,7 @@ switchD_080bcc8e__caseD_2:
     strb r0,[r2,#0x11]                       @ 080bcdfc 5074
     b LAB_080bcd6a                           @ 080bcdfe b4e7
 switchD_080bcc8e__caseD_3:
-    ldr r3, DAT_080bce60                     @ 080bce00 174b
+    ldr r3, PTR_BLDALPHA_080bce60            @ 080bce00 174b
     ldrb r1,[r2,#0x12]                       @ 080bce02 917c
     lsls r2,r1,#0x1    @ 080bce04 4a00
     lsls r1,r1,#0x19    @ 080bce06 4906
@@ -219026,8 +219026,8 @@ LAB_080bce1c:
     movs r0,#0x0    @ 080bce5a 0020
     strh r0,[r1,#0x12]                       @ 080bce5c 4882
     b LAB_080bcd6a                           @ 080bce5e 84e7
-DAT_080bce60:
-    .word  0x04000052                     @ 080bce60 52000004
+PTR_BLDALPHA_080bce60:
+    .word  BLDALPHA                       @ 080bce60 52000004
 DAT_080bce64:
     .word  0x0201fec0                     @ 080bce64 c0fe0102
 switchD_080bcc8e__caseD_4:
@@ -219075,7 +219075,7 @@ LAB_080bcea6:
     ldrb r2,[r1,#0x0]                        @ 080bceb8 0a78
     orrs r0,r2    @ 080bceba 1043
     strb r0,[r1,#0x0]                        @ 080bcebc 0870
-    ldr r1, DAT_080bcef0                     @ 080bcebe 0c49
+    ldr r1, PTR_WIN0H_080bcef0               @ 080bcebe 0c49
     movs r0,#0xf0    @ 080bcec0 f020
     strh r0,[r1,#0x0]                        @ 080bcec2 0880
     adds r1,#0x4    @ 080bcec4 0431
@@ -219100,14 +219100,14 @@ DAT_080bcee8:
     .word  0x02023130                     @ 080bcee8 30310202
 DAT_080bceec:
     .word  0x00000215                     @ 080bceec 15020000
-DAT_080bcef0:
-    .word  0x04000040                     @ 080bcef0 40000004
+PTR_WIN0H_080bcef0:
+    .word  WIN0H                          @ 080bcef0 40000004
 LAB_080bcef4:
-    ldr r1, DAT_080bcf14                     @ 080bcef4 0749
+    ldr r1, PTR_BLDCNT_080bcf14              @ 080bcef4 0749
     movs r0,#0xef    @ 080bcef6 ef20
 LAB_080bcef8:
     strh r0,[r1,#0x0]                        @ 080bcef8 0880
-    ldr r1, DAT_080bcf18                     @ 080bcefa 0749
+    ldr r1, PTR_BLDY_080bcf18                @ 080bcefa 0749
     movs r0,#0x10    @ 080bcefc 1020
     strh r0,[r1,#0x0]                        @ 080bcefe 0880
     movs r2,#0x80    @ 080bcf00 8022
@@ -219120,10 +219120,10 @@ LAB_080bcef8:
     strh r0,[r2,#0x0]                        @ 080bcf0e 1080
     b LAB_080bcd6a                           @ 080bcf10 2be7
     .byte  0x00, 0x00
-DAT_080bcf14:
-    .word  0x04000050                     @ 080bcf14 50000004
-DAT_080bcf18:
-    .word  0x04000054                     @ 080bcf18 54000004
+PTR_BLDCNT_080bcf14:
+    .word  BLDCNT                         @ 080bcf14 50000004
+PTR_BLDY_080bcf18:
+    .word  BLDY                           @ 080bcf18 54000004
 switchD_080bcc8e__caseD_5:
     movs r4,#0x0    @ 080bcf1c 0024
     lsls r6,r5,#0x10    @ 080bcf1e 2e04
@@ -219147,7 +219147,7 @@ LAB_080bcf22:
     adds r4,#0x1    @ 080bcf42 0134
     cmp r4,#0x2                              @ 080bcf44 022c
     ble LAB_080bcf22                         @ 080bcf46 ecdd
-    ldr r2, DAT_080bcfa0                     @ 080bcf48 154a
+    ldr r2, PTR_WIN0V_080bcfa0               @ 080bcf48 154a
     ldr r3, DAT_080bcfa4                     @ 080bcf4a 164b
     ldrh r4,[r3,#0x12]                       @ 080bcf4c 5c8a
     lsls r1,r4,#0x2    @ 080bcf4e a100
@@ -219193,8 +219193,8 @@ LAB_080bcf94:
     adds r0,r4,#0x0    @ 080bcf9a 201c
     strh r0,[r1,#0x0]                        @ 080bcf9c 0880
     b LAB_080bcd6a                           @ 080bcf9e e4e6
-DAT_080bcfa0:
-    .word  0x04000044                     @ 080bcfa0 44000004
+PTR_WIN0V_080bcfa0:
+    .word  WIN0V                          @ 080bcfa0 44000004
 DAT_080bcfa4:
     .word  0x0201fec0                     @ 080bcfa4 c0fe0102
 DAT_080bcfa8:
@@ -219294,20 +219294,20 @@ LAB_080bd05a:
     adds r0,#0x1    @ 080bd05c 0130
     strb r0,[r7,#0x11]                       @ 080bd05e 7874
     strh r2,[r7,#0x12]                       @ 080bd060 7a82
-    ldr r1, DAT_080bd078                     @ 080bd062 0549
+    ldr r1, PTR_BLDCNT_080bd078              @ 080bd062 0549
     movs r0,#0xff    @ 080bd064 ff20
     strh r0,[r1,#0x0]                        @ 080bd066 0880
-    ldr r0, DAT_080bd07c                     @ 080bd068 0448
+    ldr r0, PTR_BLDY_080bd07c                @ 080bd068 0448
     strh r2,[r0,#0x0]                        @ 080bd06a 0280
     bl FUN_080f9b40                          @ 080bd06c 3cf068fd
     b LAB_080bcd6a                           @ 080bd070 7be6
     .byte  0x00, 0x00
 DAT_080bd074:
     .word  0x0201fec0                     @ 080bd074 c0fe0102
-DAT_080bd078:
-    .word  0x04000050                     @ 080bd078 50000004
-DAT_080bd07c:
-    .word  0x04000054                     @ 080bd07c 54000004
+PTR_BLDCNT_080bd078:
+    .word  BLDCNT                         @ 080bd078 50000004
+PTR_BLDY_080bd07c:
+    .word  BLDY                           @ 080bd07c 54000004
 switchD_080bcc8e__caseD_8:
     movs r0,#0x1    @ 080bd080 0120
     bl FUN_080f5840                          @ 080bd082 38f0ddfb
@@ -220376,7 +220376,7 @@ switchD_080bd88a__caseD_0:
     movs r2,#0x18    @ 080bd8d8 1822
     movs r3,#0x8    @ 080bd8da 0823
     bl tile_2d_row_copy                      @ 080bd8dc 39f0fafd
-    ldr r1, DAT_080bd918                     @ 080bd8e0 0d49
+    ldr r1, PTR_BLDCNT_080bd918              @ 080bd8e0 0d49
     movs r2,#0xfd    @ 080bd8e2 fd22
     lsls r2,r2,#0x6    @ 080bd8e4 9201
     adds r0,r2,#0x0    @ 080bd8e6 101c
@@ -220405,12 +220405,12 @@ DAT_080bd910:
     .word  0x00006c2c                     @ 080bd910 2c6c0000
 DAT_080bd914:
     .word  0x098ff124                     @ 080bd914 24f18f09
-DAT_080bd918:
-    .word  0x04000050                     @ 080bd918 50000004
+PTR_BLDCNT_080bd918:
+    .word  BLDCNT                         @ 080bd918 50000004
 DAT_080bd91c:
     .word  0x0201fec0                     @ 080bd91c c0fe0102
 switchD_080bd88a__caseD_1:
-    ldr r3, DAT_080bd980                     @ 080bd920 174b
+    ldr r3, PTR_BLDALPHA_080bd980            @ 080bd920 174b
     ldrb r1,[r2,#0x11]                       @ 080bd922 517c
     lsls r2,r1,#0x1    @ 080bd924 4a00
     lsls r1,r1,#0x19    @ 080bd926 4906
@@ -220458,8 +220458,8 @@ LAB_080bd93c:
     movs r0,#0x0    @ 080bd97a 0020
     strb r0,[r1,#0x11]                       @ 080bd97c 4874
     b LAB_080bd8f2                           @ 080bd97e b8e7
-DAT_080bd980:
-    .word  0x04000052                     @ 080bd980 52000004
+PTR_BLDALPHA_080bd980:
+    .word  BLDALPHA                       @ 080bd980 52000004
 DAT_080bd984:
     .word  0x0201fec0                     @ 080bd984 c0fe0102
 switchD_080bd88a__caseD_2:
@@ -220502,7 +220502,7 @@ LAB_080bd98e:
 DAT_080bd9d0:
     .word  0x0201fec0                     @ 080bd9d0 c0fe0102
 switchD_080bd88a__caseD_3:
-    ldr r3, DAT_080bda38                     @ 080bd9d4 184b
+    ldr r3, PTR_BLDALPHA_080bda38            @ 080bd9d4 184b
     ldrb r1,[r2,#0x11]                       @ 080bd9d6 517c
     lsls r2,r1,#0x1    @ 080bd9d8 4a00
     movs r0,#0x10    @ 080bd9da 1020
@@ -220553,8 +220553,8 @@ LAB_080bda2a:
     strb r0,[r1,#0x11]                       @ 080bda32 4874
     b LAB_080bd8f2                           @ 080bda34 5de7
     .byte  0x00, 0x00
-DAT_080bda38:
-    .word  0x04000052                     @ 080bda38 52000004
+PTR_BLDALPHA_080bda38:
+    .word  BLDALPHA                       @ 080bda38 52000004
 DAT_080bda3c:
     .word  0x0201fec0                     @ 080bda3c c0fe0102
 switchD_080bd88a__caseD_4:
@@ -220634,12 +220634,12 @@ switchD_080bda92__caseD_0:
     movs r3,#0x8    @ 080bdad0 0823
     bl tile_2d_row_copy                      @ 080bdad2 39f0fffc
     bl FUN_080f55d4                          @ 080bdad6 37f07dfd
-    ldr r1, DAT_080bdb10                     @ 080bdada 0d49
+    ldr r1, PTR_BLDCNT_080bdb10              @ 080bdada 0d49
     movs r2,#0xfd    @ 080bdadc fd22
     lsls r2,r2,#0x6    @ 080bdade 9201
     adds r0,r2,#0x0    @ 080bdae0 101c
     strh r0,[r1,#0x0]                        @ 080bdae2 0880
-    ldr r0, DAT_080bdb14                     @ 080bdae4 0b48
+    ldr r0, PTR_BLDALPHA_080bdb14            @ 080bdae4 0b48
     movs r1,#0x0    @ 080bdae6 0021
     strh r1,[r0,#0x0]                        @ 080bdae8 0180
     ldr r0, DAT_080bdb18                     @ 080bdaea 0b48
@@ -220662,10 +220662,10 @@ DAT_080bdb08:
     .word  0x098cc084                     @ 080bdb08 84c08c09
 DAT_080bdb0c:
     .word  0x06014000                     @ 080bdb0c 00400106
-DAT_080bdb10:
-    .word  0x04000050                     @ 080bdb10 50000004
-DAT_080bdb14:
-    .word  0x04000052                     @ 080bdb14 52000004
+PTR_BLDCNT_080bdb10:
+    .word  BLDCNT                         @ 080bdb10 50000004
+PTR_BLDALPHA_080bdb14:
+    .word  BLDALPHA                       @ 080bdb14 52000004
 DAT_080bdb18:
     .word  0x0201fec0                     @ 080bdb18 c0fe0102
 switchD_080bda92__caseD_2:
@@ -220792,12 +220792,12 @@ switchD_080bdbca__caseD_0:
     movs r3,#0x4    @ 080bdc08 0423
     bl tile_2d_row_copy                      @ 080bdc0a 39f063fc
     bl FUN_080f55d4                          @ 080bdc0e 37f0e1fc
-    ldr r1, DAT_080bdc48                     @ 080bdc12 0d49
+    ldr r1, PTR_BLDCNT_080bdc48              @ 080bdc12 0d49
     movs r2,#0xfd    @ 080bdc14 fd22
     lsls r2,r2,#0x6    @ 080bdc16 9201
     adds r0,r2,#0x0    @ 080bdc18 101c
     strh r0,[r1,#0x0]                        @ 080bdc1a 0880
-    ldr r0, DAT_080bdc4c                     @ 080bdc1c 0b48
+    ldr r0, PTR_BLDALPHA_080bdc4c            @ 080bdc1c 0b48
     movs r1,#0x0    @ 080bdc1e 0021
     strh r1,[r0,#0x0]                        @ 080bdc20 0180
     ldr r0, DAT_080bdc50                     @ 080bdc22 0b48
@@ -220820,10 +220820,10 @@ DAT_080bdc40:
     .word  0x098c9064                     @ 080bdc40 64908c09
 DAT_080bdc44:
     .word  0x06014000                     @ 080bdc44 00400106
-DAT_080bdc48:
-    .word  0x04000050                     @ 080bdc48 50000004
-DAT_080bdc4c:
-    .word  0x04000052                     @ 080bdc4c 52000004
+PTR_BLDCNT_080bdc48:
+    .word  BLDCNT                         @ 080bdc48 50000004
+PTR_BLDALPHA_080bdc4c:
+    .word  BLDALPHA                       @ 080bdc4c 52000004
 DAT_080bdc50:
     .word  0x0201fec0                     @ 080bdc50 c0fe0102
 switchD_080bdbca__caseD_2:
@@ -220971,7 +220971,7 @@ switchD_080bdd18__caseD_0:
     movs r3,#0x4    @ 080bdd6a 0423
     bl tile_2d_row_copy                      @ 080bdd6c 39f0b2fb
     bl FUN_080f55d4                          @ 080bdd70 37f030fc
-    ldr r1, DAT_080bddd0                     @ 080bdd74 1649
+    ldr r1, PTR_WIN0H_080bddd0               @ 080bdd74 1649
     ldr r2, DAT_080bddd4                     @ 080bdd76 174a
     adds r0,r2,#0x0    @ 080bdd78 101c
     strh r0,[r1,#0x0]                        @ 080bdd7a 0880
@@ -221018,8 +221018,8 @@ DAT_080bddc8:
     .word  0x098ae044                     @ 080bddc8 44e08a09
 DAT_080bddcc:
     .word  0x06014000                     @ 080bddcc 00400106
-DAT_080bddd0:
-    .word  0x04000040                     @ 080bddd0 40000004
+PTR_WIN0H_080bddd0:
+    .word  WIN0H                          @ 080bddd0 40000004
 DAT_080bddd4:
     .word  0x000028f0                     @ 080bddd4 f0280000
 DAT_080bddd8:
@@ -221029,7 +221029,7 @@ DAT_080bdddc:
 DAT_080bdde0:
     .word  0x0201fec0                     @ 080bdde0 c0fe0102
 switchD_080bdd18__caseD_1:
-    ldr r1, DAT_080bddf4                     @ 080bdde4 0349
+    ldr r1, PTR_BLDCNT_080bddf4              @ 080bdde4 0349
     movs r0,#0xef    @ 080bdde6 ef20
     strh r0,[r1,#0x0]                        @ 080bdde8 0880
     adds r1,#0x4    @ 080bddea 0431
@@ -221037,10 +221037,10 @@ switchD_080bdd18__caseD_1:
     strh r0,[r1,#0x0]                        @ 080bddee 0880
     b LAB_080bdf00                           @ 080bddf0 86e0
     .byte  0x00, 0x00
-DAT_080bddf4:
-    .word  0x04000050                     @ 080bddf4 50000004
+PTR_BLDCNT_080bddf4:
+    .word  BLDCNT                         @ 080bddf4 50000004
 switchD_080bdd18__caseD_2:
-    ldr r3, DAT_080bde30                     @ 080bddf8 0d4b
+    ldr r3, PTR_WIN0V_080bde30               @ 080bddf8 0d4b
     ldrb r0,[r4,#0x11]                       @ 080bddfa 607c
     lsls r2,r0,#0x1    @ 080bddfc 4200
     adds r2,r2,r0    @ 080bddfe 1218
@@ -221068,8 +221068,8 @@ switchD_080bdd18__caseD_2:
     movs r0,#0x0    @ 080bde2a 0020
     strb r0,[r4,#0x11]                       @ 080bde2c 6074
     b LAB_080bddb4                           @ 080bde2e c1e7
-DAT_080bde30:
-    .word  0x04000044                     @ 080bde30 44000004
+PTR_WIN0V_080bde30:
+    .word  WIN0V                          @ 080bde30 44000004
 switchD_080bdd18__caseD_3:
     ldrb r0,[r4,#0x11]                       @ 080bde34 607c
     cmp r0,#0x10                             @ 080bde36 1028
@@ -221152,7 +221152,7 @@ DAT_080bdecc:
 DAT_080bded0:
     .word  0x0201fec0                     @ 080bded0 c0fe0102
 switchD_080bdd18__caseD_4:
-    ldr r2, DAT_080bdf08                     @ 080bded4 0c4a
+    ldr r2, PTR_WIN0V_080bdf08               @ 080bded4 0c4a
     ldrb r1,[r4,#0x11]                       @ 080bded6 617c
     lsls r0,r1,#0x1    @ 080bded8 4800
     adds r0,r0,r1    @ 080bdeda 4018
@@ -221179,8 +221179,8 @@ LAB_080bdf00:
     adds r0,#0x1    @ 080bdf02 0130
     strb r0,[r4,#0x10]                       @ 080bdf04 2074
     b LAB_080bddb4                           @ 080bdf06 55e7
-DAT_080bdf08:
-    .word  0x04000044                     @ 080bdf08 44000004
+PTR_WIN0V_080bdf08:
+    .word  WIN0V                          @ 080bdf08 44000004
 switchD_080bdd18__caseD_5:
     bl FUN_080f55d4                          @ 080bdf0c 37f062fb
     movs r2,#0x80    @ 080bdf10 8022
@@ -221414,7 +221414,7 @@ LAB_080be0b4:
     movs r3,#0x8    @ 080be0d8 0823
     bl tile_2d_row_copy                      @ 080be0da 39f0fbf9
     bl FUN_080f55d4                          @ 080be0de 37f079fa
-    ldr r1, DAT_080be128                     @ 080be0e2 1149
+    ldr r1, PTR_WINOUT_080be128              @ 080be0e2 1149
     ldr r3, DAT_080be12c                     @ 080be0e4 114b
     adds r0,r3,#0x0    @ 080be0e6 181c
     strh r0,[r1,#0x0]                        @ 080be0e8 0880
@@ -221449,8 +221449,8 @@ DAT_080be120:
     .word  0x06016000                     @ 080be120 00600106
 DAT_080be124:
     .word  0x098a5044                     @ 080be124 44508a09
-DAT_080be128:
-    .word  0x0400004a                     @ 080be128 4a000004
+PTR_WINOUT_080be128:
+    .word  WINOUT                         @ 080be128 4a000004
 DAT_080be12c:
     .word  0x00001f3f                     @ 080be12c 3f1f0000
 switchD_080bdfcc__caseD_1:
@@ -221531,7 +221531,7 @@ LAB_080be140:
     .hword 0x4641    @ 080be1ca 4146
     cmp r1,#0x2                              @ 080be1cc 0229
     ble LAB_080be140                         @ 080be1ce b7dd
-    ldr r1, DAT_080be200                     @ 080be1d0 0b49
+    ldr r1, PTR_BLDY_080be200                @ 080be1d0 0b49
     ldr r2, DAT_080be1f4                     @ 080be1d2 084a
     ldrb r0,[r2,#0x11]                       @ 080be1d4 507c
     strh r0,[r1,#0x0]                        @ 080be1d6 0880
@@ -221556,8 +221556,8 @@ DAT_080be1f8:
     .word  0x000040c0                     @ 080be1f8 c0400000
 DAT_080be1fc:
     .word  0x000048c0                     @ 080be1fc c0480000
-DAT_080be200:
-    .word  0x04000054                     @ 080be200 54000004
+PTR_BLDY_080be200:
+    .word  BLDY                           @ 080be200 54000004
 switchD_080bdfcc__caseD_2:
     movs r7,#0x30    @ 080be204 3027
     movs r2,#0x0    @ 080be206 0022
@@ -221986,7 +221986,7 @@ LAB_080be4b4:
     .hword 0x4640    @ 080be560 4046
     cmp r0,#0x2                              @ 080be562 0228
     ble LAB_080be4b4                         @ 080be564 a6dd
-    ldr r0, DAT_080be594                     @ 080be566 0b48
+    ldr r0, PTR_BLDY_080be594                @ 080be566 0b48
     ldr r2, DAT_080be588                     @ 080be568 074a
     movs r1,#0x8    @ 080be56a 0821
     ldrb r3,[r2,#0x11]                       @ 080be56c 537c
@@ -222009,8 +222009,8 @@ DAT_080be58c:
     .word  0x000048c0                     @ 080be58c c0480000
 DAT_080be590:
     .word  0x000040c0                     @ 080be590 c0400000
-DAT_080be594:
-    .word  0x04000054                     @ 080be594 54000004
+PTR_BLDY_080be594:
+    .word  BLDY                           @ 080be594 54000004
 switchD_080bdfcc__caseD_6:
     bl FUN_080f55d4                          @ 080be598 37f01cf8
     movs r2,#0x80    @ 080be59c 8022
@@ -222122,7 +222122,7 @@ switchD_080be626__caseD_0:
     movs r3,#0x8    @ 080be66a 0823
     bl tile_2d_row_copy                      @ 080be66c 38f032ff
     bl FUN_080f55d4                          @ 080be670 36f0b0ff
-    ldr r1, DAT_080be6b0                     @ 080be674 0e49
+    ldr r1, PTR_WINOUT_080be6b0              @ 080be674 0e49
     ldr r2, DAT_080be6b4                     @ 080be676 0f4a
     adds r0,r2,#0x0    @ 080be678 101c
     strh r0,[r1,#0x0]                        @ 080be67a 0880
@@ -222152,8 +222152,8 @@ DAT_080be6a8:
     .word  0x098a5024                     @ 080be6a8 24508a09
 DAT_080be6ac:
     .word  0x06014000                     @ 080be6ac 00400106
-DAT_080be6b0:
-    .word  0x0400004a                     @ 080be6b0 4a000004
+PTR_WINOUT_080be6b0:
+    .word  WINOUT                         @ 080be6b0 4a000004
 DAT_080be6b4:
     .word  0x00001f3f                     @ 080be6b4 3f1f0000
 switchD_080be626__caseD_1:
@@ -222254,7 +222254,7 @@ LAB_080be72e:
     adds r7,#0x1    @ 080be778 0137
     cmp r7,#0x2                              @ 080be77a 022f
     ble LAB_080be72e                         @ 080be77c d7dd
-    ldr r1, DAT_080be7b4                     @ 080be77e 0d49
+    ldr r1, PTR_BLDY_080be7b4                @ 080be77e 0d49
     ldr r4, DAT_080be7a8                     @ 080be780 094c
     ldrb r0,[r4,#0x11]                       @ 080be782 607c
     strh r0,[r1,#0x0]                        @ 080be784 0880
@@ -222281,8 +222281,8 @@ DAT_080be7ac:
     .word  0x000048c0                     @ 080be7ac c0480000
 DAT_080be7b0:
     .word  0x000040c0                     @ 080be7b0 c0400000
-DAT_080be7b4:
-    .word  0x04000054                     @ 080be7b4 54000004
+PTR_BLDY_080be7b4:
+    .word  BLDY                           @ 080be7b4 54000004
 switchD_080be626__caseD_2:
     adds r1,r3,#0x0    @ 080be7b8 191c
     ldrb r0,[r1,#0x11]                       @ 080be7ba 487c
@@ -222464,7 +222464,7 @@ LAB_080be8ca:
     adds r7,#0x1    @ 080be91c 0137
     cmp r7,#0x2                              @ 080be91e 022f
     ble LAB_080be8ca                         @ 080be920 d3dd
-    ldr r0, DAT_080be950                     @ 080be922 0b48
+    ldr r0, PTR_BLDY_080be950                @ 080be922 0b48
     ldr r2, DAT_080be944                     @ 080be924 074a
     movs r1,#0x8    @ 080be926 0821
     ldrb r3,[r2,#0x11]                       @ 080be928 537c
@@ -222487,8 +222487,8 @@ DAT_080be948:
     .word  0x000048c0                     @ 080be948 c0480000
 DAT_080be94c:
     .word  0x000040c0                     @ 080be94c c0400000
-DAT_080be950:
-    .word  0x04000054                     @ 080be950 54000004
+PTR_BLDY_080be950:
+    .word  BLDY                           @ 080be950 54000004
 switchD_080be626__caseD_4:
     bl FUN_080f55d4                          @ 080be954 36f03efe
     movs r2,#0x80    @ 080be958 8022
@@ -224185,7 +224185,7 @@ LAB_080bf634:
     movs r1,#0x0    @ 080bf65a 0021
     movs r2,#0x1    @ 080bf65c 0122
     bl FUN_080f7e48                          @ 080bf65e 38f0f3fb
-    ldr r1, DAT_080bf6c0                     @ 080bf662 1749
+    ldr r1, PTR_WIN0H_080bf6c0               @ 080bf662 1749
     ldr r3, DAT_080bf6c4                     @ 080bf664 174b
     adds r0,r3,#0x0    @ 080bf666 181c
     strh r0,[r1,#0x0]                        @ 080bf668 0880
@@ -224232,12 +224232,12 @@ DAT_080bf6b8:
     .word  0x0989da88                     @ 080bf6b8 88da8909
 DAT_080bf6bc:
     .word  0x02000003                     @ 080bf6bc 03000002
-DAT_080bf6c0:
-    .word  0x04000040                     @ 080bf6c0 40000004
+PTR_WIN0H_080bf6c0:
+    .word  WIN0H                          @ 080bf6c0 40000004
 DAT_080bf6c4:
     .word  0x000028f0                     @ 080bf6c4 f0280000
 switchD_080bf5dc__caseD_1:
-    ldr r1, DAT_080bf6f0                     @ 080bf6c8 0949
+    ldr r1, PTR_BLDY_080bf6f0                @ 080bf6c8 0949
     ldrh r2,[r3,#0x12]                       @ 080bf6ca 5a8a
     lsls r0,r2,#0x1    @ 080bf6cc 5000
     strh r0,[r1,#0x0]                        @ 080bf6ce 0880
@@ -224257,8 +224257,8 @@ switchD_080bf5dc__caseD_1:
     strb r0,[r3,#0x11]                       @ 080bf6ea 5874
     b LAB_080bf7c2                           @ 080bf6ec 69e0
     .byte  0x00, 0x00
-DAT_080bf6f0:
-    .word  0x04000054                     @ 080bf6f0 54000004
+PTR_BLDY_080bf6f0:
+    .word  BLDY                           @ 080bf6f0 54000004
 switchD_080bf5dc__caseD_2:
     ldr r5, DAT_080bf758                     @ 080bf6f4 184d
     movs r1,#0x96    @ 080bf6f6 9621
@@ -224336,7 +224336,7 @@ DAT_080bf788:
 DAT_080bf78c:
     .word  0x0058007c                     @ 080bf78c 7c005800
 switchD_080bf5dc__caseD_4:
-    ldr r2, DAT_080bf7ac                     @ 080bf790 064a
+    ldr r2, PTR_BLDY_080bf7ac                @ 080bf790 064a
     ldrh r0,[r3,#0x12]                       @ 080bf792 588a
     lsls r1,r0,#0x1    @ 080bf794 4100
     movs r0,#0x8    @ 080bf796 0820
@@ -224350,8 +224350,8 @@ switchD_080bf5dc__caseD_4:
     cmp r0,#0x4                              @ 080bf7a6 0428
     bls LAB_080bf7c2                         @ 080bf7a8 0bd9
     b LAB_080bf7bc                           @ 080bf7aa 07e0
-DAT_080bf7ac:
-    .word  0x04000054                     @ 080bf7ac 54000004
+PTR_BLDY_080bf7ac:
+    .word  BLDY                           @ 080bf7ac 54000004
 switchD_080bf5dc__caseD_5:
     movs r2,#0x80    @ 080bf7b0 8022
     lsls r2,r2,#0x13    @ 080bf7b2 d204
@@ -224921,7 +224921,7 @@ LAB_080bfbd2:
     ldr r0, DAT_080bfc20                     @ 080bfbdc 1048
     movs r1,#0x0    @ 080bfbde 0021
     bl FUN_080f37d4                          @ 080bfbe0 33f0f8fd
-    ldr r1, DAT_080bfc24                     @ 080bfbe4 0f49
+    ldr r1, PTR_WIN0H_080bfc24               @ 080bfbe4 0f49
     ldr r2, DAT_080bfc28                     @ 080bfbe6 104a
     adds r0,r2,#0x0    @ 080bfbe8 101c
     strh r0,[r1,#0x0]                        @ 080bfbea 0880
@@ -224953,12 +224953,12 @@ DAT_080bfc1c:
     .word  0x09dc8842                     @ 080bfc1c 4288dc09
 DAT_080bfc20:
     .word  0x06014200                     @ 080bfc20 00420106
-DAT_080bfc24:
-    .word  0x04000040                     @ 080bfc24 40000004
+PTR_WIN0H_080bfc24:
+    .word  WIN0H                          @ 080bfc24 40000004
 DAT_080bfc28:
     .word  0x000028f0                     @ 080bfc28 f0280000
 switchD_080bf82a__caseD_1:
-    ldr r1, DAT_080bfc58                     @ 080bfc2c 0a49
+    ldr r1, PTR_BLDY_080bfc58                @ 080bfc2c 0a49
     ldrh r2,[r4,#0x12]                       @ 080bfc2e 628a
     lsls r0,r2,#0x1    @ 080bfc30 5000
     strh r0,[r1,#0x0]                        @ 080bfc32 0880
@@ -224980,8 +224980,8 @@ LAB_080bfc44:
     strb r0,[r4,#0x10]                       @ 080bfc52 2074
     b LAB_080bfd7a                           @ 080bfc54 91e0
     .byte  0x00, 0x00
-DAT_080bfc58:
-    .word  0x04000054                     @ 080bfc58 54000004
+PTR_BLDY_080bfc58:
+    .word  BLDY                           @ 080bfc58 54000004
 switchD_080bf82a__caseD_2:
     ldr r2, DAT_080bfd10                     @ 080bfc5c 2c4a
     ldr r0,[r4,#0x18]                        @ 080bfc5e a069
@@ -225137,7 +225137,7 @@ LAB_080bfd7a:
     movs r0,#0x1    @ 080bfd7a 0120
     b LAB_080bfdf4                           @ 080bfd7c 3ae0
 switchD_080bf82a__caseD_3:
-    ldr r2, DAT_080bfda0                     @ 080bfd7e 084a
+    ldr r2, PTR_BLDY_080bfda0                @ 080bfd7e 084a
     ldrh r0,[r4,#0x12]                       @ 080bfd80 608a
     lsls r1,r0,#0x1    @ 080bfd82 4100
     movs r0,#0x8    @ 080bfd84 0820
@@ -225154,8 +225154,8 @@ switchD_080bf82a__caseD_3:
     adds r0,#0x1    @ 080bfd9a 0130
     strb r0,[r4,#0x10]                       @ 080bfd9c 2074
     b LAB_080bfd7a                           @ 080bfd9e ece7
-DAT_080bfda0:
-    .word  0x04000054                     @ 080bfda0 54000004
+PTR_BLDY_080bfda0:
+    .word  BLDY                           @ 080bfda0 54000004
 switchD_080bf82a__caseD_4:
     ldr r0, DAT_080bfdc8                     @ 080bfda4 0848
     ldr r1, DAT_080bfdcc                     @ 080bfda6 0949
@@ -226542,7 +226542,7 @@ switchD_080c0808__caseD_0:
     adds r0,r2,#0x0    @ 080c082c 101c
     bl FUN_080c05b4                          @ 080c082e fff7c1fe
     bl FUN_080f55d4                          @ 080c0832 34f0cffe
-    ldr r1, DAT_080c0874                     @ 080c0836 0f49
+    ldr r1, PTR_WIN0H_080c0874               @ 080c0836 0f49
     ldr r2, DAT_080c0878                     @ 080c0838 0f4a
     adds r0,r2,#0x0    @ 080c083a 101c
     strh r0,[r1,#0x0]                        @ 080c083c 0880
@@ -226573,8 +226573,8 @@ switchD_080c0808__caseD_0:
     orrs r0,r1    @ 080c086e 0843
     b LAB_080c0a2a                           @ 080c0870 dbe0
     .byte  0x00, 0x00
-DAT_080c0874:
-    .word  0x04000040                     @ 080c0874 40000004
+PTR_WIN0H_080c0874:
+    .word  WIN0H                          @ 080c0874 40000004
 DAT_080c0878:
     .word  0x00005abe                     @ 080c0878 be5a0000
 DAT_080c087c:
@@ -226683,7 +226683,7 @@ LAB_080c08c2:
     cmp r0,#0xf                              @ 080c094c 0f28
     bls LAB_080c0a08                         @ 080c094e 5bd9
     bl FUN_080f55d4                          @ 080c0950 34f040fe
-    ldr r1, DAT_080c0970                     @ 080c0954 0649
+    ldr r1, PTR_BLDCNT_080c0970              @ 080c0954 0649
     movs r0,#0x90    @ 080c0956 9020
     strh r0,[r1,#0x0]                        @ 080c0958 0880
     movs r0,#0x0    @ 080c095a 0020
@@ -226697,8 +226697,8 @@ DAT_080c0968:
     .word  0x0201fec0                     @ 080c0968 c0fe0102
 DAT_080c096c:
     .word  0x09e5f8f0                     @ 080c096c f0f8e509
-DAT_080c0970:
-    .word  0x04000050                     @ 080c0970 50000004
+PTR_BLDCNT_080c0970:
+    .word  BLDCNT                         @ 080c0970 50000004
 switchD_080c0808__caseD_2:
     movs r0,#0x5    @ 080c0974 0520
     movs r1,#0x90    @ 080c0976 9021
@@ -226733,7 +226733,7 @@ switchD_080c0808__caseD_3:
     bls LAB_080c09c8                         @ 080c09b2 09d9
     movs r0,#0x0    @ 080c09b4 0020
     strh r0,[r2,#0x12]                       @ 080c09b6 5082
-    ldr r1, DAT_080c09d0                     @ 080c09b8 0549
+    ldr r1, PTR_BLDCNT_080c09d0              @ 080c09b8 0549
     movs r3,#0xfd    @ 080c09ba fd23
     lsls r3,r3,#0x6    @ 080c09bc 9b01
     adds r0,r3,#0x0    @ 080c09be 181c
@@ -226746,13 +226746,13 @@ LAB_080c09c8:
     b LAB_080c0a04                           @ 080c09ca 1be0
 DAT_080c09cc:
     .word  0x0201fec0                     @ 080c09cc c0fe0102
-DAT_080c09d0:
-    .word  0x04000050                     @ 080c09d0 50000004
+PTR_BLDCNT_080c09d0:
+    .word  BLDCNT                         @ 080c09d0 50000004
 switchD_080c0808__caseD_4:
     ldr r4, DAT_080c0a0c                     @ 080c09d4 0d4c
     ldrh r0,[r4,#0x12]                       @ 080c09d6 608a
     lsrs r1,r0,#0x1    @ 080c09d8 4108
-    ldr r3, DAT_080c0a10                     @ 080c09da 0d4b
+    ldr r3, PTR_BLDALPHA_080c0a10            @ 080c09da 0d4b
     lsls r2,r1,#0x2    @ 080c09dc 8a00
     movs r0,#0x10    @ 080c09de 1020
     subs r0,r0,r2    @ 080c09e0 801a
@@ -226781,8 +226781,8 @@ LAB_080c0a08:
     b LAB_080c0a68                           @ 080c0a0a 2de0
 DAT_080c0a0c:
     .word  0x0201fec0                     @ 080c0a0c c0fe0102
-DAT_080c0a10:
-    .word  0x04000052                     @ 080c0a10 52000004
+PTR_BLDALPHA_080c0a10:
+    .word  BLDALPHA                       @ 080c0a10 52000004
 switchD_080c0808__caseD_5:
     ldr r0, DAT_080c0a38                     @ 080c0a14 0848
     ldr r1, DAT_080c0a3c                     @ 080c0a16 0949
@@ -226873,7 +226873,7 @@ switchD_080c0a9c__caseD_0:
     adds r0,r2,#0x0    @ 080c0ac0 101c
     bl FUN_080c05b4                          @ 080c0ac2 fff777fd
     bl FUN_080f55d4                          @ 080c0ac6 34f085fd
-    ldr r1, DAT_080c0b10                     @ 080c0aca 1149
+    ldr r1, PTR_BLDALPHA_080c0b10            @ 080c0aca 1149
     movs r2,#0x80    @ 080c0acc 8022
     lsls r2,r2,#0x5    @ 080c0ace 5201
     adds r0,r2,#0x0    @ 080c0ad0 101c
@@ -226908,8 +226908,8 @@ switchD_080c0a9c__caseD_0:
     adds r1,r3,#0x0    @ 080c0b0a 191c
     orrs r0,r1    @ 080c0b0c 0843
     b LAB_080c0c22                           @ 080c0b0e 88e0
-DAT_080c0b10:
-    .word  0x04000052                     @ 080c0b10 52000004
+PTR_BLDALPHA_080c0b10:
+    .word  BLDALPHA                       @ 080c0b10 52000004
 DAT_080c0b14:
     .word  0x00005abe                     @ 080c0b14 be5a0000
 DAT_080c0b18:
@@ -226918,7 +226918,7 @@ switchD_080c0a9c__caseD_1:
     ldr r5, DAT_080c0b60                     @ 080c0b1c 104d
     ldrh r0,[r5,#0x12]                       @ 080c0b1e 688a
     lsrs r4,r0,#0x1    @ 080c0b20 4408
-    ldr r3, DAT_080c0b64                     @ 080c0b22 104b
+    ldr r3, PTR_BLDALPHA_080c0b64            @ 080c0b22 104b
     lsls r2,r4,#0x2    @ 080c0b24 a200
     lsls r1,r4,#0x1a    @ 080c0b26 a106
     lsrs r1,r1,#0x18    @ 080c0b28 090e
@@ -226938,7 +226938,7 @@ switchD_080c0a9c__caseD_1:
     cmp r0,#0x7                              @ 080c0b46 0728
     bls LAB_080c0c00                         @ 080c0b48 5ad9
     bl FUN_080f55d4                          @ 080c0b4a 34f043fd
-    ldr r1, DAT_080c0b68                     @ 080c0b4e 0649
+    ldr r1, PTR_BLDCNT_080c0b68              @ 080c0b4e 0649
     movs r0,#0x90    @ 080c0b50 9020
     strh r0,[r1,#0x0]                        @ 080c0b52 0880
     movs r0,#0x0    @ 080c0b54 0020
@@ -226949,10 +226949,10 @@ switchD_080c0a9c__caseD_1:
     b LAB_080c0c00                           @ 080c0b5e 4fe0
 DAT_080c0b60:
     .word  0x0201fec0                     @ 080c0b60 c0fe0102
-DAT_080c0b64:
-    .word  0x04000052                     @ 080c0b64 52000004
-DAT_080c0b68:
-    .word  0x04000050                     @ 080c0b68 50000004
+PTR_BLDALPHA_080c0b64:
+    .word  BLDALPHA                       @ 080c0b64 52000004
+PTR_BLDCNT_080c0b68:
+    .word  BLDCNT                         @ 080c0b68 50000004
 switchD_080c0a9c__caseD_2:
     movs r0,#0x5    @ 080c0b6c 0520
     movs r1,#0x90    @ 080c0b6e 9021
@@ -226987,7 +226987,7 @@ switchD_080c0a9c__caseD_3:
     bls LAB_080c0bc0                         @ 080c0baa 09d9
     movs r0,#0x0    @ 080c0bac 0020
     strh r0,[r2,#0x12]                       @ 080c0bae 5082
-    ldr r1, DAT_080c0bc8                     @ 080c0bb0 0549
+    ldr r1, PTR_BLDCNT_080c0bc8              @ 080c0bb0 0549
     movs r3,#0xfd    @ 080c0bb2 fd23
     lsls r3,r3,#0x6    @ 080c0bb4 9b01
     adds r0,r3,#0x0    @ 080c0bb6 181c
@@ -227000,13 +227000,13 @@ LAB_080c0bc0:
     b LAB_080c0bfc                           @ 080c0bc2 1be0
 DAT_080c0bc4:
     .word  0x0201fec0                     @ 080c0bc4 c0fe0102
-DAT_080c0bc8:
-    .word  0x04000050                     @ 080c0bc8 50000004
+PTR_BLDCNT_080c0bc8:
+    .word  BLDCNT                         @ 080c0bc8 50000004
 switchD_080c0a9c__caseD_4:
     ldr r3, DAT_080c0c04                     @ 080c0bcc 0d4b
     ldrh r0,[r3,#0x12]                       @ 080c0bce 588a
     lsrs r4,r0,#0x1    @ 080c0bd0 4408
-    ldr r2, DAT_080c0c08                     @ 080c0bd2 0d4a
+    ldr r2, PTR_BLDALPHA_080c0c08            @ 080c0bd2 0d4a
     lsls r1,r4,#0x2    @ 080c0bd4 a100
     movs r0,#0x10    @ 080c0bd6 1020
     subs r0,r0,r1    @ 080c0bd8 401a
@@ -227035,8 +227035,8 @@ LAB_080c0c00:
     b LAB_080c0c60                           @ 080c0c02 2de0
 DAT_080c0c04:
     .word  0x0201fec0                     @ 080c0c04 c0fe0102
-DAT_080c0c08:
-    .word  0x04000052                     @ 080c0c08 52000004
+PTR_BLDALPHA_080c0c08:
+    .word  BLDALPHA                       @ 080c0c08 52000004
 switchD_080c0a9c__caseD_5:
     ldr r0, DAT_080c0c30                     @ 080c0c0c 0848
     ldr r1, DAT_080c0c34                     @ 080c0c0e 0949
@@ -227169,11 +227169,11 @@ switchD_080c0cb8__caseD_0:
     movs r1,#0x0    @ 080c0d14 0021
     movs r2,#0x0    @ 080c0d16 0022
     bl FUN_080f7e48                          @ 080c0d18 37f096f8
-    ldr r1, DAT_080c0d8c                     @ 080c0d1c 1b49
+    ldr r1, PTR_WIN0H_080c0d8c               @ 080c0d1c 1b49
     ldr r2, DAT_080c0d90                     @ 080c0d1e 1c4a
     adds r0,r2,#0x0    @ 080c0d20 101c
     strh r0,[r1,#0x0]                        @ 080c0d22 0880
-    ldr r2, DAT_080c0d94                     @ 080c0d24 1b4a
+    ldr r2, PTR_WIN0V_080c0d94               @ 080c0d24 1b4a
     adds r1,r5,#0x0    @ 080c0d26 291c
     adds r1,#0x38    @ 080c0d28 3831
     lsls r1,r1,#0x18    @ 080c0d2a 0906
@@ -227184,7 +227184,7 @@ switchD_080c0cb8__caseD_0:
     lsrs r0,r0,#0x10    @ 080c0d34 000c
     orrs r1,r0    @ 080c0d36 0143
     strh r1,[r2,#0x0]                        @ 080c0d38 1180
-    ldr r1, DAT_080c0d98                     @ 080c0d3a 1749
+    ldr r1, PTR_WININ_080c0d98               @ 080c0d3a 1749
     movs r0,#0x3f    @ 080c0d3c 3f20
     strh r0,[r1,#0x0]                        @ 080c0d3e 0880
     adds r1,#0x2    @ 080c0d40 0231
@@ -227224,20 +227224,20 @@ DAT_080c0d84:
     .word  0x0201fedc                     @ 080c0d84 dcfe0102
 DAT_080c0d88:
     .word  0x098a4e48                     @ 080c0d88 484e8a09
-DAT_080c0d8c:
-    .word  0x04000040                     @ 080c0d8c 40000004
+PTR_WIN0H_080c0d8c:
+    .word  WIN0H                          @ 080c0d8c 40000004
 DAT_080c0d90:
     .word  0x000028f0                     @ 080c0d90 f0280000
-DAT_080c0d94:
-    .word  0x04000044                     @ 080c0d94 44000004
-DAT_080c0d98:
-    .word  0x04000048                     @ 080c0d98 48000004
+PTR_WIN0V_080c0d94:
+    .word  WIN0V                          @ 080c0d94 44000004
+PTR_WININ_080c0d98:
+    .word  WININ                          @ 080c0d98 48000004
 DAT_080c0d9c:
     .word  0x0201fec4                     @ 080c0d9c c4fe0102
 DAT_080c0da0:
     .word  0x02023130                     @ 080c0da0 30310202
 switchD_080c0cb8__caseD_1:
-    ldr r1, DAT_080c0dcc                     @ 080c0da4 0949
+    ldr r1, PTR_BLDY_080c0dcc                @ 080c0da4 0949
     ldr r2, DAT_080c0dd0                     @ 080c0da6 0a4a
     ldrb r3,[r2,#0x11]                       @ 080c0da8 537c
     lsls r0,r3,#0x1    @ 080c0daa 5800
@@ -227258,8 +227258,8 @@ LAB_080c0dbe:
     strb r0,[r2,#0x11]                       @ 080c0dc6 5074
     b LAB_080c0ef8                           @ 080c0dc8 96e0
     .byte  0x00, 0x00
-DAT_080c0dcc:
-    .word  0x04000054                     @ 080c0dcc 54000004
+PTR_BLDY_080c0dcc:
+    .word  BLDY                           @ 080c0dcc 54000004
 DAT_080c0dd0:
     .word  0x0201fec0                     @ 080c0dd0 c0fe0102
 switchD_080c0cb8__caseD_2:
@@ -227365,7 +227365,7 @@ switchD_080c0cb8__caseD_4:
 DAT_080c0ea8:
     .word  0x0201fec0                     @ 080c0ea8 c0fe0102
 switchD_080c0cb8__caseD_5:
-    ldr r2, DAT_080c0ed4                     @ 080c0eac 094a
+    ldr r2, PTR_BLDY_080c0ed4                @ 080c0eac 094a
     ldr r3, DAT_080c0ed8                     @ 080c0eae 0a4b
     ldrb r0,[r3,#0x11]                       @ 080c0eb0 587c
     lsls r1,r0,#0x1    @ 080c0eb2 4100
@@ -227385,8 +227385,8 @@ switchD_080c0cb8__caseD_5:
     movs r0,#0x0    @ 080c0ece 0020
     strb r0,[r3,#0x11]                       @ 080c0ed0 5874
     b LAB_080c0ef8                           @ 080c0ed2 11e0
-DAT_080c0ed4:
-    .word  0x04000054                     @ 080c0ed4 54000004
+PTR_BLDY_080c0ed4:
+    .word  BLDY                           @ 080c0ed4 54000004
 DAT_080c0ed8:
     .word  0x0201fec0                     @ 080c0ed8 c0fe0102
 switchD_080c0cb8__caseD_6:
@@ -227555,11 +227555,11 @@ LAB_080c1008:
     adds r0,r6,#0x0    @ 080c101e 301c
     cmp r0,#0x3                              @ 080c1020 0328
     ble LAB_080c0fe4                         @ 080c1022 dfdd
-    ldr r1, DAT_080c107c                     @ 080c1024 1549
+    ldr r1, PTR_WIN0H_080c107c               @ 080c1024 1549
     ldr r2, DAT_080c1080                     @ 080c1026 164a
     adds r0,r2,#0x0    @ 080c1028 101c
     strh r0,[r1,#0x0]                        @ 080c102a 0880
-    ldr r2, DAT_080c1084                     @ 080c102c 154a
+    ldr r2, PTR_WIN0V_080c1084               @ 080c102c 154a
     .hword 0x4643    @ 080c102e 4346
     lsls r1,r3,#0x18    @ 080c1030 1906
     lsrs r1,r1,#0x18    @ 080c1032 090e
@@ -227568,7 +227568,7 @@ LAB_080c1008:
     lsrs r0,r0,#0x10    @ 080c1038 000c
     orrs r1,r0    @ 080c103a 0143
     strh r1,[r2,#0x0]                        @ 080c103c 1180
-    ldr r1, DAT_080c1088                     @ 080c103e 1249
+    ldr r1, PTR_WININ_080c1088               @ 080c103e 1249
     movs r0,#0x3f    @ 080c1040 3f20
     strh r0,[r1,#0x0]                        @ 080c1042 0880
     adds r1,#0x2    @ 080c1044 0231
@@ -227600,16 +227600,16 @@ DAT_080c1074:
     .word  0x098973f8                     @ 080c1074 f8738909
 DAT_080c1078:
     .word  0x0201fec0                     @ 080c1078 c0fe0102
-DAT_080c107c:
-    .word  0x04000040                     @ 080c107c 40000004
+PTR_WIN0H_080c107c:
+    .word  WIN0H                          @ 080c107c 40000004
 DAT_080c1080:
     .word  0x000028f0                     @ 080c1080 f0280000
-DAT_080c1084:
-    .word  0x04000044                     @ 080c1084 44000004
-DAT_080c1088:
-    .word  0x04000048                     @ 080c1088 48000004
+PTR_WIN0V_080c1084:
+    .word  WIN0V                          @ 080c1084 44000004
+PTR_WININ_080c1088:
+    .word  WININ                          @ 080c1088 48000004
 switchD_080c0f92__caseD_1:
-    ldr r1, DAT_080c10b0                     @ 080c108c 0849
+    ldr r1, PTR_BLDY_080c10b0                @ 080c108c 0849
     ldr r2, DAT_080c10b4                     @ 080c108e 094a
     ldrb r3,[r2,#0x11]                       @ 080c1090 537c
     lsls r0,r3,#0x1    @ 080c1092 5800
@@ -227627,8 +227627,8 @@ switchD_080c0f92__caseD_1:
     movs r0,#0x0    @ 080c10aa 0020
     strb r0,[r2,#0x11]                       @ 080c10ac 5074
     b LAB_080c106c                           @ 080c10ae dde7
-DAT_080c10b0:
-    .word  0x04000054                     @ 080c10b0 54000004
+PTR_BLDY_080c10b0:
+    .word  BLDY                           @ 080c10b0 54000004
 DAT_080c10b4:
     .word  0x0201fec0                     @ 080c10b4 c0fe0102
 switchD_080c0f92__caseD_2:
@@ -227759,7 +227759,7 @@ LAB_080c11ae:
 DAT_080c11bc:
     .word  0x0201fec0                     @ 080c11bc c0fe0102
 switchD_080c0f92__caseD_5:
-    ldr r2, DAT_080c11ec                     @ 080c11c0 0a4a
+    ldr r2, PTR_BLDY_080c11ec                @ 080c11c0 0a4a
     ldr r3, DAT_080c11f0                     @ 080c11c2 0b4b
     ldrb r7,[r3,#0x11]                       @ 080c11c4 5f7c
     lsls r1,r7,#0x1    @ 080c11c6 7900
@@ -227782,8 +227782,8 @@ LAB_080c11de:
     strb r0,[r3,#0x11]                       @ 080c11e6 5874
     b LAB_080c106c                           @ 080c11e8 40e7
     .byte  0x00, 0x00
-DAT_080c11ec:
-    .word  0x04000054                     @ 080c11ec 54000004
+PTR_BLDY_080c11ec:
+    .word  BLDY                           @ 080c11ec 54000004
 DAT_080c11f0:
     .word  0x0201fec0                     @ 080c11f0 c0fe0102
 switchD_080c0f92__caseD_6:
@@ -228194,11 +228194,11 @@ LAB_080c14fc:
     movs r2,#0x18    @ 080c1516 1822
     movs r3,#0x2    @ 080c1518 0223
     bl tile_2d_row_copy                      @ 080c151a 35f0dbff
-    ldr r1, DAT_080c158c                     @ 080c151e 1b49
+    ldr r1, PTR_WIN0H_080c158c               @ 080c151e 1b49
     ldr r2, DAT_080c1590                     @ 080c1520 1b4a
     adds r0,r2,#0x0    @ 080c1522 101c
     strh r0,[r1,#0x0]                        @ 080c1524 0880
-    ldr r2, DAT_080c1594                     @ 080c1526 1b4a
+    ldr r2, PTR_WIN0V_080c1594               @ 080c1526 1b4a
     movs r1,#0x2c    @ 080c1528 2c21
     adds r1,#0x40    @ 080c152a 4031
     movs r0,#0x2c    @ 080c152c 2c20
@@ -228207,7 +228207,7 @@ LAB_080c14fc:
     lsrs r0,r0,#0x10    @ 080c1532 000c
     orrs r1,r0    @ 080c1534 0143
     strh r1,[r2,#0x0]                        @ 080c1536 1180
-    ldr r1, DAT_080c1598                     @ 080c1538 1749
+    ldr r1, PTR_WININ_080c1598               @ 080c1538 1749
     movs r0,#0x3f    @ 080c153a 3f20
     strh r0,[r1,#0x0]                        @ 080c153c 0880
     adds r1,#0x2    @ 080c153e 0231
@@ -228250,14 +228250,14 @@ DAT_080c1584:
     .word  0x06014900                     @ 080c1584 00490106
 DAT_080c1588:
     .word  0x09851ffc                     @ 080c1588 fc1f8509
-DAT_080c158c:
-    .word  0x04000040                     @ 080c158c 40000004
+PTR_WIN0H_080c158c:
+    .word  WIN0H                          @ 080c158c 40000004
 DAT_080c1590:
     .word  0x000028f0                     @ 080c1590 f0280000
-DAT_080c1594:
-    .word  0x04000044                     @ 080c1594 44000004
-DAT_080c1598:
-    .word  0x04000048                     @ 080c1598 48000004
+PTR_WIN0V_080c1594:
+    .word  WIN0V                          @ 080c1594 44000004
+PTR_WININ_080c1598:
+    .word  WININ                          @ 080c1598 48000004
 DAT_080c159c:
     .word  0x080c15a0                     @ 080c159c a0150c08
 switchD_080c156c__switchdataD_080c15a0:
@@ -228308,7 +228308,7 @@ LAB_080c15e2:
     bl FUN_080cb1cc                          @ 080c1604 09f0e2fd
     b LAB_080c178c                           @ 080c1608 c0e0
 switchD_080c14ac__caseD_1:
-    ldr r1, DAT_080c1630                     @ 080c160a 0949
+    ldr r1, PTR_BLDY_080c1630                @ 080c160a 0949
     ldrb r2,[r4,#0x11]                       @ 080c160c 627c
     lsls r0,r2,#0x1    @ 080c160e 5000
     strh r0,[r1,#0x0]                        @ 080c1610 0880
@@ -228328,8 +228328,8 @@ LAB_080c1622:
     strb r0,[r4,#0x11]                       @ 080c162a 6074
     b LAB_080c1794                           @ 080c162c b2e0
     .byte  0x00, 0x00
-DAT_080c1630:
-    .word  0x04000054                     @ 080c1630 54000004
+PTR_BLDY_080c1630:
+    .word  BLDY                           @ 080c1630 54000004
 switchD_080c14ac__caseD_2:
     .hword 0x4640    @ 080c1634 4046
     subs r3,r0,r5    @ 080c1636 431b
@@ -228476,7 +228476,7 @@ switchD_080c14ac__caseD_4:
 DAT_080c1748:
     .word  0x0201fec0                     @ 080c1748 c0fe0102
 switchD_080c14ac__caseD_5:
-    ldr r2, DAT_080c1774                     @ 080c174c 094a
+    ldr r2, PTR_BLDY_080c1774                @ 080c174c 094a
     ldrb r3,[r4,#0x11]                       @ 080c174e 637c
     lsls r1,r3,#0x1    @ 080c1750 5900
     movs r0,#0x8    @ 080c1752 0820
@@ -228496,8 +228496,8 @@ switchD_080c14ac__caseD_5:
     strb r0,[r4,#0x11]                       @ 080c176e 6074
     b LAB_080c1794                           @ 080c1770 10e0
     .byte  0x00, 0x00
-DAT_080c1774:
-    .word  0x04000054                     @ 080c1774 54000004
+PTR_BLDY_080c1774:
+    .word  BLDY                           @ 080c1774 54000004
 switchD_080c14ac__caseD_6:
     movs r2,#0x80    @ 080c1778 8022
     lsls r2,r2,#0x13    @ 080c177a d204
@@ -228612,11 +228612,11 @@ switchD_080c180a__caseD_0:
     movs r2,#0x18    @ 080c1858 1822
     movs r3,#0x2    @ 080c185a 0223
     bl tile_2d_row_copy                      @ 080c185c 35f03afe
-    ldr r1, DAT_080c18c8                     @ 080c1860 1949
+    ldr r1, PTR_WIN0H_080c18c8               @ 080c1860 1949
     ldr r3, DAT_080c18cc                     @ 080c1862 1a4b
     adds r0,r3,#0x0    @ 080c1864 181c
     strh r0,[r1,#0x0]                        @ 080c1866 0880
-    ldr r2, DAT_080c18d0                     @ 080c1868 194a
+    ldr r2, PTR_WIN0V_080c18d0               @ 080c1868 194a
     .hword 0x4649    @ 080c186a 4946
     adds r1,#0x40    @ 080c186c 4031
     .hword 0x4648    @ 080c186e 4846
@@ -228625,7 +228625,7 @@ switchD_080c180a__caseD_0:
     lsrs r0,r0,#0x10    @ 080c1874 000c
     orrs r1,r0    @ 080c1876 0143
     strh r1,[r2,#0x0]                        @ 080c1878 1180
-    ldr r1, DAT_080c18d4                     @ 080c187a 1649
+    ldr r1, PTR_WININ_080c18d4               @ 080c187a 1649
     movs r0,#0x3f    @ 080c187c 3f20
     strh r0,[r1,#0x0]                        @ 080c187e 0880
     adds r1,#0x2    @ 080c1880 0231
@@ -228665,14 +228665,14 @@ DAT_080c18c0:
     .word  0x06014900                     @ 080c18c0 00490106
 DAT_080c18c4:
     .word  0x09851ffc                     @ 080c18c4 fc1f8509
-DAT_080c18c8:
-    .word  0x04000040                     @ 080c18c8 40000004
+PTR_WIN0H_080c18c8:
+    .word  WIN0H                          @ 080c18c8 40000004
 DAT_080c18cc:
     .word  0x000028f0                     @ 080c18cc f0280000
-DAT_080c18d0:
-    .word  0x04000044                     @ 080c18d0 44000004
-DAT_080c18d4:
-    .word  0x04000048                     @ 080c18d4 48000004
+PTR_WIN0V_080c18d0:
+    .word  WIN0V                          @ 080c18d0 44000004
+PTR_WININ_080c18d4:
+    .word  WININ                          @ 080c18d4 48000004
 DAT_080c18d8:
     .word  0x080c18dc                     @ 080c18d8 dc180c08
 switchD_080c18ac__switchdataD_080c18dc:
@@ -228722,7 +228722,7 @@ LAB_080c191c:
     bl FUN_080cb1cc                          @ 080c193e 09f045fc
     b LAB_080c1a88                           @ 080c1942 a1e0
 switchD_080c180a__caseD_1:
-    ldr r1, DAT_080c196c                     @ 080c1944 0949
+    ldr r1, PTR_BLDY_080c196c                @ 080c1944 0949
     ldr r2, DAT_080c1970                     @ 080c1946 0a4a
     ldrb r3,[r2,#0x11]                       @ 080c1948 537c
     lsls r0,r3,#0x1    @ 080c194a 5800
@@ -228743,8 +228743,8 @@ LAB_080c195e:
     strb r0,[r2,#0x11]                       @ 080c1966 5074
     b LAB_080c1a90                           @ 080c1968 92e0
     .byte  0x00, 0x00
-DAT_080c196c:
-    .word  0x04000054                     @ 080c196c 54000004
+PTR_BLDY_080c196c:
+    .word  BLDY                           @ 080c196c 54000004
 DAT_080c1970:
     .word  0x0201fec0                     @ 080c1970 c0fe0102
 switchD_080c180a__caseD_2:
@@ -228852,7 +228852,7 @@ switchD_080c180a__caseD_4:
 DAT_080c1a40:
     .word  0x0201fec0                     @ 080c1a40 c0fe0102
 switchD_080c180a__caseD_5:
-    ldr r2, DAT_080c1a6c                     @ 080c1a44 094a
+    ldr r2, PTR_BLDY_080c1a6c                @ 080c1a44 094a
     ldr r3, DAT_080c1a70                     @ 080c1a46 0a4b
     ldrb r0,[r3,#0x11]                       @ 080c1a48 587c
     lsls r1,r0,#0x1    @ 080c1a4a 4100
@@ -228872,8 +228872,8 @@ switchD_080c180a__caseD_5:
     movs r0,#0x0    @ 080c1a66 0020
     strb r0,[r3,#0x11]                       @ 080c1a68 5874
     b LAB_080c1a90                           @ 080c1a6a 11e0
-DAT_080c1a6c:
-    .word  0x04000054                     @ 080c1a6c 54000004
+PTR_BLDY_080c1a6c:
+    .word  BLDY                           @ 080c1a6c 54000004
 DAT_080c1a70:
     .word  0x0201fec0                     @ 080c1a70 c0fe0102
 switchD_080c180a__caseD_6:
@@ -229179,7 +229179,7 @@ switchD_080c1c80__caseD_0:
     ldr r1, DAT_080c1cf8                     @ 080c1cbc 0e49
     movs r2,#0x20    @ 080c1cbe 2022
     bl FUN_080f4ea4                          @ 080c1cc0 33f0f0f8
-    ldr r1, DAT_080c1cfc                     @ 080c1cc4 0d49
+    ldr r1, PTR_BLDALPHA_080c1cfc            @ 080c1cc4 0d49
     movs r3,#0x80    @ 080c1cc6 8023
     lsls r3,r3,#0x5    @ 080c1cc8 5b01
     adds r0,r3,#0x0    @ 080c1cca 181c
@@ -229208,12 +229208,12 @@ DAT_080c1cf4:
     .word  0x05000260                     @ 080c1cf4 60020005
 DAT_080c1cf8:
     .word  0x0990940c                     @ 080c1cf8 0c949009
-DAT_080c1cfc:
-    .word  0x04000052                     @ 080c1cfc 52000004
+PTR_BLDALPHA_080c1cfc:
+    .word  BLDALPHA                       @ 080c1cfc 52000004
 DAT_080c1d00:
     .word  0x0201fec0                     @ 080c1d00 c0fe0102
 switchD_080c1c80__caseD_1:
-    ldr r3, DAT_080c1d68                     @ 080c1d04 184b
+    ldr r3, PTR_BLDALPHA_080c1d68            @ 080c1d04 184b
     ldrb r1,[r4,#0x11]                       @ 080c1d06 617c
     lsls r2,r1,#0x1    @ 080c1d08 4a00
     lsls r1,r1,#0x19    @ 080c1d0a 4906
@@ -229262,8 +229262,8 @@ LAB_080c1d20:
     movs r0,#0x12    @ 080c1d60 1220
     bl FUN_080f9ab4                          @ 080c1d62 37f0a7fe
     b LAB_080c1ce0                           @ 080c1d66 bbe7
-DAT_080c1d68:
-    .word  0x04000052                     @ 080c1d68 52000004
+PTR_BLDALPHA_080c1d68:
+    .word  BLDALPHA                       @ 080c1d68 52000004
 DAT_080c1d6c:
     .word  0x000044c0                     @ 080c1d6c c0440000
 DAT_080c1d70:
@@ -229310,7 +229310,7 @@ DAT_080c1dbc:
 DAT_080c1dc0:
     .word  0x0201fec0                     @ 080c1dc0 c0fe0102
 switchD_080c1c80__caseD_3:
-    ldr r3, DAT_080c1e34                     @ 080c1dc4 1b4b
+    ldr r3, PTR_BLDALPHA_080c1e34            @ 080c1dc4 1b4b
     ldrb r1,[r4,#0x11]                       @ 080c1dc6 617c
     lsls r2,r1,#0x1    @ 080c1dc8 4a00
     movs r0,#0x10    @ 080c1dca 1020
@@ -229367,8 +229367,8 @@ LAB_080c1e18:
     movs r0,#0x0    @ 080c1e2e 0020
     strb r0,[r2,#0x11]                       @ 080c1e30 5074
     b LAB_080c1ce0                           @ 080c1e32 55e7
-DAT_080c1e34:
-    .word  0x04000052                     @ 080c1e34 52000004
+PTR_BLDALPHA_080c1e34:
+    .word  BLDALPHA                       @ 080c1e34 52000004
 DAT_080c1e38:
     .word  0x000044c0                     @ 080c1e38 c0440000
 DAT_080c1e3c:
@@ -229534,7 +229534,7 @@ switchD_080c1f2e__caseD_0:
     movs r3,#0x4    @ 080c1f78 0423
     bl tile_2d_row_copy                      @ 080c1f7a 35f0abfa
     bl FUN_080f55d4                          @ 080c1f7e 33f029fb
-    ldr r1, DAT_080c1fc0                     @ 080c1f82 0f49
+    ldr r1, PTR_WINOUT_080c1fc0              @ 080c1f82 0f49
     ldr r3, DAT_080c1fc4                     @ 080c1f84 0f4b
     adds r0,r3,#0x0    @ 080c1f86 181c
     strh r0,[r1,#0x0]                        @ 080c1f88 0880
@@ -229565,12 +229565,12 @@ DAT_080c1fb8:
     .word  0x00006c2c                     @ 080c1fb8 2c6c0000
 DAT_080c1fbc:
     .word  0x09912e5c                     @ 080c1fbc 5c2e9109
-DAT_080c1fc0:
-    .word  0x0400004a                     @ 080c1fc0 4a000004
+PTR_WINOUT_080c1fc0:
+    .word  WINOUT                         @ 080c1fc0 4a000004
 DAT_080c1fc4:
     .word  0x00001f3f                     @ 080c1fc4 3f1f0000
 switchD_080c1f2e__caseD_1:
-    ldr r1, DAT_080c1fe8                     @ 080c1fc8 0749
+    ldr r1, PTR_BLDY_080c1fe8                @ 080c1fc8 0749
     ldrh r0,[r3,#0x12]                       @ 080c1fca 588a
     strh r0,[r1,#0x0]                        @ 080c1fcc 0880
     adds r0,#0x1    @ 080c1fce 0130
@@ -229587,8 +229587,8 @@ LAB_080c1fdc:
     movs r0,#0x0    @ 080c1fe2 0020
     strh r0,[r3,#0x12]                       @ 080c1fe4 5882
     b LAB_080c2188                           @ 080c1fe6 cfe0
-DAT_080c1fe8:
-    .word  0x04000054                     @ 080c1fe8 54000004
+PTR_BLDY_080c1fe8:
+    .word  BLDY                           @ 080c1fe8 54000004
 switchD_080c1f2e__caseD_2:
     ldr r0, DAT_080c2054                     @ 080c1fec 1948
     ldrh r2,[r3,#0x12]                       @ 080c1fee 5a8a
@@ -229763,7 +229763,7 @@ DAT_080c2140:
 DAT_080c2144:
     .word  0x0201fec0                     @ 080c2144 c0fe0102
 switchD_080c1f2e__caseD_5:
-    ldr r2, DAT_080c216c                     @ 080c2148 084a
+    ldr r2, PTR_BLDY_080c216c                @ 080c2148 084a
     ldrh r1,[r3,#0x12]                       @ 080c214a 598a
     movs r0,#0x8    @ 080c214c 0820
     subs r0,r0,r1    @ 080c214e 401a
@@ -229781,8 +229781,8 @@ switchD_080c1f2e__caseD_5:
     strh r0,[r3,#0x12]                       @ 080c2166 5882
     b LAB_080c2188                           @ 080c2168 0ee0
     .byte  0x00, 0x00
-DAT_080c216c:
-    .word  0x04000054                     @ 080c216c 54000004
+PTR_BLDY_080c216c:
+    .word  BLDY                           @ 080c216c 54000004
 switchD_080c1f2e__caseD_6:
     bl FUN_080f55d4                          @ 080c2170 33f030fa
     movs r2,#0x80    @ 080c2174 8022
@@ -229903,7 +229903,7 @@ switchD_080c2210__caseD_0:
     movs r2,#0x18    @ 080c2252 1822
     movs r3,#0x4    @ 080c2254 0423
     bl tile_2d_row_copy                      @ 080c2256 35f03df9
-    ldr r1, DAT_080c2288                     @ 080c225a 0b49
+    ldr r1, PTR_WINOUT_080c2288              @ 080c225a 0b49
     ldr r3, DAT_080c228c                     @ 080c225c 0b4b
     adds r0,r3,#0x0    @ 080c225e 181c
     strh r0,[r1,#0x0]                        @ 080c2260 0880
@@ -229926,8 +229926,8 @@ DAT_080c2280:
     .word  0x05000260                     @ 080c2280 60020005
 DAT_080c2284:
     .word  0x06014000                     @ 080c2284 00400106
-DAT_080c2288:
-    .word  0x0400004a                     @ 080c2288 4a000004
+PTR_WINOUT_080c2288:
+    .word  WINOUT                         @ 080c2288 4a000004
 DAT_080c228c:
     .word  0x00001f3f                     @ 080c228c 3f1f0000
 switchD_080c2210__caseD_1:
@@ -229976,7 +229976,7 @@ LAB_080c22a2:
     subs r6,#0x1    @ 080c22e6 013e
     cmp r6,#0x0                              @ 080c22e8 002e
     bge LAB_080c22a2                         @ 080c22ea dada
-    ldr r1, DAT_080c231c                     @ 080c22ec 0b49
+    ldr r1, PTR_BLDY_080c231c                @ 080c22ec 0b49
     ldr r2, DAT_080c2310                     @ 080c22ee 084a
     ldrh r0,[r2,#0x12]                       @ 080c22f0 508a
     strh r0,[r1,#0x0]                        @ 080c22f2 0880
@@ -230001,8 +230001,8 @@ DAT_080c2314:
     .word  0x000048c0                     @ 080c2314 c0480000
 DAT_080c2318:
     .word  0x000040c0                     @ 080c2318 c0400000
-DAT_080c231c:
-    .word  0x04000054                     @ 080c231c 54000004
+PTR_BLDY_080c231c:
+    .word  BLDY                           @ 080c231c 54000004
 switchD_080c2210__caseD_2:
     ldrh r2,[r6,#0x12]                       @ 080c2320 728a
     adds r0,r3,#0x0    @ 080c2322 181c
@@ -230224,7 +230224,7 @@ LAB_080c248c:
     subs r6,#0x1    @ 080c24d4 013e
     cmp r6,#0x0                              @ 080c24d6 002e
     bge LAB_080c248c                         @ 080c24d8 d8da
-    ldr r2, DAT_080c250c                     @ 080c24da 0c4a
+    ldr r2, PTR_BLDY_080c250c                @ 080c24da 0c4a
     ldr r3, DAT_080c2500                     @ 080c24dc 084b
     ldrh r1,[r3,#0x12]                       @ 080c24de 598a
     movs r0,#0x8    @ 080c24e0 0820
@@ -230249,8 +230249,8 @@ DAT_080c2504:
     .word  0x000048c0                     @ 080c2504 c0480000
 DAT_080c2508:
     .word  0x000040c0                     @ 080c2508 c0400000
-DAT_080c250c:
-    .word  0x04000054                     @ 080c250c 54000004
+PTR_BLDY_080c250c:
+    .word  BLDY                           @ 080c250c 54000004
 switchD_080c2210__caseD_6:
     bl FUN_080f55d4                          @ 080c2510 33f060f8
     movs r2,#0x80    @ 080c2514 8022
@@ -231922,17 +231922,17 @@ LAB_080c317e:
     cmp r5,#0x1                              @ 080c31a6 012d
     ble LAB_080c317e                         @ 080c31a8 e9dd
     movs r3,#0x0    @ 080c31aa 0023
-    ldr r1, DAT_080c3218                     @ 080c31ac 1a49
+    ldr r1, PTR_WIN0H_080c3218               @ 080c31ac 1a49
     ldr r2, DAT_080c321c                     @ 080c31ae 1b4a
     adds r0,r2,#0x0    @ 080c31b0 101c
     strh r0,[r1,#0x0]                        @ 080c31b2 0880
-    ldr r2, DAT_080c3220                     @ 080c31b4 1a4a
+    ldr r2, PTR_WIN0V_080c3220               @ 080c31b4 1a4a
     movs r0,#0x28    @ 080c31b6 2820
     lsls r0,r0,#0x8    @ 080c31b8 0002
     movs r1,#0x68    @ 080c31ba 6821
     orrs r0,r1    @ 080c31bc 0843
     strh r0,[r2,#0x0]                        @ 080c31be 1080
-    ldr r1, DAT_080c3224                     @ 080c31c0 1849
+    ldr r1, PTR_WININ_080c3224               @ 080c31c0 1849
     movs r0,#0x3f    @ 080c31c2 3f20
     strh r0,[r1,#0x0]                        @ 080c31c4 0880
     adds r1,#0x2    @ 080c31c6 0231
@@ -231941,7 +231941,7 @@ LAB_080c317e:
     adds r1,#0x6    @ 080c31cc 0631
     movs r0,#0xef    @ 080c31ce ef20
     strh r0,[r1,#0x0]                        @ 080c31d0 0880
-    ldr r0, DAT_080c3228                     @ 080c31d2 1548
+    ldr r0, PTR_BLDY_080c3228                @ 080c31d2 1548
     strh r3,[r0,#0x0]                        @ 080c31d4 0380
     subs r2,#0x44    @ 080c31d6 443a
     ldrh r0,[r2,#0x0]                        @ 080c31d8 1088
@@ -231976,23 +231976,23 @@ DAT_080c3210:
     .word  0x098543fc                     @ 080c3210 fc438509
 DAT_080c3214:
     .word  0x02100003                     @ 080c3214 03001002
-DAT_080c3218:
-    .word  0x04000040                     @ 080c3218 40000004
+PTR_WIN0H_080c3218:
+    .word  WIN0H                          @ 080c3218 40000004
 DAT_080c321c:
     .word  0x000028f0                     @ 080c321c f0280000
-DAT_080c3220:
-    .word  0x04000044                     @ 080c3220 44000004
-DAT_080c3224:
-    .word  0x04000048                     @ 080c3224 48000004
-DAT_080c3228:
-    .word  0x04000054                     @ 080c3228 54000004
+PTR_WIN0V_080c3220:
+    .word  WIN0V                          @ 080c3220 44000004
+PTR_WININ_080c3224:
+    .word  WININ                          @ 080c3224 48000004
+PTR_BLDY_080c3228:
+    .word  BLDY                           @ 080c3228 54000004
 switchD_080c30a0__caseD_1:
-    ldr r1, DAT_080c3234                     @ 080c322c 0149
+    ldr r1, PTR_BLDY_080c3234                @ 080c322c 0149
     movs r0,#0x8    @ 080c322e 0820
     b LAB_080c3324                           @ 080c3230 78e0
     .byte  0x00, 0x00
-DAT_080c3234:
-    .word  0x04000054                     @ 080c3234 54000004
+PTR_BLDY_080c3234:
+    .word  BLDY                           @ 080c3234 54000004
 switchD_080c30a0__caseD_2:
     adds r0,r2,#0x0    @ 080c3238 101c
     bl FUN_080c305c                          @ 080c323a fff70fff
@@ -232116,7 +232116,7 @@ DAT_080c3318:
 DAT_080c331c:
     .word  0xfffff807                     @ 080c331c 07f8ffff
 switchD_080c30a0__caseD_3:
-    ldr r1, DAT_080c3340                     @ 080c3320 0749
+    ldr r1, PTR_BLDY_080c3340                @ 080c3320 0749
     movs r0,#0x0    @ 080c3322 0020
 LAB_080c3324:
     strh r0,[r1,#0x0]                        @ 080c3324 0880
@@ -232134,8 +232134,8 @@ LAB_080c3324:
 LAB_080c333c:
     movs r0,#0x1    @ 080c333c 0120
     b LAB_080c33aa                           @ 080c333e 34e0
-DAT_080c3340:
-    .word  0x04000054                     @ 080c3340 54000004
+PTR_BLDY_080c3340:
+    .word  BLDY                           @ 080c3340 54000004
 DAT_080c3344:
     .word  0xfffff807                     @ 080c3344 07f8ffff
 switchD_080c30a0__caseD_4:
@@ -239467,7 +239467,7 @@ LAB_080c7fdc:
     ldrb r2,[r1,#0x0]                        @ 080c7fe2 0a78
     orrs r0,r2    @ 080c7fe4 1043
     strb r0,[r1,#0x0]                        @ 080c7fe6 0870
-    ldr r1, DAT_080c8034                     @ 080c7fe8 1249
+    ldr r1, PTR_WIN0H_080c8034               @ 080c7fe8 1249
     ldr r3, DAT_080c8038                     @ 080c7fea 134b
     adds r0,r3,#0x0    @ 080c7fec 181c
     strh r0,[r1,#0x0]                        @ 080c7fee 0880
@@ -239507,8 +239507,8 @@ LAB_080c802c:
     b LAB_080c82cc                           @ 080c802e 4de1
 DAT_080c8030:
     .word  0x00000215                     @ 080c8030 15020000
-DAT_080c8034:
-    .word  0x04000040                     @ 080c8034 40000004
+PTR_WIN0H_080c8034:
+    .word  WIN0H                          @ 080c8034 40000004
 DAT_080c8038:
     .word  0x000028f0                     @ 080c8038 f0280000
 DAT_080c803c:
@@ -239811,7 +239811,7 @@ DAT_080c82a0:
 DAT_080c82a4:
     .word  0xfffffe01                     @ 080c82a4 01feffff
 switchD_080c7ebe__caseD_5:
-    ldr r0, DAT_080c82d4                     @ 080c82a8 0a48
+    ldr r0, PTR_WININ_080c82d4               @ 080c82a8 0a48
     movs r1,#0x0    @ 080c82aa 0021
     strh r1,[r0,#0x0]                        @ 080c82ac 0180
     adds r0,#0x2    @ 080c82ae 0230
@@ -239834,8 +239834,8 @@ LAB_080c82cc:
     pop {r1}                                 @ 080c82ce 02bc
     bx r1                                    @ 080c82d0 0847
     .byte  0x00, 0x00
-DAT_080c82d4:
-    .word  0x04000048                     @ 080c82d4 48000004
+PTR_WININ_080c82d4:
+    .word  WININ                          @ 080c82d4 48000004
 DAT_080c82d8:
     .word  0x0000dfff                     @ 080c82d8 ffdf0000
 DAT_080c82dc:
@@ -243036,7 +243036,7 @@ switchD_080c9cb2__switchdataD_080c9cbc:
     .word  0x080c9e54                     @ 080c9cd8 549e0c08
     .word  0x080c9e68                     @ 080c9cdc 689e0c08
 switchD_080c9cb2__caseD_0:
-    ldr r1, DAT_080c9d38                     @ 080c9ce0 1549
+    ldr r1, PTR_WIN1H_080c9d38               @ 080c9ce0 1549
     ldr r2, DAT_080c9d3c                     @ 080c9ce2 164a
     adds r0,r2,#0x0    @ 080c9ce4 101c
     strh r0,[r1,#0x0]                        @ 080c9ce6 0880
@@ -243063,7 +243063,7 @@ switchD_080c9cb2__caseD_0:
     lsls r2,r2,#0x6    @ 080c9d10 9201
     adds r0,r2,#0x0    @ 080c9d12 101c
     strh r0,[r1,#0x0]                        @ 080c9d14 0880
-    ldr r0, DAT_080c9d4c                     @ 080c9d16 0d48
+    ldr r0, PTR_BLDALPHA_080c9d4c            @ 080c9d16 0d48
     movs r1,#0x0    @ 080c9d18 0021
     strh r1,[r0,#0x0]                        @ 080c9d1a 0180
     adds r0,#0x2    @ 080c9d1c 0230
@@ -243080,8 +243080,8 @@ LAB_080c9d32:
     movs r0,#0x0    @ 080c9d32 0020
     b LAB_080c9eac                           @ 080c9d34 bae0
     .byte  0x00, 0x00
-DAT_080c9d38:
-    .word  0x04000042                     @ 080c9d38 42000004
+PTR_WIN1H_080c9d38:
+    .word  WIN1H                          @ 080c9d38 42000004
 DAT_080c9d3c:
     .word  0x000028f0                     @ 080c9d3c f0280000
 DAT_080c9d40:
@@ -243090,8 +243090,8 @@ DAT_080c9d44:
     .word  0x00001878                     @ 080c9d44 78180000
 DAT_080c9d48:
     .word  0x00002f3f                     @ 080c9d48 3f2f0000
-DAT_080c9d4c:
-    .word  0x04000052                     @ 080c9d4c 52000004
+PTR_BLDALPHA_080c9d4c:
+    .word  BLDALPHA                       @ 080c9d4c 52000004
 DAT_080c9d50:
     .word  0x02023130                     @ 080c9d50 30310202
 switchD_080c9cb2__caseD_1:
@@ -243105,7 +243105,7 @@ switchD_080c9cb2__caseD_1:
     strh r0,[r2,#0x0]                        @ 080c9d62 1080
     b LAB_080c9e82                           @ 080c9d64 8de0
 switchD_080c9cb2__caseD_2:
-    ldr r3, DAT_080c9d94                     @ 080c9d66 0b4b
+    ldr r3, PTR_BLDALPHA_080c9d94            @ 080c9d66 0b4b
     ldrh r1,[r4,#0x2]                        @ 080c9d68 6188
     lsls r2,r1,#0x2    @ 080c9d6a 8a00
     lsls r1,r1,#0x1a    @ 080c9d6c 8906
@@ -243123,17 +243123,17 @@ switchD_080c9cb2__caseD_2:
     lsrs r0,r0,#0x10    @ 080c9d84 000c
     cmp r0,#0x4                              @ 080c9d86 0428
     bls LAB_080c9e46                         @ 080c9d88 5dd9
-    ldr r1, DAT_080c9d98                     @ 080c9d8a 0349
+    ldr r1, PTR_BLDCNT_080c9d98              @ 080c9d8a 0349
     movs r0,#0xcc    @ 080c9d8c cc20
     strh r0,[r1,#0x0]                        @ 080c9d8e 0880
     b LAB_080c9e3c                           @ 080c9d90 54e0
     .byte  0x00, 0x00
-DAT_080c9d94:
-    .word  0x04000052                     @ 080c9d94 52000004
-DAT_080c9d98:
-    .word  0x04000050                     @ 080c9d98 50000004
+PTR_BLDALPHA_080c9d94:
+    .word  BLDALPHA                       @ 080c9d94 52000004
+PTR_BLDCNT_080c9d98:
+    .word  BLDCNT                         @ 080c9d98 50000004
 switchD_080c9cb2__caseD_3:
-    ldr r1, DAT_080c9dc0                     @ 080c9d9c 0849
+    ldr r1, PTR_BLDY_080c9dc0                @ 080c9d9c 0849
     ldrh r2,[r4,#0x2]                        @ 080c9d9e 6288
     lsls r0,r2,#0x1    @ 080c9da0 5000
     strh r0,[r1,#0x0]                        @ 080c9da2 0880
@@ -243152,8 +243152,8 @@ switchD_080c9cb2__caseD_3:
 LAB_080c9dbc:
     movs r0,#0x0    @ 080c9dbc 0020
     b LAB_080c9e4a                           @ 080c9dbe 44e0
-DAT_080c9dc0:
-    .word  0x04000054                     @ 080c9dc0 54000004
+PTR_BLDY_080c9dc0:
+    .word  BLDY                           @ 080c9dc0 54000004
 switchD_080c9cb2__caseD_4:
     movs r0,#0x0    @ 080c9dc4 0020
     bl FUN_080c9ac8                          @ 080c9dc6 fff77ffe
@@ -243167,7 +243167,7 @@ switchD_080c9cb2__caseD_4:
 DAT_080c9dd8:
     .word  0x02023130                     @ 080c9dd8 30310202
 switchD_080c9cb2__caseD_5:
-    ldr r2, DAT_080c9e10                     @ 080c9ddc 0c4a
+    ldr r2, PTR_BLDY_080c9e10                @ 080c9ddc 0c4a
     ldrh r3,[r4,#0x2]                        @ 080c9dde 6388
     lsls r1,r3,#0x1    @ 080c9de0 5900
     movs r0,#0x8    @ 080c9de2 0820
@@ -243180,7 +243180,7 @@ switchD_080c9cb2__caseD_5:
     lsrs r0,r0,#0x10    @ 080c9df0 000c
     cmp r0,#0x4                              @ 080c9df2 0428
     bls LAB_080c9e0a                         @ 080c9df4 09d9
-    ldr r1, DAT_080c9e14                     @ 080c9df6 0749
+    ldr r1, PTR_BLDCNT_080c9e14              @ 080c9df6 0749
     movs r2,#0xfd    @ 080c9df8 fd22
     lsls r2,r2,#0x6    @ 080c9dfa 9201
     adds r0,r2,#0x0    @ 080c9dfc 101c
@@ -243194,12 +243194,12 @@ LAB_080c9e0a:
     movs r0,#0x0    @ 080c9e0a 0020
     b LAB_080c9e4a                           @ 080c9e0c 1de0
     .byte  0x00, 0x00
-DAT_080c9e10:
-    .word  0x04000054                     @ 080c9e10 54000004
-DAT_080c9e14:
-    .word  0x04000050                     @ 080c9e14 50000004
+PTR_BLDY_080c9e10:
+    .word  BLDY                           @ 080c9e10 54000004
+PTR_BLDCNT_080c9e14:
+    .word  BLDCNT                         @ 080c9e14 50000004
 switchD_080c9cb2__caseD_6:
-    ldr r3, DAT_080c9e50                     @ 080c9e18 0d4b
+    ldr r3, PTR_BLDALPHA_080c9e50            @ 080c9e18 0d4b
     ldrh r1,[r4,#0x2]                        @ 080c9e1a 6188
     lsls r2,r1,#0x2    @ 080c9e1c 8a00
     movs r0,#0x10    @ 080c9e1e 1020
@@ -243229,8 +243229,8 @@ LAB_080c9e46:
 LAB_080c9e4a:
     bl FUN_080c9a10                          @ 080c9e4a fff7e1fd
     b LAB_080c9d32                           @ 080c9e4e 70e7
-DAT_080c9e50:
-    .word  0x04000052                     @ 080c9e50 52000004
+PTR_BLDALPHA_080c9e50:
+    .word  BLDALPHA                       @ 080c9e50 52000004
 switchD_080c9cb2__caseD_7:
     movs r2,#0x80    @ 080c9e54 8022
     lsls r2,r2,#0x13    @ 080c9e56 d204
@@ -243243,7 +243243,7 @@ switchD_080c9cb2__caseD_7:
 DAT_080c9e64:
     .word  0x00009fff                     @ 080c9e64 ff9f0000
 switchD_080c9cb2__caseD_8:
-    ldr r0, DAT_080c9e8c                     @ 080c9e68 0848
+    ldr r0, PTR_WIN1H_080c9e8c               @ 080c9e68 0848
     movs r1,#0x0    @ 080c9e6a 0021
     strh r1,[r0,#0x0]                        @ 080c9e6c 0180
     adds r0,#0x4    @ 080c9e6e 0430
@@ -243262,8 +243262,8 @@ LAB_080c9e82:
     strb r0,[r4,#0x1]                        @ 080c9e86 6070
     b LAB_080c9d32                           @ 080c9e88 53e7
     .byte  0x00, 0x00
-DAT_080c9e8c:
-    .word  0x04000042                     @ 080c9e8c 42000004
+PTR_WIN1H_080c9e8c:
+    .word  WIN1H                          @ 080c9e8c 42000004
 LAB_080c9e90:
     ldr r3, DAT_080c9eb4                     @ 080c9e90 084b
     adds r1,r5,r3    @ 080c9e92 e918
@@ -248358,7 +248358,7 @@ FUN_080cc904:
     adds r0,r0,r1    @ 080cc934 4018
     movs r1,#0x1    @ 080cc936 0121
     strh r1,[r0,#0x0]                        @ 080cc938 0180
-    ldr r1, DAT_080cc9ec                     @ 080cc93a 2c49
+    ldr r1, PTR_BG0CNT_080cc9ec              @ 080cc93a 2c49
     ldr r2, DAT_080cc9f0                     @ 080cc93c 2c4a
     adds r0,r2,#0x0    @ 080cc93e 101c
     strh r0,[r1,#0x0]                        @ 080cc940 0880
@@ -248437,8 +248437,8 @@ DAT_080cc9e4:
     .word  0x0203eeb0                     @ 080cc9e4 b0ee0302
 PTR_gPrng_080cc9e8:
     .word  gPrng                          @ 080cc9e8 40000003
-DAT_080cc9ec:
-    .word  0x04000008                     @ 080cc9ec 08000004
+PTR_BG0CNT_080cc9ec:
+    .word  BG0CNT                         @ 080cc9ec 08000004
 DAT_080cc9f0:
     .word  0x00001f08                     @ 080cc9f0 081f0000
 DAT_080cc9f4:
@@ -257840,7 +257840,7 @@ FUN_080d49dc:
     push {r4,r5,lr}                          @ 080d49dc 30b5
     ldr r5, DAT_080d4a40                     @ 080d49de 184d
     adds r5,#0xc    @ 080d49e0 0c35
-    ldr r1, DAT_080d4a44                     @ 080d49e2 1849
+    ldr r1, PTR_BG0CNT_080d4a44              @ 080d49e2 1849
     movs r0,#0xe0    @ 080d49e4 e020
     lsls r0,r0,#0x5    @ 080d49e6 4001
     strh r0,[r1,#0x0]                        @ 080d49e8 0880
@@ -257884,8 +257884,8 @@ FUN_080d49dc:
     .byte  0x00, 0x00
 DAT_080d4a40:
     .word  0x03005850                     @ 080d4a40 50580003
-DAT_080d4a44:
-    .word  0x04000008                     @ 080d4a44 08000004
+PTR_BG0CNT_080d4a44:
+    .word  BG0CNT                         @ 080d4a44 08000004
 DAT_080d4a48:
     .word  0x00001d86                     @ 080d4a48 861d0000
 PTR_gPrng_080d4a4c:
@@ -259120,7 +259120,7 @@ LAB_080d539a:
     lsls r0,r0,#0x4    @ 080d53a4 0001
     movs r1,#0x48    @ 080d53a6 4821
     bl bios_div                              @ 080d53a8 39f028f8
-    ldr r2, DAT_080d53c4                     @ 080d53ac 054a
+    ldr r2, PTR_BLDALPHA_080d53c4            @ 080d53ac 054a
     lsls r0,r0,#0x18    @ 080d53ae 0006
     lsrs r0,r0,#0x18    @ 080d53b0 000e
     movs r3,#0x80    @ 080d53b2 8023
@@ -259132,10 +259132,10 @@ LAB_080d539a:
     .byte  0x00, 0x00
 DAT_080d53c0:
     .word  0x03005850                     @ 080d53c0 50580003
-DAT_080d53c4:
-    .word  0x04000052                     @ 080d53c4 52000004
+PTR_BLDALPHA_080d53c4:
+    .word  BLDALPHA                       @ 080d53c4 52000004
 LAB_080d53c8:
-    ldr r1, DAT_080d5420                     @ 080d53c8 1549
+    ldr r1, PTR_BLDALPHA_080d5420            @ 080d53c8 1549
     movs r2,#0x80    @ 080d53ca 8022
     lsls r2,r2,#0x5    @ 080d53cc 5201
     adds r0,r2,#0x0    @ 080d53ce 101c
@@ -259182,8 +259182,8 @@ LAB_080d5414:
     pop {r0}                                 @ 080d541a 01bc
     bx r0                                    @ 080d541c 0047
     .byte  0x00, 0x00
-DAT_080d5420:
-    .word  0x04000052                     @ 080d5420 52000004
+PTR_BLDALPHA_080d5420:
+    .word  BLDALPHA                       @ 080d5420 52000004
 DAT_080d5424:
     .word  0x00000714                     @ 080d5424 14070000
 FUN_080d5428:
@@ -259642,7 +259642,7 @@ LAB_080d56f4:
     bl FUN_080f4f08                          @ 080d57be 1ff0a3fb
     ldr r0, DAT_080d584c                     @ 080d57c2 2248
     bl FUN_080dbe78                          @ 080d57c4 06f058fb
-    ldr r1, DAT_080d5850                     @ 080d57c8 2149
+    ldr r1, PTR_BG3CNT_080d5850              @ 080d57c8 2149
     ldrh r2,[r1,#0x0]                        @ 080d57ca 0a88
     ldr r3, DAT_080d5854                     @ 080d57cc 214b
     adds r0,r3,#0x0    @ 080d57ce 181c
@@ -259650,7 +259650,7 @@ LAB_080d56f4:
     strh r0,[r1,#0x0]                        @ 080d57d2 0880
     ldrh r0,[r1,#0x0]                        @ 080d57d4 0888
     strh r0,[r1,#0x0]                        @ 080d57d6 0880
-    ldr r2, DAT_080d5858                     @ 080d57d8 1f4a
+    ldr r2, PTR_BG0CNT_080d5858              @ 080d57d8 1f4a
     ldrh r1,[r2,#0x0]                        @ 080d57da 1188
     adds r0,r3,#0x0    @ 080d57dc 181c
     ands r0,r1    @ 080d57de 0840
@@ -259659,7 +259659,7 @@ LAB_080d56f4:
     movs r1,#0x1    @ 080d57e4 0121
     orrs r0,r1    @ 080d57e6 0843
     strh r0,[r2,#0x0]                        @ 080d57e8 1080
-    ldr r1, DAT_080d585c                     @ 080d57ea 1c49
+    ldr r1, PTR_BG1CNT_080d585c              @ 080d57ea 1c49
     ldrh r2,[r1,#0x0]                        @ 080d57ec 0a88
     adds r0,r3,#0x0    @ 080d57ee 181c
     ands r0,r2    @ 080d57f0 1040
@@ -259667,7 +259667,7 @@ LAB_080d56f4:
     ldrh r0,[r1,#0x0]                        @ 080d57f4 0888
     orrs r0,r6    @ 080d57f6 3043
     strh r0,[r1,#0x0]                        @ 080d57f8 0880
-    ldr r2, DAT_080d5860                     @ 080d57fa 194a
+    ldr r2, PTR_BG2CNT_080d5860              @ 080d57fa 194a
     ldrh r0,[r2,#0x0]                        @ 080d57fc 1088
     ands r3,r0    @ 080d57fe 0340
     strh r3,[r2,#0x0]                        @ 080d5800 1380
@@ -259675,7 +259675,7 @@ LAB_080d56f4:
     movs r1,#0x2    @ 080d5804 0221
     orrs r0,r1    @ 080d5806 0843
     strh r0,[r2,#0x0]                        @ 080d5808 1080
-    ldr r1, DAT_080d5864                     @ 080d580a 1649
+    ldr r1, PTR_BLDCNT_080d5864              @ 080d580a 1649
     ldr r2, DAT_080d5868                     @ 080d580c 164a
     adds r0,r2,#0x0    @ 080d580e 101c
     strh r0,[r1,#0x0]                        @ 080d5810 0880
@@ -259710,18 +259710,18 @@ DAT_080d5848:
     .word  0x09ccd290                     @ 080d5848 90d2cc09
 DAT_080d584c:
     .word  0x05000140                     @ 080d584c 40010005
-DAT_080d5850:
-    .word  0x0400000e                     @ 080d5850 0e000004
+PTR_BG3CNT_080d5850:
+    .word  BG3CNT                         @ 080d5850 0e000004
 DAT_080d5854:
     .word  0x0000fffc                     @ 080d5854 fcff0000
-DAT_080d5858:
-    .word  0x04000008                     @ 080d5858 08000004
-DAT_080d585c:
-    .word  0x0400000a                     @ 080d585c 0a000004
-DAT_080d5860:
-    .word  0x0400000c                     @ 080d5860 0c000004
-DAT_080d5864:
-    .word  0x04000050                     @ 080d5864 50000004
+PTR_BG0CNT_080d5858:
+    .word  BG0CNT                         @ 080d5858 08000004
+PTR_BG1CNT_080d585c:
+    .word  BG1CNT                         @ 080d585c 0a000004
+PTR_BG2CNT_080d5860:
+    .word  BG2CNT                         @ 080d5860 0c000004
+PTR_BLDCNT_080d5864:
+    .word  BLDCNT                         @ 080d5864 50000004
 DAT_080d5868:
     .word  0x00001748                     @ 080d5868 48170000
 DAT_080d586c:
@@ -259770,7 +259770,7 @@ LAB_080d58ae:
     lsls r0,r0,#0x4    @ 080d58ba 0001
     movs r1,#0x14    @ 080d58bc 1421
     bl bios_div                              @ 080d58be 38f09dfd
-    ldr r3, DAT_080d58d8                     @ 080d58c2 054b
+    ldr r3, PTR_BLDALPHA_080d58d8            @ 080d58c2 054b
     lsls r2,r0,#0x18    @ 080d58c4 0206
     lsrs r2,r2,#0x18    @ 080d58c6 120e
     movs r1,#0x10    @ 080d58c8 1021
@@ -259781,10 +259781,10 @@ LAB_080d58ae:
     strh r2,[r3,#0x0]                        @ 080d58d2 1a80
     b LAB_080d5938                           @ 080d58d4 30e0
     .byte  0x00, 0x00
-DAT_080d58d8:
-    .word  0x04000052                     @ 080d58d8 52000004
+PTR_BLDALPHA_080d58d8:
+    .word  BLDALPHA                       @ 080d58d8 52000004
 LAB_080d58dc:
-    ldr r1, DAT_080d5954                     @ 080d58dc 1d49
+    ldr r1, PTR_BG0CNT_080d5954              @ 080d58dc 1d49
     ldrh r2,[r1,#0x0]                        @ 080d58de 0a88
     ldr r3, DAT_080d5958                     @ 080d58e0 1d4b
     adds r0,r3,#0x0    @ 080d58e2 181c
@@ -259792,7 +259792,7 @@ LAB_080d58dc:
     strh r0,[r1,#0x0]                        @ 080d58e6 0880
     ldrh r0,[r1,#0x0]                        @ 080d58e8 0888
     strh r0,[r1,#0x0]                        @ 080d58ea 0880
-    ldr r2, DAT_080d595c                     @ 080d58ec 1b4a
+    ldr r2, PTR_BG1CNT_080d595c              @ 080d58ec 1b4a
     ldrh r1,[r2,#0x0]                        @ 080d58ee 1188
     adds r0,r3,#0x0    @ 080d58f0 181c
     ands r0,r1    @ 080d58f2 0840
@@ -259819,7 +259819,7 @@ LAB_080d58dc:
     orrs r0,r1    @ 080d591c 0843
     strh r0,[r2,#0x0]                        @ 080d591e 1080
     movs r6,#0x0    @ 080d5920 0026
-    ldr r1, DAT_080d5960                     @ 080d5922 0f49
+    ldr r1, PTR_BLDCNT_080d5960              @ 080d5922 0f49
     ldr r2, DAT_080d5964                     @ 080d5924 0f4a
     adds r0,r2,#0x0    @ 080d5926 101c
     strh r0,[r1,#0x0]                        @ 080d5928 0880
@@ -259842,14 +259842,14 @@ LAB_080d5938:
     pop {r1}                                 @ 080d594e 02bc
     bx r1                                    @ 080d5950 0847
     .byte  0x00, 0x00
-DAT_080d5954:
-    .word  0x04000008                     @ 080d5954 08000004
+PTR_BG0CNT_080d5954:
+    .word  BG0CNT                         @ 080d5954 08000004
 DAT_080d5958:
     .word  0x0000fffc                     @ 080d5958 fcff0000
-DAT_080d595c:
-    .word  0x0400000a                     @ 080d595c 0a000004
-DAT_080d5960:
-    .word  0x04000050                     @ 080d5960 50000004
+PTR_BG1CNT_080d595c:
+    .word  BG1CNT                         @ 080d595c 0a000004
+PTR_BLDCNT_080d5960:
+    .word  BLDCNT                         @ 080d5960 50000004
 DAT_080d5964:
     .word  0x00003f3f                     @ 080d5964 3f3f0000
 DAT_080d5968:
@@ -259865,11 +259865,11 @@ FUN_080d596c:
     movs r2,#0x0    @ 080d597c 0022
     movs r0,#0x8    @ 080d597e 0820
     strh r0,[r4,#0x6]                        @ 080d5980 e080
-    ldr r1, DAT_080d59e4                     @ 080d5982 1849
+    ldr r1, PTR_BLDCNT_080d59e4              @ 080d5982 1849
     ldr r3, DAT_080d59e8                     @ 080d5984 184b
     adds r0,r3,#0x0    @ 080d5986 181c
     strh r0,[r1,#0x0]                        @ 080d5988 0880
-    ldr r0, DAT_080d59ec                     @ 080d598a 1848
+    ldr r0, PTR_BLDY_080d59ec                @ 080d598a 1848
     strh r2,[r0,#0x0]                        @ 080d598c 0280
     adds r1,#0x2    @ 080d598e 0231
     movs r0,#0x10    @ 080d5990 1020
@@ -259882,14 +259882,14 @@ FUN_080d596c:
     ldr r3, DAT_080d59f4                     @ 080d599e 154b
     adds r0,r3,#0x0    @ 080d59a0 181c
     strh r0,[r1,#0x0]                        @ 080d59a2 0880
-    ldr r0, DAT_080d59f8                     @ 080d59a4 1448
+    ldr r0, PTR_WIN0H_080d59f8               @ 080d59a4 1448
     movs r2,#0xf0    @ 080d59a6 f022
     strh r2,[r0,#0x0]                        @ 080d59a8 0280
     subs r1,#0x6    @ 080d59aa 0639
     ldr r3, DAT_080d59fc                     @ 080d59ac 134b
     adds r0,r3,#0x0    @ 080d59ae 181c
     strh r0,[r1,#0x0]                        @ 080d59b0 0880
-    ldr r0, DAT_080d5a00                     @ 080d59b2 1348
+    ldr r0, PTR_WIN1H_080d5a00               @ 080d59b2 1348
     strh r2,[r0,#0x0]                        @ 080d59b4 0280
     adds r1,#0x2    @ 080d59b6 0231
     ldr r2, DAT_080d5a04                     @ 080d59b8 124a
@@ -259914,22 +259914,22 @@ FUN_080d596c:
     bx r0                                    @ 080d59de 0047
 DAT_080d59e0:
     .word  0x03005850                     @ 080d59e0 50580003
-DAT_080d59e4:
-    .word  0x04000050                     @ 080d59e4 50000004
+PTR_BLDCNT_080d59e4:
+    .word  BLDCNT                         @ 080d59e4 50000004
 DAT_080d59e8:
     .word  0x000002da                     @ 080d59e8 da020000
-DAT_080d59ec:
-    .word  0x04000054                     @ 080d59ec 54000004
+PTR_BLDY_080d59ec:
+    .word  BLDY                           @ 080d59ec 54000004
 DAT_080d59f0:
     .word  0x00003f3f                     @ 080d59f0 3f3f0000
 DAT_080d59f4:
     .word  0x00003f1f                     @ 080d59f4 1f3f0000
-DAT_080d59f8:
-    .word  0x04000040                     @ 080d59f8 40000004
+PTR_WIN0H_080d59f8:
+    .word  WIN0H                          @ 080d59f8 40000004
 DAT_080d59fc:
     .word  0x00001010                     @ 080d59fc 10100000
-DAT_080d5a00:
-    .word  0x04000042                     @ 080d5a00 42000004
+PTR_WIN1H_080d5a00:
+    .word  WIN1H                          @ 080d5a00 42000004
 DAT_080d5a04:
     .word  0x00009090                     @ 080d5a04 90900000
 FUN_080d5a08:
@@ -259993,7 +259993,7 @@ PTR_gPrng_080d5a78:
 DAT_080d5a7c:
     .word  0x00000724                     @ 080d5a7c 24070000
 LAB_080d5a80:
-    ldr r1, DAT_080d5af4                     @ 080d5a80 1c49
+    ldr r1, PTR_BG3CNT_080d5af4              @ 080d5a80 1c49
     ldrh r2,[r1,#0x0]                        @ 080d5a82 0a88
     ldr r3, DAT_080d5af8                     @ 080d5a84 1c4b
     adds r0,r3,#0x0    @ 080d5a86 181c
@@ -260001,7 +260001,7 @@ LAB_080d5a80:
     strh r0,[r1,#0x0]                        @ 080d5a8a 0880
     ldrh r0,[r1,#0x0]                        @ 080d5a8c 0888
     strh r0,[r1,#0x0]                        @ 080d5a8e 0880
-    ldr r2, DAT_080d5afc                     @ 080d5a90 1a4a
+    ldr r2, PTR_BG0CNT_080d5afc              @ 080d5a90 1a4a
     ldrh r1,[r2,#0x0]                        @ 080d5a92 1188
     adds r0,r3,#0x0    @ 080d5a94 181c
     ands r0,r1    @ 080d5a96 0840
@@ -260029,7 +260029,7 @@ LAB_080d5a80:
     strh r0,[r2,#0x0]                        @ 080d5ac2 1080
     movs r0,#0x1    @ 080d5ac4 0120
     .hword 0x4682    @ 080d5ac6 8246
-    ldr r1, DAT_080d5b00                     @ 080d5ac8 0d49
+    ldr r1, PTR_BLDCNT_080d5b00              @ 080d5ac8 0d49
     ldr r2, DAT_080d5b04                     @ 080d5aca 0e4a
     adds r0,r2,#0x0    @ 080d5acc 101c
     strh r0,[r1,#0x0]                        @ 080d5ace 0880
@@ -260050,14 +260050,14 @@ LAB_080d5a80:
     strb r0,[r4,#0x0]                        @ 080d5aee 2070
     movs r0,#0xb    @ 080d5af0 0b20
     b LAB_080d5c3a                           @ 080d5af2 a2e0
-DAT_080d5af4:
-    .word  0x0400000e                     @ 080d5af4 0e000004
+PTR_BG3CNT_080d5af4:
+    .word  BG3CNT                         @ 080d5af4 0e000004
 DAT_080d5af8:
     .word  0x0000fffc                     @ 080d5af8 fcff0000
-DAT_080d5afc:
-    .word  0x04000008                     @ 080d5afc 08000004
-DAT_080d5b00:
-    .word  0x04000050                     @ 080d5b00 50000004
+PTR_BG0CNT_080d5afc:
+    .word  BG0CNT                         @ 080d5afc 08000004
+PTR_BLDCNT_080d5b00:
+    .word  BLDCNT                         @ 080d5b00 50000004
 DAT_080d5b04:
     .word  0x00001748                     @ 080d5b04 48170000
 LAB_080d5b08:
@@ -260462,7 +260462,7 @@ LAB_080d5e24:
     ands r0,r1    @ 080d5e28 0840
     cmp r0,#0x0                              @ 080d5e2a 0028
     beq LAB_080d5e3c                         @ 080d5e2c 06d0
-    ldr r1, DAT_080d5e64                     @ 080d5e2e 0d49
+    ldr r1, PTR_BLDALPHA_080d5e64            @ 080d5e2e 0d49
     movs r0,#0x10    @ 080d5e30 1020
     strh r0,[r1,#0x0]                        @ 080d5e32 0880
     adds r0,r7,#0x0    @ 080d5e34 381c
@@ -260486,8 +260486,8 @@ LAB_080d5e3c:
     ldr r1, DAT_080d5e68                     @ 080d5e5e 0249
     movs r0,#0x2    @ 080d5e60 0220
     b LAB_080d5e70                           @ 080d5e62 05e0
-DAT_080d5e64:
-    .word  0x04000052                     @ 080d5e64 52000004
+PTR_BLDALPHA_080d5e64:
+    .word  BLDALPHA                       @ 080d5e64 52000004
 DAT_080d5e68:
     .word  0x03005850                     @ 080d5e68 50580003
 LAB_080d5e6c:
@@ -260570,7 +260570,7 @@ LAB_080d5ee2:
     lsls r0,r0,#0x19    @ 080d5f00 4006
     lsrs r0,r0,#0x1f    @ 080d5f02 c00f
     bl FUN_080d4f44                          @ 080d5f04 fff71ef8
-    ldr r1, DAT_080d5f30                     @ 080d5f08 0949
+    ldr r1, PTR_BLDCNT_080d5f30              @ 080d5f08 0949
     ldr r2, DAT_080d5f34                     @ 080d5f0a 0a4a
     adds r0,r2,#0x0    @ 080d5f0c 101c
     strh r0,[r1,#0x0]                        @ 080d5f0e 0880
@@ -260590,8 +260590,8 @@ DAT_080d5f28:
     .word  0x000006fc                     @ 080d5f28 fc060000
 DAT_080d5f2c:
     .word  0x00000704                     @ 080d5f2c 04070000
-DAT_080d5f30:
-    .word  0x04000050                     @ 080d5f30 50000004
+PTR_BLDCNT_080d5f30:
+    .word  BLDCNT                         @ 080d5f30 50000004
 DAT_080d5f34:
     .word  0x0000023f                     @ 080d5f34 3f020000
 FUN_080d5f38:
@@ -260737,7 +260737,7 @@ LAB_080d6008:
     lsls r0,r0,#0x4    @ 080d604a 0001
     movs r1,#0x47    @ 080d604c 4721
     bl bios_div                              @ 080d604e 38f0d5f9
-    ldr r2, DAT_080d6178                     @ 080d6052 494a
+    ldr r2, PTR_BLDALPHA_080d6178            @ 080d6052 494a
     lsls r0,r0,#0x18    @ 080d6054 0006
     lsrs r0,r0,#0x18    @ 080d6056 000e
     movs r3,#0x80    @ 080d6058 8023
@@ -260887,8 +260887,8 @@ LAB_080d611e:
     .byte  0x00, 0x00
 DAT_080d6174:
     .word  0x0300585c                     @ 080d6174 5c580003
-DAT_080d6178:
-    .word  0x04000052                     @ 080d6178 52000004
+PTR_BLDALPHA_080d6178:
+    .word  BLDALPHA                       @ 080d6178 52000004
 DAT_080d617c:
     .word  0x000006fc                     @ 080d617c fc060000
 DAT_080d6180:
@@ -260931,7 +260931,7 @@ LAB_080d61b8:
     ldrb r5,[r5,#0x1]                        @ 080d61c8 6d78
     ands r1,r5    @ 080d61ca 2940
     bl FUN_080d4af0                          @ 080d61cc fef790fc
-    ldr r1, DAT_080d623c                     @ 080d61d0 1a49
+    ldr r1, PTR_BLDALPHA_080d623c            @ 080d61d0 1a49
     movs r0,#0x10    @ 080d61d2 1020
     strh r0,[r1,#0x0]                        @ 080d61d4 0880
     ldr r0,[sp,#0x34]                        @ 080d61d6 0d98
@@ -260985,8 +260985,8 @@ LAB_080d6222:
     .byte  0x00, 0x00
 DAT_080d6238:
     .word  0x0300585c                     @ 080d6238 5c580003
-DAT_080d623c:
-    .word  0x04000052                     @ 080d623c 52000004
+PTR_BLDALPHA_080d623c:
+    .word  BLDALPHA                       @ 080d623c 52000004
 DAT_080d6240:
     .word  0x03005850                     @ 080d6240 50580003
 LAB_080d6244:
@@ -261103,11 +261103,11 @@ FUN_080d6304:
 LAB_080d6328:
     movs r0,#0x8    @ 080d6328 0820
     strh r0,[r2,#0x6]                        @ 080d632a d080
-    ldr r1, DAT_080d6368                     @ 080d632c 0e49
+    ldr r1, PTR_BLDCNT_080d6368              @ 080d632c 0e49
     ldr r3, DAT_080d636c                     @ 080d632e 0f4b
     adds r0,r3,#0x0    @ 080d6330 181c
     strh r0,[r1,#0x0]                        @ 080d6332 0880
-    ldr r0, DAT_080d6370                     @ 080d6334 0e48
+    ldr r0, PTR_BLDY_080d6370                @ 080d6334 0e48
     strh r4,[r0,#0x0]                        @ 080d6336 0480
     movs r0,#0x9    @ 080d6338 0920
     strh r0,[r2,#0x4]                        @ 080d633a 9080
@@ -261130,12 +261130,12 @@ DAT_080d6360:
     .word  0x03005850                     @ 080d6360 50580003
 PTR_gPrng_080d6364:
     .word  gPrng                          @ 080d6364 40000003
-DAT_080d6368:
-    .word  0x04000050                     @ 080d6368 50000004
+PTR_BLDCNT_080d6368:
+    .word  BLDCNT                         @ 080d6368 50000004
 DAT_080d636c:
     .word  0x00003fbf                     @ 080d636c bf3f0000
-DAT_080d6370:
-    .word  0x04000054                     @ 080d6370 54000004
+PTR_BLDY_080d6370:
+    .word  BLDY                           @ 080d6370 54000004
 FUN_080d6374:
     push {r4,r5,r6,r7,lr}                    @ 080d6374 f0b5
     .hword 0x4657    @ 080d6376 5746
@@ -261159,7 +261159,7 @@ FUN_080d6374:
     bl bios_div                              @ 080d639a 38f02ff8
     movs r1,#0x10    @ 080d639e 1021
     subs r1,r1,r0    @ 080d63a0 091a
-    ldr r0, DAT_080d644c                     @ 080d63a2 2a48
+    ldr r0, PTR_BLDY_080d644c                @ 080d63a2 2a48
     strh r1,[r0,#0x0]                        @ 080d63a4 0180
     movs r0,#0x0    @ 080d63a6 0020
     bl FUN_080dd5e4                          @ 080d63a8 07f01cf9
@@ -261244,8 +261244,8 @@ LAB_080d6424:
     b LAB_080d6462                           @ 080d6446 0ce0
 DAT_080d6448:
     .word  0x03005850                     @ 080d6448 50580003
-DAT_080d644c:
-    .word  0x04000054                     @ 080d644c 54000004
+PTR_BLDY_080d644c:
+    .word  BLDY                           @ 080d644c 54000004
 DAT_080d6450:
     .word  0x000006fc                     @ 080d6450 fc060000
 LAB_080d6454:
@@ -261291,7 +261291,7 @@ LAB_080d6498:
     movs r1,#0x10    @ 080d64a2 1021
     .hword 0x4648    @ 080d64a4 4846
     strh r1,[r0,#0x6]                        @ 080d64a6 c180
-    ldr r0, DAT_080d64dc                     @ 080d64a8 0c48
+    ldr r0, PTR_BLDY_080d64dc                @ 080d64a8 0c48
     strh r1,[r0,#0x0]                        @ 080d64aa 0180
     ldr r1, DAT_080d64e0                     @ 080d64ac 0c49
     movs r0,#0xa    @ 080d64ae 0a20
@@ -261315,8 +261315,8 @@ LAB_080d64b4:
     bx r1                                    @ 080d64d6 0847
 DAT_080d64d8:
     .word  0x000006ee                     @ 080d64d8 ee060000
-DAT_080d64dc:
-    .word  0x04000054                     @ 080d64dc 54000004
+PTR_BLDY_080d64dc:
+    .word  BLDY                           @ 080d64dc 54000004
 DAT_080d64e0:
     .word  0x03005850                     @ 080d64e0 50580003
 FUN_080d64e4:
@@ -261333,13 +261333,13 @@ FUN_080d64e4:
     lsls r0,r0,#0x4    @ 080d64f8 0001
     movs r1,#0x10    @ 080d64fa 1021
     bl bios_div                              @ 080d64fc 37f07eff
-    ldr r2, DAT_080d6540                     @ 080d6500 0f4a
+    ldr r2, PTR_BLDY_080d6540                @ 080d6500 0f4a
     strh r0,[r2,#0x0]                        @ 080d6502 1080
     movs r1,#0x6    @ 080d6504 0621
     ldrsh r0,[r4,r1]                         @ 080d6506 605e
     cmp r0,#0x0                              @ 080d6508 0028
     bne LAB_080d651a                         @ 080d650a 06d1
-    ldr r0, DAT_080d6544                     @ 080d650c 0d48
+    ldr r0, PTR_BLDCNT_080d6544              @ 080d650c 0d48
     movs r1,#0x3f    @ 080d650e 3f21
     strh r1,[r0,#0x0]                        @ 080d6510 0180
     strh r5,[r2,#0x0]                        @ 080d6512 1580
@@ -261362,10 +261362,10 @@ LAB_080d651a:
     bx r1                                    @ 080d653a 0847
 DAT_080d653c:
     .word  0x03005850                     @ 080d653c 50580003
-DAT_080d6540:
-    .word  0x04000054                     @ 080d6540 54000004
-DAT_080d6544:
-    .word  0x04000050                     @ 080d6544 50000004
+PTR_BLDY_080d6540:
+    .word  BLDY                           @ 080d6540 54000004
+PTR_BLDCNT_080d6544:
+    .word  BLDCNT                         @ 080d6544 50000004
 FUN_080d6548:
     push {r4,r5,r6,lr}                       @ 080d6548 70b5
     ldr r0, DAT_080d6584                     @ 080d654a 0e48
@@ -261385,7 +261385,7 @@ FUN_080d6548:
     lsls r0,r0,#0x4    @ 080d6566 0001
     movs r1,#0x10    @ 080d6568 1021
     bl bios_div                              @ 080d656a 37f047ff
-    ldr r2, DAT_080d6588                     @ 080d656e 064a
+    ldr r2, PTR_BLDALPHA_080d6588            @ 080d656e 064a
     movs r1,#0x10    @ 080d6570 1021
     subs r1,r1,r0    @ 080d6572 091a
     lsls r1,r1,#0x18    @ 080d6574 0906
@@ -261398,10 +261398,10 @@ FUN_080d6548:
     .byte  0x00, 0x00
 DAT_080d6584:
     .word  0x03005850                     @ 080d6584 50580003
-DAT_080d6588:
-    .word  0x04000052                     @ 080d6588 52000004
+PTR_BLDALPHA_080d6588:
+    .word  BLDALPHA                       @ 080d6588 52000004
 LAB_080d658c:
-    ldr r1, DAT_080d6610                     @ 080d658c 2049
+    ldr r1, PTR_BG0CNT_080d6610              @ 080d658c 2049
     ldrh r2,[r1,#0x0]                        @ 080d658e 0a88
     ldr r3, DAT_080d6614                     @ 080d6590 204b
     adds r0,r3,#0x0    @ 080d6592 181c
@@ -261409,7 +261409,7 @@ LAB_080d658c:
     strh r0,[r1,#0x0]                        @ 080d6596 0880
     ldrh r0,[r1,#0x0]                        @ 080d6598 0888
     strh r0,[r1,#0x0]                        @ 080d659a 0880
-    ldr r2, DAT_080d6618                     @ 080d659c 1e4a
+    ldr r2, PTR_BG1CNT_080d6618              @ 080d659c 1e4a
     ldrh r1,[r2,#0x0]                        @ 080d659e 1188
     adds r0,r3,#0x0    @ 080d65a0 181c
     ands r0,r1    @ 080d65a2 0840
@@ -261436,7 +261436,7 @@ LAB_080d658c:
     orrs r0,r1    @ 080d65cc 0843
     strh r0,[r2,#0x0]                        @ 080d65ce 1080
     movs r5,#0x0    @ 080d65d0 0025
-    ldr r1, DAT_080d661c                     @ 080d65d2 1249
+    ldr r1, PTR_BLDCNT_080d661c              @ 080d65d2 1249
     movs r0,#0x3f    @ 080d65d4 3f20
     strh r0,[r1,#0x0]                        @ 080d65d6 0880
     adds r1,#0x2    @ 080d65d8 0231
@@ -261466,14 +261466,14 @@ LAB_080d65f2:
     pop {r4,r5,r6}                           @ 080d660a 70bc
     pop {r1}                                 @ 080d660c 02bc
     bx r1                                    @ 080d660e 0847
-DAT_080d6610:
-    .word  0x04000008                     @ 080d6610 08000004
+PTR_BG0CNT_080d6610:
+    .word  BG0CNT                         @ 080d6610 08000004
 DAT_080d6614:
     .word  0x0000fffc                     @ 080d6614 fcff0000
-DAT_080d6618:
-    .word  0x0400000a                     @ 080d6618 0a000004
-DAT_080d661c:
-    .word  0x04000050                     @ 080d661c 50000004
+PTR_BG1CNT_080d6618:
+    .word  BG1CNT                         @ 080d6618 0a000004
+PTR_BLDCNT_080d661c:
+    .word  BLDCNT                         @ 080d661c 50000004
 DAT_080d6620:
     .word  0x00001010                     @ 080d6620 10100000
 DAT_080d6624:
@@ -261616,15 +261616,15 @@ DAT_080d6744:
 DAT_080d6748:
     .word  0x00000704                     @ 080d6748 04070000
 PTR_BLDY_080d674c:
-    .word  0x04000054                     @ 080d674c 54000004
+    .word  BLDY                           @ 080d674c 54000004
 PTR_WIN0H_080d6750:
-    .word  0x04000040                     @ 080d6750 40000004
+    .word  WIN0H                          @ 080d6750 40000004
 PTR_WIN0V_080d6754:
-    .word  0x04000044                     @ 080d6754 44000004
+    .word  WIN0V                          @ 080d6754 44000004
 PTR_WIN1H_080d6758:
-    .word  0x04000042                     @ 080d6758 42000004
+    .word  WIN1H                          @ 080d6758 42000004
 PTR_WIN1V_080d675c:
-    .word  0x04000046                     @ 080d675c 46000004
+    .word  WIN1V                          @ 080d675c 46000004
 DAT_080d6760:
     .word  0x00001030                     @ 080d6760 30100000
 DAT_080d6764:
@@ -262210,7 +262210,7 @@ FUN_080d6b50:
     adds r1,#0x2    @ 080d6c08 0231
     movs r0,#0x10    @ 080d6c0a 1020
     strh r0,[r1,#0x0]                        @ 080d6c0c 0880
-    ldr r0, DAT_080d6cb0                     @ 080d6c0e 2848
+    ldr r0, PTR_WININ_080d6cb0               @ 080d6c0e 2848
     ldr r2, DAT_080d6cb4                     @ 080d6c10 284a
     adds r1,r2,#0x0    @ 080d6c12 111c
     strh r1,[r0,#0x0]                        @ 080d6c14 0180
@@ -262274,21 +262274,21 @@ PTR_DAT_080d6c8c:
 PTR_DAT_080d6c90:
     .word  0x03005f4c                     @ 080d6c90 4c5f0003
 PTR_BLDY_080d6c94:
-    .word  0x04000054                     @ 080d6c94 54000004
+    .word  BLDY                           @ 080d6c94 54000004
 PTR_WIN0H_080d6c98:
-    .word  0x04000040                     @ 080d6c98 40000004
+    .word  WIN0H                          @ 080d6c98 40000004
 PTR_WIN0V_080d6c9c:
-    .word  0x04000044                     @ 080d6c9c 44000004
+    .word  WIN0V                          @ 080d6c9c 44000004
 PTR_WIN1H_080d6ca0:
-    .word  0x04000042                     @ 080d6ca0 42000004
+    .word  WIN1H                          @ 080d6ca0 42000004
 PTR_WIN1V_080d6ca4:
-    .word  0x04000046                     @ 080d6ca4 46000004
+    .word  WIN1V                          @ 080d6ca4 46000004
 PTR_BLDCNT_080d6ca8:
-    .word  0x04000050                     @ 080d6ca8 50000004
+    .word  BLDCNT                         @ 080d6ca8 50000004
 DAT_080d6cac:
     .word  0x0000023f                     @ 080d6cac 3f020000
-DAT_080d6cb0:
-    .word  0x04000048                     @ 080d6cb0 48000004
+PTR_WININ_080d6cb0:
+    .word  WININ                          @ 080d6cb0 48000004
 DAT_080d6cb4:
     .word  0x00003f3f                     @ 080d6cb4 3f3f0000
 DAT_080d6cb8:
@@ -262308,7 +262308,7 @@ FUN_080d6cc4:
     lsls r1,r2,#0x2    @ 080d6cd2 9100
     ldr r3,[r0,#0x0]                         @ 080d6cd4 0368
     adds r3,r3,r1    @ 080d6cd6 5b18
-    ldr r1, DAT_080d6d1c                     @ 080d6cd8 1049
+    ldr r1, PTR_BLDCNT_080d6d1c              @ 080d6cd8 1049
     movs r0,#0xff    @ 080d6cda ff20
     strh r0,[r1,#0x0]                        @ 080d6cdc 0880
     adds r1,#0x4    @ 080d6cde 0431
@@ -262341,8 +262341,8 @@ DAT_080d6d14:
     .word  0x03005850                     @ 080d6d14 50580003
 DAT_080d6d18:
     .word  0x00000704                     @ 080d6d18 04070000
-DAT_080d6d1c:
-    .word  0x04000050                     @ 080d6d1c 50000004
+PTR_BLDCNT_080d6d1c:
+    .word  BLDCNT                         @ 080d6d1c 50000004
 DAT_080d6d20:
     .word  0x0000dfff                     @ 080d6d20 ffdf0000
 DAT_080d6d24:
@@ -262588,7 +262588,7 @@ DAT_080d6f24:
     .word  0x03005850                     @ 080d6f24 50580003
 FUN_080d6f28:
     push {lr}                                @ 080d6f28 00b5
-    ldr r1, DAT_080d6f98                     @ 080d6f2a 1b49
+    ldr r1, PTR_BLDCNT_080d6f98              @ 080d6f2a 1b49
     ldr r2, DAT_080d6f9c                     @ 080d6f2c 1b4a
     adds r0,r2,#0x0    @ 080d6f2e 101c
     strh r0,[r1,#0x0]                        @ 080d6f30 0880
@@ -262606,14 +262606,14 @@ FUN_080d6f28:
     ldr r2, DAT_080d6fa4                     @ 080d6f48 164a
     adds r0,r2,#0x0    @ 080d6f4a 101c
     strh r0,[r1,#0x0]                        @ 080d6f4c 0880
-    ldr r0, DAT_080d6fa8                     @ 080d6f4e 1648
+    ldr r0, PTR_WIN0H_080d6fa8               @ 080d6f4e 1648
     movs r2,#0xf0    @ 080d6f50 f022
     strh r2,[r0,#0x0]                        @ 080d6f52 0280
     subs r1,#0x6    @ 080d6f54 0639
     ldr r3, DAT_080d6fac                     @ 080d6f56 154b
     adds r0,r3,#0x0    @ 080d6f58 181c
     strh r0,[r1,#0x0]                        @ 080d6f5a 0880
-    ldr r0, DAT_080d6fb0                     @ 080d6f5c 1448
+    ldr r0, PTR_WIN1H_080d6fb0               @ 080d6f5c 1448
     strh r2,[r0,#0x0]                        @ 080d6f5e 0280
     adds r1,#0x2    @ 080d6f60 0231
     ldr r2, DAT_080d6fb4                     @ 080d6f62 144a
@@ -262639,20 +262639,20 @@ FUN_080d6f28:
     pop {r1}                                 @ 080d6f92 02bc
     bx r1                                    @ 080d6f94 0847
     .byte  0x00, 0x00
-DAT_080d6f98:
-    .word  0x04000050                     @ 080d6f98 50000004
+PTR_BLDCNT_080d6f98:
+    .word  BLDCNT                         @ 080d6f98 50000004
 DAT_080d6f9c:
     .word  0x000002da                     @ 080d6f9c da020000
 DAT_080d6fa0:
     .word  0x00003f3f                     @ 080d6fa0 3f3f0000
 DAT_080d6fa4:
     .word  0x00003f1f                     @ 080d6fa4 1f3f0000
-DAT_080d6fa8:
-    .word  0x04000040                     @ 080d6fa8 40000004
+PTR_WIN0H_080d6fa8:
+    .word  WIN0H                          @ 080d6fa8 40000004
 DAT_080d6fac:
     .word  0x00001030                     @ 080d6fac 30100000
-DAT_080d6fb0:
-    .word  0x04000042                     @ 080d6fb0 42000004
+PTR_WIN1H_080d6fb0:
+    .word  WIN1H                          @ 080d6fb0 42000004
 DAT_080d6fb4:
     .word  0x00007090                     @ 080d6fb4 90700000
 DAT_080d6fb8:
@@ -262749,7 +262749,7 @@ LAB_080d705e:
     bx r1                                    @ 080d7062 0847
 FUN_080d7064:
     push {r4,r5,lr}                          @ 080d7064 30b5
-    ldr r1, DAT_080d70c0                     @ 080d7066 1649
+    ldr r1, PTR_BG0CNT_080d70c0              @ 080d7066 1649
     movs r0,#0xe0    @ 080d7068 e020
     lsls r0,r0,#0x5    @ 080d706a 4001
     strh r0,[r1,#0x0]                        @ 080d706c 0880
@@ -262787,8 +262787,8 @@ FUN_080d7064:
     pop {r4,r5}                              @ 080d70ba 30bc
     pop {r0}                                 @ 080d70bc 01bc
     bx r0                                    @ 080d70be 0047
-DAT_080d70c0:
-    .word  0x04000008                     @ 080d70c0 08000004
+PTR_BG0CNT_080d70c0:
+    .word  BG0CNT                         @ 080d70c0 08000004
 DAT_080d70c4:
     .word  0x00001d0d                     @ 080d70c4 0d1d0000
 DAT_080d70c8:
@@ -263432,7 +263432,7 @@ LAB_080d7568:
     ands r0,r5    @ 080d75e2 2840
     cmp r0,#0x0                              @ 080d75e4 0028
     bne LAB_080d7640                         @ 080d75e6 2bd1
-    ldr r1, DAT_080d7634                     @ 080d75e8 1249
+    ldr r1, PTR_BG2CNT_080d7634              @ 080d75e8 1249
     ldrh r2,[r1,#0x0]                        @ 080d75ea 0a88
     ldr r3, DAT_080d7638                     @ 080d75ec 124b
     adds r0,r3,#0x0    @ 080d75ee 181c
@@ -263447,7 +263447,7 @@ LAB_080d7568:
     strh r0,[r1,#0x0]                        @ 080d7600 0880
     ldrh r0,[r1,#0x0]                        @ 080d7602 0888
     strh r0,[r1,#0x0]                        @ 080d7604 0880
-    ldr r2, DAT_080d763c                     @ 080d7606 0d4a
+    ldr r2, PTR_BG0CNT_080d763c              @ 080d7606 0d4a
     ldrh r1,[r2,#0x0]                        @ 080d7608 1188
     adds r0,r3,#0x0    @ 080d760a 181c
     ands r0,r1    @ 080d760c 0840
@@ -263470,14 +263470,14 @@ DAT_080d762c:
     .word  0x0600e426                     @ 080d762c 26e40006
 DAT_080d7630:
     .word  0x00000725                     @ 080d7630 25070000
-DAT_080d7634:
-    .word  0x0400000c                     @ 080d7634 0c000004
+PTR_BG2CNT_080d7634:
+    .word  BG2CNT                         @ 080d7634 0c000004
 DAT_080d7638:
     .word  0x0000fffc                     @ 080d7638 fcff0000
-DAT_080d763c:
-    .word  0x04000008                     @ 080d763c 08000004
+PTR_BG0CNT_080d763c:
+    .word  BG0CNT                         @ 080d763c 08000004
 LAB_080d7640:
-    ldr r1, DAT_080d76a0                     @ 080d7640 1749
+    ldr r1, PTR_BG3CNT_080d76a0              @ 080d7640 1749
     ldrh r2,[r1,#0x0]                        @ 080d7642 0a88
     ldr r3, DAT_080d76a4                     @ 080d7644 174b
     adds r0,r3,#0x0    @ 080d7646 181c
@@ -263485,7 +263485,7 @@ LAB_080d7640:
     strh r0,[r1,#0x0]                        @ 080d764a 0880
     ldrh r0,[r1,#0x0]                        @ 080d764c 0888
     strh r0,[r1,#0x0]                        @ 080d764e 0880
-    ldr r2, DAT_080d76a8                     @ 080d7650 154a
+    ldr r2, PTR_BG0CNT_080d76a8              @ 080d7650 154a
     ldrh r1,[r2,#0x0]                        @ 080d7652 1188
     adds r0,r3,#0x0    @ 080d7654 181c
     ands r0,r1    @ 080d7656 0840
@@ -263512,7 +263512,7 @@ LAB_080d7640:
 LAB_080d7680:
     orrs r0,r1    @ 080d7680 0843
     strh r0,[r2,#0x0]                        @ 080d7682 1080
-    ldr r1, DAT_080d76ac                     @ 080d7684 0949
+    ldr r1, PTR_BLDCNT_080d76ac              @ 080d7684 0949
     ldr r2, DAT_080d76b0                     @ 080d7686 0a4a
     adds r0,r2,#0x0    @ 080d7688 101c
     strh r0,[r1,#0x0]                        @ 080d768a 0880
@@ -263526,14 +263526,14 @@ LAB_080d7680:
     pop {r1}                                 @ 080d769a 02bc
     bx r1                                    @ 080d769c 0847
     .byte  0x00, 0x00
-DAT_080d76a0:
-    .word  0x0400000e                     @ 080d76a0 0e000004
+PTR_BG3CNT_080d76a0:
+    .word  BG3CNT                         @ 080d76a0 0e000004
 DAT_080d76a4:
     .word  0x0000fffc                     @ 080d76a4 fcff0000
-DAT_080d76a8:
-    .word  0x04000008                     @ 080d76a8 08000004
-DAT_080d76ac:
-    .word  0x04000050                     @ 080d76ac 50000004
+PTR_BG0CNT_080d76a8:
+    .word  BG0CNT                         @ 080d76a8 08000004
+PTR_BLDCNT_080d76ac:
+    .word  BLDCNT                         @ 080d76ac 50000004
 DAT_080d76b0:
     .word  0x00001748                     @ 080d76b0 48170000
 FUN_080d76b4:
@@ -263578,7 +263578,7 @@ LAB_080d76ee:
     lsls r0,r0,#0x4    @ 080d76fa 0001
     movs r1,#0x14    @ 080d76fc 1421
     bl bios_div                              @ 080d76fe 36f07dfe
-    ldr r3, DAT_080d7718                     @ 080d7702 054b
+    ldr r3, PTR_BLDALPHA_080d7718            @ 080d7702 054b
     lsls r2,r0,#0x18    @ 080d7704 0206
     lsrs r2,r2,#0x18    @ 080d7706 120e
     movs r1,#0x10    @ 080d7708 1021
@@ -263589,14 +263589,14 @@ LAB_080d76ee:
     strh r2,[r3,#0x0]                        @ 080d7712 1a80
     b LAB_080d7782                           @ 080d7714 35e0
     .byte  0x00, 0x00
-DAT_080d7718:
-    .word  0x04000052                     @ 080d7718 52000004
+PTR_BLDALPHA_080d7718:
+    .word  BLDALPHA                       @ 080d7718 52000004
 LAB_080d771c:
     ldrh r2,[r5,#0x32]                       @ 080d771c 6a8e
     lsls r4,r2,#0x5    @ 080d771e 5401
     adds r4,#0x44    @ 080d7720 4434
     adds r4,r5,r4    @ 080d7722 2c19
-    ldr r1, DAT_080d7798                     @ 080d7724 1c49
+    ldr r1, PTR_BG0CNT_080d7798              @ 080d7724 1c49
     ldrh r2,[r1,#0x0]                        @ 080d7726 0a88
     ldr r3, DAT_080d779c                     @ 080d7728 1c4b
     adds r0,r3,#0x0    @ 080d772a 181c
@@ -263604,7 +263604,7 @@ LAB_080d771c:
     strh r0,[r1,#0x0]                        @ 080d772e 0880
     ldrh r0,[r1,#0x0]                        @ 080d7730 0888
     strh r0,[r1,#0x0]                        @ 080d7732 0880
-    ldr r2, DAT_080d77a0                     @ 080d7734 1a4a
+    ldr r2, PTR_BG1CNT_080d77a0              @ 080d7734 1a4a
     ldrh r1,[r2,#0x0]                        @ 080d7736 1188
     adds r0,r3,#0x0    @ 080d7738 181c
     ands r0,r1    @ 080d773a 0840
@@ -263630,7 +263630,7 @@ LAB_080d771c:
     movs r1,#0x3    @ 080d7762 0321
     orrs r0,r1    @ 080d7764 0843
     strh r0,[r2,#0x0]                        @ 080d7766 1080
-    ldr r1, DAT_080d77a4                     @ 080d7768 0e49
+    ldr r1, PTR_BLDCNT_080d77a4              @ 080d7768 0e49
     ldr r3, DAT_080d77a8                     @ 080d776a 0f4b
     adds r0,r3,#0x0    @ 080d776c 181c
     strh r0,[r1,#0x0]                        @ 080d776e 0880
@@ -263653,14 +263653,14 @@ LAB_080d7782:
     movs r0,#0x2    @ 080d7790 0220
     bl FUN_080d7244                          @ 080d7792 fff757fd
     b LAB_080d77bc                           @ 080d7796 11e0
-DAT_080d7798:
-    .word  0x04000008                     @ 080d7798 08000004
+PTR_BG0CNT_080d7798:
+    .word  BG0CNT                         @ 080d7798 08000004
 DAT_080d779c:
     .word  0x0000fffc                     @ 080d779c fcff0000
-DAT_080d77a0:
-    .word  0x0400000a                     @ 080d77a0 0a000004
-DAT_080d77a4:
-    .word  0x04000050                     @ 080d77a4 50000004
+PTR_BG1CNT_080d77a0:
+    .word  BG1CNT                         @ 080d77a0 0a000004
+PTR_BLDCNT_080d77a4:
+    .word  BLDCNT                         @ 080d77a4 50000004
 DAT_080d77a8:
     .word  0x00003f3f                     @ 080d77a8 3f3f0000
 DAT_080d77ac:
@@ -264924,7 +264924,7 @@ FUN_080d81b0:
     ands r0,r5    @ 080d81c2 2840
     cmp r0,#0x0                              @ 080d81c4 0028
     bne LAB_080d8228                         @ 080d81c6 2fd1
-    ldr r1, DAT_080d8264                     @ 080d81c8 2649
+    ldr r1, PTR_BG3CNT_080d8264              @ 080d81c8 2649
     ldrh r2,[r1,#0x0]                        @ 080d81ca 0a88
     ldr r3, DAT_080d8268                     @ 080d81cc 264b
     adds r0,r3,#0x0    @ 080d81ce 181c
@@ -264932,7 +264932,7 @@ FUN_080d81b0:
     strh r0,[r1,#0x0]                        @ 080d81d2 0880
     ldrh r0,[r1,#0x0]                        @ 080d81d4 0888
     strh r0,[r1,#0x0]                        @ 080d81d6 0880
-    ldr r2, DAT_080d826c                     @ 080d81d8 244a
+    ldr r2, PTR_BG0CNT_080d826c              @ 080d81d8 244a
     ldrh r1,[r2,#0x0]                        @ 080d81da 1188
     adds r0,r3,#0x0    @ 080d81dc 181c
     ands r0,r1    @ 080d81de 0840
@@ -264958,7 +264958,7 @@ FUN_080d81b0:
     movs r1,#0x3    @ 080d8206 0321
     orrs r0,r1    @ 080d8208 0843
     strh r0,[r2,#0x0]                        @ 080d820a 1080
-    ldr r1, DAT_080d8270                     @ 080d820c 1849
+    ldr r1, PTR_BLDCNT_080d8270              @ 080d820c 1849
     ldr r2, DAT_080d8274                     @ 080d820e 194a
     adds r0,r2,#0x0    @ 080d8210 101c
     strh r0,[r1,#0x0]                        @ 080d8212 0880
@@ -264989,7 +264989,7 @@ LAB_080d8238:
     lsls r0,r0,#0x4    @ 080d8240 0001
     movs r1,#0xa    @ 080d8242 0a21
     bl bios_div                              @ 080d8244 36f0daf8
-    ldr r2, DAT_080d8278                     @ 080d8248 0b4a
+    ldr r2, PTR_BLDALPHA_080d8278            @ 080d8248 0b4a
     movs r1,#0x10    @ 080d824a 1021
     subs r1,r1,r0    @ 080d824c 091a
     lsls r1,r1,#0x18    @ 080d824e 0906
@@ -265003,20 +265003,20 @@ DAT_080d825c:
     .word  0x03005850                     @ 080d825c 50580003
 DAT_080d8260:
     .word  0x00000724                     @ 080d8260 24070000
-DAT_080d8264:
-    .word  0x0400000e                     @ 080d8264 0e000004
+PTR_BG3CNT_080d8264:
+    .word  BG3CNT                         @ 080d8264 0e000004
 DAT_080d8268:
     .word  0x0000fffc                     @ 080d8268 fcff0000
-DAT_080d826c:
-    .word  0x04000008                     @ 080d826c 08000004
-DAT_080d8270:
-    .word  0x04000050                     @ 080d8270 50000004
+PTR_BG0CNT_080d826c:
+    .word  BG0CNT                         @ 080d826c 08000004
+PTR_BLDCNT_080d8270:
+    .word  BLDCNT                         @ 080d8270 50000004
 DAT_080d8274:
     .word  0x00001748                     @ 080d8274 48170000
-DAT_080d8278:
-    .word  0x04000052                     @ 080d8278 52000004
+PTR_BLDALPHA_080d8278:
+    .word  BLDALPHA                       @ 080d8278 52000004
 LAB_080d827c:
-    ldr r1, DAT_080d8314                     @ 080d827c 2549
+    ldr r1, PTR_BG0CNT_080d8314              @ 080d827c 2549
     ldrh r2,[r1,#0x0]                        @ 080d827e 0a88
     ldr r3, DAT_080d8318                     @ 080d8280 254b
     adds r0,r3,#0x0    @ 080d8282 181c
@@ -265024,7 +265024,7 @@ LAB_080d827c:
     strh r0,[r1,#0x0]                        @ 080d8286 0880
     ldrh r0,[r1,#0x0]                        @ 080d8288 0888
     strh r0,[r1,#0x0]                        @ 080d828a 0880
-    ldr r2, DAT_080d831c                     @ 080d828c 234a
+    ldr r2, PTR_BG1CNT_080d831c              @ 080d828c 234a
     ldrh r1,[r2,#0x0]                        @ 080d828e 1188
     adds r0,r3,#0x0    @ 080d8290 181c
     ands r0,r1    @ 080d8292 0840
@@ -265050,7 +265050,7 @@ LAB_080d827c:
     movs r1,#0x3    @ 080d82ba 0321
     orrs r0,r1    @ 080d82bc 0843
     strh r0,[r2,#0x0]                        @ 080d82be 1080
-    ldr r1, DAT_080d8320                     @ 080d82c0 1749
+    ldr r1, PTR_BLDCNT_080d8320              @ 080d82c0 1749
     ldr r2, DAT_080d8324                     @ 080d82c2 184a
     adds r0,r2,#0x0    @ 080d82c4 101c
     strh r0,[r1,#0x0]                        @ 080d82c6 0880
@@ -265091,14 +265091,14 @@ LAB_080d82fa:
     pop {r4,r5,r6,r7}                        @ 080d830e f0bc
     pop {r1}                                 @ 080d8310 02bc
     bx r1                                    @ 080d8312 0847
-DAT_080d8314:
-    .word  0x04000008                     @ 080d8314 08000004
+PTR_BG0CNT_080d8314:
+    .word  BG0CNT                         @ 080d8314 08000004
 DAT_080d8318:
     .word  0x0000fffc                     @ 080d8318 fcff0000
-DAT_080d831c:
-    .word  0x0400000a                     @ 080d831c 0a000004
-DAT_080d8320:
-    .word  0x04000050                     @ 080d8320 50000004
+PTR_BG1CNT_080d831c:
+    .word  BG1CNT                         @ 080d831c 0a000004
+PTR_BLDCNT_080d8320:
+    .word  BLDCNT                         @ 080d8320 50000004
 DAT_080d8324:
     .word  0x00003f3f                     @ 080d8324 3f3f0000
 DAT_080d8328:
@@ -265118,7 +265118,7 @@ FUN_080d8330:
     ands r0,r5    @ 080d8342 2840
     cmp r0,#0x0                              @ 080d8344 0028
     bne LAB_080d83a8                         @ 080d8346 2fd1
-    ldr r1, DAT_080d83e4                     @ 080d8348 2649
+    ldr r1, PTR_BG3CNT_080d83e4              @ 080d8348 2649
     ldrh r2,[r1,#0x0]                        @ 080d834a 0a88
     ldr r3, DAT_080d83e8                     @ 080d834c 264b
     adds r0,r3,#0x0    @ 080d834e 181c
@@ -265126,7 +265126,7 @@ FUN_080d8330:
     strh r0,[r1,#0x0]                        @ 080d8352 0880
     ldrh r0,[r1,#0x0]                        @ 080d8354 0888
     strh r0,[r1,#0x0]                        @ 080d8356 0880
-    ldr r2, DAT_080d83ec                     @ 080d8358 244a
+    ldr r2, PTR_BG0CNT_080d83ec              @ 080d8358 244a
     ldrh r1,[r2,#0x0]                        @ 080d835a 1188
     adds r0,r3,#0x0    @ 080d835c 181c
     ands r0,r1    @ 080d835e 0840
@@ -265152,7 +265152,7 @@ FUN_080d8330:
     movs r1,#0x3    @ 080d8386 0321
     orrs r0,r1    @ 080d8388 0843
     strh r0,[r2,#0x0]                        @ 080d838a 1080
-    ldr r1, DAT_080d83f0                     @ 080d838c 1849
+    ldr r1, PTR_BLDCNT_080d83f0              @ 080d838c 1849
     ldr r2, DAT_080d83f4                     @ 080d838e 194a
     adds r0,r2,#0x0    @ 080d8390 101c
     strh r0,[r1,#0x0]                        @ 080d8392 0880
@@ -265183,7 +265183,7 @@ LAB_080d83b8:
     lsls r0,r0,#0x4    @ 080d83c0 0001
     movs r1,#0xa    @ 080d83c2 0a21
     bl bios_div                              @ 080d83c4 36f01af8
-    ldr r2, DAT_080d83f8                     @ 080d83c8 0b4a
+    ldr r2, PTR_BLDALPHA_080d83f8            @ 080d83c8 0b4a
     movs r1,#0x10    @ 080d83ca 1021
     subs r1,r1,r0    @ 080d83cc 091a
     lsls r1,r1,#0x18    @ 080d83ce 0906
@@ -265197,20 +265197,20 @@ DAT_080d83dc:
     .word  0x03005850                     @ 080d83dc 50580003
 DAT_080d83e0:
     .word  0x00000724                     @ 080d83e0 24070000
-DAT_080d83e4:
-    .word  0x0400000e                     @ 080d83e4 0e000004
+PTR_BG3CNT_080d83e4:
+    .word  BG3CNT                         @ 080d83e4 0e000004
 DAT_080d83e8:
     .word  0x0000fffc                     @ 080d83e8 fcff0000
-DAT_080d83ec:
-    .word  0x04000008                     @ 080d83ec 08000004
-DAT_080d83f0:
-    .word  0x04000050                     @ 080d83f0 50000004
+PTR_BG0CNT_080d83ec:
+    .word  BG0CNT                         @ 080d83ec 08000004
+PTR_BLDCNT_080d83f0:
+    .word  BLDCNT                         @ 080d83f0 50000004
 DAT_080d83f4:
     .word  0x00001748                     @ 080d83f4 48170000
-DAT_080d83f8:
-    .word  0x04000052                     @ 080d83f8 52000004
+PTR_BLDALPHA_080d83f8:
+    .word  BLDALPHA                       @ 080d83f8 52000004
 LAB_080d83fc:
-    ldr r1, DAT_080d849c                     @ 080d83fc 2749
+    ldr r1, PTR_BG0CNT_080d849c              @ 080d83fc 2749
     ldrh r2,[r1,#0x0]                        @ 080d83fe 0a88
     ldr r3, DAT_080d84a0                     @ 080d8400 274b
     adds r0,r3,#0x0    @ 080d8402 181c
@@ -265218,7 +265218,7 @@ LAB_080d83fc:
     strh r0,[r1,#0x0]                        @ 080d8406 0880
     ldrh r0,[r1,#0x0]                        @ 080d8408 0888
     strh r0,[r1,#0x0]                        @ 080d840a 0880
-    ldr r2, DAT_080d84a4                     @ 080d840c 254a
+    ldr r2, PTR_BG1CNT_080d84a4              @ 080d840c 254a
     ldrh r1,[r2,#0x0]                        @ 080d840e 1188
     adds r0,r3,#0x0    @ 080d8410 181c
     ands r0,r1    @ 080d8412 0840
@@ -265244,7 +265244,7 @@ LAB_080d83fc:
     movs r1,#0x3    @ 080d843a 0321
     orrs r0,r1    @ 080d843c 0843
     strh r0,[r2,#0x0]                        @ 080d843e 1080
-    ldr r1, DAT_080d84a8                     @ 080d8440 1949
+    ldr r1, PTR_BLDCNT_080d84a8              @ 080d8440 1949
     ldr r2, DAT_080d84ac                     @ 080d8442 1a4a
     adds r0,r2,#0x0    @ 080d8444 101c
     strh r0,[r1,#0x0]                        @ 080d8446 0880
@@ -265289,14 +265289,14 @@ LAB_080d8480:
     pop {r1}                                 @ 080d8496 02bc
     bx r1                                    @ 080d8498 0847
     .byte  0x00, 0x00
-DAT_080d849c:
-    .word  0x04000008                     @ 080d849c 08000004
+PTR_BG0CNT_080d849c:
+    .word  BG0CNT                         @ 080d849c 08000004
 DAT_080d84a0:
     .word  0x0000fffc                     @ 080d84a0 fcff0000
-DAT_080d84a4:
-    .word  0x0400000a                     @ 080d84a4 0a000004
-DAT_080d84a8:
-    .word  0x04000050                     @ 080d84a8 50000004
+PTR_BG1CNT_080d84a4:
+    .word  BG1CNT                         @ 080d84a4 0a000004
+PTR_BLDCNT_080d84a8:
+    .word  BLDCNT                         @ 080d84a8 50000004
 DAT_080d84ac:
     .word  0x00003f3f                     @ 080d84ac 3f3f0000
 DAT_080d84b0:
@@ -266461,7 +266461,7 @@ LAB_080d8d7e:
     bx r1                                    @ 080d8d82 0847
 pack_list_bg_setup:
     push {r4,lr}                             @ 080d8d84 10b5
-    ldr r1, DAT_080d8dc8                     @ 080d8d86 1049
+    ldr r1, PTR_BG0CNT_080d8dc8              @ 080d8d86 1049
     movs r0,#0xe0    @ 080d8d88 e020
     lsls r0,r0,#0x5    @ 080d8d8a 4001
     strh r0,[r1,#0x0]                        @ 080d8d8c 0880
@@ -266489,8 +266489,8 @@ pack_list_bg_setup:
     pop {r4}                                 @ 080d8dc2 10bc
     pop {r0}                                 @ 080d8dc4 01bc
     bx r0                                    @ 080d8dc6 0047
-DAT_080d8dc8:
-    .word  0x04000008                     @ 080d8dc8 08000004
+PTR_BG0CNT_080d8dc8:
+    .word  BG0CNT                         @ 080d8dc8 08000004
 DAT_080d8dcc:
     .word  0x00001e0d                     @ 080d8dcc 0d1e0000
 DAT_080d8dd0:
@@ -268081,7 +268081,7 @@ LAB_080d99ea:
     bl FUN_080d90f8                          @ 080d9a48 fff756fb
     ldrh r0,[r5,#0x18]                       @ 080d9a4c 288b
     bl FUN_080d90f8                          @ 080d9a4e fff753fb
-    ldr r1, DAT_080d9ad0                     @ 080d9a52 1f49
+    ldr r1, PTR_BG3CNT_080d9ad0              @ 080d9a52 1f49
     ldrh r2,[r1,#0x0]                        @ 080d9a54 0a88
     ldr r3, DAT_080d9ad4                     @ 080d9a56 1f4b
     adds r0,r3,#0x0    @ 080d9a58 181c
@@ -268089,7 +268089,7 @@ LAB_080d99ea:
     strh r0,[r1,#0x0]                        @ 080d9a5c 0880
     ldrh r0,[r1,#0x0]                        @ 080d9a5e 0888
     strh r0,[r1,#0x0]                        @ 080d9a60 0880
-    ldr r2, DAT_080d9ad8                     @ 080d9a62 1d4a
+    ldr r2, PTR_BG0CNT_080d9ad8              @ 080d9a62 1d4a
     ldrh r1,[r2,#0x0]                        @ 080d9a64 1188
     adds r0,r3,#0x0    @ 080d9a66 181c
     ands r0,r1    @ 080d9a68 0840
@@ -268098,7 +268098,7 @@ LAB_080d99ea:
     movs r1,#0x1    @ 080d9a6e 0121
     orrs r0,r1    @ 080d9a70 0843
     strh r0,[r2,#0x0]                        @ 080d9a72 1080
-    ldr r1, DAT_080d9adc                     @ 080d9a74 1949
+    ldr r1, PTR_BG1CNT_080d9adc              @ 080d9a74 1949
     ldrh r2,[r1,#0x0]                        @ 080d9a76 0a88
     adds r0,r3,#0x0    @ 080d9a78 181c
     ands r0,r2    @ 080d9a7a 1040
@@ -268144,14 +268144,14 @@ DAT_080d9ac8:
     .word  0x0600e426                     @ 080d9ac8 26e40006
 DAT_080d9acc:
     .word  0x0000ffff                     @ 080d9acc ffff0000
-DAT_080d9ad0:
-    .word  0x0400000e                     @ 080d9ad0 0e000004
+PTR_BG3CNT_080d9ad0:
+    .word  BG3CNT                         @ 080d9ad0 0e000004
 DAT_080d9ad4:
     .word  0x0000fffc                     @ 080d9ad4 fcff0000
-DAT_080d9ad8:
-    .word  0x04000008                     @ 080d9ad8 08000004
-DAT_080d9adc:
-    .word  0x0400000a                     @ 080d9adc 0a000004
+PTR_BG0CNT_080d9ad8:
+    .word  BG0CNT                         @ 080d9ad8 08000004
+PTR_BG1CNT_080d9adc:
+    .word  BG1CNT                         @ 080d9adc 0a000004
 DAT_080d9ae0:
     .word  0x00001748                     @ 080d9ae0 48170000
 DAT_080d9ae4:
@@ -268198,7 +268198,7 @@ LAB_080d9b22:
     lsls r0,r0,#0x4    @ 080d9b2e 0001
     movs r1,#0x14    @ 080d9b30 1421
     bl bios_div                              @ 080d9b32 34f063fc
-    ldr r3, DAT_080d9b4c                     @ 080d9b36 054b
+    ldr r3, PTR_BLDALPHA_080d9b4c            @ 080d9b36 054b
     lsls r2,r0,#0x18    @ 080d9b38 0206
     lsrs r2,r2,#0x18    @ 080d9b3a 120e
     movs r1,#0x10    @ 080d9b3c 1021
@@ -268209,10 +268209,10 @@ LAB_080d9b22:
     strh r2,[r3,#0x0]                        @ 080d9b46 1a80
     b LAB_080d9ba4                           @ 080d9b48 2ce0
     .byte  0x00, 0x00
-DAT_080d9b4c:
-    .word  0x04000052                     @ 080d9b4c 52000004
+PTR_BLDALPHA_080d9b4c:
+    .word  BLDALPHA                       @ 080d9b4c 52000004
 LAB_080d9b50:
-    ldr r1, DAT_080d9bd0                     @ 080d9b50 1f49
+    ldr r1, PTR_BG0CNT_080d9bd0              @ 080d9b50 1f49
     ldrh r2,[r1,#0x0]                        @ 080d9b52 0a88
     ldr r3, DAT_080d9bd4                     @ 080d9b54 1f4b
     adds r0,r3,#0x0    @ 080d9b56 181c
@@ -268237,7 +268237,7 @@ LAB_080d9b50:
     ldrh r0,[r1,#0x0]                        @ 080d9b7c 0888
     orrs r0,r4    @ 080d9b7e 2043
     strh r0,[r1,#0x0]                        @ 080d9b80 0880
-    ldr r2, DAT_080d9bd8                     @ 080d9b82 154a
+    ldr r2, PTR_BG3CNT_080d9bd8              @ 080d9b82 154a
     ldrh r0,[r2,#0x0]                        @ 080d9b84 1088
     ands r3,r0    @ 080d9b86 0340
     strh r3,[r2,#0x0]                        @ 080d9b88 1380
@@ -268245,7 +268245,7 @@ LAB_080d9b50:
     movs r1,#0x3    @ 080d9b8c 0321
     orrs r0,r1    @ 080d9b8e 0843
     strh r0,[r2,#0x0]                        @ 080d9b90 1080
-    ldr r1, DAT_080d9bdc                     @ 080d9b92 1249
+    ldr r1, PTR_BLDCNT_080d9bdc              @ 080d9b92 1249
     ldr r2, DAT_080d9be0                     @ 080d9b94 124a
     adds r0,r2,#0x0    @ 080d9b96 101c
     strh r0,[r1,#0x0]                        @ 080d9b98 0880
@@ -268273,14 +268273,14 @@ LAB_080d9ba4:
     bl FUN_080d92c4                          @ 080d9bc8 fff77cfb
     b LAB_080d9bf4                           @ 080d9bcc 12e0
     .byte  0x00, 0x00
-DAT_080d9bd0:
-    .word  0x04000008                     @ 080d9bd0 08000004
+PTR_BG0CNT_080d9bd0:
+    .word  BG0CNT                         @ 080d9bd0 08000004
 DAT_080d9bd4:
     .word  0x0000fffc                     @ 080d9bd4 fcff0000
-DAT_080d9bd8:
-    .word  0x0400000e                     @ 080d9bd8 0e000004
-DAT_080d9bdc:
-    .word  0x04000050                     @ 080d9bdc 50000004
+PTR_BG3CNT_080d9bd8:
+    .word  BG3CNT                         @ 080d9bd8 0e000004
+PTR_BLDCNT_080d9bdc:
+    .word  BLDCNT                         @ 080d9bdc 50000004
 DAT_080d9be0:
     .word  0x00003f3f                     @ 080d9be0 3f3f0000
 DAT_080d9be4:
@@ -269415,7 +269415,7 @@ LAB_080da4d0:
     cmp r5,r7                                @ 080da4d8 bd42
     bcc LAB_080da4a0                         @ 080da4da e1d3
 LAB_080da4dc:
-    ldr r1, DAT_080da5a0                     @ 080da4dc 3049
+    ldr r1, PTR_BG3CNT_080da5a0              @ 080da4dc 3049
     ldrh r2,[r1,#0x0]                        @ 080da4de 0a88
     ldr r3, DAT_080da5a4                     @ 080da4e0 304b
     adds r0,r3,#0x0    @ 080da4e2 181c
@@ -269423,7 +269423,7 @@ LAB_080da4dc:
     strh r0,[r1,#0x0]                        @ 080da4e6 0880
     ldrh r0,[r1,#0x0]                        @ 080da4e8 0888
     strh r0,[r1,#0x0]                        @ 080da4ea 0880
-    ldr r2, DAT_080da5a8                     @ 080da4ec 2e4a
+    ldr r2, PTR_BG0CNT_080da5a8              @ 080da4ec 2e4a
     ldrh r1,[r2,#0x0]                        @ 080da4ee 1188
     adds r0,r3,#0x0    @ 080da4f0 181c
     ands r0,r1    @ 080da4f2 0840
@@ -269432,7 +269432,7 @@ LAB_080da4dc:
     movs r1,#0x1    @ 080da4f8 0121
     orrs r0,r1    @ 080da4fa 0843
     strh r0,[r2,#0x0]                        @ 080da4fc 1080
-    ldr r1, DAT_080da5ac                     @ 080da4fe 2b49
+    ldr r1, PTR_BG1CNT_080da5ac              @ 080da4fe 2b49
     ldrh r2,[r1,#0x0]                        @ 080da500 0a88
     adds r0,r3,#0x0    @ 080da502 181c
     ands r0,r2    @ 080da504 1040
@@ -269485,7 +269485,7 @@ LAB_080da554:
     movs r1,#0xa    @ 080da55e 0a21
     bl bios_div                              @ 080da560 33f04cff
     adds r5,r0,#0x0    @ 080da564 051c
-    ldr r2, DAT_080da5b4                     @ 080da566 134a
+    ldr r2, PTR_BLDALPHA_080da5b4            @ 080da566 134a
     movs r0,#0x10    @ 080da568 1020
     subs r0,r0,r5    @ 080da56a 401b
     lsls r0,r0,#0x18    @ 080da56c 0006
@@ -269514,18 +269514,18 @@ LAB_080da586:
     strh r0,[r4,#0xe]                        @ 080da59a e081
     b LAB_080da5f4                           @ 080da59c 2ae0
     .byte  0x00, 0x00
-DAT_080da5a0:
-    .word  0x0400000e                     @ 080da5a0 0e000004
+PTR_BG3CNT_080da5a0:
+    .word  BG3CNT                         @ 080da5a0 0e000004
 DAT_080da5a4:
     .word  0x0000fffc                     @ 080da5a4 fcff0000
-DAT_080da5a8:
-    .word  0x04000008                     @ 080da5a8 08000004
-DAT_080da5ac:
-    .word  0x0400000a                     @ 080da5ac 0a000004
+PTR_BG0CNT_080da5a8:
+    .word  BG0CNT                         @ 080da5a8 08000004
+PTR_BG1CNT_080da5ac:
+    .word  BG1CNT                         @ 080da5ac 0a000004
 DAT_080da5b0:
     .word  0x00001748                     @ 080da5b0 48170000
-DAT_080da5b4:
-    .word  0x04000052                     @ 080da5b4 52000004
+PTR_BLDALPHA_080da5b4:
+    .word  BLDALPHA                       @ 080da5b4 52000004
 LAB_080da5b8:
     ldr r2,[r4,#0x10]                        @ 080da5b8 2269
     cmp r2,#0x0                              @ 080da5ba 002a
@@ -269562,7 +269562,7 @@ LAB_080da5f4:
     bcc LAB_080da586                         @ 080da5fa c4d3
     b LAB_080da656                           @ 080da5fc 2be0
 LAB_080da5fe:
-    ldr r1, DAT_080da6a0                     @ 080da5fe 2849
+    ldr r1, PTR_BG0CNT_080da6a0              @ 080da5fe 2849
     ldrh r2,[r1,#0x0]                        @ 080da600 0a88
     ldr r3, DAT_080da6a4                     @ 080da602 284b
     adds r0,r3,#0x0    @ 080da604 181c
@@ -269587,7 +269587,7 @@ LAB_080da5fe:
     ldrh r0,[r1,#0x0]                        @ 080da62a 0888
     orrs r0,r4    @ 080da62c 2043
     strh r0,[r1,#0x0]                        @ 080da62e 0880
-    ldr r2, DAT_080da6a8                     @ 080da630 1d4a
+    ldr r2, PTR_BG3CNT_080da6a8              @ 080da630 1d4a
     ldrh r0,[r2,#0x0]                        @ 080da632 1088
     ands r3,r0    @ 080da634 0340
     strh r3,[r2,#0x0]                        @ 080da636 1380
@@ -269595,7 +269595,7 @@ LAB_080da5fe:
     movs r1,#0x3    @ 080da63a 0321
     orrs r0,r1    @ 080da63c 0843
     strh r0,[r2,#0x0]                        @ 080da63e 1080
-    ldr r1, DAT_080da6ac                     @ 080da640 1a49
+    ldr r1, PTR_BLDCNT_080da6ac              @ 080da640 1a49
     movs r0,#0x3f    @ 080da642 3f20
     strh r0,[r1,#0x0]                        @ 080da644 0880
     adds r1,#0x2    @ 080da646 0231
@@ -269643,14 +269643,14 @@ LAB_080da686:
     pop {r1}                                 @ 080da69a 02bc
     bx r1                                    @ 080da69c 0847
     .byte  0x00, 0x00
-DAT_080da6a0:
-    .word  0x04000008                     @ 080da6a0 08000004
+PTR_BG0CNT_080da6a0:
+    .word  BG0CNT                         @ 080da6a0 08000004
 DAT_080da6a4:
     .word  0x0000fffc                     @ 080da6a4 fcff0000
-DAT_080da6a8:
-    .word  0x0400000e                     @ 080da6a8 0e000004
-DAT_080da6ac:
-    .word  0x04000050                     @ 080da6ac 50000004
+PTR_BG3CNT_080da6a8:
+    .word  BG3CNT                         @ 080da6a8 0e000004
+PTR_BLDCNT_080da6ac:
+    .word  BLDCNT                         @ 080da6ac 50000004
 DAT_080da6b0:
     .word  0x00001010                     @ 080da6b0 10100000
 DAT_080da6b4:
@@ -269715,7 +269715,7 @@ LAB_080da70c:
 LAB_080da728:
     .hword 0x4641    @ 080da728 4146
     strh r1,[r7,#0x6]                        @ 080da72a f980
-    ldr r1, DAT_080da7c0                     @ 080da72c 2449
+    ldr r1, PTR_BG3CNT_080da7c0              @ 080da72c 2449
     ldrh r2,[r1,#0x0]                        @ 080da72e 0a88
     ldr r3, DAT_080da7c4                     @ 080da730 244b
     adds r0,r3,#0x0    @ 080da732 181c
@@ -269723,7 +269723,7 @@ LAB_080da728:
     strh r0,[r1,#0x0]                        @ 080da736 0880
     ldrh r0,[r1,#0x0]                        @ 080da738 0888
     strh r0,[r1,#0x0]                        @ 080da73a 0880
-    ldr r2, DAT_080da7c8                     @ 080da73c 224a
+    ldr r2, PTR_BG0CNT_080da7c8              @ 080da73c 224a
     ldrh r1,[r2,#0x0]                        @ 080da73e 1188
     adds r0,r3,#0x0    @ 080da740 181c
     ands r0,r1    @ 080da742 0840
@@ -269732,7 +269732,7 @@ LAB_080da728:
     movs r1,#0x1    @ 080da748 0121
     orrs r0,r1    @ 080da74a 0843
     strh r0,[r2,#0x0]                        @ 080da74c 1080
-    ldr r1, DAT_080da7cc                     @ 080da74e 1f49
+    ldr r1, PTR_BG1CNT_080da7cc              @ 080da74e 1f49
     ldrh r2,[r1,#0x0]                        @ 080da750 0a88
     adds r0,r3,#0x0    @ 080da752 181c
     ands r0,r2    @ 080da754 1040
@@ -269791,14 +269791,14 @@ DAT_080da7b8:
     .word  0x03005850                     @ 080da7b8 50580003
 DAT_080da7bc:
     .word  0x00000724                     @ 080da7bc 24070000
-DAT_080da7c0:
-    .word  0x0400000e                     @ 080da7c0 0e000004
+PTR_BG3CNT_080da7c0:
+    .word  BG3CNT                         @ 080da7c0 0e000004
 DAT_080da7c4:
     .word  0x0000fffc                     @ 080da7c4 fcff0000
-DAT_080da7c8:
-    .word  0x04000008                     @ 080da7c8 08000004
-DAT_080da7cc:
-    .word  0x0400000a                     @ 080da7cc 0a000004
+PTR_BG0CNT_080da7c8:
+    .word  BG0CNT                         @ 080da7c8 08000004
+PTR_BG1CNT_080da7cc:
+    .word  BG1CNT                         @ 080da7cc 0a000004
 DAT_080da7d0:
     .word  0x00001748                     @ 080da7d0 48170000
 LAB_080da7d4:
@@ -269865,7 +269865,7 @@ LAB_080da836:
     bl bios_div                              @ 080da84a 33f0d7fd
     movs r2,#0x10    @ 080da84e 1022
     subs r2,r2,r0    @ 080da850 121a
-    ldr r3, DAT_080da868                     @ 080da852 054b
+    ldr r3, PTR_BLDALPHA_080da868            @ 080da852 054b
     lsls r1,r2,#0x18    @ 080da854 1106
     lsrs r1,r1,#0x18    @ 080da856 090e
     movs r0,#0x10    @ 080da858 1020
@@ -269876,8 +269876,8 @@ LAB_080da836:
     strh r1,[r3,#0x0]                        @ 080da862 1980
     b LAB_080da876                           @ 080da864 07e0
     .byte  0x00, 0x00
-DAT_080da868:
-    .word  0x04000052                     @ 080da868 52000004
+PTR_BLDALPHA_080da868:
+    .word  BLDALPHA                       @ 080da868 52000004
 LAB_080da86c:
     movs r1,#0x80    @ 080da86c 8021
     lsls r1,r1,#0x13    @ 080da86e c904
@@ -269891,7 +269891,7 @@ LAB_080da876:
     bge LAB_080da8ee                         @ 080da87c 37da
     movs r0,#0x4    @ 080da87e 0420
     strh r0,[r7,#0x2]                        @ 080da880 7880
-    ldr r1, DAT_080da908                     @ 080da882 2149
+    ldr r1, PTR_BG0CNT_080da908              @ 080da882 2149
     ldrh r2,[r1,#0x0]                        @ 080da884 0a88
     ldr r3, DAT_080da90c                     @ 080da886 214b
     adds r0,r3,#0x0    @ 080da888 181c
@@ -269916,7 +269916,7 @@ LAB_080da876:
     ldrh r0,[r1,#0x0]                        @ 080da8ae 0888
     orrs r0,r4    @ 080da8b0 2043
     strh r0,[r1,#0x0]                        @ 080da8b2 0880
-    ldr r2, DAT_080da910                     @ 080da8b4 164a
+    ldr r2, PTR_BG3CNT_080da910              @ 080da8b4 164a
     ldrh r0,[r2,#0x0]                        @ 080da8b6 1088
     ands r3,r0    @ 080da8b8 0340
     strh r3,[r2,#0x0]                        @ 080da8ba 1380
@@ -269924,7 +269924,7 @@ LAB_080da876:
     movs r1,#0x3    @ 080da8be 0321
     orrs r0,r1    @ 080da8c0 0843
     strh r0,[r2,#0x0]                        @ 080da8c2 1080
-    ldr r1, DAT_080da914                     @ 080da8c4 1349
+    ldr r1, PTR_BLDCNT_080da914              @ 080da8c4 1349
     ldr r2, DAT_080da918                     @ 080da8c6 144a
     adds r0,r2,#0x0    @ 080da8c8 101c
     strh r0,[r1,#0x0]                        @ 080da8ca 0880
@@ -269957,14 +269957,14 @@ LAB_080da8ee:
     pop {r4,r5,r6,r7}                        @ 080da902 f0bc
     pop {r1}                                 @ 080da904 02bc
     bx r1                                    @ 080da906 0847
-DAT_080da908:
-    .word  0x04000008                     @ 080da908 08000004
+PTR_BG0CNT_080da908:
+    .word  BG0CNT                         @ 080da908 08000004
 DAT_080da90c:
     .word  0x0000fffc                     @ 080da90c fcff0000
-DAT_080da910:
-    .word  0x0400000e                     @ 080da910 0e000004
-DAT_080da914:
-    .word  0x04000050                     @ 080da914 50000004
+PTR_BG3CNT_080da910:
+    .word  BG3CNT                         @ 080da910 0e000004
+PTR_BLDCNT_080da914:
+    .word  BLDCNT                         @ 080da914 50000004
 DAT_080da918:
     .word  0x00003f3f                     @ 080da918 3f3f0000
 DAT_080da91c:
@@ -270350,7 +270350,7 @@ FUN_080dac24:
     ands r0,r4    @ 080dac3e 2040
     cmp r0,#0x0                              @ 080dac40 0028
     bne LAB_080daca2                         @ 080dac42 2ed1
-    ldr r1, DAT_080dace0                     @ 080dac44 2649
+    ldr r1, PTR_BG3CNT_080dace0              @ 080dac44 2649
     ldrh r2,[r1,#0x0]                        @ 080dac46 0a88
     ldr r3, DAT_080dace4                     @ 080dac48 264b
     adds r0,r3,#0x0    @ 080dac4a 181c
@@ -270358,7 +270358,7 @@ FUN_080dac24:
     strh r0,[r1,#0x0]                        @ 080dac4e 0880
     ldrh r0,[r1,#0x0]                        @ 080dac50 0888
     strh r0,[r1,#0x0]                        @ 080dac52 0880
-    ldr r2, DAT_080dace8                     @ 080dac54 244a
+    ldr r2, PTR_BG0CNT_080dace8              @ 080dac54 244a
     ldrh r1,[r2,#0x0]                        @ 080dac56 1188
     adds r0,r3,#0x0    @ 080dac58 181c
     ands r0,r1    @ 080dac5a 0840
@@ -270367,7 +270367,7 @@ FUN_080dac24:
     movs r1,#0x1    @ 080dac60 0121
     orrs r0,r1    @ 080dac62 0843
     strh r0,[r2,#0x0]                        @ 080dac64 1080
-    ldr r1, DAT_080dacec                     @ 080dac66 2149
+    ldr r1, PTR_BG1CNT_080dacec              @ 080dac66 2149
     ldrh r2,[r1,#0x0]                        @ 080dac68 0a88
     adds r0,r3,#0x0    @ 080dac6a 181c
     ands r0,r2    @ 080dac6c 1040
@@ -270415,7 +270415,7 @@ LAB_080dacb4:
     lsls r0,r0,#0x4    @ 080dacbc 0001
     movs r1,#0xa    @ 080dacbe 0a21
     bl bios_div                              @ 080dacc0 33f09cfb
-    ldr r2, DAT_080dacf4                     @ 080dacc4 0b4a
+    ldr r2, PTR_BLDALPHA_080dacf4            @ 080dacc4 0b4a
     movs r1,#0x10    @ 080dacc6 1021
     subs r1,r1,r0    @ 080dacc8 091a
     lsls r1,r1,#0x18    @ 080dacca 0906
@@ -270429,20 +270429,20 @@ DAT_080dacd8:
     .word  0x03005850                     @ 080dacd8 50580003
 DAT_080dacdc:
     .word  0x00000724                     @ 080dacdc 24070000
-DAT_080dace0:
-    .word  0x0400000e                     @ 080dace0 0e000004
+PTR_BG3CNT_080dace0:
+    .word  BG3CNT                         @ 080dace0 0e000004
 DAT_080dace4:
     .word  0x0000fffc                     @ 080dace4 fcff0000
-DAT_080dace8:
-    .word  0x04000008                     @ 080dace8 08000004
-DAT_080dacec:
-    .word  0x0400000a                     @ 080dacec 0a000004
+PTR_BG0CNT_080dace8:
+    .word  BG0CNT                         @ 080dace8 08000004
+PTR_BG1CNT_080dacec:
+    .word  BG1CNT                         @ 080dacec 0a000004
 DAT_080dacf0:
     .word  0x00001748                     @ 080dacf0 48170000
-DAT_080dacf4:
-    .word  0x04000052                     @ 080dacf4 52000004
+PTR_BLDALPHA_080dacf4:
+    .word  BLDALPHA                       @ 080dacf4 52000004
 LAB_080dacf8:
-    ldr r1, DAT_080dad90                     @ 080dacf8 2549
+    ldr r1, PTR_BG0CNT_080dad90              @ 080dacf8 2549
     ldrh r2,[r1,#0x0]                        @ 080dacfa 0a88
     ldr r3, DAT_080dad94                     @ 080dacfc 254b
     adds r0,r3,#0x0    @ 080dacfe 181c
@@ -270467,7 +270467,7 @@ LAB_080dacf8:
     ldrh r0,[r1,#0x0]                        @ 080dad24 0888
     orrs r0,r4    @ 080dad26 2043
     strh r0,[r1,#0x0]                        @ 080dad28 0880
-    ldr r2, DAT_080dad98                     @ 080dad2a 1b4a
+    ldr r2, PTR_BG3CNT_080dad98              @ 080dad2a 1b4a
     ldrh r0,[r2,#0x0]                        @ 080dad2c 1088
     ands r3,r0    @ 080dad2e 0340
     strh r3,[r2,#0x0]                        @ 080dad30 1380
@@ -270476,7 +270476,7 @@ LAB_080dacf8:
     orrs r0,r1    @ 080dad36 0843
     strh r0,[r2,#0x0]                        @ 080dad38 1080
     movs r6,#0x0    @ 080dad3a 0026
-    ldr r1, DAT_080dad9c                     @ 080dad3c 1749
+    ldr r1, PTR_BLDCNT_080dad9c              @ 080dad3c 1749
     movs r0,#0x3f    @ 080dad3e 3f20
     strh r0,[r1,#0x0]                        @ 080dad40 0880
     adds r1,#0x2    @ 080dad42 0231
@@ -270517,14 +270517,14 @@ LAB_080dad70:
     pop {r1}                                 @ 080dad8a 02bc
     bx r1                                    @ 080dad8c 0847
     .byte  0x00, 0x00
-DAT_080dad90:
-    .word  0x04000008                     @ 080dad90 08000004
+PTR_BG0CNT_080dad90:
+    .word  BG0CNT                         @ 080dad90 08000004
 DAT_080dad94:
     .word  0x0000fffc                     @ 080dad94 fcff0000
-DAT_080dad98:
-    .word  0x0400000e                     @ 080dad98 0e000004
-DAT_080dad9c:
-    .word  0x04000050                     @ 080dad9c 50000004
+PTR_BG3CNT_080dad98:
+    .word  BG3CNT                         @ 080dad98 0e000004
+PTR_BLDCNT_080dad9c:
+    .word  BLDCNT                         @ 080dad9c 50000004
 DAT_080dada0:
     .word  0x00001010                     @ 080dada0 10100000
 DAT_080dada4:
@@ -272167,7 +272167,7 @@ LAB_080db9f0:
     .byte  0x00, 0x00
 FUN_080db9fc:
     push {lr}                                @ 080db9fc 00b5
-    ldr r1, DAT_080dba30                     @ 080db9fe 0c49
+    ldr r1, PTR_BG3CNT_080dba30              @ 080db9fe 0c49
     ldr r0, DAT_080dba34                     @ 080dba00 0c48
     strh r0,[r1,#0x0]                        @ 080dba02 0880
     ldr r0, DAT_080dba38                     @ 080dba04 0c48
@@ -272188,8 +272188,8 @@ FUN_080db9fc:
     bl FUN_080f4f08                          @ 080dba28 19f06efa
     pop {r0}                                 @ 080dba2c 01bc
     bx r0                                    @ 080dba2e 0047
-DAT_080dba30:
-    .word  0x0400000e                     @ 080dba30 0e000004
+PTR_BG3CNT_080dba30:
+    .word  BG3CNT                         @ 080dba30 0e000004
 DAT_080dba34:
     .word  0x00001f0f                     @ 080dba34 0f1f0000
 DAT_080dba38:
@@ -274359,7 +274359,7 @@ LAB_080dcb74:
     lsls r1,r3,#0x18    @ 080dcb84 1906
     lsrs r0,r1,#0x1e    @ 080dcb86 880f
     lsls r0,r0,#0x1    @ 080dcb88 4000
-    ldr r4, DAT_080dcd74                     @ 080dcb8a 7a4c
+    ldr r4, PTR_BG0CNT_080dcd74              @ 080dcb8a 7a4c
     adds r0,r0,r4    @ 080dcb8c 0019
     ldrh r0,[r0,#0x0]                        @ 080dcb8e 0088
     movs r4,#0xc    @ 080dcb90 0c24
@@ -274375,7 +274375,7 @@ LAB_080dcb74:
     adds r4,r4,r0    @ 080dcba4 2418
     lsrs r1,r1,#0x1e    @ 080dcba6 890f
     lsls r1,r1,#0x1    @ 080dcba8 4900
-    ldr r3, DAT_080dcd74                     @ 080dcbaa 724b
+    ldr r3, PTR_BG0CNT_080dcd74              @ 080dcbaa 724b
     adds r1,r1,r3    @ 080dcbac c918
     ldrh r0,[r1,#0x0]                        @ 080dcbae 0888
     movs r1,#0xf8    @ 080dcbb0 f821
@@ -274447,7 +274447,7 @@ LAB_080dcb74:
     ldrb r3,[r3,#0x3]                        @ 080dcc3e db78
     lsrs r0,r3,#0x6    @ 080dcc40 9809
     lsls r0,r0,#0x1    @ 080dcc42 4000
-    ldr r4, DAT_080dcd74                     @ 080dcc44 4b4c
+    ldr r4, PTR_BG0CNT_080dcd74              @ 080dcc44 4b4c
     adds r0,r0,r4    @ 080dcc46 0019
     ldrh r0,[r0,#0x0]                        @ 080dcc48 0088
     movs r5,#0xf8    @ 080dcc4a f825
@@ -274609,8 +274609,8 @@ PTR_gPrng_080dcd6c:
     .word  gPrng                          @ 080dcd6c 40000003
 DAT_080dcd70:
     .word  0x09cede5c                     @ 080dcd70 5cdece09
-DAT_080dcd74:
-    .word  0x04000008                     @ 080dcd74 08000004
+PTR_BG0CNT_080dcd74:
+    .word  BG0CNT                         @ 080dcd74 08000004
 DAT_080dcd78:
     .word  0x000003ff                     @ 080dcd78 ff030000
 FUN_080dcd7c:
@@ -274935,7 +274935,7 @@ LAB_080dcf0a:
     ldrb r2,[r7,#0x3]                        @ 080dd00a fa78
     lsrs r0,r2,#0x6    @ 080dd00c 9009
     lsls r0,r0,#0x1    @ 080dd00e 4000
-    ldr r1, DAT_080dd048                     @ 080dd010 0d49
+    ldr r1, PTR_BG0CNT_080dd048              @ 080dd010 0d49
     adds r0,r0,r1    @ 080dd012 4018
     ldrh r1,[r0,#0x0]                        @ 080dd014 0188
     movs r0,#0xc    @ 080dd016 0c20
@@ -274962,8 +274962,8 @@ DAT_080dd040:
     .word  0x000003ff                     @ 080dd040 ff030000
 DAT_080dd044:
     .word  0xfffff003                     @ 080dd044 03f0ffff
-DAT_080dd048:
-    .word  0x04000008                     @ 080dd048 08000004
+PTR_BG0CNT_080dd048:
+    .word  BG0CNT                         @ 080dd048 08000004
 LAB_080dd04c:
     ldrh r7,[r7,#0x2]                        @ 080dd04c 7f88
     lsls r0,r7,#0x12    @ 080dd04e b804
@@ -275317,7 +275317,7 @@ FUN_080dd2d0:
     ldrb r6,[r4,#0x3]                        @ 080dd2e4 e678
     lsrs r2,r6,#0x6    @ 080dd2e6 b209
     lsls r2,r2,#0x2    @ 080dd2e8 9200
-    ldr r0, DAT_080dd368                     @ 080dd2ea 1f48
+    ldr r0, PTR_BG0HOFS_080dd368             @ 080dd2ea 1f48
     adds r2,r2,r0    @ 080dd2ec 1218
     ldrh r0,[r4,#0xe]                        @ 080dd2ee e089
     lsls r1,r0,#0x2    @ 080dd2f0 8100
@@ -275330,7 +275330,7 @@ FUN_080dd2d0:
     ldrb r0,[r4,#0x3]                        @ 080dd2fe e078
     lsrs r2,r0,#0x6    @ 080dd300 8209
     lsls r2,r2,#0x2    @ 080dd302 9200
-    ldr r0, DAT_080dd36c                     @ 080dd304 1948
+    ldr r0, PTR_BG0VOFS_080dd36c             @ 080dd304 1948
     adds r2,r2,r0    @ 080dd306 1218
     ldrh r3,[r4,#0x10]                       @ 080dd308 238a
     lsls r1,r3,#0x2    @ 080dd30a 9900
@@ -275344,7 +275344,7 @@ FUN_080dd2d0:
     lsls r0,r1,#0x18    @ 080dd31a 0806
     lsrs r1,r0,#0x1e    @ 080dd31c 810f
     lsls r1,r1,#0x1    @ 080dd31e 4900
-    ldr r3, DAT_080dd370                     @ 080dd320 134b
+    ldr r3, PTR_BG0CNT_080dd370              @ 080dd320 134b
     adds r1,r1,r3    @ 080dd322 c918
     lsrs r0,r0,#0x1e    @ 080dd324 800f
     lsls r0,r0,#0x1    @ 080dd326 4000
@@ -275381,12 +275381,12 @@ LAB_080dd35e:
     bx r0                                    @ 080dd362 0047
 PTR_gPrng_080dd364:
     .word  gPrng                          @ 080dd364 40000003
-DAT_080dd368:
-    .word  0x04000010                     @ 080dd368 10000004
-DAT_080dd36c:
-    .word  0x04000012                     @ 080dd36c 12000004
-DAT_080dd370:
-    .word  0x04000008                     @ 080dd370 08000004
+PTR_BG0HOFS_080dd368:
+    .word  BG0HOFS                        @ 080dd368 10000004
+PTR_BG0VOFS_080dd36c:
+    .word  BG0VOFS                        @ 080dd36c 12000004
+PTR_BG0CNT_080dd370:
+    .word  BG0CNT                         @ 080dd370 08000004
 DAT_080dd374:
     .word  0x0000fffc                     @ 080dd374 fcff0000
 FUN_080dd378:
@@ -276730,7 +276730,7 @@ DAT_080dde18:
     .word  0x03005850                     @ 080dde18 50580003
     push {r4,lr}                             @ 080dde1c 10b5
     bl FUN_080f5a98                          @ 080dde1e 17f03bfe
-    ldr r1, DAT_080ddeb4                     @ 080dde22 2449
+    ldr r1, PTR_BG0CNT_080ddeb4              @ 080dde22 2449
     movs r0,#0xe0    @ 080dde24 e020
     lsls r0,r0,#0x5    @ 080dde26 4001
     strh r0,[r1,#0x0]                        @ 080dde28 0880
@@ -276798,8 +276798,8 @@ LAB_080dde92:
     pop {r4}                                 @ 080ddeae 10bc
     pop {r1}                                 @ 080ddeb0 02bc
     bx r1                                    @ 080ddeb2 0847
-DAT_080ddeb4:
-    .word  0x04000008                     @ 080ddeb4 08000004
+PTR_BG0CNT_080ddeb4:
+    .word  BG0CNT                         @ 080ddeb4 08000004
 DAT_080ddeb8:
     .word  0x02006ed0                     @ 080ddeb8 d06e0002
 DAT_080ddebc:
@@ -279389,7 +279389,7 @@ DAT_080dfc14:
     .word  0x0200af20                     @ 080dfc14 20af0002
 FUN_080dfc18:
     push {lr}                                @ 080dfc18 00b5
-    ldr r1, DAT_080dfc64                     @ 080dfc1a 1249
+    ldr r1, PTR_BG0CNT_080dfc64              @ 080dfc1a 1249
     ldr r0, DAT_080dfc68                     @ 080dfc1c 1248
     strh r0,[r1,#0x0]                        @ 080dfc1e 0880
     adds r1,#0x2    @ 080dfc20 0231
@@ -279415,8 +279415,8 @@ FUN_080dfc18:
     movs r0,#0x1    @ 080dfc5e 0120
     pop {r1}                                 @ 080dfc60 02bc
     bx r1                                    @ 080dfc62 0847
-DAT_080dfc64:
-    .word  0x04000008                     @ 080dfc64 08000004
+PTR_BG0CNT_080dfc64:
+    .word  BG0CNT                         @ 080dfc64 08000004
 DAT_080dfc68:
     .word  0x00001f02                     @ 080dfc68 021f0000
 DAT_080dfc6c:
@@ -280718,7 +280718,7 @@ FUN_080e063c:
     movs r1,#0xe0    @ 080e0684 e021
     lsls r1,r1,#0x6    @ 080e0686 8901
     subs r1,r1,r0    @ 080e0688 091a
-    ldr r0, DAT_080e06d4                     @ 080e068a 1248
+    ldr r0, PTR_BG2X_080e06d4                @ 080e068a 1248
     str r1,[r0,#0x0]                         @ 080e068c 0160
     adds r0,#0x4    @ 080e068e 0430
     str r7,[r0,#0x0]                         @ 080e0690 0760
@@ -280754,8 +280754,8 @@ LAB_080e06c2:
     .byte  0x00, 0x00
 DAT_080e06d0:
     .word  0x03005850                     @ 080e06d0 50580003
-DAT_080e06d4:
-    .word  0x04000028                     @ 080e06d4 28000004
+PTR_BG2X_080e06d4:
+    .word  BG2X                           @ 080e06d4 28000004
 FUN_080e06d8:
     push {r4,r5,r6,r7,lr}                    @ 080e06d8 f0b5
     .hword 0x4647    @ 080e06da 4746
@@ -280777,11 +280777,11 @@ FUN_080e06d8:
     adds r7,r4,r3    @ 080e06fa e718
     ldrh r1,[r7,#0x0]                        @ 080e06fc 3988
     bl bios_div                              @ 080e06fe 2df07dfe
-    ldr r2, DAT_080e0734                     @ 080e0702 0c4a
+    ldr r2, PTR_BLDCNT_080e0734              @ 080e0702 0c4a
     ldr r3, DAT_080e0738                     @ 080e0704 0c4b
     adds r1,r3,#0x0    @ 080e0706 191c
     strh r1,[r2,#0x0]                        @ 080e0708 1180
-    ldr r1, DAT_080e073c                     @ 080e070a 0c49
+    ldr r1, PTR_BLDY_080e073c                @ 080e070a 0c49
     strh r0,[r1,#0x0]                        @ 080e070c 0880
     ldrh r0,[r5,#0x0]                        @ 080e070e 2888
     cmp r0,#0x0                              @ 080e0710 0028
@@ -280803,12 +280803,12 @@ LAB_080e072c:
     b LAB_080e0742                           @ 080e072e 08e0
 DAT_080e0730:
     .word  0x03005850                     @ 080e0730 50580003
-DAT_080e0734:
-    .word  0x04000050                     @ 080e0734 50000004
+PTR_BLDCNT_080e0734:
+    .word  BLDCNT                         @ 080e0734 50000004
 DAT_080e0738:
     .word  0x00003f84                     @ 080e0738 843f0000
-DAT_080e073c:
-    .word  0x04000054                     @ 080e073c 54000004
+PTR_BLDY_080e073c:
+    .word  BLDY                           @ 080e073c 54000004
 LAB_080e0740:
     movs r0,#0x14    @ 080e0740 1420
 LAB_080e0742:
@@ -281372,10 +281372,10 @@ switchD_080e0b58__caseD_4:
     bl FUN_080de924                          @ 080e0bbe fdf7b1fe
     cmp r0,#0x0                              @ 080e0bc2 0028
     beq switchD_080e0b58__default            @ 080e0bc4 36d0
-    ldr r1, DAT_080e0c04                     @ 080e0bc6 0f49
+    ldr r1, PTR_BG2X_080e0c04                @ 080e0bc6 0f49
     ldr r0, DAT_080e0c08                     @ 080e0bc8 0f48
     str r0,[r1,#0x0]                         @ 080e0bca 0860
-    ldr r0, DAT_080e0c0c                     @ 080e0bcc 0f48
+    ldr r0, PTR_BG2Y_080e0c0c                @ 080e0bcc 0f48
     movs r1,#0x0    @ 080e0bce 0021
     str r1,[r0,#0x0]                         @ 080e0bd0 0160
     subs r0,#0xc    @ 080e0bd2 0c38
@@ -281403,12 +281403,12 @@ LAB_080e0bfa:
     strh r0,[r4,#0x0]                        @ 080e0bfe 2080
     b switchD_080e0b58__default              @ 080e0c00 18e0
     .byte  0x00, 0x00
-DAT_080e0c04:
-    .word  0x04000028                     @ 080e0c04 28000004
+PTR_BG2X_080e0c04:
+    .word  BG2X                           @ 080e0c04 28000004
 DAT_080e0c08:
     .word  0xffffc000                     @ 080e0c08 00c0ffff
-DAT_080e0c0c:
-    .word  0x0400002c                     @ 080e0c0c 2c000004
+PTR_BG2Y_080e0c0c:
+    .word  BG2Y                           @ 080e0c0c 2c000004
 DAT_080e0c10:
     .word  0x0200af20                     @ 080e0c10 20af0002
 switchD_080e0b58__caseD_5:
@@ -281471,7 +281471,7 @@ FUN_080e0c58:
     movs r1,#0xe0    @ 080e0c86 e021
     lsls r1,r1,#0x6    @ 080e0c88 8901
     subs r1,r1,r0    @ 080e0c8a 091a
-    ldr r0, DAT_080e0d28                     @ 080e0c8c 2648
+    ldr r0, PTR_BG2X_080e0d28                @ 080e0c8c 2648
     str r1,[r0,#0x0]                         @ 080e0c8e 0160
     adds r0,#0x4    @ 080e0c90 0430
     str r6,[r0,#0x0]                         @ 080e0c92 0660
@@ -281488,11 +281488,11 @@ FUN_080e0c58:
     movs r1,#0xf    @ 080e0ca8 0f21
     bl bios_div                              @ 080e0caa 2df0a7fb
     adds r3,r0,#0x0    @ 080e0cae 031c
-    ldr r1, DAT_080e0d2c                     @ 080e0cb0 1e49
+    ldr r1, PTR_BLDCNT_080e0d2c              @ 080e0cb0 1e49
     ldr r2, DAT_080e0d30                     @ 080e0cb2 1f4a
     adds r0,r2,#0x0    @ 080e0cb4 101c
     strh r0,[r1,#0x0]                        @ 080e0cb6 0880
-    ldr r2, DAT_080e0d34                     @ 080e0cb8 1e4a
+    ldr r2, PTR_BLDALPHA_080e0d34            @ 080e0cb8 1e4a
     movs r0,#0x10    @ 080e0cba 1020
     subs r0,r0,r3    @ 080e0cbc c01a
     lsls r0,r0,#0x18    @ 080e0cbe 0006
@@ -281515,7 +281515,7 @@ LAB_080e0cca:
     ldrh r1,[r2,#0x0]                        @ 080e0ce0 1188
     ands r0,r1    @ 080e0ce2 0840
     strh r0,[r2,#0x0]                        @ 080e0ce4 1080
-    ldr r1, DAT_080e0d2c                     @ 080e0ce6 1149
+    ldr r1, PTR_BLDCNT_080e0d2c              @ 080e0ce6 1149
     ldr r2, DAT_080e0d3c                     @ 080e0ce8 144a
     adds r0,r2,#0x0    @ 080e0cea 101c
     strh r0,[r1,#0x0]                        @ 080e0cec 0880
@@ -281548,14 +281548,14 @@ LAB_080e0d14:
     .byte  0x00, 0x00
 DAT_080e0d24:
     .word  0x03005850                     @ 080e0d24 50580003
-DAT_080e0d28:
-    .word  0x04000028                     @ 080e0d28 28000004
-DAT_080e0d2c:
-    .word  0x04000050                     @ 080e0d2c 50000004
+PTR_BG2X_080e0d28:
+    .word  BG2X                           @ 080e0d28 28000004
+PTR_BLDCNT_080e0d2c:
+    .word  BLDCNT                         @ 080e0d2c 50000004
 DAT_080e0d30:
     .word  0x00001b44                     @ 080e0d30 441b0000
-DAT_080e0d34:
-    .word  0x04000052                     @ 080e0d34 52000004
+PTR_BLDALPHA_080e0d34:
+    .word  BLDALPHA                       @ 080e0d34 52000004
 DAT_080e0d38:
     .word  0xfffffbff                     @ 080e0d38 fffbffff
 DAT_080e0d3c:
@@ -281603,7 +281603,7 @@ FUN_080e0d40:
     movs r1,#0x90    @ 080e0d90 9021
     lsls r1,r1,#0x7    @ 080e0d92 c901
     subs r1,r1,r0    @ 080e0d94 091a
-    ldr r0, DAT_080e0ed0                     @ 080e0d96 4e48
+    ldr r0, PTR_BG2X_080e0ed0                @ 080e0d96 4e48
     str r2,[r0,#0x0]                         @ 080e0d98 0260
     adds r0,#0x4    @ 080e0d9a 0430
     str r1,[r0,#0x0]                         @ 080e0d9c 0160
@@ -281620,11 +281620,11 @@ FUN_080e0d40:
     movs r1,#0x3c    @ 080e0db2 3c21
     bl bios_div                              @ 080e0db4 2df022fb
     adds r3,r0,#0x0    @ 080e0db8 031c
-    ldr r1, DAT_080e0ed4                     @ 080e0dba 4649
+    ldr r1, PTR_BLDCNT_080e0ed4              @ 080e0dba 4649
     ldr r2, DAT_080e0ed8                     @ 080e0dbc 464a
     adds r0,r2,#0x0    @ 080e0dbe 101c
     strh r0,[r1,#0x0]                        @ 080e0dc0 0880
-    ldr r2, DAT_080e0edc                     @ 080e0dc2 464a
+    ldr r2, PTR_BLDALPHA_080e0edc            @ 080e0dc2 464a
     movs r0,#0x10    @ 080e0dc4 1020
     subs r0,r0,r3    @ 080e0dc6 c01a
     lsls r0,r0,#0x18    @ 080e0dc8 0006
@@ -281657,11 +281657,11 @@ LAB_080e0dd4:
     ldrh r1,[r2,#0x0]                        @ 080e0dfc 1188
     ands r0,r1    @ 080e0dfe 0840
     strh r0,[r2,#0x0]                        @ 080e0e00 1080
-    ldr r1, DAT_080e0ed4                     @ 080e0e02 3449
+    ldr r1, PTR_BLDCNT_080e0ed4              @ 080e0e02 3449
     ldr r3, DAT_080e0ee4                     @ 080e0e04 374b
     adds r0,r3,#0x0    @ 080e0e06 181c
     strh r0,[r1,#0x0]                        @ 080e0e08 0880
-    ldr r0, DAT_080e0edc                     @ 080e0e0a 3448
+    ldr r0, PTR_BLDALPHA_080e0edc            @ 080e0e0a 3448
     .hword 0x4641    @ 080e0e0c 4146
     strh r1,[r0,#0x0]                        @ 080e0e0e 0180
     .hword 0x464a    @ 080e0e10 4a46
@@ -281754,14 +281754,14 @@ LAB_080e0eb6:
     bx r1                                    @ 080e0eca 0847
 DAT_080e0ecc:
     .word  0x03005850                     @ 080e0ecc 50580003
-DAT_080e0ed0:
-    .word  0x04000028                     @ 080e0ed0 28000004
-DAT_080e0ed4:
-    .word  0x04000050                     @ 080e0ed4 50000004
+PTR_BG2X_080e0ed0:
+    .word  BG2X                           @ 080e0ed0 28000004
+PTR_BLDCNT_080e0ed4:
+    .word  BLDCNT                         @ 080e0ed4 50000004
 DAT_080e0ed8:
     .word  0x00001b44                     @ 080e0ed8 441b0000
-DAT_080e0edc:
-    .word  0x04000052                     @ 080e0edc 52000004
+PTR_BLDALPHA_080e0edc:
+    .word  BLDALPHA                       @ 080e0edc 52000004
 DAT_080e0ee0:
     .word  0xfffffbff                     @ 080e0ee0 fffbffff
 DAT_080e0ee4:
@@ -288383,7 +288383,7 @@ DAT_080e5650:
 DAT_080e5654:
     .word  0x09e5ec24                     @ 080e5654 24ece509
 FUN_080e5658:
-    ldr r1, DAT_080e5678                     @ 080e5658 0749
+    ldr r1, PTR_BLDCNT_080e5678              @ 080e5658 0749
     ldr r2, DAT_080e567c                     @ 080e565a 084a
     adds r0,r2,#0x0    @ 080e565c 101c
     strh r0,[r1,#0x0]                        @ 080e565e 0880
@@ -288399,8 +288399,8 @@ FUN_080e5658:
     str r1,[r0,#0x0]                         @ 080e5672 0160
     bx lr                                    @ 080e5674 7047
     .byte  0x00, 0x00
-DAT_080e5678:
-    .word  0x04000050                     @ 080e5678 50000004
+PTR_BLDCNT_080e5678:
+    .word  BLDCNT                         @ 080e5678 50000004
 DAT_080e567c:
     .word  0x00003b44                     @ 080e567c 443b0000
 DAT_080e5680:
@@ -290023,7 +290023,7 @@ FUN_080e6310:
     bl FUN_080f7674                          @ 080e6328 11f0a4f9
     ldr r0, DAT_080e6398                     @ 080e632c 1a48
     bl FUN_080f42a0                          @ 080e632e 0df0b7ff
-    ldr r1, DAT_080e639c                     @ 080e6332 1a49
+    ldr r1, PTR_BG0CNT_080e639c              @ 080e6332 1a49
     movs r0,#0x4    @ 080e6334 0420
     strh r0,[r1,#0x0]                        @ 080e6336 0880
     adds r1,#0x2    @ 080e6338 0231
@@ -290071,8 +290071,8 @@ DAT_080e6394:
     .word  0x02039eb0                     @ 080e6394 b09e0302
 DAT_080e6398:
     .word  0x02029eb0                     @ 080e6398 b09e0202
-DAT_080e639c:
-    .word  0x04000008                     @ 080e639c 08000004
+PTR_BG0CNT_080e639c:
+    .word  BG0CNT                         @ 080e639c 08000004
 DAT_080e63a0:
     .word  0x00000185                     @ 080e63a0 85010000
 DAT_080e63a4:
@@ -294602,7 +294602,7 @@ LAB_080e8650:
     str r0,[r2,#0xc]                         @ 080e86c8 d060
     cmp r8,sp                                @ 080e86ca e845
     bne LAB_080e86d8                         @ 080e86cc 04d1
-    ldr r2, DAT_080e86e8                     @ 080e86ce 064a
+    ldr r2, PTR_DISPSTAT_080e86e8            @ 080e86ce 064a
     .hword 0x4668    @ 080e86d0 6846
     .hword 0x4649    @ 080e86d2 4946
     bl bios_cpu_set                          @ 080e86d4 25f090fe
@@ -294616,8 +294616,8 @@ LAB_080e86da:
     pop {r4,r5,r6,r7}                        @ 080e86e2 f0bc
     pop {r1}                                 @ 080e86e4 02bc
     bx r1                                    @ 080e86e6 0847
-DAT_080e86e8:
-    .word  0x04000004                     @ 080e86e8 04000004
+PTR_DISPSTAT_080e86e8:
+    .word  DISPSTAT                       @ 080e86e8 04000004
 FUN_080e86ec:
     push {r4,r5,r6,r7,lr}                    @ 080e86ec f0b5
     .hword 0x4657    @ 080e86ee 5746
@@ -301209,24 +301209,24 @@ DAT_080ebb0c:
     .word  0x09e4e8e4                     @ 080ebb0c e4e8e409
 DAT_080ebb10:
     .word  0x09e4e8fc                     @ 080ebb10 fce8e409
-    ldr r2, DAT_080ebb28                     @ 080ebb14 044a
+    ldr r2, PTR_BG3VOFS_080ebb28             @ 080ebb14 044a
     ldr r0, PTR_gPrng_080ebb2c               @ 080ebb16 0548
     ldr r1, DAT_080ebb30                     @ 080ebb18 0549
     adds r0,r0,r1    @ 080ebb1a 4018
     ldrh r0,[r0,#0x0]                        @ 080ebb1c 0088
     lsrs r1,r0,#0x1    @ 080ebb1e 4108
     strh r1,[r2,#0x0]                        @ 080ebb20 1180
-    ldr r0, DAT_080ebb34                     @ 080ebb22 0448
+    ldr r0, PTR_BG3HOFS_080ebb34             @ 080ebb22 0448
     strh r1,[r0,#0x0]                        @ 080ebb24 0180
     bx lr                                    @ 080ebb26 7047
-DAT_080ebb28:
-    .word  0x0400001e                     @ 080ebb28 1e000004
+PTR_BG3VOFS_080ebb28:
+    .word  BG3VOFS                        @ 080ebb28 1e000004
 PTR_gPrng_080ebb2c:
     .word  gPrng                          @ 080ebb2c 40000003
 DAT_080ebb30:
     .word  0x0000020e                     @ 080ebb30 0e020000
-DAT_080ebb34:
-    .word  0x0400001c                     @ 080ebb34 1c000004
+PTR_BG3HOFS_080ebb34:
+    .word  BG3HOFS                        @ 080ebb34 1c000004
 FUN_080ebb38:
     push {r4,lr}                             @ 080ebb38 10b5
     ldr r0, PTR_gPrng_080ebbc0               @ 080ebb3a 2148
@@ -301255,7 +301255,7 @@ FUN_080ebb38:
     ands r0,r3    @ 080ebb6c 1840
     orrs r0,r1    @ 080ebb6e 0843
     strh r0,[r2,#0x0]                        @ 080ebb70 1080
-    ldr r1, DAT_080ebbdc                     @ 080ebb72 1a49
+    ldr r1, PTR_BG0CNT_080ebbdc              @ 080ebb72 1a49
     movs r0,#0x4    @ 080ebb74 0420
     strh r0,[r1,#0x0]                        @ 080ebb76 0880
     adds r1,#0x2    @ 080ebb78 0231
@@ -301303,8 +301303,8 @@ DAT_080ebbd4:
     .word  0x00006c2c                     @ 080ebbd4 2c6c0000
 DAT_080ebbd8:
     .word  0xfffffe1f                     @ 080ebbd8 1ffeffff
-DAT_080ebbdc:
-    .word  0x04000008                     @ 080ebbdc 08000004
+PTR_BG0CNT_080ebbdc:
+    .word  BG0CNT                         @ 080ebbdc 08000004
 DAT_080ebbe0:
     .word  0x00000105                     @ 080ebbe0 05010000
 DAT_080ebbe4:
@@ -301860,7 +301860,7 @@ LAB_080ec024:
     ands r0,r2    @ 080ec034 1040
     orrs r0,r1    @ 080ec036 0843
     strh r0,[r6,#0x0]                        @ 080ec038 3080
-    ldr r1, DAT_080ec05c                     @ 080ec03a 0849
+    ldr r1, PTR_BLDCNT_080ec05c              @ 080ec03a 0849
     movs r2,#0xfd    @ 080ec03c fd22
     lsls r2,r2,#0x6    @ 080ec03e 9201
     adds r0,r2,#0x0    @ 080ec040 101c
@@ -301877,8 +301877,8 @@ LAB_080ec024:
     b LAB_080ec1ac                           @ 080ec056 a9e0
 DAT_080ec058:
     .word  0xffffc03f                     @ 080ec058 3fc0ffff
-DAT_080ec05c:
-    .word  0x04000050                     @ 080ec05c 50000004
+PTR_BLDCNT_080ec05c:
+    .word  BLDCNT                         @ 080ec05c 50000004
 DAT_080ec060:
     .word  0x00001807                     @ 080ec060 07180000
 DAT_080ec064:
@@ -302120,7 +302120,7 @@ DAT_080ecec4:
 FUN_080ed484:
     push {r4,r5,lr}                          @ 080ed484 30b5
     adds r2,r0,#0x0    @ 080ed486 021c
-    ldr r0, DAT_080ed510                     @ 080ed488 2148
+    ldr r0, PTR_SIOCNT_080ed510              @ 080ed488 2148
     ldrh r1,[r0,#0x0]                        @ 080ed48a 0188
     movs r0,#0x30    @ 080ed48c 3020
     ands r0,r1    @ 080ed48e 0840
@@ -302185,8 +302185,8 @@ FUN_080ed484:
     strh r0,[r1,#0x0]                        @ 080ed50a 0880
     movs r0,#0x1    @ 080ed50c 0120
     b LAB_080ed526                           @ 080ed50e 0ae0
-DAT_080ed510:
-    .word  0x04000128                     @ 080ed510 28010004
+PTR_SIOCNT_080ed510:
+    .word  SIOCNT                         @ 080ed510 28010004
 PTR_gPrng_080ed514:
     .word  gPrng                          @ 080ed514 40000003
 DAT_080ed518:
@@ -302699,7 +302699,7 @@ LAB_080ed8e6:
     adds r5,r2,#0x0    @ 080ed8e6 151c
     cmp r5,#0x5                              @ 080ed8e8 052d
     bls LAB_080ed8b4                         @ 080ed8ea e3d9
-    ldr r5, DAT_080ed92c                     @ 080ed8ec 0f4d
+    ldr r5, PTR_IME_080ed92c                 @ 080ed8ec 0f4d
     movs r0,#0x0    @ 080ed8ee 0020
     strh r0,[r5,#0x0]                        @ 080ed8f0 2880
     movs r3,#0xe0    @ 080ed8f2 e023
@@ -302731,8 +302731,8 @@ LAB_080ed8e6:
     orrs r0,r5    @ 080ed926 2843
     b LAB_080ed9b6                           @ 080ed928 45e0
     .byte  0x00, 0x00
-DAT_080ed92c:
-    .word  0x04000208                     @ 080ed92c 08020004
+PTR_IME_080ed92c:
+    .word  IME                            @ 080ed92c 08020004
 DAT_080ed930:
     .word  0x00000464                     @ 080ed930 64040000
 DAT_080ed934:
@@ -302773,7 +302773,7 @@ LAB_080ed968:
     adds r5,#0x1    @ 080ed974 0135
     cmp r5,#0x5                              @ 080ed976 052d
     bls LAB_080ed968                         @ 080ed978 f6d9
-    ldr r5, DAT_080ed9bc                     @ 080ed97a 104d
+    ldr r5, PTR_IME_080ed9bc                 @ 080ed97a 104d
     movs r0,#0x0    @ 080ed97c 0020
     strh r0,[r5,#0x0]                        @ 080ed97e 2880
     movs r3,#0xe0    @ 080ed980 e023
@@ -302807,8 +302807,8 @@ LAB_080ed9b6:
     strb r0,[r1,#0x0]                        @ 080ed9b6 0870
     movs r0,#0x0    @ 080ed9b8 0020
     b LAB_080eda1e                           @ 080ed9ba 30e0
-DAT_080ed9bc:
-    .word  0x04000208                     @ 080ed9bc 08020004
+PTR_IME_080ed9bc:
+    .word  IME                            @ 080ed9bc 08020004
 DAT_080ed9c0:
     .word  0x00000464                     @ 080ed9c0 64040000
 DAT_080ed9c4:
@@ -302898,7 +302898,7 @@ LAB_080eda54:
     add r0,r8                                @ 080eda60 4044
     strh r4,[r0,#0x0]                        @ 080eda62 0480
     ldr r2, DAT_080edaa0                     @ 080eda64 0e4a
-    ldr r0, DAT_080edaa4                     @ 080eda66 0f48
+    ldr r0, PTR_SIOCNT_080edaa4              @ 080eda66 0f48
     ldrh r1,[r0,#0x0]                        @ 080eda68 0188
     movs r0,#0x30    @ 080eda6a 3020
     ands r0,r1    @ 080eda6c 0840
@@ -302928,8 +302928,8 @@ PTR_gPrng_080eda9c:
     .word  gPrng                          @ 080eda9c 40000003
 DAT_080edaa0:
     .word  0x09e4e980                     @ 080edaa0 80e9e409
-DAT_080edaa4:
-    .word  0x04000128                     @ 080edaa4 28010004
+PTR_SIOCNT_080edaa4:
+    .word  SIOCNT                         @ 080edaa4 28010004
 DAT_080edaa8:
     .word  0x00000594                     @ 080edaa8 94050000
 DAT_080edaac:
@@ -303298,7 +303298,7 @@ DAT_080edd54:
     beq LAB_080edd76                         @ 080edd70 01d0
     bl FUN_0810e5c8                          @ 080edd72 20f029fc
 LAB_080edd76:
-    ldr r1, DAT_080edd88                     @ 080edd76 0449
+    ldr r1, PTR_TM2CNT_L_080edd88            @ 080edd76 0449
     ldr r0, DAT_080edd8c                     @ 080edd78 0448
     str r0,[r1,#0x0]                         @ 080edd7a 0860
     pop {r0}                                 @ 080edd7c 01bc
@@ -303307,8 +303307,8 @@ PTR_gPrng_080edd80:
     .word  gPrng                          @ 080edd80 40000003
 DAT_080edd84:
     .word  0x00000924                     @ 080edd84 24090000
-DAT_080edd88:
-    .word  0x04000108                     @ 080edd88 08010004
+PTR_TM2CNT_L_080edd88:
+    .word  TM2CNT_L                       @ 080edd88 08010004
 DAT_080edd8c:
     .word  0x00c3feb9                     @ 080edd8c b9fec300
 FUN_080edd90:
@@ -303352,16 +303352,16 @@ LAB_080edda4:
     str r2,[r0,#0x0]                         @ 080eddde 0260
     ldr r0, DAT_080ede14                     @ 080edde0 0c48
     str r0,[r5,#0x18]                        @ 080edde2 a861
-    ldr r3, DAT_080ede18                     @ 080edde4 0c4b
+    ldr r3, PTR_IME_080ede18                 @ 080edde4 0c4b
     strh r2,[r3,#0x0]                        @ 080edde6 1a80
-    ldr r2, DAT_080ede1c                     @ 080edde8 0c4a
+    ldr r2, PTR_IE_080ede1c                  @ 080edde8 0c4a
     ldrh r0,[r2,#0x0]                        @ 080eddea 1088
     movs r1,#0x20    @ 080eddec 2021
     orrs r0,r1    @ 080eddee 0843
     strh r0,[r2,#0x0]                        @ 080eddf0 1080
     movs r0,#0x1    @ 080eddf2 0120
     strh r0,[r3,#0x0]                        @ 080eddf4 1880
-    ldr r1, DAT_080ede20                     @ 080eddf6 0a49
+    ldr r1, PTR_TM2CNT_L_080ede20            @ 080eddf6 0a49
     ldr r0, DAT_080ede24                     @ 080eddf8 0a48
     str r0,[r1,#0x0]                         @ 080eddfa 0860
     pop {r4,r5,r6,r7}                        @ 080eddfc f0bc
@@ -303378,20 +303378,20 @@ DAT_080ede10:
     .word  0x00000924                     @ 080ede10 24090000
 DAT_080ede14:
     .word  0x080edd59                     @ 080ede14 59dd0e08
-DAT_080ede18:
-    .word  0x04000208                     @ 080ede18 08020004
-DAT_080ede1c:
-    .word  0x04000200                     @ 080ede1c 00020004
-DAT_080ede20:
-    .word  0x04000108                     @ 080ede20 08010004
+PTR_IME_080ede18:
+    .word  IME                            @ 080ede18 08020004
+PTR_IE_080ede1c:
+    .word  IE                             @ 080ede1c 00020004
+PTR_TM2CNT_L_080ede20:
+    .word  TM2CNT_L                       @ 080ede20 08010004
 DAT_080ede24:
     .word  0x00c3feb9                     @ 080ede24 b9fec300
 FUN_080ede28:
     push {lr}                                @ 080ede28 00b5
-    ldr r3, DAT_080ede4c                     @ 080ede2a 084b
+    ldr r3, PTR_IME_080ede4c                 @ 080ede2a 084b
     movs r0,#0x0    @ 080ede2c 0020
     strh r0,[r3,#0x0]                        @ 080ede2e 1880
-    ldr r2, DAT_080ede50                     @ 080ede30 074a
+    ldr r2, PTR_IE_080ede50                  @ 080ede30 074a
     ldrh r1,[r2,#0x0]                        @ 080ede32 1188
     ldr r0, DAT_080ede54                     @ 080ede34 0748
     ands r0,r1    @ 080ede36 0840
@@ -303404,16 +303404,16 @@ FUN_080ede28:
     bl FUN_080ef77c                          @ 080ede44 01f09afc
     pop {r0}                                 @ 080ede48 01bc
     bx r0                                    @ 080ede4a 0047
-DAT_080ede4c:
-    .word  0x04000208                     @ 080ede4c 08020004
-DAT_080ede50:
-    .word  0x04000200                     @ 080ede50 00020004
+PTR_IME_080ede4c:
+    .word  IME                            @ 080ede4c 08020004
+PTR_IE_080ede50:
+    .word  IE                             @ 080ede50 00020004
 DAT_080ede54:
     .word  0x0000ffdf                     @ 080ede54 dfff0000
 DAT_080ede58:
     .word  0x03000000                     @ 080ede58 00000003
 FUN_080ede5c:
-    ldr r0, DAT_080ede9c                     @ 080ede5c 0f48
+    ldr r0, PTR_BG2X_080ede9c                @ 080ede5c 0f48
     movs r1,#0x0    @ 080ede5e 0021
     str r1,[r0,#0x0]                         @ 080ede60 0160
     adds r0,#0x4    @ 080ede62 0430
@@ -303441,14 +303441,14 @@ FUN_080ede5c:
     strh r1,[r0,#0x0]                        @ 080ede8e 0180
     adds r0,#0x2    @ 080ede90 0230
     strh r2,[r0,#0x0]                        @ 080ede92 0280
-    ldr r1, DAT_080edea0                     @ 080ede94 0249
+    ldr r1, PTR_BG0CNT_080edea0              @ 080ede94 0249
     movs r0,#0x4    @ 080ede96 0420
     strh r0,[r1,#0x0]                        @ 080ede98 0880
     bx lr                                    @ 080ede9a 7047
-DAT_080ede9c:
-    .word  0x04000028                     @ 080ede9c 28000004
-DAT_080edea0:
-    .word  0x04000008                     @ 080edea0 08000004
+PTR_BG2X_080ede9c:
+    .word  BG2X                           @ 080ede9c 28000004
+PTR_BG0CNT_080edea0:
+    .word  BG0CNT                         @ 080edea0 08000004
 FUN_080edea4:
     push {r4,r5,r6,lr}                       @ 080edea4 70b5
     adds r4,r0,#0x0    @ 080edea6 041c
@@ -306121,14 +306121,14 @@ FUN_080ef4f4:
     ldrb r0,[r0,#0x0]                        @ 080ef504 0078
     cmp r0,#0x0                              @ 080ef506 0028
     beq LAB_080ef51e                         @ 080ef508 09d0
-    ldr r2, DAT_080ef528                     @ 080ef50a 074a
+    ldr r2, PTR_SIOCNT_080ef528              @ 080ef50a 074a
     ldr r0, DAT_080ef52c                     @ 080ef50c 0748
     strh r0,[r2,#0x2]                        @ 080ef50e 5080
     ldrh r0,[r2,#0x0]                        @ 080ef510 1088
     movs r1,#0x80    @ 080ef512 8021
     orrs r0,r1    @ 080ef514 0843
     strh r0,[r2,#0x0]                        @ 080ef516 1080
-    ldr r1, DAT_080ef530                     @ 080ef518 0549
+    ldr r1, PTR_TM3CNT_H_080ef530            @ 080ef518 0549
     movs r0,#0xc0    @ 080ef51a c020
     strh r0,[r1,#0x0]                        @ 080ef51c 0880
 LAB_080ef51e:
@@ -306137,16 +306137,16 @@ DAT_080ef520:
     .word  0x030003a0                     @ 080ef520 a0030003
 DAT_080ef524:
     .word  0x0000033f                     @ 080ef524 3f030000
-DAT_080ef528:
-    .word  0x04000128                     @ 080ef528 28010004
+PTR_SIOCNT_080ef528:
+    .word  SIOCNT                         @ 080ef528 28010004
 DAT_080ef52c:
     .word  0x0000fefe                     @ 080ef52c fefe0000
-DAT_080ef530:
-    .word  0x0400010e                     @ 080ef530 0e010004
+PTR_TM3CNT_H_080ef530:
+    .word  TM3CNT_H                       @ 080ef530 0e010004
 FUN_080ef534:
     push {r4,r5,r6,r7,lr}                    @ 080ef534 f0b5
     ldr r2, DAT_080ef560                     @ 080ef536 0a4a
-    ldr r0, DAT_080ef564                     @ 080ef538 0a48
+    ldr r0, PTR_SIODATA32_080ef564           @ 080ef538 0a48
     ldr r1,[r0,#0x4]                         @ 080ef53a 4168
     ldr r0,[r0,#0x0]                         @ 080ef53c 0068
     str r0,[r2,#0x0]                         @ 080ef53e 1060
@@ -306168,8 +306168,8 @@ FUN_080ef534:
     b LAB_080ef5e6                           @ 080ef55e 42e0
 DAT_080ef560:
     .word  0x030007a4                     @ 080ef560 a4070003
-DAT_080ef564:
-    .word  0x04000120                     @ 080ef564 20010004
+PTR_SIODATA32_080ef564:
+    .word  SIODATA32                      @ 080ef564 20010004
 DAT_080ef568:
     .word  0x0000fefe                     @ 080ef568 fefe0000
 DAT_080ef56c:
@@ -306251,7 +306251,7 @@ LAB_080ef5f8:
     ldrb r0,[r3,#0x0]                        @ 080ef5fc 1878
     cmp r0,#0x0                              @ 080ef5fe 0028
     beq LAB_080ef608                         @ 080ef600 02d0
-    ldr r1, DAT_080ef654                     @ 080ef602 1449
+    ldr r1, PTR_TM3CNT_H_080ef654            @ 080ef602 1449
     movs r0,#0x0    @ 080ef604 0020
     strh r0,[r1,#0x0]                        @ 080ef606 0880
 LAB_080ef608:
@@ -306260,7 +306260,7 @@ LAB_080ef608:
     bgt LAB_080ef638                         @ 080ef60c 14dc
     cmp r0,#0x0                              @ 080ef60e 0028
     blt LAB_080ef622                         @ 080ef610 07db
-    ldr r2, DAT_080ef658                     @ 080ef612 114a
+    ldr r2, PTR_SIOCNT_080ef658              @ 080ef612 114a
     lsls r0,r0,#0x1    @ 080ef614 4000
     movs r4,#0xd7    @ 080ef616 d724
     lsls r4,r4,#0x2    @ 080ef618 a400
@@ -306272,12 +306272,12 @@ LAB_080ef622:
     ldrb r0,[r3,#0x0]                        @ 080ef622 1878
     cmp r0,#0x0                              @ 080ef624 0028
     beq LAB_080ef638                         @ 080ef626 07d0
-    ldr r2, DAT_080ef658                     @ 080ef628 0b4a
+    ldr r2, PTR_SIOCNT_080ef658              @ 080ef628 0b4a
     ldrh r0,[r2,#0x0]                        @ 080ef62a 1088
     movs r1,#0x80    @ 080ef62c 8021
     orrs r0,r1    @ 080ef62e 0843
     strh r0,[r2,#0x0]                        @ 080ef630 1080
-    ldr r1, DAT_080ef654                     @ 080ef632 0849
+    ldr r1, PTR_TM3CNT_H_080ef654            @ 080ef632 0849
     movs r0,#0xc0    @ 080ef634 c020
     strh r0,[r1,#0x0]                        @ 080ef636 0880
 LAB_080ef638:
@@ -306295,10 +306295,10 @@ DAT_080ef64c:
     .word  0x0000040c                     @ 080ef64c 0c040000
 DAT_080ef650:
     .word  0x0000033e                     @ 080ef650 3e030000
-DAT_080ef654:
-    .word  0x0400010e                     @ 080ef654 0e010004
-DAT_080ef658:
-    .word  0x04000128                     @ 080ef658 28010004
+PTR_TM3CNT_H_080ef654:
+    .word  TM3CNT_H                       @ 080ef654 0e010004
+PTR_SIOCNT_080ef658:
+    .word  SIOCNT                         @ 080ef658 28010004
 FUN_080ef65c:
     push {r4,r5,r6,r7,lr}                    @ 080ef65c f0b5
     .hword 0x464f    @ 080ef65e 4f46
@@ -306307,10 +306307,10 @@ FUN_080ef65c:
     sub sp,#0x4                              @ 080ef664 81b0
     .hword 0x4680    @ 080ef666 8046
     .hword 0x4689    @ 080ef668 8946
-    ldr r3, DAT_080ef750                     @ 080ef66a 394b
+    ldr r3, PTR_IME_080ef750                 @ 080ef66a 394b
     movs r0,#0x0    @ 080ef66c 0020
     strh r0,[r3,#0x0]                        @ 080ef66e 1880
-    ldr r2, DAT_080ef754                     @ 080ef670 384a
+    ldr r2, PTR_IE_080ef754                  @ 080ef670 384a
     ldrh r1,[r2,#0x0]                        @ 080ef672 1188
     ldr r0, DAT_080ef758                     @ 080ef674 3848
     ands r0,r1    @ 080ef676 0840
@@ -306364,9 +306364,9 @@ LAB_080ef6c2:
     adds r0,r7,r1    @ 080ef6d6 7818
     movs r6,#0x0    @ 080ef6d8 0026
     strh r6,[r0,#0x0]                        @ 080ef6da 0680
-    ldr r0, DAT_080ef768                     @ 080ef6dc 2248
+    ldr r0, PTR_RCNT_080ef768                @ 080ef6dc 2248
     strh r6,[r0,#0x0]                        @ 080ef6de 0680
-    ldr r4, DAT_080ef76c                     @ 080ef6e0 224c
+    ldr r4, PTR_SIOCNT_080ef76c              @ 080ef6e0 224c
     movs r2,#0x80    @ 080ef6e2 8022
     lsls r2,r2,#0x6    @ 080ef6e4 9201
     adds r0,r2,#0x0    @ 080ef6e6 101c
@@ -306391,9 +306391,9 @@ LAB_080ef6c2:
     str r0,[r7,#0x0]                         @ 080ef70c 3860
     .hword 0x4649    @ 080ef70e 4946
     str r1,[r7,#0x4]                         @ 080ef710 7960
-    ldr r3, DAT_080ef750                     @ 080ef712 0f4b
+    ldr r3, PTR_IME_080ef750                 @ 080ef712 0f4b
     strh r6,[r3,#0x0]                        @ 080ef714 1e80
-    ldr r2, DAT_080ef754                     @ 080ef716 0f4a
+    ldr r2, PTR_IE_080ef754                  @ 080ef716 0f4a
     ldrh r0,[r2,#0x0]                        @ 080ef718 1088
     movs r1,#0x80    @ 080ef71a 8021
     orrs r0,r1    @ 080ef71c 0843
@@ -306422,10 +306422,10 @@ LAB_080ef6c2:
     pop {r4,r5,r6,r7}                        @ 080ef74a f0bc
     pop {r0}                                 @ 080ef74c 01bc
     bx r0                                    @ 080ef74e 0047
-DAT_080ef750:
-    .word  0x04000208                     @ 080ef750 08020004
-DAT_080ef754:
-    .word  0x04000200                     @ 080ef754 00020004
+PTR_IME_080ef750:
+    .word  IME                            @ 080ef750 08020004
+PTR_IE_080ef754:
+    .word  IE                             @ 080ef754 00020004
 DAT_080ef758:
     .word  0x0000ff3f                     @ 080ef758 3fff0000
 DAT_080ef75c:
@@ -306434,10 +306434,10 @@ DAT_080ef760:
     .word  0x05000116                     @ 080ef760 16010005
 DAT_080ef764:
     .word  0x00000346                     @ 080ef764 46030000
-DAT_080ef768:
-    .word  0x04000134                     @ 080ef768 34010004
-DAT_080ef76c:
-    .word  0x04000128                     @ 080ef76c 28010004
+PTR_RCNT_080ef768:
+    .word  RCNT                           @ 080ef768 34010004
+PTR_SIOCNT_080ef76c:
+    .word  SIOCNT                         @ 080ef76c 28010004
 DAT_080ef770:
     .word  0x00004003                     @ 080ef770 03400000
 DAT_080ef774:
@@ -306445,10 +306445,10 @@ DAT_080ef774:
 DAT_080ef778:
     .word  0x0000042c                     @ 080ef778 2c040000
 FUN_080ef77c:
-    ldr r3, DAT_080ef7b4                     @ 080ef77c 0d4b
+    ldr r3, PTR_IME_080ef7b4                 @ 080ef77c 0d4b
     movs r0,#0x0    @ 080ef77e 0020
     strh r0,[r3,#0x0]                        @ 080ef780 1880
-    ldr r2, DAT_080ef7b8                     @ 080ef782 0d4a
+    ldr r2, PTR_IE_080ef7b8                  @ 080ef782 0d4a
     ldrh r1,[r2,#0x0]                        @ 080ef784 1188
     ldr r0, DAT_080ef7bc                     @ 080ef786 0d48
     ands r0,r1    @ 080ef788 0840
@@ -306461,7 +306461,7 @@ FUN_080ef77c:
     str r1,[r0,#0x0]                         @ 080ef796 0160
     movs r0,#0x1    @ 080ef798 0120
     strh r0,[r3,#0x0]                        @ 080ef79a 1880
-    ldr r1, DAT_080ef7c4                     @ 080ef79c 0949
+    ldr r1, PTR_TM3CNT_L_080ef7c4            @ 080ef79c 0949
     ldr r0, DAT_080ef7c8                     @ 080ef79e 0a48
     str r0,[r1,#0x0]                         @ 080ef7a0 0860
     adds r1,#0x1c    @ 080ef7a2 1c31
@@ -306473,16 +306473,16 @@ FUN_080ef77c:
     movs r0,#0xc0    @ 080ef7ae c020
     strh r0,[r1,#0x0]                        @ 080ef7b0 0880
     bx lr                                    @ 080ef7b2 7047
-DAT_080ef7b4:
-    .word  0x04000208                     @ 080ef7b4 08020004
-DAT_080ef7b8:
-    .word  0x04000200                     @ 080ef7b8 00020004
+PTR_IME_080ef7b4:
+    .word  IME                            @ 080ef7b4 08020004
+PTR_IE_080ef7b8:
+    .word  IE                             @ 080ef7b8 00020004
 DAT_080ef7bc:
     .word  0x0000ff3f                     @ 080ef7bc 3fff0000
 DAT_080ef7c0:
     .word  0x030003a0                     @ 080ef7c0 a0030003
-DAT_080ef7c4:
-    .word  0x0400010c                     @ 080ef7c4 0c010004
+PTR_TM3CNT_L_080ef7c4:
+    .word  TM3CNT_L                       @ 080ef7c4 0c010004
 DAT_080ef7c8:
     .word  0x0000b1fc                     @ 080ef7c8 fcb10000
 FUN_080ef7cc:
@@ -306494,7 +306494,7 @@ FUN_080ef7cc:
     strh r5,[r1,#0x0]                        @ 080ef7d6 0d80
     adds r2,#0x2    @ 080ef7d8 0232
     adds r1,r4,r2    @ 080ef7da a118
-    ldr r2, DAT_080ef814                     @ 080ef7dc 0d4a
+    ldr r2, PTR_DISPSTAT_080ef814            @ 080ef7dc 0d4a
     bl bios_cpu_set                          @ 080ef7de 1ef00bfe
     movs r1,#0x0    @ 080ef7e2 0021
     movs r0,#0xd7    @ 080ef7e4 d720
@@ -306522,8 +306522,8 @@ DAT_080ef80c:
     .word  0x030003a0                     @ 080ef80c a0030003
 DAT_080ef810:
     .word  0x0000035e                     @ 080ef810 5e030000
-DAT_080ef814:
-    .word  0x04000004                     @ 080ef814 04000004
+PTR_DISPSTAT_080ef814:
+    .word  DISPSTAT                       @ 080ef814 04000004
 FUN_080ef818:
     push {r4,r5,r6,r7,lr}                    @ 080ef818 f0b5
     .hword 0x4657    @ 080ef81a 5746
@@ -306532,7 +306532,7 @@ FUN_080ef818:
     push {r5,r6,r7}                          @ 080ef820 e0b4
     sub sp,#0x4                              @ 080ef822 81b0
     .hword 0x4682    @ 080ef824 8246
-    ldr r4, DAT_080ef8dc                     @ 080ef826 2d4c
+    ldr r4, PTR_IME_080ef8dc                 @ 080ef826 2d4c
     movs r3,#0x0    @ 080ef828 0023
     strh r3,[r4,#0x0]                        @ 080ef82a 2380
     ldr r5, DAT_080ef8e0                     @ 080ef82c 2c4d
@@ -306624,8 +306624,8 @@ LAB_080ef89e:
     orrs r0,r2    @ 080ef8d6 1043
     b LAB_080ef908                           @ 080ef8d8 16e0
     .byte  0x00, 0x00
-DAT_080ef8dc:
-    .word  0x04000208                     @ 080ef8dc 08020004
+PTR_IME_080ef8dc:
+    .word  IME                            @ 080ef8dc 08020004
 DAT_080ef8e0:
     .word  0x030003a0                     @ 080ef8e0 a0030003
 DAT_080ef8e4:
@@ -306708,7 +306708,7 @@ DAT_080ef974:
 LAB_080ef978:
     ldr r2, DAT_080efa44                     @ 080ef978 324a
     adds r1,r5,r2    @ 080ef97a a918
-    ldr r6, DAT_080efa48                     @ 080ef97c 324e
+    ldr r6, PTR_SIOCNT_080efa48              @ 080ef97c 324e
     ldr r0,[r6,#0x0]                         @ 080ef97e 3068
     str r0,[r1,#0x0]                         @ 080ef980 0860
     movs r3,#0xd3    @ 080ef982 d323
@@ -306728,9 +306728,9 @@ LAB_080ef978:
     lsrs r0,r0,#0x18    @ 080ef99e 000e
     cmp r0,#0x0                              @ 080ef9a0 0028
     bne LAB_080ef9e2                         @ 080ef9a2 1ed1
-    ldr r3, DAT_080efa4c                     @ 080ef9a4 294b
+    ldr r3, PTR_IME_080efa4c                 @ 080ef9a4 294b
     strh r0,[r3,#0x0]                        @ 080ef9a6 1880
-    ldr r2, DAT_080efa50                     @ 080ef9a8 294a
+    ldr r2, PTR_IE_080efa50                  @ 080ef9a8 294a
     ldrh r1,[r2,#0x0]                        @ 080ef9aa 1188
     ldr r0, DAT_080efa54                     @ 080ef9ac 2948
     ands r0,r1    @ 080ef9ae 0840
@@ -306746,7 +306746,7 @@ LAB_080ef978:
     rsbs r0,r0,#0    @ 080ef9c2 4042
     ands r0,r1    @ 080ef9c4 0840
     strb r0,[r6,#0x1]                        @ 080ef9c6 7070
-    ldr r1, DAT_080efa58                     @ 080ef9c8 2349
+    ldr r1, PTR_IF_080efa58                  @ 080ef9c8 2349
     movs r0,#0xc0    @ 080ef9ca c020
     strh r0,[r1,#0x0]                        @ 080ef9cc 0880
     subs r1,#0xf6    @ 080ef9ce f639
@@ -306813,16 +306813,16 @@ LAB_080efa38:
     .byte  0x00, 0x00
 DAT_080efa44:
     .word  0x0000042c                     @ 080efa44 2c040000
-DAT_080efa48:
-    .word  0x04000128                     @ 080efa48 28010004
-DAT_080efa4c:
-    .word  0x04000208                     @ 080efa4c 08020004
-DAT_080efa50:
-    .word  0x04000200                     @ 080efa50 00020004
+PTR_SIOCNT_080efa48:
+    .word  SIOCNT                         @ 080efa48 28010004
+PTR_IME_080efa4c:
+    .word  IME                            @ 080efa4c 08020004
+PTR_IE_080efa50:
+    .word  IE                             @ 080efa50 00020004
 DAT_080efa54:
     .word  0x0000ff7f                     @ 080efa54 7fff0000
-DAT_080efa58:
-    .word  0x04000202                     @ 080efa58 02020004
+PTR_IF_080efa58:
+    .word  IF                             @ 080efa58 02020004
 DAT_080efa5c:
     .word  0x0000b1fc                     @ 080efa5c fcb10000
 DAT_080efa60:
@@ -307071,7 +307071,7 @@ LAB_080efbfa:
     adds r2,#0x1    @ 080efc2c 0132
     movs r3,#0x0    @ 080efc2e 0023
     strh r2,[r4,#0x0]                        @ 080efc30 2280
-    ldr r0, DAT_080efc6c                     @ 080efc32 0e48
+    ldr r0, PTR_SIOCNT_080efc6c              @ 080efc32 0e48
     ldrh r1,[r0,#0x0]                        @ 080efc34 0188
     movs r0,#0x30    @ 080efc36 3020
     ands r0,r1    @ 080efc38 0840
@@ -307100,8 +307100,8 @@ DAT_080efc64:
     .word  0x000001ff                     @ 080efc64 ff010000
 DAT_080efc68:
     .word  0x030007b0                     @ 080efc68 b0070003
-DAT_080efc6c:
-    .word  0x04000128                     @ 080efc6c 28010004
+PTR_SIOCNT_080efc6c:
+    .word  SIOCNT                         @ 080efc6c 28010004
 LAB_080efc70:
     ldrh r0,[r4,#0x0]                        @ 080efc70 2088
     ldr r2, DAT_080efc88                     @ 080efc72 054a
@@ -307164,7 +307164,7 @@ LAB_080efcc4:
     ands r1,r4    @ 080efce0 2140
     strh r1,[r0,#0x0]                        @ 080efce2 0180
 LAB_080efce4:
-    ldr r0, DAT_080efd3c                     @ 080efce4 1548
+    ldr r0, PTR_SIOCNT_080efd3c              @ 080efce4 1548
     ldrh r1,[r0,#0x0]                        @ 080efce6 0188
     movs r0,#0x30    @ 080efce8 3020
     ands r0,r1    @ 080efcea 0840
@@ -307208,8 +307208,8 @@ DAT_080efd34:
     .word  0x030007b0                     @ 080efd34 b0070003
 DAT_080efd38:
     .word  0x000001ff                     @ 080efd38 ff010000
-DAT_080efd3c:
-    .word  0x04000128                     @ 080efd3c 28010004
+PTR_SIOCNT_080efd3c:
+    .word  SIOCNT                         @ 080efd3c 28010004
 LAB_080efd40:
     ldr r4, DAT_080efd7c                     @ 080efd40 0e4c
     .hword 0x464b    @ 080efd42 4b46
@@ -307219,7 +307219,7 @@ LAB_080efd40:
     movs r0,#0x0    @ 080efd4a 0020
     .hword 0x4684    @ 080efd4c 8446
     strh r3,[r2,#0x0]                        @ 080efd4e 1380
-    ldr r0, DAT_080efd80                     @ 080efd50 0b48
+    ldr r0, PTR_SIOCNT_080efd80              @ 080efd50 0b48
     ldrh r1,[r0,#0x0]                        @ 080efd52 0188
     movs r0,#0x30    @ 080efd54 3020
     ands r0,r1    @ 080efd56 0840
@@ -307243,8 +307243,8 @@ LAB_080efd40:
     b LAB_080efda2                           @ 080efd7a 12e0
 DAT_080efd7c:
     .word  0x030003a0                     @ 080efd7c a0030003
-DAT_080efd80:
-    .word  0x04000128                     @ 080efd80 28010004
+PTR_SIOCNT_080efd80:
+    .word  SIOCNT                         @ 080efd80 28010004
 LAB_080efd84:
     ldrh r0,[r2,#0x0]                        @ 080efd84 1088
     ldr r2, DAT_080efd98                     @ 080efd86 044a
@@ -307360,7 +307360,7 @@ FUN_080efeec:
     ldr r5, DAT_080f008c                     @ 080efefa 644d
     adds r0,r5,#0x0    @ 080efefc 281c
     bl FUN_080ef958                          @ 080efefe fff72bfd
-    ldr r2, DAT_080f0090                     @ 080eff02 634a
+    ldr r2, PTR_SIOCNT_080f0090              @ 080eff02 634a
     ldrh r1,[r2,#0x0]                        @ 080eff04 1188
     movs r3,#0x30    @ 080eff06 3023
     adds r0,r3,#0x0    @ 080eff08 181c
@@ -307564,8 +307564,8 @@ LAB_080f007e:
     b LAB_080f00ba                           @ 080f008a 16e0
 DAT_080f008c:
     .word  0x030007d6                     @ 080f008c d6070003
-DAT_080f0090:
-    .word  0x04000128                     @ 080f0090 28010004
+PTR_SIOCNT_080f0090:
+    .word  SIOCNT                         @ 080f0090 28010004
 DAT_080f0094:
     .word  0xfffffbca                     @ 080f0094 cafbffff
 DAT_080f0098:
@@ -315456,7 +315456,7 @@ FUN_080f4764:
     .hword 0x464e    @ 080f4768 4e46
     .hword 0x4645    @ 080f476a 4546
     push {r5,r6,r7}                          @ 080f476c e0b4
-    ldr r0, DAT_080f47cc                     @ 080f476e 1748
+    ldr r0, PTR_KEYINPUT_080f47cc            @ 080f476e 1748
     ldrh r0,[r0,#0x0]                        @ 080f4770 0088
     mvns r0,r0    @ 080f4772 c043
     lsls r0,r0,#0x10    @ 080f4774 0004
@@ -315503,8 +315503,8 @@ FUN_080f4764:
     movs r0,#0x0    @ 080f47c6 0020
     strh r0,[r1,#0x0]                        @ 080f47c8 0880
     b LAB_080f4834                           @ 080f47ca 33e0
-DAT_080f47cc:
-    .word  0x04000130                     @ 080f47cc 30010004
+PTR_KEYINPUT_080f47cc:
+    .word  KEYINPUT                       @ 080f47cc 30010004
 PTR_gPrng_080f47d0:
     .word  gPrng                          @ 080f47d0 40000003
 LAB_080f47d4:
@@ -316017,7 +316017,7 @@ FUN_080f4c14:
     sub sp,#0x4                              @ 080f4c16 81b0
     movs r4,#0x0    @ 080f4c18 0024
     str r4,[sp,#0x0]                         @ 080f4c1a 0094
-    ldr r5, DAT_080f4d34                     @ 080f4c1c 454d
+    ldr r5, PTR_DMA3SAD_080f4d34             @ 080f4c1c 454d
     .hword 0x4668    @ 080f4c1e 6846
     str r0,[r5,#0x0]                         @ 080f4c20 2860
     movs r0,#0x80    @ 080f4c22 8020
@@ -316086,19 +316086,19 @@ LAB_080f4ca0:
     ldr r0, DAT_080f4d5c                     @ 080f4ca8 2c48
     ldr r4, DAT_080f4d60                     @ 080f4caa 2d4c
     str r4,[r0,#0x0]                         @ 080f4cac 0460
-    ldr r2, DAT_080f4d64                     @ 080f4cae 2d4a
+    ldr r2, PTR_IME_080f4d64                 @ 080f4cae 2d4a
     movs r0,#0x0    @ 080f4cb0 0020
     strh r0,[r2,#0x0]                        @ 080f4cb2 1080
-    ldr r1, DAT_080f4d68                     @ 080f4cb4 2c49
+    ldr r1, PTR_IE_080f4d68                  @ 080f4cb4 2c49
     ldr r3, DAT_080f4d6c                     @ 080f4cb6 2d4b
     adds r0,r3,#0x0    @ 080f4cb8 181c
     strh r0,[r1,#0x0]                        @ 080f4cba 0880
-    ldr r1, DAT_080f4d70                     @ 080f4cbc 2c49
+    ldr r1, PTR_DISPSTAT_080f4d70            @ 080f4cbc 2c49
     movs r0,#0x18    @ 080f4cbe 1820
     strh r0,[r1,#0x0]                        @ 080f4cc0 0880
     movs r0,#0x1    @ 080f4cc2 0120
     strh r0,[r2,#0x0]                        @ 080f4cc4 1080
-    ldr r1, DAT_080f4d74                     @ 080f4cc6 2b49
+    ldr r1, PTR_WAITCNT_080f4d74             @ 080f4cc6 2b49
     ldr r2, DAT_080f4d78                     @ 080f4cc8 2b4a
     adds r0,r2,#0x0    @ 080f4cca 101c
     strh r0,[r1,#0x0]                        @ 080f4ccc 0880
@@ -316150,8 +316150,8 @@ LAB_080f4ca0:
     pop {r0}                                 @ 080f4d2e 01bc
     bx r0                                    @ 080f4d30 0047
     .byte  0x00, 0x00
-DAT_080f4d34:
-    .word  0x040000d4                     @ 080f4d34 d4000004
+PTR_DMA3SAD_080f4d34:
+    .word  DMA3SAD                        @ 080f4d34 d4000004
 DAT_080f4d38:
     .word  0x85010000                     @ 080f4d38 00000185
 DAT_080f4d3c:
@@ -316174,16 +316174,16 @@ DAT_080f4d5c:
     .word  0x03007ffc                     @ 080f4d5c fc7f0003
 DAT_080f4d60:
     .word  0x03000044                     @ 080f4d60 44000003
-DAT_080f4d64:
-    .word  0x04000208                     @ 080f4d64 08020004
-DAT_080f4d68:
-    .word  0x04000200                     @ 080f4d68 00020004
+PTR_IME_080f4d64:
+    .word  IME                            @ 080f4d64 08020004
+PTR_IE_080f4d68:
+    .word  IE                             @ 080f4d68 00020004
 DAT_080f4d6c:
     .word  0x00002601                     @ 080f4d6c 01260000
-DAT_080f4d70:
-    .word  0x04000004                     @ 080f4d70 04000004
-DAT_080f4d74:
-    .word  0x04000204                     @ 080f4d74 04020004
+PTR_DISPSTAT_080f4d70:
+    .word  DISPSTAT                       @ 080f4d70 04000004
+PTR_WAITCNT_080f4d74:
+    .word  WAITCNT                        @ 080f4d74 04020004
 DAT_080f4d78:
     .word  0x00004014                     @ 080f4d78 14400000
 DAT_080f4d7c:
@@ -316437,7 +316437,7 @@ LAB_080f4f4c:
     ldr r0, DAT_080f4fc0                     @ 080f4f4c 1c48
     cmp r4,r0                                @ 080f4f4e 8442
     ble LAB_080f4f8c                         @ 080f4f50 1cdd
-    ldr r3, DAT_080f4fc4                     @ 080f4f52 1c4b
+    ldr r3, PTR_DMA3SAD_080f4fc4             @ 080f4f52 1c4b
     movs r6,#0x80    @ 080f4f54 8026
     lsls r6,r6,#0x3    @ 080f4f56 f600
     ldr r0, DAT_080f4fc8                     @ 080f4f58 1b48
@@ -316472,7 +316472,7 @@ LAB_080f4f7e:
 LAB_080f4f8c:
     cmp r4,#0x0                              @ 080f4f8c 002c
     ble LAB_080f4fa6                         @ 080f4f8e 0add
-    ldr r2, DAT_080f4fc4                     @ 080f4f90 0c4a
+    ldr r2, PTR_DMA3SAD_080f4fc4             @ 080f4f90 0c4a
     str r1,[r2,#0x0]                         @ 080f4f92 1160
     str r5,[r2,#0x4]                         @ 080f4f94 5560
     lsrs r0,r4,#0x1f    @ 080f4f96 e00f
@@ -316484,7 +316484,7 @@ LAB_080f4f8c:
     str r0,[r2,#0x8]                         @ 080f4fa2 9060
     ldr r0,[r2,#0x8]                         @ 080f4fa4 9068
 LAB_080f4fa6:
-    ldr r2, DAT_080f4fc4                     @ 080f4fa6 074a
+    ldr r2, PTR_DMA3SAD_080f4fc4             @ 080f4fa6 074a
     ldr r0,[r2,#0x8]                         @ 080f4fa8 9068
     movs r1,#0x80    @ 080f4faa 8021
     lsls r1,r1,#0x18    @ 080f4fac 0906
@@ -316501,8 +316501,8 @@ LAB_080f4fba:
     bx r0                                    @ 080f4fbe 0047
 DAT_080f4fc0:
     .word  0x000003ff                     @ 080f4fc0 ff030000
-DAT_080f4fc4:
-    .word  0x040000d4                     @ 080f4fc4 d4000004
+PTR_DMA3SAD_080f4fc4:
+    .word  DMA3SAD                        @ 080f4fc4 d4000004
 DAT_080f4fc8:
     .word  0x80000200                     @ 080f4fc8 00020080
 DAT_080f4fcc:
@@ -316514,7 +316514,7 @@ FUN_080f4fd0:
     adds r3,r2,#0x0    @ 080f4fd6 131c
     cmp r3,#0xff                             @ 080f4fd8 ff2b
     ble LAB_080f5014                         @ 080f4fda 1bdd
-    ldr r1, DAT_080f5048                     @ 080f4fdc 1a49
+    ldr r1, PTR_DMA3SAD_080f5048             @ 080f4fdc 1a49
     movs r6,#0x80    @ 080f4fde 8026
     lsls r6,r6,#0x1    @ 080f4fe0 7600
     ldr r0, DAT_080f504c                     @ 080f4fe2 1a48
@@ -316548,7 +316548,7 @@ LAB_080f5008:
 LAB_080f5014:
     cmp r3,#0x0                              @ 080f5014 002b
     ble LAB_080f502e                         @ 080f5016 0add
-    ldr r2, DAT_080f5048                     @ 080f5018 0b4a
+    ldr r2, PTR_DMA3SAD_080f5048             @ 080f5018 0b4a
     str r4,[r2,#0x0]                         @ 080f501a 1460
     str r5,[r2,#0x4]                         @ 080f501c 5560
     lsrs r0,r3,#0x1f    @ 080f501e d80f
@@ -316560,7 +316560,7 @@ LAB_080f5014:
     str r0,[r2,#0x8]                         @ 080f502a 9060
     ldr r0,[r2,#0x8]                         @ 080f502c 9068
 LAB_080f502e:
-    ldr r2, DAT_080f5048                     @ 080f502e 064a
+    ldr r2, PTR_DMA3SAD_080f5048             @ 080f502e 064a
     ldr r0,[r2,#0x8]                         @ 080f5030 9068
     movs r1,#0x80    @ 080f5032 8021
     lsls r1,r1,#0x18    @ 080f5034 0906
@@ -316575,8 +316575,8 @@ LAB_080f5042:
     pop {r4,r5,r6,r7}                        @ 080f5042 f0bc
     pop {r0}                                 @ 080f5044 01bc
     bx r0                                    @ 080f5046 0047
-DAT_080f5048:
-    .word  0x040000d4                     @ 080f5048 d4000004
+PTR_DMA3SAD_080f5048:
+    .word  DMA3SAD                        @ 080f5048 d4000004
 DAT_080f504c:
     .word  0x80000080                     @ 080f504c 80000080
 DAT_080f5050:
@@ -317033,7 +317033,7 @@ FUN_080f55d4:
     ldrb r2,[r1,#0x0]                        @ 080f55e0 0a78
     ands r0,r2    @ 080f55e2 1040
     strb r0,[r1,#0x0]                        @ 080f55e4 0870
-    ldr r0, DAT_080f55f8                     @ 080f55e6 0448
+    ldr r0, PTR_BLDCNT_080f55f8              @ 080f55e6 0448
     movs r1,#0x0    @ 080f55e8 0021
     strh r1,[r0,#0x0]                        @ 080f55ea 0180
     adds r0,#0x4    @ 080f55ec 0430
@@ -317042,8 +317042,8 @@ FUN_080f55d4:
     .byte  0x00, 0x00
 PTR_gPrng_080f55f4:
     .word  gPrng                          @ 080f55f4 40000003
-DAT_080f55f8:
-    .word  0x04000050                     @ 080f55f8 50000004
+PTR_BLDCNT_080f55f8:
+    .word  BLDCNT                         @ 080f55f8 50000004
 FUN_080f55fc:
     push {r4,r5,r6,r7,lr}                    @ 080f55fc f0b5
     adds r5,r0,#0x0    @ 080f55fe 051c
@@ -317089,7 +317089,7 @@ LAB_080f5638:
     movs r0,#0x1    @ 080f564c 0120
     b LAB_080f565e                           @ 080f564e 06e0
 LAB_080f5650:
-    ldr r0, DAT_080f5664                     @ 080f5650 0448
+    ldr r0, PTR_BLDY_080f5664                @ 080f5650 0448
     lsls r1,r1,#0x1a    @ 080f5652 8906
     lsrs r1,r1,#0x1a    @ 080f5654 890e
     strh r1,[r0,#0x0]                        @ 080f5656 0180
@@ -317100,14 +317100,14 @@ LAB_080f565e:
     pop {r4,r5,r6,r7}                        @ 080f565e f0bc
     pop {r1}                                 @ 080f5660 02bc
     bx r1                                    @ 080f5662 0847
-DAT_080f5664:
-    .word  0x04000054                     @ 080f5664 54000004
+PTR_BLDY_080f5664:
+    .word  BLDY                           @ 080f5664 54000004
 FUN_080f5668:
     push {r4,r5,r6,lr}                       @ 080f5668 70b5
     adds r5,r0,#0x0    @ 080f566a 051c
     lsls r1,r1,#0x10    @ 080f566c 0904
     lsrs r1,r1,#0x10    @ 080f566e 090c
-    ldr r0, DAT_080f56c8                     @ 080f5670 1548
+    ldr r0, PTR_BLDCNT_080f56c8              @ 080f5670 1548
     strh r1,[r0,#0x0]                        @ 080f5672 0180
     ldr r1, PTR_gPrng_080f56cc               @ 080f5674 1549
     movs r0,#0x80    @ 080f5676 8020
@@ -317138,7 +317138,7 @@ FUN_080f5668:
     orrs r2,r0    @ 080f56a8 0243
     strb r2,[r4,#0x0]                        @ 080f56aa 2270
 LAB_080f56ac:
-    ldr r2, DAT_080f56d0                     @ 080f56ac 084a
+    ldr r2, PTR_BLDY_080f56d0                @ 080f56ac 084a
     movs r1,#0x80    @ 080f56ae 8021
     lsls r1,r1,#0x2    @ 080f56b0 8900
     adds r0,r6,r1    @ 080f56b2 7018
@@ -317152,12 +317152,12 @@ LAB_080f56ac:
     movs r0,#0x1    @ 080f56c2 0120
     b LAB_080f56d6                           @ 080f56c4 07e0
     .byte  0x00, 0x00
-DAT_080f56c8:
-    .word  0x04000050                     @ 080f56c8 50000004
+PTR_BLDCNT_080f56c8:
+    .word  BLDCNT                         @ 080f56c8 50000004
 PTR_gPrng_080f56cc:
     .word  gPrng                          @ 080f56cc 40000003
-DAT_080f56d0:
-    .word  0x04000054                     @ 080f56d0 54000004
+PTR_BLDY_080f56d0:
+    .word  BLDY                           @ 080f56d0 54000004
 LAB_080f56d4:
     movs r0,#0x0    @ 080f56d4 0020
 LAB_080f56d6:
@@ -317209,7 +317209,7 @@ LAB_080f5718:
     movs r0,#0x1    @ 080f572c 0120
     b LAB_080f5748                           @ 080f572e 0be0
 LAB_080f5730:
-    ldr r3, DAT_080f5750                     @ 080f5730 074b
+    ldr r3, PTR_BLDALPHA_080f5750            @ 080f5730 074b
     lsls r1,r1,#0x1a    @ 080f5732 8906
     lsrs r2,r1,#0x1a    @ 080f5734 8a0e
     adds r1,r2,#0x0    @ 080f5736 111c
@@ -317218,7 +317218,7 @@ LAB_080f5730:
     lsls r0,r0,#0x8    @ 080f573c 0002
     adds r2,r2,r0    @ 080f573e 1218
     strh r2,[r3,#0x0]                        @ 080f5740 1a80
-    ldr r0, DAT_080f5754                     @ 080f5742 0448
+    ldr r0, PTR_BLDCNT_080f5754              @ 080f5742 0448
     strh r7,[r0,#0x0]                        @ 080f5744 0780
     movs r0,#0x0    @ 080f5746 0020
 LAB_080f5748:
@@ -317226,16 +317226,16 @@ LAB_080f5748:
     pop {r1}                                 @ 080f574a 02bc
     bx r1                                    @ 080f574c 0847
     .byte  0x00, 0x00
-DAT_080f5750:
-    .word  0x04000052                     @ 080f5750 52000004
-DAT_080f5754:
-    .word  0x04000050                     @ 080f5754 50000004
+PTR_BLDALPHA_080f5750:
+    .word  BLDALPHA                       @ 080f5750 52000004
+PTR_BLDCNT_080f5754:
+    .word  BLDCNT                         @ 080f5754 50000004
 FUN_080f5758:
     push {r4,r5,r6,lr}                       @ 080f5758 70b5
     adds r5,r0,#0x0    @ 080f575a 051c
     lsls r1,r1,#0x10    @ 080f575c 0904
     lsrs r1,r1,#0x10    @ 080f575e 090c
-    ldr r0, DAT_080f57bc                     @ 080f5760 1648
+    ldr r0, PTR_BLDCNT_080f57bc              @ 080f5760 1648
     strh r1,[r0,#0x0]                        @ 080f5762 0180
     ldr r1, PTR_gPrng_080f57c0               @ 080f5764 1649
     movs r0,#0x80    @ 080f5766 8020
@@ -317266,7 +317266,7 @@ FUN_080f5758:
     orrs r2,r0    @ 080f5798 0243
     strb r2,[r4,#0x0]                        @ 080f579a 2270
 LAB_080f579c:
-    ldr r3, DAT_080f57c4                     @ 080f579c 094b
+    ldr r3, PTR_BLDALPHA_080f57c4            @ 080f579c 094b
     movs r1,#0x80    @ 080f579e 8021
     lsls r1,r1,#0x2    @ 080f57a0 8900
     adds r0,r6,r1    @ 080f57a2 7018
@@ -317282,12 +317282,12 @@ LAB_080f579c:
     bls LAB_080f57c8                         @ 080f57b6 07d9
     movs r0,#0x1    @ 080f57b8 0120
     b LAB_080f57ca                           @ 080f57ba 06e0
-DAT_080f57bc:
-    .word  0x04000050                     @ 080f57bc 50000004
+PTR_BLDCNT_080f57bc:
+    .word  BLDCNT                         @ 080f57bc 50000004
 PTR_gPrng_080f57c0:
     .word  gPrng                          @ 080f57c0 40000003
-DAT_080f57c4:
-    .word  0x04000052                     @ 080f57c4 52000004
+PTR_BLDALPHA_080f57c4:
+    .word  BLDALPHA                       @ 080f57c4 52000004
 LAB_080f57c8:
     movs r0,#0x0    @ 080f57c8 0020
 LAB_080f57ca:
@@ -317306,28 +317306,28 @@ FUN_080f57d0:
     movs r1,#0x1f    @ 080f57e0 1f21
     orrs r0,r1    @ 080f57e2 0843
     strb r0,[r2,#0x0]                        @ 080f57e4 1070
-    ldr r2, DAT_080f57fc                     @ 080f57e6 054a
+    ldr r2, PTR_BLDCNT_080f57fc              @ 080f57e6 054a
     ldr r3, DAT_080f5800                     @ 080f57e8 054b
     adds r1,r3,#0x0    @ 080f57ea 191c
     strh r1,[r2,#0x0]                        @ 080f57ec 1180
-    ldr r1, DAT_080f5804                     @ 080f57ee 0549
+    ldr r1, PTR_BLDY_080f5804                @ 080f57ee 0549
     lsls r0,r0,#0x1a    @ 080f57f0 8006
     lsrs r0,r0,#0x1a    @ 080f57f2 800e
     strh r0,[r1,#0x0]                        @ 080f57f4 0880
     bx lr                                    @ 080f57f6 7047
 PTR_gPrng_080f57f8:
     .word  gPrng                          @ 080f57f8 40000003
-DAT_080f57fc:
-    .word  0x04000050                     @ 080f57fc 50000004
+PTR_BLDCNT_080f57fc:
+    .word  BLDCNT                         @ 080f57fc 50000004
 DAT_080f5800:
     .word  0x00003fff                     @ 080f5800 ff3f0000
-DAT_080f5804:
-    .word  0x04000054                     @ 080f5804 54000004
+PTR_BLDY_080f5804:
+    .word  BLDY                           @ 080f5804 54000004
     ROM_INCBIN 0xf5808, 0x38
 FUN_080f5840:
     push {r4,r5,r6,lr}                       @ 080f5840 70b5
     adds r5,r0,#0x0    @ 080f5842 051c
-    ldr r1, DAT_080f58a0                     @ 080f5844 1649
+    ldr r1, PTR_BLDCNT_080f58a0              @ 080f5844 1649
     ldr r2, DAT_080f58a4                     @ 080f5846 174a
     adds r0,r2,#0x0    @ 080f5848 101c
     strh r0,[r1,#0x0]                        @ 080f584a 0880
@@ -317360,7 +317360,7 @@ FUN_080f5840:
     orrs r2,r0    @ 080f5880 0243
     strb r2,[r4,#0x0]                        @ 080f5882 2270
 LAB_080f5884:
-    ldr r2, DAT_080f58ac                     @ 080f5884 094a
+    ldr r2, PTR_BLDY_080f58ac                @ 080f5884 094a
     movs r1,#0x80    @ 080f5886 8021
     lsls r1,r1,#0x2    @ 080f5888 8900
     adds r0,r6,r1    @ 080f588a 7018
@@ -317374,14 +317374,14 @@ LAB_080f5884:
     movs r0,#0x1    @ 080f589a 0120
     b LAB_080f58b2                           @ 080f589c 09e0
     .byte  0x00, 0x00
-DAT_080f58a0:
-    .word  0x04000050                     @ 080f58a0 50000004
+PTR_BLDCNT_080f58a0:
+    .word  BLDCNT                         @ 080f58a0 50000004
 DAT_080f58a4:
     .word  0x00003fff                     @ 080f58a4 ff3f0000
 PTR_gPrng_080f58a8:
     .word  gPrng                          @ 080f58a8 40000003
-DAT_080f58ac:
-    .word  0x04000054                     @ 080f58ac 54000004
+PTR_BLDY_080f58ac:
+    .word  BLDY                           @ 080f58ac 54000004
 LAB_080f58b0:
     movs r0,#0x0    @ 080f58b0 0020
 LAB_080f58b2:
@@ -317431,7 +317431,7 @@ LAB_080f58f0:
     movs r0,#0x1    @ 080f5904 0120
     b LAB_080f591a                           @ 080f5906 08e0
 LAB_080f5908:
-    ldr r1, DAT_080f5920                     @ 080f5908 0549
+    ldr r1, PTR_BLDY_080f5920                @ 080f5908 0549
     lsls r0,r2,#0x1a    @ 080f590a 9006
     lsrs r0,r0,#0x1a    @ 080f590c 800e
     strh r0,[r1,#0x0]                        @ 080f590e 0880
@@ -317444,14 +317444,14 @@ LAB_080f591a:
     pop {r4,r5,r6}                           @ 080f591a 70bc
     pop {r1}                                 @ 080f591c 02bc
     bx r1                                    @ 080f591e 0847
-DAT_080f5920:
-    .word  0x04000054                     @ 080f5920 54000004
+PTR_BLDY_080f5920:
+    .word  BLDY                           @ 080f5920 54000004
 DAT_080f5924:
     .word  0x00003fff                     @ 080f5924 ff3f0000
 FUN_080f5928:
     push {r4,r5,r6,lr}                       @ 080f5928 70b5
     adds r5,r0,#0x0    @ 080f592a 051c
-    ldr r1, DAT_080f5988                     @ 080f592c 1649
+    ldr r1, PTR_BLDCNT_080f5988              @ 080f592c 1649
     ldr r2, DAT_080f598c                     @ 080f592e 174a
     adds r0,r2,#0x0    @ 080f5930 101c
     strh r0,[r1,#0x0]                        @ 080f5932 0880
@@ -317484,7 +317484,7 @@ FUN_080f5928:
     orrs r2,r0    @ 080f5968 0243
     strb r2,[r4,#0x0]                        @ 080f596a 2270
 LAB_080f596c:
-    ldr r2, DAT_080f5994                     @ 080f596c 094a
+    ldr r2, PTR_BLDY_080f5994                @ 080f596c 094a
     movs r1,#0x80    @ 080f596e 8021
     lsls r1,r1,#0x2    @ 080f5970 8900
     adds r0,r6,r1    @ 080f5972 7018
@@ -317498,14 +317498,14 @@ LAB_080f596c:
     movs r0,#0x1    @ 080f5982 0120
     b LAB_080f599a                           @ 080f5984 09e0
     .byte  0x00, 0x00
-DAT_080f5988:
-    .word  0x04000050                     @ 080f5988 50000004
+PTR_BLDCNT_080f5988:
+    .word  BLDCNT                         @ 080f5988 50000004
 DAT_080f598c:
     .word  0x00003fbf                     @ 080f598c bf3f0000
 PTR_gPrng_080f5990:
     .word  gPrng                          @ 080f5990 40000003
-DAT_080f5994:
-    .word  0x04000054                     @ 080f5994 54000004
+PTR_BLDY_080f5994:
+    .word  BLDY                           @ 080f5994 54000004
 LAB_080f5998:
     movs r0,#0x0    @ 080f5998 0020
 LAB_080f599a:
@@ -317555,7 +317555,7 @@ LAB_080f59d8:
     movs r0,#0x1    @ 080f59ec 0120
     b LAB_080f5a02                           @ 080f59ee 08e0
 LAB_080f59f0:
-    ldr r1, DAT_080f5a08                     @ 080f59f0 0549
+    ldr r1, PTR_BLDY_080f5a08                @ 080f59f0 0549
     lsls r0,r2,#0x1a    @ 080f59f2 9006
     lsrs r0,r0,#0x1a    @ 080f59f4 800e
     strh r0,[r1,#0x0]                        @ 080f59f6 0880
@@ -317568,12 +317568,12 @@ LAB_080f5a02:
     pop {r4,r5,r6}                           @ 080f5a02 70bc
     pop {r1}                                 @ 080f5a04 02bc
     bx r1                                    @ 080f5a06 0847
-DAT_080f5a08:
-    .word  0x04000054                     @ 080f5a08 54000004
+PTR_BLDY_080f5a08:
+    .word  BLDY                           @ 080f5a08 54000004
 DAT_080f5a0c:
     .word  0x00003fbf                     @ 080f5a0c bf3f0000
 FUN_080f5a10:
-    ldr r0, DAT_080f5a44                     @ 080f5a10 0c48
+    ldr r0, PTR_BG0HOFS_080f5a44             @ 080f5a10 0c48
     movs r1,#0x0    @ 080f5a12 0021
     strh r1,[r0,#0x0]                        @ 080f5a14 0180
     adds r0,#0x4    @ 080f5a16 0430
@@ -317599,12 +317599,12 @@ FUN_080f5a10:
     adds r0,r2,r3    @ 080f5a3e d018
     strh r1,[r0,#0x0]                        @ 080f5a40 0180
     bx lr                                    @ 080f5a42 7047
-DAT_080f5a44:
-    .word  0x04000010                     @ 080f5a44 10000004
+PTR_BG0HOFS_080f5a44:
+    .word  BG0HOFS                        @ 080f5a44 10000004
 PTR_gPrng_080f5a48:
     .word  gPrng                          @ 080f5a48 40000003
 FUN_080f5a4c:
-    ldr r0, DAT_080f5a80                     @ 080f5a4c 0c48
+    ldr r0, PTR_BG0VOFS_080f5a80             @ 080f5a4c 0c48
     movs r1,#0x0    @ 080f5a4e 0021
     strh r1,[r0,#0x0]                        @ 080f5a50 0180
     adds r0,#0x4    @ 080f5a52 0430
@@ -317630,8 +317630,8 @@ FUN_080f5a4c:
     adds r0,r2,r3    @ 080f5a7a d018
     strh r1,[r0,#0x0]                        @ 080f5a7c 0180
     bx lr                                    @ 080f5a7e 7047
-DAT_080f5a80:
-    .word  0x04000012                     @ 080f5a80 12000004
+PTR_BG0VOFS_080f5a80:
+    .word  BG0VOFS                        @ 080f5a80 12000004
 PTR_gPrng_080f5a84:
     .word  gPrng                          @ 080f5a84 40000003
 FUN_080f5a88:
@@ -326294,7 +326294,7 @@ LAB_080fb150:
     movs r0,#0x80    @ 080fb168 8020
     lsls r0,r0,#0x13    @ 080fb16a c004
     strh r4,[r0,#0x0]                        @ 080fb16c 0480
-    ldr r1, DAT_080fb2d8                     @ 080fb16e 5a49
+    ldr r1, PTR_BG0CNT_080fb2d8              @ 080fb16e 5a49
     movs r0,#0x5    @ 080fb170 0520
     strh r0,[r1,#0x0]                        @ 080fb172 0880
     str r4,[sp,#0x0]                         @ 080fb174 0094
@@ -326454,8 +326454,8 @@ DAT_080fb2d0:
     .word  0x02039eb0                     @ 080fb2d0 b09e0302
 DAT_080fb2d4:
     .word  0x0000040c                     @ 080fb2d4 0c040000
-DAT_080fb2d8:
-    .word  0x04000008                     @ 080fb2d8 08000004
+PTR_BG0CNT_080fb2d8:
+    .word  BG0CNT                         @ 080fb2d8 08000004
 DAT_080fb2dc:
     .word  0x01006000                     @ 080fb2dc 00600001
 DAT_080fb2e0:
@@ -326785,7 +326785,7 @@ LAB_080fbe68:
     bl FUN_080f7674                          @ 080fbe74 fbf7fefb
     bl FUN_080f5a88                          @ 080fbe78 f9f706fe
     bl FUN_080f57d0                          @ 080fbe7c f9f7a8fc
-    ldr r0, DAT_080fbe9c                     @ 080fbe80 0648
+    ldr r0, PTR_BG2CNT_080fbe9c              @ 080fbe80 0648
     strh r5,[r0,#0x0]                        @ 080fbe82 0580
     pop {r4,r5}                              @ 080fbe84 30bc
     pop {r0}                                 @ 080fbe86 01bc
@@ -326799,8 +326799,8 @@ DAT_080fbe94:
     .word  0x02029eb0                     @ 080fbe94 b09e0202
 DAT_080fbe98:
     .word  0x02039eb0                     @ 080fbe98 b09e0302
-DAT_080fbe9c:
-    .word  0x0400000c                     @ 080fbe9c 0c000004
+PTR_BG2CNT_080fbe9c:
+    .word  BG2CNT                         @ 080fbe9c 0c000004
 FUN_080fbea0:
     push {r4,lr}                             @ 080fbea0 10b5
     ldr r0, PTR_gPrng_080fbf00               @ 080fbea2 1748
@@ -326812,7 +326812,7 @@ FUN_080fbea0:
     movs r0,#0x80    @ 080fbeae 8020
     lsls r0,r0,#0x13    @ 080fbeb0 c004
     strh r1,[r0,#0x0]                        @ 080fbeb2 0180
-    ldr r1, DAT_080fbf04                     @ 080fbeb4 1349
+    ldr r1, PTR_BG0CNT_080fbf04              @ 080fbeb4 1349
     movs r0,#0x4    @ 080fbeb6 0420
     strh r0,[r1,#0x0]                        @ 080fbeb8 0880
     adds r1,#0x2    @ 080fbeba 0231
@@ -326846,8 +326846,8 @@ FUN_080fbea0:
     .byte  0x00, 0x00
 PTR_gPrng_080fbf00:
     .word  gPrng                          @ 080fbf00 40000003
-DAT_080fbf04:
-    .word  0x04000008                     @ 080fbf04 08000004
+PTR_BG0CNT_080fbf04:
+    .word  BG0CNT                         @ 080fbf04 08000004
 DAT_080fbf08:
     .word  0x00000105                     @ 080fbf08 05010000
 DAT_080fbf0c:
@@ -327764,18 +327764,18 @@ DAT_080fd5d0:
 FUN_080fd5e4:
     ldr r3, DAT_080fd5f4                     @ 080fd5e4 034b
     ands r0,r3    @ 080fd5e6 1840
-    ldr r2, DAT_080fd5f8                     @ 080fd5e8 034a
+    ldr r2, PTR_BG1HOFS_080fd5f8             @ 080fd5e8 034a
     strh r0,[r2,#0x0]                        @ 080fd5ea 1080
     ands r1,r3    @ 080fd5ec 1940
-    ldr r0, DAT_080fd5fc                     @ 080fd5ee 0348
+    ldr r0, PTR_BG1VOFS_080fd5fc             @ 080fd5ee 0348
     strh r1,[r0,#0x0]                        @ 080fd5f0 0180
     bx lr                                    @ 080fd5f2 7047
 DAT_080fd5f4:
     .word  0x000001ff                     @ 080fd5f4 ff010000
-DAT_080fd5f8:
-    .word  0x04000014                     @ 080fd5f8 14000004
-DAT_080fd5fc:
-    .word  0x04000016                     @ 080fd5fc 16000004
+PTR_BG1HOFS_080fd5f8:
+    .word  BG1HOFS                        @ 080fd5f8 14000004
+PTR_BG1VOFS_080fd5fc:
+    .word  BG1VOFS                        @ 080fd5fc 16000004
 FUN_080fd600:
     push {r4,lr}                             @ 080fd600 10b5
     ldr r0, DAT_080fd638                     @ 080fd602 0d48
@@ -328075,7 +328075,7 @@ FUN_080fd890:
     adds r6,r0,#0x0    @ 080fd8a0 061c
     cmp r5,r4                                @ 080fd8a2 a542
     bne LAB_080fd8f2                         @ 080fd8a4 25d1
-    ldr r3, DAT_080fd910                     @ 080fd8a6 1a4b
+    ldr r3, PTR_WININ_080fd910               @ 080fd8a6 1a4b
     movs r2,#0x20    @ 080fd8a8 2022
     rsbs r2,r2,#0    @ 080fd8aa 5242
     ldrh r1,[r3,#0x0]                        @ 080fd8ac 1988
@@ -328084,7 +328084,7 @@ FUN_080fd890:
     movs r1,#0x3b    @ 080fd8b2 3b21
     orrs r0,r1    @ 080fd8b4 0843
     strh r0,[r3,#0x0]                        @ 080fd8b6 1880
-    ldr r1, DAT_080fd914                     @ 080fd8b8 1649
+    ldr r1, PTR_WINOUT_080fd914              @ 080fd8b8 1649
     ldrh r0,[r1,#0x0]                        @ 080fd8ba 0888
     ands r2,r0    @ 080fd8bc 0240
     strh r2,[r1,#0x0]                        @ 080fd8be 0a80
@@ -328121,20 +328121,20 @@ LAB_080fd8f2:
     lsrs r0,r0,#0x8    @ 080fd8fe 000a
     orrs r0,r1    @ 080fd900 0843
     lsrs r0,r0,#0x10    @ 080fd902 000c
-    ldr r1, DAT_080fd91c                     @ 080fd904 0549
+    ldr r1, PTR_WIN0V_080fd91c               @ 080fd904 0549
     strh r0,[r1,#0x0]                        @ 080fd906 0880
     pop {r4,r5,r6}                           @ 080fd908 70bc
     pop {r0}                                 @ 080fd90a 01bc
     bx r0                                    @ 080fd90c 0047
     .byte  0x00, 0x00
-DAT_080fd910:
-    .word  0x04000048                     @ 080fd910 48000004
-DAT_080fd914:
-    .word  0x0400004a                     @ 080fd914 4a000004
+PTR_WININ_080fd910:
+    .word  WININ                          @ 080fd910 48000004
+PTR_WINOUT_080fd914:
+    .word  WINOUT                         @ 080fd914 4a000004
 DAT_080fd918:
     .word  0xffff9fff                     @ 080fd918 ff9fffff
-DAT_080fd91c:
-    .word  0x04000044                     @ 080fd91c 44000004
+PTR_WIN0V_080fd91c:
+    .word  WIN0V                          @ 080fd91c 44000004
 FUN_080fd920:
     push {r4,r5,lr}                          @ 080fd920 30b5
     adds r5,r0,#0x0    @ 080fd922 051c
@@ -328154,7 +328154,7 @@ FUN_080fd920:
     lsrs r1,r1,#0x8    @ 080fd940 090a
     orrs r1,r2    @ 080fd942 1143
     lsrs r1,r1,#0x10    @ 080fd944 090c
-    ldr r0, DAT_080fd96c                     @ 080fd946 0948
+    ldr r0, PTR_WIN0V_080fd96c               @ 080fd946 0948
     strh r1,[r0,#0x0]                        @ 080fd948 0180
     cmp r5,r4                                @ 080fd94a a542
     bne LAB_080fd966                         @ 080fd94c 0bd1
@@ -328171,8 +328171,8 @@ LAB_080fd966:
     pop {r4,r5}                              @ 080fd966 30bc
     pop {r0}                                 @ 080fd968 01bc
     bx r0                                    @ 080fd96a 0047
-DAT_080fd96c:
-    .word  0x04000044                     @ 080fd96c 44000004
+PTR_WIN0V_080fd96c:
+    .word  WIN0V                          @ 080fd96c 44000004
 FUN_080fd970:
     push {lr}                                @ 080fd970 00b5
     sub sp,#0x8                              @ 080fd972 82b0
@@ -328234,7 +328234,7 @@ FUN_080fd9bc:
     lsls r1,r1,#0x5    @ 080fd9e4 4901
     adds r0,r0,r1    @ 080fd9e6 4018
     ldr r1, DAT_080fd9fc                     @ 080fd9e8 0449
-    ldr r2, DAT_080fda00                     @ 080fd9ea 054a
+    ldr r2, PTR_BG0CNT_080fda00              @ 080fd9ea 054a
     bl bios_cpu_set                          @ 080fd9ec 10f004fd
     pop {r4,r5,r6}                           @ 080fd9f0 70bc
     pop {r0}                                 @ 080fd9f2 01bc
@@ -328244,8 +328244,8 @@ DAT_080fd9f8:
     .word  0x02029eb0                     @ 080fd9f8 b09e0202
 DAT_080fd9fc:
     .word  0x050001e0                     @ 080fd9fc e0010005
-DAT_080fda00:
-    .word  0x04000008                     @ 080fda00 08000004
+PTR_BG0CNT_080fda00:
+    .word  BG0CNT                         @ 080fda00 08000004
 FUN_080fda04:
     push {r4,r5,r6,r7,lr}                    @ 080fda04 f0b5
     .hword 0x464f    @ 080fda06 4f46
@@ -328304,7 +328304,7 @@ switchD_080fda24__caseD_0:
     .hword 0x4680    @ 080fda78 8046
     adds r1,r7,#0x0    @ 080fda7a 391c
     adds r1,#0x88    @ 080fda7c 8831
-    ldr r2, DAT_080fdb30                     @ 080fda7e 2c4a
+    ldr r2, PTR_SOUND1CNT_L_080fdb30         @ 080fda7e 2c4a
     .hword 0x4691    @ 080fda80 9146
     bl bios_cpu_set                          @ 080fda82 10f0b9fc
     ldr r0, DAT_080fdb34                     @ 080fda86 2b48
@@ -328382,8 +328382,8 @@ switchD_080fda24__caseD_0:
     b LAB_080fdc66                           @ 080fdb2a 9ce0
 DAT_080fdb2c:
     .word  0x09e507a0                     @ 080fdb2c a007e509
-DAT_080fdb30:
-    .word  0x04000060                     @ 080fdb30 60000004
+PTR_SOUND1CNT_L_080fdb30:
+    .word  SOUND1CNT_L                    @ 080fdb30 60000004
 DAT_080fdb34:
     .word  0x09e507b4                     @ 080fdb34 b407e509
 DAT_080fdb38:
@@ -328816,7 +328816,7 @@ card_list_screen_init:
     .hword 0x4645    @ 080fdefa 4546
     push {r5,r6,r7}                          @ 080fdefc e0b4
     ldr r5, DAT_080fdfe4                     @ 080fdefe 394d
-    ldr r1, DAT_080fdfe8                     @ 080fdf00 3949
+    ldr r1, PTR_BG0CNT_080fdfe8              @ 080fdf00 3949
     ldr r2, DAT_080fdfec                     @ 080fdf02 3a4a
     adds r0,r2,#0x0    @ 080fdf04 101c
     strh r0,[r1,#0x0]                        @ 080fdf06 0880
@@ -328835,7 +328835,7 @@ card_list_screen_init:
     adds r1,#0x2    @ 080fdf20 0231
     movs r0,#0x1    @ 080fdf22 0120
     strh r0,[r1,#0x0]                        @ 080fdf24 0880
-    ldr r0, DAT_080fdffc                     @ 080fdf26 3548
+    ldr r0, PTR_BG0VOFS_080fdffc             @ 080fdf26 3548
     movs r4,#0x0    @ 080fdf28 0024
     strh r4,[r0,#0x0]                        @ 080fdf2a 0480
     adds r0,#0x2    @ 080fdf2c 0230
@@ -328850,7 +328850,7 @@ card_list_screen_init:
     ldr r3, DAT_080fe004                     @ 080fdf3e 314b
     adds r0,r3,#0x0    @ 080fdf40 181c
     strh r0,[r1,#0x0]                        @ 080fdf42 0880
-    ldr r0, DAT_080fe008                     @ 080fdf44 3048
+    ldr r0, PTR_BG3HOFS_080fe008             @ 080fdf44 3048
     strh r4,[r0,#0x0]                        @ 080fdf46 0480
     adds r0,#0x2    @ 080fdf48 0230
     strh r4,[r0,#0x0]                        @ 080fdf4a 0480
@@ -328926,8 +328926,8 @@ LAB_080fdfda:
     b LAB_080fe0e2                           @ 080fdfe2 7ee0
 DAT_080fdfe4:
     .word  0x0202a4d0                     @ 080fdfe4 d0a40202
-DAT_080fdfe8:
-    .word  0x04000008                     @ 080fdfe8 08000004
+PTR_BG0CNT_080fdfe8:
+    .word  BG0CNT                         @ 080fdfe8 08000004
 DAT_080fdfec:
     .word  0x00001c0a                     @ 080fdfec 0a1c0000
 DAT_080fdff0:
@@ -328936,14 +328936,14 @@ DAT_080fdff4:
     .word  0x00001e83                     @ 080fdff4 831e0000
 DAT_080fdff8:
     .word  0x00001f0b                     @ 080fdff8 0b1f0000
-DAT_080fdffc:
-    .word  0x04000012                     @ 080fdffc 12000004
+PTR_BG0VOFS_080fdffc:
+    .word  BG0VOFS                        @ 080fdffc 12000004
 DAT_080fe000:
     .word  0x0000fffc                     @ 080fe000 fcff0000
 DAT_080fe004:
     .word  0x0000ffd0                     @ 080fe004 d0ff0000
-DAT_080fe008:
-    .word  0x0400001c                     @ 080fe008 1c000004
+PTR_BG3HOFS_080fe008:
+    .word  BG3HOFS                        @ 080fe008 1c000004
 PTR_gPrng_080fe00c:
     .word  gPrng                          @ 080fe00c 40000003
 DAT_080fe010:
@@ -331109,12 +331109,12 @@ LAB_080ff214:
     ands r0,r6    @ 080ff222 3040
     cmp r0,#0x0                              @ 080ff224 0028
     beq LAB_080ff250                         @ 080ff226 13d0
-    ldr r2, DAT_080ff248                     @ 080ff228 074a
+    ldr r2, PTR_BG1HOFS_080ff248             @ 080ff228 074a
     movs r0,#0x8    @ 080ff22a 0820
     ldrh r3,[r7,#0x34]                       @ 080ff22c bb8e
     subs r1,r0,r3    @ 080ff22e c11a
     strh r1,[r2,#0x0]                        @ 080ff230 1180
-    ldr r1, DAT_080ff24c                     @ 080ff232 0649
+    ldr r1, PTR_BG1VOFS_080ff24c             @ 080ff232 0649
     ldrh r4,[r7,#0x36]                       @ 080ff234 fc8e
     subs r0,r0,r4    @ 080ff236 001b
     strh r0,[r1,#0x0]                        @ 080ff238 0880
@@ -331125,16 +331125,16 @@ LAB_080ff214:
     adds r1,r5,#0x0    @ 080ff242 291c
     b LAB_080ff274                           @ 080ff244 16e0
     .byte  0x00, 0x00
-DAT_080ff248:
-    .word  0x04000014                     @ 080ff248 14000004
-DAT_080ff24c:
-    .word  0x04000016                     @ 080ff24c 16000004
+PTR_BG1HOFS_080ff248:
+    .word  BG1HOFS                        @ 080ff248 14000004
+PTR_BG1VOFS_080ff24c:
+    .word  BG1VOFS                        @ 080ff24c 16000004
 LAB_080ff250:
     movs r0,#0x12    @ 080ff250 1220
     ands r0,r6    @ 080ff252 3040
     cmp r0,#0x12                             @ 080ff254 1228
     bne LAB_080ff280                         @ 080ff256 13d1
-    ldr r1, DAT_080ff27c                     @ 080ff258 0849
+    ldr r1, PTR_BG1HOFS_080ff27c             @ 080ff258 0849
     ldrh r2,[r7,#0x34]                       @ 080ff25a ba8e
     rsbs r0,r2,#0    @ 080ff25c 5042
     strh r0,[r1,#0x0]                        @ 080ff25e 0880
@@ -331153,8 +331153,8 @@ LAB_080ff274:
     strh r0,[r2,#0x0]                        @ 080ff276 1080
     ldrb r5,[r7,#0x1f]                       @ 080ff278 fd7f
     b LAB_080ff2d4                           @ 080ff27a 2be0
-DAT_080ff27c:
-    .word  0x04000014                     @ 080ff27c 14000004
+PTR_BG1HOFS_080ff27c:
+    .word  BG1HOFS                        @ 080ff27c 14000004
 LAB_080ff280:
     ldrb r1,[r7,#0x1f]                       @ 080ff280 f97f
     movs r0,#0xa    @ 080ff282 0a20
@@ -331162,7 +331162,7 @@ LAB_080ff280:
     adds r5,r1,#0x0    @ 080ff286 0d1c
     cmp r0,#0x0                              @ 080ff288 0028
     beq LAB_080ff2c8                         @ 080ff28a 1dd0
-    ldr r1, DAT_080ff2c4                     @ 080ff28c 0d49
+    ldr r1, PTR_BG1HOFS_080ff2c4             @ 080ff28c 0d49
     adds r2,r7,#0x0    @ 080ff28e 3a1c
     adds r2,#0x56    @ 080ff290 5632
     adds r0,r7,#0x0    @ 080ff292 381c
@@ -331190,8 +331190,8 @@ LAB_080ff280:
     orrs r0,r1    @ 080ff2be 0843
     b LAB_080ff2d2                           @ 080ff2c0 07e0
     .byte  0x00, 0x00
-DAT_080ff2c4:
-    .word  0x04000014                     @ 080ff2c4 14000004
+PTR_BG1HOFS_080ff2c4:
+    .word  BG1HOFS                        @ 080ff2c4 14000004
 LAB_080ff2c8:
     movs r2,#0x80    @ 080ff2c8 8022
     lsls r2,r2,#0x13    @ 080ff2ca d204
@@ -331206,7 +331206,7 @@ LAB_080ff2d4:
     ands r0,r5    @ 080ff2d8 2840
     cmp r0,#0x0                              @ 080ff2da 0028
     beq LAB_080ff344                         @ 080ff2dc 32d0
-    ldr r4, DAT_080ff338                     @ 080ff2de 164c
+    ldr r4, PTR_WIN0H_080ff338               @ 080ff2de 164c
     .hword 0x46a0    @ 080ff2e0 a046
     adds r0,r7,#0x0    @ 080ff2e2 381c
     adds r0,#0x4a    @ 080ff2e4 4a30
@@ -331225,7 +331225,7 @@ LAB_080ff2d4:
     orrs r3,r1    @ 080ff2fe 0b43
     .hword 0x4640    @ 080ff300 4046
     strh r3,[r0,#0x0]                        @ 080ff302 0380
-    ldr r2, DAT_080ff33c                     @ 080ff304 0d4a
+    ldr r2, PTR_WIN0V_080ff33c               @ 080ff304 0d4a
     adds r0,r7,#0x0    @ 080ff306 381c
     adds r0,#0x4c    @ 080ff308 4c30
     ldrh r1,[r7,#0x36]                       @ 080ff30a f98e
@@ -331235,7 +331235,7 @@ LAB_080ff2d4:
     adds r0,#0xf    @ 080ff312 0f30
     orrs r1,r0    @ 080ff314 0143
     strh r1,[r2,#0x0]                        @ 080ff316 1180
-    ldr r1, DAT_080ff340                     @ 080ff318 0949
+    ldr r1, PTR_WININ_080ff340               @ 080ff318 0949
     movs r0,#0x3f    @ 080ff31a 3f20
     strb r0,[r1,#0x0]                        @ 080ff31c 0870
     adds r1,#0x2    @ 080ff31e 0231
@@ -331251,18 +331251,18 @@ LAB_080ff2d4:
     .byte  0x00, 0x00
 DAT_080ff334:
     .word  0x0000fdff                     @ 080ff334 fffd0000
-DAT_080ff338:
-    .word  0x04000040                     @ 080ff338 40000004
-DAT_080ff33c:
-    .word  0x04000044                     @ 080ff33c 44000004
-DAT_080ff340:
-    .word  0x04000048                     @ 080ff340 48000004
+PTR_WIN0H_080ff338:
+    .word  WIN0H                          @ 080ff338 40000004
+PTR_WIN0V_080ff33c:
+    .word  WIN0V                          @ 080ff33c 44000004
+PTR_WININ_080ff340:
+    .word  WININ                          @ 080ff340 48000004
 LAB_080ff344:
     adds r0,r1,#0x0    @ 080ff344 081c
     ands r0,r6    @ 080ff346 3040
     cmp r0,#0x0                              @ 080ff348 0028
     beq LAB_080ff39c                         @ 080ff34a 27d0
-    ldr r1, DAT_080ff388                     @ 080ff34c 0e49
+    ldr r1, PTR_WIN0H_080ff388               @ 080ff34c 0e49
     ldr r4, DAT_080ff38c                     @ 080ff34e 0f4c
     adds r0,r4,#0x0    @ 080ff350 201c
     strh r0,[r1,#0x0]                        @ 080ff352 0880
@@ -331276,9 +331276,9 @@ LAB_080ff344:
     lsls r3,r3,#0x6    @ 080ff362 9b01
     adds r1,r3,#0x0    @ 080ff364 191c
 LAB_080ff366:
-    ldr r0, DAT_080ff394                     @ 080ff366 0b48
+    ldr r0, PTR_WIN0V_080ff394               @ 080ff366 0b48
     strh r1,[r0,#0x0]                        @ 080ff368 0180
-    ldr r1, DAT_080ff398                     @ 080ff36a 0b49
+    ldr r1, PTR_WININ_080ff398               @ 080ff36a 0b49
     movs r0,#0x3f    @ 080ff36c 3f20
     strb r0,[r1,#0x0]                        @ 080ff36e 0870
     adds r1,#0x2    @ 080ff370 0231
@@ -331293,16 +331293,16 @@ LAB_080ff366:
     orrs r0,r1    @ 080ff382 0843
     b LAB_080ff3a6                           @ 080ff384 0fe0
     .byte  0x00, 0x00
-DAT_080ff388:
-    .word  0x04000040                     @ 080ff388 40000004
+PTR_WIN0H_080ff388:
+    .word  WIN0H                          @ 080ff388 40000004
 DAT_080ff38c:
     .word  0x000038b8                     @ 080ff38c b8380000
 DAT_080ff390:
     .word  0x00001888                     @ 080ff390 88180000
-DAT_080ff394:
-    .word  0x04000044                     @ 080ff394 44000004
-DAT_080ff398:
-    .word  0x04000048                     @ 080ff398 48000004
+PTR_WIN0V_080ff394:
+    .word  WIN0V                          @ 080ff394 44000004
+PTR_WININ_080ff398:
+    .word  WININ                          @ 080ff398 48000004
 LAB_080ff39c:
     movs r2,#0x80    @ 080ff39c 8022
     lsls r2,r2,#0x13    @ 080ff39e d204
@@ -331331,7 +331331,7 @@ LAB_080ff3c8:
     ands r0,r6    @ 080ff3ca 3040
     cmp r0,#0x0                              @ 080ff3cc 0028
     beq LAB_080ff3e8                         @ 080ff3ce 0bd0
-    ldr r1, DAT_080ff3e4                     @ 080ff3d0 0449
+    ldr r1, PTR_BLDCNT_080ff3e4              @ 080ff3d0 0449
     movs r0,#0xfd    @ 080ff3d2 fd20
     strh r0,[r1,#0x0]                        @ 080ff3d4 0880
     adds r1,#0x2    @ 080ff3d6 0231
@@ -331341,8 +331341,8 @@ LAB_080ff3c8:
     movs r0,#0x8    @ 080ff3de 0820
     strh r0,[r1,#0x0]                        @ 080ff3e0 0880
     b FUN_080ff418                           @ 080ff3e2 19e0
-DAT_080ff3e4:
-    .word  0x04000050                     @ 080ff3e4 50000004
+PTR_BLDCNT_080ff3e4:
+    .word  BLDCNT                         @ 080ff3e4 50000004
 LAB_080ff3e8:
     movs r0,#0x20    @ 080ff3e8 2020
     ands r0,r5    @ 080ff3ea 2840
@@ -331350,7 +331350,7 @@ LAB_080ff3e8:
     lsrs r1,r0,#0x18    @ 080ff3ee 010e
     cmp r1,#0x0                              @ 080ff3f0 0029
     beq LAB_080ff414                         @ 080ff3f2 0fd0
-    ldr r1, DAT_080ff40c                     @ 080ff3f4 0549
+    ldr r1, PTR_BLDCNT_080ff40c              @ 080ff3f4 0549
     ldr r2, DAT_080ff410                     @ 080ff3f6 064a
     adds r0,r2,#0x0    @ 080ff3f8 101c
     strh r0,[r1,#0x0]                        @ 080ff3fa 0880
@@ -331362,12 +331362,12 @@ LAB_080ff3e8:
     strh r0,[r1,#0x0]                        @ 080ff406 0880
     b FUN_080ff418                           @ 080ff408 06e0
     .byte  0x00, 0x00
-DAT_080ff40c:
-    .word  0x04000050                     @ 080ff40c 50000004
+PTR_BLDCNT_080ff40c:
+    .word  BLDCNT                         @ 080ff40c 50000004
 DAT_080ff410:
     .word  0x00002fd0                     @ 080ff410 d02f0000
 LAB_080ff414:
-    ldr r0, DAT_080ff42c                     @ 080ff414 0548
+    ldr r0, PTR_BLDCNT_080ff42c              @ 080ff414 0548
     strh r1,[r0,#0x0]                        @ 080ff416 0180
 FUN_080ff418:
     movs r0,#0x0    @ 080ff418 0020
@@ -331381,8 +331381,8 @@ FUN_080ff41a:
     pop {r1}                                 @ 080ff426 02bc
     bx r1                                    @ 080ff428 0847
     .byte  0x00, 0x00
-DAT_080ff42c:
-    .word  0x04000050                     @ 080ff42c 50000004
+PTR_BLDCNT_080ff42c:
+    .word  BLDCNT                         @ 080ff42c 50000004
 FUN_080ff430:
     movs r0,#0x1    @ 080ff430 0120
     bx lr                                    @ 080ff432 7047
@@ -335534,7 +335534,7 @@ LAB_081013bc:
     .hword 0x4664    @ 081013c2 6446
     cmp r4,#0x3                              @ 081013c4 032c
     ble LAB_08101372                         @ 081013c6 d4dd
-    ldr r1, DAT_081013e4                     @ 081013c8 0649
+    ldr r1, PTR_BG2HOFS_081013e4             @ 081013c8 0649
     movs r0,#0x0    @ 081013ca 0020
     strh r0,[r1,#0x0]                        @ 081013cc 0880
     adds r1,#0x2    @ 081013ce 0231
@@ -335548,8 +335548,8 @@ DAT_081013dc:
     .word  0x0202f3c0                     @ 081013dc c0f30202
 DAT_081013e0:
     .word  0x0600f000                     @ 081013e0 00f00006
-DAT_081013e4:
-    .word  0x04000018                     @ 081013e4 18000004
+PTR_BG2HOFS_081013e4:
+    .word  BG2HOFS                        @ 081013e4 18000004
 DAT_081013e8:
     .word  0x0000ffd0                     @ 081013e8 d0ff0000
 LAB_081013ec:
@@ -335583,7 +335583,7 @@ LAB_0810140e:
     .hword 0x4664    @ 0810141e 6446
     cmp r4,#0x3                              @ 08101420 032c
     ble LAB_081013fa                         @ 08101422 eadd
-    ldr r1, DAT_08101448                     @ 08101424 0849
+    ldr r1, PTR_BG2HOFS_08101448             @ 08101424 0849
     ldr r2, DAT_0810144c                     @ 08101426 094a
     adds r0,r2,#0x0    @ 08101428 101c
     strh r0,[r1,#0x0]                        @ 0810142a 0880
@@ -335602,8 +335602,8 @@ LAB_08101432:
     pop {r1}                                 @ 08101442 02bc
     bx r1                                    @ 08101444 0847
     .byte  0x00, 0x00
-DAT_08101448:
-    .word  0x04000018                     @ 08101448 18000004
+PTR_BG2HOFS_08101448:
+    .word  BG2HOFS                        @ 08101448 18000004
 DAT_0810144c:
     .word  0x0000fffc                     @ 0810144c fcff0000
 DAT_08101450:
@@ -342186,7 +342186,7 @@ FUN_081045c4:
     push {r4,r5,r6,r7,lr}                    @ 081045c4 f0b5
     ldr r7, DAT_08104698                     @ 081045c6 344f
     ldr r5, DAT_0810469c                     @ 081045c8 344d
-    ldr r1, DAT_081046a0                     @ 081045ca 3549
+    ldr r1, PTR_BG0CNT_081046a0              @ 081045ca 3549
     ldr r2, DAT_081046a4                     @ 081045cc 354a
     adds r0,r2,#0x0    @ 081045ce 101c
     strh r0,[r1,#0x0]                        @ 081045d0 0880
@@ -342202,7 +342202,7 @@ FUN_081045c4:
     ldr r6, DAT_081046b0                     @ 081045e4 324e
     adds r0,r6,#0x0    @ 081045e6 301c
     strh r0,[r1,#0x0]                        @ 081045e8 0880
-    ldr r0, DAT_081046b4                     @ 081045ea 3248
+    ldr r0, PTR_BG0HOFS_081046b4             @ 081045ea 3248
     movs r4,#0x0    @ 081045ec 0024
     strh r4,[r0,#0x0]                        @ 081045ee 0480
     adds r0,#0x2    @ 081045f0 0230
@@ -342286,8 +342286,8 @@ DAT_08104698:
     .word  0x0202a4d0                     @ 08104698 d0a40202
 DAT_0810469c:
     .word  0x0202f3c0                     @ 0810469c c0f30202
-DAT_081046a0:
-    .word  0x04000008                     @ 081046a0 08000004
+PTR_BG0CNT_081046a0:
+    .word  BG0CNT                         @ 081046a0 08000004
 DAT_081046a4:
     .word  0x00001c02                     @ 081046a4 021c0000
 DAT_081046a8:
@@ -342296,8 +342296,8 @@ DAT_081046ac:
     .word  0x00001e8f                     @ 081046ac 8f1e0000
 DAT_081046b0:
     .word  0x00001f0f                     @ 081046b0 0f1f0000
-DAT_081046b4:
-    .word  0x04000010                     @ 081046b4 10000004
+PTR_BG0HOFS_081046b4:
+    .word  BG0HOFS                        @ 081046b4 10000004
 PTR_gPrng_081046b8:
     .word  gPrng                          @ 081046b8 40000003
 DAT_081046bc:
@@ -344027,12 +344027,12 @@ LAB_0810558e:
     ands r0,r6    @ 08105592 3040
     cmp r0,#0x90                             @ 08105594 9028
     bne LAB_081055c4                         @ 08105596 15d1
-    ldr r2, DAT_081055bc                     @ 08105598 084a
+    ldr r2, PTR_BG1HOFS_081055bc             @ 08105598 084a
     movs r0,#0x8    @ 0810559a 0820
     ldrh r7,[r5,#0x34]                       @ 0810559c af8e
     subs r1,r0,r7    @ 0810559e c11b
     strh r1,[r2,#0x0]                        @ 081055a0 1180
-    ldr r1, DAT_081055c0                     @ 081055a2 0749
+    ldr r1, PTR_BG1VOFS_081055c0             @ 081055a2 0749
     ldrh r2,[r5,#0x36]                       @ 081055a4 ea8e
     subs r0,r0,r2    @ 081055a6 801a
     strh r0,[r1,#0x0]                        @ 081055a8 0880
@@ -344045,10 +344045,10 @@ LAB_0810558e:
     orrs r0,r1    @ 081055b6 0843
     b LAB_081055ce                           @ 081055b8 09e0
     .byte  0x00, 0x00
-DAT_081055bc:
-    .word  0x04000014                     @ 081055bc 14000004
-DAT_081055c0:
-    .word  0x04000016                     @ 081055c0 16000004
+PTR_BG1HOFS_081055bc:
+    .word  BG1HOFS                        @ 081055bc 14000004
+PTR_BG1VOFS_081055c0:
+    .word  BG1VOFS                        @ 081055c0 16000004
 LAB_081055c4:
     movs r2,#0x80    @ 081055c4 8022
     lsls r2,r2,#0x13    @ 081055c6 d204
@@ -344153,7 +344153,7 @@ LAB_08105674:
     bls LAB_08105684                         @ 08105680 00d9
     movs r6,#0x1    @ 08105682 0126
 LAB_08105684:
-    ldr r1, DAT_081056ac                     @ 08105684 0949
+    ldr r1, PTR_WIN0H_081056ac               @ 08105684 0949
     movs r0,#0xf0    @ 08105686 f020
     strh r0,[r1,#0x0]                        @ 08105688 0880
     ldrb r3,[r5,#0x1f]                       @ 0810568a eb7f
@@ -344174,14 +344174,14 @@ DAT_081056a4:
     .word  0x02000000                     @ 081056a4 00000002
 DAT_081056a8:
     .word  0x000053f0                     @ 081056a8 f0530000
-DAT_081056ac:
-    .word  0x04000040                     @ 081056ac 40000004
+PTR_WIN0H_081056ac:
+    .word  WIN0H                          @ 081056ac 40000004
 LAB_081056b0:
     movs r1,#0xa0    @ 081056b0 a021
 LAB_081056b2:
-    ldr r0, DAT_081056d4                     @ 081056b2 0848
+    ldr r0, PTR_WIN0V_081056d4               @ 081056b2 0848
     strh r1,[r0,#0x0]                        @ 081056b4 0180
-    ldr r1, DAT_081056d8                     @ 081056b6 0849
+    ldr r1, PTR_WININ_081056d8               @ 081056b6 0849
     movs r0,#0x3f    @ 081056b8 3f20
     strb r0,[r1,#0x0]                        @ 081056ba 0870
     adds r1,#0x2    @ 081056bc 0231
@@ -344196,10 +344196,10 @@ LAB_081056b2:
     orrs r0,r1    @ 081056ce 0843
     strh r0,[r2,#0x0]                        @ 081056d0 1080
     b LAB_081056ea                           @ 081056d2 0ae0
-DAT_081056d4:
-    .word  0x04000044                     @ 081056d4 44000004
-DAT_081056d8:
-    .word  0x04000048                     @ 081056d8 48000004
+PTR_WIN0V_081056d4:
+    .word  WIN0V                          @ 081056d4 44000004
+PTR_WININ_081056d8:
+    .word  WININ                          @ 081056d8 48000004
 LAB_081056dc:
     movs r2,#0x80    @ 081056dc 8022
     lsls r2,r2,#0x13    @ 081056de d204
@@ -344227,7 +344227,7 @@ FUN_08105702:
 DAT_08105708:
     .word  0x0000dfff                     @ 08105708 ffdf0000
 LAB_0810570c:
-    ldr r0, DAT_08105728                     @ 0810570c 0648
+    ldr r0, PTR_BLDCNT_08105728              @ 0810570c 0648
     ldr r7, DAT_0810572c                     @ 0810570e 074f
     adds r1,r7,#0x0    @ 08105710 391c
     strh r1,[r0,#0x0]                        @ 08105712 0180
@@ -344236,19 +344236,19 @@ LAB_0810570c:
     ldrsh r0,[r1,r2]                         @ 08105718 885e
     cmp r0,#0x0                              @ 0810571a 0028
     bne LAB_08105734                         @ 0810571c 0ad1
-    ldr r1, DAT_08105730                     @ 0810571e 0449
+    ldr r1, PTR_BLDALPHA_08105730            @ 0810571e 0449
     movs r3,#0xe2    @ 08105720 e223
     lsls r3,r3,#0x3    @ 08105722 db00
     adds r0,r3,#0x0    @ 08105724 181c
     b LAB_0810573c                           @ 08105726 09e0
-DAT_08105728:
-    .word  0x04000050                     @ 08105728 50000004
+PTR_BLDCNT_08105728:
+    .word  BLDCNT                         @ 08105728 50000004
 DAT_0810572c:
     .word  0x00003e41                     @ 0810572c 413e0000
-DAT_08105730:
-    .word  0x04000052                     @ 08105730 52000004
+PTR_BLDALPHA_08105730:
+    .word  BLDALPHA                       @ 08105730 52000004
 LAB_08105734:
-    ldr r1, DAT_08105750                     @ 08105734 0649
+    ldr r1, PTR_BLDALPHA_08105750            @ 08105734 0649
     movs r4,#0xa2    @ 08105736 a224
     lsls r4,r4,#0x3    @ 08105738 e400
     adds r0,r4,#0x0    @ 0810573a 201c
@@ -344265,8 +344265,8 @@ FUN_08105740:
     pop {r4,r5,r6,r7}                        @ 0810574a f0bc
     pop {r1}                                 @ 0810574c 02bc
     bx r1                                    @ 0810574e 0847
-DAT_08105750:
-    .word  0x04000052                     @ 08105750 52000004
+PTR_BLDALPHA_08105750:
+    .word  BLDALPHA                       @ 08105750 52000004
 FUN_08105754:
     movs r0,#0x1    @ 08105754 0120
     bx lr                                    @ 08105756 7047
@@ -344952,7 +344952,7 @@ FUN_08105bfc:
     movs r0,#0x0    @ 08105c4e 0020
     movs r1,#0xc0    @ 08105c50 c021
     bl FUN_080ee264                          @ 08105c52 e8f707fb
-    ldr r1, DAT_08105d20                     @ 08105c56 3249
+    ldr r1, PTR_BG2HOFS_08105d20             @ 08105c56 3249
     .hword 0x4642    @ 08105c58 4246
     ldrh r2,[r2,#0x1c]                       @ 08105c5a 928b
     rsbs r0,r2,#0    @ 08105c5c 5042
@@ -345057,8 +345057,8 @@ DAT_08105d18:
     .word  0x0600f000                     @ 08105d18 00f00006
 DAT_08105d1c:
     .word  0x00001e03                     @ 08105d1c 031e0000
-DAT_08105d20:
-    .word  0x04000018                     @ 08105d20 18000004
+PTR_BG2HOFS_08105d20:
+    .word  BG2HOFS                        @ 08105d20 18000004
 DAT_08105d24:
     .word  0x0600e000                     @ 08105d24 00e00006
 DAT_08105d28:
@@ -346922,7 +346922,7 @@ LAB_08106b66:
 LAB_08106b68:
     .hword 0x4644    @ 08106b68 4446
     strh r2,[r4,#0x36]                       @ 08106b6a e286
-    ldr r1, DAT_08106b8c                     @ 08106b6c 0749
+    ldr r1, PTR_BG1HOFS_08106b8c             @ 08106b6c 0749
     ldrh r6,[r4,#0x34]                       @ 08106b6e a68e
     rsbs r0,r6,#0    @ 08106b70 7042
     strh r0,[r1,#0x0]                        @ 08106b72 0880
@@ -346939,8 +346939,8 @@ LAB_08106b7a:
     pop {r4,r5,r6,r7}                        @ 08106b86 f0bc
     pop {r1}                                 @ 08106b88 02bc
     bx r1                                    @ 08106b8a 0847
-DAT_08106b8c:
-    .word  0x04000014                     @ 08106b8c 14000004
+PTR_BG1HOFS_08106b8c:
+    .word  BG1HOFS                        @ 08106b8c 14000004
     .byte  0x01, 0x20, 0x70, 0x47
 FUN_08106b94:
     push {r4,lr}                             @ 08106b94 10b5
@@ -355815,7 +355815,7 @@ LAB_0810af62:
     adds r0,#0x1    @ 0810af66 0130
     cmp r0,#0x3f                             @ 0810af68 3f28
     bls LAB_0810af62                         @ 0810af6a fad9
-    ldr r1, DAT_0810afc8                     @ 0810af6c 1649
+    ldr r1, PTR_DMA3SAD_0810afc8             @ 0810af6c 1649
     str r4,[r1,#0x0]                         @ 0810af6e 0c60
     str r5,[r1,#0x4]                         @ 0810af70 4d60
     ldr r0, DAT_0810afcc                     @ 0810af72 1648
@@ -355832,7 +355832,7 @@ LAB_0810af82:
     cmp r0,#0x0                              @ 0810af86 0028
     bne LAB_0810af82                         @ 0810af88 fbd1
 LAB_0810af8a:
-    ldr r1, DAT_0810afc8                     @ 0810af8a 0f49
+    ldr r1, PTR_DMA3SAD_0810afc8             @ 0810af8a 0f49
     str r6,[r1,#0x0]                         @ 0810af8c 0e60
     str r7,[r1,#0x4]                         @ 0810af8e 4f60
     ldr r0, DAT_0810afd0                     @ 0810af90 0f48
@@ -355865,8 +355865,8 @@ DAT_0810afc0:
     .word  0x0810df38                     @ 0810afc0 38df1008
 DAT_0810afc4:
     .word  0x03004c0c                     @ 0810afc4 0c4c0003
-DAT_0810afc8:
-    .word  0x040000d4                     @ 0810afc8 d4000004
+PTR_DMA3SAD_0810afc8:
+    .word  DMA3SAD                        @ 0810afc8 d4000004
 DAT_0810afcc:
     .word  0x80000008                     @ 0810afcc 08000080
 DAT_0810afd0:
@@ -355889,7 +355889,7 @@ LAB_0810afec:
     adds r0,r0,r2    @ 0810afee 8018
     lsls r0,r0,#0x4    @ 0810aff0 0001
     adds r3,r3,r0    @ 0810aff2 1b18
-    ldr r1, DAT_0810b018                     @ 0810aff4 0849
+    ldr r1, PTR_WAVE_RAM_0810b018            @ 0810aff4 0849
     ldr r0,[r3,#0x0]                         @ 0810aff6 1868
     str r0,[r1,#0x0]                         @ 0810aff8 0860
     adds r1,#0x4    @ 0810affa 0431
@@ -355907,10 +355907,10 @@ DAT_0810b010:
     .word  0x084be710                     @ 0810b010 10e74b08
 DAT_0810b014:
     .word  0x081143a0                     @ 0810b014 a0431108
-DAT_0810b018:
-    .word  0x04000090                     @ 0810b018 90000004
+PTR_WAVE_RAM_0810b018:
+    .word  WAVE_RAM                       @ 0810b018 90000004
 LAB_0810b01c:
-    ldr r0, DAT_0810b058                     @ 0810b01c 0e48
+    ldr r0, PTR_WAVE_RAM_0810b058            @ 0810b01c 0e48
     str r2,[r0,#0x0]                         @ 0810b01e 0260
     adds r0,#0x4    @ 0810b020 0430
     str r2,[r0,#0x0]                         @ 0810b022 0260
@@ -355935,17 +355935,17 @@ LAB_0810b044:
     adds r0,r4,#0x0    @ 0810b044 201c
     eors r0,r1    @ 0810b046 4840
     strh r0,[r3,#0x0]                        @ 0810b048 1880
-    ldr r1, DAT_0810b05c                     @ 0810b04a 0449
+    ldr r1, PTR_SOUND3CNT_L_0810b05c         @ 0810b04a 0449
     movs r0,#0x80    @ 0810b04c 8020
     orrs r2,r0    @ 0810b04e 0243
     strh r2,[r1,#0x0]                        @ 0810b050 0a80
     pop {r4}                                 @ 0810b052 10bc
     pop {r0}                                 @ 0810b054 01bc
     bx r0                                    @ 0810b056 0047
-DAT_0810b058:
-    .word  0x04000090                     @ 0810b058 90000004
-DAT_0810b05c:
-    .word  0x04000070                     @ 0810b05c 70000004
+PTR_WAVE_RAM_0810b058:
+    .word  WAVE_RAM                       @ 0810b058 90000004
+PTR_SOUND3CNT_L_0810b05c:
+    .word  SOUND3CNT_L                    @ 0810b05c 70000004
 FUN_0810b060:
     push {r4,lr}                             @ 0810b060 10b5
     ldr r4, DAT_0810b0f4                     @ 0810b062 244c
@@ -356011,7 +356011,7 @@ LAB_0810b0c8:
     movs r1,#0x0    @ 0810b0d6 0021
     movs r2,#0x0    @ 0810b0d8 0022
     bl FUN_0810afd4                          @ 0810b0da fff77bff
-    ldr r1, DAT_0810b108                     @ 0810b0de 0a49
+    ldr r1, PTR_SOUND3CNT_X_0810b108         @ 0810b0de 0a49
     movs r2,#0x80    @ 0810b0e0 8022
     lsls r2,r2,#0x8    @ 0810b0e2 1202
     adds r0,r2,#0x0    @ 0810b0e4 101c
@@ -356031,8 +356031,8 @@ DAT_0810b100:
     .word  0x0000037e                     @ 0810b100 7e030000
 DAT_0810b104:
     .word  0x0000037f                     @ 0810b104 7f030000
-DAT_0810b108:
-    .word  0x04000074                     @ 0810b108 74000004
+PTR_SOUND3CNT_X_0810b108:
+    .word  SOUND3CNT_X                    @ 0810b108 74000004
 FUN_0810b10c:
     push {r4,r5,r6,lr}                       @ 0810b10c 70b5
     adds r6,r0,#0x0    @ 0810b10e 061c
@@ -356049,7 +356049,7 @@ FUN_0810b10c:
     beq LAB_0810b128                         @ 0810b124 00d0
     movs r2,#0x1    @ 0810b126 0122
 LAB_0810b128:
-    ldr r3, DAT_0810b144                     @ 0810b128 064b
+    ldr r3, PTR_SOUNDCNT_H_0810b144          @ 0810b128 064b
     ldrh r1,[r3,#0x0]                        @ 0810b12a 1988
     cmp r6,#0x0                              @ 0810b12c 002e
     bne LAB_0810b14c                         @ 0810b12e 0dd1
@@ -356063,8 +356063,8 @@ LAB_0810b128:
     b LAB_0810b15e                           @ 0810b13e 0ee0
 DAT_0810b140:
     .word  0x030050cc                     @ 0810b140 cc500003
-DAT_0810b144:
-    .word  0x04000082                     @ 0810b144 82000004
+PTR_SOUNDCNT_H_0810b144:
+    .word  SOUNDCNT_H                     @ 0810b144 82000004
 DAT_0810b148:
     .word  0x0000ffef                     @ 0810b148 efff0000
 LAB_0810b14c:
@@ -356097,7 +356097,7 @@ LAB_0810b176:
     adds r0,r0,r1    @ 0810b17a 4018
     movs r1,#0x0    @ 0810b17c 0021
     strb r3,[r0,#0x0]                        @ 0810b17e 0370
-    ldr r2, DAT_0810b1c0                     @ 0810b180 0f4a
+    ldr r2, PTR_TM0CNT_L_0810b1c0            @ 0810b180 0f4a
     str r1,[r2,#0x0]                         @ 0810b182 1160
     ldr r1, DAT_0810b1c4                     @ 0810b184 0f49
     lsls r0,r3,#0x2    @ 0810b186 9800
@@ -356130,8 +356130,8 @@ DAT_0810b1b8:
     .word  0x030050cc                     @ 0810b1b8 cc500003
 DAT_0810b1bc:
     .word  0x0000038a                     @ 0810b1bc 8a030000
-DAT_0810b1c0:
-    .word  0x04000100                     @ 0810b1c0 00010004
+PTR_TM0CNT_L_0810b1c0:
+    .word  TM0CNT_L                       @ 0810b1c0 00010004
 DAT_0810b1c4:
     .word  0x084c7634                     @ 0810b1c4 34764c08
 DAT_0810b1c8:
@@ -356140,12 +356140,12 @@ DAT_0810b1cc:
     .word  0x084c7568                     @ 0810b1cc 68754c08
 FUN_0810b1d0:
     push {r4,r5,r6,lr}                       @ 0810b1d0 70b5
-    ldr r2, DAT_0810b2c0                     @ 0810b1d2 3b4a
+    ldr r2, PTR_IE_0810b2c0                  @ 0810b1d2 3b4a
     ldrh r1,[r2,#0x0]                        @ 0810b1d4 1188
     ldr r0, DAT_0810b2c4                     @ 0810b1d6 3b48
     ands r0,r1    @ 0810b1d8 0840
     strh r0,[r2,#0x0]                        @ 0810b1da 1080
-    ldr r0, DAT_0810b2c8                     @ 0810b1dc 3a48
+    ldr r0, PTR_DMA1SAD_0810b2c8             @ 0810b1dc 3a48
     ldr r2, DAT_0810b2cc                     @ 0810b1de 3b4a
     str r2,[r0,#0x0]                         @ 0810b1e0 0260
     ldr r5, DAT_0810b2d0                     @ 0810b1e2 3b4d
@@ -356153,7 +356153,7 @@ FUN_0810b1d0:
     ldr r4, DAT_0810b2d4                     @ 0810b1e6 3b4c
     str r4,[r0,#0x8]                         @ 0810b1e8 8460
     ldr r1,[r0,#0x8]                         @ 0810b1ea 8168
-    ldr r1, DAT_0810b2d8                     @ 0810b1ec 3a49
+    ldr r1, PTR_DMA1CNT_H_0810b2d8           @ 0810b1ec 3a49
     movs r6,#0x88    @ 0810b1ee 8826
     lsls r6,r6,#0x3    @ 0810b1f0 f600
     adds r3,r6,#0x0    @ 0810b1f2 331c
@@ -356165,23 +356165,23 @@ FUN_0810b1d0:
     str r5,[r1,#0x4]                         @ 0810b1fe 4d60
     str r4,[r1,#0x8]                         @ 0810b200 8c60
     ldr r0,[r1,#0x8]                         @ 0810b202 8868
-    ldr r0, DAT_0810b2dc                     @ 0810b204 3548
+    ldr r0, PTR_DMA2CNT_H_0810b2dc           @ 0810b204 3548
     strh r3,[r0,#0x0]                        @ 0810b206 0380
     ldr r0,[r1,#0x8]                         @ 0810b208 8868
-    ldr r0, DAT_0810b2e0                     @ 0810b20a 3548
+    ldr r0, PTR_DMA1CNT_L_0810b2e0           @ 0810b20a 3548
     movs r1,#0x0    @ 0810b20c 0021
     str r1,[r0,#0x0]                         @ 0810b20e 0160
-    ldr r2, DAT_0810b2e4                     @ 0810b210 344a
+    ldr r2, PTR_SOUNDCNT_X_0810b2e4          @ 0810b210 344a
     movs r0,#0x80    @ 0810b212 8020
     strh r0,[r2,#0x0]                        @ 0810b214 1080
-    ldr r0, DAT_0810b2e8                     @ 0810b216 3448
+    ldr r0, PTR_SOUNDCNT_L_0810b2e8          @ 0810b216 3448
     strh r1,[r0,#0x0]                        @ 0810b218 0180
     subs r2,#0x2    @ 0810b21a 023a
     movs r3,#0x88    @ 0810b21c 8823
     lsls r3,r3,#0x8    @ 0810b21e 1b02
     adds r0,r3,#0x0    @ 0810b220 181c
     strh r0,[r2,#0x0]                        @ 0810b222 1080
-    ldr r0, DAT_0810b2ec                     @ 0810b224 3148
+    ldr r0, PTR_SOUND1CNT_L_0810b2ec         @ 0810b224 3148
     strh r1,[r0,#0x0]                        @ 0810b226 0180
     adds r0,#0x2    @ 0810b228 0230
     strh r1,[r0,#0x0]                        @ 0810b22a 0180
@@ -356206,19 +356206,19 @@ FUN_0810b1d0:
     strh r1,[r0,#0x0]                        @ 0810b250 0180
     bl FUN_0810b060                          @ 0810b252 fff705ff
     movs r1,#0x8    @ 0810b256 0821
-    ldr r3, DAT_0810b2f0                     @ 0810b258 254b
+    ldr r3, PTR_FIFO_A_0810b2f0              @ 0810b258 254b
     movs r0,#0x0    @ 0810b25a 0020
-    ldr r2, DAT_0810b2f4                     @ 0810b25c 254a
+    ldr r2, PTR_FIFO_B_0810b2f4              @ 0810b25c 254a
 LAB_0810b25e:
     str r0,[r3,#0x0]                         @ 0810b25e 1860
     str r0,[r2,#0x0]                         @ 0810b260 1060
     subs r1,#0x1    @ 0810b262 0139
     cmp r1,#0x0                              @ 0810b264 0029
     bne LAB_0810b25e                         @ 0810b266 fad1
-    ldr r1, DAT_0810b2c8                     @ 0810b268 1749
+    ldr r1, PTR_DMA1SAD_0810b2c8             @ 0810b268 1749
     ldr r2, DAT_0810b2cc                     @ 0810b26a 184a
     str r2,[r1,#0x0]                         @ 0810b26c 0a60
-    ldr r0, DAT_0810b2f0                     @ 0810b26e 2048
+    ldr r0, PTR_FIFO_A_0810b2f0              @ 0810b26e 2048
     str r0,[r1,#0x4]                         @ 0810b270 4860
     ldr r0, DAT_0810b2f8                     @ 0810b272 2148
     str r0,[r1,#0x8]                         @ 0810b274 8860
@@ -356226,12 +356226,12 @@ LAB_0810b25e:
     adds r1,#0xc    @ 0810b278 0c31
     adds r2,#0x20    @ 0810b27a 2032
     str r2,[r1,#0x0]                         @ 0810b27c 0a60
-    ldr r0, DAT_0810b2f4                     @ 0810b27e 1d48
+    ldr r0, PTR_FIFO_B_0810b2f4              @ 0810b27e 1d48
     str r0,[r1,#0x4]                         @ 0810b280 4860
     ldr r0, DAT_0810b2fc                     @ 0810b282 1e48
     str r0,[r1,#0x8]                         @ 0810b284 8860
     ldr r0,[r1,#0x8]                         @ 0810b286 8868
-    ldr r2, DAT_0810b2c0                     @ 0810b288 0d4a
+    ldr r2, PTR_IE_0810b2c0                  @ 0810b288 0d4a
     ldrh r0,[r2,#0x0]                        @ 0810b28a 1088
     movs r3,#0x80    @ 0810b28c 8023
     lsls r3,r3,#0x2    @ 0810b28e 9b00
@@ -356243,7 +356243,7 @@ LAB_0810b25e:
     adds r0,r0,r6    @ 0810b29a 8019
     ldrb r0,[r0,#0x0]                        @ 0810b29c 0078
     bl FUN_0810b16c                          @ 0810b29e fff765ff
-    ldr r1, DAT_0810b2e8                     @ 0810b2a2 1149
+    ldr r1, PTR_SOUNDCNT_L_0810b2e8          @ 0810b2a2 1149
     ldr r2, DAT_0810b308                     @ 0810b2a4 184a
     adds r0,r2,#0x0    @ 0810b2a6 101c
     strh r0,[r1,#0x0]                        @ 0810b2a8 0880
@@ -356257,34 +356257,34 @@ LAB_0810b25e:
     pop {r0}                                 @ 0810b2ba 01bc
     bx r0                                    @ 0810b2bc 0047
     .byte  0x00, 0x00
-DAT_0810b2c0:
-    .word  0x04000200                     @ 0810b2c0 00020004
+PTR_IE_0810b2c0:
+    .word  IE                             @ 0810b2c0 00020004
 DAT_0810b2c4:
     .word  0x0000fdf7                     @ 0810b2c4 f7fd0000
-DAT_0810b2c8:
-    .word  0x040000bc                     @ 0810b2c8 bc000004
+PTR_DMA1SAD_0810b2c8:
+    .word  DMA1SAD                        @ 0810b2c8 bc000004
 DAT_0810b2cc:
     .word  0x030055c0                     @ 0810b2cc c0550003
 DAT_0810b2d0:
     .word  0x030055bc                     @ 0810b2d0 bc550003
 DAT_0810b2d4:
     .word  0x84400004                     @ 0810b2d4 04004084
-DAT_0810b2d8:
-    .word  0x040000c6                     @ 0810b2d8 c6000004
-DAT_0810b2dc:
-    .word  0x040000d2                     @ 0810b2dc d2000004
-DAT_0810b2e0:
-    .word  0x040000c4                     @ 0810b2e0 c4000004
-DAT_0810b2e4:
-    .word  0x04000084                     @ 0810b2e4 84000004
-DAT_0810b2e8:
-    .word  0x04000080                     @ 0810b2e8 80000004
-DAT_0810b2ec:
-    .word  0x04000060                     @ 0810b2ec 60000004
-DAT_0810b2f0:
-    .word  0x040000a0                     @ 0810b2f0 a0000004
-DAT_0810b2f4:
-    .word  0x040000a4                     @ 0810b2f4 a4000004
+PTR_DMA1CNT_H_0810b2d8:
+    .word  DMA1CNT_H                      @ 0810b2d8 c6000004
+PTR_DMA2CNT_H_0810b2dc:
+    .word  DMA2CNT_H                      @ 0810b2dc d2000004
+PTR_DMA1CNT_L_0810b2e0:
+    .word  DMA1CNT_L                      @ 0810b2e0 c4000004
+PTR_SOUNDCNT_X_0810b2e4:
+    .word  SOUNDCNT_X                     @ 0810b2e4 84000004
+PTR_SOUNDCNT_L_0810b2e8:
+    .word  SOUNDCNT_L                     @ 0810b2e8 80000004
+PTR_SOUND1CNT_L_0810b2ec:
+    .word  SOUND1CNT_L                    @ 0810b2ec 60000004
+PTR_FIFO_A_0810b2f0:
+    .word  FIFO_A                         @ 0810b2f0 a0000004
+PTR_FIFO_B_0810b2f4:
+    .word  FIFO_B                         @ 0810b2f4 a4000004
 DAT_0810b2f8:
     .word  0xf6000004                     @ 0810b2f8 040000f6
 DAT_0810b2fc:
@@ -356300,7 +356300,7 @@ DAT_0810b30c:
 FUN_0810b310:
     push {r4,r5,r6,r7,lr}                    @ 0810b310 f0b5
     adds r6,r0,#0x0    @ 0810b312 061c
-    ldr r2, DAT_0810b3a8                     @ 0810b314 244a
+    ldr r2, PTR_SOUNDBIAS_0810b3a8           @ 0810b314 244a
     ldrh r1,[r2,#0x0]                        @ 0810b316 1188
     ldr r0, DAT_0810b3ac                     @ 0810b318 2448
     ands r0,r1    @ 0810b31a 0840
@@ -356309,7 +356309,7 @@ FUN_0810b310:
     adds r1,r3,#0x0    @ 0810b320 191c
     orrs r0,r1    @ 0810b322 0843
     strh r0,[r2,#0x0]                        @ 0810b324 1080
-    ldr r0, DAT_0810b3b0                     @ 0810b326 2248
+    ldr r0, PTR_SOUNDCNT_X_0810b3b0          @ 0810b326 2248
     movs r7,#0x0    @ 0810b328 0027
     .hword 0x46bc    @ 0810b32a bc46
     .hword 0x4661    @ 0810b32c 6146
@@ -356322,7 +356322,7 @@ FUN_0810b310:
     ldr r4, DAT_0810b3bc                     @ 0810b33a 204c
     str r4,[r0,#0x8]                         @ 0810b33c 8460
     ldr r1,[r0,#0x8]                         @ 0810b33e 8168
-    ldr r1, DAT_0810b3c0                     @ 0810b340 1f49
+    ldr r1, PTR_DMA1CNT_H_0810b3c0           @ 0810b340 1f49
     movs r7,#0x88    @ 0810b342 8827
     lsls r7,r7,#0x3    @ 0810b344 ff00
     adds r3,r7,#0x0    @ 0810b346 3b1c
@@ -356334,10 +356334,10 @@ FUN_0810b310:
     str r5,[r1,#0x4]                         @ 0810b352 4d60
     str r4,[r1,#0x8]                         @ 0810b354 8c60
     ldr r0,[r1,#0x8]                         @ 0810b356 8868
-    ldr r0, DAT_0810b3c4                     @ 0810b358 1a48
+    ldr r0, PTR_DMA2CNT_H_0810b3c4           @ 0810b358 1a48
     strh r3,[r0,#0x0]                        @ 0810b35a 0380
     ldr r0,[r1,#0x8]                         @ 0810b35c 8868
-    ldr r0, DAT_0810b3c8                     @ 0810b35e 1a48
+    ldr r0, PTR_DMA1CNT_L_0810b3c8           @ 0810b35e 1a48
     movs r1,#0x0    @ 0810b360 0021
     str r1,[r0,#0x0]                         @ 0810b362 0160
     cmp r6,#0x0                              @ 0810b364 002e
@@ -356375,24 +356375,24 @@ LAB_0810b382:
     pop {r0}                                 @ 0810b3a2 01bc
     bx r0                                    @ 0810b3a4 0047
     .byte  0x00, 0x00
-DAT_0810b3a8:
-    .word  0x04000088                     @ 0810b3a8 88000004
+PTR_SOUNDBIAS_0810b3a8:
+    .word  SOUNDBIAS                      @ 0810b3a8 88000004
 DAT_0810b3ac:
     .word  0x00003fff                     @ 0810b3ac ff3f0000
-DAT_0810b3b0:
-    .word  0x04000084                     @ 0810b3b0 84000004
+PTR_SOUNDCNT_X_0810b3b0:
+    .word  SOUNDCNT_X                     @ 0810b3b0 84000004
 DAT_0810b3b4:
     .word  0x030055c0                     @ 0810b3b4 c0550003
 DAT_0810b3b8:
     .word  0x030055bc                     @ 0810b3b8 bc550003
 DAT_0810b3bc:
     .word  0x84400004                     @ 0810b3bc 04004084
-DAT_0810b3c0:
-    .word  0x040000c6                     @ 0810b3c0 c6000004
-DAT_0810b3c4:
-    .word  0x040000d2                     @ 0810b3c4 d2000004
-DAT_0810b3c8:
-    .word  0x040000c4                     @ 0810b3c8 c4000004
+PTR_DMA1CNT_H_0810b3c0:
+    .word  DMA1CNT_H                      @ 0810b3c0 c6000004
+PTR_DMA2CNT_H_0810b3c4:
+    .word  DMA2CNT_H                      @ 0810b3c4 d2000004
+PTR_DMA1CNT_L_0810b3c8:
+    .word  DMA1CNT_L                      @ 0810b3c8 c4000004
 DAT_0810b3cc:
     .word  0x03004c0c                     @ 0810b3cc 0c4c0003
 DAT_0810b3d0:
@@ -356736,7 +356736,7 @@ LAB_0810b6e2:
     adds r6,#0x1    @ 0810b6ea 0136
     b LAB_0810bbb6                           @ 0810b6ec 63e2
 LAB_0810b6ee:
-    ldr r0, DAT_0810b700                     @ 0810b6ee 0448
+    ldr r0, PTR_SOUNDCNT_H_0810b700          @ 0810b6ee 0448
     ldrh r1,[r0,#0x0]                        @ 0810b6f0 0188
     movs r3,#0x88    @ 0810b6f2 8823
     lsls r3,r3,#0x8    @ 0810b6f4 1b02
@@ -356745,8 +356745,8 @@ LAB_0810b6ee:
     strh r1,[r0,#0x0]                        @ 0810b6fa 0180
     b LAB_0810bbb6                           @ 0810b6fc 5be2
     .byte  0x00, 0x00
-DAT_0810b700:
-    .word  0x04000082                     @ 0810b700 82000004
+PTR_SOUNDCNT_H_0810b700:
+    .word  SOUNDCNT_H                     @ 0810b700 82000004
 LAB_0810b704:
     ldrb r2,[r6,#0x0]                        @ 0810b704 3278
     ldrb r0,[r6,#0x1]                        @ 0810b706 7078
@@ -357939,7 +357939,7 @@ LAB_0810bf72:
     strb r0,[r5,#0x0]                        @ 0810bf96 2870
     ldr r2,[sp,#0xd0]                        @ 0810bf98 349a
     strb r0,[r2,#0x2]                        @ 0810bf9a 9070
-    ldr r0, DAT_0810c004                     @ 0810bf9c 1948
+    ldr r0, PTR_SOUND3CNT_H_0810c004         @ 0810bf9c 1948
     strh r1,[r0,#0x0]                        @ 0810bf9e 0180
     .hword 0x4648    @ 0810bfa0 4846
     movs r2,#0x0    @ 0810bfa2 0022
@@ -357993,8 +357993,8 @@ DAT_0810bffc:
     .word  0x0000039e                     @ 0810bffc 9e030000
 DAT_0810c000:
     .word  0x0000039d                     @ 0810c000 9d030000
-DAT_0810c004:
-    .word  0x04000072                     @ 0810c004 72000004
+PTR_SOUND3CNT_H_0810c004:
+    .word  SOUND3CNT_H                    @ 0810c004 72000004
 LAB_0810c008:
     ldrh r0,[r6,#0xc]                        @ 0810c008 b089
     subs r0,#0x1    @ 0810c00a 0138
@@ -359095,21 +359095,21 @@ LAB_0810c7d4:
     lsls r0,r0,#0xc    @ 0810c7f4 0003
     ldrb r1,[r1,#0x2]                        @ 0810c7f6 8978
     orrs r0,r1    @ 0810c7f8 0843
-    ldr r1, DAT_0810c80c                     @ 0810c7fa 0449
+    ldr r1, PTR_SOUND1CNT_H_0810c80c         @ 0810c7fa 0449
     strh r0,[r1,#0x0]                        @ 0810c7fc 0880
-    ldr r0, DAT_0810c810                     @ 0810c7fe 0448
+    ldr r0, PTR_SOUND1CNT_X_0810c810         @ 0810c7fe 0448
     strh r5,[r0,#0x0]                        @ 0810c800 0580
     b LAB_0810c81e                           @ 0810c802 0ce0
 DAT_0810c804:
     .word  0x04000081                     @ 0810c804 81000004
 DAT_0810c808:
     .word  0x084c5928                     @ 0810c808 28594c08
-DAT_0810c80c:
-    .word  0x04000062                     @ 0810c80c 62000004
-DAT_0810c810:
-    .word  0x04000064                     @ 0810c810 64000004
+PTR_SOUND1CNT_H_0810c80c:
+    .word  SOUND1CNT_H                    @ 0810c80c 62000004
+PTR_SOUND1CNT_X_0810c810:
+    .word  SOUND1CNT_X                    @ 0810c810 64000004
 LAB_0810c814:
-    ldr r1, DAT_0810c844                     @ 0810c814 0b49
+    ldr r1, PTR_SOUND1CNT_X_0810c844         @ 0810c814 0b49
     ldr r2, DAT_0810c848                     @ 0810c816 0c4a
     adds r0,r2,#0x0    @ 0810c818 101c
     ands r5,r0    @ 0810c81a 0540
@@ -359135,8 +359135,8 @@ LAB_0810c838:
     ldrh r5,[r0,#0x0]                        @ 0810c83e 0588
     b LAB_0810c85a                           @ 0810c840 0be0
     .byte  0x00, 0x00
-DAT_0810c844:
-    .word  0x04000064                     @ 0810c844 64000004
+PTR_SOUND1CNT_X_0810c844:
+    .word  SOUND1CNT_X                    @ 0810c844 64000004
 DAT_0810c848:
     .word  0x000007ff                     @ 0810c848 ff070000
 DAT_0810c84c:
@@ -359156,19 +359156,19 @@ LAB_0810c85a:
     lsls r0,r0,#0xc    @ 0810c864 0003
     ldrb r1,[r7,#0xe]                        @ 0810c866 b97b
     orrs r0,r1    @ 0810c868 0843
-    ldr r1, DAT_0810c878                     @ 0810c86a 0349
+    ldr r1, PTR_SOUND2CNT_L_0810c878         @ 0810c86a 0349
     strh r0,[r1,#0x0]                        @ 0810c86c 0880
-    ldr r0, DAT_0810c87c                     @ 0810c86e 0348
+    ldr r0, PTR_SOUND2CNT_H_0810c87c         @ 0810c86e 0348
     strh r5,[r0,#0x0]                        @ 0810c870 0580
     b LAB_0810c88a                           @ 0810c872 0ae0
 DAT_0810c874:
     .word  0xffffbfff                     @ 0810c874 ffbfffff
-DAT_0810c878:
-    .word  0x04000068                     @ 0810c878 68000004
-DAT_0810c87c:
-    .word  0x0400006c                     @ 0810c87c 6c000004
+PTR_SOUND2CNT_L_0810c878:
+    .word  SOUND2CNT_L                    @ 0810c878 68000004
+PTR_SOUND2CNT_H_0810c87c:
+    .word  SOUND2CNT_H                    @ 0810c87c 6c000004
 LAB_0810c880:
-    ldr r1, DAT_0810c8b0                     @ 0810c880 0b49
+    ldr r1, PTR_SOUND2CNT_H_0810c8b0         @ 0810c880 0b49
     ldr r2, DAT_0810c8b4                     @ 0810c882 0c4a
     adds r0,r2,#0x0    @ 0810c884 101c
     ands r5,r0    @ 0810c886 0540
@@ -359189,18 +359189,18 @@ LAB_0810c88a:
     ldrb r1,[r3,#0x1b]                       @ 0810c8a2 d97e
     cmp r1,#0x0                              @ 0810c8a4 0029
     bne LAB_0810c8c0                         @ 0810c8a6 0bd1
-    ldr r0, DAT_0810c8bc                     @ 0810c8a8 0448
+    ldr r0, PTR_SOUND3CNT_H_0810c8bc         @ 0810c8a8 0448
     strh r1,[r0,#0x0]                        @ 0810c8aa 0180
     b LAB_0810c8dc                           @ 0810c8ac 16e0
     .byte  0x00, 0x00
-DAT_0810c8b0:
-    .word  0x0400006c                     @ 0810c8b0 6c000004
+PTR_SOUND2CNT_H_0810c8b0:
+    .word  SOUND2CNT_H                    @ 0810c8b0 6c000004
 DAT_0810c8b4:
     .word  0x000007ff                     @ 0810c8b4 ff070000
 DAT_0810c8b8:
     .word  0x084c5928                     @ 0810c8b8 28594c08
-DAT_0810c8bc:
-    .word  0x04000072                     @ 0810c8bc 72000004
+PTR_SOUND3CNT_H_0810c8bc:
+    .word  SOUND3CNT_H                    @ 0810c8bc 72000004
 LAB_0810c8c0:
     .hword 0x4647    @ 0810c8c0 4746
     ldrb r0,[r7,#0x1c]                       @ 0810c8c2 387f
@@ -359210,13 +359210,13 @@ LAB_0810c8c0:
     ldrb r2,[r7,#0x1b]                       @ 0810c8ca fa7e
     .hword 0x4648    @ 0810c8cc 4846
     bl FUN_0810afd4                          @ 0810c8ce fef781fb
-    ldr r1, DAT_0810c910                     @ 0810c8d2 0f49
+    ldr r1, PTR_SOUND3CNT_H_0810c910         @ 0810c8d2 0f49
     movs r2,#0x80    @ 0810c8d4 8022
     lsls r2,r2,#0x6    @ 0810c8d6 9201
     adds r0,r2,#0x0    @ 0810c8d8 101c
     strh r0,[r1,#0x0]                        @ 0810c8da 0880
 LAB_0810c8dc:
-    ldr r0, DAT_0810c914                     @ 0810c8dc 0d48
+    ldr r0, PTR_SOUND3CNT_X_0810c914         @ 0810c8dc 0d48
     strh r5,[r0,#0x0]                        @ 0810c8de 0580
 LAB_0810c8e0:
     .hword 0x4643    @ 0810c8e0 4346
@@ -359231,9 +359231,9 @@ LAB_0810c8e0:
     ands r5,r0    @ 0810c8f2 0540
     cmp r5,#0x0                              @ 0810c8f4 002d
     bne LAB_0810c928                         @ 0810c8f6 17d1
-    ldr r0, DAT_0810c91c                     @ 0810c8f8 0848
+    ldr r0, PTR_SOUND4CNT_L_0810c91c         @ 0810c8f8 0848
     strh r4,[r0,#0x0]                        @ 0810c8fa 0480
-    ldr r2, DAT_0810c920                     @ 0810c8fc 084a
+    ldr r2, PTR_SOUND4CNT_H_0810c920         @ 0810c8fc 084a
     ldr r1, DAT_0810c924                     @ 0810c8fe 0949
     movs r4,#0x24    @ 0810c900 2424
     ldrsh r0,[r3,r4]                         @ 0810c902 185f
@@ -359243,22 +359243,22 @@ LAB_0810c8e0:
     strh r0,[r2,#0x0]                        @ 0810c90a 1080
     b LAB_0810c934                           @ 0810c90c 12e0
     .byte  0x00, 0x00
-DAT_0810c910:
-    .word  0x04000072                     @ 0810c910 72000004
-DAT_0810c914:
-    .word  0x04000074                     @ 0810c914 74000004
+PTR_SOUND3CNT_H_0810c910:
+    .word  SOUND3CNT_H                    @ 0810c910 72000004
+PTR_SOUND3CNT_X_0810c914:
+    .word  SOUND3CNT_X                    @ 0810c914 74000004
 DAT_0810c918:
     .word  0x00000202                     @ 0810c918 02020000
-DAT_0810c91c:
-    .word  0x04000078                     @ 0810c91c 78000004
-DAT_0810c920:
-    .word  0x0400007c                     @ 0810c920 7c000004
+PTR_SOUND4CNT_L_0810c91c:
+    .word  SOUND4CNT_L                    @ 0810c91c 78000004
+PTR_SOUND4CNT_H_0810c920:
+    .word  SOUND4CNT_H                    @ 0810c920 7c000004
 DAT_0810c924:
     .word  0x084bf110                     @ 0810c924 10f14b08
 LAB_0810c928:
-    ldr r0, DAT_0810c978                     @ 0810c928 1348
+    ldr r0, PTR_SOUND4CNT_L_0810c978         @ 0810c928 1348
     strh r4,[r0,#0x0]                        @ 0810c92a 0480
-    ldr r1, DAT_0810c97c                     @ 0810c92c 1349
+    ldr r1, PTR_SOUND4CNT_H_0810c97c         @ 0810c92c 1349
     .hword 0x4645    @ 0810c92e 4546
     ldrh r0,[r5,#0x24]                       @ 0810c930 a88c
     strh r0,[r1,#0x0]                        @ 0810c932 0880
@@ -359298,10 +359298,10 @@ LAB_0810c942:
     strb r0,[r4,#0xe]                        @ 0810c972 a073
     strb r0,[r4,#0xf]                        @ 0810c974 e073
     b LAB_0810c9ee                           @ 0810c976 3ae0
-DAT_0810c978:
-    .word  0x04000078                     @ 0810c978 78000004
-DAT_0810c97c:
-    .word  0x0400007c                     @ 0810c97c 7c000004
+PTR_SOUND4CNT_L_0810c978:
+    .word  SOUND4CNT_L                    @ 0810c978 78000004
+PTR_SOUND4CNT_H_0810c97c:
+    .word  SOUND4CNT_H                    @ 0810c97c 7c000004
 DAT_0810c980:
     .word  0x030055a0                     @ 0810c980 a0550003
 DAT_0810c984:
@@ -360514,7 +360514,7 @@ FUN_0810dcc0:
     cmp r1,#0x0                              @ 0810dcd0 0029
     beq LAB_0810dd06                         @ 0810dcd2 18d0
     movs r4,#0x0    @ 0810dcd4 0024
-    ldr r3, DAT_0810dd14                     @ 0810dcd6 0f4b
+    ldr r3, PTR_DMA3SAD_0810dd14             @ 0810dcd6 0f4b
     movs r6,#0x0    @ 0810dcd8 0026
     ldr r5, DAT_0810dd18                     @ 0810dcda 0f4d
 LAB_0810dcdc:
@@ -360549,8 +360549,8 @@ LAB_0810dd06:
     .byte  0x00, 0x00
 DAT_0810dd10:
     .word  0x03005608                     @ 0810dd10 08560003
-DAT_0810dd14:
-    .word  0x040000d4                     @ 0810dd14 d4000004
+PTR_DMA3SAD_0810dd14:
+    .word  DMA3SAD                        @ 0810dd14 d4000004
 DAT_0810dd18:
     .word  0x81000200                     @ 0810dd18 00020081
     ROM_INCBIN 0x10dd1c, 0x24
@@ -360883,7 +360883,7 @@ LAB_0810e02c:
     bcs LAB_0810dff4                         @ 0810e090 d7ffff2a
 LAB_0810e094:
     add sp,sp,#0xd8                          @ 0810e094 d8d08de2
-    ldr r0, DAT_0810e3d0                     @ 0810e098 30039fe5
+    ldr r0, PTR_FIFO_A_0810e3d0              @ 0810e098 30039fe5
     add r7,r0,#0x1c                          @ 0810e09c 1c7080e2
     add r1,r0,#0x4                           @ 0810e0a0 041080e2
     ldr r2, DAT_0810e3d4                     @ 0810e0a4 28239fe5
@@ -361115,8 +361115,8 @@ DAT_0810e3c8:
     .word  0x03005608                     @ 0810e3c8 08560003
 DAT_0810e3cc:
     .word  0x030055c0                     @ 0810e3cc c0550003
-DAT_0810e3d0:
-    .word  0x040000a0                     @ 0810e3d0 a0000004
+PTR_FIFO_A_0810e3d0:
+    .word  FIFO_A                         @ 0810e3d0 a0000004
 DAT_0810e3d4:
     .word  0x030055c0                     @ 0810e3d4 c0550003
 DAT_0810e3d8:
@@ -361167,7 +361167,7 @@ FUN_0810e420:
     .word  0x1c05b530                     @ 0810e420 30b5051c
     adds r4,r1,#0x0    @ 0810e424 0c1c
     adds r3,r2,#0x0    @ 0810e426 131c
-    ldr r2, DAT_0810e458                     @ 0810e428 0b4a
+    ldr r2, PTR_WAITCNT_0810e458             @ 0810e428 0b4a
     ldrh r0,[r2,#0x0]                        @ 0810e42a 1088
     ldr r1, DAT_0810e45c                     @ 0810e42c 0b49
     ands r0,r1    @ 0810e42e 0840
@@ -361193,8 +361193,8 @@ LAB_0810e450:
     pop {r0}                                 @ 0810e452 01bc
     bx r0                                    @ 0810e454 0047
     .byte  0x00, 0x00
-DAT_0810e458:
-    .word  0x04000204                     @ 0810e458 04020004
+PTR_WAITCNT_0810e458:
+    .word  WAITCNT                        @ 0810e458 04020004
 DAT_0810e45c:
     .word  0x0000fffc                     @ 0810e45c fcff0000
 FUN_0810e460:
@@ -361202,7 +361202,7 @@ FUN_0810e460:
     adds r5,r0,#0x0    @ 0810e462 051c
     adds r4,r1,#0x0    @ 0810e464 0c1c
     adds r3,r2,#0x0    @ 0810e466 131c
-    ldr r2, DAT_0810e498                     @ 0810e468 0b4a
+    ldr r2, PTR_WAITCNT_0810e498             @ 0810e468 0b4a
     ldrh r0,[r2,#0x0]                        @ 0810e46a 1088
     ldr r1, DAT_0810e49c                     @ 0810e46c 0b49
     ands r0,r1    @ 0810e46e 0840
@@ -361228,8 +361228,8 @@ LAB_0810e490:
     pop {r0}                                 @ 0810e492 01bc
     bx r0                                    @ 0810e494 0047
     .byte  0x00, 0x00
-DAT_0810e498:
-    .word  0x04000204                     @ 0810e498 04020004
+PTR_WAITCNT_0810e498:
+    .word  WAITCNT                        @ 0810e498 04020004
 DAT_0810e49c:
     .word  0x0000fffc                     @ 0810e49c fcff0000
 DAT_0810e4a0:
@@ -361300,7 +361300,7 @@ LAB_0810e558:
     ldr r1, DAT_0810e578                     @ 0810e55e 0649
     ldr r0, DAT_0810e57c                     @ 0810e560 0648
     str r0,[r1,#0x0]                         @ 0810e562 0860
-    ldr r2, DAT_0810e580                     @ 0810e564 064a
+    ldr r2, PTR_WAITCNT_0810e580             @ 0810e564 064a
     ldrh r0,[r2,#0x0]                        @ 0810e566 1088
     ldr r1, DAT_0810e584                     @ 0810e568 0649
     ands r0,r1    @ 0810e56a 0840
@@ -361314,8 +361314,8 @@ DAT_0810e578:
     .word  0x02029ea4                     @ 0810e578 a49e0202
 DAT_0810e57c:
     .word  0x03005659                     @ 0810e57c 59560003
-DAT_0810e580:
-    .word  0x04000204                     @ 0810e580 04020004
+PTR_WAITCNT_0810e580:
+    .word  WAITCNT                        @ 0810e580 04020004
 DAT_0810e584:
     .word  0x0000fffc                     @ 0810e584 fcff0000
 FUN_0810e588:

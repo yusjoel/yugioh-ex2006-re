@@ -9,6 +9,9 @@
 	.include "constants/ewram.inc"
 	.include "constants/iwram.inc"
 
+@ GBA MMIO 寄存器（依据 refs/gba-ghidra-loader mapIO()）
+	.include "constants/gba_io.inc"
+
 @ 把符号 Start 声明为全局可见，这样链接器在链接阶段就能找到它作为程序入口点。
 	.global Start
 
