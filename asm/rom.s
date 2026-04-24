@@ -33,6 +33,7 @@ Start:
 @ ROM 偏移 0x4C7638 - 0x1000000，共约 11.5 MB
 	.incbin "roms/2343.gba", 0x4C7638, 0x88         @ 0x4C7638..0x4C76C0 未知小段
 	.include "data/card-image-palettes.s"           @ 0x4C76C0..0x510440  2331 × 128 B 卡图调色板
+pack_banner_obj_palette:
 	.incbin "graphics/bin/pack-banners/palettes/pack_banner_palette.bin"  @ 0x510440..0x510640 pack banner OBJ 调色板 (256色, 512B)
 	.include "data/card-image-tiles.s"              @ 0x510640..0xFBC080  2331 × 4800 B 6bpp tile 数据
 

@@ -222818,7 +222818,7 @@ LAB_080bebc8:
     lsls r1,r2,#0x3    @ 080bebd0 d100
     adds r1,r1,r2    @ 080bebd2 8918
     lsls r1,r1,#0x7    @ 080bebd4 c901
-    ldr r0, DAT_080bec04                     @ 080bebd6 0b48
+    ldr r0, PTR_card_mini_frame_tile_data_080bec04 @ 080bebd6 0b48
     adds r1,r1,r0    @ 080bebd8 0918
     str r1,[sp,#0x10]                        @ 080bebda 0491
     b LAB_080bec0c                           @ 080bebdc 16e0
@@ -222841,8 +222841,8 @@ DAT_080bebfc:
     .word  0x02000000                     @ 080bebfc 00000002
 DAT_080bec00:
     .word  0x00006c2c                     @ 080bec00 2c6c0000
-DAT_080bec04:
-    .word  0x09326280                     @ 080bec04 80623209
+PTR_card_mini_frame_tile_data_080bec04:
+    .word  card_mini_frame_tile_data      @ 080bec04 80623209
 LAB_080bec08:
     ldr r4, DAT_080bec34                     @ 080bec08 0a4c
     str r4,[sp,#0x10]                        @ 080bec0a 0494
@@ -231364,7 +231364,7 @@ LAB_080c2d50:
     lsls r1,r2,#0x1    @ 080c2d58 5100
     adds r1,r1,r2    @ 080c2d5a 8918
     lsls r1,r1,#0x9    @ 080c2d5c 4902
-    ldr r0, DAT_080c2d8c                     @ 080c2d5e 0b48
+    ldr r0, PTR_card_medium_frame_tile_data_080c2d8c @ 080c2d5e 0b48
     adds r4,r1,r0    @ 080c2d60 0c18
     lsls r0,r5,#0x5    @ 080c2d62 6801
     ldr r1, DAT_080c2d90                     @ 080c2d64 0a49
@@ -231386,8 +231386,8 @@ DAT_080c2d84:
     .word  0x02000000                     @ 080c2d84 00000002
 DAT_080c2d88:
     .word  0x00006c2c                     @ 080c2d88 2c6c0000
-DAT_080c2d8c:
-    .word  0x08fbc080                     @ 080c2d8c 80c0fb08
+PTR_card_medium_frame_tile_data_080c2d8c:
+    .word  card_medium_frame_tile_data    @ 080c2d8c 80c0fb08
 DAT_080c2d90:
     .word  0x06010000                     @ 080c2d90 00000106
 LAB_080c2d94:
@@ -232276,7 +232276,7 @@ LAB_080c343e:
     lsls r1,r2,#0x3    @ 080c3446 d100
     adds r1,r1,r2    @ 080c3448 8918
     lsls r1,r1,#0x7    @ 080c344a c901
-    ldr r0, DAT_080c3460                     @ 080c344c 0448
+    ldr r0, PTR_card_mini_frame_tile_data_080c3460 @ 080c344c 0448
     b LAB_080c3470                           @ 080c344e 0fe0
 PTR_card_image_index_080c3450:
     .word  card_image_index               @ 080c3450 005c5b09
@@ -232286,8 +232286,8 @@ DAT_080c3458:
     .word  0x02000000                     @ 080c3458 00000002
 DAT_080c345c:
     .word  0x00006c2c                     @ 080c345c 2c6c0000
-DAT_080c3460:
-    .word  0x09326280                     @ 080c3460 80623209
+PTR_card_mini_frame_tile_data_080c3460:
+    .word  card_mini_frame_tile_data      @ 080c3460 80623209
 LAB_080c3464:
     movs r0,#0x1    @ 080c3464 0120
     ands r0,r2    @ 080c3466 1040
@@ -232977,7 +232977,7 @@ LAB_080c398c:
     lsls r1,r2,#0x3    @ 080c3994 d100
     adds r1,r1,r2    @ 080c3996 8918
     lsls r1,r1,#0x7    @ 080c3998 c901
-    ldr r0, DAT_080c39b0                     @ 080c399a 0548
+    ldr r0, PTR_card_mini_frame_tile_data_080c39b0 @ 080c399a 0548
     b LAB_080c39c2                           @ 080c399c 11e0
     .byte  0x00, 0x00
 PTR_card_image_index_080c39a0:
@@ -232988,8 +232988,8 @@ DAT_080c39a8:
     .word  0x02000000                     @ 080c39a8 00000002
 DAT_080c39ac:
     .word  0x00006c2c                     @ 080c39ac 2c6c0000
-DAT_080c39b0:
-    .word  0x09326280                     @ 080c39b0 80623209
+PTR_card_mini_frame_tile_data_080c39b0:
+    .word  card_mini_frame_tile_data      @ 080c39b0 80623209
 LAB_080c39b4:
     movs r0,#0x1    @ 080c39b4 0120
     ldr r4,[sp,#0x0]                         @ 080c39b6 009c
@@ -233165,7 +233165,7 @@ LAB_080c3aee:
     lsls r1,r2,#0x3    @ 080c3af6 d100
     adds r1,r1,r2    @ 080c3af8 8918
     lsls r1,r1,#0x7    @ 080c3afa c901
-    ldr r0, DAT_080c3b3c                     @ 080c3afc 0f48
+    ldr r0, PTR_card_mini_frame_tile_data_080c3b3c @ 080c3afc 0f48
     adds r0,r1,r0    @ 080c3afe 0818
 LAB_080c3b00:
     cmp r0,#0x0                              @ 080c3b00 0028
@@ -233199,8 +233199,8 @@ DAT_080c3b34:
     .word  0x02000000                     @ 080c3b34 00000002
 DAT_080c3b38:
     .word  0x00006c2c                     @ 080c3b38 2c6c0000
-DAT_080c3b3c:
-    .word  0x09326280                     @ 080c3b3c 80623209
+PTR_card_mini_frame_tile_data_080c3b3c:
+    .word  card_mini_frame_tile_data      @ 080c3b3c 80623209
 LAB_080c3b40:
     adds r0,r6,#0x0    @ 080c3b40 301c
     adds r1,r5,#0x0    @ 080c3b42 291c
@@ -246451,7 +246451,7 @@ LAB_080cb752:
     adds r0,r7,#0x0    @ 080cb75c 381c
     adds r1,r1,r0    @ 080cb75e 0918
     lsls r1,r1,#0x9    @ 080cb760 4902
-    ldr r0, DAT_080cb7c8                     @ 080cb762 1948
+    ldr r0, PTR_card_medium_frame_tile_data_080cb7c8 @ 080cb762 1948
     adds r1,r1,r0    @ 080cb764 0918
     movs r2,#0xc0    @ 080cb766 c022
     lsls r2,r2,#0x3    @ 080cb768 d200
@@ -246501,8 +246501,8 @@ DAT_080cb7c0:
     .word  0x02000000                     @ 080cb7c0 00000002
 DAT_080cb7c4:
     .word  0x00006c2c                     @ 080cb7c4 2c6c0000
-DAT_080cb7c8:
-    .word  0x08fbc080                     @ 080cb7c8 80c0fb08
+PTR_card_medium_frame_tile_data_080cb7c8:
+    .word  card_medium_frame_tile_data    @ 080cb7c8 80c0fb08
 DAT_080cb7cc:
     .word  0x06006340                     @ 080cb7cc 40630006
 DAT_080cb7d0:
@@ -272078,7 +272078,7 @@ LAB_080db94e:
     lsls r1,r2,#0x1    @ 080db956 5100
     adds r1,r1,r2    @ 080db958 8918
     lsls r1,r1,#0x9    @ 080db95a 4902
-    ldr r0, DAT_080db9a0                     @ 080db95c 1048
+    ldr r0, PTR_card_medium_frame_tile_data_080db9a0 @ 080db95c 1048
     adds r1,r1,r0    @ 080db95e 0918
     cmp r3,#0x0                              @ 080db960 002b
     bne LAB_080db9a8                         @ 080db962 21d1
@@ -272113,8 +272113,8 @@ DAT_080db998:
     .word  0x02000000                     @ 080db998 00000002
 DAT_080db99c:
     .word  0x00006c2c                     @ 080db99c 2c6c0000
-DAT_080db9a0:
-    .word  0x08fbc080                     @ 080db9a0 80c0fb08
+PTR_card_medium_frame_tile_data_080db9a0:
+    .word  card_medium_frame_tile_data    @ 080db9a0 80c0fb08
 DAT_080db9a4:
     .word  0x000002ff                     @ 080db9a4 ff020000
 LAB_080db9a8:
@@ -324846,7 +324846,7 @@ LAB_080f9d3a:
     lsls r1,r2,#0x1    @ 080f9d86 5100
     adds r1,r1,r2    @ 080f9d88 8918
     lsls r1,r1,#0x9    @ 080f9d8a 4902
-    ldr r2, DAT_080f9e0c                     @ 080f9d8c 1f4a
+    ldr r2, PTR_card_medium_frame_tile_data_080f9e0c @ 080f9d8c 1f4a
     .hword 0x4690    @ 080f9d8e 9046
     add r1,r8                                @ 080f9d90 4144
     movs r2,#0xc0    @ 080f9d92 c022
@@ -324858,7 +324858,7 @@ LAB_080f9d3a:
     lsls r1,r2,#0x3    @ 080f9da0 d100
     adds r1,r1,r2    @ 080f9da2 8918
     lsls r1,r1,#0x7    @ 080f9da4 c901
-    ldr r4, DAT_080f9e14                     @ 080f9da6 1b4c
+    ldr r4, PTR_card_mini_frame_tile_data_080f9e14 @ 080f9da6 1b4c
     adds r1,r1,r4    @ 080f9da8 0919
     movs r6,#0x90    @ 080f9daa 9026
     lsls r6,r6,#0x3    @ 080f9dac f600
@@ -324906,12 +324906,12 @@ DAT_080f9e04:
     .word  0x06008400                     @ 080f9e04 00840006
 PTR_card_image_index_080f9e08:
     .word  card_image_index               @ 080f9e08 005c5b09
-DAT_080f9e0c:
-    .word  0x08fbc080                     @ 080f9e0c 80c0fb08
+PTR_card_medium_frame_tile_data_080f9e0c:
+    .word  card_medium_frame_tile_data    @ 080f9e0c 80c0fb08
 DAT_080f9e10:
     .word  0x06008a00                     @ 080f9e10 008a0006
-DAT_080f9e14:
-    .word  0x09326280                     @ 080f9e14 80623209
+PTR_card_mini_frame_tile_data_080f9e14:
+    .word  card_mini_frame_tile_data      @ 080f9e14 80623209
 DAT_080f9e18:
     .word  0x06008e80                     @ 080f9e18 808e0006
 DAT_080f9e1c:
@@ -335339,7 +335339,7 @@ LAB_08101246:
     adds r0,r7,#0x0    @ 08101250 381c
     adds r1,r1,r0    @ 08101252 0918
     lsls r1,r1,#0x7    @ 08101254 c901
-    ldr r0, DAT_08101290                     @ 08101256 0e48
+    ldr r0, PTR_card_mini_frame_tile_data_08101290 @ 08101256 0e48
     adds r1,r1,r0    @ 08101258 0918
     adds r0,r3,#0x0    @ 0810125a 181c
     movs r2,#0x90    @ 0810125c 9022
@@ -335368,8 +335368,8 @@ PTR_card_image_index_08101288:
     .word  card_image_index               @ 08101288 005c5b09
 DAT_0810128c:
     .word  0x080000ae                     @ 0810128c ae000008
-DAT_08101290:
-    .word  0x09326280                     @ 08101290 80623209
+PTR_card_mini_frame_tile_data_08101290:
+    .word  card_mini_frame_tile_data      @ 08101290 80623209
 LAB_08101294:
     movs r5,#0x0    @ 08101294 0025
     ldr r0, PTR_gSettings_081012f8           @ 08101296 1848
@@ -335416,7 +335416,7 @@ LAB_081012d8:
     adds r0,r7,#0x0    @ 081012e2 381c
     adds r1,r1,r0    @ 081012e4 0918
     lsls r1,r1,#0x7    @ 081012e6 c901
-    ldr r0, DAT_08101310                     @ 081012e8 0948
+    ldr r0, PTR_card_mini_frame_tile_data_08101310 @ 081012e8 0948
     adds r1,r1,r0    @ 081012ea 0918
     adds r0,r3,#0x0    @ 081012ec 181c
     movs r2,#0x90    @ 081012ee 9022
@@ -335435,8 +335435,8 @@ PTR_card_image_index_08101308:
     .word  card_image_index               @ 08101308 005c5b09
 DAT_0810130c:
     .word  0x080000ae                     @ 0810130c ae000008
-DAT_08101310:
-    .word  0x09326280                     @ 08101310 80623209
+PTR_card_mini_frame_tile_data_08101310:
+    .word  card_mini_frame_tile_data      @ 08101310 80623209
 LAB_08101314:
     adds r0,r4,#0x0    @ 08101314 201c
     movs r1,#0x90    @ 08101316 9021
