@@ -244772,7 +244772,7 @@ LAB_080ca9ce:
     movs r2,#0x20    @ 080caa16 2022
     bl FUN_080f4ea4                          @ 080caa18 2af044fa
     ldr r0, DAT_080caafc                     @ 080caa1c 3748
-    ldr r2, DAT_080cab00                     @ 080caa1e 384a
+    ldr r2, PTR_duel_field_outer_pointer_table_080cab00 @ 080caa1e 384a
     ldr r1,[r7,#0x0]                         @ 080caa20 3968
     lsls r1,r1,#0xe    @ 080caa22 8903
     lsrs r1,r1,#0x18    @ 080caa24 090e
@@ -244880,8 +244880,8 @@ DAT_080caaf8:
     .word  0x05000120                     @ 080caaf8 20010005
 DAT_080caafc:
     .word  0x06008220                     @ 080caafc 20820006
-DAT_080cab00:
-    .word  0x09855030                     @ 080cab00 30508509
+PTR_duel_field_outer_pointer_table_080cab00:
+    .word  duel_field_outer_pointer_table @ 080cab00 30508509
 DAT_080cab04:
     .word  0x0600f000                     @ 080cab04 00f00006
 DAT_080cab08:
@@ -244960,7 +244960,7 @@ LAB_080cab8c:
     ldr r4, DAT_080cac7c                     @ 080cab96 394c
     movs r6,#0x80    @ 080cab98 8026
     movs r5,#0x0    @ 080cab9a 0025
-    ldr r0, DAT_080cac80                     @ 080cab9c 3848
+    ldr r0, PTR_hud_life_points_font_080cac80 @ 080cab9c 3848
     .hword 0x4680    @ 080cab9e 8046
     movs r1,#0xa0    @ 080caba0 a021
     lsls r1,r1,#0x8    @ 080caba2 0902
@@ -245016,7 +245016,7 @@ LAB_080cabb0:
     lsls r2,r2,#0x1    @ 080cac0c 5200
     bl FUN_080f4ea4                          @ 080cac0e 2af049f9
     ldr r0, DAT_080cacb0                     @ 080cac12 2748
-    ldr r1, DAT_080cacb4                     @ 080cac14 2749
+    ldr r1, PTR_hud_phases_highlight_080cacb4 @ 080cac14 2749
     movs r2,#0xc    @ 080cac16 0c22
     movs r3,#0x4    @ 080cac18 0423
     bl tile_2d_row_copy                      @ 080cac1a 2cf05bfc
@@ -245063,8 +245063,8 @@ DAT_080cac78:
     .word  0x05000140                     @ 080cac78 40010005
 DAT_080cac7c:
     .word  0x0600e0d4                     @ 080cac7c d4e00006
-DAT_080cac80:
-    .word  0x09850b1c                     @ 080cac80 1c0b8509
+PTR_hud_life_points_font_080cac80:
+    .word  hud_life_points_font           @ 080cac80 1c0b8509
 DAT_080cac84:
     .word  0x0600a680                     @ 080cac84 80a60006
 DAT_080cac88:
@@ -245089,8 +245089,8 @@ DAT_080cacac:
     .word  0x08510460                     @ 080cacac 60045108
 DAT_080cacb0:
     .word  0x06010280                     @ 080cacb0 80020106
-DAT_080cacb4:
-    .word  0x098519fc                     @ 080cacb4 fc198509
+PTR_hud_phases_highlight_080cacb4:
+    .word  hud_phases_highlight           @ 080cacb4 fc198509
 DAT_080cacb8:
     .word  0x060113c0                     @ 080cacb8 c0130106
 DAT_080cacbc:
@@ -248375,7 +248375,7 @@ FUN_080cc904:
     adds r0,r2,#0x0    @ 080cc956 101c
     strh r0,[r1,#0x0]                        @ 080cc958 0880
     ldr r0, DAT_080cc9f8                     @ 080cc95a 2748
-    ldr r1, DAT_080cc9fc                     @ 080cc95c 2749
+    ldr r1, PTR_hud_gap_tiles_080cc9fc       @ 080cc95c 2749
     movs r2,#0x8    @ 080cc95e 0822
     movs r3,#0x4    @ 080cc960 0423
     bl tile_2d_row_copy                      @ 080cc962 2af0b7fd
@@ -248445,8 +248445,8 @@ DAT_080cc9f4:
     .word  0x00001c0b                     @ 080cc9f4 0b1c0000
 DAT_080cc9f8:
     .word  0x06010040                     @ 080cc9f8 40000106
-DAT_080cc9fc:
-    .word  0x098515fc                     @ 080cc9fc fc158509
+PTR_hud_gap_tiles_080cc9fc:
+    .word  hud_gap_tiles                  @ 080cc9fc fc158509
 DAT_080cca00:
     .word  0x06010400                     @ 080cca00 00040106
 DAT_080cca04:

@@ -43,6 +43,20 @@ LABELS = [
     (0x08510640, "card_image_tiles"),           # 2331 × 4800 B, data/card-image-tiles.s
     (0x08FBC080, "card_medium_frame_tile_data"), # 2331 × 1536 B, data/card-medium-frame.s
     (0x09326280, "card_mini_frame_tile_data"),  # data/card-mini-frame.s
+
+    # HUD 资源 + 决斗外场图块 (ROM 0x18xxxxx, 原拆分边界是静态分析推断的)
+    # 加 label 后字面量池 .word 自动变 symbol; 未在 asm 源定义的 name 由 rom_data.inc 生成 .equ
+    (0x09850B1C, "hud_life_points_font"),       # LP 数字字体 tile (0xAC0 B)
+    (0x098515DC, "hud_phase_highlights_palette"),  # Phase Highlight OBJ palette (0x20 B; ROM 无指针 ref)
+    (0x098515FC, "hud_gap_tiles"),              # HUD gap 4bpp tile sheet (0x400 B)
+    (0x098519FC, "hud_phases_highlight"),       # Phases Highlight tile (0x3650 B; 末尾 28 B 实为指针表)
+    (0x09855030, "duel_field_outer_pointer_table"),  # 6 modes + 1 sentinel = 7 × u32
+    (0x0985504C, "campaign_outer_image"),       # Campaign 外场 tile (0x9E0 B)
+    (0x09855A2C, "link_outer_image"),           # Link Duel 外场 (0x5E0 B)
+    (0x0985600C, "puzzle_outer_image"),         # Duel Puzzle 外场 (0x7E0 B)
+    (0x098567EC, "limited_outer_image"),        # Limited Duel 外场 (0xDE0 B)
+    (0x098575CC, "theme_outer_image"),          # Theme Duel 外场 (0x9E0 B)
+    (0x09857FAC, "survival_outer_image"),       # Survival Mode 外场 (0x7E0 B)
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表

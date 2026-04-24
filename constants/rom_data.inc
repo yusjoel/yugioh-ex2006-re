@@ -3749,6 +3749,17 @@
 .equ card_142D,                      0x09832594
 .equ card_142E,                      0x098325AA
 .equ card_142F,                      0x098325C0
+.equ hud_life_points_font,           0x09850B1C
+.equ hud_phase_highlights_palette,   0x098515DC
+.equ hud_gap_tiles,                  0x098515FC
+.equ hud_phases_highlight,           0x098519FC
+.equ duel_field_outer_pointer_table, 0x09855030
+.equ campaign_outer_image,           0x0985504C
+.equ link_outer_image,               0x09855A2C
+.equ puzzle_outer_image,             0x0985600C
+.equ limited_outer_image,            0x098567EC
+.equ theme_outer_image,              0x098575CC
+.equ survival_outer_image,           0x09857FAC
 .equ file_game_strings_en_start,     0x09DC4620
 .equ file_game_strings_start,        0x09DC4620
 .equ file_game_strings_de_start,     0x09DCF471
