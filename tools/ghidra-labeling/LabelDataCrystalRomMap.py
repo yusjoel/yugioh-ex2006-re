@@ -50,7 +50,7 @@ LABELS = [
     (0x098515DC, "hud_phase_highlights_palette"),  # Phase Highlight OBJ palette (0x20 B; ROM 无指针 ref)
     (0x098515FC, "hud_gap_tiles"),              # HUD gap 4bpp tile sheet (0x400 B)
     (0x098519FC, "hud_phases_highlight"),       # Phases Highlight tile (0x3650 B; 末尾 28 B 实为指针表)
-    (0x09855030, "duel_field_outer_pointer_table"),  # 6 modes + 1 sentinel = 7 × u32
+    (0x09855030, "duel_field_outer_tile_pointers"),  # 7 × u32 tile image 指针 (6 modes + 1 sentinel)
     (0x0985504C, "campaign_outer_image"),       # Campaign 外场 tile (0x9E0 B)
     (0x09855A2C, "link_outer_image"),           # Link Duel 外场 (0x5E0 B)
     (0x0985600C, "puzzle_outer_image"),         # Duel Puzzle 外场 (0x7E0 B)
@@ -157,6 +157,8 @@ RENAMES = [
     #   pool -> table (实际数据), data -> pointer_table (offset 索引)
     ("card_desc_text_pool", "card_descs_table"),
     ("card_desc_data",      "card_desc_pointer_table"),
+    # 命名精细化: 与 duel_field_outer_palette_pointers / _tilemap_pointers 并列
+    ("duel_field_outer_pointer_table", "duel_field_outer_tile_pointers"),
 ]
 
 # 需要从 Ghidra 彻底删除的错误 label (地址或名字错)。幂等。

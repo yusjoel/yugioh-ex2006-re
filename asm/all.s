@@ -244772,7 +244772,7 @@ LAB_080ca9ce:
     movs r2,#0x20    @ 080caa16 2022
     bl FUN_080f4ea4                          @ 080caa18 2af044fa
     ldr r0, DAT_080caafc                     @ 080caa1c 3748
-    ldr r2, PTR_duel_field_outer_pointer_table_080cab00 @ 080caa1e 384a
+    ldr r2, PTR_duel_field_outer_tile_pointers_080cab00 @ 080caa1e 384a
     ldr r1,[r7,#0x0]                         @ 080caa20 3968
     lsls r1,r1,#0xe    @ 080caa22 8903
     lsrs r1,r1,#0x18    @ 080caa24 090e
@@ -244880,8 +244880,8 @@ DAT_080caaf8:
     .word  0x05000120                     @ 080caaf8 20010005
 DAT_080caafc:
     .word  0x06008220                     @ 080caafc 20820006
-PTR_duel_field_outer_pointer_table_080cab00:
-    .word  duel_field_outer_pointer_table @ 080cab00 30508509
+PTR_duel_field_outer_tile_pointers_080cab00:
+    .word  duel_field_outer_tile_pointers @ 080cab00 30508509
 DAT_080cab04:
     .word  0x0600f000                     @ 080cab04 00f00006
 DAT_080cab08:

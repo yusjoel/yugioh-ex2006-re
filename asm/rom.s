@@ -80,28 +80,39 @@ pack_banner_obj_palette:
 @ 5170 条记录 (首条 20 B 少 zero0 字段由上游 Section C 提供; 其余 5169 条 × 22 B)
 	.include "data/card-stats.s"
 
-@ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x185504B（属性表后，外场图块前）
-@ 含外场图块指针表（0x1855030，7条目28字节），紧接着就是外场图块数据
-@ 内嵌 HUD 元素（Life Points Font / Phase Highlights Palette / Phases Highlight）已拆出
+@ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x1850B1B（属性表后，HUD 前）
+@ 内嵌 HUD 元素 + 外场 tile image 指针表已拆出
 	.incbin "roms/2343.gba", 0x1832602, 0x1E51A     @ seg-C 前段 0x1832602..0x1850B1C
+hud_life_points_font:
 	.incbin "graphics/bin/duel-field/tiles/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
+hud_phase_highlights_palette:
 	.incbin "graphics/bin/duel-field/palettes/hud_phase_highlights_palette.bin"  @ 0x18515DC, 0x20
+hud_gap_tiles:
 	.incbin "graphics/bin/duel-field/tiles/hud_gap_tiles.bin"                 @ 0x18515FC, 0x400（HUD gap 4bpp tile sheet）
-	.incbin "graphics/bin/duel-field/tiles/hud_phases_highlight.bin"          @ 0x18519FC, 0x3650（至 0x185504C）
+hud_phases_highlight:
+	.incbin "graphics/bin/duel-field/tiles/hud_phases_highlight.bin"          @ 0x18519FC, 0x3634（至 0x1855030）
+duel_field_outer_tile_pointers:
+	.incbin "graphics/bin/duel-field/tilemaps/duel_field_outer_tile_pointers.bin"  @ 0x1855030, 0x1C（7 × u32 外场 tile image 指针,末条 sentinel）
 
 @ ── 外场图块数据（6种决斗模式，大小各异）──────────────────────────────
-@ 指针表在 0x1855030（7条目，末条目为终止指针指向 0x185878C），数据从 0x185504C 开始
+@ duel_field_outer_tile_pointers @ 0x1855030 已拆出,指向本段 6 个 base + 1 sentinel
 @ Campaign（战役）外场图块，ROM 0x185504C，0x9E0 字节（80 图块）
+campaign_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/campaign_outer_image.bin"
 @ Link Duel（联机）外场图块，ROM 0x1855A2C，0x5E0 字节（47 图块）
+link_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/link_outer_image.bin"
 @ Duel Puzzle（谜题）外场图块，ROM 0x185600C，0x7E0 字节（63 图块）
+puzzle_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/puzzle_outer_image.bin"
 @ Limited Duel（限定）外场图块，ROM 0x18567EC，0xDE0 字节（111 图块）
+limited_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/limited_outer_image.bin"
 @ Theme Duel（主题）外场图块，ROM 0x18575CC，0x9E0 字节（80 图块）
+theme_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/theme_outer_image.bin"
 @ Survival Mode（生存）外场图块，ROM 0x1857FAC，0x7E0 字节（63 图块）
+survival_outer_image:
 	.incbin "graphics/bin/duel-field/tiles/survival_outer_image.bin"
 
 @ 外场 extra tile sheet + 外场调色板指针表
