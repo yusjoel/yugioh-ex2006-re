@@ -6,9 +6,9 @@
 ROM 范围: 0x015FFF0C ~ 0x018169B6 (= 2,190,506 B)
 
 三段:
-  1. card_desc_text_pool    ROM 0x15FFF0C ~ 0x180A508  (2,139,644 B)
+  1. card_descs_table    ROM 0x15FFF0C ~ 0x180A508  (2,139,644 B)
      2098 cards × 6 langs (cid=0..2097) null-terminated, 顺序 XX/EN/DE/FR/IT/ES
-  2. card_desc_data         ROM 0x180A508 ~ 0x1816580  (49,272 B = 12,318 × u32)
+  2. card_desc_pointer_table         ROM 0x180A508 ~ 0x1816580  (49,272 B = 12,318 × u32)
      cid=0..2052 的 offset 表, 每卡用 desc_offsets 宏展开
   3. card_desc_ptr_table    ROM 0x1816580 ~ 0x18169B4  (269 × u32 + 2 B tail)
      cid=2053..2097 的 offset 表 (末卡 cid=2097 缺 ES, 单独 5 × .word 展开)
@@ -151,10 +151,10 @@ def main():
     out.append('@ Card Descriptions (merged: effect-text + special-card text)')
     out.append(f'@ ROM 0x{POOL_START:07X} - 0x{AREA_END:07X}  ({AREA_END - POOL_START:,} B)')
     out.append('@')
-    out.append(f'@  1. card_desc_text_pool   0x{POOL_START:07X} - 0x{SEC_A_END:07X}'
+    out.append(f'@  1. card_descs_table   0x{POOL_START:07X} - 0x{SEC_A_END:07X}'
                f'  ({pool_size:,} B)')
     out.append(f'@     {N_CARDS_TOTAL} cards x 6 langs (XX/EN/DE/FR/IT/ES), null-terminated')
-    out.append(f'@  2. card_desc_data        0x{SEC_B_START:07X} - 0x{AREA_END:07X}'
+    out.append(f'@  2. card_desc_pointer_table        0x{SEC_B_START:07X} - 0x{AREA_END:07X}'
                f'  ({AREA_END - SEC_B_START:,} B, cid=0..{N_CARDS_TOTAL-1})')
     out.append(f'@     Last u32 high 2B byte-overlaps with card_stats[0].zero0 (=0x0020).')
     out.append('@')
@@ -165,12 +165,12 @@ def main():
 
     out.append('@ Macro: 6 lang offsets for cid (label - pool)')
     out.append('.macro desc_offsets cid')
-    out.append('\t.word card_desc_\\cid\\()_xx - card_desc_text_pool')
-    out.append('\t.word card_desc_\\cid\\()_en - card_desc_text_pool')
-    out.append('\t.word card_desc_\\cid\\()_de - card_desc_text_pool')
-    out.append('\t.word card_desc_\\cid\\()_fr - card_desc_text_pool')
-    out.append('\t.word card_desc_\\cid\\()_it - card_desc_text_pool')
-    out.append('\t.word card_desc_\\cid\\()_es - card_desc_text_pool')
+    out.append('\t.word card_desc_\\cid\\()_xx - card_descs_table')
+    out.append('\t.word card_desc_\\cid\\()_en - card_descs_table')
+    out.append('\t.word card_desc_\\cid\\()_de - card_descs_table')
+    out.append('\t.word card_desc_\\cid\\()_fr - card_descs_table')
+    out.append('\t.word card_desc_\\cid\\()_it - card_descs_table')
+    out.append('\t.word card_desc_\\cid\\()_es - card_descs_table')
     out.append('.endm')
     out.append('')
 
@@ -181,7 +181,7 @@ def main():
     out.append(f'@    Master cids (unique u32 groups): {len(set(master_of))},'
                f' alt-art cards share labels')
     out.append('@ -----------------------------------------------------------------------------')
-    out.append('card_desc_text_pool:')
+    out.append('card_descs_table:')
 
     # 按 cid 顺序遍历 master，每 lang 单独输出 (单行 .ascii)
     for cid in range(N_CARDS_TOTAL):
@@ -208,16 +208,16 @@ def main():
         lang = labels[0].rsplit('_', 1)[1]
         emit_string_oneline(chunk, lang, out)
 
-    # ---------- 2. card_desc_data (Section B + C 连续, 2098 cards x 6 langs) ----------
+    # ---------- 2. card_desc_pointer_table (Section B + C 连续, 2098 cards x 6 langs) ----------
     out.append('')
     out.append('@ -----------------------------------------------------------------------------')
-    out.append(f'@ 2. card_desc_data: cid=0..{N_CARDS_TOTAL-1} × 6 langs'
+    out.append(f'@ 2. card_desc_pointer_table: cid=0..{N_CARDS_TOTAL-1} × 6 langs'
                f' = {N_CARDS_TOTAL * 6} × u32')
     out.append(f'@    ROM 0x{SEC_B_START:07X} - 0x{AREA_END:07X}  ({AREA_END - SEC_B_START:,} B)')
     out.append(f'@    Last u32 (cid=2097 ES offset = 0x0020A532) high 2 bytes byte-overlap')
     out.append(f'@    with card_stats[0].zero0 (=0x0020) at ROM 0x{AREA_END-2:07X}..0x{AREA_END-1:07X}.')
     out.append('@ -----------------------------------------------------------------------------')
-    out.append('card_desc_data:')
+    out.append('card_desc_pointer_table:')
     for cid in range(N_CARDS_TOTAL):
         mc = master_of[cid]
         name = card_names[cid].strip()

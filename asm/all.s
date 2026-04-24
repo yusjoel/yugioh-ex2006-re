@@ -304964,7 +304964,7 @@ LAB_080eebd4:
 DAT_080eebd8:
     .word  0x09dcf472                     @ 080eebd8 72f4dc09
 LAB_080eebdc:
-    ldr r1, PTR_card_desc_data_080eebf4      @ 080eebdc 0549
+    ldr r1, PTR_card_desc_pointer_table_080eebf4 @ 080eebdc 0549
     lsls r0,r2,#0x1    @ 080eebde 5000
     adds r0,r0,r2    @ 080eebe0 8018
     lsls r0,r0,#0x1    @ 080eebe2 4000
@@ -304972,15 +304972,15 @@ LAB_080eebdc:
     lsls r0,r0,#0x2    @ 080eebe6 8000
     adds r0,r0,r1    @ 080eebe8 4018
     ldr r0,[r0,#0x0]                         @ 080eebea 0068
-    ldr r1, PTR_card_desc_text_pool_080eebf8 @ 080eebec 0249
+    ldr r1, PTR_card_descs_table_080eebf8    @ 080eebec 0249
     adds r0,r0,r1    @ 080eebee 4018
 LAB_080eebf0:
     bx lr                                    @ 080eebf0 7047
     .byte  0x00, 0x00
-PTR_card_desc_data_080eebf4:
-    .word  card_desc_data                 @ 080eebf4 08a58009
-PTR_card_desc_text_pool_080eebf8:
-    .word  card_desc_text_pool            @ 080eebf8 0cff5f09
+PTR_card_desc_pointer_table_080eebf4:
+    .word  card_desc_pointer_table        @ 080eebf4 08a58009
+PTR_card_descs_table_080eebf8:
+    .word  card_descs_table               @ 080eebf8 0cff5f09
 card_name_lookup_by_internal_id:
     push {lr}                                @ 080eebfc 00b5
     lsls r0,r0,#0x10    @ 080eebfe 0004
