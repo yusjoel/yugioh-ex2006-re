@@ -145,8 +145,8 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_opponent_decks.py` | ROM → `data/opponent-decks.s`（25 对手卡组，块大小可变，含融合卡组） |
 | `tools/rom-export/export_deck_strings.py` | ROM → `data/deck-strings.s`（XX 编码预组/对手卡组名字符串） |
 | `tools/rom-export/export_duel_puzzles.py` | ROM → `data/duel-puzzles.s`（35 块决斗题目存档模板） |
-| `tools/rom-export/render_gbtn.py` | `.gbtn` (NTBG bundle) → PNG 预览（支持 4bpp/8bpp + 2B/4B tilemap entry 自动推断）；`--all` 批量渲染 FS 全部 26 个 BG 资源到 `graphics/images/gbtn-previews/` |
-| `tools/fs-decompress.py` | BIOS LZ77 (SWI 0x11) 离线解压器：`.LZ*` → `.gbtn`/`.ncgr`/`.nclr`/etc. `--all` 全 FS 重建、`--verify` 与 mGBA 运行时 dump byte-identical 对比（验证 89/89 通过）。Spec: `doc/dev/data-structure/gbtn-format.md` |
+| `tools/rom-export/render_gbtn.py` | `.gbtn` (NTBG bundle) → PNG 预览（支持 4bpp/8bpp + 2B/4B tilemap entry 自动推断）；`--all` 批量渲染 FS 全部 26 个 BG 资源到 `graphics/images/gbtn-previews/`。已在 `export_all.py` pipeline，紧跟 `export_lz5bg_unpacked.py` 后执行。Spec: `doc/dev/data-structure/gbtn-format.md` |
+| `tools/fs-decompress.py` | BIOS LZ77 (SWI 0x11) 单文件 CLI 便利工具（批量流水线已在 `export_{fs_files,nns_unpacked,lz5bg_unpacked}.py`）；`<in> <out>` 单文件解压；`--verify` 与 mGBA 运行时 dump byte-identical 对比（89/89 通过） |
 
 ### 汇编再生成流水线
 

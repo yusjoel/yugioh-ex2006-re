@@ -149,7 +149,10 @@ def cli_single(in_path: str, out_path: str):
 
 
 def cli_all(out_dir: str = 'fs-decompressed-pyz', rom_path: str = 'roms/2343.gba'):
-    """Decompress every FS file to <out_dir>/<orig path stripped of .LZ prefix>."""
+    """Decompress every FS file to <out_dir>/<orig path stripped of .LZ prefix>.
+
+    去重策略（与 tools/rom-export/export_{fs_files,nns_unpacked,lz5bg_unpacked}.py 一致）：
+    99 组 dup FIDs 全部 byte-identical，同路径只写一份。"""
     rom = Path(rom_path).read_bytes()
     fs = read_fs_master(rom)
     paths = read_paths(rom, fs['paths_base'], fs['file_count'])
@@ -157,25 +160,23 @@ def cli_all(out_dir: str = 'fs-decompressed-pyz', rom_path: str = 'roms/2343.gba
     out_root = Path(out_dir)
     out_root.mkdir(parents=True, exist_ok=True)
 
-    stats = {'lz77': 0, 'passthrough': 0, 'skipped_dup': 0, 'err': 0}
-    seen_paths = set()
+    stats = {'lz77': 0, 'passthrough': 0, 'dedup': 0, 'err': 0}
+    seen_content: dict[str, bytes] = {}
     for i, p in enumerate(paths):
-        fid = i + 1  # path[i] ↔ FID[i+1]
-        # Derive decompressed filename: "foo.LZncgr" -> "foo.ncgr"; "foo.LZ5bg" -> "foo.gbtn"
+        fid = i + 1
         decomp_path = p.replace('.LZ5bg', '.gbtn').replace('.LZ', '.')
-        if decomp_path in seen_paths:
-            # Duplicate path: append _dup1, _dup2
-            base, _, ext = decomp_path.rpartition('.')
-            n = 1
-            while f'{base}_dup{n}.{ext}' in seen_paths:
-                n += 1
-            decomp_path = f'{base}_dup{n}.{ext}'
-        seen_paths.add(decomp_path)
-
-        out_fp = out_root / decomp_path
-        out_fp.parent.mkdir(parents=True, exist_ok=True)
         try:
             data, cs, ds = decompress_one_fid(rom, fs, fid)
+            if decomp_path in seen_content:
+                if seen_content[decomp_path] != data:
+                    print(f'[err] FID {fid} ({p}): 同路径 dup 但内容不同，跳过')
+                    stats['err'] += 1
+                else:
+                    stats['dedup'] += 1
+                continue
+            seen_content[decomp_path] = data
+            out_fp = out_root / decomp_path
+            out_fp.parent.mkdir(parents=True, exist_ok=True)
             out_fp.write_bytes(data)
             if cs != ds:
                 stats['lz77'] += 1
@@ -185,8 +186,9 @@ def cli_all(out_dir: str = 'fs-decompressed-pyz', rom_path: str = 'roms/2343.gba
             stats['err'] += 1
             print(f'[err] FID {fid} ({p}): {e}')
 
-    print(f'Stats: LZ77 decomp {stats["lz77"]}, passthrough {stats["passthrough"]}, errors {stats["err"]}')
-    print(f'Output: {out_root}/')
+    print(f'Stats: LZ77 decomp {stats["lz77"]}, passthrough {stats["passthrough"]}, '
+          f'dedup {stats["dedup"]}, errors {stats["err"]}')
+    print(f'Output: {out_root}/  ({len(seen_content)} unique files)')
 
 
 def cli_verify(reference_dir: str = 'temp/fs-decompressed', rom_path: str = 'roms/2343.gba'):

@@ -205,10 +205,10 @@ def render_one(in_path: str, out_path: str):
 
 def cli_all(decomp_dir: str, out_dir: str, rom_path: str):
     decomp = Path(decomp_dir)
-    if not decomp.exists():
-        print(f'Decomp dir {decomp} does not exist; running fs-decompress.py --all...')
-        subprocess.run([sys.executable, 'tools/fs-decompress.py', '--all',
-                        '--out', str(decomp), '--rom', rom_path], check=True)
+    if not decomp.exists() or not list(decomp.rglob('*.gbtn')):
+        print(f'Decomp dir {decomp} missing .gbtn; running export_lz5bg_unpacked.py first...')
+        subprocess.run([sys.executable, 'tools/rom-export/export_lz5bg_unpacked.py'],
+                       check=True)
 
     gbtn_files = sorted(decomp.rglob('*.gbtn'))
     if not gbtn_files:
@@ -233,16 +233,21 @@ def cli_all(decomp_dir: str, out_dir: str, rom_path: str):
 
 
 def main():
+    """CLI 入口。当通过 export_all.py 作为模块调用（无参数）时，等同于 --all。"""
     ap = argparse.ArgumentParser()
     ap.add_argument('infile', nargs='?', help='Input .gbtn file')
     ap.add_argument('outfile', nargs='?', help='Output PNG path')
     ap.add_argument('--all', action='store_true', help='Render all .gbtn in decomp dir')
-    ap.add_argument('--decomp-dir', default='doc/temp/fs-decomp-all',
-                    help='FS decompression output dir (auto-populated if absent)')
+    ap.add_argument('--decomp-dir', default='fs-decompressed',
+                    help='FS decompression output dir (由 export_lz5bg_unpacked.py 生成)')
     ap.add_argument('--out-dir', default='graphics/images/gbtn-previews',
                     help='PNG output dir for --all')
     ap.add_argument('--rom', default='roms/2343.gba')
-    args = ap.parse_args()
+    # 作为 export_all.py 的一步调用时 sys.argv 只有脚本名，走 --all 默认
+    if len(sys.argv) == 1:
+        args = ap.parse_args(['--all'])
+    else:
+        args = ap.parse_args()
 
     if args.all:
         cli_all(args.decomp_dir, args.out_dir, args.rom)

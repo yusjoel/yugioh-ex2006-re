@@ -30,6 +30,7 @@ EXPORT_PIPELINE = [
     'export_fs_files.py',               # fs/<orig path> + data/fs-payload.s（338 个 FS 文件）
     'export_nns_unpacked.py',           # fs-decompressed/**/*.{nanr,ncer,ncgr,nclr}（63 个解压 NNS）
     'export_lz5bg_unpacked.py',         # fs-decompressed/**/*.gbtn（26 个解压 NTBG BG 容器）
+    'render_gbtn.py',                   # graphics/images/gbtn-previews/**/*.png（26 个 .gbtn BG 层预览）
     'export_nns_parsed.py',             # graphics/fs-nns/*.{json,png} (NNS parser + palette/tile PNG)
     'export_fs_ui_name_pass.py',        # graphics/images/fs-ui/name_*, pass_* (cell 合成)
     'export_fs_ui_demos.py',            # graphics/images/fs-ui/demo_* (cutscene cells + NANR 关键帧)

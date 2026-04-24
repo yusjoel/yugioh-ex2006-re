@@ -170,19 +170,6 @@ def build_fid_table(paths: list[str], offs: list[int], szs: list[int]) -> list[t
     return entries
 
 
-def disambiguate(rel: str, counter: dict[str, int]) -> str:
-    """重名时给第 N 次出现（N≥1）追加 _dup{N} 后缀。与 export_fs_files.py 一致。"""
-    n = counter.get(rel, 0)
-    counter[rel] = n + 1
-    if n == 0:
-        return rel
-    p = Path(rel)
-    stem = p.stem
-    suffix = p.suffix
-    new_name = f"{stem}_dup{n}{suffix}"
-    return str(p.parent / new_name).replace("\\", "/")
-
-
 def strip_lz_prefix(name: str) -> str:
     """file.LZnanr → file.nanr"""
     stem, dot, ext = name.rpartition(".")
@@ -234,25 +221,13 @@ def main() -> int:
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    counter: dict[str, int] = {}
-    # 用完整 FID 列表（而非仅 .LZn*）构造计数器，保证 dup 编号与 export_fs_files.py 一致
-    for path, _, _ in fid_table:
-        if not any(path.endswith(e) for e in LZN_EXTS):
-            counter.setdefault(path, 0)
-            counter[path] += 1
-
-    # 重置计数器，边写边数
-    write_counter: dict[str, int] = {}
-    # 先把非 .LZn* 的重名次数累计（为了 _dup 编号与 export_fs_files 对齐）
-    # —— 其实更简单的做法：按 FID 顺序遍历，所有路径都参与 disambiguate，
-    # 只对 .LZn* 实际落盘。
-    dup_counter: dict[str, int] = {}
-
+    # 2026-04-24 去重：11 组 LZn* dup FIDs 全部 byte-identical，只写独立路径一份
+    seen_rel: dict[str, bytes] = {}
     ok = 0
+    dedup = 0
     total_in = 0
     total_out = 0
     for fid, (path, off, sz) in enumerate(fid_table, start=1):
-        rel = disambiguate(path, dup_counter)
         if not any(path.endswith(e) for e in LZN_EXTS):
             continue
         ext = "." + path.rsplit(".", 1)[-1]
@@ -266,7 +241,6 @@ def main() -> int:
             )
         d = lz77_decompress(blob)
 
-        # 剥 4 字节 Konami wrapper
         if len(d) < 4 or d[0] != 0x00:
             raise ValueError(
                 f"FID {fid} {path}: wrapper byte0={d[0]:#x}（期望 0x00）"
@@ -279,20 +253,27 @@ def main() -> int:
         nns = d[4:]
         validate(nns, total_size_u24, expected, f"FID {fid} {path}")
 
-        # 输出路径
-        out_rel = strip_lz_prefix(Path(rel).name)
-        dst = OUT_DIR / Path(rel).parent / out_rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_bytes(nns)
-
-        ok += 1
+        out_rel = strip_lz_prefix(Path(path).name)
+        rel_key = str(Path(path).parent / out_rel).replace("\\", "/")
+        if rel_key in seen_rel:
+            if seen_rel[rel_key] != nns:
+                raise RuntimeError(
+                    f"FID {fid} {path}: 同路径出现了内容不同的 dup，需要重设计命名"
+                )
+            dedup += 1
+        else:
+            seen_rel[rel_key] = nns
+            dst = OUT_DIR / Path(path).parent / out_rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(nns)
+            ok += 1
+            total_out += len(nns)
         total_in += sz
-        total_out += len(nns)
 
     ratio = total_in / total_out if total_out else 0
     print(
-        f"[export_nns_unpacked] {ok}/63 .LZn* files → {OUT_DIR}/ "
-        f"— LZ77 in {total_in:,} B → NNS out {total_out:,} B (ratio {ratio:.2%})"
+        f"[export_nns_unpacked] {ok} unique files + {dedup} byte-identical dups skipped "
+        f"→ {OUT_DIR}/ — LZ77 in {total_in:,} B → NNS out {total_out:,} B (ratio {ratio:.2%})"
     )
     return 0
 

@@ -83,19 +83,6 @@ def read_fs_tables(rom: bytes) -> tuple[list[int], list[int]]:
     return offs, szs
 
 
-def disambiguate(rel: str, counter: dict[str, int]) -> str:
-    """重名时给第 N 次出现（N≥1）追加 _dup{N} 后缀。"""
-    n = counter.get(rel, 0)
-    counter[rel] = n + 1
-    if n == 0:
-        return rel
-    p = Path(rel)
-    stem = p.stem
-    suffix = p.suffix
-    new_name = f"{stem}_dup{n}{suffix}"
-    return str(p.parent / new_name).replace("\\", "/")
-
-
 def fid_offset_size(fid: int, offs: list[int], szs: list[int]) -> tuple[int, int]:
     """FID → (FS-相对 offset, size)。FID 339 (orphan) 特殊处理。"""
     if fid < NUM_PATHS:  # FID 1..338
@@ -147,21 +134,35 @@ def main() -> int:
     OUT_FS_DIR.mkdir(parents=True, exist_ok=True)
     OUT_S_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    used_counter: dict[str, int] = {}
+    # 重名策略变更（2026-04-24）：
+    # 经全量字节比对，99 组 dup paths 的 FS 内容**全部** byte-identical——
+    # FS 里的"重复路径"只是索引冗余，并无独立内容（§fs-export-and-ocg-tcg.md §三
+    # 的 OCG/TCG 变体推断基于 off-by-one bug 修复前的错位，修复后作废）。
+    # 因此只写一份文件到 fs/，同内容 dup 在 fs-payload.s 里重复 .incbin 同一路径即可
+    # 保持 byte-identical 构建，且 fs/ 树干净无 _dup 噪声。
+    seen_rel: dict[str, bytes] = {}  # rel_path -> bytes (for byte-equality check)
     export_rows: list[tuple[int, str, int]] = []  # (fid, rel_path, size)
     total_bytes = 0
+    dedup_count = 0
 
-    # 正确映射：FID 1..339，path = paths[fid-1]
     for fid in range(1, NUM_FIDS + 1):
-        rel_orig = paths[fid - 1]
-        rel = disambiguate(rel_orig, used_counter)
+        rel = paths[fid - 1]
         off, sz = fid_offset_size(fid, offs, szs)
         data = rom[FS_BASE + off : FS_BASE + off + sz]
         if len(data) != sz:
             raise RuntimeError(f"FID {fid} {rel}: 读取 {len(data)} B ≠ sz {sz}")
-        dst = OUT_FS_DIR / rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_bytes(data)
+        if rel in seen_rel:
+            # 同路径再次出现。既然全 99 组 dup 都是 byte-identical，这里做硬断言：
+            if seen_rel[rel] != data:
+                raise RuntimeError(
+                    f"FID {fid} {rel}: 新增了内容不同的 dup，需要重新设计后缀方案"
+                )
+            dedup_count += 1
+        else:
+            seen_rel[rel] = data
+            dst = OUT_FS_DIR / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(data)
         export_rows.append((fid, rel, sz))
         total_bytes += sz
 
@@ -191,12 +192,10 @@ def main() -> int:
     for _, rel, _ in export_rows:
         m = re.search(r"\.([A-Za-z0-9]+)$", rel)
         ext_cnt[m.group(1) if m else "(none)"] += 1
-    dup_total = sum(v - 1 for v in used_counter.values() if v > 1)
 
-    print(f"导出 {len(export_rows)} 个 FS 文件到 {OUT_FS_DIR}/  "
-          f"(共 {total_bytes:,} B = 0x{total_bytes:X})")
-    print(f"生成 {OUT_S_PATH}")
-    print(f"重名经 _dup{{N}} 后缀消歧：{dup_total} 个")
+    print(f"FS FID 总数 {len(export_rows)}，共 {total_bytes:,} B = 0x{total_bytes:X}")
+    print(f"磁盘落盘去重后 {len(seen_rel)} 个独立文件（{dedup_count} 个重复 FID 跳过写盘，byte-identical）")
+    print(f"生成 {OUT_S_PATH}（339 条 .incbin，dup FID 重复引用同一文件路径）")
     print("扩展名分布：" + ", ".join(f".{e}:{c}" for e, c in ext_cnt.most_common()))
     return 0
 

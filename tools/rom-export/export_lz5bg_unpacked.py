@@ -179,12 +179,14 @@ def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     INDEX_JSON.parent.mkdir(parents=True, exist_ok=True)
 
-    # dup 计数器（path 顺序）
-    dup_counter: dict[str, int] = {}
+    # 2026-04-24 去重：.LZ5bg 全 26 个 FID 的路径都互不重复（无 dup），
+    # 但保留同路径硬断言以防未来 ROM 更新引入 dup。
+    seen_rel: dict[str, bytes] = {}
     index: list[dict] = []
 
     total_comp = 0
     total_decomp = 0
+    dedup = 0
 
     for pi in lz5bg_indices:
         path = paths[pi]
@@ -193,14 +195,6 @@ def main() -> int:
         sz = szs[fid]
         abs_off = FS_BASE + off
         blob = rom[abs_off : abs_off + sz]
-
-        # dup 处理
-        n = dup_counter.get(path, 0)
-        dup_counter[path] = n + 1
-        rel = path
-        if n > 0:
-            pp = Path(path)
-            rel = str(pp.parent / f"{pp.stem}_dup{n}{pp.suffix}").replace("\\", "/")
 
         d = lz77_decompress(blob)
         if len(d) < 4 or d[0] != 0x00:
@@ -211,15 +205,23 @@ def main() -> int:
         ntbg = d[4:]
         parsed = parse_ntbg(ntbg)
 
-        # 写出 .gbtn
-        out_rel = rel.replace(".LZ5bg", ".gbtn")
-        out_path = OUT_DIR / out_rel
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_bytes(ntbg)
+        out_rel = path.replace(".LZ5bg", ".gbtn")
+        if out_rel in seen_rel:
+            if seen_rel[out_rel] != ntbg:
+                raise RuntimeError(
+                    f"{path}: 同路径出现了内容不同的 dup，需要重设计命名"
+                )
+            dedup += 1
+        else:
+            seen_rel[out_rel] = ntbg
+            out_path = OUT_DIR / out_rel
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_bytes(ntbg)
+            total_decomp += len(ntbg)
 
         index.append({
-            "path": rel,
-            "out": str(out_path.relative_to(OUT_DIR)).replace("\\", "/"),
+            "path": path,
+            "out": out_rel,
             "rom_off": f"0x{abs_off:X}",
             "compressed_size": sz,
             "decompressed_size": len(d),
@@ -228,7 +230,6 @@ def main() -> int:
         })
 
         total_comp += sz
-        total_decomp += len(ntbg)
 
     INDEX_JSON.write_text(
         json.dumps({
@@ -242,8 +243,9 @@ def main() -> int:
 
     ratio = total_comp / total_decomp if total_decomp else 0
     print(
-        f"[export_lz5bg_unpacked] {len(index)}/26 files → {OUT_DIR}/**/*.gbtn  "
-        f"— LZ77 {total_comp:,} B → NTBG {total_decomp:,} B (ratio {ratio:.2%})"
+        f"[export_lz5bg_unpacked] {len(seen_rel)} unique files + {dedup} dups skipped "
+        f"→ {OUT_DIR}/**/*.gbtn  — LZ77 {total_comp:,} B → NTBG {total_decomp:,} B "
+        f"(ratio {ratio:.2%})"
     )
     return 0
 
