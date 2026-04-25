@@ -30,7 +30,7 @@ clean.bat
 - `constants/gba_constants.inc`：GBA 硬件寄存器
 - `tools/`：Python 数据导出脚本（`export_gfx.py`、`export_card_data.py`、`export_game_strings.py` 等）+ GDB/mGBA 调试辅助
 - `doc/dev/`：所有逆向分析、调试笔记、阶段性计划（`p0-*`、`p1-*`）
-- `doc/dev/methodology/asset-location.md`：**核心方法论**——ROM 资产定位（动态路径六步流程 + 静态路径四阶段流程 + 卡图/字库/pack-banner 三份实战复盘）；`doc/dev/methodology/build-pipeline.md`：构建流水线 + asm/all.s 再生成
+- `doc/dev/methodology/asset-location.md`：**核心方法论**——ROM 资产定位（动态路径六步流程 + 静态路径四阶段流程 + 卡图/字库/pack-banner 三份实战复盘）；`doc/dev/methodology/build-pipeline.md`：构建流水线 + asm/all.s 再生成；`doc/dev/methodology/symbolization.md`：字面量池符号化（Ghidra↔asm 三方同步、白名单策略、ROM 段边界三连击验证、131 icon 修正案例）
 - `doc/um06-*`：外部参考（Google Sheets 转 Markdown）
 
 ## 本地机器路径

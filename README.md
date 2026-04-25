@@ -84,7 +84,7 @@ clean.bat    @ 清理编译产物
 ├── doc/                  # 项目文档（按 "是什么 / 如何得到" 分类组织，见下方"文档组织原则"）
 │   ├── dev/                           # 开发参考（入库，长期有效）
 │   │   ├── data-structure/            # Spec：ROM 数据结构最终规范（卡属性/卡名/三种卡图/详情页 UI）
-│   │   ├── methodology/               # 方法论：资产定位 + 构建流水线
+│   │   ├── methodology/               # 方法论：资产定位 + 构建流水线 + 符号化
 │   │   ├── tools/                     # 工具链：mGBA MCP + GDB 调试
 │   │   ├── scripts/                   # GDB / Python 辅助脚本
 │   │   ├── ghidra-function-names.md   # Ghidra 函数重命名登记
