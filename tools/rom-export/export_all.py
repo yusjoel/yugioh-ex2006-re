@@ -38,6 +38,7 @@ EXPORT_PIPELINE = [
     'export_duel_puzzles_v2.py',        # data/duel-puzzles-v2.s（35 个决斗谜题，结构化 INI 文本）
     'export_ydc_structured.py',         # data/ydc-all.s + ydc-index.json（215 个 .ydc 头部+体+尾结构化）
     'export_font.py',                   # data/font.s + graphics/font/*
+    'export_font_jp.py',                # graphics/{bin,images}/font-jp/* (4 charset 变体)
     'export_pack_banners.py',           # data/pack-banners.s + graphics/pack-banners/*
     'export_card_mini_frame.py',        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
     'export_card_medium_frame.py',      # data/card-medium-frame.s + graphics/{bin,images}/card-medium-frame/*

@@ -147,6 +147,15 @@ RENAMES = [
         "GL: 初始化 state struct @ EWRAM 0x02023490 (0x22B B)"),
     ("FUN_080156ac", "gl_clear_frame_callbacks",
         "GL: 清 IWRAM 回调指针槽 [0x03000BF8/BFC/C00] = 0"),
+    # --- 第六轮 (2026-04-25) 日文字库 + 双字节字符渲染 ---
+    ("FUN_080f0188", "char_code_to_glyph_index",
+        "code > 0xEFFF: 公式 (hi&0xF)<<7|(lo&0x7F); 否则二分查找 font_jp_sjis_lookup_table[1925]"),
+    ("FUN_080f1884", "render_glyph_jp_dual_layer",
+        "渲染日文双字节字符: char_to_idx → font_jp_charset_table 选 (base, stride) → 8bpp 预解码 strb 到 OBJ tile; narrow+wide 双层叠加 (描边)"),
+    ("FUN_080f19a4", "render_glyph_jp_single_layer",
+        "渲染日文单字节字符 (高字节=0): 仅 narrow 层 (font_jp_main_*); 与 dual_layer 共享 char_to_idx 路径"),
+    ("FUN_080f0274", "measure_string_pixel_width",
+        "字符串总像素宽计算: 按 byte bit 7 二选一 char_width_narrow_5/wide_10_or_12 累加; 用于布局/居中决策"),
 ]
 
 

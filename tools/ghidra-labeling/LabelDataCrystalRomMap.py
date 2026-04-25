@@ -103,6 +103,27 @@ LABELS = [
     # 小图标 (131 个: 玩家 + 对手 + 其他, 暂用 icon_NNN 命名)
     (0x0988CF30, "icon_tiles_base"),     # 131 × 0x120 = 0x9360 B
     (0x09896290, "icon_palettes_base"),  # 131 × 0x20  = 0x1060 B (紧跟 tiles)
+
+    # 对手图形 5-base 指针表（loader 字面量池 @ 0x0802D240..0x0802D250 引用）
+    # palette copy 2 @ 0x09B4FE9C 是 copy 1 的冗余副本, 0 ref, 仅 asm/rom.s 文档 label
+    (0x09B101AC, "opponent_palettes_base"),       # 7776 B = 27 × 288 (copy 1, 实际被 loader 引用)
+    (0x09B1200C, "opponent_top_tiles_base"),      # 221184 B = 27 × 0x2000
+    (0x09B4800C, "opponent_top_tilemap_base"),    # 32400 B = 27 × 0x4B0
+    (0x09B51CFC, "opponent_bottom_tiles_base"),   # 221184 B = 27 × 0x2000
+    (0x09B87CFC, "opponent_bottom_tilemap_base"), # 32400 B = 27 × 0x4B0
+
+    # 日文双字节字库（4 个 charset 变体, 每个 1925 glyph, 8bpp 预解码每像素 1 字节）
+    # 索引 = (hi & 0xF) << 7 | (lo & 0x7F) ∈ [0, 1925); narrow=主字形, wide=描边层
+    # FUN_080F1884 用 (char_high_bit << 1) | ctx_flag_bit1 在 font_jp_charset_table 选 1 个
+    # 验证: cid=1 青眼の白龍 XX 字节 F8F7/F48C/F1A9/FBD9/FE91 → glyph 1143/524/169/1497/1809
+    (0x09BAC9A4, "font_jp_main_small"),     # 10×10 narrow main, 192500 B
+    (0x09C2B7EC, "font_jp_main_large"),     # 12×12 narrow main, 277200 B
+    (0x09BDB998, "font_jp_outline_small"),  # 12×12 wide outline, 277200 B (与 main_small 同 idx 配对)
+    (0x09C6F2BC, "font_jp_outline_large"),  # 14×14 wide outline, 377300 B
+    (0x09E5F864, "font_jp_charset_table"),  # 4 × (base, stride): (base[0..3], stride[0..3])
+    # Shift_JIS code → glyph index 二分查找表（FUN_080F0188 在 code <= 0xEFFF 时使用）
+    (0x09BA1524, "font_jp_sjis_lookup_table"),  # 1925 × u16 (sorted SJIS), 3850 B
+    (0x09BA2430, "font_jp_sjis_lookup_count"),  # u16 = 1925
     (0x095B5C00, "card_image_index"),
     (0x095B7CCC, "cards_ids_array"),
     (0x095B94CC, "card_passcode_table"),  # 2098 × u32 加密密码表

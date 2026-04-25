@@ -525,13 +525,19 @@ icon_palettes_base:
 
 @ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
 @ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
+@ 字面量池 0x0802D240 引用本 base（loader 函数指针表 5 项之一）
+opponent_palettes_base:
 	.incbin "graphics/bin/opponents/palettes/palette_copy1.bin"
 
 @ Top 图块整块，ROM 0x1B1200C–0x1B4800B，221184 字节（27 × 0x2000）
 @ 注意：第 20 个对手 Elemental Hero Electrum 图块偏移不规则（0x1B3899C），整段统一保留
+@ 字面量池 0x0802D244 引用本 base
+opponent_top_tiles_base:
 	.incbin "graphics/bin/opponents/tiles/top_tiles_all.bin"
 
 @ Top Tilemap（27 个对手），ROM 0x1B4800C–0x1B4FE9B，每个 0x4B0 字节
+@ 字面量池 0x0802D24C 引用本 base
+opponent_top_tilemap_base:
 	.incbin "graphics/bin/opponents/tilemaps/kuriboh_top_tilemap.bin"
 	.incbin "graphics/bin/opponents/tilemaps/scapegoat_top_tilemap.bin"
 	.incbin "graphics/bin/opponents/tilemaps/skull_servant_top_tilemap.bin"
@@ -561,12 +567,18 @@ icon_palettes_base:
 	.incbin "graphics/bin/opponents/tilemaps/copycat_top_tilemap.bin"
 
 @ 调色板块（Copy 2），ROM 0x1B4FE9C–0x1B51CFB，7776 字节（内容与 Copy 1 完全相同）
+@ 全 ROM 0 引用：loader 字面量池只引用 Copy 1，本块为冗余副本（仅文档边界标记，不进 rom_data.inc）
+opponent_palettes_copy2_unused:
 	.incbin "graphics/bin/opponents/palettes/palette_copy1.bin"
 
 @ Bottom 图块整块，ROM 0x1B51CFC–0x1B87CFB，221184 字节（27 × 0x2000）
+@ 字面量池 0x0802D248 引用本 base
+opponent_bottom_tiles_base:
 	.incbin "graphics/bin/opponents/tiles/bottom_tiles_all.bin"
 
 @ Bottom Tilemap（27 个对手），ROM 0x1B87CFC–0x1B8FB8B，每个 0x4B0 字节
+@ 字面量池 0x0802D250 引用本 base
+opponent_bottom_tilemap_base:
 	.incbin "graphics/bin/opponents/tilemaps/kuriboh_bottom_tilemap.bin"
 	.incbin "graphics/bin/opponents/tilemaps/scapegoat_bottom_tilemap.bin"
 	.incbin "graphics/bin/opponents/tilemaps/skull_servant_bottom_tilemap.bin"
@@ -595,8 +607,28 @@ icon_palettes_base:
 	.incbin "graphics/bin/opponents/tilemaps/mirror_match_bottom_tilemap.bin"
 	.incbin "graphics/bin/opponents/tilemaps/copycat_bottom_tilemap.bin"
 
-@ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019（内嵌英文字库已拆出）
-	.incbin "roms/2343.gba", 0x1B8FB8C, 0x13CF04   @ 0x1B8FB8C..0x1CCCA90 字库前段
+@ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019（内嵌英/日字库已拆出）
+@ 头段：含 font_jp_sjis_lookup_table @ 0x1BA1524 (3850 B) + count u16 + 其他未识别数据
+	.incbin "roms/2343.gba", 0x1B8FB8C, 0x1CE18    @ 0x1B8FB8C..0x1BAC9A4
+
+@ 日文字库（4 个 charset 变体，每个 1925 glyph，8bpp 预解码每像素 1 字节）
+@ 索引 = (hi & 0xF) << 7 | (lo & 0x7F)；详见 doc/dev/xx-encoding-analysis.md + tools/rom-export/export_font_jp.py
+@ ROM 顺序：main_small + outline_small（紧邻配对）→ gap1 → main_large + outline_large → tail gap
+font_jp_main_small:                                @ 0x1BAC9A4..0x1BDB998 (192500 B = 1925 × 10×10)
+	.incbin "graphics/bin/font-jp/main_small.bin"
+font_jp_outline_small:                             @ 0x1BDB998..0x1C1F468 (277200 B = 1925 × 12×12)
+	.incbin "graphics/bin/font-jp/outline_small.bin"
+
+@ gap1：未识别数据 50052 B（main_small/outline_small 与 main_large/outline_large 之间）
+	.incbin "roms/2343.gba", 0x1C1F468, 0xC384     @ 0x1C1F468..0x1C2B7EC
+
+font_jp_main_large:                                @ 0x1C2B7EC..0x1C6F2BC (277200 B = 1925 × 12×12)
+	.incbin "graphics/bin/font-jp/main_large.bin"
+font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (377300 B = 1925 × 14×14)
+	.incbin "graphics/bin/font-jp/outline_large.bin"
+
+@ tail gap：未识别数据 5632 B（outline_large 与 font_ascii_8x8 之间）
+	.incbin "roms/2343.gba", 0x1CCB490, 0x1600     @ 0x1CCB490..0x1CCCA90
 
 @ 英文字库（1bpp 8×8，256 字符，ASCII 直接索引），ROM 0x1CCCA90–0x1CCD28F，2048 B
 @ 加载函数 FUN_080f1b60 @ 0x080f1b60；详见 doc/dev/p2-font-location-findings.md

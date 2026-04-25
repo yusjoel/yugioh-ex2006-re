@@ -7789,7 +7789,7 @@ FUN_080179a8:
     ldr r7,[r3,#0x0]                         @ 080179be 1f68
     lsls r6,r0,#0x10    @ 080179c0 0604
     lsrs r0,r6,#0x10    @ 080179c2 300c
-    bl FUN_080f0188                          @ 080179c4 d8f0e0fb
+    bl char_code_to_glyph_index              @ 080179c4 d8f0e0fb
     cmp r0,#0x0                              @ 080179c8 0028
     beq LAB_08017a06                         @ 080179ca 1cd0
     .hword 0x466c    @ 080179cc 6c46
@@ -11866,7 +11866,7 @@ LAB_08019a84:
 LAB_08019ac6:
     lsls r4,r5,#0x10    @ 08019ac6 2c04
     lsrs r0,r4,#0x10    @ 08019ac8 200c
-    bl FUN_080f0188                          @ 08019aca d6f05dfb
+    bl char_code_to_glyph_index              @ 08019aca d6f05dfb
     cmp r0,#0x0                              @ 08019ace 0028
     beq LAB_08019b06                         @ 08019ad0 19d0
     .hword 0x4668    @ 08019ad2 6846
@@ -16990,7 +16990,7 @@ LAB_0801d5d6:
     .hword 0x464a    @ 0801d5ee 4a46
     .hword 0x4644    @ 0801d5f0 4446
     lsrs r3,r4,#0x10    @ 0801d5f2 230c
-    bl FUN_080f1884                          @ 0801d5f4 d4f046f9
+    bl render_glyph_jp_dual_layer            @ 0801d5f4 d4f046f9
     .hword 0x46aa    @ 0801d5f8 aa46
     b LAB_0801d5fe                           @ 0801d5fa 00e0
 LAB_0801d5fc:
@@ -17068,7 +17068,7 @@ LAB_0801d672:
     adds r0,r5,#0x0    @ 0801d684 281c
     .hword 0x464a    @ 0801d686 4a46
     lsrs r3,r3,#0x10    @ 0801d688 1b0c
-    bl FUN_080f19a4                          @ 0801d68a d4f08bf9
+    bl render_glyph_jp_single_layer          @ 0801d68a d4f08bf9
     .hword 0x46a2    @ 0801d68e a246
     b LAB_0801d696                           @ 0801d690 01e0
 LAB_0801d692:
@@ -17990,12 +17990,12 @@ LAB_0801ddba:
     adds r1,r6,#0x0    @ 0801ddcc 311c
     .hword 0x4652    @ 0801ddce 5246
     ldr r3, DAT_0801ddf0                     @ 0801ddd0 074b
-    bl FUN_080f1884                          @ 0801ddd2 d3f057fd
+    bl render_glyph_jp_dual_layer            @ 0801ddd2 d3f057fd
     adds r0,r4,#0x0    @ 0801ddd6 201c
     adds r1,r6,#0x0    @ 0801ddd8 311c
     .hword 0x4652    @ 0801ddda 5246
     movs r3,#0x7    @ 0801dddc 0723
-    bl FUN_080f1884                          @ 0801ddde d3f051fd
+    bl render_glyph_jp_dual_layer            @ 0801ddde d3f051fd
     adds r6,r6,r5    @ 0801dde2 7619
     adds r7,#0x2    @ 0801dde4 0237
     ldrb r0,[r7,#0x0]                        @ 0801dde6 3878
@@ -18110,12 +18110,12 @@ LAB_0801deb0:
     adds r1,r6,#0x0    @ 0801deba 311c
     .hword 0x4652    @ 0801debc 5246
     ldr r3, DAT_0801df48                     @ 0801debe 224b
-    bl FUN_080f19a4                          @ 0801dec0 d3f070fd
+    bl render_glyph_jp_single_layer          @ 0801dec0 d3f070fd
     adds r0,r5,#0x0    @ 0801dec4 281c
     adds r1,r6,#0x0    @ 0801dec6 311c
     .hword 0x4652    @ 0801dec8 5246
     movs r3,#0x7    @ 0801deca 0723
-    bl FUN_080f19a4                          @ 0801decc d3f06afd
+    bl render_glyph_jp_single_layer          @ 0801decc d3f06afd
     adds r6,r6,r4    @ 0801ded0 3619
     movs r1,#0x1    @ 0801ded2 0121
     add r8,r1                                @ 0801ded4 8844
@@ -25339,7 +25339,7 @@ LAB_0802bb92:
     ldrh r2,[r5,#0x0]                        @ 0802bba0 2a88
     ldrb r3,[r4,#0x0]                        @ 0802bba2 2378
     .hword 0x4649    @ 0802bba4 4946
-    bl FUN_080f19a4                          @ 0802bba6 c5f0fdfe
+    bl render_glyph_jp_single_layer          @ 0802bba6 c5f0fdfe
     adds r0,r6,#0x0    @ 0802bbaa 301c
     movs r1,#0xa    @ 0802bbac 0a21
     bl FUN_0810e604                          @ 0802bbae e2f029fd
@@ -25525,7 +25525,7 @@ LAB_0802bd04:
     ldrh r2,[r5,#0x0]                        @ 0802bd12 2a88
     adds r1,r7,#0x0    @ 0802bd14 391c
     movs r3,#0x7    @ 0802bd16 0723
-    bl FUN_080f19a4                          @ 0802bd18 c5f044fe
+    bl render_glyph_jp_single_layer          @ 0802bd18 c5f044fe
     adds r0,r4,#0x0    @ 0802bd1c 201c
     movs r1,#0xa    @ 0802bd1e 0a21
     bl FUN_0810e604                          @ 0802bd20 e2f070fc
@@ -28045,11 +28045,11 @@ LAB_0802d06c:
     .word  0x0994f83c                     @ 0802d188 3cf89409
     .word  0x0995383c                     @ 0802d18c 3c389509
     ROM_INCBIN 0x2d190, 0xb0
-    .word  0x09b101ac                     @ 0802d240 ac01b109
-    .word  0x09b1200c                     @ 0802d244 0c20b109
-    .word  0x09b51cfc                     @ 0802d248 fc1cb509
-    .word  0x09b4800c                     @ 0802d24c 0c80b409
-    .word  0x09b87cfc                     @ 0802d250 fc7cb809
+    .word  opponent_palettes_base         @ 0802d240 ac01b109
+    .word  opponent_top_tiles_base        @ 0802d244 0c20b109
+    .word  opponent_bottom_tiles_base     @ 0802d248 fc1cb509
+    .word  opponent_top_tilemap_base      @ 0802d24c 0c80b409
+    .word  opponent_bottom_tilemap_base   @ 0802d250 fc7cb809
     ROM_INCBIN 0x2d254, 0x154
     .word  0x09a1a52c                     @ 0802d3a8 2ca5a109
     .word  0x09a1dfac                     @ 0802d3ac acdfa109
@@ -224608,7 +224608,7 @@ DAT_080bf994:
 LAB_080bf998:
     ldr r0, DAT_080bf9e4                     @ 080bf998 1248
 LAB_080bf99a:
-    bl FUN_080f0274                          @ 080bf99a 30f06bfc
+    bl measure_string_pixel_width            @ 080bf99a 30f06bfc
     adds r4,r0,#0x0    @ 080bf99e 041c
     movs r0,#0x40    @ 080bf9a0 4020
     subs r0,r0,r4    @ 080bf9a2 001b
@@ -224787,7 +224787,7 @@ DAT_080bfae0:
 LAB_080bfae4:
     ldr r0, DAT_080bfb30                     @ 080bfae4 1248
 LAB_080bfae6:
-    bl FUN_080f0274                          @ 080bfae6 30f0c5fb
+    bl measure_string_pixel_width            @ 080bfae6 30f0c5fb
     adds r4,r0,#0x0    @ 080bfaea 041c
     movs r0,#0x40    @ 080bfaec 4020
     subs r0,r0,r4    @ 080bfaee 001b
@@ -238832,7 +238832,7 @@ LAB_080c7750:
     adds r2,#0x1    @ 080c7762 0132
     ldr r6,[sp,#0x8]                         @ 080c7764 029e
     lsrs r3,r6,#0x10    @ 080c7766 330c
-    bl FUN_080f19a4                          @ 080c7768 2af01cf9
+    bl render_glyph_jp_single_layer          @ 080c7768 2af01cf9
     ldrb r0,[r4,#0x0]                        @ 080c776c 2078
     ldr r7,[sp,#0x0]                         @ 080c776e 009f
     lsls r3,r7,#0x18    @ 080c7770 3b06
@@ -238841,7 +238841,7 @@ LAB_080c7750:
     orrs r3,r1    @ 080c7776 0b43
     adds r1,r5,#0x0    @ 080c7778 291c
     .hword 0x4642    @ 080c777a 4246
-    bl FUN_080f19a4                          @ 080c777c 2af012f9
+    bl render_glyph_jp_single_layer          @ 080c777c 2af012f9
 LAB_080c7780:
     ldrb r2,[r4,#0x0]                        @ 080c7780 2278
     cmp r2,#0x20                             @ 080c7782 202a
@@ -238922,7 +238922,7 @@ LAB_080c7802:
     adds r0,r6,#0x0    @ 080c780e 301c
     ldr r7,[sp,#0x8]                         @ 080c7810 029f
     lsrs r3,r7,#0x10    @ 080c7812 3b0c
-    bl FUN_080f1884                          @ 080c7814 2af036f8
+    bl render_glyph_jp_dual_layer            @ 080c7814 2af036f8
     ldr r0,[sp,#0x0]                         @ 080c7818 0098
     lsls r3,r0,#0x18    @ 080c781a 0306
     lsrs r3,r3,#0x18    @ 080c781c 1b0e
@@ -238931,7 +238931,7 @@ LAB_080c7802:
     adds r0,r6,#0x0    @ 080c7822 301c
     adds r1,r5,#0x0    @ 080c7824 291c
     .hword 0x4642    @ 080c7826 4246
-    bl FUN_080f1884                          @ 080c7828 2af02cf8
+    bl render_glyph_jp_dual_layer            @ 080c7828 2af02cf8
 LAB_080c782c:
     add r5,r9                                @ 080c782c 4d44
     ldr r2,[sp,#0xc]                         @ 080c782e 039a
@@ -245491,7 +245491,7 @@ FUN_080caf68:
     lsls r1,r1,#0x4    @ 080cafdc 0901
     bl FUN_080f4e74                          @ 080cafde 29f049ff
     adds r0,r5,#0x0    @ 080cafe2 281c
-    bl FUN_080f0274                          @ 080cafe4 25f046f9
+    bl measure_string_pixel_width            @ 080cafe4 25f046f9
     adds r0,#0x3    @ 080cafe8 0330
     cmp r0,#0xef                             @ 080cafea ef28
     ble LAB_080caff0                         @ 080cafec 00dd
@@ -245557,13 +245557,13 @@ LAB_080cb05e:
     adds r0,r4,#0x0    @ 080cb060 201c
     adds r1,r7,#0x0    @ 080cb062 391c
     .hword 0x4642    @ 080cb064 4246
-    bl FUN_080f1884                          @ 080cb066 26f00dfc
+    bl render_glyph_jp_dual_layer            @ 080cb066 26f00dfc
     adds r0,r4,#0x0    @ 080cb06a 201c
     adds r1,r7,#0x0    @ 080cb06c 391c
     .hword 0x4642    @ 080cb06e 4246
     ldr r4, DAT_080cb0f4                     @ 080cb070 204c
     lsrs r3,r4,#0x10    @ 080cb072 230c
-    bl FUN_080f1884                          @ 080cb074 26f006fc
+    bl render_glyph_jp_dual_layer            @ 080cb074 26f006fc
     add r7,r10                               @ 080cb078 5744
     adds r5,#0x1    @ 080cb07a 0135
     .hword 0x4651    @ 080cb07c 5146
@@ -245587,14 +245587,14 @@ LAB_080cb09a:
     movs r0,#0x2e    @ 080cb09c 2e20
     adds r1,r7,#0x0    @ 080cb09e 391c
     .hword 0x4642    @ 080cb0a0 4246
-    bl FUN_080f19a4                          @ 080cb0a2 26f07ffc
+    bl render_glyph_jp_single_layer          @ 080cb0a2 26f07ffc
     lsrs r3,r4,#0x10    @ 080cb0a6 230c
     movs r5,#0x7    @ 080cb0a8 0725
     orrs r3,r5    @ 080cb0aa 2b43
     movs r0,#0x2e    @ 080cb0ac 2e20
     adds r1,r7,#0x0    @ 080cb0ae 391c
     .hword 0x4642    @ 080cb0b0 4246
-    bl FUN_080f19a4                          @ 080cb0b2 26f077fc
+    bl render_glyph_jp_single_layer          @ 080cb0b2 26f077fc
     .hword 0x4651    @ 080cb0b6 5146
     lsrs r0,r1,#0x1    @ 080cb0b8 4808
     adds r1,r7,r0    @ 080cb0ba 3918
@@ -245612,7 +245612,7 @@ LAB_080cb0d0:
     orrs r3,r2    @ 080cb0d0 1343
     movs r0,#0x2e    @ 080cb0d2 2e20
     .hword 0x4642    @ 080cb0d4 4246
-    bl FUN_080f19a4                          @ 080cb0d6 26f065fc
+    bl render_glyph_jp_single_layer          @ 080cb0d6 26f065fc
     .hword 0x4650    @ 080cb0da 5046
     lsrs r1,r0,#0x1    @ 080cb0dc 4108
     adds r1,r7,r1    @ 080cb0de 7918
@@ -245647,13 +245647,13 @@ LAB_080cb112:
     adds r0,r2,#0x0    @ 080cb114 101c
     adds r1,r7,#0x0    @ 080cb116 391c
     .hword 0x4642    @ 080cb118 4246
-    bl FUN_080f19a4                          @ 080cb11a 26f043fc
+    bl render_glyph_jp_single_layer          @ 080cb11a 26f043fc
     ldrb r0,[r5,#0x0]                        @ 080cb11e 2878
     adds r1,r7,#0x0    @ 080cb120 391c
     .hword 0x4642    @ 080cb122 4246
     ldr r4, DAT_080cb1a4                     @ 080cb124 1f4c
     lsrs r3,r4,#0x10    @ 080cb126 230c
-    bl FUN_080f19a4                          @ 080cb128 26f03cfc
+    bl render_glyph_jp_single_layer          @ 080cb128 26f03cfc
 LAB_080cb12c:
     .hword 0x4651    @ 080cb12c 5146
     lsrs r0,r1,#0x1    @ 080cb12e 4808
@@ -245676,13 +245676,13 @@ LAB_080cb14c:
     movs r0,#0x2e    @ 080cb14e 2e20
     adds r1,r7,#0x0    @ 080cb150 391c
     .hword 0x4642    @ 080cb152 4246
-    bl FUN_080f19a4                          @ 080cb154 26f026fc
+    bl render_glyph_jp_single_layer          @ 080cb154 26f026fc
     movs r0,#0x2e    @ 080cb158 2e20
     adds r1,r7,#0x0    @ 080cb15a 391c
     .hword 0x4642    @ 080cb15c 4246
     ldr r4, DAT_080cb1a4                     @ 080cb15e 114c
     lsrs r3,r4,#0x10    @ 080cb160 230c
-    bl FUN_080f19a4                          @ 080cb162 26f01ffc
+    bl render_glyph_jp_single_layer          @ 080cb162 26f01ffc
     .hword 0x4655    @ 080cb166 5546
     lsrs r0,r5,#0x1    @ 080cb168 6808
     adds r1,r7,r0    @ 080cb16a 3918
@@ -245700,7 +245700,7 @@ LAB_080cb180:
     orrs r3,r2    @ 080cb180 1343
     movs r0,#0x2e    @ 080cb182 2e20
     .hword 0x4642    @ 080cb184 4246
-    bl FUN_080f19a4                          @ 080cb186 26f00dfc
+    bl render_glyph_jp_single_layer          @ 080cb186 26f00dfc
     .hword 0x4655    @ 080cb18a 5546
     lsrs r1,r5,#0x1    @ 080cb18c 6908
     adds r1,r7,r1    @ 080cb18e 7918
@@ -245710,7 +245710,7 @@ LAB_080cb180:
 LAB_080cb196:
     movs r0,#0x2e    @ 080cb196 2e20
     .hword 0x4642    @ 080cb198 4246
-    bl FUN_080f19a4                          @ 080cb19a 26f003fc
+    bl render_glyph_jp_single_layer          @ 080cb19a 26f003fc
     b LAB_080cb1b2                           @ 080cb19e 08e0
 DAT_080cb1a0:
     .word  0x0201e2a0                     @ 080cb1a0 a0e20102
@@ -247274,7 +247274,7 @@ LAB_080cbd82:
     orrs r0,r1    @ 080cbdcc 0843
     strb r0,[r2,#0x15]                       @ 080cbdce 5075
     ldr r0,[sp,#0xc]                         @ 080cbdd0 0398
-    bl FUN_080f0274                          @ 080cbdd2 24f04ffa
+    bl measure_string_pixel_width            @ 080cbdd2 24f04ffa
     adds r7,r0,#0x0    @ 080cbdd6 071c
     ldrb r5,[r5,#0x0]                        @ 080cbdd8 2d78
     ands r4,r5    @ 080cbdda 2c40
@@ -253786,7 +253786,7 @@ FUN_080cf25c:
     movs r3,#0x2    @ 080cf2d8 0223
     bl tile_2d_row_copy                      @ 080cf2da 28f0fbf8
     adds r0,r4,#0x0    @ 080cf2de 201c
-    bl FUN_080f0274                          @ 080cf2e0 20f0c8ff
+    bl measure_string_pixel_width            @ 080cf2e0 20f0c8ff
     adds r1,r0,#0x0    @ 080cf2e4 011c
     movs r0,#0xb8    @ 080cf2e6 b820
     subs r0,r0,r1    @ 080cf2e8 401a
@@ -272434,7 +272434,7 @@ pack_name_text_render:
     ldr r0,[r0,#0x0]                         @ 080dbc2c 0068
     str r0,[r2,#0x4]                         @ 080dbc2e 5060
     adds r0,r5,#0x0    @ 080dbc30 281c
-    bl FUN_080f0274                          @ 080dbc32 14f01ffb
+    bl measure_string_pixel_width            @ 080dbc32 14f01ffb
     adds r4,r0,#0x0    @ 080dbc36 041c
     adds r4,#0x8    @ 080dbc38 0834
     asrs r4,r4,#0x3    @ 080dbc3a e410
@@ -272581,7 +272581,7 @@ FUN_080dbcfc:
     ldr r0,[r0,#0x0]                         @ 080dbd56 0068
     str r0,[r2,#0x4]                         @ 080dbd58 5060
     adds r0,r5,#0x0    @ 080dbd5a 281c
-    bl FUN_080f0274                          @ 080dbd5c 14f08afa
+    bl measure_string_pixel_width            @ 080dbd5c 14f08afa
     adds r0,#0x8    @ 080dbd60 0830
     asrs r7,r0,#0x3    @ 080dbd62 c710
     cmp r4,#0x0                              @ 080dbd64 002c
@@ -272928,7 +272928,7 @@ LAB_080dbfc0:
     ldr r0,[r0,#0x0]                         @ 080dc000 0068
     str r0,[r5,#0x4]                         @ 080dc002 6860
     add r0,sp,#0x4                           @ 080dc004 01a8
-    bl FUN_080f0274                          @ 080dc006 14f035f9
+    bl measure_string_pixel_width            @ 080dc006 14f035f9
     movs r1,#0x66    @ 080dc00a 6621
     subs r1,r1,r0    @ 080dc00c 091a
     asrs r4,r1,#0x1    @ 080dc00e 4c10
@@ -273107,7 +273107,7 @@ LAB_080dc11a:
     ldr r0,[r0,#0x0]                         @ 080dc166 0068
     str r0,[r2,#0x4]                         @ 080dc168 5060
     add r0,sp,#0x4                           @ 080dc16a 01a8
-    bl FUN_080f0274                          @ 080dc16c 14f082f8
+    bl measure_string_pixel_width            @ 080dc16c 14f082f8
     movs r4,#0x66    @ 080dc170 6624
     subs r4,r4,r0    @ 080dc172 241a
     lsrs r4,r4,#0x1    @ 080dc174 6408
@@ -273274,7 +273274,7 @@ FUN_080dc1f8:
     .hword 0x4643    @ 080dc2c0 4346
     bl text_render_wrapper                   @ 080dc2c2 16f0dbfb
     .hword 0x4668    @ 080dc2c6 6846
-    bl FUN_080f0274                          @ 080dc2c8 13f0d4ff
+    bl measure_string_pixel_width            @ 080dc2c8 13f0d4ff
     movs r4,#0x82    @ 080dc2cc 8224
     subs r4,r4,r0    @ 080dc2ce 241a
     adds r0,r4,#0x0    @ 080dc2d0 201c
@@ -273656,7 +273656,7 @@ LAB_080dc562:
     ldr r0,[r0,#0x0]                         @ 080dc5b4 0068
     str r0,[r2,#0x4]                         @ 080dc5b6 5060
     adds r0,r6,#0x0    @ 080dc5b8 301c
-    bl FUN_080f0274                          @ 080dc5ba 13f05bfe
+    bl measure_string_pixel_width            @ 080dc5ba 13f05bfe
     adds r1,r0,#0x0    @ 080dc5be 011c
     movs r0,#0x68    @ 080dc5c0 6820
     subs r0,r0,r1    @ 080dc5c2 401a
@@ -277555,7 +277555,7 @@ FUN_080de3e8:
     adds r1,r1,r0    @ 080de460 0918
     .hword 0x4689    @ 080de462 8946
     .hword 0x4648    @ 080de464 4846
-    bl FUN_080f0274                          @ 080de466 11f005ff
+    bl measure_string_pixel_width            @ 080de466 11f005ff
     adds r7,r0,#0x0    @ 080de46a 071c
     movs r0,#0xf0    @ 080de46c f020
     subs r0,r0,r7    @ 080de46e c01b
@@ -277714,7 +277714,7 @@ LAB_080de53e:
     adds r1,r1,r0    @ 080de5b2 0918
     .hword 0x4689    @ 080de5b4 8946
     .hword 0x4648    @ 080de5b6 4846
-    bl FUN_080f0274                          @ 080de5b8 11f05cfe
+    bl measure_string_pixel_width            @ 080de5b8 11f05cfe
     movs r1,#0x30    @ 080de5bc 3021
     subs r1,r1,r0    @ 080de5be 091a
     asrs r7,r1,#0x1    @ 080de5c0 4f10
@@ -277800,7 +277800,7 @@ LAB_080de62a:
     adds r1,r1,r0    @ 080de66a 0918
     .hword 0x4689    @ 080de66c 8946
     .hword 0x4648    @ 080de66e 4846
-    bl FUN_080f0274                          @ 080de670 11f000fe
+    bl measure_string_pixel_width            @ 080de670 11f000fe
     movs r1,#0x30    @ 080de674 3021
     subs r1,r1,r0    @ 080de676 091a
     asrs r7,r1,#0x1    @ 080de678 4f10
@@ -278543,7 +278543,7 @@ LAB_080df54e:
     adds r7,r0,r3    @ 080df56e c718
 LAB_080df570:
     adds r0,r7,#0x0    @ 080df570 381c
-    bl FUN_080f0274                          @ 080df572 10f07ffe
+    bl measure_string_pixel_width            @ 080df572 10f07ffe
     movs r4,#0x44    @ 080df576 4424
     subs r4,r4,r0    @ 080df578 241a
     asrs r4,r4,#0x1    @ 080df57a 6410
@@ -307653,12 +307653,12 @@ LAB_080f0124:
     pop {r0}                                 @ 080f012e 01bc
     bx r0                                    @ 080f0130 0047
     ROM_INCBIN 0xf0132, 0x56
-FUN_080f0188:
+char_code_to_glyph_index:
     push {r4,r5,r6,lr}                       @ 080f0188 70b5
     lsls r0,r0,#0x10    @ 080f018a 0004
     lsrs r4,r0,#0x10    @ 080f018c 040c
     movs r5,#0x0    @ 080f018e 0025
-    ldr r0, DAT_080f01ac                     @ 080f0190 0648
+    ldr r0, PTR_font_jp_sjis_lookup_count_080f01ac @ 080f0190 0648
     ldrh r3,[r0,#0x0]                        @ 080f0192 0388
     subs r3,#0x1    @ 080f0194 013b
     ldr r0, DAT_080f01b0                     @ 080f0196 0648
@@ -307672,12 +307672,12 @@ FUN_080f0188:
     lsrs r1,r1,#0x1    @ 080f01a6 4908
     orrs r0,r1    @ 080f01a8 0843
     b LAB_080f01f8                           @ 080f01aa 25e0
-DAT_080f01ac:
-    .word  0x09ba2430                     @ 080f01ac 3024ba09
+PTR_font_jp_sjis_lookup_count_080f01ac:
+    .word  font_jp_sjis_lookup_count      @ 080f01ac 3024ba09
 DAT_080f01b0:
     .word  0x0000efff                     @ 080f01b0 ffef0000
 LAB_080f01b4:
-    ldr r6, DAT_080f01d0                     @ 080f01b4 064e
+    ldr r6, PTR_font_jp_sjis_lookup_table_080f01d0 @ 080f01b4 064e
 LAB_080f01b6:
     adds r0,r5,r3    @ 080f01b6 e818
     lsrs r1,r0,#0x1f    @ 080f01b8 c10f
@@ -307692,8 +307692,8 @@ LAB_080f01b6:
     adds r0,r2,#0x0    @ 080f01ca 101c
     b LAB_080f01f8                           @ 080f01cc 14e0
     .byte  0x00, 0x00
-DAT_080f01d0:
-    .word  0x09ba1524                     @ 080f01d0 2415ba09
+PTR_font_jp_sjis_lookup_table_080f01d0:
+    .word  font_jp_sjis_lookup_table      @ 080f01d0 2415ba09
 LAB_080f01d4:
     cmp r5,r3                                @ 080f01d4 9d42
     bne LAB_080f01dc                         @ 080f01d6 01d1
@@ -307740,7 +307740,7 @@ char_width_wide_10_or_12:
 DAT_080f021c:
     .word  0x02006ed0                     @ 080f021c d06e0002
     ROM_INCBIN 0xf0220, 0x54
-FUN_080f0274:
+measure_string_pixel_width:
     push {r4,r5,lr}                          @ 080f0274 30b5
     adds r4,r0,#0x0    @ 080f0276 041c
     movs r5,#0x0    @ 080f0278 0025
@@ -308015,9 +308015,9 @@ FUN_080f05d0:
     push {r4,lr}                             @ 080f05d0 10b5
     lsls r0,r0,#0x10    @ 080f05d2 0004
     lsrs r2,r0,#0x10    @ 080f05d4 020c
-    ldr r4, DAT_080f0620                     @ 080f05d6 124c
+    ldr r4, PTR_font_jp_sjis_lookup_table_080f0620 @ 080f05d6 124c
     adds r0,r2,#0x0    @ 080f05d8 101c
-    bl FUN_080f0188                          @ 080f05da fff7d5fd
+    bl char_code_to_glyph_index              @ 080f05da fff7d5fd
     lsls r0,r0,#0x1    @ 080f05de 4000
     adds r0,r0,r4    @ 080f05e0 0019
     ldrh r1,[r0,#0x0]                        @ 080f05e2 0188
@@ -308056,8 +308056,8 @@ LAB_080f0614:
 LAB_080f061c:
     b LAB_080f0710                           @ 080f061c 78e0
     .byte  0x00, 0x00
-DAT_080f0620:
-    .word  0x09ba1524                     @ 080f0620 2415ba09
+PTR_font_jp_sjis_lookup_table_080f0620:
+    .word  font_jp_sjis_lookup_table      @ 080f0620 2415ba09
 DAT_080f0624:
     .word  0x000082a5                     @ 080f0624 a5820000
 DAT_080f0628:
@@ -308205,8 +308205,8 @@ FUN_080f0720:
     push {r4,lr}                             @ 080f0720 10b5
     lsls r0,r0,#0x10    @ 080f0722 0004
     lsrs r0,r0,#0x10    @ 080f0724 000c
-    ldr r4, DAT_080f0744                     @ 080f0726 074c
-    bl FUN_080f0188                          @ 080f0728 fff72efd
+    ldr r4, PTR_font_jp_sjis_lookup_table_080f0744 @ 080f0726 074c
+    bl char_code_to_glyph_index              @ 080f0728 fff72efd
     lsls r0,r0,#0x1    @ 080f072c 4000
     adds r0,r0,r4    @ 080f072e 0019
     ldrh r1,[r0,#0x0]                        @ 080f0730 0188
@@ -308220,8 +308220,8 @@ LAB_080f073e:
     movs r0,#0x1    @ 080f073e 0120
     b LAB_080f074e                           @ 080f0740 05e0
     .byte  0x00, 0x00
-DAT_080f0744:
-    .word  0x09ba1524                     @ 080f0744 2415ba09
+PTR_font_jp_sjis_lookup_table_080f0744:
+    .word  font_jp_sjis_lookup_table      @ 080f0744 2415ba09
 DAT_080f0748:
     .word  0x00008169                     @ 080f0748 69810000
 LAB_080f074c:
@@ -309371,13 +309371,13 @@ FUN_080f1440:
     lsrs r0,r0,#0x10    @ 080f1454 000c
     lsls r4,r4,#0x10    @ 080f1456 2404
     lsrs r4,r4,#0x10    @ 080f1458 240c
-    bl FUN_080f0188                          @ 080f145a fef795fe
+    bl char_code_to_glyph_index              @ 080f145a fef795fe
     ldr r1, DAT_080f15e0                     @ 080f145e 6049
     .hword 0x468c    @ 080f1460 8c46
     ldrb r2,[r1,#0x8]                        @ 080f1462 0a7a
     lsls r3,r2,#0x1e    @ 080f1464 9307
     lsrs r2,r3,#0x1f    @ 080f1466 da0f
-    ldr r1, DAT_080f15e4                     @ 080f1468 5e49
+    ldr r1, PTR_font_jp_charset_table_080f15e4 @ 080f1468 5e49
     lsls r2,r2,#0x2    @ 080f146a 9200
     adds r1,r2,r1    @ 080f146c 5118
     ldr r5,[r1,#0x0]                         @ 080f146e 0d68
@@ -309571,8 +309571,8 @@ LAB_080f15dc:
     .byte  0x00, 0x00
 DAT_080f15e0:
     .word  0x02006ed0                     @ 080f15e0 d06e0002
-DAT_080f15e4:
-    .word  0x09e5f864                     @ 080f15e4 64f8e509
+PTR_font_jp_charset_table_080f15e4:
+    .word  font_jp_charset_table          @ 080f15e4 64f8e509
 DAT_080f15e8:
     .word  0x09e5f874                     @ 080f15e8 74f8e509
 DAT_080f15ec:
@@ -309917,7 +309917,7 @@ DAT_080f187c:
     .word  0x88888888                     @ 080f187c 88888888
 DAT_080f1880:
     .word  0x77777777                     @ 080f1880 77777777
-FUN_080f1884:
+render_glyph_jp_dual_layer:
     push {r4,r5,r6,r7,lr}                    @ 080f1884 f0b5
     .hword 0x4657    @ 080f1886 5746
     .hword 0x464e    @ 080f1888 4e46
@@ -309931,7 +309931,7 @@ FUN_080f1884:
     lsrs r0,r0,#0x10    @ 080f1898 000c
     lsls r4,r4,#0x10    @ 080f189a 2404
     lsrs r5,r4,#0x10    @ 080f189c 250c
-    bl FUN_080f0188                          @ 080f189e fef773fc
+    bl char_code_to_glyph_index              @ 080f189e fef773fc
     lsrs r4,r4,#0x18    @ 080f18a2 240e
     movs r1,#0x80    @ 080f18a4 8021
     ands r4,r1    @ 080f18a6 0c40
@@ -309954,7 +309954,7 @@ FUN_080f1884:
     ldr r6,[sp,#0x4]                         @ 080f18c8 019e
     adds r6,r6,r3    @ 080f18ca f618
     .hword 0x46b4    @ 080f18cc b446
-    ldr r2, DAT_080f199c                     @ 080f18ce 334a
+    ldr r2, PTR_font_jp_charset_table_080f199c @ 080f18ce 334a
     lsls r1,r1,#0x2    @ 080f18d0 8900
     adds r2,r1,r2    @ 080f18d2 8a18
     ldr r2,[r2,#0x0]                         @ 080f18d4 1268
@@ -310063,11 +310063,11 @@ LAB_080f1984:
     .byte  0x00, 0x00
 DAT_080f1998:
     .word  0x02006ed0                     @ 080f1998 d06e0002
-DAT_080f199c:
-    .word  0x09e5f864                     @ 080f199c 64f8e509
+PTR_font_jp_charset_table_080f199c:
+    .word  font_jp_charset_table          @ 080f199c 64f8e509
 DAT_080f19a0:
     .word  0x09e5f874                     @ 080f19a0 74f8e509
-FUN_080f19a4:
+render_glyph_jp_single_layer:
     push {r4,r5,r6,r7,lr}                    @ 080f19a4 f0b5
     .hword 0x4657    @ 080f19a6 5746
     .hword 0x464e    @ 080f19a8 4e46
@@ -311376,7 +311376,7 @@ LAB_080f2604:
     lsrs r2,r2,#0x16    @ 080f263e 920d
     adds r2,#0x1    @ 080f2640 0132
     adds r0,r5,#0x0    @ 080f2642 281c
-    bl FUN_080f19a4                          @ 080f2644 fff7aef9
+    bl render_glyph_jp_single_layer          @ 080f2644 fff7aef9
 LAB_080f2648:
     ldr r2, DAT_080f2674                     @ 080f2648 0a4a
     movs r0,#0x10    @ 080f264a 1020
@@ -311416,7 +311416,7 @@ LAB_080f267c:
     lsrs r2,r2,#0x16    @ 080f268e 920d
     adds r0,r5,#0x0    @ 080f2690 281c
     .hword 0x4653    @ 080f2692 5346
-    bl FUN_080f19a4                          @ 080f2694 fff786f9
+    bl render_glyph_jp_single_layer          @ 080f2694 fff786f9
 LAB_080f2698:
     ldr r1, DAT_080f2738                     @ 080f2698 2749
     ldrh r6,[r1,#0xc]                        @ 080f269a 8e89
@@ -311733,7 +311733,7 @@ LAB_080f28f6:
     lsrs r2,r2,#0x16    @ 080f292a 920d
     adds r2,#0x1    @ 080f292c 0132
     adds r0,r7,#0x0    @ 080f292e 381c
-    bl FUN_080f1884                          @ 080f2930 fef7a8ff
+    bl render_glyph_jp_dual_layer            @ 080f2930 fef7a8ff
 LAB_080f2934:
     ldr r2, DAT_080f2960                     @ 080f2934 0a4a
     movs r0,#0x10    @ 080f2936 1020
@@ -311777,7 +311777,7 @@ LAB_080f2970:
     lsrs r2,r2,#0x16    @ 080f2982 920d
     adds r0,r7,#0x0    @ 080f2984 381c
     .hword 0x4653    @ 080f2986 5346
-    bl FUN_080f1884                          @ 080f2988 fef77cff
+    bl render_glyph_jp_dual_layer            @ 080f2988 fef77cff
 LAB_080f298c:
     ldr r3, DAT_080f2a08                     @ 080f298c 1e4b
     ldrb r4,[r3,#0xf]                        @ 080f298e dc7b
@@ -312161,7 +312161,7 @@ LAB_080f2c58:
     adds r1,r5,#0x0    @ 080f2c68 291c
     adds r2,r7,#0x0    @ 080f2c6a 3a1c
     adds r3,r6,#0x0    @ 080f2c6c 331c
-    bl FUN_080f1884                          @ 080f2c6e fef709fe
+    bl render_glyph_jp_dual_layer            @ 080f2c6e fef709fe
     subs r5,r5,r0    @ 080f2c72 2d1a
     adds r0,r4,#0x0    @ 080f2c74 201c
     movs r1,#0xa    @ 080f2c76 0a21
@@ -312191,7 +312191,7 @@ LAB_080f2c98:
     adds r1,r5,#0x0    @ 080f2ca6 291c
     adds r2,r7,#0x0    @ 080f2ca8 3a1c
     adds r3,r6,#0x0    @ 080f2caa 331c
-    bl FUN_080f19a4                          @ 080f2cac fef77afe
+    bl render_glyph_jp_single_layer          @ 080f2cac fef77afe
     subs r1,r5,#0x5    @ 080f2cb0 691f
     ldr r0, DAT_080f2cd0                     @ 080f2cb2 0748
     ldrb r0,[r0,#0x8]                        @ 080f2cb4 007a
@@ -312231,7 +312231,7 @@ LAB_080f2cea:
     adds r1,r5,#0x0    @ 080f2cf8 291c
     .hword 0x4642    @ 080f2cfa 4246
     adds r3,r7,#0x0    @ 080f2cfc 3b1c
-    bl FUN_080f19a4                          @ 080f2cfe fef751fe
+    bl render_glyph_jp_single_layer          @ 080f2cfe fef751fe
     subs r1,r5,#0x5    @ 080f2d02 691f
     ldr r0, DAT_080f2d28                     @ 080f2d04 0848
     ldrb r0,[r0,#0x8]                        @ 080f2d06 007a
@@ -349963,8 +349963,8 @@ FUN_0810823c:
     lsls r0,r4,#0x8    @ 08108274 2002
     ldrb r1,[r1,#0x1]                        @ 08108276 4978
     orrs r0,r1    @ 08108278 0843
-    ldr r4, DAT_08108298                     @ 0810827a 074c
-    bl FUN_080f0188                          @ 0810827c e7f784ff
+    ldr r4, PTR_font_jp_sjis_lookup_table_08108298 @ 0810827a 074c
+    bl char_code_to_glyph_index              @ 0810827c e7f784ff
     lsls r0,r0,#0x1    @ 08108280 4000
     adds r0,r0,r4    @ 08108282 0019
     ldrh r5,[r0,#0x0]                        @ 08108284 0588
@@ -349977,8 +349977,8 @@ DAT_08108290:
     .word  0x02000000                     @ 08108290 00000002
 DAT_08108294:
     .word  0x00006c2c                     @ 08108294 2c6c0000
-DAT_08108298:
-    .word  0x09ba1524                     @ 08108298 2415ba09
+PTR_font_jp_sjis_lookup_table_08108298:
+    .word  font_jp_sjis_lookup_table      @ 08108298 2415ba09
 LAB_0810829c:
     lsls r1,r1,#0x1d    @ 0810829c 4907
     lsrs r1,r1,#0x1d    @ 0810829e 490f

@@ -3749,6 +3749,8 @@
 .equ card_142D,                      0x09832594
 .equ card_142E,                      0x098325AA
 .equ card_142F,                      0x098325C0
+.equ font_jp_sjis_lookup_table,      0x09BA1524
+.equ font_jp_sjis_lookup_count,      0x09BA2430
 .equ file_game_strings_en_start,     0x09DC4620
 .equ file_game_strings_start,        0x09DC4620
 .equ file_game_strings_de_start,     0x09DCF471
@@ -3764,6 +3766,7 @@
 .equ deck_id_and_data_array,         0x09E58D0C
 .equ file_opponent_card_values_start, 0x09E58D0E
 .equ file_banlists_start,            0x09E5EF30
+.equ font_jp_charset_table,          0x09E5F864
 .equ file_starter_deck_start,        0x09E5F884
 .equ file_struct_decks_start,        0x09E5FA58
 .equ fs_master_struct,               0x09E61178
