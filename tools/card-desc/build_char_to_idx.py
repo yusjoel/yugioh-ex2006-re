@@ -1,13 +1,15 @@
 """
-扫原始 .s 的 _xx label, 为每个 (UTF-8 char) 统计实际使用的 (hi,lo) → idx,
-取最高频 idx 作为 encoder 的 char_to_idx. 写入 char_to_idx.json.
+仅扫 data/card-descriptions.s 的 _xx/_ja label, 统计每个 (UTF-8 char) 实际使用的 idx,
+取最高频 idx 作为 card-desc encoder 的 char_to_idx. 写入 tools/card-desc/char_to_idx.json.
 
-控制字节 ASCII (@, 4, 5, 7) 不走 codetable, 单独标记为 None.
-重复 codetable entry 中, 选最常用的 idx (其他 idx 即使 char 相同也忽略).
+per-dataset (card-desc / card-names / deck-strings) 各有自己的 char_to_idx, 因为
+同一 ASCII 字符 (如 '@') 在 card-desc 是单字节控制码, 在 card-names 可能是 JA-encoded
+2-byte (idx=42), 编码语义不同.
 """
 import re
 import json
 from collections import Counter, defaultdict
+from pathlib import Path
 
 
 def decode_octal_string(s):
@@ -37,31 +39,57 @@ CT = {int(k): v for k, v in json.loads(
     open('tools/jp-decode/codetable.json', encoding='utf-8').read()
 )['by_idx'].items()}
 
-orig_path = r'C:\Users\yushj\AppData\Local\Temp\orig_card_descs.s'
-txt = open(orig_path, encoding='latin-1').read()
-pat = re.compile(r'card_desc_(\d+)_(xx|en|de|fr|it|es):\s*\n\s*\.ascii\s+"((?:[^"\\]|\\.)*)"')
 
-# 统计每个 char 在 _xx 实际使用的 idx 频率
+def scan_ascii_label_data(path: Path, label_re: re.Pattern):
+    """扫 .s 找 _xx/_ja label 的 .ascii bytes, yield (idx, count)."""
+    if not path.exists():
+        return
+    txt = path.read_text(encoding='latin-1')
+    for m in label_re.finditer(txt):
+        if m.group(1) not in ('xx', 'ja'):
+            continue
+        bs = decode_octal_string(m.group(2))
+        payload = bs.rstrip(b'\x00')
+        i = 0
+        while i + 1 < len(payload):
+            hi, lo = payload[i], payload[i + 1]
+            if hi >= 0xF0:
+                idx = ((hi & 0xF) << 7) | (lo & 0x7F)
+                yield idx
+            i += 2
+
+
+def scan_byte_lines(path: Path):
+    """扫 .s 形如 `.byte 0xXX, 0xXX, ...` 的行 (deck-strings.s 用), yield idx."""
+    if not path.exists():
+        return
+    line_pat = re.compile(r'^\s*\.byte\s+(.*)$', re.MULTILINE)
+    bytehex_pat = re.compile(r'0x([0-9A-Fa-f]{2})')
+    txt = path.read_text(encoding='latin-1')
+    for m in line_pat.finditer(txt):
+        bs = bytes(int(h, 16) for h in bytehex_pat.findall(m.group(1)))
+        i = 0
+        while i + 1 < len(bs):
+            hi, lo = bs[i], bs[i + 1]
+            if hi >= 0xF0:
+                idx = ((hi & 0xF) << 7) | (lo & 0x7F)
+                yield idx
+            i += 2
+
+
+# 统计 char → idx 频率 (仅 card-descriptions.s)
 char_idx_counter = defaultdict(Counter)
-for m in pat.finditer(txt):
-    if m.group(2) != 'xx':
-        continue
-    bs = decode_octal_string(m.group(3))
-    payload = bs.rstrip(b'\x00')
-    i = 0
-    while i + 1 < len(payload):
-        hi, lo = payload[i], payload[i + 1]
-        if hi >= 0xF0:
-            idx = ((hi & 0xF) << 7) | (lo & 0x7F)
-            ch = CT.get(idx)
-            if ch:
-                char_idx_counter[ch][idx] += 1
-            i += 2
-        else:
-            # 单字节控制码 (40 NN 模式), 跳过本对的非对齐 1 字节
-            # 实际上 _xx 中控制码 始终是 40 NN 对齐的 2 字节 (0x40, 0x34/0x35/0x37)
-            # 所以这里 i+=2 跳过整对
-            i += 2
+
+desc_pat = re.compile(r'card_desc_\d+_(xx|ja|en|de|fr|it|es):\s*\n\s*\.ascii\s+"((?:[^"\\]|\\.)*)"')
+for idx in scan_ascii_label_data(Path('data/card-descriptions.s'), desc_pat):
+    ch = CT.get(idx)
+    if ch:
+        char_idx_counter[ch][idx] += 1
+
+# 不做 codetable 兜底: ASCII 字符 ('@', '1', 'a' 等) 在 JA 数据中可能既存在为
+# 单字节 0x40/0x31/0x61 控制码, 也存在为 codetable idx (e.g. F0 AA = idx 42 = '@').
+# 兜底会破坏现有 ASCII pass-through 语义. 仅根据实际观察到的 (hi >= 0xF0) 出现来填.
+# 后果: 若 .txt 编辑加了从未出现的新 JA 字符 → encoder 会显式报错, 须手动补 char_to_idx.
 
 # 取每个 char 最高频 idx
 char_to_idx = {}
@@ -72,12 +100,11 @@ for ch, counts in char_idx_counter.items():
     if len(counts) > 1:
         ambiguous.append((ch, dict(counts)))
 
-print(f'Total distinct chars used in _xx: {len(char_to_idx)}')
-print(f'Chars with multiple idx variants: {len(ambiguous)}')
-for ch, cnts in ambiguous[:20]:
+print(f'Total distinct chars: {len(char_to_idx)}')
+print(f'Chars with multiple idx variants (in actual data): {len(ambiguous)}')
+for ch, cnts in ambiguous[:10]:
     print(f'  {ch!r}: {cnts}')
 
 with open('tools/card-desc/char_to_idx.json', 'w', encoding='utf-8') as f:
-    # 写成 idx → char 形式 (JSON key 必须 string, 这里用 char 作 key)
     json.dump({ch: idx for ch, idx in char_to_idx.items()}, f, ensure_ascii=False, indent=2)
 print('\nwrote tools/card-desc/char_to_idx.json')

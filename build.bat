@@ -1,8 +1,12 @@
 @echo off
 if not exist output mkdir output
 
-@rem 从 6 lang UTF-8 源生成 data/card-descriptions.s
+@rem 从 UTF-8 源生成 data/*.s (text/<dataset>/ → encoder → data/<dataset>.s)
 python tools\card-desc\encode_txt_to_s.py
+if errorlevel 1 goto :err
+python tools\card-names\encode_txt_to_s.py
+if errorlevel 1 goto :err
+python tools\deck-strings\encode_txt_to_s.py
 if errorlevel 1 goto :err
 
 as.exe -mcpu=arm7tdmi -o output\rom.o asm\rom.s

@@ -1,0 +1,100 @@
+@ text/deck-strings/ja.txt — 32 entries (SD: 7, OPP: 25)
+@ Format: =KIND_NN= header, then JA name on next line.
+@ Trailing \0 padding handled by encoder; do NOT add manually.
+
+=SD_00= pad=2
+スターターデッキ
+
+=SD_01= pad=2
+ドラゴンの力
+
+=SD_02= pad=2
+アンデットの脅威
+
+=SD_03= pad=2
+灼熱の大地
+
+=SD_04= pad=2
+海竜神の怒り
+
+=SD_05= pad=2
+戦士の伝説
+
+=SD_06= pad=1
+魔法使いの裁き
+
+=OPP_00= pad=2
+クリボー8フレンズ
+
+=OPP_01= pad=2
+逆境モンスターズ
+
+=OPP_02= pad=2
+ワイトキングダム
+
+=OPP_03= pad=2
+シャイニングパワー
+
+=OPP_04= pad=2
+魔法の国のお友達
+
+=OPP_05= pad=2
+フルチャージデッキ
+
+=OPP_06= pad=2
+おジャマジャマデッキ
+
+=OPP_07= pad=2
+魔王のR宴デッキ
+
+=OPP_08= pad=2
+カエル注意報デッキ
+
+=OPP_09= pad=2
+生命の源デッキ
+
+=OPP_10= pad=2
+竜族の誇り
+
+=OPP_11= pad=2
+蘇りし者たち
+
+=OPP_12= pad=2
+迫りくる炎
+
+=OPP_13= pad=2
+大いなる大洋
+
+=OPP_14= pad=2
+宇宙の彼方へ
+
+=OPP_15= pad=2
+歷戦の勇者たち
+
+=OPP_16= pad=2
+魔導の継承者
+
+=OPP_17= pad=2
+堅牢なる力
+
+=OPP_18= pad=2
+暗黒界の理
+
+=OPP_19= pad=2
+摩天楼のヒーロー
+
+=OPP_20= pad=2
+魔皇降臨
+
+=OPP_21= pad=2
+燃えさかる黒き炎
+
+=OPP_22= pad=2
+ビッグガジェット！
+
+=OPP_23= pad=2
+鳳凰の羽ばたき
+
+=OPP_24= pad=1
+電脳神龍
+

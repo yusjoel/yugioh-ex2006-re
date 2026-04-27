@@ -1,0 +1,6166 @@
+@ text/card-names/it.txt — 2054 entries
+@ Format: =CID= header (4-digit), then content lines.
+@ Trailing \0 padding handled by encoder; do NOT add manually.
+
+=0000=
+
+
+=0001=
+Drago Bianco Occhi Blu
+
+=0005=
+Elfo Mistico
+
+=0006=
+Gigante Hitotsu-Me
+
+=0007=
+Cucciolo di Drago
+
+=0008=
+Ryu-Kishin
+
+=0009=
+Demone Selvaggio
+
+=0010=
+Drago Alato #1
+
+=0011=
+Uomo Fungo
+
+=0012=
+Drago Infuocato della Terra Nera
+
+=0013=
+Tyhone Alato
+
+=0014=
+Spadaccino di Fuoco
+
+=0016=
+Stregone del Tempo
+
+=0017=
+Gamba Dx del Proibito
+
+=0018=
+Gamba Sx del Proibito
+
+=0019=
+Braccio Dx del Proibito
+
+=0020=
+Braccio Sx del Proibito
+
+=0021=
+Exodia il Proibito
+
+=0022=
+Teschio Evocato
+
+=0025=
+Verme Bestiale
+
+=0026=
+Servitore del Teschio
+
+=0027=
+Demone Cornuto
+
+=0028=
+Ascia da Guerra
+
+=0029=
+Castoro Guerriero
+
+=0030=
+Orco di Pietra #1
+
+=0031=
+Guerriero dei Monti
+
+=0032=
+Zombie Guerriero
+
+=0033=
+Drago Koumori
+
+=0034=
+Rex dalle Due Teste
+
+=0035=
+Il Giudicatore
+
+=0036=
+Saggi, Clown Oscuro
+
+=0037=
+Mago Nero
+
+=0040=
+Chioma di Serpenti
+
+=0041=
+Gaia il Dragone
+
+=0042=
+Gaia il Cavaliere
+
+=0044=
+Anatema del Drago
+
+=0045=
+Guardiano Celtico
+
+=0047=
+Mago Senza Volto Illusionista
+
+=0048=
+Guerriero Karbonala
+
+=0049=
+Bambola Mortale
+
+=0050=
+Oscillo Eroe #2
+
+=0051=
+Griffore
+
+=0052=
+Torike
+
+=0053=
+Sangan
+
+=0054=
+Grande Insetto
+
+=0055=
+Insetto della Foresta
+
+=0056=
+Lucertola Corazzata
+
+=0057=
+Pungiglione Assassino
+
+=0058=
+Gokibore
+
+=0059=
+Pulce Gigante
+
+=0060=
+Larva di Falena
+
+=0061=
+Grande Falena
+
+=0062=
+Kuriboh
+
+=0065=
+Mammuth delle Tombe
+
+=0066=
+Mega Squalo Bianco
+
+=0067=
+Lupo
+
+=0068=
+Lady Arpia
+
+=0069=
+Sorelle Arpie
+
+=0070=
+Ascia Tigre
+
+=0072=
+Zanna d'Argento
+
+=0073=
+Kojikocy
+
+=0074=
+Grande Falena Perfetta
+
+=0075=
+Drago Millenario
+
+=0077=
+Kraken il Demone
+
+=0078=
+Medusa
+
+=0079=
+Bozzolo dell'Evoluzione
+
+=0080=
+Soldato di Pietra
+
+=0081=
+Pianta Mangia-Uomini
+
+=0082=
+Kokkodrillus
+
+=0083=
+Il Soffocatore
+
+=0084=
+Predone d'Ascia
+
+=0085=
+Megazowler Spinoso
+
+=0086=
+Urabysauro
+
+=0087=
+Drago Strisciante #2
+
+=0088=
+Drago Nero Occhi Rossi
+
+=0092=
+Castello delle Illusioni Oscure
+
+=0093=
+Mieti-Carte
+
+=0094=
+Re di Yamimakai
+
+=0095=
+Barox
+
+=0096=
+Guardiano Metallico
+
+=0097=
+Tartaruga Catapulta
+
+=0098=
+Gyakutenno Megami
+
+=0099=
+Centauro Mistico
+
+=0100=
+Cavaliere Rabbioso
+
+=0101=
+Clown Stupido
+
+=0102=
+Zombie Corazzato
+
+=0103=
+Drago Zombie
+
+=0104=
+Zombie Clown
+
+=0105=
+Re dei Fantasmi
+
+=0106=
+Guerriero da Battaglia
+
+=0107=
+Ali di Fiamma Malvagia
+
+=0108=
+Maschera dell'Oscurità
+
+=0109=
+Specchio Trasformatore
+
+=0110=
+Sipario degli Oscuri
+
+=0111=
+Kageningen
+
+=0112=
+Cimitero Rigenerante
+
+=0113=
+Dea dal Terzo Occhio
+
+=0114=
+Eroe dell'Oriente
+
+=0115=
+Mangiatore di Vita
+
+=0116=
+La Bestia Grigia
+
+=0117=
+Bianco Cappello Magico
+
+=0118=
+Kamionwizard
+
+=0119=
+Scorpione dell'Incubo
+
+=0120=
+Spirito dei Libri
+
+=0121=
+Aiutante dell'Ombra
+
+=0122=
+La Prova dell'Incubo
+
+=0123=
+Clown del Sogno
+
+=0124=
+Leone Dormiente
+
+=0125=
+Drago Yamatano
+
+=0126=
+Uccello della Fede
+
+=0127=
+Nemuriko
+
+=0128=
+Guardiano Meteorologico
+
+=0129=
+La Tredicesima Tomba
+
+=0130=
+Cavaliere di Fuoco
+
+=0131=
+Catena Mistica
+
+=0132=
+Mano del Demone
+
+=0133=
+Spettro Oscuro
+
+=0134=
+Statua del Drago
+
+=0135=
+Zombie Argenteo Occhi Blu
+
+=0136=
+Maestro dei Rospi
+
+=0137=
+Chiocciola Armata
+
+=0138=
+Signore delle Fiamme
+
+=0139=
+Necrolancer, Signore del Tempo
+
+=0140=
+Djinn, Guardia del Vento
+
+=0141=
+Il Seducente Ladro Fantasma
+
+=0142=
+Tempio dei Teschi
+
+=0143=
+Uovo Mostro
+
+=0144=
+Ombra dell'Oscurità
+
+=0145=
+Signore della Lampada
+
+=0146=
+Rhaimundos Spada Rossa
+
+=0147=
+Ombra Rossa Sfuggente
+
+=0148=
+Dokuroizo Mieti-Anime
+
+=0149=
+Mietitore di Fuoco
+
+=0150=
+Uccello-Larva
+
+=0151=
+Armatura Vivente
+
+=0152=
+Erba di Fuoco
+
+=0153=
+Mangiatore di Uomini
+
+=0154=
+Rostro Scavatore
+
+=0155=
+Guerriero-M #1
+
+=0156=
+Guerriero-M #2
+
+=0157=
+Lisark
+
+=0158=
+Signore di Zemia
+
+=0159=
+La Mano del Giudizio
+
+=0160=
+Burattinaio Misterioso
+
+=0161=
+Drago del Fuoco Nero
+
+=0162=
+Nero Re degli Abissi
+
+=0163=
+Spirito dell'Arpa
+
+=0164=
+Armaill delle Lame
+
+=0165=
+Prigioniero Oscuro
+
+=0166=
+Hurricail
+
+=0167=
+Occhio di Fuoco
+
+=0168=
+Mostraruga
+
+=0169=
+Sferra-Artigli
+
+=0170=
+Dewan il Fantasma
+
+=0171=
+Arlownay
+
+=0172=
+Ombra Oscura
+
+=0173=
+Clown Mascherato
+
+=0174=
+Ciondolo fortunato
+
+=0175=
+Genin
+
+=0176=
+Occhio Corazzato
+
+=0177=
+Riflesso Evocatore #2
+
+=0178=
+Deeg il Portale
+
+=0179=
+Synchar Bifronte
+
+=0180=
+Fusionista
+
+=0181=
+Akakieisu
+
+=0182=
+Nuvola LaLa Li-oon
+
+=0183=
+Tartaruga-Tigre
+
+=0184=
+Terra il Terribile
+
+=0185=
+Doron il Doppio
+
+=0186=
+Arma Knight
+
+=0187=
+Amante Felice
+
+=0188=
+Cavaliere Pinguino
+
+=0189=
+Piccolo Drago
+
+=0190=
+Panda Scatenato
+
+=0191=
+Marmotta Arcidemone della Sventura
+
+=0192=
+Fantasma spettrale
+
+=0193=
+Dorover l'Avvelenatore
+
+=0194=
+Lunghi Arti #1
+
+=0195=
+Uccello Buffo
+
+=0196=
+Piccolo Angelo
+
+=0197=
+Mannaia Alata
+
+=0198=
+Spirito Hinotama
+
+=0199=
+Kaminarikozou
+
+=0200=
+Meotoko
+
+=0201=
+Mago delle Acque
+
+=0202=
+Kagemusha della Fiamma Blu
+
+=0203=
+Fantasma di Fuoco
+
+=0204=
+Dryad
+
+=0205=
+Drago Teschio Nero
+
+=0206=
+Elettrosauro Doppiafauce
+
+=0207=
+Isolamento
+
+=0208=
+Stregone Mascherato
+
+=0209=
+Kumootoko
+
+=0210=
+Demone di Mezzanotte
+
+=0211=
+Maestro di Trappola
+
+=0212=
+Spada Demoniaca
+
+=0213=
+Teschio in Agguato
+
+=0214=
+Hitodenchak
+
+=0215=
+Resti Lignei
+
+=0216=
+Clessidra della Vita
+
+=0217=
+Pesce Raro
+
+=0218=
+Clown di Legno
+
+=0219=
+Cannone Madjinn
+
+=0220=
+Titano del Terrore
+
+=0221=
+Cacciatrice di Teste
+
+=0222=
+Guardia del Labirinto
+
+=0223=
+Albero Yashinoki
+
+=0224=
+Vishwar Randi
+
+=0225=
+Demone Drdek
+
+=0226=
+Assalitore Oscuro
+
+=0227=
+Candela del Destino
+
+=0228=
+Elemento Acquatico
+
+=0229=
+Dissolviroccia
+
+=0230=
+Pipistrello Meda
+
+=0231=
+Cacciatore di Anime
+
+=0232=
+Acqua di Radice
+
+=0233=
+Maestro ed Esperto
+
+=0234=
+Trasforma-Acque
+
+=0235=
+Hyo il Guerriero
+
+=0236=
+Sirena Incantatrice
+
+=0237=
+Nekogal #1
+
+=0238=
+Fata Stregata
+
+=0239=
+Bestia Embrionale
+
+=0240=
+Corazzatopo
+
+=0241=
+Guerriero Dimensionale
+
+=0242=
+Armadillo di Pietra
+
+=0243=
+Re delle bestie delle Paludi
+
+=0244=
+Stregone degli Antichi
+
+=0245=
+Elzaim, Regina Lunare
+
+=0246=
+Specchio Malvagio
+
+=0247=
+Piccolo Spadaccino di Aile
+
+=0248=
+Orco di Pietra #2
+
+=0249=
+Elfo-Uovo Alato
+
+=0250=
+Furioso Re dei Mari
+
+=0251=
+Principessa di Tsurugi
+
+=0252=
+Guerriero Sconosciuto
+
+=0253=
+Adepto dei Segreti
+
+=0254=
+Versago il Distruttore
+
+=0255=
+Wetha
+
+=0256=
+Raggi Megirus
+
+=0257=
+Mavelo
+
+=0258=
+Antico Albero Illuminato
+
+=0259=
+Re Verde degli Spettri
+
+=0260=
+Bugroth di Terra
+
+=0261=
+Raggio e Temperatura
+
+=0262=
+Uovo di Gorgone
+
+=0263=
+Piccola Falena
+
+=0264=
+Re Nebbia
+
+=0265=
+Protettrice del Trono
+
+=0266=
+Clown Mistico
+
+=0267=
+Pecora Mistica #2
+
+=0268=
+Macchina Holograh
+
+=0269=
+Tao il Cantore
+
+=0270=
+Serpente Predone
+
+=0271=
+Orco delle Ombre Nere
+
+=0272=
+Messo della Luna
+
+=0273=
+Fireyarou
+
+=0274=
+Psi-Kappa
+
+=0275=
+Masaki lo Spadaccino Leggendario
+
+=0276=
+Dragonessa a Cavallo
+
+=0277=
+Bio-Plant
+
+=0278=
+Drago con Scudo
+
+=0279=
+Cyber-Soldato del Mondo Oscuro
+
+=0280=
+Drago Malvagio Bifronte
+
+=0281=
+Fanciulla del Suono
+
+=0282=
+Uccello Kurama
+
+=0283=
+Ascia di Distruzione
+
+=0284=
+Insetto Laser Corazzato
+
+=0285=
+Pendente Nero
+
+=0286=
+Corno di Luce
+
+=0287=
+Corno dell'Unicorno
+
+=0288=
+Egotista Elegante
+
+=0289=
+Blocca Difesa
+
+=0290=
+Nuzzler Malevolo
+
+=0291=
+Cattura-Draghi
+
+=0292=
+Foresta
+
+=0293=
+Lande Desolate
+
+=0294=
+Montagna
+
+=0295=
+Sogen
+
+=0296=
+Umi
+
+=0297=
+Yami
+
+=0298=
+Buco Nero
+
+=0299=
+Raigeki
+
+=0300=
+Curry di Mooyan
+
+=0301=
+Pozione Rossa
+
+=0302=
+Cura Segreta Goblin
+
+=0303=
+Anima del Puro
+
+=0304=
+Dian Keto il Curatore
+
+=0305=
+Scintille
+
+=0306=
+Ookazi
+
+=0307=
+Fuoco Tremendo
+
+=0308=
+Spada Rivelatrice
+
+=0309=
+Cerchio Incantatore
+
+=0310=
+Luce Trafiggi-Tenebre
+
+=0311=
+Yaranzo
+
+=0312=
+Kanan, Signora di Spada
+
+=0313=
+Takriminos
+
+=0314=
+Animale Impagliato
+
+=0315=
+Super Leone da Guerra
+
+=0316=
+Zombie dalle Tre Gambe
+
+=0317=
+Zera il Mostro
+
+=0318=
+Pinguino Volante
+
+=0319=
+Scudo del Millennio
+
+=0321=
+Dono della Fata
+
+=0322=
+Glorioso Soldato Nero
+
+=0323=
+Specchio del Demonio
+
+=0324=
+Mura Labirintiche
+
+=0325=
+Jirai Gumo
+
+=0326=
+Demone Fantasma
+
+=0327=
+Muro-Ombra
+
+=0328=
+Carrarmato-Labirinto
+
+=0329=
+Sanga del Tuono
+
+=0330=
+Kazejin
+
+=0331=
+Suijin
+
+=0332=
+Guardiano del Cancello
+
+=0333=
+Ryu-Kishin Potenziato
+
+=0334=
+Spada in Agguato
+
+=0335=
+Genio della Lampada
+
+=0337=
+Drago Occhi Blu Finale
+
+=0339=
+Alligatore Toon
+
+=0340=
+Drago-Pappagallo
+
+=0341=
+Coniglio Oscuro
+
+=0342=
+Bickuribox
+
+=0343=
+Draghetto delle Arpie
+
+=0344=
+Pendolo della Tortura
+
+=0346=
+Giltia il Cavaliere dei D.
+
+=0347=
+Ragno Lancia-Missili
+
+=0349=
+Zoa il Mostro
+
+=0350=
+Metalzoa
+
+=0351=
+Ocubeam
+
+=0352=
+Occhio Mostruoso
+
+=0353=
+Yaiba il Robot
+
+=0354=
+Re Macchina
+
+=0355=
+Drago Metallico
+
+=0356=
+Lupo Tecnologico
+
+=0357=
+Pale Distruttrici
+
+=0358=
+Meccacciatore
+
+=0359=
+L'Ostacolatore
+
+=0360=
+Golgoil
+
+=0361=
+Cyber-Stein
+
+=0362=
+Cyber Comandante
+
+=0363=
+Jinzo #7
+
+=0364=
+Drago del Tuono
+
+=0365=
+Kaiser-Drago
+
+=0366=
+Mago della Fede
+
+=0367=
+Dea dei Capricci
+
+=0368=
+Mago delle Acque
+
+=0369=
+Acqua di Ghiaccio
+
+=0370=
+Fata del Drago di Mare
+
+=0371=
+Elfo Antico
+
+=0372=
+Ragazza d'Acqua
+
+=0373=
+Squalo degli Abissi
+
+=0374=
+Abitatore degli Abissi
+
+=0375=
+Pesce dei 7 Colori
+
+=0376=
+Guardiano del Mare
+
+=0377=
+Serpente d'Acqua
+
+=0378=
+Serpente Marino Gigante
+
+=0379=
+Vendicatore Kappa
+
+=0380=
+Kanikabuto
+
+=0381=
+Zarigun
+
+=0382=
+Golem del Millennio
+
+=0383=
+Golem Distruttore
+
+=0384=
+Barile di Roccia
+
+=0385=
+Guerriero Minomushi
+
+=0386=
+Fantasma di Pietra
+
+=0387=
+Attacco Kaminari
+
+=0388=
+Elettro-Bestia
+
+=0389=
+Pinguino Fulminante
+
+=0390=
+Immortale del Tuono
+
+=0391=
+Serpente Elettrico
+
+=0392=
+Aquila Punita
+
+=0393=
+Uccello Teschio Rosso
+
+=0394=
+Uccello Rosso del Sole
+
+=0395=
+Ninja Armato
+
+=0396=
+Fatasma Magico
+
+=0397=
+Predatore di Anime
+
+=0398=
+Passero Vermiglio
+
+=0399=
+Kamen del Mare
+
+=0400=
+Serpente Sinistro
+
+=0401=
+Ganigumo
+
+=0402=
+Alinsection
+
+=0403=
+Soldati-Insetto del Cielo
+
+=0404=
+Cavaliere-Scarafaggio
+
+=0405=
+Ladruncolo
+
+=0406=
+Pragtical
+
+=0407=
+Ameba
+
+=0408=
+Korogashi
+
+=0409=
+Mago Boo Koo
+
+=0410=
+Fiore di Lupo
+
+=0411=
+Fiore dell'Arcobaleno
+
+=0412=
+Giglio a Barile
+
+=0413=
+Hoshiningen
+
+=0414=
+Maha Vailo
+
+=0415=
+Re Musicista
+
+=0416=
+Wilmee
+
+=0417=
+Insegui-Draghi
+
+=0418=
+Insetto Mangia-Uomini
+
+=0419=
+Guerriero D. Umano
+
+=0420=
+Procione-Tartaruga
+
+=0421=
+Mostro Prisman
+
+=0422=
+Pesce Matto
+
+=0423=
+Bracchio-raidus
+
+=0424=
+Fiore-Che-Ride
+
+=0425=
+Soldato a Fagiolo
+
+=0426=
+Soldato-Cannone
+
+=0427=
+Guardiano del Trono
+
+=0428=
+Scizzar il Coraggioso
+
+=0429=
+La Statua dell'Isola dell'Est
+
+=0430=
+Muka Muka
+
+=0431=
+Tartaruga di Pietra
+
+=0432=
+Kraken di Fuoco
+
+=0433=
+Uccello-Tartaruga
+
+=0434=
+Uccello-Teschio
+
+=0435=
+Uccello Mostruoso
+
+=0436=
+Il Macellaio da Bistrò
+
+=0437=
+Stellone
+
+=0438=
+Milus il Raggiante
+
+=0439=
+Cerbero Infuocato
+
+=0440=
+Eldeen
+
+=0441=
+Sabbia Mistica
+
+=0442=
+Elfi Gemelli
+
+=0444=
+Minar
+
+=0445=
+Kamakiriman
+
+=0446=
+Mechaleonte
+
+=0447=
+Mega-Sfera del Tuono
+
+=0448=
+Niwatori
+
+=0449=
+Squalo Corrosivo
+
+=0450=
+Skelengel
+
+=0451=
+Hane-Hane
+
+=0452=
+Tongyo
+
+=0453=
+Cannone Dharma
+
+=0454=
+Skelgon
+
+=0455=
+Guerriero Wow
+
+=0456=
+Griggle
+
+=0457=
+Rana la Poltiglia
+
+=0458=
+Behegon
+
+=0459=
+Elfo Oscuro
+
+=0460=
+Dragone Alato , Custode della Fortezza #2
+
+=0461=
+Dannato Errante
+
+=0462=
+Orco d'Acciaio #1
+
+=0463=
+Oscillo Eroe
+
+=0464=
+Invasore Dimensionale
+
+=0465=
+Drago Minore
+
+=0466=
+Verme Pungiglione
+
+=0467=
+Fantasma Triste
+
+=0468=
+Grande di Goldfine
+
+=0469=
+Squalo Mangia-Uomini
+
+=0470=
+Yormungarde
+
+=0471=
+Aculei degli Abissi
+
+=0472=
+Antrosauro
+
+=0473=
+Lucertola-Vampiro
+
+=0474=
+Drago Trakadon
+
+=0475=
+Drago Re della Giungla
+
+=0476=
+Piccolo D.
+
+=0477=
+Strega della Foresta Nera
+
+=0478=
+Scorpione Gigante
+
+=0479=
+Fiore degli Abissi
+
+=0480=
+Uccello Takuhee
+
+=0481=
+Catena Amalgamante
+
+=0482=
+Mecha-Chiocciola
+
+=0483=
+Kappa Verde
+
+=0484=
+Larva Mon
+
+=0485=
+Vaso Vivente
+
+=0486=
+Pianta Tentacolare
+
+=0487=
+Serpente con Rostro
+
+=0488=
+Urna di Mutazione
+
+=0489=
+Fata Musa-A
+
+=0490=
+Spettro di Dunn
+
+=0491=
+Riflesso Evocatore #1
+
+=0492=
+Demone Affamato
+
+=0493=
+Bestia Pallida
+
+=0494=
+Piccola Chimera
+
+=0495=
+Pioggia Violenta
+
+=0496=
+Fata Guerriera #2
+
+=0497=
+Fata della Tenerezza
+
+=0498=
+Soldato Pinguino
+
+=0499=
+Drago-Fata
+
+=0500=
+Atroce Marmotta Obesa
+
+=0501=
+Bestia Liquida
+
+=0502=
+Frustacode Gemelle #2
+
+=0503=
+Il Grande Bill
+
+=0504=
+Amicizia Splendente
+
+=0505=
+Volama
+
+=0506=
+Esploratore-Ombra di Hiro
+
+=0507=
+Signora della Fede
+
+=0508=
+Drago di Tuono Bifronte
+
+=0509=
+Stella Corazzata
+
+=0510=
+Bestia Marina
+
+=0511=
+Guerriero della Tradizione
+
+=0512=
+Snakeyashi
+
+=0513=
+Cosa Giacente nel Fango
+
+=0514=
+Gyojin della Marea
+
+=0515=
+Fata della Fontana
+
+=0516=
+Amazzone dei Mari
+
+=0517=
+Nekogal #2
+
+=0518=
+Apprendista Strega
+
+=0519=
+Ratto Corazzato
+
+=0520=
+Antico Guerriero Lucertola
+
+=0521=
+Ragazza della Luna
+
+=0522=
+Lucertola Notturna
+
+=0523=
+Corona dalle Ali Blu
+
+=0524=
+Bugroth Anfibio
+
+=0525=
+Acido Strisciante
+
+=0526=
+Invasore del Trono
+
+=0527=
+Pecora Mistica #1
+
+=0528=
+Mago del Disco
+
+=0529=
+Vipera di Fuoco
+
+=0530=
+Guardia Reale
+
+=0531=
+Poltiglia Repellente
+
+=0532=
+Corvo Coda-di-Frusta
+
+=0533=
+Kunai con Catena
+
+=0535=
+Labirinto Magico
+
+=0536=
+Salamandra
+
+=0537=
+Riposo Eterno
+
+=0538=
+Megamorph
+
+=0539=
+Metalmorph
+
+=0541=
+Carta Schiaccia-Tutto
+
+=0543=
+Castello Splendente
+
+=0544=
+Magia Ombra
+
+=0545=
+Rito della Gloria Nera
+
+=0546=
+Rito di Zera
+
+=0547=
+Spolverino dell'Arpia
+
+=0549=
+Rito del Leone Guerriero
+
+=0550=
+Rito dello Specchio
+
+=0551=
+Inizio delle Danze
+
+=0552=
+Ricetta dell'Hamburger
+
+=0553=
+Preghiera di Novox
+
+=0554=
+Casa del Nastro Adesivo
+
+=0555=
+Trappola dell'Acido
+
+=0557=
+Rovine Diffuse
+
+=0559=
+Brutta Reazione a Simochi
+
+=0560=
+Inverti Trappola
+
+=0561=
+Giuramento della Tartaruga
+
+=0562=
+Resurrezione di Chakra
+
+=0563=
+Patto dello Scarabeo-Lancia
+
+=0564=
+Giuramento Spada di Garma
+
+=0565=
+Risveglio di Dokurorider
+
+=0566=
+Patto della Fortezza-Balena
+
+=0567=
+Prestazione della Spada
+
+=0568=
+Hamburger Affamato
+
+=0569=
+Sengenjin
+
+=0570=
+Teschio Guardiano
+
+=0571=
+Drago Tricorno
+
+=0572=
+Drago Serpente Notturno
+
+=0573=
+Regina del Cosmo
+
+=0574=
+Chakra
+
+=0575=
+Tartaruga-Granchio
+
+=0576=
+Mikazukinoyaiba
+
+=0577=
+Drago Meteora
+
+=0578=
+Drago Nero Meteora
+
+=0579=
+Pegaso Ali Infuocate
+
+=0580=
+Spada di Garma
+
+=0581=
+Scarabeo-Lancia
+
+=0582=
+Fortezza-Balena
+
+=0583=
+Dokurorider
+
+=0584=
+Rito Magia Oscura
+
+=0585=
+Mago del Caos Nero
+
+=0586=
+Slot Machine
+
+=0587=
+Ragazza Arciere
+
+=0588=
+Ryu-Ran
+
+=0589=
+Manga Ryu-Ran
+
+=0590=
+Sirena Toon
+
+=0591=
+Teschio Evocato Toon
+
+=0592=
+Abbandono
+
+=0593=
+Idolo dai 1000 Occhi
+
+=0594=
+Limite dei 1000 Occhi
+
+=0595=
+Orco d'Acciaio #2
+
+=0596=
+Sfera di Distruzione
+
+=0597=
+Hyozanryu
+
+=0598=
+Guerriero Magnetico Alfa
+
+=0599=
+Signore di D.
+
+=0600=
+Drago Metallico Occhi Rossi
+
+=0602=
+Drago Revolver
+
+=0603=
+Hannibal il Necromante
+
+=0604=
+Guerriero-Pantera
+
+=0606=
+Geedo dalle Tre Teste
+
+=0607=
+Gazelle, Re delle Bestie Mitiche
+
+=0608=
+Statua di Pietra degli Aztechi
+
+=0609=
+Berfomet
+
+=0610=
+Chimera Volante
+
+=0611=
+Golem-Ingranaggio, la Fortezza Movente
+
+=0612=
+Jinzo
+
+=0613=
+Spadaccino di Landstar
+
+=0614=
+Predone Cibernetico
+
+=0615=
+Demone Megacyber
+
+=0616=
+Riflettore
+
+=0617=
+Guerriero Magnetico Beta
+
+=0618=
+Il Guardiano Grande Scudo
+
+=0620=
+Ragazza del Mago Nero
+
+=0623=
+Spada dell'Alligatore
+
+=0624=
+Insetto Regina
+
+=0625=
+Insetto Parassita
+
+=0626=
+Coccinella dal Dorso a Teschio
+
+=0627=
+Piccola-Guardialata
+
+=0628=
+Cavalletta Pungente
+
+=0629=
+Drago Toon Occhi Blu
+
+=0630=
+Cacciatore di Spada
+
+=0631=
+Insetto-Trapano
+
+=0632=
+Guerriero degli Abissi
+
+=0633=
+Cannone Satellite
+
+=0634=
+L'Ultimo Guerriero da un Altro Pianeta
+
+=0635=
+Dunames Strega Oscura
+
+=0636=
+Elefante Garnecia
+
+=0637=
+Shogun Difesa Totale
+
+=0638=
+Bestia di Talwar
+
+=0639=
+Cyber-Alligatech
+
+=0640=
+Guerriero Magnetico Gamma
+
+=0641=
+Macchina del Tempo
+
+=0642=
+Il Copiatore
+
+=0643=
+Mondo Toon
+
+=0645=
+L'Occhio della Gorgone
+
+=0646=
+Rito Illusione Nera
+
+=0647=
+Controllo della Mente
+
+=0648=
+Annulla Attacco
+
+=0649=
+Moltiplicatore
+
+=0650=
+Spada Forza di Luce
+
+=0651=
+Flauto Evoca-Draghi
+
+=0652=
+Scudo e Spada
+
+=0653=
+Carità Graziosa
+
+=0654=
+Distruzione a Catena
+
+=0655=
+Controllo Magnetico
+
+=0656=
+Dadi Graziosi
+
+=0657=
+Dadi del Teschio
+
+=0658=
+Controlla Mente
+
+=0659=
+Capro Espiatorio
+
+=0660=
+Amplificatore
+
+=0661=
+Distruggi-Carte
+
+=0662=
+Tragedia
+
+=0663=
+Ectoplasmer
+
+=0664=
+Sipario Magico Nero
+
+=0665=
+Barriera per Insetti
+
+=0666=
+Scudo-Braccio Magico
+
+=0667=
+Spaccatura
+
+=0668=
+Buco Trappola
+
+=0669=
+Polimerizzazione
+
+=0670=
+Rimuovi Trappola
+
+=0671=
+Duplice Attacco
+
+=0672=
+Mostro Resuscitato
+
+=0673=
+Annulla Carta Magia
+
+=0674=
+Anfora dell'Avidità
+
+=0675=
+Spirito Scava-Tombe
+
+=0676=
+Rinforzi
+
+=0677=
+Mura del Castello
+
+=0678=
+Ultima Offerta
+
+=0679=
+Tributo al Dannato
+
+=0680=
+Rilascio delle Anime
+
+=0681=
+La Bara Ridente
+
+=0682=
+Cambiare Idea
+
+=0683=
+Giudizio Solenne
+
+=0684=
+Disturbo Magico
+
+=0685=
+I Sette Attrezzi del Bandito
+
+=0686=
+Corno del Paradiso
+
+=0687=
+L'hai Voluto tu!
+
+=0688=
+Decreto Reale
+
+=0689=
+Polimerizzazione
+
+=0690=
+Spina Magica
+
+=0691=
+Rivoluzione Restructer
+
+=0692=
+Saggio delle Fusioni
+
+=0693=
+Spada Vendicatrice
+
+=0694=
+Blocca-Attacco
+
+=0695=
+La Fanciulla Infelice
+
+=0696=
+Goblin Ladro
+
+=0697=
+Infezione di Germi
+
+=0698=
+Muro Illusorio
+
+=0699=
+Neo, Guerriero Magico
+
+=0700=
+Barone Malaspada
+
+=0701=
+Forziere Mangia-Uomini
+
+=0702=
+Stregone dei Dannati
+
+=0703=
+Ultimo Desiderio
+
+=0704=
+Waboku
+
+=0705=
+Forza Riflessa
+
+=0706=
+Anello del Magnetismo
+
+=0707=
+Dividi la Sofferenza
+
+=0708=
+Stim-Pack
+
+=0709=
+Tempesta Potente
+
+=0710=
+Servo del Custode di Tombe
+
+=0711=
+Riccastro Goblin
+
+=0712=
+Pedaggio
+
+=0713=
+Destino Finale
+
+=0714=
+Strappa Possesso
+
+=0715=
+Coro del Santuario
+
+=0716=
+Confisca
+
+=0717=
+Due di Meno
+
+=0718=
+Specchio Mano di Fata
+
+=0719=
+Il Sarto Incostante
+
+=0720=
+Corsa Avventata
+
+=0721=
+Guardiano Affidabile
+
+=0722=
+La Sentinella Potente
+
+=0723=
+Catena di Energia
+
+=0724=
+Tifone Spaziale Mistico
+
+=0725=
+Ritorno Totale
+
+=0726=
+Scelta Dolorosa
+
+=0727=
+Zanna del Serpente
+
+=0728=
+Cyber Giara
+
+=0729=
+Epuratore della Luce
+
+=0730=
+Ratto Gigante
+
+=0731=
+Senju dalle 1000 Mani
+
+=0732=
+Tartaruga UFO
+
+=0733=
+Assalitore Lampo
+
+=0734=
+Karate Man
+
+=0735=
+Germe Gigante
+
+=0736=
+L'Agile Momonga
+
+=0737=
+Lancia Demente
+
+=0738=
+Angelo Splendente
+
+=0739=
+Madre Grizzly
+
+=0740=
+Kamakiri Volante #1
+
+=0741=
+Campana Cerimoniale
+
+=0742=
+Uccello Sonico
+
+=0743=
+Pomodoro Mistico
+
+=0744=
+Kotodama
+
+=0745=
+Potere di Gaia
+
+=0746=
+Umiiruka
+
+=0747=
+Distro-Fusione
+
+=0748=
+Corrente Ascendente
+
+=0749=
+Scintilla Luminosa
+
+=0750=
+Zona Mistica del Plasma
+
+=0751=
+Messaggero di Pace
+
+=0752=
+Michizure
+
+=0753=
+Raffica di Vento
+
+=0754=
+Neve Sferzante
+
+=0755=
+Guaritore Divino
+
+=0756=
+Trappola Appropriata
+
+=0757=
+Richiesta Forzata
+
+=0758=
+Ufficiale Goblin Minore
+
+=0759=
+Azzardo
+
+=0760=
+Intervento sul DNA
+
+=0761=
+Regolazione della Tribù
+
+=0762=
+Soldato di Riserva
+
+=0763=
+Attacca e Ricevi
+
+=0764=
+Cessate il Fuoco
+
+=0765=
+Luce dell'Intervento
+
+=0766=
+Rispetto del Gioco
+
+=0767=
+Ordine Imperiale
+
+=0768=
+Invito del Teschio
+
+=0769=
+Cappelli Magici
+
+=0770=
+Nobiluomo dello Scambio
+
+=0771=
+Nobiluomo dello Sterminio
+
+=0772=
+La Tomba Vuota
+
+=0773=
+Sepoltura Prematura
+
+=0774=
+Giara della Mutazione #2
+
+=0775=
+Criceto Bubbonico
+
+=0776=
+Drago di Fuoco Bifronte
+
+=0777=
+Soldato di Fuoco #1
+
+=0778=
+Mr Vulcano
+
+=0779=
+Soldato di Fuoco #2
+
+=0780=
+Kiseitai
+
+=0781=
+Cyber-Falcone
+
+=0782=
+Pipistrello Oscuro
+
+=0783=
+Kamakiri Volante #2
+
+=0784=
+Fratello delle Arpie
+
+=0785=
+Carro Armato Oni T-34
+
+=0786=
+Marcia Inarrestabile
+
+=0787=
+Combattente delle Lame
+
+=0788=
+Sigillo del Tempo
+
+=0789=
+Predatore delle Tombe
+
+=0790=
+Dono dell'Elfo Mistico
+
+=0791=
+L'Occhio della Verità
+
+=0792=
+Tornado di Polvere
+
+=0793=
+Richiamo del Posseduto
+
+=0794=
+Libro di Salomone
+
+=0795=
+Lancia Incantata
+
+=0796=
+Muro a Specchio
+
+=0797=
+Tempesta d' Etaqua
+
+=0798=
+Valkyrion Guerriero Magnetico
+
+=0799=
+Drago Spada dell'Alligatore
+
+=0800=
+Vorse il Predatore
+
+=0802=
+Anello della Distruzione
+
+=0803=
+Coro Acquatico
+
+=0804=
+Benedizione di Sebek
+
+=0805=
+Essenza Anti-Magia
+
+=0806=
+Riryoku
+
+=0807=
+Spada Anima di Drago
+
+=0808=
+Soldato Luminoso
+
+=0809=
+Tigre Reale Wanghu
+
+=0810=
+Cavaliere Comandante
+
+=0811=
+Lupo con Ascia
+
+=0812=
+Il Gentiluomo Illusorio
+
+=0813=
+Nobile dell'Oscurità
+
+=0814=
+Faccia da Uccello
+
+=0815=
+Kryuel
+
+=0816=
+Parshath Cavaliere Volante
+
+=0817=
+Truesdale, Re delle Fate
+
+=0818=
+Principessa Serpentina
+
+=0819=
+Vergine dell'Acqua
+
+=0820=
+Cavaliere Robotico
+
+=0821=
+Tuono Nyan Nyan
+
+=0822=
+Behemoth Fuso
+
+=0823=
+Behemoth Bifronte
+
+=0824=
+Lily Iniezione Fatata
+
+=0825=
+Spiritello Silvestre
+
+=0826=
+Insetto Arsenale
+
+=0827=
+Soldato Cinetico
+
+=0828=
+Mascelle della Trattativa Oscura
+
+=0829=
+Mangianima
+
+=0830=
+Guerriero di Ardesia
+
+=0831=
+Mangiatempo
+
+=0832=
+Mucus Yolk
+
+=0833=
+Servitore del Catabolismo
+
+=0834=
+Rigras Leever
+
+=0835=
+Creatura Umida
+
+=0836=
+Succhiaossa
+
+=0837=
+Danzatore della Fiamma
+
+=0838=
+Jammer Sonico
+
+=0839=
+Gearfried il Cavaliere di Ferro
+
+=0840=
+Melma Umanoide
+
+=0841=
+Drago-Verme
+
+=0842=
+Drago-Verme Umanoide
+
+=0843=
+Gelatina Rianimata
+
+=0844=
+Pesce Volante
+
+=0845=
+Bestia Anfibia
+
+=0846=
+Guerriero-Razzo
+
+=0847=
+Pescatore Leggendario
+
+=0848=
+Robolady
+
+=0849=
+Roboyarou
+
+=0850=
+Anguilla Fulmine
+
+=0851=
+Lady Sphyra
+
+=0852=
+Abisso Splendente
+
+=0853=
+Arcidemone di Gilfer
+
+=0854=
+Soldato Gadget
+
+=0855=
+Grande Antico Tiki
+
+=0856=
+La Bestia Mascherata
+
+=0857=
+Melchid la Bestia Quattro Facce
+
+=0858=
+Nuvia lo Stregato
+
+=0859=
+Scambio di Anime
+
+=0860=
+Maschera della Debolezza
+
+=0861=
+Maledizione della Bestia Mascherata
+
+=0862=
+Maschera dell' Antimagia
+
+=0863=
+Maschera della Restrizione
+
+=0864=
+Maschera del Maledetto
+
+=0865=
+Maschera della Brutalità
+
+=0866=
+Ritorno del Condannato
+
+=0867=
+Lama Accecante
+
+=0868=
+Muro Tornado
+
+=0869=
+Radiazione Infinita
+
+=0870=
+Scatola Fatata
+
+=0871=
+Tributo Torrenziale
+
+=0872=
+Moltiplicazione delle Formiche
+
+=0873=
+Defusione
+
+=0874=
+Macchina Genera Gelatina
+
+=0875=
+Gabbia d'Acciaio dell'Incubo
+
+=0876=
+Carte Infinite
+
+=0877=
+Difensore di Gelatina
+
+=0878=
+Carta del Ritorno Sicuro
+
+=0879=
+Cilindro Magico
+
+=0880=
+Desideri Solenni
+
+=0881=
+Terra Infuocata
+
+=0882=
+Ondata Gelida
+
+=0883=
+Pioggia di Meteore Fatate
+
+=0884=
+Rimozione di Limite
+
+=0885=
+Cambio
+
+=0886=
+Imitazione di Insetto
+
+=0887=
+Buco Dimensionale
+
+=0888=
+Risucchio Magico
+
+=0889=
+Legame Gravitazionale
+
+=0890=
+Ombra degli Occhi
+
+=0891=
+Girochin Kuwagata
+
+=0892=
+Cavaliere Hayabusa
+
+=0893=
+Scarabeo Bombardiere
+
+=0894=
+Coccinella del Destino
+
+=0895=
+Gradius
+
+=0896=
+Bambino della Luna Rossa
+
+=0897=
+Bestia della Spada Folle
+
+=0898=
+Teschio Marino
+
+=0899=
+Tigre Bianca Veggente
+
+=0900=
+Forza d'Attacco Goblin
+
+=0901=
+Tarta-Isola
+
+=0902=
+Indossatrice d'Ali
+
+=0903=
+Soldato della Scienza
+
+=0904=
+Anime dei Dimenticati
+
+=0905=
+Dokuroyaiba
+
+=0906=
+Pioggia Misericordiosa
+
+=0907=
+Recupera-Mostri
+
+=0908=
+Frantumatore Magico Tipo 0
+
+=0909=
+Scudo Giallo del Desiderio
+
+=0910=
+Scambio-Creature
+
+=0911=
+Mago Nero
+
+=0912=
+Mille Coltelli
+
+=0913=
+Scatola Magica
+
+=0914=
+Cedimento del Suolo
+
+=0915=
+Arciere Amazoness
+
+=0916=
+Principessa del Fuoco
+
+=0917=
+Spirito della Brezza
+
+=0918=
+Fata Danzante
+
+=0919=
+Mantide Imperatrice
+
+=0920=
+Cura Sirena
+
+=0921=
+Fata Isterica
+
+=0922=
+Bio-Mago
+
+=0923=
+La Vergine Clemente
+
+=0924=
+St. Joan
+
+=0925=
+Maria la Decaduta
+
+=0926=
+Giara della Cupidigia
+
+=0927=
+Pergamena della Malia
+
+=0928=
+Uniti Resistiamo
+
+=0929=
+Potere del Mago
+
+=0930=
+Offerte al Condannato
+
+=0931=
+Meteora Della Morte
+
+=0932=
+Fulmine Boltex
+
+=0933=
+Scambio Illuminato
+
+=0934=
+Il Ritratto Segreto
+
+=0935=
+Il Fantasma dei Sogni Scomparsi
+
+=0936=
+Il Cavaliere Senza Testa
+
+=0937=
+Paura Oscura
+
+=0938=
+Libro di Magia del Mago Nero
+
+=0939=
+Tavola del Destino
+
+=0940=
+La Porta Oscura
+
+=0941=
+Spirito Terralegato
+
+=0942=
+Spirito Oscuro del Silenzio
+
+=0943=
+Il Conte del Testamento
+
+=0944=
+Saggio Oscuro
+
+=0945=
+Cattedrale dei Nobili
+
+=0946=
+Giudizio di Anubi
+
+=0947=
+Incarnazione di Apophis
+
+=0948=
+Sepoltura Sciocca
+
+=0949=
+Makiu
+
+=0950=
+Antica Lampada
+
+=0951=
+Cyber-Arpia
+
+=0952=
+Serket la Belva Leggendaria
+
+=0953=
+Cavaliere Vento Oscuro di Gaia
+
+=0954=
+Guardiano Celtico Riaddestrato
+
+=0955=
+Zombyra l'Oscuro
+
+=0956=
+Spiritualismo
+
+=0957=
+Jowgen lo Spiritualista
+
+=0958=
+Kycoo il Distruttore di Spettri
+
+=0959=
+Evocatore di Illusioni
+
+=0960=
+Bazoo il Mangia-Anima
+
+=0961=
+Anima della Luce e della Purezza
+
+=0962=
+Spirito delle Fiamme
+
+=0963=
+Spirito Aqua
+
+=0964=
+Lo Spirito della Roccia
+
+=0965=
+Garuda lo Spirito del Vento
+
+=0966=
+Gilasaurus
+
+=0967=
+Uccello Tornado
+
+=0968=
+Folletto dei Sogni
+
+=0969=
+Rifornimento
+
+=0970=
+Maryokutai
+
+=0971=
+Potere Riunito
+
+=0972=
+Ordine Reale
+
+=0973=
+Terreno Riryoku
+
+=0974=
+Nascondiglio del Teschio
+
+=0975=
+Punizione dello Scavatombe
+
+=0976=
+Patto del Fantasma
+
+=0977=
+Pugno Distruttivo
+
+=0978=
+Distruzione Cieca
+
+=0979=
+Le Vacanze dell' Imperatore
+
+=0980=
+Laser Ciclonico
+
+=0981=
+Messaggio dello Spirito "I"
+
+=0982=
+Messaggio dello Spirito "N"
+
+=0983=
+Messaggio dello Spirito "A"
+
+=0984=
+Messaggio dello Spirito "L"
+
+=0985=
+Bambola Esca
+
+=0986=
+Cancello della Fusione
+
+=0987=
+Ekibyo Drakmord
+
+=0988=
+Scavo Miracoloso
+
+=0989=
+Spirito Vendicativo della Palude
+
+=0990=
+Spadaccina Amazoness
+
+=0991=
+Makyura l'Esecutore
+
+=0992=
+Arciere Amazoness
+
+=0993=
+Fune della Vita
+
+=0994=
+Freccia Incantata
+
+=0995=
+Maestro Amazzone della Catena
+
+=0996=
+Viser Des
+
+=0998=
+Guerriera Amazoness
+
+=0999=
+Ruota Incubo
+
+=1000=
+Byser Shock
+
+=1001=
+Ha Des Sovrano Oscuro
+
+=1002=
+Balter Oscuro il Terribile
+
+=1003=
+Demone Minore
+
+=1004=
+Anima Oscura Posseduta
+
+=1005=
+Servo Alato
+
+=1006=
+Clown Ryu-Kishin
+
+=1007=
+Lupo Bifronte
+
+=1008=
+Opticlops
+
+=1009=
+Latrato del Sovrano Oscuro
+
+=1010=
+Pallottoliere Fatale
+
+=1011=
+Macchina Assorbi-Vita
+
+=1012=
+Doppio Tranello
+
+=1013=
+Freed il Generale Senza Avversari
+
+=1014=
+Unità Scagliapietra
+
+=1015=
+Capitano Saccheggiatore
+
+=1016=
+Ryu Senshi
+
+=1017=
+Guerriero Dai Grepher
+
+=1018=
+Saggio della Frontiera
+
+=1019=
+Forza Esiliata
+
+=1020=
+Il Cacciatore dalle 7 Armi
+
+=1021=
+Domaombra
+
+=1022=
+Manipola-Draghi
+
+=1023=
+Le Truppe A.
+
+=1024=
+Rinforzi dell' Esercito
+
+=1025=
+Ordine della Luce Rivelatrice
+
+=1026=
+Il Guerriero Sopravvissuto
+
+=1027=
+Pronti all' Intercetto
+
+=1028=
+Un Finto Piano
+
+=1029=
+Drago Tiranno
+
+=1030=
+Drago Lanciere
+
+=1031=
+Spirito Ryu
+
+=1032=
+Il Drago Abitante nella Caverna
+
+=1033=
+Soldato Lucertola
+
+=1034=
+Drago Teschio-Demone
+
+=1035=
+Drago delle Caverne
+
+=1036=
+Ali Grigie
+
+=1037=
+Truppa-Drago
+
+=1038=
+La Perla di Drago
+
+=1039=
+Il Battito d'Ali del Drago Gigante
+
+=1040=
+Fiammata di Drago
+
+=1041=
+Distruzione Schiacciante
+
+=1042=
+Super Ringiovanimento
+
+=1043=
+Rabbia del Drago
+
+=1044=
+Soffio Incendiario
+
+=1045=
+Drago Avido #2
+
+=1046=
+Rifornimenti d'Emergenza
+
+=1047=
+Keldo
+
+=1048=
+Trascinato nella Tomba
+
+=1049=
+Kaiser Glider
+
+=1050=
+Riproduzione Magica
+
+=1051=
+Crollo
+
+=1052=
+Mudora
+
+=1053=
+Cestus di Dagla
+
+=1054=
+Annulla Arma Batterica
+
+=1055=
+Des Demone Selvaggio
+
+=1056=
+Inversione delle Tombe
+
+=1057=
+Kelbek
+
+=1058=
+Zolga
+
+=1059=
+Tributo Esplosivo
+
+=1060=
+Agido
+
+=1061=
+Demone del Silenzio
+
+=1062=
+Giara di Fibra
+
+=1063=
+Opzione di Gradius
+
+=1064=
+Maharaghi
+
+=1065=
+Coniglio Bianco Inaba
+
+=1066=
+Yata-Garasu
+
+=1067=
+Soldato Susa
+
+=1068=
+Drago Yamata
+
+=1069=
+Grande Naso Lungo
+
+=1070=
+Otohime
+
+=1071=
+Hino-Kagu-Tsuchi
+
+=1072=
+Prete Asura
+
+=1073=
+Fushi No Tori
+
+=1074=
+Super Robolady
+
+=1075=
+Super Roboyarou
+
+=1076=
+Specchio Fengsheng
+
+=1077=
+Cuore d'Acqua Chiara
+
+=1078=
+Un Oceano Leggendario
+
+=1079=
+Spada-Fusione Lama Murasame
+
+=1080=
+Bomba Fumogena del Ladro
+
+=1081=
+Energia Spirituale Sistema Macchina
+
+=1082=
+Secondo Lancio della Moneta
+
+=1083=
+Sconvolgimento della Natura
+
+=1084=
+Il Segreto del Bandito
+
+=1085=
+Dopo la Battaglia
+
+=1086=
+Colpo con Catena
+
+=1087=
+Sparizione
+
+=1088=
+Buco Trappola Senza Fine
+
+=1089=
+Predizione Malevola
+
+=1090=
+Nutriente Z
+
+=1091=
+Caduta
+
+=1092=
+Commediante Malvagio
+
+=1093=
+Ultimo Turno
+
+=1094=
+Des Volstgalph
+
+=1095=
+Kaiser Cavalluccio Marino
+
+=1096=
+Signore dei Vampiri
+
+=1097=
+Tartaruga Gora
+
+=1098=
+Samurai Sasuke
+
+=1099=
+Mummia Infetta
+
+=1100=
+Spirito Polvere Oscura
+
+=1101=
+Custode Reale
+
+=1102=
+Mummia Errante
+
+=1103=
+Grande Dezard
+
+=1104=
+Sciame di Scarabei
+
+=1105=
+Sciame di Locuste
+
+=1106=
+Mummia con Ascia Gigante
+
+=1107=
+Sfinge Guardiana
+
+=1108=
+Tartaruga Piramide
+
+=1109=
+Giara Dado
+
+=1110=
+Dark Scorpion-Scassinatori
+
+=1111=
+Don Zaloog
+
+=1112=
+Des Lacooda
+
+=1113=
+Fushioh Richie
+
+=1114=
+Uomo Cobra Sakuzy
+
+=1115=
+Libro della Vita
+
+=1116=
+Libro di Taiyou
+
+=1117=
+Libro della Luna
+
+=1118=
+Miraggio d'Incubo
+
+=1119=
+Richiamo della Mummia
+
+=1120=
+Timidezza
+
+=1121=
+Energia Piramide
+
+=1122=
+Maschera di Tutan
+
+=1123=
+Prova del Viaggiatore
+
+=1124=
+Sabbie Mobili Senza Fine
+
+=1125=
+Maledizione Reale
+
+=1126=
+Tetto Acuminato
+
+=1127=
+Statua del Malvagio
+
+=1128=
+Bara Oscura
+
+=1129=
+Muro Acuminato
+
+=1130=
+Trappola Botola
+
+=1131=
+Cupidigia Insaziabile
+
+=1132=
+Ragazza del Mago Nero Toon
+
+=1133=
+Gilford il Fulmineo
+
+=1135=
+Universo Exarion
+
+=1136=
+Demone Leggendario
+
+=1137=
+Difesa Toon
+
+=1138=
+Foglio Illustrativo Toon
+
+=1139=
+Stregone Mascherato Toon
+
+=1140=
+Elfi Gemelli Toon
+
+=1141=
+Soldato Cannone Toon
+
+=1142=
+Forza d'Attacco Goblin Toon
+
+=1143=
+Carta di Santità
+
+=1144=
+Maestro dei Burattini
+
+=1145=
+Newdoria
+
+=1146=
+Signore del Veleno
+
+=1147=
+Cavaliere Lama
+
+=1148=
+Helpoemer
+
+=1149=
+Soldato Nascosto
+
+=1150=
+Gil Cintato
+
+=1151=
+Calamità del Malvagio
+
+=1152=
+Golem di Lava
+
+=1153=
+Sollievo del Mostro
+
+=1154=
+Duplicazione di Macchine
+
+=1155=
+Jeroid Oscuro
+
+=1156=
+Capo del Soldato Drago
+
+=1157=
+F.G.D.
+
+=1158=
+Cavaliere della Regina
+
+=1159=
+X-Testa Cannone
+
+=1160=
+Controlla-Avversario
+
+=1161=
+Maestro Kyonshee
+
+=1162=
+Kabazauls
+
+=1163=
+Inpachi
+
+=1164=
+Spia - Custode di Tombe
+
+=1165=
+Maledizione - Custode di Tombe
+
+=1166=
+Guardia - Custode di Tombe
+
+=1167=
+Lanciere - Custode di Tombe
+
+=1168=
+Cannoniere - Custode di Tombe
+
+=1169=
+Assalitore - Custode di Tombe
+
+=1170=
+Un Uomo con Wdjat
+
+=1171=
+Cavaliere Mistico dello Sciacallo
+
+=1172=
+Un Gatto della Sfortuna
+
+=1173=
+Nave Yomi
+
+=1174=
+Saggio Falco Alato
+
+=1175=
+Un Gufo della Fortuna
+
+=1176=
+Malia di Shabti
+
+=1177=
+Giara Cobra
+
+=1178=
+Spirito Mietitore
+
+=1179=
+Cavallo Incubo
+
+=1180=
+Mietitore dell' Incubo
+
+=1181=
+Mischia Carte
+
+=1182=
+Ragionando
+
+=1183=
+Camera Oscura dell' Incubo
+
+=1184=
+Differente Capsula Dimensionale
+
+=1185=
+Necrovalle
+
+=1186=
+Lanciarazzi
+
+=1187=
+Geroglifico Litografo
+
+=1188=
+Sindrome Serpente Oscuro
+
+=1189=
+Terraformare
+
+=1190=
+Stendardo del Coraggio
+
+=1191=
+Metamorfosi
+
+=1192=
+Tributo Reale
+
+=1193=
+Quiz Invertito
+
+=1194=
+Maledizione dell'Invecchiamento
+
+=1195=
+Frattura Raigeki
+
+=1196=
+Strategia di Disturbo
+
+=1197=
+Rito dello Spirito
+
+=1198=
+Zona di Non Aggressione
+
+=1199=
+Tribù D.
+
+=1200=
+Y-Testa Drago
+
+=1201=
+XY-Cannone Drago
+
+=1202=
+Z-Carro Armato Metallico
+
+=1203=
+XYZ-Cannone Drago
+
+=1206=
+Fune Spirituale
+
+=1207=
+Cavaliere del Re
+
+=1208=
+Cavaliere del Jack
+
+=1209=
+Teletrasportatore
+
+=1210=
+Zombie Goblin
+
+=1211=
+Drillago
+
+=1212=
+Lekunga
+
+=1213=
+Riduzione del Costo
+
+=1214=
+Folla Agitata
+
+=1215=
+Gente Oppressa
+
+=1216=
+Resistenza Unita
+
+=1217=
+Lama Oscura
+
+=1218=
+Drago Nero-Pece
+
+=1219=
+Kiryu
+
+=1220=
+Comandante Decaduto
+
+=1221=
+Tigre Zombie
+
+=1222=
+Orco Gigante
+
+=1223=
+Secondo Goblin
+
+=1224=
+Orchidea Vampirica
+
+=1225=
+Rampicante Des
+
+=1226=
+Bestia Fiammeggiante
+
+=1227=
+Bestia Congelante
+
+=1228=
+Bestia Folle D.D.
+
+=1229=
+Annullatore di Magia
+
+=1230=
+Robot Soccorritore
+
+=1231=
+Giara Dimensionale
+
+=1232=
+Roulette Russa
+
+=1233=
+Paladino del Drago Bianco
+
+=1234=
+Rituale del Drago Bianco
+
+=1235=
+Avamposto
+
+=1236=
+Degradazione
+
+=1237=
+Attacco Combinato
+
+=1238=
+Unità d'Azione Autonoma
+
+=1239=
+Intruglio dell'Anziano
+
+=1240=
+Nucleo Oscuro
+
+=1241=
+Armatura di Oro Raro
+
+=1242=
+Spirito Kishido
+
+=1243=
+Pupazzo da Tributo
+
+=1244=
+Cannone a Onde Soniche
+
+=1245=
+Rivoluzione di Massa
+
+=1246=
+Tuono del Sovrano
+
+=1247=
+Scudo Magico Tipo-8
+
+=1248=
+Pioggia di Meteore
+
+=1249=
+Ananas Esplosivo
+
+=1250=
+Arma Segreta
+
+=1251=
+Formazione per l'Unione
+
+=1252=
+Buco Trappola Adesivo
+
+=1253=
+XZ-Cannone Carrarmato
+
+=1254=
+YZ-Drago Carrarmato
+
+=1255=
+Ordini di Attacco Finale
+
+=1256=
+Paladino Oscuro
+
+=1259=
+Assorbimento Magico
+
+=1260=
+Esplosione a Onde Soniche
+
+=1261=
+Santuario Demoniaco
+
+=1262=
+Grande Angus
+
+=1263=
+Aitsu
+
+=1264=
+PAPERA SONICA
+
+=1265=
+Drago Avido
+
+=1266=
+Paladina Amazoness
+
+=1267=
+Cerbottaniera Amazoness
+
+=1268=
+Tigre Amazoness
+
+=1269=
+Abile Mago Bianco
+
+=1270=
+Abile Mago Nero
+
+=1271=
+Mago Apprendista
+
+=1272=
+Anziano Mago Vendicativo
+
+=1273=
+Mago Ordine del Chaos
+
+=1274=
+Marionetta Magica
+
+=1275=
+Breaker il Guerriero Magico
+
+=1276=
+Mandragola Pianta Magica
+
+=1277=
+Scienziato Magico
+
+=1278=
+Biblioteca Reale Magica
+
+=1279=
+Armatura Exe
+
+=1280=
+Virus Infetta-Tribù
+
+=1281=
+Des Koala
+
+=1282=
+Dark Scorpion - Cliff il Rimuovi Trappole
+
+=1283=
+Mercante Magico
+
+=1284=
+Koitsu
+
+=1285=
+Tribù Orecchie da Gatto
+
+=1286=
+Demone Obbediente Definitivo
+
+=1287=
+Pietra del Potere Nero-Pece
+
+=1288=
+Colpo Big-Bang
+
+=1289=
+Concentrazione
+
+=1290=
+Sterminatore
+
+=1291=
+Occhio di Senri
+
+=1292=
+Emblema dell'Ammazza Draghi
+
+=1293=
+Ladro di Giare
+
+=1294=
+Cannone Magico a Megatoni
+
+=1295=
+Pugno Distruttivo Continuo
+
+=1296=
+Magia Spossante
+
+=1297=
+Libro di Magia Nascosto
+
+=1298=
+Ripristino Miracoloso
+
+=1299=
+Disarmo
+
+=1300=
+Anti-Magia
+
+=1301=
+La Magia Assorbi Vita
+
+=1302=
+Poltiglia Rifletti-Metalli
+
+=1303=
+Bowganian
+
+=1304=
+Scavo delle Pietre Magiche
+
+=1305=
+Granadora
+
+=1306=
+Shinato, Re di un Livello Superiore
+
+=1307=
+Cavaliere Fiamma Oscura
+
+=1308=
+Cavaliere Miraggio
+
+=1309=
+Drago Berserk
+
+=1310=
+Exodia Necross
+
+=1311=
+Giocatore da Battaglia
+
+=1312=
+Evocatore dell'Arsenale
+
+=1313=
+Cane Nin-Ken
+
+=1314=
+Scimmia Acrobatica
+
+=1315=
+Guardiano Elma
+
+=1316=
+Guardiano Ceal
+
+=1317=
+Guardiano Grarl
+
+=1318=
+Guardiano Baou
+
+=1319=
+Guardiano Kay'est
+
+=1320=
+Guardiano Tryce
+
+=1321=
+Panda Gyaku-Gire
+
+=1322=
+Goblin Ciecamente Fedele
+
+=1323=
+Disperazione dall'Oscurità
+
+=1324=
+Maju Garzett
+
+=1325=
+Paura dall'Oscurità
+
+=1326=
+Dark Scorpion - Chick il Codardo
+
+=1327=
+Signora Guerriera D.D.
+
+=1328=
+Mille Punte
+
+=1329=
+Arca di Shinato
+
+=1330=
+Un Accordo col Signore Oscuro
+
+=1331=
+Contratto con Exodia
+
+=1332=
+Pugnale a Farfalla - Elma
+
+=1333=
+Arco della Stella Cadente - Ceal
+
+=1334=
+Ascia Gravitazionale - Grarl
+
+=1335=
+Flamberga Spezza-Malvagi - Baou
+
+=1336=
+Bacchetta del Silenzio - Kay'est
+
+=1337=
+Spade Gemelle Irradianti - Tryce
+
+=1338=
+Carte Preziose dall'Aldilà
+
+=1339=
+Bacchetta dell'Occhio della mente
+
+=1340=
+Fata della Sorgente
+
+=1341=
+Grazie dei Token
+
+=1342=
+Zona Anti-Magia
+
+=1343=
+Difensore Incrollabile
+
+=1344=
+Trio Ojama
+
+=1345=
+Ladro dell'Arsenale
+
+=1346=
+Risucchia Abilità
+
+=1347=
+Riposo Eterno Definitivo
+
+=1348=
+Ruba-Anime
+
+=1349=
+Dimensione Magica
+
+=1350=
+Giudizio del Faraone
+
+=1351=
+Amicizia
+
+=1352=
+Unità
+
+=1353=
+Cavaliere Mago Nero
+
+=1354=
+Titolo di Cavaliere
+
+=1355=
+Masso del Saggio
+
+=1356=
+Gagagigo
+
+=1357=
+Allenatore D.D.
+
+=1358=
+Ojama Verde
+
+=1359=
+Arcidemone Soldato
+
+=1360=
+Orso da Guardia del Pandemonio
+
+=1361=
+Samurai Sasuke #2
+
+=1362=
+Dark Scorpion - Gorg il Forte
+
+=1363=
+Dark Scorpion - Meanae la Spina
+
+=1364=
+Marron Cane Fantastico
+
+=1365=
+Grande Maju Garzett
+
+=1366=
+Kotetsu Fabbro del Ferro
+
+=1367=
+Mefist il Generale Infernale
+
+=1368=
+Arcidemone Vile Pedone
+
+=1369=
+Arcidemone Cavaliere Ombra
+
+=1370=
+Arcidemone Alfiere Oscuro
+
+=1371=
+Arcidemone Torre della Morte
+
+=1372=
+Arcidemone Regina Infernale
+
+=1373=
+Arcidemone Re del Terrore
+
+=1374=
+Arcidemone Teschio del Fulmine
+
+=1375=
+Parassita Metallico - Lunatite
+
+=1376=
+Tsukuyomi
+
+=1377=
+Leggendario Signore delle Fiamme
+
+=1378=
+Maestro Oscuro - Zorc
+
+=1379=
+Prova del Fuoco
+
+=1380=
+Contratto con l'Abisso
+
+=1381=
+Contratto col Maestro Oscuro
+
+=1382=
+Cadere in Disgrazia
+
+=1383=
+Scacco Matto
+
+=1384=
+Conto alla Rovescia
+
+=1385=
+Raduno dei Dark Scorpion
+
+=1386=
+Pandemonio
+
+=1387=
+Altare dei Tributi
+
+=1388=
+Anima Congelata
+
+=1389=
+Cicatrice di Guerra
+
+=1390=
+Attacco Combinato Dark Scorpion
+
+=1391=
+Ruggito dell'Arcidemone
+
+=1392=
+Ritira il Dado
+
+=1393=
+Dissoluzione Magica
+
+=1394=
+Armatura Sakuretsu
+
+=1395=
+Raggio della Speranza
+
+=1396=
+Pinguino dell'Incubo
+
+=1397=
+Re delle Macchine Perfetto
+
+=1398=
+Chiron il Saggio
+
+=1399=
+Ojama Giallo
+
+=1400=
+Ojama Nero
+
+=1401=
+Tigre dell'Anima
+
+=1402=
+Grande Koala
+
+=1403=
+Canguro Des
+
+=1404=
+Ninja Cremisi
+
+=1405=
+Ninja Fulmineo
+
+=1406=
+Lucertola Folata
+
+=1407=
+Chopman il Fuorilegge Disperato
+
+=1408=
+Samurai Sasuke #3
+
+=1409=
+Navicella Spia D.D.
+
+=1410=
+Gorilla Berserk
+
+=1411=
+Freed il Viandante Coraggioso
+
+=1412=
+Sciamano del Chaos
+
+=1413=
+Necromante del Chaos
+
+=1414=
+Gustaph Predone del Chaos
+
+=1415=
+Inferno
+
+=1416=
+Fenrir
+
+=1417=
+Gigantes
+
+=1418=
+Silpheed
+
+=1419=
+Stregone del Chaos
+
+=1420=
+Gren Maju Da Eiza
+
+=1421=
+Soldato dell'Oscuro Desiderio - Emissario dell'Inizio
+
+=1422=
+Shuriken Fuhma
+
+=1423=
+Cuore del Perdente
+
+=1424=
+Natura Selvaggia
+
+=1425=
+Uragano Ojama Delta!!
+
+=1426=
+Inciampare
+
+=1427=
+Fine del Chaos
+
+=1428=
+Avidità del Chaos
+
+=1429=
+Confine D. D.
+
+=1430=
+Riciclo
+
+=1431=
+Seme Primordiale
+
+=1432=
+Rombo di Tuono
+
+=1433=
+Distorsione Dimensionale
+
+=1434=
+Ricarica
+
+=1435=
+Assorbi Anime
+
+=1436=
+Grande Incendio
+
+=1437=
+Bombardamento delle Rovine
+
+=1438=
+Sigillo Maledetto della Magia Proibita
+
+=1439=
+Torre di Babele
+
+=1440=
+Crollo Spaziale
+
+=1441=
+Sparizione a Catena
+
+=1442=
+Assenza di Gravità
+
+=1443=
+Forza Riflessa Oscura
+
+=1444=
+Risucchio di Energia
+
+=1445=
+Drago Imperatore del Chaos - Emissario della Fine
+
+=1446=
+Drago della Vittoria
+
+=1447=
+Valkiria del Mago
+
+=1448=
+Giga Gagagigo
+
+=1449=
+Folle Cane dell'Oscurità
+
+=1450=
+Nuovo Insetto
+
+=1451=
+Guerriero Serpente Marino dell'Oscurità
+
+=1452=
+Salmon Sovrano del Terrore
+
+=1453=
+Inpachi Fiammeggiante
+
+=1454=
+Algae Infuocate
+
+=1455=
+La Cosa nel Cratere
+
+=1456=
+Zombie Fuso
+
+=1457=
+Mago Nero del Chaos
+
+=1458=
+Manticora dell'Oscurità
+
+=1459=
+Uccello Furtivo
+
+=1460=
+Gru Sacra
+
+=1461=
+Ascia da Guerra Infuriata
+
+=1462=
+Tartaruga Don
+
+=1463=
+Triceratopo Oscuro
+
+=1464=
+Iper Testa-Martello
+
+=1465=
+Tiranno Oscuro
+
+=1466=
+Fiore Contraerea
+
+=1467=
+Fata delle Spine
+
+=1468=
+Principessa Insetto
+
+=1469=
+Bugroth Anfibio MK-3
+
+=1470=
+Pesce Torpedo
+
+=1471=
+Levia-Dragone - Dedalo
+
+=1472=
+Orca Mega-Fortezza dell'Oscurità
+
+=1473=
+Mollusco Proiettile
+
+=1474=
+Mataza l'Assassino Fulmineo
+
+=1475=
+Joan Angelo Custode
+
+=1476=
+Manju dalle Diecimila Mani
+
+=1477=
+Getsu Fuhma
+
+=1478=
+Ryu Kokki
+
+=1479=
+Spolverino del Grifone
+
+=1480=
+Agnelli Dispersi
+
+=1481=
+Schiacciare
+
+=1482=
+Fusione Dimensionale
+
+=1483=
+Dedizione alla Luce e all'Oscurità
+
+=1484=
+Recupero
+
+=1485=
+Pillola dell'Ultra Evoluzione
+
+=1486=
+Inno alla Terra
+
+=1487=
+Whistle Insetto di Giada
+
+=1488=
+Anello Distruttivo
+
+=1489=
+Specchio del Demone
+
+=1490=
+Dispositivo di Salvataggio Obbligatorio
+
+=1491=
+Emerge un Eroe
+
+=1492=
+Pulsante di Auto-Distruzione
+
+=1493=
+Maledizione dell'Oscurità
+
+=1494=
+Vattene Ladruncolo!
+
+=1495=
+Trapianto di DNA
+
+=1496=
+Zombie Ladro
+
+=1497=
+Disturbi Meccanici
+
+=1498=
+Invasore dell'Oscurità
+
+=1499=
+Bestia a Due Teste
+
+=1500=
+Soldato dell'Abisso
+
+=1501=
+Martello dell'Inferno
+
+=1502=
+Emes l'Infinità
+
+=1503=
+Assalitore D. D.
+
+=1504=
+Teva
+
+=1505=
+Teschio di Zoma
+
+=1506=
+Sei al Massimo
+
+=1507=
+Macchina Pericolosa TIPO 6
+
+=1508=
+Sesto Senso
+
+=1509=
+Gogiga Gagagigo
+
+=1510=
+Guerriero di Zera
+
+=1511=
+Maisei Maestro dei Sigilli
+
+=1512=
+Sfera Mistica Lucente
+
+=1513=
+Insetto-Metallo Corazzato
+
+=1514=
+L'Agente del Giudizio - Saturno
+
+=1515=
+L'Agente della Saggezza - Mercurio
+
+=1516=
+L'Agente della Creazione - Venere
+
+=1517=
+L'Agente della Forza - Venere
+
+=1518=
+La Ragazza Infelice
+
+=1519=
+Torre d'Ossa Assorbi-Anima
+
+=1520=
+Uomo-Calcio
+
+=1521=
+Lady Vampira
+
+=1522=
+Porta-Razzi
+
+=1523=
+Avatar dell'Anfora
+
+=1524=
+Maestro Leggendario Jujitsu
+
+=1525=
+KA-2 Forbici della Morte
+
+=1526=
+Scavatore a Punte
+
+=1527=
+Drago Sputafuoco
+
+=1528=
+Zaborg il Monarca del Tuono
+
+=1529=
+Libellula Atomica
+
+=1530=
+Sirena Cavaliere
+
+=1531=
+Armata Piranha
+
+=1532=
+Duemila Punte
+
+=1533=
+Disco-Combattente
+
+=1534=
+Arciere Arcano della Foresta
+
+=1535=
+Lady Ninja Yae
+
+=1536=
+Re dei Goblin
+
+=1537=
+Drago Ondata Solare
+
+=1538=
+Mago Bianco Pireku
+
+=1539=
+Archlord Zerato
+
+=1540=
+Armatura Cammuffamento-Ottico
+
+=1541=
+Wok Mistico
+
+=1542=
+Soffio Esplosivo di Distruzione
+
+=1543=
+Mostro-Cancello
+
+=1544=
+Il Santuario nel Cielo
+
+=1545=
+Terremoto
+
+=1546=
+Goblin Furtivo
+
+=1547=
+Ritorno di Fiamma
+
+=1548=
+Micro Raggio
+
+=1549=
+Luce del Giudizio
+
+=1550=
+Muro della Luce Rivelatrice
+
+=1551=
+Raggio Solare
+
+=1552=
+Arte della Trasformazione Ninjitsu
+
+=1553=
+Luce del Richiamo
+
+=1554=
+Scudo Prosciugante
+
+=1555=
+Spezza-Armatura
+
+=1556=
+Mazera DeVille
+
+=1557=
+Marshmallon
+
+=1558=
+Cavaliere della Scoperta del Teschio
+
+=1559=
+Esplosione dello Scudo
+
+=1560=
+Il Ritorno dello Zombie
+
+=1561=
+Cadavere di Yata-Garasu
+
+=1562=
+Vetri di Marshmallon
+
+=1563=
+Invito dello Spirito della Terra
+
+=1564=
+Mokey Mokey
+
+=1565=
+Gigobyte
+
+=1566=
+Kozaky
+
+=1567=
+Demone Scorpione
+
+=1568=
+Servitore del Faraone
+
+=1569=
+Guardia del Faraone
+
+=1570=
+Spirito del Faraone
+
+=1571=
+Incubo Tebano
+
+=1572=
+Apparizione Aswan
+
+=1573=
+Protettore del Santuario
+
+=1574=
+Guardia Nubiana
+
+=1575=
+Tapiro del Deserto
+
+=1576=
+Scommettitore della Sabbia
+
+=1577=
+Cavaliere Fantasma dello Sciacallo
+
+=1578=
+Ragazzo dal Cielo
+
+=1579=
+Statua dell'Elefante della Benedizione
+
+=1580=
+Statua dell'Elefante del Disastro
+
+=1581=
+Evocatore di Spiriti
+
+=1582=
+Emissario dell'Aldilà
+
+=1583=
+Doppio Coston
+
+=1584=
+Mummia Rigenerante
+
+=1585=
+Assalitore Notturno
+
+=1586=
+Scaglia-Uomo Tro
+
+=1587=
+Re delle Paludi
+
+=1588=
+Emissario dell'Oasi
+
+=1589=
+Uragano Speciale
+
+=1590=
+Ordine di Carica
+
+=1591=
+Spada del Mangia-Anima
+
+=1592=
+Barriera di Polvere
+
+=1593=
+Inverti Anima
+
+=1594=
+Economia della Magia
+
+=1595=
+7
+
+=1596=
+Livello Limite - Area B
+
+=1597=
+Stanza Prova Incantesimo
+
+=1598=
+La Legge della Normalità
+
+=1599=
+Attacco Mago Nero
+
+=1600=
+Attaccante Delta
+
+=1601=
+Energia Più Mille
+
+=1602=
+Potere del Triangolo
+
+=1603=
+Il Terzo Sarcofago
+
+=1604=
+Il Secondo Sarcofago
+
+=1605=
+Il Primo Sarcofago
+
+=1606=
+Tattica Ondata-Umana
+
+=1607=
+Maledizione di Anubis
+
+=1608=
+Sole del Deserto
+
+=1609=
+Rimbalzo Mortale
+
+=1610=
+Labirinto dell'Incubo
+
+=1611=
+Resurrezione dell'Anima
+
+=1612=
+Ordine di Schianto
+
+=1613=
+La Fine di Anubis
+
+=1614=
+Gandra, il Drago della Distruzione
+
+=1615=
+Ritorno dall'Altra Dimensione
+
+=1616=
+Piramide di Luce
+
+=1617=
+Drago Lucente Occhi Blu
+
+=1618=
+Cavaliere Familiare
+
+=1619=
+Drago Metallico Raro
+
+=1620=
+Peten il Clown Oscuro
+
+=1621=
+Stregone della Magia Oscura
+
+=1622=
+Andro-Sfinge
+
+=1623=
+Sfinge Teleia
+
+=1624=
+Theinen la Grande Sfinge
+
+=1625=
+Tempesta Infernale
+
+=1626=
+Watapon
+
+=1627=
+Inpachi Carbone
+
+=1628=
+Neo Mago delle Acque
+
+=1629=
+Marron Cane Scheletrico
+
+=1630=
+Goblin Fasullo
+
+=1631=
+Insetto Finale LV1
+
+=1632=
+Horus il Drago della Fiamma Oscura LV4
+
+=1633=
+Horus il Drago della Fiamma Oscura LV6
+
+=1634=
+Horus il Drago della Fiamma Oscura LV8
+
+=1635=
+Mimic Oscuro LV1
+
+=1636=
+Mimic Oscuro LV3
+
+=1637=
+Spadaccino Mistico LV2
+
+=1638=
+Spadaccino Mistico LV4
+
+=1639=
+Drago Armato LV3
+
+=1640=
+Drago Armato LV5
+
+=1641=
+Drago Armato LV7
+
+=1642=
+Servitore di Horus
+
+=1643=
+Cucciolo di Occhi-Rossi
+
+=1644=
+Sasuke Maestro Ninja
+
+=1645=
+Seduzione di Rafflesia
+
+=1646=
+Giovane Promessa del Baseball
+
+=1647=
+Mobius il Monarca Glaciale
+
+=1648=
+Drago Elementale
+
+=1649=
+Soldato Elementale
+
+=1650=
+Insetto Ululante
+
+=1651=
+Drago Mascherato
+
+=1652=
+Pensiero in Onda
+
+=1653=
+Rana-Pescatrice Barbuta
+
+=1654=
+Il Cavallo di Troia
+
+=1655=
+Insetto Mangia-Nobiluomini
+
+=1656=
+Muka Muka Infuriato
+
+=1657=
+Hade-Hane
+
+=1658=
+Signora Combattente della Penombra
+
+=1659=
+Re Ojama
+
+=1660=
+Maestro di Oz
+
+=1661=
+Sanwitch
+
+=1662=
+Industria Oscura della Produzione di Massa
+
+=1663=
+Lancio del Martello
+
+=1664=
+Memoria Cancellata
+
+=1665=
+Designatore dell'Abisso
+
+=1666=
+Livello Superiore!
+
+=1667=
+Esplosione di Fuoco Infernale
+
+=1668=
+Il Cimitero nella Quarta Dimensione
+
+=1669=
+Venditori di Battaglia
+
+=1670=
+Piccola Onda Grande Onda
+
+=1671=
+Arma Fusione
+
+=1672=
+Arma Rituale
+
+=1673=
+Schernire
+
+=1674=
+Fine Definitiva
+
+=1675=
+Barriera dello Spirito
+
+=1676=
+Arte della Liberazione Ninjitsu
+
+=1677=
+Nebbia del Crollo
+
+=1678=
+Recessione Pesante
+
+=1679=
+Avidità
+
+=1680=
+Bomba-Cimitero
+
+=1681=
+Mistica Barriera della Vita
+
+=1682=
+Inganno
+
+=1683=
+Gadget Verde
+
+=1684=
+Fortezza
+
+=1686=
+Gadget Rosso
+
+=1687=
+Gadget Giallo
+
+=1688=
+Magia dell'Inganno 4
+
+=1689=
+Blocco Umano
+
+=1690=
+Spadaccino Silente LV3
+
+=1691=
+Spadaccino Silente LV5
+
+=1692=
+Spadaccino Silente LV7
+
+=1693=
+Mago Silente LV4
+
+=1694=
+Circolo del Mago
+
+=1695=
+Croce del Mago
+
+=1696=
+Mago Silente LV8
+
+=1697=
+Inpachi Cyborg di Legno
+
+=1698=
+Guardia Possente
+
+=1699=
+Bokoichi il Vagone Spaventoso
+
+=1700=
+Ragazza Arpia
+
+=1701=
+Il Creatore
+
+=1702=
+Il Creatore Incarnato
+
+=1703=
+Insetto Finale LV3
+
+=1704=
+Spadaccino Mistico LV6
+
+=1705=
+Piattaforma di Supporto per Mezzi Pesanti
+
+=1706=
+Mago Elementale
+
+=1707=
+Dinosauro Elementale
+
+=1708=
+Roc dalla Valle della Nebbia
+
+=1709=
+Samurai Sasuke #4
+
+=1710=
+Lady Arpia 1
+
+=1711=
+Lady Arpia 2
+
+=1712=
+Lady Arpia 3
+
+=1713=
+Folletto della Fiamma Infuriato
+
+=1714=
+Thestalos il Monarca della Tempesta di Fuoco
+
+=1715=
+Occhio d'Aquila
+
+=1716=
+Esperto di Spionaggio Tattico
+
+=1717=
+Invasione di Fiamme
+
+=1718=
+Manta del Fato Incedente
+
+=1719=
+Lupo da Guerra Nero-Pece
+
+=1720=
+Drago Miraggio
+
+=1721=
+L'Anima di Gaia il Combustibile Collettivo
+
+=1722=
+Volpe di Fuoco
+
+=1723=
+Grande Nucleo
+
+=1724=
+Drago Fuciliere, la Bestia Versatile
+
+=1725=
+Dekoichi la Locomotiva da Battaglia Incantata
+
+=1726=
+A-Team: Unità Disponi-Trappole
+
+=1727=
+Homunculus l'Essere Alchemico
+
+=1728=
+Lama Oscura il Cavaliere del Drago
+
+=1729=
+Re Mokey Mokey
+
+=1730=
+Magia in Serie
+
+=1731=
+Terreno di Caccia delle Arpie
+
+=1732=
+Scintilla d'Estasi Triangolare
+
+=1733=
+Amuleto del Comando
+
+=1734=
+Flint
+
+=1735=
+Esplosione Mokey Mokey
+
+=1736=
+Torna all'Inizio
+
+=1737=
+Mostro Reincarnato
+
+=1738=
+Balista d'Assedio
+
+=1739=
+Alleggerire il Carico
+
+=1740=
+Dispersione di Malignità
+
+=1741=
+Ira Divina
+
+=1742=
+Xing Zhen Hu
+
+=1743=
+Metamorfosi Rara
+
+=1744=
+Haxorz Mentale
+
+=1745=
+Fuh-Rin-Ka-Zan
+
+=1746=
+Esplosione a Catena
+
+=1747=
+Cerchio Incantatore di Pikeru
+
+=1748=
+Purificazione Magica
+
+=1749=
+Barriera Astrale
+
+=1750=
+Fuoco di Copertura
+
+=1751=
+Portone del Castello
+
+=1752=
+Sigillo del Possessore
+
+=1753=
+Pesce Luna Spaziale
+
+=1754=
+Drago Ragnarok Divino
+
+=1755=
+Chu-Suke il Topo Guerriero
+
+=1756=
+Insetto Cavaliere
+
+=1757=
+Fenice Sacra di Nephtys
+
+=1758=
+Arcidiacono di Nephtys
+
+=1759=
+Insetto Finale LV5
+
+=1760=
+Grandmarg Monarca della Terra
+
+=1761=
+Valkyrie Elementale
+
+=1762=
+Demone Elementale
+
+=1763=
+Panda Maji-Gire
+
+=1764=
+Gatto-Matatabi
+
+=1765=
+Behemoth il Re degli Animali
+
+=1766=
+Mammoth dalle Grandi Zanne
+
+=1767=
+Campione Canguro
+
+=1768=
+Iena
+
+=1769=
+Coniglio Lama
+
+=1770=
+Marron Cane Meccanico
+
+=1771=
+Mago del Sangue
+
+=1772=
+Spadaccino Sacro - Gearfried il Cavaliere di Ferro
+
+=1773=
+Ben Kei - Samurai Armato
+
+=1774=
+Assassino Ombra
+
+=1775=
+Golem Guardiano
+
+=1776=
+Abare Ushioni
+
+=1777=
+La LUCE - Creatura Sigillo Fusione
+
+=1778=
+L' OSCURITÀ - Creatura Sigillo Fusione
+
+=1779=
+La TERRA - Creatura Sigillo Fusione
+
+=1780=
+Prodigio del Turbine
+
+=1781=
+Sovrano delle Fiamme
+
+=1782=
+Uccello di Fuoco
+
+=1783=
+Gatto da Soccorso
+
+=1784=
+Manipola Mente
+
+=1785=
+Drago Mitraglia
+
+=1786=
+Re Dragone
+
+=1787=
+Una Piuma di Fenice
+
+=1788=
+Fauci Velenose
+
+=1789=
+Spade Mistificatrici
+
+=1790=
+Colpo di Lancia Spinale
+
+=1791=
+Rimozione della Restrizione
+
+=1792=
+Terreno Centrifugo
+
+=1793=
+Stipulazione di un Contratto
+
+=1794=
+Ri-Fusione
+
+=1795=
+La Grande Marcia degli Animali
+
+=1796=
+Contrattacco Incrociato
+
+=1797=
+Ruggito Minaccioso
+
+=1798=
+Esplosione di Ali della Fenice
+
+=1799=
+Buon Contabile Goblin
+
+=1800=
+Scambio di Anima della Bestia
+
+=1801=
+Assalto al Quartier Generale
+
+=1802=
+Esplosione D.D.
+
+=1803=
+Virus Devasta Deck
+
+=1804=
+Esplosione Elementale
+
+=1805=
+Potente Cessate il Fuoco
+
+=1806=
+Maledizione del Vampiro
+
+=1807=
+Attacco Unito
+
+=1808=
+Succhiasangue
+
+=1809=
+Occhio Dominante
+
+=1810=
+Drago Oscuro Occhi Rossi
+
+=1811=
+Genesi Vampira
+
+=1812=
+Kaibaman
+
+=1813=
+Avian Eroe Elementale
+
+=1814=
+Burstinatrix Eroe Elementale
+
+=1815=
+Clayman Eroe Elementale
+
+=1816=
+Sparkman Eroe Elementale
+
+=1817=
+Kuriboh Alato
+
+=1819=
+Golem-Ingranaggio Antico
+
+=1820=
+Bestia-Ingranaggio Antico
+
+=1821=
+Soldato-Ingranaggio Antico
+
+=1822=
+Scorpione del Millennio
+
+=1823=
+Insetto Finale LV7
+
+=1824=
+Guardiano Perduto
+
+=1825=
+Hieracosfinge
+
+=1826=
+Criosfinge
+
+=1827=
+Cannoni d'Intercettazione Moai
+
+=1828=
+Drago Megaroccia
+
+=1829=
+Golem Pupazzo
+
+=1830=
+Tomba Ohja
+
+=1831=
+Golem Mina
+
+=1832=
+Monaco Combattente
+
+=1833=
+Maestro Monaco
+
+=1834=
+Statua Guardiana
+
+=1835=
+Verme Medusa
+
+=1836=
+Sopravvissuto D.D.
+
+=1837=
+Il Guardiano Medio Scudo
+
+=1838=
+Ninja Bianco
+
+=1839=
+Aussa l'Ammaliatrice della Terra
+
+=1840=
+Eria l'Ammaliatrice dell'Acqua
+
+=1841=
+Hiita l'Ammaliatrice del Fuoco
+
+=1842=
+Wynn l'Ammaliatrice del Vento
+
+=1843=
+Uomo Batteria AA
+
+=1844=
+Wombato Des
+
+=1845=
+Re dei Servitori del Teschio
+
+=1846=
+Reshef l'Entità Oscura
+
+=1847=
+Doriado Signora Elementale
+
+=1848=
+Uomo Alato della Fiamma Eroe Elementale
+
+=1849=
+Gigante del Tuono Eroe Elementale
+
+=1850=
+Dono del Martirio
+
+=1851=
+Doppio Attacco
+
+=1852=
+Carica Batterie
+
+=1853=
+Colpo Kaminote
+
+=1854=
+Benedizione di Doriado
+
+=1855=
+Rituale Finale degli Antichi
+
+=1856=
+Cintura Nera Leggendaria
+
+=1857=
+Unità al Nitro
+
+=1858=
+Ombre Danzanti
+
+=1859=
+Formazione Impenetrabile
+
+=1860=
+Segnale dell'Eroe
+
+=1861=
+Seconda Vista di Pikeru
+
+=1862=
+Esplosione del Campo Minato
+
+=1863=
+Bottone dell'Auto-Distruzione di Kozaky
+
+=1864=
+Depolimerizzazione
+
+=1865=
+Laboratorio Converti-Livello
+
+=1866=
+Bombardamento di Rocce
+
+=1867=
+Festival dei Segnalini
+
+=1868=
+Statuto Blocca-Magia
+
+=1869=
+Resa Reale
+
+=1870=
+Imperatore delle Fiamme Infernali
+
+=1871=
+Ishzark, il Cavaliere Sacro
+
+=1872=
+Signore dei Draghi dell'Oceano - Neo Dedalo
+
+=1873=
+Cycroid
+
+=1874=
+Patroid
+
+=1875=
+Gyroid
+
+=1876=
+Steamroid
+
+=1877=
+Drillroid
+
+=1878=
+UFOroid
+
+=1879=
+Jetroid
+
+=1880=
+Cyber Drago
+
+=1881=
+Wroughtweiller
+
+=1882=
+Bubbleman Eroe Elementale
+
+=1883=
+Steam Gyroid
+
+=1884=
+Guerriero UFOroid
+
+=1885=
+Cyber Drago Gemello
+
+=1886=
+Cyber Drago Finale
+
+=1887=
+Vincolo di Potere
+
+=1888=
+Grattacielo
+
+=1889=
+Sacerdote Evocatore
+
+=1890=
+Orribile Strada Oscura
+
+=1891=
+Kuriboh Alato LV10
+
+=1892=
+Ali Trascendentali
+
+=1893=
+Bubble-Scambio
+
+=1894=
+Pistola Spark
+
+=1895=
+Vandalgyon il Darkruler
+
+=1896=
+Soitsu
+
+=1897=
+Astice Folle
+
+=1898=
+Jerry Uomo Fagiolo
+
+=1899=
+Mago Cibernetico
+
+=1900=
+Ciclope Cibernetico
+
+=1901=
+Segugio Meccanico
+
+=1902=
+Cyber Arcidemone
+
+=1903=
+Forza d'Attacco Goblin d'Elite
+
+=1904=
+B.E.S. Nucleo Cristallino
+
+=1905=
+Kozaky Gigante
+
+=1906=
+Lei Lei Guerriero Indomabile
+
+=1907=
+Ailin Anima Protettrice
+
+=1908=
+Doitsu
+
+=1909=
+Rana Des
+
+=1910=
+T.A.D.P.O.L.E.
+
+=1911=
+Rana Velenosa
+
+=1912=
+Infinità Tiranno
+
+=1913=
+Uomo Batteria C
+
+=1914=
+Curran Maga d'Ebano
+
+=1915=
+D.D.M. - Maestro dall'Altra Dimensione
+
+=1916=
+Recupera Fusione
+
+=1917=
+Fusione Miracolo
+
+=1918=
+Specchio del Drago
+
+=1919=
+Caduta del Sistema
+
+=1920=
+Gracchiare Des
+
+=1921=
+Anfora della Generosità
+
+=1922=
+Spia di Shien
+
+=1923=
+Dardi Infuocati
+
+=1924=
+Arte Spirituale della Terra - Kurogane
+
+=1925=
+Arte Spirituale dell'Acqua - Aoi
+
+=1926=
+Arte Spirituale del Fuoco - Kurenai
+
+=1927=
+Arte Spirituale del Vento - Miyabi
+
+=1928=
+Compare un Antagonista!
+
+=1929=
+Esplosione Magica
+
+=1930=
+Energia Ascendente
+
+=1931=
+Buco Trappola D.D.
+
+=1932=
+Coscrizione
+
+=1933=
+Muro Dimensionale
+
+=1934=
+Prepararsi al Contrattacco
+
+=1935=
+Triage
+
+=1936=
+Alkana, il Cavaliere dello Scherzo
+
+=1937=
+Gilford la Leggenda
+
+=1938=
+Signora Guerriera delle Terre Desolate
+
+=1939=
+Spada Divina - Lama della Fenice
+
+=1940=
+Uomo Alato della Fiammata Lucente Eroe Elementale
+
+=1941=
+Modulazione del Livello
+
+=1942=
+Ojamuscoli
+
+=1943=
+Ojamagia
+
+=1944=
+V-Tigre Jet
+
+=1945=
+Pattinatrice Lama
+
+=1946=
+Zombie Rinato
+
+=1947=
+W-Catapulta Ala
+
+=1948=
+Bladedge Eroe Elementale
+
+=1949=
+Wildheart Eroe Elementale
+
+=1950=
+Hydrogeddon
+
+=1951=
+Oxygeddon
+
+=1952=
+Drago Acquatico
+
+=1953=
+Cyber Etoile
+
+=1954=
+VW-Catapulta Tigre
+
+=1955=
+VWXYZ-Cannone Drago Catapulta
+
+=1956=
+Cyber Lama
+
+=1957=
+Bastione Distruttore Eroe Elementale
+
+=1958=
+Tempesta Eroe Elementale
+
+=1959=
+Fendente Selvaggio Edge Eroe Elementale
+
+=1960=
+Alleanza Chthoniana
+
+=1961=
+Colpo di Piuma
+
+=1962=
+Legame - H2O
+
+=1963=
+Polimerizzatore Chthoniano
+
+=1964=
+Esplosione Chthoniana
+
+=1965=
+Barriera dell'Eroe
+
+=1966=
+Vento di Piume
+
+=1967=
+Zure, Cavaliere del Mondo Oscuro
+
+=1968=
+Tetran B.E.S.
+
+=1969=
+Nanobreaker
+
+=1970=
+Mago Fuoco-Rapido
+
+=1971=
+Beiige, Avanguardia del Mondo Oscuro
+
+=1972=
+Broww, Cacciatore del Mondo Oscuro
+
+=1973=
+Brron, Folle Sovrano del Mondo Oscuro
+
+=1974=
+Sillva, Signore della Guerra del Mondo Oscuro
+
+=1975=
+Goldd, Signore-Wu del Mondo Oscuro
+
+=1976=
+Scarr, Scout del Mondo Oscuro
+
+=1977=
+Aussa Posseduta dal Famiglio
+
+=1978=
+Eria Posseduta dal Famiglio
+
+=1979=
+Hiita Posseduta dal Famiglio
+
+=1980=
+Wynn Posseduta dal Famiglio
+
+=1981=
+Giara dell'Avarizia
+
+=1982=
+Fulmine del Mondo Oscuro
+
+=1983=
+Assalto del Boss
+
+=1984=
+Cancello del Mondo Oscuro
+
+=1985=
+Le Forze dell'Oscurità
+
+=1986=
+Accordo Oscuro
+
+=1987=
+Perdita Simultanea
+
+=1988=
+Fuori Tutti
+
+=1989=
+La Lega della Nomenclatura Uniforme
+
+=1990=
+Attaccati!
+
+=1991=
+Area di Non-Fusione
+
+=1992=
+Livello Limite - Area A
+
+=1993=
+Modificatore Corazzato
+
+=1994=
+Necroscuro Eroe Elementale
+
+=1995=
+Heyro l'Eroe
+
+=1996=
+Sferafolle Eroe Elementale
+
+=1997=
+Stregone Oscuro Eradicatore
+
+=1998=
+Cerbero Mitica Bestia
+
+=1999=
+Ondata Magica
+
+=2000=
+Vapore Curatore Eroe Elementale
+
+=2001=
+Ritorno di Fiamma
+
+=2002=
+Colpo Bubble
+
+=2003=
+Illusione Bubble
+
+=2004=
+Carica Clay
+
+=2005=
+Drago Armato LV10
+
+=2006=
+Maglio Magico
+
+=2007=
+Inferno Evocazione Folle
+
+=2008=
+Dragonute d'Attacco
+
+=2009=
+Corpo Misto
+
+=2010=
+Dragonute con Ascia
+
+=2011=
+Drago dalle Corna Bianche
+
+=2012=
+Uria, Signore delle Fiamme Ardenti
+
+=2013=
+Hamon, Signore del Tuono Fragoroso
+
+=2014=
+Raviel, il Signore dei Fantasmi
+
+=2015=
+Neo Bubbleman Eroe Elementale
+
+=2016=
+Ragazza Eroica
+
+=2017=
+Cyber Drago Barriera
+
+=2018=
+Cyber Drago Laser
+
+=2019=
+Ingranaggio Antico
+
+=2020=
+Coraggio dell'Eroe
+
+=2021=
+Circolo Magnetico LV2
+
+=2022=
+Trivella-Ingranaggio Antico
+
+=2023=
+Martiri Fantasma
+
+=2024=
+Boomerang Ciclone
+
+=2025=
+Unità Generatrice di Fotoni
+
+=2026=
+Castello-Ingranaggio Antico
+
+=2027=
+Ragazzo Miracoloso
+
+=2028=
+Unità Respingi-Attacco
+
+=2029=
+Condensatore di Danno
+
+=2030=
+Cannone-Ingranaggio Antico
+
+=2031=
+Proto-Cyber Drago
+
+=2032=
+Esplosivo Adesivo
+
+=2033=
+Prototipo di Re delle Macchine
+
+=2034=
+B.E.S. Nucleo Protetto
+
+=2035=
+Guida D.D.
+
+=2036=
+Catena Distruttrice
+
+=2037=
+Discepolo della Magia Proibita
+
+=2038=
+Tenkabito Shien
+
+=2039=
+Ticki Parassitario
+
+=2040=
+Gokipon
+
+=2041=
+Insetto Silente
+
+=2042=
+Insetto Sega Elettrica
+
+=2043=
+Anteatereatingant
+
+=2044=
+Coleottero Sciabola
+
+=2045=
+Doom Dozer
+
+=2046=
+Rana degli Alberi
+
+=2047=
+Rana Beelze
+
+=2048=
+Principessa Pikeru
+
+=2049=
+Principessa Curran
+
+=2050=
+Annientatore di Memoria
+
+=2051=
+Ascendente Malvagio
+
+=2052=
+Spettro dell'Erba
+
+=2053=
+Falena di Sabbia
+
+=2054=
+Excelion - Drago Divino
+
+=2055=
+Ruin, Regina dell'Oblio
+
+=2056=
+Demise, Re dell'Armageddon
+
+=2057=
+Rana D3S
+
+=2058=
+Simbolo di Retaggio
+
+=2059=
+La Prova delle Principesse
+
+=2060=
+Fine del Mondo
+
+=2061=
+Samsara
+
+=2062=
+Taglio Karmico
+
+=2063=
+Il Prossimo a Scomparire
+
+=2064=
+Cambio Generazionale
+
+=2065=
+Fuoco a Volontà
+
+=2066=
+Probabilità di Successo 0%
+
+=2067=
+Cacciatore di Opzioni
+
+=2068=
+Goblin Fuori dalla Padella
+
+=2069=
+Malfunzionamento
+
+=2070=
+Il Flauto dell'Evocazione di Kuriboh
+
+=2071=
+Erikshieler Eroe Elementale
+
+=2072=
+Guardiano dell'Esodo
+
+=2073=
+Grande Spirito
+
+=2074=
+Zona a Rischio
+
+=2075=
+Honclus d'Oro
+
+=2076=
+Helios, l'Antico Sole
+
+=2077=
+Helios Duo Megiste
+
+=2078=
+Helios Tris Megiste
+
+=2079=
+Neos Eroe Elementale
+
+=2080=
+Dente di Leone
+
+=2081=
+Segna-Mostro Insetto
+
+=2082=
+Segna-Kuriboh
+
+=2083=
+Segna-Montone
+
+=2084=
+Segna-Formica Soldato
+
+=2085=
+Segna-Melma
+
+=2086=
+Segna-Malvagio
+
+=2087=
+Segna-Serpente Velenoso
+
+=2088=
+Segna-Lekunga
+
+=2089=
+Segna-Pianta Malvagia
+
+=2090=
+Segna-Demone Metallico
+
+=2091=
+Segna-Ojama
+
+=2092=
+Segna-Agnello
+
+=2093=
+Segna-Inganno
+
+=2094=
+Segna-Blocco
+
+=2095=
+Segna-Genma
+
+=2096=
+Segna-Martire Genma
+
+=2097=
+Segna-Soffici
+
