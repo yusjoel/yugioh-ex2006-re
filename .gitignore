@@ -13,7 +13,11 @@
 *.log
 /ghidra/
 doc/temp/
+temp/
 __pycache__/
+
+# 视觉审阅 PNG (脚本可重新生成)
+tools/card-desc/*.png
 
 output/
 
@@ -31,7 +35,9 @@ refs/gba-ghidra-loader/
 graphics/
 
 # 导出的数据汇编（由 tools/rom-export/export_all.py 从 ROM 生成）
-data/
+data/*
+# 但 card-desc-src/ 是手维护的 6 lang UTF-8 文本源 + pointer-table 元数据, 入库
+!data/card-desc-src/
 
 # 导出的 FS 文件（由 tools/rom-export/export_fs_files.py 从 ROM 重建）
 fs/

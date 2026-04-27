@@ -1,0 +1,2103 @@
+@ Pointer Table mapping: cid → label_cid (4 digits each)
+@ Each cid in [0, 2097] maps to a label_cid that has actual data.
+@ When cid != label_cid, this is alt-art / shared description.
+@ Format: "<cid> <label_cid> <comment>"
+
+0000 0000  (dummy)
+0001 0001  Blue-Eyes White Dragon
+0002 0001  Blue-Eyes White Dragon (alt-art)
+0003 0001  Blue-Eyes White Dragon (alt-art)
+0004 0001  Blue-Eyes White Dragon (alt-art)
+0005 0005  Mystical Elf
+0006 0006  Hitotsu-Me Giant
+0007 0007  Baby Dragon
+0008 0008  Ryu-Kishin
+0009 0009  Feral Imp
+0010 0010  Winged Dragon, Guardian of the Fortress #1
+0011 0011  Mushroom Man
+0012 0012  Blackland Fire Dragon
+0013 0013  Tyhone
+0014 0014  Flame Swordsman
+0015 0014  Flame Swordsman (alt-art)
+0016 0016  Time Wizard
+0017 0017  Right Leg of the Forbidden One
+0018 0018  Left Leg of the Forbidden One
+0019 0019  Right Arm of the Forbidden One
+0020 0020  Left Arm of the Forbidden One
+0021 0021  Exodia the Forbidden One
+0022 0022  Summoned Skull
+0023 0022  Summoned Skull (alt-art)
+0024 0022  Summoned Skull (alt-art)
+0025 0025  The Wicked Worm Beast
+0026 0026  Skull Servant
+0027 0027  Horn Imp
+0028 0028  Battle Ox
+0029 0029  Beaver Warrior
+0030 0030  Rock Ogre Grotto #1
+0031 0031  Mountain Warrior
+0032 0032  Zombie Warrior
+0033 0033  Koumori Dragon
+0034 0034  Two-Headed King Rex
+0035 0035  Judge Man
+0036 0036  Saggi the Dark Clown
+0037 0037  Dark Magician
+0038 0037  Dark Magician (alt-art)
+0039 0037  Dark Magician (alt-art)
+0040 0040  The Snake Hair
+0041 0041  Gaia the Dragon Champion
+0042 0042  Gaia The Fierce Knight
+0043 0042  Gaia The Fierce Knight (alt-art)
+0044 0044  Curse of Dragon
+0045 0045  Celtic Guardian
+0046 0045  Celtic Guardian (alt-art)
+0047 0047  Illusionist Faceless Mage
+0048 0048  Karbonala Warrior
+0049 0049  Rogue Doll
+0050 0050  Oscillo Hero #2
+0051 0051  Griffore
+0052 0052  Torike
+0053 0053  Sangan
+0054 0054  Big Insect
+0055 0055  Basic Insect
+0056 0056  Armored Lizard
+0057 0057  Killer Needle
+0058 0058  Gokibore
+0059 0059  Giant Flea
+0060 0060  Larvae Moth
+0061 0061  Great Moth
+0062 0062  Kuriboh
+0063 0062  Kuriboh (alt-art)
+0064 0062  Kuriboh (alt-art)
+0065 0065  Mammoth Graveyard
+0066 0066  Great White
+0067 0067  Wolf
+0068 0068  Harpie Lady
+0069 0069  Harpie Lady Sisters
+0070 0070  Tiger Axe
+0071 0070  Tiger Axe (alt-art)
+0072 0072  Silver Fang
+0073 0073  Kojikocy
+0074 0074  Perfectly Ultimate Great Moth
+0075 0075  Thousand Dragon
+0076 0075  Thousand Dragon (alt-art)
+0077 0077  Fiend Kraken
+0078 0078  Jellyfish
+0079 0079  Cocoon of Evolution
+0080 0080  Giant Soldier of Stone
+0081 0081  Man-Eating Plant
+0082 0082  Krokodilus
+0083 0083  Grappler
+0084 0084  Axe Raider
+0085 0085  Megazowler
+0086 0086  Uraby
+0087 0087  Crawling Dragon #2
+0088 0088  Red-Eyes B. Dragon
+0089 0088  Red-Eyes B. Dragon (alt-art)
+0090 0088  Red-Eyes B. Dragon (alt-art)
+0091 0088  Red-Eyes B. Dragon (alt-art)
+0092 0092  Castle of Dark Illusions
+0093 0093  Reaper of the Cards
+0094 0094  King of Yamimakai
+0095 0095  Barox
+0096 0096  Metal Guardian
+0097 0097  Catapult Turtle
+0098 0098  Gyakutenno Megami
+0099 0099  Mystic Horseman
+0100 0100  Rabid Horseman
+0101 0101  Crass Clown
+0102 0102  Armored Zombie
+0103 0103  Dragon Zombie
+0104 0104  Clown Zombie
+0105 0105  Pumpking the King of Ghosts
+0106 0106  Battle Warrior
+0107 0107  Wings of Wicked Flame
+0108 0108  Mask of Darkness
+0109 0109  Job-Change Mirror
+0110 0110  Curtain of the Dark Ones
+0111 0111  Kageningen
+0112 0112  Graveyard and the Hand of Invitation
+0113 0113  Goddess with the Third Eye
+0114 0114  Hero of the East
+0115 0115  That Which Feeds on Life
+0116 0116  Dark Gray
+0117 0117  White Magical Hat
+0118 0118  Kamionwizard
+0119 0119  Nightmare Scorpion
+0120 0120  Spirit of the Books
+0121 0121  Supporter in the Shadows
+0122 0122  Trial of Nightmare
+0123 0123  Dream Clown
+0124 0124  Sleeping Lion
+0125 0125  Yamatano Dragon Scroll
+0126 0126  Faith Bird
+0127 0127  Nemuriko
+0128 0128  Weather Control
+0129 0129  The 13th Grave
+0130 0130  Charubin the Fire Knight
+0131 0131  Mystical Capture Chain
+0132 0132  Fiend's Hand
+0133 0133  Witty Phantom
+0134 0134  Dragon Statue
+0135 0135  Blue-Eyed Silver Zombie
+0136 0136  Toad Master
+0137 0137  Spiked Snail
+0138 0138  Flame Manipulator
+0139 0139  Necrolancer the Timelord
+0140 0140  Djinn the Watcher of the Wind
+0141 0141  The Bewitching Phantom Thief
+0142 0142  Temple of Skulls
+0143 0143  Monster Egg
+0144 0144  The Shadow Who Controls the Dark
+0145 0145  Lord of the Lamp
+0146 0146  Rhaimundos of the Red Sword
+0147 0147  The Melting Red Shadow
+0148 0148  Dokuroizo the Grim Reaper
+0149 0149  Fire Reaper
+0150 0150  Larvas
+0151 0151  Hard Armor
+0152 0152  Firegrass
+0153 0153  Man Eater
+0154 0154  Dig Beak
+0155 0155  M-Warrior #1
+0156 0156  M-Warrior #2
+0157 0157  Lisark
+0158 0158  Lord of Zemia
+0159 0159  The Judgement Hand
+0160 0160  Mysterious Puppeteer
+0161 0161  Darkfire Dragon
+0162 0162  Dark King of the Abyss
+0163 0163  Spirit of the Harp
+0164 0164  Armaill
+0165 0165  Dark Prisoner
+0166 0166  Hurricail
+0167 0167  Fire Eye
+0168 0168  Monsturtle
+0169 0169  Claw Reacher
+0170 0170  Phantom Dewan
+0171 0171  Arlownay
+0172 0172  Dark Shade
+0173 0173  Masked Clown
+0174 0174  Lucky Trinket
+0175 0175  Genin
+0176 0176  Eyearmor
+0177 0177  Fiend Reflection #2
+0178 0178  Gate Deeg
+0179 0179  Synchar
+0180 0180  Fusionist
+0181 0181  Akakieisu
+0182 0182  LaLa Li-oon
+0183 0183  Turtle Tiger
+0184 0184  Terra the Terrible
+0185 0185  Doron
+0186 0186  Arma Knight
+0187 0187  Happy Lover
+0188 0188  Penguin Knight
+0189 0189  Petit Dragon
+0190 0190  Frenzied Panda
+0191 0191  Archfiend Marmot of Nefariousness
+0192 0192  Phantom Ghost
+0193 0193  Dorover
+0194 0194  Twin Long Rods #1
+0195 0195  Droll Bird
+0196 0196  Petit Angel
+0197 0197  Winged Cleaver
+0198 0198  Hinotama Soul
+0199 0199  Kaminarikozou
+0200 0200  Meotoko
+0201 0201  Aqua Madoor
+0202 0202  Kagemusha of the Blue Flame
+0203 0203  Flame Ghost
+0204 0204  Dryad
+0205 0205  B. Skull Dragon
+0206 0206  Two-Mouth Darkruler
+0207 0207  Solitude
+0208 0208  Masked Sorcerer
+0209 0209  Kumootoko
+0210 0210  Midnight Fiend
+0211 0211  Trap Master
+0212 0212  Fiend Sword
+0213 0213  Skull Stalker
+0214 0214  Hitodenchak
+0215 0215  Wood Remains
+0216 0216  Hourglass of Life
+0217 0217  Rare Fish
+0218 0218  Wood Clown
+0219 0219  Madjinn Gunn
+0220 0220  Dark Titan of Terror
+0221 0221  Beautiful Headhuntress
+0222 0222  Guardian of the Labyrinth
+0223 0223  Yashinoki
+0224 0224  Vishwar Randi
+0225 0225  The Drdek
+0226 0226  Dark Assailant
+0227 0227  Candle of Fate
+0228 0228  Water Element
+0229 0229  Dissolverock
+0230 0230  Meda Bat
+0231 0231  One Who Hunts Souls
+0232 0232  Root Water
+0233 0233  Master & Expert
+0234 0234  Water Omotics
+0235 0235  Hyo
+0236 0236  Enchanting Mermaid
+0237 0237  Nekogal #1
+0238 0238  Fairywitch
+0239 0239  Embryonic Beast
+0240 0240  Prevent Rat
+0241 0241  Dimensional Warrior
+0242 0242  Stone Armadiller
+0243 0243  Beastking of the Swamps
+0244 0244  Ancient Sorcerer
+0245 0245  Lunar Queen Elzaim
+0246 0246  Wicked Mirror
+0247 0247  The Little Swordsman of Aile
+0248 0248  Rock Ogre Grotto #2
+0249 0249  Wing Egg Elf
+0250 0250  The Furious Sea King
+0251 0251  Princess of Tsurugi
+0252 0252  Unknown Warrior of Fiend
+0253 0253  Sectarian of Secrets
+0254 0254  Versago the Destroyer
+0255 0255  Wetha
+0256 0256  Megirus Light
+0257 0257  Mavelus
+0258 0258  Ancient Tree of Enlightenment
+0259 0259  Green Phantom King
+0260 0260  Ground Attacker Bugroth
+0261 0261  Ray & Temperature
+0262 0262  Gorgon Egg
+0263 0263  Petit Moth
+0264 0264  King Fog
+0265 0265  Protector of the Throne
+0266 0266  Mystic Clown
+0267 0267  Mystical Sheep #2
+0268 0268  Holograh
+0269 0269  Tao the Chanter
+0270 0270  Serpent Marauder
+0271 0271  Ogre of the Black Shadow
+0272 0272  Moon Envoy
+0273 0273  Fireyarou
+0274 0274  Psychic Kappa
+0275 0275  Masaki the Legendary Swordsman
+0276 0276  Dragoness the Wicked Knight
+0277 0277  Bio Plant
+0278 0278  One-Eyed Shield Dragon
+0279 0279  Cyber Soldier of Darkworld
+0280 0280  Wicked Dragon with the Ersatz Head
+0281 0281  Sonic Maid
+0282 0282  Kurama
+0283 0283  Axe of Despair
+0284 0284  Insect Armor with Laser Cannon
+0285 0285  Black Pendant
+0286 0286  Horn of Light
+0287 0287  Horn of the Unicorn
+0288 0288  Elegant Egotist
+0289 0289  Stop Defense
+0290 0290  Malevolent Nuzzler
+0291 0291  Dragon Capture Jar
+0292 0292  Forest
+0293 0293  Wasteland
+0294 0294  Mountain
+0295 0295  Sogen
+0296 0296  Umi
+0297 0297  Yami
+0298 0298  Dark Hole
+0299 0299  Raigeki
+0300 0300  Mooyan Curry
+0301 0301  Red Medicine
+0302 0302  Goblin's Secret Remedy
+0303 0303  Soul of the Pure
+0304 0304  Dian Keto the Cure Master
+0305 0305  Sparks
+0306 0306  Ookazi
+0307 0307  Tremendous Fire
+0308 0308  Swords of Revealing Light
+0309 0309  Spellbinding Circle
+0310 0310  Dark-Piercing Light
+0311 0311  Yaranzo
+0312 0312  Kanan the Swordmistress
+0313 0313  Takriminos
+0314 0314  Stuffed Animal
+0315 0315  Super War-Lion
+0316 0316  Three-Legged Zombies
+0317 0317  Zera The Mant
+0318 0318  Flying Penguin
+0319 0319  Millennium Shield
+0320 0319  Millennium Shield (alt-art)
+0321 0321  Fairy's Gift
+0322 0322  Black Luster Soldier
+0323 0323  Fiend's Mirror
+0324 0324  Labyrinth Wall
+0325 0325  Jirai Gumo
+0326 0326  Shadow Ghoul
+0327 0327  Wall Shadow
+0328 0328  Labyrinth Tank
+0329 0329  Sanga of the Thunder
+0330 0330  Kazejin
+0331 0331  Suijin
+0332 0332  Gate Guardian
+0333 0333  Ryu-Kishin Powered
+0334 0334  Swordstalker
+0335 0335  La Jinn the Mystical Genie of the Lamp
+0336 0335  La Jinn the Mystical Genie of the Lamp (alt-art)
+0337 0337  Blue-Eyes Ultimate Dragon
+0338 0337  Blue-Eyes Ultimate Dragon (alt-art)
+0339 0339  Toon Alligator
+0340 0340  Parrot Dragon
+0341 0341  Dark Rabbit
+0342 0342  Bickuribox
+0343 0343  Harpie's Pet Dragon
+0344 0344  Pendulum Machine
+0345 0344  Pendulum Machine (alt-art)
+0346 0346  Giltia the D. Knight
+0347 0347  Launcher Spider
+0348 0347  Launcher Spider (alt-art)
+0349 0349  Zoa
+0350 0350  Metalzoa
+0351 0351  Ocubeam
+0352 0352  Monster Eye
+0353 0353  Yaiba Robo
+0354 0354  Machine King
+0355 0355  Metal Dragon
+0356 0356  Giga-Tech Wolf
+0357 0357  Shovel Crusher
+0358 0358  Mechanicalchaser
+0359 0359  Blocker
+0360 0360  Golgoil
+0361 0361  Cyber-Stein
+0362 0362  Cyber Commander
+0363 0363  Jinzo #7
+0364 0364  Thunder Dragon
+0365 0365  Kaiser Dragon
+0366 0366  Magician of Faith
+0367 0367  Goddess of Whim
+0368 0368  Water Magician
+0369 0369  Ice Water
+0370 0370  Waterdragon Fairy
+0371 0371  Ancient Elf
+0372 0372  Water Girl
+0373 0373  Deepsea Shark
+0374 0374  Bottom Dweller
+0375 0375  7 Colored Fish
+0376 0376  Guardian of the Sea
+0377 0377  Aqua Snake
+0378 0378  Giant Red Seasnake
+0379 0379  Kappa Avenger
+0380 0380  Kanikabuto
+0381 0381  Zarigun
+0382 0382  Millennium Golem
+0383 0383  Destroyer Golem
+0384 0384  Barrel Rock
+0385 0385  Minomushi Warrior
+0386 0386  Stone Ghost
+0387 0387  Kaminari Attack
+0388 0388  Tripwire Beast
+0389 0389  Bolt Penguin
+0390 0390  The Immortal of Thunder
+0391 0391  Electric Snake
+0392 0392  Punished Eagle
+0393 0393  Skull Red Bird
+0394 0394  Crimson Sunbird
+0395 0395  Armed Ninja
+0396 0396  Magical Ghost
+0397 0397  Soul Hunter
+0398 0398  Vermillion Sparrow
+0399 0399  Sea Kamen
+0400 0400  Sinister Serpent
+0401 0401  Ganigumo
+0402 0402  Alinsection
+0403 0403  Insect Soldiers of the Sky
+0404 0404  Cockroach Knight
+0405 0405  Burglar
+0406 0406  Pragtical
+0407 0407  Ameba
+0408 0408  Korogashi
+0409 0409  Boo Koo
+0410 0410  Flower Wolf
+0411 0411  Rainbow Flower
+0412 0412  Barrel Lily
+0413 0413  Hoshiningen
+0414 0414  Maha Vailo
+0415 0415  Musician King
+0416 0416  Wilmee
+0417 0417  Dragon Seeker
+0418 0418  Man-Eater Bug
+0419 0419  D. Human
+0420 0420  Turtle Raccoon
+0421 0421  Prisman
+0422 0422  Crazy Fish
+0423 0423  Bracchio-raidus
+0424 0424  Laughing Flower
+0425 0425  Bean Soldier
+0426 0426  Cannon Soldier
+0427 0427  Guardian of the Throne Room
+0428 0428  Brave Scizzar
+0429 0429  The Statue of Easter Island
+0430 0430  Muka Muka
+0431 0431  Boulder Tortoise
+0432 0432  Fire Kraken
+0433 0433  Turtle Bird
+0434 0434  Skullbird
+0435 0435  Monstrous Bird
+0436 0436  The Bistro Butcher
+0437 0437  Star Boy
+0438 0438  Milus Radiant
+0439 0439  Flame Cerebrus
+0440 0440  Eldeen
+0441 0441  Mystical Sand
+0442 0442  Gemini Elf
+0443 0442  Gemini Elf (alt-art)
+0444 0444  Minar
+0445 0445  Kamakiriman
+0446 0446  Mechaleon
+0447 0447  Mega Thunderball
+0448 0448  Niwatori
+0449 0449  Corroding Shark
+0450 0450  Skelengel
+0451 0451  Hane-Hane
+0452 0452  Tongyo
+0453 0453  Dharma Cannon
+0454 0454  Skelgon
+0455 0455  Wow Warrior
+0456 0456  Griggle
+0457 0457  Frog the Jam
+0458 0458  Behegon
+0459 0459  Dark Elf
+0460 0460  Winged Dragon, Guardian of the Fortress #2
+0461 0461  The Wandering Doomed
+0462 0462  Steel Ogre Grotto #1
+0463 0463  Oscillo Hero
+0464 0464  Invader from Another Dimension
+0465 0465  Lesser Dragon
+0466 0466  Needle Worm
+0467 0467  Wretched Ghost of the Attic
+0468 0468  Great Mammoth of Goldfine
+0469 0469  Man-eating Black Shark
+0470 0470  Yormungarde
+0471 0471  Darkworld Thorns
+0472 0472  Anthrosaurus
+0473 0473  Drooling Lizard
+0474 0474  Trakadon
+0475 0475  B. Dragon Jungle King
+0476 0476  Little D
+0477 0477  Witch of the Black Forest
+0478 0478  Giant Scorpion of the Tundra
+0479 0479  Abyss Flower
+0480 0480  Takuhee
+0481 0481  Binding Chain
+0482 0482  Mechanical Snail
+0483 0483  Greenkappa
+0484 0484  Mon Larvas
+0485 0485  Living Vase
+0486 0486  Tentacle Plant
+0487 0487  Beaked Snake
+0488 0488  Morphing Jar
+0489 0489  Muse-A
+0490 0490  Rose Spectre of Dunn
+0491 0491  Fiend Reflection #1
+0492 0492  Ghoul with an Appetite
+0493 0493  Pale Beast
+0494 0494  Little Chimera
+0495 0495  Violent Rain
+0496 0496  Key Mace #2
+0497 0497  Tenderness
+0498 0498  Penguin Soldier
+0499 0499  Fairy Dragon
+0500 0500  Obese Marmot of Nefariousness
+0501 0501  Liquid Beast
+0502 0502  Twin Long Rods #2
+0503 0503  Great Bill
+0504 0504  Shining Friendship
+0505 0505  Bladefly
+0506 0506  Hiro's Shadow Scout
+0507 0507  Lady of Faith
+0508 0508  Twin-Headed Thunder Dragon
+0509 0509  Armored Starfish
+0510 0510  Marine Beast
+0511 0511  Warrior of Tradition
+0512 0512  Snakeyashi
+0513 0513  The Thing That Hides in the Mud
+0514 0514  High Tide Gyojin
+0515 0515  Fairy of the Fountain
+0516 0516  Amazon of the Seas
+0517 0517  Nekogal #2
+0518 0518  Witch's Apprentice
+0519 0519  Armored Rat
+0520 0520  Ancient Lizard Warrior
+0521 0521  Maiden of the Moonlight
+0522 0522  Night Lizard
+0523 0523  Blue-Winged Crown
+0524 0524  Amphibious Bugroth
+0525 0525  Acid Crawler
+0526 0526  Invader of the Throne
+0527 0527  Mystical Sheep #1
+0528 0528  Disk Magician
+0529 0529  Flame Viper
+0530 0530  Royal Guard
+0531 0531  Gruesome Goo
+0532 0532  Whiptail Crow
+0533 0533  Kunai with Chain
+0534 0533  Kunai with Chain (alt-art)
+0535 0535  Magical Labyrinth
+0536 0536  Salamandra
+0537 0537  Eternal Rest
+0538 0538  Megamorph
+0539 0539  Metalmorph
+0540 0539  Metalmorph (alt-art)
+0541 0541  Crush Card
+0542 0541  Crush Card (alt-art)
+0543 0543  Bright Castle
+0544 0544  Shadow Spell
+0545 0545  Black Luster Ritual
+0546 0546  Zera Ritual
+0547 0547  Harpie's Feather Duster
+0548 0547  Harpie's Feather Duster (alt-art)
+0549 0549  War-Lion Ritual
+0550 0550  Beastly Mirror Ritual
+0551 0551  Commencement Dance
+0552 0552  Hamburger Recipe
+0553 0553  Novox's Prayer
+0554 0554  House of Adhesive Tape
+0555 0555  Acid Trap Hole
+0556 0555  Acid Trap Hole (alt-art)
+0557 0557  Widespread Ruin
+0558 0557  Widespread Ruin (alt-art)
+0559 0559  Bad Reaction to Simochi
+0560 0560  Reverse Trap
+0561 0561  Turtle Oath
+0562 0562  Resurrection of Chakra
+0563 0563  Javelin Beetle Pact
+0564 0564  Garma Sword Oath
+0565 0565  Revival of Dokurorider
+0566 0566  Fortress Whale's Oath
+0567 0567  Performance of Sword
+0568 0568  Hungry Burger
+0569 0569  Sengenjin
+0570 0570  Skull Guardian
+0571 0571  Tri-Horned Dragon
+0572 0572  Serpent Night Dragon
+0573 0573  Cosmo Queen
+0574 0574  Chakra
+0575 0575  Crab Turtle
+0576 0576  Mikazukinoyaiba
+0577 0577  Meteor Dragon
+0578 0578  Meteor B. Dragon
+0579 0579  Firewing Pegasus
+0580 0580  Garma Sword
+0581 0581  Javelin Beetle
+0582 0582  Fortress Whale
+0583 0583  Dokurorider
+0584 0584  Dark Magic Ritual
+0585 0585  Magician of Black Chaos
+0586 0586  Slot Machine
+0587 0587  Red Archery Girl
+0588 0588  Ryu-Ran
+0589 0589  Manga Ryu-Ran
+0590 0590  Toon Mermaid
+0591 0591  Toon Summoned Skull
+0592 0592  Relinquished
+0593 0593  Thousand-Eyes Idol
+0594 0594  Thousand-Eyes Restrict
+0595 0595  Steel Ogre Grotto #2
+0596 0596  Blast Sphere
+0597 0597  Hyozanryu
+0598 0598  Alpha The Magnet Warrior
+0599 0599  Lord of D.
+0600 0600  Red-Eyes Black Metal Dragon
+0601 0600  Red-Eyes Black Metal Dragon (alt-art)
+0602 0602  Barrel Dragon
+0603 0603  Hannibal Necromancer
+0604 0604  Panther Warrior
+0605 0604  Panther Warrior (alt-art)
+0606 0606  Three-Headed Geedo
+0607 0607  Gazelle the King of Mythical Beasts
+0608 0608  Stone Statue of the Aztecs
+0609 0609  Berfomet
+0610 0610  Chimera the Flying Mythical Beast
+0611 0611  Gear Golem the Moving Fortress
+0612 0612  Jinzo
+0613 0613  Swordsman of Landstar
+0614 0614  Cyber Raider
+0615 0615  The Fiend Megacyber
+0616 0616  Reflect Bounder
+0617 0617  Beta The Magnet Warrior
+0618 0618  Big Shield Gardna
+0619 0618  Big Shield Gardna (alt-art)
+0620 0620  Dark Magician Girl
+0621 0620  Dark Magician Girl (alt-art)
+0622 0620  Dark Magician Girl (alt-art)
+0623 0623  Alligator's Sword
+0624 0624  Insect Queen
+0625 0625  Parasite Paracide
+0626 0626  Skull-Mark Ladybug
+0627 0627  Little-Winguard
+0628 0628  Pinch Hopper
+0629 0629  Blue-Eyes Toon Dragon
+0630 0630  Sword Hunter
+0631 0631  Drill Bug
+0632 0632  Deepsea Warrior
+0633 0633  Satellite Cannon
+0634 0634  The Last Warrior from Another Planet
+0635 0635  Dunames Dark Witch
+0636 0636  Garnecia Elefantis
+0637 0637  Total Defense Shogun
+0638 0638  Beast of Talwar
+0639 0639  Cyber-Tech Alligator
+0640 0640  Gamma The Magnet Warrior
+0641 0641  Time Machine
+0642 0642  Copycat
+0643 0643  Toon World
+0644 0643  Toon World (alt-art)
+0645 0645  Gorgon's Eye
+0646 0646  Black Illusion Ritual
+0647 0647  Brain Control
+0648 0648  Negate Attack
+0649 0649  Multiply
+0650 0650  Lightforce Sword
+0651 0651  The Flute of Summoning Dragon
+0652 0652  Shield & Sword
+0653 0653  Graceful Charity
+0654 0654  Chain Destruction
+0655 0655  Mesmeric Control
+0656 0656  Graceful Dice
+0657 0657  Skull Dice
+0658 0658  Mind Control
+0659 0659  Scapegoat
+0660 0660  Amplifier
+0661 0661  Card Destruction
+0662 0662  Tragedy
+0663 0663  Ectoplasmer
+0664 0664  Dark Magic Curtain
+0665 0665  Insect Barrier
+0666 0666  Magic-Arm Shield
+0667 0667  Fissure
+0668 0668  Trap Hole
+0669 0669  Polymerization
+0670 0670  Remove Trap
+0671 0671  Two-Pronged Attack
+0672 0672  Monster Reborn
+0673 0673  De-Spell
+0674 0674  Pot of Greed
+0675 0675  Gravedigger Ghoul
+0676 0676  Reinforcements
+0677 0677  Castle Walls
+0678 0678  Ultimate Offering
+0679 0679  Tribute to The Doomed
+0680 0680  Soul Release
+0681 0681  The Cheerful Coffin
+0682 0682  Change of Heart
+0683 0683  Solemn Judgment
+0684 0684  Magic Jammer
+0685 0685  Seven Tools of the Bandit
+0686 0686  Horn of Heaven
+0687 0687  Just Desserts
+0688 0688  Royal Decree
+0689 0689  Polymerization
+0690 0690  Magical Thorn
+0691 0691  Restructer Revolution
+0692 0692  Fusion Sage
+0693 0693  Sword of Deep-Seated
+0694 0694  Block Attack
+0695 0695  The Unhappy Maiden
+0696 0696  Robbin' Goblin
+0697 0697  Germ Infection
+0698 0698  Wall of Illusion
+0699 0699  Neo the Magic Swordsman
+0700 0700  Baron of the Fiend Sword
+0701 0701  Man-Eating Treasure Chest
+0702 0702  Sorcerer of the Doomed
+0703 0703  Last Will
+0704 0704  Waboku
+0705 0705  Mirror Force
+0706 0706  Ring of Magnetism
+0707 0707  Share the Pain
+0708 0708  Stim-Pack
+0709 0709  Heavy Storm
+0710 0710  Gravekeeper's Servant
+0711 0711  Upstart Goblin
+0712 0712  Toll
+0713 0713  Final Destiny
+0714 0714  Snatch Steal
+0715 0715  Chorus of Sanctuary
+0716 0716  Confiscation
+0717 0717  Delinquent Duo
+0718 0718  Fairy's Hand Mirror
+0719 0719  Tailor of the Fickle
+0720 0720  Rush Recklessly
+0721 0721  The Reliable Guardian
+0722 0722  The Forceful Sentry
+0723 0723  Chain Energy
+0724 0724  Mystical Space Typhoon
+0725 0725  Giant Trunade
+0726 0726  Painful Choice
+0727 0727  Snake Fang
+0728 0728  Cyber Jar
+0729 0729  Banisher of the Light
+0730 0730  Giant Rat
+0731 0731  Senju of the Thousand Hands
+0732 0732  UFO Turtle
+0733 0733  Flash Assailant
+0734 0734  Karate Man
+0735 0735  Giant Germ
+0736 0736  Nimble Momonga
+0737 0737  Spear Cretin
+0738 0738  Shining Angel
+0739 0739  Mother Grizzly
+0740 0740  Flying Kamakiri #1
+0741 0741  Ceremonial Bell
+0742 0742  Sonic Bird
+0743 0743  Mystic Tomato
+0744 0744  Kotodama
+0745 0745  Gaia Power
+0746 0746  Umiiruka
+0747 0747  Molten Destruction
+0748 0748  Rising Air Current
+0749 0749  Luminous Spark
+0750 0750  Mystic Plasma Zone
+0751 0751  Messenger of Peace
+0752 0752  Michizure
+0753 0753  Gust
+0754 0754  Driving Snow
+0755 0755  Numinous Healer
+0756 0756  Appropriate
+0757 0757  Forced Requisition
+0758 0758  Minor Goblin Official
+0759 0759  Gamble
+0760 0760  DNA Surgery
+0761 0761  The Regulation of Tribe
+0762 0762  Backup Soldier
+0763 0763  Attack and Receive
+0764 0764  Ceasefire
+0765 0765  Light of Intervention
+0766 0766  Respect Play
+0767 0767  Imperial Order
+0768 0768  Skull Invitation
+0769 0769  Magical Hats
+0770 0770  Nobleman of Crossout
+0771 0771  Nobleman of Extermination
+0772 0772  The Shallow Grave
+0773 0773  Premature Burial
+0774 0774  Morphing Jar #2
+0775 0775  Bubonic Vermin
+0776 0776  Twin-Headed Fire Dragon
+0777 0777  Darkfire Soldier #1
+0778 0778  Mr. Volcano
+0779 0779  Darkfire Soldier #2
+0780 0780  Kiseitai
+0781 0781  Cyber Falcon
+0782 0782  Dark Bat
+0783 0783  Flying Kamakiri #2
+0784 0784  Harpie's Brother
+0785 0785  Oni Tank T-34
+0786 0786  Overdrive
+0787 0787  Buster Blader
+0788 0788  Time Seal
+0789 0789  Graverobber
+0790 0790  Gift of The Mystical Elf
+0791 0791  The Eye of Truth
+0792 0792  Dust Tornado
+0793 0793  Call of the Haunted
+0794 0794  Solomon's Lawbook
+0795 0795  Enchanted Javelin
+0796 0796  Mirror Wall
+0797 0797  Windstorm of Etaqua
+0798 0798  Valkyrion the Magna Warrior
+0799 0799  Alligator's Sword Dragon
+0800 0800  Vorse Raider
+0801 0800  Vorse Raider (alt-art)
+0802 0802  Ring of Destruction
+0803 0803  Aqua Chorus
+0804 0804  Sebek's Blessing
+0805 0805  Anti-Spell Fragrance
+0806 0806  Riryoku
+0807 0807  Sword of Dragon's Soul
+0808 0808  Luminous Soldier
+0809 0809  King Tiger Wanghu
+0810 0810  Command Knight
+0811 0811  Wolf Axwielder
+0812 0812  The Illusory Gentleman
+0813 0813  Patrician of Darkness
+0814 0814  Birdface
+0815 0815  Kryuel
+0816 0816  Airknight Parshath
+0817 0817  Fairy King Truesdale
+0818 0818  Serpentine Princess
+0819 0819  Maiden of the Aqua
+0820 0820  Robotic Knight
+0821 0821  Thunder Nyan Nyan
+0822 0822  Molten Behemoth
+0823 0823  Twin-Headed Behemoth
+0824 0824  Injection Fairy Lily
+0825 0825  Woodland Sprite
+0826 0826  Arsenal Bug
+0827 0827  Kinetic Soldier
+0828 0828  Jowls of Dark Demise
+0829 0829  Souleater
+0830 0830  Slate Warrior
+0831 0831  Timeater
+0832 0832  Mucus Yolk
+0833 0833  Servant of Catabolism
+0834 0834  Rigras Leever
+0835 0835  Moisture Creature
+0836 0836  Boneheimer
+0837 0837  Flame Dancer
+0838 0838  Sonic Jammer
+0839 0839  Gearfried the Iron Knight
+0840 0840  Humanoid Slime
+0841 0841  Worm Drake
+0842 0842  Humanoid Worm Drake
+0843 0843  Revival Jam
+0844 0844  Flying Fish
+0845 0845  Amphibian Beast
+0846 0846  Rocket Warrior
+0847 0847  The Legendary Fisherman
+0848 0848  Robolady
+0849 0849  Roboyarou
+0850 0850  Lightning Conger
+0851 0851  Spherous Lady
+0852 0852  Shining Abyss
+0853 0853  Archfiend of Gilfer
+0854 0854  Gadget Soldier
+0855 0855  Grand Tiki Elder
+0856 0856  The Masked Beast
+0857 0857  Melchid the Four-Face Beast
+0858 0858  Nuvia the Wicked
+0859 0859  Soul Exchange
+0860 0860  Mask of Weakness
+0861 0861  Curse of the Masked Beast
+0862 0862  Mask of Dispel
+0863 0863  Mask of Restrict
+0864 0864  Mask of the Accursed
+0865 0865  Mask of Brutality
+0866 0866  Return of the Doomed
+0867 0867  Lightning Blade
+0868 0868  Tornado Wall
+0869 0869  Infinite Dismissal
+0870 0870  Fairy Box
+0871 0871  Torrential Tribute
+0872 0872  Multiplication of Ants
+0873 0873  De-Fusion
+0874 0874  Jam Breeding Machine
+0875 0875  Nightmare's Steelcage
+0876 0876  Infinite Cards
+0877 0877  Jam Defender
+0878 0878  Card of Safe Return
+0879 0879  Magic Cylinder
+0880 0880  Solemn Wishes
+0881 0881  Burning Land
+0882 0882  Cold Wave
+0883 0883  Fairy Meteor Crush
+0884 0884  Limiter Removal
+0885 0885  Shift
+0886 0886  Insect Imitation
+0887 0887  Dimensionhole
+0888 0888  Magic Drain
+0889 0889  Gravity Bind
+0890 0890  Shadow of Eyes
+0891 0891  Girochin Kuwagata
+0892 0892  Hayabusa Knight
+0893 0893  Bombardment Beetle
+0894 0894  4-Starred Ladybug of Doom
+0895 0895  Gradius
+0896 0896  Red-Moon Baby
+0897 0897  Mad Sword Beast
+0898 0898  Skull Mariner
+0899 0899  The All-Seeing White Tiger
+0900 0900  Goblin Attack Force
+0901 0901  Island Turtle
+0902 0902  Wingweaver
+0903 0903  Science Soldier
+0904 0904  Souls of the Forgotten
+0905 0905  Dokuroyaiba
+0906 0906  Rain of Mercy
+0907 0907  Monster Recovery
+0908 0908  Type Zero Magic Crusher
+0909 0909  Yellow Luster Shield
+0910 0910  Creature Swap
+0911 0911  Dark Magician
+0912 0912  Thousand Knives
+0913 0913  Mystic Box
+0914 0914  Ground Collapse
+0915 0915  Amazon Archer
+0916 0916  Fire Princess
+0917 0917  Spirit of the Breeze
+0918 0918  Dancing Fairy
+0919 0919  Empress Mantis
+0920 0920  Cure Mermaid
+0921 0921  Hysteric Fairy
+0922 0922  Bio-Mage
+0923 0923  The Forgiving Maiden
+0924 0924  St. Joan
+0925 0925  Marie the Fallen One
+0926 0926  Jar of Greed
+0927 0927  Scroll of Bewitchment
+0928 0928  United We Stand
+0929 0929  Mage Power
+0930 0930  Offerings to the Doomed
+0931 0931  Meteor of Destruction
+0932 0932  Lightning Vortex
+0933 0933  Exchange
+0934 0934  The Portrait's Secret
+0935 0935  The Gross Ghost of Fled Dreams
+0936 0936  Headless Knight
+0937 0937  Dark Necrofear
+0938 0938  Dark Magician's Tome of Black Magic
+0939 0939  Destiny Board
+0940 0940  The Dark Door
+0941 0941  Earthbound Spirit
+0942 0942  Dark Spirit of the Silent
+0943 0943  The Earl of Demise
+0944 0944  Dark Sage
+0945 0945  Cathedral of Nobles
+0946 0946  Judgment of Anubis
+0947 0947  Embodiment of Apophis
+0948 0948  Foolish Burial
+0949 0949  Makiu
+0950 0950  Ancient Lamp
+0951 0951  Cyber Harpie Lady
+0952 0952  Mystical Beast Serket
+0953 0953  Swift Gaia the Fierce Knight
+0954 0954  Obnoxious Celtic Guard
+0955 0955  Zombyra the Dark
+0956 0956  Spiritualism
+0957 0957  Jowgen the Spiritualist
+0958 0958  Kycoo the Ghost Destroyer
+0959 0959  Summoner of Illusions
+0960 0960  Bazoo the Soul-Eater
+0961 0961  Soul of Purity and Light
+0962 0962  Spirit of Flames
+0963 0963  Aqua Spirit
+0964 0964  The Rock Spirit
+0965 0965  Garuda the Wind Spirit
+0966 0966  Gilasaurus
+0967 0967  Tornado Bird
+0968 0968  Dreamsprite
+0969 0969  Supply
+0970 0970  Maryokutai
+0971 0971  Collected Power
+0972 0972  Royal Command
+0973 0973  Riryoku Field
+0974 0974  Skull Lair
+0975 0975  Graverobber's Retribution
+0976 0976  Deal of Phantom
+0977 0977  Destruction Punch
+0978 0978  Blind Destruction
+0979 0979  The Emperor's Holiday
+0980 0980  Cyclon Laser
+0981 0981  Spirit Message "I"
+0982 0982  Spirit Message "N"
+0983 0983  Spirit Message "A"
+0984 0984  Spirit Message "L"
+0985 0985  Bait Doll
+0986 0986  Fusion Gate
+0987 0987  Ekibyo Drakmord
+0988 0988  Miracle Dig
+0989 0989  Vengeful Bog Spirit
+0990 0990  Amazoness Swords Woman
+0991 0991  Makyura the Destructor
+0992 0992  Amazoness Archers
+0993 0993  Rope of Life
+0994 0994  Enchanted Arrow
+0995 0995  Amazoness Chain Master
+0996 0996  Viser Des
+0997 0996  Viser Des (alt-art)
+0998 0998  Amazoness Fighter
+0999 0999  Nightmare Wheel
+1000 1000  Byser Shock
+1001 1001  Dark Ruler Ha Des
+1002 1002  Dark Balter the Terrible
+1003 1003  Lesser Fiend
+1004 1004  Possessed Dark Soul
+1005 1005  Winged Minion
+1006 1006  Ryu-Kishin Clown
+1007 1007  Twin-Headed Wolf
+1008 1008  Opticlops
+1009 1009  Bark of Dark Ruler
+1010 1010  Fatal Abacus
+1011 1011  Life Absorbing Machine
+1012 1012  Double Snare
+1013 1013  Freed the Matchless General
+1014 1014  Throwstone Unit
+1015 1015  Marauding Captain
+1016 1016  Ryu Senshi
+1017 1017  Warrior Dai Grepher
+1018 1018  Frontier Wiseman
+1019 1019  Exiled Force
+1020 1020  The Hunter with 7 Weapons
+1021 1021  Shadow Tamer
+1022 1022  Dragon Manipulator
+1023 1023  The A. Forces
+1024 1024  Reinforcement of the Army
+1025 1025  Array of Revealing Light
+1026 1026  The Warrior Returning Alive
+1027 1027  Ready for Intercepting
+1028 1028  A Feint Plan
+1029 1029  Tyrant Dragon
+1030 1030  Spear Dragon
+1031 1031  Spirit Ryu
+1032 1032  The Dragon dwelling in the Cave
+1033 1033  Lizard Soldier
+1034 1034  Fiend Skull Dragon
+1035 1035  Cave Dragon
+1036 1036  Gray Wing
+1037 1037  Troop Dragon
+1038 1038  The Dragon's Bead
+1039 1039  A Wingbeat of Giant Dragon
+1040 1040  Dragon's Gunfire
+1041 1041  Stamping Destruction
+1042 1042  Super Rejuvenation
+1043 1043  Dragon's Rage
+1044 1044  Burst Breath
+1045 1045  Luster Dragon #2
+1046 1046  Emergency Provisions
+1047 1047  Keldo
+1048 1048  Dragged Down into the Grave
+1049 1049  Kaiser Glider
+1050 1050  Spell Reproduction
+1051 1051  Collapse
+1052 1052  Mudora
+1053 1053  Cestus of Dagla
+1054 1054  De-Spell Germ Weapon
+1055 1055  Des Feral Imp
+1056 1056  Reversal of Graves
+1057 1057  Kelbek
+1058 1058  Zolga
+1059 1059  Blast Held by a Tribute
+1060 1060  Agido
+1061 1061  Silent Fiend
+1062 1062  Fiber Jar
+1063 1063  Gradius' Option
+1064 1064  Maharaghi
+1065 1065  Inaba White Rabbit
+1066 1066  Yata-Garasu
+1067 1067  Susa Soldier
+1068 1068  Yamata Dragon
+1069 1069  Great Long Nose
+1070 1070  Otohime
+1071 1071  Hino-Kagu-Tsuchi
+1072 1072  Asura Priest
+1073 1073  Fushi No Tori
+1074 1074  Super Robolady
+1075 1075  Super Roboyarou
+1076 1076  Fengsheng Mirror
+1077 1077  Heart of Clear Water
+1078 1078  A Legendary Ocean
+1079 1079  Fusion Sword Murasame Blade
+1080 1080  Smoke Grenade of the Thief
+1081 1081  Spiritual Energy Settle Machine
+1082 1082  Second Coin Toss
+1083 1083  Convulsion of Nature
+1084 1084  The Secret of the Bandit
+1085 1085  After the Struggle
+1086 1086  Blast with Chain
+1087 1087  Disappear
+1088 1088  Bottomless Trap Hole
+1089 1089  Ominous Fortunetelling
+1090 1090  Nutrient Z
+1091 1091  Drop Off
+1092 1092  Fiend Comedian
+1093 1093  Last Turn
+1094 1094  Des Volstgalph
+1095 1095  Kaiser Sea Horse
+1096 1096  Vampire Lord
+1097 1097  Gora Turtle
+1098 1098  Sasuke Samurai
+1099 1099  Poison Mummy
+1100 1100  Dark Dust Spirit
+1101 1101  Royal Keeper
+1102 1102  Wandering Mummy
+1103 1103  Great Dezard
+1104 1104  Swarm of Scarabs
+1105 1105  Swarm of Locusts
+1106 1106  Giant Axe Mummy
+1107 1107  Guardian Sphinx
+1108 1108  Pyramid Turtle
+1109 1109  Dice Jar
+1110 1110  Dark Scorpion Burglars
+1111 1111  Don Zaloog
+1112 1112  Des Lacooda
+1113 1113  Fushioh Richie
+1114 1114  Cobraman Sakuzy
+1115 1115  Book of Life
+1116 1116  Book of Taiyou
+1117 1117  Book of Moon
+1118 1118  Mirage of Nightmare
+1119 1119  Call of the Mummy
+1120 1120  Timidity
+1121 1121  Pyramid Energy
+1122 1122  Tutan Mask
+1123 1123  Ordeal of a Traveler
+1124 1124  Bottomless Shifting Sand
+1125 1125  Curse of Royal
+1126 1126  Needle Ceiling
+1127 1127  Statue of the Wicked
+1128 1128  Dark Coffin
+1129 1129  Needle Wall
+1130 1130  Trap Dustshoot
+1131 1131  Reckless Greed
+1132 1132  Toon Dark Magician Girl
+1133 1133  Gilford the Lightning
+1134 1133  Gilford the Lightning (alt-art)
+1135 1135  Exarion Universe
+1136 1136  Legendary Fiend
+1137 1137  Toon Defense
+1138 1138  Toon Table of Contents
+1139 1139  Toon Masked Sorcerer
+1140 1140  Toon Gemini Elf
+1141 1141  Toon Cannon Soldier
+1142 1142  Toon Goblin Attack Force
+1143 1143  Card of Sanctity
+1144 1144  Puppet Master
+1145 1145  Newdoria
+1146 1146  Lord Poison
+1147 1147  Blade Knight
+1148 1148  Helpoemer
+1149 1149  Hidden Soldier
+1150 1150  Gil Garth
+1151 1151  Calamity of the Wicked
+1152 1152  Lava Golem
+1153 1153  Monster Relief
+1154 1154  Machine Duplication
+1155 1155  Dark Jeroid
+1156 1156  Master of Dragon Soldier
+1157 1157  F.G.D.
+1158 1158  Queen's Knight
+1159 1159  X-Head Cannon
+1160 1160  Enemy Controller
+1161 1161  Master Kyonshee
+1162 1162  Kabazauls
+1163 1163  Inpachi
+1164 1164  Gravekeeper's Spy
+1165 1165  Gravekeeper's Curse
+1166 1166  Gravekeeper's Guard
+1167 1167  Gravekeeper's Spear Soldier
+1168 1168  Gravekeeper's Cannonholder
+1169 1169  Gravekeeper's Assailant
+1170 1170  A Man with Wdjat
+1171 1171  Mystical Knight of Jackal
+1172 1172  A Cat of Ill Omen
+1173 1173  Yomi Ship
+1174 1174  Winged Sage Falcos
+1175 1175  An Owl of Luck
+1176 1176  Charm of Shabti
+1177 1177  Cobra Jar
+1178 1178  Spirit Reaper
+1179 1179  Nightmare Horse
+1180 1180  Reaper on the Nightmare
+1181 1181  Card Shuffle
+1182 1182  Reasoning
+1183 1183  Dark Room of Nightmare
+1184 1184  Different Dimension Capsule
+1185 1185  Necrovalley
+1186 1186  Buster Rancher
+1187 1187  Hieroglyph Lithograph
+1188 1188  Dark Snake Syndrome
+1189 1189  Terraforming
+1190 1190  Banner of Courage
+1191 1191  Metamorphosis
+1192 1192  Royal Tribute
+1193 1193  Reversal Quiz
+1194 1194  Curse of Aging
+1195 1195  Raigeki Break
+1196 1196  Disturbance Strategy
+1197 1197  Rite of Spirit
+1198 1198  Non Aggression Area
+1199 1199  D. Tribe
+1200 1200  Y-Dragon Head
+1201 1201  XY-Dragon Cannon
+1202 1202  Z-Metal Tank
+1203 1203  XYZ-Dragon Cannon
+1204 1203  XYZ-Dragon Cannon (alt-art)
+1205 1203  XYZ-Dragon Cannon (alt-art)
+1206 1206  Rope of Spirit
+1207 1207  King's Knight
+1208 1208  Jack's Knight
+1209 1209  Interdimensional Matter Transporter
+1210 1210  Goblin Zombie
+1211 1211  Drillago
+1212 1212  Lekunga
+1213 1213  Cost Down
+1214 1214  People Running About
+1215 1215  Oppressed People
+1216 1216  United Resistance
+1217 1217  Dark Blade
+1218 1218  Pitch-Dark Dragon
+1219 1219  Kiryu
+1220 1220  Decayed Commander
+1221 1221  Zombie Tiger
+1222 1222  Giant Orc
+1223 1223  Second Goblin
+1224 1224  Vampire Orchis
+1225 1225  Des Dendle
+1226 1226  Burning Beast
+1227 1227  Freezing Beast
+1228 1228  D.D. Crazy Beast
+1229 1229  Spell Canceller
+1230 1230  Helping Robo For Combat
+1231 1231  Dimension Jar
+1232 1232  Roulette Barrel
+1233 1233  Paladin of White Dragon
+1234 1234  White Dragon Ritual
+1235 1235  Frontline Base
+1236 1236  Demotion
+1237 1237  Combination Attack
+1238 1238  Autonomous Action Unit
+1239 1239  Poison of the Old Man
+1240 1240  Dark Core
+1241 1241  Raregold Armor
+1242 1242  Kishido Spirit
+1243 1243  Tribute Doll
+1244 1244  Wave-Motion Cannon
+1245 1245  Huge Revolution
+1246 1246  Thunder of Ruler
+1247 1247  Spell Shield Type-8
+1248 1248  Meteorain
+1249 1249  Pineapple Blast
+1250 1250  Secret Barrel
+1251 1251  Formation Union
+1252 1252  Adhesion Trap Hole
+1253 1253  XZ-Tank Cannon
+1254 1254  YZ-Tank Dragon
+1255 1255  Final Attack Orders
+1256 1256  Dark Paladin
+1257 1256  Dark Paladin (alt-art)
+1258 1256  Dark Paladin (alt-art)
+1259 1259  Spell Absorption
+1260 1260  Diffusion Wave-Motion
+1261 1261  Fiend's Sanctuary
+1262 1262  Great Angus
+1263 1263  Aitsu
+1264 1264  Sonic Duck
+1265 1265  Luster Dragon
+1266 1266  Amazoness Paladin
+1267 1267  Amazoness Blowpiper
+1268 1268  Amazoness Tiger
+1269 1269  Skilled White Magician
+1270 1270  Skilled Dark Magician
+1271 1271  Apprentice Magician
+1272 1272  Old Vindictive Magician
+1273 1273  Chaos Command Magician
+1274 1274  Magical Marionette
+1275 1275  Breaker the Magical Warrior
+1276 1276  Magical Plant Mandragola
+1277 1277  Magical Scientist
+1278 1278  Royal Magical Library
+1279 1279  Armor Exe
+1280 1280  Tribe-Infecting Virus
+1281 1281  Des Koala
+1282 1282  Cliff the Trap Remover
+1283 1283  Magical Merchant
+1284 1284  Koitsu
+1285 1285  Cat's Ear Tribe
+1286 1286  Ultimate Obedient Fiend
+1287 1287  Pitch-Black Power Stone
+1288 1288  Big Bang Shot
+1289 1289  Gather Your Mind
+1290 1290  Mass Driver
+1291 1291  Senri Eye
+1292 1292  Emblem of Dragon Destroyer
+1293 1293  Jar Robber
+1294 1294  Mega Ton Magical Cannon
+1295 1295  Continuous Destruction Punch
+1296 1296  Exhausting Spell
+1297 1297  Hidden Book of Spell
+1298 1298  Miracle Restoring
+1299 1299  Disarmament
+1300 1300  Anti-Spell
+1301 1301  The Spell Absorbing Life
+1302 1302  Metal Reflect Slime
+1303 1303  Bowganian
+1304 1304  Excavation of Mage Stones
+1305 1305  Granadora
+1306 1306  Shinato, King of a Higher Plane
+1307 1307  Dark Flare Knight
+1308 1308  Mirage Knight
+1309 1309  Berserk Dragon
+1310 1310  Exodia Necross
+1311 1311  Battle Footballer
+1312 1312  Arsenal Summoner
+1313 1313  Nin-Ken Dog
+1314 1314  Acrobat Monkey
+1315 1315  Guardian Elma
+1316 1316  Guardian Ceal
+1317 1317  Guardian Grarl
+1318 1318  Guardian Baou
+1319 1319  Guardian Kay'est
+1320 1320  Guardian Tryce
+1321 1321  Gyaku-Gire Panda
+1322 1322  Blindly Loyal Goblin
+1323 1323  Despair from the Dark
+1324 1324  Maju Garzett
+1325 1325  Fear from the Dark
+1326 1326  Dark Scorpion - Chick the Yellow
+1327 1327  D.D. Warrior Lady
+1328 1328  Thousand Needles
+1329 1329  Shinato's Ark
+1330 1330  A Deal with Dark Ruler
+1331 1331  Contract with Exodia
+1332 1332  Butterfly Dagger - Elma
+1333 1333  Shooting Star Bow - Ceal
+1334 1334  Gravity Axe - Grarl
+1335 1335  Wicked-Breaking Flamberge - Baou
+1336 1336  Rod of Silence - Kay'est
+1337 1337  Twin Swords of Flashing Light - Tryce
+1338 1338  Precious Cards from Beyond
+1339 1339  Rod of the Mind's Eye
+1340 1340  Fairy of the Spring
+1341 1341  Token Thanksgiving
+1342 1342  Non-Spellcasting Area
+1343 1343  Staunch Defender
+1344 1344  Ojama Trio
+1345 1345  Arsenal Robber
+1346 1346  Skill Drain
+1347 1347  Really Eternal Rest
+1348 1348  Soul Taker
+1349 1349  Magical Dimension
+1350 1350  Judgement of Pharaoh
+1351 1351  Friendship
+1352 1352  Unity
+1353 1353  Dark Magician Knight
+1354 1354  Knight's Title
+1355 1355  Sage's Stone
+1356 1356  Gagagigo
+1357 1357  D. D. Trainer
+1358 1358  Ojama Green
+1359 1359  Archfiend Soldier
+1360 1360  Pandemonium Watchbear
+1361 1361  Sasuke Samurai #2
+1362 1362  Dark Scorpion - Gorg the Strong
+1363 1363  Dark Scorpion - Meanae the Thorn
+1364 1364  Outstanding Dog Marron
+1365 1365  Great Maju Garzett
+1366 1366  Iron Blacksmith Kotetsu
+1367 1367  Mefist the Infernal General
+1368 1368  Vilepawn Archfiend
+1369 1369  Shadowknight Archfiend
+1370 1370  Darkbishop Archfiend
+1371 1371  Desrook Archfiend
+1372 1372  Infernalqueen Archfiend
+1373 1373  Terrorking Archfiend
+1374 1374  Skull Archfiend of Lightning
+1375 1375  Metallizing Parasite - Lunatite
+1376 1376  Tsukuyomi
+1377 1377  Legendary Flame Lord
+1378 1378  Dark Master - Zorc
+1379 1379  Incandescent Ordeal
+1380 1380  Contract with the Abyss
+1381 1381  Contract with the Dark Master
+1382 1382  Falling Down
+1383 1383  Checkmate
+1384 1384  Final Countdown
+1385 1385  Mustering of the Dark Scorpions
+1386 1386  Pandemonium
+1387 1387  Altar for Tribute
+1388 1388  Frozen Soul
+1389 1389  Battle-Scarred
+1390 1390  Dark Scorpion Combination
+1391 1391  Archfiend's Roar
+1392 1392  Dice Re-Roll
+1393 1393  Spell Vanishing
+1394 1394  Sakuretsu Armor
+1395 1395  Ray of Hope
+1396 1396  Nightmare Penguin
+1397 1397  Perfect Machine King
+1398 1398  Chiron the Mage
+1399 1399  Ojama Yellow
+1400 1400  Ojama Black
+1401 1401  Soul Tiger
+1402 1402  Big Koala
+1403 1403  Des Kangaroo
+1404 1404  Crimson Ninja
+1405 1405  Strike Ninja
+1406 1406  Gale Lizard
+1407 1407  Chopman the Desperate Outlaw
+1408 1408  Sasuke Samurai #3
+1409 1409  D. D. Scout Plane
+1410 1410  Berserk Gorilla
+1411 1411  Freed the Brave Wanderer
+1412 1412  Witch Doctor of Chaos
+1413 1413  Chaos Necromancer
+1414 1414  Chaosrider Gustaph
+1415 1415  Inferno
+1416 1416  Fenrir
+1417 1417  Gigantes
+1418 1418  Silpheed
+1419 1419  Chaos Sorcerer
+1420 1420  Gren Maju Da Eiza
+1421 1421  Black Luster Soldier - Envoy of the Beginning
+1422 1422  Fuhma Shuriken
+1423 1423  Heart of the Underdog
+1424 1424  Wild Nature's Release
+1425 1425  Ojama Delta Hurricane!!
+1426 1426  Stumbling
+1427 1427  Chaos End
+1428 1428  Chaos Greed
+1429 1429  D. D. Borderline
+1430 1430  Recycle
+1431 1431  Primal Seed
+1432 1432  Thunder Crash
+1433 1433  Dimension Distortion
+1434 1434  Reload
+1435 1435  Soul Absorption
+1436 1436  Big Burn
+1437 1437  Blasting the Ruins
+1438 1438  Cursed Seal of the Forbidden Spell
+1439 1439  Tower of Babel
+1440 1440  Spatial Collapse
+1441 1441  Chain Disappearance
+1442 1442  Zero Gravity
+1443 1443  Dark Mirror Force
+1444 1444  Energy Drain
+1445 1445  Chaos Emperor Dragon - Envoy of the End
+1446 1446  Victory D.
+1447 1447  Magician's Valkyrie
+1448 1448  Giga Gagagigo
+1449 1449  Mad Dog of Darkness
+1450 1450  Neo Bug
+1451 1451  Sea Serpent Warrior of Darkness
+1452 1452  Terrorking Salmon
+1453 1453  Blazing Inpachi
+1454 1454  Burning Algae
+1455 1455  The Thing in the Crater
+1456 1456  Molten Zombie
+1457 1457  Dark Magician of Chaos
+1458 1458  Manticore of Darkness
+1459 1459  Stealth Bird
+1460 1460  Sacred Crane
+1461 1461  Enraged Battle Ox
+1462 1462  Don Turtle
+1463 1463  Dark Driceratops
+1464 1464  Hyper Hammerhead
+1465 1465  Black Tyranno
+1466 1466  Anti-Aircraft Flower
+1467 1467  Prickle Fairy
+1468 1468  Insect Princess
+1469 1469  Amphibious Bugroth MK-3
+1470 1470  Torpedo Fish
+1471 1471  Levia-Dragon - Daedalus
+1472 1472  Orca Mega-Fortress of Darkness
+1473 1473  Cannonball Spear Shellfish
+1474 1474  Mataza the Zapper
+1475 1475  Guardian Angel Joan
+1476 1476  Manju of the Ten Thousand Hands
+1477 1477  Getsu Fuhma
+1478 1478  Ryu Kokki
+1479 1479  Gryphon's Feather Duster
+1480 1480  Stray Lambs
+1481 1481  Smashing Ground
+1482 1482  Dimension Fusion
+1483 1483  Dedication through Light and Darkness
+1484 1484  Salvage
+1485 1485  Ultra Evolution Pill
+1486 1486  Earth Chant
+1487 1487  Jade Insect Whistle
+1488 1488  Destruction Ring
+1489 1489  Fiend's Hand Mirror
+1490 1490  Compulsory Evacuation Device
+1491 1491  A Hero Emerges
+1492 1492  Self-Destruct Button
+1493 1493  Curse of Darkness
+1494 1494  Begone, Knave!
+1495 1495  DNA Transplant
+1496 1496  Robbin' Zombie
+1497 1497  Trap Jammer
+1498 1498  Invader of Darkness
+1499 1499  Twinheaded Beast
+1500 1500  Abyss Soldier
+1501 1501  Inferno Hammer
+1502 1502  Emes the Infinity
+1503 1503  D. D. Assailant
+1504 1504  Teva
+1505 1505  Skull Zoma
+1506 1506  Maximum Six
+1507 1507  Dangerous Machine TYPE-6
+1508 1508  Sixth Sense
+1509 1509  Gogiga Gagagigo
+1510 1510  Warrior of Zera
+1511 1511  Sealmaster Meisei
+1512 1512  Mystical Shine Ball
+1513 1513  Metal Armored Bug
+1514 1514  The Agent of Judgment - Saturn
+1515 1515  The Agent of Wisdom - Mercury
+1516 1516  The Agent of Creation - Venus
+1517 1517  The Agent of Force - Mars
+1518 1518  The Unhappy Girl
+1519 1519  Soul-Absorbing Bone Tower
+1520 1520  The Kick Man
+1521 1521  Vampire Lady
+1522 1522  Rocket Jumper
+1523 1523  Avatar of The Pot
+1524 1524  Legendary Jujitsu Master
+1525 1525  KA-2 Des Scissors
+1526 1526  Needle Burrower
+1527 1527  Blowback Dragon
+1528 1528  Zaborg the Thunder Monarch
+1529 1529  Atomic Firefly
+1530 1530  Mermaid Knight
+1531 1531  Piranha Army
+1532 1532  Two Thousand Needles
+1533 1533  Disc Fighter
+1534 1534  Arcane Archer of the Forest
+1535 1535  Lady Ninja Yae
+1536 1536  Goblin King
+1537 1537  Solar Flare Dragon
+1538 1538  White Magician Pikeru
+1539 1539  Archlord Zerato
+1540 1540  Opti-Camouflage Armor
+1541 1541  Mystik Wok
+1542 1542  Burst Stream of Destruction
+1543 1543  Monster Gate
+1544 1544  The Sanctuary in the Sky
+1545 1545  Earthquake
+1546 1546  Goblin Thief
+1547 1547  Backfire
+1548 1548  Micro Ray
+1549 1549  Light of Judgment
+1550 1550  Wall of Revealing Light
+1551 1551  Solar Ray
+1552 1552  Ninjitsu Art of Transformation
+1553 1553  Beckoning Light
+1554 1554  Draining Shield
+1555 1555  Armor Break
+1556 1556  Mazera DeVille
+1557 1557  Marshmallon
+1558 1558  Skull Descovery Knight
+1559 1559  Shield Crash
+1560 1560  Return Zombie
+1561 1561  Corpse of Yata-Garasu
+1562 1562  Marshmallon glasses
+1563 1563  Earthbound Spirit's Invitation
+1564 1564  Mokey Mokey
+1565 1565  Gigobyte
+1566 1566  Kozaky
+1567 1567  Fiend Scorpion
+1568 1568  Pharaoh's Servant
+1569 1569  Pharaonic Protector
+1570 1570  Spirit of the Pharaoh
+1571 1571  Theban Nightmare
+1572 1572  Aswan Apparition
+1573 1573  Protector of the Sanctuary
+1574 1574  Nubian Guard
+1575 1575  Desertapir
+1576 1576  Sand Gambler
+1577 1577  Ghost Knight of Jackal
+1578 1578  Absorbing Kid from the Sky
+1579 1579  Elephant Statue of Blessing
+1580 1580  Elephant Statue of Disaster
+1581 1581  Spirit Caller
+1582 1582  Emissary of the Afterlife
+1583 1583  Double Coston
+1584 1584  Regenerating Mummy
+1585 1585  Night Assailant
+1586 1586  Man-Thro' Tro'
+1587 1587  King of the Swamp
+1588 1588  Emissary of the Oasis
+1589 1589  Special Hurricane
+1590 1590  Order to Charge
+1591 1591  Sword of the Soul-Eater
+1592 1592  Dust Barrier
+1593 1593  Soul Reversal
+1594 1594  Spell Economics
+1595 1595  7
+1596 1596  Level Limit - Area B
+1597 1597  Enchanting Fitting Room
+1598 1598  The Law of the Normal
+1599 1599  Dark Magic Attack
+1600 1600  Delta Attacker
+1601 1601  Thousand Energy
+1602 1602  Triangle Power
+1603 1603  The Third Sarcophagus
+1604 1604  The Second Sarcophagus
+1605 1605  The First Sarcophagus
+1606 1606  Human-Wave Tactics
+1607 1607  Curse of Anubis
+1608 1608  Desert Sunlight
+1609 1609  Des Counterblow
+1610 1610  Labyrinth of Nightmare
+1611 1611  Soul Resurrection
+1612 1612  Order to Smash
+1613 1613  The End of Anubis
+1614 1614  Crush D. Gandra
+1615 1615  Return from the Different Dimension
+1616 1616  Pyramid of Light
+1617 1617  Blue-Eyes Shining Dragon
+1618 1618  Familiar Knight
+1619 1619  Rare Metal Dragon
+1620 1620  Peten the Dark Clown
+1621 1621  Sorcerer of Dark Magic
+1622 1622  Andro Sphinx
+1623 1623  Sphinx Teleia
+1624 1624  Theinen the Great Sphinx
+1625 1625  Inferno Tempest
+1626 1626  Watapon
+1627 1627  Charcoal Inpachi
+1628 1628  Neo Aqua Madoor
+1629 1629  Skull Dog Marron
+1630 1630  Goblin Calligrapher
+1631 1631  Ultimate Insect LV1
+1632 1632  Horus the Black Flame Dragon LV4
+1633 1633  Horus the Black Flame Dragon LV6
+1634 1634  Horus the Black Flame Dragon LV8
+1635 1635  Dark Mimic LV1
+1636 1636  Dark Mimic LV3
+1637 1637  Mystic Swordsman LV2
+1638 1638  Mystic Swordsman LV4
+1639 1639  Armed Dragon LV3
+1640 1640  Armed Dragon LV5
+1641 1641  Armed Dragon LV7
+1642 1642  Horus' Servant
+1643 1643  Red-Eyes B. Chick
+1644 1644  Ninja Grandmaster Sasuke
+1645 1645  Rafflesia Seduction
+1646 1646  Ultimate Baseball Kid
+1647 1647  Mobius the Frost Monarch
+1648 1648  Element Dragon
+1649 1649  Element Soldier
+1650 1650  Howling Insect
+1651 1651  Masked Dragon
+1652 1652  Mind on Air
+1653 1653  Unshaven Angler
+1654 1654  The Trojan Horse
+1655 1655  Nobleman-Eater Bug
+1656 1656  Enraged Muka Muka
+1657 1657  Hade-Hane
+1658 1658  Penumbral Soldier Lady
+1659 1659  Ojama King
+1660 1660  Master of Oz
+1661 1661  Sanwitch
+1662 1662  Dark Factory of Mass Production
+1663 1663  Hammer Shot
+1664 1664  Mind Wipe
+1665 1665  Abyssal Designator
+1666 1666  Level Up!
+1667 1667  Inferno Fire Blast
+1668 1668  The Graveyard in the Fourth Dimension
+1669 1669  Two-Man Cell Battle
+1670 1670  Big Wave Small Wave
+1671 1671  Fusion Weapon
+1672 1672  Ritual Weapon
+1673 1673  Taunt
+1674 1674  Absolute End
+1675 1675  Spirit Barrier
+1676 1676  Ninjitsu Art of Decoy
+1677 1677  Enervating Mist
+1678 1678  Heavy Slump
+1679 1679  Greed
+1680 1680  Cemetary Bomb
+1681 1681  Hallowed Life Barrier
+1682 1682  The Tricky
+1683 1683  Green Gadget
+1684 1684  Stronghold
+1685 1684  Stronghold (alt-art)
+1686 1686  Red Gadget
+1687 1687  Yellow Gadget
+1688 1688  Tricky's Magic 4
+1689 1689  The Blockman
+1690 1690  Silent Swordsman LV3
+1691 1691  Silent Swordsman LV5
+1692 1692  Silent Swordsman LV7
+1693 1693  Silent Magician LV4
+1694 1694  Magician's Circle
+1695 1695  Magician's Unite
+1696 1696  Silent Magician LV8
+1697 1697  Woodborg Inpachi
+1698 1698  Mighty Guard
+1699 1699  Bokoichi the Freightening Car
+1700 1700  Harpie Girl
+1701 1701  The Creator
+1702 1702  The Creator Incarnate
+1703 1703  Ultimate Insect LV3
+1704 1704  Mystic Swordsman LV6
+1705 1705  Heavy Mech Support Platform
+1706 1706  Element Magician
+1707 1707  Element Saurus
+1708 1708  Roc from the Valley of Haze
+1709 1709  Sasuke Samurai #4
+1710 1710  Harpie Lady 1
+1711 1711  Harpie Lady 2
+1712 1712  Harpie Lady 3
+1713 1713  Raging Flame Sprite
+1714 1714  Thestalos the Firestorm Monarch
+1715 1715  Eagle Eye
+1716 1716  Tactical Espionage Expert
+1717 1717  Invasion of Flames
+1718 1718  Creeping Doom Manta
+1719 1719  Pitch-Black Warwolf
+1720 1720  Mirage Dragon
+1721 1721  Gaia Soul the Combustible Collective
+1722 1722  Fox Fire
+1723 1723  Big Core
+1724 1724  Fusilier Dragon, the Dual-Mode Beast
+1725 1725  Dekoichi the Battlechanted Locomotive
+1726 1726  A-Team: Trap Disposal Unit
+1727 1727  Homunculus the Alchemic Being
+1728 1728  Dark Blade the Dragon Knight
+1729 1729  Mokey Mokey King
+1730 1730  Serial Spell
+1731 1731  Harpies' Hunting Ground
+1732 1732  Triangle Ecstasy Spark
+1733 1733  Necklace of Command
+1734 1734  Flint
+1735 1735  Mokey Mokey Smackdown
+1736 1736  Back to Square One
+1737 1737  Monster Reincarnation
+1738 1738  Ballista of Rampart Smashing
+1739 1739  Lighten the Load
+1740 1740  Malice Dispersion
+1741 1741  Divine Wrath
+1742 1742  Xing Zhen Hu
+1743 1743  Rare Metalmorph
+1744 1744  Mind Haxorz
+1745 1745  Fuh-Rin-Ka-Zan
+1746 1746  Chain Burst
+1747 1747  Pikeru's Circle of Enchantment
+1748 1748  Spell Purification
+1749 1749  Astral Barrier
+1750 1750  Covering Fire
+1751 1751  Castle Gate
+1752 1752  Owner's Seal
+1753 1753  Space Mambo
+1754 1754  Divine Dragon Ragnarok
+1755 1755  Chu-Ske the Mouse Fighter
+1756 1756  Insect Knight
+1757 1757  Sacred Phoenix of Nephthys
+1758 1758  Hand of Nephthys
+1759 1759  Ultimate Insect LV5
+1760 1760  Granmarg the Rock Monarch
+1761 1761  Element Valkyrie
+1762 1762  Element Doom
+1763 1763  Maji-Gire Panda
+1764 1764  Catnipped Kitty
+1765 1765  Behemoth the King of All Animals
+1766 1766  Big-Tusked Mammoth
+1767 1767  Kangaroo Champ
+1768 1768  Hyena
+1769 1769  Blade Rabbit
+1770 1770  Mecha-Dog Marron
+1771 1771  Blast Magician
+1772 1772  Gearfried the Swordmaster
+1773 1773  Armed Samurai - Ben Kei
+1774 1774  Shadowslayer
+1775 1775  Golem Sentry
+1776 1776  Abare Ushioni
+1777 1777  The Light - Hex-Sealed Fusion
+1778 1778  The Dark - Hex-Sealed Fusion
+1779 1779  The Earth - Hex-Sealed Fusion
+1780 1780  Whirlwind Prodigy
+1781 1781  Flame Ruler
+1782 1782  Firebird
+1783 1783  Rescue Cat
+1784 1784  Brain Jacker
+1785 1785  Gatling Dragon
+1786 1786  King Dragun
+1787 1787  A Feather of the Phoenix
+1788 1788  Poison Fangs
+1789 1789  Swords of Concealing Light
+1790 1790  Spiral Spear Strike
+1791 1791  Release Restraint
+1792 1792  Centrifugal Field
+1793 1793  Fulfillment of the Contract
+1794 1794  Re-Fusion
+1795 1795  The Big March of Animals
+1796 1796  Cross Counter
+1797 1797  Threatening Roar
+1798 1798  Phoenix Wing Wind Blast
+1799 1799  Good Goblin Housekeeping
+1800 1800  Beast Soul Swap
+1801 1801  Assault on GHQ
+1802 1802  D.D. Dynamite
+1803 1803  Deck Devastation Virus
+1804 1804  Elemental Burst
+1805 1805  Forced Ceasefire
+1806 1806  Curse of Vampire
+1807 1807  Union Attack
+1808 1808  Blood Sucker
+1809 1809  Overpowering Eye
+1810 1810  Red-Eyes Darkness Dragon
+1811 1811  Vampire Genesis
+1812 1812  Kaibaman
+1813 1813  Elemental Hero Avian
+1814 1814  Elemental Hero Burstinatrix
+1815 1815  Elemental Hero Clayman
+1816 1816  Elemental Hero Sparkman
+1817 1817  Winged Kuriboh
+1818 1817  Winged Kuriboh (alt-art)
+1819 1819  Ancient Gear Golem
+1820 1820  Ancient Gear Beast
+1821 1821  Ancient Gear Soldier
+1822 1822  Millennium Scorpion
+1823 1823  Ultimate Insect LV7
+1824 1824  Lost Guardian
+1825 1825  Hieracosphinx
+1826 1826  Criosphinx
+1827 1827  Moai Interceptor Cannons
+1828 1828  Megarock Dragon
+1829 1829  Dummy Golem
+1830 1830  Grave Ohja
+1831 1831  Mine Golem
+1832 1832  Monk Fighter
+1833 1833  Master Monk
+1834 1834  Guardian Statue
+1835 1835  Medusa Worm
+1836 1836  D.D. Survivor
+1837 1837  Mid Shield Gardna
+1838 1838  White Ninja
+1839 1839  Aussa the Earth Charmer
+1840 1840  Eria the Water Charmer
+1841 1841  Hiita the Fire Charmer
+1842 1842  Wynn the Wind Charmer
+1843 1843  Batteryman AA
+1844 1844  Des Wombat
+1845 1845  King of the Skull Servants
+1846 1846  Reshef the Dark Being
+1847 1847  Elemental Mistress Doriado
+1848 1848  Elemental Hero Flame Wingman
+1849 1849  Elemental Hero Thunder Giant
+1850 1850  Gift of the Martyr
+1851 1851  Double Attack
+1852 1852  Battery Charger
+1853 1853  Kaminote Blow
+1854 1854  Doriado's Blessing
+1855 1855  Final Ritual of the Ancients
+1856 1856  Legendary Black Belt
+1857 1857  Nitro Unit
+1858 1858  Shifting Shadows
+1859 1859  Impenetrable Formation
+1860 1860  Hero Signal
+1861 1861  Pikeru's Second Sight
+1862 1862  Minefield Eruption
+1863 1863  Kozaky's Self-Destruct Button
+1864 1864  Mispolymerization
+1865 1865  Level Conversion Lab
+1866 1866  Rock Bombardment
+1867 1867  Token Feastevil
+1868 1868  Spell-Stopping Statute
+1869 1869  Royal Surrender
+1870 1870  Infernal Flame Emperor
+1871 1871  Holy Knight Ishzark
+1872 1872  Ocean Dragon Lord - Neo-Daedalus
+1873 1873  Cycroid
+1874 1874  Patroid
+1875 1875  Gyroid
+1876 1876  Steamroid
+1877 1877  Drillroid
+1878 1878  UFOroid
+1879 1879  Jetroid
+1880 1880  Cyber Dragon
+1881 1881  Wroughtweiler
+1882 1882  Elemental Hero Bubbleman
+1883 1883  Steam Gyroid
+1884 1884  UFOroid Fighter
+1885 1885  Cyber Twin Dragon
+1886 1886  Cyber End Dragon
+1887 1887  Power Bond
+1888 1888  Skyscraper
+1889 1889  Summon Priest
+1890 1890  Dark Dreadroute
+1891 1891  Winged Kuriboh LV10
+1892 1892  Transcendent Wings
+1893 1893  Bubble Shuffle
+1894 1894  Spark Blaster
+1895 1895  Dark Ruler Vandalgyon
+1896 1896  Soitsu
+1897 1897  Mad Lobster
+1898 1898  Jerry Beans Man
+1899 1899  Cybernetic Magician
+1900 1900  Cybernetic Cyclopean
+1901 1901  Mechanical Hound
+1902 1902  Cyber Archfiend
+1903 1903  Goblin Elite Attack Force
+1904 1904  B.E.S. Crystal Core
+1905 1905  Giant Kozaky
+1906 1906  Indomitable Fighter Lei Lei
+1907 1907  Protective Soul Ailin
+1908 1908  Doitsu
+1909 1909  Des Frog
+1910 1910  T.A.D.P.O.L.E.
+1911 1911  Poison Draw Frog
+1912 1912  Tyranno Infinity
+1913 1913  Batteryman C
+1914 1914  Ebon Magician Curran
+1915 1915  D.D.M. - Different Dimension Master
+1916 1916  Fusion Recovery
+1917 1917  Miracle Fusion
+1918 1918  Dragon's Mirror
+1919 1919  System Down
+1920 1920  Des Croaking
+1921 1921  Pot of Generosity
+1922 1922  Shien's Spy
+1923 1923  Fire Darts
+1924 1924  Spiritual Earth Art - Kurogane
+1925 1925  Spiritual Water Art - Aoi
+1926 1926  Spiritual Fire Art - Kurenai
+1927 1927  Spiritual Wind Art - Miyabi
+1928 1928  A Rival Appears!
+1929 1929  Magical Explosion
+1930 1930  Rising Energy
+1931 1931  D.D. Trap Hole
+1932 1932  Conscription
+1933 1933  Dimension Wall
+1934 1934  Prepare to Strike Back
+1935 1935  Triage
+1936 1936  Alkana Knight Joker
+1937 1937  Gilford the Legend
+1938 1938  Warrior Lady of the Wasteland
+1939 1939  Divine Sword - Phoenix Blade
+1940 1940  Elemental Hero Shining Flare Wingman
+1941 1941  Level Modulation
+1942 1942  Ojamuscle
+1943 1943  Ojamagic
+1944 1944  V-Tiger Jet
+1945 1945  Blade Skater
+1946 1946  Reborn Zombie
+1947 1947  W-Wing Catapult
+1948 1948  Elemental Hero Bladedge
+1949 1949  Elemental Hero Wildheart
+1950 1950  Hydrogeddon
+1951 1951  Oxygeddon
+1952 1952  Water Dragon
+1953 1953  Etoile Cyber
+1954 1954  VW-Tiger Catapult
+1955 1955  VWXYZ-Dragon Catapult Cannon
+1956 1956  Cyber Blader
+1957 1957  Elemental Hero Rampart Blaster
+1958 1958  Elemental Hero Tempest
+1959 1959  Elemental Hero Wildedge
+1960 1960  Chthonian Alliance
+1961 1961  Feather Shot
+1962 1962  Bonding - H2O
+1963 1963  Chthonian Polymer
+1964 1964  Chthonian Blast
+1965 1965  Hero Barrier
+1966 1966  Feather Wind
+1967 1967  Zure, Knight of Dark World
+1968 1968  B.E.S. Tetran
+1969 1969  Nanobreaker
+1970 1970  Rapid-Fire Magician
+1971 1971  Beiige, Vanguard of Dark World
+1972 1972  Broww, Huntsman of Dark World
+1973 1973  Brron, Mad King of Dark World
+1974 1974  Sillva, Warlord of Dark World
+1975 1975  Goldd, Wu-Lord of Dark World
+1976 1976  Scarr, Scout of Dark World
+1977 1977  Familiar-Possessed - Aussa
+1978 1978  Familiar-Possessed - Eria
+1979 1979  Familiar-Possessed - Hiita
+1980 1980  Familiar-Possessed - Wynn
+1981 1981  Pot of Avarice
+1982 1982  Dark World Lightning
+1983 1983  Boss Rush
+1984 1984  Gateway to Dark World
+1985 1985  The Forces of Darkness
+1986 1986  Dark Deal
+1987 1987  Simultaneous Loss
+1988 1988  Weed Out
+1989 1989  The League of Uniform Nomenclature
+1990 1990  Roll Out!
+1991 1991  Non-Fusion Area
+1992 1992  Level Limit - Area A
+1993 1993  Armed Changer
+1994 1994  Elemental Hero Necroshade
+1995 1995  Hero Heyro
+1996 1996  Elemental Hero Madballman
+1997 1997  Dark Eradicator Warlock
+1998 1998  Mythical Beast Cerberus
+1999 1999  Magical Blast
+2000 2000  Elemental Hero Steam Healer
+2001 2001  Burst Return
+2002 2002  Bubble Blaster
+2003 2003  Bubble Illusion
+2004 2004  Clay Charge
+2005 2005  Armed Dragon LV10
+2006 2006  Magical Mallet
+2007 2007  Inferno Reckless Summon
+2008 2008  Rancer Dragonute
+2009 2009  Mistobody
+2010 2010  Axe Dragonute
+2011 2011  White Horns D.
+2012 2012  Uria, Lord of Searing Flames
+2013 2013  Hamon, Lord of Striking Thunder
+2014 2014  Raviel, Lord of Phantasms
+2015 2015  Elemental Hero Neo Bubbleman
+2016 2016  Hero Kid
+2017 2017  Cyber Barrier Dragon
+2018 2018  Cyber Laser Dragon
+2019 2019  Ancient Gear
+2020 2020  Hero Heart
+2021 2021  Magnet Circle LV2
+2022 2022  Ancient Gear Drill
+2023 2023  Phantasmal Martyrs
+2024 2024  Cyclone Boomerang
+2025 2025  Photon Generator Unit
+2026 2026  Ancient Gear Castle
+2027 2027  Miracle Kids
+2028 2028  Attack Reflector Unit
+2029 2029  Damage Condenser
+2030 2030  Ancient Gear Cannon
+2031 2031  Proto-Cyber Dragon
+2032 2032  Adhesive Explosive
+2033 2033  Machine King Prototype
+2034 2034  B.E.S. Covered Core
+2035 2035  D.D. Guide
+2036 2036  Chain Thrasher
+2037 2037  Disciple of the Forbidden Spell
+2038 2038  Tenkabito Shien
+2039 2039  Parasitic Ticky
+2040 2040  Gokipon
+2041 2041  Silent Insect
+2042 2042  Chainsaw Insect
+2043 2043  Anteatereatingant
+2044 2044  Saber Beetle
+2045 2045  Doom Dozer
+2046 2046  Treeborn Frog
+2047 2047  Beelze Frog
+2048 2048  Princess Pikeru
+2049 2049  Princess Curran
+2050 2050  Memory Crusher
+2051 2051  Malice Ascendant
+2052 2052  Grass Phantom
+2053 2053  Sand Moth
+2054 2054  Divine Dragon - Excelion
+2055 2055  Ruin, Queen of Oblivion
+2056 2056  Demise, King of Armageddon
+2057 2057  D.3.S. Frog
+2058 2058  Symbol of Heritage
+2059 2059  Trial of the Princesses
+2060 2060  End of the World
+2061 2061  Samsara
+2062 2062  Karma Cut
+2063 2063  Next to be Lost
+2064 2064  Generation Shift
+2065 2065  Full Salvo
+2066 2066  Success Probability 0%
+2067 2067  Option Hunter
+2068 2068  Goblin Out of the Frying Pan
+2069 2069  Malfunction
+2070 2070  The Flute of Summoning Kuriboh
+2071 2071  Elemental Hero Erikshieler
+2072 2072  Guardian Exode
+2073 2073  Great Spirit
+2074 2074  Fault Zone
+2075 2075  Homunculus Gold
+2076 2076  The Ancient Sun Helios
+2077 2077  Helios Duo Megiste
+2078 2078  Helios Tris Megiste
+2079 2079  Elemental Hero Neos
+2080 2080  Dandylion
+2081 2081  Insect Monster Token
+2082 2082  Kuriboh Token
+2083 2083  Sheep Token
+2084 2084  Army Ant Token
+2085 2085  Slime Token
+2086 2086  Wicked Token
+2087 2087  Poisonous Snake Token
+2088 2088  Lekunga Token
+2089 2089  Wicked Plant Token
+2090 2090  Metal Fiend Token
+2091 2091  Ojama Token
+2092 2092  Lamb Token
+2093 2093  Tricky Token
+2094 2094  Block Token
+2095 2095  Phantasm Token
+2096 2096  Phantasmal Martyr Token
+2097 2097  Fluffy Token
