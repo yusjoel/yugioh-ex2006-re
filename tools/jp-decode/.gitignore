@@ -1,0 +1,27 @@
+# OCR 中间产物 (大文件 + 可重生成)
+ocr_paddle.json
+ocr_raw.json
+ocr_log.txt
+ocr_paddle_log.txt
+diff_report.json
+diff_review.json
+empty_candidates.json
+
+# 字库单字 PNG (1925 张, 由 render_glyphs.py 重生成)
+glyphs/
+
+# 测试 PNG (临时)
+test_glyphs/
+test_cards/
+
+# Tesseract 训练数据 (二进制 ~14MB, 用户单独下载)
+tessdata/
+
+# 审核 PNG (工作快照, 由脚本重生成)
+review/
+
+# Python cache
+__pycache__/
+
+# 旧版 seed JSON (已被 seed_codetable.py 取代)
+codetable_seed.json
