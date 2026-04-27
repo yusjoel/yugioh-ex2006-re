@@ -1,4 +1,4 @@
-@ data/card-desc-src/de.txt — 2054 entries
+@ text/card-desc/de.txt — 2054 entries
 @ Format: =CID= header (4-digit), then content lines.
 @ Trailing \0 padding handled by encoder; do NOT add manually.
 

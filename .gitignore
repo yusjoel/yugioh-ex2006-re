@@ -35,9 +35,12 @@ refs/gba-ghidra-loader/
 graphics/
 
 # 导出的数据汇编（由 tools/rom-export/export_all.py 从 ROM 生成）
-data/*
-# 但 card-desc-src/ 是手维护的 6 lang UTF-8 文本源 + pointer-table 元数据, 入库
-!data/card-desc-src/
+data/
+
+# 文本源 (UTF-8) — 手维护, 由 encoder 编译为 data/*.s
+# text/card-desc/ — 卡描述 (6 lang)
+# text/card-names/ — 卡名 (6 lang, TODO)
+# text/game-strings/ — 游戏文本 (6 lang, TODO)
 
 # 导出的 FS 文件（由 tools/rom-export/export_fs_files.py 从 ROM 重建）
 fs/

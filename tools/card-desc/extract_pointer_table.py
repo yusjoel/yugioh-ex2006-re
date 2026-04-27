@@ -1,5 +1,5 @@
 """
-从原 .s 提取 pointer table mapping → data/card-desc-src/pointer-table.txt
+从原 .s 提取 pointer table mapping → text/card-desc/pointer-table.txt
 
 Format (each line):
   cid label_cid comment
@@ -37,7 +37,7 @@ print(f'Sample alt-art:')
 for c, l in alt_art[:5]:
     print(f'  cid={c} → label_cid={l}')
 
-out = Path('data/card-desc-src/pointer-table.txt')
+out = Path('text/card-desc/pointer-table.txt')
 out.parent.mkdir(parents=True, exist_ok=True)
 with open(out, 'w', encoding='utf-8', newline='\n') as f:
     f.write('@ Pointer Table mapping: cid → label_cid (4 digits each)\n')

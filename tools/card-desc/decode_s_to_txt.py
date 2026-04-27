@@ -1,5 +1,5 @@
 """
-Decoder: data/card-descriptions.s → data/card-desc-src/{ja,en,de,fr,it,es}.txt
+Decoder: data/card-descriptions.s → text/card-desc/{ja,en,de,fr,it,es}.txt
 
 读取现有 .s 的全部 12324 个 label, 解码为 UTF-8 文本, 按 lang 分文件:
   - ja: ROM 自定义 2-byte 编码 → codetable → UTF-8 char
@@ -17,7 +17,7 @@ import json
 import os
 from pathlib import Path
 
-OUT_DIR = Path('data/card-desc-src')
+OUT_DIR = Path('text/card-desc')
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -117,7 +117,7 @@ for new_lang in LANGS:
     )
     out = OUT_DIR / f'{new_lang}.txt'
     with open(out, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(f'@ data/card-desc-src/{new_lang}.txt — {len(entries)} entries\n')
+        f.write(f'@ text/card-desc/{new_lang}.txt — {len(entries)} entries\n')
         f.write(f'@ Format: =CID= header (4-digit), then content lines.\n')
         f.write(f'@ Trailing \\0 padding handled by encoder; do NOT add manually.\n\n')
         for cid, bs in entries:
@@ -134,4 +134,4 @@ for new_lang in LANGS:
     size = os.path.getsize(out)
     print(f'  {out}: {len(entries)} entries, {size:,} B')
 
-print('\n✓ decode finished')
+print('\ndecode finished')
