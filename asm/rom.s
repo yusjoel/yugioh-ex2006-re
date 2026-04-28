@@ -642,12 +642,9 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 
 	.incbin "roms/2343.gba", 0x1CE822C, 0xD19E4     @ 0x1CE822C..0x1DB9C10 字库后段后部
 
-@ JA UI 字符串表（ROM偏移 0x1DB9C10 - 0x1DC461F, 1597 条）
-@ 与 game-strings (5 lang, 0x1DC4620~) 平行；含 7 SD + 25 OPP 名 (slot[5] 引用)
-	.include "data/deck-strings.s"
-
-@ 游戏文本字符串表（ROM偏移 0x1DC4620 - 0x1DFF9D1）
-@ 含 5 种语言（EN/DE/FR/IT/ES）的完整游戏文本，共 242610 字节
+@ 游戏文本字符串表 6 lang (ROM 偏移 0x1DB9C10 - 0x1DFF9D1, ~286 KB)
+@ JA + EN/DE/FR/IT/ES, master pointer table @ ROM 0xF40 (1642 行)
+@ 见 data/game-strings.s 的 wrapper 注释 + doc/dev/data-structure/game-strings.md
 	.include "data/game-strings.s"
 
 @ 后 16MB 中间段前部：ROM偏移 0x1DFF9D2 - 0x1E31553

@@ -15,7 +15,7 @@ import struct
 import sys
 
 ROM_PATH = 'roms/2343.gba'
-ASM_OUT = 'data/deck-strings.s'
+ASM_OUT = 'data/game-strings-ja.s'
 
 JA_START = 0x1DB9C10
 JA_END   = 0x1DC4620  # exclusive

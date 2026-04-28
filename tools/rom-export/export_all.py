@@ -53,7 +53,7 @@ EXPORT_PIPELINE = [
     (None, 'export_card_mini_frame.py'),        # data/card-mini-frame{,-palette}.s + graphics/{bin,images}/card-mini-frame/*
     (None, 'export_card_medium_frame.py'),      # data/card-medium-frame.s + graphics/{bin,images}/card-medium-frame/*
     (None, 'export_ui_sheets.py'),              # graphics/{bin,images}/ui-misc/* (HUD/state/switch sheets + aux palettes)
-    (None, 'export_deck_strings.py'),           # data/deck-strings.s
+    (None, 'export_deck_strings.py'),           # data/game-strings-ja.s
 
     # Step 3: 依赖 card-names.s 的脚本
     (None, 'export_card_images.py'),            # data/card-image-* + cards-ids-array.s + graphics/card-images-rom/
@@ -68,7 +68,7 @@ EXPORT_PIPELINE = [
     ('card-desc',    'decode_s_to_txt.py'),     # text/card-desc/{ja,en,de,fr,it,es}.txt
     ('card-desc',    'extract_pointer_table.py'),# text/card-desc/pointer-table.txt
     ('card-names',   'decode_s_to_txt.py'),     # text/card-names/{ja,en,de,fr,it,es}.txt + pointer-table.txt
-    ('deck-strings', 'decode_s_to_txt.py'),     # text/deck-strings/ja.txt
+    ('game-strings', 'decode_s_to_txt.py'),     # text/game-strings/ja.txt
 
     # Step 5: text/<text-dataset>/*.txt → data/<text-dataset>.s (重编码闭环, 等价 build.bat encoder)
     # 跑完后 data/*.s 与 Step 1-3 的输出应 byte-identical
@@ -76,10 +76,10 @@ EXPORT_PIPELINE = [
     ('jp-decode',    'fix_halfwidth_to_fullwidth.py'),# 半角→全角 + Math Bold 唯一占位
     ('card-desc',    'build_char_to_idx.py'),         # tools/card-desc/char_to_idx.json
     ('card-names',   'build_char_to_idx.py'),         # tools/card-names/char_to_idx.json
-    ('deck-strings', 'build_char_to_idx.py'),         # tools/deck-strings/char_to_idx.json
+    ('game-strings', 'build_char_to_idx.py'),         # tools/game-strings/char_to_idx.json
     ('card-desc',    'encode_txt_to_s.py'),           # data/card-descriptions.s
     ('card-names',   'encode_txt_to_s.py'),           # data/card-names.s
-    ('deck-strings', 'encode_txt_to_s.py'),           # data/deck-strings.s
+    ('game-strings', 'encode_txt_to_s.py'),           # data/game-strings-ja.s
 ]
 
 
