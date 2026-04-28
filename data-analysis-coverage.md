@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**21,886,684 B（76.68%）**（含 2026-04-23 的 43,776 B UI sheet 增量）
-- 未分析：**6,656,748 B（23.32%）**
+- 已分析：**21,908,216 B（76.76%）**（含 2026-04-28 game-strings 1651 行统一 +18 B）
+- 未分析：**6,635,216 B（23.24%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -21,8 +21,8 @@
 | `0x01896730` | `0x279A7C` | 2,595,452 | 小图标调色板后，对手调色板 Copy1 前 |
 | `0x01B8FB8C` | `0x13CF04` | 1,298,180 | 后 16MB 第一段剩余，字库前段 |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | FS 后尾段 |
-| `0x01CE822C` | `0xD6DEE` | 880,110 | 字库后段后部 |
-| `0x01DFF9D2` | `0x31B82` | 203,650 | 游戏文本后，卡列表调色板前 |
+| `0x01CE822C` | `0xD19E4` | 858,596 | 字库后段后部 |
+| `0x01DFF9E4` | `0x31B70` | 203,632 | 游戏文本后，卡列表调色板前 |
 | `0x01E31714` | `0x275FA` | 161,274 | 调色板后，对手卡值前 |
 | `0x01867560` | `0x26510` | 156,944 | 内场调色板后，小图标图块前 |
 | `0x01832602` | `0x1E51A` | 124,186 | seg-C 前段（属性表后，HUD 图块前） |
@@ -36,7 +36,7 @@
 | `0x01E5F8EA` | `0x16E` | 366 | 初始卡组后，预组前 |
 | `0x004C7638` | `0x88` | 136 | all.s 后 / 大卡图调色板前 |
 
-**合计**：17 段，6,700,524 B（23.47% 数据区）
+**合计**：17 段，6,678,992 B（占数据区 23.40%；顶层"未分析 6,635,216"另扣去 2026-04-23 已结构化的 43,776 B UI sheet sub-block）
 
 ## 全部段（按 ROM 地址顺序）
 
@@ -85,10 +85,9 @@
 | `0x01CCCA90` | `0x800` | 2,048 | ✓ 已分析 | font (English 1bpp) | `.include data/font.s` |
 | `0x01CCD290` | `0x16D0` | 5,840 | ✗ 未分析 | 字库后段前部 | raw `.incbin roms/2343.gba` |
 | `0x01CCE960` | `0x198CC` | 104,652 | ✓ 已分析 | pack-banners (tiles) | `.include data/pack-banners.s` |
-| `0x01CE822C` | `0xD6DEE` | 880,110 | ✗ 未分析 | 字库后段后部 | raw `.incbin roms/2343.gba` |
-| `0x01DBF01A` | `0x5606` | 22,022 | ✓ 已分析 | deck-strings | `.include data/deck-strings.s` |
-| `0x01DC4620` | `0x3B3B2` | 242,610 | ✓ 已分析 | game-strings | `.include data/game-strings.s` |
-| `0x01DFF9D2` | `0x31B82` | 203,650 | ✗ 未分析 | 游戏文本后，卡列表调色板前 | raw `.incbin roms/2343.gba` |
+| `0x01CE822C` | `0xD19E4` | 858,596 | ✗ 未分析 | 字库后段后部 | raw `.incbin roms/2343.gba` |
+| `0x01DB9C10` | `0x45DD4` | 286,164 | ✓ 已分析 | game-strings (6 lang JA+EN/DE/FR/IT/ES, 1651 master rows) | `.include data/game-strings.s` |
+| `0x01DFF9E4` | `0x31B70` | 203,632 | ✗ 未分析 | 游戏文本后，卡列表调色板前 | raw `.incbin roms/2343.gba` |
 | `0x01E31554` | `0x1C0` | 448 | ✓ 已分析 | card-mini-frame-palette | `.include data/card-mini-frame-palette.s` |
 | `0x01E31714` | `0x275FA` | 161,274 | ✗ 未分析 | 调色板后，对手卡值前 | raw `.incbin roms/2343.gba` |
 | `0x01E58D0E` | `0x360` | 864 | ✓ 已分析 | opponent-card-values | `.include data/opponent-card-values.s` |
@@ -106,7 +105,7 @@
 | `0x01E64684` | `0x70350` | 459,600 | ✓ 已分析 | fs-payload (338 files via fs/) | `.include data/fs-payload.s` |
 | `0x01ED49D4` | `0x12B62C` | 1,226,284 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
 
-**合计**：63 段（46 已分析 + 17 未分析），28,543,432 B
+**合计**：62 段（45 已分析 + 17 未分析），28,543,432 B
 
 ## 2026-04-22 合并：card-descriptions + card-effect-text
 
@@ -187,3 +186,21 @@ key(cid) = ((cid * 0x343FD + 0x269EC3) >> 16) | 0x9EC30000   （Borland rand LCG
 - seg `0x1DFF9D2` 仍 raw：`0x1DFF9D2..0x1E246D4` (150,786 B) + `0x1E25554..0x1E25674` (288 B) + `0x1E25F34..0x1E265B4` (1,664 B) + `0x1E2FEB4..0x1E310B4` (4,608 B, post-case9 FF/AA-dominant 未知格式) + `0x1E312B4..0x1E31554` (672 B) = 合计 157,940 B
 - seg `0x1E31714` 仍 raw：共 161,210 B（64 B / 161,274 = 0.04% 已分析）
 - 本次总计：未分析字节 6,700,524 → 6,656,748（清理 43,776 B，数据区已分析占比 76.53% → 76.68%）
+
+## 2026-04-28 game-strings 6 lang 1651 行统一（取消 extras 特殊段）
+
+发现 master pointer table @ ROM 0xF40 实际是 **1651 × 24 B**（不是 1642 + 9 phantom）。
+原以为末 9 行（rows 1642..1650）是 JA-only Death Message extras，5 lang col 是 phantom 偏移指向 inter-region pad；实测各 lang region 末都有自身 9 个 \\0\\0 槽对齐，相当于全 6 lang 都有 1651 行 master，5 lang 在 1642..1650 一律空翻译。
+
+合并/扩展：
+- 旧 `data/deck-strings.s`（0x1DBF01A..0x1DC4620 JA 区段）已并入 `data/game-strings.s` 的 JA col（commit `38454a0`）；JA 真起点 `0x1DB9C10`（commit `f3586c9`）使本次表更新前的 doc 仍按旧拆分计数
+- 各 5 lang region 末 +18 B（Death Message 9 槽 \\0\\0）+ 必要对齐 pad → ES 末址 `0x1DFF9D2 → 0x1DFF9E4`
+- 后续 .incbin 起点同步 `0x1DFF9E4`（asm/rom.s）
+
+新 game-strings 区段：`0x1DB9C10..0x1DFF9E4`（**286,164 B**，6 lang × 1651 master rows，每 lang region 末含 9 行 Death Message tail）
+新 master pointer table @ ROM `0xF40..0xAA10`：1651 行 × 24 B label 减法（无 phantom）+ 8 B trailing pad，见 `tools/game-strings/build_pointer_table.py`
+
+净效果：
+- "字库后段后部" raw 0xD6DEE → 0xD19E4（21,514 B 转移到 JA 已分析）
+- "游戏文本后" raw 0x31B82 → 0x31B70 (–18 B)
+- 已分析 21,886,684 → 21,908,216（+21,532）；未分析 6,656,748 → 6,635,216（–21,532）；占比 76.68% → 76.76%

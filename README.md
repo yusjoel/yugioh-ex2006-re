@@ -133,7 +133,11 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_pack_card_lists.py` | ROM → `data/pack-card-lists.s`（45 个 pack 共 3,515 条卡牌条目 + 51 条 pack 信息） |
 | `tools/rom-export/export_card_descriptions.py` | ROM → `data/card-descriptions.s`（合并: text pool 2098 卡 × 6 lang + card_desc_data 12,588 × u32 offset 表；取代旧 export_card_effect_text.py） |
 | `tools/rom-export/export_card_data.py` | ROM → `data/card-names.s`（名字池 + 2098×6 u32 指针表，合并版）、`data/card-stats.s`（5170 统计条目；首条 20B 少 zero0 字段） |
-| `tools/rom-export/export_game_strings.py` | ROM → `data/game-strings-{en,de,fr,it,es}.s`（CP1252 编码） |
+| `tools/rom-export/export_game_strings.py` | ROM → `data/game-strings-{en,de,fr,it,es}.s` 初始版（CP1252 编码，sequential labels）；最终版由 `tools/game-strings/encode_txt_to_s.py` 经 text↔data 闭环重写为 master-row-indexed labels |
+| `tools/rom-export/export_deck_strings.py` | ROM → `data/game-strings-ja.s` 初始版（JA 区 0x1DB9C10..0x1DC4620，自定义 2B JA 编码 + 1B ASCII control）；最终版同上由 `encode_txt_to_s.py` 重写 |
+| `tools/game-strings/decode_s_to_txt.py` | ROM → `text/game-strings/{ja,en,de,fr,it,es}.txt`（master pointer table-driven，1651 行 × 6 lang，UTF-8） |
+| `tools/game-strings/encode_txt_to_s.py` | `text/game-strings/*.txt` → `data/game-strings-{ja,en,de,fr,it,es}.s`（最终版，labels `game_str_<lang>_NNNN` 对齐 master 表 row idx） |
+| `tools/game-strings/build_pointer_table.py` | 生成 `data/game-strings-pointer-table.s`（1651 × 24 B，全 row 用 `gst_offsets NNNN` 宏 = 6 lang label 减法） |
 | `tools/rom-export/export_card_images.py` | ROM → `data/card-image-index.s` + `data/cards-ids-array.s`（含 `internal_card_id → card_id` 反向映射）+ `graphics/card-images-rom/` |
 | `tools/rom-export/export_card_mini_frame.py` | ROM → `data/card-mini-frame{,-palette}.s` + `graphics/bin/card-mini-frame/` + 彩色 PNG 两套（OBJ 用 ROM 0x1E31614；BG 用 ROM 0x00510460） |
 | `tools/rom-export/export_file_paths.py` | ROM → `data/file-paths.s`（339 条内部文件路径） |
@@ -143,7 +147,6 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_struct_decks.py` | ROM → `data/struct-decks.s`（6 套预组 + 指针表） |
 | `tools/rom-export/export_opponent_card_values.py` | ROM → `data/opponent-card-values.s`（27 对手卡值块，32 B×27） |
 | `tools/rom-export/export_opponent_decks.py` | ROM → `data/opponent-decks.s`（25 对手卡组，块大小可变，含融合卡组） |
-| `tools/rom-export/export_deck_strings.py` | ROM → `data/deck-strings.s`（XX 编码预组/对手卡组名字符串） |
 | `tools/rom-export/export_duel_puzzles.py` | ROM → `data/duel-puzzles.s`（35 块决斗题目存档模板） |
 | `tools/rom-export/render_gbtn.py` | `.gbtn` (NTBG bundle) → PNG 预览（支持 4bpp/8bpp + 2B/4B tilemap entry 自动推断）；`--all` 批量渲染 FS 全部 26 个 BG 资源到 `graphics/images/gbtn-previews/`。已在 `export_all.py` pipeline，紧跟 `export_lz5bg_unpacked.py` 后执行。Spec: `doc/dev/data-structure/gbtn-format.md` |
 | `tools/fs-decompress.py` | BIOS LZ77 (SWI 0x11) 单文件 CLI 便利工具（批量流水线已在 `export_{fs_files,nns_unpacked,lz5bg_unpacked}.py`）；`<in> <out>` 单文件解压；`--verify` 与 mGBA 运行时 dump byte-identical 对比（89/89 通过） |
