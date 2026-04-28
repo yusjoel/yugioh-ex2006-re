@@ -640,10 +640,10 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @ 指针表 (.word label) + 51 × 0x800 bytes 8bpp OBJ tile data
 	.include "data/pack-banners.s"
 
-	.incbin "roms/2343.gba", 0x1CE822C, 0xD6DEE     @ 0x1CE822C..0x1DBF01A 字库后段后部
+	.incbin "roms/2343.gba", 0x1CE822C, 0xD19E4     @ 0x1CE822C..0x1DB9C10 字库后段后部
 
-@ 未知语言（XX）卡组名字符串（ROM偏移 0x1DBF01A - 0x1DC461F）
-@ 含自定义编码（可能为日语）的预组/初始卡组名和对手卡组名；具体编码未知，待后续研究
+@ JA UI 字符串表（ROM偏移 0x1DB9C10 - 0x1DC461F, 1597 条）
+@ 与 game-strings (5 lang, 0x1DC4620~) 平行；含 7 SD + 25 OPP 名 (slot[5] 引用)
 	.include "data/deck-strings.s"
 
 @ 游戏文本字符串表（ROM偏移 0x1DC4620 - 0x1DFF9D1）
