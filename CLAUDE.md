@@ -13,14 +13,14 @@ GBA ROM 反汇编项目，目标是将《Yu-Gi-Oh! Ultimate Masters: WCT 2006》
 ## 构建与验证
 
 ```bat
-build.bat        :: encoder → as → ld → objcopy，产出 output/2343.gba
+build.bat        :: 纯汇编 (as → ld → objcopy)，产出 output/2343.gba。前置: data/*.s 必须已就绪
 clean.bat        :: 删 output/ 构建产物
 clean-all.bat    :: 5 个导出目录 (data fs fs-decompressed graphics text) → temp/ + clean.bat
 build-all.bat    :: export_all.py → build.bat → ROM 校验 → temp 比对 (round-trip)
 ```
 
 - 使用 **devkitARM**（`as.exe`/`ld.exe`/`objcopy.exe` 需在 `PATH`，或改 `build.bat`）
-- 构建前必须先运行 `python tools/rom-export/export_all.py` 从 `roms/2343.gba` 导出所有图形/数据文件（不入库）
+- 构建前必须先运行 `python tools/rom-export/export_all.py`：从 `roms/2343.gba` 导出 graphics/data/fs，并跑 text↔data 闭环 (decoder + 多 dataset encoder)。`build.bat` 不再含 encoder 步骤——全部统一到 `export_all.py`
 - 链接脚本 `ld_script.txt`，入口 `asm/rom.s`（`.include` header + crt0，其余 `.incbin`）
 - 单层验证 byte-identical：`fc /b roms\2343.gba output\2343.gba` 或比对 sha1
 - **完整 round-trip 验证**：`clean-all.bat` → `build-all.bat`，除 ROM byte-identical 外还逐文件 SHA1 对比 `temp/<dir>/` 与重导出的 5 个目录（约 18,159 文件）。验证脚本 `tools/rom-export/verify_against_temp.py`。

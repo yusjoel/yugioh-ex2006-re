@@ -1,13 +1,7 @@
 @echo off
+@rem 纯汇编流程: data/*.s → output/2343.gba
+@rem 前置: data/*.s 必须已就绪 (跑 export_all.py 或 build-all.bat 准备)
 if not exist output mkdir output
-
-@rem 从 UTF-8 源生成 data/*.s (text/<dataset>/ → encoder → data/<dataset>.s)
-python tools\card-desc\encode_txt_to_s.py
-if errorlevel 1 goto :err
-python tools\card-names\encode_txt_to_s.py
-if errorlevel 1 goto :err
-python tools\deck-strings\encode_txt_to_s.py
-if errorlevel 1 goto :err
 
 as.exe -mcpu=arm7tdmi -o output\rom.o asm\rom.s
 if errorlevel 1 goto :err
