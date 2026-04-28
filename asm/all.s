@@ -71,9 +71,9 @@ DAT_080008c2:
     .word  0x09cb09ca                     @ 080008f8 ca09cb09
     .word  0x09cd09cc                     @ 080008fc cc09cd09
     ROM_INCBIN 0x900, 0x640
-game_str_pointer_table:
-    .word  0x00000000                     @ 08000f40 00000000
-    ROM_INCBIN 0xf44, 0x9acc
+
+.include "data/game-strings-pointer-table.s"
+
 DWORD_0800aa10:
     .word  0x00100010                     @ 0800aa10 10001000
     ROM_INCBIN 0xaa14, 0x5f8

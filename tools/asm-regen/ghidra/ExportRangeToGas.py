@@ -37,6 +37,14 @@ ROM_BASE_ADDR = 0x08000000
 ROM_PATH = "roms/2343.gba"
 UNDEF_INCBIN_THRESHOLD = 16
 
+# SKIP_REGIONS: 跳过这些区段, 用 .include 引外部 .s 文件 (不内联 inline 数据)
+# 配 (start_gba, end_gba_exclusive, include_directive)
+# 用例: 大型结构化数据表 (master pointer table 等), 已抽到 data/*.s 用 label 减法表达
+SKIP_REGIONS = [
+    # game-strings master pointer table @ 0x08000F40, 1651 行 x 24 B + 8 B pad = 39632 B
+    (0x08000F40, 0x0800AA10, '.include "data/game-strings-pointer-table.s"'),
+]
+
 # --------------------------
 # 基础工具
 # --------------------------
@@ -735,6 +743,18 @@ def run():
 
         cur = start_addr
         while (not monitor.isCancelled()) and cur.compareTo(end_addr) <= 0:
+
+            # SKIP_REGIONS: 跳过指定区段, 用 .include 替换 inline 数据
+            cur_off = cur.getOffset() & 0xFFFFFFFF
+            skipped = False
+            for skip_start, skip_end, include_line in SKIP_REGIONS:
+                if cur_off == skip_start:
+                    bw.write("\n%s\n\n" % include_line)
+                    cur = toAddr(skip_end)
+                    skipped = True
+                    break
+            if skipped:
+                continue
 
             # label（现有或 DAT_）+ 可选 XREF
             emit_label_if_any_or_forced(bw, program, cur, emitted_addr_set)

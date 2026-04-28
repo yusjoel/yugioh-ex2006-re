@@ -80,6 +80,7 @@ EXPORT_PIPELINE = [
     ('card-desc',    'encode_txt_to_s.py'),           # data/card-descriptions.s
     ('card-names',   'encode_txt_to_s.py'),           # data/card-names.s
     ('game-strings', 'encode_txt_to_s.py'),           # data/game-strings-ja.s
+    ('game-strings', 'build_pointer_table.py'),       # data/game-strings-pointer-table.s (master 表 1651 行)
 ]
 
 
