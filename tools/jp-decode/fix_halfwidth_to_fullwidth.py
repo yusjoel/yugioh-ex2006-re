@@ -19,6 +19,13 @@ import json
 CT_PATH = 'tools/jp-decode/codetable.json'
 ct = json.loads(open(CT_PATH, encoding='utf-8').read())
 
+# 加载 user_confirmed: 这些 idx 是手工定的, 不动
+import importlib.util
+spec = importlib.util.spec_from_file_location('user_confirmed', 'tools/jp-decode/user_confirmed.py')
+uc_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(uc_mod)
+USER_CONFIRMED_IDX = set(uc_mod.USER_CONFIRMED.keys())
+
 # 第一遍: 收集已有的全角 ASCII (作 occupied 集)
 occupied_full = set()
 for ch in ct['by_idx'].values():
@@ -38,11 +45,15 @@ def to_math_bold(cp):
 
 
 # 第二遍: 半角→全角; 若全角已被其他 idx 占用 → 用 Math Bold 唯一替代 (避免 codetable 重复)
+# 例外: user_confirmed.py 已设的 idx, 视为最终值, 不动
 new_by_idx = {}
 changed_full = []
 changed_math = []
 skipped = []
 for idx_str, ch in ct['by_idx'].items():
+    if int(idx_str) in USER_CONFIRMED_IDX:
+        new_by_idx[idx_str] = ch
+        continue
     if ch and len(ch) == 1:
         cp = ord(ch)
         if 0x21 <= cp <= 0x7E:

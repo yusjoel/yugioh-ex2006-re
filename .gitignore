@@ -37,10 +37,9 @@ graphics/
 # 导出的数据汇编（由 tools/rom-export/export_all.py 从 ROM 生成）
 data/
 
-# 文本源 (UTF-8) — 手维护, 由 encoder 编译为 data/*.s
-# text/card-desc/ — 卡描述 (6 lang)
-# text/card-names/ — 卡名 (6 lang, TODO)
-# text/game-strings/ — 游戏文本 (6 lang, TODO)
+# 文本源 (UTF-8 中间产物) — 由 decode_s_to_txt 从 data/*.s 生成, encode 编回 data/*.s
+# 真正的源头是 codetable.json (jp-decode/) + ROM (5 lang CP1252)
+text/
 
 # 导出的 FS 文件（由 tools/rom-export/export_fs_files.py 从 ROM 重建）
 fs/
