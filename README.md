@@ -59,7 +59,8 @@ clean.bat    @ 清理编译产物
 │   │   ├── card-images/    tiles/ + palettes/          (2331 tile_block × 2)
 │   │   ├── duel-field/     tiles/ + palettes/ + tilemaps/  (6 模式 + HUD)
 │   │   ├── font/           tiles/font.bin               (英文 1bpp 字库)
-│   │   ├── icons/          tiles/ + palettes/           (27 对手小图标)
+│   │   ├── icons/          tiles/ + palettes/           (131 character icon, ROM 0x188CF30..0x18972F0)
+│   │   ├── font-jp/        main_small/large + outline_small/large    (4 charset 变体 1925 glyph)
 │   │   ├── opponents/      tiles/ + palettes/ + tilemaps/  (27 大图)
 │   │   └── pack-banners/   tiles/ + palettes/           (51 卡包封面)
 │   └── images/           # PNG 预览
@@ -128,7 +129,9 @@ clean.bat    @ 清理编译产物
 
 | 脚本 | 作用 |
 |------|------|
-| `tools/rom-export/export_gfx.py` | ROM → `graphics/opponents/*.bin` + PNG + 调色板 + `graphics/icons/*.png`；构建前必跑 |
+| `tools/rom-export/export_gfx.py` | ROM → `graphics/opponents/*.bin` + PNG + 调色板 + `graphics/{icons,duel-field}/*`；含 131 个 character icon (tiles + palettes, 0x188CF30..0x18972F0) + 27 对手大图 + duel-field 内/外场 6 模式；构建前必跑 |
+| `tools/rom-export/export_font.py` | ROM → `data/font.s` + `graphics/font/*`（英文 1bpp 8×8 字库，256 字符，ROM 0x1CCCA90 / 2048 B）|
+| `tools/rom-export/export_font_jp.py` | ROM → `graphics/{bin,images}/font-jp/*`（4 charset 变体: main_small 192,500 B + outline_small 277,200 B + main_large 277,200 B + outline_large 377,300 B = 1,124,200 B 共 1925 glyph 8bpp 预解码每像素 1 字节, ROM 0x1BAC9A4..0x1CCB490 散布）|
 | `tools/rom-export/export_pack_banners.py` | ROM → `graphics/pack-banners/*.bin` + 彩色 PNG + `data/pack-banners.s`；构建前必跑 |
 | `tools/rom-export/export_pack_card_lists.py` | ROM → `data/pack-card-lists.s`（45 个 pack 共 3,515 条卡牌条目 + 51 条 pack 信息） |
 | `tools/rom-export/export_card_descriptions.py` | ROM → `data/card-descriptions.s`（合并: text pool 2098 卡 × 6 lang + card_desc_data 12,588 × u32 offset 表；取代旧 export_card_effect_text.py） |

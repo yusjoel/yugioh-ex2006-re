@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**21,908,216 B（76.76%）**（含 2026-04-28 game-strings 1651 行统一 +18 B）
-- 未分析：**6,635,216 B（23.24%）**
+- 已分析：**23,065,904 B（80.81%）**（2026-04-28 同步盘点：font-jp 1.1 MB + icons 27→131 + fs-payload +208 B + game-strings 1651 行）
+- 未分析：**5,477,528 B（19.19%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -18,25 +18,26 @@
 
 | 起址 | 大小 | 字节数 | 备注 |
 |---:|---:|---:|---|
-| `0x01896730` | `0x279A7C` | 2,595,452 | 小图标调色板后，对手调色板 Copy1 前 |
-| `0x01B8FB8C` | `0x13CF04` | 1,298,180 | 后 16MB 第一段剩余，字库前段 |
-| `0x01ED49D4` | `0x12B62C` | 1,226,284 | FS 后尾段 |
+| `0x018972F0` | `0x278EBC` | 2,592,956 | 131 icon 调色板后，对手调色板 Copy1 前 |
+| `0x01ED4AA4` | `0x12B55C` | 1,226,076 | FS 后尾段（fs-payload 含 FID 339 后） |
 | `0x01CE822C` | `0xD19E4` | 858,596 | 字库后段后部 |
 | `0x01DFF9E4` | `0x31B70` | 203,632 | 游戏文本后，卡列表调色板前 |
 | `0x01E31714` | `0x275FA` | 161,274 | 调色板后，对手卡值前 |
-| `0x01867560` | `0x26510` | 156,944 | 内场调色板后，小图标图块前 |
+| `0x01867560` | `0x259D0` | 153,552 | 内场调色板后，icon tiles 前 |
 | `0x01832602` | `0x1E51A` | 124,186 | seg-C 前段（属性表后，HUD 图块前） |
-| `0x0188F8D0` | `0x6B00` | 27,392 | 小图标 tile 后，小图标调色板前 |
+| `0x01B8FB8C` | `0x1CE18` | 118,296 | 字库前段（含 font_jp_sjis_lookup_table 等） |
+| `0x01C1F468` | `0xC384` | 50,052 | font-jp small/large 之间 gap1 |
 | `0x01E5906E` | `0x1B8E` | 7,054 | 对手卡值后 |
 | `0x01CCD290` | `0x16D0` | 5,840 | 字库后段前部 |
 | `0x01865E20` | `0x1680` | 5,760 | 未知第 7 内场图块 |
+| `0x01CCB490` | `0x1600` | 5,632 | font-jp tail gap |
 | `0x01E5FD84` | `0x1408` | 5,128 | 预组后，文件路径表前 |
 | `0x01E5E618` | `0x918` | 2,328 | 卡包信息表后，禁卡表前 |
 | `0x01E5F6CC` | `0x1B8` | 440 | 禁卡表后，初始卡组前 |
 | `0x01E5F8EA` | `0x16E` | 366 | 初始卡组后，预组前 |
 | `0x004C7638` | `0x88` | 136 | all.s 后 / 大卡图调色板前 |
 
-**合计**：17 段，6,678,992 B（占数据区 23.40%；顶层"未分析 6,635,216"另扣去 2026-04-23 已结构化的 43,776 B UI sheet sub-block）
+**合计**：18 段，5,521,304 B（占数据区 19.34%；顶层"未分析 5,477,528"另扣去 2026-04-23 已结构化的 43,776 B UI sheet sub-block）
 
 ## 全部段（按 ROM 地址顺序）
 
@@ -70,18 +71,23 @@
 | `0x0185D720` | `0x8700` | 34,560 | ✓ 已分析 | duel-field inner images (6 modes) | `.incbin graphics/bin/duel-field/tiles/*_inner_image.bin` |
 | `0x01865E20` | `0x1680` | 5,760 | ✗ 未分析 | 未知第 7 内场图块 | raw `.incbin roms/2343.gba` |
 | `0x018674A0` | `0xC0` | 192 | ✓ 已分析 | duel-field inner palettes (6 modes) | `.incbin graphics/bin/duel-field/palettes/*_inner_palette.bin` |
-| `0x01867560` | `0x26510` | 156,944 | ✗ 未分析 | 内场调色板后，小图标图块前 | raw `.incbin roms/2343.gba` |
-| `0x0188DA70` | `0x1E60` | 7,776 | ✓ 已分析 | opponent icons tiles (27) | `.incbin graphics/bin/icons/tiles/*_icon_tiles.bin` |
-| `0x0188F8D0` | `0x6B00` | 27,392 | ✗ 未分析 | 小图标 tile 后，小图标调色板前 | raw `.incbin roms/2343.gba` |
-| `0x018963D0` | `0x360` | 864 | ✓ 已分析 | opponent icons palettes (27) | `.incbin graphics/bin/icons/palettes/*_icon_palette.bin` |
-| `0x01896730` | `0x279A7C` | 2,595,452 | ✗ 未分析 | 小图标调色板后，对手调色板 Copy1 前 | raw `.incbin roms/2343.gba` |
+| `0x01867560` | `0x259D0` | 153,552 | ✗ 未分析 | 内场调色板后，icon tiles 前 | raw `.incbin roms/2343.gba` |
+| `0x0188CF30` | `0x9360` | 37,728 | ✓ 已分析 | icons tiles (131 × 0x120) | `.incbin graphics/bin/icons/tiles/icon_NNN.bin` |
+| `0x01896290` | `0x1060` | 4,192 | ✓ 已分析 | icons palettes (131 × 0x20) | `.incbin graphics/bin/icons/palettes/icon_NNN.bin` |
+| `0x018972F0` | `0x278EBC` | 2,592,956 | ✗ 未分析 | 131 icon 调色板后，对手调色板 Copy1 前 | raw `.incbin roms/2343.gba` |
 | `0x01B101AC` | `0x1E60` | 7,776 | ✓ 已分析 | opponents palette copy1 | `.incbin graphics/bin/opponents/palettes/palette_copy1.bin` |
 | `0x01B1200C` | `0x36000` | 221,184 | ✓ 已分析 | opponents top tiles | `.incbin graphics/bin/opponents/tiles/top_tiles_all.bin` |
 | `0x01B4800C` | `0x7E90` | 32,400 | ✓ 已分析 | opponents top tilemaps (27) | `.incbin graphics/bin/opponents/tilemaps/*_top_tilemap.bin` |
 | `0x01B4FE9C` | `0x1E60` | 7,776 | ✓ 已分析 | opponents palette copy2 | `.incbin graphics/bin/opponents/palettes/palette_copy1.bin (复用)` |
 | `0x01B51CFC` | `0x36000` | 221,184 | ✓ 已分析 | opponents bottom tiles | `.incbin graphics/bin/opponents/tiles/bottom_tiles_all.bin` |
 | `0x01B87CFC` | `0x7E90` | 32,400 | ✓ 已分析 | opponents bottom tilemaps (27) | `.incbin graphics/bin/opponents/tilemaps/*_bottom_tilemap.bin` |
-| `0x01B8FB8C` | `0x13CF04` | 1,298,180 | ✗ 未分析 | 后 16MB 第一段剩余，字库前段 | raw `.incbin roms/2343.gba` |
+| `0x01B8FB8C` | `0x1CE18` | 118,296 | ✗ 未分析 | 字库前段（含 font_jp_sjis_lookup_table @ 0x1BA1524, 3850 B + count u16 + 其他） | raw `.incbin roms/2343.gba` |
+| `0x01BAC9A4` | `0x2EFF4` | 192,500 | ✓ 已分析 | font_jp_main_small (1925 × 10×10, 8bpp) | `.incbin graphics/bin/font-jp/main_small.bin` |
+| `0x01BDB998` | `0x43AD0` | 277,200 | ✓ 已分析 | font_jp_outline_small (1925 × 12×12, 8bpp) | `.incbin graphics/bin/font-jp/outline_small.bin` |
+| `0x01C1F468` | `0xC384` | 50,052 | ✗ 未分析 | font-jp small/large 之间 gap1 | raw `.incbin roms/2343.gba` |
+| `0x01C2B7EC` | `0x43AD0` | 277,200 | ✓ 已分析 | font_jp_main_large (1925 × 12×12, 8bpp) | `.incbin graphics/bin/font-jp/main_large.bin` |
+| `0x01C6F2BC` | `0x5C1D4` | 377,300 | ✓ 已分析 | font_jp_outline_large (1925 × 14×14, 8bpp) | `.incbin graphics/bin/font-jp/outline_large.bin` |
+| `0x01CCB490` | `0x1600` | 5,632 | ✗ 未分析 | font-jp tail gap | raw `.incbin roms/2343.gba` |
 | `0x01CCCA90` | `0x800` | 2,048 | ✓ 已分析 | font (English 1bpp) | `.include data/font.s` |
 | `0x01CCD290` | `0x16D0` | 5,840 | ✗ 未分析 | 字库后段前部 | raw `.incbin roms/2343.gba` |
 | `0x01CCE960` | `0x198CC` | 104,652 | ✓ 已分析 | pack-banners (tiles) | `.include data/pack-banners.s` |
@@ -102,10 +108,10 @@
 | `0x01E5FD84` | `0x1408` | 5,128 | ✗ 未分析 | 预组后，文件路径表前 | raw `.incbin roms/2343.gba` |
 | `0x01E6118C` | `0x2A5C` | 10,844 | ✓ 已分析 | file-paths | `.include data/file-paths.s` |
 | `0x01E63BE8` | `0xA9C` | 2,716 | ✓ 已分析 | fs-tables | `.include data/fs-tables.s` |
-| `0x01E64684` | `0x70350` | 459,600 | ✓ 已分析 | fs-payload (338 files via fs/) | `.include data/fs-payload.s` |
-| `0x01ED49D4` | `0x12B62C` | 1,226,284 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
+| `0x01E64684` | `0x70420` | 459,808 | ✓ 已分析 | fs-payload (339 files via fs/，含 FID 339 orphan palette title_obj_s.LZnclr 208 B) | `.include data/fs-payload.s` |
+| `0x01ED4AA4` | `0x12B55C` | 1,226,076 | ✗ 未分析 | FS 后尾段 | raw `.incbin roms/2343.gba` |
 
-**合计**：62 段（45 已分析 + 17 未分析），28,543,432 B
+**合计**：67 段（49 已分析 + 18 未分析），28,543,432 B
 
 ## 2026-04-22 合并：card-descriptions + card-effect-text
 
@@ -203,4 +209,39 @@ key(cid) = ((cid * 0x343FD + 0x269EC3) >> 16) | 0x9EC30000   （Borland rand LCG
 净效果：
 - "字库后段后部" raw 0xD6DEE → 0xD19E4（21,514 B 转移到 JA 已分析）
 - "游戏文本后" raw 0x31B82 → 0x31B70 (–18 B)
-- 已分析 21,886,684 → 21,908,216（+21,532）；未分析 6,656,748 → 6,635,216（–21,532）；占比 76.68% → 76.76%
+
+## 2026-04-28 同步盘点：font-jp 拆出 + icons 27→131 + fs-payload +208 B
+
+本次表更新前 doc 多处与 asm/rom.s 实际 .incbin/.include 失同步，集中订正：
+
+### font-jp 4 段拆出（commit `392af21` ROM 日文卡名码表完整逆向 + `557e4a9` 日文字库系统）
+旧 `0x1B8FB8C / 0x13CF04` (1,298,180 B) 一整块 raw 拆为 7 子块：
+- `0x01B8FB8C / 0x1CE18` (118,296 B) ✗ 头段（含 `font_jp_sjis_lookup_table @ 0x1BA1524` 3850 B + count u16 + 其他未识别）
+- `0x01BAC9A4 / 0x2EFF4` (192,500 B) ✓ `font_jp_main_small`（1925 × 10×10, 8bpp 预解码每像素 1 字节）
+- `0x01BDB998 / 0x43AD0` (277,200 B) ✓ `font_jp_outline_small`（1925 × 12×12）
+- `0x01C1F468 / 0xC384` (50,052 B) ✗ small/large 之间 gap1
+- `0x01C2B7EC / 0x43AD0` (277,200 B) ✓ `font_jp_main_large`（1925 × 12×12）
+- `0x01C6F2BC / 0x5C1D4` (377,300 B) ✓ `font_jp_outline_large`（1925 × 14×14）
+- `0x01CCB490 / 0x1600` (5,632 B) ✗ tail gap
+
+新结构化 1,124,200 B，导出脚本 `tools/rom-export/export_font_jp.py`（已接入 `export_all.py`）。
+
+### icons 27→131 扩展（commit `557e4a9` 等）
+旧 27 对手图标 (`0x0188DA70 / 7,776` tiles + `0x018963D0 / 864` palettes) → 新 131 全 character icon：
+- `0x0188CF30 / 0x9360` (37,728 B) ✓ tiles 131 × 0x120
+- `0x01896290 / 0x1060` (4,192 B) ✓ palettes 131 × 0x20
+
+吸收原 raw `0x0188F8D0 / 0x6B00`（27,392 B 中间 gap，已无）+ 老 raw 起止位移：
+- `0x01867560` raw 0x26510 → 0x259D0（–2,880 B 转移）
+- `0x01896730` raw 0x279A7C → `0x018972F0` raw 0x278EBC（起点后移 0xBC0, –3,008 B 转移）
+
+净结构化 +33,280 B。
+
+### fs-payload +208 B（FID 339 orphan palette）
+旧 fs-payload `0x70350` (459,600 B) → `0x70420` (459,808 B)，含 `title_obj_s.LZnclr` 208 B（在 szs[0] 声称 0x70350 外，自然延伸）。
+对应 raw `0x01ED49D4 / 0x12B62C` → `0x01ED4AA4 / 0x12B55C`（–208 B 转移）。
+
+### 总净效果
+- 已分析 21,908,216 → **23,065,904**（+1,157,688）
+- 未分析 6,635,216 → **5,477,528**（–1,157,688）
+- 占比 76.76% → **80.81%**
