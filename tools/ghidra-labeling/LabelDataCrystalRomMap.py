@@ -132,6 +132,19 @@ LABELS = [
     (0x095FFF0C, "card_descs_table"),        # 曾用名 card_desc_text_pool / card_effect_text_pool@0x095FFF6C(错)
     (0x0980A508, "card_desc_pointer_table"), # 2098 × 6 × u32 per-cid offset 表; 曾用名 card_desc_data
     (0x098169B8, "card_stats_table"),      # 5170 × 22 B (首条 20B 少 zero0)
+
+    # game-strings (UI text 6 lang) — 见 doc/dev/data-structure/game-strings.md
+    # 1642 行 master pointer table @ 0x08000F40, 每行 24 B = 6 lang × 4 B offset
+    # 顺序 [JA, EN, DE, FR, IT, ES]; offset = entry_addr - game_str_ja (BASE)
+    # 代码引用: 0x08000F40 ROM 字面量 101 hits, 0x09DB9C10 99 hits
+    (0x08000F40, "game_str_pointer_table"),  # master 表, 1642 × 24 B = 39408 B
+    (0x09DB9C10, "game_str_ja"),             # JA 区起点 (= STRING_TABLE_BASE)
+    (0x09DC4620, "game_str_en"),             # EN 区起点
+    (0x09DCF471, "game_str_de"),             # DE 区起点
+    (0x09DDB7DE, "game_str_fr"),             # FR 区起点
+    (0x09DE7CB7, "game_str_it"),             # IT 区起点
+    (0x09DF3C66, "game_str_es"),             # ES 区起点
+
     (0x09E58D0C, "deck_id_and_data_array"),  # = data/opponent-card-values.s (-2B); 27×32B
                                               # wiki 标注的 << 16 stride 是 lsr r4,0x16 误读
 
@@ -235,6 +248,13 @@ RENAMES = [
 #     asm/all.s 0x095FFF6C 0 引用证实该地址不是任何字面量池目标。
 REMOVALS = [
     (0x095FFF6C, "card_effect_text_pool"),
+    # 旧 file_game_strings_* 系列 label (与 game_str_* 同址重复, 清掉旧的)
+    (0x09DC4620, "file_game_strings_en_start"),
+    (0x09DC4620, "file_game_strings_start"),
+    (0x09DCF471, "file_game_strings_de_start"),
+    (0x09DDB7DE, "file_game_strings_fr_start"),
+    (0x09DE7CB7, "file_game_strings_it_start"),
+    (0x09DF3C66, "file_game_strings_es_start"),
 ]
 
 

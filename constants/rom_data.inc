@@ -3751,12 +3751,6 @@
 .equ card_142F,                      0x098325C0
 .equ font_jp_sjis_lookup_table,      0x09BA1524
 .equ font_jp_sjis_lookup_count,      0x09BA2430
-.equ file_game_strings_en_start,     0x09DC4620
-.equ file_game_strings_start,        0x09DC4620
-.equ file_game_strings_de_start,     0x09DCF471
-.equ file_game_strings_fr_start,     0x09DDB7DE
-.equ file_game_strings_it_start,     0x09DE7CB7
-.equ file_game_strings_es_start,     0x09DF3C66
 .equ gl_common_c_filename,           0x09E398DC
 .equ gl_bright_assert,               0x09E398EC
 .equ name_input_path_strings,        0x09E3B360

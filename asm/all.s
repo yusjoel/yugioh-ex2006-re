@@ -71,7 +71,7 @@ DAT_080008c2:
     .word  0x09cb09ca                     @ 080008f8 ca09cb09
     .word  0x09cd09cc                     @ 080008fc cc09cd09
     ROM_INCBIN 0x900, 0x640
-DWORD_08000f40:
+game_str_pointer_table:
     .word  0x00000000                     @ 08000f40 00000000
     ROM_INCBIN 0xf44, 0x9acc
 DWORD_0800aa10:
@@ -6744,7 +6744,7 @@ LAB_08016b14:
     ldr r3, DAT_08016b54                     @ 08016b16 0f4b
     adds r0,r4,r3    @ 08016b18 e018
     bl FUN_080f4e18                          @ 08016b1a def07df9
-    ldr r2, DAT_08016b58                     @ 08016b1e 0e4a
+    ldr r2, PTR_game_str_pointer_table_08016b58 @ 08016b1e 0e4a
     lsls r0,r0,#0x10    @ 08016b20 0004
     lsrs r0,r0,#0x10    @ 08016b22 000c
     lsls r1,r0,#0x1    @ 08016b24 4100
@@ -6760,7 +6760,7 @@ LAB_08016b14:
     lsls r1,r1,#0x2    @ 08016b38 8900
     adds r1,r1,r2    @ 08016b3a 8918
     ldr r0,[r1,#0x0]                         @ 08016b3c 0868
-    ldr r1, DAT_08016b64                     @ 08016b3e 0949
+    ldr r1, PTR_game_str_ja_08016b64         @ 08016b3e 0949
     adds r0,r0,r1    @ 08016b40 4018
     pop {r4}                                 @ 08016b42 10bc
     pop {r1}                                 @ 08016b44 02bc
@@ -6773,14 +6773,14 @@ DAT_08016b50:
     .word  0x09e3a780                     @ 08016b50 80a7e309
 DAT_08016b54:
     .word  0x00001072                     @ 08016b54 72100000
-DAT_08016b58:
-    .word  0x08000f40                     @ 08016b58 400f0008
+PTR_game_str_pointer_table_08016b58:
+    .word  game_str_pointer_table         @ 08016b58 400f0008
 DAT_08016b5c:
     .word  0x02000000                     @ 08016b5c 00000002
 DAT_08016b60:
     .word  0x00006c2c                     @ 08016b60 2c6c0000
-DAT_08016b64:
-    .word  0x09db9c10                     @ 08016b64 109cdb09
+PTR_game_str_ja_08016b64:
+    .word  game_str_ja                    @ 08016b64 109cdb09
     ROM_INCBIN 0x16b68, 0x1c
     .word  0x08016b88                     @ 08016b84 886b0108
 PTR_DAT_08016b88:
@@ -7666,7 +7666,7 @@ FUN_080178b4:
     ldr r5, DAT_08017930                     @ 080178ba 1d4d
     ldr r0, DAT_08017934                     @ 080178bc 1d48
     bl FUN_080f4e18                          @ 080178be ddf0abfa
-    ldr r1, DAT_08017938                     @ 080178c2 1d49
+    ldr r1, PTR_game_str_pointer_table_08017938 @ 080178c2 1d49
     .hword 0x4688    @ 080178c4 8846
     lsls r0,r0,#0x10    @ 080178c6 0004
     lsrs r0,r0,#0x10    @ 080178c8 000c
@@ -7683,7 +7683,7 @@ FUN_080178b4:
     lsls r1,r1,#0x2    @ 080178de 8900
     add r1,r8                                @ 080178e0 4144
     ldr r0,[r1,#0x0]                         @ 080178e2 0868
-    ldr r6, DAT_08017944                     @ 080178e4 174e
+    ldr r6, PTR_game_str_ja_08017944         @ 080178e4 174e
     adds r0,r0,r6    @ 080178e6 8019
     adds r5,#0x8d    @ 080178e8 8d35
     adds r1,r5,#0x0    @ 080178ea 291c
@@ -7720,14 +7720,14 @@ DAT_08017930:
     .word  0x02029250                     @ 08017930 50920202
 DAT_08017934:
     .word  0x00001004                     @ 08017934 04100000
-DAT_08017938:
-    .word  0x08000f40                     @ 08017938 400f0008
+PTR_game_str_pointer_table_08017938:
+    .word  game_str_pointer_table         @ 08017938 400f0008
 DAT_0801793c:
     .word  0x02000000                     @ 0801793c 00000002
 DAT_08017940:
     .word  0x00006c2c                     @ 08017940 2c6c0000
-DAT_08017944:
-    .word  0x09db9c10                     @ 08017944 109cdb09
+PTR_game_str_ja_08017944:
+    .word  game_str_ja                    @ 08017944 109cdb09
 DAT_08017948:
     .word  0x00001005                     @ 08017948 05100000
 FUN_0801794c:
@@ -7735,7 +7735,7 @@ FUN_0801794c:
     ldr r4, DAT_08017990                     @ 0801794e 104c
     ldr r0, DAT_08017994                     @ 08017950 1048
     bl FUN_080f4e18                          @ 08017952 ddf061fa
-    ldr r2, DAT_08017998                     @ 08017956 104a
+    ldr r2, PTR_game_str_pointer_table_08017998 @ 08017956 104a
     lsls r0,r0,#0x10    @ 08017958 0004
     lsrs r0,r0,#0x10    @ 0801795a 000c
     lsls r1,r0,#0x1    @ 0801795c 4100
@@ -7751,7 +7751,7 @@ FUN_0801794c:
     lsls r1,r1,#0x2    @ 08017970 8900
     adds r1,r1,r2    @ 08017972 8918
     ldr r0,[r1,#0x0]                         @ 08017974 0868
-    ldr r1, DAT_080179a4                     @ 08017976 0b49
+    ldr r1, PTR_game_str_ja_080179a4         @ 08017976 0b49
     adds r0,r0,r1    @ 08017978 4018
     adds r4,#0x8d    @ 0801797a 8d34
     adds r1,r4,#0x0    @ 0801797c 211c
@@ -7766,14 +7766,14 @@ DAT_08017990:
     .word  0x02029250                     @ 08017990 50920202
 DAT_08017994:
     .word  0x00001006                     @ 08017994 06100000
-DAT_08017998:
-    .word  0x08000f40                     @ 08017998 400f0008
+PTR_game_str_pointer_table_08017998:
+    .word  game_str_pointer_table         @ 08017998 400f0008
 DAT_0801799c:
     .word  0x02000000                     @ 0801799c 00000002
 DAT_080179a0:
     .word  0x00006c2c                     @ 080179a0 2c6c0000
-DAT_080179a4:
-    .word  0x09db9c10                     @ 080179a4 109cdb09
+PTR_game_str_ja_080179a4:
+    .word  game_str_ja                    @ 080179a4 109cdb09
 FUN_080179a8:
     push {r4,r5,r6,r7,lr}                    @ 080179a8 f0b5
     .hword 0x4657    @ 080179aa 5746
@@ -7987,7 +7987,7 @@ FUN_08017b44:
     .hword 0x4680    @ 08017b52 8046
     ldr r0, DAT_08017c58                     @ 08017b54 4048
     bl FUN_080f4e18                          @ 08017b56 ddf05ff9
-    ldr r7, DAT_08017c5c                     @ 08017b5a 404f
+    ldr r7, PTR_game_str_pointer_table_08017c5c @ 08017b5a 404f
     lsls r0,r0,#0x10    @ 08017b5c 0004
     lsrs r0,r0,#0x10    @ 08017b5e 000c
     lsls r1,r0,#0x1    @ 08017b60 4100
@@ -8003,7 +8003,7 @@ FUN_08017b44:
     lsls r1,r1,#0x2    @ 08017b74 8900
     adds r1,r1,r7    @ 08017b76 c919
     ldr r4,[r1,#0x0]                         @ 08017b78 0c68
-    ldr r0, DAT_08017c68                     @ 08017b7a 3b48
+    ldr r0, PTR_game_str_ja_08017c68         @ 08017b7a 3b48
     .hword 0x4681    @ 08017b7c 8146
     add r4,r9                                @ 08017b7e 4c44
     adds r0,r4,#0x0    @ 08017b80 201c
@@ -8105,14 +8105,14 @@ DAT_08017c54:
     .word  0x02029250                     @ 08017c54 50920202
 DAT_08017c58:
     .word  0x00001008                     @ 08017c58 08100000
-DAT_08017c5c:
-    .word  0x08000f40                     @ 08017c5c 400f0008
+PTR_game_str_pointer_table_08017c5c:
+    .word  game_str_pointer_table         @ 08017c5c 400f0008
 DAT_08017c60:
     .word  0x02000000                     @ 08017c60 00000002
 DAT_08017c64:
     .word  0x00006c2c                     @ 08017c64 2c6c0000
-DAT_08017c68:
-    .word  0x09db9c10                     @ 08017c68 109cdb09
+PTR_game_str_ja_08017c68:
+    .word  game_str_ja                    @ 08017c68 109cdb09
 DAT_08017c6c:
     .word  0x00000321                     @ 08017c6c 21030000
 DAT_08017c70:
@@ -10742,10 +10742,10 @@ switchD_08018fa0__caseD_2:
     lsrs r0,r0,#0x1d    @ 08019110 400f
     adds r1,r1,r0    @ 08019112 0918
     lsls r1,r1,#0x2    @ 08019114 8900
-    ldr r0, DAT_08019234                     @ 08019116 4748
+    ldr r0, PTR_game_str_pointer_table_08019234 @ 08019116 4748
     adds r1,r1,r0    @ 08019118 0918
     ldr r0,[r1,#0x0]                         @ 0801911a 0868
-    ldr r1, DAT_08019238                     @ 0801911c 4649
+    ldr r1, PTR_game_str_ja_08019238         @ 0801911c 4649
     .hword 0x4689    @ 0801911e 8946
     add r0,r9                                @ 08019120 4844
     adds r4,r0,#0x0    @ 08019122 041c
@@ -10787,7 +10787,7 @@ LAB_0801913c:
     lsrs r0,r0,#0x1d    @ 0801916e 400f
     adds r1,r1,r0    @ 08019170 0918
     lsls r1,r1,#0x2    @ 08019172 8900
-    ldr r3, DAT_08019234                     @ 08019174 2f4b
+    ldr r3, PTR_game_str_pointer_table_08019234 @ 08019174 2f4b
     adds r1,r1,r3    @ 08019176 c918
     ldr r0,[r1,#0x0]                         @ 08019178 0868
     .hword 0x4649    @ 0801917a 4946
@@ -10825,7 +10825,7 @@ LAB_08019194:
     lsrs r0,r0,#0x1d    @ 080191be 400f
     adds r1,r1,r0    @ 080191c0 0918
     lsls r1,r1,#0x2    @ 080191c2 8900
-    ldr r3, DAT_08019234                     @ 080191c4 1b4b
+    ldr r3, PTR_game_str_pointer_table_08019234 @ 080191c4 1b4b
     adds r1,r1,r3    @ 080191c6 c918
     ldr r0,[r1,#0x0]                         @ 080191c8 0868
     .hword 0x4649    @ 080191ca 4946
@@ -10878,10 +10878,10 @@ DAT_0801922c:
     .word  0x02000000                     @ 0801922c 00000002
 DAT_08019230:
     .word  0x00006c2c                     @ 08019230 2c6c0000
-DAT_08019234:
-    .word  0x08000f40                     @ 08019234 400f0008
-DAT_08019238:
-    .word  0x09db9c10                     @ 08019238 109cdb09
+PTR_game_str_pointer_table_08019234:
+    .word  game_str_pointer_table         @ 08019234 400f0008
+PTR_game_str_ja_08019238:
+    .word  game_str_ja                    @ 08019238 109cdb09
 DAT_0801923c:
     .word  0x0000100a                     @ 0801923c 0a100000
 DAT_08019240:
@@ -11699,7 +11699,7 @@ FUN_08019964:
     ldr r5, PTR_gBanlistPasswordBuffer_080199e0 @ 0801996a 1d4d
     ldr r0, DAT_080199e4                     @ 0801996c 1d48
     bl FUN_080f4e18                          @ 0801996e dbf053fa
-    ldr r1, DAT_080199e8                     @ 08019972 1d49
+    ldr r1, PTR_game_str_pointer_table_080199e8 @ 08019972 1d49
     .hword 0x4688    @ 08019974 8846
     lsls r0,r0,#0x10    @ 08019976 0004
     lsrs r0,r0,#0x10    @ 08019978 000c
@@ -11716,7 +11716,7 @@ FUN_08019964:
     lsls r1,r1,#0x2    @ 0801998e 8900
     add r1,r8                                @ 08019990 4144
     ldr r0,[r1,#0x0]                         @ 08019992 0868
-    ldr r6, DAT_080199f4                     @ 08019994 174e
+    ldr r6, PTR_game_str_ja_080199f4         @ 08019994 174e
     adds r0,r0,r6    @ 08019996 8019
     adds r1,r5,#0x0    @ 08019998 291c
     bl FUN_08014470                          @ 0801999a faf769fd
@@ -11753,14 +11753,14 @@ PTR_gBanlistPasswordBuffer_080199e0:
     .word  gBanlistPasswordBuffer         @ 080199e0 10980202
 DAT_080199e4:
     .word  0x00001036                     @ 080199e4 36100000
-DAT_080199e8:
-    .word  0x08000f40                     @ 080199e8 400f0008
+PTR_game_str_pointer_table_080199e8:
+    .word  game_str_pointer_table         @ 080199e8 400f0008
 DAT_080199ec:
     .word  0x02000000                     @ 080199ec 00000002
 DAT_080199f0:
     .word  0x00006c2c                     @ 080199f0 2c6c0000
-DAT_080199f4:
-    .word  0x09db9c10                     @ 080199f4 109cdb09
+PTR_game_str_ja_080199f4:
+    .word  game_str_ja                    @ 080199f4 109cdb09
 DAT_080199f8:
     .word  0x00001037                     @ 080199f8 37100000
 FUN_080199fc:
@@ -11768,7 +11768,7 @@ FUN_080199fc:
     ldr r4, PTR_gBanlistPasswordBuffer_08019a40 @ 080199fe 104c
     ldr r0, DAT_08019a44                     @ 08019a00 1048
     bl FUN_080f4e18                          @ 08019a02 dbf009fa
-    ldr r2, DAT_08019a48                     @ 08019a06 104a
+    ldr r2, PTR_game_str_pointer_table_08019a48 @ 08019a06 104a
     lsls r0,r0,#0x10    @ 08019a08 0004
     lsrs r0,r0,#0x10    @ 08019a0a 000c
     lsls r1,r0,#0x1    @ 08019a0c 4100
@@ -11784,7 +11784,7 @@ FUN_080199fc:
     lsls r1,r1,#0x2    @ 08019a20 8900
     adds r1,r1,r2    @ 08019a22 8918
     ldr r0,[r1,#0x0]                         @ 08019a24 0868
-    ldr r1, DAT_08019a54                     @ 08019a26 0b49
+    ldr r1, PTR_game_str_ja_08019a54         @ 08019a26 0b49
     adds r0,r0,r1    @ 08019a28 4018
     adds r1,r4,#0x0    @ 08019a2a 211c
     bl FUN_08014470                          @ 08019a2c faf720fd
@@ -11799,14 +11799,14 @@ PTR_gBanlistPasswordBuffer_08019a40:
     .word  gBanlistPasswordBuffer         @ 08019a40 10980202
 DAT_08019a44:
     .word  0x00001038                     @ 08019a44 38100000
-DAT_08019a48:
-    .word  0x08000f40                     @ 08019a48 400f0008
+PTR_game_str_pointer_table_08019a48:
+    .word  game_str_pointer_table         @ 08019a48 400f0008
 DAT_08019a4c:
     .word  0x02000000                     @ 08019a4c 00000002
 DAT_08019a50:
     .word  0x00006c2c                     @ 08019a50 2c6c0000
-DAT_08019a54:
-    .word  0x09db9c10                     @ 08019a54 109cdb09
+PTR_game_str_ja_08019a54:
+    .word  game_str_ja                    @ 08019a54 109cdb09
 FUN_08019a58:
     push {r4,r5,r6,r7,lr}                    @ 08019a58 f0b5
     .hword 0x4657    @ 08019a5a 5746
@@ -11941,7 +11941,7 @@ FUN_08019b4c:
     strb r0,[r1,#0x0]                        @ 08019b60 0870
     ldr r0, DAT_08019c24                     @ 08019b62 3048
     bl FUN_080f4e18                          @ 08019b64 dbf058f9
-    ldr r7, DAT_08019c28                     @ 08019b68 2f4f
+    ldr r7, PTR_game_str_pointer_table_08019c28 @ 08019b68 2f4f
     lsls r0,r0,#0x10    @ 08019b6a 0004
     lsrs r0,r0,#0x10    @ 08019b6c 000c
     lsls r1,r0,#0x1    @ 08019b6e 4100
@@ -11957,7 +11957,7 @@ FUN_08019b4c:
     lsls r1,r1,#0x2    @ 08019b82 8900
     adds r1,r1,r7    @ 08019b84 c919
     ldr r4,[r1,#0x0]                         @ 08019b86 0c68
-    ldr r0, DAT_08019c34                     @ 08019b88 2a48
+    ldr r0, PTR_game_str_ja_08019c34         @ 08019b88 2a48
     .hword 0x4681    @ 08019b8a 8146
     add r4,r9                                @ 08019b8c 4c44
     adds r0,r4,#0x0    @ 08019b8e 201c
@@ -12030,14 +12030,14 @@ DAT_08019c20:
     .word  0x0202348c                     @ 08019c20 8c340202
 DAT_08019c24:
     .word  0x00001038                     @ 08019c24 38100000
-DAT_08019c28:
-    .word  0x08000f40                     @ 08019c28 400f0008
+PTR_game_str_pointer_table_08019c28:
+    .word  game_str_pointer_table         @ 08019c28 400f0008
 DAT_08019c2c:
     .word  0x02000000                     @ 08019c2c 00000002
 DAT_08019c30:
     .word  0x00006c2c                     @ 08019c30 2c6c0000
-DAT_08019c34:
-    .word  0x09db9c10                     @ 08019c34 109cdb09
+PTR_game_str_ja_08019c34:
+    .word  game_str_ja                    @ 08019c34 109cdb09
 DAT_08019c38:
     .word  0x00000675                     @ 08019c38 75060000
 DAT_08019c3c:
@@ -12787,7 +12787,7 @@ FUN_0801a230:
     sub sp,#0x14                             @ 0801a236 85b0
     ldr r0, DWORD_0801a308                   @ 0801a238 3348
     bl FUN_080f4e18                          @ 0801a23a daf0edfd
-    ldr r3, DWORD_0801a30c                   @ 0801a23e 334b
+    ldr r3, PTR_game_str_pointer_table_0801a30c @ 0801a23e 334b
     lsls r0,r0,#0x10    @ 0801a240 0004
     lsrs r0,r0,#0x10    @ 0801a242 000c
     lsls r1,r0,#0x1    @ 0801a244 4100
@@ -12803,7 +12803,7 @@ FUN_0801a230:
     lsls r1,r1,#0x2    @ 0801a258 8900
     adds r1,r1,r3    @ 0801a25a c918
     ldr r1,[r1,#0x0]                         @ 0801a25c 0968
-    ldr r0, DWORD_0801a318                   @ 0801a25e 2e48
+    ldr r0, PTR_game_str_ja_0801a318         @ 0801a25e 2e48
     adds r7,r1,r0    @ 0801a260 0f18
     movs r0,#0x7    @ 0801a262 0720
     .hword 0x4680    @ 0801a264 8046
@@ -12885,14 +12885,14 @@ LAB_0801a270:
     bx r0                                    @ 0801a306 0047
 DWORD_0801a308:
     .word  0x00001037                     @ 0801a308 37100000
-DWORD_0801a30c:
-    .word  0x08000f40                     @ 0801a30c 400f0008
+PTR_game_str_pointer_table_0801a30c:
+    .word  game_str_pointer_table         @ 0801a30c 400f0008
 DWORD_0801a310:
     .word  0x02000000                     @ 0801a310 00000002
 DWORD_0801a314:
     .word  0x00006c2c                     @ 0801a314 2c6c0000
-DWORD_0801a318:
-    .word  0x09db9c10                     @ 0801a318 109cdb09
+PTR_game_str_ja_0801a318:
+    .word  game_str_ja                    @ 0801a318 109cdb09
 DWORD_0801a31c:
     .word  0x06002280                     @ 0801a31c 80220006
 DWORD_0801a320:
@@ -21163,7 +21163,7 @@ LAB_0802008c:
 LAB_080200e0:
     ldrh r0,[r7,#0x0]                        @ 080200e0 3888
     bl FUN_080f4e18                          @ 080200e2 d4f099fe
-    ldr r2, DAT_08020144                     @ 080200e6 174a
+    ldr r2, PTR_game_str_pointer_table_08020144 @ 080200e6 174a
     lsls r0,r0,#0x10    @ 080200e8 0004
     lsrs r0,r0,#0x10    @ 080200ea 000c
     lsls r1,r0,#0x1    @ 080200ec 4100
@@ -21178,7 +21178,7 @@ LAB_080200e0:
     lsls r1,r1,#0x2    @ 080200fe 8900
     adds r1,r1,r2    @ 08020100 8918
     ldr r0,[r1,#0x0]                         @ 08020102 0868
-    ldr r5, DAT_0802014c                     @ 08020104 114d
+    ldr r5, PTR_game_str_ja_0802014c         @ 08020104 114d
     adds r0,r0,r5    @ 08020106 4019
     movs r1,#0x0    @ 08020108 0021
     bl FUN_0802b590                          @ 0802010a 0bf041fa
@@ -21208,12 +21208,12 @@ DAT_0802013c:
     .word  0x00006c3c                     @ 0802013c 3c6c0000
 DAT_08020140:
     .word  0x00001662                     @ 08020140 62160000
-DAT_08020144:
-    .word  0x08000f40                     @ 08020144 400f0008
+PTR_game_str_pointer_table_08020144:
+    .word  game_str_pointer_table         @ 08020144 400f0008
 DAT_08020148:
     .word  0x00006c2c                     @ 08020148 2c6c0000
-DAT_0802014c:
-    .word  0x09db9c10                     @ 0802014c 109cdb09
+PTR_game_str_ja_0802014c:
+    .word  game_str_ja                    @ 0802014c 109cdb09
 DAT_08020150:
     .word  0x00004b4e                     @ 08020150 4e4b0000
 DAT_08020154:
@@ -22438,7 +22438,7 @@ LAB_08023ed8:
     lsls r1,r1,#0x4    @ 08023eda 0901
     adds r0,r6,r1    @ 08023edc 7018
     bl FUN_080f4e18                          @ 08023ede d0f09bff
-    ldr r2, DAT_08023fb0                     @ 08023ee2 334a
+    ldr r2, PTR_game_str_pointer_table_08023fb0 @ 08023ee2 334a
     lsls r0,r0,#0x10    @ 08023ee4 0004
     lsrs r0,r0,#0x10    @ 08023ee6 000c
     lsls r1,r0,#0x1    @ 08023ee8 4100
@@ -22454,7 +22454,7 @@ LAB_08023ed8:
     lsls r1,r1,#0x2    @ 08023efc 8900
     adds r1,r1,r2    @ 08023efe 8918
     ldr r5,[r1,#0x0]                         @ 08023f00 0d68
-    ldr r0, DAT_08023fbc                     @ 08023f02 2e48
+    ldr r0, PTR_game_str_ja_08023fbc         @ 08023f02 2e48
     adds r5,r5,r0    @ 08023f04 2d18
     lsls r4,r6,#0x1    @ 08023f06 7400
     adds r4,r4,r6    @ 08023f08 a419
@@ -22541,14 +22541,14 @@ LAB_08023fa0:
     pop {r0}                                 @ 08023faa 01bc
     bx r0                                    @ 08023fac 0047
     .byte  0x00, 0x00
-DAT_08023fb0:
-    .word  0x08000f40                     @ 08023fb0 400f0008
+PTR_game_str_pointer_table_08023fb0:
+    .word  game_str_pointer_table         @ 08023fb0 400f0008
 DAT_08023fb4:
     .word  0x02000000                     @ 08023fb4 00000002
 DAT_08023fb8:
     .word  0x00006c2c                     @ 08023fb8 2c6c0000
-DAT_08023fbc:
-    .word  0x09db9c10                     @ 08023fbc 109cdb09
+PTR_game_str_ja_08023fbc:
+    .word  game_str_ja                    @ 08023fbc 109cdb09
 DAT_08023fc0:
     .word  0x00000f09                     @ 08023fc0 090f0000
 DAT_08023fc4:
@@ -25378,7 +25378,7 @@ LAB_0802bb92:
     ldr r2, DAT_0802bc74                     @ 0802bbf2 204a
     adds r0,r7,r2    @ 0802bbf4 b818
     bl FUN_080f4e18                          @ 0802bbf6 c9f00ff9
-    ldr r2, DAT_0802bc78                     @ 0802bbfa 1f4a
+    ldr r2, PTR_game_str_pointer_table_0802bc78 @ 0802bbfa 1f4a
     lsls r0,r0,#0x10    @ 0802bbfc 0004
     lsrs r0,r0,#0x10    @ 0802bbfe 000c
     lsls r1,r0,#0x1    @ 0802bc00 4100
@@ -25386,7 +25386,7 @@ LAB_0802bb92:
     lsls r1,r1,#0x3    @ 0802bc04 c900
     adds r1,r1,r2    @ 0802bc06 8918
     ldr r3,[r1,#0x0]                         @ 0802bc08 0b68
-    ldr r0, DAT_0802bc7c                     @ 0802bc0a 1c48
+    ldr r0, PTR_game_str_ja_0802bc7c         @ 0802bc0a 1c48
     adds r3,r3,r0    @ 0802bc0c 1b18
     .hword 0x4648    @ 0802bc0e 4846
     .hword 0x4641    @ 0802bc10 4146
@@ -25442,10 +25442,10 @@ DAT_0802bc70:
     .word  0x09e5f854                     @ 0802bc70 54f8e509
 DAT_0802bc74:
     .word  0x00000bfa                     @ 0802bc74 fa0b0000
-DAT_0802bc78:
-    .word  0x08000f40                     @ 0802bc78 400f0008
-DAT_0802bc7c:
-    .word  0x09db9c10                     @ 0802bc7c 109cdb09
+PTR_game_str_pointer_table_0802bc78:
+    .word  game_str_pointer_table         @ 0802bc78 400f0008
+PTR_game_str_ja_0802bc7c:
+    .word  game_str_ja                    @ 0802bc7c 109cdb09
 DAT_0802bc80:
     .word  0x02000000                     @ 0802bc80 00000002
 DAT_0802bc84:
@@ -26224,7 +26224,7 @@ FUN_0802c238:
     ldr r1, DAT_0802c2f0                     @ 0802c24a 2949
     adds r0,r0,r1    @ 0802c24c 4018
     bl FUN_080f4e18                          @ 0802c24e c8f0e3fd
-    ldr r2, DAT_0802c2f4                     @ 0802c252 284a
+    ldr r2, PTR_game_str_pointer_table_0802c2f4 @ 0802c252 284a
     lsls r0,r0,#0x10    @ 0802c254 0004
     lsrs r0,r0,#0x10    @ 0802c256 000c
     lsls r1,r0,#0x1    @ 0802c258 4100
@@ -26240,7 +26240,7 @@ FUN_0802c238:
     lsls r1,r1,#0x2    @ 0802c26c 8900
     adds r1,r1,r2    @ 0802c26e 8918
     ldr r1,[r1,#0x0]                         @ 0802c270 0968
-    ldr r0, DAT_0802c300                     @ 0802c272 2348
+    ldr r0, PTR_game_str_ja_0802c300         @ 0802c272 2348
     adds r1,r1,r0    @ 0802c274 0918
     .hword 0x4668    @ 0802c276 6846
     adds r2,r4,#0x0    @ 0802c278 221c
@@ -26300,14 +26300,14 @@ LAB_0802c2c0:
     .byte  0x00, 0x00
 DAT_0802c2f0:
     .word  0x00000c1c                     @ 0802c2f0 1c0c0000
-DAT_0802c2f4:
-    .word  0x08000f40                     @ 0802c2f4 400f0008
+PTR_game_str_pointer_table_0802c2f4:
+    .word  game_str_pointer_table         @ 0802c2f4 400f0008
 DAT_0802c2f8:
     .word  0x02000000                     @ 0802c2f8 00000002
 DAT_0802c2fc:
     .word  0x00006c2c                     @ 0802c2fc 2c6c0000
-DAT_0802c300:
-    .word  0x09db9c10                     @ 0802c300 109cdb09
+PTR_game_str_ja_0802c300:
+    .word  game_str_ja                    @ 0802c300 109cdb09
 DAT_0802c304:
     .word  0x00008008                     @ 0802c304 08800000
 DAT_0802c308:
@@ -26364,7 +26364,7 @@ FUN_0802c358:
     lsls r0,r0,#0x2    @ 0802c372 8000
     add r0,r9                                @ 0802c374 4844
     bl FUN_080f4e18                          @ 0802c376 c8f04ffd
-    ldr r2, DAT_0802c3dc                     @ 0802c37a 184a
+    ldr r2, PTR_game_str_pointer_table_0802c3dc @ 0802c37a 184a
     lsls r0,r0,#0x10    @ 0802c37c 0004
     lsrs r0,r0,#0x10    @ 0802c37e 000c
     lsls r1,r0,#0x1    @ 0802c380 4100
@@ -26380,7 +26380,7 @@ FUN_0802c358:
     lsls r1,r1,#0x2    @ 0802c394 8900
     adds r1,r1,r2    @ 0802c396 8918
     ldr r1,[r1,#0x0]                         @ 0802c398 0968
-    ldr r0, DAT_0802c3e8                     @ 0802c39a 1348
+    ldr r0, PTR_game_str_ja_0802c3e8         @ 0802c39a 1348
     adds r1,r1,r0    @ 0802c39c 0918
     add r0,sp,#0x8                           @ 0802c39e 02a8
     bl FUN_080f51ac                          @ 0802c3a0 c8f004ff
@@ -26412,14 +26412,14 @@ LAB_0802c3d0:
 switchD_0802c3d8__switchD:
     .hword 0x4687    @ 0802c3d8 8746
     .byte  0x00, 0x00
-DAT_0802c3dc:
-    .word  0x08000f40                     @ 0802c3dc 400f0008
+PTR_game_str_pointer_table_0802c3dc:
+    .word  game_str_pointer_table         @ 0802c3dc 400f0008
 DAT_0802c3e0:
     .word  0x02000000                     @ 0802c3e0 00000002
 DAT_0802c3e4:
     .word  0x00006c2c                     @ 0802c3e4 2c6c0000
-DAT_0802c3e8:
-    .word  0x09db9c10                     @ 0802c3e8 109cdb09
+PTR_game_str_ja_0802c3e8:
+    .word  game_str_ja                    @ 0802c3e8 109cdb09
 DAT_0802c3ec:
     .word  0x00008008                     @ 0802c3ec 08800000
 DAT_0802c3f0:
@@ -26935,7 +26935,7 @@ switchD_0802c3d8__caseD_2736:
     lsls r0,r0,#0x3    @ 0802c7ee c000
     add r0,r9                                @ 0802c7f0 4844
     bl FUN_080f4e18                          @ 0802c7f2 c8f011fb
-    ldr r2, DAT_0802c82c                     @ 0802c7f6 0d4a
+    ldr r2, PTR_game_str_pointer_table_0802c82c @ 0802c7f6 0d4a
     lsls r0,r0,#0x10    @ 0802c7f8 0004
     lsrs r0,r0,#0x10    @ 0802c7fa 000c
     lsls r1,r0,#0x1    @ 0802c7fc 4100
@@ -26951,7 +26951,7 @@ switchD_0802c3d8__caseD_2736:
     lsls r1,r1,#0x2    @ 0802c810 8900
     adds r1,r1,r2    @ 0802c812 8918
     ldr r2,[r1,#0x0]                         @ 0802c814 0a68
-    ldr r0, DAT_0802c838                     @ 0802c816 0848
+    ldr r0, PTR_game_str_ja_0802c838         @ 0802c816 0848
     adds r2,r2,r0    @ 0802c818 1218
     movs r0,#0x2    @ 0802c81a 0220
     adds r1,r6,#0x0    @ 0802c81c 311c
@@ -26961,14 +26961,14 @@ switchD_0802c3d8__caseD_2736:
     b LAB_0802c83e                           @ 0802c826 0ae0
 DAT_0802c828:
     .word  0x000015b1                     @ 0802c828 b1150000
-DAT_0802c82c:
-    .word  0x08000f40                     @ 0802c82c 400f0008
+PTR_game_str_pointer_table_0802c82c:
+    .word  game_str_pointer_table         @ 0802c82c 400f0008
 DAT_0802c830:
     .word  0x02000000                     @ 0802c830 00000002
 DAT_0802c834:
     .word  0x00006c2c                     @ 0802c834 2c6c0000
-DAT_0802c838:
-    .word  0x09db9c10                     @ 0802c838 109cdb09
+PTR_game_str_ja_0802c838:
+    .word  game_str_ja                    @ 0802c838 109cdb09
 LAB_0802c83c:
     movs r7,#0x0    @ 0802c83c 0027
 LAB_0802c83e:
@@ -26982,7 +26982,7 @@ LAB_0802c83e:
     lsls r0,r0,#0x3    @ 0802c84e c000
     add r0,r9                                @ 0802c850 4844
     bl FUN_080f4e18                          @ 0802c852 c8f0e1fa
-    ldr r2, DAT_0802c88c                     @ 0802c856 0d4a
+    ldr r2, PTR_game_str_pointer_table_0802c88c @ 0802c856 0d4a
     lsls r0,r0,#0x10    @ 0802c858 0004
     lsrs r0,r0,#0x10    @ 0802c85a 000c
     lsls r1,r0,#0x1    @ 0802c85c 4100
@@ -26998,7 +26998,7 @@ LAB_0802c83e:
     lsls r1,r1,#0x2    @ 0802c870 8900
     adds r1,r1,r2    @ 0802c872 8918
     ldr r2,[r1,#0x0]                         @ 0802c874 0a68
-    ldr r0, DAT_0802c898                     @ 0802c876 0848
+    ldr r0, PTR_game_str_ja_0802c898         @ 0802c876 0848
     adds r2,r2,r0    @ 0802c878 1218
     movs r0,#0x2    @ 0802c87a 0220
     adds r1,r6,#0x0    @ 0802c87c 311c
@@ -27008,14 +27008,14 @@ LAB_0802c83e:
     b LAB_0802c89e                           @ 0802c886 0ae0
 DAT_0802c888:
     .word  0x000015f9                     @ 0802c888 f9150000
-DAT_0802c88c:
-    .word  0x08000f40                     @ 0802c88c 400f0008
+PTR_game_str_pointer_table_0802c88c:
+    .word  game_str_pointer_table         @ 0802c88c 400f0008
 DAT_0802c890:
     .word  0x02000000                     @ 0802c890 00000002
 DAT_0802c894:
     .word  0x00006c2c                     @ 0802c894 2c6c0000
-DAT_0802c898:
-    .word  0x09db9c10                     @ 0802c898 109cdb09
+PTR_game_str_ja_0802c898:
+    .word  game_str_ja                    @ 0802c898 109cdb09
 LAB_0802c89c:
     movs r7,#0x0    @ 0802c89c 0027
 LAB_0802c89e:
@@ -27029,7 +27029,7 @@ LAB_0802c89e:
     lsls r0,r0,#0x3    @ 0802c8ae c000
     add r0,r9                                @ 0802c8b0 4844
     bl FUN_080f4e18                          @ 0802c8b2 c8f0b1fa
-    ldr r2, DAT_0802c8ec                     @ 0802c8b6 0d4a
+    ldr r2, PTR_game_str_pointer_table_0802c8ec @ 0802c8b6 0d4a
     lsls r0,r0,#0x10    @ 0802c8b8 0004
     lsrs r0,r0,#0x10    @ 0802c8ba 000c
     lsls r1,r0,#0x1    @ 0802c8bc 4100
@@ -27045,7 +27045,7 @@ LAB_0802c89e:
     lsls r1,r1,#0x2    @ 0802c8d0 8900
     adds r1,r1,r2    @ 0802c8d2 8918
     ldr r2,[r1,#0x0]                         @ 0802c8d4 0a68
-    ldr r0, DAT_0802c8f8                     @ 0802c8d6 0848
+    ldr r0, PTR_game_str_ja_0802c8f8         @ 0802c8d6 0848
     adds r2,r2,r0    @ 0802c8d8 1218
     movs r0,#0x2    @ 0802c8da 0220
     adds r1,r6,#0x0    @ 0802c8dc 311c
@@ -27055,14 +27055,14 @@ LAB_0802c89e:
     b LAB_0802c8fe                           @ 0802c8e6 0ae0
 DAT_0802c8e8:
     .word  0x000015fa                     @ 0802c8e8 fa150000
-DAT_0802c8ec:
-    .word  0x08000f40                     @ 0802c8ec 400f0008
+PTR_game_str_pointer_table_0802c8ec:
+    .word  game_str_pointer_table         @ 0802c8ec 400f0008
 DAT_0802c8f0:
     .word  0x02000000                     @ 0802c8f0 00000002
 DAT_0802c8f4:
     .word  0x00006c2c                     @ 0802c8f4 2c6c0000
-DAT_0802c8f8:
-    .word  0x09db9c10                     @ 0802c8f8 109cdb09
+PTR_game_str_ja_0802c8f8:
+    .word  game_str_ja                    @ 0802c8f8 109cdb09
 LAB_0802c8fc:
     movs r7,#0x0    @ 0802c8fc 0027
 LAB_0802c8fe:
@@ -27076,7 +27076,7 @@ LAB_0802c8fe:
     lsls r0,r0,#0x3    @ 0802c90e c000
     add r0,r9                                @ 0802c910 4844
     bl FUN_080f4e18                          @ 0802c912 c8f081fa
-    ldr r2, DAT_0802c94c                     @ 0802c916 0d4a
+    ldr r2, PTR_game_str_pointer_table_0802c94c @ 0802c916 0d4a
     lsls r0,r0,#0x10    @ 0802c918 0004
     lsrs r0,r0,#0x10    @ 0802c91a 000c
     lsls r1,r0,#0x1    @ 0802c91c 4100
@@ -27092,7 +27092,7 @@ LAB_0802c8fe:
     lsls r1,r1,#0x2    @ 0802c930 8900
     adds r1,r1,r2    @ 0802c932 8918
     ldr r2,[r1,#0x0]                         @ 0802c934 0a68
-    ldr r0, DAT_0802c958                     @ 0802c936 0848
+    ldr r0, PTR_game_str_ja_0802c958         @ 0802c936 0848
     adds r2,r2,r0    @ 0802c938 1218
     movs r0,#0x2    @ 0802c93a 0220
     adds r1,r6,#0x0    @ 0802c93c 311c
@@ -27102,14 +27102,14 @@ LAB_0802c8fe:
     b switchD_0802c3d8__caseD_2730           @ 0802c946 52e0
 DAT_0802c948:
     .word  0x000015b4                     @ 0802c948 b4150000
-DAT_0802c94c:
-    .word  0x08000f40                     @ 0802c94c 400f0008
+PTR_game_str_pointer_table_0802c94c:
+    .word  game_str_pointer_table         @ 0802c94c 400f0008
 DAT_0802c950:
     .word  0x02000000                     @ 0802c950 00000002
 DAT_0802c954:
     .word  0x00006c2c                     @ 0802c954 2c6c0000
-DAT_0802c958:
-    .word  0x09db9c10                     @ 0802c958 109cdb09
+PTR_game_str_ja_0802c958:
+    .word  game_str_ja                    @ 0802c958 109cdb09
 LAB_0802c95c:
     movs r7,#0x0    @ 0802c95c 0027
     b switchD_0802c3d8__caseD_2730           @ 0802c95e 46e0
@@ -27206,7 +27206,7 @@ LAB_0802c9f4:
     lsls r0,r0,#0x3    @ 0802c9f6 c000
     add r0,r9                                @ 0802c9f8 4844
     bl FUN_080f4e18                          @ 0802c9fa c8f00dfa
-    ldr r2, DAT_0802ca40                     @ 0802c9fe 104a
+    ldr r2, PTR_game_str_pointer_table_0802ca40 @ 0802c9fe 104a
     lsls r0,r0,#0x10    @ 0802ca00 0004
     lsrs r0,r0,#0x10    @ 0802ca02 000c
     lsls r1,r0,#0x1    @ 0802ca04 4100
@@ -27222,7 +27222,7 @@ LAB_0802c9f4:
     lsls r1,r1,#0x2    @ 0802ca18 8900
     adds r1,r1,r2    @ 0802ca1a 8918
     ldr r1,[r1,#0x0]                         @ 0802ca1c 0968
-    ldr r0, DAT_0802ca4c                     @ 0802ca1e 0b48
+    ldr r0, PTR_game_str_ja_0802ca4c         @ 0802ca1e 0b48
     adds r1,r1,r0    @ 0802ca20 0918
     .hword 0x4688    @ 0802ca22 8846
     ldr r4, DAT_0802ca50                     @ 0802ca24 0a4c
@@ -27238,14 +27238,14 @@ LAB_0802c9f4:
     beq LAB_0802ca54                         @ 0802ca3a 0bd0
     movs r0,#0x6    @ 0802ca3c 0620
     b LAB_0802ca56                           @ 0802ca3e 0ae0
-DAT_0802ca40:
-    .word  0x08000f40                     @ 0802ca40 400f0008
+PTR_game_str_pointer_table_0802ca40:
+    .word  game_str_pointer_table         @ 0802ca40 400f0008
 DAT_0802ca44:
     .word  0x02000000                     @ 0802ca44 00000002
 DAT_0802ca48:
     .word  0x00006c2c                     @ 0802ca48 2c6c0000
-DAT_0802ca4c:
-    .word  0x09db9c10                     @ 0802ca4c 109cdb09
+PTR_game_str_ja_0802ca4c:
+    .word  game_str_ja                    @ 0802ca4c 109cdb09
 DAT_0802ca50:
     .word  0x09e5e9cc                     @ 0802ca50 cce9e509
 LAB_0802ca54:
@@ -27266,7 +27266,7 @@ LAB_0802ca66:
     lsls r0,r0,#0x3    @ 0802ca6e c000
     add r0,r9                                @ 0802ca70 4844
     bl FUN_080f4e18                          @ 0802ca72 c8f0d1f9
-    ldr r2, DAT_0802cb88                     @ 0802ca76 444a
+    ldr r2, PTR_game_str_pointer_table_0802cb88 @ 0802ca76 444a
     lsls r0,r0,#0x10    @ 0802ca78 0004
     lsrs r0,r0,#0x10    @ 0802ca7a 000c
     lsls r1,r0,#0x1    @ 0802ca7c 4100
@@ -27282,7 +27282,7 @@ LAB_0802ca66:
     lsls r1,r1,#0x2    @ 0802ca90 8900
     adds r1,r1,r2    @ 0802ca92 8918
     ldr r2,[r1,#0x0]                         @ 0802ca94 0a68
-    ldr r0, DAT_0802cb94                     @ 0802ca96 3f48
+    ldr r0, PTR_game_str_ja_0802cb94         @ 0802ca96 3f48
     adds r2,r2,r0    @ 0802ca98 1218
     movs r0,#0x2    @ 0802ca9a 0220
     adds r1,r6,#0x0    @ 0802ca9c 311c
@@ -27307,10 +27307,10 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cac4 400f
     adds r1,r1,r0    @ 0802cac6 0918
     lsls r1,r1,#0x2    @ 0802cac8 8900
-    ldr r0, DAT_0802cb88                     @ 0802caca 2f48
+    ldr r0, PTR_game_str_pointer_table_0802cb88 @ 0802caca 2f48
     adds r1,r1,r0    @ 0802cacc 0918
     ldr r0,[r1,#0x0]                         @ 0802cace 0868
-    ldr r1, DAT_0802cb94                     @ 0802cad0 3049
+    ldr r1, PTR_game_str_ja_0802cb94         @ 0802cad0 3049
     .hword 0x4689    @ 0802cad2 8946
     add r0,r9                                @ 0802cad4 4844
     bl FUN_080f54e0                          @ 0802cad6 c8f003fd
@@ -27332,7 +27332,7 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cafa 400f
     adds r1,r1,r0    @ 0802cafc 0918
     lsls r1,r1,#0x2    @ 0802cafe 8900
-    ldr r3, DAT_0802cb88                     @ 0802cb00 214b
+    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb00 214b
     adds r1,r1,r3    @ 0802cb02 c918
     ldr r3,[r1,#0x0]                         @ 0802cb04 0b68
     add r3,r9                                @ 0802cb06 4b44
@@ -27353,7 +27353,7 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cb28 400f
     adds r1,r1,r0    @ 0802cb2a 0918
     lsls r1,r1,#0x2    @ 0802cb2c 8900
-    ldr r3, DAT_0802cb88                     @ 0802cb2e 164b
+    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb2e 164b
     adds r1,r1,r3    @ 0802cb30 c918
     ldr r0,[r1,#0x0]                         @ 0802cb32 0868
     add r0,r9                                @ 0802cb34 4844
@@ -27379,7 +27379,7 @@ LAB_0802cb48:
     lsrs r0,r0,#0x1d    @ 0802cb5e 400f
     adds r1,r1,r0    @ 0802cb60 0918
     lsls r1,r1,#0x2    @ 0802cb62 8900
-    ldr r3, DAT_0802cb88                     @ 0802cb64 084b
+    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb64 084b
     adds r1,r1,r3    @ 0802cb66 c918
     ldr r3,[r1,#0x0]                         @ 0802cb68 0b68
     add r3,r9                                @ 0802cb6a 4b44
@@ -27396,14 +27396,14 @@ LAB_0802cb48:
     pop {r4,r5,r6,r7}                        @ 0802cb82 f0bc
     pop {r1}                                 @ 0802cb84 02bc
     bx r1                                    @ 0802cb86 0847
-DAT_0802cb88:
-    .word  0x08000f40                     @ 0802cb88 400f0008
+PTR_game_str_pointer_table_0802cb88:
+    .word  game_str_pointer_table         @ 0802cb88 400f0008
 DAT_0802cb8c:
     .word  0x02000000                     @ 0802cb8c 00000002
 DAT_0802cb90:
     .word  0x00006c2c                     @ 0802cb90 2c6c0000
-DAT_0802cb94:
-    .word  0x09db9c10                     @ 0802cb94 109cdb09
+PTR_game_str_ja_0802cb94:
+    .word  game_str_ja                    @ 0802cb94 109cdb09
 DAT_0802cb98:
     .word  0x00000c02                     @ 0802cb98 020c0000
 DAT_0802cb9c:
@@ -245245,7 +245245,7 @@ FUN_080cad78:
     .hword 0x4698    @ 080cadf0 9846
     .hword 0x4640    @ 080cadf2 4046
     bl FUN_080f4e18                          @ 080cadf4 2af010f8
-    ldr r1, DAT_080cae78                     @ 080cadf8 1f49
+    ldr r1, PTR_game_str_pointer_table_080cae78 @ 080cadf8 1f49
     .hword 0x4689    @ 080cadfa 8946
     lsls r0,r0,#0x10    @ 080cadfc 0004
     lsrs r0,r0,#0x10    @ 080cadfe 000c
@@ -245259,7 +245259,7 @@ FUN_080cad78:
     lsls r1,r1,#0x2    @ 080cae0e 8900
     add r1,r9                                @ 080cae10 4944
     ldr r3,[r1,#0x0]                         @ 080cae12 0b68
-    ldr r6, DAT_080cae7c                     @ 080cae14 194e
+    ldr r6, PTR_game_str_ja_080cae7c         @ 080cae14 194e
     adds r3,r3,r6    @ 080cae16 9b19
     movs r0,#0x2    @ 080cae18 0220
     movs r1,#0x2    @ 080cae1a 0221
@@ -245305,10 +245305,10 @@ DAT_080cae70:
     .word  0x00006c2c                     @ 080cae70 2c6c0000
 DAT_080cae74:
     .word  0x09e5f854                     @ 080cae74 54f8e509
-DAT_080cae78:
-    .word  0x08000f40                     @ 080cae78 400f0008
-DAT_080cae7c:
-    .word  0x09db9c10                     @ 080cae7c 109cdb09
+PTR_game_str_pointer_table_080cae78:
+    .word  game_str_pointer_table         @ 080cae78 400f0008
+PTR_game_str_ja_080cae7c:
+    .word  game_str_ja                    @ 080cae7c 109cdb09
 DAT_080cae80:
     .word  0x0600a8e0                     @ 080cae80 e0a80006
 FUN_080cae84:
@@ -246968,7 +246968,7 @@ LAB_080cbb62:
     lsls r3,r3,#0x2    @ 080cbb64 9b00
     adds r0,r6,r3    @ 080cbb66 f018
     bl FUN_080f4e18                          @ 080cbb68 29f056f9
-    ldr r2, DAT_080cbbb4                     @ 080cbb6c 114a
+    ldr r2, PTR_game_str_pointer_table_080cbbb4 @ 080cbb6c 114a
     lsls r0,r0,#0x10    @ 080cbb6e 0004
     lsrs r0,r0,#0x10    @ 080cbb70 000c
     lsls r1,r0,#0x1    @ 080cbb72 4100
@@ -246984,7 +246984,7 @@ LAB_080cbb62:
     lsls r1,r1,#0x2    @ 080cbb86 8900
     adds r1,r1,r2    @ 080cbb88 8918
     ldr r1,[r1,#0x0]                         @ 080cbb8a 0968
-    ldr r0, DAT_080cbbc0                     @ 080cbb8c 0c48
+    ldr r0, PTR_game_str_ja_080cbbc0         @ 080cbb8c 0c48
     adds r1,r1,r0    @ 080cbb8e 0918
     str r1,[sp,#0xc]                         @ 080cbb90 0391
     ldr r2, PTR_gP1LifePoints_080cbbc4       @ 080cbb92 0c4a
@@ -247004,14 +247004,14 @@ LAB_080cbb62:
     adds r1,r1,r0    @ 080cbbae 0918
     ldr r1,[r1,#0x0]                         @ 080cbbb0 0968
     b LAB_080cbc8e                           @ 080cbbb2 6ce0
-DAT_080cbbb4:
-    .word  0x08000f40                     @ 080cbbb4 400f0008
+PTR_game_str_pointer_table_080cbbb4:
+    .word  game_str_pointer_table         @ 080cbbb4 400f0008
 DAT_080cbbb8:
     .word  0x02000000                     @ 080cbbb8 00000002
 DAT_080cbbbc:
     .word  0x00006c2c                     @ 080cbbbc 2c6c0000
-DAT_080cbbc0:
-    .word  0x09db9c10                     @ 080cbbc0 109cdb09
+PTR_game_str_ja_080cbbc0:
+    .word  game_str_ja                    @ 080cbbc0 109cdb09
 PTR_gP1LifePoints_080cbbc4:
     .word  gP1LifePoints                  @ 080cbbc4 e0c40102
 DAT_080cbbc8:
@@ -247020,7 +247020,7 @@ LAB_080cbbcc:
     ldr r1, DAT_080cbc1c                     @ 080cbbcc 1349
     adds r0,r6,r1    @ 080cbbce 7018
     bl FUN_080f4e18                          @ 080cbbd0 29f022f9
-    ldr r2, DAT_080cbc20                     @ 080cbbd4 124a
+    ldr r2, PTR_game_str_pointer_table_080cbc20 @ 080cbbd4 124a
     lsls r0,r0,#0x10    @ 080cbbd6 0004
     lsrs r0,r0,#0x10    @ 080cbbd8 000c
     lsls r1,r0,#0x1    @ 080cbbda 4100
@@ -247036,7 +247036,7 @@ LAB_080cbbcc:
     lsls r1,r1,#0x2    @ 080cbbee 8900
     adds r1,r1,r2    @ 080cbbf0 8918
     ldr r1,[r1,#0x0]                         @ 080cbbf2 0968
-    ldr r0, DAT_080cbc2c                     @ 080cbbf4 0d48
+    ldr r0, PTR_game_str_ja_080cbc2c         @ 080cbbf4 0d48
     adds r1,r1,r0    @ 080cbbf6 0918
     str r1,[sp,#0xc]                         @ 080cbbf8 0391
     ldr r2, PTR_gP1LifePoints_080cbc30       @ 080cbbfa 0d4a
@@ -247058,14 +247058,14 @@ LAB_080cbbcc:
     b LAB_080cbc88                           @ 080cbc1a 35e0
 DAT_080cbc1c:
     .word  0x000003ee                     @ 080cbc1c ee030000
-DAT_080cbc20:
-    .word  0x08000f40                     @ 080cbc20 400f0008
+PTR_game_str_pointer_table_080cbc20:
+    .word  game_str_pointer_table         @ 080cbc20 400f0008
 DAT_080cbc24:
     .word  0x02000000                     @ 080cbc24 00000002
 DAT_080cbc28:
     .word  0x00006c2c                     @ 080cbc28 2c6c0000
-DAT_080cbc2c:
-    .word  0x09db9c10                     @ 080cbc2c 109cdb09
+PTR_game_str_ja_080cbc2c:
+    .word  game_str_ja                    @ 080cbc2c 109cdb09
 PTR_gP1LifePoints_080cbc30:
     .word  gP1LifePoints                  @ 080cbc30 e0c40102
 DAT_080cbc34:
@@ -247075,7 +247075,7 @@ LAB_080cbc38:
     lsls r2,r2,#0x2    @ 080cbc3a 9200
     adds r0,r6,r2    @ 080cbc3c b018
     bl FUN_080f4e18                          @ 080cbc3e 29f0ebf8
-    ldr r2, DAT_080cbca4                     @ 080cbc42 184a
+    ldr r2, PTR_game_str_pointer_table_080cbca4 @ 080cbc42 184a
     lsls r0,r0,#0x10    @ 080cbc44 0004
     lsrs r0,r0,#0x10    @ 080cbc46 000c
     lsls r1,r0,#0x1    @ 080cbc48 4100
@@ -247091,7 +247091,7 @@ LAB_080cbc38:
     lsls r1,r1,#0x2    @ 080cbc5c 8900
     adds r1,r1,r2    @ 080cbc5e 8918
     ldr r1,[r1,#0x0]                         @ 080cbc60 0968
-    ldr r0, DAT_080cbcb0                     @ 080cbc62 1348
+    ldr r0, PTR_game_str_ja_080cbcb0         @ 080cbc62 1348
     adds r1,r1,r0    @ 080cbc64 0918
     str r1,[sp,#0xc]                         @ 080cbc66 0391
     ldr r2, PTR_gP1LifePoints_080cbcb4       @ 080cbc68 124a
@@ -247125,14 +247125,14 @@ LAB_080cbc8e:
     str r0,[sp,#0x4]                         @ 080cbc9e 0190
     b LAB_080cbcfc                           @ 080cbca0 2ce0
     .byte  0x00, 0x00
-DAT_080cbca4:
-    .word  0x08000f40                     @ 080cbca4 400f0008
+PTR_game_str_pointer_table_080cbca4:
+    .word  game_str_pointer_table         @ 080cbca4 400f0008
 DAT_080cbca8:
     .word  0x02000000                     @ 080cbca8 00000002
 DAT_080cbcac:
     .word  0x00006c2c                     @ 080cbcac 2c6c0000
-DAT_080cbcb0:
-    .word  0x09db9c10                     @ 080cbcb0 109cdb09
+PTR_game_str_ja_080cbcb0:
+    .word  game_str_ja                    @ 080cbcb0 109cdb09
 PTR_gP1LifePoints_080cbcb4:
     .word  gP1LifePoints                  @ 080cbcb4 e0c40102
 DAT_080cbcb8:
@@ -247141,7 +247141,7 @@ LAB_080cbcbc:
     ldr r2, DAT_080cbd58                     @ 080cbcbc 264a
     adds r0,r6,r2    @ 080cbcbe b018
     bl FUN_080f4e18                          @ 080cbcc0 29f0aaf8
-    ldr r2, DAT_080cbd5c                     @ 080cbcc4 254a
+    ldr r2, PTR_game_str_pointer_table_080cbd5c @ 080cbcc4 254a
     lsls r0,r0,#0x10    @ 080cbcc6 0004
     lsrs r0,r0,#0x10    @ 080cbcc8 000c
     lsls r1,r0,#0x1    @ 080cbcca 4100
@@ -247157,7 +247157,7 @@ LAB_080cbcbc:
     lsls r1,r1,#0x2    @ 080cbcde 8900
     adds r1,r1,r2    @ 080cbce0 8918
     ldr r1,[r1,#0x0]                         @ 080cbce2 0968
-    ldr r0, DAT_080cbd68                     @ 080cbce4 2048
+    ldr r0, PTR_game_str_ja_080cbd68         @ 080cbce4 2048
     adds r1,r1,r0    @ 080cbce6 0918
     str r1,[sp,#0xc]                         @ 080cbce8 0391
     ldr r2, PTR_gP1LifePoints_080cbd6c       @ 080cbcea 204a
@@ -247215,14 +247215,14 @@ LAB_080cbd2e:
     .byte  0x00, 0x00
 DAT_080cbd58:
     .word  0x000003ea                     @ 080cbd58 ea030000
-DAT_080cbd5c:
-    .word  0x08000f40                     @ 080cbd5c 400f0008
+PTR_game_str_pointer_table_080cbd5c:
+    .word  game_str_pointer_table         @ 080cbd5c 400f0008
 DAT_080cbd60:
     .word  0x02000000                     @ 080cbd60 00000002
 DAT_080cbd64:
     .word  0x00006c2c                     @ 080cbd64 2c6c0000
-DAT_080cbd68:
-    .word  0x09db9c10                     @ 080cbd68 109cdb09
+PTR_game_str_ja_080cbd68:
+    .word  game_str_ja                    @ 080cbd68 109cdb09
 PTR_gP1LifePoints_080cbd6c:
     .word  gP1LifePoints                  @ 080cbd6c e0c40102
 DAT_080cbd70:
@@ -251512,7 +251512,7 @@ LAB_080ce104:
     ldr r3, DAT_080ce208                     @ 080ce17e 224b
     adds r0,r0,r3    @ 080ce180 c018
     bl FUN_080f4e18                          @ 080ce182 26f049fe
-    ldr r2, DAT_080ce20c                     @ 080ce186 214a
+    ldr r2, PTR_game_str_pointer_table_080ce20c @ 080ce186 214a
     lsls r0,r0,#0x10    @ 080ce188 0004
     lsrs r0,r0,#0x10    @ 080ce18a 000c
     lsls r1,r0,#0x1    @ 080ce18c 4100
@@ -251525,7 +251525,7 @@ LAB_080ce104:
     lsls r1,r1,#0x2    @ 080ce19a 8900
     adds r1,r1,r2    @ 080ce19c 8918
     ldr r3,[r1,#0x0]                         @ 080ce19e 0b68
-    ldr r0, DAT_080ce210                     @ 080ce1a0 1b48
+    ldr r0, PTR_game_str_ja_080ce210         @ 080ce1a0 1b48
     adds r3,r3,r0    @ 080ce1a2 1b18
     movs r0,#0x2    @ 080ce1a4 0220
     movs r1,#0x2    @ 080ce1a6 0221
@@ -251577,10 +251577,10 @@ DAT_080ce204:
     .word  0x09e5f854                     @ 080ce204 54f8e509
 DAT_080ce208:
     .word  0x00000213                     @ 080ce208 13020000
-DAT_080ce20c:
-    .word  0x08000f40                     @ 080ce20c 400f0008
-DAT_080ce210:
-    .word  0x09db9c10                     @ 080ce210 109cdb09
+PTR_game_str_pointer_table_080ce20c:
+    .word  game_str_pointer_table         @ 080ce20c 400f0008
+PTR_game_str_ja_080ce210:
+    .word  game_str_ja                    @ 080ce210 109cdb09
 DAT_080ce214:
     .word  0x00000a01                     @ 080ce214 010a0000
 FUN_080ce218:
@@ -252218,7 +252218,7 @@ LAB_080ce6e4:
     ldr r2, DAT_080ce748                     @ 080ce6ea 174a
     adds r0,r1,r2    @ 080ce6ec 8818
     bl FUN_080f4e18                          @ 080ce6ee 26f093fb
-    ldr r2, DAT_080ce74c                     @ 080ce6f2 164a
+    ldr r2, PTR_game_str_pointer_table_080ce74c @ 080ce6f2 164a
     lsls r0,r0,#0x10    @ 080ce6f4 0004
     lsrs r0,r0,#0x10    @ 080ce6f6 000c
     lsls r1,r0,#0x1    @ 080ce6f8 4100
@@ -252234,7 +252234,7 @@ LAB_080ce6e4:
     lsls r1,r1,#0x2    @ 080ce70c 8900
     adds r1,r1,r2    @ 080ce70e 8918
     ldr r3,[r1,#0x0]                         @ 080ce710 0b68
-    ldr r0, DAT_080ce758                     @ 080ce712 1148
+    ldr r0, PTR_game_str_ja_080ce758         @ 080ce712 1148
     adds r3,r3,r0    @ 080ce714 1b18
     movs r0,#0x2    @ 080ce716 0220
     movs r1,#0x2    @ 080ce718 0221
@@ -252260,14 +252260,14 @@ DAT_080ce744:
     .word  0x00000a14                     @ 080ce744 140a0000
 DAT_080ce748:
     .word  0x00000213                     @ 080ce748 13020000
-DAT_080ce74c:
-    .word  0x08000f40                     @ 080ce74c 400f0008
+PTR_game_str_pointer_table_080ce74c:
+    .word  game_str_pointer_table         @ 080ce74c 400f0008
 DAT_080ce750:
     .word  0x02000000                     @ 080ce750 00000002
 DAT_080ce754:
     .word  0x00006c2c                     @ 080ce754 2c6c0000
-DAT_080ce758:
-    .word  0x09db9c10                     @ 080ce758 109cdb09
+PTR_game_str_ja_080ce758:
+    .word  game_str_ja                    @ 080ce758 109cdb09
 DAT_080ce75c:
     .word  0x06013800                     @ 080ce75c 00380106
 DAT_080ce760:
@@ -254604,7 +254604,7 @@ LAB_080cf878:
     .hword 0x4688    @ 080cf91c 8846
     add r0,r8                                @ 080cf91e 4044
     bl FUN_080f4e18                          @ 080cf920 25f07afa
-    ldr r2, DAT_080cf9e8                     @ 080cf924 304a
+    ldr r2, PTR_game_str_pointer_table_080cf9e8 @ 080cf924 304a
     .hword 0x4692    @ 080cf926 9246
     lsls r0,r0,#0x10    @ 080cf928 0004
     lsrs r0,r0,#0x10    @ 080cf92a 000c
@@ -254618,7 +254618,7 @@ LAB_080cf878:
     lsls r1,r1,#0x2    @ 080cf93a 8900
     add r1,r10                               @ 080cf93c 5144
     ldr r3,[r1,#0x0]                         @ 080cf93e 0b68
-    ldr r6, DAT_080cf9ec                     @ 080cf940 2a4e
+    ldr r6, PTR_game_str_ja_080cf9ec         @ 080cf940 2a4e
     adds r3,r3,r6    @ 080cf942 9b19
     movs r0,#0x3    @ 080cf944 0320
     movs r1,#0x3    @ 080cf946 0321
@@ -254698,10 +254698,10 @@ DAT_080cf9e0:
     .word  0x06012800                     @ 080cf9e0 00280106
 DAT_080cf9e4:
     .word  0x000001f5                     @ 080cf9e4 f5010000
-DAT_080cf9e8:
-    .word  0x08000f40                     @ 080cf9e8 400f0008
-DAT_080cf9ec:
-    .word  0x09db9c10                     @ 080cf9ec 109cdb09
+PTR_game_str_pointer_table_080cf9e8:
+    .word  game_str_pointer_table         @ 080cf9e8 400f0008
+PTR_game_str_ja_080cf9ec:
+    .word  game_str_ja                    @ 080cf9ec 109cdb09
 DAT_080cf9f0:
     .word  0x00000a01                     @ 080cf9f0 010a0000
 FUN_080cf9f4:
@@ -255276,7 +255276,7 @@ LAB_080cfe48:
     ldr r2, DAT_080cfea8                     @ 080cfe4a 174a
     adds r0,r0,r2    @ 080cfe4c 8018
     bl FUN_080f4e18                          @ 080cfe4e 24f0e3ff
-    ldr r2, DAT_080cfeac                     @ 080cfe52 164a
+    ldr r2, PTR_game_str_pointer_table_080cfeac @ 080cfe52 164a
     lsls r0,r0,#0x10    @ 080cfe54 0004
     lsrs r0,r0,#0x10    @ 080cfe56 000c
     lsls r1,r0,#0x1    @ 080cfe58 4100
@@ -255292,7 +255292,7 @@ LAB_080cfe48:
     lsls r1,r1,#0x2    @ 080cfe6c 8900
     adds r1,r1,r2    @ 080cfe6e 8918
     ldr r3,[r1,#0x0]                         @ 080cfe70 0b68
-    ldr r0, DAT_080cfeb8                     @ 080cfe72 1148
+    ldr r0, PTR_game_str_ja_080cfeb8         @ 080cfe72 1148
     adds r3,r3,r0    @ 080cfe74 1b18
     movs r0,#0x2    @ 080cfe76 0220
     movs r1,#0x2    @ 080cfe78 0221
@@ -255318,14 +255318,14 @@ LAB_080cfe48:
     .byte  0x00, 0x00
 DAT_080cfea8:
     .word  0x000001f5                     @ 080cfea8 f5010000
-DAT_080cfeac:
-    .word  0x08000f40                     @ 080cfeac 400f0008
+PTR_game_str_pointer_table_080cfeac:
+    .word  game_str_pointer_table         @ 080cfeac 400f0008
 DAT_080cfeb0:
     .word  0x02000000                     @ 080cfeb0 00000002
 DAT_080cfeb4:
     .word  0x00006c2c                     @ 080cfeb4 2c6c0000
-DAT_080cfeb8:
-    .word  0x09db9c10                     @ 080cfeb8 109cdb09
+PTR_game_str_ja_080cfeb8:
+    .word  game_str_ja                    @ 080cfeb8 109cdb09
 DAT_080cfebc:
     .word  0x06012800                     @ 080cfebc 00280106
 DAT_080cfec0:
@@ -261032,7 +261032,7 @@ FUN_080d6290:
     ldr r4, DAT_080d62e8                     @ 080d6292 154c
     ldr r0, DAT_080d62ec                     @ 080d6294 1548
     bl FUN_080f4e18                          @ 080d6296 1ef0bffd
-    ldr r2, DAT_080d62f0                     @ 080d629a 154a
+    ldr r2, PTR_game_str_pointer_table_080d62f0 @ 080d629a 154a
     lsls r0,r0,#0x10    @ 080d629c 0004
     lsrs r0,r0,#0x10    @ 080d629e 000c
     lsls r1,r0,#0x1    @ 080d62a0 4100
@@ -261048,7 +261048,7 @@ FUN_080d6290:
     lsls r1,r1,#0x2    @ 080d62b4 8900
     adds r1,r1,r2    @ 080d62b6 8918
     ldr r2,[r1,#0x0]                         @ 080d62b8 0a68
-    ldr r0, DAT_080d62fc                     @ 080d62ba 1048
+    ldr r0, PTR_game_str_ja_080d62fc         @ 080d62ba 1048
     adds r2,r2,r0    @ 080d62bc 1218
     adds r0,r4,#0x0    @ 080d62be 201c
     movs r1,#0x0    @ 080d62c0 0021
@@ -261071,14 +261071,14 @@ DAT_080d62e8:
     .word  0x000a001e                     @ 080d62e8 1e000a00
 DAT_080d62ec:
     .word  0x000013f7                     @ 080d62ec f7130000
-DAT_080d62f0:
-    .word  0x08000f40                     @ 080d62f0 400f0008
+PTR_game_str_pointer_table_080d62f0:
+    .word  game_str_pointer_table         @ 080d62f0 400f0008
 DAT_080d62f4:
     .word  0x02000000                     @ 080d62f4 00000002
 DAT_080d62f8:
     .word  0x00006c2c                     @ 080d62f8 2c6c0000
-DAT_080d62fc:
-    .word  0x09db9c10                     @ 080d62fc 109cdb09
+PTR_game_str_ja_080d62fc:
+    .word  game_str_ja                    @ 080d62fc 109cdb09
 DAT_080d6300:
     .word  0x03005850                     @ 080d6300 50580003
 FUN_080d6304:
@@ -265753,7 +265753,7 @@ DAT_080d8800:
     ldr r4, DAT_080d884c                     @ 080d880a 104c
     ldr r0, DAT_080d8850                     @ 080d880c 1048
     bl FUN_080f4e18                          @ 080d880e 1cf003fb
-    ldr r2, DAT_080d8854                     @ 080d8812 104a
+    ldr r2, PTR_game_str_pointer_table_080d8854 @ 080d8812 104a
     lsls r0,r0,#0x10    @ 080d8814 0004
     lsrs r0,r0,#0x10    @ 080d8816 000c
     lsls r1,r0,#0x1    @ 080d8818 4100
@@ -265769,7 +265769,7 @@ DAT_080d8800:
     lsls r1,r1,#0x2    @ 080d882c 8900
     adds r1,r1,r2    @ 080d882e 8918
     ldr r2,[r1,#0x0]                         @ 080d8830 0a68
-    ldr r0, DAT_080d8860                     @ 080d8832 0b48
+    ldr r0, PTR_game_str_ja_080d8860         @ 080d8832 0b48
     adds r2,r2,r0    @ 080d8834 1218
     adds r0,r4,#0x0    @ 080d8836 201c
     movs r1,#0x0    @ 080d8838 0021
@@ -265785,14 +265785,14 @@ DAT_080d884c:
     .word  0x0010001e                     @ 080d884c 1e001000
 DAT_080d8850:
     .word  0x000013f6                     @ 080d8850 f6130000
-DAT_080d8854:
-    .word  0x08000f40                     @ 080d8854 400f0008
+PTR_game_str_pointer_table_080d8854:
+    .word  game_str_pointer_table         @ 080d8854 400f0008
 DAT_080d8858:
     .word  0x02000000                     @ 080d8858 00000002
 DAT_080d885c:
     .word  0x00006c2c                     @ 080d885c 2c6c0000
-DAT_080d8860:
-    .word  0x09db9c10                     @ 080d8860 109cdb09
+PTR_game_str_ja_080d8860:
+    .word  game_str_ja                    @ 080d8860 109cdb09
 DAT_080d8864:
     .word  0x03005850                     @ 080d8864 50580003
     push {r4,lr}                             @ 080d8868 10b5
@@ -267805,7 +267805,7 @@ LAB_080d9810:
     ldr r0, DAT_080d9888                     @ 080d9810 1d48
 LAB_080d9812:
     bl FUN_080f4e18                          @ 080d9812 1bf001fb
-    ldr r2, DAT_080d988c                     @ 080d9816 1d4a
+    ldr r2, PTR_game_str_pointer_table_080d988c @ 080d9816 1d4a
     lsls r0,r0,#0x10    @ 080d9818 0004
     lsrs r0,r0,#0x10    @ 080d981a 000c
     lsls r1,r0,#0x1    @ 080d981c 4100
@@ -267818,7 +267818,7 @@ LAB_080d9812:
     lsls r1,r1,#0x2    @ 080d982a 8900
     adds r1,r1,r2    @ 080d982c 8918
     ldr r1,[r1,#0x0]                         @ 080d982e 0968
-    ldr r0, DAT_080d9890                     @ 080d9830 1748
+    ldr r0, PTR_game_str_ja_080d9890         @ 080d9830 1748
     adds r4,r1,r0    @ 080d9832 0c18
     movs r0,#0xa    @ 080d9834 0a20
     movs r1,#0x2    @ 080d9836 0221
@@ -267860,10 +267860,10 @@ LAB_080d987c:
     .byte  0x00, 0x00
 DAT_080d9888:
     .word  0x00000642                     @ 080d9888 42060000
-DAT_080d988c:
-    .word  0x08000f40                     @ 080d988c 400f0008
-DAT_080d9890:
-    .word  0x09db9c10                     @ 080d9890 109cdb09
+PTR_game_str_pointer_table_080d988c:
+    .word  game_str_pointer_table         @ 080d988c 400f0008
+PTR_game_str_ja_080d9890:
+    .word  game_str_ja                    @ 080d9890 109cdb09
 DAT_080d9894:
     .word  0x00008008                     @ 080d9894 08800000
 DAT_080d9898:
@@ -271887,7 +271887,7 @@ FUN_080db7c4:
     ldr r4, DAT_080db830                     @ 080db7ec 104c
     ldr r0, DAT_080db834                     @ 080db7ee 1148
     bl FUN_080f4e18                          @ 080db7f0 19f012fb
-    ldr r2, DAT_080db838                     @ 080db7f4 104a
+    ldr r2, PTR_game_str_pointer_table_080db838 @ 080db7f4 104a
     lsls r0,r0,#0x10    @ 080db7f6 0004
     lsrs r0,r0,#0x10    @ 080db7f8 000c
     lsls r1,r0,#0x1    @ 080db7fa 4100
@@ -271903,7 +271903,7 @@ FUN_080db7c4:
     lsls r1,r1,#0x2    @ 080db80e 8900
     adds r1,r1,r2    @ 080db810 8918
     ldr r2,[r1,#0x0]                         @ 080db812 0a68
-    ldr r0, DAT_080db844                     @ 080db814 0b48
+    ldr r0, PTR_game_str_ja_080db844         @ 080db814 0b48
     adds r2,r2,r0    @ 080db816 1218
     adds r0,r4,#0x0    @ 080db818 201c
     movs r1,#0x0    @ 080db81a 0021
@@ -271920,14 +271920,14 @@ DAT_080db830:
     .word  0x0010001e                     @ 080db830 1e001000
 DAT_080db834:
     .word  0x000013f5                     @ 080db834 f5130000
-DAT_080db838:
-    .word  0x08000f40                     @ 080db838 400f0008
+PTR_game_str_pointer_table_080db838:
+    .word  game_str_pointer_table         @ 080db838 400f0008
 DAT_080db83c:
     .word  0x02000000                     @ 080db83c 00000002
 DAT_080db840:
     .word  0x00006c2c                     @ 080db840 2c6c0000
-DAT_080db844:
-    .word  0x09db9c10                     @ 080db844 109cdb09
+PTR_game_str_ja_080db844:
+    .word  game_str_ja                    @ 080db844 109cdb09
 LAB_080db848:
     movs r0,#0x1    @ 080db848 0120
 LAB_080db84a:
@@ -272269,7 +272269,7 @@ LAB_080dba80:
     ldr r6, DAT_080dbb70                     @ 080dbadc 244e
     adds r0,r6,#0x0    @ 080dbade 301c
     bl FUN_080f4e18                          @ 080dbae0 19f09af9
-    ldr r2, DAT_080dbb74                     @ 080dbae4 234a
+    ldr r2, PTR_game_str_pointer_table_080dbb74 @ 080dbae4 234a
     .hword 0x4690    @ 080dbae6 9046
     lsls r0,r0,#0x10    @ 080dbae8 0004
     lsrs r0,r0,#0x10    @ 080dbaea 000c
@@ -272285,7 +272285,7 @@ LAB_080dba80:
     lsls r1,r1,#0x2    @ 080dbafe 8900
     add r1,r8                                @ 080dbb00 4144
     ldr r3,[r1,#0x0]                         @ 080dbb02 0b68
-    ldr r4, DAT_080dbb7c                     @ 080dbb04 1d4c
+    ldr r4, PTR_game_str_ja_080dbb7c         @ 080dbb04 1d4c
     adds r3,r3,r4    @ 080dbb06 1b19
     movs r0,#0x3a    @ 080dbb08 3a20
     movs r1,#0x3    @ 080dbb0a 0321
@@ -272337,12 +272337,12 @@ DAT_080dbb6c:
     .word  0x00000107                     @ 080dbb6c 07010000
 DAT_080dbb70:
     .word  0x0000138f                     @ 080dbb70 8f130000
-DAT_080dbb74:
-    .word  0x08000f40                     @ 080dbb74 400f0008
+PTR_game_str_pointer_table_080dbb74:
+    .word  game_str_pointer_table         @ 080dbb74 400f0008
 DAT_080dbb78:
     .word  0x00006c2c                     @ 080dbb78 2c6c0000
-DAT_080dbb7c:
-    .word  0x09db9c10                     @ 080dbb7c 109cdb09
+PTR_game_str_ja_080dbb7c:
+    .word  game_str_ja                    @ 080dbb7c 109cdb09
 FUN_080dbb80:
     push {r4,r5,lr}                          @ 080dbb80 30b5
     adds r3,r0,#0x0    @ 080dbb82 031c
@@ -272386,7 +272386,7 @@ pack_name_text_render:
     adds r1,r1,r0    @ 080dbbc8 0918
     ldrh r0,[r1,#0x6]                        @ 080dbbca c888
     bl FUN_080f4e18                          @ 080dbbcc 19f024f9
-    ldr r2, DAT_080dbc68                     @ 080dbbd0 254a
+    ldr r2, PTR_game_str_pointer_table_080dbc68 @ 080dbbd0 254a
     lsls r0,r0,#0x10    @ 080dbbd2 0004
     lsrs r0,r0,#0x10    @ 080dbbd4 000c
     lsls r1,r0,#0x1    @ 080dbbd6 4100
@@ -272402,7 +272402,7 @@ pack_name_text_render:
     lsls r1,r1,#0x2    @ 080dbbea 8900
     adds r1,r1,r2    @ 080dbbec 8918
     ldr r5,[r1,#0x0]                         @ 080dbbee 0d68
-    ldr r0, DAT_080dbc74                     @ 080dbbf0 2048
+    ldr r0, PTR_game_str_ja_080dbc74         @ 080dbbf0 2048
     adds r5,r5,r0    @ 080dbbf2 2d18
     movs r0,#0x30    @ 080dbbf4 3020
     movs r1,#0x2    @ 080dbbf6 0221
@@ -272457,14 +272457,14 @@ pack_name_text_render:
     bx r1                                    @ 080dbc62 0847
 PTR_pack_info_table_080dbc64:
     .word  pack_info_table                @ 080dbc64 e8e2e509
-DAT_080dbc68:
-    .word  0x08000f40                     @ 080dbc68 400f0008
+PTR_game_str_pointer_table_080dbc68:
+    .word  game_str_pointer_table         @ 080dbc68 400f0008
 DAT_080dbc6c:
     .word  0x02000000                     @ 080dbc6c 00000002
 DAT_080dbc70:
     .word  0x00006c2c                     @ 080dbc70 2c6c0000
-DAT_080dbc74:
-    .word  0x09db9c10                     @ 080dbc74 109cdb09
+PTR_game_str_ja_080dbc74:
+    .word  game_str_ja                    @ 080dbc74 109cdb09
 DAT_080dbc78:
     .word  0x02006ed0                     @ 080dbc78 d06e0002
 DAT_080dbc7c:
@@ -272837,7 +272837,7 @@ FUN_080dbf40:
     adds r4,r1,#0x0    @ 080dbf4a 0c1c
     ldr r0, DAT_080dbf94                     @ 080dbf4c 1148
     bl FUN_080f4e18                          @ 080dbf4e 18f063ff
-    ldr r2, DAT_080dbf98                     @ 080dbf52 114a
+    ldr r2, PTR_game_str_pointer_table_080dbf98 @ 080dbf52 114a
     lsls r0,r0,#0x10    @ 080dbf54 0004
     lsrs r0,r0,#0x10    @ 080dbf56 000c
     lsls r1,r0,#0x1    @ 080dbf58 4100
@@ -272853,7 +272853,7 @@ FUN_080dbf40:
     lsls r1,r1,#0x2    @ 080dbf6c 8900
     adds r1,r1,r2    @ 080dbf6e 8918
     ldr r1,[r1,#0x0]                         @ 080dbf70 0968
-    ldr r0, DAT_080dbfa4                     @ 080dbf72 0c48
+    ldr r0, PTR_game_str_ja_080dbfa4         @ 080dbf72 0c48
     adds r1,r1,r0    @ 080dbf74 0918
     ldr r0, PTR_pack_info_table_080dbfa8     @ 080dbf76 0c48
     lsls r4,r4,#0x4    @ 080dbf78 2401
@@ -272871,14 +272871,14 @@ FUN_080dbf40:
     .byte  0x00, 0x00
 DAT_080dbf94:
     .word  0x000013f9                     @ 080dbf94 f9130000
-DAT_080dbf98:
-    .word  0x08000f40                     @ 080dbf98 400f0008
+PTR_game_str_pointer_table_080dbf98:
+    .word  game_str_pointer_table         @ 080dbf98 400f0008
 DAT_080dbf9c:
     .word  0x02000000                     @ 080dbf9c 00000002
 DAT_080dbfa0:
     .word  0x00006c2c                     @ 080dbfa0 2c6c0000
-DAT_080dbfa4:
-    .word  0x09db9c10                     @ 080dbfa4 109cdb09
+PTR_game_str_ja_080dbfa4:
+    .word  game_str_ja                    @ 080dbfa4 109cdb09
 PTR_pack_info_table_080dbfa8:
     .word  pack_info_table                @ 080dbfa8 e8e2e509
 DAT_080dbfac:
@@ -273011,7 +273011,7 @@ FUN_080dc098:
     adds r5,r2,#0x0    @ 080dc0a4 151c
     ldr r0, DAT_080dc0e8                     @ 080dc0a6 1048
     bl FUN_080f4e18                          @ 080dc0a8 18f0b6fe
-    ldr r2, DAT_080dc0ec                     @ 080dc0ac 0f4a
+    ldr r2, PTR_game_str_pointer_table_080dc0ec @ 080dc0ac 0f4a
     lsls r0,r0,#0x10    @ 080dc0ae 0004
     lsrs r0,r0,#0x10    @ 080dc0b0 000c
     lsls r1,r0,#0x1    @ 080dc0b2 4100
@@ -273027,7 +273027,7 @@ FUN_080dc098:
     lsls r1,r1,#0x2    @ 080dc0c6 8900
     adds r1,r1,r2    @ 080dc0c8 8918
     ldr r1,[r1,#0x0]                         @ 080dc0ca 0968
-    ldr r0, DAT_080dc0f8                     @ 080dc0cc 0a48
+    ldr r0, PTR_game_str_ja_080dc0f8         @ 080dc0cc 0a48
     adds r6,r1,r0    @ 080dc0ce 0e18
     movs r7,#0x1    @ 080dc0d0 0127
     adds r0,r4,#0x0    @ 080dc0d2 201c
@@ -273042,14 +273042,14 @@ FUN_080dc098:
     b LAB_080dc11a                           @ 080dc0e6 18e0
 DAT_080dc0e8:
     .word  0x000013ee                     @ 080dc0e8 ee130000
-DAT_080dc0ec:
-    .word  0x08000f40                     @ 080dc0ec 400f0008
+PTR_game_str_pointer_table_080dc0ec:
+    .word  game_str_pointer_table         @ 080dc0ec 400f0008
 DAT_080dc0f0:
     .word  0x02000000                     @ 080dc0f0 00000002
 DAT_080dc0f4:
     .word  0x00006c2c                     @ 080dc0f4 2c6c0000
-DAT_080dc0f8:
-    .word  0x09db9c10                     @ 080dc0f8 109cdb09
+PTR_game_str_ja_080dc0f8:
+    .word  game_str_ja                    @ 080dc0f8 109cdb09
 LAB_080dc0fc:
     cmp r1,#0x0                              @ 080dc0fc 0029
     beq LAB_080dc118                         @ 080dc0fe 0bd0
@@ -273188,7 +273188,7 @@ FUN_080dc1f8:
     adds r5,#0xc    @ 080dc208 0c35
     ldr r0, DAT_080dc304                     @ 080dc20a 3e48
     bl FUN_080f4e18                          @ 080dc20c 18f004fe
-    ldr r1, DAT_080dc308                     @ 080dc210 3d49
+    ldr r1, PTR_game_str_pointer_table_080dc308 @ 080dc210 3d49
     .hword 0x4689    @ 080dc212 8946
     lsls r0,r0,#0x10    @ 080dc214 0004
     lsrs r0,r0,#0x10    @ 080dc216 000c
@@ -273206,7 +273206,7 @@ FUN_080dc1f8:
     add r1,r9                                @ 080dc22e 4944
     ldr r1,[r1,#0x0]                         @ 080dc230 0968
     .hword 0x4688    @ 080dc232 8846
-    ldr r6, DAT_080dc314                     @ 080dc234 374e
+    ldr r6, PTR_game_str_ja_080dc314         @ 080dc234 374e
     add r8,r6                                @ 080dc236 b044
     ldr r0, DAT_080dc318                     @ 080dc238 3748
     bl FUN_080f4e18                          @ 080dc23a 18f0edfd
@@ -273302,14 +273302,14 @@ DAT_080dc300:
     .word  0x03005850                     @ 080dc300 50580003
 DAT_080dc304:
     .word  0x000013ef                     @ 080dc304 ef130000
-DAT_080dc308:
-    .word  0x08000f40                     @ 080dc308 400f0008
+PTR_game_str_pointer_table_080dc308:
+    .word  game_str_pointer_table         @ 080dc308 400f0008
 DAT_080dc30c:
     .word  0x02000000                     @ 080dc30c 00000002
 DAT_080dc310:
     .word  0x00006c2c                     @ 080dc310 2c6c0000
-DAT_080dc314:
-    .word  0x09db9c10                     @ 080dc314 109cdb09
+PTR_game_str_ja_080dc314:
+    .word  game_str_ja                    @ 080dc314 109cdb09
 DAT_080dc318:
     .word  0x0000138f                     @ 080dc318 8f130000
 DAT_080dc31c:
@@ -273704,7 +273704,7 @@ FUN_080dc60c:
     adds r4,r4,r0    @ 080dc614 2418
     ldr r0, DAT_080dc650                     @ 080dc616 0e48
     bl FUN_080f4e18                          @ 080dc618 18f0fefb
-    ldr r2, DAT_080dc654                     @ 080dc61c 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc654 @ 080dc61c 0d4a
     lsls r0,r0,#0x10    @ 080dc61e 0004
     lsrs r0,r0,#0x10    @ 080dc620 000c
     lsls r1,r0,#0x1    @ 080dc622 4100
@@ -273720,7 +273720,7 @@ FUN_080dc60c:
     lsls r1,r1,#0x2    @ 080dc636 8900
     adds r1,r1,r2    @ 080dc638 8918
     ldr r1,[r1,#0x0]                         @ 080dc63a 0968
-    ldr r0, DAT_080dc660                     @ 080dc63c 0848
+    ldr r0, PTR_game_str_ja_080dc660         @ 080dc63c 0848
     adds r1,r1,r0    @ 080dc63e 0918
     adds r0,r4,#0x0    @ 080dc640 201c
     bl FUN_080dc558                          @ 080dc642 fff789ff
@@ -273731,14 +273731,14 @@ DAT_080dc64c:
     .word  0x06010000                     @ 080dc64c 00000106
 DAT_080dc650:
     .word  0x000013f8                     @ 080dc650 f8130000
-DAT_080dc654:
-    .word  0x08000f40                     @ 080dc654 400f0008
+PTR_game_str_pointer_table_080dc654:
+    .word  game_str_pointer_table         @ 080dc654 400f0008
 DAT_080dc658:
     .word  0x02000000                     @ 080dc658 00000002
 DAT_080dc65c:
     .word  0x00006c2c                     @ 080dc65c 2c6c0000
-DAT_080dc660:
-    .word  0x09db9c10                     @ 080dc660 109cdb09
+PTR_game_str_ja_080dc660:
+    .word  game_str_ja                    @ 080dc660 109cdb09
 FUN_080dc664:
     push {r4,lr}                             @ 080dc664 10b5
     adds r4,r0,#0x0    @ 080dc666 041c
@@ -273747,7 +273747,7 @@ FUN_080dc664:
     adds r4,r4,r0    @ 080dc66c 2418
     ldr r0, DAT_080dc6a8                     @ 080dc66e 0e48
     bl FUN_080f4e18                          @ 080dc670 18f0d2fb
-    ldr r2, DAT_080dc6ac                     @ 080dc674 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc6ac @ 080dc674 0d4a
     lsls r0,r0,#0x10    @ 080dc676 0004
     lsrs r0,r0,#0x10    @ 080dc678 000c
     lsls r1,r0,#0x1    @ 080dc67a 4100
@@ -273763,7 +273763,7 @@ FUN_080dc664:
     lsls r1,r1,#0x2    @ 080dc68e 8900
     adds r1,r1,r2    @ 080dc690 8918
     ldr r1,[r1,#0x0]                         @ 080dc692 0968
-    ldr r0, DAT_080dc6b8                     @ 080dc694 0848
+    ldr r0, PTR_game_str_ja_080dc6b8         @ 080dc694 0848
     adds r1,r1,r0    @ 080dc696 0918
     adds r0,r4,#0x0    @ 080dc698 201c
     bl FUN_080dc558                          @ 080dc69a fff75dff
@@ -273774,14 +273774,14 @@ DAT_080dc6a4:
     .word  0x06010000                     @ 080dc6a4 00000106
 DAT_080dc6a8:
     .word  0x000013f9                     @ 080dc6a8 f9130000
-DAT_080dc6ac:
-    .word  0x08000f40                     @ 080dc6ac 400f0008
+PTR_game_str_pointer_table_080dc6ac:
+    .word  game_str_pointer_table         @ 080dc6ac 400f0008
 DAT_080dc6b0:
     .word  0x02000000                     @ 080dc6b0 00000002
 DAT_080dc6b4:
     .word  0x00006c2c                     @ 080dc6b4 2c6c0000
-DAT_080dc6b8:
-    .word  0x09db9c10                     @ 080dc6b8 109cdb09
+PTR_game_str_ja_080dc6b8:
+    .word  game_str_ja                    @ 080dc6b8 109cdb09
 FUN_080dc6bc:
     push {r4,r5,r6,r7,lr}                    @ 080dc6bc f0b5
     .hword 0x4657    @ 080dc6be 5746
@@ -273800,7 +273800,7 @@ FUN_080dc6bc:
     bne LAB_080dc70c                         @ 080dc6da 17d1
     ldr r0, DAT_080dc6fc                     @ 080dc6dc 0748
     bl FUN_080f4e18                          @ 080dc6de 18f09bfb
-    ldr r2, DAT_080dc700                     @ 080dc6e2 074a
+    ldr r2, PTR_game_str_pointer_table_080dc700 @ 080dc6e2 074a
     lsls r0,r0,#0x10    @ 080dc6e4 0004
     lsrs r0,r0,#0x10    @ 080dc6e6 000c
     lsls r1,r0,#0x1    @ 080dc6e8 4100
@@ -273815,8 +273815,8 @@ DAT_080dc6f8:
     .word  0x03005850                     @ 080dc6f8 50580003
 DAT_080dc6fc:
     .word  0x000013f4                     @ 080dc6fc f4130000
-DAT_080dc700:
-    .word  0x08000f40                     @ 080dc700 400f0008
+PTR_game_str_pointer_table_080dc700:
+    .word  game_str_pointer_table         @ 080dc700 400f0008
 DAT_080dc704:
     .word  0x02000000                     @ 080dc704 00000002
 DAT_080dc708:
@@ -273831,7 +273831,7 @@ LAB_080dc70c:
     bcs LAB_080dc75c                         @ 080dc718 20d2
     ldr r0, DAT_080dc74c                     @ 080dc71a 0c48
     bl FUN_080f4e18                          @ 080dc71c 18f07cfb
-    ldr r2, DAT_080dc750                     @ 080dc720 0b4a
+    ldr r2, PTR_game_str_pointer_table_080dc750 @ 080dc720 0b4a
     lsls r0,r0,#0x10    @ 080dc722 0004
     lsrs r0,r0,#0x10    @ 080dc724 000c
     lsls r1,r0,#0x1    @ 080dc726 4100
@@ -273847,7 +273847,7 @@ LAB_080dc730:
     lsls r1,r1,#0x2    @ 080dc738 8900
     adds r1,r1,r2    @ 080dc73a 8918
     ldr r1,[r1,#0x0]                         @ 080dc73c 0968
-    ldr r0, DAT_080dc758                     @ 080dc73e 0648
+    ldr r0, PTR_game_str_ja_080dc758         @ 080dc73e 0648
     adds r2,r1,r0    @ 080dc740 0a18
     b LAB_080dc786                           @ 080dc742 20e0
 DAT_080dc744:
@@ -273856,16 +273856,16 @@ DAT_080dc748:
     .word  0x00006c38                     @ 080dc748 386c0000
 DAT_080dc74c:
     .word  0x000013f2                     @ 080dc74c f2130000
-DAT_080dc750:
-    .word  0x08000f40                     @ 080dc750 400f0008
+PTR_game_str_pointer_table_080dc750:
+    .word  game_str_pointer_table         @ 080dc750 400f0008
 DAT_080dc754:
     .word  0x00006c2c                     @ 080dc754 2c6c0000
-DAT_080dc758:
-    .word  0x09db9c10                     @ 080dc758 109cdb09
+PTR_game_str_ja_080dc758:
+    .word  game_str_ja                    @ 080dc758 109cdb09
 LAB_080dc75c:
     ldr r0, DAT_080dc808                     @ 080dc75c 2a48
     bl FUN_080f4e18                          @ 080dc75e 18f05bfb
-    ldr r2, DAT_080dc80c                     @ 080dc762 2a4a
+    ldr r2, PTR_game_str_pointer_table_080dc80c @ 080dc762 2a4a
     lsls r0,r0,#0x10    @ 080dc764 0004
     lsrs r0,r0,#0x10    @ 080dc766 000c
     lsls r1,r0,#0x1    @ 080dc768 4100
@@ -273880,7 +273880,7 @@ LAB_080dc75c:
     lsls r1,r1,#0x2    @ 080dc77a 8900
     adds r1,r1,r2    @ 080dc77c 8918
     ldr r1,[r1,#0x0]                         @ 080dc77e 0968
-    ldr r0, DAT_080dc814                     @ 080dc780 2448
+    ldr r0, PTR_game_str_ja_080dc814         @ 080dc780 2448
     adds r2,r1,r0    @ 080dc782 0a18
     movs r7,#0x1    @ 080dc784 0127
 LAB_080dc786:
@@ -273891,7 +273891,7 @@ LAB_080dc786:
     bne LAB_080dc7f8                         @ 080dc790 32d1
     ldr r0, DAT_080dc81c                     @ 080dc792 2248
     bl FUN_080f4e18                          @ 080dc794 18f040fb
-    ldr r1, DAT_080dc80c                     @ 080dc798 1c49
+    ldr r1, PTR_game_str_pointer_table_080dc80c @ 080dc798 1c49
     .hword 0x4688    @ 080dc79a 8846
     lsls r0,r0,#0x10    @ 080dc79c 0004
     lsrs r0,r0,#0x10    @ 080dc79e 000c
@@ -273908,7 +273908,7 @@ LAB_080dc786:
     lsls r1,r1,#0x2    @ 080dc7b4 8900
     add r1,r8                                @ 080dc7b6 4144
     ldr r0,[r1,#0x0]                         @ 080dc7b8 0868
-    ldr r6, DAT_080dc814                     @ 080dc7ba 164e
+    ldr r6, PTR_game_str_ja_080dc814         @ 080dc7ba 164e
     adds r2,r0,r6    @ 080dc7bc 8219
     .hword 0x4649    @ 080dc7be 4946
     lsls r0,r1,#0x5    @ 080dc7c0 4801
@@ -273947,12 +273947,12 @@ LAB_080dc7f8:
     bx r1                                    @ 080dc806 0847
 DAT_080dc808:
     .word  0x000013f3                     @ 080dc808 f3130000
-DAT_080dc80c:
-    .word  0x08000f40                     @ 080dc80c 400f0008
+PTR_game_str_pointer_table_080dc80c:
+    .word  game_str_pointer_table         @ 080dc80c 400f0008
 DAT_080dc810:
     .word  0x00006c2c                     @ 080dc810 2c6c0000
-DAT_080dc814:
-    .word  0x09db9c10                     @ 080dc814 109cdb09
+PTR_game_str_ja_080dc814:
+    .word  game_str_ja                    @ 080dc814 109cdb09
 DAT_080dc818:
     .word  0x0010001e                     @ 080dc818 1e001000
 DAT_080dc81c:
@@ -273970,7 +273970,7 @@ FUN_080dc82c:
     adds r0,r0,r1    @ 080dc832 4018
     ldrh r0,[r0,#0x8]                        @ 080dc834 0089
     bl FUN_080f4e18                          @ 080dc836 18f0effa
-    ldr r2, DAT_080dc870                     @ 080dc83a 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc870 @ 080dc83a 0d4a
     lsls r0,r0,#0x10    @ 080dc83c 0004
     lsrs r0,r0,#0x10    @ 080dc83e 000c
     lsls r1,r0,#0x1    @ 080dc840 4100
@@ -273986,7 +273986,7 @@ FUN_080dc82c:
     lsls r1,r1,#0x2    @ 080dc854 8900
     adds r1,r1,r2    @ 080dc856 8918
     ldr r2,[r1,#0x0]                         @ 080dc858 0a68
-    ldr r0, DAT_080dc87c                     @ 080dc85a 0848
+    ldr r0, PTR_game_str_ja_080dc87c         @ 080dc85a 0848
     adds r2,r2,r0    @ 080dc85c 1218
     ldr r0, DAT_080dc880                     @ 080dc85e 0848
     movs r1,#0x0    @ 080dc860 0021
@@ -273996,14 +273996,14 @@ FUN_080dc82c:
     .byte  0x00, 0x00
 PTR_pack_info_table_080dc86c:
     .word  pack_info_table                @ 080dc86c e8e2e509
-DAT_080dc870:
-    .word  0x08000f40                     @ 080dc870 400f0008
+PTR_game_str_pointer_table_080dc870:
+    .word  game_str_pointer_table         @ 080dc870 400f0008
 DAT_080dc874:
     .word  0x02000000                     @ 080dc874 00000002
 DAT_080dc878:
     .word  0x00006c2c                     @ 080dc878 2c6c0000
-DAT_080dc87c:
-    .word  0x09db9c10                     @ 080dc87c 109cdb09
+PTR_game_str_ja_080dc87c:
+    .word  game_str_ja                    @ 080dc87c 109cdb09
 DAT_080dc880:
     .word  0x0010001e                     @ 080dc880 1e001000
 FUN_080dc884:
@@ -274055,7 +274055,7 @@ FUN_080dc8d0:
     adds r4,r4,r0    @ 080dc8d8 2418
     ldr r0, DAT_080dc914                     @ 080dc8da 0e48
     bl FUN_080f4e18                          @ 080dc8dc 18f09cfa
-    ldr r2, DAT_080dc918                     @ 080dc8e0 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc918 @ 080dc8e0 0d4a
     lsls r0,r0,#0x10    @ 080dc8e2 0004
     lsrs r0,r0,#0x10    @ 080dc8e4 000c
     lsls r1,r0,#0x1    @ 080dc8e6 4100
@@ -274071,7 +274071,7 @@ FUN_080dc8d0:
     lsls r1,r1,#0x2    @ 080dc8fa 8900
     adds r1,r1,r2    @ 080dc8fc 8918
     ldr r1,[r1,#0x0]                         @ 080dc8fe 0968
-    ldr r0, DAT_080dc924                     @ 080dc900 0848
+    ldr r0, PTR_game_str_ja_080dc924         @ 080dc900 0848
     adds r1,r1,r0    @ 080dc902 0918
     adds r0,r4,#0x0    @ 080dc904 201c
     bl FUN_080dc558                          @ 080dc906 fff727fe
@@ -274082,14 +274082,14 @@ DAT_080dc910:
     .word  0x06010000                     @ 080dc910 00000106
 DAT_080dc914:
     .word  0x000013f1                     @ 080dc914 f1130000
-DAT_080dc918:
-    .word  0x08000f40                     @ 080dc918 400f0008
+PTR_game_str_pointer_table_080dc918:
+    .word  game_str_pointer_table         @ 080dc918 400f0008
 DAT_080dc91c:
     .word  0x02000000                     @ 080dc91c 00000002
 DAT_080dc920:
     .word  0x00006c2c                     @ 080dc920 2c6c0000
-DAT_080dc924:
-    .word  0x09db9c10                     @ 080dc924 109cdb09
+PTR_game_str_ja_080dc924:
+    .word  game_str_ja                    @ 080dc924 109cdb09
 FUN_080dc928:
     push {r4,lr}                             @ 080dc928 10b5
     adds r4,r0,#0x0    @ 080dc92a 041c
@@ -274098,7 +274098,7 @@ FUN_080dc928:
     adds r4,r4,r0    @ 080dc930 2418
     ldr r0, DAT_080dc96c                     @ 080dc932 0e48
     bl FUN_080f4e18                          @ 080dc934 18f070fa
-    ldr r2, DAT_080dc970                     @ 080dc938 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc970 @ 080dc938 0d4a
     lsls r0,r0,#0x10    @ 080dc93a 0004
     lsrs r0,r0,#0x10    @ 080dc93c 000c
     lsls r1,r0,#0x1    @ 080dc93e 4100
@@ -274114,7 +274114,7 @@ FUN_080dc928:
     lsls r1,r1,#0x2    @ 080dc952 8900
     adds r1,r1,r2    @ 080dc954 8918
     ldr r1,[r1,#0x0]                         @ 080dc956 0968
-    ldr r0, DAT_080dc97c                     @ 080dc958 0848
+    ldr r0, PTR_game_str_ja_080dc97c         @ 080dc958 0848
     adds r1,r1,r0    @ 080dc95a 0918
     adds r0,r4,#0x0    @ 080dc95c 201c
     bl FUN_080dc558                          @ 080dc95e fff7fbfd
@@ -274125,14 +274125,14 @@ DAT_080dc968:
     .word  0x06010000                     @ 080dc968 00000106
 DAT_080dc96c:
     .word  0x00001390                     @ 080dc96c 90130000
-DAT_080dc970:
-    .word  0x08000f40                     @ 080dc970 400f0008
+PTR_game_str_pointer_table_080dc970:
+    .word  game_str_pointer_table         @ 080dc970 400f0008
 DAT_080dc974:
     .word  0x02000000                     @ 080dc974 00000002
 DAT_080dc978:
     .word  0x00006c2c                     @ 080dc978 2c6c0000
-DAT_080dc97c:
-    .word  0x09db9c10                     @ 080dc97c 109cdb09
+PTR_game_str_ja_080dc97c:
+    .word  game_str_ja                    @ 080dc97c 109cdb09
 FUN_080dc980:
     push {r4,lr}                             @ 080dc980 10b5
     adds r4,r0,#0x0    @ 080dc982 041c
@@ -274141,7 +274141,7 @@ FUN_080dc980:
     adds r4,r4,r0    @ 080dc988 2418
     ldr r0, DAT_080dc9c4                     @ 080dc98a 0e48
     bl FUN_080f4e18                          @ 080dc98c 18f044fa
-    ldr r2, DAT_080dc9c8                     @ 080dc990 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dc9c8 @ 080dc990 0d4a
     lsls r0,r0,#0x10    @ 080dc992 0004
     lsrs r0,r0,#0x10    @ 080dc994 000c
     lsls r1,r0,#0x1    @ 080dc996 4100
@@ -274157,7 +274157,7 @@ FUN_080dc980:
     lsls r1,r1,#0x2    @ 080dc9aa 8900
     adds r1,r1,r2    @ 080dc9ac 8918
     ldr r1,[r1,#0x0]                         @ 080dc9ae 0968
-    ldr r0, DAT_080dc9d4                     @ 080dc9b0 0848
+    ldr r0, PTR_game_str_ja_080dc9d4         @ 080dc9b0 0848
     adds r1,r1,r0    @ 080dc9b2 0918
     adds r0,r4,#0x0    @ 080dc9b4 201c
     bl FUN_080dc558                          @ 080dc9b6 fff7cffd
@@ -274168,14 +274168,14 @@ DAT_080dc9c0:
     .word  0x06010000                     @ 080dc9c0 00000106
 DAT_080dc9c4:
     .word  0x000013fa                     @ 080dc9c4 fa130000
-DAT_080dc9c8:
-    .word  0x08000f40                     @ 080dc9c8 400f0008
+PTR_game_str_pointer_table_080dc9c8:
+    .word  game_str_pointer_table         @ 080dc9c8 400f0008
 DAT_080dc9cc:
     .word  0x02000000                     @ 080dc9cc 00000002
 DAT_080dc9d0:
     .word  0x00006c2c                     @ 080dc9d0 2c6c0000
-DAT_080dc9d4:
-    .word  0x09db9c10                     @ 080dc9d4 109cdb09
+PTR_game_str_ja_080dc9d4:
+    .word  game_str_ja                    @ 080dc9d4 109cdb09
 FUN_080dc9d8:
     push {r4,lr}                             @ 080dc9d8 10b5
     adds r4,r0,#0x0    @ 080dc9da 041c
@@ -274184,7 +274184,7 @@ FUN_080dc9d8:
     adds r4,r4,r0    @ 080dc9e0 2418
     ldr r0, DAT_080dca1c                     @ 080dc9e2 0e48
     bl FUN_080f4e18                          @ 080dc9e4 18f018fa
-    ldr r2, DAT_080dca20                     @ 080dc9e8 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dca20 @ 080dc9e8 0d4a
     lsls r0,r0,#0x10    @ 080dc9ea 0004
     lsrs r0,r0,#0x10    @ 080dc9ec 000c
     lsls r1,r0,#0x1    @ 080dc9ee 4100
@@ -274200,7 +274200,7 @@ FUN_080dc9d8:
     lsls r1,r1,#0x2    @ 080dca02 8900
     adds r1,r1,r2    @ 080dca04 8918
     ldr r1,[r1,#0x0]                         @ 080dca06 0968
-    ldr r0, DAT_080dca2c                     @ 080dca08 0848
+    ldr r0, PTR_game_str_ja_080dca2c         @ 080dca08 0848
     adds r1,r1,r0    @ 080dca0a 0918
     adds r0,r4,#0x0    @ 080dca0c 201c
     bl FUN_080dc558                          @ 080dca0e fff7a3fd
@@ -274211,14 +274211,14 @@ DAT_080dca18:
     .word  0x06010000                     @ 080dca18 00000106
 DAT_080dca1c:
     .word  0x000013fb                     @ 080dca1c fb130000
-DAT_080dca20:
-    .word  0x08000f40                     @ 080dca20 400f0008
+PTR_game_str_pointer_table_080dca20:
+    .word  game_str_pointer_table         @ 080dca20 400f0008
 DAT_080dca24:
     .word  0x02000000                     @ 080dca24 00000002
 DAT_080dca28:
     .word  0x00006c2c                     @ 080dca28 2c6c0000
-DAT_080dca2c:
-    .word  0x09db9c10                     @ 080dca2c 109cdb09
+PTR_game_str_ja_080dca2c:
+    .word  game_str_ja                    @ 080dca2c 109cdb09
 FUN_080dca30:
     push {r4,lr}                             @ 080dca30 10b5
     adds r4,r0,#0x0    @ 080dca32 041c
@@ -274227,7 +274227,7 @@ FUN_080dca30:
     adds r4,r4,r0    @ 080dca38 2418
     ldr r0, DAT_080dca74                     @ 080dca3a 0e48
     bl FUN_080f4e18                          @ 080dca3c 18f0ecf9
-    ldr r2, DAT_080dca78                     @ 080dca40 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dca78 @ 080dca40 0d4a
     lsls r0,r0,#0x10    @ 080dca42 0004
     lsrs r0,r0,#0x10    @ 080dca44 000c
     lsls r1,r0,#0x1    @ 080dca46 4100
@@ -274243,7 +274243,7 @@ FUN_080dca30:
     lsls r1,r1,#0x2    @ 080dca5a 8900
     adds r1,r1,r2    @ 080dca5c 8918
     ldr r1,[r1,#0x0]                         @ 080dca5e 0968
-    ldr r0, DAT_080dca84                     @ 080dca60 0848
+    ldr r0, PTR_game_str_ja_080dca84         @ 080dca60 0848
     adds r1,r1,r0    @ 080dca62 0918
     adds r0,r4,#0x0    @ 080dca64 201c
     bl FUN_080dc558                          @ 080dca66 fff777fd
@@ -274254,14 +274254,14 @@ DAT_080dca70:
     .word  0x06010000                     @ 080dca70 00000106
 DAT_080dca74:
     .word  0x000007ee                     @ 080dca74 ee070000
-DAT_080dca78:
-    .word  0x08000f40                     @ 080dca78 400f0008
+PTR_game_str_pointer_table_080dca78:
+    .word  game_str_pointer_table         @ 080dca78 400f0008
 DAT_080dca7c:
     .word  0x02000000                     @ 080dca7c 00000002
 DAT_080dca80:
     .word  0x00006c2c                     @ 080dca80 2c6c0000
-DAT_080dca84:
-    .word  0x09db9c10                     @ 080dca84 109cdb09
+PTR_game_str_ja_080dca84:
+    .word  game_str_ja                    @ 080dca84 109cdb09
 FUN_080dca88:
     push {r4,lr}                             @ 080dca88 10b5
     adds r4,r0,#0x0    @ 080dca8a 041c
@@ -274270,7 +274270,7 @@ FUN_080dca88:
     adds r4,r4,r0    @ 080dca90 2418
     ldr r0, DAT_080dcacc                     @ 080dca92 0e48
     bl FUN_080f4e18                          @ 080dca94 18f0c0f9
-    ldr r2, DAT_080dcad0                     @ 080dca98 0d4a
+    ldr r2, PTR_game_str_pointer_table_080dcad0 @ 080dca98 0d4a
     lsls r0,r0,#0x10    @ 080dca9a 0004
     lsrs r0,r0,#0x10    @ 080dca9c 000c
     lsls r1,r0,#0x1    @ 080dca9e 4100
@@ -274286,7 +274286,7 @@ FUN_080dca88:
     lsls r1,r1,#0x2    @ 080dcab2 8900
     adds r1,r1,r2    @ 080dcab4 8918
     ldr r1,[r1,#0x0]                         @ 080dcab6 0968
-    ldr r0, DAT_080dcadc                     @ 080dcab8 0848
+    ldr r0, PTR_game_str_ja_080dcadc         @ 080dcab8 0848
     adds r1,r1,r0    @ 080dcaba 0918
     adds r0,r4,#0x0    @ 080dcabc 201c
     bl FUN_080dc558                          @ 080dcabe fff74bfd
@@ -274297,14 +274297,14 @@ DAT_080dcac8:
     .word  0x06010000                     @ 080dcac8 00000106
 DAT_080dcacc:
     .word  0x000007ef                     @ 080dcacc ef070000
-DAT_080dcad0:
-    .word  0x08000f40                     @ 080dcad0 400f0008
+PTR_game_str_pointer_table_080dcad0:
+    .word  game_str_pointer_table         @ 080dcad0 400f0008
 DAT_080dcad4:
     .word  0x02000000                     @ 080dcad4 00000002
 DAT_080dcad8:
     .word  0x00006c2c                     @ 080dcad8 2c6c0000
-DAT_080dcadc:
-    .word  0x09db9c10                     @ 080dcadc 109cdb09
+PTR_game_str_ja_080dcadc:
+    .word  game_str_ja                    @ 080dcadc 109cdb09
 FUN_080dcae0:
     ldr r1, DAT_080dcaf8                     @ 080dcae0 0549
     lsrs r2,r0,#0x4    @ 080dcae2 0209
@@ -277413,7 +277413,7 @@ LAB_080de2d8:
     bl FUN_080f2c8c                          @ 080de33a 14f0a7fc
     ldr r0, DAT_080de3d8                     @ 080de33e 2648
     bl FUN_080f4e18                          @ 080de340 16f06afd
-    ldr r2, DAT_080de3dc                     @ 080de344 254a
+    ldr r2, PTR_game_str_pointer_table_080de3dc @ 080de344 254a
     lsls r0,r0,#0x10    @ 080de346 0004
     lsrs r0,r0,#0x10    @ 080de348 000c
     lsls r1,r0,#0x1    @ 080de34a 4100
@@ -277428,7 +277428,7 @@ LAB_080de2d8:
     lsls r1,r1,#0x2    @ 080de35c 8900
     adds r1,r1,r2    @ 080de35e 8918
     ldr r4,[r1,#0x0]                         @ 080de360 0c68
-    ldr r0, DAT_080de3e4                     @ 080de362 2048
+    ldr r0, PTR_game_str_ja_080de3e4         @ 080de362 2048
     adds r4,r4,r0    @ 080de364 2418
     movs r0,#0x38    @ 080de366 3820
     movs r1,#0x3    @ 080de368 0321
@@ -277487,12 +277487,12 @@ DAT_080de3d4:
     .word  0x00008008                     @ 080de3d4 08800000
 DAT_080de3d8:
     .word  0x0000138f                     @ 080de3d8 8f130000
-DAT_080de3dc:
-    .word  0x08000f40                     @ 080de3dc 400f0008
+PTR_game_str_pointer_table_080de3dc:
+    .word  game_str_pointer_table         @ 080de3dc 400f0008
 DAT_080de3e0:
     .word  0x00006c2c                     @ 080de3e0 2c6c0000
-DAT_080de3e4:
-    .word  0x09db9c10                     @ 080de3e4 109cdb09
+PTR_game_str_ja_080de3e4:
+    .word  game_str_ja                    @ 080de3e4 109cdb09
 FUN_080de3e8:
     push {r4,r5,r6,r7,lr}                    @ 080de3e8 f0b5
     .hword 0x4657    @ 080de3ea 5746
@@ -277535,7 +277535,7 @@ FUN_080de3e8:
     bl FUN_080f0bb4                          @ 080de434 12f0befb
     ldr r0, DAT_080de72c                     @ 080de438 bc48
     bl FUN_080f4e18                          @ 080de43a 16f0edfc
-    ldr r2, DAT_080de730                     @ 080de43e bc4a
+    ldr r2, PTR_game_str_pointer_table_080de730 @ 080de43e bc4a
     lsls r0,r0,#0x10    @ 080de440 0004
     lsrs r0,r0,#0x10    @ 080de442 000c
     lsls r1,r0,#0x1    @ 080de444 4100
@@ -277551,7 +277551,7 @@ FUN_080de3e8:
     lsls r1,r1,#0x2    @ 080de458 8900
     adds r1,r1,r2    @ 080de45a 8918
     ldr r1,[r1,#0x0]                         @ 080de45c 0968
-    ldr r0, DAT_080de73c                     @ 080de45e b748
+    ldr r0, PTR_game_str_ja_080de73c         @ 080de45e b748
     adds r1,r1,r0    @ 080de460 0918
     .hword 0x4689    @ 080de462 8946
     .hword 0x4648    @ 080de464 4846
@@ -277694,7 +277694,7 @@ LAB_080de53e:
     str r0,[r2,#0x4]                         @ 080de588 5060
     ldr r0, DAT_080de74c                     @ 080de58a 7048
     bl FUN_080f4e18                          @ 080de58c 16f044fc
-    ldr r2, DAT_080de730                     @ 080de590 674a
+    ldr r2, PTR_game_str_pointer_table_080de730 @ 080de590 674a
     lsls r0,r0,#0x10    @ 080de592 0004
     lsrs r0,r0,#0x10    @ 080de594 000c
     lsls r1,r0,#0x1    @ 080de596 4100
@@ -277710,7 +277710,7 @@ LAB_080de53e:
     lsls r1,r1,#0x2    @ 080de5aa 8900
     adds r1,r1,r2    @ 080de5ac 8918
     ldr r1,[r1,#0x0]                         @ 080de5ae 0968
-    ldr r0, DAT_080de73c                     @ 080de5b0 6248
+    ldr r0, PTR_game_str_ja_080de73c         @ 080de5b0 6248
     adds r1,r1,r0    @ 080de5b2 0918
     .hword 0x4689    @ 080de5b4 8946
     .hword 0x4648    @ 080de5b6 4846
@@ -277780,7 +277780,7 @@ LAB_080de62a:
     bge LAB_080de628                         @ 080de640 f2da
     ldr r0, DAT_080de754                     @ 080de642 4448
     bl FUN_080f4e18                          @ 080de644 16f0e8fb
-    ldr r2, DAT_080de730                     @ 080de648 394a
+    ldr r2, PTR_game_str_pointer_table_080de730 @ 080de648 394a
     lsls r0,r0,#0x10    @ 080de64a 0004
     lsrs r0,r0,#0x10    @ 080de64c 000c
     lsls r1,r0,#0x1    @ 080de64e 4100
@@ -277796,7 +277796,7 @@ LAB_080de62a:
     lsls r1,r1,#0x2    @ 080de662 8900
     adds r1,r1,r2    @ 080de664 8918
     ldr r1,[r1,#0x0]                         @ 080de666 0968
-    ldr r0, DAT_080de73c                     @ 080de668 3448
+    ldr r0, PTR_game_str_ja_080de73c         @ 080de668 3448
     adds r1,r1,r0    @ 080de66a 0918
     .hword 0x4689    @ 080de66c 8946
     .hword 0x4648    @ 080de66e 4846
@@ -277889,14 +277889,14 @@ DAT_080de728:
     .word  0x09e5f854                     @ 080de728 54f8e509
 DAT_080de72c:
     .word  0x00001389                     @ 080de72c 89130000
-DAT_080de730:
-    .word  0x08000f40                     @ 080de730 400f0008
+PTR_game_str_pointer_table_080de730:
+    .word  game_str_pointer_table         @ 080de730 400f0008
 DAT_080de734:
     .word  0x02000000                     @ 080de734 00000002
 DAT_080de738:
     .word  0x00006c2c                     @ 080de738 2c6c0000
-DAT_080de73c:
-    .word  0x09db9c10                     @ 080de73c 109cdb09
+PTR_game_str_ja_080de73c:
+    .word  game_str_ja                    @ 080de73c 109cdb09
 DAT_080de740:
     .word  0x00000107                     @ 080de740 07010000
 DAT_080de744:
@@ -278408,7 +278408,7 @@ FUN_080df3f0:
     str r0,[r4,#0x4]                         @ 080df45e 6060
     ldr r0, DAT_080df518                     @ 080df460 2d48
     bl FUN_080f4e18                          @ 080df462 15f0d9fc
-    ldr r2, DAT_080df51c                     @ 080df466 2d4a
+    ldr r2, PTR_game_str_pointer_table_080df51c @ 080df466 2d4a
     .hword 0x4692    @ 080df468 9246
     lsls r0,r0,#0x10    @ 080df46a 0004
     lsrs r0,r0,#0x10    @ 080df46c 000c
@@ -278427,7 +278427,7 @@ FUN_080df3f0:
     lsls r1,r1,#0x2    @ 080df486 8900
     add r1,r10                               @ 080df488 5144
     ldr r0,[r1,#0x0]                         @ 080df48a 0868
-    ldr r3, DAT_080df528                     @ 080df48c 264b
+    ldr r3, PTR_game_str_ja_080df528         @ 080df48c 264b
     adds r7,r0,r3    @ 080df48e c718
     movs r2,#0x84    @ 080df490 8422
     lsls r2,r2,#0x1    @ 080df492 5200
@@ -278465,7 +278465,7 @@ FUN_080df3f0:
     .hword 0x46d1    @ 080df4d8 d146
     .hword 0x46c2    @ 080df4da c246
     ldr r6, DAT_080df534                     @ 080df4dc 154e
-    ldr r0, DAT_080df528                     @ 080df4de 1248
+    ldr r0, PTR_game_str_ja_080df528         @ 080df4de 1248
     .hword 0x4680    @ 080df4e0 8046
 LAB_080df4e2:
     ldr r0, DAT_080df538                     @ 080df4e2 1548
@@ -278496,14 +278496,14 @@ DAT_080df514:
     .word  0x09e5f854                     @ 080df514 54f8e509
 DAT_080df518:
     .word  0x00001390                     @ 080df518 90130000
-DAT_080df51c:
-    .word  0x08000f40                     @ 080df51c 400f0008
+PTR_game_str_pointer_table_080df51c:
+    .word  game_str_pointer_table         @ 080df51c 400f0008
 DAT_080df520:
     .word  0x02000000                     @ 080df520 00000002
 DAT_080df524:
     .word  0x00006c2c                     @ 080df524 2c6c0000
-DAT_080df528:
-    .word  0x09db9c10                     @ 080df528 109cdb09
+PTR_game_str_ja_080df528:
+    .word  game_str_ja                    @ 080df528 109cdb09
 DAT_080df52c:
     .word  0x00000107                     @ 080df52c 07010000
 DAT_080df530:
@@ -280474,7 +280474,7 @@ LAB_080e0492:
     ldr r4, DAT_080e04f4                     @ 080e049e 154c
     ldr r0, DAT_080e04f8                     @ 080e04a0 1548
     bl FUN_080f4e18                          @ 080e04a2 14f0b9fc
-    ldr r2, DAT_080e04fc                     @ 080e04a6 154a
+    ldr r2, PTR_game_str_pointer_table_080e04fc @ 080e04a6 154a
     lsls r0,r0,#0x10    @ 080e04a8 0004
     lsrs r0,r0,#0x10    @ 080e04aa 000c
     lsls r1,r0,#0x1    @ 080e04ac 4100
@@ -280490,7 +280490,7 @@ LAB_080e0492:
     lsls r1,r1,#0x2    @ 080e04c0 8900
     adds r1,r1,r2    @ 080e04c2 8918
     ldr r2,[r1,#0x0]                         @ 080e04c4 0a68
-    ldr r0, DAT_080e0508                     @ 080e04c6 1048
+    ldr r0, PTR_game_str_ja_080e0508         @ 080e04c6 1048
     adds r2,r2,r0    @ 080e04c8 1218
     ldr r0, DAT_080e050c                     @ 080e04ca 1048
     movs r1,#0x0    @ 080e04cc 0021
@@ -280515,14 +280515,14 @@ DAT_080e04f4:
     .word  0x03005850                     @ 080e04f4 50580003
 DAT_080e04f8:
     .word  0x0000138a                     @ 080e04f8 8a130000
-DAT_080e04fc:
-    .word  0x08000f40                     @ 080e04fc 400f0008
+PTR_game_str_pointer_table_080e04fc:
+    .word  game_str_pointer_table         @ 080e04fc 400f0008
 DAT_080e0500:
     .word  0x02000000                     @ 080e0500 00000002
 DAT_080e0504:
     .word  0x00006c2c                     @ 080e0504 2c6c0000
-DAT_080e0508:
-    .word  0x09db9c10                     @ 080e0508 109cdb09
+PTR_game_str_ja_080e0508:
+    .word  game_str_ja                    @ 080e0508 109cdb09
 DAT_080e050c:
     .word  0x0014001e                     @ 080e050c 1e001400
 FUN_080e0510:
@@ -280833,7 +280833,7 @@ FUN_080e0758:
     adds r7,#0xc    @ 080e0764 0c37
     ldr r0, DAT_080e07c4                     @ 080e0766 1748
     bl FUN_080f4e18                          @ 080e0768 14f056fb
-    ldr r6, DAT_080e07c8                     @ 080e076c 164e
+    ldr r6, PTR_game_str_pointer_table_080e07c8 @ 080e076c 164e
     lsls r0,r0,#0x10    @ 080e076e 0004
     lsrs r0,r0,#0x10    @ 080e0770 000c
     lsls r1,r0,#0x1    @ 080e0772 4100
@@ -280849,7 +280849,7 @@ FUN_080e0758:
     lsls r1,r1,#0x2    @ 080e0786 8900
     adds r1,r1,r6    @ 080e0788 8919
     ldr r0,[r1,#0x0]                         @ 080e078a 0868
-    ldr r5, DAT_080e07d4                     @ 080e078c 114d
+    ldr r5, PTR_game_str_ja_080e07d4         @ 080e078c 114d
     adds r2,r0,r5    @ 080e078e 4219
     ldrh r1,[r7,#0x1a]                       @ 080e0790 798b
     movs r0,#0x1    @ 080e0792 0120
@@ -280878,14 +280878,14 @@ DAT_080e07c0:
     .word  0x03005850                     @ 080e07c0 50580003
 DAT_080e07c4:
     .word  0x0000138a                     @ 080e07c4 8a130000
-DAT_080e07c8:
-    .word  0x08000f40                     @ 080e07c8 400f0008
+PTR_game_str_pointer_table_080e07c8:
+    .word  game_str_pointer_table         @ 080e07c8 400f0008
 DAT_080e07cc:
     .word  0x02000000                     @ 080e07cc 00000002
 DAT_080e07d0:
     .word  0x00006c2c                     @ 080e07d0 2c6c0000
-DAT_080e07d4:
-    .word  0x09db9c10                     @ 080e07d4 109cdb09
+PTR_game_str_ja_080e07d4:
+    .word  game_str_ja                    @ 080e07d4 109cdb09
 DAT_080e07d8:
     .word  0x0000138b                     @ 080e07d8 8b130000
 LAB_080e07dc:
@@ -280994,7 +280994,7 @@ FUN_080e08a4:
     adds r5,#0xc    @ 080e08ac 0c35
     ldr r0, DAT_080e091c                     @ 080e08ae 1b48
     bl FUN_080f4e18                          @ 080e08b0 14f0b2fa
-    ldr r2, DAT_080e0920                     @ 080e08b4 1a4a
+    ldr r2, PTR_game_str_pointer_table_080e0920 @ 080e08b4 1a4a
     lsls r0,r0,#0x10    @ 080e08b6 0004
     lsrs r0,r0,#0x10    @ 080e08b8 000c
     lsls r1,r0,#0x1    @ 080e08ba 4100
@@ -281010,7 +281010,7 @@ FUN_080e08a4:
     lsls r1,r1,#0x2    @ 080e08ce 8900
     adds r1,r1,r2    @ 080e08d0 8918
     ldr r1,[r1,#0x0]                         @ 080e08d2 0968
-    ldr r0, DAT_080e092c                     @ 080e08d4 1548
+    ldr r0, PTR_game_str_ja_080e092c         @ 080e08d4 1548
     adds r1,r1,r0    @ 080e08d6 0918
     ldr r4, DAT_080e0930                     @ 080e08d8 154c
     ldr r2,[r5,#0x1c]                        @ 080e08da ea69
@@ -281045,14 +281045,14 @@ DAT_080e0918:
     .word  0x03005850                     @ 080e0918 50580003
 DAT_080e091c:
     .word  0x0000138c                     @ 080e091c 8c130000
-DAT_080e0920:
-    .word  0x08000f40                     @ 080e0920 400f0008
+PTR_game_str_pointer_table_080e0920:
+    .word  game_str_pointer_table         @ 080e0920 400f0008
 DAT_080e0924:
     .word  0x02000000                     @ 080e0924 00000002
 DAT_080e0928:
     .word  0x00006c2c                     @ 080e0928 2c6c0000
-DAT_080e092c:
-    .word  0x09db9c10                     @ 080e092c 109cdb09
+PTR_game_str_ja_080e092c:
+    .word  game_str_ja                    @ 080e092c 109cdb09
 DAT_080e0930:
     .word  0x02035eb0                     @ 080e0930 b05e0302
 DAT_080e0934:
@@ -281689,7 +281689,7 @@ LAB_080e0dd4:
     ldr r5, DAT_080e0ef0                     @ 080e0e42 2b4d
     ldr r0, DAT_080e0ef4                     @ 080e0e44 2b48
     bl FUN_080f4e18                          @ 080e0e46 13f0e7ff
-    ldr r3, DAT_080e0ef8                     @ 080e0e4a 2b4b
+    ldr r3, PTR_game_str_pointer_table_080e0ef8 @ 080e0e4a 2b4b
     lsls r0,r0,#0x10    @ 080e0e4c 0004
     lsrs r0,r0,#0x10    @ 080e0e4e 000c
     lsls r2,r0,#0x1    @ 080e0e50 4200
@@ -281704,7 +281704,7 @@ LAB_080e0dd4:
     lsls r2,r2,#0x2    @ 080e0e62 9200
     adds r2,r2,r3    @ 080e0e64 d218
     ldr r4,[r2,#0x0]                         @ 080e0e66 1468
-    ldr r0, DAT_080e0f00                     @ 080e0e68 2548
+    ldr r0, PTR_game_str_ja_080e0f00         @ 080e0e68 2548
     adds r4,r4,r0    @ 080e0e6a 2418
     .hword 0x464a    @ 080e0e6c 4a46
     ldrh r0,[r2,#0x18]                       @ 080e0e6e 108b
@@ -281774,12 +281774,12 @@ DAT_080e0ef0:
     .word  0x02035eb0                     @ 080e0ef0 b05e0302
 DAT_080e0ef4:
     .word  0x0000138e                     @ 080e0ef4 8e130000
-DAT_080e0ef8:
-    .word  0x08000f40                     @ 080e0ef8 400f0008
+PTR_game_str_pointer_table_080e0ef8:
+    .word  game_str_pointer_table         @ 080e0ef8 400f0008
 DAT_080e0efc:
     .word  0x00006c26                     @ 080e0efc 266c0000
-DAT_080e0f00:
-    .word  0x09db9c10                     @ 080e0f00 109cdb09
+PTR_game_str_ja_080e0f00:
+    .word  game_str_ja                    @ 080e0f00 109cdb09
 DAT_080e0f04:
     .word  0x0014001e                     @ 080e0f04 1e001400
 FUN_080e0f08:
@@ -288552,7 +288552,7 @@ FUN_080e5740:
     .hword 0x4680    @ 080e57a4 8046
     .hword 0x4650    @ 080e57a6 5046
     bl FUN_080f4e18                          @ 080e57a8 0ff036fb
-    ldr r1, DAT_080e5834                     @ 080e57ac 2149
+    ldr r1, PTR_game_str_pointer_table_080e5834 @ 080e57ac 2149
     .hword 0x4689    @ 080e57ae 8946
     lsls r0,r0,#0x10    @ 080e57b0 0004
     lsrs r0,r0,#0x10    @ 080e57b2 000c
@@ -288566,7 +288566,7 @@ FUN_080e5740:
     lsls r1,r1,#0x2    @ 080e57c2 8900
     add r1,r9                                @ 080e57c4 4944
     ldr r3,[r1,#0x0]                         @ 080e57c6 0b68
-    ldr r6, DAT_080e5838                     @ 080e57c8 1b4e
+    ldr r6, PTR_game_str_ja_080e5838         @ 080e57c8 1b4e
     adds r3,r3,r6    @ 080e57ca 9b19
     movs r0,#0x3    @ 080e57cc 0320
     movs r1,#0x1    @ 080e57ce 0121
@@ -288616,10 +288616,10 @@ DAT_080e582c:
     .word  0x09e5f854                     @ 080e582c 54f8e509
 DAT_080e5830:
     .word  0x00008001                     @ 080e5830 01800000
-DAT_080e5834:
-    .word  0x08000f40                     @ 080e5834 400f0008
-DAT_080e5838:
-    .word  0x09db9c10                     @ 080e5838 109cdb09
+PTR_game_str_pointer_table_080e5834:
+    .word  game_str_pointer_table         @ 080e5834 400f0008
+PTR_game_str_ja_080e5838:
+    .word  game_str_ja                    @ 080e5838 109cdb09
 FUN_080e583c:
     push {r4,r5,r6,r7,lr}                    @ 080e583c f0b5
     adds r6,r2,#0x0    @ 080e583e 161c
@@ -288731,7 +288731,7 @@ FUN_080e58a8:
     .hword 0x4680    @ 080e590c 8046
     .hword 0x4650    @ 080e590e 5046
     bl FUN_080f4e18                          @ 080e5910 0ff082fa
-    ldr r1, DAT_080e599c                     @ 080e5914 2149
+    ldr r1, PTR_game_str_pointer_table_080e599c @ 080e5914 2149
     .hword 0x4689    @ 080e5916 8946
     lsls r0,r0,#0x10    @ 080e5918 0004
     lsrs r0,r0,#0x10    @ 080e591a 000c
@@ -288745,7 +288745,7 @@ FUN_080e58a8:
     lsls r1,r1,#0x2    @ 080e592a 8900
     add r1,r9                                @ 080e592c 4944
     ldr r3,[r1,#0x0]                         @ 080e592e 0b68
-    ldr r6, DAT_080e59a0                     @ 080e5930 1b4e
+    ldr r6, PTR_game_str_ja_080e59a0         @ 080e5930 1b4e
     adds r3,r3,r6    @ 080e5932 9b19
     movs r0,#0xe    @ 080e5934 0e20
     movs r1,#0x1    @ 080e5936 0121
@@ -288795,10 +288795,10 @@ DAT_080e5994:
     .word  0x09e5f854                     @ 080e5994 54f8e509
 DAT_080e5998:
     .word  0x00008001                     @ 080e5998 01800000
-DAT_080e599c:
-    .word  0x08000f40                     @ 080e599c 400f0008
-DAT_080e59a0:
-    .word  0x09db9c10                     @ 080e59a0 109cdb09
+PTR_game_str_pointer_table_080e599c:
+    .word  game_str_pointer_table         @ 080e599c 400f0008
+PTR_game_str_ja_080e59a0:
+    .word  game_str_ja                    @ 080e59a0 109cdb09
 FUN_080e59a4:
     push {r4,r5,r6,r7,lr}                    @ 080e59a4 f0b5
     adds r6,r3,#0x0    @ 080e59a6 1e1c
@@ -288981,7 +288981,7 @@ LAB_080e5ae2:
     adds r0,r0,r1    @ 080e5b06 4018
     ldrh r0,[r0,#0x0]                        @ 080e5b08 0088
     bl FUN_080f4e18                          @ 080e5b0a 0ff085f9
-    ldr r2, DAT_080e5b7c                     @ 080e5b0e 1b4a
+    ldr r2, PTR_game_str_pointer_table_080e5b7c @ 080e5b0e 1b4a
     lsls r0,r0,#0x10    @ 080e5b10 0004
     lsrs r0,r0,#0x10    @ 080e5b12 000c
     lsls r1,r0,#0x1    @ 080e5b14 4100
@@ -288998,7 +288998,7 @@ LAB_080e5ae2:
     lsls r1,r1,#0x2    @ 080e5b2a 8900
     adds r1,r1,r2    @ 080e5b2c 8918
     ldr r1,[r1,#0x0]                         @ 080e5b2e 0968
-    ldr r6, DAT_080e5b88                     @ 080e5b30 154e
+    ldr r6, PTR_game_str_ja_080e5b88         @ 080e5b30 154e
     adds r1,r1,r6    @ 080e5b32 8919
     .hword 0x4668    @ 080e5b34 6846
     bl FUN_080f51ac                          @ 080e5b36 0ff039fb
@@ -289034,14 +289034,14 @@ DAT_080e5b74:
     .word  0xfffffe00                     @ 080e5b74 00feffff
 DAT_080e5b78:
     .word  0x02029590                     @ 080e5b78 90950202
-DAT_080e5b7c:
-    .word  0x08000f40                     @ 080e5b7c 400f0008
+PTR_game_str_pointer_table_080e5b7c:
+    .word  game_str_pointer_table         @ 080e5b7c 400f0008
 DAT_080e5b80:
     .word  0x02000000                     @ 080e5b80 00000002
 DAT_080e5b84:
     .word  0x00006c2c                     @ 080e5b84 2c6c0000
-DAT_080e5b88:
-    .word  0x09db9c10                     @ 080e5b88 109cdb09
+PTR_game_str_ja_080e5b88:
+    .word  game_str_ja                    @ 080e5b88 109cdb09
 DAT_080e5b8c:
     .word  0x00004774                     @ 080e5b8c 74470000
 DAT_080e5b90:
@@ -289300,7 +289300,7 @@ LAB_080e5d68:
     movs r0,#0xc2    @ 080e5d68 c220
     lsls r0,r0,#0x4    @ 080e5d6a 0001
     bl FUN_080f4e18                          @ 080e5d6c 0ff054f8
-    ldr r2, DAT_080e5dac                     @ 080e5d70 0e4a
+    ldr r2, PTR_game_str_pointer_table_080e5dac @ 080e5d70 0e4a
     lsls r0,r0,#0x10    @ 080e5d72 0004
     lsrs r0,r0,#0x10    @ 080e5d74 000c
     lsls r1,r0,#0x1    @ 080e5d76 4100
@@ -289315,7 +289315,7 @@ LAB_080e5d68:
     lsls r1,r1,#0x2    @ 080e5d88 8900
     adds r1,r1,r2    @ 080e5d8a 8918
     ldr r1,[r1,#0x0]                         @ 080e5d8c 0968
-    ldr r0, DAT_080e5db4                     @ 080e5d8e 0948
+    ldr r0, PTR_game_str_ja_080e5db4         @ 080e5d8e 0948
     adds r1,r1,r0    @ 080e5d90 0918
     ldrb r4,[r4,#0x0]                        @ 080e5d92 2478
     adds r0,r4,r5    @ 080e5d94 6019
@@ -289329,12 +289329,12 @@ LAB_080e5d68:
     bl FUN_080f5228                          @ 080e5da4 0ff040fa
     b LAB_080e5ee4                           @ 080e5da8 9ce0
     .byte  0x00, 0x00
-DAT_080e5dac:
-    .word  0x08000f40                     @ 080e5dac 400f0008
+PTR_game_str_pointer_table_080e5dac:
+    .word  game_str_pointer_table         @ 080e5dac 400f0008
 DAT_080e5db0:
     .word  0x00006c2c                     @ 080e5db0 2c6c0000
-DAT_080e5db4:
-    .word  0x09db9c10                     @ 080e5db4 109cdb09
+PTR_game_str_ja_080e5db4:
+    .word  game_str_ja                    @ 080e5db4 109cdb09
 DAT_080e5db8:
     .word  0x00006c3c                     @ 080e5db8 3c6c0000
 LAB_080e5dbc:
@@ -289444,7 +289444,7 @@ LAB_080e5e94:
     ldr r1, DAT_080e5f28                     @ 080e5ea0 2149
     adds r0,r0,r1    @ 080e5ea2 4018
     bl FUN_080f4e18                          @ 080e5ea4 0ef0b8ff
-    ldr r3, DAT_080e5f2c                     @ 080e5ea8 204b
+    ldr r3, PTR_game_str_pointer_table_080e5f2c @ 080e5ea8 204b
     lsls r0,r0,#0x10    @ 080e5eaa 0004
     lsrs r0,r0,#0x10    @ 080e5eac 000c
     lsls r1,r0,#0x1    @ 080e5eae 4100
@@ -289460,7 +289460,7 @@ LAB_080e5e94:
     lsls r1,r1,#0x2    @ 080e5ec2 8900
     adds r1,r1,r3    @ 080e5ec4 c918
     ldr r1,[r1,#0x0]                         @ 080e5ec6 0968
-    ldr r0, DAT_080e5f38                     @ 080e5ec8 1b48
+    ldr r0, PTR_game_str_ja_080e5f38         @ 080e5ec8 1b48
     adds r1,r1,r0    @ 080e5eca 0918
     adds r4,#0x31    @ 080e5ecc 3134
     ldrb r4,[r4,#0x0]                        @ 080e5ece 2478
@@ -289508,14 +289508,14 @@ DAT_080e5f24:
     .word  0x02029590                     @ 080e5f24 90950202
 DAT_080e5f28:
     .word  0x00000c1c                     @ 080e5f28 1c0c0000
-DAT_080e5f2c:
-    .word  0x08000f40                     @ 080e5f2c 400f0008
+PTR_game_str_pointer_table_080e5f2c:
+    .word  game_str_pointer_table         @ 080e5f2c 400f0008
 DAT_080e5f30:
     .word  0x02000000                     @ 080e5f30 00000002
 DAT_080e5f34:
     .word  0x00006c2c                     @ 080e5f34 2c6c0000
-DAT_080e5f38:
-    .word  0x09db9c10                     @ 080e5f38 109cdb09
+PTR_game_str_ja_080e5f38:
+    .word  game_str_ja                    @ 080e5f38 109cdb09
 DAT_080e5f3c:
     .word  0x00006c3c                     @ 080e5f3c 3c6c0000
 DAT_080e5f40:
@@ -289744,7 +289744,7 @@ FUN_080e609c:
     lsls r1,r1,#0x2    @ 080e60f4 8900
     adds r0,r0,r1    @ 080e60f6 4018
     bl FUN_080f4e18                          @ 080e60f8 0ef08efe
-    ldr r2, DAT_080e616c                     @ 080e60fc 1b4a
+    ldr r2, PTR_game_str_pointer_table_080e616c @ 080e60fc 1b4a
     lsls r0,r0,#0x10    @ 080e60fe 0004
     lsrs r0,r0,#0x10    @ 080e6100 000c
     lsls r1,r0,#0x1    @ 080e6102 4100
@@ -289757,7 +289757,7 @@ FUN_080e609c:
     lsls r1,r1,#0x2    @ 080e6110 8900
     adds r1,r1,r2    @ 080e6112 8918
     ldr r1,[r1,#0x0]                         @ 080e6114 0968
-    ldr r5, DAT_080e6170                     @ 080e6116 164d
+    ldr r5, PTR_game_str_ja_080e6170         @ 080e6116 164d
     adds r1,r1,r5    @ 080e6118 4919
     .hword 0x4668    @ 080e611a 6846
     bl FUN_080f51ac                          @ 080e611c 0ff046f8
@@ -289798,10 +289798,10 @@ DAT_080e6164:
     .word  0x09e5f854                     @ 080e6164 54f8e509
 DAT_080e6168:
     .word  0x02029590                     @ 080e6168 90950202
-DAT_080e616c:
-    .word  0x08000f40                     @ 080e616c 400f0008
-DAT_080e6170:
-    .word  0x09db9c10                     @ 080e6170 109cdb09
+PTR_game_str_pointer_table_080e616c:
+    .word  game_str_pointer_table         @ 080e616c 400f0008
+PTR_game_str_ja_080e6170:
+    .word  game_str_ja                    @ 080e6170 109cdb09
 DAT_080e6174:
     .word  0x00004774                     @ 080e6174 74470000
 DAT_080e6178:
@@ -301573,7 +301573,7 @@ LAB_080ebdd2:
     movs r1,#0xc    @ 080ebde6 0c21
     bl FUN_080f0bb4                          @ 080ebde8 04f0e4fe
     movs r6,#0x0    @ 080ebdec 0026
-    ldr r3, DAT_080ebe80                     @ 080ebdee 244b
+    ldr r3, PTR_game_str_pointer_table_080ebe80 @ 080ebdee 244b
     .hword 0x469a    @ 080ebdf0 9a46
     ldr r0, PTR_gSettings_080ebe84           @ 080ebdf2 2448
     .hword 0x4681    @ 080ebdf4 8146
@@ -301598,7 +301598,7 @@ LAB_080ebdfc:
     lsls r1,r1,#0x2    @ 080ebe1a 8900
     add r1,r10                               @ 080ebe1c 5144
     ldr r4,[r1,#0x0]                         @ 080ebe1e 0c68
-    ldr r0, DAT_080ebe88                     @ 080ebe20 1948
+    ldr r0, PTR_game_str_ja_080ebe88         @ 080ebe20 1948
     adds r4,r4,r0    @ 080ebe22 2418
     adds r0,r4,#0x0    @ 080ebe24 201c
     bl FUN_080f54e0                          @ 080ebe26 09f05bfb
@@ -301642,12 +301642,12 @@ DAT_080ebe78:
     .word  0x09dcad60                     @ 080ebe78 60addc09
 DAT_080ebe7c:
     .word  0x06010040                     @ 080ebe7c 40000106
-DAT_080ebe80:
-    .word  0x08000f40                     @ 080ebe80 400f0008
+PTR_game_str_pointer_table_080ebe80:
+    .word  game_str_pointer_table         @ 080ebe80 400f0008
 PTR_gSettings_080ebe84:
     .word  gSettings                      @ 080ebe84 2c6c0002
-DAT_080ebe88:
-    .word  0x09db9c10                     @ 080ebe88 109cdb09
+PTR_game_str_ja_080ebe88:
+    .word  game_str_ja                    @ 080ebe88 109cdb09
 DAT_080ebe8c:
     .word  0x06010a00                     @ 080ebe8c 000a0106
 PTR_gPrng_080ebe90:
@@ -305012,7 +305012,7 @@ FUN_080eec54:
     bne LAB_080eeca0                         @ 080eec5e 1fd1
     adds r0,r1,#0x0    @ 080eec60 081c
     bl FUN_080f4e18                          @ 080eec62 06f0d9f8
-    ldr r2, DAT_080eec90                     @ 080eec66 0a4a
+    ldr r2, PTR_game_str_pointer_table_080eec90 @ 080eec66 0a4a
     lsls r0,r0,#0x10    @ 080eec68 0004
     lsrs r0,r0,#0x10    @ 080eec6a 000c
     lsls r1,r0,#0x1    @ 080eec6c 4100
@@ -305028,19 +305028,19 @@ FUN_080eec54:
     lsls r1,r1,#0x2    @ 080eec80 8900
     adds r1,r1,r2    @ 080eec82 8918
     ldr r0,[r1,#0x0]                         @ 080eec84 0868
-    ldr r1, DAT_080eec9c                     @ 080eec86 0549
+    ldr r1, PTR_game_str_ja_080eec9c         @ 080eec86 0549
     adds r0,r0,r1    @ 080eec88 4018
     b LAB_080eeca2                           @ 080eec8a 0ae0
 DAT_080eec8c:
     .word  0xfffe0000                     @ 080eec8c 0000feff
-DAT_080eec90:
-    .word  0x08000f40                     @ 080eec90 400f0008
+PTR_game_str_pointer_table_080eec90:
+    .word  game_str_pointer_table         @ 080eec90 400f0008
 DAT_080eec94:
     .word  0x02000000                     @ 080eec94 00000002
 DAT_080eec98:
     .word  0x00006c2c                     @ 080eec98 2c6c0000
-DAT_080eec9c:
-    .word  0x09db9c10                     @ 080eec9c 109cdb09
+PTR_game_str_ja_080eec9c:
+    .word  game_str_ja                    @ 080eec9c 109cdb09
 LAB_080eeca0:
     adds r0,r1,#0x0    @ 080eeca0 081c
 LAB_080eeca2:
@@ -305055,7 +305055,7 @@ FUN_080eeca8:
     lsls r1,r1,#0x1    @ 080eecb0 4900
     adds r0,r0,r1    @ 080eecb2 4018
     bl FUN_080f4e18                          @ 080eecb4 06f0b0f8
-    ldr r2, DAT_080eece0                     @ 080eecb8 094a
+    ldr r2, PTR_game_str_pointer_table_080eece0 @ 080eecb8 094a
     lsls r0,r0,#0x10    @ 080eecba 0004
     lsrs r0,r0,#0x10    @ 080eecbc 000c
     lsls r1,r0,#0x1    @ 080eecbe 4100
@@ -305071,18 +305071,18 @@ FUN_080eeca8:
     lsls r1,r1,#0x2    @ 080eecd2 8900
     adds r1,r1,r2    @ 080eecd4 8918
     ldr r0,[r1,#0x0]                         @ 080eecd6 0868
-    ldr r1, DAT_080eecec                     @ 080eecd8 0449
+    ldr r1, PTR_game_str_ja_080eecec         @ 080eecd8 0449
     adds r0,r0,r1    @ 080eecda 4018
     b LAB_080eecf2                           @ 080eecdc 09e0
     .byte  0x00, 0x00
-DAT_080eece0:
-    .word  0x08000f40                     @ 080eece0 400f0008
+PTR_game_str_pointer_table_080eece0:
+    .word  game_str_pointer_table         @ 080eece0 400f0008
 DAT_080eece4:
     .word  0x02000000                     @ 080eece4 00000002
 DAT_080eece8:
     .word  0x00006c2c                     @ 080eece8 2c6c0000
-DAT_080eecec:
-    .word  0x09db9c10                     @ 080eecec 109cdb09
+PTR_game_str_ja_080eecec:
+    .word  game_str_ja                    @ 080eecec 109cdb09
 LAB_080eecf0:
     ldr r0, DAT_080eecf8                     @ 080eecf0 0148
 LAB_080eecf2:
@@ -305099,7 +305099,7 @@ FUN_080eed50:
     ldr r1, DAT_080eed84                     @ 080eed56 0b49
     adds r0,r0,r1    @ 080eed58 4018
     bl FUN_080f4e18                          @ 080eed5a 06f05df8
-    ldr r2, DAT_080eed88                     @ 080eed5e 0a4a
+    ldr r2, PTR_game_str_pointer_table_080eed88 @ 080eed5e 0a4a
     lsls r0,r0,#0x10    @ 080eed60 0004
     lsrs r0,r0,#0x10    @ 080eed62 000c
     lsls r1,r0,#0x1    @ 080eed64 4100
@@ -305115,19 +305115,19 @@ FUN_080eed50:
     lsls r1,r1,#0x2    @ 080eed78 8900
     adds r1,r1,r2    @ 080eed7a 8918
     ldr r0,[r1,#0x0]                         @ 080eed7c 0868
-    ldr r1, DAT_080eed94                     @ 080eed7e 0549
+    ldr r1, PTR_game_str_ja_080eed94         @ 080eed7e 0549
     adds r0,r0,r1    @ 080eed80 4018
     b LAB_080eed9a                           @ 080eed82 0ae0
 DAT_080eed84:
     .word  0x00000212                     @ 080eed84 12020000
-DAT_080eed88:
-    .word  0x08000f40                     @ 080eed88 400f0008
+PTR_game_str_pointer_table_080eed88:
+    .word  game_str_pointer_table         @ 080eed88 400f0008
 DAT_080eed8c:
     .word  0x02000000                     @ 080eed8c 00000002
 DAT_080eed90:
     .word  0x00006c2c                     @ 080eed90 2c6c0000
-DAT_080eed94:
-    .word  0x09db9c10                     @ 080eed94 109cdb09
+PTR_game_str_ja_080eed94:
+    .word  game_str_ja                    @ 080eed94 109cdb09
 LAB_080eed98:
     ldr r0, DAT_080eeda0                     @ 080eed98 0148
 LAB_080eed9a:
@@ -315212,7 +315212,7 @@ LAB_080f4496:
     strb r0,[r5,#0x17]                       @ 080f44c0 e875
     ldr r0, DAT_080f454c                     @ 080f44c2 2248
     bl FUN_080f4e18                          @ 080f44c4 00f0a8fc
-    ldr r2, DAT_080f4550                     @ 080f44c8 214a
+    ldr r2, PTR_game_str_pointer_table_080f4550 @ 080f44c8 214a
     lsls r0,r0,#0x10    @ 080f44ca 0004
     lsrs r0,r0,#0x10    @ 080f44cc 000c
     lsls r1,r0,#0x1    @ 080f44ce 4100
@@ -315225,7 +315225,7 @@ LAB_080f4496:
     lsls r1,r1,#0x2    @ 080f44dc 8900
     adds r1,r1,r2    @ 080f44de 8918
     ldr r1,[r1,#0x0]                         @ 080f44e0 0968
-    ldr r0, DAT_080f4554                     @ 080f44e2 1c48
+    ldr r0, PTR_game_str_ja_080f4554         @ 080f44e2 1c48
     adds r1,r1,r0    @ 080f44e4 0918
     adds r0,r5,#0x0    @ 080f44e6 281c
     movs r2,#0x16    @ 080f44e8 1622
@@ -315278,10 +315278,10 @@ DAT_080f4548:
     .word  0x000059dc                     @ 080f4548 dc590000
 DAT_080f454c:
     .word  0x000005e6                     @ 080f454c e6050000
-DAT_080f4550:
-    .word  0x08000f40                     @ 080f4550 400f0008
-DAT_080f4554:
-    .word  0x09db9c10                     @ 080f4554 109cdb09
+PTR_game_str_pointer_table_080f4550:
+    .word  game_str_pointer_table         @ 080f4550 400f0008
+PTR_game_str_ja_080f4554:
+    .word  game_str_ja                    @ 080f4554 109cdb09
 PTR_file_starter_deck_start_080f4558:
     .word  file_starter_deck_start        @ 080f4558 84f8e509
 DAT_080f455c:
@@ -326640,7 +326640,7 @@ FUN_080fbb60:
     adds r4,r4,r2    @ 080fbba0 a418
     adds r0,r4,#0x0    @ 080fbba2 201c
     bl FUN_080f4e18                          @ 080fbba4 f9f738f9
-    ldr r2, DAT_080fbc6c                     @ 080fbba8 304a
+    ldr r2, PTR_game_str_pointer_table_080fbc6c @ 080fbba8 304a
     lsls r0,r0,#0x10    @ 080fbbaa 0004
     lsrs r0,r0,#0x10    @ 080fbbac 000c
     lsls r1,r0,#0x1    @ 080fbbae 4100
@@ -326653,7 +326653,7 @@ FUN_080fbb60:
     lsls r1,r1,#0x2    @ 080fbbbc 8900
     adds r1,r1,r2    @ 080fbbbe 8918
     ldr r1,[r1,#0x0]                         @ 080fbbc0 0968
-    ldr r0, DAT_080fbc70                     @ 080fbbc2 2b48
+    ldr r0, PTR_game_str_ja_080fbc70         @ 080fbbc2 2b48
     adds r1,r1,r0    @ 080fbbc4 0918
     .hword 0x4648    @ 080fbbc6 4846
     movs r2,#0x16    @ 080fbbc8 1622
@@ -326738,10 +326738,10 @@ DAT_080fbc64:
     .word  0x00005af4                     @ 080fbc64 f45a0000
 DAT_080fbc68:
     .word  0x000005e7                     @ 080fbc68 e7050000
-DAT_080fbc6c:
-    .word  0x08000f40                     @ 080fbc6c 400f0008
-DAT_080fbc70:
-    .word  0x09db9c10                     @ 080fbc70 109cdb09
+PTR_game_str_pointer_table_080fbc6c:
+    .word  game_str_pointer_table         @ 080fbc6c 400f0008
+PTR_game_str_ja_080fbc70:
+    .word  game_str_ja                    @ 080fbc70 109cdb09
 DAT_080fbc74:
     .word  0x02001368                     @ 080fbc74 68130002
 DAT_080fbc78:
@@ -329017,7 +329017,7 @@ LAB_080fe05a:
     ldr r2, DAT_080fe0c4                     @ 080fe094 0b4a
     adds r0,r0,r2    @ 080fe096 8018
     bl FUN_080f4e18                          @ 080fe098 f6f7befe
-    ldr r2, DAT_080fe0c8                     @ 080fe09c 0a4a
+    ldr r2, PTR_game_str_pointer_table_080fe0c8 @ 080fe09c 0a4a
     lsls r0,r0,#0x10    @ 080fe09e 0004
     lsrs r0,r0,#0x10    @ 080fe0a0 000c
     lsls r1,r0,#0x1    @ 080fe0a2 4100
@@ -329030,7 +329030,7 @@ LAB_080fe05a:
     lsls r1,r1,#0x2    @ 080fe0b0 8900
     adds r1,r1,r2    @ 080fe0b2 8918
     ldr r1,[r1,#0x0]                         @ 080fe0b4 0968
-    ldr r0, DAT_080fe0cc                     @ 080fe0b6 0548
+    ldr r0, PTR_game_str_ja_080fe0cc         @ 080fe0b6 0548
     adds r6,r1,r0    @ 080fe0b8 0e18
     b LAB_080fe0e2                           @ 080fe0ba 12e0
 DAT_080fe0bc:
@@ -329039,10 +329039,10 @@ DAT_080fe0c0:
     .word  0x00006c2c                     @ 080fe0c0 2c6c0000
 DAT_080fe0c4:
     .word  0x00001069                     @ 080fe0c4 69100000
-DAT_080fe0c8:
-    .word  0x08000f40                     @ 080fe0c8 400f0008
-DAT_080fe0cc:
-    .word  0x09db9c10                     @ 080fe0cc 109cdb09
+PTR_game_str_pointer_table_080fe0c8:
+    .word  game_str_pointer_table         @ 080fe0c8 400f0008
+PTR_game_str_ja_080fe0cc:
+    .word  game_str_ja                    @ 080fe0cc 109cdb09
 LAB_080fe0d0:
     lsls r0,r1,#0x7    @ 080fe0d0 c801
     adds r0,r0,r1    @ 080fe0d2 4018
@@ -334777,7 +334777,7 @@ LAB_08100d7e:
     bne LAB_08100e1c                         @ 08100dca 27d1
     ldr r0, DAT_08100e10                     @ 08100dcc 1048
     bl FUN_080f4e18                          @ 08100dce f4f723f8
-    ldr r2, DAT_08100e14                     @ 08100dd2 104a
+    ldr r2, PTR_game_str_pointer_table_08100e14 @ 08100dd2 104a
     lsls r0,r0,#0x10    @ 08100dd4 0004
     lsrs r0,r0,#0x10    @ 08100dd6 000c
     lsls r1,r0,#0x1    @ 08100dd8 4100
@@ -334790,7 +334790,7 @@ LAB_08100d7e:
     lsls r1,r1,#0x2    @ 08100de6 8900
     adds r1,r1,r2    @ 08100de8 8918
     ldr r1,[r1,#0x0]                         @ 08100dea 0968
-    ldr r0, DAT_08100e18                     @ 08100dec 0a48
+    ldr r0, PTR_game_str_ja_08100e18         @ 08100dec 0a48
     adds r5,r1,r0    @ 08100dee 0d18
     b LAB_08100e9e                           @ 08100df0 55e0
     .byte  0x00, 0x00
@@ -334810,10 +334810,10 @@ DAT_08100e0c:
     .word  0x09e5f854                     @ 08100e0c 54f8e509
 DAT_08100e10:
     .word  0x000006c1                     @ 08100e10 c1060000
-DAT_08100e14:
-    .word  0x08000f40                     @ 08100e14 400f0008
-DAT_08100e18:
-    .word  0x09db9c10                     @ 08100e18 109cdb09
+PTR_game_str_pointer_table_08100e14:
+    .word  game_str_pointer_table         @ 08100e14 400f0008
+PTR_game_str_ja_08100e18:
+    .word  game_str_ja                    @ 08100e18 109cdb09
 LAB_08100e1c:
     cmp r5,#0x0                              @ 08100e1c 002d
     bge LAB_08100e48                         @ 08100e1e 13da
@@ -334857,7 +334857,7 @@ LAB_08100e68:
     ldr r0, DAT_08100f1c                     @ 08100e68 2c48
 LAB_08100e6a:
     bl FUN_080f4e18                          @ 08100e6a f3f7d5ff
-    ldr r2, DAT_08100f20                     @ 08100e6e 2c4a
+    ldr r2, PTR_game_str_pointer_table_08100f20 @ 08100e6e 2c4a
     lsls r0,r0,#0x10    @ 08100e70 0004
     lsrs r0,r0,#0x10    @ 08100e72 000c
     lsls r1,r0,#0x1    @ 08100e74 4100
@@ -334873,7 +334873,7 @@ LAB_08100e6a:
     lsls r1,r1,#0x2    @ 08100e88 8900
     adds r1,r1,r2    @ 08100e8a 8918
     ldr r1,[r1,#0x0]                         @ 08100e8c 0968
-    ldr r0, DAT_08100f2c                     @ 08100e8e 2748
+    ldr r0, PTR_game_str_ja_08100f2c         @ 08100e8e 2748
     adds r5,r1,r0    @ 08100e90 0d18
     .hword 0x4668    @ 08100e92 6846
     adds r1,r5,#0x0    @ 08100e94 291c
@@ -334943,14 +334943,14 @@ LAB_08100f10:
     .byte  0x00, 0x00
 DAT_08100f1c:
     .word  0x000006c3                     @ 08100f1c c3060000
-DAT_08100f20:
-    .word  0x08000f40                     @ 08100f20 400f0008
+PTR_game_str_pointer_table_08100f20:
+    .word  game_str_pointer_table         @ 08100f20 400f0008
 DAT_08100f24:
     .word  0x02000000                     @ 08100f24 00000002
 DAT_08100f28:
     .word  0x00006c2c                     @ 08100f28 2c6c0000
-DAT_08100f2c:
-    .word  0x09db9c10                     @ 08100f2c 109cdb09
+PTR_game_str_ja_08100f2c:
+    .word  game_str_ja                    @ 08100f2c 109cdb09
 DAT_08100f30:
     .word  0x09e5fff8                     @ 08100f30 f8ffe509
 DAT_08100f34:
@@ -335004,7 +335004,7 @@ FUN_08100f38:
     lsls r2,r2,#0x3    @ 08100f94 d200
     adds r0,r0,r2    @ 08100f96 8018
     bl FUN_080f4e18                          @ 08100f98 f3f73eff
-    ldr r2, DAT_08101054                     @ 08100f9c 2d4a
+    ldr r2, PTR_game_str_pointer_table_08101054 @ 08100f9c 2d4a
     lsls r0,r0,#0x10    @ 08100f9e 0004
     lsrs r0,r0,#0x10    @ 08100fa0 000c
     lsls r1,r0,#0x1    @ 08100fa2 4100
@@ -335017,7 +335017,7 @@ FUN_08100f38:
     lsls r1,r1,#0x2    @ 08100fb0 8900
     adds r1,r1,r2    @ 08100fb2 8918
     ldr r1,[r1,#0x0]                         @ 08100fb4 0968
-    ldr r0, DAT_08101058                     @ 08100fb6 2848
+    ldr r0, PTR_game_str_ja_08101058         @ 08100fb6 2848
     adds r5,r1,r0    @ 08100fb8 0d18
     adds r0,r5,#0x0    @ 08100fba 281c
     bl FUN_0810f0dc                          @ 08100fbc 0ef08ef8
@@ -335092,10 +335092,10 @@ DAT_0810104c:
     .word  0x00006c2c                     @ 0810104c 2c6c0000
 DAT_08101050:
     .word  0x09e5f854                     @ 08101050 54f8e509
-DAT_08101054:
-    .word  0x08000f40                     @ 08101054 400f0008
-DAT_08101058:
-    .word  0x09db9c10                     @ 08101058 109cdb09
+PTR_game_str_pointer_table_08101054:
+    .word  game_str_pointer_table         @ 08101054 400f0008
+PTR_game_str_ja_08101058:
+    .word  game_str_ja                    @ 08101058 109cdb09
 DAT_0810105c:
     .word  0x09e6012c                     @ 0810105c 2c01e609
 DAT_08101060:
@@ -345176,10 +345176,10 @@ FUN_08105d94:
     lsrs r0,r0,#0x1d    @ 08105e0a 400f
     adds r1,r1,r0    @ 08105e0c 0918
     lsls r1,r1,#0x2    @ 08105e0e 8900
-    ldr r3, DAT_08105f1c                     @ 08105e10 424b
+    ldr r3, PTR_game_str_pointer_table_08105f1c @ 08105e10 424b
     adds r1,r1,r3    @ 08105e12 c918
     ldr r1,[r1,#0x0]                         @ 08105e14 0968
-    ldr r0, DAT_08105f20                     @ 08105e16 4248
+    ldr r0, PTR_game_str_ja_08105f20         @ 08105e16 4248
     adds r7,r1,r0    @ 08105e18 0f18
     ldr r2, DAT_08105f24                     @ 08105e1a 424a
     movs r0,#0x6    @ 08105e1c 0620
@@ -345220,7 +345220,7 @@ FUN_08105d94:
     ldr r0,[r2,#0x0]                         @ 08105e68 1068
     cmp r6,r0                                @ 08105e6a 8642
     bge LAB_08105ee4                         @ 08105e6c 3ada
-    ldr r3, DAT_08105f1c                     @ 08105e6e 2b4b
+    ldr r3, PTR_game_str_pointer_table_08105f1c @ 08105e6e 2b4b
     .hword 0x4699    @ 08105e70 9946
     ldr r0, PTR_gSettings_08105f18           @ 08105e72 2948
     .hword 0x4680    @ 08105e74 8046
@@ -345254,7 +345254,7 @@ LAB_08105e78:
     lsls r1,r1,#0x2    @ 08105eae 8900
     add r1,r9                                @ 08105eb0 4944
     ldr r1,[r1,#0x0]                         @ 08105eb2 0968
-    ldr r0, DAT_08105f20                     @ 08105eb4 1a48
+    ldr r0, PTR_game_str_ja_08105f20         @ 08105eb4 1a48
     adds r7,r1,r0    @ 08105eb6 0f18
     movs r0,#0x18    @ 08105eb8 1820
     movs r1,#0x2    @ 08105eba 0221
@@ -345304,10 +345304,10 @@ DAT_08105f14:
     .word  0x00000699                     @ 08105f14 99060000
 PTR_gSettings_08105f18:
     .word  gSettings                      @ 08105f18 2c6c0002
-DAT_08105f1c:
-    .word  0x08000f40                     @ 08105f1c 400f0008
-DAT_08105f20:
-    .word  0x09db9c10                     @ 08105f20 109cdb09
+PTR_game_str_pointer_table_08105f1c:
+    .word  game_str_pointer_table         @ 08105f1c 400f0008
+PTR_game_str_ja_08105f20:
+    .word  game_str_ja                    @ 08105f20 109cdb09
 DAT_08105f24:
     .word  0x00030001                     @ 08105f24 01000300
 DAT_08105f28:
@@ -345414,7 +345414,7 @@ LAB_08105fee:
 switchD_08105f8c__default:
     adds r0,r5,#0x0    @ 08105ff0 281c
     bl FUN_080f4e18                          @ 08105ff2 eef711ff
-    ldr r1, DAT_081060c8                     @ 08105ff6 3449
+    ldr r1, PTR_game_str_pointer_table_081060c8 @ 08105ff6 3449
     .hword 0x4689    @ 08105ff8 8946
     lsls r0,r0,#0x10    @ 08105ffa 0004
     lsrs r0,r0,#0x10    @ 08105ffc 000c
@@ -345431,7 +345431,7 @@ switchD_08105f8c__default:
     lsls r1,r1,#0x2    @ 08106012 8900
     add r1,r9                                @ 08106014 4944
     ldr r0,[r1,#0x0]                         @ 08106016 0868
-    ldr r5, DAT_081060d4                     @ 08106018 2e4d
+    ldr r5, PTR_game_str_ja_081060d4         @ 08106018 2e4d
     adds r7,r0,r5    @ 0810601a 4719
     adds r0,r7,#0x0    @ 0810601c 381c
     bl FUN_0810f0dc                          @ 0810601e 09f05df8
@@ -345512,14 +345512,14 @@ LAB_081060a2:
     .byte  0x00, 0x00
 DAT_081060c4:
     .word  0x000006cc                     @ 081060c4 cc060000
-DAT_081060c8:
-    .word  0x08000f40                     @ 081060c8 400f0008
+PTR_game_str_pointer_table_081060c8:
+    .word  game_str_pointer_table         @ 081060c8 400f0008
 DAT_081060cc:
     .word  0x02000000                     @ 081060cc 00000002
 DAT_081060d0:
     .word  0x00006c2c                     @ 081060d0 2c6c0000
-DAT_081060d4:
-    .word  0x09db9c10                     @ 081060d4 109cdb09
+PTR_game_str_ja_081060d4:
+    .word  game_str_ja                    @ 081060d4 109cdb09
 DAT_081060d8:
     .word  0x06003800                     @ 081060d8 00380006
 DAT_081060dc:
@@ -345922,7 +345922,7 @@ LAB_08106392:
     ldr r3, DAT_08106418                     @ 081063ea 0b4b
     adds r0,r0,r3    @ 081063ec c018
     bl FUN_080f4e18                          @ 081063ee eef713fd
-    ldr r2, DAT_0810641c                     @ 081063f2 0a4a
+    ldr r2, PTR_game_str_pointer_table_0810641c @ 081063f2 0a4a
     lsls r0,r0,#0x10    @ 081063f4 0004
     lsrs r0,r0,#0x10    @ 081063f6 000c
     lsls r1,r0,#0x1    @ 081063f8 4100
@@ -345943,8 +345943,8 @@ DAT_08106414:
     .word  0x09e5f854                     @ 08106414 54f8e509
 DAT_08106418:
     .word  0x00001069                     @ 08106418 69100000
-DAT_0810641c:
-    .word  0x08000f40                     @ 0810641c 400f0008
+PTR_game_str_pointer_table_0810641c:
+    .word  game_str_pointer_table         @ 0810641c 400f0008
 LAB_08106420:
     subs r1,r6,r0    @ 08106420 311a
     lsls r0,r1,#0x7    @ 08106422 c801
@@ -346052,7 +346052,7 @@ LAB_081064be:
     str r0,[r2,#0x4]                         @ 081064f0 5060
     ldr r0, DAT_0810657c                     @ 081064f2 2248
     bl FUN_080f4e18                          @ 081064f4 eef790fc
-    ldr r2, DAT_08106580                     @ 081064f8 214a
+    ldr r2, PTR_game_str_pointer_table_08106580 @ 081064f8 214a
     lsls r0,r0,#0x10    @ 081064fa 0004
     lsrs r0,r0,#0x10    @ 081064fc 000c
     lsls r1,r0,#0x1    @ 081064fe 4100
@@ -346066,7 +346066,7 @@ LAB_08106508:
     lsls r1,r1,#0x2    @ 0810650c 8900
     adds r1,r1,r2    @ 0810650e 8918
     ldr r1,[r1,#0x0]                         @ 08106510 0968
-    ldr r0, DAT_08106584                     @ 08106512 1c48
+    ldr r0, PTR_game_str_ja_08106584         @ 08106512 1c48
     adds r5,r1,r0    @ 08106514 0d18
 LAB_08106516:
     .hword 0x4668    @ 08106516 6846
@@ -346120,10 +346120,10 @@ DAT_08106578:
     .word  0x09e5f854                     @ 08106578 54f8e509
 DAT_0810657c:
     .word  0x0000069a                     @ 0810657c 9a060000
-DAT_08106580:
-    .word  0x08000f40                     @ 08106580 400f0008
-DAT_08106584:
-    .word  0x09db9c10                     @ 08106584 109cdb09
+PTR_game_str_pointer_table_08106580:
+    .word  game_str_pointer_table         @ 08106580 400f0008
+PTR_game_str_ja_08106584:
+    .word  game_str_ja                    @ 08106584 109cdb09
 FUN_08106588:
     push {lr}                                @ 08106588 00b5
     adds r2,r0,#0x0    @ 0810658a 021c
@@ -348066,7 +348066,7 @@ LAB_081073f4:
     movs r5,#0xe    @ 081073f6 0e25
     ldrsh r0,[r4,r5]                         @ 081073f8 605f
     bl FUN_080f4e18                          @ 081073fa edf70dfd
-    ldr r2, DAT_08107478                     @ 081073fe 1e4a
+    ldr r2, PTR_game_str_pointer_table_08107478 @ 081073fe 1e4a
     lsls r0,r0,#0x10    @ 08107400 0004
     lsrs r0,r0,#0x10    @ 08107402 000c
     lsls r1,r0,#0x1    @ 08107404 4100
@@ -348082,7 +348082,7 @@ LAB_081073f4:
     lsls r1,r1,#0x2    @ 08107418 8900
     adds r1,r1,r2    @ 0810741a 8918
     ldr r1,[r1,#0x0]                         @ 0810741c 0968
-    ldr r0, DAT_08107484                     @ 0810741e 1948
+    ldr r0, PTR_game_str_ja_08107484         @ 0810741e 1948
     adds r1,r1,r0    @ 08107420 0918
     .hword 0x4689    @ 08107422 8946
 LAB_08107424:
@@ -348127,14 +348127,14 @@ LAB_0810742c:
     bl select_charset_then_load_name         @ 08107470 e7f79cf9
     b LAB_08107494                           @ 08107474 0ee0
     .byte  0x00, 0x00
-DAT_08107478:
-    .word  0x08000f40                     @ 08107478 400f0008
+PTR_game_str_pointer_table_08107478:
+    .word  game_str_pointer_table         @ 08107478 400f0008
 DAT_0810747c:
     .word  0x02000000                     @ 0810747c 00000002
 DAT_08107480:
     .word  0x00006c2c                     @ 08107480 2c6c0000
-DAT_08107484:
-    .word  0x09db9c10                     @ 08107484 109cdb09
+PTR_game_str_ja_08107484:
+    .word  game_str_ja                    @ 08107484 109cdb09
 LAB_08107488:
     ldr r2,[sp,#0x110]                       @ 08107488 449a
     cmp r2,#0x18                             @ 0810748a 182a
@@ -348372,7 +348372,7 @@ LAB_0810763c:
     lsls r3,r3,#0x1    @ 08107652 5b00
     add r3,sp                                @ 08107654 6b44
     .hword 0x469a    @ 08107656 9a46
-    ldr r7, DAT_08107750                     @ 08107658 3d4f
+    ldr r7, PTR_game_str_pointer_table_08107750 @ 08107658 3d4f
     ldr r6, PTR_gSettings_08107754           @ 0810765a 3e4e
     ldr r5, DAT_08107758                     @ 0810765c 3e4d
 LAB_0810765e:
@@ -348391,7 +348391,7 @@ LAB_0810765e:
     lsls r1,r1,#0x2    @ 08107678 8900
     adds r1,r1,r7    @ 0810767a c919
     ldr r1,[r1,#0x0]                         @ 0810767c 0968
-    ldr r0, DAT_0810775c                     @ 0810767e 3748
+    ldr r0, PTR_game_str_ja_0810775c         @ 0810767e 3748
     adds r4,r1,r0    @ 08107680 0c18
     ldr r3,[sp,#0x128]                       @ 08107682 4a9b
     str r3,[sp,#0x0]                         @ 08107684 0093
@@ -348454,10 +348454,10 @@ LAB_081076dc:
     lsrs r0,r0,#0x1d    @ 081076f4 400f
     adds r1,r1,r0    @ 081076f6 0918
     lsls r1,r1,#0x2    @ 081076f8 8900
-    ldr r5, DAT_08107750                     @ 081076fa 154d
+    ldr r5, PTR_game_str_pointer_table_08107750 @ 081076fa 154d
     adds r1,r1,r5    @ 081076fc 4919
     ldr r1,[r1,#0x0]                         @ 081076fe 0968
-    ldr r0, DAT_0810775c                     @ 08107700 1648
+    ldr r0, PTR_game_str_ja_0810775c         @ 08107700 1648
     adds r4,r1,r0    @ 08107702 0c18
     adds r0,r4,#0x0    @ 08107704 201c
     bl FUN_0810f0dc                          @ 08107706 07f0e9fc
@@ -348494,14 +348494,14 @@ LAB_081076dc:
     b LAB_081077ce                           @ 0810774a 40e0
 DAT_0810774c:
     .word  0x09e606ee                     @ 0810774c ee06e609
-DAT_08107750:
-    .word  0x08000f40                     @ 08107750 400f0008
+PTR_game_str_pointer_table_08107750:
+    .word  game_str_pointer_table         @ 08107750 400f0008
 PTR_gSettings_08107754:
     .word  gSettings                      @ 08107754 2c6c0002
 DAT_08107758:
     .word  0x09e606e0                     @ 08107758 e006e609
-DAT_0810775c:
-    .word  0x09db9c10                     @ 0810775c 109cdb09
+PTR_game_str_ja_0810775c:
+    .word  game_str_ja                    @ 0810775c 109cdb09
 LAB_08107760:
     movs r6,#0x0    @ 08107760 0026
     movs r0,#0x84    @ 08107762 8420
@@ -353215,7 +353215,7 @@ LAB_08109b28:
     cmp r0,#0x0                              @ 08109b6e 0028
     blt LAB_08109bb8                         @ 08109b70 22db
     bl FUN_080f4e18                          @ 08109b72 ebf751f9
-    ldr r2, DAT_08109ba8                     @ 08109b76 0c4a
+    ldr r2, PTR_game_str_pointer_table_08109ba8 @ 08109b76 0c4a
     lsls r0,r0,#0x10    @ 08109b78 0004
     lsrs r0,r0,#0x10    @ 08109b7a 000c
     lsls r1,r0,#0x1    @ 08109b7c 4100
@@ -353231,7 +353231,7 @@ LAB_08109b28:
     lsls r1,r1,#0x2    @ 08109b90 8900
     adds r1,r1,r2    @ 08109b92 8918
     ldr r1,[r1,#0x0]                         @ 08109b94 0968
-    ldr r0, DAT_08109bb4                     @ 08109b96 0748
+    ldr r0, PTR_game_str_ja_08109bb4         @ 08109b96 0748
     adds r1,r1,r0    @ 08109b98 0918
     str r1,[sp,#0x0]                         @ 08109b9a 0091
     b LAB_08109bbc                           @ 08109b9c 0ee0
@@ -353240,14 +353240,14 @@ DAT_08109ba0:
     .word  0x06009800                     @ 08109ba0 00980006
 DAT_08109ba4:
     .word  0x02006ed0                     @ 08109ba4 d06e0002
-DAT_08109ba8:
-    .word  0x08000f40                     @ 08109ba8 400f0008
+PTR_game_str_pointer_table_08109ba8:
+    .word  game_str_pointer_table         @ 08109ba8 400f0008
 DAT_08109bac:
     .word  0x02000000                     @ 08109bac 00000002
 DAT_08109bb0:
     .word  0x00006c2c                     @ 08109bb0 2c6c0000
-DAT_08109bb4:
-    .word  0x09db9c10                     @ 08109bb4 109cdb09
+PTR_game_str_ja_08109bb4:
+    .word  game_str_ja                    @ 08109bb4 109cdb09
 LAB_08109bb8:
     movs r4,#0x0    @ 08109bb8 0024
     str r4,[sp,#0x0]                         @ 08109bba 0094
@@ -353663,7 +353663,7 @@ LAB_08109e8a:
     movs r2,#0x0    @ 08109eae 0022
     ldrsh r0,[r1,r2]                         @ 08109eb0 885e
     bl FUN_080f4e18                          @ 08109eb2 eaf7b1ff
-    ldr r2, DAT_08109edc                     @ 08109eb6 094a
+    ldr r2, PTR_game_str_pointer_table_08109edc @ 08109eb6 094a
     lsls r0,r0,#0x10    @ 08109eb8 0004
     lsrs r0,r0,#0x10    @ 08109eba 000c
     lsls r1,r0,#0x1    @ 08109ebc 4100
@@ -353679,17 +353679,17 @@ LAB_08109e8a:
     lsls r1,r1,#0x2    @ 08109ed0 8900
     adds r1,r1,r2    @ 08109ed2 8918
     ldr r1,[r1,#0x0]                         @ 08109ed4 0968
-    ldr r0, DAT_08109ee8                     @ 08109ed6 0448
+    ldr r0, PTR_game_str_ja_08109ee8         @ 08109ed6 0448
     adds r4,r1,r0    @ 08109ed8 0c18
     b LAB_08109eee                           @ 08109eda 08e0
-DAT_08109edc:
-    .word  0x08000f40                     @ 08109edc 400f0008
+PTR_game_str_pointer_table_08109edc:
+    .word  game_str_pointer_table         @ 08109edc 400f0008
 DAT_08109ee0:
     .word  0x02000000                     @ 08109ee0 00000002
 DAT_08109ee4:
     .word  0x00006c2c                     @ 08109ee4 2c6c0000
-DAT_08109ee8:
-    .word  0x09db9c10                     @ 08109ee8 109cdb09
+PTR_game_str_ja_08109ee8:
+    .word  game_str_ja                    @ 08109ee8 109cdb09
 LAB_08109eec:
     movs r4,#0x0    @ 08109eec 0024
 LAB_08109eee:
