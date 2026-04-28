@@ -13,14 +13,18 @@ GBA ROM 反汇编项目，目标是将《Yu-Gi-Oh! Ultimate Masters: WCT 2006》
 ## 构建与验证
 
 ```bat
-build.bat    :: as → ld → objcopy，产出 output/2343.gba
-clean.bat
+build.bat        :: encoder → as → ld → objcopy，产出 output/2343.gba
+clean.bat        :: 删 output/ 构建产物
+clean-all.bat    :: 5 个导出目录 (data fs fs-decompressed graphics text) → temp/ + clean.bat
+build-all.bat    :: export_all.py → build.bat → ROM 校验 → temp 比对 (round-trip)
 ```
 
 - 使用 **devkitARM**（`as.exe`/`ld.exe`/`objcopy.exe` 需在 `PATH`，或改 `build.bat`）
 - 构建前必须先运行 `python tools/rom-export/export_all.py` 从 `roms/2343.gba` 导出所有图形/数据文件（不入库）
 - 链接脚本 `ld_script.txt`，入口 `asm/rom.s`（`.include` header + crt0，其余 `.incbin`）
-- 验证 byte-identical：`fc /b roms\2343.gba output\2343.gba` 或比对 sha1
+- 单层验证 byte-identical：`fc /b roms\2343.gba output\2343.gba` 或比对 sha1
+- **完整 round-trip 验证**：`clean-all.bat` → `build-all.bat`，除 ROM byte-identical 外还逐文件 SHA1 对比 `temp/<dir>/` 与重导出的 5 个目录（约 18,159 文件）。验证脚本 `tools/rom-export/verify_against_temp.py`。
+- `build.bat` 末尾 `pause` 受 `NOPAUSE=1` env 控制（`build-all.bat` 内部 setlocal 自动设）
 
 ## 代码布局要点
 

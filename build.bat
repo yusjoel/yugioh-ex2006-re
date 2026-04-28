@@ -21,4 +21,4 @@ goto :ok
 echo BUILD FAILED
 exit /b 1
 :ok
-pause
+if not defined NOPAUSE pause
