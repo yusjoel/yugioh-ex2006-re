@@ -5,8 +5,10 @@ game-strings 导出脚本
 
 从 roms/2343.gba 读取游戏文本字符串，导出为各语言汇编文件。
 
-ROM 范围: 0x1DC4620 ~ 0x1DFF9D1
+ROM 范围: 0x1DC4620 ~ 0x1DFF9E3
 包含 5 种语言（EN/DE/FR/IT/ES）的游戏文本，Latin-1 编码。
+各 lang region_end 已含其自身的 9 行 Death Message tail (18 B \\0) + 必要对齐 pad,
+对应 master pointer table rows 1642..1650 的 \\0\\0 槽 (5 lang 无翻译).
 
 指针表结构（位于 ROM 低地址区）：
   字符串表基地址 (STRING_TABLE_BASE) = 0x1DB9C10
@@ -21,6 +23,9 @@ ROM 范围: 0x1DC4620 ~ 0x1DFF9D1
   data/game-strings-fr.s
   data/game-strings-it.s
   data/game-strings-es.s
+
+注: 本脚本只是初始导出, 真正构建用的 .s 由 tools/game-strings/encode_txt_to_s.py
+重写 (走 text/game-strings/*.txt 闭环, master-table-driven, label 对齐 pointer-table).
 """
 
 import os
@@ -35,11 +40,11 @@ STRING_TABLE_BASE = 0x1DB9C10
 
 # 各语言的 ROM 文件偏移范围（闭区间）
 LANG_RANGES = {
-    'en': (0x1DC4620, 0x1DCF470),
-    'de': (0x1DCF471, 0x1DDB7DD),
-    'fr': (0x1DDB7DE, 0x1DE7CB6),
-    'it': (0x1DE7CB7, 0x1DF3C65),
-    'es': (0x1DF3C66, 0x1DFF9D1),
+    'en': (0x1DC4620, 0x1DCF483),
+    'de': (0x1DCF484, 0x1DDB7F1),
+    'fr': (0x1DDB7F2, 0x1DE7CC9),
+    'it': (0x1DE7CCA, 0x1DF3C79),
+    'es': (0x1DF3C7A, 0x1DFF9E3),
 }
 
 # 各语言在指针表槽中的下标（0=EN, 1=DE, 2=FR, 3=IT, 4=ES）
@@ -221,18 +226,20 @@ def main():
         f.write(
             '@ data/game-strings.s\n'
             '@ 游戏文本字符串表 (6 lang wrapper)\n'
-            '@ ROM 偏移: 0x1DB9C10 ~ 0x1DFF9D1 (含 JA 区 + 5 lang 区)\n'
+            '@ ROM 偏移: 0x1DB9C10 ~ 0x1DFF9E3 (含 JA 区 + 5 lang 区, 各含 9 行 Death Message tail)\n'
             '@\n'
             '@ 6 lang: JA + EN + DE + FR + IT + ES\n'
-            '@   JA: 0x1DB9C10 ~ 0x1DC4620  (43,536 B, 1597 nonempty + 1 0-byte)\n'
-            '@   EN: 0x1DC4620 ~ 0x1DCF470  (44,624 B, 1564 nonempty)\n'
-            '@   DE: 0x1DCF471 ~ 0x1DDB7DD  (50,028 B, 1560 nonempty)\n'
-            '@   FR: 0x1DDB7DE ~ 0x1DE7CB6  (50,392 B, 1560 nonempty)\n'
-            '@   IT: 0x1DE7CB7 ~ 0x1DF3C65  (49,070 B, 1560 nonempty)\n'
-            '@   ES: 0x1DF3C66 ~ 0x1DFF9D1  (48,491 B, 1560 nonempty)\n'
+            '@   JA: 0x1DB9C10 ~ 0x1DC461F  (43,536 B)\n'
+            '@   EN: 0x1DC4620 ~ 0x1DCF483  (44,644 B)\n'
+            '@   DE: 0x1DCF484 ~ 0x1DDB7F1  (50,030 B)\n'
+            '@   FR: 0x1DDB7F2 ~ 0x1DE7CC9  (50,392 B)\n'
+            '@   IT: 0x1DE7CCA ~ 0x1DF3C79  (49,072 B)\n'
+            '@   ES: 0x1DF3C7A ~ 0x1DFF9E3  (48,490 B)\n'
             '@\n'
-            '@ Master pointer table @ ROM 0xF40 (1642 行 × 24 B, 顺序 [JA,EN,DE,FR,IT,ES])\n'
-            '@ 见 doc/dev/data-structure/game-strings.md (TODO)\n'
+            '@ Master pointer table @ ROM 0xF40 (1651 行 × 24 B, 顺序 [JA,EN,DE,FR,IT,ES])\n'
+            '@   Rows 0..1641: 共享 6 lang UI 文本\n'
+            '@   Rows 1642..1650: Death Message 尾巴 (JA 真实日文; 5 lang 全 \\0\\0)\n'
+            '@ 见 doc/dev/data-structure/game-strings.md\n'
             '\n'
             '.include "data/game-strings-ja.s"\n'
             '.include "data/game-strings-en.s"\n'

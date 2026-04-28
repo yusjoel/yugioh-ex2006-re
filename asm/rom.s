@@ -642,14 +642,14 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 
 	.incbin "roms/2343.gba", 0x1CE822C, 0xD19E4     @ 0x1CE822C..0x1DB9C10 字库后段后部
 
-@ 游戏文本字符串表 6 lang (ROM 偏移 0x1DB9C10 - 0x1DFF9D1, ~286 KB)
-@ JA + EN/DE/FR/IT/ES, master pointer table @ ROM 0xF40 (1642 行)
+@ 游戏文本字符串表 6 lang (ROM 偏移 0x1DB9C10 - 0x1DFF9E3, ~286 KB)
+@ JA + EN/DE/FR/IT/ES, master pointer table @ ROM 0xF40 (1651 行)
 @ 见 data/game-strings.s 的 wrapper 注释 + doc/dev/data-structure/game-strings.md
 	.include "data/game-strings.s"
 
-@ 后 16MB 中间段前部：ROM偏移 0x1DFF9D2 - 0x1E31553
+@ 后 16MB 中间段前部：ROM偏移 0x1DFF9E4 - 0x1E31553
 @ 已拆分：
-@   - 0x1DFF9D2..0x1E246D4 (0x24D02 B): 剩余未知
+@   - 0x1DFF9E4..0x1E246D4 (0x24CF0 B): 剩余未知
 @   - 0x1E246D4..0x1E25554 (0xE80 B):   HUD 数字/图标 sheet (FUN_08101068)
 @   - 0x1E25554..0x1E25674 (0x120 B):   gap
 @   - 0x1E25674..0x1E25F34 (0x8C0 B):   state sheets (FUN_081016c0 s1 small/big + s3)
@@ -658,7 +658,7 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @   - 0x1E2FEB4..0x1E310B4 (0x1200 B):  post-case9 未知格式 (FF/AA-dominant)
 @   - 0x1E310B4..0x1E312B4 (0x200 B):   aux OBJ 箭头 (FUN_081066fc)
 @   - 0x1E312B4..0x1E31554 (0x2A0 B):   剩余未知
-	.incbin "roms/2343.gba", 0x1DFF9D2, 0x24D02
+	.incbin "roms/2343.gba", 0x1DFF9E4, 0x24CF0
 
 @ HUD 数字/图标 sheet (FUN_08101068, 116 tiles 4bpp, 3712 B)
 	.incbin "graphics/bin/ui-misc/_MERGED_HUD_sheet_01E246D4_01E25554.bin"

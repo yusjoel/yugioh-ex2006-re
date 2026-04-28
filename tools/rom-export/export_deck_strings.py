@@ -5,7 +5,7 @@ JA UI 字符串表 (deck-strings, 现 JA 全 UI text) 导出脚本
 
 ROM 0x1DB9C10 ~ 0x1DC4620 = 完整 JA UI 文字 (~1597 条)
 - STRING_TABLE_BASE = 0x1DB9C10 (此区起点 = pointer 表 base)
-- 与 EN/DE/FR/IT/ES UI text (game-strings 区, 0x1DC4620~0x1DFF9D1) 平行
+- 与 EN/DE/FR/IT/ES UI text (game-strings 区, 0x1DC4620~0x1DFF9E4) 平行
 - 含 7 SD + 25 OPP 名 (slot[5] = JA pointer 指向, 在 0x1DBF02C / 0x1DC1D74 起)
 
 输出: data/deck-strings.s  (全 .byte 形式; 无 .incbin 间隙)
