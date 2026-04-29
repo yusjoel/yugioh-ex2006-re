@@ -44,6 +44,17 @@ LABELS = [
     (0x08FBC080, "card_medium_frame_tile_data"), # 2331 × 1536 B, data/card-medium-frame.s
     (0x09326280, "card_mini_frame_tile_data"),  # data/card-mini-frame.s
 
+    # card-mini-frame OBJ 调色板 (data/card-mini-frame-palette.s, ROM 0x1E31554..0x1E31714 = 0x1C0 B)
+    # 由 card_list_screen_init (FUN_080fdef4 → FUN_081011c4) 4 次 memcpy 加载到 PALRAM:
+    #   pal_128  → PALRAM 0x05000140 (BG colors 160-175) + 0x05000300 (OBJ 128-143)
+    #   pal_144  → PALRAM 0x05000320 (OBJ colors 144-159)
+    #   pal_main → PALRAM 0x05000200 (OBJ colors 0-127)
+    # all.s 字面量池目前以裸 .word 0x09e31554 / 0x09e31594 形式引用 (3 处), 加 label 后符号化
+    (0x09E31554, "card_mini_frame_pal_128"),   # 32 B (16 colors, OBJ 128-143)
+    (0x09E31574, "card_mini_frame_pal_144"),   # 32 B (16 colors, OBJ 144-159; 0 ref)
+    (0x09E31594, "card_mini_frame_pal_gap"),   # 128 B (其他 UI 调色板, 2 处 .word 引用)
+    (0x09E31614, "card_mini_frame_pal_main"),  # 256 B (OBJ colors 0-127; 0 ref)
+
     # HUD 资源 + 决斗外场图块 (ROM 0x18xxxxx, 原拆分边界是静态分析推断的)
     # 加 label 后字面量池 .word 自动变 symbol; 未在 asm 源定义的 name 由 rom_data.inc 生成 .equ
     (0x09850B1C, "hud_life_points_font"),       # LP 数字字体 tile (0xAC0 B)
@@ -145,8 +156,10 @@ LABELS = [
     (0x09DE7CB7, "game_str_it"),             # IT 区起点
     (0x09DF3C66, "game_str_es"),             # ES 区起点
 
-    (0x09E58D0C, "deck_id_and_data_array"),  # = data/opponent-card-values.s (-2B); 27×32B
-                                              # wiki 标注的 << 16 stride 是 lsr r4,0x16 误读
+    (0x09E58D0C, "deck_record_table"),       # = data/opponent-card-values.s; 121×32B = 0xF20 B
+                                              # 三段: Opponent(27) + Theme(52) + Limited(42)
+                                              # 结构 {u16 deck_id, u16 cv, u16 dup, char path[26]}
+                                              # 代码循环上限 r1<=0x78 (FUN_0801f3e8 / FUN_080242c8)
 
     # 代码内分支标签（非函数入口，用 LAB 命名以便 Ghidra 视为代码标签）
     # 这两处在 wiki 反汇编里是入口/中间点，但 Ghidra 已识别为 LAB_*；
@@ -239,6 +252,8 @@ RENAMES = [
     ("card_desc_data",      "card_desc_pointer_table"),
     # 命名精细化: 与 duel_field_outer_palette_pointers / _tilemap_pointers 并列
     ("duel_field_outer_pointer_table", "duel_field_outer_tile_pointers"),
+    # opponent_card_values 实为 121 条 deck record (含 theme/limited),改 deck_record_table
+    ("deck_id_and_data_array", "deck_record_table"),
 ]
 
 # 需要从 Ghidra 彻底删除的错误 label (地址或名字错)。幂等。
@@ -248,6 +263,8 @@ RENAMES = [
 #     asm/all.s 0x095FFF6C 0 引用证实该地址不是任何字面量池目标。
 REMOVALS = [
     (0x095FFF6C, "card_effect_text_pool"),
+    # 旧 file_opponent_card_values_start: 数据文件起点回退到 0x09E58D0C 后该 label 错位 2B
+    (0x09E58D0E, "file_opponent_card_values_start"),
     # 旧 file_game_strings_* 系列 label (与 game_str_* 同址重复, 清掉旧的)
     (0x09DC4620, "file_game_strings_en_start"),
     (0x09DC4620, "file_game_strings_start"),

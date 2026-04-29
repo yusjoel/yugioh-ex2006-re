@@ -16844,7 +16844,7 @@ card_info_page_init_bg0:
     movs r2,#0x20    @ 0801d4ca 2022
     bl FUN_080f4ea4                          @ 0801d4cc d7f0eafc
     ldr r0, DAT_0801d508                     @ 0801d4d0 0d48
-    ldr r1, DAT_0801d50c                     @ 0801d4d2 0e49
+    ldr r1, PTR_card_mini_frame_pal_main_0801d50c @ 0801d4d2 0e49
     movs r2,#0x80    @ 0801d4d4 8022
     lsls r2,r2,#0x1    @ 0801d4d6 5200
     bl FUN_080f4ea4                          @ 0801d4d8 d7f0e4fc
@@ -16872,8 +16872,8 @@ DAT_0801d504:
     .word  0x050003e0                     @ 0801d504 e0030005
 DAT_0801d508:
     .word  0x05000200                     @ 0801d508 00020005
-DAT_0801d50c:
-    .word  0x09e31614                     @ 0801d50c 1416e309
+PTR_card_mini_frame_pal_main_0801d50c:
+    .word  card_mini_frame_pal_main       @ 0801d50c 1416e309
 FUN_0801d510:
     push {r4,r5,r6,r7,lr}                    @ 0801d510 f0b5
     .hword 0x4657    @ 0801d512 5746
@@ -20756,15 +20756,15 @@ FUN_0801f3e4:
 FUN_0801f3e8:
     adds r3,r0,#0x0    @ 0801f3e8 031c
     movs r1,#0x0    @ 0801f3ea 0021
-    ldr r2, PTR_deck_id_and_data_array_0801f3f8 @ 0801f3ec 024a
+    ldr r2, PTR_deck_record_table_0801f3f8   @ 0801f3ec 024a
 LAB_0801f3ee:
     ldrh r0,[r2,#0x0]                        @ 0801f3ee 1088
     cmp r0,r3                                @ 0801f3f0 9842
     bne LAB_0801f3fc                         @ 0801f3f2 03d1
     adds r0,r1,#0x0    @ 0801f3f4 081c
     b LAB_0801f408                           @ 0801f3f6 07e0
-PTR_deck_id_and_data_array_0801f3f8:
-    .word  deck_id_and_data_array         @ 0801f3f8 0c8de509
+PTR_deck_record_table_0801f3f8:
+    .word  deck_record_table              @ 0801f3f8 0c8de509
 LAB_0801f3fc:
     adds r2,#0x20    @ 0801f3fc 2032
     adds r1,#0x1    @ 0801f3fe 0131
@@ -22941,7 +22941,7 @@ DAT_080242c0:
 DAT_080242c4:
     .word  0x00006e57                     @ 080242c4 576e0000
 LAB_080242c8:
-    ldr r0, PTR_deck_id_and_data_array_08024438 @ 080242c8 5b48
+    ldr r0, PTR_deck_record_table_08024438   @ 080242c8 5b48
     lsrs r1,r4,#0x16    @ 080242ca a10d
     adds r1,r1,r0    @ 080242cc 0918
     ldrh r0,[r1,#0x2]                        @ 080242ce 4888
@@ -23125,8 +23125,8 @@ LAB_080243e6:
     beq LAB_080244b4                         @ 08024432 3fd0
     b LAB_080244b6                           @ 08024434 3fe0
     .byte  0x00, 0x00
-PTR_deck_id_and_data_array_08024438:
-    .word  deck_id_and_data_array         @ 08024438 0c8de509
+PTR_deck_record_table_08024438:
+    .word  deck_record_table              @ 08024438 0c8de509
 DAT_0802443c:
     .word  0x02023360                     @ 0802443c 60330202
 DAT_08024440:
@@ -335178,7 +335178,7 @@ LAB_081010fe:
     cmp r4,#0x0                              @ 08101110 002c
     bge LAB_081010fe                         @ 08101112 f4da
     ldr r0, DAT_081011a8                     @ 08101114 2448
-    ldr r4, DAT_081011ac                     @ 08101116 254c
+    ldr r4, PTR_card_mini_frame_pal_128_081011ac @ 08101116 254c
     adds r1,r4,#0x0    @ 08101118 211c
     movs r2,#0x20    @ 0810111a 2022
     bl FUN_080f4ea4                          @ 0810111c f3f7c2fe
@@ -335187,11 +335187,11 @@ LAB_081010fe:
     movs r2,#0x20    @ 08101124 2022
     bl FUN_080f4ea4                          @ 08101126 f3f7bdfe
     ldr r0, DAT_081011b4                     @ 0810112a 2248
-    ldr r1, DAT_081011b8                     @ 0810112c 2249
+    ldr r1, PTR_card_mini_frame_pal_144_081011b8 @ 0810112c 2249
     movs r2,#0x20    @ 0810112e 2022
     bl FUN_080f4ea4                          @ 08101130 f3f7b8fe
     ldr r0, DAT_081011bc                     @ 08101134 2148
-    ldr r1, DAT_081011c0                     @ 08101136 2249
+    ldr r1, PTR_card_mini_frame_pal_main_081011c0 @ 08101136 2249
     movs r2,#0x80    @ 08101138 8022
     lsls r2,r2,#0x1    @ 0810113a 5200
     bl FUN_080f4ea4                          @ 0810113c f3f7b2fe
@@ -335249,18 +335249,18 @@ DAT_081011a4:
     .word  0x06017c40                     @ 081011a4 407c0106
 DAT_081011a8:
     .word  0x05000140                     @ 081011a8 40010005
-DAT_081011ac:
-    .word  0x09e31554                     @ 081011ac 5415e309
+PTR_card_mini_frame_pal_128_081011ac:
+    .word  card_mini_frame_pal_128        @ 081011ac 5415e309
 DAT_081011b0:
     .word  0x05000300                     @ 081011b0 00030005
 DAT_081011b4:
     .word  0x05000320                     @ 081011b4 20030005
-DAT_081011b8:
-    .word  0x09e31574                     @ 081011b8 7415e309
+PTR_card_mini_frame_pal_144_081011b8:
+    .word  card_mini_frame_pal_144        @ 081011b8 7415e309
 DAT_081011bc:
     .word  0x05000200                     @ 081011bc 00020005
-DAT_081011c0:
-    .word  0x09e31614                     @ 081011c0 1416e309
+PTR_card_mini_frame_pal_main_081011c0:
+    .word  card_mini_frame_pal_main       @ 081011c0 1416e309
 card_list_tile_renderer:
     push {r4,r5,r6,r7,lr}                    @ 081011c4 f0b5
     .hword 0x4657    @ 081011c6 5746
@@ -335957,7 +335957,7 @@ LAB_081016e8:
     cmp r4,#0xa                              @ 081016fc 0a2c
     ble LAB_081016e8                         @ 081016fe f3dd
     ldr r0, DAT_0810171c                     @ 08101700 0648
-    ldr r1, DAT_08101720                     @ 08101702 0749
+    ldr r1, PTR_card_mini_frame_pal_gap_08101720 @ 08101702 0749
     movs r2,#0x20    @ 08101704 2022
     bl FUN_080f4ea4                          @ 08101706 f3f7cdfb
     b LAB_0810174a                           @ 0810170a 1ee0
@@ -335971,8 +335971,8 @@ DAT_08101718:
     .word  0x09e25674                     @ 08101718 7456e209
 DAT_0810171c:
     .word  0x05000360                     @ 0810171c 60030005
-DAT_08101720:
-    .word  0x09e31594                     @ 08101720 9415e309
+PTR_card_mini_frame_pal_gap_08101720:
+    .word  card_mini_frame_pal_gap        @ 08101720 9415e309
 LAB_08101724:
     movs r4,#0x0    @ 08101724 0024
     ldr r5, DAT_08101754                     @ 08101726 0b4d
@@ -336445,7 +336445,7 @@ FUN_08101a88:
     ldrh r1,[r1,#0x0]                        @ 08101aa6 0988
     ldrh r0,[r0,#0x0]                        @ 08101aa8 0088
     subs r4,r1,r0    @ 08101aaa 0c1a
-    ldr r7, DAT_08101adc                     @ 08101aac 0b4f
+    ldr r7, PTR_card_mini_frame_pal_gap_08101adc @ 08101aac 0b4f
     .hword 0x4668    @ 08101aae 6846
     adds r1,r7,#0x0    @ 08101ab0 391c
     movs r2,#0x20    @ 08101ab2 2022
@@ -336469,8 +336469,8 @@ DAT_08101ad4:
     .word  0x0202f3c0                     @ 08101ad4 c0f30202
 DAT_08101ad8:
     .word  0x00001a16                     @ 08101ad8 161a0000
-DAT_08101adc:
-    .word  0x09e31594                     @ 08101adc 9415e309
+PTR_card_mini_frame_pal_gap_08101adc:
+    .word  card_mini_frame_pal_gap        @ 08101adc 9415e309
 LAB_08101ae0:
     cmp r4,#0x0                              @ 08101ae0 002c
     bge LAB_08101b2c                         @ 08101ae2 23da
@@ -348028,7 +348028,7 @@ DAT_081073ac:
     .word  0x09e3157a                     @ 081073ac 7a15e309
 LAB_081073b0:
     ldr r0, DAT_081073e4                     @ 081073b0 0c48
-    ldr r1, DAT_081073e8                     @ 081073b2 0d49
+    ldr r1, PTR_card_mini_frame_pal_144_081073e8 @ 081073b2 0d49
     movs r2,#0x20    @ 081073b4 2022
     bl FUN_080f4ea4                          @ 081073b6 edf775fd
 LAB_081073ba:
@@ -348055,8 +348055,8 @@ LAB_081073cc:
     .byte  0x00, 0x00
 DAT_081073e4:
     .word  0x05000160                     @ 081073e4 60010005
-DAT_081073e8:
-    .word  0x09e31574                     @ 081073e8 7415e309
+PTR_card_mini_frame_pal_144_081073e8:
+    .word  card_mini_frame_pal_144        @ 081073e8 7415e309
 DAT_081073ec:
     .word  0x02000000                     @ 081073ec 00000002
 DAT_081073f0:
@@ -348749,7 +348749,7 @@ FUN_0810793c:
     movs r3,#0x1    @ 08107944 0123
     bl tile_2d_row_copy                      @ 08107946 eff7c5fd
     ldr r0, DAT_08107964                     @ 0810794a 0648
-    ldr r1, DAT_08107968                     @ 0810794c 0649
+    ldr r1, PTR_card_mini_frame_pal_144_08107968 @ 0810794c 0649
     movs r2,#0x20    @ 0810794e 2022
     bl FUN_080f4ea4                          @ 08107950 edf7a8fa
     movs r0,#0x1    @ 08107954 0120
@@ -348762,8 +348762,8 @@ DAT_08107960:
     .word  0x09e252f4                     @ 08107960 f452e209
 DAT_08107964:
     .word  0x05000320                     @ 08107964 20030005
-DAT_08107968:
-    .word  0x09e31574                     @ 08107968 7415e309
+PTR_card_mini_frame_pal_144_08107968:
+    .word  card_mini_frame_pal_144        @ 08107968 7415e309
 FUN_0810796c:
     push {r4,r5,r6,r7,lr}                    @ 0810796c f0b5
     .hword 0x4647    @ 0810796e 4746

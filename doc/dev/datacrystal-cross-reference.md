@@ -194,10 +194,12 @@ build.bat 全程通过，唯一警告是预存在的 `r13 is deprecated`（与�
 1. ~~**`card-names.s` 起始 + lang 顺序未修复**~~：✓ 已修复（详见 §4.7）。
 
 2. **XX 编码反向工程**：每字符 2 字节（实测对数 = JP 字数），含义未知。已引入 `refs/yugioh-card-search/` 五十音排序卡表作为对照数据，可用于解码。下一步参见 `doc/dev/xx-encoding-analysis.md`（待写）。
-2. ~~**`0x9E58D0C` `deck_id_and_data_array` 未结构化**~~：核实后是项目 `data/opponent-card-values.s` (ROM `0x1E58D0E`, 27×32B) 的同一段，仅起点差 2B。Ghidra label 已打。
-
-   - Wiki 反汇编 `lsr r1,r4,0x16`（`r4 >> 22`），不是 `<< 16`；27 × 0x10000 = 1.7 MB 也放不下 ROM 剩余空间。
-   - 实际 stride 32 B（已在 `data/opponent-card-values.s` 描述）。
+2. ~~**`0x9E58D0C` `deck_id_and_data_array` 未结构化**~~：✓ 已重构为 `deck_record_table`（2026-04-29）。
+   - 全表 121 条记录 × 32 B = 0xF20 B（不是原以为的 27×32B = 0x360 B）。
+   - 三段：Opponent (rec[0..26], deck_id 0x1F40+) + Theme (rec[27..78], 0x2711+) + Limited (rec[79..120], 0x4E20+)。
+   - 真结构: `{u16 deck_id, u16 card_value, u16 deck_id_dup, char path[26]}`，原文件按 +2 偏移解读为 `{cv, unk, path[20], pad6, unk_b}` 是错的。
+   - 代码循环上限 r1<=0x78（FUN_0801f3e8 / FUN_080242c8）正好 121 条。
+   - Wiki 反汇编 `lsr r1,r4,0x16`（`r4 >> 22`），不是 `<< 16`。
 
 ---
 

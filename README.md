@@ -36,7 +36,7 @@ clean.bat    @ 清理编译产物
 │   ├── crt0.s            # 启动代码（0x0C0–0x0FF）
 │   └── all.s             # 前 16MB 反汇编代码
 ├── data/                 # 结构化的数据区（不含于仓库，由 tools/rom-export/export_all.py 从 ROM 生成）
-│   ├── opponent-card-values.s  # 27 个对手卡值块（ROM 0x1E58D0E）
+│   ├── opponent-card-values.s  # deck_record_table: 121 条 deck record（ROM 0x1E58D0C, Opponent 27 + Theme 52 + Limited 42）
 │   ├── banlists.s              # 8 个版本禁卡表，487 条目（ROM 0x1E5EF30）
 │   ├── starter-deck.s          # 初始卡组，50 张（ROM 0x1E5F884）
 │   ├── struct-decks.s          # 6 套预组 + 指针表（ROM 0x1E5FA58）
@@ -148,7 +148,7 @@ clean.bat    @ 清理编译产物
 | `tools/rom-export/export_banlists.py` | ROM → `data/banlists.s`（8 个版本禁卡表，487 条目） |
 | `tools/rom-export/export_starter_deck.py` | ROM → `data/starter-deck.s`（初始卡组 50 张） |
 | `tools/rom-export/export_struct_decks.py` | ROM → `data/struct-decks.s`（6 套预组 + 指针表） |
-| `tools/rom-export/export_opponent_card_values.py` | ROM → `data/opponent-card-values.s`（27 对手卡值块，32 B×27） |
+| `tools/rom-export/export_opponent_card_values.py` | ROM → `data/opponent-card-values.s`（deck_record_table: 121 × 32 B = Opponent 27 + Theme 52 + Limited 42） |
 | `tools/rom-export/export_opponent_decks.py` | ROM → `data/opponent-decks.s`（25 对手卡组，块大小可变，含融合卡组） |
 | `tools/rom-export/export_duel_puzzles.py` | ROM → `data/duel-puzzles.s`（35 块决斗题目存档模板） |
 | `tools/rom-export/render_gbtn.py` | `.gbtn` (NTBG bundle) → PNG 预览（支持 4bpp/8bpp + 2B/4B tilemap entry 自动推断）；`--all` 批量渲染 FS 全部 26 个 BG 资源到 `graphics/images/gbtn-previews/`。已在 `export_all.py` pipeline，紧跟 `export_lz5bg_unpacked.py` 后执行。Spec: `doc/dev/data-structure/gbtn-format.md` |

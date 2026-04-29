@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-对手卡值块 (Opponent Card Values) 导出脚本
+Deck Record Table 导出脚本（原名 opponent-card-values）
 
-从 roms/2343.gba 导出 ROM 0x1E58D0E ~ 0x1E5906E 区域：
-27 条目 × 32 字节 = 864 字节
+从 roms/2343.gba 导出 ROM 0x1E58D0C..0x1E59C2C 区域：
+121 条记录 × 32 字节 = 3872 字节 = 0xF20 字节
 
-每条结构:
-  +0x00  u16  card_value（卡牌实力值，SO code）
-  +0x02  u16  unk（0x1F40 起递增）
-  +0x04  20B  path 字符串（ASCII，null-pad）
-  +0x18  6B   零填充（path 超长时溢出到此区）
-  +0x1E  u16  unk_b（= unk + 1）
+每条结构（32 字节）:
+  +0x00  u16  deck_id        (in-game deck ID, 3 段连续 + 跳跃)
+  +0x02  u16  card_value     (SO code, deck strength signal card)
+  +0x04  u16  deck_id_dup    (第二 ID, opponent 段 = deck_id, theme/limited 段独立)
+  +0x06  26B  path           (null-padded "deck/LVN_xxx.ydc" / "deck/theme_NNN.ydc" / "deck/limit_NNN.ydc")
+
+3 段（按记录索引连续，但 deck_id 跳跃）:
+  rec[  0..26]  Opponent  deck_id 0x1F40..0x1F5A   path deck/LVN_xxx.ydc (含 2 dummy)
+  rec[ 27..78]  Theme     deck_id 0x2711..0x2744   path deck/theme_NNN.ydc
+  rec[ 79..120] Limited   deck_id 0x4E20..0x4E49   path deck/limit_NNN.ydc
+
+代码访问: 见 FUN_0801f3e8 / FUN_080242c8, base=0x09E58D0C, stride=32, 循环上限 r1<=0x78
+（Ghidra label: deck_record_table @ 0x09E58D0C）
 
 输出:
-  data/opponent-card-values.s
-
-来源文档: doc/um06-romhacking-resource/opponents-coinflip-screen.md
+  data/opponent-card-values.s   (label: deck_record_table)
 """
 
 import os
@@ -27,11 +32,12 @@ import sys
 ROM_PATH = 'roms/2343.gba'
 ASM_OUT = 'data/opponent-card-values.s'
 
-REGION_START = 0x1E58D0E
+REGION_START = 0x1E58D0C
 ENTRY_SIZE = 32
-NUM_ENTRIES = 27
+NUM_ENTRIES = 121
+REGION_END = REGION_START + NUM_ENTRIES * ENTRY_SIZE  # 0x1E59C2C
 
-# 27 个对手显示名，按 ROM 顺序
+# 27 个 opponent 段显示名（rec[0..26]）
 OPPONENT_NAMES = [
     'Kuriboh', 'Scapegoat', 'Skull Servant', 'Watapon', 'Pikeru',
     'Batteryman C', 'Ojama Yellow', 'Goblin King', 'Des Frog', 'Water Dragon',
@@ -45,7 +51,7 @@ OPPONENT_NAMES = [
 
 
 def load_card_info(project_root):
-    """从 doc/um06-deck-modification-tool/data.md 读 slot_id → (name_en, passcode)。"""
+    """从 doc/um06-deck-modification-tool/data.md 读 SO code → (name, passcode)。"""
     path = os.path.join(project_root, 'doc/um06-deck-modification-tool/data.md')
     mapping = {}
     pattern = re.compile(
@@ -62,71 +68,90 @@ def load_card_info(project_root):
     return mapping
 
 
-def fmt_byte_list(data: bytes) -> str:
+def fmt_byte_list(data):
     return ', '.join(str(b) for b in data)
 
 
-def path_comment(first20: bytes) -> str:
-    """根据前 20B 构造 path 注释。"""
-    # 找第一个 null 截断
-    null_idx = first20.find(b'\0')
+def category(deck_id):
+    if deck_id < 0x2000:
+        return 'opponent'
+    if deck_id < 0x4000:
+        return 'theme'
+    return 'limited'
+
+
+def cv_comment(card_value, name_hint, card_info):
+    # Mirror Match 特例: card_value=4007(BEWD) 是占位
+    if name_hint == 'Mirror Match':
+        return 'card_value: Mirror Match (= BEWD 占位)'
+    info = card_info.get(card_value)
+    if info:
+        cv_name, cv_pw = info
+        cv_pw_str = cv_pw.zfill(8) if cv_pw else '?'
+        return 'card_value: %s (密码: %s)' % (cv_name, cv_pw_str)
+    return 'card_value: SO=0x%04X' % card_value
+
+
+def path_label(path26):
+    null_idx = path26.find(b'\x00')
     if null_idx == -1:
-        # path 占满 20B，可能还跨到后 6B (脚本不在此判断)
-        return f'@ "{first20.decode("ascii")}"'
-    # path < 20B，有 null-pad
-    path_str = first20[:null_idx].decode('ascii')
-    return f'@ "{path_str}" + null-pad'
+        return path26.decode('ascii', errors='replace')
+    return path26[:null_idx].decode('ascii', errors='replace')
 
 
 def generate_asm(rom, card_info):
     lines = []
     lines.append('@ =============================================================================')
-    lines.append('@ 对手卡值块数据（Opponent Card Values）')
-    lines.append(f'@ ROM偏移: 0x{REGION_START:X} - 0x{REGION_START + NUM_ENTRIES * ENTRY_SIZE - 1:X}'
-                 f'（共 {NUM_ENTRIES} 条目 × {ENTRY_SIZE} 字节 = {NUM_ENTRIES * ENTRY_SIZE} 字节）')
+    lines.append('@ Deck Record Table（原名 opponent_card_values）')
+    lines.append('@ ROM偏移: 0x%X - 0x%X（共 %d 条记录 × %d 字节 = 0x%X = %d 字节）' % (
+        REGION_START, REGION_END - 1, NUM_ENTRIES, ENTRY_SIZE,
+        NUM_ENTRIES * ENTRY_SIZE, NUM_ENTRIES * ENTRY_SIZE))
     lines.append('@')
-    lines.append('@ 每条目结构（32 字节）:')
-    lines.append('@   +0x00  2字节  card_value（卡牌实力值，SO code）')
-    lines.append('@   +0x02  2字节  unk（0x1F40 起递增，用途不明）')
-    lines.append('@   +0x04  20字节 文件路径字符串（null-padded，如 deck/LV1_kuriboh.ydc）')
-    lines.append('@   +0x18  6字节  全零填充')
-    lines.append('@   +0x1E  2字节  unk_b（= unk + 1）')
+    lines.append('@ 每条记录（32 字节）:')
+    lines.append('@   +0x00  u16  deck_id        (in-game deck ID, 三段不连续)')
+    lines.append('@   +0x02  u16  card_value     (SO code, deck 实力信号卡)')
+    lines.append('@   +0x04  u16  deck_id_dup    (opponent 段 = deck_id, theme/limited 段独立)')
+    lines.append('@   +0x06  26B  path           (null-padded ASCII)')
     lines.append('@')
-    lines.append('@ 来源文档: doc/um06-romhacking-resource/opponents-coinflip-screen.md')
+    lines.append('@ 三段（按记录索引连续，deck_id 跳跃）:')
+    lines.append('@   rec[  0..26]  Opponent  deck_id 0x1F40..0x1F5A   含 rec[25]/[26] dummy slot')
+    lines.append('@   rec[ 27..78]  Theme     deck_id 0x2711..0x2744')
+    lines.append('@   rec[ 79..120] Limited   deck_id 0x4E20..0x4E49')
+    lines.append('@')
+    lines.append('@ 代码 base 引用: FUN_0801f3e8 (查 deck_id 返回索引), FUN_080242c8')
+    lines.append('@ Ghidra label: deck_record_table @ 0x09E58D0C; 循环上限 r1<=0x78')
     lines.append('@ 由 tools/rom-export/export_opponent_card_values.py 生成')
     lines.append('@ =============================================================================')
     lines.append('')
-    lines.append('opponent_card_values:')
+    lines.append('deck_record_table:')
+    lines.append('opponent_card_values:    @ 历史别名（保留兼容引用）')
+    lines.append('')
 
+    last_cat = None
     for i in range(NUM_ENTRIES):
         off = REGION_START + i * ENTRY_SIZE
-        card_value = struct.unpack_from('<H', rom, off + 0x00)[0]
-        unk        = struct.unpack_from('<H', rom, off + 0x02)[0]
-        path20     = rom[off + 0x04:off + 0x18]  # 20 bytes
-        pad6       = rom[off + 0x18:off + 0x1E]  # 6 bytes
-        unk_b      = struct.unpack_from('<H', rom, off + 0x1E)[0]
+        deck_id     = struct.unpack_from('<H', rom, off + 0x00)[0]
+        card_value  = struct.unpack_from('<H', rom, off + 0x02)[0]
+        deck_id_dup = struct.unpack_from('<H', rom, off + 0x04)[0]
+        path26      = rom[off + 0x06:off + 0x20]  # 26 bytes
 
-        name_display = OPPONENT_NAMES[i]
+        cat = category(deck_id)
+        if cat != last_cat:
+            lines.append('    @ ============== %s 段 ==============' % cat.upper())
+            last_cat = cat
 
-        # Mirror Match 特例：card_value=4007(BEWD) 只是占位，实际对手是镜像——
-        # 注释用对手名而非 BEWD 卡名。
-        if name_display == 'Mirror Match':
-            cv_comment = f'card_value: {name_display}'
+        path_str = path_label(path26)
+        # opponent 段附带 OPPONENT_NAMES，theme/limited 用 path basename
+        if cat == 'opponent' and i < len(OPPONENT_NAMES):
+            display_name = OPPONENT_NAMES[i]
         else:
-            info = card_info.get(card_value)
-            if info:
-                cv_name, cv_pw = info
-                cv_pw_str = cv_pw.zfill(8) if cv_pw else '?'
-                cv_comment = f'card_value: {cv_name} (密码: {cv_pw_str})'
-            else:
-                cv_comment = f'card_value: SO=0x{card_value:04X}'
+            display_name = path_str
 
-        lines.append(f'    @ --- {name_display} ---')
-        lines.append(f'    .hword {card_value:5d}    @ {cv_comment}')
-        lines.append(f'    .hword 0x{unk:04X}    @ unk')
-        lines.append(f'    .byte {fmt_byte_list(path20)}    {path_comment(path20)}')
-        lines.append(f'    .byte {fmt_byte_list(pad6)}    @ 6字节填充')
-        lines.append(f'    .hword 0x{unk_b:04X}    @ unk_b')
+        lines.append('    @ rec[%3d] @ 0x%07X (%s)' % (i, off, display_name))
+        lines.append('    .hword 0x%04X            @ deck_id' % deck_id)
+        lines.append('    .hword %5d              @ %s' % (card_value, cv_comment(card_value, display_name, card_info)))
+        lines.append('    .hword 0x%04X            @ deck_id_dup' % deck_id_dup)
+        lines.append('    .byte %s    @ path: "%s"' % (fmt_byte_list(path26), path_str))
         lines.append('')
 
     return '\n'.join(lines) + '\n'
@@ -138,18 +163,18 @@ def main():
     os.chdir(project_root)
 
     if not os.path.exists(ROM_PATH):
-        print(f'ERROR: {ROM_PATH} not found', file=sys.stderr)
+        print('ERROR: %s not found' % ROM_PATH, file=sys.stderr)
         sys.exit(1)
 
     rom = open(ROM_PATH, 'rb').read()
     card_info = load_card_info(project_root)
-    print(f'卡名/密码映射: {len(card_info)} 条')
+    print('卡名/密码映射: %d 条' % len(card_info))
 
     asm = generate_asm(rom, card_info)
     with open(ASM_OUT, 'w', encoding='utf-8') as f:
         f.write(asm)
-    print(f'汇编文件: {ASM_OUT}  ({len(asm)} bytes)')
-    print('完成。')
+    print('汇编文件: %s  (%d bytes)' % (ASM_OUT, len(asm)))
+    print('完成。%d 条 record × %d B = 0x%X B' % (NUM_ENTRIES, ENTRY_SIZE, NUM_ENTRIES * ENTRY_SIZE))
 
 
 if __name__ == '__main__':

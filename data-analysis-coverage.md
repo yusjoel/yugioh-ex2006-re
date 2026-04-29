@@ -7,8 +7,8 @@
 ## 概览
 
 - 数据区总大小：**28,543,432 B**（~27.2 MB）
-- 已分析：**23,065,904 B（80.81%）**（2026-04-28 同步盘点：font-jp 1.1 MB + icons 27→131 + fs-payload +208 B + game-strings 1651 行）
-- 未分析：**5,477,528 B（19.19%）**
+- 已分析：**23,068,912 B（80.82%）**（2026-04-29 同步：deck-record-table 27→121 records, +3008 B; 2026-04-28 同步盘点：font-jp 1.1 MB + icons 27→131 + fs-payload +208 B + game-strings 1651 行）
+- 未分析：**5,474,520 B（19.18%）**
 
 分类规则：
 - **已分析** = `asm/rom.s` 中以 `.include "data/*.s"` 或 `.incbin "graphics/bin/..."` / `.incbin "fs/..."` 形式明确拆出的段
@@ -22,12 +22,12 @@
 | `0x01ED4AA4` | `0x12B55C` | 1,226,076 | FS 后尾段（fs-payload 含 FID 339 后） |
 | `0x01CE822C` | `0xD19E4` | 858,596 | 字库后段后部 |
 | `0x01DFF9E4` | `0x31B70` | 203,632 | 游戏文本后，卡列表调色板前 |
-| `0x01E31714` | `0x275FA` | 161,274 | 调色板后，对手卡值前 |
+| `0x01E31714` | `0x275F8` | 161,272 | 调色板后，deck record table 前 |
 | `0x01867560` | `0x259D0` | 153,552 | 内场调色板后，icon tiles 前 |
 | `0x01832602` | `0x1E51A` | 124,186 | seg-C 前段（属性表后，HUD 图块前） |
 | `0x01B8FB8C` | `0x1CE18` | 118,296 | 字库前段（含 font_jp_sjis_lookup_table 等） |
 | `0x01C1F468` | `0xC384` | 50,052 | font-jp small/large 之间 gap1 |
-| `0x01E5906E` | `0x1B8E` | 7,054 | 对手卡值后 |
+| `0x01E59C2C` | `0xFD0` | 4,048 | deck record table 后 |
 | `0x01CCD290` | `0x16D0` | 5,840 | 字库后段前部 |
 | `0x01865E20` | `0x1680` | 5,760 | 未知第 7 内场图块 |
 | `0x01CCB490` | `0x1600` | 5,632 | font-jp tail gap |
@@ -95,9 +95,9 @@
 | `0x01DB9C10` | `0x45DD4` | 286,164 | ✓ 已分析 | game-strings (6 lang JA+EN/DE/FR/IT/ES, 1651 master rows) | `.include data/game-strings.s` |
 | `0x01DFF9E4` | `0x31B70` | 203,632 | ✗ 未分析 | 游戏文本后，卡列表调色板前 | raw `.incbin roms/2343.gba` |
 | `0x01E31554` | `0x1C0` | 448 | ✓ 已分析 | card-mini-frame-palette | `.include data/card-mini-frame-palette.s` |
-| `0x01E31714` | `0x275FA` | 161,274 | ✗ 未分析 | 调色板后，对手卡值前 | raw `.incbin roms/2343.gba` |
-| `0x01E58D0E` | `0x360` | 864 | ✓ 已分析 | opponent-card-values | `.include data/opponent-card-values.s` |
-| `0x01E5906E` | `0x1B8E` | 7,054 | ✗ 未分析 | 对手卡值后 | raw `.incbin roms/2343.gba` |
+| `0x01E31714` | `0x275F8` | 161,272 | ✗ 未分析 | 调色板后，deck record table 前 | raw `.incbin roms/2343.gba` |
+| `0x01E58D0C` | `0xF20` | 3,872 | ✓ 已分析 | deck-record-table (Opponent 27 + Theme 52 + Limited 42, 121×32B) | `.include data/opponent-card-values.s` |
+| `0x01E59C2C` | `0xFD0` | 4,048 | ✗ 未分析 | deck record table 后，pack 卡列表前 | raw `.incbin roms/2343.gba` |
 | `0x01E5ABFC` | `0x3A1C` | 14,876 | ✓ 已分析 | pack-card-lists | `.include data/pack-card-lists.s` |
 | `0x01E5E618` | `0x918` | 2,328 | ✗ 未分析 | 卡包信息表后，禁卡表前 | raw `.incbin roms/2343.gba` |
 | `0x01E5EF30` | `0x79C` | 1,948 | ✓ 已分析 | banlists | `.include data/banlists.s` |

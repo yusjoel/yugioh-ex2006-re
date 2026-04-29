@@ -716,19 +716,20 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @   - 0x1E31754..0x1E31774 (0x20 B): 动画调色板 (FUN_081058c8)
 @   - 0x1E31774..0x1E31794 (0x20 B): 未知
 @   - 0x1E31794..0x1E317B4 (0x20 B): OBJ 辅助调色板 (FUN_081066fc)
-@   - 0x1E317B4..0x1E58D0D (0x2755A B): 剩余未知
+@   - 0x1E317B4..0x1E58D0B (0x27558 B): 剩余未知
 	.incbin "roms/2343.gba", 0x1E31714, 0x40
 	.incbin "graphics/bin/ui-misc/FUN081058c8_anim_pal_01E31754.bin"
 	.incbin "roms/2343.gba", 0x1E31774, 0x20
 	.incbin "graphics/bin/ui-misc/FUN081066fc_obj_pal_01E31794.bin"
-	.incbin "roms/2343.gba", 0x1E317B4, 0x2755A
+	.incbin "roms/2343.gba", 0x1E317B4, 0x27558
 
-@ 对手卡值块数据（ROM偏移 0x1E58D0E - 0x1E5906D）
-@ 27 个对手条目，每条 32 字节，共 0x360 字节
+@ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
+@ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)
+@ 代码访问: FUN_0801f3e8 base=0x09E58D0C stride=32 loop r1<=0x78
 	.include "data/opponent-card-values.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1E5906E - 0x1E5ABFB（对手卡值后，卡包卡牌列表前）
-	.incbin "roms/2343.gba", 0x1E5906E, 0x1B8E
+@ 后 16MB 中间段：ROM偏移 0x1E59C2C - 0x1E5ABFB（deck record table 后，卡包卡牌列表前）
+	.incbin "roms/2343.gba", 0x1E59C2C, 0xFD0
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节
