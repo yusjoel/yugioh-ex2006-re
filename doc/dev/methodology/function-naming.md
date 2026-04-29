@@ -44,35 +44,115 @@
 
 ### 信号
 
-`memcpy/memset/strcmp` 等 libc 函数、libgcc 软件除法 `__divsi3`/`__udivsi3`、ARM EABI helper `__aeabi_*`、编译器自动生成的常用模板——这些函数在不同项目里**指令字节几乎一致**，是 Ghidra Function ID (FID) 系统的目标。
+`memcpy/memset/strcmp` 等 libc 函数、libgcc 软件除法 `__divsi3`/`__udivsi3`、ARM EABI helper `__aeabi_*`、编译器自动生成的常用模板——这些函数在不同项目里**指令字节几乎一致**（除了 relocation 处的 BL/ABS32），是 byte-pattern + mask 匹配的高 ROI 目标。
 
-### 操作
+### 现实约束：Ghidra 的内置 FID 不够用
+
+Ghidra 12.0.3 自带的 FID 数据库（`Features/FunctionID/data/*.fidbf`）**只覆盖 MSVC x86/x64**，没有 ARM。GBA / NDS 项目想用 FID，**必须自建**——靠手头的静态库 `.a` 抽 .o 现造 pattern。
+
+### 自建 FID 流水线（推荐）
+
+不必走 Ghidra 的 FID 框架，直接用 byte-pattern + relocation mask + ROM 搜索的轻量流水线即可，**得到的命中比 fidb 还更直观**（直接拿到 ROM 地址 + 符号名）。
+
+#### 1. 找匹配的工具链产物
+
+GBA 工程：
+
+- **agbcc**（Pokemon 系列等用的 GBA gcc 4.x 修改版）→ `libc.a / libgcc.a` 含 newlib + gcc runtime
+- **devkitARM**（更现代 toolchain）→ 不同版本的 `libc.a`
+- 已知用某 toolchain 编译的开源 GBA 项目（如 pokeruby/pokeemerald）→ 它的 `libs/m4a.c / agb_flash*.c / libagbsyscall.s` 编译产物
+
+#### 2. 抽 .o + 提取符号 / 字节 / relocation
+
+每个 `.a` 内是若干 `.o`（ELF ARM relocatable）。每个 .o 通常一个或多个全局函数：
 
 ```
-1. 找匹配工具链的 FID 数据库
-   GBA 工程通常匹配:  agbcc.fidb / gcc-arm-eabi-X.Y.fidb / newlib-arm.fidb
-2. Ghidra: File → Configure → Apply Fid Library → 加载 FID
-3. 跑 Function ID 分析器 (默认已 ON), 或 reAnalyzeAll() 触发
-4. 命中的函数自动重命名 + 留 FID bookmark
+ar x lib*.a                       # 解 archive
+nm --print-size <obj>             # T 符号 + 大小
+objdump -r <obj>                  # relocation 表 (R_ARM_THM_CALL / R_ARM_ABS32 等)
+objcopy -O binary -j .text <obj>  # .text 段裸字节  (单 .text 段时)
 ```
 
-### 典型命中
+如果用了 `--function-sections`（每函数独立 `.text`），多 section 同名时 `objcopy -j .text` 只取第一段；改用 **pyelftools** 或 `objcopy --only-section=.text.<func>` 按 section 名提。
 
-- libc: `memcpy / memset / strlen / strcmp / strcpy / memcmp`
-- libgcc: `__divsi3 / __udivsi3 / __modsi3 / __umodsi3 / __divdi3`
-- ARM EABI: `__aeabi_idiv / __aeabi_uidiv / __aeabi_idivmod / __aeabi_uidivmod`
-- 软件浮点 (GBA 无 FPU): `__addsf3 / __mulsf3 / __floatsisf / __fixsfsi`
+#### 3. 构造 pattern + mask
+
+pattern = 函数完整字节序列。mask = 等长 byte 数组，1 = 必须等，0 = 忽略。
+对每条 relocation，把目标 4 字节标 mask=0（保守覆盖 ARM/THUMB BL 4B + ABS32 4B）：
+
+```
+relocation                                       覆盖
+─────────────────────────────────────────────────────
+R_ARM_THM_CALL / R_ARM_THM_PC22 / R_ARM_THM_JUMP24    BL/B 4B 全 mask
+R_ARM_CALL / R_ARM_PC24 / R_ARM_JUMP24                 同
+R_ARM_ABS32 / R_ARM_REL32 / R_ARM_GOT32                literal pool 4B 全 mask
+```
+
+#### 4. ROM 搜索（带 anchor 加速）
+
+朴素扫 32 MB × N 模式 太慢。优化：每个 pattern 找最长**连续未 mask 段**作 anchor，
+用 `bytes.find(anchor)` 定位候选，再做 mask-aware 完整比对。
+
+#### 5. 落地 score
+
+每个 (pattern, ROM\_addr) 唯一匹配 → score=5（字节级证据足够强）。
+
+### 关键陷阱：trampoline 同 byte 多名
+
+newlib 风格的 wrapper：
+
+```c
+void *calloc(size_t a, size_t b)  { return _calloc_r(_REENT, a, b); }
+void *realloc(void *p, size_t s)  { return _realloc_r(_REENT, p, s); }
+FILE *fopen(const char *f, ...)   { return _fopen_r(_REENT, f, ...); }
+```
+
+编译出的 `.o` **字节完全一致**，仅 `bl _xxx_r` 的 reloc target 不同（mask 后等价）。
+ROM 里如果只链了其中一个 wrapper，多个 .o pattern 都会命中同一地址——**信息不足以区分**。
+
+处理：检测"同地址 ≥ 2 个 sym 命中" → tag 为 `fid_trampoline:name1|name2|...`，
+proposed_name 留空（score≠5），等读 ROM 中实际 `bl` target 反查后 disambiguate。
+
+### 反例：toolchain 不匹配 → 0 命中
+
+NitroSDK（NDS SDK）原版用 **CodeWarrior for ARM (Metrowerks CW)** 编译，输出 .a 是 ARM ELF
+但**指令选择 / 寄存器分配 / inline 决策跟 gcc/agbcc 完全不一样**。
+
+实测在 GBA 工程上扫了 NitroSDK 1.0 + 2.0 RC3 共 ~9000 个全局函数（ARM7 + ARM9 多 flavor），
+**唯一命中 1 个 12 字节小函数**，且高度疑似巧合。
+
+教训：FID 之前先核对 toolchain 家族（compiler 厂商 + 主版本）。**不同家族编译出的 .a 互相不可 FID**——
+连 gcc 3.x 与 gcc 4.x 都常常对不上，更不用说跨厂商。
+
+### ROM 头路径泄漏 ≠ 链接库
+
+ROM 里出现 `inc/<sdk>/foo.h` 这种 assert 字符串，**只能证明**：
+
+- 那个头文件被 `#include` 进至少一个编译单元
+- 编译时启用了 assert（保留 `__FILE__`）
+
+**不能证明** SDK 的 `libfoo.a` 被链接。如果 `foo.h` 全是 `static inline`，函数会在 caller
+里展开（连同 assert 字符串），但**没有独立的 `.text` 入口供 FID 匹配**。
+
+### 典型命中（agbcc 全套）
+
+- libc: `memcpy / memset / strlen / strcmp / strcpy / strcat / strncmp / strncpy / memcmp / qsort / sscanf`
+- libc 数值：`_strtod_r / _strtol_r / _strtoul_r / __sccl / __srefill / fread / fflush / ungetc`
+- libc 内存：`_malloc_r / _free_r / _malloc_trim_r / _Balloc / _Bfree / _multadd / _multiply / _s2b / _i2b`
+- libgcc 整数：`__divsi3 / __udivsi3 / __modsi3 / __umodsi3 / __muldi3 / __lshrdi3 / __negdi2 / __cmpdi2`
+- libgcc 浮点：`__adddf3 / __cmpdf2 / __divdf3 / __muldf3 / __addsf3 / __divsf3 / __mulsf3 / __subsf3 / __fixdfsi / __fixsfsi / __floatsidf`
 
 ### 局限
 
-- 找不到匹配 FID 数据库就跳过
-- FID 是字节级 hash，编译器版本 / 优化级别不同的会 miss
+- 找不到匹配 toolchain 的产物就跳过这步
+- 编译器版本 / 优化级别不同的会 miss（同 toolchain 不同版本也常常对不上）
 - 自定义修改过 libgcc 的项目会大量 miss
-- 内联的 libc 调用（`memcpy` 被编译成内联 ldm/stm）匹配不到
+- 内联的 libc 调用（`memcpy` 被编译成内联 ldm/stm）没有独立函数体可匹配
+- `static inline` 头文件的函数在 caller 内展开，没法匹配
 
 ### 适用阶段
 
-放在最前面。命中的函数从一开始就是"已知"的，不用再聚类。
+放在最前面。命中的函数从一开始就是"已知"的，不用再聚类。**先验证 toolchain 兼容**（小 POC 单函数试一遍），再扩到全套。
 
 ---
 
