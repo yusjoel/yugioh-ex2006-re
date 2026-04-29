@@ -280,3 +280,69 @@ IO_FAMILY_TAGS = set(IO_FAMILY_RENAME.values())
 
 # 全部 module_id 集合 (用于 tag 解析时识别哪些 token 是模块名)
 ALL_MODULES = set(MODULE_TO_PREFIX.keys())
+
+
+# -----------------------------------------------------------------------------
+# 场景大类划分 (用于 cluster_scenes_via_callgraph.py 阶段 1)
+#
+# SCENE_MODULES: "场景内部"模块, 函数有边界, 互相调用频繁.
+#   作种子, 沿 callgraph 双向 BFS 扩散.
+# UTILITY_MODULES: "通用工具"模块, 横切多个场景被广泛调用.
+#   作 BFS 边界——遇到则停止, 不污染 scene 扩散.
+# 二者互斥, 任意 module 必须分一类.
+# -----------------------------------------------------------------------------
+SCENE_MODULES = set([
+    "demo",          # 战斗动画 (exodia/shuen/vija)
+    "title_ex",      # 标题屏扩展
+    "name_input",    # 玩家名字输入页
+    "pass_input",    # banlist 密码输入页
+    "pack",          # 卡包浏览/购买
+    "pack_banner",   # (现已合并到 pack)
+    "card_info",     # 卡牌详情页
+    "card_list",     # 卡牌列表页
+    "duel_puzzle",   # 决斗谜题
+    "duel_field",    # 决斗场地 (HUD/外场)
+])
+
+UTILITY_MODULES = set([
+    "font_jp", "font_ascii",     # 字体渲染
+    "game_str",                   # i18n 字符串
+    "fs",                         # 文件系统
+    "banlist",                    # 禁卡表数据
+    "card_stats",                 # 卡数据
+    "card_image",                 # 卡图
+    "card_frame",                 # 卡边框
+    "card_name", "card_desc",     # 卡名/描述
+    "card_ids", "card_data",      # 卡 ID 映射
+    "card_passcode",              # 卡密码
+    "level_sig",                  # Limited Duel 等级签名
+    "ydc",                        # Yu-Gi-Oh Duel Console (限定/主题)
+    "opp_card_value",             # 对手卡价值
+    "deck",                       # starter/struct deck 数据
+])
+
+# Sanity: 二者无交集且并集 ⊆ ALL_MODULES
+assert not (SCENE_MODULES & UTILITY_MODULES), \
+    "SCENE/UTILITY overlap: %s" % (SCENE_MODULES & UTILITY_MODULES)
+_uncategorized = ALL_MODULES - SCENE_MODULES - UTILITY_MODULES
+if _uncategorized:
+    # 不强制——某些 module (e.g. pack_banner) 已合并, 容许存在
+    pass
+
+
+# 已 Ghidra 命名但不属任何 module 的函数, 若名字以这些前缀开头则视为 utility
+# (图层 helper / BIOS / CPU op / BG 寄存器解码 / 默认 stub)
+HELPER_NAME_PREFIXES = (
+    "gl_", "cpu_", "bios_",
+    "bg0_", "bg1_", "bg2_", "bg3_",
+    "default",
+)
+
+
+def is_helper_name(name):
+    if not name or is_auto_name(name):
+        return False
+    for p in HELPER_NAME_PREFIXES:
+        if name == p or name.startswith(p):
+            return True
+    return False
