@@ -161,6 +161,10 @@ LABELS = [
                                               # 结构 {u16 deck_id, u16 cv, u16 dup, char path[26]}
                                               # 代码循环上限 r1<=0x78 (FUN_0801f3e8 / FUN_080242c8)
 
+    (0x09E5F6CC, "banlist_master_table"),     # = data/banlists.s 末段; 10 × 8B = 80 B
+                                              # {u32 entries_ptr, u32 count}, banlist_default 拆 3 段
+                                              # 唯一 caller 字面量池 .word @ 0x080EF00C
+
     # 代码内分支标签（非函数入口，用 LAB 命名以便 Ghidra 视为代码标签）
     # 这两处在 wiki 反汇编里是入口/中间点，但 Ghidra 已识别为 LAB_*；
     # 保留 wiki 语义注释即可，不强行重命名。

@@ -738,12 +738,13 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @ 后 16MB 中间段：ROM偏移 0x1E5E618 - 0x1E5EF2F（卡包信息表后，禁卡表前）
 	.incbin "roms/2343.gba", 0x1E5E618, 0x918
 
-@ 禁卡表数据（ROM偏移 0x1E5EF30 - 0x1E5F6CB）
-@ 包含 8 个版本共 487 条目，共 0x79C 字节
+@ 禁卡表数据 + Banlist Master Table（ROM偏移 0x1E5EF30 - 0x1E5F71B）
+@ 8 个 banlist (487 条 × 4B) + master table (10 × 8B = 80 B), 共 0x7EC 字节
 	.include "data/banlists.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1E5F6CC - 0x1E5F883（禁卡表后，初始卡组前）
-	.incbin "roms/2343.gba", 0x1E5F6CC, 0x1B8
+@ 后 16MB 中间段：ROM偏移 0x1E5F71C - 0x1E5F883（master table 后，初始卡组前）
+@ 含 theme/limited duel meta + font_jp 维度查表 (待结构化)
+	.incbin "roms/2343.gba", 0x1E5F71C, 0x168
 
 @ 初始卡组数据（ROM偏移 0x1E5F884 - 0x1E5F8E9）
 @ 50 张牌 + 终止符，共 0x66 字节

@@ -305408,7 +305408,7 @@ FUN_080eefc0:
     lsrs r1,r1,#0x1f    @ 080eefda c90f
     .hword 0x4689    @ 080eefdc 8946
     lsls r4,r4,#0x3    @ 080eefde e400
-    ldr r0, DAT_080ef00c                     @ 080eefe0 0a48
+    ldr r0, PTR_banlist_master_table_080ef00c @ 080eefe0 0a48
     adds r4,r4,r0    @ 080eefe2 2418
     .hword 0x46a0    @ 080eefe4 a046
     ldr r7,[r4,#0x4]                         @ 080eefe6 6768
@@ -305431,8 +305431,8 @@ LAB_080eefee:
 LAB_080ef008:
     ldrh r0,[r4,#0x2]                        @ 080ef008 6088
     b LAB_080ef01e                           @ 080ef00a 08e0
-DAT_080ef00c:
-    .word  0x09e5f6cc                     @ 080ef00c ccf6e509
+PTR_banlist_master_table_080ef00c:
+    .word  banlist_master_table           @ 080ef00c ccf6e509
 LAB_080ef010:
     ldrh r2,[r4,#0x0]                        @ 080ef010 2288
     cmp r2,r6                                @ 080ef012 b242
