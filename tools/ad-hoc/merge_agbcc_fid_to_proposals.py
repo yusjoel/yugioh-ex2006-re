@@ -59,8 +59,9 @@ def main():
         clean_map[r["address"]] = (r["sym_name"], r["archive"], r["object"])
     for addr in trampoline_candidates:
         trampoline_candidates[addr] = sorted(trampoline_candidates[addr])
-    trampoline_tags = {
-        addr: "fid_trampoline:" + "|".join(names)
+    # 旧格式 fid_trampoline:foo|bar 已废弃, 改写多 token "tramp_<name>"
+    trampoline_tokens = {
+        addr: ["tramp_" + n for n in names]
         for addr, names in trampoline_candidates.items()
     }
 
@@ -97,11 +98,14 @@ def main():
                 row["proposed_name"] = sym_name
                 row["score"] = "5"
                 n_added += 1
-        # (b) trampoline -> 写 tags (覆写旧 fid_trampoline:* token, 保留其它)
-        if addr in trampoline_tags:
+        # (b) trampoline -> 写 tags (覆写旧 tramp_*/fid_trampoline:*, 保留其它)
+        if addr in trampoline_tokens:
             old_tags = (row.get("tags") or "").split(";")
-            kept = [t for t in old_tags if t and not t.startswith("fid_trampoline:")]
-            kept.append(trampoline_tags[addr])
+            kept = [t.strip() for t in old_tags
+                    if t.strip()
+                    and not t.strip().startswith("tramp_")
+                    and not t.strip().startswith("fid_trampoline:")]
+            kept.extend(trampoline_tokens[addr])
             row["tags"] = ";".join(kept)
             n_tagged_trampoline += 1
 
