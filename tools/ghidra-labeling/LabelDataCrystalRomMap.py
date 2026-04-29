@@ -165,6 +165,15 @@ LABELS = [
                                               # {u32 entries_ptr, u32 count}, banlist_default 拆 3 段
                                               # 唯一 caller 字面量池 .word @ 0x080EF00C
 
+    # post-banlists 4 张表 (data/post-banlists-tables.s, ROM 0x1E5F71C..0x1E5F884 = 0x168 B)
+    (0x09E5F71C, "level_signature_table"),    # 14 × 20 B (Limited Duel 等级数据? 推测)
+                                              # {u16 so_code, char field_a[8], char field_b[8], u16 pad}
+                                              # caller: 0x080EF474 base, 0x0801D8A0 / 0x0801D8FC field a/b
+    (0x09E5F834, "font_jp_dim_table"),        # 32 B = 4 × {u32, u32} 维度配对
+    (0x09E5F854, "font_jp_base_table"),       # 32 B = 8 × u32 ptrs ⭐ HOT 92 ldrs
+                                              # ptr[0..3] alt fonts (state-bits 选择), ptr[4..7] font_jp_*
+    (0x09E5F874, "font_jp_stride_table"),     # 16 B = 4 × u32 (100/144/144/196 = per-glyph 字节数)
+
     # 代码内分支标签（非函数入口，用 LAB 命名以便 Ghidra 视为代码标签）
     # 这两处在 wiki 反汇编里是入口/中间点，但 Ghidra 已识别为 LAB_*；
     # 保留 wiki 语义注释即可，不强行重命名。

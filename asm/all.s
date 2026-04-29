@@ -7532,7 +7532,7 @@ FUN_08017798:
     ldrb r0,[r2,#0x8]                        @ 080177b0 107a
     orrs r1,r0    @ 080177b2 0143
     strb r1,[r2,#0x8]                        @ 080177b4 1172
-    ldr r3, DAT_080177d8                     @ 080177b6 084b
+    ldr r3, PTR_font_jp_base_table_080177d8  @ 080177b6 084b
     lsls r0,r1,#0x1e    @ 080177b8 8807
     lsrs r0,r0,#0x1f    @ 080177ba c00f
     lsls r0,r0,#0x2    @ 080177bc 8000
@@ -7549,8 +7549,8 @@ DAT_080177d0:
     .word  0x06000020                     @ 080177d0 20000006
 DAT_080177d4:
     .word  0x02006ed0                     @ 080177d4 d06e0002
-DAT_080177d8:
-    .word  0x09e5f854                     @ 080177d8 54f8e509
+PTR_font_jp_base_table_080177d8:
+    .word  font_jp_base_table             @ 080177d8 54f8e509
 FUN_080177dc:
     push {r4,lr}                             @ 080177dc 10b5
     adds r4,r3,#0x0    @ 080177de 1c1c
@@ -7572,7 +7572,7 @@ FUN_080177dc:
     ands r0,r3    @ 08017800 1840
     orrs r0,r4    @ 08017802 2043
     strb r0,[r2,#0x8]                        @ 08017804 1072
-    ldr r3, DAT_0801782c                     @ 08017806 094b
+    ldr r3, PTR_font_jp_base_table_0801782c  @ 08017806 094b
     lsls r1,r0,#0x1e    @ 08017808 8107
     lsrs r1,r1,#0x1f    @ 0801780a c90f
     lsls r1,r1,#0x2    @ 0801780c 8900
@@ -7591,8 +7591,8 @@ DAT_08017824:
     .word  0x06010000                     @ 08017824 00000106
 DAT_08017828:
     .word  0x02006ed0                     @ 08017828 d06e0002
-DAT_0801782c:
-    .word  0x09e5f854                     @ 0801782c 54f8e509
+PTR_font_jp_base_table_0801782c:
+    .word  font_jp_base_table             @ 0801782c 54f8e509
 FUN_08017830:
     push {lr}                                @ 08017830 00b5
     sub sp,#0x14                             @ 08017832 85b0
@@ -11516,7 +11516,7 @@ SUB_080197dc:
     rsbs r1,r1,#0    @ 080197fe 4942
     ands r0,r1    @ 08019800 0840
     strb r0,[r2,#0x8]                        @ 08019802 1072
-    ldr r1, DWORD_0801981c                   @ 08019804 0549
+    ldr r1, PTR_font_jp_base_table_0801981c  @ 08019804 0549
     lsls r0,r0,#0x1e    @ 08019806 8007
     lsrs r0,r0,#0x1f    @ 08019808 c00f
     lsls r0,r0,#0x2    @ 0801980a 8000
@@ -11528,8 +11528,8 @@ SUB_080197dc:
     .byte  0x00, 0x00
 DWORD_08019818:
     .word  0x02006ed0                     @ 08019818 d06e0002
-DWORD_0801981c:
-    .word  0x09e5f854                     @ 0801981c 54f8e509
+PTR_font_jp_base_table_0801981c:
+    .word  font_jp_base_table             @ 0801981c 54f8e509
 SUB_08019820:
     push {lr}                                @ 08019820 00b5
     ldr r0, DWORD_08019858                   @ 08019822 0d48
@@ -11548,7 +11548,7 @@ SUB_08019820:
     rsbs r1,r1,#0    @ 0801983e 4942
     ands r0,r1    @ 08019840 0840
     strb r0,[r2,#0x8]                        @ 08019842 1072
-    ldr r1, DWORD_08019860                   @ 08019844 0649
+    ldr r1, PTR_font_jp_base_table_08019860  @ 08019844 0649
     lsls r0,r0,#0x1e    @ 08019846 8007
     lsrs r0,r0,#0x1f    @ 08019848 c00f
     lsls r0,r0,#0x2    @ 0801984a 8000
@@ -11562,8 +11562,8 @@ DWORD_08019858:
     .word  0x06000020                     @ 08019858 20000006
 DWORD_0801985c:
     .word  0x02006ed0                     @ 0801985c d06e0002
-DWORD_08019860:
-    .word  0x09e5f854                     @ 08019860 54f8e509
+PTR_font_jp_base_table_08019860:
+    .word  font_jp_base_table             @ 08019860 54f8e509
 FUN_08019864:
     push {r4,r5,lr}                          @ 08019864 30b5
     adds r4,r3,#0x0    @ 08019866 1c1c
@@ -11598,7 +11598,7 @@ FUN_08019864:
     ands r1,r2    @ 080198a2 1140
     orrs r1,r0    @ 080198a4 0143
     strb r1,[r3,#0x8]                        @ 080198a6 1972
-    ldr r2, DAT_080198d4                     @ 080198a8 0a4a
+    ldr r2, PTR_font_jp_base_table_080198d4  @ 080198a8 0a4a
     lsls r0,r1,#0x1e    @ 080198aa 8807
     lsrs r0,r0,#0x1f    @ 080198ac c00f
     lsls r0,r0,#0x2    @ 080198ae 8000
@@ -11620,8 +11620,8 @@ DAT_080198cc:
     .word  0x02000000                     @ 080198cc 00000002
 DAT_080198d0:
     .word  0x00006c2c                     @ 080198d0 2c6c0000
-DAT_080198d4:
-    .word  0x09e5f854                     @ 080198d4 54f8e509
+PTR_font_jp_base_table_080198d4:
+    .word  font_jp_base_table             @ 080198d4 54f8e509
 FUN_080198d8:
     push {lr}                                @ 080198d8 00b5
     sub sp,#0x14                             @ 080198da 85b0
@@ -12838,7 +12838,7 @@ LAB_0801a270:
     ands r0,r1    @ 0801a2a2 0840
     orrs r0,r4    @ 0801a2a4 2043
     strb r0,[r2,#0x8]                        @ 0801a2a6 1072
-    ldr r3, DWORD_0801a324                   @ 0801a2a8 1e4b
+    ldr r3, PTR_font_jp_base_table_0801a324  @ 0801a2a8 1e4b
     lsls r1,r0,#0x1e    @ 0801a2aa 8107
     lsrs r1,r1,#0x1f    @ 0801a2ac c90f
     lsls r1,r1,#0x2    @ 0801a2ae 8900
@@ -12897,8 +12897,8 @@ DWORD_0801a31c:
     .word  0x06002280                     @ 0801a31c 80220006
 DWORD_0801a320:
     .word  0x02006ed0                     @ 0801a320 d06e0002
-DWORD_0801a324:
-    .word  0x09e5f854                     @ 0801a324 54f8e509
+PTR_font_jp_base_table_0801a324:
+    .word  font_jp_base_table             @ 0801a324 54f8e509
 FUN_0801a328:
     push {r4,r5,r6,lr}                       @ 0801a328 70b5
     .hword 0x4656    @ 0801a32a 5646
@@ -16920,7 +16920,7 @@ LAB_0801d546:
     movs r1,#0x2    @ 0801d562 0221
     orrs r0,r1    @ 0801d564 0843
     strb r0,[r5,#0x8]                        @ 0801d566 2872
-    ldr r1, DAT_0801d5b4                     @ 0801d568 1249
+    ldr r1, PTR_font_jp_base_table_0801d5b4  @ 0801d568 1249
     .hword 0x4688    @ 0801d56a 8846
     lsls r1,r0,#0x1e    @ 0801d56c 8107
     lsrs r1,r1,#0x1f    @ 0801d56e c90f
@@ -16957,8 +16957,8 @@ DAT_0801d5ac:
     .word  0x02000000                     @ 0801d5ac 00000002
 DAT_0801d5b0:
     .word  0x00006c2c                     @ 0801d5b0 2c6c0000
-DAT_0801d5b4:
-    .word  0x09e5f854                     @ 0801d5b4 54f8e509
+PTR_font_jp_base_table_0801d5b4:
+    .word  font_jp_base_table             @ 0801d5b4 54f8e509
 DAT_0801d5b8:
     .word  0x0201afb0                     @ 0801d5b8 b0af0102
 LAB_0801d5bc:
@@ -17806,7 +17806,7 @@ LAB_0801dc46:
     movs r1,#0x2    @ 0801dc64 0221
     orrs r0,r1    @ 0801dc66 0843
     strb r0,[r2,#0x8]                        @ 0801dc68 1072
-    ldr r1, DAT_0801dca8                     @ 0801dc6a 0f49
+    ldr r1, PTR_font_jp_base_table_0801dca8  @ 0801dc6a 0f49
     lsls r0,r0,#0x1e    @ 0801dc6c 8007
     lsrs r0,r0,#0x1f    @ 0801dc6e c00f
     lsls r0,r0,#0x2    @ 0801dc70 8000
@@ -17837,8 +17837,8 @@ DAT_0801dca0:
     .word  0x00006c2c                     @ 0801dca0 2c6c0000
 DAT_0801dca4:
     .word  0x02006ed0                     @ 0801dca4 d06e0002
-DAT_0801dca8:
-    .word  0x09e5f854                     @ 0801dca8 54f8e509
+PTR_font_jp_base_table_0801dca8:
+    .word  font_jp_base_table             @ 0801dca8 54f8e509
 LAB_0801dcac:
     adds r5,r6,#0x0    @ 0801dcac 351c
     ldr r2, DAT_0801dd04                     @ 0801dcae 154a
@@ -17850,7 +17850,7 @@ LAB_0801dcac:
     ands r0,r3    @ 0801dcba 1840
     orrs r0,r1    @ 0801dcbc 0843
     strb r0,[r2,#0x8]                        @ 0801dcbe 1072
-    ldr r3, DAT_0801dd08                     @ 0801dcc0 114b
+    ldr r3, PTR_font_jp_base_table_0801dd08  @ 0801dcc0 114b
     lsls r1,r0,#0x1e    @ 0801dcc2 8107
     lsrs r1,r1,#0x1f    @ 0801dcc4 c90f
     lsls r1,r1,#0x2    @ 0801dcc6 8900
@@ -17887,8 +17887,8 @@ LAB_0801dce0:
     b LAB_0801dd2a                           @ 0801dd02 12e0
 DAT_0801dd04:
     .word  0x02006ed0                     @ 0801dd04 d06e0002
-DAT_0801dd08:
-    .word  0x09e5f854                     @ 0801dd08 54f8e509
+PTR_font_jp_base_table_0801dd08:
+    .word  font_jp_base_table             @ 0801dd08 54f8e509
 DAT_0801dd0c:
     .word  0x09e589c4                     @ 0801dd0c c489e509
 LAB_0801dd10:
@@ -17937,7 +17937,7 @@ LAB_0801dd40:
     movs r1,#0x2    @ 0801dd62 0221
     orrs r0,r1    @ 0801dd64 0843
     strb r0,[r2,#0x8]                        @ 0801dd66 1072
-    ldr r1, DAT_0801dda0                     @ 0801dd68 0d49
+    ldr r1, PTR_font_jp_base_table_0801dda0  @ 0801dd68 0d49
     lsls r0,r0,#0x1e    @ 0801dd6a 8007
     lsrs r0,r0,#0x1f    @ 0801dd6c c00f
     lsls r0,r0,#0x2    @ 0801dd6e 8000
@@ -17964,8 +17964,8 @@ DAT_0801dd98:
     .word  0x00006c2c                     @ 0801dd98 2c6c0000
 DAT_0801dd9c:
     .word  0x02006ed0                     @ 0801dd9c d06e0002
-DAT_0801dda0:
-    .word  0x09e5f854                     @ 0801dda0 54f8e509
+PTR_font_jp_base_table_0801dda0:
+    .word  font_jp_base_table             @ 0801dda0 54f8e509
 LAB_0801dda4:
     movs r6,#0x4    @ 0801dda4 0426
     movs r0,#0x40    @ 0801dda6 4020
@@ -18012,7 +18012,7 @@ LAB_0801ddf4:
     ldrb r3,[r2,#0x8]                        @ 0801ddfa 137a
     orrs r1,r3    @ 0801ddfc 1943
     strb r1,[r2,#0x8]                        @ 0801ddfe 1172
-    ldr r3, DAT_0801de34                     @ 0801de00 0c4b
+    ldr r3, PTR_font_jp_base_table_0801de34  @ 0801de00 0c4b
     lsls r0,r1,#0x1e    @ 0801de02 8807
     lsrs r0,r0,#0x1f    @ 0801de04 c00f
     lsls r0,r0,#0x2    @ 0801de06 8000
@@ -18037,8 +18037,8 @@ LAB_0801ddf4:
     b LAB_0801de46                           @ 0801de2e 0ae0
 DAT_0801de30:
     .word  0x02006ed0                     @ 0801de30 d06e0002
-DAT_0801de34:
-    .word  0x09e5f854                     @ 0801de34 54f8e509
+PTR_font_jp_base_table_0801de34:
+    .word  font_jp_base_table             @ 0801de34 54f8e509
 LAB_0801de38:
     movs r6,#0x4    @ 0801de38 0426
     movs r0,#0x40    @ 0801de3a 4020
@@ -18052,7 +18052,7 @@ LAB_0801de46:
     cmp r0,#0x0                              @ 0801de4a 0028
     beq LAB_0801dede                         @ 0801de4c 47d0
     ldr r7, DAT_0801de84                     @ 0801de4e 0d4f
-    ldr r2, DAT_0801de88                     @ 0801de50 0d4a
+    ldr r2, PTR_font_jp_base_table_0801de88  @ 0801de50 0d4a
     .hword 0x4691    @ 0801de52 9146
 LAB_0801de54:
     .hword 0x4643    @ 0801de54 4346
@@ -18081,8 +18081,8 @@ LAB_0801de54:
     .byte  0x00, 0x00
 DAT_0801de84:
     .word  0x02006ed0                     @ 0801de84 d06e0002
-DAT_0801de88:
-    .word  0x09e5f854                     @ 0801de88 54f8e509
+PTR_font_jp_base_table_0801de88:
+    .word  font_jp_base_table             @ 0801de88 54f8e509
 DAT_0801de8c:
     .word  0x09e589c4                     @ 0801de8c c489e509
 LAB_0801de90:
@@ -18303,7 +18303,7 @@ render_card_description_text:
     movs r1,#0x2    @ 0801e028 0221
     orrs r0,r1    @ 0801e02a 0843
     strb r0,[r4,#0x8]                        @ 0801e02c 2072
-    ldr r1, DAT_0801e0f4                     @ 0801e02e 3149
+    ldr r1, PTR_font_jp_base_table_0801e0f4  @ 0801e02e 3149
     .hword 0x4689    @ 0801e030 8946
     lsls r1,r0,#0x1e    @ 0801e032 8107
     lsrs r1,r1,#0x1f    @ 0801e034 c90f
@@ -18400,8 +18400,8 @@ DAT_0801e0ec:
     .word  0x02000000                     @ 0801e0ec 00000002
 DAT_0801e0f0:
     .word  0x00006c2c                     @ 0801e0f0 2c6c0000
-DAT_0801e0f4:
-    .word  0x09e5f854                     @ 0801e0f4 54f8e509
+PTR_font_jp_base_table_0801e0f4:
+    .word  font_jp_base_table             @ 0801e0f4 54f8e509
 DAT_0801e0f8:
     .word  0x0201afb0                     @ 0801e0f8 b0af0102
 DAT_0801e0fc:
@@ -21665,7 +21665,7 @@ LAB_080238d4:
     ldrb r2,[r3,#0x8]                        @ 080238da 1a7a
     orrs r2,r0    @ 080238dc 0243
     strb r2,[r3,#0x8]                        @ 080238de 1a72
-    ldr r4, DAT_0802398c                     @ 080238e0 2a4c
+    ldr r4, PTR_font_jp_base_table_0802398c  @ 080238e0 2a4c
     lsls r1,r2,#0x1e    @ 080238e2 9107
     lsrs r1,r1,#0x1f    @ 080238e4 c90f
     lsls r1,r1,#0x2    @ 080238e6 8900
@@ -21750,8 +21750,8 @@ LAB_0802396e:
     .byte  0x00, 0x00
 DAT_08023988:
     .word  0x02006ed0                     @ 08023988 d06e0002
-DAT_0802398c:
-    .word  0x09e5f854                     @ 0802398c 54f8e509
+PTR_font_jp_base_table_0802398c:
+    .word  font_jp_base_table             @ 0802398c 54f8e509
 DAT_08023990:
     .word  0x06010000                     @ 08023990 00000106
 FUN_08023994:
@@ -21807,7 +21807,7 @@ FUN_08023994:
     movs r1,#0x2    @ 080239fa 0221
     orrs r0,r1    @ 080239fc 0843
     strb r0,[r2,#0x8]                        @ 080239fe 1072
-    ldr r3, DAT_08023b18                     @ 08023a00 454b
+    ldr r3, PTR_font_jp_base_table_08023b18  @ 08023a00 454b
     lsls r1,r0,#0x1e    @ 08023a02 8107
     lsrs r1,r1,#0x1f    @ 08023a04 c90f
     lsls r1,r1,#0x2    @ 08023a06 8900
@@ -21953,8 +21953,8 @@ DAT_08023b10:
     .word  0x02000000                     @ 08023b10 00000002
 DAT_08023b14:
     .word  0x00006c2c                     @ 08023b14 2c6c0000
-DAT_08023b18:
-    .word  0x09e5f854                     @ 08023b18 54f8e509
+PTR_font_jp_base_table_08023b18:
+    .word  font_jp_base_table             @ 08023b18 54f8e509
 DAT_08023b1c:
     .word  0x06004000                     @ 08023b1c 00400006
 DAT_08023b20:
@@ -24447,7 +24447,7 @@ FUN_0802b484:
     movs r1,#0x2    @ 0802b4b6 0221
     orrs r0,r1    @ 0802b4b8 0843
     strb r0,[r5,#0x8]                        @ 0802b4ba 2872
-    ldr r7, DAT_0802b584                     @ 0802b4bc 314f
+    ldr r7, PTR_font_jp_base_table_0802b584  @ 0802b4bc 314f
     lsls r1,r0,#0x1e    @ 0802b4be 8107
     lsrs r1,r1,#0x1f    @ 0802b4c0 c90f
     lsls r1,r1,#0x2    @ 0802b4c2 8900
@@ -24544,8 +24544,8 @@ DAT_0802b57c:
     .word  0x02000000                     @ 0802b57c 00000002
 DAT_0802b580:
     .word  0x00006c2c                     @ 0802b580 2c6c0000
-DAT_0802b584:
-    .word  0x09e5f854                     @ 0802b584 54f8e509
+PTR_font_jp_base_table_0802b584:
+    .word  font_jp_base_table             @ 0802b584 54f8e509
 DAT_0802b588:
     .word  0x060053c0                     @ 0802b588 c0530006
 DAT_0802b58c:
@@ -24654,7 +24654,7 @@ FUN_0802b590:
     rsbs r1,r1,#0    @ 0802b674 4942
     ands r0,r1    @ 0802b676 0840
     strb r0,[r2,#0x8]                        @ 0802b678 1072
-    ldr r1, DAT_0802b710                     @ 0802b67a 2549
+    ldr r1, PTR_font_jp_base_table_0802b710  @ 0802b67a 2549
     lsls r0,r0,#0x1f    @ 0802b67c c007
     lsrs r0,r0,#0x1f    @ 0802b67e c00f
     lsls r0,r0,#0x3    @ 0802b680 c000
@@ -24725,8 +24725,8 @@ DAT_0802b708:
     .word  0x02000000                     @ 0802b708 00000002
 DAT_0802b70c:
     .word  0x00006c2c                     @ 0802b70c 2c6c0000
-DAT_0802b710:
-    .word  0x09e5f854                     @ 0802b710 54f8e509
+PTR_font_jp_base_table_0802b710:
+    .word  font_jp_base_table             @ 0802b710 54f8e509
 DAT_0802b714:
     .word  0x00008001                     @ 0802b714 01800000
 LAB_0802b718:
@@ -24747,7 +24747,7 @@ LAB_0802b718:
     movs r1,#0x2    @ 0802b734 0221
     orrs r0,r1    @ 0802b736 0843
     strb r0,[r2,#0x8]                        @ 0802b738 1072
-    ldr r3, DAT_0802b80c                     @ 0802b73a 344b
+    ldr r3, PTR_font_jp_base_table_0802b80c  @ 0802b73a 344b
     lsls r1,r0,#0x1e    @ 0802b73c 8107
     lsrs r1,r1,#0x1f    @ 0802b73e c90f
     lsls r1,r1,#0x2    @ 0802b740 8900
@@ -24850,8 +24850,8 @@ DAT_0802b804:
     .word  0x02000000                     @ 0802b804 00000002
 DAT_0802b808:
     .word  0x00006c2c                     @ 0802b808 2c6c0000
-DAT_0802b80c:
-    .word  0x09e5f854                     @ 0802b80c 54f8e509
+PTR_font_jp_base_table_0802b80c:
+    .word  font_jp_base_table             @ 0802b80c 54f8e509
 DAT_0802b810:
     .word  0x00008001                     @ 0802b810 01800000
 DAT_0802b814:
@@ -24967,7 +24967,7 @@ FUN_0802b8bc:
     movs r1,#0x2    @ 0802b8e6 0221
     orrs r0,r1    @ 0802b8e8 0843
     strb r0,[r2,#0x8]                        @ 0802b8ea 1072
-    ldr r3, DAT_0802b934                     @ 0802b8ec 114b
+    ldr r3, PTR_font_jp_base_table_0802b934  @ 0802b8ec 114b
     lsls r1,r0,#0x1e    @ 0802b8ee 8107
     lsrs r1,r1,#0x1f    @ 0802b8f0 c90f
     lsls r1,r1,#0x2    @ 0802b8f2 8900
@@ -25002,8 +25002,8 @@ DAT_0802b92c:
     .word  0x02000000                     @ 0802b92c 00000002
 DAT_0802b930:
     .word  0x00006c2c                     @ 0802b930 2c6c0000
-DAT_0802b934:
-    .word  0x09e5f854                     @ 0802b934 54f8e509
+PTR_font_jp_base_table_0802b934:
+    .word  font_jp_base_table             @ 0802b934 54f8e509
 DAT_0802b938:
     .word  0x050001e0                     @ 0802b938 e0010005
 DAT_0802b93c:
@@ -25361,7 +25361,7 @@ LAB_0802bb92:
     ldrb r1,[r5,#0x8]                        @ 0802bbd0 297a
     ands r0,r1    @ 0802bbd2 0840
     strb r0,[r5,#0x8]                        @ 0802bbd4 2872
-    ldr r1, DAT_0802bc70                     @ 0802bbd6 2649
+    ldr r1, PTR_font_jp_base_table_0802bc70  @ 0802bbd6 2649
     lsls r0,r0,#0x1e    @ 0802bbd8 8007
     lsrs r0,r0,#0x1f    @ 0802bbda c00f
     lsls r0,r0,#0x2    @ 0802bbdc 8000
@@ -25438,8 +25438,8 @@ DAT_0802bc68:
     .word  0x09e59da8                     @ 0802bc68 a89de509
 DAT_0802bc6c:
     .word  0x02006ed0                     @ 0802bc6c d06e0002
-DAT_0802bc70:
-    .word  0x09e5f854                     @ 0802bc70 54f8e509
+PTR_font_jp_base_table_0802bc70:
+    .word  font_jp_base_table             @ 0802bc70 54f8e509
 DAT_0802bc74:
     .word  0x00000bfa                     @ 0802bc74 fa0b0000
 PTR_game_str_pointer_table_0802bc78:
@@ -27432,7 +27432,7 @@ FUN_0802cba0:
     movs r1,#0x2    @ 0802cbca 0221
     orrs r0,r1    @ 0802cbcc 0843
     strb r0,[r2,#0x8]                        @ 0802cbce 1072
-    ldr r3, DAT_0802cc00                     @ 0802cbd0 0b4b
+    ldr r3, PTR_font_jp_base_table_0802cc00  @ 0802cbd0 0b4b
     lsls r1,r0,#0x1e    @ 0802cbd2 8107
     lsrs r1,r1,#0x1f    @ 0802cbd4 c90f
     lsls r1,r1,#0x2    @ 0802cbd6 8900
@@ -27455,8 +27455,8 @@ DAT_0802cbf8:
     .word  0x02000000                     @ 0802cbf8 00000002
 DAT_0802cbfc:
     .word  0x00006c2c                     @ 0802cbfc 2c6c0000
-DAT_0802cc00:
-    .word  0x09e5f854                     @ 0802cc00 54f8e509
+PTR_font_jp_base_table_0802cc00:
+    .word  font_jp_base_table             @ 0802cc00 54f8e509
 DAT_0802cc04:
     .word  0x050001e0                     @ 0802cc04 e0010005
 FUN_0802cc08:
@@ -27614,7 +27614,7 @@ LAB_0802cc7c:
     movs r1,#0x2    @ 0802cd48 0221
     orrs r0,r1    @ 0802cd4a 0843
     strb r0,[r2,#0x8]                        @ 0802cd4c 1072
-    ldr r3, DAT_0802cdc8                     @ 0802cd4e 1e4b
+    ldr r3, PTR_font_jp_base_table_0802cdc8  @ 0802cd4e 1e4b
     lsls r1,r0,#0x1e    @ 0802cd50 8107
     lsrs r1,r1,#0x1f    @ 0802cd52 c90f
     lsls r1,r1,#0x2    @ 0802cd54 8900
@@ -27675,8 +27675,8 @@ DAT_0802cdc0:
     .word  0x02000000                     @ 0802cdc0 00000002
 DAT_0802cdc4:
     .word  0x00006c2c                     @ 0802cdc4 2c6c0000
-DAT_0802cdc8:
-    .word  0x09e5f854                     @ 0802cdc8 54f8e509
+PTR_font_jp_base_table_0802cdc8:
+    .word  font_jp_base_table             @ 0802cdc8 54f8e509
 DAT_0802cdcc:
     .word  0x09dc0240                     @ 0802cdcc 4002dc09
 DAT_0802cdd0:
@@ -28475,7 +28475,7 @@ LAB_0802de1e:
     movs r0,#0x2    @ 0802de90 0220
     orrs r4,r0    @ 0802de92 0443
     strb r4,[r1,#0x8]                        @ 0802de94 0c72
-    ldr r2, DAT_0802def4                     @ 0802de96 174a
+    ldr r2, PTR_font_jp_base_table_0802def4  @ 0802de96 174a
     lsls r0,r4,#0x1e    @ 0802de98 a007
     lsrs r0,r0,#0x1f    @ 0802de9a c00f
     lsls r0,r0,#0x2    @ 0802de9c 8000
@@ -28522,8 +28522,8 @@ DAT_0802deec:
     .word  0x02000000                     @ 0802deec 00000002
 DAT_0802def0:
     .word  0x00006c2c                     @ 0802def0 2c6c0000
-DAT_0802def4:
-    .word  0x09e5f854                     @ 0802def4 54f8e509
+PTR_font_jp_base_table_0802def4:
+    .word  font_jp_base_table             @ 0802def4 54f8e509
 DAT_0802def8:
     .word  0x09dbd7e8                     @ 0802def8 e8d7db09
 DAT_0802defc:
@@ -224548,7 +224548,7 @@ LAB_080bf8f0:
     rsbs r1,r1,#0    @ 080bf926 4942
     ands r0,r1    @ 080bf928 0840
     strb r0,[r2,#0x8]                        @ 080bf92a 1072
-    ldr r1, DAT_080bf974                     @ 080bf92c 1149
+    ldr r1, PTR_font_jp_base_table_080bf974  @ 080bf92c 1149
     lsls r0,r0,#0x1f    @ 080bf92e c007
     lsrs r0,r0,#0x1f    @ 080bf930 c00f
     lsls r0,r0,#0x3    @ 080bf932 c000
@@ -224584,8 +224584,8 @@ DAT_080bf96c:
     .word  0x02000000                     @ 080bf96c 00000002
 DAT_080bf970:
     .word  0x00006c2c                     @ 080bf970 2c6c0000
-DAT_080bf974:
-    .word  0x09e5f854                     @ 080bf974 54f8e509
+PTR_font_jp_base_table_080bf974:
+    .word  font_jp_base_table             @ 080bf974 54f8e509
 DAT_080bf978:
     .word  0x09dbd7f2                     @ 080bf978 f2d7db09
 DAT_080bf97c:
@@ -225611,7 +225611,7 @@ FUN_080c00f0:
     movs r1,#0x2    @ 080c011c 0221
     orrs r0,r1    @ 080c011e 0843
     strb r0,[r2,#0x8]                        @ 080c0120 1072
-    ldr r3, DAT_080c016c                     @ 080c0122 124b
+    ldr r3, PTR_font_jp_base_table_080c016c  @ 080c0122 124b
     lsls r1,r0,#0x1e    @ 080c0124 8107
     lsrs r1,r1,#0x1f    @ 080c0126 c90f
     lsls r1,r1,#0x2    @ 080c0128 8900
@@ -225647,8 +225647,8 @@ DAT_080c0164:
     .word  0x02000000                     @ 080c0164 00000002
 DAT_080c0168:
     .word  0x00006c2c                     @ 080c0168 2c6c0000
-DAT_080c016c:
-    .word  0x09e5f854                     @ 080c016c 54f8e509
+PTR_font_jp_base_table_080c016c:
+    .word  font_jp_base_table             @ 080c016c 54f8e509
 PTR_card_stats_table_080c0170:
     .word  card_stats_table               @ 080c0170 b8698109
 DAT_080c0174:
@@ -242590,7 +242590,7 @@ FUN_080c992c:
     movs r2,#0x2    @ 080c997a 0222
     orrs r0,r2    @ 080c997c 1043
     strb r0,[r4,#0x8]                        @ 080c997e 2072
-    ldr r3, DAT_080c9a08                     @ 080c9980 214b
+    ldr r3, PTR_font_jp_base_table_080c9a08  @ 080c9980 214b
     lsls r2,r0,#0x1e    @ 080c9982 8207
     lsrs r2,r2,#0x1f    @ 080c9984 d20f
     lsls r2,r2,#0x2    @ 080c9986 9200
@@ -242657,8 +242657,8 @@ DAT_080c9a00:
     .word  0x02000000                     @ 080c9a00 00000002
 DAT_080c9a04:
     .word  0x00006c2c                     @ 080c9a04 2c6c0000
-DAT_080c9a08:
-    .word  0x09e5f854                     @ 080c9a08 54f8e509
+PTR_font_jp_base_table_080c9a08:
+    .word  font_jp_base_table             @ 080c9a08 54f8e509
 DAT_080c9a0c:
     .word  0x06016600                     @ 080c9a0c 00660106
 FUN_080c9a10:
@@ -245218,7 +245218,7 @@ FUN_080cad78:
     movs r1,#0x2    @ 080cadba 0221
     orrs r0,r1    @ 080cadbc 0843
     strb r0,[r2,#0x8]                        @ 080cadbe 1072
-    ldr r3, DAT_080cae74                     @ 080cadc0 2c4b
+    ldr r3, PTR_font_jp_base_table_080cae74  @ 080cadc0 2c4b
     lsls r1,r0,#0x1e    @ 080cadc2 8107
     lsrs r1,r1,#0x1f    @ 080cadc4 c90f
     lsls r1,r1,#0x2    @ 080cadc6 8900
@@ -245303,8 +245303,8 @@ DAT_080cae6c:
     .word  0x02000000                     @ 080cae6c 00000002
 DAT_080cae70:
     .word  0x00006c2c                     @ 080cae70 2c6c0000
-DAT_080cae74:
-    .word  0x09e5f854                     @ 080cae74 54f8e509
+PTR_font_jp_base_table_080cae74:
+    .word  font_jp_base_table             @ 080cae74 54f8e509
 PTR_game_str_pointer_table_080cae78:
     .word  game_str_pointer_table         @ 080cae78 400f0008
 PTR_game_str_ja_080cae7c:
@@ -245471,7 +245471,7 @@ FUN_080caf68:
     movs r1,#0x2    @ 080cafb4 0221
     orrs r0,r1    @ 080cafb6 0843
     strb r0,[r2,#0x8]                        @ 080cafb8 1072
-    ldr r3, DAT_080cb024                     @ 080cafba 1a4b
+    ldr r3, PTR_font_jp_base_table_080cb024  @ 080cafba 1a4b
     lsls r1,r0,#0x1e    @ 080cafbc 8107
     lsrs r1,r1,#0x1f    @ 080cafbe c90f
     lsls r1,r1,#0x2    @ 080cafc0 8900
@@ -245522,8 +245522,8 @@ DAT_080cb01c:
     .word  0x00006c2c                     @ 080cb01c 2c6c0000
 DAT_080cb020:
     .word  0x02006ed0                     @ 080cb020 d06e0002
-DAT_080cb024:
-    .word  0x09e5f854                     @ 080cb024 54f8e509
+PTR_font_jp_base_table_080cb024:
+    .word  font_jp_base_table             @ 080cb024 54f8e509
 DAT_080cb028:
     .word  0x0600a8e0                     @ 080cb028 e0a80006
 DAT_080cb02c:
@@ -247258,7 +247258,7 @@ LAB_080cbd82:
     movs r1,#0x2    @ 080cbdac 0221
     orrs r0,r1    @ 080cbdae 0843
     strb r0,[r2,#0x8]                        @ 080cbdb0 1072
-    ldr r3, DAT_080cbe00                     @ 080cbdb2 134b
+    ldr r3, PTR_font_jp_base_table_080cbe00  @ 080cbdb2 134b
     lsls r1,r0,#0x1e    @ 080cbdb4 8107
     lsrs r1,r1,#0x1f    @ 080cbdb6 c90f
     lsls r1,r1,#0x2    @ 080cbdb8 8900
@@ -247295,8 +247295,8 @@ DAT_080cbdf8:
     .word  0x02000000                     @ 080cbdf8 00000002
 DAT_080cbdfc:
     .word  0x00006c2c                     @ 080cbdfc 2c6c0000
-DAT_080cbe00:
-    .word  0x09e5f854                     @ 080cbe00 54f8e509
+PTR_font_jp_base_table_080cbe00:
+    .word  font_jp_base_table             @ 080cbe00 54f8e509
 LAB_080cbe04:
     bl char_width_narrow_5                   @ 080cbe04 24f0fcf9
     .hword 0x4643    @ 080cbe08 4346
@@ -249252,7 +249252,7 @@ FUN_080ccfe4:
     movs r1,#0x2    @ 080cd01e 0221
     orrs r0,r1    @ 080cd020 0843
     strb r0,[r2,#0x8]                        @ 080cd022 1072
-    ldr r3, DAT_080cd0cc                     @ 080cd024 294b
+    ldr r3, PTR_font_jp_base_table_080cd0cc  @ 080cd024 294b
     lsls r1,r0,#0x1e    @ 080cd026 8107
     lsrs r1,r1,#0x1f    @ 080cd028 c90f
     lsls r1,r1,#0x2    @ 080cd02a 8900
@@ -249336,8 +249336,8 @@ DAT_080cd0c4:
     .word  0x02000000                     @ 080cd0c4 00000002
 DAT_080cd0c8:
     .word  0x00006c2c                     @ 080cd0c8 2c6c0000
-DAT_080cd0cc:
-    .word  0x09e5f854                     @ 080cd0cc 54f8e509
+PTR_font_jp_base_table_080cd0cc:
+    .word  font_jp_base_table             @ 080cd0cc 54f8e509
 DAT_080cd0d0:
     .word  0x0201f441                     @ 080cd0d0 41f40102
 DAT_080cd0d4:
@@ -249679,7 +249679,7 @@ FUN_080cd33c:
     movs r1,#0x2    @ 080cd36e 0221
     orrs r0,r1    @ 080cd370 0843
     strb r0,[r2,#0x8]                        @ 080cd372 1072
-    ldr r3, DAT_080cd438                     @ 080cd374 304b
+    ldr r3, PTR_font_jp_base_table_080cd438  @ 080cd374 304b
     lsls r1,r0,#0x1e    @ 080cd376 8107
     lsrs r1,r1,#0x1f    @ 080cd378 c90f
     lsls r1,r1,#0x2    @ 080cd37a 8900
@@ -249779,8 +249779,8 @@ DAT_080cd430:
     .word  0x02000000                     @ 080cd430 00000002
 DAT_080cd434:
     .word  0x00006c2c                     @ 080cd434 2c6c0000
-DAT_080cd438:
-    .word  0x09e5f854                     @ 080cd438 54f8e509
+PTR_font_jp_base_table_080cd438:
+    .word  font_jp_base_table             @ 080cd438 54f8e509
 DAT_080cd43c:
     .word  0x0201f441                     @ 080cd43c 41f40102
 DAT_080cd440:
@@ -250360,7 +250360,7 @@ FUN_080cd870:
     movs r1,#0x2    @ 080cd8a0 0221
     orrs r0,r1    @ 080cd8a2 0843
     strb r0,[r2,#0x8]                        @ 080cd8a4 1072
-    ldr r3, DAT_080cd930                     @ 080cd8a6 224b
+    ldr r3, PTR_font_jp_base_table_080cd930  @ 080cd8a6 224b
     lsls r1,r0,#0x1e    @ 080cd8a8 8107
     lsrs r1,r1,#0x1f    @ 080cd8aa c90f
     lsls r1,r1,#0x2    @ 080cd8ac 8900
@@ -250430,8 +250430,8 @@ DAT_080cd928:
     .word  0x02000000                     @ 080cd928 00000002
 DAT_080cd92c:
     .word  0x00006c2c                     @ 080cd92c 2c6c0000
-DAT_080cd930:
-    .word  0x09e5f854                     @ 080cd930 54f8e509
+PTR_font_jp_base_table_080cd930:
+    .word  font_jp_base_table             @ 080cd930 54f8e509
 DAT_080cd934:
     .word  0x0201f441                     @ 080cd934 41f40102
 DAT_080cd938:
@@ -250619,7 +250619,7 @@ FUN_080cda6c:
     movs r1,#0x2    @ 080cdaa0 0221
     orrs r0,r1    @ 080cdaa2 0843
     strb r0,[r2,#0x8]                        @ 080cdaa4 1072
-    ldr r3, DAT_080cdb8c                     @ 080cdaa6 394b
+    ldr r3, PTR_font_jp_base_table_080cdb8c  @ 080cdaa6 394b
     lsls r1,r0,#0x1e    @ 080cdaa8 8107
     lsrs r1,r1,#0x1f    @ 080cdaaa c90f
     lsls r1,r1,#0x2    @ 080cdaac 8900
@@ -250737,8 +250737,8 @@ DAT_080cdb84:
     .word  0x02000000                     @ 080cdb84 00000002
 DAT_080cdb88:
     .word  0x00006c2c                     @ 080cdb88 2c6c0000
-DAT_080cdb8c:
-    .word  0x09e5f854                     @ 080cdb8c 54f8e509
+PTR_font_jp_base_table_080cdb8c:
+    .word  font_jp_base_table             @ 080cdb8c 54f8e509
 DAT_080cdb90:
     .word  0x0201f441                     @ 080cdb90 41f40102
 DAT_080cdb94:
@@ -251490,7 +251490,7 @@ LAB_080ce104:
     movs r1,#0x2    @ 080ce152 0221
     orrs r0,r1    @ 080ce154 0843
     strb r0,[r2,#0x8]                        @ 080ce156 1072
-    ldr r3, DAT_080ce204                     @ 080ce158 2a4b
+    ldr r3, PTR_font_jp_base_table_080ce204  @ 080ce158 2a4b
     lsls r1,r0,#0x1e    @ 080ce15a 8107
     lsrs r1,r1,#0x1f    @ 080ce15c c90f
     lsls r1,r1,#0x2    @ 080ce15e 8900
@@ -251573,8 +251573,8 @@ DAT_080ce1fc:
     .word  0x02000000                     @ 080ce1fc 00000002
 DAT_080ce200:
     .word  0x00006c2c                     @ 080ce200 2c6c0000
-DAT_080ce204:
-    .word  0x09e5f854                     @ 080ce204 54f8e509
+PTR_font_jp_base_table_080ce204:
+    .word  font_jp_base_table             @ 080ce204 54f8e509
 DAT_080ce208:
     .word  0x00000213                     @ 080ce208 13020000
 PTR_game_str_pointer_table_080ce20c:
@@ -251610,7 +251610,7 @@ FUN_080ce218:
     movs r1,#0x2    @ 080ce248 0221
     orrs r0,r1    @ 080ce24a 0843
     strb r0,[r2,#0x8]                        @ 080ce24c 1072
-    ldr r3, DAT_080ce2d8                     @ 080ce24e 224b
+    ldr r3, PTR_font_jp_base_table_080ce2d8  @ 080ce24e 224b
     lsls r1,r0,#0x1e    @ 080ce250 8107
     lsrs r1,r1,#0x1f    @ 080ce252 c90f
     lsls r1,r1,#0x2    @ 080ce254 8900
@@ -251680,8 +251680,8 @@ DAT_080ce2d0:
     .word  0x02000000                     @ 080ce2d0 00000002
 DAT_080ce2d4:
     .word  0x00006c2c                     @ 080ce2d4 2c6c0000
-DAT_080ce2d8:
-    .word  0x09e5f854                     @ 080ce2d8 54f8e509
+PTR_font_jp_base_table_080ce2d8:
+    .word  font_jp_base_table             @ 080ce2d8 54f8e509
 DAT_080ce2dc:
     .word  0x0201f441                     @ 080ce2dc 41f40102
 DAT_080ce2e0:
@@ -252176,7 +252176,7 @@ LAB_080ce664:
     movs r1,#0x2    @ 080ce698 0221
     orrs r0,r1    @ 080ce69a 0843
     strb r0,[r2,#0x8]                        @ 080ce69c 1072
-    ldr r3, DAT_080ce6dc                     @ 080ce69e 0f4b
+    ldr r3, PTR_font_jp_base_table_080ce6dc  @ 080ce69e 0f4b
     lsls r1,r0,#0x1e    @ 080ce6a0 8107
     lsrs r1,r1,#0x1f    @ 080ce6a2 c90f
     lsls r1,r1,#0x2    @ 080ce6a4 8900
@@ -252207,8 +252207,8 @@ DAT_080ce6d4:
     .word  0x02000000                     @ 080ce6d4 00000002
 DAT_080ce6d8:
     .word  0x00006c2c                     @ 080ce6d8 2c6c0000
-DAT_080ce6dc:
-    .word  0x09e5f854                     @ 080ce6dc 54f8e509
+PTR_font_jp_base_table_080ce6dc:
+    .word  font_jp_base_table             @ 080ce6dc 54f8e509
 DAT_080ce6e0:
     .word  0xfffe01ff                     @ 080ce6e0 ff01feff
 LAB_080ce6e4:
@@ -252454,7 +252454,7 @@ LAB_080ce87e:
     movs r1,#0x2    @ 080ce8c2 0221
     orrs r0,r1    @ 080ce8c4 0843
     strb r0,[r4,#0x8]                        @ 080ce8c6 2072
-    ldr r1, DAT_080ce9ec                     @ 080ce8c8 4849
+    ldr r1, PTR_font_jp_base_table_080ce9ec  @ 080ce8c8 4849
     .hword 0x4688    @ 080ce8ca 8846
     lsls r1,r0,#0x1e    @ 080ce8cc 8107
     lsrs r1,r1,#0x1f    @ 080ce8ce c90f
@@ -252602,8 +252602,8 @@ DAT_080ce9e4:
     .word  0x02000000                     @ 080ce9e4 00000002
 DAT_080ce9e8:
     .word  0x00006c2c                     @ 080ce9e8 2c6c0000
-DAT_080ce9ec:
-    .word  0x09e5f854                     @ 080ce9ec 54f8e509
+PTR_font_jp_base_table_080ce9ec:
+    .word  font_jp_base_table             @ 080ce9ec 54f8e509
 DAT_080ce9f0:
     .word  0x0201e4f0                     @ 080ce9f0 f0e40102
 DAT_080ce9f4:
@@ -252686,7 +252686,7 @@ FUN_080cea50:
     movs r1,#0x2    @ 080cea8c 0221
     orrs r0,r1    @ 080cea8e 0843
     strb r0,[r2,#0x8]                        @ 080cea90 1072
-    ldr r3, DAT_080ceb54                     @ 080cea92 304b
+    ldr r3, PTR_font_jp_base_table_080ceb54  @ 080cea92 304b
     lsls r1,r0,#0x1e    @ 080cea94 8107
     lsrs r1,r1,#0x1f    @ 080cea96 c90f
     lsls r1,r1,#0x2    @ 080cea98 8900
@@ -252785,8 +252785,8 @@ DAT_080ceb4c:
     .word  0x02000000                     @ 080ceb4c 00000002
 DAT_080ceb50:
     .word  0x00006c2c                     @ 080ceb50 2c6c0000
-DAT_080ceb54:
-    .word  0x09e5f854                     @ 080ceb54 54f8e509
+PTR_font_jp_base_table_080ceb54:
+    .word  font_jp_base_table             @ 080ceb54 54f8e509
 DAT_080ceb58:
     .word  0x0201f441                     @ 080ceb58 41f40102
 DAT_080ceb5c:
@@ -252907,7 +252907,7 @@ LAB_080cec04:
     movs r1,#0x2    @ 080cec38 0221
     orrs r0,r1    @ 080cec3a 0843
     strb r0,[r2,#0x8]                        @ 080cec3c 1072
-    ldr r3, DAT_080cecfc                     @ 080cec3e 2f4b
+    ldr r3, PTR_font_jp_base_table_080cecfc  @ 080cec3e 2f4b
     lsls r1,r0,#0x1e    @ 080cec40 8107
     lsrs r1,r1,#0x1f    @ 080cec42 c90f
     lsls r1,r1,#0x2    @ 080cec44 8900
@@ -253004,8 +253004,8 @@ DAT_080cecf4:
     .word  0x02000000                     @ 080cecf4 00000002
 DAT_080cecf8:
     .word  0x00006c2c                     @ 080cecf8 2c6c0000
-DAT_080cecfc:
-    .word  0x09e5f854                     @ 080cecfc 54f8e509
+PTR_font_jp_base_table_080cecfc:
+    .word  font_jp_base_table             @ 080cecfc 54f8e509
 DAT_080ced00:
     .word  0x00000201                     @ 080ced00 01020000
 DAT_080ced04:
@@ -253347,7 +253347,7 @@ LAB_080cef50:
     movs r1,#0x2    @ 080cef82 0221
     orrs r0,r1    @ 080cef84 0843
     strb r0,[r2,#0x8]                        @ 080cef86 1072
-    ldr r3, DAT_080cefd8                     @ 080cef88 134b
+    ldr r3, PTR_font_jp_base_table_080cefd8  @ 080cef88 134b
     lsls r1,r0,#0x1e    @ 080cef8a 8107
     lsrs r1,r1,#0x1f    @ 080cef8c c90f
     lsls r1,r1,#0x2    @ 080cef8e 8900
@@ -253386,8 +253386,8 @@ DAT_080cefd0:
     .word  0x02000000                     @ 080cefd0 00000002
 DAT_080cefd4:
     .word  0x00006c2c                     @ 080cefd4 2c6c0000
-DAT_080cefd8:
-    .word  0x09e5f854                     @ 080cefd8 54f8e509
+PTR_font_jp_base_table_080cefd8:
+    .word  font_jp_base_table             @ 080cefd8 54f8e509
 DAT_080cefdc:
     .word  0x06014000                     @ 080cefdc 00400106
 DAT_080cefe0:
@@ -253764,7 +253764,7 @@ FUN_080cf25c:
     movs r1,#0x2    @ 080cf2ac 0221
     orrs r0,r1    @ 080cf2ae 0843
     strb r0,[r2,#0x8]                        @ 080cf2b0 1072
-    ldr r3, DAT_080cf328                     @ 080cf2b2 1d4b
+    ldr r3, PTR_font_jp_base_table_080cf328  @ 080cf2b2 1d4b
     lsls r1,r0,#0x1e    @ 080cf2b4 8107
     lsrs r1,r1,#0x1f    @ 080cf2b6 c90f
     lsls r1,r1,#0x2    @ 080cf2b8 8900
@@ -253819,8 +253819,8 @@ DAT_080cf320:
     .word  0x02000000                     @ 080cf320 00000002
 DAT_080cf324:
     .word  0x00006c2c                     @ 080cf324 2c6c0000
-DAT_080cf328:
-    .word  0x09e5f854                     @ 080cf328 54f8e509
+PTR_font_jp_base_table_080cf328:
+    .word  font_jp_base_table             @ 080cf328 54f8e509
 DAT_080cf32c:
     .word  0x06013800                     @ 080cf32c 00380106
 FUN_080cf330:
@@ -253914,7 +253914,7 @@ FUN_080cf3b0:
     movs r1,#0x2    @ 080cf3e0 0221
     orrs r0,r1    @ 080cf3e2 0843
     strb r0,[r2,#0x8]                        @ 080cf3e4 1072
-    ldr r3, DAT_080cf474                     @ 080cf3e6 234b
+    ldr r3, PTR_font_jp_base_table_080cf474  @ 080cf3e6 234b
     lsls r1,r0,#0x1e    @ 080cf3e8 8107
     lsrs r1,r1,#0x1f    @ 080cf3ea c90f
     lsls r1,r1,#0x2    @ 080cf3ec 8900
@@ -253985,8 +253985,8 @@ DAT_080cf46c:
     .word  0x02000000                     @ 080cf46c 00000002
 DAT_080cf470:
     .word  0x00006c2c                     @ 080cf470 2c6c0000
-DAT_080cf474:
-    .word  0x09e5f854                     @ 080cf474 54f8e509
+PTR_font_jp_base_table_080cf474:
+    .word  font_jp_base_table             @ 080cf474 54f8e509
 DAT_080cf478:
     .word  0x0201f441                     @ 080cf478 41f40102
 DAT_080cf47c:
@@ -254572,7 +254572,7 @@ LAB_080cf878:
     movs r1,#0x2    @ 080cf8da 0221
     orrs r0,r1    @ 080cf8dc 0843
     strb r0,[r2,#0x8]                        @ 080cf8de 1072
-    ldr r3, DAT_080cf9dc                     @ 080cf8e0 3e4b
+    ldr r3, PTR_font_jp_base_table_080cf9dc  @ 080cf8e0 3e4b
     lsls r1,r0,#0x1e    @ 080cf8e2 8107
     lsrs r1,r1,#0x1f    @ 080cf8e4 c90f
     lsls r1,r1,#0x2    @ 080cf8e6 8900
@@ -254692,8 +254692,8 @@ DAT_080cf9d4:
     .word  0x02000000                     @ 080cf9d4 00000002
 DAT_080cf9d8:
     .word  0x00006c2c                     @ 080cf9d8 2c6c0000
-DAT_080cf9dc:
-    .word  0x09e5f854                     @ 080cf9dc 54f8e509
+PTR_font_jp_base_table_080cf9dc:
+    .word  font_jp_base_table             @ 080cf9dc 54f8e509
 DAT_080cf9e0:
     .word  0x06012800                     @ 080cf9e0 00280106
 DAT_080cf9e4:
@@ -254731,7 +254731,7 @@ FUN_080cf9f4:
     movs r1,#0x2    @ 080cfa24 0221
     orrs r0,r1    @ 080cfa26 0843
     strb r0,[r2,#0x8]                        @ 080cfa28 1072
-    ldr r3, DAT_080cfab4                     @ 080cfa2a 224b
+    ldr r3, PTR_font_jp_base_table_080cfab4  @ 080cfa2a 224b
     lsls r1,r0,#0x1e    @ 080cfa2c 8107
     lsrs r1,r1,#0x1f    @ 080cfa2e c90f
     lsls r1,r1,#0x2    @ 080cfa30 8900
@@ -254801,8 +254801,8 @@ DAT_080cfaac:
     .word  0x02000000                     @ 080cfaac 00000002
 DAT_080cfab0:
     .word  0x00006c2c                     @ 080cfab0 2c6c0000
-DAT_080cfab4:
-    .word  0x09e5f854                     @ 080cfab4 54f8e509
+PTR_font_jp_base_table_080cfab4:
+    .word  font_jp_base_table             @ 080cfab4 54f8e509
 DAT_080cfab8:
     .word  0x0201f441                     @ 080cfab8 41f40102
 DAT_080cfabc:
@@ -255232,7 +255232,7 @@ LAB_080cfdca:
     movs r1,#0x2    @ 080cfdf2 0221
     orrs r0,r1    @ 080cfdf4 0843
     strb r0,[r2,#0x8]                        @ 080cfdf6 1072
-    ldr r3, DAT_080cfe3c                     @ 080cfdf8 104b
+    ldr r3, PTR_font_jp_base_table_080cfe3c  @ 080cfdf8 104b
     lsls r1,r0,#0x1e    @ 080cfdfa 8107
     lsrs r1,r1,#0x1f    @ 080cfdfc c90f
     lsls r1,r1,#0x2    @ 080cfdfe 8900
@@ -255265,8 +255265,8 @@ DAT_080cfe34:
     .word  0x02000000                     @ 080cfe34 00000002
 DAT_080cfe38:
     .word  0x00006c2c                     @ 080cfe38 2c6c0000
-DAT_080cfe3c:
-    .word  0x09e5f854                     @ 080cfe3c 54f8e509
+PTR_font_jp_base_table_080cfe3c:
+    .word  font_jp_base_table             @ 080cfe3c 54f8e509
 DAT_080cfe40:
     .word  0x06012800                     @ 080cfe40 00280106
 DAT_080cfe44:
@@ -255531,7 +255531,7 @@ FUN_080cffd4:
     movs r1,#0x2    @ 080d004e 0221
     orrs r0,r1    @ 080d0050 0843
     strb r0,[r2,#0x8]                        @ 080d0052 1072
-    ldr r3, DAT_080d0130                     @ 080d0054 364b
+    ldr r3, PTR_font_jp_base_table_080d0130  @ 080d0054 364b
     lsls r1,r0,#0x1e    @ 080d0056 8107
     lsrs r1,r1,#0x1f    @ 080d0058 c90f
     lsls r1,r1,#0x2    @ 080d005a 8900
@@ -255639,8 +255639,8 @@ DAT_080d0128:
     .word  0x02000000                     @ 080d0128 00000002
 DAT_080d012c:
     .word  0x00006c2c                     @ 080d012c 2c6c0000
-DAT_080d0130:
-    .word  0x09e5f854                     @ 080d0130 54f8e509
+PTR_font_jp_base_table_080d0130:
+    .word  font_jp_base_table             @ 080d0130 54f8e509
 DAT_080d0134:
     .word  0x06014000                     @ 080d0134 00400106
 DAT_080d0138:
@@ -256153,7 +256153,7 @@ FUN_080d04dc:
     movs r1,#0x2    @ 080d0516 0221
     orrs r0,r1    @ 080d0518 0843
     strb r0,[r2,#0x8]                        @ 080d051a 1072
-    ldr r3, DAT_080d05d4                     @ 080d051c 2d4b
+    ldr r3, PTR_font_jp_base_table_080d05d4  @ 080d051c 2d4b
     lsls r1,r0,#0x1e    @ 080d051e 8107
     lsrs r1,r1,#0x1f    @ 080d0520 c90f
     lsls r1,r1,#0x2    @ 080d0522 8900
@@ -256246,8 +256246,8 @@ DAT_080d05cc:
     .word  0x02000000                     @ 080d05cc 00000002
 DAT_080d05d0:
     .word  0x00006c2c                     @ 080d05d0 2c6c0000
-DAT_080d05d4:
-    .word  0x09e5f854                     @ 080d05d4 54f8e509
+PTR_font_jp_base_table_080d05d4:
+    .word  font_jp_base_table             @ 080d05d4 54f8e509
 DAT_080d05d8:
     .word  0x0201f441                     @ 080d05d8 41f40102
 DAT_080d05dc:
@@ -266956,7 +266956,7 @@ FUN_080d912c:
     ldrb r3,[r2,#0x14]                       @ 080d915c 137d
     ands r0,r3    @ 080d915e 1840
     strb r0,[r2,#0x14]                       @ 080d9160 1075
-    ldr r0, DAT_080d91d8                     @ 080d9162 1d48
+    ldr r0, PTR_font_jp_base_table_080d91d8  @ 080d9162 1d48
     lsls r1,r1,#0x1f    @ 080d9164 c907
     lsrs r1,r1,#0x1f    @ 080d9166 c90f
     lsls r1,r1,#0x3    @ 080d9168 c900
@@ -267012,8 +267012,8 @@ DAT_080d91d0:
     .word  0x06017ac0                     @ 080d91d0 c07a0106
 DAT_080d91d4:
     .word  0x02006ed0                     @ 080d91d4 d06e0002
-DAT_080d91d8:
-    .word  0x09e5f854                     @ 080d91d8 54f8e509
+PTR_font_jp_base_table_080d91d8:
+    .word  font_jp_base_table             @ 080d91d8 54f8e509
 DAT_080d91dc:
     .word  0x00008002                     @ 080d91dc 02800000
 FUN_080d91e0:
@@ -267755,7 +267755,7 @@ LAB_080d9758:
     ldrb r3,[r2,#0x14]                       @ 080d97aa 137d
     ands r0,r3    @ 080d97ac 1840
     strb r0,[r2,#0x14]                       @ 080d97ae 1075
-    ldr r0, DAT_080d97fc                     @ 080d97b0 1248
+    ldr r0, PTR_font_jp_base_table_080d97fc  @ 080d97b0 1248
     lsls r1,r1,#0x1f    @ 080d97b2 c907
     lsrs r1,r1,#0x1f    @ 080d97b4 c90f
     lsls r1,r1,#0x3    @ 080d97b6 c900
@@ -267791,8 +267791,8 @@ DAT_080d97f4:
     .word  0x09e49500                     @ 080d97f4 0095e409
 DAT_080d97f8:
     .word  0x02006ed0                     @ 080d97f8 d06e0002
-DAT_080d97fc:
-    .word  0x09e5f854                     @ 080d97fc 54f8e509
+PTR_font_jp_base_table_080d97fc:
+    .word  font_jp_base_table             @ 080d97fc 54f8e509
 DAT_080d9800:
     .word  0x06017980                     @ 080d9800 80790106
 DAT_080d9804:
@@ -272241,7 +272241,7 @@ LAB_080dba80:
     ldrb r3,[r2,#0x14]                       @ 080dbaa0 137d
     ands r0,r3    @ 080dbaa2 1840
     strb r0,[r2,#0x14]                       @ 080dbaa4 1075
-    ldr r3, DAT_080dbb64                     @ 080dbaa6 2f4b
+    ldr r3, PTR_font_jp_base_table_080dbb64  @ 080dbaa6 2f4b
     lsls r0,r1,#0x1e    @ 080dbaa8 8807
     lsrs r0,r0,#0x1f    @ 080dbaaa c00f
     lsls r0,r0,#0x2    @ 080dbaac 8000
@@ -272329,8 +272329,8 @@ DAT_080dbb5c:
     .word  0x05f5e0ff                     @ 080dbb5c ffe0f505
 DAT_080dbb60:
     .word  0x02006ed0                     @ 080dbb60 d06e0002
-DAT_080dbb64:
-    .word  0x09e5f854                     @ 080dbb64 54f8e509
+PTR_font_jp_base_table_080dbb64:
+    .word  font_jp_base_table             @ 080dbb64 54f8e509
 DAT_080dbb68:
     .word  0x00008108                     @ 080dbb68 08810000
 DAT_080dbb6c:
@@ -272422,7 +272422,7 @@ pack_name_text_render:
     ldrb r3,[r2,#0x14]                       @ 080dbc14 137d
     ands r0,r3    @ 080dbc16 1840
     strb r0,[r2,#0x14]                       @ 080dbc18 1075
-    ldr r3, DAT_080dbc7c                     @ 080dbc1a 184b
+    ldr r3, PTR_font_jp_base_table_080dbc7c  @ 080dbc1a 184b
     lsls r0,r1,#0x1e    @ 080dbc1c 8807
     lsrs r0,r0,#0x1f    @ 080dbc1e c00f
     lsls r0,r0,#0x2    @ 080dbc20 8000
@@ -272467,8 +272467,8 @@ PTR_game_str_ja_080dbc74:
     .word  game_str_ja                    @ 080dbc74 109cdb09
 DAT_080dbc78:
     .word  0x02006ed0                     @ 080dbc78 d06e0002
-DAT_080dbc7c:
-    .word  0x09e5f854                     @ 080dbc7c 54f8e509
+PTR_font_jp_base_table_080dbc7c:
+    .word  font_jp_base_table             @ 080dbc7c 54f8e509
 DAT_080dbc80:
     .word  0x00008108                     @ 080dbc80 08810000
 DAT_080dbc84:
@@ -272569,7 +272569,7 @@ FUN_080dbcfc:
     ldrb r3,[r2,#0x14]                       @ 080dbd3e 137d
     ands r0,r3    @ 080dbd40 1840
     strb r0,[r2,#0x14]                       @ 080dbd42 1075
-    ldr r3, DAT_080dbd88                     @ 080dbd44 104b
+    ldr r3, PTR_font_jp_base_table_080dbd88  @ 080dbd44 104b
     lsls r0,r1,#0x1e    @ 080dbd46 8807
     lsrs r0,r0,#0x1f    @ 080dbd48 c00f
     lsls r0,r0,#0x2    @ 080dbd4a 8000
@@ -272602,8 +272602,8 @@ DAT_080dbd80:
     .word  0x00006c2c                     @ 080dbd80 2c6c0000
 DAT_080dbd84:
     .word  0x02006ed0                     @ 080dbd84 d06e0002
-DAT_080dbd88:
-    .word  0x09e5f854                     @ 080dbd88 54f8e509
+PTR_font_jp_base_table_080dbd88:
+    .word  font_jp_base_table             @ 080dbd88 54f8e509
 DAT_080dbd8c:
     .word  0x00008108                     @ 080dbd8c 08810000
 LAB_080dbd90:
@@ -272866,7 +272866,7 @@ FUN_080dbf40:
     bl FUN_080f528c                          @ 080dbf86 19f081f9
     movs r6,#0x0    @ 080dbf8a 0026
     ldr r5, DAT_080dbfac                     @ 080dbf8c 074d
-    ldr r7, DAT_080dbfb0                     @ 080dbf8e 084f
+    ldr r7, PTR_font_jp_base_table_080dbfb0  @ 080dbf8e 084f
     b LAB_080dbfb8                           @ 080dbf90 12e0
     .byte  0x00, 0x00
 DAT_080dbf94:
@@ -272883,8 +272883,8 @@ PTR_pack_info_table_080dbfa8:
     .word  pack_info_table                @ 080dbfa8 e8e2e509
 DAT_080dbfac:
     .word  0x02006ed0                     @ 080dbfac d06e0002
-DAT_080dbfb0:
-    .word  0x09e5f854                     @ 080dbfb0 54f8e509
+PTR_font_jp_base_table_080dbfb0:
+    .word  font_jp_base_table             @ 080dbfb0 54f8e509
 LAB_080dbfb4:
     cmp r6,#0x0                              @ 080dbfb4 002e
     beq LAB_080dc014                         @ 080dbfb6 2dd0
@@ -273095,7 +273095,7 @@ LAB_080dc11a:
     ldrb r3,[r2,#0x14]                       @ 080dc14e 137d
     ands r0,r3    @ 080dc150 1840
     strb r0,[r2,#0x14]                       @ 080dc152 1075
-    ldr r3, DAT_080dc1b4                     @ 080dc154 174b
+    ldr r3, PTR_font_jp_base_table_080dc1b4  @ 080dc154 174b
     lsls r0,r1,#0x1e    @ 080dc156 8807
     lsrs r0,r0,#0x1f    @ 080dc158 c00f
     lsls r0,r0,#0x2    @ 080dc15a 8000
@@ -273139,8 +273139,8 @@ LAB_080dc11a:
     bx r0                                    @ 080dc1ae 0047
 DAT_080dc1b0:
     .word  0x02006ed0                     @ 080dc1b0 d06e0002
-DAT_080dc1b4:
-    .word  0x09e5f854                     @ 080dc1b4 54f8e509
+PTR_font_jp_base_table_080dc1b4:
+    .word  font_jp_base_table             @ 080dc1b4 54f8e509
 FUN_080dc1b8:
     push {r4,r5,lr}                          @ 080dc1b8 30b5
     adds r3,r0,#0x0    @ 080dc1ba 031c
@@ -273250,7 +273250,7 @@ FUN_080dc1f8:
     ldrb r3,[r2,#0x14]                       @ 080dc28e 137d
     ands r0,r3    @ 080dc290 1840
     strb r0,[r2,#0x14]                       @ 080dc292 1075
-    ldr r3, DAT_080dc320                     @ 080dc294 224b
+    ldr r3, PTR_font_jp_base_table_080dc320  @ 080dc294 224b
     lsls r0,r1,#0x1e    @ 080dc296 8807
     lsrs r0,r0,#0x1f    @ 080dc298 c00f
     lsls r0,r0,#0x2    @ 080dc29a 8000
@@ -273314,8 +273314,8 @@ DAT_080dc318:
     .word  0x0000138f                     @ 080dc318 8f130000
 DAT_080dc31c:
     .word  0x02006ed0                     @ 080dc31c d06e0002
-DAT_080dc320:
-    .word  0x09e5f854                     @ 080dc320 54f8e509
+PTR_font_jp_base_table_080dc320:
+    .word  font_jp_base_table             @ 080dc320 54f8e509
 DAT_080dc324:
     .word  0x00008108                     @ 080dc324 08810000
 DAT_080dc328:
@@ -273644,7 +273644,7 @@ LAB_080dc562:
     ldrb r3,[r2,#0x14]                       @ 080dc59c 137d
     ands r0,r3    @ 080dc59e 1840
     strb r0,[r2,#0x14]                       @ 080dc5a0 1075
-    ldr r3, DAT_080dc5e4                     @ 080dc5a2 104b
+    ldr r3, PTR_font_jp_base_table_080dc5e4  @ 080dc5a2 104b
     lsls r0,r1,#0x1e    @ 080dc5a4 8807
     lsrs r0,r0,#0x1f    @ 080dc5a6 c00f
     lsls r0,r0,#0x2    @ 080dc5a8 8000
@@ -273675,8 +273675,8 @@ LAB_080dc5d8:
     .byte  0x00, 0x00
 DAT_080dc5e0:
     .word  0x02006ed0                     @ 080dc5e0 d06e0002
-DAT_080dc5e4:
-    .word  0x09e5f854                     @ 080dc5e4 54f8e509
+PTR_font_jp_base_table_080dc5e4:
+    .word  font_jp_base_table             @ 080dc5e4 54f8e509
 DAT_080dc5e8:
     .word  0x00000107                     @ 080dc5e8 07010000
 FUN_080dc5ec:
@@ -274836,7 +274836,7 @@ LAB_080dcf0a:
     ands r0,r3    @ 080dcf3e 1840
     orrs r0,r2    @ 080dcf40 1043
     strb r0,[r6,#0x14]                       @ 080dcf42 3075
-    ldr r2, DAT_080dd03c                     @ 080dcf44 3d4a
+    ldr r2, PTR_font_jp_base_table_080dd03c  @ 080dcf44 3d4a
     lsls r0,r1,#0x1e    @ 080dcf46 8807
     lsrs r0,r0,#0x1f    @ 080dcf48 c00f
     lsls r0,r0,#0x2    @ 080dcf4a 8000
@@ -274956,8 +274956,8 @@ PTR_gPrng_080dd034:
     .word  gPrng                          @ 080dd034 40000003
 DAT_080dd038:
     .word  0x02006ed0                     @ 080dd038 d06e0002
-DAT_080dd03c:
-    .word  0x09e5f854                     @ 080dd03c 54f8e509
+PTR_font_jp_base_table_080dd03c:
+    .word  font_jp_base_table             @ 080dd03c 54f8e509
 DAT_080dd040:
     .word  0x000003ff                     @ 080dd040 ff030000
 DAT_080dd044:
@@ -275038,7 +275038,7 @@ LAB_080dd0a4:
     ands r0,r3    @ 080dd0d4 1840
     orrs r0,r2    @ 080dd0d6 1043
     strb r0,[r5,#0x14]                       @ 080dd0d8 2875
-    ldr r2, DAT_080dd158                     @ 080dd0da 1f4a
+    ldr r2, PTR_font_jp_base_table_080dd158  @ 080dd0da 1f4a
     lsls r0,r1,#0x1e    @ 080dd0dc 8807
     lsrs r0,r0,#0x1f    @ 080dd0de c00f
     lsls r0,r0,#0x2    @ 080dd0e0 8000
@@ -275101,8 +275101,8 @@ LAB_080dd148:
     .byte  0x00, 0x00
 DAT_080dd154:
     .word  0x02006ed0                     @ 080dd154 d06e0002
-DAT_080dd158:
-    .word  0x09e5f854                     @ 080dd158 54f8e509
+PTR_font_jp_base_table_080dd158:
+    .word  font_jp_base_table             @ 080dd158 54f8e509
 DAT_080dd15c:
     .word  0x000003ff                     @ 080dd15c ff030000
 DAT_080dd160:
@@ -276751,7 +276751,7 @@ DAT_080dde18:
     ldrb r3,[r2,#0x14]                       @ 080dde48 137d
     ands r0,r3    @ 080dde4a 1840
     strb r0,[r2,#0x14]                       @ 080dde4c 1075
-    ldr r3, DAT_080ddebc                     @ 080dde4e 1b4b
+    ldr r3, PTR_font_jp_base_table_080ddebc  @ 080dde4e 1b4b
     lsls r0,r1,#0x1e    @ 080dde50 8807
     lsrs r0,r0,#0x1f    @ 080dde52 c00f
     lsls r0,r0,#0x2    @ 080dde54 8000
@@ -276802,8 +276802,8 @@ PTR_BG0CNT_080ddeb4:
     .word  BG0CNT                         @ 080ddeb4 08000004
 DAT_080ddeb8:
     .word  0x02006ed0                     @ 080ddeb8 d06e0002
-DAT_080ddebc:
-    .word  0x09e5f854                     @ 080ddebc 54f8e509
+PTR_font_jp_base_table_080ddebc:
+    .word  font_jp_base_table             @ 080ddebc 54f8e509
 DAT_080ddec0:
     .word  0x00000107                     @ 080ddec0 07010000
 DAT_080ddec4:
@@ -277390,7 +277390,7 @@ LAB_080de2d8:
     ldrb r3,[r2,#0x14]                       @ 080de308 137d
     ands r0,r3    @ 080de30a 1840
     strb r0,[r2,#0x14]                       @ 080de30c 1075
-    ldr r0, DAT_080de3d0                     @ 080de30e 3048
+    ldr r0, PTR_font_jp_base_table_080de3d0  @ 080de30e 3048
     lsls r1,r1,#0x1f    @ 080de310 c907
     lsrs r1,r1,#0x1f    @ 080de312 c90f
     lsls r1,r1,#0x3    @ 080de314 c900
@@ -277481,8 +277481,8 @@ DAT_080de3c8:
     .word  0x0600f8e8                     @ 080de3c8 e8f80006
 DAT_080de3cc:
     .word  0x02006ed0                     @ 080de3cc d06e0002
-DAT_080de3d0:
-    .word  0x09e5f854                     @ 080de3d0 54f8e509
+PTR_font_jp_base_table_080de3d0:
+    .word  font_jp_base_table             @ 080de3d0 54f8e509
 DAT_080de3d4:
     .word  0x00008008                     @ 080de3d4 08800000
 DAT_080de3d8:
@@ -277519,7 +277519,7 @@ FUN_080de3e8:
     ldrb r3,[r2,#0x14]                       @ 080de414 137d
     ands r0,r3    @ 080de416 1840
     strb r0,[r2,#0x14]                       @ 080de418 1075
-    ldr r3, DAT_080de728                     @ 080de41a c34b
+    ldr r3, PTR_font_jp_base_table_080de728  @ 080de41a c34b
     lsls r0,r1,#0x1e    @ 080de41c 8807
     lsrs r0,r0,#0x1f    @ 080de41e c00f
     lsls r0,r0,#0x2    @ 080de420 8000
@@ -277685,7 +277685,7 @@ LAB_080de53e:
     ldrb r3,[r2,#0x14]                       @ 080de576 137d
     ands r0,r3    @ 080de578 1840
     strb r0,[r2,#0x14]                       @ 080de57a 1075
-    ldr r0, DAT_080de728                     @ 080de57c 6a48
+    ldr r0, PTR_font_jp_base_table_080de728  @ 080de57c 6a48
     lsls r1,r1,#0x1f    @ 080de57e c907
     lsrs r1,r1,#0x1f    @ 080de580 c90f
     lsls r1,r1,#0x3    @ 080de582 c900
@@ -277885,8 +277885,8 @@ DAT_080de720:
     .word  0x06000020                     @ 080de720 20000006
 DAT_080de724:
     .word  0x02006ed0                     @ 080de724 d06e0002
-DAT_080de728:
-    .word  0x09e5f854                     @ 080de728 54f8e509
+PTR_font_jp_base_table_080de728:
+    .word  font_jp_base_table             @ 080de728 54f8e509
 DAT_080de72c:
     .word  0x00001389                     @ 080de72c 89130000
 PTR_game_str_pointer_table_080de730:
@@ -278227,7 +278227,7 @@ FUN_080df2d0:
     ldrb r3,[r2,#0x14]                       @ 080df2ea 137d
     ands r0,r3    @ 080df2ec 1840
     strb r0,[r2,#0x14]                       @ 080df2ee 1075
-    ldr r3, DAT_080df354                     @ 080df2f0 184b
+    ldr r3, PTR_font_jp_base_table_080df354  @ 080df2f0 184b
     lsls r0,r1,#0x1e    @ 080df2f2 8807
     lsrs r0,r0,#0x1f    @ 080df2f4 c00f
     lsls r0,r0,#0x2    @ 080df2f6 8000
@@ -278273,8 +278273,8 @@ LAB_080df30a:
     .byte  0x00, 0x00
 DAT_080df350:
     .word  0x02006ed0                     @ 080df350 d06e0002
-DAT_080df354:
-    .word  0x09e5f854                     @ 080df354 54f8e509
+PTR_font_jp_base_table_080df354:
+    .word  font_jp_base_table             @ 080df354 54f8e509
 DAT_080df358:
     .word  0x06012000                     @ 080df358 00200106
 DAT_080df35c:
@@ -278402,7 +278402,7 @@ FUN_080df3f0:
     lsrs r1,r1,#0x1f    @ 080df452 c90f
     lsls r1,r1,#0x3    @ 080df454 c900
     adds r0,r0,r1    @ 080df456 4018
-    ldr r1, DAT_080df514                     @ 080df458 2e49
+    ldr r1, PTR_font_jp_base_table_080df514  @ 080df458 2e49
     adds r0,r0,r1    @ 080df45a 4018
     ldr r0,[r0,#0x0]                         @ 080df45c 0068
     str r0,[r4,#0x4]                         @ 080df45e 6060
@@ -278457,7 +278457,7 @@ FUN_080df3f0:
     lsls r0,r0,#0x1f    @ 080df4c8 c007
     lsrs r0,r0,#0x1f    @ 080df4ca c00f
     lsls r0,r0,#0x3    @ 080df4cc c000
-    ldr r3, DAT_080df514                     @ 080df4ce 114b
+    ldr r3, PTR_font_jp_base_table_080df514  @ 080df4ce 114b
     adds r0,r0,r3    @ 080df4d0 c018
     ldr r0,[r0,#0x0]                         @ 080df4d2 0068
     str r0,[r4,#0x4]                         @ 080df4d4 6060
@@ -278492,8 +278492,8 @@ DAT_080df50c:
     .word  0x06011200                     @ 080df50c 00120106
 DAT_080df510:
     .word  0x02006ed0                     @ 080df510 d06e0002
-DAT_080df514:
-    .word  0x09e5f854                     @ 080df514 54f8e509
+PTR_font_jp_base_table_080df514:
+    .word  font_jp_base_table             @ 080df514 54f8e509
 DAT_080df518:
     .word  0x00001390                     @ 080df518 90130000
 PTR_game_str_pointer_table_080df51c:
@@ -288537,7 +288537,7 @@ FUN_080e5740:
     movs r1,#0x2    @ 080e5786 0221
     orrs r0,r1    @ 080e5788 0843
     strb r0,[r2,#0x8]                        @ 080e578a 1072
-    ldr r3, DAT_080e582c                     @ 080e578c 274b
+    ldr r3, PTR_font_jp_base_table_080e582c  @ 080e578c 274b
     lsls r1,r0,#0x1e    @ 080e578e 8107
     lsrs r1,r1,#0x1f    @ 080e5790 c90f
     lsls r1,r1,#0x2    @ 080e5792 8900
@@ -288612,8 +288612,8 @@ DAT_080e5824:
     .word  0x02000000                     @ 080e5824 00000002
 DAT_080e5828:
     .word  0x00006c2c                     @ 080e5828 2c6c0000
-DAT_080e582c:
-    .word  0x09e5f854                     @ 080e582c 54f8e509
+PTR_font_jp_base_table_080e582c:
+    .word  font_jp_base_table             @ 080e582c 54f8e509
 DAT_080e5830:
     .word  0x00008001                     @ 080e5830 01800000
 PTR_game_str_pointer_table_080e5834:
@@ -288716,7 +288716,7 @@ FUN_080e58a8:
     movs r1,#0x2    @ 080e58ee 0221
     orrs r0,r1    @ 080e58f0 0843
     strb r0,[r2,#0x8]                        @ 080e58f2 1072
-    ldr r3, DAT_080e5994                     @ 080e58f4 274b
+    ldr r3, PTR_font_jp_base_table_080e5994  @ 080e58f4 274b
     lsls r1,r0,#0x1e    @ 080e58f6 8107
     lsrs r1,r1,#0x1f    @ 080e58f8 c90f
     lsls r1,r1,#0x2    @ 080e58fa 8900
@@ -288791,8 +288791,8 @@ DAT_080e598c:
     .word  0x02000000                     @ 080e598c 00000002
 DAT_080e5990:
     .word  0x00006c2c                     @ 080e5990 2c6c0000
-DAT_080e5994:
-    .word  0x09e5f854                     @ 080e5994 54f8e509
+PTR_font_jp_base_table_080e5994:
+    .word  font_jp_base_table             @ 080e5994 54f8e509
 DAT_080e5998:
     .word  0x00008001                     @ 080e5998 01800000
 PTR_game_str_pointer_table_080e599c:
@@ -288883,7 +288883,7 @@ FUN_080e5a10:
     movs r1,#0x2    @ 080e5a3c 0221
     orrs r0,r1    @ 080e5a3e 0843
     strb r0,[r4,#0x8]                        @ 080e5a40 2072
-    ldr r6, DAT_080e5abc                     @ 080e5a42 1e4e
+    ldr r6, PTR_font_jp_base_table_080e5abc  @ 080e5a42 1e4e
     lsls r1,r0,#0x1e    @ 080e5a44 8107
     lsrs r1,r1,#0x1f    @ 080e5a46 c90f
     lsls r1,r1,#0x2    @ 080e5a48 8900
@@ -288940,8 +288940,8 @@ DAT_080e5ab4:
     .word  0x02000000                     @ 080e5ab4 00000002
 DAT_080e5ab8:
     .word  0x00006c2c                     @ 080e5ab8 2c6c0000
-DAT_080e5abc:
-    .word  0x09e5f854                     @ 080e5abc 54f8e509
+PTR_font_jp_base_table_080e5abc:
+    .word  font_jp_base_table             @ 080e5abc 54f8e509
 DAT_080e5ac0:
     .word  0x00008008                     @ 080e5ac0 08800000
 DAT_080e5ac4:
@@ -289133,7 +289133,7 @@ FUN_080e5c04:
     movs r1,#0x2    @ 080e5c2c 0221
     orrs r0,r1    @ 080e5c2e 0843
     strb r0,[r2,#0x8]                        @ 080e5c30 1072
-    ldr r3, DAT_080e5ca0                     @ 080e5c32 1b4b
+    ldr r3, PTR_font_jp_base_table_080e5ca0  @ 080e5c32 1b4b
     lsls r1,r0,#0x1e    @ 080e5c34 8107
     lsrs r1,r1,#0x1f    @ 080e5c36 c90f
     lsls r1,r1,#0x2    @ 080e5c38 8900
@@ -289189,8 +289189,8 @@ DAT_080e5c98:
     .word  0x02000000                     @ 080e5c98 00000002
 DAT_080e5c9c:
     .word  0x00006c2c                     @ 080e5c9c 2c6c0000
-DAT_080e5ca0:
-    .word  0x09e5f854                     @ 080e5ca0 54f8e509
+PTR_font_jp_base_table_080e5ca0:
+    .word  font_jp_base_table             @ 080e5ca0 54f8e509
 DAT_080e5ca4:
     .word  0x06011800                     @ 080e5ca4 00180106
 DAT_080e5ca8:
@@ -289646,7 +289646,7 @@ FUN_080e600c:
     movs r1,#0x2    @ 080e602c 0221
     orrs r0,r1    @ 080e602e 0843
     strb r0,[r2,#0x8]                        @ 080e6030 1072
-    ldr r3, DAT_080e6094                     @ 080e6032 184b
+    ldr r3, PTR_font_jp_base_table_080e6094  @ 080e6032 184b
     lsls r1,r0,#0x1e    @ 080e6034 8107
     lsrs r1,r1,#0x1f    @ 080e6036 c90f
     lsls r1,r1,#0x2    @ 080e6038 8900
@@ -289692,8 +289692,8 @@ DAT_080e608c:
     .word  0x02000000                     @ 080e608c 00000002
 DAT_080e6090:
     .word  0x00006c2c                     @ 080e6090 2c6c0000
-DAT_080e6094:
-    .word  0x09e5f854                     @ 080e6094 54f8e509
+PTR_font_jp_base_table_080e6094:
+    .word  font_jp_base_table             @ 080e6094 54f8e509
 DAT_080e6098:
     .word  0x06012800                     @ 080e6098 00280106
 FUN_080e609c:
@@ -289722,7 +289722,7 @@ FUN_080e609c:
     movs r1,#0x2    @ 080e60c8 0221
     orrs r0,r1    @ 080e60ca 0843
     strb r0,[r2,#0x8]                        @ 080e60cc 1072
-    ldr r3, DAT_080e6164                     @ 080e60ce 254b
+    ldr r3, PTR_font_jp_base_table_080e6164  @ 080e60ce 254b
     lsls r1,r0,#0x1e    @ 080e60d0 8107
     lsrs r1,r1,#0x1f    @ 080e60d2 c90f
     lsls r1,r1,#0x2    @ 080e60d4 8900
@@ -289794,8 +289794,8 @@ DAT_080e615c:
     .word  0x02000000                     @ 080e615c 00000002
 DAT_080e6160:
     .word  0x00006c2c                     @ 080e6160 2c6c0000
-DAT_080e6164:
-    .word  0x09e5f854                     @ 080e6164 54f8e509
+PTR_font_jp_base_table_080e6164:
+    .word  font_jp_base_table             @ 080e6164 54f8e509
 DAT_080e6168:
     .word  0x02029590                     @ 080e6168 90950202
 PTR_game_str_pointer_table_080e616c:
@@ -289871,7 +289871,7 @@ FUN_080e61c0:
     movs r1,#0x2    @ 080e61ee 0221
     orrs r0,r1    @ 080e61f0 0843
     strb r0,[r2,#0x8]                        @ 080e61f2 1072
-    ldr r3, DAT_080e625c                     @ 080e61f4 194b
+    ldr r3, PTR_font_jp_base_table_080e625c  @ 080e61f4 194b
     lsls r1,r0,#0x1e    @ 080e61f6 8107
     lsrs r1,r1,#0x1f    @ 080e61f8 c90f
     lsls r1,r1,#0x2    @ 080e61fa 8900
@@ -289918,8 +289918,8 @@ DAT_080e6254:
     .word  0x02000000                     @ 080e6254 00000002
 DAT_080e6258:
     .word  0x00006c2c                     @ 080e6258 2c6c0000
-DAT_080e625c:
-    .word  0x09e5f854                     @ 080e625c 54f8e509
+PTR_font_jp_base_table_080e625c:
+    .word  font_jp_base_table             @ 080e625c 54f8e509
 DAT_080e6260:
     .word  0x06015020                     @ 080e6260 20500106
 FUN_080e6264:
@@ -290183,7 +290183,7 @@ FUN_080e6404:
     movs r1,#0x2    @ 080e648a 0221
     orrs r0,r1    @ 080e648c 0843
     strb r0,[r2,#0x8]                        @ 080e648e 1072
-    ldr r3, DAT_080e6570                     @ 080e6490 374b
+    ldr r3, PTR_font_jp_base_table_080e6570  @ 080e6490 374b
     lsls r1,r0,#0x1e    @ 080e6492 8107
     lsrs r1,r1,#0x1f    @ 080e6494 c90f
     lsls r1,r1,#0x2    @ 080e6496 8900
@@ -290289,8 +290289,8 @@ DAT_080e6568:
     .word  0x02000000                     @ 080e6568 00000002
 DAT_080e656c:
     .word  0x00006c2c                     @ 080e656c 2c6c0000
-DAT_080e6570:
-    .word  0x09e5f854                     @ 080e6570 54f8e509
+PTR_font_jp_base_table_080e6570:
+    .word  font_jp_base_table             @ 080e6570 54f8e509
 DAT_080e6574:
     .word  0x00008001                     @ 080e6574 01800000
 DAT_080e6578:
@@ -301378,7 +301378,7 @@ LAB_080ebc0c:
     movs r1,#0x2    @ 080ebc76 0221
     orrs r0,r1    @ 080ebc78 0843
     strb r0,[r2,#0x8]                        @ 080ebc7a 1072
-    ldr r3, DAT_080ebce4                     @ 080ebc7c 194b
+    ldr r3, PTR_font_jp_base_table_080ebce4  @ 080ebc7c 194b
     lsls r1,r0,#0x1e    @ 080ebc7e 8107
     lsrs r1,r1,#0x1f    @ 080ebc80 c90f
     lsls r1,r1,#0x2    @ 080ebc82 8900
@@ -301430,8 +301430,8 @@ DAT_080ebcdc:
     .word  0x02000000                     @ 080ebcdc 00000002
 DAT_080ebce0:
     .word  0x00006c2c                     @ 080ebce0 2c6c0000
-DAT_080ebce4:
-    .word  0x09e5f854                     @ 080ebce4 54f8e509
+PTR_font_jp_base_table_080ebce4:
+    .word  font_jp_base_table             @ 080ebce4 54f8e509
 DAT_080ebce8:
     .word  0x09dbff7a                     @ 080ebce8 7affdb09
 DAT_080ebcec:
@@ -306028,7 +306028,7 @@ FUN_080ef454:
     muls r0,r1    @ 080ef45e 4843
     adds r0,r0,r2    @ 080ef460 8018
     ldrh r1,[r0,#0x0]                        @ 080ef462 0188
-    ldr r0, DAT_080ef474                     @ 080ef464 0348
+    ldr r0, PTR_level_signature_table_080ef474 @ 080ef464 0348
 LAB_080ef466:
     ldrh r2,[r0,#0x0]                        @ 080ef466 0288
     cmp r2,r1                                @ 080ef468 8a42
@@ -306037,8 +306037,8 @@ LAB_080ef466:
     b LAB_080ef484                           @ 080ef46e 09e0
 PTR_card_stats_table_080ef470:
     .word  card_stats_table               @ 080ef470 b8698109
-DAT_080ef474:
-    .word  0x09e5f71c                     @ 080ef474 1cf7e509
+PTR_level_signature_table_080ef474:
+    .word  level_signature_table          @ 080ef474 1cf7e509
 LAB_080ef478:
     adds r0,#0x14    @ 080ef478 1430
     adds r3,#0x1    @ 080ef47a 0133
@@ -308336,7 +308336,7 @@ LAB_080f0c64:
     ands r1,r6    @ 080f0c7c 3140
     orrs r1,r0    @ 080f0c7e 0143
     strb r1,[r2,#0x8]                        @ 080f0c80 1172
-    ldr r3, DAT_080f0cbc                     @ 080f0c82 0e4b
+    ldr r3, PTR_font_jp_base_table_080f0cbc  @ 080f0c82 0e4b
     lsls r0,r1,#0x1e    @ 080f0c84 8807
     lsrs r0,r0,#0x1f    @ 080f0c86 c00f
     lsls r0,r0,#0x2    @ 080f0c88 8000
@@ -308365,8 +308365,8 @@ DAT_080f0cb4:
     .word  0x02000000                     @ 080f0cb4 00000002
 DAT_080f0cb8:
     .word  0x00006c2c                     @ 080f0cb8 2c6c0000
-DAT_080f0cbc:
-    .word  0x09e5f854                     @ 080f0cbc 54f8e509
+PTR_font_jp_base_table_080f0cbc:
+    .word  font_jp_base_table             @ 080f0cbc 54f8e509
 FUN_080f0cc0:
     push {r4,r5,lr}                          @ 080f0cc0 30b5
     adds r4,r2,#0x0    @ 080f0cc2 141c
@@ -309381,7 +309381,7 @@ FUN_080f1440:
     lsls r2,r2,#0x2    @ 080f146a 9200
     adds r1,r2,r1    @ 080f146c 5118
     ldr r5,[r1,#0x0]                         @ 080f146e 0d68
-    ldr r1, DAT_080f15e8                     @ 080f1470 5d49
+    ldr r1, PTR_font_jp_stride_table_080f15e8 @ 080f1470 5d49
     adds r2,r2,r1    @ 080f1472 5218
     ldr r1,[r2,#0x0]                         @ 080f1474 1168
     muls r0,r1    @ 080f1476 4843
@@ -309573,8 +309573,8 @@ DAT_080f15e0:
     .word  0x02006ed0                     @ 080f15e0 d06e0002
 PTR_font_jp_charset_table_080f15e4:
     .word  font_jp_charset_table          @ 080f15e4 64f8e509
-DAT_080f15e8:
-    .word  0x09e5f874                     @ 080f15e8 74f8e509
+PTR_font_jp_stride_table_080f15e8:
+    .word  font_jp_stride_table           @ 080f15e8 74f8e509
 DAT_080f15ec:
     .word  0x77777777                     @ 080f15ec 77777777
 DAT_080f15f0:
@@ -309959,7 +309959,7 @@ render_glyph_jp_dual_layer:
     adds r2,r1,r2    @ 080f18d2 8a18
     ldr r2,[r2,#0x0]                         @ 080f18d4 1268
     str r2,[sp,#0xc]                         @ 080f18d6 0392
-    ldr r2, DAT_080f19a0                     @ 080f18d8 314a
+    ldr r2, PTR_font_jp_stride_table_080f19a0 @ 080f18d8 314a
     adds r1,r1,r2    @ 080f18da 8918
     ldr r1,[r1,#0x0]                         @ 080f18dc 0968
     muls r0,r1    @ 080f18de 4843
@@ -310065,8 +310065,8 @@ DAT_080f1998:
     .word  0x02006ed0                     @ 080f1998 d06e0002
 PTR_font_jp_charset_table_080f199c:
     .word  font_jp_charset_table          @ 080f199c 64f8e509
-DAT_080f19a0:
-    .word  0x09e5f874                     @ 080f19a0 74f8e509
+PTR_font_jp_stride_table_080f19a0:
+    .word  font_jp_stride_table           @ 080f19a0 74f8e509
 render_glyph_jp_single_layer:
     push {r4,r5,r6,r7,lr}                    @ 080f19a4 f0b5
     .hword 0x4657    @ 080f19a6 5746
@@ -315039,7 +315039,7 @@ FUN_080f42b4:
     ands r3,r1    @ 080f4370 0b40
     orrs r3,r0    @ 080f4372 0343
     strb r3,[r5,#0x8]                        @ 080f4374 2b72
-    ldr r1, DAT_080f43c0                     @ 080f4376 1249
+    ldr r1, PTR_font_jp_base_table_080f43c0  @ 080f4376 1249
     lsls r0,r3,#0x1e    @ 080f4378 9807
     lsrs r0,r0,#0x1f    @ 080f437a c00f
     lsls r0,r0,#0x2    @ 080f437c 8000
@@ -315076,8 +315076,8 @@ DAT_080f43b8:
     .word  0x02000000                     @ 080f43b8 00000002
 DAT_080f43bc:
     .word  0x00006c2c                     @ 080f43bc 2c6c0000
-DAT_080f43c0:
-    .word  0x09e5f854                     @ 080f43c0 54f8e509
+PTR_font_jp_base_table_080f43c0:
+    .word  font_jp_base_table             @ 080f43c0 54f8e509
 FUN_080f43c4:
     push {r4,lr}                             @ 080f43c4 10b5
     adds r3,r1,#0x0    @ 080f43c6 0b1c
@@ -324759,7 +324759,7 @@ FUN_080f9ca8:
     movs r7,#0x2    @ 080f9ccc 0227
     orrs r0,r7    @ 080f9cce 3843
     strb r0,[r5,#0x8]                        @ 080f9cd0 2872
-    ldr r2, DAT_080f9df0                     @ 080f9cd2 474a
+    ldr r2, PTR_font_jp_base_table_080f9df0  @ 080f9cd2 474a
     .hword 0x4690    @ 080f9cd4 9046
     lsls r0,r0,#0x1e    @ 080f9cd6 8007
     lsrs r0,r0,#0x1f    @ 080f9cd8 c00f
@@ -324892,8 +324892,8 @@ LAB_080f9d3a:
     bx r0                                    @ 080f9dea 0047
 DAT_080f9dec:
     .word  0x02006ed0                     @ 080f9dec d06e0002
-DAT_080f9df0:
-    .word  0x09e5f854                     @ 080f9df0 54f8e509
+PTR_font_jp_base_table_080f9df0:
+    .word  font_jp_base_table             @ 080f9df0 54f8e509
 DAT_080f9df4:
     .word  0x02000000                     @ 080f9df4 00000002
 DAT_080f9df8:
@@ -325123,7 +325123,7 @@ FUN_080fa638:
     movs r1,#0x2    @ 080fa64e 0221
     orrs r0,r1    @ 080fa650 0843
     strb r0,[r2,#0x8]                        @ 080fa652 1072
-    ldr r1, DAT_080fa680                     @ 080fa654 0a49
+    ldr r1, PTR_font_jp_base_table_080fa680  @ 080fa654 0a49
     lsls r0,r0,#0x1e    @ 080fa656 8007
     lsrs r0,r0,#0x1f    @ 080fa658 c00f
     lsls r0,r0,#0x2    @ 080fa65a 8000
@@ -325143,8 +325143,8 @@ FUN_080fa638:
     bx r0                                    @ 080fa67a 0047
 DAT_080fa67c:
     .word  0x02006ed0                     @ 080fa67c d06e0002
-DAT_080fa680:
-    .word  0x09e5f854                     @ 080fa680 54f8e509
+PTR_font_jp_base_table_080fa680:
+    .word  font_jp_base_table             @ 080fa680 54f8e509
 DAT_080fa684:
     .word  0x06005c00                     @ 080fa684 005c0006
     ROM_INCBIN 0xfa688, 0x15c
@@ -326344,7 +326344,7 @@ LAB_080fb1b2:
     .hword 0x4641    @ 080fb1dc 4146
     orrs r0,r1    @ 080fb1de 0843
     strb r0,[r6,#0x8]                        @ 080fb1e0 3072
-    ldr r3, DAT_080fb2f4                     @ 080fb1e2 444b
+    ldr r3, PTR_font_jp_base_table_080fb2f4  @ 080fb1e2 444b
     .hword 0x4699    @ 080fb1e4 9946
     lsls r0,r0,#0x1e    @ 080fb1e6 8007
     lsrs r0,r0,#0x1f    @ 080fb1e8 c00f
@@ -326468,8 +326468,8 @@ DAT_080fb2ec:
     .word  0x09ccd2b0                     @ 080fb2ec b0d2cc09
 DAT_080fb2f0:
     .word  0x02006ed0                     @ 080fb2f0 d06e0002
-DAT_080fb2f4:
-    .word  0x09e5f854                     @ 080fb2f4 54f8e509
+PTR_font_jp_base_table_080fb2f4:
+    .word  font_jp_base_table             @ 080fb2f4 54f8e509
 DAT_080fb2f8:
     .word  0x09e4fde4                     @ 080fb2f8 e4fde409
 DAT_080fb2fc:
@@ -326938,7 +326938,7 @@ FUN_080fbf18:
     movs r1,#0x2    @ 080fbfca 0221
     orrs r0,r1    @ 080fbfcc 0843
     strb r0,[r2,#0x8]                        @ 080fbfce 1072
-    ldr r3, DAT_080fc048                     @ 080fbfd0 1d4b
+    ldr r3, PTR_font_jp_base_table_080fc048  @ 080fbfd0 1d4b
     lsls r1,r0,#0x1e    @ 080fbfd2 8107
     lsrs r1,r1,#0x1f    @ 080fbfd4 c90f
     lsls r1,r1,#0x2    @ 080fbfd6 8900
@@ -326998,8 +326998,8 @@ DAT_080fc040:
     .word  0x02000000                     @ 080fc040 00000002
 DAT_080fc044:
     .word  0x00006c2c                     @ 080fc044 2c6c0000
-DAT_080fc048:
-    .word  0x09e5f854                     @ 080fc048 54f8e509
+PTR_font_jp_base_table_080fc048:
+    .word  font_jp_base_table             @ 080fc048 54f8e509
 DAT_080fc04c:
     .word  0x09dbefe0                     @ 080fc04c e0efdb09
 DAT_080fc050:
@@ -328902,7 +328902,7 @@ card_list_screen_init:
     movs r1,#0x2    @ 080fdfb2 0221
     orrs r0,r1    @ 080fdfb4 0843
     strb r0,[r4,#0x8]                        @ 080fdfb6 2072
-    ldr r2, DAT_080fe028                     @ 080fdfb8 1b4a
+    ldr r2, PTR_font_jp_base_table_080fe028  @ 080fdfb8 1b4a
     .hword 0x4690    @ 080fdfba 9046
     lsls r0,r0,#0x1e    @ 080fdfbc 8007
     lsrs r0,r0,#0x1f    @ 080fdfbe c00f
@@ -328958,8 +328958,8 @@ DAT_080fe020:
     .word  0x06010000                     @ 080fe020 00000106
 DAT_080fe024:
     .word  0x02006ed0                     @ 080fe024 d06e0002
-DAT_080fe028:
-    .word  0x09e5f854                     @ 080fe028 54f8e509
+PTR_font_jp_base_table_080fe028:
+    .word  font_jp_base_table             @ 080fe028 54f8e509
 LAB_080fe02c:
     adds r0,r5,#0x0    @ 080fe02c 281c
     adds r0,#0x83    @ 080fe02e 8330
@@ -333557,7 +333557,7 @@ LAB_0810043e:
     movs r1,#0x2    @ 0810045c 0221
     orrs r0,r1    @ 0810045e 0843
     strb r0,[r2,#0x8]                        @ 08100460 1072
-    ldr r3, DAT_08100548                     @ 08100462 394b
+    ldr r3, PTR_font_jp_base_table_08100548  @ 08100462 394b
     lsls r1,r0,#0x1e    @ 08100464 8107
     lsrs r1,r1,#0x1f    @ 08100466 c90f
     lsls r1,r1,#0x2    @ 08100468 8900
@@ -333666,8 +333666,8 @@ DAT_08100540:
     .word  0x02000000                     @ 08100540 00000002
 DAT_08100544:
     .word  0x00006c2c                     @ 08100544 2c6c0000
-DAT_08100548:
-    .word  0x09e5f854                     @ 08100548 54f8e509
+PTR_font_jp_base_table_08100548:
+    .word  font_jp_base_table             @ 08100548 54f8e509
 DAT_0810054c:
     .word  0x06008000                     @ 0810054c 00800006
 PTR_card_stats_table_08100550:
@@ -334298,7 +334298,7 @@ LAB_081009ee:
     .hword 0x4649    @ 08100a24 4946
     orrs r0,r1    @ 08100a26 0843
     strb r0,[r6,#0x8]                        @ 08100a28 3072
-    ldr r5, DAT_08100aa8                     @ 08100a2a 1f4d
+    ldr r5, PTR_font_jp_base_table_08100aa8  @ 08100a2a 1f4d
     lsls r1,r0,#0x1e    @ 08100a2c 8107
     lsrs r1,r1,#0x1f    @ 08100a2e c90f
     lsls r1,r1,#0x2    @ 08100a30 8900
@@ -334358,8 +334358,8 @@ DAT_08100aa0:
     .word  0x00008108                     @ 08100aa0 08810000
 DAT_08100aa4:
     .word  0x00000107                     @ 08100aa4 07010000
-DAT_08100aa8:
-    .word  0x09e5f854                     @ 08100aa8 54f8e509
+PTR_font_jp_base_table_08100aa8:
+    .word  font_jp_base_table             @ 08100aa8 54f8e509
 DAT_08100aac:
     .word  0x09e50ff4                     @ 08100aac f40fe509
 FUN_08100ab0:
@@ -334763,7 +334763,7 @@ LAB_08100d7e:
     rsbs r1,r1,#0    @ 08100dac 4942
     ands r0,r1    @ 08100dae 0840
     strb r0,[r2,#0x8]                        @ 08100db0 1072
-    ldr r1, DAT_08100e0c                     @ 08100db2 1649
+    ldr r1, PTR_font_jp_base_table_08100e0c  @ 08100db2 1649
     lsls r0,r0,#0x1f    @ 08100db4 c007
     lsrs r0,r0,#0x1f    @ 08100db6 c00f
     lsls r0,r0,#0x3    @ 08100db8 c000
@@ -334806,8 +334806,8 @@ DAT_08100e04:
     .word  0x02000000                     @ 08100e04 00000002
 DAT_08100e08:
     .word  0x00006c2c                     @ 08100e08 2c6c0000
-DAT_08100e0c:
-    .word  0x09e5f854                     @ 08100e0c 54f8e509
+PTR_font_jp_base_table_08100e0c:
+    .word  font_jp_base_table             @ 08100e0c 54f8e509
 DAT_08100e10:
     .word  0x000006c1                     @ 08100e10 c1060000
 PTR_game_str_pointer_table_08100e14:
@@ -334984,7 +334984,7 @@ FUN_08100f38:
     movs r1,#0x2    @ 08100f6a 0221
     orrs r0,r1    @ 08100f6c 0843
     strb r0,[r2,#0x8]                        @ 08100f6e 1072
-    ldr r3, DAT_08101050                     @ 08100f70 374b
+    ldr r3, PTR_font_jp_base_table_08101050  @ 08100f70 374b
     lsls r1,r0,#0x1e    @ 08100f72 8107
     lsrs r1,r1,#0x1f    @ 08100f74 c90f
     lsls r1,r1,#0x2    @ 08100f76 8900
@@ -335090,8 +335090,8 @@ DAT_08101048:
     .word  0x02000000                     @ 08101048 00000002
 DAT_0810104c:
     .word  0x00006c2c                     @ 0810104c 2c6c0000
-DAT_08101050:
-    .word  0x09e5f854                     @ 08101050 54f8e509
+PTR_font_jp_base_table_08101050:
+    .word  font_jp_base_table             @ 08101050 54f8e509
 PTR_game_str_pointer_table_08101054:
     .word  game_str_pointer_table         @ 08101054 400f0008
 PTR_game_str_ja_08101058:
@@ -345146,7 +345146,7 @@ FUN_08105d94:
     movs r1,#0x2    @ 08105dc8 0221
     orrs r0,r1    @ 08105dca 0843
     strb r0,[r5,#0x8]                        @ 08105dcc 2872
-    ldr r2, DAT_08105f0c                     @ 08105dce 4f4a
+    ldr r2, PTR_font_jp_base_table_08105f0c  @ 08105dce 4f4a
     .hword 0x4690    @ 08105dd0 9046
     lsls r0,r0,#0x1e    @ 08105dd2 8007
     lsrs r0,r0,#0x1f    @ 08105dd4 c00f
@@ -345296,8 +345296,8 @@ DAT_08105f04:
     .word  0x09e60558                     @ 08105f04 5805e609
 DAT_08105f08:
     .word  0x02006ed0                     @ 08105f08 d06e0002
-DAT_08105f0c:
-    .word  0x09e5f854                     @ 08105f0c 54f8e509
+PTR_font_jp_base_table_08105f0c:
+    .word  font_jp_base_table             @ 08105f0c 54f8e509
 DAT_08105f10:
     .word  0x06000040                     @ 08105f10 40000006
 DAT_08105f14:
@@ -345333,7 +345333,7 @@ FUN_08105f34:
     movs r1,#0x2    @ 08105f4e 0221
     orrs r0,r1    @ 08105f50 0843
     strb r0,[r2,#0x8]                        @ 08105f52 1072
-    ldr r1, DAT_08105f9c                     @ 08105f54 1149
+    ldr r1, PTR_font_jp_base_table_08105f9c  @ 08105f54 1149
     lsls r0,r0,#0x1e    @ 08105f56 8007
     lsrs r0,r0,#0x1f    @ 08105f58 c00f
     lsls r0,r0,#0x2    @ 08105f5a 8000
@@ -345368,8 +345368,8 @@ DAT_08105f94:
     .word  0x0202f3c0                     @ 08105f94 c0f30202
 DAT_08105f98:
     .word  0x02006ed0                     @ 08105f98 d06e0002
-DAT_08105f9c:
-    .word  0x09e5f854                     @ 08105f9c 54f8e509
+PTR_font_jp_base_table_08105f9c:
+    .word  font_jp_base_table             @ 08105f9c 54f8e509
 DAT_08105fa0:
     .word  0x06000040                     @ 08105fa0 40000006
 DAT_08105fa4:
@@ -345683,7 +345683,7 @@ FUN_081061d0:
     ldrb r5,[r2,#0x8]                        @ 08106210 157a
     orrs r1,r5    @ 08106212 2943
     strb r1,[r2,#0x8]                        @ 08106214 1172
-    ldr r3, DAT_08106250                     @ 08106216 0e4b
+    ldr r3, PTR_font_jp_base_table_08106250  @ 08106216 0e4b
     lsls r0,r1,#0x1e    @ 08106218 8807
     lsrs r0,r0,#0x1f    @ 0810621a c00f
     lsls r0,r0,#0x2    @ 0810621c 8000
@@ -345711,8 +345711,8 @@ DAT_08106248:
     .word  0x06000800                     @ 08106248 00080006
 DAT_0810624c:
     .word  0x02006ed0                     @ 0810624c d06e0002
-DAT_08106250:
-    .word  0x09e5f854                     @ 08106250 54f8e509
+PTR_font_jp_base_table_08106250:
+    .word  font_jp_base_table             @ 08106250 54f8e509
 LAB_08106254:
     movs r7,#0x8    @ 08106254 0827
 LAB_08106256:
@@ -345756,7 +345756,7 @@ LAB_08106256:
     ldrb r4,[r2,#0x8]                        @ 081062a6 147a
     orrs r1,r4    @ 081062a8 2143
     strb r1,[r2,#0x8]                        @ 081062aa 1172
-    ldr r3, DAT_08106304                     @ 081062ac 154b
+    ldr r3, PTR_font_jp_base_table_08106304  @ 081062ac 154b
     lsls r0,r1,#0x1e    @ 081062ae 8807
     lsrs r0,r0,#0x1f    @ 081062b0 c00f
     lsls r0,r0,#0x2    @ 081062b2 8000
@@ -345797,8 +345797,8 @@ LAB_081062fc:
     b LAB_08106540                           @ 081062fe 1fe1
 DAT_08106300:
     .word  0x02006ed0                     @ 08106300 d06e0002
-DAT_08106304:
-    .word  0x09e5f854                     @ 08106304 54f8e509
+PTR_font_jp_base_table_08106304:
+    .word  font_jp_base_table             @ 08106304 54f8e509
 LAB_08106308:
     ldr r1, DAT_08106320                     @ 08106308 0549
     ldrh r0,[r1,#0x18]                       @ 0810630a 088b
@@ -345897,7 +345897,7 @@ LAB_08106392:
     ands r1,r3    @ 081063b8 1940
     orrs r1,r0    @ 081063ba 0143
     strb r1,[r2,#0x8]                        @ 081063bc 1172
-    ldr r3, DAT_08106414                     @ 081063be 154b
+    ldr r3, PTR_font_jp_base_table_08106414  @ 081063be 154b
     lsls r0,r1,#0x1e    @ 081063c0 8807
     lsrs r0,r0,#0x1f    @ 081063c2 c00f
     lsls r0,r0,#0x2    @ 081063c4 8000
@@ -345939,8 +345939,8 @@ DAT_0810640c:
     .word  0x02006ed0                     @ 0810640c d06e0002
 DAT_08106410:
     .word  0x00006c2c                     @ 08106410 2c6c0000
-DAT_08106414:
-    .word  0x09e5f854                     @ 08106414 54f8e509
+PTR_font_jp_base_table_08106414:
+    .word  font_jp_base_table             @ 08106414 54f8e509
 DAT_08106418:
     .word  0x00001069                     @ 08106418 69100000
 PTR_game_str_pointer_table_0810641c:
@@ -345979,7 +345979,7 @@ LAB_0810643c:
     ands r0,r5    @ 0810645c 2840
     orrs r0,r1    @ 0810645e 0843
     strb r0,[r4,#0x8]                        @ 08106460 2072
-    ldr r5, DAT_081064ac                     @ 08106462 124d
+    ldr r5, PTR_font_jp_base_table_081064ac  @ 08106462 124d
     lsls r1,r0,#0x1e    @ 08106464 8107
     lsrs r1,r1,#0x1f    @ 08106466 c90f
     lsls r1,r1,#0x2    @ 08106468 8900
@@ -346014,8 +346014,8 @@ DAT_081064a4:
     .word  0x02000000                     @ 081064a4 00000002
 DAT_081064a8:
     .word  0x00001267                     @ 081064a8 67120000
-DAT_081064ac:
-    .word  0x09e5f854                     @ 081064ac 54f8e509
+PTR_font_jp_base_table_081064ac:
+    .word  font_jp_base_table             @ 081064ac 54f8e509
 DAT_081064b0:
     .word  0x00001250                     @ 081064b0 50120000
 LAB_081064b4:
@@ -346039,7 +346039,7 @@ LAB_081064be:
     ands r1,r5    @ 081064d6 2940
     orrs r1,r0    @ 081064d8 0143
     strb r1,[r2,#0x8]                        @ 081064da 1172
-    ldr r3, DAT_08106578                     @ 081064dc 264b
+    ldr r3, PTR_font_jp_base_table_08106578  @ 081064dc 264b
     lsls r0,r1,#0x1e    @ 081064de 8807
     lsrs r0,r0,#0x1f    @ 081064e0 c00f
     lsls r0,r0,#0x2    @ 081064e2 8000
@@ -346116,8 +346116,8 @@ DAT_08106570:
     .word  0x02000000                     @ 08106570 00000002
 DAT_08106574:
     .word  0x00006c2c                     @ 08106574 2c6c0000
-DAT_08106578:
-    .word  0x09e5f854                     @ 08106578 54f8e509
+PTR_font_jp_base_table_08106578:
+    .word  font_jp_base_table             @ 08106578 54f8e509
 DAT_0810657c:
     .word  0x0000069a                     @ 0810657c 9a060000
 PTR_game_str_pointer_table_08106580:
@@ -347041,7 +347041,7 @@ FUN_08106c10:
     movs r1,#0x2    @ 08106c50 0221
     orrs r0,r1    @ 08106c52 0843
     strb r0,[r4,#0x8]                        @ 08106c54 2072
-    ldr r2, DAT_08106d20                     @ 08106c56 324a
+    ldr r2, PTR_font_jp_base_table_08106d20  @ 08106c56 324a
     .hword 0x4690    @ 08106c58 9046
     lsls r0,r0,#0x1e    @ 08106c5a 8007
     lsrs r0,r0,#0x1f    @ 08106c5c c00f
@@ -347139,8 +347139,8 @@ DAT_08106d18:
     .word  0x06009400                     @ 08106d18 00940006
 DAT_08106d1c:
     .word  0x02006ed0                     @ 08106d1c d06e0002
-DAT_08106d20:
-    .word  0x09e5f854                     @ 08106d20 54f8e509
+PTR_font_jp_base_table_08106d20:
+    .word  font_jp_base_table             @ 08106d20 54f8e509
 DAT_08106d24:
     .word  0x0200af20                     @ 08106d24 20af0002
 DAT_08106d28:
@@ -350093,7 +350093,7 @@ LAB_08108350:
     rsbs r1,r1,#0    @ 08108378 4942
     ands r0,r1    @ 0810837a 0840
     strb r0,[r2,#0x8]                        @ 0810837c 1072
-    ldr r0, DAT_081083ac                     @ 0810837e 0b48
+    ldr r0, PTR_font_jp_base_table_081083ac  @ 0810837e 0b48
     ldr r0,[r0,#0x0]                         @ 08108380 0068
     str r0,[r2,#0x4]                         @ 08108382 5060
     movs r0,#0x0    @ 08108384 0020
@@ -350115,8 +350115,8 @@ DAT_081083a4:
     .word  0x06009800                     @ 081083a4 00980006
 DAT_081083a8:
     .word  0x02006ed0                     @ 081083a8 d06e0002
-DAT_081083ac:
-    .word  0x09e5f854                     @ 081083ac 54f8e509
+PTR_font_jp_base_table_081083ac:
+    .word  font_jp_base_table             @ 081083ac 54f8e509
 FUN_081083b0:
     push {r4,r5,r6,r7,lr}                    @ 081083b0 f0b5
     .hword 0x4657    @ 081083b2 5746
