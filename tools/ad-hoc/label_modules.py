@@ -83,6 +83,47 @@ LABEL_PREFIX_RULES = [
 
     (re.compile(r"^card_desc_pointer_table$"),           "card_desc",   "card_desc"),
     (re.compile(r"^opp(onent)?_card_value"),             "opp_card_value", "opp_card_value"),
+
+    # -------------------------------------------------------------------------
+    # EWRAM/IWRAM 全局变量 (constants/ewram.inc + iwram.inc)
+    # 由 LabelDataCrystalRomMap.py 在 Ghidra 内打 USER_DEFINED label
+    # 经 ExportFunctionLabelRefs.py (LABEL_RANGE_LO=0x02000000) 进入 label-refs
+    # -------------------------------------------------------------------------
+    # 决斗运行时 / HUD
+    (re.compile(r"^gP[12]LifePoints$"),                  "duel_field",    "duel_field"),
+
+    # 输入页 (与 name_input scene 同模块)
+    (re.compile(r"^gPlayerNameEntry$"),                  "name_input",    "name_input"),
+
+    # 禁卡 (与 banlist module 同)
+    (re.compile(r"^gBanlistPasswordBuffer$"),            "banlist",       "banlist"),
+
+    # 决斗谜题进度 (与现有 duel_puzzle module 同)
+    (re.compile(r"^gDuelPuzzleProgress$"),               "duel_puzzle",   "duel_puzzle"),
+
+    # Limited / Theme Duel 专属进度表
+    (re.compile(r"^gLimitedDuelProgress$"),              "limited_duel",  "limited_duel"),
+    (re.compile(r"^gThemeDuelScores$"),                  "theme_duel",    "theme_duel"),
+
+    # 玩家存档资料
+    (re.compile(r"^gPlayer(Name|Icon)$"),                "player_profile", "player_profile"),
+
+    # 已解锁对手位图
+    (re.compile(r"^gUnlockedDuelists$"),                 "opp_unlock",    "opp_unlock"),
+
+    # 27 个对手胜场计数器 (gWinsBase 是 [0] alias)
+    (re.compile(r"^gWins"),                              "opp_wins",      "opp_wins"),
+
+    # 系统设置 (语言 ID 等)
+    (re.compile(r"^gSettings$"),                         "settings",      "settings"),
+
+    # DP 货币
+    (re.compile(r"^gMoneyDp$"),                          "money",         "money"),
+
+    # IWRAM 全局
+    (re.compile(r"^gPrng$"),                             "prng",          "prng"),
+    (re.compile(r"^gFrameCounter$"),                     "frame_counter", "frame_counter"),
+    (re.compile(r"^pack_ui_state$"),                     "pack",          "pack"),
 ]
 
 
@@ -223,6 +264,17 @@ MODULE_TO_PREFIX = {
     "demo":            "demo",        # demo/exodia/, demo/shuen/, demo/vija/ (召唤/胜利动画)
     "title_ex":        "title_ex",    # titleEx/ (title screen extension)
     "pass_input":      "pass_input",  # pass_input/ (banlist 密码输入页)
+
+    # EWRAM/IWRAM 全局引入的新模块 (constants/ewram.inc + iwram.inc)
+    "limited_duel":    "limited_duel",   # gLimitedDuelProgress
+    "theme_duel":      "theme_duel",     # gThemeDuelScores
+    "player_profile":  "player_profile", # gPlayerName / gPlayerIcon
+    "opp_unlock":      "opp_unlock",     # gUnlockedDuelists
+    "opp_wins":        "opp_wins",       # gWins<Opponent> (27)
+    "settings":        "settings",       # gSettings
+    "money":           "money",          # gMoneyDp
+    "prng":            "prng",           # gPrng
+    "frame_counter":   "frame_counter",  # gFrameCounter
 }
 
 
@@ -303,6 +355,8 @@ SCENE_MODULES = set([
     "card_list",     # 卡牌列表页
     "duel_puzzle",   # 决斗谜题
     "duel_field",    # 决斗场地 (HUD/外场)
+    "limited_duel",  # Limited Duel 模式 (gLimitedDuelProgress)
+    "theme_duel",    # Theme Duel 模式 (gThemeDuelScores)
 ])
 
 UTILITY_MODULES = set([
@@ -320,6 +374,13 @@ UTILITY_MODULES = set([
     "ydc",                        # Yu-Gi-Oh Duel Console (限定/主题)
     "opp_card_value",             # 对手卡价值
     "deck",                       # starter/struct deck 数据
+    "player_profile",             # gPlayerName / gPlayerIcon (存档)
+    "opp_unlock",                 # gUnlockedDuelists 解锁位图
+    "opp_wins",                   # gWins<Opponent> 胜场表
+    "settings",                   # gSettings (语言 + 选项)
+    "money",                      # gMoneyDp DP 货币
+    "prng",                       # gPrng 全局 PRNG (横切)
+    "frame_counter",              # gFrameCounter (横切)
 ])
 
 # Sanity: 二者无交集且并集 ⊆ ALL_MODULES

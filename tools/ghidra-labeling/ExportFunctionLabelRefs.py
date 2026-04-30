@@ -15,7 +15,10 @@
 #   - SymbolType == LABEL                (排除 FUNCTION / NAMESPACE / 等)
 #   - SourceType in {USER_DEFINED, IMPORTED}
 #   - 名字不以 DAT_/LAB_/PTR_/SUB_/FUN_/thunk_FUN_/UNK_/SWITCH_ 开头
-#   - 地址在 [0x08000000, 0x09FFFFFF]    (跳过 EWRAM/IWRAM/MMIO)
+#   - 地址在 [0x02000000, 0x03FFFFFF] (EWRAM/IWRAM, constants/ewram.inc + iwram.inc)
+#                  ∪ [0x08000000, 0x09FFFFFF] (ROM data, constants/rom_data.inc)
+#                                              (中间 0x04 MMIO / 0x05-0x07 PALRAM/VRAM/OAM
+#                                               loader 未定义任何 USER_DEFINED, 不会进结果)
 #
 # 输出: temp/ghidra-funcs-label-refs.csv
 #   columns: address, name, total_hits, unique_labels, top_labels
@@ -30,7 +33,9 @@ import re
 from ghidra.program.model.symbol import SymbolType, SourceType
 
 
-LABEL_RANGE_LO = 0x08000000
+# 两段地址范围: EWRAM/IWRAM (0x02-0x03) 和 ROM data (0x08-0x09)
+# MMIO/PALRAM/VRAM/OAM (0x04-0x07) 没有 USER_DEFINED label, 不需特别排除
+LABEL_RANGE_LO = 0x02000000
 LABEL_RANGE_HI = 0x09FFFFFF
 
 AUTO_PREFIXES = ("DAT_", "LAB_", "PTR_", "SUB_", "FUN_", "thunk_FUN_",
@@ -86,6 +91,8 @@ def main():
 
     # 分布统计 (粗分桶)
     bucket_counts = {
+        "ewram         [0x02000000-0x02FFFFFF]": 0,
+        "iwram         [0x03000000-0x03FFFFFF]": 0,
         "rom_main_code [0x080000C0-0x084C7637]": 0,
         "rom_data      [0x084C7638-0x09FFFFFF]": 0,
     }
@@ -105,7 +112,11 @@ def main():
             continue
 
         n_labels_kept += 1
-        if 0x080000C0 <= addr_int <= 0x084C7637:
+        if 0x02000000 <= addr_int <= 0x02FFFFFF:
+            bucket_counts["ewram         [0x02000000-0x02FFFFFF]"] += 1
+        elif 0x03000000 <= addr_int <= 0x03FFFFFF:
+            bucket_counts["iwram         [0x03000000-0x03FFFFFF]"] += 1
+        elif 0x080000C0 <= addr_int <= 0x084C7637:
             bucket_counts["rom_main_code [0x080000C0-0x084C7637]"] += 1
         else:
             bucket_counts["rom_data      [0x084C7638-0x09FFFFFF]"] += 1
