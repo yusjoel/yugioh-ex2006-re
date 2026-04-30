@@ -20575,7 +20575,7 @@ switchD_0801efa4__caseD_3b:
     bl FUN_080bc918                          @ 0801f20e 9df083fb
     b LAB_0801f234                           @ 0801f212 0fe0
 switchD_0801efa4__caseD_3c:
-    bl FUN_080bc880                          @ 0801f214 9df034fb
+    bl play_demo_shuen                       @ 0801f214 9df034fb
     b LAB_0801f234                           @ 0801f218 0ce0
 switchD_0801efa4__caseD_17:
     bl FUN_080befc0                          @ 0801f21a 9ff0d1fe
@@ -218465,7 +218465,9 @@ LAB_080bc854:
     .byte  0x00, 0x00
 DAT_080bc87c:
     .word  0x05000200                     @ 080bc87c 00020005
-FUN_080bc880:
+
+@ demo 'shuen' (終焉) 过场动画播放协调器. 6-step 顺序状态机 on [gBannerState+0x10]: step 0=等帧 (FUN_080cca5c) / step 1=BG/palette setup (FUN_0801b7e8) / step 2=fs_load 资源 (FUN_0801ba4c) / step 3=播放 demo_shuen_state_machine / step 4=HUD 刷新 + refresh_duel_field_zone_info (强制推进) / step 5=等帧收尾 (FUN_080cca38) / default=cleanup (与 banner_anim_state_machine 同清理协议: 清 gBannerState[+0x0] bit1 + [0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 0x3c (PageManager scene_id=0x3c). 推测是 shuen victory anim, 等 runtime 验证.
+play_demo_shuen:
     push {lr}                                @ 080bc880 00b5
     ldr r1, DAT_080bc894                     @ 080bc882 0449
     ldrb r0,[r1,#0x10]                       @ 080bc884 087c

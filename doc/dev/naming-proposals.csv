@@ -2146,7 +2146,7 @@ address,name,proposed_name,score,tags
 0x080bc71c,FUN_080bc71c,duel_field_080bc71c,3,duel_field
 0x080bc794,FUN_080bc794,,,
 0x080bc7e0,FUN_080bc7e0,,,palette;scene_pack
-0x080bc880,FUN_080bc880,duel_field_080bc880,2,card_frame;card_ids;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str
+0x080bc880,play_demo_shuen,,,card_frame;card_ids;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str
 0x080bc918,FUN_080bc918,duel_field_080bc918,2,blend;display;window;vram;palette;card_frame;card_ids;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str
 0x080bcbd4,FUN_080bcbd4,duel_field_080bcbd4,2,card_frame;card_ids;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;settings
 0x080bcc6c,FUN_080bcc6c,,,blend;window;display;palette;vram;scene_duel_puzzle;frame_counter

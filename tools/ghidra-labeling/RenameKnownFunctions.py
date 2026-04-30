@@ -204,6 +204,18 @@ RENAMES = [
         "无入参/无返回值. 用途: 光标 hover 决斗场 zone 改变后, 此函数按当前 "
         "state 重渲染. 14 个 caller 跨 PageManager / scene loader / banner 等."),
 
+    # 2026-04-30: shuen demo 播放协调器 (FUN_0801ef94 case 0x3c 的 page handler)
+    ("FUN_080bc880", "play_demo_shuen",
+        "demo 'shuen' (終焉) 过场动画播放协调器. 6-step 顺序状态机 on "
+        "[gBannerState+0x10]: step 0=等帧 (FUN_080cca5c) / step 1=BG/palette "
+        "setup (FUN_0801b7e8) / step 2=fs_load 资源 (FUN_0801ba4c) / step 3=播放 "
+        "demo_shuen_state_machine / step 4=HUD 刷新 + refresh_duel_field_zone_info "
+        "(强制推进) / step 5=等帧收尾 (FUN_080cca38) / default=cleanup (与 "
+        "banner_anim_state_machine 同清理协议: 清 gBannerState[+0x0] bit1 + "
+        "[0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 "
+        "case 0x3c (PageManager scene_id=0x3c). 推测是 shuen victory anim, "
+        "等 runtime 验证."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
