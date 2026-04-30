@@ -229,7 +229,7 @@ address,name,proposed_name,score,tags
 0x0801bbd4,FUN_0801bbd4,,,scene_demo
 0x0801bc28,FUN_0801bc28,,,window;display
 0x0801bcb8,FUN_0801bcb8,,,window
-0x0801bd08,FUN_0801bd08,demo_0801bd08,4,display;palette;demo;fs
+0x0801bd08,demo_shuen_state_machine,,,display;palette;demo;fs
 0x0801c2ac,FUN_0801c2ac,,,bg;display;palette
 0x0801c310,FUN_0801c310,,,
 0x0801c3f4,FUN_0801c3f4,demo_0801c3f4,3,demo;fs

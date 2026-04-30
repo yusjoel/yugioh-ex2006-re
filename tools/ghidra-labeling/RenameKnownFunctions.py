@@ -182,6 +182,18 @@ RENAMES = [
         "通用模态文本对话框/提示创建. 入参: r0 = (height<<16) | width, r1 = flags, r2 = char *text. "
         "把 size split 写进内部 struct 的 [+0xa]/[+0xc], 再调 FUN_080dd070 计算并存 [+0xe]/[+0x10], "
         "最后 FUN_080dcb54/FUN_080dced0 完成绘制. 被 13+ pack/save/dialog game_str 函数共用."),
+
+    # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
+    ("FUN_0801bd08", "demo_shuen_state_machine",
+        "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
+        "step 0 INIT: 加载 BG1 (FUN_0801b93c 'demo/shuen/shuen_bg1.LZ5bg') + BG2 "
+        "(fs_load 'demo/shuen/shuen_bg2.LZ5bg' 缓存到 [gDemoState+0x88]) + OAM/window "
+        "+ 启 fade-in. step 1=wait init (poll FUN_080148f4). step 2=phase A "
+        "(keyframe 0x09e3d01f, sub-state 按 0x3c/0x96/0x4b/0xa5/0xe6 分支). step 3=wait A. "
+        "step 4=phase B (双 keyframe 0x09e3d022/0x09e3d028, 6帧循环, sub-state==0x78 推进). "
+        "step 5=fadeout (3 种 brightness/blend 模式). step 6=wait fadeout. default 路径 "
+        "cleanup (FUN_0801522c sprite + FUN_08015160 + FUN_080148f4 final poll). "
+        "返回 1=busy / 0=done. 唯一 caller: FUN_080bc880 case 3 (scene loader)."),
 ]
 
 

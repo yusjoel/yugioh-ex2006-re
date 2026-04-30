@@ -89,3 +89,17 @@
 
 .equ gBanlistPasswordBuffer,     0x02029810  @ 1440 B  禁卡密码输入
                                              @ 每 2 B 一项: [charset][character_id]
+
+@ -----------------------------------------------------------------------------
+@ Demo 过场动画 (cinematic; demo/shuen, demo/exodia, demo/vija ...)
+@ -----------------------------------------------------------------------------
+.equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
+                                             @ +0x88 = u32 fs_load 返回的解压数据指针
+                                             @ +0x8c = u32 packed bitfield
+                                             @         bit 0      = done flag
+                                             @         bits 9..16 = main state (0..6)
+                                             @ +0x8e = u16 sub-state (low byte 频繁用)
+                                             @ +0x90 = u8  bit field
+                                             @ +0x94 = u32 frame counter
+                                             @ 已知用户: demo_shuen_state_machine
+                                             @ (其它 demo/exodia, demo/vija 等可能复用)

@@ -231,6 +231,7 @@ LABELS = [
     (0x0201FEC0, "gBannerState"),  # banner 出/入场动画状态结构 (EWRAM); +0x10 = u8 main state, +0x11 = u8 sub-counter; 被 banner_anim_state_machine + FUN_080be600 共用
     (0x02029512, "gPlayerNameEntry"),
     (0x02029810, "gBanlistPasswordBuffer"),
+    (0x02029EC0, "gDemoState"),  # demo 过场动画状态结构 (EWRAM); +0x88 = fs 解压指针; +0x8c = packed bitfield (bit0=done, bits9..16=main state); +0x8e = u16 sub-state; +0x94 = u32 frame counter; demo_shuen_state_machine 用
 
     # IWRAM
     (0x03000040, "gPrng"),

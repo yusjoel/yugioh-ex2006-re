@@ -236,7 +236,7 @@ FUN_08013510:
     bx r1                                    @ 08013560 0847
     .byte  0x00, 0x00
 DAT_08013564:
-    .word  0x02029ec0                     @ 08013564 c09e0202
+    .word  gDemoState                     @ 08013564 c09e0202
 DAT_08013568:
     .word  0x05000025                     @ 08013568 25000005
 DAT_0801356c:
@@ -369,7 +369,7 @@ LAB_08013646:
     bx r0                                    @ 08013664 0047
     .byte  0x00, 0x00
 DAT_08013668:
-    .word  0x02029ec0                     @ 08013668 c09e0202
+    .word  gDemoState                     @ 08013668 c09e0202
 DAT_0801366c:
     .word  0x09e396b8                     @ 0801366c b896e309
 DAT_08013670:
@@ -473,7 +473,7 @@ LAB_08013708:
 DAT_08013734:
     .word  0x09e396c8                     @ 08013734 c896e309
 DAT_08013738:
-    .word  0x02029ec0                     @ 08013738 c09e0202
+    .word  gDemoState                     @ 08013738 c09e0202
 DAT_0801373c:
     .word  0xffffc07f                     @ 0801373c 7fc0ffff
 FUN_08013740:
@@ -762,7 +762,7 @@ FUN_08013940:
     pop {r0}                                 @ 08013980 01bc
     bx r0                                    @ 08013982 0047
 DAT_08013984:
-    .word  0x02029ec0                     @ 08013984 c09e0202
+    .word  gDemoState                     @ 08013984 c09e0202
 DAT_08013988:
     .word  0x09e397d4                     @ 08013988 d497e309
 FUN_0801398c:
@@ -829,7 +829,7 @@ LAB_08013a00:
     bx r0                                    @ 08013a04 0047
     .byte  0x00, 0x00
 DAT_08013a08:
-    .word  0x02029ec0                     @ 08013a08 c09e0202
+    .word  gDemoState                     @ 08013a08 c09e0202
 DAT_08013a0c:
     .word  0xfffffe01                     @ 08013a0c 01feffff
 FUN_08013a10:
@@ -873,7 +873,7 @@ LAB_08013a58:
     bx r0                                    @ 08013a5c 0047
     .byte  0x00, 0x00
 DAT_08013a60:
-    .word  0x02029ec0                     @ 08013a60 c09e0202
+    .word  gDemoState                     @ 08013a60 c09e0202
 DAT_08013a64:
     .word  0xfffffe01                     @ 08013a64 01feffff
 FUN_08013a68:
@@ -912,7 +912,7 @@ LAB_08013a94:
     bl FUN_0801571c                          @ 08013aaa 01f037fe
     b LAB_08013aca                           @ 08013aae 0ce0
 DAT_08013ab0:
-    .word  0x02029ec0                     @ 08013ab0 c09e0202
+    .word  gDemoState                     @ 08013ab0 c09e0202
 DAT_08013ab4:
     .word  0x09e397f4                     @ 08013ab4 f497e309
 DAT_08013ab8:
@@ -1078,7 +1078,7 @@ LAB_08013bf2:
 switchD_08013bfa__switchD:
     .hword 0x4687    @ 08013bfa 8746
 DAT_08013bfc:
-    .word  0x02029ec0                     @ 08013bfc c09e0202
+    .word  gDemoState                     @ 08013bfc c09e0202
 DAT_08013c00:
     .word  0x08013c04                     @ 08013c00 043c0108
 switchD_08013bfa__switchdataD_08013c04:
@@ -13803,7 +13803,7 @@ FUN_0801b7e8:
     bx r1                                    @ 0801b838 0847
     .byte  0x00, 0x00
 DAT_0801b83c:
-    .word  0x02029ec0                     @ 0801b83c c09e0202
+    .word  gDemoState                     @ 0801b83c c09e0202
 DAT_0801b840:
     .word  0x05000026                     @ 0801b840 26000005
 DAT_0801b844:
@@ -13908,7 +13908,7 @@ FUN_0801b850:
     bx r0                                    @ 0801b90c 0047
     .byte  0x00, 0x00
 DAT_0801b910:
-    .word  0x02029ec0                     @ 0801b910 c09e0202
+    .word  gDemoState                     @ 0801b910 c09e0202
 DAT_0801b914:
     .word  0x09e3cee8                     @ 0801b914 e8cee309
 DAT_0801b918:
@@ -14059,7 +14059,7 @@ FUN_0801ba04:
     pop {r0}                                 @ 0801ba40 01bc
     bx r0                                    @ 0801ba42 0047
 DAT_0801ba44:
-    .word  0x02029ec0                     @ 0801ba44 c09e0202
+    .word  gDemoState                     @ 0801ba44 c09e0202
 DAT_0801ba48:
     .word  0x09e3cf60                     @ 0801ba48 60cfe309
 FUN_0801ba4c:
@@ -14126,7 +14126,7 @@ LAB_0801bac0:
     bx r0                                    @ 0801bac4 0047
     .byte  0x00, 0x00
 DAT_0801bac8:
-    .word  0x02029ec0                     @ 0801bac8 c09e0202
+    .word  gDemoState                     @ 0801bac8 c09e0202
 DAT_0801bacc:
     .word  0xfffffe01                     @ 0801bacc 01feffff
 FUN_0801bad0:
@@ -14170,7 +14170,7 @@ LAB_0801bb18:
     bx r0                                    @ 0801bb1c 0047
     .byte  0x00, 0x00
 DAT_0801bb20:
-    .word  0x02029ec0                     @ 0801bb20 c09e0202
+    .word  gDemoState                     @ 0801bb20 c09e0202
 DAT_0801bb24:
     .word  0xfffffe01                     @ 0801bb24 01feffff
 FUN_0801bb28:
@@ -14225,7 +14225,7 @@ LAB_0801bb82:
     b LAB_0801bbaa                           @ 0801bb90 0be0
     .byte  0x00, 0x00
 DAT_0801bb94:
-    .word  0x02029ec0                     @ 0801bb94 c09e0202
+    .word  gDemoState                     @ 0801bb94 c09e0202
 DAT_0801bb98:
     .word  0x09e3cf70                     @ 0801bb98 70cfe309
 DAT_0801bb9c:
@@ -14407,31 +14407,33 @@ LAB_0801bcfe:
     bx r0                                    @ 0801bd02 0047
 PTR_WIN0V_0801bd04:
     .word  WIN0V                          @ 0801bd04 44000004
-FUN_0801bd08:
+
+@ demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). step 0 INIT: 加载 BG1 (FUN_0801b93c 'demo/shuen/shuen_bg1.LZ5bg') + BG2 (fs_load 'demo/shuen/shuen_bg2.LZ5bg' 缓存到 [gDemoState+0x88]) + OAM/window + 启 fade-in. step 1=wait init (poll FUN_080148f4). step 2=phase A (keyframe 0x09e3d01f, sub-state 按 0x3c/0x96/0x4b/0xa5/0xe6 分支). step 3=wait A. step 4=phase B (双 keyframe 0x09e3d022/0x09e3d028, 6帧循环, sub-state==0x78 推进). step 5=fadeout (3 种 brightness/blend 模式). step 6=wait fadeout. default 路径 cleanup (FUN_0801522c sprite + FUN_08015160 + FUN_080148f4 final poll). 返回 1=busy / 0=done. 唯一 caller: FUN_080bc880 case 3 (scene loader).
+demo_shuen_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 0801bd08 f0b5
     .hword 0x4657    @ 0801bd0a 5746
     .hword 0x464e    @ 0801bd0c 4e46
     .hword 0x4645    @ 0801bd0e 4546
     push {r5,r6,r7}                          @ 0801bd10 e0b4
     sub sp,#0x20                             @ 0801bd12 88b0
-    ldr r6, DAT_0801bd30                     @ 0801bd14 064e
+    ldr r6, DAT_0801bd30                     @ 0801bd14 064e  -- r6 = &gDemoState (0x02029EC0)
     adds r0,r6,#0x0    @ 0801bd16 301c
     adds r0,#0x8c    @ 0801bd18 8c30
-    ldr r0,[r0,#0x0]                         @ 0801bd1a 0068
-    lsls r0,r0,#0xf    @ 0801bd1c c003
+    ldr r0,[r0,#0x0]                         @ 0801bd1a 0068  -- r0 = packed bitfield gDemoState[+0x8c]
+    lsls r0,r0,#0xf    @ 0801bd1c c003  -- main state = (r0 << 0xf) >> 0x18 (= bits 9..16 of [+0x8c])
     lsrs r0,r0,#0x18    @ 0801bd1e 000e
-    cmp r0,#0x6                              @ 0801bd20 0628
+    cmp r0,#0x6                              @ 0801bd20 0628  -- state > 6 -> default (cleanup, 检查 done flag)
     bls LAB_0801bd26                         @ 0801bd22 00d9
     b switchD_0801bd2e__default              @ 0801bd24 7ae2
 LAB_0801bd26:
     lsls r0,r0,#0x2    @ 0801bd26 8000
     ldr r1, DAT_0801bd34                     @ 0801bd28 0249
     adds r0,r0,r1    @ 0801bd2a 4018
-    ldr r0,[r0,#0x0]                         @ 0801bd2c 0068
+    ldr r0,[r0,#0x0]                         @ 0801bd2c 0068  -- switch dispatch: jump_table @ 0x0801bd38 (7 entries)
 switchD_0801bd2e__switchD:
     .hword 0x4687    @ 0801bd2e 8746
 DAT_0801bd30:
-    .word  0x02029ec0                     @ 0801bd30 c09e0202
+    .word  gDemoState                     @ 0801bd30 c09e0202
 DAT_0801bd34:
     .word  0x0801bd38                     @ 0801bd34 38bd0108
 switchD_0801bd2e__switchdataD_0801bd38:
@@ -14443,14 +14445,14 @@ switchD_0801bd2e__switchdataD_0801bd38:
     .word  0x0801c0c8                     @ 0801bd4c c8c00108
     .word  0x0801c208                     @ 0801bd50 08c20108
 switchD_0801bd2e__caseD_0:
-    ldr r0, DAT_0801bdcc                     @ 0801bd54 1d48
-    bl FUN_0801b93c                          @ 0801bd56 fff7f1fd
+    ldr r0, DAT_0801bdcc                     @ 0801bd54 1d48  -- case 0 INIT: 加载资源 + 启 fade-in
+    bl FUN_0801b93c                          @ 0801bd56 fff7f1fd  -- FUN_0801b93c('demo/shuen/shuen_bg1.LZ5bg')
     ldr r0, DAT_0801bdd0                     @ 0801bd5a 1d48
     movs r1,#0x0    @ 0801bd5c 0021
-    bl fs_load                               @ 0801bd5e f9f723f9
+    bl fs_load                               @ 0801bd5e f9f723f9  -- fs_load('demo/shuen/shuen_bg2.LZ5bg', 0)
     adds r1,r6,#0x0    @ 0801bd62 311c
     adds r1,#0x88    @ 0801bd64 8831
-    str r0,[r1,#0x0]                         @ 0801bd66 0860
+    str r0,[r1,#0x0]                         @ 0801bd66 0860  -- gDemoState[+0x88] = fs_load 返回 (解压数据指针)
     movs r4,#0x0    @ 0801bd68 0024
     str r4,[sp,#0x0]                         @ 0801bd6a 0094
     str r4,[sp,#0x4]                         @ 0801bd6c 0194
@@ -14458,19 +14460,19 @@ switchD_0801bd2e__caseD_0:
     movs r1,#0x0    @ 0801bd70 0021
     movs r2,#0x1    @ 0801bd72 0122
     movs r3,#0x1    @ 0801bd74 0123
-    bl FUN_0801b91c                          @ 0801bd76 fff7d1fd
+    bl FUN_0801b91c                          @ 0801bd76 fff7d1fd  -- FUN_0801b91c(0,0,1,1) (OAM/window setup #1)
     str r4,[sp,#0x0]                         @ 0801bd7a 0094
     str r4,[sp,#0x4]                         @ 0801bd7c 0194
     movs r0,#0x0    @ 0801bd7e 0020
     movs r1,#0x1    @ 0801bd80 0121
     movs r2,#0x0    @ 0801bd82 0022
     movs r3,#0x2    @ 0801bd84 0223
-    bl FUN_0801b91c                          @ 0801bd86 fff7c9fd
+    bl FUN_0801b91c                          @ 0801bd86 fff7c9fd  -- FUN_0801b91c(0,1,0,2) (OAM/window setup #2)
     bl FUN_0801ba78                          @ 0801bd8a fff775fe
     movs r0,#0x28    @ 0801bd8e 2820
     movs r1,#0x0    @ 0801bd90 0021
     movs r2,#0x3c    @ 0801bd92 3c22
-    bl FUN_080147d8                          @ 0801bd94 f8f720fd
+    bl FUN_080147d8                          @ 0801bd94 f8f720fd  -- FUN_080147d8(0x28, 0, 0x3c) (启 fade-in)
     movs r2,#0x80    @ 0801bd98 8022
     lsls r2,r2,#0x13    @ 0801bd9a d204
     movs r3,#0xc0    @ 0801bd9c c023
@@ -14479,9 +14481,9 @@ switchD_0801bd2e__caseD_0:
     ldrh r1,[r2,#0x0]                        @ 0801bda2 1188
     ands r0,r1    @ 0801bda4 0840
     orrs r0,r3    @ 0801bda6 1843
-    strh r0,[r2,#0x0]                        @ 0801bda8 1080
+    strh r0,[r2,#0x0]                        @ 0801bda8 1080  -- DISPCNT |= 0x1800 (启 BG3 + OBJ)
     movs r0,#0x3    @ 0801bdaa 0320
-    bl FUN_080f9adc                          @ 0801bdac ddf096fe
+    bl FUN_080f9adc                          @ 0801bdac ddf096fe  -- FUN_080f9adc(3) (TODO: 推测 sound/sfx)
     adds r3,r6,#0x0    @ 0801bdb0 331c
     adds r3,#0x8c    @ 0801bdb2 8c33
     ldr r2,[r3,#0x0]                         @ 0801bdb4 1a68
@@ -14494,7 +14496,7 @@ switchD_0801bd2e__caseD_0:
     ldr r0, DAT_0801bdd8                     @ 0801bdc2 0548
     ands r0,r2    @ 0801bdc4 1040
     orrs r0,r1    @ 0801bdc6 0843
-    str r0,[r3,#0x0]                         @ 0801bdc8 1860
+    str r0,[r3,#0x0]                         @ 0801bdc8 1860  -- gDemoState[+0x8c]: state++ (bits 9..16)
     b switchD_0801bd2e__default              @ 0801bdca 27e2
 DAT_0801bdcc:
     .word  0x09e3cfe8                     @ 0801bdcc e8cfe309
@@ -14505,9 +14507,9 @@ DAT_0801bdd4:
 DAT_0801bdd8:
     .word  0xfffe01ff                     @ 0801bdd8 ff01feff
 switchD_0801bd2e__caseD_1:
-    bl FUN_080148f4                          @ 0801bddc f8f78afd
+    bl FUN_080148f4                          @ 0801bddc f8f78afd  -- case 1 WAIT_INIT: 等 gl ready (FUN_080148f4)
     cmp r0,#0x0                              @ 0801bde0 0028
-    bne LAB_0801be20                         @ 0801bde2 1dd1
+    bne LAB_0801be20                         @ 0801bde2 1dd1  -- r0 != 0 (still busy) -> 不推进, 跳到 helper
     adds r1,r6,#0x0    @ 0801bde4 311c
     adds r1,#0x8e    @ 0801bde6 8e31
     ldr r0, DAT_0801be28                     @ 0801bde8 0f48
@@ -14547,17 +14549,17 @@ DAT_0801be28:
 DAT_0801be2c:
     .word  0xfffe01ff                     @ 0801be2c ff01feff
 switchD_0801bd2e__caseD_2:
-    ldr r1, DAT_0801be98                     @ 0801be30 1949
+    ldr r1, DAT_0801be98                     @ 0801be30 1949  -- case 2 PHASE_A: keyframe 时间线
     add r0,sp,#0x8                           @ 0801be32 02a8
     movs r2,#0x3    @ 0801be34 0322
-    bl memcpy                                @ 0801be36 f2f091fd
+    bl memcpy                                @ 0801be36 f2f091fd  -- memcpy(stack+0x8, 0x09e3d01f, 3) (载 3-byte keyframe table)
     adds r1,r6,#0x0    @ 0801be3a 311c
     adds r1,#0x8e    @ 0801be3c 8e31
     ldrh r2,[r1,#0x0]                        @ 0801be3e 0a88
     lsls r0,r2,#0x17    @ 0801be40 d005
     lsrs r0,r0,#0x18    @ 0801be42 000e
     .hword 0x4688    @ 0801be44 8846
-    cmp r0,#0x3c                             @ 0801be46 3c28
+    cmp r0,#0x3c                             @ 0801be46 3c28  -- switch sub_state (low byte of [+0x8e]): 0x3c/0x96/0x4b/0xa5/0xe6
     beq LAB_0801be4e                         @ 0801be48 01d0
     cmp r0,#0x96                             @ 0801be4a 9628
     bne LAB_0801be9c                         @ 0801be4c 26d1
@@ -14727,7 +14729,7 @@ DAT_0801bf94:
 DAT_0801bf98:
     .word  0xfffe01ff                     @ 0801bf98 ff01feff
 switchD_0801bd2e__caseD_3:
-    bl FUN_080148f4                          @ 0801bf9c f8f7aafc
+    bl FUN_080148f4                          @ 0801bf9c f8f7aafc  -- case 3 WAIT_A: 等 phase A 完成 (FUN_080148f4)
     cmp r0,#0x0                              @ 0801bfa0 0028
     beq LAB_0801bfa6                         @ 0801bfa2 00d0
     b LAB_0801c1ec                           @ 0801bfa4 22e1
@@ -14759,16 +14761,16 @@ DAT_0801bfd0:
 DAT_0801bfd4:
     .word  0xfffe01ff                     @ 0801bfd4 ff01feff
 switchD_0801bd2e__caseD_4:
-    add r5,sp,#0xc                           @ 0801bfd8 03ad
+    add r5,sp,#0xc                           @ 0801bfd8 03ad  -- case 4 PHASE_B: 双 keyframe 6 帧循环
     ldr r1, DAT_0801c0b4                     @ 0801bfda 3649
     adds r0,r5,#0x0    @ 0801bfdc 281c
     movs r2,#0x6    @ 0801bfde 0622
-    bl memcpy                                @ 0801bfe0 f2f0bcfc
+    bl memcpy                                @ 0801bfe0 f2f0bcfc  -- memcpy(stack+0xc, 0x09e3d022, 6) (keyframe A)
     add r4,sp,#0x14                          @ 0801bfe4 05ac
     ldr r1, DAT_0801c0b8                     @ 0801bfe6 3449
     adds r0,r4,#0x0    @ 0801bfe8 201c
     movs r2,#0x6    @ 0801bfea 0622
-    bl memcpy                                @ 0801bfec f2f0b6fc
+    bl memcpy                                @ 0801bfec f2f0b6fc  -- memcpy(stack+0x14, 0x09e3d028, 6) (keyframe B)
     movs r3,#0x0    @ 0801bff0 0023
     movs r0,#0x8e    @ 0801bff2 8e20
     adds r0,r0,r6    @ 0801bff4 8019
@@ -14814,7 +14816,7 @@ LAB_0801c036:
     ldrh r1,[r2,#0x0]                        @ 0801c03e 1188
     lsls r0,r1,#0x17    @ 0801c040 c805
     lsrs r0,r0,#0x18    @ 0801c042 000e
-    cmp r0,#0x78                             @ 0801c044 7828
+    cmp r0,#0x78                             @ 0801c044 7828  -- if sub_state == 0x78: BLDY=0x3c, state++
     bne LAB_0801c084                         @ 0801c046 1dd1
     ldr r0, DAT_0801c0c0                     @ 0801c048 1d48
     ands r0,r1    @ 0801c04a 0840
@@ -14881,7 +14883,7 @@ DAT_0801c0c0:
 DAT_0801c0c4:
     .word  0xfffe01ff                     @ 0801c0c4 ff01feff
 switchD_0801bd2e__caseD_5:
-    movs r0,#0x8e    @ 0801c0c8 8e20
+    movs r0,#0x8e    @ 0801c0c8 8e20  -- case 5 FADEOUT: 3 种 brightness/blend 模式
     adds r0,r0,r6    @ 0801c0ca 8019
     .hword 0x4680    @ 0801c0cc 8046
     ldrh r2,[r0,#0x0]                        @ 0801c0ce 0288
@@ -14923,7 +14925,7 @@ LAB_0801c10c:
 LAB_0801c112:
     movs r0,#0x3f    @ 0801c112 3f20
     movs r1,#0x0    @ 0801c114 0021
-    bl gl_set_brightness                     @ 0801c116 f8f7f1fa
+    bl gl_set_brightness                     @ 0801c116 f8f7f1fa  -- gl_set_brightness(0x3f, 0) (mode 0)
     movs r0,#0x3f    @ 0801c11a 3f20
     movs r1,#0x10    @ 0801c11c 1021
     movs r2,#0x1e    @ 0801c11e 1e22
@@ -14963,7 +14965,7 @@ DAT_0801c160:
 LAB_0801c164:
     movs r0,#0x3f    @ 0801c164 3f20
     movs r1,#0x10    @ 0801c166 1021
-    bl gl_set_brightness                     @ 0801c168 f8f7c8fa
+    bl gl_set_brightness                     @ 0801c168 f8f7c8fa  -- gl_set_brightness(0x3f, 0x10) (mode 1)
     movs r0,#0x3f    @ 0801c16c 3f20
     movs r1,#0x0    @ 0801c16e 0021
     movs r2,#0x1e    @ 0801c170 1e22
@@ -15011,7 +15013,7 @@ DAT_0801c1c0:
 LAB_0801c1c4:
     movs r0,#0x3f    @ 0801c1c4 3f20
     movs r1,#0x0    @ 0801c1c6 0021
-    bl gl_set_brightness                     @ 0801c1c8 f8f798fa
+    bl gl_set_brightness                     @ 0801c1c8 f8f798fa  -- gl_set_brightness(0x3f, 0) (mode 2 -> state++)
     movs r1,#0x10    @ 0801c1cc 1021
     rsbs r1,r1,#0    @ 0801c1ce 4942
     movs r0,#0x3f    @ 0801c1d0 3f20
@@ -15034,7 +15036,7 @@ LAB_0801c1ec:
     adds r1,#0x94    @ 0801c1f2 9431
     ldr r2,[r1,#0x0]                         @ 0801c1f4 0a68
     adds r0,r2,#0x0    @ 0801c1f6 101c
-    adds r2,#0x1    @ 0801c1f8 0132
+    adds r2,#0x1    @ 0801c1f8 0132  -- gDemoState[+0x94]++ (frame counter)
     str r2,[r1,#0x0]                         @ 0801c1fa 0a60
     bl FUN_0801bbd4                          @ 0801c1fc fff7eafc
     b switchD_0801bd2e__default              @ 0801c200 0ce0
@@ -15042,7 +15044,7 @@ LAB_0801c1ec:
 DAT_0801c204:
     .word  0xfffffe01                     @ 0801c204 01feffff
 switchD_0801bd2e__caseD_6:
-    bl FUN_080148f4                          @ 0801c208 f8f774fb
+    bl FUN_080148f4                          @ 0801c208 f8f774fb  -- case 6 WAIT_FADEOUT: 等最终 fade-out
     cmp r0,#0x0                              @ 0801c20c 0028
     bne switchD_0801bd2e__default            @ 0801c20e 05d1
     adds r1,r6,#0x0    @ 0801c210 311c
@@ -15050,26 +15052,26 @@ switchD_0801bd2e__caseD_6:
     movs r0,#0x1    @ 0801c214 0120
     ldrb r2,[r1,#0x0]                        @ 0801c216 0a78
     orrs r0,r2    @ 0801c218 1043
-    strb r0,[r1,#0x0]                        @ 0801c21a 0870
+    strb r0,[r1,#0x0]                        @ 0801c21a 0870  -- gDemoState[+0x8c] |= 1 (set done flag bit0)
 switchD_0801bd2e__default:
-    bl FUN_0801522c                          @ 0801c21c f9f706f8
+    bl FUN_0801522c                          @ 0801c21c f9f706f8  -- default DONE: cleanup helpers
     bl FUN_08015160                          @ 0801c220 f8f79eff
-    bl FUN_080148f4                          @ 0801c224 f8f766fb
+    bl FUN_080148f4                          @ 0801c224 f8f766fb  -- FUN_080148f4 final ready check
     cmp r0,#0x0                              @ 0801c228 0028
-    bne LAB_0801c23c                         @ 0801c22a 07d1
+    bne LAB_0801c23c                         @ 0801c22a 07d1  -- r0 != 0 (gl busy) -> 走 cleanup return 0 路径
     adds r0,r6,#0x0    @ 0801c22c 301c
     adds r0,#0x8c    @ 0801c22e 8c30
-    ldrb r0,[r0,#0x0]                        @ 0801c230 0078
+    ldrb r0,[r0,#0x0]                        @ 0801c230 0078  -- 检查 gDemoState[+0x8c] bit0 (done flag)
     lsls r0,r0,#0x1f    @ 0801c232 c007
     cmp r0,#0x0                              @ 0801c234 0028
     beq LAB_0801c23c                         @ 0801c236 01d0
-    movs r0,#0x1    @ 0801c238 0120
+    movs r0,#0x1    @ 0801c238 0120  -- bit0 set + gl ready -> r0 = 1 (busy, 等下一帧)
     b LAB_0801c242                           @ 0801c23a 02e0
 LAB_0801c23c:
-    bl FUN_08014914                          @ 0801c23c f8f76afb
+    bl FUN_08014914                          @ 0801c23c f8f76afb  -- FUN_08014914 final cleanup; r0 = 0 (done)
     movs r0,#0x0    @ 0801c240 0020
 LAB_0801c242:
-    add sp,#0x20                             @ 0801c242 08b0
+    add sp,#0x20                             @ 0801c242 08b0  -- epilogue: 返回 r0 (1=busy / 0=done)
     pop {r3,r4,r5}                           @ 0801c244 38bc
     .hword 0x4698    @ 0801c246 9846
     .hword 0x46a1    @ 0801c248 a146
@@ -218496,7 +218498,7 @@ switchD_080bc892__caseD_2:
     bl FUN_0801ba4c                          @ 080bc8c0 5ff7c4f8
     b LAB_080bc8da                           @ 080bc8c4 09e0
 switchD_080bc892__caseD_3:
-    bl FUN_0801bd08                          @ 080bc8c6 5ff71ffa
+    bl demo_shuen_state_machine              @ 080bc8c6 5ff71ffa
     b LAB_080bc8da                           @ 080bc8ca 06e0
 switchD_080bc892__caseD_4:
     bl FUN_080cc904                          @ 080bc8cc 10f01af8
