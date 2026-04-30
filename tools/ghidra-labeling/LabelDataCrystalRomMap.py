@@ -148,6 +148,13 @@ LABELS = [
     # 1642 行 master pointer table @ 0x08000F40, 每行 24 B = 6 lang × 4 B offset
     # 顺序 [JA, EN, DE, FR, IT, ES]; offset = entry_addr - game_str_ja (BASE)
     # 代码引用: 0x08000F40 ROM 字面量 101 hits, 0x09DB9C10 99 hits
+
+    # logical_id -> master_row 重映射表 (见 game_str_id_to_row 即 FUN_080f4e18 的二分查找)
+    # 游戏代码用 16-bit logical_id (如 0x1004) 调 game_str_id_to_row, 返回 master row.
+    # arr[0..199] 多为 identity, 高范围 (0x10XX/0x13XX/0x6XX/0x7XX) 为 game-message 类别.
+    (0x08000240, "game_str_id_remap_count"),   # u16, 当前 = 0x0673 = 1651
+    (0x08000250, "game_str_id_remap_table"),   # 1651 × u16 sorted, 3302 B (0x250..0xF36)
+
     (0x08000F40, "game_str_pointer_table"),  # master 表, 1642 × 24 B = 39408 B
     (0x09DB9C10, "game_str_ja"),             # JA 区起点 (= STRING_TABLE_BASE)
     (0x09DC4620, "game_str_en"),             # EN 区起点

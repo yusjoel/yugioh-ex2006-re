@@ -54,7 +54,7 @@ DAT_0800022c:
 DAT_08000230:
     .word  0x080f4d91                     @ 08000230 914d0f08
     .byte  0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-DAT_08000240:
+game_str_id_remap_count:
     .hword 0x0673                         @ 08000240 7306
     ROM_INCBIN 0x242, 0x680
 DAT_080008c2:
@@ -2023,6 +2023,8 @@ LAB_08014386:
     pop {r1}                                 @ 08014392 02bc
     bx r1                                    @ 08014394 0847
     ROM_INCBIN 0x14396, 0x5a
+
+@ datacrystal: 禁卡密码字符录入 [gBanlistPasswordBuffer]
 banlist_password_enter_char:
     push {r4,r5,r6,lr}                       @ 080143f0 70b5
     adds r4,r0,#0x0    @ 080143f2 041c
@@ -2323,6 +2325,8 @@ LAB_080145f8:
     pop {r1}                                 @ 080145fa 02bc
     bx r1                                    @ 080145fc 0847
     .byte  0x00, 0x00
+
+@ FS LZ 解压器 (非 BIOS SWI 0x11); fs_load 内部调用
 cpu_copy_auto:
     push {lr}                                @ 08014600 00b5
     adds r3,r0,#0x0    @ 08014602 031c
@@ -2354,6 +2358,8 @@ LAB_08014632:
     pop {r0}                                 @ 08014632 01bc
     bx r0                                    @ 08014634 0047
     .byte  0x00, 0x00
+
+@ GL 基础设施: 清 VRAM (0x6000 u32) + PALRAM (0x100 u32) + 8 个 BG scroll 寄存器
 gl_clear_vram_palram_scroll:
     push {r4,lr}                             @ 08014638 10b5
     sub sp,#0x8                              @ 0801463a 82b0
@@ -2455,6 +2461,8 @@ LAB_080146f4:
     strb r0,[r2,#0x8]                        @ 080146f6 1072
     bx lr                                    @ 080146f8 7047
     .byte  0x00, 0x00
+
+@ GL: 设置亮度 (mode=r0=0x3F, bright=r1=[-16,16]); 源 GL/GL_Common.c
 gl_set_brightness:
     push {r4,r5,r6,lr}                       @ 080146fc 70b5
     adds r6,r0,#0x0    @ 080146fe 061c
@@ -2691,6 +2699,8 @@ DAT_080148c8:
     .word  0xfffffc03                     @ 080148c8 03fcffff
 DAT_080148cc:
     .word  0xfffc03ff                     @ 080148cc ff03fcff
+
+@ GL: 启动 8 帧淡入 (bright -16 -> 0)
 gl_fade_in:
     push {lr}                                @ 080148d0 00b5
     movs r0,#0x3f    @ 080148d2 3f20
@@ -2699,6 +2709,8 @@ gl_fade_in:
     bl FUN_080147d8                          @ 080148d8 fff77eff
     pop {r0}                                 @ 080148dc 01bc
     bx r0                                    @ 080148de 0047
+
+@ GL: 启动 8 帧淡出 (bright -> -16)
 gl_fade_out:
     push {lr}                                @ 080148e0 00b5
     movs r1,#0x10    @ 080148e2 1021
@@ -3500,6 +3512,8 @@ LAB_08014f46:
     pop {r1}                                 @ 08014f4e 02bc
     bx r1                                    @ 08014f50 0847
     .byte  0x00, 0x00
+
+@ FS 路径解析: 拆目录/文件名二级查表 -> FID 索引
 fs_resolve_path_to_fid:
     push {r4,r5,r6,r7,lr}                    @ 08014f54 f0b5
     .hword 0x4647    @ 08014f56 4746
@@ -3541,6 +3555,8 @@ LAB_08014f90:
     pop {r1}                                 @ 08014f96 02bc
     bx r1                                    @ 08014f98 0847
     .byte  0x00, 0x00, 0x00, 0xb5, 0x00, 0x21, 0x00, 0xf0, 0x02, 0xf8, 0x02, 0xbc, 0x08, 0x47
+
+@ FS loader: u8* fs_load(const char* path, int flag); 读 fs_master_struct @ 0x09E61178
 fs_load:
     push {r4,r5,r6,r7,lr}                    @ 08014fa8 f0b5
     .hword 0x4657    @ 08014faa 5746
@@ -3741,6 +3757,8 @@ DAT_08015130:
     .word  0x09e39c50                     @ 08015130 509ce309
 DAT_08015134:
     .word  0x09e39c5c                     @ 08015134 5c9ce309
+
+@ GL: 初始化 state struct @ EWRAM 0x02023490 (0x22B B)
 gl_state_init:
     push {lr}                                @ 08015138 00b5
     sub sp,#0x4                              @ 0801513a 81b0
@@ -4427,6 +4445,8 @@ DAT_080156a4:
     .word  0x09e3a4b8                     @ 080156a4 b8a4e309
 DAT_080156a8:
     .word  0x03002c08                     @ 080156a8 082c0003
+
+@ GL: 清 IWRAM 回调指针槽 [0x03000BF8/BFC/C00] = 0
 gl_clear_frame_callbacks:
     ldr r0, DAT_080156bc                     @ 080156ac 0348
     movs r1,#0x0    @ 080156ae 0021
@@ -6744,7 +6764,7 @@ LAB_08016b14:
     ldrb r4,[r4,#0x0]                        @ 08016b14 2478
     ldr r3, DAT_08016b54                     @ 08016b16 0f4b
     adds r0,r4,r3    @ 08016b18 e018
-    bl FUN_080f4e18                          @ 08016b1a def07df9
+    bl game_str_id_to_row                    @ 08016b1a def07df9
     ldr r2, PTR_game_str_pointer_table_08016b58 @ 08016b1e 0e4a
     lsls r0,r0,#0x10    @ 08016b20 0004
     lsrs r0,r0,#0x10    @ 08016b22 000c
@@ -7258,6 +7278,8 @@ FUN_08017540:
     .byte  0x00, 0x00
 DAT_08017570:
     .word  0x02029250                     @ 08017570 50920202
+
+@ name_input 页 IO 初始化 (DISPCNT=0x1F40, BG0-3CNT=0x1C02/0x1D8C/0x1E8D/0x1F8F); state[0]
 name_input_page_init:
     push {r4,lr}                             @ 08017574 10b5
     sub sp,#0x4                              @ 08017576 81b0
@@ -7666,7 +7688,7 @@ FUN_080178b4:
     push {r6}                                @ 080178b8 40b4
     ldr r5, DAT_08017930                     @ 080178ba 1d4d
     ldr r0, DAT_08017934                     @ 080178bc 1d48
-    bl FUN_080f4e18                          @ 080178be ddf0abfa
+    bl game_str_id_to_row                    @ 080178be ddf0abfa
     ldr r1, PTR_game_str_pointer_table_08017938 @ 080178c2 1d49
     .hword 0x4688    @ 080178c4 8846
     lsls r0,r0,#0x10    @ 080178c6 0004
@@ -7693,7 +7715,7 @@ FUN_080178b4:
     movs r1,#0xc    @ 080178f2 0c21
     bl FUN_0801785c                          @ 080178f4 fff7b2ff
     ldr r0, DAT_08017948                     @ 080178f8 1348
-    bl FUN_080f4e18                          @ 080178fa ddf08dfa
+    bl game_str_id_to_row                    @ 080178fa ddf08dfa
     lsls r0,r0,#0x10    @ 080178fe 0004
     lsrs r0,r0,#0x10    @ 08017900 000c
     lsls r1,r0,#0x1    @ 08017902 4100
@@ -7735,7 +7757,7 @@ FUN_0801794c:
     push {r4,lr}                             @ 0801794c 10b5
     ldr r4, DAT_08017990                     @ 0801794e 104c
     ldr r0, DAT_08017994                     @ 08017950 1048
-    bl FUN_080f4e18                          @ 08017952 ddf061fa
+    bl game_str_id_to_row                    @ 08017952 ddf061fa
     ldr r2, PTR_game_str_pointer_table_08017998 @ 08017956 104a
     lsls r0,r0,#0x10    @ 08017958 0004
     lsrs r0,r0,#0x10    @ 0801795a 000c
@@ -7987,7 +8009,7 @@ FUN_08017b44:
     ldr r0, DAT_08017c54                     @ 08017b50 4048
     .hword 0x4680    @ 08017b52 8046
     ldr r0, DAT_08017c58                     @ 08017b54 4048
-    bl FUN_080f4e18                          @ 08017b56 ddf05ff9
+    bl game_str_id_to_row                    @ 08017b56 ddf05ff9
     ldr r7, PTR_game_str_pointer_table_08017c5c @ 08017b5a 404f
     lsls r0,r0,#0x10    @ 08017b5c 0004
     lsrs r0,r0,#0x10    @ 08017b5e 000c
@@ -8028,7 +8050,7 @@ FUN_08017b44:
     movs r3,#0x2    @ 08017ba8 0223
     bl FUN_080183d0                          @ 08017baa 00f011fc
     ldr r0, DAT_08017c70                     @ 08017bae 3048
-    bl FUN_080f4e18                          @ 08017bb0 ddf032f9
+    bl game_str_id_to_row                    @ 08017bb0 ddf032f9
     lsls r0,r0,#0x10    @ 08017bb4 0004
     lsrs r0,r0,#0x10    @ 08017bb6 000c
     lsls r1,r0,#0x1    @ 08017bb8 4100
@@ -8061,7 +8083,7 @@ FUN_08017b44:
     movs r3,#0x2    @ 08017bf2 0223
     bl FUN_080183d0                          @ 08017bf4 00f0ecfb
     ldr r0, DAT_08017c74                     @ 08017bf8 1e48
-    bl FUN_080f4e18                          @ 08017bfa ddf00df9
+    bl game_str_id_to_row                    @ 08017bfa ddf00df9
     lsls r0,r0,#0x10    @ 08017bfe 0004
     lsrs r0,r0,#0x10    @ 08017c00 000c
     lsls r1,r0,#0x1    @ 08017c02 4100
@@ -8667,6 +8689,8 @@ LAB_080180a6:
     adds r0,r1,#0x0    @ 080180a6 081c
     pop {r1}                                 @ 080180a8 02bc
     bx r1                                    @ 080180aa 0847
+
+@ name_input 页资产装载: fs_load 加载 name_o_01.* + name_b_01/02/04; state[1]
 name_input_page_load_assets:
     push {r4,r5,r6,r7,lr}                    @ 080180ac f0b5
     .hword 0x464f    @ 080180ae 4f46
@@ -10729,7 +10753,7 @@ switchD_08018fa0__caseD_2:
     ldr r2, DAT_08019224                     @ 080190f0 4c4a
     bl bios_cpu_fast_set                     @ 080190f2 f5f07ff9
     ldr r0, DAT_08019228                     @ 080190f6 4c48
-    bl FUN_080f4e18                          @ 080190f8 dbf08efe
+    bl game_str_id_to_row                    @ 080190f8 dbf08efe
     lsls r0,r0,#0x10    @ 080190fc 0004
     lsrs r0,r0,#0x10    @ 080190fe 000c
     lsls r1,r0,#0x1    @ 08019100 4100
@@ -10777,7 +10801,7 @@ LAB_0801913c:
     movs r3,#0x7    @ 08019154 0723
     bl FUN_080175f4                          @ 08019156 fef74dfa
     ldr r0, DAT_0801923c                     @ 0801915a 3848
-    bl FUN_080f4e18                          @ 0801915c dbf05cfe
+    bl game_str_id_to_row                    @ 0801915c dbf05cfe
     lsls r0,r0,#0x10    @ 08019160 0004
     lsrs r0,r0,#0x10    @ 08019162 000c
     lsls r1,r0,#0x1    @ 08019164 4100
@@ -10815,7 +10839,7 @@ LAB_08019194:
     movs r3,#0x7    @ 080191a4 0723
     bl FUN_080175f4                          @ 080191a6 fef725fa
     ldr r0, DAT_08019240                     @ 080191aa 2548
-    bl FUN_080f4e18                          @ 080191ac dbf034fe
+    bl game_str_id_to_row                    @ 080191ac dbf034fe
     lsls r0,r0,#0x10    @ 080191b0 0004
     lsrs r0,r0,#0x10    @ 080191b2 000c
     lsls r1,r0,#0x1    @ 080191b4 4100
@@ -11183,6 +11207,8 @@ DAT_0801948c:
     .word  0x00000319                     @ 0801948c 19030000
 DAT_08019490:
     .word  0x09e587ec                     @ 08019490 ec87e509
+
+@ name_input 页主循环 (光标/输入/回显); state[2]
 name_input_page_tick:
     push {r4,lr}                             @ 08019494 10b5
     ldr r4, DAT_080194ac                     @ 08019496 054c
@@ -11227,6 +11253,8 @@ LAB_080194e6:
     pop {r4}                                 @ 080194e6 10bc
     pop {r1}                                 @ 080194e8 02bc
     bx r1                                    @ 080194ea 0847
+
+@ name_input 页退出/清理; state[3]
 name_input_page_exit:
     push {lr}                                @ 080194ec 00b5
     ldr r0, DAT_08019500                     @ 080194ee 0448
@@ -11294,6 +11322,8 @@ PTR_gPrng_0801956c:
     .word  gPrng                          @ 0801956c 40000003
 DAT_08019570:
     .word  0x0000023a                     @ 08019570 3a020000
+
+@ 通用页面状态分派器 (跨页复用); 从 [0x03000040] 读 state, 索引状态表
 page_state_dispatcher:
     push {r4,r5,r6,lr}                       @ 08019574 70b5
     adds r6,r0,#0x0    @ 08019576 061c
@@ -11699,7 +11729,7 @@ FUN_08019964:
     push {r6}                                @ 08019968 40b4
     ldr r5, PTR_gBanlistPasswordBuffer_080199e0 @ 0801996a 1d4d
     ldr r0, DAT_080199e4                     @ 0801996c 1d48
-    bl FUN_080f4e18                          @ 0801996e dbf053fa
+    bl game_str_id_to_row                    @ 0801996e dbf053fa
     ldr r1, PTR_game_str_pointer_table_080199e8 @ 08019972 1d49
     .hword 0x4688    @ 08019974 8846
     lsls r0,r0,#0x10    @ 08019976 0004
@@ -11725,7 +11755,7 @@ FUN_08019964:
     movs r1,#0xf    @ 080199a0 0f21
     bl FUN_0801990c                          @ 080199a2 fff7b3ff
     ldr r0, DAT_080199f8                     @ 080199a6 1448
-    bl FUN_080f4e18                          @ 080199a8 dbf036fa
+    bl game_str_id_to_row                    @ 080199a8 dbf036fa
     lsls r0,r0,#0x10    @ 080199ac 0004
     lsrs r0,r0,#0x10    @ 080199ae 000c
     lsls r1,r0,#0x1    @ 080199b0 4100
@@ -11768,7 +11798,7 @@ FUN_080199fc:
     push {r4,lr}                             @ 080199fc 10b5
     ldr r4, PTR_gBanlistPasswordBuffer_08019a40 @ 080199fe 104c
     ldr r0, DAT_08019a44                     @ 08019a00 1048
-    bl FUN_080f4e18                          @ 08019a02 dbf009fa
+    bl game_str_id_to_row                    @ 08019a02 dbf009fa
     ldr r2, PTR_game_str_pointer_table_08019a48 @ 08019a06 104a
     lsls r0,r0,#0x10    @ 08019a08 0004
     lsrs r0,r0,#0x10    @ 08019a0a 000c
@@ -11941,7 +11971,7 @@ FUN_08019b4c:
     ldr r1, DAT_08019c20                     @ 08019b5e 3049
     strb r0,[r1,#0x0]                        @ 08019b60 0870
     ldr r0, DAT_08019c24                     @ 08019b62 3048
-    bl FUN_080f4e18                          @ 08019b64 dbf058f9
+    bl game_str_id_to_row                    @ 08019b64 dbf058f9
     ldr r7, PTR_game_str_pointer_table_08019c28 @ 08019b68 2f4f
     lsls r0,r0,#0x10    @ 08019b6a 0004
     lsrs r0,r0,#0x10    @ 08019b6c 000c
@@ -11982,7 +12012,7 @@ FUN_08019b4c:
     movs r3,#0x2    @ 08019bb6 0223
     bl FUN_0801a6b4                          @ 08019bb8 00f07cfd
     ldr r0, DAT_08019c3c                     @ 08019bbc 1f48
-    bl FUN_080f4e18                          @ 08019bbe dbf02bf9
+    bl game_str_id_to_row                    @ 08019bbe dbf02bf9
     lsls r0,r0,#0x10    @ 08019bc2 0004
     lsrs r0,r0,#0x10    @ 08019bc4 000c
     lsls r1,r0,#0x1    @ 08019bc6 4100
@@ -12787,7 +12817,7 @@ FUN_0801a230:
     push {r7}                                @ 0801a234 80b4
     sub sp,#0x14                             @ 0801a236 85b0
     ldr r0, DWORD_0801a308                   @ 0801a238 3348
-    bl FUN_080f4e18                          @ 0801a23a daf0edfd
+    bl game_str_id_to_row                    @ 0801a23a daf0edfd
     ldr r3, PTR_game_str_pointer_table_0801a30c @ 0801a23e 334b
     lsls r0,r0,#0x10    @ 0801a240 0004
     lsrs r0,r0,#0x10    @ 0801a242 000c
@@ -16554,6 +16584,8 @@ PTR_DAT_0801d044:
     .word  0x0801d0c0                     @ 0801d0b8 c0d00108
 DAT_0801d0bc:
     ROM_INCBIN 0x1d0bc, 0x1d4
+
+@ p1: 6bpp -> BG0 VRAM, 每6 ROM bytes -> 8 像素
 decode_card_image_6bpp:
     push {r4,r5,r6,r7,lr}                    @ 0801d290 f0b5
     .hword 0x4657    @ 0801d292 5746
@@ -16782,6 +16814,8 @@ DAT_0801d440:
     .word  0x00003f3f                     @ 0801d440 3f3f0000
 DAT_0801d444:
     .word  0x00000c7f                     @ 0801d444 7f0c0000
+
+@ p1: FUN_0801e640 的首个 bl
 card_info_page_enter_with_card_id:
     push {lr}                                @ 0801d448 00b5
     ldr r0, DAT_0801d458                     @ 0801d44a 0348
@@ -16792,6 +16826,8 @@ card_info_page_enter_with_card_id:
     .byte  0x00, 0x00
 DAT_0801d458:
     .word  0x0201afb0                     @ 0801d458 b0af0102
+
+@ p1: 写 BG0CNT=0x0086, 清 BG0 VRAM
 card_info_page_init_bg0:
     push {r4,lr}                             @ 0801d45c 10b5
     ldr r0, PTR_gPrng_0801d4e4               @ 0801d45e 2148
@@ -17461,6 +17497,8 @@ LAB_0801d98e:
     bx r1                                    @ 0801d992 0847
 DAT_0801d994:
     .word  0x06008580                     @ 0801d994 80850006
+
+@ p1: 读卡片属性, 调 decode_card_image_6bpp (r1=0x10 palette offset)
 card_image_decode_wrapper:
     push {r4,r5,r6,r7,lr}                    @ 0801d998 f0b5
     .hword 0x4657    @ 0801d99a 5746
@@ -17735,6 +17773,8 @@ LAB_0801dbca:
     pop {r0}                                 @ 0801dbd6 01bc
     bx r0                                    @ 0801dbd8 0047
     .byte  0x00, 0x00
+
+@ p1/p2: 页面动画/过渡 (非 tile 写入), 待细化
 card_info_page_step_03_unknown:
     push {r4,r5,r6,r7,lr}                    @ 0801dbdc f0b5
     .hword 0x4657    @ 0801dbde 5746
@@ -18280,6 +18320,8 @@ LAB_0801dff4:
     .byte  0x00, 0x00
 PTR_gPrng_0801dffc:
     .word  gPrng                          @ 0801dffc 40000003
+
+@ p2: 字段/描述绘制入口, 字面量池含 .word 0x06010040
 render_card_description_text:
     push {r4,r5,r6,r7,lr}                    @ 0801e000 f0b5
     .hword 0x464f    @ 0801e002 4f46
@@ -18407,6 +18449,8 @@ DAT_0801e0f8:
     .word  0x0201afb0                     @ 0801e0f8 b0af0102
 DAT_0801e0fc:
     .word  0x06010040                     @ 0801e0fc 40000106
+
+@ p2: 顶层最后一个 bl, UI 收尾
 card_info_page_finalize:
     push {r4,r5,r6,r7,lr}                    @ 0801e100 f0b5
     .hword 0x4657    @ 0801e102 5746
@@ -18836,6 +18880,8 @@ DAT_0801e438:
     .word  0x02000000                     @ 0801e438 00000002
 DAT_0801e43c:
     .word  0x00006c2c                     @ 0801e43c 2c6c0000
+
+@ p1/p2: 卡牌信息页顶层, card_id=(word0<<15)>>18
 card_info_page_entry:
     push {r4,lr}                             @ 0801e440 10b5
     bl card_info_page_init_bg0               @ 0801e442 fff70bf8
@@ -19088,6 +19134,8 @@ FUN_0801e620:
     .byte  0x00, 0x00
 DAT_0801e63c:
     .word  0x0201afb0                     @ 0801e63c b0af0102
+
+@ TG.4-next: 卡列表按 A 进详情页的派发, 首 bl 即 card_info_page_enter_with_card_id
 card_list_on_select_to_info_page:
     push {r4,r5,r6,r7,lr}                    @ 0801e640 f0b5
     .hword 0x464f    @ 0801e642 4f46
@@ -21164,7 +21212,7 @@ LAB_0802008c:
     adds r6,r6,r2    @ 080200de b618
 LAB_080200e0:
     ldrh r0,[r7,#0x0]                        @ 080200e0 3888
-    bl FUN_080f4e18                          @ 080200e2 d4f099fe
+    bl game_str_id_to_row                    @ 080200e2 d4f099fe
     ldr r2, PTR_game_str_pointer_table_08020144 @ 080200e6 174a
     lsls r0,r0,#0x10    @ 080200e8 0004
     lsrs r0,r0,#0x10    @ 080200ea 000c
@@ -21617,6 +21665,8 @@ FUN_0802385e:
     .byte  0x00, 0x00
 DAT_08023878:
     .word  0x0201e2a0                     @ 08023878 a0e20102
+
+@ datacrystal: 通用十进制绘制（被多处调用，含 0x080242c8 入口）
 draw_decimal_with_offset:
     push {r4,r5,r6,r7,lr}                    @ 0802387c f0b5
     .hword 0x4657    @ 0802387e 5746
@@ -22440,7 +22490,7 @@ LAB_08023ed8:
     movs r1,#0xbe    @ 08023ed8 be21
     lsls r1,r1,#0x4    @ 08023eda 0901
     adds r0,r6,r1    @ 08023edc 7018
-    bl FUN_080f4e18                          @ 08023ede d0f09bff
+    bl game_str_id_to_row                    @ 08023ede d0f09bff
     ldr r2, PTR_game_str_pointer_table_08023fb0 @ 08023ee2 334a
     lsls r0,r0,#0x10    @ 08023ee4 0004
     lsrs r0,r0,#0x10    @ 08023ee6 000c
@@ -25382,7 +25432,7 @@ LAB_0802bb92:
     ldrb r6,[r0,#0x0]                        @ 0802bbf0 0678
     ldr r2, DAT_0802bc74                     @ 0802bbf2 204a
     adds r0,r7,r2    @ 0802bbf4 b818
-    bl FUN_080f4e18                          @ 0802bbf6 c9f00ff9
+    bl game_str_id_to_row                    @ 0802bbf6 c9f00ff9
     ldr r2, PTR_game_str_pointer_table_0802bc78 @ 0802bbfa 1f4a
     lsls r0,r0,#0x10    @ 0802bbfc 0004
     lsrs r0,r0,#0x10    @ 0802bbfe 000c
@@ -26228,7 +26278,7 @@ FUN_0802c238:
     ldr r0,[sp,#0x58]                        @ 0802c248 1698
     ldr r1, DAT_0802c2f0                     @ 0802c24a 2949
     adds r0,r0,r1    @ 0802c24c 4018
-    bl FUN_080f4e18                          @ 0802c24e c8f0e3fd
+    bl game_str_id_to_row                    @ 0802c24e c8f0e3fd
     ldr r2, PTR_game_str_pointer_table_0802c2f4 @ 0802c252 284a
     lsls r0,r0,#0x10    @ 0802c254 0004
     lsrs r0,r0,#0x10    @ 0802c256 000c
@@ -26368,7 +26418,7 @@ FUN_0802c358:
     movs r0,#0xfa    @ 0802c370 fa20
     lsls r0,r0,#0x2    @ 0802c372 8000
     add r0,r9                                @ 0802c374 4844
-    bl FUN_080f4e18                          @ 0802c376 c8f04ffd
+    bl game_str_id_to_row                    @ 0802c376 c8f04ffd
     ldr r2, PTR_game_str_pointer_table_0802c3dc @ 0802c37a 184a
     lsls r0,r0,#0x10    @ 0802c37c 0004
     lsrs r0,r0,#0x10    @ 0802c37e 000c
@@ -26939,7 +26989,7 @@ switchD_0802c3d8__caseD_2736:
     movs r0,#0xfa    @ 0802c7ec fa20
     lsls r0,r0,#0x3    @ 0802c7ee c000
     add r0,r9                                @ 0802c7f0 4844
-    bl FUN_080f4e18                          @ 0802c7f2 c8f011fb
+    bl game_str_id_to_row                    @ 0802c7f2 c8f011fb
     ldr r2, PTR_game_str_pointer_table_0802c82c @ 0802c7f6 0d4a
     lsls r0,r0,#0x10    @ 0802c7f8 0004
     lsrs r0,r0,#0x10    @ 0802c7fa 000c
@@ -26986,7 +27036,7 @@ LAB_0802c83e:
     movs r0,#0xfa    @ 0802c84c fa20
     lsls r0,r0,#0x3    @ 0802c84e c000
     add r0,r9                                @ 0802c850 4844
-    bl FUN_080f4e18                          @ 0802c852 c8f0e1fa
+    bl game_str_id_to_row                    @ 0802c852 c8f0e1fa
     ldr r2, PTR_game_str_pointer_table_0802c88c @ 0802c856 0d4a
     lsls r0,r0,#0x10    @ 0802c858 0004
     lsrs r0,r0,#0x10    @ 0802c85a 000c
@@ -27033,7 +27083,7 @@ LAB_0802c89e:
     movs r0,#0xfa    @ 0802c8ac fa20
     lsls r0,r0,#0x3    @ 0802c8ae c000
     add r0,r9                                @ 0802c8b0 4844
-    bl FUN_080f4e18                          @ 0802c8b2 c8f0b1fa
+    bl game_str_id_to_row                    @ 0802c8b2 c8f0b1fa
     ldr r2, PTR_game_str_pointer_table_0802c8ec @ 0802c8b6 0d4a
     lsls r0,r0,#0x10    @ 0802c8b8 0004
     lsrs r0,r0,#0x10    @ 0802c8ba 000c
@@ -27080,7 +27130,7 @@ LAB_0802c8fe:
     movs r0,#0xfa    @ 0802c90c fa20
     lsls r0,r0,#0x3    @ 0802c90e c000
     add r0,r9                                @ 0802c910 4844
-    bl FUN_080f4e18                          @ 0802c912 c8f081fa
+    bl game_str_id_to_row                    @ 0802c912 c8f081fa
     ldr r2, PTR_game_str_pointer_table_0802c94c @ 0802c916 0d4a
     lsls r0,r0,#0x10    @ 0802c918 0004
     lsrs r0,r0,#0x10    @ 0802c91a 000c
@@ -27210,7 +27260,7 @@ LAB_0802c9f4:
     movs r0,#0xfa    @ 0802c9f4 fa20
     lsls r0,r0,#0x3    @ 0802c9f6 c000
     add r0,r9                                @ 0802c9f8 4844
-    bl FUN_080f4e18                          @ 0802c9fa c8f00dfa
+    bl game_str_id_to_row                    @ 0802c9fa c8f00dfa
     ldr r2, PTR_game_str_pointer_table_0802ca40 @ 0802c9fe 104a
     lsls r0,r0,#0x10    @ 0802ca00 0004
     lsrs r0,r0,#0x10    @ 0802ca02 000c
@@ -27270,7 +27320,7 @@ LAB_0802ca66:
     movs r0,#0xfa    @ 0802ca6c fa20
     lsls r0,r0,#0x3    @ 0802ca6e c000
     add r0,r9                                @ 0802ca70 4844
-    bl FUN_080f4e18                          @ 0802ca72 c8f0d1f9
+    bl game_str_id_to_row                    @ 0802ca72 c8f0d1f9
     ldr r2, PTR_game_str_pointer_table_0802cb88 @ 0802ca76 444a
     lsls r0,r0,#0x10    @ 0802ca78 0004
     lsrs r0,r0,#0x10    @ 0802ca7a 000c
@@ -27297,7 +27347,7 @@ LAB_0802caa4:
     ldr r0, DAT_0802cb98                     @ 0802caa4 3c48
     subs r0,r0,r7    @ 0802caa6 c01b
     .hword 0x4680    @ 0802caa8 8046
-    bl FUN_080f4e18                          @ 0802caaa c8f0b5f9
+    bl game_str_id_to_row                    @ 0802caaa c8f0b5f9
     lsls r0,r0,#0x10    @ 0802caae 0004
     lsrs r0,r0,#0x10    @ 0802cab0 000c
     lsls r1,r0,#0x1    @ 0802cab2 4100
@@ -27325,7 +27375,7 @@ LAB_0802caa4:
     subs r4,r6,r4    @ 0802cae0 341b
     ldr r5, DAT_0802cb9c                     @ 0802cae2 2e4d
     .hword 0x4640    @ 0802cae4 4046
-    bl FUN_080f4e18                          @ 0802cae6 c8f097f9
+    bl game_str_id_to_row                    @ 0802cae6 c8f097f9
     lsls r0,r0,#0x10    @ 0802caea 0004
     lsrs r0,r0,#0x10    @ 0802caec 000c
     lsls r1,r0,#0x1    @ 0802caee 4100
@@ -27346,7 +27396,7 @@ LAB_0802caa4:
     adds r2,r5,#0x0    @ 0802cb0c 2a1c
     bl text_render_wrapper                   @ 0802cb0e c5f0b5ff
     .hword 0x4640    @ 0802cb12 4046
-    bl FUN_080f4e18                          @ 0802cb14 c8f080f9
+    bl game_str_id_to_row                    @ 0802cb14 c8f080f9
     lsls r0,r0,#0x10    @ 0802cb18 0004
     lsrs r0,r0,#0x10    @ 0802cb1a 000c
     lsls r1,r0,#0x1    @ 0802cb1c 4100
@@ -27372,7 +27422,7 @@ LAB_0802caa4:
     movs r4,#0x6    @ 0802cb46 0624
 LAB_0802cb48:
     .hword 0x4640    @ 0802cb48 4046
-    bl FUN_080f4e18                          @ 0802cb4a c8f065f9
+    bl game_str_id_to_row                    @ 0802cb4a c8f065f9
     lsls r0,r0,#0x10    @ 0802cb4e 0004
     lsrs r0,r0,#0x10    @ 0802cb50 000c
     lsls r1,r0,#0x1    @ 0802cb52 4100
@@ -221402,6 +221452,8 @@ DAT_080bdfa4:
     .word  0x02023130                     @ 080bdfa4 30310202
 DAT_080bdfa8:
     .word  0x00000215                     @ 080bdfa8 15020000
+
+@ pack-banner: 卡包 UI 运行时状态机 (7 路 switch), overlay/动画
 pack_ui_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080bdfac f0b5
     .hword 0x4657    @ 080bdfae 5746
@@ -232335,6 +232387,8 @@ DAT_080c33b4:
     .word  0x02023130                     @ 080c33b4 30310202
 DAT_080c33b8:
     .word  0x00000215                     @ 080c33b8 15020000
+
+@ P1 findings: 卡列表小图 (OBJ 8bpp, 1152 B/条)
 load_card_list_small_image:
     push {r4,r5,r6,r7,lr}                    @ 080c33bc f0b5
     .hword 0x4657    @ 080c33be 5746
@@ -245381,7 +245435,7 @@ FUN_080cad78:
     lsls r3,r3,#0x2    @ 080cadee 9b00
     .hword 0x4698    @ 080cadf0 9846
     .hword 0x4640    @ 080cadf2 4046
-    bl FUN_080f4e18                          @ 080cadf4 2af010f8
+    bl game_str_id_to_row                    @ 080cadf4 2af010f8
     ldr r1, PTR_game_str_pointer_table_080cae78 @ 080cadf8 1f49
     .hword 0x4689    @ 080cadfa 8946
     lsls r0,r0,#0x10    @ 080cadfc 0004
@@ -245403,7 +245457,7 @@ FUN_080cad78:
     adds r2,r4,#0x0    @ 080cae1c 221c
     bl text_render_wrapper                   @ 080cae1e 27f02dfe
     .hword 0x4640    @ 080cae22 4046
-    bl FUN_080f4e18                          @ 080cae24 29f0f8ff
+    bl game_str_id_to_row                    @ 080cae24 29f0f8ff
     lsls r0,r0,#0x10    @ 080cae28 0004
     lsrs r0,r0,#0x10    @ 080cae2a 000c
     lsls r1,r0,#0x1    @ 080cae2c 4100
@@ -247104,7 +247158,7 @@ LAB_080cbb62:
     movs r3,#0xfb    @ 080cbb62 fb23
     lsls r3,r3,#0x2    @ 080cbb64 9b00
     adds r0,r6,r3    @ 080cbb66 f018
-    bl FUN_080f4e18                          @ 080cbb68 29f056f9
+    bl game_str_id_to_row                    @ 080cbb68 29f056f9
     ldr r2, PTR_game_str_pointer_table_080cbbb4 @ 080cbb6c 114a
     lsls r0,r0,#0x10    @ 080cbb6e 0004
     lsrs r0,r0,#0x10    @ 080cbb70 000c
@@ -247156,7 +247210,7 @@ DAT_080cbbc8:
 LAB_080cbbcc:
     ldr r1, DAT_080cbc1c                     @ 080cbbcc 1349
     adds r0,r6,r1    @ 080cbbce 7018
-    bl FUN_080f4e18                          @ 080cbbd0 29f022f9
+    bl game_str_id_to_row                    @ 080cbbd0 29f022f9
     ldr r2, PTR_game_str_pointer_table_080cbc20 @ 080cbbd4 124a
     lsls r0,r0,#0x10    @ 080cbbd6 0004
     lsrs r0,r0,#0x10    @ 080cbbd8 000c
@@ -247211,7 +247265,7 @@ LAB_080cbc38:
     movs r2,#0xfc    @ 080cbc38 fc22
     lsls r2,r2,#0x2    @ 080cbc3a 9200
     adds r0,r6,r2    @ 080cbc3c b018
-    bl FUN_080f4e18                          @ 080cbc3e 29f0ebf8
+    bl game_str_id_to_row                    @ 080cbc3e 29f0ebf8
     ldr r2, PTR_game_str_pointer_table_080cbca4 @ 080cbc42 184a
     lsls r0,r0,#0x10    @ 080cbc44 0004
     lsrs r0,r0,#0x10    @ 080cbc46 000c
@@ -247277,7 +247331,7 @@ DAT_080cbcb8:
 LAB_080cbcbc:
     ldr r2, DAT_080cbd58                     @ 080cbcbc 264a
     adds r0,r6,r2    @ 080cbcbe b018
-    bl FUN_080f4e18                          @ 080cbcc0 29f0aaf8
+    bl game_str_id_to_row                    @ 080cbcc0 29f0aaf8
     ldr r2, PTR_game_str_pointer_table_080cbd5c @ 080cbcc4 254a
     lsls r0,r0,#0x10    @ 080cbcc6 0004
     lsrs r0,r0,#0x10    @ 080cbcc8 000c
@@ -251648,7 +251702,7 @@ LAB_080ce104:
     ldrh r0,[r0,#0x0]                        @ 080ce17c 0088
     ldr r3, DAT_080ce208                     @ 080ce17e 224b
     adds r0,r0,r3    @ 080ce180 c018
-    bl FUN_080f4e18                          @ 080ce182 26f049fe
+    bl game_str_id_to_row                    @ 080ce182 26f049fe
     ldr r2, PTR_game_str_pointer_table_080ce20c @ 080ce186 214a
     lsls r0,r0,#0x10    @ 080ce188 0004
     lsrs r0,r0,#0x10    @ 080ce18a 000c
@@ -252354,7 +252408,7 @@ LAB_080ce6e4:
     ldrh r1,[r4,#0x0]                        @ 080ce6e8 2188
     ldr r2, DAT_080ce748                     @ 080ce6ea 174a
     adds r0,r1,r2    @ 080ce6ec 8818
-    bl FUN_080f4e18                          @ 080ce6ee 26f093fb
+    bl game_str_id_to_row                    @ 080ce6ee 26f093fb
     ldr r2, PTR_game_str_pointer_table_080ce74c @ 080ce6f2 164a
     lsls r0,r0,#0x10    @ 080ce6f4 0004
     lsrs r0,r0,#0x10    @ 080ce6f6 000c
@@ -254740,7 +254794,7 @@ LAB_080cf878:
     ldr r1, DAT_080cf9e4                     @ 080cf91a 3249
     .hword 0x4688    @ 080cf91c 8846
     add r0,r8                                @ 080cf91e 4044
-    bl FUN_080f4e18                          @ 080cf920 25f07afa
+    bl game_str_id_to_row                    @ 080cf920 25f07afa
     ldr r2, PTR_game_str_pointer_table_080cf9e8 @ 080cf924 304a
     .hword 0x4692    @ 080cf926 9246
     lsls r0,r0,#0x10    @ 080cf928 0004
@@ -254766,7 +254820,7 @@ LAB_080cf878:
     lsls r0,r1,#0x14    @ 080cf952 0805
     lsrs r0,r0,#0x18    @ 080cf954 000e
     add r0,r8                                @ 080cf956 4044
-    bl FUN_080f4e18                          @ 080cf958 25f05efa
+    bl game_str_id_to_row                    @ 080cf958 25f05efa
     lsls r0,r0,#0x10    @ 080cf95c 0004
     lsrs r0,r0,#0x10    @ 080cf95e 000c
     lsls r1,r0,#0x1    @ 080cf960 4100
@@ -255412,7 +255466,7 @@ LAB_080cfe48:
     lsrs r0,r1,#0x18    @ 080cfe48 080e
     ldr r2, DAT_080cfea8                     @ 080cfe4a 174a
     adds r0,r0,r2    @ 080cfe4c 8018
-    bl FUN_080f4e18                          @ 080cfe4e 24f0e3ff
+    bl game_str_id_to_row                    @ 080cfe4e 24f0e3ff
     ldr r2, PTR_game_str_pointer_table_080cfeac @ 080cfe52 164a
     lsls r0,r0,#0x10    @ 080cfe54 0004
     lsrs r0,r0,#0x10    @ 080cfe56 000c
@@ -261171,7 +261225,7 @@ FUN_080d6290:
     push {r4,lr}                             @ 080d6290 10b5
     ldr r4, DAT_080d62e8                     @ 080d6292 154c
     ldr r0, DAT_080d62ec                     @ 080d6294 1548
-    bl FUN_080f4e18                          @ 080d6296 1ef0bffd
+    bl game_str_id_to_row                    @ 080d6296 1ef0bffd
     ldr r2, PTR_game_str_pointer_table_080d62f0 @ 080d629a 154a
     lsls r0,r0,#0x10    @ 080d629c 0004
     lsrs r0,r0,#0x10    @ 080d629e 000c
@@ -265898,7 +265952,7 @@ FUN_080d8804:
     bl FUN_080f5a88                          @ 080d8806 1df03ff9
     ldr r4, DAT_080d884c                     @ 080d880a 104c
     ldr r0, DAT_080d8850                     @ 080d880c 1048
-    bl FUN_080f4e18                          @ 080d880e 1cf003fb
+    bl game_str_id_to_row                    @ 080d880e 1cf003fb
     ldr r2, PTR_game_str_pointer_table_080d8854 @ 080d8812 104a
     lsls r0,r0,#0x10    @ 080d8814 0004
     lsrs r0,r0,#0x10    @ 080d8816 000c
@@ -266607,6 +266661,8 @@ LAB_080d8d7e:
     pop {r4}                                 @ 080d8d7e 10bc
     pop {r1}                                 @ 080d8d80 02bc
     bx r1                                    @ 080d8d82 0847
+
+@ pack-banner: BG0CNT=0x1C00, BG2CNT=0x1E0D, 清空 VRAM screenblocks
 pack_list_bg_setup:
     push {r4,lr}                             @ 080d8d84 10b5
     ldr r1, PTR_BG0CNT_080d8dc8              @ 080d8d86 1049
@@ -266647,6 +266703,8 @@ DAT_080d8dd4:
     .word  0x0600d000                     @ 080d8dd4 00d00006
 DAT_080d8dd8:
     .word  0x0600f000                     @ 080d8dd8 00f00006
+
+@ pack-banner: 返回当前可见 pack 数 (clamp 1..5)
 pack_visible_count:
     ldr r0, DAT_080d8df4                     @ 080d8ddc 0548
     ldrh r1,[r0,#0x14]                       @ 080d8dde 818a
@@ -266750,6 +266808,8 @@ LAB_080d8e88:
     .byte  0x00, 0x00
 DAT_080d8e94:
     .word  0x03005850                     @ 080d8e94 50580003
+
+@ pack-banner: 逐 pack 初始化 (banner tile + name text + detail)
 pack_entry_init:
     push {r4,r5,r6,lr}                       @ 080d8e98 70b5
     adds r1,r0,#0x0    @ 080d8e9a 011c
@@ -266802,6 +266862,8 @@ DAT_080d8f00:
     .word  0x00001288                     @ 080d8f00 88120000
 DAT_080d8f04:
     .word  0x00000c08                     @ 080d8f04 080c0000
+
+@ pack-banner: 从 0x09CCE2B0/C0/D0 加载 BG tilemap + BG palette
 pack_list_tilemap_load:
     push {lr}                                @ 080d8f08 00b5
     ldr r0, DAT_080d8f30                     @ 080d8f0a 0948
@@ -266832,6 +266894,8 @@ DAT_080d8f40:
     .word  0x050001a0                     @ 080d8f40 a0010005
 DAT_080d8f44:
     .word  0x09cce2c0                     @ 080d8f44 c0e2cc09
+
+@ pack-banner: 按 slot 计算 OBJ VRAM 地址, 调 pack_banner_tile_copy
 pack_banner_obj_setup:
     push {r4,r5,r6,lr}                       @ 080d8f48 70b5
     adds r6,r0,#0x0    @ 080d8f4a 061c
@@ -266861,6 +266925,8 @@ LAB_080d8f56:
     bx r0                                    @ 080d8f7e 0047
 DAT_080d8f80:
     .word  0x06014000                     @ 080d8f80 00400106
+
+@ pack-banner: EWRAM 记录 → BG VRAM 0x06000240, 含 pack cost
 pack_detail_bg_tile_load:
     push {r4,r5,lr}                          @ 080d8f84 30b5
     adds r2,r0,#0x0    @ 080d8f86 021c
@@ -267837,6 +267903,8 @@ DAT_080d9714:
     .word  0x000006c4                     @ 080d9714 c4060000
 DAT_080d9718:
     .word  0x0200af20                     @ 080d9718 20af0002
+
+@ pack-banner: 卡包列表页初始化, 函数指针表 0x09E4948C[11]
 pack_list_page_init:
     push {r4,r5,r6,lr}                       @ 080d971c 70b5
     sub sp,#0xc                              @ 080d971e 83b0
@@ -267952,7 +268020,7 @@ DAT_080d980c:
 LAB_080d9810:
     ldr r0, DAT_080d9888                     @ 080d9810 1d48
 LAB_080d9812:
-    bl FUN_080f4e18                          @ 080d9812 1bf001fb
+    bl game_str_id_to_row                    @ 080d9812 1bf001fb
     ldr r2, PTR_game_str_pointer_table_080d988c @ 080d9816 1d4a
     lsls r0,r0,#0x10    @ 080d9818 0004
     lsrs r0,r0,#0x10    @ 080d981a 000c
@@ -272041,7 +272109,7 @@ FUN_080db7c4:
     bls LAB_080db848                         @ 080db7ea 2dd9
     ldr r4, DAT_080db830                     @ 080db7ec 104c
     ldr r0, DAT_080db834                     @ 080db7ee 1148
-    bl FUN_080f4e18                          @ 080db7f0 19f012fb
+    bl game_str_id_to_row                    @ 080db7f0 19f012fb
     ldr r2, PTR_game_str_pointer_table_080db838 @ 080db7f4 104a
     lsls r0,r0,#0x10    @ 080db7f6 0004
     lsrs r0,r0,#0x10    @ 080db7f8 000c
@@ -272096,6 +272164,8 @@ FUN_080db850:
     pop {r0}                                 @ 080db85a 01bc
     bx r0                                    @ 080db85c 0047
     .byte  0x00, 0x00
+
+@ pack-banner: ROM 指针表 0x09CCE960[id] → OBJ VRAM, mode 1=2D stride
 pack_banner_tile_copy:
     push {r4,r5,r6,r7,lr}                    @ 080db860 f0b5
     .hword 0x4647    @ 080db862 4746
@@ -272423,7 +272493,7 @@ LAB_080dba80:
     bl FUN_080f2c8c                          @ 080dbad8 17f0d8f8
     ldr r6, DAT_080dbb70                     @ 080dbadc 244e
     adds r0,r6,#0x0    @ 080dbade 301c
-    bl FUN_080f4e18                          @ 080dbae0 19f09af9
+    bl game_str_id_to_row                    @ 080dbae0 19f09af9
     ldr r2, PTR_game_str_pointer_table_080dbb74 @ 080dbae4 234a
     .hword 0x4690    @ 080dbae6 9046
     lsls r0,r0,#0x10    @ 080dbae8 0004
@@ -272447,7 +272517,7 @@ LAB_080dba80:
     .hword 0x464a    @ 080dbb0c 4a46
     bl FUN_080f2c2c                          @ 080dbb0e 17f08df8
     adds r0,r6,#0x0    @ 080dbb12 301c
-    bl FUN_080f4e18                          @ 080dbb14 19f080f9
+    bl game_str_id_to_row                    @ 080dbb14 19f080f9
     lsls r0,r0,#0x10    @ 080dbb18 0004
     lsrs r0,r0,#0x10    @ 080dbb1a 000c
     lsls r1,r0,#0x1    @ 080dbb1c 4100
@@ -272533,6 +272603,8 @@ FUN_080dbbb0:
     pop {r0}                                 @ 080dbbba 01bc
     bx r0                                    @ 080dbbbc 0047
     .byte  0x00, 0x00
+
+@ pack-banner: ROM 0x09E5E2E8 查包名, text_render_wrapper x2
 pack_name_text_render:
     push {r4,r5,r6,lr}                       @ 080dbbc0 70b5
     adds r6,r0,#0x0    @ 080dbbc2 061c
@@ -272540,7 +272612,7 @@ pack_name_text_render:
     lsls r1,r1,#0x4    @ 080dbbc6 0901
     adds r1,r1,r0    @ 080dbbc8 0918
     ldrh r0,[r1,#0x6]                        @ 080dbbca c888
-    bl FUN_080f4e18                          @ 080dbbcc 19f024f9
+    bl game_str_id_to_row                    @ 080dbbcc 19f024f9
     ldr r2, PTR_game_str_pointer_table_080dbc68 @ 080dbbd0 254a
     lsls r0,r0,#0x10    @ 080dbbd2 0004
     lsrs r0,r0,#0x10    @ 080dbbd4 000c
@@ -272991,7 +273063,7 @@ FUN_080dbf40:
     .hword 0x4680    @ 080dbf48 8046
     adds r4,r1,#0x0    @ 080dbf4a 0c1c
     ldr r0, DAT_080dbf94                     @ 080dbf4c 1148
-    bl FUN_080f4e18                          @ 080dbf4e 18f063ff
+    bl game_str_id_to_row                    @ 080dbf4e 18f063ff
     ldr r2, PTR_game_str_pointer_table_080dbf98 @ 080dbf52 114a
     lsls r0,r0,#0x10    @ 080dbf54 0004
     lsrs r0,r0,#0x10    @ 080dbf56 000c
@@ -273165,7 +273237,7 @@ FUN_080dc098:
     adds r4,r1,#0x0    @ 080dc0a2 0c1c
     adds r5,r2,#0x0    @ 080dc0a4 151c
     ldr r0, DAT_080dc0e8                     @ 080dc0a6 1048
-    bl FUN_080f4e18                          @ 080dc0a8 18f0b6fe
+    bl game_str_id_to_row                    @ 080dc0a8 18f0b6fe
     ldr r2, PTR_game_str_pointer_table_080dc0ec @ 080dc0ac 0f4a
     lsls r0,r0,#0x10    @ 080dc0ae 0004
     lsrs r0,r0,#0x10    @ 080dc0b0 000c
@@ -273342,7 +273414,7 @@ FUN_080dc1f8:
     ldr r5, DAT_080dc300                     @ 080dc206 3e4d
     adds r5,#0xc    @ 080dc208 0c35
     ldr r0, DAT_080dc304                     @ 080dc20a 3e48
-    bl FUN_080f4e18                          @ 080dc20c 18f004fe
+    bl game_str_id_to_row                    @ 080dc20c 18f004fe
     ldr r1, PTR_game_str_pointer_table_080dc308 @ 080dc210 3d49
     .hword 0x4689    @ 080dc212 8946
     lsls r0,r0,#0x10    @ 080dc214 0004
@@ -273364,7 +273436,7 @@ FUN_080dc1f8:
     ldr r6, PTR_game_str_ja_080dc314         @ 080dc234 374e
     add r8,r6                                @ 080dc236 b044
     ldr r0, DAT_080dc318                     @ 080dc238 3748
-    bl FUN_080f4e18                          @ 080dc23a 18f0edfd
+    bl game_str_id_to_row                    @ 080dc23a 18f0edfd
     lsls r0,r0,#0x10    @ 080dc23e 0004
     lsrs r0,r0,#0x10    @ 080dc240 000c
     lsls r1,r0,#0x1    @ 080dc242 4100
@@ -273858,7 +273930,7 @@ FUN_080dc60c:
     ldr r0, DAT_080dc64c                     @ 080dc612 0e48
     adds r4,r4,r0    @ 080dc614 2418
     ldr r0, DAT_080dc650                     @ 080dc616 0e48
-    bl FUN_080f4e18                          @ 080dc618 18f0fefb
+    bl game_str_id_to_row                    @ 080dc618 18f0fefb
     ldr r2, PTR_game_str_pointer_table_080dc654 @ 080dc61c 0d4a
     lsls r0,r0,#0x10    @ 080dc61e 0004
     lsrs r0,r0,#0x10    @ 080dc620 000c
@@ -273901,7 +273973,7 @@ FUN_080dc664:
     ldr r0, DAT_080dc6a4                     @ 080dc66a 0e48
     adds r4,r4,r0    @ 080dc66c 2418
     ldr r0, DAT_080dc6a8                     @ 080dc66e 0e48
-    bl FUN_080f4e18                          @ 080dc670 18f0d2fb
+    bl game_str_id_to_row                    @ 080dc670 18f0d2fb
     ldr r2, PTR_game_str_pointer_table_080dc6ac @ 080dc674 0d4a
     lsls r0,r0,#0x10    @ 080dc676 0004
     lsrs r0,r0,#0x10    @ 080dc678 000c
@@ -273954,7 +274026,7 @@ FUN_080dc6bc:
     cmp r0,#0x0                              @ 080dc6d8 0028
     bne LAB_080dc70c                         @ 080dc6da 17d1
     ldr r0, DAT_080dc6fc                     @ 080dc6dc 0748
-    bl FUN_080f4e18                          @ 080dc6de 18f09bfb
+    bl game_str_id_to_row                    @ 080dc6de 18f09bfb
     ldr r2, PTR_game_str_pointer_table_080dc700 @ 080dc6e2 074a
     lsls r0,r0,#0x10    @ 080dc6e4 0004
     lsrs r0,r0,#0x10    @ 080dc6e6 000c
@@ -273985,7 +274057,7 @@ LAB_080dc70c:
     cmp r1,r0                                @ 080dc716 8142
     bcs LAB_080dc75c                         @ 080dc718 20d2
     ldr r0, DAT_080dc74c                     @ 080dc71a 0c48
-    bl FUN_080f4e18                          @ 080dc71c 18f07cfb
+    bl game_str_id_to_row                    @ 080dc71c 18f07cfb
     ldr r2, PTR_game_str_pointer_table_080dc750 @ 080dc720 0b4a
     lsls r0,r0,#0x10    @ 080dc722 0004
     lsrs r0,r0,#0x10    @ 080dc724 000c
@@ -274019,7 +274091,7 @@ PTR_game_str_ja_080dc758:
     .word  game_str_ja                    @ 080dc758 109cdb09
 LAB_080dc75c:
     ldr r0, DAT_080dc808                     @ 080dc75c 2a48
-    bl FUN_080f4e18                          @ 080dc75e 18f05bfb
+    bl game_str_id_to_row                    @ 080dc75e 18f05bfb
     ldr r2, PTR_game_str_pointer_table_080dc80c @ 080dc762 2a4a
     lsls r0,r0,#0x10    @ 080dc764 0004
     lsrs r0,r0,#0x10    @ 080dc766 000c
@@ -274045,7 +274117,7 @@ LAB_080dc786:
     cmp r7,#0x1                              @ 080dc78e 012f
     bne LAB_080dc7f8                         @ 080dc790 32d1
     ldr r0, DAT_080dc81c                     @ 080dc792 2248
-    bl FUN_080f4e18                          @ 080dc794 18f040fb
+    bl game_str_id_to_row                    @ 080dc794 18f040fb
     ldr r1, PTR_game_str_pointer_table_080dc80c @ 080dc798 1c49
     .hword 0x4688    @ 080dc79a 8846
     lsls r0,r0,#0x10    @ 080dc79c 0004
@@ -274072,7 +274144,7 @@ LAB_080dc786:
     adds r1,r2,#0x0    @ 080dc7c6 111c
     bl FUN_080dc558                          @ 080dc7c8 fff7c6fe
     ldr r0, DAT_080dc828                     @ 080dc7cc 1648
-    bl FUN_080f4e18                          @ 080dc7ce 18f023fb
+    bl game_str_id_to_row                    @ 080dc7ce 18f023fb
     lsls r0,r0,#0x10    @ 080dc7d2 0004
     lsrs r0,r0,#0x10    @ 080dc7d4 000c
     lsls r1,r0,#0x1    @ 080dc7d6 4100
@@ -274124,7 +274196,7 @@ FUN_080dc82c:
     lsls r0,r0,#0x4    @ 080dc830 0001
     adds r0,r0,r1    @ 080dc832 4018
     ldrh r0,[r0,#0x8]                        @ 080dc834 0089
-    bl FUN_080f4e18                          @ 080dc836 18f0effa
+    bl game_str_id_to_row                    @ 080dc836 18f0effa
     ldr r2, PTR_game_str_pointer_table_080dc870 @ 080dc83a 0d4a
     lsls r0,r0,#0x10    @ 080dc83c 0004
     lsrs r0,r0,#0x10    @ 080dc83e 000c
@@ -274209,7 +274281,7 @@ FUN_080dc8d0:
     ldr r0, DAT_080dc910                     @ 080dc8d6 0e48
     adds r4,r4,r0    @ 080dc8d8 2418
     ldr r0, DAT_080dc914                     @ 080dc8da 0e48
-    bl FUN_080f4e18                          @ 080dc8dc 18f09cfa
+    bl game_str_id_to_row                    @ 080dc8dc 18f09cfa
     ldr r2, PTR_game_str_pointer_table_080dc918 @ 080dc8e0 0d4a
     lsls r0,r0,#0x10    @ 080dc8e2 0004
     lsrs r0,r0,#0x10    @ 080dc8e4 000c
@@ -274252,7 +274324,7 @@ FUN_080dc928:
     ldr r0, DAT_080dc968                     @ 080dc92e 0e48
     adds r4,r4,r0    @ 080dc930 2418
     ldr r0, DAT_080dc96c                     @ 080dc932 0e48
-    bl FUN_080f4e18                          @ 080dc934 18f070fa
+    bl game_str_id_to_row                    @ 080dc934 18f070fa
     ldr r2, PTR_game_str_pointer_table_080dc970 @ 080dc938 0d4a
     lsls r0,r0,#0x10    @ 080dc93a 0004
     lsrs r0,r0,#0x10    @ 080dc93c 000c
@@ -274295,7 +274367,7 @@ FUN_080dc980:
     ldr r0, DAT_080dc9c0                     @ 080dc986 0e48
     adds r4,r4,r0    @ 080dc988 2418
     ldr r0, DAT_080dc9c4                     @ 080dc98a 0e48
-    bl FUN_080f4e18                          @ 080dc98c 18f044fa
+    bl game_str_id_to_row                    @ 080dc98c 18f044fa
     ldr r2, PTR_game_str_pointer_table_080dc9c8 @ 080dc990 0d4a
     lsls r0,r0,#0x10    @ 080dc992 0004
     lsrs r0,r0,#0x10    @ 080dc994 000c
@@ -274338,7 +274410,7 @@ FUN_080dc9d8:
     ldr r0, DAT_080dca18                     @ 080dc9de 0e48
     adds r4,r4,r0    @ 080dc9e0 2418
     ldr r0, DAT_080dca1c                     @ 080dc9e2 0e48
-    bl FUN_080f4e18                          @ 080dc9e4 18f018fa
+    bl game_str_id_to_row                    @ 080dc9e4 18f018fa
     ldr r2, PTR_game_str_pointer_table_080dca20 @ 080dc9e8 0d4a
     lsls r0,r0,#0x10    @ 080dc9ea 0004
     lsrs r0,r0,#0x10    @ 080dc9ec 000c
@@ -274381,7 +274453,7 @@ FUN_080dca30:
     ldr r0, DAT_080dca70                     @ 080dca36 0e48
     adds r4,r4,r0    @ 080dca38 2418
     ldr r0, DAT_080dca74                     @ 080dca3a 0e48
-    bl FUN_080f4e18                          @ 080dca3c 18f0ecf9
+    bl game_str_id_to_row                    @ 080dca3c 18f0ecf9
     ldr r2, PTR_game_str_pointer_table_080dca78 @ 080dca40 0d4a
     lsls r0,r0,#0x10    @ 080dca42 0004
     lsrs r0,r0,#0x10    @ 080dca44 000c
@@ -274424,7 +274496,7 @@ FUN_080dca88:
     ldr r0, DAT_080dcac8                     @ 080dca8e 0e48
     adds r4,r4,r0    @ 080dca90 2418
     ldr r0, DAT_080dcacc                     @ 080dca92 0e48
-    bl FUN_080f4e18                          @ 080dca94 18f0c0f9
+    bl game_str_id_to_row                    @ 080dca94 18f0c0f9
     ldr r2, PTR_game_str_pointer_table_080dcad0 @ 080dca98 0d4a
     lsls r0,r0,#0x10    @ 080dca9a 0004
     lsrs r0,r0,#0x10    @ 080dca9c 000c
@@ -277572,7 +277644,7 @@ LAB_080de2d8:
     adds r3,r4,#0x0    @ 080de338 231c
     bl FUN_080f2c8c                          @ 080de33a 14f0a7fc
     ldr r0, DAT_080de3d8                     @ 080de33e 2648
-    bl FUN_080f4e18                          @ 080de340 16f06afd
+    bl game_str_id_to_row                    @ 080de340 16f06afd
     ldr r2, PTR_game_str_pointer_table_080de3dc @ 080de344 254a
     lsls r0,r0,#0x10    @ 080de346 0004
     lsrs r0,r0,#0x10    @ 080de348 000c
@@ -277694,7 +277766,7 @@ FUN_080de3e8:
     movs r1,#0x2    @ 080de432 0221
     bl FUN_080f0bb4                          @ 080de434 12f0befb
     ldr r0, DAT_080de72c                     @ 080de438 bc48
-    bl FUN_080f4e18                          @ 080de43a 16f0edfc
+    bl game_str_id_to_row                    @ 080de43a 16f0edfc
     ldr r2, PTR_game_str_pointer_table_080de730 @ 080de43e bc4a
     lsls r0,r0,#0x10    @ 080de440 0004
     lsrs r0,r0,#0x10    @ 080de442 000c
@@ -277853,7 +277925,7 @@ LAB_080de53e:
     ldr r0,[r1,#0x0]                         @ 080de586 0868
     str r0,[r2,#0x4]                         @ 080de588 5060
     ldr r0, DAT_080de74c                     @ 080de58a 7048
-    bl FUN_080f4e18                          @ 080de58c 16f044fc
+    bl game_str_id_to_row                    @ 080de58c 16f044fc
     ldr r2, PTR_game_str_pointer_table_080de730 @ 080de590 674a
     lsls r0,r0,#0x10    @ 080de592 0004
     lsrs r0,r0,#0x10    @ 080de594 000c
@@ -277939,7 +278011,7 @@ LAB_080de62a:
     cmp r6,#0x0                              @ 080de63e 002e
     bge LAB_080de628                         @ 080de640 f2da
     ldr r0, DAT_080de754                     @ 080de642 4448
-    bl FUN_080f4e18                          @ 080de644 16f0e8fb
+    bl game_str_id_to_row                    @ 080de644 16f0e8fb
     ldr r2, PTR_game_str_pointer_table_080de730 @ 080de648 394a
     lsls r0,r0,#0x10    @ 080de64a 0004
     lsrs r0,r0,#0x10    @ 080de64c 000c
@@ -278567,7 +278639,7 @@ FUN_080df3f0:
     ldr r0,[r0,#0x0]                         @ 080df45c 0068
     str r0,[r4,#0x4]                         @ 080df45e 6060
     ldr r0, DAT_080df518                     @ 080df460 2d48
-    bl FUN_080f4e18                          @ 080df462 15f0d9fc
+    bl game_str_id_to_row                    @ 080df462 15f0d9fc
     ldr r2, PTR_game_str_pointer_table_080df51c @ 080df466 2d4a
     .hword 0x4692    @ 080df468 9246
     lsls r0,r0,#0x10    @ 080df46a 0004
@@ -278685,7 +278757,7 @@ DAT_080df548:
 LAB_080df54c:
     ldr r0, DAT_080df5c0                     @ 080df54c 1c48
 LAB_080df54e:
-    bl FUN_080f4e18                          @ 080df54e 15f063fc
+    bl game_str_id_to_row                    @ 080df54e 15f063fc
     lsls r0,r0,#0x10    @ 080df552 0004
     lsrs r0,r0,#0x10    @ 080df554 000c
     lsls r1,r0,#0x1    @ 080df556 4100
@@ -280639,7 +280711,7 @@ FUN_080e049c:
     push {r4,lr}                             @ 080e049c 10b5
     ldr r4, DAT_080e04f4                     @ 080e049e 154c
     ldr r0, DAT_080e04f8                     @ 080e04a0 1548
-    bl FUN_080f4e18                          @ 080e04a2 14f0b9fc
+    bl game_str_id_to_row                    @ 080e04a2 14f0b9fc
     ldr r2, PTR_game_str_pointer_table_080e04fc @ 080e04a6 154a
     lsls r0,r0,#0x10    @ 080e04a8 0004
     lsrs r0,r0,#0x10    @ 080e04aa 000c
@@ -280998,7 +281070,7 @@ FUN_080e0758:
     adds r7,r0,#0x0    @ 080e0762 071c
     adds r7,#0xc    @ 080e0764 0c37
     ldr r0, DAT_080e07c4                     @ 080e0766 1748
-    bl FUN_080f4e18                          @ 080e0768 14f056fb
+    bl game_str_id_to_row                    @ 080e0768 14f056fb
     ldr r6, PTR_game_str_pointer_table_080e07c8 @ 080e076c 164e
     lsls r0,r0,#0x10    @ 080e076e 0004
     lsrs r0,r0,#0x10    @ 080e0770 000c
@@ -281024,7 +281096,7 @@ FUN_080e0758:
     cmp r0,#0x0                              @ 080e0798 0028
     beq LAB_080e07dc                         @ 080e079a 1fd0
     ldr r0, DAT_080e07d8                     @ 080e079c 0e48
-    bl FUN_080f4e18                          @ 080e079e 14f03bfb
+    bl game_str_id_to_row                    @ 080e079e 14f03bfb
     lsls r0,r0,#0x10    @ 080e07a2 0004
     lsrs r0,r0,#0x10    @ 080e07a4 000c
     lsls r1,r0,#0x1    @ 080e07a6 4100
@@ -281060,7 +281132,7 @@ LAB_080e07dc:
     cmp r0,#0x0                              @ 080e07e0 0028
     beq LAB_080e0816                         @ 080e07e2 18d0
     ldr r0, DAT_080e0848                     @ 080e07e4 1848
-    bl FUN_080f4e18                          @ 080e07e6 14f017fb
+    bl game_str_id_to_row                    @ 080e07e6 14f017fb
     lsls r0,r0,#0x10    @ 080e07ea 0004
     lsrs r0,r0,#0x10    @ 080e07ec 000c
     lsls r1,r0,#0x1    @ 080e07ee 4100
@@ -281159,7 +281231,7 @@ FUN_080e08a4:
     adds r5,r6,#0x0    @ 080e08aa 351c
     adds r5,#0xc    @ 080e08ac 0c35
     ldr r0, DAT_080e091c                     @ 080e08ae 1b48
-    bl FUN_080f4e18                          @ 080e08b0 14f0b2fa
+    bl game_str_id_to_row                    @ 080e08b0 14f0b2fa
     ldr r2, PTR_game_str_pointer_table_080e0920 @ 080e08b4 1a4a
     lsls r0,r0,#0x10    @ 080e08b6 0004
     lsrs r0,r0,#0x10    @ 080e08b8 000c
@@ -281855,7 +281927,7 @@ LAB_080e0dd4:
     bl FUN_080de2bc                          @ 080e0e3e fdf73dfa
     ldr r5, DAT_080e0ef0                     @ 080e0e42 2b4d
     ldr r0, DAT_080e0ef4                     @ 080e0e44 2b48
-    bl FUN_080f4e18                          @ 080e0e46 13f0e7ff
+    bl game_str_id_to_row                    @ 080e0e46 13f0e7ff
     ldr r3, PTR_game_str_pointer_table_080e0ef8 @ 080e0e4a 2b4b
     lsls r0,r0,#0x10    @ 080e0e4c 0004
     lsrs r0,r0,#0x10    @ 080e0e4e 000c
@@ -288718,7 +288790,7 @@ FUN_080e5740:
     ldr r0, DAT_080e5830                     @ 080e57a2 2348
     .hword 0x4680    @ 080e57a4 8046
     .hword 0x4650    @ 080e57a6 5046
-    bl FUN_080f4e18                          @ 080e57a8 0ff036fb
+    bl game_str_id_to_row                    @ 080e57a8 0ff036fb
     ldr r1, PTR_game_str_pointer_table_080e5834 @ 080e57ac 2149
     .hword 0x4689    @ 080e57ae 8946
     lsls r0,r0,#0x10    @ 080e57b0 0004
@@ -288740,7 +288812,7 @@ FUN_080e5740:
     .hword 0x4642    @ 080e57d0 4246
     bl text_render_wrapper                   @ 080e57d2 0df053f9
     .hword 0x4650    @ 080e57d6 5046
-    bl FUN_080f4e18                          @ 080e57d8 0ff01efb
+    bl game_str_id_to_row                    @ 080e57d8 0ff01efb
     lsls r0,r0,#0x10    @ 080e57dc 0004
     lsrs r0,r0,#0x10    @ 080e57de 000c
     lsls r1,r0,#0x1    @ 080e57e0 4100
@@ -288897,7 +288969,7 @@ FUN_080e58a8:
     ldr r0, DAT_080e5998                     @ 080e590a 2348
     .hword 0x4680    @ 080e590c 8046
     .hword 0x4650    @ 080e590e 5046
-    bl FUN_080f4e18                          @ 080e5910 0ff082fa
+    bl game_str_id_to_row                    @ 080e5910 0ff082fa
     ldr r1, PTR_game_str_pointer_table_080e599c @ 080e5914 2149
     .hword 0x4689    @ 080e5916 8946
     lsls r0,r0,#0x10    @ 080e5918 0004
@@ -288919,7 +288991,7 @@ FUN_080e58a8:
     .hword 0x4642    @ 080e5938 4246
     bl text_render_wrapper                   @ 080e593a 0df09ff8
     .hword 0x4650    @ 080e593e 5046
-    bl FUN_080f4e18                          @ 080e5940 0ff06afa
+    bl game_str_id_to_row                    @ 080e5940 0ff06afa
     lsls r0,r0,#0x10    @ 080e5944 0004
     lsrs r0,r0,#0x10    @ 080e5946 000c
     lsls r1,r0,#0x1    @ 080e5948 4100
@@ -289147,7 +289219,7 @@ LAB_080e5ae2:
     lsls r0,r0,#0x2    @ 080e5b04 8000
     adds r0,r0,r1    @ 080e5b06 4018
     ldrh r0,[r0,#0x0]                        @ 080e5b08 0088
-    bl FUN_080f4e18                          @ 080e5b0a 0ff085f9
+    bl game_str_id_to_row                    @ 080e5b0a 0ff085f9
     ldr r2, PTR_game_str_pointer_table_080e5b7c @ 080e5b0e 1b4a
     lsls r0,r0,#0x10    @ 080e5b10 0004
     lsrs r0,r0,#0x10    @ 080e5b12 000c
@@ -289466,7 +289538,7 @@ LAB_080e5d54:
 LAB_080e5d68:
     movs r0,#0xc2    @ 080e5d68 c220
     lsls r0,r0,#0x4    @ 080e5d6a 0001
-    bl FUN_080f4e18                          @ 080e5d6c 0ff054f8
+    bl game_str_id_to_row                    @ 080e5d6c 0ff054f8
     ldr r2, PTR_game_str_pointer_table_080e5dac @ 080e5d70 0e4a
     lsls r0,r0,#0x10    @ 080e5d72 0004
     lsrs r0,r0,#0x10    @ 080e5d74 000c
@@ -289610,7 +289682,7 @@ LAB_080e5e94:
     ldrh r0,[r0,#0x8]                        @ 080e5e9e 0089
     ldr r1, DAT_080e5f28                     @ 080e5ea0 2149
     adds r0,r0,r1    @ 080e5ea2 4018
-    bl FUN_080f4e18                          @ 080e5ea4 0ef0b8ff
+    bl game_str_id_to_row                    @ 080e5ea4 0ef0b8ff
     ldr r3, PTR_game_str_pointer_table_080e5f2c @ 080e5ea8 204b
     lsls r0,r0,#0x10    @ 080e5eaa 0004
     lsrs r0,r0,#0x10    @ 080e5eac 000c
@@ -289910,7 +289982,7 @@ FUN_080e609c:
     movs r1,#0xfa    @ 080e60f2 fa21
     lsls r1,r1,#0x2    @ 080e60f4 8900
     adds r0,r0,r1    @ 080e60f6 4018
-    bl FUN_080f4e18                          @ 080e60f8 0ef08efe
+    bl game_str_id_to_row                    @ 080e60f8 0ef08efe
     ldr r2, PTR_game_str_pointer_table_080e616c @ 080e60fc 1b4a
     lsls r0,r0,#0x10    @ 080e60fe 0004
     lsrs r0,r0,#0x10    @ 080e6100 000c
@@ -301752,7 +301824,7 @@ LAB_080ebdfc:
     movs r2,#0xfa    @ 080ebdfc fa22
     lsls r2,r2,#0x4    @ 080ebdfe 1201
     adds r0,r6,r2    @ 080ebe00 b018
-    bl FUN_080f4e18                          @ 080ebe02 09f009f8
+    bl game_str_id_to_row                    @ 080ebe02 09f009f8
     lsls r0,r0,#0x10    @ 080ebe06 0004
     lsrs r0,r0,#0x10    @ 080ebe08 000c
     lsls r1,r0,#0x1    @ 080ebe0a 4100
@@ -304499,6 +304571,8 @@ LAB_080ee766:
     pop {r4}                                 @ 080ee766 10bc
     pop {r1}                                 @ 080ee768 02bc
     bx r1                                    @ 080ee76a 0847
+
+@ datacrystal: cards_ids_array 查表，icid 4007..7078 → card_id；越界返 0
 internal_card_id_to_card_id:
     lsls r0,r0,#0x10    @ 080ee76c 0004
     lsrs r2,r0,#0x10    @ 080ee76e 020c
@@ -304534,6 +304608,8 @@ LAB_080ee7a8:
     movs r0,#0x0    @ 080ee7a8 0020
 LAB_080ee7aa:
     bx lr                                    @ 080ee7aa 7047
+
+@ datacrystal: 按 game-region/language 选字符集，分支到对应 name 加载（含 JP 特例 0x1497..0x149A）；0x080ee968 是其内部 LAB
 select_charset_then_load_name:
     adds r2,r0,#0x0    @ 080ee7ac 021c
     adds r3,r1,#0x0    @ 080ee7ae 0b1c
@@ -305059,6 +305135,8 @@ DAT_080eeb4c:
     .word  0x0983885c                     @ 080eeb4c 5c888309
 DAT_080eeb50:
     .word  0x0983a924                     @ 080eeb50 24a98309
+
+@ 按 card_id 查卡片属性表 (0x098169B6 基址), 返回 ATK/DEF/type 等
 card_data_query:
     adds r2,r0,#0x0    @ 080eeb54 021c
     adds r3,r1,#0x0    @ 080eeb56 0b1c
@@ -305150,6 +305228,8 @@ PTR_card_desc_pointer_table_080eebf4:
     .word  card_desc_pointer_table        @ 080eebf4 08a58009
 PTR_card_descs_table_080eebf8:
     .word  card_descs_table               @ 080eebf8 0cff5f09
+
+@ datacrystal: 包装：icid → cid → 读 gSettings 取 lang_id → 调 select_charset_then_load_name
 card_name_lookup_by_internal_id:
     push {lr}                                @ 080eebfc 00b5
     lsls r0,r0,#0x10    @ 080eebfe 0004
@@ -305180,7 +305260,7 @@ FUN_080eec54:
     cmp r0,#0x0                              @ 080eec5c 0028
     bne LAB_080eeca0                         @ 080eec5e 1fd1
     adds r0,r1,#0x0    @ 080eec60 081c
-    bl FUN_080f4e18                          @ 080eec62 06f0d9f8
+    bl game_str_id_to_row                    @ 080eec62 06f0d9f8
     ldr r2, PTR_game_str_pointer_table_080eec90 @ 080eec66 0a4a
     lsls r0,r0,#0x10    @ 080eec68 0004
     lsrs r0,r0,#0x10    @ 080eec6a 000c
@@ -305223,7 +305303,7 @@ FUN_080eeca8:
     movs r1,#0xfa    @ 080eecae fa21
     lsls r1,r1,#0x1    @ 080eecb0 4900
     adds r0,r0,r1    @ 080eecb2 4018
-    bl FUN_080f4e18                          @ 080eecb4 06f0b0f8
+    bl game_str_id_to_row                    @ 080eecb4 06f0b0f8
     ldr r2, PTR_game_str_pointer_table_080eece0 @ 080eecb8 094a
     lsls r0,r0,#0x10    @ 080eecba 0004
     lsrs r0,r0,#0x10    @ 080eecbc 000c
@@ -305267,7 +305347,7 @@ FUN_080eed50:
     beq LAB_080eed98                         @ 080eed54 20d0
     ldr r1, DAT_080eed84                     @ 080eed56 0b49
     adds r0,r0,r1    @ 080eed58 4018
-    bl FUN_080f4e18                          @ 080eed5a 06f05df8
+    bl game_str_id_to_row                    @ 080eed5a 06f05df8
     ldr r2, PTR_game_str_pointer_table_080eed88 @ 080eed5e 0a4a
     lsls r0,r0,#0x10    @ 080eed60 0004
     lsrs r0,r0,#0x10    @ 080eed62 000c
@@ -307822,6 +307902,8 @@ LAB_080f0124:
     pop {r0}                                 @ 080f012e 01bc
     bx r0                                    @ 080f0130 0047
     ROM_INCBIN 0xf0132, 0x56
+
+@ code > 0xEFFF: 公式 (hi&0xF)<<7|(lo&0x7F); 否则二分查找 font_jp_sjis_lookup_table[1925]
 char_code_to_glyph_index:
     push {r4,r5,r6,lr}                       @ 080f0188 70b5
     lsls r0,r0,#0x10    @ 080f018a 0004
@@ -307890,6 +307972,8 @@ LAB_080f01f8:
     pop {r1}                                 @ 080f01fa 02bc
     bx r1                                    @ 080f01fc 0847
     .byte  0x00, 0x00
+
+@ p2: 窄字宽度 5px
 char_width_narrow_5:
     ldr r0, DAT_080f020c                     @ 080f0200 0248
     ldrb r0,[r0,#0x8]                        @ 080f0202 007a
@@ -307899,6 +307983,8 @@ char_width_narrow_5:
     bx lr                                    @ 080f020a 7047
 DAT_080f020c:
     .word  0x02006ed0                     @ 080f020c d06e0002
+
+@ p2: 宽字宽度 10 或 12px
 char_width_wide_10_or_12:
     ldr r1, DAT_080f021c                     @ 080f0210 0249
     movs r0,#0x2    @ 080f0212 0220
@@ -307909,6 +307995,8 @@ char_width_wide_10_or_12:
 DAT_080f021c:
     .word  0x02006ed0                     @ 080f021c d06e0002
     ROM_INCBIN 0xf0220, 0x54
+
+@ 字符串总像素宽计算: 按 byte bit 7 二选一 char_width_narrow_5/wide_10_or_12 累加; 用于布局/居中决策
 measure_string_pixel_width:
     push {r4,r5,lr}                          @ 080f0274 30b5
     adds r4,r0,#0x0    @ 080f0276 041c
@@ -307936,6 +308024,8 @@ LAB_080f0296:
     pop {r4,r5}                              @ 080f029e 30bc
     pop {r1}                                 @ 080f02a0 02bc
     bx r1                                    @ 080f02a2 0847
+
+@ p2: jump table @ 0x080f02d4, 返回字符宽度类别
 get_char_width_class:
     adds r2,r0,#0x0    @ 080f02a4 021c
     movs r3,#0x0    @ 080f02a6 0023
@@ -308880,6 +308970,8 @@ FUN_080f0eec:
     pop {r0}                                 @ 080f0f64 01bc
     bx r0                                    @ 080f0f66 0047
     .byte  0x70, 0x47, 0x00, 0x00, 0x70, 0x47, 0x00, 0x00
+
+@ p2: 每行 8 bit blit 到 line buffer
 blit_glyph_row_to_buffer:
     push {r4,r5,r6,r7,lr}                    @ 080f0f70 f0b5
     .hword 0x4657    @ 080f0f72 5746
@@ -310086,6 +310178,8 @@ DAT_080f187c:
     .word  0x88888888                     @ 080f187c 88888888
 DAT_080f1880:
     .word  0x77777777                     @ 080f1880 77777777
+
+@ 渲染日文双字节字符: char_to_idx → font_jp_charset_table 选 (base, stride) → 8bpp 预解码 strb 到 OBJ tile; narrow+wide 双层叠加 (描边)
 render_glyph_jp_dual_layer:
     push {r4,r5,r6,r7,lr}                    @ 080f1884 f0b5
     .hword 0x4657    @ 080f1886 5746
@@ -310236,6 +310330,8 @@ PTR_font_jp_charset_table_080f199c:
     .word  font_jp_charset_table          @ 080f199c 64f8e509
 PTR_font_jp_stride_table_080f19a0:
     .word  font_jp_stride_table           @ 080f19a0 74f8e509
+
+@ 渲染日文单字节字符 (高字节=0): 仅 narrow 层 (font_jp_main_*); 与 dual_layer 共享 char_to_idx 路径
 render_glyph_jp_single_layer:
     push {r4,r5,r6,r7,lr}                    @ 080f19a4 f0b5
     .hword 0x4657    @ 080f19a6 5746
@@ -310458,6 +310554,8 @@ LAB_080f1b22:
     pop {r0}                                 @ 080f1b5a 01bc
     bx r0                                    @ 080f1b5c 0047
     .byte  0x00, 0x00
+
+@ p2: 从 0x09CCCA90+ch*8 读 8 bytes, 循环 4 轮每轮 2 字节 blit
 load_glyph_row_pair:
     push {r4,r5,r6,r7,lr}                    @ 080f1b60 f0b5
     .hword 0x464f    @ 080f1b62 4f46
@@ -312074,6 +312172,8 @@ FUN_080f2a60:
     pop {r4,r5}                              @ 080f2a76 30bc
     pop {r1}                                 @ 080f2a78 02bc
     bx r1                                    @ 080f2a7a 0847
+
+@ p2: render_string_to_line_buffer 的薄包装
 text_render_wrapper:
     push {r4,lr}                             @ 080f2a7c 10b5
     sub sp,#0x8                              @ 080f2a7e 82b0
@@ -312096,6 +312196,8 @@ text_render_wrapper:
     .byte  0x00, 0x00
 DAT_080f2aa4:
     .word  0x02006ed0                     @ 080f2aa4 d06e0002
+
+@ p2: 逐字符遍历, 处理 \n/\r/\t/空格
 render_string_to_line_buffer:
     push {r4,r5,r6,r7,lr}                    @ 080f2aa8 f0b5
     .hword 0x4657    @ 080f2aaa 5746
@@ -312451,6 +312553,8 @@ LAB_080f2d38:
     pop {r0}                                 @ 080f2d62 01bc
     bx r0                                    @ 080f2d64 0047
     ROM_INCBIN 0xf2d66, 0xe6
+
+@ p2: line buffer -> 0x06010040+ sprite tile
 commit_line_buffer_to_sprite_vram:
     push {r4,r5,r6,r7,lr}                    @ 080f2e4c f0b5
     .hword 0x4657    @ 080f2e4e 5746
@@ -315380,7 +315484,7 @@ LAB_080f4496:
     movs r6,#0x0    @ 080f44be 0026
     strb r0,[r5,#0x17]                       @ 080f44c0 e875
     ldr r0, DAT_080f454c                     @ 080f44c2 2248
-    bl FUN_080f4e18                          @ 080f44c4 00f0a8fc
+    bl game_str_id_to_row                    @ 080f44c4 00f0a8fc
     ldr r2, PTR_game_str_pointer_table_080f4550 @ 080f44c8 214a
     lsls r0,r0,#0x10    @ 080f44ca 0004
     lsrs r0,r0,#0x10    @ 080f44cc 000c
@@ -316428,7 +316532,9 @@ LAB_080f4dfa:
 DAT_080f4e0c:
     .word  0x080fbad1                     @ 080f4e0c d1ba0f08
     .byte  0x70, 0x47, 0x00, 0x00, 0x70, 0x47, 0x00, 0x00
-FUN_080f4e18:
+
+@ game_str logical_id -> master_row 二分查找. arg=u16 logical_id (e.g. 0x1004); 查 game_str_id_remap_table @ 0x08000250 (1651 * u16 sorted, count @ 0x08000240); 返回 master_row [0..1650], 找不到返回 0. caller 用结果索引 game_str_pointer_table @ 0x08000F40 取 (lang offset, base) 拿到字符串地址.
+game_str_id_to_row:
     push {r4,r5,r6,lr}                       @ 080f4e18 70b5
     adds r5,r0,#0x0    @ 080f4e1a 051c
     movs r4,#0x0    @ 080f4e1c 0024
@@ -316451,9 +316557,9 @@ LAB_080f4e26:
     b LAB_080f4e6c                           @ 080f4e3c 16e0
     .byte  0x00, 0x00
 DAT_080f4e40:
-    .word  0x08000240                     @ 080f4e40 40020008
+    .word  game_str_id_remap_count        @ 080f4e40 40020008
 DAT_080f4e44:
-    .word  0x08000250                     @ 080f4e44 50020008
+    .word  game_str_id_remap_table        @ 080f4e44 50020008
 LAB_080f4e48:
     cmp r4,r3                                @ 080f4e48 9c42
     bne LAB_080f4e50                         @ 080f4e4a 01d1
@@ -321273,6 +321379,8 @@ DAT_080f74cc:
     .word  0x000001ff                     @ 080f74cc ff010000
 DAT_080f74d0:
     .word  0x00000401                     @ 080f74d0 01040000
+
+@ pack-banner/通用: 按行拷贝 tile 到 2D OBJ VRAM (dest stride 0x400)
 tile_2d_row_copy:
     push {r4,r5,r6,r7,lr}                    @ 080f74d4 f0b5
     adds r5,r0,#0x0    @ 080f74d6 051c
@@ -326810,7 +326918,7 @@ FUN_080fbb60:
     ldr r2, DAT_080fbc68                     @ 080fbb9e 324a
     adds r4,r4,r2    @ 080fbba0 a418
     adds r0,r4,#0x0    @ 080fbba2 201c
-    bl FUN_080f4e18                          @ 080fbba4 f9f738f9
+    bl game_str_id_to_row                    @ 080fbba4 f9f738f9
     ldr r2, PTR_game_str_pointer_table_080fbc6c @ 080fbba8 304a
     lsls r0,r0,#0x10    @ 080fbbaa 0004
     lsrs r0,r0,#0x10    @ 080fbbac 000c
@@ -328984,6 +329092,8 @@ FUN_080fde90:
     pop {r1}                                 @ 080fde96 02bc
     bx r1                                    @ 080fde98 0847
     ROM_INCBIN 0xfde9a, 0x5a
+
+@ card-mini-frame: 屏幕初始化序列；4 次 memcpy 加载静态 OBJ 调色板 (0x09E31554/74/14)；调 card_list_tile_renderer
 card_list_screen_init:
     push {r4,r5,r6,r7,lr}                    @ 080fdef4 f0b5
     .hword 0x4657    @ 080fdef6 5746
@@ -329191,7 +329301,7 @@ LAB_080fe05a:
     adds r0,r1,#0x0    @ 080fe092 081c
     ldr r2, DAT_080fe0c4                     @ 080fe094 0b4a
     adds r0,r0,r2    @ 080fe096 8018
-    bl FUN_080f4e18                          @ 080fe098 f6f7befe
+    bl game_str_id_to_row                    @ 080fe098 f6f7befe
     ldr r2, PTR_game_str_pointer_table_080fe0c8 @ 080fe09c 0a4a
     lsls r0,r0,#0x10    @ 080fe09e 0004
     lsrs r0,r0,#0x10    @ 080fe0a0 000c
@@ -334951,7 +335061,7 @@ LAB_08100d7e:
     cmp r5,#0x0                              @ 08100dc8 002d
     bne LAB_08100e1c                         @ 08100dca 27d1
     ldr r0, DAT_08100e10                     @ 08100dcc 1048
-    bl FUN_080f4e18                          @ 08100dce f4f723f8
+    bl game_str_id_to_row                    @ 08100dce f4f723f8
     ldr r2, PTR_game_str_pointer_table_08100e14 @ 08100dd2 104a
     lsls r0,r0,#0x10    @ 08100dd4 0004
     lsrs r0,r0,#0x10    @ 08100dd6 000c
@@ -335031,7 +335141,7 @@ LAB_08100e5e:
 LAB_08100e68:
     ldr r0, DAT_08100f1c                     @ 08100e68 2c48
 LAB_08100e6a:
-    bl FUN_080f4e18                          @ 08100e6a f3f7d5ff
+    bl game_str_id_to_row                    @ 08100e6a f3f7d5ff
     ldr r2, PTR_game_str_pointer_table_08100f20 @ 08100e6e 2c4a
     lsls r0,r0,#0x10    @ 08100e70 0004
     lsrs r0,r0,#0x10    @ 08100e72 000c
@@ -335178,7 +335288,7 @@ FUN_08100f38:
     movs r2,#0xd9    @ 08100f92 d922
     lsls r2,r2,#0x3    @ 08100f94 d200
     adds r0,r0,r2    @ 08100f96 8018
-    bl FUN_080f4e18                          @ 08100f98 f3f73eff
+    bl game_str_id_to_row                    @ 08100f98 f3f73eff
     ldr r2, PTR_game_str_pointer_table_08101054 @ 08100f9c 2d4a
     lsls r0,r0,#0x10    @ 08100f9e 0004
     lsrs r0,r0,#0x10    @ 08100fa0 000c
@@ -335436,6 +335546,8 @@ DAT_081011bc:
     .word  0x05000200                     @ 081011bc 00020005
 PTR_card_mini_frame_pal_main_081011c0:
     .word  card_mini_frame_pal_main       @ 081011c0 1416e309
+
+@ card-mini-frame: 卡列表小图 tile 渲染; 字面量池含 0x09326280(tile 基址) + 0x095B5C00(index 表)
 card_list_tile_renderer:
     push {r4,r5,r6,r7,lr}                    @ 081011c4 f0b5
     .hword 0x4657    @ 081011c6 5746
@@ -345339,7 +345451,7 @@ FUN_08105d94:
     movs r1,#0x2    @ 08105dee 0221
     bl FUN_080f0bb4                          @ 08105df0 eaf7e0fe
     ldr r0, DAT_08105f14                     @ 08105df4 4748
-    bl FUN_080f4e18                          @ 08105df6 eff70ff8
+    bl game_str_id_to_row                    @ 08105df6 eff70ff8
     lsls r0,r0,#0x10    @ 08105dfa 0004
     lsrs r0,r0,#0x10    @ 08105dfc 000c
     lsls r1,r0,#0x1    @ 08105dfe 4100
@@ -345415,7 +345527,7 @@ LAB_08105e78:
     ldrsh r0,[r4,r1]                         @ 08105e90 605e
     ldr r2, DAT_08105f30                     @ 08105e92 274a
     adds r0,r0,r2    @ 08105e94 8018
-    bl FUN_080f4e18                          @ 08105e96 eef7bfff
+    bl game_str_id_to_row                    @ 08105e96 eef7bfff
     lsls r0,r0,#0x10    @ 08105e9a 0004
     lsrs r0,r0,#0x10    @ 08105e9c 000c
     lsls r1,r0,#0x1    @ 08105e9e 4100
@@ -345588,7 +345700,7 @@ LAB_08105fee:
     movs r6,#0x5    @ 08105fee 0526
 switchD_08105f8c__default:
     adds r0,r5,#0x0    @ 08105ff0 281c
-    bl FUN_080f4e18                          @ 08105ff2 eef711ff
+    bl game_str_id_to_row                    @ 08105ff2 eef711ff
     ldr r1, PTR_game_str_pointer_table_081060c8 @ 08105ff6 3449
     .hword 0x4689    @ 08105ff8 8946
     lsls r0,r0,#0x10    @ 08105ffa 0004
@@ -345636,7 +345748,7 @@ switchD_08105f8c__default:
     movs r1,#0x2    @ 08106056 0221
     bl FUN_080f0bb4                          @ 08106058 eaf7acfd
     ldr r0, DAT_081060dc                     @ 0810605c 1f48
-    bl FUN_080f4e18                          @ 0810605e eef7dbfe
+    bl game_str_id_to_row                    @ 0810605e eef7dbfe
     lsls r0,r0,#0x10    @ 08106062 0004
     lsrs r0,r0,#0x10    @ 08106064 000c
     lsls r1,r0,#0x1    @ 08106066 4100
@@ -346096,7 +346208,7 @@ LAB_08106392:
     asrs r0,r0,#0x18    @ 081063e8 0016
     ldr r3, DAT_08106418                     @ 081063ea 0b4b
     adds r0,r0,r3    @ 081063ec c018
-    bl FUN_080f4e18                          @ 081063ee eef713fd
+    bl game_str_id_to_row                    @ 081063ee eef713fd
     ldr r2, PTR_game_str_pointer_table_0810641c @ 081063f2 0a4a
     lsls r0,r0,#0x10    @ 081063f4 0004
     lsrs r0,r0,#0x10    @ 081063f6 000c
@@ -346226,7 +346338,7 @@ LAB_081064be:
     ldr r0,[r0,#0x0]                         @ 081064ee 0068
     str r0,[r2,#0x4]                         @ 081064f0 5060
     ldr r0, DAT_0810657c                     @ 081064f2 2248
-    bl FUN_080f4e18                          @ 081064f4 eef790fc
+    bl game_str_id_to_row                    @ 081064f4 eef790fc
     ldr r2, PTR_game_str_pointer_table_08106580 @ 081064f8 214a
     lsls r0,r0,#0x10    @ 081064fa 0004
     lsrs r0,r0,#0x10    @ 081064fc 000c
@@ -348240,7 +348352,7 @@ LAB_081073f4:
     .hword 0x4644    @ 081073f4 4446
     movs r5,#0xe    @ 081073f6 0e25
     ldrsh r0,[r4,r5]                         @ 081073f8 605f
-    bl FUN_080f4e18                          @ 081073fa edf70dfd
+    bl game_str_id_to_row                    @ 081073fa edf70dfd
     ldr r2, PTR_game_str_pointer_table_08107478 @ 081073fe 1e4a
     lsls r0,r0,#0x10    @ 08107400 0004
     lsrs r0,r0,#0x10    @ 08107402 000c
@@ -348553,7 +348665,7 @@ LAB_0810763c:
 LAB_0810765e:
     movs r4,#0x0    @ 0810765e 0024
     ldrsh r0,[r5,r4]                         @ 08107660 285f
-    bl FUN_080f4e18                          @ 08107662 edf7d9fb
+    bl game_str_id_to_row                    @ 08107662 edf7d9fb
     lsls r0,r0,#0x10    @ 08107666 0004
     lsrs r0,r0,#0x10    @ 08107668 000c
     lsls r1,r0,#0x1    @ 0810766a 4100
@@ -348617,7 +348729,7 @@ LAB_081076d2:
 LAB_081076dc:
     movs r3,#0x0    @ 081076dc 0023
     ldrsh r0,[r7,r3]                         @ 081076de f85e
-    bl FUN_080f4e18                          @ 081076e0 edf79afb
+    bl game_str_id_to_row                    @ 081076e0 edf79afb
     lsls r0,r0,#0x10    @ 081076e4 0004
     lsrs r0,r0,#0x10    @ 081076e6 000c
     lsls r1,r0,#0x1    @ 081076e8 4100
@@ -353400,7 +353512,7 @@ LAB_08109b28:
     ldrsh r0,[r1,r3]                         @ 08109b6c c85e
     cmp r0,#0x0                              @ 08109b6e 0028
     blt LAB_08109bb8                         @ 08109b70 22db
-    bl FUN_080f4e18                          @ 08109b72 ebf751f9
+    bl game_str_id_to_row                    @ 08109b72 ebf751f9
     ldr r2, PTR_game_str_pointer_table_08109ba8 @ 08109b76 0c4a
     lsls r0,r0,#0x10    @ 08109b78 0004
     lsrs r0,r0,#0x10    @ 08109b7a 000c
@@ -353848,7 +353960,7 @@ LAB_08109e8a:
     blt LAB_08109eec                         @ 08109eac 1edb
     movs r2,#0x0    @ 08109eae 0022
     ldrsh r0,[r1,r2]                         @ 08109eb0 885e
-    bl FUN_080f4e18                          @ 08109eb2 eaf7b1ff
+    bl game_str_id_to_row                    @ 08109eb2 eaf7b1ff
     ldr r2, PTR_game_str_pointer_table_08109edc @ 08109eb6 094a
     lsls r0,r0,#0x10    @ 08109eb8 0004
     lsrs r0,r0,#0x10    @ 08109eba 000c
@@ -361319,13 +361431,19 @@ DAT_0810e3ec:
     .word  0x00007fff                     @ 0810e3ec ff7f0000
 DAT_0810e3f0:
     .word  0x03005648                     @ 0810e3f0 48560003
+
+@ BIOS SWI 0xC = CpuFastSet (32 B chunks)
 bios_cpu_fast_set:
 .thumb
     svc 0xc                                  @ 0810e3f4 0cdf
     bx lr                                    @ 0810e3f6 7047
+
+@ BIOS SWI 0xB = CpuSet (word/halfword)
 bios_cpu_set:
     svc 0xb                                  @ 0810e3f8 0bdf
     bx lr                                    @ 0810e3fa 7047
+
+@ BIOS SWI 0x6 = Div
 bios_div:
     svc 0x6                                  @ 0810e3fc 06df
     bx lr                                    @ 0810e3fe 7047
@@ -361343,9 +361461,13 @@ FUN_0810e408:
     bx lr                                    @ 0810e412 7047
 DAT_0810e414:
     .word  0xbaae187f                     @ 0810e414 7f18aeba
+
+@ BIOS SWI 0x12 = HuffUnComp
 bios_huff_uncomp:
     svc 0x12                                 @ 0810e418 12df
     bx lr                                    @ 0810e41a 7047
+
+@ BIOS SWI 0x11 = LZ77UnCompReadNormalWrite8bit
 bios_lz77_uncomp:
     svc 0x11                                 @ 0810e41c 11df
     bx lr                                    @ 0810e41e 7047

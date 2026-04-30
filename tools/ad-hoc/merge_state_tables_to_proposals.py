@@ -9,7 +9,7 @@ merge_state_tables_to_proposals.py  --  方法 5: 状态机表反推 → 命名�
 
 Module 推断策略 (优先级降序):
     P1. caller 在 CSV 中已直接 tag 为 SCENE module → 表归该 module
-    P2. caller 已扩散 tag (via_<scene>) → 候选 module (弱信号)
+    P2. caller 已扩散 tag (旧 via_<scene>; multi-tag 重构后已折叠到 P1, 此分支不再触发)
     P3. entry 中已 tag 为 SCENE module 的多数派 → 表归该 module
     P4. caller 名字前缀派生 (如 'pack_list_page_init') → module
     P5. 都无 → 跳过 (输出 unresolved 列表供人工决定)

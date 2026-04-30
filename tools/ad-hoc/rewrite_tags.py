@@ -87,8 +87,12 @@ def rewrite_tags(old_tags):
             continue
         # === 单 token 格式 (新或半新) ===
         if tok.startswith("via_"):
+            # multi-tag 体系下 via_<X> 重命名为 <X> (X∈ALL_MODULES); 否则丢弃
+            mod = tok[4:]
+            if mod in ALL_MODULES:
+                new_tokens.append(mod)
             had_via = True
-            continue  # propagate 重生
+            continue
         # 旧 io_<family> 单 token: 翻译为新名字
         if tok in IO_FAMILY_RENAME:
             new_tokens.append(IO_FAMILY_RENAME[tok])

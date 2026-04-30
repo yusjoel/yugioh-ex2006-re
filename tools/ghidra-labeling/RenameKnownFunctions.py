@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #@runtime Jython
 #@category Ygo-ex2006
+# NOTE (2026-04-30): 中文注释必须显式 decode("utf-8") 成 unicode 后再传给 Ghidra Java API,
+# 否则 Java String 把 utf-8 字节当 Latin-1 收, 存进 .rep 是 mojibake.
+# 旧条目 plate comment 已经 mojibake; 单独靠 FixCommentEncoding.py 修.
 # RenameKnownFunctions.py  (Jython 2.7 / Ghidra script)
 #
 # TG.4  把已知 FUN_xxx 批量 rename.
@@ -156,6 +159,13 @@ RENAMES = [
         "渲染日文单字节字符 (高字节=0): 仅 narrow 层 (font_jp_main_*); 与 dual_layer 共享 char_to_idx 路径"),
     ("FUN_080f0274", "measure_string_pixel_width",
         "字符串总像素宽计算: 按 byte bit 7 二选一 char_width_narrow_5/wide_10_or_12 累加; 用于布局/居中决策"),
+
+    # --- game_str logical_id 映射 (2026-04-30) ---
+    ("FUN_080f4e18", "game_str_id_to_row",
+        "game_str logical_id -> master_row 二分查找. arg=u16 logical_id (e.g. 0x1004); "
+        "查 game_str_id_remap_table @ 0x08000250 (1651 * u16 sorted, count @ 0x08000240); "
+        "返回 master_row [0..1650], 找不到返回 0. caller 用结果索引 game_str_pointer_table "
+        "@ 0x08000F40 取 (lang offset, base) 拿到字符串地址."),
 ]
 
 
@@ -182,6 +192,11 @@ def do_rename(old, new, comment):
 
     # plate comment (函数上方)
     try:
+        # 显式 utf-8 decode -> Java String. 若已是 unicode 直接用.
+        if isinstance(comment, str):
+            comment_u = comment.decode("utf-8")
+        else:
+            comment_u = comment
         func = getFunctionAt(target.getAddress())
         if func is not None:
             listing = currentProgram.getListing()
@@ -189,7 +204,7 @@ def do_rename(old, new, comment):
             if cu is not None:
                 existing = cu.getComment(CodeUnit.PLATE_COMMENT)
                 if not existing:
-                    cu.setComment(CodeUnit.PLATE_COMMENT, comment)
+                    cu.setComment(CodeUnit.PLATE_COMMENT, comment_u)
     except Exception as e:
         print("[warn] plate comment %s: %s" % (new, e))
 

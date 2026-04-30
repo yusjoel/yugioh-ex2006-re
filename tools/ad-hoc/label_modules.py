@@ -250,8 +250,9 @@ def derive_module_from_path(path):
 
 
 # Tag 形式约定 (单 token, 无 key:value, 无括号):
-#   模块直接命中  -> '<module>'              e.g. 'font_jp', 'card_stats'
-#   模块扩散      -> 'via_<module>'          e.g. 'via_game_str'
+#   模块 (multi-tag) -> '<module>'           e.g. 'font_jp', 'card_stats'
+#                       不区分直接命中 vs 扩散; 一个函数可同时持有多个 module tag.
+#                       (旧的 'via_<module>' 形式已废弃, 由 propagate_label_tags.py 迁移.)
 #   IO family    -> 语义化 family 名         e.g. 'palette', 'vram', 'bg', 'sprite'
 #   FID tramp    -> 'tramp_<func>'           e.g. 'tramp_calloc'
 #

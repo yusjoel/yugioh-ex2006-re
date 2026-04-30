@@ -100,35 +100,70 @@ python -c "print(open('roms/2343.gba','rb').read()==open('output/2343.gba','rb')
 
 ### Phase 3: 反向标注
 
-#### ⑩ Ghidra 函数重命名
+#### ⑩ 备份 Ghidra 工程（写入前必做）
+
+```bash
+TS=$(date +%Y%m%d-%H%M%S)
+cp -r "ghidra/Yu-Gi-Oh WCT 2006.rep" "ghidra/Yu-Gi-Oh WCT 2006.rep.bak-${TS}-pre-<task>"
+```
+
+任何 Ghidra script 写入前必备份。Ghidra 工程是 source of truth，写坏只能从 .rep 备份恢复。
+
+#### ⑪ Ghidra 函数重命名
 
 **脚本**：`tools/ghidra-labeling/RenameKnownFunctions.py`
 
 **流程**：
-1. 追加本次定位的新函数名到脚本
+1. 追加本次定位的新函数名到脚本（`(orig, new, plate_comment)` 三元组）
 2. headless 执行：`tools\asm-regen\ghidra-run-script.bat RenameKnownFunctions.py`
 3. Ghidra 自动 `Save succeeded`
 
 Ghidra 会把 `FUN_xxxxxxxx` 替换为语义名，并在 plate comment 里写一行简短说明。完整登记表与脚本用法见 `doc/dev/ghidra-function-names.md`。
 
-#### ⑪ Ghidra 数据 label
+⚠️ **mojibake 坑（2026-04-30 修过历史 110 条）**：中文注释字符串必须 `.decode("utf-8")` 转成 unicode 再传给 Java API（如 `cu.setComment`），否则 Java 把 utf-8 字节当 Latin-1 收成 String，存进 .rep 全是乱码。`RenameKnownFunctions.do_rename` 已修。如发现历史 mojibake，跑 `tools/ghidra-labeling/FixCommentEncoding.py` 一次性修（latin-1↔utf-8 round-trip 检测，幂等）。
 
-**脚本**：`tools/ghidra-labeling/LabelPackBanners.py` / `LabelPackCardLists.py` 等，每类数据一个脚本
+#### ⑫ Ghidra 数据 label
+
+**脚本**：`tools/ghidra-labeling/LabelDataCrystalRomMap.py`（共享中央表）/ `LabelPackBanners.py` / `LabelPackCardLists.py` 等，每类数据一个脚本。
 
 **特点**：从 ROM 指针表动态读取各地址，不硬编码——即使数据位置调整脚本也能自动跟随。
 
-#### ⑫ 重导出 asm/all.s
+加新 label **三连击**（缺一漏一就 build fail "undefined reference"）：
 
-```bat
-tools\asm-regen\ghidra-export-range.bat 080000c0 084c7637 asm\all.s.raw 0
-grep -v -E "^\.(thumb|arm)\s*$" asm/all.s.raw > asm/all.s.raw.nomode
-python tools/asm-regen/inject_modes.py asm/all.s.raw.nomode asm/all.s
-build.bat
+```bash
+# 1. 加 USER_DEFINED label
+tools/asm-regen/ghidra-run-script.bat LabelDataCrystalRomMap.py
+# 2. 给字面量池 .word <addr> 加 DATA reference, 让 .word 自动符号化为 .word <label_name>
+tools/asm-regen/ghidra-run-script.bat AddLiteralPoolReferences.py
+# 3. 把 INCBIN 内部 label (如 game_str_id_remap_table @ 0x250) 写成 .equ 给 GAS 链接器
+tools/asm-regen/ghidra-run-script.bat ExportRomLabelsToInc.py
 ```
 
-导出后 `bl FUN_080db860` 会变为 `bl pack_banner_tile_copy`，代码可读性大幅提升。再次验证 byte-identical。
+`ExportRomLabelsToInc.py` 范围 = `[0x080000C0, 0x09FFFFFF]`，但已在 asm/*.s 中以 `name:` 形式 disasm 出的会自动跳过（`scan_existing_asm_labels`），不重复 .equ。
 
-详细流水线见本文 §二。
+#### ⑬ 重导出 asm/all.s + 校验
+
+```bash
+tools/asm-regen/ghidra-export-range.bat 080000c0 084c7637 asm/all.s 0
+python tools/asm-regen/inject_modes.py    # 无参 = 原地改 asm/all.s
+NOPAUSE=1 ./build.bat                       # bash harness 下必须 NOPAUSE=1
+sha1sum roms/2343.gba output/2343.gba       # 必须一致
+```
+
+导出后 `bl FUN_080db860` 变 `bl pack_banner_tile_copy`，`.word 0x08000240` 变 `.word game_str_id_remap_count`。再次 byte-identical 验证。
+
+详细底层流水线（ExportRangeToGas 输出格式 / inject_modes 规则 / 已知问题）见本文 §二。
+
+#### ⑭ 注释备份导出（可选，每次深入分析后做）
+
+```bash
+tools/asm-regen/ghidra-run-script.bat ExportComments.py
+```
+
+导出全部 plate / pre / post / eol / repeatable / func_repeatable 注释到 `temp/ghidra-comments.csv`。用途：
+- 把 Ghidra 内人工注释从 .rep 二进制工程导成纯文本，纳入 git 跟踪
+- 不在 Ghidra 内的 reviewer 也能看到分析成果
+- 作为分析备份，避免 .rep 损坏丢失
 
 ### Phase 4: 文档
 
@@ -290,7 +325,87 @@ cmp roms/2343.gba output/2343.gba && echo OK
 
 ---
 
-## 三、可复用 checklist
+## 三、深入分析单个函数：标准 Ghidra 写入流程
+
+**适用场景**：分析了一个之前不理解的函数（如 `FUN_080f4e18` → `game_str_id_to_row`），要把语义沉淀到 Ghidra（rename + plate comment + 关联数据 label），并保持 byte-identical。
+
+**用本流程的判定**：函数已读懂用途、入参、返回值、关键数据；不是猜测性命名。猜测性的留 CSV 提案，不写 Ghidra。
+
+### 完整步骤（实战记录: 2026-04-30 game_str_id_to_row 落地）
+
+```bash
+# === 0. 备份 ===
+TS=$(date +%Y%m%d-%H%M%S)
+cp -r "ghidra/Yu-Gi-Oh WCT 2006.rep" \
+      "ghidra/Yu-Gi-Oh WCT 2006.rep.bak-${TS}-pre-<funcname>"
+
+# === 1. 加 USER_DEFINED label 给关联数据 ===
+# 编辑 tools/ghidra-labeling/LabelDataCrystalRomMap.py 加条目:
+#   (0x08000240, "game_str_id_remap_count"),   # u16, count
+#   (0x08000250, "game_str_id_remap_table"),   # 1651 × u16 sorted
+tools/asm-regen/ghidra-run-script.bat LabelDataCrystalRomMap.py
+# 已 exists 的 label 会 [skip], 幂等
+
+# === 2. 函数 rename + plate comment ===
+# 编辑 tools/ghidra-labeling/RenameKnownFunctions.py 加条目:
+#   ("FUN_080f4e18", "game_str_id_to_row",
+#       "二分查找 game_str_id_remap_table @ 0x08000250 ... ")
+# ⚠ 中文必须 utf-8: do_rename 已自动 .decode("utf-8")
+tools/asm-regen/ghidra-run-script.bat RenameKnownFunctions.py
+
+# === 3. 字面量池符号化三连击 ===
+tools/asm-regen/ghidra-run-script.bat AddLiteralPoolReferences.py
+# .word 0x08000240 -> .word game_str_id_remap_count (加 DATA ref)
+tools/asm-regen/ghidra-run-script.bat ExportRomLabelsToInc.py
+# 把 INCBIN 内部 label 写成 .equ 给 GAS 链接器 (asm/*.s 已有 name: 的自动 skip)
+
+# === 4. 重导 asm + 校验 ===
+tools/asm-regen/ghidra-export-range.bat 080000c0 084c7637 asm/all.s 0
+python tools/asm-regen/inject_modes.py
+NOPAUSE=1 ./build.bat
+sha1sum roms/2343.gba output/2343.gba
+# 必须一致: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+# === 5. 注释备份导出 (可选但推荐) ===
+tools/asm-regen/ghidra-run-script.bat ExportComments.py
+# 输出 temp/ghidra-comments.csv
+# git add temp/ghidra-comments.csv  # 如要纳入 git
+```
+
+### 失败模式与排查
+
+| 现象 | 根因 | 修复 |
+|---|---|---|
+| `bl FUN_080f4e18` 在 asm/all.s 中**没**变成新名字 | rename 没生效 / 没 save | 看 RenameKnownFunctions 输出有 `[ok] FUN_xxx -> new_name`；重跑确认 `[miss] (already renamed)` |
+| `.word 0x08000240` 没符号化 | 缺 DATA reference | 跑 `AddLiteralPoolReferences.py`，查 dry 输出有该地址 |
+| build 报 `undefined reference to game_str_id_remap_table` | label 在 INCBIN 内部，没 .equ | 跑 `ExportRomLabelsToInc.py` 重生 `constants/rom_data.inc`，确认含 `.equ <name>, 0xNNNNNNNN` |
+| build 报 `use of r13 is deprecated` | inject_modes 没跑 | 在 `./build.bat` 前加 `python tools/asm-regen/inject_modes.py` |
+| sha1 不一致 | 改动外溢 / disasm 边界变化 / inject_modes 补丁失效 | 回滚 .rep 备份，二分定位哪步引入差异 |
+| 中文 plate comment 显示 mojibake (`äºåæ¥æ¾`) | 老脚本写入时没 .decode("utf-8") | 跑 `tools/ghidra-labeling/FixCommentEncoding.py` 全工程批量修 |
+
+### 工具职责矩阵
+
+| 工具 | 作用域 | 写入 .rep | 改 asm/all.s | 改其它入库文件 |
+|---|---|:---:|:---:|---|
+| `LabelDataCrystalRomMap.py` | 加 USER_DEFINED label | ✓ | 间接 (下次 export) | — |
+| `RenameKnownFunctions.py` | 函数 rename + plate comment | ✓ | 间接 | — |
+| `AddLiteralPoolReferences.py` | 给 4-byte data 加 DATA ref | ✓ | 间接 (符号化生效) | — |
+| `ExportRomLabelsToInc.py` | 扫 USER_DEFINED label → .equ | — | — | `constants/rom_data.inc` |
+| `ExportRangeToGas.py`（包装在 `ghidra-export-range.bat`）| 反汇编 → asm/all.s | — | ✓ 全文重写 | — |
+| `inject_modes.py` | mode 切换 + s 后缀 + 硬补丁 | — | ✓ 原地改 | — |
+| `ExportComments.py` | 导出所有注释 | — | — | `temp/ghidra-comments.csv` |
+| `FixCommentEncoding.py` | 修历史 mojibake 注释 | ✓ | 间接 | — |
+| `build.bat` | as → ld → objcopy | — | — | `output/2343.gba` |
+
+### 何时 *不* 用此流程
+
+- **猜测性命名**：函数大致用途清楚但不确定细节 → 写 `doc/dev/naming-proposals.csv`（5 列 schema），等证据更强再 apply 到 Ghidra
+- **跨多函数批量分析**：用 `tools/ghidra-labeling/ApplyNamingProposals.py`（只 apply score=5）
+- **数据 label 不属任何模块**：可以只标 label 不命名，留 `DAT_xxx` 自动名
+
+---
+
+## 四、可复用 checklist
 
 后续定位新资产时，按以下清单逐项打勾：
 
@@ -309,9 +424,13 @@ cmp roms/2343.gba output/2343.gba && echo OK
 - [ ] 构建 byte-identical
 
 **Phase 3 反向标注**：
-- [ ] Ghidra 函数重命名（追加 `RenameKnownFunctions.py`）
-- [ ] Ghidra 数据 label（新建 `Label<模块>.py`）
-- [ ] 重导出 asm/all.s + 再次构建验证
+- [ ] **备份 .rep**（写入前必做：`cp -r ghidra/*.rep ghidra/*.rep.bak-<ts>-pre-<task>`）
+- [ ] Ghidra 函数重命名（追加 `RenameKnownFunctions.py`，中文注释 `.decode("utf-8")`）
+- [ ] Ghidra 数据 label（`LabelDataCrystalRomMap.py` 或新建 `Label<模块>.py`）
+- [ ] 加新 label 后三连击：`AddLiteralPoolReferences.py` + `ExportRomLabelsToInc.py`
+- [ ] 重导出 `asm/all.s` + `inject_modes.py` + `NOPAUSE=1 ./build.bat`
+- [ ] sha1sum byte-identical 校验
+- [ ] （可选）`ExportComments.py` 导出注释纳入 git
 
 **Phase 4 文档**：
 - [ ] Spec 写入 `doc/dev/data-structure/<名>.md`
@@ -321,7 +440,7 @@ cmp roms/2343.gba output/2343.gba && echo OK
 
 ---
 
-## 四、产出清单模板
+## 五、产出清单模板
 
 单次资产定位 + 结构化的典型产出：
 
@@ -343,7 +462,7 @@ cmp roms/2343.gba output/2343.gba && echo OK
 
 ---
 
-## 五、相关文档
+## 六、相关文档
 
 | 文件 | 关系 |
 |------|------|

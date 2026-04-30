@@ -24,10 +24,11 @@
 # - 但它会尽量避免 GAS 语法报错（如 [0x...]、重复label、Thumb/ARM模式错位）。
 
 import re
-from java.io import FileWriter, BufferedWriter
+from java.io import FileWriter, BufferedWriter, OutputStreamWriter, FileOutputStream
 from jarray import zeros
 from ghidra.program.model.symbol import SymbolType, SourceType
 from ghidra.program.model.data import Structure
+from ghidra.program.model.listing import CodeUnit
 
 # --------------------------
 # 可按需修改的常量
@@ -211,6 +212,42 @@ def get_or_create_dat_label_for_addr_if_in_range(program, addr, start_addr, end_
     addr_to_label[akey] = cand
     label_to_addr[cand] = akey
     return cand
+
+def emit_codeunit_comment(bw, program, addr, ctype, prefix):
+    """
+    输出 addr 处指定类型注释 (ctype: PLATE/PRE/POST/EOL/REPEATABLE).
+    多行 split, 每行前缀 prefix. 无注释时不输出.
+    GAS @ 是行注释起始符, 故每行输出形如 '<prefix><line>'.
+    """
+    if addr is None:
+        return False
+    listing = program.getListing()
+    cu = listing.getCodeUnitAt(addr)
+    if cu is None:
+        return False
+    txt = cu.getComment(ctype)
+    if not txt:
+        return False
+    for line in txt.split("\n"):
+        bw.write("%s%s\n" % (prefix, line))
+    return True
+
+
+def emit_plate_comment(bw, program, addr):
+    """label 之前输出 plate comment (顶格 '@ ', 前后空行分隔)."""
+    if addr is None:
+        return
+    listing = program.getListing()
+    cu = listing.getCodeUnitAt(addr)
+    if cu is None:
+        return
+    txt = cu.getComment(CodeUnit.PLATE_COMMENT)
+    if not txt:
+        return
+    bw.write("\n")
+    for line in txt.split("\n"):
+        bw.write("@ %s\n" % line)
+
 
 def emit_label_if_any_or_forced(bw, program, addr, emitted_addr_set):
     """输出该地址的 label（现有label 或 ADR 合成的 DAT_），按地址去重"""
@@ -641,7 +678,8 @@ def emit_undef_run(bw, program, start_addr, run_len):
 
 def export_all_struct_types(program, out_file):
     dtm = program.getDataTypeManager()
-    bw = BufferedWriter(FileWriter(out_file))
+    bw = BufferedWriter(
+        OutputStreamWriter(FileOutputStream(out_file), "UTF-8"))
     try:
         bw.write("/* Struct definitions exported from Ghidra */\n")
         bw.write("/* Program: %s */\n" % program.getName())
@@ -721,7 +759,9 @@ def run():
         printerr("Invalid range.")
         return
 
-    bw = BufferedWriter(FileWriter(out_file))
+    # 用 UTF-8 显式编码, 否则 Java 平台默认 charset (Win=cp1252/gbk) 写中文注释丢字节.
+    bw = BufferedWriter(
+        OutputStreamWriter(FileOutputStream(out_file), "UTF-8"))
 
     emitted_addr_set = set()
     mode_state = {'thumb': None}
@@ -756,8 +796,10 @@ def run():
             if skipped:
                 continue
 
-            # label（现有或 DAT_）+ 可选 XREF
+            # PLATE comment (label 之前) + label（现有或 DAT_）+ PRE comment + 可选 XREF
+            emit_plate_comment(bw, program, cur)
             emit_label_if_any_or_forced(bw, program, cur, emitted_addr_set)
+            emit_codeunit_comment(bw, program, cur, CodeUnit.PRE_COMMENT, "    @ ")
             emit_xrefs_if_enabled(bw, program, cur, include_xrefs)
 
             # 指令优先
@@ -774,7 +816,25 @@ def run():
                 text = fix_adr_immediate_to_label(program, text, start_addr, end_addr)
 
                 hexbytes = bytes_hex_from_java_bytes(ins.getBytes())
-                bw.write("    %-40s %s\n" % (text, fmt_addr_bytes(ins.getAddress(), hexbytes)))
+                # EOL comment: 首行追加到现有 '@ <addr> <hex>' 注释末尾 (同一 @ 注释延续);
+                # 多余行作为 POST 风格独立行下方输出.
+                eol_first = ""
+                eol_extra = []
+                cu_at = listing.getCodeUnitAt(ins.getAddress())
+                if cu_at is not None:
+                    e = cu_at.getComment(CodeUnit.EOL_COMMENT)
+                    if e:
+                        e_lines = e.split("\n")
+                        eol_first = "  -- " + e_lines[0]
+                        eol_extra = e_lines[1:]
+                bw.write("    %-40s %s%s\n" % (
+                    text, fmt_addr_bytes(ins.getAddress(), hexbytes), eol_first))
+                for line in eol_extra:
+                    bw.write("    @ %s\n" % line)
+
+                # POST comment (指令之后)
+                emit_codeunit_comment(bw, program, ins.getAddress(),
+                                       CodeUnit.POST_COMMENT, "    @ ")
 
                 nxt = ins.getMaxAddress().next()
                 if nxt is None:
@@ -786,9 +846,12 @@ def run():
             d = listing.getDataAt(cur)
             if d is not None and d.isDefined():
                 dt = d.getDataType()
+                data_addr = cur
 
                 if isinstance(dt, Structure):
                     emit_structure_fields(bw, program, d, end_addr, emitted_addr_set, include_xrefs)
+                    emit_codeunit_comment(bw, program, data_addr,
+                                           CodeUnit.POST_COMMENT, "    @ ")
                     nxt = d.getMaxAddress().next()
                     if nxt is None:
                         break
@@ -800,6 +863,8 @@ def run():
                 consumed = emit_defined_data(bw, program, d, end_addr)
                 if consumed <= 0:
                     consumed = 1
+                emit_codeunit_comment(bw, program, data_addr,
+                                       CodeUnit.POST_COMMENT, "    @ ")
                 cur = cur.add(consumed)
                 continue
 

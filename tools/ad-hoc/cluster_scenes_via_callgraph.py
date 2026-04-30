@@ -55,19 +55,15 @@ def parse_tags(s):
 
 
 def has_any_utility_tag(tokens):
-    """tokens 中是否有 utility module tag (直接或扩散)."""
+    """tokens 中是否有 utility module tag (multi-tag 体系下不再区分直接/扩散)."""
     for t in tokens:
         if t in UTILITY_MODULES:
             return True
-        if t.startswith("via_"):
-            m = t[4:]
-            if m in UTILITY_MODULES:
-                return True
     return False
 
 
 def find_direct_scene_module(tokens):
-    """tokens 中是否有 scene module 直接 tag (单 token, 非 via_)."""
+    """tokens 中是否有 scene module tag."""
     for t in tokens:
         if t in SCENE_MODULES:
             return t

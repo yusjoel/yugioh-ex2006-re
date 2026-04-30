@@ -3,10 +3,11 @@
 @ Source: Ghidra symbol table (refs/gba-ghidra-loader + project scripts)
 @ Generator: tools/ghidra-labeling/ExportRomLabelsToInc.py
 @
-@ Range: [0x084C7638, 0x09FFFFFF] (past asm/all.s upper bound)
+@ Range: [0x080000C0, 0x09FFFFFF] (whole ROM; main-code labels in asm/*.s auto-skipped)
 @ Usage: .word <name> in asm; GAS substitutes via .equ
 @ =============================================================================
 
+.equ game_str_id_remap_table,      0x08000250
 .equ file_card_names_start,        0x095BB5AC
 .equ card_desc_table,              0x09800000
 .equ card_desc_ptr_table,          0x09816580

@@ -26,7 +26,9 @@ import os
 import re
 from ghidra.program.model.symbol import SymbolType, SourceType
 
-RANGE_LO = 0x084C7638
+RANGE_LO = 0x080000C0   # 包含 ROM main code 段; main code 内已 disasm 的 label
+                        # (如 game_str_pointer_table) 通过 scan_existing_asm_labels 跳过,
+                        # 此 .inc 仅补 INCBIN 内部 label (如 game_str_id_remap_table @ 0x250)
 RANGE_HI = 0x09FFFFFF
 
 AUTO_PREFIXES = ("DAT_", "LAB_", "FUN_", "PTR_", "SUB_", "UNK_", "SWITCH_")
@@ -132,7 +134,7 @@ def main():
         "@ Source: Ghidra symbol table (refs/gba-ghidra-loader + project scripts)",
         "@ Generator: tools/ghidra-labeling/ExportRomLabelsToInc.py",
         "@",
-        "@ Range: [0x%08X, 0x%08X] (past asm/all.s upper bound)" % (RANGE_LO, RANGE_HI),
+        "@ Range: [0x%08X, 0x%08X] (whole ROM; main-code labels in asm/*.s auto-skipped)" % (RANGE_LO, RANGE_HI),
         "@ Usage: .word <name> in asm; GAS substitutes via .equ",
         "@ =============================================================================",
         "",

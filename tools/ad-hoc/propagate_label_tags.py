@@ -1,48 +1,39 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-propagate_label_tags.py  --  方法 3 扩展: data_label tag 沿调用图向上扩散
+propagate_label_tags.py  --  module tag 沿调用图扩散 (multi-tag, 无 via_ 前缀)
 
-镜像 tools/ghidra-labeling/PropagateIOTagsViaCallGraph.py 的算法,
-但传播的是 method 3 的 data_label module.
+设计 (v2):
+  - **不区分**直接命中 vs 间接调用. 函数 F 调了 game_str 函数 -> F 也获得 'game_str' tag.
+  - **multi-tag**. 一个函数同时持有 'font_jp;game_str;card_stats' 是自然事情.
+  - **不参与评分**. score / proposed_name 不动. 标 tag 是无副作用操作.
+  - **无阈值**. 任意 callee 携带 module tag M -> caller 继承 M.
 
 输入:
-    temp/ghidra-funcs-callgraph.csv      ExportFunctionCallGraph.py 的输出
-    doc/dev/naming-proposals.csv         (5 列 schema, 简化 tag 格式)
+    temp/ghidra-funcs-callgraph.csv      ExportFunctionCallGraph.py 输出
+    doc/dev/naming-proposals.csv         (5 列 schema)
+
 输出:
-    doc/dev/naming-proposals.csv         (in-place 覆写)
+    doc/dev/naming-proposals.csv         (in-place 覆写, 仅改 tags 列)
 
-种子来源 (Round 0):
-    1. CSV 中已有 module tag 的函数 (如 tags 含 'font_jp', 'card_stats')
-       这些来自 method 3 直接命中 (merge_label_refs_to_proposals.py 写入)
-    2. 已 Ghidra 命名 + 名字前缀能映射 module 的函数
-       (如 fs_load → fs, pack_list_bg_setup → pack, card_info_page_init_bg0 → card_info)
-       靠 label_modules.derive_module_from_func_name
+迁移行为:
+    - 入口扫一遍 tags, 把 'via_<X>' (单 token) 改名为 '<X>' (X 必须在 ALL_MODULES)
+      去重保序. 旧扩散 tag 与现有直接 tag 合并成一个.
 
-算法:
-    Round N+1: 对每个未 tag 函数 F:
-                - 跳过条件: score=5 (FID) 或 proposed_name 已填
-                - 收集所有"callee 已 tag 且 c_depth < N+1"的 module 票
-                - 严格多数 (winner_count * 2 > total_votes) 才传播
-                - 给 F: tag 'via_<module>' (单 token)
-                - 若 F 是 auto-name (FUN_xxx):
-                    proposed_name = "<prefix>_<addr8>"
-                    score = 2  (弱启发, 不主动 apply)
-                - 若 F 已 Ghidra 命名:
-                    只追加 tag, 不动 proposed_name/score
+种子:
+    1. 迁移后 CSV 中已有 module tag (∈ ALL_MODULES) 的函数
+    2. funcname 前缀派生 module 的函数 (label_modules.derive_module_from_func_name)
+
+扩散:
+    Round N+1: 对每个函数 F (无 skip 条件):
+                F 的 module tag 集合 ∪= 各 callee 的 module tag 集合
     重复直到无新增或 MAX_DEPTH 轮.
 
-新格式 tag:
-    模块直接命中  -> 'font_jp', 'card_stats', 'game_str' (单 token)
-    模块扩散      -> 'via_font_jp', 'via_game_str'
-    IO family    -> 'io_bg', 'io_win'
-    IO 寄存器     -> 'reg_DISPCNT', 'reg_BG0CNT'
-    FID trampoline-> 'tramp_calloc'
+只传播 ALL_MODULES 中的 tag. IO family / tramp_* / 其它 tag 不参与本脚本扩散.
 """
 
 import csv
 import os
-import re
 import sys
 from collections import defaultdict
 
@@ -50,14 +41,14 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(REPO_ROOT, "tools", "ad-hoc"))
 
 from label_modules import (
-    ALL_MODULES, MODULE_TO_PREFIX,
-    derive_module_from_func_name, is_auto_name,
+    ALL_MODULES,
+    derive_module_from_func_name,
 )
 
 CALLGRAPH = os.path.join(REPO_ROOT, "temp", "ghidra-funcs-callgraph.csv")
 PROPOSALS = os.path.join(REPO_ROOT, "doc", "dev", "naming-proposals.csv")
 
-MAX_DEPTH = 10
+MAX_DEPTH = 32  # 安全上限; 集合只增不减, 通常几轮就收敛
 
 
 def parse_tags(tags_str):
@@ -66,40 +57,28 @@ def parse_tags(tags_str):
     return [t.strip() for t in tags_str.split(";") if t.strip()]
 
 
-def find_module_tag(tokens):
-    """
-    在 token 列表中找模块 tag:
-      返回 ('direct', module) 若有 'font_jp' 这种直接命中 token
-      返回 ('via', module)    若有 'via_font_jp' 扩散 token
-      返回 (None, None)       否则
-    direct 优先于 via.
-    """
-    direct = None
-    via = None
+def migrate_via_tokens(tokens):
+    """把 'via_<X>' (X∈ALL_MODULES) 重写为 '<X>'. 其它 token 原样保留. 去重保序."""
+    out = []
+    seen = set()
     for t in tokens:
-        if t in ALL_MODULES:
-            direct = t
-            break
         if t.startswith("via_"):
-            m = t[4:]
-            if m in ALL_MODULES and via is None:
-                via = m
-    if direct:
-        return ("direct", direct)
-    if via:
-        return ("via", via)
-    return (None, None)
-
-
-def remove_via_tags(tokens):
-    """删除所有 via_* token, 保留其它. 用于扩散重写."""
-    return [t for t in tokens if not t.startswith("via_")]
+            mod = t[4:]
+            if mod in ALL_MODULES:
+                t = mod
+            # 否则保留原样 (未识别 via_ tag, 可能将来加新模块)
+        if t in seen:
+            continue
+        seen.add(t)
+        out.append(t)
+    return out
 
 
 def main():
     if not os.path.isfile(CALLGRAPH):
-        sys.stderr.write("ERROR: %s 不存在; 先跑 ExportFunctionCallGraph.py\n"
-                         % CALLGRAPH)
+        sys.stderr.write(
+            "ERROR: %s 不存在; 先跑 ExportFunctionCallGraph.py\n" % CALLGRAPH
+        )
         return 1
     if not os.path.isfile(PROPOSALS):
         sys.stderr.write("ERROR: %s 不存在\n" % PROPOSALS)
@@ -124,119 +103,134 @@ def main():
     rows_by_addr = {int(r["address"], 16): r for r in rows}
     print("[load] proposals: %d rows" % len(rows))
 
-    # --- 收集种子 ---
-    # tags[ep] = (module_id, depth, votes_winner, votes_total, source)
-    tags = {}
-    n_seed_from_module_tag = 0
-    n_seed_from_func_name = 0
-    n_seed_overlap = 0  # 既有 module tag 又有 funcname 派生
+    # --- 第一步: 迁移 via_X -> X ---
+    n_via_migrated = 0
+    n_rows_changed_in_migration = 0
+    for r in rows:
+        old_tokens = parse_tags(r.get("tags") or "")
+        new_tokens = migrate_via_tokens(old_tokens)
+        # 计 via_ 数
+        n_via = sum(1 for t in old_tokens if t.startswith("via_") and t[4:] in ALL_MODULES)
+        if n_via > 0:
+            n_via_migrated += n_via
+        if new_tokens != old_tokens:
+            r["tags"] = ";".join(new_tokens)
+            n_rows_changed_in_migration += 1
+    print("[migrate] %d via_<X> tokens flattened across %d rows"
+          % (n_via_migrated, n_rows_changed_in_migration))
+
+    # --- 第二步: 收集每个函数的初始 module tag 集合 ---
+    # func_mods[ep] = set(module_id, ...)
+    func_mods = {}
+    n_seed_from_tag = 0
+    n_seed_from_name = 0
+    n_seed_total = 0
     for ep, r in rows_by_addr.items():
         tokens = parse_tags(r.get("tags") or "")
-        kind, mod = find_module_tag(tokens)
-        if kind == "direct":
-            tags[ep] = (mod, 0, 1, 1, "label")
-            n_seed_from_module_tag += 1
-            continue
-        # 从函数名前缀派生 (Ghidra 已命名)
+        mods = set(t for t in tokens if t in ALL_MODULES)
+        if mods:
+            n_seed_from_tag += 1
+        # funcname 派生
         nm_mod = derive_module_from_func_name(r.get("name") or "")
         if nm_mod:
-            tags[ep] = (nm_mod, 0, 1, 1, "name")
-            n_seed_from_func_name += 1
-            if kind == "via":
-                n_seed_overlap += 1
-            continue
-        # 扩散来的 (kind=='via') 不算种子重新跑一遍 (已在 rewrite_tags 重置)
+            mods.add(nm_mod)
+            if not (set(t for t in tokens if t in ALL_MODULES)):
+                # 仅 funcname 派生 (没原 tag)
+                n_seed_from_name += 1
+        if mods:
+            n_seed_total += 1
+        func_mods[ep] = mods
 
-    n_seeds = len(tags)
-    print("[seed] total = %d  (label tag = %d, func name = %d)" %
-          (n_seeds, n_seed_from_module_tag, n_seed_from_func_name))
+    print("[seed] functions with >=1 module tag: %d  (from CSV tag: %d, only-from-name: %d)"
+          % (n_seed_total, n_seed_from_tag, n_seed_from_name))
 
-    # --- BFS 扩散 ---
+    # --- 第三步: BFS 多 tag 扩散 (callee tags -> caller) ---
     print("[propagate]")
     for depth in range(1, MAX_DEPTH + 1):
-        new_tags = {}
+        changed = 0
+        new_additions = 0
         for ep, r in rows_by_addr.items():
-            if ep in tags:
-                continue
-            # 跳过条件 (注意: 已 Ghidra 命名 不再是 skip)
-            if (r.get("proposed_name") or "").strip():
-                continue
-            if (r.get("score") or "").strip() == "5":
-                continue
             cs = callees_of.get(ep)
             if not cs:
                 continue
-            votes = {}
+            cur = func_mods[ep]
+            added = set()
             for c in cs:
-                if c not in tags:
+                cm = func_mods.get(c)
+                if not cm:
                     continue
-                c_mod, c_dep, _, _, _ = tags[c]
-                if c_dep >= depth:
-                    continue
-                votes[c_mod] = votes.get(c_mod, 0) + 1
-            if not votes:
-                continue
-            sorted_v = sorted(votes.items(), key=lambda x: -x[1])
-            winner_mod, winner_count = sorted_v[0]
-            total_votes = sum(votes.values())
-            if winner_count * 2 <= total_votes:
-                continue  # 严格多数
-            new_tags[ep] = (winner_mod, depth, winner_count, total_votes, "prop")
-        tags.update(new_tags)
-        print("  round %d  +%-4d  cumulative %d" % (depth, len(new_tags), len(tags)))
-        if not new_tags:
+                for m in cm:
+                    if m not in cur and m not in added:
+                        added.add(m)
+            if added:
+                cur |= added
+                func_mods[ep] = cur
+                changed += 1
+                new_additions += len(added)
+        print("  round %2d  funcs_changed=%-4d  tags_added=%d" % (depth, changed, new_additions))
+        if changed == 0:
             print("  收敛")
             break
 
-    # --- 写回 CSV ---
-    n_via_written_unnamed = 0
-    n_via_written_named = 0
-    n_funcname_seed_tagged = 0
-    by_module = defaultdict(int)
-    by_depth = defaultdict(int)
-    for ep, (mod, dep, w, tot, src) in tags.items():
-        r = rows_by_addr[ep]
-        tokens = remove_via_tags(parse_tags(r.get("tags") or ""))
-        if dep == 0:
-            # 种子: label 来源已有 module tag (merge_label_refs 写过, 不重复);
-            # funcname 来源还没有 module tag, 给它加上直接 module tag (单 token)
-            if src == "name" and mod not in tokens:
-                tokens.append(mod)
-                r["tags"] = ";".join(tokens)
-                n_funcname_seed_tagged += 1
-            continue
-        # dep > 0: 扩散
-        via_tok = "via_" + mod
-        if via_tok not in tokens:
-            tokens.append(via_tok)
-        r["tags"] = ";".join(tokens)
-        if is_auto_name(r.get("name") or ""):
-            prefix = MODULE_TO_PREFIX.get(mod, mod)
-            r["proposed_name"] = "%s_%08x" % (prefix, ep)
-            r["score"] = "2"
-            n_via_written_unnamed += 1
-        else:
-            n_via_written_named += 1
-        by_module[mod] += 1
-        by_depth[dep] += 1
+    # --- 第四步: 写回 tags 列 ---
+    # 保留非 module / 非 via_ 的所有 token (IO family, tramp_, 其它),
+    # 用最终 func_mods[ep] 替换 module tag 部分.
+    n_rows_changed = 0
+    n_module_tags_added = 0
+    n_module_tags_removed = 0
+    for ep, r in rows_by_addr.items():
+        old_tokens = parse_tags(r.get("tags") or "")
+        # 拆分: kept (非 module, 非 via_) + old_mods (旧 module tag)
+        kept = []
+        old_mod_set = set()
+        for t in old_tokens:
+            if t.startswith("via_"):
+                # 迁移后理论上不会再有, 但安全起见跳过
+                continue
+            if t in ALL_MODULES:
+                old_mod_set.add(t)
+                continue
+            kept.append(t)
+        new_mod_set = func_mods[ep]
+        # 保序: kept 先, 然后按 ALL_MODULES 字典序追加
+        new_tokens = list(kept)
+        for m in sorted(new_mod_set):
+            if m not in new_tokens:
+                new_tokens.append(m)
+        # 去重
+        seen = set()
+        deduped = []
+        for t in new_tokens:
+            if t in seen:
+                continue
+            seen.add(t)
+            deduped.append(t)
+        new_tags_str = ";".join(deduped)
+        old_tags_str = r.get("tags") or ""
+        if new_tags_str != old_tags_str:
+            r["tags"] = new_tags_str
+            n_rows_changed += 1
+        added_here = new_mod_set - old_mod_set
+        removed_here = old_mod_set - new_mod_set
+        n_module_tags_added += len(added_here)
+        n_module_tags_removed += len(removed_here)
 
-    print("\n[write] propagated tag added : %d total" %
-          (n_via_written_unnamed + n_via_written_named))
-    print("        new propose_name (unnamed funcs)  : %d" % n_via_written_unnamed)
-    print("        tag-only (Ghidra-named funcs)     : %d" % n_via_written_named)
-    print("        funcname seeds gained module tag  : %d" % n_funcname_seed_tagged)
-    print("        seeds (depth=0) untouched         : %d" % n_seeds)
-    print("        total tagged                      : %d" % len(tags))
+    print("\n[write] tag rows changed: %d" % n_rows_changed)
+    print("        module tags added (cumulative): %d" % n_module_tags_added)
+    print("        module tags removed (should be 0): %d" % n_module_tags_removed)
 
-    print("\n[stats] by depth:")
-    for d in sorted(by_depth.keys()):
-        print("  depth %d  : %4d" % (d, by_depth[d]))
-    print("[stats] propagated by module:")
-    for mod in sorted(by_module.keys(), key=lambda k: -by_module[k]):
-        print("  %-15s : %4d" % (mod, by_module[mod]))
+    # --- 统计 ---
+    by_module_count = defaultdict(int)
+    for ep, mods in func_mods.items():
+        for m in mods:
+            by_module_count[m] += 1
+    print("\n[stats] funcs carrying each module tag (top 25):")
+    for m in sorted(by_module_count.keys(), key=lambda k: -by_module_count[k])[:25]:
+        print("  %-15s : %4d" % (m, by_module_count[m]))
 
+    # 写回
     with open(PROPOSALS, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for r in rows:
             writer.writerow(r)

@@ -24,8 +24,7 @@ merge_fs_load_strings_to_proposals.py  --  方法 4: 字符串泄漏锚
     - 已 Ghidra 命名: 只追加 module tag, 不动 proposed_name/score
 
 附加清理:
-    若 caller 因路径锚定到模块 M, 同时 tags 含 'via_fs' (来自 method 3 扩散),
-    删除 via_fs (path 锚是 fs 调用关系的精确化, via_fs 已冗余).
+    (multi-tag 体系下 fs tag 直接保留即可, 不再做 via_fs 删除处理.)
 
 CSV tag 格式: 单 token, 无 key:value, 无括号.
 """
@@ -115,7 +114,6 @@ def main():
         "skip_multi_module": 0,
         "skip_no_module": 0,
         "skip_caller_not_in_csv": 0,
-        "via_fs_removed": 0,
     }
     samples = []
 
@@ -159,10 +157,6 @@ def main():
             tokens = parse_tags(row.get("tags") or "")
             if module not in tokens:
                 tokens.append(module)
-            # 路径锚已精确化 fs 关系, 删 via_fs
-            if "via_fs" in tokens:
-                tokens.remove("via_fs")
-                buckets["via_fs_removed"] += 1
             row["tags"] = ";".join(tokens)
             buckets["skip_already_proposed_strong"] += 1
             continue
@@ -171,9 +165,6 @@ def main():
             tokens = parse_tags(row.get("tags") or "")
             if module not in tokens:
                 tokens.append(module)
-            if "via_fs" in tokens:
-                tokens.remove("via_fs")
-                buckets["via_fs_removed"] += 1
             row["tags"] = ";".join(tokens)
             buckets["tag_only_named_func"] += 1
             samples.append("  [named ] %s  %-30s  module=%s  paths=%d" %
@@ -186,14 +177,6 @@ def main():
         proposed = "%s_%08x" % (prefix, addr_int)
 
         tokens = parse_tags(row.get("tags") or "")
-        # 删 via_fs (路径锚精确化了 fs 关系)
-        if "via_fs" in tokens:
-            tokens.remove("via_fs")
-            buckets["via_fs_removed"] += 1
-        # 删旧的 via_<module> (升级为直接 module tag)
-        via_tok = "via_" + module
-        if via_tok in tokens:
-            tokens.remove(via_tok)
         if module not in tokens:
             tokens.append(module)
         row["tags"] = ";".join(tokens)
@@ -226,8 +209,6 @@ def main():
         tokens = parse_tags(row.get("tags") or "")
         if module not in tokens:
             tokens.append(module)
-        if "via_fs" in tokens:
-            tokens.remove("via_fs")
         row["tags"] = ";".join(tokens)
         # 仅当 auto name + 无强提案才写 proposed_name
         existing_proposed = (row.get("proposed_name") or "").strip()
@@ -246,8 +227,7 @@ def main():
     for k in [
             "tag_score4", "tag_score3", "tag_only_named_func",
             "skip_already_proposed_strong", "skip_score5",
-            "skip_multi_module", "skip_no_module", "skip_caller_not_in_csv",
-            "via_fs_removed"]:
+            "skip_multi_module", "skip_no_module", "skip_caller_not_in_csv"]:
         print("  %-32s = %d" % (k, buckets[k]))
     if wrapper_modules:
         print("  wrapper_tagged                   = %d" % wrapper_tagged)
