@@ -257604,7 +257604,7 @@ LAB_080d466e:
     pop {r0}                                 @ 080d468c 01bc
     bx r0                                    @ 080d468e 0047
 DAT_080d4690:
-    .word  0x03005850                     @ 080d4690 50580003
+    .word  pack_ui_state                  @ 080d4690 50580003
 DAT_080d4694:
     .word  0x000003ff                     @ 080d4694 ff030000
 DAT_080d4698:
@@ -257658,7 +257658,7 @@ LAB_080d46cc:
     b LAB_080d4774                           @ 080d46f4 3ee0
     .byte  0x00, 0x00
 DAT_080d46f8:
-    .word  0x03005850                     @ 080d46f8 50580003
+    .word  pack_ui_state                  @ 080d46f8 50580003
 DAT_080d46fc:
     .word  0x000080c0                     @ 080d46fc c0800000
 LAB_080d4700:
@@ -257912,7 +257912,7 @@ FUN_080d48c8:
     b LAB_080d4938                           @ 080d48e0 2ae0
     .byte  0x00, 0x00
 DAT_080d48e4:
-    .word  0x03005850                     @ 080d48e4 50580003
+    .word  pack_ui_state                  @ 080d48e4 50580003
 LAB_080d48e8:
     subs r0,r1,#0x1    @ 080d48e8 481e
     strh r0,[r4,#0x10]                       @ 080d48ea 2082
@@ -257972,7 +257972,7 @@ FUN_080d4940:
     bx r0                                    @ 080d4954 0047
     .byte  0x00, 0x00
 DAT_080d4958:
-    .word  0x03005850                     @ 080d4958 50580003
+    .word  pack_ui_state                  @ 080d4958 50580003
 DAT_080d495c:
     .word  0x000006b2                     @ 080d495c b2060000
 DAT_080d4960:
@@ -257986,7 +257986,7 @@ FUN_080d4978:
     strh r0,[r1,#0x0]                        @ 080d4980 0880
     bx lr                                    @ 080d4982 7047
 DAT_080d4984:
-    .word  0x03005850                     @ 080d4984 50580003
+    .word  pack_ui_state                  @ 080d4984 50580003
 FUN_080d4988:
     push {r4,r5,r6,lr}                       @ 080d4988 70b5
     ldr r3, DAT_080d49c4                     @ 080d498a 0e4b
@@ -258019,7 +258019,7 @@ FUN_080d4988:
     pop {r0}                                 @ 080d49c0 01bc
     bx r0                                    @ 080d49c2 0047
 DAT_080d49c4:
-    .word  0x03005850                     @ 080d49c4 50580003
+    .word  pack_ui_state                  @ 080d49c4 50580003
 DAT_080d49c8:
     .word  0x000006b2                     @ 080d49c8 b2060000
 DAT_080d49cc:
@@ -258077,7 +258077,7 @@ FUN_080d49dc:
     bx r0                                    @ 080d4a3c 0047
     .byte  0x00, 0x00
 DAT_080d4a40:
-    .word  0x03005850                     @ 080d4a40 50580003
+    .word  pack_ui_state                  @ 080d4a40 50580003
 PTR_BG0CNT_080d4a44:
     .word  BG0CNT                         @ 080d4a44 08000004
 DAT_080d4a48:
@@ -258217,7 +258217,7 @@ FUN_080d4b28:
     bl FUN_080d511c                          @ 080d4b42 00f0ebfa
     b LAB_080d4b78                           @ 080d4b46 17e0
 DAT_080d4b48:
-    .word  0x03005850                     @ 080d4b48 50580003
+    .word  pack_ui_state                  @ 080d4b48 50580003
 LAB_080d4b4c:
     movs r0,#0x1    @ 080d4b4c 0120
     movs r1,#0x5    @ 080d4b4e 0521
@@ -258293,7 +258293,7 @@ LAB_080d4bc4:
     b LAB_080d4bf8                           @ 080d4bdc 0ce0
     .byte  0x00, 0x00
 DAT_080d4be0:
-    .word  0x03005850                     @ 080d4be0 50580003
+    .word  pack_ui_state                  @ 080d4be0 50580003
 DAT_080d4be4:
     .word  0x000006fc                     @ 080d4be4 fc060000
 DAT_080d4be8:
@@ -258390,7 +258390,7 @@ LAB_080d4c82:
     b LAB_080d4cbc                           @ 080d4c9c 0ee0
     .byte  0x00, 0x00
 DAT_080d4ca0:
-    .word  0x03005850                     @ 080d4ca0 50580003
+    .word  pack_ui_state                  @ 080d4ca0 50580003
 DAT_080d4ca4:
     .word  0x000006fc                     @ 080d4ca4 fc060000
 DAT_080d4ca8:
@@ -258546,7 +258546,7 @@ LAB_080d4dae:
     bx r0                                    @ 080d4dd8 0047
     .byte  0x00, 0x00
 DAT_080d4ddc:
-    .word  0x03005850                     @ 080d4ddc 50580003
+    .word  pack_ui_state                  @ 080d4ddc 50580003
 DAT_080d4de0:
     .word  0x0600e000                     @ 080d4de0 00e00006
 FUN_080d4de4:
@@ -258596,7 +258596,7 @@ LAB_080d4e36:
     pop {r0}                                 @ 080d4e3c 01bc
     bx r0                                    @ 080d4e3e 0047
 DAT_080d4e40:
-    .word  0x03005850                     @ 080d4e40 50580003
+    .word  pack_ui_state                  @ 080d4e40 50580003
 DAT_080d4e44:
     .word  0x0600e000                     @ 080d4e44 00e00006
 FUN_080d4e48:
@@ -258747,7 +258747,7 @@ LAB_080d4f54:
     b LAB_080d4f6c                           @ 080d4f60 04e0
     .byte  0x00, 0x00
 DAT_080d4f64:
-    .word  0x03005850                     @ 080d4f64 50580003
+    .word  pack_ui_state                  @ 080d4f64 50580003
 LAB_080d4f68:
     movs r5,#0x0    @ 080d4f68 0025
     ldrh r0,[r4,#0x12]                       @ 080d4f6a 608a
@@ -258800,7 +258800,7 @@ LAB_080d4fb4:
     b LAB_080d4fcc                           @ 080d4fc0 04e0
     .byte  0x00, 0x00
 DAT_080d4fc4:
-    .word  0x03005850                     @ 080d4fc4 50580003
+    .word  pack_ui_state                  @ 080d4fc4 50580003
 LAB_080d4fc8:
     movs r5,#0x0    @ 080d4fc8 0025
     ldrh r0,[r4,#0x16]                       @ 080d4fca e08a
@@ -258970,7 +258970,7 @@ LAB_080d50f8:
     bx r0                                    @ 080d5110 0047
     .byte  0x00, 0x00
 DAT_080d5114:
-    .word  0x03005850                     @ 080d5114 50580003
+    .word  pack_ui_state                  @ 080d5114 50580003
 DAT_080d5118:
     .word  0x0000070c                     @ 080d5118 0c070000
 FUN_080d511c:
@@ -259045,7 +259045,7 @@ FUN_080d5184:
     blt LAB_080d51b0                         @ 080d51a4 04db
     b LAB_080d51c0                           @ 080d51a6 0be0
 DAT_080d51a8:
-    .word  0x03005850                     @ 080d51a8 50580003
+    .word  pack_ui_state                  @ 080d51a8 50580003
 LAB_080d51ac:
     cmp r1,#0x0                              @ 080d51ac 0029
     ble LAB_080d51c0                         @ 080d51ae 07dd
@@ -259248,7 +259248,7 @@ FUN_080d5318:
     bx r0                                    @ 080d5328 0047
     .byte  0x00, 0x00
 DAT_080d532c:
-    .word  0x03005850                     @ 080d532c 50580003
+    .word  pack_ui_state                  @ 080d532c 50580003
 DAT_080d5330:
     .word  0x0000070c                     @ 080d5330 0c070000
 FUN_080d5334:
@@ -259277,7 +259277,7 @@ LAB_080d5342:
     bx r0                                    @ 080d5360 0047
     .byte  0x00, 0x00
 DAT_080d5364:
-    .word  0x03005850                     @ 080d5364 50580003
+    .word  pack_ui_state                  @ 080d5364 50580003
 DAT_080d5368:
     .word  0x0000070c                     @ 080d5368 0c070000
 FUN_080d536c:
@@ -259325,7 +259325,7 @@ LAB_080d539a:
     b LAB_080d53d2                           @ 080d53bc 09e0
     .byte  0x00, 0x00
 DAT_080d53c0:
-    .word  0x03005850                     @ 080d53c0 50580003
+    .word  pack_ui_state                  @ 080d53c0 50580003
 PTR_BLDALPHA_080d53c4:
     .word  BLDALPHA                       @ 080d53c4 52000004
 LAB_080d53c8:
@@ -259394,7 +259394,7 @@ FUN_080d5428:
     b LAB_080d545e                           @ 080d543c 0fe0
     .byte  0x00, 0x00
 DAT_080d5440:
-    .word  0x03005850                     @ 080d5440 50580003
+    .word  pack_ui_state                  @ 080d5440 50580003
 LAB_080d5444:
     movs r0,#0x7    @ 080d5444 0720
     ldrb r1,[r4,#0x0]                        @ 080d5446 2178
@@ -259483,7 +259483,7 @@ LAB_080d54cc:
     b LAB_080d5510                           @ 080d54e8 12e0
     .byte  0x00, 0x00
 DAT_080d54ec:
-    .word  0x03005850                     @ 080d54ec 50580003
+    .word  pack_ui_state                  @ 080d54ec 50580003
 DAT_080d54f0:
     .word  0x000006fc                     @ 080d54f0 fc060000
 DAT_080d54f4:
@@ -259667,7 +259667,7 @@ FUN_080d5604:
     pop {r1}                                 @ 080d5654 02bc
     bx r1                                    @ 080d5656 0847
 DAT_080d5658:
-    .word  0x03005850                     @ 080d5658 50580003
+    .word  pack_ui_state                  @ 080d5658 50580003
 DAT_080d565c:
     .word  0x000006fa                     @ 080d565c fa060000
 DAT_080d5660:
@@ -259724,7 +259724,7 @@ LAB_080d56b2:
     adds r6,r6,r0    @ 080d56c8 3618
     b LAB_080d56e2                           @ 080d56ca 0ae0
 DAT_080d56cc:
-    .word  0x03005850                     @ 080d56cc 50580003
+    .word  pack_ui_state                  @ 080d56cc 50580003
 DAT_080d56d0:
     .word  0x000006fc                     @ 080d56d0 fc060000
 DAT_080d56d4:
@@ -259919,7 +259919,7 @@ PTR_BLDCNT_080d5864:
 DAT_080d5868:
     .word  0x00001748                     @ 080d5868 48170000
 DAT_080d586c:
-    .word  0x03005850                     @ 080d586c 50580003
+    .word  pack_ui_state                  @ 080d586c 50580003
 FUN_080d5870:
     push {r4,r5,r6,r7,lr}                    @ 080d5870 f0b5
     ldr r2, DAT_080d58a8                     @ 080d5872 0d4a
@@ -259951,7 +259951,7 @@ LAB_080d589e:
     movs r0,#0x0    @ 080d58a4 0020
     b LAB_080d58ae                           @ 080d58a6 02e0
 DAT_080d58a8:
-    .word  0x03005850                     @ 080d58a8 50580003
+    .word  pack_ui_state                  @ 080d58a8 50580003
 LAB_080d58ac:
     movs r0,#0x14    @ 080d58ac 1420
 LAB_080d58ae:
@@ -260107,7 +260107,7 @@ FUN_080d596c:
     pop {r0}                                 @ 080d59dc 01bc
     bx r0                                    @ 080d59de 0047
 DAT_080d59e0:
-    .word  0x03005850                     @ 080d59e0 50580003
+    .word  pack_ui_state                  @ 080d59e0 50580003
 PTR_BLDCNT_080d59e4:
     .word  BLDCNT                         @ 080d59e4 50000004
 DAT_080d59e8:
@@ -260177,7 +260177,7 @@ FUN_080d5a08:
     b LAB_080d5c3a                           @ 080d5a68 e7e0
     .byte  0x00, 0x00
 DAT_080d5a6c:
-    .word  0x03005850                     @ 080d5a6c 50580003
+    .word  pack_ui_state                  @ 080d5a6c 50580003
 DAT_080d5a70:
     .word  0x000006fc                     @ 080d5a70 fc060000
 DAT_080d5a74:
@@ -260554,7 +260554,7 @@ LAB_080d5d38:
     bx r1                                    @ 080d5d58 0847
     .byte  0x00, 0x00
 DAT_080d5d5c:
-    .word  0x03005850                     @ 080d5d5c 50580003
+    .word  pack_ui_state                  @ 080d5d5c 50580003
 DAT_080d5d60:
     .word  0x00000724                     @ 080d5d60 24070000
 FUN_080d5d64:
@@ -260639,7 +260639,7 @@ FUN_080d5d64:
     bl FUN_080d4b28                          @ 080d5e06 fef78ffe
     b LAB_080d5e24                           @ 080d5e0a 0be0
 DAT_080d5e0c:
-    .word  0x03005850                     @ 080d5e0c 50580003
+    .word  pack_ui_state                  @ 080d5e0c 50580003
 DAT_080d5e10:
     .word  0x000006fc                     @ 080d5e10 fc060000
 DAT_080d5e14:
@@ -260683,7 +260683,7 @@ LAB_080d5e3c:
 PTR_BLDALPHA_080d5e64:
     .word  BLDALPHA                       @ 080d5e64 52000004
 DAT_080d5e68:
-    .word  0x03005850                     @ 080d5e68 50580003
+    .word  pack_ui_state                  @ 080d5e68 50580003
 LAB_080d5e6c:
     ldr r1, DAT_080d5e80                     @ 080d5e6c 0449
     movs r0,#0xe    @ 080d5e6e 0e20
@@ -260697,7 +260697,7 @@ LAB_080d5e70:
     pop {r1}                                 @ 080d5e7c 02bc
     bx r1                                    @ 080d5e7e 0847
 DAT_080d5e80:
-    .word  0x03005850                     @ 080d5e80 50580003
+    .word  pack_ui_state                  @ 080d5e80 50580003
 FUN_080d5e84:
     push {r4,r5,r6,r7,lr}                    @ 080d5e84 f0b5
     .hword 0x4647    @ 080d5e86 4746
@@ -260779,7 +260779,7 @@ LAB_080d5ee2:
     bx r1                                    @ 080d5f20 0847
     .byte  0x00, 0x00
 DAT_080d5f24:
-    .word  0x03005850                     @ 080d5f24 50580003
+    .word  pack_ui_state                  @ 080d5f24 50580003
 DAT_080d5f28:
     .word  0x000006fc                     @ 080d5f28 fc060000
 DAT_080d5f2c:
@@ -260828,7 +260828,7 @@ FUN_080d5f38:
     str r1,[sp,#0x38]                        @ 080d5f80 0e91
     b LAB_080d5f98                           @ 080d5f82 09e0
 DAT_080d5f84:
-    .word  0x03005850                     @ 080d5f84 50580003
+    .word  pack_ui_state                  @ 080d5f84 50580003
 DAT_080d5f88:
     .word  0x000006fc                     @ 080d5f88 fc060000
 DAT_080d5f8c:
@@ -261182,7 +261182,7 @@ DAT_080d6238:
 PTR_BLDALPHA_080d623c:
     .word  BLDALPHA                       @ 080d623c 52000004
 DAT_080d6240:
-    .word  0x03005850                     @ 080d6240 50580003
+    .word  pack_ui_state                  @ 080d6240 50580003
 LAB_080d6244:
     add r0,sp,#0x20                          @ 080d6244 08a8
     adds r0,r0,r1    @ 080d6246 4018
@@ -261221,12 +261221,14 @@ LAB_080d6262:
     bx r1                                    @ 080d628a 0847
 DAT_080d628c:
     .word  0x0300585c                     @ 080d628c 5c580003
-FUN_080d6290:
-    push {r4,lr}                             @ 080d6290 10b5
-    ldr r4, DAT_080d62e8                     @ 080d6292 154c
-    ldr r0, DAT_080d62ec                     @ 080d6294 1548
-    bl game_str_id_to_row                    @ 080d6296 1ef0bffd
-    ldr r2, PTR_game_str_pointer_table_080d62f0 @ 080d629a 154a
+
+@ Pack shop 'Open all' 完成时的终态处理. 通过 game_str_id_to_row(0x13f7) 取 row 1086 = 'Opened all packs.', 调 text_overlay_create 弹模态对话框 (h=10, w=30), 然后切 pack_ui_state[+0x10]=8 把 pack 状态机推到完成态. 返回 1.
+pack_ui_show_all_opened_done:
+    push {r4,lr}                             @ 080d6290 10b5  -- pack_ui_show_all_opened_done: 入口
+    ldr r4, DAT_080d62e8                     @ 080d6292 154c  -- r4 = dialog size = (h=10 << 16) | w=30 = 0x000a001e
+    ldr r0, DAT_080d62ec                     @ 080d6294 1548  -- r0 = logical string id 0x13f7
+    bl game_str_id_to_row                    @ 080d6296 1ef0bffd  -- r0 = master_row (= 1086 = 'Opened all packs.')
+    ldr r2, PTR_game_str_pointer_table_080d62f0 @ 080d629a 154a  -- <<< 经典 game_str lookup chain: row -> string addr (lang from gSettings) >>>
     lsls r0,r0,#0x10    @ 080d629c 0004
     lsrs r0,r0,#0x10    @ 080d629e 000c
     lsls r1,r0,#0x1    @ 080d62a0 4100
@@ -261241,22 +261243,22 @@ FUN_080d6290:
     adds r1,r1,r0    @ 080d62b2 0918
     lsls r1,r1,#0x2    @ 080d62b4 8900
     adds r1,r1,r2    @ 080d62b6 8918
-    ldr r2,[r1,#0x0]                         @ 080d62b8 0a68
+    ldr r2,[r1,#0x0]                         @ 080d62b8 0a68  -- r2 = master[row].offset[lang]
     ldr r0, PTR_game_str_ja_080d62fc         @ 080d62ba 1048
-    adds r2,r2,r0    @ 080d62bc 1218
-    adds r0,r4,#0x0    @ 080d62be 201c
+    adds r2,r2,r0    @ 080d62bc 1218  -- r2 = STRING_TABLE_BASE + offset = 'Opened all packs.' 字符串地址
+    adds r0,r4,#0x0    @ 080d62be 201c  -- r0 = size_packed (0x000a001e), r1 = flags (0), r2 = text
     movs r1,#0x0    @ 080d62c0 0021
-    bl FUN_080dd53c                          @ 080d62c2 07f03bf9
+    bl text_overlay_create                   @ 080d62c2 07f03bf9  -- text_overlay_create(size, 0, 'Opened all packs.')
     movs r0,#0x1    @ 080d62c6 0120
-    bl FUN_080d55cc                          @ 080d62c8 fff780f9
+    bl FUN_080d55cc                          @ 080d62c8 fff780f9  -- FUN_080d55cc(1) -- pack ui helper (TODO: 命名)
     movs r0,#0x1    @ 080d62cc 0120
-    bl FUN_080d46a8                          @ 080d62ce fef7ebf9
+    bl FUN_080d46a8                          @ 080d62ce fef7ebf9  -- FUN_080d46a8(1) -- pack ui helper (TODO: 命名)
     movs r0,#0x3    @ 080d62d2 0320
-    bl FUN_080d5184                          @ 080d62d4 fef756ff
+    bl FUN_080d5184                          @ 080d62d4 fef756ff  -- FUN_080d5184(3) -- pack ui helper (TODO: 命名)
     ldr r1, DAT_080d6300                     @ 080d62d8 0949
-    movs r0,#0x8    @ 080d62da 0820
-    strh r0,[r1,#0x10]                       @ 080d62dc 0882
-    movs r0,#0x1    @ 080d62de 0120
+    movs r0,#0x8    @ 080d62da 0820  -- r0 = 8 (next state)
+    strh r0,[r1,#0x10]                       @ 080d62dc 0882  -- pack_ui_state[+0x10] = 8  (切 pack 状态机到完成态)
+    movs r0,#0x1    @ 080d62de 0120  -- r0 = 1 (return value: success)
     pop {r4}                                 @ 080d62e0 10bc
     pop {r1}                                 @ 080d62e2 02bc
     bx r1                                    @ 080d62e4 0847
@@ -261274,7 +261276,7 @@ DAT_080d62f8:
 PTR_game_str_ja_080d62fc:
     .word  game_str_ja                    @ 080d62fc 109cdb09
 DAT_080d6300:
-    .word  0x03005850                     @ 080d6300 50580003
+    .word  pack_ui_state                  @ 080d6300 50580003
 FUN_080d6304:
     push {r4,lr}                             @ 080d6304 10b5
     ldr r0, DAT_080d6360                     @ 080d6306 1648
@@ -261321,7 +261323,7 @@ LAB_080d633e:
     bx r1                                    @ 080d635c 0847
     .byte  0x00, 0x00
 DAT_080d6360:
-    .word  0x03005850                     @ 080d6360 50580003
+    .word  pack_ui_state                  @ 080d6360 50580003
 PTR_gPrng_080d6364:
     .word  gPrng                          @ 080d6364 40000003
 PTR_BLDCNT_080d6368:
@@ -261437,7 +261439,7 @@ LAB_080d6424:
     bl FUN_080d4af0                          @ 080d6442 fef755fb
     b LAB_080d6462                           @ 080d6446 0ce0
 DAT_080d6448:
-    .word  0x03005850                     @ 080d6448 50580003
+    .word  pack_ui_state                  @ 080d6448 50580003
 PTR_BLDY_080d644c:
     .word  BLDY                           @ 080d644c 54000004
 DAT_080d6450:
@@ -261512,7 +261514,7 @@ DAT_080d64d8:
 PTR_BLDY_080d64dc:
     .word  BLDY                           @ 080d64dc 54000004
 DAT_080d64e0:
-    .word  0x03005850                     @ 080d64e0 50580003
+    .word  pack_ui_state                  @ 080d64e0 50580003
 FUN_080d64e4:
     push {r4,r5,lr}                          @ 080d64e4 30b5
     ldr r0, DAT_080d653c                     @ 080d64e6 1548
@@ -261555,7 +261557,7 @@ LAB_080d651a:
     pop {r1}                                 @ 080d6538 02bc
     bx r1                                    @ 080d653a 0847
 DAT_080d653c:
-    .word  0x03005850                     @ 080d653c 50580003
+    .word  pack_ui_state                  @ 080d653c 50580003
 PTR_BLDY_080d6540:
     .word  BLDY                           @ 080d6540 54000004
 PTR_BLDCNT_080d6544:
@@ -261591,7 +261593,7 @@ FUN_080d6548:
     b LAB_080d65e8                           @ 080d6580 32e0
     .byte  0x00, 0x00
 DAT_080d6584:
-    .word  0x03005850                     @ 080d6584 50580003
+    .word  pack_ui_state                  @ 080d6584 50580003
 PTR_BLDALPHA_080d6588:
     .word  BLDALPHA                       @ 080d6588 52000004
 LAB_080d658c:
@@ -261671,7 +261673,7 @@ PTR_BLDCNT_080d661c:
 DAT_080d6620:
     .word  0x00001010                     @ 080d6620 10100000
 DAT_080d6624:
-    .word  0x03005850                     @ 080d6624 50580003
+    .word  pack_ui_state                  @ 080d6624 50580003
 FUN_080d6628:
     push {r4,r5,r6,r7,lr}                    @ 080d6628 f0b5
     .hword 0x4657    @ 080d662a 5746
@@ -261806,7 +261808,7 @@ LAB_080d6700:
     pop {r1}                                 @ 080d6740 02bc
     bx r1                                    @ 080d6742 0847
 DAT_080d6744:
-    .word  0x03005850                     @ 080d6744 50580003
+    .word  pack_ui_state                  @ 080d6744 50580003
 DAT_080d6748:
     .word  0x00000704                     @ 080d6748 04070000
 PTR_BLDY_080d674c:
@@ -261851,7 +261853,7 @@ FUN_080d6774:
     pop {r0}                                 @ 080d679c 01bc
     bx r0                                    @ 080d679e 0047
 DAT_080d67a0:
-    .word  0x03005850                     @ 080d67a0 50580003
+    .word  pack_ui_state                  @ 080d67a0 50580003
 DAT_080d67a4:
     .word  0x00000724                     @ 080d67a4 24070000
 FUN_080d67a8:
@@ -261920,7 +261922,7 @@ LAB_080d680a:
     movs r0,#0x10    @ 080d6828 1020
     b LAB_080d68f6                           @ 080d682a 64e0
 DAT_080d682c:
-    .word  0x03005850                     @ 080d682c 50580003
+    .word  pack_ui_state                  @ 080d682c 50580003
 DAT_080d6830:
     .word  0x000006fc                     @ 080d6830 fc060000
 DAT_080d6834:
@@ -262306,7 +262308,7 @@ LAB_080d6ae2:
     bx r1                                    @ 080d6b38 0847
     .byte  0x00, 0x00
 DAT_080d6b3c:
-    .word  0x03005850                     @ 080d6b3c 50580003
+    .word  pack_ui_state                  @ 080d6b3c 50580003
 DAT_080d6b40:
     .word  0x00000704                     @ 080d6b40 04070000
 DAT_080d6b44:
@@ -262322,7 +262324,7 @@ FUN_080d6b50:
     .hword 0x4645    @ 080d6b56 4546
     push {r5,r6,r7}                          @ 080d6b58 e0b4
     sub sp,#0x4                              @ 080d6b5a 81b0
-    ldr r7, PTR_DAT_080d6c88                 @ 080d6b5c 4a4f
+    ldr r7, PTR_pack_ui_state_080d6c88       @ 080d6b5c 4a4f
     adds r4,r7,#0x0    @ 080d6b5e 3c1c
     adds r4,#0xc    @ 080d6b60 0c34
     ldr r0, PTR_DAT_080d6c8c                 @ 080d6b62 4a48
@@ -262461,8 +262463,8 @@ LAB_080d6c42:
     pop {r1}                                 @ 080d6c82 02bc
     bx r1                                    @ 080d6c84 0847
     .byte  0x00, 0x00
-PTR_DAT_080d6c88:
-    .word  0x03005850                     @ 080d6c88 50580003
+PTR_pack_ui_state_080d6c88:
+    .word  pack_ui_state                  @ 080d6c88 50580003
 PTR_DAT_080d6c8c:
     .word  0x03005f4a                     @ 080d6c8c 4a5f0003
 PTR_DAT_080d6c90:
@@ -262532,7 +262534,7 @@ FUN_080d6cc4:
     bx r1                                    @ 080d6d10 0847
     .byte  0x00, 0x00
 DAT_080d6d14:
-    .word  0x03005850                     @ 080d6d14 50580003
+    .word  pack_ui_state                  @ 080d6d14 50580003
 DAT_080d6d18:
     .word  0x00000704                     @ 080d6d18 04070000
 PTR_BLDCNT_080d6d1c:
@@ -262598,7 +262600,7 @@ LAB_080d6d50:
     subs r5,r0,#0x1    @ 080d6d98 451e
     b LAB_080d6de4                           @ 080d6d9a 23e0
 DAT_080d6d9c:
-    .word  0x03005850                     @ 080d6d9c 50580003
+    .word  pack_ui_state                  @ 080d6d9c 50580003
 DAT_080d6da0:
     .word  0x000006fc                     @ 080d6da0 fc060000
 DAT_080d6da4:
@@ -262779,7 +262781,7 @@ DAT_080d6f1c:
 DAT_080d6f20:
     .word  0x09ccd290                     @ 080d6f20 90d2cc09
 DAT_080d6f24:
-    .word  0x03005850                     @ 080d6f24 50580003
+    .word  pack_ui_state                  @ 080d6f24 50580003
 FUN_080d6f28:
     push {lr}                                @ 080d6f28 00b5
     ldr r1, PTR_BLDCNT_080d6f98              @ 080d6f2a 1b49
@@ -262850,7 +262852,7 @@ PTR_WIN1H_080d6fb0:
 DAT_080d6fb4:
     .word  0x00007090                     @ 080d6fb4 90700000
 DAT_080d6fb8:
-    .word  0x03005850                     @ 080d6fb8 50580003
+    .word  pack_ui_state                  @ 080d6fb8 50580003
 FUN_080d6fbc:
     push {r4,r5,lr}                          @ 080d6fbc 30b5
     ldr r5, DAT_080d6ffc                     @ 080d6fbe 0f4d
@@ -262884,7 +262886,7 @@ FUN_080d6fbc:
     b LAB_080d700e                           @ 080d6ff8 09e0
     .byte  0x00, 0x00
 DAT_080d6ffc:
-    .word  0x03005850                     @ 080d6ffc 50580003
+    .word  pack_ui_state                  @ 080d6ffc 50580003
 PTR_gPrng_080d7000:
     .word  gPrng                          @ 080d7000 40000003
 DAT_080d7004:
@@ -262930,7 +262932,7 @@ LAB_080d704a:
     b LAB_080d705e                           @ 080d704c 07e0
     .byte  0x00, 0x00
 DAT_080d7050:
-    .word  0x03005850                     @ 080d7050 50580003
+    .word  pack_ui_state                  @ 080d7050 50580003
 DAT_080d7054:
     .word  0x09e493e0                     @ 080d7054 e093e409
 PTR_gPrng_080d7058:
@@ -263268,7 +263270,7 @@ LAB_080d72e0:
     bx r0                                    @ 080d72ec 0047
     .byte  0x00, 0x00
 DAT_080d72f0:
-    .word  0x03005850                     @ 080d72f0 50580003
+    .word  pack_ui_state                  @ 080d72f0 50580003
 DAT_080d72f4:
     .word  0x0000c00c                     @ 080d72f4 0cc00000
 FUN_080d72f8:
@@ -263302,7 +263304,7 @@ FUN_080d72f8:
     pop {r1}                                 @ 080d7330 02bc
     bx r1                                    @ 080d7332 0847
 DAT_080d7334:
-    .word  0x03005850                     @ 080d7334 50580003
+    .word  pack_ui_state                  @ 080d7334 50580003
 DAT_080d7338:
     .word  0x0200af20                     @ 080d7338 20af0002
 FUN_080d733c:
@@ -263417,7 +263419,7 @@ LAB_080d7424:
     bx r1                                    @ 080d7430 0847
     .byte  0x00, 0x00
 DAT_080d7434:
-    .word  0x03005850                     @ 080d7434 50580003
+    .word  pack_ui_state                  @ 080d7434 50580003
 DAT_080d7438:
     .word  0x0600e000                     @ 080d7438 00e00006
 DAT_080d743c:
@@ -263505,7 +263507,7 @@ LAB_080d749e:
     bl FUN_080d71f4                          @ 080d74de fff789fe
     b LAB_080d752c                           @ 080d74e2 23e0
 DAT_080d74e4:
-    .word  0x03005850                     @ 080d74e4 50580003
+    .word  pack_ui_state                  @ 080d74e4 50580003
 DAT_080d74e8:
     .word  0x00000724                     @ 080d74e8 24070000
 LAB_080d74ec:
@@ -263660,7 +263662,7 @@ FUN_080d7578:
     b LAB_080d7680                           @ 080d7624 2ce0
     .byte  0x00, 0x00
 DAT_080d7628:
-    .word  0x03005850                     @ 080d7628 50580003
+    .word  pack_ui_state                  @ 080d7628 50580003
 DAT_080d762c:
     .word  0x0600e426                     @ 080d762c 26e40006
 DAT_080d7630:
@@ -263760,7 +263762,7 @@ LAB_080d76de:
     movs r0,#0x0    @ 080d76e4 0020
     b LAB_080d76ee                           @ 080d76e6 02e0
 DAT_080d76e8:
-    .word  0x03005850                     @ 080d76e8 50580003
+    .word  pack_ui_state                  @ 080d76e8 50580003
 LAB_080d76ec:
     movs r0,#0x14    @ 080d76ec 1420
 LAB_080d76ee:
@@ -263912,7 +263914,7 @@ FUN_080d77c4:
     movs r5,#0x1    @ 080d7818 0125
     b LAB_080d785e                           @ 080d781a 20e0
 DAT_080d781c:
-    .word  0x03005850                     @ 080d781c 50580003
+    .word  pack_ui_state                  @ 080d781c 50580003
 PTR_gPrng_080d7820:
     .word  gPrng                          @ 080d7820 40000003
 DAT_080d7824:
@@ -263974,7 +263976,7 @@ LAB_080d785e:
 PTR_gPrng_080d7894:
     .word  gPrng                          @ 080d7894 40000003
 DAT_080d7898:
-    .word  0x03005850                     @ 080d7898 50580003
+    .word  pack_ui_state                  @ 080d7898 50580003
 LAB_080d789c:
     cmp r0,#0x2                              @ 080d789c 0228
     beq LAB_080d78a2                         @ 080d789e 00d0
@@ -263997,7 +263999,7 @@ LAB_080d78a2:
     movs r0,#0xd    @ 080d78c0 0d20
     b LAB_080d7c3a                           @ 080d78c2 bae1
 DAT_080d78c4:
-    .word  0x03005850                     @ 080d78c4 50580003
+    .word  pack_ui_state                  @ 080d78c4 50580003
 LAB_080d78c8:
     movs r0,#0x24    @ 080d78c8 2420
     bl FUN_080f9ab4                          @ 080d78ca 22f0f3f8
@@ -264013,7 +264015,7 @@ LAB_080d78c8:
     movs r0,#0x8    @ 080d78e0 0820
     b LAB_080d7c3a                           @ 080d78e2 aae1
 DAT_080d78e4:
-    .word  0x03005850                     @ 080d78e4 50580003
+    .word  pack_ui_state                  @ 080d78e4 50580003
 LAB_080d78e8:
     movs r0,#0x10    @ 080d78e8 1020
     ands r0,r1    @ 080d78ea 0840
@@ -264068,7 +264070,7 @@ LAB_080d78e8:
     b LAB_080d7c3c                           @ 080d7954 72e1
     .byte  0x00, 0x00
 DAT_080d7958:
-    .word  0x03005850                     @ 080d7958 50580003
+    .word  pack_ui_state                  @ 080d7958 50580003
 LAB_080d795c:
     movs r0,#0xe3    @ 080d795c e320
     lsls r0,r0,#0x3    @ 080d795e c000
@@ -264104,7 +264106,7 @@ LAB_080d796c:
     movs r0,#0x5    @ 080d799c 0520
     b LAB_080d7c3a                           @ 080d799e 4ce1
 DAT_080d79a0:
-    .word  0x03005850                     @ 080d79a0 50580003
+    .word  pack_ui_state                  @ 080d79a0 50580003
 LAB_080d79a4:
     movs r0,#0xe3    @ 080d79a4 e320
     lsls r0,r0,#0x3    @ 080d79a6 c000
@@ -264167,7 +264169,7 @@ LAB_080d79c6:
     strh r0,[r5,#0x4]                        @ 080d7a1c a880
     b LAB_080d7c3c                           @ 080d7a1e 0de1
 DAT_080d7a20:
-    .word  0x03005850                     @ 080d7a20 50580003
+    .word  pack_ui_state                  @ 080d7a20 50580003
 LAB_080d7a24:
     cmp r0,#0x2                              @ 080d7a24 0228
     beq LAB_080d7a2a                         @ 080d7a26 00d0
@@ -264199,7 +264201,7 @@ LAB_080d7a32:
     movs r0,#0x5    @ 080d7a5c 0520
     b LAB_080d7c3a                           @ 080d7a5e ece0
 DAT_080d7a60:
-    .word  0x03005850                     @ 080d7a60 50580003
+    .word  pack_ui_state                  @ 080d7a60 50580003
 LAB_080d7a64:
     movs r0,#0x40    @ 080d7a64 4020
     ands r0,r1    @ 080d7a66 0840
@@ -264255,7 +264257,7 @@ LAB_080d7a7a:
     strh r0,[r5,#0x4]                        @ 080d7ad0 a880
     b LAB_080d7c3c                           @ 080d7ad2 b3e0
 DAT_080d7ad4:
-    .word  0x03005850                     @ 080d7ad4 50580003
+    .word  pack_ui_state                  @ 080d7ad4 50580003
 LAB_080d7ad8:
     cmp r1,#0x2                              @ 080d7ad8 0229
     beq LAB_080d7ade                         @ 080d7ada 00d0
@@ -264305,7 +264307,7 @@ LAB_080d7ade:
     b LAB_080d7c3c                           @ 080d7b38 80e0
     .byte  0x00, 0x00
 DAT_080d7b3c:
-    .word  0x03005850                     @ 080d7b3c 50580003
+    .word  pack_ui_state                  @ 080d7b3c 50580003
 LAB_080d7b40:
     movs r0,#0x80    @ 080d7b40 8020
     ands r0,r1    @ 080d7b42 0840
@@ -264360,7 +264362,7 @@ LAB_080d7b40:
     b LAB_080d7c3c                           @ 080d7bac 46e0
     .byte  0x00, 0x00
 DAT_080d7bb0:
-    .word  0x03005850                     @ 080d7bb0 50580003
+    .word  pack_ui_state                  @ 080d7bb0 50580003
 LAB_080d7bb4:
     movs r0,#0x2    @ 080d7bb4 0220
     strh r0,[r6,#0x1a]                       @ 080d7bb6 7083
@@ -264387,7 +264389,7 @@ LAB_080d7bb4:
     b LAB_080d7c3a                           @ 080d7be8 27e0
     .byte  0x00, 0x00
 DAT_080d7bec:
-    .word  0x03005850                     @ 080d7bec 50580003
+    .word  pack_ui_state                  @ 080d7bec 50580003
 LAB_080d7bf0:
     movs r0,#0xe3    @ 080d7bf0 e320
     lsls r0,r0,#0x3    @ 080d7bf2 c000
@@ -264464,7 +264466,7 @@ LAB_080d7c64:
     bx r1                                    @ 080d7c7c 0847
     .byte  0x00, 0x00
 DAT_080d7c80:
-    .word  0x03005850                     @ 080d7c80 50580003
+    .word  pack_ui_state                  @ 080d7c80 50580003
 PTR_gPrng_080d7c84:
     .word  gPrng                          @ 080d7c84 40000003
 FUN_080d7c88:
@@ -264483,7 +264485,7 @@ FUN_080d7c88:
     bl FUN_080d4978                          @ 080d7ca2 fcf769fe
     b LAB_080d7cb2                           @ 080d7ca6 04e0
 DAT_080d7ca8:
-    .word  0x03005850                     @ 080d7ca8 50580003
+    .word  pack_ui_state                  @ 080d7ca8 50580003
 LAB_080d7cac:
     movs r0,#0x1    @ 080d7cac 0120
     bl FUN_080d4978                          @ 080d7cae fcf763fe
@@ -264504,7 +264506,7 @@ LAB_080d7cb8:
     bx r1                                    @ 080d7cd0 0847
     .byte  0x00, 0x00
 DAT_080d7cd4:
-    .word  0x03005850                     @ 080d7cd4 50580003
+    .word  pack_ui_state                  @ 080d7cd4 50580003
 FUN_080d7cd8:
     push {r4,r5,r6,r7,lr}                    @ 080d7cd8 f0b5
     ldr r0, DAT_080d7d10                     @ 080d7cda 0d48
@@ -264534,7 +264536,7 @@ FUN_080d7cd8:
     bl FUN_080db700                          @ 080d7d0a 03f0f9fc
     b LAB_080d7d5c                           @ 080d7d0e 25e0
 DAT_080d7d10:
-    .word  0x03005850                     @ 080d7d10 50580003
+    .word  pack_ui_state                  @ 080d7d10 50580003
 LAB_080d7d14:
     adds r0,r2,#0x0    @ 080d7d14 101c
     movs r1,#0x1    @ 080d7d16 0121
@@ -264567,7 +264569,7 @@ LAB_080d7d4a:
     movs r0,#0xa    @ 080d7d54 0a20
     b LAB_080d7daa                           @ 080d7d56 28e0
 DAT_080d7d58:
-    .word  0x03005850                     @ 080d7d58 50580003
+    .word  pack_ui_state                  @ 080d7d58 50580003
 LAB_080d7d5c:
     movs r1,#0x1    @ 080d7d5c 0121
     lsls r1,r7    @ 080d7d5e b940
@@ -264612,7 +264614,7 @@ LAB_080d7daa:
 DAT_080d7db4:
     .word  0x00000719                     @ 080d7db4 19070000
 DAT_080d7db8:
-    .word  0x03005850                     @ 080d7db8 50580003
+    .word  pack_ui_state                  @ 080d7db8 50580003
 FUN_080d7dbc:
     push {r4,r5,r6,r7,lr}                    @ 080d7dbc f0b5
     .hword 0x464f    @ 080d7dbe 4f46
@@ -264670,7 +264672,7 @@ LAB_080d7e1a:
     b LAB_080d7e96                           @ 080d7e20 39e0
     .byte  0x00, 0x00
 DAT_080d7e24:
-    .word  0x03005850                     @ 080d7e24 50580003
+    .word  pack_ui_state                  @ 080d7e24 50580003
 LAB_080d7e28:
     movs r6,#0x0    @ 080d7e28 0026
     movs r0,#0x1    @ 080d7e2a 0120
@@ -264768,7 +264770,7 @@ LAB_080d7edc:
 DAT_080d7eec:
     .word  0x00000719                     @ 080d7eec 19070000
 DAT_080d7ef0:
-    .word  0x03005850                     @ 080d7ef0 50580003
+    .word  pack_ui_state                  @ 080d7ef0 50580003
 FUN_080d7ef4:
     push {r4,lr}                             @ 080d7ef4 10b5
     ldr r0, DAT_080d7f18                     @ 080d7ef6 0848
@@ -264788,7 +264790,7 @@ FUN_080d7ef4:
     movs r0,#0x9    @ 080d7f14 0920
     b LAB_080d7f1e                           @ 080d7f16 02e0
 DAT_080d7f18:
-    .word  0x03005850                     @ 080d7f18 50580003
+    .word  pack_ui_state                  @ 080d7f18 50580003
 LAB_080d7f1c:
     movs r0,#0xa    @ 080d7f1c 0a20
 LAB_080d7f1e:
@@ -264842,7 +264844,7 @@ LAB_080d7f5e:
     strh r0,[r5,#0x4]                        @ 080d7f84 a880
     b LAB_080d7f9c                           @ 080d7f86 09e0
 DAT_080d7f88:
-    .word  0x03005850                     @ 080d7f88 50580003
+    .word  pack_ui_state                  @ 080d7f88 50580003
 PTR_gPrng_080d7f8c:
     .word  gPrng                          @ 080d7f8c 40000003
 LAB_080d7f90:
@@ -265041,7 +265043,7 @@ LAB_080d8104:
     pop {r1}                                 @ 080d8114 02bc
     bx r1                                    @ 080d8116 0847
 DAT_080d8118:
-    .word  0x03005850                     @ 080d8118 50580003
+    .word  pack_ui_state                  @ 080d8118 50580003
 FUN_080d811c:
     push {r4,lr}                             @ 080d811c 10b5
     movs r4,#0x0    @ 080d811e 0024
@@ -265084,7 +265086,7 @@ LAB_080d814e:
 PTR_gPrng_080d8170:
     .word  gPrng                          @ 080d8170 40000003
 DAT_080d8174:
-    .word  0x03005850                     @ 080d8174 50580003
+    .word  pack_ui_state                  @ 080d8174 50580003
 FUN_080d8178:
     push {r4,lr}                             @ 080d8178 10b5
     bl FUN_080d48c8                          @ 080d817a fcf7a5fb
@@ -265109,7 +265111,7 @@ LAB_080d81a2:
     bx r1                                    @ 080d81a8 0847
     .byte  0x00, 0x00
 DAT_080d81ac:
-    .word  0x03005850                     @ 080d81ac 50580003
+    .word  pack_ui_state                  @ 080d81ac 50580003
 FUN_080d81b0:
     push {r4,r5,r6,r7,lr}                    @ 080d81b0 f0b5
     ldr r0, DAT_080d825c                     @ 080d81b2 2a48
@@ -265199,7 +265201,7 @@ LAB_080d8238:
     strh r1,[r2,#0x0]                        @ 080d8258 1180
     b LAB_080d82d8                           @ 080d825a 3de0
 DAT_080d825c:
-    .word  0x03005850                     @ 080d825c 50580003
+    .word  pack_ui_state                  @ 080d825c 50580003
 DAT_080d8260:
     .word  0x00000724                     @ 080d8260 24070000
 PTR_BG3CNT_080d8264:
@@ -265303,7 +265305,7 @@ DAT_080d8324:
 DAT_080d8328:
     .word  0x00001010                     @ 080d8328 10100000
 DAT_080d832c:
-    .word  0x03005850                     @ 080d832c 50580003
+    .word  pack_ui_state                  @ 080d832c 50580003
 FUN_080d8330:
     push {r4,r5,r6,r7,lr}                    @ 080d8330 f0b5
     ldr r0, DAT_080d83dc                     @ 080d8332 2a48
@@ -265393,7 +265395,7 @@ LAB_080d83b8:
     strh r1,[r2,#0x0]                        @ 080d83d8 1180
     b LAB_080d8458                           @ 080d83da 3de0
 DAT_080d83dc:
-    .word  0x03005850                     @ 080d83dc 50580003
+    .word  pack_ui_state                  @ 080d83dc 50580003
 DAT_080d83e0:
     .word  0x00000724                     @ 080d83e0 24070000
 PTR_BG3CNT_080d83e4:
@@ -265501,7 +265503,7 @@ DAT_080d84ac:
 DAT_080d84b0:
     .word  0x00001010                     @ 080d84b0 10100000
 DAT_080d84b4:
-    .word  0x03005850                     @ 080d84b4 50580003
+    .word  pack_ui_state                  @ 080d84b4 50580003
 FUN_080d84b8:
     push {r4,lr}                             @ 080d84b8 10b5
     ldr r0, DAT_080d84fc                     @ 080d84ba 1048
@@ -265540,7 +265542,7 @@ LAB_080d84f2:
     bx r1                                    @ 080d84f8 0847
     .byte  0x00, 0x00
 DAT_080d84fc:
-    .word  0x03005850                     @ 080d84fc 50580003
+    .word  pack_ui_state                  @ 080d84fc 50580003
 DAT_080d8500:
     .word  0x00000724                     @ 080d8500 24070000
 FUN_080d8504:
@@ -265565,7 +265567,7 @@ LAB_080d8528:
     movs r0,#0x0    @ 080d8528 0020
     b LAB_080d8536                           @ 080d852a 04e0
 DAT_080d852c:
-    .word  0x03005850                     @ 080d852c 50580003
+    .word  pack_ui_state                  @ 080d852c 50580003
 DAT_080d8530:
     .word  0x09e49438                     @ 080d8530 3894e409
 LAB_080d8534:
@@ -265944,7 +265946,7 @@ FUN_080d87d0:
     pop {r1}                                 @ 080d87f8 02bc
     bx r1                                    @ 080d87fa 0847
 DAT_080d87fc:
-    .word  0x03005850                     @ 080d87fc 50580003
+    .word  pack_ui_state                  @ 080d87fc 50580003
 DAT_080d8800:
     .word  0x0200af20                     @ 080d8800 20af0002
 FUN_080d8804:
@@ -265973,7 +265975,7 @@ FUN_080d8804:
     adds r2,r2,r0    @ 080d8834 1218
     adds r0,r4,#0x0    @ 080d8836 201c
     movs r1,#0x0    @ 080d8838 0021
-    bl FUN_080dd53c                          @ 080d883a 04f07ffe
+    bl text_overlay_create                   @ 080d883a 04f07ffe
     ldr r1, DAT_080d8864                     @ 080d883e 0949
     movs r0,#0x1    @ 080d8840 0120
     strh r0,[r1,#0x10]                       @ 080d8842 0882
@@ -265994,7 +265996,7 @@ DAT_080d885c:
 PTR_game_str_ja_080d8860:
     .word  game_str_ja                    @ 080d8860 109cdb09
 DAT_080d8864:
-    .word  0x03005850                     @ 080d8864 50580003
+    .word  pack_ui_state                  @ 080d8864 50580003
 FUN_080d8868:
     push {r4,lr}                             @ 080d8868 10b5
     movs r4,#0x0    @ 080d886a 0024
@@ -266027,7 +266029,7 @@ LAB_080d8896:
 PTR_gPrng_080d88a0:
     .word  gPrng                          @ 080d88a0 40000003
 DAT_080d88a4:
-    .word  0x03005850                     @ 080d88a4 50580003
+    .word  pack_ui_state                  @ 080d88a4 50580003
 FUN_080d88a8:
     push {r4,r5,r6,r7,lr}                    @ 080d88a8 f0b5
     .hword 0x4657    @ 080d88aa 5746
@@ -266079,7 +266081,7 @@ LAB_080d88ee:
     movs r0,#0x4    @ 080d8908 0420
     b LAB_080d891e                           @ 080d890a 08e0
 DAT_080d890c:
-    .word  0x03005850                     @ 080d890c 50580003
+    .word  pack_ui_state                  @ 080d890c 50580003
 DAT_080d8910:
     .word  0x000006fc                     @ 080d8910 fc060000
 DAT_080d8914:
@@ -266274,7 +266276,7 @@ DAT_080d8a7c:
 DAT_080d8a80:
     .word  0x000006ee                     @ 080d8a80 ee060000
 DAT_080d8a84:
-    .word  0x03005850                     @ 080d8a84 50580003
+    .word  pack_ui_state                  @ 080d8a84 50580003
 FUN_080d8a88:
     push {r4,r5,r6,r7,lr}                    @ 080d8a88 f0b5
     .hword 0x464f    @ 080d8a8a 4f46
@@ -266334,7 +266336,7 @@ LAB_080d8ad8:
     str r0,[r6,#0x0]                         @ 080d8af8 3060
     b LAB_080d8b22                           @ 080d8afa 12e0
 DAT_080d8afc:
-    .word  0x03005850                     @ 080d8afc 50580003
+    .word  pack_ui_state                  @ 080d8afc 50580003
 DAT_080d8b00:
     .word  0x000006fc                     @ 080d8b00 fc060000
 DAT_080d8b04:
@@ -266445,7 +266447,7 @@ DAT_080d8bd4:
 DAT_080d8bd8:
     .word  0x000006ee                     @ 080d8bd8 ee060000
 DAT_080d8bdc:
-    .word  0x03005850                     @ 080d8bdc 50580003
+    .word  pack_ui_state                  @ 080d8bdc 50580003
 FUN_080d8be0:
     push {r4,r5,r6,r7,lr}                    @ 080d8be0 f0b5
     .hword 0x4657    @ 080d8be2 5746
@@ -266477,7 +266479,7 @@ LAB_080d8c0e:
     adds r7,r0,#0x1    @ 080d8c14 471c
     b LAB_080d8c52                           @ 080d8c16 1ce0
 DAT_080d8c18:
-    .word  0x03005850                     @ 080d8c18 50580003
+    .word  pack_ui_state                  @ 080d8c18 50580003
 DAT_080d8c1c:
     .word  0x000006fc                     @ 080d8c1c fc060000
 LAB_080d8c20:
@@ -266561,7 +266563,7 @@ DAT_080d8cbc:
 DAT_080d8cc0:
     .word  0x000006f4                     @ 080d8cc0 f4060000
 DAT_080d8cc4:
-    .word  0x03005850                     @ 080d8cc4 50580003
+    .word  pack_ui_state                  @ 080d8cc4 50580003
 FUN_080d8cc8:
     push {r4,lr}                             @ 080d8cc8 10b5
     ldr r0, DAT_080d8cf4                     @ 080d8cca 0a48
@@ -266586,7 +266588,7 @@ LAB_080d8ce4:
     bx r1                                    @ 080d8cf0 0847
     .byte  0x00, 0x00
 DAT_080d8cf4:
-    .word  0x03005850                     @ 080d8cf4 50580003
+    .word  pack_ui_state                  @ 080d8cf4 50580003
 FUN_080d8cf8:
     push {r4,lr}                             @ 080d8cf8 10b5
     movs r4,#0x0    @ 080d8cfa 0024
@@ -266613,7 +266615,7 @@ LAB_080d8d1a:
 DAT_080d8d24:
     .word  0xffffefff                     @ 080d8d24 ffefffff
 DAT_080d8d28:
-    .word  0x03005850                     @ 080d8d28 50580003
+    .word  pack_ui_state                  @ 080d8d28 50580003
     ldr r0, DAT_080d8d44                     @ 080d8d2c 0548
     movs r1,#0x3    @ 080d8d2e 0321
     strh r1,[r0,#0xe]                        @ 080d8d30 c181
@@ -266627,7 +266629,7 @@ DAT_080d8d28:
     movs r0,#0x1    @ 080d8d40 0120
     bx lr                                    @ 080d8d42 7047
 DAT_080d8d44:
-    .word  0x03005850                     @ 080d8d44 50580003
+    .word  pack_ui_state                  @ 080d8d44 50580003
 DAT_080d8d48:
     .word  0x00000724                     @ 080d8d48 24070000
 FUN_080d8d4c:
@@ -266652,7 +266654,7 @@ LAB_080d8d70:
     movs r0,#0x0    @ 080d8d70 0020
     b LAB_080d8d7e                           @ 080d8d72 04e0
 DAT_080d8d74:
-    .word  0x03005850                     @ 080d8d74 50580003
+    .word  pack_ui_state                  @ 080d8d74 50580003
 DAT_080d8d78:
     .word  0x09e49480                     @ 080d8d78 8094e409
 LAB_080d8d7c:
@@ -266721,7 +266723,7 @@ LAB_080d8df0:
     bx lr                                    @ 080d8df0 7047
     .byte  0x00, 0x00
 DAT_080d8df4:
-    .word  0x03005850                     @ 080d8df4 50580003
+    .word  pack_ui_state                  @ 080d8df4 50580003
 FUN_080d8df8:
     push {r4,r5,lr}                          @ 080d8df8 30b5
     adds r4,r0,#0x0    @ 080d8dfa 041c
@@ -266807,7 +266809,7 @@ LAB_080d8e88:
     bx r0                                    @ 080d8e90 0047
     .byte  0x00, 0x00
 DAT_080d8e94:
-    .word  0x03005850                     @ 080d8e94 50580003
+    .word  pack_ui_state                  @ 080d8e94 50580003
 
 @ pack-banner: 逐 pack 初始化 (banner tile + name text + detail)
 pack_entry_init:
@@ -266855,7 +266857,7 @@ pack_entry_init:
     pop {r0}                                 @ 080d8ef4 01bc
     bx r0                                    @ 080d8ef6 0047
 DAT_080d8ef8:
-    .word  0x03005850                     @ 080d8ef8 50580003
+    .word  pack_ui_state                  @ 080d8ef8 50580003
 DAT_080d8efc:
     .word  0x02029eb7                     @ 080d8efc b79e0202
 DAT_080d8f00:
@@ -266940,7 +266942,7 @@ pack_detail_bg_tile_load:
     bl FUN_080dbbb0                          @ 080d8f96 02f00bfe
     b LAB_080d8fd6                           @ 080d8f9a 1ce0
 DAT_080d8f9c:
-    .word  0x03005850                     @ 080d8f9c 50580003
+    .word  pack_ui_state                  @ 080d8f9c 50580003
 DAT_080d8fa0:
     .word  0x0000ffff                     @ 080d8fa0 ffff0000
 DAT_080d8fa4:
@@ -266991,7 +266993,7 @@ FUN_080d8fec:
     lsrs r5,r0,#0x8    @ 080d8ffc 050a
     b LAB_080d9008                           @ 080d8ffe 03e0
 DAT_080d9000:
-    .word  0x03005850                     @ 080d9000 50580003
+    .word  pack_ui_state                  @ 080d9000 50580003
 LAB_080d9004:
     movs r5,#0x0    @ 080d9004 0025
     ldrh r0,[r4,#0x12]                       @ 080d9006 608a
@@ -267221,7 +267223,7 @@ LAB_080d91c6:
     pop {r0}                                 @ 080d91c8 01bc
     bx r0                                    @ 080d91ca 0047
 DAT_080d91cc:
-    .word  0x03005850                     @ 080d91cc 50580003
+    .word  pack_ui_state                  @ 080d91cc 50580003
 DAT_080d91d0:
     .word  0x06017ac0                     @ 080d91d0 c07a0106
 DAT_080d91d4:
@@ -267381,7 +267383,7 @@ LAB_080d92f0:
     b LAB_080d9328                           @ 080d930c 0ce0
     .byte  0x00, 0x00
 DAT_080d9310:
-    .word  0x03005850                     @ 080d9310 50580003
+    .word  pack_ui_state                  @ 080d9310 50580003
 LAB_080d9314:
     ldrh r2,[r4,#0x4]                        @ 080d9314 a288
     lsls r1,r2,#0x10    @ 080d9316 1104
@@ -267450,7 +267452,7 @@ LAB_080d9378:
     lsrs r7,r1,#0x10    @ 080d9390 0f0c
     b LAB_080d93aa                           @ 080d9392 0ae0
 DAT_080d9394:
-    .word  0x03005850                     @ 080d9394 50580003
+    .word  pack_ui_state                  @ 080d9394 50580003
 LAB_080d9398:
     ldrh r0,[r6,#0x22]                       @ 080d9398 708c
     subs r0,#0xf    @ 080d939a 0f38
@@ -267715,7 +267717,7 @@ LAB_080d953e:
     pop {r0}                                 @ 080d95a4 01bc
     bx r0                                    @ 080d95a6 0047
 DAT_080d95a8:
-    .word  0x03005850                     @ 080d95a8 50580003
+    .word  pack_ui_state                  @ 080d95a8 50580003
 DAT_080d95ac:
     .word  0x09e49508                     @ 080d95ac 0895e409
 DAT_080d95b0:
@@ -267797,7 +267799,7 @@ LAB_080d963c:
     pop {r0}                                 @ 080d9644 01bc
     bx r0                                    @ 080d9646 0047
 DAT_080d9648:
-    .word  0x03005850                     @ 080d9648 50580003
+    .word  pack_ui_state                  @ 080d9648 50580003
 DAT_080d964c:
     .word  0x000003d6                     @ 080d964c d6030000
 FUN_080d9650:
@@ -267866,7 +267868,7 @@ LAB_080d96b8:
     strh r0,[r5,#0x1e]                       @ 080d96cc e883
     b LAB_080d96e0                           @ 080d96ce 07e0
 DAT_080d96d0:
-    .word  0x03005850                     @ 080d96d0 50580003
+    .word  pack_ui_state                  @ 080d96d0 50580003
 DAT_080d96d4:
     .word  0x00000724                     @ 080d96d4 24070000
 LAB_080d96d8:
@@ -267928,7 +267930,7 @@ pack_list_page_init:
     b LAB_080d9758                           @ 080d9748 06e0
     .byte  0x00, 0x00
 DAT_080d974c:
-    .word  0x03005850                     @ 080d974c 50580003
+    .word  pack_ui_state                  @ 080d974c 50580003
 LAB_080d9750:
     adds r0,r4,#0x0    @ 080d9750 201c
     bl pack_entry_init                       @ 080d9752 fff7a1fb
@@ -268087,7 +268089,7 @@ DAT_080d9898:
 DAT_080d989c:
     .word  0x09ccd290                     @ 080d989c 90d2cc09
 DAT_080d98a0:
-    .word  0x03005850                     @ 080d98a0 50580003
+    .word  pack_ui_state                  @ 080d98a0 50580003
 FUN_080d98a4:
     push {r4,r5,r6,r7,lr}                    @ 080d98a4 f0b5
     .hword 0x464f    @ 080d98a6 4f46
@@ -268180,7 +268182,7 @@ LAB_080d993a:
     b LAB_080d99b6                           @ 080d9950 31e0
     .byte  0x00, 0x00
 DAT_080d9954:
-    .word  0x03005850                     @ 080d9954 50580003
+    .word  pack_ui_state                  @ 080d9954 50580003
 DAT_080d9958:
     .word  0x00000724                     @ 080d9958 24070000
 LAB_080d995c:
@@ -268356,7 +268358,7 @@ LAB_080d9aba:
     bx r1                                    @ 080d9ac0 0847
     .byte  0x00, 0x00
 DAT_080d9ac4:
-    .word  0x03005850                     @ 080d9ac4 50580003
+    .word  pack_ui_state                  @ 080d9ac4 50580003
 DAT_080d9ac8:
     .word  0x0600e426                     @ 080d9ac8 26e40006
 DAT_080d9acc:
@@ -268402,7 +268404,7 @@ LAB_080d9b12:
     movs r0,#0x0    @ 080d9b18 0020
     b LAB_080d9b22                           @ 080d9b1a 02e0
 DAT_080d9b1c:
-    .word  0x03005850                     @ 080d9b1c 50580003
+    .word  pack_ui_state                  @ 080d9b1c 50580003
 LAB_080d9b20:
     movs r0,#0x14    @ 080d9b20 1420
 LAB_080d9b22:
@@ -268539,7 +268541,7 @@ FUN_080d9c10:
     pop {r0}                                 @ 080d9c30 01bc
     bx r0                                    @ 080d9c32 0047
 DAT_080d9c34:
-    .word  0x03005850                     @ 080d9c34 50580003
+    .word  pack_ui_state                  @ 080d9c34 50580003
 FUN_080d9c38:
     push {r4,r5,r6,lr}                       @ 080d9c38 70b5
     ldr r4, DAT_080d9c90                     @ 080d9c3a 154c
@@ -268581,7 +268583,7 @@ FUN_080d9c38:
     movs r0,#0x5    @ 080d9c8c 0520
     b LAB_080d9f86                           @ 080d9c8e 7ae1
 DAT_080d9c90:
-    .word  0x03005850                     @ 080d9c90 50580003
+    .word  pack_ui_state                  @ 080d9c90 50580003
 PTR_gPrng_080d9c94:
     .word  gPrng                          @ 080d9c94 40000003
 DAT_080d9c98:
@@ -269067,7 +269069,7 @@ LAB_080da046:
     b LAB_080da08e                           @ 080da06c 0fe0
     .byte  0x00, 0x00
 DAT_080da070:
-    .word  0x03005850                     @ 080da070 50580003
+    .word  pack_ui_state                  @ 080da070 50580003
 DAT_080da074:
     .word  0x00000724                     @ 080da074 24070000
 DAT_080da078:
@@ -269216,7 +269218,7 @@ LAB_080da184:
     pop {r1}                                 @ 080da190 02bc
     bx r1                                    @ 080da192 0847
 DAT_080da194:
-    .word  0x03005850                     @ 080da194 50580003
+    .word  pack_ui_state                  @ 080da194 50580003
 FUN_080da198:
     push {r4,r5,r6,lr}                       @ 080da198 70b5
     ldr r0, DAT_080da1d4                     @ 080da19a 0e48
@@ -269247,7 +269249,7 @@ LAB_080da1c4:
     bx r1                                    @ 080da1d0 0847
     .byte  0x00, 0x00
 DAT_080da1d4:
-    .word  0x03005850                     @ 080da1d4 50580003
+    .word  pack_ui_state                  @ 080da1d4 50580003
 FUN_080da1d8:
     push {r4,r5,r6,r7,lr}                    @ 080da1d8 f0b5
     .hword 0x464f    @ 080da1da 4f46
@@ -269301,7 +269303,7 @@ LAB_080da222:
     b LAB_080da25a                           @ 080da23c 0de0
     .byte  0x00, 0x00
 DAT_080da240:
-    .word  0x03005850                     @ 080da240 50580003
+    .word  pack_ui_state                  @ 080da240 50580003
 DAT_080da244:
     .word  0x00000724                     @ 080da244 24070000
 DAT_080da248:
@@ -269469,7 +269471,7 @@ LAB_080da36a:
     pop {r1}                                 @ 080da380 02bc
     bx r1                                    @ 080da382 0847
 DAT_080da384:
-    .word  0x03005850                     @ 080da384 50580003
+    .word  pack_ui_state                  @ 080da384 50580003
 FUN_080da388:
     push {r4,r5,r6,lr}                       @ 080da388 70b5
     ldr r0, DAT_080da3a8                     @ 080da38a 0748
@@ -269487,7 +269489,7 @@ FUN_080da388:
     b LAB_080da3ba                           @ 080da3a4 09e0
     .byte  0x00, 0x00
 DAT_080da3a8:
-    .word  0x03005850                     @ 080da3a8 50580003
+    .word  pack_ui_state                  @ 080da3a8 50580003
 LAB_080da3ac:
     movs r0,#0x0    @ 080da3ac 0020
     bl FUN_080d4978                          @ 080da3ae faf7e3fa
@@ -269531,7 +269533,7 @@ LAB_080da3e6:
 DAT_080da408:
     .word  0x0000ffff                     @ 080da408 ffff0000
 DAT_080da40c:
-    .word  0x03005850                     @ 080da40c 50580003
+    .word  pack_ui_state                  @ 080da40c 50580003
 FUN_080da410:
     push {r4,lr}                             @ 080da410 10b5
     ldr r0, DAT_080da468                     @ 080da412 1548
@@ -269570,7 +269572,7 @@ LAB_080da442:
     bx r1                                    @ 080da464 0847
     .byte  0x00, 0x00
 DAT_080da468:
-    .word  0x03005850                     @ 080da468 50580003
+    .word  pack_ui_state                  @ 080da468 50580003
 FUN_080da46c:
     push {r4,r5,r6,r7,lr}                    @ 080da46c f0b5
     .hword 0x4647    @ 080da46e 4746
@@ -269609,7 +269611,7 @@ LAB_080da4a0:
     b LAB_080da4ca                           @ 080da4b0 0be0
     .byte  0x00, 0x00
 DAT_080da4b4:
-    .word  0x03005850                     @ 080da4b4 50580003
+    .word  pack_ui_state                  @ 080da4b4 50580003
 DAT_080da4b8:
     .word  0x00000724                     @ 080da4b8 24070000
 LAB_080da4bc:
@@ -269871,7 +269873,7 @@ PTR_BLDCNT_080da6ac:
 DAT_080da6b0:
     .word  0x00001010                     @ 080da6b0 10100000
 DAT_080da6b4:
-    .word  0x03005850                     @ 080da6b4 50580003
+    .word  pack_ui_state                  @ 080da6b4 50580003
 FUN_080da6b8:
     push {r4,r5,r6,r7,lr}                    @ 080da6b8 f0b5
     .hword 0x464f    @ 080da6ba 4f46
@@ -270005,7 +270007,7 @@ LAB_080da79c:
     b LAB_080da82e                           @ 080da7b4 3be0
     .byte  0x00, 0x00
 DAT_080da7b8:
-    .word  0x03005850                     @ 080da7b8 50580003
+    .word  pack_ui_state                  @ 080da7b8 50580003
 DAT_080da7bc:
     .word  0x00000724                     @ 080da7bc 24070000
 PTR_BG3CNT_080da7c0:
@@ -270187,7 +270189,7 @@ DAT_080da918:
 DAT_080da91c:
     .word  0x00001010                     @ 080da91c 10100000
 DAT_080da920:
-    .word  0x03005850                     @ 080da920 50580003
+    .word  pack_ui_state                  @ 080da920 50580003
 FUN_080da924:
     push {r4,lr}                             @ 080da924 10b5
     ldr r0, DAT_080da944                     @ 080da926 0748
@@ -270205,7 +270207,7 @@ FUN_080da924:
     movs r0,#0xd    @ 080da940 0d20
     b LAB_080da94a                           @ 080da942 02e0
 DAT_080da944:
-    .word  0x03005850                     @ 080da944 50580003
+    .word  pack_ui_state                  @ 080da944 50580003
 LAB_080da948:
     movs r0,#0xe    @ 080da948 0e20
 LAB_080da94a:
@@ -270270,7 +270272,7 @@ LAB_080da996:
     b LAB_080daaa4                           @ 080da9cc 6ae0
     .byte  0x00, 0x00
 DAT_080da9d0:
-    .word  0x03005850                     @ 080da9d0 50580003
+    .word  pack_ui_state                  @ 080da9d0 50580003
 PTR_gPrng_080da9d4:
     .word  gPrng                          @ 080da9d4 40000003
 DAT_080da9d8:
@@ -270486,7 +270488,7 @@ LAB_080dab56:
 PTR_gPrng_080dab84:
     .word  gPrng                          @ 080dab84 40000003
 DAT_080dab88:
-    .word  0x03005850                     @ 080dab88 50580003
+    .word  pack_ui_state                  @ 080dab88 50580003
 FUN_080dab8c:
     push {r4,lr}                             @ 080dab8c 10b5
     bl FUN_080d48c8                          @ 080dab8e f9f79bfe
@@ -270515,7 +270517,7 @@ LAB_080dabc2:
     bx r1                                    @ 080dabc8 0847
     .byte  0x00, 0x00
 DAT_080dabcc:
-    .word  0x03005850                     @ 080dabcc 50580003
+    .word  pack_ui_state                  @ 080dabcc 50580003
 FUN_080dabd0:
     push {r4,r5,lr}                          @ 080dabd0 30b5
     ldr r0, DAT_080dac20                     @ 080dabd2 1348
@@ -270552,7 +270554,7 @@ LAB_080dac00:
     pop {r1}                                 @ 080dac1c 02bc
     bx r1                                    @ 080dac1e 0847
 DAT_080dac20:
-    .word  0x03005850                     @ 080dac20 50580003
+    .word  pack_ui_state                  @ 080dac20 50580003
 FUN_080dac24:
     push {r4,r5,r6,r7,lr}                    @ 080dac24 f0b5
     .hword 0x4647    @ 080dac26 4746
@@ -270646,7 +270648,7 @@ LAB_080dacb4:
     strh r1,[r2,#0x0]                        @ 080dacd4 1180
     b LAB_080dad52                           @ 080dacd6 3ce0
 DAT_080dacd8:
-    .word  0x03005850                     @ 080dacd8 50580003
+    .word  pack_ui_state                  @ 080dacd8 50580003
 DAT_080dacdc:
     .word  0x00000724                     @ 080dacdc 24070000
 PTR_BG3CNT_080dace0:
@@ -270748,7 +270750,7 @@ PTR_BLDCNT_080dad9c:
 DAT_080dada0:
     .word  0x00001010                     @ 080dada0 10100000
 DAT_080dada4:
-    .word  0x03005850                     @ 080dada4 50580003
+    .word  pack_ui_state                  @ 080dada4 50580003
 FUN_080dada8:
     push {r4,lr}                             @ 080dada8 10b5
     ldr r0, PTR_gPrng_080dadf0               @ 080dadaa 1148
@@ -270784,7 +270786,7 @@ LAB_080dadca:
 PTR_gPrng_080dadf0:
     .word  gPrng                          @ 080dadf0 40000003
 DAT_080dadf4:
-    .word  0x03005850                     @ 080dadf4 50580003
+    .word  pack_ui_state                  @ 080dadf4 50580003
 FUN_080dadf8:
     push {r4,lr}                             @ 080dadf8 10b5
     ldr r0, DAT_080dae3c                     @ 080dadfa 1048
@@ -270823,7 +270825,7 @@ LAB_080dae32:
     bx r1                                    @ 080dae38 0847
     .byte  0x00, 0x00
 DAT_080dae3c:
-    .word  0x03005850                     @ 080dae3c 50580003
+    .word  pack_ui_state                  @ 080dae3c 50580003
 DAT_080dae40:
     .word  0x00000724                     @ 080dae40 24070000
 FUN_080dae44:
@@ -270848,7 +270850,7 @@ LAB_080dae68:
     movs r0,#0x0    @ 080dae68 0020
     b LAB_080dae76                           @ 080dae6a 04e0
 DAT_080dae6c:
-    .word  0x03005850                     @ 080dae6c 50580003
+    .word  pack_ui_state                  @ 080dae6c 50580003
 DAT_080dae70:
     .word  0x09e494a8                     @ 080dae70 a894e409
 LAB_080dae74:
@@ -270877,7 +270879,7 @@ LAB_080dae8a:
 switchD_080dae9a__switchD:
     .hword 0x4687    @ 080dae9a 8746
 DAT_080dae9c:
-    .word  0x03005850                     @ 080dae9c 50580003
+    .word  pack_ui_state                  @ 080dae9c 50580003
 DAT_080daea0:
     .word  0x080daea4                     @ 080daea0 a4ae0d08
 switchD_080dae9a__switchdataD_080daea4:
@@ -271530,7 +271532,7 @@ LAB_080db388:
     b LAB_080db3f8                           @ 080db3a0 2ae0
     .byte  0x00, 0x00
 DAT_080db3a4:
-    .word  0x03005850                     @ 080db3a4 50580003
+    .word  pack_ui_state                  @ 080db3a4 50580003
 DAT_080db3a8:
     .word  0x0000071c                     @ 080db3a8 1c070000
 DAT_080db3ac:
@@ -271632,7 +271634,7 @@ FUN_080db448:
     beq LAB_080db472                         @ 080db460 07d0
     b LAB_080db48e                           @ 080db462 14e0
 DAT_080db464:
-    .word  0x03005850                     @ 080db464 50580003
+    .word  pack_ui_state                  @ 080db464 50580003
 LAB_080db468:
     cmp r0,#0x2                              @ 080db468 0228
     beq LAB_080db484                         @ 080db46a 0bd0
@@ -271711,7 +271713,7 @@ LAB_080db4dc:
     bx lr                                    @ 080db4ec 7047
     .byte  0x00, 0x00
 DAT_080db4f0:
-    .word  0x03005850                     @ 080db4f0 50580003
+    .word  pack_ui_state                  @ 080db4f0 50580003
 FUN_080db4f4:
     push {r4,r5,r6,r7,lr}                    @ 080db4f4 f0b5
     sub sp,#0x10                             @ 080db4f6 84b0
@@ -271747,7 +271749,7 @@ LAB_080db512:
     orrs r0,r2    @ 080db530 1043
     b LAB_080db548                           @ 080db532 09e0
 DAT_080db534:
-    .word  0x03005850                     @ 080db534 50580003
+    .word  pack_ui_state                  @ 080db534 50580003
 DAT_080db538:
     .word  0x020363c0                     @ 080db538 c0630302
 DAT_080db53c:
@@ -271981,7 +271983,7 @@ FUN_080db6b8:
     pop {r0}                                 @ 080db6f4 01bc
     bx r0                                    @ 080db6f6 0047
 DAT_080db6f8:
-    .word  0x03005850                     @ 080db6f8 50580003
+    .word  pack_ui_state                  @ 080db6f8 50580003
 PTR_pack_info_table_080db6fc:
     .word  pack_info_table                @ 080db6fc e8e2e509
 FUN_080db700:
@@ -272018,7 +272020,7 @@ FUN_080db700:
     pop {r0}                                 @ 080db73c 01bc
     bx r0                                    @ 080db73e 0047
 DAT_080db740:
-    .word  0x03005850                     @ 080db740 50580003
+    .word  pack_ui_state                  @ 080db740 50580003
 PTR_pack_info_table_080db744:
     .word  pack_info_table                @ 080db744 e8e2e509
 FUN_080db748:
@@ -272083,7 +272085,7 @@ LAB_080db7b0:
     bx r0                                    @ 080db7b8 0047
     .byte  0x00, 0x00
 DAT_080db7bc:
-    .word  0x03005850                     @ 080db7bc 50580003
+    .word  pack_ui_state                  @ 080db7bc 50580003
 PTR_pack_info_table_080db7c0:
     .word  pack_info_table                @ 080db7c0 e8e2e509
 FUN_080db7c4:
@@ -272130,11 +272132,11 @@ FUN_080db7c4:
     adds r2,r2,r0    @ 080db816 1218
     adds r0,r4,#0x0    @ 080db818 201c
     movs r1,#0x0    @ 080db81a 0021
-    bl FUN_080dd53c                          @ 080db81c 01f08efe
+    bl text_overlay_create                   @ 080db81c 01f08efe
     movs r0,#0x0    @ 080db820 0020
     b LAB_080db84a                           @ 080db822 12e0
 DAT_080db824:
-    .word  0x03005850                     @ 080db824 50580003
+    .word  pack_ui_state                  @ 080db824 50580003
 PTR_pack_info_table_080db828:
     .word  pack_info_table                @ 080db828 e8e2e509
 DAT_080db82c:
@@ -273526,7 +273528,7 @@ FUN_080dc1f8:
     pop {r0}                                 @ 080dc2fc 01bc
     bx r0                                    @ 080dc2fe 0047
 DAT_080dc300:
-    .word  0x03005850                     @ 080dc300 50580003
+    .word  pack_ui_state                  @ 080dc300 50580003
 DAT_080dc304:
     .word  0x000013ef                     @ 080dc304 ef130000
 PTR_game_str_pointer_table_080dc308:
@@ -274039,7 +274041,7 @@ FUN_080dc6bc:
     b LAB_080dc730                           @ 080dc6f4 1ce0
     .byte  0x00, 0x00
 DAT_080dc6f8:
-    .word  0x03005850                     @ 080dc6f8 50580003
+    .word  pack_ui_state                  @ 080dc6f8 50580003
 DAT_080dc6fc:
     .word  0x000013f4                     @ 080dc6fc f4130000
 PTR_game_str_pointer_table_080dc700:
@@ -274113,7 +274115,7 @@ LAB_080dc75c:
 LAB_080dc786:
     ldr r0, DAT_080dc818                     @ 080dc786 2448
     movs r1,#0x0    @ 080dc788 0021
-    bl FUN_080dd53c                          @ 080dc78a 00f0d7fe
+    bl text_overlay_create                   @ 080dc78a 00f0d7fe
     cmp r7,#0x1                              @ 080dc78e 012f
     bne LAB_080dc7f8                         @ 080dc790 32d1
     ldr r0, DAT_080dc81c                     @ 080dc792 2248
@@ -274217,7 +274219,7 @@ FUN_080dc82c:
     adds r2,r2,r0    @ 080dc85c 1218
     ldr r0, DAT_080dc880                     @ 080dc85e 0848
     movs r1,#0x0    @ 080dc860 0021
-    bl FUN_080dd53c                          @ 080dc862 00f06bfe
+    bl text_overlay_create                   @ 080dc862 00f06bfe
     pop {r0}                                 @ 080dc866 01bc
     bx r0                                    @ 080dc868 0047
     .byte  0x00, 0x00
@@ -274253,7 +274255,7 @@ LAB_080dc8a4:
     movs r0,#0x0    @ 080dc8a4 0020
     b LAB_080dc8b2                           @ 080dc8a6 04e0
 DAT_080dc8a8:
-    .word  0x03005850                     @ 080dc8a8 50580003
+    .word  pack_ui_state                  @ 080dc8a8 50580003
 DAT_080dc8ac:
     .word  0x09e4951c                     @ 080dc8ac 1c95e409
 LAB_080dc8b0:
@@ -275816,7 +275818,9 @@ LAB_080dd530:
     .byte  0x00, 0x00
 DAT_080dd538:
     .word  0x05000200                     @ 080dd538 00020005
-FUN_080dd53c:
+
+@ 通用模态文本对话框/提示创建. 入参: r0 = (height<<16) | width, r1 = flags, r2 = char *text. 把 size split 写进内部 struct 的 [+0xa]/[+0xc], 再调 FUN_080dd070 计算并存 [+0xe]/[+0x10], 最后 FUN_080dcb54/FUN_080dced0 完成绘制. 被 13+ pack/save/dialog game_str 函数共用.
+text_overlay_create:
     push {r4,r5,r6,r7,lr}                    @ 080dd53c f0b5
     .hword 0x4647    @ 080dd53e 4746
     push {r7}                                @ 080dd540 80b4
@@ -276808,7 +276812,7 @@ DAT_080ddcb0:
 DAT_080ddcb4:
     .word  0x00000207                     @ 080ddcb4 07020000
 DAT_080ddcb8:
-    .word  0x03005850                     @ 080ddcb8 50580003
+    .word  pack_ui_state                  @ 080ddcb8 50580003
 LAB_080ddcbc:
     movs r0,#0x1    @ 080ddcbc 0120
 LAB_080ddcbe:
@@ -276847,7 +276851,7 @@ FUN_080ddcc4:
     bx r1                                    @ 080ddd04 0847
     .byte  0x00, 0x00
 DAT_080ddd08:
-    .word  0x03005850                     @ 080ddd08 50580003
+    .word  pack_ui_state                  @ 080ddd08 50580003
 DAT_080ddd0c:
     .word  0x02035fb0                     @ 080ddd0c b05f0302
 DAT_080ddd10:
@@ -276871,7 +276875,7 @@ FUN_080ddd1c:
     pop {r1}                                 @ 080ddd34 02bc
     bx r1                                    @ 080ddd36 0847
 DAT_080ddd38:
-    .word  0x03005850                     @ 080ddd38 50580003
+    .word  pack_ui_state                  @ 080ddd38 50580003
 FUN_080ddd3c:
     push {r4,lr}                             @ 080ddd3c 10b5
     ldr r4, DAT_080ddd58                     @ 080ddd3e 064c
@@ -276887,7 +276891,7 @@ FUN_080ddd3c:
     bx r1                                    @ 080ddd54 0847
     .byte  0x00, 0x00
 DAT_080ddd58:
-    .word  0x03005850                     @ 080ddd58 50580003
+    .word  pack_ui_state                  @ 080ddd58 50580003
 FUN_080ddd5c:
     push {r4,lr}                             @ 080ddd5c 10b5
     ldr r4, DAT_080ddd8c                     @ 080ddd5e 0b4c
@@ -276913,7 +276917,7 @@ FUN_080ddd5c:
     b LAB_080ddd9a                           @ 080ddd88 07e0
     .byte  0x00, 0x00
 DAT_080ddd8c:
-    .word  0x03005850                     @ 080ddd8c 50580003
+    .word  pack_ui_state                  @ 080ddd8c 50580003
 DAT_080ddd90:
     .word  0x09e495a8                     @ 080ddd90 a895e409
 LAB_080ddd94:
@@ -276955,7 +276959,7 @@ FUN_080dddf0:
     bx r1                                    @ 080dde14 0847
     .byte  0x00, 0x00
 DAT_080dde18:
-    .word  0x03005850                     @ 080dde18 50580003
+    .word  pack_ui_state                  @ 080dde18 50580003
 FUN_080dde1c:
     push {r4,lr}                             @ 080dde1c 10b5
     bl FUN_080f5a98                          @ 080dde1e 17f03bfe
@@ -277098,7 +277102,7 @@ LAB_080ddf2e:
     b LAB_080ddf3e                           @ 080ddf30 05e0
     .byte  0x00, 0x00
 DAT_080ddf34:
-    .word  0x03005850                     @ 080ddf34 50580003
+    .word  pack_ui_state                  @ 080ddf34 50580003
 PTR_gPrng_080ddf38:
     .word  gPrng                          @ 080ddf38 40000003
 LAB_080ddf3c:
@@ -277175,7 +277179,7 @@ FUN_080ddfa0:
     beq LAB_080ddfc8                         @ 080ddfbc 04d0
     b LAB_080ddfd0                           @ 080ddfbe 07e0
 DAT_080ddfc0:
-    .word  0x03005850                     @ 080ddfc0 50580003
+    .word  pack_ui_state                  @ 080ddfc0 50580003
 LAB_080ddfc4:
     strh r3,[r1,#0x6]                        @ 080ddfc4 cb80
     b LAB_080ddfd0                           @ 080ddfc6 03e0
@@ -277213,7 +277217,7 @@ LAB_080ddff8:
 DAT_080ddffc:
     .word  0x09e495d8                     @ 080ddffc d895e409
 DAT_080de000:
-    .word  0x03005850                     @ 080de000 50580003
+    .word  pack_ui_state                  @ 080de000 50580003
 LAB_080de004:
     movs r0,#0x1    @ 080de004 0120
 LAB_080de006:
@@ -277457,7 +277461,7 @@ LAB_080de1be:
     pop {r0}                                 @ 080de1c0 01bc
     bx r0                                    @ 080de1c2 0047
 DAT_080de1c4:
-    .word  0x03005850                     @ 080de1c4 50580003
+    .word  pack_ui_state                  @ 080de1c4 50580003
 FUN_080de1c8:
     push {r4,lr}                             @ 080de1c8 10b5
     ldr r3, DAT_080de224                     @ 080de1ca 164b
@@ -277507,7 +277511,7 @@ LAB_080de21a:
     bx r1                                    @ 080de220 0847
     .byte  0x00, 0x00
 DAT_080de224:
-    .word  0x03005850                     @ 080de224 50580003
+    .word  pack_ui_state                  @ 080de224 50580003
 PTR_gPrng_080de228:
     .word  gPrng                          @ 080de228 40000003
 FUN_080de22c:
@@ -277548,7 +277552,7 @@ FUN_080de22c:
     bx r0                                    @ 080de274 0047
     .byte  0x00, 0x00
 DAT_080de278:
-    .word  0x03005850                     @ 080de278 50580003
+    .word  pack_ui_state                  @ 080de278 50580003
 FUN_080de27c:
     push {lr}                                @ 080de27c 00b5
     ldr r0, DAT_080de2a4                     @ 080de27e 0948
@@ -277702,7 +277706,7 @@ LAB_080de396:
     bx r1                                    @ 080de3b4 0847
     .byte  0x00, 0x00
 DAT_080de3b8:
-    .word  0x03005850                     @ 080de3b8 50580003
+    .word  pack_ui_state                  @ 080de3b8 50580003
 DAT_080de3bc:
     .word  0x02000000                     @ 080de3bc 00000002
 DAT_080de3c0:
@@ -278891,7 +278895,7 @@ LAB_080df650:
     bx r0                                    @ 080df65c 0047
     .byte  0x00, 0x00
 DAT_080df660:
-    .word  0x03005850                     @ 080df660 50580003
+    .word  pack_ui_state                  @ 080df660 50580003
 FUN_080df664:
     push {r4,r5,r6,lr}                       @ 080df664 70b5
     adds r6,r0,#0x0    @ 080df666 061c
@@ -278956,7 +278960,7 @@ LAB_080df6de:
     pop {r0}                                 @ 080df6e0 01bc
     bx r0                                    @ 080df6e2 0047
 DAT_080df6e4:
-    .word  0x03005850                     @ 080df6e4 50580003
+    .word  pack_ui_state                  @ 080df6e4 50580003
 FUN_080df6e8:
     push {r4,r5,r6,r7,lr}                    @ 080df6e8 f0b5
     .hword 0x4647    @ 080df6ea 4746
@@ -279008,7 +279012,7 @@ LAB_080df6fa:
     b LAB_080df77c                           @ 080df748 18e0
     .byte  0x00, 0x00
 DAT_080df74c:
-    .word  0x03005850                     @ 080df74c 50580003
+    .word  pack_ui_state                  @ 080df74c 50580003
 LAB_080df750:
     subs r4,r4,r1    @ 080df750 641a
     adds r0,r4,#0x1    @ 080df752 601c
@@ -279112,7 +279116,7 @@ LAB_080df804:
     b LAB_080df87a                           @ 080df814 31e0
     .byte  0x00, 0x00
 DAT_080df818:
-    .word  0x03005850                     @ 080df818 50580003
+    .word  pack_ui_state                  @ 080df818 50580003
 DAT_080df81c:
     .word  0x0000209d                     @ 080df81c 9d200000
 LAB_080df820:
@@ -279217,7 +279221,7 @@ LAB_080df8de:
     b LAB_080df900                           @ 080df8e8 0ae0
     .byte  0x00, 0x00
 DAT_080df8ec:
-    .word  0x03005850                     @ 080df8ec 50580003
+    .word  pack_ui_state                  @ 080df8ec 50580003
 DAT_080df8f0:
     .word  0x09cebf30                     @ 080df8f0 30bfce09
 DAT_080df8f4:
@@ -279417,7 +279421,7 @@ FUN_080dfa44:
     adds r0,r0,r4    @ 080dfa78 0019
     b LAB_080dfa84                           @ 080dfa7a 03e0
 DAT_080dfa7c:
-    .word  0x03005850                     @ 080dfa7c 50580003
+    .word  pack_ui_state                  @ 080dfa7c 50580003
 LAB_080dfa80:
     lsls r0,r5,#0x10    @ 080dfa80 2804
     lsrs r0,r0,#0x10    @ 080dfa82 000c
@@ -279616,7 +279620,7 @@ LAB_080dfb84:
     pop {r1}                                 @ 080dfc0c 02bc
     bx r1                                    @ 080dfc0e 0847
 DAT_080dfc10:
-    .word  0x03005850                     @ 080dfc10 50580003
+    .word  pack_ui_state                  @ 080dfc10 50580003
 DAT_080dfc14:
     .word  0x0200af20                     @ 080dfc14 20af0002
 FUN_080dfc18:
@@ -279729,7 +279733,7 @@ FUN_080dfcb0:
     .hword 0x46b2    @ 080dfd08 b246
     b LAB_080dffb2                           @ 080dfd0a 52e1
 DAT_080dfd0c:
-    .word  0x03005850                     @ 080dfd0c 50580003
+    .word  pack_ui_state                  @ 080dfd0c 50580003
 PTR_gPrng_080dfd10:
     .word  gPrng                          @ 080dfd10 40000003
 LAB_080dfd14:
@@ -279863,7 +279867,7 @@ LAB_080dfdae:
     bl FUN_080f9ab4                          @ 080dfe1e 19f049fe
     b LAB_080dfe52                           @ 080dfe22 16e0
 DAT_080dfe24:
-    .word  0x03005850                     @ 080dfe24 50580003
+    .word  pack_ui_state                  @ 080dfe24 50580003
 LAB_080dfe28:
     ldr r0, DAT_080dfe70                     @ 080dfe28 1148
     cmp r1,r0                                @ 080dfe2a 8142
@@ -279905,7 +279909,7 @@ LAB_080dfe5c:
 DAT_080dfe70:
     .word  0x00010005                     @ 080dfe70 05000100
 DAT_080dfe74:
-    .word  0x03005850                     @ 080dfe74 50580003
+    .word  pack_ui_state                  @ 080dfe74 50580003
 LAB_080dfe78:
     movs r0,#0xf0    @ 080dfe78 f020
     ands r0,r2    @ 080dfe7a 1040
@@ -280020,7 +280024,7 @@ LAB_080dff4e:
     .hword 0x4682    @ 080dff50 8246
     b LAB_080dffb2                           @ 080dff52 2ee0
 DAT_080dff54:
-    .word  0x03005850                     @ 080dff54 50580003
+    .word  pack_ui_state                  @ 080dff54 50580003
 LAB_080dff58:
     movs r0,#0x0    @ 080dff58 0020
     .hword 0x4641    @ 080dff5a 4146
@@ -280144,7 +280148,7 @@ LAB_080e0022:
     b LAB_080e0068                           @ 080e004c 0ce0
     .byte  0x00, 0x00
 DAT_080e0050:
-    .word  0x03005850                     @ 080e0050 50580003
+    .word  pack_ui_state                  @ 080e0050 50580003
 PTR_gPrng_080e0054:
     .word  gPrng                          @ 080e0054 40000003
 LAB_080e0058:
@@ -280187,7 +280191,7 @@ LAB_080e0088:
     pop {r1}                                 @ 080e00a4 02bc
     bx r1                                    @ 080e00a6 0847
 DAT_080e00a8:
-    .word  0x03005850                     @ 080e00a8 50580003
+    .word  pack_ui_state                  @ 080e00a8 50580003
 FUN_080e00ac:
     push {r4,r5,r6,lr}                       @ 080e00ac 70b5
     ldr r4, DAT_080e0100                     @ 080e00ae 144c
@@ -280231,7 +280235,7 @@ FUN_080e00ac:
     movs r0,#0x3    @ 080e00fc 0320
     b LAB_080e010e                           @ 080e00fe 06e0
 DAT_080e0100:
-    .word  0x03005850                     @ 080e0100 50580003
+    .word  pack_ui_state                  @ 080e0100 50580003
 LAB_080e0104:
     movs r0,#0x5    @ 080e0104 0520
     movs r1,#0x1    @ 080e0106 0121
@@ -280285,7 +280289,7 @@ LAB_080e0146:
     strh r0,[r1,#0x10]                       @ 080e0168 0882
     b LAB_080e0172                           @ 080e016a 02e0
 DAT_080e016c:
-    .word  0x03005850                     @ 080e016c 50580003
+    .word  pack_ui_state                  @ 080e016c 50580003
 LAB_080e0170:
     movs r4,#0x0    @ 080e0170 0024
 LAB_080e0172:
@@ -280341,7 +280345,7 @@ LAB_080e01c4:
     pop {r1}                                 @ 080e01e0 02bc
     bx r1                                    @ 080e01e2 0847
 DAT_080e01e4:
-    .word  0x03005850                     @ 080e01e4 50580003
+    .word  pack_ui_state                  @ 080e01e4 50580003
 FUN_080e01e8:
     push {r4,r5,lr}                          @ 080e01e8 30b5
     ldr r1, DAT_080e0214                     @ 080e01ea 0a49
@@ -280366,7 +280370,7 @@ FUN_080e01e8:
     b LAB_080e0230                           @ 080e0210 0ee0
     .byte  0x00, 0x00
 DAT_080e0214:
-    .word  0x03005850                     @ 080e0214 50580003
+    .word  pack_ui_state                  @ 080e0214 50580003
 LAB_080e0218:
     movs r0,#0x1    @ 080e0218 0120
     bl FUN_080dfa44                          @ 080e021a fff713fc
@@ -280456,7 +280460,7 @@ LAB_080e028a:
     bx r1                                    @ 080e02c0 0847
     .byte  0x00, 0x00
 DAT_080e02c4:
-    .word  0x03005850                     @ 080e02c4 50580003
+    .word  pack_ui_state                  @ 080e02c4 50580003
 FUN_080e02c8:
     push {r4,r5,r6,r7,lr}                    @ 080e02c8 f0b5
     .hword 0x4657    @ 080e02ca 5746
@@ -280501,7 +280505,7 @@ LAB_080e030c:
     b LAB_080e0368                           @ 080e0314 28e0
     .byte  0x00, 0x00
 DAT_080e0318:
-    .word  0x03005850                     @ 080e0318 50580003
+    .word  pack_ui_state                  @ 080e0318 50580003
 DAT_080e031c:
     .word  0x095b7cca                     @ 080e031c ca7c5b09
 LAB_080e0320:
@@ -280634,7 +280638,7 @@ LAB_080e03f0:
     movs r0,#0xb    @ 080e040c 0b20
     b LAB_080e042c                           @ 080e040e 0de0
 DAT_080e0410:
-    .word  0x03005850                     @ 080e0410 50580003
+    .word  pack_ui_state                  @ 080e0410 50580003
 LAB_080e0414:
     ldr r0, DAT_080e0420                     @ 080e0414 0248
     ldrh r0,[r0,#0x0]                        @ 080e0416 0088
@@ -280664,7 +280668,7 @@ LAB_080e0432:
     bx r1                                    @ 080e0440 0847
     .byte  0x00, 0x00
 DAT_080e0444:
-    .word  0x03005850                     @ 080e0444 50580003
+    .word  pack_ui_state                  @ 080e0444 50580003
 FUN_080e0448:
     push {r4,r5,lr}                          @ 080e0448 30b5
     ldr r4, DAT_080e047c                     @ 080e044a 0c4c
@@ -280692,7 +280696,7 @@ FUN_080e0448:
     movs r5,#0x1    @ 080e0478 0125
     b LAB_080e0492                           @ 080e047a 0ae0
 DAT_080e047c:
-    .word  0x03005850                     @ 080e047c 50580003
+    .word  pack_ui_state                  @ 080e047c 50580003
 LAB_080e0480:
     ldrh r0,[r1,#0x0]                        @ 080e0480 0888
     movs r1,#0xc    @ 080e0482 0c21
@@ -280732,7 +280736,7 @@ FUN_080e049c:
     adds r2,r2,r0    @ 080e04c8 1218
     ldr r0, DAT_080e050c                     @ 080e04ca 1048
     movs r1,#0x0    @ 080e04cc 0021
-    bl FUN_080dd53c                          @ 080e04ce fdf735f8
+    bl text_overlay_create                   @ 080e04ce fdf735f8
     movs r0,#0xa0    @ 080e04d2 a020
     lsls r0,r0,#0x1    @ 080e04d4 4000
     adds r1,r4,r0    @ 080e04d6 2118
@@ -280750,7 +280754,7 @@ FUN_080e049c:
     pop {r1}                                 @ 080e04f0 02bc
     bx r1                                    @ 080e04f2 0847
 DAT_080e04f4:
-    .word  0x03005850                     @ 080e04f4 50580003
+    .word  pack_ui_state                  @ 080e04f4 50580003
 DAT_080e04f8:
     .word  0x0000138a                     @ 080e04f8 8a130000
 PTR_game_str_pointer_table_080e04fc:
@@ -280784,7 +280788,7 @@ LAB_080e052e:
     b LAB_080e0568                           @ 080e0530 1ae0
     .byte  0x00, 0x00
 DAT_080e0534:
-    .word  0x03005850                     @ 080e0534 50580003
+    .word  pack_ui_state                  @ 080e0534 50580003
 PTR_gPrng_080e0538:
     .word  gPrng                          @ 080e0538 40000003
 LAB_080e053c:
@@ -280888,7 +280892,7 @@ LAB_080e05f2:
     pop {r1}                                 @ 080e05fc 02bc
     bx r1                                    @ 080e05fe 0847
 DAT_080e0600:
-    .word  0x03005850                     @ 080e0600 50580003
+    .word  pack_ui_state                  @ 080e0600 50580003
 FUN_080e0604:
     push {r4,r5,lr}                          @ 080e0604 30b5
     ldr r4, DAT_080e0638                     @ 080e0606 0c4c
@@ -280916,7 +280920,7 @@ LAB_080e062a:
     pop {r1}                                 @ 080e0634 02bc
     bx r1                                    @ 080e0636 0847
 DAT_080e0638:
-    .word  0x03005850                     @ 080e0638 50580003
+    .word  pack_ui_state                  @ 080e0638 50580003
 FUN_080e063c:
     push {r4,r5,r6,r7,lr}                    @ 080e063c f0b5
     .hword 0x4647    @ 080e063e 4746
@@ -280991,7 +280995,7 @@ LAB_080e06c2:
     bx r1                                    @ 080e06cc 0847
     .byte  0x00, 0x00
 DAT_080e06d0:
-    .word  0x03005850                     @ 080e06d0 50580003
+    .word  pack_ui_state                  @ 080e06d0 50580003
 PTR_BG2X_080e06d4:
     .word  BG2X                           @ 080e06d4 28000004
 FUN_080e06d8:
@@ -281040,7 +281044,7 @@ LAB_080e072c:
     movs r0,#0x12    @ 080e072c 1220
     b LAB_080e0742                           @ 080e072e 08e0
 DAT_080e0730:
-    .word  0x03005850                     @ 080e0730 50580003
+    .word  pack_ui_state                  @ 080e0730 50580003
 PTR_BLDCNT_080e0734:
     .word  BLDCNT                         @ 080e0734 50000004
 DAT_080e0738:
@@ -281113,7 +281117,7 @@ FUN_080e0758:
     b LAB_080e0816                           @ 080e07bc 2be0
     .byte  0x00, 0x00
 DAT_080e07c0:
-    .word  0x03005850                     @ 080e07c0 50580003
+    .word  pack_ui_state                  @ 080e07c0 50580003
 DAT_080e07c4:
     .word  0x0000138a                     @ 080e07c4 8a130000
 PTR_game_str_pointer_table_080e07c8:
@@ -281157,7 +281161,7 @@ LAB_080e07dc:
 LAB_080e0816:
     ldr r0, DAT_080e0850                     @ 080e0816 0e48
     movs r1,#0x0    @ 080e0818 0021
-    bl FUN_080dd53c                          @ 080e081a fcf78ffe
+    bl text_overlay_create                   @ 080e081a fcf78ffe
     movs r2,#0x9a    @ 080e081e 9a22
     lsls r2,r2,#0x1    @ 080e0820 5200
     adds r1,r7,r2    @ 080e0822 b918
@@ -281185,7 +281189,7 @@ DAT_080e084c:
 DAT_080e0850:
     .word  0x0014001e                     @ 080e0850 1e001400
 DAT_080e0854:
-    .word  0x03005850                     @ 080e0854 50580003
+    .word  pack_ui_state                  @ 080e0854 50580003
 FUN_080e0858:
     push {r4,lr}                             @ 080e0858 10b5
     ldr r2, DAT_080e089c                     @ 080e085a 104a
@@ -281221,7 +281225,7 @@ LAB_080e0886:
     bx r1                                    @ 080e0898 0847
     .byte  0x00, 0x00
 DAT_080e089c:
-    .word  0x03005850                     @ 080e089c 50580003
+    .word  pack_ui_state                  @ 080e089c 50580003
 PTR_gPrng_080e08a0:
     .word  gPrng                          @ 080e08a0 40000003
 FUN_080e08a4:
@@ -281260,7 +281264,7 @@ FUN_080e08a4:
     ldr r0, DAT_080e0934                     @ 080e08e8 1248
     movs r1,#0x0    @ 080e08ea 0021
     adds r2,r4,#0x0    @ 080e08ec 221c
-    bl FUN_080dd53c                          @ 080e08ee fcf725fe
+    bl text_overlay_create                   @ 080e08ee fcf725fe
     movs r0,#0xa0    @ 080e08f2 a020
     lsls r0,r0,#0x1    @ 080e08f4 4000
     adds r1,r6,r0    @ 080e08f6 3118
@@ -281280,7 +281284,7 @@ FUN_080e08a4:
     bx r1                                    @ 080e0914 0847
     .byte  0x00, 0x00
 DAT_080e0918:
-    .word  0x03005850                     @ 080e0918 50580003
+    .word  pack_ui_state                  @ 080e0918 50580003
 DAT_080e091c:
     .word  0x0000138c                     @ 080e091c 8c130000
 PTR_game_str_pointer_table_080e0920:
@@ -281326,7 +281330,7 @@ LAB_080e0960:
     pop {r1}                                 @ 080e0970 02bc
     bx r1                                    @ 080e0972 0847
 DAT_080e0974:
-    .word  0x03005850                     @ 080e0974 50580003
+    .word  pack_ui_state                  @ 080e0974 50580003
 PTR_gPrng_080e0978:
     .word  gPrng                          @ 080e0978 40000003
 FUN_080e097c:
@@ -281360,7 +281364,7 @@ FUN_080e097c:
     movs r0,#0x19    @ 080e09b4 1920
     b LAB_080e0a34                           @ 080e09b6 3de0
 DAT_080e09b8:
-    .word  0x03005850                     @ 080e09b8 50580003
+    .word  pack_ui_state                  @ 080e09b8 50580003
 PTR_gPrng_080e09bc:
     .word  gPrng                          @ 080e09bc 40000003
 LAB_080e09c0:
@@ -281489,7 +281493,7 @@ LAB_080e0a98:
 PTR_gPrng_080e0ab4:
     .word  gPrng                          @ 080e0ab4 40000003
 DAT_080e0ab8:
-    .word  0x03005850                     @ 080e0ab8 50580003
+    .word  pack_ui_state                  @ 080e0ab8 50580003
 LAB_080e0abc:
     movs r0,#0x0    @ 080e0abc 0020
     strh r0,[r5,#0x4]                        @ 080e0abe a880
@@ -281544,7 +281548,7 @@ LAB_080e0b0c:
     pop {r1}                                 @ 080e0b34 02bc
     bx r1                                    @ 080e0b36 0847
 DAT_080e0b38:
-    .word  0x03005850                     @ 080e0b38 50580003
+    .word  pack_ui_state                  @ 080e0b38 50580003
 FUN_080e0b3c:
     push {r4,r5,r6,lr}                       @ 080e0b3c 70b5
     sub sp,#0x4                              @ 080e0b3e 81b0
@@ -281564,7 +281568,7 @@ switchD_080e0b58__switchD:
     .hword 0x4687    @ 080e0b58 8746
     .byte  0x00, 0x00
 DAT_080e0b5c:
-    .word  0x03005850                     @ 080e0b5c 50580003
+    .word  pack_ui_state                  @ 080e0b5c 50580003
 DAT_080e0b60:
     .word  0x080e0b64                     @ 080e0b60 640b0e08
 switchD_080e0b58__switchdataD_080e0b64:
@@ -281683,7 +281687,7 @@ LAB_080e0c44:
 DAT_080e0c50:
     .word  0x00001701                     @ 080e0c50 01170000
 DAT_080e0c54:
-    .word  0x03005850                     @ 080e0c54 50580003
+    .word  pack_ui_state                  @ 080e0c54 50580003
 FUN_080e0c58:
     push {r4,r5,r6,lr}                       @ 080e0c58 70b5
     ldr r5, DAT_080e0d24                     @ 080e0c5a 324d
@@ -281786,7 +281790,7 @@ LAB_080e0d14:
     bx r1                                    @ 080e0d20 0847
     .byte  0x00, 0x00
 DAT_080e0d24:
-    .word  0x03005850                     @ 080e0d24 50580003
+    .word  pack_ui_state                  @ 080e0d24 50580003
 PTR_BG2X_080e0d28:
     .word  BG2X                           @ 080e0d28 28000004
 PTR_BLDCNT_080e0d2c:
@@ -281956,7 +281960,7 @@ LAB_080e0dd4:
     ldr r0, DAT_080e0f04                     @ 080e0e80 2048
     movs r1,#0x0    @ 080e0e82 0021
     adds r2,r5,#0x0    @ 080e0e84 2a1c
-    bl FUN_080dd53c                          @ 080e0e86 fcf759fb
+    bl text_overlay_create                   @ 080e0e86 fcf759fb
     movs r0,#0x1b    @ 080e0e8a 1b20
     strh r0,[r6,#0x4]                        @ 080e0e8c b080
     movs r7,#0x1    @ 080e0e8e 0127
@@ -281992,7 +281996,7 @@ LAB_080e0eb6:
     pop {r1}                                 @ 080e0ec8 02bc
     bx r1                                    @ 080e0eca 0847
 DAT_080e0ecc:
-    .word  0x03005850                     @ 080e0ecc 50580003
+    .word  pack_ui_state                  @ 080e0ecc 50580003
 PTR_BG2X_080e0ed0:
     .word  BG2X                           @ 080e0ed0 28000004
 PTR_BLDCNT_080e0ed4:
@@ -282102,7 +282106,7 @@ LAB_080e0f92:
     pop {r1}                                 @ 080e0f9c 02bc
     bx r1                                    @ 080e0f9e 0847
 DAT_080e0fa0:
-    .word  0x03005850                     @ 080e0fa0 50580003
+    .word  pack_ui_state                  @ 080e0fa0 50580003
 PTR_gPrng_080e0fa4:
     .word  gPrng                          @ 080e0fa4 40000003
     ldr r1, DAT_080e0fb4                     @ 080e0fa8 0249
@@ -282112,7 +282116,7 @@ PTR_gPrng_080e0fa4:
     bx lr                                    @ 080e0fb0 7047
     .byte  0x00, 0x00
 DAT_080e0fb4:
-    .word  0x03005850                     @ 080e0fb4 50580003
+    .word  pack_ui_state                  @ 080e0fb4 50580003
 FUN_080e0fb8:
     push {r4,lr}                             @ 080e0fb8 10b5
     ldr r4, DAT_080e0fdc                     @ 080e0fba 084c
@@ -282133,7 +282137,7 @@ LAB_080e0fd8:
     movs r0,#0x0    @ 080e0fd8 0020
     b LAB_080e0fe6                           @ 080e0fda 04e0
 DAT_080e0fdc:
-    .word  0x03005850                     @ 080e0fdc 50580003
+    .word  pack_ui_state                  @ 080e0fdc 50580003
 DAT_080e0fe0:
     .word  0x09e495f4                     @ 080e0fe0 f495e409
 LAB_080e0fe4:
@@ -326739,7 +326743,7 @@ DAT_080fb2dc:
 DAT_080fb2e0:
     .word  0x02029eb0                     @ 080fb2e0 b09e0202
 DAT_080fb2e4:
-    .word  0x03005850                     @ 080fb2e4 50580003
+    .word  pack_ui_state                  @ 080fb2e4 50580003
 DAT_080fb2e8:
     .word  0x06010000                     @ 080fb2e8 00000106
 DAT_080fb2ec:

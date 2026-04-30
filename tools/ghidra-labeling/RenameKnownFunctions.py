@@ -166,6 +166,16 @@ RENAMES = [
         "查 game_str_id_remap_table @ 0x08000250 (1651 * u16 sorted, count @ 0x08000240); "
         "返回 master_row [0..1650], 找不到返回 0. caller 用结果索引 game_str_pointer_table "
         "@ 0x08000F40 取 (lang offset, base) 拿到字符串地址."),
+
+    # --- pack UI dialog (2026-04-30) ---
+    ("FUN_080d6290", "pack_ui_show_all_opened_done",
+        "Pack shop 'Open all' 完成时的终态处理. 通过 game_str_id_to_row(0x13f7) 取 row 1086 = "
+        "'Opened all packs.', 调 text_overlay_create 弹模态对话框 (h=10, w=30), 然后切 "
+        "pack_ui_state[+0x10]=8 把 pack 状态机推到完成态. 返回 1."),
+    ("FUN_080dd53c", "text_overlay_create",
+        "通用模态文本对话框/提示创建. 入参: r0 = (height<<16) | width, r1 = flags, r2 = char *text. "
+        "把 size split 写进内部 struct 的 [+0xa]/[+0xc], 再调 FUN_080dd070 计算并存 [+0xe]/[+0x10], "
+        "最后 FUN_080dcb54/FUN_080dced0 完成绘制. 被 13+ pack/save/dialog game_str 函数共用."),
 ]
 
 

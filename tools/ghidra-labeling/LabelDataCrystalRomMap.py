@@ -234,6 +234,7 @@ LABELS = [
     # IWRAM
     (0x03000040, "gPrng"),
     (0x03000240, "gFrameCounter"),
+    (0x03005850, "pack_ui_state"),  # pack scene 状态结构 (IWRAM); offset 0x10 = u16 state field
 ]
 
 

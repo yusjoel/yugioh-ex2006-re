@@ -6,7 +6,7 @@
 
 ---
 
-## 一、完整端到端工作流（14 阶段，4 大 Phase）
+## 一、完整端到端工作流（17 阶段，4 大 Phase）
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -24,13 +24,16 @@
 │  ⑨ 构建 + byte-identical 验证                               │
 ├─────────────────────────────────────────────────────────────┤
 │  Phase 3: 反向标注                                          │
-│  ⑩ Ghidra 函数重命名 (RenameKnownFunctions.py)              │
-│  ⑪ Ghidra 数据 label (LabelPackBanners.py)                  │
-│  ⑫ 重导出 asm/all.s + 构建验证                              │
+│  ⑩ 备份 .rep                                                 │
+│  ⑪ Ghidra 函数重命名 (RenameKnownFunctions.py)              │
+│  ⑫ Ghidra 数据 label (LabelDataCrystalRomMap.py)            │
+│  ⑬ 重导出 asm/all.s + 构建验证 (含字面量池三连击)            │
+│  ⑭ Ghidra → CSV 函数名同步 (sync_ghidra_names_to_proposals) │
+│  ⑮ (可选) ExportComments 注释纳入 git                        │
 ├─────────────────────────────────────────────────────────────┤
 │  Phase 4: 文档                                              │
-│  ⑬ 分析报告 (doc/analysis/*.md 或 doc/dev/data-structure/)  │
-│  ⑭ 方法论更新 (asset-location.md 视情况)                    │
+│  ⑯ 分析报告 (doc/analysis/*.md 或 doc/dev/data-structure/)  │
+│  ⑰ 方法论更新 (asset-location.md 视情况)                    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -154,7 +157,20 @@ sha1sum roms/2343.gba output/2343.gba       # 必须一致
 
 详细底层流水线（ExportRangeToGas 输出格式 / inject_modes 规则 / 已知问题）见本文 §二。
 
-#### ⑭ 注释备份导出（可选，每次深入分析后做）
+#### ⑭ 同步 Ghidra 函数名回 CSV（rename 后必跑）
+
+```bash
+# 1. 重导 Ghidra inventory 拿最新函数名
+tools/asm-regen/ghidra-run-script.bat ExportFunctionInventory.py
+# 2. 单向 Ghidra -> CSV 同步: name 列更新 + proposed/score 清空
+python tools/ad-hoc/sync_ghidra_names_to_proposals.py
+```
+
+**作用**：把 Ghidra 已 USER_DEFINED 命名的函数名拷回 `doc/dev/naming-proposals.csv` 的 name 列；`proposed_name` + `score` 一律清空（提案已落地为现实，不再是 todo）。幂等可重跑。
+
+**何时漏跑会出问题**：CSV name 列停在 `FUN_xxxxxxxx`，但 Ghidra 已是 `pack_ui_show_all_opened_done` —— 后续基于 CSV name 做分析（如 propagate / cluster）会用旧名，分析结论与 Ghidra 不一致。
+
+#### ⑮ 注释备份导出（可选，每次深入分析后做）
 
 ```bash
 tools/asm-regen/ghidra-run-script.bat ExportComments.py
@@ -366,7 +382,12 @@ NOPAUSE=1 ./build.bat
 sha1sum roms/2343.gba output/2343.gba
 # 必须一致: 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-# === 5. 注释备份导出 (可选但推荐) ===
+# === 5. 同步 Ghidra 函数名回 CSV (rename 后必跑) ===
+tools/asm-regen/ghidra-run-script.bat ExportFunctionInventory.py
+python tools/ad-hoc/sync_ghidra_names_to_proposals.py
+# CSV name 列更新为 Ghidra 真名, proposed/score 清空 (proposal 已落地)
+
+# === 6. 注释备份导出 (可选但推荐) ===
 tools/asm-regen/ghidra-run-script.bat ExportComments.py
 # 输出 temp/ghidra-comments.csv
 # git add temp/ghidra-comments.csv  # 如要纳入 git
@@ -389,8 +410,11 @@ tools/asm-regen/ghidra-run-script.bat ExportComments.py
 |---|---|:---:|:---:|---|
 | `LabelDataCrystalRomMap.py` | 加 USER_DEFINED label | ✓ | 间接 (下次 export) | — |
 | `RenameKnownFunctions.py` | 函数 rename + plate comment | ✓ | 间接 | — |
+| `Annotate*.py`（per-function） | 参数签名 + 行级 EOL/PRE/POST 注释 | ✓ | 间接 | — |
 | `AddLiteralPoolReferences.py` | 给 4-byte data 加 DATA ref | ✓ | 间接 (符号化生效) | — |
 | `ExportRomLabelsToInc.py` | 扫 USER_DEFINED label → .equ | — | — | `constants/rom_data.inc` |
+| `ExportFunctionInventory.py` | 全函数清单导出 | — | — | `temp/ghidra-functions.csv` |
+| `sync_ghidra_names_to_proposals.py` | 单向 Ghidra → CSV 名字同步 | — | — | `doc/dev/naming-proposals.csv` |
 | `ExportRangeToGas.py`（包装在 `ghidra-export-range.bat`）| 反汇编 → asm/all.s | — | ✓ 全文重写 | — |
 | `inject_modes.py` | mode 切换 + s 后缀 + 硬补丁 | — | ✓ 原地改 | — |
 | `ExportComments.py` | 导出所有注释 | — | — | `temp/ghidra-comments.csv` |
@@ -427,9 +451,11 @@ tools/asm-regen/ghidra-run-script.bat ExportComments.py
 - [ ] **备份 .rep**（写入前必做：`cp -r ghidra/*.rep ghidra/*.rep.bak-<ts>-pre-<task>`）
 - [ ] Ghidra 函数重命名（追加 `RenameKnownFunctions.py`，中文注释 `.decode("utf-8")`）
 - [ ] Ghidra 数据 label（`LabelDataCrystalRomMap.py` 或新建 `Label<模块>.py`）
+- [ ] （深入分析）参数签名 + 行级注释：写 `Annotate<Module>.py`
 - [ ] 加新 label 后三连击：`AddLiteralPoolReferences.py` + `ExportRomLabelsToInc.py`
 - [ ] 重导出 `asm/all.s` + `inject_modes.py` + `NOPAUSE=1 ./build.bat`
 - [ ] sha1sum byte-identical 校验
+- [ ] **同步 Ghidra 名字回 CSV**：`ExportFunctionInventory.py` + `sync_ghidra_names_to_proposals.py`
 - [ ] （可选）`ExportComments.py` 导出注释纳入 git
 
 **Phase 4 文档**：
