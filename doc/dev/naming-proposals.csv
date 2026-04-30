@@ -2285,8 +2285,8 @@ address,name,proposed_name,score,tags
 0x080cae84,FUN_080cae84,,,vram
 0x080caf68,FUN_080caf68,font_jp_080caf68,3,vram;font_jp
 0x080cb1cc,FUN_080cb1cc,card_stats_080cb1cc,3,vram;palette;card_stats;duel_field;font_jp
-0x080cb998,FUN_080cb998,game_str_080cb998,3,vram;card_ids;card_stats;duel_field;font_jp;game_str
-0x080cbf0c,FUN_080cbf0c,game_str_080cbf0c,2,card_ids;card_stats;duel_field;font_jp;game_str
+0x080cb998,render_duel_field_zone_info,,,vram;card_ids;card_stats;duel_field;font_jp;game_str
+0x080cbf0c,refresh_duel_field_zone_info,,,card_ids;card_stats;duel_field;font_jp;game_str
 0x080cbf58,FUN_080cbf58,card_stats_080cbf58,3,card_ids;card_stats;duel_field;game_str;settings
 0x080cc528,FUN_080cc528,,,
 0x080cc5f4,FUN_080cc5f4,,,

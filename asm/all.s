@@ -20241,7 +20241,7 @@ switchD_0801ecbc__caseD_11:
     adds r0,r6,#0x0    @ 0801ef0a 301c
     bl FUN_080c4220                          @ 0801ef0c a5f088f9
     bl FUN_080c678c                          @ 0801ef10 a7f03cfc
-    bl FUN_080cbf0c                          @ 0801ef14 acf0faff
+    bl refresh_duel_field_zone_info          @ 0801ef14 acf0faff
     b switchD_0801ecbc__caseD_1              @ 0801ef18 22e0
     .byte  0x00, 0x00
 DAT_0801ef1c:
@@ -20271,7 +20271,7 @@ LAB_0801ef48:
     bl FUN_080c6a20                          @ 0801ef48 a7f06afd
     b switchD_0801ecbc__caseD_a              @ 0801ef4c 39e7
 switchD_0801ecbc__caseD_24:
-    bl FUN_080cbf0c                          @ 0801ef4e acf0ddff
+    bl refresh_duel_field_zone_info          @ 0801ef4e acf0ddff
     bl FUN_080c8d30                          @ 0801ef52 a9f0edfe
     bl FUN_080c8bf0                          @ 0801ef56 a9f04bfe
     bl FUN_080c8904                          @ 0801ef5a a9f0d3fc
@@ -218502,7 +218502,7 @@ switchD_080bc892__caseD_3:
     b LAB_080bc8da                           @ 080bc8ca 06e0
 switchD_080bc892__caseD_4:
     bl FUN_080cc904                          @ 080bc8cc 10f01af8
-    bl FUN_080cbf0c                          @ 080bc8d0 0ff01cfb
+    bl refresh_duel_field_zone_info          @ 080bc8d0 0ff01cfb
     b LAB_080bc8de                           @ 080bc8d4 03e0
 switchD_080bc892__caseD_5:
     bl FUN_080cca38                          @ 080bc8d6 10f0aff8
@@ -218841,7 +218841,7 @@ switchD_080bc938__caseD_9:
     b LAB_080bcb8e                           @ 080bcb7e 06e0
 switchD_080bc938__caseD_a:
     bl FUN_080cc904                          @ 080bcb80 0ff0c0fe
-    bl FUN_080cbf0c                          @ 080bcb84 0ff0c2f9
+    bl refresh_duel_field_zone_info          @ 080bcb84 0ff0c2f9
     b LAB_080bcb92                           @ 080bcb88 03e0
 switchD_080bc938__caseD_b:
     bl FUN_080cca38                          @ 080bcb8a 0ff055ff
@@ -218923,7 +218923,7 @@ switchD_080bcbe6__caseD_3:
     b LAB_080bcc2e                           @ 080bcc1e 06e0
 switchD_080bcbe6__caseD_4:
     bl FUN_080cc904                          @ 080bcc20 0ff070fe
-    bl FUN_080cbf0c                          @ 080bcc24 0ff072f9
+    bl refresh_duel_field_zone_info          @ 080bcc24 0ff072f9
     b LAB_080bcc32                           @ 080bcc28 03e0
 switchD_080bcbe6__caseD_5:
     bl FUN_080cca38                          @ 080bcc2a 0ff005ff
@@ -223782,7 +223782,7 @@ switchD_080bf13c__default:
     strb r0,[r7,#0x10]                       @ 080bf1ea 3874
     b LAB_080bf120                           @ 080bf1ec 98e7
 LAB_080bf1ee:
-    bl FUN_080cbf0c                          @ 080bf1ee 0cf08dfe
+    bl refresh_duel_field_zone_info          @ 080bf1ee 0cf08dfe
     ldrb r0,[r7,#0x10]                       @ 080bf1f2 387c
     adds r0,#0x1    @ 080bf1f4 0130
     strb r0,[r7,#0x10]                       @ 080bf1f6 3874
@@ -223865,7 +223865,7 @@ LAB_080bf284:
     adds r0,r6,#0x0    @ 080bf284 301c
     movs r1,#0xb    @ 080bf286 0b21
     adds r2,r4,#0x0    @ 080bf288 221c
-    bl FUN_080cb998                          @ 080bf28a 0cf085fb
+    bl render_duel_field_zone_info           @ 080bf28a 0cf085fb
     ldrb r0,[r5,#0x10]                       @ 080bf28e 287c
     adds r0,#0x1    @ 080bf290 0130
     strb r0,[r5,#0x10]                       @ 080bf292 2874
@@ -227588,7 +227588,7 @@ switchD_080c0cb8__caseD_6:
     ands r0,r1    @ 080c0ee4 0840
     strh r0,[r2,#0x0]                        @ 080c0ee6 1080
     bl FUN_080f55d4                          @ 080c0ee8 34f074fb
-    bl FUN_080cbf0c                          @ 080c0eec 0bf00ef8
+    bl refresh_duel_field_zone_info          @ 080c0eec 0bf00ef8
 LAB_080c0ef0:
     ldr r1, DAT_080c0f00                     @ 080c0ef0 0349
 LAB_080c0ef2:
@@ -227985,7 +227985,7 @@ switchD_080c0f92__caseD_6:
     ands r0,r1    @ 080c11fc 0840
     strh r0,[r2,#0x0]                        @ 080c11fe 1080
     bl FUN_080f55d4                          @ 080c1200 34f0e8f9
-    bl FUN_080cbf0c                          @ 080c1204 0af082fe
+    bl refresh_duel_field_zone_info          @ 080c1204 0af082fe
     ldr r1, DAT_080c1218                     @ 080c1208 0349
     ldrb r0,[r1,#0x10]                       @ 080c120a 087c
     adds r0,#0x1    @ 080c120c 0130
@@ -228697,7 +228697,7 @@ switchD_080c14ac__caseD_6:
     ands r0,r1    @ 080c1780 0840
     strh r0,[r2,#0x0]                        @ 080c1782 1080
     bl FUN_080f55d4                          @ 080c1784 33f026ff
-    bl FUN_080cbf0c                          @ 080c1788 0af0c0fb
+    bl refresh_duel_field_zone_info          @ 080c1788 0af0c0fb
 LAB_080c178c:
     ldr r1, DAT_080c179c                     @ 080c178c 0349
 LAB_080c178e:
@@ -229075,7 +229075,7 @@ switchD_080c180a__caseD_6:
     ands r0,r1    @ 080c1a7c 0840
     strh r0,[r2,#0x0]                        @ 080c1a7e 1080
     bl FUN_080f55d4                          @ 080c1a80 33f0a8fd
-    bl FUN_080cbf0c                          @ 080c1a84 0af042fa
+    bl refresh_duel_field_zone_info          @ 080c1a84 0af042fa
 LAB_080c1a88:
     ldr r1, DAT_080c1a98                     @ 080c1a88 0349
 LAB_080c1a8a:
@@ -230825,7 +230825,7 @@ DAT_080c27f0:
 DAT_080c27f4:
     .word  0x02023180                     @ 080c27f4 80310202
 switchD_080c25f4__caseD_5:
-    bl FUN_080cbf0c                          @ 080c27f8 09f088fb
+    bl refresh_duel_field_zone_info          @ 080c27f8 09f088fb
 LAB_080c27fc:
     ldr r1, DAT_080c2808                     @ 080c27fc 0249
 LAB_080c27fe:
@@ -235494,7 +235494,7 @@ DAT_080c53f4:
 DAT_080c53f8:
     .word  0x02023118                     @ 080c53f8 18310202
 switchD_080c4f02__caseD_4:
-    bl FUN_080cbf0c                          @ 080c53fc 06f086fd
+    bl refresh_duel_field_zone_info          @ 080c53fc 06f086fd
 LAB_080c5400:
     ldr r1, DAT_080c540c                     @ 080c5400 0249
 LAB_080c5402:
@@ -236615,7 +236615,7 @@ LAB_080c657a:
     .hword 0x4648    @ 080c657e 4846
     adds r1,r7,#0x0    @ 080c6580 391c
     adds r2,r6,#0x0    @ 080c6582 321c
-    bl FUN_080cb998                          @ 080c6584 05f008fa
+    bl render_duel_field_zone_info           @ 080c6584 05f008fa
 LAB_080c6588:
     ldrb r0,[r5,#0x0]                        @ 080c6588 2878
     adds r0,#0x1    @ 080c658a 0130
@@ -237320,7 +237320,7 @@ switchD_080c6a3e__default:
     .hword 0x4640    @ 080c6aec 4046
     adds r1,r6,#0x0    @ 080c6aee 311c
     adds r2,r7,#0x0    @ 080c6af0 3a1c
-    bl FUN_080cb998                          @ 080c6af2 04f051ff
+    bl render_duel_field_zone_info           @ 080c6af2 04f051ff
     pop {r3}                                 @ 080c6af6 08bc
     .hword 0x4698    @ 080c6af8 9846
     pop {r4,r5,r6,r7}                        @ 080c6afa f0bc
@@ -238703,7 +238703,7 @@ LAB_080c74f4:
     adds r2,r0,r5    @ 080c7502 4219
     adds r0,r7,#0x0    @ 080c7504 381c
     movs r1,#0xb    @ 080c7506 0b21
-    bl FUN_080cb998                          @ 080c7508 04f046fa
+    bl render_duel_field_zone_info           @ 080c7508 04f046fa
     b LAB_080c751e                           @ 080c750c 07e0
     .byte  0x00, 0x00
 DAT_080c7510:
@@ -238712,7 +238712,7 @@ LAB_080c7514:
     adds r0,r7,#0x0    @ 080c7514 381c
     adds r1,r4,#0x0    @ 080c7516 211c
     adds r2,r5,#0x0    @ 080c7518 2a1c
-    bl FUN_080cb998                          @ 080c751a 04f03dfa
+    bl render_duel_field_zone_info           @ 080c751a 04f03dfa
 LAB_080c751e:
     add sp,#0xc                              @ 080c751e 03b0
     pop {r3,r4,r5}                           @ 080c7520 38bc
@@ -239531,7 +239531,7 @@ switchD_080c7ebe__switchdataD_080c7ecc:
     .word  0x080c82a8                     @ 080c7ee0 a8820c08
     .word  0x080c827c                     @ 080c7ee4 7c820c08
 switchD_080c7ebe__caseD_1:
-    bl FUN_080cbf0c                          @ 080c7ee8 04f010f8
+    bl refresh_duel_field_zone_info          @ 080c7ee8 04f010f8
     ldr r1, DAT_080c7f38                     @ 080c7eec 1249
     ldr r3, DAT_080c7f3c                     @ 080c7eee 134b
     adds r1,r1,r3    @ 080c7ef0 c918
@@ -246926,16 +246926,18 @@ DAT_080cb990:
     .word  0x050001e0                     @ 080cb990 e0010005
 DAT_080cb994:
     .word  0x0984e30c                     @ 080cb994 0ce38409
-FUN_080cb998:
+
+@ 决斗场 hover-zone info 渲染派发器. 入参 (r0=player_flag 0=P1/1=P2, r1=mode 0..0x7f, r2=sub_idx). 主表 (table @ 0x080cb9cc) 12 entries 实际4 个 case body: mode 0..4 调 FUN_0803b618/5c0/4b0 helper 链; mode 5..a 读 0x0201c510 决斗场卡 struct (P1/P2 stride 0x868); mode b 用 0x0201c600 + 0x02023130+0x50 复杂 lookup. 二级 if/else: mode c=Fusion Deck:, d=Deck:, e=Graveyard:, f=Removed Cards: (各 P1/P2 一份, logical_id 0x3ea..0x3f1) 调 game_str_id_to_row 取标签 + 数值. default(>=0x10) 经 LAB_080cbcfc 公共数字位拆分. 公共渲染路径调 text_render_wrapper x2 + commit_line_buffer_to_sprite_vram(0x0600a8e0) 或 FUN_080cb1cc + FUN_080c8d30. 字体按 gSettings 语言切. 无返回值, 纯写 OBJ VRAM 0x0600a8e0 (右对齐 240px).
+render_duel_field_zone_info:
     push {r4,r5,r6,r7,lr}                    @ 080cb998 f0b5
     .hword 0x4657    @ 080cb99a 5746
     .hword 0x464e    @ 080cb99c 4e46
     .hword 0x4645    @ 080cb99e 4546
     push {r5,r6,r7}                          @ 080cb9a0 e0b4
     sub sp,#0x10                             @ 080cb9a2 84b0
-    adds r6,r0,#0x0    @ 080cb9a4 061c
-    adds r7,r1,#0x0    @ 080cb9a6 0f1c
-    adds r5,r2,#0x0    @ 080cb9a8 151c
+    adds r6,r0,#0x0    @ 080cb9a4 061c  -- r6 = arg0 = player_flag (0=P1, 1=P2; bit0 控制 0x868 stride)
+    adds r7,r1,#0x0    @ 080cb9a6 0f1c  -- r7 = arg1 = mode (0..0x7f+)
+    adds r5,r2,#0x0    @ 080cb9a8 151c  -- r5 = arg2 = sub_idx
     movs r0,#0x0    @ 080cb9aa 0020
     str r0,[sp,#0x4]                         @ 080cb9ac 0190
     .hword 0x4681    @ 080cb9ae 8146
@@ -246943,7 +246945,7 @@ FUN_080cb998:
     str r1,[sp,#0x8]                         @ 080cb9b2 0291
     str r0,[sp,#0x0]                         @ 080cb9b4 0090
     .hword 0x468a    @ 080cb9b6 8a46
-    cmp r7,#0xb                              @ 080cb9b8 0b2f
+    cmp r7,#0xb                              @ 080cb9b8 0b2f  -- mode > 0xb -> secondary if/else (LAB_080cbb48)
     bls LAB_080cb9be                         @ 080cb9ba 00d9
 switchD_080cb9c6__default:
     b LAB_080cbb48                           @ 080cb9bc c4e0
@@ -246951,7 +246953,7 @@ LAB_080cb9be:
     lsls r0,r7,#0x2    @ 080cb9be b800
     ldr r1, DAT_080cb9c8                     @ 080cb9c0 0149
     adds r0,r0,r1    @ 080cb9c2 4018
-    ldr r0,[r0,#0x0]                         @ 080cb9c4 0068
+    ldr r0,[r0,#0x0]                         @ 080cb9c4 0068  -- switch dispatch: jump_table @ 0x080cb9cc (12 entries, 4 distinct bodies)
 switchD_080cb9c6__switchD:
     .hword 0x4687    @ 080cb9c6 8746
 DAT_080cb9c8:
@@ -246970,7 +246972,7 @@ switchD_080cb9c6__switchdataD_080cb9cc:
     .word  0x080cbab4                     @ 080cb9f4 b4ba0c08
     .word  0x080cbae8                     @ 080cb9f8 e8ba0c08
 switchD_080cb9c6__caseD_0:
-    adds r2,r7,r5    @ 080cb9fc 7a19
+    adds r2,r7,r5    @ 080cb9fc 7a19  -- case 0..4: 调 helper 链 (FUN_0803b618/5c0/4b0) + gPageState[+0x220] bit field
     .hword 0x4690    @ 080cb9fe 9046
     ldr r0, DAT_080cba88                     @ 080cba00 2148
     ldr r3, DAT_080cba8c                     @ 080cba02 224b
@@ -247045,7 +247047,7 @@ DAT_080cba88:
 DAT_080cba8c:
     .word  0x0202334e                     @ 080cba8c 4e330202
 switchD_080cb9c6__caseD_5:
-    movs r2,#0x1    @ 080cba90 0122
+    movs r2,#0x1    @ 080cba90 0122  -- case 5..9: 读 0x0201c510 + (player&1)*0x868 决斗场卡 struct
     ands r2,r6    @ 080cba92 3240
     adds r1,r7,r5    @ 080cba94 7919
     lsls r0,r1,#0x2    @ 080cba96 8800
@@ -247064,7 +247066,7 @@ DAT_080cbaac:
 DAT_080cbab0:
     .word  0x0201c510                     @ 080cbab0 10c50102
 switchD_080cb9c6__caseD_a:
-    movs r2,#0x1    @ 080cbab4 0122
+    movs r2,#0x1    @ 080cbab4 0122  -- case 0xa: 类似 5..9 但不同 offset
     ands r2,r6    @ 080cbab6 3240
     adds r1,r7,r5    @ 080cbab8 7919
     lsls r0,r1,#0x2    @ 080cbaba 8800
@@ -247092,7 +247094,7 @@ DAT_080cbae0:
 DAT_080cbae4:
     .word  0x0201c510                     @ 080cbae4 10c50102
 switchD_080cb9c6__caseD_b:
-    movs r0,#0x1    @ 080cbae8 0120
+    movs r0,#0x1    @ 080cbae8 0120  -- case 0xb: 用 0x0201c600 + gPageState[+0x50] lookup, 比对 gActiveCardId
     ands r0,r6    @ 080cbaea 3040
     lsls r1,r5,#0x2    @ 080cbaec a900
     ldr r2, DAT_080cbb38                     @ 080cbaee 124a
@@ -247141,7 +247143,7 @@ DAT_080cbb40:
 DAT_080cbb44:
     .word  0x02023130                     @ 080cbb44 30310202
 LAB_080cbb48:
-    cmp r7,#0xd                              @ 080cbb48 0d2f
+    cmp r7,#0xd                              @ 080cbb48 0d2f  -- secondary dispatch: mode 0xc/d/e/f / default
     beq LAB_080cbb62                         @ 080cbb4a 0ad0
     cmp r7,#0xd                              @ 080cbb4c 0d2f
     bgt LAB_080cbb58                         @ 080cbb4e 03dc
@@ -247157,7 +247159,7 @@ LAB_080cbb58:
     beq LAB_080cbc38                         @ 080cbb5e 6bd0
     b LAB_080cbcfc                           @ 080cbb60 cce0
 LAB_080cbb62:
-    movs r3,#0xfb    @ 080cbb62 fb23
+    movs r3,#0xfb    @ 080cbb62 fb23  -- case 0xd: game_str_id_to_row(0x3ec + player) -> 'Deck:' (P1/P2)
     lsls r3,r3,#0x2    @ 080cbb64 9b00
     adds r0,r6,r3    @ 080cbb66 f018
     bl game_str_id_to_row                    @ 080cbb68 29f056f9
@@ -247210,7 +247212,7 @@ PTR_gP1LifePoints_080cbbc4:
 DAT_080cbbc8:
     .word  0x00000868                     @ 080cbbc8 68080000
 LAB_080cbbcc:
-    ldr r1, DAT_080cbc1c                     @ 080cbbcc 1349
+    ldr r1, DAT_080cbc1c                     @ 080cbbcc 1349  -- case 0xe: game_str_id_to_row(0x3ee + player) -> 'Graveyard:' (P1/P2)
     adds r0,r6,r1    @ 080cbbce 7018
     bl game_str_id_to_row                    @ 080cbbd0 29f022f9
     ldr r2, PTR_game_str_pointer_table_080cbc20 @ 080cbbd4 124a
@@ -247264,7 +247266,7 @@ PTR_gP1LifePoints_080cbc30:
 DAT_080cbc34:
     .word  0x00000868                     @ 080cbc34 68080000
 LAB_080cbc38:
-    movs r2,#0xfc    @ 080cbc38 fc22
+    movs r2,#0xfc    @ 080cbc38 fc22  -- case 0xf: game_str_id_to_row(0x3f0 + player) -> 'Removed Cards:' (P1/P2)
     lsls r2,r2,#0x2    @ 080cbc3a 9200
     adds r0,r6,r2    @ 080cbc3c b018
     bl game_str_id_to_row                    @ 080cbc3e 29f0ebf8
@@ -247331,7 +247333,7 @@ PTR_gP1LifePoints_080cbcb4:
 DAT_080cbcb8:
     .word  0x00000868                     @ 080cbcb8 68080000
 LAB_080cbcbc:
-    ldr r2, DAT_080cbd58                     @ 080cbcbc 264a
+    ldr r2, DAT_080cbd58                     @ 080cbcbc 264a  -- case 0xc: game_str_id_to_row(0x3ea + player) -> 'Fusion Deck:' (P1/P2)
     adds r0,r6,r2    @ 080cbcbe b018
     bl game_str_id_to_row                    @ 080cbcc0 29f0aaf8
     ldr r2, PTR_game_str_pointer_table_080cbd5c @ 080cbcc4 254a
@@ -247363,10 +247365,10 @@ LAB_080cbcbc:
     ldr r0,[r0,#0x0]                         @ 080cbcf8 0068
     .hword 0x4682    @ 080cbcfa 8246
 LAB_080cbcfc:
-    adds r0,r6,#0x0    @ 080cbcfc 301c
+    adds r0,r6,#0x0    @ 080cbcfc 301c  -- LAB_080cbcfc: default (>=0x10) 公共路径 / case c..f 文本渲染入口
     adds r1,r7,#0x0    @ 080cbcfe 391c
     adds r2,r5,#0x0    @ 080cbd00 2a1c
-    bl FUN_0803b618                          @ 080cbd02 6ff789fc
+    bl FUN_0803b618                          @ 080cbd02 6ff789fc  -- FUN_0803b618(player, mode, sub_idx): 通用属性提取
     .hword 0x4681    @ 080cbd06 8146
     movs r2,#0x1    @ 080cbd08 0122
     adds r1,r6,#0x0    @ 080cbd0a 311c
@@ -247388,7 +247390,7 @@ LAB_080cbcfc:
     .hword 0x4688    @ 080cbd2a 8846
     .hword 0x4650    @ 080cbd2c 5046
 LAB_080cbd2e:
-    movs r1,#0xa    @ 080cbd2e 0a21
+    movs r1,#0xa    @ 080cbd2e 0a21  -- 数字位数计算: r0 /= 10 循环, r8 = digit_count
     bl __divsi3                              @ 080cbd30 42f068fc
     movs r2,#0x1    @ 080cbd34 0122
     add r8,r2                                @ 080cbd36 9044
@@ -247428,11 +247430,11 @@ LAB_080cbd78:
     strh r0,[r1,#0x8]                        @ 080cbd7c 0881
     bl FUN_080cace8                          @ 080cbd7e fef7b3ff
 LAB_080cbd82:
-    movs r0,#0x20    @ 080cbd82 2020
+    movs r0,#0x20    @ 080cbd82 2020  -- LAB_080cbd82: 准备字体 + measure_string_pixel_width + 渲染
     movs r1,#0x2    @ 080cbd84 0221
     movs r2,#0x1    @ 080cbd86 0122
     movs r3,#0x2    @ 080cbd88 0223
-    bl FUN_080f0cc0                          @ 080cbd8a 24f099ff
+    bl FUN_080f0cc0                          @ 080cbd8a 24f099ff  -- FUN_080f0cc0(0x20, 2, 1, 2): 准备 sprite/text 渲染上下文
     ldr r2, DAT_080cbdf4                     @ 080cbd8e 194a
     ldr r5, DAT_080cbdf8                     @ 080cbd90 194d
     ldr r3, DAT_080cbdfc                     @ 080cbd92 1a4b
@@ -247459,7 +247461,7 @@ LAB_080cbd82:
     lsrs r0,r0,#0x1f    @ 080cbdbc c00f
     lsls r0,r0,#0x3    @ 080cbdbe c000
     adds r1,r1,r0    @ 080cbdc0 0918
-    adds r1,r1,r3    @ 080cbdc2 c918
+    adds r1,r1,r3    @ 080cbdc2 c918  -- PTR_font_jp_base_table: 按 gSettings 语言选字体 ptr
     ldr r0,[r1,#0x0]                         @ 080cbdc4 0868
     str r0,[r2,#0x4]                         @ 080cbdc6 5060
     movs r0,#0x40    @ 080cbdc8 4020
@@ -247467,7 +247469,7 @@ LAB_080cbd82:
     orrs r0,r1    @ 080cbdcc 0843
     strb r0,[r2,#0x15]                       @ 080cbdce 5075
     ldr r0,[sp,#0xc]                         @ 080cbdd0 0398
-    bl measure_string_pixel_width            @ 080cbdd2 24f04ffa
+    bl measure_string_pixel_width            @ 080cbdd2 24f04ffa  -- measure_string_pixel_width(string_addr) -> r7 = pixel width
     adds r7,r0,#0x0    @ 080cbdd6 071c
     ldrb r5,[r5,#0x0]                        @ 080cbdd8 2d78
     ands r4,r5    @ 080cbdda 2c40
@@ -247499,13 +247501,13 @@ LAB_080cbe0e:
     adds r0,#0xa    @ 080cbe0e 0a30
     adds r4,r7,r0    @ 080cbe10 3c18
     movs r0,#0xf0    @ 080cbe12 f020
-    subs r4,r0,r4    @ 080cbe14 041b
+    subs r4,r0,r4    @ 080cbe14 041b  -- r4 = 0xf0 - text_width  (右对齐到 240px)
     ldr r5, DAT_080cbe78                     @ 080cbe16 184d
     adds r0,r4,#0x0    @ 080cbe18 201c
     movs r1,#0x2    @ 080cbe1a 0221
     adds r2,r5,#0x0    @ 080cbe1c 2a1c
     ldr r3,[sp,#0xc]                         @ 080cbe1e 039b
-    bl text_render_wrapper                   @ 080cbe20 26f02cfe
+    bl text_render_wrapper                   @ 080cbe20 26f02cfe  -- text_render_wrapper(pos, 2, color, string): 主层文本渲染
     ldr r0, DAT_080cbe7c                     @ 080cbe24 1548
     ldr r0,[r0,#0x4]                         @ 080cbe26 4068
     movs r1,#0x1    @ 080cbe28 0121
@@ -247518,7 +247520,7 @@ LAB_080cbe34:
     adds r0,r4,#0x0    @ 080cbe34 201c
     movs r1,#0x2    @ 080cbe36 0221
     ldr r3,[sp,#0xc]                         @ 080cbe38 039b
-    bl text_render_wrapper                   @ 080cbe3a 26f01ffe
+    bl text_render_wrapper                   @ 080cbe3a 26f01ffe  -- text_render_wrapper(pos, 2, color2, string): 描边/阴影层
     adds r4,r4,r7    @ 080cbe3e e419
     ldr r1, DAT_080cbe80                     @ 080cbe40 0f49
     ldr r0, DAT_080cbe84                     @ 080cbe42 1048
@@ -247572,19 +247574,19 @@ LAB_080cbe88:
 LAB_080cbeac:
     ldr r0, DAT_080cbeb8                     @ 080cbeac 0248
     movs r1,#0x0    @ 080cbeae 0021
-    bl commit_line_buffer_to_sprite_vram     @ 080cbeb0 26f0ccff
+    bl commit_line_buffer_to_sprite_vram     @ 080cbeb0 26f0ccff  -- commit_line_buffer_to_sprite_vram(0x0600a8e0, 0): ★ 写 OBJ VRAM
     b LAB_080cbefc                           @ 080cbeb4 22e0
     .byte  0x00, 0x00
 DAT_080cbeb8:
     .word  0x0600a8e0                     @ 080cbeb8 e0a80006
 LAB_080cbebc:
-    cmp r4,#0x0                              @ 080cbebc 002c
+    cmp r4,#0x0                              @ 080cbebc 002c  -- LAB_080cbebc: case 0..b 出口公共包装
     beq LAB_080cbec8                         @ 080cbebe 03d0
     adds r0,r4,#0x0    @ 080cbec0 201c
-    bl FUN_080cc8c8                          @ 080cbec2 00f001fd
+    bl FUN_080cc8c8                          @ 080cbec2 00f001fd  -- FUN_080cc8c8(r4): 处理 r4 中的 packed 提取值
     str r0,[sp,#0x4]                         @ 080cbec6 0190
 LAB_080cbec8:
-    movs r2,#0x1    @ 080cbec8 0122
+    movs r2,#0x1    @ 080cbec8 0122  -- 重组 (player, mode, sub_idx, sl, sp+8) 成 [sp+0] packed value
     ands r6,r2    @ 080cbeca 1640
     movs r0,#0x1f    @ 080cbecc 1f20
     ands r7,r0    @ 080cbece 0740
@@ -247606,10 +247608,10 @@ LAB_080cbec8:
     ldr r0,[sp,#0x4]                         @ 080cbeee 0198
     .hword 0x4669    @ 080cbef0 6946
     movs r2,#0x0    @ 080cbef2 0022
-    bl FUN_080cb1cc                          @ 080cbef4 fff76af9
-    bl FUN_080c8d30                          @ 080cbef8 fcf71aff
+    bl FUN_080cb1cc                          @ 080cbef4 fff76af9  -- FUN_080cb1cc(value, sp_ptr, 0): 最终 sprite 渲染提交
+    bl FUN_080c8d30                          @ 080cbef8 fcf71aff  -- FUN_080c8d30(): 渲染收尾 helper
 LAB_080cbefc:
-    add sp,#0x10                             @ 080cbefc 04b0
+    add sp,#0x10                             @ 080cbefc 04b0  -- LAB_080cbefc: epilogue (无返回值; pop+bx 是 LR 还原)
     pop {r3,r4,r5}                           @ 080cbefe 38bc
     .hword 0x4698    @ 080cbf00 9846
     .hword 0x46a1    @ 080cbf02 a146
@@ -247617,42 +247619,44 @@ LAB_080cbefc:
     pop {r4,r5,r6,r7}                        @ 080cbf06 f0bc
     pop {r0}                                 @ 080cbf08 01bc
     bx r0                                    @ 080cbf0a 0047
-FUN_080cbf0c:
+
+@ render_duel_field_zone_info 的 state-driven wrapper. 读 gPageState [+0x210] u16 packed (bit7=player_flag, low7=mode, high7=sub_idx), 若 mode==0xb 则 sub_idx 经 gPageState[+0x4c+player*2] 的 lookup 表重映射. 调 render_duel_field_zone_info(player, mode, sub_idx). 无入参/无返回值. 用途: 光标 hover 决斗场 zone 改变后, 此函数按当前 state 重渲染. 14 个 caller 跨 PageManager / scene loader / banner 等.
+refresh_duel_field_zone_info:
     push {r4,r5,r6,r7,lr}                    @ 080cbf0c f0b5
-    ldr r7, DAT_080cbf54                     @ 080cbf0e 114f
+    ldr r7, DAT_080cbf54                     @ 080cbf0e 114f  -- r7 = &gPageState (0x02023130)
     movs r1,#0x84    @ 080cbf10 8421
     lsls r1,r1,#0x2    @ 080cbf12 8900
-    adds r0,r7,r1    @ 080cbf14 7818
-    ldrh r3,[r0,#0x0]                        @ 080cbf16 0388
+    adds r0,r7,r1    @ 080cbf14 7818  -- r0 = &gPageState[+0x210] (0x02023340) - packed render-target
+    ldrh r3,[r0,#0x0]                        @ 080cbf16 0388  -- r3 = packed u16 (bit7=player_flag, low7=mode, high7=sub_idx)
     adds r2,r3,#0x0    @ 080cbf18 1a1c
     movs r0,#0x80    @ 080cbf1a 8020
     ands r0,r2    @ 080cbf1c 1040
     lsls r0,r0,#0x18    @ 080cbf1e 0006
-    lsrs r4,r0,#0x1f    @ 080cbf20 c40f
+    lsrs r4,r0,#0x1f    @ 080cbf20 c40f  -- r4 = r6 = (r3 >> 7) & 1 = player_flag
     adds r6,r4,#0x0    @ 080cbf22 261c
     movs r1,#0x7f    @ 080cbf24 7f21
     adds r0,r1,#0x0    @ 080cbf26 081c
-    ands r0,r2    @ 080cbf28 1040
+    ands r0,r2    @ 080cbf28 1040  -- r5 = r3 & 0x7f = mode
     adds r5,r0,#0x0    @ 080cbf2a 051c
     lsrs r2,r3,#0x8    @ 080cbf2c 1a0a
-    ands r2,r1    @ 080cbf2e 0a40
-    cmp r5,#0xb                              @ 080cbf30 0b2d
+    ands r2,r1    @ 080cbf2e 0a40  -- r2 = (r3 >> 8) & 0x7f = sub_idx
+    cmp r5,#0xb                              @ 080cbf30 0b2d  -- 若 mode == 0xb (special): sub_idx 经 player-specific lookup 表重映射
     bne LAB_080cbf44                         @ 080cbf32 07d1
     lsls r0,r4,#0x1    @ 080cbf34 6000
     adds r1,r7,#0x0    @ 080cbf36 391c
     adds r1,#0x4c    @ 080cbf38 4c31
-    adds r0,r0,r1    @ 080cbf3a 4018
+    adds r0,r0,r1    @ 080cbf3a 4018  -- lookup: gPageState[+0x4c + player_flag*2] (u16)
     ldrh r0,[r0,#0x0]                        @ 080cbf3c 0088
-    adds r0,r0,r2    @ 080cbf3e 8018
+    adds r0,r0,r2    @ 080cbf3e 8018  -- sub_idx = lookup_value + (r3>>8)&0x7f, 截断到 u16
     lsls r0,r0,#0x10    @ 080cbf40 0004
     lsrs r2,r0,#0x10    @ 080cbf42 020c
 LAB_080cbf44:
     adds r0,r6,#0x0    @ 080cbf44 301c
     adds r1,r5,#0x0    @ 080cbf46 291c
-    bl FUN_080cb998                          @ 080cbf48 fff726fd
+    bl render_duel_field_zone_info           @ 080cbf48 fff726fd  -- render_duel_field_zone_info(player_flag, mode, sub_idx)
     pop {r4,r5,r6,r7}                        @ 080cbf4c f0bc
     pop {r0}                                 @ 080cbf4e 01bc
-    bx r0                                    @ 080cbf50 0047
+    bx r0                                    @ 080cbf50 0047  -- epilogue (无返回值)
     .byte  0x00, 0x00
 DAT_080cbf54:
     .word  0x02023130                     @ 080cbf54 30310202
@@ -249124,7 +249128,7 @@ LAB_080ccdac:
     b LAB_080ccdd8                           @ 080ccdb0 12e0
 LAB_080ccdb2:
     bl FUN_080cc904                          @ 080ccdb2 fff7a7fd
-    bl FUN_080cbf0c                          @ 080ccdb6 fff7a9f8
+    bl refresh_duel_field_zone_info          @ 080ccdb6 fff7a9f8
     bl FUN_080c8d30                          @ 080ccdba fbf7b9ff
     ldr r1, DAT_080ccdd0                     @ 080ccdbe 0449
     adds r0,r4,r1    @ 080ccdc0 6018

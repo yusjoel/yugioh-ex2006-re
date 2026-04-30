@@ -183,6 +183,27 @@ RENAMES = [
         "把 size split 写进内部 struct 的 [+0xa]/[+0xc], 再调 FUN_080dd070 计算并存 [+0xe]/[+0x10], "
         "最后 FUN_080dcb54/FUN_080dced0 完成绘制. 被 13+ pack/save/dialog game_str 函数共用."),
 
+    # 2026-04-30: 决斗场 hover-zone info 渲染 (HUD)
+    ("FUN_080cb998", "render_duel_field_zone_info",
+        "决斗场 hover-zone info 渲染派发器. 入参 (r0=player_flag 0=P1/1=P2, "
+        "r1=mode 0..0x7f, r2=sub_idx). 主表 (table @ 0x080cb9cc) 12 entries 实际"
+        "4 个 case body: mode 0..4 调 FUN_0803b618/5c0/4b0 helper 链; mode 5..a "
+        "读 0x0201c510 决斗场卡 struct (P1/P2 stride 0x868); mode b 用 "
+        "0x0201c600 + 0x02023130+0x50 复杂 lookup. 二级 if/else: mode c=Fusion "
+        "Deck:, d=Deck:, e=Graveyard:, f=Removed Cards: (各 P1/P2 一份, "
+        "logical_id 0x3ea..0x3f1) 调 game_str_id_to_row 取标签 + 数值. "
+        "default(>=0x10) 经 LAB_080cbcfc 公共数字位拆分. 公共渲染路径调 "
+        "text_render_wrapper x2 + commit_line_buffer_to_sprite_vram(0x0600a8e0) "
+        "或 FUN_080cb1cc + FUN_080c8d30. 字体按 gSettings 语言切. 无返回值, "
+        "纯写 OBJ VRAM 0x0600a8e0 (右对齐 240px)."),
+    ("FUN_080cbf0c", "refresh_duel_field_zone_info",
+        "render_duel_field_zone_info 的 state-driven wrapper. 读 gPageState "
+        "[+0x210] u16 packed (bit7=player_flag, low7=mode, high7=sub_idx), "
+        "若 mode==0xb 则 sub_idx 经 gPageState[+0x4c+player*2] 的 lookup 表"
+        "重映射. 调 render_duel_field_zone_info(player, mode, sub_idx). "
+        "无入参/无返回值. 用途: 光标 hover 决斗场 zone 改变后, 此函数按当前 "
+        "state 重渲染. 14 个 caller 跨 PageManager / scene loader / banner 等."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
