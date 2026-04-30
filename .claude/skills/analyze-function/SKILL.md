@@ -46,7 +46,30 @@ sed -n "$((LINE-3)),$((LINE+80))p" asm/all.s
   - `0x04000000..0x040003FF` → IO MMIO
   - `0x05000000..0x07000400` → PALRAM/VRAM/OAM
   - 小整数 (< 0x10000) → 可能是 logical id / size / flag / coord
-- **callees**：每个 `bl <target>`。已命名的（如 `bl game_str_id_to_row`）说明调用链已知；`bl FUN_xxx` 标 `(TODO)`，不深入。
+- **callees**：每个 `bl <target>`。已命名的（如 `bl game_str_id_to_row`）说明调用链已知；`bl FUN_xxx` 不要立刻标 `(TODO)`，先做下面的 callee tag 反推。
+- **callee tag 反推**（重要：能在不深入 callee 函数体的情况下得到粗略业务方向）：
+
+  对每个 `bl FUN_xxx` 的 callee，去 `doc/dev/naming-proposals.csv` 查 `(proposed_name, score, tags)` 四元组：
+
+  ```bash
+  for addr in <callee1> <callee2> <callee3> ...; do
+    grep "^0x$addr," doc/dev/naming-proposals.csv
+  done
+  ```
+
+  解读约定：
+  - **proposed_name**（如 `hud_080cc904` / `game_str_080cbf0c` 带 module 前缀的占位名）→ callee 已被某个方法（label refs / FID / 状态表 / 字符串锚）锚定到具体模块。score=5 强证据 / 4-3 中证据 / 2 弱启发。
+  - **tags** 单 module token → 业务专属；多 module → 跨模块 helper / dispatcher（4+ 个 module 几乎没业务信息）。
+  - **IO family tag**（`vram` / `bg` / `palette` / `display` / `blend` / `window` / `sprite` / `dma` / `sio` / `timer`）是横切信号，看业务 module 才是关键。
+  - **frame_counter / prng / settings** 几乎到处出现，弱信号。
+
+  **叠加多个 callee 的 tag → 当前函数的业务推断**。例：6-state 顺序调度器，sub-handler tag 分别是 `frame_counter`(sync) / `bg;palette` / `fs` / `demo;fs` / `hud;duel_field;game_str` / `frame_counter`(sync) → 这是一个**决斗场景加载序列**（同步等待 → BG/调色板 → 资源加载 → 动画 → HUD/文本渲染 → 同步收尾）。
+
+  caveat：
+  - tag 是 `propagate_label_tags.py` 沿 callgraph 扩散来的，sync/util helper 容易被沾上调用方的 module tag → 单一 callee 的单一 tag 容易误导。
+  - **多个 callee 的 tag 一致性高才是可信信号**。一个 sub-handler 的弱 tag 不要单独采信，要看整体 pattern。
+  - score 列空白但 tags 非空：仅是 propagate 的扩散结果，比 score=2 还弱。
+
 - **callers**：`grep -n "bl FUN_<addr>" asm/all.s | wc -l` 看调用频率，`head` 看几个 caller 的地址。
 - **state writes**：`strh/strb/str rN, [rM, #imm]` 写到 EWRAM/IWRAM 地址 → 全局状态机变量。
 - **返回值**：函数末尾 `movs r0, #N; pop {pc}` 模式 → 返回值。
