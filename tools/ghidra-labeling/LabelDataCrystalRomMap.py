@@ -131,7 +131,9 @@ LABELS = [
     (0x09C2B7EC, "font_jp_main_large"),     # 12×12 narrow main, 277200 B
     (0x09BDB998, "font_jp_outline_small"),  # 12×12 wide outline, 277200 B (与 main_small 同 idx 配对)
     (0x09C6F2BC, "font_jp_outline_large"),  # 14×14 wide outline, 377300 B
+    (0x09E493B4, "rom_card_zoom_anim_curve"),  # play_card_zoom_in case 2 用的 4-tick angle 曲线 (10 B = 5 hwords); hword[0..3]={0,1,8,15} 经 (idx*4)&0x7f → sin idx {0,4,32,60}; hword[4]=0x10 sentinel
     (0x09E5F864, "font_jp_charset_table"),  # 4 × (base, stride): (base[0..3], stride[0..3])
+    (0x09E5F8F0, "rom_sin_table_q8"),       # 128-entry signed sin table (Q8, peak 0x100=1.0); 一周期 0..0x7f; cos=sin[(idx+0x20)&0x7f] / -sin=sin[(idx+0x40)&0x7f] / -cos=sin[(idx+0x60)&0x7f]; 10+ caller, 主供 OBJ affine 变换
     # Shift_JIS code → glyph index 二分查找表（FUN_080F0188 在 code <= 0xEFFF 时使用）
     (0x09BA1524, "font_jp_sjis_lookup_table"),  # 1925 × u16 (sorted SJIS), 3850 B
     (0x09BA2430, "font_jp_sjis_lookup_count"),  # u16 = 1925
@@ -229,6 +231,7 @@ LABELS = [
     (0x0201C4E0, "gP1LifePoints"),
     (0x0201CD48, "gP2LifePoints"),
     (0x0201FEC0, "gBannerState"),  # banner 出/入场动画状态结构 (EWRAM); +0x10 = u8 main state, +0x11 = u8 sub-counter; 被 banner_anim_state_machine + FUN_080be600 共用
+    (0x02023110, "gUIEffectState"),  # UI 特效派发器状态结构 (EWRAM); 服务 play_ui_effect (FUN_0801ef94) ~28 个 effect handler; +0x0 = u16 step, +0x4 = u32 packed param (常 = card_ref), +0x8 = u32 mode flag, +0x18 = u8 sub_tick, +0x19 = u8 cleanup bit
     (0x02029512, "gPlayerNameEntry"),
     (0x02029810, "gBanlistPasswordBuffer"),
     (0x02029EC0, "gDemoState"),  # demo 过场动画状态结构 (EWRAM); +0x88 = fs 解压指针; +0x8c = packed bitfield (bit0=done, bits9..16=main state); +0x8e = u16 sub-state; +0x94 = u32 frame counter; demo_shuen_state_machine 用

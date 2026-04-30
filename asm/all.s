@@ -20305,7 +20305,9 @@ LAB_0801ef86:
     pop {r4,r5,r6,r7}                        @ 0801ef8e f0bc
     pop {r1}                                 @ 0801ef90 02bc
     bx r1                                    @ 0801ef92 0847
-FUN_0801ef94:
+
+@ UI 特效派发器 (per-frame tick). r0 = effect_id (0..0x3d), 按 ID 分派到 ~28 个独立的 effect handler 子状态机, busy/done 返回. dispatch table 中 重复 fallthrough 到 default 的 case = 未实现/无效 ID. 已识别 effect: 0x01 = banner_anim_state_machine (pack 横幅出/入场), 0x1a = play_card_zoom_in (小图→大图缩放过渡), 0x3c = play_demo_shuen (终焉过场). 其他 case 子函数批量占位为 play_ui_effect_<id_hex>, 待详细分析. cmp 上限 0x3d, 大于则 default. case 0/0x18/0x19 共享 caseD_0 (state-bit 检查后选 FUN_080c4edc 或 FUN_080c4350); case 1 状态化 (banner_anim 或 FUN_080be600); case 2 三向状态分派. case 0x31/0x32 内联无 bl (特殊 readback).
+play_ui_effect:
     push {lr}                                @ 0801ef94 00b5
     cmp r0,#0x3d                             @ 0801ef96 3d28
     bls LAB_0801ef9c                         @ 0801ef98 00d9
@@ -20394,7 +20396,7 @@ switchD_0801efa4__caseD_0:
     b LAB_0801f234                           @ 0801f0b4 bee0
     .byte  0x00, 0x00
 DAT_0801f0b8:
-    .word  0x02023110                     @ 0801f0b8 10310202
+    .word  gUIEffectState                 @ 0801f0b8 10310202
 LAB_0801f0bc:
     movs r0,#0x1    @ 0801f0bc 0120
     ands r0,r1    @ 0801f0be 0840
@@ -20405,16 +20407,16 @@ LAB_0801f0c6:
     bl FUN_080c4350                          @ 0801f0c6 a5f043f9
     b LAB_0801f234                           @ 0801f0ca b3e0
 switchD_0801efa4__caseD_3:
-    bl FUN_080cca80                          @ 0801f0cc adf0d8fc
+    bl play_ui_effect_03                     @ 0801f0cc adf0d8fc
     b LAB_0801f234                           @ 0801f0d0 b0e0
 switchD_0801efa4__caseD_15:
-    bl FUN_080bea94                          @ 0801f0d2 9ff0dffc
+    bl play_ui_effect_15                     @ 0801f0d2 9ff0dffc
     b LAB_0801f234                           @ 0801f0d6 ade0
 switchD_0801efa4__caseD_10:
-    bl FUN_080c25ac                          @ 0801f0d8 a3f068fa
+    bl play_ui_effect_10                     @ 0801f0d8 a3f068fa
     b LAB_0801f234                           @ 0801f0dc aae0
 switchD_0801efa4__caseD_11:
-    bl FUN_080bf228                          @ 0801f0de a0f0a3f8
+    bl play_ui_effect_11                     @ 0801f0de a0f0a3f8
     b LAB_0801f234                           @ 0801f0e2 a7e0
 switchD_0801efa4__caseD_31:
     ldr r0, DAT_0801f0fc                     @ 0801f0e4 0548
@@ -20436,10 +20438,10 @@ DAT_0801f100:
 DAT_0801f104:
     .word  0x00002f51                     @ 0801f104 512f0000
 switchD_0801efa4__caseD_1a:
-    bl FUN_080c3d20                          @ 0801f108 a4f00afe
+    bl play_card_zoom_in                     @ 0801f108 a4f00afe
     b LAB_0801f234                           @ 0801f10c 92e0
 switchD_0801efa4__caseD_e:
-    bl FUN_080bf394                          @ 0801f10e a0f041f9
+    bl play_ui_effect_0e                     @ 0801f10e a0f041f9
     b LAB_0801f234                           @ 0801f112 8fe0
 switchD_0801efa4__caseD_32:
     ldr r0, DAT_0801f124                     @ 0801f114 0348
@@ -20455,13 +20457,13 @@ DAT_0801f124:
 DAT_0801f128:
     .word  0x00002f51                     @ 0801f128 512f0000
 switchD_0801efa4__caseD_6:
-    bl FUN_080c91e0                          @ 0801f12c aaf058f8
+    bl play_ui_effect_06                     @ 0801f12c aaf058f8
     b LAB_0801f234                           @ 0801f130 80e0
 switchD_0801efa4__caseD_5:
-    bl FUN_080bfe0c                          @ 0801f132 a0f06bfe
+    bl play_ui_effect_05                     @ 0801f132 a0f06bfe
     b LAB_0801f234                           @ 0801f136 7de0
 switchD_0801efa4__caseD_4:
-    bl FUN_080bdcfc                          @ 0801f138 9ef0e0fd
+    bl play_ui_effect_04                     @ 0801f138 9ef0e0fd
     b LAB_0801f234                           @ 0801f13c 7ae0
 switchD_0801efa4__caseD_1:
     ldr r1, PTR_gPrng_0801f154               @ 0801f13e 0549
@@ -20533,61 +20535,61 @@ LAB_0801f1ba:
     bl FUN_080bd660                          @ 0801f1ba 9ef051fa
     b LAB_0801f234                           @ 0801f1be 39e0
 switchD_0801efa4__caseD_30:
-    bl FUN_080bd870                          @ 0801f1c0 9ef056fb
+    bl play_ui_effect_30                     @ 0801f1c0 9ef056fb
     b LAB_0801f234                           @ 0801f1c4 36e0
 switchD_0801efa4__caseD_20:
-    bl FUN_080c0c70                          @ 0801f1c6 a1f053fd
+    bl play_ui_effect_20                     @ 0801f1c6 a1f053fd
     b LAB_0801f234                           @ 0801f1ca 33e0
 switchD_0801efa4__caseD_21:
-    bl FUN_080c0f38                          @ 0801f1cc a1f0b4fe
+    bl play_ui_effect_21                     @ 0801f1cc a1f0b4fe
     b LAB_0801f234                           @ 0801f1d0 30e0
 switchD_0801efa4__caseD_23:
-    bl FUN_080c17d4                          @ 0801f1d2 a2f0fffa
+    bl play_ui_effect_23                     @ 0801f1d2 a2f0fffa
     b LAB_0801f234                           @ 0801f1d6 2de0
 switchD_0801efa4__caseD_25:
-    bl FUN_080c1448                          @ 0801f1d8 a2f036f9
+    bl play_ui_effect_25                     @ 0801f1d8 a2f036f9
     b LAB_0801f234                           @ 0801f1dc 2ae0
 switchD_0801efa4__caseD_13:
-    bl FUN_080c1ad0                          @ 0801f1de a2f077fc
+    bl play_ui_effect_13                     @ 0801f1de a2f077fc
     b LAB_0801f234                           @ 0801f1e2 27e0
 switchD_0801efa4__caseD_c:
-    bl FUN_080c3080                          @ 0801f1e4 a3f04cff
+    bl play_ui_effect_0c                     @ 0801f1e4 a3f04cff
     b LAB_0801f234                           @ 0801f1e8 24e0
 switchD_0801efa4__caseD_b:
-    bl FUN_080c2acc                          @ 0801f1ea a3f06ffc
+    bl play_ui_effect_0b                     @ 0801f1ea a3f06ffc
     b LAB_0801f234                           @ 0801f1ee 21e0
 switchD_0801efa4__caseD_33:
-    bl FUN_080c07e4                          @ 0801f1f0 a1f0f8fa
+    bl play_ui_effect_33                     @ 0801f1f0 a1f0f8fa
     b LAB_0801f234                           @ 0801f1f4 1ee0
 switchD_0801efa4__caseD_34:
-    bl FUN_080c0a80                          @ 0801f1f6 a1f043fc
+    bl play_ui_effect_34                     @ 0801f1f6 a1f043fc
     b LAB_0801f234                           @ 0801f1fa 1be0
 switchD_0801efa4__caseD_37:
-    bl FUN_080bf7f8                          @ 0801f1fc a0f0fcfa
+    bl play_ui_effect_37                     @ 0801f1fc a0f0fcfa
     b LAB_0801f234                           @ 0801f200 18e0
 switchD_0801efa4__caseD_38:
-    bl FUN_080bf5a0                          @ 0801f202 a0f0cdf9
+    bl play_ui_effect_38                     @ 0801f202 a0f0cdf9
     b LAB_0801f234                           @ 0801f206 15e0
 switchD_0801efa4__caseD_3a:
-    bl FUN_080bcbd4                          @ 0801f208 9df0e4fc
+    bl play_ui_effect_3a                     @ 0801f208 9df0e4fc
     b LAB_0801f234                           @ 0801f20c 12e0
 switchD_0801efa4__caseD_3b:
-    bl FUN_080bc918                          @ 0801f20e 9df083fb
+    bl play_ui_effect_3b                     @ 0801f20e 9df083fb
     b LAB_0801f234                           @ 0801f212 0fe0
 switchD_0801efa4__caseD_3c:
     bl play_demo_shuen                       @ 0801f214 9df034fb
     b LAB_0801f234                           @ 0801f218 0ce0
 switchD_0801efa4__caseD_17:
-    bl FUN_080befc0                          @ 0801f21a 9ff0d1fe
+    bl play_ui_effect_17                     @ 0801f21a 9ff0d1fe
     b LAB_0801f234                           @ 0801f21e 09e0
 switchD_0801efa4__caseD_2f:
-    bl FUN_080c1e9c                          @ 0801f220 a2f03cfe
+    bl play_ui_effect_2f                     @ 0801f220 a2f03cfe
     b LAB_0801f234                           @ 0801f224 06e0
 switchD_0801efa4__caseD_2e:
-    bl FUN_080c1c60                          @ 0801f226 a2f01bfd
+    bl play_ui_effect_2e                     @ 0801f226 a2f01bfd
     b LAB_0801f234                           @ 0801f22a 03e0
 switchD_0801efa4__caseD_3d:
-    bl FUN_080c2544                          @ 0801f22c a3f08af9
+    bl play_ui_effect_3d                     @ 0801f22c a3f08af9
     b LAB_0801f234                           @ 0801f230 00e0
 switchD_0801efa4__caseD_7:
     movs r0,#0x0    @ 0801f232 0020
@@ -54816,11 +54818,11 @@ LAB_0803bccc:
     cmp r0,#0x0                              @ 0803bcdc 0028
     bne LAB_0803bcf4                         @ 0803bcde 09d1
     movs r0,#0x31    @ 0803bce0 3120
-    bl FUN_0801ef94                          @ 0803bce2 e3f757f9
+    bl play_ui_effect                        @ 0803bce2 e3f757f9
     cmp r0,#0x0                              @ 0803bce6 0028
     bne LAB_0803bcf4                         @ 0803bce8 04d1
     movs r0,#0x32    @ 0803bcea 3220
-    bl FUN_0801ef94                          @ 0803bcec e3f752f9
+    bl play_ui_effect                        @ 0803bcec e3f752f9
     cmp r0,#0x0                              @ 0803bcf0 0028
     beq LAB_0803bcf6                         @ 0803bcf2 00d0
 LAB_0803bcf4:
@@ -55585,7 +55587,7 @@ FUN_0803c3b4:
     .hword 0x4647    @ 0803c3b6 4746
     push {r7}                                @ 0803c3b8 80b4
     movs r0,#0x0    @ 0803c3ba 0020
-    bl FUN_0801ef94                          @ 0803c3bc e2f7eafd
+    bl play_ui_effect                        @ 0803c3bc e2f7eafd
     cmp r0,#0x0                              @ 0803c3c0 0028
     beq LAB_0803c3c6                         @ 0803c3c2 00d0
     b LAB_0803c50a                           @ 0803c3c4 a1e0
@@ -55912,7 +55914,7 @@ LAB_0803c624:
     str r0,[r1,#0x0]                         @ 0803c63c 0860
 LAB_0803c63e:
     movs r0,#0xb    @ 0803c63e 0b20
-    bl FUN_0801ef94                          @ 0803c640 e2f7a8fc
+    bl play_ui_effect                        @ 0803c640 e2f7a8fc
     adds r1,r0,#0x0    @ 0803c644 011c
     cmp r1,#0x0                              @ 0803c646 0029
     bne LAB_0803c652                         @ 0803c648 03d1
@@ -55989,7 +55991,7 @@ FUN_0803c674:
     str r0,[r6,#0x0]                         @ 0803c6d4 3060
 LAB_0803c6d6:
     movs r0,#0xb    @ 0803c6d6 0b20
-    bl FUN_0801ef94                          @ 0803c6d8 e2f75cfc
+    bl play_ui_effect                        @ 0803c6d8 e2f75cfc
     adds r1,r0,#0x0    @ 0803c6dc 011c
     cmp r1,#0x0                              @ 0803c6de 0029
     bne LAB_0803c6e8                         @ 0803c6e0 02d1
@@ -56048,7 +56050,7 @@ FUN_0803c708:
     str r0,[r5,#0x0]                         @ 0803c74c 2860
 LAB_0803c74e:
     movs r0,#0xc    @ 0803c74e 0c20
-    bl FUN_0801ef94                          @ 0803c750 e2f720fc
+    bl play_ui_effect                        @ 0803c750 e2f720fc
     adds r1,r0,#0x0    @ 0803c754 011c
     cmp r1,#0x0                              @ 0803c756 0029
     bne LAB_0803c760                         @ 0803c758 02d1
@@ -56863,7 +56865,7 @@ DAT_0803cd94:
     .word  0x0201bcc0                     @ 0803cd94 c0bc0102
 LAB_0803cd98:
     movs r0,#0x16    @ 0803cd98 1620
-    bl FUN_0801ef94                          @ 0803cd9a e2f7fbf8
+    bl play_ui_effect                        @ 0803cd9a e2f7fbf8
     adds r1,r0,#0x0    @ 0803cd9e 011c
     cmp r1,#0x0                              @ 0803cda0 0029
     beq LAB_0803cda6                         @ 0803cda2 00d0
@@ -57179,7 +57181,7 @@ DAT_0803d00c:
 LAB_0803d010:
     movs r0,#0x1    @ 0803d010 0120
     rsbs r0,r0,#0    @ 0803d012 4042
-    bl FUN_0801ef94                          @ 0803d014 e1f7beff
+    bl play_ui_effect                        @ 0803d014 e1f7beff
     adds r1,r0,#0x0    @ 0803d018 011c
     cmp r1,#0x0                              @ 0803d01a 0029
     bne LAB_0803d024                         @ 0803d01c 02d1
@@ -57861,7 +57863,7 @@ DAT_0803d560:
     .word  0x0201bcc0                     @ 0803d560 c0bc0102
 LAB_0803d564:
     movs r0,#0x16    @ 0803d564 1620
-    bl FUN_0801ef94                          @ 0803d566 e1f715fd
+    bl play_ui_effect                        @ 0803d566 e1f715fd
     cmp r0,#0x0                              @ 0803d56a 0028
     beq LAB_0803d570                         @ 0803d56c 00d0
     b LAB_0803d6e0                           @ 0803d56e b7e0
@@ -58814,7 +58816,7 @@ DAT_0803dcc8:
     .word  0x0201bcc0                     @ 0803dcc8 c0bc0102
 LAB_0803dccc:
     movs r0,#0x44    @ 0803dccc 4420
-    bl FUN_0801ef94                          @ 0803dcce e1f761f9
+    bl play_ui_effect                        @ 0803dcce e1f761f9
     cmp r0,#0x0                              @ 0803dcd2 0028
     beq LAB_0803dcd8                         @ 0803dcd4 00d0
     b LAB_0803de5c                           @ 0803dcd6 c1e0
@@ -58878,7 +58880,7 @@ DAT_0803dd44:
     .word  0x0201bcc0                     @ 0803dd44 c0bc0102
 LAB_0803dd48:
     movs r0,#0x1a    @ 0803dd48 1a20
-    bl FUN_0801ef94                          @ 0803dd4a e1f723f9
+    bl play_ui_effect                        @ 0803dd4a e1f723f9
     cmp r0,#0x0                              @ 0803dd4e 0028
     beq LAB_0803dd54                         @ 0803dd50 00d0
     b LAB_0803de5c                           @ 0803dd52 83e0
@@ -59156,7 +59158,7 @@ DAT_0803df5c:
     .word  0x0201bb90                     @ 0803df5c 90bb0102
 LAB_0803df60:
     movs r0,#0x45    @ 0803df60 4520
-    bl FUN_0801ef94                          @ 0803df62 e1f717f8
+    bl play_ui_effect                        @ 0803df62 e1f717f8
     cmp r0,#0x0                              @ 0803df66 0028
     beq LAB_0803df6c                         @ 0803df68 00d0
     b LAB_0803e0ae                           @ 0803df6a a0e0
@@ -59228,7 +59230,7 @@ LAB_0803dfe2:
     b LAB_0803e07c                           @ 0803dfea 47e0
 LAB_0803dfec:
     movs r0,#0x1a    @ 0803dfec 1a20
-    bl FUN_0801ef94                          @ 0803dfee e0f7d1ff
+    bl play_ui_effect                        @ 0803dfee e0f7d1ff
     cmp r0,#0x0                              @ 0803dff2 0028
     bne LAB_0803e0ae                         @ 0803dff4 5bd1
     ldr r0,[sp,#0x8]                         @ 0803dff6 0298
@@ -59319,7 +59321,7 @@ DAT_0803e098:
     .word  0x0201bcc0                     @ 0803e098 c0bc0102
 LAB_0803e09c:
     movs r0,#0x41    @ 0803e09c 4120
-    bl FUN_0801ef94                          @ 0803e09e e0f779ff
+    bl play_ui_effect                        @ 0803e09e e0f779ff
     adds r1,r0,#0x0    @ 0803e0a2 011c
     cmp r1,#0x0                              @ 0803e0a4 0029
     bne LAB_0803e0ae                         @ 0803e0a6 02d1
@@ -59775,7 +59777,7 @@ DAT_0803e418:
     .word  0x0201bcc0                     @ 0803e418 c0bc0102
 LAB_0803e41c:
     movs r0,#0x25    @ 0803e41c 2520
-    bl FUN_0801ef94                          @ 0803e41e e0f7b9fd
+    bl play_ui_effect                        @ 0803e41e e0f7b9fd
     adds r4,r0,#0x0    @ 0803e422 041c
     cmp r4,#0x0                              @ 0803e424 002c
     bne LAB_0803e43a                         @ 0803e426 08d1
@@ -59906,7 +59908,7 @@ DAT_0803e524:
     .word  0x00000868                     @ 0803e524 68080000
 LAB_0803e528:
     movs r0,#0x16    @ 0803e528 1620
-    bl FUN_0801ef94                          @ 0803e52a e0f733fd
+    bl play_ui_effect                        @ 0803e52a e0f733fd
     cmp r0,#0x0                              @ 0803e52e 0028
     bne LAB_0803e582                         @ 0803e530 27d1
     .hword 0x4640    @ 0803e532 4046
@@ -59943,7 +59945,7 @@ DAT_0803e56c:
     .word  0x0201bcc0                     @ 0803e56c c0bc0102
 LAB_0803e570:
     movs r0,#0x17    @ 0803e570 1720
-    bl FUN_0801ef94                          @ 0803e572 e0f70ffd
+    bl play_ui_effect                        @ 0803e572 e0f70ffd
     adds r1,r0,#0x0    @ 0803e576 011c
     cmp r1,#0x0                              @ 0803e578 0029
     bne LAB_0803e582                         @ 0803e57a 02d1
@@ -60111,7 +60113,7 @@ DAT_0803e6b0:
     .word  0x0000080c                     @ 0803e6b0 0c080000
 switchD_0803e62c__caseD_2:
     movs r0,#0x1d    @ 0803e6b4 1d20
-    bl FUN_0801ef94                          @ 0803e6b6 e0f76dfc
+    bl play_ui_effect                        @ 0803e6b6 e0f76dfc
     cmp r0,#0x0                              @ 0803e6ba 0028
     beq LAB_0803e6c0                         @ 0803e6bc 00d0
     b switchD_0803e62c__default              @ 0803e6be 19e2
@@ -60639,7 +60641,7 @@ DAT_0803eadc:
     .word  0x0201bcc0                     @ 0803eadc c0bc0102
 switchD_0803e62c__caseD_4:
     movs r0,#0x48    @ 0803eae0 4820
-    bl FUN_0801ef94                          @ 0803eae2 e0f757fa
+    bl play_ui_effect                        @ 0803eae2 e0f757fa
     adds r1,r0,#0x0    @ 0803eae6 011c
     cmp r1,#0x0                              @ 0803eae8 0029
     bne switchD_0803e62c__default            @ 0803eaea 03d1
@@ -60761,7 +60763,7 @@ DAT_0803ebcc:
     .word  0x00000814                     @ 0803ebcc 14080000
 switchD_0803eb72__caseD_1:
     movs r0,#0x1e    @ 0803ebd0 1e20
-    bl FUN_0801ef94                          @ 0803ebd2 e0f7dff9
+    bl play_ui_effect                        @ 0803ebd2 e0f7dff9
     cmp r0,#0x0                              @ 0803ebd6 0028
     beq LAB_0803ebdc                         @ 0803ebd8 00d0
     b switchD_0803eb72__default              @ 0803ebda ebe1
@@ -61244,7 +61246,7 @@ DAT_0803ef9c:
     .word  0x0201c4d8                     @ 0803ef9c d8c40102
 switchD_0803eb72__caseD_4:
     movs r0,#0x48    @ 0803efa0 4820
-    bl FUN_0801ef94                          @ 0803efa2 dff7f7ff
+    bl play_ui_effect                        @ 0803efa2 dff7f7ff
     adds r1,r0,#0x0    @ 0803efa6 011c
     cmp r1,#0x0                              @ 0803efa8 0029
     bne switchD_0803eb72__default            @ 0803efaa 03d1
@@ -61373,7 +61375,7 @@ DAT_0803f09c:
     .word  0x0201bcc0                     @ 0803f09c c0bc0102
 switchD_0803f030__caseD_1:
     movs r0,#0x16    @ 0803f0a0 1620
-    bl FUN_0801ef94                          @ 0803f0a2 dff777ff
+    bl play_ui_effect                        @ 0803f0a2 dff777ff
     cmp r0,#0x0                              @ 0803f0a6 0028
     beq LAB_0803f0ac                         @ 0803f0a8 00d0
     b switchD_0803f030__default              @ 0803f0aa 8be1
@@ -61418,7 +61420,7 @@ DAT_0803f0f8:
     .word  0x0000080c                     @ 0803f0f8 0c080000
 switchD_0803f030__caseD_2:
     movs r0,#0x1f    @ 0803f0fc 1f20
-    bl FUN_0801ef94                          @ 0803f0fe dff749ff
+    bl play_ui_effect                        @ 0803f0fe dff749ff
     cmp r0,#0x0                              @ 0803f102 0028
     beq LAB_0803f108                         @ 0803f104 00d0
     b switchD_0803f030__default              @ 0803f106 5de1
@@ -61760,7 +61762,7 @@ DAT_0803f3ac:
     .word  0x0201bcc0                     @ 0803f3ac c0bc0102
 switchD_0803f030__caseD_4:
     movs r0,#0x48    @ 0803f3b0 4820
-    bl FUN_0801ef94                          @ 0803f3b2 dff7effd
+    bl play_ui_effect                        @ 0803f3b2 dff7effd
     adds r1,r0,#0x0    @ 0803f3b6 011c
     cmp r1,#0x0                              @ 0803f3b8 0029
     bne switchD_0803f030__default            @ 0803f3ba 03d1
@@ -61877,7 +61879,7 @@ DAT_0803f494:
     .word  0x00000868                     @ 0803f494 68080000
 LAB_0803f498:
     movs r0,#0x16    @ 0803f498 1620
-    bl FUN_0801ef94                          @ 0803f49a dff77bfd
+    bl play_ui_effect                        @ 0803f49a dff77bfd
     cmp r0,#0x0                              @ 0803f49e 0028
     bne LAB_0803f560                         @ 0803f4a0 5ed1
     .hword 0x4648    @ 0803f4a2 4846
@@ -61896,7 +61898,7 @@ LAB_0803f4b8:
     b LAB_0803f560                           @ 0803f4be 4fe0
 LAB_0803f4c0:
     movs r0,#0x41    @ 0803f4c0 4120
-    bl FUN_0801ef94                          @ 0803f4c2 dff767fd
+    bl play_ui_effect                        @ 0803f4c2 dff767fd
     cmp r0,#0x0                              @ 0803f4c6 0028
     bne LAB_0803f560                         @ 0803f4c8 4ad1
     cmp r6,#0x0                              @ 0803f4ca 002e
@@ -61945,7 +61947,7 @@ DAT_0803f51c:
     .word  0x0201bcc0                     @ 0803f51c c0bc0102
 LAB_0803f520:
     movs r0,#0x20    @ 0803f520 2020
-    bl FUN_0801ef94                          @ 0803f522 dff737fd
+    bl play_ui_effect                        @ 0803f522 dff737fd
     adds r4,r0,#0x0    @ 0803f526 041c
     cmp r4,#0x0                              @ 0803f528 002c
     bne LAB_0803f560                         @ 0803f52a 19d1
@@ -62036,7 +62038,7 @@ LAB_0803f5c6:
     b LAB_0803f606                           @ 0803f5ce 1ae0
 LAB_0803f5d0:
     movs r0,#0x41    @ 0803f5d0 4120
-    bl FUN_0801ef94                          @ 0803f5d2 dff7dffc
+    bl play_ui_effect                        @ 0803f5d2 dff7dffc
     cmp r0,#0x0                              @ 0803f5d6 0028
     bne LAB_0803f606                         @ 0803f5d8 15d1
     ands r5,r4    @ 0803f5da 2540
@@ -62053,7 +62055,7 @@ LAB_0803f5d0:
     b LAB_0803f606                           @ 0803f5f2 08e0
 LAB_0803f5f4:
     movs r0,#0x20    @ 0803f5f4 2020
-    bl FUN_0801ef94                          @ 0803f5f6 dff7cdfc
+    bl play_ui_effect                        @ 0803f5f6 dff7cdfc
     adds r1,r0,#0x0    @ 0803f5fa 011c
     cmp r1,#0x0                              @ 0803f5fc 0029
     bne LAB_0803f606                         @ 0803f5fe 02d1
@@ -62117,7 +62119,7 @@ LAB_0803f666:
     b LAB_0803f77a                           @ 0803f66c 85e0
 LAB_0803f66e:
     movs r0,#0x41    @ 0803f66e 4120
-    bl FUN_0801ef94                          @ 0803f670 dff790fc
+    bl play_ui_effect                        @ 0803f670 dff790fc
     cmp r0,#0x0                              @ 0803f674 0028
     beq LAB_0803f67a                         @ 0803f676 00d0
     b LAB_0803f77a                           @ 0803f678 7fe0
@@ -62248,7 +62250,7 @@ DAT_0803f764:
     .word  0x0201bcc0                     @ 0803f764 c0bc0102
 LAB_0803f768:
     movs r0,#0x20    @ 0803f768 2020
-    bl FUN_0801ef94                          @ 0803f76a dff713fc
+    bl play_ui_effect                        @ 0803f76a dff713fc
     adds r1,r0,#0x0    @ 0803f76e 011c
     cmp r1,#0x0                              @ 0803f770 0029
     bne LAB_0803f77a                         @ 0803f772 02d1
@@ -62391,7 +62393,7 @@ DAT_0803f878:
     .word  0x0201bcc0                     @ 0803f878 c0bc0102
 LAB_0803f87c:
     movs r0,#0x21    @ 0803f87c 2120
-    bl FUN_0801ef94                          @ 0803f87e dff789fb
+    bl play_ui_effect                        @ 0803f87e dff789fb
     adds r1,r0,#0x0    @ 0803f882 011c
     cmp r1,#0x0                              @ 0803f884 0029
     bne LAB_0803f88e                         @ 0803f886 02d1
@@ -62465,7 +62467,7 @@ DAT_0803f908:
     .word  0x0201c510                     @ 0803f908 10c50102
 LAB_0803f90c:
     movs r0,#0x22    @ 0803f90c 2220
-    bl FUN_0801ef94                          @ 0803f90e dff741fb
+    bl play_ui_effect                        @ 0803f90e dff741fb
     adds r4,r0,#0x0    @ 0803f912 041c
     cmp r4,#0x0                              @ 0803f914 002c
     bne LAB_0803f938                         @ 0803f916 0fd1
@@ -62582,7 +62584,7 @@ DAT_0803f9f8:
     .word  0x0201c510                     @ 0803f9f8 10c50102
 LAB_0803f9fc:
     movs r0,#0x23    @ 0803f9fc 2320
-    bl FUN_0801ef94                          @ 0803f9fe dff7c9fa
+    bl play_ui_effect                        @ 0803f9fe dff7c9fa
     cmp r0,#0x0                              @ 0803fa02 0028
     bne LAB_0803fa22                         @ 0803fa04 0dd1
     b LAB_0803fa0c                           @ 0803fa06 01e0
@@ -63220,7 +63222,7 @@ LAB_0803fee2:
     b LAB_08040096                           @ 0803fee6 d6e0
 LAB_0803fee8:
     movs r0,#0x1f    @ 0803fee8 1f20
-    bl FUN_0801ef94                          @ 0803feea dff753f8
+    bl play_ui_effect                        @ 0803feea dff753f8
     cmp r0,#0x0                              @ 0803feee 0028
     beq LAB_0803fef4                         @ 0803fef0 00d0
     b LAB_08040098                           @ 0803fef2 d1e0
@@ -63496,7 +63498,7 @@ LAB_080400f4:
     b LAB_08040136                           @ 08040106 16e0
 LAB_08040108:
     movs r0,#0x13    @ 08040108 1320
-    bl FUN_0801ef94                          @ 0804010a def743ff
+    bl play_ui_effect                        @ 0804010a def743ff
     adds r6,r0,#0x0    @ 0804010e 061c
     cmp r6,#0x0                              @ 08040110 002e
     bne LAB_08040136                         @ 08040112 10d1
@@ -63645,7 +63647,7 @@ LAB_0804022c:
     b LAB_0804024e                           @ 0804023a 08e0
 LAB_0804023c:
     movs r0,#0x15    @ 0804023c 1520
-    bl FUN_0801ef94                          @ 0804023e def7a9fe
+    bl play_ui_effect                        @ 0804023e def7a9fe
     adds r1,r0,#0x0    @ 08040242 011c
     cmp r1,#0x0                              @ 08040244 0029
     bne LAB_0804024e                         @ 08040246 02d1
@@ -63680,7 +63682,7 @@ DAT_0804027c:
     .word  0x0201bcc0                     @ 0804027c c0bc0102
 LAB_08040280:
     movs r0,#0x1    @ 08040280 0120
-    bl FUN_0801ef94                          @ 08040282 def787fe
+    bl play_ui_effect                        @ 08040282 def787fe
     adds r1,r0,#0x0    @ 08040286 011c
     cmp r1,#0x0                              @ 08040288 0029
     bne LAB_08040292                         @ 0804028a 02d1
@@ -63763,7 +63765,7 @@ DAT_08040318:
     .word  0x0201bcc0                     @ 08040318 c0bc0102
 LAB_0804031c:
     movs r0,#0x2    @ 0804031c 0220
-    bl FUN_0801ef94                          @ 0804031e def739fe
+    bl play_ui_effect                        @ 0804031e def739fe
     adds r1,r0,#0x0    @ 08040322 011c
     cmp r1,#0x0                              @ 08040324 0029
     bne LAB_0804032e                         @ 08040326 02d1
@@ -63897,7 +63899,7 @@ DAT_08040424:
     .word  0x00001cf4                     @ 08040424 f41c0000
 LAB_08040428:
     movs r0,#0x4    @ 08040428 0420
-    bl FUN_0801ef94                          @ 0804042a def7b3fd
+    bl play_ui_effect                        @ 0804042a def7b3fd
     adds r4,r0,#0x0    @ 0804042e 041c
     cmp r4,#0x0                              @ 08040430 002c
     bne LAB_08040446                         @ 08040432 08d1
@@ -63954,7 +63956,7 @@ FUN_0804048c:
 FUN_08040498:
     push {r4,lr}                             @ 08040498 10b5
     movs r0,#0x5    @ 0804049a 0520
-    bl FUN_0801ef94                          @ 0804049c def77afd
+    bl play_ui_effect                        @ 0804049c def77afd
     adds r4,r0,#0x0    @ 080404a0 041c
     cmp r4,#0x0                              @ 080404a2 002c
     bne LAB_080404b6                         @ 080404a4 07d1
@@ -64341,7 +64343,7 @@ DAT_08040788:
     .word  0x000010d8                     @ 08040788 d8100000
 LAB_0804078c:
     movs r0,#0x6    @ 0804078c 0620
-    bl FUN_0801ef94                          @ 0804078e def701fc
+    bl play_ui_effect                        @ 0804078e def701fc
     adds r4,r0,#0x0    @ 08040792 041c
     cmp r4,#0x0                              @ 08040794 002c
     bne LAB_080407aa                         @ 08040796 08d1
@@ -64383,7 +64385,7 @@ DAT_080407dc:
     .word  0x0201bcc0                     @ 080407dc c0bc0102
 LAB_080407e0:
     movs r0,#0x40    @ 080407e0 4020
-    bl FUN_0801ef94                          @ 080407e2 def7d7fb
+    bl play_ui_effect                        @ 080407e2 def7d7fb
     adds r1,r0,#0x0    @ 080407e6 011c
     cmp r1,#0x0                              @ 080407e8 0029
     bne LAB_080407f2                         @ 080407ea 02d1
@@ -64423,7 +64425,7 @@ DAT_0804082c:
     .word  0x0201bcc0                     @ 0804082c c0bc0102
 LAB_08040830:
     movs r0,#0x2e    @ 08040830 2e20
-    bl FUN_0801ef94                          @ 08040832 def7affb
+    bl play_ui_effect                        @ 08040832 def7affb
     adds r1,r0,#0x0    @ 08040836 011c
     cmp r1,#0x0                              @ 08040838 0029
     bne LAB_08040842                         @ 0804083a 02d1
@@ -64460,7 +64462,7 @@ DAT_08040874:
     .word  0x0201bcc0                     @ 08040874 c0bc0102
 LAB_08040878:
     movs r0,#0x2f    @ 08040878 2f20
-    bl FUN_0801ef94                          @ 0804087a def78bfb
+    bl play_ui_effect                        @ 0804087a def78bfb
     adds r1,r0,#0x0    @ 0804087e 011c
     cmp r1,#0x0                              @ 08040880 0029
     bne LAB_0804088a                         @ 08040882 02d1
@@ -64516,7 +64518,7 @@ DAT_080408e4:
     .word  0x0201bcc0                     @ 080408e4 c0bc0102
 LAB_080408e8:
     movs r0,#0x37    @ 080408e8 3720
-    bl FUN_0801ef94                          @ 080408ea def753fb
+    bl play_ui_effect                        @ 080408ea def753fb
     adds r1,r0,#0x0    @ 080408ee 011c
     cmp r1,#0x0                              @ 080408f0 0029
     bne LAB_080408fa                         @ 080408f2 02d1
@@ -64564,7 +64566,7 @@ DAT_08040944:
     .word  0x0201bcc0                     @ 08040944 c0bc0102
 LAB_08040948:
     movs r0,#0x38    @ 08040948 3820
-    bl FUN_0801ef94                          @ 0804094a def723fb
+    bl play_ui_effect                        @ 0804094a def723fb
     adds r1,r0,#0x0    @ 0804094e 011c
     cmp r1,#0x0                              @ 08040950 0029
     bne LAB_0804095a                         @ 08040952 02d1
@@ -64603,7 +64605,7 @@ DAT_08040990:
     .word  0x0201bcc0                     @ 08040990 c0bc0102
 LAB_08040994:
     movs r0,#0x3a    @ 08040994 3a20
-    bl FUN_0801ef94                          @ 08040996 def7fdfa
+    bl play_ui_effect                        @ 08040996 def7fdfa
     adds r1,r0,#0x0    @ 0804099a 011c
     cmp r1,#0x0                              @ 0804099c 0029
     bne LAB_080409a6                         @ 0804099e 02d1
@@ -64640,7 +64642,7 @@ DAT_080409d8:
     .word  0x0201bcc0                     @ 080409d8 c0bc0102
 LAB_080409dc:
     movs r0,#0x39    @ 080409dc 3920
-    bl FUN_0801ef94                          @ 080409de def7d9fa
+    bl play_ui_effect                        @ 080409de def7d9fa
     adds r4,r0,#0x0    @ 080409e2 041c
     cmp r4,#0x0                              @ 080409e4 002c
     bne LAB_080409fa                         @ 080409e6 08d1
@@ -64683,7 +64685,7 @@ DAT_08040a2c:
     .word  0x0201bcc0                     @ 08040a2c c0bc0102
 LAB_08040a30:
     movs r0,#0x3b    @ 08040a30 3b20
-    bl FUN_0801ef94                          @ 08040a32 def7affa
+    bl play_ui_effect                        @ 08040a32 def7affa
     adds r1,r0,#0x0    @ 08040a36 011c
     cmp r1,#0x0                              @ 08040a38 0029
     bne LAB_08040a42                         @ 08040a3a 02d1
@@ -64776,7 +64778,7 @@ DAT_08040adc:
     .word  0x0201bcc0                     @ 08040adc c0bc0102
 LAB_08040ae0:
     movs r0,#0x3b    @ 08040ae0 3b20
-    bl FUN_0801ef94                          @ 08040ae2 def757fa
+    bl play_ui_effect                        @ 08040ae2 def757fa
     adds r1,r0,#0x0    @ 08040ae6 011c
     cmp r1,#0x0                              @ 08040ae8 0029
     bne LAB_08040af2                         @ 08040aea 02d1
@@ -64817,7 +64819,7 @@ DAT_08040b2c:
     .word  0x0201bcc0                     @ 08040b2c c0bc0102
 LAB_08040b30:
     movs r0,#0x3c    @ 08040b30 3c20
-    bl FUN_0801ef94                          @ 08040b32 def72ffa
+    bl play_ui_effect                        @ 08040b32 def72ffa
     adds r1,r0,#0x0    @ 08040b36 011c
     cmp r1,#0x0                              @ 08040b38 0029
     bne LAB_08040b42                         @ 08040b3a 02d1
@@ -64867,7 +64869,7 @@ DAT_08040b8c:
     .word  0x00001cf0                     @ 08040b8c f01c0000
 LAB_08040b90:
     movs r0,#0x3d    @ 08040b90 3d20
-    bl FUN_0801ef94                          @ 08040b92 def7fff9
+    bl play_ui_effect                        @ 08040b92 def7fff9
     adds r1,r0,#0x0    @ 08040b96 011c
     cmp r1,#0x0                              @ 08040b98 0029
     bne LAB_08040ba2                         @ 08040b9a 02d1
@@ -65314,7 +65316,7 @@ DAT_08040ee4:
 LAB_08040ee8:
     movs r0,#0x1    @ 08040ee8 0120
     rsbs r0,r0,#0    @ 08040eea 4042
-    bl FUN_0801ef94                          @ 08040eec def752f8
+    bl play_ui_effect                        @ 08040eec def752f8
     cmp r0,#0x0                              @ 08040ef0 0028
     bne LAB_08040f4e                         @ 08040ef2 2cd1
     ldr r6, PTR_gP1LifePoints_08040f34       @ 08040ef4 0f4e
@@ -65354,7 +65356,7 @@ DAT_08040f38:
     .word  0x00000868                     @ 08040f38 68080000
 LAB_08040f3c:
     movs r0,#0x10    @ 08040f3c 1020
-    bl FUN_0801ef94                          @ 08040f3e def729f8
+    bl play_ui_effect                        @ 08040f3e def729f8
     adds r1,r0,#0x0    @ 08040f42 011c
     cmp r1,#0x0                              @ 08040f44 0029
     bne LAB_08040f4e                         @ 08040f46 02d1
@@ -65476,7 +65478,7 @@ DAT_08041024:
     .word  0x00000868                     @ 08041024 68080000
 LAB_08041028:
     movs r0,#0x11    @ 08041028 1120
-    bl FUN_0801ef94                          @ 0804102a ddf7b3ff
+    bl play_ui_effect                        @ 0804102a ddf7b3ff
     adds r1,r0,#0x0    @ 0804102e 011c
     cmp r1,#0x0                              @ 08041030 0029
     bne LAB_0804103a                         @ 08041032 02d1
@@ -65542,7 +65544,7 @@ DAT_080410a4:
     .word  0x00000868                     @ 080410a4 68080000
 LAB_080410a8:
     movs r0,#0x12    @ 080410a8 1220
-    bl FUN_0801ef94                          @ 080410aa ddf773ff
+    bl play_ui_effect                        @ 080410aa ddf773ff
     adds r1,r0,#0x0    @ 080410ae 011c
     cmp r1,#0x0                              @ 080410b0 0029
     bne LAB_080410ba                         @ 080410b2 02d1
@@ -65617,7 +65619,7 @@ LAB_08041124:
     b LAB_0804131a                           @ 08041136 f0e0
 LAB_08041138:
     movs r0,#0x42    @ 08041138 4220
-    bl FUN_0801ef94                          @ 0804113a ddf72bff
+    bl play_ui_effect                        @ 0804113a ddf72bff
     cmp r0,#0x0                              @ 0804113e 0028
     beq LAB_08041144                         @ 08041140 00d0
     b LAB_0804131a                           @ 08041142 eae0
@@ -65848,7 +65850,7 @@ DAT_08041304:
     .word  0x0201bcc0                     @ 08041304 c0bc0102
 LAB_08041308:
     movs r0,#0x1c    @ 08041308 1c20
-    bl FUN_0801ef94                          @ 0804130a ddf743fe
+    bl play_ui_effect                        @ 0804130a ddf743fe
     adds r1,r0,#0x0    @ 0804130e 011c
     cmp r1,#0x0                              @ 08041310 0029
     bne LAB_0804131a                         @ 08041312 02d1
@@ -65923,7 +65925,7 @@ LAB_08041384:
     b LAB_08041538                           @ 08041396 cfe0
 LAB_08041398:
     movs r0,#0x42    @ 08041398 4220
-    bl FUN_0801ef94                          @ 0804139a ddf7fbfd
+    bl play_ui_effect                        @ 0804139a ddf7fbfd
     cmp r0,#0x0                              @ 0804139e 0028
     beq LAB_080413a4                         @ 080413a0 00d0
     b LAB_08041538                           @ 080413a2 c9e0
@@ -66118,11 +66120,11 @@ DAT_08041518:
     .word  0x0201bcc0                     @ 08041518 c0bc0102
 LAB_0804151c:
     movs r0,#0x1c    @ 0804151c 1c20
-    bl FUN_0801ef94                          @ 0804151e ddf739fd
+    bl play_ui_effect                        @ 0804151e ddf739fd
     cmp r0,#0x0                              @ 08041522 0028
     bne LAB_08041538                         @ 08041524 08d1
     movs r0,#0x41    @ 08041526 4120
-    bl FUN_0801ef94                          @ 08041528 ddf734fd
+    bl play_ui_effect                        @ 08041528 ddf734fd
     adds r1,r0,#0x0    @ 0804152c 011c
     cmp r1,#0x0                              @ 0804152e 0029
     bne LAB_08041538                         @ 08041530 02d1
@@ -66521,7 +66523,7 @@ FUN_080417f0:
     str r0,[r7,#0x0]                         @ 0804183c 3860
 LAB_0804183e:
     movs r0,#0x2d    @ 0804183e 2d20
-    bl FUN_0801ef94                          @ 08041840 ddf7a8fb
+    bl play_ui_effect                        @ 08041840 ddf7a8fb
     adds r1,r0,#0x0    @ 08041844 011c
     cmp r1,#0x0                              @ 08041846 0029
     bne LAB_08041850                         @ 08041848 02d1
@@ -66560,7 +66562,7 @@ FUN_0804186c:
     cmp r0,#0x1                              @ 08041886 0128
     beq LAB_080418ba                         @ 08041888 17d0
     movs r0,#0x35    @ 0804188a 3520
-    bl FUN_0801ef94                          @ 0804188c ddf782fb
+    bl play_ui_effect                        @ 0804188c ddf782fb
     cmp r0,#0x0                              @ 08041890 0028
     bne LAB_0804191e                         @ 08041892 44d1
     ldr r0, DAT_080418a4                     @ 08041894 0348
@@ -66584,7 +66586,7 @@ LAB_080418a8:
     b LAB_0804191e                           @ 080418b8 31e0
 LAB_080418ba:
     movs r0,#0x3f    @ 080418ba 3f20
-    bl FUN_0801ef94                          @ 080418bc ddf76afb
+    bl play_ui_effect                        @ 080418bc ddf76afb
     cmp r0,#0x0                              @ 080418c0 0028
     bne LAB_0804191e                         @ 080418c2 2cd1
     movs r0,#0x35    @ 080418c4 3520
@@ -66667,7 +66669,7 @@ FUN_0804192c:
     str r0,[r5,#0x0]                         @ 0804195a 2860
 LAB_0804195c:
     movs r0,#0x3e    @ 0804195c 3e20
-    bl FUN_0801ef94                          @ 0804195e ddf719fb
+    bl play_ui_effect                        @ 0804195e ddf719fb
     adds r4,r0,#0x0    @ 08041962 041c
     cmp r4,#0x0                              @ 08041964 002c
     bne LAB_0804197a                         @ 08041966 08d1
@@ -66925,7 +66927,7 @@ DAT_08041b44:
     .word  0x0201bcc0                     @ 08041b44 c0bc0102
 LAB_08041b48:
     movs r0,#0x27    @ 08041b48 2720
-    bl FUN_0801ef94                          @ 08041b4a ddf723fa
+    bl play_ui_effect                        @ 08041b4a ddf723fa
     adds r1,r0,#0x0    @ 08041b4e 011c
     cmp r1,#0x0                              @ 08041b50 0029
     bne LAB_08041b5a                         @ 08041b52 02d1
@@ -66964,7 +66966,7 @@ FUN_08041b70:
     str r0,[r4,#0x0]                         @ 08041b92 2060
 LAB_08041b94:
     movs r0,#0x43    @ 08041b94 4320
-    bl FUN_0801ef94                          @ 08041b96 ddf7fdf9
+    bl play_ui_effect                        @ 08041b96 ddf7fdf9
     adds r1,r0,#0x0    @ 08041b9a 011c
     cmp r1,#0x0                              @ 08041b9c 0029
     bne LAB_08041ba6                         @ 08041b9e 02d1
@@ -67017,7 +67019,7 @@ DAT_08041bf8:
     .word  0x0000080c                     @ 08041bf8 0c080000
 LAB_08041bfc:
     movs r0,#0x2a    @ 08041bfc 2a20
-    bl FUN_0801ef94                          @ 08041bfe ddf7c9f9
+    bl play_ui_effect                        @ 08041bfe ddf7c9f9
     cmp r0,#0x0                              @ 08041c02 0028
     beq LAB_08041c08                         @ 08041c04 00d0
     b LAB_08041ed2                           @ 08041c06 64e1
@@ -67043,7 +67045,7 @@ DAT_08041c28:
     .word  0x00000814                     @ 08041c28 14080000
 LAB_08041c2c:
     movs r0,#0x2a    @ 08041c2c 2a20
-    bl FUN_0801ef94                          @ 08041c2e ddf7b1f9
+    bl play_ui_effect                        @ 08041c2e ddf7b1f9
     cmp r0,#0x0                              @ 08041c32 0028
     beq LAB_08041c38                         @ 08041c34 00d0
     b LAB_08041ed2                           @ 08041c36 4ce1
@@ -67419,7 +67421,7 @@ LAB_08041f18:
 LAB_08041f1c:
     movs r0,#0x1    @ 08041f1c 0120
     rsbs r0,r0,#0    @ 08041f1e 4042
-    bl FUN_0801ef94                          @ 08041f20 ddf738f8
+    bl play_ui_effect                        @ 08041f20 ddf738f8
     cmp r0,#0x0                              @ 08041f24 0028
     bne LAB_08041fd8                         @ 08041f26 57d1
     cmp r7,#0x2                              @ 08041f28 022f
@@ -67504,7 +67506,7 @@ LAB_08041fc0:
     bne LAB_08041fc8                         @ 08041fc4 00d1
     movs r0,#0x34    @ 08041fc6 3420
 LAB_08041fc8:
-    bl FUN_0801ef94                          @ 08041fc8 dcf7e4ff
+    bl play_ui_effect                        @ 08041fc8 dcf7e4ff
     adds r1,r0,#0x0    @ 08041fcc 011c
     cmp r1,#0x0                              @ 08041fce 0029
     bne LAB_08041fd8                         @ 08041fd0 02d1
@@ -67556,7 +67558,7 @@ DAT_08042020:
 LAB_08042024:
     movs r0,#0x1    @ 08042024 0120
     rsbs r0,r0,#0    @ 08042026 4042
-    bl FUN_0801ef94                          @ 08042028 dcf7b4ff
+    bl play_ui_effect                        @ 08042028 dcf7b4ff
     cmp r0,#0x0                              @ 0804202c 0028
     beq LAB_08042032                         @ 0804202e 00d0
     b LAB_080422ae                           @ 08042030 3de1
@@ -67861,7 +67863,7 @@ DAT_08042298:
     .word  0x0201bcc0                     @ 08042298 c0bc0102
 LAB_0804229c:
     movs r0,#0x34    @ 0804229c 3420
-    bl FUN_0801ef94                          @ 0804229e dcf779fe
+    bl play_ui_effect                        @ 0804229e dcf779fe
     adds r2,r0,#0x0    @ 080422a2 021c
     cmp r2,#0x0                              @ 080422a4 002a
     bne LAB_080422ae                         @ 080422a6 02d1
@@ -68078,7 +68080,7 @@ DAT_08042444:
     .word  0x0201c510                     @ 08042444 10c50102
 LAB_08042448:
     movs r0,#0x34    @ 08042448 3420
-    bl FUN_0801ef94                          @ 0804244a dcf7a3fd
+    bl play_ui_effect                        @ 0804244a dcf7a3fd
     adds r1,r0,#0x0    @ 0804244e 011c
     cmp r1,#0x0                              @ 08042450 0029
     bne LAB_0804245a                         @ 08042452 02d1
@@ -68189,7 +68191,7 @@ DAT_0804251c:
     .word  0x00001130                     @ 0804251c 30110000
 LAB_08042520:
     movs r0,#0x26    @ 08042520 2620
-    bl FUN_0801ef94                          @ 08042522 dcf737fd
+    bl play_ui_effect                        @ 08042522 dcf737fd
     adds r1,r0,#0x0    @ 08042526 011c
     cmp r1,#0x0                              @ 08042528 0029
     bne LAB_08042532                         @ 0804252a 02d1
@@ -68249,7 +68251,7 @@ LAB_0804258c:
     beq LAB_0804259e                         @ 0804258e 06d0
     movs r0,#0x30    @ 08042590 3020
     str r3,[sp,#0x0]                         @ 08042592 0093
-    bl FUN_0801ef94                          @ 08042594 dcf7fefc
+    bl play_ui_effect                        @ 08042594 dcf7fefc
     ldr r3,[sp,#0x0]                         @ 08042598 009b
     cmp r0,#0x0                              @ 0804259a 0028
     bne LAB_080425da                         @ 0804259c 1dd1
@@ -68616,7 +68618,7 @@ DAT_0804286c:
     .word  0x0201e2a0                     @ 0804286c a0e20102
 switchD_08042632__caseD_1:
     movs r0,#0xe    @ 08042870 0e20
-    bl FUN_0801ef94                          @ 08042872 dcf78ffb
+    bl play_ui_effect                        @ 08042872 dcf78ffb
     adds r4,r0,#0x0    @ 08042876 041c
     cmp r4,#0x0                              @ 08042878 002c
     beq LAB_0804287e                         @ 0804287a 00d0
@@ -68644,7 +68646,7 @@ DAT_080428a4:
     .word  0x00000814                     @ 080428a4 14080000
 switchD_08042632__caseD_2:
     movs r0,#0x47    @ 080428a8 4720
-    bl FUN_0801ef94                          @ 080428aa dcf773fb
+    bl play_ui_effect                        @ 080428aa dcf773fb
     cmp r0,#0x0                              @ 080428ae 0028
     beq LAB_080428b4                         @ 080428b0 00d0
     b switchD_08042632__default              @ 080428b2 7be0
@@ -68687,7 +68689,7 @@ DAT_080428f4:
     .word  0x0201bcc0                     @ 080428f4 c0bc0102
 switchD_08042632__caseD_4:
     movs r0,#0xe    @ 080428f8 0e20
-    bl FUN_0801ef94                          @ 080428fa dcf74bfb
+    bl play_ui_effect                        @ 080428fa dcf74bfb
     cmp r0,#0x0                              @ 080428fe 0028
     bne switchD_08042632__default            @ 08042900 54d1
     cmp r7,#0x0                              @ 08042902 002f
@@ -68839,7 +68841,7 @@ LAB_08042a10:
     b LAB_08042a96                           @ 08042a22 38e0
 LAB_08042a24:
     movs r0,#0xd    @ 08042a24 0d20
-    bl FUN_0801ef94                          @ 08042a26 dcf7b5fa
+    bl play_ui_effect                        @ 08042a26 dcf7b5fa
     cmp r0,#0x0                              @ 08042a2a 0028
     bne LAB_08042a96                         @ 08042a2c 33d1
     ldr r1, PTR_gP1LifePoints_08042aa0       @ 08042a2e 1c49
@@ -161751,7 +161753,7 @@ FUN_08093584:
 FUN_08093598:
     push {lr}                                @ 08093598 00b5
     movs r0,#0x31    @ 0809359a 3120
-    bl FUN_0801ef94                          @ 0809359c 8bf7fafc
+    bl play_ui_effect                        @ 0809359c 8bf7fafc
     pop {r1}                                 @ 080935a0 02bc
     bx r1                                    @ 080935a2 0847
 FUN_080935a4:
@@ -218466,7 +218468,7 @@ LAB_080bc854:
 DAT_080bc87c:
     .word  0x05000200                     @ 080bc87c 00020005
 
-@ demo 'shuen' (終焉) 过场动画播放协调器. 6-step 顺序状态机 on [gBannerState+0x10]: step 0=等帧 (FUN_080cca5c) / step 1=BG/palette setup (FUN_0801b7e8) / step 2=fs_load 资源 (FUN_0801ba4c) / step 3=播放 demo_shuen_state_machine / step 4=HUD 刷新 + refresh_duel_field_zone_info (强制推进) / step 5=等帧收尾 (FUN_080cca38) / default=cleanup (与 banner_anim_state_machine 同清理协议: 清 gBannerState[+0x0] bit1 + [0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 0x3c (PageManager scene_id=0x3c). 推测是 shuen victory anim, 等 runtime 验证.
+@ demo 'shuen' (終焉) 过场动画播放协调器. 6-step 顺序状态机 on [gBannerState+0x10]: step 0=等帧 (FUN_080cca5c) / step 1=BG/palette setup (FUN_0801b7e8) / step 2=fs_load 资源 (FUN_0801ba4c) / step 3=播放 demo_shuen_state_machine / step 4=HUD 刷新 + refresh_duel_field_zone_info (强制推进) / step 5=等帧收尾 (FUN_080cca38) / default=cleanup (与 banner_anim_state_machine 同清理协议: 清 gBannerState[+0x0] bit1 + [0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: play_ui_effect (FUN_0801ef94) case 0x3c (effect_id=0x3c). 推测是 shuen victory anim, 等 runtime 验证.
 play_demo_shuen:
     push {lr}                                @ 080bc880 00b5
     ldr r1, DAT_080bc894                     @ 080bc882 0449
@@ -218544,7 +218546,9 @@ DAT_080bc910:
     .word  0x02023130                     @ 080bc910 30310202
 DAT_080bc914:
     .word  0x00000215                     @ 080bc914 15020000
-FUN_080bc918:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x3b 子状态机, 待详细分析.
+play_ui_effect_3b:
     push {r4,r5,r6,r7,lr}                    @ 080bc918 f0b5
     .hword 0x464f    @ 080bc91a 4f46
     .hword 0x4646    @ 080bc91c 4646
@@ -218888,7 +218892,9 @@ DAT_080bcbcc:
     .word  0x02023130                     @ 080bcbcc 30310202
 DAT_080bcbd0:
     .word  0x00000215                     @ 080bcbd0 15020000
-FUN_080bcbd4:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x3a 子状态机, 待详细分析.
+play_ui_effect_3a:
     push {lr}                                @ 080bcbd4 00b5
     ldr r1, DAT_080bcbe8                     @ 080bcbd6 0449
     ldrb r0,[r1,#0x10]                       @ 080bcbd8 087c
@@ -220282,7 +220288,7 @@ switchD_080bd694__switchD:
     .hword 0x4687    @ 080bd694 8746
     .byte  0x00, 0x00
 DAT_080bd698:
-    .word  0x09e5f8f0                     @ 080bd698 f0f8e509
+    .word  rom_sin_table_q8               @ 080bd698 f0f8e509
 DAT_080bd69c:
     .word  gBannerState                   @ 080bd69c c0fe0102
 DAT_080bd6a0:
@@ -220512,7 +220518,9 @@ DAT_080bd868:
     .word  0x02023130                     @ 080bd868 30310202
 DAT_080bd86c:
     .word  0x00000215                     @ 080bd86c 15020000
-FUN_080bd870:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x30 子状态机, 待详细分析.
+play_ui_effect_30:
     push {r4,r5,r6,r7,lr}                    @ 080bd870 f0b5
     movs r7,#0x2c    @ 080bd872 2c27
     movs r5,#0x28    @ 080bd874 2825
@@ -221105,7 +221113,9 @@ LAB_080bdcf6:
     pop {r4,r5,r6}                           @ 080bdcf6 70bc
     pop {r1}                                 @ 080bdcf8 02bc
     bx r1                                    @ 080bdcfa 0847
-FUN_080bdcfc:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x04 子状态机, 待详细分析.
+play_ui_effect_04:
     push {r4,r5,r6,r7,lr}                    @ 080bdcfc f0b5
     .hword 0x4647    @ 080bdcfe 4746
     push {r7}                                @ 080bdd00 80b4
@@ -221457,7 +221467,7 @@ DAT_080bdfa4:
 DAT_080bdfa8:
     .word  0x00000215                     @ 080bdfa8 15020000
 
-@ banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init (载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out (BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 [gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 1.
+@ banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init (载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out (BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 [gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: play_ui_effect (FUN_0801ef94) case 1 (effect_id=1).
 banner_anim_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080bdfac f0b5
     .hword 0x4657    @ 080bdfae 5746
@@ -222850,7 +222860,9 @@ DAT_080bea8c:
     .word  0x0201fedc                     @ 080bea8c dcfe0102
 DAT_080bea90:
     .word  0x02000005                     @ 080bea90 05000002
-FUN_080bea94:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x15 子状态机, 待详细分析.
+play_ui_effect_15:
     push {r4,r5,r6,r7,lr}                    @ 080bea94 f0b5
     .hword 0x4657    @ 080bea96 5746
     .hword 0x464e    @ 080bea98 4e46
@@ -223182,7 +223194,7 @@ DAT_080bed18:
 DAT_080bed1c:
     .word  0x0201e2a0                     @ 080bed1c a0e20102
 DAT_080bed20:
-    .word  0x09e5f8f0                     @ 080bed20 f0f8e509
+    .word  rom_sin_table_q8               @ 080bed20 f0f8e509
 LAB_080bed24:
     ldr r6, PTR_gP1LifePoints_080bed7c       @ 080bed24 154e
     movs r4,#0x1    @ 080bed26 0124
@@ -223509,7 +223521,9 @@ DAT_080befb8:
     .word  0x02023130                     @ 080befb8 30310202
 DAT_080befbc:
     .word  0x0201fedc                     @ 080befbc dcfe0102
-FUN_080befc0:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x17 子状态机, 待详细分析.
+play_ui_effect_17:
     push {r4,r5,r6,r7,lr}                    @ 080befc0 f0b5
     sub sp,#0x4                              @ 080befc2 81b0
     ldr r0, DAT_080befe4                     @ 080befc4 0748
@@ -223814,7 +223828,9 @@ DAT_080bf220:
     .word  0x02023130                     @ 080bf220 30310202
 DAT_080bf224:
     .word  0x00000215                     @ 080bf224 15020000
-FUN_080bf228:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x11 子状态机, 待详细分析.
+play_ui_effect_11:
     push {r4,r5,r6,r7,lr}                    @ 080bf228 f0b5
     ldr r2, DAT_080bf250                     @ 080bf22a 094a
     ldr r6,[r2,#0x4]                         @ 080bf22c 5668
@@ -224002,7 +224018,9 @@ LAB_080bf380:
     .byte  0x00, 0x00
 DAT_080bf390:
     .word  0x00000202                     @ 080bf390 02020000
-FUN_080bf394:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x0e 子状态机, 待详细分析.
+play_ui_effect_0e:
     push {r4,r5,r6,r7,lr}                    @ 080bf394 f0b5
     .hword 0x464f    @ 080bf396 4f46
     .hword 0x4646    @ 080bf398 4646
@@ -224284,7 +224302,9 @@ DAT_080bf598:
     .word  0x02023130                     @ 080bf598 30310202
 DAT_080bf59c:
     .word  0x00000215                     @ 080bf59c 15020000
-FUN_080bf5a0:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x38 子状态机, 待详细分析.
+play_ui_effect_38:
     push {r4,r5,r6,lr}                       @ 080bf5a0 70b5
     ldr r2, DAT_080bf5e0                     @ 080bf5a2 0f4a
     ldr r5,[r2,#0x4]                         @ 080bf5a4 5568
@@ -224324,7 +224344,7 @@ switchD_080bf5dc__switchD:
 DAT_080bf5e0:
     .word  gBannerState                   @ 080bf5e0 c0fe0102
 DAT_080bf5e4:
-    .word  0x09e5f8f0                     @ 080bf5e4 f0f8e509
+    .word  rom_sin_table_q8               @ 080bf5e4 f0f8e509
 DAT_080bf5e8:
     .word  0x080bf5ec                     @ 080bf5e8 ecf50b08
 switchD_080bf5dc__switchdataD_080bf5ec:
@@ -224586,7 +224606,9 @@ DAT_080bf7f0:
     .word  0x02023130                     @ 080bf7f0 30310202
 DAT_080bf7f4:
     .word  0x00000215                     @ 080bf7f4 15020000
-FUN_080bf7f8:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x37 子状态机, 待详细分析.
+play_ui_effect_37:
     push {r4,r5,r6,r7,lr}                    @ 080bf7f8 f0b5
     .hword 0x4657    @ 080bf7fa 5746
     .hword 0x464e    @ 080bf7fc 4e46
@@ -225267,7 +225289,7 @@ LAB_080bfcee:
     b LAB_080bfd40                           @ 080bfd0c 18e0
     .byte  0x00, 0x00
 DAT_080bfd10:
-    .word  0x09e5f8f0                     @ 080bfd10 f0f8e509
+    .word  rom_sin_table_q8               @ 080bfd10 f0f8e509
 DAT_080bfd14:
     .word  0x0201fedc                     @ 080bfd14 dcfe0102
 LAB_080bfd18:
@@ -225404,7 +225426,9 @@ DAT_080bfe04:
     .word  0x02023130                     @ 080bfe04 30310202
 DAT_080bfe08:
     .word  0x00000215                     @ 080bfe08 15020000
-FUN_080bfe0c:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x05 子状态机, 待详细分析.
+play_ui_effect_05:
     push {r4,r5,r6,lr}                       @ 080bfe0c 70b5
     ldr r5, DAT_080bfe2c                     @ 080bfe0e 074d
     ldr r6,[r5,#0x4]                         @ 080bfe10 6e68
@@ -226697,7 +226721,9 @@ LAB_080c07a6:
     .byte  0x00, 0x00
 DAT_080c07e0:
     .word  0x00008080                     @ 080c07e0 80800000
-FUN_080c07e4:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x33 子状态机, 待详细分析.
+play_ui_effect_33:
     push {r4,r5,r6,r7,lr}                    @ 080c07e4 f0b5
     .hword 0x4657    @ 080c07e6 5746
     .hword 0x464e    @ 080c07e8 4e46
@@ -226889,7 +226915,7 @@ LAB_080c08c2:
 DAT_080c0968:
     .word  gBannerState                   @ 080c0968 c0fe0102
 DAT_080c096c:
-    .word  0x09e5f8f0                     @ 080c096c f0f8e509
+    .word  rom_sin_table_q8               @ 080c096c f0f8e509
 PTR_BLDCNT_080c0970:
     .word  BLDCNT                         @ 080c0970 50000004
 switchD_080c0808__caseD_2:
@@ -227032,7 +227058,9 @@ DAT_080c0a78:
     .word  0x02023130                     @ 080c0a78 30310202
 DAT_080c0a7c:
     .word  0x00000215                     @ 080c0a7c 15020000
-FUN_080c0a80:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x34 子状态机, 待详细分析.
+play_ui_effect_34:
     push {r4,r5,lr}                          @ 080c0a80 30b5
     ldr r4, DAT_080c0aa0                     @ 080c0a82 074c
     ldr r0,[r4,#0x8]                         @ 080c0a84 a068
@@ -227282,7 +227310,9 @@ DAT_080c0c68:
     .word  0x02023130                     @ 080c0c68 30310202
 DAT_080c0c6c:
     .word  0x00000215                     @ 080c0c6c 15020000
-FUN_080c0c70:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x20 子状态机, 待详细分析.
+play_ui_effect_20:
     push {r4,r5,r6,r7,lr}                    @ 080c0c70 f0b5
     .hword 0x4657    @ 080c0c72 5746
     .hword 0x464e    @ 080c0c74 4e46
@@ -227632,7 +227662,9 @@ DAT_080c0f30:
     .word  0x02023130                     @ 080c0f30 30310202
 DAT_080c0f34:
     .word  0x00000215                     @ 080c0f34 15020000
-FUN_080c0f38:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x21 子状态机, 待详细分析.
+play_ui_effect_21:
     push {r4,r5,r6,r7,lr}                    @ 080c0f38 f0b5
     .hword 0x464f    @ 080c0f3a 4f46
     .hword 0x4646    @ 080c0f3c 4646
@@ -228284,7 +228316,9 @@ LAB_080c1438:
     pop {r4,r5,r6,r7}                        @ 080c1442 f0bc
     pop {r0}                                 @ 080c1444 01bc
     bx r0                                    @ 080c1446 0047
-FUN_080c1448:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x25 子状态机, 待详细分析.
+play_ui_effect_25:
     push {r4,r5,r6,r7,lr}                    @ 080c1448 f0b5
     .hword 0x4657    @ 080c144a 5746
     .hword 0x464e    @ 080c144c 4e46
@@ -228741,7 +228775,9 @@ DAT_080c17cc:
     .word  0x02023130                     @ 080c17cc 30310202
 DAT_080c17d0:
     .word  0x00000215                     @ 080c17d0 15020000
-FUN_080c17d4:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x23 子状态机, 待详细分析.
+play_ui_effect_23:
     push {r4,r5,r6,r7,lr}                    @ 080c17d4 f0b5
     .hword 0x4657    @ 080c17d6 5746
     .hword 0x464e    @ 080c17d8 4e46
@@ -229119,7 +229155,9 @@ DAT_080c1ac8:
     .word  0x02023130                     @ 080c1ac8 30310202
 DAT_080c1acc:
     .word  0x00000215                     @ 080c1acc 15020000
-FUN_080c1ad0:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x13 子状态机, 待详细分析.
+play_ui_effect_13:
     push {r4,r5,r6,r7,lr}                    @ 080c1ad0 f0b5
     .hword 0x4647    @ 080c1ad2 4746
     push {r7}                                @ 080c1ad4 80b4
@@ -229323,7 +229361,9 @@ DAT_080c1c58:
     .word  0x02023130                     @ 080c1c58 30310202
 DAT_080c1c5c:
     .word  0x00000215                     @ 080c1c5c 15020000
-FUN_080c1c60:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x2e 子状态机, 待详细分析.
+play_ui_effect_2e:
     push {r4,r5,r6,r7,lr}                    @ 080c1c60 f0b5
     ldr r1, DAT_080c1c84                     @ 080c1c62 0849
     ldr r2,[r1,#0x4]                         @ 080c1c64 4a68
@@ -229615,7 +229655,9 @@ DAT_080c1e94:
     .word  0x02023130                     @ 080c1e94 30310202
 DAT_080c1e98:
     .word  0x00000215                     @ 080c1e98 15020000
-FUN_080c1e9c:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x2f 子状态机, 待详细分析.
+play_ui_effect_2f:
     push {r4,r5,r6,lr}                       @ 080c1e9c 70b5
     ldr r4, DAT_080c1ed0                     @ 080c1e9e 0c4c
     ldr r1,[r4,#0x4]                         @ 080c1ea0 6168
@@ -230474,7 +230516,9 @@ LAB_080c2536:
     pop {r4,r5,r6,r7}                        @ 080c253e f0bc
     pop {r1}                                 @ 080c2540 02bc
     bx r1                                    @ 080c2542 0847
-FUN_080c2544:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x3d 子状态机, 待详细分析.
+play_ui_effect_3d:
     push {lr}                                @ 080c2544 00b5
     ldr r2, DAT_080c255c                     @ 080c2546 054a
     ldr r1,[r2,#0x4]                         @ 080c2548 5168
@@ -230531,7 +230575,9 @@ DAT_080c25a4:
     .word  0x02023130                     @ 080c25a4 30310202
 DAT_080c25a8:
     .word  0x00000215                     @ 080c25a8 15020000
-FUN_080c25ac:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x10 子状态机, 待详细分析.
+play_ui_effect_10:
     push {r4,r5,r6,r7,lr}                    @ 080c25ac f0b5
     .hword 0x4657    @ 080c25ae 5746
     .hword 0x464e    @ 080c25b0 4e46
@@ -231205,7 +231251,9 @@ LAB_080c2aae:
     bx r0                                    @ 080c2ac6 0047
 DAT_080c2ac8:
     .word  0x0000248c                     @ 080c2ac8 8c240000
-FUN_080c2acc:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x0b 子状态机, 待详细分析.
+play_ui_effect_0b:
     push {r4,r5,r6,lr}                       @ 080c2acc 70b5
     ldr r0, DAT_080c2afc                     @ 080c2ace 0b48
     ldr r1,[r0,#0xc]                         @ 080c2ad0 c168
@@ -231971,7 +232019,9 @@ FUN_080c305c:
     pop {r0}                                 @ 080c307a 01bc
     bx r0                                    @ 080c307c 0047
     .byte  0x00, 0x00
-FUN_080c3080:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x0c 子状态机, 待详细分析.
+play_ui_effect_0c:
     push {r4,r5,r6,r7,lr}                    @ 080c3080 f0b5
     .hword 0x4647    @ 080c3082 4746
     push {r7}                                @ 080c3084 80b4
@@ -233655,37 +233705,39 @@ FUN_080c3d00:
     bx r0                                    @ 080c3d18 0047
     .byte  0x00, 0x00
 DAT_080c3d1c:
-    .word  0x02023110                     @ 080c3d1c 10310202
-FUN_080c3d20:
+    .word  gUIEffectState                 @ 080c3d1c 10310202
+
+@ 卡牌小图→大图缩放/旋转过渡动画 (5-step on gUIEffectState[+0x0]). 读 packed card_ref @ gUIEffectState[+0x4] (bit 0=side / [5:1]=row(5b) / [13:6]=col(8b) / bit 16,17=mode flag). 索引 EWRAM 卡牌信息数组 0x0201c510 + (row+col)*0x14 + side*0x868. step 0 = load_card_list_small_image x2 装载小图. step 1 = 起始帧 (FUN_080f6ccc + FUN_080c3880 stats overlay). step 2 = 4-tick affine 过渡: 用 rom_sin_table_q8 算 PA/PB/PC/PD, angle index ∈ rom_card_zoom_anim_curve {0,1,8,15}, scale = sin*5 + 0x100, 提交 OAM affine 矩阵 via FUN_080f72e8; sub_tick @ gUIEffectState[+0x18] 满 4 后主 step++. step 3 = 装第二张图 + FUN_080c38cc 全 bit-field stats. step 4 = 切大图模式 (FUN_080cb1cc, BG VRAM/palette 重磅上传). 返回 1=busy / 0=done. 唯一 caller: play_ui_effect (FUN_0801ef94) case 0x1a (effect_id=0x1a).
+play_card_zoom_in:
     push {r4,r5,r6,r7,lr}                    @ 080c3d20 f0b5
     .hword 0x4657    @ 080c3d22 5746
     .hword 0x464e    @ 080c3d24 4e46
     .hword 0x4645    @ 080c3d26 4546
     push {r5,r6,r7}                          @ 080c3d28 e0b4
     sub sp,#0x24                             @ 080c3d2a 89b0
-    ldr r7, DAT_080c3e04                     @ 080c3d2c 354f
-    ldr r0, DAT_080c3e08                     @ 080c3d2e 3648
+    ldr r7, DAT_080c3e04                     @ 080c3d2c 354f  -- r7 = &gUIEffectState+0x4 (0x02023114, packed card_ref)
+    ldr r0, DAT_080c3e08                     @ 080c3d2e 3648  -- r0 = &gUIEffectState (0x02023110)
     ldr r0,[r0,#0x8]                         @ 080c3d30 8068
-    str r0,[sp,#0x14]                        @ 080c3d32 0590
-    ldr r3,[r7,#0x0]                         @ 080c3d34 3b68
-    lsls r5,r3,#0x1f    @ 080c3d36 dd07
+    str r0,[sp,#0x14]                        @ 080c3d32 0590  -- [sp+0x14] = gUIEffectState[+0x8] (mode flag, 后用)
+    ldr r3,[r7,#0x0]                         @ 080c3d34 3b68  -- r3 = packed card_ref @ gUIEffectState[+0x4]
+    lsls r5,r3,#0x1f    @ 080c3d36 dd07  -- r2 = bit 0 (side 0/1)
     lsrs r2,r5,#0x1f    @ 080c3d38 ea0f
     lsls r4,r3,#0x1a    @ 080c3d3a 9c06
-    lsrs r1,r4,#0x1b    @ 080c3d3c e10e
+    lsrs r1,r4,#0x1b    @ 080c3d3c e10e  -- r1 = bits [5:1] (5b row, 0..31)
     lsls r3,r3,#0x12    @ 080c3d3e 9b04
-    lsrs r0,r3,#0x18    @ 080c3d40 180e
+    lsrs r0,r3,#0x18    @ 080c3d40 180e  -- r0 = bits [13:6] (8b col, 0..255)
     adds r1,r1,r0    @ 080c3d42 0918
     lsls r0,r1,#0x2    @ 080c3d44 8800
     adds r0,r0,r1    @ 080c3d46 4018
-    lsls r0,r0,#0x2    @ 080c3d48 8000
-    ldr r1, DAT_080c3e0c                     @ 080c3d4a 3049
+    lsls r0,r0,#0x2    @ 080c3d48 8000  -- r0 = (row+col) * 0x14 (entry stride)
+    ldr r1, DAT_080c3e0c                     @ 080c3d4a 3049  -- r1 = 0x868 (per-side 偏移)
     .hword 0x4688    @ 080c3d4c 8846
     .hword 0x4641    @ 080c3d4e 4146
-    muls r1,r2    @ 080c3d50 5143
+    muls r1,r2    @ 080c3d50 5143  -- r1 = 0x868 * side (0 或 0x868)
     adds r0,r0,r1    @ 080c3d52 4018
-    ldr r6, DAT_080c3e10                     @ 080c3d54 2e4e
-    adds r0,r0,r6    @ 080c3d56 8019
-    ldr r2,[r0,#0x0]                         @ 080c3d58 0268
+    ldr r6, DAT_080c3e10                     @ 080c3d54 2e4e  -- r6 = 0x0201c510 (卡牌信息数组基址)
+    adds r0,r0,r6    @ 080c3d56 8019  -- r0 = 0x0201c510 + (row+col)*0x14 + side*0x868
+    ldr r2,[r0,#0x0]                         @ 080c3d58 0268  -- r2 = entry[+0]: dword 含尺寸编码
     lsls r2,r2,#0x2    @ 080c3d5a 9200
     lsrs r2,r2,#0x18    @ 080c3d5c 120e
     lsls r2,r2,#0x1    @ 080c3d5e 5200
@@ -233700,11 +233752,11 @@ FUN_080c3d20:
     muls r1,r5    @ 080c3d70 6943
     adds r0,r0,r1    @ 080c3d72 4018
     adds r0,r0,r6    @ 080c3d74 8019
-    ldr r0,[r0,#0x0]                         @ 080c3d76 0068
+    ldr r0,[r0,#0x0]                         @ 080c3d76 0068  -- r0 = entry[+0] dword (重新读)
     lsls r0,r0,#0x12    @ 080c3d78 8004
     lsrs r0,r0,#0x1f    @ 080c3d7a c00f
-    orrs r0,r2    @ 080c3d7c 1043
-    bl FUN_080cc8c8                          @ 080c3d7e 08f0a3fd
+    orrs r0,r2    @ 080c3d7c 1043  -- r0 |= 高位标志 (合成 card_id 输入)
+    bl FUN_080cc8c8                          @ 080c3d7e 08f0a3fd  -- r0 = card_ids_080cc8c8(combined_param) (解析 card_id)
     lsls r0,r0,#0x10    @ 080c3d82 0004
     lsrs r0,r0,#0x10    @ 080c3d84 000c
     .hword 0x4681    @ 080c3d86 8146
@@ -233715,16 +233767,16 @@ FUN_080c3d20:
     lsrs r1,r1,#0x1b    @ 080c3d90 c90e
     lsls r2,r2,#0x12    @ 080c3d92 9204
     lsrs r2,r2,#0x18    @ 080c3d94 120e
-    bl FUN_080c35ac                          @ 080c3d96 fff709fc
+    bl FUN_080c35ac                          @ 080c3d96 fff709fc  -- r0 = FUN_080c35ac(side, row, col) (帧/尺寸计算)
     subs r1,r0,#0x4    @ 080c3d9a 011f
     lsls r1,r1,#0x10    @ 080c3d9c 0904
     lsrs r1,r1,#0x10    @ 080c3d9e 090c
-    str r1,[sp,#0x1c]                        @ 080c3da0 0791
+    str r1,[sp,#0x1c]                        @ 080c3da0 0791  -- [sp+0x1c] = (r0-4) & 0xffff (width-4)
     lsrs r0,r0,#0x10    @ 080c3da2 000c
     subs r0,#0x4    @ 080c3da4 0438
     lsls r0,r0,#0x10    @ 080c3da6 0004
     lsrs r0,r0,#0x10    @ 080c3da8 000c
-    str r0,[sp,#0x20]                        @ 080c3daa 0890
+    str r0,[sp,#0x20]                        @ 080c3daa 0890  -- [sp+0x20] = (r0-4) & 0xffff (height-4)
     ldr r5,[r7,#0x0]                         @ 080c3dac 3d68
     lsls r3,r5,#0x1f    @ 080c3dae eb07
     lsrs r4,r3,#0x1f    @ 080c3db0 dc0f
@@ -233737,7 +233789,7 @@ FUN_080c3d20:
     muls r1,r4    @ 080c3dbe 6143
     adds r0,r0,r1    @ 080c3dc0 4018
     adds r0,r0,r6    @ 080c3dc2 8019
-    ldrh r0,[r0,#0x6]                        @ 080c3dc4 c088
+    ldrh r0,[r0,#0x6]                        @ 080c3dc4 c088  -- r0 = entry[+6] hword
     .hword 0x4682    @ 080c3dc6 8246
     movs r4,#0x1    @ 080c3dc8 0124
     str r4,[sp,#0x18]                        @ 080c3dca 0694
@@ -233750,32 +233802,32 @@ FUN_080c3d20:
     muls r1,r3    @ 080c3dd8 5943
     adds r0,r0,r1    @ 080c3dda 4018
     adds r0,r0,r6    @ 080c3ddc 8019
-    ldrh r4,[r0,#0x8]                        @ 080c3dde 0489
+    ldrh r4,[r0,#0x8]                        @ 080c3dde 0489  -- r4 = entry[+8] hword (默认 OAM attr)
     movs r6,#0x0    @ 080c3de0 0026
     ldr r0,[sp,#0x14]                        @ 080c3de2 0598
-    cmp r0,#0x0                              @ 080c3de4 0028
+    cmp r0,#0x0                              @ 080c3de4 0028  -- if mode flag (gUIEffectState[+0x8]) == 0 -> 跳过 r4 修正
     beq LAB_080c3df0                         @ 080c3de6 03d0
     lsls r0,r5,#0x11    @ 080c3de8 6804
     lsrs r0,r0,#0x1f    @ 080c3dea c00f
     ldr r1,[sp,#0x18]                        @ 080c3dec 0699
-    subs r4,r1,r0    @ 080c3dee 0c1a
+    subs r4,r1,r0    @ 080c3dee 0c1a  -- r4 = 1 - bit17 (mode 修正)
 LAB_080c3df0:
-    ldr r2, DAT_080c3e08                     @ 080c3df0 054a
-    ldrh r0,[r2,#0x0]                        @ 080c3df2 1088
-    cmp r0,#0x4                              @ 080c3df4 0428
+    ldr r2, DAT_080c3e08                     @ 080c3df0 054a  -- r2 = &gUIEffectState
+    ldrh r0,[r2,#0x0]                        @ 080c3df2 1088  -- r0 = step @ gUIEffectState[+0x0] (u16)
+    cmp r0,#0x4                              @ 080c3df4 0428  -- step > 4 -> default (r0 = 0, 完成)
     bls LAB_080c3dfa                         @ 080c3df6 00d9
     b switchD_080c3e02__default              @ 080c3df8 68e1
 LAB_080c3dfa:
-    lsls r0,r0,#0x2    @ 080c3dfa 8000
-    ldr r1, DAT_080c3e14                     @ 080c3dfc 0549
+    lsls r0,r0,#0x2    @ 080c3dfa 8000  -- r0 = step * 4 (jump_table 偏移)
+    ldr r1, DAT_080c3e14                     @ 080c3dfc 0549  -- r1 = jump_table @ 0x080c3e18 (5 entries)
     adds r0,r0,r1    @ 080c3dfe 4018
     ldr r0,[r0,#0x0]                         @ 080c3e00 0068
 switchD_080c3e02__switchD:
-    .hword 0x4687    @ 080c3e02 8746
+    .hword 0x4687    @ 080c3e02 8746  -- switch dispatch: bx jump_table[step]
 DAT_080c3e04:
     .word  0x02023114                     @ 080c3e04 14310202
 DAT_080c3e08:
-    .word  0x02023110                     @ 080c3e08 10310202
+    .word  gUIEffectState                 @ 080c3e08 10310202
 DAT_080c3e0c:
     .word  0x00000868                     @ 080c3e0c 68080000
 DAT_080c3e10:
@@ -233789,32 +233841,32 @@ switchD_080c3e02__switchdataD_080c3e18:
     .word  0x080c4030                     @ 080c3e24 30400c08
     .word  0x080c40a8                     @ 080c3e28 a8400c08
 switchD_080c3e02__caseD_0:
-    movs r3,#0x80    @ 080c3e2c 8023
+    movs r3,#0x80    @ 080c3e2c 8023  -- case 0: 装小卡图 (双侧/双 size)
     lsls r3,r3,#0x2    @ 080c3e2e 9b00
     .hword 0x4648    @ 080c3e30 4846
     adds r1,r4,#0x0    @ 080c3e32 211c
     movs r2,#0x0    @ 080c3e34 0022
-    bl load_card_list_small_image            @ 080c3e36 fff7c1fa
-    ldr r0,[r7,#0x0]                         @ 080c3e3a 3868
+    bl load_card_list_small_image            @ 080c3e36 fff7c1fa  -- load_card_list_small_image(0x200, r4=card_id, 0)
+    ldr r0,[r7,#0x0]                         @ 080c3e3a 3868  -- r0 = packed[bit16] (flag_a)
     lsls r0,r0,#0x11    @ 080c3e3c 4004
     lsrs r0,r0,#0x1f    @ 080c3e3e c00f
-    cmp r4,r0                                @ 080c3e40 8442
+    cmp r4,r0                                @ 080c3e40 8442  -- if r4 == flag_a -> 跳过第二次装载, 直接收尾
     bne LAB_080c3e46                         @ 080c3e42 00d1
     b LAB_080c40bc                           @ 080c3e44 3ae1
 LAB_080c3e46:
     movs r1,#0x0    @ 080c3e46 0021
     cmp r4,#0x0                              @ 080c3e48 002c
     bne LAB_080c3e4e                         @ 080c3e4a 00d1
-    movs r1,#0x1    @ 080c3e4c 0121
+    movs r1,#0x1    @ 080c3e4c 0121  -- r1 = (r4 == 0) ? 1 : 0 (alt card_id)
 LAB_080c3e4e:
     movs r3,#0x82    @ 080c3e4e 8223
     lsls r3,r3,#0x2    @ 080c3e50 9b00
     .hword 0x4648    @ 080c3e52 4846
     movs r2,#0x0    @ 080c3e54 0022
-    bl load_card_list_small_image            @ 080c3e56 fff7b1fa
-    b LAB_080c40bc                           @ 080c3e5a 2fe1
+    bl load_card_list_small_image            @ 080c3e56 fff7b1fa  -- load_card_list_small_image(0x208, alt_id, 0) (第二张)
+    b LAB_080c40bc                           @ 080c3e5a 2fe1  -- → 收尾推进 step++
 switchD_080c3e02__caseD_1:
-    ldr r2,[r7,#0x0]                         @ 080c3e5c 3a68
+    ldr r2,[r7,#0x0]                         @ 080c3e5c 3a68  -- case 1: 起始帧渲染 (OBJ blit + stats overlay)
     lsls r2,r2,#0x1f    @ 080c3e5e d207
     lsrs r2,r2,#0x1f    @ 080c3e60 d20f
     ldr r0, DAT_080c3ec8                     @ 080c3e62 1948
@@ -233823,10 +233875,10 @@ switchD_080c3e02__caseD_1:
     eors r0,r1    @ 080c3e68 4840
     cmp r2,r0                                @ 080c3e6a 8242
     bne LAB_080c3e70                         @ 080c3e6c 00d1
-    adds r6,#0x40    @ 080c3e6e 4036
+    adds r6,#0x40    @ 080c3e6e 4036  -- if side != gPlayer[+4]^1 -> r6 += 0x40 (OAM Y 微调)
 LAB_080c3e70:
     .hword 0x4655    @ 080c3e70 5546
-    cmp r5,#0x0                              @ 080c3e72 002d
+    cmp r5,#0x0                              @ 080c3e72 002d  -- if r5 (bit0) != 0 -> r6 += 0x20 (OAM X 微调)
     beq LAB_080c3e78                         @ 080c3e74 00d0
     adds r6,#0x20    @ 080c3e76 2036
 LAB_080c3e78:
@@ -233841,11 +233893,11 @@ LAB_080c3e78:
     orrs r6,r1    @ 080c3e88 0e43
     movs r1,#0x80    @ 080c3e8a 8021
     adds r3,r6,#0x0    @ 080c3e8c 331c
-    bl FUN_080f6ccc                          @ 080c3e8e 32f01dff
+    bl FUN_080f6ccc                          @ 080c3e8e 32f01dff  -- FUN_080f6ccc(0x80, w|h, 0x100, oam_combined) (OBJ blit)
     ldr r2,[r7,#0x0]                         @ 080c3e92 3a68
     lsls r1,r2,#0x1a    @ 080c3e94 9106
     lsrs r0,r1,#0x1b    @ 080c3e96 c80e
-    cmp r0,#0xa                              @ 080c3e98 0a28
+    cmp r0,#0xa                              @ 080c3e98 0a28  -- r0 = bits [5:1] (row), > 10 -> default
     ble LAB_080c3e9e                         @ 080c3e9a 00dd
     b switchD_080c3e02__default              @ 080c3e9c 16e1
 LAB_080c3e9e:
@@ -233858,25 +233910,25 @@ LAB_080c3ea4:
     lsrs r1,r1,#0x1b    @ 080c3ea8 c90e
     lsls r2,r2,#0x12    @ 080c3eaa 9204
     lsrs r2,r2,#0x18    @ 080c3eac 120e
-    bl FUN_080c3880                          @ 080c3eae fff7e7fc
+    bl FUN_080c3880                          @ 080c3eae fff7e7fc  -- FUN_080c3880(side, row, col) (card stats overlay)
     ldr r0,[r7,#0x0]                         @ 080c3eb2 3868
     lsls r0,r0,#0x11    @ 080c3eb4 4004
     lsrs r0,r0,#0x1f    @ 080c3eb6 c00f
-    cmp r4,r0                                @ 080c3eb8 8442
+    cmp r4,r0                                @ 080c3eb8 8442  -- if r4 == flag_a -> 跳过 stats, 直接收尾
     bne LAB_080c3ebe                         @ 080c3eba 00d1
     b LAB_080c40bc                           @ 080c3ebc fee0
 LAB_080c3ebe:
     movs r0,#0x3    @ 080c3ebe 0320
-    bl FUN_080f9ab4                          @ 080c3ec0 35f0f8fd
+    bl FUN_080f9ab4                          @ 080c3ec0 35f0f8fd  -- FUN_080f9ab4(3) (TODO: 推测 sound/sfx 触发)
     b LAB_080c40bc                           @ 080c3ec4 fae0
     .byte  0x00, 0x00
 DAT_080c3ec8:
     .word  0x0201e2a0                     @ 080c3ec8 a0e20102
 switchD_080c3e02__caseD_2:
-    ldr r2,[r7,#0x0]                         @ 080c3ecc 3a68
+    ldr r2,[r7,#0x0]                         @ 080c3ecc 3a68  -- case 2: 4-tick affine (旋转+缩放) 过渡
     lsls r0,r2,#0x11    @ 080c3ece 5004
     lsrs r0,r0,#0x1f    @ 080c3ed0 c00f
-    cmp r4,r0                                @ 080c3ed2 8442
+    cmp r4,r0                                @ 080c3ed2 8442  -- if r4 == flag_a -> 走 LAB_080c3f30 (无第二图, 仅 affine)
     bne LAB_080c3f30                         @ 080c3ed4 2cd1
     lsls r2,r2,#0x1f    @ 080c3ed6 d207
     lsrs r2,r2,#0x1f    @ 080c3ed8 d20f
@@ -233886,12 +233938,12 @@ switchD_080c3e02__caseD_2:
     eors r0,r1    @ 080c3ee0 4840
     cmp r2,r0                                @ 080c3ee2 8242
     bne LAB_080c3ee8                         @ 080c3ee4 00d1
-    adds r6,#0x40    @ 080c3ee6 4036
+    adds r6,#0x40    @ 080c3ee6 4036  -- r6 += 0x40 (player turn 修正)
 LAB_080c3ee8:
     movs r0,#0x80    @ 080c3ee8 8020
     ldrb r7,[r7,#0x1]                        @ 080c3eea 7f78
     ands r0,r7    @ 080c3eec 3840
-    cmp r0,#0x0                              @ 080c3eee 0028
+    cmp r0,#0x0                              @ 080c3eee 0028  -- if !(packed[bit15] aka byte+1 bit7) -> r6 += 0x20 - shift*8
     bne LAB_080c3f08                         @ 080c3ef0 0ad1
     adds r6,#0x20    @ 080c3ef2 2036
     ldr r0, DAT_080c3f04                     @ 080c3ef4 0348
@@ -233903,9 +233955,9 @@ LAB_080c3ee8:
 DAT_080c3f00:
     .word  0x0201e2a0                     @ 080c3f00 a0e20102
 DAT_080c3f04:
-    .word  0x02023110                     @ 080c3f04 10310202
+    .word  gUIEffectState                 @ 080c3f04 10310202
 LAB_080c3f08:
-    ldr r0, DAT_080c3f2c                     @ 080c3f08 0848
+    ldr r0, DAT_080c3f2c                     @ 080c3f08 0848  -- else -> r6 += shift*8 (相反方向)
     ldrb r0,[r0,#0x18]                       @ 080c3f0a 007e
     lsls r0,r0,#0x3    @ 080c3f0c c000
     adds r6,r6,r0    @ 080c3f0e 3618
@@ -233921,21 +233973,21 @@ LAB_080c3f10:
     orrs r6,r1    @ 080c3f20 0e43
     movs r1,#0x80    @ 080c3f22 8021
     adds r3,r6,#0x0    @ 080c3f24 331c
-    bl FUN_080f6ccc                          @ 080c3f26 32f0d1fe
-    b LAB_080c4010                           @ 080c3f2a 71e0
+    bl FUN_080f6ccc                          @ 080c3f26 32f0d1fe  -- FUN_080f6ccc(0x80, w|h, 0x100, oam) (双侧 OBJ blit)
+    b LAB_080c4010                           @ 080c3f2a 71e0  -- → 进入 LAB_080c4010 (推 sub_tick)
 DAT_080c3f2c:
-    .word  0x02023110                     @ 080c3f2c 10310202
+    .word  gUIEffectState                 @ 080c3f2c 10310202
 LAB_080c3f30:
-    movs r0,#0x80    @ 080c3f30 8020
+    movs r0,#0x80    @ 080c3f30 8020  -- LAB_080c3f30: 单侧 affine 过渡主体
     lsls r0,r0,#0x2    @ 080c3f32 8000
     .hword 0x4681    @ 080c3f34 8146
     ldr r1, DAT_080c3f84                     @ 080c3f36 1349
     add r0,sp,#0x8                           @ 080c3f38 02a8
     movs r2,#0xa    @ 080c3f3a 0a22
-    bl memcpy                                @ 080c3f3c 4af00efd
+    bl memcpy                                @ 080c3f3c 4af00efd  -- memcpy(sp+0x8, rom_card_zoom_anim_curve, 10) (4-tick angle 曲线)
     ldr r4, DAT_080c3f88                     @ 080c3f40 114c
-    ldrb r1,[r4,#0x18]                       @ 080c3f42 217e
-    cmp r1,#0x1                              @ 080c3f44 0129
+    ldrb r1,[r4,#0x18]                       @ 080c3f42 217e  -- r1 = sub_tick @ gUIEffectState[+0x18]
+    cmp r1,#0x1                              @ 080c3f44 0129  -- if sub_tick > 1 -> r2 = 0x208 (后两 tick 用大尺寸)
     bls LAB_080c3f4e                         @ 080c3f46 02d9
     movs r2,#0x82    @ 080c3f48 8222
     lsls r2,r2,#0x2    @ 080c3f4a 9200
@@ -233971,9 +234023,9 @@ LAB_080c3f6a:
     subs r6,r6,r0    @ 080c3f80 361a
     b LAB_080c3f96                           @ 080c3f82 08e0
 DAT_080c3f84:
-    .word  0x09e493b4                     @ 080c3f84 b493e409
+    .word  rom_card_zoom_anim_curve       @ 080c3f84 b493e409
 DAT_080c3f88:
-    .word  0x02023110                     @ 080c3f88 10310202
+    .word  gUIEffectState                 @ 080c3f88 10310202
 DAT_080c3f8c:
     .word  0x0201e2a0                     @ 080c3f8c a0e20102
 LAB_080c3f90:
@@ -233981,43 +234033,43 @@ LAB_080c3f90:
     lsls r0,r4,#0x3    @ 080c3f92 e000
     adds r6,r6,r0    @ 080c3f94 3618
 LAB_080c3f96:
-    ldr r0, DAT_080c4028                     @ 080c3f96 2448
+    ldr r0, DAT_080c4028                     @ 080c3f96 2448  -- r8 = rom_sin_table_q8 (0x09e5f8f0, 128-entry Q8 sin)
     .hword 0x4680    @ 080c3f98 8046
     ldr r0, DAT_080c402c                     @ 080c3f9a 2448
     ldrb r0,[r0,#0x18]                       @ 080c3f9c 007e
     lsls r0,r0,#0x1    @ 080c3f9e 4000
     add r0,sp                                @ 080c3fa0 6844
     adds r0,#0x8    @ 080c3fa2 0830
-    ldrh r0,[r0,#0x0]                        @ 080c3fa4 0088
+    ldrh r0,[r0,#0x0]                        @ 080c3fa4 0088  -- r0 = anim_curve[sub_tick] (∈ {0,1,8,15})
     lsls r0,r0,#0x2    @ 080c3fa6 8000
     movs r4,#0x7f    @ 080c3fa8 7f24
-    ands r0,r4    @ 080c3faa 2040
+    ands r0,r4    @ 080c3faa 2040  -- angle_idx = (anim*4) & 0x7f (7-bit, sin table 索引)
     lsls r0,r0,#0x1    @ 080c3fac 4000
     add r0,r8                                @ 080c3fae 4044
-    ldrh r2,[r0,#0x0]                        @ 080c3fb0 0288
+    ldrh r2,[r0,#0x0]                        @ 080c3fb0 0288  -- r2 = sin[angle_idx]
     lsls r1,r2,#0x2    @ 080c3fb2 9100
     adds r1,r2,r1    @ 080c3fb4 5118
     movs r5,#0x80    @ 080c3fb6 8025
     lsls r5,r5,#0x1    @ 080c3fb8 6d00
-    adds r1,r1,r5    @ 080c3fba 4919
+    adds r1,r1,r5    @ 080c3fba 4919  -- scale = sin*5 + 0x100 (Q8, 1.0~7×)
     adds r0,r6,#0x0    @ 080c3fbc 301c
     ands r0,r4    @ 080c3fbe 2040
     lsls r0,r0,#0x1    @ 080c3fc0 4000
     add r0,r8                                @ 080c3fc2 4044
     movs r2,#0x0    @ 080c3fc4 0022
-    ldrsh r0,[r0,r2]                         @ 080c3fc6 805e
+    ldrsh r0,[r0,r2]                         @ 080c3fc6 805e  -- r0 = sin[(r6 & 0x7f)]  → 此处作 cos 入口?
     adds r2,r0,#0x0    @ 080c3fc8 021c
-    muls r2,r1    @ 080c3fca 4a43
+    muls r2,r1    @ 080c3fca 4a43  -- PA = cos × scale (affine 矩阵)
     adds r0,r6,#0x0    @ 080c3fcc 301c
     adds r0,#0x20    @ 080c3fce 2030
     ands r0,r4    @ 080c3fd0 2040
     lsls r0,r0,#0x1    @ 080c3fd2 4000
     add r0,r8                                @ 080c3fd4 4044
     movs r5,#0x0    @ 080c3fd6 0025
-    ldrsh r3,[r0,r5]                         @ 080c3fd8 435f
+    ldrsh r3,[r0,r5]                         @ 080c3fd8 435f  -- r3 = sin[(r6+0x20) & 0x7f] (90° 偏移 = cos→sin)
     adds r5,r3,#0x0    @ 080c3fda 1d1c
-    muls r5,r1    @ 080c3fdc 4d43
-    adds r6,#0x40    @ 080c3fde 4036
+    muls r5,r1    @ 080c3fdc 4d43  -- PB = sin × scale
+    adds r6,#0x40    @ 080c3fde 4036  -- r6 += 0x40 (180° 偏移, 用于 PC/PD)
     ands r6,r4    @ 080c3fe0 2640
     lsls r6,r6,#0x1    @ 080c3fe2 7600
     add r6,r8                                @ 080c3fe4 4644
@@ -234037,29 +234089,29 @@ LAB_080c3f96:
     orrs r2,r5    @ 080c4000 2a43
     lsls r3,r3,#0x10    @ 080c4002 1b04
     lsrs r3,r3,#0x10    @ 080c4004 1b0c
-    ldrh r6,[r6,#0x0]                        @ 080c4006 3688
+    ldrh r6,[r6,#0x0]                        @ 080c4006 3688  -- r6 = sin[(r6+0x40) & 0x7f] (-cos)
     lsls r4,r6,#0x10    @ 080c4008 3404
     orrs r3,r4    @ 080c400a 2343
-    bl FUN_080f72e8                          @ 080c400c 33f06cf9
+    bl FUN_080f72e8                          @ 080c400c 33f06cf9  -- FUN_080f72e8(...) (提交 OAM affine 矩阵)
 LAB_080c4010:
-    ldr r2, DAT_080c402c                     @ 080c4010 064a
-    ldrb r0,[r2,#0x18]                       @ 080c4012 107e
-    adds r1,r0,#0x1    @ 080c4014 411c
+    ldr r2, DAT_080c402c                     @ 080c4010 064a  -- LAB_080c4010: sub_tick 推进逻辑
+    ldrb r0,[r2,#0x18]                       @ 080c4012 107e  -- r0 = gUIEffectState[+0x18] (sub_tick byte)
+    adds r1,r0,#0x1    @ 080c4014 411c  -- gUIEffectState[+0x18] = sub_tick + 1
     strb r1,[r2,#0x18]                       @ 080c4016 1176
     lsls r0,r0,#0x18    @ 080c4018 0006
     lsrs r0,r0,#0x18    @ 080c401a 000e
     cmp r0,#0x3                              @ 080c401c 0328
-    bls LAB_080c40c4                         @ 080c401e 51d9
-    ldrh r0,[r2,#0x0]                        @ 080c4020 1088
+    bls LAB_080c40c4                         @ 080c401e 51d9  -- if old_sub_tick <= 3 -> 仍在 4-tick 内, r0 = 1 返回
+    ldrh r0,[r2,#0x0]                        @ 080c4020 1088  -- old_sub_tick > 3 -> 主 step++ (gUIEffectState[+0x0])
     adds r0,#0x1    @ 080c4022 0130
     strh r0,[r2,#0x0]                        @ 080c4024 1080
     b LAB_080c40c4                           @ 080c4026 4de0
 DAT_080c4028:
-    .word  0x09e5f8f0                     @ 080c4028 f0f8e509
+    .word  rom_sin_table_q8               @ 080c4028 f0f8e509
 DAT_080c402c:
-    .word  0x02023110                     @ 080c402c 10310202
+    .word  gUIEffectState                 @ 080c402c 10310202
 switchD_080c3e02__caseD_3:
-    ldr r0,[r7,#0x0]                         @ 080c4030 3868
+    ldr r0,[r7,#0x0]                         @ 080c4030 3868  -- case 3: 装第二张图 + 完整 stats overlay
     lsls r1,r0,#0x11    @ 080c4032 4104
     lsrs r0,r1,#0x1f    @ 080c4034 c80f
     cmp r4,r0                                @ 080c4036 8442
@@ -234069,7 +234121,7 @@ switchD_080c3e02__caseD_3:
     lsls r3,r3,#0x2    @ 080c403e 9b00
     .hword 0x4648    @ 080c4040 4846
     movs r2,#0x0    @ 080c4042 0022
-    bl load_card_list_small_image            @ 080c4044 fff7baf9
+    bl load_card_list_small_image            @ 080c4044 fff7baf9  -- load_card_list_small_image (条件性)
 LAB_080c4048:
     ldr r2,[r7,#0x0]                         @ 080c4048 3a68
     lsls r2,r2,#0x1f    @ 080c404a d207
@@ -234100,7 +234152,7 @@ LAB_080c4068:
     orrs r6,r1    @ 080c4078 0e43
     movs r1,#0x80    @ 080c407a 8021
     adds r3,r6,#0x0    @ 080c407c 331c
-    bl FUN_080f6ccc                          @ 080c407e 32f025fe
+    bl FUN_080f6ccc                          @ 080c407e 32f025fe  -- FUN_080f6ccc(...) (OBJ blit)
     ldr r4,[r7,#0x0]                         @ 080c4082 3c68
     lsls r0,r4,#0x1f    @ 080c4084 e007
     lsrs r0,r0,#0x1f    @ 080c4086 c00f
@@ -234115,35 +234167,35 @@ LAB_080c4068:
     str r4,[sp,#0x0]                         @ 080c4098 0094
     .hword 0x464c    @ 080c409a 4c46
     str r4,[sp,#0x4]                         @ 080c409c 0194
-    bl FUN_080c38cc                          @ 080c409e fff715fc
+    bl FUN_080c38cc                          @ 080c409e fff715fc  -- FUN_080c38cc(side, row, col, flag_a, flag_b) 全 bit-field stats
     b LAB_080c40bc                           @ 080c40a2 0be0
 DAT_080c40a4:
     .word  0x0201e2a0                     @ 080c40a4 a0e20102
 switchD_080c3e02__caseD_4:
-    ldr r0,[r7,#0x0]                         @ 080c40a8 3868
+    ldr r0,[r7,#0x0]                         @ 080c40a8 3868  -- case 4: 切大图模式
     lsls r0,r0,#0x11    @ 080c40aa 4004
     lsrs r0,r0,#0x1f    @ 080c40ac c00f
-    cmp r4,r0                                @ 080c40ae 8442
+    cmp r4,r0                                @ 080c40ae 8442  -- if r4 == flag_a -> 跳过 (单侧时不重渲)
     beq LAB_080c40bc                         @ 080c40b0 04d0
     .hword 0x4648    @ 080c40b2 4846
     adds r1,r7,#0x0    @ 080c40b4 391c
     movs r2,#0x0    @ 080c40b6 0022
-    bl FUN_080cb1cc                          @ 080c40b8 07f088f8
+    bl FUN_080cb1cc                          @ 080c40b8 07f088f8  -- FUN_080cb1cc(side, &gUIEffectState+0x4, 0) (BG VRAM+palette 大图)
 LAB_080c40bc:
-    ldr r1, DAT_080c40c8                     @ 080c40bc 0249
+    ldr r1, DAT_080c40c8                     @ 080c40bc 0249  -- LAB_080c40bc: 共用收尾 (主 step++)
     ldrh r0,[r1,#0x0]                        @ 080c40be 0888
     adds r0,#0x1    @ 080c40c0 0130
-    strh r0,[r1,#0x0]                        @ 080c40c2 0880
+    strh r0,[r1,#0x0]                        @ 080c40c2 0880  -- gUIEffectState[+0x0] (u16) = step + 1
 LAB_080c40c4:
-    movs r0,#0x1    @ 080c40c4 0120
+    movs r0,#0x1    @ 080c40c4 0120  -- LAB_080c40c4: 返回 r0 = 1 (busy)
     b LAB_080c40ce                           @ 080c40c6 02e0
 DAT_080c40c8:
-    .word  0x02023110                     @ 080c40c8 10310202
+    .word  gUIEffectState                 @ 080c40c8 10310202
 switchD_080c3e02__default:
-    movs r0,#0x0    @ 080c40cc 0020
+    movs r0,#0x0    @ 080c40cc 0020  -- default: r0 = 0 (done)
 LAB_080c40ce:
     add sp,#0x24                             @ 080c40ce 09b0
-    pop {r3,r4,r5}                           @ 080c40d0 38bc
+    pop {r3,r4,r5}                           @ 080c40d0 38bc  -- epilogue: 返回 r0 (1=busy / 0=done)
     .hword 0x4698    @ 080c40d2 9846
     .hword 0x46a1    @ 080c40d4 a146
     .hword 0x46aa    @ 080c40d6 aa46
@@ -234184,7 +234236,7 @@ FUN_080c40e0:
     bx r0                                    @ 080c411c 0047
     .byte  0x00, 0x00
 DAT_080c4120:
-    .word  0x02023110                     @ 080c4120 10310202
+    .word  gUIEffectState                 @ 080c4120 10310202
 DAT_080c4124:
     .word  0x02023130                     @ 080c4124 30310202
 DAT_080c4128:
@@ -234489,7 +234541,7 @@ LAB_080c437e:
     ldr r0,[r0,#0x0]                         @ 080c4384 0068
     .hword 0x4687    @ 080c4386 8746
 DAT_080c4388:
-    .word  0x02023110                     @ 080c4388 10310202
+    .word  gUIEffectState                 @ 080c4388 10310202
 DAT_080c438c:
     .word  0x080c4390                     @ 080c438c 90430c08
 PTR_DAT_080c4390:
@@ -234830,7 +234882,7 @@ FUN_080c4ea0:
     pop {r0}                                 @ 080c4ecc 01bc
     bx r0                                    @ 080c4ece 0047
 DAT_080c4ed0:
-    .word  0x02023110                     @ 080c4ed0 10310202
+    .word  gUIEffectState                 @ 080c4ed0 10310202
 DAT_080c4ed4:
     .word  0x02023130                     @ 080c4ed4 30310202
 DAT_080c4ed8:
@@ -235101,7 +235153,7 @@ LAB_080c50f4:
     movs r0,#0x1    @ 080c50f4 0120
     b LAB_080c542c                           @ 080c50f6 99e1
 DAT_080c50f8:
-    .word  0x02023110                     @ 080c50f8 10310202
+    .word  gUIEffectState                 @ 080c50f8 10310202
 DAT_080c50fc:
     .word  0x02023118                     @ 080c50fc 18310202
 DAT_080c5100:
@@ -235180,7 +235232,7 @@ LAB_080c5178:
     b LAB_080c519a                           @ 080c5188 07e0
     .byte  0x00, 0x00
 DAT_080c518c:
-    .word  0x02023110                     @ 080c518c 10310202
+    .word  gUIEffectState                 @ 080c518c 10310202
 DAT_080c5190:
     .word  0x02023118                     @ 080c5190 18310202
 DAT_080c5194:
@@ -235277,7 +235329,7 @@ LAB_080c5232:
     lsls r0,r0,#0x5    @ 080c5240 4001
     b LAB_080c524e                           @ 080c5242 04e0
 DAT_080c5244:
-    .word  0x02023110                     @ 080c5244 10310202
+    .word  gUIEffectState                 @ 080c5244 10310202
 DAT_080c5248:
     .word  0x0201e2a0                     @ 080c5248 a0e20102
 LAB_080c524c:
@@ -235315,7 +235367,7 @@ LAB_080c5282:
     b LAB_080c50f4                           @ 080c5288 34e7
     .byte  0x00, 0x00
 DAT_080c528c:
-    .word  0x02023110                     @ 080c528c 10310202
+    .word  gUIEffectState                 @ 080c528c 10310202
 switchD_080c4f02__caseD_3:
     .hword 0x4651    @ 080c5290 5146
     ldr r0,[r1,#0x0]                         @ 080c5292 0868
@@ -235490,7 +235542,7 @@ LAB_080c53b2:
     b LAB_080c5402                           @ 080c53ec 09e0
     .byte  0x00, 0x00
 DAT_080c53f0:
-    .word  0x02023110                     @ 080c53f0 10310202
+    .word  gUIEffectState                 @ 080c53f0 10310202
 DAT_080c53f4:
     .word  0x0201e2a0                     @ 080c53f4 a0e20102
 DAT_080c53f8:
@@ -235506,7 +235558,7 @@ LAB_080c5402:
     b LAB_080c50f4                           @ 080c5408 74e6
     .byte  0x00, 0x00
 DAT_080c540c:
-    .word  0x02023110                     @ 080c540c 10310202
+    .word  gUIEffectState                 @ 080c540c 10310202
 LAB_080c5410:
     movs r0,#0x3    @ 080c5410 0320
     rsbs r0,r0,#0    @ 080c5412 4042
@@ -241740,7 +241792,9 @@ DAT_080c8fd0:
 DAT_080c8fd4:
     .word  0x0201e2a0                     @ 080c8fd4 a0e20102
     ROM_INCBIN 0xc8fd8, 0x208
-FUN_080c91e0:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析.
+play_ui_effect_06:
     push {r4,lr}                             @ 080c91e0 10b5
     ldr r1, DAT_080c9208                     @ 080c91e2 0949
     ldr r4, DAT_080c920c                     @ 080c91e4 094c
@@ -248488,7 +248542,7 @@ DAT_080cc8a0:
 DAT_080cc8a4:
     .word  0x02023130                     @ 080cc8a4 30310202
 DAT_080cc8a8:
-    .word  0x02023110                     @ 080cc8a8 10310202
+    .word  gUIEffectState                 @ 080cc8a8 10310202
 DAT_080cc8ac:
     .word  0x0201f440                     @ 080cc8ac 40f40102
 DAT_080cc8b0:
@@ -248710,7 +248764,9 @@ DAT_080cca78:
     .word  0x02023130                     @ 080cca78 30310202
 DAT_080cca7c:
     .word  0x00000215                     @ 080cca7c 15020000
-FUN_080cca80:
+
+@ 占位名 - play_ui_effect (FUN_0801ef94) case 0x03 子状态机, 待详细分析.
+play_ui_effect_03:
     push {r4,r5,r6,r7,lr}                    @ 080cca80 f0b5
     movs r5,#0x0    @ 080cca82 0025
     ldr r0, PTR_gP1LifePoints_080cca94       @ 080cca84 0348
@@ -318643,7 +318699,7 @@ FUN_080f5fa0:
 PTR_gPrng_080f6014:
     .word  gPrng                          @ 080f6014 40000003
 DAT_080f6018:
-    .word  0x09e5f8f0                     @ 080f6018 f0f8e509
+    .word  rom_sin_table_q8               @ 080f6018 f0f8e509
 LAB_080f601c:
     lsls r0,r7,#0x10    @ 080f601c 3804
     asrs r0,r0,#0x10    @ 080f601e 0014
@@ -318752,7 +318808,7 @@ FUN_080f609c:
 PTR_gPrng_080f6108:
     .word  gPrng                          @ 080f6108 40000003
 DAT_080f610c:
-    .word  0x09e5f8f0                     @ 080f610c f0f8e509
+    .word  rom_sin_table_q8               @ 080f610c f0f8e509
     ROM_INCBIN 0xf6110, 0x34
 FUN_080f6144:
     push {r4,lr}                             @ 080f6144 10b5
@@ -323025,7 +323081,7 @@ LAB_080f870a:
     lsls r0,r4,#0x3    @ 080f871c e000
     b LAB_080f872a                           @ 080f871e 04e0
 DAT_080f8720:
-    .word  0x09e5f8f0                     @ 080f8720 f0f8e509
+    .word  rom_sin_table_q8               @ 080f8720 f0f8e509
 LAB_080f8724:
     ldr r5,[sp,#0x64]                        @ 080f8724 199d
     subs r3,r3,r5    @ 080f8726 5b1b
@@ -323340,7 +323396,7 @@ LAB_080f894a:
     lsls r0,r5,#0x3    @ 080f895c e800
     b LAB_080f8968                           @ 080f895e 03e0
 DAT_080f8960:
-    .word  0x09e5f8f0                     @ 080f8960 f0f8e509
+    .word  rom_sin_table_q8               @ 080f8960 f0f8e509
 LAB_080f8964:
     subs r4,r4,r5    @ 080f8964 641b
     .hword 0x4640    @ 080f8966 4046

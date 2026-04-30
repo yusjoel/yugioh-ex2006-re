@@ -87,11 +87,14 @@ RENAMES = [
     # 2026-04-30: 重命名 pack_ui_state_machine -> banner_anim_state_machine.
     # 复审发现该函数实际读 0x0201fec0 (gBannerState), 与 pack_ui_state (0x03005850)
     # 完全无关; 内容是 banner 出/入场 7-state 动画 (BLDY/WINOUT 调制 + tile copy).
-    ("pack_ui_state_machine", "banner_anim_state_machine",
+    # 2026-04-30 (后续): 修正 plate, FUN_0801ef94 实为 play_ui_effect (UI 特效派发器),
+    # 不是 PageManager.
+    ("banner_anim_state_machine", "banner_anim_state_machine",
         "banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init "
         "(载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out "
         "(BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 "
-        "[gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 1."),
+        "[gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: play_ui_effect "
+        "(FUN_0801ef94) case 1 (effect_id=1)."),
     ("FUN_080d8ddc", "pack_visible_count",
         "pack-banner: 返回当前可见 pack 数 (clamp 1..5)"),
     ("FUN_080d8f84", "pack_detail_bg_tile_load",
@@ -204,17 +207,101 @@ RENAMES = [
         "无入参/无返回值. 用途: 光标 hover 决斗场 zone 改变后, 此函数按当前 "
         "state 重渲染. 14 个 caller 跨 PageManager / scene loader / banner 等."),
 
-    # 2026-04-30: shuen demo 播放协调器 (FUN_0801ef94 case 0x3c 的 page handler)
-    ("FUN_080bc880", "play_demo_shuen",
+    # 2026-04-30: shuen demo 播放协调器 (play_ui_effect FUN_0801ef94 case 0x3c)
+    # 2026-04-30 (后续): 修正 plate, FUN_0801ef94 实为 play_ui_effect (UI 特效派发器),
+    # 不是 PageManager.
+    ("play_demo_shuen", "play_demo_shuen",
         "demo 'shuen' (終焉) 过场动画播放协调器. 6-step 顺序状态机 on "
         "[gBannerState+0x10]: step 0=等帧 (FUN_080cca5c) / step 1=BG/palette "
         "setup (FUN_0801b7e8) / step 2=fs_load 资源 (FUN_0801ba4c) / step 3=播放 "
         "demo_shuen_state_machine / step 4=HUD 刷新 + refresh_duel_field_zone_info "
         "(强制推进) / step 5=等帧收尾 (FUN_080cca38) / default=cleanup (与 "
         "banner_anim_state_machine 同清理协议: 清 gBannerState[+0x0] bit1 + "
-        "[0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 "
-        "case 0x3c (PageManager scene_id=0x3c). 推测是 shuen victory anim, "
+        "[0x02023345] bit0,2). 返回 1=busy / 0=done. 唯一 caller: play_ui_effect "
+        "(FUN_0801ef94) case 0x3c (effect_id=0x3c). 推测是 shuen victory anim, "
         "等 runtime 验证."),
+
+    # 2026-04-30: UI 特效派发器 (effect-id-based per-frame dispatcher)
+    ("FUN_0801ef94", "play_ui_effect",
+        "UI 特效派发器 (per-frame tick). r0 = effect_id (0..0x3d), 按 ID 分派到 "
+        "~28 个独立的 effect handler 子状态机, busy/done 返回. dispatch table 中 "
+        "重复 fallthrough 到 default 的 case = 未实现/无效 ID. 已识别 effect: "
+        "0x01 = banner_anim_state_machine (pack 横幅出/入场), "
+        "0x1a = play_card_zoom_in (小图→大图缩放过渡), "
+        "0x3c = play_demo_shuen (终焉过场). 其他 case 子函数批量占位为 "
+        "play_ui_effect_<id_hex>, 待详细分析. cmp 上限 0x3d, 大于则 default. "
+        "case 0/0x18/0x19 共享 caseD_0 (state-bit 检查后选 FUN_080c4edc 或 FUN_080c4350); "
+        "case 1 状态化 (banner_anim 或 FUN_080be600); case 2 三向状态分派. "
+        "case 0x31/0x32 内联无 bl (特殊 readback)."),
+
+    # 2026-04-30: 卡牌小图→大图缩放/旋转过渡动画 (play_ui_effect case 0x1a)
+    ("FUN_080c3d20", "play_card_zoom_in",
+        "卡牌小图→大图缩放/旋转过渡动画 (5-step on gUIEffectState[+0x0]). "
+        "读 packed card_ref @ gUIEffectState[+0x4] (bit 0=side / [5:1]=row(5b) / "
+        "[13:6]=col(8b) / bit 16,17=mode flag). 索引 EWRAM 卡牌信息数组 "
+        "0x0201c510 + (row+col)*0x14 + side*0x868. step 0 = "
+        "load_card_list_small_image x2 装载小图. step 1 = 起始帧 (FUN_080f6ccc + "
+        "FUN_080c3880 stats overlay). step 2 = 4-tick affine 过渡: 用 "
+        "rom_sin_table_q8 算 PA/PB/PC/PD, angle index ∈ rom_card_zoom_anim_curve "
+        "{0,1,8,15}, scale = sin*5 + 0x100, 提交 OAM affine 矩阵 via FUN_080f72e8; "
+        "sub_tick @ gUIEffectState[+0x18] 满 4 后主 step++. step 3 = 装第二张图 + "
+        "FUN_080c38cc 全 bit-field stats. step 4 = 切大图模式 (FUN_080cb1cc, "
+        "BG VRAM/palette 重磅上传). 返回 1=busy / 0=done. 唯一 caller: "
+        "play_ui_effect (FUN_0801ef94) case 0x1a (effect_id=0x1a)."),
+
+    # 2026-04-30: play_ui_effect 子 handler 占位名 (按 case_id hex 编号, 待详细分析)
+    ("FUN_080cca80", "play_ui_effect_03",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x03 子状态机, 待详细分析."),
+    ("FUN_080bdcfc", "play_ui_effect_04",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x04 子状态机, 待详细分析."),
+    ("FUN_080bfe0c", "play_ui_effect_05",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x05 子状态机, 待详细分析."),
+    ("FUN_080c91e0", "play_ui_effect_06",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x06 子状态机, 待详细分析."),
+    ("FUN_080c2acc", "play_ui_effect_0b",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0b 子状态机, 待详细分析."),
+    ("FUN_080c3080", "play_ui_effect_0c",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0c 子状态机, 待详细分析."),
+    ("FUN_080bf394", "play_ui_effect_0e",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x0e 子状态机, 待详细分析."),
+    ("FUN_080c25ac", "play_ui_effect_10",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x10 子状态机, 待详细分析."),
+    ("FUN_080bf228", "play_ui_effect_11",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x11 子状态机, 待详细分析."),
+    ("FUN_080c1ad0", "play_ui_effect_13",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x13 子状态机, 待详细分析."),
+    ("FUN_080bea94", "play_ui_effect_15",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x15 子状态机, 待详细分析."),
+    ("FUN_080befc0", "play_ui_effect_17",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x17 子状态机, 待详细分析."),
+    ("FUN_080c0c70", "play_ui_effect_20",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x20 子状态机, 待详细分析."),
+    ("FUN_080c0f38", "play_ui_effect_21",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x21 子状态机, 待详细分析."),
+    ("FUN_080c17d4", "play_ui_effect_23",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x23 子状态机, 待详细分析."),
+    ("FUN_080c1448", "play_ui_effect_25",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x25 子状态机, 待详细分析."),
+    ("FUN_080c1c60", "play_ui_effect_2e",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x2e 子状态机, 待详细分析."),
+    ("FUN_080c1e9c", "play_ui_effect_2f",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x2f 子状态机, 待详细分析."),
+    ("FUN_080bd870", "play_ui_effect_30",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x30 子状态机, 待详细分析."),
+    ("FUN_080c07e4", "play_ui_effect_33",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x33 子状态机, 待详细分析."),
+    ("FUN_080c0a80", "play_ui_effect_34",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x34 子状态机, 待详细分析."),
+    ("FUN_080bf7f8", "play_ui_effect_37",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x37 子状态机, 待详细分析."),
+    ("FUN_080bf5a0", "play_ui_effect_38",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x38 子状态机, 待详细分析."),
+    ("FUN_080bcbd4", "play_ui_effect_3a",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3a 子状态机, 待详细分析."),
+    ("FUN_080bc918", "play_ui_effect_3b",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3b 子状态机, 待详细分析."),
+    ("FUN_080c2544", "play_ui_effect_3d",
+        "占位名 - play_ui_effect (FUN_0801ef94) case 0x3d 子状态机, 待详细分析."),
 
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",

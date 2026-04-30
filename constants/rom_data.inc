@@ -3757,10 +3757,12 @@
 .equ name_input_path_strings,      0x09E3B360
 .equ nns_g2d_assert_anmID,         0x09E3B434
 .equ pass_input_path_strings,      0x09E3C5B4
+.equ rom_card_zoom_anim_curve,     0x09E493B4
 .equ name_input_state_table,       0x09E588B8
 .equ file_banlists_start,          0x09E5EF30
 .equ font_jp_charset_table,        0x09E5F864
 .equ file_starter_deck_start,      0x09E5F884
+.equ rom_sin_table_q8,             0x09E5F8F0
 .equ file_struct_decks_start,      0x09E5FA58
 .equ fs_master_struct,             0x09E61178
 .equ deck_kuriboh,                 0x09E6468E
