@@ -228,6 +228,7 @@ LABELS = [
 
     (0x0201C4E0, "gP1LifePoints"),
     (0x0201CD48, "gP2LifePoints"),
+    (0x0201FEC0, "gBannerState"),  # banner 出/入场动画状态结构 (EWRAM); +0x10 = u8 main state, +0x11 = u8 sub-counter; 被 banner_anim_state_machine + FUN_080be600 共用
     (0x02029512, "gPlayerNameEntry"),
     (0x02029810, "gBanlistPasswordBuffer"),
 

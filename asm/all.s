@@ -19797,7 +19797,7 @@ DAT_0801eb34:
 DAT_0801eb38:
     .word  0x0201f440                     @ 0801eb38 40f40102
 DAT_0801eb3c:
-    .word  0x0201fec0                     @ 0801eb3c c0fe0102
+    .word  gBannerState                   @ 0801eb3c c0fe0102
 PTR_gPrng_0801eb40:
     .word  gPrng                          @ 0801eb40 40000003
 DAT_0801eb44:
@@ -20470,7 +20470,7 @@ switchD_0801efa4__caseD_1:
     ands r0,r1    @ 0801f148 0840
     cmp r0,#0x0                              @ 0801f14a 0028
     beq LAB_0801f15c                         @ 0801f14c 06d0
-    bl pack_ui_state_machine                 @ 0801f14e 9ef02dff
+    bl banner_anim_state_machine             @ 0801f14e 9ef02dff
     b LAB_0801f234                           @ 0801f152 6fe0
 PTR_gPrng_0801f154:
     .word  gPrng                          @ 0801f154 40000003
@@ -20516,7 +20516,7 @@ LAB_0801f190:
     b switchD_0801efa4__caseD_7              @ 0801f1a0 47e0
     .byte  0x00, 0x00
 DAT_0801f1a4:
-    .word  0x0201fec0                     @ 0801f1a4 c0fe0102
+    .word  gBannerState                   @ 0801f1a4 c0fe0102
 LAB_0801f1a8:
     cmp r0,#0x3                              @ 0801f1a8 0328
     beq LAB_0801f1ba                         @ 0801f1aa 06d0
@@ -218369,7 +218369,7 @@ FUN_080bc794:
     bx r0                                    @ 080bc7d0 0047
     .byte  0x00, 0x00
 DAT_080bc7d4:
-    .word  0x0201fec0                     @ 080bc7d4 c0fe0102
+    .word  gBannerState                   @ 080bc7d4 c0fe0102
 DAT_080bc7d8:
     .word  0x02023130                     @ 080bc7d8 30310202
 DAT_080bc7dc:
@@ -218476,7 +218476,7 @@ FUN_080bc880:
 switchD_080bc892__switchD:
     .hword 0x4687    @ 080bc892 8746
 DAT_080bc894:
-    .word  0x0201fec0                     @ 080bc894 c0fe0102
+    .word  gBannerState                   @ 080bc894 c0fe0102
 DAT_080bc898:
     .word  0x080bc89c                     @ 080bc898 9cc80b08
 switchD_080bc892__switchdataD_080bc89c:
@@ -218517,7 +218517,7 @@ LAB_080bc8e6:
     b LAB_080bc90c                           @ 080bc8e8 10e0
     .byte  0x00, 0x00
 DAT_080bc8ec:
-    .word  0x0201fec0                     @ 080bc8ec c0fe0102
+    .word  gBannerState                   @ 080bc8ec c0fe0102
 switchD_080bc892__default:
     movs r0,#0x2    @ 080bc8f0 0220
     rsbs r0,r0,#0    @ 080bc8f2 4042
@@ -218562,7 +218562,7 @@ switchD_080bc938__switchD:
     .hword 0x4687    @ 080bc938 8746
     .byte  0x00, 0x00
 DAT_080bc93c:
-    .word  0x0201fec0                     @ 080bc93c c0fe0102
+    .word  gBannerState                   @ 080bc93c c0fe0102
 DAT_080bc940:
     .word  0x080bc944                     @ 080bc940 44c90b08
 switchD_080bc938__switchdataD_080bc944:
@@ -218820,7 +218820,7 @@ switchD_080bc938__caseD_5:
 DAT_080bcb58:
     .word  0x0000dfff                     @ 080bcb58 ffdf0000
 DAT_080bcb5c:
-    .word  0x0201fec0                     @ 080bcb5c c0fe0102
+    .word  gBannerState                   @ 080bcb5c c0fe0102
 DAT_080bcb60:
     .word  0x02023130                     @ 080bcb60 30310202
 DAT_080bcb64:
@@ -218856,7 +218856,7 @@ LAB_080bcb9a:
     b LAB_080bcbc0                           @ 080bcb9c 10e0
     .byte  0x00, 0x00
 DAT_080bcba0:
-    .word  0x0201fec0                     @ 080bcba0 c0fe0102
+    .word  gBannerState                   @ 080bcba0 c0fe0102
 LAB_080bcba4:
     movs r0,#0x2    @ 080bcba4 0220
     rsbs r0,r0,#0    @ 080bcba6 4042
@@ -218897,7 +218897,7 @@ FUN_080bcbd4:
 switchD_080bcbe6__switchD:
     .hword 0x4687    @ 080bcbe6 8746
 DAT_080bcbe8:
-    .word  0x0201fec0                     @ 080bcbe8 c0fe0102
+    .word  gBannerState                   @ 080bcbe8 c0fe0102
 DAT_080bcbec:
     .word  0x080bcbf0                     @ 080bcbec f0cb0b08
 switchD_080bcbe6__switchdataD_080bcbf0:
@@ -218938,7 +218938,7 @@ LAB_080bcc3a:
     b LAB_080bcc60                           @ 080bcc3c 10e0
     .byte  0x00, 0x00
 DAT_080bcc40:
-    .word  0x0201fec0                     @ 080bcc40 c0fe0102
+    .word  gBannerState                   @ 080bcc40 c0fe0102
 switchD_080bcbe6__default:
     movs r0,#0x2    @ 080bcc44 0220
     rsbs r0,r0,#0    @ 080bcc46 4042
@@ -218984,7 +218984,7 @@ LAB_080bcc86:
 switchD_080bcc8e__switchD:
     .hword 0x4687    @ 080bcc8e 8746
 DAT_080bcc90:
-    .word  0x0201fec0                     @ 080bcc90 c0fe0102
+    .word  gBannerState                   @ 080bcc90 c0fe0102
 DAT_080bcc94:
     .word  0x080bcc98                     @ 080bcc94 98cc0b08
 switchD_080bcc8e__switchdataD_080bcc98:
@@ -219105,7 +219105,7 @@ DAT_080bcd84:
 PTR_BLDCNT_080bcd88:
     .word  BLDCNT                         @ 080bcd88 50000004
 DAT_080bcd8c:
-    .word  0x0201fec0                     @ 080bcd8c c0fe0102
+    .word  gBannerState                   @ 080bcd8c c0fe0102
 switchD_080bcc8e__caseD_1:
     ldr r3, PTR_BLDALPHA_080bcdf0            @ 080bcd90 174b
     ldrb r1,[r2,#0x12]                       @ 080bcd92 917c
@@ -219158,7 +219158,7 @@ LAB_080bcdac:
 PTR_BLDALPHA_080bcdf0:
     .word  BLDALPHA                       @ 080bcdf0 52000004
 DAT_080bcdf4:
-    .word  0x0201fec0                     @ 080bcdf4 c0fe0102
+    .word  gBannerState                   @ 080bcdf4 c0fe0102
 switchD_080bcc8e__caseD_2:
     ldrb r0,[r2,#0x11]                       @ 080bcdf8 507c
     adds r0,#0x1    @ 080bcdfa 0130
@@ -219216,7 +219216,7 @@ LAB_080bce1c:
 PTR_BLDALPHA_080bce60:
     .word  BLDALPHA                       @ 080bce60 52000004
 DAT_080bce64:
-    .word  0x0201fec0                     @ 080bce64 c0fe0102
+    .word  gBannerState                   @ 080bce64 c0fe0102
 switchD_080bcc8e__caseD_4:
     movs r4,#0x0    @ 080bce68 0024
     lsls r6,r5,#0x10    @ 080bce6a 2e04
@@ -219282,7 +219282,7 @@ LAB_080bcea6:
     b LAB_080bcef8                           @ 080bcee0 0ae0
     .byte  0x00, 0x00
 DAT_080bcee4:
-    .word  0x0201fec0                     @ 080bcee4 c0fe0102
+    .word  gBannerState                   @ 080bcee4 c0fe0102
 DAT_080bcee8:
     .word  0x02023130                     @ 080bcee8 30310202
 DAT_080bceec:
@@ -219383,7 +219383,7 @@ LAB_080bcf94:
 PTR_WIN0V_080bcfa0:
     .word  WIN0V                          @ 080bcfa0 44000004
 DAT_080bcfa4:
-    .word  0x0201fec0                     @ 080bcfa4 c0fe0102
+    .word  gBannerState                   @ 080bcfa4 c0fe0102
 DAT_080bcfa8:
     .word  0x00007fff                     @ 080bcfa8 ff7f0000
 switchD_080bcc8e__caseD_6:
@@ -219427,7 +219427,7 @@ LAB_080bcfea:
     b LAB_080bcd6a                           @ 080bcff4 b9e6
     .byte  0x00, 0x00
 DAT_080bcff8:
-    .word  0x0201fec0                     @ 080bcff8 c0fe0102
+    .word  gBannerState                   @ 080bcff8 c0fe0102
 switchD_080bcc8e__caseD_7:
     movs r4,#0x0    @ 080bcffc 0024
     lsls r6,r5,#0x10    @ 080bcffe 2e04
@@ -219490,7 +219490,7 @@ LAB_080bd05a:
     b LAB_080bcd6a                           @ 080bd070 7be6
     .byte  0x00, 0x00
 DAT_080bd074:
-    .word  0x0201fec0                     @ 080bd074 c0fe0102
+    .word  gBannerState                   @ 080bd074 c0fe0102
 PTR_BLDCNT_080bd078:
     .word  BLDCNT                         @ 080bd078 50000004
 PTR_BLDY_080bd07c:
@@ -219509,7 +219509,7 @@ LAB_080bd08c:
     b LAB_080bcd6a                           @ 080bd094 69e6
     .byte  0x00, 0x00
 DAT_080bd098:
-    .word  0x0201fec0                     @ 080bd098 c0fe0102
+    .word  gBannerState                   @ 080bd098 c0fe0102
 LAB_080bd09c:
     movs r0,#0x0    @ 080bd09c 0020
 LAB_080bd09e:
@@ -219540,7 +219540,7 @@ switchD_080bd0c8__switchD:
     .hword 0x4687    @ 080bd0c8 8746
     .byte  0x00, 0x00
 DAT_080bd0cc:
-    .word  0x0201fec0                     @ 080bd0cc c0fe0102
+    .word  gBannerState                   @ 080bd0cc c0fe0102
 DAT_080bd0d0:
     .word  0x080bd0d4                     @ 080bd0d0 d4d00b08
 switchD_080bd0c8__switchdataD_080bd0d4:
@@ -219725,7 +219725,7 @@ LAB_080bd208:
 DAT_080bd24c:
     .word  0x098d20a4                     @ 080bd24c a4208d09
 DAT_080bd250:
-    .word  0x0201fec0                     @ 080bd250 c0fe0102
+    .word  gBannerState                   @ 080bd250 c0fe0102
 switchD_080bd0c8__caseD_3:
     ldr r0, DAT_080bd2b0                     @ 080bd254 1648
     movs r2,#0x10    @ 080bd256 1022
@@ -219775,7 +219775,7 @@ LAB_080bd26c:
 DAT_080bd2b0:
     .word  0x098d20a4                     @ 080bd2b0 a4208d09
 DAT_080bd2b4:
-    .word  0x0201fec0                     @ 080bd2b4 c0fe0102
+    .word  gBannerState                   @ 080bd2b4 c0fe0102
 switchD_080bd0c8__caseD_4:
     movs r4,#0x0    @ 080bd2b8 0024
     lsls r5,r5,#0x10    @ 080bd2ba 2d04
@@ -219834,7 +219834,7 @@ LAB_080bd324:
     movs r0,#0x1    @ 080bd324 0120
     b LAB_080bd3e0                           @ 080bd326 5be0
 DAT_080bd328:
-    .word  0x0201fec0                     @ 080bd328 c0fe0102
+    .word  gBannerState                   @ 080bd328 c0fe0102
 PTR_gPrng_080bd32c:
     .word  gPrng                          @ 080bd32c 40000003
 DAT_080bd330:
@@ -219848,7 +219848,7 @@ LAB_080bd334:
     b LAB_080bd324                           @ 080bd340 f0e7
     .byte  0x00, 0x00
 DAT_080bd344:
-    .word  0x0201fec0                     @ 080bd344 c0fe0102
+    .word  gBannerState                   @ 080bd344 c0fe0102
 switchD_080bd0c8__caseD_5:
     movs r4,#0x0    @ 080bd348 0024
     lsls r5,r5,#0x10    @ 080bd34a 2d04
@@ -219886,7 +219886,7 @@ LAB_080bd34e:
     strb r0,[r1,#0x10]                       @ 080bd38c 0874
     b LAB_080bd324                           @ 080bd38e c9e7
 DAT_080bd390:
-    .word  0x0201fec0                     @ 080bd390 c0fe0102
+    .word  gBannerState                   @ 080bd390 c0fe0102
 switchD_080bd0c8__caseD_6:
     movs r0,#0x2    @ 080bd394 0220
     bl FUN_080f59a0                          @ 080bd396 38f003fb
@@ -219898,7 +219898,7 @@ switchD_080bd0c8__caseD_6:
     strb r0,[r1,#0x10]                       @ 080bd3a4 0874
     b LAB_080bd324                           @ 080bd3a6 bde7
 DAT_080bd3a8:
-    .word  0x0201fec0                     @ 080bd3a8 c0fe0102
+    .word  gBannerState                   @ 080bd3a8 c0fe0102
 switchD_080bd0c8__caseD_8:
     bl FUN_080bcc6c                          @ 080bd3ac fff75efc
     cmp r0,#0x0                              @ 080bd3b0 0028
@@ -219911,7 +219911,7 @@ LAB_080bd3b4:
     b LAB_080bd324                           @ 080bd3bc b2e7
     .byte  0x00, 0x00
 DAT_080bd3c0:
-    .word  0x0201fec0                     @ 080bd3c0 c0fe0102
+    .word  gBannerState                   @ 080bd3c0 c0fe0102
 switchD_080bd0c8__caseD_7:
     movs r0,#0x2    @ 080bd3c4 0220
     rsbs r0,r0,#0    @ 080bd3c6 4042
@@ -219960,7 +219960,7 @@ switchD_080bd414__switchD:
     .hword 0x4687    @ 080bd414 8746
     .byte  0x00, 0x00
 DAT_080bd418:
-    .word  0x0201fec0                     @ 080bd418 c0fe0102
+    .word  gBannerState                   @ 080bd418 c0fe0102
 DAT_080bd41c:
     .word  0x080bd420                     @ 080bd41c 20d40b08
 switchD_080bd414__switchdataD_080bd420:
@@ -220153,7 +220153,7 @@ LAB_080bd5a8:
     movs r0,#0x1    @ 080bd5a8 0120
     b LAB_080bd64c                           @ 080bd5aa 4fe0
 DAT_080bd5ac:
-    .word  0x0201fec0                     @ 080bd5ac c0fe0102
+    .word  gBannerState                   @ 080bd5ac c0fe0102
 PTR_gPrng_080bd5b0:
     .word  gPrng                          @ 080bd5b0 40000003
 DAT_080bd5b4:
@@ -220166,7 +220166,7 @@ LAB_080bd5b8:
     b LAB_080bd5a8                           @ 080bd5c0 f2e7
     .byte  0x00, 0x00
 DAT_080bd5c4:
-    .word  0x0201fec0                     @ 080bd5c4 c0fe0102
+    .word  gBannerState                   @ 080bd5c4 c0fe0102
 switchD_080bd414__caseD_3:
     movs r4,#0x0    @ 080bd5c8 0024
     lsls r5,r5,#0x10    @ 080bd5ca 2d04
@@ -220205,7 +220205,7 @@ LAB_080bd5ce:
     strb r0,[r1,#0x10]                       @ 080bd610 0874
     b LAB_080bd5a8                           @ 080bd612 c9e7
 DAT_080bd614:
-    .word  0x0201fec0                     @ 080bd614 c0fe0102
+    .word  gBannerState                   @ 080bd614 c0fe0102
 switchD_080bd414__caseD_8:
     bl FUN_080bcc6c                          @ 080bd618 fff728fb
     cmp r0,#0x0                              @ 080bd61c 0028
@@ -220218,7 +220218,7 @@ LAB_080bd620:
     b LAB_080bd5a8                           @ 080bd628 bee7
     .byte  0x00, 0x00
 DAT_080bd62c:
-    .word  0x0201fec0                     @ 080bd62c c0fe0102
+    .word  gBannerState                   @ 080bd62c c0fe0102
 switchD_080bd414__caseD_4:
     movs r0,#0x2    @ 080bd630 0220
     rsbs r0,r0,#0    @ 080bd632 4042
@@ -220280,7 +220280,7 @@ switchD_080bd694__switchD:
 DAT_080bd698:
     .word  0x09e5f8f0                     @ 080bd698 f0f8e509
 DAT_080bd69c:
-    .word  0x0201fec0                     @ 080bd69c c0fe0102
+    .word  gBannerState                   @ 080bd69c c0fe0102
 DAT_080bd6a0:
     .word  0x080bd6a4                     @ 080bd6a0 a4d60b08
 switchD_080bd694__switchdataD_080bd6a4:
@@ -220381,7 +220381,7 @@ LAB_080bd72e:
     b LAB_080bd7e8                           @ 080bd774 38e0
     .byte  0x00, 0x00
 DAT_080bd778:
-    .word  0x0201fec0                     @ 080bd778 c0fe0102
+    .word  gBannerState                   @ 080bd778 c0fe0102
 switchD_080bd694__caseD_2:
     movs r4,#0x0    @ 080bd77c 0024
     movs r0,#0x30    @ 080bd77e 3020
@@ -220440,7 +220440,7 @@ LAB_080bd7e8:
     movs r0,#0x1    @ 080bd7e8 0120
     b LAB_080bd860                           @ 080bd7ea 39e0
 DAT_080bd7ec:
-    .word  0x0201fec0                     @ 080bd7ec c0fe0102
+    .word  gBannerState                   @ 080bd7ec c0fe0102
 PTR_gPrng_080bd7f0:
     .word  gPrng                          @ 080bd7f0 40000003
 DAT_080bd7f4:
@@ -220453,7 +220453,7 @@ LAB_080bd7f8:
     b LAB_080bd7e8                           @ 080bd800 f2e7
     .byte  0x00, 0x00
 DAT_080bd804:
-    .word  0x0201fec0                     @ 080bd804 c0fe0102
+    .word  gBannerState                   @ 080bd804 c0fe0102
 switchD_080bd694__caseD_3:
     movs r0,#0x2    @ 080bd808 0220
     bl FUN_080f5840                          @ 080bd80a 38f019f8
@@ -220470,7 +220470,7 @@ switchD_080bd694__caseD_3:
     strb r0,[r1,#0x10]                       @ 080bd824 0874
     b LAB_080bd7e8                           @ 080bd826 dfe7
 DAT_080bd828:
-    .word  0x0201fec0                     @ 080bd828 c0fe0102
+    .word  gBannerState                   @ 080bd828 c0fe0102
 switchD_080bd694__caseD_8:
     bl FUN_080bcc6c                          @ 080bd82c fff71efa
     cmp r0,#0x0                              @ 080bd830 0028
@@ -220483,7 +220483,7 @@ LAB_080bd834:
     b LAB_080bd7e8                           @ 080bd83c d4e7
     .byte  0x00, 0x00
 DAT_080bd840:
-    .word  0x0201fec0                     @ 080bd840 c0fe0102
+    .word  gBannerState                   @ 080bd840 c0fe0102
 switchD_080bd694__caseD_4:
     movs r0,#0x2    @ 080bd844 0220
     rsbs r0,r0,#0    @ 080bd846 4042
@@ -220527,7 +220527,7 @@ LAB_080bd882:
 switchD_080bd88a__switchD:
     .hword 0x4687    @ 080bd88a 8746
 DAT_080bd88c:
-    .word  0x0201fec0                     @ 080bd88c c0fe0102
+    .word  gBannerState                   @ 080bd88c c0fe0102
 DAT_080bd890:
     .word  0x080bd894                     @ 080bd890 94d80b08
 switchD_080bd88a__switchdataD_080bd894:
@@ -220595,7 +220595,7 @@ DAT_080bd914:
 PTR_BLDCNT_080bd918:
     .word  BLDCNT                         @ 080bd918 50000004
 DAT_080bd91c:
-    .word  0x0201fec0                     @ 080bd91c c0fe0102
+    .word  gBannerState                   @ 080bd91c c0fe0102
 switchD_080bd88a__caseD_1:
     ldr r3, PTR_BLDALPHA_080bd980            @ 080bd920 174b
     ldrb r1,[r2,#0x11]                       @ 080bd922 517c
@@ -220648,7 +220648,7 @@ LAB_080bd93c:
 PTR_BLDALPHA_080bd980:
     .word  BLDALPHA                       @ 080bd980 52000004
 DAT_080bd984:
-    .word  0x0201fec0                     @ 080bd984 c0fe0102
+    .word  gBannerState                   @ 080bd984 c0fe0102
 switchD_080bd88a__caseD_2:
     movs r4,#0x0    @ 080bd988 0024
     lsls r6,r5,#0x10    @ 080bd98a 2e04
@@ -220687,7 +220687,7 @@ LAB_080bd98e:
     strb r0,[r1,#0x11]                       @ 080bd9cc 4874
     b LAB_080bd8f2                           @ 080bd9ce 90e7
 DAT_080bd9d0:
-    .word  0x0201fec0                     @ 080bd9d0 c0fe0102
+    .word  gBannerState                   @ 080bd9d0 c0fe0102
 switchD_080bd88a__caseD_3:
     ldr r3, PTR_BLDALPHA_080bda38            @ 080bd9d4 184b
     ldrb r1,[r2,#0x11]                       @ 080bd9d6 517c
@@ -220743,7 +220743,7 @@ LAB_080bda2a:
 PTR_BLDALPHA_080bda38:
     .word  BLDALPHA                       @ 080bda38 52000004
 DAT_080bda3c:
-    .word  0x0201fec0                     @ 080bda3c c0fe0102
+    .word  gBannerState                   @ 080bda3c c0fe0102
 switchD_080bd88a__caseD_4:
     ldrb r0,[r2,#0x10]                       @ 080bda40 107c
     adds r0,#0x1    @ 080bda42 0130
@@ -220793,7 +220793,7 @@ LAB_080bda8a:
 switchD_080bda92__switchD:
     .hword 0x4687    @ 080bda92 8746
 DAT_080bda94:
-    .word  0x0201fec0                     @ 080bda94 c0fe0102
+    .word  gBannerState                   @ 080bda94 c0fe0102
 DAT_080bda98:
     .word  0x080bda9c                     @ 080bda98 9cda0b08
 switchD_080bda92__switchdataD_080bda9c:
@@ -220854,7 +220854,7 @@ PTR_BLDCNT_080bdb10:
 PTR_BLDALPHA_080bdb14:
     .word  BLDALPHA                       @ 080bdb14 52000004
 DAT_080bdb18:
-    .word  0x0201fec0                     @ 080bdb18 c0fe0102
+    .word  gBannerState                   @ 080bdb18 c0fe0102
 switchD_080bda92__caseD_2:
     ldrb r0,[r2,#0x11]                       @ 080bdb1c 507c
     cmp r0,#0x10                             @ 080bdb1e 1028
@@ -220921,7 +220921,7 @@ LAB_080bdb54:
 DAT_080bdb98:
     .word  0x098c9064                     @ 080bdb98 64908c09
 DAT_080bdb9c:
-    .word  0x0201fec0                     @ 080bdb9c c0fe0102
+    .word  gBannerState                   @ 080bdb9c c0fe0102
 switchD_080bda92__caseD_1:
     ldrb r0,[r2,#0x10]                       @ 080bdba0 107c
     adds r0,#0x1    @ 080bdba2 0130
@@ -220951,7 +220951,7 @@ LAB_080bdbc2:
 switchD_080bdbca__switchD:
     .hword 0x4687    @ 080bdbca 8746
 DAT_080bdbcc:
-    .word  0x0201fec0                     @ 080bdbcc c0fe0102
+    .word  gBannerState                   @ 080bdbcc c0fe0102
 DAT_080bdbd0:
     .word  0x080bdbd4                     @ 080bdbd0 d4db0b08
 switchD_080bdbca__switchdataD_080bdbd4:
@@ -221012,7 +221012,7 @@ PTR_BLDCNT_080bdc48:
 PTR_BLDALPHA_080bdc4c:
     .word  BLDALPHA                       @ 080bdc4c 52000004
 DAT_080bdc50:
-    .word  0x0201fec0                     @ 080bdc50 c0fe0102
+    .word  gBannerState                   @ 080bdc50 c0fe0102
 switchD_080bdbca__caseD_2:
     ldrb r0,[r2,#0x11]                       @ 080bdc54 507c
     cmp r0,#0x10                             @ 080bdc56 1028
@@ -221081,7 +221081,7 @@ DAT_080bdcd0:
 DAT_080bdcd4:
     .word  0x000040c0                     @ 080bdcd4 c0400000
 DAT_080bdcd8:
-    .word  0x0201fec0                     @ 080bdcd8 c0fe0102
+    .word  gBannerState                   @ 080bdcd8 c0fe0102
 switchD_080bdbca__caseD_1:
     ldrb r0,[r2,#0x10]                       @ 080bdcdc 107c
     adds r0,#0x1    @ 080bdcde 0130
@@ -221122,7 +221122,7 @@ switchD_080bdd18__switchD:
     .hword 0x4687    @ 080bdd18 8746
     .byte  0x00, 0x00
 DAT_080bdd1c:
-    .word  0x0201fec0                     @ 080bdd1c c0fe0102
+    .word  gBannerState                   @ 080bdd1c c0fe0102
 DAT_080bdd20:
     .word  0x080bdd24                     @ 080bdd20 24dd0b08
 switchD_080bdd18__switchdataD_080bdd24:
@@ -221214,7 +221214,7 @@ DAT_080bddd8:
 DAT_080bdddc:
     .word  0x00003fff                     @ 080bdddc ff3f0000
 DAT_080bdde0:
-    .word  0x0201fec0                     @ 080bdde0 c0fe0102
+    .word  gBannerState                   @ 080bdde0 c0fe0102
 switchD_080bdd18__caseD_1:
     ldr r1, PTR_BLDCNT_080bddf4              @ 080bdde4 0349
     movs r0,#0xef    @ 080bdde6 ef20
@@ -221337,7 +221337,7 @@ DAT_080bdec8:
 DAT_080bdecc:
     .word  0x000040c0                     @ 080bdecc c0400000
 DAT_080bded0:
-    .word  0x0201fec0                     @ 080bded0 c0fe0102
+    .word  gBannerState                   @ 080bded0 c0fe0102
 switchD_080bdd18__caseD_4:
     ldr r2, PTR_WIN0V_080bdf08               @ 080bded4 0c4a
     ldrb r1,[r4,#0x11]                       @ 080bded6 617c
@@ -221385,7 +221385,7 @@ switchD_080bdd18__caseD_5:
 DAT_080bdf28:
     .word  0x0000dfff                     @ 080bdf28 ffdf0000
 DAT_080bdf2c:
-    .word  0x0201fec0                     @ 080bdf2c c0fe0102
+    .word  gBannerState                   @ 080bdf2c c0fe0102
 LAB_080bdf30:
     cmp r2,#0x0                              @ 080bdf30 002a
     bne LAB_080bdf6c                         @ 080bdf32 1bd1
@@ -221453,18 +221453,18 @@ DAT_080bdfa4:
 DAT_080bdfa8:
     .word  0x00000215                     @ 080bdfa8 15020000
 
-@ pack-banner: 卡包 UI 运行时状态机 (7 路 switch), overlay/动画
-pack_ui_state_machine:
+@ banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init (载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out (BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 [gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 1.
+banner_anim_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 080bdfac f0b5
     .hword 0x4657    @ 080bdfae 5746
     .hword 0x464e    @ 080bdfb0 4e46
     .hword 0x4645    @ 080bdfb2 4546
     push {r5,r6,r7}                          @ 080bdfb4 e0b4
     sub sp,#0x8                              @ 080bdfb6 82b0
-    ldr r5, DAT_080bdfd0                     @ 080bdfb8 054d
-    ldrb r0,[r5,#0x10]                       @ 080bdfba 287c
+    ldr r5, DAT_080bdfd0                     @ 080bdfb8 054d  -- r5 = &gBannerState (0x0201FEC0)
+    ldrb r0,[r5,#0x10]                       @ 080bdfba 287c  -- r0 = main state (gBannerState[+0x10])
     adds r3,r5,#0x0    @ 080bdfbc 2b1c
-    cmp r0,#0x6                              @ 080bdfbe 0628
+    cmp r0,#0x6                              @ 080bdfbe 0628  -- state > 6 -> default (DONE cleanup, return 0)
     bls LAB_080bdfc4                         @ 080bdfc0 00d9
 switchD_080bdfcc__default:
     b LAB_080be5bc                           @ 080bdfc2 fbe2
@@ -221472,12 +221472,12 @@ LAB_080bdfc4:
     lsls r0,r0,#0x2    @ 080bdfc4 8000
     ldr r1, DAT_080bdfd4                     @ 080bdfc6 0349
     adds r0,r0,r1    @ 080bdfc8 4018
-    ldr r0,[r0,#0x0]                         @ 080bdfca 0068
+    ldr r0,[r0,#0x0]                         @ 080bdfca 0068  -- switch dispatch: pc = jump_table[state] (table @ 0x080bdfd8)
 switchD_080bdfcc__switchD:
     .hword 0x4687    @ 080bdfcc 8746
     .byte  0x00, 0x00
 DAT_080bdfd0:
-    .word  0x0201fec0                     @ 080bdfd0 c0fe0102
+    .word  gBannerState                   @ 080bdfd0 c0fe0102
 DAT_080bdfd4:
     .word  0x080bdfd8                     @ 080bdfd4 d8df0b08
 switchD_080bdfcc__switchdataD_080bdfd8:
@@ -221489,7 +221489,7 @@ switchD_080bdfcc__switchdataD_080bdfd8:
     .word  0x080be4a0                     @ 080bdfec a0e40b08
     .word  0x080be598                     @ 080bdff0 98e50b08
 switchD_080bdfcc__caseD_0:
-    ldr r0, DAT_080be06c                     @ 080bdff4 1d48
+    ldr r0, DAT_080be06c                     @ 080bdff4 1d48  -- case 0 INIT (1 帧): 载 banner palette/tile (lang-dep, gSettings 低3bit), 设 WINOUT, 启 BG3
     ldr r1, DAT_080be070                     @ 080bdff6 1e49
     movs r2,#0x20    @ 080bdff8 2022
     bl FUN_080f4ea4                          @ 080bdffa 36f053ff
@@ -221643,7 +221643,7 @@ PTR_WINOUT_080be128:
 DAT_080be12c:
     .word  0x00001f3f                     @ 080be12c 3f1f0000
 switchD_080bdfcc__caseD_1:
-    movs r0,#0xe    @ 080be130 0e20
+    movs r0,#0xe    @ 080be130 0e20  -- case 1 FADE_IN_A (7 帧): 3行x4次 FUN_080f616c, 末尾 BLDY = sub-counter
     .hword 0x4681    @ 080be132 8146
     movs r1,#0x0    @ 080be134 0021
     .hword 0x4688    @ 080be136 8846
@@ -221726,7 +221726,7 @@ LAB_080be140:
     strh r0,[r1,#0x0]                        @ 080be1d6 0880
     ldrb r0,[r2,#0x11]                       @ 080be1d8 507c
     adds r0,#0x1    @ 080be1da 0130
-    strb r0,[r2,#0x11]                       @ 080be1dc 5074
+    strb r0,[r2,#0x11]                       @ 080be1dc 5074  -- gBannerState[+0x11]++ (sub-counter)
     lsls r0,r0,#0x18    @ 080be1de 0006
     lsrs r0,r0,#0x18    @ 080be1e0 000e
     cmp r0,#0x6                              @ 080be1e2 0628
@@ -221735,12 +221735,12 @@ LAB_080be140:
 LAB_080be1e8:
     ldrb r0,[r2,#0x10]                       @ 080be1e8 107c
     adds r0,#0x1    @ 080be1ea 0130
-    strb r0,[r2,#0x10]                       @ 080be1ec 1074
+    strb r0,[r2,#0x10]                       @ 080be1ec 1074  -- gBannerState[+0x10]++; gBannerState[+0x11] = 0 (满 7 帧, 进 case 2)
     movs r0,#0x0    @ 080be1ee 0020
     strb r0,[r2,#0x11]                       @ 080be1f0 5074
     b LAB_080be5b0                           @ 080be1f2 dde1
 DAT_080be1f4:
-    .word  0x0201fec0                     @ 080be1f4 c0fe0102
+    .word  gBannerState                   @ 080be1f4 c0fe0102
 DAT_080be1f8:
     .word  0x000040c0                     @ 080be1f8 c0400000
 DAT_080be1fc:
@@ -221748,7 +221748,7 @@ DAT_080be1fc:
 PTR_BLDY_080be200:
     .word  BLDY                           @ 080be200 54000004
 switchD_080bdfcc__caseD_2:
-    movs r7,#0x30    @ 080be204 3027
+    movs r7,#0x30    @ 080be204 3027  -- case 2 DISPLAY (64 帧): 3行x2次 FUN_080f616c, 持续显示无 BLDY 调整
     movs r2,#0x0    @ 080be206 0022
     .hword 0x4690    @ 080be208 9046
     movs r6,#0x18    @ 080be20a 1826
@@ -221799,9 +221799,9 @@ LAB_080be25a:
     b LAB_080be5b0                           @ 080be264 a4e1
     .byte  0x00, 0x00
 DAT_080be268:
-    .word  0x0201fec0                     @ 080be268 c0fe0102
+    .word  gBannerState                   @ 080be268 c0fe0102
 switchD_080bdfcc__caseD_3:
-    movs r0,#0x1b    @ 080be26c 1b20
+    movs r0,#0x1b    @ 080be26c 1b20  -- case 3 FADE_OUT_A (8 帧): 3行x8次 FUN_080f616c (复杂坐标), 末尾 bl FUN_080f9ab4(8)
     .hword 0x4681    @ 080be26e 8146
     movs r1,#0x0    @ 080be270 0021
     .hword 0x4688    @ 080be272 8846
@@ -221994,13 +221994,13 @@ LAB_080be3e4:
     b LAB_080be5b0                           @ 080be3f4 dce0
     .byte  0x00, 0x00
 DAT_080be3f8:
-    .word  0x0201fec0                     @ 080be3f8 c0fe0102
+    .word  gBannerState                   @ 080be3f8 c0fe0102
 DAT_080be3fc:
     .word  0x000048c0                     @ 080be3fc c0480000
 DAT_080be400:
     .word  0x000040c0                     @ 080be400 c0400000
 switchD_080bdfcc__caseD_4:
-    movs r7,#0x30    @ 080be404 3027
+    movs r7,#0x30    @ 080be404 3027  -- case 4 TEXT_TRANSITION (64 帧): 前16帧 fade-in 文本, 16~32帧反向 fade-out
     adds r1,r3,#0x0    @ 080be406 191c
     ldrb r0,[r1,#0x11]                       @ 080be408 487c
     cmp r0,#0x20                             @ 080be40a 2028
@@ -222077,9 +222077,9 @@ LAB_080be48c:
 DAT_080be498:
     .word  0x098a5024                     @ 080be498 24508a09
 DAT_080be49c:
-    .word  0x0201fec0                     @ 080be49c c0fe0102
+    .word  gBannerState                   @ 080be49c c0fe0102
 switchD_080bdfcc__caseD_5:
-    movs r2,#0x1b    @ 080be4a0 1b22
+    movs r2,#0x1b    @ 080be4a0 1b22  -- case 5 FADE_OUT_B (8 帧): 3行x4次 FUN_080f616c, 末尾 BLDY = (8 - sub-counter)
     .hword 0x4691    @ 080be4a2 9146
     movs r3,#0x0    @ 080be4a4 0023
     .hword 0x4698    @ 080be4a6 9846
@@ -222193,7 +222193,7 @@ LAB_080be4b4:
     strb r0,[r2,#0x10]                       @ 080be584 1074
     b LAB_080be5b0                           @ 080be586 13e0
 DAT_080be588:
-    .word  0x0201fec0                     @ 080be588 c0fe0102
+    .word  gBannerState                   @ 080be588 c0fe0102
 DAT_080be58c:
     .word  0x000048c0                     @ 080be58c c0480000
 DAT_080be590:
@@ -222201,27 +222201,27 @@ DAT_080be590:
 PTR_BLDY_080be594:
     .word  BLDY                           @ 080be594 54000004
 switchD_080bdfcc__caseD_6:
-    bl FUN_080f55d4                          @ 080be598 37f01cf8
+    bl FUN_080f55d4                          @ 080be598 37f01cf8  -- case 6 TEARDOWN (1 帧): bl FUN_080f55d4(); DISPCNT &= 0x1FFF (清 BG3 enable)
     movs r2,#0x80    @ 080be59c 8022
     lsls r2,r2,#0x13    @ 080be59e d204
     ldrh r1,[r2,#0x0]                        @ 080be5a0 1188
     ldr r0, DAT_080be5b4                     @ 080be5a2 0448
     ands r0,r1    @ 080be5a4 0840
 LAB_080be5a6:
-    strh r0,[r2,#0x0]                        @ 080be5a6 1080
+    strh r0,[r2,#0x0]                        @ 080be5a6 1080  -- case 0 / case 6 共用: 写 DISPCNT, gBannerState[+0x10]++
     ldr r1, DAT_080be5b8                     @ 080be5a8 0349
     ldrb r0,[r1,#0x10]                       @ 080be5aa 087c
     adds r0,#0x1    @ 080be5ac 0130
-    strb r0,[r1,#0x10]                       @ 080be5ae 0874
+    strb r0,[r1,#0x10]                       @ 080be5ae 0874  -- gBannerState[+0x10]++ (推进主状态)
 LAB_080be5b0:
-    movs r0,#0x1    @ 080be5b0 0120
+    movs r0,#0x1    @ 080be5b0 0120  -- LAB_080be5b0: r0 = 1 (busy, 状态机继续运行)
     b LAB_080be5e8                           @ 080be5b2 19e0
 DAT_080be5b4:
     .word  0x00001fff                     @ 080be5b4 ff1f0000
 DAT_080be5b8:
-    .word  0x0201fec0                     @ 080be5b8 c0fe0102
+    .word  gBannerState                   @ 080be5b8 c0fe0102
 LAB_080be5bc:
-    ldr r4, DAT_080be5f8                     @ 080be5bc 0e4c
+    ldr r4, DAT_080be5f8                     @ 080be5bc 0e4c  -- default DONE: 读 [0x02023350+0x220] 调 FUN_080f9adc(); 清 gBannerState[+0x0] bit1; 清 [0x02023350+0x215] bit0,2
     movs r1,#0x88    @ 080be5be 8821
     lsls r1,r1,#0x2    @ 080be5c0 8900
     adds r0,r4,r1    @ 080be5c2 6018
@@ -222241,9 +222241,9 @@ LAB_080be5bc:
     ldrb r1,[r4,#0x0]                        @ 080be5e0 2178
     ands r0,r1    @ 080be5e2 0840
     strb r0,[r4,#0x0]                        @ 080be5e4 2070
-    movs r0,#0x0    @ 080be5e6 0020
+    movs r0,#0x0    @ 080be5e6 0020  -- r0 = 0 (done)
 LAB_080be5e8:
-    add sp,#0x8                              @ 080be5e8 02b0
+    add sp,#0x8                              @ 080be5e8 02b0  -- epilogue: 返回 r0 (1=busy / 0=done)
     pop {r3,r4,r5}                           @ 080be5ea 38bc
     .hword 0x4698    @ 080be5ec 9846
     .hword 0x46a1    @ 080be5ee a146
@@ -222280,7 +222280,7 @@ LAB_080be61e:
 switchD_080be626__switchD:
     .hword 0x4687    @ 080be626 8746
 DAT_080be628:
-    .word  0x0201fec0                     @ 080be628 c0fe0102
+    .word  gBannerState                   @ 080be628 c0fe0102
 DAT_080be62c:
     .word  0x080be630                     @ 080be62c 30e60b08
 switchD_080be626__switchdataD_080be630:
@@ -222465,7 +222465,7 @@ LAB_080be796:
     strb r0,[r4,#0x11]                       @ 080be7a4 6074
     b LAB_080be96c                           @ 080be7a6 e1e0
 DAT_080be7a8:
-    .word  0x0201fec0                     @ 080be7a8 c0fe0102
+    .word  gBannerState                   @ 080be7a8 c0fe0102
 DAT_080be7ac:
     .word  0x000048c0                     @ 080be7ac c0480000
 DAT_080be7b0:
@@ -222546,7 +222546,7 @@ LAB_080be838:
 DAT_080be844:
     .word  0x098a5024                     @ 080be844 24508a09
 DAT_080be848:
-    .word  0x0201fec0                     @ 080be848 c0fe0102
+    .word  gBannerState                   @ 080be848 c0fe0102
 switchD_080be626__caseD_3:
     adds r2,r4,#0x0    @ 080be84c 221c
     adds r2,#0x20    @ 080be84e 2032
@@ -222671,7 +222671,7 @@ LAB_080be8ca:
     strb r0,[r2,#0x10]                       @ 080be940 1074
     b LAB_080be96c                           @ 080be942 13e0
 DAT_080be944:
-    .word  0x0201fec0                     @ 080be944 c0fe0102
+    .word  gBannerState                   @ 080be944 c0fe0102
 DAT_080be948:
     .word  0x000048c0                     @ 080be948 c0480000
 DAT_080be94c:
@@ -222697,7 +222697,7 @@ LAB_080be96c:
 DAT_080be970:
     .word  0x00001fff                     @ 080be970 ff1f0000
 DAT_080be974:
-    .word  0x0201fec0                     @ 080be974 c0fe0102
+    .word  gBannerState                   @ 080be974 c0fe0102
 LAB_080be978:
     ldr r4, DAT_080be9b4                     @ 080be978 0e4c
     movs r1,#0x88    @ 080be97a 8821
@@ -222889,7 +222889,7 @@ LAB_080beade:
     beq LAB_080beafa                         @ 080beae4 09d0
     b LAB_080beda8                           @ 080beae6 5fe1
 DAT_080beae8:
-    .word  0x0201fec0                     @ 080beae8 c0fe0102
+    .word  gBannerState                   @ 080beae8 c0fe0102
 LAB_080beaec:
     cmp r4,#0x2                              @ 080beaec 022c
     bne LAB_080beaf2                         @ 080beaee 00d1
@@ -223077,7 +223077,7 @@ LAB_080bec54:
     movs r0,#0x1    @ 080bec54 0120
     b LAB_080bedc6                           @ 080bec56 b6e0
 DAT_080bec58:
-    .word  0x0201fec0                     @ 080bec58 c0fe0102
+    .word  gBannerState                   @ 080bec58 c0fe0102
 LAB_080bec5c:
     movs r2,#0x80    @ 080bec5c 8022
     lsls r2,r2,#0x2    @ 080bec5e 9200
@@ -223272,7 +223272,7 @@ LAB_080bedc6:
     bx r1                                    @ 080bedd4 0847
     .byte  0x00, 0x00
 DAT_080bedd8:
-    .word  0x0201fec0                     @ 080bedd8 c0fe0102
+    .word  gBannerState                   @ 080bedd8 c0fe0102
 DAT_080beddc:
     .word  0x02023130                     @ 080beddc 30310202
 DAT_080bede0:
@@ -223307,7 +223307,7 @@ FUN_080bede4:
     movs r0,#0x0    @ 080bee18 0020
     b LAB_080befac                           @ 080bee1a c7e0
 DAT_080bee1c:
-    .word  0x0201fec0                     @ 080bee1c c0fe0102
+    .word  gBannerState                   @ 080bee1c c0fe0102
 DAT_080bee20:
     .word  0x02023130                     @ 080bee20 30310202
 DAT_080bee24:
@@ -223526,7 +223526,7 @@ LAB_080befd8:
     b LAB_080bf1fa                           @ 080befe0 0be1
     .byte  0x00, 0x00
 DAT_080befe4:
-    .word  0x0201fec0                     @ 080befe4 c0fe0102
+    .word  gBannerState                   @ 080befe4 c0fe0102
 LAB_080befe8:
     cmp r1,#0x2                              @ 080befe8 0229
     bne LAB_080befee                         @ 080befea 00d1
@@ -223690,7 +223690,7 @@ DAT_080bf124:
 DAT_080bf128:
     .word  0x0201c880                     @ 080bf128 80c80102
 DAT_080bf12c:
-    .word  0x0201fec0                     @ 080bf12c c0fe0102
+    .word  gBannerState                   @ 080bf12c c0fe0102
 LAB_080bf130:
     cmp r6,#0xf                              @ 080bf130 0f2e
     bhi switchD_080bf13c__default            @ 080bf132 45d8
@@ -223832,7 +223832,7 @@ FUN_080bf228:
     b LAB_080bf25a                           @ 080bf24c 05e0
     .byte  0x00, 0x00
 DAT_080bf250:
-    .word  0x0201fec0                     @ 080bf250 c0fe0102
+    .word  gBannerState                   @ 080bf250 c0fe0102
 DAT_080bf254:
     .word  0x02023130                     @ 080bf254 30310202
 LAB_080bf258:
@@ -223897,7 +223897,7 @@ LAB_080bf2c4:
     bx r1                                    @ 080bf2c8 0847
     .byte  0x00, 0x00
 DAT_080bf2cc:
-    .word  0x0201fec0                     @ 080bf2cc c0fe0102
+    .word  gBannerState                   @ 080bf2cc c0fe0102
 FUN_080bf2d0:
     push {r4,r5,r6,r7,lr}                    @ 080bf2d0 f0b5
     .hword 0x4657    @ 080bf2d2 5746
@@ -223975,7 +223975,7 @@ LAB_080bf312:
     b LAB_080bf372                           @ 080bf364 05e0
     .byte  0x00, 0x00
 DAT_080bf368:
-    .word  0x0201fec0                     @ 080bf368 c0fe0102
+    .word  gBannerState                   @ 080bf368 c0fe0102
 DAT_080bf36c:
     .word  0x0201e2a0                     @ 080bf36c a0e20102
 LAB_080bf370:
@@ -224040,7 +224040,7 @@ LAB_080bf3ca:
     b LAB_080bf56e                           @ 080bf3d8 c9e0
     .byte  0x00, 0x00
 DAT_080bf3dc:
-    .word  0x0201fec0                     @ 080bf3dc c0fe0102
+    .word  gBannerState                   @ 080bf3dc c0fe0102
 LAB_080bf3e0:
     cmp r0,#0x2                              @ 080bf3e0 0228
     beq LAB_080bf45a                         @ 080bf3e2 3ad0
@@ -224084,7 +224084,7 @@ DAT_080bf428:
 DAT_080bf42c:
     .word  0x09851ffc                     @ 080bf42c fc1f8509
 DAT_080bf430:
-    .word  0x0201fec0                     @ 080bf430 c0fe0102
+    .word  gBannerState                   @ 080bf430 c0fe0102
 LAB_080bf434:
     adds r0,r7,#0x0    @ 080bf434 381c
     adds r1,r6,#0x0    @ 080bf436 311c
@@ -224141,7 +224141,7 @@ LAB_080bf498:
     subs r4,r6,r5    @ 080bf498 741b
     b LAB_080bf4aa                           @ 080bf49a 06e0
 DAT_080bf49c:
-    .word  0x0201fec0                     @ 080bf49c c0fe0102
+    .word  gBannerState                   @ 080bf49c c0fe0102
 PTR_gP1LifePoints_080bf4a0:
     .word  gP1LifePoints                  @ 080bf4a0 e0c40102
 DAT_080bf4a4:
@@ -224234,7 +224234,7 @@ LAB_080bf540:
     strb r0,[r1,#0x10]                       @ 080bf544 0874
     b LAB_080bf424                           @ 080bf546 6de7
 DAT_080bf548:
-    .word  0x0201fec0                     @ 080bf548 c0fe0102
+    .word  gBannerState                   @ 080bf548 c0fe0102
 LAB_080bf54c:
     adds r0,r7,#0x0    @ 080bf54c 381c
     adds r1,r6,#0x0    @ 080bf54e 311c
@@ -224318,7 +224318,7 @@ switchD_080bf5dc__switchD:
     .hword 0x4687    @ 080bf5dc 8746
     .byte  0x00, 0x00
 DAT_080bf5e0:
-    .word  0x0201fec0                     @ 080bf5e0 c0fe0102
+    .word  gBannerState                   @ 080bf5e0 c0fe0102
 DAT_080bf5e4:
     .word  0x09e5f8f0                     @ 080bf5e4 f0f8e509
 DAT_080bf5e8:
@@ -224613,7 +224613,7 @@ LAB_080bf822:
 switchD_080bf82a__switchD:
     .hword 0x4687    @ 080bf82a 8746
 DAT_080bf82c:
-    .word  0x0201fec0                     @ 080bf82c c0fe0102
+    .word  gBannerState                   @ 080bf82c c0fe0102
 DAT_080bf830:
     .word  0x080bf834                     @ 080bf830 34f80b08
 switchD_080bf82a__switchdataD_080bf834:
@@ -225300,7 +225300,7 @@ LAB_080bfd46:
     adds r0,r1,#0x3    @ 080bfd50 c81c
     b LAB_080bfd5a                           @ 080bfd52 02e0
 DAT_080bfd54:
-    .word  0x0201fec0                     @ 080bfd54 c0fe0102
+    .word  gBannerState                   @ 080bfd54 c0fe0102
 LAB_080bfd58:
     movs r0,#0x40    @ 080bfd58 4020
 LAB_080bfd5a:
@@ -225371,7 +225371,7 @@ DAT_080bfdcc:
 DAT_080bfdd0:
     .word  0x0000dfff                     @ 080bfdd0 ffdf0000
 DAT_080bfdd4:
-    .word  0x0201fec0                     @ 080bfdd4 c0fe0102
+    .word  gBannerState                   @ 080bfdd4 c0fe0102
 LAB_080bfdd8:
     movs r0,#0x2    @ 080bfdd8 0220
     rsbs r0,r0,#0    @ 080bfdda 4042
@@ -225418,7 +225418,7 @@ FUN_080bfe0c:
     b LAB_080bff0c                           @ 080bfe28 70e0
     .byte  0x00, 0x00
 DAT_080bfe2c:
-    .word  0x0201fec0                     @ 080bfe2c c0fe0102
+    .word  gBannerState                   @ 080bfe2c c0fe0102
 PTR_gP1LifePoints_080bfe30:
     .word  gP1LifePoints                  @ 080bfe30 e0c40102
 DAT_080bfe34:
@@ -225545,7 +225545,7 @@ LAB_080bff1e:
 PTR_gPrng_080bff24:
     .word  gPrng                          @ 080bff24 40000003
 DAT_080bff28:
-    .word  0x0201fec0                     @ 080bff28 c0fe0102
+    .word  gBannerState                   @ 080bff28 c0fe0102
 DAT_080bff2c:
     .word  0x02023130                     @ 080bff2c 30310202
 DAT_080bff30:
@@ -226717,7 +226717,7 @@ switchD_080c0808__switchD:
     .hword 0x4687    @ 080c0808 8746
     .byte  0x00, 0x00
 DAT_080c080c:
-    .word  0x0201fec0                     @ 080c080c c0fe0102
+    .word  gBannerState                   @ 080c080c c0fe0102
 DAT_080c0810:
     .word  0x080c0814                     @ 080c0810 14080c08
 switchD_080c0808__switchdataD_080c0814:
@@ -226883,7 +226883,7 @@ LAB_080c08c2:
     strb r0,[r2,#0x10]                       @ 080c0964 1074
     b LAB_080c0a08                           @ 080c0966 4fe0
 DAT_080c0968:
-    .word  0x0201fec0                     @ 080c0968 c0fe0102
+    .word  gBannerState                   @ 080c0968 c0fe0102
 DAT_080c096c:
     .word  0x09e5f8f0                     @ 080c096c f0f8e509
 PTR_BLDCNT_080c0970:
@@ -226905,7 +226905,7 @@ LAB_080c098e:
     b LAB_080c0a04                           @ 080c0990 38e0
     .byte  0x00, 0x00
 DAT_080c0994:
-    .word  0x0201fec0                     @ 080c0994 c0fe0102
+    .word  gBannerState                   @ 080c0994 c0fe0102
 switchD_080c0808__caseD_3:
     movs r0,#0x5    @ 080c0998 0520
     movs r1,#0x90    @ 080c099a 9021
@@ -226934,7 +226934,7 @@ LAB_080c09c8:
     movs r0,#0x0    @ 080c09c8 0020
     b LAB_080c0a04                           @ 080c09ca 1be0
 DAT_080c09cc:
-    .word  0x0201fec0                     @ 080c09cc c0fe0102
+    .word  gBannerState                   @ 080c09cc c0fe0102
 PTR_BLDCNT_080c09d0:
     .word  BLDCNT                         @ 080c09d0 50000004
 switchD_080c0808__caseD_4:
@@ -226969,7 +226969,7 @@ LAB_080c0a08:
     movs r0,#0x1    @ 080c0a08 0120
     b LAB_080c0a68                           @ 080c0a0a 2de0
 DAT_080c0a0c:
-    .word  0x0201fec0                     @ 080c0a0c c0fe0102
+    .word  gBannerState                   @ 080c0a0c c0fe0102
 PTR_BLDALPHA_080c0a10:
     .word  BLDALPHA                       @ 080c0a10 52000004
 switchD_080c0808__caseD_5:
@@ -226998,7 +226998,7 @@ DAT_080c0a3c:
 DAT_080c0a40:
     .word  0x0000dfff                     @ 080c0a40 ffdf0000
 DAT_080c0a44:
-    .word  0x0201fec0                     @ 080c0a44 c0fe0102
+    .word  gBannerState                   @ 080c0a44 c0fe0102
 LAB_080c0a48:
     bl FUN_080f55d4                          @ 080c0a48 34f0c4fd
     movs r0,#0x2    @ 080c0a4c 0220
@@ -227048,7 +227048,7 @@ switchD_080c0a9c__switchD:
     .hword 0x4687    @ 080c0a9c 8746
     .byte  0x00, 0x00
 DAT_080c0aa0:
-    .word  0x0201fec0                     @ 080c0aa0 c0fe0102
+    .word  gBannerState                   @ 080c0aa0 c0fe0102
 DAT_080c0aa4:
     .word  0x080c0aa8                     @ 080c0aa4 a80a0c08
 switchD_080c0a9c__switchdataD_080c0aa8:
@@ -227137,7 +227137,7 @@ switchD_080c0a9c__caseD_1:
     strb r0,[r5,#0x10]                       @ 080c0b5c 2874
     b LAB_080c0c00                           @ 080c0b5e 4fe0
 DAT_080c0b60:
-    .word  0x0201fec0                     @ 080c0b60 c0fe0102
+    .word  gBannerState                   @ 080c0b60 c0fe0102
 PTR_BLDALPHA_080c0b64:
     .word  BLDALPHA                       @ 080c0b64 52000004
 PTR_BLDCNT_080c0b68:
@@ -227159,7 +227159,7 @@ LAB_080c0b86:
     b LAB_080c0bfc                           @ 080c0b88 38e0
     .byte  0x00, 0x00
 DAT_080c0b8c:
-    .word  0x0201fec0                     @ 080c0b8c c0fe0102
+    .word  gBannerState                   @ 080c0b8c c0fe0102
 switchD_080c0a9c__caseD_3:
     movs r0,#0x5    @ 080c0b90 0520
     movs r1,#0x90    @ 080c0b92 9021
@@ -227188,7 +227188,7 @@ LAB_080c0bc0:
     movs r0,#0x0    @ 080c0bc0 0020
     b LAB_080c0bfc                           @ 080c0bc2 1be0
 DAT_080c0bc4:
-    .word  0x0201fec0                     @ 080c0bc4 c0fe0102
+    .word  gBannerState                   @ 080c0bc4 c0fe0102
 PTR_BLDCNT_080c0bc8:
     .word  BLDCNT                         @ 080c0bc8 50000004
 switchD_080c0a9c__caseD_4:
@@ -227223,7 +227223,7 @@ LAB_080c0c00:
     movs r0,#0x1    @ 080c0c00 0120
     b LAB_080c0c60                           @ 080c0c02 2de0
 DAT_080c0c04:
-    .word  0x0201fec0                     @ 080c0c04 c0fe0102
+    .word  gBannerState                   @ 080c0c04 c0fe0102
 PTR_BLDALPHA_080c0c08:
     .word  BLDALPHA                       @ 080c0c08 52000004
 switchD_080c0a9c__caseD_5:
@@ -227252,7 +227252,7 @@ DAT_080c0c34:
 DAT_080c0c38:
     .word  0x0000dfff                     @ 080c0c38 ffdf0000
 DAT_080c0c3c:
-    .word  0x0201fec0                     @ 080c0c3c c0fe0102
+    .word  gBannerState                   @ 080c0c3c c0fe0102
 LAB_080c0c40:
     bl FUN_080f55d4                          @ 080c0c40 34f0c8fc
     movs r0,#0x2    @ 080c0c44 0220
@@ -227450,7 +227450,7 @@ LAB_080c0dbe:
 PTR_BLDY_080c0dcc:
     .word  BLDY                           @ 080c0dcc 54000004
 DAT_080c0dd0:
-    .word  0x0201fec0                     @ 080c0dd0 c0fe0102
+    .word  gBannerState                   @ 080c0dd0 c0fe0102
 switchD_080c0cb8__caseD_2:
     lsls r0,r5,#0x10    @ 080c0dd4 2804
     .hword 0x4649    @ 080c0dd6 4946
@@ -227486,7 +227486,7 @@ switchD_080c0cb8__caseD_2:
     bl FUN_080f9ab4                          @ 080c0e16 38f04dfe
     b LAB_080c0ef8                           @ 080c0e1a 6de0
 DAT_080c0e1c:
-    .word  0x0201fec0                     @ 080c0e1c c0fe0102
+    .word  gBannerState                   @ 080c0e1c c0fe0102
 switchD_080c0cb8__caseD_3:
     ldr r6, DAT_080c0e68                     @ 080c0e20 114e
     lsls r4,r5,#0x10    @ 080c0e22 2c04
@@ -227552,7 +227552,7 @@ switchD_080c0cb8__caseD_4:
     strb r0,[r1,#0x11]                       @ 080c0ea4 4874
     b LAB_080c0ef2                           @ 080c0ea6 24e0
 DAT_080c0ea8:
-    .word  0x0201fec0                     @ 080c0ea8 c0fe0102
+    .word  gBannerState                   @ 080c0ea8 c0fe0102
 switchD_080c0cb8__caseD_5:
     ldr r2, PTR_BLDY_080c0ed4                @ 080c0eac 094a
     ldr r3, DAT_080c0ed8                     @ 080c0eae 0a4b
@@ -227577,7 +227577,7 @@ switchD_080c0cb8__caseD_5:
 PTR_BLDY_080c0ed4:
     .word  BLDY                           @ 080c0ed4 54000004
 DAT_080c0ed8:
-    .word  0x0201fec0                     @ 080c0ed8 c0fe0102
+    .word  gBannerState                   @ 080c0ed8 c0fe0102
 switchD_080c0cb8__caseD_6:
     movs r2,#0x80    @ 080c0edc 8022
     lsls r2,r2,#0x13    @ 080c0ede d204
@@ -227599,7 +227599,7 @@ LAB_080c0ef8:
 DAT_080c0efc:
     .word  0x0000dfff                     @ 080c0efc ffdf0000
 DAT_080c0f00:
-    .word  0x0201fec0                     @ 080c0f00 c0fe0102
+    .word  gBannerState                   @ 080c0f00 c0fe0102
 LAB_080c0f04:
     movs r0,#0x2    @ 080c0f04 0220
     rsbs r0,r0,#0    @ 080c0f06 4042
@@ -227676,7 +227676,7 @@ LAB_080c0f8a:
 switchD_080c0f92__switchD:
     .hword 0x4687    @ 080c0f92 8746
 DAT_080c0f94:
-    .word  0x0201fec0                     @ 080c0f94 c0fe0102
+    .word  gBannerState                   @ 080c0f94 c0fe0102
 DAT_080c0f98:
     .word  0x080c0f9c                     @ 080c0f98 9c0f0c08
 switchD_080c0f92__switchdataD_080c0f9c:
@@ -227788,7 +227788,7 @@ DAT_080c1070:
 DAT_080c1074:
     .word  0x098973f8                     @ 080c1074 f8738909
 DAT_080c1078:
-    .word  0x0201fec0                     @ 080c1078 c0fe0102
+    .word  gBannerState                   @ 080c1078 c0fe0102
 PTR_WIN0H_080c107c:
     .word  WIN0H                          @ 080c107c 40000004
 DAT_080c1080:
@@ -227819,7 +227819,7 @@ switchD_080c0f92__caseD_1:
 PTR_BLDY_080c10b0:
     .word  BLDY                           @ 080c10b0 54000004
 DAT_080c10b4:
-    .word  0x0201fec0                     @ 080c10b4 c0fe0102
+    .word  gBannerState                   @ 080c10b4 c0fe0102
 switchD_080c0f92__caseD_2:
     lsls r0,r6,#0x10    @ 080c10b8 3004
     orrs r0,r5    @ 080c10ba 2843
@@ -227853,7 +227853,7 @@ switchD_080c0f92__caseD_2:
     bl FUN_080f9ab4                          @ 080c10f6 38f0ddfc
     b LAB_080c106c                           @ 080c10fa b7e7
 DAT_080c10fc:
-    .word  0x0201fec0                     @ 080c10fc c0fe0102
+    .word  gBannerState                   @ 080c10fc c0fe0102
 switchD_080c0f92__caseD_3:
     ldr r4, DAT_080c1164                     @ 080c1100 184c
     ldrb r3,[r4,#0x11]                       @ 080c1102 637c
@@ -227903,7 +227903,7 @@ switchD_080c0f92__caseD_3:
     b LAB_080c106c                           @ 080c1160 84e7
     .byte  0x00, 0x00
 DAT_080c1164:
-    .word  0x0201fec0                     @ 080c1164 c0fe0102
+    .word  gBannerState                   @ 080c1164 c0fe0102
 switchD_080c0f92__caseD_4:
     adds r0,r6,#0x0    @ 080c1168 301c
     adds r0,#0x8    @ 080c116a 0830
@@ -227946,7 +227946,7 @@ LAB_080c11ae:
     b LAB_080c106c                           @ 080c11b8 58e7
     .byte  0x00, 0x00
 DAT_080c11bc:
-    .word  0x0201fec0                     @ 080c11bc c0fe0102
+    .word  gBannerState                   @ 080c11bc c0fe0102
 switchD_080c0f92__caseD_5:
     ldr r2, PTR_BLDY_080c11ec                @ 080c11c0 0a4a
     ldr r3, DAT_080c11f0                     @ 080c11c2 0b4b
@@ -227974,7 +227974,7 @@ LAB_080c11de:
 PTR_BLDY_080c11ec:
     .word  BLDY                           @ 080c11ec 54000004
 DAT_080c11f0:
-    .word  0x0201fec0                     @ 080c11f0 c0fe0102
+    .word  gBannerState                   @ 080c11f0 c0fe0102
 switchD_080c0f92__caseD_6:
     movs r2,#0x80    @ 080c11f4 8022
     lsls r2,r2,#0x13    @ 080c11f6 d204
@@ -227993,7 +227993,7 @@ switchD_080c0f92__caseD_6:
 DAT_080c1214:
     .word  0x0000dfff                     @ 080c1214 ffdf0000
 DAT_080c1218:
-    .word  0x0201fec0                     @ 080c1218 c0fe0102
+    .word  gBannerState                   @ 080c1218 c0fe0102
 LAB_080c121c:
     movs r0,#0x2    @ 080c121c 0220
     rsbs r0,r0,#0    @ 080c121e 4042
@@ -228338,7 +228338,7 @@ switchD_080c14ac__switchD:
     .hword 0x4687    @ 080c14ac 8746
     .byte  0x00, 0x00
 DAT_080c14b0:
-    .word  0x0201fec0                     @ 080c14b0 c0fe0102
+    .word  gBannerState                   @ 080c14b0 c0fe0102
 DAT_080c14b4:
     .word  0x00000868                     @ 080c14b4 68080000
 DAT_080c14b8:
@@ -228547,7 +228547,7 @@ LAB_080c1662:
     b LAB_080c178e                           @ 080c1664 93e0
     .byte  0x00, 0x00
 DAT_080c1668:
-    .word  0x0201fec0                     @ 080c1668 c0fe0102
+    .word  gBannerState                   @ 080c1668 c0fe0102
 switchD_080c14ac__caseD_3:
     .hword 0x4642    @ 080c166c 4246
     subs r4,r2,r5    @ 080c166e 541b
@@ -228576,7 +228576,7 @@ LAB_080c1684:
     b LAB_080c16aa                           @ 080c169c 05e0
     .byte  0x00, 0x00
 DAT_080c16a0:
-    .word  0x0201fec0                     @ 080c16a0 c0fe0102
+    .word  gBannerState                   @ 080c16a0 c0fe0102
 LAB_080c16a4:
     movs r0,#0x25    @ 080c16a4 2520
     bl FUN_080f9ab4                          @ 080c16a6 38f005fa
@@ -228589,7 +228589,7 @@ LAB_080c16aa:
     adds r4,r4,r0    @ 080c16b4 2418
     b LAB_080c16c4                           @ 080c16b6 05e0
 DAT_080c16b8:
-    .word  0x0201fec0                     @ 080c16b8 c0fe0102
+    .word  gBannerState                   @ 080c16b8 c0fe0102
 LAB_080c16bc:
     ldr r0, DAT_080c1714                     @ 080c16bc 1548
     ldrh r0,[r0,#0x12]                       @ 080c16be 408a
@@ -228637,7 +228637,7 @@ LAB_080c16ea:
     b LAB_080c1794                           @ 080c1710 40e0
     .byte  0x00, 0x00
 DAT_080c1714:
-    .word  0x0201fec0                     @ 080c1714 c0fe0102
+    .word  gBannerState                   @ 080c1714 c0fe0102
 switchD_080c14ac__caseD_4:
     .hword 0x4642    @ 080c1718 4246
     lsls r3,r2,#0x10    @ 080c171a 1304
@@ -228663,7 +228663,7 @@ switchD_080c14ac__caseD_4:
     b LAB_080c178e                           @ 080c1744 23e0
     .byte  0x00, 0x00
 DAT_080c1748:
-    .word  0x0201fec0                     @ 080c1748 c0fe0102
+    .word  gBannerState                   @ 080c1748 c0fe0102
 switchD_080c14ac__caseD_5:
     ldr r2, PTR_BLDY_080c1774                @ 080c174c 094a
     ldrb r3,[r4,#0x11]                       @ 080c174e 637c
@@ -228708,7 +228708,7 @@ LAB_080c1794:
 DAT_080c1798:
     .word  0x0000dfff                     @ 080c1798 ffdf0000
 DAT_080c179c:
-    .word  0x0201fec0                     @ 080c179c c0fe0102
+    .word  gBannerState                   @ 080c179c c0fe0102
 LAB_080c17a0:
     movs r0,#0x2    @ 080c17a0 0220
     rsbs r0,r0,#0    @ 080c17a2 4042
@@ -228769,7 +228769,7 @@ LAB_080c1802:
 switchD_080c180a__switchD:
     .hword 0x4687    @ 080c180a 8746
 DAT_080c180c:
-    .word  0x0201fec0                     @ 080c180c c0fe0102
+    .word  gBannerState                   @ 080c180c c0fe0102
 DAT_080c1810:
     .word  0x080c1814                     @ 080c1810 14180c08
 switchD_080c180a__switchdataD_080c1814:
@@ -228935,7 +228935,7 @@ LAB_080c195e:
 PTR_BLDY_080c196c:
     .word  BLDY                           @ 080c196c 54000004
 DAT_080c1970:
-    .word  0x0201fec0                     @ 080c1970 c0fe0102
+    .word  gBannerState                   @ 080c1970 c0fe0102
 switchD_080c180a__caseD_2:
     subs r3,r7,#0x1    @ 080c1974 7b1e
     lsls r3,r3,#0x10    @ 080c1976 1b04
@@ -228961,7 +228961,7 @@ switchD_080c180a__caseD_2:
     b LAB_080c1a8a                           @ 080c19a0 73e0
     .byte  0x00, 0x00
 DAT_080c19a4:
-    .word  0x0201fec0                     @ 080c19a4 c0fe0102
+    .word  gBannerState                   @ 080c19a4 c0fe0102
 switchD_080c180a__caseD_3:
     ldr r1, DAT_080c1a10                     @ 080c19a8 1949
     ldrh r0,[r1,#0x12]                       @ 080c19aa 488a
@@ -229015,7 +229015,7 @@ LAB_080c19e2:
     b LAB_080c1a90                           @ 080c1a0c 40e0
     .byte  0x00, 0x00
 DAT_080c1a10:
-    .word  0x0201fec0                     @ 080c1a10 c0fe0102
+    .word  gBannerState                   @ 080c1a10 c0fe0102
 switchD_080c180a__caseD_4:
     lsls r3,r7,#0x10    @ 080c1a14 3b04
     lsrs r3,r3,#0x10    @ 080c1a16 1b0c
@@ -229039,7 +229039,7 @@ switchD_080c180a__caseD_4:
     strb r4,[r1,#0x11]                       @ 080c1a3c 4c74
     b LAB_080c1a8a                           @ 080c1a3e 24e0
 DAT_080c1a40:
-    .word  0x0201fec0                     @ 080c1a40 c0fe0102
+    .word  gBannerState                   @ 080c1a40 c0fe0102
 switchD_080c180a__caseD_5:
     ldr r2, PTR_BLDY_080c1a6c                @ 080c1a44 094a
     ldr r3, DAT_080c1a70                     @ 080c1a46 0a4b
@@ -229064,7 +229064,7 @@ switchD_080c180a__caseD_5:
 PTR_BLDY_080c1a6c:
     .word  BLDY                           @ 080c1a6c 54000004
 DAT_080c1a70:
-    .word  0x0201fec0                     @ 080c1a70 c0fe0102
+    .word  gBannerState                   @ 080c1a70 c0fe0102
 switchD_080c180a__caseD_6:
     movs r2,#0x80    @ 080c1a74 8022
     lsls r2,r2,#0x13    @ 080c1a76 d204
@@ -229086,7 +229086,7 @@ LAB_080c1a90:
 DAT_080c1a94:
     .word  0x0000dfff                     @ 080c1a94 ffdf0000
 DAT_080c1a98:
-    .word  0x0201fec0                     @ 080c1a98 c0fe0102
+    .word  gBannerState                   @ 080c1a98 c0fe0102
 LAB_080c1a9c:
     movs r0,#0x2    @ 080c1a9c 0220
     rsbs r0,r0,#0    @ 080c1a9e 4042
@@ -229147,7 +229147,7 @@ LAB_080c1af6:
     b LAB_080c1c30                           @ 080c1b04 94e0
     .byte  0x00, 0x00
 DAT_080c1b08:
-    .word  0x0201fec0                     @ 080c1b08 c0fe0102
+    .word  gBannerState                   @ 080c1b08 c0fe0102
 DAT_080c1b0c:
     .word  0x0201e2a0                     @ 080c1b0c a0e20102
 LAB_080c1b10:
@@ -229264,7 +229264,7 @@ LAB_080c1bd6:
     b LAB_080c1c22                           @ 080c1bf4 15e0
     .byte  0x00, 0x00
 DAT_080c1bf8:
-    .word  0x0201fec0                     @ 080c1bf8 c0fe0102
+    .word  gBannerState                   @ 080c1bf8 c0fe0102
 DAT_080c1bfc:
     .word  0x02023130                     @ 080c1bfc 30310202
 DAT_080c1c00:
@@ -229342,7 +229342,7 @@ switchD_080c1c80__switchD:
     .hword 0x4687    @ 080c1c80 8746
     .byte  0x00, 0x00
 DAT_080c1c84:
-    .word  0x0201fec0                     @ 080c1c84 c0fe0102
+    .word  gBannerState                   @ 080c1c84 c0fe0102
 DAT_080c1c88:
     .word  0x080c1c8c                     @ 080c1c88 8c1c0c08
 switchD_080c1c80__switchdataD_080c1c8c:
@@ -229400,7 +229400,7 @@ DAT_080c1cf8:
 PTR_BLDALPHA_080c1cfc:
     .word  BLDALPHA                       @ 080c1cfc 52000004
 DAT_080c1d00:
-    .word  0x0201fec0                     @ 080c1d00 c0fe0102
+    .word  gBannerState                   @ 080c1d00 c0fe0102
 switchD_080c1c80__caseD_1:
     ldr r3, PTR_BLDALPHA_080c1d68            @ 080c1d04 184b
     ldrb r1,[r4,#0x11]                       @ 080c1d06 617c
@@ -229456,7 +229456,7 @@ PTR_BLDALPHA_080c1d68:
 DAT_080c1d6c:
     .word  0x000044c0                     @ 080c1d6c c0440000
 DAT_080c1d70:
-    .word  0x0201fec0                     @ 080c1d70 c0fe0102
+    .word  gBannerState                   @ 080c1d70 c0fe0102
 switchD_080c1c80__caseD_2:
     movs r4,#0x0    @ 080c1d74 0024
     lsls r6,r5,#0x10    @ 080c1d76 2e04
@@ -229497,7 +229497,7 @@ LAB_080c1d7a:
 DAT_080c1dbc:
     .word  0x000040c0                     @ 080c1dbc c0400000
 DAT_080c1dc0:
-    .word  0x0201fec0                     @ 080c1dc0 c0fe0102
+    .word  gBannerState                   @ 080c1dc0 c0fe0102
 switchD_080c1c80__caseD_3:
     ldr r3, PTR_BLDALPHA_080c1e34            @ 080c1dc4 1b4b
     ldrb r1,[r4,#0x11]                       @ 080c1dc6 617c
@@ -229561,7 +229561,7 @@ PTR_BLDALPHA_080c1e34:
 DAT_080c1e38:
     .word  0x000044c0                     @ 080c1e38 c0440000
 DAT_080c1e3c:
-    .word  0x0201fec0                     @ 080c1e3c c0fe0102
+    .word  gBannerState                   @ 080c1e3c c0fe0102
 DAT_080c1e40:
     .word  0x02023130                     @ 080c1e40 30310202
 DAT_080c1e44:
@@ -229639,7 +229639,7 @@ FUN_080c1e9c:
     b LAB_080c1f02                           @ 080c1ecc 19e0
     .byte  0x00, 0x00
 DAT_080c1ed0:
-    .word  0x0201fec0                     @ 080c1ed0 c0fe0102
+    .word  gBannerState                   @ 080c1ed0 c0fe0102
 DAT_080c1ed4:
     .word  0x02023130                     @ 080c1ed4 30310202
 DAT_080c1ed8:
@@ -229691,7 +229691,7 @@ LAB_080c1f26:
 switchD_080c1f2e__switchD:
     .hword 0x4687    @ 080c1f2e 8746
 DAT_080c1f30:
-    .word  0x0201fec0                     @ 080c1f30 c0fe0102
+    .word  gBannerState                   @ 080c1f30 c0fe0102
 DAT_080c1f34:
     .word  0x080c1f38                     @ 080c1f34 381f0c08
 switchD_080c1f2e__switchdataD_080c1f38:
@@ -229837,7 +229837,7 @@ DAT_080c2058:
 DAT_080c205c:
     .word  0x000040c0                     @ 080c205c c0400000
 DAT_080c2060:
-    .word  0x0201fec0                     @ 080c2060 c0fe0102
+    .word  gBannerState                   @ 080c2060 c0fe0102
 switchD_080c1f2e__caseD_3:
     ldr r0, DAT_080c20d0                     @ 080c2064 1a48
     movs r2,#0x10    @ 080c2066 1022
@@ -229898,7 +229898,7 @@ DAT_080c20d4:
 DAT_080c20d8:
     .word  0x000040c0                     @ 080c20d8 c0400000
 DAT_080c20dc:
-    .word  0x0201fec0                     @ 080c20dc c0fe0102
+    .word  gBannerState                   @ 080c20dc c0fe0102
 switchD_080c1f2e__caseD_4:
     movs r6,#0x0    @ 080c20e0 0026
     lsls r4,r4,#0x10    @ 080c20e2 2404
@@ -229950,7 +229950,7 @@ DAT_080c213c:
 DAT_080c2140:
     .word  0x000040c0                     @ 080c2140 c0400000
 DAT_080c2144:
-    .word  0x0201fec0                     @ 080c2144 c0fe0102
+    .word  gBannerState                   @ 080c2144 c0fe0102
 switchD_080c1f2e__caseD_5:
     ldr r2, PTR_BLDY_080c216c                @ 080c2148 084a
     ldrh r1,[r3,#0x12]                       @ 080c214a 598a
@@ -229991,7 +229991,7 @@ LAB_080c2188:
 DAT_080c218c:
     .word  0x00007fff                     @ 080c218c ff7f0000
 DAT_080c2190:
-    .word  0x0201fec0                     @ 080c2190 c0fe0102
+    .word  gBannerState                   @ 080c2190 c0fe0102
 LAB_080c2194:
     movs r0,#0x0    @ 080c2194 0020
 LAB_080c2196:
@@ -230028,7 +230028,7 @@ FUN_080c21a0:
     b LAB_080c2200                           @ 080c21d0 16e0
     .byte  0x00, 0x00
 DAT_080c21d4:
-    .word  0x0201fec0                     @ 080c21d4 c0fe0102
+    .word  gBannerState                   @ 080c21d4 c0fe0102
 DAT_080c21d8:
     .word  0x02000000                     @ 080c21d8 00000002
 DAT_080c21dc:
@@ -230185,7 +230185,7 @@ LAB_080c2302:
     b LAB_080c2528                           @ 080c230c 0ce1
     .byte  0x00, 0x00
 DAT_080c2310:
-    .word  0x0201fec0                     @ 080c2310 c0fe0102
+    .word  gBannerState                   @ 080c2310 c0fe0102
 DAT_080c2314:
     .word  0x000048c0                     @ 080c2314 c0480000
 DAT_080c2318:
@@ -230249,7 +230249,7 @@ DAT_080c2388:
 DAT_080c238c:
     .word  0x000040c0                     @ 080c238c c0400000
 DAT_080c2390:
-    .word  0x0201fec0                     @ 080c2390 c0fe0102
+    .word  gBannerState                   @ 080c2390 c0fe0102
 switchD_080c2210__caseD_3:
     movs r2,#0x10    @ 080c2394 1022
     ldrh r6,[r6,#0x12]                       @ 080c2396 768a
@@ -230311,7 +230311,7 @@ DAT_080c2404:
 DAT_080c2408:
     .word  0x000040c0                     @ 080c2408 c0400000
 DAT_080c240c:
-    .word  0x0201fec0                     @ 080c240c c0fe0102
+    .word  gBannerState                   @ 080c240c c0fe0102
 switchD_080c2210__caseD_4:
     movs r6,#0x0    @ 080c2410 0026
     lsls r7,r7,#0x10    @ 080c2412 3f04
@@ -230363,7 +230363,7 @@ DAT_080c246c:
 DAT_080c2470:
     .word  0x000040c0                     @ 080c2470 c0400000
 DAT_080c2474:
-    .word  0x0201fec0                     @ 080c2474 c0fe0102
+    .word  gBannerState                   @ 080c2474 c0fe0102
 switchD_080c2210__caseD_5:
     movs r2,#0x8    @ 080c2478 0822
     .hword 0x4692    @ 080c247a 9246
@@ -230433,7 +230433,7 @@ LAB_080c248c:
     b LAB_080c2528                           @ 080c24fc 14e0
     .byte  0x00, 0x00
 DAT_080c2500:
-    .word  0x0201fec0                     @ 080c2500 c0fe0102
+    .word  gBannerState                   @ 080c2500 c0fe0102
 DAT_080c2504:
     .word  0x000048c0                     @ 080c2504 c0480000
 DAT_080c2508:
@@ -230459,7 +230459,7 @@ LAB_080c2528:
 DAT_080c252c:
     .word  0x00007fff                     @ 080c252c ff7f0000
 DAT_080c2530:
-    .word  0x0201fec0                     @ 080c2530 c0fe0102
+    .word  gBannerState                   @ 080c2530 c0fe0102
 LAB_080c2534:
     movs r0,#0x0    @ 080c2534 0020
 LAB_080c2536:
@@ -230483,7 +230483,7 @@ FUN_080c2544:
     bl FUN_080c1f10                          @ 080c2556 fff7dbfc
     b LAB_080c256c                           @ 080c255a 07e0
 DAT_080c255c:
-    .word  0x0201fec0                     @ 080c255c c0fe0102
+    .word  gBannerState                   @ 080c255c c0fe0102
 LAB_080c2560:
     cmp r1,#0x0                              @ 080c2560 0029
     blt LAB_080c256e                         @ 080c2562 04db
@@ -230504,7 +230504,7 @@ LAB_080c257a:
     b LAB_080c25a0                           @ 080c257c 10e0
     .byte  0x00, 0x00
 DAT_080c2580:
-    .word  0x0201fec0                     @ 080c2580 c0fe0102
+    .word  gBannerState                   @ 080c2580 c0fe0102
 LAB_080c2584:
     movs r0,#0x2    @ 080c2584 0220
     rsbs r0,r0,#0    @ 080c2586 4042
@@ -230572,7 +230572,7 @@ switchD_080c25f4__switchD:
     .hword 0x4687    @ 080c25f4 8746
     .byte  0x00, 0x00
 DAT_080c25f8:
-    .word  0x0201fec0                     @ 080c25f8 c0fe0102
+    .word  gBannerState                   @ 080c25f8 c0fe0102
 DAT_080c25fc:
     .word  0x0201e2a0                     @ 080c25fc a0e20102
 PTR_gP1LifePoints_080c2600:
@@ -230726,7 +230726,7 @@ LAB_080c271c:
 DAT_080c2730:
     .word  0x0202317c                     @ 080c2730 7c310202
 DAT_080c2734:
-    .word  0x0201fec0                     @ 080c2734 c0fe0102
+    .word  gBannerState                   @ 080c2734 c0fe0102
 switchD_080c25f4__caseD_3:
     movs r4,#0x0    @ 080c2738 0024
     cmp r4,r5                                @ 080c273a ac42
@@ -230771,7 +230771,7 @@ LAB_080c2778:
 DAT_080c2788:
     .word  0x0202317c                     @ 080c2788 7c310202
 DAT_080c278c:
-    .word  0x0201fec0                     @ 080c278c c0fe0102
+    .word  gBannerState                   @ 080c278c c0fe0102
 switchD_080c25f4__caseD_4:
     movs r4,#0x0    @ 080c2790 0024
     lsls r2,r6,#0x1    @ 080c2792 7200
@@ -230834,7 +230834,7 @@ LAB_080c2804:
     movs r0,#0x1    @ 080c2804 0120
     b LAB_080c2828                           @ 080c2806 0fe0
 DAT_080c2808:
-    .word  0x0201fec0                     @ 080c2808 c0fe0102
+    .word  gBannerState                   @ 080c2808 c0fe0102
 LAB_080c280c:
     movs r0,#0x2    @ 080c280c 0220
     rsbs r0,r0,#0    @ 080c280e 4042
@@ -231389,7 +231389,7 @@ DAT_080c2c24:
 DAT_080c2c28:
     .word  0xfff807ff                     @ 080c2c28 ff07f8ff
 DAT_080c2c2c:
-    .word  0x0201fec0                     @ 080c2c2c c0fe0102
+    .word  gBannerState                   @ 080c2c2c c0fe0102
 LAB_080c2c30:
     ldr r0,[r4,#0xc]                         @ 080c2c30 e068
     cmp r0,#0x4                              @ 080c2c32 0428
@@ -248490,7 +248490,7 @@ DAT_080cc8b4:
 DAT_080cc8b8:
     .word  0x00002f5c                     @ 080cc8b8 5c2f0000
 DAT_080cc8bc:
-    .word  0x0201fec0                     @ 080cc8bc c0fe0102
+    .word  gBannerState                   @ 080cc8bc c0fe0102
 DAT_080cc8c0:
     .word  0x0201fe60                     @ 080cc8c0 60fe0102
 PTR_gPrng_080cc8c4:

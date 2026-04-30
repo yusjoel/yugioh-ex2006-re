@@ -2157,7 +2157,7 @@ address,name,proposed_name,score,tags
 0x080bda7c,FUN_080bda7c,settings_080bda7c,3,blend;palette;vram;scene_pack;frame_counter;settings
 0x080bdbb4,FUN_080bdbb4,settings_080bdbb4,3,blend;palette;vram;scene_pack;frame_counter;settings
 0x080bdcfc,FUN_080bdcfc,,,display;window;blend;palette;vram;scene_pack;frame_counter
-0x080bdfac,pack_ui_state_machine,,,blend;vram;display;palette;window;frame_counter;pack
+0x080bdfac,banner_anim_state_machine,,,blend;vram;display;palette;window;frame_counter
 0x080be600,FUN_080be600,settings_080be600,3,blend;display;palette;window;vram;scene_pack;frame_counter;settings
 0x080be9bc,FUN_080be9bc,,,palette;vram
 0x080bea94,FUN_080bea94,card_frame_080bea94,3,card_frame;card_ids;card_stats;duel_field;font_jp

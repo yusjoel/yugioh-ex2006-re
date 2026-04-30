@@ -84,8 +84,14 @@ RENAMES = [
         "pack-banner: ROM 指针表 0x09CCE960[id] → OBJ VRAM, mode 1=2D stride"),
     ("FUN_080dbbc0", "pack_name_text_render",
         "pack-banner: ROM 0x09E5E2E8 查包名, text_render_wrapper x2"),
-    ("FUN_080bdfac", "pack_ui_state_machine",
-        "pack-banner: 卡包 UI 运行时状态机 (7 路 switch), overlay/动画"),
+    # 2026-04-30: 重命名 pack_ui_state_machine -> banner_anim_state_machine.
+    # 复审发现该函数实际读 0x0201fec0 (gBannerState), 与 pack_ui_state (0x03005850)
+    # 完全无关; 内容是 banner 出/入场 7-state 动画 (BLDY/WINOUT 调制 + tile copy).
+    ("pack_ui_state_machine", "banner_anim_state_machine",
+        "banner 出/入场动画状态机 (7-state on [gBannerState+0x10]); 阶段: 0=init "
+        "(载 palette/tiles, 启 BG3), 1-2=fade-in (BLDY 渐增 7+64f), 3-5=fade-out "
+        "(BLDY 渐减 + 文本切换 8+64+8f), 6=teardown (关 BG3); sub-counter 在 "
+        "[gBannerState+0x11]; 返回 1=busy / 0=done. 唯一 caller: FUN_0801ef94 case 1."),
     ("FUN_080d8ddc", "pack_visible_count",
         "pack-banner: 返回当前可见 pack 数 (clamp 1..5)"),
     ("FUN_080d8f84", "pack_detail_bg_tile_load",
@@ -201,6 +207,11 @@ def do_rename(old, new, comment):
         return False
 
     # plate comment (函数上方)
+    # 规则:
+    #   - first arg 是 FUN_xxxxxxxx (首次命名): 仅在无 plate 时写, 不覆盖手工编辑
+    #   - first arg 是 user-defined name (重命名旧 entry): 强制覆盖, 因为名字变了
+    #     plate 也得同步, 旧 plate 如果有 mojibake 也顺便修了
+    is_rename_userdefined = not old.startswith("FUN_")
     try:
         # 显式 utf-8 decode -> Java String. 若已是 unicode 直接用.
         if isinstance(comment, str):
@@ -213,7 +224,7 @@ def do_rename(old, new, comment):
             cu = listing.getCodeUnitAt(func.getEntryPoint())
             if cu is not None:
                 existing = cu.getComment(CodeUnit.PLATE_COMMENT)
-                if not existing:
+                if is_rename_userdefined or not existing:
                     cu.setComment(CodeUnit.PLATE_COMMENT, comment_u)
     except Exception as e:
         print("[warn] plate comment %s: %s" % (new, e))
