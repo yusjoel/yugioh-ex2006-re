@@ -277004,55 +277004,24 @@ LAB_080ddda8:
     pop {r4}                                 @ 080ddda8 10bc
     pop {r1}                                 @ 080dddaa 02bc
     bx r1                                    @ 080dddac 0847
-    ROM_INCBIN 0xdddae, 0x42
-FUN_080dddf0:
-    push {r4,lr}                             @ 080dddf0 10b5
-    ldr r4, DAT_080dde18                     @ 080dddf2 094c
-    adds r4,#0xc    @ 080dddf4 0c34
-    adds r0,r4,#0x0    @ 080dddf6 201c
-    movs r1,#0x8    @ 080dddf8 0821
-    bl FUN_080f4e98                          @ 080dddfa 17f04df8
-    bl FUN_080dd748                          @ 080dddfe fff7a3fc
-    movs r0,#0x0    @ 080dde02 0020
-    strh r0,[r4,#0x2]                        @ 080dde04 6080
-    subs r0,#0x2    @ 080dde06 0238
-    ldrb r1,[r4,#0x4]                        @ 080dde08 2179
-    ands r0,r1    @ 080dde0a 0840
-    strb r0,[r4,#0x4]                        @ 080dde0c 2071
-    movs r0,#0x1    @ 080dde0e 0120
-    pop {r4}                                 @ 080dde10 10bc
-    pop {r1}                                 @ 080dde12 02bc
-    bx r1                                    @ 080dde14 0847
-    .byte  0x00, 0x00
-DAT_080dde18:
-    .word  pack_ui_state                  @ 080dde18 50580003
-FUN_080dde1c:
-    push {r4,lr}                             @ 080dde1c 10b5
-    bl FUN_080f5a98                          @ 080dde1e 17f03bfe
-    ldr r1, PTR_BG0CNT_080ddeb4              @ 080dde22 2449
-    movs r0,#0xe0    @ 080dde24 e020
-    lsls r0,r0,#0x5    @ 080dde26 4001
-    strh r0,[r1,#0x0]                        @ 080dde28 0880
-    movs r0,#0x20    @ 080dde2a 2020
-    movs r1,#0x20    @ 080dde2c 2021
-    bl FUN_080f0bb4                          @ 080dde2e 12f0c1fe
-    ldr r2, DAT_080ddeb8                     @ 080dde32 214a
-    movs r0,#0x1    @ 080dde34 0120
-    ldrb r1,[r2,#0x15]                       @ 080dde36 517d
-    orrs r0,r1    @ 080dde38 0843
-    strb r0,[r2,#0x15]                       @ 080dde3a 5075
-    movs r1,#0x2    @ 080dde3c 0221
-    ldrb r3,[r2,#0x8]                        @ 080dde3e 137a
-    orrs r1,r3    @ 080dde40 1943
-    strb r1,[r2,#0x8]                        @ 080dde42 1172
-    movs r0,#0x7d    @ 080dde44 7d20
-    rsbs r0,r0,#0    @ 080dde46 4042
-    ldrb r3,[r2,#0x14]                       @ 080dde48 137d
-    ands r0,r3    @ 080dde4a 1840
-    strb r0,[r2,#0x14]                       @ 080dde4c 1075
-    ldr r3, PTR_font_jp_base_table_080ddebc  @ 080dde4e 1b4b
-    lsls r0,r1,#0x1e    @ 080dde50 8807
-    lsrs r0,r0,#0x1f    @ 080dde52 c00f
+    ROM_INCBIN 0xdddae, 0x16
+enter_exchange_dp_page:
+    push {lr}                                @ 080dddc4 00b5
+    ldr r0, DWORD_080dddd0                   @ 080dddc6 0248
+    bl FUN_080ddbf8                          @ 080dddc8 fff716ff
+    pop {r1}                                 @ 080dddcc 02bc
+    bx r1                                    @ 080dddce 0847
+DWORD_080dddd0:
+    .word  0x09e49588                     @ 080dddd0 8895e409
+enter_password_input_page:
+    push {lr}                                @ 080dddd4 00b5
+    ldr r0, DWORD_080ddde0                   @ 080dddd6 0248
+    bl FUN_080ddbf8                          @ 080dddd8 fff70eff
+    pop {r1}                                 @ 080ddddc 02bc
+    bx r1                                    @ 080dddde 0847
+DWORD_080ddde0:
+    .word  0x09e49598                     @ 080ddde0 9895e409
+    ROM_INCBIN 0xddde4, 0x70
     lsls r0,r0,#0x2    @ 080dde54 8000
     lsls r1,r1,#0x1f    @ 080dde56 c907
     lsrs r1,r1,#0x1f    @ 080dde58 c90f
@@ -277097,11 +277066,8 @@ LAB_080dde92:
     pop {r4}                                 @ 080ddeae 10bc
     pop {r1}                                 @ 080ddeb0 02bc
     bx r1                                    @ 080ddeb2 0847
-PTR_BG0CNT_080ddeb4:
     .word  BG0CNT                         @ 080ddeb4 08000004
-DAT_080ddeb8:
     .word  0x02006ed0                     @ 080ddeb8 d06e0002
-PTR_font_jp_base_table_080ddebc:
     .word  font_jp_base_table             @ 080ddebc 54f8e509
 DAT_080ddec0:
     .word  0x00000107                     @ 080ddec0 07010000
@@ -282649,7 +282615,9 @@ DAT_080e1388:
     .word  0x09e5e620                     @ 080e1388 20e6e509
 DAT_080e138c:
     .word  0x0000e0fc                     @ 080e138c fce00000
-FUN_080e1390:
+
+@ Challenge! 子菜单 'Limited Duel' (0x0bc3) 入口. challenge_rows row[1] init_fn. 待 runtime 验证.
+enter_limited_duel_page:
     push {r4,r5,r6,r7,lr}                    @ 080e1390 f0b5
     sub sp,#0x8                              @ 080e1392 82b0
     ldr r0, PTR_gPrng_080e13b4               @ 080e1394 0748
@@ -283504,7 +283472,9 @@ DAT_080e1a48:
     .word  0x09e5e80c                     @ 080e1a48 0ce8e509
 DAT_080e1a4c:
     .word  0x0000e0fc                     @ 080e1a4c fce00000
-FUN_080e1a50:
+
+@ Challenge! 子菜单 'Duel Puzzle' (0x0bc2) 入口. challenge_rows row[0] init_fn. 待 runtime 验证.
+enter_duel_puzzle_page:
     push {r4,r5,r6,r7,lr}                    @ 080e1a50 f0b5
     sub sp,#0x8                              @ 080e1a52 82b0
     ldr r0, PTR_gPrng_080e1a74               @ 080e1a54 0748
@@ -283994,33 +283964,43 @@ LAB_080e1e04:
     .word  0x080e2b90                     @ 080e2868 902b0e08
     .word  0x080e2bd0                     @ 080e286c d02b0e08
 DAT_080e2870:
-    ROM_INCBIN 0xe2870, 0x3f0
-    .word  0x080e2cc0                     @ 080e2c60 c02c0e08
-    .word  0x080e2d04                     @ 080e2c64 042d0e08
-    .word  0x080e2d4c                     @ 080e2c68 4c2d0e08
-    .word  0x080e2e24                     @ 080e2c6c 242e0e08
-    .word  0x080e3238                     @ 080e2c70 38320e08
-    .word  0x080e3238                     @ 080e2c74 38320e08
-    .word  0x080e3238                     @ 080e2c78 38320e08
-    .word  0x080e3238                     @ 080e2c7c 38320e08
-    .word  0x080e3238                     @ 080e2c80 38320e08
-    .word  0x080e3238                     @ 080e2c84 38320e08
-    .word  0x080e2e6c                     @ 080e2c88 6c2e0e08
-    .word  0x080e2e98                     @ 080e2c8c 982e0e08
-    .word  0x080e2f00                     @ 080e2c90 002f0e08
-    .word  0x080e2f4c                     @ 080e2c94 4c2f0e08
-    .word  0x080e2fd2                     @ 080e2c98 d22f0e08
-    .word  0x080e3094                     @ 080e2c9c 94300e08
-    .word  0x080e2d04                     @ 080e2ca0 042d0e08
-    .word  0x080e2d4c                     @ 080e2ca4 4c2d0e08
-    .word  0x080e2e3c                     @ 080e2ca8 3c2e0e08
-    .word  0x080e3238                     @ 080e2cac 38320e08
-    .word  0x080e309e                     @ 080e2cb0 9e300e08
+    ROM_INCBIN 0xe2870, 0x3c4
+enter_survival_duel_page:
+    push {r4,r5,r6,lr}                       @ 080e2c34 70b5
+    sub sp,#0x80                             @ 080e2c36 a0b0
+    ldr r1, DWORD_080e2c58                   @ 080e2c38 0749
+    movs r2,#0x80    @ 080e2c3a 8022
+    lsls r2,r2,#0x2    @ 080e2c3c 9200
+    adds r0,r1,r2    @ 080e2c3e 8818
+    ldr r0,[r0,#0x0]                         @ 080e2c40 0068
+    lsls r0,r0,#0xa    @ 080e2c42 8002
+    lsrs r0,r0,#0x18    @ 080e2c44 000e
+    adds r6,r1,#0x0    @ 080e2c46 0e1c
+    cmp r0,#0x17                             @ 080e2c48 1728
+    bls LAB_080e2c4e                         @ 080e2c4a 00d9
+    b LAB_080e3238                           @ 080e2c4c f4e2
+LAB_080e2c4e:
+    lsls r0,r0,#0x2    @ 080e2c4e 8000
+    ldr r1, DWORD_080e2c5c                   @ 080e2c50 0249
+    adds r0,r0,r1    @ 080e2c52 4018
+    ldr r0,[r0,#0x0]                         @ 080e2c54 0068
+    .hword 0x4687    @ 080e2c56 8746
+DWORD_080e2c58:
+    .word  0x03000040                     @ 080e2c58 40000003
+DWORD_080e2c5c:
+    .word  0x080e2c60                     @ 080e2c5c 602c0e08
+    ROM_INCBIN 0xe2c60, 0x54
     .word  0x080e3184                     @ 080e2cb4 84310e08
     .word  0x080e31d8                     @ 080e2cb8 d8310e08
     .word  0x080e320c                     @ 080e2cbc 0c320e08
-DAT_080e2cc0:
-    ROM_INCBIN 0xe2cc0, 0x598
+    ROM_INCBIN 0xe2cc0, 0x578
+LAB_080e3238:
+    movs r0,#0x1    @ 080e3238 0120
+    add sp,#0x80                             @ 080e323a 20b0
+    pop {r4,r5,r6}                           @ 080e323c 70bc
+    pop {r1}                                 @ 080e323e 02bc
+    bx r1                                    @ 080e3240 0847
+    ROM_INCBIN 0xe3242, 0x16
 FUN_080e3258:
     movs r0,#0x32    @ 080e3258 3220
     bx lr                                    @ 080e325a 7047
@@ -284860,7 +284840,9 @@ DAT_080e38fc:
     .word  0x02000000                     @ 080e38fc 00000002
 DAT_080e3900:
     .word  0x00006c3c                     @ 080e3900 3c6c0000
-FUN_080e3904:
+
+@ Challenge! 子菜单 'Theme Duel' (0x0bc4) 入口. challenge_rows row[2] init_fn. 待 runtime 验证.
+enter_theme_duel_page:
     push {r4,r5,r6,r7,lr}                    @ 080e3904 f0b5
     sub sp,#0x8                              @ 080e3906 82b0
     ldr r0, PTR_gPrng_080e3928               @ 080e3908 0748
@@ -293231,7 +293213,9 @@ LAB_080e798e:
     pop {r4}                                 @ 080e798e 10bc
     pop {r1}                                 @ 080e7990 02bc
     bx r1                                    @ 080e7992 0847
-FUN_080e7994:
+
+@ Free Duel 子菜单 'Campaign' (0x0a28) 入口. free_duel_rows row[0] init_fn. 也是 main_menu_page_table entry[7] 的 alt-mode 直进入口 (跳过 Free Duel 子菜单选择). 待 runtime 验证.
+enter_campaign_page:
     push {r4,lr}                             @ 080e7994 10b5
     ldr r2, PTR_gPrng_080e79fc               @ 080e7996 194a
     movs r0,#0x80    @ 080e7998 8020
@@ -293298,7 +293282,9 @@ DAT_080e7a10:
     .word  0x00000203                     @ 080e7a10 03020000
 DAT_080e7a14:
     .word  0xffc03fff                     @ 080e7a14 ff3fc0ff
-FUN_080e7a18:
+
+@ Free Duel 子菜单 'Link Duel' (0x0a29) 入口. free_duel_rows row[1] init_fn. 待 runtime 验证.
+enter_link_duel_page:
     push {r4,lr}                             @ 080e7a18 10b5
     ldr r2, PTR_gPrng_080e7a80               @ 080e7a1a 194a
     movs r0,#0x80    @ 080e7a1c 8020
@@ -302105,7 +302091,9 @@ DAT_080ebfb0:
     .word  0x00200040                     @ 080ebfb0 40002000
 DAT_080ebfb4:
     .word  0x000014c8                     @ 080ebfb4 c8140000
-FUN_080ebfb8:
+
+@ Options 子菜单 'Language Selection' (0x0a8f) 入口. options_rows row[1] init_fn. 待 runtime 验证.
+enter_language_selection_page:
     push {r4,r5,r6,r7,lr}                    @ 080ebfb8 f0b5
     ldr r7, PTR_gPrng_080ebfd8               @ 080ebfba 074f
     movs r0,#0x81    @ 080ebfbc 8120
@@ -302404,31 +302392,43 @@ LAB_080ec1f8:
     .word  0x06000044                     @ 080ec4cc 44000006
     .word  0x06000082                     @ 080ec4d0 82000006
     .word  0x06000084                     @ 080ec4d4 84000006
-    ROM_INCBIN 0xec4d8, 0x994
-    .word  0x080ecec4                     @ 080ece6c c4ce0e08
-    .word  0x080ecf24                     @ 080ece70 24cf0e08
-    .word  0x080ecf6c                     @ 080ece74 6ccf0e08
-    .word  0x080ed088                     @ 080ece78 88d00e08
-    .word  0x080ed474                     @ 080ece7c 74d40e08
-    .word  0x080ed474                     @ 080ece80 74d40e08
-    .word  0x080ed474                     @ 080ece84 74d40e08
-    .word  0x080ed474                     @ 080ece88 74d40e08
-    .word  0x080ed474                     @ 080ece8c 74d40e08
-    .word  0x080ed474                     @ 080ece90 74d40e08
-    .word  0x080ed09a                     @ 080ece94 9ad00e08
-    .word  0x080ed0be                     @ 080ece98 bed00e08
-    .word  0x080ed13e                     @ 080ece9c 3ed10e08
-    .word  0x080ed474                     @ 080ecea0 74d40e08
-    .word  0x080ed474                     @ 080ecea4 74d40e08
-    .word  0x080ed290                     @ 080ecea8 90d20e08
-    .word  0x080ed2b4                     @ 080eceac b4d20e08
-    .word  0x080ed474                     @ 080eceb0 74d40e08
-    .word  0x080ed474                     @ 080eceb4 74d40e08
-    .word  0x080ed474                     @ 080eceb8 74d40e08
-    .word  0x080ed348                     @ 080ecebc 48d30e08
+    ROM_INCBIN 0xec4d8, 0x968
+enter_your_status_page:
+    push {r4,r5,r6,r7,lr}                    @ 080ece40 f0b5
+    ldr r1, DWORD_080ece64                   @ 080ece42 0849
+    movs r2,#0x81    @ 080ece44 8122
+    lsls r2,r2,#0x2    @ 080ece46 9200
+    adds r0,r1,r2    @ 080ece48 8818
+    ldrh r0,[r0,#0x0]                        @ 080ece4a 0088
+    lsls r0,r0,#0x12    @ 080ece4c 8004
+    lsrs r0,r0,#0x18    @ 080ece4e 000e
+    adds r2,r1,#0x0    @ 080ece50 0a1c
+    cmp r0,#0x15                             @ 080ece52 1528
+    bls LAB_080ece58                         @ 080ece54 00d9
+    b LAB_080ed474                           @ 080ece56 0de3
+LAB_080ece58:
+    lsls r0,r0,#0x2    @ 080ece58 8000
+    ldr r1, DWORD_080ece68                   @ 080ece5a 0349
+    adds r0,r0,r1    @ 080ece5c 4018
+    ldr r0,[r0,#0x0]                         @ 080ece5e 0068
+    .hword 0x4687    @ 080ece60 8746
+    .byte  0x00, 0x00
+DWORD_080ece64:
+    .word  0x03000040                     @ 080ece64 40000003
+DWORD_080ece68:
+    .word  0x080ece6c                     @ 080ece68 6cce0e08
+    ROM_INCBIN 0xece6c, 0x54
     .word  0x080ed39c                     @ 080ecec0 9cd30e08
-DAT_080ecec4:
-    ROM_INCBIN 0xecec4, 0x5c0
+    ROM_INCBIN 0xecec4, 0x5b0
+LAB_080ed474:
+    movs r1,#0x80    @ 080ed474 8021
+    lsls r1,r1,#0x13    @ 080ed476 c904
+    movs r0,#0x0    @ 080ed478 0020
+    strh r0,[r1,#0x0]                        @ 080ed47a 0880
+    movs r0,#0x1    @ 080ed47c 0120
+    pop {r4,r5,r6,r7}                        @ 080ed47e f0bc
+    pop {r1}                                 @ 080ed480 02bc
+    bx r1                                    @ 080ed482 0847
 FUN_080ed484:
     push {r4,r5,lr}                          @ 080ed484 30b5
     adds r2,r0,#0x0    @ 080ed486 021c
@@ -329164,7 +329164,7 @@ DAT_080fde8c:
     .word  0xffc03fff                     @ 080fde8c ff3fc0ff
 FUN_080fde90:
     push {lr}                                @ 080fde90 00b5
-    bl FUN_080ebfb8                          @ 080fde92 eef791f8
+    bl enter_language_selection_page         @ 080fde92 eef791f8
     pop {r1}                                 @ 080fde96 02bc
     bx r1                                    @ 080fde98 0847
     ROM_INCBIN 0xfde9a, 0x5a
@@ -350702,7 +350702,9 @@ LAB_08108542:
     .byte  0x00, 0x00
 DAT_08108554:
     .word  0x00009b98                     @ 08108554 989b0000
-FUN_08108558:
+
+@ 主菜单 'Forb/Ltd Card Lists' (0x10ac) 子页入口. main_menu_page_table entry[4]/[10] init_fn (无 sub-row). 待 runtime 验证.
+enter_forb_ltd_lists_page:
     push {r4,r5,lr}                          @ 08108558 30b5
     ldr r1, DAT_081085b0                     @ 0810855a 1549
     ldr r5, PTR_gPrng_081085b4               @ 0810855c 154d
@@ -351397,7 +351399,9 @@ LAB_08108aba:
     pop {r4,r5,r6}                           @ 08108aba 70bc
     pop {r1}                                 @ 08108abc 02bc
     bx r1                                    @ 08108abe 0847
-FUN_08108ac0:
+
+@ 主菜单 'Deck Edit' (0x0bba) 子页入口. main_menu_page_table entry[0]/[6] init_fn (无 sub-row, init_fn 直接进入). 待 runtime 验证具体行为.
+enter_deck_edit_page:
     push {r4,r5,lr}                          @ 08108ac0 30b5
     ldr r1, DAT_08108b18                     @ 08108ac2 1549
     ldr r5, PTR_gPrng_08108b1c               @ 08108ac4 154d

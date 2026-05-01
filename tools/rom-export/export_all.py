@@ -59,6 +59,7 @@ EXPORT_PIPELINE = [
     (None, 'export_card_images.py'),            # data/card-image-* + cards-ids-array.s + graphics/card-images-rom/
     (None, 'export_pack_card_lists.py'),        # data/pack-card-lists.s
     (None, 'export_banlists.py'),               # data/banlists.s
+    (None, 'export_main_menu.py'),              # data/main-menu.s (主菜单 page table + sub-rows)
     (None, 'export_post_banlists_tables.py'),   # data/post-banlists-tables.s (level_signature + font_jp_dim/base/stride)
     (None, 'export_starter_deck.py'),           # data/starter-deck.s
     (None, 'export_struct_decks.py'),           # data/struct-decks.s

@@ -351,6 +351,47 @@ RENAMES = [
         "set_active_page_handler 注册 default 后继续 loop. 这是游戏的主 game "
         "loop wrapper (在 BIOS V-Blank IRQ 之外的 main thread)."),
 
+    # 2026-05-01: 主菜单 12 个 init_fn (按 main_menu_page_table title_string_id 命名)
+    # 数据源: ROM 0x09E5ED24 main_menu_page_table 12 entry + 4 sub-row arrays.
+    # 静态分析 + 文本对应 (text/game-strings/en.txt) 决定命名, runtime 未逐一验证.
+    ("FUN_08108ac0", "enter_deck_edit_page",
+        "主菜单 'Deck Edit' (0x0bba) 子页入口. main_menu_page_table entry[0]/[6] "
+        "init_fn (无 sub-row, init_fn 直接进入). 待 runtime 验证具体行为."),
+    ("FUN_08108558", "enter_forb_ltd_lists_page",
+        "主菜单 'Forb/Ltd Card Lists' (0x10ac) 子页入口. main_menu_page_table "
+        "entry[4]/[10] init_fn (无 sub-row). 待 runtime 验证."),
+    ("FUN_080e7994", "enter_campaign_page",
+        "Free Duel 子菜单 'Campaign' (0x0a28) 入口. free_duel_rows row[0] "
+        "init_fn. 也是 main_menu_page_table entry[7] 的 alt-mode 直进入口 "
+        "(跳过 Free Duel 子菜单选择). 待 runtime 验证."),
+    ("FUN_080e7a18", "enter_link_duel_page",
+        "Free Duel 子菜单 'Link Duel' (0x0a29) 入口. free_duel_rows row[1] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080e1a50", "enter_duel_puzzle_page",
+        "Challenge! 子菜单 'Duel Puzzle' (0x0bc2) 入口. challenge_rows row[0] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080e1390", "enter_limited_duel_page",
+        "Challenge! 子菜单 'Limited Duel' (0x0bc3) 入口. challenge_rows row[1] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080e3904", "enter_theme_duel_page",
+        "Challenge! 子菜单 'Theme Duel' (0x0bc4) 入口. challenge_rows row[2] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080e2c34", "enter_survival_duel_page",
+        "Challenge! 子菜单 'Survival Duel' (0x0bc5) 入口. challenge_rows row[3] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080dddc4", "enter_exchange_dp_page",
+        "Get Cards 子菜单 'Exchange DP to Pack' (0x0bcc) 入口. get_cards_rows "
+        "row[0] init_fn. 待 runtime 验证."),
+    ("FUN_080dddd4", "enter_password_input_page",
+        "Get Cards 子菜单 'PASSWORD' (0x0bcd) 入口. get_cards_rows row[1] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080ece40", "enter_your_status_page",
+        "Options 子菜单 'Your Status' (0x0bbd) 入口. options_rows row[0] "
+        "init_fn. 待 runtime 验证."),
+    ("FUN_080ebfb8", "enter_language_selection_page",
+        "Options 子菜单 'Language Selection' (0x0a8f) 入口. options_rows row[1] "
+        "init_fn. 待 runtime 验证."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

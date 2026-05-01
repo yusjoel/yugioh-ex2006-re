@@ -735,8 +735,15 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节
 	.include "data/pack-card-lists.s"
 
-@ 后 16MB 中间段：ROM偏移 0x1E5E618 - 0x1E5EF2F（卡包信息表后，禁卡表前）
-	.incbin "roms/2343.gba", 0x1E5E618, 0x918
+@ 后 16MB 中间段前部：ROM偏移 0x1E5E618 - 0x1E5ECD3（卡包信息表后，主菜单数据前）
+	.incbin "roms/2343.gba", 0x1E5E618, 0x6BC
+
+@ 主菜单 page table + sub-row 数组（ROM偏移 0x1E5ECD4 - 0x1E5EE13, 0x140 字节）
+@ 6 子页 + sub-rows 结构化数据
+	.include "data/main-menu.s"
+
+@ 后 16MB 中间段后部：ROM偏移 0x1E5EE14 - 0x1E5EF2F（主菜单数据后，禁卡表前）
+	.incbin "roms/2343.gba", 0x1E5EE14, 0x11C
 
 @ 禁卡表数据 + Banlist Master Table（ROM偏移 0x1E5EF30 - 0x1E5F71B）
 @ 8 个 banlist (487 条 × 4B) + master table (10 × 8B = 80 B), 共 0x7EC 字节
