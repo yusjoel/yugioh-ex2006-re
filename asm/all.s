@@ -282940,7 +282940,7 @@ switchD_080e13b0__caseD_5:
     str r0,[r4,#0x0]                         @ 080e15d0 2060
     b LAB_080e14b8                           @ 080e15d2 71e7
 DAT_080e15d4:
-    .word  0x02029590                     @ 080e15d4 90950202
+    .word  gMenuState                     @ 080e15d4 90950202
 DAT_080e15d8:
     .word  0x0801f445                     @ 080e15d8 45f40108
 PTR_gPrng_080e15dc:
@@ -283031,7 +283031,7 @@ PTR_gPrng_080e1680:
 DAT_080e1684:
     .word  0x00000213                     @ 080e1684 13020000
 DAT_080e1688:
-    .word  0x02029590                     @ 080e1688 90950202
+    .word  gMenuState                     @ 080e1688 90950202
 DAT_080e168c:
     .word  0x0201e2a0                     @ 080e168c a0e20102
 DAT_080e1690:
@@ -283110,7 +283110,7 @@ DAT_080e171c:
 DAT_080e1720:
     .word  0x00006c3c                     @ 080e1720 3c6c0000
 DAT_080e1724:
-    .word  0x02029590                     @ 080e1724 90950202
+    .word  gMenuState                     @ 080e1724 90950202
 DAT_080e1728:
     .word  0xfffffc3f                     @ 080e1728 3ffcffff
 PTR_gPrng_080e172c:
@@ -283150,7 +283150,7 @@ LAB_080e176a:
     str r0,[r2,#0x0]                         @ 080e176c 1060
     b LAB_080e14b8                           @ 080e176e a3e6
 DAT_080e1770:
-    .word  0x02029590                     @ 080e1770 90950202
+    .word  gMenuState                     @ 080e1770 90950202
 PTR_gPrng_080e1774:
     .word  gPrng                          @ 080e1774 40000003
 DAT_080e1778:
@@ -283787,7 +283787,7 @@ switchD_080e1a70__caseD_5:
     str r0,[r4,#0x0]                         @ 080e1c80 2060
     b LAB_080e1b78                           @ 080e1c82 79e7
 DAT_080e1c84:
-    .word  0x02029590                     @ 080e1c84 90950202
+    .word  gMenuState                     @ 080e1c84 90950202
 DAT_080e1c88:
     .word  0x0801fec1                     @ 080e1c88 c1fe0108
 PTR_gPrng_080e1c8c:
@@ -283870,7 +283870,7 @@ DAT_080e1d20:
 DAT_080e1d24:
     .word  0x02000000                     @ 080e1d24 00000002
 DAT_080e1d28:
-    .word  0x02029590                     @ 080e1d28 90950202
+    .word  gMenuState                     @ 080e1d28 90950202
 DAT_080e1d2c:
     .word  0x00006c3c                     @ 080e1d2c 3c6c0000
 LAB_080e1d30:
@@ -283946,7 +283946,7 @@ LAB_080e1d56:
 DAT_080e1dbc:
     .word  0x02000000                     @ 080e1dbc 00000002
 DAT_080e1dc0:
-    .word  0x02029590                     @ 080e1dc0 90950202
+    .word  gMenuState                     @ 080e1dc0 90950202
 DAT_080e1dc4:
     .word  0x00006c3c                     @ 080e1dc4 3c6c0000
 DAT_080e1dc8:
@@ -285151,7 +285151,7 @@ switchD_080e3924__caseD_5:
     str r0,[r4,#0x0]                         @ 080e3b44 2060
     b LAB_080e3a2c                           @ 080e3b46 71e7
 DAT_080e3b48:
-    .word  0x02029590                     @ 080e3b48 90950202
+    .word  gMenuState                     @ 080e3b48 90950202
 DAT_080e3b4c:
     .word  0x08022e2d                     @ 080e3b4c 2d2e0208
 PTR_gPrng_080e3b50:
@@ -285256,7 +285256,7 @@ LAB_080e3be2:
     b LAB_080e3c9c                           @ 080e3c14 42e0
     .byte  0x00, 0x00
 DAT_080e3c18:
-    .word  0x02029590                     @ 080e3c18 90950202
+    .word  gMenuState                     @ 080e3c18 90950202
 DAT_080e3c1c:
     .word  0x02000000                     @ 080e3c1c 00000002
 DAT_080e3c20:
@@ -285354,7 +285354,7 @@ LAB_080e3cb0:
 DAT_080e3ccc:
     .word  0x02023360                     @ 080e3ccc 60330202
 DAT_080e3cd0:
-    .word  0x02029590                     @ 080e3cd0 90950202
+    .word  gMenuState                     @ 080e3cd0 90950202
 DAT_080e3cd4:
     .word  0x00006d6c                     @ 080e3cd4 6c6d0000
 LAB_080e3cd8:
@@ -285422,7 +285422,7 @@ DAT_080e3d4c:
 DAT_080e3d50:
     .word  0x00006d6c                     @ 080e3d50 6c6d0000
 DAT_080e3d54:
-    .word  0x02029590                     @ 080e3d54 90950202
+    .word  gMenuState                     @ 080e3d54 90950202
 DAT_080e3d58:
     .word  0xfffffc3f                     @ 080e3d58 3ffcffff
 PTR_gPrng_080e3d5c:
@@ -285462,7 +285462,7 @@ LAB_080e3d9a:
     str r0,[r2,#0x0]                         @ 080e3d9c 1060
     b LAB_080e3a2c                           @ 080e3d9e 45e6
 DAT_080e3da0:
-    .word  0x02029590                     @ 080e3da0 90950202
+    .word  gMenuState                     @ 080e3da0 90950202
 PTR_gPrng_080e3da4:
     .word  gPrng                          @ 080e3da4 40000003
 DAT_080e3da8:
@@ -288684,7 +288684,7 @@ FUN_080e560a:
     strh r0,[r3,#0x0]                        @ 080e5644 1880
     bx lr                                    @ 080e5646 7047
 DAT_080e5648:
-    .word  0x02029590                     @ 080e5648 90950202
+    .word  gMenuState                     @ 080e5648 90950202
 DAT_080e564c:
     .word  0xfffffc03                     @ 080e564c 03fcffff
 DAT_080e5650:
@@ -288800,7 +288800,7 @@ LAB_080e5704:
 DAT_080e5728:
     .word  0x05000200                     @ 080e5728 00020005
 DAT_080e572c:
-    .word  0x02029590                     @ 080e572c 90950202
+    .word  gMenuState                     @ 080e572c 90950202
 DAT_080e5730:
     .word  0x09cf8894                     @ 080e5730 9488cf09
 DAT_080e5734:
@@ -288988,7 +288988,9 @@ LAB_080e5896:
     pop {r0}                                 @ 080e58a2 01bc
     bx r0                                    @ 080e58a4 0047
     .byte  0x00, 0x00
-FUN_080e58a8:
+
+@ 渲染单个菜单 row 的双行文字 (标题 + 副标题/描述) 到 sprite VRAM. 入参: r0 = page_idx (0..N, 决定 VRAM 偏移 0x06007480 + idx*0x600), r1 = string_id (u16, 对应 master pointer table row). 流程: memcpy ROM 0x09cf265c (0x600B template tile) 到 VRAM → font/glyph setup (FUN_080f0bb4 0x18,2) → 解 gSettings.lang (@ 0x02006c2c) 选 font_jp base → 两次 game_str_id_to_row(string_id) + text_render_wrapper (narrow 行 vs wide 行) → commit_line_buffer_to_sprite_vram. caller: FUN_080e7e0c case 4 内的 row 渲染循环.
+render_page_row_text:
     push {r4,r5,r6,lr}                       @ 080e58a8 70b5
     .hword 0x4656    @ 080e58aa 5646
     .hword 0x464d    @ 080e58ac 4d46
@@ -289342,7 +289344,7 @@ LAB_080e5ae2:
 DAT_080e5b74:
     .word  0xfffffe00                     @ 080e5b74 00feffff
 DAT_080e5b78:
-    .word  0x02029590                     @ 080e5b78 90950202
+    .word  gMenuState                     @ 080e5b78 90950202
 PTR_game_str_pointer_table_080e5b7c:
     .word  game_str_pointer_table         @ 080e5b7c 400f0008
 DAT_080e5b80:
@@ -289503,7 +289505,7 @@ PTR_font_jp_base_table_080e5ca0:
 DAT_080e5ca4:
     .word  0x06011800                     @ 080e5ca4 00180106
 DAT_080e5ca8:
-    .word  0x02029590                     @ 080e5ca8 90950202
+    .word  gMenuState                     @ 080e5ca8 90950202
 LAB_080e5cac:
     cmp r0,#0x7                              @ 080e5cac 0728
     bne LAB_080e5cb2                         @ 080e5cae 00d1
@@ -289814,7 +289816,7 @@ LAB_080e5ee4:
     b LAB_080e5f62                           @ 080e5f20 1fe0
     .byte  0x00, 0x00
 DAT_080e5f24:
-    .word  0x02029590                     @ 080e5f24 90950202
+    .word  gMenuState                     @ 080e5f24 90950202
 DAT_080e5f28:
     .word  0x00000c1c                     @ 080e5f28 1c0c0000
 PTR_game_str_pointer_table_080e5f2c:
@@ -290106,7 +290108,7 @@ DAT_080e6160:
 PTR_font_jp_base_table_080e6164:
     .word  font_jp_base_table             @ 080e6164 54f8e509
 DAT_080e6168:
-    .word  0x02029590                     @ 080e6168 90950202
+    .word  gMenuState                     @ 080e6168 90950202
 PTR_game_str_pointer_table_080e616c:
     .word  game_str_pointer_table         @ 080e616c 400f0008
 PTR_game_str_ja_080e6170:
@@ -290312,7 +290314,7 @@ LAB_080e62fe:
     pop {r0}                                 @ 080e6300 01bc
     bx r0                                    @ 080e6302 0047
 DAT_080e6304:
-    .word  0x02029590                     @ 080e6304 90950202
+    .word  gMenuState                     @ 080e6304 90950202
 DAT_080e6308:
     .word  0x050003c0                     @ 080e6308 c0030005
 DAT_080e630c:
@@ -290392,7 +290394,7 @@ DAT_080e63a8:
 DAT_080e63ac:
     .word  0x06010000                     @ 080e63ac 00000106
 DAT_080e63b0:
-    .word  0x02029590                     @ 080e63b0 90950202
+    .word  gMenuState                     @ 080e63b0 90950202
 FUN_080e63b4:
     push {lr}                                @ 080e63b4 00b5
     movs r0,#0xc0    @ 080e63b6 c020
@@ -290604,7 +290606,7 @@ PTR_font_jp_base_table_080e6570:
 DAT_080e6574:
     .word  0x00008001                     @ 080e6574 01800000
 DAT_080e6578:
-    .word  0x02029590                     @ 080e6578 90950202
+    .word  gMenuState                     @ 080e6578 90950202
 DAT_080e657c:
     .word  0x06011100                     @ 080e657c 00110106
 DAT_080e6580:
@@ -290638,7 +290640,7 @@ LAB_080e65a8:
     pop {r0}                                 @ 080e65b8 01bc
     bx r0                                    @ 080e65ba 0047
 DAT_080e65bc:
-    .word  0x02029590                     @ 080e65bc 90950202
+    .word  gMenuState                     @ 080e65bc 90950202
 FUN_080e65c0:
     push {r4,lr}                             @ 080e65c0 10b5
     movs r4,#0x0    @ 080e65c2 0024
@@ -291331,7 +291333,7 @@ LAB_080e6aea:
     pop {r0}                                 @ 080e6aec 01bc
     bx r0                                    @ 080e6aee 0047
 DAT_080e6af0:
-    .word  0x02029590                     @ 080e6af0 90950202
+    .word  gMenuState                     @ 080e6af0 90950202
 DAT_080e6af4:
     .word  0x0000f80f                     @ 080e6af4 0ff80000
 DAT_080e6af8:
@@ -291420,7 +291422,7 @@ FUN_080e6b24:
     b LAB_080e6bd2                           @ 080e6b9c 19e0
     .byte  0x00, 0x00
 DAT_080e6ba0:
-    .word  0x02029590                     @ 080e6ba0 90950202
+    .word  gMenuState                     @ 080e6ba0 90950202
 PTR_gPrng_080e6ba4:
     .word  gPrng                          @ 080e6ba4 40000003
 DAT_080e6ba8:
@@ -291549,7 +291551,7 @@ LAB_080e6c76:
     beq LAB_080e6caa                         @ 080e6c90 0bd0
     b LAB_080e6ce8                           @ 080e6c92 29e0
 DAT_080e6c94:
-    .word  0x02029590                     @ 080e6c94 90950202
+    .word  gMenuState                     @ 080e6c94 90950202
 DAT_080e6c98:
     .word  0x09e5ec44                     @ 080e6c98 44ece509
 DAT_080e6c9c:
@@ -291828,7 +291830,7 @@ PTR_gPrng_080e6ebc:
 DAT_080e6ec0:
     .word  0xf0060000                     @ 080e6ec0 000006f0
 DAT_080e6ec4:
-    .word  0x02029590                     @ 080e6ec4 90950202
+    .word  gMenuState                     @ 080e6ec4 90950202
 DAT_080e6ec8:
     .word  0x0000ec40                     @ 080e6ec8 40ec0000
 DAT_080e6ecc:
@@ -292055,7 +292057,7 @@ DAT_080e7090:
 DAT_080e7094:
     .word  0x0000d390                     @ 080e7094 90d30000
 DAT_080e7098:
-    .word  0x02029590                     @ 080e7098 90950202
+    .word  gMenuState                     @ 080e7098 90950202
 DAT_080e709c:
     .word  0xfffff140                     @ 080e709c 40f1ffff
 DAT_080e70a0:
@@ -292095,7 +292097,7 @@ FUN_080e70ac:
     b LAB_080e70fc                           @ 080e70e4 0ae0
     .byte  0x00, 0x00
 DAT_080e70e8:
-    .word  0x02029590                     @ 080e70e8 90950202
+    .word  gMenuState                     @ 080e70e8 90950202
 LAB_080e70ec:
     adds r2,r1,#0x0    @ 080e70ec 0a1c
     adds r2,#0x27    @ 080e70ee 2732
@@ -292171,7 +292173,7 @@ LAB_080e7174:
     movs r0,#0x1    @ 080e7174 0120
     b LAB_080e7182                           @ 080e7176 04e0
 DAT_080e7178:
-    .word  0x02029590                     @ 080e7178 90950202
+    .word  gMenuState                     @ 080e7178 90950202
 DAT_080e717c:
     .word  0xfffffc7f                     @ 080e717c 7ffcffff
 LAB_080e7180:
@@ -292309,7 +292311,7 @@ LAB_080e727c:
     bx r1                                    @ 080e7284 0847
     .byte  0x00, 0x00
 DAT_080e7288:
-    .word  0x02029590                     @ 080e7288 90950202
+    .word  gMenuState                     @ 080e7288 90950202
 PTR_gPrng_080e728c:
     .word  gPrng                          @ 080e728c 40000003
 DAT_080e7290:
@@ -292366,7 +292368,7 @@ LAB_080e72ec:
     bx r0                                    @ 080e72f0 0047
     .byte  0x00, 0x00
 DAT_080e72f4:
-    .word  0x02029590                     @ 080e72f4 90950202
+    .word  gMenuState                     @ 080e72f4 90950202
 FUN_080e72f8:
     push {r4,lr}                             @ 080e72f8 10b5
     ldr r1, DAT_080e7368                     @ 080e72fa 1b49
@@ -292425,7 +292427,7 @@ FUN_080e72f8:
     bx r0                                    @ 080e7364 0047
     .byte  0x00, 0x00
 DAT_080e7368:
-    .word  0x02029590                     @ 080e7368 90950202
+    .word  gMenuState                     @ 080e7368 90950202
 DAT_080e736c:
     .word  0xfffffc7f                     @ 080e736c 7ffcffff
 FUN_080e7370:
@@ -292451,7 +292453,7 @@ FUN_080e7370:
     b LAB_080e73b0                           @ 080e7398 0ae0
     .byte  0x00, 0x00
 DAT_080e739c:
-    .word  0x02029590                     @ 080e739c 90950202
+    .word  gMenuState                     @ 080e739c 90950202
 LAB_080e73a0:
     movs r0,#0x1    @ 080e73a0 0120
     orrs r0,r1    @ 080e73a2 0843
@@ -292536,7 +292538,7 @@ LAB_080e7418:
     bl FUN_080e6264                          @ 080e743e fef711ff
     b LAB_080e7478                           @ 080e7442 19e0
 DAT_080e7444:
-    .word  0x02029590                     @ 080e7444 90950202
+    .word  gMenuState                     @ 080e7444 90950202
 PTR_gPrng_080e7448:
     .word  gPrng                          @ 080e7448 40000003
 DAT_080e744c:
@@ -292582,7 +292584,7 @@ LAB_080e7478:
     b LAB_080e7690                           @ 080e749c f8e0
     .byte  0x00, 0x00
 DAT_080e74a0:
-    .word  0x02029590                     @ 080e74a0 90950202
+    .word  gMenuState                     @ 080e74a0 90950202
 LAB_080e74a4:
     ldr r5, DAT_080e75ac                     @ 080e74a4 414d
     adds r7,r5,#0x0    @ 080e74a6 2f1c
@@ -292714,7 +292716,7 @@ LAB_080e7572:
     adds r0,#0x2e    @ 080e75a8 2e30
     b LAB_080e76b4                           @ 080e75aa 83e0
 DAT_080e75ac:
-    .word  0x02029590                     @ 080e75ac 90950202
+    .word  gMenuState                     @ 080e75ac 90950202
 DAT_080e75b0:
     .word  0x0203a2c0                     @ 080e75b0 c0a20302
 DAT_080e75b4:
@@ -292787,7 +292789,7 @@ switchD_080e7634__switchD:
     .hword 0x4687    @ 080e7634 8746
     .byte  0x00, 0x00
 DAT_080e7638:
-    .word  0x02029590                     @ 080e7638 90950202
+    .word  gMenuState                     @ 080e7638 90950202
 DAT_080e763c:
     .word  0x080e7640                     @ 080e763c 40760e08
 switchD_080e7634__switchdataD_080e7640:
@@ -292839,7 +292841,7 @@ LAB_080e76b4:
 PTR_gPrng_080e76b8:
     .word  gPrng                          @ 080e76b8 40000003
 DAT_080e76bc:
-    .word  0x02029590                     @ 080e76bc 90950202
+    .word  gMenuState                     @ 080e76bc 90950202
 switchD_080e7634__caseD_12:
     adds r1,r3,#0x0    @ 080e76c0 191c
     adds r1,#0x2e    @ 080e76c2 2e31
@@ -292944,7 +292946,7 @@ LAB_080e7770:
 PTR_gPrng_080e7784:
     .word  gPrng                          @ 080e7784 40000003
 DAT_080e7788:
-    .word  0x02029590                     @ 080e7788 90950202
+    .word  gMenuState                     @ 080e7788 90950202
 DAT_080e778c:
     .word  0x0000ffff                     @ 080e778c ffff0000
 LAB_080e7790:
@@ -293137,7 +293139,7 @@ DAT_080e78e0:
 DAT_080e78e4:
     .word  0x0203a2c0                     @ 080e78e4 c0a20302
 DAT_080e78e8:
-    .word  0x02029590                     @ 080e78e8 90950202
+    .word  gMenuState                     @ 080e78e8 90950202
 LAB_080e78ec:
     movs r0,#0x1    @ 080e78ec 0120
     bl FUN_080f9ab4                          @ 080e78ee 12f0e1f8
@@ -293222,7 +293224,7 @@ FUN_080e7954:
     b LAB_080e798e                           @ 080e7984 03e0
     .byte  0x00, 0x00
 DAT_080e7988:
-    .word  0x02029590                     @ 080e7988 90950202
+    .word  gMenuState                     @ 080e7988 90950202
 LAB_080e798c:
     movs r0,#0x1    @ 080e798c 0120
 LAB_080e798e:
@@ -293285,7 +293287,7 @@ LAB_080e79f2:
 PTR_gPrng_080e79fc:
     .word  gPrng                          @ 080e79fc 40000003
 DAT_080e7a00:
-    .word  0x02029590                     @ 080e7a00 90950202
+    .word  gMenuState                     @ 080e7a00 90950202
 DAT_080e7a04:
     .word  0x08025c95                     @ 080e7a04 955c0208
 DAT_080e7a08:
@@ -293352,7 +293354,7 @@ LAB_080e7a76:
 PTR_gPrng_080e7a80:
     .word  gPrng                          @ 080e7a80 40000003
 DAT_080e7a84:
-    .word  0x02029590                     @ 080e7a84 90950202
+    .word  gMenuState                     @ 080e7a84 90950202
 DAT_080e7a88:
     .word  0x08028d41                     @ 080e7a88 418d0208
 DAT_080e7a8c:
@@ -293480,7 +293482,7 @@ LAB_080e7b24:
     b LAB_080e7ba2                           @ 080e7b80 0fe0
     .byte  0x00, 0x00
 DAT_080e7b84:
-    .word  0x02029590                     @ 080e7b84 90950202
+    .word  gMenuState                     @ 080e7b84 90950202
 PTR_gPrng_080e7b88:
     .word  gPrng                          @ 080e7b88 40000003
 DAT_080e7b8c:
@@ -293642,7 +293644,7 @@ LAB_080e7cb8:
     movs r0,#0x0    @ 080e7cb8 0020
     b LAB_080e7cce                           @ 080e7cba 08e0
 DAT_080e7cbc:
-    .word  0x02029590                     @ 080e7cbc 90950202
+    .word  gMenuState                     @ 080e7cbc 90950202
 PTR_gPrng_080e7cc0:
     .word  gPrng                          @ 080e7cc0 40000003
 DAT_080e7cc4:
@@ -293702,7 +293704,7 @@ LAB_080e7d0a:
 DAT_080e7d24:
     .word  0x09e5ee14                     @ 080e7d24 14eee509
 DAT_080e7d28:
-    .word  0x02029590                     @ 080e7d28 90950202
+    .word  gMenuState                     @ 080e7d28 90950202
 LAB_080e7d2c:
     ldr r0, DAT_080e7d44                     @ 080e7d2c 0548
     ldrb r1,[r0,#0x8]                        @ 080e7d2e 017a
@@ -293718,7 +293720,7 @@ LAB_080e7d3e:
     b LAB_080e7d4a                           @ 080e7d40 03e0
     .byte  0x00, 0x00
 DAT_080e7d44:
-    .word  0x02029590                     @ 080e7d44 90950202
+    .word  gMenuState                     @ 080e7d44 90950202
 LAB_080e7d48:
     movs r0,#0x0    @ 080e7d48 0020
 LAB_080e7d4a:
@@ -293736,7 +293738,7 @@ FUN_080e7d50:
     lsls r1,r0,#0x19    @ 080e7d60 4106
     b LAB_080e7da2                           @ 080e7d62 1ee0
 DAT_080e7d64:
-    .word  0x02029590                     @ 080e7d64 90950202
+    .word  gMenuState                     @ 080e7d64 90950202
 LAB_080e7d68:
     cmp r4,r6                                @ 080e7d68 b442
     beq LAB_080e7d9a                         @ 080e7d6a 16d0
@@ -293794,7 +293796,7 @@ LAB_080e7da2:
 DAT_080e7dcc:
     .word  0x09e5ee14                     @ 080e7dcc 14eee509
 DAT_080e7dd0:
-    .word  0x02029590                     @ 080e7dd0 90950202
+    .word  gMenuState                     @ 080e7dd0 90950202
 LAB_080e7dd4:
     subs r0,#0x1    @ 080e7dd4 0138
     strb r0,[r1,#0x9]                        @ 080e7dd6 4872
@@ -293820,7 +293822,7 @@ LAB_080e7dda:
     movs r0,#0x1    @ 080e7dfc 0120
     b LAB_080e7e06                           @ 080e7dfe 02e0
 DAT_080e7e00:
-    .word  0x02029590                     @ 080e7e00 90950202
+    .word  gMenuState                     @ 080e7e00 90950202
 LAB_080e7e04:
     movs r0,#0x0    @ 080e7e04 0020
 LAB_080e7e06:
@@ -293931,9 +293933,9 @@ LAB_080e7ee2:
     adds r2,r2,r5    @ 080e7efc 5219
     b LAB_080e84a2                           @ 080e7efe d0e2
 DAT_080e7f00:
-    .word  0x02029590                     @ 080e7f00 90950202
+    .word  gMenuState                     @ 080e7f00 90950202
 DAT_080e7f04:
-    .word  0x09e5ed24                     @ 080e7f04 24ede509
+    .word  main_menu_page_table           @ 080e7f04 24ede509
 PTR_gPrng_080e7f08:
     .word  gPrng                          @ 080e7f08 40000003
 DAT_080e7f0c:
@@ -293966,7 +293968,7 @@ LAB_080e7f30:
     b LAB_080e84a2                           @ 080e7f40 afe2
     .byte  0x00, 0x00
 DAT_080e7f44:
-    .word  0x02029590                     @ 080e7f44 90950202
+    .word  gMenuState                     @ 080e7f44 90950202
 PTR_gPrng_080e7f48:
     .word  gPrng                          @ 080e7f48 40000003
 switchD_080e7e30__caseD_2:
@@ -293987,7 +293989,7 @@ LAB_080e7f5c:
     adds r2,r2,r1    @ 080e7f68 5218
     b LAB_080e84a2                           @ 080e7f6a 9ae2
 DAT_080e7f6c:
-    .word  0x02029590                     @ 080e7f6c 90950202
+    .word  gMenuState                     @ 080e7f6c 90950202
 PTR_gPrng_080e7f70:
     .word  gPrng                          @ 080e7f70 40000003
 switchD_080e7e30__caseD_3:
@@ -294030,7 +294032,7 @@ LAB_080e7fbc:
     b switchD_080e7e30__caseD_7              @ 080e7fc0 7ae2
     .byte  0x00, 0x00
 DAT_080e7fc4:
-    .word  0x02029590                     @ 080e7fc4 90950202
+    .word  gMenuState                     @ 080e7fc4 90950202
 DAT_080e7fc8:
     .word  0xfffffe3f                     @ 080e7fc8 3ffeffff
 PTR_gPrng_080e7fcc:
@@ -294081,7 +294083,7 @@ LAB_080e7fec:
 LAB_080e8026:
     ldrh r1,[r4,#0x0]                        @ 080e8026 2188
     adds r0,r5,#0x0    @ 080e8028 281c
-    bl FUN_080e58a8                          @ 080e802a fdf73dfc
+    bl render_page_row_text                  @ 080e802a fdf73dfc
     adds r4,#0x8    @ 080e802e 0834
     adds r5,#0x1    @ 080e8030 0135
     ldrb r2,[r7,#0xb]                        @ 080e8032 fa7a
@@ -294123,7 +294125,7 @@ LAB_080e804c:
     b LAB_080e84b4                           @ 080e8078 1ce2
     .byte  0x00, 0x00
 DAT_080e807c:
-    .word  0x02029590                     @ 080e807c 90950202
+    .word  gMenuState                     @ 080e807c 90950202
 PTR_gPrng_080e8080:
     .word  gPrng                          @ 080e8080 40000003
 DAT_080e8084:
@@ -294364,7 +294366,7 @@ LAB_080e818a:
     b switchD_080e7e30__caseD_7              @ 080e8258 2ee1
     .byte  0x00, 0x00
 DAT_080e825c:
-    .word  0x02029590                     @ 080e825c 90950202
+    .word  gMenuState                     @ 080e825c 90950202
 DAT_080e8260:
     .word  0x08108559                     @ 080e8260 59851008
 PTR_gPrng_080e8264:
@@ -294416,7 +294418,7 @@ LAB_080e82b6:
     movs r2,#0x40    @ 080e82c4 4022
     b LAB_080e83cc                           @ 080e82c6 81e0
 DAT_080e82c8:
-    .word  0x02029590                     @ 080e82c8 90950202
+    .word  gMenuState                     @ 080e82c8 90950202
 PTR_gPrng_080e82cc:
     .word  gPrng                          @ 080e82cc 40000003
 DAT_080e82d0:
@@ -294501,7 +294503,7 @@ PTR_gPrng_080e8368:
 DAT_080e836c:
     .word  0xffffc03f                     @ 080e836c 3fc0ffff
 DAT_080e8370:
-    .word  0x02029590                     @ 080e8370 90950202
+    .word  gMenuState                     @ 080e8370 90950202
 switchD_080e7e30__caseD_c:
     bl FUN_080e6974                          @ 080e8374 fef7fefa
     movs r1,#0x1    @ 080e8378 0121
@@ -294523,7 +294525,7 @@ LAB_080e8388:
     b LAB_080e84a2                           @ 080e8398 83e0
     .byte  0x00, 0x00
 DAT_080e839c:
-    .word  0x02029590                     @ 080e839c 90950202
+    .word  gMenuState                     @ 080e839c 90950202
 PTR_gPrng_080e83a0:
     .word  gPrng                          @ 080e83a0 40000003
 switchD_080e7e30__caseD_d:
@@ -294552,7 +294554,7 @@ LAB_080e83cc:
     b switchD_080e7e30__caseD_7              @ 080e83d0 72e0
     .byte  0x00, 0x00
 DAT_080e83d4:
-    .word  0x02029590                     @ 080e83d4 90950202
+    .word  gMenuState                     @ 080e83d4 90950202
 PTR_gPrng_080e83d8:
     .word  gPrng                          @ 080e83d8 40000003
 DAT_080e83dc:
@@ -294570,7 +294572,7 @@ switchD_080e7e30__caseD_f:
     bl FUN_080e568c                          @ 080e83f6 fdf749f9
     b LAB_080e849a                           @ 080e83fa 4ee0
 DAT_080e83fc:
-    .word  0x02029590                     @ 080e83fc 90950202
+    .word  gMenuState                     @ 080e83fc 90950202
 switchD_080e7e30__caseD_11:
     ldr r5, DAT_080e84c8                     @ 080e8400 314d
     ldrb r4,[r5,#0xb]                        @ 080e8402 ec7a
@@ -294672,7 +294674,7 @@ switchD_080e7e30__caseD_7:
     bx r1                                    @ 080e84c4 0847
     .byte  0x00, 0x00
 DAT_080e84c8:
-    .word  0x02029590                     @ 080e84c8 90950202
+    .word  gMenuState                     @ 080e84c8 90950202
 PTR_gPrng_080e84cc:
     .word  gPrng                          @ 080e84cc 40000003
 DAT_080e84d0:
@@ -316007,7 +316009,9 @@ LAB_080f48e8:
     bx lr                                    @ 080f48f2 7047
 PTR_gPrng_080f48f4:
     .word  gPrng                          @ 080f48f4 40000003
-FUN_080f48f8:
+
+@ 把 page handler fn_ptr 写入 IWRAM 槽供 main_dispatch_loop 间接跳转. 入参 r0 = THUMB fn_ptr (e.g. 0x080e7e0d = FUN_080e7e0c+1). 内部清 多个 IWRAM 状态字 (gPrng+0x1f4/+0x1f8/+0x208 等), 重置 BG/blend 寄存器, 设置 fn_ptr 到 [gPrng+0x1f0]. main_dispatch_loop 下一帧从该 槽读出执行. 多 caller (各 page 切换点).
+set_active_page_handler:
     push {r4,r5,r6,r7,lr}                    @ 080f48f8 f0b5
     ldr r1, PTR_gPrng_080f4990               @ 080f48fa 2549
     .hword 0x468c    @ 080f48fc 8c46
@@ -316290,7 +316294,9 @@ FUN_080f4b78:
     pop {r0}                                 @ 080f4b8e 01bc
     bx r0                                    @ 080f4b90 0047
     .byte  0x00, 0x00
-FUN_080f4b94:
+
+@ 主调度循环 (无限循环): 每帧检查 IWRAM 状态 [0x03000184]/[gPrng+0x1f0] (active page handler fn_ptr 槽), 默认 fn = 0x080e7e0d (FUN_080e7e0c). 通过 FUN_0810e5c8 间接调用 page handler. handler 返回非 0 则调 set_active_page_handler 注册 default 后继续 loop. 这是游戏的主 game loop wrapper (在 BIOS V-Blank IRQ 之外的 main thread).
+main_dispatch_loop:
     push {r4,r5,r6,lr}                       @ 080f4b94 70b5
     ldr r5, DAT_080f4c04                     @ 080f4b96 1b4d
     ldr r0, DAT_080f4c08                     @ 080f4b98 1b48
@@ -316346,7 +316352,7 @@ LAB_080f4bf2:
     cmp r0,#0x0                              @ 080f4bf8 0028
     beq LAB_080f4b9c                         @ 080f4bfa cfd0
     ldr r0, DAT_080f4c10                     @ 080f4bfc 0448
-    bl FUN_080f48f8                          @ 080f4bfe fff77bfe
+    bl set_active_page_handler               @ 080f4bfe fff77bfe
     b LAB_080f4b9c                           @ 080f4c02 cbe7
 DAT_080f4c04:
     .word  0x03000184                     @ 080f4c04 84010003
@@ -316593,8 +316599,8 @@ LAB_080f4df4:
     bl FUN_080f9be4                          @ 080f4df6 04f0f5fe
 LAB_080f4dfa:
     ldr r0, DAT_080f4e0c                     @ 080f4dfa 0448
-    bl FUN_080f48f8                          @ 080f4dfc fff77cfd
-    bl FUN_080f4b94                          @ 080f4e00 fff7c8fe
+    bl set_active_page_handler               @ 080f4dfc fff77cfd
+    bl main_dispatch_loop                    @ 080f4e00 fff7c8fe
     pop {r4}                                 @ 080f4e04 10bc
     pop {r0}                                 @ 080f4e06 01bc
     bx r0                                    @ 080f4e08 0047
@@ -329003,7 +329009,7 @@ FUN_080fdd3c:
     cmp r1,#0x0                              @ 080fdd5e 0029
     bne LAB_080fddbc                         @ 080fdd60 2cd1
     ldr r0, DAT_080fdd94                     @ 080fdd62 0c48
-    bl FUN_080f48f8                          @ 080fdd64 f6f7c8fd
+    bl set_active_page_handler               @ 080fdd64 f6f7c8fd
     bl FUN_080f9b98                          @ 080fdd68 fbf716ff
     cmp r0,#0x0                              @ 080fdd6c 0028
     beq LAB_080fdd9c                         @ 080fdd6e 15d0
@@ -329047,7 +329053,7 @@ DAT_080fddb8:
     .word  0xffffc03f                     @ 080fddb8 3fc0ffff
 LAB_080fddbc:
     ldr r0, DAT_080fddcc                     @ 080fddbc 0348
-    bl FUN_080f48f8                          @ 080fddbe f6f79bfd
+    bl set_active_page_handler               @ 080fddbe f6f79bfd
 LAB_080fddc2:
     movs r0,#0x0    @ 080fddc2 0020
     pop {r4}                                 @ 080fddc4 10bc

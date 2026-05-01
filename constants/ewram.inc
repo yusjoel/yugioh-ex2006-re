@@ -103,6 +103,16 @@
                                              @ 每 2 B 一项: [charset][character_id]
 
 @ -----------------------------------------------------------------------------
+@ 主菜单 (main menu page state)
+@ -----------------------------------------------------------------------------
+.equ gMenuState,                 0x02029590  @ 主菜单状态结构
+                                             @ +0x0  = u32 ptr 到 main_menu_page_table (ROM 0x09E5ED24)
+                                             @ +0xb  = u8 bits[6:4] = current page idx (0..5)
+                                             @ 服务者: FUN_080e7e0c (主菜单 page state machine)
+                                             @ 6 子页: Deck Edit / Free Duel / Challenge! /
+                                             @         Get Cards / Forb-Ltd Card Lists / Options
+
+@ -----------------------------------------------------------------------------
 @ Demo 过场动画 (cinematic; demo/shuen, demo/exodia, demo/vija ...)
 @ -----------------------------------------------------------------------------
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构

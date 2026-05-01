@@ -324,6 +324,33 @@ RENAMES = [
         "0x080ccbb2 (switchD case). runtime 验证: 按 RIGHT 触发 caller 反复调 "
         "本函数 10 次形成 cursor 推进序列."),
 
+    # 2026-05-01: 主菜单 / 主调度循环命名族 (game_str_id_to_row 上溯链)
+    # GDB 实测: 在 ss4 主菜单 Options 子页按 A, 触发 4 个 game_str_id_to_row hit
+    # (id 0xbbd "Your Status" + 0xa8f "Language Selection"), lr 都在 FUN_080e58a8.
+    # 静态分析 + ROM table @ 0x09E5ED24 解码出主菜单 6 子页:
+    # Deck Edit / Free Duel / Challenge! / Get Cards / Forb/Ltd Card Lists / Options.
+    ("FUN_080e58a8", "render_page_row_text",
+        "渲染单个菜单 row 的双行文字 (标题 + 副标题/描述) 到 sprite VRAM. "
+        "入参: r0 = page_idx (0..N, 决定 VRAM 偏移 0x06007480 + idx*0x600), "
+        "r1 = string_id (u16, 对应 master pointer table row). 流程: memcpy "
+        "ROM 0x09cf265c (0x600B template tile) 到 VRAM → font/glyph setup "
+        "(FUN_080f0bb4 0x18,2) → 解 gSettings.lang (@ 0x02006c2c) 选 font_jp "
+        "base → 两次 game_str_id_to_row(string_id) + text_render_wrapper "
+        "(narrow 行 vs wide 行) → commit_line_buffer_to_sprite_vram. caller: "
+        "FUN_080e7e0c case 4 内的 row 渲染循环."),
+    ("FUN_080f48f8", "set_active_page_handler",
+        "把 page handler fn_ptr 写入 IWRAM 槽供 main_dispatch_loop 间接跳转. "
+        "入参 r0 = THUMB fn_ptr (e.g. 0x080e7e0d = FUN_080e7e0c+1). 内部清 "
+        "多个 IWRAM 状态字 (gPrng+0x1f4/+0x1f8/+0x208 等), 重置 BG/blend "
+        "寄存器, 设置 fn_ptr 到 [gPrng+0x1f0]. main_dispatch_loop 下一帧从该 "
+        "槽读出执行. 多 caller (各 page 切换点)."),
+    ("FUN_080f4b94", "main_dispatch_loop",
+        "主调度循环 (无限循环): 每帧检查 IWRAM 状态 [0x03000184]/[gPrng+0x1f0] "
+        "(active page handler fn_ptr 槽), 默认 fn = 0x080e7e0d (FUN_080e7e0c). "
+        "通过 FUN_0810e5c8 间接调用 page handler. handler 返回非 0 则调 "
+        "set_active_page_handler 注册 default 后继续 loop. 这是游戏的主 game "
+        "loop wrapper (在 BIOS V-Blank IRQ 之外的 main thread)."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

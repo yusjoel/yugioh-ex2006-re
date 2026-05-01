@@ -2237,7 +2237,7 @@ address,name,proposed_name,score,tags
 0x080c6b04,FUN_080c6b04,,,
 0x080c6e9c,FUN_080c6e9c,card_ids_080c6e9c,2,card_ids;duel_field
 0x080c707c,FUN_080c707c,card_ids_080c707c,2,card_ids
-0x080c716c,FUN_080c716c,game_str_080c716c,2,card_ids;card_stats;duel_field;font_jp;game_str
+0x080c716c,apply_zone_cursor_step,,,card_ids;card_stats;duel_field;font_jp;game_str
 0x080c7530,FUN_080c7530,,,
 0x080c7638,FUN_080c7638,,,
 0x080c76c0,FUN_080c76c0,font_jp_080c76c0,2,font_jp
@@ -2718,7 +2718,7 @@ address,name,proposed_name,score,tags
 0x080e56a0,FUN_080e56a0,,,vram;palette
 0x080e5740,FUN_080e5740,font_jp_080e5740,2,font_jp;game_str
 0x080e583c,FUN_080e583c,,,
-0x080e58a8,FUN_080e58a8,font_jp_080e58a8,2,font_jp;game_str
+0x080e58a8,render_page_row_text,,,font_jp;game_str
 0x080e59a4,FUN_080e59a4,,,
 0x080e5a10,FUN_080e5a10,font_jp_080e5a10,3,vram;font_jp
 0x080e5ac8,FUN_080e5ac8,game_str_080e5ac8,3,vram;card_ids;font_jp;game_str;settings
@@ -2960,12 +2960,12 @@ address,name,proposed_name,score,tags
 0x080f4884,FUN_080f4884,,,
 0x080f48c8,FUN_080f48c8,,,
 0x080f48dc,FUN_080f48dc,,,
-0x080f48f8,FUN_080f48f8,frame_counter_080f48f8,3,frame_counter
+0x080f48f8,set_active_page_handler,,,frame_counter
 0x080f4a18,FUN_080f4a18,,,
 0x080f4adc,FUN_080f4adc,,,sprite;scene_duel_puzzle
 0x080f4b3c,FUN_080f4b3c,,,bg;scene_duel_puzzle
 0x080f4b78,FUN_080f4b78,,,scene_duel_puzzle;prng
-0x080f4b94,FUN_080f4b94,,,scene_duel_puzzle;frame_counter;prng
+0x080f4b94,main_dispatch_loop,,,scene_duel_puzzle;frame_counter;prng
 0x080f4c14,FUN_080f4c14,,,dma;sys;display
 0x080f4d90,FUN_080f4d90,,,frame_counter;prng;settings
 0x080f4e18,game_str_id_to_row,,,game_str
