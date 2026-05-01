@@ -238283,78 +238283,80 @@ LAB_080c7166:
     pop {r4,r5,r6,r7}                        @ 080c7166 f0bc
     pop {r1}                                 @ 080c7168 02bc
     bx r1                                    @ 080c716a 0847
-FUN_080c716c:
+
+@ zone 光标单步推进 + 渲染. 入参 r0 = 当前 gPageState[+0x210] 的 u16 packed (bit7=player, 低7=mode, 高7=sub_idx). 流程: 解包 → 按 mode/input flag 决策新 packed (mode==0xd 走 gPrng+0x14e, 其他走 gPrng+0x146; mode==0xb 时 sub_idx 经 gPageState[+0x4c+player*2] 重映射) → 6-way switch on gP1[+0x1cf4] 选择 case 0/1/3 的 active-zone 决策路径 → 可能走 LAB_080c7458 mode-bit 修正 (gPageState[+0x148] bit 0x10/20/40/80 → FUN_080c6b04/6e9c). finalize 块: 写 gPageState[+0x210]=新packed → FUN_080c699c (zone state setter) → 若 packed 与 lookup 都未变则 return 无 render, 否则 bl render_duel_field_zone_info(player,mode,sub_idx) (mode==0xb 时 sub_idx 用重映射值). 特殊路径: r4!=0 + FUN_080c707c!=0 时取 FUN_080c6638 entry → card_ids_080cc8c8 → 写 gPageState[+0x21c] card_id + 设 gPageState[+0x215] |= 4 (dirty), 不 render. 单次调用只 render 一次. caller: FUN_080c7ea0 内 0x080c7f9c (主决斗场显示统筹) + 0x080ccbb2 (switchD case). runtime 验证: 按 RIGHT 触发 caller 反复调 本函数 10 次形成 cursor 推进序列.
+apply_zone_cursor_step:
     push {r4,r5,r6,r7,lr}                    @ 080c716c f0b5
     .hword 0x4657    @ 080c716e 5746
     .hword 0x464e    @ 080c7170 4e46
     .hword 0x4645    @ 080c7172 4546
     push {r5,r6,r7}                          @ 080c7174 e0b4
     sub sp,#0xc                              @ 080c7176 83b0
-    lsls r0,r0,#0x10    @ 080c7178 0004
+    lsls r0,r0,#0x10    @ 080c7178 0004  -- r0 = (u16)packed_cursor (清高 16 位)
     lsrs r6,r0,#0x10    @ 080c717a 060c
-    str r6,[sp,#0x0]                         @ 080c717c 0096
+    str r6,[sp,#0x0]                         @ 080c717c 0096  -- [sp+0x0] = r6 = packed_cursor (保存原始)
     movs r2,#0x80    @ 080c717e 8022
     adds r1,r6,#0x0    @ 080c7180 311c
     ands r1,r2    @ 080c7182 1140
     lsls r1,r1,#0x18    @ 080c7184 0906
-    lsrs r1,r1,#0x1f    @ 080c7186 c90f
+    lsrs r1,r1,#0x1f    @ 080c7186 c90f  -- [sp+0x4] = player_flag (bit 7)
     str r1,[sp,#0x4]                         @ 080c7188 0191
     movs r1,#0x7f    @ 080c718a 7f21
     adds r5,r6,#0x0    @ 080c718c 351c
-    ands r5,r1    @ 080c718e 0d40
+    ands r5,r1    @ 080c718e 0d40  -- r5 = mode = packed & 0x7f (低 7 位)
     lsrs r7,r0,#0x18    @ 080c7190 070e
     movs r0,#0x7f    @ 080c7192 7f20
-    ands r7,r0    @ 080c7194 0740
-    ldr r2, DAT_080c71bc                     @ 080c7196 094a
+    ands r7,r0    @ 080c7194 0740  -- r7 = sub_idx = (packed >> 8) & 0x7f (高 7 位)
+    ldr r2, DAT_080c71bc                     @ 080c7196 094a  -- r2 = &gPageState (0x02023130)
     ldr r1,[sp,#0x4]                         @ 080c7198 0199
     lsls r0,r1,#0x1    @ 080c719a 4800
     adds r1,r2,#0x0    @ 080c719c 111c
     adds r1,#0x4c    @ 080c719e 4c31
     adds r0,r0,r1    @ 080c71a0 4018
     ldrh r0,[r0,#0x0]                        @ 080c71a2 0088
-    str r0,[sp,#0x8]                         @ 080c71a4 0290
+    str r0,[sp,#0x8]                         @ 080c71a4 0290  -- [sp+0x8] = gPageState[+0x4c + player*2] (mode==0xb 重映射 lookup base)
     adds r3,r2,#0x0    @ 080c71a6 131c
-    cmp r5,#0xd                              @ 080c71a8 0d2d
+    cmp r5,#0xd                              @ 080c71a8 0d2d  -- if mode == 0xd: 走特殊 input source
     bne LAB_080c71c4                         @ 080c71aa 0bd1
     ldr r1, PTR_gPrng_080c71c0               @ 080c71ac 0449
     movs r2,#0xa7    @ 080c71ae a722
     lsls r2,r2,#0x1    @ 080c71b0 5200
     adds r4,r1,r2    @ 080c71b2 8c18
     movs r0,#0x80    @ 080c71b4 8020
-    lsls r0,r0,#0x1    @ 080c71b6 4000
-    b LAB_080c71ce                           @ 080c71b8 09e0
+    lsls r0,r0,#0x1    @ 080c71b6 4000  -- r0 = 0x100 (mask)
+    b LAB_080c71ce                           @ 080c71b8 09e0  -- r4 = gPrng + 0x14e (hword input flag)
     .byte  0x00, 0x00
 DAT_080c71bc:
     .word  0x02023130                     @ 080c71bc 30310202
 PTR_gPrng_080c71c0:
     .word  gPrng                          @ 080c71c0 40000003
 LAB_080c71c4:
-    ldr r1, PTR_gPrng_080c7224               @ 080c71c4 1749
+    ldr r1, PTR_gPrng_080c7224               @ 080c71c4 1749  -- default: r4 = gPrng + 0x146 (byte input flag)
     movs r0,#0xa3    @ 080c71c6 a320
     lsls r0,r0,#0x1    @ 080c71c8 4000
     adds r4,r1,r0    @ 080c71ca 0c18
-    subs r0,#0x46    @ 080c71cc 4638
+    subs r0,#0x46    @ 080c71cc 4638  -- r0 = 0x40 (mask for non-d mode)
 LAB_080c71ce:
-    ldrh r4,[r4,#0x0]                        @ 080c71ce 2488
+    ldrh r4,[r4,#0x0]                        @ 080c71ce 2488  -- r4 = ldrh [r4]; r4 &= mask (input flag bit set?)
     ands r0,r4    @ 080c71d0 2040
     lsls r0,r0,#0x10    @ 080c71d2 0004
     lsrs r4,r0,#0x10    @ 080c71d4 040c
     adds r2,r1,#0x0    @ 080c71d6 0a1c
-    cmp r5,#0xb                              @ 080c71d8 0b2d
+    cmp r5,#0xb                              @ 080c71d8 0b2d  -- if mode == 0xb: sub_idx += lookup_base (重映射)
     bne LAB_080c71e4                         @ 080c71da 03d1
     ldr r1,[sp,#0x8]                         @ 080c71dc 0299
     adds r0,r7,r1    @ 080c71de 7818
     lsls r0,r0,#0x10    @ 080c71e0 0004
     lsrs r7,r0,#0x10    @ 080c71e2 070c
 LAB_080c71e4:
-    cmp r4,#0x0                              @ 080c71e4 002c
+    cmp r4,#0x0                              @ 080c71e4 002c  -- if r4 == 0 (无 input flag): 跳 LAB_080c724e (mode 决策)
     beq LAB_080c724e                         @ 080c71e6 32d0
     adds r0,r6,#0x0    @ 080c71e8 301c
-    bl FUN_080c707c                          @ 080c71ea fff747ff
+    bl FUN_080c707c                          @ 080c71ea fff747ff  -- FUN_080c707c(packed) 检查 zone 是否处于特殊状态
     cmp r0,#0x0                              @ 080c71ee 0028
-    beq LAB_080c7230                         @ 080c71f0 1ed0
+    beq LAB_080c7230                         @ 080c71f0 1ed0  -- if FUN_080c707c == 0: 跳 LAB_080c7230 (zone state setter only)
     adds r0,r6,#0x0    @ 080c71f2 301c
-    bl FUN_080c6638                          @ 080c71f4 fff720fa
+    bl FUN_080c6638                          @ 080c71f4 fff720fa  -- FUN_080c6638(packed) 取 zone entry 指针
     ldr r1,[r0,#0x0]                         @ 080c71f8 0168
     lsls r0,r1,#0x2    @ 080c71fa 8800
     lsrs r0,r0,#0x18    @ 080c71fc 000e
@@ -238362,19 +238364,19 @@ LAB_080c71e4:
     lsls r1,r1,#0x12    @ 080c7200 8904
     lsrs r1,r1,#0x1f    @ 080c7202 c90f
     adds r0,r0,r1    @ 080c7204 4018
-    bl FUN_080cc8c8                          @ 080c7206 05f05ffb
+    bl FUN_080cc8c8                          @ 080c7206 05f05ffb  -- card_ids_080cc8c8(combined) 拿 card_id
     ldr r1, DAT_080c7228                     @ 080c720a 0749
     movs r3,#0x87    @ 080c720c 8723
     lsls r3,r3,#0x2    @ 080c720e 9b00
     adds r2,r1,r3    @ 080c7210 ca18
-    strh r0,[r2,#0x0]                        @ 080c7212 1080
+    strh r0,[r2,#0x0]                        @ 080c7212 1080  -- gPageState[+0x21c] = card_id (hword)
     ldr r0, DAT_080c722c                     @ 080c7214 0548
     adds r1,r1,r0    @ 080c7216 0918
     movs r0,#0x4    @ 080c7218 0420
     ldrb r2,[r1,#0x0]                        @ 080c721a 0a78
     orrs r0,r2    @ 080c721c 1043
-    strb r0,[r1,#0x0]                        @ 080c721e 0870
-    b LAB_080c751e                           @ 080c7220 7de1
+    strb r0,[r1,#0x0]                        @ 080c721e 0870  -- gPageState[+0x215] |= 0x4 (dirty bit)
+    b LAB_080c751e                           @ 080c7220 7de1  -- → return (不调 render)
     .byte  0x00, 0x00
 PTR_gPrng_080c7224:
     .word  gPrng                          @ 080c7224 40000003
@@ -238383,7 +238385,7 @@ DAT_080c7228:
 DAT_080c722c:
     .word  0x00000215                     @ 080c722c 15020000
 LAB_080c7230:
-    movs r1,#0x80    @ 080c7230 8021
+    movs r1,#0x80    @ 080c7230 8021  -- LAB_080c7230: 调 zone state setter 不 render
     adds r0,r6,#0x0    @ 080c7232 301c
     ands r0,r1    @ 080c7234 0840
     lsls r0,r0,#0x18    @ 080c7236 0006
@@ -238395,10 +238397,10 @@ LAB_080c7230:
     movs r3,#0x7f    @ 080c7242 7f23
     ands r2,r3    @ 080c7244 1a40
     movs r3,#0x0    @ 080c7246 0023
-    bl FUN_080c699c                          @ 080c7248 fff7a8fb
-    b LAB_080c751e                           @ 080c724c 67e1
+    bl FUN_080c699c                          @ 080c7248 fff7a8fb  -- FUN_080c699c(player, mode, sub_idx, 0)
+    b LAB_080c751e                           @ 080c724c 67e1  -- → return
 LAB_080c724e:
-    movs r0,#0xa4    @ 080c724e a420
+    movs r0,#0xa4    @ 080c724e a420  -- LAB_080c724e: 检查 gPageState[+0x148] bit 0xb8 (mode-bit handler 触发)
     lsls r0,r0,#0x1    @ 080c7250 4000
     adds r1,r2,r0    @ 080c7252 1118
     adds r0,#0xb8    @ 080c7254 b830
@@ -238406,9 +238408,9 @@ LAB_080c724e:
     ands r0,r1    @ 080c7258 0840
     cmp r0,#0x0                              @ 080c725a 0028
     bne LAB_080c7260                         @ 080c725c 00d1
-    b LAB_080c7458                           @ 080c725e fbe0
+    b LAB_080c7458                           @ 080c725e fbe0  -- 若 bit set: 跳 LAB_080c7458 走 mode-bit 修正
 LAB_080c7260:
-    ldr r1, DAT_080c729c                     @ 080c7260 0e49
+    ldr r1, DAT_080c729c                     @ 080c7260 0e49  -- 检查 0x0201f440 bit 0 (input/menu flag)
     movs r4,#0x1    @ 080c7262 0124
     adds r0,r4,#0x0    @ 080c7264 201c
     ldrb r1,[r1,#0x0]                        @ 080c7266 0978
@@ -238417,7 +238419,7 @@ LAB_080c7260:
     beq LAB_080c7270                         @ 080c726c 00d0
     b LAB_080c7458                           @ 080c726e f3e0
 LAB_080c7270:
-    ldr r1, DAT_080c72a0                     @ 080c7270 0b49
+    ldr r1, DAT_080c72a0                     @ 080c7270 0b49  -- 检查 [0x02020160 + 0x2f51] bit 0 (input/menu flag)
     ldr r0, DAT_080c72a4                     @ 080c7272 0c48
     adds r1,r1,r0    @ 080c7274 0918
     adds r0,r4,#0x0    @ 080c7276 201c
@@ -238432,7 +238434,7 @@ LAB_080c7282:
     adds r0,r1,r2    @ 080c7286 8818
     ldr r0,[r0,#0x0]                         @ 080c7288 0068
     adds r4,r1,#0x0    @ 080c728a 0c1c
-    cmp r0,#0x5                              @ 080c728c 0528
+    cmp r0,#0x5                              @ 080c728c 0528  -- switch on gP1Player[+0x1cf4] (6 cases: 0..5)
     bls LAB_080c7292                         @ 080c728e 00d9
     b switchD_080c729a__default              @ 080c7290 0de1
 LAB_080c7292:
@@ -238462,18 +238464,18 @@ switchD_080c729a__switchdataD_080c72b4:
     .word  0x080c72e0                     @ 080c72c4 e0720c08
     .word  0x080c72e0                     @ 080c72c8 e0720c08
 switchD_080c729a__caseD_0:
-    ldr r0, DAT_080c72dc                     @ 080c72cc 0348
+    ldr r0, DAT_080c72dc                     @ 080c72cc 0348  -- case 0: 读 gP2[+0x4] turn_flag bit 0
     ldr r0,[r0,#0x4]                         @ 080c72ce 4068
     movs r1,#0x1    @ 080c72d0 0121
     ands r0,r1    @ 080c72d2 0840
-    lsls r6,r0,#0x7    @ 080c72d4 c601
+    lsls r6,r0,#0x7    @ 080c72d4 c601  -- r6 = (turn<<7) | 0xd (强制 mode=0xd)
     movs r0,#0xd    @ 080c72d6 0d20
     orrs r6,r0    @ 080c72d8 0643
     b switchD_080c729a__default              @ 080c72da e8e0
 DAT_080c72dc:
     .word  0x0201e2a0                     @ 080c72dc a0e20102
 switchD_080c729a__caseD_1:
-    ldr r0, DAT_080c7398                     @ 080c72e0 2d48
+    ldr r0, DAT_080c7398                     @ 080c72e0 2d48  -- case 1: 操作 gPageState[+0x212] byte + 双 loop 找有效卡
     adds r3,r3,r0    @ 080c72e2 1b18
     ldrb r2,[r3,#0x0]                        @ 080c72e4 1a78
     lsls r0,r2,#0x1f    @ 080c72e6 d007
@@ -238486,7 +238488,7 @@ switchD_080c729a__caseD_1:
     rsbs r0,r0,#0    @ 080c72f4 4042
     ands r0,r2    @ 080c72f6 1040
     orrs r0,r1    @ 080c72f8 0843
-    strb r0,[r3,#0x0]                        @ 080c72fa 1870
+    strb r0,[r3,#0x0]                        @ 080c72fa 1870  -- gPageState[+0x212] = 修正后 byte
     movs r1,#0x1    @ 080c72fc 0121
     ands r0,r1    @ 080c72fe 0840
     cmp r0,#0x0                              @ 080c7300 0028
@@ -238497,7 +238499,7 @@ switchD_080c729a__caseD_1:
     movs r1,#0x80    @ 080c730a 8021
     .hword 0x4689    @ 080c730c 8946
 LAB_080c730e:
-    ldr r0,[r7,#0x4]                         @ 080c730e 7868
+    ldr r0,[r7,#0x4]                         @ 080c730e 7868  -- loop A: sub_idx 0..4 用 FUN_080c6638 + card_ids_080cc8c8 找有效卡
     .hword 0x4642    @ 080c7310 4246
     ands r0,r2    @ 080c7312 1040
     lsls r0,r0,#0x7    @ 080c7314 c001
@@ -238537,7 +238539,7 @@ LAB_080c734c:
     movs r2,#0x5    @ 080c735a 0522
     .hword 0x4692    @ 080c735c 9246
 LAB_080c735e:
-    ldr r0,[r7,#0x4]                         @ 080c735e 7868
+    ldr r0,[r7,#0x4]                         @ 080c735e 7868  -- loop B: 同上但用不同 mode 编码
     .hword 0x4643    @ 080c7360 4346
     ands r0,r3    @ 080c7362 1840
     lsls r0,r0,#0x7    @ 080c7364 c001
@@ -238569,7 +238571,7 @@ DAT_080c7398:
 DAT_080c739c:
     .word  0x0201e2a0                     @ 080c739c a0e20102
 LAB_080c73a0:
-    ldr r0, DAT_080c73c0                     @ 080c73a0 0748
+    ldr r0, DAT_080c73c0                     @ 080c73a0 0748  -- LAB_080c73a0: 用 [gP1+0xc] entry + sub_idx 重映射
     ldr r2,[r0,#0x4]                         @ 080c73a2 4268
     ands r2,r1    @ 080c73a4 0a40
     ldr r0, DAT_080c73c4                     @ 080c73a6 0748
@@ -238582,7 +238584,7 @@ LAB_080c73a0:
     beq switchD_080c729a__default            @ 080c73b4 7bd0
     lsls r6,r2,#0x7    @ 080c73b6 d601
     movs r0,#0xb    @ 080c73b8 0b20
-    orrs r6,r0    @ 080c73ba 0643
+    orrs r6,r0    @ 080c73ba 0643  -- r6 = (lookup<<7) | 0xb (强制 mode=0xb)
     b switchD_080c729a__default              @ 080c73bc 77e0
     .byte  0x00, 0x00
 DAT_080c73c0:
@@ -238590,11 +238592,11 @@ DAT_080c73c0:
 DAT_080c73c4:
     .word  0x00000868                     @ 080c73c4 68080000
 switchD_080c729a__caseD_3:
-    ldr r4, DAT_080c73fc                     @ 080c73c8 0c4c
+    ldr r4, DAT_080c73fc                     @ 080c73c8 0c4c  -- case 3: FUN_0803495c input check + sub_idx loop
     ldr r0,[r4,#0x4]                         @ 080c73ca 6068
     adds r1,r7,#0x0    @ 080c73cc 391c
     movs r2,#0x1    @ 080c73ce 0122
-    bl FUN_0803495c                          @ 080c73d0 6df7c4fa
+    bl FUN_0803495c                          @ 080c73d0 6df7c4fa  -- FUN_0803495c(turn, sub_idx, 1) 检查 input
     cmp r0,#0x0                              @ 080c73d4 0028
     beq LAB_080c7400                         @ 080c73d6 13d0
     adds r4,r7,#0x0    @ 080c73d8 3c1c
@@ -238669,13 +238671,13 @@ LAB_080c7452:
     orrs r6,r0    @ 080c7454 0643
     b switchD_080c729a__default              @ 080c7456 2ae0
 LAB_080c7458:
-    movs r1,#0xa4    @ 080c7458 a421
+    movs r1,#0xa4    @ 080c7458 a421  -- LAB_080c7458: 4 个 mode-bit 修正块
     lsls r1,r1,#0x1    @ 080c745a 4900
     adds r4,r2,r1    @ 080c745c 5418
     movs r0,#0x40    @ 080c745e 4020
     ldrh r2,[r4,#0x0]                        @ 080c7460 2288
     ands r0,r2    @ 080c7462 1040
-    cmp r0,#0x0                              @ 080c7464 0028
+    cmp r0,#0x0                              @ 080c7464 0028  -- if bit 0x40: r6 = FUN_080c6b04(packed, 0)
     beq LAB_080c7472                         @ 080c7466 04d0
     adds r0,r6,#0x0    @ 080c7468 301c
     movs r1,#0x0    @ 080c746a 0021
@@ -238685,7 +238687,7 @@ LAB_080c7472:
     movs r0,#0x80    @ 080c7472 8020
     ldrh r3,[r4,#0x0]                        @ 080c7474 2388
     ands r0,r3    @ 080c7476 1840
-    cmp r0,#0x0                              @ 080c7478 0028
+    cmp r0,#0x0                              @ 080c7478 0028  -- if bit 0x80: r6 = FUN_080c6b04(packed, 1)
     beq LAB_080c7486                         @ 080c747a 04d0
     adds r0,r6,#0x0    @ 080c747c 301c
     movs r1,#0x1    @ 080c747e 0121
@@ -238695,7 +238697,7 @@ LAB_080c7486:
     movs r0,#0x20    @ 080c7486 2020
     ldrh r1,[r4,#0x0]                        @ 080c7488 2188
     ands r0,r1    @ 080c748a 0840
-    cmp r0,#0x0                              @ 080c748c 0028
+    cmp r0,#0x0                              @ 080c748c 0028  -- if bit 0x20: r6 = FUN_080c6e9c(packed, 0)
     beq LAB_080c749a                         @ 080c748e 04d0
     adds r0,r6,#0x0    @ 080c7490 301c
     movs r1,#0x0    @ 080c7492 0021
@@ -238705,24 +238707,24 @@ LAB_080c749a:
     movs r0,#0x10    @ 080c749a 1020
     ldrh r4,[r4,#0x0]                        @ 080c749c 2488
     ands r0,r4    @ 080c749e 2040
-    cmp r0,#0x0                              @ 080c74a0 0028
+    cmp r0,#0x0                              @ 080c74a0 0028  -- if bit 0x10: r6 = FUN_080c6e9c(packed, 1)
     beq switchD_080c729a__default            @ 080c74a2 04d0
     adds r0,r6,#0x0    @ 080c74a4 301c
     movs r1,#0x1    @ 080c74a6 0121
     bl FUN_080c6e9c                          @ 080c74a8 fff7f8fc
     adds r6,r0,#0x0    @ 080c74ac 061c
 switchD_080c729a__default:
-    ldr r2, DAT_080c7510                     @ 080c74ae 184a
+    ldr r2, DAT_080c7510                     @ 080c74ae 184a  -- switchD_default (finalize): 写 gPageState[+0x210] = 新 packed
     .hword 0x4690    @ 080c74b0 9046
     movs r0,#0x84    @ 080c74b2 8420
     lsls r0,r0,#0x2    @ 080c74b4 8000
     add r0,r8                                @ 080c74b6 4044
-    strh r6,[r0,#0x0]                        @ 080c74b8 0680
+    strh r6,[r0,#0x0]                        @ 080c74b8 0680  -- gPageState[+0x210] = r6
     movs r1,#0x80    @ 080c74ba 8021
     adds r0,r6,#0x0    @ 080c74bc 301c
     ands r0,r1    @ 080c74be 0840
     lsls r0,r0,#0x18    @ 080c74c0 0006
-    lsrs r7,r0,#0x1f    @ 080c74c2 c70f
+    lsrs r7,r0,#0x1f    @ 080c74c2 c70f  -- 解包 r6: r7=player, r4=mode, r5=sub_idx
     movs r0,#0x7f    @ 080c74c4 7f20
     adds r4,r6,#0x0    @ 080c74c6 341c
     ands r4,r0    @ 080c74c8 0440
@@ -238733,9 +238735,9 @@ switchD_080c729a__default:
     adds r1,r4,#0x0    @ 080c74d2 211c
     adds r2,r5,#0x0    @ 080c74d4 2a1c
     movs r3,#0x0    @ 080c74d6 0023
-    bl FUN_080c699c                          @ 080c74d8 fff760fa
+    bl FUN_080c699c                          @ 080c74d8 fff760fa  -- FUN_080c699c(player, mode, sub_idx, 0) zone state setter
     ldr r3,[sp,#0x0]                         @ 080c74dc 009b
-    cmp r6,r3                                @ 080c74de 9e42
+    cmp r6,r3                                @ 080c74de 9e42  -- 比较 r6 vs sp+0 (新 packed == 旧 packed?)
     bne LAB_080c74f4                         @ 080c74e0 08d1
     ldr r1,[sp,#0x4]                         @ 080c74e2 0199
     lsls r0,r1,#0x1    @ 080c74e4 4800
@@ -238744,31 +238746,31 @@ switchD_080c729a__default:
     adds r0,r0,r1    @ 080c74ea 4018
     ldr r2,[sp,#0x8]                         @ 080c74ec 029a
     ldrh r0,[r0,#0x0]                        @ 080c74ee 0088
-    cmp r2,r0                                @ 080c74f0 8242
-    beq LAB_080c751e                         @ 080c74f2 14d0
+    cmp r2,r0                                @ 080c74f0 8242  -- 比较 lookup vs sp+0x8 (lookup 也未变?)
+    beq LAB_080c751e                         @ 080c74f2 14d0  -- 都未变 → 跳 epilogue, 不 render
 LAB_080c74f4:
-    cmp r4,#0xb                              @ 080c74f4 0b2c
+    cmp r4,#0xb                              @ 080c74f4 0b2c  -- if mode == 0xb: 走重映射 render 路径
     bne LAB_080c7514                         @ 080c74f6 0dd1
     lsls r0,r7,#0x1    @ 080c74f8 7800
     .hword 0x4641    @ 080c74fa 4146
     adds r1,#0x4c    @ 080c74fc 4c31
     adds r0,r0,r1    @ 080c74fe 4018
     ldrh r0,[r0,#0x0]                        @ 080c7500 0088
-    adds r2,r0,r5    @ 080c7502 4219
+    adds r2,r0,r5    @ 080c7502 4219  -- r2 = lookup + sub_idx (重映射 sub_idx)
     adds r0,r7,#0x0    @ 080c7504 381c
     movs r1,#0xb    @ 080c7506 0b21
-    bl render_duel_field_zone_info           @ 080c7508 04f046fa
+    bl render_duel_field_zone_info           @ 080c7508 04f046fa  -- render_duel_field_zone_info(player, 0xb, lookup_remapped)
     b LAB_080c751e                           @ 080c750c 07e0
     .byte  0x00, 0x00
 DAT_080c7510:
     .word  0x02023130                     @ 080c7510 30310202
 LAB_080c7514:
-    adds r0,r7,#0x0    @ 080c7514 381c
+    adds r0,r7,#0x0    @ 080c7514 381c  -- LAB_080c7514: mode != 0xb 普通 render
     adds r1,r4,#0x0    @ 080c7516 211c
     adds r2,r5,#0x0    @ 080c7518 2a1c
-    bl render_duel_field_zone_info           @ 080c751a 04f03dfa
+    bl render_duel_field_zone_info           @ 080c751a 04f03dfa  -- render_duel_field_zone_info(player, mode, sub_idx)
 LAB_080c751e:
-    add sp,#0xc                              @ 080c751e 03b0
+    add sp,#0xc                              @ 080c751e 03b0  -- LAB_080c751e: epilogue, 恢复 r4-r10 + 返回
     pop {r3,r4,r5}                           @ 080c7520 38bc
     .hword 0x4698    @ 080c7522 9846
     .hword 0x46a1    @ 080c7524 a146
@@ -239676,7 +239678,7 @@ LAB_080c7f90:
     lsls r1,r1,#0x2    @ 080c7f96 8900
     adds r0,r4,r1    @ 080c7f98 6018
     ldrh r0,[r0,#0x0]                        @ 080c7f9a 0088
-    bl FUN_080c716c                          @ 080c7f9c fff7e6f8
+    bl apply_zone_cursor_step                @ 080c7f9c fff7e6f8
     movs r2,#0x87    @ 080c7fa0 8722
     lsls r2,r2,#0x2    @ 080c7fa2 9200
     adds r0,r4,r2    @ 080c7fa4 a018
@@ -248923,7 +248925,7 @@ LAB_080ccba8:
     lsls r0,r0,#0x2    @ 080ccbac 8000
     adds r6,r4,r0    @ 080ccbae 2618
     ldrh r0,[r6,#0x0]                        @ 080ccbb0 3088
-    bl FUN_080c716c                          @ 080ccbb2 faf7dbfa
+    bl apply_zone_cursor_step                @ 080ccbb2 faf7dbfa
     bl FUN_080c5444                          @ 080ccbb6 f8f745fc
     bl FUN_080c8aa8                          @ 080ccbba fbf775ff
     movs r1,#0x87    @ 080ccbbe 8721

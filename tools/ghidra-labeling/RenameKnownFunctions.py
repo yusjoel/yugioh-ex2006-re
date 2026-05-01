@@ -303,6 +303,27 @@ RENAMES = [
     ("FUN_080c2544", "play_ui_effect_3d",
         "占位名 - play_ui_effect (FUN_0801ef94) case 0x3d 子状态机, 待详细分析."),
 
+    # 2026-05-01: zone 光标单步推进函数 (按 RIGHT 时被 FUN_080c7ea0 反复调用,
+    # 形成 10 步序列推进 gPageState[+0x210] packed cursor + 每次 render 一次).
+    # GDB hbreak 验证: 单 caller 行 0x080c751f 命中 10 次跨多帧, mode/sub_idx
+    # 序列 (0,3)→(0,4)→(0xE,0)→(0xF,0)→(0xA,0)→(0,0)→(0,1..4).
+    ("FUN_080c716c", "apply_zone_cursor_step",
+        "zone 光标单步推进 + 渲染. 入参 r0 = 当前 gPageState[+0x210] 的 u16 "
+        "packed (bit7=player, 低7=mode, 高7=sub_idx). 流程: 解包 → 按 mode/input "
+        "flag 决策新 packed (mode==0xd 走 gPrng+0x14e, 其他走 gPrng+0x146; "
+        "mode==0xb 时 sub_idx 经 gPageState[+0x4c+player*2] 重映射) → 6-way "
+        "switch on gP1[+0x1cf4] 选择 case 0/1/3 的 active-zone 决策路径 → "
+        "可能走 LAB_080c7458 mode-bit 修正 (gPageState[+0x148] bit 0x10/20/40/80 "
+        "→ FUN_080c6b04/6e9c). finalize 块: 写 gPageState[+0x210]=新packed → "
+        "FUN_080c699c (zone state setter) → 若 packed 与 lookup 都未变则 return "
+        "无 render, 否则 bl render_duel_field_zone_info(player,mode,sub_idx) "
+        "(mode==0xb 时 sub_idx 用重映射值). 特殊路径: r4!=0 + FUN_080c707c!=0 "
+        "时取 FUN_080c6638 entry → card_ids_080cc8c8 → 写 gPageState[+0x21c] "
+        "card_id + 设 gPageState[+0x215] |= 4 (dirty), 不 render. 单次调用只 "
+        "render 一次. caller: FUN_080c7ea0 内 0x080c7f9c (主决斗场显示统筹) + "
+        "0x080ccbb2 (switchD case). runtime 验证: 按 RIGHT 触发 caller 反复调 "
+        "本函数 10 次形成 cursor 推进序列."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
