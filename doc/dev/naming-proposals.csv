@@ -126,7 +126,7 @@ address,name,proposed_name,score,tags
 0x080176c0,FUN_080176c0,,,scene_name_input
 0x0801778c,FUN_0801778c,,,scene_name_input
 0x08017798,FUN_08017798,font_jp_08017798,3,vram;font_jp
-0x080177dc,FUN_080177dc,font_jp_080177dc,3,vram;font_jp
+0x080177dc,setup_font_jp_ctx_obj_vram_row,,,vram;font_jp
 0x08017830,FUN_08017830,,,scene_name_input
 0x0801785c,FUN_0801785c,banlist_0801785c,2,banlist;settings
 0x080178b4,FUN_080178b4,game_str_080178b4,3,text_input;banlist;game_str;settings

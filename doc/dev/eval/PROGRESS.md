@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 15/259 |
-| **下一步** | 开始分析 `FUN_080177dc` (topo=33, L7, indeg=1, E) |
-| **上次更新** | 2026-05-02 16:40 |
+| **当前步骤** | 函数命名循环进行中, 已完成 16/259 |
+| **下一步** | 开始分析 `FUN_080183d0` (topo=34, L6, indeg=2, E) |
+| **上次更新** | 2026-05-02 17:00 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**15 / 259 (5.79%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**16 / 259 (6.18%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -60,7 +60,7 @@
 | 13 | 29 | L4 | 3 | E | `0x080f21e8` | FUN_080f21e8 | render_jp_string_glyph_loop | 1 | [eval](080f21e8.md) |
 | 14 | 31 | L7 | 3 | E | `0x080175f4` | FUN_080175f4 | dispatch_text_render_by_mode | 2 | [eval](080175f4.md) |
 | 15 | 32 | L8 | 6 | D | `0x080f42b4` | FUN_080f42b4 | init_font_jp_render_context | 1 | [eval](080f42b4.md) |
-| 16 | 33 | L7 | 1 | E | `0x080177dc` | FUN_080177dc | _(待分析)_ | — | — |
+| 16 | 33 | L7 | 1 | E | `0x080177dc` | FUN_080177dc | setup_font_jp_ctx_obj_vram_row | 1 | [eval](080177dc.md) |
 | 17 | 34 | L6 | 2 | E | `0x080183d0` | FUN_080183d0 | _(待分析)_ | — | — |
 | 18 | 35 | L6 | 2 | E | `0x08018400` | FUN_08018400 | _(待分析)_ | — | — |
 | 19 | 36 | L5 | 3 | E | `0x08018774` | FUN_08018774 | _(待分析)_ | — | — |
@@ -327,6 +327,7 @@
 - 2026-05-02 16:06: 0x080f21e8 PASSED → render_jp_string_glyph_loop (rev=1, 45/45) — font_jp 模块主字形渲染循环 (topo=29, L4, indeg=3); 被3个薄包装调用, 直调全部4个 render_glyph_* 变体+count_word_charlen+test_char_kinsoku_head; 四层证据互证 (调用图hub+数据label反推+状态机表+兄弟对称体) high 置信度; 首轮满分落地. 里程碑: 已分析 5.02% (13/259), 突破5%.
 - 2026-05-02 16:23: 0x080175f4 PASSED → dispatch_text_render_by_mode (rev=2, v1 40/45 → v2 45/45) — name_input 页面族文字渲染分发器 (topo=31, L7, indeg=3); render_mode 三值分支 (0x20 单字符偏移/0x80 8方向描边+中心/其他直接渲染), 最多调用 text_render_wrapper 9 次; v1 因 dispatch_str_render_mode 中 str 与 ARM STORE 助记符歧义被扣R1; v2 改名 dispatch_text_render_by_mode 满分; 已分析 5.41% (14/259).
 - 2026-05-02 16:40: 0x080f42b4 PASSED → init_font_jp_render_context (rev=1, 45/45) — font_jp 渲染上下文初始化入口 (topo=32, L8, indeg=6, D); 6 个 text-box setup caller 在页面初始化阶段调用; bios_cpu_set 清零 EWRAM 104 字节上下文结构体, 写入 VRAM 基址/宽高 tiles/函数指针/init-complete bit4; 四层证据互证 (数据label+状态机+调用图hub+IO寄存器簇) high 置信度; 首轮满分落地; 已分析 5.79% (15/259).
+- 2026-05-02 17:00: 0x080177dc PASSED → setup_font_jp_ctx_obj_vram_row (rev=1, 45/45) — font_jp OBJ VRAM 行初始化器 (topo=33, L7, indeg=1, E); 唯一 caller FUN_080183d0 (名字输入页面包装层); 以 tile 行索引计算 OBJ VRAM 基址 (0x06010000 + r0×0x20), 调 init_font_jp_render_context 后追加置位 context[+0x15] bit5 + render_flags bit0→bit1 + 重写函数指针; 与 FUN_08017798 (BG VRAM) 形成对称对; med 置信度 (缺 runtime VRAM dump); 首轮满分落地; 已分析 6.18% (16/259).
 
 ## BLOCKED 追踪
 

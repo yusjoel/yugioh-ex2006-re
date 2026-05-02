@@ -519,6 +519,17 @@ RENAMES = [
         "选出对应的渲染函数指针写入 context[+0x04]，最后在 context[+0x15] 置位 bit4（0x10）"
         "标记初始化完成。调用方随即修改 context[+0x08] 低位和 context[+0x15] 其它位完成各自的显示模式配置。"),
 
+    # 2026-05-02: setup_font_jp_ctx_obj_vram_row (analysis-loop topo=33)
+    ("FUN_080177dc", "setup_font_jp_ctx_obj_vram_row",
+        "由 FUN_080183d0（名字输入页面字符串渲染包装层）在 text-box 初始化阶段调用，"
+        "负责以 OBJ 区 VRAM（0x06010000）为目标，按 tile 行索引计算 VRAM 基址"
+        "（基址 = 0x06010000 + r0 × 0x20），调用 init_font_jp_render_context 完成 "
+        "104 字节渲染上下文清零和三项核心参数写入，之后追加置位 context[+0x15] bit5（0x20），"
+        "并根据 r3 bit0 将 context[+0x8] bit1 设置为对应渲染模式标志，"
+        "最后重新从 font_jp_base_table 读取函数指针写入 context[+0x04]。"
+        "与使用 BG VRAM（0x06000020）的 FUN_08017798 形成对称：该函数覆盖 OBJ 精灵 VRAM 区，"
+        "且 tile 行索引由调用方参数决定，适用于名字输入页面的多行文字 tile 槽配置。"),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
