@@ -17,7 +17,7 @@ address,name,proposed_name,score,tags
 0x08013b84,FUN_08013b84,,,window;scene_demo
 0x08013bd4,FUN_08013bd4,demo_08013bd4,4,display;bg;demo;fs;settings
 0x080143f0,banlist_password_enter_char,,,banlist
-0x08014470,FUN_08014470,banlist_08014470,2,banlist
+0x08014470,copy_str_unbounded,,,banlist
 0x08014480,FUN_08014480,banlist_08014480,2,banlist
 0x080144e8,FUN_080144e8,settings_080144e8,3,settings
 0x0801455c,FUN_0801455c,settings_0801455c,3,settings

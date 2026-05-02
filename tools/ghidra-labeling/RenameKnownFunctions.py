@@ -392,6 +392,14 @@ RENAMES = [
         "Options 子菜单 'Language Selection' (0x0a8f) 入口. options_rows row[1] "
         "init_fn. 待 runtime 验证."),
 
+    # 2026-05-02: copy_str_unbounded (analysis-loop topo=1)
+    ("FUN_08014470", "copy_str_unbounded",
+        "无界字符串复制 wrapper. 调用方传入 r0=src, r1=dst; 本函数向 "
+        "banlist_password_enter_char 传入 r2=0x05F5E0FF (99,999,999 无上限哨兵) "
+        "实现不限长度的 src→dst 复制 (1/2 字节编码, 0x00 终止符). "
+        "返回 r0=chars_written. 13 个 caller 覆盖 banlist/name_input/pass_input/game_str. "
+        "已命名 caller: name_input_page_exit (0x080194ec)."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
