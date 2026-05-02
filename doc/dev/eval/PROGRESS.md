@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 47/259 |
-| **下一步** | 开始分析 `FUN_080edf4c` (topo=77, L8, indeg=2, E) |
-| **上次更新** | 2026-05-02 21:40 |
+| **当前步骤** | 函数命名循环进行中, 已完成 62/259 |
+| **下一步** | 开始分析 `FUN_080f6450` (topo=98, L6, indeg=16, D) |
+| **上次更新** | 2026-05-02 23:00 |
 | **上次 callgraph 刷新** | 2026-05-02 17:52 |
 | **callgraph_locked** | `true` (整任务期间禁用 refresh — rename 不改变拓扑结构, 仅手工拆分/合并函数后才需重置 false 并 refresh 一次) |
 
 ## 进度
 
-**47 / 259 (18.15%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**62 / 259 (23.94%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -97,21 +97,21 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 45 | 74 | L7 | 1 | E | `0x0801d92c` | FUN_0801d92c | draw_card_level_label_to_vram | 1 | [eval](0801d92c.md) |
 | 46 | 75 | L7 | 2 | E | `0x080ef2cc` | FUN_080ef2cc | resolve_card_type_icon_ptr | 1 | [eval](080ef2cc.md) |
 | 47 | 76 | L8 | 2 | E | `0x080edf00` | FUN_080edf00 | upload_tile_and_palette_from_struct | 2 | [eval](080edf00.md) |
-| 48 | 77 | L8 | 2 | E | `0x080edf4c` | FUN_080edf4c | _(待分析)_ | — | — |
-| 49 | 78 | L7 | 10 | D | `0x080ee010` | FUN_080ee010 | _(待分析)_ | — | — |
-| 50 | 79 | L7 | 2 | E | `0x080ef3bc` | FUN_080ef3bc | _(待分析)_ | — | — |
-| 51 | 82 | L5 | 1 | E | `0x0801dfa0` | FUN_0801dfa0 | _(待分析)_ | — | — |
-| 52 | 83 | L6 | 32 | C | `0x080f0cc0` | FUN_080f0cc0 | _(待分析)_ | — | — |
-| 53 | 85 | L7 | 1 | E | `0x080ef488` | FUN_080ef488 | _(待分析)_ | — | — |
-| 54 | 86 | L6 | 3 | E | `0x080ef4bc` | FUN_080ef4bc | _(待分析)_ | — | — |
-| 55 | 88 | L5 | 26 | C | `0x080f55d4` | FUN_080f55d4 | _(待分析)_ | — | — |
-| 56 | 89 | L4 | 17 | D | `0x080f58b8` | FUN_080f58b8 | _(待分析)_ | — | — |
-| 57 | 90 | L5 | 1 | E | `0x0801e328` | FUN_0801e328 | _(待分析)_ | — | — |
-| 58 | 91 | L6 | 21 | C | `0x080f5840` | FUN_080f5840 | _(待分析)_ | — | — |
-| 59 | 92 | L5 | 2 | E | `0x0801e344` | FUN_0801e344 | _(待分析)_ | — | — |
-| 60 | 93 | L4 | 10 | D | `0x0810d150` | FUN_0810d150 | _(待分析)_ | — | — |
-| 61 | 94 | L3 | 77 | C | `0x080f9ab4` | FUN_080f9ab4 | _(待分析)_ | — | — |
-| 62 | 95 | L5 | 1 | E | `0x0801e36c` | FUN_0801e36c | _(待分析)_ | — | — |
+| 48 | 77 | L8 | 2 | E | `0x080edf4c` | FUN_080edf4c | write_tile_row_to_vram | 1 | [eval](080edf4c.md) |
+| 49 | 78 | L7 | 10 | D | `0x080ee010` | FUN_080ee010 | load_pack_tile_and_map_to_vram | 2 | [eval](080ee010.md) |
+| 50 | 79 | L7 | 2 | E | `0x080ef3bc` | FUN_080ef3bc | check_card_atk_in_valid_range | 2 | [eval](080ef3bc.md) |
+| 51 | 82 | L5 | 1 | E | `0x0801dfa0` | FUN_0801dfa0 | tick_scroll_frame_and_update_pos | 2 | [eval](0801dfa0.md) |
+| 52 | 83 | L6 | 32 | C | `0x080f0cc0` | FUN_080f0cc0 | setup_line_buf_with_font_and_align | 1 | [eval](080f0cc0.md) |
+| 53 | 85 | L7 | 1 | E | `0x080ef488` | FUN_080ef488 | resolve_card_flag_table_ptr | 2 | [eval](080ef488.md) |
+| 54 | 86 | L6 | 3 | E | `0x080ef4bc` | FUN_080ef4bc | test_card_flag_bit | 1 | [eval](080ef4bc.md) |
+| 55 | 88 | L5 | 26 | C | `0x080f55d4` | FUN_080f55d4 | disable_blend_and_clear_step | 2 | [eval](080f55d4.md) |
+| 56 | 89 | L4 | 17 | D | `0x080f58b8` | FUN_080f58b8 | tick_blend_step_by_delta | 1 | [eval](080f58b8.md) |
+| 57 | 90 | L5 | 1 | E | `0x0801e328` | FUN_0801e328 | tick_blend_fadeout_and_set_dispcnt | 2 | [eval](0801e328.md) |
+| 58 | 91 | L6 | 21 | C | `0x080f5840` | FUN_080f5840 | start_blend_fadein_with_target | 2 | [eval](080f5840.md) |
+| 59 | 92 | L5 | 2 | E | `0x0801e344` | FUN_0801e344 | tick_blend_fadein_and_poll_done | 2 | [eval](0801e344.md) |
+| 60 | 93 | L4 | 10 | D | `0x0810d150` | FUN_0810d150 | init_sprite_entry_by_id | 1 | [eval](0810d150.md) |
+| 61 | 94 | L3 | 77 | C | `0x080f9ab4` | FUN_080f9ab4 | sync_state_and_init_sprite | 1 | [eval](080f9ab4.md) |
+| 62 | 95 | L5 | 1 | E | `0x0801e36c` | FUN_0801e36c | update_card_info_page_state | 2 | [eval](0801e36c.md) |
 | 63 | 98 | L6 | 16 | D | `0x080f6450` | FUN_080f6450 | _(待分析)_ | — | — |
 | 64 | 99 | L4 | 83 | C | `0x080f616c` | FUN_080f616c | _(待分析)_ | — | — |
 | 65 | 100 | L6 | 1 | E | `0x0801e490` | FUN_0801e490 | _(待分析)_ | — | — |
@@ -338,6 +338,7 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 - 2026-05-02 17:52: 0x08018774 PASSED → refresh_selected_char_obj_tile (rev=1, 45/45) — name_input 页面双缓冲 OBJ VRAM 字形刷新器 (topo=36, L5, indeg=3, E); 3 个 caller (0x080187e0/0x08018838/0x0801950c) 在字符切换/确认时触发; 读 IWRAM 0x02029564 ping-pong 槽位位域 (bit0 XOR 1), 调 zero_obj_vram_tiles 清空 34 块瓦片后调 render_jp_text_to_vram_obj 写入当前选中假名, 最后 strb 写回翻转槽位完成双缓冲换页; 首轮满分落地; 已分析 7.34% (19/259).
 - 2026-05-02 20:17: BATCH=3 PASSED — 0x0801950c→commit_input_name_to_buf / 0x080fa4d4→return_void_handler / 0x080f4ea4→copy_bytes_by_halfword (各 rev=1, 45/45); 单 Ghidra session + 1 build + sha1 9689337d 一致; 已分析 8.49% (22/259).
 - 2026-05-02 20:50: BATCH=10 落地 (9 PASSED + 1 BLOCKED) — 0x080f4f08→copy_memory_dma3_with_cpu_fallback (rev=1) / 0x080f4e74→zero_fill_by_halfword (rev=1) / 0x080f42a0→store_ewram_ctx_ptr_and_clear_mode_flags (rev=2) / 0x080f5a10→reset_bg_hscroll_regs_and_shadows (rev=1) / 0x080f5a4c→reset_bg_vscroll_regs_and_shadows (rev=1) / 0x080f5a88→reset_all_bg_scroll_regs_and_shadows (rev=1) / 0x080f4e98→zero_fill_halfword_wrapper (rev=1) / 0x080f5e98→clear_obj_list_entries_range (rev=2, BLOCKED SB-080f5e98-1) / 0x080f5ef4→init_scene_obj_list (rev=1) / 0x080f7674→reset_display_and_obj_vram (rev=1); 单 Ghidra session (10 [ok]) + 1 build + sha1 9689337d 一致; 已分析 12.36% (32/259).
+- 2026-05-02 23:00: BATCH=15 落地 #2 (15 PASSED) — 0x080edf4c→write_tile_row_to_vram (rev=1) / 0x080ee010→load_pack_tile_and_map_to_vram (rev=2) / 0x080ef3bc→check_card_atk_in_valid_range (rev=2) / 0x0801dfa0→tick_scroll_frame_and_update_pos (rev=2) / 0x080f0cc0→setup_line_buf_with_font_and_align (rev=1) / 0x080ef488→resolve_card_flag_table_ptr (rev=2) / 0x080ef4bc→test_card_flag_bit (rev=1) / 0x080f55d4→disable_blend_and_clear_step (rev=2) / 0x080f58b8→tick_blend_step_by_delta (rev=1) / 0x0801e328→tick_blend_fadeout_and_set_dispcnt (rev=2) / 0x080f5840→start_blend_fadein_with_target (rev=2) / 0x0801e344→tick_blend_fadein_and_poll_done (rev=2) / 0x0810d150→init_sprite_entry_by_id (rev=1) / 0x080f9ab4→sync_state_and_init_sprite (rev=1) / 0x0801e36c→update_card_info_page_state (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 23.94% (62/259). 里程碑: 突破 23%, blend/sprite/card_flag 工具簇全落地.
 - 2026-05-02 21:40: BATCH=15 落地 (15 PASSED) — 0x080ee988→resolve_card_gfx_pointer_by_type (rev=1) / 0x0801d510→render_card_name_to_line_buf (rev=1) / 0x080f0bb4→setup_line_buf_pos_and_font (rev=1) / 0x080f35e8→blit_tile_color_to_vram_region (rev=3) / 0x080f4ed0→copy_words_aligned (rev=1) / 0x0801d6b4→draw_card_name_label_to_vram (rev=1) / 0x080f1b0c→blit_glyph_columns_to_buf (rev=2) / 0x0801d70c→render_atk_def_digits_to_buf (rev=1) / 0x0801d7d0→draw_atk_def_label_to_vram (rev=1) / 0x080f54e0→count_bytes_until_null (rev=1) / 0x0801d830→render_card_level_text_to_buf (rev=2) / 0x080ef454→lookup_level_glyph_index (rev=1) / 0x0801d92c→draw_card_level_label_to_vram (rev=1) / 0x080ef2cc→resolve_card_type_icon_ptr (rev=1) / 0x080edf00→upload_tile_and_palette_from_struct (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 18.15% (47/259). 里程碑: 突破 18%, card_image_decode_wrapper 完整子调用簇落地.
 
 ## BLOCKED 追踪

@@ -751,6 +751,108 @@ RENAMES = [
         "被两个 bg/vram/palette 相关 caller 调用, 是将字体/图标资源一次性写入 VRAM 和调色板的工具函数. "
         "返回 [r6] (调色板子结构第一个 halfword)."),
 
+    # 2026-05-02: BATCH-15 落地 #2 (topo=77/78/79/82/83/85/86/88/89/90/91/92/93/94/95)
+    ("FUN_080edf4c", "write_tile_row_to_vram",
+        "被 load_pack_tile_and_map_to_vram (FUN_080ee010) 和 FUN_08023b6c (duel_field) 调用. "
+        "以 r3 指向的 tile 结构体为数据源, 按行迭代将 tile 数据写入 VRAM 目标地址 (0x06000800 区域). "
+        "每次迭代从源结构体读 2 个 u16 (tile_index/attr), 计算目标行偏移后以 strh 写入 VRAM. "
+        "副作用: 写入 [VRAM 0x06000800+按行偏移] 若干 halfword."),
+    ("FUN_080ee010", "load_pack_tile_and_map_to_vram",
+        "scene_pack 场景的 VRAM tile/palette/map 加载入口. 接收 tile_slot(r0), palette_index(r1), "
+        "struct_ptr(r2) 三个参数, 先调用 upload_tile_and_palette_from_struct 完成 tile 图形数据和调色板上传, "
+        "再调用 write_tile_row_to_vram (FUN_080edf4c) 将 tile map 数据写入 BG VRAM. "
+        "被 card_image_decode_wrapper/FUN_08023b6c/FUN_0802b590 等多个场景初始化函数调用, "
+        "是 pack/卡图 BG tile 加载的二合一封装."),
+    ("FUN_080ef3bc", "check_card_atk_in_valid_range",
+        "被 card_image_decode_wrapper (0x0801d998) 和 FUN_080c0180 (card_stats/font_jp) 调用. "
+        "接收卡片索引 (r0, u16 截断), 以步长 0x16 在 card_stats_table 中定位该卡行, "
+        "读取第一个 halfword 字段 (ATK 值), 与 7 个阈值逐一比较, "
+        "判断 ATK 是否落在某个有效/特殊区间内. "
+        "返回 1 (有效) 或 0 (无效/超限). 用于过滤需要特殊处理的高 ATK 卡片."),
+    ("FUN_0801dfa0", "tick_scroll_frame_and_update_pos",
+        "被 FUN_0801e714 (card_info 场景主循环) 唯一调用, 是卡片信息场景的逐帧滚动位置更新函数. "
+        "从 EWRAM 结构体 0x0201afb0 读取字段 [+0x14] (帧计数器), 若超过 0xe8=232 "
+        "则将帧计数器继续递增并以帧数计算滚动偏移量, 写入 [+0x18] (像素 Y 偏移) 和 [+0x1c] (子计数器); "
+        "若帧计数器未超阈值则清零并停止滚动. "
+        "最终写 VRAM 0x03000240 (gFrameCounter 偏移处) 的对应字段以同步 HW 位置."),
+    ("FUN_080f0cc0", "setup_line_buf_with_font_and_align",
+        "font_jp 模块高频工具函数 (indeg=32). 先调用 setup_line_buf_pos_and_font 完成基础行缓冲区位置和字体设置, "
+        "再写入 EWRAM 0x02006ed0 结构体中的两个字节字段: "
+        "[+0x15] 的 bit1 根据 r2 (align_flag) 决定左/右对齐; "
+        "[+0x14] 的 bits[7:2] 根据 r3 (color_index & 0x1f) 设置文字颜色索引. "
+        "被 render_card_description_text/play_ui_effect_37 等多个文字渲染入口调用, 是行对齐+颜色二合一配置函数."),
+    ("FUN_080ef488", "resolve_card_flag_table_ptr",
+        "仅被 FUN_080ef4bc (scene_card_info) 调用. 接收卡片索引 (r0, u16 截断), "
+        "与常量 FIELD_card_flag_table_idx=0x0fa6=4006 比较: "
+        "若 <= FIELD_card_flag_table_idx 则返回 0; "
+        "若在 PTR_card_flag_table 所指扩展表范围内, "
+        "则计算 base-relative 偏移 (card_index - 0x0fa7 得扩展区行号) 并返回指向 ROM 卡片标志表的指针; "
+        "否则返回 0."),
+    ("FUN_080ef4bc", "test_card_flag_bit",
+        "scene_card_info 场景中用于检测特定卡片是否设有某标志位的工具函数. "
+        "接收卡片索引 (r0) 和标志位编号 (r1, 0..0x1f), "
+        "先调用 resolve_card_flag_table_ptr 获取指向该卡片 ROM 标志表行的指针; "
+        "若指针为 0 或 r1 超过 0x1f 则返回 0. "
+        "否则以 r1>>4 作行内 u16 偏移 (每 16 bit 一组), r1 & 0xf 作位索引, "
+        "读取 flag halfword 并测试目标 bit. 返回 1 表示标志位置位, 0 表示未置位. "
+        "被 card_info_page_finalize 和 FUN_08104130/FUN_0810a52c (card_stats) 调用."),
+    ("FUN_080f55d4", "disable_blend_and_clear_step",
+        "blend+frame_counter 工具族的清除变体 (indeg=26). "
+        "清除 gFrameCounter (0x03000240) byte 中的 bit6 (blend_active 标志位), "
+        "然后将 BLDCNT (0x04000050) 和 BLDY (0x04000054) 均写 0, 彻底禁用 GBA 混合效果. "
+        "被 FUN_080f58b8 在 blend_step 归零时调用, "
+        "也被 play_ui_effect_3b/play_ui_effect_30 等特效函数直接调用以重置混合状态."),
+    ("FUN_080f58b8", "tick_blend_step_by_delta",
+        "blend+frame_counter 工具族的递减变体 (indeg=17). "
+        "从 gFrameCounter byte (gPrng+0x200 = 0x03000240) 提取 bits[5:0] (当前 blend_step, 0..63), "
+        "减去入参 r0 (delta). 若结果 > 0 则将新 blend_step 写回 gFrameCounter 并将 BLDY (0x04000054) 设为新值; "
+        "若 blend_step 递减至 <= 0 则调用 disable_blend_and_clear_step 彻底关闭混合, 返回 1. "
+        "返回 0 表示混合仍在进行."),
+    ("FUN_0801e328", "tick_blend_fadeout_and_set_dispcnt",
+        "被 FUN_0801e714 (card_info 场景主循环) 唯一调用. "
+        "先向 DISPCNT (0x04000000) 写入 0x1f00|当前值 (置位 bits[12:8] = BG0-BG3+OBJ 显示使能位), "
+        "然后以 delta=4 调用 tick_blend_step_by_delta 递减 blend_step. "
+        "实质是卡片信息场景每帧的混合淡出+显示模式锁定组合. "
+        "返回 tick_blend_step_by_delta 的返回值 (1=淡出完成, 0=进行中)."),
+    ("FUN_080f5840", "start_blend_fadein_with_target",
+        "blend+frame_counter 工具族的启动/递增变体 (indeg=21). "
+        "先写 BLDCNT (0x04000050) = 0x3fff (bits[13:0] 全置 1: 所有 BG 层作为 blend source 1+2), "
+        "然后从 gFrameCounter bits[5:0] 读取当前 blend_step, 将 r0 (target_step) 加上 blend_step, "
+        "& 0x3f 夹紧, 若结果 <= BLDY_NEAR_MAX=0x1e 则写回; "
+        "若 > BLDY_NEAR_MAX 则夹紧到 BLDY_MAX=0x1f. "
+        "若新 blend_step 超过 BLDY_NEAR_MAX 返回 1 (达到目标), 否则返回 0 (仍在过渡). "
+        "与 tick_blend_step_by_delta 互为反向."),
+    ("FUN_0801e344", "tick_blend_fadein_and_poll_done",
+        "被 FUN_0801e714 (card_info 场景) 和 FUN_080fa3a8 调用. "
+        "以 target_step=4 调用 start_blend_fadein_with_target 递增 blend_step; "
+        "若返回 0 (仍在过渡) 则将返回值继续传递为 0; "
+        "若返回 1 (混合完成) 则读 DISPCNT (0x04000000), "
+        "与 DISPCNT_PRESERVE_MASK=0xe0ff 做 AND (保留 bits[7:0]+bits[15:13], 清除 bits[12:8] = BG0-BG3+OBJ 使能位), "
+        "写回 DISPCNT 关闭高位显示标志, 并返回 1. "
+        "实质是 blend fade-in 的每帧驱动函数, 完成时自动清理 DISPCNT."),
+    ("FUN_0810d150", "init_sprite_entry_by_id",
+        "IWRAM sprite 管理结构体 (0x030050cc) 的 entry 初始化函数 (indeg=10). "
+        "接收 sprite/entity ID (r0). 若 r0 bit15 置位则先在结构体偏移 0x89*4=0x224 处的 0x28-byte entry 数组中"
+        "线性搜索 [+0x1f] bit7=1 且 [+0xe] signed==r0 的已有 entry; "
+        "若找到则复用, 否则在固定槽位写入初始化数据: "
+        "halfword[0xda*4]:=r0 (entity_id), byte[0x387]:=0x10 (sprite_type), "
+        "halfword[0x36e/0x370/0x372/0x37a]:=0, halfword[0xde*4]:=0xffff, halfword[0xdf*4]:=0x3f3f. "
+        "被 sync_state_and_init_sprite (FUN_080f9ab4, indeg=77) 驱动, 服务于卡片/场景对象的 OBJ/sprite 状态初始化."),
+    ("FUN_080f9ab4", "sync_state_and_init_sprite",
+        "高频工具函数 (indeg=77), 负责监测 IWRAM 状态变量并在变化时触发 sprite 初始化. "
+        "读取 gPrng+0x20c (0x0300024c, 旧状态快照 halfword) 与 gPrng+0x218 (0x03000258, 当前状态 halfword), "
+        "若两者相同则直接返回 (无变化); "
+        "若不同则将 0x0300024c 的值同步到 0x03000258, 再以入参 r0 (callback_data) 调用 init_sprite_entry_by_id. "
+        "被 banlist/settings/card_info 等多个模块在 UI 状态切换时调用, 实质是状态脏标记+sprite 重建触发器."),
+    ("FUN_0801e36c", "update_card_info_page_state",
+        "card_info 场景的每帧状态更新函数, 被 FUN_0801e714 (card_info 场景主循环) 唯一调用. "
+        "共执行四步逻辑: "
+        "(1) 读 IWRAM gPrng+0x148 (0x03000188) bits[1:0], 若非零则调用 sync_state_and_init_sprite(1) 触发 sprite 初始化; "
+        "(2) 读 [0x0201afb0+0x6] 倒计时字段, 若非零则递减并在归零时返回 1; "
+        "(3) 根据 gPrng+0x146 的显示标志 bit7/bit6 调整 [struct+0x20] 的滚动偏移值; "
+        "(4) 若 gPrng+0x148 bit2 设置且 [0x02006c2c] bits[2:0]==0, 则翻转 [struct+0x0] bit0 并调用 card_info_page_step_03_unknown. "
+        "最终返回 0 (继续更新) 或 1 (触发场景切换)."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
