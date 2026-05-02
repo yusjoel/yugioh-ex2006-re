@@ -540,6 +540,15 @@ RENAMES = [
         "再以硬编码的模式参数（r1=1, r2=1, r3=7, arg5=8, arg6=0x80）调 dispatch_text_render_by_mode，"
         "将字符串渲染到 VRAM OBJ 瓦片（精灵层）。0x80 模式对应 dispatch 内的 JP 8 行字形 OBJ 渲染路径。"),
 
+    # 2026-05-02: refresh_selected_char_obj_tile (analysis-loop topo=36)
+    ("FUN_08018774", "refresh_selected_char_obj_tile",
+        "banlist/font_jp/settings callers (0x080187e0/0x08018838/0x0801950c) "
+        "name_input 界面每次切换/确认字符时触发. "
+        "读 IWRAM 0x02029564 (游戏状态基址 0x02029250 + 0xc5*4) 处的 2-bit ping-pong 槽位选择子, "
+        "切换到对端槽位 (bit0 XOR 1), 调 zero_obj_vram_tiles 清空该槽位的 34 块 OBJ VRAM 瓦片, "
+        "再调 render_jp_text_to_vram_obj 把当前选中假名写入那 34 块瓦片, "
+        "最后将翻转后的槽位值写回原地址, 完成双缓冲换页, 防止字符更新时 OBJ VRAM 可见撕裂."),
+
     # 2026-05-02: zero_obj_vram_tiles (analysis-loop topo=35)
     ("FUN_08018400", "zero_obj_vram_tiles",
         "render_jp_text_to_vram_obj OBJ tile CpuSet fill. "

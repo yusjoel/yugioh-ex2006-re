@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 18/259 |
-| **下一步** | 开始分析 `FUN_08018774` (topo=36, L5, indeg=3, E) |
-| **上次更新** | 2026-05-02 17:32 |
+| **当前步骤** | 函数命名循环进行中, 已完成 19/259 |
+| **下一步** | 开始分析 `FUN_0801950c` (topo=37, L4, indeg=1, E) |
+| **上次更新** | 2026-05-02 17:52 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**18 / 259 (6.95%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**19 / 259 (7.34%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -63,7 +63,7 @@
 | 16 | 33 | L7 | 1 | E | `0x080177dc` | FUN_080177dc | setup_font_jp_ctx_obj_vram_row | 1 | [eval](080177dc.md) |
 | 17 | 34 | L6 | 2 | E | `0x080183d0` | FUN_080183d0 | render_jp_text_to_vram_obj | 3 | [eval](080183d0.md) |
 | 18 | 35 | L6 | 2 | E | `0x08018400` | FUN_08018400 | zero_obj_vram_tiles | 1 | [eval](08018400.md) |
-| 19 | 36 | L5 | 3 | E | `0x08018774` | FUN_08018774 | _(待分析)_ | — | — |
+| 19 | 36 | L5 | 3 | E | `0x08018774` | FUN_08018774 | refresh_selected_char_obj_tile | 1 | [eval](08018774.md) |
 | 20 | 37 | L4 | 1 | E | `0x0801950c` | FUN_0801950c | _(待分析)_ | — | — |
 | 21 | 39 | L4 | 9 | D | `0x080fa4d4` | FUN_080fa4d4 | _(待分析)_ | — | — |
 | 22 | 41 | L3 | 150 | C | `0x080f4ea4` | FUN_080f4ea4 | _(待分析)_ | — | — |
@@ -330,6 +330,7 @@
 - 2026-05-02 17:00: 0x080177dc PASSED → setup_font_jp_ctx_obj_vram_row (rev=1, 45/45) — font_jp OBJ VRAM 行初始化器 (topo=33, L7, indeg=1, E); 唯一 caller FUN_080183d0 (名字输入页面包装层); 以 tile 行索引计算 OBJ VRAM 基址 (0x06010000 + r0×0x20), 调 init_font_jp_render_context 后追加置位 context[+0x15] bit5 + render_flags bit0→bit1 + 重写函数指针; 与 FUN_08017798 (BG VRAM) 形成对称对; med 置信度 (缺 runtime VRAM dump); 首轮满分落地; 已分析 6.18% (16/259).
 - 2026-05-02 17:16: 0x080183d0 PASSED → render_jp_text_to_vram_obj (rev=3, 45/45) — name_input 页面文字渲染薄包装 (topo=34, L6, indeg=2, E); 由 FUN_08017b44 (调用 3 次) 和 FUN_08018774 (调用 1 次) 共享; 固化调 setup_font_jp_ctx_obj_vram_row 配置 OBJ VRAM 上下文后以硬编码参数 (r1=1,r2=1,r3=7,arg5=8,arg6=0x80) 调 dispatch_text_render_by_mode; 0x80 模式走 JP 8 行字形 OBJ 渲染路径; v1 NEEDS_FIX 35/45 → v2 40/45 → R7 rubric 放宽 → v3 PASSED 45/45; 已分析 6.56% (17/259).
 - 2026-05-02 17:32: 0x08018400 PASSED → zero_obj_vram_tiles (rev=1, 45/45) — render_jp_text_to_vram_obj OBJ tile 清屏前置 (topo=35, L6, indeg=2, E); 两个调用方 (0x08017b44 x3, 0x08018774 x1) 在每次调用 render_jp_text_to_vram_obj 前先调本函数清零目标 tile 区域; BIOS CpuSet SWI 0x0B fill+word 模式将 [0x06010000+tile_idx*32, +num_tiles*32) 填零; 首轮满分落地; 已分析 6.95% (18/259).
+- 2026-05-02 17:52: 0x08018774 PASSED → refresh_selected_char_obj_tile (rev=1, 45/45) — name_input 页面双缓冲 OBJ VRAM 字形刷新器 (topo=36, L5, indeg=3, E); 3 个 caller (0x080187e0/0x08018838/0x0801950c) 在字符切换/确认时触发; 读 IWRAM 0x02029564 ping-pong 槽位位域 (bit0 XOR 1), 调 zero_obj_vram_tiles 清空 34 块瓦片后调 render_jp_text_to_vram_obj 写入当前选中假名, 最后 strb 写回翻转槽位完成双缓冲换页; 首轮满分落地; 已分析 7.34% (19/259).
 
 ## BLOCKED 追踪
 
