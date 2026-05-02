@@ -433,6 +433,15 @@ RENAMES = [
         "tile 缓冲区 (*gfx_state). 按 glyph_width+(x&7)>16 分溢出路径 (跨 tile 列) "
         "和单列路径两支."),
 
+    # 2026-05-02: blit_glyph_col_to_buffer (analysis-loop topo=21)
+    ("FUN_080f1070", "blit_glyph_col_to_buffer",
+        "由 render_glyph_jp_single_layer (0x080f19a4) 在逐字符渲染循环中每字符调用 6 次, "
+        "每次处理字形一列像素的写入. 以 10 次行迭代 (r5=0..9) 遍历字形高度, 对列像素掩码 "
+        "(10-bit bitmask, 经高位寄存器传入) 中每个置位行计算 VRAM tile 字节偏移, "
+        "按 [0x02006ed0+0x15] bit3 区分 4bpp (nibble read-modify-write) 与 8bpp (byte write) 两路, "
+        "将颜色值写入 EWRAM 字形缓冲区. 是 blit_glyph_row_to_buffer (0x080f0f70) 的列方向对称体, "
+        "行处理 8 像素改为列处理 10 行."),
+
     # 2026-05-02: render_glyph_indexed_dual_layer (analysis-loop topo=17)
     ("FUN_080f1720", "render_glyph_indexed_dual_layer",
         "由 FUN_080f21e8 在检测到字体标志 [0x02006ed0+0x15]&0x10 后调用. "

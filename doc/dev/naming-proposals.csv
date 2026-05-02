@@ -2921,7 +2921,7 @@ address,name,proposed_name,score,tags
 0x080f0e0c,FUN_080f0e0c,,,
 0x080f0eec,FUN_080f0eec,,,
 0x080f0f70,blit_glyph_row_to_buffer,,,font_jp
-0x080f1070,FUN_080f1070,,,
+0x080f1070,blit_glyph_col_to_buffer,,,
 0x080f1180,FUN_080f1180,,,
 0x080f132c,FUN_080f132c,,,
 0x080f1440,render_glyph_jp_4bpp_dual_layer,,,font_jp
