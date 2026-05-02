@@ -27,15 +27,15 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 22/259 |
-| **下一步** | 开始分析 `FUN_080f4f08` (topo=42, L8, indeg=30, C) |
-| **上次更新** | 2026-05-02 20:17 |
+| **当前步骤** | 函数命名循环进行中, 已完成 32/259 |
+| **下一步** | 开始分析 `FUN_080ee988` (topo=56, L6, indeg=6, D) |
+| **上次更新** | 2026-05-02 20:50 |
 | **上次 callgraph 刷新** | 2026-05-02 17:52 |
 | **callgraph_locked** | `true` (整任务期间禁用 refresh — rename 不改变拓扑结构, 仅手工拆分/合并函数后才需重置 false 并 refresh 一次) |
 
 ## 进度
 
-**22 / 259 (8.49%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**32 / 259 (12.36%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -68,16 +68,16 @@
 | 20 | 37 | L4 | 1 | E | `0x0801950c` | FUN_0801950c | commit_input_name_to_buf | 1 | [eval](0801950c.md) |
 | 21 | 39 | L4 | 9 | D | `0x080fa4d4` | FUN_080fa4d4 | return_void_handler | 1 | [eval](080fa4d4.md) |
 | 22 | 41 | L3 | 150 | C | `0x080f4ea4` | FUN_080f4ea4 | copy_bytes_by_halfword | 1 | [eval](080f4ea4.md) |
-| 23 | 42 | L8 | 30 | C | `0x080f4f08` | FUN_080f4f08 | _(待分析)_ | — | — |
-| 24 | 44 | L2 | 130 | C | `0x080f4e74` | FUN_080f4e74 | _(待分析)_ | — | — |
-| 25 | 46 | L2 | 24 | C | `0x080f42a0` | FUN_080f42a0 | _(待分析)_ | — | — |
-| 26 | 47 | L8 | 1 | E | `0x080f5a10` | FUN_080f5a10 | _(待分析)_ | — | — |
-| 27 | 48 | L8 | 1 | E | `0x080f5a4c` | FUN_080f5a4c | _(待分析)_ | — | — |
-| 28 | 49 | L7 | 24 | C | `0x080f5a88` | FUN_080f5a88 | _(待分析)_ | — | — |
-| 29 | 50 | L3 | 29 | C | `0x080f4e98` | FUN_080f4e98 | _(待分析)_ | — | — |
-| 30 | 51 | L4 | 2 | E | `0x080f5e98` | FUN_080f5e98 | _(待分析)_ | — | — |
-| 31 | 52 | L3 | 3 | E | `0x080f5ef4` | FUN_080f5ef4 | _(待分析)_ | — | — |
-| 32 | 53 | L2 | 22 | C | `0x080f7674` | FUN_080f7674 | _(待分析)_ | — | — |
+| 23 | 42 | L8 | 30 | C | `0x080f4f08` | FUN_080f4f08 | copy_memory_dma3_with_cpu_fallback | 1 | [eval](080f4f08.md) |
+| 24 | 44 | L2 | 130 | C | `0x080f4e74` | FUN_080f4e74 | zero_fill_by_halfword | 1 | [eval](080f4e74.md) |
+| 25 | 46 | L2 | 24 | C | `0x080f42a0` | FUN_080f42a0 | store_ewram_ctx_ptr_and_clear_mode_flags | 2 | [eval](080f42a0.md) |
+| 26 | 47 | L8 | 1 | E | `0x080f5a10` | FUN_080f5a10 | reset_bg_hscroll_regs_and_shadows | 1 | [eval](080f5a10.md) |
+| 27 | 48 | L8 | 1 | E | `0x080f5a4c` | FUN_080f5a4c | reset_bg_vscroll_regs_and_shadows | 1 | [eval](080f5a4c.md) |
+| 28 | 49 | L7 | 24 | C | `0x080f5a88` | FUN_080f5a88 | reset_all_bg_scroll_regs_and_shadows | 1 | [eval](080f5a88.md) |
+| 29 | 50 | L3 | 29 | C | `0x080f4e98` | FUN_080f4e98 | zero_fill_halfword_wrapper | 1 | [eval](080f4e98.md) |
+| 30 | 51 | L4 | 2 | E | `0x080f5e98` | FUN_080f5e98 | clear_obj_list_entries_range (BLOCKED SB-080f5e98-1) | 2 | [eval](080f5e98.md) |
+| 31 | 52 | L3 | 3 | E | `0x080f5ef4` | FUN_080f5ef4 | init_scene_obj_list | 1 | [eval](080f5ef4.md) |
+| 32 | 53 | L2 | 22 | C | `0x080f7674` | FUN_080f7674 | reset_display_and_obj_vram | 1 | [eval](080f7674.md) |
 | 33 | 56 | L6 | 6 | D | `0x080ee988` | FUN_080ee988 | _(待分析)_ | — | — |
 | 34 | 59 | L8 | 2 | E | `0x0801d510` | FUN_0801d510 | _(待分析)_ | — | — |
 | 35 | 60 | L3 | 57 | C | `0x080f0bb4` | FUN_080f0bb4 | _(待分析)_ | — | — |
@@ -333,11 +333,13 @@
 - 2026-05-02 17:32: 0x08018400 PASSED → zero_obj_vram_tiles (rev=1, 45/45) — render_jp_text_to_vram_obj OBJ tile 清屏前置 (topo=35, L6, indeg=2, E); 两个调用方 (0x08017b44 x3, 0x08018774 x1) 在每次调用 render_jp_text_to_vram_obj 前先调本函数清零目标 tile 区域; BIOS CpuSet SWI 0x0B fill+word 模式将 [0x06010000+tile_idx*32, +num_tiles*32) 填零; 首轮满分落地; 已分析 6.95% (18/259).
 - 2026-05-02 17:52: 0x08018774 PASSED → refresh_selected_char_obj_tile (rev=1, 45/45) — name_input 页面双缓冲 OBJ VRAM 字形刷新器 (topo=36, L5, indeg=3, E); 3 个 caller (0x080187e0/0x08018838/0x0801950c) 在字符切换/确认时触发; 读 IWRAM 0x02029564 ping-pong 槽位位域 (bit0 XOR 1), 调 zero_obj_vram_tiles 清空 34 块瓦片后调 render_jp_text_to_vram_obj 写入当前选中假名, 最后 strb 写回翻转槽位完成双缓冲换页; 首轮满分落地; 已分析 7.34% (19/259).
 - 2026-05-02 20:17: BATCH=3 PASSED — 0x0801950c→commit_input_name_to_buf / 0x080fa4d4→return_void_handler / 0x080f4ea4→copy_bytes_by_halfword (各 rev=1, 45/45); 单 Ghidra session + 1 build + sha1 9689337d 一致; 已分析 8.49% (22/259).
+- 2026-05-02 20:50: BATCH=10 落地 (9 PASSED + 1 BLOCKED) — 0x080f4f08→copy_memory_dma3_with_cpu_fallback (rev=1) / 0x080f4e74→zero_fill_by_halfword (rev=1) / 0x080f42a0→store_ewram_ctx_ptr_and_clear_mode_flags (rev=2) / 0x080f5a10→reset_bg_hscroll_regs_and_shadows (rev=1) / 0x080f5a4c→reset_bg_vscroll_regs_and_shadows (rev=1) / 0x080f5a88→reset_all_bg_scroll_regs_and_shadows (rev=1) / 0x080f4e98→zero_fill_halfword_wrapper (rev=1) / 0x080f5e98→clear_obj_list_entries_range (rev=2, BLOCKED SB-080f5e98-1) / 0x080f5ef4→init_scene_obj_list (rev=1) / 0x080f7674→reset_display_and_obj_vram (rev=1); 单 Ghidra session (10 [ok]) + 1 build + sha1 9689337d 一致; 已分析 12.36% (32/259).
 
 ## BLOCKED 追踪
 
 | SB 编号 | 日期 | 阻塞原因 | 解除前置条件 |
 |---------|------|----------|-------------|
 | SB-080fa4dc-1 | 2026-05-02 | r3 assert_type 枚举语义需 debug build 验证 (函数命名本身已 PASSED) | 找到 debug build 或匹配工程的 assert 宏定义 |
+| SB-080f5e98-1 | 2026-05-02 | 条目 +5 / +1 的 bit mask 操作语义需 mGBA 在 scene_card_list 初始化时 dump gPrng+0x1bc 所指内存结构 (before/after) 确认 | mGBA 断点 FUN_080f5ef4 入口，dump [gPrng+0x1bc] before/after 各条目的 +5/+1 字节变化 |
 
 > 格式: `SB-<ADDR>-<N> | <YYYY-MM-DD> | <阻塞原因> | <解除前置条件>`

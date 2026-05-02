@@ -581,6 +581,76 @@ RENAMES = [
         "参数 r0=dst, r1=src, r2=byte_count; 先以 ldrh/strh 对拷 byte_count/2 次, "
         "若 byte_count 为奇数则额外拷贝末 1 字节. 无返回值."),
 
+    # 2026-05-02: BATCH-10 落地 (topo=42/44/46/47/48/49/50/51/52/53)
+    ("FUN_080f4f08", "copy_memory_dma3_with_cpu_fallback",
+        "向目标地址复制 byte_count 字节，根据 gPrng+0x174 的模式控制位选择传输后端: "
+        "bit12 置位时退化为 CPU halfword 循环 (copy_bytes_by_halfword), "
+        "bit13 置位时调用 BIOS CpuSet 字对齐拷贝, "
+        "否则使用 DMA3 以 1024 字节 (0x200 halfword) 为块分多次触发, "
+        "等待 DMA_ENABLE 位清零后继续下一块, 尾余 (<= 0x3ff 字节) 由最后一次 DMA3 搬完. "
+        "由 decode_card_image_6bpp (addr 0x0801d290) 及多个 scene_pack/card_image 场景调用, "
+        "是游戏 VRAM/EWRAM 大块数据搬运的统一入口."),
+    ("FUN_080f4e74", "zero_fill_by_halfword",
+        "将 dst 起始的 byte_count 字节全部清零, 内循环以 strh 双字节步进写 0, "
+        "最后若字节数为奇数则补 strb 写末尾 1 字节. "
+        "indeg=130, 是全 ROM 最高频使用的零填充 utility; "
+        "由 card_info_page_enter_with_card_id、card_info_page_init_bg0、draw_decimal_with_offset "
+        "等覆盖 card_info/font_jp/vram 全模块的函数在 VRAM、PALRAM、EWRAM 缓冲区清零场景下广泛调用."),
+    ("FUN_080f42a0", "store_ewram_ctx_ptr_and_clear_mode_flags",
+        "将 r0 (指针值) 存入 EWRAM 固定槽 0x02006ed0, 随后读取该结构体偏移 0x15 的标志字节, "
+        "清除 bit0 和 bit4 后写回. indeg=24, 由 card_info_page_init_bg0 及多个 "
+        "bg/vram/display/palette 组合的页面初始化函数调用, 作用是在页面切换时登记当前显示上下文指针"
+        "并将模式/dirty 标志复位为初始状态, 为后续 BG 渲染做前置清理."),
+    ("FUN_080f5a10", "reset_bg_hscroll_regs_and_shadows",
+        "将全部 4 个 BG 层的水平滚动硬件寄存器 (BG0HOFS~BG3HOFS, 步长 +4) 清零, "
+        "同时将 IWRAM 影子寄存器 gPrng+0x1e0、+0x1e2、+0x1e4、+0x1e6 "
+        "(对应 BG0..BG3 HOFS 软件副本) 一并清零. "
+        "仅被 reset_all_bg_scroll_regs_and_shadows (FUN_080f5a88) 调用 (作为 HOFS 分支), "
+        "由后者在页面初始化时与 VOFS 分支 (FUN_080f5a4c) 配对调用, 完成全 BG 滚动归零."),
+    ("FUN_080f5a4c", "reset_bg_vscroll_regs_and_shadows",
+        "将全部 4 个 BG 层的垂直滚动硬件寄存器 (BG0VOFS~BG3VOFS, 步长 +4) 清零, "
+        "同时将 IWRAM 影子寄存器 gPrng+0x1e8、+0x1ea、+0x1ec、+0x1ee "
+        "(对应 BG0..BG3 VOFS 软件副本) 一并清零. "
+        "与 sibling reset_bg_hscroll_regs_and_shadows (FUN_080f5a10) 结构完全对称, "
+        "仅被 reset_all_bg_scroll_regs_and_shadows (FUN_080f5a88) 调用作为 VOFS 分支, "
+        "在页面初始化时完成垂直滚动归零."),
+    ("FUN_080f5a88", "reset_all_bg_scroll_regs_and_shadows",
+        "依次调用 reset_bg_hscroll_regs_and_shadows (FUN_080f5a10) 和 "
+        "reset_bg_vscroll_regs_and_shadows (FUN_080f5a4c), "
+        "将全部 8 个 BG 滚动硬件寄存器 (BG0HOFS~BG3VOFS) 及 8 个 IWRAM 影子值 "
+        "(gPrng+0x1e0~+0x1ee) 全部归零. indeg=24, 是页面初始化链的标准清理步骤, "
+        "由 card_info_page_init_bg0 及多个 bg/display/palette 组合的场景初始化函数在进入新页面时调用, "
+        "确保上一页面的滚动偏移不影响新 BG 布局."),
+    ("FUN_080f4e98", "zero_fill_halfword_wrapper",
+        "对 zero_fill_by_halfword (FUN_080f4e74) 的单层包装: "
+        "以标准 push/bl/pop 调用约定封装, 参数直传 (r0=dst, r1=byte_count), 无额外逻辑. "
+        "indeg=29, 是 scene_pack/card_image 等模块优先使用的清零入口; "
+        "其直接 callee FUN_080f4e74 indeg=130, "
+        "两者共同服务于全 ROM 的 VRAM/EWRAM 缓冲区清零需求."),
+    ("FUN_080f5e98", "clear_obj_list_entries_range",
+        "遍历 OBJ 列表 [start_idx, end_idx), 将每个 8 字节条目的前 8 字节清零 (stmia + str), "
+        "再对条目内偏移 +5 和 +1 的字节做位域清除操作. "
+        "列表基址从 IWRAM 固定地址 0x030001fc (= gPrng+0x1bc) 加载, 每条目步长 = idx*8. "
+        "由 init_scene_obj_list (FUN_080f5ef4, 初始化全部 128 条目) 及 "
+        "FUN_080f4adc (scene_duel_puzzle;sprite 场景复位) 调用, "
+        "用途是在场景切换或 OBJ 列表重建前批量重置条目状态. "
+        "[SB-080f5e98-1] 条目 +5/+1 bit mask 操作语义待 runtime 验证."),
+    ("FUN_080f5ef4", "init_scene_obj_list",
+        "初始化场景 OBJ 列表: 调用 clear_obj_list_entries_range(0, 0x80) 清零全部 128 条目, "
+        "然后在列表末尾写入容量标记 [base+0x400]=0x80 (capacity=128) "
+        "和计数标记 [base+0x401]=0 (count=0), 完成 OBJ 列表的空初始化. "
+        "由 reset_display_and_obj_vram (FUN_080f7674) 以及两个 scene_card_list "
+        "palette/display 初始化函数调用, 是进入卡牌列表或调色板初始化场景前的必备前置步骤."),
+    ("FUN_080f7674", "reset_display_and_obj_vram",
+        "读取 DISPCNT (0x04000000) 当前视频模式 (bits 2:0), "
+        "将 OBJ PALRAM (0x05000200, 0x200 字节) 清零, "
+        "再按模式分支清零对应的 VRAM OBJ tile 区域 "
+        "(mode 0/1/2: 0x06010000 起 0x8000 字节; mode 3/4/5: 0x06014000 起 0x4000 字节); "
+        "若 r5 (r0 输入) 不为 0 则将其写入 gPrng+0x1bc (OBJ 列表指针槽); "
+        "最后调用 init_scene_obj_list (FUN_080f5ef4) 重建空 OBJ 列表. "
+        "indeg=22, 由 card_info_page_init_bg0 及多个 bg/vram/display/palette 场景初始化链"
+        "在页面切换时调用, 是显示状态完全重置的标准入口."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
