@@ -6,9 +6,10 @@
 # IDE
 .vscode/
 .idea/
-# .claude/ 默认忽略 settings 等本地文件, 但 skills/ 入库 (项目共享方法论)
+# .claude/ 默认忽略 settings 等本地文件, 但 skills/ + agents/ 入库 (项目共享方法论)
 .claude/*
 !.claude/skills/
+!.claude/agents/
 
 # 临时文件
 *.tmp

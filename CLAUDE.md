@@ -91,6 +91,35 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 **任何文件都不要主动 commit**，必须等用户明确指令。可以主动 `git add`（stage）改动，由用户决定何时提交。
 
+## 反汇编命名 4-agent 体系 (analysis-loop)
+
+**用途**: 自底向上递归命名 ROM 函数。完整文档 `doc/dev/refactor-loop-adapted.md`，进度跟踪 `doc/dev/eval/PROGRESS.md`。
+
+**组件**:
+- 4 sub-agent: `analysis-{executor,reviewer,fixer,lesson-keeper}` (位于 `.claude/agents/`)
+- 2 skill: `analysis-eval` (R1-R11 评分单一权威) + `analysis-loop` (驱动器, 含 Step 0+1+2 前置)
+- 经验沉淀: `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_*.md`
+
+**入口**: `Skill: analysis-loop [<addr>]`（不传 addr 则从 PROGRESS.md "下一步"字段读）
+
+### 反汇编命名零容忍词
+
+eval 文档 / proposal / commit message / agent 输出中出现以下任一 → analysis-eval skill 自动扣 R11 到 0:
+
+| 词 | 替代 |
+|----|------|
+| 似乎 / 大概 / 应该是 / 可能是 | 给 file:line 证据 + 标置信度 (high/med/low) |
+| 我认为 / 我觉得 | 同上 |
+| 这次不适用 / 特例 / 暂时 | 走 BLOCKED 流程登记 SB-<ADDR>-N |
+| 还行 / 够用 / 凑合 | 不是评分语言 |
+| `[降级]` / `[跳过]` / `[待补全]` | 立即 abort, 求助用户 |
+
+### 命名形式硬约束 (R3)
+
+`proposed_name` 必须 `^[a-z][a-z0-9_]+$` 形式, 且语义 `verb_object[_qualifier]`:
+- ✓ `apply_zone_cursor_step` / `commit_line_buffer_to_sprite_vram`
+- ✗ `helper` / `process_data` / `do_thing` / `func_N` / `handler_N`
+
 ## Shell 注意
 
 harness 是 bash（Git Bash / MSYS），但 `build.bat`、`clean.bat`、`tools/*.bat`、`tools/*.ps1` 都是 Windows 脚本——直接调用它们即可（不要移植到 sh）。路径在 bash 命令里用正斜杠。
