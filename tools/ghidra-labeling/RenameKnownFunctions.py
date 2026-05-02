@@ -557,6 +557,30 @@ RENAMES = [
         "BIOS CpuSet SWI 0x0B fill+word mode: "
         "OBJ VRAM [0x06010000 + tile_idx*32, +num_tiles*32) := 0."),
 
+    # 2026-05-02: commit_input_name_to_buf (analysis-loop topo batch)
+    ("FUN_0801950c", "commit_input_name_to_buf",
+        "由 page_state_dispatcher (0x08019574, tags: banlist,font_jp,name_input,settings) "
+        "在玩家确认输入名称时调用. 将 r0 指向的已输入名称串复制到 EWRAM 名称缓冲区 [0x02029512], "
+        "同时将字符计数写入 [0x0202956e], 最后调用 refresh_selected_char_obj_tile 刷新光标 "
+        "OBJ tile 显示. 返回 1 表示确认成功, 是名称输入页 (禁止牌/设置/玩家名) confirm 动作的最终落地函数."),
+
+    # 2026-05-02: return_void_handler (analysis-loop topo batch)
+    ("FUN_080fa4d4", "return_void_handler",
+        "空回调函数体, 单指令 bx lr 立即返回. "
+        "由 page_state_dispatcher (0x08019574, tags: banlist,font_jp,name_input,settings) "
+        "及其他 8 个页面状态机函数注册为 no-op 页面处理器槽位 (init/tick/exit 等). "
+        "不接受任何参数, 无任何副作用, 无返回值. "
+        "与同簇 0x080fa4c0/0x080fa4d8 均为相同结构的空 handler 占位, "
+        "区别于 suppress_assert_report (0x080fa4dc, 4 参数断言 nop)."),
+
+    # 2026-05-02: copy_bytes_by_halfword (analysis-loop topo batch)
+    ("FUN_080f4ea4", "copy_bytes_by_halfword",
+        "通用内存复制工具函数, 以 16 位 (halfword) 步长为主循环单元, 处理末尾奇数字节. "
+        "由 card_info_page_init_bg0 (0x0801d45c), card_image_decode_wrapper (0x0801d998), "
+        "card_info_page_finalize (0x0801e100) 等 150 个调用方在 VRAM/PALRAM/EWRAM 数据搬运场景下调用. "
+        "参数 r0=dst, r1=src, r2=byte_count; 先以 ldrh/strh 对拷 byte_count/2 次, "
+        "若 byte_count 为奇数则额外拷贝末 1 字节. 无返回值."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

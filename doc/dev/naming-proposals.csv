@@ -171,7 +171,7 @@ address,name,proposed_name,score,tags
 0x08018f7c,FUN_08018f7c,game_str_08018f7c,4,window;bg;display;vram;banlist;duel_field;font_jp;game_str;settings
 0x08019494,name_input_page_tick,,,banlist;duel_field;font_jp;game_str;name_input;settings
 0x080194ec,name_input_page_exit,,,banlist;name_input
-0x0801950c,FUN_0801950c,banlist_0801950c,2,banlist;font_jp;settings
+0x0801950c,commit_input_name_to_buf,,,banlist;font_jp;settings
 0x08019540,FUN_08019540,banlist_08019540,2,banlist;font_jp;name_input;settings
 0x08019554,FUN_08019554,,,scene_name_input
 0x08019574,page_state_dispatcher,,,banlist;font_jp;name_input;settings
@@ -2971,7 +2971,7 @@ address,name,proposed_name,score,tags
 0x080f4e18,game_str_id_to_row,,,game_str
 0x080f4e74,FUN_080f4e74,,,
 0x080f4e98,FUN_080f4e98,,,
-0x080f4ea4,FUN_080f4ea4,,,
+0x080f4ea4,copy_bytes_by_halfword,,,
 0x080f4ed0,FUN_080f4ed0,,,scene_pack
 0x080f4ee8,FUN_080f4ee8,,,
 0x080f4f08,FUN_080f4f08,,,dma
@@ -3071,7 +3071,7 @@ address,name,proposed_name,score,tags
 0x080f9ca8,FUN_080f9ca8,font_jp_080f9ca8,2,vram;font_jp
 0x080fa4c0,FUN_080fa4c0,,,
 0x080fa4cc,FUN_080fa4cc,,,
-0x080fa4d4,FUN_080fa4d4,,,
+0x080fa4d4,return_void_handler,,,
 0x080fa4d8,FUN_080fa4d8,,,
 0x080fa4dc,suppress_assert_report,,,
 0x080fa4e4,FUN_080fa4e4,,,

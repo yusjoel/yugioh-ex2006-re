@@ -130,6 +130,7 @@ model: sonnet
 - ARM 助记符冲突 → `feedback_arm_mnemonic_collision.md`
 - plate 含弯引号/全角符号 → `feedback_jython_unicode_plate_comment.md`
 - 同 caller 串调 zero_ + render_ → `feedback_clear_then_render_pair.md`
+- 函数体仅 `bx lr` (2 字节) → `feedback_release_noop_stub_fingerprint.md` (类型 A/B 区分; callsite 参数数量是关键)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
