@@ -122,7 +122,7 @@ address,name,proposed_name,score,tags
 0x08017478,FUN_08017478,,,
 0x08017540,FUN_08017540,,,
 0x08017574,name_input_page_init,,,bg;display;palette;name_input
-0x080175f4,FUN_080175f4,font_jp_080175f4,2,font_jp
+0x080175f4,dispatch_text_render_by_mode,,,font_jp
 0x080176c0,FUN_080176c0,,,scene_name_input
 0x0801778c,FUN_0801778c,,,scene_name_input
 0x08017798,FUN_08017798,font_jp_08017798,3,vram;font_jp
