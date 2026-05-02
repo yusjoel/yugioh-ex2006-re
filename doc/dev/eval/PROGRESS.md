@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 12/259 |
-| **下一步** | 开始分析 `FUN_080f21e8` (topo=29, L4, indeg=3, E) |
-| **上次更新** | 2026-05-02 15:53 |
+| **当前步骤** | 函数命名循环进行中, 已完成 13/259 |
+| **下一步** | 开始分析 `FUN_080175f4` (topo=31, L7, indeg=3, E) |
+| **上次更新** | 2026-05-02 16:06 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**12 / 259 (4.63%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**13 / 259 (5.02%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -57,7 +57,7 @@
 | 10 | 22 | L6 | 1 | E | `0x080f1180` | FUN_080f1180 | blit_glyph_row_colored | 1 | [eval](080f1180.md) |
 | 11 | 27 | L5 | 2 | E | `0x080f05d0` | FUN_080f05d0 | test_char_kinsoku_head | 1 | [eval](080f05d0.md) |
 | 12 | 28 | L5 | 2 | E | `0x080f1bbc` | FUN_080f1bbc | count_word_charlen | 1 | [eval](080f1bbc.md) |
-| 13 | 29 | L4 | 3 | E | `0x080f21e8` | FUN_080f21e8 | _(待分析)_ | — | — |
+| 13 | 29 | L4 | 3 | E | `0x080f21e8` | FUN_080f21e8 | render_jp_string_glyph_loop | 1 | [eval](080f21e8.md) |
 | 14 | 31 | L7 | 3 | E | `0x080175f4` | FUN_080175f4 | _(待分析)_ | — | — |
 | 15 | 32 | L8 | 6 | D | `0x080f42b4` | FUN_080f42b4 | _(待分析)_ | — | — |
 | 16 | 33 | L7 | 1 | E | `0x080177dc` | FUN_080177dc | _(待分析)_ | — | — |
@@ -324,6 +324,7 @@
 - 2026-05-02 15:22: 0x080f1180 PASSED → blit_glyph_row_colored (rev=1, 45/45) — font_jp 渲染族叶子, blit_glyph_row_to_buffer 的显式颜色变体; r3 传入 packed_color nibble (低4位前景/高4位背景), 4bpp nibble read-modify-write + 8bpp byte write 双路, 对应 render_glyph_jp_single_layer sp+0x8 标志非零分支; 首轮满分落地
 - 2026-05-02 15:37: 0x080f05d0 PASSED → test_char_kinsoku_head (rev=1, 45/45) — font_jp 禁則处理叶子; char_code→glyph_index→SJIS 码→逐范围比对行頭禁則字符集(小假名/标点/闭括号), 返回 bool; 与 test_char_kinsoku_tail (FUN_080f0720) 构成 JIS X 4051 对称对; 首轮满分落地
 - 2026-05-02 15:53: 0x080f1bbc PASSED → count_word_charlen (rev=1, 45/45) — font_jp 换行词元字符数测量叶子; switch 表 179 字符码分支覆盖空白/禁則/转义/句点4类; 三层互证 (word-wrap 调用方 muls×字符宽/数据 label/switch 字符集) high 置信度; 首轮满分落地
+- 2026-05-02 16:06: 0x080f21e8 PASSED → render_jp_string_glyph_loop (rev=1, 45/45) — font_jp 模块主字形渲染循环 (topo=29, L4, indeg=3); 被3个薄包装调用, 直调全部4个 render_glyph_* 变体+count_word_charlen+test_char_kinsoku_head; 四层证据互证 (调用图hub+数据label反推+状态机表+兄弟对称体) high 置信度; 首轮满分落地. 里程碑: 已分析 5.02% (13/259), 突破5%.
 
 ## BLOCKED 追踪
 

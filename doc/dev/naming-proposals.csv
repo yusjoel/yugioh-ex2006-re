@@ -2932,7 +2932,7 @@ address,name,proposed_name,score,tags
 0x080f1b60,load_glyph_row_pair,,,font_jp
 0x080f1bbc,count_word_charlen,,,
 0x080f1ed0,FUN_080f1ed0,,,
-0x080f21e8,FUN_080f21e8,font_jp_080f21e8,2,font_jp
+0x080f21e8,render_jp_string_glyph_loop,,,font_jp
 0x080f2a44,FUN_080f2a44,font_jp_080f2a44,2,font_jp
 0x080f2a60,FUN_080f2a60,font_jp_080f2a60,2,font_jp
 0x080f2a7c,text_render_wrapper,,,font_jp
