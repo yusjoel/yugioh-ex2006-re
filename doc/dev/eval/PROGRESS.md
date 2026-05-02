@@ -1,7 +1,7 @@
 # 反汇编命名 — 进度跟踪文档
 
 > 用途: 跨会话续接的项目状态镜像。新会话读完本文档即可继续工作。
-> **每次完成 1 个函数, fixer 必须更新本文档** (PROGRESS 字段 + 函数列表对应行)
+> **每完成 1 个 batch (默认 15 函数), fixer 一次性更新本文档** (PROGRESS 字段 + N 行函数列表)
 
 ---
 
@@ -10,14 +10,34 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作.
 
-按 下一步 字段开始:
-  Skill: analysis-loop <next_function_addr>
+【batch 模式 — 默认 N=15】
+  1. python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json
+  2. 启动 4-agent loop (executor → reviewer → fixer → lesson-keeper),
+     每个 sub-agent 一次处理 N 个函数, 单 Ghidra session + 单 build + 单 sha1 verify
+  3. byte-identical 通过后自动 commit (用户已授权)
+  4. 进入下一 batch
 
-每完成 1 个函数, 必须:
-  1. 更新进度百分比 + 已分析数
-  2. 更新函数列表对应行的 分析后函数名 + rev + eval 链接
-  3. 更新 当前步骤 + 下一步 字段
-  4. 不自动 commit, 等用户指令
+【单函数模式 — 调试 / 卡住时回退用】
+  Skill: analysis-loop <addr>
+
+【参数调整】
+  - batch 大小: 改 --max <N>, 范围 5-20 (默认 15)
+  - 实测速率 (batch=10): ~2.3min/函数, ~35k tokens/函数
+  - 实测速率 (单函数): ~14min/函数, ~200k tokens/函数 → batch=10 提速 6x
+
+【自动停下询问的 4 种情况】
+  - byte-identical ❌ (落地红线)
+  - 任一 sub-agent 主动求助 (低置信度 / 硬规则违反)
+  - MAX_ITER (≥3 轮 reviewer 不收敛)
+  - BLOCKED 登记后是否继续下一 batch
+  详见 memory/feedback_analysis_loop_autonomous.md
+
+【每 batch 完成后 fixer 必须】
+  1. 进度 +N / 百分比重算
+  2. 函数列表 N 行: 分析后函数名 + rev + eval 链接
+  3. 当前步骤 + 下一步 + 上次更新
+  4. 历史里程碑追加 1 行
+  5. BLOCKED 追踪 (如有 SB-<ADDR>-N): 追加
 ```
 
 ---
