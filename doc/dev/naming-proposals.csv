@@ -116,7 +116,7 @@ address,name,proposed_name,score,tags
 0x080165bc,FUN_080165bc,,,
 0x0801695c,FUN_0801695c,,,
 0x08016a7c,FUN_08016a7c,,,
-0x08016afc,FUN_08016afc,game_str_08016afc,3,banlist;game_str
+0x08016afc,resolve_prhlist_entry_name_ptr,,,banlist;game_str
 0x080171ec,FUN_080171ec,,,
 0x08017464,FUN_08017464,,,
 0x08017478,FUN_08017478,,,

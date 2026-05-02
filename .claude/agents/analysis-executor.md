@@ -96,7 +96,7 @@ model: sonnet
 1. **FID** (函数指纹): 入口/出口字节匹配已知 SDK / agbcc helper
 2. **IO 寄存器簇**: 函数体内访问的 GBA 硬件寄存器 (DMA?CNT / BG?CNT / SOUND? / IRQ_IF / VRAM/PALRAM/OAM 区段)
 3. **数据 label 反推**: 函数读/写的已命名 ROM/IWRAM label
-4. **字符串泄漏锚**: 函数内 ROM 字面量指向的 ASCII 字符串
+4. **字符串泄漏锚**: 函数内 ROM 字面量指向的 ASCII 字符串（若发现 `"<dir>/<file>.c"` assert 路径，立即 grep 同路径所有函数作为模块簇 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_assert_path_cluster_anchor.md`）
 5. **状态表**: 函数读 [gPrng+N] 等状态字, 推断 page state machine 角色
 6. **调用图 hub**: 已命名 caller 的语义 + 调用模式 (是否 page handler init / per-frame tick / 一次性 setup)
 

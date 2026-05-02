@@ -424,6 +424,14 @@ RENAMES = [
         "本函数只做原始字节计数, 不感知游戏自定义编码宽度. "
         "调用方将两次返回值之差加一作为搜索循环次数上限."),
 
+    # 2026-05-02: resolve_prhlist_entry_name_ptr (analysis-loop topo=16)
+    ("FUN_08016afc", "resolve_prhlist_entry_name_ptr",
+        "由 card_list_screen_init/FUN_081061d0/FUN_08107198 在 banlist 界面调用. "
+        "给定禁止条目结构体指针(pDst), 读 +0x201 处 u8 nameID, assert nameID!=0 "
+        "(GL/PRH_Main.c:38 'pDst->nameID'), 调 game_str_id_to_row(nameID+0x1072) "
+        "得 master_row, 再读 WRAM[0x02006c2c] 低3位选语言槽, "
+        "返回 game_str_ja 基址+偏移 的本地化卡名字符串指针. 纯查询叶子, 无外部副作用."),
+
     # 2026-05-02: suppress_assert_report (analysis-loop topo=7)
     ("FUN_080fa4dc", "suppress_assert_report",
         "发布版空断言回调 (release build no-op). 由 GL/FS/nnsys/游戏各模块断言宏在条件不满足时调用; "

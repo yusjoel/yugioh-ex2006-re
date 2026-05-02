@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 5/259 |
-| **下一步** | 开始分析 `FUN_08016afc` (topo=16, L3, indeg=3, E) |
-| **上次更新** | 2026-05-02 14:05 |
+| **当前步骤** | 函数命名循环进行中, 已完成 6/259 |
+| **下一步** | 开始分析 `FUN_080f1720` (topo=17, L5, indeg=1, E) |
+| **上次更新** | 2026-05-02 14:16 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**5 / 259 (1.93%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**6 / 259 (2.32%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -50,7 +50,7 @@
 | 3 | 6 | L7 | 1 | E | `0x08014ea0` | FUN_08014ea0 | measure_str_bytelen | 1 | [eval](08014ea0.md) |
 | 4 | 7 | L4 | 137 | C | `0x080fa4dc` | FUN_080fa4dc | suppress_assert_report | 2 | [eval](080fa4dc.md) |
 | 5 | 8 | L6 | 1 | E | `0x08014eb4` | FUN_08014eb4 | find_substr_offset | 1 | [eval](08014eb4.md) |
-| 6 | 16 | L3 | 3 | E | `0x08016afc` | FUN_08016afc | _(待分析)_ | — | — |
+| 6 | 16 | L3 | 3 | E | `0x08016afc` | FUN_08016afc | resolve_prhlist_entry_name_ptr | 1 | [eval](08016afc.md) |
 | 7 | 17 | L5 | 1 | E | `0x080f1720` | FUN_080f1720 | _(待分析)_ | — | — |
 | 8 | 19 | L5 | 1 | E | `0x080f1440` | FUN_080f1440 | _(待分析)_ | — | — |
 | 9 | 21 | L6 | 1 | E | `0x080f1070` | FUN_080f1070 | _(待分析)_ | — | — |
@@ -317,6 +317,7 @@
 - 2026-05-02 13:28: 0x08014ea0 PASSED → measure_str_bytelen (rev=1) — 首轮零缺陷, 纯字节计数 strlen 变体
 - 2026-05-02 13:47: 0x080fa4dc PASSED → suppress_assert_report (rev=2) — 高 indeg=137 / 364 调用点, 发布版空断言回调 (2 字节 bx lr leaf)
 - 2026-05-02 14:05: 0x08014eb4 PASSED → find_substr_offset (rev=1) — GL/GL_File.c 朴素 strstr, 字符串泄漏锚三连 (pSrc/pKey/GL_File.c:38-39), 首轮满分
+- 2026-05-02 14:16: 0x08016afc PASSED → resolve_prhlist_entry_name_ptr (rev=1) — GL/PRH_Main.c 禁止牌名称查询叶子, 字符串泄漏锚 (pDst->nameID) + 数据 label 反推 (game_str_pointer_table/game_str_ja), 首轮满分
 
 ## BLOCKED 追踪
 
