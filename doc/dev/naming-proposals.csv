@@ -58,7 +58,7 @@ address,name,proposed_name,score,tags
 0x08014dd4,FUN_08014dd4,,,
 0x08014e14,FUN_08014e14,,,
 0x08014ea0,measure_str_bytelen,,,
-0x08014eb4,FUN_08014eb4,,,
+0x08014eb4,find_substr_offset,,,
 0x08014f54,fs_resolve_path_to_fid,,,fs
 0x08014fa8,fs_load,,,fs
 0x0801510c,FUN_0801510c,,,

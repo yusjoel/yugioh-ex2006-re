@@ -89,6 +89,8 @@ model: sonnet
 
 ### Phase 2: 6 层方法论分析
 
+> 叶子工具函数快速通道: **叶子工具函数三要素 → one-shot PASSED 极大概率** — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_leaf_utility_oneshot.md`
+
 按 `doc/dev/methodology/function-naming.md` 6 层逐层尝试：
 
 1. **FID** (函数指纹): 入口/出口字节匹配已知 SDK / agbcc helper

@@ -409,6 +409,13 @@ RENAMES = [
         "返回 r0=chars_written. 13 个 caller 覆盖 banlist/name_input/pass_input/game_str. "
         "已命名 caller: name_input_page_exit (0x080194ec)."),
 
+    # 2026-05-02: find_substr_offset (analysis-loop topo=8)
+    ("FUN_08014eb4", "find_substr_offset",
+        "由 fs_load 在 GL 文件系统路径解析阶段调用，依次以 #、!、.LZ 三种前缀魔数作为 pKey 探测 pSrc 路径字符串，"
+        "从而判断文件名是否携带特定标记。函数实现朴素线性 strstr 搜索：先用两次 measure_str_bytelen 确定有效搜索窗口"
+        "（len_pSrc - len_pKey + 1），再逐偏移比对，首字节匹配后继续全长比对，成功返回首次命中的字节偏移（>=0），"
+        "未命中返回 -1。源文件归属 GL/GL_File.c（assert 字符串泄漏锚）。"),
+
     # 2026-05-02: measure_str_bytelen (analysis-loop topo=6)
     ("FUN_08014ea0", "measure_str_bytelen",
         "由 FUN_08014eb4 (GL/GL_File.c 字符串搜索) 在子串搜索前调用, 分别测量 pSrc "
