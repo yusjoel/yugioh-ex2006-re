@@ -93,7 +93,7 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 ## 反汇编命名 4-agent 体系 (analysis-loop)
 
-**用途**: 自底向上递归命名 ROM 函数。完整文档 `doc/dev/refactor-loop-adapted.md`，进度跟踪 `doc/dev/eval/PROGRESS.md`。
+**用途**: 自底向上递归命名 ROM 函数。完整文档 `doc/dev/methodology/analysis-loop.md`，进度跟踪 `doc/dev/eval/PROGRESS.md`。
 
 **组件**:
 - 4 sub-agent: `analysis-{executor,reviewer,fixer,lesson-keeper}` (位于 `.claude/agents/`)
