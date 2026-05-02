@@ -944,6 +944,105 @@ RENAMES = [
         "then copies r1 byte-by-byte to that position, appending a null terminator. "
         "Equivalent to strcat(r0,r1) with no bounds check."),
 
+    # 2026-05-02: BATCH-15 落地 #4 (topo=115/116/117/118/119/121/122/123/125/126/127/128/129/130/131)
+    ("FUN_080f508c", "format_decimal_halfword_to_buf",
+        "format_decimal_halfword_to_buf: r1 (decimal int) -> up to 10 halfword-encoded digits "
+        "(magic base 0x4f82, each digit: (digit+0x4f)<<8 | 0x82) in stack frame, "
+        "then append_text_to_buf_end to r0 dst_buf. "
+        "Called by expand_format_decimal_to_buf (0x080f5228/0x080f528c) when gSettings bits[2:0]==0 "
+        "(non-JP mode). Clears gSettings+0x16 halfword as side effect."),
+    ("FUN_080f50f0", "format_decimal_byte_to_buf",
+        "format_decimal_byte_to_buf: r1 (decimal int) -> up to 10 ASCII digit bytes "
+        "('0'+digit, 0x30 initial fill) in stack frame, "
+        "then append_text_to_buf_end to r0 dst_buf. "
+        "Sister of format_decimal_halfword_to_buf (0x080f508c): this outputs ASCII byte digits "
+        "(JP/wide-char mode), that outputs halfword-encoded digits (non-JP mode). "
+        "Called by expand_format_decimal_to_buf when gSettings bits[2:0]!=0."),
+    ("FUN_080f5148", "expand_format_text_to_buf",
+        "expand_format_text_to_buf: scans r1 fmt_str byte-by-byte into r0 dst_buf; "
+        "on '%%s' (0x25 0x73): writes NUL, calls append_text_to_buf_end twice "
+        "(current content, then r2 arg_str). Non-'%%s' bytes copied directly. "
+        "Minimal single-%%s printf-like expander used by scene_pack/card_name/font_jp modules "
+        "to embed card names into display templates."),
+    ("FUN_080f5228", "expand_format_decimal_to_buf",
+        "expand_format_decimal_to_buf: scans r1 fmt_str; on '%%d' (0x25 0x64): "
+        "reads gSettings byte bits[2:0] to select encoding path -- "
+        "0: format_decimal_halfword_to_buf (0x080f508c); non-0: format_decimal_byte_to_buf (0x080f50f0). "
+        "Appends remaining fmt via append_text_to_buf_end. Non-'%%d' bytes copied directly. "
+        "Implements locale-aware '%%d' expansion; called by result_screen/duel_field/vram modules."),
+    ("FUN_080f57d0", "apply_blend_fadeout_flat",
+        "apply_blend_fadeout_flat: no args. "
+        "Reads gPrng+0x200 (0x03000240, gFrameCounter byte), clears bit6 (blend_active), "
+        "sets bits[4:0]=0x1f (BLDY_MAX), writes back. "
+        "Then sets BLDCNT (0x04000050)=0x3fff (all BG layers as blend source), "
+        "BLDY (0x04000054)=0x1f (max fade-out). "
+        "Immediately forces screen to maximum dark blend with no transition. "
+        "Called by 10+ duel_field/pack/display/palette scene init or clear-screen callers."),
+    ("FUN_080f5d1c", "bsearch_index_by_callback",
+        "bsearch_index_by_callback: binary search on sorted array of r2 elements, stride r3. "
+        "r0=base_ptr (->r8), r1=key (->r9), [sp+0x28]=compare callback (->r10, called via bx r10). "
+        "Callback returns 0=hit, neg=go-low, pos=go-high. "
+        "On hit: writes found_index+1 to IWRAM 0x030001b6 halfword, returns index+1. "
+        "On miss: writes r4 to gPrng+0x17a, returns original count. "
+        "Used by card_stats callers to locate entries in sorted tables."),
+    ("FUN_080f61e4", "write_obj_attr_packed",
+        "write_obj_attr_packed: writes one sprite entry (attr0/attr1/attr2) to "
+        "OBJ attribute shadow buffer at gPrng+0x1bc (0x030001fc). "
+        "r0 low16=attr0 (Y/shape/mode), r0 high16=attr_extra (X/size), r1=attr1_x, r2=attr2_tile. "
+        "Applies 0xfffffe00 mask to attr0, writes 3 halfwords to 8-byte aligned slot, "
+        "increments use-count byte at [entry+0x400]. Skips if count==0x80 (slot full). "
+        "Called by batch/grid/conditional OBJ write paths; sibling of write_obj_attr_with_priority."),
+    ("FUN_080f6578", "write_obj_attr_with_priority",
+        "write_obj_attr_with_priority: priority/affine variant of write_obj_attr_packed (0x080f61e4). "
+        "Same OBJ shadow buffer at gPrng+0x1bc; same 3-halfword write structure. "
+        "Key difference: attr0 synthesis ORs 0x2400 (bit10=double-size/R/S, bit13=affine flag). "
+        "r0 low16=attr0, r0 high16=attr_extra, r1=attr1_x, r2=attr2_tile. "
+        "Increments use-count byte at [entry+0x400]. "
+        "Unique caller: FUN_08107b90 (OBJ mode dispatch, priority/affine path)."),
+    ("FUN_0810cf10", "init_sound_channel_entry",
+        "init_sound_channel_entry: initializes key fields of a sound channel entry "
+        "in IWRAM management struct at 0x030050cc. "
+        "r0=channel_id (written to [base+0x366] halfword), r1=channel_flag (written to [base+0x386]). "
+        "Also clears: [base+0x38b]=0 (status), [base+0x10]=0 (counter), "
+        "[base+0x39c]=0xff (end_marker), [base+0x374]=r0+1 (next_id halfword). "
+        "Called by reset_sound_channel_entry (r1=0) and FUN_0810cf60 (r1 from caller)."),
+    ("FUN_0810cf54", "reset_sound_channel_entry",
+        "reset_sound_channel_entry: calls init_sound_channel_entry (0x0810cf10) with r1=0, "
+        "clearing channel_flag and resetting all other fields of the channel entry "
+        "in IWRAM struct at 0x030050cc. "
+        "'Clear/reset' wrapper variant of init_sound_channel_entry. "
+        "Called by set_channel_if_changed (FUN_080f9adc) and 5 other callers "
+        "on scene exit or sound stop."),
+    ("FUN_080f9adc", "set_channel_if_changed",
+        "set_channel_if_changed: reads EWRAM 0x0200af10 halfword (active channel_id), "
+        "compares with r0; if equal returns immediately (lazy update, no-op). "
+        "If different: writes r0 to [0x0200af10], calls reset_sound_channel_entry (0x0810cf54). "
+        "Standard lazy-update pattern. indeg=15, called by demo_shuen_state_machine, "
+        "banner_anim_state_machine, and display/palette/demo/fs scene functions."),
+    ("FUN_080f9bc4", "copy_puzzle_seed_to_wram",
+        "copy_puzzle_seed_to_wram: copies 8 bytes from ROM 0x09e4f568 (puzzle seed data) "
+        "to EWRAM 0x02000000 via fixed-count ldrb/strb loop (r1=7, countdown to 0). "
+        "No args, no return value. "
+        "Called by init_puzzle_wram_and_checksum (0x080f9c68) during puzzle state init "
+        "to load the ROM-stored initial seed into working memory."),
+    ("FUN_080f9c08", "compute_puzzle_checksum",
+        "compute_puzzle_checksum: computes 16-bit rolling checksum over EWRAM 0x02000000, "
+        "length 0x6ecc halfwords. Init value 0x5847 (magic). Per-halfword: "
+        "acc = (acc + halfword) << 16, XOR 0xffff0000, >> 16. "
+        "No args; returns r0=u16 checksum. No external writes (pure compute). "
+        "Called by init_puzzle_wram_and_checksum (stores result) and FUN_080f9c40 (verifies)."),
+    ("FUN_080f9c68", "init_puzzle_wram_and_checksum",
+        "init_puzzle_wram_and_checksum: scene_duel_puzzle EWRAM init entry. "
+        "Calls copy_puzzle_seed_to_wram (0x080f9bc4) to load ROM seed to EWRAM 0x02000000, "
+        "then compute_puzzle_checksum (0x080f9c08) for the data block, "
+        "then writes checksum to EWRAM [0x02000000+0x6ecc] halfword. "
+        "Called by 12 callers covering scene_duel_puzzle/money/pack on init or reward update nodes."),
+    ("FUN_0810e460", "copy_bytes_with_waitcnt",
+        "copy_bytes_with_waitcnt: configures WAITCNT (0x04000204) bits[1:0]:=3 "
+        "(SRAM 8 wait cycles) before byte-by-byte copy of r2 bytes from r0 (src) to r1 (dst). "
+        "r2==-1 skips copy. SRAM requires 8-bit-only access; WAITCNT setup ensures correct timing. "
+        "Called 3 times by FUN_0810e588 (scene_duel_puzzle) for SRAM save-data write."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
