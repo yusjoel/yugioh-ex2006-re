@@ -2909,7 +2909,7 @@ address,name,proposed_name,score,tags
 0x080f0210,char_width_wide_10_or_12,,,font_jp
 0x080f0274,measure_string_pixel_width,,,font_jp
 0x080f02a4,get_char_width_class,,,font_jp
-0x080f05d0,FUN_080f05d0,font_jp_080f05d0,3,font_jp
+0x080f05d0,test_char_kinsoku_head,,,font_jp
 0x080f0720,FUN_080f0720,font_jp_080f0720,3,font_jp
 0x080f0bb4,FUN_080f0bb4,font_jp_080f0bb4,3,font_jp
 0x080f0cc0,FUN_080f0cc0,font_jp_080f0cc0,2,font_jp
