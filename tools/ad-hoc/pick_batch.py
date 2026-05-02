@@ -51,6 +51,7 @@ TOPO_CSV = REPO / "temp/closure_topo_order.csv"
 CALLGRAPH_CSV = REPO / "temp/complete_callgraph.csv"
 NAMING_CSV = REPO / "doc/dev/naming-proposals.csv"
 ASM_S = REPO / "asm/all.s"
+PROGRESS_MD = REPO / "doc/dev/eval/PROGRESS.md"
 
 
 def load_naming_proposals():
@@ -90,6 +91,36 @@ def load_callgraph_callers():
         for row in csv.DictReader(f):
             out.setdefault(row["callee_addr"], []).append(row["caller_addr"])
     return out
+
+
+def load_callgraph_callees():
+    """caller_addr -> [callee_addr, ...]"""
+    out = {}
+    with open(CALLGRAPH_CSV, encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            out.setdefault(row["caller_addr"], []).append(row["callee_addr"])
+    return out
+
+
+FAIL_LINE_RE = re.compile(r"^\|\s*(0x[0-9a-fA-F]+)\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|\s*([A-Z_]+)\s*\|")
+
+
+def load_failed_addrs():
+    """Parse PROGRESS.md '失败追踪' section. Returns set of failed ADDRs."""
+    failed = set()
+    if not PROGRESS_MD.exists():
+        return failed
+    text = PROGRESS_MD.read_text(encoding="utf-8")
+    # Find 失败追踪 section
+    m = re.search(r"##\s*失败追踪.*?(?=\n##\s|\Z)", text, re.DOTALL)
+    if not m:
+        return failed
+    section = m.group(0)
+    for line in section.splitlines():
+        m2 = FAIL_LINE_RE.match(line)
+        if m2:
+            failed.add(m2.group(1).lower())
+    return failed
 
 
 def is_analyzed(name_proposals, addr):
@@ -168,6 +199,8 @@ def pick_batch(max_n, root_addr=None):
     name_props = load_naming_proposals()
     topo = load_topo()
     callers_map = load_callgraph_callers()
+    callees_map = load_callgraph_callees()
+    failed = load_failed_addrs()
 
     asm_lines = ASM_S.read_text(encoding="utf-8").splitlines(keepends=True)
 
@@ -178,6 +211,26 @@ def pick_batch(max_n, root_addr=None):
         and not t["class"].startswith("B_")
         and not is_analyzed(name_props, t["addr"])
     ]
+
+    # Auto-skip: exclude failed addrs themselves, and any candidate whose direct
+    # callees include any failed addr (R7 caller chain broken — can't safely name).
+    cascade_skipped = []
+    filtered = []
+    for t in candidates:
+        addr_lc = t["addr"].lower()
+        if addr_lc in failed:
+            cascade_skipped.append(f"{t['addr']}: in 失败追踪")
+            continue
+        callees = callees_map.get(t["addr"], [])
+        bad_callees = [c for c in callees if c.lower() in failed]
+        if bad_callees:
+            cascade_skipped.append(
+                f"{t['addr']}: callee in 失败追踪 ({','.join(bad_callees)})"
+            )
+            continue
+        filtered.append(t)
+
+    candidates = filtered
 
     # If root specified, find its position in candidates and start there
     if root_addr:
@@ -222,7 +275,11 @@ def pick_batch(max_n, root_addr=None):
             }
         )
 
-    return {"batch": batch, "skipped": skipped}
+    return {
+        "batch": batch,
+        "skipped": skipped + cascade_skipped,
+        "failed_count": len(failed),
+    }
 
 
 def main():

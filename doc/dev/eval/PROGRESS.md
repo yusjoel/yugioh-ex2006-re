@@ -8,36 +8,20 @@
 ## 续接提示词 (新会话直接粘贴)
 
 ```
-读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作.
+读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作, batch=15 全自动模式。
 
-【batch 模式 — 默认 N=15】
-  1. python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json
-  2. 启动 4-agent loop (executor → reviewer → fixer → lesson-keeper),
-     每个 sub-agent 一次处理 N 个函数, 单 Ghidra session + 单 build + 单 sha1 verify
-  3. byte-identical 通过后自动 commit (用户已授权)
-  4. 进入下一 batch
+python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 调整 batch 大小
 
-【单函数模式 — 调试 / 卡住时回退用】
-  Skill: analysis-loop <addr>
+启动 4-agent loop (executor → reviewer → fixer → lesson-keeper) 处理 batch.json 中的全部函数,
+单 Ghidra session + 单 build + 单 sha1 verify, byte-identical 通过后自动 commit, 进入下一 batch。
 
-【参数调整】
-  - batch 大小: 改 --max <N>, 范围 5-20 (默认 15)
-  - 实测速率 (batch=10): ~2.3min/函数, ~35k tokens/函数
-  - 实测速率 (单函数): ~14min/函数, ~200k tokens/函数 → batch=10 提速 6x
+任何函数失败 (byte-identical ❌ / MAX_ITER / agent 求助 / 无法命名) → 不停下询问:
+  1. 在 PROGRESS.md "失败追踪" 段记录 (ADDR, reason, date)
+  2. 该函数标 ⚠ FAIL 于函数列表对应行
+  3. pick_batch.py 自动把"含失败 callee"的函数标 SKIP, 不进入下一 batch
+  4. 继续下一批
 
-【自动停下询问的 4 种情况】
-  - byte-identical ❌ (落地红线)
-  - 任一 sub-agent 主动求助 (低置信度 / 硬规则违反)
-  - MAX_ITER (≥3 轮 reviewer 不收敛)
-  - BLOCKED 登记后是否继续下一 batch
-  详见 memory/feedback_analysis_loop_autonomous.md
-
-【每 batch 完成后 fixer 必须】
-  1. 进度 +N / 百分比重算
-  2. 函数列表 N 行: 分析后函数名 + rev + eval 链接
-  3. 当前步骤 + 下一步 + 上次更新
-  4. 历史里程碑追加 1 行
-  5. BLOCKED 追踪 (如有 SB-<ADDR>-N): 追加
+仅 BLOCKED 但有命名的函数仍走落地 (BLOCKED 是 SB tracking 不阻塞 rename)。
 ```
 
 ---
@@ -363,3 +347,17 @@
 | SB-080f5e98-1 | 2026-05-02 | 条目 +5 / +1 的 bit mask 操作语义需 mGBA 在 scene_card_list 初始化时 dump gPrng+0x1bc 所指内存结构 (before/after) 确认 | mGBA 断点 FUN_080f5ef4 入口，dump [gPrng+0x1bc] before/after 各条目的 +5/+1 字节变化 |
 
 > 格式: `SB-<ADDR>-<N> | <YYYY-MM-DD> | <阻塞原因> | <解除前置条件>`
+
+## 失败追踪 (auto-skip)
+
+> fixer 在 byte-identical ❌ / MAX_ITER / agent 求助 / 完全无法命名 时追加。
+> pick_batch.py 自动:
+>   - 排除 ADDR 在本表的函数 (本身失败)
+>   - 排除直接 callee 含本表 ADDR 的函数 (cascade SKIP, 因 R7 无法满足)
+>   - 函数列表对应行标 ⚠ FAIL / ⏭ SKIP
+
+| ADDR | 日期 | 失败原因 | 备注 |
+|------|------|----------|------|
+| _(空)_ | — | — | — |
+
+> 格式: `0x<ADDR> | <YYYY-MM-DD> | BUILD_FAIL/MAX_ITER/AGENT_HELP/UNNAMABLE | <一句话 why>`

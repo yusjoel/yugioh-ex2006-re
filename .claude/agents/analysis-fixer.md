@@ -85,16 +85,23 @@ grep -v '^\.thumb\s*$\|^\.arm\s*$' asm/all.s.raw > asm/all.s.raw.nomode
 python tools/asm-regen/inject_modes.py asm/all.s.raw.nomode asm/all.s
 ```
 
-#### 3d. byte-identical 验证 (红线)
+#### 3d. byte-identical 验证 (红线 — 失败自动回滚)
 
 ```bash
 NOPAUSE=1 ./build.bat
 sha1sum roms/2343.gba output/2343.gba
 ```
 
-两行 sha1 必须一致。**不一致 → 立即 abort + Fixer Report 标 ❌ + 提示用户回滚 .rep 备份**。
+两行 sha1 必须一致。**不一致 → 自动回滚 + 标失败 + 继续下一 batch (不停下询问)**:
 
-不允许任何形式的"跳过 byte-identical" / "暂时不验证" / "下次再说"。
+1. 恢复 Ghidra .rep 从本 batch 开始前的备份 (`Yu-Gi-Oh WCT 2006.rep.bak-<TS>-pre-batch*`)
+2. `git checkout -- asm/all.s tools/ghidra-labeling/RenameKnownFunctions.py doc/dev/naming-proposals.csv` 恢复仓库文件
+3. 在 `doc/dev/eval/PROGRESS.md` "失败追踪" 段为 batch 中**所有** N 个函数追加行: `0x<ADDR> | <YYYY-MM-DD> | BUILD_FAIL | byte-identical 不一致, 整 batch 回滚`
+4. 函数列表对应 N 行 `分析后` 列填 `⚠ FAIL (BUILD_FAIL)`, eval 列填 `[eval](<ADDR>.md)` (proposal/eval 文件保留供 lesson-keeper 抽教训)
+5. 不增进度 (本 batch 0 PASSED)
+6. Fixer Report 标 ❌ + 列出回滚的 N 个 ADDR
+
+不允许"跳过 byte-identical" / "暂时不验证"。回滚后 pick_batch.py 下次自动跳过 (cascade SKIP 含本 batch ADDR 作 callee 的函数)。
 
 #### 3e. CSV 同步
 
@@ -111,6 +118,21 @@ python tools/ad-hoc/sync_ghidra_names_to_proposals.py
 ```bash
 tools/asm-regen/ghidra-run-script.bat ExportComments.py
 ```
+
+### Phase 3.5: MAX_ITER / agent 求助 / UNNAMABLE 失败处理 (loop driver 触发, 非 Phase 3 内部)
+
+driver 在以下情况调本 phase 而非 Phase 3:
+- reviewer 第 3 轮仍 NEEDS_FIX (MAX_ITER) → reason = `MAX_ITER`
+- 任何 sub-agent 主动求助 (无法判定 / 硬规则违反) → reason = `AGENT_HELP`
+- proposal 含零容忍词且 P0 修复后仍触发 → reason = `UNNAMABLE`
+
+动作:
+1. 在 PROGRESS.md "失败追踪" 段追加: `0x<ADDR> | <YYYY-MM-DD> | <reason> | <一句 why>`
+2. 函数列表对应行 `分析后` 列填 `⚠ FAIL (<reason>)`, `rev` 填轮数, `eval` 填链接 (保留)
+3. 不参与本 batch 的 Phase 3 落地 (跳过该函数的 RenameKnownFunctions.py 条目)
+4. batch 中其他 PASSED/BLOCKED-named 函数照常落地
+
+不停下询问。下次 pick_batch 自动 skip 该函数及其 callers。
 
 ### Phase 4: 更新 PROGRESS.md (仅 PASSED 模式且 Phase 3 byte-identical OK)
 
@@ -153,7 +175,7 @@ tools/asm-regen/ghidra-run-script.bat ExportComments.py
 
 1. **禁止重新打分** — 不能改 eval 里 `[ ]`/`[x]` 或 R1-R9 分数
 2. **禁止顺手优化清单外** — 即使看到明显问题
-3. **禁止迎合 byte-identical 失败** — 必须查根因, 不允许跳过 sha1 验证
+3. **禁止跳过 sha1 验证** — byte-identical 失败必须自动回滚 + 标失败, **不可继续假装通过**
 4. **禁止自行降级** — `[降级]` `[跳过]` `[待补全]` 都触发 abort
-5. **禁止 commit** — 完全交给用户; fixer 完成后 PROGRESS.md 标 "等待用户 commit"
-6. **禁止 NEEDS_FIX 模式跑 Phase 3** — Ghidra 写入是终态动作, 仅在 review state == PASSED 时做
+5. **禁止 NEEDS_FIX 模式跑 Phase 3** — Ghidra 写入是终态动作, 仅在 review state == PASSED 时做
+6. **禁止停下询问** — 用户已授权全自动模式; 任何失败走 Phase 3.5 记录 + 跳过, batch 中其他函数照常推进
