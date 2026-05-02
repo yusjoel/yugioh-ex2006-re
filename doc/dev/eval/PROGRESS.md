@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 62/259 |
-| **下一步** | 开始分析 `FUN_080f6450` (topo=98, L6, indeg=16, D) |
-| **上次更新** | 2026-05-02 23:00 |
+| **当前步骤** | 函数命名循环进行中, 已完成 77/259 |
+| **下一步** | 开始分析 `FUN_080f508c` (topo=115, L6, indeg=2, E) |
+| **上次更新** | 2026-05-03 00:00 |
 | **上次 callgraph 刷新** | 2026-05-02 17:52 |
 | **callgraph_locked** | `true` (整任务期间禁用 refresh — rename 不改变拓扑结构, 仅手工拆分/合并函数后才需重置 false 并 refresh 一次) |
 
 ## 进度
 
-**62 / 259 (23.94%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**77 / 259 (29.73%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -112,21 +112,21 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 60 | 93 | L4 | 10 | D | `0x0810d150` | FUN_0810d150 | init_sprite_entry_by_id | 1 | [eval](0810d150.md) |
 | 61 | 94 | L3 | 77 | C | `0x080f9ab4` | FUN_080f9ab4 | sync_state_and_init_sprite | 1 | [eval](080f9ab4.md) |
 | 62 | 95 | L5 | 1 | E | `0x0801e36c` | FUN_0801e36c | update_card_info_page_state | 2 | [eval](0801e36c.md) |
-| 63 | 98 | L6 | 16 | D | `0x080f6450` | FUN_080f6450 | _(待分析)_ | — | — |
-| 64 | 99 | L4 | 83 | C | `0x080f616c` | FUN_080f616c | _(待分析)_ | — | — |
-| 65 | 100 | L6 | 1 | E | `0x0801e490` | FUN_0801e490 | _(待分析)_ | — | — |
-| 66 | 101 | L6 | 1 | E | `0x0801e594` | FUN_0801e594 | _(待分析)_ | — | — |
-| 67 | 102 | L5 | 1 | E | `0x0801e620` | FUN_0801e620 | _(待分析)_ | — | — |
-| 68 | 104 | L4 | 6 | D | `0x0801e714` | FUN_0801e714 | _(待分析)_ | — | — |
-| 69 | 105 | L3 | 11 | D | `0x0801e7b8` | FUN_0801e7b8 | _(待分析)_ | — | — |
-| 70 | 106 | L4 | 2 | E | `0x0801e7bc` | FUN_0801e7bc | _(待分析)_ | — | — |
-| 71 | 107 | L4 | 1 | E | `0x0801e7cc` | FUN_0801e7cc | _(待分析)_ | — | — |
-| 72 | 108 | L5 | 41 | C | `0x0804ab4c` | FUN_0804ab4c | _(待分析)_ | — | — |
-| 73 | 109 | L4 | 1 | E | `0x080ee050` | FUN_080ee050 | _(待分析)_ | — | — |
-| 74 | 110 | L4 | 1 | E | `0x080ee264` | FUN_080ee264 | _(待分析)_ | — | — |
-| 75 | 112 | L5 | 1 | E | `0x080f0cf8` | FUN_080f0cf8 | _(待分析)_ | — | — |
-| 76 | 113 | L4 | 1 | E | `0x080f0d8c` | FUN_080f0d8c | _(待分析)_ | — | — |
-| 77 | 114 | L5 | 10 | D | `0x080f506c` | FUN_080f506c | _(待分析)_ | — | — |
+| 63 | 98 | L6 | 16 | D | `0x080f6450` | FUN_080f6450 | write_oam_entry_with_tile_inc | 1 | [eval](eval/080f6450.md) |
+| 64 | 99 | L4 | 83 | C | `0x080f616c` | FUN_080f616c | write_oam_entry_from_packed_args | 1 | [eval](eval/080f616c.md) |
+| 65 | 100 | L6 | 1 | E | `0x0801e490` | FUN_0801e490 | draw_card_stat_digits_to_oam | 1 | [eval](eval/0801e490.md) |
+| 66 | 101 | L6 | 1 | E | `0x0801e594` | FUN_0801e594 | draw_stat_row_sprites_to_oam | 1 | [eval](eval/0801e594.md) |
+| 67 | 102 | L5 | 1 | E | `0x0801e620` | FUN_0801e620 | render_card_stats_oam_for_current_card | 1 | [eval](eval/0801e620.md) |
+| 68 | 104 | L4 | 6 | D | `0x0801e714` | FUN_0801e714 | tick_card_info_page_by_state | 1 | [eval](eval/0801e714.md) |
+| 69 | 105 | L3 | 11 | D | `0x0801e7b8` | FUN_0801e7b8 | get_card_data_format_id | 1 | [eval](eval/0801e7b8.md) |
+| 70 | 106 | L4 | 2 | E | `0x0801e7bc` | FUN_0801e7bc | lookup_card_entry_by_index | 1 | [eval](eval/0801e7bc.md) |
+| 71 | 107 | L4 | 1 | E | `0x0801e7cc` | FUN_0801e7cc | load_card_fs_entry_to_struct | 1 | [eval](eval/0801e7cc.md) |
+| 72 | 108 | L5 | 41 | C | `0x0804ab4c` | FUN_0804ab4c | check_card_pair_allowed | 1 | [eval](eval/0804ab4c.md) |
+| 73 | 109 | L4 | 1 | E | `0x080ee050` | FUN_080ee050 | upload_sprite_tiles_and_write_oam | 1 | [eval](eval/080ee050.md) |
+| 74 | 110 | L4 | 1 | E | `0x080ee264` | FUN_080ee264 | upload_sprite_tiles_with_palette_blend | 1 | [eval](eval/080ee264.md) |
+| 75 | 112 | L5 | 1 | E | `0x080f0cf8` | FUN_080f0cf8 | setup_line_buf_font_align_and_tile_fields | 1 | [eval](eval/080f0cf8.md) |
+| 76 | 113 | L4 | 1 | E | `0x080f0d8c` | FUN_080f0d8c | setup_line_buf_font_with_char_index | 1 | [eval](eval/080f0d8c.md) |
+| 77 | 114 | L5 | 10 | D | `0x080f506c` | FUN_080f506c | append_text_to_buf_end | 1 | [eval](eval/080f506c.md) |
 | 78 | 115 | L6 | 2 | E | `0x080f508c` | FUN_080f508c | _(待分析)_ | — | — |
 | 79 | 116 | L6 | 4 | E | `0x080f50f0` | FUN_080f50f0 | _(待分析)_ | — | — |
 | 80 | 117 | L4 | 7 | D | `0x080f5148` | FUN_080f5148 | _(待分析)_ | — | — |
@@ -339,6 +339,7 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 - 2026-05-02 20:17: BATCH=3 PASSED — 0x0801950c→commit_input_name_to_buf / 0x080fa4d4→return_void_handler / 0x080f4ea4→copy_bytes_by_halfword (各 rev=1, 45/45); 单 Ghidra session + 1 build + sha1 9689337d 一致; 已分析 8.49% (22/259).
 - 2026-05-02 20:50: BATCH=10 落地 (9 PASSED + 1 BLOCKED) — 0x080f4f08→copy_memory_dma3_with_cpu_fallback (rev=1) / 0x080f4e74→zero_fill_by_halfword (rev=1) / 0x080f42a0→store_ewram_ctx_ptr_and_clear_mode_flags (rev=2) / 0x080f5a10→reset_bg_hscroll_regs_and_shadows (rev=1) / 0x080f5a4c→reset_bg_vscroll_regs_and_shadows (rev=1) / 0x080f5a88→reset_all_bg_scroll_regs_and_shadows (rev=1) / 0x080f4e98→zero_fill_halfword_wrapper (rev=1) / 0x080f5e98→clear_obj_list_entries_range (rev=2, BLOCKED SB-080f5e98-1) / 0x080f5ef4→init_scene_obj_list (rev=1) / 0x080f7674→reset_display_and_obj_vram (rev=1); 单 Ghidra session (10 [ok]) + 1 build + sha1 9689337d 一致; 已分析 12.36% (32/259).
 - 2026-05-02 23:00: BATCH=15 落地 #2 (15 PASSED) — 0x080edf4c→write_tile_row_to_vram (rev=1) / 0x080ee010→load_pack_tile_and_map_to_vram (rev=2) / 0x080ef3bc→check_card_atk_in_valid_range (rev=2) / 0x0801dfa0→tick_scroll_frame_and_update_pos (rev=2) / 0x080f0cc0→setup_line_buf_with_font_and_align (rev=1) / 0x080ef488→resolve_card_flag_table_ptr (rev=2) / 0x080ef4bc→test_card_flag_bit (rev=1) / 0x080f55d4→disable_blend_and_clear_step (rev=2) / 0x080f58b8→tick_blend_step_by_delta (rev=1) / 0x0801e328→tick_blend_fadeout_and_set_dispcnt (rev=2) / 0x080f5840→start_blend_fadein_with_target (rev=2) / 0x0801e344→tick_blend_fadein_and_poll_done (rev=2) / 0x0810d150→init_sprite_entry_by_id (rev=1) / 0x080f9ab4→sync_state_and_init_sprite (rev=1) / 0x0801e36c→update_card_info_page_state (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 23.94% (62/259). 里程碑: 突破 23%, blend/sprite/card_flag 工具簇全落地.
+- 2026-05-03 00:00: BATCH=15 落地 #3 (15 PASSED, 15/15 rev=1) — 0x080f6450→write_oam_entry_with_tile_inc / 0x080f616c→write_oam_entry_from_packed_args / 0x0801e490→draw_card_stat_digits_to_oam / 0x0801e594→draw_stat_row_sprites_to_oam / 0x0801e620→render_card_stats_oam_for_current_card / 0x0801e714→tick_card_info_page_by_state / 0x0801e7b8→get_card_data_format_id / 0x0801e7bc→lookup_card_entry_by_index / 0x0801e7cc→load_card_fs_entry_to_struct / 0x0804ab4c→check_card_pair_allowed / 0x080ee050→upload_sprite_tiles_and_write_oam / 0x080ee264→upload_sprite_tiles_with_palette_blend / 0x080f0cf8→setup_line_buf_font_align_and_tile_fields / 0x080f0d8c→setup_line_buf_font_with_char_index / 0x080f506c→append_text_to_buf_end; 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 29.73% (77/259). 里程碑: 突破 29%, OAM/card_stats/FS/line_buf 工具簇全落地.
 - 2026-05-02 21:40: BATCH=15 落地 (15 PASSED) — 0x080ee988→resolve_card_gfx_pointer_by_type (rev=1) / 0x0801d510→render_card_name_to_line_buf (rev=1) / 0x080f0bb4→setup_line_buf_pos_and_font (rev=1) / 0x080f35e8→blit_tile_color_to_vram_region (rev=3) / 0x080f4ed0→copy_words_aligned (rev=1) / 0x0801d6b4→draw_card_name_label_to_vram (rev=1) / 0x080f1b0c→blit_glyph_columns_to_buf (rev=2) / 0x0801d70c→render_atk_def_digits_to_buf (rev=1) / 0x0801d7d0→draw_atk_def_label_to_vram (rev=1) / 0x080f54e0→count_bytes_until_null (rev=1) / 0x0801d830→render_card_level_text_to_buf (rev=2) / 0x080ef454→lookup_level_glyph_index (rev=1) / 0x0801d92c→draw_card_level_label_to_vram (rev=1) / 0x080ef2cc→resolve_card_type_icon_ptr (rev=1) / 0x080edf00→upload_tile_and_palette_from_struct (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 18.15% (47/259). 里程碑: 突破 18%, card_image_decode_wrapper 完整子调用簇落地.
 
 ## BLOCKED 追踪

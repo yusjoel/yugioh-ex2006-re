@@ -853,6 +853,97 @@ RENAMES = [
         "(4) 若 gPrng+0x148 bit2 设置且 [0x02006c2c] bits[2:0]==0, 则翻转 [struct+0x0] bit0 并调用 card_info_page_step_03_unknown. "
         "最终返回 0 (继续更新) 或 1 (触发场景切换)."),
 
+    # 2026-05-02: BATCH-15 落地 #3 (topo=98/99/100/101/102/104/105/106/107/108/109/110/112/113/114)
+    ("FUN_080f6450", "write_oam_entry_with_tile_inc",
+        "OAM write helper (indeg=16) for card_stats render path. "
+        "r0 low16=sprite_slot, high16=oam_y; r1=tile_y_offset; r2=x_coord (9-bit); r3=attr2 base. "
+        "Locates entry in gPrng sprite table (offset 0x1bc), writes attr0/attr1/attr2 halfwords, "
+        "then increments tile count byte. Skips write if tile_y_offset==0x80 (invalid slot). "
+        "Variant of write_oam_entry_from_packed_args with different arg packing."),
+    ("FUN_080f616c", "write_oam_entry_from_packed_args",
+        "High-frequency OAM write primitive (indeg=83), called by card_stats/font_jp/opp_wins. "
+        "r0 low16=x_coord (9-bit), high16=oam_y; r1=tile_index; r2=attr2. "
+        "Locates gPrng sprite table entry, writes attr0/attr1/attr2 halfwords, "
+        "increments tile count byte. DAT_080f61dc=0xfffffe00 masks attr1 X field. "
+        "Same structure as write_oam_entry_with_tile_inc but different arg layout."),
+    ("FUN_0801e490", "draw_card_stat_digits_to_oam",
+        "Called by render_card_stats_oam_for_current_card (FUN_0801e620). "
+        "Reads card_id (r0 low16), looks up card_stats_table row (stride=11 halfwords), "
+        "reads ATK (offset+6)/DEF (offset+5)/type (offset+9), then calls "
+        "write_oam_entry_from_packed_args to write digit sprites to OAM buffer. "
+        "Skips render if ATK not in 1..20 range (Spell/Trap have no ATK). "
+        "For type 22 (Quick-Play Trap) with field[9]!=0, renders a second digit group."),
+    ("FUN_0801e594", "draw_stat_row_sprites_to_oam",
+        "Called by render_card_stats_oam_for_current_card (FUN_0801e620). "
+        "r0=row_count (signed; negative values rounded up by +7 before >>3). "
+        "Folds row_count by 8 to get column/row indices, then loops writing 4 sprite entries "
+        "per row at Y positions 0x70/0x90/0xb0/0xd0 (32px steps) via write_oam_entry_from_packed_args. "
+        "Loop terminates when r6 > 0x8f (GBA screen height-1=143)."),
+    ("FUN_0801e620", "render_card_stats_oam_for_current_card",
+        "Called every frame by tick_card_info_page_by_state (FUN_0801e714). "
+        "Reads current card_id from global state struct 0x0201afb0 (+0x0 bits[17:2]) "
+        "and row_count (+0x20), then calls draw_card_stat_digits_to_oam and "
+        "draw_stat_row_sprites_to_oam to write all card stat sprites to OAM buffer."),
+    ("FUN_0801e714", "tick_card_info_page_by_state",
+        "card_info page per-frame main loop. Reads state halfword from 0x0201afb0+0x4, "
+        "dispatches 4 paths: 0=init (read VCOUNT, call card_info_page_entry), "
+        "1/2/3=each calls render_card_stats_oam_for_current_card + tick_scroll_frame_and_update_pos, "
+        "then tick_blend_fadeout_and_set_dispcnt / update_card_info_page_state / "
+        "tick_blend_fadein_and_poll_done respectively. Increments state each frame; "
+        "returns 1 (page exit) when state overflows, restoring VCOUNT."),
+    ("FUN_0801e7b8", "get_card_data_format_id",
+        "No-arg leaf; returns constant 0x81 (card data format ID / FS entry type tag). "
+        "Called by deck/banlist scene callers (card_ids/card_stats/fs tags) as a "
+        "format version discriminator. Body: movs r0,#0x81; bx lr."),
+    ("FUN_0801e7bc", "lookup_card_entry_by_index",
+        "Word-indexed table lookup: computes r0*4 + DAT_0801e7c8 (0x09e58b08) "
+        "and returns the 32-bit value at that address. "
+        "Standard ROM table fetch primitive used by card_ids/fs callers."),
+    ("FUN_0801e7cc", "load_card_fs_entry_to_struct",
+        "Called by FUN_08103524 (card_ids/fs). r0=slot_index, r1=fs_file_id. "
+        "Computes IWRAM struct offset: 0x0201e2b4 + slot*0x108 (slot*33*8). "
+        "Calls fs_load(r1,0), then parses FS data header: reads +0x8 halfword as count1 -> [r4+0x0], "
+        "copies count1 halfwords from +0xA -> [r4+0xC], reads next halfword as count2 -> [r4+0x8], "
+        "copies count2 halfwords -> [r4+0xCA]. Fills deck card FS data block into IWRAM struct."),
+    ("FUN_0804ab4c", "check_card_pair_allowed",
+        "Boolean card-pair whitelist checker (indeg=41), called by duel_field scene. "
+        "r0=card_id_a, r1=card_id_b. Returns 1 if pair is allowed, 0 otherwise. "
+        "Checks: same ID -> 1; ID-tree of known special card IDs "
+        "(0x12e5/0xfc9/0xfe4/0x1477/0x1303/0x142d/0x150b/0x182c/0x182a/0x10f4 etc.) "
+        "via cmp/beq branches. Used to validate fusion material pairs and special combos."),
+    ("FUN_080ee050", "upload_sprite_tiles_and_write_oam",
+        "Called by FUN_08105bfc (vram/banlist/deck scene). "
+        "r0=x_base, r1=y_base, r2=tile_slot, r3=sprite_frame_desc ptr, [sp+0x30]=packed_extra. "
+        "Reads tile_count from r3, calls copy_bytes_by_halfword twice to upload tile data "
+        "to OBJ VRAM (0x06000800+tile_slot*32 and 0x06008000 second bank), "
+        "then iterates OAM entry list writing attr0/attr1/attr2 via strh. "
+        "Returns tile count written (u16)."),
+    ("FUN_080ee264", "upload_sprite_tiles_with_palette_blend",
+        "Palette-blending variant of upload_sprite_tiles_and_write_oam, same caller FUN_08105bfc. "
+        "r0=x_base, r1=y_base, r2=tile_slot, r3=packed_pal (low byte=palette_id), "
+        "[sp+0x30]=sprite_frame_desc ptr. "
+        "Like upload_sprite_tiles_and_write_oam but adds per-entry palette blend: "
+        "checks attr1 palette flag; if set, ORs palette_id<<8 into attr1 before strh write. "
+        "Used when sprite rendering requires runtime palette index adjustment."),
+    ("FUN_080f0cf8", "setup_line_buf_font_align_and_tile_fields",
+        "Called by setup_line_buf_font_with_char_index (FUN_080f0d8c). "
+        "Wraps setup_line_buf_with_font_and_align (r0=font_ptr, r1=line_buf_ptr, align=1, line_type=2), "
+        "then writes tile coordinate fields to IWRAM line-buf state 0x02006ed0: "
+        "[+0xA] bits[9:0] := r2 & 0x3ff (tile_x), "
+        "[+0xB] bits[7:4] := (r3 & 0xf)<<4 (color nibble), "
+        "[+0xC] bits[5:0] := (r3>>16) & 0x3f (tile_y)."),
+    ("FUN_080f0d8c", "setup_line_buf_font_with_char_index",
+        "Called by FUN_08107198 (banlist/card_frame/font_jp). "
+        "Wraps setup_line_buf_font_align_and_tile_fields (r0-r3 passthrough), "
+        "then reads [sp+0xC] (5th arg) as char_index (5-bit), writes "
+        "[0x02006ed0+0x14] bits[6:1] := (char_index & 0x1f)<<1 (char slot / tile index field). "
+        "Completes full line-buf state initialization for font_jp rendering."),
+    ("FUN_080f506c", "append_text_to_buf_end",
+        "String append utility (indeg=10), called by scene_pack/duel_field/result_screen. "
+        "r0=dst_str (null-terminated), r1=src_str. Scans r0 to find trailing null, "
+        "then copies r1 byte-by-byte to that position, appending a null terminator. "
+        "Equivalent to strcat(r0,r1) with no bounds check."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
