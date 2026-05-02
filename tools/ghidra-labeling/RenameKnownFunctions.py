@@ -540,6 +540,14 @@ RENAMES = [
         "再以硬编码的模式参数（r1=1, r2=1, r3=7, arg5=8, arg6=0x80）调 dispatch_text_render_by_mode，"
         "将字符串渲染到 VRAM OBJ 瓦片（精灵层）。0x80 模式对应 dispatch 内的 JP 8 行字形 OBJ 渲染路径。"),
 
+    # 2026-05-02: zero_obj_vram_tiles (analysis-loop topo=35)
+    ("FUN_08018400", "zero_obj_vram_tiles",
+        "render_jp_text_to_vram_obj OBJ tile CpuSet fill. "
+        "name_input addr 0x08017b44 (x3) + addr 0x08018774 (x1) "
+        "render_jp_text_to_vram_obj. "
+        "BIOS CpuSet SWI 0x0B fill+word mode: "
+        "OBJ VRAM [0x06010000 + tile_idx*32, +num_tiles*32) := 0."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

@@ -75,6 +75,8 @@ cp -r "ghidra/Yu-Gi-Oh WCT 2006.rep" "ghidra/Yu-Gi-Oh WCT 2006.rep.bak-${TS}-pre
 - 把命名条目追加到 `tools/ghidra-labeling/RenameKnownFunctions.py` 的 `(orig, new, plate)` 列表
 - `tools/asm-regen/ghidra-run-script.bat RenameKnownFunctions.py`
 
+> **Jython 2.7 plate 文本 ASCII-only**: plate 文本中禁用弯引号（" " U+201C/U+201D）、全角符号、中文括号等非 ASCII 排版字符，否则 Jython 脚本抛出解析异常 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/ghidra-headless-gotchas.md`（待第 2 次复现后补充该条目）
+
 #### 3c. 重导 asm/all.s
 
 ```bash

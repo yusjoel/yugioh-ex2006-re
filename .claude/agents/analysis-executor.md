@@ -102,6 +102,8 @@ model: sonnet
 
 把每层证据列在 proposal 的"置信度证据"段。
 
+> **bios_cpu_set fill 模式快速通道**: 若函数体内出现 `bios_cpu_set` 调用，立即拆解控制字（bit24=fill? bit26=word? len×4=多少字节? 目标在哪个 GBA 内存区域?）—— 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bios_cpuset_fill_pattern.md` — 四项确认后置信度可升 high，动词直接由 fill_mode + 目标区域决定（`zero_` / `init_` / `fill_`）。
+
 > **render 族分析快速通道**: 若函数名含 `render_glyph_*` 或 caller 已有多个 render 变体 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_render_family_qualifier_naming.md` — 先画"输入模态 × 位深 × 层数"矩阵再命名，矩阵缺格即为额外 L6 证据。
 
 > **单 flag_bit 对称分支快速通道**: 若函数体内或 caller 中存在 `ldrb [ctx+offset]; ands #bitmask; beq/bne <callee>` 模式 — **单 flag_bit 对称分支 → 两个 callee 必然为同操作不同渲染模式变体** — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_symmetric_flag_bit_dispatch.md`；若对称 callee 已命名，可直接推导当前函数名并作为 L6 证据列入置信度证据段。
