@@ -18,6 +18,10 @@ doc/temp/
 temp/
 __pycache__/
 
+# asm/all.s 再生中间产物 (由 ghidra-export-range.bat → inject_modes.py 生成)
+asm/all.s.raw
+asm/all.s.raw.nomode
+
 # 视觉审阅 PNG (脚本可重新生成)
 tools/card-desc/*.png
 
