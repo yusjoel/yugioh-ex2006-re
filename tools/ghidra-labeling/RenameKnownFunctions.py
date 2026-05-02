@@ -409,6 +409,14 @@ RENAMES = [
         "返回 r0=chars_written. 13 个 caller 覆盖 banlist/name_input/pass_input/game_str. "
         "已命名 caller: name_input_page_exit (0x080194ec)."),
 
+    # 2026-05-02: measure_str_bytelen (analysis-loop topo=6)
+    ("FUN_08014ea0", "measure_str_bytelen",
+        "由 FUN_08014eb4 (GL/GL_File.c 字符串搜索) 在子串搜索前调用, 分别测量 pSrc "
+        "和 pKey 的字节长度以确定搜索范围上界. 逐字节遍历直到空字节, 返回不含终止符 "
+        "的字节数 (等同 strlen 语义). 与 count_str_charlen (0x0801455c) 不同, "
+        "本函数只做原始字节计数, 不感知游戏自定义编码宽度. "
+        "调用方将两次返回值之差加一作为搜索循环次数上限."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
