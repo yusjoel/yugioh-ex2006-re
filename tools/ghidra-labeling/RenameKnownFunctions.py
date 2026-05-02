@@ -392,6 +392,15 @@ RENAMES = [
         "Options 子菜单 'Language Selection' (0x0a8f) 入口. options_rows row[1] "
         "init_fn. 待 runtime 验证."),
 
+    # 2026-05-02: count_str_charlen (analysis-loop topo=2)
+    ("FUN_0801455c", "count_str_charlen",
+        "由 settings_080145bc/banlist_0801990c 等跨 banlist/font_jp/game_str/settings "
+        "共 10 个调用方在文字渲染前调用, 用于测量字符串的字符单元数量. "
+        "输入字符串遵循 1/2 字节混合编码: 若字节 bit7=1 则为双字节字符(前导+后继, ptr+2), "
+        "否则单字节(ptr+1). 双字节检测由 [EWRAM+0x6c2c] & 0x7 决定(0=OCG/J 双字节, 非0=TCG 单字节). "
+        "附加标志 [0x0202348c] 在 OCG 模式下可切换为字节计数路径. "
+        "返回 r0=charlen (字符单元总数, 不含 0x00 终止符). 纯只读操作, 无任何内存写入."),
+
     # 2026-05-02: copy_str_unbounded (analysis-loop topo=1)
     ("FUN_08014470", "copy_str_unbounded",
         "无界字符串复制 wrapper. 调用方传入 r0=src, r1=dst; 本函数向 "

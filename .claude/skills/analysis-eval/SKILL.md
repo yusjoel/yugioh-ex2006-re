@@ -12,7 +12,8 @@ description: Score a function naming proposal against the 9-criteria rubric (R1-
 ## 输出位置
 
 - 写入：`doc/dev/eval/<ADDR>.md` (覆盖)
-- ADDR 格式: `0x08014470` (含 `0x` 前缀, 8 位小写 hex)
+- ADDR 格式: `08014470` (**8 位小写 hex, 不含 `0x` 前缀**) — 与现有 PROGRESS.md 链接 + proposal 文件名一致
+- 例: `doc/dev/eval/08014470.md`, `doc/dev/eval/0801455c.md`
 
 ---
 
