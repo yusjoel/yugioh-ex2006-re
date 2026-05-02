@@ -651,6 +651,106 @@ RENAMES = [
         "indeg=22, 由 card_info_page_init_bg0 及多个 bg/vram/display/palette 场景初始化链"
         "在页面切换时调用, 是显示状态完全重置的标准入口."),
 
+    # 2026-05-02: BATCH-15 落地 (topo=56/59/60/61/62/64/66/68/69/70/72/73/74/75/76)
+    ("FUN_080ee988", "resolve_card_gfx_pointer_by_type",
+        "按卡片 ID 查卡片属性表 (card_stats_table), 先读 [0x080000ae] 判断区域码是否为 0x4a (日版特判), "
+        "再用属性字段 (offsets 0x16*id+0x0) 与多个边界值 (0x1497/0x1498/0x1499) 做多路分支, "
+        "结合 IWRAM [0x02000000+0x6c2c] 中的 byte&0x7 作为阵营/属性子类索引, "
+        "最终返回图形数据指针 (ROM 段内地址, 供调用方写入 sprite 参数). 该函数是卡面辅助图形 "
+        "(怪兽属性图标/魔陷/效果等) 的路由核心, 每次绘制卡片信息页时被调用."),
+    ("FUN_0801d510", "render_card_name_to_line_buf",
+        "接收卡片索引 (r0), 从 card_stats_table 读取卡种字段判断是否为特殊宽度 (0x16/0x17), "
+        "再从 IWRAM 状态字 [0x02006c2c] 读取语言/charset 标志调用 select_charset_then_load_name "
+        "加载卡名字符串, 然后按双字节 JP 编码逐字素调用 render_glyph_jp_dual_layer 将卡名渲染进行缓冲区. "
+        "限宽逻辑 (cmp #0x5c) 防止卡名溢出单行. 被 FUN_0801d6b4 (card_image_decode_wrapper 下一级) "
+        "调用, 构成绘制卡片详情页卡名行的核心路径."),
+    ("FUN_080f0bb4", "setup_line_buf_pos_and_font",
+        "初始化 IWRAM 渲染状态结构体 [0x02006ed0] 中的行缓冲位置字段和字体指针字段, "
+        "为随后的字素渲染函数 (render_glyph_jp_dual_layer / blit_glyph_row_to_buffer 等) 准备上下文. "
+        "r0 传入 X 坐标 (低 8 bit 写入 OAM 位置字), r1 传入行号/Y 坐标, "
+        "函数通过多个 mask/orr 操作拼接 OAM 属性字 ([0x02006ed0+0x8]/[+0xa]/[+0xb]/[+0xc]), "
+        "最后从 font_jp_base_table 选取字体位图指针写入 [0x02006ed0+0x4]. "
+        "indeg=57 确认其为所有 JP 字符渲染路径的公共 setup 入口."),
+    ("FUN_080f35e8", "blit_tile_color_to_vram_region",
+        "从 IWRAM 渲染状态结构体 [0x02006ed0] 读取 tile 列数和行数, 然后以双色 (r1 低字节=前景色 4bpp 索引, "
+        "r1 高字节=背景色 4bpp 索引) 对一块矩形 tile 区域执行像素级 OR-mask 写入. "
+        "外层循环按 tile 行 (从结构体读取行/列计数乘积), 内层按列步进 0x40 字节/tile 行, "
+        "对每个非零像素 tile 执行 strh 到 VRAM 基址 (r0). r0 入口保存至 r2 供内层循环使用. "
+        "被 commit_line_buffer_to_sprite_vram 和两个未命名邻居调用, 是将行缓冲区内容刷入 "
+        "OBJ VRAM 的最后一步位操作核心."),
+    ("FUN_080f4ed0", "copy_words_aligned",
+        "将 r1 指向的源缓冲区以 word (32 bit) 为单位复制 ceil(r2/4) 个 word 到 r0 (r3) 指向的目标. "
+        "r2 传入字节数, 函数对其执行 (r2+3)>>2 向上取整得 word 计数, 然后以 ldmia/stmia 对循环复制. "
+        "r2==0 时直接返回. 纯工具函数, 被 commit_line_buffer_to_sprite_vram / pack_detail_bg_tile_load "
+        "等多个 VRAM 写入路径调用, 负责将内存块对齐复制到目标区域."),
+    ("FUN_0801d6b4", "draw_card_name_label_to_vram",
+        "作为 card_image_decode_wrapper 的直接子调用, 负责将卡名文本行渲染并提交到 OBJ VRAM. "
+        "步骤固定三段: (1) 调用 setup_line_buf_pos_and_font (FUN_080f0bb4) 以 x=0xe/y=2 初始化 "
+        "行缓冲区位置和字体指针, 目标 tile 基址 0x06001c00<<2=0x06007000; "
+        "(2) 调用 render_card_name_to_line_buf (FUN_0801d510) 以卡片索引渲染卡名到行缓冲区; "
+        "(3) 调用 commit_line_buffer_to_sprite_vram 将行缓冲区内容刷新到 VRAM 地址 0x06008500. "
+        "indeg=1 (唯一来自 card_image_decode_wrapper), 确认是卡名行的专属绘制函数."),
+    ("FUN_080f1b0c", "blit_glyph_columns_to_buf",
+        "从 r0 指向的字符数据流 (JP 双字节编码序列) 按列循环读取字素 halfword, "
+        "对每个 halfword 分离低字节 (glyph_index&0xff) 后调用 blit_glyph_row_to_buffer "
+        "将字素列数据写入行缓冲区指定位置 (r2=dst_col_start, r3=palette_idx). "
+        "内部计数器初值 0x3 控制循环 (r9 递减至 -1 共 4 次, 处理双字节流中 4 个字素). "
+        "被 FUN_0801d70c 以固定 r1=0x1a/0x22/0x40/0x48 四次调用, 对应 ATK/DEF 数字各位."),
+    ("FUN_0801d70c", "render_atk_def_digits_to_buf",
+        "接收卡片 ATK (r0) 和 DEF (r1) 值, 通过 __umodsi3/__udivsi3 逐位分解十进制数字, "
+        "对 ATK 的个/十/百/千位分别以固定列偏移 (0x36, 0x32, ...) 调用 FUN_080f1b0c "
+        "将数字字素渲染到行缓冲区中对应列; DEF 同理以另一组列偏移渲染. "
+        "行缓冲区基址从 DAT_0801d7c8 (0x0984f59c) 读取, 数字字素基址从 DAT_0801d7cc (0x0984f54c). "
+        "被 FUN_0801d7d0 (draw_atk_def_label_to_vram) 调用, 是 ATK/DEF 数值渲染的计算核心."),
+    ("FUN_0801d7d0", "draw_atk_def_label_to_vram",
+        "card_image_decode_wrapper 的第二个直接子调用, 负责将卡片 ATK/DEF 数值渲染并提交到 OBJ VRAM. "
+        "步骤三段: (1) 调用 setup_line_buf_pos_and_font 以 x=0xe/y=2 + tile 基址 0x06001c00 "
+        "初始化行缓冲区; (2) 调用 render_atk_def_digits_to_buf (FUN_0801d70c) 将 ATK (r0) 和 "
+        "DEF (r1) 数字字素渲染到缓冲区; (3) 调用 commit_line_buffer_to_sprite_vram 以目标地址 "
+        "0x06008580 刷新到 VRAM. 与 draw_card_name_label_to_vram (FUN_0801d6b4) 结构完全对称, "
+        "两者均被 card_image_decode_wrapper 以 indeg=1 调用."),
+    ("FUN_080f54e0", "count_bytes_until_null",
+        "从 r0 指向的字节序列起始处向后扫描, 统计非零字节个数 (即 C strlen 语义), "
+        "结果以 r0 返回. 常量 r2 从 0 自增, r1 指针逐字节步进, 遇到 0x00 停止. "
+        "indeg=22 (高 indeg util), 被 draw_decimal_with_offset 等字符串处理函数调用, "
+        "用于在渲染前获取字符串/字素序列的字节长度."),
+    ("FUN_0801d830", "render_card_level_text_to_buf",
+        "接收 level 字符串表索引 (r0, 来自 lookup_level_glyph_index 返回值), 从 ROM 字符串表 "
+        "(0x09e5f726 = level/type 文字表) 定位对应文本, "
+        "先以固定 4 次调用 blit_glyph_columns_to_buf (FUN_080f1b0c, r1=0x1a/0x22/0x40/0x48) "
+        "将 \"LEVEL\"/\"RANK\" 等标签字素写入缓冲区, "
+        "再调用 count_bytes_until_null 取文本长度, 然后逐字节解码数字 (0x30-0x39 -> %10 取余, "
+        "特殊码 0x3f/'?'->0xe, 0x58/'X'->0xf) 并以 FUN_080f1b0c 渲染各数字字素到对应列. "
+        "被 FUN_0801d92c (draw_card_level_label_to_vram) 调用, 是 Level/Rank 数值行的渲染核心."),
+    ("FUN_080ef454", "lookup_level_glyph_index",
+        "接收卡片索引 (r0, u16 截断), 以步长 0x16 (22 bytes/entry) 在 card_stats_table 中定位该卡行, "
+        "读取 level 字段 (halfword at offset 0), 然后与 level_signature_table 中的特征值逐项比对 "
+        "(最多 0xd=13 项, 步长 0x14=20), 返回匹配项的索引 (0-12), 未找到返回 -1. "
+        "返回值被调用方 FUN_0801d92c 用于选择对应等级字素图案 (Level/Rank 星图)."),
+    ("FUN_0801d92c", "draw_card_level_label_to_vram",
+        "card_image_decode_wrapper 的第三个直接子调用, 负责将卡片等级 (Level/Rank) 星图渲染并提交到 OBJ VRAM. "
+        "先调用 lookup_level_glyph_index (FUN_080ef454) 以卡片索引查 level_signature_table 取等级索引; "
+        "若返回 -1 (无等级数据, 如魔法/陷阱) 则直接返回 0. "
+        "否则调用 setup_line_buf_pos_and_font (FUN_080f0bb4) 以 x=0xe/y=2 初始化行缓冲区, "
+        "再调用 render_card_level_text_to_buf (FUN_0801d830) 渲染等级文字/星图到缓冲区, "
+        "最后 commit_line_buffer_to_sprite_vram 写入 VRAM (目标地址 DAT_0801d994). "
+        "indeg=1, 唯一 caller card_image_decode_wrapper."),
+    ("FUN_080ef2cc", "resolve_card_type_icon_ptr",
+        "按卡片索引 (r0, u16) 从 card_stats_table 读取卡种字段 (偏移 0xb*idx+0x6, halfword), "
+        "先检查 card_index 是否超出总卡数上限 [0x095b7cca]; 超出则返回默认图标指针 (0x0984cfec). "
+        "在范围内时: 字段值 0x16 -> 返回 0x0984cfac (魔法?), 0x17 -> 返回 0x0984cfcc (陷阱?), "
+        "其余: 查辅助索引表 (0x09e4f1c4, 步长 (card_type_subidx+8)*2) 取子类型值 1/2/3/other, "
+        "分别对应返回 0x0984cf4c / 0x0984cf6c / 0x0984cf8c / 0x0984cf2c (各类型图标 ROM 指针). "
+        "被 card_image_decode_wrapper 和 FUN_080c05b4 调用, 为卡片信息页类型图标提供 sprite 源地址."),
+    ("FUN_080edf00", "upload_tile_and_palette_from_struct",
+        "将一个复合数据结构中的 tile 图像数据和调色板数据分两次通过 copy_bytes_by_halfword "
+        "分别上传到 OBJ VRAM (0x06004000+) 和调色板 RAM (0x05000000+). "
+        "r0=tile_index (用于调色板 RAM 写偏移: tile_index*2 + 0x05000000; u16 截断存入 r4), "
+        "r1=src_tile_ref (用于 VRAM 写偏移: src_tile_ref*32 + 0x06004000; lsls r1,#16 >> r0,#11 计算), "
+        "r2=data_struct 指针, [r2+0]=width halfword, r6=r2+width*2+8 为调色板子结构. "
+        "被两个 bg/vram/palette 相关 caller 调用, 是将字体/图标资源一次性写入 VRAM 和调色板的工具函数. "
+        "返回 [r6] (调色板子结构第一个 halfword)."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

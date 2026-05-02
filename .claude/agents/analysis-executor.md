@@ -131,6 +131,7 @@ model: sonnet
 - plate 含弯引号/全角符号 → `feedback_jython_unicode_plate_comment.md`
 - 同 caller 串调 zero_ + render_ → `feedback_clear_then_render_pair.md`
 - 函数体仅 `bx lr` (2 字节) → `feedback_release_noop_stub_fingerprint.md` (类型 A/B 区分; callsite 参数数量是关键)
+- indeg=1 from card_image hub + 调用 commit_line_buffer_to_sprite_vram + setup_line_buf_pos_and_font + render_*_to_buf triple → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_card_stat_label_drawer_cluster.md`
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
