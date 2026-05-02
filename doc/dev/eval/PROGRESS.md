@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 3/259 |
-| **下一步** | 开始分析 `FUN_080fa4dc` (topo=7, L4, indeg=137, C) |
-| **上次更新** | 2026-05-02 13:28 |
+| **当前步骤** | 函数命名循环进行中, 已完成 4/259 |
+| **下一步** | 开始分析 `FUN_08014eb4` (topo=8, L6, indeg=1, E) |
+| **上次更新** | 2026-05-02 13:47 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**3 / 259 (1.16%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**4 / 259 (1.54%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -48,7 +48,7 @@
 | 1 | 1 | L5 | 13 | D | `0x08014470` | FUN_08014470 | copy_str_unbounded | 1 | [eval](08014470.md) |
 | 2 | 2 | L5 | 10 | D | `0x0801455c` | FUN_0801455c | count_str_charlen | 2 | [eval](0801455c.md) |
 | 3 | 6 | L7 | 1 | E | `0x08014ea0` | FUN_08014ea0 | measure_str_bytelen | 1 | [eval](08014ea0.md) |
-| 4 | 7 | L4 | 137 | C | `0x080fa4dc` | FUN_080fa4dc | _(待分析)_ | — | — |
+| 4 | 7 | L4 | 137 | C | `0x080fa4dc` | FUN_080fa4dc | suppress_assert_report | 2 | [eval](080fa4dc.md) |
 | 5 | 8 | L6 | 1 | E | `0x08014eb4` | FUN_08014eb4 | _(待分析)_ | — | — |
 | 6 | 16 | L3 | 3 | E | `0x08016afc` | FUN_08016afc | _(待分析)_ | — | — |
 | 7 | 17 | L5 | 1 | E | `0x080f1720` | FUN_080f1720 | _(待分析)_ | — | — |
@@ -315,9 +315,12 @@
 - 2026-05-02 12:41: 完成 #1 copy_str_unbounded (0x08014470, topo=1, PASSED 45/45, rev=1) — 首函数零缺陷落地
 - 2026-05-02 13:14: 0x0801455c PASSED → count_str_charlen (rev=2)
 - 2026-05-02 13:28: 0x08014ea0 PASSED → measure_str_bytelen (rev=1) — 首轮零缺陷, 纯字节计数 strlen 变体
+- 2026-05-02 13:47: 0x080fa4dc PASSED → suppress_assert_report (rev=2) — 高 indeg=137 / 364 调用点, 发布版空断言回调 (2 字节 bx lr leaf)
 
 ## BLOCKED 追踪
 
-无 BLOCKED 项。
+| SB 编号 | 日期 | 阻塞原因 | 解除前置条件 |
+|---------|------|----------|-------------|
+| SB-080fa4dc-1 | 2026-05-02 | r3 assert_type 枚举语义需 debug build 验证 (函数命名本身已 PASSED) | 找到 debug build 或匹配工程的 assert 宏定义 |
 
 > 格式: `SB-<ADDR>-<N> | <YYYY-MM-DD> | <阻塞原因> | <解除前置条件>`

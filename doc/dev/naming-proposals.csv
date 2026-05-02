@@ -3073,7 +3073,7 @@ address,name,proposed_name,score,tags
 0x080fa4cc,FUN_080fa4cc,,,
 0x080fa4d4,FUN_080fa4d4,,,
 0x080fa4d8,FUN_080fa4d8,,,
-0x080fa4dc,FUN_080fa4dc,,,
+0x080fa4dc,suppress_assert_report,,,
 0x080fa4e4,FUN_080fa4e4,,,
 0x080fa530,FUN_080fa530,,,
 0x080fa570,FUN_080fa570,,,prng

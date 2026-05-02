@@ -417,6 +417,12 @@ RENAMES = [
         "本函数只做原始字节计数, 不感知游戏自定义编码宽度. "
         "调用方将两次返回值之差加一作为搜索循环次数上限."),
 
+    # 2026-05-02: suppress_assert_report (analysis-loop topo=7)
+    ("FUN_080fa4dc", "suppress_assert_report",
+        "发布版空断言回调 (release build no-op). 由 GL/FS/nnsys/游戏各模块断言宏在条件不满足时调用; "
+        "接收 filename/line/expr/assert_type 后立即 bx lr, 不产生任何输出或副作用. "
+        "共 137 个调用函数、364 处调用点, 覆盖 GL_Common.c / GL_File.c / nnsys/g2d/*.c 等 26 个源文件模块."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
