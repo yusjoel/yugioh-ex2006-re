@@ -51,7 +51,7 @@ P0 通过 → Phase 1。
 2. `Grep -n "@ <addr>" asm/all.s` 定位函数, `Read` 完整反汇编
 3. `Read CLAUDE.md` "反汇编命名零容忍词" + 禁止事项段
 4. `Bash python -c ...` 从 `temp/complete_callgraph.csv` 抽 caller/callee
-5. `Glob` + `Read` `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_*.md` 拿到所有已沉淀经验（特别注意 IO 簇知识库 / dispatch 模式 / 命名反模式；**叶子工具函数三要素模式**: 见 `feedback_leaf_utility_oneshot.md` — 若满足三要素 R8 不得以缺 runtime 为由扣分；**assert 路径模块簇锚**: 见 `feedback_assert_path_cluster_anchor.md` — 函数含 `"<dir>/<file>.c"` assert 路径但 executor 未做跨函数模块枚举时可扣 R8）
+5. `Glob` + `Read` `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_*.md` 拿到所有已沉淀经验（特别注意 IO 簇知识库 / dispatch 模式 / 命名反模式；**叶子工具函数三要素模式**: 见 `feedback_leaf_utility_oneshot.md` — 若满足三要素 R8 不得以缺 runtime 为由扣分；**assert 路径模块簇锚**: 见 `feedback_assert_path_cluster_anchor.md` — 函数含 `"<dir>/<file>.c"` assert 路径但 executor 未做跨函数模块枚举时可扣 R8；**render 族 qualifier 矩阵**: 见 `feedback_render_family_qualifier_naming.md` — render 变体命名缺兄弟矩阵分析时可扣 R7/R8）
 6. `Read doc/dev/methodology/function-naming.md` 6 层方法论（确认 executor 是否走完）
 
 ### Phase 2: 逐条评分 (R1-R9)

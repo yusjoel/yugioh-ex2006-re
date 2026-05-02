@@ -102,6 +102,8 @@ model: sonnet
 
 把每层证据列在 proposal 的"置信度证据"段。
 
+> **render 族分析快速通道**: 若函数名含 `render_glyph_*` 或 caller 已有多个 render 变体 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_render_family_qualifier_naming.md` — 先画"输入模态 × 位深 × 层数"矩阵再命名，矩阵缺格即为额外 L6 证据。
+
 ### Phase 3: 命名 + plate
 
 1. **proposed_name** 严格 `verb_object[_qualifier]` 形式

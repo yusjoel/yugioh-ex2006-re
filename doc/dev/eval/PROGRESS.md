@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 7/259 |
-| **下一步** | 开始分析 `FUN_080f1440` (topo=19, L5, indeg=1, E) |
-| **上次更新** | 2026-05-02 14:31 |
+| **当前步骤** | 函数命名循环进行中, 已完成 8/259 |
+| **下一步** | 开始分析 `FUN_080f1070` (topo=21, L6, indeg=1, E) |
+| **上次更新** | 2026-05-02 14:53 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**7 / 259 (2.70%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**8 / 259 (3.09%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -52,7 +52,7 @@
 | 5 | 8 | L6 | 1 | E | `0x08014eb4` | FUN_08014eb4 | find_substr_offset | 1 | [eval](08014eb4.md) |
 | 6 | 16 | L3 | 3 | E | `0x08016afc` | FUN_08016afc | resolve_prhlist_entry_name_ptr | 1 | [eval](08016afc.md) |
 | 7 | 17 | L5 | 1 | E | `0x080f1720` | FUN_080f1720 | render_glyph_indexed_dual_layer | 1 | [eval](080f1720.md) |
-| 8 | 19 | L5 | 1 | E | `0x080f1440` | FUN_080f1440 | _(待分析)_ | — | — |
+| 8 | 19 | L5 | 1 | E | `0x080f1440` | FUN_080f1440 | render_glyph_jp_4bpp_dual_layer | 2 | [eval](080f1440.md) |
 | 9 | 21 | L6 | 1 | E | `0x080f1070` | FUN_080f1070 | _(待分析)_ | — | — |
 | 10 | 22 | L6 | 1 | E | `0x080f1180` | FUN_080f1180 | _(待分析)_ | — | — |
 | 11 | 27 | L5 | 2 | E | `0x080f05d0` | FUN_080f05d0 | _(待分析)_ | — | — |
@@ -319,6 +319,7 @@
 - 2026-05-02 14:05: 0x08014eb4 PASSED → find_substr_offset (rev=1) — GL/GL_File.c 朴素 strstr, 字符串泄漏锚三连 (pSrc/pKey/GL_File.c:38-39), 首轮满分
 - 2026-05-02 14:16: 0x08016afc PASSED → resolve_prhlist_entry_name_ptr (rev=1) — GL/PRH_Main.c 禁止牌名称查询叶子, 字符串泄漏锚 (pDst->nameID) + 数据 label 反推 (game_str_pointer_table/game_str_ja), 首轮满分
 - 2026-05-02 14:31: 0x080f1720 PASSED → render_glyph_indexed_dual_layer (rev=1) — font_jp 渲染族变体, 跳过 char_code_to_glyph_index, 直接以 u8 字形索引查 ROM 字体位图表 4bpp 双写; med 置信度 (3 待运行验证项)
+- 2026-05-02 14:53: 0x080f1440 PASSED → render_glyph_jp_4bpp_dual_layer (rev=2, v1 35/45 → v2 45/45) — font_jp 渲染族 4bpp 替代路径, char_code→glyph_index→font_jp_charset/stride 表定位, 4bpp word 双写 (str+adds r4,#0x20), 溢出/单列双分支; 四层证据三角验证 high 置信度
 
 ## BLOCKED 追踪
 

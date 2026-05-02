@@ -424,6 +424,15 @@ RENAMES = [
         "本函数只做原始字节计数, 不感知游戏自定义编码宽度. "
         "调用方将两次返回值之差加一作为搜索循环次数上限."),
 
+    # 2026-05-02: render_glyph_jp_4bpp_dual_layer (analysis-loop topo=19)
+    ("FUN_080f1440", "render_glyph_jp_4bpp_dual_layer",
+        "由 font_jp_080f21e8 在检测到 [0x02006ed0+0x15]&0x10==1 (4bpp 模式标志) 时调用, "
+        "作为 render_glyph_jp_dual_layer 的 4bpp 替代路径. 接受 u16 char_code, 经 "
+        "char_code_to_glyph_index 映射后查 font_jp_charset_table/font_jp_stride_table "
+        "定位字形位图, 以 4bpp word 写 (str r0,[r4]+adds r4,#0x20 双写) 输出到 OBJ sprite "
+        "tile 缓冲区 (*gfx_state). 按 glyph_width+(x&7)>16 分溢出路径 (跨 tile 列) "
+        "和单列路径两支."),
+
     # 2026-05-02: render_glyph_indexed_dual_layer (analysis-loop topo=17)
     ("FUN_080f1720", "render_glyph_indexed_dual_layer",
         "由 FUN_080f21e8 在检测到字体标志 [0x02006ed0+0x15]&0x10 后调用. "
