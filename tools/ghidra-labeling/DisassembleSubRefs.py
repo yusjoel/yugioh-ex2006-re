@@ -16,8 +16,11 @@ from java.math import BigInteger
 
 import re
 import os
+import csv as csv_mod
 
 ASM_PATH = "asm/all.s"
+COMPLETE_CG = "temp/complete_callgraph.csv"
+DIRECT_CG = "temp/ghidra-funcs-callgraph.csv"
 
 
 def find_repo_root():
@@ -37,10 +40,32 @@ def collect_sub_refs():
         for line in f:
             for m in re.finditer(r"SUB_([0-9a-fA-F]{8})", line):
                 refs.add(int(m.group(1), 16))
-    return sorted(refs)
+    return refs
 
 
-SUB_ADDRS = collect_sub_refs()
+def collect_missing_indirect_callees():
+    """从 complete_callgraph.csv 收集 indirect callee 中尚未是 Ghidra function 的地址"""
+    root = find_repo_root()
+    cg_path = os.path.join(root, COMPLETE_CG)
+    direct_path = os.path.join(root, DIRECT_CG)
+    if not (os.path.exists(cg_path) and os.path.exists(direct_path)):
+        return set()
+    known = set()
+    with open(direct_path) as f:
+        for r in csv_mod.DictReader(f):
+            known.add(int(r["caller_addr"], 16))
+            known.add(int(r["callee_addr"], 16))
+    missing = set()
+    with open(cg_path) as f:
+        for r in csv_mod.DictReader(f):
+            if r["kind"] == "indirect_table":
+                ce = int(r["callee_addr"], 16)
+                if ce not in known:
+                    missing.add(ce)
+    return missing
+
+
+SUB_ADDRS = sorted(collect_sub_refs() | collect_missing_indirect_callees())
 
 
 def _addr(v):
