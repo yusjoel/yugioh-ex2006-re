@@ -473,6 +473,13 @@ RENAMES = [
         "接收 filename/line/expr/assert_type 后立即 bx lr, 不产生任何输出或副作用. "
         "共 137 个调用函数、364 处调用点, 覆盖 GL_Common.c / GL_File.c / nnsys/g2d/*.c 等 26 个源文件模块."),
 
+    # 2026-05-02: count_word_charlen (analysis-loop topo=28)
+    ("FUN_080f1bbc", "count_word_charlen",
+        "由 font_jp_080c76c0/font_jp_080f21e8 在行换行判断前调用, 测量下一个词元的字符数. "
+        "从当前字节指针逐字节扫描: 空白/连字符停止返回; 行末禁則字符(!//:;?)计入后立即返回; "
+        "转义前缀(%/@ 0x25/0x40)跳过继续扫; 句点'.'后跟'.'则连续扫否则计入停止. "
+        "返回值供调用方乘以字符宽度后与行宽阈值 0x17<<3=184px 比较决定是否换行. 纯叶子函数, 无外部副作用."),
+
     # 2026-05-02: test_char_kinsoku_head (analysis-loop topo=27)
     ("FUN_080f05d0", "test_char_kinsoku_head",
         "由 font_jp_080c76c0/font_jp_080f21e8 调用，判断字符是否属于行頭禁則集（不允许出现在行首）。"
