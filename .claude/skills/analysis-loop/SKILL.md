@@ -1,6 +1,6 @@
 ---
 name: analysis-loop
-description: Drive the full function naming analysis loop for a given ROM address (executor → reviewer → fixer → reviewer → ... until 55/55 or BLOCKED → lesson-keeper). Coordinates 4 analysis-* sub-agents. Includes Step 0/1/2 pre-flight (refresh callgraph + closure classification + topo sort if stale) and PROGRESS.md update at the end. Use when the user says "继续命名" / "analyze 0xXXXXXXXX" / "/analysis-loop" / wants to run one function through the full quality gate.
+description: Drive the full function naming analysis loop for a given ROM address (executor → reviewer → fixer → reviewer → ... until 45/45 PASSED → fixer 落地 → lesson-keeper, or BLOCKED → lesson-keeper). Coordinates 4 analysis-* sub-agents. Includes Step 0/1/2 pre-flight (refresh callgraph + closure classification + topo sort if stale) and PROGRESS.md update at the end. Use when the user says "继续命名" / "analyze 0xXXXXXXXX" / "/analysis-loop" / wants to run one function through the full quality gate.
 ---
 
 # Analysis Loop Driver Skill
@@ -24,22 +24,35 @@ description: Drive the full function naming analysis loop for a given ROM addres
 | 角色 | Subagent | 输入 | 输出 |
 |------|---------|------|------|
 | 分析 | `analysis-executor` | ADDR + 上下文 | `doc/dev/eval/<ADDR>.proposal.md` + Executor Report |
-| 审核 | `analysis-reviewer` | proposal + asm/all.s | `doc/dev/eval/<ADDR>.md` (R1-R11 + 清单, 通过 analysis-eval skill 写入) |
-| 修改 | `analysis-fixer` | eval 修改清单 | 改 proposal; PASSED 时写 Ghidra + byte-identical + CSV 同步 + PROGRESS.md 更新 |
+| 审核 | `analysis-reviewer` | proposal + asm/all.s | `doc/dev/eval/<ADDR>.md` (R1-R9 + 清单, 通过 analysis-eval skill 写入) |
+| 修改 | `analysis-fixer` | eval 修改清单 (NEEDS_FIX 模式) 或 PASSED 信号 (落地模式) | NEEDS_FIX: 改 proposal; PASSED: 写 Ghidra + byte-identical + CSV 同步 + PROGRESS.md 更新 |
 | 总结 | `analysis-lesson-keeper` | loop 完整历史 | observation_pool 加条目, 或 ≥ 2 复现晋升 `memory/feedback_*.md` |
 
 ## 评分阈值
 
 | 状态 | 条件 | 行为 |
 |------|------|------|
-| PASSED | 55/55 无 BLOCKER | 跳 Step 6 lesson-keeper, 提示用户 commit |
-| NEEDS_FIX | < 55 无 BLOCKER | 调 fixer → 回 reviewer |
-| BLOCKED | 语义需 runtime 验证 | 登记 SB-<ADDR>-N; lesson-keeper 仍要跑; 不强求 55 |
+| PASSED | 45/45 无 BLOCKER | 调 fixer 落地 phase (Ghidra+asm+build+byte-identical+CSV+PROGRESS) → lesson-keeper, 提示用户 commit |
+| NEEDS_FIX | < 45 无 BLOCKER | 调 fixer (NEEDS_FIX 模式: 改 proposal) → 回 reviewer |
+| BLOCKED | 语义需 runtime 验证 | 登记 SB-<ADDR>-N; 跳过 fixer 落地; lesson-keeper 仍要跑; 不强求 45 |
 | P0_FAILED | proposal 缺失 / 含零容忍词 | 调 fixer 专门处理 P0, 其他清单延后 |
-| MAX_ITER | 达上限仍 < 55 | 停止, 求助用户 |
+| MAX_ITER | 达上限仍 < 45 | 停止, 求助用户 |
 
-> **不接受 54/55**。完美主义是设计目标 — 卡住必须走"求助用户 → BLOCKED 或改 rubric"流程, 不允许自行降级。
+> **不接受 44/45**。完美主义是设计目标 — 卡住必须走"求助用户 → BLOCKED 或改 rubric"流程, 不允许自行降级。
 > BLOCKED 不是失败 — 诚实记录"除阻塞项外已尽力"的状态。
+
+## 评分边界 (重要)
+
+R1-R9 (45 分) 只评 **proposal 文件本身的命名质量**。
+
+**不评的事** (这些是 review PASSED 之后由 fixer 在「落地阶段」机械执行的红线动作, 各自有独立 pass/fail, 不计入评分):
+
+- Ghidra rename / plate comment 是否已写入
+- `naming-proposals.csv` 是否同步
+- asm/all.s 是否已重导
+- ROM 是否 byte-identical (落地 phase 红线: 失败 = abort)
+
+理由: executor 角色边界明确禁止触碰 Ghidra; 把这些算进评分等于结构性扣分, 第一轮 review 注定不能 PASSED。完整说明见 `analysis-eval` skill 的"评分边界"段。
 
 ---
 
@@ -114,31 +127,49 @@ Agent(analysis-reviewer, { ADDR: <addr> })
 
 ```
 if state == PASSED:
-    goto Step 5  # 跳过 fixer, 直接 lesson-keeper (因为 PASSED 意味着上一轮 fixer 已落地)
+    Agent(analysis-fixer, { ADDR, mode: PASSED })  # 落地 phase
+    if Fixer Report byte-identical == ❌:
+        abort + 提示用户回滚 .rep 备份
+    else:
+        goto Step 5  # lesson-keeper
 elif state == BLOCKED:
     登记 SB-<ADDR>-N 到 doc/dev/eval/PROGRESS.md "BLOCKED 追踪"段
-    goto Step 5  # lesson-keeper 仍要跑
+    goto Step 5  # lesson-keeper 仍要跑 (不调 fixer 落地)
 elif state == P0_FAILED:
-    调 fixer 专门处理 P0 → 跳回 Step 2
+    Agent(analysis-fixer, { ADDR, mode: P0_FAILED })  # 删零容忍词 / 补 proposal
+    goto Step 2 (iter += 1)
 elif state == NEEDS_FIX and iter < max-iter:
-    调 fixer → 跳回 Step 2 (iter += 1)
+    Agent(analysis-fixer, { ADDR, mode: NEEDS_FIX })  # 改 proposal
+    goto Step 2 (iter += 1)
 else:  # MAX_ITER
     停止求助用户
 ```
 
-**首轮 reviewer 后**: R1 (CSV 同步) 一定 0 分, 因为 fixer 还没跑过 Phase 3。所以首轮一定走 NEEDS_FIX → fixer → 第 2 轮 reviewer。
+**首轮 reviewer 后**: 如果 proposal 写得好, 完全有可能直接 45/45 PASSED, 第一轮就走 fixer 落地 phase。这与旧版"R1 必扣 0 → 至少 2 轮"不同 — R1/R2 已并入 fixer 落地, 不再算入评分。
 
-### Step 4: fixer
+### Step 4: fixer (NEEDS_FIX 或 P0_FAILED 模式)
 
 ```
-Agent(analysis-fixer, { ADDR: <addr> })
+Agent(analysis-fixer, { ADDR: <addr>, mode: NEEDS_FIX })
 ```
 
 读 Fixer Report:
 - 如 fixer Phase 1 遇"清单项不可执行" → 记录但继续 (下轮 reviewer 重评)
 - 如 fixer 求助用户 → 停止
-- 如 fixer Phase 3 byte-identical 失败 → 立即 abort + 提示用户回滚 .rep 备份
+- NEEDS_FIX 模式不会执行 Phase 3, 所以无 byte-identical 风险
 - 否则 → 回 Step 2
+
+### Step 4': fixer 落地 phase (PASSED 模式, 由 Step 3 触发)
+
+```
+Agent(analysis-fixer, { ADDR: <addr>, mode: PASSED })
+```
+
+执行: Ghidra rename + plate + asm/all.s 重导 + build + byte-identical 验证 + CSV 同步 + PROGRESS.md 更新。
+
+读 Fixer Report:
+- byte-identical ❌ → 立即 abort + 提示用户回滚 .rep 备份 (本函数停止, 不进 lesson-keeper)
+- byte-identical ✅ → 进 Step 5
 
 ### Step 5: lesson-keeper
 
@@ -160,10 +191,10 @@ Agent(analysis-lesson-keeper, {
 ## Analysis Loop Complete: 0x<ADDR>
 
 - Final state: PASSED / BLOCKED / MAX_ITER
-- Final score: X/55
-- Iterations: N (executor 1 + reviewer N + fixer N-1)
+- Final score: X/45
+- Iterations: N (executor 1 + reviewer N + fixer 改 proposal N-1 + fixer 落地 1 (仅 PASSED))
 - Final name: <new_name>
-- byte-identical: ✅ / ❌ / N/A
+- byte-identical: ✅ / ❌ / N/A (BLOCKED)
 - PROGRESS.md updated: ✅ / ❌
 - Lessons: <observation_pool: +M / promoted to feedback: +K>
 - Next candidate (auto-selected): 0x<NEXT_ADDR>
@@ -180,7 +211,7 @@ Agent(analysis-lesson-keeper, {
 
 ## PROGRESS.md 自动更新协议
 
-fixer Phase 4 必须更新以下字段 (用 Edit, 不 Write 整文件):
+fixer Phase 4 (PASSED 模式落地完成后) 必须更新以下字段 (用 Edit, 不 Write 整文件):
 
 | 字段 | 更新逻辑 |
 |------|---------|
@@ -188,7 +219,7 @@ fixer Phase 4 必须更新以下字段 (用 Edit, 不 Write 整文件):
 | 顶部"当前步骤" | 改为下一 candidate 描述 |
 | 顶部"下一步" | 从 closure_topo_order.csv 选最小 topo_idx 未分析 |
 | 顶部"上次更新" | 当前时间 |
-| 函数列表对应行 | "分析后函数名" 填新 name; "rev" +1; "eval" 填链接 |
+| 函数列表对应行 | "分析后函数名" 填新 name; "rev" 填本函数完成命名所需的 reviewer 轮数; "eval" 填链接 |
 | 历史里程碑 | 追加 1 行: `<时间>: <ADDR> PASSED → <new_name>` |
 | BLOCKED 追踪 (如有) | 追加 SB-<ADDR>-N 一行 |
 
@@ -203,6 +234,10 @@ fixer Phase 4 必须更新以下字段 (用 Edit, 不 Write 整文件):
 ### 为什么 reviewer 是独立 sub-agent?
 
 隔离 context。reviewer 默认看不到 executor/fixer 的注释和话术, 只看 proposal/asm/diff。
+
+### 为什么把 Ghidra 同步 / byte-identical 从评分挪到落地 phase?
+
+executor 角色边界禁止触碰 Ghidra, 因此第一轮 review 时 Ghidra 必然没同步; 把这件事算进评分等于结构性扣分, 第一轮注定不能 PASSED, 反复一轮没意义。新设计: R1-R9 (45 分) 只评命名质量, review PASSED → fixer 一次性把所有落地动作 (Ghidra + asm + build + byte-identical + CSV + PROGRESS) 跑完。byte-identical 仍然是红线 (fixer 落地 phase 失败 = abort), 但不参与 0-5 计分。
 
 ### 为什么每函数 PASSED 都跑 lesson-keeper?
 

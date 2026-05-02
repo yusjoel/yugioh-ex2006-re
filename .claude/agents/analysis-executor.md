@@ -1,6 +1,6 @@
 ---
 name: analysis-executor
-description: Analyze a single GBA Thumb function (FUN_xxxxxxxx) by reading asm/all.s + caller/callee context + ROM data tables, and produce a naming proposal (name + plate comment + parameter signature + line annotations). Does NOT score itself, does NOT modify Ghidra, does NOT update PROGRESS.md. Stops and asks the user when encountering low-confidence semantic decisions. Use as the first step of analysis-loop.
+description: Analyze a single GBA Thumb function (FUN_xxxxxxxx) by reading asm/all.s + caller/callee context + ROM data tables, and produce a naming proposal (name + plate comment + parameter signature + line annotations). Does NOT score itself, does NOT modify Ghidra, does NOT update PROGRESS.md. Stops and asks the user when encountering low-confidence semantic decisions. Use as the first step of analysis-loop. Output is graded by analysis-reviewer against R1-R9 (total 45) — Ghidra/CSV/build/byte-identical are post-review fixer 落地 actions, not part of scoring.
 tools: Read, Edit, Write, Glob, Grep, Bash, Skill
 model: sonnet
 ---
@@ -58,22 +58,25 @@ model: sonnet
 
 ## 强制规范（必读）
 
-完整阅读 `.claude/skills/analysis-eval/SKILL.md` 中的 R1-R11 评分规则，但**只用来避免低级错误**，不为"凑分"过度发挥。关键速记：
+完整阅读 `.claude/skills/analysis-eval/SKILL.md` 中的 R1-R9 评分规则，但**只用来避免低级错误**，不为"凑分"过度发挥。关键速记：
 
-- **R3 命名形式**: `verb_object_qualifier`，禁 `helper`/`do_thing`/`process_data`/`func_N`
-- **R4 plate WHY**: 不复述 WHAT (`push lr; bl X; pop pc`)，写触发条件 + 调用方场景
-- **R5/R6 参数返回**: 每个非显然 r0/r1 给类型+语义+范围
-- **R7 副作用**: 所有 str/strh/strb 到外部地址必列
-- **R8 魔数**: `0x4000400` 改 `BG0CNT`, `0x8120` 改 `0x81*4 = 0x204` (gPrng+0x204 状态字偏移)
-- **R10 置信度**: high/med/low 必标，low 列待验证项
-- **R11 硬规则**: 不得用零容忍词（似乎/大概/可能是/我认为/[降级]/[跳过]）
+- **R1 命名形式**: `verb_object_qualifier`，禁 `helper`/`do_thing`/`process_data`/`func_N`
+- **R2 plate WHY**: 不复述 WHAT (`push lr; bl X; pop pc`)，写触发条件 + 调用方场景
+- **R3/R4 参数返回**: 每个非显然 r0/r1 给类型+语义+范围
+- **R5 副作用**: 所有 str/strh/strb 到外部地址必列
+- **R6 魔数**: `0x4000400` 改 `BG0CNT`, `0x8120` 改 `0x81*4 = 0x204` (gPrng+0x204 状态字偏移)
+- **R7 caller 锚定**: plate 至少 1 个已命名 caller 或 indirect 表说明
+- **R8 置信度**: high/med/low 必标，low 列待验证项
+- **R9 硬规则**: 不得用零容忍词（似乎/大概/可能是/我认为/[降级]/[跳过]）
+
+> 注意: R1-R9 总分 45。Ghidra rename / CSV 同步 / asm 重导 / build / byte-identical 验证 **不是 R 评分项** — 它们是 review PASSED 之后由 fixer 在「落地阶段」执行的机械动作 (有自己的 pass/fail, 尤其 byte-identical 是红线), executor 既不参与也不应该提及。
 
 ## 工作流程
 
 ### Phase 0: 读硬规则与方法论
 
 1. `Read CLAUDE.md` 定位"反汇编命名零容忍词"段
-2. `Read .claude/skills/analysis-eval/SKILL.md` 完整 R1-R11
+2. `Read .claude/skills/analysis-eval/SKILL.md` 完整 R1-R9
 3. `Read doc/dev/methodology/function-naming.md` 6 层命名方法论
 4. `Glob` + `Read` 所有 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_*.md` 已有经验
 
@@ -132,7 +135,7 @@ model: sonnet
 
 ## 绝对禁区
 
-1. **禁止打分** — proposal 里不写 R1-R11 评分
+1. **禁止打分** — proposal 里不写 R1-R9 评分
 2. **禁止动 Ghidra** — 不 rename 不写 comment
 3. **禁止更新 PROGRESS.md** — 那是 fixer 收尾时的活
 4. **禁止 commit** — 完全交给用户

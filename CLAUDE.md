@@ -97,14 +97,16 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 **组件**:
 - 4 sub-agent: `analysis-{executor,reviewer,fixer,lesson-keeper}` (位于 `.claude/agents/`)
-- 2 skill: `analysis-eval` (R1-R11 评分单一权威) + `analysis-loop` (驱动器, 含 Step 0+1+2 前置)
+- 2 skill: `analysis-eval` (R1-R9 评分单一权威, 满分 45) + `analysis-loop` (驱动器, 含 Step 0+1+2 前置 + 落地 phase)
 - 经验沉淀: `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_*.md`
 
 **入口**: `Skill: analysis-loop [<addr>]`（不传 addr 则从 PROGRESS.md "下一步"字段读）
 
+**评分 vs 落地分离**: R1-R9 (45 分) 只评 proposal 命名质量。Ghidra rename / asm 重导 / build / byte-identical 验证 / CSV 同步 是 review PASSED 后 fixer 在「落地 phase」执行的红线动作 (byte-identical 失败 = abort + 回滚 .rep), 不计入评分。
+
 ### 反汇编命名零容忍词
 
-eval 文档 / proposal / commit message / agent 输出中出现以下任一 → analysis-eval skill 自动扣 R11 到 0:
+eval 文档 / proposal / commit message / agent 输出中出现以下任一 → analysis-eval skill 自动扣 R9 到 0:
 
 | 词 | 替代 |
 |----|------|
@@ -114,7 +116,7 @@ eval 文档 / proposal / commit message / agent 输出中出现以下任一 → 
 | 还行 / 够用 / 凑合 | 不是评分语言 |
 | `[降级]` / `[跳过]` / `[待补全]` | 立即 abort, 求助用户 |
 
-### 命名形式硬约束 (R3)
+### 命名形式硬约束 (R1)
 
 `proposed_name` 必须 `^[a-z][a-z0-9_]+$` 形式, 且语义 `verb_object[_qualifier]`:
 - ✓ `apply_zone_cursor_step` / `commit_line_buffer_to_sprite_vram`

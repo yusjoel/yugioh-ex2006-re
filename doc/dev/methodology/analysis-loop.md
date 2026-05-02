@@ -1,6 +1,6 @@
 # 方法论：4-agent 函数命名循环 (analysis-loop)
 
-> 用途：自底向上批量命名 ROM 函数, 角色分离防 reward-hacking, R1-R11 单一权威评分, 经验沉淀。
+> 用途：自底向上批量命名 ROM 函数, 角色分离防 reward-hacking, R1-R9 单一权威评分 (45 分), 落地 phase 独立执行, 经验沉淀。
 > 单函数粒度的命名见 [`function-naming.md`](function-naming.md) (6 层方法论); 本文档讲如何把 6 层方法论包装成可大规模运行的 loop。
 
 ---
@@ -69,8 +69,8 @@
 | 角色 | 输入 | 输出 | 禁区 |
 |------|------|------|------|
 | **executor** | ADDR + 上下文 (depth/indeg/class/已命名 caller-callee) | `<ADDR>.proposal.md` (name + plate + sig + 行注释 + 6 层证据) | 不打分 / 不动 Ghidra / 不更新 PROGRESS |
-| **reviewer** | proposal + asm/all.s + callgraph | `<ADDR>.md` (R1-R11 评分 + 可执行清单) 通过 analysis-eval skill 写 | 不修代码 / 不被 proposal 注释污染 / 不打 54/55 / 不豁免硬规则 |
-| **fixer** | eval 清单 | 改 proposal; PASSED 时 → Ghidra rename + plate + asm 重导 + byte-identical + CSV 同步 + PROGRESS 更新 | 不重新打分 / 不顺手优化清单外 / 不迎合 byte-identical 失败 / 不自行降级 / 不 commit |
+| **reviewer** | proposal + asm/all.s + callgraph | `<ADDR>.md` (R1-R9 评分 45 满, + 可执行清单) 通过 analysis-eval skill 写 | 不修代码 / 不被 proposal 注释污染 / 不打 44/45 / 不豁免硬规则 / 不评 Ghidra/CSV/build/byte-identical |
+| **fixer** | NEEDS_FIX: eval 清单; PASSED: 落地信号 | NEEDS_FIX 模式: 改 proposal; PASSED 模式: Ghidra rename + plate + asm 重导 + build + byte-identical + CSV 同步 + PROGRESS 更新 | 不重新打分 / 不顺手优化清单外 / 不迎合 byte-identical 失败 / 不自行降级 / 不 commit / 不在 NEEDS_FIX 模式跑落地 |
 | **lesson-keeper** | loop 完整历史 (proposal/eval 多版本 + fixer reports) | observation_pool +1 行 (1 次观察); ≥2 次同主题晋升 `memory/feedback_*.md` + 回灌引用到 agent/skill | 不沉淀一次性决策 / 不复制规则到 agent (只插引用) / 不动代码 |
 
 ---
@@ -78,33 +78,39 @@
 ## 关键设计
 
 1. **角色边界硬**：executor 不评分; reviewer 不改; fixer 不打分; lesson-keeper 不动代码。
-2. **R1-R11 单一权威**：在 `.claude/skills/analysis-eval/SKILL.md`, agent 全部从这里读。改 rubric 只改一处。
-3. **每条扣分对应可执行清单** (位置 + 当前 + 应改为), fixer 只按清单改不自由发挥。
-4. **每函数 PASSED 后跑 lesson-keeper** (高频, 1 次观察→pool, ≥2 次→feedback)。复现门槛防止把"一次性决策"当通用规则。
-5. **BLOCKED 是合法终态** (函数语义需 runtime mGBA/GDB 验证时, 登记 SB-<ADDR>-N, 不硬凑满分)。
-6. **不自动 commit** — 单函数 PASSED 后停下提示用户, 用户决定 commit message。
+2. **R1-R9 单一权威**：在 `.claude/skills/analysis-eval/SKILL.md`, agent 全部从这里读。改 rubric 只改一处。
+3. **评分 vs 落地分离**: R1-R9 (45 分) 只评 proposal 命名质量; Ghidra 同步 / asm 重导 / build / byte-identical / CSV 同步 是 fixer 在「落地阶段」执行的红线动作 (byte-identical 失败 = abort), 不计入评分。这避免了"executor 不能动 Ghidra → 第一轮必扣 → 至少 2 轮"的结构性循环。
+4. **每条扣分对应可执行清单** (位置 + 当前 + 应改为), fixer 只按清单改不自由发挥。
+5. **每函数 PASSED 后跑 lesson-keeper** (高频, 1 次观察→pool, ≥2 次→feedback)。复现门槛防止把"一次性决策"当通用规则。
+6. **BLOCKED 是合法终态** (函数语义需 runtime mGBA/GDB 验证时, 登记 SB-<ADDR>-N, 不硬凑满分)。
+7. **不自动 commit** — 单函数 PASSED 后停下提示用户, 用户决定 commit message。
 
 ---
 
-## R1-R11 速查表
+## R1-R9 速查表
 
 完整规则与样例见 `.claude/skills/analysis-eval/SKILL.md`。
 
 | ID | 主题 | 0 分 | 5 分 |
 |----|------|---------|---------|
-| R1 | CSV+Ghidra 同步 | naming-proposals.csv 仍 FUN_/SUB_ | name 列已新名 + Ghidra 一致 |
-| R2 | byte-identical | sha1 不一致 | sha1 一致 (proposal 阶段 N/A) |
-| R3 | 命名形式 | 含禁词 / 大写 / 单词 | `verb_object[_qualifier]` 全小写下划线 |
-| R4 | plate WHY | 仅复述 WHAT | 含调用方场景+触发条件+副作用目的 ≥2 项 |
-| R5 | 参数语义 | 标 generic 或漏标 | 每参数 `(类型+含义+范围)` |
-| R6 | 返回值 | 漏 / `0 or 1` 无含义 | 明确成功/失败/output channel |
-| R7 | 副作用 | 任一 str 漏列 | 全列 `[<addr>] := <value>` 含义 |
-| R8 | 魔数符号化 | 裸 `0x4000400` | 用 `.equ` 名或注解偏移 |
-| R9 | caller 锚定 | plate 不提 caller | ≥1 已命名 caller 或 indirect 表说明 |
-| R10 | 置信度 | 漏标 / high 无证据 | high/med/low + low 必列待验证项 |
-| R11 | 硬规则 (二值) | 含零容忍词/降级注释 | grep 全 0 匹配 |
+| R1 | 命名形式 | 含禁词 / 大写 / 单词 | `verb_object[_qualifier]` 全小写下划线 |
+| R2 | plate WHY | 仅复述 WHAT | 含调用方场景+触发条件+副作用目的 ≥2 项 |
+| R3 | 参数语义 | 标 generic 或漏标 | 每参数 `(类型+含义+范围)` |
+| R4 | 返回值 | 漏 / `0 or 1` 无含义 | 明确成功/失败/output channel |
+| R5 | 副作用 | 任一 str 漏列 | 全列 `[<addr>] := <value>` 含义 |
+| R6 | 魔数符号化 | 裸 `0x4000400` | 用 `.equ` 名或注解偏移 |
+| R7 | caller 锚定 | plate 不提 caller | ≥1 已命名 caller 或 indirect 表说明 |
+| R8 | 置信度 | 漏标 / high 无证据 | high/med/low + low 必列待验证项 |
+| R9 | 硬规则 (二值) | 含零容忍词/降级注释 | grep 全 0 匹配 |
 
-满分 55 (R2 在 proposal 阶段 N/A 不计)。**不接受 54/55**。**0/5 二值评分** (命名场景模糊更少, 二值更适合)。
+满分 45。**不接受 44/45**。**0/5 二值评分** (命名场景模糊更少, 二值更适合)。
+
+不在评分内 (review PASSED 后由 fixer 在落地 phase 执行, 各自独立 pass/fail):
+- Ghidra rename + plate comment 写入
+- naming-proposals.csv 同步
+- asm/all.s 重导
+- build (NOPAUSE=1 ./build.bat)
+- ROM byte-identical 验证 (失败 = abort + 回滚 .rep 备份)
 
 ---
 
@@ -160,13 +166,13 @@
 
 | 状态 | 条件 | 行为 |
 |------|------|------|
-| **PASSED** | 55/55 无 BLOCKER | 跳到 lesson-keeper, 提示用户 commit |
-| **NEEDS_FIX** | < 55 无 BLOCKER | 调 fixer → 回 reviewer (iter += 1) |
-| **BLOCKED** | 函数语义需 runtime 验证 | 登记 SB-<ADDR>-N; lesson-keeper 仍要跑; 不强求 55 |
+| **PASSED** | 45/45 无 BLOCKER | 调 fixer 落地 phase (Ghidra+asm+build+byte-identical+CSV+PROGRESS) → lesson-keeper, 提示用户 commit |
+| **NEEDS_FIX** | < 45 无 BLOCKER | 调 fixer (NEEDS_FIX 模式: 改 proposal) → 回 reviewer (iter += 1) |
+| **BLOCKED** | 函数语义需 runtime 验证 | 登记 SB-<ADDR>-N; 跳过落地; lesson-keeper 仍要跑; 不强求 45 |
 | **P0_FAILED** | proposal 缺失 / 含零容忍词 | 调 fixer 专门处理 P0, 其他清单延后 |
-| **MAX_ITER** | 达上限仍 < 55 | 停止, 求助用户 (改 rubric 或拆 scope) |
+| **MAX_ITER** | 达上限仍 < 45 | 停止, 求助用户 (改 rubric 或拆 scope) |
 
-首轮 reviewer 后 R1 (CSV 同步) 一定 0 分 (fixer 还没跑过 Phase 3), 所以首轮一定走 NEEDS_FIX → fixer → 第 2 轮 reviewer。
+首轮 reviewer 后如果 proposal 写得好, 完全可能直接 45/45 PASSED, 一轮就走 fixer 落地。这与旧版 (含 R1 CSV+Ghidra 同步) 不同 — 旧版第一轮 R1 必扣 0, 至少 2 轮; 新版把 Ghidra/CSV/build/byte-identical 全挪到 fixer 落地 phase, 不参与计分。
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: analysis-eval
-description: Score a function naming proposal against the 11-criteria rubric (R1-R11, total 55) and write a complete doc/dev/eval/<ADDR>.md file with scores, evidence, and a mandatory executable fix list. Use when reviewing function naming proposals, or whenever the user says "评分 X 函数命名" / "review naming proposal X" / "看看这次命名质量". This skill encapsulates BOTH the rubric AND the eval doc format — they are inseparable.
+description: Score a function naming proposal against the 9-criteria rubric (R1-R9, total 45) and write a complete doc/dev/eval/<ADDR>.md file with scores, evidence, and a mandatory executable fix list. Use when reviewing function naming proposals, or whenever the user says "评分 X 函数命名" / "review naming proposal X" / "看看这次命名质量". This skill encapsulates BOTH the rubric AND the eval doc format — they are inseparable.
 ---
 
 # Analysis Evaluation Skill
@@ -16,11 +16,27 @@ description: Score a function naming proposal against the 11-criteria rubric (R1
 
 ---
 
+## 评分边界 (重要)
+
+本 skill 只评 **命名质量** — 即 proposal 文件 (`doc/dev/eval/<ADDR>.proposal.md`) 是否值得被采纳。
+
+**不评的事**:
+- Ghidra 是否已 rename / plate comment 是否已写入
+- `naming-proposals.csv` 是否同步
+- asm/all.s 是否已重导
+- ROM 是否 byte-identical
+
+以上 4 项 (Ghidra 同步 + CSV 同步 + asm 重导 + byte-identical 验证) 是 **review PASSED 之后** 由 `analysis-fixer` 在「落地阶段」统一执行的机械动作。它们有自己的 pass/fail (尤其 byte-identical = 红线), 但**不计入 R1-R9 评分**。
+
+理由: executor 不允许触碰 Ghidra (角色边界), 因此第一轮 review 时 Ghidra 必然未同步; 把这件事算进评分等于结构性扣分, 反复一轮没意义。
+
+---
+
 ## 元规则 1: 豁免权唯一归属用户 (零容忍)
 
-reviewer / executor / fixer **不得自行协商、申请、接受任何 R1-R11 规则的豁免**。包括但不限于:
+reviewer / executor / fixer **不得自行协商、申请、接受任何 R1-R9 规则的豁免**。包括但不限于:
 
-- executor 写"// 此处豁免 R5 因为..."
+- executor 写"// 此处豁免 R3 因为..."
 - fixer 在清单项写"加豁免注释说明规避"
 - reviewer 看到豁免说辞后打满分
 - 任何形式的"特例声明"、"环境限制说明"、"这里确实没办法所以允许"
@@ -56,34 +72,12 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 ---
 
-## R1-R11 评分规则 (针对函数命名场景定制)
+## R1-R9 评分规则 (针对函数命名场景定制)
 
-> 每条满分 5 分, 总分 55。**二值评分: 0 或 5, 不接受 3 分中间档** (与原 refactor-loop 模板不同, 命名场景模糊更少, 二值更适合)。
-> R11 硬规则只有 0 或 5。
+> 每条满分 5 分, 总分 45。**二值评分: 0 或 5, 不接受 3 分中间档** (与原 refactor-loop 模板不同, 命名场景模糊更少, 二值更适合)。
+> R9 硬规则只有 0 或 5。
 
-### R1 — 目标达成 (CSV + Ghidra 同步)
-
-**要求**: `naming-proposals.csv` 中该 addr 的 `name` 列已是新名 (不再是 FUN_/SUB_), 且与 Ghidra 内 rename 一致。
-
-**5 分**:
-- `grep "^0x<ADDR>" doc/dev/naming-proposals.csv` 返回的 name 列 ≠ FUN_/SUB_/空
-- 跑 `tools/asm-regen/ghidra-run-script.bat ExportFunctionInventory.py` + `sync_ghidra_names_to_proposals.py` 后 0 diff
-
-**0 分**: 任一条件不满足 (典型: proposal 阶段 reviewer 第 1 轮必扣此条, 直到 fixer Phase 3 应用)
-
-**清单生成规则**: 列出 fixer 需要执行的命令 (rename + sync)
-
-### R2 — byte-identical 保留
-
-**要求**: Ghidra rename + plate comment 应用后, 重导 asm/all.s + build, ROM SHA1 不变。
-
-**5 分**: `sha1sum roms/2343.gba output/2343.gba` 两行一致
-
-**0 分**: SHA1 不一致 → 必须 abort 求助用户 (Ghidra 状态污染 / Edit 误改 / inject_modes 结果异常)
-
-**清单生成规则**: 列出 abort 命令 (回滚 .rep 备份)
-
-### R3 — 命名形式
+### R1 — 命名形式
 
 **要求**: `proposed_name` 严格符合 `^[a-z][a-z0-9_]+$`, 且语义为 `verb_object[_qualifier]`
 
@@ -102,7 +96,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 给出符合形式的备选名 (≥ 2 个), 让 fixer 选
 
-### R4 — plate explains WHY (不复述 WHAT)
+### R2 — plate explains WHY (不复述 WHAT)
 
 **要求**: plate comment 不能仅复述指令序列, 必须含 (调用方场景 + 触发条件 + 副作用目的) 中至少 2 项, 且为中文。
 
@@ -119,7 +113,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 给出符合 5 分要求的 plate 重写
 
-### R5 — 参数语义
+### R3 — 参数语义
 
 **要求**: 函数所有非显然 r0/r1/r2/r3 参数都标 `(类型 + 含义 + 范围/枚举)`
 
@@ -135,12 +129,12 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 列出每个不合格参数 + 应改为的描述 (基于 asm/all.s 函数体推断)
 
-### R6 — 返回值语义
+### R4 — 返回值语义
 
 **要求**: 返回值 (r0) 含义明确, 含成功/失败/output channel
 
 **5 分**:
-- 例: "r0 = u32 status (0=success, 1=insufficient_buffer, 2=invalid_card)" 
+- 例: "r0 = u32 status (0=success, 1=insufficient_buffer, 2=invalid_card)"
 - 例: "r0 = u8 next_state (0..0xb 表 page state idx)"
 - 无返回值: "void (无返回, 仅副作用)"
 
@@ -151,7 +145,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 基于 asm/all.s 函数体内 movs r0,#X 序列 + caller 对 r0 的使用模式, 推出语义
 
-### R7 — 副作用列表
+### R5 — 副作用列表
 
 **要求**: 函数体内所有 str/strh/strb 到外部地址 (非 sp 相对) 都列出, 含 (地址 + 写入值含义)
 
@@ -172,7 +166,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: grep asm/all.s 函数体内 str/strh/strb, 对每条列出"应改为"
 
-### R8 — 魔数符号化
+### R6 — 魔数符号化
 
 **要求**: 不保留 `0x4000400` / `0x8120` / `0x10c0` 等裸字面量未解释。用 `.equ` 名 (如 `BG0CNT`) 或注解 (如 `0x8120 → 0x81*4 = 0x204` 偏移)。
 
@@ -188,7 +182,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: grep proposal 的"行级注释"段, 找出裸 hex 数字, 对每个给出符号化形式
 
-### R9 — caller 上下文锚定
+### R7 — caller 上下文锚定
 
 **要求**: plate 至少含 1 条 `调用方: <name>` (已命名的 caller) 或 "通过 <table> entry[N] 间接调用" (indirect)
 
@@ -202,7 +196,7 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 从 `temp/complete_callgraph.csv` grep 该 addr 的 caller, 列出已命名的填入 plate
 
-### R10 — 置信度诚实
+### R8 — 置信度诚实
 
 **要求**: proposal 必须标 `confidence: high/med/low`, 且置信度与证据匹配
 
@@ -218,11 +212,11 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 **清单生成规则**: 检查证据数 vs 置信度, 给出应改为的级别
 
-### R11 — 硬规则合规 (零容忍, 0 或 5)
+### R9 — 硬规则合规 (零容忍, 0 或 5)
 
 **要求**: 不得违反 `CLAUDE.md` 禁止事项 / 项目硬规则。
 
-R11 = 5 / 0 二值, 无中间档。reviewer 在评 R11 之前必须 grep:
+R9 = 5 / 0 二值, 无中间档。reviewer 在评 R9 之前必须 grep:
 
 | 违规模式 | grep 命令 (从仓库根) | 触发条件 |
 |---------|--------------------|---------|
@@ -234,7 +228,7 @@ R11 = 5 / 0 二值, 无中间档。reviewer 在评 R11 之前必须 grep:
 
 **5 分**: 上述全部 0 匹配。
 
-**清单生成规则**: 列出每个违规位置 + 删除/改写指令; **eval 顶部必加红字** `⚠️ HARD RULE VIOLATION (R11)`
+**清单生成规则**: 列出每个违规位置 + 删除/改写指令; **eval 顶部必加红字** `⚠️ HARD RULE VIOLATION (R9)`
 
 ---
 
@@ -243,19 +237,17 @@ R11 = 5 / 0 二值, 无中间档。reviewer 在评 R11 之前必须 grep:
 ```markdown
 | 编号 | 要求 | 得分 | 证据 (位置) | 对应清单项 |
 |------|------|------|------------|----------|
-| R1 | CSV+Ghidra 同步 | 0/5 | naming-proposals.csv:行 仍为 FUN_xxxxxxxx | #1 |
-| R2 | byte-identical | N/A | proposal 阶段未跑 build | — |
-| R3 | 命名形式 | 5/5 | proposal:#proposed_name = render_page_title_text | — |
-| R4 | plate WHY | 0/5 | plate 仅复述指令序列, 缺触发条件/调用方场景 | #2 |
-| R5 | 参数语义 | 0/5 | r0 标"input", r1 漏标 | #3 |
-| R6 | 返回值 | 5/5 | "r0 = void" 明确 | — |
-| R7 | 副作用 | 0/5 | str r0,[r4,#0] @ 0x08014482 漏列 | #4 |
-| R8 | 魔数符号化 | 0/5 | 0x4000400 未注 BG2CNT | #5 |
-| R9 | caller 锚定 | 0/5 | plate 不提 caller | #6 |
-| R10 | 置信度 | 0/5 | 漏标 confidence | #7 |
-| R11 | 硬规则 | 5/5 | grep 全 0 匹配 | — |
+| R1 | 命名形式 | 5/5 | proposal:#proposed_name = render_page_title_text | — |
+| R2 | plate WHY | 0/5 | plate 仅复述指令序列, 缺触发条件/调用方场景 | #1 |
+| R3 | 参数语义 | 0/5 | r0 标"input", r1 漏标 | #2 |
+| R4 | 返回值 | 5/5 | "r0 = void" 明确 | — |
+| R5 | 副作用 | 0/5 | str r0,[r4,#0] @ 0x08014482 漏列 | #3 |
+| R6 | 魔数符号化 | 0/5 | 0x4000400 未注 BG2CNT | #4 |
+| R7 | caller 锚定 | 0/5 | plate 不提 caller | #5 |
+| R8 | 置信度 | 0/5 | 漏标 confidence | #6 |
+| R9 | 硬规则 | 5/5 | grep 全 0 匹配 | — |
 
-**总分: 15/55** (R2 N/A 不计 — fixer 阶段补)
+**总分: 15/45**
 ```
 
 ## eval 文档格式
@@ -301,9 +293,9 @@ R11 = 5 / 0 二值, 无中间档。reviewer 在评 R11 之前必须 grep:
 
 | 版本 | 日期 | 分数 | 状态 | 变更 |
 |------|------|------|------|------|
-| v1 | YYYY-MM-DD HH:MM | 15/55 | NEEDS_FIX | 首次评分; 修改清单 #1-#7 |
-| v2 | YYYY-MM-DD HH:MM | 50/55 | NEEDS_FIX | fixer 应用 #1-#6, R10 仍未达标 (置信度 evidence 不足) |
-| v3 | YYYY-MM-DD HH:MM | 55/55 | PASSED | fixer 补充 R10 evidence, 跑 byte-identical 通过 |
+| v1 | YYYY-MM-DD HH:MM | 15/45 | NEEDS_FIX | 首次评分; 修改清单 #1-#6 |
+| v2 | YYYY-MM-DD HH:MM | 40/45 | NEEDS_FIX | fixer 应用 #1-#5, R8 仍未达标 (置信度 evidence 不足) |
+| v3 | YYYY-MM-DD HH:MM | 45/45 | PASSED | fixer 补充 R8 evidence, review 通过 |
 ```
 
 ---
@@ -321,10 +313,10 @@ R11 = 5 / 0 二值, 无中间档。reviewer 在评 R11 之前必须 grep:
 
 ## 分数与清单的一致性自检
 
-- 总分 = 各 Rx 得分之和 (N/A 项不计)
+- 总分 = 各 Rx 得分之和 (BLOCKED 项扣 0 不算 N/A)
 - 非满分 Rx 必须有 ≥ 1 清单条目对应
 - 清单项编号与"对应清单项"列必须一致
-- PASSED 必须 55/55 (R2 已跑且 5/5)
+- PASSED 必须 45/45
 
 任一不一致 → 重写 eval。
 
@@ -353,3 +345,4 @@ Skill(skill="analysis-eval", args="0x080fa4dc")
 - 不是命名生成器 — 只评分 + 写 eval
 - 不是 Ghidra 调用工具 — fixer 负责 rename
 - 不是 commit 工具 — commit 是用户决定
+- 不评 byte-identical / Ghidra 同步 / CSV 同步 — 这些是 fixer 落地阶段的红线动作 (有自己的 pass/fail), 不计入 R1-R9 评分
