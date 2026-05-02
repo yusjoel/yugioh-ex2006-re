@@ -424,6 +424,14 @@ RENAMES = [
         "本函数只做原始字节计数, 不感知游戏自定义编码宽度. "
         "调用方将两次返回值之差加一作为搜索循环次数上限."),
 
+    # 2026-05-02: render_glyph_indexed_dual_layer (analysis-loop topo=17)
+    ("FUN_080f1720", "render_glyph_indexed_dual_layer",
+        "由 FUN_080f21e8 在检测到字体标志 [0x02006ed0+0x15]&0x10 后调用. "
+        "直接以 u8 字形索引(0-255)查 ROM 字体位图表(窄字 10B/条目 @ 0x09ccb490, "
+        "宽字 12B/条目 @ 0x09ccbe90), 将字形以 4bpp 双写方式展开并写入 OBJ tile 缓冲区 "
+        "(*[0x02006ed0]). 跳过 char_code_to_glyph_index 映射, 适用于小字符集快速渲染路径. "
+        "双写(两次 str 间距+0x20)对应同一字形行在 sprite tile 内的两个 4bpp 横向分区."),
+
     # 2026-05-02: resolve_prhlist_entry_name_ptr (analysis-loop topo=16)
     ("FUN_08016afc", "resolve_prhlist_entry_name_ptr",
         "由 card_list_screen_init/FUN_081061d0/FUN_08107198 在 banlist 界面调用. "
