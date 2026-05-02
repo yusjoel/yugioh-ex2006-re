@@ -185,17 +185,25 @@ BLOCKED 与"豁免"区别: 豁免是想绕过规则, BLOCKED 是诚实记录"卡
 
 ### R7 — caller 上下文锚定
 
-**要求**: plate 至少含 1 条 `调用方: <name>` (已命名的 caller) 或 "通过 <table> entry[N] 间接调用" (indirect)
+**要求**: plate 至少含 1 条具体可定位的 caller 信息, 三种合法形式择一:
+
+(a) **已命名 caller** — 直接给语义名 (首选, 当 caller 已命名)
+(b) **In-closure pending caller** — `addr 0x0xxxxxxx` + naming-proposals.csv 中的 `tags` + 一句简述角色 (当 caller 是 closure 内待命名函数, 即按 topo 排序后续会命名)
+(c) **Indirect dispatch** — 通过 fn_ptr table 间接调用时, "通过 `0x09xxxxxx` <table_name> entry[N] 间接派发, 由 <已命名根函数> 触发"
 
 **5 分**:
-- 例: "调用方: main_dispatch_loop (per-frame), enter_deck_edit_page (一次性 init)"
-- 例: "通过 `0x09e60a8c` deck_edit page table entry[3] 间接派发, 由 enter_deck_edit_page 触发"
+- 例 (a): "调用方: main_dispatch_loop (per-frame), enter_deck_edit_page (一次性 init)"
+- 例 (b): "调用方 addr 0x08018774 (tags: font_jp;name_input, 调用 1 次, name_input 子树, 待命名) — 本函数是其文字渲染适配器"
+- 例 (c): "通过 `0x09e60a8c` deck_edit page table entry[3] 间接派发, 由 enter_deck_edit_page 触发"
 
 **0 分** (任一):
 - plate 完全不提调用方
-- 仅说 "called by other functions" 无具体名
+- 仅说 "called by other functions" / "called by FUN_xxxxxxxx" 无 tags / 无 role 描述
+- 形式 (b) 缺 tags 或缺一句简述角色
 
-**清单生成规则**: 从 `temp/complete_callgraph.csv` grep 该 addr 的 caller, 列出已命名的填入 plate
+**清单生成规则**: 从 `temp/complete_callgraph.csv` 抽 caller 列表, 优先用形式 (a); caller 都未命名时用形式 (b), 必须 grep `naming-proposals.csv` 拿到 tags + 写一句简述
+
+**rationale (设计动机)**: topo 排序保证 callee 先于 caller 命名, 因此非根函数的 caller 大概率未命名; 强制要求"已命名 caller"会导致 R7 在闭包内大面积扣分, 与 R7 "锚定上下文"原意背离 — 形式 (b) 提供同等信息密度。
 
 ### R8 — 置信度诚实
 

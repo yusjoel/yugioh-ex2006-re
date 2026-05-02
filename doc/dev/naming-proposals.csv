@@ -151,7 +151,7 @@ address,name,proposed_name,score,tags
 0x08018254,FUN_08018254,,,bg
 0x08018260,FUN_08018260,,,
 0x080182ec,FUN_080182ec,,,
-0x080183d0,FUN_080183d0,font_jp_080183d0,2,font_jp
+0x080183d0,render_jp_text_to_vram_obj,,,font_jp
 0x08018400,FUN_08018400,,,
 0x08018434,FUN_08018434,,,
 0x0801848c,FUN_0801848c,settings_0801848c,3,settings

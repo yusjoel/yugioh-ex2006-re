@@ -530,6 +530,16 @@ RENAMES = [
         "与使用 BG VRAM（0x06000020）的 FUN_08017798 形成对称：该函数覆盖 OBJ 精灵 VRAM 区，"
         "且 tile 行索引由调用方参数决定，适用于名字输入页面的多行文字 tile 槽配置。"),
 
+    # 2026-05-02: render_jp_text_to_vram_obj (analysis-loop topo=34)
+    ("FUN_080183d0", "render_jp_text_to_vram_obj",
+        "name_input 页面文字渲染的薄包装函数。由 name_input 页面渲染子树的两个上层函数调用："
+        "addr 0x08017b44（tags: game_str;name_input，场景文字行列渲染，调用 3 次）和 addr 0x08018774"
+        "（tags: font_jp;name_input，当前被选中字符高亮显示，调用 1 次）；两者均尚未命名，通过 name_input "
+        "EWRAM 缓冲区 0x02029250 + FUN_08018400 计算 vram_row 后压栈传入本函数；本函数先调 "
+        "setup_font_jp_ctx_obj_vram_row 配置 JP 字体渲染上下文（目标 VRAM OBJ 行 + 图层模式），"
+        "再以硬编码的模式参数（r1=1, r2=1, r3=7, arg5=8, arg6=0x80）调 dispatch_text_render_by_mode，"
+        "将字符串渲染到 VRAM OBJ 瓦片（精灵层）。0x80 模式对应 dispatch 内的 JP 8 行字形 OBJ 渲染路径。"),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

@@ -65,7 +65,7 @@ model: sonnet
 - **R3/R4 参数返回**: 每个非显然 r0/r1 给类型+语义+范围
 - **R5 副作用**: 所有 str/strh/strb 到外部地址必列
 - **R6 魔数**: `0x4000400` 改 `BG0CNT`, `0x8120` 改 `0x81*4 = 0x204` (gPrng+0x204 状态字偏移)
-- **R7 caller 锚定**: plate 至少 1 个已命名 caller 或 indirect 表说明
+- **R7 caller 锚定**: plate 至少 1 个已命名 caller 或形式 (b) addr+tags+role（topo pending）或 indirect 表说明 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md`
 - **R8 置信度**: high/med/low 必标，low 列待验证项
 - **R9 硬规则**: 不得用零容忍词（似乎/大概/可能是/我认为/[降级]/[跳过]）
 
@@ -125,6 +125,8 @@ model: sonnet
 2. proposed_name 形如 `^[a-z][a-z0-9_]+$`，无大写无连字符
 3. 置信度标了 (high/med/low)
 4. 参数 r0/r1 类型不是裸 "input"
+5. **ARM 助记符冲突检查**: `proposed_name` 每段与 `str/ldr/mov/cmp/sub/add/bl/bx/pop/push` 逐一比对；任一匹配 → 立即换词（`_str_`→`_text_`，`_ldr_`→`_fetch_` 等）— 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_arm_mnemonic_collision.md`
+6. **R7 pending caller 预填**: 若所有 caller 均为 FUN_*，直接用形式 (b) addr+tags+role 写入 plate，不留空 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md`
 
 ### Phase 5: 完成报告
 
