@@ -433,6 +433,15 @@ RENAMES = [
         "tile 缓冲区 (*gfx_state). 按 glyph_width+(x&7)>16 分溢出路径 (跨 tile 列) "
         "和单列路径两支."),
 
+    # 2026-05-02: blit_glyph_row_colored (analysis-loop topo=22)
+    ("FUN_080f1180", "blit_glyph_row_colored",
+        "由 render_glyph_jp_single_layer (0x080f19a4) 在逐字符渲染循环中按字符高度的一半 (每字符 2 次) 调用, "
+        "仅在渲染上下文要求显式色彩覆盖时激活 (调用方 sp+0x8 标志非零时分派到本函数, 为零则改调 blit_glyph_row_to_buffer). "
+        "与 blit_glyph_row_to_buffer (0x080f0f70) 处理同一 row 方向写入, 关键区别在于 r3 额外传入显式前/背景颜色 nibble "
+        "(低 4 位前景, 高 4 位背景), 每次迭代同时写两个相邻像素位置, "
+        "按 [0x02006ed0+0x15] bit3 区分 4bpp (nibble read-modify-write) 与 8bpp (byte write) 两路, "
+        "将像素写入 EWRAM 字形 tile 缓冲区."),
+
     # 2026-05-02: blit_glyph_col_to_buffer (analysis-loop topo=21)
     ("FUN_080f1070", "blit_glyph_col_to_buffer",
         "由 render_glyph_jp_single_layer (0x080f19a4) 在逐字符渲染循环中每字符调用 6 次, "

@@ -27,14 +27,14 @@
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 9/259 |
-| **下一步** | 开始分析 `FUN_080f1180` (topo=22, L6, indeg=1, E) |
-| **上次更新** | 2026-05-02 15:08 |
+| **当前步骤** | 函数命名循环进行中, 已完成 10/259 |
+| **下一步** | 开始分析 `FUN_080f05d0` (topo=27, L5, indeg=2, E) |
+| **上次更新** | 2026-05-02 15:22 |
 | **上次 callgraph 刷新** | 2026-05-02 11:00 |
 
 ## 进度
 
-**9 / 259 (3.47%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**10 / 259 (3.86%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -54,7 +54,7 @@
 | 7 | 17 | L5 | 1 | E | `0x080f1720` | FUN_080f1720 | render_glyph_indexed_dual_layer | 1 | [eval](080f1720.md) |
 | 8 | 19 | L5 | 1 | E | `0x080f1440` | FUN_080f1440 | render_glyph_jp_4bpp_dual_layer | 2 | [eval](080f1440.md) |
 | 9 | 21 | L6 | 1 | E | `0x080f1070` | FUN_080f1070 | blit_glyph_col_to_buffer | 1 | [eval](080f1070.md) |
-| 10 | 22 | L6 | 1 | E | `0x080f1180` | FUN_080f1180 | _(待分析)_ | — | — |
+| 10 | 22 | L6 | 1 | E | `0x080f1180` | FUN_080f1180 | blit_glyph_row_colored | 1 | [eval](080f1180.md) |
 | 11 | 27 | L5 | 2 | E | `0x080f05d0` | FUN_080f05d0 | _(待分析)_ | — | — |
 | 12 | 28 | L5 | 2 | E | `0x080f1bbc` | FUN_080f1bbc | _(待分析)_ | — | — |
 | 13 | 29 | L4 | 3 | E | `0x080f21e8` | FUN_080f21e8 | _(待分析)_ | — | — |
@@ -321,6 +321,7 @@
 - 2026-05-02 14:31: 0x080f1720 PASSED → render_glyph_indexed_dual_layer (rev=1) — font_jp 渲染族变体, 跳过 char_code_to_glyph_index, 直接以 u8 字形索引查 ROM 字体位图表 4bpp 双写; med 置信度 (3 待运行验证项)
 - 2026-05-02 14:53: 0x080f1440 PASSED → render_glyph_jp_4bpp_dual_layer (rev=2, v1 35/45 → v2 45/45) — font_jp 渲染族 4bpp 替代路径, char_code→glyph_index→font_jp_charset/stride 表定位, 4bpp word 双写 (str+adds r4,#0x20), 溢出/单列双分支; 四层证据三角验证 high 置信度
 - 2026-05-02 15:08: 0x080f1070 PASSED → blit_glyph_col_to_buffer (rev=1, 45/45) — font_jp 渲染族叶子, blit_glyph_row_to_buffer 列方向对称体; 10 行迭代 (vs 行版 8 列), 4bpp nibble read-modify-write + 8bpp byte write 双路; 三层 high 置信度, 首轮满分落地
+- 2026-05-02 15:22: 0x080f1180 PASSED → blit_glyph_row_colored (rev=1, 45/45) — font_jp 渲染族叶子, blit_glyph_row_to_buffer 的显式颜色变体; r3 传入 packed_color nibble (低4位前景/高4位背景), 4bpp nibble read-modify-write + 8bpp byte write 双路, 对应 render_glyph_jp_single_layer sp+0x8 标志非零分支; 首轮满分落地
 
 ## BLOCKED 追踪
 
