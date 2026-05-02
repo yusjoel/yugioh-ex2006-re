@@ -2952,7 +2952,7 @@ address,name,proposed_name,score,tags
 0x080f3eec,FUN_080f3eec,,,
 0x080f4018,FUN_080f4018,,,
 0x080f42a0,FUN_080f42a0,,,
-0x080f42b4,FUN_080f42b4,font_jp_080f42b4,3,font_jp
+0x080f42b4,init_font_jp_render_context,,,font_jp
 0x080f43c4,FUN_080f43c4,,,
 0x080f4468,FUN_080f4468,starter_deck_080f4468,4,banlist;card_ids;deck;game_str
 0x080f4564,FUN_080f4564,card_ids_080f4564,2,card_ids;duel_puzzle;opp_wins
