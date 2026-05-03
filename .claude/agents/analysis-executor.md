@@ -105,7 +105,7 @@ model: sonnet
 4. 参数类型不是裸 "input"/"value"
 5. **ARM 助记符冲突**: proposed_name 每段不在 {`str`, `ldr`, `mov`, `cmp`, `sub`, `add`, `bl`, `bx`, `pop`, `push`, `mul`, `lsl`, `lsr`, `asr`} → 命中立即换词 (`_str_`→`_text_`)
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
-7. **plate ASCII**: 弯引号 / 全角括号 / 中文标点用 ASCII 替代 (`""`→`""`, `（）`→`()`, `、`→`/`)
+7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）→ 全部替换为最接近的 ASCII 对应符号；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
 9. **R1 双动词检查**: proposed_name 不得含 `_and_` 连接两个动词; `_and_return` 永远不合法 (return 是隐含语义); epilogue/wrapper 统一用单动词形式
 
@@ -137,6 +137,8 @@ model: sonnet
 - 任意参数寄存器语义不明确/列为 "unknown" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
 - R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3)
 - 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
+- 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
+- 函数入口含 `adds rX, rY, #0x0`（X < 4）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (rX 不是独立参数，先扫入口 5 条指令)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 

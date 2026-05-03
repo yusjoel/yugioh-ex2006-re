@@ -1363,6 +1363,108 @@ RENAMES = [
         "(5) 调用 build_deck_slot_count_table 构建统计表. "
         "返回 r0=1."),
 
+    # 2026-05-03: BATCH-8 落地 (topo=183/184/185/186/187/188/189/190/191/192/193/194/195/196/197)
+    ("FUN_08101c40", "query_deck_timer_remaining",
+        "当 gPrng+0x20e 处存有当前回合计时器值时, 计算距离一局结束还剩余多少秒. "
+        "被决斗/卡牌列表场景的多个 caller 在帧更新中调用, 用于控制倒计时显示. "
+        "若当前不满足[正在游戏]条件 (state!=1 或 bit5 未置) 则直接返回 0; "
+        "否则计算 (0x2a6b - timer_value) / 0x3c, 负数截断为 0 后返回."),
+    ("FUN_08106d88", "render_card_name_tiles_to_vram",
+        "在卡牌信息显示页面中, 将卡名字符 tile 数据批量写入 VRAM (0x0600e800 区域). "
+        "由 FUN_081067e0 在每帧卡名区域刷新时调用. "
+        "函数根据 gPrng/state 中的字体宽度标志 (bit2 of byte+0x1e) 选择 6 格或 7 格列宽, "
+        "计算出每字符在 tile 网格中的行列位置, 再用 strh 逐 tile 写入目标 VRAM; "
+        "对每行最多写 16 个 halfword (0xf+1). "
+        "副作用: 修改 0x0600e800 起始的 OBJ tile VRAM 区域."),
+    ("FUN_08106c10", "render_card_name_text_to_bg",
+        "在卡牌信息页面的 BG 图层上渲染当前选中卡的卡名文字. "
+        "函数首先清空 0x0600e800 区域 (0x800 halfword), 再通过 card_data_query 查询卡名字符串; "
+        "配置 font_jp 渲染管线 (setup_line_buf_with_font_and_align, align=中央), "
+        "置 bit6 标志后调用 text_render_wrapper 输出至 BG tile 缓冲区. "
+        "若卡名需要两行渲染 (ldrh+0x0e 判断超过阈值), 则清除 bit5 标志后再次配置并渲染第二行. "
+        "最终更新 [0x0202f3c0+0x6a] 为按字体宽度折算的行宽. "
+        "由 FUN_081067e0 在卡名区域需要刷新时调用."),
+    ("FUN_08106e38", "copy_card_name_font_row_to_sprite_vram",
+        "将当前卡名指定行的 font_jp tile 数据复制到 OBJ sprite VRAM (0x06009400 区域), "
+        "并将渲染结果提交至 sprite 属性表. "
+        "函数根据 bit2 字体宽度标志决定每行 tile 列数 (6 或 7), "
+        "按行索引 r1 计算目标 VRAM 偏移 (r1 * cols * 0x400), "
+        "从 font_jp 源地址 (0x0200af20) 复制 cols*0x400 字节, "
+        "再清零同尺寸区域后调用 commit_line_buffer_to_sprite_vram 提交; "
+        "最后将行索引写回 [state+0x6e+row*2]. 由 FUN_081067e0 在字体行刷新时调用."),
+    ("FUN_081067e0", "update_card_info_name_display",
+        "卡牌信息页面中, 每帧驱动卡名显示区域的更新逻辑. "
+        "函数检查全局状态 (gPrng+0x146 = 0x2a3*2 halfword 与 bit1/bit4 标志), "
+        "根据当前渲染阶段分派到 FUN_08106c10 (渲染卡名文字到 BG) 或后续 VRAM tile 复制分支. "
+        "仅有一个 caller (FUN_080ff528), 属于卡牌列表场景中卡名区域的专用更新驱动函数."),
+    ("FUN_080ff528", "trigger_card_name_render_if_idle",
+        "在卡牌列表/决斗场景帧更新中, 检查当前是否处于[游戏进行中且计时器未耗尽]状态, "
+        "若满足条件则调用 query_deck_timer_remaining 判断是否仍有时间; "
+        "若结果为 0 (时间归零) 则置 [0x0202f3c0+0x1e] bit5, "
+        "并在成功后调用 FUN_081067e0 驱动卡名区域刷新. "
+        "主要被卡牌列表总帧循环 (FUN_080fe308) 调用."),
+    ("FUN_08101a88", "apply_card_frame_palette_animated",
+        "根据当前选中卡的属性 (attribute) 计算卡框调色板动画帧, "
+        "将对应调色板数据写入 OBJ 调色板区域 (0x05000360). "
+        "函数读取 [0x0202a4d0] game state 与 card_mini_frame_pal_gap 调色板数据; "
+        "通过 __divsi3/__modsi3 将属性值折算为 5 种旋转循环中的位置, "
+        "选出对应颜色写入目标 strh 序列. "
+        "最后更新 [0x0202f3c0+0xa] (帧计数) 并溢出归零. "
+        "被显示/blend/BG/card_frame 相关的帧更新函数调用."),
+    ("FUN_08107b4c", "dispatch_oam_write_by_mode",
+        "根据当前场景模式标志决定调用哪个 OAM 写入函数: "
+        "若 [0x0202f3c0+0x1e] halfword 的 bits[13:12] == 0xc000>>7 (即 0x6002) 且 r3!=0, "
+        "则调用 write_obj_attr_packed (仅写属性); "
+        "否则调用 write_oam_entry_from_packed_args (完整 OAM 写入). "
+        "被多个 (indeg=14) 场景渲染函数频繁调用, 是 OAM 写入的中心分派点."),
+    ("FUN_08101d0c", "write_digit_sprites_for_score",
+        "在卡牌详情/决斗场景中, 遍历多个数值槽 (r4 in [0..8]), "
+        "从 ROM 数字 tile 表中取出对应数字 sprite 属性并调用 dispatch_oam_write_by_mode 写入 OAM. "
+        "每个槽读取 [0x09e60068 + slot*4] 中存储的 sprite 描述符, "
+        "并通过 mod/div 对数值 (0x0202a4d0+offset) 进行十进制拆位, "
+        "计算出在 VRAM tile 中的行列坐标后组装 OAM entry. "
+        "被 FUN_080fefaa (显示/BG/card_frame 帧更新) 调用."),
+    ("FUN_08101c94", "compute_card_frame_palette_index",
+        "根据 [0x0202f3c0+0xc] (卡属性值, s16) 计算当前帧应使用的调色板槽序号, "
+        "并将结果写入 OBJ 调色板区 (0x05000162). "
+        "属性值 <= 0x13 时, 直接取 round(attr/2)+0x15 作为槽号; "
+        "超过时取 0x1f - round((attr-0x14)/2). "
+        "随后从 card_mini_frame_pal_gap 基址拷贝 4 个 halfword 至 0x05000162, "
+        "并递增帧计数 [0x0202f3c0+0xc] 模 0x27+1 滚动. "
+        "由 FUN_080fefaa 在卡框调色板动画帧更新时调用."),
+    ("FUN_08107eb0", "clear_card_display_flag_bits",
+        "清除 [0x0202f3c0+0x1f] 中的 bit0+bit3 (掩码 0x9 取反写回), "
+        "用于在卡牌统计/详情显示初始化时复位显示控制标志. "
+        "函数体极小 (6 指令叶子), "
+        "被 FUN_080fefaa / FUN_080ff918 / FUN_080ff94c 三个 card_stats 相关函数调用."),
+    ("FUN_080ffaa4", "compute_card_list_scroll_position",
+        "根据当前场景状态计算卡牌列表的滚动偏移量. "
+        "函数读取 [0x0202a4d0+0x10] 与 [+0x0e] 的两个 s16 值求和后乘以 5 再乘以 2 "
+        "(公式: (a+b)*5*2), 得出列表行偏移; "
+        "再与 [0x0202f3c0+0x78] 处的最大行数比较截断; "
+        "若未激活 (bit0=0) 则直接取 [+0x10] 和 [+0x0e] 之和. "
+        "返回最终滚动偏移值 (可为负, 截断为 -1). "
+        "indeg=10 高频工具函数, 被多个场景初始化和帧更新 caller 共用."),
+    ("FUN_0810a8e4", "copy_card_icon_tiles_to_vram",
+        "将卡牌图标 tile 数据从 ROM (0x06017280 区域) 分两批通过 tile_2d_row_copy 写入 sprite VRAM, "
+        "再在 4 行 x 4 列的迭代中对每行以 copy_bytes_by_halfword 将 0x20 halfword 块 "
+        "从 0x060172a0 复制至 0x06017300. "
+        "被 FUN_0810a52c (渲染卡牌 stats 时) 和 FUN_08107e5c 调用, 属 vram 图标贴图工具函数."),
+    ("FUN_0810a52c", "render_card_stats_panel",
+        "渲染卡牌统计面板 (ATK/DEF/Level 等数值及图标). "
+        "函数接受卡牌列表行序号作为参数, 从 card_stats_table 中读取对应卡的属性字段; "
+        "通过 read_card_list_field_by_row_col 和 test_card_flag_bit 获取卡牌标志位; "
+        "然后对 ATK/DEF 数值进行十进制拆位 (mod/div 循环), 将拆出的数字写入显示缓冲区; "
+        "根据卡型是否含特殊 Level 字段决定渲染路径, "
+        "最终调用 copy_card_icon_tiles_to_vram 更新图标区域, "
+        "并刷新 card_stats 相关 flag 字节."),
+    ("FUN_0810a8c0", "clear_card_stats_render_flags",
+        "清除 [0x0202f3c0+0x1f] 中的 bit0+bit1 (掩码 0x3 取反写回), "
+        "复位卡牌统计面板的渲染就绪标志. "
+        "函数体极小 (6 指令叶子, 无 push/pop), indeg=5, "
+        "被多个 scene_card_list/card_stats caller 在场景切换或面板清理时调用. "
+        "与 clear_card_display_flag_bits (0x08107eb0) 操作同一 flag 字节但清除不同位."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
