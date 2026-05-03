@@ -1149,6 +1149,105 @@ RENAMES = [
         "在导航操作后调用, 说明这些字段记录当前滚动位置/光标/帧计数等状态, "
         "每次切换显示模式时需整体归零并将某个字段置 sentinel."),
 
+    # 2026-05-03: BATCH-15 落地 #6 (topo=149/151/152/153/154/155/156/157/158/159/160/161/163/164/165)
+    ("FUN_081016c0", "load_card_mini_frame_tiles_by_type",
+        "card_list 界面初始化时调用, 根据 IWRAM 0x0202a4d0[+0] (card_type, int16) 分 3 路分支: "
+        "==1 走小卡框路径(0x06016a80, 0x09e25934), ==3 走大卡框路径(0x06016a80, 0x09e25c34), 其余直接返回. "
+        "两路均循环 tile_2d_row_copy 将 ROM 卡框 tile 拷贝到 VRAM OBJ 区, "
+        "并以 copy_bytes_by_halfword 将对应调色板写入 PAL_OBJ(0x05000360). "
+        "由 card_list_screen_init(0x080fdef4) 唯一调用."),
+    ("FUN_08100048", "resolve_card_scroll_offset_by_mode",
+        "card_list 界面多处调用, 以 IWRAM 0x0202a4d0[+4] (display_mode, int16, [0..3]) "
+        "和 0x0202f3c0 (scroll_state) 为输入, 按 mode 分支查找或计算当前卡片列表的滚动偏移量并写回 "
+        "0x0202f3c0[+0x74]. mode==0 直接取固定基础偏移 0x4acc; "
+        "mode==1 按卡片 foil bit (ldrb [r2+0x16] & 1) 选 4ede/4ed6, "
+        "再用 __divsi3 计算水平像素偏移并写入 +0x7a; mode==2/3 同理选不同 offset 表. "
+        "最终将解析到的滚动目标指针存入 [r4+0x74], 像素偏移写入 [r4+0x7a]."),
+    ("FUN_081044ac", "clear_card_list_slot_flag_by_index",
+        "card_list 场景槽位标志清除工具函数. 接收 r0=slot_index ([0..12]), "
+        "以 1<<slot_index 计算位掩码, 对 IWRAM 0x0202a4d0[+0x30] (slot_flags 字段) 执行 bics 清除对应位, "
+        "并将 0x0202a4d0[+0x32] 置 0 (标记刷新状态). "
+        "被 clear_all_card_list_slot_flags 以 r4=0..12 循环调用(批量清除所有槽), "
+        "也被 FUN_081078d4 / FUN_081095e8 单次调用."),
+    ("FUN_081014e4", "clear_all_card_list_slot_flags",
+        "card_list 场景槽位标志批量清零入口. 以 r4=0 到 r4=0xd(13) 为循环变量, "
+        "逐一调用 clear_card_list_slot_flag_by_index(r4), 共执行 14 次(索引 0..13). "
+        "被 init_card_list_display_and_objs 在场景初始化阶段调用, "
+        "也被 FUN_080ff434 / dispatch_card_frame_tile_load_by_type 在刷新/切换时调用. "
+        "函数体仅 6 条指令, 是典型的 batch-clear 包装."),
+    ("FUN_0810445c", "load_card_frame_tile_row_by_index",
+        "card_list 界面卡框 tile 行加载函数. 接收 r0=frame_index ([0..0xd]), "
+        "乘以 12(r0*3<<2) 计算 ROM 卡框数据偏移, 从 0x0202a4d0[+0] (card_type, int16) "
+        "查表取对应 tile 行数据地址, 调用 tile_2d_row_copy 将 4x4 tile 块写入 VRAM 目标行. "
+        "写完后对 0x0202a4d0[+0x30] 置对应位(orrs), 并清零 0x0202a4d0[+0x32] 触发刷新. "
+        "由 dispatch_card_frame_tile_load_by_type 按解析后的 frame_index 调用."),
+    ("FUN_08101454", "dispatch_card_frame_tile_load_by_type",
+        "card_list 界面的卡框 tile 行加载调度器. 读取 IWRAM 0x0202a4d0[+6] (card_frame_type, int16), "
+        "先调用 clear_all_card_list_slot_flags 重置所有槽, 再按 type 分支选择 frame_index([0..0xd]) "
+        "并调用 load_card_frame_tile_row_by_index. "
+        "type==0: 根据 [+0]/[+8] 字段选 index 4/5; type==1: 根据 [+0] 选 3/6; "
+        "type==2: 根据 foil bit 选 10/11; type==3: 根据 [+0x12] 选 12/13. "
+        "由 card_list_screen_init 及多个场景切换函数调用(indeg=5), 是卡框 tile 重载的统一入口."),
+    ("FUN_08101068", "load_card_full_frame_tiles_and_palettes",
+        "card_list 界面初始化时由 card_list_screen_init 唯一调用, "
+        "将完整的卡框 tile 套件和调色板批量写入 VRAM/PAL. "
+        "包含多轮 copy_bytes_by_halfword 和 tile_2d_row_copy 调用: "
+        "先从 ROM 0x09e24934 拷贝 0x1c0 字节 tile 数据到 VRAM OBJ 0x0600c040, "
+        "再从多个 ROM 源分别拷贝 tile 行到 0x0600c200/0x06016800/0x06016c00/0x06017000/0x06017400. "
+        "最后将 card_mini_frame_pal_128/pal_144/pal_main 写入 PAL_OBJ 0x05000140/0x05000300/0x05000320/0x05000200."),
+    ("FUN_08100b70", "render_card_list_visible_slots",
+        "card_list 界面可见槽位 tile 渲染函数. 读取 0x0202f3c0[+0](slot_vis_flags, uint16), "
+        "若 bit4(0x10) 置位则先调用 zero_fill_by_halfword 清零 VRAM OBJ 0x0600e000(0x800 字节). "
+        "随后以 r3=0..5 循环, 每次从 slot_vis_flags 右移 r3 位取 bit0 判断槽是否可见; "
+        "若可见则进一步检查 0x0202a4d0[+0x16] & 1 (foil bit). "
+        "可见槽按 display_mode 分别从 4 个 ROM tile 表中取偏移, "
+        "加 VRAM 基址后将 tile 数据以 strh 写入 VRAM OBJ."),
+    ("FUN_0810a0e8", "format_decimal_with_sign_pos",
+        "settings/card_list 数值渲染工具函数, 正数路径包装. "
+        "接收目标缓冲区指针(r0)和正整数值(r1), 将 r1 移入 r2 后以固定格式串 (ROM 0x09e56cf4) "
+        "调用 expand_format_decimal_to_buf, 格式化出 \"+N\" 形式的带正号十进制字符串并写入 r0 缓冲区. "
+        "由 render_deck_count_diff_label 和 FUN_08107198 在 r5>0 分支调用, "
+        "为 sibling format_decimal_with_sign_neg(0x0810a0fc) 的对偶函数."),
+    ("FUN_0810a0fc", "format_decimal_with_sign_neg",
+        "settings/card_list 数值渲染工具函数, 负数或无符号绝对值路径包装. "
+        "接收目标缓冲区指针(r0)和有符号整数值(r1), 取 r1 的绝对值(bge skip / rsbs r4,r5,0)后 "
+        "以十进制逐位分解(循环 __modsi3/__divsi3 /10 提取各位, 最多 15 位). "
+        "若原值为负则从 game_str_ja 取负号字形写入 [r1+0]; "
+        "最后按倒序将各位数字以 stmia 填入输出缓冲, "
+        "与 format_decimal_with_sign_pos 构成正负对."),
+    ("FUN_08100d70", "render_deck_count_diff_label",
+        "card_list/settings 界面中展示卡组数量差值标签的渲染函数. "
+        "读取 IWRAM 0x0202a4d0[+0](mode, uint16), 若不等于 1 则直接退出. "
+        "读取 0x0202a4d0[0x1a16] 和 [0x1a1e] 两个 uint16 值相减得差值 r5. "
+        "根据 r5==0 查 game_str_id 0x6c1; r5!=0 分支按符号选 "
+        "format_decimal_with_sign_pos 或 format_decimal_with_sign_neg 格式化差值. "
+        "连续调 text_render_wrapper 三次(含阴影), "
+        "最后 zero_fill_by_halfword + commit_line_buffer_to_sprite_vram 写入 sprite VRAM."),
+    ("FUN_0810017c", "write_card_list_slot_tiles_to_vram",
+        "card_list 界面单槽 OBJ tile 写入函数. 接收 r0=slot_index ([0..N]), "
+        "以 r0*24(r0*3<<3) 计算到 ROM 数据表 (0x09e5fda0) 中该槽结构体偏移. "
+        "外层循环 r5=0 to [base+0xf]-1 (row_count), 内层循环 r3=0 to [base+0xe]-1 (col_count), "
+        "每次以 ldrh 取 tile_id, 加 [base+0x10](tile_base_offset) 再 OR [base+0x14](pal_idx)<<0xc, "
+        "用 strh 写入 VRAM OBJ 0x0600f800 目标行列偏移. "
+        "循环后以 copy_bytes_by_halfword 追加第二 tile 层."),
+    ("FUN_080fe2b4", "reset_card_list_scene_state",
+        "card_list 场景状态重置函数. 读取 IWRAM 0x0202a4d0[+0] (mode, int16), "
+        "若在有效范围 [0..3] 之外则不写 [+6]; 若为 0/1/3 则将 mode 值写入 [+6](last_mode); "
+        "==2 时写 0. 随后无条件将 [+8]/[+a]/[+c]/[+e]/[+10]/[+12] 六个 uint16 字段清零. "
+        "由 4 个不同的场景初始化函数调用, 在进入 card_list 界面前统一重置场景状态."),
+    ("FUN_080fe2e8", "init_card_list_display_and_objs",
+        "card_list 界面显示硬件初始化函数. "
+        "调用 clear_all_card_list_slot_flags 批量清零所有槽标志, "
+        "再将 DISPCNT(0x04000000) 和 PAL_BG 基址(0x05000000) 均写 0 以关闭显示并清调色板首字, "
+        "最后调用 init_scene_obj_list 初始化场景 OBJ 列表. "
+        "由 6 个不同场景的过渡/切换函数调用, 是进入 card_list 界面前的硬件准备步骤."),
+    ("FUN_080ff418", "return_zero_epilogue_stub",
+        "单指令入口点, 仅执行 movs r0,#0 后落入紧邻下方 FUN_080ff41a 的共享 epilogue "
+        "(add sp,0x1c / pop 多寄存器 / bx r1). "
+        "本质是外层大函数(FUN_080fe308 区域, 0x080ff408 处 b 跳入)的失败/0 返回出口路径. "
+        "Ghidra 将其标记为独立函数, 但实际是 FUN_080fe308 内部的 tail-shared early-exit 片段. "
+        "由 FUN_080fe308(0x080fe308) 以 b 指令无条件跳入, 无其他 caller."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

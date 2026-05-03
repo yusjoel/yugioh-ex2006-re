@@ -134,6 +134,7 @@ model: sonnet
 - indeg=1 from card_image hub + 调用 commit_line_buffer_to_sprite_vram + setup_line_buf_pos_and_font + render_*_to_buf triple → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_card_stat_label_drawer_cluster.md`
 - 任意参数寄存器语义不明确/列为 "unknown" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
 - R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3)
+- 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
