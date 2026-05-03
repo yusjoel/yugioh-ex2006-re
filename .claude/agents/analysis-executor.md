@@ -133,6 +133,7 @@ model: sonnet
 - 函数体仅 `bx lr` (2 字节) → `feedback_release_noop_stub_fingerprint.md` (类型 A/B 区分; callsite 参数数量是关键)
 - indeg=1 from card_image hub + 调用 commit_line_buffer_to_sprite_vram + setup_line_buf_pos_and_font + render_*_to_buf triple → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_card_stat_label_drawer_cluster.md`
 - 任意参数寄存器语义不明确/列为 "unknown" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
+- R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 

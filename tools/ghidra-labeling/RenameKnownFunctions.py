@@ -1043,6 +1043,112 @@ RENAMES = [
         "r2==-1 skips copy. SRAM requires 8-bit-only access; WAITCNT setup ensures correct timing. "
         "Called 3 times by FUN_0810e588 (scene_duel_puzzle) for SRAM save-data write."),
 
+    # 2026-05-03: BATCH-15 落地 #5 (topo=133/134/135/136/137/138/139/141/142/143/144/145/146/147/148)
+    ("FUN_0810e588", "copy_with_waitcnt_and_verify_loop",
+        "在 duel_puzzle 场景初始化路径下被 FUN_080f9c88 调用, 以固定源地址 r0 (EWRAM 0x02000000) "
+        "向目标 r1 (SRAM 0x0E000000) 拷贝 r2 (0x6ed0) 字节, 拷贝完成后调用 FUN_0810e5d4 进行校验; "
+        "若校验失败则重试, 最多循环 3 次 (r7 从 0 到 2). 副作用: 写入 r1 目标内存区域, "
+        "并通过 [0x02029ea4] 读取某计数/校验辅助状态. 拷贝通过 copy_bytes_with_waitcnt 完成, "
+        "保证等待总线就绪."),
+    ("FUN_080f9c88", "init_puzzle_wram_then_copy",
+        "duel_puzzle 场景进入时的轻量封装函数. 依次调用 init_puzzle_wram_and_checksum 完成谜题 WRAM 初始化, "
+        "再以固定源 0x02000000 + 长度 0x6ed0 调用 copy_with_waitcnt_and_verify_loop "
+        "将谜题数据拷贝到目标区域. 被 enter_duel_puzzle_page / enter_limited_duel_page / "
+        "enter_theme_duel_page 等多个场景入口调用, 是 duel_puzzle 所有变体共享的 WRAM 预备序列."),
+    ("FUN_08103280", "read_card_list_field_by_row_col",
+        "card_list 场景双参字段读取函数, 与 read_card_list_field_by_index (0x08103244) "
+        "为同一翻译单元内的兄弟对. 以 r0 (行) 和 r1 (列/偏移) 计算二维索引 (r0*7+r1)*2, "
+        "从 IWRAM 0x0202a4d0 + 偏移 0xa9*4=0x2a4 处读取有符号半字. "
+        "FUN_081014fc 在调用 read_card_list_field_by_index 后立即调用本函数, "
+        "传入行计数 r4+1 和列参数, 说明用于访问 card_list 的二维布局."),
+    ("FUN_08103244", "read_card_list_field_by_index",
+        "card_list 场景通用字段读取函数. 以 r0 为下标 (halfword 步长 *2), "
+        "从 IWRAM 0x0202a4d0 + 偏移 0xa7*4=0x29c 处读取一个有符号半字并返回. "
+        "被 FUN_081014fc (vram/scene_card_list) 和 FUN_081021dc (card_ids/card_stats) "
+        "等多个 card_list 子系统函数调用, 用于查询卡片列表内某一索引对应的字段值 "
+        "(确切字段语义待 runtime 确认)."),
+    ("FUN_08109848", "resolve_card_gfx_row_by_type",
+        "根据卡片类型编号 (r0, 有效值 2-12, 内部先减 2) 从 ROM 跳转表选出对应图形数据块的起始指针 (r1) "
+        "和条目数 (r3), 然后在该块中线性搜索与 r1 (传入值 = r4) 匹配的条目, "
+        "返回该条目偏移 +2 处的 s16 值 (图形行索引). 若超出范围或未找到则返回 -1. "
+        "各 case 数据位于 ROM 0x09e60fc0-0x09e610d4, "
+        "是 card_list 场景显示时 per-type 图形行查找的核心函数."),
+    ("FUN_08109788", "resolve_card_frame_palette_by_type",
+        "根据卡片类型编号 (r0, 范围 0-12) 从 ROM 查找对应卡框调色板数据指针, "
+        "合并 r1 (子偏移, 移位 8 位) 后返回. "
+        "各 case 加载 ROM 地址 0x09e265b4-0x09e2ddb4 段内的调色板数据指针 (per-type 调色板块). "
+        "返回值 = palette_ptr + (r3<<8), 即调色板基地址加行偏移; 若 r2==0 则返回 0 (无效类型). "
+        "在 FUN_081014fc 中由 FUN_08109848 的返回值作为 r1 传入, 两者构成 type->palette 的两级分派."),
+    ("FUN_081014fc", "setup_card_list_tile_rows",
+        "card_list 场景 VRAM tile 初始化函数. 从 IWRAM 0x0202a4d0 (r7) 读取当前选中卡片字段, "
+        "调用 read_card_list_field_by_index / resolve_card_gfx_row_by_type / "
+        "resolve_card_frame_palette_by_type 构成三级查表链, "
+        "再以 tile_2d_row_copy 将卡框 palette 数据拷贝到 VRAM 0x06010880 (r6). "
+        "外层循环 r4=0..5 执行 6 次, 每次偏移 VRAM 目标地址 r4*128 字节, 覆盖 6 行 tile 数据. "
+        "由 card_list_screen_init 和 FUN_080fffc4 调用, 是卡片列表界面卡框 tile 批量写入的核心."),
+    ("FUN_08100980", "render_card_name_label",
+        "card_list / card_stats 场景中渲染单张卡片名称的核心函数. r0 为卡片 ID, r1 为渲染模式标志 "
+        "(bit1 为 0 = 走 resolve_card_gfx_pointer_by_type 路径, "
+        "bit1 为 1 = 走 select_charset_then_load_name 路径; "
+        "caller FUN_08100968 通过 lsls/lsrs 提取 [0x0202a4d0+0x16] 的 bit1 后传入). "
+        "名称加载后若长度 <= 26 则直接 strcpy 到栈缓冲区, 否则截断为 26 字节并补 NUL. "
+        "随后调用 text_render_wrapper 渲染名称 (含阴影/双行), "
+        "并更新 [0x02006ed0+8] 的字体标志位 (bit1 控制当前字体 charset). "
+        "副作用: 向 OBJ VRAM 写入字符 tile (通过 text_render_wrapper)."),
+    ("FUN_08100968", "dispatch_render_card_name_with_flags",
+        "render_card_name_label (0x08100980) 的一层轻量封装. "
+        "从 IWRAM 0x0202a4d0 (card_list 状态基地址) 偏移 0x16 处读取一个字节, "
+        "取 bit1 (lsls/lsrs 提取) 作为 r1 渲染标志, "
+        "连同 r0 (card_id, 由外部 FUN_08100238 传入) 一起调用 render_card_name_label. "
+        "目的是将 IWRAM 中的 charset/display 状态标志透明地注入渲染调用, 调用方无需感知标志字段位置."),
+    ("FUN_08102494", "search_card_list_subtable_by_key",
+        "根据模式参数 r0 (0-3) 从 IWRAM 0x0202a4d0 中选取对应子表偏移 (0x140c/0x160c/0x180c/0x1a0c), "
+        "读取该子表的条目数 (halfword), 若非零则以 r1 的低 12 位 (r1 & 0xfff, card_id) 为关键字 "
+        "调用 bsearch_index_by_callback 在子表中二分查找匹配条目, 返回命中条目的高 4 bit (lsrs 0x4). "
+        "若子表为空或未命中则返回 0. 被 FUN_08100238 (vram/card_stats/font_jp) 调用, "
+        "用于 card_list 场景卡片信息显示前的分类子表定位."),
+    ("FUN_08102914", "read_card_list_type_hi_nibble",
+        "从 IWRAM 0x02000006 + r0*2 处读取一个字节, 右移 4 位取高 nibble 后返回. r0 为下标参数. "
+        "被 FUN_08100238 / FUN_080ff56c / FUN_080ffe38 三个 card_list 相关函数调用, "
+        "用于提取 card_list IWRAM 某表中每个条目字节的类型高位编码. 函数体为纯只读叶子, 4 条指令."),
+    ("FUN_08100238", "render_card_list_entry_row",
+        "card_list 场景每行卡片信息的完整渲染函数. "
+        "从 IWRAM 0x0202f3c0 (r0 at entry via [sp+0]) 读取当前行配置, "
+        "以 [base+2] 的 bit 位掩码判断哪些列启用, 对每列执行: "
+        "zero_fill_by_halfword 清 VRAM Sprite 行, commit_line_buffer_to_sprite_vram 写字符, "
+        "调用 dispatch_render_card_name_with_flags (0x08100968) 渲染卡名, "
+        "调用 search_card_list_subtable_by_key (0x08102494) 查子表, "
+        "调用 read_card_list_type_hi_nibble (0x08102914) 读类型高位. "
+        "外层以 r4 迭代 4 个 card_list 列 (0-3), 内层对每列最多 9 个条目 (r7=0-8) 循环. "
+        "由 card_list_screen_init 和 FUN_080fffc4 调用."),
+    ("FUN_08100f38", "render_game_text_centered_label",
+        "card_list 界面字符串标签居中渲染函数. 从 IWRAM 0x0202a4d0 (r6) 读取当前状态, "
+        "检查 [r6+0] 是否 == 3; 若是则配置字体 charset (通过 PTR_font_jp_base_table), "
+        "以 [r6+4] 的偏移量加常数 0xd9*8=0x6c8 调用 game_str_id_to_row 获取字符串行号, "
+        "再从 game_str_pointer_table 定位目标字符串, "
+        "调用 strlen 测量宽度后计算居中起始 X 坐标 (0x60 - len*12/4 = 居中偏移, 最小 1). "
+        "随后以 text_render_wrapper 连续渲染 3 遍该字符串 (含阴影偏移 r0/r0+1 两行), "
+        "最后 zero_fill_by_halfword+commit_line_buffer_to_sprite_vram 完成 sprite 写入. "
+        "由 card_list_screen_init 和 FUN_080fe308 调用."),
+    ("FUN_0810133c", "setup_card_list_bg2_tilemap",
+        "card_list 场景 BG2 tilemap 初始化函数. "
+        "检查 IWRAM 0x0202a4d0+0x16 的 bit0 启用标志; "
+        "若置位则先对 VRAM 0x0600f000 (r8 由 DAT_081013e0 = 0x0600f000 加载) "
+        "调用 zero_fill_by_halfword 清零 0x800 halfword (0x1000 字节), "
+        "再以双重循环 (外层 r4=0..3 共 4 列, 内层 r3=0..9 共 10 行) "
+        "计算 tilemap 序号并 strh 写入目标地址, 构建 4x10 卡片列表 tilemap. "
+        "若 bit0 未置位则走另一路径 (LAB_081013ec), 同样清零 0x800 halfword 后写 4x4 tilemap. "
+        "函数末尾将 BG2HOFS 设为 0xfffc 或 0xffd0 (含列方向偏移). "
+        "由 card_list_screen_init / FUN_080fe308 / FUN_080fffc4 调用."),
+    ("FUN_080ff9c0", "reset_card_list_scroll_state",
+        "card_list 场景滚动/选择状态重置函数. "
+        "将 IWRAM 0x0202f3c0 结构体中偏移 0xe-0x1a 共 7 个 halfword 字段清零, "
+        "唯独将偏移 0x12 设为 0xffff (无效/哨兵值). 随后返回 1. "
+        "被 card_list_screen_init 在初始化时调用一次, "
+        "也被 FUN_080ff4f0 / FUN_080ff980 / FUN_080ffaf8 (均为 scene_card_list) "
+        "在导航操作后调用, 说明这些字段记录当前滚动位置/光标/帧计数等状态, "
+        "每次切换显示模式时需整体归零并将某个字段置 sentinel."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

@@ -60,6 +60,7 @@ model: sonnet
 | caller 全 FUN_* | `feedback_r7_pending_caller_form.md` (R7 form b 必接受) |
 | 函数体仅 `bx lr` | `feedback_release_noop_stub_fingerprint.md` (R3/R5 无参/无副作用满分; 类型 B 置信度 high 合法) |
 | R3 任意参数含 "unknown"/裸类型无语义注 | `feedback_caller_traced_param_type.md` (直接扣 R3 到 0; 要求重做 caller-trace) |
+| R3 数值型 index 参数缺 [lo..hi] 范围 | `feedback_r3_param_range_required.md` (扣 R3; executor 补范围后重审) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
