@@ -104,8 +104,10 @@ model: sonnet
 3. 置信度标了 (high/med/low)
 4. 参数类型不是裸 "input"/"value"
 5. **ARM 助记符冲突**: proposed_name 每段不在 {`str`, `ldr`, `mov`, `cmp`, `sub`, `add`, `bl`, `bx`, `pop`, `push`, `mul`, `lsl`, `lsr`, `asr`} → 命中立即换词 (`_str_`→`_text_`)
-6. **R7 pending caller**: 若所有 caller 都是 FUN_*, 用形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`
+6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
 7. **plate ASCII**: 弯引号 / 全角括号 / 中文标点用 ASCII 替代 (`""`→`""`, `（）`→`()`, `、`→`/`)
+8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
+9. **R1 双动词检查**: proposed_name 不得含 `_and_` 连接两个动词; `_and_return` 永远不合法 (return 是隐含语义); epilogue/wrapper 统一用单动词形式
 
 ### Phase 5: 完成报告
 

@@ -1248,6 +1248,121 @@ RENAMES = [
         "Ghidra 将其标记为独立函数, 但实际是 FUN_080fe308 内部的 tail-shared early-exit 片段. "
         "由 FUN_080fe308(0x080fe308) 以 b 指令无条件跳入, 无其他 caller."),
 
+    # --- batch7 (2026-05-03): deck slot / card_frame 渲染簇 ---
+    ("FUN_080ff41a", "restore_regs_epilogue",
+        "该入口点是 FUN_080fe308 大函数内部共享的尾部 epilogue 片段. "
+        "调用方通过 b 无条件跳入 (0x080ff41a), 从 r0 已清零 (由紧邻上方的 return_zero_epilogue_stub 负责) "
+        "的状态开始执行: 恢复 sp+0x1c, 弹出 r3/r4/r5 及高寄存器别名 "
+        "(mov r8,r3; mov r9,r1; mov r10,r2), 再弹出 r4-r7 和 r1, 最后 bx r1 返回. "
+        "本质是一段被 Ghidra 独立标记的 shared restore_regs_epilogue 代码片段, 并非独立语义函数."),
+    ("FUN_08102538", "count_valid_cards_by_slot_type",
+        "在卡组构建场景中被调用, 按 r0 指定的 slot 类型 (0=主卡, 1=融合, 2=魔法/陷阱, 3=仪式等) "
+        "遍历 IWRAM 0x0202a4d0 所指向的卡片结构, 调用 check_card_pair_allowed 验证每张候选卡是否可加入该 slot, "
+        "统计满足条件的卡片数量并写入 r7 结构的输出区域. "
+        "返回 r0=满足条件的计数, 供上层 find_best_slot_for_card 汇总三路结果后判断最优 deck slot."),
+    ("FUN_08102620", "find_best_slot_for_card",
+        "在卡组构建场景中被 FUN_080fe308 和 FUN_08103100 调用. "
+        "函数对 deck 的四种 slot 类型 (r7=0..3) 逐一遍历: 每轮对当前候选卡列表分别调用 "
+        "count_valid_cards_by_slot_type 三次 (type 1/2/3), 将结果求和后与该 slot 的卡组上限比较. "
+        "若总数超出上限, 则提取该卡的 ATK 等级字段并将该 slot 索引作为候选. "
+        "循环结束后返回最优 slot 索引 (r0=找到的 slot_idx), 0 表示未找到或不满足."),
+    ("FUN_081044c0", "write_slot_display_coords",
+        "在多个 UI 场景 (card_stats 展示, settings 面板, banlist 画面) 中被调用, "
+        "负责将显示坐标写入 IWRAM slot 描述符. "
+        "函数以 r0 为 slot 索引, 以 4 字节步长偏移到 IWRAM 基址 0x0202a4d0 对应条目, "
+        "将 r1 写入偏移 +0x34 (x 坐标或宽度), r2 写入偏移 +0x36 (y 坐标或高度), 返回 r0=1 表示成功."),
+    ("FUN_081078f8", "render_jp_text_pair_with_flag",
+        "由 render_card_frame_scene (banlist/card_frame/settings 综合渲染函数) 唯一调用, "
+        "负责在指定位置渲染一对日文字符串. "
+        "函数首先将 IWRAM 0x02006ed0+8 处的状态字节置位 bit1 (标记 'jp 渲染进行中'), "
+        "然后以 (r0+1, r1+1) 和宽度 0x104 (0x82<<1) 调用 text_render_wrapper 渲染第一行; "
+        "若 r2 非零则对第二次调用的宽度参数减去 7, 再次调用 text_render_wrapper 以 (r0, r1) 渲染第二行内容. "
+        "r3 传入字符串指针或格式标识."),
+    ("FUN_08107a48", "calc_card_stat_bonus_by_type",
+        "由 FUN_0810796c (settings/card_frame 渲染函数) 循环调用, "
+        "用于计算特定 slot 位置上指定卡片的能力值加成 (bonus). "
+        "函数根据 IWRAM 0x0202f3c0+0x6c2c 中的 lang_flag bit[2:0] 选取两套卡片数据表 "
+        "(EN 版: 0x09e606f4; JP 版: 0x09e60894), 然后 switch 卡片类型字段 (偏移 0 处的 halfword, [1..4]): "
+        "type3 对应 +(-19) 行偏移, type4 对应 +(-10) 行偏移, type1/2 走默认分支. "
+        "r2 和 r3 为两个输出指针 (分别指向调用方栈上的 y_delta 槽和 x_bonus 槽), "
+        "将计算出的 y_delta 和 x_bonus 分别写入 *r2/*r3 供调用方合成 OBJ 属性."),
+    ("FUN_0810793c", "load_card_mini_frame_tile_and_pal",
+        "由 render_card_frame_scene (banlist/card_frame/settings 综合渲染函数) 唯一调用, "
+        "负责将卡片迷你外框的 tile 数据和调色板一次性加载到 VRAM/CRAM. "
+        "函数调用 tile_2d_row_copy 将 ROM 中 9 行 x 1 列的 tile 数据 (步进=1) 复制到 VRAM 0x06017800; "
+        "再调用 copy_bytes_by_halfword 将 32 个 halfword (64 字节) 的 card_mini_frame_pal_144 "
+        "调色板写入 CRAM 0x05000320 (BG/OBJ 调色板区). "
+        "整体用于切换到迷你框显示时的资源初始化."),
+    ("FUN_08107198", "render_card_frame_scene",
+        "该函数是 banlist/card_frame/settings 场景的核心渲染入口, "
+        "由三个上层函数 (dispatch_card_type_and_render_frame, FUN_081045c4, FUN_081047e8) 调用. "
+        "函数首先根据 lang_flag (IWRAM 0x0202f3c0+0x6c2c bits[2:0]) 选择 EN/JP 卡片数据表 "
+        "并复制 0x120 字节 tile 数据到 VRAM 0x06009400; "
+        "然后对卡片外框网格每个单元格写入 OBJ tile 索引 (VRAM 0x06009800); "
+        "再写入 banlist/deck 状态标志对应的 OBJ 属性; "
+        "切换调色板 (card_mini_frame_pal_144 至 0x05000160/0x05000166); "
+        "调用 select_charset_then_load_name 加载卡片名称; "
+        "最后链式调用 load_card_mini_frame_tile_and_pal / render_jp_text_pair_with_flag / "
+        "calc_card_stat_bonus_by_type / write_slot_display_coords 完成全帧渲染."),
+    ("FUN_080ff824", "dispatch_card_type_and_render_frame",
+        "由 FUN_080fe308 (大型 deck/card 场景主函数) 唯一调用. "
+        "函数读取 IWRAM 0x0202f3c0 偏移 +6 处的 halfword, 减 1 后作为 switch 索引 ([0..10]): "
+        "各 case 将内部枚举值 (0,1,2,3,4,5,0x10,0x11,0x12,0x19,0xf) 写入 r4 (对应卡片展示类型); "
+        "再读取 deck_slot [0x0202a4d0+6] 的当前类型值, 置 5, "
+        "然后调用 dispatch_card_frame_tile_load_by_type 加载对应帧 tile, "
+        "最后调用 render_card_frame_scene 渲染目标 slot. "
+        "用于将外部卡片类型 ID 映射为内部枚举再触发帧渲染."),
+    ("FUN_0810372c", "copy_deck_slot_card_data",
+        "由 init_deck_slot_data (deck slot 总调度函数) 以 r1=1 调用, "
+        "负责将指定 deck_type (r0=[0..3]) 对应的卡片数据复制到目标缓冲区. "
+        "函数从 IWRAM 0x0202a4d0 选取对应 deck_type 的源区偏移 "
+        "(type0: +0x2b9c/+0x1a6c, type1: +0x3ecc/+0x3ccc, type2: +0x44cc/+0x42cc, type3: +0x4acc/+0x48cc), "
+        "根据 r1 标志决定使用哪个源指针, "
+        "然后调用 copy_bytes_by_halfword 复制 0x200 字节卡片数据; "
+        "type0 特殊路径复制 0x1130 字节. "
+        "用于在场景切换时刷新 deck slot 数据缓冲区."),
+    ("FUN_08103c3c", "apply_card_obj_attr_by_type",
+        "由 init_deck_slot_data 和 FUN_08102c6c (均属 card_stats 场景) 调用, "
+        "负责将 deck slot 中第 r0 个位置的卡片设置 OBJ 属性. "
+        "函数从 IWRAM 0x0202a4d0 偏移 +0xa7*2+r0*2 读取已排序卡片的 card_id (有符号 16 位); "
+        "以 1<<card_id 构造 tile 位图并写入 IWRAM 0x0202f3c0+0x7c; "
+        "若 card_id 非零且非 7, 则额外 OR 0x8000 (bit15=暗背景标志); "
+        "若 card_id 为 0 或 7 则进入扩展标志分支 OR 0x800000. 返回 r0=1."),
+    ("FUN_08104130", "check_card_valid_for_deck_slot",
+        "由 filter_deck_slot_candidates 和 FUN_08102c6c (均属 card_stats 场景) 调用, "
+        "对候选卡片验证是否满足当前 deck slot 的限制条件. "
+        "函数读取 IWRAM 0x0202f3c0+0x7e 的 flag halfword: "
+        "若 bit0=1 则取候选卡的 ATK 等级字段 (card_type_table bits[7:4]) 与 "
+        "slot 对应的 ATK 上限 (0x0202a4d0+0x2a6+slot_idx*14) 比较, 不满足则返回 0; "
+        "若 bit1=1 则检查 cost/level 是否在允许范围; "
+        "若 bit2=1 则检查等级等条件; 最终通过全部检查后返回 1 (合法)."),
+    ("FUN_081035f4", "filter_deck_slot_candidates",
+        "由 init_deck_slot_data 和 FUN_08102c6c (card_stats 场景) 调用, "
+        "负责对指定 deck_type (r0=[0..3]) 的候选卡片列表进行合法性过滤. "
+        "函数根据 deck_type 从 IWRAM 0x0202a4d0 选取对应源列表偏移 "
+        "(type0: +0x1a6c, type1: +0x3ccc, type2: +0x42cc, type3: +0x48cc), "
+        "清零目标区 0x0202f3c0+0x7e 的计数字段; "
+        "然后遍历源列表每对 (card_entry), 对每张卡调用 check_card_valid_for_deck_slot 验证; "
+        "通过验证的写入结果区并更新计数; "
+        "最后将计数写入 0x0202a4d0+0x4ecc 偏移. 返回 r0=1."),
+    ("FUN_081038fc", "build_deck_slot_count_table",
+        "由 init_deck_slot_data (deck 初始化最后一步) 以及 FUN_08102c6c (card_stats 场景) 调用, "
+        "负责根据已过滤卡片列表构建 deck slot 的 count 统计表. "
+        "函数按 deck_type r0 ([0..3]) 选取对应的两组指针, "
+        "清零目标区域 (IWRAM r9 基址 +0x1a34 偏移 8 字节); "
+        "遍历已排序列表, 按 card_stats_table 查找对应属性类型 (switch 0-8), "
+        "在 count_table +0x1a24 对应偏移累加计数; "
+        "最后在 +0x1a4c 写入结果摘要. 返回 r0=1."),
+    ("FUN_081031a4", "init_deck_slot_data",
+        "被 9 个 caller 调用 (indeg=9), 是 card_stats 场景下 deck slot 数据初始化的核心调度函数. "
+        "接收 deck_type r0 ([0..3]), 顺序执行五步: "
+        "(1) 调用 filter_deck_slot_candidates 以 r0 过滤候选卡片; "
+        "(2) 调用 copy_deck_slot_card_data 以 (r0, 1) 复制 deck slot 数据; "
+        "(3) 调用 apply_card_obj_attr_by_type 设置 OBJ 属性; "
+        "(4) 以比较函数调用 qsort 对结果排序; "
+        "(5) 调用 build_deck_slot_count_table 构建统计表. "
+        "返回 r0=1."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
