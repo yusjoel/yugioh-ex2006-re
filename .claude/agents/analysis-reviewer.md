@@ -65,6 +65,7 @@ model: sonnet
 | 函数入口含 `adds rX, rY, #0x0` 且 r3 含被覆盖寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (R3=0; 被覆盖 rX 不是独立参数) |
 | 函数涉及 OAM attr / DISPCNT / IO 写入含裸 16/32-bit 常量 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (R6=0; 无 Constants: 块 / `0xC00` 标为 priority 而非 mode mask) |
 | R3 中高寄存器 (r4/r8/r9/r10/r11) 在函数体首次赋值前被读取，但 proposal 未列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (R3=0; 要求 executor 补 callsite asm 证据，注明 caller-set) |
+| proposal 置信度为 med/low 但无独立"## 置信度 / 升级路径"节，或该节内无可操作路径 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (R8=0; 要求 executor 补写独立节并逐项列解决路径) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
