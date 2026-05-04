@@ -1588,6 +1588,97 @@ RENAMES = [
         "写 OAM slot 0x9b94/0x9b96 (主/副徽章) 及 0x9b98 (附加 tile 组), "
         "结构与 render_card_type_icon_oam (0x0810ab90) 完全对称."),
 
+    # 2026-05-04: BATCH-10 落地 (topo=213..228)
+    ("FUN_081081bc", "render_card_atk_def_to_vram",
+        "FUN_08107bdc (card_stats/font_jp) bit3 set -> zero_fill_by_halfword(0x0600e800, 0x800) "
+        "clear ATK/DEF tile buf, then 2x2 coord grid loop strh tile indices; "
+        "zero_fill_by_halfword(0x06009800, 0x800) second clear. Returns 1 or 0 (bit3 unset)."),
+    ("FUN_0810a190", "lookup_sjis_font_index_by_char",
+        "Called by render_card_name_glyph_to_vram (0x0810823c). "
+        "r0=uint16 char_code. <=0xFF: direct table ROM 0x09e61158 halfword fetch. "
+        ">0xFF: bsearch_index_by_callback on sorted SJIS table ROM 0x09e6115c. "
+        "Both paths return byte-swapped glyph_index (hi/lo swap). Read-only ROM tables."),
+    ("FUN_0810823c", "render_card_name_glyph_to_vram",
+        "Called by tick_card_stats_render_panel (0x08107bdc) when bit4 set. "
+        "Reads card_list_field index from IWRAM 0x0202a4d0[+4], calls read_card_list_field_by_index. "
+        "r7<=0: write empty glyph. r7>0: charset flag [0x02006c2c] bit[2:0] -> "
+        "resolve_card_gfx_pointer_by_type + char_code_to_glyph_index + lookup_sjis_font_index_by_char "
+        "or select_charset_then_load_name. strb glyph hi/lo bytes to VRAM. switch(r7-2) per card type."),
+    ("FUN_08107bdc", "tick_card_stats_render_panel",
+        "Called by tick_card_display_render_panel (0x080fefaa) every frame. "
+        "bit3 set: call render_card_atk_def_to_vram, clear bit0+bit6. "
+        "bit4 set: call render_card_name_glyph_to_vram, clear bit4+bit0. "
+        "read_card_list_field_by_index -> r6 card type -> cmp 2/7 -> render_card_type_badge_oam. "
+        "switch(r6-2) dispatch per card type OAM/coord calc."),
+    ("FUN_080ff9e0", "advance_card_list_frame_counter",
+        "Called by tick_card_display_render_panel (0x080fefaa) every frame. "
+        "Reads IWRAM 0x0202a4d0[+6] display_mode; if !=2 zeroes frame_counter. "
+        "If ==2, compares 5 fields ([+4]/[+0xe]/[+0x10] vs [0x0202f3c0+0x12]/[+0x18]/[+0x1a]); "
+        "all match: increment [0x0202f3c0+0xe] frame_counter up to max 0x1d(29); "
+        "any mismatch: zero it."),
+    ("FUN_08101764", "tick_card_list_slot_highlight_oam",
+        "Called by tick_card_display_render_panel (0x080fefaa). "
+        "Outer loop r7=0..3. Reads display_mode from IWRAM 0x0202a4d0[0], "
+        "branches on enum 0/1/2/3 to compute tile offsets and write OAM sprite attrs. "
+        "Uses ROM table 0x09e60010 for tile/slot params. "
+        "Maintains card_list slot highlight/selection OAM each frame."),
+    ("FUN_08101574", "write_card_list_slot_oam_entries",
+        "Called by tick_card_display_render_panel (0x080fefaa). "
+        "Calls write_oam_entry_priority_aware(tile=0x40, y=0, ...) for row 0; "
+        "outer loop r5=0..5 (6 rows): read_card_list_field_by_row_col, "
+        "[0x0202f3c0+0x1f] bit5 -> priority flag, write_oam_entry_priority_aware per row (r2=0x24 step). "
+        "Second pass col=0 entries: for r6>0 rows writes extra sprites at y=0xa8+row*0x10, x=0x2a."),
+    ("FUN_080fefaa", "tick_card_display_render_panel",
+        "Called by FUN_080fe308 (scene main loop). "
+        "Display panel frame dispatcher for card_stats/font_jp/frame_counter subsystems. "
+        "Entry: movs r5,#0 / movs r1,#0 then jumps to main body at LAB_080fefae. "
+        "Downstream callees: tick_card_stats_render_panel, advance_card_list_frame_counter, "
+        "write_card_list_slot_oam_entries, tick_card_list_slot_highlight_oam."),
+    ("FUN_080ff434", "apply_card_list_scroll_selection",
+        "Called by FUN_080fe308 (scene main loop). "
+        "compute_card_list_scroll_position -> if <0 return 0. "
+        "Read card_id from [0x0202f3c0+0x74] offset table (20-bit). "
+        "card_list_on_select_to_info_page; [0x02006c2c] bit[2:0] lang -> strb update [0x0201afb0] bit1. "
+        "strh 0 -> REG_DISPCNT (0x04000000), strh 0 -> PAL_RAM_BASE (0x05000000). "
+        "clear_all_card_list_slot_flags. Returns 1."),
+    ("FUN_080ff4b8", "dispatch_card_info_list_tick_by_state",
+        "Called by FUN_080fe308 (scene main loop). "
+        "Reads IWRAM 0x0202a4d0[0] display_mode: !=1 -> tick_card_info_page_by_state. "
+        "==1: check [+0x16] bit5 deck_timer enable; not set -> tick_card_info_page_by_state. "
+        "Set: query_deck_timer_remaining; !=0 -> tick_card_info_page_by_state. "
+        "==0 (timer done): card_list_screen_init, return 1 (scene switch)."),
+    ("FUN_080fffc4", "dispatch_card_list_render_by_scroll_mode",
+        "Called by FUN_080fe308 (scene main loop). "
+        "resolve_card_scroll_offset_by_mode updates [0x0202f3c0+0x74]/[+0x7a]. "
+        "Reads IWRAM 0x0202a4d0[0] display_mode 0/1/2/3 -> write_card_list_slot_tiles_to_vram with mode-specific offset. "
+        "Then: card_list_tile_renderer, setup_card_list_bg2_tilemap, strh 0xf dirty flag x3, "
+        "render_card_list_visible_slots, render_card_list_entry_row, "
+        "dispatch_card_frame_tile_load_by_type, setup_card_list_tile_rows. Returns 1."),
+    ("FUN_08106bfc", "clear_card_list_mode_bits",
+        "Called by FUN_080fe308 (scene main loop). Leaf function. "
+        "rsbs r0,#3 -> mask 0xFFFFFFFD (~3). ldrb [0x0202f3c0+0x1e], ands, strb -> clears bit0+bit1. "
+        "Returns 1. Resets card_list mode low 2 bits on state transition."),
+    ("FUN_0810796c", "tick_card_stat_bonus_oam",
+        "Called by tick_card_slot_sprite_animation (0x08106ebc). "
+        "Check [0x0202f3c0+0x1e] bit7 (render enable); return 0 if unset. "
+        "[0x02000000+0x6c2c] bit[2:0] -> EN table 0x09e606f4 or JP table 0x09e60894. "
+        "ldrsh [r5+0x38] slot type; switch(2/3/4) -> r6=1/3/1, r7=-19/-19/-10. "
+        "Loop r4=0..r6-1: calc_card_stat_bonus_by_type + dispatch_oam_write_by_mode. Returns 1."),
+    ("FUN_08106ebc", "tick_card_slot_sprite_animation",
+        "Called by dispatch_settings_card_display_by_mode (0x080ff8d0) and FUN_081047e8. "
+        "Reads gPrng+0x148/+0x14e random halfwords -> state mask. "
+        "bit7 of [0x0202f3c0+0x1e]: animation enable gate. bit4: sub-state flag. "
+        "Lang table select 0x09e606f4/0x09e60894. slot_type 0-4 -> anim counter inc/dec, "
+        "sync_state_and_init_sprite, strb anim attr [r6+0x16]. "
+        "Tail: bit5 unset -> tick_card_stat_bonus_oam + calc_card_stat_bonus_by_type + write_slot_display_coords. Returns 1."),
+    ("FUN_080ff8d0", "dispatch_settings_card_display_by_mode",
+        "Called by FUN_080fe308 (scene main loop). "
+        "Reads IWRAM 0x0202a4d0[0] display_mode: !=1 -> return 0. "
+        "==1: [+0x16] bit5 deck_timer enable; not set -> return 0. "
+        "query_deck_timer_remaining: !=0 -> return 0. "
+        "[0x0202f3c0+0x38]==0x12 -> return 0 (special state). "
+        "Otherwise: orrs [0x0202f3c0+0x1e] bit5 (0x20), strb, tick_card_slot_sprite_animation. Returns 1."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

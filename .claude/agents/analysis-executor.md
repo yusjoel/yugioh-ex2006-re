@@ -94,7 +94,7 @@ model: sonnet
 
 - proposed_name: 严格 `^[a-z][a-z0-9_]+$`, `verb_object[_qualifier]`
 - plate: 中文 ASCII 标点 (Jython 限制), 含调用方+触发+副作用 ≥ 2 项
-- 参数: 不确定标 `(unknown, 待 runtime 验证)`
+- 参数: 不确定时先扫入口 5 条指令确认 void (见 `feedback_r3_void_confirmation_required.md`); 仍不明确则追 caller asm; 禁止写"待 runtime 验证"
 - 行级注释: ≤30 行精华
 
 ### Phase 4: 自检 (一次过, 全部用 grep)
@@ -107,7 +107,7 @@ model: sonnet
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
 7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）→ 全部替换为最接近的 ASCII 对应符号；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
-9. **R1 双动词检查**: proposed_name 不得含 `_and_` 连接两个动词; `_and_return` 永远不合法 (return 是隐含语义); epilogue/wrapper 统一用单动词形式
+9. **R1 双动词检查**: proposed_name 不得含 `_and_` 或 `_or_` 连接两个动词; `_and_return` 永远不合法 (return 是隐含语义); dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
 
 ### Phase 5: 完成报告
 
@@ -134,11 +134,12 @@ model: sonnet
 - 同 caller 串调 zero_ + render_ → `feedback_clear_then_render_pair.md`
 - 函数体仅 `bx lr` (2 字节) → `feedback_release_noop_stub_fingerprint.md` (类型 A/B 区分; callsite 参数数量是关键)
 - indeg=1 from card_image hub + 调用 commit_line_buffer_to_sprite_vram + setup_line_buf_pos_and_font + render_*_to_buf triple → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_card_stat_label_drawer_cluster.md`
-- 任意参数寄存器语义不明确/列为 "unknown" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
+- 任意参数寄存器语义不明确/列为 "unknown" 或想写"待 runtime 验证" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_void_confirmation_required.md` (先扫入口 5 条指令; 禁止占位符) + `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
 - R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3)
 - 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
 - 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
 - 函数入口含 `adds rX, rY, #0x0`（X < 4）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (rX 不是独立参数，先扫入口 5 条指令)
+- proposed_name 含 `_and_` 或 `_or_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state)
 - 函数体含 OAM attr 写入 / DISPCNT / IO 寄存器裸整数常量 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (必须在 Constants: 块命名; `0xC00`=mode mask 非 priority; batch-9 7/7 R6 扣分)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
