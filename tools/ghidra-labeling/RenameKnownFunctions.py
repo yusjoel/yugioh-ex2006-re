@@ -1804,6 +1804,118 @@ RENAMES = [
         "若允许则将 card_id 写入 output_buf (str r4,[r7]) 并推进 r7; 同时计数 r2. "
         "返回 r0 = 收集到的有效配对卡数量."),
 
+    # 2026-05-05: BATCH-12 落地 (topo=244/245/246/247/248/249/250/251/252/253/254/255/256/257/258)
+    ("FUN_08103524", "load_card_name_from_fs_by_index",
+        "以卡牌索引号 r1 查找 FS 条目 (lookup_card_entry_by_index), 再通过 load_card_fs_entry_to_struct "
+        "将文件系统字符串加载到结构体; 随后对 r0 指向的目标缓冲区调用 zero_fill_by_halfword 清零 "
+        "(大小 0x8c*2=0x118 字节), 然后 strncpy 复制卡名字符串并写入终止符. "
+        "最后从 IWRAM [0x02000000+0x6c2c] 读取语言 bit[2:0] 并写入 [r7+0x17]. "
+        "由三个 card_ids/card_stats/fs 上下文调用方 (FUN_081021dc, FUN_081026f4, FUN_08103020) 调用, "
+        "用于将单张卡的卡名字符串填入卡片信息结构体指定字段."),
+    ("FUN_081026f4", "check_card_entry_by_mode",
+        "由场景主循环 (FUN_080fe308) 和 FUN_08105964 调用, 根据模式参数 r0 "
+        "(0=新卡/无状态, 1=已有索引) 以及索引参数 r1 对卡片条目执行有效性检查并选择加载路径. "
+        "r0=0 时检查 IWRAM banlist 位图 (0x0202a4d0+0xc2*2) 中对应位是否为零; "
+        "r0=1 时调用 get_card_data_format_id 并比较范围. 检查失败返回 r0=-1; "
+        "通过后根据模式分发到 copy_bytes_by_halfword (模式0) / load_card_name_from_fs_by_index (模式1) / "
+        "copy_bytes_by_halfword (模式2+). 函数完成后将结果写回 IWRAM 并通过多段 "
+        "bl insert_card_into_deck_slot 按 deck_type 更新 deck slot 状态."),
+    ("FUN_08102828", "find_card_slot_by_id_and_mode",
+        "被 update_card_list_scroll_page_state (scene_card_list) 调用, "
+        "以卡牌 ID (r1 经 0x0fff 掩码处理后的值) 在 IWRAM [0x0202a4d0] 的 deck slot 数组中 "
+        "按模式 r3 (0-3) 查找匹配条目. 模式 0/1/2/3 各对应不同的 slot 起始偏移 "
+        "(0x2b9c/0x3ecc/0x40cc/0x3ccc 等), 使用 bsearch_index_by_callback 进行二分查找; "
+        "找到则返回在 slot 中的下标, 否则返回 0. r0 经初始化后清零其指向的 halfword ([r0]=0); "
+        "r2 为输出指针, 写入掩码后 card ID (strh). 配合 update_card_list_scroll_page_state 的滚动/分页逻辑使用."),
+    ("FUN_080ffaf8", "update_card_list_scroll_page_state",
+        "由场景主循环 tick_card_list_scene_frame (FUN_080fe308) 调用, "
+        "负责更新卡片列表的滚动/翻页状态. 检查 [r4+0x78] (scroll pending flag) 是否为零: "
+        "若为零则切换 [r6+0x16] bit0 (奇偶翻页标记), 并将 strh 0 写入 [r6+0xc/0xe/0x10] 三个状态字段; "
+        "若非零则调用 compute_card_list_scroll_position 计算滚动位置, "
+        "再调用 find_card_slot_by_id_and_mode 找到对应 slot 下标, "
+        "之后通过 __modsi3 / __divsi3 计算行内列偏移和行号, 分别 strh 到 [r6+0xc] (列) 和 [r6+0xe] (行). "
+        "最后调用 reset_card_list_scroll_state 并返回 1."),
+    ("FUN_080fe308", "tick_card_list_scene_frame",
+        "card_list 场景每帧主 tick 函数, 由四个高层场景管理函数 "
+        "(FUN_08108788/08108cdc/08108fd8/0810af00) 调用. "
+        "从 IWRAM gPrng 区域读取状态标记: [gPrng+0xa4*2] (r1) 和 [gPrng+0xa7*2] (r0), "
+        "计算 r5 = r1 & ~r0 (活跃 tick 掩码); 检查 [r7+0x1e] bit0, 若为零则直接跳过; "
+        "若非零则调用 dispatch_card_info_list_tick_by_state 执行状态机 tick. "
+        "若 dispatch 返回 0 则再调用 return_zero_epilogue_stub. "
+        "dispatch 返回非零时清除 [r7+0x1e] bit1 并再次调用 return_zero_epilogue_stub."),
+    ("FUN_080ff430", "return_one_scene_card_list",
+        "scene_card_list 场景的固定返回值存根, 函数体仅 movs r0,#0x1 + bx lr 两条指令. "
+        "由四个高层场景容器 (FUN_08108788/08108cdc/08108fd8/0810af00) 调用, "
+        "语义为'当前帧无需进一步处理, 返回已完成状态 1'. "
+        "根据 release-noop-stub 指纹 (2字节体 + indeg>=4), 属于类型 B 零参数场景处理器占位."),
+    ("FUN_08102924", "insert_card_into_deck_slot",
+        "由 populate_deck_slots_from_card_list (card_stats) 和 reset_all_deck_slots (card_stats) "
+        "以 deck_type=0/1/2/3 批量调用, 将一张卡插入指定 deck slot 数组中的有序位置. "
+        "r0=IWRAM 基址 (->r8), r1=deck_slot_mode (->r4) 决定目标 slot 偏移 "
+        "(0->0xb7*4, 1->0x140c, 2->0x160c, 3->0x180c), r2=card_id (->r7, & 0x0fff), "
+        "r3=insert_mode (->stack). 使用 bsearch_index_by_callback 在已排序数组中定位插入点; "
+        "若找到则更新现有条目的 type nibble; 若未找到则在末尾追加并通过 strh/移位更新计数字段 "
+        "[slot+0x1a0c] 和 [slot+0x1a14]. 返回 0 (插入成功) 或当前计数."),
+    ("FUN_08103350", "populate_deck_slots_from_card_list",
+        "由 reinit_deck_slots_and_data/FUN_08102124/FUN_0810230c/FUN_081021dc (均含 card_stats tag) 调用, "
+        "负责将 IWRAM [0x0202a4d0+0x6c] 卡片列表中的已排序条目批量插入 deck slot. "
+        "两段循环分别处理 slot 类型 1 (偏移 +0x1c, 循环上限 [base+0x18]) 和 slot 类型 2 "
+        "(偏移 +0xbc, 循环上限 [base+0x19]): 每次从对应 halfword 读取 card_id, "
+        "以 deck_type=1/2, r1=0, r3=1 调用 insert_card_into_deck_slot 逐条插入. 返回 r0=1."),
+    ("FUN_08103820", "zero_deck_slot_range_by_type",
+        "由 reset_all_deck_slots (批量 type 0..3 调用) 和 FUN_0810236c (card_stats) 调用, "
+        "根据 deck_type (r0, [0..3]) 和 flag (r1, 0=主/1=副) 选择目标 slot 的 IWRAM 偏移, "
+        "调用 zero_fill_by_halfword 将对应区域清零. "
+        "四种 deck_type 分别对应偏移 0x3ecc/0x3ccc/0x140c/0x160c (flag=0) "
+        "或 0x40cc/0x3ecc/0x3ccc/0x42cc (flag=1); "
+        "大小固定为 0x200 halfword (0x400 字节) 或 0x1130 halfword. 返回 r0=1."),
+    ("FUN_0810329c", "reset_all_deck_slots",
+        "被五个 card_stats 调用方调用 (FUN_08102124/081021dc/0810230c/081030c4/081030e0), "
+        "是 deck slot 重置的核心入口. 循环 type=0..3 调用 zero_deck_slot_range_by_type(type, 0) "
+        "将全部四种 deck slot 区域清零; 随后以 banlist 位图 (IWRAM 0x02000006) 为外层循环, "
+        "对每个设置了对应 bit 的索引, 读取标记 byte (0xb7*4 偏移), 提取 type nibble, "
+        "并调用 write_card_list_field_by_row_col 写入对应 row/col. "
+        "最后将计数 r5/r6 分别 strh 到 [r8+0x1a0c] 和 [r8+0x1a14]. 返回 r0=1."),
+    ("FUN_081030e0", "reinit_deck_slots_and_data",
+        "由 init_card_stats_display_fields (card_stats) 和 FUN_08103020 (card_ids/card_stats/fs) 调用, "
+        "是 deck slot 完整初始化序列的组合函数. 依次调用: "
+        "(1) reset_all_deck_slots() 清零全部 slot 状态; "
+        "(2) populate_deck_slots_from_card_list() 将卡片列表重新填入 slot; "
+        "(3) 循环 slot_idx=0..3 调用 init_deck_slot_data(slot_idx) 初始化每个 slot 的详细数据. "
+        "返回 r0=1."),
+    ("FUN_0810322c", "write_card_list_field_by_index",
+        "被 FUN_08102034/08102124/081021dc/0810236c (均含 card_stats) 调用, "
+        "是卡片列表字段写入的最小工具函数. 以 r0 为字段下标 (halfword 步长 *2), "
+        "在 IWRAM 0x0202a4d0+0xa7*4=0x29c 偏移处写入 halfword r1. "
+        "函数体 7 条指令, 返回 r0=1. "
+        "与已命名的 write_card_list_field_by_row_col 语义相似但参数不同 "
+        "(本函数用线性下标, 彼函数用 row/col 二维坐标)."),
+    ("FUN_08102034", "init_card_stats_display_fields",
+        "由高层场景容器 FUN_08108b38 (含 banlist/card_frame/card_list/card_stats/deck/font_jp/settings) 调用, "
+        "是卡片统计显示字段的初始化入口. 函数先 copy_bytes_by_halfword 将 0x0201138 的 0x118 字节 "
+        "复制到 IWRAM 0x0202a4d0+0x6c; 随后调用 write_card_list_field_by_index 依次写入4个字段: "
+        "(index=0, value=0), (index=1, value=1), (index=2, value=1), (index=3, value=1); "
+        "之后对每个 slot (r5=0..3) 读取 [r6+slot] 的原始值, 经 clamp [1..5] 后调用 "
+        "write_card_list_field_by_row_col 写入7列显示字段; "
+        "最后调用 reinit_deck_slots_and_data() 重建 deck slot. 返回 r0=1."),
+    ("FUN_081033c4", "build_card_list_slot_display_entries",
+        "由 refresh_card_list_slot_display/FUN_081021ac/FUN_081021dc/FUN_08102fc4 "
+        "(均含 scene_card_list tag) 调用, 负责将 IWRAM deck slot 数据构建为卡片列表槽位的显示条目 "
+        "(halfword 数组). 函数使用 r9 (implicit 参数, IWRAM 基址相关) 作为基址: "
+        "先 zero_fill_by_halfword 清零目标区域 (r9+0xc2*2 偏移, 大小 0x118 字节), "
+        "再 copy_bytes_by_halfword 从 r9+0x6c 复制 0x17 halfword 的头部数据; "
+        "读取 [r9+0x83] 写入 [dest+0x17] (类型标记). 随后以 r12 (implicit) 为循环上限, "
+        "遍历三组 slot 数组 (偏移 0x1a0c/0x1a34/0x1a3c/0x180c), "
+        "将每个 slot entry 的低 20-bit 提取后 strh 写入输出缓冲区, "
+        "并累加 r6 计数 (写入 [dest+0x18] 和 [dest+0x19]). 返回 r0=1."),
+    ("FUN_081020e0", "refresh_card_list_slot_display",
+        "由 FUN_08108c4c (scene_duel_puzzle/card_list) 调用, 是 card_list 槽位显示的刷新入口. "
+        "函数对 slot_idx=0..3 循环: (1) read_card_list_field_by_row_col(slot_idx, 0) 读取当前槽位字段值, "
+        "strb 写入 [0x02006c34+slot_idx] (IWRAM 槽位状态字节); "
+        "(2) 调用 build_card_list_slot_display_entries 构建显示条目; "
+        "(3) 最后 copy_bytes_by_halfword 将 0x0202a4d0+0x6c 的 0x118 字节复制到 0x02001138. "
+        "返回 r0=1."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
