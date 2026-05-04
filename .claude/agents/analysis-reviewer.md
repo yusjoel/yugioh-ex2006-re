@@ -63,6 +63,7 @@ model: sonnet
 | R3 数值型 index 参数缺 [lo..hi] 范围 | `feedback_r3_param_range_required.md` (扣 R3; executor 补范围后重审) |
 | R4 返回值仅写数值（"returns 1" 无含义）或缺路径说明 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (R4=0; 要求补语义+路径) |
 | 函数入口含 `adds rX, rY, #0x0` 且 r3 含被覆盖寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (R3=0; 被覆盖 rX 不是独立参数) |
+| 函数涉及 OAM attr / DISPCNT / IO 写入含裸 16/32-bit 常量 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (R6=0; 无 Constants: 块 / `0xC00` 标为 priority 而非 mode mask) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 

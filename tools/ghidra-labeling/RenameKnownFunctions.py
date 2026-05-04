@@ -1465,6 +1465,129 @@ RENAMES = [
         "被多个 scene_card_list/card_stats caller 在场景切换或面板清理时调用. "
         "与 clear_card_display_flag_bits (0x08107eb0) 操作同一 flag 字节但清除不同位."),
 
+    # 2026-05-04: BATCH-9 落地 (topo=198/199/200/201/202/203/204/206/207/208/209/210/211/212/213)
+    ("FUN_080ff918", "render_card_stats_panel_if_scrolled",
+        "由 FUN_080fefaa (display/blend/window/bg/card_stats/font_jp 场景帧主循环) 调用, "
+        "触发条件为卡牌列表帧更新时. 先重置 clear_card_stats_render_flags / "
+        "clear_card_display_flag_bits 两项标志, 再调用 compute_card_list_scroll_position "
+        "取得当前滚动索引; 若滚动索引 >= 0, 以该索引 *2 偏移读取 [0x0202f3c0+0x74] 表中的卡牌 "
+        "entry, 经 lsls/lsrs 20 位掩码提取 12 位字段后传入 render_card_stats_panel 渲染卡牌详情面板. "
+        "返回 1 表示成功渲染, 0 表示无有效滚动位置跳过渲染."),
+    ("FUN_081081a0", "set_card_stats_display_position",
+        "由 FUN_080fefaa (display/blend/window/bg/card_stats/font_jp 场景帧主循环) 调用, "
+        "用于写入卡牌统计显示区域的坐标. 函数将 r0 (x) 写入 [0x0202f3c0+0x34], "
+        "将 r1 (y) 写入 [0x0202f3c0+0x36]; 0x0202f3c0 为卡牌统计显示状态结构体基地址, "
+        "+0x34/+0x36 在同模块多处被 strh 写入, 对应显示坐标 halfword 对. 返回常量 1."),
+    ("FUN_08107b90", "write_oam_entry_priority_aware",
+        "被 FUN_08100cc4 / FUN_08101574 (scene_card_list) / FUN_081016a4 / "
+        "FUN_08107bdc (card_stats/font_jp) / FUN_0810903c (card_stats/font_jp/game_str) "
+        "等 6 处共享调用, 是卡牌列表场景的通用 OAM 写入中间层. "
+        "读取 [0x0202f3c0+0x1e] 的 bits[13:12] (掩码 0x6000), 与常量 0xC000 比较: "
+        "相等且 r3==0 则调用 write_obj_attr_with_priority (覆写 OAM priority 字段), "
+        "否则调用 write_oam_entry_with_tile_inc (按 tile 递增方式写 OAM). "
+        "r0=OAM 参数包, r1=属性 1 (尺寸/形状), r2=属性 0 (坐标), r3=标志 (0 时启用 priority 路径)."),
+    ("FUN_081016a4", "write_fixed_card_list_cursor_oam",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 触发时机为每帧更新卡牌列表光标/指示图标的 OAM 属性. "
+        "函数以硬编码参数调用 write_oam_entry_priority_aware: "
+        "r0=0x00020028 (attr0: y=0x28=40, 16x16 size), r1=0x40 (attr1: x=64), "
+        "r2=0x0c22 (attr2: tile=0x22, palette=12), r3=0 (允许 priority 路径). "
+        "所有参数均为字面量, 推测为固定位置光标/箭头精灵的初始化写入."),
+    ("FUN_08101ba8", "render_deck_timer_digits_oam",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 触发条件为: [0x0202a4d0+0x0] == 1 (card_type 字段为 1) "
+        "且 [0x0202a4d0+0x16] bit5 != 0 (计时器使能标志). 满足条件后调用 "
+        "query_deck_timer_remaining 取剩余秒数, 依次以 /60 得到分钟数, "
+        "%60 再 /10 / %10 得到秒十位/秒个位, 共 4 个十进制数字; "
+        "在 0x09e60058 ROM 字形表中按索引找到对应 halfword 属性, "
+        "循环 4 次调用 dispatch_oam_write_by_mode 将每位数字精灵写入 OAM. "
+        "若条件不满足则跳过, 直接返回 1."),
+    ("FUN_08101e2c", "render_card_list_scrollbar_oam",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 每帧负责绘制卡牌列表滚动条的 OAM 精灵组. "
+        "首先检查 [0x0202f3c0+0x7a] 当前列表长度是否 > 4, 若否则跳过整个渲染. "
+        "满足条件后读取 [0x0202a4d0+0x10] 作为滚动位置基准, "
+        "从 [0x0202f3c0+0x7a] 减 4 得到可滚动范围, "
+        "以 SCROLLBAR_BASE_Y=0x52 * 4 / __divsi3 计算 thumb 块高度; "
+        "循环对 N 个 thumb tile 调用 dispatch_oam_write_by_mode, "
+        "并对两端固定端帽精灵 (top: 0x002f00ec, bot: 0x008900ec) 写固定 OAM 条目; "
+        "最终将 thumb 中心 x 坐标写入 [0x0202f3c0+0x1c]."),
+    ("FUN_0810ab90", "render_card_type_icon_oam",
+        "由 FUN_0810a22c (card_stats/font_jp) 唯一调用, "
+        "用于在卡牌统计面板中渲染卡牌属性图标 OAM 精灵组. "
+        "函数首先检查 [0x0202f3c0+0x1f] bit1 是否置位; 若未置位则直接返回 0. "
+        "通过 [0x0202f3c0+0x54] (card_type s16) 计算 x 偏移: type * 5 OAM slots per type group, "
+        "再加 [+0x4e] * 14 bytes 行偏移; bit2 置位时额外加 0x16 (=22) 行间距校正. "
+        "检查 [0x0202a4d0+0x16] bits[0:2]==5 则 r10 减 8. "
+        "最终以两次 dispatch_oam_write_by_mode 写 OAM slot 0x9b94/0x9b96 (图标主体), "
+        "再循环写 0x9b98 (N 个附加 tile), 返回 1."),
+    ("FUN_0810a944", "render_card_name_text_to_vram",
+        "由 FUN_0810a22c (card_stats/font_jp) 唯一调用, "
+        "触发条件为 [0x0202f3c0+0x1f] bit1 置位. "
+        "函数先对 VRAM 0x0600e800 区域调用 zero_fill_by_halfword 两次清空 sprite tile 缓冲; "
+        "调用 setup_line_buf_pos_and_font 初始化行缓冲位置与字体 (mode=0x20, font=2). "
+        "根据 [0x02006ed0+0x6c2c] 处 bit0-2 判断走 resolve_card_gfx_pointer_by_type "
+        "(卡图指针路径) 还是 select_charset_then_load_name (字符集名称路径), "
+        "将卡牌名称字符串写入行缓冲; strlen 截断至 50 字符后调用 text_render_wrapper + "
+        "commit_line_buffer_to_sprite_vram 将名称文本提交到 sprite VRAM. "
+        "最终循环 2x32 次通过 strh 将 tile 索引写入 0xffff9000 区域 (相对基址负偏移 -0x7000), "
+        "并将文本起始 x 写入 [0x0202f3c0+0x4a], 字形宽度写入 [+0x4c/+0x52/+0x54]."),
+    ("FUN_0810a22c", "render_card_name_panel",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 每帧负责渲染卡牌名称显示面板的全部内容. "
+        "首先检查 [0x0202f3c0+0x1f] bit1 是否置位 (名称面板使能), 未置位则跳过全部逻辑. "
+        "置位后再检查 bit6 是否置位: 若置位, 调用 render_card_name_text_to_vram 将卡牌名称文本渲染到 "
+        "sprite VRAM 并清除 bit6; 随后无条件调用 render_card_type_icon_oam 写图标 OAM 精灵. "
+        "其后根据 bit2 分支, 进一步更新名称面板的坐标和 OAM 精灵属性. 返回 1."),
+    ("FUN_08100cc4", "render_card_list_row_sprites_oam",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 负责将卡牌列表中 4 行 (r6: 0..3) 的行指示精灵写入 OAM. "
+        "函数首先检查 [0x0202a4d0+0x16] bit0 是否置位, 若未置位则跳过所有写 OAM. "
+        "对每行: 从 [0x0202f3c0+0x78] 处的行数组首地址读当前行 entry, "
+        "以 [entry+0x10] 取 y 偏移加当前行索引作为新 y; "
+        "计算 OAM attr0 (y | 0xC00, bits[10:11] = OBJ mode field), "
+        "连续调用两次 write_oam_entry_priority_aware 写两个相邻 sprite."),
+    ("FUN_08107ec4", "render_card_attribute_badge_oam",
+        "被 FUN_080fefaa (display/blend/window/bg/card_stats) 和 FUN_080ff94c (card_stats) "
+        "两处调用, 用于在卡牌统计面板中渲染卡牌属性徽章 OAM 精灵. "
+        "函数首先对 [0x0202f3c0+0x5a..+0x5d] 四字节执行 OR 0xFF (标记已用 tile 槽), "
+        "再读取 [0x0202a4d0] 作为卡牌索引, 调用 read_card_list_field_by_index 取属性字段值后减 2, "
+        "对结果做 9 路 switch (case 0-8) 分派不同的属性类型处理块. "
+        "各 case 从 card_stats_table 按行读取对应属性的 tile 坐标数据 (11 列, 含 0xffff 边界检查), "
+        "以 __divsi3/__modsi3 计算 tile 行列后调用 dispatch_oam_write_by_mode 写 OAM 精灵."),
+    ("FUN_08107e5c", "init_card_icon_tile_slots",
+        "由 FUN_080ff94c (card_stats) 唯一调用, 在图标路径卡牌统计渲染前执行 tile 槽初始化. "
+        "先调用 copy_card_icon_tiles_to_vram 将卡牌图标 tile 数据复制到 VRAM sprite 区; "
+        "随后对 [0x0202f3c0+0x5a..+0x5d] 四字节各 OR 0xFF (标记 tile 槽为已分配); "
+        "再将 [0x0202f3c0+0x50], [+0x56], [+0x58], [+0x60] 四个 halfword 清零; "
+        "最后读 [+0x1f] OR bit3 写回, 读 [+0x1e] AND ~0x11 (清除 bit0+bit4) 写回. 函数返回 1."),
+    ("FUN_080ff94c", "render_card_stats_panel_with_icon",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 是图标路径的卡牌统计面板渲染编排函数, "
+        "与 render_card_stats_panel_if_scrolled 构成同一 caller 下的两变体. "
+        "函数先调用 clear_card_display_flag_bits 和 clear_card_stats_render_flags 重置标志, "
+        "再调用 init_card_icon_tile_slots 将图标 tile 复制到 VRAM 并初始化槽位; "
+        "调用 compute_card_list_scroll_position 取滚动索引, 若 >= 0 则以 index*2 偏移读取 "
+        "[0x0202f3c0+0x74] 表中的 entry, lsls/lsrs 20 位提取卡牌 id 字段后传入 "
+        "render_card_attribute_badge_oam 渲染属性徽章. 固定返回 1."),
+    ("FUN_0810a8d4", "set_card_stats_sprite_position",
+        "由 FUN_080fefaa (display/blend/window/bg/card_frame/card_stats/font_jp/frame_counter "
+        "场景帧主循环) 唯一调用, 将 r0 (x) 和 r1 (y) 以 strh 写入 "
+        "[0x0202f3c0+0x34] 和 [0x0202f3c0+0x36]. "
+        "与 0x081081a0 (set_card_stats_display_position) 为写相同偏移对的两个叶子函数变体: "
+        "本函数无 push/pop (纯叶子, bx lr 直接返回), 0x081081a0 有 lr push 但逻辑等价. "
+        "0x0202f3c0 是卡牌统计显示状态结构体基地址, +0x34/+0x36 halfword 对统一表示精灵显示坐标."),
+    ("FUN_081083b0", "render_card_type_badge_oam",
+        "由 FUN_08107bdc (card_stats/font_jp) 唯一调用, "
+        "在 scene_card_list 卡牌统计面板中渲染卡牌类型徽章 (monster/spell/trap 等) 的 OAM 精灵. "
+        "函数首先检查 [0x0202f3c0+0x1f] bit3 是否置位 (类型徽章显示使能); 未置位则返回 0. "
+        "置位后调用 read_card_list_field_by_index 读卡牌类型字段, 减 2 后对 0..8 做 9-case switch: "
+        "case 0-1 (monster 分支) 设置 11 tiles (88px); "
+        "case 2-3 / case 4 设置 6 tiles (48px); case 5 / case 6-7 / case 8 设置 5 tiles (40px). "
+        "以 (width+7)/8 向上取整 tile 高度, 循环调用 dispatch_oam_write_by_mode "
+        "写 OAM slot 0x9b94/0x9b96 (主/副徽章) 及 0x9b98 (附加 tile 组), "
+        "结构与 render_card_type_icon_oam (0x0810ab90) 完全对称."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "
