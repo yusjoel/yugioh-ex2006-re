@@ -1679,6 +1679,131 @@ RENAMES = [
         "[0x0202f3c0+0x38]==0x12 -> return 0 (special state). "
         "Otherwise: orrs [0x0202f3c0+0x1e] bit5 (0x20), strb, tick_card_slot_sprite_animation. Returns 1."),
 
+    # 2026-05-05: BATCH-11 落地 (topo=229/230/231/232/233/234/235/236/237/238/239/240/241/242/243)
+    ("FUN_081078d4", "clear_card_list_slots_and_anim_flag",
+        "由 FUN_080fe308 (卡牌列表场景主循环) 和 FUN_081047e8 (deck 编辑场景主循环) 各调用一次, "
+        "用于在场景状态切换时清理槽位与动画标志. "
+        "函数依次以 slot_index=1 和 slot_index=2 调用 clear_card_list_slot_flag_by_index 清除对应槽位标志位; "
+        "随后对 [0x0202f3c0+0x1e] 执行 ands 0x7F, 即清除 bit7 (动画/渲染进行中标志), 完成双重重置. "
+        "返回 r0=1 表示操作完成."),
+    ("FUN_0810325c", "write_card_list_field_by_row_col",
+        "由 FUN_080feede 区域 (卡牌列表场景行渲染) 以 r0=card_id, r1=col_index [1..6], r2=-1 连续调用 6 次, "
+        "以及 FUN_08102034/08102124/081021dc/0810236c (均属 card_stats 场景) 调用. "
+        "函数计算二维索引 (r0*7+r1)*2 并加基址偏移 0xa9*4=0x2A4 写入 IWRAM 0x0202a4d0, "
+        "将 r2 (halfword) 存储到对应槽位字段. "
+        "与已命名的 read_card_list_field_by_row_col (0x08103280) 构成完全对称的写操作版本, 同一翻译单元内的读写对."),
+    ("FUN_08109e08", "render_card_stats_text_full",
+        "由 FUN_0810903c (card_stats+font_jp+game_str 场景渲染协调器) 唯一调用. "
+        "函数入口检查 [0x0202f3c0+0x1e] bit3 (0x8) 是否置位; 若未置位则直接返回 0, 表示渲染条件未满足. "
+        "满足条件时分配 0x60 字节栈帧并执行完整的卡片属性文字渲染流程 (含 card_stats 和 game_str 数据). "
+        "为 0810903c 调用的两个渲染子函数之一, 与 08109a50 (含 vram 写入) 并列, "
+        "本函数侧重纯文字内容 (card_stats/game_str) 渲染."),
+    ("FUN_08109a50", "render_card_jp_text_to_vram",
+        "由 FUN_0810903c (card_stats+font_jp+game_str 场景渲染协调器) 唯一调用. "
+        "函数入口检查 [0x0202f3c0+0x1e] bit3 (0x8) 是否置位; 若未置位则直接返回 0. "
+        "满足条件时分配 0x2C 字节栈帧, 执行日文字体 (font_jp) 驱动的文字渲染并写入 VRAM. "
+        "为 0810903c 调用的两个渲染子函数之一, 与 08109e08 (card_stats/game_str 纯文字) 并列, "
+        "本函数侧重 VRAM 直写路径的日文字符渲染. "
+        "VRAM 目标: 0x0600e800 (zero_fill_by_halfword 清零) 和 0x06009800 (commit_line_buffer_to_sprite_vram 写入)."),
+    ("FUN_0810903c", "dispatch_card_stats_text_render",
+        "由 FUN_080ff7e0 (card_stats/font_jp/game_str 场景帧更新器) 唯一调用. "
+        "函数入口检查 [0x0202f3c0+0x1e] bit3 (0x8) 是否置位; 若未置位则尝试置 bit4 (0x10) 并返回; "
+        "满足条件后加载 gPrng 偏移处的两个 halfword (偏移 0xA4*2 和 0xA7*2) 做 BIC 运算得到渲染区域掩码. "
+        "随后检查 [0x0202f3c0+0x1e] bit3 再次确认, 按条件分派调用两个渲染子函数: "
+        "render_card_jp_text_to_vram (08109a50) 和 render_card_stats_text_full (08109e08), "
+        "分别负责日文 VRAM 渲染和 card_stats 文字渲染."),
+    ("FUN_080ff7e0", "trigger_card_stats_render_on_timeout",
+        "由 FUN_080fe308 (卡牌列表场景大型主循环) 唯一调用. "
+        "函数首先读取 [0x0202a4d0+0] (display_mode) 与 [+0x16] bit5 (deck_timer_enable); "
+        "若 display_mode!=1 或 deck_timer 未启用则跳至 fallback 分支. "
+        "否则调用 query_deck_timer_remaining 查询剩余时间; 若仍有时间 (返回非 0) 则跳过渲染. "
+        "当计时器归零时对 [0x0202f3c0+0x1e] OR 0x20 (bit5) 置位, 标记卡片统计区需要渲染; "
+        "之后调用 dispatch_card_stats_text_render (0810903c) 触发文字渲染. "
+        "Fallback 分支直接调用 dispatch_card_stats_text_render. "
+        "返回 dispatch_card_stats_text_render 的返回值 (r0), 或固定 1."),
+    ("FUN_081095e8", "clear_card_list_slot0_and_mode_bits",
+        "由 FUN_080fe308 (卡牌列表场景主循环) 在 tick_card_display_render_panel 之后唯一调用, "
+        "用于场景状态切换时清理 slot=0 及模式标志. "
+        "函数以 slot_index=0 调用 clear_card_list_slot_flag_by_index 清除第 0 槽; "
+        "随后对 [0x0202f3c0+0x1e] 执行 rsbs #0 生成掩码 ~0x9 = 0xFFFFFFF6, "
+        "即 AND 清除 bit0 (slot_active) 和 bit3 (render_en); 返回 r0=1. "
+        "与 081078d4 构成同 family 的对称清除操作 (081078d4 清除 slot=1+2 及 bit7; 本函数清除 slot=0 及 bit0+bit3)."),
+    ("FUN_081099f0", "copy_card_frame_tile_rows_to_vram",
+        "由 FUN_08109300 (vram+palette+scene_card_list+settings 场景渲染器) 在 load_card_frame_tile_row_by_index 之后唯一调用, "
+        "负责将卡帧 tile 行数据批量复制到 VRAM. "
+        "函数以固定参数调用 tile_2d_row_copy 两次: "
+        "第一次以目标 r0=DAT_08109a40, row=0, cols=4, rows=4; "
+        "第二次以同一目标, 另一调色板 r1=DAT_08109a44, cols=3, rows=3. "
+        "两次调用覆盖卡帧的大/小两种 tile 区域, 完成 VRAM 数据写入. 固定返回 r0=0."),
+    ("FUN_081096d4", "compute_card_slot_display_offset",
+        "由 FUN_080ff56c (card_stats+settings 场景) 和 FUN_08109300 (vram+palette+scene_card_list+settings 场景渲染器) 各调用一次. "
+        "函数入口检查 [0x0202f3c0+0x1e] bit3 (0x8) 是否置位; 未置位则返回 0. "
+        "满足条件后读取 [0x02006c2c] bit[2:0] (语言/设置模式); "
+        "bit[2:0]=0 时从 [0x0202f3c0+0x38] 读取 slot_type (s16), 计算 slot_type*5*4 并以 DAT_0810971c (ROM 基址) 为基准定位 slot_entry; "
+        "bit[2:0]!=0 时从另一路径获取. "
+        "在 slot_entry 中搜索匹配 [r8=card_id, caller-set non-APCS] 的条目 (cmp r0,r8 @ 0810975c), "
+        "找到后将 tile_col*0x40+0x8 / tile_row*0x40+0x8 写入 [0x0202f3c0+0x40] 和 [+0x42] 两个 halfword 字段. "
+        "最终返回 1."),
+    ("FUN_08109300", "render_card_frame_slot_to_vram",
+        "由 FUN_080ff56c (card_stats+settings 场景) 唯一调用, 负责将指定卡帧槽位的 tile 数据和调色板写入 VRAM. "
+        "函数接收三个参数 (r0=slot_index, r1=palette_id, r2=card_type), 保存至栈; "
+        "读取 [0x02006c2c] bit[2:0] 选择两套 ROM 查找表 (DAT_08109340=0x09e60cc8 或 DAT_081094c0=0x09e60e44); "
+        "按 slot_index*5*4 定位目标 slot_entry. "
+        "调用 copy_bytes_by_halfword 复制 0x280 字节 tile 数据至 VRAM 0x06009400; "
+        "对 slot_entry 的每个 col/row 调用 resolve_card_frame_palette_by_type + tile_2d_row_copy 将调色板索引写入 VRAM 0x06011000. "
+        "最后调用 copy_bytes_by_halfword 向 VRAM 0x0600E800 写入 OAM tile 头信息, "
+        "再调用 load_card_frame_tile_row_by_index 和 copy_card_frame_tile_rows_to_vram (081099f0) 完成 tile 行复制; "
+        "对 [0x0202f3c0+0x1e] OR 0x8 (bit3) 置位标记渲染完成. "
+        "r2==-1 (无效 slot) 时直接返回 0."),
+    ("FUN_08109608", "compute_card_slot_size_bounds",
+        "由 FUN_080ff56c (card_stats+settings 场景) 唯一调用, 在 render_card_frame_slot_to_vram (08109300) 之后调用. "
+        "函数接收 r0=x_pos, r1=y_pos 两个坐标参数, 检查 [0x0202f3c0+0x1e] bit3; 未置位则直接返回 0. "
+        "满足条件后读取 [0x02006c2c] bit[2:0] 选择查找表 (0x09e60cc8 或 0x09e60e44), "
+        "按 [0x0202f3c0+0x38]*20 定位 slot_entry. "
+        "从 slot_entry [+0x8] / [+0x9] 读取 tile_w / tile_h (各 4 位), "
+        "计算 x_bound = x_pos - tile_w*16 (clamped >= 4); y_bound = y_pos - tile_h*16 (clamped >= 4), "
+        "写入 [0x0202f3c0+0x34] 和 [0x0202f3c0+0x36] (各 halfword). "
+        "若 bit3 仍置位则调用 write_slot_display_coords 写出最终坐标. 返回 1."),
+    ("FUN_080ff56c", "dispatch_card_frame_render_by_mode",
+        "由 FUN_080fe308 (卡牌列表场景大型主循环) 唯一调用. "
+        "函数读取 [0x0202a4d0+6] (display_mode, s16) 作为一级 switch 分支键 ([0..3]): "
+        "mode=0 进入子分支检查 [+0x8] 和 [+0x6], 分派到 render_card_frame_slot_to_vram (08109300) + "
+        "compute_card_slot_size_bounds (08109608) + compute_card_slot_display_offset (081096d4); "
+        "mode=1 检查 [+0x16] bit6 (扩展标志) 后调用 read_card_list_type_hi_nibble 并路由; "
+        "mode=2 调用 compute_card_list_scroll_position 后对选中 card_id 定位 card_stats_table entry, "
+        "再按 [+0] 枚举 (0/1/2/3) 调用 render_card_frame_slot_to_vram + compute_card_slot_size_bounds + "
+        "resolve_card_gfx_row_by_type + compute_card_slot_display_offset; "
+        "mode=3 直接调用 dispatch_card_frame_tile_load_by_type. "
+        "每条路径末尾均置 [0x0202f3c0+0x1e] 相关 bit 并返回 1."),
+    ("FUN_08106b94", "init_card_list_scroll_entry",
+        "由 FUN_080ff4f0 (scene_card_list 场景重置协调器) 在 reset_card_list_scroll_state 之后唯一调用, "
+        "传入从 card_list 指针表读取的 card_id (20-bit 提取后的低 20 位). "
+        "函数向 scene_card_list 结构写入目标 card_id 的滚动入口参数: "
+        "对 [0x0202f3c0+0x64] 写入 r0 (card_id); 对 [0x0202f3c0+0x66]/[+0x68] 写入 0 (滚动偏移清零); "
+        "随后在 [0x0202f3c0+0x70..0x74] 区域 OR 写入 DAT_08106bf8 (0x0000ffff) 位掩码 (3 次循环, stride=2); "
+        "对 [0x0202f3c0+0x34] 写入 0x38 (初始 x 坐标); "
+        "根据 [0x0202f3c0+0x1e] bit2 选择 [+0x36] := 0x18 或 0x20 (y 坐标); "
+        "最后对 [+0x1e] OR 0x2 (bit1), AND ~0x11 (清除 bit0+bit4), 标记入口就绪并清除旧状态位. 返回 1."),
+    ("FUN_080ff4f0", "reinit_card_list_scroll_view",
+        "由 FUN_080fe308 (卡牌列表场景大型主循环) 唯一调用, "
+        "重新初始化滚动视图状态 (重新定位滚动位置 + 清除渲染脏标志 + 重置并初始化滚动条目). "
+        "函数首先调用 compute_card_list_scroll_position 计算滚动位置; "
+        "若返回值 <0 (无有效卡片) 则跳过后续操作返回 0. "
+        "位置有效时依次调用: clear_card_stats_render_flags (清除卡片统计渲染脏标志), "
+        "reset_card_list_scroll_state (重置滚动状态), "
+        "然后从 [0x0202f3c0+0x74] 指针表读取 scroll_pos 对应的 card_id (lsls/lsrs 提取低 20 位), "
+        "最后调用 init_card_list_scroll_entry (08106b94) 写入目标 card_id 的显示坐标和滚动入口参数. "
+        "返回 1 表示重置完成."),
+    ("FUN_08103b3c", "collect_valid_card_pairs_to_buf",
+        "由 FUN_081026f4 (card_ids+card_stats+fs 联合场景) 唯一调用, "
+        "负责从 deck slot 的三个卡片分区 (main/extra/side) 中收集满足配对条件的卡片 ID 到输出缓冲区. "
+        "函数从 r0=deck_slot 指针 (r5), r1=partner_card_type, r10=output_buf (非 APCS, prologue mov r7,r10) 获取参数. "
+        "三重循环分别遍历 [r5+0x18] 个 main 卡 (偏移 0x1C), [r5+0x19] 个 extra 卡 (偏移 0xBC), "
+        "[r5+0x1A] 个 side 卡 (偏移 0xDA); "
+        "每次对当前 card_id * 0x16 定位 card_stats_table entry 后调用 check_card_pair_allowed(card_entry, partner_card_type); "
+        "若允许则将 card_id 写入 output_buf (str r4,[r7]) 并推进 r7; 同时计数 r2. "
+        "返回 r0 = 收集到的有效配对卡数量."),
+
     # 2026-04-30: demo 'shuen' (終焉) 过场动画状态机
     ("FUN_0801bd08", "demo_shuen_state_machine",
         "demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). "

@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `enter_deck_edit_page` (0x08108ac0) |
-| **当前步骤** | 函数命名循环进行中, 已完成 182/259 |
-| **下一步** | 读 closure_topo_order.csv 取 topo>228 的下一个未命名函数 |
-| **上次更新** | 2026-05-04 |
+| **当前步骤** | 函数命名循环进行中, 已完成 197/259 |
+| **下一步** | 读 closure_topo_order.csv 取 topo>243 的下一个未命名函数 |
+| **上次更新** | 2026-05-05 |
 | **上次 callgraph 刷新** | 2026-05-02 17:52 |
 | **callgraph_locked** | `true` (整任务期间禁用 refresh — rename 不改变拓扑结构, 仅手工拆分/合并函数后才需重置 false 并 refresh 一次) |
 
 ## 进度
 
-**182 / 259 (70.27%) 已分析** (跳过 A 已命名 + B runtime/invoker)
+**197 / 259 (76.06%) 已分析** (跳过 A 已命名 + B runtime/invoker)
 
 ---
 
@@ -232,21 +232,21 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 180 | 226 | L4 | 1 | E | `0x0810796c` | FUN_0810796c | tick_card_stat_bonus_oam | 2 | [eval](eval/0810796c.md) |
 | 181 | 227 | L3 | 2 | E | `0x08106ebc` | FUN_08106ebc | tick_card_slot_sprite_animation | 2 | [eval](eval/08106ebc.md) |
 | 182 | 228 | L3 | 1 | E | `0x080ff8d0` | FUN_080ff8d0 | dispatch_settings_card_display_by_mode | 2 | [eval](eval/080ff8d0.md) |
-| 183 | 229 | L3 | 2 | E | `0x081078d4` | FUN_081078d4 | _(待分析)_ | — | — |
-| 184 | 230 | L3 | 5 | D | `0x0810325c` | FUN_0810325c | _(待分析)_ | — | — |
-| 185 | 231 | L5 | 1 | E | `0x08109e08` | FUN_08109e08 | _(待分析)_ | — | — |
-| 186 | 232 | L5 | 1 | E | `0x08109a50` | FUN_08109a50 | _(待分析)_ | — | — |
-| 187 | 233 | L4 | 1 | E | `0x0810903c` | FUN_0810903c | _(待分析)_ | — | — |
-| 188 | 234 | L3 | 1 | E | `0x080ff7e0` | FUN_080ff7e0 | _(待分析)_ | — | — |
-| 189 | 235 | L3 | 1 | E | `0x081095e8` | FUN_081095e8 | _(待分析)_ | — | — |
-| 190 | 236 | L5 | 1 | E | `0x081099f0` | FUN_081099f0 | _(待分析)_ | — | — |
-| 191 | 237 | L4 | 2 | E | `0x081096d4` | FUN_081096d4 | _(待分析)_ | — | — |
-| 192 | 238 | L4 | 1 | E | `0x08109300` | FUN_08109300 | _(待分析)_ | — | — |
-| 193 | 239 | L4 | 1 | E | `0x08109608` | FUN_08109608 | _(待分析)_ | — | — |
-| 194 | 240 | L3 | 1 | E | `0x080ff56c` | FUN_080ff56c | _(待分析)_ | — | — |
-| 195 | 241 | L4 | 1 | E | `0x08106b94` | FUN_08106b94 | _(待分析)_ | — | — |
-| 196 | 242 | L3 | 1 | E | `0x080ff4f0` | FUN_080ff4f0 | _(待分析)_ | — | — |
-| 197 | 243 | L4 | 1 | E | `0x08103b3c` | FUN_08103b3c | _(待分析)_ | — | — |
+| 183 | 229 | L3 | 2 | E | `0x081078d4` | FUN_081078d4 | clear_card_list_slots_and_anim_flag | 1 | [eval](081078d4.md) |
+| 184 | 230 | L3 | 5 | D | `0x0810325c` | FUN_0810325c | write_card_list_field_by_row_col | 1 | [eval](0810325c.md) |
+| 185 | 231 | L5 | 1 | E | `0x08109e08` | FUN_08109e08 | render_card_stats_text_full | 2 | [eval](08109e08.md) |
+| 186 | 232 | L5 | 1 | E | `0x08109a50` | FUN_08109a50 | render_card_jp_text_to_vram | 2 | [eval](08109a50.md) |
+| 187 | 233 | L4 | 1 | E | `0x0810903c` | FUN_0810903c | dispatch_card_stats_text_render | 1 | [eval](0810903c.md) |
+| 188 | 234 | L3 | 1 | E | `0x080ff7e0` | FUN_080ff7e0 | trigger_card_stats_render_on_timeout | 1 | [eval](080ff7e0.md) |
+| 189 | 235 | L3 | 1 | E | `0x081095e8` | FUN_081095e8 | clear_card_list_slot0_and_mode_bits | 1 | [eval](081095e8.md) |
+| 190 | 236 | L5 | 1 | E | `0x081099f0` | FUN_081099f0 | copy_card_frame_tile_rows_to_vram | 1 | [eval](081099f0.md) |
+| 191 | 237 | L4 | 2 | E | `0x081096d4` | FUN_081096d4 | compute_card_slot_display_offset | 2 | [eval](081096d4.md) |
+| 192 | 238 | L4 | 1 | E | `0x08109300` | FUN_08109300 | render_card_frame_slot_to_vram | 1 | [eval](08109300.md) |
+| 193 | 239 | L4 | 1 | E | `0x08109608` | FUN_08109608 | compute_card_slot_size_bounds | 1 | [eval](08109608.md) |
+| 194 | 240 | L3 | 1 | E | `0x080ff56c` | FUN_080ff56c | dispatch_card_frame_render_by_mode | 1 | [eval](080ff56c.md) |
+| 195 | 241 | L4 | 1 | E | `0x08106b94` | FUN_08106b94 | init_card_list_scroll_entry | 1 | [eval](08106b94.md) |
+| 196 | 242 | L3 | 1 | E | `0x080ff4f0` | FUN_080ff4f0 | reinit_card_list_scroll_view | 2 | [eval](080ff4f0.md) |
+| 197 | 243 | L4 | 1 | E | `0x08103b3c` | FUN_08103b3c | collect_valid_card_pairs_to_buf | 2 | [eval](08103b3c.md) |
 | 198 | 244 | L3 | 3 | E | `0x08103524` | FUN_08103524 | _(待分析)_ | — | — |
 | 199 | 245 | L3 | 2 | E | `0x081026f4` | FUN_081026f4 | _(待分析)_ | — | — |
 | 200 | 246 | L4 | 1 | E | `0x08102828` | FUN_08102828 | _(待分析)_ | — | — |
@@ -347,6 +347,7 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 - 2026-05-03: BATCH=15 落地 #8 (15 PASSED, 2 rev=1 + 12 rev=2 + 1 rev=3) — 0x08101c40→query_deck_timer_remaining (rev=2) / 0x08106d88→render_card_name_tiles_to_vram (rev=2) / 0x08106c10→render_card_name_text_to_bg (rev=1) / 0x08106e38→copy_card_name_font_row_to_sprite_vram (rev=2) / 0x081067e0→update_card_info_name_display (rev=2) / 0x080ff528→trigger_card_name_render_if_idle (rev=2) / 0x08101a88→apply_card_frame_palette_animated (rev=2) / 0x08107b4c→dispatch_oam_write_by_mode (rev=2) / 0x08101d0c→write_digit_sprites_for_score (rev=2) / 0x08101c94→compute_card_frame_palette_index (rev=2) / 0x08107eb0→clear_card_display_flag_bits (rev=3) / 0x080ffaa4→compute_card_list_scroll_position (rev=1) / 0x0810a8e4→copy_card_icon_tiles_to_vram (rev=2) / 0x0810a52c→render_card_stats_panel (rev=2) / 0x0810a8c0→clear_card_stats_render_flags (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 58.69% (152/259). 里程碑: 突破 58%, card_info_name_display/card_frame_palette/OAM_dispatch/card_stats_panel 工具簇全落地.
 - 2026-05-04: BATCH=15 落地 #9 (15 PASSED, 8 rev=1 + 7 rev=2) — 0x080ff918→render_card_stats_panel_if_scrolled (rev=1) / 0x081081a0→set_card_stats_display_position (rev=1) / 0x08107b90→write_oam_entry_priority_aware (rev=1) / 0x081016a4→write_fixed_card_list_cursor_oam (rev=2) / 0x08101ba8→render_deck_timer_digits_oam (rev=1) / 0x08101e2c→render_card_list_scrollbar_oam (rev=2) / 0x0810ab90→render_card_type_icon_oam (rev=2) / 0x0810a944→render_card_name_text_to_vram (rev=2) / 0x0810a22c→render_card_name_panel (rev=1) / 0x08100cc4→render_card_list_row_sprites_oam (rev=2) / 0x08107ec4→render_card_attribute_badge_oam (rev=2) / 0x08107e5c→init_card_icon_tile_slots (rev=1) / 0x080ff94c→render_card_stats_panel_with_icon (rev=1) / 0x0810a8d4→set_card_stats_sprite_position (rev=1) / 0x081083b0→render_card_type_badge_oam (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 64.48% (167/259). 里程碑: 突破 64%, card_stats_panel/OAM_write/scrollbar/card_name_panel/type_badge 工具簇全落地.
 - 2026-05-04: BATCH=15 落地 #10 (15 PASSED, 2 rev=1 + 13 rev=2) — 0x081081bc→render_card_atk_def_to_vram (rev=2) / 0x0810a190→lookup_sjis_font_index_by_char (rev=1) / 0x0810823c→render_card_name_glyph_to_vram (rev=2) / 0x08107bdc→tick_card_stats_render_panel (rev=2) / 0x080ff9e0→advance_card_list_frame_counter (rev=2) / 0x08101764→tick_card_list_slot_highlight_oam (rev=2) / 0x08101574→write_card_list_slot_oam_entries (rev=2) / 0x080fefaa→tick_card_display_render_panel (rev=2) / 0x080ff434→apply_card_list_scroll_selection (rev=2) / 0x080ff4b8→dispatch_card_info_list_tick_by_state (rev=2) / 0x080fffc4→dispatch_card_list_render_by_scroll_mode (rev=2) / 0x08106bfc→clear_card_list_mode_bits (rev=1) / 0x0810796c→tick_card_stat_bonus_oam (rev=2) / 0x08106ebc→tick_card_slot_sprite_animation (rev=2) / 0x080ff8d0→dispatch_settings_card_display_by_mode (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 70.27% (182/259). 里程碑: 突破 70%, card_list_display_panel/card_stats_render/slot_animation/settings_dispatch 工具簇全落地.
+- 2026-05-05: BATCH=15 落地 #11 (15 PASSED, 10 rev=1 + 5 rev=2) — 0x081078d4→clear_card_list_slots_and_anim_flag (rev=1) / 0x0810325c→write_card_list_field_by_row_col (rev=1) / 0x08109e08→render_card_stats_text_full (rev=2) / 0x08109a50→render_card_jp_text_to_vram (rev=2) / 0x0810903c→dispatch_card_stats_text_render (rev=1) / 0x080ff7e0→trigger_card_stats_render_on_timeout (rev=1) / 0x081095e8→clear_card_list_slot0_and_mode_bits (rev=1) / 0x081099f0→copy_card_frame_tile_rows_to_vram (rev=1) / 0x081096d4→compute_card_slot_display_offset (rev=2) / 0x08109300→render_card_frame_slot_to_vram (rev=1) / 0x08109608→compute_card_slot_size_bounds (rev=1) / 0x080ff56c→dispatch_card_frame_render_by_mode (rev=1) / 0x08106b94→init_card_list_scroll_entry (rev=1) / 0x080ff4f0→reinit_card_list_scroll_view (rev=2) / 0x08103b3c→collect_valid_card_pairs_to_buf (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 76.06% (197/259). 里程碑: 突破 76%, card_stats_text_render/card_frame_slot_vram/card_list_scroll/card_pairs 工具簇全落地.
 - 2026-05-02 21:40: BATCH=15 落地 (15 PASSED) — 0x080ee988→resolve_card_gfx_pointer_by_type (rev=1) / 0x0801d510→render_card_name_to_line_buf (rev=1) / 0x080f0bb4→setup_line_buf_pos_and_font (rev=1) / 0x080f35e8→blit_tile_color_to_vram_region (rev=3) / 0x080f4ed0→copy_words_aligned (rev=1) / 0x0801d6b4→draw_card_name_label_to_vram (rev=1) / 0x080f1b0c→blit_glyph_columns_to_buf (rev=2) / 0x0801d70c→render_atk_def_digits_to_buf (rev=1) / 0x0801d7d0→draw_atk_def_label_to_vram (rev=1) / 0x080f54e0→count_bytes_until_null (rev=1) / 0x0801d830→render_card_level_text_to_buf (rev=2) / 0x080ef454→lookup_level_glyph_index (rev=1) / 0x0801d92c→draw_card_level_label_to_vram (rev=1) / 0x080ef2cc→resolve_card_type_icon_ptr (rev=1) / 0x080edf00→upload_tile_and_palette_from_struct (rev=2); 单 Ghidra session (15 [ok]) + 1 build + sha1 9689337d 一致; 已分析 18.15% (47/259). 里程碑: 突破 18%, card_image_decode_wrapper 完整子调用簇落地.
 
 ## BLOCKED 追踪
