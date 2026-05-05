@@ -133,7 +133,7 @@ def main():
 
     # 输出 TXT (人类友好)
     with open(OUT_TXT, "w", encoding="utf-8") as f:
-        f.write(f"# enter_deck_edit_page (0x08108ac0) 闭包反向拓扑序\n")
+        f.write(f"# campaign_scene_handler (FUN_08025c94) 闭包反向拓扑序\n")
         f.write(f"# 总 {len(classified)} 函数, {len(sccs)} SCC ({len(big_sccs)} non-trivial)\n")
         f.write(f"# topo_idx 升序: 0 = 最深 sink (callee 全是 leaf/已命名/runtime), 越大越靠近 root\n")
         f.write(f"# 推荐流程: 跳过 A/B 类, 按 topo_idx 升序选 C/D/E/F 类做 analyze-function\n")

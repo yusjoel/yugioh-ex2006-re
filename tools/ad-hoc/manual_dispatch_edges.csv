@@ -1,0 +1,34 @@
+caller_addr,table_rom_addr,callee_addr,note
+# 手工标注的间接派发边 (resolve_fnptr_tables.py 未捕获的 mov pc,rN 模式 / 局部跳表 / 设置全局函数指针后从全局调).
+# 格式: caller_addr (做派发的函数), table_rom_addr (跳表入口, 无表则填 caller_addr), callee_addr, note (英文+中文均可)
+# 由 tools/ad-hoc/merge_manual_edges.py 合并到 temp/complete_callgraph.csv (kind=indirect_manual)
+
+# campaign_scene_handler (FUN_08025c94) 状态分发 — 35 条目, 26 unique handlers (PTR_DAT_08025ccc 0x08025ccc..0x08025d54)
+# 派发指令: mov pc, r0 (.hword 0x4687 @ 08025cbe), 索引来自 (gPrng+0x202)>>0x12>>0x18 截 8bit
+0x08025c94,0x08025ccc,0x08025d58,campaign state 0
+0x08025c94,0x08025ccc,0x08025ec0,campaign state 1
+0x08025c94,0x08025ccc,0x08025f14,campaign state 2
+0x08025c94,0x08025ccc,0x080266bc,campaign state 3
+0x08025c94,0x08025ccc,0x080266d0,campaign state 4
+0x08025c94,0x08025ccc,0x08026748,campaign state 5
+0x08025c94,0x08025ccc,0x080267ca,campaign state 6
+0x08025c94,0x08025ccc,0x08026858,campaign state 7
+0x08025c94,0x08025ccc,0x08027c78,campaign state default/error (idx 8/9/13-19)
+0x08025c94,0x08025ccc,0x08026a2c,campaign state 10
+0x08025c94,0x08025ccc,0x08026af2,campaign state 11
+0x08025c94,0x08025ccc,0x08026bc8,campaign state 12
+0x08025c94,0x08025ccc,0x08026c88,campaign state 20
+0x08025c94,0x08025ccc,0x08026e68,campaign state 21
+0x08025c94,0x08025ccc,0x08026e9c,campaign state 22
+0x08025c94,0x08025ccc,0x08026fe4,campaign state 23
+0x08025c94,0x08025ccc,0x0802727c,campaign state 24
+0x08025c94,0x08025ccc,0x080274f4,campaign state 25
+0x08025c94,0x08025ccc,0x0802752c,campaign state 26
+0x08025c94,0x08025ccc,0x080276dc,campaign state 27
+0x08025c94,0x08025ccc,0x08027714,campaign state 28
+0x08025c94,0x08025ccc,0x0802774c,campaign state 29
+0x08025c94,0x08025ccc,0x080277a4,campaign state 30
+0x08025c94,0x08025ccc,0x08027834,campaign state 31
+0x08025c94,0x08025ccc,0x08027888,campaign state 32
+0x08025c94,0x08025ccc,0x080278c0,campaign state 33
+0x08025c94,0x08025ccc,0x08027a0c,campaign state 34

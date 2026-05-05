@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Step 1: 对 enter_deck_edit_page 的 308 函数闭包打分类标签
+Step 1: 对 campaign_scene_handler (FUN_08025c94) 的函数闭包打分类标签
 
 类别:
   A 已命名 (有语义名)              skip 递归
@@ -13,7 +13,7 @@ Step 1: 对 enter_deck_edit_page 的 308 函数闭包打分类标签
 输入:
   temp/complete_callgraph.csv
   doc/dev/naming-proposals.csv
-  temp/enter_deck_edit_page_closure.txt (用其中地址)
+  (root 由本文件 ROOT 常量决定, 见下)
 
 输出:
   temp/closure_classified.csv (addr, name, class, indeg, depth, kind)
@@ -27,10 +27,12 @@ from collections import Counter, defaultdict
 
 CG_PATH = "temp/complete_callgraph.csv"
 PROPOSALS = "doc/dev/naming-proposals.csv"
-CLOSURE_TXT = "temp/enter_deck_edit_page_closure.txt"
+CLOSURE_TXT = "temp/campaign_scene_handler_closure.txt"
 OUT_CSV = "temp/closure_classified.csv"
 
-ROOT = 0x08108ac0
+# 当前根: campaign_scene_handler (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度)
+# 切换历史: 0x08108ac0 enter_deck_edit_page → 0x080e7994 enter_campaign_page (3-fn 静态闭包过小) → 0x08025c94 真实状态机入口
+ROOT = 0x08025c94
 
 # Runtime/libgcc 段起点 (FUN_0810e5c8 起为 invoker thunks + libgcc + libc)
 RUNTIME_LO = 0x0810e5c8

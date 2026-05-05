@@ -30,7 +30,7 @@ PROPOSALS = "doc/dev/naming-proposals.csv"
 
 OUT_COMPLETE = "temp/complete_callgraph.csv"
 OUT_TABLES = "temp/fnptr_tables.csv"
-OUT_CLOSURE = "temp/enter_deck_edit_page_closure.txt"
+OUT_CLOSURE = "temp/campaign_scene_handler_closure.txt"
 
 ROM_BASE = 0x08000000
 CODE_LO = 0x080000C0
@@ -286,12 +286,12 @@ def main():
             f.write(f"0x{ca:08x},0x{ce:08x},{k}\n")
     print(f"  -> {OUT_COMPLETE}  ({len(all_edges)} edges total)")
 
-    # 计算 enter_deck_edit_page 闭包
+    # 计算 campaign_scene_handler (FUN_08025c94) 闭包
     calls = defaultdict(set)
     for ca, ce, k in all_edges:
         calls[ca].add((ce, k))
 
-    root = 0x08108ac0
+    root = 0x08025c94
     visited = {root: 0}
     queue = [root]
     edge_kind = {}  # callee -> kind
@@ -312,7 +312,7 @@ def main():
             known[int(r["address"], 16)] = r["name"]
 
     with open(OUT_CLOSURE, "w", encoding="utf-8") as f:
-        f.write(f"# enter_deck_edit_page (0x08108ac0) 完整闭包 (含间接派发)\n")
+        f.write(f"# campaign_scene_handler (FUN_08025c94) 完整闭包 (含间接派发)\n")
         f.write(f"# 总计 {len(visited)} 函数\n")
         f.write(f"# level=BFS 深度, kind=direct/indirect_table, name=已命名/FUN_/SUB_/-\n\n")
         # 按 (level, addr) 排序
@@ -331,7 +331,7 @@ def main():
 
     # 简报
     print()
-    print("=== enter_deck_edit_page 闭包 ===")
+    print("=== campaign_scene_handler (FUN_08025c94) 闭包 ===")
     print(f"  总函数: {len(visited)}")
     from collections import Counter
     by_level = Counter(visited.values())
