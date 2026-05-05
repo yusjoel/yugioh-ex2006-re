@@ -2978,6 +2978,139 @@ RENAMES = [
         "then writes &pAnimBank->pSequenceArrayHead[seqId*8] to pAnimCtrl->pAnimSequence (+0). "
         "Returns 1=success, 0=out-of-bounds. "
         "Side-effect: pAnimCtrl active sequence pointer updated."),
+
+    # 2026-05-06: campaign-7 batch (topo=113/114/115/116/117/118/119/120/121/122/123/124/125/126/127)
+    ("FUN_080e8f88", "set_cell_anim_sequence_by_idx_guarded",
+        "nnsys/g2d/g2d_Animation.c line 0x1a9=425. "
+        "Called by step_cell_anim_sequence_guarded (0x080e95ec). "
+        "Asserts pCellAnim != NULL (line 425) and pCellAnim->pCurrentCell (+0x18) non-NULL (line 427). "
+        "Calls set_cell_anim_sequence_by_index(pCellAnim, sequence_idx); "
+        "if return non-zero: clears [pCellAnim+0xc] (reset sequence-changed flag). "
+        "r0=NNS_G2dCellAnimation* pCellAnim [non-NULL], r1=u16 sequence_idx. "
+        "Returns set_cell_anim_sequence_by_index return value."),
+    ("FUN_080e95ec", "step_cell_anim_sequence_guarded",
+        "nnsys/g2d/g2d_CellAnimation.c. "
+        "Called by dispatch_cell_anim_sequence_step (0x080156e0, D_shared_mid hub indeg=6) and FUN_08015ea4. "
+        "Asserts pCellAnim != NULL (g2d_Animation.c:0x143=323), pCellAnim->pCurrentCell (+0x18) non-NULL. "
+        "Calls set_cell_anim_sequence_by_idx_guarded(pCellAnim, seq_idx); "
+        "if return non-zero: calls apply_cell_anim_frame to apply OAM data. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=u16 sequence_idx. "
+        "Returns 0=no frame change, non-zero=frame applied."),
+    ("FUN_080156e0", "dispatch_cell_anim_sequence_step",
+        "D_shared_mid hub (indeg=6) shared across 5 scenes (scene_demo 0x08013a68/0x0801bb28 + "
+        "3 unnamed scene 0x08018260/0x0801a49c/0x0801c5d8). "
+        "Body: u16 mask on r1 (lsls/lsrs #0x10) then tail-call step_cell_anim_sequence_guarded (0x080e95ec). "
+        "Provides unified entry + width truncation ensuring sequence_idx is u16 for NNS G2D layer. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=u16 sequence_idx. "
+        "Returns transparent from step_cell_anim_sequence_guarded."),
+    ("FUN_080e957c", "advance_cell_anim_frame_guarded",
+        "nnsys/g2d/g2d_CellAnimation.c line 0x122=290. "
+        "Called by dispatch_cell_anim_frame_advance (0x0801571c, D_shared_mid hub indeg=6). "
+        "Asserts pCellAnim != NULL (line 290), pCellAnim->pCurrentCell (+0x18) non-NULL (line 291), "
+        "animation sequence type == NNS_G2D_ANIMATIONTYPE_CELL (line 293). "
+        "Calls step_anim_ctrl_by_frames(pCellAnim, frames); "
+        "if return non-zero (frame changed): calls apply_cell_anim_frame to update OAM. "
+        "Sibling of step_cell_anim_sequence_guarded: this advances frames, that switches sequences. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=s16 frames [0..N]. "
+        "Returns 0=no change, non-zero=frame changed."),
+    ("FUN_0801571c", "dispatch_cell_anim_frame_advance",
+        "D_shared_mid hub (indeg=6) shared across 5 scenes, sibling of dispatch_cell_anim_sequence_step. "
+        "Same caller set (scene_demo 0x08013a68/0x0801bb28 + 3 unnamed 0x08018260/0x0801a49c/0x0801c5d8). "
+        "Body: 5 instructions, direct call to advance_cell_anim_frame_guarded (0x080e957c), no param transform. "
+        "Provides unified public jump point for NNS G2D frame advance. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=s16 frames. "
+        "Returns transparent from advance_cell_anim_frame_guarded."),
+    ("FUN_08015924", "resolve_bg_affine_param_offset",
+        "GL/IG2D_Main.c line 0x180=384. "
+        "Called by setup_isd_cell_anim_oam_entry (0x08015954). "
+        "Converts BG index (1 or 2) to corresponding affine parameter register byte offset. "
+        "r0==1 -> returns 4; r0==2 -> returns 9; other -> assert(0) (IG2D_Main.c:384), returns 0. "
+        "Pairs with resolve_isd_affine_matrix_ptr (0x08016108): this returns P-param offset, "
+        "that returns matrix data pointer. "
+        "r0=u8 bg_index [1..2]. Returns u8 param_offset {4, 9}."),
+    ("FUN_08016108", "resolve_isd_affine_matrix_ptr",
+        "GL/ISD_Draw.c line 0x8c=140. "
+        "Called by setup_isd_cell_anim_oam_entry (0x08015954). "
+        "Returns ISD matrix data pointer by affine type code (4 or 9). "
+        "r0==4 -> ldr DAT_08016130 (=0x09e587e4) content; r0==9 -> ldr DAT_0801613c (=0x09e587e8) content; "
+        "other -> assert(0) (ISD_Draw.c:140), returns 0. "
+        "Paired with resolve_bg_affine_param_offset: receives its return value as input. "
+        "r0=u8 affine_type {4, 9}. Returns void* affine matrix data ptr."),
+    ("FUN_080151b4", "assign_palette_slot_entry",
+        "Called by alloc_palette_entry_slot (0x080151d8, palette tag) only. "
+        "Establishes bidirectional mapping slot_idx <-> palette_entry in EWRAM palette manager table. "
+        "Base 0x02023490: slot_record array at +0x800 (1 byte/entry), palette_map array at +0x880. "
+        "Saves old palette_map[palette_entry] into slot_record[slot_idx]; "
+        "writes slot_idx into palette_map[palette_entry] (atomic slot occupation record). "
+        "r0=u8 slot_idx [0..127], r1=u8 palette_entry [0..31]. Returns void. "
+        "Side-effects: [0x02023C90+slot_idx] and [0x02023D10+palette_entry] updated."),
+    ("FUN_080151d8", "alloc_palette_entry_slot",
+        "GL/IG2D_Main.c palette slot allocator. "
+        "Called by setup_isd_cell_anim_oam_entry (0x08015954) and 3 other scene init paths. "
+        "Checks [0x02024330] signed byte (slot counter) >= 0; if negative (no slots): returns NULL. "
+        "Otherwise: calls assign_palette_slot_entry to record mapping, increments counter, "
+        "computes EWRAM palette entry addr (base + slot*8 + 0x400), "
+        "bios_cpu_set zero-fills 8 bytes (CPUSET_CTRL=0x05000002), returns entry ptr. "
+        "r0=u8 palette_id [0..31]. Returns u8* palette entry ptr or NULL. "
+        "Side-effects: [0x02024330] += 1; palette entry zeroed."),
+    ("FUN_080e969c", "build_oam_attrs_from_cell_with_affine",
+        "Called by setup_isd_cell_anim_oam_entry (0x08015954). "
+        "Transforms all cell OAM objects of current NNS_G2dCellAnimation frame via SRT affine "
+        "and writes result to output buffer (pDst). "
+        "Source: inc/nnsys/g2d/fmt/g2d_Cell_data.h + g2d_Animation_inline.h asserts. "
+        "Core loop: reads attr0/attr1/attr2 (3x u16), extracts flip flags and OAM mode, "
+        "applies SRT transform via __muldi3 (12.20 fixed-point matrix multiply), "
+        "re-encodes transformed X/Y into attr0/attr1. Loop from 0 to min(cell_oam_count, max_limit). "
+        "r0=void* pDst_base [0x030007f8 at callsite], r1=u16 max_oam_count [0..128], "
+        "r2=NNS_G2dCellData* pCell, r3=NNS_G2dAnimController* pAnimCtrl. "
+        "Returns u16 actual OAM count written. "
+        "Side-effects: [pDst+i*8] per-entry OAM attr0/attr1 pair written."),
+    ("FUN_08015954", "setup_isd_cell_anim_oam_entry",
+        "GL/IG2D_Main.c line 0xe3=227. "
+        "Called by dispatch_isd_cell_anim_oam_setup (0x08015a8c, D_shared_mid hub indeg=6) and FUN_0801a49c. "
+        "Core cell animation OAM initializer: "
+        "(1) resolve_bg_affine_param_offset -> affine offset; "
+        "(2) resolve_isd_affine_matrix_ptr(offset) -> matrix ptr; "
+        "(3) asserts pCell != NULL; "
+        "(4) loops alloc_palette_entry_slot to allocate palette slots; "
+        "(5) build_oam_attrs_from_cell_with_affine(0x030007f8, max=128, pCell, pAnimCtrl). "
+        "Returns u16 OAM entry count. "
+        "Side-effects: EWRAM palette slot [0x02024330]+1; OAM buffer [0x030007f8+...] written."),
+    ("FUN_08015a8c", "dispatch_isd_cell_anim_oam_setup",
+        "D_shared_mid hub (indeg=6) shared across 5 scenes (scene_demo + unnamed scene + 0x08015ea4). "
+        "Body 29 instructions: loads stack args (r4-r7 from [sp+0x38..0x54]) into new stack frame, "
+        "sets [sp+0x20]=0 (counter init), calls setup_isd_cell_anim_oam_entry, unwinds and returns. "
+        "Multi-arg wrapper: repacks caller-supplied stack args and forwards to core init function. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=void* pCell, r2=NNS_G2dCellDataBank* pCellBank, "
+        "r3=u16 bg_index [1..2]. Returns u16 OAM count transparent from setup_isd_cell_anim_oam_entry."),
+    ("FUN_08015718", "read_obj_id_field",
+        "Minimal D_shared_mid hub (indeg=6, 2 instructions, 4 bytes). "
+        "Body: ldrh r0,[r0,#0x0]; bx lr -- reads first u16 field of object and returns. "
+        "Called by FUN_08013a68 (scene_demo) before comparing slot_idx; "
+        "receives pointer loaded from gDemoState table by slot offset. "
+        "Provides type-safe accessor for object's first u16 field (ID / count / type_code). "
+        "r0=void* obj_ptr. Returns u16 first field value."),
+    ("FUN_08013a68", "setup_demo_cell_anim_slot",
+        "scene_demo cell animation slot initializer. "
+        "Called by FUN_08013bd4 (tags: display,bg,demo,fs,settings) only. "
+        "Steps: (1) table-lookup gDemoState[slot_idx*4] for cell anim ptr; "
+        "(2) read_obj_id_field to assert slot_idx < obj_field (IG2D_Main.c:0x14b=331); "
+        "(3) get gDemoState+slot*4+8 anim struct addr; "
+        "(4) if frame_or_seq_param==-1: dispatch_cell_anim_frame_advance; "
+        "else: dispatch_cell_anim_sequence_step; "
+        "(5) assemble stack args and call dispatch_isd_cell_anim_oam_setup for OAM init. "
+        "r0=u8 slot_idx [0..slot_count-1], r1=NNS_G2dCellAnimation* pCellAnim, "
+        "r2=s16 frame_or_seq_param (-1=frame advance, else=seq_idx lsls*0xc), r3=s16 second_param. "
+        "Constants: gDemoState=0x02029ec0."),
+    ("FUN_080147d8", "gl_set_blend2_level",
+        "GL/GL_Common.c -- blend2 coefficient setter, symmetric sibling of gl_set_brightness. "
+        "Called by gl_fade_in (0x080148d0), gl_fade_out (0x080148e0), and 11 other window/display/scene callers (indeg=13). "
+        "Asserts blend1_level+0x10<=0x20 and blend2_level<=0x10 (GL_Common.c line 0x10a=266, 0x10b=267). "
+        "Writes blend2_level to [gl_state+0x8] bits[11:2] (mask 0xFFFFFC03, shift 10); "
+        "saves blend1_level to [gl_state+0x1]; old [gl_state+0x1] -> [gl_state+0x0]; "
+        "writes blend_target to [gl_state+0x2]; calls update_brightness_fade_flag(blend1_level). "
+        "r0=u8 blend_target [0..255], r1=s8 blend1_level [-16..16], r2=u8 blend2_level [0..16]. "
+        "Constants: GL_STATE_BASE=0x02023480 / BLEND2_MASK=0xFFFFFC03 / BLEND2_SHIFT=10."),
 ]
 
 

@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=15 模式, campaign-7) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json` → 启动 4-agent loop (campaign-7) |
-| **上次更新** | 2026-05-06 (campaign-6 batch, 90/1526) |
+| **当前步骤** | Step 1 — executor (batch=15 模式, campaign-8) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json` → 启动 4-agent loop (campaign-8) |
+| **上次更新** | 2026-05-06 (campaign-7 batch, 105/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**90 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**105 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -156,11 +156,27 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 88 | 109 | — | — | E | 0x080139b8 | FUN_080139b8 | tick_demo_bg3_hscroll | 1 | [eval](eval/080139b8.md) |
 | 89 | 110 | — | — | E | 0x08013a10 | FUN_08013a10 | tick_demo_bg3_vscroll | 1 | [eval](eval/08013a10.md) |
 | 90 | 111 | — | — | D | 0x080e8b6c | FUN_080e8b6c | set_cell_anim_sequence_by_index | 2 | [eval](eval/080e8b6c.md) |
+| 91 | 113 | — | — | D | 0x080e8f88 | FUN_080e8f88 | set_cell_anim_sequence_by_idx_guarded | 1 | [eval](eval/080e8f88.md) |
+| 92 | 114 | — | — | D | 0x080e95ec | FUN_080e95ec | step_cell_anim_sequence_guarded | 1 | [eval](eval/080e95ec.md) |
+| 93 | 115 | — | — | D | 0x080156e0 | FUN_080156e0 | dispatch_cell_anim_sequence_step | 1 | [eval](eval/080156e0.md) |
+| 94 | 116 | — | — | D | 0x080e957c | FUN_080e957c | advance_cell_anim_frame_guarded | 1 | [eval](eval/080e957c.md) |
+| 95 | 117 | — | — | D | 0x0801571c | FUN_0801571c | dispatch_cell_anim_frame_advance | 1 | [eval](eval/0801571c.md) |
+| 96 | 118 | — | — | E | 0x08015924 | FUN_08015924 | resolve_bg_affine_param_offset | 1 | [eval](eval/08015924.md) |
+| 97 | 119 | — | — | E | 0x08016108 | FUN_08016108 | resolve_isd_affine_matrix_ptr | 1 | [eval](eval/08016108.md) |
+| 98 | 120 | — | — | E | 0x080151b4 | FUN_080151b4 | assign_palette_slot_entry | 1 | [eval](eval/080151b4.md) |
+| 99 | 121 | — | — | D | 0x080151d8 | FUN_080151d8 | alloc_palette_entry_slot | 1 | [eval](eval/080151d8.md) |
+| 100 | 122 | — | — | D | 0x080e969c | FUN_080e969c | build_oam_attrs_from_cell_with_affine | 2 | [eval](eval/080e969c.md) |
+| 101 | 123 | — | — | D | 0x08015954 | FUN_08015954 | setup_isd_cell_anim_oam_entry | 2 | [eval](eval/08015954.md) |
+| 102 | 124 | — | — | D | 0x08015a8c | FUN_08015a8c | dispatch_isd_cell_anim_oam_setup | 1 | [eval](eval/08015a8c.md) |
+| 103 | 125 | — | — | D | 0x08015718 | FUN_08015718 | read_obj_id_field | 1 | [eval](eval/08015718.md) |
+| 104 | 126 | — | — | E | 0x08013a68 | FUN_08013a68 | setup_demo_cell_anim_slot | 1 | [eval](eval/08013a68.md) |
+| 105 | 127 | — | — | C | 0x080147d8 | FUN_080147d8 | gl_set_blend2_level | 2 | [eval](eval/080147d8.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-06: **campaign-7 batch PASSED** — ISD/cell anim OAM 入口 hub 簇 (3 个 D_shared_mid 跨 3 scene 共享: dispatch_cell_anim_sequence_step/dispatch_cell_anim_frame_advance/dispatch_isd_cell_anim_oam_setup) + gl_set_blend2_level (indeg=13) + palette slot allocator; 3 R3 修复 (高寄存器 callee-save vs 真输入 + 内部 DAT 加载误判为参数); byte-identical 保持. (105/1526 = 6.88%)
 - 2026-05-06: **campaign-6 batch PASSED** — IG2D_Main FS loader hub (load_g2d_obj_resource_set @ 0x08015d30) + Exodia demo OBJ asset load (asset table @ 0x09e397d4) + scene_demo BG3 scroll tick + g2d_NCG_load.c parser; 2 fix iter (R4 void, R7 caller role); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (90/1526 = 5.90%)
 - 2026-05-06: **campaign-5 batch PASSED** — NitroSDK G2D library wrapper 第 3 簇 (g2d_NAN_load.c / g2d_NCL_load.c / g2d_NOB_load.c / GL/IG2D_Main.c); 1 R5 register-typo 3-round 修复; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (75/1526 = 4.91%)
 - 2026-05-06: **campaign-4 batch PASSED** — NitroSDK G2D library wrapper 第 2 簇 (CellAnimation/Image/SRTControl/g2d_Load); 1 R3 r1 misclassified-as-unused fix iter; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (60/1526 = 3.93%)
