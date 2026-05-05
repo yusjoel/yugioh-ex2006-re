@@ -2738,6 +2738,125 @@ RENAMES = [
         "Standard NNS G2D binary block pointer patch-up step. "
         "r0=NNS_G2dBinaryBlockHeader* pBlock. "
         "Loop counter is u16 (lsls/lsrs 0x10 truncation)."),
+    # --- campaign-5 batch (batch15-5) ---
+    ("FUN_080eaec4", "find_bin_block_by_type",
+        "nnsys/g2d/g2d_Load.c line 10 (pBinFileHeader). "
+        "Search NNS G2D binary file header for a block by type tag. "
+        "r0=NNS_G2dBinaryBlockHeader* pBinFileHeader (non-NULL assert), "
+        "r1=u32 type_tag (4-byte magic e.g. 'NANR'/'PLTT'). "
+        "Walks block list at [pBinFileHeader+0xc]; compares [block+0x0]==type_tag; "
+        "returns block ptr if found, NULL if not found. "
+        "indeg=7 (used by g2d_NAN_load / g2d_NCL_load / g2d_NOB_load loaders)."),
+    ("FUN_080eaf58", "link_nanr_anim_bank",
+        "nnsys/g2d/g2d_NAN_load.c line 38 (pNanrFile). "
+        "Validate NANR file and write parsed result to caller-supplied pointer slot. "
+        "r0=NNS_G2dBinaryFileHeader* pNanrFile, r1=NNS_G2dAnimBankData** ppAnimBank. "
+        "Asserts both ptrs non-NULL; calls find_bin_block_by_type(pNanrFile,'NANR'); "
+        "if block found: skips 8-byte block header, calls relocate_nanr_block_ptrs, "
+        "writes *ppAnimBank = block+8; returns 1 on success, 0 on failure."),
+    ("FUN_080eafb4", "check_anim_block_has_data",
+        "NNS G2D anim block utility (leaf, no external writes). "
+        "r0=NNS_G2dAnimBlock* pSeqHead: [+0x0]=count(halfword), [+0xc]=first entry ptr. "
+        "Iterates count entries (stride 8 bytes); returns 1 if any [entry+0x4]!=0, "
+        "else returns 0. Called by relocate_nanr_block_ptrs to validate data after reloc. "
+        "Equivalent to NNSi_G2dCheckAnimSequenceValidity_."),
+    ("FUN_080eafd4", "load_nanr_anim_bank",
+        "nnsys/g2d/g2d_NAN_load.c line 92. "
+        "NANR anim file loader top-level entry: validates magic, calls link_nanr_anim_bank. "
+        "r0=NNS_G2dBinaryFileHeader* pNanrFile, r1=NNS_G2dAnimBankData** ppAnimBank. "
+        "Asserts both non-NULL (line 92/93); verifies [pNanrFile+0]=='NANR' (0x4e414e52) "
+        "and [pNanrFile+6] u16 >= 0x100 (version check); then calls link_nanr_anim_bank. "
+        "Returns 1=success, 0=failure. "
+        "Constants: NANR_SIGNATURE=0x4e414e52, VERSION_MIN=0x100."),
+    ("FUN_080eb0f4", "relocate_nanr_block_ptrs",
+        "nnsys/g2d/g2d_NAN_load.c line 130. "
+        "Patch all relative offsets in a NANR block to absolute pointers. "
+        "r0=NNS_G2dAnimBankData* pBlock (block data body, after 8-byte block header). "
+        "Patches [pBlock+4],[+8],[+0xc] relative->absolute; "
+        "iterates each anim sequence: patches [seq+0xc] and each frame [frame+0x0]; "
+        "handles optional ext block at [pBlock+0x14]; "
+        "calls check_anim_block_has_data to validate. "
+        "Entry uses .hword 0x4657/0x464e/0x4645 (THUMB high-register save encoding)."),
+    ("FUN_080eb54c", "load_nclr_pltt_data",
+        "nnsys/g2d/g2d_NCL_load.c line 49 (pNclrFile). "
+        "NCLR palette file loader: verify magic, find 'PLTT' block, relocate, write *ppPltData. "
+        "r0=NNS_G2dBinaryFileHeader* pNclrFile, r1=NNS_G2dPaletteData** ppPltData. "
+        "Asserts both non-NULL; verifies magic=='NCLR'(0x4e434c52) or 'NCPR'(0x4e435052); "
+        "checks [pNclrFile+6] u16 version>=0x100 and <0x100 for bitdepth; "
+        "calls find_bin_block_by_type(pNclrFile,'PLTT')(0x504c5454); "
+        "calls relocate_ncl_pltt_data_ptr; *ppPltData=block+8; returns 1/0."),
+    ("FUN_080eb6b4", "relocate_ncl_pltt_data_ptr",
+        "nnsys/g2d/g2d_NCL_load.c line 151 (pPlttData). "
+        "Patch palette data block raw-data relative pointer to absolute address. "
+        "r0=NNS_G2dPaletteData* pPlttData. "
+        "Asserts pPlttData != NULL; then: [pPlttData+0xc] += pPlttData "
+        "(converts pRawData field from relative offset to absolute ptr). "
+        "Called by load_nclr_pltt_data after finding PLTT block."),
+    ("FUN_080eb6dc", "get_nob_cell_data_offset",
+        "nnsys/g2d/g2d_NOB_load.c line 11 (pCellBank). "
+        "Compute byte offset of a cell entry in a NOB cell bank by format flag. "
+        "r0=NNS_G2dCellBank* pCellBank, r1=u16 cell_idx [0..count-1]. "
+        "[pCellBank+0x2] bit0: 0=stride 8 bytes (lsls #3), 1=stride 16 bytes (lsls #4). "
+        "Returns [pCellBank+0x4] + cell_idx*stride (absolute address of cell entry). "
+        "Equivalent to NNSi_G2dGetCellDataAddress."),
+    ("FUN_080eb718", "relocate_nob_exdata_block_ptrs",
+        "nnsys/g2d/g2d_NOB_load.c line 28 (pExData). "
+        "Relocate internal pointers in a NOB extra-data block. "
+        "r0=NNS_G2dBinaryBlockHeader* pExData (non-NULL assert). "
+        "Skips 8-byte block header (r0+8) then calls relocate_bin_block_ptrs "
+        "to patch all relative offsets to absolute addresses. "
+        "Called by relocate_nob_cell_bank_ptrs when [pNcerData+0x14] exdata is present."),
+    ("FUN_080eb744", "load_ncer_cell_bank",
+        "nnsys/g2d/g2d_NOB_load.c line 41 (pNcerFile). "
+        "NCER cell bank loader: verify magic, find 'CBEK' block, relocate, write *ppCellBank. "
+        "r0=NNS_G2dBinaryFileHeader* pNcerFile, r1=NNS_G2dCellBank** ppCellBank. "
+        "Asserts both non-NULL; verifies magic==0x4e434552 ('NCER'); version>=0x100; "
+        "calls find_bin_block_by_type(pNcerFile,0x4345424b 'CBEK'); "
+        "calls relocate_nob_cell_bank_ptrs; *ppCellBank=block+8; returns 1/0. "
+        "Constants: NCER_SIGNATURE=0x4e434552, CBEK_BLOCK_TYPE=0x4345424b."),
+    ("FUN_080eb838", "relocate_nob_cell_bank_ptrs",
+        "nnsys/g2d/g2d_NOB_load.c line 110 (pCellData). "
+        "Full internal pointer relocation for a NCER cell bank data block. "
+        "r0=NNS_G2dCellBank* pNcerData (block body after 8-byte header). "
+        "[pNcerData+4]+=pNcerData (cell array base abs); "
+        "iterates each cell via get_nob_cell_data_offset: [cell+4]+=r6 (cell data ptr abs); "
+        "if [pNcerData+0xc]!=0: abs + patch [ext+4]; "
+        "if [pNcerData+0x14]!=0: abs + call relocate_nob_exdata_block_ptrs. "
+        "Called by load_ncer_cell_bank."),
+    ("FUN_08015674", "alloc_char_data_slot",
+        "GL/IG2D_Main.c line 52. "
+        "Allocate a 4096-byte char-data buffer slot from IWRAM pool; return its ptr. "
+        "No parameters (all state from IWRAM). "
+        "IWRAM [0x03000c00] holds current slot count; asserts count<=1 (max 2 slots [0..1]); "
+        "returns [0x03002c08] + count*4096 (lsls count,#0xc); increments [0x03000c00]. "
+        "Side-effect: [0x03000c00] := old_count+1. "
+        "Constants: SLOT_COUNT_PTR=[0x03000c00], CHAR_POOL_BASE=[0x03002c08], SLOT_SIZE=4096."),
+    ("FUN_08015b10", "load_nce_cell_bank_from_file",
+        "GL/IG2D_Main.c. "
+        "Full pipeline: allocate NCE buffer slot, load file from FS, parse cell bank. "
+        "r0=NNS_G2dCellBank** ppCellBank (non-NULL assert), r1=const char* pFname (non-NULL). "
+        "Calls alloc_nce_buff_slot -> invoke_fs_load(pFname, slot_ptr) -> "
+        "load_ncer_cell_bank(slot_ptr, ppCellBank). "
+        "Returns loaded data ptr on success, NULL on failure. "
+        "Side-effects: IWRAM slot allocated, file DMA'd, *ppCellBank set."),
+    ("FUN_08015b70", "load_nanr_anim_bank_from_file",
+        "GL/IG2D_Main.c. "
+        "Full pipeline: allocate char-data slot, load NANR file from FS, parse anim bank. "
+        "r0=NNS_G2dAnimBankData** ppAnimBank (non-NULL assert line 0x1c1), "
+        "r1=void** ppCharData (non-NULL assert line 0x1c2). "
+        "Calls alloc_char_data_slot -> invoke_fs_load(ppCharData, slot_ptr) -> "
+        "load_nanr_anim_bank(slot_ptr, ppAnimBank). "
+        "Returns loaded data ptr on success, NULL on failure. "
+        "Side-effects: char-data slot allocated ([0x03000c00] +1), file DMA'd, *ppAnimBank set."),
+    ("FUN_08015c30", "load_nclr_pltt_data_from_file",
+        "GL/IG2D_Main.c. "
+        "Full pipeline: load NCLR palette file from FS, parse palette data. "
+        "r0=NNS_G2dPaletteData** ppPltData (non-NULL assert line 0x266=614), "
+        "r1=const char* pFname (non-NULL assert line 0x267=615). "
+        "Calls invoke_fs_load(pFname, NULL) (system-allocated buffer) -> "
+        "load_nclr_pltt_data(loaded_ptr, ppPltData). "
+        "Returns loaded data ptr on success, NULL on failure. "
+        "Side-effects: file loaded to system memory, *ppPltData set."),
 ]
 
 
