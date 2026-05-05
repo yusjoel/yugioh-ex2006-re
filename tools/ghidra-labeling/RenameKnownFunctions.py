@@ -2255,6 +2255,22 @@ RENAMES = [
         "由三个 card_list/deck_edit/banlist 场景帧调度器调用 (FUN_081085d0/FUN_08108b38/FUN_0810ad98), "
         "与 return_one_card_list_scene_stub (0x08106eb4) 共享完全相同的 caller 集合但地址不同. "
         "在对应场景的某一帧处理分支中作为无需特殊处理返回 1 的占位."),
+    ("FUN_08108b38", "init_deck_edit_card_list_scene",
+        "deck_edit 场景状态机的 state-0 初始化处理器, "
+        "由 enter_deck_edit_page (0x08108ac0) 通过函数指针表 (ROM 0x09e60a8c[0]) 间接调用. "
+        "负责零填充 EWRAM 场景上下文 (0x0202f3c0, 256 halfword), "
+        "按 gPrng+0x244 的 bit0 决定是否调用 init_card_stats_display_fields 初始化卡片属性显示域, "
+        "依次调用 reset_card_list_scene_state/card_list_screen_init/reset_card_list_scroll_offset "
+        "完成卡牌列表场景的完整初始化序列, 注册两个无操作占位存根, "
+        "清除 gPrng+0x244 的 bit1 标志, 并通过 set_channel_if_changed(6) 切换 BGM 通道. "
+        "最终向 gPrng+0x204 写入 OR 0x40 将调度状态推进到 state-1 (tick_deck_edit_card_list_scene), 返回 1."),
+    ("FUN_08108cdc", "tick_deck_edit_card_list_scene",
+        "deck_edit 场景状态机的 state-1 帧驱动处理器, "
+        "由 enter_deck_edit_page 通过函数指针表 (ROM 0x09e60a8c[1]) 间接调用, 每帧运行一次. "
+        "调用 tick_card_list_scene_frame/render_card_list_oam_entries 完成帧推进与 OAM 刷新. "
+        "若 tick 返回非零则读 [0x0202a4d0+0x2] 场景跳转码: "
+        "==1 时重新初始化显示对象并写 gPrng+0x204 OR 0xc0 (state-3); "
+        "其他非零值写 OR 0x80 (state-2). 返回 1 表示跳转完成, 0 表示继续."),
 ]
 
 

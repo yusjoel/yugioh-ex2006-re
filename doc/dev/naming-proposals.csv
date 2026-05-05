@@ -3268,9 +3268,9 @@ address,name,proposed_name,score,tags
 0x0810899c,FUN_0810899c,,,
 0x081089d8,FUN_081089d8,prng_081089d8,3,scene_pass_input;pass_input;prng
 0x08108ac0,enter_deck_edit_page,,,card_list
-0x08108b38,FUN_08108b38,card_list_08108b38,2,banlist;card_frame;card_list;card_stats;deck;font_jp;frame_counter;game_str;settings
+0x08108b38,init_deck_edit_card_list_scene,,,banlist;card_frame;card_list;card_stats;deck;font_jp;frame_counter;game_str;settings
 0x08108c4c,init_puzzle_deck_edit_card_list,,,scene_duel_puzzle;card_list
-0x08108cdc,FUN_08108cdc,card_stats_08108cdc,2,banlist;card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_stats;deck;font_jp;frame_counter;fs;game_str;settings
+0x08108cdc,tick_deck_edit_card_list_scene,,,banlist;card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_stats;deck;font_jp;frame_counter;fs;game_str;settings
 0x08108d70,init_card_list_scene_bg_for_deck_edit,,,banlist;card_frame;card_ids;card_list;card_stats;deck;font_jp;frame_counter;fs;game_str;settings
 0x08108da4,tick_deck_edit_card_list_frame,,,banlist;card_frame;card_ids;card_list;card_stats;deck;font_jp;frame_counter;fs;game_str;name_input;settings
 0x08108eb8,init_card_list_scene_bg_with_scroll_reset,,,banlist;card_frame;card_ids;card_stats;deck;font_jp;frame_counter;fs;game_str;settings
