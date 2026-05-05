@@ -2857,6 +2857,127 @@ RENAMES = [
         "load_nclr_pltt_data(loaded_ptr, ppPltData). "
         "Returns loaded data ptr on success, NULL on failure. "
         "Side-effects: file loaded to system memory, *ppPltData set."),
+    # --- campaign-6 batch ---
+    ("FUN_080eb2e8", "fixup_char_block_data_ptr",
+        "GL/IG2D_Main.c g2d_NCG_load.c pipeline. "
+        "r0=NNS_G2dCharacterData* pCharData (NCGR bin +8, non-NULL assert line 92). "
+        "Asserts pCharData != NULL, then adds pCharData base to [pCharData+0x14] "
+        "(relative pixel-data offset -> absolute pointer fixup). "
+        "Checks [pCharData+0xc] and may skip trailing branch. "
+        "Side-effect: [pCharData+0x14] updated from relative offset to absolute address."),
+    ("FUN_080eb23c", "parse_ncgr_char_data",
+        "GL/IG2D_Main.c g2d_NCG_load.c pipeline. "
+        "r0=const void* pNcgrFile (must be non-NULL, magic==0x4E434752 'NCGR'), "
+        "r1=NNS_G2dCharacterData** ppCharData (non-NULL). "
+        "Validates magic and version, calls find_bin_block_by_type for 'RAHC' (CHAR block), "
+        "then calls fixup_char_block_data_ptr and writes result to *ppCharData. "
+        "Returns 1=success, 0=fail (bad magic or no CHAR block). "
+        "Side-effect: *ppCharData points to fixup'd CHAR data block, or NULL on failure."),
+    ("FUN_08015bd0", "load_ncgr_char_data_from_file",
+        "GL/IG2D_Main.c line 574-575. "
+        "r0=NNS_G2dCharacterData** ppCharData (non-NULL), "
+        "r1=const char* pFname (NCGR file path, non-NULL). "
+        "Calls invoke_fs_load to load NCGR file into system-allocated buffer, "
+        "then calls parse_ncgr_char_data to parse CHAR block into *ppCharData. "
+        "Returns file buffer ptr on success, NULL on failure. "
+        "Side-effects: FS memory allocated, *ppCharData set to parsed char data."),
+    ("FUN_080e9c74", "set_img_proxy_vram_slot",
+        "GL/IG2D_Main.c g2d_Image.c line 468-469. "
+        "r0=NNS_G2dImageProxy* pProxy (non-NULL), "
+        "r1=void* pImg (image data ptr, non-NULL), "
+        "r2=NNS_G2dVRamType type [0..2] (0=3D_MAIN, 1=2D_MAIN, 2=2D_SUB). "
+        "Asserts all args, calls check_vram_location_slot, "
+        "then writes pImg to pProxy[type] (str pImg,[pProxy+type*4]). "
+        "Side-effect: NNS_G2dImageProxy VRAM slot[type] set to pImg."),
+    ("FUN_08015c90", "copy_pltt_data_to_vram_proxy",
+        "GL/IG2D_Main.c line 729-730. "
+        "r0=NNS_G2dPaletteData* pSrcData (non-NULL), "
+        "r1=u32 vram_offset (added to OBJ palette base 0x05000200), "
+        "r2=NNS_G2dVRamType vram_type [0..2], "
+        "r3=NNS_G2dImageProxy* pPltProxt (non-NULL). "
+        "If r6==1: bios_cpu_fast_set DMA copies palette to OBJ VRAM at 0x05000200+offset; "
+        "else assert_false (line 739). "
+        "Calls set_img_proxy_vram_slot to update proxy slot. "
+        "Side-effects: OBJ palette VRAM written; ImageProxy slot updated."),
+    ("FUN_080e9a94", "init_img_proxy_fields",
+        "GL/IG2D_Main.c g2d_Image.c line 373. "
+        "r0=NNS_G2dImageProxy* pProxy (non-NULL). "
+        "Asserts pProxy != NULL, then writes 0xFFFFFFFF (-1) to fields "
+        "[pProxy+0x0], [pProxy+0x4], [pProxy+0x8] (3 VRAM slot fields). "
+        "Side-effect: all 3 ImageProxy VRAM slots marked invalid (NNS init pattern)."),
+    ("FUN_080eb1f4", "get_anim_sequence_ptr_by_index",
+        "GL/IG2D_Main.c g2d_NAN_load.c line 203 / g2d_NAN_load.h line 21. "
+        "r0=NNS_G2dAnimBankData* pAnimBank (non-NULL), "
+        "r1=u16 seqIndex [0..numSequences-1] (high 16 bits truncated). "
+        "Asserts pAnimBank != NULL and seqIndex < numSequences, "
+        "then returns &pAnimBank->pSequenceArrayHead[seqIndex] (each entry 16 bytes). "
+        "Returns NULL on out-of-bounds. "
+        "No side-effects (pure address computation)."),
+    ("FUN_080e9c38", "init_renderer_img_proxy_fields",
+        "GL/IG2D_Main.c g2d_Image.c line 449. "
+        "r0=NNS_G2dRendererImageProxy* pProxy (non-NULL). "
+        "Asserts pProxy != NULL, then writes 0xFFFFFFFF (-1) to fields "
+        "[pProxy+0x8], [pProxy+0xc], [pProxy+0x10] (3 VRAM location slots). "
+        "Symmetric sibling to init_img_proxy_fields (0x080e9a94) which covers +0..+8. "
+        "Side-effect: RendererImageProxy VRAM slots +8/+c/+10 marked invalid."),
+    ("FUN_08015d30", "load_g2d_obj_resource_set",
+        "GL/IG2D_Main.c core G2D OBJ resource loader, line 813-874, indeg=6. "
+        "r0=void* pOutState, r1=NNS_G2dCellAnimation** ppAnimCtrl (r8 via 0x4689), "
+        "r2=G2dObjPathConfig* pPaths {ncer*,nanr*,ncgr*,nclr*}, r3=u32 vramFlags. "
+        "Stack args: flag0/flag1/pFilePathTable/flag3/bufSize. "
+        "Sequence: init_img_proxy_fields + init_renderer_img_proxy_fields, "
+        "load_nce_cell_bank_from_file + load_nanr_anim_bank_from_file, "
+        "alloc_cell_anim_slot + get_anim_sequence_ptr_by_index + bind_cell_anim_to_bank per seq, "
+        "optional load_ncgr_char_data_from_file + load_img_proxy_to_vram (NCGR path), "
+        "optional load_nclr_pltt_data_from_file + copy_pltt_data_to_vram_proxy (NCLR path). "
+        "Side-effects: VRAM OBJ tile+palette written; ppAnimCtrl slots bound; ImageProxy set."),
+    ("FUN_08013940", "load_demo_obj_resource_by_slot",
+        "demo scene OBJ resource loader with slot selection. "
+        "r0=u32 slot_index [0..1] (0=exodia01_obj, 1=exodia02_obj). "
+        "Reads file path table from ROM constant at 0x09e397d4 (8 paths: 2 slots x 4 files), "
+        "indexes by slot_index*16 on stack, then calls load_g2d_obj_resource_set. "
+        "Side-effects: gDemoState anim ctrl + ImageProxy initialised; "
+        "OBJ Tile VRAM + OBJ Palette VRAM written with exodia file data."),
+    ("FUN_0801398c", "load_demo_obj_resource_slot0",
+        "demo scene slot-0 OBJ loader stub. "
+        "void args. "
+        "Fixes r0=0 then calls load_demo_obj_resource_by_slot(0) "
+        "to load exodia01_obj {NCER/NANR/NCGR/NCLR} into demo state slot 0. "
+        "Returns r0=1 (fixed success flag). "
+        "Side-effects: same as load_demo_obj_resource_by_slot(0)."),
+    ("FUN_0801399c", "write_bg3_scroll_regs",
+        "demo scene BG3 scroll register write helper. "
+        "r0=u16 hofs [0..511], r1=u16 vofs [0..511]. "
+        "Masks both with 0x1FF, then strh hofs -> BG3HOFS (0x04000018), "
+        "strh vofs -> BG3VOFS (0x0400001E). "
+        "Called by tick_demo_bg3_hscroll and tick_demo_bg3_vscroll after computing new offsets. "
+        "Side-effects: GBA IO regs BG3HOFS and BG3VOFS updated."),
+    ("FUN_080139b8", "tick_demo_bg3_hscroll",
+        "demo scene per-frame BG3 horizontal scroll updater. "
+        "void args. "
+        "Reads gDemoState+0x8c bits[23:16] as 8-bit scroll counter, "
+        "computes HOFS = counter % 160 (0xa0, GBA screen width), "
+        "steps counter bits[8:1] += 2 mod 256 with wrap at 0xa0, "
+        "writes back to gDemoState+0x8c, calls write_bg3_scroll_regs(0, hofs). "
+        "Side-effects: gDemoState+0x8c updated; BG3HOFS written."),
+    ("FUN_08013a10", "tick_demo_bg3_vscroll",
+        "demo scene per-frame BG3 vertical scroll updater. "
+        "void args. "
+        "Reads gDemoState+0x8c bits[23:16], computes VOFS = -(counter % 240) "
+        "(0xf0, GBA screen height; rsbs for upward scroll direction), "
+        "steps counter bits[8:1] += 2 mod 256 with wrap at 0xf0, "
+        "writes back, calls write_bg3_scroll_regs(vofs, 0). "
+        "Side-effects: gDemoState+0x8c updated; BG3VOFS written."),
+    ("FUN_080e8b6c", "set_cell_anim_sequence_by_index",
+        "g2d_Animation.c line 272-273. "
+        "r0=NNS_G2dCellAnimation* pAnimCtrl (non-NULL), "
+        "r1=u16 seqId [0..numSequences-1] (high 16 bits truncated), "
+        "r2=NNS_G2dAnimBankData* pAnimBank (must already be bound). "
+        "Asserts pAnimCtrl != NULL and pAnimCtrl->pAnimSequence != NULL, "
+        "checks seqId < pAnimBank->numSequences, "
+        "then writes &pAnimBank->pSequenceArrayHead[seqId*8] to pAnimCtrl->pAnimSequence (+0). "
+        "Returns 1=success, 0=out-of-bounds. "
+        "Side-effect: pAnimCtrl active sequence pointer updated."),
 ]
 
 

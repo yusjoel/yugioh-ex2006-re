@@ -57,11 +57,11 @@ model: sonnet
 | caller flag_bit 对称分派 | `feedback_symmetric_flag_bit_dispatch.md` (R8 L6 证据) |
 | `bios_cpu_set` 调用 | `feedback_bios_cpuset_fill_pattern.md` (R6 控制字拆解) |
 | caller zero+render pair | `feedback_clear_then_render_pair.md` (R8 L6) |
-| caller 全 FUN_* | `feedback_r7_pending_caller_form.md` (R7 form b 必接受) |
+| caller 全 FUN_*, 或 R7 role 字段写"未命名调用者" | `feedback_r7_pending_caller_form.md` (R7 form b 必接受; "未命名调用者" = R7=0，需功能描述非命名状态标签) |
 | 函数体仅 `bx lr` | `feedback_release_noop_stub_fingerprint.md` (R3/R5 无参/无副作用满分; 类型 B 置信度 high 合法) |
 | R3 任意参数含 "unknown"/裸类型无语义注 | `feedback_caller_traced_param_type.md` (直接扣 R3 到 0; 要求重做 caller-trace) |
 | R3 数值型 index 参数缺 [lo..hi] 范围 | `feedback_r3_param_range_required.md` (扣 R3; executor 补范围后重审) |
-| R4 返回值仅写数值（"returns 1" 无含义）或缺路径说明 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (R4=0; 要求补语义+路径) |
+| R4 返回值仅写数值（"returns 1" 无含义）或缺路径说明，或整节 `- 返回:` 行缺失 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (R4=0; 要求补语义+路径; 完全缺返回行同等违规) |
 | 函数入口含 `adds rX, rY, #0x0` 且 r3 含被覆盖寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (R3=0; 被覆盖 rX 不是独立参数) |
 | 函数入口含 `ldr rN, [pc,#N]` 加载字面量池常量，但 R3 将 rN 列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (R3=0; DAT 加载值是内部常量，不是 APCS 输入) |
 | 函数涉及 OAM attr / DISPCNT / IO 写入含裸 16/32-bit 常量 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (R6=0; 无 Constants: 块 / `0xC00` 标为 priority 而非 mode mask) |
@@ -75,6 +75,8 @@ model: sonnet
 ### Phase 3: 写 eval 文档 (Write)
 
 直接 Write `doc/dev/eval/<ADDR>.md`, 模板:
+
+> **文件名规则**: 使用纯 8 位小写 hex，禁止加 `0x` 前缀。正确: `080eb2e8.md`; 错误: `0x080eb2e8.md`。
 
 ```markdown
 # Naming Evaluation: <ADDR>
