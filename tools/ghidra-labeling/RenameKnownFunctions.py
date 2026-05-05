@@ -2272,6 +2272,106 @@ RENAMES = [
         "==1 时重新初始化显示对象并写 gPrng+0x204 OR 0xc0 (state-3); "
         "其他非零值写 OR 0x80 (state-2). 返回 1 表示跳转完成, 0 表示继续."),
 
+    # 2026-05-05: campaign-2 batch (topo=28/29/30/31/32/33/34/35/36/37/38/39/40/41/42)
+    ("FUN_08014af0", "calc_bg_screenmap_block_offset",
+        "BG screen block byte offset calculator. r0=bg_index [0..3], r1=tile_x [0..63], r2=tile_y [0..63]. "
+        "Queries BGxCNT screen_size field via bg0/1/2/3_cnt_get_screen_size, then computes which "
+        "screen block the (tile_x, tile_y) coordinate falls in. "
+        "screen_size 0=32x32 (1 block), 1=64x32 (2 col blocks), 2=32x64 (2 row blocks), 3=64x64 (4 blocks). "
+        "Returns r0 = byte offset {0, 0x800, 0x1000, 0x1800} for the target screen block. "
+        "Constants: 0x800 = 1 screen block size (32x32 tiles, 2KB). "
+        "Caller apply_bgdt_entry_to_bg calls this twice before write_tile_region_to_bg_screen."),
+    ("FUN_08014a50", "get_bg2_char_vram_addr",
+        "Reads BG2CNT register (0x0400000C) char_base_block field (bits[3:2]), "
+        "returns BG2 char VRAM base address. Formula: addr = 0x06000000 + char_base_block * 0x4000. "
+        "No side effects, pure compute. One of four-function sibling cluster: "
+        "get_bg0/bg1/bg2/bg3_char_vram_addr. Called by copy_to_bg2_char_tiles and scene init callers."),
+    ("FUN_08014c94", "copy_to_bg2_char_tiles",
+        "Copies src tile data via bios_cpu_fast_set to BG2 char VRAM. "
+        "Asserts src 4-byte aligned (gl_common.c:492) before calling get_bg2_char_vram_addr. "
+        "r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. "
+        "Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. "
+        "Constants: 0x3 = 4-byte alignment mask; BG char area max 16KB = 0x1000 words."),
+    ("FUN_08014a70", "get_bg3_char_vram_addr",
+        "Reads BG3CNT register (0x0400000E) char_base_block field (bits[3:2]), "
+        "returns BG3 char VRAM base address. Formula: addr = 0x06000000 + char_base_block * 0x4000. "
+        "No side effects, pure compute. One of four-function sibling cluster: "
+        "get_bg0/bg1/bg2/bg3_char_vram_addr. Called only by copy_to_bg3_char_tiles."),
+    ("FUN_08014cd4", "copy_to_bg3_char_tiles",
+        "Copies src tile data via bios_cpu_fast_set to BG3 char VRAM. "
+        "Asserts src 4-byte aligned (gl_common.c:497) before calling get_bg3_char_vram_addr. "
+        "r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. "
+        "Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. "
+        "Constants: 0x3 = 4-byte alignment mask."),
+    ("FUN_08014a10", "get_bg0_char_vram_addr",
+        "Reads BG0CNT register (0x04000008) char_base_block field (bits[3:2]), "
+        "returns BG0 char VRAM base address. Formula: addr = 0x06000000 + char_base_block * 0x4000. "
+        "Uses sp-trick to read/restore IO register without net side effect. "
+        "One of four-function sibling cluster: get_bg0/bg1/bg2/bg3_char_vram_addr. "
+        "Returns r0 = u32 BG0 char VRAM base [0x06000000..0x06007000, step 0x4000, CBB in [0..3]]."),
+    ("FUN_08014c14", "copy_to_bg0_char_tiles",
+        "Copies src tile data via bios_cpu_fast_set to BG0 char VRAM. "
+        "Asserts src 4-byte aligned (gl_common.c:482) before calling get_bg0_char_vram_addr. "
+        "r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. "
+        "Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. "
+        "Constants: 0x3 = 4-byte alignment mask; caller apply_bgdt_entry_to_bg uses this."),
+    ("FUN_08014a30", "get_bg1_char_vram_addr",
+        "Reads BG1CNT register (0x0400000A) char_base_block field (bits[3:2]), "
+        "returns BG1 char VRAM base address. Formula: addr = 0x06000000 + char_base_block * 0x4000. "
+        "No side effects, pure compute. One of four-function sibling cluster: "
+        "get_bg0/bg1/bg2/bg3_char_vram_addr. Called only by copy_to_bg1_char_tiles."),
+    ("FUN_08014c54", "copy_to_bg1_char_tiles",
+        "Copies src tile data via bios_cpu_fast_set to BG1 char VRAM. "
+        "Asserts src 4-byte aligned (gl_common.c:487) before calling get_bg1_char_vram_addr. "
+        "r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. "
+        "Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. "
+        "Constants: 0x3 = 4-byte alignment mask."),
+    ("FUN_080165bc", "apply_bgdt_entry_to_bg",
+        "Applies one BGDT (Background Data) resource entry to target BG state struct. "
+        "r0=void* bg_dst (target BG state struct with priority/palette/tile_pos fields), "
+        "r1=void* bgdt_entry (contains priority/tile_rect/char_data ptr etc). "
+        "Writes priority (bits[6:5]) and palette attr to bg_dst[+0x14], tile attr to bg_dst[+0x16]. "
+        "Calls write_tile_region_to_bg_screen up to 3 times for screen map regions; "
+        "calls calc_bg_screenmap_block_offset before each to handle cross-screen-block offsets. "
+        "If entry has char tile data and bg_index valid, dispatches to copy_to_bg0/1/2/3_char_tiles. "
+        "Returns fixed 0. Called by apply_gfx_resource_list on 'BGDT' (0x54444742) tag match."),
+    ("FUN_0801626c", "write_palt_block_to_vram",
+        "Writes PALT (palette) data block to GBA palette VRAM. "
+        "r0=void* src_entry (PALT resource entry with type/x/visible/data fields), "
+        "r1=void* dst_info. "
+        "Checks src_entry[+0x10] signed x>=0 and src_entry[+0x18] bit31 visibility. "
+        "src_entry[+0x14] bits[3:0] type: 0-3 -> BG palette 0x05000000; type 4 -> OBJ palette 0x05000200. "
+        "Uses bios_cpu_fast_set to write. Returns fixed 0. "
+        "Called by apply_gfx_resource_list on 'PALT' (0x544C4150) tag match. "
+        "Constants: 0x05000000 = BG palette VRAM base; 0x05000200 = OBJ palette VRAM base."),
+    ("FUN_08014c0c", "get_obj_tile_vram_base",
+        "Returns constant 0x06010000 (OBJ/sprite tile VRAM base address). "
+        "Body: ldr r0, DAT_08014c10; bx lr. Pure constant leaf. "
+        "GBA OBJ tile data starts at 0x06010000 (32KB in mode 0-2). "
+        "Called only by copy_to_obj_tile_vram to get the write target base."),
+    ("FUN_08014e14", "copy_to_obj_tile_vram",
+        "Copies src data via bios_cpu_set to OBJ tile VRAM (0x06010000). "
+        "Asserts src 4-byte aligned (gl_common.c:524) before calling get_obj_tile_vram_base. "
+        "r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0x1FFF], r2=word_count [1..0x2000]. "
+        "indeg=4, called by apply_objd_entry_to_sprite and 3 other scene renderers. "
+        "Constants: gl_common.c:524 = 0x83<<2 = 0x20C; 0x06010000 = OBJ tile VRAM base."),
+    ("FUN_0801695c", "apply_objd_entry_to_sprite",
+        "Applies one OBJD (Object Data) resource entry to target sprite/OAM state struct. "
+        "r0=void* sprite_dst, r1=void* objd_entry. "
+        "Reads data_len([+0xc]) / __udivsi3 / tile_stride([+0xa]) -> row_count -> strh sprite_dst[+0x12]. "
+        "Writes tile_attr bits[7:4] (palette) and bits[3:0] (mode) to sprite_dst[+0x14]. "
+        "If mode==4 (4bpp indexed) and VRAM target offset valid, calls copy_to_obj_tile_vram. "
+        "Returns fixed 0. Called by apply_gfx_resource_list on 'OBJD' (0x444A424F) tag match. "
+        "Constants: 'OBJD' = 0x444A424F; mode 4 = 4bpp indexed tile mode."),
+    ("FUN_08016a7c", "apply_gfx_resource_list",
+        "Iterates a graphics resource entry list, dispatching each entry by 4-byte type tag. "
+        "r0=void* list_header ([+0x0]=first entry ptr, [+0xE]=entry_count, [+0xC]=entry_stride). "
+        "Supports three types: 'BGDT' (0x54444742) -> apply_bgdt_entry_to_bg; "
+        "'OBJD' (0x444A424F) -> apply_objd_entry_to_sprite; 'PALT' (0x544C4150) -> write_palt_block_to_vram. "
+        "Returns fixed 0 when list exhausted. indeg=13, called by 5+ scene types "
+        "(scene_demo/scene_name_input/palette/demo/fs) as unified BG/OBJ/palette init entry. "
+        "Constants: 0x54444742='BGDT'; 0x444A424F='OBJD'; 0x544C4150='PALT'."),
+
     # 2026-05-05: campaign-1 batch (topo=1/2/8/10/11/13/14/15/16/17/18/19/20/21/25)
     ("FUN_08015194", "fill_gl_palram_buf_0xf0",
         "由 init_gl_palette_slot_flags (FUN_08015160) 在 GL 状态初始化链末尾调用, "
