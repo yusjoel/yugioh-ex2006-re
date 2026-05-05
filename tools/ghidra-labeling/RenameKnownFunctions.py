@@ -2056,6 +2056,120 @@ RENAMES = [
         "随后还渲染 game_str_id 0x69b (卡片属性) 到 VRAM 0x06003800, "
         "最后循环 8 行调用 render_banlist_card_row_text (FUN_081061d0) 渲染具体卡片行. "
         "被两个场景初始化驱动各调用一次."),
+
+    # 2026-05-05: BATCH-14 落地 (topo=274/275/276/277/278/279/280/281/282/284/285/286/287/288/289)
+    ("FUN_08105bfc", "init_card_list_sprite_oam_and_bg",
+        "card_list 场景完整 sprite/OAM/BG 初始化函数. 从 0x0202a4d0[+0x18] 读当前卡框索引, "
+        "从 0x09e60600 查 ROM 卡框条目结构体, 调用 upload_sprite_tiles_and_write_oam 写入 OAM slot; "
+        "再以 upload_sprite_tiles_with_palette_blend 上传带调色板混合的 sprite tile. "
+        "向 BG2HOFS/BG2VOFS 写入卷轴偏移 (negated), zero_fill_by_halfword 清空 VRAM sprite 区域 "
+        "0x0600f000 和 0x0600e000, 并将 OBJ 调色板表 0x05000140 填入 16 色数据. "
+        "最后写入 BG tilemap card_list 行与 game_string sprite 行. "
+        "被 setup_card_list_scene_bg_regs (FUN_081045c4) 在场景初始化路径末段唯一调用."),
+    ("FUN_081045c4", "setup_card_list_scene_bg_regs",
+        "card_list 场景 BG 寄存器及场景状态初始化函数. 连续向 BG0CNT/BG1CNT/BG2CNT/BG3CNT "
+        "(0x04000008+) 写入 4 个预设控制字 (0x1c02/0x1d09/0x1e8f/0x1f0f), "
+        "将 BG0HOFS~BG3VOFS 共 8 个卷轴寄存器全部清零, 并将 BLDALPHA (0x04000052) 写入 0x5001 启用混合. "
+        "随后调用 apply_blend_fadeout_flat 执行 fade 动画, 清除 0x0202f3c0[+0x1f] 的 bit6/bit0, "
+        "将 gPrng+0x174 写入 0x5001. 接着 zero_fill_by_halfword 清空 5 块 VRAM 区域 "
+        "(0x06004000~0x06013fff). 从 gSave 读取 deck_format 字段判断 card_type 格式以初始化 "
+        "0x0202f3c0[+0x22] 的游标偏移. 被 dispatch_card_list_scene_state 等多个场景入口调用."),
+    ("FUN_081047cc", "clear_dispcnt_blendcnt_and_obj_list",
+        "清零 DISPCNT 与 BLDCNT 寄存器并清空场景 OBJ 列表的小函数. "
+        "向 DISPCNT (0x04000000) 写 0 关闭所有 BG/OBJ 显示, "
+        "向 BLDCNT (0x04000050) 写 0 关闭混合效果, "
+        "再调用 init_scene_obj_list 清空 OBJ 列表; 返回固定值 1. "
+        "被 dispatch_card_list_scene_state 等 4 个 card_list 场景变体初始化路径调用, "
+        "作为每次场景切换前统一的显示/OBJ 复位步骤."),
+    ("FUN_08105702", "set_scene_mode_flag",
+        "将 r0 写入场景控制块 0x0202f3c0[+0x1f] (scene mode_flags 字段), "
+        "通过尾调用 return_zero_from_scene_dispatch 固定返回 0. "
+        "调用方 dispatch_card_list_scene_state 在场景状态转换末段调用本函数, "
+        "传入经 AND 0x7f 处理过的标志字节, 用于保存模式标志并以返回 0 告知状态机迭代已完成. "
+        "函数体仅 2 条指令 (strb + b), 是场景状态机中典型的 set-flag-then-exit 尾调用惯用法."),
+    ("FUN_08106588", "copy_card_frame_tile_row_to_vram",
+        "将 card_list 场景当前卡框的 tile 行数据复制到 VRAM BG tile 区域的辅助函数. "
+        "从 0x0202a4d0[+0x18] (s16) 读取当前选中卡框 index, 乘以 0x20 计算 ROM 条目偏移 "
+        "并加基址 0x09e60600 定位卡框结构体, 再从入参 r0 (行号) 计算目标 VRAM 地址 "
+        "0x06000800 + row*0x200. 调用 copy_bytes_by_halfword(src=card_frame_entry[0], "
+        "dst=vram_row_addr, len=0x600) 写入 tile 数据, 返回 1. "
+        "被 dispatch_card_list_scene_state 在场景初始化路径调用, 用于按行刷新卡框 BG tile."),
+    ("FUN_08105948", "tick_scene_anim_counter_mod29",
+        "对场景动画帧计数器执行模 29 递增的单功能函数. "
+        "读取 0x0202f3c0[+0x2a] (s16 动画帧计数器), 加 1 后写回; "
+        "若结果超过 0x1d (29) 则归零. "
+        "被 caller 0x08105520 (display/window/bg/frame_counter) 每帧调用, "
+        "用于驱动需要 29 帧周期的场景动画效果 (如卡框高亮闪烁). "
+        "函数体仅 11 条指令, 无调用, 是纯叶子计数器函数."),
+    ("FUN_081058c8", "build_palette_row_to_obj_pal_slot",
+        "按照当前动画帧计数器 0x0202f3c0[+0x28] 的相位, "
+        "为 card_list 场景构建一行调色板数据并写入 OBJ 调色板 slot 0x05000360. "
+        "对计数器值 [0xb..0xe] 范围内的每个颜色索引 (0..14), 由 0x09e31754 表查出基准 RGB565 颜色, "
+        "按计数器偏移量调整亮度后写入临时缓冲区; 越界索引直接透传原始颜色. "
+        "最后调用 copy_bytes_by_halfword 将 16 色 (0x20 字节) 写入 OBJ PAL 0x05000360, "
+        "帧计数器加 1 模 0x20 后写回. "
+        "被 caller 0x08105520 每帧调用, 实现卡框调色板闪烁动画."),
+    ("FUN_0810672c", "write_card_cursor_oam_by_scroll",
+        "根据场景当前滚动偏移量计算并写入卡牌游标 OAM 条目的函数. "
+        "从 0x0202f3c0[+0x2a] (s16 scroll_phase, 范围 0..29) 读取当前帧相位, "
+        "计算高度偏移 y_off = (0xe1 - (phase-15)^2 * 4) / 0xe1, "
+        "再从 [+0x26] 读可视行数 visible_rows; 若 visible_rows > 0, "
+        "则以 OAM 属性 y_off<<16|0x4 / r2=0x8f18 调用 dispatch_oam_write_by_mode 写入游标 OAM. "
+        "随后读 [+0x26] (row_count) 与 get_card_data_format_id 比较, 决定游标 x 位置. "
+        "再以 y=0x80-y_off, attr=0x40, x=scroll_x 调用 dispatch_oam_write_by_mode 写第二个 OAM 条目. "
+        "被 caller 0x08105520 每帧调用."),
+    ("FUN_081065fc", "write_card_slot_oam_all_rows",
+        "遍历 card_list 场景所有卡槽行, 为每行卡牌写入 OAM 条目的驱动函数. "
+        "外层循环以 r8 (行数上限, 来自 0x0202f3c0[+0x6]) 迭代, "
+        "内层从 0x09e605e8 卡框条目数组 (entry_size=0xc bytes) 读取每格参数: "
+        "从 [+0x6] 读显示项数 item_count, 从 [+0x2] 读基础 x 偏移, 从 [+0x4] 读 y step. "
+        "结合 0x0202f3c0[+0x24] (当前选中 index) 与卡框 mode 标志 "
+        "计算每个卡槽的 OAM x/y 坐标, 最终调用 dispatch_oam_write_by_mode 写入. "
+        "被 caller 0x08105520 每帧调用."),
+    ("FUN_081052aa", "set_card_list_slot_count",
+        "将 r0 写入卡片列表控制块 0x0202a4d0[+0x20] (s16 slot_count 字段), "
+        "通过尾调用 return_one_from_scene_dispatch 固定返回 1. "
+        "调用方 dispatch_card_list_scene_state 在场景状态机的更新 slot 数量分支中调用, "
+        "传入当前选中行的列计数值. "
+        "函数体仅 3 条指令, 是场景状态机中对称于 set_scene_mode_flag "
+        "(设置 mode_flag 并返回 0) 的 set-count-then-return-one 尾调用惯用法."),
+    ("FUN_0810573e", "return_zero_from_scene_dispatch",
+        "场景状态机分派函数的公共返回 0 出口. 设置 r0=0 后落入 return_one_from_scene_dispatch "
+        "的公共栈恢复+返回序列. 与 return_one_from_scene_dispatch (FUN_08105740) "
+        "构成对称的 return_zero/return_one 对, 供 dispatch_card_list_scene_state 等场景状态机 "
+        "在各分支末尾直接尾跳转. 该模式在 GBA 场景状态机中普遍用于将 "
+        "'本帧是否完成转换' 的布尔值返回给驱动循环."),
+    ("FUN_08105740", "return_one_from_scene_dispatch",
+        "场景状态机分派函数的公共返回 1 出口兼栈恢复序列. "
+        "调用方 dispatch_card_list_scene_state 等场景驱动函数以 "
+        "push {r4,r5,r6,r7,lr} + push {r5,r6,r7} + sub sp,#0xc 的三段式栈建立帧, "
+        "本函数用 add sp,#0xc + pop {r3,r4,r5} + pop {r4,r5,r6,r7} + pop {r1}; bx r1 "
+        "将三段完全拆除并跳返. 与 return_zero_from_scene_dispatch (FUN_0810573e) 构成对称对, "
+        "set_card_list_slot_count 等短函数直接尾跳本函数以返回 1."),
+    ("FUN_081047e8", "dispatch_card_list_scene_state",
+        "card_list 场景主状态机分派函数. 读取 0x0202f3c0[+0x1f] bit7 判断场景是否激活; "
+        "若未激活则进入 animating counter 路径. "
+        "激活时检查 0x0202a4d0[+0x18] (s16 mode) 决定进入新场景初始化还是已激活场景更新两大路径. "
+        "初始化路径: 检查 gSave 是否为 pass_input/banlist 模式, 选择合适的 page_state_dispatcher 表, "
+        "调用 page_state_dispatcher 后按 flag 决定调用 setup_card_list_scene_bg_regs / "
+        "reset_card_list_scroll_offset / write_vram_bg_tilemap_card_list 等完整初始化链. "
+        "更新路径: 基于 0x0202f3c0[+0x38] 的 sub_state 字段进行 16 路 switch 分派, "
+        "各 case 处理卡牌选择/滚动/确认/取消等交互. "
+        "被 FUN_08108940 / FUN_08108da4 / FUN_08108eec 3 个场景驱动调用."),
+    ("FUN_08105754", "return_one_scene_stub",
+        "仅含 movs r0,#1; bx lr 两条指令的无操作占位函数, 固定返回 1. "
+        "被 card_list 场景的 3 个场景变体驱动 (FUN_08108940 / FUN_08108da4 / FUN_08108eec) 共同调用, "
+        "根据调用位置推断为场景生命周期中某一阶段的空实现槽 (如 cleanup / finalize). "
+        "函数体字节与 return_one_card_list_stub (0x08104328) / return_one_scene_card_list (0x080ff430) "
+        "模式完全一致. indeg=3 且 tag 为 scene_card_list."),
+    ("FUN_08105758", "query_card_list_max_index",
+        "根据当前 card_list 显示模式返回卡牌列表最大有效 index 上限的查询函数. "
+        "从 0x0202a4d0[+0x18] (s16 mode, 值 0..5) 读取显示模式: "
+        "若 mode==4 (全卡数据库), 调用 get_card_data_format_id 并返回其结果; "
+        "若 mode 在 [5..6] 范围 (EX/GB pack), 读 0x0202a4d0[+0x24] (s16 pack_card_count) 并加 0xc 返回; "
+        "其余 mode 返回固定值 0x3c (60). "
+        "被 FUN_081089d8 (pass_input) 和 FUN_08108da4 (card_list scene) 调用, "
+        "用于在滚动/选择时验证 index 是否越界. 纯只读无副作用."),
 ]
 
 
