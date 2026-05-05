@@ -107,7 +107,7 @@ model: sonnet
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
 7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）→ 全部替换为最接近的 ASCII 对应符号；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
-9. **R1 双动词检查**: proposed_name 不得含 `_and_` 或 `_or_` 连接两个动词; `_and_return` 永远不合法 (return 是隐含语义); dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
+9. **R1 双动词检查**: proposed_name 不得含 `_and_` / `_or_` / `_then_` 连接两个动词; `_and_return` / `_then_return_` 永远不合法 (return 是隐含语义); 函数做副作用后返回固定值时只命名副作用 (`write_X_then_return_Y` → `set_X`), 返回值写进参数签名返回行; dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
 10. **R8 med/low 升级路径**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`)
 
 ### Phase 5: 完成报告
@@ -141,7 +141,7 @@ model: sonnet
 - 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
 - 函数入口含 `adds rX, rY, #0x0`（X < 4）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (rX 不是独立参数，先扫入口 5 条指令)
 - 函数入口含 `ldr rN, [pc,#N]` / `ldr rN, =<const>` 加载字面量池常量地址 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (rN 及随后 `mov rHigh,rN` 的目标均为内部值，不是参数)
-- proposed_name 含 `_and_` 或 `_or_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state)
+- proposed_name 含 `_and_` / `_or_` / `_then_` 连接动词, 或含 `_then_return_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state; _then_return_Y 场景直接截断)
 - 函数体含 OAM attr 写入 / DISPCNT / IO 寄存器裸整数常量 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (必须在 Constants: 块命名; `0xC00`=mode mask 非 priority; batch-9 7/7 R6 扣分)
 - 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分)
 - 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0)
