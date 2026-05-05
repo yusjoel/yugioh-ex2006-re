@@ -2271,6 +2271,104 @@ RENAMES = [
         "若 tick 返回非零则读 [0x0202a4d0+0x2] 场景跳转码: "
         "==1 时重新初始化显示对象并写 gPrng+0x204 OR 0xc0 (state-3); "
         "其他非零值写 OR 0x80 (state-2). 返回 1 表示跳转完成, 0 表示继续."),
+
+    # 2026-05-05: campaign-1 batch (topo=1/2/8/10/11/13/14/15/16/17/18/19/20/21/25)
+    ("FUN_08015194", "fill_gl_palram_buf_0xf0",
+        "由 init_gl_palette_slot_flags (FUN_08015160) 在 GL 状态初始化链末尾调用, "
+        "负责将调色板 RAM 子区域全部填充为 0xf0 (halfword fill 模式). "
+        "实现: sp 作为 src 地址存放填充值 0xf0; bios_cpu_set fill 写入 EWRAM 0x02023490 "
+        "起始 0x100 halfword (0x200 字节), 确保调色板条目处于已知默认值状态(非零). "
+        "Constants: 0x05000100 = bios_cpu_set 控制字 (bit24=1 fill, len=0x100 halfwords=0x200 bytes)."),
+    ("FUN_08015160", "init_gl_palette_slot_flags",
+        "被 gl_state_init/name_input_page_tick/demo_shuen_state_machine 等 7 个场景共同调用, "
+        "负责将 GL 调色板槽位标记区域 (EWRAM 0x02023490+0x880, 共 32 字节) 全部置为 0xFF, "
+        "并将相邻控制字节 (offset 0x8A0) 清零, 最后调用 fill_gl_palram_buf_0xf0 填充调色板 RAM 子区. "
+        "触发时机: 每次 GL 层重新初始化或场景切换需要复位调色板槽位状态时调用."),
+    ("FUN_080146cc", "update_brightness_fade_flag",
+        "由 gl_set_brightness 在设置亮度目标值后调用, 根据亮度状态结构体 (EWRAM 0x02023480) "
+        "中的当前值 (offset +0) 和目标值 (offset +1) 符号确定 fade 状态标记并写回 offset +8. "
+        "若两个值均 >= 0 则将 +8 的低 2 位清零并置 bit1 (fade 激活); "
+        "若任一值 < 0 则置 +8 为 3 (idle/disabled). "
+        "副作用: [0x02023480+8] 写入新 flag 字节."),
+    ("FUN_08013510", "reset_display_and_gl_state",
+        "由 play_ui_effect_3a 及 FUN_08014398 在需要完全重置显示层时调用. "
+        "执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); "
+        "(2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); "
+        "(3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; "
+        "(4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; "
+        "(5) gl_state_init 重置 GL 状态结构体; "
+        "(6) gl_clear_frame_callbacks 清空帧回调队列. "
+        "Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B."),
+    ("FUN_08015fc8", "zero_struct_36bytes",
+        "被 scene_demo/scene_name_input 初始化器等 13 个调用点使用, "
+        "将 r0 传入的指针所指向的 36 字节结构体清零. "
+        "实现: 利用栈临时存储 0 (halfword), 以 bios_cpu_set halfword fill 模式将目标地址起 "
+        "0x12 个 halfword (36 字节) 填充为 0. 返回 r0=0 (固定). "
+        "Constants: 0x01000012 = bios_cpu_set 控制字 (bit24=1 fill, halfword, len=0x12=36 bytes)."),
+    ("FUN_08014bcc", "get_bg2_screen_vram_addr",
+        "由 assert-wrapper copy_to_bg2_screen_map 在执行 BG2 screen map 拷贝前调用, "
+        "读取 BG2CNT 寄存器 (0x0400000C) 的 screen_base_block 字段 (bits [12:8]), "
+        "计算并返回 BG2 screen map 在 VRAM 中的实际起始地址. "
+        "公式: addr = 0x06000000 + screen_base_block * 0x800. 无副作用, 纯计算返回. "
+        "与 get_bg0/bg1/bg3_screen_vram_addr 构成四函数 sibling 簇."),
+    ("FUN_08014d94", "copy_to_bg2_screen_map",
+        "由 dispatch_bg_screen_map_write 在 bg_index=2 时调用, "
+        "将 src 数据经 bios_cpu_set 拷贝到 BG2 的 screen map VRAM 地址. "
+        "调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:513 处的 suppress_assert_report. "
+        "对齐通过后: 调 get_bg2_screen_vram_addr 查询 BG2CNT 获得 screen 基址, "
+        "加上 dst_offset, 以 bios_cpu_set copy 写入."),
+    ("FUN_08014bec", "get_bg3_screen_vram_addr",
+        "由 assert-wrapper copy_to_bg3_screen_map 在执行 BG3 screen map 拷贝前调用, "
+        "读取 BG3CNT 寄存器 (0x0400000E) 的 screen_base_block 字段 (bits [12:8]), "
+        "计算并返回 BG3 screen map 在 VRAM 中的实际起始地址. "
+        "公式: addr = 0x06000000 + screen_base_block * 0x800. 无副作用, 纯计算返回. "
+        "与 get_bg0/bg1/bg2_screen_vram_addr 构成四函数 sibling 簇."),
+    ("FUN_08014dd4", "copy_to_bg3_screen_map",
+        "由 dispatch_bg_screen_map_write 在 bg_index=3 时调用, "
+        "将 src 数据经 bios_cpu_set 拷贝到 BG3 的 screen map VRAM 地址. "
+        "调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:518 处的 suppress_assert_report. "
+        "对齐通过后: 调 get_bg3_screen_vram_addr 查询 BG3CNT 获得 screen 基址, "
+        "加上 dst_offset, 以 bios_cpu_set copy 写入."),
+    ("FUN_08014b8c", "get_bg0_screen_vram_addr",
+        "由 assert-wrapper copy_to_bg0_screen_map 在执行 BG0 screen map 拷贝前调用, "
+        "读取 BG0CNT 寄存器 (0x04000008) 的 screen_base_block 字段 (bits [12:8]), "
+        "计算并返回 BG0 screen map 在 VRAM 中的实际起始地址. "
+        "公式: addr = 0x06000000 + screen_base_block * 0x800. 无副作用, 纯计算返回. "
+        "与 get_bg1/bg2/bg3_screen_vram_addr 构成四函数 sibling 簇."),
+    ("FUN_08014d14", "copy_to_bg0_screen_map",
+        "由 dispatch_bg_screen_map_write 在 bg_index=0 时调用, "
+        "将 src 数据经 bios_cpu_set 拷贝到 BG0 的 screen map VRAM 地址. "
+        "调用前先以 assert 检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:503 处的 suppress_assert_report. "
+        "对齐通过后: 调 get_bg0_screen_vram_addr 查询 BG0CNT 获得 screen 基址, "
+        "加上 dst_offset, 以 bios_cpu_set copy 模式写入."),
+    ("FUN_08014bac", "get_bg1_screen_vram_addr",
+        "由 assert-wrapper copy_to_bg1_screen_map 在执行 BG1 screen map 拷贝前调用, "
+        "读取 BG1CNT 寄存器 (0x0400000A) 的 screen_base_block 字段 (bits [12:8]), "
+        "计算并返回 BG1 screen map 在 VRAM 中的实际起始地址. "
+        "公式: addr = 0x06000000 + screen_base_block * 0x800. 无副作用, 纯计算返回. "
+        "与 get_bg0/bg2/bg3_screen_vram_addr 构成四函数 sibling 簇."),
+    ("FUN_08014d54", "copy_to_bg1_screen_map",
+        "由 dispatch_bg_screen_map_write 在 bg_index=1 时调用, "
+        "将 src 数据经 bios_cpu_set 拷贝到 BG1 的 screen map VRAM 地址. "
+        "调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:508 处的 suppress_assert_report. "
+        "对齐通过后: 调 get_bg1_screen_vram_addr 查询 BG1CNT 获得 screen 基址, "
+        "加上 dst_offset, 以 bios_cpu_set copy 写入."),
+    ("FUN_080162dc", "dispatch_bg_screen_map_write",
+        "由 write_tile_region_to_bg_screen 调用, 根据 r2 (dst) 的高 20 位是否置位来选择两种写入路径: "
+        "(A) r2 高位非零 -- r2 即为原始 VRAM 地址, 直接 bios_cpu_set (src=r0, dst=r2, len=r3); "
+        "(B) r2 高位全零 -- r2 为偏移量, r1 为 bg_index [0..3], "
+        "分派到 copy_to_bg0/1/2/3_screen_map. "
+        "Constants: 0xfff00000 = 高 12 位掩码, 用于判断 r2 是原始地址还是 bg_index+offset."),
+    ("FUN_08016344", "write_tile_region_to_bg_screen",
+        "由 FUN_080165bc 调用, 将 tileset 描述符 (r6 struct) 中指定的 tile 区域逐行写入 "
+        "目标 BG (BG2 或 BG3) 的 screen map. "
+        "处理流程: (1) 读取 r6[0xc] (tile 数量/data ptr), 若为 0 则直接返回; "
+        "(2) 读 r6[0x15] bit1 选择路径 (普通 tile 序列或含 X 偏移的特殊格式); "
+        "(3) 调 bg2_cnt_get_screen_size/bg3_cnt_get_screen_size 确定 screen 宽度; "
+        "(4) 按 r6[0x16] 的 width/height 字段计算每行写入范围, "
+        "循环调用 dispatch_bg_screen_map_write 写入各行. "
+        "BG2/BG3 由 r6[0x14] bits[3:0] 选择. "
+        "Confidence: med (r6 struct field layout +0x14/+0x15/+0x16 awaits runtime verify)."),
 ]
 
 
