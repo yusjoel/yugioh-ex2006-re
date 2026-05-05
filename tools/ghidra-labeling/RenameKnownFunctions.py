@@ -2170,6 +2170,91 @@ RENAMES = [
         "其余 mode 返回固定值 0x3c (60). "
         "被 FUN_081089d8 (pass_input) 和 FUN_08108da4 (card_list scene) 调用, "
         "用于在滚动/选择时验证 index 是否越界. 纯只读无副作用."),
+
+    # 2026-05-05: BATCH-15 落地 (topo=290/291/292/293/294/295/296/297/298/299/300/301/302/303/304)
+    ("FUN_08105784", "check_card_index_in_format_range",
+        "验证给定卡牌序号是否在当前卡组列表槽位允许的格式范围内. "
+        "入参 r0 为待检卡牌线性序号. 读取 [0x0202a4d0+0x18] 槽类型字段: "
+        "若为 4 (CUSTOM 格式) 则调用 get_card_data_format_id 获取格式 ID 并与序号比较; "
+        "对其他槽类型则以固定上界 (CARD_LIST_MAX_INDEX=0x3b 或 [ctx+0x24]+0xc) 做范围检查. "
+        "由 FUN_08108da4 (deck_edit 状态机) 在初始化时逐条调用以筛选可显示的卡牌条目. "
+        "返回 1=序号合法, 0=越界."),
+    ("FUN_08106eb4", "return_one_card_list_scene_stub",
+        "card_list 场景专用空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "三个调用方 (FUN_081085d0/FUN_08108b38/FUN_0810ad98) 均为 card_list 场景帧调度器, "
+        "在特定状态下以此占位代替真实的输入处理器, 返回 1 表示已处理/继续."),
+    ("FUN_08106eb8", "return_one_puzzle_card_list_stub",
+        "决斗谜题卡牌列表场景专用空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由 scene_duel_puzzle+card_list 双标签场景的帧调度器调用 (FUN_081086f8/FUN_08108c4c/FUN_0810aeb4), "
+        "充当特定状态下的无操作输入处理占位符, 返回 1 表示已处理/继续."),
+    ("FUN_08108da0", "return_one_deck_edit_stub",
+        "deck_edit 页面专用空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由 enter_deck_edit_page (0x08108ac0) 唯一调用, "
+        "在 deck_edit 场景状态机的某一分支中作为无操作处理器占位, 返回 1 表示继续."),
+    ("FUN_08108f80", "init_card_list_scene_for_deck_slot",
+        "为卡牌列表场景执行完整初始化流程, 适用于 deck_edit 页面中某个具体卡组槽位. "
+        "向场景上下文 [0x0202a4d0+0x0] 写 2 (场景类型 ID), [+0x4] 写 1 (子模式标志); "
+        "检查槽类型 [+0x18]: 若为 4 则 r0=1 否则 r0=0, 连同 [+0x22] 调用 load_card_list_entry_to_slot. "
+        "依次调用 reset_card_list_scene_state/card_list_screen_init/reset_card_list_scroll_offset, "
+        "最后写 gPrng+0x204 场景调度字 (OR 0x280) 触发状态机切换. 由 enter_deck_edit_page 调用."),
+    ("FUN_08108da4", "tick_deck_edit_card_list_frame",
+        "deck_edit 场景中卡牌列表页面的每帧驱动函数. "
+        "调用 dispatch_card_list_scene_state 执行状态机分派, render_card_list_oam_entries 刷新 OAM. "
+        "若 dispatch 返回非零则读 [0x0202a4d0+0x1e] 场景状态字 (5 路 switch): "
+        "状态 1-4 各写 slot_type 1-4 至 [ctx+0x18] 并遍历 card_index 调用 check_card_index_in_format_range 筛选首条有效卡牌; "
+        "状态 0 执行退出/还原. 返回 0=无转换, 1=完成转换. 由 enter_deck_edit_page 注册为主帧处理器."),
+    ("FUN_08108ee8", "return_one_deck_edit_input_stub",
+        "deck_edit 页面专用空操作输入处理占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由 enter_deck_edit_page (0x08108ac0) 唯一调用, "
+        "注册为 deck_edit 某状态分支的输入处理器占位, 返回 1 表示已处理/继续."),
+    ("FUN_08109038", "return_one_puzzle_deck_init_stub",
+        "决斗谜题卡牌列表初始化序列中的空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由三个 caller 调用: FUN_081086f8 (scene_duel_puzzle/card_list 帧调度器), "
+        "FUN_08108c4c (puzzle deck_edit 场景初始化), FUN_0810aeb4 (与 08106eb8 共享相同 caller 集合). "
+        "在 puzzle 场景初始化/帧调度流程中充当初始化已完成/继续的固定占位返回."),
+    ("FUN_08108c4c", "init_puzzle_deck_edit_card_list",
+        "决斗谜题模式下卡牌列表 (deck_edit) 场景的完整初始化函数. "
+        "由 enter_deck_edit_page 在 puzzle 分支调用. 依次调用两个占位存根 (08106eb8/08109038), "
+        "return_one_card_list_stub 清理旧状态, init_card_list_display_and_objs 初始化显示对象, "
+        "refresh_card_list_slot_display 刷新槽位. "
+        "随后从 [0x0202a4d0+0x16] 读谜题选项字节, 将 bit0-4 重新打包到 IWRAM [0x02000000+0x6c30]. "
+        "最后调用 init_puzzle_wram_then_copy 并写 gPrng+0x204 (OR 0xfc) 切换场景. 返回 1."),
+    ("FUN_08108eec", "tick_deck_edit_name_input_frame",
+        "deck_edit 场景中含 name_input 子页面的每帧驱动函数. "
+        "调用 dispatch_card_list_scene_state 执行状态分派, render_card_list_oam_entries 刷新 OAM. "
+        "若转换发生则读 [0x0202a4d0+0x20] 场景子状态 (s16): "
+        "==1 则 return_one_card_list_stub + clear_dispcnt_blendcnt_and_obj_list + gPrng+0x204 OR 0x240 (切换到 name_input); "
+        "!=1 则清屏 + 备份 [ctx+0x18] 至 [ctx+0x1a] + gPrng+0x204 OR 0xc0 (切回主列表). "
+        "返回 0=无切换, 1=完成切换. 由 enter_deck_edit_page 注册为含 name_input 的分支帧处理器."),
+    ("FUN_08108eb8", "init_card_list_scene_bg_with_scroll_reset",
+        "card_list 场景背景寄存器初始化函数 (含滚动归零). "
+        "调用 setup_card_list_scene_bg_regs 设置 BG 控制寄存器, "
+        "然后 reset_card_list_scroll_offset 归零列表滚动偏移. "
+        "读 gPrng+0x204 场景调度字, 用掩码 0xffffc03f 清除旧状态域并写入 0x1c0 (0xe0<<1) 作为下一状态编码. "
+        "与 08108d70 (写 0x100) 为同族变体, 唯一区别是目标状态值不同. 由 enter_deck_edit_page 调用. 返回 1."),
+    ("FUN_08108d70", "init_card_list_scene_bg_for_deck_edit",
+        "deck_edit 卡牌列表场景初始化时设置 BG 寄存器与滚动偏移的变体函数. "
+        "依次调用 setup_card_list_scene_bg_regs 配置 BG 硬件寄存器, "
+        "然后 reset_card_list_scroll_offset 归零滚动, "
+        "最后向 gPrng+0x204 写入 0x100 (0x80<<1) 作为下一场景状态编码, 返回 1. "
+        "与 08108eb8 结构完全同构, 唯一区别是写入的状态目标值不同 (0x100 vs 0x1c0). 由 enter_deck_edit_page 调用."),
+    ("FUN_08108fd4", "return_one_card_info_stub",
+        "card_info 显示页面专用空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由 enter_deck_edit_page (0x08108ac0) 唯一调用, "
+        "在 deck_edit 状态机中作为 card_info 某分支的无操作处理器占位, 返回 1 表示已处理/继续. "
+        "地址紧邻 FUN_08108fd8 (tick_card_info_display_frame), 构成占位+实体对."),
+    ("FUN_08108fd8", "tick_card_info_display_frame",
+        "card_info 子页面的每帧驱动函数. 由 enter_deck_edit_page 注册为 card_info 分支帧处理器. "
+        "调用 tick_card_list_scene_frame 推进场景时序, render_card_list_oam_entries 刷新 OAM, "
+        "return_one_scene_card_list 统一帧结束. "
+        "若 tick 返回非零则调用 return_one_card_list_stub/init_card_list_display_and_objs/"
+        "reinit_deck_slots_from_card_stats, 清零 [0x0202a4d0+0x0], "
+        "写 gPrng+0x204 OR 0x180 (0xc0<<1) 返回主列表. 返回 0=展示中, 1=完成退出."),
+    ("FUN_08109034", "return_one_card_list_main_stub",
+        "card_list 主场景专用空操作占位函数. 函数体仅 movs r0,#1; bx lr. "
+        "由三个 card_list/deck_edit/banlist 场景帧调度器调用 (FUN_081085d0/FUN_08108b38/FUN_0810ad98), "
+        "与 return_one_card_list_scene_stub (0x08106eb4) 共享完全相同的 caller 集合但地址不同. "
+        "在对应场景的某一帧处理分支中作为无需特殊处理返回 1 的占位."),
 ]
 
 
