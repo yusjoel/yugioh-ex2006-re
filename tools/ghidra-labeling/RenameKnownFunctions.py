@@ -2469,6 +2469,131 @@ RENAMES = [
         "循环调用 dispatch_bg_screen_map_write 写入各行. "
         "BG2/BG3 由 r6[0x14] bits[3:0] 选择. "
         "Confidence: med (r6 struct field layout +0x14/+0x15/+0x16 awaits runtime verify)."),
+
+    # 2026-05-05: campaign-3 batch (topo=43/44/45/55/56/59x3/60/61/62/63/64/65/66)
+    # demo loader (exodia/exodia*.LZ5bg assets) + NitroSDK G2D library wrappers
+    ("FUN_08013578", "setup_demo_sprite_entry",
+        "Called by dispatch_demo_sprite_setup_by_mode (mode=0). "
+        "Initialises OAM attr0/attr1/attr2 fields for one demo sprite slot, "
+        "then calls apply_gfx_resource_list to commit. "
+        "Detects JP BIOS version byte [0x080000ae]>>8 == 0x4a and adjusts tile offset +0x38. "
+        "r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. "
+        "Constants: OAM_BIOS_JP_MASK=0x4a / ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf."),
+    ("FUN_08013680", "setup_demo_sprite_entry_alt",
+        "Called by dispatch_demo_sprite_setup_by_mode (mode=1 or mode=2). "
+        "Structure mirrors setup_demo_sprite_entry (0x08013578) but omits JP BIOS detection branch. "
+        "Initialises OAM attr0/attr1/attr2 and calls apply_gfx_resource_list. "
+        "Resource list template: 0x09e396c8 (demo/exodia/exodia01_obj.LZncer). "
+        "r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. "
+        "Constants: ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf / ATTR2_MASK=0xffffc07f."),
+    ("FUN_08013740", "dispatch_demo_sprite_setup_by_mode",
+        "Dispatcher called by scene_demo state machine (FUN_08013bd4) for sprite init. "
+        "mode=0 -> setup_demo_sprite_entry (0x08013578); "
+        "mode=1 or mode=2 -> setup_demo_sprite_entry_alt (0x08013680); "
+        "other mode: epilogue only. "
+        "Epilogue unconditionally writes 0 to DISPCNT (0x04000000) via 0xa0<<0x13. "
+        "r0=mode[0..2], r1=x_pos, r2=palette_idx, r3=ptr. "
+        "Constants: DISPCNT=0x04000000."),
+    ("FUN_0801379c", "load_demo_bg_gfx_set0",
+        "Called by scene_demo state machine (FUN_08013bd4, case=0). "
+        "Loads first BG graphics group: fs_load(r0='demo/exodia/exodia00_1.LZ5bg'), "
+        "then two rounds of zero_struct_36bytes + apply_gfx_resource_list for BG0 and BG1. "
+        "First apply: priority=3; second apply: tile offset 0xa00 + attr1 bit7 set. "
+        "Epilogue strh to DISPCNT (0xa0<<0x13 = 0x04000000). "
+        "Constants: BG0_PRIORITY=0x3 / OBJ_VRAM_OFFSET=0xa00 / DISPCNT=0x04000000."),
+    ("FUN_08013864", "load_demo_bg_gfx_set1",
+        "Called by scene_demo state machine (FUN_08013bd4, case=5). "
+        "Symmetric to load_demo_bg_gfx_set0 (0x0801379c); loads second BG group: "
+        "fs_load(r0='demo/exodia/exodia01_BG.LZ5bg'), two zero_struct_36bytes + two apply_gfx_resource_list, "
+        "plus a third apply for extended resource descriptor DAT_0801393c=0x141e0000. "
+        "Difference: second apply uses tile base 0x22 instead of 0xa0<<4. "
+        "Epilogue strh to DISPCNT. "
+        "Constants: BG_TILE_BASE2=0x22 / DISPCNT=0x04000000 / EXTRA_RESOURCE=0x141e0000."),
+    ("FUN_080e88cc", "advance_anim_ctrl_frame",
+        "NitroSDK nnsys/g2d/g2d_Animation.c -- animation controller frame advance. "
+        "Called by step_anim_ctrl_by_frames (0x080e8d70). "
+        "Asserts pAnimCtrl != NULL and pAnimCtrl->pCurrent != NULL (suppress lines 0xf8/0x4d). "
+        "Reads [pAnimCtrl+0x14]/[pAnimCtrl+0x18] for sequence type (LOOP=2 / REVERSE=4). "
+        "Toggles [pAnimCtrl+0x4] active flag, updates [pAnimCtrl+0x0] frame position "
+        "via set_anim_ctrl_position_fwd (FUN_080e90fc). "
+        "r0=ptr pAnimCtrl (NNS_G2dAnimController). "
+        "Constants: ANIM_TYPE_LOOP=2 / ANIM_TYPE_REVERSE=4 / ANIM_CTRL_ACTIVE_OFFSET=0x4."),
+    ("FUN_080e8d70", "step_anim_ctrl_by_frames",
+        "NitroSDK nnsys/g2d/g2d_Animation.c -- advance animation controller by N frames. "
+        "Called by set_anim_ctrl_position_fwd (0x080e90fc) and FUN_080e957c. "
+        "Asserts pAnimCtrl != NULL (suppress line 0x16d), pCurrent != NULL (line 0xb7), "
+        "frames >= 0 (line 0x16f). "
+        "If [pAnimCtrl+0x8]==1 (active): computes frames * pCurrent->speed (__muldi3) "
+        "+ 0x800 rounding, adds to [pAnimCtrl+0xc] (position accumulator). "
+        "Returns new [pAnimCtrl+0xc] or 0 if inactive. "
+        "r0=ptr pAnimCtrl, r1=s32 frames[0..MAX_INT]. "
+        "Constants: ANIM_SPEED_SHIFT=12 / ROUNDING_OFFSET=0x800 / ACTIVE_FLAG=1."),
+    ("FUN_080e90fc", "set_anim_ctrl_position_fwd",
+        "NitroSDK nnsys/g2d/g2d_Animation.c -- reset animation controller frame pointer to sequence start. "
+        "Called by advance_anim_ctrl_frame (0x080e88cc), bind_anim_ctrl_callback (0x080e91a8), FUN_080e9500. "
+        "Asserts pAnimCtrl != NULL. Reads [pAnimCtrl+0x10] speed: if speed>0 computes forward base "
+        "= pContent + count*8; else base = pContent + totalFrames*8 - 8. "
+        "Writes [pAnimCtrl+0x0]=base, [pAnimCtrl+0xc]=0, then calls step_anim_ctrl_by_frames(pAnimCtrl,0). "
+        "r0=ptr pAnimCtrl (NNS_G2dAnimController). "
+        "Constants: FRAME_SIZE=8 / POSITION_INIT=0."),
+    ("FUN_080e91a8", "bind_anim_ctrl_callback",
+        "NitroSDK nnsys/g2d/g2d_Animation.c -- bind animation sequence to controller and reset position. "
+        "Called by FUN_080e94a4. "
+        "Asserts pAnimCtrl != NULL (suppress line 0x260) and pCallBack != NULL. "
+        "Stores pCallBack to [pAnimCtrl+0x18] (pCurrent field), "
+        "then calls set_anim_ctrl_position_fwd (FUN_080e90fc) to reset frame pointer. "
+        "Equivalent to NNS_G2dSetAnimCtrlCurrentAnimSequence. "
+        "r0=ptr pAnimCtrl, r1=ptr pCallBack (NNS_G2dAnimSequence). "
+        "Constants: ANIM_CTRL_PCURRENT_OFFSET=0x18."),
+    ("FUN_080e8bc8", "get_anim_ctrl_current_frame_ptr",
+        "NitroSDK nnsys/g2d/g2d_Animation.c -- pure getter returning pAnimCtrl->pCurrent->pContent. "
+        "Called by FUN_080e9350. "
+        "Asserts pAnimCtrl != NULL (suppress line 0x12f), pCurrent != NULL (line 0x130), "
+        "pContent != NULL (line 0x131). "
+        "Returns [[pAnimCtrl+0]+0] = pCurrent->pContent via two-level pointer deref. No writes. "
+        "r0=ptr pAnimCtrl -> ret ptr (current frame content). "
+        "Constants: ANIM_CTRL_PCURRENT_OFFSET=0 / PCURRENT_PCONTENT_OFFSET=0."),
+    ("FUN_080eb8a8", "set_nob_cell_position",
+        "NitroSDK nnsys/g2d/g2d_NOB_load.c -- set X/Y position of a NOB cell entry. "
+        "Called by FUN_080e9350. "
+        "Checks [pCell+0]==1 (CELL_TYPE_ACTIVE); if ok: sets [pCell+0x12] bit3 (position valid flag), "
+        "writes strh x_pos to [pCell+0xc], strh y_pos to [pCell+0xe]. "
+        "Type mismatch triggers suppress_assert_report (line 0x27). "
+        "r0=ptr pCell (NNS_G2dNOBCell), r1=u16 x_pos[0..65535], r2=u16 y_pos[0..65535]. "
+        "Constants: CELL_TYPE_ACTIVE=1 / CELL_FLAG_POS_SET=0x8 / CELL_X_OFFSET=0xc / CELL_Y_OFFSET=0xe."),
+    ("FUN_080eb8e4", "set_nob_cell_frame_idx",
+        "NitroSDK nnsys/g2d/g2d_NOB_load.c -- set frame index of a NOB cell entry. "
+        "Called by FUN_080e9350. "
+        "Checks [pCell+0]==1 (CELL_TYPE_ACTIVE); if ok: sets [pCell+0x12] bit2 (frame-idx valid flag), "
+        "writes strh frame_idx to [pCell+0x10]. "
+        "Type mismatch triggers suppress_assert_report (line 0x45). "
+        "r0=ptr pCell (NNS_G2dNOBCell), r1=u16 frame_idx[0..65535]. "
+        "Constants: CELL_TYPE_ACTIVE=1 / CELL_FLAG_FRAME_SET=0x4 / CELL_FRAME_IDX_OFFSET=0x10."),
+    ("FUN_080eb978", "init_srt_ctrl_state",
+        "NitroSDK nnsys/g2d/g2d_SRTControl.c -- initialise SRT controller scale/rotate/translate fields. "
+        "Called by bind_srt_ctrl_data (0x080eb94c). "
+        "Asserts pCtrl != NULL (suppress line 0x8f) and type==NNS_G2D_SRTCONTROLTYPE_SRT==1 (line 0x90). "
+        "Clears [pCtrl+0] halfword, calls bios_cpu_set fill-0 (control word 0x0100000c) to zero "
+        "[pCtrl+4..0xf] (12 bytes), then writes [pCtrl+4]=0x1000 and [pCtrl+8]=0x1000 (scale=1.0 in 4.12). "
+        "r0=ptr pCtrl (NNS_G2dSRTControl). "
+        "Constants: SRT_SCALE_INIT=0x1000 / SRT_CLEAR_LEN=0xc / NNS_G2D_SRTCONTROLTYPE_SRT=1."),
+    ("FUN_080eb94c", "bind_srt_ctrl_data",
+        "NitroSDK nnsys/g2d/g2d_SRTControl.c -- bind data pointer to SRT controller and initialise state. "
+        "Called by FUN_080e9350 and FUN_080e9400. "
+        "Asserts pCtrl != NULL (suppress line 0x77). "
+        "Stores pData to [pCtrl+0x0] (data field), then calls init_srt_ctrl_state (FUN_080eb978) "
+        "to set scale=0x1000, clear rotate/translate. Equivalent to NNS_G2dInitSRTControl. "
+        "r0=ptr pCtrl (NNS_G2dSRTControl), r1=ptr pData. "
+        "Constants: SRT_CTRL_DATA_OFFSET=0."),
+    ("FUN_080eb7f0", "get_nob_cell_data_ptr",
+        "NitroSDK nnsys/g2d/g2d_NOB_load.c -- return pointer to cell entry by slot index. "
+        "Called by FUN_080e9350 and FUN_080eb838. "
+        "Asserts pCellData != NULL (suppress line 0x51). "
+        "Checks slot_index (u16) < pCellData->count (halfword at [pCellData+0]); returns NULL if out of range. "
+        "Format flag [pCellData+0x2] bit0: 0 -> stride=8 bytes (lsls slot,#3); 1 -> stride=16 bytes (lsls slot,#4). "
+        "Returns [pCellData+0x4] + index*stride. "
+        "r0=ptr pCellData (NNS_G2dCellData), r1=u16 slot_index[0..count-1] -> ret ptr (cell entry or NULL). "
+        "Constants: CELL_STRIDE_8B=8 / CELL_STRIDE_16B=16 / COUNT_OFFSET=0 / FORMAT_FLAG_OFFSET=2 / DATA_BASE_OFFSET=4."),
 ]
 
 
