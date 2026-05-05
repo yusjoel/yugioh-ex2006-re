@@ -140,6 +140,7 @@ model: sonnet
 - 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
 - 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
 - 函数入口含 `adds rX, rY, #0x0`（X < 4）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (rX 不是独立参数，先扫入口 5 条指令)
+- 函数入口含 `ldr rN, [pc,#N]` / `ldr rN, =<const>` 加载字面量池常量地址 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (rN 及随后 `mov rHigh,rN` 的目标均为内部值，不是参数)
 - proposed_name 含 `_and_` 或 `_or_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state)
 - 函数体含 OAM attr 写入 / DISPCNT / IO 寄存器裸整数常量 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (必须在 Constants: 块命名; `0xC00`=mode mask 非 priority; batch-9 7/7 R6 扣分)
 - 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分)
