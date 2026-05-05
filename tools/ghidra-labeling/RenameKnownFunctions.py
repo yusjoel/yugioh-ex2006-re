@@ -1927,6 +1927,135 @@ RENAMES = [
         "step 5=fadeout (3 种 brightness/blend 模式). step 6=wait fadeout. default 路径 "
         "cleanup (FUN_0801522c sprite + FUN_08015160 + FUN_080148f4 final poll). "
         "返回 1=busy / 0=done. 唯一 caller: FUN_080bc880 case 3 (scene loader)."),
+
+    # --- BATCH 13 (2026-05-05): card_list 渲染/OAM/文字/deck_slot 工具簇 ---
+    ("FUN_081021dc", "load_card_list_entry_to_slot",
+        "card_list 场景的卡槽数据加载入口. 根据 r0(list_type: 0=全库/1=format/2=其他) "
+        "和 r1(card_index) 决定从哪张牌组数据区复制 6 列字段到 IWRAM 0x0202a4d0[+0x6c]. "
+        "list_type==0 时按 r1>>5 定位 u32 位图确认该卡已出现; list_type==1 时调用 "
+        "get_card_data_format_id 验证 card_index 在 format 范围内; 验证通过后调用 "
+        "build_card_list_slot_display_entries 构建槽显示条目, 并循环填写 "
+        "read/write_card_list_field_by_row_col 各字段, 最终调用 init_deck_slot_data. "
+        "被 FUN_08108f80 (scene_card_list 顶层驱动) 以变化的 card_index 反复调用."),
+    ("FUN_0810230c", "reinit_deck_slots_from_card_stats",
+        "card_stats 场景下的牌组槽全量重新初始化入口. 无外部参数; 内部 ldr 加载 "
+        "0x0202a4d0 (IWRAM card_list 槽基址), r6 = 0x0202a4d0+0x184 (card_stats 源). "
+        "先以 copy_bytes_by_halfword(0x0202a4d0+0x6c, 0x02001138, 0x118) 把当前 "
+        "card_stats 数据复制到 IWRAM 槽缓冲区, 再调用 reset_all_deck_slots 清空所有 "
+        "牌组槽, 接着 populate_deck_slots_from_card_list 按卡列表重建槽内容, 最后循环 "
+        "(index 1..3) 对非零槽调用 init_deck_slot_data 单独初始化, 并再次 "
+        "copy_bytes_by_halfword 将槽区 0x17 字节属性拷回. "
+        "被 FUN_08108fd8 (card_stats 大驱动) 在切入展示模式时调用一次."),
+    ("FUN_08104318", "reset_card_list_scroll_offset",
+        "card_list 场景的滚动偏移清零工具. 向 IWRAM 0x0202f3c0[+0x32] "
+        "(card_list 状态结构体滚动偏移字段, s16) 写入 0, 返回 1. "
+        "indeg=8 说明场景中多个初始化/场景切换点均需将滚动复位到顶部. "
+        "与 sibling FUN_08104328 (纯 return 1) 形成一对: 08104318 带副作用, 08104328 为空存根."),
+    ("FUN_08104328", "return_one_card_list_stub",
+        "card_list / scene_duel_puzzle 场景通用的无操作成功占位函数. "
+        "仅执行 movs r0,#1; bx lr, 始终返回 1. indeg=10 说明多个场景驱动在需要 "
+        "'此步骤成功但无实际工作'时统一调用此桩. "
+        "与 sibling reset_card_list_scroll_offset (08104318) 配对: 后者有 strh 副作用, 此函数为纯返回版本."),
+    ("FUN_0810432c", "render_card_list_oam_entries",
+        "card_list 场景 OAM 条目渲染主循环. 读取 0x0202f3c0[+0x1e] (bit0) 和 "
+        "0x0202a4d0[+0x1f] (bit7) 两个标志, 任一置位则跳转到末尾直接返回. "
+        "遍历 14 个卡槽, 对每个槽检查 slot_flags[+0x30] 对应位是否激活; "
+        "激活时读取 x/y 坐标字段, 叠加行偏移后计算显示坐标, 调用 __divsi3 "
+        "将 RGB 分量各调整亮度 (乘以 r7/15), 检查 card_flag bit1 决定高亮色, "
+        "最终调用 dispatch_oam_write_by_mode 写入 OAM. "
+        "外层循环结束后若 slot_flags!=0 则调用 blend_palette_entry_by_scroll_pos. "
+        "被 7 个 card_list 场景驱动以固定节奏调用."),
+    ("FUN_08104458", "return_one_card_list_oam_stub",
+        "card_list 场景 OAM 渲染链中的无操作成功占位函数. "
+        "仅执行 movs r0,#1; bx lr, 始终返回 1. indeg=7, "
+        "被与 render_card_list_oam_entries (0810432c) 完全相同的 7 个 caller 调用, "
+        "构成'做实际工作的函数 + 无操作存根'配对模式."),
+    ("FUN_081044d4", "blend_palette_entry_by_scroll_pos",
+        "card_list 场景高亮卡槽的调色板混合计算与写入函数. "
+        "从 IWRAM 0x0202f3c0[+0x32] 读取当前滚动偏移 (s16), 超过 0xf 时改用 "
+        "0x1e-scroll 做反向插值. 以迭代计数 0..14 从 ROM 调色板表 0x09e315d4 "
+        "逐项读出 RGB565 颜色, 将 R/G/B 三分量各自拆分(5/5/5 bit), 乘以插值系数 "
+        "r7(0..15)/15 通过 __divsi3 归一化, 重新组合为 RGB565 写入目标缓冲区. "
+        "迭代结束后调用 copy_bytes_by_halfword 将 0x20 字节写入 BG 调色板 0x05000340, "
+        "并将 0x0202f3c0[+0x32] 递增 (超过 0x1d 时归零). "
+        "由 render_card_list_oam_entries 在 slot_flags[+0x30] 非零时作为高亮动画 tick 调用."),
+    ("FUN_081065c0", "load_card_frame_tile_to_vram_slot_a",
+        "card_list 场景卡框 tile 第一套的 VRAM 加载函数. "
+        "从 IWRAM 0x0202a4d0[+0x18] (s16, 当前选中卡框 index) 读取帧索引, "
+        "乘以 0x20 (<<5) 计算 ROM 卡框条目偏移, 加上基址 0x09e60600 定位到对应结构体. "
+        "随后以 tile_2d_row_copy(r4[0x8], dst=0x06016a80, w=0xc, h=0x2) 将卡框主 "
+        "tile 块写入 VRAM BG 区, 再以 copy_bytes_by_halfword(r4[0xc], "
+        "dst=0x05000360, 0x20) 将 16 色调色板写入 OBJ 调色板 slot. "
+        "与 sibling FUN_081066fc (load_card_frame_tile_to_vram_slot_b) 构成两套 "
+        "卡框 tile 加载对, 均被 FUN_081045c4 (bg/vram/palette 场景初始化) 调用."),
+    ("FUN_081066fc", "load_card_frame_tile_to_vram_slot_b",
+        "card_list 场景卡框 tile 第二套的 VRAM 加载函数. "
+        "与 sibling load_card_frame_tile_to_vram_slot_a (081065c0) 结构一致, "
+        "但使用固定 ROM 源地址而非动态索引: "
+        "tile_2d_row_copy(src=0x09e310b4, dst=0x06016300, w=0x8, h=0x2) 写第二套卡框 tile; "
+        "copy_bytes_by_halfword(src=0x09e31794, dst=0x05000300, 0x20) 写对应调色板到 OBJ palette slot 0x18. "
+        "均被 FUN_081045c4 (bg/vram/palette 场景初始化) 在 slot_a 之后调用."),
+    ("FUN_08106130", "write_vram_bg_tilemap_card_list",
+        "card_list 场景 BG tilemap 区域填写函数, 无外部参数. "
+        "内部 ldr 加载 VRAM 基址 0x0600e000 存入 r8. "
+        "从 IWRAM 0x0202f3c0[+0x26] 读取当前滚动偏移 (s16), 对 8 取模得到像素内偏移 "
+        "(r7 = offset % 8), 再除以 8 得到 tile 行偏移. "
+        "外层循环遍历 2 行, 内层遍历每行 8 个列组, 计算目标 tilemap 地址: "
+        "基址 0x0600e000 + 行号*0x28*0x10 + 列偏移; "
+        "以 0xffffa000 (tile_attr 掩码) 构建属性, 对 24 个 halfword 条目调用 strh 写入 tilemap. "
+        "由 card_list 场景初始化驱动和文字渲染链中间层各调用一次."),
+    ("FUN_081060e4", "render_text_dual_pass_with_shadow",
+        "card_list 场景文字双次渲染工具, 产生描边/阴影效果. "
+        "接收文字缓冲区指针 r0/r1 和打包参数 r2 (低 16 位=tile_x_offset, 高 8 位=tile_y_offset), "
+        "分两次调用 text_render_wrapper: "
+        "第一次以 0x8100 或运算后的颜色属性渲染背景层 (阴影色); "
+        "第二次以 0x8000 或运算后的颜色属性渲染前景层. "
+        "被 render_game_string_line_to_sprite_vram (08105d94) 和 "
+        "render_banlist_card_row_text (081061d0) 以相同 (r0=tile_x, r1=tile_y, r2=packed_attr) 模式调用."),
+    ("FUN_08105d94", "render_game_string_line_to_sprite_vram",
+        "card_list 场景游戏字符串行文字的 sprite VRAM 渲染驱动. "
+        "初始化时从 0x0202a4d0[+0x18] 读卡框索引计算 ROM 条目偏移, "
+        "从 0x0202f3c0[+0x22] 读 card_type 枚举, 设置 line_buf 状态 (02006ed0[+8] bit1), "
+        "选择对应 font_jp_base_table 条目写入 line_buf[+4]. "
+        "随后调用 zero_fill_by_halfword 清空 VRAM 0x06000040 起 0x780 字节 sprite 区域, "
+        "setup_line_buf_pos_and_font(r0=0x1e, r1=2) 设置位置, "
+        "game_str_id_to_row(0x699) 获取主字符串行号, 根据 gSettings.lang 和 "
+        "game_str_pointer_table 定位日文字符串指针, "
+        "调用 render_text_dual_pass_with_shadow(6, 2, packed_attr, str_ptr). "
+        "之后循环遍历 card_list 的所有条目行, 每行 copy_bytes_by_halfword 更新 "
+        "line_buf VRAM 基址并调用 render_text_dual_pass_with_shadow + "
+        "commit_line_buffer_to_sprite_vram 写入. "
+        "被 FUN_08105bfc (card_list 场景完整 BG 初始化) 单次调用."),
+    ("FUN_08105964", "query_card_list_slot_validity",
+        "根据当前 card_list 展示模式 (0x0202a4d0[+0x18] s16, 值 0..5) 检验传入的 "
+        "card_index 是否在有效范围内, 返回 0(无效/越界)、1(有效)、2(有效但格式受限) 三态结果. "
+        "通过 6 路 switch 分派: case0 (mode=card) 检查 card_index < format_count; "
+        "case1/2 (EX/GB pack) 对 0x0202f3c0[+0x24] (pack_card_count) 范围内的位图检验; "
+        "case4/5 类似; default 返回 0. "
+        "被 render_banlist_card_row_text (081061d0) 用于决定显示内容."),
+    ("FUN_081061d0", "render_banlist_card_row_text",
+        "banlist 场景卡片行文字渲染函数. 接收 r0=slot_index (0-based), r1=card_index, "
+        "以 r0<<9 计算 VRAM 目标偏移加到 0x06000800 写入 sprite tile 区. "
+        "调用 copy_bytes_by_halfword 初始化行缓冲, setup_line_buf_pos_and_font(0x18, 2) 设置字体. "
+        "以 query_card_list_slot_validity(state, card_index) 判断有效性: "
+        "返回 1 时 r7=8 (显示 -), 返回 2 时 r7=7 (特殊占位). "
+        "若 0x0202a4d0[+0x18]==4 (format 模式) 则调用 lookup_card_entry_by_index + "
+        "strncpy 写卡名并精确计算居中 x 偏移; "
+        "非 format 模式则调用 game_str_id_to_row + 字符串指针表查找日文字符串. "
+        "最终调用 render_text_dual_pass_with_shadow 渲染双层文字, 写入 sprite tile."),
+    ("FUN_08105f34", "render_card_type_text_row_to_sprite",
+        "card_list 场景卡片类型文字行的 sprite VRAM 全量渲染驱动. "
+        "根据 0x0202a4d0[+0x18] (s16, 展示模式 0..5) 执行 6 路 switch: "
+        "各 case 设置对应的 game_str_id (0x69c..0x06cd) 和显示行数 r6 (4..5), "
+        "调用 game_str_id_to_row 获取字符串行号. "
+        "初始化时设置 line_buf 状态 (02006ed0[+8] bit1) 并写 font 指针, "
+        "zero_fill_by_halfword 清空 VRAM 0x06000040 sprite 区 (0x780 字节), "
+        "setup_line_buf_pos_and_font(0x1e, 2). "
+        "之后按行数循环调用 render_text_dual_pass_with_shadow + "
+        "commit_line_buffer_to_sprite_vram 渲染各行. "
+        "随后还渲染 game_str_id 0x69b (卡片属性) 到 VRAM 0x06003800, "
+        "最后循环 8 行调用 render_banlist_card_row_text (FUN_081061d0) 渲染具体卡片行. "
+        "被两个场景初始化驱动各调用一次."),
 ]
 
 
