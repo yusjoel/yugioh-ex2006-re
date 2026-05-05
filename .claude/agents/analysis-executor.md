@@ -144,7 +144,8 @@ model: sonnet
 - 函数入口含 `ldr rN, [pc,#N]` / `ldr rN, =<const>` 加载字面量池常量地址 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (rN 及随后 `mov rHigh,rN` 的目标均为内部值，不是参数)
 - proposed_name 含 `_and_` / `_or_` / `_then_` 连接动词, 或含 `_then_return_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state; _then_return_Y 场景直接截断)
 - 函数体含 OAM attr 写入 / DISPCNT / IO 寄存器裸整数常量 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (必须在 Constants: 块命名; `0xC00`=mode mask 非 priority; batch-9 7/7 R6 扣分)
-- 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分)
+- 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数），或入口 `mov rHigh, rLow` 后 rHigh 参与实质计算/传参（非仅 epilogue 还原）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分; `mov r8,r1` 后若 r8 被用于传参则 r1 是真实参数被 preserved 而非丢弃)
+- assert 串含 `nnsys/<lib>/<Lib>_<Name>.c` 路径（如 `g2d_CellAnimation.c`、`g2d_Image.c`、`g2d_SRTControl.c` 等 NNS SDK 路径）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_syslib_struct_prefix_from_source_path.md` (snake_case of Name 即为参数/结构体前缀; 采用 SDK 约定; 同路径所有函数视为同一翻译单元兄弟簇)
 - 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。

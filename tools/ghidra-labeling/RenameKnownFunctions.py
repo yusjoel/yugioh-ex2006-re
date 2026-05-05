@@ -2594,6 +2594,150 @@ RENAMES = [
         "Returns [pCellData+0x4] + index*stride. "
         "r0=ptr pCellData (NNS_G2dCellData), r1=u16 slot_index[0..count-1] -> ret ptr (cell entry or NULL). "
         "Constants: CELL_STRIDE_8B=8 / CELL_STRIDE_16B=16 / COUNT_OFFSET=0 / FORMAT_FLAG_OFFSET=2 / DATA_BASE_OFFSET=4."),
+
+    # 2026-05-06: campaign-4 batch (topo=67/68/69/70/71/72/73/74/75/76/77/78/79/80/81)
+    ("FUN_080eb918", "set_srt_ctrl_translate",
+        "nnsys/g2d/g2d_SRTControl.c -- SRT controller translate write. "
+        "Called by apply_cell_anim_frame (0x080e9350) when frame type==6. "
+        "Asserts [pCtrl+0x0]==1 (SRT_STATE_ACTIVE, line 0x62); "
+        "writes r1 (tx) to [pCtrl+0x4], r2 (ty) to [pCtrl+0x8], "
+        "sets [pCtrl+0x12] bit1 (translate-dirty flag). "
+        "r0=NNS_G2dSRTControl* pCtrl [active], r1=s16 tx, r2=s16 ty. "
+        "Constants: SRT_STATE_ACTIVE=1 / SRT_TRANSLATE_FLAG=0x2 / "
+        "SRT_TRANSLATE_X_OFFSET=0x4 / SRT_TRANSLATE_Y_OFFSET=0x8 / SRT_FLAGS_OFFSET=0x12."),
+    ("FUN_080e9350", "apply_cell_anim_frame",
+        "nnsys/g2d/g2d_CellAnimation.c -- apply current animation frame to CellAnimation controller. "
+        "Called by init_cell_anim_with_seq (0x080e94a4) and update paths. "
+        "Asserts pCellAnim != NULL (line 0x16), pCellAnim->pCellDataBank != NULL (line 0x17). "
+        "Reads current frame ptr via get_anim_ctrl_current_frame_ptr, "
+        "calls get_nob_cell_data_ptr -> stores result at [pCellAnim+0x2C]; "
+        "calls bind_srt_ctrl_data to init SRT sub-controller at [pCellAnim+0x38]; "
+        "dispatch on frame transform type (0/2/6): "
+        "type 2 -> set_nob_cell_position; type 6 -> set_srt_ctrl_translate. "
+        "r0=NNS_G2dCellAnimation* pCellAnim [non-NULL]. "
+        "Constants: CELL_ANIM_CELL_DATA_BANK_OFFSET=0x30 / CELL_ANIM_CURRENT_CELL_OFFSET=0x2C / "
+        "CELL_ANIM_SRT_CTRL_OFFSET=0x38."),
+    ("FUN_080e94a4", "init_cell_anim_with_seq",
+        "nnsys/g2d/g2d_CellAnimation.c -- bind animation sequence to CellAnimation and apply first frame. "
+        "Called by bind_cell_anim_to_bank (0x080e9400). "
+        "Asserts pCellAnim != NULL (line 0xE5), pAnimSeq != NULL (line 0xE6), "
+        "pAnimSeq type == NNS_G2D_ANIMATIONTYPE_CELL (line 0xE8). "
+        "Calls bind_anim_ctrl_callback to bind sequence, then apply_cell_anim_frame to write first frame. "
+        "Equivalent to NNS_G2dSetCellAnimationSequence. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dAnimSequence* pAnimSeq. "
+        "Constants: ANIM_TYPE_CELL=1."),
+    ("FUN_080e90cc", "zero_anim_ctrl_fields",
+        "nnsys/g2d/g2d_Animation.c -- zero animation controller sub-struct fields. "
+        "Called by init_anim_ctrl (0x080e905c) and FUN_080e90a0. "
+        "Asserts pAnimCtrl != NULL (line 0x225=549). "
+        "Writes 0 to [pAnimCtrl+0x0], [+0x4], [+0x8] (word each), "
+        "and halfword 0 to [pAnimCtrl+0xC]. "
+        "r0=NNS_G2dAnimController* pAnimCtrl (caller passes pAnim+0x1C sub-struct). "
+        "Constants: ANIM_CTRL_SUB_STRUCT_OFFSET=0x1C."),
+    ("FUN_080e905c", "init_anim_ctrl",
+        "nnsys/g2d/g2d_Animation.c -- full NNS_G2dAnimController initialisation. "
+        "Called by bind_cell_anim_to_bank (0x080e9400). "
+        "Asserts pAnimCtrl != NULL (line 0x1F7=503). "
+        "Calls zero_anim_ctrl_fields(pAnimCtrl+0x1C), then sets main struct: "
+        "[+0x0]=0, [+0x4]=0, [+0x8]=1, [+0xC]=0, [+0x10]=0x1000 (speed), [+0x14]=0, [+0x18]=0. "
+        "Equivalent to NNS_G2dInitAnimCtrl. "
+        "r0=NNS_G2dAnimController* pAnimCtrl [non-NULL]. "
+        "Constants: ANIM_CTRL_DEFAULT_SPEED=0x1000 / ANIM_CTRL_DEFAULT_LOOP_COUNT=1."),
+    ("FUN_080e9400", "bind_cell_anim_to_bank",
+        "nnsys/g2d/g2d_CellAnimation.c -- main CellAnimation init entry. "
+        "Called by game layer 0x08015d30 (fs tag). "
+        "Asserts pCellAnim/pCellDataBank/pAnimSeq non-NULL (line 0x87/0x88/0x89 and 0x64/0x65/0x66). "
+        "Calls bind_srt_ctrl_data(pCellAnim+0x38), init_anim_ctrl(pCellAnim), "
+        "init_cell_anim_with_seq(pCellAnim, pAnimSeq). "
+        "Writes pCellDataBank to [pCellAnim+0x30], -1 to [pCellAnim+0x34] (frame counter). "
+        "Equivalent to NNS_G2dInitCellAnimation. "
+        "r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dCellDataBank* pCellDataBank, "
+        "r2=NNS_G2dAnimSequence* pAnimSeq. "
+        "Constants: CELL_ANIM_SRT_CTRL_OFFSET=0x38 / CELL_ANIM_CELL_DATA_BANK_OFFSET=0x30 / "
+        "CELL_ANIM_FRAME_COUNTER_OFFSET=0x34."),
+    ("FUN_08015ac4", "alloc_cell_anim_slot",
+        "GL/IG2D_Main.c -- allocate next free CellAnmBank slot. "
+        "Called by 0x08015d30 (fs tag). "
+        "Asserts [0x03000BF8] <= 0x3F (UsedCellAnm < NELEMS(CellAnmBank), line 0x127=295). "
+        "Computes slot addr = CellAnmBank + counter*0x54, increments counter, returns ptr. "
+        "r0: no input (entry ldr r4,DAT overwrites r0). "
+        "Returns NNS_G2dCellAnimation* (allocated slot). "
+        "Side effect: [0x03000BF8] += 1. "
+        "Constants: IG2D_CELL_ANM_MAX=0x40 / CELL_ANM_ENTRY_SIZE=0x54 / "
+        "UsedCellAnm=[0x03000BF8] / CellAnmBank=0x02027D40."),
+    ("FUN_080eae5c", "check_vram_location_slot",
+        "nnsys/g2d/g2d_Image.c -- check if VRAM location slot[type] is set. "
+        "Called by set_img_proxy_vram_location (0x080e9acc) and 2 other image-proxy paths. "
+        "Asserts pVramLocation != NULL (line 0x35=53), type <= 2 (line 0x36=54). "
+        "Reads pVramLocation->slot[type] = [pVramLocation + type*4]; "
+        "returns 1 if non-zero (slot set), 0 if zero (not set). "
+        "Uses mvns+rsbs+orrs+lsrs 0x1F idiom for non-zero boolean. "
+        "r0=NNS_G2dImageProxy* pVramLocation [non-NULL], r1=u32 type [0..2]. "
+        "Constants: NNS_G2D_VRAM_TYPE_3DMAIN=0 / NNS_G2D_VRAM_TYPE_2DMAIN=1 / "
+        "NNS_G2D_VRAM_TYPE_2DSUB=2."),
+    ("FUN_080e9acc", "set_img_proxy_vram_location",
+        "nnsys/g2d/g2d_Image.c -- write VRAM base address into image proxy slot. "
+        "Called by load_img_proxy_to_vram (0x080e9de8) and 3 other image load paths. "
+        "Asserts pImgProxy != NULL (line 0xC8=200), type <= 2 (line 0x189=393 and 0x20=32), "
+        "pImgProxy != NULL (line 0x1F=31). "
+        "Calls check_vram_location_slot, then writes baseAddr to [pImgProxy + type*4]. "
+        "r0=NNS_G2dImageProxy* pImgProxy [non-NULL], r1=u32 type [0..2], r2=u32 baseAddr. "
+        "Constants: NNS_G2D_VRAM_TYPE_MAX=3 / IMG_PROXY_SLOT_STRIDE=4."),
+    ("FUN_080e99f0", "check_vram_size_for_type",
+        "nnsys/g2d/g2d_Image.c -- validate VRAM offset against type capacity. "
+        "Called by load_img_proxy_to_vram (0x080e9de8). "
+        "type==0 or 1 -> max 0x300000 (0xC0<<14, 2D MAIN/SUB OBJ VRAM 192KB); "
+        "type==2 -> max 0x200000 (0x80<<14, 3D VRAM 128KB); "
+        "other type -> returns 0. "
+        "Applies -0x10 bias to offset before comparison; returns 1 (valid) or 0 (out of range). "
+        "r0=u32 type [0..2], r1=u32 offset (bytes). "
+        "Constants: VRAM_2D_SIZE=0x300000 (0xC0<<14) / VRAM_3D_SIZE=0x200000 (0x80<<14)."),
+    ("FUN_080e9a18", "check_img_mapping_type",
+        "nnsys/g2d/g2d_Image.c -- validate image mapping type compatibility with VRAM target. "
+        "Called by load_img_proxy_to_vram (0x080e9de8) and FUN_080ea0a0. "
+        "type==0 (3D_MAIN) -> returns 1 immediately (no mapping check). "
+        "Otherwise reads [pSrcData+0x8] (mappingType), compares against predefined constants "
+        "(0x00100010=NNS_G2D_1D_32K / 0x00200010 / 0x00300010 etc.) with capacity bounds check. "
+        "Returns 1 (compatible) or 0 (incompatible). "
+        "Equivalent to NNS_G2D internal IsValid1DMappingType_. "
+        "r0=NNS_G2dCharacterData* pSrcData, r1=u32 type [0..2]."),
+    ("FUN_080e9de8", "load_img_proxy_to_vram",
+        "nnsys/g2d/g2d_Image.c -- load character image to OBJ tile VRAM and update image proxy. "
+        "Called by game layer 0x08015d30 (fs tag). "
+        "Asserts pImgProxy != NULL (line 0x221), pSrcData != NULL (line 0x222). "
+        "Validates via check_vram_size_for_type + check_img_mapping_type; "
+        "dispatches 32-way switch on [pSrcData+0x2] (mapType) to internal enum 0-5; "
+        "calls copy_to_obj_tile_vram to write pixel data, "
+        "then set_img_proxy_vram_location to update proxy. "
+        "r0=NNS_G2dImageProxy* pImgProxy, r1=u32 dst_word_offset [0..0x1FFF] (saved to r8), "
+        "r2=NNS_G2dCharacterData* pSrcData, r3=u32 type [0..2]. "
+        "Constants: CHAR_FMT_CHAR=NNS_G2D_CHARACTER_FMT_CHAR / MAP_TYPE_COUNT=32."),
+    ("FUN_0801563c", "alloc_nce_buff_slot",
+        "GL/IG2D_Main.c -- allocate next free NceBuff (NCE = NNS Cell Entry) slot. "
+        "Called by 0x08015b10 (fs tag). "
+        "Asserts [0x03000BFC] <= 1 (UsedNceBuff < IG2D_LOAD_ANM_MAX=2, line 0x2F=47). "
+        "Computes slot addr = [0x03000C08] + count*(1<<12), increments counter, returns ptr. "
+        "r0: no input (entry ldr r4,DAT overwrites r0). "
+        "Returns void* (4KB-aligned NceBuff slot). "
+        "Side effect: [0x03000BFC] += 1. "
+        "Constants: IG2D_LOAD_ANM_MAX=2 / NCE_BUFF_SLOT_SIZE=0x1000 / "
+        "UsedNceBuff=[0x03000BFC] / NceBuffBase=[0x03000C08]."),
+    ("FUN_08015b04", "invoke_fs_load",
+        "GL/IG2D_Main.c area -- thin fs_load wrapper. "
+        "Called by 4 G2D resource load paths (FUN_08015b10/b70/bd0/c30, all fs-tagged). "
+        "Body: push lr / bl fs_load / pop r1 / bx r1 -- passes all args through, "
+        "returns fs_load return value. "
+        "r0..r3: forwarded to fs_load unchanged. "
+        "Returns: fs_load return value."),
+    ("FUN_080eaf28", "relocate_bin_block_ptrs",
+        "nnsys/g2d/g2d_Load.c -- relocate internal pointers in a binary block. "
+        "Called by FUN_080eb718 (NNS G2D resource file loader) after loading. "
+        "Reads [pBlock+0x4] (relative offset table base) + pBlock -> absBase; "
+        "writes absBase back to [pBlock+0x4]; "
+        "loops i=0..count-1 ([pBlock+0x0]): [absBase+i*4] += pBlock (relative->absolute). "
+        "Standard NNS G2D binary block pointer patch-up step. "
+        "r0=NNS_G2dBinaryBlockHeader* pBlock. "
+        "Loop counter is u16 (lsls/lsrs 0x10 truncation)."),
 ]
 
 
