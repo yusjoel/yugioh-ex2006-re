@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=15 模式, campaign-8) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json` → 启动 4-agent loop (campaign-8) |
-| **上次更新** | 2026-05-06 (campaign-7 batch, 105/1526) |
+| **当前步骤** | Step 1 — executor (batch=15 模式, campaign-9) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json` → 启动 4-agent loop (campaign-9) |
+| **上次更新** | 2026-05-06 (campaign-8 batch, 120/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**105 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**120 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -171,11 +171,27 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 103 | 125 | — | — | D | 0x08015718 | FUN_08015718 | read_obj_id_field | 1 | [eval](eval/08015718.md) |
 | 104 | 126 | — | — | E | 0x08013a68 | FUN_08013a68 | setup_demo_cell_anim_slot | 1 | [eval](eval/08013a68.md) |
 | 105 | 127 | — | — | C | 0x080147d8 | FUN_080147d8 | gl_set_blend2_level | 2 | [eval](eval/080147d8.md) |
+| 106 | 129 | — | — | E | 0x08013af4 | FUN_08013af4 | apply_demo_window_fade_in_step | 2 | [eval](eval/08013af4.md) |
+| 107 | 130 | — | — | D | 0x08014914 | FUN_08014914 | tick_blend_transition_step | 1 | [eval](eval/08014914.md) |
+| 108 | 131 | — | — | E | 0x08013b84 | FUN_08013b84 | apply_demo_window_fade_out_step | 1 | [eval](eval/08013b84.md) |
+| 109 | 132 | — | — | E | 0x0801469c | FUN_0801469c | clear_demo_sprite_enable_bits | 1 | [eval](eval/0801469c.md) |
+| 110 | 133 | — | — | D | 0x0801522c | FUN_0801522c | copy_sprite_attr_table_to_oam | 2 | [eval](eval/0801522c.md) |
+| 111 | 134 | — | — | E | 0x08014838 | FUN_08014838 | init_blend_transition_params_ex | 1 | [eval](eval/08014838.md) |
+| 112 | 135 | — | — | D | 0x08014754 | FUN_08014754 | init_blend_transition_params | 2 | [eval](eval/08014754.md) |
+| 113 | 139 | — | — | D | 0x080148f4 | FUN_080148f4 | check_blend_transition_done | 1 | [eval](eval/080148f4.md) |
+| 114 | 140 | — | — | E | 0x08013bd4 | FUN_08013bd4 | tick_demo_scene_state_machine | 1 | [eval](eval/08013bd4.md) |
+| 115 | 141 | — | — | E | 0x080156c8 | FUN_080156c8 | get_title_ex_obj_field8 | 1 | [eval](eval/080156c8.md) |
+| 116 | 142 | — | — | E | 0x080156cc | FUN_080156cc | set_title_ex_obj_field8 | 1 | [eval](eval/080156cc.md) |
+| 117 | 144 | — | — | E | 0x08015728 | FUN_08015728 | compute_bg_affine_matrix_scaled | 2 | [eval](eval/08015728.md) |
+| 118 | 145 | — | — | E | 0x08015868 | FUN_08015868 | apply_bg_affine_by_angle_scale | 1 | [eval](eval/08015868.md) |
+| 119 | 146 | — | — | E | 0x0801b7e8 | FUN_0801b7e8 | init_demo_shuen_display_state | 2 | [eval](eval/0801b7e8.md) |
+| 120 | 147 | — | — | E | 0x0801b850 | FUN_0801b850 | load_demo_shuen_sprite_gfx | 3 | [eval](eval/0801b850.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-06: **campaign-8 batch PASSED** — scene_demo 状态机 tick + window fade in/out + BG affine math + demo_shuen 资源加载 + ISD title_ex obj stub 簇; 6 R3+R5+R6 修复 (IO base 误读 0x04000026/WIN0H 误读 BLDCNT/r1-r2 颠倒/EWRAM-VRAM 混淆/r0-r2 矛盾/r8 输入误判 callee-saved); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (120/1526 = 7.86%)
 - 2026-05-06: **campaign-7 batch PASSED** — ISD/cell anim OAM 入口 hub 簇 (3 个 D_shared_mid 跨 3 scene 共享: dispatch_cell_anim_sequence_step/dispatch_cell_anim_frame_advance/dispatch_isd_cell_anim_oam_setup) + gl_set_blend2_level (indeg=13) + palette slot allocator; 3 R3 修复 (高寄存器 callee-save vs 真输入 + 内部 DAT 加载误判为参数); byte-identical 保持. (105/1526 = 6.88%)
 - 2026-05-06: **campaign-6 batch PASSED** — IG2D_Main FS loader hub (load_g2d_obj_resource_set @ 0x08015d30) + Exodia demo OBJ asset load (asset table @ 0x09e397d4) + scene_demo BG3 scroll tick + g2d_NCG_load.c parser; 2 fix iter (R4 void, R7 caller role); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (90/1526 = 5.90%)
 - 2026-05-06: **campaign-5 batch PASSED** — NitroSDK G2D library wrapper 第 3 簇 (g2d_NAN_load.c / g2d_NCL_load.c / g2d_NOB_load.c / GL/IG2D_Main.c); 1 R5 register-typo 3-round 修复; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (75/1526 = 4.91%)

@@ -3111,6 +3111,124 @@ RENAMES = [
         "writes blend_target to [gl_state+0x2]; calls update_brightness_fade_flag(blend1_level). "
         "r0=u8 blend_target [0..255], r1=s8 blend1_level [-16..16], r2=u8 blend2_level [0..16]. "
         "Constants: GL_STATE_BASE=0x02023480 / BLEND2_MASK=0xFFFFFC03 / BLEND2_SHIFT=10."),
+    # --- campaign-8 batch (2026-05-06) ---
+    ("FUN_08013af4", "apply_demo_window_fade_in_step",
+        "Called by tick_demo_scene_state_machine (0x08013bd4) caseD_4/caseD_6 to execute one fade-in step "
+        "for the demo window animation. Accepts current_frame r0 and max_frames r1; "
+        "if equal (fade done): configures WININ/WINOUT/WIN0H/WIN0V registers and calls gl_set_brightness(0x3f,0) + gl_set_blend2_level. "
+        "Otherwise writes WIN0V vertical range proportional to frame progress. "
+        "r0=u8 current_frame [0..max_frames-1], r1=u8 max_frames [1..15]. "
+        "Symmetric sibling of apply_demo_window_fade_out_step (0x08013b84). "
+        "Side-effects: WININ(0x04000048), WINOUT(0x0400004a), WIN0H(0x04000040), WIN0V(0x04000044), DISPCNT bits[13:5]."),
+    ("FUN_08013b84", "apply_demo_window_fade_out_step",
+        "Called by tick_demo_scene_state_machine (0x08013bd4) caseD_6 to execute one fade-out step. "
+        "Computes window vertical range as (max-cur)*0x50/max and writes to WIN0V; "
+        "on completion calls gl_set_brightness(0x3f,-16) + tick_blend_transition_step (0x08014914) + gl_set_blend2_level. "
+        "r0=u8 current_frame [0..max_frames-1], r1=u8 max_frames [1..15]. "
+        "Symmetric sibling of apply_demo_window_fade_in_step (0x08013af4), direction reversed. "
+        "Side-effects: WIN0V(0x04000044), gl_set_brightness(-16), tick_blend_transition_step."),
+    ("FUN_08013bd4", "tick_demo_scene_state_machine",
+        "Called by FUN_08014398 and play_ui_effect_3a (0x080bcbd4); drives the demo scene (Exodia animation) "
+        "per-frame state machine. Reads gDemoState+0x8c bits[22:15] as state_idx (0-9), dispatches via 10-entry jump table: "
+        "case0 load BG gfx set0+FS+sprites; case1/2 check blend progress and advance fade-in; "
+        "case3/4 step sprite animation frames; case5 load BG gfx set1; case6/7 fade-out window animation; "
+        "case8/9 end states. Each case increments state counter and falls through to default (no change). "
+        "No parameters (void); all inputs from gDemoState EWRAM struct. "
+        "Side-effects: gDemoState+0x8c state field, DISPCNT/BG3CNT/BLDCNT IO registers."),
+    ("FUN_0801469c", "clear_demo_sprite_enable_bits",
+        "Called by tick_demo_scene_state_machine (0x08013bd4) caseD_4 after blend-done check "
+        "to reset sprite-enable bits in gDemoState+0x8. "
+        "Three-step operation on same field: (1) ldrb/strb clear bit2 (mask ~0x04); "
+        "(2) ldrh/strh clear bits[9:2] (mask 0xfffffc03); "
+        "(3) ldr/str clear bits[17:10] and set bit10 (0x400) as sprite-inactive initial state. "
+        "No parameters (void); leaf function. "
+        "Side-effects: [gDemoState(0x02023480)+0x8] byte/halfword/word."),
+    ("FUN_08014914", "tick_blend_transition_step",
+        "Called by many scene ticks (indeg=10) including demo scene state machine and name_input_page_tick. "
+        "Advances the GL blend-transition state machine one step per frame: "
+        "reads gDemoState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); "
+        "if equal returns idle; otherwise increments step and dispatches by step-range (0x00/0x40/0x80/0xC0). "
+        "0x40/0x00 branches interpolate BLDCNT/BLDY; 0x80/0xC0 branches set BLDY direction coefficient. "
+        "No parameters (void). "
+        "Side-effects: gDemoState+0x8 step field, BLDCNT(0x04000050), BLDY(0x04000054)."),
+    ("FUN_080148f4", "check_blend_transition_done",
+        "Called by many scene ticks (indeg=7) including tick_demo_scene_state_machine caseD_1/2/3 and name_input_page_tick. "
+        "Reads gDemoState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); "
+        "returns 0 if equal (transition complete), 1 if still in progress. Pure read, no side-effects. "
+        "Prerequisite check before tick_blend_transition_step (0x08014914): caller waits for 0 before advancing state. "
+        "No parameters (void). Returns r0=u8 done_flag {0=done, 1=in-progress}."),
+    ("FUN_08014754", "init_blend_transition_params",
+        "Called by tick_demo_scene_state_machine caseD_2/3 and 3 other scene ticks (indeg=5). "
+        "Initializes gDemoState blend-transition param struct (0x02023480): writes r1/r0/r2/r3 "
+        "(blend start/current/end/step) to byte fields +0/+1/+2/+4/+5/+6; clears bits[9:2] of +0x8 "
+        "and ORs 0x400; sets +0x8 bit0=1 (active). Out-of-range params trigger suppress_assert_report "
+        "(GL/GL_Common.c lines 248/249). High-register convention: r8=r1 via caller mov r8,r1. "
+        "r0=u8 blend_target [0..255], r1=s8 blend1_start [0..16], r2=u8 blend2_end [0..16], "
+        "r3=u8 blend_step [0..16]. No return (void)."),
+    ("FUN_08014838", "init_blend_transition_params_ex",
+        "Extended version of init_blend_transition_params (0x08014754); called by tick_demo_scene_state_machine "
+        "caseD_3 and 3 other scene ticks (indeg=4). Accepts extra stack param r5=[sp+0x1c] as additional blend channel. "
+        "Same purpose: writes r0/r1/r2/r3/r5 to gDemoState+0x0..+0x6 byte fields with history-roll (+1->+0, +5->+4); "
+        "clears +0x8 step count and sets active bit. Out-of-range params trigger suppress_assert_report "
+        "(GL/GL_Common.c lines 282/283). High-register convention: r8=r0, r9=r1 via caller mov instructions. "
+        "r0=u8 blend_target_ch1 [0..255], r1=s8 blend1_start_ch1 [0..16], r2=u8 blend2_end_ch1 [0..16], "
+        "r3=u8 blend_step_ch1 [0..16], [sp+0x1c]=u8 blend_extra. No return (void)."),
+    ("FUN_0801522c", "copy_sprite_attr_table_to_oam",
+        "Called by many scene ticks (indeg=6) including tick_demo_scene_state_machine, name_input_page_tick, "
+        "demo_shuen_state_machine. Copies up to 32 sprite attribute entries (8 bytes each) from EWRAM sprite-attr "
+        "array (0x02023490+0x880) to EWRAM OAM buffer (0x02023490+slot*8); sentinel=-1 terminates list. "
+        "Finally calls bios_cpu_fast_set to zero unused OAM VRAM slots (0x07000000). "
+        "No external parameters (void); all addresses computed internally from DAT_080152ac=0x02023490. "
+        "Side-effects: EWRAM OAM buffer (0x02023490+) write; bios_cpu_fast_set zero OAM VRAM (0x07000000)."),
+    ("FUN_080156c8", "get_title_ex_obj_field8",
+        "Called by FUN_0801bb28 (scene_demo) and two scene_title_ex callers (indeg=3). "
+        "Body: ldr r0,[r0,#0x8]; bx lr -- simple field getter. "
+        "r0=ptr obj (title_ex scene object); returns r0=u32 field8 ([obj+0x8]). "
+        "Getter/setter pair with set_title_ex_obj_field8 (0x080156cc) at adjacent address. Pure read, no side-effects."),
+    ("FUN_080156cc", "set_title_ex_obj_field8",
+        "Called by FUN_0801bb28 (scene_demo) and FUN_080fd678 (scene_title_ex) (indeg=2). "
+        "Body: str r1,[r0,#0x8]; bx lr -- simple field setter. "
+        "r0=ptr obj (title_ex scene object), r1=u32 value to write to [obj+0x8]. "
+        "Getter/setter pair with get_title_ex_obj_field8 (0x080156c8) at adjacent address. "
+        "Side-effects: [r0+0x8] := r1."),
+    ("FUN_08015728", "compute_bg_affine_matrix_scaled",
+        "Called by FUN_08015820 and apply_bg_affine_by_angle_scale (0x08015868) (indeg=2). "
+        "Computes BG affine transform matrix PA/PB/PC/PD from angle and x/y scale: "
+        "1) bios_div(0x01000000, scale_x/y) for fixed-point reciprocals (8.24); "
+        "2) lookup cos(angle)=trig_table[angle+0x40] and sin(angle)=trig_table[angle] (ROM 0x09e399d0, 256 s16 entries); "
+        "3) __muldi3(trig_val<<4, inv_scale) -> 8.8 fixed-point affine coefficient; PD=-cos*inv_scale_y. "
+        "Results written to output buffer r3: [r3+0]=PA, [r3+4]=PB, [r3+8]=PC, [r3+0xc]=PD. "
+        "r0=s32 scale_x, r1=s32 scale_y, r2=s32 angle [0..255], r3=ptr out_matrix. "
+        "Returns r0=ptr out_matrix. "
+        "Constants: TRIG_TABLE=0x09e399d0, FIXED_ONE=0x01000000."),
+    ("FUN_08015868", "apply_bg_affine_by_angle_scale",
+        "Called by FUN_0801c668 (BG affine animation driver, indeg=1). "
+        "Full BG affine transform write-back entry: asserts bg_index in [2..3] (GBA only BG2/BG3 support affine); "
+        "calls compute_bg_affine_matrix_scaled to get PA/PB/PC/PD; shifts each >>4 and writes to "
+        "BG2PA/PB/PC/PD hardware registers (0x04000020+bg_index*0x10); computes and writes BG2X/BG2Y reference point. "
+        "r0=u8 bg_index [2..3], r1=u8 angle [0..255], r2=s32 scale_x, r3=s32 scale_y, [sp+0x2c]=ptr out_matrix. "
+        "Side-effects: BG2PA(0x04000020)/BG2PB/BG2PC/BG2PD and BG2X(0x04000028)/BG2Y written per bg_index offset."),
+    ("FUN_0801b7e8", "init_demo_shuen_display_state",
+        "Called by play_demo_shuen (0x080bc880) and FUN_0801c254 (indeg=2). "
+        "Full display-state reset for the demo shuen (final) scene: "
+        "bios_cpu_set fill-zeros gDemoState (EWRAM 0x02029ec0) header; "
+        "gl_clear_vram_palram_scroll; writes DISPCNT(0x04000000):=0x40 (BG mode 2); "
+        "writes BG0CNT(0x04000008):=0x1d00, BG1CNT(0x0400000a):=0x1e01, "
+        "BG2CNT(0x0400000c):=0x1f02, BG3CNT(0x0400000e):=0x9b0b; "
+        "gl_set_brightness(0x3f,-16) (full dark for fade-in); gl_state_init; gl_clear_frame_callbacks. "
+        "No parameters (void). Returns r0=1 (success). "
+        "Constants: DISPCNT=0x04000000, BG0CNT_VAL=0x1d00, BG1CNT_VAL=0x1e01, "
+        "BG2CNT_VAL=0x1f02, BG3CNT_VAL=0x9b0b."),
+    ("FUN_0801b850", "load_demo_shuen_sprite_gfx",
+        "Called by FUN_0801b91c (scene_demo, indeg=1). "
+        "Loads a single sprite GFX resource for the demo shuen scene. "
+        "Non-APCS input: r8=ptr oam_entry (caller-set, transparent through FUN_0801b91c which has no r8 write). "
+        "APCS: r0=u8 sprite_slot [0..1], r1=u8 tile_param_low [0..1], r2=u8 tile_param_high [1..2], "
+        "r3=u8 sprite_config [0..0]; stack [sp+0x48]=u8 palette_slot [0..0]. "
+        "Reads gDemoState+0x88 for GFX resource handle; calls zero_struct_36bytes(r8) to clear OAM buffer; "
+        "configures OAM attr bytes [+0x14/0x17/0x18] for tile shape/priority/palette; "
+        "loads ROM GFX resource descriptor (0x09e3cee8) and calls apply_gfx_resource_list. "
+        "Constants: GFX_RESOURCE_LIST=0x09e3cee8, OAM_PALETTE_MASK=0xffffc07f, OAM_ENTRY_SIZE=36."),
 ]
 
 
