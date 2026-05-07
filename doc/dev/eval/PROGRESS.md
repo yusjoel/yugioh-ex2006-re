@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-19) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-19) |
-| **上次更新** | 2026-05-08 (campaign-18 batch, 320/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-20) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-20) |
+| **上次更新** | 2026-05-08 (campaign-19 batch, 340/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**320 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**340 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -392,11 +392,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 318 | 436 | 7 | 17 | D | 0x08033634 | FUN_08033634 | get_first_placeable_monster_slot | 1 | [eval](eval/08033634.md) |
 | 319 | 437 | 7 | 1 | E | 0x080a4490 | FUN_080a4490 | eval_equip_targets_for_card | 2 | [eval](eval/080a4490.md) |
 | 320 | 438 | 7 | 5 | D | 0x0804c6cc | FUN_0804c6cc | get_paired_card_id_by_variant | 1 | [eval](eval/0804c6cc.md) |
+| 321 | 439 | 7 | 4 | E | 0x080338b8 | FUN_080338b8 | count_equip_placements_with_chain_check | 2 | [eval](eval/080338b8.md) |
+| 322 | 440 | 7 | 2 | E | 0x080a4648 | FUN_080a4648 | check_player_can_place_card | 1 | [eval](eval/080a4648.md) |
+| 323 | 441 | 7 | 7 | D | 0x0804b164 | FUN_0804b164 | check_card_id_is_normal_summon_type | 1 | [eval](eval/0804b164.md) |
+| 324 | 442 | 7 | 1 | E | 0x080a4574 | FUN_080a4574 | check_equip_slot_has_field_spell_target | 2 | [eval](eval/080a4574.md) |
+| 325 | 443 | 8 | 2 | E | 0x08032e20 | FUN_08032e20 | count_equip_slots_meeting_atk_threshold | 2 | [eval](eval/08032e20.md) |
+| 326 | 444 | 8 | 6 | D | 0x08033610 | FUN_08033610 | count_monster_slots_accepting_card | 1 | [eval](eval/08033610.md) |
+| 327 | 445 | 7 | 1 | E | 0x080a45f4 | FUN_080a45f4 | check_equip_card_activation_valid | 1 | [eval](eval/080a45f4.md) |
+| 328 | 446 | 6 | 6 | D | 0x080a46a0 | FUN_080a46a0 | eval_card_placement_flags_for_ai | 1 | [eval](eval/080a46a0.md) |
+| 329 | 447 | 5 | 7 | D | 0x080a4694 | FUN_080a4694 | eval_card_placement_flags_default | 1 | [eval](eval/080a4694.md) |
+| 330 | 448 | 7 | 11 | D | 0x080313dc | FUN_080313dc | get_equip_card_set_code_for_slot | 1 | [eval](eval/080313dc.md) |
+| 331 | 449 | 8 | 1 | E | 0x080a533c | FUN_080a533c | check_equip_slot_pair_can_activate | 1 | [eval](eval/080a533c.md) |
+| 332 | 450 | 7 | 1 | E | 0x080a3a80 | FUN_080a3a80 | scan_activatable_equip_slots_init | 2 | [eval](eval/080a3a80.md) |
+| 333 | 451 | 7 | 2 | E | 0x08031184 | FUN_08031184 | find_slot_idx_by_set_code | 1 | [eval](eval/08031184.md) |
+| 334 | 452 | 8 | 5 | D | 0x080324b4 | FUN_080324b4 | find_equip_slot_by_card_id | 1 | [eval](eval/080324b4.md) |
+| 335 | 453 | 7 | 9 | D | 0x08033088 | FUN_08033088 | check_toon_world_equip_present | 1 | [eval](eval/08033088.md) |
+| 336 | 454 | 8 | 1 | E | 0x080a57b8 | FUN_080a57b8 | check_equip_slot_pair_can_activate_alt | 1 | [eval](eval/080a57b8.md) |
+| 337 | 455 | 7 | 2 | E | 0x080a3d0c | FUN_080a3d0c | scan_activatable_equip_slots_alt | 2 | [eval](eval/080a3d0c.md) |
+| 338 | 456 | 7 | 1 | E | 0x080a3c2c | FUN_080a3c2c | check_banisher_of_light_activatable | 2 | [eval](eval/080a3c2c.md) |
+| 339 | 457 | 7 | 1 | E | 0x080a3dac | FUN_080a3dac | check_equip_set_activatable_for_player | 2 | [eval](eval/080a3dac.md) |
+| 340 | 458 | 8 | 29 | C | 0x0803bc24 | FUN_0803bc24 | check_spell_zone_slot_placeable | 1 | [eval](eval/0803bc24.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #19 PASSED** — duel field equip activation/scan cluster (eval_card_placement_flags_for_ai/default sibling + scan_activatable_equip_slots init/alt + Toon World/Banisher of Light named card activation check + check_spell_zone_slot_placeable indeg=29) + monster slot/equip slot BST classifiers; 1 fix iter (3 NEEDS_FIX: 2 R1 bare hex card_id -> card name + 1 R3 internal working register mislabeled caller-set); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (340/1526 = 22.28%)
 - 2026-05-08: **batch=20 #18 PASSED** — duel field equip/placement validator chain (slot equip eligibility indeg=53 + count_monster_slots indeg=73 + field_spell_b_placeable + field_spell_group_placeable + monster_slot_accepts_card + first_placeable_monster_slot 兄弟 + equip_lock effect ID 标签); 1+1 fix iter (5 R7 caller addr 自引用/缺 +1 R6 + 2 R2 plate 字数 + 2 R6 0xb FIELD_SPELL_ZONE); first-shot 15/20; 跨过 20% 里程碑 (320/1526 = 20.97%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.
 - 2026-05-08: **batch=20 #17 PASSED** — duel field placement/equip activation chain (slot placement blocker indeg=40 + monster slot finder indeg=28 + equip card target + activation dispatch + field spell allowed + equip set _c sibling + apply_card_equip_activation + check_card_zone_activation_blocked + invoke_equip_zone_activation_check) + field slot display update + zone descriptor resolver + find_card_effect_node_entry + dispatch_card_effect_activation; 1 fix iter (3 NEEDS_FIX: R7 caller addr placeholder + R3 player_id mislabeled card_id + R3 r3 internal sp clobber + R7 self-reference); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (300/1526 = 19.66%)
 - 2026-05-08: **batch=20 #16 PASSED** — card display VRAM rendering pipeline (jp_string/glyph_nibble/line_buf/card_label/stat/name/choice_label 簇) + game_str pointer resolver indeg=8 + write_decimal_digits_to_oam + 多 init_*_vram 兄弟簇; 1+1+1 fix iter (3 R3 callsite + 2 R7 caller addr r9/r10 上层调用链 + r8/r10 callee-save 删除 + r9 范围 [0..0x01FF]); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (280/1526 = 18.35%)
