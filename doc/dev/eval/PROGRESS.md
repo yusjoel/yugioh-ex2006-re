@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-10) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-10) |
-| **上次更新** | 2026-05-07 (campaign-9 batch, 140/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-11) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-11) |
+| **上次更新** | 2026-05-07 (campaign-10 batch, 160/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**140 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**160 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -206,11 +206,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 138 | 167 | 7 | 1 | E | 0x0801c6b0 | FUN_0801c6b0 | tick_bg_scroll_anim_frame | 1 | [eval](eval/0801c6b0.md) |
 | 139 | 168 | 9 | 1 | E | 0x0801c728 | FUN_0801c728 | advance_scene_phase_counter | 1 | [eval](eval/0801c728.md) |
 | 140 | 169 | 9 | 1 | E | 0x0801c74c | FUN_0801c74c | update_dual_cell_anim_oam_pos | 2 | [eval](eval/0801c74c.md) |
+| 141 | 170 | 8 | 1 | E | 0x0801c794 | FUN_0801c794 | tick_vija_obj_anim_slot | 1 | [eval](eval/0801c794.md) |
+| 142 | 171 | 7 | 1 | E | 0x0801cadc | FUN_0801cadc | tick_all_vija_obj_anim_slots | 1 | [eval](eval/0801cadc.md) |
+| 143 | 173 | 6 | 3 | E | 0x0801cb00 | FUN_0801cb00 | run_vija_scene_state_machine | 1 | [eval](eval/0801cb00.md) |
+| 144 | 246 | 7 | 2 | E | 0x0801e6f4 | FUN_0801e6f4 | open_card_info_page_from_list | 1 | [eval](eval/0801e6f4.md) |
+| 145 | 249 | 2 | 3 | E | 0x0801e850 | FUN_0801e850 | fill_card_fs_display_entries | 1 | [eval](eval/0801e850.md) |
+| 146 | 250 | 2 | 1 | E | 0x0801e974 | FUN_0801e974 | fill_card_fs_display_entries_for_card_list | 1 | [eval](eval/0801e974.md) |
+| 147 | 251 | 4 | 2 | E | 0x0810d0a4 | FUN_0810d0a4 | write_sound_engine_request | 1 | [eval](eval/0810d0a4.md) |
+| 148 | 252 | 3 | 6 | D | 0x080f9b40 | FUN_080f9b40 | request_sound_engine_code10 | 1 | [eval](eval/080f9b40.md) |
+| 149 | 253 | 6 | 4 | E | 0x080f2c8c | FUN_080f2c8c | render_decimal_digits_jp | 1 | [eval](eval/080f2c8c.md) |
+| 150 | 254 | 5 | 7 | D | 0x08037b90 | FUN_08037b90 | get_player_deck_flag_bit1 | 1 | [eval](eval/08037b90.md) |
+| 151 | 256 | 5 | 43 | C | 0x0802fd60 | FUN_0802fd60 | find_effect_node_in_zone | 1 | [eval](eval/0802fd60.md) |
+| 152 | 257 | 4 | 22 | C | 0x0803b618 | FUN_0803b618 | get_zone_card_attribute_by_type | 1 | [eval](eval/0803b618.md) |
+| 153 | 258 | 8 | 4 | E | 0x0802fb2c | FUN_0802fb2c | find_node_by_value_and_zone_type | 1 | [eval](eval/0802fb2c.md) |
+| 154 | 259 | 7 | 17 | D | 0x0802fdc0 | FUN_0802fdc0 | check_node_in_slot_chain | 1 | [eval](eval/0802fdc0.md) |
+| 155 | 260 | 7 | 7 | D | 0x080eeea8 | FUN_080eeea8 | get_card_extended_stat_field8 | 1 | [eval](eval/080eeea8.md) |
+| 156 | 261 | 8 | 7 | D | 0x0804ad70 | FUN_0804ad70 | check_card_field8_is_normal | 1 | [eval](eval/0804ad70.md) |
+| 157 | 262 | 7 | 5 | D | 0x08030aa4 | FUN_08030aa4 | check_slot_card_is_equip_type | 1 | [eval](eval/08030aa4.md) |
+| 158 | 263 | 5 | 4 | E | 0x08032358 | FUN_08032358 | classify_card_effect_category | 1 | [eval](eval/08032358.md) |
+| 159 | 264 | 7 | 13 | D | 0x0803412c | FUN_0803412c | check_card_matches_active_effect_slot | 1 | [eval](eval/0803412c.md) |
+| 160 | 265 | 7 | 3 | E | 0x0802f434 | FUN_0802f434 | count_slot_equip_list_matches | 1 | [eval](eval/0802f434.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-07: **batch=20 #10 PASSED** — vija UI effect scene 收尾 (anim slot tick + state machine) + card list info page bridge + sound engine request 簇 + duel core util cluster (effect node 查询/zone attribute getter/slot chain check/card field8 谓词); 1 fix iter (6 NEEDS_FIX: 4 R3 范围 + 1 R6 + 1 R2/R4 switch 反向修正); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (160/1526 = 10.49%)
 - 2026-05-07: **campaign-9 batch PASSED** — demo_shuen 完整运行时簇 (state machine sub-funcs/scroll tick/cell anim batch) + vija UI effect scene 平行簇 (BG/OBJ load by region+mode/OBJ cell anim driver/affine tick) + reset_gl_display_state 跨 scene 重置 hub; 1 fix iter (3 R3: entry-clobber + 参数互换 + index 范围); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (140/1526 = 9.17%)
 - 2026-05-06: **campaign-8 batch PASSED** — scene_demo 状态机 tick + window fade in/out + BG affine math + demo_shuen 资源加载 + ISD title_ex obj stub 簇; 6 R3+R5+R6 修复 (IO base 误读 0x04000026/WIN0H 误读 BLDCNT/r1-r2 颠倒/EWRAM-VRAM 混淆/r0-r2 矛盾/r8 输入误判 callee-saved); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (120/1526 = 7.86%)
 - 2026-05-06: **campaign-7 batch PASSED** — ISD/cell anim OAM 入口 hub 簇 (3 个 D_shared_mid 跨 3 scene 共享: dispatch_cell_anim_sequence_step/dispatch_cell_anim_frame_advance/dispatch_isd_cell_anim_oam_setup) + gl_set_blend2_level (indeg=13) + palette slot allocator; 3 R3 修复 (高寄存器 callee-save vs 真输入 + 内部 DAT 加载误判为参数); byte-identical 保持. (105/1526 = 6.88%)

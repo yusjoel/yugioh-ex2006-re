@@ -243,9 +243,9 @@ address,name,proposed_name,score,tags
 0x0801c710,FUN_0801c710,,,scene_title_ex
 0x0801c728,advance_scene_phase_counter,,,
 0x0801c74c,update_dual_cell_anim_oam_pos,,,
-0x0801c794,FUN_0801c794,,,
-0x0801cadc,FUN_0801cadc,,,
-0x0801cb00,FUN_0801cb00,fs_0801cb00,2,display;palette;demo;fs
+0x0801c794,tick_vija_obj_anim_slot,,,
+0x0801cadc,tick_all_vija_obj_anim_slots,,,
+0x0801cb00,run_vija_scene_state_machine,,,display;palette;demo;fs
 0x0801d290,decode_card_image_6bpp,,,vram;card_image
 0x0801d448,card_info_page_enter_with_card_id,,,card_info
 0x0801d45c,card_info_page_init_bg0,,,bg;palette;vram;display;card_info
@@ -270,13 +270,13 @@ address,name,proposed_name,score,tags
 0x0801e620,render_card_stats_oam_for_current_card,,,card_stats
 0x0801e640,card_list_on_select_to_info_page,,,card_info;card_list
 0x0801e6cc,FUN_0801e6cc,,,scene_card_list;card_ids;card_info;card_list
-0x0801e6f4,FUN_0801e6f4,card_list_0801e6f4,2,scene_card_list;card_info;card_list
+0x0801e6f4,open_card_info_page_from_list,,,scene_card_list;card_info;card_list
 0x0801e714,tick_card_info_page_by_state,,,display;card_data;card_desc;card_image;card_info;card_stats;font_jp;frame_counter
 0x0801e7b8,get_card_data_format_id,,,
 0x0801e7bc,lookup_card_entry_by_index,,,
 0x0801e7cc,load_card_fs_entry_to_struct,,,fs
-0x0801e850,FUN_0801e850,card_stats_0801e850,3,card_stats
-0x0801e974,FUN_0801e974,card_stats_0801e974,2,card_stats
+0x0801e850,fill_card_fs_display_entries,,,card_stats
+0x0801e974,fill_card_fs_display_entries_for_card_list,,,card_stats
 0x0801e984,FUN_0801e984,prng_0801e984,3,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
 0x0801ec9c,FUN_0801ec9c,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x0801ef94,play_ui_effect,,,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
@@ -354,7 +354,7 @@ address,name,proposed_name,score,tags
 0x0802f394,FUN_0802f394,,,
 0x0802f3a8,FUN_0802f3a8,,,
 0x0802f3e0,FUN_0802f3e0,,,
-0x0802f434,FUN_0802f434,,,
+0x0802f434,count_slot_equip_list_matches,,,
 0x0802f4e0,FUN_0802f4e0,,,
 0x0802f550,FUN_0802f550,,,
 0x0802f5b0,FUN_0802f5b0,,,
@@ -367,7 +367,7 @@ address,name,proposed_name,score,tags
 0x0802f930,FUN_0802f930,,,
 0x0802f9fc,FUN_0802f9fc,,,duel_field
 0x0802faf4,FUN_0802faf4,,,
-0x0802fb2c,FUN_0802fb2c,,,
+0x0802fb2c,find_node_by_value_and_zone_type,,,
 0x0802fb6c,FUN_0802fb6c,,,
 0x0802fbbc,FUN_0802fbbc,,,
 0x0802fbf4,FUN_0802fbf4,,,
@@ -376,8 +376,8 @@ address,name,proposed_name,score,tags
 0x0802fc90,FUN_0802fc90,,,
 0x0802fcc0,FUN_0802fcc0,,,
 0x0802fd00,FUN_0802fd00,,,
-0x0802fd60,FUN_0802fd60,,,
-0x0802fdc0,FUN_0802fdc0,,,
+0x0802fd60,find_effect_node_in_zone,,,
+0x0802fdc0,check_node_in_slot_chain,,,
 0x0802fdf4,FUN_0802fdf4,,,
 0x0802fe60,FUN_0802fe60,,,
 0x0802fe98,FUN_0802fe98,,,
@@ -400,7 +400,7 @@ address,name,proposed_name,score,tags
 0x080309b8,FUN_080309b8,,,
 0x080309fc,FUN_080309fc,,,
 0x08030a30,FUN_08030a30,,,
-0x08030aa4,FUN_08030aa4,,,
+0x08030aa4,check_slot_card_is_equip_type,,,
 0x08030b0c,FUN_08030b0c,,,
 0x08030b70,FUN_08030b70,,,
 0x08030b88,FUN_08030b88,,,
@@ -444,7 +444,7 @@ address,name,proposed_name,score,tags
 0x0803217c,FUN_0803217c,,,
 0x08032194,FUN_08032194,,,duel_field
 0x08032280,FUN_08032280,,,duel_field
-0x08032358,FUN_08032358,,,
+0x08032358,classify_card_effect_category,,,
 0x080324b4,FUN_080324b4,,,
 0x08032548,FUN_08032548,,,
 0x0803259c,FUN_0803259c,,,
@@ -508,7 +508,7 @@ address,name,proposed_name,score,tags
 0x08033fa4,FUN_08033fa4,,,
 0x08034020,FUN_08034020,duel_field_08034020,3,duel_field
 0x0803407c,FUN_0803407c,,,
-0x0803412c,FUN_0803412c,,,
+0x0803412c,check_card_matches_active_effect_slot,,,
 0x08034180,FUN_08034180,,,
 0x08034298,FUN_08034298,,,
 0x08034358,FUN_08034358,,,
@@ -569,7 +569,7 @@ address,name,proposed_name,score,tags
 0x08037a8c,FUN_08037a8c,duel_field_08037a8c,3,duel_field
 0x08037ae4,FUN_08037ae4,duel_field_08037ae4,3,duel_field
 0x08037b34,FUN_08037b34,duel_field_08037b34,3,duel_field
-0x08037b90,FUN_08037b90,,,
+0x08037b90,get_player_deck_flag_bit1,,,
 0x08037bb4,FUN_08037bb4,,,
 0x08037c20,FUN_08037c20,duel_field_08037c20,3,duel_field
 0x08037c9c,FUN_08037c9c,,,
@@ -602,7 +602,7 @@ address,name,proposed_name,score,tags
 0x0803b3a8,FUN_0803b3a8,,,
 0x0803b4b0,FUN_0803b4b0,,,
 0x0803b5c0,FUN_0803b5c0,,,
-0x0803b618,FUN_0803b618,,,
+0x0803b618,get_zone_card_attribute_by_type,,,
 0x0803b738,FUN_0803b738,,,
 0x0803b81c,FUN_0803b81c,,,
 0x0803b854,FUN_0803b854,,,
@@ -885,7 +885,7 @@ address,name,proposed_name,score,tags
 0x0804ac58,FUN_0804ac58,,,
 0x0804acc8,FUN_0804acc8,,,
 0x0804ad48,FUN_0804ad48,,,
-0x0804ad70,FUN_0804ad70,,,
+0x0804ad70,check_card_field8_is_normal,,,
 0x0804adc8,FUN_0804adc8,,,
 0x0804adf0,FUN_0804adf0,,,
 0x0804ae04,FUN_0804ae04,,,
@@ -2874,7 +2874,7 @@ address,name,proposed_name,score,tags
 0x080eee24,FUN_080eee24,,,
 0x080eee50,FUN_080eee50,,,
 0x080eee7c,FUN_080eee7c,,,
-0x080eeea8,FUN_080eeea8,,,
+0x080eeea8,get_card_extended_stat_field8,,,
 0x080eeed4,FUN_080eeed4,,,
 0x080eef0c,FUN_080eef0c,,,
 0x080eef44,FUN_080eef44,,,
@@ -2940,7 +2940,7 @@ address,name,proposed_name,score,tags
 0x080f2c1c,FUN_080f2c1c,font_jp_080f2c1c,2,font_jp
 0x080f2c2c,FUN_080f2c2c,font_jp_080f2c2c,2,font_jp
 0x080f2c4c,FUN_080f2c4c,font_jp_080f2c4c,2,font_jp
-0x080f2c8c,FUN_080f2c8c,font_jp_080f2c8c,2,font_jp
+0x080f2c8c,render_decimal_digits_jp,,,font_jp
 0x080f2cd4,FUN_080f2cd4,font_jp_080f2cd4,2,font_jp
 0x080f2d2c,FUN_080f2d2c,font_jp_080f2d2c,2,font_jp
 0x080f2e4c,commit_line_buffer_to_sprite_vram,,,font_jp
@@ -3059,7 +3059,7 @@ address,name,proposed_name,score,tags
 0x080f9ab4,sync_state_and_init_sprite,,,
 0x080f9adc,set_channel_if_changed,,,
 0x080f9b24,FUN_080f9b24,,,
-0x080f9b40,FUN_080f9b40,,,scene_duel_puzzle
+0x080f9b40,request_sound_engine_code10,,,scene_duel_puzzle
 0x080f9b70,FUN_080f9b70,,,
 0x080f9b98,FUN_080f9b98,,,
 0x080f9bc4,copy_puzzle_seed_to_wram,,,scene_duel_puzzle
@@ -3322,7 +3322,7 @@ address,name,proposed_name,score,tags
 0x0810ce9e,FUN_0810ce9e,,,
 0x0810cf10,init_sound_channel_entry,,,
 0x0810cf54,reset_sound_channel_entry,,,
-0x0810d0a4,FUN_0810d0a4,,,scene_duel_puzzle
+0x0810d0a4,write_sound_engine_request,,,scene_duel_puzzle
 0x0810d0c0,FUN_0810d0c0,,,
 0x0810d0f4,FUN_0810d0f4,,,
 0x0810d128,FUN_0810d128,,,

@@ -3460,6 +3460,198 @@ RENAMES = [
         "[sp+0]=0, [sp+4]=0 for both calls. Returns void. "
         "Side-effects: OAM slots [obj_index=2] and [obj_index=r0+3] updated via drive_vija_obj_cell_anim "
         "-> dispatch_isd_cell_anim_oam_setup."),
+
+    # 2026-05-07: campaign-10 batch (topo=170..265 subset) vija scene + card list + sound + duel core
+    ("FUN_0801c794", "tick_vija_obj_anim_slot",
+        "vija scene OBJ slot per-frame animation state machine tick. "
+        "Called by tick_all_vija_obj_anim_slots (FUN_0801cadc) with stride=8 for each of 5 slot ctrl blocks "
+        "at IWRAM 0x02029eb0+0x98+i*8 (i=[0..4]). "
+        "r0=u8* slot_ctrl_ptr: byte[0]=phase [0..0x1e], byte[1]=sub-counter/seq-idx. "
+        "Outer switch routes by phase; inner switch maps to x-coord variant (0x30/0x50 px). "
+        "Active phases (1/0xa/3/0x1e/4/5): interpolate x/y from sub-counter, call drive_vija_obj_cell_anim. "
+        "Phase 2: call advance_scene_phase_counter then update_dual_cell_anim_oam_pos. "
+        "Phase 5: call drive_vija_obj_cell_anim twice with fixed x=-1, y=0x78, z=0x50, then exit. "
+        "Phase 0 and invalid phases: return immediately. "
+        "Side-effects: slot_ctrl_ptr byte[0]/byte[1] updated; OAM entry for active slot written. "
+        "Constants: PHASE_MAX=0x1e, X_VARIANT_A=0x30, X_VARIANT_B=0x50, SIN_TABLE=0x09e399d0."),
+    ("FUN_0801cadc", "tick_all_vija_obj_anim_slots",
+        "vija scene batch per-frame tick for all 5 OBJ animation slots. "
+        "Loops i=[0..4] over IWRAM 0x02029eb0+0x98 with stride=8, calling tick_vija_obj_anim_slot(ptr) per slot. "
+        "No parameters; returns void. "
+        "Called by run_vija_scene_state_machine (FUN_0801cb00) in phase 4 (active anim) and phase 7 (transition). "
+        "Constants: SLOT_BASE_OFFSET=0x98, SLOT_STRIDE=8, SLOT_COUNT=5."),
+    ("FUN_0801cb00", "run_vija_scene_state_machine",
+        "vija scene (play_ui_effect_3b) per-frame state machine driver. "
+        "No parameters; all state from IWRAM 0x02029eb0. "
+        "10-phase dispatch (phases 0-9): "
+        "phase 0: init display regs (DISPCNT/BGxCNT), load BG+OBJ gfx, clear palette, init 5 OBJ slots; "
+        "phase 1: check blend done, start fade-in; "
+        "phase 2/3: advance blend, check affine init; "
+        "phase 4: tick_all_vija_obj_anim_slots + tick_bg_scroll_anim_frame + tick_bg2_affine_anim_frame each frame; "
+        "phase 5: start fade-out blend; phase 6: tick blend; "
+        "phase 7: tick_all_vija_obj_anim_slots + check fade; "
+        "phase 8/9: epilogue return 1. "
+        "Returns r0=1 (scene done) or r0=0 (scene continue). "
+        "Side-effects: DISPCNT/BG0-2CNT/palette VRAM, OAM, IWRAM state fields. "
+        "Constants: VIJA_STATE=0x02029eb0, DISPCNT_INIT=0x1741, SLOT_COUNT=5."),
+    ("FUN_0801e6f4", "open_card_info_page_from_list",
+        "Transition entry called by card_list scene dispatchers (FUN_080c64b8 state=0, FUN_080d2c60 state=0) "
+        "when player selects a card in the list to view its info page. "
+        "Zero-extends card_id (r0) and origin_page (r1=0) to u16, calls card_list_on_select_to_info_page; "
+        "then sets [0x0201afb0+0x0] bit2 (0x4) to mark card_info_page_active_flag. "
+        "r0=u16 card_id, r1=u16 origin_page, r2=ptr, r3=ptr. Returns void. "
+        "Constants: 0x4=[0x0201afb0+0x0] bit2 = card_info_page_active_flag."),
+    ("FUN_0801e850", "fill_card_fs_display_entries",
+        "Reads card FS data block (base 0x0201e2b4, stride=0x108, indexed by r0=slot_index) "
+        "and fills up to three sub-arrays of display entries (halfword) into the target buffer at r1. "
+        "Sub-array counts stored at [r1+0x18], [r1+0x19], [r1+0x1a]; "
+        "entries sourced from card_stats_table and mapping table at 0x0201ff60. "
+        "Callers: fill_card_fs_display_entries_for_card_list (fixed r1=0x02001138), "
+        "FUN_0802752c, FUN_0802803c. "
+        "Clears three word fields at r1 before filling (init write cursors). No return value (void). "
+        "r0=u8 slot_index [0..1], r1=ptr display_buffer. "
+        "Constants: 0x108=card FS data block stride (slot*0x108=slot*33*8)."),
+    ("FUN_0801e974", "fill_card_fs_display_entries_for_card_list",
+        "Specialized wrapper for fill_card_fs_display_entries (FUN_0801e850) that fixes "
+        "the second argument to 0x02001138 (card_list slot display buffer EWRAM address) "
+        "and forwards r0 (slot_index) unchanged. "
+        "Called by FUN_0802752c to write card FS data into the card_list slot display buffer. "
+        "No computation logic; single ldr overwrites r1 then jumps to core function. "
+        "r0=u8 slot_index [0..1]. Returns void."),
+    ("FUN_0810d0a4", "write_sound_engine_request",
+        "Writes a request byte to the IWRAM sound engine management struct (base 0x030050cc) "
+        "and clears the adjacent status byte: "
+        "[0x030050cc+0x381] := 0 (status/ack byte cleared), [0x030050cc+0x380] := r0 (request_code). "
+        "Called by request_sound_engine_code10 (FUN_080f9b40, r0=0x10) and FUN_080f9b4c (transparent r0). "
+        "r0=u8 request_code [0..0xff]. Returns void. "
+        "Constants: 0x030050cc=sound engine IWRAM struct base; 0x380=request code byte offset; "
+        "0x381=status/ack byte offset."),
+    ("FUN_080f9b40", "request_sound_engine_code10",
+        "Specialized wrapper for write_sound_engine_request (FUN_0810d0a4) with fixed request_code=0x10. "
+        "No parameters. Returns void. "
+        "Called by scene_duel_puzzle state machine branches (0x080bd06c, 0x080bd334, 0x080bd5fe, "
+        "0x080bd812, 0x080cc884, 0x0801ea08 -- 6 callsites), all at blend-fade transition completion nodes. "
+        "Body: movs r0,#0x10; bl write_sound_engine_request. "
+        "Semantic: trigger sound engine opcode 0x10 at scene-transition checkpoint."),
+    ("FUN_080f2c8c", "render_decimal_digits_jp",
+        "Renders unsigned integer r3 as decimal digits right-to-left into JP font line buffer. "
+        "Per digit: r3 %% 10 via __modsi3, +0x30 -> char code, bl render_glyph_jp_single_layer, "
+        "r3 /= 10 via __divsi3, x -= width (width: [0x02006ed0+0x8] bit0 == 0 -> 10px JP; 1 -> 5px ASCII). "
+        "Loop until quotient is 0. "
+        "r0=u16 x_pos [0..239], r1=u8 y_row [0..31], r2=u16 color_attr, r3=u32 decimal_value. Returns void. "
+        "Callers: render_duel_field_zone_info, FUN_080d912c, FUN_080dba64, FUN_080de2bc "
+        "(LP/ATK/DEF numeric field rendering, typically called twice: main color + shadow color). "
+        "Constants: 0x30=ASCII digit base ('0'); 0x02006ed0+0x8=gSettings character width flag."),
+    ("FUN_08037b90", "get_player_deck_flag_bit1",
+        "Returns bit1 of the deck status word for the specified player. "
+        "r0 bit0 selects player index (0=P1, 1=P2); stride 0x868 locates player struct; "
+        "offset +0x11c (=0x8e*2) reads 32-bit status word, lsrs #1 extracts bit1. "
+        "r0=u32 packed_player_id (bit0=player index [0..1]). Returns u32 (0 or 1). "
+        "Callers: FUN_08037c20 (duel_field, skip-deck-sort check); "
+        "get_zone_card_attribute_by_type case_b (conditional return 0/1 based on entity match). "
+        "Constants: 0x868=player struct stride, 0x11c=deck_status_word_offset."),
+    ("FUN_0802fd60", "find_effect_node_in_zone",
+        "Searches the slot chain for a node matching effect_code ([node+0]==r2), "
+        "entity_id ([node+4]==r3), and valid zone_type ([node+2]&0xF<=5). "
+        "Player slot address: 0x0201c510 + (r0 bit0)*0x868 + r1*20; [slot+0xa]=chain head index. "
+        "Node pool: EWRAM 0x0201d9c0, stride 8 bytes. Returns 1 if found, 0 if not. "
+        "r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 effect_code, r3=u16 entity_id. "
+        "Callers: FUN_08033730 (duel_field effect activation check); "
+        "get_zone_card_attribute_by_type case_d (slot 0xb effect presence check). "
+        "Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes."),
+    ("FUN_0803b618", "get_zone_card_attribute_by_type",
+        "Dispatches on zone_type_code (r1, [0xb..0xf]) across 5 cases to read a card attribute for player r0. "
+        "case_b (0xb): entity ID match check then get_player_deck_flag_bit1. "
+        "case_c (0xc): returns 0 fixed. "
+        "case_d (0xd): reads bit field from 0x0201c740 table then calls find_effect_node_in_zone. "
+        "case_e (0xe): returns 1 fixed. "
+        "case_f (0xf): reads [gP1LifePoints+0x788+slot*2] byte; ==0x40 -> return bit[9]; "
+        "==0x80 -> return 0; other -> return 1. "
+        "default: reads u16 at [+8] from 0x0201bc54 or 0x0201c510 table. "
+        "r0=u32 packed_player_id, r1=u32 zone_type_code [0xb..0xf], r2=u32 slot_or_card_index [0..9]. "
+        "Returns u16 card attribute value. "
+        "Constants: 0x868=player stride; 0x0201c740=gP1CardZone base; 0x12a1=case_d field offset; "
+        "0x788=case_f LifePoints offset; 0x0201bc54=default table base; "
+        "0x40=case_f threshold A (bit6); 0x80=case_f threshold B (bit7)."),
+    ("FUN_0802fb2c", "find_node_by_value_and_zone_type",
+        "Traverses EWRAM node pool (0x0201d9c0, stride 8 bytes) via linked list, "
+        "returning first node ptr where [node+0]==value (r1) and [node+2]&0xF==zone_type (r2, [0..5]). "
+        "r0=u32 head_index [1..139] (0=empty list -> return NULL). "
+        "Node layout: [+0]=u16 value, [+2]=type_byte (low 4 bits=zone_type), [+6]=u16 next_index, stride 8. "
+        "Returns u32* node pointer or NULL (0) if not found. "
+        "Leaf function (no callees). "
+        "Callers: check_node_in_slot_chain (FUN_0802fdc0), FUN_0802fe98, FUN_0802ff34, FUN_0802ff84. "
+        "Constants: 0x0201d9c0=node pool base, NODE_STRIDE=8, ZONE_TYPE_MAX=5."),
+    ("FUN_0802fdc0", "check_node_in_slot_chain",
+        "Computes slot entry address (0x0201c510 + (r0 bit0)*0x868 + r1*20), "
+        "reads [slot+0xa] chain head index, then calls find_node_by_value_and_zone_type "
+        "with r2=value and r3=zone_type to search EWRAM node pool (0x0201d9c0). "
+        "Returns 1 if matching node found, 0 otherwise. "
+        "Simplified variant of find_effect_node_in_zone (FUN_0802fd60) -- "
+        "that function additionally checks [node+4]==entity_id; this one only does dual-field match. "
+        "r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 card_id, r3=u8 zone_type [0..5]. "
+        "Returns u32 bool. "
+        "Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes."),
+    ("FUN_080eeea8", "get_card_extended_stat_field8",
+        "Reads field[8] (u16) from the ROM extended card attribute table for a given card_id. "
+        "Sibling of 0x080eedf8..0x080eeed4 cluster; each function differs only in the field index N "
+        "in 'adds r0,#N'; this one uses N=8. "
+        "card_id <= 0x0fa6 (normal card upper bound 4006) -> returns 0. "
+        "Otherwise: row = card_id - 0xfa7; offset = row*11 + 8; reads u16 from ROM table 0x09821e04. "
+        "r0=u16 card_id. Returns u16 extended_stat_field8. "
+        "Callers: FUN_0804a9dc (card type classifier), check_card_field8_is_normal (FUN_0804ad70). "
+        "Constants: 0x0fa6=normal card upper bound, 0x09821e04=extended stat table base, field_stride=11."),
+    ("FUN_0804ad70", "check_card_field8_is_normal",
+        "Calls get_card_extended_stat_field8 for r0=card_id, subtracts 1, "
+        "uses result as 0..11 index into 12-entry switch table. "
+        "indices {0,2,4,5,6,7,9,10,11} (field8 in {1,3,5,6,7,8,10,11,12}) -> return 1 (normal). "
+        "indices {1,3,8} (field8 in {2,4,9}) -> return 0 (abnormal). "
+        "field8=0 (normal card or out-of-range): 0-1=0xffffffff, bhi default -> return 0. "
+        "Semantic: field8 in {2,4,9} = abnormal extended types (return 0); all others = normal (return 1). "
+        "r0=u16 card_id. Returns bool is_normal_field8. "
+        "Callers: check_slot_card_is_equip_type (FUN_08030aa4), multiple 0x0804/0x0805/0x0806 duel scenes."),
+    ("FUN_08030aa4", "check_slot_card_is_equip_type",
+        "Reads EWRAM duel slot (0x0201c510 + (r0 bit0)*0x868 + r1*20), extracts low 13 bits as card_id. "
+        "Compares card_id against whitelist {0x172f, 0x1636, 0x1809, 0x1472}: "
+        "match -> call check_node_in_slot_chain(side, slot, 0x1472, 5) and return its result. "
+        "No match -> call check_card_field8_is_normal(card_id) for field8 extended type check. "
+        "r0=u32 player_side (bit0), r1=u32 slot_idx [0..4]. Returns bool is_equip_type. "
+        "Callers: duel_field FUN_08030b0c (card_type==8 guard), 0x080364b0, 0x08050c58, "
+        "0x08051318, 0x08091888. "
+        "Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes, "
+        "0x172f/0x1809/0x1472=equip/magic card ID whitelist, "
+        "0x1636=second ID (=0x172f-0xf9, DAT_08030a6c asm:47150)."),
+    ("FUN_08032358", "classify_card_effect_category",
+        "Maps card_id (r0) to an effect category code [1..0x17] (23 categories) via multi-level cmp/beq tree. "
+        "Hardcoded whitelist includes ~20+ specific card_ids: "
+        "0x1348/0x10f5/0x10f3/0x10f1/0x10f2/0x1345/0x1346/0x169f/0x14d1/0x1349/ "
+        "0x149c/0x150b/0x159d/0x1477/0x175e/0x187f/0x18ff and others. "
+        "card_id not in whitelist -> returns 0. "
+        "r0=u16 card_id. Returns u8 effect_category [1..0x17] or 0. "
+        "Callers: check_card_matches_active_effect_slot (FUN_0803412c), FUN_0804074c (duel hub), "
+        "0x0808db90, 0x080c8f48."),
+    ("FUN_0803412c", "check_card_matches_active_effect_slot",
+        "Checks if card_id matches the effect category stored in the active effect slot "
+        "at gP1LifePoints+0x10d8 (=0x0201D5B8). "
+        "Special case: card_id==0x10f4 -> substitute reference card 0x150b for category lookup. "
+        "General: call classify_card_effect_category(card_id), compare result against [0x0201D5B8]; "
+        "return 1 if equal, 0 if not. "
+        "r0=u16 card_id. Returns bool matches_active_effect. "
+        "indeg=13; core predicate used by duel rule engine across 0x0803xx/0x0805xx/0x0809xx and hub FUN_0804074c. "
+        "Constants: 0x10f4=special card needing proxy; 0x150b=proxy reference card; "
+        "0x0201D5B8=active effect slot category address (gP1LifePoints+0x10d8)."),
+    ("FUN_0802f434", "count_slot_equip_list_matches",
+        "Reads [slot+0xa] equip chain head from EWRAM slot "
+        "(0x0201c510 + (r0 bit0)*0x868 + r1*20); returns 0 if chain is empty. "
+        "Otherwise traverses 8-byte node list (base 0x0201d9c0) counting nodes matching "
+        "r2/r9 (ref_card_id_a) and r3/r8 (ref_card_id_b) multi-field conditions. "
+        "Non-APCS inputs: r8=ref_card_id_b, r9=ref_card_id_a (caller-set high registers). "
+        "r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u16 ref_card_id_a, r3=u16 ref_card_id_b. "
+        "Returns u32 match_count. "
+        "Callers: FUN_0802f3e0 (direct upstream count-path selector), "
+        "0x080364b0/0x080352b0 (duel rule core). "
+        "Constants: 0x0201c510=gDuelFieldSlots, 0x14b0=equip node pool offset "
+        "(gDuelFieldSlots+0x14b0=0x0201D9C0), slot+0xa=u16 chain head, node_stride=8."),
 ]
 
 
