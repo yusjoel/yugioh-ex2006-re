@@ -151,6 +151,7 @@ model: sonnet
 - assert 串含 `nnsys/<lib>/<Lib>_<Name>.c` 路径（如 `g2d_CellAnimation.c`、`g2d_Image.c`、`g2d_SRTControl.c` 等 NNS SDK 路径）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_syslib_struct_prefix_from_source_path.md` (snake_case of Name 即为参数/结构体前缀; 采用 SDK 约定; 同路径所有函数视为同一翻译单元兄弟簇)
 - 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0; 已静态确认的值禁止标"待验证")
 - 函数地址在 0x08038xxx 且体 = push + ldr r0,[sp,#0x3c] + bl + b LAB → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (命名 compute_lp_cost_by_<dim>_<scale>; R4=void; `b LAB` 无独立 r0 写)
+- caller bl 前含 `lsls rX,rN,#S; lsrs rX,rX,#S`（低 N 位提取）或单步 `lsrs rX,rX,#S`（高位/符号位提取）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callsite_bit_shift_param_range.md` (静态计算范围 [0..2^(32-S)-1] 写入 R3; Form B #0x1f → [0..1] player_id)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
