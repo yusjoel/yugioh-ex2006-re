@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-14) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-14) |
-| **上次更新** | 2026-05-08 (campaign-13 batch, 220/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-15) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-15) |
+| **上次更新** | 2026-05-08 (campaign-14 batch, 240/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**220 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**240 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -292,11 +292,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 218 | 327 | 7 | 46 | C | 0x08033188 | FUN_08033188 | count_occupied_monster_zones | 1 | [eval](eval/08033188.md) |
 | 219 | 328 | 6 | 4 | E | 0x080331bc | FUN_080331bc | count_occupied_monster_zones_with_effect_bonus | 1 | [eval](eval/080331bc.md) |
 | 220 | 329 | 6 | 1 | E | 0x08038a1a | FUN_08038a1a | compute_lp_cost_by_occupied_monster_zones | 1 | [eval](eval/08038a1a.md) |
+| 221 | 330 | 7 | 8 | D | 0x0804be38 | FUN_0804be38 | get_card_effect_category | 1 | [eval](eval/0804be38.md) |
+| 222 | 331 | 6 | 16 | D | 0x0803149c | FUN_0803149c | get_slot_effect_card_value | 1 | [eval](eval/0803149c.md) |
+| 223 | 332 | 7 | 6 | D | 0x08032904 | FUN_08032904 | count_zones_by_card_and_mode | 1 | [eval](eval/08032904.md) |
+| 224 | 333 | 7 | 10 | D | 0x0802f3a8 | FUN_0802f3a8 | query_zone_chain_count_with_eligibility | 1 | [eval](eval/0802f3a8.md) |
+| 225 | 334 | 7 | 1 | E | 0x0803a428 | FUN_0803a428 | adjust_slot_score_by_chain_and_zone | 1 | [eval](eval/0803a428.md) |
+| 226 | 335 | 7 | 3 | E | 0x0804b30c | FUN_0804b30c | check_card_id_is_special_summon_type | 1 | [eval](eval/0804b30c.md) |
+| 227 | 336 | 6 | 8 | D | 0x08032ef0 | FUN_08032ef0 | count_monster_slots_by_state_all | 1 | [eval](eval/08032ef0.md) |
+| 228 | 337 | 7 | 1 | E | 0x0803309c | FUN_0803309c | count_active_slots_with_field6_value | 1 | [eval](eval/0803309c.md) |
+| 229 | 338 | 7 | 2 | E | 0x0803407c | FUN_0803407c | eval_slot_target_eligibility_full | 1 | [eval](eval/0803407c.md) |
+| 230 | 339 | 6 | 1 | E | 0x08038e1e | FUN_08038e1e | apply_slot_score_bonus_by_state | 1 | [eval](eval/08038e1e.md) |
+| 231 | 340 | 6 | 1 | E | 0x08034020 | FUN_08034020 | count_hand_cards_by_field6_alt | 1 | [eval](eval/08034020.md) |
+| 232 | 341 | 6 | 1 | E | 0x0803a520 | FUN_0803a520 | cleanup_slot_score_entry_epilogue | 1 | [eval](eval/0803a520.md) |
+| 233 | 342 | 6 | 9 | D | 0x08032ca4 | FUN_08032ca4 | count_paired_slots_both_sides | 1 | [eval](eval/08032ca4.md) |
+| 234 | 343 | 7 | 5 | D | 0x08030048 | FUN_08030048 | find_equip_chain_node_by_pred | 1 | [eval](eval/08030048.md) |
+| 235 | 344 | 7 | 19 | D | 0x0803b230 | FUN_0803b230 | check_slot_zone_bit_eligible | 1 | [eval](eval/0803b230.md) |
+| 236 | 345 | 6 | 29 | C | 0x0803a9a8 | FUN_0803a9a8 | eval_equip_chain_score_for_slot | 1 | [eval](eval/0803a9a8.md) |
+| 237 | 346 | 6 | 38 | C | 0x08030a30 | FUN_08030a30 | check_slot_card_is_equip_whitelist | 1 | [eval](eval/08030a30.md) |
+| 238 | 347 | 6 | 1 | E | 0x08038dd4 | FUN_08038dd4 | compute_lp_cost_by_zone_field5_x100 | 1 | [eval](eval/08038dd4.md) |
+| 239 | 348 | 6 | 16 | D | 0x080eeed4 | FUN_080eeed4 | get_card_extended_stat_field3 | 1 | [eval](eval/080eeed4.md) |
+| 240 | 349 | 6 | 3 | E | 0x0802f4e0 | FUN_0802f4e0 | count_active_extended_chain_nodes | 1 | [eval](eval/0802f4e0.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #14 PASSED (单 call 模式)** — duel core 评估/计数/装备链/LP cost 簇 (get_card_effect_category + get_slot_effect_card_value + count_zones_by_card_and_mode + query_zone_chain_count_with_eligibility + adjust_slot_score_by_chain_and_zone + check_card_id_is_special_summon_type + count_monster_slots_by_state_all + count_active_slots_with_field6_value + eval_slot_target_eligibility_full + apply_slot_score_bonus_by_state + count_hand_cards_by_field6_alt (冲突重命名) + cleanup_slot_score_entry_epilogue + count_paired_slots_both_sides + find_equip_chain_node_by_pred + check_slot_zone_bit_eligible + eval_equip_chain_score_for_slot indeg=29 + check_slot_card_is_equip_whitelist indeg=38 + compute_lp_cost_by_zone_field5_x100 + get_card_extended_stat_field3 (sibling cluster 第 5 元) + count_active_extended_chain_nodes); 1 name collision fix (0x08034020 count_hand_cards_by_field6 → count_hand_cards_by_field6_alt, offsets 0x1c/0x5d0 vs 0x14/0x418); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (240/1526 = 15.73%)
 - 2026-05-08: **batch=20 #13 PASSED** — duel field count/cost util cluster (find_equip_chain_node/pair + count_monster_slots_by_state/fnptr + count_occupied_monster_zones indeg=46 + count_occupied_monster_zones_with_effect_bonus + count_paired_slots_with_field5 indeg=27 + count_hand_cards_by_field6/with_field5 + count_extra_deck_cards_by_id + count_zone_slots_with_card_field5 + 4x compute_lp_cost_by_* dispatch branches + get_zone_slot_card_ref/field6_by_type + ensure_card_id_cache_entry indeg=22 + lookup_rom_card_attribute_table_a); 1 fix iter (non-APCS r8 inputs clarified); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (220/1526 = 14.42%)
 - 2026-05-07: **batch=20 #12 PASSED** — duel core util cluster (effect/equip node pool 链 + zone slot ptr resolver indeg=43 + card BST classifiers indeg=18+9+1 + zone descriptor finder indeg=52 + card_id whitelist + slot pair check) + Gravekeeper 后续 placement rules; 1+1 fix iter (R3 r12 internal-set 标识 + R6 ROM ATK base + r0 歧义清除); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (200/1526 = 13.10%)
 - 2026-05-07: **batch=20 #11 PASSED** — 0x080eexx card extended stat getter 4-sibling 簇 (field5/6/7/9) + 0x0804ad48 indeg=135 dispatch wrapper + duel core util cluster (slot card pair check / active-card test / effect zone counter / equip chain rule / Gravekeeper card-id whitelist); 1 fix iter (R6 状态码符号化 + effect_code 计算修正); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (180/1526 = 11.80%)

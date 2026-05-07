@@ -4329,6 +4329,163 @@ RENAMES = [
         "Sibling FUN_080eef44 uses col_offset=(0xb*row+3)*2=row*22+6. "
         "Constants: table_base=0x09821e04, index_min=0xfa7 (cmp > 0xfa6), "
         "row_stride=0xb*2=22 bytes, col_offset_A=8 (halfword 4 in row), sentinel=0xffff."),
+
+    # 2026-05-08: campaign-14 batch (duel core evaluation/count/equip chain/LP cost cluster)
+    ("FUN_0804be38", "get_card_effect_category",
+        "Classify card_id (r0) into effect category code via binary tree ID comparisons. "
+        "Returns: 0=none, 1=type_B, 3=type_C, 5=type_D, 0xff=type_A. "
+        "Pure read-only; no side effects. "
+        "Key IDs: 0x161a, 0x128e, 0x1610-0x1617, 0x16de, 0x1624, 0x186a, 0x1817, 0x1983. "
+        "Called by get_slot_effect_card_value (returns 0/non-0) and addr 0x0804513c (extracts bit0)."),
+    ("FUN_0803149c", "get_slot_effect_card_value",
+        "Read gDuelFieldSlots[player_side][slot_idx] word, extract card_id (bits[12:0]), "
+        "call get_card_effect_category(card_id). If result==0 return 0; else return slot word[0xc] (effect value field). "
+        "r0: packed_side_flags (bit0=player_side [0..1]); r1: slot_idx [0..4]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes, effect_field_offset=0xc."),
+    ("FUN_08032904", "count_zones_by_card_and_mode",
+        "Dispatch based on r2 (mode_flags): "
+        "mode==0: bl count_field_copies_of_card(card_id); "
+        "mode bit0: bl count_available_effect_zones(1-player, card_id, -1) -> accumulate; "
+        "mode bit1: bl count_available_effect_zones(player, card_id, -1) -> accumulate. "
+        "r0: card_id [0..0x19b7]; r1: player_side [0..1]; r2: mode_flags [0..3]. "
+        "Returns r0=count (field copies or available effect zone sum)."),
+    ("FUN_0802f3a8", "query_zone_chain_count_with_eligibility",
+        "Wrapper around count_zone_chain_eligible_cards that dynamically computes both eligibility flags. "
+        "Flow: bl check_slot_card_effect_eligibility(r0,r1)->r6; "
+        "bl check_slot_card_fieldspell_eligibility(r0,r1)->sp[0]; "
+        "bl count_zone_chain_eligible_cards(player, slot, r8, r6, sp[0]). "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]; r8 (non-APCS, caller-set): filter_value. "
+        "Returns r0=match_count [0..chain_len]."),
+    ("FUN_0803a428", "adjust_slot_score_by_chain_and_zone",
+        "Mid-section of AI slot scoring function (~0x08037ec0). Adjusts r7[+0x14] (atk_score) "
+        "and r7[+0x18] (def_score) via stack variables and multiple callee results. "
+        "Paths: add/subtract sp[0x48..0x58]+r10 delta; zero atk_score if count_field_copies_of_card(0x1951) "
+        "and r7[4]==4 or r7[0xc] bit4; double atk_score if count_occupied_monster_zones_with_effect_bonus==2; "
+        "halve via query_zone_chain_count_with_eligibility loop; halve via count_available_effect_zones sum loop; "
+        "clamp both scores >=0; fall-through to cleanup_slot_score_entry_epilogue. "
+        "r7 (non-APCS): slot_score_entry ptr ([+0x14]=atk_score, [+0x18]=def_score). "
+        "r10 (non-APCS): auxiliary_score. No APCS params. "
+        "Side effects: writes r7[+0x14] and r7[+0x18]."),
+    ("FUN_0804b30c", "check_card_id_is_special_summon_type",
+        "Check if card_id (r0) falls in special-summon card ID ranges or exact values. "
+        "Ranges/IDs checked: 0x18ab..0x18ad, 0x19aa, 0x19ad..0x19ae, 0x19b2, 0x19bb and final fallthrough. "
+        "Returns 1=matches special-summon type, 0=no match. "
+        "Pure leaf, no side effects. Sibling cluster: get_card_effect_category, FUN_0804b2dc, FUN_0804b1f0. "
+        "r0: card_id [0..0x19b7]."),
+    ("FUN_08032ef0", "count_monster_slots_by_state_all",
+        "Thin wrapper: sets r2=-1 (full-scan, no filter) then calls count_monster_slots_by_state(r0, r1, -1). "
+        "r0: player_side [0..1]; r1: state_mask (e.g. 0xd=occupied, 0xf, 0x12). "
+        "Returns r0=slot_count. indeg=8. "
+        "Constants: r2=-1 fixed (movs r2,#1; rsbs r2,r2,#0)."),
+    ("FUN_0803309c", "count_active_slots_with_field6_value",
+        "Iterate player (r0 bit0) monster zone slots 0..4; for each active slot (lsls valid bit), "
+        "call test_slot_has_active_card(player, slot_idx, r10=effect_code); "
+        "if true and slot[+6] halfword == r9 (target_field6_val), increment counter. "
+        "r0: player_side [0..1]; r1: effect_code (-> r10 at entry); r2: target_field6_val [0..0xffff] (-> r9). "
+        "Returns r0=count [0..5]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, monster_zone_count=5, slot_entry=0x14."),
+    ("FUN_0803407c", "eval_slot_target_eligibility_full",
+        "Comprehensive slot-target eligibility evaluator. "
+        "Calls resolve_slot_card_id_for_pair then multiple query_zone_chain_count_with_eligibility "
+        "and count_zones_by_card_and_mode calls using non-APCS r8/r9/r10 params. "
+        "Large switch dispatches on card_id for zone count aggregation. "
+        "r8 (non-APCS): player_side_or_mode; r9 (non-APCS): target_param; r10 (non-APCS): aux_param. "
+        "Returns r0=eligibility_result (0=ineligible; >0=target count/score). indeg=2. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_08038e1e", "apply_slot_score_bonus_by_state",
+        "Apply state-based bonus increments to AI scoring stack variables sp[0x54] and sp[0x58]. "
+        "Path 1: card_id==0x1782 and sp[0x64] bit0==0: check_value_in_slot_chain(0x1843) -> "
+        "count_available_effect_zones -> if >0 write r7[+0x14]=0xbb8. "
+        "Path 2: state_code==0xd: count_active_slots_with_field6_value(r1=0x13a0) x2 -> sp[0x54/0x58] += count*124. "
+        "Path 3: state_code==0xf: count_available_effect_zones(0x1399) -> sp[0x54] += count*25; "
+        "optionally count_monster_slots_by_state_all*0xc8. "
+        "Path 4: state_code==0x7: field-copy loop bonus. "
+        "r7 (non-APCS): slot_score_entry ptr. No APCS params. "
+        "Side effects: [r7+0x14], sp[0x54], sp[0x58]."),
+    ("FUN_08034020", "count_hand_cards_by_field6_alt",
+        "Count hand cards where get_card_extended_stat_field6(card_id)==r8 (non-APCS). "
+        "Alt variant of count_hand_cards_by_field6 (0x08033e70): uses different EWRAM offsets "
+        "(hand_count_offset=0x1c vs 0x14; hand_base_offset=0xba*8=0x5d0 vs 0x83*8=0x418). "
+        "Flow: gP1LifePoints+0x1c+player*0x868=hand_count; "
+        "iterate gP1LifePoints+player*0x868+0x5d0 (hand array, 4 bytes/entry); "
+        "extract card_id bits[12:0]; bl get_card_extended_stat_field6; cmp r0,r8; match->counter++. "
+        "r0: player_side [0..1]; r8 (non-APCS, caller-set): target_field6_value. "
+        "Returns r0=count [0..hand_size]. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "hand_count_offset=0x1c, hand_base_offset=0xba*8=0x5d0, card_entry_size=4."),
+    ("FUN_0803a520", "cleanup_slot_score_entry_epilogue",
+        "Shared early-exit/epilogue of large slot-scoring function (~0x08037ec0). "
+        "Entered when card_id==0 (empty slot) or slot_idx>4 (out-of-range). "
+        "Body: add sp,#0x84; pop non-APCS regs; pop callee-saved; pop r0 (return addr); bx r0. "
+        "No scoring writes; pure stack cleanup. indeg=3 (three early-exit callers). "
+        "Also entered by fall-through from adjust_slot_score_by_chain_and_zone."),
+    ("FUN_08032ca4", "count_paired_slots_both_sides",
+        "Call count_paired_slots_with_field5(player=0, card_id, -1) and "
+        "count_paired_slots_with_field5(player=1, card_id, -1), sum results. "
+        "r0: card_id [0..0x19b7]. Returns r0=total_count [0..10]. "
+        "Full-field wrapper analogous to count_monster_slots_by_state_all. indeg=9. "
+        "Constants: r2=-1 fixed (rsbs #0)."),
+    ("FUN_08030048", "find_equip_chain_node_by_pred",
+        "Read slot[+0xa] chain head from gDuelFieldSlots[player_side][slot_idx]; return 0 if empty. "
+        "Traverse gDuelNodePool (0x0201d9c0) nodes (8 bytes each): for each node call "
+        "FUN_0810e5e4 trampoline (bx r6) with (node_ptr, pred_param); if returns nonzero, return node_ptr. "
+        "Next via node[+6] halfword. Exhausted: return 0. "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]; r3: pred_param (-> r1 in trampoline); "
+        "r6 (non-APCS): fn_ptr/id for trampoline. Returns r0=node_ptr or 0. "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, "
+        "slot_chain_offset=0xa, node_stride=8, node_next_offset=6."),
+    ("FUN_0803b230", "check_slot_zone_bit_eligible",
+        "Wrap compute_slot_zone_eligibility_mask(r0, r1) and test if bit r2 is set in result. "
+        "Flow: save r2->r4; bl compute_slot_zone_eligibility_mask; "
+        "movs r1,#1; lsls r1,r4 (1<<r4); ands r1,r0; >0->return 1, else 0. "
+        "r0: player_side [0..1]; r1: card_id [0..0x19b7]; r2: bit_index [0..31]. "
+        "Returns r0=bool. indeg=19."),
+    ("FUN_0803a9a8", "eval_equip_chain_score_for_slot",
+        "Compute AI equip-chain score for gDuelFieldSlots[player_side][slot_idx]. "
+        "Check fieldspell eligibility; if 0 return 0. "
+        "Base score: get_card_extended_stat_field5(card_id)->r6. "
+        "Traverse slot[+0xa] chain nodes; adjust r6 by node type (0..0xa) and equip card IDs "
+        "(0x1472/0x1636/0x172f/0x1809). "
+        "Second pass: scan both-player slots for field5 conditions; call check_slot_zone_bit_eligible(bit3); "
+        "each match: r6--. Returns max(r6, 1). "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]; "
+        "r8 (non-APCS, caller-set then overwritten internally to current card_id; caller value preserved via push/pop); "
+        "r9 (non-APCS, init from r0): player_side_copy; r10 (non-APCS, init from r1): slot_idx_copy. "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, "
+        "equip_ids=0x1472/0x1636/0x172f/0x1809."),
+    ("FUN_08030a30", "check_slot_card_is_equip_whitelist",
+        "Extract card_id (bits[12:0]) from gDuelFieldSlots[player_side][slot_idx]; "
+        "compare against whitelist {0x1472, 0x1636, 0x172f, 0x1809}. "
+        "On hit: call check_node_in_slot_chain(player_side, slot_idx, 0x1472, 5) and return its bool result. "
+        "No hit: return 0. "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]. Returns r0=bool. indeg=38. "
+        "Stricter variant of check_slot_card_is_equip_type (no field8 fallback). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "equip_ids=0x1472/0x1636/0x172f/0x1809."),
+    ("FUN_08038dd4", "compute_lp_cost_by_zone_field5_x100",
+        "Call count_zone_slots_with_card_field5(0) and count_zone_slots_with_card_field5(1), "
+        "sum both-side counts, multiply by 0x64 (100), write to r7[+0x18] and r7[+0x14] via fall-through. "
+        "No APCS params; r7 (non-APCS): slot_score_entry ptr. "
+        "Side effects: [r7+0x18] := count*100; [r7+0x14] := count*100 (fall-through). "
+        "Sibling variants: FUN_08038dea (x200), compute_lp_cost_by_zone_field5_both_players (x390). "
+        "Constants: scale_factor=0x64=100."),
+    ("FUN_080eeed4", "get_card_extended_stat_field3",
+        "Read ROM extended card attribute table (0x09821e04, 11 halfwords/row) column index 3 "
+        "for card_id (r0). If card_id<=0x0fa6 (normal card bound) return 0. "
+        "row=card_id-0xfa7; offset=(row*11+3)*2; read u16 from table_base+offset; "
+        "0xffff sentinel treated as 0. "
+        "Sibling cluster: get_card_extended_stat_field5/6/7/8/9; only N differs (N=3 here). "
+        "r0: card_id [0..0x19b7]. Returns r0=u16 extended_stat_field3. "
+        "Constants: table_base=0x09821e04, normal_bound=0x0fa6, row_stride=11 halfwords, field_col=3."),
+    ("FUN_0802f4e0", "count_active_extended_chain_nodes",
+        "Read slot[+0xa] chain head from gDuelFieldSlots[player_side][slot_idx]; traverse gDuelNodePool. "
+        "For each node: type=byte[2]&0xf; skip if type<=9. "
+        "For type>9: extract player_side and slot_idx from node[0] (byte[0]=player bit0, byte[1]>>8=slot_idx); "
+        "navigate to that slot in gDuelFieldSlots; check lsls*0x13 active bit; if nonzero r5++. "
+        "Continue via node[+6] next. Returns r5=count of type>9 active chain nodes. "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]. indeg=3. "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, "
+        "node_type_threshold=9, node_next_offset=6, player_stride=0x868."),
 ]
 
 
