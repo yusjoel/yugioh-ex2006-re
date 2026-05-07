@@ -4614,6 +4614,130 @@ RENAMES = [
         "OAM attr2 tile field. Returns void. "
         "Side effects: anim_state frame_counter and tile_idx updated; OAM attr2 written. "
         "Constants: anim_frame_threshold from anim_state struct."),
+
+    # --- batch #16 (campaign-16, 2026-05-08) card display VRAM rendering pipeline ---
+    ("FUN_080c9c94", "advance_card_display_effect_step",
+        "Advance one step of the card display effect animation (fade/slide/flip). "
+        "Called by the card display scene state machine; reads current effect phase from "
+        "EWRAM card display state struct, increments phase counter, triggers VRAM/OAM updates. "
+        "r0: card_display_state_ptr. Returns void. "
+        "Side effects: phase counter incremented; OAM and/or VRAM updated per effect step."),
+    ("FUN_080f0720", "test_char_kinsoku_tail",
+        "Test whether a character code is a kinsoku tail character (cannot start a line in JP typography). "
+        "r0: char_code (u16 JP character code). "
+        "Returns 1 if char_code is in the kinsoku tail set (e.g. closing brackets, punctuation), 0 otherwise. "
+        "Pure read-only leaf; no side effects. "
+        "Constants: kinsoku_tail_table in ROM."),
+    ("FUN_080c76c0", "render_jp_string_to_tile_line",
+        "Render a JP-encoded string into a BG tile line buffer. "
+        "Iterates over characters in the string, calls glyph rasterizer per character, "
+        "accumulates glyph nibble rows into the tile line buffer. "
+        "r0: str_ptr (JP encoded string); r1: tile_line_buf_ptr; r2: x_start [0..N]; r3: color_attr. "
+        "Returns void. Side effects: tile_line_buf written with glyph nibble rows."),
+    ("FUN_080f370c", "write_glyph_nibble_rows_to_vram",
+        "Write 4bpp glyph nibble rows from a line buffer into BG tile VRAM. "
+        "r0: line_buf_ptr (source nibble rows); r1: vram_tile_dest ptr; r2: row_count [1..8]. "
+        "Packs nibble pairs into 32-bit tile words and stores to VRAM. "
+        "Returns void. Side effects: VRAM tile region written. "
+        "Constants: nibble_mask=0xf, tile_word_stride=4."),
+    ("FUN_080f37d4", "write_line_buf_to_bg_tile_vram",
+        "Write a complete line buffer (packed glyph rows) into BG tile VRAM for one text row. "
+        "r0: line_buf_ptr; r1: vram_tile_dest ptr; r2: tile_col_count [1..N]. "
+        "Copies tile_col_count 32-bit tile words from line buffer to VRAM destination. "
+        "Returns void. Side effects: BG tile VRAM region written. "
+        "Constants: tile_word_size=4 bytes."),
+    ("FUN_080ce218", "render_card_label_text_to_bg",
+        "Render a card label text string into BG tile VRAM for the card info display. "
+        "Looks up label string from ROM string table, calls render_jp_string_to_tile_line "
+        "then write_line_buf_to_bg_tile_vram to commit rendered glyphs. "
+        "r0: label_id [0..N]; r1: bg_tile_dest ptr; r2: x_col [0..29]; r3: y_row [0..23]. "
+        "Returns void. Side effects: BG tile VRAM written with label text."),
+    ("FUN_080cd9a0", "init_card_palette_and_tile_vram",
+        "Initialize palette and tile VRAM regions for the card display screen. "
+        "Fills OBJ palette and BG palette with card display colors from ROM palette table; "
+        "zero-fills BG tile VRAM region for text layer. "
+        "No APCS params (reads display state from globals). Returns void. "
+        "Side effects: OBJ palette, BG palette, BG tile VRAM written. "
+        "Constants: card_palette_table_base in ROM; bios_cpu_set fill mode."),
+    ("FUN_080cf330", "init_card_stat_tile_and_scroll",
+        "Initialize BG tile data and scroll registers for the card stat display area. "
+        "Writes stat label tile indices into BG map VRAM and sets BG scroll registers "
+        "to position the stat area. "
+        "No APCS params (reads card_display_state from globals). Returns void. "
+        "Side effects: BG map VRAM and BG scroll regs written. "
+        "Constants: BG2HOFS=0x04000014, BG2VOFS=0x04000016."),
+    ("FUN_080eec54", "resolve_game_str_ptr",
+        "Resolve a game string pointer from the ROM string table by string_id. "
+        "r0: string_id [0..N]. Returns ptr to null-terminated JP string in ROM. "
+        "Reads entry from ROM string pointer table (base address from globals), "
+        "returns the stored pointer. Pure read-only; no side effects. "
+        "indeg=8. Constants: game_str_table_base in ROM."),
+    ("FUN_080cf25c", "render_card_numeric_stat_to_bg",
+        "Render a numeric card stat (ATK/DEF/LP) as decimal digits into BG tile VRAM. "
+        "Calls resolve_game_str_ptr for the stat label, then render_decimal_digits_jp "
+        "to rasterize the numeric value. "
+        "r0: stat_type [0..N]; r1: stat_value [0..9999]; r2: bg_tile_dest ptr; r3: x_col [0..29]. "
+        "Returns void. Side effects: BG tile VRAM written with decimal digit tiles."),
+    ("FUN_080cf3b0", "render_card_stat_label_with_value",
+        "Render a card stat label string followed by its numeric value into BG tile VRAM. "
+        "Calls render_card_label_text_to_bg for the label, then render_card_numeric_stat_to_bg "
+        "for the value. "
+        "r0: stat_id [0..N]; r1: stat_value [0..9999]; r2: bg_tile_dest ptr; r3: row [0..23]. "
+        "Returns void. Side effects: BG tile VRAM written with label+value tiles."),
+    ("FUN_080f5054", "copy_cstr_to_buf",
+        "Copy a null-terminated C string (ASCII/JP) from src to dst buffer. "
+        "r0: dst_ptr; r1: src_ptr. Copies bytes until null terminator (inclusive). "
+        "Returns dst_ptr (r0 unchanged). Leaf function. No side effects beyond dst_ptr region. "
+        "Constants: none."),
+    ("FUN_080d03b0", "init_choice_label_vram_case1",
+        "Initialize BG tile VRAM for choice label display variant case 1 (first option). "
+        "Writes tile map entries for the first choice label position in the card choice UI. "
+        "No APCS params; reads choice_display_state from globals. Returns void. "
+        "Side effects: BG map VRAM written for choice label case 1. "
+        "Sibling: init_choice_label_vram_case8."),
+    ("FUN_080cceb8", "init_choice_label_vram_case8",
+        "Initialize BG tile VRAM for choice label display variant case 8 (eighth option). "
+        "Writes tile map entries for the eighth choice label position in the card choice UI. "
+        "No APCS params; reads choice_display_state from globals. Returns void. "
+        "Side effects: BG map VRAM written for choice label case 8. "
+        "Sibling: init_choice_label_vram_case1."),
+    ("FUN_080cd33c", "render_card_name_label_to_bg",
+        "Render the card name string into BG tile VRAM for the card info name row. "
+        "Looks up card name JP string via resolve_game_str_ptr(card_id), "
+        "calls render_jp_string_to_tile_line then write_line_buf_to_bg_tile_vram. "
+        "r0: card_id [0..0x19b7]; r1: bg_tile_dest ptr; r2: x_col [0..29]; r3: y_row [0..23]. "
+        "Returns void. Side effects: BG tile VRAM name row written."),
+    ("FUN_080c78bc", "init_card_icon_tile_and_palette",
+        "Initialize OBJ tile VRAM and palette for card type/attribute icon display. "
+        "Copies icon tile data from ROM to OBJ VRAM, writes palette entries for icon colors. "
+        "r0: card_type [0..N]; r1: card_attribute [0..N]. Returns void. "
+        "Side effects: OBJ tile VRAM and OBJ palette written for icon display. "
+        "Constants: icon_tile_table_base in ROM; OBJ_VRAM_BASE=0x06010000."),
+    ("FUN_080c3b50", "render_field_zone_mini_card_tiles",
+        "Render mini card tile data for a duel field zone slot into BG tile VRAM. "
+        "Reads zone slot card_id, looks up mini card tile source from ROM table, "
+        "copies tile data to BG VRAM at the zone position. "
+        "r0: player_side [0..1]; r1: zone_slot_idx [0..9]; r2: bg_tile_dest ptr. "
+        "Returns void. Side effects: BG tile VRAM written with mini card tile data. "
+        "Constants: mini_card_tile_table_base in ROM."),
+    ("FUN_080c9eb8", "write_decimal_digits_to_oam",
+        "Write decimal digit OAM entries for a numeric value (LP/ATK/DEF) to OAM buffer. "
+        "Decomposes r0 into decimal digits, looks up digit tile indices, "
+        "writes OAM attr0/1/2 entries for each digit sprite. "
+        "r0: value [0..9999]; r1: oam_dest ptr; r2: x_start [0..239]; r3: y_pos [0..159]. "
+        "Returns void. Side effects: OAM buffer entries written. "
+        "Constants: digit_tile_base_idx in OBJ VRAM tile map."),
+    ("FUN_08095b50", "check_player_side_condition",
+        "Check whether the player_side condition flag is set for a given slot. "
+        "Reads gDuelFieldSlots[player_side][slot_idx] condition byte and tests a specific bit. "
+        "r0: player_side [0..1]; r1: slot_idx [0..9]. "
+        "Returns 1 if condition bit set, 0 otherwise. Pure read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes."),
+    ("FUN_080c3790", "get_field_slot_tile_vram_addr",
+        "Compute the BG tile VRAM address for a duel field zone slot position. "
+        "r0: player_side [0..1]; r1: zone_slot_idx [0..9]. "
+        "Returns ptr to BG tile VRAM position for the slot. Pure address compute; no side effects. "
+        "Constants: field_tile_map_base, slot_x/y layout table in ROM."),
 ]
 
 
