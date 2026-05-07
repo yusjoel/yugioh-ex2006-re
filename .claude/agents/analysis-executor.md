@@ -154,6 +154,8 @@ model: sonnet
 - caller bl 前含 `lsls rX,rN,#S; lsrs rX,rX,#S`（低 N 位提取）或单步 `lsrs rX,rX,#S`（高位/符号位提取）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callsite_bit_shift_param_range.md` (静态计算范围 [0..2^(32-S)-1] 写入 R3; Form B #0x1f → [0..1] player_id)
 - R7 caller 地址填写时须自检：(1) addr != 本函数地址（禁止自引用）; (2) addr 必须存在于 complete_callgraph.csv 中以本函数为 callee 的 bl 记录（禁止将地址相邻的 sibling 误列为 caller）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md`
 - plate comment 草稿完成后估算字数：超过 500 字（≈35 行×13 词）→ 立即压缩 Side effects: 为单子句形式，压缩 Constants: 为 NAME=value // 一词说明，分析性prose 移至 proposal body → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md`
+- proposed_name 含 `_0x[0-9a-f]{3,}_` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 必须查 doc/dev/data.md 替换为语义卡名; 复现 0x08033088+0x080a3c2c)
+- sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 

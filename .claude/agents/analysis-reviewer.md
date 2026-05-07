@@ -73,6 +73,8 @@ model: sonnet
 | 函数地址在 0x08038xxx，体 = push+ldr r0,[sp,#0x3c]+bl+b LAB，R4 非 void | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (R4=0; b LAB 无独立 r0 写; void 强制) |
 | R7 form (b) 中 caller addr == 本函数地址（自引用）或 caller addr 为地址相邻 sibling（非真实 bl 关系）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md` (R7=0; 自引用或 sibling 误引均属 mechanical error; reviewer 须验证 addr != self && addr ∈ callgraph callers) |
 | R2 plate 明显超过 500 字（目测 >35 密集行，或 proposal 注明字数超限）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md` (R2=0; 超过 500 字为硬限; 内容质量不作减免) |
+| proposed_name 含 `_0x[0-9a-f]{3,}` 段（裸 hex card_id）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1=0; 必须查 doc/dev/data.md 替换为语义卡名) |
+| R3 中高寄存器被列为参数，但其在函数体内的首次 use 是 bl 返回值赋值（mov rN,r0）或循环计数器初始化（内部 working register）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (Counter-pattern 三类内部 working register: push+用于 bl 返回值/循环计数/表加载 → 整行删除，非 caller-set) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
