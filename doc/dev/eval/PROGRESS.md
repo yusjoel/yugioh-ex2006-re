@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-15) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-15) |
-| **上次更新** | 2026-05-08 (campaign-14 batch, 240/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-16) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-16) |
+| **上次更新** | 2026-05-08 (campaign-15 batch, 260/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**240 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**260 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -312,11 +312,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 238 | 347 | 6 | 1 | E | 0x08038dd4 | FUN_08038dd4 | compute_lp_cost_by_zone_field5_x100 | 1 | [eval](eval/08038dd4.md) |
 | 239 | 348 | 6 | 16 | D | 0x080eeed4 | FUN_080eeed4 | get_card_extended_stat_field3 | 1 | [eval](eval/080eeed4.md) |
 | 240 | 349 | 6 | 3 | E | 0x0802f4e0 | FUN_0802f4e0 | count_active_extended_chain_nodes | 1 | [eval](eval/0802f4e0.md) |
+| 241 | 350 | 6 | 1 | E | 0x08038dea | FUN_08038dea | compute_lp_cost_by_zone_field5_x200 | 1 | [eval](eval/08038dea.md) |
+| 242 | 351 | 5 | 3 | E | 0x08037ec0 | FUN_08037ec0 | eval_slot_score_entry_full | 1 | [eval](eval/08037ec0.md) |
+| 243 | 352 | 7 | 5 | D | 0x080ca660 | FUN_080ca660 | decode_card_image_tiles_to_vram | 1 | [eval](eval/080ca660.md) |
+| 244 | 353 | 7 | 3 | E | 0x0804bf20 | FUN_0804bf20 | check_card_id_is_equip_set_b | 1 | [eval](eval/0804bf20.md) |
+| 245 | 354 | 7 | 3 | E | 0x0804bd78 | FUN_0804bd78 | check_card_id_is_equip_set_a | 1 | [eval](eval/0804bd78.md) |
+| 246 | 355 | 7 | 3 | E | 0x080cae84 | FUN_080cae84 | write_card_digit_tiles_to_vram | 1 | [eval](eval/080cae84.md) |
+| 247 | 356 | 7 | 2 | E | 0x080cace8 | FUN_080cace8 | zero_card_display_vram_regions | 1 | [eval](eval/080cace8.md) |
+| 248 | 357 | 7 | 2 | E | 0x080caf68 | FUN_080caf68 | render_card_name_to_sprite_vram | 1 | [eval](eval/080caf68.md) |
+| 249 | 358 | 6 | 4 | E | 0x08030b70 | FUN_08030b70 | check_card_stat_field7_equals | 1 | [eval](eval/08030b70.md) |
+| 250 | 359 | 6 | 3 | E | 0x0802fbbc | FUN_0802fbbc | count_chain_nodes_by_card_id | 1 | [eval](eval/0802fbbc.md) |
+| 251 | 360 | 6 | 3 | E | 0x0802fc34 | FUN_0802fc34 | count_slot_chain_nodes_by_card_id | 1 | [eval](eval/0802fc34.md) |
+| 252 | 361 | 6 | 2 | E | 0x080377b0 | FUN_080377b0 | eval_equip_bonus_for_slot | 1 | [eval](eval/080377b0.md) |
+| 253 | 362 | 7 | 3 | E | 0x080c933c | FUN_080c933c | map_card_id_to_digit_tile_offset | 1 | [eval](eval/080c933c.md) |
+| 254 | 363 | 6 | 2 | E | 0x080cb1cc | FUN_080cb1cc | render_large_card_display_by_mode | 1 | [eval](eval/080cb1cc.md) |
+| 255 | 364 | 7 | 4 | D | 0x080f2c4c | FUN_080f2c4c | render_decimal_digits_jp_signed | 1 | [eval](eval/080f2c4c.md) |
+| 256 | 365 | 7 | 2 | E | 0x080c7894 | FUN_080c7894 | init_bg_vram_for_card_display | 1 | [eval](eval/080c7894.md) |
+| 257 | 366 | 7 | 3 | E | 0x080c9a10 | FUN_080c9a10 | write_oam_card_icon_strip | 1 | [eval](eval/080c9a10.md) |
+| 258 | 367 | 7 | 2 | E | 0x080c9374 | FUN_080c9374 | write_nibble_palette_rows_to_vram | 1 | [eval](eval/080c9374.md) |
+| 259 | 368 | 7 | 3 | E | 0x080c992c | FUN_080c992c | render_card_type_icon_to_vram | 1 | [eval](eval/080c992c.md) |
+| 260 | 369 | 7 | 2 | E | 0x080c9ac8 | FUN_080c9ac8 | tick_card_icon_anim_step | 1 | [eval](eval/080c9ac8.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #15 PASSED (单 call 模式)** — LP cost 补全 (compute_lp_cost_by_zone_field5_x200 + eval_slot_score_entry_full) + card display pipeline 簇 (decode_card_image_tiles_to_vram + write_card_digit_tiles_to_vram + zero_card_display_vram_regions + render_card_name_to_sprite_vram + map_card_id_to_digit_tile_offset + render_large_card_display_by_mode + render_decimal_digits_jp_signed + init_bg_vram_for_card_display + write_oam_card_icon_strip + write_nibble_palette_rows_to_vram + render_card_type_icon_to_vram + tick_card_icon_anim_step) + equip set classifiers (check_card_id_is_equip_set_a/b) + duel util (check_card_stat_field7_equals + count_chain_nodes_by_card_id + count_slot_chain_nodes_by_card_id + eval_equip_bonus_for_slot); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (260/1526 = 17.04%)
 - 2026-05-08: **batch=20 #14 PASSED (单 call 模式)** — duel core 评估/计数/装备链/LP cost 簇 (get_card_effect_category + get_slot_effect_card_value + count_zones_by_card_and_mode + query_zone_chain_count_with_eligibility + adjust_slot_score_by_chain_and_zone + check_card_id_is_special_summon_type + count_monster_slots_by_state_all + count_active_slots_with_field6_value + eval_slot_target_eligibility_full + apply_slot_score_bonus_by_state + count_hand_cards_by_field6_alt (冲突重命名) + cleanup_slot_score_entry_epilogue + count_paired_slots_both_sides + find_equip_chain_node_by_pred + check_slot_zone_bit_eligible + eval_equip_chain_score_for_slot indeg=29 + check_slot_card_is_equip_whitelist indeg=38 + compute_lp_cost_by_zone_field5_x100 + get_card_extended_stat_field3 (sibling cluster 第 5 元) + count_active_extended_chain_nodes); 1 name collision fix (0x08034020 count_hand_cards_by_field6 → count_hand_cards_by_field6_alt, offsets 0x1c/0x5d0 vs 0x14/0x418); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (240/1526 = 15.73%)
 - 2026-05-08: **batch=20 #13 PASSED** — duel field count/cost util cluster (find_equip_chain_node/pair + count_monster_slots_by_state/fnptr + count_occupied_monster_zones indeg=46 + count_occupied_monster_zones_with_effect_bonus + count_paired_slots_with_field5 indeg=27 + count_hand_cards_by_field6/with_field5 + count_extra_deck_cards_by_id + count_zone_slots_with_card_field5 + 4x compute_lp_cost_by_* dispatch branches + get_zone_slot_card_ref/field6_by_type + ensure_card_id_cache_entry indeg=22 + lookup_rom_card_attribute_table_a); 1 fix iter (non-APCS r8 inputs clarified); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (220/1526 = 14.42%)
 - 2026-05-07: **batch=20 #12 PASSED** — duel core util cluster (effect/equip node pool 链 + zone slot ptr resolver indeg=43 + card BST classifiers indeg=18+9+1 + zone descriptor finder indeg=52 + card_id whitelist + slot pair check) + Gravekeeper 后续 placement rules; 1+1 fix iter (R3 r12 internal-set 标识 + R6 ROM ATK base + r0 歧义清除); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (200/1526 = 13.10%)

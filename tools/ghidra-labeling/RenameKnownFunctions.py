@@ -4486,6 +4486,134 @@ RENAMES = [
         "r0: player_side [0..1]; r1: slot_idx [0..4]. indeg=3. "
         "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, "
         "node_type_threshold=9, node_next_offset=6, player_stride=0x868."),
+
+    # --- batch #15 (campaign-15, 2026-05-08) ---
+    ("FUN_08038dea", "compute_lp_cost_by_zone_field5_x200",
+        "Call count_zone_slots_with_card_field5(0) and count_zone_slots_with_card_field5(1), "
+        "sum both-side counts, multiply by 0xc8 (200), write to r7[+0x18] and r7[+0x14] via fall-through. "
+        "No APCS params; r7 (non-APCS): slot_score_entry ptr. "
+        "Side effects: [r7+0x18] := count*200; [r7+0x14] := count*200 (fall-through). "
+        "Sibling variants: compute_lp_cost_by_zone_field5_x100 (x100), "
+        "compute_lp_cost_by_zone_field5_both_players (x390). "
+        "Constants: scale_factor=0xc8=200."),
+    ("FUN_08037ec0", "eval_slot_score_entry_full",
+        "Full AI slot-score evaluator for one field slot (large function, indeg=3). "
+        "r0: player_side [0..1] (-> r6); r1: slot_idx [0..4] (-> r5). "
+        "Allocates 0x84 bytes stack; checks slot active, card_id, zone occupancy. "
+        "Dispatches to compute_lp_cost_by_* case branches for various card and zone states. "
+        "Falls through to adjust_slot_score_by_chain_and_zone then "
+        "cleanup_slot_score_entry_epilogue. "
+        "Side effects: writes r7[+0x14] (atk_score) and r7[+0x18] (def_score) via callees. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes."),
+    ("FUN_080ca660", "decode_card_image_tiles_to_vram",
+        "Decompress and decode card image tile data into VRAM for card display. "
+        "Reads tile data source pointer, calls decompression routine, then writes decoded "
+        "tile data to VRAM destination. r0: card_id [0..0x19b7]; r1: vram_dest ptr. "
+        "Returns void. Side effects: VRAM region at r1 written with decompressed tile data. "
+        "Constants: card_tile_table_base=ROM tile index table."),
+    ("FUN_0804bf20", "check_card_id_is_equip_set_b",
+        "Check if card_id (r0) belongs to equip card set B (second hardcoded ID range/list). "
+        "Pure BST leaf over card IDs in set B. Returns 1=member, 0=not member. "
+        "Sibling: check_card_id_is_equip_set_a (set A range). "
+        "r0: card_id [0..0x19b7]. Returns u32 bool."),
+    ("FUN_0804bd78", "check_card_id_is_equip_set_a",
+        "Check if card_id (r0) belongs to equip card set A (first hardcoded ID range/list). "
+        "Pure BST leaf over card IDs in set A. Returns 1=member, 0=not member. "
+        "Sibling: check_card_id_is_equip_set_b (set B range). "
+        "r0: card_id [0..0x19b7]. Returns u32 bool."),
+    ("FUN_080cae84", "write_card_digit_tiles_to_vram",
+        "Write prebuilt digit tile data for card number display into VRAM. "
+        "r0: digit_tile_src ptr; r1: vram_dest ptr; r2: tile_count [1..N]. "
+        "Iterates tile_count entries, copying digit tile words to VRAM destination. "
+        "Returns void. Side effects: VRAM region written with digit tiles. "
+        "Constants: tile_word_size=4 bytes per tile entry."),
+    ("FUN_080cace8", "zero_card_display_vram_regions",
+        "Zero-fill VRAM regions used for card display (card image, digits, name strip). "
+        "No APCS params; reads display region base addresses from global state. "
+        "Calls bios_cpu_set fill=0 for each subregion. Returns void. "
+        "Side effects: card display VRAM zeroed before redraw. "
+        "Constants: uses bios_cpu_set fill mode (bit24=1)."),
+    ("FUN_080caf68", "render_card_name_to_sprite_vram",
+        "Render card name string tiles into sprite VRAM for card name display strip. "
+        "r0: card_id [0..0x19b7]; r1: sprite_vram_dest ptr. "
+        "Looks up name string, converts characters to tile indices, writes to sprite VRAM. "
+        "Returns void. Side effects: sprite VRAM region written with name tile data."),
+    ("FUN_08030b70", "check_card_stat_field7_equals",
+        "Read card stat field7 for card_id (r0) and compare to r1 (target_value). "
+        "Returns 1 if field7==target_value, 0 otherwise. "
+        "r0: card_id [0..0x19b7]; r1: target_value [0..0xff]. "
+        "Returns u32 bool. Pure read-only leaf. "
+        "Constants: card_stat_table_base=ROM card stat table, field7_offset=7."),
+    ("FUN_0802fbbc", "count_chain_nodes_by_card_id",
+        "Traverse gDuelNodePool from head_index (r0) counting nodes where "
+        "card_id (node[+0] low 13 bits) == r1 (target_card_id) and zone_type<=5. "
+        "r0: head_index [0..139]; r1: target_card_id [0..0x19b7]. "
+        "Returns u32 match_count. "
+        "Constants: gDuelNodePool=0x0201d9c0, node_stride=8, zone_type_mask=0xf, zone_type_max=5."),
+    ("FUN_0802fc34", "count_slot_chain_nodes_by_card_id",
+        "Wrapper: read chain_head from gDuelFieldSlots[player_side][slot_idx]+0xa, "
+        "call count_chain_nodes_by_card_id(head, r2). "
+        "r0: packed_player_id (bit0=side); r1: slot_idx [0..11]; r2: target_card_id [0..0x19b7]. "
+        "Returns u32 match_count (0=chain empty or no match). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa."),
+    ("FUN_080377b0", "eval_equip_bonus_for_slot",
+        "Evaluate equip bonus score for slot (r0=player_side, r1=slot_idx). "
+        "Calls eval_equip_chain_score_for_slot and combines with zone eligibility mask. "
+        "Returns r0=bonus_score [0..N]. "
+        "r0: player_side [0..1]; r1: slot_idx [0..4]. "
+        "Constants: gDuelFieldSlots=0x0201c510."),
+    ("FUN_080c933c", "map_card_id_to_digit_tile_offset",
+        "Map card_id (r0) to the ROM tile offset for card number digit display. "
+        "Looks up card number digits from card attribute table, returns byte offset into "
+        "digit tile ROM data. r0: card_id [0..0x19b7]. "
+        "Returns u32 tile_offset. Pure read-only. "
+        "Constants: card_number_table_base=ROM digit tile index table."),
+    ("FUN_080cb1cc", "render_large_card_display_by_mode",
+        "Top-level dispatcher for large card display rendering. "
+        "r0: display_mode [0..N]; r1: card_id [0..0x19b7]. "
+        "Dispatches to sub-renderers: decode_card_image_tiles_to_vram, "
+        "render_card_name_to_sprite_vram, write_card_digit_tiles_to_vram, etc. "
+        "Returns void. Side effects: VRAM and OAM written for card display. "
+        "Constants: mode dispatch table in ROM."),
+    ("FUN_080f2c4c", "render_decimal_digits_jp_signed",
+        "Render signed decimal integer as digit tiles in JP glyph style. "
+        "r0: value (s32 signed integer); r1: dest_ptr (sprite VRAM or BG tile dest). "
+        "Decomposes value into decimal digits, maps each digit to JP tile index, "
+        "writes tiles to dest. Handles sign (negative prefix tile). "
+        "Returns void. Side effects: dest_ptr region written with digit tiles. "
+        "Constants: JP digit tile base index in glyph tile set."),
+    ("FUN_080c7894", "init_bg_vram_for_card_display",
+        "Initialize BG VRAM regions for card display screen. "
+        "Clears BG tile/map regions, sets palette entries, configures BG control registers "
+        "for card image and text display layers. "
+        "No APCS params; all addresses from global display state. "
+        "Returns void. Side effects: BG VRAM, palette, DISPCNT regs written. "
+        "Constants: BG control regs 0x04000008/0x0400000a/0x0400000c/0x0400000e."),
+    ("FUN_080c9a10", "write_oam_card_icon_strip",
+        "Write OAM entries for card type/attribute icon strip in card display. "
+        "r0: oam_base ptr; r1: icon_count [1..N]; r2: start_x [0..239]; r3: start_y [0..159]. "
+        "For each icon: compute OAM attr0/attr1/attr2, write to oam_base + index*8. "
+        "Returns void. Side effects: OAM region written. "
+        "Constants: OAM_ATTR0_Y_MASK=0xff, OAM_ATTR1_X_MASK=0x1ff."),
+    ("FUN_080c9374", "write_nibble_palette_rows_to_vram",
+        "Write 4bpp nibble palette row data to VRAM for card display tiles. "
+        "r0: src_palette_data ptr; r1: vram_dest ptr; r2: row_count [1..N]. "
+        "Iterates row_count rows, packing nibble pairs into halfwords, writing to VRAM. "
+        "Returns void. Side effects: VRAM tile palette region written. "
+        "Constants: nibble_mask=0xf, halfword_shift=4."),
+    ("FUN_080c992c", "render_card_type_icon_to_vram",
+        "Render card type icon tile into VRAM for card display. "
+        "r0: card_type [0..N]; r1: vram_dest ptr. "
+        "Looks up type icon tile source from ROM table, copies tile data to vram_dest. "
+        "Returns void. Side effects: VRAM region written with type icon tiles. "
+        "Constants: card_type_icon_table_base=ROM icon tile table."),
+    ("FUN_080c9ac8", "tick_card_icon_anim_step",
+        "Advance card icon animation by one step, updating OAM and VRAM tile indices. "
+        "r0: anim_state_ptr (struct with frame_counter, tile_idx, oam_ptr). "
+        "Increments frame counter; on threshold, advances tile_idx and writes updated "
+        "OAM attr2 tile field. Returns void. "
+        "Side effects: anim_state frame_counter and tile_idx updated; OAM attr2 written. "
+        "Constants: anim_frame_threshold from anim_state struct."),
 ]
 
 
