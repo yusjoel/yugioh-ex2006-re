@@ -5490,6 +5490,192 @@ RENAMES = [
         "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..11]; r2=u16 target_card_id [0..0x1fff]. "
         "Returns u32 count [0..chain_len]. Pure read-only. "
         "Constants: gDuelFieldSlots=0x0201c510, node_pool=0x0201D9C0, player_stride=0x868."),
+
+    # --- batch #21 (campaign-21, 2026-05-08) duel field equip activation eval cluster ---
+    ("FUN_080a5498", "check_equip_slot_pair_can_activate_full",
+        "Core equip slot pair activation checker. "
+        "Guards: (r1+r2)<=4; reads [0x0201e4d0] activation state, gDuelFieldSlots. "
+        "Dispatches on set_code (0x112e/0x128c/0x1758/0x1895/0x19a6) to specialized sub-checks; "
+        "default path: check_slot_card_can_be_equipped + check_slot_placement_blocked_by_field_effect. "
+        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]. "
+        "Returns u32 (0x800=can activate, 0=cannot). Read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, state_base=0x0201e4d0, "
+        "success=0x800, set_code_sphinx=0x112e, set_code_sphinx_teleia=0x128c, "
+        "set_code_ra=0x1758, set_code_c=0x1895, set_code_d=0x19a6."),
+    ("FUN_080a5714", "check_equip_slot_can_activate_with_context",
+        "check_equip_slot_pair_can_activate_full looser variant with count-list prohibition check. "
+        "Entry: r4=(r1+r2)<=4 guard; reads [0x0201e4d0+8] count; "
+        "count==0: (A) count_available_monster_slots==0 and player bit0 mismatch -> return 0; "
+        "(B) else check_slot_placement_blocked_by_field_effect. "
+        "count>0: scan [state+0xc] prohibition pair list; hit (player,slot) -> return 0. "
+        "Tail-calls check_equip_slot_pair_can_activate_full(r0, r1, r2). "
+        "Non-APCS: r8 saves slot_offset at entry (.hword 0x4690 = mov r8,r2) for tail-call restore. "
+        "r0=u32 player_side [0..1]; r1=u32 base_slot_idx [0..4]; r2=u32 slot_offset [0..4]. "
+        "Returns u32 (0x800=can activate, 0=cannot). Read-only. "
+        "Constants: state_base=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080a3ae8", "scan_equip_activation_for_player",
+        "Scan all field equip slots for player and return 1 if any activatable slot exists. "
+        "Init: writes player_side bit0 to [0x0201e4d0] byte0, player<<8 bitmask to dword, "
+        "byte[0x12]|=0x2, byte[0x8]:=0. "
+        "Double loop player=[0..1] x slot=[0..4]: call check_equip_slot_can_activate_with_context(p,s,0); "
+        "hit -> return 1 immediately. "
+        "All fail: if r10==0 and count_available_monster_slots(player)==0 -> return 0; else return 1. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=activatable slot exists, 0=none). "
+        "Side-effects: [0x0201e4d0+0x0] byte:=player_side; [0x0201e4d0] dword bits[23:8]:=player<<8; "
+        "[0x0201e4d0+0x12] byte|=0x02; [0x0201e4d0+0x8] byte:=0. "
+        "Constants: state_base=0x0201e4d0, player_stride=0x868, ff8000ff_mask=0xff8000ff."),
+    ("FUN_080312ec", "find_slot_idx_by_card_id_in_player_zones",
+        "Linear scan gDuelFieldSlots[side*0x868+slot*0x14] for card_id match; return slot index or -1. "
+        "Entry: r0=player_side (bit0), r1=card_id. "
+        "Extracts zone_type (lsls #2/lsrs #0x18) and side_bit (lsls #0x12/lsrs #0x1f) per slot; "
+        "match bits[12:0]==r1 -> return slot_idx. "
+        "Not found -> return -1 (rsbs). "
+        "indeg=21; used by duel_field hub to locate card slot index by card_id. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns s32 slot_index [0..count-1] or -1. Read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14."),
+    ("FUN_080a3b50", "get_equip_activation_mode_by_card_id",
+        "Pure leaf: map card_id to equip activation mode_code. "
+        "card_id==0x17c6 -> return 2; card_id==0x19a5 -> return 3; else -> return 1. "
+        "Result written by caller scan_equip_activation_with_mode to [0x0201e4d0+8]. "
+        "r0=u16 card_id [0..0x1fff]. Returns u8 mode_code [1..3]. Leaf, pure read-only. "
+        "Constants: card_id_mode2=0x17c6, card_id_mode3=0x19a5."),
+    ("FUN_080a3b74", "scan_equip_activation_with_mode",
+        "scan_equip_activation_for_player precise variant with extra card_id mode initialization. "
+        "Entry: call get_equip_activation_mode_by_card_id(r1) -> mode_code; "
+        "write to [0x0201e4d0]: byte0:=player_side, dword bits[23:8]:=player<<8, "
+        "byte[0x12]|=0x2, byte[0x8]:=mode_code. "
+        "Double loop player=[0..1] x slot=[0..4]: call check_equip_slot_pair_can_activate_full(p,s,s_off); "
+        "hit and player==r7 and slot<=4: call check_slot_placement_blocked_by_field_effect; "
+        "pass -> r9:=1. Any slot: r6-- (available count). "
+        "Final: r6<=0 and r10==0 and count_available_monster_slots==0 -> return 0; else return 1. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 bool (1=activatable, 0=not). "
+        "Side-effects: [0x0201e4d0+0x0/0x12/0x8] written as described. "
+        "Constants: state_base=0x0201e4d0, mask=0xff8000ff."),
+    ("FUN_080a3d74", "check_banisher_pair_activation_allowed",
+        "Check if banisher card pair can be activated for player. "
+        "Guard 1: count_field_copies_of_card(0x1332)>0 -> return 0 (Banisher already on field). "
+        "Guard 2: count_valid_monster_pair_slots(player, 0x15a3)==0 -> return 0 (Ectoplasmer absent). "
+        "Then: call scan_activatable_equip_slots_alt; return its result. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=allowed, 0=blocked). "
+        "confidence: med (indirect scan via scan_activatable_equip_slots_alt). "
+        "Constants: banisher_card_id=0x1332, pair_card_id=0x15a3."),
+    ("FUN_080a4af4", "eval_equip_target_slot_flags",
+        "Large equip target slot flag evaluator; reads gDuelFieldSlots[slot_idx] card_id and "
+        "checks multiple special card IDs to determine activation flags. "
+        "Paths: LAB_080a50b0 -> scan_equip_activation_for_player(player); "
+        "LAB_080a50ba -> scan_equip_activation_with_mode(player, card_id). "
+        "Various card_id checks (0x112e/0x128c/0x1758/0x1895/0x19a6) dispatch specialized sub-checks; "
+        "each success writes [gDuelFieldSlots+0x1d78] phase code (0x10/0x11/0x17). "
+        "Returns r7=accumulated activation flags. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, duel_phase_code_offset=0x1d78, "
+        "set_code_sphinx=0x112e, set_code_sphinx_teleia=0x128c, set_code_ra=0x1758."),
+    ("FUN_08095fe0", "eval_spell_activation_flags_by_zone",
+        "Large equip/spell card activation condition evaluator; dispatches by equip_type (field6). "
+        "Entry: reads gDuelFieldSlots[player][slot] card_id; checks active_player (duel_state+4) bit0 XOR player; "
+        "mismatch -> return 0. "
+        "check_card_targeted_by_spell_zone_effect: hit -> [gDuelFieldSlots+0x1c58]:=0x10. "
+        "check_lp_exceeds_spell_copy_threshold: hit -> [gDuelFieldSlots+0x1c58]:=0x17. "
+        "Reads [state+0x1bd4] zone_phase_code; code==3 -> LAB_080961a8; "
+        "code==2/4 -> get_card_extended_stat_field6 -> equip_type dispatch: "
+        "0x16 -> check_field_spell_placement_allowed -> invoke_equip_zone_activation_check -> "
+        "check_zone_has_no_field_spell_node -> check_field_spell_b_placeable; "
+        "0x17 -> check_field_spell_placement_allowed -> invoke_equip_zone_activation_check; "
+        "else -> check_card_has_equip_placement_type -> eval_equip_target_slot_flags. "
+        "Tail: check_card_is_equip_set_c -> invoke_equip_zone_activation_check; "
+        "check_card_field5_is_nonzero + check_value_in_slot_chain(0x1407) Non-Aggression guard. "
+        "indeg=1. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..10]; r2=u32 result_ptr. "
+        "Returns u32 flags (0=cannot activate; nonzero=condition met). "
+        "Side-effects: [gDuelFieldSlots+0x1c58]:=0x10/0x17; [gDuelFieldSlots+0x1d78]:=0x0c/0x0d/0x0f. "
+        "Constants: gDuelFieldSlots=0x0201c510, duel_state=0x0201e2a0, equip_type_A=0x16, equip_type_B=0x17."),
+    ("FUN_0804ae2c", "check_card_stat_field8_is_8",
+        "Bool wrapper: get_card_extended_stat_field8(card_id)==8 -> return 1; else -> return 0. "
+        "Sibling cluster: check_card_stat_field8_is_6 (0x0804ae04), FUN_0804ae18 (==7). "
+        "indeg=3. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=field8==8, 0=not). Leaf."),
+    ("FUN_0809058c", "check_card_has_activatable_effect_node",
+        "Stack-allocates 0x18-byte context, writes card_id + 0x30 flags, "
+        "calls find_card_effect_node_entry; returns 1 if node found, 0 if not. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool. "
+        "Constants: EFFECT_QUERY_FLAG_ACTIVE_SEARCHABLE=0x30, context_size=0x18."),
+    ("FUN_0804c05c", "check_card_id_is_equip_blocker",
+        "Pure leaf: whitelist {0x149c, 0x1232, 0x1517} -> return 1; else -> return 0. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=equip blocker, 0=not). Leaf, no side-effects. "
+        "Constants: equip_blocker_a=0x149c (Beast Soul Swap), equip_blocker_b=0x1232, equip_blocker_c=0x1517."),
+    ("FUN_0805a3e0", "eval_equip_activation_for_slot",
+        "Context-struct based equip slot activation evaluator. "
+        "Reads card_id/player_side/slot_type from stack context_struct r0; "
+        "calls check_card_has_activatable_effect_node -> check_card_id_is_equip_blocker -> "
+        "check_card_stat_field8_is_8; accumulates flags to [context+2]. "
+        "Writes [gDuelFieldSlots+0x1d78]:=0x04 on inner path. "
+        "r0=ptr context_struct ([+0]=card_id, [+2]={player_side,slot_type}, [+4]=zone_flags). "
+        "Returns u32 bool (1=activatable, 0=blocked). "
+        "Side-effects: [gDuelFieldSlots+0x1d78]:=0x04; [context+2] flags accumulated. "
+        "Constants: gDuelFieldSlots=0x0201c510, duel_phase_code_offset=0x1d78."),
+    ("FUN_0805a280", "setup_equip_context_for_slot_activation",
+        "Assembles 0x18-byte context_struct on stack from gDuelFieldSlots, then delegates activation check. "
+        "Entry: memset 0x18 bytes; reads gDuelFieldSlots[player][slot] card_id low 13 bits -> [sp+0] hword; "
+        "card_id==0 -> return 0. "
+        "Writes r1 bit0 (player_id) to [sp+2] bit0; slot_idx bits<<1 to [sp+2] bits[6:1]; "
+        "zone_type<<1|side_bit to [sp+4] bits[13:6]. "
+        "Checks gDuelFieldSlots[player][slot][+8] active_hword: ==0 -> check_card_zone_activation_blocked; "
+        "!=0 -> eval_equip_activation_for_slot. "
+        "r0=u32 player_side_primary [0..1]; r1=u32 player_id [0..1]; r2=u32 slot_idx [0..4]. "
+        "Returns u32 bool (1=activatable, 0=not). "
+        "Side-effects: [sp..sp+0x18] stack context_struct (destroyed on return). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14."),
+    ("FUN_0805a354", "setup_equip_context_for_zone_activation",
+        "Simplified setup_equip_context_for_slot_activation variant with fixed slot_type=0x16. "
+        "Allocates 0x18-byte stack context, reads gDuelFieldSlots[player][slot] card_id; "
+        "writes player_id bit0, fixed zone_code=0x16 to [sp+2]; passes result_ptr r2 to "
+        "check_card_zone_activation_blocked. "
+        "Called by eval_zone_activation_flags_for_player (0x08096864) on zone 0xb path. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]; r2=u32 result_ptr. "
+        "Returns u32 bool (1=activatable, 0=not). "
+        "Constants: gDuelFieldSlots=0x0201c510, zone_code_fixed=0x16, player_stride=0x868."),
+    ("FUN_0803b738", "read_player_field_slot_word_by_zone",
+        "Jump-table dispatch on zone_type [0xb..0xf]: returns gDuelFieldSlots[side*0x868+fixed_offset] word. "
+        "zone 0xb->offset 0x18, 0xc->0x10, 0xd->0x14, 0xe->0x1c, 0xf->0x0c. "
+        "Default path: zone_type*20 offset, extracts card_id low 13 bits, returns 1 if nonzero else 0. "
+        "r0=u32 player_side [0..1]; r1=u32 zone_type [0xb..0xf]; r2=u32 slot_offset [0..4]. "
+        "Returns u32 slot_word or 1/0. Read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "zone_0xb_off=0x18, zone_0xc_off=0x10, zone_0xd_off=0x14, zone_0xe_off=0x1c, zone_0xf_off=0x0c."),
+    ("FUN_080968f4", "check_zone_slot_card_activatable",
+        "Calls read_player_field_slot_word_by_zone; zone 0xd/0xc checks [gLP+0x1d00]; "
+        "zones 0xe/0xf -> return 2. Returns mode_code: 0=blocked, 2=activatable. "
+        "r0=u32 player_side [0..1]; r1=u32 zone_type [0xb..0xf]; r2=u32 slot_offset [0..4]. "
+        "Returns u32 mode_code (0=blocked, 2=activatable). Read-only. "
+        "Constants: DUEL_ACTIVATION_FLAG_OFFSET=0x1d00, MODE_ACTIVATABLE=2, "
+        "gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_08096864", "eval_zone_activation_flags_for_player",
+        "Evaluates zone_type r2 activation flags for player r0/r1. "
+        "zone 0xb: LP threshold guard + setup_equip_context_for_zone_activation; "
+        "zones [0xc..0xf]: check_zone_slot_card_activatable; "
+        "else: setup_equip_context_for_slot_activation. "
+        "Returns flags (bit3=0x8=zone activatable). "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..10]; r2=u32 zone_type [0xb..0xf or other]. "
+        "Returns u32 flags (0=no activation; 0x8=zone activatable). "
+        "Constants: ACTIVE_ZONE_PLAYER_FIELD_OFFSET=0x1d64, FLAG_ZONE_ACTIVATABLE=0x8, "
+        "gDuelFieldSlots=0x0201c510."),
+    ("FUN_0804ae04", "check_card_stat_field8_is_6",
+        "Bool wrapper: get_card_extended_stat_field8(card_id)==6 -> return 1; else -> return 0. "
+        "Sibling cluster: check_card_stat_field8_is_8 (0x0804ae2c), FUN_0804ae18 (==7). "
+        "indeg=16. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=field8==6, 0=not). Leaf."),
+    ("FUN_08032d1c", "count_equip_set_activatable_slots_for_player",
+        "Count equip zone slots [5..0xa] for player satisfying set_code match. "
+        "Non-APCS: r8=count_accumulator, r9=set_code_guard, r10=target_set_code (all caller-set). "
+        "Loops slot_idx 5..10 (stride 0x14): call get_equip_card_set_code_for_slot(player, slot); "
+        "result>0 and matches guard conditions -> r8++. "
+        "Returns r8 (accumulated count) via r0. "
+        "r0=u32 player_side [0..1]; r8 (non-APCS)=u32 initial_count; "
+        "r9 (non-APCS)=u32 set_code_guard; r10 (non-APCS)=u32 target_set_code. "
+        "Returns u32 count via r0. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot5_card_off=0x64, "
+        "slot5_state_off=0x74, slot_entry_size=0x14."),
 ]
 
 
