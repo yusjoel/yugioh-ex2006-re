@@ -71,6 +71,8 @@ model: sonnet
 | proposal 置信度为 med/low 但无独立"## 置信度 / 升级路径"节，或该节内无可操作路径；或已静态确认的值被标为"待验证" | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (R8=0; 要求 executor 补写独立节并逐项列解决路径; 静态可确认项必须直接写值而非"待验证") |
 | R3 高寄存器被列为参数但函数体实为 push+立即覆盖（callee-save），或高寄存器被列为参数但函数体实际是 push+overwrite（正确应删除该行） | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (Counter-pattern: callee-saved 必须整行删除，不得补范围；verify: 函数体首次 use 是 epilogue restore 而非计算 use) |
 | 函数地址在 0x08038xxx，体 = push+ldr r0,[sp,#0x3c]+bl+b LAB，R4 非 void | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (R4=0; b LAB 无独立 r0 写; void 强制) |
+| R7 form (b) 中 caller addr == 本函数地址（自引用）或 caller addr 为地址相邻 sibling（非真实 bl 关系）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md` (R7=0; 自引用或 sibling 误引均属 mechanical error; reviewer 须验证 addr != self && addr ∈ callgraph callers) |
+| R2 plate 明显超过 500 字（目测 >35 密集行，或 proposal 注明字数超限）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md` (R2=0; 超过 500 字为硬限; 内容质量不作减免) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
