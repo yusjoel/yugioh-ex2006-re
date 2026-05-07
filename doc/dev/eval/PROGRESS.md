@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-20) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-20) |
-| **上次更新** | 2026-05-08 (campaign-19 batch, 340/1526) |
+| **当前步骤** | Step 1 — executor (batch=21 模式, campaign-20) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-21) |
+| **上次更新** | 2026-05-08 (campaign-20 batch, 360/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**340 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**360 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -412,11 +412,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 338 | 456 | 7 | 1 | E | 0x080a3c2c | FUN_080a3c2c | check_banisher_of_light_activatable | 2 | [eval](eval/080a3c2c.md) |
 | 339 | 457 | 7 | 1 | E | 0x080a3dac | FUN_080a3dac | check_equip_set_activatable_for_player | 2 | [eval](eval/080a3dac.md) |
 | 340 | 458 | 8 | 29 | C | 0x0803bc24 | FUN_0803bc24 | check_spell_zone_slot_placeable | 1 | [eval](eval/0803bc24.md) |
+| 341 | 459 | 8 | 2 | E | 0x080a422c | FUN_080a422c | classify_spell_card_activation_type | 1 | [eval](eval/080a422c.md) |
+| 342 | 460 | 7 | 1 | E | 0x0808da68 | FUN_0808da68 | find_effect_record_index_by_id | 1 | [eval](eval/0808da68.md) |
+| 343 | 461 | 6 | 101 | C | 0x0808dab0 | FUN_0808dab0 | dispatch_effect_handler_by_card_id | 1 | [eval](eval/0808dab0.md) |
+| 344 | 462 | 8 | 2 | E | 0x0803bb04 | FUN_0803bb04 | check_field_spell_neo_daedalus_placeable | 1 | [eval](eval/0803bb04.md) |
+| 345 | 463 | 7 | 85 | C | 0x0803bb7c | FUN_0803bb7c | check_field_spell_neo_daedalus_group_placeable | 1 | [eval](eval/0803bb7c.md) |
+| 346 | 464 | 7 | 1 | E | 0x080a42b0 | FUN_080a42b0 | eval_spell_card_activation_placeable | 1 | [eval](eval/080a42b0.md) |
+| 347 | 465 | 8 | 14 | D | 0x08037a2c | FUN_08037a2c | count_valid_monster_pair_slots | 1 | [eval](eval/08037a2c.md) |
+| 348 | 466 | 7 | 1 | E | 0x080a3eb4 | FUN_080a3eb4 | eval_equip_card_placeable_for_player | 1 | [eval](eval/080a3eb4.md) |
+| 349 | 467 | 8 | 1 | E | 0x08032fa4 | FUN_08032fa4 | count_unpaired_slots_for_card | 1 | [eval](eval/08032fa4.md) |
+| 350 | 468 | 7 | 1 | E | 0x080a4134 | FUN_080a4134 | check_ritual_fusion_pairable_slots_exist | 1 | [eval](eval/080a4134.md) |
+| 351 | 469 | 7 | 1 | E | 0x080a40bc | FUN_080a40bc | check_equip_target_monster_placeable | 1 | [eval](eval/080a40bc.md) |
+| 352 | 470 | 7 | 16 | D | 0x080339d8 | FUN_080339d8 | count_equippable_slots_for_card | 1 | [eval](eval/080339d8.md) |
+| 353 | 471 | 7 | 1 | E | 0x080a3fc8 | FUN_080a3fc8 | eval_equip_card_multi_target_placeable | 1 | [eval](eval/080a3fc8.md) |
+| 354 | 472 | 8 | 4 | E | 0x0803b1a4 | FUN_0803b1a4 | resolve_best_target_slot_for_equip | 1 | [eval](eval/0803b1a4.md) |
+| 355 | 473 | 7 | 1 | E | 0x080a43c8 | FUN_080a43c8 | eval_spell_equip_target_availability | 1 | [eval](eval/080a43c8.md) |
+| 356 | 474 | 7 | 6 | D | 0x08032ccc | FUN_08032ccc | count_equipped_paired_slots_for_player | 1 | [eval](eval/08032ccc.md) |
+| 357 | 475 | 8 | 1 | E | 0x080a80a8 | FUN_080a80a8 | check_slot_equip_target_eligible | 1 | [eval](eval/080a80a8.md) |
+| 358 | 476 | 7 | 1 | E | 0x080a4058 | FUN_080a4058 | init_spell_activation_context | 1 | [eval](eval/080a4058.md) |
+| 359 | 477 | 9 | 1 | E | 0x0804b350 | FUN_0804b350 | check_card_id_in_fusion_target_range | 1 | [eval](eval/0804b350.md) |
+| 360 | 478 | 7 | 4 | E | 0x0802f1f8 | FUN_0802f1f8 | count_slot_chain_copies_of_card | 1 | [eval](eval/0802f1f8.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #20 PASSED** — duel core spell/equip activation eval cluster (dispatch_effect_handler_by_card_id indeg=101 + check_field_spell_neo_daedalus_group_placeable indeg=85 + classify_spell_card_activation_type BST + find_effect_record_index_by_id binary search + eval_spell_card_activation_placeable + count_valid_monster_pair_slots r8 non-APCS + eval_equip_card_placeable_for_player r10 non-APCS + count_unpaired_slots_for_card + check_ritual_fusion_pairable_slots_exist + check_equip_target_monster_placeable + count_equippable_slots_for_card r10 non-APCS + eval_equip_card_multi_target_placeable r8 non-APCS + resolve_best_target_slot_for_equip wrapper + eval_spell_equip_target_availability + count_equipped_paired_slots_for_player r8/r10 non-APCS + check_slot_equip_target_eligible r12 non-APCS + init_spell_activation_context gSpellContext init + check_card_id_in_fusion_target_range BST + count_slot_chain_copies_of_card); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (360/1526 = 23.59%)
 - 2026-05-08: **batch=20 #19 PASSED** — duel field equip activation/scan cluster (eval_card_placement_flags_for_ai/default sibling + scan_activatable_equip_slots init/alt + Toon World/Banisher of Light named card activation check + check_spell_zone_slot_placeable indeg=29) + monster slot/equip slot BST classifiers; 1 fix iter (3 NEEDS_FIX: 2 R1 bare hex card_id -> card name + 1 R3 internal working register mislabeled caller-set); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (340/1526 = 22.28%)
 - 2026-05-08: **batch=20 #18 PASSED** — duel field equip/placement validator chain (slot equip eligibility indeg=53 + count_monster_slots indeg=73 + field_spell_b_placeable + field_spell_group_placeable + monster_slot_accepts_card + first_placeable_monster_slot 兄弟 + equip_lock effect ID 标签); 1+1 fix iter (5 R7 caller addr 自引用/缺 +1 R6 + 2 R2 plate 字数 + 2 R6 0xb FIELD_SPELL_ZONE); first-shot 15/20; 跨过 20% 里程碑 (320/1526 = 20.97%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.
 - 2026-05-08: **batch=20 #17 PASSED** — duel field placement/equip activation chain (slot placement blocker indeg=40 + monster slot finder indeg=28 + equip card target + activation dispatch + field spell allowed + equip set _c sibling + apply_card_equip_activation + check_card_zone_activation_blocked + invoke_equip_zone_activation_check) + field slot display update + zone descriptor resolver + find_card_effect_node_entry + dispatch_card_effect_activation; 1 fix iter (3 NEEDS_FIX: R7 caller addr placeholder + R3 player_id mislabeled card_id + R3 r3 internal sp clobber + R7 self-reference); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (300/1526 = 19.66%)

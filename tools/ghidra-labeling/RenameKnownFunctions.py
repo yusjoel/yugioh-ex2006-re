@@ -5340,6 +5340,156 @@ RENAMES = [
         "Side-effects: play_ui_effect(0x31)/play_ui_effect(0x32) triggered conditionally. "
         "Constants: count_available_effect_zones_param=0x1480, guard_card_id=0x159d, "
         "gP1LifePoints=0x0201c4e0, ui_sfx_occupied=0x31, ui_sfx_blocked=0x32."),
+
+    # --- batch #20 (campaign-20, 2026-05-08) duel core spell/equip activation eval cluster ---
+    ("FUN_080a422c", "classify_spell_card_activation_type",
+        "Maps card_id to spell activation type code: 0=normal/unsupported, 1=equip, 2=field_spell, "
+        "3=special_field. Multi-branch BST; key boundaries 0x16c6/0x1487/0x16cb/0x18b4/0x19ca. "
+        "Leaf function, bx lr exit. "
+        "r0=u16 card_id [0..0x1fff]. Returns u8 activation_type [0..3]."),
+    ("FUN_0808da68", "find_effect_record_index_by_id",
+        "Binary search on ROM effect record table (0x09e5a128, 0x132 entries, 8 bytes each) "
+        "for effect_id (r0). Returns table index [0..0x131] if found, -1 if not found. "
+        "r0=u16 effect_id. Returns s32 index (-1=not found). Leaf, pure read-only. "
+        "Constants: table_base=0x09e5a128, entry_count=0x132, entry_size=8."),
+    ("FUN_0808dab0", "dispatch_effect_handler_by_card_id",
+        "Look up card_id (r1) in ROM effect record table (0x09e5a128); read fn ptr at [+4]; "
+        "call via FUN_0810e5d4 trampoline. Clears gEffectContext+0xc before call; "
+        "reads that field as return value after. "
+        "100+ callsites; central spell/trap effect dispatch entry. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 handler_result (from gEffectContext+0xc). "
+        "Side-effects: gEffectContext+0xc cleared then written by handler. "
+        "Constants: effect_table=0x09e5a128, gEffectContext=0x0201e4f0, result_field_offset=0xc."),
+    ("FUN_0803bb04", "check_field_spell_neo_daedalus_placeable",
+        "Check whether player (r0) can place Neo Daedalus family field spell. "
+        "Checks gP1LifePoints[side*0x868+0x11c] bit21; count_field_copies_of_card(0x147f/0x12b1) > 0 -> 0; "
+        "check_slot_has_node_by_card_id(player, 0xb, 0x15ad) nonzero -> 0; "
+        "find_effect_node_in_zone(player, 0xb, 0x1679, 1) nonzero -> 0. All pass -> return 1. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=placeable, 0=blocked). "
+        "Constants: FIELD_SPELL_ZONE=0xb, gP1LifePoints+0x11c=field_state_word."),
+    ("FUN_0803bb7c", "check_field_spell_neo_daedalus_group_placeable",
+        "Check whether player (r0) can place Neo Daedalus field spell group card. "
+        "count_available_effect_zones(player, 0x13ff, -1) nonzero -> return 0; "
+        "else call check_field_spell_neo_daedalus_placeable and forward result. "
+        "85 callsites; core gate for duel field spell activation. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=placeable, 0=blocked). "
+        "Constants: effect_zone_id=0x13ff, FIELD_SPELL_ZONE=0xb."),
+    ("FUN_080a42b0", "eval_spell_card_activation_placeable",
+        "Comprehensive check whether player (r0) can activate spell card (r1=card_id). "
+        "Steps: classify_spell_card_activation_type -> check_value_in_slot_chain(0x14a0) -> "
+        "check_field_spell_neo_daedalus_group_placeable -> check_spell_zone_slot_placeable -> "
+        "count_available_monster_slots; dispatches loop or dispatch_effect_handler_by_card_id. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 bool (1=activatable, 0=blocked). "
+        "Constants: chain_check_id=0x14a0, player_stride=0x868, gDuelFieldSlots=0x0201c510."),
+    ("FUN_08037a2c", "count_valid_monster_pair_slots",
+        "Count monster zone slots for player (r0) satisfying check_card_pair_allowed. "
+        "r8=target_card_id is non-APCS caller-set implicit input. "
+        "Iterates [gP1LifePoints+side*0x868+0xc] monster slots; lsls/lsrs #19 extracts card_id. "
+        "r0=u32 player_side [0..1]; r8 (non-APCS, caller-set)=u16 target_card_id [0..0x1fff]. "
+        "Returns u32 count [0..5]. Pure read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, monster_count_offset=0xc, slot_entry=0x14."),
+    ("FUN_080a3eb4", "eval_equip_card_placeable_for_player",
+        "Evaluate whether player (r0) can activate equip spell (r10=equip_card_id, non-APCS). "
+        "count_available_monster_slots -> count_field_copies_of_card(0x13f2) > 0 -> return 0; "
+        "dual-side 5-slot loop check_slot_card_can_be_equipped + check_slot_placement_blocked_by_field_effect; "
+        "call count_valid_monster_pair_slots for pairing check. "
+        "r0=u32 player_side [0..1]; r10 (non-APCS, caller-set)=u16 equip_card_id [0..0x1fff]. "
+        "Returns u32 bool (1=placeable, 0=blocked). "
+        "Constants: lockdown_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_08032fa4", "count_unpaired_slots_for_card",
+        "Count player (r0) slots 0..10 satisfying check_slot_card_pair_allowed "
+        "AND find_paired_zone_entry_for_card==0 (unpaired). "
+        "Used to evaluate available unpaired target slots before ritual/fusion activation. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 count [0..10]. Pure read-only. "
+        "Constants: slot_range=[0..10], player_stride=0x868."),
+    ("FUN_080a4134", "check_ritual_fusion_pairable_slots_exist",
+        "Check whether player (r0) field has unpaired slots for ritual/fusion card (r1=card_id). "
+        "Branches on card_id (0x15f9/0x15fa/0x15fb/0x15b0/0x15b3/0x15b4/0x1947/0x194b/0x1953/0x1954) "
+        "and calls count_unpaired_slots_for_card once or twice; any nonzero -> return 1. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 bool (1=pairable slot exists, 0=none)."),
+    ("FUN_080a40bc", "check_equip_target_monster_placeable",
+        "Check whether player (r0) can place equip spell on a target monster slot. "
+        "gP1LifePoints+0x11c bit17 equip lock -> check_value_in_slot_chain(0xb, 0x12f3) nonzero -> return 0; "
+        "count_field_copies_of_card(0x13f2) > 0 -> return 0; "
+        "5-slot loop check_slot_card_can_be_equipped; r7 > 1 -> return 1. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=can place, 0=blocked). "
+        "Constants: FIELD_SPELL_ZONE=0xb, lock_chain_id=0x12f3, lockdown_card_id=0x13f2."),
+    ("FUN_080339d8", "count_equippable_slots_for_card",
+        "Count across both players' 5 monster slots satisfying check_slot_card_can_be_equipped "
+        "for equip_card_id (r0). r10=slot_key non-APCS (encodes (player_byte<<8)|slot_byte, exclude self); "
+        "result accumulated in r8. "
+        "Pre-check: count_field_copies_of_card(0x13f2) > 0 -> return 0. "
+        "r0=u32 equip_card_id [0..0x1fff]; r10 (non-APCS, caller-set)=u32 slot_key. "
+        "Returns u32 count [0..10] via r8. "
+        "Constants: lockdown_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080a3fc8", "eval_equip_card_multi_target_placeable",
+        "Evaluate whether equip spell (r8=equip_card_id, non-APCS) has more than one legal target "
+        "for player (r0). count_equippable_slots_for_card <= 1 -> return 0. "
+        "Dual-layer scan both players' 5 slots: check_slot_card_can_be_equipped + slot[+8] equip check "
+        "+ card type comparison. "
+        "r0=u32 player_side [0..1]; r8 (non-APCS, caller-set)=u16 equip_card_id [0..0x1fff]. "
+        "Returns u32 bool (1=multi-target available, 0=single or none). "
+        "Constants: slot_range=[0..4], player_range=[0..1], gDuelFieldSlots=0x0201c510."),
+    ("FUN_0803b1a4", "resolve_best_target_slot_for_equip",
+        "Thin wrapper: calls resolve_slot_chain_best_target with r2=0 (best_target mode). "
+        "3-instruction function body. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]. "
+        "Returns u32 result_ptr (0=not found; nonzero=best target). "
+        "Constants: mode=0 (best_target resolve mode)."),
+    ("FUN_080a43c8", "eval_spell_equip_target_availability",
+        "Evaluate whether equip spell activation (r0=player, r1=card_id) has legal targets. "
+        "Pre-gates: check_field_spell_neo_daedalus_group_placeable == 0 -> return 0; "
+        "check_spell_zone_slot_placeable == 0 -> return 0. "
+        "Main path: iterate 5 slots calling resolve_best_target_slot_for_equip; "
+        "r12++ (single target) / r9++ (multi target). "
+        "Monster slot path: dispatch_effect_handler_by_card_id x2 (mode 0/1). "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 bool (1=target exists, 0=none). "
+        "Constants: FIELD_SPELL_ZONE=0xb, chain_check_id=0x14a0, player_stride=0x868."),
+    ("FUN_08032ccc", "count_equipped_paired_slots_for_player",
+        "Count player (r0) spell zone slots satisfying check_slot_card_pair_allowed "
+        "AND slot[+8] nonzero (equipped). "
+        "r8=slot_count_upper non-APCS (loop upper bound); r10=target_card_id non-APCS. "
+        "Iterates slots 0..9. "
+        "r0=u32 player_side [0..1]; r8 (non-APCS)=u32 slot_count_upper; "
+        "r10 (non-APCS)=u16 target_card_id [0..0x1fff]. "
+        "Returns u32 count [0..9]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_equip_offset=0x8."),
+    ("FUN_080a80a8", "check_slot_equip_target_eligible",
+        "Check whether monster slot (r12=base_slot_idx, non-APCS) is a valid equip target for player (r0). "
+        "Reads gSpellContext+0 (0x0201e4d0) bit0 (player_bit) and extracts equip_card_id; "
+        "gSpellContext+8 == 0: BST on equip_card_id to get expected field7, compare via "
+        "get_card_extended_stat_field7; triple filter: check_slot_zone_bit_eligible + "
+        "count_available_monster_slots + check_slot_placement_blocked_by_field_effect. "
+        "Pass -> return 0x800 (valid flag). "
+        "r0=u32 player_side [0..1]; r12 (non-APCS, caller-set)=u32 base_slot_idx [0..4]. "
+        "Returns u32 (0x800=eligible, 0=not). "
+        "Constants: gSpellContext=0x0201e4d0, gDuelFieldSlots=0x0201c510, valid_return=0x800."),
+    ("FUN_080a4058", "init_spell_activation_context",
+        "Initialize spell activation context (gSpellContext=0x0201e4d0) for player (r0). "
+        "Writes player_side to bit0, card_id to bits[22:8], sets bit1 of [+0x12], clears [+0x8]. "
+        "Loops slots 0..4 calling check_slot_equip_target_eligible; any nonzero -> return 1. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Returns u32 bool (1=eligible slot found, 0=none). "
+        "Side-effects: gSpellContext fields updated. "
+        "Constants: gSpellContext=0x0201e4d0, player_bit=bit0, slot_range=[0..4]."),
+    ("FUN_0804b350", "check_card_id_in_fusion_target_range",
+        "Check whether card_id (r0; entry adds r1,r0,#0 captures it) is in fusion target ID ranges. "
+        "BST ranges: [0x17c7..0x17c9], single 0x152e, [0x18b2..0x18b3]. "
+        "Leaf function, bx lr. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=in fusion target range, 0=not). "
+        "Constants: range1=[0x17c7..0x17c9], single=0x152e, range2=[0x18b2..0x18b3]."),
+    ("FUN_0802f1f8", "count_slot_chain_copies_of_card",
+        "Count nodes in slot (r0=player, r1=slot_idx) equip chain matching card_id (r2). "
+        "Reads [slot+0xa] chain head; traverses nodes; zone_type_byte > 5 -> skip; "
+        "reverse-lookup gDuelFieldSlots card_id and compare to r2; match -> r5++. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..11]; r2=u16 target_card_id [0..0x1fff]. "
+        "Returns u32 count [0..chain_len]. Pure read-only. "
+        "Constants: gDuelFieldSlots=0x0201c510, node_pool=0x0201D9C0, player_stride=0x868."),
 ]
 
 

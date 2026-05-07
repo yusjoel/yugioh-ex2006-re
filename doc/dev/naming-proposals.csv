@@ -349,7 +349,7 @@ address,name,proposed_name,score,tags
 0x0802ef84,FUN_0802ef84,,,
 0x0802f0d8,FUN_0802f0d8,,,
 0x0802f14c,FUN_0802f14c,,,
-0x0802f1f8,FUN_0802f1f8,,,
+0x0802f1f8,count_slot_chain_copies_of_card,,,
 0x0802f27c,count_zone_chain_eligible_cards,,,
 0x0802f394,count_equip_chain_default_flags,,,
 0x0802f3a8,query_zone_chain_count_with_eligibility,,,
@@ -459,7 +459,7 @@ address,name,proposed_name,score,tags
 0x08032bc8,count_paired_slots_with_field5,,,
 0x08032c94,count_paired_slots_with_field5_default,,,
 0x08032ca4,count_paired_slots_both_sides,,,
-0x08032ccc,FUN_08032ccc,,,
+0x08032ccc,count_equipped_paired_slots_for_player,,,
 0x08032d1c,FUN_08032d1c,,,
 0x08032dac,FUN_08032dac,,,
 0x08032e20,count_equip_slots_meeting_atk_threshold,,,
@@ -468,7 +468,7 @@ address,name,proposed_name,score,tags
 0x08032f00,FUN_08032f00,,,
 0x08032f6c,FUN_08032f6c,,,
 0x08032f7c,FUN_08032f7c,,,
-0x08032fa4,FUN_08032fa4,,,
+0x08032fa4,count_unpaired_slots_for_card,,,
 0x08032fd8,FUN_08032fd8,duel_field_08032fd8,3,duel_field
 0x08033088,check_toon_world_equip_present,,,
 0x0803309c,count_active_slots_with_field6_value,,,
@@ -491,7 +491,7 @@ address,name,proposed_name,score,tags
 0x08033730,check_slot_card_can_be_equipped,,,
 0x080337f0,check_equip_cards_share_field7,,,
 0x080338b8,count_equip_placements_with_chain_check,,,
-0x080339d8,FUN_080339d8,,,
+0x080339d8,count_equippable_slots_for_card,,,
 0x08033a6c,FUN_08033a6c,,,
 0x08033b08,FUN_08033b08,,,
 0x08033b18,FUN_08033b18,,,
@@ -565,7 +565,7 @@ address,name,proposed_name,score,tags
 0x08037904,FUN_08037904,,,
 0x08037974,FUN_08037974,duel_field_08037974,3,duel_field
 0x080379d0,FUN_080379d0,duel_field_080379d0,3,duel_field
-0x08037a2c,FUN_08037a2c,duel_field_08037a2c,3,duel_field
+0x08037a2c,count_valid_monster_pair_slots,,,duel_field
 0x08037a8c,FUN_08037a8c,duel_field_08037a8c,3,duel_field
 0x08037ae4,FUN_08037ae4,duel_field_08037ae4,3,duel_field
 0x08037b34,FUN_08037b34,duel_field_08037b34,3,duel_field
@@ -595,7 +595,7 @@ address,name,proposed_name,score,tags
 0x0803abf0,get_slot_card_state_code,,,
 0x0803ac04,query_slot_card_state_code,,,
 0x0803aed0,resolve_slot_chain_best_target,,,
-0x0803b1a4,FUN_0803b1a4,,,
+0x0803b1a4,resolve_best_target_slot_for_equip,,,
 0x0803b1b0,compute_slot_zone_eligibility_mask,,,
 0x0803b230,check_slot_zone_bit_eligible,,,
 0x0803b2b4,get_zone_slot_ptr,,,
@@ -612,8 +612,8 @@ address,name,proposed_name,score,tags
 0x0803b980,check_field_spell_group_placeable,,,
 0x0803b9f4,check_field_spell_card_placeable_strict,,,
 0x0803ba98,FUN_0803ba98,,,
-0x0803bb04,FUN_0803bb04,,,
-0x0803bb7c,FUN_0803bb7c,,,
+0x0803bb04,check_field_spell_neo_daedalus_placeable,,,
+0x0803bb7c,check_field_spell_neo_daedalus_group_placeable,,,
 0x0803bba4,FUN_0803bba4,,,
 0x0803bc24,check_spell_zone_slot_placeable,,,
 0x0803bc58,FUN_0803bc58,,,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
@@ -900,7 +900,7 @@ address,name,proposed_name,score,tags
 0x0804b1f0,FUN_0804b1f0,,,
 0x0804b2dc,FUN_0804b2dc,,,
 0x0804b30c,check_card_id_is_special_summon_type,,,
-0x0804b350,FUN_0804b350,,,
+0x0804b350,check_card_id_in_fusion_target_range,,,
 0x0804b388,FUN_0804b388,,,
 0x0804b4f4,get_card_field_summon_restriction,,,
 0x0804b81c,get_card_special_group_code,,,
@@ -1587,8 +1587,8 @@ address,name,proposed_name,score,tags
 0x08087cf0,FUN_08087cf0,,,
 0x0808d7f4,FUN_0808d7f4,,,
 0x0808d88c,FUN_0808d88c,,,
-0x0808da68,FUN_0808da68,,,
-0x0808dab0,FUN_0808dab0,,,
+0x0808da68,find_effect_record_index_by_id,,,
+0x0808dab0,dispatch_effect_handler_by_card_id,,,
 0x0808daf0,FUN_0808daf0,,,
 0x0808db90,FUN_0808db90,,,duel_field
 0x0808dc48,FUN_0808dc48,,,
@@ -1972,14 +1972,14 @@ address,name,proposed_name,score,tags
 0x080a3d0c,scan_activatable_equip_slots_alt,,,
 0x080a3d74,FUN_080a3d74,,,duel_field
 0x080a3dac,check_equip_set_activatable_for_player,,,
-0x080a3eb4,FUN_080a3eb4,,,duel_field
-0x080a3fc8,FUN_080a3fc8,,,
-0x080a4058,FUN_080a4058,,,
-0x080a40bc,FUN_080a40bc,,,
-0x080a4134,FUN_080a4134,,,
-0x080a422c,FUN_080a422c,,,
-0x080a42b0,FUN_080a42b0,,,
-0x080a43c8,FUN_080a43c8,,,
+0x080a3eb4,eval_equip_card_placeable_for_player,,,duel_field
+0x080a3fc8,eval_equip_card_multi_target_placeable,,,
+0x080a4058,init_spell_activation_context,,,
+0x080a40bc,check_equip_target_monster_placeable,,,
+0x080a4134,check_ritual_fusion_pairable_slots_exist,,,
+0x080a422c,classify_spell_card_activation_type,,,
+0x080a42b0,eval_spell_card_activation_placeable,,,
+0x080a43c8,eval_spell_equip_target_availability,,,
 0x080a4490,eval_equip_targets_for_card,,,
 0x080a4574,check_equip_slot_has_field_spell_target,,,
 0x080a45f4,check_equip_card_activation_valid,,,
@@ -1998,7 +1998,7 @@ address,name,proposed_name,score,tags
 0x080a5f7c,FUN_080a5f7c,game_str_080a5f7c,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080a6508,FUN_080a6508,card_name_080a6508,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x080a6630,FUN_080a6630,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
-0x080a80a8,FUN_080a80a8,,,
+0x080a80a8,check_slot_equip_target_eligible,,,
 0x080aba8c,FUN_080aba8c,,,
 0x080abb90,FUN_080abb90,,,
 0x080abbd8,FUN_080abbd8,,,
