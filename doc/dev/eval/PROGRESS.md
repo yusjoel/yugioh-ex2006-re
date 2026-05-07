@@ -15,6 +15,12 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 启动 4-agent loop (executor → reviewer → fixer → lesson-keeper) 处理 batch.json 中的全部函数,
 单 Ghidra session + 单 build + 单 sha1 verify, byte-identical 通过后自动 commit, 进入下一 batch。
 
+**强制单 call 模式 (token 经济优先, 不在意 wall-clock)**:
+  - executor: 1 个 sub-agent 一次性产出 batch 全部 20 份 proposal (禁止拆分 4×5 并行)
+  - reviewer: 1 个 sub-agent 一次性评 20 份 (禁止拆分)
+  - fixer iter (NEEDS_FIX): 1 个 sub-agent 处理本批所有 NEEDS_FIX
+  - 拆分并行会导致 skill/feedback/asm 上下文重复加载, 实测 ~3× token 浪费, 收益仅 wall-clock
+
 任何函数失败 (byte-identical ❌ / MAX_ITER / agent 求助 / 无法命名) → 不停下询问:
   1. 在 PROGRESS.md "失败追踪" 段记录 (ADDR, reason, date)
   2. 该函数标 ⚠ FAIL 于函数列表对应行
