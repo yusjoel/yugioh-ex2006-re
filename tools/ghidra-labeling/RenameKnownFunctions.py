@@ -4136,6 +4136,199 @@ RENAMES = [
         "Side-effect: [0x020230c4..] rewritten with fresh zone effect buff values. "
         "Constants: gPageState=0x02023130, render_state_offset=0x210, "
         "effect_buff_cache=0x020230c4."),
+    # 2026-05-08: BATCH campaign-13 (duel field count/cost util cluster)
+    ("FUN_0802f5b0", "find_equip_chain_node_by_slot_pair",
+        "In the equip chain of slot (r0 bit0=player_side, r1=slot_idx), find a node that matches "
+        "r2=ref_player and r3=ref_slot. "
+        "Flow: read gDuelFieldSlots[player][slot]+0xa = chain_head_index; return 0 if chain empty. "
+        "Traverse gDuelNodePool (0x0201d9c0, stride 8): [node+0]=byte(ref_player), "
+        "[node+0 high>>8]=byte(ref_slot), [node+2]&0xF=zone_type <= 5 (valid zone). "
+        "Hit: return packed(zone_type<<28 | zone_idx<<16); end of chain: return 0. "
+        "Caller FUN_0802f680 calls this for all 2x11 slots to find a paired node. "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, player_stride=0x868, "
+        "slot_entry_size=0x14, chain_head_offset=0xa, node_stride=8, zone_type_max=5."),
+    ("FUN_0802f680", "find_equip_chain_pair_across_field",
+        "Search entire duel field (2 players x 10 slots) for a paired equip chain node "
+        "matching (r0=player_side, r1=slot_idx). "
+        "Flow: outer r5=0..1 (player), inner r4=0..10 (slot index); call "
+        "find_equip_chain_node_by_slot_pair(r5, r4, r0, r1) for each slot; "
+        "hit: return packed zone descriptor immediately. "
+        "Not found after all slots: return DAT=0x0000ffff (sentinel). "
+        "Purpose: check if given slot already has a paired node in another slot's equip chain. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_count_per_player=11, sentinel_not_found=0x0000ffff."),
+    ("FUN_08032bc8", "count_paired_slots_with_field5",
+        "Count slots on player's field satisfying paired+field5-nonzero conditions. "
+        "Path A (check_card_field5_is_nonzero != 0): scan monster zone (slots 0..4), "
+        "skip r9-specified slot, call check_slot_card_pair_allowed(player, slot, r2, r10) "
+        "and [slot+0x8]!=0 -> count++. "
+        "Path B (check_card_field5_is_nonzero == 0): scan trap zone (slots 5..10), "
+        "skip r9-specified slot, check active bit + card_id>0 + [slot+0x10]>>1 bit clear "
+        "+ card_id==r8 -> count++. "
+        "Non-APCS inputs: r8=card_id_filter (caller-set); r9=skip_slot (caller-set); "
+        "r10=equip_ref (caller-set, passed to check_slot_card_pair_allowed). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry_size=0x14, monster_zone=0..4, trap_zone=5..10."),
+    ("FUN_08032c94", "count_paired_slots_with_field5_default",
+        "Default wrapper calling count_paired_slots_with_field5 with r2=-1 (0xFFFFFFFF sentinel). "
+        "Flow: movs r2,1; rsbs r2,r2,0 -> r2=-1 (0xFFFFFFFF); bl count_paired_slots_with_field5; "
+        "return result. r2=-1 means no-filter in check_slot_card_pair_allowed. "
+        "Very high frequency (indeg=27); main entry point for count_paired_slots_with_field5. "
+        "Constants: sentinel_r2=0xFFFFFFFF (produced by rsbs)."),
+    ("FUN_08032e80", "count_monster_slots_by_state",
+        "Count monster zone slots (0..4) for player_side where get_slot_card_state_code "
+        "returns a value equal to r10. "
+        "Flow: r2=(r0&1)*0x868+gDuelFieldSlots; inner r4=0..4; skip if active bit=0 or "
+        "[slot+0x8]=card_id=0; call get_slot_card_state_code(r6, r4); compare low 16 bits to r10; "
+        "match -> r7++. Return r7=matching slot count. "
+        "Non-APCS inputs: r9=slot_filter (caller-set, skip slot where r4==r9); "
+        "r10=target_state_code (caller-set, state code to match). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry_size=0x14, monster_zone_count=5."),
+    ("FUN_08033188", "count_occupied_monster_zones",
+        "Count monster zone slots (0..4) with active bit set (occupied). "
+        "Flow: r1=(r0&1)*0x868; r4=gDuelFieldSlots; for r2=4..0 (5 slots): "
+        "ldr [gDuelFieldSlots+player_stride+r2*0x14]; lsls*0x13 extracts active bit; "
+        "nonzero -> r3++. Return r3=occupied monster slot count. "
+        "Very high frequency (indeg=46); fundamental duel field slot count utility. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry_size=0x14, monster_zone_count=5 (r2=4..0), active_bit_shift=0x13."),
+    ("FUN_080331bc", "count_occupied_monster_zones_with_effect_bonus",
+        "Extend count_occupied_monster_zones by checking gDuelEffectCtx (0x0201bb90) "
+        "for an active effect slot; if matching, add 1 to count. "
+        "Flow: r4=r0 (player_id saved); bl count_occupied_monster_zones(r4) -> r2 (base count); "
+        "read gDuelEffectCtx: [+0x0]=P0_id, [+0x4]=P1_id; "
+        "if P0_id==r4, read [gDuelEffectCtx+0xc4] halfword, active bit set -> r2++; "
+        "same check for P1_id==r4 at offset 0xd8. Return r2=bonus-adjusted occupied count. "
+        "Constants: gDuelEffectCtx=0x0201bb90, ctx_P0_id_offset=0, ctx_P1_id_offset=4, "
+        "ctx_slot_c4_offset=0xc4, ctx_slot_d8_offset=0xd8, active_bit_shift=0x13."),
+    ("FUN_08033214", "count_monster_slots_by_fnptr",
+        "Count monster zone slots (0..4) where r7 function pointer returns nonzero for card_id. "
+        "Flow: r4=player_side*0x868+gDuelFieldSlots+0x8; r5=4 (descending 0..4); "
+        "for each slot: ldrh [slot+0x8]=card_id; skip if 0; ldr [slot+0] extract card_id bits[12:0]; "
+        "bl FUN_0810e5e4 (=bx r7, trampoline calling r7 fnptr, arg r0=card_id); nonzero -> r6++. "
+        "Return r6=matching slot count. "
+        "Non-APCS input: r7=function_ptr (caller-set, executed via FUN_0810e5e4=bx r7 trampoline). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry_size=0x14, monster_zone_count=5 (r5=4..0), "
+        "card_id_offset=0x8, FUN_0810e5e4_trampoline=bx r7."),
+    ("FUN_08033e70", "count_hand_cards_by_field6",
+        "Count hand cards where get_card_extended_stat_field6(card_id) equals r8. "
+        "Flow: read gP1LifePoints+0x14+player_stride = hand count n; return 0 if n==0. "
+        "Hand array base: gP1LifePoints+player*0x868+0x83*8 (=gP1LifePoints+player*0x868+0x418). "
+        "For i=0..n-1: ldr [base+i*4]=card_word; card_id=bits[12:0]; "
+        "call get_card_extended_stat_field6(card_id); compare to r8; hit -> r6++. "
+        "Return r6=matching hand card count. "
+        "Non-APCS input: r8=target_field6_value (caller-set, extended stat field6 value to match). "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "hand_count_offset=0x14, hand_base_offset=0x83*8=0x418."),
+    ("FUN_080370dc", "count_extra_deck_cards_by_id",
+        "Count Extra Deck cards for player_side where card_id equals r6 (=r1 low 16 bits). "
+        "Flow: r6=r1&0xffff (card_id filter); read gP1LifePoints+player*0x868+0x14=hand_count; "
+        "Extra Deck base: gP1LifePoints+player*0x868+0x83*8. "
+        "For i=0..count-1: ldr card_word=[base+i*4]; card_id=bits[12:0]; cmp card_id,r6; "
+        "hit -> r4++. Return r4=matching count. "
+        "Non-APCS note: r1 low 16 bits extracted as card_id filter into r6 at entry "
+        "(lsls r1,r1,0x10; lsrs r6,r1,0x10). "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "extra_deck_count_offset=0x14, extra_deck_base_offset=0x83*8=0x418."),
+    ("FUN_0803730c", "count_hand_cards_with_field5",
+        "Count hand cards where check_card_field5_is_nonzero(card_id) returns true. "
+        "Flow: read gP1LifePoints+player*0x868+0x14=hand_count n; return 0 if n==0. "
+        "Hand base: gP1LifePoints+player*0x868+0x83*8. "
+        "For i=0..n-1: ldr card_word=[base+i*4]; card_id=bits[12:0]; "
+        "bl check_card_field5_is_nonzero(card_id); nonzero -> r6++. "
+        "Return r6=matching hand card count. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "hand_count_offset=0x14, hand_base_offset=0x83*8=0x418."),
+    ("FUN_080373ac", "count_zone_slots_with_card_field5",
+        "Count slots in r9/r8-specified 2D zone table where zone flag is 0x40 or 0x80 "
+        "and check_card_field5_is_nonzero(card_id) returns true. "
+        "r0=player_side [0..1] (bit0, saved to r5); "
+        "Non-APCS r9=player_stride multiplier (caller-set); "
+        "Non-APCS r8=zone array base (caller-set, points to gP1LifePoints+player*r9+0xba*8). "
+        "Inner double loop (player=0..1 x slot=0..count): read zone flag byte; "
+        "==0x40 or ==0x80 -> enter check_card_field5_is_nonzero path; hit -> r6++. "
+        "Return r6=matching slot count. "
+        "Constants: gP1LifePoints=0x0201c4e0, flag_byte_offset=0xf1*8 (0x788), "
+        "zone_flag_A=0x40, zone_flag_B=0x80."),
+    ("FUN_08038a1a", "compute_lp_cost_by_occupied_monster_zones",
+        "Wrap count_occupied_monster_zones_with_effect_bonus and pass result to shared LP cost path. "
+        "Flow: ldr r5=[sp+0x3c] (player_side); subs r0,r6,r5 (compute opponent player side); "
+        "bl count_occupied_monster_zones_with_effect_bonus(r0); "
+        "b LAB_08038d38 (scale by constant and accumulate into r10). "
+        "Case branch of FUN_08037ec0 large LP cost dispatch (entry via b LAB_08038d38). "
+        "Note: subs r0,r6,r5 with r6=1,r5=0->r0=1; r6=0,r5=0->r0=0; computes opponent side. "
+        "Constants: shared_scale_addr=0x08038d38 (count*0xa0=count*160)."),
+    ("FUN_08038c02", "compute_lp_cost_by_hand_field6",
+        "Wrap count_hand_cards_by_field6, scale count by 5 for LP cost, jump to shared scale path. "
+        "Flow: ldr r0=[sp+0x3c] (player_side from caller stack); movs r1,1 (target_field6=1); "
+        "bl count_hand_cards_by_field6; lsls r1,r0,2; adds r1,r1,r0 (r1=count*5); "
+        "b LAB_08038d98 (multiply r1 by 0x4e=78 and store into r10). "
+        "Case branch of FUN_08037ec0 large LP cost dispatch. "
+        "Constants: field6_target=1, lp_scale=5, shared_scale_addr=0x08038d98."),
+    ("FUN_08038d08", "compute_lp_cost_by_extra_deck_card_id",
+        "Wrap count_extra_deck_cards_by_id, scale count by 5 for LP cost, jump to shared scale path. "
+        "Flow: ldr r1,DAT=0x1919 (card_id=0x1919); ldr r0=[sp+0x3c] (player_side); "
+        "bl count_extra_deck_cards_by_id(player, 0x1919); "
+        "lsls r1,r0,2; adds r1,r1,r0 (r1=count*5); "
+        "b LAB_08038d98 (multiply by (0x10-1)*4 and accumulate into r10). "
+        "Case branch of FUN_08037ec0 large LP cost dispatch. "
+        "Constants: card_id_target=0x1919, lp_scale=5, shared_scale_addr=0x08038d98."),
+    ("FUN_08038e00", "compute_lp_cost_by_zone_field5_both_players",
+        "Call count_zone_slots_with_card_field5 for both players, sum results, "
+        "apply LP cost formula (count*5)*0x4e, write to r7[+0x18] and r7[+0x14]. "
+        "Flow: bl count_zone_slots_with_card_field5(0)->r4; "
+        "bl count_zone_slots_with_card_field5(1)->r0; r4+=r0; r1=r4*5; "
+        "r0=(r1*0x10-r1)*4; write to r7[+0x18]; shared path LAB_08038e18 writes r7[+0x14]. "
+        "Case branch of FUN_08037ec0 large LP cost dispatch. "
+        "Constants: lp_scale_a=5, lp_scale_b=0x4e=78 (total factor=count*390)."),
+    ("FUN_0803b4b0", "get_zone_slot_card_ref_by_type",
+        "Read zone slot card reference field by zone_type_code (r1) and return packed value. "
+        "Switch dispatch (r1-0xb, 5 cases): "
+        "0xb: base=0x0201c600+player_side*0x868+r2*4 -> ldr [slot]; "
+        "0xc: base=0x0201c880+player_side*0x868+r2*4 -> ldr [slot]; "
+        "0xd: base=0x0201c740+player_side*0x868+r2*4 -> ldr [slot]; "
+        "0xe: base=0x0201c8f8+player_side*0x868+r2*4 -> ldr [slot]; "
+        "0xf: base=0x0201cab0+player_side*0x868+r2*4 -> ldr [slot]; "
+        "default (r1+r2<=10): base=gDuelFieldSlots+player_side*0x868+(r1+r2)*20 -> ldr [slot]; "
+        "default (r1+r2>10): base=0x0201bc54+player_side*20 -> ldr [slot]. "
+        "Return: packed bits[22..16]<<1 | bit[13] (entity/player reference bits). "
+        "Sibling FUN_0803b5c0 returns [slot+6] u16 for same switch. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "zone_0b=0x0201c600, zone_0c=0x0201c880, zone_0d=0x0201c740, "
+        "zone_0e=0x0201c8f8, zone_0f=0x0201cab0, default_extended=0x0201bc54."),
+    ("FUN_0803b5c0", "get_zone_slot_field6_by_type",
+        "Read [slot+6] u16 field from EWRAM zone table by zone_type_code (r1) and slot_index (r2). "
+        "Logic fully symmetric with get_zone_slot_card_ref_by_type but returns [slot+0x6] halfword. "
+        "Switch dispatch (r1 [0xb..0xf]): r1 in [0xb..0xf] -> shared path; "
+        "r1>0xf or <0xb -> return 0; "
+        "r1+r2>10: read 0x0201bc54+player*20 -> ldrh [+6]; "
+        "r1+r2<=10: gDuelFieldSlots+player*0x868+(r1+r2)*20 -> ldrh [+6]. "
+        "Return: r0=u16 zone_slot_field6 (0=invalid zone_type or empty slot). "
+        "Sibling get_zone_slot_card_ref_by_type reads [slot+0] and extracts packed bits. "
+        "Constants: zone_0b=0x0201c600 (shared with get_zone_slot_card_ref_by_type), "
+        "sentinel_zone_range=[0xb..0xf], field_offset=6."),
+    ("FUN_080cc8c8", "ensure_card_id_cache_entry",
+        "Ensure cache entry at 0x0201ff60+r0*2 is filled; if zero, load from hand table and write. "
+        "Flow: r4=0x0201ff60+r0*2 (cache slot ptr); ldrh [r4]; nonzero (cached) -> return. "
+        "Otherwise: base=gP1LifePoints+r0*4+0x87*32 (=gP1LifePoints+r0*4+0x10e0); "
+        "ldrh card_word=[base]; card_id=bits[12:0]; bl internal_card_id_to_card_id(card_id); "
+        "lsls/lsrs truncate to 16 bits; strh card_id,[r4] (write cache slot). "
+        "No explicit r0 return. "
+        "Used to cache current hand/slot card_id for UI display layer, avoiding repeat decode. "
+        "Constants: cache_base=0x0201ff60, cache_stride=2 (u16/entry), "
+        "gP1LifePoints=0x0201c4e0, hand_base_offset=0x87*32=0x10e0, card_id_mask=0x1fff."),
+    ("FUN_080eef0c", "lookup_rom_card_attribute_table_a",
+        "Look up card attribute table in ROM (0x09821e04, stride=0x16=11*2 bytes/row) "
+        "by card index and return specific field u16 value. "
+        "Flow: r1=r0 (card_index); if r1<=0xfa6 (=4006, boundary check) return 0; "
+        "else: r1+=0xfffff059 (=r1-0xfa7=row index); "
+        "col_offset=(0xb*row+4)*2 (=row*22+8); base=0x09821e04+col_offset; "
+        "ldrh [result]; if result==0xffff (sentinel) return 0, else return result. "
+        "Sibling FUN_080eef44 uses col_offset=(0xb*row+3)*2=row*22+6. "
+        "Constants: table_base=0x09821e04, index_min=0xfa7 (cmp > 0xfa6), "
+        "row_stride=0xb*2=22 bytes, col_offset_A=8 (halfword 4 in row), sentinel=0xffff."),
 ]
 
 
