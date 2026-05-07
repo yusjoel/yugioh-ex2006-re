@@ -4738,6 +4738,163 @@ RENAMES = [
         "r0: player_side [0..1]; r1: zone_slot_idx [0..9]. "
         "Returns ptr to BG tile VRAM position for the slot. Pure address compute; no side effects. "
         "Constants: field_tile_map_base, slot_x/y layout table in ROM."),
+
+    # --- batch #17 (campaign-17, 2026-05-08) duel field placement/equip activation chain ---
+    ("FUN_080c3840", "blit_field_slot_tile_with_palette_hi",
+        "Blit field slot tile VRAM with high-palette data. "
+        "Calls get_field_slot_tile_vram_addr(player_id,row,col); if addr==0 returns. "
+        "Reads ROM palette table 0x09854df0 (0x90 halfwords), OR-merges hi/lo bytes, writes to VRAM. "
+        "r0=u16 player_id [0..1], r1=u16 row, r2=u16 col. Returns void. "
+        "Side-effects: VRAM [tile_addr..+0x120] overwritten. "
+        "Constants: palette_table=0x09854df0, tile_count=0x90."),
+    ("FUN_080333ac", "check_slot_placement_blocked_by_field_effect",
+        "Returns 0 if slot placement is blocked by active field effect node (indeg=40), 1 if allowed. "
+        "Monster zone path (slot 0..4): traverses gDuelNodePool field-spell chain, checks field6 low bits, "
+        "matches Yami(0x1432)/Sanctuary(0x17ee) IDs and direction/effect bits. "
+        "Spell/trap path (slot 5..9): uses check_slot_card_is_equip_whitelist + get_node_entity_id_in_slot. "
+        "r0=u8 player_id [0..1], r1=u8 slot_idx [0..9]. Returns u32 bool (0=blocked, 1=allowed). "
+        "Constants: player_stride=0x868, slot_entry=0x14, Yami_id=0x1432, Sanctuary_id=0x17ee."),
+    ("FUN_080c3880", "update_field_slot_tile_display",
+        "Update field slot tile display: blit palette or zero-fill based on placement block check. "
+        "Calls get_field_slot_tile_vram_addr, stores addr in r7. "
+        "slot_idx [0..0xa] and check_slot_placement_blocked_by_field_effect==0: "
+        "calls blit_field_slot_tile_with_palette_hi. "
+        "slot_idx > 0xa or blocked: if VRAM addr valid, calls zero_fill_by_halfword (0x90 halfwords). "
+        "r0=u16 player_id [0..1], r1=u16 slot_idx [0..0xa], r2=u16 extra. Returns void. "
+        "Side-effects: VRAM [tile_addr..+0x120] written or zeroed. "
+        "Constants: slot_range_max=0xa, tile_size=0x120."),
+    ("FUN_0803b960", "check_zone_has_no_field_spell_node",
+        "Returns 1 if field spell zone has no effect node for card 0x1679 (zone type 0xb), 0 if blocked. "
+        "Calls find_effect_node_in_zone(player_id, zone_type=0xb, card_id=0x1679, mode=2); "
+        "inverts result: 0=node present (return 0), non-0=absent (return 1). Leaf function. "
+        "r0=u8 player_id [0..1]. Returns u32 bool (1=no node/allowed, 0=node exists/blocked). "
+        "Constants: zone_type=0xb, card_id=0x1679, search_mode=2."),
+    ("FUN_080904f4", "find_card_effect_node_entry",
+        "Binary search for card effect node descriptor by card_id and effect_type. "
+        "Reads card_id from [r0+0] (u16), effect_type from [r0+3] bits[5:2] [0..3]. "
+        "Dispatches to one of four sorted ROM tables: "
+        "type=0->0x09e3f19c(0x2a3 entries), type=1->0x09e430fc(0x187), "
+        "type=2->0x09e455bc(0x8e), type=3->0x09e46324(0xb7). "
+        "Standard binary search (entry_size=0xc, key=first word). "
+        "r0=ptr card_info ([+0]=card_id, [+3] bits[5:2]=type [0..3]). "
+        "Returns ptr effect_node_descriptor, or 0 if not found. Pure read-only leaf. "
+        "Constants: entry_size=0xc, type_max=3."),
+    ("FUN_08090848", "dispatch_card_effect_activation",
+        "Lookup effect node then dispatch card effect activation via unicast or broadcast handler. "
+        "Calls find_card_effect_node_entry; if node==0 returns 1 (no handler). "
+        "If node[+0xc] (unicast handler ptr) non-0: saves card_ptr to global slot 0x0201b714, "
+        "calls FUN_0810e5d0 unicast handler, restores slot. "
+        "If node[+0x8] non-0: calls FUN_0810e5d4 broadcast over 2 players x 11 zones. "
+        "r0=ptr card_info, r1=u32 override_param. Returns u32 (0=success, 1=blocked/no-handler). "
+        "Side-effects: [0x0201b714] temp card_ptr; [0x0201b290+0x4bc] zeroed on broadcast path. "
+        "Constants: global_card_slot=0x0201b714, player_count=2, zone_count=11."),
+    ("FUN_08031390", "resolve_slot_id_to_zone_ptr",
+        "Convert slot_id to zone descriptor ptr via two-step lookup. "
+        "Calls find_zone_descriptor_by_slot_id(slot_id)->descriptor; "
+        "if descriptor==0x4000 (invalid sentinel) returns 0. "
+        "Else unpacks descriptor bytes as r0/r1/r2 and calls get_zone_slot_ptr. "
+        "r0=u32 slot_id. Returns ptr zone_slot (0 if invalid). Pure read-only. "
+        "Constants: invalid_sentinel=0x4000."),
+    ("FUN_0804bc90", "get_card_equip_zone_rank",
+        "Return equip zone rank value for card_id; used in equip target priority comparison. "
+        "Reads field6 and field9 extended stats; if field6==0x16 and field9==1 returns 3. "
+        "Otherwise performs card_id BST mapping: special IDs->2, default->1. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 rank (1=normal, 2=special, 3=priority path). "
+        "Constants: equip_type_continuous=0x16, equip_type_ritual=0x17."),
+    ("FUN_08055930", "get_card_lp_cost_by_id",
+        "Return LP cost for equip card entry by card_id lookup in large BST table. "
+        "Reads card_id from [r0+0], player_side from [r0+2], flag_bits from [r0+3]. "
+        "If field6==0x16 (continuous equip) and count_available_effect_zones==0: returns 0 (free). "
+        "Otherwise BST card_id->LP cost value; unmatched card_id->0xfa8 (default cost). "
+        "r0=ptr equip_card_entry ([+0]=card_id, [+2]=player_side, [+3]=flags). "
+        "Returns u32 lp_cost (0=free). Pure read-only computation. "
+        "Constants: equip_type_continuous=0x16, default_cost=0xfa8."),
+    ("FUN_08033bb0", "check_slot_available_for_card",
+        "Returns 1 if slot is empty and placement is not blocked by field effect; 0 otherwise. "
+        "Tests active bit (lsls #0x13) of gDuelFieldSlots[player*0x868+slot*0x14]; "
+        "if occupied returns 0. If free calls check_slot_placement_blocked_by_field_effect; "
+        "returns its result. Used by find_first_available_monster_slot_for_player inner loop. "
+        "r0=u8 player_id [0..1], r1=u8 slot_idx [0..4]. Returns u32 bool (1=available, 0=not). "
+        "Constants: active_bit_shift=0x13, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_0803310c", "count_occupied_all_field_zones",
+        "Count all occupied field zone slots (11 total: monster 5 + spell/trap 5 + field 1) for player. "
+        "Iterates gDuelFieldSlots[player*0x868..+11*0x14] testing active bit (lsls #0x13) per slot; "
+        "nonzero->count++. Also checks gP1LifePoints[+0x10d0] bonus flag and [0x0201bb90] turn data "
+        "for +1/+2 bonus conditions. "
+        "r0=u8 player_id [0..1]. Returns u32 count (0..13). Pure read-only. "
+        "Constants: zone_count=11, active_bit_shift=0x13, player_stride=0x868, slot_entry=0x14."),
+    ("FUN_08033bf4", "find_first_available_monster_slot_for_player",
+        "Find first available monster zone slot for player_id; returns slot ptr or -1. "
+        "If count_field_copies_of_card(0x16df)>0 and count_occupied_all_field_zones>4: returns -1 (full). "
+        "Iterates node_pool_base 0x09e3ef60 (slots 0..4); "
+        "calls check_slot_available_for_card(player_id, slot+5); hit->returns (node+5) ptr. "
+        "r0=u8 player_id [0..1]. Returns ptr monster_slot_entry (-1=no available slot). Pure read-only. "
+        "Constants: special_card=0x16df, max_zones=5, node_pool_base=0x09e3ef60."),
+    ("FUN_0805aea4", "apply_card_equip_activation",
+        "Full equip card activation flow: placement rules -> LP check -> slot alloc -> effect dispatch. "
+        "Calls check_card_placement_rules; if fails returns 0. "
+        "If partner non-0: compares get_card_equip_zone_rank for both cards; rank_self<rank_partner->fail. "
+        "Calls get_card_lp_cost_by_id; if LP insufficient writes [gP1LifePoints+0x1d78]=0x17, returns 0. "
+        "On success: find_first_available_monster_slot_for_player, updates card[2] zone_bits, "
+        "calls dispatch_card_effect_activation; returns its result. "
+        "r0=ptr card_info, r1=ptr partner_card_info (0=none). Returns u32 dispatch result. "
+        "Side-effects: [gP1LifePoints+0x1d78]:=0x17 on fail; card[+2] zone_bits updated. "
+        "Constants: special_equip_id=0x19a3, player_stride=0x868, lp_fail_flag=0x17."),
+    ("FUN_0805a238", "check_spell_zone_slot_face_down",
+        "Returns 1 if spell/trap zone slot_idx [5..10] is face-down, 0 otherwise. "
+        "Out-of-range (slot_idx-5 > 5): returns 0. "
+        "Reads gDuelFieldSlots[player*0x868+slot*0x14+0x40] word, extracts bit1 (facedown bit). "
+        "r0=u8 player_id [0..1], r1=u8 slot_idx [5..10]. Returns u32 bool. Leaf, pure read. "
+        "Constants: spell_zone_start=5, slot_entry=0x14, facedown_bit=bit1, player_stride=0x868."),
+    ("FUN_0803026c", "get_card_equip_target_zone_cost",
+        "Return zone cost/eligibility value for equip target selection by card_id and zone_bits. "
+        "Calls get_card_extended_stat_field9; if field9==1 returns 1 (special pass). "
+        "Large BST over card_id: 0x1774/0x158a/0x15fc etc->1; unmatched->0 (ineligible). "
+        "r0=u16 card_id [0..0x1fff], r1=u16 zone_bits. Returns u32 (1=eligible, 0=ineligible). Pure read. "
+        "Constants: special_field9=1."),
+    ("FUN_0805a86c", "check_equip_card_can_target_partner",
+        "Validate equip card (r0) can legally target partner card (r1). "
+        "If partner non-0: compare get_card_equip_zone_rank for both; rank_self<rank_partner->reject; "
+        "rank<=1->reject; check_spell_zone_slot_face_down->reject if face-down. "
+        "If partner==0: rank<=1->reject. "
+        "Final: get_card_equip_target_zone_cost(card_id, zone_bits)->0->reject. "
+        "r0=ptr equip_card_info, r1=ptr partner_card_info (0=none). Returns u32 bool (1=can target). "
+        "Side-effects: [gP1LifePoints+0x1d78]:=0x16 on block path. "
+        "Constants: rank_threshold=1."),
+    ("FUN_08033c9c", "check_field_spell_placement_allowed",
+        "Returns 1 if field spell card_id can be placed for player; 0 if blocked. "
+        "If get_card_extended_stat_field9(card_id)==2 (dual field): checks count_field_copies_of_card(0x16df), "
+        "reads gDuelFieldSlots active bit, calls count_occupied_all_field_zones; >4->return 0. "
+        "Else: calls find_first_available_monster_slot_for_player; <0->return 0. "
+        "r0=u8 player_id [0..1], r1=u16 card_id [0..0x1fff]. Returns u32 bool. Pure read. "
+        "Constants: field9_dual_field=2, full_zone_threshold=4, special_card=0x16df."),
+    ("FUN_0804c014", "check_card_is_equip_set_c",
+        "equip set C classifier: third sibling alongside check_card_id_is_equip_set_a (0x0804bd78) "
+        "and check_card_id_is_equip_set_b (0x0804bf20). "
+        "BST whitelist over card_id: hits 0x114f/0xfe0/0x168f/0x179c etc->return 1; else->return 0. "
+        "Called by check_card_zone_activation_blocked in continuous equip (field6==0x16) path. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool. Leaf, no side-effects. "
+        "Constants: set_c_ids={0xfe0, 0x114f, 0x168f, 0x179c}."),
+    ("FUN_0805a570", "check_card_zone_activation_blocked",
+        "Comprehensive gate: returns 1 if equip/field-spell card activation is blocked, 0 if allowed. "
+        "Reads card_id/player_side/flag_bits from stack buf r0. card_id==0->return 1. "
+        "field6==0x16 path: check_card_is_equip_set_c; check_field_spell_placement_allowed; "
+        "check_equip_card_can_target_partner; find_effect_node_in_zone; "
+        "check_card_is_zone_pair_restricted; check_value_in_slot_chain; count_available_effect_zones. "
+        "Final: apply_card_equip_activation. Any fail->return 1. "
+        "r0=ptr card_activation_entry ([+0]=card_id, [+2]=player+slot, [+3]=flags), "
+        "r1=u32 override_flag [0..1]. Returns u32 bool. "
+        "Side-effects: [gP1LifePoints+0x1d78]:=0x14 on block; apply_card_equip_activation side-effects. "
+        "Constants: active_flag=0x16."),
+    ("FUN_0805b164", "invoke_equip_zone_activation_check",
+        "Build equip card activation entry on stack and call check_card_zone_activation_blocked. "
+        "Allocates 0x18 bytes stack buf; memset to 0; strh card_id->[buf+0]; "
+        "sets [buf+2] bit0=player_id&1 (player_side); writes zone_code=0x16 to [buf+2] bits[5:0]; "
+        "reads gDuelFieldSlots[player*0x868+slot*4+0x0201c600] node word into [buf+4]. "
+        "Calls check_card_zone_activation_blocked(buf, 0). Returns its result. "
+        "r0=u8 player_id [0..1], r1=u16 slot_idx [0..4], r2=u16 card_id [0..0x1fff]. "
+        "Returns u32 (1=blocked, 0=allowed). "
+        "Constants: buf_size=0x18, zone_code_equip=0x16, node_base=0x0201c600."),
 ]
 
 

@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-17) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-17) |
-| **上次更新** | 2026-05-08 (campaign-16 batch, 280/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-18) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-18) |
+| **上次更新** | 2026-05-08 (campaign-17 batch, 300/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**280 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**300 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -352,11 +352,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 278 | 387 | 7 | 3 | E | 0x080c9eb8 | FUN_080c9eb8 | write_decimal_digits_to_oam | 1 | [eval](eval/080c9eb8.md) |
 | 279 | 388 | 6 | 2 | E | 0x08095b50 | FUN_08095b50 | check_player_side_condition | 1 | [eval](eval/08095b50.md) |
 | 280 | 389 | 7 | 2 | E | 0x080c3790 | FUN_080c3790 | get_field_slot_tile_vram_addr | 1 | [eval](eval/080c3790.md) |
+| 281 | 398 | 6 | 1 | E | 0x080c3840 | FUN_080c3840 | blit_field_slot_tile_with_palette_hi | 1 | [eval](eval/080c3840.md) |
+| 282 | 399 | 6 | 40 | C | 0x080333ac | FUN_080333ac | check_slot_placement_blocked_by_field_effect | 1 | [eval](eval/080333ac.md) |
+| 283 | 400 | 5 | 9 | D | 0x080c3880 | FUN_080c3880 | update_field_slot_tile_display | 2 | [eval](eval/080c3880.md) |
+| 284 | 401 | 6 | 3 | E | 0x0803b960 | FUN_0803b960 | check_zone_has_no_field_spell_node | 1 | [eval](eval/0803b960.md) |
+| 285 | 403 | 7 | 15 | D | 0x080904f4 | FUN_080904f4 | find_card_effect_node_entry | 1 | [eval](eval/080904f4.md) |
+| 286 | 404 | 8 | 14 | D | 0x08090848 | FUN_08090848 | dispatch_card_effect_activation | 1 | [eval](eval/08090848.md) |
+| 287 | 405 | 7 | 7 | D | 0x08031390 | FUN_08031390 | resolve_slot_id_to_zone_ptr | 1 | [eval](eval/08031390.md) |
+| 288 | 406 | 8 | 3 | E | 0x0804bc90 | FUN_0804bc90 | get_card_equip_zone_rank | 1 | [eval](eval/0804bc90.md) |
+| 289 | 407 | 8 | 3 | E | 0x08055930 | FUN_08055930 | get_card_lp_cost_by_id | 1 | [eval](eval/08055930.md) |
+| 290 | 408 | 8 | 2 | E | 0x08033bb0 | FUN_08033bb0 | check_slot_available_for_card | 1 | [eval](eval/08033bb0.md) |
+| 291 | 409 | 7 | 11 | D | 0x0803310c | FUN_0803310c | count_occupied_all_field_zones | 1 | [eval](eval/0803310c.md) |
+| 292 | 410 | 7 | 28 | C | 0x08033bf4 | FUN_08033bf4 | find_first_available_monster_slot_for_player | 2 | [eval](eval/08033bf4.md) |
+| 293 | 411 | 7 | 4 | E | 0x0805aea4 | FUN_0805aea4 | apply_card_equip_activation | 1 | [eval](eval/0805aea4.md) |
+| 294 | 412 | 8 | 1 | E | 0x0805a238 | FUN_0805a238 | check_spell_zone_slot_face_down | 1 | [eval](eval/0805a238.md) |
+| 295 | 413 | 8 | 1 | E | 0x0803026c | FUN_0803026c | get_card_equip_target_zone_cost | 1 | [eval](eval/0803026c.md) |
+| 296 | 414 | 7 | 2 | E | 0x0805a86c | FUN_0805a86c | check_equip_card_can_target_partner | 1 | [eval](eval/0805a86c.md) |
+| 297 | 415 | 6 | 3 | E | 0x08033c9c | FUN_08033c9c | check_field_spell_placement_allowed | 1 | [eval](eval/08033c9c.md) |
+| 298 | 416 | 6 | 3 | E | 0x0804c014 | FUN_0804c014 | check_card_is_equip_set_c | 1 | [eval](eval/0804c014.md) |
+| 299 | 417 | 7 | 6 | D | 0x0805a570 | FUN_0805a570 | check_card_zone_activation_blocked | 1 | [eval](eval/0805a570.md) |
+| 300 | 418 | 6 | 1 | E | 0x0805b164 | FUN_0805b164 | invoke_equip_zone_activation_check | 2 | [eval](eval/0805b164.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #17 PASSED** — duel field placement/equip activation chain (slot placement blocker indeg=40 + monster slot finder indeg=28 + equip card target + activation dispatch + field spell allowed + equip set _c sibling + apply_card_equip_activation + check_card_zone_activation_blocked + invoke_equip_zone_activation_check) + field slot display update + zone descriptor resolver + find_card_effect_node_entry + dispatch_card_effect_activation; 1 fix iter (3 NEEDS_FIX: R7 caller addr placeholder + R3 player_id mislabeled card_id + R3 r3 internal sp clobber + R7 self-reference); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (300/1526 = 19.66%)
 - 2026-05-08: **batch=20 #16 PASSED** — card display VRAM rendering pipeline (jp_string/glyph_nibble/line_buf/card_label/stat/name/choice_label 簇) + game_str pointer resolver indeg=8 + write_decimal_digits_to_oam + 多 init_*_vram 兄弟簇; 1+1+1 fix iter (3 R3 callsite + 2 R7 caller addr r9/r10 上层调用链 + r8/r10 callee-save 删除 + r9 范围 [0..0x01FF]); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (280/1526 = 18.35%)
 - 2026-05-08: **batch=20 #15 PASSED (单 call 模式)** — LP cost 补全 (compute_lp_cost_by_zone_field5_x200 + eval_slot_score_entry_full) + card display pipeline 簇 (decode_card_image_tiles_to_vram + write_card_digit_tiles_to_vram + zero_card_display_vram_regions + render_card_name_to_sprite_vram + map_card_id_to_digit_tile_offset + render_large_card_display_by_mode + render_decimal_digits_jp_signed + init_bg_vram_for_card_display + write_oam_card_icon_strip + write_nibble_palette_rows_to_vram + render_card_type_icon_to_vram + tick_card_icon_anim_step) + equip set classifiers (check_card_id_is_equip_set_a/b) + duel util (check_card_stat_field7_equals + count_chain_nodes_by_card_id + count_slot_chain_nodes_by_card_id + eval_equip_bonus_for_slot); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (260/1526 = 17.04%)
 - 2026-05-08: **batch=20 #14 PASSED (单 call 模式)** — duel core 评估/计数/装备链/LP cost 簇 (get_card_effect_category + get_slot_effect_card_value + count_zones_by_card_and_mode + query_zone_chain_count_with_eligibility + adjust_slot_score_by_chain_and_zone + check_card_id_is_special_summon_type + count_monster_slots_by_state_all + count_active_slots_with_field6_value + eval_slot_target_eligibility_full + apply_slot_score_bonus_by_state + count_hand_cards_by_field6_alt (冲突重命名) + cleanup_slot_score_entry_epilogue + count_paired_slots_both_sides + find_equip_chain_node_by_pred + check_slot_zone_bit_eligible + eval_equip_chain_score_for_slot indeg=29 + check_slot_card_is_equip_whitelist indeg=38 + compute_lp_cost_by_zone_field5_x100 + get_card_extended_stat_field3 (sibling cluster 第 5 元) + count_active_extended_chain_nodes); 1 name collision fix (0x08034020 count_hand_cards_by_field6 → count_hand_cards_by_field6_alt, offsets 0x1c/0x5d0 vs 0x14/0x418); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (240/1526 = 15.73%)
