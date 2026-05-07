@@ -137,7 +137,7 @@ model: sonnet
 - 函数体仅 `bx lr` (2 字节) → `feedback_release_noop_stub_fingerprint.md` (类型 A/B 区分; callsite 参数数量是关键)
 - indeg=1 from card_image hub + 调用 commit_line_buffer_to_sprite_vram + setup_line_buf_pos_and_font + render_*_to_buf triple → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_card_stat_label_drawer_cluster.md`
 - 任意参数寄存器语义不明确/列为 "unknown" 或想写"待 runtime 验证" → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_void_confirmation_required.md` (先扫入口 5 条指令; 禁止占位符) + `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_caller_traced_param_type.md` (必读 caller 参数构造序列; 不得留 unknown)
-- R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3; 范围单位必须与参数类型单位一致——word offset → word range，byte offset → byte range)
+- R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3; 范围单位必须与参数类型单位一致——word offset → word range，byte offset → byte range; **indeg>=10 时必须扫 >=3 个不同 caller 才能确定上界**)
 - N 个结构完全对称的函数仅在整数索引（0..N-1）上不同 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_numbered_index_sibling_cluster.md` (qualifier 直接用该数字 bgN/layerN; 不得发明语义词)
 - 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
 - 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
@@ -145,6 +145,7 @@ model: sonnet
 - 函数入口含 `ldr rN, [pc,#N]` / `ldr rN, =<const>` 加载字面量池常量地址 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (rN 及随后 `mov rHigh,rN` 的目标均为内部值，不是参数)
 - proposed_name 含 `_and_` / `_or_` / `_then_` 连接动词, 或含 `_then_return_` → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r1_dual_verb_in_name.md` (R1 零分违规; 改用单覆盖动词 + _by_mode/_by_state; _then_return_Y 场景直接截断)
 - 函数体含 OAM attr 写入 / DISPCNT / IO 寄存器裸整数常量 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (必须在 Constants: 块命名; `0xC00`=mode mask 非 priority; batch-9 7/7 R6 扣分)
+- 函数体含任何非显而易见字面量（枚举 bit-flags / cmp 隐式推导值 / 域上界常量）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_magic_constant_unsymbolized.md` (覆盖 OAM 以外的所有域; cmp 的隐式操作数必须回溯推导语义; 三次复现 0x08105784+0x08030aa4+0x0803b618)
 - 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数），或入口 `mov rHigh, rLow` 后 rHigh 参与实质计算/传参（非仅 epilogue 还原）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分; `mov r8,r1` 后若 r8 被用于传参则 r1 是真实参数被 preserved 而非丢弃)
 - assert 串含 `nnsys/<lib>/<Lib>_<Name>.c` 路径（如 `g2d_CellAnimation.c`、`g2d_Image.c`、`g2d_SRTControl.c` 等 NNS SDK 路径）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_syslib_struct_prefix_from_source_path.md` (snake_case of Name 即为参数/结构体前缀; 采用 SDK 约定; 同路径所有函数视为同一翻译单元兄弟簇)
 - 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0)
