@@ -149,7 +149,8 @@ model: sonnet
 - 函数体中 r4/r8/r9/r10/r11 在首次赋值前被读取（隐式 caller-set 参数），或入口 `mov rHigh, rLow` 后 rHigh 参与实质计算/传参（非仅 epilogue 还原）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (必须附 callsite asm 证据; 与 high-register-stack-arg-confusion 严格区分; `mov r8,r1` 后若 r8 被用于传参则 r1 是真实参数被 preserved 而非丢弃; 若高寄存器在函数体内被二次覆盖但经 push/pop 保存恢复, 仍需文档化两阶段语义)
 - proposed_name 与 PROGRESS.md 已命名列重名 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_proposal_name_collision.md` (提交前 grep PROGRESS.md 确认无重名; 有冲突则加结构差异 qualifier, 非末尾裸 _alt)
 - assert 串含 `nnsys/<lib>/<Lib>_<Name>.c` 路径（如 `g2d_CellAnimation.c`、`g2d_Image.c`、`g2d_SRTControl.c` 等 NNS SDK 路径）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_syslib_struct_prefix_from_source_path.md` (snake_case of Name 即为参数/结构体前缀; 采用 SDK 约定; 同路径所有函数视为同一翻译单元兄弟簇)
-- 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0)
+- 置信度标为 med 或 low → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (必须含独立"## 置信度 / 升级路径"节; 每个待验证项附可操作路径; 缺失即 R8=0; 已静态确认的值禁止标"待验证")
+- 函数地址在 0x08038xxx 且体 = push + ldr r0,[sp,#0x3c] + bl + b LAB → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (命名 compute_lp_cost_by_<dim>_<scale>; R4=void; `b LAB` 无独立 r0 写)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 

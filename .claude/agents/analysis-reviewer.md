@@ -68,7 +68,9 @@ model: sonnet
 | R3 中高寄存器 (r4/r8/r9/r10/r11) 在函数体首次赋值前被读取，但 proposal 未列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (R3=0; 要求 executor 补 callsite asm 证据，注明 caller-set) |
 | R3 已正确标注某高寄存器为 caller-set input，reviewer 拟改判为 callee-saved | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (禁止仅凭结构直觉翻转；必须在函数体内找到该寄存器被覆盖且覆盖先于任何读 use 的证据，否则维持 caller-set 结论) |
 | proposed_name 与 PROGRESS.md 中已命名函数重名 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_proposal_name_collision.md` (R1 扣分; 要求 executor grep PROGRESS.md 后加结构差异 qualifier) |
-| proposal 置信度为 med/low 但无独立"## 置信度 / 升级路径"节，或该节内无可操作路径 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (R8=0; 要求 executor 补写独立节并逐项列解决路径) |
+| proposal 置信度为 med/low 但无独立"## 置信度 / 升级路径"节，或该节内无可操作路径；或已静态确认的值被标为"待验证" | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_med_confidence_section_required.md` (R8=0; 要求 executor 补写独立节并逐项列解决路径; 静态可确认项必须直接写值而非"待验证") |
+| R3 高寄存器被列为参数但函数体实为 push+立即覆盖（callee-save），或高寄存器被列为参数但函数体实际是 push+overwrite（正确应删除该行） | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (Counter-pattern: callee-saved 必须整行删除，不得补范围；verify: 函数体首次 use 是 epilogue restore 而非计算 use) |
+| 函数地址在 0x08038xxx，体 = push+ldr r0,[sp,#0x3c]+bl+b LAB，R4 非 void | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (R4=0; b LAB 无独立 r0 写; void 强制) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
