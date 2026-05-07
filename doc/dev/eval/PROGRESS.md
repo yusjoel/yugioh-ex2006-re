@@ -8,9 +8,9 @@
 ## 续接提示词 (新会话直接粘贴)
 
 ```
-读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作, batch=15 全自动模式。
+读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作, batch=20 全自动模式。
 
-python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 调整 batch 大小
+python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 
 启动 4-agent loop (executor → reviewer → fixer → lesson-keeper) 处理 batch.json 中的全部函数,
 单 Ghidra session + 单 build + 单 sha1 verify, byte-identical 通过后自动 commit, 进入下一 batch。
@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=15 模式, campaign-9) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json` → 启动 4-agent loop (campaign-9) |
-| **上次更新** | 2026-05-06 (campaign-8 batch, 120/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-10) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-10) |
+| **上次更新** | 2026-05-07 (campaign-9 batch, 140/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**120 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**140 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -186,11 +186,32 @@ python tools/ad-hoc/pick_batch.py --max 15 --out temp/batch.json   # ← 改 15 
 | 118 | 145 | — | — | E | 0x08015868 | FUN_08015868 | apply_bg_affine_by_angle_scale | 1 | [eval](eval/08015868.md) |
 | 119 | 146 | — | — | E | 0x0801b7e8 | FUN_0801b7e8 | init_demo_shuen_display_state | 2 | [eval](eval/0801b7e8.md) |
 | 120 | 147 | — | — | E | 0x0801b850 | FUN_0801b850 | load_demo_shuen_sprite_gfx | 3 | [eval](eval/0801b850.md) |
+| 121 | 148 | 7 | 1 | E | 0x0801b91c | FUN_0801b91c | load_shuen_sprite_gfx_guarded | 1 | [eval](eval/0801b91c.md) |
+| 122 | 149 | 7 | 1 | E | 0x0801b93c | FUN_0801b93c | load_shuen_bg1_gfx_set | 1 | [eval](eval/0801b93c.md) |
+| 123 | 150 | 7 | 1 | E | 0x0801ba04 | FUN_0801ba04 | load_shuen_obj_resource_by_slot | 1 | [eval](eval/0801ba04.md) |
+| 124 | 151 | 6 | 2 | E | 0x0801ba4c | FUN_0801ba4c | load_shuen_obj_resource_slot0 | 1 | [eval](eval/0801ba4c.md) |
+| 125 | 152 | 8 | 2 | E | 0x0801ba5c | FUN_0801ba5c | write_shuen_bg3_scroll_regs | 1 | [eval](eval/0801ba5c.md) |
+| 126 | 153 | 7 | 1 | E | 0x0801ba78 | FUN_0801ba78 | tick_demo_shuen_bg3_hscroll | 1 | [eval](eval/0801ba78.md) |
+| 127 | 154 | 8 | 1 | E | 0x0801bb28 | FUN_0801bb28 | advance_shuen_cell_anim_frame | 1 | [eval](eval/0801bb28.md) |
+| 128 | 156 | 7 | 1 | E | 0x0801bbd4 | FUN_0801bbd4 | tick_shuen_anim_slots_batch | 1 | [eval](eval/0801bbd4.md) |
+| 129 | 158 | 6 | 3 | E | 0x0801c2ac | FUN_0801c2ac | reset_gl_display_state | 1 | [eval](eval/0801c2ac.md) |
+| 130 | 159 | 8 | 1 | E | 0x0801c310 | FUN_0801c310 | load_vija_bg_gfx_embedded | 1 | [eval](eval/0801c310.md) |
+| 131 | 160 | 8 | 1 | E | 0x0801c3f4 | FUN_0801c3f4 | load_vija_bg_gfx_from_fs | 2 | [eval](eval/0801c3f4.md) |
+| 132 | 161 | 7 | 2 | E | 0x0801c484 | FUN_0801c484 | load_vija_bg_gfx_by_mode | 2 | [eval](eval/0801c484.md) |
+| 133 | 162 | 7 | 1 | E | 0x0801c4c0 | FUN_0801c4c0 | load_vija_obj_resource_by_region | 1 | [eval](eval/0801c4c0.md) |
+| 134 | 163 | 6 | 3 | E | 0x0801c50c | FUN_0801c50c | load_vija_obj_resource_gated | 1 | [eval](eval/0801c50c.md) |
+| 135 | 164 | 9 | 2 | E | 0x0801c5d8 | FUN_0801c5d8 | drive_vija_obj_cell_anim | 1 | [eval](eval/0801c5d8.md) |
+| 136 | 165 | 8 | 1 | E | 0x0801c668 | FUN_0801c668 | apply_bg2_affine_fixed_angle | 1 | [eval](eval/0801c668.md) |
+| 137 | 166 | 7 | 1 | E | 0x0801c694 | FUN_0801c694 | tick_bg2_affine_anim_frame | 1 | [eval](eval/0801c694.md) |
+| 138 | 167 | 7 | 1 | E | 0x0801c6b0 | FUN_0801c6b0 | tick_bg_scroll_anim_frame | 1 | [eval](eval/0801c6b0.md) |
+| 139 | 168 | 9 | 1 | E | 0x0801c728 | FUN_0801c728 | advance_scene_phase_counter | 1 | [eval](eval/0801c728.md) |
+| 140 | 169 | 9 | 1 | E | 0x0801c74c | FUN_0801c74c | update_dual_cell_anim_oam_pos | 2 | [eval](eval/0801c74c.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-07: **campaign-9 batch PASSED** — demo_shuen 完整运行时簇 (state machine sub-funcs/scroll tick/cell anim batch) + vija UI effect scene 平行簇 (BG/OBJ load by region+mode/OBJ cell anim driver/affine tick) + reset_gl_display_state 跨 scene 重置 hub; 1 fix iter (3 R3: entry-clobber + 参数互换 + index 范围); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (140/1526 = 9.17%)
 - 2026-05-06: **campaign-8 batch PASSED** — scene_demo 状态机 tick + window fade in/out + BG affine math + demo_shuen 资源加载 + ISD title_ex obj stub 簇; 6 R3+R5+R6 修复 (IO base 误读 0x04000026/WIN0H 误读 BLDCNT/r1-r2 颠倒/EWRAM-VRAM 混淆/r0-r2 矛盾/r8 输入误判 callee-saved); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (120/1526 = 7.86%)
 - 2026-05-06: **campaign-7 batch PASSED** — ISD/cell anim OAM 入口 hub 簇 (3 个 D_shared_mid 跨 3 scene 共享: dispatch_cell_anim_sequence_step/dispatch_cell_anim_frame_advance/dispatch_isd_cell_anim_oam_setup) + gl_set_blend2_level (indeg=13) + palette slot allocator; 3 R3 修复 (高寄存器 callee-save vs 真输入 + 内部 DAT 加载误判为参数); byte-identical 保持. (105/1526 = 6.88%)
 - 2026-05-06: **campaign-6 batch PASSED** — IG2D_Main FS loader hub (load_g2d_obj_resource_set @ 0x08015d30) + Exodia demo OBJ asset load (asset table @ 0x09e397d4) + scene_demo BG3 scroll tick + g2d_NCG_load.c parser; 2 fix iter (R4 void, R7 caller role); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (90/1526 = 5.90%)
