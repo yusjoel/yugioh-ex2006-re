@@ -31,15 +31,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-12) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-12) |
-| **上次更新** | 2026-05-07 (campaign-11 batch, 180/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-13) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-13) |
+| **上次更新** | 2026-05-07 (campaign-12 batch, 200/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**180 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**200 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -246,11 +246,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 178 | 284 | 1 | 8 | D | 0x0803b1b0 | FUN_0803b1b0 | compute_slot_zone_eligibility_mask | 1 | [eval](eval/0803b1b0.md) |
 | 179 | 285 | 1 | 1 | E | 0x0803a540 | FUN_0803a540 | check_slot_equip_chain_rule | 1 | [eval](eval/0803a540.md) |
 | 180 | 286 | 1 | 3 | E | 0x0804af60 | FUN_0804af60 | check_card_is_gravekeeper | 1 | [eval](eval/0804af60.md) |
+| 181 | 287 | 7 | 2 | E | 0x08037c9c | FUN_08037c9c | compute_zone_effect_atk_delta | 1 | [eval](eval/08037c9c.md) |
+| 182 | 288 | 6 | 1 | E | 0x0803a658 | FUN_0803a658 | classify_equip_target_eligibility | 1 | [eval](eval/0803a658.md) |
+| 183 | 289 | 7 | 5 | D | 0x0802faf4 | FUN_0802faf4 | find_node_by_value | 1 | [eval](eval/0802faf4.md) |
+| 184 | 290 | 8 | 2 | E | 0x0802fcc0 | FUN_0802fcc0 | check_value_in_effect_context_chain | 1 | [eval](eval/0802fcc0.md) |
+| 185 | 291 | 6 | 33 | C | 0x0802fe60 | FUN_0802fe60 | get_node_entity_id_in_slot | 1 | [eval](eval/0802fe60.md) |
+| 186 | 292 | 8 | 1 | E | 0x0804c1b8 | FUN_0804c1b8 | get_card_effect_zone_check_sides | 1 | [eval](eval/0804c1b8.md) |
+| 187 | 293 | 5 | 52 | C | 0x08030de8 | FUN_08030de8 | find_zone_descriptor_by_slot_id | 1 | [eval](eval/08030de8.md) |
+| 188 | 294 | 8 | 9 | D | 0x0804c16c | FUN_0804c16c | check_card_is_zone_pair_restricted | 1 | [eval](eval/0804c16c.md) |
+| 189 | 295 | 6 | 107 | C | 0x0802fc90 | FUN_0802fc90 | check_value_in_slot_chain | 1 | [eval](eval/0802fc90.md) |
+| 190 | 296 | 8 | 2 | E | 0x0802f27c | FUN_0802f27c | count_zone_chain_eligible_cards | 1 | [eval](eval/0802f27c.md) |
+| 191 | 297 | 7 | 16 | D | 0x0802f394 | FUN_0802f394 | count_equip_chain_default_flags | 1 | [eval](eval/0802f394.md) |
+| 192 | 298 | 8 | 18 | D | 0x0804b4f4 | FUN_0804b4f4 | get_card_field_summon_restriction | 1 | [eval](eval/0804b4f4.md) |
+| 193 | 299 | 6 | 14 | D | 0x08034298 | FUN_08034298 | check_card_targeted_by_spell_zone_effect | 1 | [eval](eval/08034298.md) |
+| 194 | 300 | 7 | 2 | E | 0x0805a9a8 | FUN_0805a9a8 | check_card_placement_rules | 1 | [eval](eval/0805a9a8.md) |
+| 195 | 302 | 6 | 43 | C | 0x0803b2b4 | FUN_0803b2b4 | get_zone_slot_ptr | 1 | [eval](eval/0803b2b4.md) |
+| 196 | 303 | 6 | 1 | E | 0x08036c2c | FUN_08036c2c | build_effect_zone_entry | 1 | [eval](eval/08036c2c.md) |
+| 197 | 304 | 7 | 93 | C | 0x08080d6c | FUN_08080d6c | read_effect_slot_side_and_type | 1 | [eval](eval/08080d6c.md) |
+| 198 | 305 | 6 | 1 | E | 0x08036b88 | FUN_08036b88 | find_effect_entry_by_player_zone | 1 | [eval](eval/08036b88.md) |
+| 199 | 306 | 5 | 1 | E | 0x0803a7f0 | FUN_0803a7f0 | build_equip_target_eligibility_table | 1 | [eval](eval/0803a7f0.md) |
+| 200 | 307 | 4 | 4 | E | 0x080c8d30 | FUN_080c8d30 | refresh_zone_effect_buff_cache | 1 | [eval](eval/080c8d30.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-07: **batch=20 #12 PASSED** — duel core util cluster (effect/equip node pool 链 + zone slot ptr resolver indeg=43 + card BST classifiers indeg=18+9+1 + zone descriptor finder indeg=52 + card_id whitelist + slot pair check) + Gravekeeper 后续 placement rules; 1+1 fix iter (R3 r12 internal-set 标识 + R6 ROM ATK base + r0 歧义清除); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (200/1526 = 13.10%)
 - 2026-05-07: **batch=20 #11 PASSED** — 0x080eexx card extended stat getter 4-sibling 簇 (field5/6/7/9) + 0x0804ad48 indeg=135 dispatch wrapper + duel core util cluster (slot card pair check / active-card test / effect zone counter / equip chain rule / Gravekeeper card-id whitelist); 1 fix iter (R6 状态码符号化 + effect_code 计算修正); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (180/1526 = 11.80%)
 - 2026-05-07: **batch=20 #10 PASSED** — vija UI effect scene 收尾 (anim slot tick + state machine) + card list info page bridge + sound engine request 簇 + duel core util cluster (effect node 查询/zone attribute getter/slot chain check/card field8 谓词); 1 fix iter (6 NEEDS_FIX: 4 R3 范围 + 1 R6 + 1 R2/R4 switch 反向修正); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (160/1526 = 10.49%)
 - 2026-05-07: **campaign-9 batch PASSED** — demo_shuen 完整运行时簇 (state machine sub-funcs/scroll tick/cell anim batch) + vija UI effect scene 平行簇 (BG/OBJ load by region+mode/OBJ cell anim driver/affine tick) + reset_gl_display_state 跨 scene 重置 hub; 1 fix iter (3 R3: entry-clobber + 参数互换 + index 范围); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (140/1526 = 9.17%)
