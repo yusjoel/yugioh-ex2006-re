@@ -4895,6 +4895,209 @@ RENAMES = [
         "r0=u8 player_id [0..1], r1=u16 slot_idx [0..4], r2=u16 card_id [0..0x1fff]. "
         "Returns u32 (1=blocked, 0=allowed). "
         "Constants: buf_size=0x18, zone_code_equip=0x16, node_base=0x0201c600."),
+
+    # --- batch #18 (campaign-18, 2026-05-08) duel field equip/placement validator chain ---
+    ("FUN_0804a9dc", "map_field8_to_card_type_category",
+        "Maps extended_stat field8 raw value [0..15] to internal card type category code [0..9]. "
+        "Calls get_card_extended_stat_field8(card_id); if >15 returns 0 (unknown). "
+        "Mapping: 0->0, 1->1, 2->3, 3->3, 4->2, 5->2, 6->1, 7->1, 8->1, 9->0, "
+        "10->4, 11->5, 12->6, 13->7, 14->8, 15->9. "
+        "Called by check_slot_card_is_equip_type (0x08030b2c) and check_card_has_equip_placement_type "
+        "to determine if a card belongs to equip/magic/trap category for placement rules. "
+        "r0=u16 card_id [0..0x1fff]. Returns u8 card_type_category [0..9] (0=unknown). "
+        "indeg=15."),
+    ("FUN_0804b81c", "get_card_special_group_code",
+        "Performs large BST over card_id to assign one of 6 special group codes [0..5]. "
+        "Group 0=no match/unrestricted, groups 1..5=specific card families "
+        "(e.g. 0x17c4/0x1758=group 2, range 0x1585-0x1117=group 1, 0x19cd/0x19ca=group 4). "
+        "Called by check_card_has_equip_placement_type when map_field8 result is not in [2,3], "
+        "as secondary classification. Pure read-only; no side effects. "
+        "r0=u16 card_id [0..0x1fff]. Returns u8 special_group_code [0..5] (0=no match). "
+        "indeg=3."),
+    ("FUN_0804ba58", "check_card_has_equip_placement_type",
+        "Returns 1 if card_id satisfies equip/special placement type condition, 0 otherwise. "
+        "First calls map_field8_to_card_type_category: 0->return 0; in [2,3]->return 1 directly; "
+        "else calls get_card_special_group_code and treats result>0 as 1. "
+        "Used by 20 callers to quickly filter whether a card is allowed into the equip zone "
+        "before placement. r0=u16 card_id [0..0x1fff]. Returns u32 bool. "
+        "indeg=20, class C. "
+        "Constants: category_ritual_or_fusion=[2,3]."),
+    ("FUN_0804c18c", "check_card_is_field_spell_type_b",
+        "Checks if card_id falls in field_spell type-B ranges: "
+        "[0x1497..0x149a] or [0x17ad..0x17ae]. Returns 1 if hit, 0 otherwise. "
+        "Leaf function; no callees. Called by check_field_spell_b_placeable (0x080309fc) "
+        "as final eligibility gate. Sibling: get_card_effect_zone_check_sides (0x0804c1b8, "
+        "returns side_mask vs this returning bool). "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool. indeg=1, class E. "
+        "Constants: FIELD_SPELL_B_RANGE1=[0x1497..0x149a], FIELD_SPELL_B_RANGE2=[0x17ad..0x17ae]."),
+    ("FUN_080309fc", "check_field_spell_b_placeable",
+        "Three-condition chain to check whether field_spell type-B card_id can be placed. "
+        "(1) check_value_in_slot_chain(player=0, slot=0xb, value=0x1407) non-zero -> return 1 (blocked); "
+        "(2) check_card_targeted_by_spell_zone_effect(card_id, -1) non-zero -> return 1 (blocked); "
+        "(3) check_card_is_field_spell_type_b(card_id) -> return its result. "
+        "All three pass means placement allowed (returns 0). "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool (1=blocked, 0=placeable). "
+        "indeg=2, class E. "
+        "Constants: FIELD_SPELL_ZONE=0xb, field_spell_b_effect_id=0x1407."),
+    ("FUN_0803b910", "check_lp_exceeds_spell_copy_threshold",
+        "Checks whether current player LP exceeds threshold set by copy count of card 0x132c on field. "
+        "First calls check_card_targeted_by_spell_zone_effect(card_id, -1): if blocked return 0. "
+        "Then count_field_copies_of_card(0x132c) -> copy_count; "
+        "threshold = copy_count * 132 (via lsls/subs/lsls/adds/lsls shift sequence); "
+        "reads gP1LifePoints + player_side*0x868 for current LP; LP>threshold -> return 1. "
+        "r0=u16 card_id [0..0x1fff]; r1=u32 player_side [0..1]. "
+        "Returns u32 bool (1=LP exceeds threshold and not blocked, 0=blocked or LP insufficient). "
+        "indeg=4. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, copy_card=0x132c, scale=132."),
+    ("FUN_0802fb6c", "find_node_by_value_zone_entity",
+        "Traverses gDuelNodePool (0x0201d9c0, stride=8) from head_index, returning the first node where "
+        "[node+0](u16)==r1(card_id), [node+2]&0xF(zone_type) in [1..2], "
+        "[node+2]&0xF0==0 (upper flags clear), and if r2>=0 then [node+4](u16 entity_id)==r2. "
+        "r2<0 acts as wildcard (skip entity_id check). "
+        "r0=u16 head_index [0..139]; r1=u16 card_id; r2=s32 entity_id (-1=wildcard). "
+        "Returns u32* matching node ptr, or 0 (NULL) if not found. Read-only leaf. "
+        "indeg=3. "
+        "Constants: gDuelNodePool=0x0201d9c0, node_stride=8, zone_type_range=[1..2], flag_mask=0xF0."),
+    ("FUN_0802fdf4", "check_slot_has_node_by_card_id",
+        "Reads chain head index from gDuelFieldSlots[player_side][slot_idx]+0xa; "
+        "calls find_node_by_value_zone_entity(head, card_id, -1) (wildcard entity). "
+        "Returns 1 if matching node found, 0 otherwise. "
+        "r2=card_id is moved to r3 at entry; r1 is set to -1 for wildcard entity search. "
+        "Called by check_field_spell_group_placeable and check_field_spell_card_placeable_strict "
+        "to test whether a specific effect is already present in a slot chain. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..11]; r2=u16 card_id. "
+        "Returns u32 bool. indeg=10, class D. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa."),
+    ("FUN_0803b9f4", "check_field_spell_card_placeable_strict",
+        "Strict 7-condition check: can player place special field-spell card. "
+        "Conditions (all must pass for return 1): "
+        "(1) gP1LifePoints+side*0x868+0x11c bit20 == 0; "
+        "(2) count_available_effect_zones(player, 0x13ff, -1) != 0; "
+        "(3) count_field_copies_of_card(0x12b1) == 0; "
+        "(4) check_slot_has_node_by_card_id(player, FIELD_SPELL_ZONE, 0x15ad) == 0; "
+        "(5) find_effect_node_in_zone(player, FIELD_SPELL_ZONE, 0x1679, 1) == 0; "
+        "(6) check_value_in_slot_chain(player, FIELD_SPELL_ZONE, 0x1578) == 0; "
+        "(7) count_available_effect_zones(player, 0x1972, -1) != 0. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=placeable, 0=any condition blocks). "
+        "indeg=6, class D. "
+        "Constants: FIELD_SPELL_ZONE=0xb, gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+    ("FUN_0803b980", "check_field_spell_group_placeable",
+        "Combined check: can player place field-spell group card. "
+        "If count_field_copies_of_card(0x135d)>0: calls check_field_spell_card_placeable_strict(player); "
+        "if strict check fails return 0. "
+        "Then sequential checks (any non-zero -> return 0): "
+        "check_slot_has_node_by_card_id(player, FIELD_SPELL_ZONE, 0x15ad); "
+        "find_effect_node_in_zone(player, FIELD_SPELL_ZONE, 0x1679, mode=1); "
+        "check_value_in_slot_chain(player, FIELD_SPELL_ZONE, 0x1578); "
+        "count_available_effect_zones(player, 0x1972, -1). "
+        "All pass -> return 1. "
+        "r0=u32 player_side [0..1]. Returns u32 bool (1=placeable, 0=blocked). "
+        "indeg=4, class E. "
+        "Constants: FIELD_SPELL_ZONE=0xb, group_card=0x135d."),
+    ("FUN_0804ba90", "check_card_not_equip_placement_type",
+        "Negated wrapper of check_card_has_equip_placement_type with card_id 0x17c4 special exemption. "
+        "If card_id==0x17c4: return 0 (exempt, treated as non-equip-type). "
+        "Otherwise: call check_card_has_equip_placement_type; result==0->return 1, else->return 0. "
+        "I.e. returns 1 when card is NOT equip/special placement type. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 bool. "
+        "indeg=2, class E. "
+        "Constants: exempt_id=0x17c4."),
+    ("FUN_08033730", "check_slot_card_can_be_equipped",
+        "Determines whether the monster in slot (target_player, slot_idx) can be equipped by equip_player. "
+        "Reads card_id from gDuelFieldSlots low 13 bits; returns 0 if card_id==0 or slot_idx>4. "
+        "count_field_copies_of_card(0x13f2)>0 -> return 0. "
+        "If equip_player != target_player: find_effect_node_in_zone(target, slot_idx, 0x13eb, equip_player); "
+        "absent -> return 0. "
+        "check_value_in_slot_chain twice: 0x16a4 (equip_lock_A) and 0x12d1 (equip_lock_B). "
+        "Special: card_id==0x1900 extra VRAM bit flag check. All pass -> return 1. "
+        "r0=u32 equip_player_side [0..1]; r1=u32 target_player_side [0..1]; r2=u32 slot_idx [0..4]. "
+        "Returns u32 bool (1=equippable, 0=not). Read-only. "
+        "indeg=53, class C. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "field_lock_card=0x13f2, equip_blocker=0x13eb, lock_A=0x16a4, lock_B=0x12d1, special=0x1900."),
+    ("FUN_08033688", "check_slot_equip_eligibility",
+        "Whitelist pre-filter layer before check_slot_card_can_be_equipped. "
+        "Reads card_id from gDuelFieldSlots[target_side][slot_idx] low 13 bits; "
+        "BST whitelist over special IDs: "
+        "0x14f9 -> extra unoccupied check -> return 0; "
+        "0x1836 -> extra bit-flag check -> return 0; "
+        "0x1670/0x19ee -> other special logic -> return 0. "
+        "No whitelist hit: call check_slot_card_can_be_equipped(equip_player, target_player, slot_idx). "
+        "r8 (non-APCS, caller-set): u32 equip_player_side (loaded via .hword 0x4684 = mov r4,r8 at entry); "
+        "r1=u32 target_player_side [0..1]; r2=u32 slot_idx [0..4]. "
+        "Returns u32 bool (1=equippable, 0=not or blocked by whitelist). "
+        "indeg=6, class D. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "whitelist_ids=0x14f9/0x1836/0x1670/0x19ee."),
+    ("FUN_080337f0", "check_equip_cards_share_field7",
+        "Checks that two cards share the same extended_stat field7 and equip conditions are met. "
+        "Reads gDuelFieldSlots[target_side][slot_idx]+0x40 word; bit5 != 0 -> return 0 (slot flagged). "
+        "If equip_player != target_player: check [slot+0x38] != 0. "
+        "Reads slot_card_id (low 13 bits from slot+0x30 word); "
+        "BST whitelist: 0x17e9/0x1521/0x1798 or range [0x1874-1..0x1874]. "
+        "Calls get_card_extended_stat_field7 twice (equip_card_id from r8, slot_card_id); "
+        "equal -> return 1, else -> return 0. "
+        "r8 (non-APCS, caller-set): u16 equip_card_id (via .hword 0x468c = mov r4,r8); "
+        "r1=u32 target_player_side [0..1]; r2=u32 equip_player_side [0..1]; r3=u32 slot_idx [0..4]. "
+        "Returns u32 bool (1=field7 match and equip conditions met, 0=not). "
+        "indeg=6, class D. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, bit5_flag_offset=0x40."),
+    ("FUN_0803352c", "check_monster_slot_accepts_card",
+        "Checks if gDuelFieldSlots[player_side][slot_idx] can accept a new card placement. "
+        "Tests bit19 (lsls #0x13): occupied path checks entity state (0x0201bb90) and "
+        "check_slot_placement_blocked_by_field_effect; if pass return 1. "
+        "Empty slot path: checks gP1LifePoints+side*0x868+0x10a0 bit0 and "
+        "check_slot_placement_blocked_by_field_effect; if pass return 1. "
+        "Called by count_available_monster_slots (indeg=73) and find_first_placeable_monster_slot. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]. Returns u32 bool (1=accepts, 0=not). "
+        "indeg=7, class D. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, entity_state=0x0201bb90, "
+        "lp_flag_offset=0x10a0."),
+    ("FUN_080335b8", "count_available_monster_slots",
+        "Counts monster zone slots [0..4] for player_side that accept new card placement. "
+        "Loops slot_idx 0..4 calling check_monster_slot_accepts_card(player, slot_idx); counts returns of 1. "
+        "If count_field_copies_of_card(0x16df)>0: clamps valid_count by "
+        "max(0, 5 - count_occupied_all_field_zones). "
+        "Ultra-high-frequency: indeg=73, class C; used by placement and equip logic. "
+        "r0=u32 player_side [0..1]. Returns u32 available_count [0..5]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "special_card=0x16df, monster_zone_count=5."),
+    ("FUN_08033654", "find_first_placeable_monster_slot",
+        "Reads from ROM slot-order table at 0x09e3ef4c (5 entries x 4 bytes); "
+        "for each slot_idx calls check_monster_slot_accepts_card(player, slot_idx); "
+        "returns first slot_idx that returns 1. All 5 fail -> returns -1 (0xFFFFFFFF). "
+        "Variant sibling of count_available_monster_slots: finds index vs counts. "
+        "r0=u32 player_side [0..1]. Returns s32 slot_idx [0..4] or -1. "
+        "indeg=5, class D. "
+        "Constants: slot_order_table=0x09e3ef4c, table_count=5."),
+    ("FUN_08033634", "get_first_placeable_monster_slot",
+        "Two-step wrapper: calls count_available_monster_slots(player); if 0 return -1. "
+        "If >0: calls find_first_placeable_monster_slot(player) and passes through result. "
+        "Callers get combined 'has available slot + first slot index' in one call. "
+        "r0=u32 player_side [0..1]. Returns s32 slot_idx [0..4] or -1. "
+        "indeg=17, class D."),
+    ("FUN_080a4490", "eval_equip_targets_for_card",
+        "Evaluates equip card (r1=equip_card_id) target availability for player (r0=player_side). "
+        "Returns tri-state: 0=no target; 1=target available; 3=all-target mode. "
+        "count_field_copies_of_card(0x13f2)>0 -> return 0. "
+        "Loops slot 0..4: check_slot_equip_eligibility (r8=equip_player non-APCS); "
+        "on hit: match field6/field7 (r9/r10 counters) + check_slot_placement_blocked_by_field_effect. "
+        "Post-loop: field_blocked=1 path returns 3 or 0 by r2/r10; "
+        "field_blocked=0 path: get_first_placeable_monster_slot<=0->return 0; r10>2->return 1. "
+        "r0=u32 player_side [0..1]; r1=u16 equip_card_id [0..0x1fff]. "
+        "Returns u8 equip_eval_result (0=not equippable, 1=equippable, 3=all-target). "
+        "indeg=1, class E. "
+        "Constants: field_lock_card=0x13f2."),
+    ("FUN_0804c6cc", "get_paired_card_id_by_variant",
+        "Maps input card_id to its paired card_id via 6-entry switch. "
+        "Subtracts 0x164a from card_id to get variant_index; if outside [0..5] return 0. "
+        "Switch: 0->0x165c, 1->0x165d, 2->0x165e, 3->0x165f, 4->0x1660, 5->0x1661. "
+        "I.e. card_id 0x164a..0x164f each maps to associated pair ID 0x165c..0x1661. "
+        "Out-of-range returns 0. "
+        "r0=u16 card_id [0..0x1fff] (typically 0x164a..0x164f). "
+        "Returns u16 paired_card_id (0x165c..0x1661) or 0. "
+        "indeg=5, class D. "
+        "Constants: variant_base=0x164a, paired_base=0x165c, variant_count=6."),
 ]
 
 

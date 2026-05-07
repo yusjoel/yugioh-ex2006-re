@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-18) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-18) |
-| **上次更新** | 2026-05-08 (campaign-17 batch, 300/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 模式, campaign-19) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-19) |
+| **上次更新** | 2026-05-08 (campaign-18 batch, 320/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**300 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**320 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -372,11 +372,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 298 | 416 | 6 | 3 | E | 0x0804c014 | FUN_0804c014 | check_card_is_equip_set_c | 1 | [eval](eval/0804c014.md) |
 | 299 | 417 | 7 | 6 | D | 0x0805a570 | FUN_0805a570 | check_card_zone_activation_blocked | 1 | [eval](eval/0805a570.md) |
 | 300 | 418 | 6 | 1 | E | 0x0805b164 | FUN_0805b164 | invoke_equip_zone_activation_check | 2 | [eval](eval/0805b164.md) |
+| 301 | 419 | 7 | 15 | D | 0x0804a9dc | FUN_0804a9dc | map_field8_to_card_type_category | 1 | [eval](eval/0804a9dc.md) |
+| 302 | 420 | 7 | 3 | E | 0x0804b81c | FUN_0804b81c | get_card_special_group_code | 1 | [eval](eval/0804b81c.md) |
+| 303 | 421 | 6 | 20 | C | 0x0804ba58 | FUN_0804ba58 | check_card_has_equip_placement_type | 1 | [eval](eval/0804ba58.md) |
+| 304 | 422 | 7 | 1 | E | 0x0804c18c | FUN_0804c18c | check_card_is_field_spell_type_b | 1 | [eval](eval/0804c18c.md) |
+| 305 | 423 | 6 | 2 | E | 0x080309fc | FUN_080309fc | check_field_spell_b_placeable | 1 | [eval](eval/080309fc.md) |
+| 306 | 424 | 6 | 4 | E | 0x0803b910 | FUN_0803b910 | check_lp_exceeds_spell_copy_threshold | 1 | [eval](eval/0803b910.md) |
+| 307 | 425 | 8 | 3 | E | 0x0802fb6c | FUN_0802fb6c | find_node_by_value_zone_entity | 1 | [eval](eval/0802fb6c.md) |
+| 308 | 426 | 7 | 10 | D | 0x0802fdf4 | FUN_0802fdf4 | check_slot_has_node_by_card_id | 1 | [eval](eval/0802fdf4.md) |
+| 309 | 427 | 7 | 6 | D | 0x0803b9f4 | FUN_0803b9f4 | check_field_spell_card_placeable_strict | 1 | [eval](eval/0803b9f4.md) |
+| 310 | 428 | 7 | 4 | E | 0x0803b980 | FUN_0803b980 | check_field_spell_group_placeable | 1 | [eval](eval/0803b980.md) |
+| 311 | 429 | 7 | 2 | E | 0x0804ba90 | FUN_0804ba90 | check_card_not_equip_placement_type | 1 | [eval](eval/0804ba90.md) |
+| 312 | 430 | 8 | 53 | C | 0x08033730 | FUN_08033730 | check_slot_card_can_be_equipped | 1 | [eval](eval/08033730.md) |
+| 313 | 431 | 8 | 6 | D | 0x08033688 | FUN_08033688 | check_slot_equip_eligibility | 2 | [eval](eval/08033688.md) |
+| 314 | 432 | 8 | 6 | D | 0x080337f0 | FUN_080337f0 | check_equip_cards_share_field7 | 2 | [eval](eval/080337f0.md) |
+| 315 | 433 | 8 | 7 | D | 0x0803352c | FUN_0803352c | check_monster_slot_accepts_card | 1 | [eval](eval/0803352c.md) |
+| 316 | 434 | 7 | 73 | C | 0x080335b8 | FUN_080335b8 | count_available_monster_slots | 1 | [eval](eval/080335b8.md) |
+| 317 | 435 | 8 | 5 | D | 0x08033654 | FUN_08033654 | find_first_placeable_monster_slot | 1 | [eval](eval/08033654.md) |
+| 318 | 436 | 7 | 17 | D | 0x08033634 | FUN_08033634 | get_first_placeable_monster_slot | 1 | [eval](eval/08033634.md) |
+| 319 | 437 | 7 | 1 | E | 0x080a4490 | FUN_080a4490 | eval_equip_targets_for_card | 2 | [eval](eval/080a4490.md) |
+| 320 | 438 | 7 | 5 | D | 0x0804c6cc | FUN_0804c6cc | get_paired_card_id_by_variant | 1 | [eval](eval/0804c6cc.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #18 PASSED** — duel field equip/placement validator chain (slot equip eligibility indeg=53 + count_monster_slots indeg=73 + field_spell_b_placeable + field_spell_group_placeable + monster_slot_accepts_card + first_placeable_monster_slot 兄弟 + equip_lock effect ID 标签); 1+1 fix iter (5 R7 caller addr 自引用/缺 +1 R6 + 2 R2 plate 字数 + 2 R6 0xb FIELD_SPELL_ZONE); first-shot 15/20; 跨过 20% 里程碑 (320/1526 = 20.97%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.
 - 2026-05-08: **batch=20 #17 PASSED** — duel field placement/equip activation chain (slot placement blocker indeg=40 + monster slot finder indeg=28 + equip card target + activation dispatch + field spell allowed + equip set _c sibling + apply_card_equip_activation + check_card_zone_activation_blocked + invoke_equip_zone_activation_check) + field slot display update + zone descriptor resolver + find_card_effect_node_entry + dispatch_card_effect_activation; 1 fix iter (3 NEEDS_FIX: R7 caller addr placeholder + R3 player_id mislabeled card_id + R3 r3 internal sp clobber + R7 self-reference); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (300/1526 = 19.66%)
 - 2026-05-08: **batch=20 #16 PASSED** — card display VRAM rendering pipeline (jp_string/glyph_nibble/line_buf/card_label/stat/name/choice_label 簇) + game_str pointer resolver indeg=8 + write_decimal_digits_to_oam + 多 init_*_vram 兄弟簇; 1+1+1 fix iter (3 R3 callsite + 2 R7 caller addr r9/r10 上层调用链 + r8/r10 callee-save 删除 + r9 范围 [0..0x01FF]); first-shot 17/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (280/1526 = 18.35%)
 - 2026-05-08: **batch=20 #15 PASSED (单 call 模式)** — LP cost 补全 (compute_lp_cost_by_zone_field5_x200 + eval_slot_score_entry_full) + card display pipeline 簇 (decode_card_image_tiles_to_vram + write_card_digit_tiles_to_vram + zero_card_display_vram_regions + render_card_name_to_sprite_vram + map_card_id_to_digit_tile_offset + render_large_card_display_by_mode + render_decimal_digits_jp_signed + init_bg_vram_for_card_display + write_oam_card_icon_strip + write_nibble_palette_rows_to_vram + render_card_type_icon_to_vram + tick_card_icon_anim_step) + equip set classifiers (check_card_id_is_equip_set_a/b) + duel util (check_card_stat_field7_equals + count_chain_nodes_by_card_id + count_slot_chain_nodes_by_card_id + eval_equip_bonus_for_slot); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (260/1526 = 17.04%)
