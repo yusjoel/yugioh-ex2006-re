@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-23) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-23) |
-| **上次更新** | 2026-05-08 (campaign-22 batch, 400/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-24) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-24) |
+| **上次更新** | 2026-05-08 (campaign-23 batch, 420/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**400 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**420 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -472,11 +472,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 398 | 516 | 8 | 10 | D | 0x080366f0 | FUN_080366f0 | check_slot_fieldspell_eligible_by_side | 2 | [eval](eval/080366f0.md) |
 | 399 | 517 | 7 | 3 | E | 0x0802f3e0 | FUN_0802f3e0 | query_slot_effect_eligibility_with_equip_fallback | 2 | [eval](eval/0802f3e0.md) |
 | 400 | 518 | 7 | 3 | E | 0x080332f0 | FUN_080332f0 | count_slots_matching_card_pair | 2 | [eval](eval/080332f0.md) |
+| 401 | 519 | 6 | 11 | D | 0x080352b0 | FUN_080352b0 | eval_slot_activation_eligibility_full | 1 | [eval](eval/080352b0.md) |
+| 402 | 520 | 7 | 1 | E | 0x08033d44 | FUN_08033d44 | check_any_slot_fieldspell_zone_eligible | 1 | [eval](eval/08033d44.md) |
+| 403 | 521 | 7 | 5 | D | 0x08033294 | FUN_08033294 | count_slots_with_chain_field_match | 1 | [eval](eval/08033294.md) |
+| 404 | 522 | 6 | 6 | D | 0x08035bc8 | FUN_08035bc8 | eval_slot_fieldspell_activation_full | 1 | [eval](eval/08035bc8.md) |
+| 405 | 523 | 5 | 9 | D | 0x0803495c | FUN_0803495c | eval_slot_activation_guard_full | 1 | [eval](eval/0803495c.md) |
+| 406 | 524 | 5 | 1 | E | 0x08096264 | FUN_08096264 | setup_equip_slot_activation_entry | 1 | [eval](eval/08096264.md) |
+| 407 | 525 | 5 | 2 | E | 0x08096954 | FUN_08096954 | dispatch_zone_effect_by_slot | 1 | [eval](eval/08096954.md) |
+| 408 | 526 | 5 | 1 | E | 0x0809678c | FUN_0809678c | eval_zone_activation_flags_by_type | 1 | [eval](eval/0809678c.md) |
+| 409 | 527 | 6 | 3 | E | 0x0805b0cc | FUN_0805b0cc | build_zone_activation_entry_blocked | 1 | [eval](eval/0805b0cc.md) |
+| 410 | 528 | 6 | 1 | E | 0x0805b034 | FUN_0805b034 | build_zone_activation_entry_equip | 1 | [eval](eval/0805b034.md) |
+| 411 | 529 | 5 | 1 | E | 0x0809650c | FUN_0809650c | setup_equip_slot_activation_entry_alt | 1 | [eval](eval/0809650c.md) |
+| 412 | 530 | 4 | 5 | D | 0x08096b3c | FUN_08096b3c | dispatch_zone_activation_by_state | 1 | [eval](eval/08096b3c.md) |
+| 413 | 531 | 5 | 2 | E | 0x080c89a8 | FUN_080c89a8 | query_player_slot_activation_bitmask | 1 | [eval](eval/080c89a8.md) |
+| 414 | 532 | 4 | 5 | D | 0x080c38cc | FUN_080c38cc | render_field_slot_card_tile | 1 | [eval](eval/080c38cc.md) |
+| 415 | 533 | 4 | 6 | D | 0x080c4220 | FUN_080c4220 | refresh_player_field_slot_tiles | 1 | [eval](eval/080c4220.md) |
+| 416 | 534 | 4 | 4 | E | 0x080c39fc | FUN_080c39fc | render_field_zone_card_tile_by_type | 1 | [eval](eval/080c39fc.md) |
+| 417 | 535 | 3 | 1 | E | 0x080c4d04 | FUN_080c4d04 | redraw_all_field_slot_tiles | 1 | [eval](eval/080c4d04.md) |
+| 418 | 536 | 3 | 1 | E | 0x080c36a8 | FUN_080c36a8 | write_palette_tile_row_to_vram | 1 | [eval](eval/080c36a8.md) |
+| 419 | 537 | 4 | 5 | D | 0x080ee3a8 | FUN_080ee3a8 | apply_palette_offset_to_tile_row | 1 | [eval](eval/080ee3a8.md) |
+| 420 | 538 | 4 | 1 | E | 0x080ca4f4 | FUN_080ca4f4 | upload_player_icon_gfx_to_vram | 1 | [eval](eval/080ca4f4.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-08: **batch=20 #23 PASSED (单 call 落地)** — duel field zone activation dispatch + field slot tile render cluster (eval_slot_activation_eligibility_full indeg=11 + check_any_slot_fieldspell_zone_eligible + count_slots_with_chain_field_match + eval_slot_fieldspell_activation_full + eval_slot_activation_guard_full indeg=9 + setup_equip_slot_activation_entry + dispatch_zone_effect_by_slot + eval_zone_activation_flags_by_type + build_zone_activation_entry_blocked/equip 兄弟对 + setup_equip_slot_activation_entry_alt + dispatch_zone_activation_by_state indeg=5 hub + query_player_slot_activation_bitmask + render_field_slot_card_tile indeg=5 + refresh_player_field_slot_tiles indeg=6 + render_field_zone_card_tile_by_type + redraw_all_field_slot_tiles + write_palette_tile_row_to_vram + apply_palette_offset_to_tile_row indeg=5 + upload_player_icon_gfx_to_vram); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (420/1526 = 27.52%)
 - 2026-05-08: **batch=20 #22 PASSED** — duel slot activation/eligibility eval cluster (eval_slot_score_entry_full callee cluster + check_slot_*_activatable/eligible sibling cluster + Last Warrior/Archfiend/Amazoness card_id anchored cluster + count_slots_matching_card_pair) + check_player_has_equip_type_in_slots; 1 fix iter (8 NEEDS_FIX: 6 R3 non-APCS misclassified (mov rN,APCS) -> delete param rows + 2 R7 self-reference + 1 R7 indeg=41 caller count insufficient); first-shot 12/20; crossed 25% milestone (400/1526 = 26.21%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.
 - 2026-05-08: **batch=21 PASSED (单 call 模式)** — duel field equip activation eval cluster (check_equip_slot_pair_can_activate_full + check_equip_slot_can_activate_with_context count-list variant + scan_equip_activation_for_player + scan_equip_activation_with_mode card_id mode init + get_equip_activation_mode_by_card_id leaf + find_slot_idx_by_card_id_in_player_zones indeg=21 + check_banisher_pair_activation_allowed med + eval_equip_target_slot_flags + eval_spell_activation_flags_by_zone indeg=1 large hub + check_card_stat_field8_is_8/6 sibling pair + check_card_has_activatable_effect_node + check_card_id_is_equip_blocker whitelist + eval_equip_activation_for_slot + setup_equip_context_for_slot_activation + setup_equip_context_for_zone_activation + read_player_field_slot_word_by_zone jump-table + check_zone_slot_card_activatable + eval_zone_activation_flags_for_player + count_equip_set_activatable_slots_for_player r8/r9/r10 non-APCS); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (380/1526 = 24.90%)
 - 2026-05-08: **batch=20 #20 PASSED** — duel core spell/equip activation eval cluster (dispatch_effect_handler_by_card_id indeg=101 + check_field_spell_neo_daedalus_group_placeable indeg=85 + classify_spell_card_activation_type BST + find_effect_record_index_by_id binary search + eval_spell_card_activation_placeable + count_valid_monster_pair_slots r8 non-APCS + eval_equip_card_placeable_for_player r10 non-APCS + count_unpaired_slots_for_card + check_ritual_fusion_pairable_slots_exist + check_equip_target_monster_placeable + count_equippable_slots_for_card r10 non-APCS + eval_equip_card_multi_target_placeable r8 non-APCS + resolve_best_target_slot_for_equip wrapper + eval_spell_equip_target_availability + count_equipped_paired_slots_for_player r8/r10 non-APCS + check_slot_equip_target_eligible r12 non-APCS + init_spell_activation_context gSpellContext init + check_card_id_in_fusion_target_range BST + count_slot_chain_copies_of_card); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (360/1526 = 23.59%)

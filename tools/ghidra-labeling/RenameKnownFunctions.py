@@ -5898,6 +5898,251 @@ RENAMES = [
         "Returns u32 count. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
         "slot_count=5 [0..4], slot+0x8=equip_chain_head, slot+0x6=chain_field."),
+
+    # batch=23
+    ("FUN_080352b0", "eval_slot_activation_eligibility_full",
+        "当 duel 场地需要判断某一卡槽 (player_side, slot_idx) 上的卡是否可以激活效果时, "
+        "由上层 hub (FUN_0803495c / eval_zone_activation_flags_for_player 簇) 调用. "
+        "函数依次执行多层筛选: (1) 同时调用 check_slot_card_effect_eligibility 和 "
+        "check_slot_card_fieldspell_eligibility 获取效果/魔法场地资格掩码; "
+        "(2) 以 FIELD_SPELL_ZONE=0xb 检查当前槽的 field spell 链; "
+        "(3) 按卡 ID 范围 (0x15ff/0x1505/0x1644/0x1958 等特定 id) 分支查询装备/效果链, "
+        "调用 query_zone_chain_count_with_eligibility / count_equip_chain_default_flags / "
+        "query_slot_effect_eligibility_with_equip_fallback; "
+        "(4) 针对 Amazoness/Archfiend 类卡调用 count_available_effect_zones; "
+        "(5) 按 equip 列表匹配 count_slot_equip_list_matches 及 get_slot_field5_score 做阈值判断. "
+        "副作用: 无 VRAM/IWRAM 写入; 纯读取 gDuelFieldSlots. indeg=11, class D. "
+        "返回 0=不可激活, 1=可激活. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "FIELD_SPELL_ZONE=0xb, slot_entry=0x14."),
+
+    ("FUN_08033d44", "check_any_slot_fieldspell_zone_eligible",
+        "当需要判断某一玩家侧 (r0 bit0) 是否存在至少一个合法的场地魔法区位时调用. "
+        "函数遍历 gDuelFieldSlots 5 个卡槽 (slot_idx 0..4), 对每槽: "
+        "(1) 检查 [slot+0] bit9 是否置位 (槽有卡); "
+        "(2) 检查 [slot+0x8] equip_chain_head 非零; "
+        "(3) 调用 compute_slot_zone_eligibility_mask 取掩码并 AND 0x7, 非零即返回 0 (找到合法区位). "
+        "所有槽均不满足则返回 1. 纯读操作, 无副作用. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry=0x14 (20 bytes), slot_count=[0..4]."),
+
+    ("FUN_08033294", "count_slots_with_chain_field_match",
+        "当上层需要统计某玩家侧满足双条件的卡槽数量时调用: "
+        "条件 A (r1 非零时) 要求 [slot+0x8] equip_chain_head 非零; "
+        "条件 B (r2 非零时) 要求 [slot+0x6] chain_field 非零. "
+        "函数遍历 gDuelFieldSlots 中该玩家的 5 个卡槽 (slot_idx 0..4), "
+        "对每个有卡 ([slot+0] bit9 置位) 的槽: 若条件 A/B 均满足则计数 r5++. "
+        "返回命中计数. 纯叶子函数, 无副作用. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
+        "slot+0x8=equip_chain_head, slot+0x6=chain_field."),
+
+    ("FUN_08035bc8", "eval_slot_fieldspell_activation_full",
+        "当判断卡槽上的 field spell 是否可以激活时由 FUN_0803495c 调用. "
+        "函数首先调用 check_slot_card_fieldspell_eligibility 和 "
+        "check_slot_field_spell_chain_eligible 获取 field spell 基础资格; "
+        "若后者为 0 则直接返回 0. "
+        "再调用两次 query_zone_chain_count_with_eligibility "
+        "(使用卡 ID 0x1561 和 0x1852) 检查区域链. "
+        "若无链记录, 则检查 [slot+0] bit5 (chain_lock) 和 [slot+0x8] (equip_chain_head) 双重条件; "
+        "然后按对侧对应槽的卡 ID 进行详细分支分别走不同子路径. "
+        "返回 0=不可激活, 1/2=不同激活级别. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "0x1561/0x1852=zone chain filter codes, FIELD_SPELL_ZONE=0xb."),
+
+    ("FUN_0803495c", "eval_slot_activation_guard_full",
+        "当上层 zone eval 循环 (indeg=9) 需要综合判断某玩家侧 (r0) 某 slot (r1) "
+        "是否可激活卡效果时调用. "
+        "函数首先调用 check_slot_card_activatable 做基础可激活检查; 失败则返回 0. "
+        "通过后依次尝试 check_player_field_spell_chain_eligible 和 "
+        "eval_slot_fieldspell_activation_full 做 field spell 专项检查; 任意通过则返回 1. "
+        "若两者均失败, 则遍历 5 个卡槽, 对每槽调用 eval_slot_activation_eligibility_full "
+        "(FUN_080352b0) 进行全量效果资格判断. 全部失败返回 0. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_count=[0..4]."),
+
+    ("FUN_08096264", "setup_equip_slot_activation_entry",
+        "当 zone eval 主循环确定某卡槽需要建立装备激活记录时调用 (indeg=1). "
+        "函数接受 player_side/slot_idx/zone_slot, 首先检查 slot_idx<=4; "
+        "读取 gDuelState[+0x4] 判断当前激活玩家侧; "
+        "若是对侧则调用 check_card_field5_is_nonzero 确认卡有效, "
+        "确认 equip_chain_head 非零且 check_card_id_is_equip_blocker 通过. "
+        "在 EWRAM 区域 (r8 非 APCS 传递的节点地址 + 0x18 字节 memset 清零) 构建激活条目: "
+        "写入 card_id/player_side bit/zone_code/属性位; "
+        "最终调用 eval_equip_activation_for_slot 返回激活结果 (0x8=可激活). "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelState=0x0201e2a0, "
+        "ACTIVATION_FLAG=0x8, DUEL_ZONE_ACTIVATION_OFFSET=0x1d48, buf_size=0x18."),
+
+    ("FUN_08096954", "dispatch_zone_effect_by_slot",
+        "当 zone eval 路径需要对卡槽 (r0=player_side, r1=slot_idx) 派发效果处理时调用 (indeg=2). "
+        "函数极简: 将 r1 (slot_idx) 移到 r2 位置, 再将常量 0xfffe 作为 r1 传入 "
+        "dispatch_effect_handler_by_card_id; "
+        "若返回非零则返回 0x8 (可激活标志), 否则返回 0. "
+        "0xfffe 为通配效果 ID, 对应通用激活判断路径. "
+        "Constants: EFFECT_ID_GENERIC=0xfffe, ACTIVATION_FLAG=0x8."),
+
+    ("FUN_0809678c", "eval_zone_activation_flags_by_type",
+        "当 zone eval 主循环需要对单个 zone_type (r1) 的卡槽计算激活标志位时调用 (indeg=1). "
+        "根据 zone_type 三路分支: "
+        "(A) zone==0xb (FIELD_SPELL_ZONE): 读 gP1LifePoints[player*0x868+0xc] 做 LP 阈值比较, "
+        "调用 setup_equip_context_for_zone_activation, 成功则 r6|=0x8; "
+        "(B) zone_type in [0xc..0xf]: 调用 check_zone_slot_card_activatable 取 u16 标志, "
+        "再调 dispatch_zone_effect_by_slot OR 进 r6; "
+        "若玩家为对侧且 slot==0xd 则 r6|=0x1000; "
+        "(C) 其他: 调用 setup_equip_context_for_slot_activation. "
+        "返回 r6 (激活标志复合值). "
+        "Constants: FIELD_SPELL_ZONE=0xb, ACTIVE_ZONE_PLAYER_FIELD_OFFSET=0x1d64, "
+        "FLAG_ZONE_ACTIVATABLE=0x8, FLAG_DUAL_ZONE=0x1000."),
+
+    ("FUN_0805b0cc", "build_zone_activation_entry_blocked",
+        "当需要构建一个装备激活条目并检查其是否被阻断时调用 (indeg=3). "
+        "函数在栈上分配 0x18 字节缓冲区, memset 清零; "
+        "将 r2(card_id) 写入 [buf+0]; "
+        "设置 [buf+2] bit0=player_side&1 和 bits[5:0]=zone_code; "
+        "设置 [buf+3] |= 0x40; "
+        "读取 gDuelFieldSlots[player*0x868+slot*20] 的 node word 提取属性字段写入 [buf+4]; "
+        "最终调用 check_card_zone_activation_blocked(buf, 0). 返回其结果. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, buf_size=0x18, "
+        "slot_entry=0x14, OAM_attr_mask_1=0xffff803f, OAM_attr_mask_2=0xfffff03f."),
+
+    ("FUN_0805b034", "build_zone_activation_entry_equip",
+        "当需要构建一个装备类型激活条目并对其做 eval_equip_activation_for_slot 判定时调用 (indeg=1). "
+        "函数结构与 build_zone_activation_entry_blocked (FUN_0805b0cc) 几乎完全对称, "
+        "区别在于最终调用的是 eval_equip_activation_for_slot 而非 check_card_zone_activation_blocked, "
+        "用于判断装备魔法槽的激活合法性. "
+        "栈分配 0x18 字节, memset 清零; 写入 card_id/player_bit/zone_code/attr; "
+        "调用 eval_equip_activation_for_slot(buf, 0); 返回其结果. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, buf_size=0x18, "
+        "OAM_attr_mask_1=0xffff803f, OAM_attr_mask_2=0xfffff03f."),
+
+    ("FUN_0809650c", "setup_equip_slot_activation_entry_alt",
+        "FUN_08096264 (setup_equip_slot_activation_entry) 的结构对称变体, "
+        "被 FUN_08096b3c dispatch hub 的另一 case 分支调用 (indeg=1). "
+        "同样接受 player_side/slot_idx/zone_slot 三个参数, "
+        "首先调用 find_paired_zone_entry_for_card 判断是否已有配对条目; "
+        "若已配对且玩家侧与 gDuelState[+0x4] 匹配, 则写 [gP1LifePoints+0x1d48]:=0x10. "
+        "无配对时继续判断后 memset 清零缓冲区并构建激活条目, "
+        "调用 eval_equip_activation_for_slot. "
+        "然后进入扩展路径: 检查 get_card_extended_stat_field6 == 0x16/0x17, "
+        "调用 build_zone_activation_entry_blocked / build_zone_activation_entry_equip 做额外 block 检查. "
+        "Constants: gDuelState=0x0201e2a0, gDuelFieldSlots=0x0201c510, "
+        "ACTIVATION_FLAG=0x8, DUEL_ZONE_OFFSET=0x1d48, buf_size=0x18."),
+
+    ("FUN_08096b3c", "dispatch_zone_activation_by_state",
+        "duel field zone 激活评估的主 dispatch hub (indeg=5, class D). "
+        "入口读取 gP1LifePoints[+0x1d50] (zone state 标志), 若为 0 则返回 0. "
+        "否则读 gP1LifePoints[+0x1d4c] (zone state 类型 1..10), 减 1 后查跳表 (10 个 case): "
+        "case 1=单 monster zone; "
+        "case 2/3=多 zone 类型按 slot_idx 分 4 组分别调 setup_equip_slot_activation_entry / "
+        "setup_equip_slot_activation_entry_alt / eval_zone_activation_flags_by_type; "
+        "case 4/5/7/9=场地/trap/magic zone 特殊路径; case 6/8/10=其他路径. "
+        "Constants: gP1LifePoints 偏移: 0x1d4c=zone_type, 0x1d50=zone_state, "
+        "FLAG_DUAL_ZONE=0x1000, FLAG_ACTIVATABLE=0x8."),
+
+    ("FUN_080c89a8", "query_player_slot_activation_bitmask",
+        "当 FUN_080c4220 (duel field display 更新) 需要知道某玩家所有卡槽的激活可能性时调用 (indeg=2). "
+        "函数遍历 7 个槽 (r4=0..6), 对每槽从 gDuelZoneDisplay (0x0202317c) 读取 slot_id (halfword), "
+        "然后调用 dispatch_zone_activation_by_state (FUN_08096b3c, r1=slot_id, r2=r4) 取激活标志; "
+        "若标志 bit11 (0x800) 置位则将 r4 对应 bit 置入返回掩码 r5. "
+        "最终返回 r5=7bit 掩码 (bit N = slot N 可激活). "
+        "Constants: gDuelZoneDisplay=0x0202317c, FLAG_SLOT_ACTIVATABLE_BIT=0x800 (bit11), "
+        "slot_count=[0..6]."),
+
+    ("FUN_080c38cc", "render_field_slot_card_tile",
+        "当 duel field 需要在 BG tile map 上渲染一个卡槽的卡牌小图标时调用 (indeg=5, class D). "
+        "函数参数通过非 APCS 高寄存器传递 (r8=player_side 等), "
+        "栈 sp[0x24]=card_mini_frame_flag, sp[0x28]=use_card_image_flag. "
+        "首先调用 get_field_slot_tile_vram_addr 取目标 VRAM 地址. "
+        "若 use_card_image_flag==0, 调用 update_field_slot_tile_display 直接清空槽. "
+        "否则按 card_mini_frame_flag 决定数据源; "
+        "读取 tile_data 后循环以 halfword 形式复制 0x120 字节 (144 个 halfword = 卡牌缩略图) 到 VRAM 目标地址. "
+        "Constants: tile_copy_count=0x90=144 halfwords, ROM_VERSION_BYTE_ADDR=0x080000ae, "
+        "EWRAM_FLAGS=0x02000000+0x6c2c."),
+
+    ("FUN_080c4220", "refresh_player_field_slot_tiles",
+        "当 duel field 场地需要整体刷新某玩家所有卡槽的 BG tile 显示时调用 (indeg=6, class D). "
+        "函数接受 player_side (r0) 和一个 halfword (r1, 传入槽 header 值), "
+        "首先读取 gP1LifePoints[player*0x868+0xc] 的 zone count (max 7). "
+        "外层循环 r4=0..r8 (max slot count), 对每槽: "
+        "检查 gDuelState[+0x4] (对侧 player) 或调 get_player_deck_flag_bit1 确认是否对侧; "
+        "若是对侧则 r6=1 (有卡), 否则从 gDuelZoneSlotData (0x02023180) 读 zone halfword 判断是否有卡. "
+        "然后调用 render_field_slot_card_tile (FUN_080c38cc) 渲染每槽. "
+        "内层结束后继续对 slot [4..6] 调 update_field_slot_tile_display 清空魔法/陷阱槽. "
+        "最后写入 gDuelZoneSlotHeader (0x02023130+0x4c+player*2) 一个 halfword, "
+        "并调用 query_player_slot_activation_bitmask (FUN_080c89a8) 取激活掩码写入辅助区域. "
+        "Constants: gDuelState=0x0201e2a0, gP1LifePoints LP_ZONE_COUNT_OFFSET=0xc, "
+        "gDuelZoneSlotData=0x02023180, gDuelZoneSlotHeader=0x02023130, "
+        "gDuelFieldSlots=0x0201c600, player_stride=0x868, ACTIVATABLE_MASK_SHIFT=5."),
+
+    ("FUN_080c39fc", "render_field_zone_card_tile_by_type",
+        "当需要根据 zone_type (slot_idx r1 = 0xc/0xd/0xe/0xf 的特殊 zone) "
+        "渲染对应的卡牌小图标 tile 时调用 (indeg=4, tags: card_frame card_ids). "
+        "函数获取 get_field_slot_tile_vram_addr 定位 VRAM 目标; 然后按 zone_type 分支: "
+        "zone 0xc -> 若 card_id (r4) 非零从 gDuelFieldSlots[player][FUSION_ZONE?] 读卡属性 "
+        "(含 JP flag 检查) 后确定 tile 源; "
+        "zone 0xd -> 若有卡读 gDuelSpecialZone_0x0201c740 (magic slot 数组) 确定 mini frame tile; "
+        "zone 0xe -> 与 0xd 类似, 读 gDuelSpecialZone2_0x0201c8f4; "
+        "zone 0xf -> 先调 get_zone_card_attribute_by_type 取属性, 再读 gDuelSpecialZone3_0x0201caac; "
+        "若无卡(r4==0)则调 update_field_slot_tile_display 清空. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "gDuelSpecialZone_0xc=0x0201c740, gDuelSpecialZone_0xe=0x0201c8f4, "
+        "gDuelSpecialZone_0xf=0x0201caac, ROM_VERSION_BYTE=0x080000ae, "
+        "EWRAM_FLAGS=0x02000000+0x6c2c, JP_FLAG_BYTE=0x4a."),
+
+    ("FUN_080c4d04", "redraw_all_field_slot_tiles",
+        "当 duel field 场地需要完整重绘所有 zone 和 slot 的卡牌 tile 时调用 (indeg=1, class D). "
+        "函数外层循环 r7=0..1 (两个玩家), 内层循环 r6=0..4 (5 个主要 slot): "
+        "对每 (player, slot) 组合, 读取 gDuelAnimState (0x0202334e) 和 gDuelAnimFlags (0x02023350) "
+        "合成 zone_mask, 再通过 get_zone_card_attribute_by_type / get_zone_slot_field6_by_type / "
+        "get_zone_slot_card_ref_by_type + ensure_card_id_cache_entry 获取每槽卡 ID; "
+        "调用 render_field_slot_card_tile (FUN_080c38cc) 渲染主 slot. "
+        "外层结束后遍历 slot 5..10 同样渲染. "
+        "最后对 4 个特殊 zone (0xc/0xd/0xe/0xf) 各调 render_field_zone_card_tile_by_type "
+        "(FUN_080c39fc). 最终对两个玩家各调 refresh_player_field_slot_tiles (FUN_080c4220) "
+        "完成 header/tile 同步. "
+        "Constants: gDuelAnimState=0x0202334e, gDuelAnimFlags=0x02023350, "
+        "player_stride=0x868, gDuelFieldSlots=0x0201c510."),
+
+    ("FUN_080c36a8", "write_palette_tile_row_to_vram",
+        "当 duel field 显示初始化或场地 BG 重建时调用 (indeg=1, tags: vram palette scene_duel_field). "
+        "函数从 ROM 数据表 (0x09e49254/0x09e49258) 和 VRAM base 0x0600e800 开始, "
+        "以 r7=0..1 (两行或两层) / r2=0..0x15 (列, 22 列) 的双层循环, "
+        "每次读取两个 ROM word (palette_index 和 tile_index), "
+        "将 tile_index<<5 | palette_offset 合成 halfword 写入 VRAM BG tile map. "
+        "外层 r7==1 时, tile_index 在 0..8 范围内加 0xC00 以选择第二套 tile 集. "
+        "循环结束后以 copy_bytes_by_halfword 将 palette 数据 (0x100 halfwords, 0x200 bytes) "
+        "从 ROM (0x08510460) 复制到 BG palette (0x05000020). "
+        "Constants: VRAM_BG_TILE_MAP=0x0600e800, BG_PALETTE_VRAM=0x05000020, "
+        "ROM_PALETTE_SRC=0x08510460, ROM_TILE_TABLE_A=0x09e49254, ROM_TILE_TABLE_B=0x09e49258, "
+        "TILE_SET_MASK=0xC00, col_count=0x15 (22 cols), row_count=2, "
+        "palette_copy_size=0x100 halfwords=0x200 bytes."),
+
+    ("FUN_080ee3a8", "apply_palette_offset_to_tile_row",
+        "当 scene_duel_field 需要对一段 BG tile 数据按调色板偏移进行修改时调用 (indeg=5, class D). "
+        "函数从栈 sp[0x28] 读取 tile_count (外层循环次数), "
+        "以 r4=tile_count (递减) 和 r5=src_ptr (halfword 步进) 构成内层 tile 遍历循环. "
+        "对每个 halfword tile entry: "
+        "检查 [src] & 0x3ff (tile index field) 非零才处理; "
+        "读 sp[0x4] (palette_mask) 与 tile_value OR, "
+        "再将 [src] & 0xf000 (palette bank) 加上 r6 (palette_offset lsl 0xc) 合成新 tile halfword 写入 dst [r3+]. "
+        "用于将 duel field BG tile 行的调色板索引批量替换为指定 palette_bank, 实现高亮/变色效果. "
+        "Constants: TILE_INDEX_MASK=0x3ff, PALETTE_BANK_MASK=0xf000, "
+        "PALETTE_FIELD_MASK=0xf0000000 (sp[4] palette_mask)."),
+
+    ("FUN_080ca4f4", "upload_player_icon_gfx_to_vram",
+        "当 duel field scene 需要将某玩家的 LP/图标数字 tile 数据和调色板上传到 VRAM 时调用 "
+        "(indeg=1, tags: vram palette scene_duel_field). "
+        "函数根据 player_side (r0) 与当前激活玩家 (gDuelState[+0x4] XOR 1) 是否匹配, "
+        "在两个 VRAM 目标地址间选择 (0x0600fb80=player 1 位置, 0x0600f840=player 2 位置). "
+        "以 r4 (tile_row start = 0x1CE 或 0x1D7) / r3 (步进) 为基准, "
+        "外层循环 r3=3..0 (3 次) 写入 3 列 tile halfword 到 BG tile map. "
+        "然后读 gDuelState 判断当前玩家, 根据是否对侧从 icon_palettes_base (ROM) "
+        "选择 +0x20 偏移的调色板, 以 copy_bytes_by_halfword 复制 0x40 字节到 "
+        "BG_PAL_VRAM (0x05000180). "
+        "若当前玩家==对侧, 还从 icon_tiles_base (ROM asset 0x0600bae0 或 0x0600b9c0) "
+        "+ player offset 复制 0x120 字节 icon tile. "
+        "Constants: gDuelState=0x0201e2a0, BG_TILE_MAP_P1=0x0600fb80, "
+        "BG_TILE_MAP_P2=0x0600f840, BG_PALETTE_ICON=0x05000180, "
+        "ICON_TILE_SIZE=0x120 bytes, PALETTE_COPY_SIZE=0x40 bytes, "
+        "tile_row_start_local=0x1CE, tile_row_start_remote=0x1D7."),
 ]
 
 
