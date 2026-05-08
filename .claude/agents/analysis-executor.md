@@ -107,9 +107,17 @@ model: sonnet
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
 7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）→ 全部替换为最接近的 ASCII 对应符号；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
-9. **R1 双动词检查**: proposed_name 不得含 `_and_` / `_or_` / `_then_` 连接两个动词; `_and_return` / `_then_return_` 永远不合法 (return 是隐含语义); 函数做副作用后返回固定值时只命名副作用 (`write_X_then_return_Y` → `set_X`), 返回值写进参数签名返回行; dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
-10. **R8 med/low 升级路径**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`)
-11. **R4 返回行存在性硬扫**: Grep `返回:` 或 `- 返回` 在参数签名段 → 必须 ≥ 1 条; 完全缺失返回行与"仅写数值无语义"等同 → R4=0; 确认存在后再检查含义+路径说明是否符合 `feedback_r4_fixed_return_semantic.md`
+9. **R3 callee-save 高寄存器机械检测 (强制执行, 不可跳过)**: 14 函数 2 批 (#22 + #23) 同期复现, executor 误把 callee-save alias 当 caller-set 输入是当前 token 头号浪费源。**写完 R3 参数签名后, 必须执行以下 checklist**:
+    - [ ] 扫描函数入口前 5 条指令 (含 `.hword 0x46xx` 形式的 THUMB 高低寄存器混合传送)
+    - [ ] 列出所有 `.hword 0x46xx = mov rN, rM` 指令。0x46xx 解码: bit 6 = 目标 H 位, bit 7 = 源 H 位, bits[5:3] = 源 reg, bits[2:0] = 目标 reg。常见值: `0x4680=mov r8,r0`, `0x4681=mov r9,r0`, `0x4688=mov r8,r1`, `0x4689=mov r9,r1`, `0x4690=mov r8,r2`, `0x4691=mov r9,r2`, `0x4698=mov r8,r3`, `0x4699=mov r9,r3`, `0x46c0=nop` (mov r8,r8 = 编码占位)
+    - [ ] 对每条 mov rN, rM 应用三分支判定:
+      - **rM ∈ {r0,r1,r2,r3} 且 rN ∈ {r4..r12}** → rN **必须** 删除 R3 参数行 (callee-save alias; rN 只是 APCS 入参 rM 的内部别名, 函数体调用 bl 后 rM 被破坏故先搬到 callee-save 槽)
+      - **rM ∈ {r4..r12} 来自 ldr DAT_xxx / literal pool** → rN 是 internal-set (函数自载入常量, 不是参数; 参考 `feedback_internal_load_misclassified_as_param.md`)
+      - **rN 是真 caller-set 参数** ↔ caller bl 之前明确出现 `mov rN, X` (X ∉ {r0,r1,r2,r3}) 或 `ldr rN, [sp,#?]` 等设置, 且函数体使用前未被覆盖 → 必须附 caller bl 之前的 callsite asm 证据 (不是 callee 入口的 mov 消费指令)
+    - [ ] 自检 grep: 在最终 R3 参数签名段中 grep 是否有 r4/r8/r9/r10/r11/r12 行; 若有, 每条必能引用上述三分支之一并附完整 asm 证据 (callee body 的入口 mov 不算 callsite 证据 — 参见 `feedback_non_apcs_register_input.md` Counter-pattern + #22/#23 复现)
+10. **R1 双动词检查**: proposed_name 不得含 `_and_` / `_or_` / `_then_` 连接两个动词; `_and_return` / `_then_return_` 永远不合法 (return 是隐含语义); 函数做副作用后返回固定值时只命名副作用 (`write_X_then_return_Y` → `set_X`), 返回值写进参数签名返回行; dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
+11. **R8 med/low 升级路径**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`)
+12. **R4 返回行存在性硬扫**: Grep `返回:` 或 `- 返回` 在参数签名段 → 必须 ≥ 1 条; 完全缺失返回行与"仅写数值无语义"等同 → R4=0; 确认存在后再检查含义+路径说明是否符合 `feedback_r4_fixed_return_semantic.md`
 
 ### Phase 5: 完成报告
 
