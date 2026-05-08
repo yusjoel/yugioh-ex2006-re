@@ -5676,6 +5676,228 @@ RENAMES = [
         "Returns u32 count via r0. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot5_card_off=0x64, "
         "slot5_state_off=0x74, slot_entry_size=0x14."),
+
+    # batch #22: duel slot activation/eligibility eval cluster (20 functions)
+    ("FUN_08034358", "check_slot_field_action_eligibility",
+        "Checks if gDuelFieldSlots[player_side][slot_idx] meets field action eligibility. "
+        "Verifies slot is occupied (card_id bit9 != 0), else return 0. "
+        "Checks slot[+0x10] bit21: bit21==1 -> if gDuelActivation[+4]==player_side write "
+        "[gP1LifePoints+side*0x868+0x1d48]=0x3 return 0; "
+        "bit21==0 -> run checks: check_slot_card_effect_eligibility / "
+        "check_slot_card_fieldspell_eligibility / check_value_in_slot_chain(x3) / "
+        "query_zone_chain_count_with_eligibility / count_equip_chain_default_flags / "
+        "find_paired_zone_entry_for_card / count_available_effect_zones. "
+        "All pass return 1, any fail return 0. indeg=6. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
+        "activation_base=0x0201e2a0."),
+    ("FUN_0803ba98", "check_field_spell_last_warrior_placeable",
+        "Checks if player field allows placing Last Warrior from Another Planet (0x12b1) related field spell. "
+        "Reads gP1LifePoints[player_side*0x868+0x11c] bit20; bit20==1 -> return 0 (already restricted). "
+        "Else: count_available_effect_zones(player, 0x13ff=Jam Breeding Machine, -1) nonzero -> return 0; "
+        "count_field_copies_of_card(0x12b1=Last Warrior) nonzero -> return 0; "
+        "find_effect_node_in_zone(player, 0xb, 0x1679=Judgement of Pharaoh, 1) nonzero -> return 0. "
+        "All pass return 1. indeg=3. "
+        "r0=u32 player_side [0..1]. Returns u32 0/1. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, field_state_offset=0x11c, "
+        "bit20=0x100000, 0x12b1=Last Warrior, 0x13ff=Jam Breeding Machine, "
+        "0x1679=Judgement of Pharaoh."),
+    ("FUN_080345e0", "check_field_spell_slot_placeable",
+        "Checks if gDuelFieldSlots[player_side][slot_idx] allows placing a field spell. "
+        "Reads slot+0x8 (equip chain head); nonzero -> return 0 (slot occupied by equip chain). "
+        "Then three gate checks: (1) check_slot_field_action_eligibility(player, slot); "
+        "(2) check_field_spell_last_warrior_placeable(player); "
+        "(3) check_field_spell_neo_daedalus_group_placeable(player). "
+        "Any 0 -> return 0. "
+        "On pass checks card_id range (Archfiend range 0x164a..0x164f etc.) for extra pair constraints. "
+        "Final pass return 1. indeg=3. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot+0x8=equip_chain_head."),
+    ("FUN_080346c4", "check_slot_monster_activation_eligible",
+        "Multi-condition monster activation eligibility check for gDuelFieldSlots[player_side][slot_idx]. "
+        "Reads slot[flags] bit22 (occupation flag); bit22==0 -> return 0. "
+        "Checks bit23; bit23==1 -> proceed to activation path. "
+        "bit23==0: reads slot[+0x30] flags extracting bit5/bit1 with slot+0x8 equip chain head "
+        "for multi-condition filtering. "
+        "On pass branches by card_id: 0x1723=Twinheaded Beast, 0x14d5=Tyrant Dragon etc. "
+        "Final pass return 1, fail return 0. indeg=2. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gP1LifePoints ptr, player_stride=0x868, slot_offset=slot_idx*0x14+0x40, "
+        "bit22=occupation, bit23=summoned_flag."),
+    ("FUN_08035280", "exit_slot_activation_with_state_write",
+        "Checks if gDuelActivation[+4] equals r5 (caller-saved player_side); "
+        "if match writes 0x13 (activation_fail_code) to gP1LifePoints+0x1d78. "
+        "Returns 0 regardless of write. "
+        "Dedicated activation-fail exit for check_slot_full_activation_eligibility (FUN_08034a58): "
+        "called via tail-branch b FUN_08035280 from multiple sites inside FUN_08034a58. "
+        "indeg=1. No APCS params (uses caller r5). Returns u32 0. "
+        "Constants: gDuelActivation=0x0201e2a0, activation_player_offset=+4, "
+        "0x1d78=activation_state_offset, activation_fail_code=0x13."),
+    ("FUN_08033cf8", "check_player_has_equip_type_in_slots",
+        "Scans player (r0 bit0) 5 monster zone slots (slot_idx 0..4), "
+        "checks if any slot has equip-type card (field8==6). "
+        "Per slot: (1) card_id low 13 bits nonzero; "
+        "(2) ldrh slot+0x8 (equip_chain_head) nonzero; "
+        "(3) check_card_stat_field8_is_6(card_id) true. "
+        "All three satisfied -> return 1 immediately. "
+        "Leaf function (check_card_stat_field8_is_6 is named callee). indeg=3. "
+        "r0=u32 player_side [0..1]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
+        "slot_count=5 [0..4], slot+0x8=equip_chain_head."),
+    ("FUN_08035988", "check_slot_field_spell_chain_eligible",
+        "Checks field-chain equip eligibility for slot (player_side=r0, slot_idx=r1). "
+        "Calls check_slot_card_fieldspell_eligibility for eligibility flags. "
+        "Computes slot address from player_side bit0 and slot_idx; "
+        "reads slot[+0x10] flags extracting bit5/bit1 with slot+0x8 (equip_chain_head) for triple filter. "
+        "On pass branches by slot card_id: "
+        "0x147d=Zombyra, 0x127d..0x1283=Toon range, 0x154a=Toon Dark Magician Girl etc.; "
+        "each branch calls check_card_matches_active_effect_slot / find_equip_chain_node_by_slot_pair. "
+        "indeg=4. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot+0x10=flags_word, bit5/bit1=restriction_flags."),
+    ("FUN_08035b24", "check_field_spell_trap_chain_eligible",
+        "Checks trap-chain eligibility for player (r0 bit0) field spell zone slots. "
+        "Scans 5 slots (r6=0..4) from gDuelFieldSlots+player*0x868. "
+        "Per slot: card_id low 13 bits nonzero; "
+        "slot[+0x10] bit5/bit1 dual filter pass; "
+        "card_id==0x13cd=The Legendary Fisherman -> "
+        "calls check_card_matches_active_effect_slot(0x10f4=Umi). "
+        "No match in 5 slots -> return 0. indeg=2. "
+        "r0=u32 player_side [0..1]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "0x13cd=The Legendary Fisherman, 0x10f4=Umi."),
+    ("FUN_08032dac", "count_equip_zone_slots_matching_card",
+        "Counts slots in player (r0 bit0) equip zone (slot 5..10, offset +0x64) matching all conditions. "
+        "r1=target_card_id (saved to r8), r2=ref_value (saved to r12). "
+        "Per slot (stride 0x14, 6 slots): "
+        "(1) card_id low 13 bits == r8; "
+        "(2) slot[+0x10] bit5==0 and bit1==0; "
+        "(3) ldrh [slot+0x8] (equip_chain_head) != 0; "
+        "(4) slot[+0xc] >= r12. "
+        "All satisfied -> r6++. Returns hit count. indeg=1. "
+        "r0=u32 player_side [0..1]; r1=u32 target_card_id; r2=u32 ref_value. Returns u32 count. "
+        "Non-APCS: r8=target_card_id (caller-saved from r1), r12=ref_value (caller-saved from r2). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "equip_zone_base=+0x64, slot_count=6 [0..5]."),
+    ("FUN_08034a58", "check_slot_full_activation_eligibility",
+        "Comprehensive activation eligibility check for gDuelFieldSlots[player_side][slot_idx]. "
+        "Core composite function for field activation decisions (200+ instructions). "
+        "Entry: push callee-save regs + sub sp,#0x40 (0x40-byte frame); "
+        "reads slot card_id and slot[+0x10] flags; "
+        "slot+0x10 bit24 nonzero -> b exit_slot_activation_with_state_write (fail exit). "
+        "Calls in sequence: find_paired_zone_entry_for_card / eval_slot_score_entry_full / "
+        "check_slot_card_effect_eligibility / check_slot_card_fieldspell_eligibility / "
+        "query_zone_chain_count_with_eligibility (multiple) / "
+        "count_equip_chain_default_flags (x3) / "
+        "count_field_copies_of_card / count_available_effect_zones. "
+        "Exits via exit_slot_activation_with_state_write writing activation state then returns 0. "
+        "indeg=2. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "gDuelActivation=0x0201e2a0, 0x1d48=activation_field, 0x1d78=second_activation_field."),
+    ("FUN_080349b0", "check_slot_card_activatable",
+        "Checks if card in gDuelFieldSlots[player_side][slot_idx] is activatable. "
+        "Reads slot card_id and slot+0x8 (equip_chain_head); card_id==0 -> return 0 (empty slot). "
+        "slot+0x6 (chain_field) nonzero: branch by card_id: "
+        "0x12b4=Total Defense Shogun -> reads slot[+0x10] bit5 as activation flag; "
+        "0x1956=EHero Rampart Blaster -> bit5 inverted and calls count_occupied_monster_zones; "
+        "other -> return 0. "
+        "slot+0x6==0: calls check_slot_monster_activation_eligible; "
+        "if returns 0 calls check_slot_full_activation_eligibility. indeg=8. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "0x12b4=Total Defense Shogun, 0x1956=Elemental Hero Rampart Blaster."),
+    ("FUN_08035ba4", "check_player_field_spell_chain_eligible",
+        "Checks if player (r0) has activation eligibility in field spell chain. "
+        "Calls check_slot_field_spell_chain_eligible(r0); if returns 0 -> return 0. "
+        "If nonzero, calls check_field_spell_trap_chain_eligible(1-r4=opponent); "
+        "if opponent returns 0 -> return 1 (player eligible, no opponent conflict). "
+        "If opponent also nonzero -> return 0. "
+        "Result: player has field chain eligibility AND opponent has no conflict -> 1; else 0. "
+        "indeg=6. "
+        "r0=u32 player_side [0..1]. Returns u32 0/1."),
+    ("FUN_08030b0c", "check_slot_card_is_monster_type",
+        "Reads card_id from gDuelFieldSlots[player_side][slot_idx], "
+        "calls map_field8_to_card_type_category for type code "
+        "(0=Normal Monster, 7=Ritual/Effect subset, 8=Equip). "
+        "type==0 or ==7 -> return 1; "
+        "type==8 -> calls check_slot_card_is_equip_type(player, slot) and returns inverted result; "
+        "other types (2..6 etc.) -> return 0. "
+        "Determines if slot card is activatable Monster or specific effect card rather than pure equip spell. "
+        "indeg=9. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "card_type_normal=0, card_type_ritual_sub=7, card_type_equip=8."),
+    ("FUN_0802f61c", "count_equip_slots_with_active_chain",
+        "Counts slots in player (r0 bit0) where all three hold: "
+        "(1) slot occupied (card_id bit9 != 0); "
+        "(2) slot+0x8 (equip_chain_head) != 0; "
+        "(3) count_equip_chain_default_flags(player, slot_idx, r1=chain_filter) nonzero. "
+        "r1 saved to r9 at entry via .hword 0x4689 (mov r9,r1); "
+        "restored to r2 at each callee call via .hword 0x464a (mov r2,r9). "
+        "indeg=6. "
+        "r0=u32 player_side [0..1]; r1=u32 chain_filter. Returns u32 count. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry=0x14, slot_count=5 [0..4]."),
+    ("FUN_0804aea0", "check_card_is_archfiend_type",
+        "Checks if card_id (r0) belongs to the Archfiend card group. "
+        "Series of card_id range/single-value comparisons: "
+        "0x107f=B.Skull Dragon, 0x10ab=Wicked Mirror, 0x127f=Toon Summoned Skull, "
+        "0x12b5=Beast of Talwar, 0x13e3=Archfiend of Gilfer, 0x14b7=Lesser Fiend, "
+        "0x14da=Fiend Skull Dragon, 0x1661-0x1666 range, 0x1692=Skull Archfiend of Lightning etc. "
+        "Any match return 1, else return 0. Leaf function (bx lr). indeg=7. "
+        "r0=u32 card_id. Returns u32 0/1."),
+    ("FUN_0804b048", "check_card_is_amazoness_type",
+        "Checks if card_id (r0) belongs to the Amazoness card group. "
+        "Whitelist comparisons: "
+        "0x14ab=Amazoness Chain Master, 0x14a6=Amazoness Archers, "
+        "0x14af=Amazoness Fighter, 0x14b0=Amazoness Paladin, 0x160f=Amazoness Tiger etc. "
+        "Any match return 1, else return 0. Pure leaf function (bx lr). indeg=1. "
+        "r0=u32 card_id. Returns u32 0/1."),
+    ("FUN_0803a958", "get_slot_field5_score",
+        "Extracts field5 score (sp+0x14 offset) from eval_slot_score_entry_full result array. "
+        "Builds 0x24-byte frame (sub sp,#0x24); "
+        ".hword 0x466a (mov r2,sp) passes stack top as result buffer pointer; "
+        "r0=player_side and r1=slot_idx forwarded directly to eval_slot_score_entry_full; "
+        "result array written to sp+0x4..sp+0x24; returns sp+0x14 (index=4, field5). "
+        "5-instruction body. Numbered sibling cluster with adjacent functions extracting "
+        "different fields from same eval_slot_score_entry_full result. "
+        "indeg=41. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 field5_score. "
+        "Constants: sp+0x14=score_field5_offset (entry index 4), "
+        "eval_slot_score_entry_full result array base at sp+0x4."),
+    ("FUN_080366f0", "check_slot_fieldspell_eligible_by_side",
+        "Small wrapper: takes (r0=player_side, r1=slot_idx, r2=target_player_side), "
+        "calls check_slot_card_fieldspell_eligibility(r0, r1) for eligibility flags, "
+        "then ANDs result with (r2+1) and checks > 0. "
+        "Returns 1 if slot has fieldspell eligibility AND (eligibility_flags & (r2+1)) != 0. "
+        "Compact selector used at multiple duel sites to check if specific side has field spell activation right. "
+        "indeg=10. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; r2=u32 target_player_side [0..1]. "
+        "Returns u32 0/1."),
+    ("FUN_0802f3e0", "query_slot_effect_eligibility_with_equip_fallback",
+        "Selects path based on card_id (r2) field6 value: "
+        "field6==0x17 (Union type) -> computes player_side XOR r3 nonzero as r2 flag, "
+        "calls check_slot_fieldspell_eligible_by_side(r0, r1, r2); "
+        "other field6 -> computes r2 flag similarly, "
+        "calls query_slot_effect_eligibility_nonzero(r0, r1, r2). "
+        "If above result==0 -> calls count_slot_equip_list_matches(r0, r1, card_id, r3) "
+        "and returns equip count. indeg=3. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; "
+        "r2=u32 card_id; r3=u32 filter_value. Returns u32 count_or_flag. "
+        "Constants: field6_union_type=0x17."),
+    ("FUN_080332f0", "count_slots_matching_card_pair",
+        "Counts player (r0 bit0) 5 slots (slot_idx 0..4) satisfying all: "
+        "(1) slot occupied (card_id bit9 != 0); "
+        "(2) slot+0x8 (equip_chain_head) == r1 (target_chain_head); "
+        "(3) slot+0x6 (chain_field) == r2 (target_chain_field). "
+        "All satisfied -> counter++. Returns hit count. "
+        "Pure leaf scan function. indeg=3. "
+        "r0=u32 player_side [0..1]; r1=u32 target_chain_head; r2=u32 target_chain_field. "
+        "Returns u32 count. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, "
+        "slot_count=5 [0..4], slot+0x8=equip_chain_head, slot+0x6=chain_field."),
 ]
 
 
