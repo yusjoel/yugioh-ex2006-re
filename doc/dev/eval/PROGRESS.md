@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-25) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-25) |
-| **上次更新** | 2026-05-09 (campaign-24 batch, 440/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-26) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-26) |
+| **上次更新** | 2026-05-09 (campaign-25 batch, 460/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**440 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**460 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -512,11 +512,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 438 | 558 | 7 | 1 | E | 0x080c00f0 | FUN_080c00f0 | draw_card_name_to_bg_tile_vram | 1 | [eval](eval/080c00f0.md) |
 | 439 | 559 | 8 | 1 | E | 0x080c0204 | FUN_080c0204 | write_nibble_to_bg_tile_cell | 1 | [eval](eval/080c0204.md) |
 | 440 | 560 | 7 | 2 | E | 0x080c0274 | FUN_080c0274 | write_nibble_sequence_to_bg_tiles | 1 | [eval](eval/080c0274.md) |
+| 441 | 561 | 6 | 2 | E | 0x080c0310 | FUN_080c0310 | write_nibble_row_pair_to_bg_tiles | 1 | [eval](eval/080c0310.md) |
+| 442 | 562 | 6 | 1 | E | 0x080c0394 | FUN_080c0394 | copy_card_frame_nibbles_to_palette_vram | 1 | [eval](eval/080c0394.md) |
+| 443 | 563 | 5 | 2 | E | 0x080c05b4 | FUN_080c05b4 | render_card_display_with_type_gfx | 1 | [eval](eval/080c05b4.md) |
+| 444 | 564 | 5 | 2 | E | 0x080f55fc | FUN_080f55fc | clamp_blend_counter_to_target | 1 | [eval](eval/080f55fc.md) |
+| 445 | 565 | 7 | 5 | D | 0x080c2d24 | FUN_080c2d24 | blit_card_frame_tile_row_to_vram | 1 | [eval](eval/080c2d24.md) |
+| 446 | 566 | 4 | 1 | E | 0x080c8bf0 | FUN_080c8bf0 | build_slot_activation_mask_for_player | 1 | [eval](eval/080c8bf0.md) |
+| 447 | 567 | 7 | 1 | E | 0x080f70c4 | FUN_080f70c4 | push_oam_entry_to_aob_slot | 1 | [eval](eval/080f70c4.md) |
+| 448 | 568 | 6 | 11 | D | 0x080f8000 | FUN_080f8000 | render_aob_frame_to_oam | 1 | [eval](eval/080f8000.md) |
+| 449 | 569 | 6 | 11 | D | 0x080f7f08 | FUN_080f7f08 | tick_aob_frame_counter | 1 | [eval](eval/080f7f08.md) |
+| 450 | 570 | 8 | 1 | E | 0x080c2ddc | FUN_080c2ddc | write_digit_oam_column_with_scroll | 1 | [eval](eval/080c2ddc.md) |
+| 451 | 571 | 7 | 1 | E | 0x080c2e58 | FUN_080c2e58 | render_decimal_number_to_oam | 1 | [eval](eval/080c2e58.md) |
+| 452 | 572 | 6 | 1 | E | 0x080c2eac | FUN_080c2eac | render_card_number_oam_by_player | 1 | [eval](eval/080c2eac.md) |
+| 453 | 573 | 5 | 1 | E | 0x080c305c | FUN_080c305c | render_dual_card_number_oam_columns | 1 | [eval](eval/080c305c.md) |
+| 454 | 574 | 4 | 11 | D | 0x08096e14 | FUN_08096e14 | init_duel_zone_target_slot_refs | 1 | [eval](eval/08096e14.md) |
+| 455 | 575 | 5 | 2 | E | 0x080c6800 | FUN_080c6800 | transform_zone_oam_coords_by_player | 1 | [eval](eval/080c6800.md) |
+| 456 | 576 | 5 | 11 | D | 0x080c35ac | FUN_080c35ac | resolve_zone_oam_base_coords_by_type | 1 | [eval](eval/080c35ac.md) |
+| 457 | 577 | 4 | 1 | E | 0x080c8aa8 | FUN_080c8aa8 | render_duel_field_slot_oam_grid | 1 | [eval](eval/080c8aa8.md) |
+| 458 | 578 | 5 | 3 | E | 0x080c57c4 | FUN_080c57c4 | compute_card_sprite_oam_coords_by_zone | 1 | [eval](eval/080c57c4.md) |
+| 459 | 579 | 4 | 1 | E | 0x080c6240 | FUN_080c6240 | tick_card_sprite_oam_step_a | 1 | [eval](eval/080c6240.md) |
+| 460 | 582 | 5 | 2 | E | 0x080f7528 | FUN_080f7528 | write_tile_rows_to_vram_by_mode | 1 | [eval](eval/080f7528.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-09: **batch=20 #25 PASSED (单 call 落地)** — card frame nibble/OAM + blend counter + AOB frame tick/render + duel field slot OAM grid + OAM zone coord resolver cluster (write_nibble_row_pair_to_bg_tiles + copy_card_frame_nibbles_to_palette_vram + render_card_display_with_type_gfx + clamp_blend_counter_to_target + blit_card_frame_tile_row_to_vram + build_slot_activation_mask_for_player + push_oam_entry_to_aob_slot + render_aob_frame_to_oam indeg=11 + tick_aob_frame_counter indeg=11 + write_digit_oam_column_with_scroll + render_decimal_number_to_oam + render_card_number_oam_by_player + render_dual_card_number_oam_columns + init_duel_zone_target_slot_refs indeg=11 + transform_zone_oam_coords_by_player + resolve_zone_oam_base_coords_by_type indeg=11 + render_duel_field_slot_oam_grid + compute_card_sprite_oam_coords_by_zone + tick_card_sprite_oam_step_a + write_tile_rows_to_vram_by_mode); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (460/1526 = 30.14%)
 - 2026-05-09: **batch=20 #24 PASSED (单 call 落地)** — duel field VRAM init + AOB ctx cluster + card image/name/atkdef render pipeline (write_lp_digit_tiles_to_vram + init_duel_field_tile_indices + resolve_aob_pattern_entry_ptr + init_aob_ctx_with_anm_entry indeg=14 + init_aob_ctx_from_ptnsect indeg=14 + init_duel_field_lp_aob_ctx + init_duel_field_vram_layout indeg=8 hub + tick_duel_field_fadeout_step indeg=8 + tick_duel_field_fadein_step indeg=10 + blend_palette_entry_toward_target indeg=8 + tick_banner_pack_state_machine + write_card_image_oam_grid + tick_blend_step_with_bldcnt + init_line_buf_with_jp_font_flag + draw_card_atkdef_label_to_vram + repack_nibbles_with_palette_offset + render_card_image_to_vram + draw_card_name_to_bg_tile_vram + write_nibble_to_bg_tile_cell + write_nibble_sequence_to_bg_tiles); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (440/1526 = 28.83%)
 - 2026-05-08: **batch=20 #23 PASSED (单 call 落地)** — duel field zone activation dispatch + field slot tile render cluster (eval_slot_activation_eligibility_full indeg=11 + check_any_slot_fieldspell_zone_eligible + count_slots_with_chain_field_match + eval_slot_fieldspell_activation_full + eval_slot_activation_guard_full indeg=9 + setup_equip_slot_activation_entry + dispatch_zone_effect_by_slot + eval_zone_activation_flags_by_type + build_zone_activation_entry_blocked/equip 兄弟对 + setup_equip_slot_activation_entry_alt + dispatch_zone_activation_by_state indeg=5 hub + query_player_slot_activation_bitmask + render_field_slot_card_tile indeg=5 + refresh_player_field_slot_tiles indeg=6 + render_field_zone_card_tile_by_type + redraw_all_field_slot_tiles + write_palette_tile_row_to_vram + apply_palette_offset_to_tile_row indeg=5 + upload_player_icon_gfx_to_vram); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (420/1526 = 27.52%)
 - 2026-05-08: **batch=20 #22 PASSED** — duel slot activation/eligibility eval cluster (eval_slot_score_entry_full callee cluster + check_slot_*_activatable/eligible sibling cluster + Last Warrior/Archfiend/Amazoness card_id anchored cluster + count_slots_matching_card_pair) + check_player_has_equip_type_in_slots; 1 fix iter (8 NEEDS_FIX: 6 R3 non-APCS misclassified (mov rN,APCS) -> delete param rows + 2 R7 self-reference + 1 R7 indeg=41 caller count insufficient); first-shot 12/20; crossed 25% milestone (400/1526 = 26.21%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.

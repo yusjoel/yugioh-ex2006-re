@@ -6295,6 +6295,83 @@ RENAMES = [
         "坐标由 r0 (packed: lo16=tile_x_even [6..80], hi16=inner_row_base [5..6]) 和 r1 (vram_row_param) 驱动. "
         "被 FUN_080c0310 和 FUN_080c05b4 调用. "
         "Constants: OUTER_LOOP_COUNT=8, NIBBLE_LOW_MASK=0x0f, NIBBLE_HIGH_MASK=0xf0."),
+    # 2026-05-09: batch #25 (campaign-25) landing (topo=561-582, 20 functions)
+    ("FUN_080c0310", "write_nibble_row_pair_to_bg_tiles",
+        "BG tile VRAM nibble dual-row writer: 4x bl write_nibble_sequence_to_bg_tiles, "
+        "stride 0x20 per row, 2x2 tile block. VRAM base 0x06010000 (DAT_080c03e8). "
+        "Caller: render_card_display_with_type_gfx (ATK/DEF nibble rows)."),
+    ("FUN_080c0394", "copy_card_frame_nibbles_to_palette_vram",
+        "Card frame nibble tile copy to OBJ/BG VRAM by palette offset. "
+        "r1>>11=type selects 0x06010000 BG or 0x05000200 PAL VRAM. "
+        "Tail-jumps to LAB_080c0598 (no independent return). Caller: render_card_display_with_type_gfx."),
+    ("FUN_080c05b4", "render_card_display_with_type_gfx",
+        "Full card display render: card image + ATK/DEF nibble tiles + name label + type icon. "
+        "Reads card_stats_table[card_id*11]. Dispatches on card_type 0x16/0x17 (fusion/ritual frame). "
+        "Callers: play_ui_effect_33, play_ui_effect_34."),
+    ("FUN_080f55fc", "clamp_blend_counter_to_target",
+        "Converge gPrng+0x200 blend counter (low 6 bits) toward r0 target. "
+        "If current>target: subtract delta, mask 0x3f. Else: clear and set negative 0x40. "
+        "Callers: play_ui_effect_33, play_ui_effect_34."),
+    ("FUN_080c2d24", "blit_card_frame_tile_row_to_vram",
+        "Copy card_medium_frame_tile_data row to OBJ VRAM 0x06010000+r1*0x20. "
+        "Checks DAT_080000ae flag 0x4a for field_spell frame variant. "
+        "Calls tile_2d_row_copy(dest, 0, 8, 6). 5 callers: play_ui_effect_20/21/23/25/0c."),
+    ("FUN_080c8bf0", "build_slot_activation_mask_for_player",
+        "Build slot activation bitmask at 0x020230c0+3 for current player. "
+        "Only runs when player_state==3 (duel phase check). "
+        "Loops slot 0..4 calling eval_slot_activation_guard_full; clears mask if gPrng+0x1d10==-1."),
+    ("FUN_080f70c4", "push_oam_entry_to_aob_slot",
+        "Write OAM attr0/1/2 (from r2 ptr) to AOB slot array at gPrng+0x1bc, then increment slot write ptr. "
+        "Skips if slot ptr byte==0x80 (full). Slot stride 8 bytes (lsls r1,#3)."),
+    ("FUN_080f8000", "render_aob_frame_to_oam",
+        "Render AOB animation object current frame to OAM buffer and copy tile data to VRAM 0x06010000. "
+        "16-case shape/color dispatch; calls copy_bytes_by_halfword + push_oam_entry_to_aob_slot. "
+        "11 callers including play_ui_effect_37/38/3b."),
+    ("FUN_080f7f08", "tick_aob_frame_counter",
+        "Advance AOB frame counter (aob+0xc/0xd/0x12/0x13), resolve new ptn entry on frame change. "
+        "Returns 0 if uninitialized (bit5 of aob+0x12), 1 on normal tick. "
+        "Shared by same 11 callers as render_aob_frame_to_oam."),
+    ("FUN_080c2ddc", "write_digit_oam_column_with_scroll",
+        "Decimal decompose r4 via __modsi3/__divsi3 (base 10), write each digit OAM entry. "
+        "Digit tile base 0x70, x step -0xc per digit (right to left). "
+        "Optional gPrng+0x20c bit1 x-jitter via r3 scroll_flag. Caller: render_decimal_number_to_oam."),
+    ("FUN_080c2e58", "render_decimal_number_to_oam",
+        "Count decimal digits of r1, compute OAM x_base (r5*100+digit_count*6+0x52), "
+        "then call write_digit_oam_column_with_scroll. Caller: render_card_number_oam_by_player."),
+    ("FUN_080c2eac", "render_card_number_oam_by_player",
+        "Select OAM tile orientation by player side comparison (0x0201fe60+3/4 vs 0x0201e2a0+4^1). "
+        "flip_sign: 0xae (flip) or 0x4a (normal). Calls render_decimal_number_to_oam. "
+        "r0=oam_x_base [0x200..0x208], r1=oam_y_base. Caller: render_dual_card_number_oam_columns."),
+    ("FUN_080c305c", "render_dual_card_number_oam_columns",
+        "Call render_card_number_oam_by_player twice with r0=0x200 then r0=0x208 (two digit columns). "
+        "r1=oam_y same for both calls. Caller: play_ui_effect_0c."),
+    ("FUN_08096e14", "init_duel_zone_target_slot_refs",
+        "Init duel_field zone slot ref cache in gP1LifePoints+0x1d68 area. "
+        "Calls get_zone_slot_ptr 3x; extracts card_id bits[12:0]; sets active flag at +0x1d54=1. "
+        "11 callers in duel_field scene."),
+    ("FUN_080c6800", "transform_zone_oam_coords_by_player",
+        "Mirror OAM coords (r2=x, r3=y) by player_id vs ctx.current_player^1; 16-case zone_type switch. "
+        "Returns packed (y<<16|x). Pure calc, no external writes. "
+        "Callers: render_duel_field_slot_oam_grid, compute_card_sprite_oam_coords_by_zone."),
+    ("FUN_080c35ac", "resolve_zone_oam_base_coords_by_type",
+        "Lookup OAM base coords from DAT_080c35e8 table by zone_type [0..15] and player_id. "
+        "16-case switch; returns packed (y<<16|x). Pure query. "
+        "11 callers including play_ui_effect_15/10/play_card_zoom_in."),
+    ("FUN_080c8aa8", "render_duel_field_slot_oam_grid",
+        "Iterate all duel_field zone slots (type 0..10 + b..f), compute OAM coords via "
+        "resolve_zone_oam_base_coords_by_type + transform_zone_oam_coords_by_player, "
+        "write OAM via write_oam_entry_from_packed_args. void input. Caller: play_ui_effect_03."),
+    ("FUN_080c57c4", "compute_card_sprite_oam_coords_by_zone",
+        "Compute card sprite OAM coords by zone (player_id r5, zone_type r1, zone_idx r2). "
+        "Calls resolve_zone_oam_base_coords_by_type; applies y offset by card_type [1/3/5]. "
+        "Loops activation mask bits. Returns void. 3 wrapper callers."),
+    ("FUN_080c6240", "tick_card_sprite_oam_step_a",
+        "Call compute_card_sprite_oam_coords_by_zone, increment ctx+0x2a counter, "
+        "return 1 if counter>3 (done) else 0 (continue). void input. Caller: FUN_080c65b0."),
+    ("FUN_080f7528", "write_tile_rows_to_vram_by_mode",
+        "Conditional copy/zero OBJ VRAM rows: src==0 calls zero_fill_by_halfword per row, "
+        "src!=0 calls copy_bytes_by_halfword. Row stride 0x400 (OBJ 2D mode). "
+        "r2>>0xb=halfword stride, [sp+0x18]=col offset. Callers: FUN_080c5b78, FUN_080dc4ec."),
 ]
 
 
