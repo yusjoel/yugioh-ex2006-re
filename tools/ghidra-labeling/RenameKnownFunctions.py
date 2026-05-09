@@ -7041,6 +7041,169 @@ RENAMES = [
         "Constants: campaign_state=0x020230c0, WIN0H=0x04000040, WIN0V=0x04000044, "
         "BLDY=0x04000054, WININ=0x04000048, WINOUT=0x0400004a, "
         "campaign_inner_image=0x0985d720, VRAM=0x06009000."),
+    # --- batch #30 (campaign-30) ---
+    ("FUN_080c91bc", "reset_blend_control_regs",
+        "当 play_ui_effect_06 (case 0x06 UI 效果子状态机) 调用本函数时, 执行如下操作: "
+        "读 BLDCNT (0x04000050) 并与掩码 0x9fff AND 清除 blend 模式字段[15:13]; "
+        "将 BLDCOEF (0x04000052) 与 BLDALPHA (0x04000054) 均写为 0, 关闭 alpha 混合系数. "
+        "副作用目的: 禁用 GBA 图层混合效果, 使画面回到正常直通模式. "
+        "函数固定返回 1, 供调用方判断操作是否已执行. "
+        "Constants: BLDCNT=0x04000050, MASK_9FFF=0x9fff (清除 BLDCNT[15:13]=blend mode), "
+        "BLDCOEF=+2, BLDALPHA=+4 (相对 BLDCNT 偏移)."),
+    ("FUN_080bd3f4", "tick_banner_display_state_machine",
+        "由 play_ui_effect (0x0801ef94) 调用. "
+        "读取 gBannerState (0x0201feC0, 偏移 +0x10 字节) 作为 switch 索引 [0..8], 共 9 个 case (case 4..7 合并为同一分支). "
+        "每个 case 执行对应帧阶段操作: case 0 设置 VRAM/palette 标志并拷贝调色板数据, 按 LP 状态选择 tile 源; "
+        "case 1 更新 banner 贴图行偏移并调 tile_2d_row_copy; 后续 case 逐步完成 banner 动画帧推进. "
+        "函数通过 high-register callee-save (.hword 0x4647=mov r7,r0; .hword 0x4680=mov r8,r0) "
+        "保存 gBannerState 指针和输入参数供 switch 各分支复用. "
+        "Constants: gBannerState=0x0201feC0, VRAM_BG_BASE=0x06014000, "
+        "PALETTE_SRC_0=0x05000260, ROM_PALETTE_A=0x098db0c4, ROM_PALETTE_B=0x098ed0e4."),
+    ("FUN_0803bc58", "check_card_play_condition_eligible",
+        "检查给定卡牌播放/效果条件是否满足. "
+        "r0 为来自调用方的索引 (从 FUN_080c9f50 传入 ldr r0,[r0,#0x4] 的值). "
+        "首先检查 gBannerState 相关结构体 (0x0201bcc0 + 0x80c/0x808 偏移) 是否均为 0; "
+        "若非 0 则直接返回 0 (不满足). "
+        "通过后检查 gP1LifePoints 结构中对应玩家的 LP 字段, 激活状态字段, 以及特定状态码; "
+        "还会调用 check_player_side_condition 判断玩家阵营条件. "
+        "最终返回 0 (不满足) 或 1 (满足). "
+        "Constants: BASE=0x0201bcc0, OFFSET_STATE_A=0x80c, OFFSET_STATE_B=0x808, "
+        "gP1LifePoints=0x0201c4e0, LP_OFFSET_PLAYER=0x1ce8, LP_OFFSET_ACTIVE=0x1d10, "
+        "LP_OFFSET_TARGET=0x1d4c."),
+    ("FUN_080c9f50", "render_card_view_scene_by_lp_time",
+        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 和 FUN_080ca42c 调用. "
+        "首先检查 gP1LifePoints+0x1d08 是否非零 (LP 存在); 若为零直接跳到函数末尾. "
+        "然后调用 check_card_play_condition_eligible (FUN_0803bc58) 判断卡牌播放条件; 不满足则跳转. "
+        "满足后, 从 LP 结构读取时间字段 (gP1LifePoints+r8*4+0x214), "
+        "除以 0x3c (60) 得到分钟 r5 和秒数 r7, "
+        "再调用各卡牌渲染子程序 (render_jp_string_to_tile_line 等) 将卡牌信息绘制到 BG tile VRAM. "
+        "函数使用 r8/r9 作为 high-register callee-save 参数别名. "
+        "Constants: gP1LifePoints=0x0201c4e0, OFFSET_LP_CHECK=0x1d08, TIME_DIV=0x3c (60), "
+        "gPrng=0x03000040, TIME_LAYOUT=0x00660028."),
+    ("FUN_080cd250", "init_field_bg_tile_vram_layout",
+        "由 FUN_080c7950 (vram/card_stats/font_jp) 和 FUN_080c7ea0 (window/vram/display/card) 调用. "
+        "函数入口将 r0 低 16 位 (r5=u16_lo) 和高 16 位 (r4=u16_hi) 分别提取作为 palette index 和 tile 偏移参数. "
+        "首先 zero_fill_by_halfword 清零 BG tile VRAM 区域 (0x06014000, 0x80<<0x7=0x4000 halfword = 0x8000 字节); "
+        "然后依次调用 copy_bytes_by_halfword (0x05000260 palette) 和三次 tile_2d_row_copy 将 card tile 数据从 ROM 复制到 VRAM. "
+        "之后读取状态结构体的 palette/tile 字段, 计算 OBJ palette index 并循环写入 BG tile 中调色板编号字段. "
+        "Constants: VRAM_BG_BASE=0x06014000, PALETTE_SRC=0x05000260, "
+        "ROM_TILE_SRC_A=0x0988aad8, ROM_TILE_SRC_B=0x0988a7d8, ROM_TILE_SRC_C=0x0988ab58, "
+        "STATE_BASE=0x0201f440, PALETTE_IDX_MASK=0xfffff00f, LOOP_END=5."),
+    ("FUN_080cea50", "render_card_entry_jp_labels_to_bg",
+        "由 FUN_080c7ea0 (window/vram/display/card_data 全标签主控) 独占调用 (indeg=1). "
+        "初始化 JP 文字渲染缓冲区 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
+        "读取状态结构体 (0x0201f440 + 0x0a16) 的 bit[0..2] 判断当前语言/模式标志, 选择对应的 font_jp_base_table 条目; "
+        "然后循环遍历 card entry 表 (0x0201e4f0, 每条 4 字节, r5 in [0..3]) "
+        "逐条调用 render_jp_string_to_tile_line 将 JP 文字渲染到 BG tile 缓冲; "
+        "完成后调用 write_line_buf_to_bg_tile_vram 将缓冲写入 BG tile VRAM. "
+        "Constants: STATE_BASE=0x0201f440, OFFSET_LANG_FLAG=0x0a16, "
+        "CARD_ENTRY_TABLE=0x0201e4f0, VRAM_BG=0x06014000, LOOP_RANGE=[0..3]."),
+    ("FUN_080cf7d4", "render_card_stat_tiles_to_vram",
+        "由 FUN_080c7950 (vram/card_stats/font_jp) 和 FUN_080c7ea0 (window/vram/display/card) 调用. "
+        "首先 zero_fill_by_halfword 清零 BG tile VRAM (0x06014000, 0x80<<7=0x4000 halfword); "
+        "读取状态结构体 (0x0201f440 + 0x0a17/0x0a18) 的 bit[0]/bit[1] 判断是否需要渲染. "
+        "若条件不满足直接跳至末尾. "
+        "满足后: 读 r4 (入口参数) 作为 stat 值, 计算显示行列位置 (modsi3/divsi3 各 1 次, 除数 0xa=10), "
+        "调用 copy_bytes_by_halfword 拷贝调色板数据两次 (来自 ROM 0x09850c5c/0x0984ee2c 到 0x05000260/0x05000280), "
+        "然后 tile_2d_row_copy 拷贝 tile 数据到 VRAM (0x06010000), "
+        "调用 setup_line_buf + render_jp (game_str) 渲染统计数字字符到 BG tile; "
+        "最后 write_line_buf_to_bg_tile_vram 写回 VRAM. "
+        "函数使用 r8/r9/r10 为 callee-save 别名. "
+        "r0: s32 stat_value (caller1 080c7a74 从卡牌 ATK/DEF 字段传入; caller2 080c80da 固定传 0). "
+        "Constants: VRAM_BG_CLEAR=0x06014000, STATE_BASE=0x0201f440, "
+        "PAL_DST_A=0x05000260, PAL_SRC_A=0x09850c5c, PAL_DST_B=0x05000280, PAL_SRC_B=0x0984ee2c, "
+        "TILE_VRAM_BASE=0x06010000, STAT_ROWS=0x13, STAT_COLS=0xa."),
+    ("FUN_080cff50", "init_field_slot_tile_attrs",
+        "由 FUN_080c7950 (vram/card_stats) 和 FUN_080c7ea0 (window/vram/display/card) 调用. "
+        "入口将 r0 低 16 位提取为 r4 (palette_index), 高 16 位提取为 r5 (tile_offset). "
+        "首先 zero_fill_by_halfword 清零 BG tile VRAM (0x06014000, 0x4000 halfword). "
+        "读取状态结构体 (0x0201f440 + 0x0a17/0x0a18) 的两个标志位决定是否执行后续写入; 若均为 0 则跳过. "
+        "满足后: 将 palette_index 写入状态字段 0x0a0c (halfword, 通过掩码 0x7fff/0xffff8000 保留低 15 位), "
+        "将 tile_offset (r5) 写入状态字段 0x0a0d byte (bit[6:0], mask 0x7f). "
+        "最后固定写入状态字段 0x0a01 := 7. "
+        "r0: u32 packed_params (低 16 位=palette_index [0..0x7fff], 高 16 位=tile_offset [0..0x7f]). "
+        "Constants: VRAM_BG_BASE=0x06014000, STATE_BASE=0x0201f440, "
+        "OFFSET_FLAG_A=0x0a17, OFFSET_FLAG_B=0x0a18, MASK_15BIT_LO=0x7fff, STATE_DONE=7."),
+    ("FUN_080cffd4", "render_duel_zone_card_detail_to_vram",
+        "由 FUN_080c7ea0 (window/vram/display/card_data/duel_field 全标签主控) 独占调用 (indeg=1). "
+        "综合执行以下操作: (1) 读状态字段 (0x0201f440+0x0a0c) 的卡牌 ID (15 位), "
+        "调用 ensure_card_id_cache_entry 确保卡牌数据已缓存; "
+        "(2) 读下一个槽位 ID, 调用 find_zone_descriptor_by_slot_id 和 get_zone_slot_ptr 获取区域插槽指针; "
+        "(3) 读插槽中卡牌 face_down bit, 与 0x4020 合并存入 sp+4; "
+        "(4) 初始化 JP 文字行缓冲 (setup_line_buf_with_font_and_align); "
+        "(5) 设置语言模式 flag (font_jp_base_table 查找); "
+        "(6) render_jp_string_to_tile_line 渲染卡牌名称 JP 文字; "
+        "(7) write_line_buf_to_bg_tile_vram 写 BG tile VRAM; "
+        "(8) 两次 load_card_list_small_image 加载小图; "
+        "(9) render_large_card_display_by_mode 渲染大卡图. "
+        "Constants: STATE_BASE=0x0201f440, OFFSET_CARD_SLOT=0x0a0c, "
+        "FLAG_FACE_DOWN=0x4020, VRAM_BG=0x06014000, gP1LifePoints_BASE=0x02023130."),
+    ("FUN_080d04dc", "render_jp_two_line_text_to_bg_vram",
+        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
+        "与 080ccfe4 结构完全对称: 初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
+        "设置语言模式标志 (STATE+0x8 bit[1..2]); 从 font_jp_base_table 取字体基址; "
+        "以 STATE_DATA (0x0201f441) 为源, 调用 render_jp_string_to_tile_line 两次 (循环 r6 in [0..1]), "
+        "每次偏移 0x200 字节 (0x80*4); 完成后 write_line_buf_to_bg_tile_vram 刷新到 BG tile VRAM (0x06014000). "
+        "函数使用 r8/r9 callee-save high-register 别名, 由 .hword 0x4657/464e/4645/4682 搬移. "
+        "Constants: STATE_BASE=0x02006ed0, STATE_DATA=0x0201f441, "
+        "VRAM_BG=0x06014000, FONT_SIZE=0x200, LOOP_RANGE=[0..1]."),
+    ("FUN_080ca160", "render_lp_zone_digit_oam_row",
+        "由 FUN_080c7ea0 (window/vram/display/card) 和 FUN_080ca42c (card_data/card_frame/..) 调用. "
+        "函数在结构体 0x0201e2a0 中循环查找 slot.id == 0; "
+        "比较键 r10 由函数内部 movs r0,#0; mov r10,r0 设置为 0 (非 caller-set). "
+        "每次命中 (slot.id==0) 后: 调用 write_oam_entry_from_packed_args 写一个 OAM 精灵条目; "
+        "然后三次调用 write_decimal_digits_to_oam 分别在 OAM 偏移 0x74/0x6c/0x64 写入 3 组十进制数字 (来自 r4 计算的 data 地址). "
+        "最终跳到 LAB_080ca266 结束. "
+        "Constants: STRUCT_BASE=0x0201e2a0, gP1LifePoints=0x0201c4e0, "
+        "OAM_SHAPE_SIZE=0xc4<<0xf|0xe0, DIGIT_OAM_OFF_A=0x74, DIGIT_OAM_OFF_B=0x6c, DIGIT_OAM_OFF_C=0x64, "
+        "DATA_STRIDE=0x868, ZONE_ENTRY_STRIDE=0xec, LOOP_KEY=0."),
+    ("FUN_080ccfe4", "render_jp_two_line_text_to_bg_vram_alt",
+        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
+        "与 080d04dc 结构完全对称: 初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
+        "设置语言模式标志 (STATE+0x8 bit[1..2]); 从 font_jp_base_table 取字体基址; "
+        "以 STATE_DATA (0x0201f441) 为源调用 render_jp_string_to_tile_line 两次 (循环 r6 in [0..1], 步进 0x200 字节); "
+        "完成后 write_line_buf_to_bg_tile_vram 刷新到 BG tile VRAM (0x06014000). "
+        "两函数共用同一 STATE_BASE (0x02006ed0) / STATE_DATA (0x0201f441) / VRAM / 字体配置, "
+        "仅写入的 STATE 字段偏移略有差异. "
+        "Constants: STATE_BASE=0x02006ed0, STATE_DATA=0x0201f441, "
+        "VRAM_BG=0x06014000, FONT_SIZE=0x200, LOOP_RANGE=[0..1]."),
+    ("FUN_080cda6c", "render_jp_label_row_with_tile_count",
+        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
+        "初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
+        "设置语言模式 (STATE_BASE+0x8); 从 font_jp_base_table 取字体基址; "
+        "调用 render_jp_string_to_tile_line 一次; 调用 write_line_buf_to_bg_tile_vram 将 JP 文字写入 VRAM. "
+        "随后检查状态字段 (STATE_BASE+0x0a16/0x0a17 双标志), 若均为 0: "
+        "计算 tile 行列位置 (asrs r0,r4,#3 行; ands r4,r7=#7 列), 将 tile_pos halfword 写入 STATE_BASE+0x0a03; "
+        "另外读状态字段 +0x0a0d (palette/tile nibble), 递增 nibble 字段并写回; "
+        "最终将 tile_row_count 写入 STATE_BASE+0x0a03-1 (base_ptr-1 字节). "
+        "Constants: STATE_BASE=0x02006ed0, STATE_DATA=0x0201f441, "
+        "OFFSET_FLAG_A=0x0a16, OFFSET_FLAG_B=0x0a17, OFFSET_TILE_POS=0x0a03, OFFSET_NIBBLE=0x0a0d, "
+        "VRAM_BG=0x06014000, TILE_MASK=0x7."),
+    ("FUN_080cd870", "render_jp_label_row_with_tile_pos",
+        "由 FUN_080c7ea0 (window/vram/display/card 全标签主控) 独占调用 (indeg=1). "
+        "与 080cda6c 结构高度对称, 但末尾使用直接行列计算而非 nibble 循环. "
+        "初始化 JP 行缓冲 (setup_line_buf_with_font_and_align: font=0x17, width=0x10, mode=1, align=2); "
+        "设置语言模式 (STATE+0x8); 从 font_jp_base_table 取字体基址; "
+        "调用 render_jp_string_to_tile_line; 调用 write_line_buf_to_bg_tile_vram 写 BG VRAM. "
+        "然后检查状态字段 (STATE+0x0a16/0x0a17 双标志), 若均为 0: "
+        "将 render 返回值 r4-1 作为 tile_width 写入 STATE+0x0a03 halfword; "
+        "再计算 tile_row (r4+0x10 除以 8) 和 tile_col (r4+0x10 & 7), "
+        "若有余则 tile_row+1, 最终写入 STATE+0x0a02 byte. "
+        "Constants: STATE_BASE=0x02006ed0, STATE_DATA=0x0201f441, "
+        "OFFSET_TILE_WIDTH=0x0a03, OFFSET_TILE_ROW=0x0a02, VRAM_BG=0x06014000, "
+        "OFFSET_FLAG_A=0x0a16, OFFSET_FLAG_B=0x0a17, TILE_ALIGN=8."),
+    ("FUN_080ce7f0", "zero_fill_card_label_vram_if_ready",
+        "由 FUN_080c7950 (vram/card_stats/font_jp) 和 FUN_080c7ea0 (window/vram/display/card) 调用. "
+        "首先 zero_fill_by_halfword 清零 BG tile VRAM (0x06014000, 0x80<<7=0x4000 halfword). "
+        "读取状态结构体 (0x0201f440 + 0x0a17/0x0a18) 的双标志: 若任一非零则跳到 LAB_080cea22 (早期退出). "
+        "若均为零则进入主循环 (r6 in [0..?]): 从 card entry 表 (0x0201e4f0 + r6*4) 读取 game_str_id (13 位), "
+        "调用 resolve_game_str_ptr 解析字符串指针; "
+        "若字符串第一字节为 0 (空串) 则清除 entry.flag[0x11] bit[6]; "
+        "否则调用渲染路径 (LAB_080ce86c) 将字符串内容写入 BG VRAM 对应区域. "
+        "函数使用 r8/r9 callee-save (.hword 0x4682/4689). "
+        "Constants: VRAM_BG_BASE=0x06014000, STATE_BASE=0x0201f440, "
+        "OFFSET_FLAG_A=0x0a17, OFFSET_FLAG_B=0x0a18, "
+        "CARD_ENTRY_TABLE=0x0201e4f0, ENTRY_FLAG_OFF=0x11, STR_ID_MASK=0x1fff."),
 ]
 
 
