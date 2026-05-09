@@ -165,6 +165,7 @@ model: sonnet
 - proposed_name 含 `_0x[0-9a-f]{3,}_` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 必须查 doc/dev/data.md 替换为语义卡名; 复现 0x08033088+0x080a3c2c)
 - sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)
 - plate comment 草稿含"推测/可能/大概/似乎/应该是"等主观词 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_speculative_language_in_plate.md` (R2=0; 必须以 caller-tag callsite 事实替代; batch #26 两函数命中)
+- R8 置信度节打算写"待 runtime 验证"时，先检查：该值是否来自函数体内字面 `#IMM` → 若是，静态可读，禁止列为待验证项 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_static_value_marked_runtime_pending.md`
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
