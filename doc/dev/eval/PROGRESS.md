@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-24) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-24) |
-| **上次更新** | 2026-05-08 (campaign-23 batch, 420/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-25) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-25) |
+| **上次更新** | 2026-05-09 (campaign-24 batch, 440/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**420 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**440 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -492,11 +492,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 418 | 536 | 3 | 1 | E | 0x080c36a8 | FUN_080c36a8 | write_palette_tile_row_to_vram | 1 | [eval](eval/080c36a8.md) |
 | 419 | 537 | 4 | 5 | D | 0x080ee3a8 | FUN_080ee3a8 | apply_palette_offset_to_tile_row | 1 | [eval](eval/080ee3a8.md) |
 | 420 | 538 | 4 | 1 | E | 0x080ca4f4 | FUN_080ca4f4 | upload_player_icon_gfx_to_vram | 1 | [eval](eval/080ca4f4.md) |
+| 421 | 539 | 4 | 3 | E | 0x080ca5f8 | FUN_080ca5f8 | write_lp_digit_tiles_to_vram | 1 | [eval](eval/080ca5f8.md) |
+| 422 | 540 | 3 | 1 | E | 0x080ca8ec | FUN_080ca8ec | init_duel_field_tile_indices | 1 | [eval](eval/080ca8ec.md) |
+| 423 | 542 | 5 | 3 | E | 0x080f7e0c | FUN_080f7e0c | resolve_aob_pattern_entry_ptr | 1 | [eval](eval/080f7e0c.md) |
+| 424 | 543 | 4 | 14 | D | 0x080f7e48 | FUN_080f7e48 | init_aob_ctx_with_anm_entry | 1 | [eval](eval/080f7e48.md) |
+| 425 | 544 | 4 | 14 | D | 0x080f7da4 | FUN_080f7da4 | init_aob_ctx_from_ptnsect | 1 | [eval](eval/080f7da4.md) |
+| 426 | 545 | 3 | 1 | E | 0x080c879c | FUN_080c879c | init_duel_field_lp_aob_ctx | 1 | [eval](eval/080c879c.md) |
+| 427 | 546 | 2 | 8 | D | 0x080cc904 | FUN_080cc904 | init_duel_field_vram_layout | 1 | [eval](eval/080cc904.md) |
+| 428 | 547 | 2 | 8 | D | 0x080cca38 | FUN_080cca38 | tick_duel_field_fadeout_step | 1 | [eval](eval/080cca38.md) |
+| 429 | 548 | 2 | 10 | D | 0x080cca5c | FUN_080cca5c | tick_duel_field_fadein_step | 1 | [eval](eval/080cca5c.md) |
+| 430 | 550 | 6 | 8 | D | 0x080bc7e0 | FUN_080bc7e0 | blend_palette_entry_toward_target | 1 | [eval](eval/080bc7e0.md) |
+| 431 | 551 | 5 | 1 | E | 0x080be600 | FUN_080be600 | tick_banner_pack_state_machine | 1 | [eval](eval/080be600.md) |
+| 432 | 552 | 6 | 2 | E | 0x080c0760 | FUN_080c0760 | write_card_image_oam_grid | 1 | [eval](eval/080c0760.md) |
+| 433 | 553 | 6 | 2 | E | 0x080f5668 | FUN_080f5668 | tick_blend_step_with_bldcnt | 1 | [eval](eval/080f5668.md) |
+| 434 | 554 | 8 | 2 | E | 0x080f0db4 | FUN_080f0db4 | init_line_buf_with_jp_font_flag | 1 | [eval](eval/080f0db4.md) |
+| 435 | 555 | 7 | 1 | E | 0x080c0180 | FUN_080c0180 | draw_card_atkdef_label_to_vram | 1 | [eval](eval/080c0180.md) |
+| 436 | 556 | 8 | 1 | E | 0x080bff34 | FUN_080bff34 | repack_nibbles_with_palette_offset | 1 | [eval](eval/080bff34.md) |
+| 437 | 557 | 7 | 1 | E | 0x080bff6c | FUN_080bff6c | render_card_image_to_vram | 1 | [eval](eval/080bff6c.md) |
+| 438 | 558 | 7 | 1 | E | 0x080c00f0 | FUN_080c00f0 | draw_card_name_to_bg_tile_vram | 1 | [eval](eval/080c00f0.md) |
+| 439 | 559 | 8 | 1 | E | 0x080c0204 | FUN_080c0204 | write_nibble_to_bg_tile_cell | 1 | [eval](eval/080c0204.md) |
+| 440 | 560 | 7 | 2 | E | 0x080c0274 | FUN_080c0274 | write_nibble_sequence_to_bg_tiles | 1 | [eval](eval/080c0274.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-09: **batch=20 #24 PASSED (单 call 落地)** — duel field VRAM init + AOB ctx cluster + card image/name/atkdef render pipeline (write_lp_digit_tiles_to_vram + init_duel_field_tile_indices + resolve_aob_pattern_entry_ptr + init_aob_ctx_with_anm_entry indeg=14 + init_aob_ctx_from_ptnsect indeg=14 + init_duel_field_lp_aob_ctx + init_duel_field_vram_layout indeg=8 hub + tick_duel_field_fadeout_step indeg=8 + tick_duel_field_fadein_step indeg=10 + blend_palette_entry_toward_target indeg=8 + tick_banner_pack_state_machine + write_card_image_oam_grid + tick_blend_step_with_bldcnt + init_line_buf_with_jp_font_flag + draw_card_atkdef_label_to_vram + repack_nibbles_with_palette_offset + render_card_image_to_vram + draw_card_name_to_bg_tile_vram + write_nibble_to_bg_tile_cell + write_nibble_sequence_to_bg_tiles); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (440/1526 = 28.83%)
 - 2026-05-08: **batch=20 #23 PASSED (单 call 落地)** — duel field zone activation dispatch + field slot tile render cluster (eval_slot_activation_eligibility_full indeg=11 + check_any_slot_fieldspell_zone_eligible + count_slots_with_chain_field_match + eval_slot_fieldspell_activation_full + eval_slot_activation_guard_full indeg=9 + setup_equip_slot_activation_entry + dispatch_zone_effect_by_slot + eval_zone_activation_flags_by_type + build_zone_activation_entry_blocked/equip 兄弟对 + setup_equip_slot_activation_entry_alt + dispatch_zone_activation_by_state indeg=5 hub + query_player_slot_activation_bitmask + render_field_slot_card_tile indeg=5 + refresh_player_field_slot_tiles indeg=6 + render_field_zone_card_tile_by_type + redraw_all_field_slot_tiles + write_palette_tile_row_to_vram + apply_palette_offset_to_tile_row indeg=5 + upload_player_icon_gfx_to_vram); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (420/1526 = 27.52%)
 - 2026-05-08: **batch=20 #22 PASSED** — duel slot activation/eligibility eval cluster (eval_slot_score_entry_full callee cluster + check_slot_*_activatable/eligible sibling cluster + Last Warrior/Archfiend/Amazoness card_id anchored cluster + count_slots_matching_card_pair) + check_player_has_equip_type_in_slots; 1 fix iter (8 NEEDS_FIX: 6 R3 non-APCS misclassified (mov rN,APCS) -> delete param rows + 2 R7 self-reference + 1 R7 indeg=41 caller count insufficient); first-shot 12/20; crossed 25% milestone (400/1526 = 26.21%); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b.
 - 2026-05-08: **batch=21 PASSED (单 call 模式)** — duel field equip activation eval cluster (check_equip_slot_pair_can_activate_full + check_equip_slot_can_activate_with_context count-list variant + scan_equip_activation_for_player + scan_equip_activation_with_mode card_id mode init + get_equip_activation_mode_by_card_id leaf + find_slot_idx_by_card_id_in_player_zones indeg=21 + check_banisher_pair_activation_allowed med + eval_equip_target_slot_flags + eval_spell_activation_flags_by_zone indeg=1 large hub + check_card_stat_field8_is_8/6 sibling pair + check_card_has_activatable_effect_node + check_card_id_is_equip_blocker whitelist + eval_equip_activation_for_slot + setup_equip_context_for_slot_activation + setup_equip_context_for_zone_activation + read_player_field_slot_word_by_zone jump-table + check_zone_slot_card_activatable + eval_zone_activation_flags_for_player + count_equip_set_activatable_slots_for_player r8/r9/r10 non-APCS); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (380/1526 = 24.90%)

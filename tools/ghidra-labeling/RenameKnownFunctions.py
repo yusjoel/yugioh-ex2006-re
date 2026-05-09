@@ -6143,6 +6143,158 @@ RENAMES = [
         "BG_TILE_MAP_P2=0x0600f840, BG_PALETTE_ICON=0x05000180, "
         "ICON_TILE_SIZE=0x120 bytes, PALETTE_COPY_SIZE=0x40 bytes, "
         "tile_row_start_local=0x1CE, tile_row_start_remote=0x1D7."),
+
+    # 2026-05-09: campaign-24 batch (topo=539-560, 20 functions)
+    ("FUN_080ca5f8", "write_lp_digit_tiles_to_vram",
+        "按 player_id (r0) 与 EWRAM 对手 ID (0x0201e2a0+4 XOR 1) 比对, "
+        "选择 VRAM 基地址 (LP_VRAM_BASE=0x0600f000) 的目标区域 (P1 偏移 +8, P2 偏移 0x448), "
+        "将 LP 数值 (r1, clamp 至 99999) 逐位分解为十进制数字, "
+        "以 strh 循环写入 5 个 tile 索引 halfword (tile base index 0x134=0x9a*2). "
+        "由 play_ui_effect_0e / FUN_080ca8ec / FUN_0801ec9c 调用. "
+        "Constants: LP_VRAM_BASE=0x0600f000, LP_DIGIT_AREA_OFFSET_P2=0x448, "
+        "LP_DIGIT_AREA_OFFSET_P1=+8, TILE_IDX_BASE=0x134, LP_MAX=99999, "
+        "EWRAM_GAME_CTX=0x0201e2a0."),
+    ("FUN_080ca8ec", "init_duel_field_tile_indices",
+        "在 duel field 初始化流程中被 init_duel_field_vram_layout (indeg=8) 调用, "
+        "向 VRAM 两块 tile 索引区写入连续递增 tile 编号序列, "
+        "以及向 palette VRAM 区写入带高位 OR 掩码 (0xe000) 的 tile 属性 halfword. "
+        "双层嵌套循环填充两组 tile 区 (各 6 行 x 4 列), 再以第三组循环写入 palette 属性. "
+        "无外部参数 (void). "
+        "Constants: VRAM_TILE_AREA_A=DAT_080caac4, VRAM_TILE_AREA_B=DAT_080caad0, "
+        "TILE_ATTR_PAL_MASK=0xe000, row_stride=0x40 bytes."),
+    ("FUN_080f7e0c", "resolve_aob_pattern_entry_ptr",
+        "来自 system/s_opdobj.c line 188. "
+        "给定 AOB 上下文指针 (r0) 和图案编号 (r1, u16), "
+        "验证图案编号 < AOB_PTNSECT_HEADER->PtnNum (越界触发 suppress_assert_report), "
+        "计算对应图案数据指针并写入 [ctx+0x4]. "
+        "由 init_aob_ctx_from_ptnsect / init_aob_ctx_with_anm_entry / FUN_080f7f08 调用. "
+        "Constants: ASSERT_FILE=system/s_opdobj.c, ASSERT_LINE=0xbc(188), AOB_ENTRY_SIZE=4."),
+    ("FUN_080f7e48", "init_aob_ctx_with_anm_entry",
+        "来自 system/s_opdobj.c line 207. "
+        "给定 AOB ctx (r0), 动画编号 (r1, u16), 初始化标志 (r2, u8), "
+        "验证动画编号 < AOB_ANMSECT_HEADER->AnmNum, "
+        "写动画入口地址到 [ctx+0x8], 根据 [ctx+0x13] bit3/bit4 决定是否调用 "
+        "resolve_aob_pattern_entry_ptr 初始化图案指针, 并设置帧步进量 [ctx+0xc/0xd/0xe]. "
+        "被 14 个调用方共享 (duel field LP / UI effect 3b/38 / palette vram 路径). "
+        "Constants: AOB_FLAG_HAS_PATTERN=0x8, AOB_FLAG_HAS_FRAME_DIV=0x10, "
+        "ASSERT_LINE=0xcf(207)."),
+    ("FUN_080f7da4", "init_aob_ctx_from_ptnsect",
+        "来自 system/s_opdobj.c. AOB 对象生命周期初始化入口, 被 14 个调用方共享. "
+        "清零 ctx 前 0x14 字节 (zero_fill_halfword_wrapper), 写入 p_ptnsect 到 [ctx+0x0], "
+        "从 mode_param 分离 tile_count (bits[31:16] -> [ctx+0x10]) 与 ptn_mode (bits[3:0] -> [ctx+0x12]), "
+        "检测图案数量 > 0x10 设 AOB_FLAG_LARGE (bit7), 写 init_flag 到 bit6, "
+        "最后调用 resolve_aob_pattern_entry_ptr(ctx, 0) 设置初始图案指针. "
+        "Constants: AOB_CTX_SIZE_HALF=0x14, AOB_LARGE_TILE_THRESHOLD=0x10, "
+        "AOB_FLAG_LARGE=0x80, AOB_FLAG_INIT=0x40."),
+    ("FUN_080c879c", "init_duel_field_lp_aob_ctx",
+        "在 duel field 初始化 hub (init_duel_field_vram_layout) 的唯一调用下, "
+        "将 LP 表盘背景 tile 复制到 VRAM (5 次 tile_2d_row_copy), "
+        "初始化 AOB ctx (init_aob_ctx_from_ptnsect), 根据 EWRAM 对手 ID 决定动画方向 "
+        "(init_aob_ctx_with_anm_entry, anm_no 0 或 1), 再拷贝两组 tile 完成 LP 区域布局. "
+        "写 [r4+0x13] bit0=1 标记 AOB ctx 已激活. "
+        "Constants: PTR_gP1LifePoints, ANM_NO_OPPONENT=0, ANM_NO_SELF=1."),
+    ("FUN_080cc904", "init_duel_field_vram_layout",
+        "duel field 场地 VRAM 完整初始化 hub, 被 play_demo_shuen / play_ui_effect_3b/3a / "
+        "FUN_0801fec0 等 8 个调用方共享. "
+        "依次: (1) zero_fill_by_halfword 清空 VRAM OBJ tile 区; "
+        "(2) store_ewram_ctx_ptr_and_clear_mode_flags; (3) reset_display_and_obj_vram; "
+        "(4) apply_blend_fadeout_flat; (5) reset_all_bg_scroll_regs_and_shadows; "
+        "(6) 设置 gPrng[0xba*2]=1; (7) 配置 BG0-3CNT 四寄存器; "
+        "(8) 复制多组 tile/screen 数据; (9) init_duel_field_lp_aob_ctx; "
+        "(10) 条件性复制 tile; (11) write_palette_tile_row_to_vram; "
+        "(12) init_duel_field_tile_indices + redraw_all_field_slot_tiles; (13) strh DISPCNT. "
+        "Constants: BG0CNT=0x1f08, BG1CNT=0x1f09, BG2CNT=0x1d82, BG3CNT=0x1c0b."),
+    ("FUN_080cca38", "tick_duel_field_fadeout_step",
+        "在 duel field 状态机收尾步骤中被 8 个 caller 调用 "
+        "(play_demo_shuen / play_ui_effect_3b/3a / FUN_0801fec0 等). "
+        "先将 EWRAM 标志字节 [0x02023345] bit1 置 1 (激活淡出信号), "
+        "然后以步进量 2 调用 tick_blend_step_by_delta 推进混合淡出过渡. "
+        "无参数; 返回 tick_blend_step_by_delta 的返回值 (0=进行中, 1=完成). "
+        "Constants: EWRAM_FLAG_ADDR=0x02023345, BLEND_STEP_DELTA=2, FLAG_BIT1=0x2."),
+    ("FUN_080cca5c", "tick_duel_field_fadein_step",
+        "与 tick_duel_field_fadeout_step (0x080cca38) 构成对称函数对, 被 10 个 caller 共享. "
+        "先将 EWRAM 标志字节 [0x02023345] bits[1:0] 同时清零 (ands ~0x3=0xFC), "
+        "然后以步进量 2 调用 start_blend_fadein_with_target 开始混合淡入过渡. "
+        "无参数; 返回 start_blend_fadein_with_target 的返回值. "
+        "Constants: EWRAM_FLAG_ADDR=0x02023345, BLEND_STEP_DELTA=2, FLAG_CLEAR_MASK=0xFC."),
+    ("FUN_080bc7e0", "blend_palette_entry_toward_target",
+        "给定 BGR555 调色板条目指针 (r0), 目标颜色 (r1, u16), 混合步数 (r2, u16, clamp 至 0x10), "
+        "对 R/G/B 各 5 bit 分量执行线性插值混合 (delta*blend_steps/16), 写回 PAL RAM. "
+        "由 banner_anim_state_machine / play_ui_effect_04 / FUN_080bd0a8 等 8 个 caller 调用. "
+        "Constants: COMPONENT_MASK=0x1f, BLEND_DIVISOR=16, "
+        "PAL_VRAM_BASE=0x05000200, BLEND_MAX_STEPS=0x10."),
+    ("FUN_080be600", "tick_banner_pack_state_machine",
+        "pack 场景 banner 状态机驱动器, 读取 gBannerState[+0x10] (当前状态 0-4), "
+        "通过 switch 跳转到 5 个子状态处理函数, 协调 pack 开包 banner 动画全流程 "
+        "(含 display/window/blend/palette/vram). "
+        "唯一调用方: play_ui_effect (0x0801ef94, scene_pack). "
+        "Constants: gBannerState_OFFSET=0x10, CASE_COUNT=5, OBJ_PAL_HIGH_MASK=0xe000."),
+    ("FUN_080c0760", "write_card_image_oam_grid",
+        "将卡图 tile 以 5x4 网格形式写入 OAM, 被 play_ui_effect_33/34 调用. "
+        "根据 r0 (tile_offset_sign, 0 或 1) 计算 OAM attr bit7 (0x400 掩码), "
+        "对 5 行 x 4 列 OAM 条目循环调用 write_oam_entry_with_tile_inc, "
+        "每行 tile 步进 0x20, 每列 attr 步进 4. "
+        "r1 在入口第一条指令 (rsbs r1,r0,#0) 被覆盖, 不是独立参数. "
+        "Constants: GRID_COLS=4, GRID_ROWS=5, TILE_ROW_STEP=0x20, ATTR_STEP=4, "
+        "OAM_ATTR_MASK=0x400."),
+    ("FUN_080f5668", "tick_blend_step_with_bldcnt",
+        "被 play_ui_effect_33/34 调用, 设置 BLDCNT (0x04000050) = r1, "
+        "累加 r0 (delta) 到 gPrng+0x200 bits[5:0] (blend step 计步字节, clamp 至 0x1f), "
+        "写 BLDY (0x04000054) = current_step; step > 0x1e 返回 1 (完成), 否则返回 0. "
+        "Constants: BLDCNT=0x04000050, BLDY=0x04000054, "
+        "gPrng_BLEND_STEP_OFFSET=gPrng+0x200, BLEND_STEP_MAX_ACTIVE=0x1e, "
+        "BLEND_STEP_CLAMP=0x1f, BLEND_STEP_FIELD_MASK=0x3f."),
+    ("FUN_080f0db4", "init_line_buf_with_jp_font_flag",
+        "被 draw_card_name_to_bg_tile_vram / draw_card_atkdef_label_to_vram 调用, "
+        "是 card stats 区域文字渲染的字体初始化路径. "
+        "调用 setup_line_buf_pos_and_font (r0=x_pos, r1=font_type) 建立 line buffer 渲染状态, "
+        "然后对 EWRAM [0x02006ed0+0x14] bit7 置 1, 标记启用 JP 字体扩展渲染模式. "
+        "Callsite 固定传入 r0=0xe / r1=0x2. "
+        "Constants: EWRAM_FONT_CTX=0x02006ed0, FLAG_JP_EXT=0x80."),
+    ("FUN_080c0180", "draw_card_atkdef_label_to_vram",
+        "从 card_stats_table 按 card_idx (r0) 读取 ATK (offset 3) / DEF (offset 4), "
+        "调用 init_line_buf_with_jp_font_flag (r0=0xe, r1=2) 建立 JP 字体上下文, "
+        "检查 ATK 有效性后选择渲染路径: 等级文字 (lookup_level_glyph_index + render_card_level_text_to_buf) "
+        "或 ATK/DEF 数字 (render_atk_def_digits_to_buf), "
+        "最后调用 write_line_buf_to_bg_tile_vram 写入 BG tile VRAM. "
+        "唯一调用方: FUN_080c05b4 (card image 显示页 hub). "
+        "Constants: CARD_STATS_FIELD_ATK=3, CARD_STATS_FIELD_DEF=4, "
+        "INVALID_STAT_SENTINEL=0xffff, ENTRY_STRIDE=0xb."),
+    ("FUN_080bff34", "repack_nibbles_with_palette_offset",
+        "将 r0 (nibble_packed, u16, 含 4 个 nibble 调色板索引) 的每个 nibble "
+        "加上 r1 (palette_offset, u8) 后截断至 nibble, 重新打包为 16 位输出. "
+        "由 render_card_image_to_vram 4 次调用, 用于卡图调色板索引批量偏移. "
+        "纯叶子函数, 无外部副作用. "
+        "Constants: NIBBLE_MASK=0x0f0f, UPPER_NIBBLE_MASK=0xf0."),
+    ("FUN_080bff6c", "render_card_image_to_vram",
+        "从 ROM 卡图数据表按 card_idx (r0) 和 VRAM 目标槽位 (r1) 加载卡图 tile 和调色板到 VRAM. "
+        "4 次调用 repack_nibbles_with_palette_offset 转换调色板索引后写入 PAL RAM (0x05000200), "
+        "再将 tile 数据复制到 BG VRAM (0x060148c0 + slot_offset); "
+        "外层循环 11 行 x 0x4f halfword. 唯一调用方: FUN_080c05b4. "
+        "Constants: VRAM_CARD_TILE_BASE=0x060148c0, PAL_RAM_BASE=0x05000200, "
+        "TILE_ROW_HALFWORDS=0x4f, OUTER_LOOP_COUNT=0xa."),
+    ("FUN_080c00f0", "draw_card_name_to_bg_tile_vram",
+        "渲染卡牌名称到 BG tile VRAM. 唯一调用方: FUN_080c05b4 (card image 显示页 hub). "
+        "调用 init_line_buf_with_jp_font_flag (r0=0xe, r1=2) 建立 JP 字体上下文, "
+        "读 EWRAM 字体方向标志选择字体基址, "
+        "调用 render_card_name_to_line_buf (card_idx) 渲染到 line buffer, "
+        "检查 card_stats_table type 字段 (offset 6, 与 0x16 比较) 选择竖排/横排字体映射表, "
+        "最后调用 write_line_buf_to_bg_tile_vram 写入 VRAM. "
+        "Constants: CARD_STATS_TYPE_FIELD=6, CARD_TYPE_VERTICAL_LIMIT=0x16."),
+    ("FUN_080c0204", "write_nibble_to_bg_tile_cell",
+        "在 BG tile VRAM 指定二维坐标 (tile_x=r0, tile_y=r1) 写入单个 nibble (r2=palette_nibble, r3=vram_row_base). "
+        "将坐标转换为 VRAM halfword 地址 (VRAM_BASE=0x06010000, 行步进 0x400 halfword), "
+        "根据 tile_y 奇偶确定写高/低 nibble, 修改 halfword 后写回. "
+        "被 write_nibble_sequence_to_bg_tiles 两次调用. "
+        "Constants: VRAM_BG_TILE_BASE=0x06010000, TILE_ROW_STRIDE=0x400, "
+        "NIBBLE_HIGH_MASK=0xff00, NIBBLE_LOW_MASK=0x00ff."),
+    ("FUN_080c0274", "write_nibble_sequence_to_bg_tiles",
+        "从 packed nibble 字节数组 (r2) 中逐字节读取双 nibble, "
+        "对每个非零 nibble 调用 write_nibble_to_bg_tile_cell 写入对应 BG tile VRAM 坐标. "
+        "外层循环 8 槽 (r7: 0..7), 内层循环 nibble 序列 (r8, 步进 -1), "
+        "坐标由 r0 (packed: lo16=tile_x_even [6..80], hi16=inner_row_base [5..6]) 和 r1 (vram_row_param) 驱动. "
+        "被 FUN_080c0310 和 FUN_080c05b4 调用. "
+        "Constants: OUTER_LOOP_COUNT=8, NIBBLE_LOW_MASK=0x0f, NIBBLE_HIGH_MASK=0xf0."),
 ]
 
 
