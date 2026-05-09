@@ -320,12 +320,12 @@ address,name,proposed_name,score,tags
 0x0802bdc4,FUN_0802bdc4,,,display;scene_duel_puzzle;frame_counter
 0x0802bde4,FUN_0802bde4,,,display;scene_duel_puzzle;frame_counter
 0x0802be08,FUN_0802be08,,,scene_duel_puzzle
-0x0802c238,FUN_0802c238,game_str_0802c238,3,result_screen;font_jp;game_str;settings
+0x0802c238,render_game_text_decimal_to_line,,,result_screen;font_jp;game_str;settings
 0x0802c30c,render_card_name_format_to_line,,,scene_pack;card_ids;card_name;font_jp
-0x0802c358,FUN_0802c358,game_str_0802c358,4,result_screen;card_ids;card_name;font_jp;game_str;settings
+0x0802c358,render_card_name_escape_to_line,,,result_screen;card_ids;card_name;font_jp;game_str;settings
 0x0802cba0,init_jp_font_linebuf_for_render,,,palette;font_jp
 0x0802cc08,commit_glyph_linebuf_to_sprite_vram_with_index,,,vram;font_jp
-0x0802cc68,FUN_0802cc68,font_jp_0802cc68,3,vram;bg;display;palette;card_ids;card_name;font_jp;game_str;settings
+0x0802cc68,init_card_name_result_screen,,,vram;bg;display;palette;card_ids;card_name;font_jp;game_str;settings
 0x0802cf98,tick_scene_blend_fadeout_step,,,display;frame_counter
 0x0802cfb4,tick_scene_blend_fadein_step,,,display;frame_counter
 0x0802cfd4,tick_scene_blend_fade_sequence,,,frame_counter
@@ -1699,7 +1699,7 @@ address,name,proposed_name,score,tags
 0x08094a28,FUN_08094a28,duel_field_08094a28,3,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
 0x08094c10,FUN_08094c10,,,
 0x08094dac,FUN_08094dac,,,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
-0x08094e74,FUN_08094e74,,,
+0x08094e74,get_card_data_bit_by_index,,,
 0x08094eb4,FUN_08094eb4,,,
 0x08094f20,FUN_08094f20,,,
 0x08094f3c,FUN_08094f3c,,,
@@ -1727,7 +1727,7 @@ address,name,proposed_name,score,tags
 0x08096864,eval_zone_activation_flags_for_player,,,duel_field
 0x080968f4,check_zone_slot_card_activatable,,,
 0x08096954,dispatch_zone_effect_by_slot,,,
-0x08096974,FUN_08096974,,,
+0x08096974,get_lp_display_anim_counter,,,
 0x08096988,FUN_08096988,,,
 0x080969c4,FUN_080969c4,,,
 0x08096a08,FUN_08096a08,,,
@@ -2220,7 +2220,7 @@ address,name,proposed_name,score,tags
 0x080c4220,refresh_player_field_slot_tiles,,,card_ids;duel_field
 0x080c4350,FUN_080c4350,card_ids_080c4350,2,card_ids
 0x080c4ca0,FUN_080c4ca0,,,
-0x080c4cd4,FUN_080c4cd4,,,
+0x080c4cd4,check_lp_threshold_for_zone_slot,,,
 0x080c4d04,redraw_all_field_slot_tiles,,,card_frame;card_ids;duel_field
 0x080c4ea0,FUN_080c4ea0,,,
 0x080c4edc,FUN_080c4edc,,,card_ids;card_stats;duel_field;font_jp;game_str
@@ -2232,11 +2232,11 @@ address,name,proposed_name,score,tags
 0x080c6638,resolve_zone_data_ptr_by_oam_word,,,scene_duel_field
 0x080c678c,FUN_080c678c,,,scene_duel_field
 0x080c6800,transform_zone_oam_coords_by_player,,,
-0x080c699c,FUN_080c699c,,,
+0x080c699c,set_zone_oam_coords_by_player,,,
 0x080c6a20,FUN_080c6a20,game_str_080c6a20,2,card_ids;card_stats;duel_field;font_jp;game_str
-0x080c6b04,FUN_080c6b04,,,
-0x080c6e9c,FUN_080c6e9c,card_ids_080c6e9c,2,card_ids;duel_field
-0x080c707c,FUN_080c707c,card_ids_080c707c,2,card_ids
+0x080c6b04,decode_zone_oam_word_to_slot_fields,,,
+0x080c6e9c,decode_zone_oam_word_to_cursor_fields,,,card_ids;duel_field
+0x080c707c,check_zone_card_id_cache_valid,,,card_ids
 0x080c716c,apply_zone_cursor_step,,,card_ids;card_stats;duel_field;font_jp;game_str
 0x080c7530,FUN_080c7530,,,
 0x080c7638,FUN_080c7638,,,
@@ -2290,7 +2290,7 @@ address,name,proposed_name,score,tags
 0x080cbf58,FUN_080cbf58,card_stats_080cbf58,3,card_ids;card_stats;duel_field;game_str;settings
 0x080cc528,FUN_080cc528,,,
 0x080cc5f4,FUN_080cc5f4,,,
-0x080cc618,FUN_080cc618,,,
+0x080cc618,sort_zone_oam_entries_to_vram,,,
 0x080cc694,FUN_080cc694,,,
 0x080cc83c,FUN_080cc83c,,,scene_duel_puzzle
 0x080cc8c8,ensure_card_id_cache_entry,,,card_ids
@@ -2661,8 +2661,8 @@ address,name,proposed_name,score,tags
 0x080e17bc,FUN_080e17bc,,,scene_duel_puzzle;opp_wins
 0x080e19e0,FUN_080e19e0,duel_puzzle_080e19e0,3,scene_duel_puzzle;duel_puzzle;opp_wins
 0x080e1a50,enter_duel_puzzle_page,,,banlist;card_ids;card_name;card_stats;deck;font_jp;frame_counter;game_str;settings
-0x080e3258,FUN_080e3258,,,scene_duel_puzzle
-0x080e325c,FUN_080e325c,,,
+0x080e3258,get_duel_puzzle_count,,,scene_duel_puzzle
+0x080e325c,find_puzzle_slot_by_id,,,
 0x080e328c,FUN_080e328c,card_ids_080e328c,2,card_ids;duel_puzzle;opp_wins
 0x080e386c,FUN_080e386c,card_ids_080e386c,2,card_ids;duel_puzzle;opp_wins
 0x080e3904,enter_theme_duel_page,,,banlist;card_ids;card_name;card_stats;deck;font_jp;frame_counter;game_str;money;settings
@@ -3012,7 +3012,7 @@ address,name,proposed_name,score,tags
 0x080f5fa0,FUN_080f5fa0,,,
 0x080f6074,FUN_080f6074,,,scene_pack
 0x080f609c,FUN_080f609c,,,scene_pack
-0x080f6144,FUN_080f6144,,,
+0x080f6144,write_oam_entry_attr_pairs,,,
 0x080f616c,write_oam_entry_from_packed_args,,,
 0x080f61e4,write_obj_attr_packed,,,
 0x080f6260,FUN_080f6260,,,
@@ -3027,7 +3027,7 @@ address,name,proposed_name,score,tags
 0x080f6ec8,FUN_080f6ec8,,,scene_pack
 0x080f70c4,push_oam_entry_to_aob_slot,,,
 0x080f7108,FUN_080f7108,,,
-0x080f72e8,FUN_080f72e8,,,
+0x080f72e8,write_oam_sprite_entry_by_flip_mode,,,
 0x080f74d4,tile_2d_row_copy,,,
 0x080f7528,write_tile_rows_to_vram_by_mode,,,scene_pack
 0x080f758c,FUN_080f758c,,,

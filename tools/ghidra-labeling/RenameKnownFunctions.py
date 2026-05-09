@@ -6520,6 +6520,144 @@ RENAMES = [
         "r0=ptr fmt_str, r1=ptr out_buf. Returns void. "
         "Caller: expand_format_text_to_buf (format engine). "
         "Constants: ESCAPE_PERCENT=0x25, ESCAPE_C=0x63, digit_count=3."),
+
+    # --- batch #27 (campaign-27, 2026-05-09) ---
+    ("FUN_08094e74", "get_card_data_bit_by_index",
+        "Return the 1-bit flag at the given index from the ROM card-data table. "
+        "r0=card_data_index [0..0x72]: index<=0x34 -> direct word read from EWRAM table at "
+        "0x0201b1b0 stride-4; index>0x34 -> compute word-row via (index-0x36)>>5, "
+        "read from table_b base (0x0201b1b0+0xd4), extract bit via lsrs+ands. "
+        "Returns r0=bit_value [0..1]. No side effects. "
+        "Callers: result_screen, card_image, game_str, duel_field clusters. "
+        "Constants: table_base_a=0x0201b1b0, stride=4, max_idx_a=0x34, "
+        "table_base_b=0x0201b1b0+0xd4, row_shift=5, offset_a=0x36, offset_b=0x17."),
+    ("FUN_0802c238", "render_game_text_decimal_to_line",
+        "Format a game_str record as decimal text and render it to a display line. "
+        "Steps: (1) load str_id_offset from sp+0x58, add base 0x0c1c, call game_str_id_to_row; "
+        "(2) look up game_str_pointer_table with font-variant correction from settings[0x6c2c] bits[2:0]; "
+        "(3) call expand_format_decimal_to_buf; (4) call count_bytes_until_null for width; "
+        "(5) four passes of text_render_wrapper (flags 0x8008, 0x7, r8-saved, sp+0x5c). "
+        "Returns r0=render_width bits[9:0] from gPrng+0x6ed0[0xe]. "
+        "Constants: str_base_offset=0x0c1c, settings_addr=0x02000000+0x6c2c, "
+        "font_variant_mask=0x7, render_flags_1=0x8008, render_flags_2=0x7, "
+        "width_field=gPrng+0x6ed0+0xe, width_mask=0x3ff."),
+    ("FUN_080e3258", "get_duel_puzzle_count",
+        "Return the hardcoded total count of duel puzzles: movs r0,#0x32 -> bx lr. "
+        "0x32=50, matching the 50 built-in duel puzzles. No parameters. No side effects. "
+        "Called by find_puzzle_slot_by_id as loop bound and by scene_duel_puzzle callers "
+        "as upper limit. Constants: DUEL_PUZZLE_COUNT=0x32 (=50)."),
+    ("FUN_080e325c", "find_puzzle_slot_by_id",
+        "Linear search in the duel puzzle table for an entry matching puzzle_id. "
+        "r0=puzzle_id [0..0x31]. r5=table_base=0x09e5e9cc, stride=0xc (12 bytes/entry). "
+        "Loop: call get_duel_puzzle_count() for upper bound (50); compare ldrh [r5] with r6; "
+        "match -> return r4 (slot index); no match -> r5+=0xc, r4++. "
+        "Returns s32: slot_index [0..0x31] if found, -1 (rsbs) if not found. No side effects. "
+        "Constants: PUZZLE_TABLE_BASE=0x09e5e9cc, PUZZLE_ENTRY_STRIDE=0xc, NOT_FOUND=-1."),
+    ("FUN_0802c358", "render_card_name_escape_to_line",
+        "Expand and render the card name (escape form) for a given card_id to a display line, "
+        "then dispatch to sub-scene rendering via 16-entry switchD. "
+        "r0=card_id [0x2711..0x2744] (saved to r9; r8/r10 init to 0). "
+        "Steps: (1) r9+0x3e8 -> game_str_id_to_row; (2) font-variant from settings[0x6c2c]; "
+        "(3) expand_card_name_escape_to_buf to sp+8; (4) two text_render_wrapper passes "
+        "(flags 0x8008, 0x5); (5) read render_width from gPrng+0x6ed0[0xe]; "
+        "(6) switchD keyed on r9-0x2711. Tail-jumps into sub-scene; no direct return. "
+        "Constants: game_str_base=0x3e8, settings_addr=0x02000000+0x6c2c, "
+        "render_flags_1=0x8008, render_flags_2=5, switch_adjust=-0x2711."),
+    ("FUN_0802cc68", "init_card_name_result_screen",
+        "Fully initialize the card-name result screen: validate card_id range, "
+        "configure VRAM/BG registers, upload tiles and palette, init font buffer, render card name. "
+        "r0=card_id [0x2711..0x2744]; validated as r0-0x2711 in [0..0x33], else return 0. "
+        "Steps: clear DISPCNT, reset_display_and_obj_vram, store_ewram_ctx_ptr_and_clear_mode_flags, "
+        "set BG0-3CNT, reset_all_bg_scroll_regs_and_shadows, upload_pack_vram_and_palette, "
+        "zero_fill_by_halfword (VRAM regions), copy_bytes_by_halfword (tiles/palette), "
+        "load_pack_tile_and_map_to_vram, setup_line_buf_pos_and_font, init_jp_font_linebuf_for_render, "
+        "render_card_name_escape_to_line, commit_glyph_linebuf_to_sprite_vram_with_index. "
+        "Returns 1 on success, 0 if card_id out of range. "
+        "Side effects: DISPCNT=0, BG0CNT=0x5, BG1CNT=0x104, BG2CNT=0x8208, BG3CNT=0x407, VRAM/PAL. "
+        "Constants: DISPCNT=0x04000000, card_id_adjust=-0x2711, max_adjusted=0x33, "
+        "gPrng_slot_offset=0x174, VRAM_BG=0x06004000, PAL_BASE=0x05000220."),
+    ("FUN_080c6e9c", "decode_zone_oam_word_to_cursor_fields",
+        "Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch "
+        "to the matching zone cursor-position handler via 16-entry switchD. "
+        "r0=packed_oam_word (low16: bit7=player_id, bits[6:0]=zone_type; bits[31:24]=sub_idx). "
+        "r1=secondary_param (saved to r8, passed to switchD cases). "
+        "Reads gDuelFieldCtx[0x0201e2a0+4] for player-flip flag; may swap r8. "
+        "Tail-jumps into switchD; no direct return. "
+        "Called by apply_zone_cursor_step (0x080c716c) on mode_flag bit path. "
+        "Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, "
+        "duel_field_ctx=0x0201e2a0, zone_type_max=0xf, jump_table=DAT_080c6ef8."),
+    ("FUN_080c4cd4", "check_lp_threshold_for_zone_slot",
+        "Check whether the LP value of a given player slot meets a threshold. "
+        "r0 bit0=player_id [0..1]; r1 low16=threshold [0..0xFFFF]. "
+        "Reads gP1LifePoints[player_id*0x868+0xc] halfword. "
+        "Returns: 0 if slot empty/zero, 1 if LP < threshold, 2 if LP >= threshold. "
+        "No side effects (pure read). Called by decode_zone_oam_word_to_slot_fields case 5. "
+        "Constants: gP1LifePoints=0x0201C4E0, player_stride=0x868, lp_slot_offset=0xc."),
+    ("FUN_080c6b04", "decode_zone_oam_word_to_slot_fields",
+        "Unpack a zone OAM descriptor word into player/zone_type/sub_idx fields and dispatch "
+        "to the matching zone slot handler via 16-entry switchD; symmetric to "
+        "decode_zone_oam_word_to_cursor_fields but focused on slot position decoding and LP checks. "
+        "r0=packed_oam_word; r1=secondary_param (saved to r8). "
+        "Reads gDuelFieldCtx[0x0201e2a0+4] for flip flag. Some switchD cases call "
+        "check_lp_threshold_for_zone_slot. Tail-jumps via switchD; no direct return. "
+        "Constants: player_bit=0x80, zone_type_mask=0x7f, sub_idx_shift=24, "
+        "duel_field_ctx=0x0201e2a0, zone_type_max=0xf."),
+    ("FUN_080c707c", "check_zone_card_id_cache_valid",
+        "Check whether the card-ID cache for the zone described by the OAM word is valid (non-empty). "
+        "r0=packed_oam_word (same format as decode_zone_oam_word_to_cursor_fields). "
+        "Steps: resolve_zone_data_ptr_by_oam_word, unpack player/zone_type/tile fields, "
+        "check gDuelFieldCtx flip, handle special zone 0xd (LP word check), "
+        "call get_zone_card_attribute_by_type and ensure_card_id_cache_entry. "
+        "Returns 1 if valid card ID cached, 0 otherwise. "
+        "Side effects: ensure_card_id_cache_entry may write EWRAM card-ID cache. "
+        "Constants: player_bit=0x80, zone_type_mask=0x7f, tile_shift=24, "
+        "player_stride=0x868, lp_offset=0x10, gDuelFieldCtx=0x0201e2a0."),
+    ("FUN_080cc618", "sort_zone_oam_entries_to_vram",
+        "Collect active zone OAM sprite entries from gPrng sprite table into a stack buffer, "
+        "sort them with qsort, then write back to OAM mirror at 0x030001fc. "
+        "No parameters. Steps: alloc sp-=0x600; read count from gPrng+0x1bc+0x400; "
+        "collect 9-byte entries (ldmia+str/strb) to sp buffer; "
+        "qsort(sp_buf, count, 0xc, compare_fn=0x080cc5f5); "
+        "write back 6 bytes/entry via copy_bytes_by_halfword to OAM[entry*8]. "
+        "Side effects: writes [0x030001fc+entry*8] for each active OAM entry. "
+        "Constants: gPrng_sprite_table=gPrng+0x1bc, count_offset=0x400, "
+        "entry_copy_size=9, qsort_stride=0xc, oam_target=0x030001fc, write_bytes=6, "
+        "sp_frame=0x600."),
+    ("FUN_080c699c", "set_zone_oam_coords_by_player",
+        "Transform zone OAM coordinates via transform_zone_oam_coords_by_player and write the "
+        "result into the OAM sprite entry, then refresh the OAM sort buffer. "
+        "r0=src_x, r1=src_y, r2=zone_type [0..0xF], r3=extra_flags. "
+        "write_mode: r2==0 -> mode=0x6 (player 0), else mode=0x2. "
+        "Combines transformed x/y + mode + (r3<<0xc) + 0x2300 (OAM type base) into strh. "
+        "Calls sort_zone_oam_entries_to_vram to flush OAM mirror. "
+        "Side effects: via callee writes OAM sprite table and OAM mirror. "
+        "Constants: mode_player0=0x6, mode_default=0x2, oam_type_base=0x2300."),
+    ("FUN_08096974", "get_lp_display_anim_counter",
+        "Return the LP display animation counter value from gP1LifePoints+0x1d4c. "
+        "4-instruction leaf: load gP1LifePoints (0x0201C4E0), add offset 0x1d4c, ldr word, bx lr. "
+        "No parameters. No side effects. "
+        "Field named 'duel LP display animation counter_A' by zero_duel_lp_display_counters (0x08096ecc). "
+        "All callers use cmp r0,#0x1 to gate subsequent logic on animation state. "
+        "Constants: gP1LifePoints=0x0201C4E0, field_offset=0x1d4c."),
+    ("FUN_080f6144", "write_oam_entry_attr_pairs",
+        "Write two attr halfword pairs into a gPrng sprite table entry. "
+        "r0=packed_xy_low (>>0xb -> entry_index), r1=packed_attr_hi (hi16=attr1_x, lo16=attr1_y), "
+        "r2=packed_attr2 (hi16=attr2_hi, lo16=attr2_lo). "
+        "Writes: [entry+6]=r1>>16, [entry+0xe]=r1&0xFFFF, [entry+0x16]=r2>>16, [entry+0x1e]=r2&0xFFFF. "
+        "Pure leaf, no bl calls. "
+        "Constants: gPrng=0x03000040, sprite_table_offset=0xde*2=0x1bc, entry_shift=0xb, "
+        "attr1_x_off=6, attr1_y_off=0xe, attr2_hi_off=0x16, attr2_lo_off=0x1e."),
+    ("FUN_080f72e8", "write_oam_sprite_entry_by_flip_mode",
+        "Write OAM attr pairs to a gPrng sprite table entry with per-flip-mode x/y offset, "
+        "then increment entry counters. "
+        "r0=packed_xy (lo16=x, hi16=y), r1=packed_attr (hi16=attr_hi, lo16=sub_type), "
+        "r2=attr2_hi_packed (saved r9), r3=attr2_lo_packed/flip_mode (saved r10). "
+        "Guards: sprite count >= 0x80 or sub_type==0x20 -> early exit. "
+        "16-case switchD on flip_mode adjusts x/y by +-4/8/0x10/0x20 pixels per case. "
+        "Calls write_oam_entry_attr_pairs then strb-increments two count bytes. "
+        "Side effects: gPrng sprite table attr fields written; two count bytes incremented. "
+        "Constants: MAX_SPRITE_COUNT=0x80, SPRITE_COUNT_OFFSET=0x400, "
+        "X_MASK=0x1ff, TILE_STRIDE_OFFSET=0x401."),
 ]
 
 
