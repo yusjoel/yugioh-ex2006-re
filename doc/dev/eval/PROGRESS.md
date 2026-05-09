@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-29) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-29) |
-| **上次更新** | 2026-05-09 (campaign-28 batch, 509/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-30) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-30) |
+| **上次更新** | 2026-05-09 (campaign-29 batch, 524/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**509 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**524 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -581,11 +581,27 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 507 | 643 | 5 | 1 | E | 0x080bd0a8 | FUN_080bd0a8 | dispatch_banner_scene_tick_by_state | 1 | [eval](eval/080bd0a8.md) |
 | 508 | 646 | 4 | 3 | E | 0x080c678c | FUN_080c678c | update_zone_oam_card_count_tag | 1 | [eval](eval/080c678c.md) |
 | 509 | 647 | 6 | 1 | E | 0x080f64dc | FUN_080f64dc | write_obj_attr_256color_affine | 1 | [eval](eval/080f64dc.md) |
+| 510 | 649 | 5 | 11 | D | 0x0803b3a8 | FUN_0803b3a8 | get_zone_slot_entity_ref_by_type | 1 | [eval](eval/0803b3a8.md) |
+| 511 | 652 | 6 | 1 | E | 0x080c1f10 | FUN_080c1f10 | tick_pack_banner_3d_state_machine | 1 | [eval](eval/080c1f10.md) |
+| 512 | 653 | 6 | 1 | E | 0x080c21a0 | FUN_080c21a0 | tick_pack_banner_3d_state_machine_alt | 1 | [eval](eval/080c21a0.md) |
+| 513 | 655 | 5 | 10 | D | 0x080f67f4 | FUN_080f67f4 | write_oam_entry_with_slot_check | 1 | [eval](eval/080f67f4.md) |
+| 514 | 656 | 6 | 2 | E | 0x080c124c | FUN_080c124c | render_card_zoom_oam_sprite_grid | 1 | [eval](eval/080c124c.md) |
+| 515 | 658 | 5 | 2 | E | 0x080c2990 | FUN_080c2990 | write_zone_pair_oam_with_coords | 1 | [eval](eval/080c2990.md) |
+| 516 | 659 | 6 | 1 | E | 0x080bdbb4 | FUN_080bdbb4 | tick_pack_banner_state_machine_b | 1 | [eval](eval/080bdbb4.md) |
+| 517 | 660 | 6 | 1 | E | 0x080bda7c | FUN_080bda7c | tick_pack_banner_state_machine_a | 1 | [eval](eval/080bda7c.md) |
+| 518 | 661 | 4 | 2 | E | 0x080c6a20 | FUN_080c6a20 | write_zone_slot_oam_descriptor | 1 | [eval](eval/080c6a20.md) |
+| 519 | 664 | 6 | 1 | E | 0x080c4ca0 | FUN_080c4ca0 | clear_ui_effect_state_flags | 1 | [eval](eval/080c4ca0.md) |
+| 520 | 665 | 5 | 1 | E | 0x080c4350 | FUN_080c4350 | dispatch_ui_effect_by_card_type | 1 | [eval](eval/080c4350.md) |
+| 521 | 668 | 5 | 1 | E | 0x080c4edc | FUN_080c4edc | run_ui_effect_card_pair_state_machine | 1 | [eval](eval/080c4edc.md) |
+| 522 | 669 | 5 | 1 | E | 0x080bd660 | FUN_080bd660 | tick_duel_puzzle_banner_state_machine | 1 | [eval](eval/080bd660.md) |
+| 523 | 671 | 6 | 1 | E | 0x080c8fd8 | FUN_080c8fd8 | init_window_regs_for_campaign_banner | 1 | [eval](eval/080c8fd8.md) |
+| 524 | 672 | 6 | 1 | E | 0x080c9030 | FUN_080c9030 | tick_campaign_banner_slide_state_machine | 1 | [eval](eval/080c9030.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-09: **batch #29 PASSED (campaign-29 落地)** — zone slot entity ref reader (get_zone_slot_entity_ref_by_type indeg=11 switch-5-cases + default) + pack banner 3D state machine pair (tick_pack_banner_3d_state_machine 7-phase + tick_pack_banner_3d_state_machine_alt alt-resource-path) + OAM slot-check writer (write_oam_entry_with_slot_check sentinel=0x80) + card zoom OAM grid (render_card_zoom_oam_sprite_grid __divsi3/__modsi3 折行) + zone pair OAM (write_zone_pair_oam_with_coords gDuelActivation flip-dispatch) + pack banner state machine A/B sibling pair (tick_pack_banner_state_machine_a pal_init=0x098cc0a4 + tick_pack_banner_state_machine_b pal_init=0x098c9064) + zone slot OAM descriptor (write_zone_slot_oam_descriptor 16-case switch) + UI effect flag clear (clear_ui_effect_state_flags bit1/bit0-bit2) + UI effect card-type dispatcher (dispatch_ui_effect_by_card_type 5-case) + card pair state machine (run_ui_effect_card_pair_state_machine resolve+load+build) + duel puzzle banner state machine (tick_duel_puzzle_banner_state_machine sin-wave OAM 9-phase) + campaign banner init+tick pair (init_window_regs_for_campaign_banner WIN0H/WININ/BLDCNT + tick_campaign_banner_slide_state_machine WIN0V slide 4-phase); first-shot 15/15; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (524/1526 = 34.34%)
 - 2026-05-09: **batch #28 PASSED (campaign-28 落地)** — LP digit OAM renderer + release noop pair (return_void_noop + suppress_display_output) + blend EVY pair (start_blend_fade_with_evy + advance_blend_evy_step) + OBJ affine cluster (write_obj_affine_scale_diagonal pure-diagonal + write_obj_affine_rot_scale sin-table) + write_obj_attr_256color_affine (bit13 mode) + pack OBJ attr by_dir trio (write_pack_obj_attr_by_dir + write_pack_obj_attr_by_dir_split r3-hi16 + write_pack_obj_attr_by_dir_stacked r3-both-stacked) + banner dual-state-machine (dispatch_banner_anim_tick_by_state gBannerState[+0x11] + dispatch_banner_scene_tick_by_state gBannerState[+0x10]) + compute_duel_zone_dir_for_player zone-direction pure-read + update_zone_oam_card_count_tag zone-deck OAM tag update + draw_number_digits_to_oam LP digit loop; first-shot 15/15; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (509/1526 = 33.36%)
 - 2026-05-09: **batch #27 PASSED (campaign-27 落地)** — card-data bit query + result_screen card name render pipeline + duel puzzle search + zone OAM decode/LP threshold/coord/sort cluster + LP anim counter + OAM sprite attr write pair (get_card_data_bit_by_index indeg=6 + render_game_text_decimal_to_line + get_duel_puzzle_count indeg=7 leaf + find_puzzle_slot_by_id linear scan + render_card_name_escape_to_line switchD tail + init_card_name_result_screen full screen init + decode_zone_oam_word_to_cursor_fields 16-case + check_lp_threshold_for_zone_slot 3-way + decode_zone_oam_word_to_slot_fields 16-case + check_zone_card_id_cache_valid + sort_zone_oam_entries_to_vram qsort+writeBack + set_zone_oam_coords_by_player + get_lp_display_anim_counter leaf + write_oam_entry_attr_pairs 4-strh + write_oam_sprite_entry_by_flip_mode 16-flip-case); first-shot 15/15; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (494/1526 = 32.37%)
 - 2026-05-09: **batch=19 #26 PASSED (单 call 落地)** — duel field card sprite OAM phase dispatch cluster + result_screen blend fade + LP display counter clear + pack VRAM upload + card name format render pipeline (dispatch_duel_field_zone_oam_by_type + init_duel_field_card_sprite_vram + tick_card_sprite_oam_step_b/c 兄弟对 + tick_card_sprite_oam_phase_dispatch 4-phase state machine + resolve_zone_data_ptr_by_oam_word indeg=6 + dispatch_duel_zone_pair_to_oam + setup_zone_oam_entry_by_field_slot + zero_duel_lp_display_counters leaf + tick_scene_blend_fadeout_step + tick_scene_blend_fadein_step 对称对 + tick_scene_blend_fade_sequence state machine + init_zone_oam_ctx_by_type + init_jp_font_linebuf_for_render + commit_glyph_linebuf_to_sprite_vram_with_index + upload_pack_vram_and_palette indeg=13 + find_lp_entry_by_flag_and_type + render_card_name_format_to_line + expand_card_name_escape_to_buf); first-shot 19/19; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (479/1526 = 31.39%)
