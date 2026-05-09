@@ -6372,6 +6372,154 @@ RENAMES = [
         "Conditional copy/zero OBJ VRAM rows: src==0 calls zero_fill_by_halfword per row, "
         "src!=0 calls copy_bytes_by_halfword. Row stride 0x400 (OBJ 2D mode). "
         "r2>>0xb=halfword stride, [sp+0x18]=col offset. Callers: FUN_080c5b78, FUN_080dc4ec."),
+
+    # 2026-05-09: batch #26 (campaign-26, topo=583-604, 19 functions)
+    ("FUN_080c5b78", "dispatch_duel_field_zone_oam_by_type",
+        "Dispatches OAM update for a single duel field zone slot by zone_type. "
+        "Reads gPrng+0x214 halfword to extract zone_type [0..0xd]; "
+        "16-way jump table routes each type to a dedicated OAM write sub-function. "
+        "No APCS input (all state from gPrng+0x214). Returns void. "
+        "Called by init_duel_field_card_sprite_vram (080c6184) and setup_zone_oam_entry_by_field_slot (080c5444). "
+        "Constants: gPrng_zone_halfword=gPrng+0x214, zone_type_max=0xd."),
+    ("FUN_080c6184", "init_duel_field_card_sprite_vram",
+        "Initialize card sprite VRAM for a duel field slot: "
+        "copies tile data to VRAM 0x06013800 via write_tile_rows_to_vram_by_mode, "
+        "copies palettes to PAL VRAM 0x05000280 and 0x050002a0, "
+        "calls dispatch_duel_field_zone_oam_by_type to configure OAM, "
+        "updates slot_phase counter at ctx+0x2a. "
+        "r0=u16 player_id [0..1]. Returns void. "
+        "Side-effects: OBJ VRAM 0x06013800, PAL VRAM 0x05000280/0x050002a0, OAM updated. "
+        "Constants: VRAM_CARD_SPRITE=0x06013800, PAL_A=0x05000280, PAL_B=0x050002a0."),
+    ("FUN_080c6268", "tick_card_sprite_oam_step_b",
+        "OAM animation second step for duel field card sprite. "
+        "Reads gPrng+0x210 packed halfword; extracts player_flag (bit15), "
+        "x_coord (bits[14:8]), y_coord (bits[6:0]); writes OAM entry. "
+        "r0=void. Returns void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). "
+        "Constants: gPrng_oam_word=gPrng+0x210, player_flag_bit=15, x_bits=[14:8], y_bits=[6:0]."),
+    ("FUN_080c6490", "tick_card_sprite_oam_step_c",
+        "OAM animation third step for duel field card sprite; symmetric to tick_card_sprite_oam_step_a. "
+        "Increments ctx+0x2a step counter; returns 1 when counter > 3 (done), else 0 (continue). "
+        "r0=void. Caller: tick_card_sprite_oam_phase_dispatch (080c65b0). "
+        "Constants: step_done_threshold=3."),
+    ("FUN_080c65b0", "tick_card_sprite_oam_phase_dispatch",
+        "4-phase card sprite OAM state machine: "
+        "phase 0=fadein (tick_card_sprite_oam_step_a), "
+        "phase 1=card_info (tick_card_sprite_oam_step_b), "
+        "phase 2=vram_refresh (init_duel_field_card_sprite_vram), "
+        "phase 3=fadeout (tick_card_sprite_oam_step_c). "
+        "Reads phase index from ctx+0x28; advances phase on step completion. "
+        "r0=void. Returns void."),
+    ("FUN_080c6638", "resolve_zone_data_ptr_by_oam_word",
+        "Decode packed OAM halfword and return zone data pointer via 16-way zone_type dispatch. "
+        "Reads gPrng+0x210 (oam_word); extracts zone_type [0..0xd]; "
+        "jump table returns pointer to zone data block for each type. "
+        "Pure lookup; no side-effects. "
+        "r0=void. Returns u32* zone_data_ptr. "
+        "Constants: gPrng_oam_word=gPrng+0x210, zone_type_max=0xd."),
+    ("FUN_080c64b8", "dispatch_duel_zone_pair_to_oam",
+        "Calls resolve_zone_data_ptr_by_oam_word twice, compares the two zone data pointers; "
+        "if they differ, calls sync_state_and_init_sprite to commit the OAM update. "
+        "r0=void. Returns void. "
+        "Caller: tick_card_sprite_oam_phase_dispatch (080c65b0) in card_info phase. "
+        "Constants: zone comparison drives sprite sync trigger."),
+    ("FUN_080c5444", "setup_zone_oam_entry_by_field_slot",
+        "Read gPrng+0x210 OAM halfword; dispatch on zone_type via DAT_080c54a8 16-entry table; "
+        "write OAM slots 0x70fb/0x70fc/0x70fd with computed attr0/1/2. "
+        "r0=void. Returns void. "
+        "Caller: dispatch_duel_field_zone_oam_by_type; used in duel field OAM init path. "
+        "Constants: gPrng_oam_word=gPrng+0x210, OAM_SLOT_A=0x70fb, OAM_SLOT_B=0x70fc, OAM_SLOT_C=0x70fd, "
+        "zone_dispatch_table=DAT_080c54a8."),
+    ("FUN_08096ecc", "zero_duel_lp_display_counters",
+        "Clear two duel LP display animation counters. "
+        "Writes 0 to gP1LifePoints+0x1d4c and gP1LifePoints+0x1d5c (str r2=0 twice). "
+        "No APCS input; leaf function (bx lr). Returns void. "
+        "Callers: FUN_080b70ac (duel_field init chain), play_ui_effect_03 (0x080cca80). "
+        "Side-effects: [gP1LifePoints+0x1d4c]:=0; [gP1LifePoints+0x1d5c]:=0. "
+        "Constants: gP1LifePoints=0x0201c4e0, field_A_offset=0x1d4c, field_B_offset=0x1d5c."),
+    ("FUN_0802cf98", "tick_scene_blend_fadeout_step",
+        "Execute one blend fadeout step. "
+        "Reads BLDCNT (0x04000050), ORs BLD_SRC_ALL mask 0x1f00, writes back to enable full-screen blend source. "
+        "Then calls tick_blend_step_by_delta(delta=4) to advance blend counter. "
+        "r0=void. Returns void. "
+        "Caller: FUN_0802cfd4 (tick_scene_blend_fade_sequence) phase 0 branch. "
+        "Side-effects: [BLDCNT 0x04000050] |= 0x1f00; blend counter += 4 via callee. "
+        "Constants: BLDCNT=0x04000050, BLD_SRC_ALL=0x1f00, blend_delta=4."),
+    ("FUN_0802cfb4", "tick_scene_blend_fadein_step",
+        "Execute one blend fadein step and detect completion. "
+        "Calls start_blend_fadein_with_target(target=4); if returns 0 (in progress) returns 0. "
+        "On completion: writes 0 to BLDCNT (0x04000050) to disable blend, returns 1. "
+        "r0=void. Returns u32 done_flag (0=in progress, 1=complete). "
+        "Caller: FUN_0802cfd4 (tick_scene_blend_fade_sequence) phase 1 branch. "
+        "Side-effects: [BLDCNT 0x04000050]:=0 on completion. "
+        "Constants: BLDCNT=0x04000050, target=4."),
+    ("FUN_0802cfd4", "tick_scene_blend_fade_sequence",
+        "Fadeout-fadein state machine for scene blend transition. "
+        "Reads phase_state from 0x02023360+0x118; phase 0: calls tick_scene_blend_fadeout_step; "
+        "phase 1: calls tick_scene_blend_fadein_step; advances phase on completion. "
+        "Always returns 0. r0=void. "
+        "Caller: frame_counter-driven state machine hub. "
+        "Constants: phase_state_addr=0x02023360+0x118."),
+    ("FUN_080c55dc", "init_zone_oam_ctx_by_type",
+        "Zero-fill EWRAM OAM context buffer at 0x0201ff30 (0x2c halfwords). "
+        "Sets ctx_valid bit0=1 in context header. "
+        "16-way zone_type dispatch to initialize type-specific OAM fields. "
+        "r0=void. Returns void. "
+        "Caller: setup_zone_oam_entry_by_field_slot and related OAM init path. "
+        "Side-effects: [0x0201ff30..+0x58]:=0; ctx valid bit set; OAM type fields written. "
+        "Constants: ctx_base=0x0201ff30, ctx_size=0x2c halfwords, valid_bit=bit0."),
+    ("FUN_0802cba0", "init_jp_font_linebuf_for_render",
+        "Initialize JP font line buffer for card name rendering. "
+        "Calls setup_line_buf_with_font_and_align(font_id=0x1a, width=0x28); "
+        "writes JP font direction flags to EWRAM; "
+        "clears PAL VRAM region 0x050001e0 (palette slot for text rendering). "
+        "r0=void. Returns void. "
+        "Caller: render_card_name_format_to_line (0x0802c30c) and related result_screen functions. "
+        "Side-effects: line buffer state updated; [0x050001e0..] zeroed. "
+        "Constants: font_id=0x1a, width=0x28, PAL_TEXT_VRAM=0x050001e0."),
+    ("FUN_0802cc08", "commit_glyph_linebuf_to_sprite_vram_with_index",
+        "Clear OBJ VRAM 0x06008020 (0x8200 halfwords zero-fill), "
+        "commit line buffer glyphs to sprite VRAM, "
+        "then write tile index sequence (0,1..25,0,0,0) x40 loops into OAM index table. "
+        "r0=void. Returns void. "
+        "Caller: result_screen card name rendering pipeline. "
+        "Side-effects: OBJ VRAM 0x06008020 zeroed; tile index table written. "
+        "Constants: OBJ_VRAM_BASE=0x06008020, zero_fill_count=0x8200 halfwords, "
+        "tile_seq_len=26 (0+1..25+0+0+0), loop_count=0x28."),
+    ("FUN_080f5a98", "upload_pack_vram_and_palette",
+        "Upload pack banner VRAM and palette data: "
+        "4x copy_bytes_by_halfword: BG PAL -> 0x05000000, BG tile -> 0x06004000, "
+        "OBJ PAL -> 0x05000200, OBJ tile -> 0x06010000. "
+        "Clears palette[0] entry (transparent) at BG PAL base. "
+        "r0=u32 src_ptr (ROM pack data block). Returns void. "
+        "Side-effects: BG PAL 0x05000000, BG tile 0x06004000, OBJ PAL 0x05000200, OBJ tile 0x06010000. "
+        "Constants: BG_PAL=0x05000000, BG_TILE=0x06004000, OBJ_PAL=0x05000200, OBJ_TILE=0x06010000."),
+    ("FUN_08031348", "find_lp_entry_by_flag_and_type",
+        "Linear scan of gP1LifePoints+4 array (step=4, max 0xff entries) for an entry matching "
+        "flag bit0 == r0, entry_type (low 13 bits of halfword at [entry+0x10e0]) == 1, "
+        "and valid_mark bit7 of [entry+0x10e0+1] set. "
+        "Returns 1 if matching entry found, 0 if not found. "
+        "r0=u32 flag_value [0..1]. Returns u32 found_flag. "
+        "Callers: FUN_08020db4, FUN_08020fa8, FUN_0802c358 (result_screen LP record display). "
+        "Constants: array_step=4, field_offset=0x10e0, max_count=0xff, type_value=1, valid_bit7=1."),
+    ("FUN_0802c30c", "render_card_name_format_to_line",
+        "Lookup card name and format-render to a display line. "
+        "Calls card_name_lookup_by_internal_id(r3=card_internal_id) to get name ptr; "
+        "calls expand_format_text_to_buf(name, r2=fmt_args, sp_buf, 0x100) to expand into 256-byte stack buf; "
+        "calls text_render_wrapper(r5=dst_buf, r6=line_idx, text_buf, flags=0x8008) for first pass; "
+        "calls text_render_wrapper again with extra_flags=7 for second pass (shadow/highlight). "
+        "Returns low 10 bits of [gPrng+0x6ed0+0xe] halfword as render_width. "
+        "r0=ptr dst_buf, r1=u16 line_idx [0..0x401], r2=ptr fmt_args, r3=u16 card_internal_id. "
+        "Returns u16 render_width (bits[9:0] of gPrng+0x6ed0[0xe]). "
+        "Caller: FUN_0802c358 (result_screen). "
+        "Constants: stack_buf_size=0x100, render_flags=0x8008, extra_flags=7, "
+        "width_field_offset=0xe, width_mask=0x3ff."),
+    ("FUN_080f51ac", "expand_card_name_escape_to_buf",
+        "Scan format string for percent-c escape sequence (0x25 0x63), "
+        "read 3 decimal digit characters, call internal_card_id_to_card_id + "
+        "select_charset_then_load_name + append_text_to_buf_end to append the card name. "
+        "r0=ptr fmt_str, r1=ptr out_buf. Returns void. "
+        "Caller: expand_format_text_to_buf (format engine). "
+        "Constants: ESCAPE_PERCENT=0x25, ESCAPE_C=0x63, digit_count=3."),
 ]
 
 
