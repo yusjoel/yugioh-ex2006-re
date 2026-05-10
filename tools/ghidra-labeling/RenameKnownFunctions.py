@@ -8407,6 +8407,230 @@ RENAMES = [
         "Increments gP1LifePoints[0x1d1c] (phase counter). Returns 0=done, 1=busy. "
         "Constants: phase_offset=0x1d1c, sprite_attr_spell=0x8006, sprite_attr_trap=0x8007, "
         "sprite_attr_monster=0x8008, sprite_attr_alt=0x8005."),
+    # --- batch #38 (campaign-38, 2026-05-10) ---
+    ("FUN_080abb90", "reset_sprite_attr_record_flags",
+        "Resets flag fields in the sprite attr record struct at 0x0201e4d0. "
+        "Loads struct ptr from DAT_080abbcc; r0 is overwritten at entry (void input). "
+        "Clears bits in [+0x13] (AND 0x01 keep bit0), clears bit1 in [+0x14] (AND 0xFD), "
+        "applies mask 0xFFFFFE01 to [+0x14] halfword and word, "
+        "applies mask to [+0x16] halfword; then ORs 0x30 (bit4+bit5) into [+0x12] byte "
+        "to mark record as committed/done. Leaf; called by FUN_080954e8 after sprite attr "
+        "sequence processing to prevent double-submission. Returns void. "
+        "Constants: struct_base=0x0201e4d0, keep_mask=0x01, clear_bit1=0xFD, "
+        "wide_mask_0=0xFFFFFE01 (DAT_080abbd0), wide_mask_1=0xFFFE01FF (DAT_080abbd4), "
+        "done_bits=0x30."),
+    ("FUN_08085320", "submit_lp_bar_sprite_row_by_type",
+        "Submits one LP bar display row to the sprite row queue based on current duel state. "
+        "r0=u16 x_coord [0..0xFFFF] (low 16 bits via lsls/lsrs); "
+        "r1=u32 lp_bar_param (width/type field written to sprite row buffer). "
+        "Path A: if gP1LifePoints+0x1d08 LP data ptr is valid and player_id matches, "
+        "writes x_coord/lp_bar_param to sp buffer, calls "
+        "submit_sprite_row_data(type=0x9, y=-1, sp, count=6). "
+        "Path B: if gDuelCtx+0x4d0 LP bar count=0 and extra condition met, "
+        "writes LP bar width/count fields then calls submit_sprite_row_data. "
+        "r4=x_coord, r5=lp_bar_param. 32 duel_field callers. Returns void (b LAB, no r0). "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, lp_data_offset=0x1d08, "
+        "gDuelCtx=0x0201b290, lp_bar_count_offset=0x4d0 (0x9a<<3), type=0x9, row_count=6."),
+    ("FUN_080909e0", "check_card_effect_node_active",
+        "Checks whether the given card has an active effect node with nonzero activation count. "
+        "Calls find_card_effect_node_entry(card_entry); if node not found returns 0. "
+        "If found, reads [node+0x4] activation count; converts to bool via "
+        "(rsbs #0 | orrs) then lsrs #0x1f to extract sign bit as final flag. "
+        "r0=ptr card_entry; returns r0=u32 is_active (1=active, 0=inactive or missing). "
+        "No side effects. Called by dispatch_card_effect_by_stat_type as precondition check. "
+        "Constants: effect_node_active_offset=0x4."),
+    ("FUN_0805b2a4", "dispatch_card_effect_by_stat_type",
+        "Dispatches card effect processing based on card stat type fields and special card IDs. "
+        "r0=ptr card_entry (saved to r7). "
+        "Step 1: checks [r7+0x4] bit1 (processed_bit=0x2); if set returns 0 (already handled). "
+        "Step 2: calls check_card_effect_node_active; if node missing returns 0. "
+        "Step 3: checks [r7+0x4] bit2 (alt_path_bit=0x4); if clear jumps to large branch LAB_0805b3c2. "
+        "Step 4: calls get_card_extended_stat_field9; matches field9 [2..3] range. "
+        "Step 5: checks [r7+0x3] AND 0x30 (stat3_bits); if card_id==0x1909 returns 0 (special skip). "
+        "Whole function is pure read; all exit paths are movs r0,#0 or movs r0,#1. "
+        "Called by FUN_080954e8 (duel scene main loop). Returns u32 should_continue (0=skip, 1=proceed). "
+        "Constants: processed_bit=0x2, alt_path_bit=0x4, stat3_bits=0x30, "
+        "card_id_special=0x1909, field9_range=[2..3]."),
+    ("FUN_0801f3b0", "read_prng_entry_flag_clear",
+        "Reads a flag byte at gPrng+0x1c0[+0x584] and returns the inverted bit0 as a bool. "
+        "No APCS input (first two instructions overwrite r0 and r1). "
+        "Computes gPrng + (0xe0<<1)=0x1c0, dereferences the word there as a pointer, "
+        "then adds offset 0x584 (DAT_0801f3cc), reads a byte, and returns "
+        "bics r0(=1),r1 -> 1 if bit0 is clear, 0 if bit0 is set. "
+        "Result is 'flag_is_clear' boolean. Leaf; called by FUN_080954e8 (prng tagged). "
+        "No side effects (read-only). "
+        "Constants: gPrng_offset=0x1c0 (0xe0<<1), entry_offset=0x584, flag_bit=0x1."),
+    ("FUN_080a1968", "commit_lp_display_row_to_sprite",
+        "Initialises LP display state fields then submits one LP bar sprite row. "
+        "No APCS input (entry overwrites r2 with PTR_gP1LifePoints). "
+        "Writes [gP1LifePoints+0x1d88]:=1 (active), [+0x1d94]:=0, [+0x1d84]:=0. "
+        "Checks player_id match (eors#1 XOR); if match and LP data valid, "
+        "calls copy_bytes_by_halfword(src, sp, len=0x10) then "
+        "submit_sprite_row_data(type=0x1e, y=-1, sp, count=0x12). "
+        "Clears [0x0201b870+0x301] bit0/bit1 (AND 0xFC), sets [gP1LifePoints+0x1d84]:=1 (done). "
+        "Called by setup_lp_display_row_with_data (0x080a1a38) and FUN_080a1a00. Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, active_flag_offset=0x1d88, zero_offset=0x1d94, "
+        "data_offset=0x1d84, copy_len=0x10, type=0x1e, row_count=0x12."),
+    ("FUN_080a1a38", "setup_lp_display_row_with_data",
+        "Writes caller-provided LP bar display params to gP1LifePoints state area "
+        "then triggers sprite row submission. "
+        "r0=u32 lp_val_a (written to gP1LifePoints+0x1d6c); "
+        "r1=u32 lp_val_b (written to +0x1d70); "
+        "r2=ptr src_data; r3=u32 copy_count [0..8] (clamped to 8 via cmp#8/ble). "
+        "Calls copy_bytes_by_halfword(r2, gP1LifePoints+0x1d74, r3*2), "
+        "then commit_lp_display_row_to_sprite(). Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, val_a_offset=0x1d6c, val_b_offset=0x1d70, "
+        "data_offset=0x1d74, max_copy_count=8."),
+    ("FUN_08095b3c", "get_lp_display_state_word",
+        "Reads and returns the 32-bit LP display state control word from "
+        "gP1LifePoints+0x1d0c. No APCS input (entry overwrites r0). "
+        "4-instruction leaf: ldr gP1LifePoints, ldr 0x1d0c offset, adds, ldr [r0], bx lr. "
+        "Non-zero return enables LP display update in caller FUN_080954e8; "
+        "zero means no update needed this frame. No side effects. "
+        "Constants: gP1LifePoints=0x0201c4e0, state_offset=0x1d0c."),
+    ("FUN_0803bde4", "write_sprite_attr_record_entry",
+        "Writes four halfword sprite attributes into fixed slots in gSpriteAttrBuf "
+        "and marks the slot as filled. "
+        "r0=u16 attr0, r1=u16 attr1, r2=u16 attr2, r3=u16 attr3. "
+        "Loads gSpriteAttrBuf (0x0201b870) into r12; "
+        "writes attr0 to [base+0x304] (0xc1*4), attr1 to [+0x306], "
+        "attr2 to [+0x308] (0xc2*4), attr3 to [+0x30a]; "
+        "ORs 0x4 into [base+0x300] (0xc0*4) to set filled bit; "
+        "writes 0 to [base+0x30c] (0xc3*4) to clear attr3 pad byte. "
+        "Calls return_void_noop_stub as commit callback. Returns void. "
+        "Constants: gSpriteAttrBuf=0x0201b870, flags_offset=0x300, filled_bit=0x4, "
+        "attr_offsets=[0x304,0x306,0x308,0x30a,0x30c]."),
+    ("FUN_0804a76c", "increment_lp_bar_display_counter",
+        "Increments the LP bar display counter in gDuelCtx and initialises animation "
+        "state on first increment. No APCS input (entry overwrites r4 with gDuelCtx). "
+        "Checks gDuelCtx+0x4d0 (active flag); if nonzero returns immediately. "
+        "Reads gP1LifePoints+0x1d08 LP data ptr; if nonzero checks player_id match. "
+        "On player mismatch: writes halfword=1 to sp, calls "
+        "submit_sprite_row_data(type=0xa, y=-1, sp, count=2). "
+        "On match or LP ptr null: increments gDuelCtx+0x4c4; "
+        "if counter first becomes 1: clears [+0x4cc] and [+0x580], increments [+0x4c8]. "
+        "indeg=64. Returns void. "
+        "Constants: gDuelCtx=0x0201b290, active_flag_offset=0x4d0, counter_offset=0x4c4, "
+        "anim_offset=0x4cc, anim2_offset=0x580, seq_counter_offset=0x4c8, type=0xa, row_count=2."),
+    ("FUN_080310d0", "find_slot_idx_in_dual_list_by_id",
+        "Searches two player slot lists sequentially for an entry matching a target ID; "
+        "returns its logical index. "
+        "r0=u32 player_side [0..1]; r1=u16 target_id [0..0x1FFF] (low 13 bits matched). "
+        "Base: gP1LifePoints+0x10e0 (0x87<<5). Outer loop r4=[0..1] (lists); "
+        "inner loop r3=[0..0x7e] (127 entries, 8 bytes each). "
+        "Each entry: ldrh, extract low 13 bits (lsls#0x13/lsrs#0x13), cmp with target. "
+        "Hit: returns r1 = r6 XOR r4 (player_side XOR list_idx). "
+        "Miss: returns 0. Pure read; no side effects. "
+        "Constants: gP1LifePoints=0x0201c4e0, base_offset=0x10e0 (0x87<<5), "
+        "entry_size=8, entry_count=0x7f, id_bits=13."),
+    ("FUN_0803b8b0", "write_field_slot_bit_by_player",
+        "Performs a single bit set or clear on the slot flags word for a given player and slot. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; "
+        "r2=u32 bit_pos [0..31]; r3=u32 set_flag (0=clear BIC, nonzero=set OR). "
+        "Target address: gP1LifePoints + player_side*0x868 + slot_idx*0x14 + 0x40. "
+        "Reads flags word, applies (1<<bit_pos) OR or BIC, writes back. "
+        "indeg=11; called by duel_field and card_data callers. Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "slot_entry_size=0x14, flags_offset=0x40."),
+    ("FUN_0804a970", "set_field_slot_bit_with_sprite_update",
+        "Conditionally writes a slot flag bit and enqueues a sprite attr update when "
+        "the bit value changes. "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; "
+        "r2=u32 bit_pos [0..31]; r3=u32 set_flag [0..1]. "
+        "Reads gP1LifePoints[player*0x868+slot*0x14+0x40] flags word, extracts bit at bit_pos; "
+        "if current == set_flag skips (no-op). Otherwise calls "
+        "write_field_slot_bit_by_player(player, slot, bit_pos, set_flag) then "
+        "enqueue_sprite_attr_record(oam_y, slot_idx, bit_pos, set_flag) "
+        "with oam_y=0x2a (player=0) or 0x802a (player!=0). "
+        "indeg=29; core shared path for slot flag updates. Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, "
+        "slot_entry_size=0x14, flags_offset=0x40, oam_y_p0=0x2a, oam_y_p1=0x802a."),
+    ("FUN_0804c76c", "submit_slot_card_sprite_row_entry",
+        "Looks up a duel slot index, packs card sprite attributes and submits a display row. "
+        "r0=u32 player_side [0..1]; r1=u32 card_id [0..0xFFFF]; "
+        "r2=u16 slot_idx [0..0xFFFF] (0 triggers dynamic find via find_slot_idx_in_dual_list_by_id); "
+        "r3=u32 slot_data_word (written to gDuelCtx slot struct +0x14 in alternate path). "
+        "Main path: checks gP1LifePoints+0x1d08 LP ptr and player_id match; "
+        "packs 6 halfword sprite attrs to sp buf, calls "
+        "submit_sprite_row_data(type=0x14, y=-1, sp, count=0xc). "
+        "Alt path: finds gDuelCtx+0x480 or 0x488 slot ptr, "
+        "calls zero_fill_by_halfword(0x18 bytes), packs card_id/slot fields, "
+        "increments active count halfword. Returns void. "
+        "Constants: gDuelCtx=0x0201b290, p0_slot_offset=0x480, p1_slot_offset=0x488, "
+        "slot_entry_size=0x18, sprite_type=0x14, row_count=0xc."),
+    ("FUN_0804a870", "decrement_lp_bar_display_counter",
+        "Symmetric counterpart of increment_lp_bar_display_counter (0x0804a76c); "
+        "decrements gDuelCtx+0x4c4 by 1 (subs #1) instead of incrementing. "
+        "No APCS input (entry overwrites r4 with gDuelCtx). "
+        "Checks gDuelCtx+0x4d0 active flag; if nonzero returns. "
+        "Reads gP1LifePoints+0x1d08 LP ptr and player_id; on mismatch "
+        "writes halfword=3 to sp, calls submit_sprite_row_data(type=0xa, y=-1, sp, count=2). "
+        "On match or LP ptr null: decrements [gDuelCtx+0x4c4]. "
+        "No extra initialisation when counter reaches 0 (unlike increment variant). "
+        "indeg=67. Returns void. "
+        "Constants: gDuelCtx=0x0201b290, active_flag_offset=0x4d0, counter_offset=0x4c4, "
+        "sprite_type=0xa, row_count=2."),
+    ("FUN_08094eb4", "write_card_display_index_entry",
+        "Writes or updates one entry in the card display index array at 0x0201b1b0. "
+        "r0=u32 index [0..0x7F]; r1=u32 value. "
+        "If index <= 0x34 (52): direct path writes r1 to [0x0201b1b0+index*4]. "
+        "If index > 0x34: extended path computes sub_idx=(index-0x35), "
+        "locates word in 32-slot bitfield at [0x0201b1b0+0xd4+word_slot*4], "
+        "applies (1<<bit_pos) OR if value!=0, BIC if value==0. "
+        "indeg=10; leaf. Returns void (bx lr). "
+        "Constants: array_base=0x0201b1b0, direct_max_index=0x34, "
+        "extended_base_offset=0xd4, extended_slot_bits=32."),
+    ("FUN_08094f3c", "write_card_display_index_with_bit_offset",
+        "Wrapper that queries a card data bit then adds a base offset to form the "
+        "final display index before writing. "
+        "r0=ptr card_entry; r1=u32 base_offset [0..0x7F]. "
+        "Calls get_card_data_bit_by_index(card_entry, bit_selector); "
+        "computes index = bit_result + base_offset; "
+        "calls write_card_display_index_entry(card_entry, index). "
+        "indeg=27; called by card_data/card_frame/duel_field callers. Returns void. "
+        "Side effect: write_card_display_index_entry applied to computed index."),
+    ("FUN_08094f70", "update_card_display_index_by_type_rules",
+        "Applies field6/field9 type rules to update card display index array entries. "
+        "r0=ptr card_entry (saved to r4); r1=s32 active_count (saved to r6; "
+        "caller FUN_08095a18 passes [gP1LifePoints+0x310]; <=0 skips sub-condition checks). "
+        "Checks card_side XOR flip_status vs current player_id [0x0201e2a0+4]; "
+        "mismatch: skips all. "
+        "If field6 (get_card_extended_stat_field9/field6) == 0x17 (23): "
+        "calls write_card_display_index_entry(0x3a, 1); if [r0+0x3] AND 0x30 == 0, "
+        "calls write_card_display_index_with_bit_offset(0x21, 1); "
+        "checks field9: if field9==1 returns early. "
+        "If field6 == 0x16 (22): similar path "
+        "write_card_display_index_entry(0x39,1) + write_card_display_index_with_bit_offset(0x1f,1). "
+        "Final: write_card_display_index_with_bit_offset(0x20 or 0x22, 1). "
+        "Called only by FUN_080954e8. Returns void. "
+        "Constants: player_id_ptr=0x0201e2a0, field6_type_23=0x17, field6_type_22=0x16, "
+        "field9_threshold=1, index_A=0x3a, index_B=0x39, index_C=0x21, "
+        "index_D=0x1f, index_E=0x20, index_F=0x22."),
+    ("FUN_0804a7f8", "increment_lp_bar_counter_no_player",
+        "Similar to increment_lp_bar_display_counter (0x0804a76c) but takes no player_side "
+        "parameter and writes halfword=2 (vs 1) on player mismatch. "
+        "No APCS input (entry: push {lr}; ldr r3, gDuelCtx). "
+        "Checks gDuelCtx+0x4d0 active flag; if nonzero returns. "
+        "Checks gP1LifePoints+0x1d08 LP ptr and player_id [0x0201e2a0+4] XOR 1; "
+        "on mismatch: writes halfword=2 to sp, "
+        "calls submit_sprite_row_data(type=0xa, y=-1, sp, count=2). "
+        "On match or LP null: increments gDuelCtx+0x4c4; "
+        "if counter becomes 1: increments gDuelCtx+0x4c8. "
+        "Missing 0x4cc/0x580 clear steps present in 0x0804a76c. indeg=4. Returns void. "
+        "Constants: gDuelCtx=0x0201b290, active_flag_offset=0x4d0, counter_offset=0x4c4, "
+        "seq_offset=0x4c8, type=0xa, row_count=2, mismatch_halfword=2."),
+    ("FUN_080ed674", "check_prng_anim_frame_slot_occupied",
+        "Checks whether a player's target animation frame slot is already occupied in "
+        "the gPrng frame table. "
+        "r0=u32 player_id [0..1]. "
+        "Loads gPrng+0x1c0 frame table ptr; locates player entry at +0x5a0+player*14. "
+        "Reads frame byte, adds 6, masks to low 8 bits, ORs 0xb000 to form OAM attr r5. "
+        "Loops (r6+6)/6+3 iterations over circular index (player+i) & 0x3f: "
+        "reads each halfword from frame table, masks with 0xf0ff, compares to r5; "
+        "on hit returns 1 (slot occupied). After loop returns 0 (free). "
+        "No side effects. Called by FUN_080ed6fc (prng tag). "
+        "Constants: gPrng=0x03000040, frame_ptr_offset=0x1c0, table_offset=0x5a0, "
+        "entry_stride=14, frame_mask=0xFF, oam_base=0xb000, attr_mask=0xf0ff, slot_wrap=0x3f."),
 ]
 
 
