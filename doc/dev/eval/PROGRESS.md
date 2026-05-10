@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-36) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-36) |
-| **上次更新** | 2026-05-10 (campaign-35 batch #35, 607/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-37) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-37) |
+| **上次更新** | 2026-05-10 (campaign-36 batch #36, 627/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**607 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**627 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -679,11 +679,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 605 | 760 | 9 | 2 | E | 0x080d3dc4 | FUN_080d3dc4 | compare_zone_slot_card_stat_pair_win | 1 | [eval](eval/080d3dc4.md) |
 | 606 | 761 | 9 | 2 | E | 0x080d3d28 | FUN_080d3d28 | compare_zone_slot_card_stat_pair_alt | 1 | [eval](eval/080d3d28.md) |
 | 607 | 762 | 9 | 2 | E | 0x080d3c8c | FUN_080d3c8c | compare_zone_slot_card_stat_pair | 1 | [eval](eval/080d3c8c.md) |
+| 608 | 763 | 9 | 2 | E | 0x080d3b6c | FUN_080d3b6c | compare_zone_slot_visibility_pair | 1 | [eval](eval/080d3b6c.md) |
+| 609 | 764 | 9 | 2 | E | 0x080d3bf0 | FUN_080d3bf0 | compare_zone_slot_stat_with_type_alt | 1 | [eval](eval/080d3bf0.md) |
+| 610 | 765 | 9 | 2 | E | 0x080d3e50 | FUN_080d3e50 | compare_zone_slot_card_stat_with_atk | 1 | [eval](eval/080d3e50.md) |
+| 611 | 766 | 9 | 2 | E | 0x080d3f4c | FUN_080d3f4c | compare_zone_slot_card_stat_with_level | 1 | [eval](eval/080d3f4c.md) |
+| 612 | 767 | 8 | 2 | E | 0x080d403c | FUN_080d403c | sort_zone_slots_by_stat_insertion | 1 | [eval](eval/080d403c.md) |
+| 613 | 768 | 7 | 1 | E | 0x080d4148 | FUN_080d4148 | sort_zone_slots_by_stat_quicksort | 1 | [eval](eval/080d4148.md) |
+| 614 | 769 | 6 | 1 | E | 0x080d4268 | FUN_080d4268 | setup_zone_slot_sorted_view | 1 | [eval](eval/080d4268.md) |
+| 615 | 770 | 5 | 1 | E | 0x080d4478 | FUN_080d4478 | tick_zone_card_list_state_machine | 1 | [eval](eval/080d4478.md) |
+| 616 | 771 | 4 | 1 | E | 0x080d2ef4 | FUN_080d2ef4 | tick_zone_card_list_view | 1 | [eval](eval/080d2ef4.md) |
+| 617 | 772 | 3 | 1 | E | 0x080cc340 | FUN_080cc340 | invert_zone_tick_result | 1 | [eval](eval/080cc340.md) |
+| 618 | 773 | 4 | 1 | E | 0x080cc208 | FUN_080cc208 | tick_zone_detail_render_step | 1 | [eval](eval/080cc208.md) |
+| 619 | 774 | 4 | 1 | E | 0x080cc228 | FUN_080cc228 | tick_zone_detail_panel_by_anim_state | 1 | [eval](eval/080cc228.md) |
+| 620 | 775 | 4 | 1 | E | 0x080cc354 | FUN_080cc354 | tick_zone_field_info_panel | 1 | [eval](eval/080cc354.md) |
+| 621 | 776 | 3 | 1 | E | 0x080cc528 | FUN_080cc528 | tick_zone_display_frame | 1 | [eval](eval/080cc528.md) |
+| 622 | 777 | 5 | 2 | E | 0x08093598 | FUN_08093598 | play_card_ok_ui_effect | 1 | [eval](eval/08093598.md) |
+| 623 | 778 | — | 2 | E | 0x0801f3d4 | FUN_0801f3d4 | return_void_noop_stub | 1 | [eval](eval/0801f3d4.md) |
+| 624 | 779 | — | 135 | C | 0x0803bd2c | FUN_0803bd2c | enqueue_sprite_attr_record | 1 | [eval](eval/0803bd2c.md) |
+| 625 | 780 | — | 5 | D | 0x080ed858 | FUN_080ed858 | write_sprite_row_to_vram_buffer | 1 | [eval](eval/080ed858.md) |
+| 626 | 781 | — | 2 | E | 0x080953c4 | FUN_080953c4 | dispatch_sprite_row_write_by_type | 1 | [eval](eval/080953c4.md) |
+| 627 | 782 | — | 14 | D | 0x08095498 | FUN_08095498 | submit_sprite_row_data | 1 | [eval](eval/08095498.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-10: **batch #36 PASSED (campaign-36 落地)** — zone slot comparator cluster + zone sort insertion/quicksort + zone slot sorted view setup + zone card list state machine/view + zone display frame tick + zone detail render/panel + zone field info panel + invert zone tick result + play card ok UI effect + return void noop stub + sprite attr queue enqueue + sprite row VRAM write + sprite row dispatch by type + sprite row data submit (compare_zone_slot_visibility_pair gDuelCtx+0x02020160 stride=0x28 compare_table=0x09832604 invisible->1/-1 + compare_zone_slot_stat_with_type_alt type_0x16->-2/type_0x17->-3 + compare_zone_slot_card_stat_with_atk ATK/DEF tables 0x09e4f310/0x09e4f32c/0x09e4f2ac + compare_zone_slot_card_stat_with_level same tables different ptr@080d3f94 invisible=0x27 + sort_zone_slots_by_stat_insertion base-case count<=6 FUN_0810e5d0 comparator ldrh/strh halfword swap + sort_zone_slots_by_stat_quicksort recursive pivot=arr[count/2+count%2] threshold=6 self-recursive + setup_zone_slot_sorted_view gDuelCtx+0x2f52 bits[12:5] VRAM 0x0601f000 zero + dispatch_zone_card_anim_by_type + render_zone_slot_card_icon_tile loop + load_card_list_small_image + dispatch_zone_card_display_by_mode + tick_zone_card_list_state_machine state=0/1/2 gDuelCtx+0x2f4d gPrng+0x148 bit6/7/5 fixed_return=1 + tick_zone_card_list_view type_combined gDuelCtx+0x2f53/0x2f54 bits[7:5]<<3|bits[4:0] type=[1..5]/4/5/6/else full dispatch + invert_zone_tick_result bool-invert wrapper 3-instruction push/bl/cmp/beq/movs/b + tick_zone_detail_render_step render_zone_card_detail_panel+state+1 fixed_return=1 + tick_zone_detail_panel_by_anim_state sub_state [0..6] apply_palette_offset_to_tile_row x2 VRAM=0x0600f00a + tick_zone_field_info_panel sub_state=0 zero VRAM / 1..6 palette / 7 render_duel_field_zone_info+copy_bytes OBJ_PAL=0x050002e0 + tick_zone_display_frame gDuelCtx+0x2f4c selector LP_alive gPrng_rand/60>179 flag + 4 sub-system dispatch + play_card_ok_ui_effect movs r0,#0x31=49 bl play_ui_effect single-instruction wrapper + return_void_noop_stub bx lr release-stub + enqueue_sprite_attr_record indeg=135 queue_base=0x0201bcc0+0x808 capacity=0xff 4-strh x/y/w/h + write_sprite_row_to_vram_buffer r7=(r1+1)/2 <=6 single-ch/>6 dual-ch IME toggle gPrng+0x464/0x584 + dispatch_sprite_row_write_by_type subs#2/cmp#0x1d switch_table=0x080953dc 30-entry bits[18:15] 0x0201b870 + submit_sprite_row_data 256-byte stack buf r1=-1 skip-header copy_bytes+dispatch+write 3-step); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (627/1526 = 41.09%)
 - 2026-05-10: **batch #35 PASSED (campaign-35 落地)** — zone card anim OAM render cluster + equip eligibility check chain + hand slot search pair + effect ctx slot writer (render_zone_card_anim_oam_frame gDuelCtx+0x2f53/0x2f54 type_combined 4-branch OAM write + render_zone_card_anim_oam_frame_alt subs#5 multi-col variant + check_zone_anim_id_in_table linear-scan gDuelCtx+0x2e00/0x2e40 halfword array + check_card_stat_field8_is_7 field8==7 bool wrapper sibling cluster + check_card_is_equip_target_eligible BST exclusion + special_group 2/4 filter + eval_equip_placement_full_check 5-step toon-world chain + check_zone_slot_equip_eligible_alt alt zone_base=0x0201cab0 + find_hand_slot_idx_by_set_code_alt count_offset=0x1c/array=0x5d0 + count_slots_equippable_by_state_code guard_0x13f2 + 2-player slot sweep + check_zone_slot_equip_eligible indeg=21 C_util_high zone_base=0x0201c8f8 + find_hand_slot_idx_by_set_code indeg=43 C_util_high count_offset=0x14/array=0x418 + dispatch_effect_ctx_slot_by_zone_type zone_type[0xb..0xf] 5-entry jump table + render_zone_card_anim_oam_with_base r9=gDuelCtx internal + check_zone_anim_id_in_table + strh-clear + render_zone_card_anim_dual_pass active_flag gDuelCtx+0x2f51 bit4 guard + 2-pass OAM + write_effect_ctx_slot_index 3-instruction leaf gEffectContext+0x8 + dispatch_zone_card_anim_by_subtype gDuelCtx+0x2f4e subtype [0..6] 7-entry table + update_zone_anim_queue_entry clear/shift mode queue gDuelCtx+0x2dfe + compare_zone_slot_card_stat_pair/alt/win three-sibling -2/-3 vs -1/-2 vs +9 ldmia/stmia 24-byte card_stats batch); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (607/1526 = 39.78%)
 - 2026-05-10: **batch #34 PASSED (campaign-34 落地)** — duel zone card anim dispatch cluster (dispatch_zone_card_anim_by_type 7-case bx-r8 jump-table gDuelCtx+0x2f53 bits[7:5] | gDuelCtx+0x2f54 bits[4:0]<<3 type_combined [0..6] + tick_zone_card_anim_state 3-phase state-machine [0x020230ad] idle/loading/active gPrng+0x148 flag-check + advance_zone_card_anim 2-instruction bl+b call-then-exit stub + signal_zone_tick_done 1-instruction movs r0,#1 fallthrough stub + dispatch_zone_card_anim_by_type_alt symmetric partner attr-code=6 gDuelCtx+0x2f56 row-offset variant + exit_zone_tick_frame shared pop+bx frame exit 3-instruction stub); first-shot 6/6; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (587/1526 = 38.47%)
 - 2026-05-10: **batch #33 PASSED (campaign-33 落地)** — card-list display master + face tile row render pair + card frame tile copy + card-list scene frame tick + tile palette buf writer + tile row clamped reader + field scroll phase checker + zone slot visibility checker + zone slot card icon tile render + zone card detail panel (8-step full render) + zone card JP text panel + zone card display mode dispatcher + zone card detail view 4-state machine (tick_card_list_display_master 2-level mode dispatch + render_card_list_face_row_by_mode/alt lsls#0xf/lsrs#0x18 mode extract 3-variant strh VRAM + copy_card_frame_tiles_by_type copy+computed-goto 14-case + tick_card_list_scene_frame PRNG/60 threshold + set_tile_palette_index_in_buf halfword bit[15:8] write + get_clamped_tile_row_count 3-range clamp + check_field_scroll_phase_ready 4-range phase check + check_zone_slot_attr_visible slot*0x28 stride attr_type=0xf + render_zone_slot_card_icon_tile slot%5 VRAM row + render_zone_card_detail_panel 8-step BG+OBJ+JP pipeline + render_zone_card_jp_text_panel zero+copy+JP render 2-line + dispatch_zone_card_display_by_mode r1=[0..1] mode + tick_zone_card_detail_view 4-state fadein+card_info+rebuild+fadeout); first-shot 14/14; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (581/1526 = 38.07%)
