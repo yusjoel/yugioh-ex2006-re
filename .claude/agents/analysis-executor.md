@@ -105,7 +105,7 @@ model: sonnet
 4. 参数类型不是裸 "input"/"value"
 5. **ARM 助记符冲突**: proposed_name 每段不在 {`str`, `ldr`, `mov`, `cmp`, `sub`, `add`, `bl`, `bx`, `pop`, `push`, `mul`, `lsl`, `lsr`, `asr`} → 命中立即换词 (`_str_`→`_text_`)
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
-7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）→ 全部替换为最接近的 ASCII 对应符号；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
+7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）/ **箭头类**: `→`（U+2192）/ `←`（U+2190）/ `↑`（U+2191）/ `↓`（U+2193）及整个 ARROWS block（U+2190..U+21FF）→ 全部替换为最接近的 ASCII 对应符号（箭头 → `->` 或 `->`）；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
 9. **R3 callee-save 高寄存器机械检测 (强制执行, 不可跳过)**: 14 函数 2 批 (#22 + #23) 同期复现, executor 误把 callee-save alias 当 caller-set 输入是当前 token 头号浪费源。**写完 R3 参数签名后, 必须执行以下 checklist**:
     - [ ] 扫描函数入口前 5 条指令 (含 `.hword 0x46xx` 形式的 THUMB 高低寄存器混合传送)
@@ -166,6 +166,9 @@ model: sonnet
 - sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)
 - plate comment 草稿含"推测/可能/大概/似乎/应该是"等主观词 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_speculative_language_in_plate.md` (R2=0; 必须以 caller-tag callsite 事实替代; batch #26 两函数命中)
 - R8 置信度节打算写"待 runtime 验证"时，先检查：该值是否来自函数体内字面 `#IMM` → 若是，静态可读，禁止列为待验证项 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_static_value_marked_runtime_pending.md`
+- 分析 dispatch hub 的 N 个 case callee 时，qualifier `_by_<X>` 中 X 取各 case 的区分变量/枚举语义名，不用序号 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_dispatch_case_sibling_by_qualifier.md`
+- 两个对称 sibling 函数唯一差异为内存区域基址常量（VRAM/EWRAM list/OAM 基址）时，qualifier 用该区域语义名（obj_vram/bg_vram/main_list/secondary_list 等）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_memory_region_sibling_qualifier.md`
+- Phase 4 step 7 plate ASCII 硬扫：除已列字符外，还须检查箭头类字符（→←↑↓及 Unicode ARROWS block U+2190..U+21FF）/ en-dash（–）/ em-dash（—）/ 省略号（…）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
