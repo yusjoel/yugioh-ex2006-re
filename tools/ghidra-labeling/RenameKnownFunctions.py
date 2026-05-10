@@ -8229,6 +8229,184 @@ RENAMES = [
         "sp[r5*2..] from src_data_ptr; indirect: dispatch_sprite_row_write_by_type + "
         "write_sprite_row_to_vram_buffer effects. "
         "Constants: SKIP_OFFSET=-1, stack_buf_size=0x100=256."),
+
+    # --- batch #37 (campaign-37, 2026-05-10) topo 783-802 ---
+    ("FUN_08095380", "pack_sprite_row_attr_words",
+        "Packs four halfword fields (x_pos/y_pos/palette/flags) into two 32-bit sprite-row "
+        "attribute words and submits them via submit_sprite_row_data with count=6. "
+        "r0[15:0] | r1[15:0]<<16 forms first attr word; second attr word is built from sp[4] "
+        "ANDed with DAT_080953bc, ORed with r2[15:0], ANDed with DAT_080953c0, ORed with r3[15:0]. "
+        "Passes r1=-1 (full mask) and r2+2 (stride+2) to submit_sprite_row_data(base_ptr,-1,stride+2,6). "
+        "Called by 5 card-display/duel-field callers as unified sprite row attribute merge entry. "
+        "r0=u16 x_or_slot_word [0..0xffff]; r1=u16 y_or_attr_high [0..0xffff]; "
+        "r2=u16 palette_or_stride [0..0xffff]; r3=u16 flags_or_tile [0..0xffff]; "
+        "sp+4=u32 base_attr_word. Returns void (submit_sprite_row_data return transparent). "
+        "Constants: submit count=6, stride=r2+2, AND masks DAT_080953bc/DAT_080953c0."),
+    ("FUN_080c2880", "init_field_slot_aob_ctx_b",
+        "Initialises duel_field slot AOB (animation object) context structure at 0x0201fe60 "
+        "for dispatch_card_display_op case 0x0b. "
+        "Writes r1[7:0]<<3 into [base+4][10:3] (palette field), r0 to [base+8], r2 to [base+c]. "
+        "Calls init_aob_ctx_from_ptnsect([base+0x48], ptnsect_id, r1_dat, 1), then sets "
+        "[base+0x5b] bit0 (init done). Reads gP1LifePoints[0x1ce8] vs (gDuelActivation[4]^player_id) "
+        "to select anm_entry param (2 or 3) for init_aob_ctx_with_anm_entry. "
+        "Clears high bits of [base+0]/[base+2] via AND mask. "
+        "r0=ptr arg0 [0..0x03ffffff]; r1=u8 palette_slot [0..0xff]; r2=ptr arg2. Returns void. "
+        "Constants: base_struct=0x0201fe60, mask=0xfffff807, gDuelActivation=0x0201e2a0."),
+    ("FUN_080c3d00", "init_field_slot_ctx_zoom",
+        "Initialises duel_field card zoom display context (DAT_080c3d1c, 0x1c halfwords=0x38 bytes) "
+        "for dispatch_card_display_op case 0x1a (card zoom-in scene). "
+        "Calls zero_fill_by_halfword(base, 0x1c), then writes r0 to [base+4] and r1 to [base+8]. "
+        "r0=ptr ctx_src (zoom source descriptor); r1=ptr ctx_dst (zoom target descriptor). "
+        "Returns void. "
+        "Constants: base_struct=DAT_080c3d1c, zero_len=0x1c halfwords (0x38 bytes)."),
+    ("FUN_080c8904", "refresh_all_zone_slot_tile_display",
+        "Iterates all duel field zone slots for both players and refreshes tile display state; "
+        "called as final sub-step of dispatch_card_display_op case 0x24. "
+        "Outer loop r5=[0..1] (player_id); inner loop slot_type [0..4] then [5..10]. "
+        "For each slot calls get_zone_slot_entity_ref_by_type; if null calls "
+        "update_field_slot_tile_display(player, slot, 0). "
+        "No APCS params (all data from globals). Returns void. "
+        "Constants: gDuelZoneDisplay=0x02023130, slot_type_lo=[0..4], slot_type_hi=[5..10]."),
+    ("FUN_080bc794", "init_field_slot_aob_ctx_a",
+        "Initialises duel_field slot AOB context structure (DAT_080bc7d4, zero_len=0x6c halfwords=0xd8 bytes) "
+        "for dispatch_card_display_op cases 0x01 and 0x21. "
+        "Calls zero_fill_by_halfword(base, 0x6c), writes r0->[base+4], r1->[base+8], "
+        "r2 (via mov r8,r2 / mov r0,r8)->[base+c]. Sets [base+0] bit0 (init done). "
+        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
+        "r0=ptr arg_data; r1=ptr arg_target; r2=ptr arg_extra (saved via r8). Returns void. "
+        "Constants: base_struct=DAT_080bc7d4, zero_len=0x6c halfwords=0xd8 bytes, player_flag_bit=0x4."),
+    ("FUN_080c291c", "write_zone_oam_entry_with_flip",
+        "Reads zone_type[2:0] and sub_idx[7:3] from slot struct (0x0201fe60), "
+        "forms zone_oam_key = sub_idx<<5 | zone_type. "
+        "If key nonzero selects r1 as flip param, else r0; writes to [base+0x10] and [base+0x14]. "
+        "Reconstructs OAM coord from two bytes and writes to [base+0x18]. "
+        "Sets ctrl bit2 at 0x02023345. Corresponds to dispatch_card_display_op case 0x0c. "
+        "r0=u32 oam_param_a; r1=u32 oam_param_b; r2=u8 sub_packed [0..0xff]. Returns void. "
+        "Constants: base_struct=0x0201fe60, ctrl_byte=0x02023345, zone_key_mask=sub_idx<<5|zone_type[2:0]."),
+    ("FUN_080c4ea0", "init_field_slot_aob_ctx_c",
+        "Initialises third variant of duel_field slot AOB context (DAT_080c4ed0, 0x1c halfwords=0x38 bytes) "
+        "for dispatch_card_display_op case 0x19. "
+        "Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8]. "
+        "Sets [base+0x19] bit1 (init_flag=0x2). "
+        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
+        "r0=ptr arg_data; r1=ptr arg_target. Returns void. "
+        "Constants: base_struct=DAT_080c4ed0, zero_len=0x1c halfwords, init_flag=0x2."),
+    ("FUN_080c412c", "render_field_slot_card_tile_by_id",
+        "Decodes packed slot descriptor (r0) to player_id/zone_type/sub_idx, "
+        "calls get_field_slot_tile_vram_addr to find VRAM slot, reads cached card_id at +0x120. "
+        "If cache empty: calls internal_card_id_to_card_id(r1) and writes result to cache, "
+        "then calls ensure_card_id_cache_entry. Finally calls render_field_slot_card_tile. "
+        "Corresponds to dispatch_card_display_op case 0x1b. "
+        "r0=u32 slot_descriptor (bit0=player_id, bits[5:1]=zone_type, bits[13:6]=sub_idx); "
+        "r1=u16 card_id_raw [0..0x1fff]. Returns void. "
+        "Constants: VRAM_cache_offset=0x120 (0x90*2)."),
+    ("FUN_080c2840", "write_field_slot_activation_mask",
+        "Zero-fills field slot activation state structure (DAT_080c287c, 0x5c halfwords=0xb8 bytes) "
+        "then writes two bit-fields from r0: r0[4:0]<<3 -> [base+3][5:3], r0[21:19]&0x7 -> [base+4][2:0]. "
+        "Called in dispatch_card_display_op case 0x09 after build_slot_activation_mask_for_player. "
+        "r0=u32 packed_slot_data (output of build_slot_activation_mask_for_player, "
+        "effective bits [4:0] and [21:19]). Returns void. "
+        "Constants: base_struct=DAT_080c287c, zero_len=0x5c halfwords=0xb8 bytes, "
+        "mask_lo=0x1f (bit[4:0]), mask_hi=0x7 (bit[21:19])."),
+    ("FUN_080c8f48", "init_card_effect_aob_ctx",
+        "Initialises card-effect AOB context (DAT_080c8fb4, 0x4c halfwords=0x98 bytes) "
+        "for dispatch_card_display_op case 0x06. "
+        "Calls zero_fill_by_halfword(base, 0x4c), then classify_card_effect_category(r0) "
+        "to get effect category byte. Writes category<<1 into gDuelActivation halfword bits[2:1]. "
+        "Calls init_aob_ctx_from_ptnsect([base+0x38], ...). Sets [base+0x4b] bit0 (init done). "
+        "Reads gP1LifePoints[0x1ce8] vs (gDuelActivation[4]^1) to select anm_entry param. "
+        "r0=u16 card_id [0..0x1fff]. Returns void. "
+        "Constants: base_struct=DAT_080c8fb4, zero_len=0x4c halfwords=0x98 bytes, "
+        "gDuelActivation=0x0201e2a0, category_mask=0xff."),
+    ("FUN_080c786c", "zero_card_name_vram_buf",
+        "Clears 32KB card name VRAM buffer (DAT_080c7888) via zero_fill_by_halfword(base, 0x4000). "
+        "Called by copy_game_text_to_card_name_vram before writing text tiles. "
+        "Writes ctrl ready flag 0x0b to external ctrl byte after clearing. "
+        "No APCS params (all addresses loaded from DAT). Returns void. "
+        "Constants: vram_buf=DAT_080c7888, zero_len=0x4000 halfwords=0x8000 bytes (32KB), ctrl_val=0x0b."),
+    ("FUN_080c7950", "copy_game_text_to_card_name_vram",
+        "Writes game string to card name VRAM buffer for dispatch_card_display_op case 0x31. "
+        "Calls zero_card_name_vram_buf to clear 32KB, then resolve_game_str_ptr(r1) twice "
+        "(validity check and pointer fetch); if valid calls copy_cstr_to_buf(vram_base+1, str_ptr). "
+        "r0=u32 zone_descriptor [0..0xffffffff]; r1=u16 game_str_id [0..0xd7ea]; "
+        "r2=u32 extra_flags [0..2]. Returns void. "
+        "Constants: vram_base=DAT_080c7984, vram_offset=+1 (skip first halfword)."),
+    ("FUN_08094314", "get_duel_activation_zone_id",
+        "Three-instruction leaf: ldr ptr from DAT_0809431c, ldr [ptr+0xc], bx lr. "
+        "Returns current activated zone ID from global duel activation state structure. "
+        "No APCS params. Returns u32 zone_id. Pure read, no side effects. "
+        "Callers: build_field_zone_display_state (0x080cbf58), "
+        "FUN_080bb414 (duel_field zone activation), FUN_08057c28. "
+        "Constants: ptr=DAT_0809431c, zone_id_offset=0xc."),
+    ("FUN_080cbf58", "build_field_zone_display_state",
+        "Builds complete duel field zone display state for dispatch_card_display_op case 0x32. "
+        "Zero-fills gDuelZoneState (0x02020160, 0x2f5c halfwords=0x5eb8 bytes). "
+        "Extracts zone_id from r0[7:0], writes <<13 into [base+0x2f50][20:13], sets [base+0x2f51] bit0, "
+        "sets ctrl [0x02023345] bit2. Calls get_duel_activation_zone_id, decodes zone class bits, "
+        "writes [base+0x2f57]/[base+0x2f58] zone category fields. "
+        "Inner loop: for each slot calls ensure_card_id_cache_entry + find_zone_descriptor_by_slot_id "
+        "+ eval_slot_score_entry_full; reads ATK/DEF/level from card_stats_table via ldmia/stmia. "
+        "r0=u8 zone_descriptor [0..0xff]. Returns void. "
+        "Constants: gDuelZoneState=0x02020160, gDuelActivation=0x0201e2a0, zero_len=0x2f5c halfwords."),
+    ("FUN_080c40e0", "init_field_slot_aob_ctx_d",
+        "Initialises fourth variant of duel_field slot AOB context (DAT_080c4120, 0x1c halfwords=0x38 bytes) "
+        "for dispatch_card_display_op case 0x18. "
+        "Calls zero_fill_by_halfword(base, 0x1c), writes r0->[base+4], r1->[base+8], "
+        "r2 (via mov r8,r2 / mov r0,r8)->[base+c]. Sets [base+0x19] bit0 (init_flag=0x1). "
+        "Reads gP1LifePoints player bit, ORs 0x4, writes to external ctrl byte. "
+        "r0=ptr arg_data; r1=ptr arg_target; r2=ptr arg_extra (three-arg variant via r8). Returns void. "
+        "Constants: base_struct=DAT_080c4120, zero_len=0x1c halfwords, init_flag=0x1."),
+    ("FUN_080c89e8", "update_zone_activation_display_state",
+        "Updates per-player zone activation display state for all 11 slot types; "
+        "called in dispatch_card_display_op case 0x03 after write_zone_slot_oam_descriptor. "
+        "Outer loop r6=[0..1] (player_id); inner slot_type [0..10]: "
+        "calls dispatch_zone_activation_by_state(is_active, slot_type, 0); "
+        "if return bit11 (0x800) set, accumulates bit into r5 bitmask. "
+        "Writes final bitmask to gDuelZoneCtrl (0x020230c0) [+0x30+player*4]; "
+        "calls query_player_slot_activation_bitmask to refresh related fields. "
+        "No APCS params (all from globals). Returns void. "
+        "Constants: gDuelZoneCtrl=0x020230c0, FLAG_ACTIVATABLE=0x800, slot_type_range=[0..10]."),
+    ("FUN_08094678", "get_player_lp_by_field_type",
+        "Reads player LP/stat value from gP1LifePoints by player_id and field_type code. "
+        "r0=u32 player_bit_packed (bit0=player_id); r1=u8 field_type [0xc..0xf]. "
+        "Dispatches: 0xc->[+0x18], 0xd->[+0x10], 0xe->[+0x14], 0xf->[+0x1c] "
+        "relative to player_id*0x868 base. Returns 0 for type outside [0xc..0xf]. "
+        "Called by dispatch_card_display_op case 0x14; return used as zone_type param for "
+        "render_field_zone_card_tile_by_type. Pure read, no side effects. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, type_range=[0xc..0xf]."),
+    ("FUN_0801ec9c", "dispatch_card_display_op",
+        "Core card display operation dispatcher (indeg=114). "
+        "r0=op_code [1..0x3d] (subs#1; cmp#0x3c); dispatches via 61-entry jump table 0x0801ecc4. "
+        "Case handlers (sample): 0x01/0x21=init_field_slot_aob_ctx_a, 0x03=write_zone_slot_oam_descriptor+"
+        "update_zone_activation_display_state, 0x06=init_card_effect_aob_ctx, "
+        "0x09=build_slot_activation_mask_for_player+write_field_slot_activation_mask, "
+        "0x0b=init_field_slot_aob_ctx_b, 0x0c=write_zone_oam_entry_with_flip, "
+        "0x0d=write_lp_digit_tiles_to_vram, 0x14=get_player_lp_by_field_type+render_field_zone_card_tile_by_type, "
+        "0x18=init_field_slot_aob_ctx_d, 0x19=init_field_slot_aob_ctx_c, "
+        "0x1a=init_field_slot_ctx_zoom, 0x1b=render_field_slot_card_tile_by_id, "
+        "0x1c=init_field_slot_aob_ctx_a (case alias), 0x24=refresh_duel_field+refresh_zone_effect_buff_cache+"
+        "refresh_all_zone_slot_tile_display, 0x31=copy_game_text_to_card_name_vram, "
+        "0x32=build_field_zone_display_state. "
+        "r1/r2/r3=op args (transparent to callee). Returns 1=done or 0=default/invalid. "
+        "Constants: jump_table=0x0801ecc4, op_range=[1..0x3d]."),
+    ("FUN_0809355c", "invoke_card_display_op_0x31",
+        "Lightweight thunk: sets r0=0x31, r1=0x0b, r2=0, r3=0, then calls "
+        "dispatch_card_display_op (0x0801ec9c). "
+        "Hardcodes op 0x31 (copy_game_text_to_card_name_vram) with sub_param r1=0x0b. "
+        "Called by process_card_play_ok_sequence (0x08094a28) and FUN_080954e8 (duel field sprite refresh). "
+        "No APCS params. Returns u32 result transparent from dispatch_card_display_op (1=done, 0=invalid). "
+        "Constants: op_code=0x31, sub_param=0x0b."),
+    ("FUN_08094a28", "process_card_play_ok_sequence",
+        "State-machine for 'play card OK' UI sequence. "
+        "Calls play_card_ok_ui_effect; if nonzero returns 0 (busy). "
+        "Reads gP1LifePoints[0x1d1c] phase code: 1=draw_phase path, 2=LP compare path, else done. "
+        "Main path: reads [gP1LifePoints+0x2c] spell/trap/monster phase state (3/4/7), "
+        "calls enqueue_sprite_attr_record with attr 0x8006/0x8007/0x8008/0x8005. "
+        "Calls pack_sprite_row_attr_words (0x08095380) to submit sprite row. "
+        "If [gDuelActivation+offset]!=1: calls invoke_card_display_op_0x31 (0x0809355c). "
+        "Increments gP1LifePoints[0x1d1c] (phase counter). Returns 0=done, 1=busy. "
+        "Constants: phase_offset=0x1d1c, sprite_attr_spell=0x8006, sprite_attr_trap=0x8007, "
+        "sprite_attr_monster=0x8008, sprite_attr_alt=0x8005."),
 ]
 
 
