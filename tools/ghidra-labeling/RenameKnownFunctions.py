@@ -7800,6 +7800,193 @@ RENAMES = [
         "FUN_080d3826 (signal_zone_tick_done) fall-through -> here; "
         "advance_zone_card_anim (0x080d3820) tail-jumps here. "
         "Standard THUMB 'shared function exit' pattern matching FUN_080d2ef4 push {r4,r5,r6,r7,lr}."),
+
+    # batch #35 (campaign-35) -----------------------------------------------
+    ("FUN_080d1088", "render_zone_card_anim_oam_frame",
+        "Synthesizes type_combined from gDuelCtx+0x2f53/0x2f54 (bits[7:5]<<3 | bits[4:0]&0x1f); "
+        "if type_combined==0 exits (null path). Otherwise reads gDuelCtx+0x2f58 (card zone type [0..5]) "
+        "and branches into 4 OAM write paths (type 0->LAB_080d117e, 1->LAB_080d120c, 2->LAB_080d122c, "
+        "3->LAB_080d1250). Each path reads gPrng+0x83*4 halfword bits[7:4] % 3 or & 1 to generate anim "
+        "frame offset, then calls write_oam_entry_from_packed_args. LAB_080d1280 reads gDuelCtx+0x2f56 "
+        "halfword bits[12:5] as zone slot encoding for OAM Y coordinate (read-only). "
+        "Called by render_zone_card_anim_dual_pass (0x080d1b2c) as first render pass. "
+        "Side effects: OAM writes via write_oam_entry_from_packed_args + write_oam_entry_with_slot_check. "
+        "Constants: gDuelCtx=0x02020160, status_offset=0x2f53, low_offset=0x2f54, word_offset=0x2f58, "
+        "slot_encode_offset=0x2f56 (read-only), gPrng anim_seed_offset=0x83*4=0x20c, oam_size=0x80."),
+    ("FUN_080d0c7c", "render_zone_card_anim_oam_frame_alt",
+        "Alt variant of render_zone_card_anim_oam_frame (0x080d1088). Same: reads gDuelCtx+0x2f53/0x2f54 "
+        "to synthesize type_combined. Difference: if type_combined!=0, applies 'subs r1,r0,#5' (minus-5 "
+        "offset) then checks r1>0 to enter multi-column OAM write logic (LAB_080d0cf6) with col_count=0x10 "
+        "and col_step=0x54. Called by render_zone_card_anim_dual_pass (0x080d1b2c) as fallback when "
+        "type_combined>5. Side effects: OAM writes via write_oam_entry_from_packed_args. "
+        "Constants: gDuelCtx=0x02020160, status_offset=0x2f53, low_offset=0x2f54, word_offset=0x2f58, "
+        "col_count=0x10, col_step=0x54."),
+    ("FUN_080d07cc", "check_zone_anim_id_in_table",
+        "Linear search in gDuelCtx+0x2e00 (gDuelCtx+0xb8*0x40) halfword array for entry matching r0. "
+        "Array length read from gDuelCtx+0x2e40 (gDuelCtx+0xb9*0x40). Compares each [gDuelCtx+0x2e00+i*2] "
+        "with r4 (=r0 input); sets r5=1 on match. Returns r5 (1=found, 0=not_found). "
+        "Called exclusively by render_zone_card_anim_oam_with_base (0x080d136c). "
+        "Side effects: read-only. "
+        "Constants: gDuelCtx=0x02020160, anim_table_base=0x2e00 (0xb8*0x40), "
+        "count_offset=0x2e40 (0xb9*0x40), entry_size=2."),
+    ("FUN_0804ae18", "check_card_stat_field8_is_7",
+        "Bool wrapper: calls get_card_extended_stat_field8(card_id); returns 1 if result==7, else 0. "
+        "Sibling cluster with check_card_stat_field8_is_6 (0x0804ae04) and check_card_stat_field8_is_8 "
+        "(0x0804ae2c); all called from equip/effect eligibility chains. "
+        "Side effects: none. Constants: field8_target=7."),
+    ("FUN_0804bb6c", "check_card_is_equip_target_eligible",
+        "Given card_id, determines whether the card can be targeted by an equip spell (i.e. monster "
+        "meets equip conditions). Steps: (1) check_card_stat_field8_is_7(card_id): field8==7 -> return 0 "
+        "(fusion-exclusive excluded). (2) BST exclusion of specific card_id ranges and individual IDs: "
+        "upper limit 0x18e0 (0xc7*0x20); low range excludes 0x15fc/0x1729/0x16ec and others. "
+        "(3) get_card_special_group_code(card_id): special_group==2 or ==4 -> return 0. "
+        "All checks pass -> return 1. Core filter for equip card placement chain. "
+        "Side effects: none. "
+        "Constants: field8_7_exclude=7, upper_card_id=0x18e0 (0xc7*0x20), "
+        "excluded_ids=0x15fc/0x1729/0x16ec/0x18c9/0x1987/0x19ce/0x19ef, special_group_2/4=excluded."),
+    ("FUN_0803bba4", "eval_equip_placement_full_check",
+        "Full equip placement feasibility check for (player_side, card_id, use_toon_flag) triple. "
+        "Chain: (1) check_card_is_equip_target_eligible(card_id): not eligible -> return 0. "
+        "(2) check_card_has_equip_placement_type(card_id): no type -> special case path. "
+        "(3) use_toon_flag (r2)==0 -> return 0. "
+        "(4) check_card_stat_field8_is_6(card_id): not 6 -> return 0. "
+        "(5) check_toon_world_equip_present(player_side): 0 -> return 0; nonzero -> return 1. "
+        "Special case: card_id==0x160f -> count_paired_slots_with_field5_default; "
+        "range [0x160f-5..0x164f] -> get_paired_card_id_by_variant + count_paired_slots. "
+        "indeg=10. Side effects: none. "
+        "Constants: equip_special_id=0x160f, paired_range_hi=0x164f, paired_range_lo=0x160a."),
+    ("FUN_08037568", "check_zone_slot_equip_eligible_alt",
+        "Alt variant of check_zone_slot_equip_eligible (0x08037434); structure fully symmetric, "
+        "difference is zone table base: gDuelFieldP1_base=0x0201cab0 (vs 0x0201c8f8). "
+        "Reads [player*0x868+slot_idx*4] slot word, extracts card_id bits[12:0], runs same "
+        "five-step equip check chain. indeg=3. Side effects: none. "
+        "Constants: zone_base=0x0201cab0, player_stride=0x868, slot_entry=4."),
+    ("FUN_08031294", "find_hand_slot_idx_by_set_code_alt",
+        "Iterates gP1LifePoints[player*0x868+0x1c] count and gP1LifePoints[player*0x868+0x5d0] "
+        "array (entry_size=4), extracts set_code encoding (lsls #2/lsrs #0x18 + lsls #0x12/lsrs #0x1f) "
+        "and compares with r1; returns slot index on match or -1 if not found. "
+        "Alt variant of find_hand_slot_idx_by_set_code (count_offset=0x14, base=0x418); "
+        "this function uses count_offset=0x1c / array_offset=0xba*8=0x5d0. "
+        "Confirmed by PASSED count_hand_cards_by_field6_alt (0x08034020) using same offsets. "
+        "Side effects: read-only. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, count_offset=0x1c, "
+        "array_offset=0xba*8=0x5d0, entry_size=4."),
+    ("FUN_08033a6c", "count_slots_equippable_by_state_code",
+        "Counts zone slots across both players that can accept an equip card with the given state_code. "
+        "Guard: count_field_copies_of_card(0x13f2)>0 -> return 0 (card 0x13f2 on field blocks). "
+        "Main loop: player=[0,1] x slot=[0..4] over gDuelFieldSlots (0x0201c510), tests bit19=occupied; "
+        "if player==r8 (target side) or slot[+8]!=0, calls get_slot_card_state_code(player, slot_idx) "
+        "and compares with sp[0]=r1; on match calls check_slot_card_can_be_equipped; increments r9. "
+        "Returns r9 (count). Called only by check_zone_slot_equip_eligible (0x08037434) at "
+        "card_id==0x15b4 path with state_code=1. Side effects: read-only. "
+        "Constants: guard_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "slot_entry=0x14, slot_count=5."),
+    ("FUN_08037434", "check_zone_slot_equip_eligible",
+        "Reads zone slot [zone_player_id_bit0*0x868+slot_idx*4] from gDuelFieldP0 (0x0201c8f8), "
+        "extracts bits[12:0] as card_id, runs full equip feasibility check. "
+        "r0 (player_side) for toon_world/slot_chain sub-functions; r1 (zone_player_id) bit0 for zone "
+        "table row select; r2 (slot_index [0..4]) as slot offset. "
+        "Check chain: (1) check_card_is_equip_target_eligible(card_id). "
+        "(2) check_card_has_equip_placement_type(card_id): fail -> eval_equip_placement_full_check. "
+        "(3) lsls r0,r0,#0x11 (equip lock bit): set -> return 0. "
+        "(4) check_card_stat_field8_is_6(card_id): not 6 -> eval_equip_placement_full_check. "
+        "(5) check_toon_world_equip_present(player_side): 0 -> return 0. "
+        "Special: card_id==0x14fc -> count_paired_slots; card_id==0x1578 -> gP1LifePoints flag bit. "
+        "indeg=21, C_util_high. Side effects: none. "
+        "Constants: zone_base_P0=0x0201c8f8, player_stride=0x868, slot_entry=4, bit_lock_shift=0x11, "
+        "special_id_0x14fc, special_id_0x1578, equip_check_value=0xb, "
+        "gP1LifePoints_bit17_offset=0x8e*2=0x11c."),
+    ("FUN_0803123c", "find_hand_slot_idx_by_set_code",
+        "Gets hand card count from gP1LifePoints[player*0x868+0x14], iterates "
+        "gP1LifePoints[player*0x868+0x418] hand array (entry_size=4), extracts set_code encoding "
+        "(lsls #2/lsrs #0x18 + lsls #0x12/lsrs #0x1f) and compares with r1; returns slot index on "
+        "match or -1 (rsbs) if not found. Sibling of find_slot_idx_by_set_code (0x08031184, "
+        "count_offset=0x10, base=0x260); differs in count_offset=0x14 / base=0x418. "
+        "indeg=43, C_util_high. Side effects: read-only. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, count_offset=0x14, "
+        "array_offset=0x83*8=0x418, entry_size=4."),
+    ("FUN_08094398", "dispatch_effect_ctx_slot_by_zone_type",
+        "Reads effect slot entry from gEffectContext+0x10 (=0x0201e500) at [+r0*4], then reads "
+        "halfword from attr_table [0x0201e900+r0*2] and extracts bits[4:0] (zone_type). "
+        "If zone_type-0xb in [0..4] (zone_type in [0xb..0xf], 5 valid values), jumps via 5-entry "
+        "table at 0x080943d0; otherwise error path (r6=1, LAB_080943e4). "
+        "Sole caller: render_zone_card_anim_oam_with_base (0x080d136c) at 0x080d170e. "
+        "Side effects: indirect (by jump table handlers). "
+        "Constants: gEffectContext=0x0201e4f0, slot_table=0x0201e500, "
+        "attr_table=0x0201e900 (=0x0201e500+0x400), jump_table=0x080943d0, "
+        "zone_type_valid_range=[0xb..0xf] (5 entries)."),
+    ("FUN_080d136c", "render_zone_card_anim_oam_with_base",
+        "Base-r9 variant of render_zone_card_anim_oam_frame: prologue loads gDuelCtx "
+        "(DWORD_080d13ac=0x02020160) internally into r9 via '.hword 0x4689=mov r9,r1'; "
+        "does not consume APCS r1 parameter. All gDuelCtx field reads use 'add r0,r9' with fixed "
+        "offsets (0x2f53/0x2f54/0x2f57/0x2f58). Also calls check_zone_anim_id_in_table (0x080d07cc) "
+        "and dispatch_effect_ctx_slot_by_zone_type (0x08094398). Void, no APCS params. "
+        "Side effects: OAM writes via write_oam_entry_from_packed_args; "
+        "[gDuelCtx+0x2e42+slot*2] := 0 via strh at 0x080d157c (slot=modsi3(zone_slot,5)). "
+        "Constants: gDuelCtx=0x02020160, base_offsets={0x2f53,0x2f54,0x2f57,0x2f58}, "
+        "r9=gDuelCtx (internal load)."),
+    ("FUN_080d1b2c", "render_zone_card_anim_dual_pass",
+        "Zone card animation two-pass OAM render wrapper. Entry reads gDuelCtx+0x2f51 bit4: "
+        "if set, returns immediately (animation inactive). Otherwise calls in sequence: "
+        "render_zone_card_anim_oam_frame (0x080d1088) and render_zone_card_anim_oam_with_base "
+        "(0x080d136c) for two OAM write passes. Then re-evaluates type_combined from "
+        "gDuelCtx+0x2f53/0x2f54: if <=5 and gDuelCtx+0x2f58 type also satisfies condition, "
+        "calls render_zone_card_anim_oam_frame_alt (0x080d0c7c) as third path. "
+        "Called exclusively by FUN_080d2ef4. Side effects: OAM writes (through three sub-functions). "
+        "Constants: gDuelCtx=0x02020160, active_flag_offset=0x2f51, active_bit=bit4=0x10."),
+    ("FUN_080942d0", "write_effect_ctx_slot_index",
+        "Single write: stores r0 into gEffectContext+0x8 (effect slot index field). "
+        "3 instructions (ldr+str+bx lr). Called by effect activation chains when binding target slot. "
+        "Side effects: [gEffectContext+0x8] := r0. "
+        "Constants: gEffectContext=0x0201e4f0, slot_index_offset=0x8."),
+    ("FUN_080d2690", "dispatch_zone_card_anim_by_subtype",
+        "Reads gDuelCtx+0x2f4e (subtype byte); if >6, jumps to error path (LAB_080d29f4, clears byte). "
+        "Otherwise uses subtype*4 to index PTR_PTR_080d26b8 (7-entry function pointer table at "
+        "0x080d26bc), loads target function pointer into r7, and tail-calls via '.hword 0x4687=bx r7'. "
+        "7 cases cover handlers at 0x080d26d8..0x080d29f4. Complements dispatch_zone_card_anim_by_type "
+        "(0x080d1bb4) which dispatches on type_combined; this dispatches on subtype. "
+        "Called exclusively by FUN_080d2ef4. Side effects: indirect (by sub-handlers). "
+        "Constants: gDuelCtx=0x02020160, subtype_offset=0x2f4e, jump_table=0x080d26bc, "
+        "handler_count=7."),
+    ("FUN_080d2634", "update_zone_anim_queue_entry",
+        "Finds and updates matching entry in gDuelCtx+0x2dfe animation queue array. "
+        "Queue length read from gDuelCtx+0x2e40 (0xb9*0x40); iterates entries (entry_size=2). "
+        "r1==0 (clear mode): finds [entry+2]==r4, clears [entry+2] to 0, sets r3=1. "
+        "r1!=0 (shift mode): copies [entry+2] to [entry+0]. "
+        "After loop, if r3!=0: gDuelCtx+0x2e40 -= 1 (decrements queue length). "
+        "Returns r3 (operation success flag). Called exclusively by FUN_080d2ef4. "
+        "Side effects: [gDuelCtx+0x2dfe+i*2+2] := 0 (conditional clear); "
+        "[gDuelCtx+0x2e40] -= 1 (conditional decrement). "
+        "Constants: gDuelCtx=0x02020160, queue_base_offset=0x2dfe, count_offset=0x2e40, "
+        "entry_size=2."),
+    ("FUN_080d3dc4", "compare_zone_slot_card_stat_pair_win",
+        "Third variant of compare_zone_slot_card_stat_pair sibling cluster. Symmetric structure; "
+        "difference: 'success' path returns +9 (movs r0,#9) rather than a negative code; "
+        "invisible path still returns -4. Compares r1 against 0x16/0x17; on mismatch ('win' case) "
+        "at LAB_080d3e10 computes return value from card_stats_table via multi-level index "
+        "add r0,r8/r9/r10 and stores to [r5]. This variant returns the 'win' status code (positive). "
+        "Side effects: [r5] := 0x9 (stack-local slot write, not external EWRAM). "
+        "Constants: win_code=0x9, no_vis_code=-4, sentinel_16=0x16, sentinel_17=0x17."),
+    ("FUN_080d3d28", "compare_zone_slot_card_stat_pair_alt",
+        "Alt variant of compare_zone_slot_card_stat_pair (0x080d3c8c). Fully symmetric structure: "
+        "zero-extends r0/r1, loops 2x calling check_zone_slot_attr_visible, ldmia/stmia batch "
+        "24 bytes, compares r1 with 0x16/0x17. Difference: uses different DAT constants "
+        "(DAT_080d3d64=0x02020160) and different result code assignments: "
+        "r1==0x16 -> rsbs r0=-1; r1==0x17 -> rsbs r0=-2 (vs 0x080d3c8c which returns -2/-3). "
+        "Invisible path returns -4 identically. One of the three-member sibling cluster. "
+        "Side effects: stack-local temporaries only, no external EWRAM/VRAM. "
+        "Constants: same as compare_zone_slot_card_stat_pair."),
+    ("FUN_080d3c8c", "compare_zone_slot_card_stat_pair",
+        "Compares card stats of two zone slots (r0, r1 each u16 slot index, zero-extended) and "
+        "returns a result code. Internal: r8=gDuelCtx, r9=card_stats_table, r10=internal DAT. "
+        "Main loop 2x (r7=0,1): calls check_zone_slot_attr_visible for each slot; if visible, "
+        "reads stat word (slot_id*5*8+base) via ldmia batch copy 24 bytes; compares original r1 "
+        "with 0x16/0x17: 0x16 -> rsbs r0=-2; 0x17 -> rsbs r0=-3; else continue; "
+        "visibility fail -> rsbs r0=-4. Sibling cluster with FUN_080d3d28 / FUN_080d3dc4; "
+        "differs only in return code constants (-2/-3 vs -1/-2 vs +9). "
+        "Side effects: ldmia/stmia batch writes to stack-local (not external). "
+        "Constants: gDuelCtx=0x02020160, slot_stride=5*8=40, loop_count=2, "
+        "sentinel_16=0x16, sentinel_17=0x17."),
 ]
 
 
