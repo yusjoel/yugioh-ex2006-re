@@ -7746,6 +7746,60 @@ RENAMES = [
         "Returns r0: 1=state_advanced / 0=waiting_or_reset. "
         "Constants: DUEL_CTX=0x02020160; VIEW_STATE_OFFSET=0x2f4e; WIN0H=0x04000004; "
         "WIN0H_VAL=0x28f0; CARD_PAGE_BUF1=0x0203eeb0; CARD_PAGE_BUF2=0x02029eb0."),
+    # --- batch #34 (campaign-34) ---
+    ("FUN_080d1bb4", "dispatch_zone_card_anim_by_type",
+        "Called by tick_zone_card_anim_state (0x080d2390) at phase=2 and by FUN_080d4268 directly. "
+        "Extracts bits[7:5] from gDuelCtx+0x2f53 as card_high, bits[4:0] from gDuelCtx+0x2f54 shifted left 3, "
+        "ORs to form type_combined [0..6]; if >6 jumps to LAB_080d21ce (error path). "
+        "Indexes PTR_DAT_080d1c10 (7-entry function pointer table), loads target into r8, tail-calls via bx r8. "
+        "Side effects: indirect VRAM/OAM writes through 7 sub-handlers. "
+        "Constants: DUEL_CTX=0x02020160; CARD_STATUS_OFFSET=0x2f53; CARD_LOW_OFFSET=0x2f54; "
+        "CARD_WORD_OFFSET=0x2f58; JUMP_TABLE_PTR=0x080d1c0c; TYPE_COUNT=7; "
+        "TYPE_MASK_HIGH=bits[7:5]; TYPE_MASK_LOW=0x1f."),
+    ("FUN_080d2390", "tick_zone_card_anim_state",
+        "Uniquely called by advance_zone_card_anim (0x080d3820). "
+        "Core state-machine tick for duel field zone card slot display. "
+        "Reads phase byte [0x020230ad] (0=idle-check, 1=loading, 2=active/render). "
+        "phase=1: promote to 2, return 1. "
+        "phase=0: check gPrng+0x148 bit6/bit7/bit5/bit4/bit2 card attr flags; "
+        "conditionally call sync_state_and_init_sprite or write gDuelCtx+0x2f54/0x2f51/0x2f4d fields. "
+        "phase=2: call dispatch_zone_card_anim_by_type. "
+        "All paths return r0=1 (frame-processed). "
+        "Constants: DUEL_CTX=0x02020160; SCENE_PHASE_ADDR=0x020230ad; PRNG_CARD_FLAGS=gPrng+0x148; "
+        "FLAG_BIT6=0x40; FLAG_BIT7=0x80; FLAG_BIT5=0x20; FLAG_BIT4=0x10; FLAG_BIT2=0x2; "
+        "ATTR_OFFSET1=0x2f54; ATTR_OFFSET2=0x2f51; ATTR_OFFSET3=0x2f4d."),
+    ("FUN_080d3820", "advance_zone_card_anim",
+        "2-instruction stub called by FUN_080d2ef4 at zone card slot type=1 branch. "
+        "bl tick_zone_card_anim_state (0x080d2390) to advance the slot animation state machine, "
+        "then b exit_zone_tick_frame (0x080d3828) to pop FUN_080d2ef4 frame and return to its caller. "
+        "Inherits r0=1 (frame-processed) from tick_zone_card_anim_state unchanged. "
+        "GBA inline exit-stub pattern: single operation then shared pop+bx exit."),
+    ("FUN_080d3826", "signal_zone_tick_done",
+        "Shared 'return done' exit stub for FUN_080d2ef4 (duel zone card slot state dispatcher). "
+        "FUN_080d2ef4 branches here (b FUN_080d3826, not bl) from at least 11 sites to signal "
+        "'this frame slot processing complete'. "
+        "movs r0,#0x1 sets return value = 1 (done), then falls through to exit_zone_tick_frame (0x080d3828) "
+        "to pop FUN_080d2ef4 frame and return to FUN_080cc340 (which interprets r0=1 as non-busy). "
+        "Constants: DONE=1."),
+    ("FUN_080d2a08", "dispatch_zone_card_anim_by_type_alt",
+        "Called by FUN_080d2ef4 at zone card attr-code=6 branch. "
+        "Symmetric partner of dispatch_zone_card_anim_by_type (0x080d1bb4) using different row-offset field. "
+        "Extracts bits[7:5] from gDuelCtx+0x2f53 and bits[4:0] from gDuelCtx+0x2f54 shifted left 3 "
+        "to form type_combined [0..6]; if >6 jumps to LAB_080d2c54 (error path). "
+        "Uses gDuelCtx+0x2f56 (vs 0x2f58 in primary) for row offset, validates zone index from gDuelCtx+0x2f4f. "
+        "Indexes PTR_DAT_080d2aa0 (7-entry table), tail-calls via bx r8. "
+        "Side effects: VRAM/OAM writes through 7 sub-handlers (INCBIN 0x080d2abc..0x080d2c54). "
+        "Constants: DUEL_CTX=0x02020160; CARD_STATUS_OFFSET=0x2f53; CARD_LOW_OFFSET=0x2f54; "
+        "ROW_OFFSET=0x2f56; ZONE_OFFSET=0x2f4f; JUMP_TABLE_PTR=0x080d2a9c; TYPE_COUNT=7; LOW_MASK=0x1f."),
+    ("FUN_080d3828", "exit_zone_tick_frame",
+        "Shared frame exit stub for FUN_080d2ef4 (duel zone card slot state dispatcher). "
+        "FUN_080d2ef4 enters via 'b FUN_080d3828' (preserving current r0) from multiple paths. "
+        "3 instructions: pop {r4,r5,r6,r7} restores FUN_080d2ef4 callee-saves; "
+        "pop {r1} retrieves saved LR; bx r1 returns to FUN_080d2ef4 caller with r0 unchanged. "
+        "r0 on entry = 0 (busy/waiting) or 1 (done/advanced), set by caller before branching here. "
+        "FUN_080d3826 (signal_zone_tick_done) fall-through -> here; "
+        "advance_zone_card_anim (0x080d3820) tail-jumps here. "
+        "Standard THUMB 'shared function exit' pattern matching FUN_080d2ef4 push {r4,r5,r6,r7,lr}."),
 ]
 
 
