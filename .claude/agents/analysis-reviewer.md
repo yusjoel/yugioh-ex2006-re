@@ -65,6 +65,7 @@ model: sonnet
 | 函数入口含 `adds rX, rY, #0x0` 且 r3 含被覆盖寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (R3=0; 被覆盖 rX 不是独立参数) |
 | 函数入口含 `ldr rN, [pc,#N]` 加载字面量池常量，但 R3 将 rN 列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (R3=0; DAT 加载值是内部常量，不是 APCS 输入) |
 | 函数涉及 OAM attr / DISPCNT / IO 写入含裸 16/32-bit 常量 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_oam_attr_magic_constant_naming.md` (R6=0; 无 Constants: 块 / `0xC00` 标为 priority 而非 mode mask) |
+| Constants 块含 `xx`/`??`/`NN` 等地址占位符而非解析值 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_address_placeholder_in_constants.md` (R6=0; 须追踪 DAT+算术得最终值，或写 base+runtime_index 形式) |
 | R3 中高寄存器 (r4/r8/r9/r10/r11) 在函数体首次赋值前被读取，但 proposal 未列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (R3=0; 要求 executor 补 callsite asm 证据，注明 caller-set) |
 | R3 已正确标注某高寄存器为 caller-set input，reviewer 拟改判为 callee-saved | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (禁止仅凭结构直觉翻转；必须在函数体内找到该寄存器被覆盖且覆盖先于任何读 use 的证据，否则维持 caller-set 结论) |
 | proposed_name 与 PROGRESS.md 中已命名函数重名 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_proposal_name_collision.md` (R1 扣分; 要求 executor grep PROGRESS.md 后加结构差异 qualifier) |
