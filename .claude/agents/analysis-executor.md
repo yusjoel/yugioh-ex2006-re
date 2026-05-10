@@ -148,6 +148,7 @@ model: sonnet
 - R3 数值型 index 参数缺 [lo..hi] 范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_range_required.md` (写完参数行后自检; 缺范围即被扣 R3; 范围单位必须与参数类型单位一致——word offset → word range，byte offset → byte range; **indeg>=10 时必须扫 >=3 个不同 caller 才能确定上界**)
 - N 个结构完全对称的函数仅在整数索引（0..N-1）上不同 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_numbered_index_sibling_cluster.md` (qualifier 直接用该数字 bgN/layerN; 不得发明语义词)
 - 副作用写 [rN+offset] 时 rN 可能已被函数体改写 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_post_rewrite_register_side_effect.md` (用符号名追踪写入位置处 rN 的当前值)
+- R5 填写前对每条 str/strh/strb/stmia 指令分类：[sp+N] 或经 `mov rN,sp`（.hword 0x4668 = mov r0,sp，非 mov r8,r13）计算的写目标 = 栈局部，必须排除在 R5 外部列表之外 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r5_stack_local_write_as_external.md`
 - 返回值 r0 被 `movs r0, #N` 固定赋值 / 函数体无返回值语义 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (必须注明 N 的含义 + 路径说明; void 函数标"无返回，仅副作用")
 - 函数入口含 `adds rX, rY, #0x0`（X < 4）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (rX 不是独立参数，先扫入口 5 条指令)
 - 函数入口含 `ldr rN, [pc,#N]` / `ldr rN, =<const>` 加载字面量池常量地址 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (rN 及随后 `mov rHigh,rN` 的目标均为内部值，不是参数)

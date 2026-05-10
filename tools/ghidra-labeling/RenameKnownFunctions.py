@@ -7582,6 +7582,170 @@ RENAMES = [
         "Calls write_oam_entry_from_packed_args (slot=0x60, attr0=0x34). No APCS inputs. "
         "Constants: ROW_OFFSET=0x0a03; SLOT_STATE_OFFSET=0x0a1b [0..1]; "
         "X_INDEX_OFFSET=0x0a0e; Y_ADJUST_OFFSET=0x0a04; ATTR0=0x34; OAM_SLOT=0x60."),
+
+    # 2026-05-10: campaign-33 batch #33 (topo=723-736)
+    ("FUN_080c82e4", "tick_card_list_display_master",
+        "Card-list display master tick; called once per frame by tick_card_list_scene_frame (0x080c8688). "
+        "Reads gFontState+0x0a17 byte, combines bits to form mode index r4=(bit0<<7)|(bits[7:1]). "
+        "r4=0: call dispatch_card_list_oam_row_by_card_type (10-case card-type OAM row dispatch); "
+        "r4=1: call dispatch_card_display_state_by_mode (7-case display mode dispatch); "
+        "r4>=2: read gFontState+0x0a01 card_type byte, enter 14-entry switchD table at 0x080c8384, "
+        "call corresponding render_card_list_oam_row_by_* sibling. "
+        "No direct IO/VRAM writes; all side effects in callees. "
+        "Constants: FONT_STATE_BASE=0x0201f440; STATE_BYTE_OFFSET=0x0a17; "
+        "CARD_TYPE_OFFSET=0x0a01; SWITCH_TABLE=0x080c8384 (14 entries)."),
+    ("FUN_080c7ba8", "render_card_list_face_row_by_mode",
+        "Card-list face tile row renderer; called by tick_card_list_scene_frame (0x080c8688). "
+        "Reads gFontState+0x0a18 word; extracts bits[24:15] via lsls #0xf/lsrs #0x18 -> mode [0..2]. "
+        "mode=0: iterate row_count rows, write 3 strh tile entries per row to VRAM 0x0600f020+offset; "
+        "tile IDs: top=0x013f, mid=0x0141, bot=0x01a2/0x01a3. "
+        "mode=1: reverse layout variant, tile IDs 0x01a3/0x01a1/0x0143. "
+        "mode=2: third variant. "
+        "Side effects: [gFontState+0x0a18] row counter updated; "
+        "[0x0600f000+offset]/[0x0600f00a+offset] strh tile IDs written (BG VRAM). "
+        "Constants: FONT_STATE_BASE=0x0201f440; MODE_OFFSET=0x0a18; "
+        "TILE_TOP=0x013f; TILE_MID=0x0141; TILE_BOT=0x01a2; VRAM_BASE=0x0600f020."),
+    ("FUN_080c7af8", "copy_card_frame_tiles_by_type",
+        "Copy ROM card frame tile data to OBJ VRAM, then computed-goto to per-type inline tile data. "
+        "Called by tick_card_list_scene_frame (0x080c8688). "
+        "Step 1: copy_bytes_by_halfword(dst=0x0600a7c0, src=0x09889fd8, count=0x120 bytes) -> write frame tiles. "
+        "Step 2: read gFontState+0x0a01 card_type [0..13]; out-of-range -> return r0=1. "
+        "Step 3: lsls r0,#2 -> index into PTR_PTR_080c7b2c (14-entry table); "
+        ".hword 0x4687 = mov pc,r0 (THUMB computed-goto) -> jump to inline case segment. "
+        "Side effects: [0x0600a7c0..0x0600a8df] OBJ VRAM written; per-case inline VRAM writes. "
+        "Constants: VRAM_FRAME=0x0600a7c0; ROM_TILE_SRC=0x09889fd8; COPY_SIZE=0x120; "
+        "CARD_TYPE_OFFSET=gFontState+0x0a01 [0..13]; JUMP_TABLE=0x080c7b30 (14 entries)."),
+    ("FUN_080c841c", "render_card_list_face_row_by_mode_alt",
+        "Card-list face tile row renderer, alt variant of render_card_list_face_row_by_mode (0x080c7ba8). "
+        "Called by tick_card_list_scene_frame (0x080c8688); structure fully symmetric to 0x080c7ba8. "
+        "Same mode extraction (lsls #0xf/lsrs #0x18 -> mode [0..2]), same tile IDs (0x013f/0x0141/0x01a2/0x01a3). "
+        "Key difference: VRAM base 0x0600f00a (mode=0) vs 0x0600f000 (mode=1/2) "
+        "vs 0x080c7ba8 which uses 0x0600f020 -- renders a different horizontal tile column. "
+        "Side effects: [gFontState+0x0a18] row counter; [0x0600f00a+offset]/[0x0600f000+offset] strh writes. "
+        "Constants: FONT_STATE_BASE=0x0201f440; MODE_OFFSET=0x0a18; "
+        "VRAM_BASE_M0=0x0600f00a; VRAM_BASE_M12=0x0600f000."),
+    ("FUN_080c8688", "tick_card_list_scene_frame",
+        "Card-list scene per-frame tick; called by scene dispatch hub (FUN_0801e984). "
+        "Step 1: check gP1LifePoints+0x1d08 (LP existence); 0 -> skip init, go to sort path. "
+        "Step 2: read gPrng+0x214 low 31 bits, bl __divsi3(divisor=0x3c=60); "
+        "quotient > 0xb3=179 -> update gFontState+0x0222: clear bits[3:2] (AND ~0xd), set bit2 (OR 0x4). "
+        "Step 3: read gFontState+0x0a18 combo word, call FUN_0810e5c8 (card image load check). "
+        "Step 4: if FUN_0810e5c8 nonzero: clear gFontState+0x0a1b bit0, +0x0a1c bit1, +0x0222+r3 bit1, +0x0215 bit0. "
+        "Step 5: bl sort_zone_oam_entries_to_vram. "
+        "Step 6: bl tick_card_list_display_master (0x080c82e4). Returns r0=1 (frame_processed). "
+        "Constants: LP_EXIST_OFFSET=0x1d08; gPrng+0x214; DIVISOR=0x3c; THRESHOLD=0xb3; "
+        "FONT_BYTE_OFFSET=0x0222; OAM_ROW_OFFSET=0x0a17."),
+    ("FUN_08094540", "set_tile_palette_index_in_buf",
+        "Write palette index into EWRAM tile attribute buffer entry. "
+        "r0=tile_slot [0..255]; r1=palette_index (u8, written to halfword bits[15:8]). "
+        "Guard: slot > 255 -> return without write. "
+        "Target halfword addr: [0x0201e4f0 + 0x410 + 2*slot]. "
+        "Operation: ldrh -> ands 0x1f (keep bits[4:0] = tile index) -> OR (r1<<8) -> strh. "
+        "No return value (void); side effect only. "
+        "Called by duel_field tile attr init callers (indeg=5). "
+        "Constants: BUF_BASE=0x0201e4f0; TILE_ATTR_OFFSET=0x410; TILE_IDX_MASK=0x1f; PAL_SHIFT=8."),
+    ("FUN_08094290", "get_clamped_tile_row_count",
+        "Read tile_row_phase from [0x0201e4f0+0x4] and clamp to valid display offset range. "
+        "Caller: check_field_scroll_phase_ready (0x080d25e0) and FUN_080d2ef4. "
+        "Clamp rules: value <= 5 -> return 0; "
+        "[6..37] -> return value-6 [0..31]; "
+        "[38..71] -> return value-39; "
+        ">71 -> return min(value, [0x0201e4f0+0xc]). "
+        "Leaf function (bx lr); no side effects (pure read). "
+        "Constants: STATE_BASE=0x0201e4f0; TILE_ROW_PHASE_OFFSET=0x4; "
+        "RANGE1_MAX=5; RANGE2=[6..37]; RANGE3=[38..71]."),
+    ("FUN_080d25e0", "check_field_scroll_phase_ready",
+        "Check if duel field scroll animation phase satisfies advance condition. "
+        "Called by FUN_080d136c / FUN_080d2ef4 / FUN_080d4478. "
+        "Reads [0x0201e4f0+0x4] (phase_counter); dispatches by range: "
+        "[0..5]: return 0 (too early). "
+        "[6..37]: read scroll_flag [0x02020160+0x2e40]; if 0 -> return 0, else -> return 1. "
+        "[38..71]: same scroll_flag + compare against get_clamped_tile_row_count (0x08094290); "
+        "if scroll_flag < clamped_count -> return 0, else -> return 1. "
+        "[>71]: return 1 (phase complete). "
+        "Returns 1=ready_to_advance / 0=not_ready. Callee: get_clamped_tile_row_count. "
+        "Constants: PHASE_BASE=0x0201e4f0; PHASE_OFFSET=0x4; "
+        "SCROLL_FLAG_ADDR=0x02024fa0 (=0x02020160+0x2e40)."),
+    ("FUN_080d0784", "check_zone_slot_attr_visible",
+        "Check if duel field zone slot card attribute satisfies visibility condition (indeg=14). "
+        "r0=slot_index; computes gDuelCtx+0x24+slot*0x28 (stride 5*8=0x28). "
+        "Reads card_type byte at [addr+0]; reads phase_counter [0x0201e4f0+0x4] and "
+        "active_zone_card [0x0201e2a0+0x4]. "
+        "phase_counter==4: if card_type==active_zone_card -> return 0 (not visible). "
+        "Otherwise: bl get_zone_card_attribute_by_type(card_type, attr_type=0xf). "
+        "Returns 1=attribute satisfied (visible) / 0=not satisfied. Read-only; no side effects. "
+        "Constants: DUEL_CTX=0x02020160; CARD_TYPE_OFFSET=0x24; STRUCT_STRIDE=0x28; "
+        "PHASE_BASE=0x0201e4f0; ACTIVE_ZONE_BASE=0x0201e2a0; ATTR_TYPE=0xf."),
+    ("FUN_080d3830", "render_zone_slot_card_icon_tile",
+        "Render card icon tile for duel field zone slot to OBJ VRAM (indeg=4). "
+        "r0=slot_index; reads gDuelCtx+0x2f53 card_status byte; "
+        "extracts bits[7:5] (high 3) and bits[4:0] (low 5); "
+        "if combined==0 -> direct write to OAM addr (zero-vector path). "
+        "Else: copy slot card metadata (9 words via ldmia/stmia); "
+        "compute slot_mod5 = slot_index % 5 (bl __modsi3); "
+        "VRAM row offset = (slot_mod5*4 + 0x1e0) << 5; "
+        "bl tile_2d_row_copy(src, row=0, width=4, height=2) -> write 4x2 icon block to OBJ VRAM 0x06010000. "
+        "No return value (void); side effects: OBJ VRAM 0x06010000+row_offset written. "
+        "Constants: DUEL_CTX=0x02020160; CARD_STATUS_OFFSET=0x2f53; CARD_LOW_MASK=0x1f; "
+        "STRIDE=0x28; MOD_DIVISOR=5; TILE_VRAM=0x06010000; TILE_WIDTH=4; TILE_HEIGHT=2."),
+    ("FUN_080d08a4", "render_zone_card_detail_panel",
+        "Full render pipeline for duel field selected zone card detail panel (indeg=2). "
+        "8 sequential steps: "
+        "(1) copy_bytes_by_halfword(dst=0x0600b0e0, src=0x0988ad78, size=0x3e0) -> BG tile frame; "
+        "(2) copy_bytes_by_halfword(dst=0x05000160, src=0x0988b158, size=0x40) -> OBJ palette; "
+        "(3) setup_line_buf_with_font_and_align(font=0x1b, align=2, flag=1, param=0) -> JP font; "
+        "(4) read gDuelCtx+0x6c2c+0x2e40 bits[2:0] (card_attr) -> update card_info_ctx+0x8/+0x4; "
+        "(5) text_render_wrapper x2 -> render two JP card name lines; "
+        "(6) zero_fill_by_halfword(0x0600bc00, 0x6c0) + commit_line_buffer_to_sprite_vram -> sprite VRAM; "
+        "(7) tile_2d_row_copy x10+ for card frame sub-regions; "
+        "(8) game_str_id_to_row x3 + measure_string_pixel_width -> centered card description. "
+        "No APCS input (void); callee-save r7/r6/r5 via .hword 0x4657/464e/4645. "
+        "Constants: BG_TILE_DST=0x0600b0e0; PAL_DST=0x05000160; SPRITE_BUF=0x0600bc00; "
+        "FONT_ID=0x1b; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c+0x2e40; GAME_STR_ID=0x3e9."),
+    ("FUN_080cad78", "render_zone_card_jp_text_panel",
+        "Render duel field zone card JP text panel (card name + description); indeg=1. "
+        "r0=card_str_base [0..N] (JP string lookup index). "
+        "Step 1: bl zero_card_display_vram_regions -> clear old display. "
+        "Step 2: copy_bytes_by_halfword(dst=0x06006340, src=0x0984f5cc, size=0x600) -> BG tile frame. "
+        "Step 3: setup_line_buf_with_font_and_align(0x20, 2, 1, 2) -> JP font config. "
+        "Step 4: read gDuelCtx+0x6c2c card_attr bits[2:0], update card_info_ctx+0x8/+0x4/+0x15. "
+        "Step 5: card_str_variant = (r0+1) & 0xff | 0x8000; game_str page base = 0x3e8. "
+        "Step 6: bl game_str_id_to_row -> text_render_wrapper (first JP line). "
+        "Step 7: same for second JP line (text_render_wrapper r2=7). "
+        "Step 8: bl commit_line_buffer_to_sprite_vram -> commit to OBJ tile VRAM. "
+        "Constants: FONT_ID=0x20; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c; "
+        "GAME_STR_PAGE=0x3e8; DISPLAY_FLAG=0x8000; LINE2_OFFSET=7."),
+    ("FUN_080d0818", "dispatch_zone_card_display_by_mode",
+        "Duel field zone slot card display dispatcher by mode (indeg=5). "
+        "r0=slot_index; r1=display_mode [0..1]. "
+        "Step 1: compute gDuelCtx+0x24+slot*0x28 -> read card_status/card_attr/card_type bytes. "
+        "Step 2: build OAM_attr0 halfword and strh to stack temp slot. "
+        "Step 3: .hword 0x4684=mov r12,r0 saves slot_index; ldmia/stmia copies 9 slot words to stack. "
+        "Step 4: strh 0 to [0x02023130+8] -> clear display_pending_flag. "
+        "Step 5: compare r1 (display_mode): "
+        "mode=0 -> if slot card_id matches gDuelCtx active_card_id: "
+        "bl render_zone_card_jp_text_panel(r0=1); else bl render_large_card_display_by_mode. "
+        "mode=1 -> bl render_zone_card_jp_text_panel(r0=1). "
+        "No return value (void). "
+        "Constants: DUEL_CTX=0x02020160; SLOT_STRIDE=0x28; CARD_STATUS_OFFSET=0x24; "
+        "DISPLAY_FLAG_ADDR=0x02023130+8; MODE_LARGE=0; MODE_JP=1."),
+    ("FUN_080d2c60", "tick_zone_card_detail_view",
+        "4-state machine tick for duel field zone card detail view (indeg=1). "
+        "Called by FUN_080d2ef4 (duel scene outer state machine). "
+        "Reads [gDuelCtx+0x2f4e] view_state byte; dispatches: "
+        "state=0 (fade-in): bl tick_duel_field_fadein_step; on done: open_card_info_page_from_list, "
+        "set gFontState+0x0222 bit4, strh [WIN0H=0x04000004]=0x28f0, increment view_state. "
+        "state=1 (card info page): bl tick_card_info_page_by_state; on done: increment view_state. "
+        "state=2 (rebuild field): read slot card_id, bl init_duel_field_vram_layout, "
+        "bl render_zone_card_detail_panel (0x080d08a4), bl check_zone_slot_attr_visible (0x080d0784), "
+        "bl dispatch_zone_card_display_by_mode (0x080d0818), apply_palette_offset_to_tile_row, "
+        "write WIN0H/WIN0V/WININ, increment view_state; return 1. "
+        "state=3 (fade-out): bl tick_duel_field_fadeout_step; on done: clear gFontState+0x0222 bits[4:0], "
+        "increment view_state; return 1. "
+        "other: write [gDuelCtx+0x2f4e]=0 (reset), return 0. "
+        "Returns r0: 1=state_advanced / 0=waiting_or_reset. "
+        "Constants: DUEL_CTX=0x02020160; VIEW_STATE_OFFSET=0x2f4e; WIN0H=0x04000004; "
+        "WIN0H_VAL=0x28f0; CARD_PAGE_BUF1=0x0203eeb0; CARD_PAGE_BUF2=0x02029eb0."),
 ]
 
 

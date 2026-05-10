@@ -1682,7 +1682,7 @@ address,name,proposed_name,score,tags
 0x080942f8,FUN_080942f8,,,
 0x08094314,FUN_08094314,,,
 0x08094320,FUN_08094320,,,
-0x08094540,FUN_08094540,,,
+0x08094540,set_tile_palette_index_in_buf,,,
 0x08094564,FUN_08094564,,,
 0x0809457c,FUN_0809457c,,,
 0x080945b8,FUN_080945b8,,,
@@ -2246,9 +2246,9 @@ address,name,proposed_name,score,tags
 0x080c78bc,init_card_icon_tile_and_palette,,,vram;palette
 0x080c7950,FUN_080c7950,game_str_080c7950,2,vram;card_stats;font_jp;game_str;settings
 0x080c7ea0,dispatch_card_display_state_by_mode,,,window;vram;display;card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
-0x080c82e4,FUN_080c82e4,font_jp_080c82e4,2,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
-0x080c841c,FUN_080c841c,,,vram
-0x080c8688,FUN_080c8688,,,
+0x080c82e4,tick_card_list_display_master,,,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;font_jp;frame_counter;fs;game_str;pack;prng;settings
+0x080c841c,render_card_list_face_row_by_mode_alt,,,vram
+0x080c8688,tick_card_list_scene_frame,,,
 0x080c879c,init_duel_field_lp_aob_ctx,,,vram;scene_duel_field
 0x080c8870,FUN_080c8870,,,
 0x080c8904,FUN_080c8904,,,
@@ -2283,7 +2283,7 @@ address,name,proposed_name,score,tags
 0x080ca660,decode_card_image_tiles_to_vram,,,vram
 0x080ca8ec,init_duel_field_tile_indices,,,vram;palette;duel_field
 0x080cace8,zero_card_display_vram_regions,,,vram
-0x080cad78,FUN_080cad78,game_str_080cad78,3,vram;font_jp;game_str
+0x080cad78,render_zone_card_jp_text_panel,,,vram;font_jp;game_str
 0x080cae84,write_card_digit_tiles_to_vram,,,vram
 0x080caf68,render_card_name_to_sprite_vram,,,vram;font_jp
 0x080cb1cc,render_large_card_display_by_mode,,,vram;palette;card_stats;duel_field;font_jp
@@ -2344,7 +2344,7 @@ address,name,proposed_name,score,tags
 0x080d04dc,render_jp_two_line_text_to_bg_vram,,,vram;font_jp
 0x080d05e4,render_card_list_oam_row_by_pack_slot,,,
 0x080d0640,render_card_list_oam_row_by_slot_nibble,,,
-0x080d0784,FUN_080d0784,,,
+0x080d0784,check_zone_slot_attr_visible,,,
 0x080d3b6c,FUN_080d3b6c,settings_080d3b6c,3,settings
 0x080d3bf0,FUN_080d3bf0,,,
 0x080d3c8c,FUN_080d3c8c,,,
