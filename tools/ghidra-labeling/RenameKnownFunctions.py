@@ -9664,6 +9664,169 @@ RENAMES = [
         "r0=ptr effect_slot_group (contains [+0]=card_id, [+3]=flags, [+4]=slot_count). "
         "Returns u32: 1=normal-summon-path eligible, 0=not. "
         "Constants: type_skip=0xe; summon path card_ids: 0x1534/0x133b/0x1449/0x1452/0x19c0 etc."),
+    # --- batch #44 (campaign-44) ---
+    ("FUN_080b499c", "check_normal_summon_eligible_for_slot",
+        "Full eligibility check for normal summon of a single card slot, with summon target init on pass. "
+        "r0=player_id [0..1]; r1=slot_ptr ([r1+0]=card_id); r2=mode_flag [0..1]. "
+        "Scans gDuelCardMain (0x0201b290+0xc0<<2) for matching card_id+mode_flag entry: "
+        "found -> path B (equip activation via find_zone_slot_idx_allowed_for_card); "
+        "not found -> path A: check_card_field5_is_nonzero + check_card_normal_summon_eligible_full. "
+        "Both paths write [gP1LifePoints+0x1d64]:=player_id and call init_duel_zone_target_slot_refs. "
+        "Returns u32: 1=eligible+initialized, 0=not eligible. "
+        "Constants: gDuelCardMain=0x0201b290+0x300, gDuelEffectZones=0x0201c510, player_stride=0x868."),
+    ("FUN_080bb3dc", "check_normal_summon_eligible_for_any_effect_zone",
+        "Scans up to 0xce effect zone entries (base=0x09e48918, stride=8) for player r0. "
+        "For each entry: check_card_field5_is_nonzero; if valid call check_normal_summon_eligible_for_slot(player, entry, 0). "
+        "Returns u32: 1=any effect zone card passes normal summon eligibility, 0=none. "
+        "r0=u32 player_id [0..1]. "
+        "Constants: effect_zone_base=0x09e48918, max_entries=0xce, entry_stride=8."),
+    ("FUN_080b4ba8", "check_normal_summon_eligible_any_slot",
+        "Checks whether player r0 has any card slot or effect zone satisfying normal summon eligibility. "
+        "Writes r0 to [0x0201afe0] (current player ptr). "
+        "Iterates gDuelCardMain (0x09e478d0) up to 0xdd slots (stride=8): "
+        "calls check_normal_summon_eligible_for_slot(player, slot, 0) per slot; returns 1 on first pass. "
+        "Falls back to check_normal_summon_eligible_for_any_effect_zone(player). "
+        "Returns u32: 1=eligible slot exists, 0=none. "
+        "r0=u32 player_id [0..1]. Constants: player_ptr=0x0201afe0, gDuelCardMain=0x09e478d0, max_slots=0xdd."),
+    ("FUN_08085430", "build_sprite_row_from_zone_state",
+        "Builds one sprite row from zone state data and submits it. "
+        "r0=player_id [0..1]: selects sprite type (0->0xb, 1->0xc). "
+        "Reads [gP1LifePoints+0x1d08] guard word: 0 -> skip. "
+        "Reads gDuelCardBase+0x4cc for dest row buf ptr; reads byte array at +0x4d4 and word array at +0x4f4; "
+        "packs byte+low16+high16 per slot (6 bytes each) into dest buf. "
+        "Calls submit_sprite_row_data with sprite_count from row header and stride per slot. "
+        "Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, state_guard_off=0x1d08, gDuelCardBase=0x0201b290."),
+    ("FUN_0801f238", "copy_game_text_if_raw",
+        "Copies a game string to dest buf r0: if r1 is a raw string ID (high 15 bits == 0, "
+        "mask 0xFFFE0000 & r1 == 0) calls resolve_game_str_ptr(r1) then strcpy; "
+        "otherwise uses r1 directly as pointer for strcpy. "
+        "r0=u8* dest; r1=u32 str_handle (raw ID or resolved ptr). Returns void. "
+        "Side effects: writes NUL-terminated string to [r0..]. "
+        "Constants: RAW_ID_MASK=0xFFFE0000."),
+    ("FUN_0801f25c", "append_game_text_if_raw",
+        "Appends a game string to end of dest buf r0 (strcat variant of copy_game_text_if_raw). "
+        "If r1 high 15 bits == 0 calls resolve_game_str_ptr(r1) then strcat; "
+        "otherwise uses r1 directly as pointer for strcat. "
+        "r0=u8* dest (existing content); r1=u32 str_handle. Returns void. "
+        "Side effects: appends NUL-terminated string to [r0 end..]. "
+        "Constants: RAW_ID_MASK=0xFFFE0000."),
+    ("FUN_08085a50", "build_field_action_text_by_zone_type",
+        "Builds field action description string into dest buf r0 based on active zone type code. "
+        "Zeroes [r4] (dest buf first byte); reads [gDuelCardBase+0x4cc] ctrl word: 0 -> empty string. "
+        "Reads type byte at +0x4d4 as switch key (r3-1, upper bound 0x1d, 30 cases). "
+        "Each case calls copy_game_text_if_raw(r4, str_id) for zone-specific string. "
+        "Tail (caseD_11): if [r4+0] non-empty appends separator (0x09e3f14c) via append_game_text_if_raw; "
+        "then appends fixed tail str_id=0x10d. Returns void. "
+        "Constants: gDuelCardBase=0x0201b290, ctrl_off=0x4cc, type_off=0x4d4, tail_id=0x10d."),
+    ("FUN_08094800", "check_all_equip_target_slots_available",
+        "Checks whether all equip target slots are available for player r0. "
+        "First calls count_available_effect_zones(player, 0x1468, -1): 0 -> return 0. "
+        "Then calls find_equip_slot_by_card_id 4 times with IDs 0x1497/0x1498/0x1499/0x149a: "
+        "any returns < 0 -> return 0. All non-negative -> return 1. "
+        "r0=u32 player_id [0..1]. Returns u32: 1=all slots available, 0=at least one unavailable. "
+        "Constants: effect_zone_id=0x1468, equip_slot_ids=0x1497..0x149a."),
+    ("FUN_080947a0", "check_all_fusion_pair_slots_available",
+        "Checks whether all 5 fusion pair slots are valid for player r0. "
+        "Calls count_valid_monster_pair_slots 5 times with IDs 0x0fb7/0x0fb8/0x0fb9/0x0fba/0x0fbb. "
+        "Any returns 0 -> return 0 immediately. All non-zero -> return 1. "
+        "r0=u32 player_id [0..1]. Returns u32: 1=all 5 fusion pair slots valid, 0=at least one invalid. "
+        "Constants: fusion_slot_ids=0x0fb7..0x0fbb."),
+    ("FUN_08094864", "query_summon_eligibility_code",
+        "Returns the highest-priority summon eligibility code for player r0 (priority 0..9). "
+        "Checks in order: opponent field non-empty->2; check_all_fusion_pair_slots_available->3; "
+        "check_all_equip_target_slots_available->4; check_node_in_slot_chain series->5/6/7/8/9; "
+        "hand empty ([gP1LifePoints+0x28+player*0x868]==0)->1; else->0. "
+        "r0=u32 player_id [0..1]. Returns u32 code [0..9] (0=cannot summon, 1=hand empty, "
+        "2=opponent occupied, 3=fusion, 4=equip, 5-9=chain states). "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, hand_off=0x28, field_off=0x20."),
+    ("FUN_0809495c", "check_normal_summon_eligibility",
+        "Checks and updates summon eligibility state for both players each frame. "
+        "Reads [gP1LifePoints+0x1d08] guard; if non-zero checks [+0x1ce8] vs [gDuelSettings+0x4]^1: "
+        "match -> return 0 (already handled). "
+        "Calls query_summon_eligibility_code for player 0 and 1; writes results to "
+        "[gP1LifePoints+0x2c+player*0x868] (summon code fields). "
+        "Both 0 -> check [+0x10dc]; at least one non-zero -> write [+0x1cfc]/[+0x10dc] and return 1. "
+        "r0..r3: no APCS inputs. Returns u32: 0=no change, 1=new summon state detected. "
+        "Constants: gP1LifePoints=0x0201c4e0, gDuelSettings=0x0201e2a0, player_stride=0x868."),
+    ("FUN_080854b8", "scan_equip_target_slots_for_card",
+        "Scans equip target slot list to determine if card r0 (card_id) has any valid equip target. "
+        "r1=slot_ptr (start). Reads byte per slot from gDuelCardBase+0x4d4; byte-1 as switch key "
+        "(switchD_080854da, 30 cases); each case checks r4 (card_id) against allowed equip target range. "
+        "Match -> return 1 (caseD_d); no match -> slot_counter++; all checked -> return 0. "
+        "r0=u32 card_id; r1=ptr slot_ptr. Returns u32: 1=valid target found, 0=none. "
+        "Constants: gDuelCardBase=0x0201b290, slot_byte_base_off=0x4d4."),
+    ("FUN_08085838", "scan_all_zones_for_equip_target",
+        "Scans all field zones of both players for a valid equip target. "
+        "Outer loop r6=[0..1] (player), inner r5=[0..0xa] (slot stride 0x14): "
+        "reads gDuelCardSlots (0x0201c510) slot field5 (bits 13..0); if non-zero calls "
+        "setup_equip_context_for_slot_activation; if valid calls scan_equip_target_slots_for_card. "
+        "Second pass scans gDuelEffectZones (0x0201c600) with r1 (equip_flag) via "
+        "setup_equip_context_for_zone_activation + scan_equip_target_slots_for_card. "
+        "Returns u32: 1=found, 0=not found. "
+        "r0=u32 player_id [0..1]; r1=u32 equip_flag. "
+        "Constants: gDuelCardSlots=0x0201c510, gDuelEffectZones=0x0201c600, player_stride=0x868."),
+    ("FUN_08085d4c", "dispatch_field_display_state_by_type",
+        "Dispatches field display handling based on display type code read from gDuelCardBase+0x578. "
+        "Reads [gDuelCardBase+0x57c] as ctrl value (r4); reads type code [+0x578]: "
+        ">0x32 -> caseD_3 return 1 (skip). Otherwise indexes switchD_08085d70 (51 entries). "
+        "case 0: check_normal_summon_eligibility; case 1: scan_all_zones_for_equip_target + "
+        "check_normal_summon_eligible_any_slot + invoke display op; case 0xa: write_card_display_ctx_fields; "
+        "case 0x14: build_sprite_row_from_zone_state; default: return 1. "
+        "r0..r3: no APCS inputs. Returns u32: 0=busy (action taken), 1=done/skip. "
+        "Constants: gDuelCardBase=0x0201b290, type_off=0x578, ctrl_off=0x57c, type_limit=0x32."),
+    ("FUN_0804f0c2", "clear_sprite_row_queue_overflow_flag",
+        "Clears sprite row queue overflow flag word and returns 1. "
+        "Loads gSpriteRowBase (0x0201b290) + 0x93<<3 (=0x498); stores 0 to that address. "
+        "Restores frame (add sp,#0x2c + callee-restore) and returns r0=1. "
+        "Called by dispatch_sprite_row_queue_by_state when state_code > 0x67 (overflow). "
+        "Also serves as default fallback for dispatch table indices 8..0x67. "
+        "r0..r3: no APCS inputs. Returns u32: 1 (fixed). "
+        "Side effects: [0x0201b290+0x498] := 0."),
+    ("FUN_0804db50", "dispatch_sprite_row_queue_by_state",
+        "Dispatches sprite row queue processing based on current state code. "
+        "Reads [gSpriteRowBase+0x480] read-ptr to compute row stride; "
+        "reads state code [+0x49c]: >0x67 -> call clear_sprite_row_queue_overflow_flag; "
+        "else index dispatch table PTR_DAT_0804dbb8 (indices 0..7=8 handlers, 8..0x67=overflow fallback). "
+        "r0..r3: no APCS inputs. Returns u32 passthrough from dispatched handler. "
+        "Side effects: sub-handlers may modify gSpriteRowBase internal state fields. "
+        "Constants: gSpriteRowBase=0x0201b290, read_ptr_off=0x480, state_code_off=0x49c, limit=0x67."),
+    ("FUN_0808e600", "enqueue_equip_chain_sprites_for_zones",
+        "Scans both players effect zones for active equip chain cards and enqueues OBJ sprite attrs. "
+        "Entry: checks [gP1LifePoints+0x10d0] bit0 + [+0x1d28]<=8 -> return 0 (cooldown). "
+        "Outer r5=[0..1] (player); inner scans gDuelActivation effect zone list (5 slots per player): "
+        "test_slot_has_active_card; checks field5 bitmask and chain flags; "
+        "count_equip_chain_default_flags + eval_slot_target_eligibility_full; on pass: "
+        "builds OBJ attr word and calls enqueue_sprite_attr_with_mode(slot, zone_idx, attr, 0x9). "
+        "On hits: enqueue_sprite_attr_by_sign + prepare_slot_ctx_for_equip_bitmap. "
+        "r0..r3: no APCS inputs. Returns u32: 1=enqueued, 0=none. "
+        "Constants: gP1LifePoints=0x0201c4e0, gDuelActivation=0x0201e1c8, attr_mode=0x9."),
+    ("FUN_0808fe84", "apply_equip_activation_from_zone_scan",
+        "Scans both players effect zones for card_type=0x18b2 (equip card type) and applies activation. "
+        "r8=0/r9=gP1LifePoints/r10=1 manage two-player scan; inner r7=[0..4] (zone slot index). "
+        "Reads slot [+0] bit13..0 (card_type); filters card_type==0x18b2 and valid slot. "
+        "Calls apply_equip_activation_with_id_lookup then enqueue_sprite_attr_with_xy_split per match. "
+        "r0..r3: no APCS inputs. Returns u32: 1=found and activated, 0=none. "
+        "Side effects: writes EWRAM equip state; enqueues OBJ sprite attrs. "
+        "Constants: gDuelEffectZones=0x0201c510, target_card_type=0x18b2, player_stride=0x868."),
+    ("FUN_08094f20", "write_card_display_index_if_above_bit",
+        "Conditionally writes card display index entry only if target_index > current bit value. "
+        "r0=ptr card_entry; r1=u32 target_index [0..0xFF]. "
+        "Calls get_card_data_bit_by_index(r0, r1) -> r0; if r1 > r0 calls write_card_display_index_entry(r4, r5). "
+        "Returns void. indeg=7. Used by 5 hub callers to ensure only higher-priority index is written. "
+        "Side effects: if r1>bit_value: write_card_display_index_entry(card_entry, target_index)."),
+    ("FUN_08095084", "write_monster_zone_display_indices",
+        "Scans both players monster zones, scores each slot and writes display indices via "
+        "write_card_display_index_if_above_bit (0x08094f20). "
+        "Phase 1: iterates gDuelEffectZones 5 slots (stride 0x14): "
+        "reads slot field5 (bit 13..0); if non-zero: stmia into collect buf, r8++; "
+        "get_slot_field5_score(player, idx) -> write_card_display_index_if_above_bit(0, score); "
+        "check_slot_placement_blocked_by_field_effect -> r10++. "
+        "Phase 2 (r8>=3): check_card_pair_allowed for each slot pair -> "
+        "any >=2 pairs valid: write_card_display_index_entry(0x3b, 1). "
+        "r8==5: write index=0x3c; r10==5: write index=0x3d. "
+        "r0..r3: no APCS inputs. Returns void. "
+        "Constants: gDuelSettings=0x0201e2a0, gDuelEffectZones=0x0201c510, player_stride=0x868."),
     ("FUN_0805bcf0", "check_card_special_summon_eligible_full",
         "Multi-layer special summon eligibility check for card_slot_ptr r0. "
         "Entry: check_card_field5_is_nonzero, check_card_field8_is_normal (both must pass). "
