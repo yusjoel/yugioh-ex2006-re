@@ -9315,6 +9315,187 @@ RENAMES = [
         "Callers: FUN_0806c828, FUN_08095d84 (duel_field). "
         "Constants: player_stride=0x868, gDuelFieldSlots_offset=0x0201c600, "
         "FIELD6_EQUIP=0x16, FIELD9_TYPE2=0x2, slot_key=0xa, sprite_tile=0x198a."),
+    # campaign-42 batch #42
+    ("FUN_08095d84", "dispatch_lp_bar_animation_step",
+        "LP bar animation state machine single-frame dispatcher. "
+        "Reads state word at gP1LifePoints+0x1d60 (offset 0xeb<<5) and dispatches: "
+        "state=0: calls render_monster_slot_card_with_lp_bar, writes result to +0x1d74, advances state; "
+        "state=1: sets state to 2, skips render; "
+        "other: r3!=0 -> init_card_sprite_row_entry_alt, r1==0 -> init_card_sprite_row_entry. "
+        "Clears pending flag at gP1LifePoints+0x1d54 on exit. "
+        "r0=u32 anim_mode [0..2]; r1=u32 use_alt_entry [0..1]; r2=ptr row_entry_ptr. Returns void. "
+        "Callers: FUN_0804ce78, FUN_08085d4c, trigger_lp_bar_animation_if_ready (r0=1,r1=0,r2=0). "
+        "Constants: state_offset=0x1d60, result_offset=0x1d74, pending_flag_offset=0x1d54."),
+    ("FUN_08095ca0", "trigger_lp_bar_animation_if_ready",
+        "Gate function for LP bar animation. "
+        "Reads gP1LifePoints+0x1d44; if equal to 0x0fee, calls "
+        "dispatch_lp_bar_animation_step(r0=1, r1=0, r2=0) and jumps to shared tail LAB_08095d32. "
+        "Otherwise (LAB_08095ccc): writes 1 to 0x0201b290+0x9a*8 (sprite buffer flag); "
+        "reads [gP1LifePoints+0x1d68], calls render_field_card_copy_count; "
+        "if r0!=0 calls init_card_sprite_row_entry_alt else init_card_sprite_row_entry; "
+        "writes 0 to [gP1LifePoints+0x1d54] (pending flag clear). "
+        "r0=u32 player_bit_field (bit0=player_id [0..1]). Returns void. "
+        "Callers: FUN_0804ce78, FUN_08085d4c. "
+        "Constants: trigger_sentinel=0x0fee, sprite_buf_flag_addr=0x0201b290+0x4d0."),
+    ("FUN_08093390", "trigger_card_display_op31_if_not_active",
+        "Guard for card display slot activation. "
+        "Reads state at 0x0201e2a0+0x8+slot_index*4; if state==1 (already active) returns immediately. "
+        "Otherwise calls dispatch_card_display_op(op=0x31, r1=0, r2=display_param, r3=0). "
+        "r0=u32 slot_index [0..N-1]; r1=u32 display_param (forwarded as r2 to dispatch). Returns void. "
+        "indeg=119 (C_util_high). Callers: FUN_080563cc and 118 others."),
+    ("FUN_080942dc", "get_monster_slot_entry_ptr",
+        "Pure leaf. Reads active slot count from 0x0201e4f0+0x8, "
+        "computes next-write address as base+0x10+count*4, and returns it. "
+        "No parameters (r0-r3 unused at entry). Returns ptr to monster_slot_array[count]. "
+        "indeg=26 (C_util_high). Callers: FUN_08057874, FUN_080598d8, FUN_08059b4c and others. "
+        "Constants: monster_slot_base=0x0201e4f0, count_offset=0x8, entries_offset=0x10."),
+    ("FUN_0809463c", "advance_prng_state",
+        "LCG single-step advance. Reads 32-bit seed from gP1LifePoints+0x1ce0 (offset 0xe7<<5), "
+        "computes new_seed = seed * 0x343fd + 0x269ec3 (standard C rand() parameters), "
+        "writes new_seed back, then extracts bits[16..30] via (new_seed<<1)>>17 "
+        "as 15-bit pseudo-random output. "
+        "No input parameters (r0 overwritten at entry). Returns u16 prng_value [0..0x7fff]. "
+        "Callers: sample_prng_scaled, FUN_0809457c, check_slot_palette_nonzero. "
+        "Constants: seed_offset=0x1ce0, LCG_mul=0x343fd, LCG_inc=0x269ec3."),
+    ("FUN_08094664", "sample_prng_scaled",
+        "Wrapper around advance_prng_state for range-scaled random sampling. "
+        "Calls advance_prng_state to get 15-bit prng value, multiplies by r0 (upper_bound), "
+        "then shifts right 0xf (divides by 32768) to yield uniform integer in [0..upper_bound-1]. "
+        "r0=u32 upper_bound [1..0x7fff]. Returns u32 random_index [0..upper_bound-1]. "
+        "indeg=34. Callers: FUN_08031668, FUN_08031d44, FUN_08037c20 and others. "
+        "Side effect: advances LCG seed at gP1LifePoints+0x1ce0."),
+    ("FUN_08094564", "read_slot_palette_index",
+        "Pure leaf. Reads palette index for a monster slot from "
+        "0x0201e4f0+0x410+slot_index*2 (halfword), extracts high byte (>>8) and returns it. "
+        "r0=u32 slot_index [0..N-1]. Returns u8 palette_index [0..255]. "
+        "Callers: FUN_0809457c, check_slot_palette_nonzero. "
+        "Constants: monster_slot_base=0x0201e4f0, palette_subarray_offset=0x410 (=0x82<<3)."),
+    ("FUN_080ade34", "check_slot_palette_nonzero",
+        "Boolean wrapper around read_slot_palette_index. "
+        "Returns 1 if palette_index > 0 (slot occupied/active), 0 if empty. "
+        "r0=u32 slot_index [0..N-1]. Returns u32 is_active [0..1]. "
+        "Callers: find_first_empty_slot_for_card_type, find_random_empty_slot_excluding_card_id, "
+        "find_slot_by_card_type_and_player, FUN_080ae050."),
+    ("FUN_080ade8c", "find_random_empty_slot_excluding_card_id",
+        "Two-phase scan over monster_slot array (0x0201e4f0). "
+        "Phase 1: iterates all slots; for each slot with check_slot_palette_nonzero==0 (empty), "
+        "reads card_id from 0x0201e500+idx*4 bits[18..0]; if card_id != target, increments r5 (eligible count). "
+        "Phase 2: if r5>0, calls sample_prng_scaled(r5) to pick random offset, "
+        "then re-scans to find the N-th eligible empty slot and returns its index. "
+        "Returns -1 if no eligible slot found. "
+        "r0=u32 card_id [0..0x7ffff] (exclude slots matching this ID). "
+        "Returns i32 slot_index [0..N-1] or -1. "
+        "Callers: FUN_080ae050."),
+    ("FUN_080adf8c", "check_special_card_activation_eligible",
+        "Activation eligibility check for specific special card IDs. "
+        "Compares r0 (card_id) against hardcoded set {0x1366, 0x137d, 0x15e6}; "
+        "on match reads slot card_id from 0x0201e500+r1*4 bits[18..0], "
+        "then compares against {0x1596, 0x13c3, 0x1914}. "
+        "For 0x1914: calls count_equipped_paired_slots_for_player for both players; "
+        "if either has equipped pair returns 0 (ineligible). "
+        "r0=u32 card_id [0..0x7fff]; r1=u32 slot_index [0..N-1]. "
+        "Returns u32 eligible [0..1]. "
+        "Callers: FUN_080ae050. "
+        "Constants: special_ids={0x1366,0x137d,0x15e6}, pair_ids={0x1596,0x13c3,0x1914}."),
+    ("FUN_08032f7c", "count_slot_card_pair_allowed_for_card",
+        "Iterates slots 0..10 for player r0, calls check_slot_card_pair_allowed(player, slot_idx, card_id) "
+        "for each, and counts allowed slots. Returns count [0..11]. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. "
+        "Callers: FUN_080ac584, FUN_080acc30, check_compound_pair_activation_eligible, "
+        "check_any_pair_slot_available_for_card, FUN_080b76e4."),
+    ("FUN_080af914", "check_any_pair_slot_available_for_card",
+        "Dual slot availability check for a card. "
+        "First calls count_valid_monster_pair_slots(player, card_id & 0xffff); "
+        "if non-zero returns 1. "
+        "Then calls count_slot_card_pair_allowed_for_card(player, card_id); "
+        "if non-zero returns 1. Returns 0 if both are zero. "
+        "r0=u32 player_side [0..1]; r1=u32 card_id_packed (low 16 bits = card_id). "
+        "Returns u32 any_slot_available [0..1]. "
+        "Callers: FUN_080ac584, FUN_080acc30, FUN_080ae050, FUN_080bbf38."),
+    ("FUN_080eef9c", "get_card_type_bits_by_internal_id",
+        "Converts internal card_id to standard card_id via internal_card_id_to_card_id, "
+        "then reads byte at card_attr_table (0x02000006) + card_id*2+1, "
+        "masks low 2 bits (ands #0x3), and returns card type enum "
+        "(0=monster, 1=spell, 2=trap, 3=other). "
+        "r0=u16 internal_card_id [0..0xffff]. Returns u32 card_type_bits [0..3]. "
+        "Callers: FUN_0807ed04, FUN_0807ee74, FUN_080ae050, FUN_080b58e8, FUN_080b70ac."),
+    ("FUN_08037b34", "count_monster_slots_with_field5_ge_threshold",
+        "Iterates all monster zone cards for player r0 "
+        "(count at gP1LifePoints+player*0x868+0xc, entries at +0x120 subarray). "
+        "For each card calls get_card_extended_stat_field5; "
+        "if return >= threshold (r1, saved in r8) increments counter. "
+        "Returns match_count. "
+        "r0=u32 player_side [0..1]; r1=u32 field5_threshold [0..255] (known callsite: 7). "
+        "Uses non-APCS r8 for threshold (mov r8,r1 via .hword 0x4688). "
+        "Callers: FUN_080ae050 (with r1=7). "
+        "Constants: player_stride=0x868, monsters_offset=0xc, subarray_offset=0x120 (=0x90<<1)."),
+    ("FUN_080af534", "check_card_id_in_eligible_set",
+        "Pure leaf. Binary-search-style comparison tree checking if r0 (card_id) "
+        "belongs to a predefined whitelist including: "
+        "0x14ac, 0x130c, 0x10f4, 0x12ac, 0x1302, 0x140e, 0x134a, 0x1468, 0x147c, "
+        "0x1645, 0x15ee, 0x1636, 0x1770, 0x166c, 0x172c, 0x1855, 0x185c, 0x1992 and others. "
+        "LAB_080af696 path returns 1; LAB_080af68c path returns (r1==0 ? 1 : 0); "
+        "LAB_080af69a returns 0. "
+        "r0=u32 card_id [0..0x7fff]; r1=u32 mode_flag [0..1]. "
+        "Returns u32 eligible [0..1]. "
+        "indeg=7. Callers: FUN_080ae050, FUN_080af6a0, FUN_080af72c, FUN_080b5348, FUN_080b54c0."),
+    ("FUN_080adf40", "find_slot_by_card_type_and_player",
+        "Linear scan over monster_slot array (0x0201e4f0, count at [+0xc]). "
+        "For each slot with check_slot_palette_nonzero==0 (empty): "
+        "reads slot data word from 0x0201e500+idx*4, extracts bits[18..0] as card_type "
+        "and bit[13] (via lsrs#0x12) as player_id; "
+        "if both match r1 (card_type) and r0 (player_id) returns slot index. "
+        "Returns -1 if not found. "
+        "r0=u32 player_id [0..1]; r1=u32 card_type [0..0x7ffff]. "
+        "Returns i32 slot_index [0..N-1] or -1. "
+        "Callers: FUN_080ae050."),
+    ("FUN_080ade48", "find_first_empty_slot_for_card_type",
+        "Linear scan over monster_slot array (0x0201e4f0, count at [+0xc]). "
+        "For each slot with check_slot_palette_nonzero==0 (empty): "
+        "reads slot data from 0x0201e500+idx*4, extracts bits[18..0] card_type; "
+        "if matches r0 returns slot index. "
+        "Returns -1 if not found. "
+        "Differs from find_slot_by_card_type_and_player: no player check. "
+        "r0=u32 card_type [0..0x7ffff]. "
+        "Returns i32 slot_index [0..N-1] or -1. "
+        "Callers: FUN_080ae050."),
+    ("FUN_08031a84", "count_zone_card_pair_allowed_for_card",
+        "Iterates all monster zone cards for player r0 "
+        "(count at gP1LifePoints+player*0x868+0x10). "
+        "For each card reads card_id (bits[18..0]) and calls "
+        "check_card_pair_allowed(card_id, r1); if allowed increments counter. "
+        "Returns match_count. "
+        "r1 (card_id threshold) saved in r8 via .hword 0x4688 = mov r8,r1. "
+        "r0=u32 player_side [0..1]; r1=u16 card_id [0..0xffff]. "
+        "Callers: check_compound_pair_activation_eligible. "
+        "Constants: player_stride=0x868, zone_count_offset=0x10."),
+    ("FUN_080af8cc", "check_compound_pair_activation_eligible",
+        "Four-fold compound pairing activation check; returns 1 if any condition met. "
+        "Sequentially calls: "
+        "(1) count_zone_card_pair_allowed_for_card(player, card_id & 0xffff); "
+        "(2) count_valid_monster_pair_slots(player, card_id & 0xffff); "
+        "(3) count_extra_deck_cards_by_id(player, card_id); "
+        "(4) count_slot_card_pair_allowed_for_card(player, card_id_packed). "
+        "Returns 0 only if all four are zero. "
+        "r0=u32 player_side [0..1]; r1=u32 card_id_packed (low 16 bits = card_id). "
+        "Returns u32 any_condition_met [0..1]. "
+        "Callers: FUN_080a3130, FUN_080acc30, FUN_080ae050."),
+    ("FUN_080abf64", "eval_zone_slot_score_for_player",
+        "Computes score entry for zone slot r1 of player r0, writing into score_out (r2). "
+        "Slot base = 0x0201c510 + (player_id&1)*0x868 + slot_index*0x14. "
+        "If slot[+0x8] halfword != 0: calls eval_slot_score_entry_full directly. "
+        "Else reads card_id from slot[0], checks slot[+0x11] bit7 (activation flag): "
+        "if active: temporarily writes slot[+0x8], calls eval_slot_score_entry_full, restores; "
+        "if not active: calls get_card_extended_stat_field5; "
+        "field5<=4 -> score_out[0x14]=0x4b0, score_out[0x18]=0x708; "
+        "field5>4 -> score_out[0x14]=0x834. "
+        "Writes score_out[0x00/0x04/0x08/0x10/0x14/0x18]. "
+        "r0=u32 player_bit_field (bit0=player_id [0..1]); r1=u32 card_slot_index [0..N-1]; "
+        "r2=ptr score_out. Returns void. "
+        "Uses non-APCS high registers: r8=base addr (0x0201c510), r12=1 (constant). "
+        "Callers: FUN_080ac004, FUN_080ae050, FUN_080aef1c, FUN_080aefc4, FUN_080af070. "
+        "Constants: zone_base=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "score_low_threshold=4, score_A=0x4b0, score_B=0x708, score_C=0x834."),
 ]
 
 

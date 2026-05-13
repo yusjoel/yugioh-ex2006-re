@@ -173,6 +173,7 @@ model: sonnet
 - Phase 4 step 7 plate ASCII 硬扫：除已列字符外，还须检查箭头类字符（→←↑↓及 Unicode ARROWS block U+2190..U+21FF）/ en-dash（–）/ em-dash（—）/ 省略号（…）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`
 - 写完 R3 参数签名后，对每个 r0-r3 参数自检：在 asm 中找第一条实际使用该寄存器的指令，确认指令形式（`ldr [rN,#N]`=指针, `cmp rN,rM`=标量/值）与标注角色一致；不一致立即修正 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_role_swap.md`
 - 写完 R3 后，检查 prologue push 指令保存的 callee-save 寄存器数量 N；若提案列出的 APCS 参数数量 < N，则找出遗漏的 `mov rSaved,rAPCS` spill 对并补入参数行 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_missing_param_from_push_count.md`
+- 函数体内出现 `bl predicate; bne LAB_skip`（或类似 beq LAB_skip 后跟实质逻辑）时：处理的是 predicate 返回 0 的情况（bne 跳过 nonzero；fall-through = zero-case）；plate 主语必须是 "predicate 返回 0" 的槽/元素；callee 名含正面词（nonzero/valid/active）时，函数处理的是反面情形（empty/invalid/inactive）；自检：grep plate 段中 callee 名，若叙述方向与 bne 方向不符立即修正 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callee_bne_polarity_inversion.md`
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
