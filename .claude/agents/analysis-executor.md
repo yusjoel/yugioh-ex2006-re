@@ -172,6 +172,7 @@ model: sonnet
 - 两个对称 sibling 函数唯一差异为内存区域基址常量（VRAM/EWRAM list/OAM 基址）时，qualifier 用该区域语义名（obj_vram/bg_vram/main_list/secondary_list 等）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_memory_region_sibling_qualifier.md`
 - Phase 4 step 7 plate ASCII 硬扫：除已列字符外，还须检查箭头类字符（→←↑↓及 Unicode ARROWS block U+2190..U+21FF）/ en-dash（–）/ em-dash（—）/ 省略号（…）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`
 - 写完 R3 参数签名后，对每个 r0-r3 参数自检：在 asm 中找第一条实际使用该寄存器的指令，确认指令形式（`ldr [rN,#N]`=指针, `cmp rN,rM`=标量/值）与标注角色一致；不一致立即修正 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_role_swap.md`
+- 写完 R3 后，检查 prologue push 指令保存的 callee-save 寄存器数量 N；若提案列出的 APCS 参数数量 < N，则找出遗漏的 `mov rSaved,rAPCS` spill 对并补入参数行 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_missing_param_from_push_count.md`
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 

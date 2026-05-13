@@ -61,6 +61,7 @@ model: sonnet
 | 函数体仅 `bx lr` | `feedback_release_noop_stub_fingerprint.md` (R3/R5 无参/无副作用满分; 类型 B 置信度 high 合法) |
 | R3 任意参数含 "unknown"/裸类型无语义注 | `feedback_caller_traced_param_type.md` (直接扣 R3 到 0; 要求重做 caller-trace) |
 | R3 数值型 index 参数缺 [lo..hi] 范围 | `feedback_r3_param_range_required.md` (扣 R3; executor 补范围后重审) |
+| R3 列出的 APCS 参数数量 < prologue push 中 callee-save 寄存器数量 N | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_missing_param_from_push_count.md` (扣 R3; 要求 executor 补全 `mov rSaved,rAPCS` spill 对对应的参数行) |
 | R4 返回值仅写数值（"returns 1" 无含义）或缺路径说明，或整节 `- 返回:` 行缺失 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md` (R4=0; 要求补语义+路径; 完全缺返回行同等违规) |
 | 函数入口含 `adds rX, rY, #0x0` 且 r3 含被覆盖寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_entry_instruction_param_clobber.md` (R3=0; 被覆盖 rX 不是独立参数) |
 | 函数入口含 `ldr rN, [pc,#N]` 加载字面量池常量，但 R3 将 rN 列为参数 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_internal_load_misclassified_as_param.md` (R3=0; DAT 加载值是内部常量，不是 APCS 输入) |

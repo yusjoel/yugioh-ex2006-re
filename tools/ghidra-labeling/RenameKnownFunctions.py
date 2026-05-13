@@ -9108,6 +9108,213 @@ RENAMES = [
         "FUN_08058f90+). Sibling enqueue_sprite_attr_with_shape (#681, 0x08045268) is structural "
         "twin + extra OR 0x100 (TYPE_FLAG); this is bare-split version. "
         "Constants: ATTR1_DEFAULT=0x3a, ATTR1_EXT=0x803a, AUX_BYTE_BITS=8, OAM_TYPE_A=0xa."),
+    # campaign-41 batch #41
+    ("FUN_080431ac", "enqueue_equip_slot_sprite_attr",
+        "Enqueues OAM sprite attr for an equip card slot. "
+        "Checks equip chain validity via check_value_in_slot_chain; if chain exists, "
+        "builds OAM attr1 from slot_idx|0x100 and calls enqueue_sprite_attr_record "
+        "with sprite base 0x8037. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u16 equip_slot_ref; r3=u8 flag (via r8). Returns void. "
+        "35 callers, all duel_field related. "
+        "Constants: OAM_ATTR1_BASE=0x8037, OAM_VISIBLE_BIT=0x100."),
+    ("FUN_0808ea28", "enqueue_paired_slot_sprite_attrs_for_player",
+        "Iterates all slot pairs for a player (player*2 rows, up to 11 slots per row). "
+        "For each pair, calls check_slot_card_pair_allowed; if non-zero, reads slot attrs "
+        "and calls enqueue_sprite_attr_with_mode (mode=3) to write OAM. "
+        "Also calls enqueue_equip_slot_sprite_attr for equip chain slots. "
+        "r0=u32 player_data_ptr; r1=u8 player_id [0..1]; "
+        "r2=u8 col_idx [0..10]; r3=u8 row_count [0..1]. Returns void. "
+        "Callers: FUN_08044e30 (duel_field), FUN_0806c368. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, mode=3."),
+    ("FUN_0804543c", "enqueue_equip_card_sprite_attr_for_slot",
+        "Checks if the card on the given player slot belongs to equip set B "
+        "(check_card_id_is_equip_set_b). If yes, selects OAM attr (0x3c or 0x803c) "
+        "based on r2 threshold and player_id, then calls enqueue_sprite_attr_record. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=s16 threshold (ble -> 0x3c, else 0x803c). Returns void. "
+        "5 callers, all duel_field related. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "OAM_ATTR_DEFAULT=0x3c, OAM_ATTR_FLIP=0x803c."),
+    ("FUN_08045314", "enqueue_effect_card_slot_sprite_attr",
+        "Gets effect category for card on player slot (get_card_effect_category) "
+        "and compares with effect card value (get_slot_effect_card_value). "
+        "Selects OAM attr (0x3c default or DAT_080453fc) based on zone_col and zone_row, "
+        "then calls enqueue_sprite_attr_record and/or enqueue_sprite_attr_with_mode. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u8 zone_col [0..9]. Returns void. "
+        "5 callers, all duel_field. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "OAM_DEFAULT=0x3c, mode_values=0x12/0x22."),
+    ("FUN_08043128", "enqueue_equip_chain_slot_sprite_attr",
+        "Finds equip chain node via find_equip_chain_node_by_slot_pair. "
+        "If node exists, builds OAM attr1 (base 0x8037, high bits 0xa000) "
+        "and calls enqueue_sprite_attr_record to enqueue equip chain slot sprite. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_a [0..9]; "
+        "r2=u32 packed_slot_pair (hi byte=slot_b, lo byte=equip_ref); "
+        "r3=u8 equip_type. Returns void. "
+        "7 callers, duel_field related. "
+        "Constants: OAM_SPRITE_BASE=0x8037, OAM_ATTR_HIGH=0xa000."),
+    ("FUN_0804317c", "enqueue_equip_chain_all_slots_for_pair",
+        "Iterates all player (0..1) x slot (0..10) combinations and calls "
+        "enqueue_equip_chain_slot_sprite_attr for each pair to refresh all equip chain "
+        "slot OAM sprite attributes. "
+        "r0=u8 side_a [0..1]; r1=u8 side_b [0..1]. Returns void. "
+        "Called only by FUN_08044e30 (duel_field hub). "
+        "Inner loop: slot [0..10]; outer loop: player [0..1]."),
+    ("FUN_08032a8c", "find_best_slot_for_card_by_player",
+        "Scans monster zone (slots 0..4) if card field5 is nonzero, otherwise trap zone "
+        "(slots 5..10). In monster path calls check_slot_card_pair_allowed and checks "
+        "[slot+0x8]; in trap path compares card_id and checks active_bit and [slot+0x10] "
+        "bit flags. Returns best slot ATK value (ldrh [slot+0x4]) or 0 if not found. "
+        "r0=u8 player_id [0..1]; r1=ptr slot_ref. Returns u16 best_atk_value. "
+        "Called only by find_best_slot_atk_across_players. "
+        "Constants: gDuelFieldSlots=0x0201c510, equip_zone_offset=0x10a4, "
+        "player_stride=0x868, slot_entry_size=0x14."),
+    ("FUN_08032b98", "find_best_slot_atk_across_players",
+        "Calls find_best_slot_for_card_by_player twice (player=0 then player=1) "
+        "on the same slot_ref and returns the larger ATK value. "
+        "If player=0 result is 0 returns player=1 result; "
+        "if player=1 result is 0 or smaller, returns player=0 result. "
+        "r0=ptr slot_ref. Returns u16 best_atk_value (0 if neither found). "
+        "Called by populate_effect_node_snapshot."),
+    ("FUN_0805b5f0", "populate_effect_node_snapshot",
+        "Batch-fills a snapshot struct (r0 ptr) with effect zone node pointers and "
+        "chain entries. Clears [r7+0x18], then calls find_effect_node_in_zone (x6) "
+        "and check_value_in_slot_chain (x5) to write [r7+0x0..0x2c]. "
+        "If count_field_copies_of_card>0, also calls find_best_slot_atk_across_players "
+        "and conditionally overwrites [r7+0x10/0x14]. "
+        "Then scans slot pairs and calls find_paired_zone_entry_for_card / "
+        "count_occupied_monster_zones. "
+        "r0=ptr effect_snapshot. Returns void. "
+        "Callers: FUN_0805b990, FUN_0805bc48. "
+        "Constants: zone_id=0xb, chain_check_const=0xc240, type_codes=1/2."),
+    ("FUN_0803670c", "query_slot_card_type_eligibility",
+        "Routes eligibility check based on card field6 (get_card_extended_stat_field6): "
+        "field6==0x17 (field spell) -> reads byte[+0x2] bit0 for side and calls "
+        "check_slot_fieldspell_eligible_by_side; "
+        "field6==0x16 (equip/continuous) -> calls query_slot_effect_eligibility_nonzero; "
+        "other types in zone_col 5..9 -> check_card_field5_is_nonzero then same. "
+        "r0=ptr card_slot_entry; r1=u8 player_id [0..1]; r2=u8 zone_col [0..9]. "
+        "Returns u8 eligible_flag (1=eligible, 0=not). "
+        "74 callers (C_util_high). "
+        "Constants: FIELD_SPELL=0x17, EQUIP_CONTINUOUS=0x16, zone_col_range=[5..9]."),
+    ("FUN_0804640c", "check_slot_equip_placement_valid",
+        "Comprehensive check whether equip card can be placed on slot (player, zone_col). "
+        "Steps: (1) read slot card_id, reject if zero; "
+        "(2) query_slot_card_type_eligibility; "
+        "(3) if zone_col!=0 call check_card_equip_eligible_for_slot; "
+        "(4) if card_id==0x169f check side match; "
+        "(5) check byte[slot+0x4] bit4; "
+        "(6) if card_id==0x1258 check gP1LifePoints+offset bit2. "
+        "r0=ptr duel_field_base; r1=u8 player_id [0..1]; r2=u8 zone_col [0..9]. "
+        "Returns u8 valid_flag (1=placeable, 0=not). "
+        "Called only by build_equip_placement_valid_bitmap. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "equip_zone_offset=0x10a4, card_id_169f=0x169f, card_id_1258=0x1258."),
+    ("FUN_08046538", "build_equip_placement_valid_bitmap",
+        "Iterates all player (0..1) x slot (0..10) combinations. "
+        "For each, calls check_slot_equip_placement_valid and ORs result bit "
+        "(1<<(player*16+slot)) into internal bitmap r8. "
+        "Returns accumulated valid placement bitmap. "
+        "r0=ptr duel_field_ptr; r1=u32 equip_mask; r2=u8 player_side [0..1]. "
+        "Returns u32 valid_placement_bitmap. "
+        "Called by update_equip_target_bitmap_for_field (indeg=25, duel_field). "
+        "Bitmap formula: 1<<(player_id*16+slot_idx); slot [0..10], player [0..1]."),
+    ("FUN_0804659c", "check_slot_equip_target_eligibility",
+        "Checks if slot meets equip target conditions. "
+        "Reads stack param 5 (extra_param); uses zone_flags bit1 to set extra_flag. "
+        "Gets entity ref via get_zone_slot_entity_ref_by_type. "
+        "Routes by field6: 0x16->query_slot_effect_eligibility_nonzero, "
+        "0x17->check_slot_fieldspell_eligible_by_side. "
+        "Also requires count_equip_chain_default_flags!=0 and "
+        "find_equip_target_for_card_slot to succeed. "
+        "r0=ptr card_slot_ptr; r1=u8 player_id [0..1]; "
+        "r2=u8 zone_flags [0..0xF] (bit1=extra_flag trigger); "
+        "r3=u8 zone_col [0..9]; sp+0x34=u32 extra_param. "
+        "Returns u8 eligible_flag (1=eligible, 0=not). "
+        "Callers: FUN_08047724, FUN_08046538. "
+        "Constants: EQUIP_CONT=0x16, FIELD_SPELL=0x17, zone_flags_bit1=0x2."),
+    ("FUN_08043644", "enqueue_sprite_attrs_for_card_chain_list",
+        "Reads linked list head from slot [+0xa]; if non-zero, traverses chain. "
+        "For each entry, reads byte[+0x2] bits[3:0] and compares with chain_type_filter. "
+        "On match, calls enqueue_equip_slot_bitmap_update with [entry+0x0], [entry+0x1] "
+        "and [entry+0x6] halfword. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u8 chain_type_filter [0..15]. Returns void. "
+        "Called only by FUN_08044e30 (duel_field hub). "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "chain_entry_base=0x0201d9c0, link_field_offset=0xa, entry_size=8."),
+    ("FUN_08044e30", "update_duel_field_slot_sprite_state",
+        "Full sprite state update for a duel field slot (player_id, slot_idx, side_flag). "
+        "Compares gP1LifePoints+offset control word bit5 against side_flag; exits if mismatch. "
+        "Reads card_id (low 13 bits), calls set_field_slot_bit_with_sprite_update, "
+        "then dispatches by slot_idx<=4 vs >4 to sub-paths calling enqueue_effect_card_slot_sprite_attr, "
+        "enqueue_equip_card_sprite_attr_for_slot, enqueue_equip_slot_sprite_attr, "
+        "enqueue_equip_chain_all_slots_for_pair, enqueue_sprite_attrs_for_card_chain_list, "
+        "enqueue_paired_slot_sprite_attrs_for_player. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; r2=u8 side_flag [0..1]. "
+        "Returns void. "
+        "Callers: FUN_08044dcc, FUN_0805b990 (both duel_field). "
+        "Constants: player_stride=0x868, ctrl_offset=0x40, card_id_shift=0x13, "
+        "monster_zone_max=4."),
+    ("FUN_08047724", "update_equip_target_bitmap_for_field",
+        "Builds and updates equip target valid bitmap for current duel field state. "
+        "Phase 1: iterates player=0..1 x slot=0..4, calls count_equip_chain_default_flags, "
+        "writes bits to internal bitmap r9; calls build_equip_placement_valid_bitmap "
+        "and stores in sp[0x10]. "
+        "Phase 2: iterates player=0..1 x slot=0..10, filters spells via "
+        "check_card_type_is_spell, dispatches by zone_type (0xb/0xd); "
+        "calls scan_equip_zone_candidates_with_snapshot, count_field_copies_of_card, "
+        "check_slot_equip_target_eligibility per slot. "
+        "Finally writes combined sprite flags to gP1LifePoints+0x10d4 control field "
+        "and calls increment_lp_bar_display_counter. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u8 zone_flags [0x0..0xF]; r3=u8 side_flags [0..2]. Returns void. "
+        "25 callers (C_util_high, all duel_field). "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "equip_ctrl_offset=0x10d4, aux_offset=0x1ce8, "
+        "chain_flags_param=0x1825, chain_entry_base=0x0201e1c8."),
+    ("FUN_0804790c", "prepare_slot_ctx_for_equip_bitmap",
+        "Initializes target struct (memset 0x18 bytes to zero), writes r1 (halfword) "
+        "to [sp_buf+0x0], reads byte[r2+0x2] bit1 and merges into [r2+0x2], "
+        "then calls update_equip_target_bitmap_for_field (zone_flags=0xe, side_flags=2). "
+        "r0=u8 player_id [0..1]; r1=u16 slot_ref; r2=ptr card_slot_ptr. Returns void. "
+        "Callers: enqueue_equip_slot_bitmap_update and 4 duel_field callers. "
+        "Constants: memset_size=0x18, zone_flags=0xe, side_flags=0x2, bit1_mask=0x2."),
+    ("FUN_0804794c", "enqueue_equip_slot_bitmap_update",
+        "Computes slot bitmask 1<<(player*16+slot), then XORs player_id with r2 "
+        "(player_xor_flag) and calls prepare_slot_ctx_for_equip_bitmap. "
+        "Returns 1 if bitmap & slot_bit is nonzero, else 0. "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u8 player_xor_flag [0..1]; r3=ptr card_slot_ptr. "
+        "Returns u8 slot_in_bitmap (1=in valid bitmap, 0=not). "
+        "43 callers (C_util_high, all duel_field). "
+        "Bitmap formula: 1<<(player_id*16+slot_idx)."),
+    ("FUN_0805b990", "scan_equip_zone_candidates_with_snapshot",
+        "Calls populate_effect_node_snapshot to fill stack snapshot struct (sp+0x0, 0x48 bytes). "
+        "Then iterates player=0..1 x slot=0..9; for each slot with card_id!=0, "
+        "runs check_card_is_zone_pair_restricted, check_card_field8_is_normal, "
+        "handles special card ID rules, and dispatches monster (slot<=4) vs "
+        "magic/trap (slot>4) sub-paths. On match calls "
+        "update_duel_field_slot_sprite_state to refresh OAM. "
+        "r0=ptr duel_field_ctx; r1=u8 slot_idx [0..0xa]; "
+        "r2=u8 zone_flags [0..0xF]. Returns void. "
+        "Callers: FUN_08047724, FUN_0806d960, FUN_08090218. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, "
+        "monster_zone_max=4, snapshot_size=0x48."),
+    ("FUN_0804a334", "render_monster_slot_card_with_lp_bar",
+        "Full display sequence for the card on the first available monster slot "
+        "for a player: (1) reads field6/field9; if field6==0x16 and field9==2, "
+        "calls enqueue_equip_slot_bitmap_update (slot=0xa, r2=0); "
+        "(2) calls render_field_card_copy_count; "
+        "(3) if slot has card, calls enqueue_sprite_attr_type11 (r1=0x198a); "
+        "(4) calls submit_lp_bar_sprite_row_by_type (slot_key=0xa). "
+        "r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; "
+        "r2=u8 player_flag [0..1]. Returns void. "
+        "Callers: FUN_0806c828, FUN_08095d84 (duel_field). "
+        "Constants: player_stride=0x868, gDuelFieldSlots_offset=0x0201c600, "
+        "FIELD6_EQUIP=0x16, FIELD9_TYPE2=0x2, slot_key=0xa, sprite_tile=0x198a."),
 ]
 
 
