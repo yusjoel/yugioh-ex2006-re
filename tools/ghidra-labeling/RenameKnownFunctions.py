@@ -9496,6 +9496,195 @@ RENAMES = [
         "Callers: FUN_080ac004, FUN_080ae050, FUN_080aef1c, FUN_080aefc4, FUN_080af070. "
         "Constants: zone_base=0x0201c510, player_stride=0x868, slot_stride=0x14, "
         "score_low_threshold=4, score_A=0x4b0, score_B=0x708, score_C=0x834."),
+
+    # 2026-05-13: campaign-43 batch #43 (topo=856..913, 20 fns)
+    ("FUN_08033370", "count_active_cards_in_zone_by_player",
+        "Iterates first 4 zone slots of gDuelFieldSlots for the given player_side, "
+        "counts slots where bit9 is set (active) and slot[+6] card_id matches target_card_id. "
+        "r0=u32 player_side [0..1]; r1=u16 target_card_id. Returns u32 count [0..4]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "active_bit=bit9, loop_count=4."),
+    ("FUN_080aec7a", "exit_slot_search_with_result",
+        "Shared epilogue thunk for find_empty_slot_for_card_id_dispatch (FUN_080ae050). "
+        "Body is pure callee-restore epilogue: add sp,#0x2c + pop r8/r9/r10 via .hword 0x46xx "
+        "+ pop {r4..r7} + pop {r1}; bx r1. "
+        "Called by FUN_080ae050 when a valid slot (>=0) is found (5 callsites). "
+        "No independent business logic; mirrors the push/sub-sp prologue of FUN_080ae050."),
+    ("FUN_080ae050", "find_empty_slot_for_card_id_dispatch",
+        "Uses r1 (card_id) as key via multi-range BST + linear search to find an empty field slot. "
+        "Checks [0x0201e4f0+0xc] global activation state; if 0 skips main body. "
+        "Dispatches by card_id range: calls check_compound_pair_activation_eligible, "
+        "find_first_empty_slot_for_card_type, find_slot_by_card_type_and_player, "
+        "find_random_empty_slot_excluding_card_id. "
+        "On slot found (>=0) calls exit_slot_search_with_result (FUN_080aec7a) to return. "
+        "Side effect: [0x0201afe0] = r0 (card_slot_ptr, current card processing ctx). "
+        "r0=ptr card_slot_ptr; r1=u16 card_id; r2=u32 player_side [0..1]. "
+        "Returns s32 slot_index (>=0) or -1."),
+    ("FUN_080aece4", "fill_effect_slots_up_to_count",
+        "Loops calling find_empty_slot_for_card_id_dispatch (FUN_080ae050) to fill up to "
+        "max_count effect slots, then calls write_effect_ctx_slot_index + set_tile_palette_index_in_buf "
+        "for each found slot (palette index = loop counter r4). "
+        "Triggered by init_effect_slot_display_context (FUN_080941c4) for card effect type [0x7..0x26]. "
+        "Side effects: [gP1LifePoints+0x1d40]=r4 (final slot count); "
+        "[0x0201afe0]=card_slot_ptr (via FUN_080ae050). "
+        "r0=ptr card_slot_ptr; r1=u16 card_id_a; r2=u16 card_id_b; r3=u32 max_count [0..N]. "
+        "Returns u32 actual_filled_count [0..max_count]. "
+        "Constants: gP1LifePoints+0x1d40 = effect_slot_count_field."),
+    ("FUN_080aec8c", "activate_effect_slot_for_card",
+        "Activates a single effect slot for one card: calls dispatch_effect_handler_by_card_id; "
+        "if non-zero writes [0x0201afe0]=card_slot_ptr, calls find_empty_slot_for_card_id_dispatch "
+        "to get slot r4, then write_effect_ctx_slot_index(r4) + set_tile_palette_index_in_buf(r4,1) "
+        "+ [gP1LifePoints+0x1d40]=1. "
+        "Triggered by init_effect_slot_display_context for card_type==6 or 0x49. "
+        "r0=ptr card_slot_ptr; r1=u16 card_id; r2=u32 context_param. "
+        "Returns s32 slot_index (>=0) or -1. "
+        "Side effects: [0x0201afe0]=card_slot_ptr; [gP1LifePoints+0x1d40]=1."),
+    ("FUN_080aed4c", "fill_effect_slots_up_to_count_with_equip_cap",
+        "Symmetric to fill_effect_slots_up_to_count (FUN_080aece4) but adds special handling "
+        "when r8 (card_id_b) == 0x18e0 (0xc7*0x20): calls count_equip_slots_active_only(1-r7) "
+        "and uses its result to further cap max_count. "
+        "Triggered by init_effect_slot_display_context for card effect type [0x28..0x47]. "
+        "Side effects: [gP1LifePoints+0x1d40]=r4 (final count); [0x0201afe0]=card_slot_ptr. "
+        "r0=ptr card_slot_ptr; r1=u32 player_side_or_ref; r2=u16 card_id_b; r3=u32 max_count. "
+        "Returns u32 actual_filled_count. "
+        "Constants: 0x18e0=special_card_id_threshold; gP1LifePoints+0x1d40=effect_slot_count_field."),
+    ("FUN_080941c4", "init_effect_slot_display_context",
+        "Effect slot display context init hub (indeg=39). "
+        "Saves r0..r3 to r6/r5/r7/r8, loads gEffectDisplayCtx (0x0201e4f0): "
+        "writes [+0x0]=card_slot_ptr, [+0x4]=card_type, [+0x8]=0; "
+        "zero-fills [+0x10..+0x20f] and [+0x410..+0x50f]. "
+        "Dispatches by card_type: type==6 or 0x49 -> activate_effect_slot_for_card; "
+        "type [7..37] -> fill_effect_slots_up_to_count (max=type-6); "
+        "type [0x28..0x47] -> fill_effect_slots_up_to_count_with_equip_cap (max=type-0x27); "
+        "type > 0x49 -> [gP1LifePoints+0x1d40]=0x161c; "
+        "default -> dispatch_effect_handler_by_card_id + dispatch_card_display_op(0x32). "
+        "r0=ptr card_slot_ptr; r1=u32 card_type; r2=u32 player_side_or_ref; r3=u32 extra_param. "
+        "Returns void. "
+        "Constants: gEffectDisplayCtx=0x0201e4f0, zero_fill_1=0x200 bytes, "
+        "zero_fill_2=0x100 bytes, 0x161c=special_count_value."),
+    ("FUN_08097150", "dispatch_to_effect_handler_by_card_type",
+        "Linear scans ROM effect handler table (DAT_0809717c=0x09e47560) "
+        "with entry stride=0x10, up to 0x11 (17) entries. "
+        "Matches r1 (card_type) against entry[+0x0]; on match reads handler ptr at [+0xc+offset] "
+        "and calls FUN_0810e5d4(r5, r4, r6, r3). "
+        "r0=ptr context_ptr; r1=u16 card_type; r2=u32 sub_param. Returns void. "
+        "Callers: dispatch_effect_slot_by_display_state (state==2 path), FUN_080bb414."),
+    ("FUN_08095ec4", "dispatch_effect_slot_by_display_state",
+        "Reads [gP1LifePoints+0x1d60] (0xeb<<5) display state; dispatches 0/1/2: "
+        "state==0: trigger_card_display_op31_if_not_active(r6, 0x114); "
+        "state==1: init_effect_slot_display_context(r6, 6, r7) then state++; "
+        "state==2: reads monster slot fields via get_monster_slot_entry_ptr x3, "
+        "calls dispatch_to_effect_handler_by_card_type, clears [gP1LifePoints+0x1d54]=0. "
+        "r1=u32 context_ptr (saved as r6); r2=u32 sub_param. Returns void. "
+        "Side effects: [gP1LifePoints+0x1d60]+=1 (state 0/1); [gP1LifePoints+0x1d54]=0 (state 2). "
+        "Caller: FUN_08085d4c (effect slot display update driver)."),
+    ("FUN_080933c8", "invoke_card_display_op_0x31_with_params",
+        "4-instruction thunk: reorders r0/r1 as dispatch_card_display_op args. "
+        "Fixed op=0x31 (copy_game_text_to_card_name_vram), sub1=0x2. "
+        "Actual call: dispatch_card_display_op(0x31, 0x2, r0_in, r1_in). "
+        "Sibling of invoke_card_display_op_0x31 (0x0809355c) which uses fixed 4-arg form. "
+        "r0=ptr card_slot_ptr (becomes dispatch r2); r1=u32 sub_param (becomes dispatch r3). "
+        "Callers: FUN_0804ce78 (card name display), FUN_08085d4c (effect slot render)."),
+    ("FUN_0804394c", "enqueue_zone_card_sprite_attr_by_slot",
+        "Reads gDuelFieldSlots[player_side][slot_idx]; if bit9 set (slot occupied), "
+        "builds OAM sprite attr and calls enqueue_sprite_attr_record. "
+        "OAM_ATTR0_BASE=0x8035 (Y_pos[7:0]=0x35, bit15=1, 4bpp square shape). "
+        "slot offset = slot_idx*0x14; player offset = (player_side&1)*0x868. "
+        "slot[+8] halfword: 0 -> flip_flag=1, non-zero -> flip_flag=0. "
+        "Calls enqueue_sprite_attr_record(0x8035, slot_idx_masked, flip_flag, 4). "
+        "r0=u32 player_side [0..1]; r1=u32 slot_idx [0..10]. Returns void. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "OAM_ATTR0_BASE=0x8035, OAM_count=4."),
+    ("FUN_08095ba8", "init_equip_card_sprite_row_entry",
+        "Initializes OAM sprite row entry for an equip card. "
+        "Reads player_bit from [gP1LifePoints+0x1d68], base_slot_a from [+0x1d6c], "
+        "slot_b from [+0x1d70]; slot_idx = slot_a + slot_b. "
+        "If slot[+0x38]==0 (not yet rendered): calls enqueue_zone_card_sprite_attr_by_slot. "
+        "Else: builds OAM attr0 word and calls init_card_sprite_row_entry_alt or "
+        "init_card_sprite_row_entry (fallback). "
+        "Clears [gP1LifePoints+0x1d54]=0 at end. "
+        "r0=u32 context_extra (saved to r8 via .hword 0x4680=mov r8,r0). Returns void. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "slot_rendered_offset=0x38; gP1LifePoints offsets 0x1d44/0x1d48/0x1d54/0x1d68/0x1d6c/0x1d70. "
+        "Callers: FUN_0804ce78, FUN_08085d4c (equip card display sequence)."),
+    ("FUN_08096988", "write_card_display_ctx_fields",
+        "Leaf function (bx lr). Writes 5 gP1LifePoints fields for card display context init. "
+        "Side effects: [gP1LifePoints+0x1d4c]=r0 (display_key); "
+        "[+0x1d7c]=0; [+0x1d58]=0; [+0x1d54]=0; "
+        "[+0x1d64]=[gDuelActivation+4] (copy activation slot ref). "
+        "r0=u32 display_key (card_id or display area id). Returns void. "
+        "Constants: gP1LifePoints, gDuelActivation=0x0201e2a0; "
+        "offsets 0x1d4c/0x1d7c/0x1d58/0x1d54/0x1d64. "
+        "indeg=6; all callers are card_frame+card_ids context."),
+    ("FUN_080af940", "check_effect_zone_available_for_player",
+        "Checks if specified player side has any available effect zone slot. "
+        "Reads gP1LifePoints[player_side&1 * 0x868 + 0xc] (zone count); "
+        "if > 6 returns 1 (full). Otherwise calls count_available_effect_zones(player_side, 0x1387, -1). "
+        "count > 0 -> return 0 (slot available); count == 0 -> return 1 (no slot). "
+        "r0=u32 player_side [0..1]. Returns u32: 0=available, 1=no slot. "
+        "Constants: player_stride=0x868, zone_count_offset=0xc, zone_limit=6, "
+        "zone_id=0x1387, quota=-1. "
+        "Callers: FUN_080b499c, FUN_080baed0, FUN_080bb9b8 (duel_field activation eval)."),
+    ("FUN_0805bc48", "check_card_normal_summon_eligible_full",
+        "Multi-condition normal summon eligibility check for card r1 (card_id), player r0. "
+        "Entry: populate_effect_node_snapshot; check_card_is_zone_pair_restricted -> return 0 if restricted. "
+        "Branches on get_card_extended_stat_field6==0x17 (compound) or not, "
+        "checks field9==2/3/4, check_card_field5_is_nonzero, find_effect_node_in_zone. "
+        "Also checks count_occupied_monster_zones_with_effect_bonus>=3 -> "
+        "count_available_effect_zones(player, DAT=0x1955, -1)==0 -> return 0. "
+        "End: slot[+2] & 0x303e==0x201c && count_field_copies_of_card(0x17b9)>0 -> "
+        "FUN_0803088c (non-type-0xe slot summon check). "
+        "r0=u32 player_side [0..1]; r1=u16 card_id. Returns u32: 1=eligible, 0=not. "
+        "Constants: field6_compound=0x17, zone_limit=3, 0x1302=specific_card, "
+        "0x303e/0x201c=status_mask/value, 0x17b9=card_id_check."),
+    ("FUN_08037a8c", "find_zone_slot_idx_allowed_for_card",
+        "Scans gDuelFieldSlots for player_side, returns first slot index where "
+        "check_card_pair_allowed(slot_card_id, target_card_id) passes. "
+        "Zone count upper bound from gP1LifePoints[side*0x868+0xc]. "
+        "Slot card_id extracted as low 13 bits (lsls/lsrs #0x13). "
+        "r0=u32 player_side [0..1]; r1=u16 target_card_id. Returns s32 slot_idx (>=0) or -1. "
+        "indeg=8. Constants: player_stride=0x868, zone_count_offset=0xc, slot_pool_offset=0x120."),
+    ("FUN_0804c38c", "classify_card_id_summon_category",
+        "Large BST: classifies card_id r0 into 3 summon/effect categories. "
+        "Returns 0 = no category (not in any known range), "
+        "1 = category-1 (primary range including up to 0x1631), "
+        "2 = category-2 (special subset e.g. 0x19c0/0x19d7). "
+        "Used by check_effect_slot_summon_path_eligible (FUN_0803088c) to decide activation path. "
+        "r0=u16 card_id [0..0x1fff]. Returns u32 category [0..2]. "
+        "Constants: upper_bound=0x1631, special_card=0x1488; "
+        "exit labels: LAB_0804c6be->1, LAB_0804c6c2->2, LAB_0804c6c6->0."),
+    ("FUN_0803088c", "check_effect_slot_summon_path_eligible",
+        "Iterates effect slot group pointed to by r0; skips slots with type==0xe "
+        "(bits[23:16] from read_effect_slot_side_and_type). "
+        "After loop: calls classify_card_id_summon_category on slot[+0x0] (card_id). "
+        "category==1 -> return 1 (eligible); "
+        "category==2 -> checks specific card_ids (0x1534/0x133b/0x1449/0x1452 etc.) "
+        "and slot[+3] bit4/5 (0x10/0x20 summon flags) -> return 0 or 1; "
+        "category==0 -> return 0. "
+        "r0=ptr effect_slot_group (contains [+0]=card_id, [+3]=flags, [+4]=slot_count). "
+        "Returns u32: 1=normal-summon-path eligible, 0=not. "
+        "Constants: type_skip=0xe; summon path card_ids: 0x1534/0x133b/0x1449/0x1452/0x19c0 etc."),
+    ("FUN_0805bcf0", "check_card_special_summon_eligible_full",
+        "Multi-layer special summon eligibility check for card_slot_ptr r0. "
+        "Entry: check_card_field5_is_nonzero, check_card_field8_is_normal (both must pass). "
+        "Then: find_zone_descriptor_by_slot_id, get_card_field_summon_restriction, "
+        "count_field_copies_of_card (0x148e/0x14da/0x166c), check_value_in_slot_chain, "
+        "count_occupied_monster_zones_with_effect_bonus>=3 -> count_available_effect_zones==0 -> 0. "
+        "For zone_type [5..0xa]: bl check_card_normal_summon_eligible_full; "
+        "then count_field_copies_of_card(0x159d) + check_effect_slot_summon_path_eligible. "
+        "End: slot[+2] & 0x303e==0x201c -> count_field_copies_of_card(0x17b9)->eligible. "
+        "r0=ptr card_slot_ptr (slot[+0]=card_id, slot[+2]=flags, slot[+4]=zone_bits). "
+        "Returns u32: 1=special-summon eligible, 0=not. "
+        "indeg=3: FUN_0809f21c, FUN_080ad974, FUN_080bae6c."),
+    ("FUN_080bae6c", "check_card_summon_eligible_by_field6",
+        "Determines player_side and zone_id from get_card_extended_stat_field6 value "
+        "(0x16 -> zone_id=0x17d4; 0x17 -> zone_id=0x17c6; default -> zone_id=0x1771). "
+        "Calls count_available_effect_zones(player_side, zone_id, -1); "
+        "if count > 0 returns 1 (slot available); "
+        "else falls back to check_card_special_summon_eligible_full (FUN_0805bcf0). "
+        "r0=ptr card_slot_ptr. Returns u32: 1=summon eligible, 0=not. "
+        "Constants: field6_vals=0x16/0x17, zone_ids=0x17d4/0x17c6/0x1771, quota=-1. "
+        "Callers: FUN_080b499c, FUN_080baed0 (duel_field activation eval chain)."),
 ]
 
 
