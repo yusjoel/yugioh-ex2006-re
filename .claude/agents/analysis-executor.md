@@ -104,6 +104,12 @@ model: sonnet
 3. 置信度标了 (high/med/low)
 4. 参数类型不是裸 "input"/"value"
 5. **ARM 助记符冲突**: proposed_name 每段不在 {`str`, `ldr`, `mov`, `cmp`, `sub`, `add`, `bl`, `bx`, `pop`, `push`, `mul`, `lsl`, `lsr`, `asr`} → 命中立即换词 (`_str_`→`_text_`)
+5a. **裸 card_id 硬停门 (cluster 强制)**: Grep proposal 中所有 `proposed_name` 行是否匹配 `_0x[0-9a-f]{3,}` 或 `_card_[0-9a-f]+`。任一命中 → **立即停止**, 不得提交; 转入以下流程:
+    1. 从函数体 asm 枚举所有 card_id 常量 (cmp/ldr 立即数)
+    2. 若为 sibling cluster: 枚举所有兄弟函数的 card_id 常量, 建立映射表
+    3. 打开 `doc/dev/data.md`, 逐条查 card_id → 卡名 → snake_case (去冠词 the/of/a, 用 _ 连接)
+    4. 全部替换后重新自检步骤 5a
+    **此检查不可省略**; batch #49 11 函数全部命中此模式, 浪费一整轮 iter1 review (见 `feedback_bare_card_id_in_name.md`)
 6. **R7 pending caller 硬扫**: Grep `待确认` 在 proposal 的 `调用图` 段 → 必须 0; 若所有 caller 都是 FUN_*, 每个 caller 必须已写形式 (b) `addr 0x0xxxxxxx (tags: ..., role: ...)`, 不得留占位符
 7. **plate ASCII 硬扫**: Grep plate 段中所有 Unicode 排版字符 — 必须全 0。目标字符（不限于）: 弯引号 `""`（U+201C/U+201D）/ 单弯引号 `''`（U+2018/U+2019）/ 全角括号 `（）`（U+FF08/U+FF09）/ 中文顿号 `、`（U+3001）/ 中文逗号 `，`（U+FF0C）/ 全角冒号 `：`（U+FF1A）/ 破折号 `——`（U+2014/2015）/ 省略号 `……`（U+2026）/ **箭头类**: `→`（U+2192）/ `←`（U+2190）/ `↑`（U+2191）/ `↓`（U+2193）及整个 ARROWS block（U+2190..U+21FF）→ 全部替换为最接近的 ASCII 对应符号（箭头 → `->` 或 `->`）；汉字本身不受影响（`feedback_jython_unicode_plate_comment.md`）
 8. **R3 数值范围硬扫**: 逐行扫参数签名段 — 每个 index / slot / type_code / count 类参数 必须有 `[lo..hi]` 标注; 若有 `[0..N-1]` 或 `[0..max_xxx-1]` 等符号上界 → 必须换成具体数字 (查 asm guard 或 table size); 缺任一立即补写再提交
@@ -164,7 +170,7 @@ model: sonnet
 - caller bl 前含 `lsls rX,rN,#S; lsrs rX,rX,#S`（低 N 位提取）或单步 `lsrs rX,rX,#S`（高位/符号位提取）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callsite_bit_shift_param_range.md` (静态计算范围 [0..2^(32-S)-1] 写入 R3; Form B #0x1f → [0..1] player_id)
 - R7 caller 地址填写时须自检：(1) addr != 本函数地址（禁止自引用）; (2) addr 必须存在于 complete_callgraph.csv 中以本函数为 callee 的 bl 记录（禁止将地址相邻的 sibling 误列为 caller）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md` + `feedback_r7_self_reference.md`
 - plate comment 草稿完成后估算字数：超过 500 字（≈35 行×13 词）→ 立即压缩 Side effects: 为单子句形式，压缩 Constants: 为 NAME=value // 一词说明，分析性prose 移至 proposal body → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md`
-- proposed_name 含 `_0x[0-9a-f]{3,}_` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 必须查 doc/dev/data.md 替换为语义卡名; 复现 0x08033088+0x080a3c2c)
+- proposed_name 含 `_0x[0-9a-f]{3,}_` / `_card_[0-9a-f]+` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 单函数或 sibling cluster 均须在提交前一次性查 doc/dev/data.md 解析全部 card_id; batch #49 11 函数同批命中; 复现 0x08033088+0x080a3c2c+batch#49-cluster)
 - sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)
 - plate comment 草稿含"推测/可能/大概/似乎/应该是"等主观词 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_speculative_language_in_plate.md` (R2=0; 必须以 caller-tag callsite 事实替代; batch #26 两函数命中)
 - R8 置信度节打算写"待 runtime 验证"时，先检查：该值是否来自函数体内字面 `#IMM` → 若是，静态可读，禁止列为待验证项 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_static_value_marked_runtime_pending.md`
