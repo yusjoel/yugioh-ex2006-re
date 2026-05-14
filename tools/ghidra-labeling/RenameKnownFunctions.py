@@ -11370,6 +11370,172 @@ RENAMES = [
         "Symmetric to scan_all_zone_slots_for_equip_chain_sprite_archfiends_roar (0x0809cee8). "
         "Called by duel_field main dispatch hub. "
         "Constants: CARD_ID=0x1876 (Rescue Cat)."),
+
+    # --- batch #53 (campaign-53, 2026-05-15) ---
+    ("FUN_0809d4fc", "scan_spell_trap_zone_slots_for_equip_activation_boss_rush",
+        "Boss Rush (0x1972) spell/trap zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1972 into r0 (overwriting player_id), "
+        "tail-calls scan_spell_trap_zone_slots_for_equip_activation_by_card(0x1972). "
+        "5 instructions: push/ldr/bl/pop r1/bx r1. "
+        "Symmetric to 0x0809d50c (Greed). "
+        "Constants: CARD_ID=0x1972=Boss Rush."),
+    ("FUN_0809ed00", "scan_monster_zone_for_equip_activation_white_magician_pikeru",
+        "White Magician Pikeru (0x1757) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1757 into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1757). "
+        "Symmetric to 0x0809ed10 (Ebon Magician Curran) and 0x0809ed20 (Princess Pikeru). "
+        "Constants: CARD_ID=0x1757=White Magician Pikeru."),
+    ("FUN_080a1d04", "set_lp_display_row_all_slots",
+        "LP display row update for all-slots mode. "
+        "r0=player_id([0..1]), r1=card_id (internal ID, 16-bit). "
+        "Extracts low 16 bits of r1, calls set_lp_display_row_fields(player, 0xf, card_id&0xffff, 0). "
+        "type=0xf = all-slots mode. Called by scan_spell_trap_zone_for_equip_activation_via_packed_attr "
+        "after successful activation. "
+        "Constants: LP_ROW_TYPE=0xf (all slots), ROW_MASK=0, CARD_ID_MASK=0xffff."),
+    ("FUN_0804cc8c", "submit_slot_card_sprite_row_packed",
+        "packed_attr form slot card sprite row submission thin wrapper. "
+        "r0=packed_attr(u32, OAM attribute fields), r1=entity_id(u16). "
+        "Moves r0 to r3 (packed_attr), extracts r1 low 16 bits into r2, "
+        "fixes r0=0/r1=packed_attr, calls submit_slot_card_sprite_row_entry(0, packed_attr, entity_id&0xffff, 0). "
+        "Provides sprite row submission interface for the reverse path of "
+        "scan_spell_trap_zone_for_equip_activation_via_packed_attr. "
+        "Constants: FIXED_R0=0, FIXED_R3=0."),
+    ("FUN_0809f5dc", "scan_spell_trap_zone_for_equip_activation_via_packed_attr",
+        "General spell/trap zone equip activation scanner (packed OAM attr variant). "
+        "r0=player_id([0..1]), r1=card_id(16-bit internal ID). "
+        "Checks gP1LifePoints+0x1d24 loop counter; if 0: init to 5, forward scan slots 0..9, "
+        "builds packed_attr (player_bit|slot|card_id mask merge), calls test_slot_has_active_card, "
+        "on hit calls apply_equip_activation_via_packed_attr; if non-zero then "
+        "calls set_lp_display_row_all_slots; reverse path calls submit_slot_card_sprite_row_packed. "
+        "Resets counter to 0 when done. "
+        "Constants: COUNTER_OFFSET=0x1d24, CARD_ID_MASK=0xffff, SLOT_COUNT=10 (0..9), "
+        "OAM_MASK1=0xf8<<13=0x1f0000, OAM_BASE=0x84<<19=0x4200000."),
+    ("FUN_0809f704", "scan_spell_trap_zone_for_equip_activation_reserved_icid_e",
+        "reserved_icid_e (0x1367, no valid card) spell/trap zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Inverts player_id (r0=1-player_id), loads card_id=0x1367 into r1, "
+        "tail-calls scan_spell_trap_zone_for_equip_activation_via_packed_attr(1-player, 0x1367). "
+        "Symmetric to 0x0809f71c (Recycle, no player invert). icid 0x1367 maps to 0xFFFF (no card). "
+        "Constants: CARD_ID=0x1367=reserved_icid_e (no valid card)."),
+    ("FUN_08047a38", "query_equip_target_bitmap_with_zone_struct",
+        "Equip target bitmap query with stack-allocated zone struct. "
+        "r0=player_id([0..1]), r1=slot_idx([0..4] monster zone), r2=card_id (internal ID). "
+        "Allocates 0x18 bytes on stack for zone_struct, calls memset to zero it. "
+        "Computes player_zone_bit = 1 << (player*16+slot), writes to zone_struct[2]. "
+        "Calls update_equip_target_bitmap_for_field(player_zone_bit, zone=0xf, card_id). "
+        "Returns zone_struct target bitmap AND player_zone_bit (non-zero = target available). "
+        "Sibling of query_equip_target_bitmap_default (fixed side=2/zone=0xe). "
+        "Constants: ZONE_STRUCT_SIZE=0x18, ZONE_PARAM=0xf."),
+    ("FUN_0809cf08", "scan_all_zone_slots_for_return_from_different_dimension_equip",
+        "Return from the Different Dimension (0x17be) all-zone-slot equip chain sprite scanner. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 loop counter to scan slots 0..9. "
+        "Each iter: div 5 -> player_side, mod 5 -> slot_idx; checks activation bit; "
+        "calls check_value_in_slot_chain(player, slot, 0x17be); "
+        "calls check_slot_fieldspell_eligible_by_side(player, slot, 0); "
+        "if both pass calls query_equip_target_bitmap_with_zone_struct; "
+        "if bitmap==0 calls enqueue_equip_slot_sprite_attr(player, slot, 0x17be, r3=1). "
+        "Has extra check_slot_fieldspell_eligible_by_side filter vs Magical Scientist version. "
+        "Constants: CARD_ID=0x17be=Return from the Different Dimension, "
+        "COUNTER_OFFSET=0x1d24, SLOT_STRIDE=0x868, SLOT_COUNT=10."),
+    ("FUN_0809d50c", "scan_spell_trap_zone_slots_for_equip_activation_greed",
+        "Greed (0x1802) spell/trap zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1802 into r0 (overwriting player_id), "
+        "tail-calls scan_spell_trap_zone_slots_for_equip_activation_by_card(0x1802). "
+        "Symmetric to 0x0809d4fc (Boss Rush). "
+        "Constants: CARD_ID=0x1802=Greed."),
+    ("FUN_0809ed10", "scan_monster_zone_for_equip_activation_ebon_magician_curran",
+        "Ebon Magician Curran (0x191d) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x191d into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x191d). "
+        "Symmetric to 0x0809ed00 (White Magician Pikeru) and 0x0809ed20 (Princess Pikeru). "
+        "Constants: CARD_ID=0x191d=Ebon Magician Curran."),
+    ("FUN_080a1ae8", "set_lp_display_row_if_nonzero",
+        "Conditional LP display row update gate. "
+        "r0=player_id([0..1]), r1=lp_delta (signed LP difference). "
+        "Returns immediately if r1==0; otherwise extracts r1 low 16 bits (lsls/lsrs#0x10), "
+        "calls set_lp_display_row_fields(player, 1, lp_delta&0xffff, 0x80). "
+        "Called by scan_equip_zone_for_infinite_cards_lp_display_update with LP delta (LP - threshold). "
+        "Constants: LP_ROW_TYPE=1, ROW_MASK=0x80, LP_DELTA_MASK=0xffff."),
+    ("FUN_0809d914", "scan_equip_zone_for_infinite_cards_lp_display_update",
+        "Infinite Cards (0x1401) + Hieroglyph Lithograph (0x159f) equip zone LP display row update. "
+        "r0=player_id([0..1]). Calls count_field_copies_of_card(0x1401); if not on field continues. "
+        "Calls check_value_in_slot_chain(player, zone=0xb, 0x159f); if hit changes threshold 6->7. "
+        "Calls count_available_effect_zones(1-player, 0xc000, -1); if >0 changes threshold to 5. "
+        "Reads gP1LifePoints+player*0x868+0xc (LP value); if LP>threshold calls "
+        "set_lp_display_row_if_nonzero(player, LP-threshold). "
+        "Constants: CARD_ID_INFINITE_CARDS=0x1401, CARD_ID_HIEROGLYPH=0x159f, ZONE=0xb, "
+        "THRESHOLD_DEFAULT=6, THRESHOLD_WITH_HIEROGLYPH=7, THRESHOLD_WITH_EFFECTS=5, "
+        "LP_STRUCT_OFFSET=0xc, SLOT_STRIDE=0x868."),
+    ("FUN_0809d718", "scan_equip_zone_for_last_turn_activation",
+        "Last Turn (0x151e) equip zone activation scanner. "
+        "r0=player_id([0..1]). Loads card_id=0x151e into r5. "
+        "Calls check_value_in_slot_chain(player, zone=0xb, card_id=0x151e). "
+        "On hit calls count_occupied_monster_zones(player); if non-zero checks "
+        "count_occupied_monster_zones(1-player)==0 (Last Turn requires opponent monster zone empty). "
+        "Both conditions met: calls enqueue_equip_zone_sprite_by_side(player, card_id) "
+        "and enqueue_sprite_attr_type11(player, card_id, mode=5, 0). "
+        "Returns 0 (hit+conditions met) or 1 (no hit/conditions fail). "
+        "Constants: CARD_ID=0x151e=Last Turn, ZONE=0xb, OAM_TYPE11_MODE=5."),
+    ("FUN_0809d51c", "scan_spell_trap_zone_for_two_man_cell_battle_equip",
+        "Two-Man Cell Battle (0x17f8) spell/trap zone equip activation scanner. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 loop counter to scan slots 0..9. "
+        "Each iter: counter/5 -> player_side, counter%5+5 -> slot_idx (slots 5..9, spell/trap). "
+        "Calls test_slot_has_active_card(player_side, slot, card_id=0x17f8). "
+        "On hit builds packed_attr (player_bit|spell/trap slot bits|OAM prefix mask|extracted fields), "
+        "calls apply_equip_activation_with_id_lookup. "
+        "Returns 0 (early-exit on hit) or 1 (all miss). "
+        "Constants: CARD_ID=0x17f8=Two-Man Cell Battle, COUNTER_OFFSET=0x1d24, "
+        "SLOT_STRIDE=0x868, SLOT_OFFSET_BASE=5 (slot=counter%5+5), SLOT_COUNT=10."),
+    ("FUN_0809f71c", "scan_spell_trap_zone_for_equip_activation_recycle",
+        "Recycle (0x16d5) spell/trap zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x16d5 into r1, "
+        "directly (no player invert) tail-calls "
+        "scan_spell_trap_zone_for_equip_activation_via_packed_attr(player, 0x16d5). "
+        "Symmetric to 0x0809f704 (reserved_icid_e, inverts player). "
+        "Constants: CARD_ID=0x16d5=Recycle."),
+    ("FUN_0809c920", "scan_equip_zone_for_strike_ninja_activation",
+        "Strike Ninja (0x16b9) equip zone activation scanner. "
+        "r0=player_id([0..1]). Iterates both sides (player XOR side): "
+        "calls get_node_entity_id_in_slot(player^side, zone=0xb, card_id=0x16b9); "
+        "if entity present builds packed_attr=((player^side)<<31)|0x0a4f16b9, "
+        "calls apply_equip_activation_with_id_lookup(packed_attr, entity_id, 0); "
+        "on success calls enqueue_equip_slot_sprite_attr. "
+        "OAM prefix 0x0a4f is Strike Ninja exclusive (vs general prefix 0x0a4e). "
+        "Constants: CARD_ID=0x16b9=Strike Ninja, OAM_PACKED=0x0a4f16b9, ZONE=0xb."),
+    ("FUN_0809ed20", "scan_monster_zone_for_equip_activation_princess_pikeru",
+        "Princess Pikeru (0x19cd) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x19cd into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x19cd). "
+        "Symmetric to 0x0809ed00 (White Magician Pikeru) and 0x0809ed10 (Ebon Magician Curran). "
+        "Three form LP recovery monster sprite cluster. "
+        "Constants: CARD_ID=0x19cd=Princess Pikeru."),
+    ("FUN_0809cd24", "scan_all_zone_slots_for_equip_chain_sprite_magical_scientist",
+        "Magical Scientist (0x1619) all-zone-slot equip chain sprite scanner. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 loop counter to scan slots 0..9. "
+        "Each iter: counter/5 -> player_side, counter%5 -> slot_idx. "
+        "Checks activation bit. If active: calls check_value_in_slot_chain(player, slot, 0x1619); "
+        "on hit calls query_equip_zone_slot_target_bit(player, slot, 0, 0x1619); "
+        "if bitmap==0 calls enqueue_equip_slot_sprite_attr(player, slot, 0x1619, r3=1). "
+        "Symmetric to scan_all_zone_slots_for_equip_chain_sprite_update but with "
+        "query_equip_zone_slot_target_bit filter. "
+        "Constants: CARD_ID=0x1619=Magical Scientist, COUNTER_OFFSET=0x1d24, "
+        "SLOT_STRIDE=0x868, SLOT_COUNT=10."),
+    ("FUN_0809c6e8", "scan_equip_zone_for_activation_by_card",
+        "General equip zone activation scanner. "
+        "r0=player_id([0..1]), r1=card_id (internal ID, 16-bit). "
+        "Iterates both sides (player XOR side, 2 iterations). "
+        "Calls get_node_entity_id_in_slot(player_xor, zone=0xb, card_id). "
+        "On entity found: builds packed_attr=((player_xor)<<31)|0x0a4e0000|(card_id&0xffff), "
+        "calls apply_equip_activation_with_id_lookup and enqueue_equip_slot_sprite_attr. "
+        "Called by Dark Necrofear/Manticore of Darkness/Fox Fire/Helios Duo/Helios Tris stubs. "
+        "Constants: EQUIP_ZONE=0xb, OAM_PREFIX=0x0a4e0000, CARD_ID_MASK=0xffff."),
+    ("FUN_0809d324", "scan_equip_zone_for_dark_necrofear_activation",
+        "Dark Necrofear (0x1466) equip zone activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1466 into r1, "
+        "tail-calls scan_equip_zone_for_activation_by_card(player_id, 0x1466). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to Manticore of Darkness/Fox Fire/Helios Duo/Helios Tris stubs "
+        "in the same region, all routing through scan_equip_zone_for_activation_by_card. "
+        "Constants: CARD_ID=0x1466=Dark Necrofear."),
 ]
 
 
