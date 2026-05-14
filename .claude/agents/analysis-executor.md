@@ -125,6 +125,10 @@ model: sonnet
 11. **R8 med/low 升级路径**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`)
 12. **R4 返回行存在性硬扫**: Grep `返回:` 或 `- 返回` 在参数签名段 → 必须 ≥ 1 条; 完全缺失返回行与"仅写数值无语义"等同 → R4=0; 确认存在后再检查含义+路径说明是否符合 `feedback_r4_fixed_return_semantic.md`
 13. **scratchpad 净化硬扫**: 提交前对 proposal 全文 grep 以下关键词: `wait`, `actually`, `let me`, `After decode:`, `re-check`, `Note:` (非结构字段内的)。任何命中 → 该段落含探索性中间过程文字, 必须替换为干净结构化内容 (`rN: <type> <name> [range]`)。reasoning 过程留在草稿; proposal 只提交结论。见 `feedback_executor_scratchpad_in_proposal.md` (batch #50 两函数 R3=0)
+14. **sibling-cluster 模板复制盲点硬扫 (batch ≥5 siblings 必须执行)**:
+    - **R7 caller 字段**: Grep 调用图段中 `dispatch 体系|场景调用|hub 调用|由.*调用` — 任一命中表示使用了描述性占位符而非形式 (b)。必须对命中行：(a) 从 batch prompt 或 callgraph 数据中取该函数实际 caller 的 8 位 hex 地址，(b) 填入 `addr 0x0xxxxxxx (tags: <tags>; role: <一句>)` 格式，(c) 禁止用场景名/体系名代替地址。参见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_executor_template_copy_blindspot.md`
+    - **R4 透传语义**: Grep 参数签名段中 `透传.*返回值[^(]` (即"透传 X 返回值"后无括号)。任一命中 → 立即查该 callee 在当前 batch 的前序 proposal 或已有 eval 文件中的 R4 记录，将其 0/1 路径描述补入括号：`透传 callee 返回值 (0=..., 1=...)`。callee 无记录时写 `(含义待确认)` + 置信度降为 med。参见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_fixed_return_semantic.md`
+    - batch #53 13+7 函数同批触发，所有数据在 prompt 中已存在，无需额外查询。
 
 ### Phase 5: 完成报告
 
@@ -183,6 +187,7 @@ model: sonnet
 - 函数体内出现 `bl predicate; bne LAB_skip`（或类似 beq LAB_skip 后跟实质逻辑）时：处理的是 predicate 返回 0 的情况（bne 跳过 nonzero；fall-through = zero-case）；plate 主语必须是 "predicate 返回 0" 的槽/元素；callee 名含正面词（nonzero/valid/active）时，函数处理的是反面情形（empty/invalid/inactive）；自检：grep plate 段中 callee 名，若叙述方向与 bne 方向不符立即修正 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callee_bne_polarity_inversion.md`
 - 写完 R4 后检查函数最后 3 条指令：若出现 (A) 无条件 `b LAB_xxx`（分支至非出口标签）且函数体无独立 r0 写，或 (B) `pop {r0}; bx r0`（r0 被恢复为栈保存的 lr）→ R4 必须 void；禁止同时写"void"和"透传"（`pop{r0};bx r0` 重写 r0，非透传）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_exit_mechanism_voids_return.md`
 - case stub 的固定 icid 常量经 icid-to-cid 表查出 cid=0xFFFF（未上市卡，无语义名）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_reserved_icid_letter_qualifier.md` (qualifier 用 `_reserved_icid_<letter>`，字母按地址升序分配，禁止用 `_0xNNNN` hex 形式或自造卡名)
+- batch 中 ≥5 个 sibling stub 函数共享同一 caller hub → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_executor_template_copy_blindspot.md` (模板复制盲点：R7 必须从 batch prompt 取实际 caller addr+tags+role，禁止用场景描述词替代；R4 透传后必须补 callee 的 0/1 语义；batch #53 13+7 函数同批触发)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
