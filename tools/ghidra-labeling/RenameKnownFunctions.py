@@ -11190,6 +11190,186 @@ RENAMES = [
         "Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. "
         "Fixes r1=0x1519 then tail-calls scan_trap_zone_for_equip_activation_by_card. "
         "Side effects: via scan_trap_zone_for_equip_activation_by_card on hit."),
+
+    # batch #52
+    ("FUN_0801f2c4", "format_game_text_with_text_arg",
+        "Replaces %s placeholder in format string r1 with string arg r2, writes result to dest buffer r0. "
+        "If high 15 bits of r1 or r2 are 0 (no RAW_ID_MASK=0xfffe0000 tag), "
+        "calls resolve_game_str_ptr to resolve game string ID to real pointer. "
+        "Copies chars one by one; on %s truncates current position, "
+        "calls append_game_text_if_raw to insert r2 content, then continues appending remaining format string. "
+        "Used by 34 callers (C_util_high) as core UI text formatting utility for card/player name dynamic strings. "
+        "Constants: RAW_ID_MASK=0xfffe0000 (high-15-bit mask distinguishing raw ID from real pointer)."),
+
+    ("FUN_0809cac4", "scan_monster_zone_slots_for_equip_activation_berserk_dragon",
+        "Monster-zone equip activation case stub for Berserk Dragon (internal_card_id=0x1644, cid=1309). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1644, "
+        "tail-calls scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Return value forwarded (0=processed, 1=counter > 4). "
+        "Constants: CARD_ID=0x1644 (Berserk Dragon)."),
+
+    ("FUN_080906cc", "build_equip_zone_bitmap_for_player",
+        "Builds 2x11 equip zone bitmap (bitmask) for a given player. "
+        "Nested double loop: outer r5 in {0,1} (player_side), inner r4 in {0..10} (slot_idx). "
+        "Each (side, slot): calls FUN_0810e5e8 invoker thunk (r0=player_id from r9, r1=side, r2=slot); "
+        "if non-zero result, ORs bit=1<<(side*16+slot) into result r6. "
+        "Returns 32-bit bitmap: high 16 bits = side=1, low 16 bits = side=0. "
+        "Called by query_equip_zone_bitmap_with_effect_guard and multiple duel_field callers. "
+        "Constants: SIDE_COUNT=2, SLOT_COUNT=11, BITMAP_FORMULA=1<<(side*16+slot)."),
+
+    ("FUN_0809066c", "query_equip_zone_bitmap_with_effect_guard",
+        "Effect-node guard wrapper: calls find_card_effect_node_entry with r0 (slot_info_ptr or card_id). "
+        "If node missing or [node+8]==0 (no valid target), returns -1. "
+        "If node valid, calls build_equip_zone_bitmap_for_player(r0=slot_info_ptr) and returns bitmap. "
+        "Called by scan_equip_zone_chain_for_sprite_and_bitmap_update and other duel_field functions. "
+        "Acts as unified entry: compute bitmap only if valid equip node exists. "
+        "Constants: NULL_RESULT=-1."),
+
+    ("FUN_0809d0c8", "scan_equip_zone_chain_for_sprite_and_bitmap_update",
+        "Equip zone chain effect detection with sprite and bitmap update. "
+        "r0=player_id; reads counter from gP1LifePoints+0x1d24 (<=1, 2 iterations). "
+        "Each iteration: fetches slot data from r9[counter*4], calls check_value_in_slot_chain "
+        "(player, zone=0xb, slot_data); on hit: allocates 0x18-byte struct on stack with slot info and flag bits (bit2 merged), "
+        "calls query_equip_zone_bitmap_with_effect_guard(struct_ptr); "
+        "if valid bitmap: calls enqueue_equip_zone_sprite_by_side and prepare_slot_ctx_for_equip_bitmap. "
+        "Increments counter; returns 0 on first hit. "
+        "r9=ROM slot descriptor table at 0x09e47680. "
+        "Constants: COUNTER_OFFSET=0x1d24, MAX_ITER=1, ZONE=0xb, STRUCT_SIZE=0x18, "
+        "ROM_SLOT_TABLE=0x09e47680."),
+
+    ("FUN_0809c8cc", "scan_equip_zone_for_interdimensional_matter_transporter",
+        "Scans both players' zone 11 for Interdimensional Matter Transporter (internal_card_id=0x15b8, cid=1209). "
+        "r0=initial player_side; outer loop r5 in {0,1}: r4 = r0 XOR r5 (alternates sides). "
+        "Each side: calls get_node_entity_id_in_slot(r4, zone=0xb, card=0x15b8); "
+        "if valid entity_id (>=0): builds r0=(r4<<31)|0x0a5015b8, "
+        "calls apply_equip_activation_with_id_lookup(r0, 0, 0). "
+        "If not activated: calls enqueue_equip_slot_sprite_attr(r4, 0xb, 0x15b8, 0). "
+        "Called by duel_field main dispatch hub via indirect dispatch. "
+        "Constants: CARD_ID=0x15b8 (Interdimensional Matter Transporter), "
+        "ZONE=0xb, COMBINED_ICID=0x0a5015b8."),
+
+    ("FUN_0809d4cc", "scan_monster_zone_slots_for_equip_activation_little_winguard",
+        "Monster-zone equip activation case stub for Little-Winguard (internal_card_id=0x12a3, cid=627). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x12a3, "
+        "tail-calls scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x12a3 (Little-Winguard)."),
+
+    ("FUN_0809ead0", "scan_trap_zone_for_equip_activation_needle_wall",
+        "Trap-zone equip activation case stub for Needle Wall (internal_card_id=0x1545, cid=1129). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1545, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Symmetric to scan_trap_zone_for_equip_activation_dangerous_machine_type6 (0x0809eae0). "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x1545 (Needle Wall)."),
+
+    ("FUN_0809cad4", "scan_monster_zone_slots_for_equip_activation_cyber_archfiend",
+        "Monster-zone equip activation case stub for Cyber Archfiend (internal_card_id=0x1911, cid=1902). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1911, "
+        "tail-calls scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Called by duel_field main dispatch hub. "
+        "Return value forwarded (0=processed, 1=counter > 4). "
+        "Constants: CARD_ID=0x1911 (Cyber Archfiend)."),
+
+    ("FUN_0809eed8", "scan_all_zone_slots_for_lp_indicator_burning_land",
+        "Burning Land (internal_card_id=0x1406, cid=881) full-zone LP loss indicator scan. "
+        "r0=player_id; reads counter from gP1LifePoints+0x1d24 (<=9, 10 iterations). "
+        "Each iteration: side=counter/5 XOR player_id (alternates both players), slot=counter%5+5 (spell/trap zone 5..9). "
+        "Calls test_slot_has_active_card(side, slot, 0x1406); on hit: "
+        "decodes card data word, calls enqueue_sprite_attr_for_zone_card_id_lookup to update sprite; "
+        "then calls submit_lp_change_indicator_with_chain_check with r1=0x1f4=500 (LP drain) and r3=0x1406. "
+        "Increments counter; returns 0 on first hit. "
+        "Constants: CARD_ID=0x1406 (Burning Land), LP_DRAIN=500 (0x1f4=0xfa<<1), "
+        "SLOT_OFFSET=5, MAX_ITER=9, COUNTER_OFFSET=0x1d24."),
+
+    ("FUN_0809d4dc", "scan_spell_trap_zone_slots_for_equip_activation_ectoplasmer",
+        "Spell/trap zone equip activation case stub for Ectoplasmer (internal_card_id=0x12dc, cid=663). "
+        "3-instruction thin wrapper: no APCS input; r0 set internally to 0x12dc via ldr, "
+        "tail-calls scan_spell_trap_zone_slots_for_equip_activation_by_card. "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x12dc (Ectoplasmer)."),
+
+    ("FUN_0809eae0", "scan_trap_zone_for_equip_activation_dangerous_machine_type6",
+        "Trap-zone equip activation case stub for Dangerous Machine TYPE-6 (internal_card_id=0x1738, cid=1507). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1738, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Symmetric to scan_trap_zone_for_equip_activation_needle_wall (0x0809ead0). "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x1738 (Dangerous Machine TYPE-6)."),
+
+    ("FUN_0809ece0", "scan_trap_zone_for_equip_activation_life_absorbing_machine",
+        "Trap-zone equip activation case stub for Life Absorbing Machine (internal_card_id=0x14c0, cid=1011). "
+        "4-instruction thin wrapper: passes r0=player_id, builds r1=0xa6<<5=0x14c0, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Adjacent to scan_trap_zone_for_equip_activation_senri_eye (0x0809ecf0). "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x14c0 (Life Absorbing Machine, built as 0xa6<<5)."),
+
+    ("FUN_08047bb4", "query_equip_zone_slot_target_bit",
+        "Queries whether zone=0xb specified slot is a valid equip target by testing one bit of the bitmap. "
+        "Allocates 0x18-byte struct on stack; fills slot info; "
+        "calls update_equip_target_bitmap_for_field then tests the corresponding bit. "
+        "r0=player_side [0..1], r1=slot_idx [0..10], r2=side_xor_mask (XOR with player_side controls flip), "
+        "r3=card_halfword (written to struct[+0]). "
+        "Bitmap mask: r5=1<<(player_side*16+slot_idx). "
+        "Calls memset to zero struct; writes r3 to [struct+0]; merges (player_side XOR r2)&1 into [struct+2] bit1; "
+        "calls update_equip_target_bitmap_for_field(struct, r5, zone=0xb, side=0). "
+        "Returns (bitmap_result & r5) != 0 (1) or 0. "
+        "Called by scan_monster_zone_for_equip_sprite_and_bitmap_wicked_worm_beast and other duel_field scanners. "
+        "Constants: STRUCT_SIZE=0x18, ZONE=0xb, SIDE_FLAGS=0."),
+
+    ("FUN_0809cae4", "scan_monster_zone_for_equip_sprite_and_bitmap_wicked_worm_beast",
+        "Monster-zone equip sprite and bitmap scan for The Wicked Worm Beast (internal_card_id=0x0fbd, cid=25). "
+        "r0=player_id; reads counter from gP1LifePoints+0x1d24; if >4 returns 1. "
+        "Loops 5 slots (slot=0..4): calls test_slot_has_active_card(player, slot, 0x0fbd). "
+        "On hit: (1) decodes card data word (byte2<<1 + bit13), "
+        "calls enqueue_sprite_attr_for_zone_card_id_lookup to update display; "
+        "(2) calls query_equip_zone_slot_target_bit (zone=0xb) to update equip target bitmap. "
+        "Increments counter each iteration; returns 0 on first hit. "
+        "Constants: CARD_ID=0x0fbd (The Wicked Worm Beast), SLOT_MAX=4, ZONE=0xb, "
+        "STRIDE=0x868, COUNTER_OFFSET=0x1d24."),
+
+    ("FUN_0809cee8", "scan_all_zone_slots_for_equip_chain_sprite_archfiends_roar",
+        "Equip chain sprite refresh stub for Archfiend's Roar (internal_card_id=0x16a4, cid=1391). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x16a4, "
+        "tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Same structure as Limiter Removal / Karate Man / Wild Nature's Release siblings. "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x16a4 (Archfiend's Roar)."),
+
+    ("FUN_0809d4ec", "scan_spell_trap_zone_slots_for_equip_activation_labyrinth_of_nightmare",
+        "Spell/trap zone equip activation case stub for Labyrinth of Nightmare (internal_card_id=0x17b6, cid=1610). "
+        "3-instruction thin wrapper: no APCS input; r0 set internally to 0x17b6 via ldr, "
+        "tail-calls scan_spell_trap_zone_slots_for_equip_activation_by_card. "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x17b6 (Labyrinth of Nightmare)."),
+
+    ("FUN_0809eaf0", "scan_equip_zone_for_dimensionhole",
+        "Scans zone 11 for Dimensionhole (internal_card_id=0x140c, cid=887) node and processes equip activation. "
+        "r0=player_side; loads r5=0x140c (Dimensionhole). "
+        "Calls get_node_entity_id_in_slot(r0=player, zone=0xb, card=0x140c). "
+        "If valid entity_id (>=0): builds r0=(player<<31)|0x0450140c, "
+        "calls apply_equip_activation_with_id_lookup; "
+        "if not activated: calls enqueue_equip_slot_sprite_attr(player, zone=0xb, 0x140c, 0). "
+        "If no node: returns 1. "
+        "Constants: CARD_ID=0x140c (Dimensionhole), ZONE=0xb, COMBINED_ICID=0x0450140c."),
+
+    ("FUN_0809ecf0", "scan_trap_zone_for_equip_activation_senri_eye",
+        "Trap-zone equip activation case stub for Senri Eye (internal_card_id=0x1628, cid=1291). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1628, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Adjacent to scan_trap_zone_for_equip_activation_life_absorbing_machine (0x0809ece0). "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x1628 (Senri Eye)."),
+
+    ("FUN_0809cef8", "scan_all_zone_slots_for_equip_chain_sprite_rescue_cat",
+        "Equip chain sprite refresh stub for Rescue Cat (internal_card_id=0x1876, cid=1783). "
+        "3-instruction thin wrapper: passes r0=player_id, fixes r1=0x1876, "
+        "tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Symmetric to scan_all_zone_slots_for_equip_chain_sprite_archfiends_roar (0x0809cee8). "
+        "Called by duel_field main dispatch hub. "
+        "Constants: CARD_ID=0x1876 (Rescue Cat)."),
 ]
 
 
