@@ -12035,6 +12035,233 @@ RENAMES = [
         "via submit_sprite_row_data: sprite row buffer. "
         "Constants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
         "SPRITE_BUF=0x0201b870, ROM_DISPLAY_TABLE=0x0201e2a0."),
+    # batch=20 #57 (campaign-57) — equip activation chain + zone slot score + equip target selection cluster
+    ("FUN_080abcac", "init_equip_sub_entry_fields_from_slot",
+        "由装备精灵处理簇中的对称函数 (0x080abbd8/0x080abd60/0x080abe54 等) 以及 FUN_08095d44 调用 (indeg=3+). "
+        "入口 r0=player_id, r1=slot_idx; 首先从 gDuelFieldSlots[player*0x868+slot*0x14] 读取装备槽数据, "
+        "提取 face/orient 编码 (bits[23:22]<<1|bit18) 写入 struct[0x0201e4d0+0x2] 高 bit 段; "
+        "提取 card_stat_field8 是否为 6 决定 struct[+0x4] 写 2 或 4; 清零 struct[+0x8]; "
+        "尾调用 init_equip_sub_entry_state_with_sprite_submit 完成精灵提交. "
+        "Side effects: 修改 0x0201e4d0 子条目结构体的 byte[0], hword[2], hword[4], byte[8] 字段; "
+        "通过 init_equip_sub_entry_state_with_sprite_submit 影响精灵行缓冲区. "
+        "Constants: EQUIP_STRUCT=0x0201e4d0, gDuelFieldSlots=0x0201c510, "
+        "player_stride=0x868, slot_stride=0x14, FIELD8_IS_6=0x6."),
+    ("FUN_080ad450", "dispatch_equip_check_by_mode",
+        "由 FUN_080ad464 (装备槽位位图构建) 在内层循环中调用 (indeg>=1). "
+        "入口 r0=player_id, r1=target_slot_idx, r2=equip_slot_idx, r3=mode; "
+        "根据 r3 是否为 0 分派: mode==0 调用 check_slot_card_can_be_equipped; "
+        "mode!=0 调用 check_slot_equip_eligibility. "
+        "3 行 dispatch 包装, 共享 pop {r1}; bx r1 尾调用出口. "
+        "Side effects: 无直接外部写入; 通过 callee 执行查询. "
+        "Constants: mode==0 -> check_slot_card_can_be_equipped; mode!=0 -> check_slot_equip_eligibility."),
+    ("FUN_080ad464", "build_equip_eligible_slot_bitmap",
+        "由 FUN_080ad510/FUN_080ad4ac/FUN_080ad5ec 调用 (indeg>=3), 为装备目标选择提供位图. "
+        "入口 r0=player_id, 非 APCS r9=equip_card_slot_idx (caller 通过 0x4689/0x4688 注入). "
+        "对每个 target_slot [0..1] x equip_subslot [0..4] 调用 dispatch_equip_check_by_mode; "
+        "检查通过则将 bit(target_slot*16+equip_subslot) 写入累积位图 r6; 结束后返回 r0=r6 位图. "
+        "使用非 APCS r8=player_id, r9=equip_card_slot (caller-set). "
+        "Side effects: 无外部写入. "
+        "Constants: target_slots=[0..1], equip_subslots=[0..4], bitmap_shift=target_slot*16+subslot."),
+    ("FUN_080abf14", "eval_zone_slot_score_for_player_with_activation_guard",
+        "由 FUN_080ac004 (dispatch 包装) 以及 FUN_080ae050/0x080aef1c/0x080aefc4/0x080af070 调用 (indeg=5). "
+        "入口 r0=player_bit_field, r1=card_slot_index, r2=score_out_ptr; "
+        "计算 gDuelFieldSlots[player*0x868+slot*0x14] 槽的得分条目. "
+        "若 slot[+0x8] halfword != 0, 直接调用 eval_slot_score_entry_full; "
+        "否则: 若 slot[+0x11] bit7 (activation flag) 置位, 临时向 slot[+0x8] 写入 r12 (=1), "
+        "调用 eval_slot_score_entry_full 后恢复; "
+        "若未激活, 调用 get_card_extended_stat_field5, field5<=4 写 score_out[0x14]=0x4b0/[0x18]=0x708, "
+        "field5>4 写 score_out[0x14]=0x834, 并清零 score_out[0/4/8]. "
+        "使用非 APCS 寄存器 r12=1 (常量). "
+        "Side effects: 写 score_out (r2 所指) 多字段. "
+        "Constants: zone_base=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "score_A=0x4b0, score_B=0x708, score_C=0x834."),
+    ("FUN_080ac004", "dispatch_zone_slot_score_by_player_flag",
+        "由 FUN_080b4d08/FUN_080b4e40 等 AI 得分扫描函数调用 (indeg>=2). "
+        "入口 r0=score_out_ptr (包含 player/slot 信息), r1=slot_idx, r2=score_out; "
+        "读 [0x0201afe0] 全局标志字, 若等于 r3 (=r0 入口值) 则调用 "
+        "eval_zone_slot_score_for_player_with_activation_guard (FUN_080abf14); "
+        "否则调用 eval_zone_slot_score_for_player (已命名). "
+        "根据全局当前玩家 ID 标志决定使用哪个得分函数. "
+        "Side effects: 通过被调函数间接写入 score_out 结构体. "
+        "Constants: gCurrentPlayerFlag=0x0201afe0."),
+    ("FUN_080b4d08", "find_best_scored_slot_from_bitmap",
+        "对 slot_bitmap 中所有置位槽位 [0..4] 进行 Fisher-Yates shuffle 后依次评分, 返回得分最高的槽位索引. "
+        "入口 r0=player_id, r1=slot_bitmap, r2=mode (r9), r3=target_player (r8). "
+        "callee-save: .hword 0x4657/464e/4645=mov r7/r6/r5,r10/r9/r8 保存; "
+        ".hword 0x4691=mov r9,r2 注入 mode; .hword 0x4698=mov r8,r3 注入 target_player; "
+        ".hword 0x466a=mov r2,sp 获取输出缓冲区. "
+        "收集 bitmap 置位 slot 0..4 到栈缓冲区; 若空返回 -1; "
+        "否则做 sample_prng_scaled Fisher-Yates shuffle; "
+        "再遍历每个候选调用 dispatch_zone_slot_score_by_player_flag 获取 (score, mode_flag), "
+        "按 mode (r9) 正负号做 max/min 比较, 记录最优 slot 到 sp[0x54]; "
+        "最终返回最优 slot_idx. 被 FUN_080b5348 (equip target selector) 调用. "
+        "Side effects: 无外部写入. Constants: SLOT_MAX=4, FAIL=-1."),
+    ("FUN_080b5190", "sample_random_monster_slot_with_field9_filter",
+        "从 slot_bitmap 中随机抽取一个怪兽区 (slot [5..10]) 的合格槽位, 并对每个候选槽位做 field9 范围 [2..4] 过滤. "
+        "入口 r0=player_id, r1=slot_bitmap; "
+        "callee-save 高寄存器 (.hword 0x4657/464e/4645 保存 r10/r9/r8); "
+        ".hword 0x466a=mov r2,sp 获取栈输出缓冲区. "
+        "第一遍 (slot 5..10): 收集 bitmap 中置位且 field9 in [2..4] 的 slot 到缓冲区, "
+        "Fisher-Yates shuffle 后选随机一个; 若命中直接返回. "
+        "第二遍: 再扫一次, 过滤 field9>0 (bit0 check) 的 slot; "
+        "第三遍: 收集 hword[+8]!=0 的 slot 并随机返回; 均失败则 sample_prng_scaled(count) 兜底. "
+        "被 FUN_080b5348 作为 fallback 调用. Side effects: 无外部写入. "
+        "Constants: SLOT_START=5, SLOT_MAX=10, FIELD9_MIN=2, FIELD9_MAX=4, GY_BASE=0x0201c510."),
+    ("FUN_080b5348", "select_equip_target_slot_with_eligibility_check",
+        "装备目标选择核心函数, 优先选择卡牌在 eligible_set 内的槽位, 失败后多级回退. "
+        "入口 r0=player_id (.hword 0x4680=mov r8,r0), r1=slot_bitmap (sp[0x50]), "
+        "r2=eligible_set 指针 (sp[0x54]). "
+        "第一阶段: 收集 bitmap 中全部 [0..10] 槽位候选, Fisher-Yates shuffle; "
+        "遍历每个候选从 gP1LifePoints slot word 提取 card_icid, "
+        "调用 check_card_id_in_eligible_set 命中则立即返回该 slot_idx. "
+        "第二阶段 (chain=3 特殊逻辑): 检查 [gP1LifePoints+0x1cf4]==3 且 [+0x1ce8]==r8; "
+        "满足时重新扫 bitmap 找可激活槽 (check_slot_card_activatable), "
+        "调用 find_best_scored_slot_from_bitmap 并按 LP 阈值 (0xaf*8=0x578) 判断; "
+        "若分数满足返回. "
+        "第三阶段: 调用 find_best_scored_slot_from_bitmap(mode=1) 再次尝试; "
+        "最终 fallback 调用 sample_random_monster_slot_with_field9_filter. "
+        "Side effects: 无外部写入. "
+        "Constants: CHAIN_LIMIT=3, LP_THRESHOLD=0x578, GY=gP1LifePoints, SLOT_MAX=10."),
+    ("FUN_080b5108", "sample_random_slot_from_bitmap",
+        "从 slot_bitmap 中随机抽取一个置位槽位, 覆盖全部 11 个槽位 [0..10]. "
+        "入口 r0=player_id (仅用于 lsls r5,r0,#4 计算 slot 位移基, 实际未用于筛选), r1=slot_bitmap; "
+        "用 .hword 0x466c=mov r4,sp 获得栈上输出缓冲区地址. "
+        "遍历 slot 0..10, 将 bitmap 中置位的 slot_idx 依次写入 sp 栈缓冲区, 记 count; "
+        "若 count==0 返回 -1; 否则调用 sample_prng_scaled(count) 随机选一个下标, "
+        "从缓冲区读回对应 slot_idx 返回. "
+        "是 select_equip_target_slot_by_bitmap 的基础随机采样原语. "
+        "Side effects: 无外部写入. Constants: SLOT_MAX=10, FAIL=-1."),
+    ("FUN_080b55ac", "select_equip_target_slot_full",
+        "装备目标选择完整版本, 对 bitmap 中所有候选槽位执行 4 轮类型/卡牌属性过滤后选出最优槽. "
+        "入口 r0=player_id (.hword 0x4682=mov r10,r0), r1=slot_bitmap (sp[0x50]), "
+        "r2=mode (sp[0x54]), r3=equip_card_slot. "
+        "第一阶段: Fisher-Yates shuffle 全部 [0..10] 候选; "
+        "调用 check_slot_equip_eligibility_by_type 过滤; "
+        "过滤 field5<=6 (非高等级) 且有装备放置类型 (check_card_has_equip_placement_type) 且 field7 匹配的槽; "
+        "通过特定白名单卡牌 ID 检查 (0x11e4/0x0fd6/0x17e9/0x1874/0x1521/0x1798/0x14f3/0x163f). "
+        "第二阶段: 4 轮 count_equip_chain_default_flags 检查 (card_ids: 0x149d/0x1286/0x13f3/0x14b2). "
+        "第三阶段: check_card_id_in_eligible_set 白名单过滤 + orrs 构建 eligible_bitmap; "
+        "调用 find_best_scored_slot_from_bitmap 取最优; "
+        "若 mode!=0 则检查 LP 阈值 (0xaf*8=0x578); "
+        "最终 fallback 调用 sample_random_slot_from_bitmap. "
+        "Side effects: 无外部写入. "
+        "Constants: SLOT_MAX=10, LP_THR=0x578, "
+        "CARD_WL=[0x11e4,0x0fd6,0x14f3,0x163f,0x17e9,0x1521,0x1798,0x1874,0x149d,0x1286,0x13f3,0x14b2]."),
+    ("FUN_080ad608", "select_equip_target_slot_by_bitmap_alt",
+        "由 FUN_080ad510/FUN_080ad5ec 调用 (indeg>=2), 是 select_equip_target_slot_by_bitmap (0x080ad4c8) 的对称变体. "
+        "两者结构完全一致, 唯一差异: mode 参数传给 FUN_080b55ac 时本函数使用 r2=0 而 0x080ad4c8 使用 r2=1. "
+        "同样先以对手侧 (1-player) 调用 FUN_080b5348 (mode=0), 成功则编码返回; "
+        "失败则以本方侧调用 FUN_080b55ac (mode=0). "
+        "返回格式与 select_equip_target_slot_by_bitmap 相同: -1=失败, >=0: bits[31:24]=player, bits[7:0]=slot_idx. "
+        "Side effects: 通过 FUN_080b5348/FUN_080b55ac 读取 PRNG. Constants: mode=0 (both calls), FAIL=-1."),
+    ("FUN_080ad4c8", "select_equip_target_slot_by_bitmap",
+        "由 FUN_080ad510/FUN_080ad4ac 调用 (indeg>=2), 是装备目标槽位选择的核心分派器. "
+        "入口 r0=player_id, r1=slot_bitmap (caller-set). "
+        "首先以 (1-player_id) 作为主玩家, 调用 FUN_080b5348 (装备目标随机候选选择器, mode=0 对手侧); "
+        "若返回 >=0 则将结果编码为 (1-player)<<24|result 返回; "
+        "否则调用 FUN_080b55ac (mode=1, 本方侧) 选择; 若仍失败返回 -1. "
+        "返回值高字节=player_id, 低字节=slot_idx (或 -1 失败). "
+        "Side effects: 通过 FUN_080b5348/FUN_080b55ac 的副作用传播. "
+        "Constants: opponent_first=1-player, FAIL=-1."),
+    ("FUN_080ad510", "eval_equip_target_slot_with_score",
+        "由 FUN_080ad720 (装备目标迭代主循环) 调用 (indeg=1). "
+        "入口 r0=player_id, r1=equip_slot_idx, r2=exclude_bitmap_ptr, r3=count; "
+        "非 APCS r9=equip_card_slot (caller-set). "
+        "首先调用 build_equip_eligible_slot_bitmap 得到 eligible_bitmap; "
+        "若 count>0 则从 sp[0x40] 读取排除列表, 从 bitmap 中清除已排除槽位; "
+        "随后两路: 先以 mode=0 调用 select_equip_target_slot_by_bitmap (FUN_080ad4c8), "
+        "若未找到则以 mode=1 调用 FUN_080ad608 (对称 alt); "
+        "若两路均失败返回 -1; 成功后调用 eval_slot_score_entry_full 获取得分, "
+        "检查特定卡牌 ID (0x1654/0x1388/0x1688) 做得分修正, 最终返回编码目标槽位或 -1. "
+        "Side effects: 通过 eval_slot_score_entry_full 写 score_out. "
+        "Constants: CARD_IDS=[0x1654, 0x1388, 0x1688], FAIL=-1."),
+    ("FUN_080ad650", "score_equip_slot_placement_for_ai",
+        "由 FUN_080ad720/FUN_080bbde8 调用 (indeg>=2), 为 AI 装备放置决策评分. "
+        "入口 r0=player_id, r1=equip_slot_idx, 非 APCS r8=card_id (caller 通过 .hword 0x4690 注入). "
+        "首先从 gP1LifePoints+player*4+0x87*0x20 读 slot hword, 提取 icid (bits[12:0]); "
+        "调用 eval_equip_bonus_for_slot 获取装备加成 r7; "
+        "随后对特定卡牌 ID (0x1725/0x1386..0x1388/0x16ec/0x1729/0x1986) 做二分查找: "
+        "命中则返回 3 (高优先级); 未命中则检查 equip_bonus: bonus<=4 返回 0; "
+        "bonus>4 调用 eval_card_placement_flags_for_ai, "
+        "根据 flags bit6/bit4 和 card_id=0x1864 做修正返回 0/1/2. "
+        "Side effects: 无外部写入. "
+        "Constants: SCORE_HIGH=3, SCORE_MED=2, SCORE_LOW=1, SCORE_SKIP=0, "
+        "bonus_threshold=4, LP_stride=0x868, CARD_IDS=[0x1725,0x1386,0x1388,0x16ec,0x1729,0x1986,0x1864]."),
+    ("FUN_080a5e28", "init_equip_entry_sprite_fields",
+        "由 FUN_080a5f38 (装备条目激活初始化) 以及 FUN_080a5f7c (switch 分派器) 调用 (indeg>=2). "
+        "入口 r0=player_id, r1=equip_slot_idx, r2=mode, r3=extra_flag; "
+        "对全局装备子条目结构体 0x0201e4d0 进行精灵属性初始化: "
+        "写 byte[0] 的 player_id bit0 + 置位 bit5(0x20)/bit7(0x80); "
+        "从 gP1LifePoints+slot*4+0x87*0x20 读 hword 提取 card_stat bits[12:5] 写入 word[0] 高位; "
+        "slot<<7 写入 hword[+0x2] bits[13:7]; 清零 hword[+0x6], byte[+0x8]; "
+        "根据 mode(0/1/2) 设置 byte[0] 附加标志 "
+        "(mode=0: 检查 0x135d 场上数量后置 bit5; mode=1: 清零 bit5; mode=2: 置 byte[+0x12] bit1); "
+        "最终置位 byte[+0x12] bit0, 写 byte[+0x13] bit0, 清 byte[+0x14] bit1, AND masks 清理字段. "
+        "Side effects: 0x0201e4d0 子结构多字段. "
+        "Constants: EQUIP_STRUCT=0x0201e4d0, CARD_ID_A=0x135d, "
+        "SLOT_LP_OFFSET=0x87*0x20=0x10c0, player_stride=0x868."),
+    ("FUN_080a5f38", "apply_equip_entry_sprite_from_slot_context",
+        "由 FUN_080a5f7c (switch 分派器, indeg>=2) 和 FUN_080bbde8 (field spell equip placement) 调用. "
+        "入口 r0=player_id, r1=mode_flag (0=使用 player_id 作 mode, 否则 mode=2), r2=extra_flag; "
+        "从 gP1LifePoints+0x1d68 读 equip_slot_idx, 从 +0x1d48 读 equip_card_slot; "
+        "根据 mode_flag==0 选择 player_id 还是常量 2 作 mode 参数传给 init_equip_entry_sprite_fields; "
+        "调用后清零 [gP1LifePoints+0x1d54]; 返回 1 表示成功. "
+        "Side effects: [gP1LifePoints+0x1d54] := 0 (清零 pending equip 激活标志), "
+        "以及 init_equip_entry_sprite_fields 的所有副作用 (0x0201e4d0 多字段). "
+        "Constants: EQUIP_SLOT_IDX_OFF=0x1d68, EQUIP_CARD_SLOT_OFF=0x1d48, PENDING_FLAG_OFF=0x1d54."),
+    ("FUN_080bbde8", "execute_field_spell_equip_placement",
+        "由 score_equip_slot_placement_for_ai 的调用方 hub 调用 (indeg>=2), "
+        "为场地魔法卡的装备效果完成目标选择和初始化. "
+        "入口 r0=player_id (.hword 0x4680=mov r8,r0), r1=equip_card_slot (sp[0xc]), "
+        "r2=mode (sp[0x10]). "
+        "从 gDuelFieldSlots (0x0201c600) 读取 r1 指定槽的 card word, "
+        "提取 card_icid (bits[12:0]) 存 sp[0x14], "
+        "提取面向/位置复合值传给 score_equip_slot_placement_for_ai 获取 score; "
+        "调用 check_field_spell_card_placeable_strict 确认可放置性. "
+        "主循环 (score 次迭代): 对每个候选调用 eval_equip_target_slot_with_score; "
+        "返回 -1 则整体返回 -1; "
+        "target_player==r8 时调用 check_field_spell_icid_summon_restriction "
+        "和 init_equip_sub_entry_fields_from_slot; "
+        "否则调用 check_equip_cards_share_field7 过滤. "
+        "完成后写 [gP1LifePoints+0x1d64] 和 [+0x1d68], 读 equip 数据写 [+0x1d48], "
+        "调用 apply_equip_entry_sprite_from_slot_context, 清零 [0x0201b160]. "
+        "返回 1=成功, 0=不可放置, -1=无目标. "
+        "Side effects: [gP1LifePoints+0x1d64/0x1d68] := 0 (equip slot context), "
+        "[gP1LifePoints+0x1d48] := equip card data, [0x0201b160] := 0 (global state flag). "
+        "Constants: GY=gDuelFieldSlots=0x0201c600, GP1=gP1LifePoints, "
+        "STRIDE=0x868, STATE_FLAG=0x0201b160."),
+    ("FUN_080acbf0", "check_player_lp_exceeds_toon_world_cost",
+        "由 FUN_080acc30 (大型装备激活判断 hub) 调用 (indeg=1). "
+        "入口 r0=player_id; 加载卡牌 0x132c (Toon World), "
+        "调用 count_field_copies_of_card 得到场上 Toon World 张数 count; "
+        "计算费用 = count * 0x1F4 (count*500; 拆解: count<<5=32c, 32c-c=31c, 31c<<2=124c, 124c+c=125c, 125c<<2=500c); "
+        "读取对应玩家 LP (gP1LifePoints+player*0x868); "
+        "若 LP > cost 则返回 1 (足够), 否则返回 0 (不足). "
+        "纯查询函数, 无外部副作用. "
+        "Constants: CARD_ID=0x132c (Toon World), cost_formula=count*0x1F4, "
+        "gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+    ("FUN_08097190", "check_equip_effect_zone_preconditions",
+        "检查玩家能否在装备效果区 (zone=0xb) 发动特定效果的多项前提条件, 返回 0=不满足/1=满足. "
+        "入口 r0=player_id. "
+        "依次检查: (1) [gP1LifePoints+0x1cec] != 0 (全局装备效果激活计数非零); "
+        "(2) [gP1LifePoints+0x1cf4] <= 3 (连锁层数上限); "
+        "(3) [gP1LifePoints+player*0x868+0x8e*2+0x40].bit18 == 0 (玩家装备区未被锁定); "
+        "(4) check_value_in_slot_chain(player, 0xb, 0x15f0) == 0 (zone 0xb 无 card_id=0x15f0); "
+        "(5) check_value_in_slot_chain(player, 0xb, 0x173f) == 0 (zone 0xb 无 card_id=0x173f); "
+        "(6) count_available_effect_zones(0, 0x16d4, -1) > 0 或 count_hand_cards_by_field6(0, 0x16) > 0; "
+        "(7) count_available_effect_zones(1, 0x16d4, -1) > 0 或 count_hand_cards_by_field6(1, 0x16) > 0. "
+        "全部通过返回 1, 任一失败返回 0. 无外部写入. "
+        "Constants: CHAIN_LIMIT=3, ZONE=0xb, CARD_BLOCK_A=0x15f0, CARD_BLOCK_B=0x173f, "
+        "EFFECT_CARD=0x16d4, FIELD6_TYPE=0x16."),
+    ("FUN_08033f28", "count_graveyard_equip_cards_by_field9",
+        "统计指定玩家墓地中 field6==0x16 (装备类) 且 field9==target_type 的卡牌数量. "
+        "入口 r0=player_id, r1=field9_target_type (caller 通过 .hword 0x4688=mov r8,r1 保存到 r8). "
+        "计算墓地基址 0x0201c8f8 + player*0x868 + 0x14 (count); "
+        "对每张墓地牌提取 bits[12:0] 得 card_icid; "
+        "调用 get_card_extended_stat_field6 判断是否为装备类 (==0x16); "
+        "再调用 get_card_extended_stat_field9 判断类型是否匹配 r8; "
+        "两者均满足则计数+1. 返回匹配数量. 无外部写入. "
+        "Constants: GY_BASE=0x0201c8f8, PLAYER_STRIDE=0x868, COUNT_OFFSET=0x14, EQUIP_FIELD6=0x16."),
 ]
 
 
