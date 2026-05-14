@@ -79,6 +79,7 @@ model: sonnet
 | proposed_name 含 `_0x[0-9a-f]{3,}` 段（裸 hex card_id）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1=0; 必须查 doc/dev/data.md 替换为语义卡名) |
 | R3 中高寄存器被列为参数，但其在函数体内的首次 use 是 bl 返回值赋值（mov rN,r0）或循环计数器初始化（内部 working register）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (Counter-pattern 三类内部 working register: push+用于 bl 返回值/循环计数/表加载 → 整行删除，非 caller-set) |
 | R2 plate 对 `bl predicate; bne LAB_skip` 后的循环体描述方向：plate 写"处理 predicate 为 true/nonzero 的元素"时，检查 bne 方向——bne 跳过 nonzero，函数实际处理 predicate 返回 0 的元素；若叙述方向与 asm 相反 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callee_bne_polarity_inversion.md` (R2=0; callee 名含正面词但 bne 跳过时，函数处理反面情形; batch #42 三函数三次复现) |
+| R4 返回描述含"透传"而 epilogue 为 `pop {r0}; bx r0`（r0 = 恢复的 lr，非 callee 返回值），或 R4 有具体返回类型但函数的唯一出口是无条件 `b LAB_xxx`（函数体无独立 r0 写）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_exit_mechanism_voids_return.md` (R4=0; 两种出口模式均强制 void；"void 透传" 对 pop{r0};bx r0 是 self-contradiction) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
