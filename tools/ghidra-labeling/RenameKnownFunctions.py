@@ -12403,6 +12403,213 @@ RENAMES = [
         "(6) get_slot_field6_score 取最终分值. "
         "返回最优格子索引 r4. "
         "Constants: slot_entry stride 0x868*r4, gDuelFieldSlots=0x0201c510."),
+    # batch #59
+    ("FUN_080909fc", "scan_equip_chain_nodes_for_bitmap_update",
+        "被 FUN_08090a78 (equip 激活主循环) 调用 (indeg=6). "
+        "入口 r0=packed_player_slot (bit0=player_side, 高位=slot index 编码), r1=slot_idx, r2=unused(由 callee-save 覆盖), r3=callback_flag. "
+        "函数体: 从 gDuelFieldSlots (0x0201c510, stride=0x868) 根据 r0/r1 计算目标格子基址, 读取 slot[+0xa] 的 chain_head 指针; "
+        "若为 0 则直接返回. 否则遍历 gDuelNodePool (0x0201d9c0, stride=8) 的链表节点: "
+        "检查 node[+2].bits[3:0] 是否==0xa; 若是, 提取 node[+0] 的 player 和 slot 字段, "
+        "调用 test_slot_has_active_card 确认目标槽位有激活卡; "
+        "若 r3 (callback_flag) 非零, 调用 enqueue_equip_slot_bitmap_update 将该槽位加入位图更新队列; "
+        "若 r3 为 0, 仅设置内部标志 r7=1. "
+        "副作用: 间接通过 enqueue_equip_slot_bitmap_update 更新 OAM 位图队列. "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, player_stride=0x868, slot_entry=20, node_type_equip=0xa, node_stride=8."),
+    ("FUN_080916cc", "write_equip_target_score_entry",
+        "被 FUN_08091888 (duel field equip 评分主循环) 调用 (indeg=6), 在 equip 评分结构体中写入一条目标格子得分条目. "
+        "入口 r0=player_id [0..1], r1=ptr 指向 duel zone struct (base=0x0201bb90), r2=ptr 指向得分记录 (score_entry), r8=target_slot_or_idx (caller-set, 非 APCS). "
+        "函数体: 读取 0x0201bb90[+0x9c] (is_activated 标志); 以 r8 为索引计算 zone struct 内 [+0x2c+idx*4] / [+0xa0+idx*4] / [+0xa4+idx*4] 等多字段写入; "
+        "若 r1 (extra_ptr)==0 则写 [+0xa8]=(1-r2[0]), [+0xac]=5; 否则写 [+0xa8]=r1[0], [+0xac]=r1[4]. "
+        "接着遍历候选链调用 check_value_in_slot_chain (卡牌 0x1930 = Viser Des check), 若找到则写 [+0xac] = 5 或 chain result. "
+        "最后 eors 写 zone[+0x38+idx*4] (activation toggle 位). "
+        "副作用: 写入 gDuelBattleState (0x0201bb90) 多字段; 调用 check_value_in_slot_chain 只读. "
+        "Constants: gDuelBattleState=0x0201bb90, CARD_VISER_DES=0x1930 [check], slot_stride=0x38, eq_base=0x14a4/0x1639."),
+    ("FUN_08091888", "eval_field_equip_activation_candidates",
+        "被 FUN_08090a78 (equip 激活主循环) 和 FUN_080afcb4 以 r0=0/r1=1 调用 (indeg>=2). "
+        "大型 duel field equip 激活评分器: 入口 r0=player_id, r1=mode_flag. "
+        "函数体读取 gDuelBattleState (0x0201bb90) 中当前 equip 激活上下文 (slot 信息, LP 状态, fieldspell 标志), "
+        "通过复杂 BST 分派确定目标卡牌 card_id 所属类别 (多个 cmp 分支对应不同 card_id 范围). "
+        "对每个匹配类别: 调用 check_slot_card_fieldspell_eligibility 确认场地魔法资格; "
+        "初始化两组候选格 (slot_a / slot_b) 的 score 字段为 0; "
+        "再以 mode_flag 区分路径, 调用 write_equip_target_score_entry (FUN_080916cc) 写入得分条目. "
+        "全部分支均以写 gDuelBattleState 多字段为副作用. 函数体超过 350 指令. "
+        "Constants: gDuelBattleState=0x0201bb90, gP1LifePoints=0x0201c4e0, player_stride=0x868, slot_entry=20, 各 card_id BST 覆盖 0x14a4..0x19c9."),
+    ("FUN_080931de", "flush_field_spell_equip_slot_sprites",
+        "被 FUN_08091888 父函数内多条路径以 beq/bne 分支调用, 也作为独立函数从外部 bl 调用 (indeg=8+). "
+        "函数体: 首先检查 gDuelBattleState[+8] (is_busy 标志) 和 sp[0x8] (context_flag); 任一非零则跳过主逻辑. "
+        "若两者均为 0: 读取 sp[0x14] (r4, 当前 context 格子指针) 检查 [+0x2c] (activation_pending 位); "
+        "若置位且 r7==0, 加载 [+0x10] 与 0x18f1 (Graveyard card ID) 比较, 通过后调用 check_value_in_slot_chain (0x0fb6, 5-slot chain); "
+        "根据结果: 未命中则清零 [+0x2c], 若 sp[0x4] 非零则调用 enqueue_sprite_attr_for_zone_card_id_lookup + enqueue_sprite_attr_with_mode(mode=2) + enqueue_sprite_attr_with_mode(mode=4); "
+        "命中则 enqueue_sprite_attr_with_mode(mode=4). 随后对 sp[0x10] 做对称处理 (另一侧 player). "
+        "副作用: 写 [gDuelBattleState+0x2c]=0 (清激活标志); 调用 3 次 enqueue_sprite_attr 更新 OAM. "
+        "Constants: gDuelBattleState=0x0201bb90, CARD_GRAVEYARD_REF=0x18f1, chain_ref_0x0fb6, player_stride=0x868."),
+    ("FUN_080ac028", "find_best_activatable_slot_score_for_player",
+        "被 FUN_080ac0bc 调用一次 (indeg=1 from 080ac0bc), 也被 0x080a39fa 调用 (indeg>=2). "
+        "入口 r0=player_id [0..1], r1=activation_gate (saved to r9; 0=full eligibility check, 非0=activatable check), r2=loop_limit (saved to r10; slot 扫描上限). "
+        "遍历当前玩家侧 monster 格 slot [0..r2]: 检查 gDuelFieldSlots[player*0x868+slot*0x14].word[0] bits[13..0] 是否非 0 (有卡); "
+        "若 r1 (activation_gate) 非 0, 调用 check_slot_card_activatable; "
+        "若 r1==0, 调用 check_slot_full_activation_eligibility; "
+        "通过则调用 dispatch_zone_slot_score_by_player_flag 获取得分写入 sp[0x14]; "
+        "若 sp[0x14] > r7 (初始 -1) 则更新 r7. 循环结束后返回 r7 (最高分或 -1). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4, INIT_BEST=-1."),
+    ("FUN_080aef1c", "find_best_scored_slot_for_player_with_gate",
+        "被 FUN_080ac0bc 以两种参数组合各调用一次 (indeg=2 from 080ac0bc, r3=1 或 r3=0). "
+        "入口 r0=caller_player_id [0..1], r1=scan_player_id [0..1], r2=slot_limit [0..4], r3=extra_flag [0..1] (saved to r10 via mov r10,r3). "
+        "遍历 scan_player_id 侧 monster 格 slot [0..r2]: 检查有卡; "
+        "若 r0==r1 (同侧) 调用 eval_zone_slot_score_for_player_with_activation_guard; "
+        "否则调用 eval_zone_slot_score_for_player; "
+        "结果写 sp[0x14] (得分), 比较更新最高分 r8 (non-APCS); 若 r10 (extra_flag) 非零额外比较 sp[0x18]. "
+        "最终返回最高分 slot_idx (r8) 或 -1. "
+        "Non-APCS: r8=best_score(initial=-1), r9=best_slot_idx. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+    ("FUN_080ac0bc", "eval_player_activation_score_and_lp_threshold",
+        "被 FUN_080ac4cc / FUN_080ac56e 各调用一次 (indeg=2). "
+        "入口 r0=player_id [0..1], r1=score_context_ptr. "
+        "综合评估当前玩家的激活格得分与 LP 阈值, 返回激活决策 bool. "
+        "函数体: (1) r6=opponent=(1-player), r4=-1(初始阈值); "
+        "(2) 以 r0=opponent, r2=0 调用 find_best_activatable_slot_score_for_player, 得分暂存 r9; "
+        "(3) 以 r0=player, r1=player, r2=-1, r3=1 调用 find_best_scored_slot_for_player_with_gate (activation=1), 返回 sp[0x4]; "
+        "(4) 再以 r3=0 调用同函数, 返回 sp[0x8]; "
+        "(5) sp[0xc]=0x64 (初始比较分); "
+        "(6) 调用 count_occupied_monster_zones (opponent); "
+        "(7) 若为 0: 计算 gP1LifePoints[player*0x868]+0x40 (LP 值), 调用 FUN_080af374 (total slot score), 比较 LP vs score 差值; "
+        "若通过调用 check_equip_effect_zone_preconditions. "
+        "(8) 多层 score/LP 比较判断; 最终返回 0=可激活, 1=不可. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, LP_THRESHOLD_BASE=0x64=100, 0x13f9, 0x3e7, 0x130c."),
+    ("FUN_080b153c", "select_equip_placement_slot_with_score",
+        "被 FUN_080bc388 (try_execute_toon_world_equip_placement) 以 r0=player_id, r1=sp (caller stack frame ptr) 调用 (indeg>=1). "
+        "大型综合选择器: (1) 调用 resolve_equip_target_slot_for_player(player, 1) 确认装备目标格可用性; "
+        "(2) 两次调用 scan_monster_slots_for_max_zone_score (分别扫 opponent 和 self 侧), 结果存 sp[0x30..0x3c]; "
+        "(3) 检查 player LP > 0; "
+        "(4) 遍历 gDuelFieldSlots + player_side (0x0201c600 侧, 约 0x100 条目): "
+        "对每个有效卡牌条目调用 check_card_field5_is_nonzero -> check_card_effect_activation_eligible_by_id -> eval_card_placement_flags_default -> score_equip_slot_placement_for_ai, 累计候选列表; "
+        "(5) 遍历候选列表调用 eval_equip_target_slot_with_score; "
+        "(6) 若有候选, 调用 check_card_activation_eligible_by_id -> select_optimal_monster_placement_slot -> FUN_080ac0bc (LP 阈值) -> FUN_080b1458 (field spell 放置检查); "
+        "(7) 在第二遍 gDuelFieldSlots 扫描中额外调用 eval_equip_bonus_for_slot. "
+        "最终将最优格子索引写入 r1 指向的 caller stack 区域; 返回最优得分 (>=0) 或 -1 (无匹配). "
+        "Constants: gDuelFieldSlots=0x0201c510, gDuelFieldSlots2=0x0201c600, player_stride=0x868, INIT_BEST=-1."),
+    ("FUN_080bc388", "try_execute_toon_world_equip_placement",
+        "被 toon world AI 决策入口调用 (indeg 待确认). "
+        "无 APCS 参数: player_id 从 gP1LifePoints[+0x1ce8] 读取 (以 ldr r5,PTR_gP1LifePoints; ldr r1,DAT_0x1ce8; adds r0,r5,r1; ldr r4,[r0] 方式读取). "
+        "函数体: (1) 读 0x0201afe0[+8] (duel battle state 字段); 非 0 则返回 1 (战斗状态下不允许放置); "
+        "(2) 调用 check_player_lp_exceeds_toon_world_cost(player); 不满足则跳到 fail; "
+        "(3) 读 gP1LifePoints[player*0x868+0x11c] bit17 (toon world 相关标志); 若置位则 fail; "
+        "(4) 调用 check_field_spell_card_placeable_strict 或 check_field_spell_group_placeable(player); 至少一个通过才继续; "
+        "(5) 调用 select_equip_placement_slot_with_score(player, sp) 选最优格; 返回 -1 则 fail; "
+        "(6) 调用 execute_field_spell_equip_placement; 失败则 fail; "
+        "(7) fail 路径: [0x0201afe0+8] += 1 (计数器递增); 所有路径返回 0. 成功路径 (execute_field_spell_equip_placement 成功) 也返回 0. 非成功分支 (战斗状态) 返回 1. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_offset_in=0x1ce8, battle_state_ptr=0x0201afe0, player_stride=0x868, toon_flag_bit17_word_offset=0x11c."),
+    ("FUN_080baed0", "try_activate_equip_for_matching_slot",
+        "被 FUN_080bb35c (scan_all_effect_zone_entries_for_equip_activation) 以及另一 sibling 调用 (indeg>=2). "
+        "入口 r0=player_id [0..1], r1=entry_ptr (指向 0x09e483b0 pool 的一个 8 字节条目; entry[0]=target_card_id). "
+        "函数体: (1) 从 entry[0] 读 target_card_id -> 内部 r9; "
+        "(2) 以 r8=player_id&1 和 r10=1 为内部循环控制量, 遍历 gDuelFieldSlots[player*0x868] slot 0..0xa (11 个格): "
+        "对每格检查 slot[0].bits[12..0]==r9 (card_id 匹配); "
+        "(3) 匹配时: 检查 slot[+0x10].bit5=0 (非已激活), bit1=0 (非锁定); memset 0x18 字节到 sp 局部区; "
+        "写 OAM attr (r2=entry[+4]=sprite_ptr: attr0/attr1/attr2 位域操作); "
+        "(4) 检查 slot[+8]: 非 0 则调用 eval_equip_activation_for_slot, 否则调用 check_card_zone_activation_blocked; "
+        "(5) 若通过: check_card_summon_eligible_by_field6; FUN_0810e5d0 (equip chain validation); "
+        "(6) 成功路径: init_duel_zone_target_slot_refs; 写 [gP1LifePoints+0x1c44]:=player_id / [gP1LifePoints+0x1c38]:=3; 返回 1. 失败路径返回 0. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, gP1LifePoints=0x0201c4e0, LOOP_MAX=0xa."),
+    ("FUN_080bb35c", "scan_all_effect_zone_entries_for_equip_activation",
+        "被 FUN_080bc22c (toon world equip AI 决策) 以 r0=player_id 调用 (indeg=1, @ 080bc2d6). "
+        "入口 r0=player_id [0..1]. 遍历固定 ROM 常量池 0x09e483b0: "
+        "以 r4=0..0xa4 (165 次, 步长 8 字节) 计算 entry_ptr=0x09e483b0+r4*8; "
+        "调用 try_activate_equip_for_matching_slot(player, entry_ptr); "
+        "若返回 1 (找到匹配并激活成功) 立即返回 1; 全部条目失败则返回 0. "
+        "纯扫描器, 外部写入通过 callee 副作用传播. "
+        "Constants: ENTRY_POOL_BASE=0x09e483b0, ENTRY_SIZE=8, ENTRY_COUNT=0xa4+1=165."),
+    ("FUN_080bbf38", "check_field_spell_equip_placement_eligible",
+        "被 FUN_080bc22c 调用 (indeg>=1, 在 toon world equip 决策链上). "
+        "入口 r0=player_id [0..1]. "
+        "逻辑: (1) 调用 check_field_spell_card_placeable_strict(player); 失败直接返回 0; "
+        "(2) 检查 gP1LifePoints[player*0x868+0xc] > 0 (LP 基础检查); "
+        "(3) 以 r8=0 (loop counter), r9=0 (entry scan 基准) 遍历 gDuelFieldSlots2 (0x0201c600) 条目: "
+        "提取 card_id 和 field7_type; 调用 eval_card_placement_flags_default(player, card_type, card_id); "
+        "对返回 flags 的 bit4 检查; "
+        "(4) 对匹配卡牌按 BST 分派 card_id 到多条路径: count_occupied_monster_zones / count_equip_slots_active_only / "
+        "count_equip_placements_with_chain_check / count_slot_card_pair_allowed_for_card / "
+        "check_any_pair_slot_available_for_card / count_equippable_slots_for_card / dispatch_effect_handler_by_card_id; "
+        "各路径设置 r10 位标志; "
+        "(5) 通过路径: 写 [gP1LifePoints+0x1d64] := player_id, [gP1LifePoints+0x1d68] := player_id; "
+        "构建 OAM slot attr; 调用 apply_equip_entry_sprite_from_slot_context; 返回 1. 失败返回 0. "
+        "Constants: gP1LifePoints=0x0201c4e0, gDuelFieldSlots2=0x0201c600, player_stride=0x868, "
+        "card_id_set=[0x13b5, 0x147b, 0x154b, 0x16ec, 0x1870, 0x185d, 0x1905, 0x18cd]."),
+    ("FUN_080b0bc0", "prepare_effect_zone_slots_for_field_action",
+        "被 duel AI field action 决策路径调用 (indeg 待确认). "
+        "入口 r0=player_id [0..1]. "
+        "遍历当前玩家侧 gDuelFieldSlots[player*0x868] 的 5 个 monster 格 (slot 0..4): "
+        "(1) 读 slot[0] bits[18..0] 检查有卡; 无卡跳过; "
+        "(2) 读 slot[+8]: 若为 0, 调用 check_field_spell_last_warrior_placeable(player); "
+        "通过后再调用 get_card_field_summon_restriction(card_id); 若有召唤限制 (非 0) 跳过; "
+        "(3) 读 slot[+6]: 若非 0, 调用 check_slot_field_action_eligibility(player, slot); "
+        "(4) 若通过: strh 0 -> [slot+6] (清零 field6 状态), strh 1 -> [slot+8] (设 field8=1). "
+        "写入标志位表明该格已准备好进行 field action. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+    ("FUN_080afa60", "check_equip_target_slot_card_eligible_by_id",
+        "被 FUN_080b153c (select_equip_placement_slot_with_score) 调用, 检查指定 monster 格的卡牌 ID 是否符合装备牌放置资格. "
+        "入口 r0=player_id [0..1], r1=slot_idx [0..4], r2=mode [0..1]. "
+        "函数体: 由 slot_idx 和 player_id 计算 gDuelFieldSlots+player*0x868+slot*0x14 地址 (r12 保存基址); "
+        "读 slot[0].bits[12..0] 取出 card_id; 以 card_id 为键进行 BST 分派, "
+        "匹配多个特定 card_id 范围 (0x1524..0x17d8, 0x17df, 0x18f3, 0x1963, 0x19c2 等); "
+        "对应路径: 检查 slot[+8] (field8=equip 关联状态) 是否非 0, 或检查 slot[+6] (field6) 是否非 0 并对符号取位, 返回 bool. "
+        "0x4684=mov r12,r0 保存 gDuelFieldSlots 基址. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4."),
+    ("FUN_080af374", "sum_all_slot_scores_for_player",
+        "被 FUN_080b4ccc 调用两次 (r0=self_player/r1=self_player, 再 r0=self_player/r1=1-player), "
+        "用于分别统计同侧和对侧所有 monster 格的累计得分. "
+        "入口 r0=self_player_id [0..1], r1=scan_player_id [0..1]. "
+        "循环 slot 0..4 (共 5 格): 若 r0==r1 (同侧), 调用 eval_zone_slot_score_for_player_with_activation_guard(scan_player, slot); "
+        "否则调用 eval_zone_slot_score_for_player(scan_player, slot); "
+        "将 sp[0x14] 处的得分累加至 r6. 循环结束后返回 r6 (总得分). "
+        "纯聚合器, 无外部写入. 0x466a=mov r2,sp, 用于将栈缓冲区地址传给 callee 写回得分. "
+        "Constants: SLOT_MAX=4."),
+    ("FUN_080b4ccc", "check_player_score_advantage_exceeds_lp",
+        "被 duel AI 决策路径调用 (indeg 待确认). "
+        "入口 r0=player_id [0..1]. "
+        "逻辑: (1) 调用 sum_all_slot_scores_for_player(player, player) -> r6 (自侧总分); "
+        "(2) 计算 opponent=1-player; "
+        "(3) 调用 sum_all_slot_scores_for_player(player, opponent) -> r0 (对侧总分); "
+        "(4) diff=opponent_score - self_score; "
+        "(5) 读 gP1LifePoints[player*0x868] (当前玩家 LP 值); "
+        "(6) 若 diff >= LP 返回 1 (对手格子优势超过我方 LP), 否则返回 0. "
+        "纯只读查询, 无外部写入. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+    ("FUN_080ad270", "check_card_id_in_field_spell_bst",
+        "被 FUN_080b1458 (field spell 放置资格检查) 以 r0=card_id 调用 (indeg=1 from batch context). "
+        "纯叶子 BST 查找: 以 r0=card_id 为键, 在约 20 个特定 field spell 相关 card_id 的白名单集合上执行二叉搜索树查询. "
+        "覆盖范围约 0x0fd6..0x19fe, 包含多个单点和少量连续段. "
+        "card_id 在集合中返回 1, 不在返回 0. 无外部状态读写, 纯叶子函数. "
+        "被 check_field_spell_placeable (FUN_080b1458) 作为 field spell 卡牌 ID 门控条件. "
+        "Constants: id_set 覆盖约 0x0fd6, 0x10dd, 0x1185, 0x11c3, 0x11e4, 0x1309, 0x130b, 0x133c..0x133f, 0x13e3, 0x13e9, 0x19fe 等特定 ID."),
+    ("FUN_080b1458", "check_card_field_spell_equip_placeable",
+        "被多个 field spell 放置决策路径调用 (indeg 待确认). "
+        "入口 r0=player_id [0..1], r1=card_id. "
+        "函数体逻辑: (1) 以 r1=card_id 调用 check_card_id_in_field_spell_bst; 若命中 (特定 field spell 系列) 立即返回 1; "
+        "(2) 否则调用 check_field_spell_group_placeable (r0=player_id) 确认场地魔法放置资格; 若失败返回 0; "
+        "(3) 通过 card_id BST 分派: 匹配 0x11c3/0x119b 系列调用 count_occupied_monster_zones; "
+        "匹配 0x100c/0x10dd 系列调用 count_hand_cards_by_field6(field6=0x16/0x17); "
+        "匹配 0x11f5 系列调用 compare_zone_max_scores_by_player; "
+        "匹配 0x1331/0x1369/0x179a 系列也走各自逻辑; 最终返回 bool (1=可放置, 0=不可). "
+        "副作用: 无外部写入. "
+        "Constants: field_spell_bst_ids=[0x100c, 0x10dd, 0x11c3, 0x119b, 0x11f5, 0x1331, 0x1369, 0x179a], gP1LifePoints=0x0201c4e0."),
+    ("FUN_080ad4ac", "resolve_equip_target_slot_for_player",
+        "被 FUN_080b153c (equip 目标选择主流程) 以 r0=player_id, r1=1 调用 (indeg=1 from PROGRESS tracking). "
+        "5 指令极简包装器: 以 r0=player_id, r1=slot_bitmap 调用 build_equip_eligible_slot_bitmap, "
+        "得到装备候选位图 r0; 再以 r0=player_id, r1=r1(原), r2=bitmap 调用 select_equip_target_slot_by_bitmap 选出目标格子. "
+        "返回 select_equip_target_slot_by_bitmap 的结果 (高字节=player_id, 低字节=slot_idx, 或 -1 失败). "
+        "无外部写副作用, 仅转发语义. "
+        "Constants: 无独立常量."),
+    ("FUN_080afc24", "find_best_scored_spell_zone_slot",
+        "被 FUN_080affe8/FUN_080b0008/FUN_080b0080/FUN_080b047c 等多处调用 (indeg>=4). "
+        "入口 r0=player_id [0..1], r1=slot_count [0..4] (从 caller r9 传入), r2=activation_mode [0..1]. "
+        "函数体: 以 player_id*0x868 计算 gDuelFieldSlots+player 侧基址 (r8=player_offset); "
+        "r10=slot_count (r1 别名), r9=activation_mode (r2 别名). "
+        "循环 slot 0..r10: 读 slot[0] bits[18..0] 检查有卡; "
+        "若 r9 (activation_mode) 非 0, 调用 check_slot_full_activation_eligibility(player, slot, 1); "
+        "读 0x0201b00c + slot_offset (spell zone 得分表); "
+        "若得分 > r3 (初始 -1 阈值) 则更新 r3. 循环结束返回 r3 (最高得分, -1=无匹配). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_score_base=0x0201b00c, SLOT_MAX=4, INIT_THRESHOLD=-1."),
 ]
 
 
