@@ -10085,6 +10085,167 @@ RENAMES = [
         "r0=u16 src_encoded, r1=u16 dst_encoded. Returns void. "
         "Constants: gDuelFieldSlots=0x0201c510, chain_list=0x0201d9c0, card_id_range=0x118a..0x11c9, type_equip=0xa. "
         "Callers: FUN_08043ea4, FUN_08043f44."),
+
+    # --- batch #46 (campaign-46) ---
+    ("FUN_08043ea4", "enqueue_equip_chain_pair_sprite_if_eligible",
+        "Check activation bit (bit12) of two equip slots (r0=player_a/r1=slot_a, r2=player_b/r3=slot_b); "
+        "if both active, call enqueue_equip_chain_pair_sprite_validated to enqueue dual-slot sprite, "
+        "write sprite attr to OAM buffer via enqueue_sprite_attr_record, "
+        "then scan activation chain via scan_equip_chain_list_for_activation_sprite. "
+        "Entry unpacks u8 player_id and u8 slot_idx via lsls/lsrs. Returns void. "
+        "Params: r0=u8 player_id_a [0..1], r1=u8 slot_idx_a [0..4], r2=u8 player_id_b [0..1], r3=u8 slot_idx_b [0..4]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14."),
+    ("FUN_08036014", "check_slot_equip_eligibility_by_type",
+        "Comprehensive equip eligibility check for a field slot (r0=player_id, r1=slot_idx, r2=flag). "
+        "Calls check_slot_card_effect_eligibility then count_zones_by_card_and_mode; "
+        "dispatches to different eligibility paths based on card type field attr[0xc..0xf] (type=1/5/6/0xa etc). "
+        "Returns 1 if slot can legally equip, 0 otherwise. Shared by 7 duel_field callers. "
+        "Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4], r2=u8 flag [0..1]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_0804c140", "check_card_id_is_field_zone_special",
+        "Leaf function. Checks if card_id (r0) matches one of three special field zone cards: "
+        "0x170a, 0x1652 (=0x170a-0xb8), or 0x17d2. Returns 1 if match, 0 otherwise. "
+        "Called by check_slot_field_zone_card_eligible to filter special zone cards before equip check. "
+        "Params: r0=u16 card_id [0..0x1fff]. "
+        "Constants: CARD_ID_FIELD_ZONE_A=0x170a, CARD_ID_FIELD_ZONE_B=0x1652, CARD_ID_FIELD_ZONE_C=0x17d2."),
+    ("FUN_08032f00", "count_eligible_zone_slots_for_player",
+        "Iterates 5 field slots (slot 0..4, stride 0x14) for given player side (r0=player_id, r2=zone_flag). "
+        "For each slot checks: (1) bit12 activation flag nonzero; (2) [slot+0x8] nonzero (valid card); "
+        "(3) check_slot_zone_bit_eligible passes. Increments counter if all three pass. "
+        "Returns count of eligible slots [0..5]. Called by count_eligible_zone_slots_all_flags with r2=-1. "
+        "Params: r0=u8 player_id [0..1], r2=i32 zone_flag (zone bit mask, -1=all). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14."),
+    ("FUN_08032f6c", "count_eligible_zone_slots_all_flags",
+        "Thin wrapper around count_eligible_zone_slots_for_player. "
+        "Sets r2=-1 (movs r2,#1; rsbs r2,r2,#0 = all-flags) then tail-calls FUN_08032f00. "
+        "Counts all eligible zone slots for given player side with all zone bits selected. "
+        "Params: r0=u8 player_id [0..1]. Returns r0=u8 count [0..5]. "
+        "Constants: ZONE_FLAG_ALL=-1."),
+    ("FUN_080363bc", "check_slot_field_zone_card_eligible",
+        "Comprehensive field zone card eligibility check for slot (r0=player_id, r1=slot_idx). "
+        "Reads slot at 0x0201c510+player*0x868+slot*0x14, checks bit12 activation and [slot+0x10] limit bits (bit5/bit1). "
+        "Calls check_card_id_is_field_zone_special to filter special zone cards; "
+        "then compares card_id against 0x1826/0x17e4/0x1860 etc. "
+        "If conditions met, calls count_eligible_zone_slots_all_flags to verify opposite side has eligible slots. "
+        "Returns 1 (eligible) or 0 (ineligible). "
+        "Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4]. "
+        "Constants: CARD_ID_FIELD_A=0x1826, CARD_ID_FIELD_B=0x17e4, CARD_ID_FIELD_C=0x1860, gDuelFieldSlots=0x0201c510."),
+    ("FUN_08042b24", "resolve_equip_target_slot_for_enqueue",
+        "Equip activation target slot resolution and enqueue. Entry r0=player_id, r1=slot_idx. "
+        "Calls check_slot_field_zone_card_eligible; checks bit12 activation; "
+        "calls check_slot_equip_eligibility_by_type to find target slot; "
+        "calls check_slot_card_is_equip_whitelist. Whitelist path uses find_first_available_monster_slot_for_player; "
+        "non-whitelist path uses get_first_placeable_monster_slot. "
+        "If valid target (r6!=-1): calls enqueue_equip_slot_bitmap_update (r2=1). "
+        "If cross-side slot (r7!=r4): packs player/slot and calls enqueue_equip_chain_pair_sprite_if_eligible. "
+        "Returns 1=processed, 0=not processed. "
+        "Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4]."),
+    ("FUN_08047e20", "prepare_equip_slot_ctx_for_bitmap_update",
+        "Equip target context init and bitmap update. Entry r0=player_id, r1=slot_idx, r2=extra_flag, r3=flags. "
+        "Allocates 0x18-byte stack workspace, clears via memset; writes r3 (halfword) to [sp+0x0]; "
+        "reads [r2+0x2] byte, applies bit1 mask, writes back; "
+        "computes slot bitmap (1<<(player*0x10+slot_idx)); "
+        "calls update_equip_target_bitmap_for_field (zone_flags=0xe, side_flags=0). "
+        "Returns 1 if slot bit set in bitmap, 0 otherwise. "
+        "Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..9], r2=u8 extra_flag [0..1], r3=u16 flags. "
+        "Constants: MEMSET_SIZE=0x18, ZONE_FLAGS=0xe, SIDE_FLAGS=0x0, BIT1_MASK=0x2."),
+    ("FUN_080478fc", "query_equip_target_bitmap_default",
+        "Minimal leaf wrapper (5 instructions). Calls update_equip_target_bitmap_for_field with fixed params "
+        "r2=0xe (zone_flags) and r3=2 (side_flags=both sides). "
+        "Passes through r0=player_id, r1=slot_mask to callee. "
+        "indeg=29, highest-frequency equip target bitmap query entry in field code. "
+        "Params: r0=u32 player_id, r1=u32 slot_mask. "
+        "Constants: ZONE_FLAGS=0xe, SIDE_FLAGS=0x2."),
+    ("FUN_08047970", "test_equip_target_slot_in_bitmap",
+        "Combines r1=player_id and r2=slot_idx into slot bitmap mask (1<<(r1*0x10+r2)), "
+        "then calls query_equip_target_bitmap_default (FUN_080478fc). "
+        "Returns 1 if bitmap AND slot_mask nonzero (slot is valid equip target), 0 otherwise. "
+        "indeg=19, standard entry for equip feasibility test throughout field code. "
+        "Params: r0=u32 bitmap_ctx, r1=u8 player_id [0..1], r2=u8 slot_idx [0..9]."),
+    ("FUN_08047f1c", "update_equip_bitmap_with_cross_side_flag",
+        "Equip target bitmap update with cross-side flag injection. "
+        "Entry r0=bitmap_ctx, r1=player_id_a, r2=slot_idx, r3=zone_flags, [sp+0x10]=side_flags. "
+        "Computes slot_mask=1<<(r1*0x10+r2); detects cross-side (r4 XOR r1 nonzero) via eors/rsbs/orrs/asrs pattern; "
+        "if cross-side, ORs 0x20000 (bit17) into zone_flags; then calls update_equip_target_bitmap_for_field. "
+        "Returns 1 if bitmap hit, 0 otherwise. "
+        "Params: r0=u32 bitmap_ctx, r1=u8 player_id_a [0..1], r2=u8 slot_idx [0..9], r3=u32 zone_flags, [sp+0x10]=u32 side_flags. "
+        "Constants: CROSS_SIDE_FLAG=0x20000."),
+    ("FUN_0808efa8", "scan_field_for_whitelist_equip_sprite_and_lp",
+        "Iterates 2 sides x 5 slots. For each active slot calls check_slot_card_is_equip_whitelist; "
+        "if pass, reads opposite-side same-slot equip chain data (bit5/bit1 limit checks); "
+        "calls enqueue_sprite_attr_for_zone_card_id_lookup to enqueue zone sprite attr. "
+        "When cross-side match found, calls submit_lp_change_indicator_with_chain_check per interval. "
+        "Returns 1=found and processed at least one eligible slot, 0=none. "
+        "Params: r0=void (entry movs r0,#0 overwrites). "
+        "Constants: gDuelFieldBase=0x0201e1c8, player_stride=0x868."),
+    ("FUN_0808f9f8", "scan_field_slots_for_equip_bitmap_update",
+        "Iterates 2 sides (player 0..1) x monster zone slots (slot 5..9). "
+        "For each slot calls test_slot_has_active_card (card_id=0x1624); "
+        "if active and get_slot_effect_card_value returns 0 (no extra effect value), "
+        "calls enqueue_equip_slot_bitmap_update to enqueue bitmap update. "
+        "Returns 1=found and processed, 0=none. Single caller FUN_08090218 (duel_field master). "
+        "Params: r0=void (entry movs r6,#0 overwrites). "
+        "Constants: BASE_ADDR=0x0201e1c8, CARD_ID_FILTER=0x1624."),
+    ("FUN_0808eeb0", "scan_field_slots_for_chain_sprite_enqueue",
+        "Iterates 2 sides x 5 slots; checks each slot bit12 activation flag and [slot+0xc] field "
+        "value against chain node constant 0xa2680000. For matching slots calls "
+        "enqueue_sprite_attr_with_xy_split to enqueue split-XY sprite attr. "
+        "Inner loop slot 0..4, outer loop player 0..1. Base addr 0x0201e1c8. "
+        "Single caller FUN_08090218 (duel_field master). "
+        "Params: r0=void (entry ldr r0,DAT overwrites). "
+        "Constants: BASE_ADDR=0x0201e1c8, CHAIN_NODE_MAGIC=0xa2680000, PLAYER_STRIDE=0x868."),
+    ("FUN_0808f230", "scan_field_for_equip_priority_slot_update",
+        "Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x160f) per slot; "
+        "among active slots compares [slot+0x4] values (priority/ATK), selects slot with smaller value; "
+        "calls enqueue_equip_slot_bitmap_update to update equip bitmap. "
+        "Returns 1=found and updated, 0=not processed. Single caller FUN_08090218. "
+        "Params: r0=void (entry movs r0,#0 + mov r10,r0 overwrites). "
+        "Constants: CARD_ID_TARGET=0x160f, BASE_ADDR=0x0201e1c8, PLAYER_STRIDE=0x868."),
+    ("FUN_08037bb4", "check_field_effect_zone_activation_eligible",
+        "Checks field effect zone activation eligibility for given player side (r0=player_id). "
+        "Logic: (1) call count_available_effect_zones (card=0x137b) for opposite side - return 1 if nonzero; "
+        "(2) call count_field_copies_of_card for own side - return 1 if nonzero; "
+        "(3) call count_available_effect_zones (card=0x17e7) for opposite side; "
+        "(4) if opposite player_id matches stored value at gP1LifePoints+0x1ce8, "
+        "call count_field_copies_of_card (card=0x135e). Returns 1 if any condition met, 0 otherwise. "
+        "Params: r0=u8 player_id [0..1]. "
+        "Constants: CARD_ID_A=0x137b, CARD_ID_B=0x17e7, CARD_ID_C=0x135e, ZONE_FLAG_ALL=-1."),
+    ("FUN_0808ffb4", "scan_field_slots_for_equip_sprite_by_chain",
+        "Iterates 2 sides x 5 slots; for each active slot checks card_id=0x1817; "
+        "calls count_slot_chain_nodes_by_card_id; if nonzero, checks bit5: "
+        "bit5=0 calls enqueue_effect_card_slot_sprite_attr (with count param), "
+        "then calls enqueue_equip_slot_sprite_attr (r3=1). "
+        "Returns 1=processed at least one slot, 0=none. Single caller FUN_08090218. "
+        "Params: r0=void (entry movs r0,#0 + mov r8,r0 overwrites). "
+        "Constants: CARD_ID_TARGET=0x1817, BASE_ADDR=0x0201e1c8."),
+    ("FUN_0808eb68", "find_first_eligible_zone_slot_for_player",
+        "Iterates 5 field slots (slot 0..4, stride 0x14) for given player side (r0=player_id). "
+        "Checks each slot: (1) bit12 activation flag; (2) [slot+0x8] nonzero (has card); "
+        "(3) check_slot_zone_bit_eligible (r2=1). Returns 1 immediately on first match, 0 if none found. "
+        "Called by scan_field_slots_for_zone_equip_bitmap_update and FUN_0809a1a4. "
+        "Params: r0=u8 player_id [0..1]. "
+        "Constants: PLAYER_STRIDE=0x868, BASE_ADDR=0x0201c510, ZONE_FLAG=1."),
+    ("FUN_0808ebb8", "scan_field_slots_for_zone_equip_bitmap_update",
+        "Iterates 2 sides x 5 slots; calls test_slot_has_active_card (card_id=0x13a4) to confirm active; "
+        "if active, calls find_first_eligible_zone_slot_for_player to confirm that side has eligible zone slot; "
+        "if eligible, calls enqueue_equip_slot_bitmap_update to enqueue equip bitmap update. "
+        "Returns 1=processed, 0=none. Single caller FUN_08090218 (duel_field master). "
+        "Params: r0=void (entry movs r6,#0 overwrites). "
+        "Constants: CARD_ID_TARGET=0x13a4, BASE_ADDR=0x0201e1c8."),
+    ("FUN_080439e0", "apply_slot_equip_activation_with_sprite",
+        "Performs equip activation for a field slot (r0=player_id, r1=slot_idx, r2=extra, r3=side_flag) "
+        "and updates sprite display. Reads slot card_id (bits[12:0]); checks slot_idx<=4 and activation flag; "
+        "builds OAM attr word using bit masks (0xfffffdff/0xffffc3ff/0xffffbfff/0xffff7fff/"
+        "0xfffffe00/0xfffeffff/0xfffdffff) to clear old fields then OR in new slot/player/flip bits; "
+        "calls enqueue_sprite_attr_record to write OAM buffer. "
+        "Based on side_flag calls set_field_slot_bit_with_sprite_update (r3=1); "
+        "for specific card_ids (0x1005/0x1048/0x101e/0x1197/0x1868) calls apply_equip_activation_with_id_lookup; "
+        "if LP change, calls submit_lp_bar_sprite_row_by_type. Returns 1=success, 0=not processed. "
+        "Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4], r2=u16 extra_field, r3=u8 side_flag [0..1]. "
+        "Constants: OAM_CLEAR_BIT9=0xfffffdff, OAM_CLEAR_BITS14_15=0xffffc3ff, OAM_CLEAR_BIT14=0xffffbfff, "
+        "OAM_CLEAR_BIT15=0xffff7fff, OAM_CLEAR_BITS0_8=0xfffffe00, OAM_CLEAR_BIT16=0xfffeffff, "
+        "OAM_CLEAR_BIT17=0xfffdffff, CARD_ID_BRANCH_A=0x1005, CARD_ID_BRANCH_B=0x1048, "
+        "CARD_ID_BRANCH_C=0x1197, CARD_ID_BRANCH_D=0x1868."),
 ]
 
 
