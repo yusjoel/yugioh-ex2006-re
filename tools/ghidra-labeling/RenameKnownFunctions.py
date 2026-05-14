@@ -10413,6 +10413,195 @@ RENAMES = [
         "then jumps to shared tail LAB_0804fffe. "
         "Params: r4=u32 player_side [0..1] (caller-set), r7=u32 slot_idx [0..9] (caller-set). "
         "Returns r0: result of check_slot_zone_bit_eligible."),
+    # batch #48
+    ("FUN_0804ff54", "check_card_state_code_eq_15",
+        "In dispatch branch of check_slot_card_eligible_by_card_id (0x0804f6c4). "
+        "Compares r3 (card_state_code from caller frame, set by query_slot_card_state_code) "
+        "with fixed value 0xf (15); returns 1 if equal, 0 otherwise. "
+        "Symmetric to check_card_state_code_eq_11/check_card_state_code_eq_3; only cmp immediate differs. "
+        "Jumps to shared tail LAB_0804fffe (pop+bx). "
+        "Params: r3=u32 card_state_code [0..0xffff] (caller-set non-APCS). "
+        "Returns r0=u32 is_match (1 if card_state_code==15, else 0)."),
+    ("FUN_0804fed6", "return_zero_unconditional",
+        "Called by check_slot_card_eligible_by_card_id (0x0804f6c4) on all non-matching paths. "
+        "Body: movs r0,#0 + b LAB_0804fffe (shared frame exit). "
+        "Reads no parameters; writes no external state. "
+        "Used as unified 'not eligible' return exit for multiple bne/beq branches. "
+        "Returns r0=u32 0 (always)."),
+    ("FUN_0804ffea", "check_slot_zone_bit2_eligible",
+        "In dispatch branch of check_slot_card_eligible_by_card_id (0x0804f6c4). "
+        "Reads r4=player_side and r7=slot_idx from caller frame (non-APCS). "
+        "Sets r2=2 (fixed zone_bit), calls check_slot_zone_bit_eligible, "
+        "then jumps to shared tail LAB_0804fffe. "
+        "Symmetric to check_slot_zone_bit1_eligible (r2=1) and check_slot_zone_bit3_eligible (r2=3). "
+        "Params: r4=u32 player_side [0..1] (caller-set), r7=u32 slot_idx [0..9] (caller-set). "
+        "Returns r0: result of check_slot_zone_bit_eligible (1=eligible, 0=not eligible)."),
+    ("FUN_0804fffc", "return_true_unconditional",
+        "Called by check_slot_card_eligible_by_card_id (0x0804f6c4) on all unconditionally eligible paths. "
+        "Body: movs r0,#1, then falls into shared frame exit LAB_0804fffe (pop+bx). "
+        "Reads no parameters; writes no external state. "
+        "Sibling of return_zero_unconditional (0x0804fed6); forms true/false pair. "
+        "Returns r0=u32 1 (always)."),
+    ("FUN_0804ff72", "check_card_state_code_eq_16",
+        "In dispatch branch of check_slot_card_eligible_by_card_id (0x0804f6c4). "
+        "Compares r3 (card_state_code from caller frame) with 0x10 (16); "
+        "returns 1 if equal, 0 otherwise. Jumps to shared tail LAB_0804fffe. "
+        "Symmetric to check_card_state_code_eq_15/check_card_state_code_eq_11/etc. "
+        "Params: r3=u32 card_state_code [0..0xffff] (caller-set non-APCS). "
+        "Returns r0=u32 is_match (1 if card_state_code==16, else 0)."),
+    ("FUN_0804ff7c", "check_card_state_code_eq_13",
+        "In dispatch branch of check_slot_card_eligible_by_card_id (0x0804f6c4). "
+        "Compares r3 (card_state_code from caller frame) with 0xd (13); "
+        "returns 1 if equal, 0 otherwise. Jumps to shared tail LAB_0804fffe. "
+        "Symmetric to all check_card_state_code_eq_N siblings; only cmp immediate differs. "
+        "Params: r3=u32 card_state_code [0..0xffff] (caller-set non-APCS). "
+        "Returns r0=u32 is_match (1 if card_state_code==13, else 0)."),
+    ("FUN_0804f6c4", "check_slot_card_eligible_by_card_id",
+        "duel_field card eligibility dispatch hub (indeg=8). "
+        "Saves r0/r1/r2 as r5=card_ptr, r4=player_side, r7=slot_idx. "
+        "Reads gDuelFieldSlots (0x0201c510) + player*0x868 + slot*20; "
+        "calls query_slot_card_state_code -> r3=state_code. "
+        "Dispatches via BST on card_ptr[0] halfword to 40+ branch labels "
+        "(check_card_state_code_eq_N / check_slot_zone_bitN_eligible / inline LABs). "
+        "Shared tail LAB_0804fffe: pop{r3,r4,r5}+mov pc,r8/r9/r10. "
+        "Returns 1=eligible, 0=not eligible, -1=forced reject (LAB_0804fff6). "
+        "Params: r0=u32* card_ptr, r1=u32 player_side [0..1], r2=u32 slot_idx [0..9]. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14."),
+    ("FUN_0802f768", "find_card_slot_by_zone_card_id",
+        "Called exclusively by dispatch_equip_chain_slot_scan_by_player (0x08042bd0). "
+        "Reads gDuelFieldSlots (0x0201c510) + player*0x868, checks chain head [+0xa]; "
+        "traverses chain nodes (stride=8), filters card_type bits[3:0]<=5, "
+        "extracts card_id (lsrs#0x10) and compares with r2 (target card_id). "
+        "Returns found card_id or 0xffff (no match). "
+        "Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9], r2=u32 card_id [0..0xffff]. "
+        "Returns r0=u32 found_card_id (card_id if match, else 0xffff). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, no_result=0xffff."),
+    ("FUN_08044dcc", "enqueue_field_slot_sprite_with_state_update",
+        "Called by dispatch_equip_chain_slot_scan_by_player and 10 other duel_field functions (indeg=11). "
+        "Reads gDuelFieldSlots (0x0201c510) + player*0x868 + slot*20; "
+        "extracts bits[22:16] (display_type) and bit18 (side_flag), forms combined=display_type*2+side_flag; "
+        "if combined==r2 (display_code): calls update_duel_field_slot_sprite_state(player, slot, 1). "
+        "Always enqueues OAM sprite via enqueue_sprite_attr_record "
+        "(attr0=0x43 P1 or 0x8043 P2, attr1=slot_idx, attr2=display_code, attr3=0). "
+        "Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..10], r2=u16 display_code [0..0xffff]. "
+        "Returns void. "
+        "Constants: gDuelFieldSlots=0x0201c510, OAM_P1=0x43, OAM_P2=0x8043."),
+    ("FUN_0802f81c", "find_equip_slot_by_zone_card_id_with_flag",
+        "Called exclusively by dispatch_equip_chain_slot_scan_by_player (0x08042bd0). "
+        "Symmetric to find_card_slot_by_zone_card_id (0x0802f768); adds bit4 flag filter. "
+        "Reads gDuelFieldSlots (0x0201c510) + player*0x868, checks chain head [+0xa]; "
+        "traverses nodes (stride=8), compares card_id (lsls#0x13/lsrs#0x13), "
+        "then additionally checks lsrs#0x4 AND r4 vs r8 (flag_mask). "
+        "Returns card_id low 16 on match, 0xffff otherwise. "
+        "Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9], r3=u32 flag_mask (bit4 filter). "
+        "Returns r0=u32 found_card_id (or 0xffff). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, no_result=0xffff."),
+    ("FUN_08042bd0", "dispatch_equip_chain_slot_scan_by_player",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Saves r0=player_side (sp+0x40), r1=slot_idx (sp+0x44). "
+        "Reads gDuelFieldSlots (0x0201c510) + player*0x868 + slot*20, checks chain head [+0x8]. "
+        "If chain head==0: calls scan_equip_chain_list_by_player_slot(player, slot), "
+        "then returns 0 via LAB_0804303e. "
+        "If chain head!=0: enters LAB_08042d64 (complex equip chain path with "
+        "find_card_slot_by_zone_card_id / find_equip_slot_by_zone_card_id_with_flag / "
+        "enqueue_field_slot_sprite_with_state_update), returns 1 via LAB_08043040. "
+        "Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9]. "
+        "Returns r0=u32 processed_flag (1=chain processed, 0=chain empty). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0x8."),
+    ("FUN_0808f450", "scan_field_slots_for_lp_change_sprite_update",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Double loop 2x9 (player [0..1] x zone_slot [0..8]). "
+        "Per slot: reads gP1LifePoints+0x1ce8+player_offset, checks state mask (0xa5f80000); "
+        "if match: calls enqueue_sprite_attr_with_xy_split; builds equip bitmap from bit5/bit1; "
+        "if equip bitmap nonzero: calls enqueue_sprite_attr_for_zone_card_id_lookup; "
+        "then calls submit_lp_change_indicator_with_chain_check twice (both player sides). "
+        "Returns r0=u32 hit_flag (1=at least one slot processed, 0=none). "
+        "Constants: gP1LifePoints+0x1ce8=player_offset, slot_stride=0x14, state_mask=0xa5f80000."),
+    ("FUN_0808fbd0", "scan_field_slots_for_archfiend_equip_bitmap_update",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Symmetric to scan_equip_chain_slots_for_bitmap_update (0x0808f57c). "
+        "Double loop 2x5 (player [0..1] x slot [0..4]); per slot: "
+        "calls test_slot_has_active_card (card_id=0x16bf); if active: "
+        "traverses 10 sub-slots calling check_card_is_archfiend_type, counts archfiend cards (r7). "
+        "If r7==0 (no archfiend): calls enqueue_equip_slot_bitmap_update(player, slot, 0, 0). "
+        "Returns r0=u32 updated_flag (1=at least one bitmap updated, 0=none). "
+        "Constants: CARD_ID=0x16bf, gDuelFieldSlots=0x0201c510, archfiend_slot_count=10."),
+    ("FUN_0808e4d8", "scan_field_slots_for_lp_zone_sprite_with_equip",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Symmetric to scan_field_slots_for_lp_change_sprite_update (0x0808f450); "
+        "difference: player side uses 1-r6 (opponent_side flip) for LP indicator. "
+        "Double loop 2x9 (player [0..1] x zone_slot [0..9]). "
+        "Per slot: reads gDuelFieldSlots+player*0x868, checks state filter; "
+        "if match: calls enqueue_sprite_attr_with_xy_split; builds equip bitmap; "
+        "if nonzero: calls enqueue_sprite_attr_for_zone_card_id_lookup; "
+        "calls submit_lp_change_indicator_with_chain_check with opponent_side. "
+        "Returns r0=u32 hit_flag (1=at least one slot updated, 0=none). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14."),
+    ("FUN_0808dd5c", "scan_field_for_equip_set_slot_sprite_update",
+        "Called by FUN_08067ea0, FUN_08090218, FUN_080a0334 (indeg=3). "
+        "Double loop 2x5 (player [0..1] x slot [0..4]). "
+        "Per slot: reads gDuelFieldSlots+player*0x868+slot*20, checks card_id==0x1009; "
+        "if chain head [+0x8] nonzero: calls count_paired_slots_both_sides(0x0ff9). "
+        "If paired>0: reads paired zone, calls enqueue_sprite_attr_for_zone_card_id_lookup + "
+        "set_field_slot_bit_with_sprite_update + get_equip_card_set_code_for_slot + "
+        "enqueue_equip_set_slot_sprite_by_zone_col. "
+        "If paired==0: calls set_field_slot_bit_with_sprite_update + enqueue_equip_slot_sprite_attr. "
+        "Returns r0=u32 updated_flag (0=none, 1=at least one slot updated). "
+        "Params: r0=u32 player_id [0..1]. "
+        "Constants: card_id_filter=0x1009, paired_check_card=0x0ff9, gDuelFieldSlots=0x0201c510."),
+    ("FUN_0808f6e4", "scan_chain_nodes_for_equip_zone11_sprite",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Outer loop 2x (player [0..1]); per player: "
+        "calls check_node_in_slot_chain(player XOR r4, zone=0xb=0x188c, card_type=2); "
+        "if node exists: traverses chain node list (base=0x0201d9c0, stride=8), "
+        "checks [node+0x0] AND 0x000fffff == 0x0002188c (zone11 marker); "
+        "if match: calls find_slot_idx_by_card_id_in_player_zones; "
+        "if slot>=0 and player_xor==0: calls enqueue_equip_zone_sprite_by_side; "
+        "calls submit_equip_slot_sprite_zone11 + enqueue_sprite_attr_for_chain_node_match. "
+        "Returns r0=u32 hit_count (zone11 sprite processing count, 0=no match). "
+        "Constants: zone_id=0xb (zone11), chain_base=0x0201d9c0, zone11_marker=0x0002188c."),
+    ("FUN_0808fae4", "scan_field_slots_for_inactive_equip_bitmap_clear",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Symmetric to scan_field_slots_for_archfiend_equip_bitmap_update (0x0808fbd0); "
+        "adds bit5 inactive equip filter. "
+        "Double loop 2x5 (player [0..1] x slot [0..4]); per slot: "
+        "calls test_slot_has_active_card; if active: reads gDuelFieldSlots2 (0x0201c520) field, "
+        "checks bit5==0 (equip inactive); if inactive: traverses 10 sub-slots calling "
+        "check_card_is_archfiend_type; if no archfiend (r7==0): calls enqueue_equip_slot_bitmap_update. "
+        "Returns r0=u32 updated_flag (1=at least one updated, 0=none). "
+        "Constants: gDuelFieldSlots2=0x0201c520, player_stride=0x868, sub_slot_count=10."),
+    ("FUN_0808f86c", "scan_field_slots_for_equip_chain_node_bitmap_update",
+        "Called by FUN_08090218 and FUN_08099e0c (indeg=2). "
+        "Entry gate: reads gP1LifePoints+0x10d0 [+0x0] bit0 (equip active flag); "
+        "if bit0==0: returns 0 immediately. "
+        "Also gates on gP1LifePoints+0x1d28 value >8 (phase threshold). "
+        "Double loop 2x5 (player [0..1] x slot [0..4]); per slot: "
+        "reads equip_chain_base (0x0201e1c8)+player+slot, compares card_id with 0x1596 or 0x1598; "
+        "if match and chain head [+0x8] nonzero: calls find_equip_chain_node_by_pred; "
+        "if found: calls enqueue_equip_slot_bitmap_update(player, slot, 0, 0). "
+        "Returns r0=u32 updated_flag (1=updated, 0=none). "
+        "Constants: equip_flag_offset=0x10d0, equip_chain_base=0x0201e1c8, "
+        "card_id_A=0x1596, card_id_B=0x1598."),
+    ("FUN_0804a570", "enqueue_duel_field_card_slot_sprite",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "Symmetric to enqueue_sprite_attr_for_card_slot (0x0804a5a0). "
+        "Reads gP1LifePoints (0x0201c4e0) + 0x1ce0 offset (slot state dword); "
+        "selects OAM attr0: 0x4d (P1) if r0==0, else 0x804d (P2). "
+        "Splits dword into lo/hi halfwords as attr1/attr2, calls enqueue_sprite_attr_record(attr0,lo,hi,0). "
+        "Params: r0=u32 player_side [0..1]. Returns void. "
+        "Constants: gP1LifePoints=0x0201c4e0, slot_state_offset=0x1ce0, OAM_P1=0x4d, OAM_P2=0x804d."),
+    ("FUN_0808e370", "scan_field_for_fieldspell_eligible_slot_sprite",
+        "Called exclusively by FUN_08090218 (duel_field main controller, indeg=1). "
+        "First calls count_field_copies_of_card(card_id=0x12fb); if 0: returns 0. "
+        "Double loop 2x5 (player [0..1] x slot [0..4]); per slot: "
+        "calls check_value_in_slot_chain(player, slot, 0x12ea); "
+        "if nonzero: calls count_available_effect_zones(0x12fb, -1) -> r2; "
+        "calls check_slot_fieldspell_eligible_by_side(player, slot, r2); "
+        "if eligible (==0): sets bit (player*16+slot) in hit bitmap (r9). "
+        "If hit bitmap nonzero: calls enqueue_sprite_attr_by_sign(-1, 0x12fb); "
+        "second double loop 2x5 calls prepare_equip_slot_ctx_for_bitmap_update per hit slot. "
+        "Returns r0=u32 updated_flag (1=processed, 0=none). "
+        "Constants: CARD_ID_COUNT=0x12fb, CARD_ID_CHAIN=0x12ea."),
 ]
 
 
