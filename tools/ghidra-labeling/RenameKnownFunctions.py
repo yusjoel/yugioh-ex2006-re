@@ -10602,6 +10602,228 @@ RENAMES = [
         "second double loop 2x5 calls prepare_equip_slot_ctx_for_bitmap_update per hit slot. "
         "Returns r0=u32 updated_flag (1=processed, 0=none). "
         "Constants: CARD_ID_COUNT=0x12fb, CARD_ID_CHAIN=0x12ea."),
+
+    # --- batch #49 (campaign-49) ---
+    ("FUN_0808e45c", "scan_trap_zone_slots_for_equip_shape_sprite",
+        "Called exclusively by FUN_080440b8 (duel_field). "
+        "r0=player_id [0..1]; r1=packed_xy [fixed=1 at callsite 0x08044342]. "
+        "Computes opponent_side (r7=1-r0). Scans gDuelFieldSlots+player*0x868+0x64, "
+        "slot 5..9: reads slot state word, lsls #0x13, compares DAT_0808e4d4=0x98300000; "
+        "skips mismatch. Checks bit5/bit1 equip-lock flags (mvns AND); "
+        "if nonzero: calls enqueue_sprite_attr_with_shape(opponent, slot, r8_input). "
+        "Returns void. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "SLOT_START=5, SLOT_END=9, state_mask=0x98300000."),
+    ("FUN_0808e770", "scan_effect_zones_for_equip_activation_forced_requisition",
+        "Called exclusively by FUN_080440b8 (duel_field). "
+        "r0=player_id [0..1]. Returns void. "
+        "First calls count_available_effect_zones(player, card_id=0x1354, zone_flags=-1); "
+        "if 0: returns immediately. "
+        "Scans gDuelFieldSlots+player*0x868+slot*0x14, slot 5..10: "
+        "extracts card_type_id bits[18:0], compares 0x1354; skips mismatch. "
+        "Checks bit5/bit1 equip-lock (mvns AND). Then reads bit4: "
+        "if bit4==0: calls set_field_slot_bit_with_sprite_update(player,slot,4,1), "
+        "enqueue_sprite_attr_with_xy_split, apply_equip_activation_with_id_lookup; "
+        "if bit4!=0: calls enqueue_sprite_attr_with_shape(player,slot,1). "
+        "Constants: CARD_ID_FILTER=0x1354, gDuelFieldSlots=0x0201c510, "
+        "gDuelFieldSlots_B=0x0201c520, player_stride=0x868, SLOT_START=5, SLOT_END=10."),
+    ("FUN_0808e8fc", "scan_all_zone_slots_for_lp_change_indicator",
+        "Called exclusively by FUN_08090218 (duel_field main controller). "
+        "No APCS input (movs r3,#0 / movs r1,#0 at entry). "
+        "Double loop player [0..1] x slot [0..9]: base gDuelFieldSlots+player*0x868 "
+        "(DAT_0808ea14=0x1ce8 offset). Per slot: extracts card_type_id bits[18:0], "
+        "compares 0x1361; if match and [slot+0xc] nonzero: "
+        "calls enqueue_sprite_attr_with_xy_split; "
+        "builds equip bitmap from bit5/bit1 (mvns AND); "
+        "if nonzero: calls enqueue_sprite_attr_for_zone_card_id_lookup; "
+        "calls submit_lp_change_indicator_with_chain_check twice (own side + opponent via eors). "
+        "Returns r0=u32 hit_flag (1=at least one slot processed, 0=none). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, "
+        "CARD_ID_FILTER=0x1361, zone_chain_base=0x0201e1c8, slot_max=9."),
+    ("FUN_0808f174", "scan_field_for_paired_equip_slot_bitmap_update",
+        "Called exclusively by FUN_08090218 (duel_field main controller). "
+        "No APCS input (movs r6,#0 at entry; loads global base from DAT_0808f1ac=0x0201e1c8). "
+        "Double loop player [0..1] x slot [0..4]: "
+        "calls test_slot_has_active_card(card_id=0x147a) to confirm active; "
+        "calls count_paired_slots_with_field5_default(card_id=0x146f) for pair count; "
+        "if both pass: calls enqueue_equip_slot_bitmap_update(player,slot,0,0). "
+        "Returns r0=u32 hit_flag (1=at least one group processed, 0=none). "
+        "Constants: BASE_ADDR=0x0201e1c8, CARD_ID_ACTIVE=0x147a, "
+        "CARD_ID_PAIR=0x146f, player_stride=0x1784."),
+    ("FUN_0809007c", "scan_equip_set_slot_sprite_by_counter",
+        "Called exclusively by FUN_08090218 (duel_field main controller). "
+        "No APCS input; loads from PTR_gP1LifePoints. "
+        "Reads [gP1LifePoints+0x1cf4] counter; if != 7: returns 0 immediately. "
+        "If == 7: loads slot base from [gP1LifePoints+0x1ce8], iterates 4 slots (0..3); "
+        "per slot: checks [slot+0xc] bits[12:0] vs passed card_id, "
+        "[slot+0x8] nonzero, and [slot+0x10] bit4 (equip-activation bit); "
+        "if match: calls enqueue_equip_set_slot_sprite_by_zone_col and "
+        "enqueue_sprite_attr_with_xy_split. Returns r0=u32 hit_flag "
+        "(1=at least one slot processed, 0=none or counter != 7). "
+        "Constants: counter_val_trigger=7, counter_offset=0x1cf4, "
+        "slot_base_offset=0x1ce8, slot_stride=0x14, equip_bit=bit4."),
+    ("FUN_08090218", "dispatch_equip_field_scan_sequence",
+        "Called exclusively by FUN_0804f2e0 (duel_field frame dispatcher). "
+        "No APCS input; loads from PTR_gP1LifePoints. "
+        "Entry: checks [gP1LifePoints+offset_0]; if 0: returns 0 immediately. "
+        "Sequential chain of ~30 equip-zone scan functions; each returns 0=continue / "
+        "nonzero=stop (jumps to LAB_080904d8, returns 1). "
+        "Chain order (partial): write_monster_zone_display_indices -> "
+        "increment_lp_bar_counter_no_player -> scan_equip_zone_candidates_with_snapshot -> "
+        "dispatch_equip_pair_sprites_by_state -> scan_all_slots_for_max_equip_match -> "
+        "scan_field_for_equip_set_slot_sprite_update -> "
+        "scan_chain_nodes_for_equip_zone_sprite -> "
+        "... -> scan_all_zone_slots_for_lp_change_indicator -> "
+        "scan_equip_set_slot_sprite_by_counter -> LP bar state update. "
+        "Returns r0=u32 (1=some scanner processed a slot, 0=all passed or entry condition unmet). "
+        "Constants: chain members ~30, all named in asm/all.s."),
+    ("FUN_0804f2e0", "dispatch_equip_field_update_by_anim_state",
+        "Called exclusively by FUN_08094cd4 (top-level equip field frame update). "
+        "No APCS input; loads global base from DAT_0804f2f4=0x0201b290. "
+        "Three-way priority dispatch: "
+        "(1) if [gP1LifePoints+0x48c] nonzero: calls dispatch_sprite_row_anim_by_state, returns 1; "
+        "(2) elif [gP1LifePoints+0x498] nonzero: calls dispatch_sprite_row_queue_by_state, returns 1; "
+        "(3) else: calls dispatch_equip_field_scan_sequence, returns its result. "
+        "Returns r0=u32 (pass-through from whichever path executed). "
+        "Constants: base=0x0201b290, anim_state_offset=0x48c, queue_state_offset=0x498."),
+    ("FUN_0809e920", "scan_monster_zone_for_equip_activation_by_card",
+        "Called by ~20 callers (C_util_high, duel_field). "
+        "r0=player_id [0..1]; r1=card_type_id [0..0x1fff] (fixed by each stub caller). "
+        "Uses [gP1LifePoints+0x1d24] as monster-zone slot counter upper bound; "
+        "if counter > 4: returns 1 immediately. "
+        "Loops slot 0..counter: calls test_slot_has_active_card(player,slot,card_type_id); "
+        "if active: builds OAM attr (bits[28:21]->y, 0x84<<0x13 shape mask, 0xffff low mask), "
+        "calls apply_equip_activation_with_id_lookup; increments counter +1; "
+        "if counter > 4: returns 1. Returns r0=u32 done_flag "
+        "(0=processed current iteration, 1=counter exceeded 4). "
+        "Side effects: [gP1LifePoints+0x1d24] := counter+1 (accumulates across frames). "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "counter_offset=0x1d24, MASK_16=0xffff, SLOT_MAX=4."),
+    ("FUN_0809e9e0", "scan_trap_zone_for_equip_activation_by_card",
+        "Called by ~17 callers (D_shared_mid, duel_field). "
+        "r0=player_id [0..1]; r1=card_type_id [0..0x1fff] (fixed by each stub caller). "
+        "Symmetric sibling of scan_monster_zone_for_equip_activation_by_card; "
+        "difference: slot_idx = counter_val + 5 (LAB_0809ea0a: adds r4,r0,#5), "
+        "covering trap/magic zone slots 5..9. "
+        "Uses [gP1LifePoints+0x1d24] counter; if > 4: returns 1. "
+        "Per iteration: calls test_slot_has_active_card(player,slot+5,card_type_id); "
+        "if active: calls apply_equip_activation_with_id_lookup; increments counter. "
+        "Returns r0=u32 done_flag (0=processed, 1=counter > 4). "
+        "Side effects: [gP1LifePoints+0x1d24] := counter+1. "
+        "Constants: counter_offset=0x1d24, SLOT_OFFSET=5, SLOT_MAX=4, player_stride=0x868."),
+    ("FUN_0809ec04", "scan_monster_zone_for_equip_activation_spirit_of_the_breeze",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "4-instruction thin wrapper stub: "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x1450. "
+        "Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 pass-through (0=processed, 1=counter > 4). "
+        "Sibling pair with FUN_0809ec14 (card_id=0x1451). "
+        "Constants: CARD_ID=0x1450."),
+    ("FUN_0809ec14", "scan_monster_zone_for_equip_activation_dancing_fairy",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "4-instruction thin wrapper stub: "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x1451. "
+        "Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 pass-through (0=processed, 1=counter > 4). "
+        "Sequential sibling with FUN_0809ec04 (card_id=0x1450, addr diff=0x10). "
+        "Constants: CARD_ID=0x1451."),
+    ("FUN_0809ee14", "scan_all_zone_slots_for_equip_lp_indicator_graverobbers_retribution",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "r0=player_id [0..1]. "
+        "Reads [gP1LifePoints+0x1d24] counter; if 0: initializes to 5; if > 9: returns 1. "
+        "Per-frame slot processing (one slot per call): "
+        "calls test_slot_has_active_card(player, counter_val, card_type_id=0x1491); "
+        "if active: calls count_zone_slots_with_card_field5(opponent, 0x1491) -> r7; "
+        "if r7 > 0: calls enqueue_sprite_attr_for_zone_card_id_lookup, "
+        "then submit_lp_change_indicator_with_chain_check(player, slot, r7*100, side_flag); "
+        "increments counter +1; returns 0. Returns 1 when all slots scanned or no match. "
+        "Side effects: [gP1LifePoints+0x1d24] := counter+1; OAM and LP indicator buffers written. "
+        "Constants: CARD_ID=0x1491, counter_offset=0x1d24, SLOT_INIT=5, SLOT_MAX=9, "
+        "player_stride=0x868, gDuelFieldSlots=0x0201c510, lp_scale=100."),
+    ("FUN_0809f000", "scan_trap_zone_for_equip_activation_the_eye_of_truth",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "5-instruction thin wrapper stub: inverts player_id (r0 := 1 - r0), "
+        "fixes r1=0x137b, tail-calls scan_trap_zone_for_equip_activation_by_card (FUN_0809e9e0). "
+        "The inversion makes the scan target the opponent trap zone. "
+        "Returns r0=u32 pass-through (0=processed, 1=counter full). "
+        "Sibling with FUN_0809f018 (card_id=0x1355); both use opponent-side inversion. "
+        "Constants: CARD_ID=0x137b, PLAYER_INVERT=1-r0."),
+    ("FUN_0809f018", "scan_trap_zone_for_equip_activation_minor_goblin_official",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "5-instruction thin wrapper stub: inverts player_id (r0 := 1 - r0), "
+        "fixes r1=0x1355, tail-calls scan_trap_zone_for_equip_activation_by_card (FUN_0809e9e0). "
+        "Structurally symmetric sibling of FUN_0809f000 (card_id=0x137b); "
+        "both perform opponent-side inversion before delegating to e9e0. "
+        "Returns r0=u32 pass-through. "
+        "Constants: CARD_ID=0x1355, PLAYER_INVERT=1-r0."),
+    ("FUN_0809f158", "scan_monster_zone_chain_for_equip_activation",
+        "Called by FUN_0809f1fc (card_id=0x1181) and FUN_0809f20c (card_id=0x19cb). "
+        "r0=player_packed [0..1]; r1=card_type_id [0..0x1fff] "
+        "(.hword 0x4688=mov r8,r1 saves to r8). "
+        "First: calls check_value_in_slot_chain(player, zone=0xb, card_type_id); "
+        "if found in chain: returns 1. "
+        "Else: reads [gP1LifePoints+(player&1)*0x868+0x14] active monster slot count; "
+        "if 0: returns 1. Loops slot 0..count-1: reads gDuelFieldSlots (0x0201c8f8) "
+        "slot state word, extracts bits[18:0], compares card_type_id; "
+        "if match and lsls r0,r1,#0xa >= 0: builds OAM attr "
+        "(DAT_0809f1d8=0x044e0000 | card_bits | player_bit), "
+        "calls apply_equip_activation_with_id_lookup; returns 0 on success. "
+        "Returns r0=u32 hit_flag (0=activated, 1=chain duplicate or no match). "
+        "Constants: SLOT_ZONE=0xb, gDuelFieldSlots_base=0x0201c8f8, "
+        "player_stride=0x868, OAM_FLAG=0x044e0000."),
+    ("FUN_0809f20c", "scan_monster_zone_chain_for_equip_activation_treeborn_frog",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "4-instruction thin wrapper stub: "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x19cb. "
+        "Calls scan_monster_zone_chain_for_equip_activation (FUN_0809f158). "
+        "Returns r0=u32 pass-through. "
+        "Sibling with FUN_0809f1fc (card_id=0x1181). "
+        "Constants: CARD_ID=0x19cb."),
+    ("FUN_0809f21c", "scan_equip_zone_for_special_summon_activation_return_zombie",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "r0=player_id [0..1]. "
+        "Reads [gP1LifePoints+(player&1)*0x868+0x14] slot count; if 0: returns 1. "
+        "Loops slot 0..count-1: reads gDuelFieldSlots_equip (0x0201c8f8+player*0x868+slot*4), "
+        "ANDs 0x201fff to extract card_id field, compares 0x1775; skips mismatch. "
+        "If match: calls memset(sp+buf, 0, 0x18) to init local slot struct; "
+        "builds OAM attr (multi-field strh/ldrb/strb); "
+        "calls check_card_special_summon_eligible_full; "
+        "if eligible: calls apply_equip_activation_with_id_lookup; returns 0. "
+        "Returns r0=u32 hit_flag (0=activated, 1=no match or not eligible). "
+        "Side effects: local sp buffer [sp+0..sp+0x17] zeroed; "
+        "equip activation state written via apply_equip_activation_with_id_lookup. "
+        "Constants: CARD_ID_FILTER=0x1775, gDuelFieldSlots_equip=0x0201c8f8, "
+        "player_stride=0x868, SLOT_COUNT_OFFSET=0x14, MASK_CARD_ID=0x201fff, "
+        "OAM_FLAG=0x044e0000, memset_size=0x18."),
+    ("FUN_0809f40c", "scan_monster_zone_for_equip_activation_legendary_fiend",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "4-instruction thin wrapper stub: "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x154d. "
+        "Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 pass-through (0=processed, 1=counter > 4). "
+        "Sibling with FUN_0809f41c (card_id=0x1645, addr diff=0x10). "
+        "Constants: CARD_ID=0x154d."),
+    ("FUN_0809f41c", "scan_monster_zone_for_equip_activation_exodia_necross",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "4-instruction thin wrapper stub: "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x1645. "
+        "Calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 pass-through (0=processed, 1=counter > 4). "
+        "Card ID 0x1645 same as scan_field_for_extra_deck_equip_slot_update (B-type fusion field card). "
+        "Sibling with FUN_0809f40c (card_id=0x154d, addr diff=0x10). "
+        "Constants: CARD_ID=0x1645."),
+    ("FUN_0809f808", "scan_trap_zone_for_equip_bitmap_update_bottomless_shifting_sand",
+        "Called by FUN_0809d984 and FUN_0809fb16 (each once). "
+        "r0=player_id [0..1] (adds r5,r0,#0). "
+        "Reads [gP1LifePoints+(r0&1)*0x868+0x0c] trap-zone slot counter; "
+        "if > 4: returns 1 immediately. "
+        "Sets slot start r4=5; loops slot 5..9 (cmp r4,#9): "
+        "calls test_slot_has_active_card(player_id, slot, card_type_id=0x1540); "
+        "if active: calls enqueue_equip_slot_bitmap_update(player,slot,0,0); returns 0. "
+        "Returns r0=u32 hit_flag (0=at least one slot processed, 1=no active slot found). "
+        "Side effects: enqueue_equip_slot_bitmap_update writes equip-slot bitmap sprite buffer. "
+        "Constants: SLOT_START=5, SLOT_END=9, CARD_ID=0x1540 (=0xaa<<5), "
+        "player_stride=0x868, counter_offset=0x0c."),
 ]
 
 
