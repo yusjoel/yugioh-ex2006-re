@@ -11536,6 +11536,170 @@ RENAMES = [
         "Symmetric to Manticore of Darkness/Fox Fire/Helios Duo/Helios Tris stubs "
         "in the same region, all routing through scan_equip_zone_for_activation_by_card. "
         "Constants: CARD_ID=0x1466=Dark Necrofear."),
+
+    # --- batch54 (2026-05-15): equip activation scan cluster + chain node counters ---
+    ("FUN_0809c498", "scan_all_monster_zone_slots_for_equip_activation_by_card",
+        "General all-monster-zone-slot equip activation scanner (10 slots). "
+        "r0=player_id([0..1]), r1=card_id (internal ID). "
+        "Uses gP1LifePoints+0x1d24 as loop counter, scans slots 0..9. "
+        "Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; "
+        "calls test_slot_has_active_card(side, col, card_id). "
+        "On hit: builds OAM attr (bit31=player_bit, bits[25:16]=0xa2<<4|player_bit), "
+        "calls apply_equip_activation_with_id_lookup. "
+        "Success: counter++, return 0; all slots scanned without hit: return 1. "
+        "Called by Insect Queen/Gaia Soul/Infernalqueen/Mirage of Nightmare stubs. "
+        "Constants: COUNTER_OFFSET=0x1d24, SLOT_COUNT=10, SLOT_STRIDE=0x868, "
+        "OAM_MASK=0xffff, OAM_PREFIX=0xa2<<0x14."),
+    ("FUN_0809c74c", "scan_monster_zone_slots_for_equip_activation_solar_flare_dragon",
+        "Solar Flare Dragon (0x1756) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1756 into r1, "
+        "tail-calls scan_monster_zone_slots_for_equip_activation_by_player(player_id, 0x1756). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Routes through 5-slot gP1LifePoints+0x1d24 counter path "
+        "(not the 10-slot scan_all_monster_zone_slots_for_equip_activation_by_card path). "
+        "Constants: CARD_ID=0x1756=Solar Flare Dragon."),
+    ("FUN_0809c75c", "scan_all_monster_zone_slots_for_equip_activation_insect_queen",
+        "Insect Queen (0x12a0) all-monster-zone-slot equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Builds card_id via immediate: movs r1,#0x95; lsls r1,r1,#0x5 = 0x12a0, "
+        "tail-calls scan_all_monster_zone_slots_for_equip_activation_by_card(player_id, 0x12a0). "
+        "Differs from Gaia Soul stub (0x0809c76c) which uses ldr DAT for card_id. "
+        "Constants: CARD_ID=0x12a0=Insect Queen (imm: 0x95<<5)."),
+    ("FUN_0809c76c", "scan_all_monster_zone_slots_for_equip_activation_gaia_soul",
+        "Gaia Soul the Combustible Collective (0x1835) all-monster-zone-slot equip activation thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1835 via ldr DAT into r1, "
+        "tail-calls scan_all_monster_zone_slots_for_equip_activation_by_card(player_id, 0x1835). "
+        "Symmetric to Insect Queen stub (0x0809c75c), differs only in card_id load method. "
+        "Constants: CARD_ID=0x1835=Gaia Soul the Combustible Collective."),
+    ("FUN_0809d334", "scan_equip_zone_for_manticore_of_darkness_activation",
+        "Manticore of Darkness (0x16f9) equip zone activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x16f9 into r1, "
+        "tail-calls scan_equip_zone_for_activation_by_card(player_id, 0x16f9). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to Fox Fire(0x0809d344)/Helios Duo Megiste(0x0809d354)/"
+        "Helios Tris Megiste(0x0809d364)/Dark Necrofear(0x0809d324) stubs. "
+        "Constants: CARD_ID=0x16f9=Manticore of Darkness."),
+    ("FUN_0809d344", "scan_equip_zone_for_fox_fire_activation",
+        "Fox Fire (0x1836) equip zone activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1836 into r1, "
+        "tail-calls scan_equip_zone_for_activation_by_card(player_id, 0x1836). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to Manticore of Darkness(0x0809d334)/Helios Duo(0x0809d354)/"
+        "Helios Tris(0x0809d364)/Dark Necrofear(0x0809d324) stubs. "
+        "Constants: CARD_ID=0x1836=Fox Fire."),
+    ("FUN_0809d354", "scan_equip_zone_for_helios_duo_megiste_activation",
+        "Helios Duo Megiste (0x19f7) equip zone activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x19f7 into r1, "
+        "tail-calls scan_equip_zone_for_activation_by_card(player_id, 0x19f7). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Adjacent to Helios Tris Megiste stub (0x0809d364), card_ids consecutive 0x19f7/0x19f8. "
+        "Constants: CARD_ID=0x19f7=Helios Duo Megiste."),
+    ("FUN_0809d364", "scan_equip_zone_for_helios_tris_megiste_activation",
+        "Helios Tris Megiste (0x19f8) equip zone activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x19f8 into r1, "
+        "tail-calls scan_equip_zone_for_activation_by_card(player_id, 0x19f8). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Adjacent to Helios Duo Megiste stub (0x0809d354), card_ids consecutive 0x19f7/0x19f8. "
+        "Constants: CARD_ID=0x19f8=Helios Tris Megiste."),
+    ("FUN_0809d764", "scan_equip_zone_for_last_turn_sprite",
+        "Last Turn (0x151e) equip zone sprite display update function. "
+        "r0=player_id([0..1]). Calls check_value_in_slot_chain(player_id, zone=0xb, card_id=0x151e); "
+        "if not in chain returns 1 (no hit). "
+        "On hit: calls enqueue_equip_zone_sprite_by_side(player_id, 0x151e) and "
+        "enqueue_sprite_attr_type11(player_id, 0x151e, mode=5, 0); returns 0. "
+        "Sprite-only; no count_occupied_monster_zones double-check unlike scan_equip_zone_for_last_turn_activation(0x0809d718). "
+        "Constants: CARD_ID=0x151e=Last Turn, ZONE=0xb, OAM_TYPE11_MODE=5."),
+    ("FUN_0809eb34", "scan_monster_zone_for_equip_activation_reserved_icid_f",
+        "Reserved internal_card_id=0x11cf equip activation scan thin wrapper, sibling 'f'. "
+        "r0=player_id([0..1]). Loads card_id=0x11cf into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x11cf). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to scan_monster_zone_slots_for_equip_activation_reserved_icid_d(0x0809caa4), "
+        "same card_id but different scan path. "
+        "Constants: CARD_ID=0x11cf=reserved/unused."),
+    ("FUN_0809eb44", "scan_monster_zone_for_equip_activation_lava_golem",
+        "Lava Golem (0x1578) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1578 into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1578). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to reserved_icid_f(0x0809eb34)/Princess Curran(0x0809ed30)/Bowganian(0x0809ed40) stubs. "
+        "Constants: CARD_ID=0x1578=Lava Golem."),
+    ("FUN_0809eb54", "scan_monster_zone_slots_for_equip_activation_reserved_icid_g",
+        "Reserved internal_card_id=0x1338 monster zone equip activation scan, sibling 'g'. "
+        "r0=player_id([0..1]). Scans 5 equip zone slots using gP1LifePoints+0x1d24 counter. "
+        "Each slot: test_slot_has_active_card(player_bit, slot_idx, 0x1338); "
+        "on hit: count_occupied_monster_zones(player_id)==1 gate; "
+        "if met: enqueue_sprite_attr_for_zone_card_id_lookup; "
+        "if slot[+6]==0: invoke_equip_activation_with_zero_flag; "
+        "set_field_slot_bit_with_sprite_update(player, slot, bit=0x15, val=1). "
+        "Returns 1 if no activation. "
+        "Constants: CARD_ID=0x1338=reserved/unused, COUNTER_OFFSET=0x1d24, "
+        "EQUIP_BASE_OFFSET=0x30, SLOT_COUNT=5, SET_BIT=0x15."),
+    ("FUN_0809ed30", "scan_monster_zone_for_equip_activation_princess_curran",
+        "Princess Curran (0x19ce) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x19ce into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x19ce). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Adjacent to Princess Pikeru(0x0809ed00)/Ebon Magician Curran(0x0809ed10)/Bowganian(0x0809ed40). "
+        "Constants: CARD_ID=0x19ce=Princess Curran."),
+    ("FUN_0809ed40", "scan_monster_zone_for_equip_activation_bowganian",
+        "Bowganian (0x1637) monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Loads card_id=0x1637 into r1, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(player_id, 0x1637). "
+        "4 instructions: push/ldr/bl/pop+bx. "
+        "Symmetric to Princess Curran(0x0809ed30)/Princess Pikeru(0x0809ed00)/Ebon Magician Curran(0x0809ed10). "
+        "Constants: CARD_ID=0x1637=Bowganian."),
+    ("FUN_0809ed50", "scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend",
+        "Infernalqueen Archfiend (0x1690) all-monster-zone-slot equip activation scan. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. "
+        "Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; "
+        "test_slot_has_active_card(side, col, 0x1690); on hit build OAM attr "
+        "(0x84<<0x13 prefix + player_bit + col_encoded); "
+        "apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. "
+        "Structurally identical to scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare(0x0809f744). "
+        "Constants: CARD_ID=0x1690=Infernalqueen Archfiend, COUNTER_OFFSET=0x1d24, "
+        "SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13."),
+    ("FUN_0809f348", "scan_monster_zone_slots_for_equip_activation_mucus_yolk",
+        "Mucus Yolk (0x13b2) monster zone slot equip activation scan with dual chain filter. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 5 monster zone slots. "
+        "Each slot: test_slot_has_active_card(player_bit, slot_idx, 0x13b2); "
+        "on hit: check_node_in_slot_chain(player_bit, slot_idx, 0x13b2, type=2) second gate; "
+        "both pass: read OAM attr, call enqueue_sprite_attr_for_zone_card_id_lookup "
+        "and enqueue_sprite_attr_with_mode(mode=3). Counter++; return 1 if no hit. "
+        "Constants: CARD_ID=0x13b2=Mucus Yolk, COUNTER_OFFSET=0x1d24, SLOT_COUNT=5, "
+        "SLOT_STRIDE=0x868, CHAIN_TYPE=2, SPRITE_MODE=3."),
+    ("FUN_0809f72c", "scan_monster_zone_for_equip_activation_aqua_spirit_opponent",
+        "Aqua Spirit (0x1485) opponent-side monster zone equip activation scan thin wrapper. "
+        "r0=player_id([0..1]). Entry inverts player: r0 = 1 - r0; loads card_id=0x1485, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card(1-player_id, 0x1485). "
+        "Player invert at entry distinguishes this from symmetric stubs without inversion. "
+        "Constants: CARD_ID=0x1485=Aqua Spirit, PLAYER_INVERT=1-r0."),
+    ("FUN_0809f744", "scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare",
+        "Mirage of Nightmare (0x1539) all-monster-zone-slot equip activation scan. "
+        "r0=player_id([0..1]). Uses gP1LifePoints+0x1d24 counter, scans 10 slots. "
+        "Each slot: udivsi3/umodsi3 compute col=slot%5, side=slot/5; "
+        "test_slot_has_active_card(side, col, 0x1539); on hit build OAM attr "
+        "(0x84<<0x13=0x4200000 prefix + player_bit + col_encoded); "
+        "apply_equip_activation_with_id_lookup. Success: counter++, return 0; else return 1. "
+        "Structurally identical to scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend(0x0809ed50). "
+        "Constants: CARD_ID=0x1539=Mirage of Nightmare, COUNTER_OFFSET=0x1d24, "
+        "SLOT_COUNT=10, OAM_PREFIX=0x84<<0x13=0x4200000."),
+    ("FUN_0802fbf4", "count_chain_nodes_by_card_id_and_type",
+        "Chain node counter: counts nodes in chain head r0 with card_id==r1 AND type_lo4==r2. "
+        "r4=hit counter init 0. Per node: lsls r0,r0,#0x3 -> address=0x0201d9c0+index*8; "
+        "ldrb [+2] -> type byte, lsls/lsrs #0x1c -> type_lo4; if type_lo4>5 skip; "
+        "ldrh [+0] -> card_id vs r6(target_card_id); "
+        "lsrs r0,r1,#0x1c -> type_lo4 vs r5(target_type); triple match -> r4++. "
+        "ldrh [+6] -> next; next==0 exits loop. "
+        "Extends count_chain_nodes_by_card_id with type_lo4 third filter. "
+        "Constants: NODE_BASE=0x0201d9c0, NODE_STRIDE=8, TYPE_MAX=5."),
+    ("FUN_0802fc60", "count_slot_chain_nodes_by_card_id_and_type",
+        "Slot chain node counter with card_id+type dual filter, extends count_slot_chain_nodes_by_card_id(0x0802fc34). "
+        "r0=packed_player_id(bit0=side), r1=slot_idx([0..11]), r2=target_card_id, r3=target_type. "
+        "Extracts player_side=r0&1, reads gDuelFieldSlots[player_side][slot_idx]+0xa (chain head ldrh), "
+        "calls count_chain_nodes_by_card_id_and_type(chain_head, r2, r3). "
+        "Called twice by FUN_0809d374 with r3=1 and r3=2; results multiplied to test "
+        "simultaneous presence of type1 and type2 nodes. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa."),
 ]
 
 

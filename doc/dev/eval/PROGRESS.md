@@ -37,15 +37,15 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 字段 | 值 |
 |------|----|
 | **根函数** | `campaign_scene_handler` (FUN_08025c94, 由 enter_campaign_page 写入 gMenuState+0x234, 间接调度) |
-| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-54) |
-| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-54, 下一候选: topo=1119+) |
-| **上次更新** | 2026-05-15 (campaign-53 batch #53, 967/1526) |
+| **当前步骤** | Step 1 — executor (batch=20 全自动模式, campaign-55) |
+| **下一步** | `python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json` → 启动 4-agent loop (campaign-55, 下一候选: topo=1139+) |
+| **上次更新** | 2026-05-15 (campaign-54 batch #54, 987/1526) |
 | **上次 callgraph 刷新** | 2026-05-05 (含 +50 新反汇 fns, +131 callgraph 边, +26 manual dispatch 边) |
 | **callgraph_locked** | `true` (后续 rename 不动拓扑, 整任务期间不需再 refresh) |
 
 ## 进度
 
-**967 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
+**987 / 1526 已分析** (campaign_scene_handler 闭包: 1698 functions, 其中 A_named=150 + B_invoker=8 + B_runtime=14 = 172 跳过, 待命名 1526)
 
 > 已命名函数池 (跨根复用): 259 个 (来自上一根 `enter_deck_edit_page` 任务). pick_batch.py 自动跳过已命名函数, 仅处理新根闭包内剩余 `FUN_*` 节点. 闭包内 A_named=150 即来自此池.
 
@@ -1039,11 +1039,32 @@ python tools/ad-hoc/pick_batch.py --max 20 --out temp/batch.json
 | 965 | 1116 | 7 | 1 | E | 0x0809cd24 | FUN_0809cd24 | scan_all_zone_slots_for_equip_chain_sprite_magical_scientist | 2 | [eval](eval/0809cd24.md) |
 | 966 | 1117 | 8 | 5 | D | 0x0809c6e8 | FUN_0809c6e8 | scan_equip_zone_for_activation_by_card | 1 | [eval](eval/0809c6e8.md) |
 | 967 | 1118 | 7 | 1 | E | 0x0809d324 | FUN_0809d324 | scan_equip_zone_for_dark_necrofear_activation | 2 | [eval](eval/0809d324.md) |
+| 968 | 1119 | 7 | 2 | E | 0x0809f72c | FUN_0809f72c | scan_monster_zone_for_equip_activation_aqua_spirit_opponent | 1 | [eval](eval/0809f72c.md) |
+| 969 | 1120 | 7 | 2 | E | 0x0809ed30 | FUN_0809ed30 | scan_monster_zone_for_equip_activation_princess_curran | 1 | [eval](eval/0809ed30.md) |
+| 970 | 1121 | 7 | 1 | E | 0x0809d334 | FUN_0809d334 | scan_equip_zone_for_manticore_of_darkness_activation | 1 | [eval](eval/0809d334.md) |
+| 971 | 1122 | 7 | 2 | E | 0x0809eb34 | FUN_0809eb34 | scan_monster_zone_for_equip_activation_reserved_icid_f | 1 | [eval](eval/0809eb34.md) |
+| 972 | 1123 | 7 | 2 | E | 0x0809ed40 | FUN_0809ed40 | scan_monster_zone_for_equip_activation_bowganian | 1 | [eval](eval/0809ed40.md) |
+| 973 | 1124 | 7 | 1 | E | 0x0809d344 | FUN_0809d344 | scan_equip_zone_for_fox_fire_activation | 1 | [eval](eval/0809d344.md) |
+| 974 | 1125 | 7 | 2 | E | 0x0809eb44 | FUN_0809eb44 | scan_monster_zone_for_equip_activation_lava_golem | 1 | [eval](eval/0809eb44.md) |
+| 975 | 1126 | 7 | 2 | E | 0x0809f744 | FUN_0809f744 | scan_all_monster_zone_slots_for_equip_activation_mirage_of_nightmare | 1 | [eval](eval/0809f744.md) |
+| 976 | 1127 | 7 | 2 | E | 0x0809f348 | FUN_0809f348 | scan_monster_zone_slots_for_equip_activation_mucus_yolk | 1 | [eval](eval/0809f348.md) |
+| 977 | 1128 | 7 | 1 | E | 0x0809c74c | FUN_0809c74c | scan_monster_zone_slots_for_equip_activation_solar_flare_dragon | 1 | [eval](eval/0809c74c.md) |
+| 978 | 1129 | 7 | 2 | E | 0x0809ed50 | FUN_0809ed50 | scan_all_monster_zone_slots_for_equip_activation_infernalqueen_archfiend | 1 | [eval](eval/0809ed50.md) |
+| 979 | 1130 | 7 | 1 | E | 0x0809d354 | FUN_0809d354 | scan_equip_zone_for_helios_duo_megiste_activation | 1 | [eval](eval/0809d354.md) |
+| 980 | 1131 | 7 | 2 | E | 0x0809eb54 | FUN_0809eb54 | scan_monster_zone_slots_for_equip_activation_reserved_icid_g | 1 | [eval](eval/0809eb54.md) |
+| 981 | 1132 | 8 | 5 | D | 0x0809c498 | FUN_0809c498 | scan_all_monster_zone_slots_for_equip_activation_by_card | 2 | [eval](eval/0809c498.md) |
+| 982 | 1133 | 7 | 1 | E | 0x0809c75c | FUN_0809c75c | scan_all_monster_zone_slots_for_equip_activation_insect_queen | 1 | [eval](eval/0809c75c.md) |
+| 983 | 1134 | 7 | 1 | E | 0x0809d364 | FUN_0809d364 | scan_equip_zone_for_helios_tris_megiste_activation | 1 | [eval](eval/0809d364.md) |
+| 984 | 1135 | 7 | 1 | E | 0x0809d764 | FUN_0809d764 | scan_equip_zone_for_last_turn_sprite | 1 | [eval](eval/0809d764.md) |
+| 985 | 1136 | 7 | 1 | E | 0x0809c76c | FUN_0809c76c | scan_all_monster_zone_slots_for_equip_activation_gaia_soul | 1 | [eval](eval/0809c76c.md) |
+| 986 | 1137 | 9 | 2 | E | 0x0802fbf4 | FUN_0802fbf4 | count_chain_nodes_by_card_id_and_type | 1 | [eval](eval/0802fbf4.md) |
+| 987 | 1138 | 8 | 1 | E | 0x0802fc60 | FUN_0802fc60 | count_slot_chain_nodes_by_card_id_and_type | 1 | [eval](eval/0802fc60.md) |
 
 ---
 
 ## 历史里程碑
 
+- 2026-05-15: **batch #54 PASSED (campaign-54 落地)** — equip activation scan cluster + chain node counters (scan_all_monster_zone_slots_for_equip_activation_by_card D_shared_mid indeg=5 10-slot udivsi3/umodsi3 OAM_PREFIX=0xa2<<0x14 general hub + Solar Flare Dragon 5-slot wrapper + Insect Queen 10-slot imm-build wrapper + Gaia Soul 10-slot ldr-build wrapper + Manticore of Darkness equip-zone stub + Fox Fire equip-zone stub + Helios Duo Megiste equip-zone stub + Helios Tris Megiste equip-zone stub consecutive card_ids 0x19f7/0x19f8 + scan_equip_zone_for_last_turn_sprite chain-check+enqueue_equip_zone_sprite+type11 sprite-only no monster-count gate + reserved_icid_f monster-zone wrapper card_id=0x11cf + Lava Golem monster-zone wrapper + reserved_icid_g 5-slot count_occupied_monster_zones==1 gate + Princess Curran monster-zone wrapper + Bowganian monster-zone wrapper + Infernalqueen Archfiend 10-slot OAM_PREFIX=0x84<<0x13 + Mucus Yolk 5-slot dual-chain test_slot+check_node_in_slot_chain type=2 filter + Aqua Spirit opponent-side player-invert 1-r0 + Mirage of Nightmare 10-slot symmetric to Infernalqueen + count_chain_nodes_by_card_id_and_type triple-condition card_id+type_lo4+type_lo4<=5 filter + count_slot_chain_nodes_by_card_id_and_type slot chain head ldrh + call count_chain_nodes_by_card_id_and_type); rev=1 (19 fns), rev=2 (1 fn: 0x0809c498); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (987/1526 = 64.68%)
 - 2026-05-15: **batch #53 PASSED (campaign-53 落地)** — equip activation scan cluster + LP display row update pair + packed attr scanner + zone struct bitmap query (scan_spell_trap_zone_slots_for_equip_activation_boss_rush 0x1972 5-instr tail-call wrapper + scan_spell_trap_zone_slots_for_equip_activation_greed 0x1802 symmetric + scan_monster_zone_for_equip_activation_white_magician_pikeru 0x1757 + scan_monster_zone_for_equip_activation_ebon_magician_curran 0x191d + scan_monster_zone_for_equip_activation_princess_pikeru 0x19cd LP-recovery monster triple cluster + set_lp_display_row_all_slots type=0xf all-slots wrapper + set_lp_display_row_if_nonzero type=1 mask=0x80 conditional gate + submit_slot_card_sprite_row_packed r0->r3 packed_attr rearrange + scan_spell_trap_zone_for_equip_activation_via_packed_attr packed OAM attr counter=0x1d24 10-slot bidirectional path + scan_spell_trap_zone_for_equip_activation_reserved_icid_e 0x1367 player-invert + scan_spell_trap_zone_for_equip_activation_recycle 0x16d5 no-player-invert + scan_spell_trap_zone_for_two_man_cell_battle_equip 0x17f8 slot+5 offset packed_attr build + query_equip_target_bitmap_with_zone_struct 0x18-byte stack zone_struct player_zone_bit=1<<(p*16+s) zone=0xf bitmap AND query + scan_all_zone_slots_for_return_from_different_dimension_equip 0x17be check_slot_fieldspell_eligible_by_side extra gate + scan_all_zone_slots_for_equip_chain_sprite_magical_scientist 0x1619 query_equip_zone_slot_target_bit filter + scan_equip_zone_for_activation_by_card general OAM_PREFIX=0x0a4e0000 2-side loop + scan_equip_zone_for_dark_necrofear_activation 0x1466 4-instr stub + scan_equip_zone_for_strike_ninja_activation 0x16b9 OAM_PREFIX=0x0a4f exclusive + scan_equip_zone_for_infinite_cards_lp_display_update 0x1401+0x159f threshold=6/7/5 LP-delta gate + scan_equip_zone_for_last_turn_activation 0x151e dual count_occupied_monster_zones check); rev=1 (7 fns), rev=2 (13 fns); byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (967/1526 = 63.37%)
 - 2026-05-15: **batch #52 PASSED (campaign-52 落地)** — game text formatter core (format_game_text_with_text_arg, C_util_high indeg=34, %s substitution with resolve_game_str_ptr) + equip zone bitmap infrastructure (build_equip_zone_bitmap_for_player 2x11 bitmask + query_equip_zone_bitmap_with_effect_guard effect-node guard) + equip zone chain scanner (scan_equip_zone_chain_for_sprite_and_bitmap_update) + equip zone slot target query (query_equip_zone_slot_target_bit memset+bitmap) + Wicked Worm Beast scan (sprite+bitmap dual update) + Interdimensional Matter Transporter scan (both sides XOR loop) + Dimensionhole scan (single-node activation+sprite) + Burning Land LP indicator scan (10-slot counter dual-player) + card-specific thin-wrapper stubs: Berserk Dragon / Cyber Archfiend / Little-Winguard (monster zone) + Needle Wall / Dangerous Machine TYPE-6 / Life Absorbing Machine / Senri Eye (trap zone) + Ectoplasmer / Labyrinth of Nightmare (spell/trap zone) + Archfiend's Roar / Rescue Cat (chain sprite refresh); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (947/1526 = 62.06%)
 - 2026-05-15: **batch #51 PASSED (campaign-51 落地) — [60% MILESTONE]** — LP display row fields write + conditional enqueue gate + equip activation scan case stubs cluster: A Man with Wdjat (0x158e) / reserved_icid_c (0x1147) / Jam Breeding Machine (0x13ff) / Blind Destruction (0x1494) / Ominous Fortunetelling (0x1519) + continuous-equip sprite refresh core (scan_all_zone_slots_for_equip_chain_sprite_update 10-slot counter loop bitmap+OAM) + case stubs: Limiter Removal (0x1409) / Karate Man (0x1337) / Wild Nature's Release (0x16ce) / Summoner of Illusions (0x1481 with Royal Command+Fiend Skull Dragon double guard) + equip chain zone-fixed stubs: Deck Devastation Virus (zone=3) / Pikeru's Second Sight (zone=2) + Final Countdown dual-side sprite (zone=0xb type11 overflow) + monster zone equip activation core (scan_monster_zone_slots_for_equip_activation_by_player 5-slot player-bit OAM) + monster zone stubs: reserved_icid_d (0x11cf) / Satellite Cannon (0x12ac) + spell/trap zone equip activation core (scan_spell_trap_zone_slots_for_equip_activation_by_card slot=n%5+5 10-slot) + Human-Wave Tactics stub (0x17b2); first-shot 20/20; byte-identical SHA1=9689337d6aac1ce9699ab60aac73fc2cfdccad9b. (927/1526 = 60.75%)
