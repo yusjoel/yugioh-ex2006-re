@@ -77,6 +77,10 @@ cp -r "ghidra/Yu-Gi-Oh WCT 2006.rep" "ghidra/Yu-Gi-Oh WCT 2006.rep.bak-${TS}-pre
 
 > **Jython 2.7 plate 文本 ASCII-only**: plate 文本中禁用弯引号、全角括号、中文顿号等一切非 ASCII 排版字符，否则 Jython 脚本抛出解析异常 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`
 
+> **R3 栈参数漏填**: 若 reviewer 以"missing stack arg at [sp,#M]"扣 R3，须计算 push 帧大小 F=saved_regs*4，将所有 M>=F 的 ldr [sp,#M] 追踪唯一 caller 并补入参数行 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_stack_arg_beyond_r3.md`
+
+> **Constants 块 card_id 核实**: 若 reviewer 以"card_id 0xNNNN 无卡名"扣 R6，须查 doc/dev/data.md 核实后更新 Constants 条目为 `CARD_ID=0xNNNN (Card Name)` — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_card_id_cross_reference.md`
+
 #### 3c. 重导 asm/all.s
 
 ```bash
