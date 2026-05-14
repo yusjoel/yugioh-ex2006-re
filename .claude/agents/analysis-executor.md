@@ -182,6 +182,7 @@ model: sonnet
 - 写完 R3 后，检查 prologue push 指令保存的 callee-save 寄存器数量 N；若提案列出的 APCS 参数数量 < N，则找出遗漏的 `mov rSaved,rAPCS` spill 对并补入参数行 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_missing_param_from_push_count.md`
 - 函数体内出现 `bl predicate; bne LAB_skip`（或类似 beq LAB_skip 后跟实质逻辑）时：处理的是 predicate 返回 0 的情况（bne 跳过 nonzero；fall-through = zero-case）；plate 主语必须是 "predicate 返回 0" 的槽/元素；callee 名含正面词（nonzero/valid/active）时，函数处理的是反面情形（empty/invalid/inactive）；自检：grep plate 段中 callee 名，若叙述方向与 bne 方向不符立即修正 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_callee_bne_polarity_inversion.md`
 - 写完 R4 后检查函数最后 3 条指令：若出现 (A) 无条件 `b LAB_xxx`（分支至非出口标签）且函数体无独立 r0 写，或 (B) `pop {r0}; bx r0`（r0 被恢复为栈保存的 lr）→ R4 必须 void；禁止同时写"void"和"透传"（`pop{r0};bx r0` 重写 r0，非透传）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_exit_mechanism_voids_return.md`
+- case stub 的固定 icid 常量经 icid-to-cid 表查出 cid=0xFFFF（未上市卡，无语义名）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_reserved_icid_letter_qualifier.md` (qualifier 用 `_reserved_icid_<letter>`，字母按地址升序分配，禁止用 `_0xNNNN` hex 形式或自造卡名)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
