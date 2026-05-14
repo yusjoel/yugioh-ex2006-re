@@ -12262,6 +12262,147 @@ RENAMES = [
         "再调用 get_card_extended_stat_field9 判断类型是否匹配 r8; "
         "两者均满足则计数+1. 返回匹配数量. 无外部写入. "
         "Constants: GY_BASE=0x0201c8f8, PLAYER_STRIDE=0x868, COUNT_OFFSET=0x14, EQUIP_FIELD6=0x16."),
+
+    # --- campaign-58 batch #58 (2026-05-15) ---
+    ("FUN_08033334", "count_monster_slots_by_chain_head_id",
+        "遍历 gDuelFieldSlots 指定玩家侧 5 个怪物区格子 (slot 0..4), "
+        "统计同时满足: (1) slot[0] bit19 置位 (格子有卡); "
+        "(2) slot[+8] (equip_chain_head) 低 16 位等于 r1 (target_chain_head_id) 的格子数. "
+        "循环步长 0x14 字节, 返回命中数量. "
+        "用于检测某卡当前是否作为装备链头部挂接在怪物格上. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14."),
+    ("FUN_080ad340", "check_card_id_in_effect_target_whitelist",
+        "以 r0=card_id 为键在特定卡牌白名单上执行 BST 查询. "
+        "card_id 属于白名单集合则返回 1, 否则返回 0. "
+        "纯叶子函数, 无外部状态读写. "
+        "BST 覆盖 card_id 范围 0x133c..0x19c5 (约 15 个特定卡牌 ID). "
+        "被 check_card_activation_eligible_by_id (0x080ac584) 作为激活门控条件之一. "
+        "Constants: return 0=not_in_set, 1=in_set."),
+    ("FUN_08033e30", "count_spell_zone_slots_with_empty_chain",
+        "遍历 gDuelFieldSlots 指定玩家侧魔法/陷阱区 5 个格子 (slot 5..9, 偏移 0x64), "
+        "统计同时满足: (1) slot[0] bit19 置位 (有卡); "
+        "(2) slot[+8] (equip_chain_head) == 0 (无装备链) 的格子数. "
+        "count_monster_slots_by_chain_head_id (0x08033334) 的魔法/陷阱区变体. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_zone_offset=0x64."),
+    ("FUN_080aee24", "scan_monster_slots_for_max_zone_score",
+        "扫描指定玩家侧怪物区 5 个格子 (slot 0..4), "
+        "对每个有效占用格子调用 dispatch_zone_slot_score_by_player_flag 求得分, "
+        "将两个维度的最大分值写入 *out_max_A, *out_max_B. "
+        "Non-APCS: r8=player_side, r9=extra_param, r10=loop_init. "
+        "被 compare_zone_max_scores_by_player (0x080aedd4) 以正反玩家各调一次. "
+        "Constants: gDuelFieldSlots=0x0201c510, stride=0x868, slots 0..4."),
+    ("FUN_080aedd4", "compare_zone_max_scores_by_player",
+        "以双玩家视角各调用 scan_monster_slots_for_max_zone_score 一次 "
+        "(player=1-r4 和 player=r4), 获取双方怪物区最大区域得分并比较. "
+        "返回 -2=opponent_advantage, 0=equal, +2=player_advantage. "
+        "上层 7 个调用者 (含 duel_field/AI 评分) 依据返回值做分支决策. "
+        "Constants: r0=-2=opponent_advantage, 0=equal, +2=player_advantage."),
+    ("FUN_080acc30", "check_card_effect_activation_eligible_by_id",
+        "对指定卡牌 (r2 低 16 位=card_id) 执行综合效果激活资格检查, "
+        "结合玩家状态与场地条件返回 0 (不符合) 或 1 (符合). "
+        "入口 .hword 0x4647=mov r7,r8 为 callee-save; r0=player_side, r1=context_ptr, r2=card_id. "
+        "BST 覆盖 0x0fb7..0x16ec, 含 check_compound_pair_activation_eligible "
+        "和 compare_zone_max_scores_by_player 两条特殊路径. "
+        "Constants: return 0=not_eligible, 1=eligible."),
+    ("FUN_080b4c6c", "scan_spell_zone_for_equip_target_by_id",
+        "扫描指定玩家侧魔法/陷阱区 5 格 (slot 5..9, 偏移 0x64..0xb4), "
+        "查找内部 ID 与 r8 (non-APCS, 入口 .hword 0x4688=mov r8,r1) 匹配的格子. "
+        "若找到则以 player_side+slot_idx+r4 调用 setup_equip_context_for_slot_activation; "
+        "返回非零则返回 1 (成功), 遍历完无命中返回 0. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_zone_start=0x64, slot_entry=0x14."),
+    ("FUN_080ad898", "check_card_id_placement_allowed",
+        "以 r0=card_id 执行多分支 BST 检查, 返回放置许可状态. "
+        "路径 A: r0=((r2!=0)?1:0); 路径 B: 固定返回 1 (允许); "
+        "路径 C: 固定返回 0 (不允许); 路径 D: 依赖 r1 是否非零. "
+        "BST card_id 范围 0x11bc..0x19fe (大量特定怪物卡). "
+        "被 scan_hand_for_best_equip_target_slot 用于筛选手牌可放置卡牌. "
+        "Constants: BST range 0x11bc..0x19fe; return 0=forbidden, 1=allowed."),
+    ("FUN_080b58e8", "scan_hand_for_best_equip_target_slot",
+        "扫描指定玩家侧手牌 (gP1LifePoints+player*0x868+0xc 读手牌数量), "
+        "对每张手牌依次执行多层筛选: (1) FUN_0810e5d4 基本资格; "
+        "(2) get_card_extended_stat_field5<=4 或 check_card_has_equip_placement_type; "
+        "(3) check_card_id_placement_allowed; (4) check_card_effect_activation_eligible_by_id; "
+        "(5) type==0x3 时调 sample_prng_scaled. "
+        "返回最佳候选手牌索引 (r7) 或 -1. "
+        "Constants: gP1LifePoints base, hand_count_offset=0xc, player_stride=0x868."),
+    ("FUN_080af9c0", "check_hand_equip_target_available",
+        "检查指定玩家侧手牌中是否存在可用装备目标格. "
+        "以固定参数调用 scan_hand_for_best_equip_target_slot; "
+        "若返回值 <0 则无目标返回 0; 否则提取 slot_idx, 读对应格子 card_id (低 13 位), "
+        "调用 check_card_effect_activation_eligible_by_id 最终确认. "
+        "激活资格为 0 则返回 1 (目标可用), 否则返回 0. "
+        "Constants: DAT_080af9fc=0x080af981 (callback ptr), gDuelFieldSlots=0x0201c600."),
+    ("FUN_080ac4e8", "check_card_normal_summon_restricted",
+        "先调用 get_card_field_summon_restriction 检查场地召唤限制; "
+        "若返回非零 (有限制) 则返回 1 (受限). "
+        "否则对 r4 (入口 r0=card_id) 做 BST 检查 0x13e8/0x1286/0x152e/0x19bd 等; "
+        "命中则返回 1, 未命中返回 0. "
+        "被 check_card_activation_eligible_by_id (0x080ac584) 作为普通召唤资格前置门控. "
+        "Constants: card_id whitelist {0x13e8, 0x1286, 0x152e, 0x19bd, ...}; return 0=not_restricted."),
+    ("FUN_080af070", "scan_monster_slots_for_best_scored_slot",
+        "扫描指定玩家侧怪物区 5 格 (slot 0..4), "
+        "对每个非空格子调用 eval_zone_slot_score_for_player_with_activation_guard "
+        "或 eval_zone_slot_score_for_player (依 r2==r6 选路径), 累积得分至 r4; "
+        "若 r4 大于 non-APCS r8 则更新 r9=最高分格子索引, r10=最高分. "
+        "返回最高分格子索引. "
+        "Non-APCS: r8=score_threshold, r9=output_best_idx, r10=output_best_score."),
+    ("FUN_08037974", "count_gy_cards_by_field6",
+        "遍历指定玩家侧墓地卡牌数组 (gP1LifePoints+player*0x868+0x120, 数量读自 +0xc), "
+        "对每张卡提取低 13 位 card_id, 调用 get_card_extended_stat_field6, "
+        "与 non-APCS r8 (入口 .hword 0x4688=mov r8,r1) 比较; 命中则 r6 自增. "
+        "返回命中数量. 与 count_hand_cards_by_field6 结构对称 (基址 +0x120 vs +0x418). "
+        "Constants: gP1LifePoints base, gy_base_offset=0x120, gy_count_offset=0xc, player_stride=0x868."),
+    ("FUN_080ac584", "check_card_activation_eligible_by_id",
+        "以 r5=card_id (r1 入口) 执行大型综合激活资格检查, 覆盖场地/手牌/墓地等多种激活路径. "
+        "入口 .hword 0x464f=mov r7,r9 / .hword 0x4646=mov r6,r8 为 callee-save. "
+        "r0=player_side (mov r8,r0), r1=ctx (r5), r2=card_context (mov r9,r2), r3=extra (r4). "
+        "执行流程: check_value_in_slot_chain + 大型 BST 分派 (含 count_field_copies_of_card, "
+        "check_card_normal_summon_restricted, count_gy_cards_by_field6, "
+        "check_hand_equip_target_available, scan_monster_slots_for_best_scored_slot). "
+        "返回 1=eligible, 0=not_eligible, -1=special. "
+        "Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868."),
+    ("FUN_0803a980", "get_slot_field6_score",
+        "从 eval_slot_score_entry_full 结果数组中提取 sp+0x18 偏移处的 field6 分值. "
+        "建立 0x24 字节栈帧; .hword 0x466a=mov r2,sp 将栈顶作为结果 buffer 传入; "
+        "r0=player_side, r1=slot_idx 直接透传; 取 sp+0x18 (base sp+0x4, 偏移 0x14, field6) 返回. "
+        "与 get_slot_field5_score (0x0803a958), get_slot_field7_score (0x0803a96c) 构成兄弟簇. "
+        "indeg=14."),
+    ("FUN_0803a96c", "get_slot_field7_score",
+        "从 eval_slot_score_entry_full 结果数组中提取 sp+0x1c 偏移处的 field7 分值. "
+        "建立 0x24 字节栈帧; .hword 0x466a=mov r2,sp 将栈顶作为结果 buffer 传入; "
+        "r0=player_side, r1=slot_idx 直接透传; 取 sp+0x1c (base sp+0x4, 偏移 0x18, field7) 返回. "
+        "与 get_slot_field5_score (0x0803a958, sp+0x14), get_slot_field6_score (0x0803a980, sp+0x18) "
+        "构成同一编号兄弟簇. indeg=7."),
+    ("FUN_080b0c60", "find_best_placeable_monster_slot",
+        "在已快照的格子缓冲区 (via sp+0x24 从调用帧传入) 中找出最适合放置怪物的格子索引. "
+        "r0=player_side (mov r10,r0), r1=card_context (mov r8,r1), r3=entry_count. "
+        "对每个缓冲区条目调用 get_slot_field7_score 累加得分, "
+        "并调用 zero_fill_by_halfword 清空对应格子临时区. "
+        "再调 get_first_placeable_monster_slot 搜索可放置格, 写入格子条目属性. "
+        "特定 card_id (0x1654, 0x1388, 0x1688) 额外写 slot+0xc. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+    ("FUN_080b0b64", "save_field_slots_to_buffer",
+        "将 gDuelFieldSlots 中两个玩家侧前 5 个格子条目 (各 0x64 字节) 复制到 r0 指定缓冲区. "
+        "第一次 copy_bytes_by_halfword(dst=r4, src=gDuelFieldSlots, len=0x64) 拷贝 P1 侧; "
+        "然后 dst+=0x64, src+=0x868; 第二次拷贝 P2 侧. "
+        "与 restore_field_slots_from_buffer (0x080b0b90) 构成保存/恢复对. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, copy_size=0x64 (5 slots*0x14)."),
+    ("FUN_080b0b90", "restore_field_slots_from_buffer",
+        "将缓冲区 (r0) 中保存的两个玩家侧格子快照写回 gDuelFieldSlots. "
+        "与 save_field_slots_to_buffer (0x080b0b64) 方向相反: "
+        "第一次 copy_bytes_by_halfword(dst=gDuelFieldSlots, src=r0, len=0x64) 还原 P1 侧; "
+        "然后 src+=0x64, dst+=0x868; 第二次还原 P2 侧. "
+        "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, copy_size=0x64."),
+    ("FUN_080b135c", "select_optimal_monster_placement_slot",
+        "综合选择怪物卡在场地上的最优放置格. "
+        "流程: (1) save_field_slots_to_buffer 保存快照; "
+        "(2) find_best_placeable_monster_slot 评分选出最优格子索引 r4; "
+        "(3) 若 r4<0 则无可用格跳出; "
+        "(4) eval_slot_score_entry_full 建立完整得分条目; "
+        "(5) 读格子 bit1 (side flag), 将格子索引写入 OAM 记录 strh r3,[r0,#0x6]; "
+        "(6) get_slot_field6_score 取最终分值. "
+        "返回最优格子索引 r4. "
+        "Constants: slot_entry stride 0x868*r4, gDuelFieldSlots=0x0201c510."),
 ]
 
 
