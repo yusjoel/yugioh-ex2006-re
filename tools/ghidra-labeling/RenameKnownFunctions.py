@@ -11044,6 +11044,152 @@ RENAMES = [
         "Side effects: OAM sprite buffer; LP/shape sprite; [gP1LifePoints+0x1d24] counter. "
         "Constants: CARD_ID=0x1370 (Kiseitai), SLOT_OFFSET=5, SLOT_MAX=4, "
         "chain_sentinel=0xffff, node_count_threshold=0xa, counter_offset=0x1d24."),
+
+    # --- batch #51 (campaign-51, 2026-05-15) ---
+    ("FUN_080a1a00", "set_lp_display_row_fields",
+        "Writes 4 LP display row parameters into fixed offsets of gP1LifePoints struct, "
+        "then calls commit_lp_display_row_to_sprite to submit the row to the sprite queue. "
+        "r0 -> gP1LifePoints+0x1d8c (word), r1 -> +0x1d90 (word), "
+        "r2 -> +0x1d98 (halfword), r3 -> +0x1d9a (halfword). "
+        "Called by enqueue_lp_display_row_if_enabled and 8 other LP bar render wrappers. "
+        "Constants: gP1LifePoints=0x0201c4e0, VAL_A_OFFSET=0x1d8c, VAL_B_OFFSET=0x1d90, "
+        "VAL_C_OFFSET=0x1d98, VAL_D_OFFSET=0x1d9a."),
+
+    ("FUN_080a1a78", "enqueue_lp_display_row_if_enabled",
+        "Conditional LP display row commit wrapper. "
+        "r1 (enable_flag) == 0: returns immediately, no update. "
+        "r1 != 0: computes OAM condition bits (r2 != 0 -> bit0, r3 != 0 -> bit1), "
+        "zero-extends r1 as halfword, then calls set_lp_display_row_fields. "
+        "Provides enable gate to suppress redundant sprite commits when LP is unchanged. "
+        "r0: lp_ptr (LP row display start addr); r1: enable_flag; r2: val_c; r3: val_d."),
+
+    ("FUN_0809f87c", "scan_monster_zone_for_equip_activation_a_man_with_wdjat",
+        "Equip activation scan case stub for A Man with Wdjat (internal_card_id=0x158e, cid=1170). "
+        "Called by duel_field main dispatch hub (FUN_0809d984) and auxiliary scan (FUN_0809fb16). "
+        "Fixes r1=0x158e then tail-calls scan_monster_zone_for_equip_activation_by_card. "
+        "Side effects: via scan_monster_zone_for_equip_activation_by_card on hit."),
+
+    ("FUN_0809cdd4", "scan_all_zone_slots_for_equip_chain_sprite_update",
+        "Core scanner for continuous-equip effect sprite refresh. "
+        "r0=player_ctx, r1=card_id. Uses gP1LifePoints+0x1d24 as loop counter, "
+        "scans slots 0..9 (10 slots total). "
+        "Each slot: check_value_in_slot_chain verifies card in chain; "
+        "on hit: enqueue_equip_slot_bitmap_update, then if bitmap==0: enqueue_equip_slot_sprite_attr. "
+        "Called by Limiter Removal / Karate Man / Wild Nature's Release / Summoner of Illusions stubs. "
+        "Constants: gP1LifePoints=0x0201c4e0, COUNTER_OFFSET=0x1d24, SLOT_COUNT=10, SLOT_STRIDE=0x868."),
+
+    ("FUN_0809ce80", "scan_all_zone_slots_for_equip_chain_sprite_limiter_removal",
+        "Continuous-equip sprite refresh case stub for Limiter Removal (internal_card_id=0x1409, cid=884). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x1409 then tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Side effects: via scan_all_zone_slots_for_equip_chain_sprite_update on hit."),
+
+    ("FUN_0809d880", "scan_equip_chain_list_for_sprite_deck_devastation_virus",
+        "Equip chain sprite scan case stub for Deck Devastation Virus (internal_card_id=0x188c, cid=1803). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x188c, r2=3 (zone=3) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. "
+        "Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit."),
+
+    ("FUN_0809f88c", "scan_monster_zone_for_equip_activation_reserved_icid_c",
+        "Equip activation scan case stub for reserved internal_card_id=0x1147 (cid=0xFFFF, no valid card). "
+        "Called by FUN_0809d984 and FUN_0809fb16. "
+        "Fixes r1=0x1147 then tail-calls scan_monster_zone_for_equip_activation_by_card. "
+        "At runtime scan will never match a valid card slot. "
+        "Sibling of reserved_icid_a (0x0809f85c) and reserved_icid_b (0x0809f86c)."),
+
+    ("FUN_0809ce90", "scan_all_zone_slots_for_equip_chain_sprite_karate_man",
+        "Continuous-equip sprite refresh case stub for Karate Man (internal_card_id=0x1337, cid=734). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x1337 then tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Side effects: via scan_all_zone_slots_for_equip_chain_sprite_update on hit."),
+
+    ("FUN_0809d894", "scan_equip_chain_list_for_sprite_pikeru_second_sight",
+        "Equip chain sprite scan case stub for Pikeru's Second Sight (internal_card_id=0x18d5, cid=1861). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x18d5, r2=2 (zone=2) then tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone. "
+        "Side effects: via scan_equip_chain_list_for_sprite_by_card_and_zone on hit."),
+
+    ("FUN_0809cea0", "scan_all_zone_slots_for_equip_chain_sprite_wild_natures_release",
+        "Continuous-equip sprite refresh case stub for Wild Nature's Release (internal_card_id=0x16ce, cid=1424). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x16ce then tail-calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Side effects: via scan_all_zone_slots_for_equip_chain_sprite_update on hit."),
+
+    ("FUN_0809eaa0", "scan_trap_zone_for_equip_activation_jam_breeding_machine",
+        "Equip activation scan case stub for Jam Breeding Machine (internal_card_id=0x13ff, cid=874). "
+        "Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. "
+        "Fixes r1=0x13ff then tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Side effects: via scan_trap_zone_for_equip_activation_by_card on hit."),
+
+    ("FUN_0809c3d8", "scan_monster_zone_slots_for_equip_activation_by_player",
+        "Core monster-zone equip activation scanner. "
+        "r0=player_side [0..1], r1=card_id. Uses gP1LifePoints+0x1d24 as counter, "
+        "scans 5 monster zone slots (0..4). "
+        "Each slot: test_slot_has_active_card; on hit builds OAM attr (0xa2<<0x14|player_bit, slot_encoded) "
+        "then calls apply_equip_activation_with_id_lookup. "
+        "Called by reserved_icid_d stub (FUN_0809caa4) and Satellite Cannon stub (FUN_0809cab4). "
+        "Constants: gP1LifePoints=0x0201c4e0, COUNTER_OFFSET=0x1d24, MONSTER_SLOT_COUNT=5, "
+        "OAM_BASE=0xa2<<0x14, SLOT_STRIDE=0x868."),
+
+    ("FUN_0809caa4", "scan_monster_zone_slots_for_equip_activation_reserved_icid_d",
+        "Monster-zone equip activation case stub for reserved internal_card_id=0x11cf (cid=0xFFFF, no valid card). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x11cf then tail-calls scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Sibling of Satellite Cannon stub (FUN_0809cab4); no card match at runtime."),
+
+    ("FUN_0809d8a8", "scan_equip_zone_for_final_countdown_sprite",
+        "Renders Final Countdown (internal_card_id=0x169c, cid=1384) progress sprites for both players. "
+        "Loops r6=1 to 0 (both sides), alternates player via eors. "
+        "zone=0xb; calls get_node_entity_id_in_slot to fetch node entity ID; "
+        "computes tile offset r4=node_count-entity_id+1; "
+        "calls enqueue_sprite_attr_record (OAM P1=0x3b / P2=0x803b); "
+        "if r4 > 0x13: calls enqueue_sprite_attr_type11 for overflow marker. "
+        "Constants: CARD_ID=0x169c, ZONE=0xb, EWRAM_NODE_BASE=0x0201e1cc, "
+        "OAM_P1=0x3b, OAM_P2=0x803b, TYPE11_THRESHOLD=0x13."),
+
+    ("FUN_0809ceb0", "scan_all_zone_slots_for_equip_chain_sprite_summoner_of_illusions",
+        "Conditional continuous-equip sprite refresh stub for Summoner of Illusions (internal_card_id=0x1481, cid=959). "
+        "Guard A: if Royal Command (0x148e) is on field, return 1 (skip). "
+        "Guard B: if Fiend Skull Dragon (0x14da) is on field, return 1 (skip). "
+        "Otherwise: fixes r1=0x1481, calls scan_all_zone_slots_for_equip_chain_sprite_update. "
+        "Constants: CARD_ID_GUARD_A=0x148e (Royal Command), "
+        "CARD_ID_GUARD_B=0x14da (Fiend Skull Dragon), CARD_ID_TARGET=0x1481 (Summoner of Illusions)."),
+
+    ("FUN_0809eab0", "scan_trap_zone_for_equip_activation_blind_destruction",
+        "Equip activation scan case stub for Blind Destruction (internal_card_id=0x1494, cid=978). "
+        "Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. "
+        "Fixes r1=0x1494 then tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Side effects: via scan_trap_zone_for_equip_activation_by_card on hit."),
+
+    ("FUN_0809cab4", "scan_monster_zone_slots_for_equip_activation_satellite_cannon",
+        "Monster-zone equip activation case stub for Satellite Cannon (internal_card_id=0x12ac, cid=633). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Fixes r1=0x12ac then tail-calls scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Side effects: via scan_monster_zone_slots_for_equip_activation_by_player on hit."),
+
+    ("FUN_0809c61c", "scan_spell_trap_zone_slots_for_equip_activation_by_card",
+        "Core spell/trap zone equip activation scanner. "
+        "r0=card_id (stored in r8 internally). Uses gP1LifePoints+0x1d24 as counter, "
+        "scans 10 slots (0..9). Each iteration: slot = n%5 + 5 (spell/trap zone slots 5..9), "
+        "player = n/5 via __udivsi3/__umodsi3. "
+        "test_slot_has_active_card; on hit builds OAM attr then apply_equip_activation_with_id_lookup. "
+        "Called by Human-Wave Tactics stub (FUN_0809d4bc) and 4 sibling stubs. "
+        "Constants: gP1LifePoints=0x0201c4e0, COUNTER_OFFSET=0x1d24, "
+        "PLAYER_LOOKUP_OFFSET=0x1ce8, SLOT_BASE=5, SLOT_COUNT=10, OAM_BASE=0xa2<<0x14."),
+
+    ("FUN_0809d4bc", "scan_spell_trap_zone_slots_for_equip_activation_human_wave_tactics",
+        "Spell/trap zone equip activation case stub for Human-Wave Tactics (internal_card_id=0x17b2, cid=1606). "
+        "Called by duel_field main dispatch hub (FUN_0809d984). "
+        "Loads r0=0x17b2 (overrides any caller r0) then tail-calls "
+        "scan_spell_trap_zone_slots_for_equip_activation_by_card. "
+        "No APCS input parameters; r0 set internally. "
+        "Side effects: via scan_spell_trap_zone_slots_for_equip_activation_by_card on hit."),
+
+    ("FUN_0809eac0", "scan_trap_zone_for_equip_activation_ominous_fortunetelling",
+        "Equip activation scan case stub for Ominous Fortunetelling (internal_card_id=0x1519, cid=1089). "
+        "Called by duel_field main dispatch hub (FUN_0809d984) and FUN_0809fb16. "
+        "Fixes r1=0x1519 then tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Side effects: via scan_trap_zone_for_equip_activation_by_card on hit."),
 ]
 
 
