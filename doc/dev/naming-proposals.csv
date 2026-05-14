@@ -605,7 +605,7 @@ address,name,proposed_name,score,tags
 0x0803b618,get_zone_card_attribute_by_type,,,
 0x0803b738,read_player_field_slot_word_by_zone,,,
 0x0803b81c,FUN_0803b81c,,,
-0x0803b854,FUN_0803b854,,,
+0x0803b854,set_player_state_bit,,,
 0x0803b8b0,write_field_slot_bit_by_player,,,
 0x0803b910,check_lp_exceeds_spell_copy_threshold,,,duel_field
 0x0803b960,check_zone_has_no_field_spell_node,,,
@@ -878,7 +878,7 @@ address,name,proposed_name,score,tags
 0x0804a7f8,increment_lp_bar_counter_no_player,,,
 0x0804a870,decrement_lp_bar_display_counter,,,
 0x0804a8d8,FUN_0804a8d8,,,
-0x0804a918,FUN_0804a918,,,
+0x0804a918,set_player_state_bit_with_sprite_update,,,
 0x0804a970,set_field_slot_bit_with_sprite_update,,,
 0x0804a9dc,map_field8_to_card_type_category,,,
 0x0804ab4c,check_card_pair_allowed,,,
@@ -1646,7 +1646,7 @@ address,name,proposed_name,score,tags
 0x08090714,FUN_08090714,,,
 0x0809077c,FUN_0809077c,,,
 0x0809078c,FUN_0809078c,,,
-0x080907f4,FUN_080907f4,,,
+0x080907f4,count_effect_node_activations_by_zone,,,
 0x08090848,dispatch_card_effect_activation,,,
 0x08090900,FUN_08090900,,,
 0x08090944,FUN_08090944,,,
@@ -1660,7 +1660,7 @@ address,name,proposed_name,score,tags
 0x080931de,FUN_080931de,,,
 0x08093384,FUN_08093384,,,
 0x08093390,trigger_card_display_op31_if_not_active,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
-0x080933b4,FUN_080933b4,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
+0x080933b4,invoke_card_display_op_0x31_sub1,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080933c8,invoke_card_display_op_0x31_with_params,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080933dc,FUN_080933dc,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x0809347c,FUN_0809347c,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
@@ -1743,7 +1743,7 @@ address,name,proposed_name,score,tags
 0x080970a0,FUN_080970a0,,,
 0x08097150,dispatch_to_effect_handler_by_card_type,,,
 0x08097190,FUN_08097190,duel_field_08097190,3,duel_field
-0x08097244,FUN_08097244,,,
+0x08097244,check_equip_zone_has_frozen_soul_or_great_long_nose,,,
 0x08097278,FUN_08097278,,,duel_field
 0x08097360,FUN_08097360,,,duel_field
 0x08097430,FUN_08097430,,,duel_field
@@ -1785,7 +1785,7 @@ address,name,proposed_name,score,tags
 0x0809c77c,scan_all_monster_zone_slots_for_equip_activation_dd_guide,,,duel_field
 0x0809c78c,scan_all_monster_zone_slots_for_equip_activation_mirage_knight,,,duel_field
 0x0809c79c,scan_all_monster_zone_slots_for_equip_activation_crush_d_gandra,,,duel_field
-0x0809c7ac,FUN_0809c7ac,,,duel_field
+0x0809c7ac,scan_hand_slot_for_equip_activation_by_card_type,,,duel_field
 0x0809c8cc,scan_equip_zone_for_interdimensional_matter_transporter,,,duel_field
 0x0809c920,scan_equip_zone_for_strike_ninja_activation,,,duel_field
 0x0809c978,scan_monster_zone_for_equip_activation_dd_scout_plane,,,duel_field
@@ -1806,13 +1806,13 @@ address,name,proposed_name,score,tags
 0x0809cee8,scan_all_zone_slots_for_equip_chain_sprite_archfiends_roar,,,duel_field
 0x0809cef8,scan_all_zone_slots_for_equip_chain_sprite_rescue_cat,,,duel_field
 0x0809cf08,scan_all_zone_slots_for_return_from_different_dimension_equip,,,duel_field
-0x0809cfc4,FUN_0809cfc4,,,duel_field
+0x0809cfc4,scan_equip_zone_for_infinite_dismissal_activation,,,duel_field
 0x0809d0c8,scan_equip_zone_chain_for_sprite_and_bitmap_update,,,duel_field
 0x0809d180,scan_spell_trap_zone_for_equip_activation_destiny_board,,,duel_field
 0x0809d198,scan_spell_trap_zone_for_equip_activation_bottomless_shifting_sand,,,duel_field
-0x0809d1ac,FUN_0809d1ac,,,duel_field
-0x0809d1c4,FUN_0809d1c4,,,duel_field
-0x0809d1dc,FUN_0809d1dc,,,duel_field
+0x0809d1ac,scan_spell_trap_zone_for_equip_activation_first_sarcophagus,,,duel_field
+0x0809d1c4,scan_monster_zone_for_equip_activation_garuda_opponent,,,duel_field
+0x0809d1dc,scan_equip_zone_for_return_of_the_doomed_activation,,,duel_field
 0x0809d220,scan_equip_chain_and_slots_for_graverobber_sprite,,,duel_field
 0x0809d324,scan_equip_zone_for_dark_necrofear_activation,,,duel_field
 0x0809d334,scan_equip_zone_for_manticore_of_darkness_activation,,,duel_field
@@ -1828,7 +1828,7 @@ address,name,proposed_name,score,tags
 0x0809d4fc,scan_spell_trap_zone_slots_for_equip_activation_boss_rush,,,duel_field
 0x0809d50c,scan_spell_trap_zone_slots_for_equip_activation_greed,,,duel_field
 0x0809d51c,scan_spell_trap_zone_for_two_man_cell_battle_equip,,,duel_field
-0x0809d5f4,FUN_0809d5f4,card_name_0809d5f4,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
+0x0809d5f4,scan_hand_equip_slot_for_activation_with_name_display,,,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x0809d718,scan_equip_zone_for_last_turn_activation,,,
 0x0809d764,scan_equip_zone_for_last_turn_sprite,,,
 0x0809d79c,scan_equip_chain_for_power_bond_sprite_and_lp_indicator,,,duel_field
@@ -1838,7 +1838,7 @@ address,name,proposed_name,score,tags
 0x0809d894,scan_equip_chain_list_for_sprite_pikeru_second_sight,,,
 0x0809d8a8,scan_equip_zone_for_final_countdown_sprite,,,
 0x0809d914,scan_equip_zone_for_infinite_cards_lp_display_update,,,
-0x0809d984,FUN_0809d984,card_name_0809d984,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
+0x0809d984,run_equip_activation_phase_by_counter,,,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x0809e078,FUN_0809e078,,,
 0x0809e168,FUN_0809e168,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x0809e5e0,FUN_0809e5e0,,,duel_field
@@ -1873,9 +1873,9 @@ address,name,proposed_name,score,tags
 0x0809ef88,scan_trap_zone_for_equip_activation_mask_of_dispel,,,duel_field
 0x0809ef98,scan_trap_zone_for_equip_activation_mask_of_accursed,,,duel_field
 0x0809efa8,scan_trap_zone_for_equip_activation_nightmare_wheel,,,duel_field
-0x0809efb8,FUN_0809efb8,,,duel_field
-0x0809efd0,FUN_0809efd0,,,duel_field
-0x0809efe8,FUN_0809efe8,,,duel_field
+0x0809efb8,scan_trap_zone_for_equip_activation_snatch_steal,,,duel_field
+0x0809efd0,scan_trap_zone_for_equip_activation_brain_jacker,,,duel_field
+0x0809efe8,scan_trap_zone_for_equip_activation_falling_down,,,duel_field
 0x0809f000,scan_trap_zone_for_equip_activation_the_eye_of_truth,,,duel_field
 0x0809f018,scan_trap_zone_for_equip_activation_minor_goblin_official,,,duel_field
 0x0809f030,scan_trap_zone_for_equip_activation_blast_sphere,,,duel_field
@@ -1883,7 +1883,7 @@ address,name,proposed_name,score,tags
 0x0809f060,scan_monster_zone_for_equip_activation_malice_ascendant,,,duel_field
 0x0809f078,scan_trap_slots_for_kiseitai_equip_chain_sprite,,,duel_field
 0x0809f158,scan_monster_zone_chain_for_equip_activation,,,duel_field
-0x0809f1fc,FUN_0809f1fc,,,duel_field
+0x0809f1fc,scan_monster_zone_chain_for_equip_activation_sinister_serpent,,,duel_field
 0x0809f20c,scan_monster_zone_chain_for_equip_activation_treeborn_frog,,,duel_field
 0x0809f21c,scan_equip_zone_for_special_summon_activation_return_zombie,,,duel_field
 0x0809f348,scan_monster_zone_slots_for_equip_activation_mucus_yolk,,,
@@ -1896,8 +1896,8 @@ address,name,proposed_name,score,tags
 0x0809f584,scan_equip_zone_for_equip_activation_revival_jam,,,duel_field
 0x0809f594,scan_equip_zone_for_equip_activation_vampire_lord,,,duel_field
 0x0809f5a4,scan_equip_zone_for_equip_activation_sacred_phoenix,,,duel_field
-0x0809f5b4,FUN_0809f5b4,,,duel_field
-0x0809f5c4,FUN_0809f5c4,,,duel_field
+0x0809f5b4,scan_equip_zone_for_entity_sprite_activation_curse_of_vampire,,,duel_field
+0x0809f5c4,scan_equip_zone_for_entity_sprite_activation_curse_of_vampire_opponent,,,duel_field
 0x0809f5dc,scan_spell_trap_zone_for_equip_activation_via_packed_attr,,,duel_field
 0x0809f704,scan_spell_trap_zone_for_equip_activation_reserved_icid_e,,,duel_field
 0x0809f71c,scan_spell_trap_zone_for_equip_activation_recycle,,,duel_field
@@ -2001,7 +2001,7 @@ address,name,proposed_name,score,tags
 0x080a6508,FUN_080a6508,card_name_080a6508,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x080a6630,FUN_080a6630,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080a80a8,check_slot_equip_target_eligible,,,
-0x080aba8c,FUN_080aba8c,,,
+0x080aba8c,init_equip_sub_entry_state_with_sprite_submit,,,
 0x080abb90,reset_sprite_attr_record_flags,,,
 0x080abbd8,FUN_080abbd8,,,
 0x080abcac,FUN_080abcac,,,
@@ -2136,7 +2136,7 @@ address,name,proposed_name,score,tags
 0x080bb3dc,check_normal_summon_eligible_for_any_effect_zone,,,duel_field
 0x080bb414,FUN_080bb414,,,duel_field
 0x080bb9b8,FUN_080bb9b8,,,duel_field
-0x080bbbf8,FUN_080bbbf8,,,
+0x080bbbf8,check_field_spell_icid_summon_restriction,,,
 0x080bbde8,FUN_080bbde8,,,duel_field
 0x080bbf38,FUN_080bbf38,duel_field_080bbf38,3,duel_field
 0x080bc168,FUN_080bc168,card_ids_080bc168,2,card_ids;duel_field

@@ -11842,6 +11842,199 @@ RENAMES = [
         "tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x14b2). "
         "与 0x0809ef88 (Mask of Dispel) 及 0x0809ef98 (Mask of the Accursed) 构成同族 sibling 簇. "
         "Side effects: via callee on hit. Constants: CARD_ID=0x14b2 (Nightmare Wheel)."),
+
+    # --- campaign-56 batch #56 (2026-05-15) ---
+    ("FUN_0809c7ac", "scan_hand_slot_for_equip_activation_by_card_type",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "读取 [gP1LifePoints+0x1d24] 计数器 (<=9 继续); counter/5 求商 (xor player_bit), "
+        "counter%5 求余 r3; 手牌槽地址 gP1LifePoints + player*0x868 + r3*0x14 + 0x30; "
+        "读槽数据低 13 位 card_type_id, 加 (-0x17d2) 后 cmp #8 -> 9-entry switch. "
+        "命中: slot[+0x8]!=0 跳过; 否则构建 OAM attr (0xa2<<0x14) 调用 apply_equip_activation_with_id_lookup; "
+        "命中递增 [gP1LifePoints+0x1cf4] 子计数器返回 0. 未命中: counter+1 重循环直至 >9 返回 1. "
+        "Side effects: equip activation state; [gP1LifePoints+0x1cf4] counter. "
+        "Constants: COUNTER_OFFSET=0x1d24, CARD_TYPE_BASE=0x17d2, SLOT_STRIDE=0x14, "
+        "player_stride=0x868, OAM_PREFIX=0xa2<<0x14."),
+    ("FUN_0809d1ac", "scan_spell_trap_zone_for_equip_activation_first_sarcophagus",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "5 条指令 thin wrapper: r0 -> r1 (player_id), r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809d1c0=0x17af (The First Sarcophagus card_id), "
+        "tail-call scan_spell_trap_zone_for_equip_activation_by_player_and_card. "
+        "与 Destiny Board (0x0809d180) / Bottomless Shifting Sand (0x0809d198) 对称 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x17af (The First Sarcophagus)."),
+    ("FUN_080933b4", "invoke_card_display_op_0x31_sub1",
+        "高频 3 条指令 thunk (indeg=36). 固定参数 op=0x31, sub=0x1, "
+        "将入口 r0 重映射为 dispatch_card_display_op 的第 3 参数 (r2), r3=0. "
+        "调用形式: dispatch_card_display_op(0x31, 0x1, r0_in, 0). "
+        "op=0x31 为 copy_game_text_to_card_name_vram (卡名 VRAM 拷贝), "
+        "sub=0x1 区别于同操作 sub=0x2 变体 (invoke_card_display_op_0x31_with_params, 0x080933c8). "
+        "被 duel_field / card_frame / card_stats / game_str / font_jp 等多个模块调用. "
+        "Side effects: via dispatch_card_display_op op=0x31: 卡名 VRAM 缓冲区写入. "
+        "Constants: OP=0x31, SUB=0x1."),
+    ("FUN_0809f5b4", "scan_equip_zone_for_entity_sprite_activation_curse_of_vampire",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "4 条指令 thin wrapper: r0=player_id 透传, "
+        "r1=DAT_0809f5c0=0x188f (Curse of Vampire card_id), "
+        "tail-call scan_equip_zone_for_entity_sprite_and_activation. "
+        "与 0x0809f5a4 (Sacred Phoenix) / 0x0809f594 (Vampire Lord) / 0x0809f584 (Revival Jam) "
+        "构成同族 sibling 簇 (己方侧, 无 player-invert). "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x188f (Curse of Vampire)."),
+    ("FUN_0809efb8", "scan_trap_zone_for_equip_activation_snatch_steal",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809efcc=0x1322 (Snatch Steal card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card. "
+        "Snatch Steal 装备于对手怪兽, 故扫描对手陷阱区. "
+        "与 Brain Jacker (0x0809efd0) / Falling Down (0x0809efe8) 构成对手侧 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1322 (Snatch Steal), PLAYER_INVERT=1-r0."),
+    ("FUN_0809cfc4", "scan_equip_zone_for_infinite_dismissal_activation",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "检查 [gP1LifePoints+0x1d24] 激活锁; 调用 count_field_copies_of_card(0x13f8) 确认场上有 Infinite Dismissal. "
+        "双层循环 r7=0..1 (player), r6=0..4 (slot): 检查存在标志; "
+        "eval_equip_chain_score_for_slot -> score<=3; bit_mask 匹配判定资格; "
+        "命中后: count_available_effect_zones + enqueue_sprite_attr_by_sign + prepare_slot_ctx_for_equip_bitmap; "
+        "递增 [+0x1d24] 计数器返回 0. "
+        "Side effects: equip activation bitmap; OAM sprite buffer; [gP1LifePoints+0x1d24] counter. "
+        "Constants: CARD_ID=0x13f8 (Infinite Dismissal), player_stride=0x868, SLOT_MAX=4, "
+        "MAX_EQUIP_CHAIN_SCORE=3, gDuelFieldSlots_base=0x0201c520."),
+    ("FUN_0809d1c4", "scan_monster_zone_for_equip_activation_garuda_opponent",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809d1d8=0x1487 (Garuda the Wind Spirit card_id), "
+        "tail-call scan_monster_zone_slots_for_equip_activation_by_player. "
+        "Garuda 装备效果作用于对手怪兽区, 故扫描对手侧. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1487 (Garuda the Wind Spirit), PLAYER_INVERT=1-r0."),
+    ("FUN_0809f5c4", "scan_equip_zone_for_entity_sprite_activation_curse_of_vampire_opponent",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809f5d8=0x188f (Curse of Vampire card_id), "
+        "tail-call scan_equip_zone_for_entity_sprite_and_activation. "
+        "与 FUN_0809f5b4 (Curse of Vampire, 己方版) 构成同卡不同侧 sibling 对. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x188f (Curse of Vampire), PLAYER_INVERT=1-r0."),
+    ("FUN_0809efd0", "scan_trap_zone_for_equip_activation_brain_jacker",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809efe4=0x1877 (Brain Jacker card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card. "
+        "与 Snatch Steal (0x0809efb8) / Falling Down (0x0809efe8) 构成对手侧 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1877 (Brain Jacker), PLAYER_INVERT=1-r0."),
+    ("FUN_0809d1dc", "scan_equip_zone_for_return_of_the_doomed_activation",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "检查装备区 zone=0xb 中是否存在 Return of the Doomed (card_id=0x13f5). "
+        "入口 r0=player_id -> r4. check_value_in_slot_chain(r4, 0xb, 0x13f5); 未命中返回 1. "
+        "命中: packed_attr = (r4<<31) | 0x0a5013f5; apply_equip_activation_with_id_lookup; "
+        "enqueue_equip_slot_sprite_attr(r4, 0xb, 0x13f5, 0); 返回 0. "
+        "Side effects: 装备激活状态; OAM sprite buffer. "
+        "Constants: CARD_ID=0x13f5 (Return of the Doomed), ZONE=0xb, COMBINED_ICID=0x0a5013f5."),
+    ("FUN_0809efe8", "scan_trap_zone_for_equip_activation_falling_down",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "5 条指令 thin wrapper: r0 -> r1, r0=1-r1 (opponent player-invert), "
+        "r1=DAT_0809effc=0x169a (Falling Down card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card. "
+        "与 Snatch Steal (0x0809efb8) / Brain Jacker (0x0809efd0) 构成对手侧 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x169a (Falling Down), PLAYER_INVERT=1-r0."),
+    ("FUN_0809d5f4", "scan_hand_equip_slot_for_activation_with_name_display",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 调用. "
+        "入口 r0=player_id -> r7; 读 [gP1LifePoints+0x1d24] 计数器, >4 提前退出. "
+        "按计数器索引取 ROM 槽描述符表 (0x09e47688); 构建 packed_attr = (0xa5<<0x14) | ldrh[slot_desc+0]; "
+        "调用 apply_equip_activation_via_packed_attr; 激活成功且 [0x0201e2a0+player*4+8]==1 时: "
+        "card_name_lookup_by_internal_id + format_game_text_with_text_arg(0xfa) + invoke_card_display_op_0x31_sub1 显示卡名; "
+        "计数器 +5 步进返回 0; 失败则 counter+1 直至 >4. "
+        "Side effects: equip activation state; 卡名 VRAM; [gP1LifePoints+0x1d24] counter. "
+        "Constants: COUNTER_OFFSET=0x1d24, ROM_SLOT_TABLE=0x09e47688, OAM_BASE=0xa5<<0x14, "
+        "gCardNameState=0x0201e2a0, COUNTER_STEP=5."),
+    ("FUN_0809f1fc", "scan_monster_zone_chain_for_equip_activation_sinister_serpent",
+        "由 duel_field 主调度枢纽 run_equip_activation_phase_by_counter 及辅助扫描调用. "
+        "4 条指令 thin wrapper: r0=player_id 透传, "
+        "r1=DAT_0809f208=0x1181 (Sinister Serpent card_id), "
+        "tail-call scan_monster_zone_chain_for_equip_activation. "
+        "与 scan_monster_zone_chain_for_equip_activation_treeborn_frog (0x0809f20c, card_id=0x19cb) "
+        "构成同族 sibling 对. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1181 (Sinister Serpent)."),
+    ("FUN_0809d984", "run_equip_activation_phase_by_counter",
+        "由 equip 激活主循环驱动器 (0x08094c60) 调用. "
+        "以 [gP1LifePoints+0x1d1c] 作为阶段计数器 (0..0x14=21 阶), "
+        "通过跳转表 (0x0809da00, 21 entries) 路由到各子阶段处理程序. "
+        "入口先检查 Last Turn 扫描条件 ([player_data+0x11c] bit23) 并调用 scan_equip_zone_for_last_turn_activation. "
+        "case 0: enqueue_sprite_attr_record + 清零子计数器; "
+        "case 1: submit_lp_bar_sprite_row_by_type; "
+        "case 3/4: 扫描 equip chain 槽 0..9 by icid 0x0fee/0x150e; "
+        "case 5: 双 player 全场 find_equip_chain_pair + check_equip_eligibility; "
+        "case 6: find_equip_chain_node_min_count_by_pred; "
+        "case 7: card_name 显示 / LP row / equip bitmap; "
+        "case a/b/c/0x14: 扫描 ROM 卡牌列表 (0x09e476b0/0x09e47738/0x09e4779c). "
+        "返回 0=继续 / 1=阶段完毕. "
+        "Side effects: [gP1LifePoints+0x1d1c] phase_counter; "
+        "[gP1LifePoints+0x1d24] sub-counter; OAM buffer; equip bitmap. "
+        "Constants: PHASE_MAX=0x14, player_stride=0x868, sub_counter_offset=0x1d24, "
+        "phase_offset=0x1d1c, player_data_offset=0x1ce8, ICID_A=0x0fee, ICID_B=0x150e, "
+        "ROM_LIST_A=0x09e476b0, ROM_LIST_B=0x09e47738, ROM_LIST_C=0x09e4779c."),
+    ("FUN_08097244", "check_equip_zone_has_frozen_soul_or_great_long_nose",
+        "检查玩家装备区 (zone=0xb) 中是否存在 Frozen Soul (card_id=0x16a1) "
+        "或 Great Long Nose (card_id=0x1502). "
+        "入口 r0=player_id -> r4. "
+        "先 check_value_in_slot_chain(r4, 0xb, 0x16a1); 命中返回 1. "
+        "否则 check_slot_has_node_by_card_id(r4, 0xb, 0x1502); 命中返回 1; 否则返回 0. "
+        "纯查询函数, 无外部写入. indeg=3. "
+        "Side effects: none. "
+        "Constants: CARD_ID_A=0x16a1 (Frozen Soul), CARD_ID_B=0x1502 (Great Long Nose), ZONE=0xb."),
+    ("FUN_080907f4", "count_effect_node_activations_by_zone",
+        "由多个装备/字段效果触发路径调用 (indeg=16). "
+        "入口 r0=card_info_ptr -> r6, r1=effect_param -> r8 (via .hword 0x4688=mov r8,r1). "
+        "调用 find_card_effect_node_entry(r6, r8) 获取效果节点 r5; "
+        "清零全局计数器 [0x0201b290+0x4bc]. "
+        "若节点为 0 或 node[+0x8]==0 则返回 0. "
+        "否则循环 r4=0..0xa (11 zones), 每次调用 FUN_0810e5d4(r6, r8, r4); "
+        "返回非零则成功计数 r7++. 返回 r7 (成功激活 zone 数). "
+        "与 dispatch_card_effect_activation (0x08090848) 构成兄弟对 (后者含单播路径). "
+        "Side effects: [0x0201b290+0x4bc] := 0; via FUN_0810e5d4: zone 效果节点激活状态. "
+        "Constants: GLOBAL_CTR_ADDR=0x0201b290, CTR_OFFSET=0x4bc, ZONE_MAX=0xa."),
+    ("FUN_080bbbf8", "check_field_spell_icid_summon_restriction",
+        "由字段咒文放置处理器 FUN_080bbde8 调用 (indeg=1). "
+        "入口 r0=player_id -> r7, r1=slot_idx [0..9] -> r6. "
+        "先 check_field_spell_slot_placeable(r7, r6); 不可放置返回 0. "
+        "计算 gDuelFieldSlots[player*0x868+slot*0x14] 条目; 提取低 13 位 icid -> r5. "
+        "多段阈值 binary-search cmp 链: "
+        "icid=0x0ffa/0x11c3/0x13ab/0x13b0/0x152b/0x152e/0x16ba/0x18bb -> "
+        "memset + count_effect_node_activations_by_zone (返回 0 或 restriction code); "
+        "icid=0x11f5 -> slot_count<=5 返回 0 or 1; "
+        "icid=0x16fa/0x19f1 -> 返回 1; "
+        "其余 -> get_card_field_summon_restriction. "
+        "Side effects: via count_effect_node_activations_by_zone: [0x0201b290+0x4bc] 清零; zone 激活. "
+        "Constants: ICID_THRESHOLD=0x152b, ICID_SLOT_COUNT_CHECK=0x11f5, "
+        "player_stride=0x868, slot_size=0x14, gDuelFieldSlots=0x0201c510."),
+    ("FUN_0803b854", "set_player_state_bit",
+        "对 [gP1LifePoints + player&1 * 0x868 + 0x11c] 执行单比特 OR (置位) 或 BIC (清位). "
+        "入口 r0=player_id, r1=bit_pos [0..31], r2=set_flag (0=clear, nonzero=set). "
+        "r2!=0: 计算 1<<bit_pos 后 OR 到目标字; r2==0: BIC 清位. 写回后返回 void. "
+        "与 write_field_slot_bit_by_player (0x0803b8b0, 操作 slot-level +0x40) 构成 sibling. "
+        "indeg=4; 被 set_player_state_bit_with_sprite_update 及 equip 激活路径直接调用. "
+        "Side effects: [gP1LifePoints + player&1 * 0x868 + 0x11c]: bit_pos OR/BIC. "
+        "Constants: flags_offset=0x11c (0x8e*2), player_stride=0x868."),
+    ("FUN_0804a918", "set_player_state_bit_with_sprite_update",
+        "对玩家级状态标志字 [gP1LifePoints + player&1 * 0x868 + 0x11c] 条件置位/清位, "
+        "并在状态变化时提交 OAM sprite 属性. "
+        "入口 r0=player_id -> r4, r1=bit_pos [0..31] -> r5, r2=set_flag [0..1] -> r6. "
+        "先读目标 flags word, 提取 bit_pos 当前值; 若已等于 set_flag 则直接返回 (no-op). "
+        "否则 set_player_state_bit(r4, r5, r6); 然后 enqueue_sprite_attr_record(oam_y, bit_pos, set_flag, 0), "
+        "oam_y=0x22 (player=0) / 0x8022 (player=1). "
+        "与 set_field_slot_bit_with_sprite_update (0x0804a970, slot-level) 构成 sibling. indeg=14. "
+        "Side effects: [gP1LifePoints+player*0x868+0x11c]: OR/BIC; OAM sprite 属性缓冲区写入. "
+        "Constants: flags_offset=0x11c, oam_y_p0=0x22, oam_y_p1=0x8022, player_stride=0x868."),
+    ("FUN_080aba8c", "init_equip_sub_entry_state_with_sprite_submit",
+        "由 equip sprite 处理簇四个对称函数 (0x080abbd8/0x080abcac/0x080abd60/0x080abe54) 调用 (indeg=4). "
+        "加载全局 equip 子条目控制结构体指针 (DAT_080abb74=0x0201e4d0). "
+        "重置结构体标志: AND 0x01 保留 [+0x13] bit0; AND 0xFD 清 [+0x14] bit1; "
+        "掩码 0xFFFFFE01 清 [+0x14]; AND mask 清 [+0x16]; 置位 [+0x12] bit4 (0x10). "
+        "遍历子条目数组 (struct[+0x8] 个条目, 每条目 2 字节, 从 struct+9 起): "
+        "提取 player_bit (bit0) 和 slot_idx (byte1), 查 gDuelFieldSlots 条目, "
+        "提取 face/orient 编码 (bits[23:22]<<1|bit18) 存入子条目 [0]. "
+        "struct[0] bit6 设置时: set_player_state_bit_with_sprite_update(player_bit, 0x10, 1). "
+        "[0x0201e2a0+player*4+8]==2 时: 置位 struct[+0x12] bit5 (0x20); "
+        "submit_sprite_row_data(-1, 0x15, 0x18); 清除 [0x0201b870+0xc00] bits 1:0. "
+        "Side effects: 0x0201e4d0 结构体多字段; via set_player_state_bit_with_sprite_update: player flags; "
+        "via submit_sprite_row_data: sprite row buffer. "
+        "Constants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "SPRITE_BUF=0x0201b870, ROM_DISPLAY_TABLE=0x0201e2a0."),
 ]
 
 
