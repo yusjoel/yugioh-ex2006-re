@@ -10824,6 +10824,226 @@ RENAMES = [
         "Side effects: enqueue_equip_slot_bitmap_update writes equip-slot bitmap sprite buffer. "
         "Constants: SLOT_START=5, SLOT_END=9, CARD_ID=0x1540 (=0xaa<<5), "
         "player_stride=0x868, counter_offset=0x0c."),
+    # --- campaign-50 batch #50 (2026-05-14) equip zone sprite/activation cluster ---
+    ("FUN_080440b8", "dispatch_equip_zone_sprite_and_activation",
+        "Core equip zone sprite dispatch and activation hub. "
+        "Called by FUN_080443c4 and multiple equip zone scanners via sp[0x28]/sp[0x2c] flags. "
+        "Entry saves r0..r3 to callee-save regs; sp[0x28]!=0 switches sp[0x4] to 0x1d/0x1e (LP row type). "
+        "Reads zone slot word, extracts card_type_id (bits[18:0]), dispatches through ~20 card_id branch tree "
+        "(0x16f9=Manticore of Darkness, 0x13e3=Archfiend of Gilfer, 0x11bc=Minar, 0x12a2=Skull-Mark Ladybug, etc.); "
+        "on match: calls enqueue_sprite_attr_record or enqueue_sprite_attr_for_zone_card_id_lookup/ "
+        "enqueue_sprite_attr_type11/apply_equip_activation_with_id_lookup. "
+        "Tail: calls scan_field_slots_for_equip_sprite + submit_lp_bar_sprite_row_by_type; "
+        "if sp[0x28]!=0 and zone_type==0xe: scan_trap_zone_slots_for_equip_shape_sprite; "
+        "then scan_effect_zones_for_equip_activation_forced_requisition. "
+        "If sp[0x2c]==1 and find_effect_node_in_zone hit: enqueue_equip_zone_sprite_by_side + submit_lp_change_indicator_with_chain_check. "
+        "Side effects: OAM sprite attr buffer via enqueue_* callees; gP1LifePoints chain state via apply_equip_activation_with_id_lookup. "
+        "Constants: OAM_ROW_TYPE_NORMAL=0x1e, OAM_ROW_TYPE_SPECIAL=0x1d, "
+        "OAM_SHAPE=0x8045/0x45 (P2/P1), ZONE_11=0xb, card_id_tree_count~=20."),
+    ("FUN_080443c4", "dispatch_equip_zone_sprite_banisher_of_the_light",
+        "Thin wrapper around dispatch_equip_zone_sprite_and_activation for Banisher of the Light (card_id=0x1332). "
+        "r0=player_id, r1=slot_idx (s16; skips if < 0), r2=zone_col_flags. "
+        "When r1>=0: calls get_zone_slot_ptr(r1, zone=0xb); "
+        "calls count_field_copies_of_card(0x1332); "
+        "sets r3=0xf if copies>0 (special OAM shape), else 0xe; "
+        "sets sp[0x0]=1 (P2 H-flip), sp[0x4]=0; "
+        "calls dispatch_equip_zone_sprite_and_activation(r0, zone_ptr, r2). "
+        "Returns void. "
+        "Side effects: OAM sprite attr buffer and equip activation state via dispatch_equip_zone_sprite_and_activation. "
+        "Constants: card_id=0x1332 (Banisher of the Light), ZONE=0xb, OAM_WITH_COPY=0xf, OAM_WITHOUT_COPY=0xe."),
+    ("FUN_0809d220", "scan_equip_chain_and_slots_for_graverobber_sprite",
+        "Scans equip chain and field slots for Graverobber (card_id=0x1379) sprite dispatch. "
+        "r0=player_id [0..1] (callee-save mov r7,r0). "
+        "Outer loop both sides (r4 in {0,1}, r5=player^r4): "
+        "calls check_value_in_slot_chain(r5, zone=0xb, 0x1379); "
+        "if in chain: reads chain depth from gDuelFieldSlots[0x0201c4ec], traverses nodes; "
+        "per node: calls find_effect_node_in_zone(player, zone=0xb, 0x1379); "
+        "if found: calls enqueue_equip_zone_sprite_by_side + FUN_080443c4 (Banisher wrapper). "
+        "Inner loop slot 5..10 in gDuelFieldSlots[0x0201c510]: "
+        "checks active flag (lsls r0,r2,#0x13 != 0) and ldrh[slot+0x8]==0 (equip-lock cleared); "
+        "if eligible: calls find_effect_node_in_zone/enqueue_equip_zone_sprite_by_side + prepare_equip_slot_ctx_for_bitmap_update. "
+        "Returns 0=processed, 1=no match. "
+        "Side effects: OAM sprite buffer via enqueue_equip_zone_sprite_by_side; "
+        "equip bitmap via prepare_equip_slot_ctx_for_bitmap_update. "
+        "Constants: CARD_ID=0x1379 (Graverobber), chain_base=0x0201c4ec, "
+        "slot_base=0x0201c510, player_stride=0x868, SLOT_START=5, SLOT_END=10, ZONE=0xb."),
+    ("FUN_0809ec24", "scan_monster_zone_for_equip_activation_cure_mermaid",
+        "4-instruction thin wrapper stub for Cure Mermaid (card_id=0x1454) equip activation. "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x1454. "
+        "Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 done_flag (0=activated, 1=counter overflow or no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x1454 (Cure Mermaid)."),
+    ("FUN_0809f42c", "scan_monster_zone_for_equip_activation_amazoness_blowpiper",
+        "4-instruction thin wrapper stub for Amazoness Blowpiper (card_id=0x160e) equip activation. "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x160e. "
+        "Tail-calls scan_monster_zone_for_equip_activation_by_card. "
+        "Returns r0=u32 done_flag (0=activated, 1=counter overflow or no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x160e (Amazoness Blowpiper)."),
+    ("FUN_0809f030", "scan_trap_zone_for_equip_activation_blast_sphere",
+        "5-instruction thin wrapper stub for Blast Sphere (card_id=0x1286) equip activation, with player-invert. "
+        "Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x1286, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Structurally symmetric sibling of scan_trap_zone_for_equip_activation_the_eye_of_truth / _minor_goblin_official. "
+        "Returns r0=u32 pass-through (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x1286 (Blast Sphere), PLAYER_INVERT=1-r0."),
+    ("FUN_0809ca34", "scan_equip_slot_for_dd_survivor_activation",
+        "Scans equip slots for D.D. Survivor (card_id=0x18bc) activation, both player sides. "
+        "r0=player_id [0..1]. "
+        "Two-pass loop (r5 in {0,1}, r4=player^r5): "
+        "calls get_node_entity_id_in_slot(r4, zone=0xb, 0x18bc); "
+        "if entity_id <= 0: skip; "
+        "else: selects OAM_SELF=0x004f18bc or OAM_OPP=0x014f18bc based on r1&1 != r4; "
+        "ORs player_bit (lsls r1,r3,#0x1f); "
+        "calls apply_equip_activation_with_id_lookup(r0, entity_id, 0); "
+        "calls enqueue_equip_slot_sprite_attr(r4, zone=0xb, 0x18bc, 0). "
+        "Returns 0=activated at least once, 1=no entity found in either pass. "
+        "Side effects: equip activation state; OAM sprite buffer. "
+        "Constants: CARD_ID=0x18bc (D.D. Survivor), OAM_SELF=0x004f18bc, OAM_OPP=0x014f18bc, ZONE=0xb."),
+    ("FUN_0809ec34", "scan_monster_slots_for_equip_activation_marie_the_fallen_one",
+        "Scans monster slots for Marie the Fallen One (card_id=0x1459) equip activation. "
+        "r0=player_id [0..1] (callee-save mov r7,r0). "
+        "First checks [gP1LifePoints+0x1d24] counter: if != 0 returns 1 immediately. "
+        "Else reads [gP1LifePoints+player*0x868+0x14] monster slot count; "
+        "loops slot 0..count-1: reads slot node from gP1LifePoints offset 0x418 area, "
+        "checks masked card_id (bits[18:0] AND 0x201fff == 0x1459=Marie); "
+        "if match: builds OAM attr = card_bits | OAM_FLAG(0x044e0000) | player_bit (lsls 0x1f), "
+        "calls apply_equip_activation_with_id_lookup; increments [gP1LifePoints+0x1d24]; returns 0. "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state. "
+        "Constants: CARD_ID=0x1459 (Marie the Fallen One), CARD_MASK=0x201fff, "
+        "OAM_FLAG=0x044e0000, counter_offset=0x1d24, player_stride=0x868."),
+    ("FUN_0809d438", "scan_equip_slot_for_twin_headed_behemoth_activation",
+        "Scans equip slots for Twin-Headed Behemoth (card_id=0x13a6) activation. "
+        "r0=player_id [0..1] (callee-save mov r7,r0; r8=0x13a6 loaded internally). "
+        "Checks [gP1LifePoints+0x1d24] counter: if > 1 returns 1. "
+        "Two-pass loop (r0 in {0,1}): r5=player^counter; "
+        "calls get_node_entity_id_in_slot(r5, zone=0xb, 0x13a6); "
+        "if entity_id > 0: calls find_zone_descriptor_by_slot_id(entity_id), extracts zone_type (bits[23:16]); "
+        "if zone_type==0xe: builds OAM attr = (r5&1)<<0x1f | DAT=0x0a4e13a6, "
+        "calls apply_equip_activation_with_id_lookup; "
+        "calls enqueue_equip_slot_sprite_attr(r5, zone=0xb, 0x13a6, 0); returns 0. "
+        "Misses increment [gP1LifePoints+0x1d24] counter. "
+        "Side effects: equip activation state; OAM sprite buffer; [gP1LifePoints+0x1d24] counter. "
+        "Constants: CARD_ID=0x13a6 (Twin-Headed Behemoth), OAM_ATTR=0x0a4e13a6, "
+        "zone_type_equip=0xe, ZONE=0xb, counter_offset=0x1d24."),
+    ("FUN_0809f43c", "scan_monster_zone_for_equip_activation_agent_of_wisdom_mercury",
+        "4-instruction thin wrapper stub for The Agent of Wisdom - Mercury (card_id=0x1740) equip activation. "
+        "r0=player_id [0..1] (pass-through); computes r1=0xba<<5=0x1740 via movs+lsls. "
+        "Tail-calls scan_monster_zone_for_equip_activation_by_card. "
+        "Returns r0=u32 done_flag (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x1740 (The Agent of Wisdom - Mercury, 0xba*0x20)."),
+    ("FUN_0809f048", "scan_trap_zone_for_equip_activation_adhesive_explosive",
+        "5-instruction thin wrapper stub for Adhesive Explosive (card_id=0x19bd) equip activation, with player-invert. "
+        "Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x19bd, "
+        "tail-calls scan_trap_zone_for_equip_activation_by_card. "
+        "Structurally symmetric sibling of scan_trap_zone_for_equip_activation_blast_sphere (card_id=0x1286). "
+        "Returns r0=u32 pass-through (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x19bd (Adhesive Explosive), PLAYER_INVERT=1-r0."),
+    ("FUN_0809f44c", "scan_field_slots_for_lv_monster_equip_activation",
+        "Scans field slots for LV-series monster equip activation. "
+        "r0=player_id [0..1] (callee-save mov r7,r0). "
+        "Checks [gP1LifePoints+0x1d24] counter: if > 4 returns 1. "
+        "Reads gDuelFieldSlots[player][counter_val] slot word (0x0201c510); "
+        "extracts card_type_id (bits[18:0]); compares against LV-card set BST: "
+        "0x1812=Silent Swordsman LV3, 0x17d9=Armed Dragon LV3, 0x1817=Silent Magician LV4, "
+        "0x1822=Ultimate Insect LV3, 0x185e=Ultimate Insect LV5 (and siblings). "
+        "On match: checks gDuelFieldSlots_A[player][slot][0x8] hword (equip count) != 0; "
+        "if nonzero: builds OAM attr, calls apply_equip_activation_with_id_lookup; "
+        "increments [gDuelFieldSlots+0x1cf4] counter; returns 0. "
+        "Side effects: [gDuelFieldSlots_base+0x1cf4] incremented; equip activation state. "
+        "Constants: LV_CARD_SET={0x1812,0x17d9,0x1817,0x1822,...}, "
+        "counter_offset=0x1d24, write_counter_offset=0x1cf4, equip_count_offset=0x8."),
+    ("FUN_0809cc58", "scan_field_slots_for_equip_bitmap_update_by_card_range",
+        "Scans both-side field slots for equip bitmap update, filtered by card_id range. "
+        "r0=player_id [0..1] (callee-save mov r7,r0). "
+        "Outer loop both sides (r2 in {0,1}, current_player=player^r2): "
+        "iterates monster slots 0..4 in gDuelFieldSlots_B (0x0201c520); "
+        "checks flag_word>>3 bit (equip active flag); if 0: skip. "
+        "Checks equip-lock bits (bit5 and bit1 of flag via mvns gates); "
+        "reads card_type_id (bits[18:0]) from gDuelFieldSlots_A (0x0201c510); "
+        "compares against range [DAT_0809ccf8-2..DAT_0809ccf8] = [0x1386..0x1388]; "
+        "if in range: extracts OAM xy coords, calls enqueue_sprite_attr_for_zone_card_id_lookup; "
+        "calls prepare_equip_slot_ctx_for_bitmap_update(player, slot, 0, 0). "
+        "Side effects: OAM sprite buffer; equip slot bitmap. "
+        "Constants: gDuelFieldSlots_A=0x0201c510, gDuelFieldSlots_B=0x0201c520, "
+        "player_stride=0x868, SLOT_MAX=4, card_id_hi=0x1388, card_id_lo=0x1386."),
+    ("FUN_0809f85c", "scan_monster_zone_for_equip_activation_reserved_icid_a",
+        "4-instruction thin wrapper stub for reserved internal card_id 0x1282 equip activation. "
+        "icid=0x1282 has no public name in cards-ids-array (between Relinquished=0x1281 and Thousand-Eyes Idol=0x1283). "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x1282. "
+        "Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 done_flag (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x1282 (internal id, no public name)."),
+    ("FUN_0809f060", "scan_monster_zone_for_equip_activation_malice_ascendant",
+        "5-instruction thin wrapper stub for Malice Ascendant (card_id=0x19d0) equip activation, with player-invert. "
+        "Saves r0 to r1, computes r0 := 1-r1 (opponent side), fixes r1=0x19d0, "
+        "tail-calls scan_monster_zone_for_equip_activation_by_card. "
+        "Player inversion reflects that this card's equip effect targets opponent's monsters. "
+        "Returns r0=u32 pass-through (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x19d0 (Malice Ascendant), PLAYER_INVERT=1-r0."),
+    ("FUN_0809d7ec", "scan_equip_chain_list_for_sprite_by_card_and_zone",
+        "Scans equip chain list for sprite submission, matched by card_id and zone_col. "
+        "r0=player_id [0..1], r1=card_type_id [0..0x1fff], r2=zone_col [0..N]. "
+        "First calls check_value_in_slot_chain(player, zone=0xb, card_id); if absent returns 1. "
+        "Reads [gP1LifePoints+player*0x868+0xa] hword = chain_count; if 0 returns 1. "
+        "Traverses chain nodes from gDuelFieldSlots=0x0201d9c0+player*0x868 (node_size=8, [node+6]=next): "
+        "ldrh[node+0] vs card_type_id; ldrb[node+2]&0xf vs zone_col. "
+        "On match: builds OAM attr base=0x3b (P1) or 0x803b (P2); "
+        "lsrs r3,byte[node+2],#5 = distance_offset; "
+        "calls enqueue_sprite_attr_record(OAM_base, node_xy, 1). "
+        "Returns r0=always 1 (no r0=0 path). "
+        "Side effects: OAM sprite attr buffer via enqueue_sprite_attr_record. "
+        "Constants: chain_base=0x0201d9c0, player_stride=0x868, chain_count_offset=0xa, "
+        "OAM_P1=0x3b, OAM_P2=0x803b, node_size=8."),
+    ("FUN_0809d86c", "scan_equip_chain_list_for_sprite_crush_card",
+        "4-instruction thin wrapper for scan_equip_chain_list_for_sprite_by_card_and_zone, Crush Card variant. "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x123b (Crush Card), r2=3 (zone_col). "
+        "Tail-calls scan_equip_chain_list_for_sprite_by_card_and_zone (FUN_0809d7ec). "
+        "Returns r0=u32 always 1 (pass-through). "
+        "Side effects: OAM sprite attr buffer via callee -> enqueue_sprite_attr_record. "
+        "Constants: CARD_ID=0x123b (Crush Card), zone_col=3."),
+    ("FUN_0809f86c", "scan_monster_zone_for_equip_activation_reserved_icid_b",
+        "4-instruction thin wrapper stub for reserved internal card_id 0x11ea equip activation. "
+        "icid=0x11ea has no public name in cards-ids-array (between Abyss Flower=0x11e9 and Takuhee=0x11eb). "
+        "r0=player_id [0..1] (pass-through); fixed r1=0x11ea. "
+        "Tail-calls scan_monster_zone_for_equip_activation_by_card (FUN_0809e920). "
+        "Returns r0=u32 done_flag (0=activated, 1=done/no match). "
+        "Side effects: [gP1LifePoints+0x1d24] counter incremented; equip activation state via callee. "
+        "Constants: CARD_ID=0x11ea (internal id, no public name)."),
+    ("FUN_08031474", "find_equip_chain_node_min_count_by_pred",
+        "Finds minimum count value across equip chain nodes matching predicate card_id=0x1130. "
+        "r0=player_side_packed (bit0=player [0..1]), r1=slot_idx. "
+        "Allocates sp[0x0]; initializes sp[0x0]=0x10000 (sentinel upper bound). "
+        "Calls find_equip_chain_node_by_pred(r0, r1, predicate=0x08031455, sp): "
+        "predicate checks ldrh[node+0]==0x1130; on match: compares ldrh[node+4] vs sp[0], stores min. "
+        "Returns ldr r0,[sp,#0] & 0xffff = u16 minimum count. "
+        "Known callers: 0x08042484 (reads bit15 of hword for player, hword[+2] for slot, "
+        "compares result with ldrh[r4+4]); 0x0809de7e (uses result for sprite count threshold). "
+        "Side effects: none (sp[0x0] is stack-local). "
+        "Constants: init_sentinel=0x10000, pred_card_id=0x1130, MASK=0xffff."),
+    ("FUN_0809f078", "scan_trap_slots_for_kiseitai_equip_chain_sprite",
+        "Scans trap zone slots for Kiseitai (card_id=0x1370) equip chain sprite submission. "
+        "r0=player_id [0..1] (callee-save .hword 0x4657=mov r7,r0). "
+        "Checks [gP1LifePoints+0x1d24] counter: if > 4 returns 1. "
+        "Sets opponent=1-player; inner loop counter_val in [0..4]: "
+        "slot = counter_val + 5 (trap zone offset); "
+        "calls test_slot_has_active_card(opponent, slot, 0x1370=Kiseitai); "
+        "if active: calls find_equip_chain_pair_across_field(opponent, slot, player, counter_val); "
+        "if chain_pair != 0xffff: extracts slot_a (low byte) and slot_b (high byte); "
+        "calls find_equip_chain_node_by_slot_pair(slot_a, slot_b, player, counter_val); "
+        "if node_count == 0xa: reads gDuelFieldSlots_B[player][counter_val] card data, "
+        "calls enqueue_sprite_attr_for_zone_card_id_lookup(player, counter_val, xy); "
+        "calls get_slot_field5_score(slot_a, slot_b) + submit_effect_zone_lp_and_shape_sprites; "
+        "increments [gP1LifePoints+0x1d24]; returns 0. "
+        "Side effects: OAM sprite buffer; LP/shape sprite; [gP1LifePoints+0x1d24] counter. "
+        "Constants: CARD_ID=0x1370 (Kiseitai), SLOT_OFFSET=5, SLOT_MAX=4, "
+        "chain_sentinel=0xffff, node_count_threshold=0xa, counter_offset=0x1d24."),
 ]
 
 
