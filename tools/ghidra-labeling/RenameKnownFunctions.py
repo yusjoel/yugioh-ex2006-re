@@ -12862,6 +12862,270 @@ RENAMES = [
         "gDuelFieldSlots=0x0201c510, player_stride=0x868, "
         "card_ids=[0x15d2,0x1566,0x1915,0x1983,0x14d6,0x1392,0x1415,0x12e2,0x1362,0x1512,0x1469,0x11ed], "
         "zone_equip=0xb, zone_type_target=0xe."),
+
+    # batch #61 — campaign-61 (2026-05-15)
+    ("FUN_08048780", "enqueue_sprite_attr_record_with_cap",
+        "Clamps r1 to 0xffff then calls enqueue_sprite_attr_record with fixed r2=3, r3=0. "
+        "If r1==0, skips enqueue and returns via LAB_080487a4 pop {r0}; bx r0 (Pattern B epilogue). "
+        "Callers: FUN_08098264 (card_frame, card_ids, duel_field tags). "
+        "Params: r0=oam_attr_or_id (pass-through), r1=raw_value [0..0xffff]. "
+        "Returns void (r0 clobbered by pop {r0} epilogue). "
+        "Side effects: enqueue_sprite_attr_record writes OAM attr buffer. "
+        "Constants: CAP=0xffff, r2_fixed=3, r3_fixed=0."),
+
+    ("FUN_080934e4", "invoke_card_display_op_0x31_sub8",
+        "4-instruction thunk: calls dispatch_card_display_op(op=0x31, sub=0x8, r2=r0_in, r3=0x0). "
+        "op=0x31 is copy_game_text_to_card_name_vram operation; sub=0x8 specifies sub-command variant. "
+        "indeg=8; triggered by duel_field/card_frame callers. "
+        "Params: r0=card_slot_ptr (pass-through as dispatch 3rd arg r2). "
+        "Returns r0=u32 dispatch_result (1=done/0=invalid, pass-through from dispatch_card_display_op). "
+        "Side effects: dispatch_card_display_op(0x31,0x8,...) writes VRAM card name buffer. "
+        "Constants: OP_CODE=0x31, SUB_PARAM=0x8."),
+
+    ("FUN_080969c4", "init_zone_activation_display_fields",
+        "Initializes several zone-activation display fields in gP1LifePoints struct (no loops, one-shot write). "
+        "Writes: r0 (zone_eval_fn callback ptr) -> [gP1LifePoints+0x1d7c]; "
+        "[gP1LifePoints+0x1d4c]=7 (zone eval state init); [gP1LifePoints+0x1d58]=0; "
+        "[gP1LifePoints+0x1d54]=0 (derived as 0x1d7c-0x28 via subs r3,#0x28); "
+        "[gP1LifePoints+0x1d64] := [0x0201e2a0+0x4] (current duel phase word). "
+        "indeg=31 (high-frequency, card_frame/card_ids/duel_field tags), called before zone eval main loop. "
+        "Params: r0=zone_eval_fn ptr written to [gP1LifePoints+0x1d7c]. "
+        "Side effects: writes gP1LifePoints+0x1d4c/0x1d7c/0x1d58/0x1d54/0x1d64. "
+        "Constants: ACTIVE_ZONE_PLAYER_FIELD_OFFSET=0x1d64, ZONE_STATE_OFFSET=0x1d4c, "
+        "ZONE_INIT_VAL=7, gDuelStateBase=0x0201e2a0."),
+
+    ("FUN_08047d28", "submit_equip_sprite_if_slot_eligible",
+        "Checks if given player slot can equip a target; enqueues equip indicator sprite attr if eligible. "
+        "r0=player_id, r1=slot_idx. Clears 0x18-byte stack struct via memset; reads slot card state bits; "
+        "modifies equip activation flag (BIC+OR on slot_entry byte[2]); calls update_equip_target_bitmap_for_field "
+        "with bit_mask=1<<(player*16+slot); if nonzero and slot card state_code==1, calls enqueue_sprite_attr_type11. "
+        "Returns 1 (equip activatable) or 0 (not). "
+        "Params: r0=player_id [0..1] -> r5, r1=slot_idx [0..10] -> r6. "
+        "Side effects: slot_entry byte+2 flag BIC/OR; update_equip_target_bitmap_for_field; "
+        "enqueue_sprite_attr_type11 writes OAM attr buffer (conditional). "
+        "Constants: bit_mask=1<<(player*16+slot), equip_slot_stride=0xe, DAT_08047d8c=0x14e2."),
+
+    ("FUN_080974a8", "fill_slot_activation_state_array",
+        "Fills 5 hand/field slot activation eligibility entries into caller-provided output buffer. "
+        "r0=output_struct_ptr (->r5). Loop r6=0..4: reads slot card entry from gP1LifePoints+slot path, "
+        "extracts sub_type and player_bit, calls eval_slot_activation_eligibility_full, "
+        "writes result to [r5+0x30+slot*4]. First entry (slot=0) also writes sub_type to [r5+0x0], "
+        "player_bit to [r5+0x4]. r8/r9/r10 are callee-save (saved via .hword 0x4657/464e/4645), not params. "
+        "Called by FUN_0809757c and FUN_08098564 before activation popup/zone eval. "
+        "Params: r0=output_slot_state ptr (>=0x44 bytes) -> r5. "
+        "Side effects: writes [r5+0x0], [r5+0x4], [r5+0x30+k*4] for k=0..4. "
+        "Constants: SLOT_COUNT=5, gDuelFieldSlots=0x0201c510, player_stride=0x868, "
+        "type_field_offset=0x10e1, entry_size=0x14."),
+
+    ("FUN_080a1e0c", "enqueue_lp_display_row_type17",
+        "Calls set_lp_display_row_fields with fixed row type 0x11 (decimal 17). "
+        "r0=lp_row_base, r1=lp_value (zero-extended to 16-bit -> r5), r2/r3 high-bytes merged to r4 (4th param). "
+        "Hardcodes r1=0x11 before calling set_lp_display_row_fields. "
+        "indeg=10, frequently called by LP bar render path (FUN_080670a0 duel_field tag etc). "
+        "Params: r0=lp_row_base, r1=lp_value [0..0xffff], r2=display_mode [0..3], r3=display_state [0..0xff]. "
+        "Returns void. "
+        "Side effects: set_lp_display_row_fields writes gP1LifePoints LP row fields and triggers OAM sprite submit. "
+        "Constants: ROW_TYPE=0x11 (17)."),
+
+    ("FUN_080b54c0", "select_equip_target_slot_by_eligible_set",
+        "Filters slot_bitmap candidates by check_card_id_in_eligible_set whitelist, then picks "
+        "best slot via find_best_scored_slot_from_bitmap or random via sample_random_slot_from_bitmap. "
+        "Simplified variant of select_equip_target_slot_full (0x080b55ac): only whitelist-set-match phase. "
+        "r0=player_id (-> sp[0x2c]), r1=slot_bitmap (-> r10 via .hword 0x468a=mov r10,r1). "
+        "Phase 1: enumerate slots in bitmap to stack buffer; Fisher-Yates shuffle if count>1. "
+        "Phase 2: check each candidate via check_card_id_in_eligible_set -> call find_best_scored_slot_from_bitmap; "
+        "fallback to sample_random_slot_from_bitmap if result<0. "
+        "Called by FUN_080b5d98, FUN_080b6c08, FUN_080b70ac on equip target selection path. "
+        "Params: r0=player_id [0..1], r1=slot_bitmap [0..0x7ff]. "
+        "Returns r0=s32 best_slot_idx [0..10] or -1. "
+        "Side effects: none (pure computation). "
+        "Constants: SLOT_MAX=10, gDuelFieldSlots=0x0201c510, player_stride=0x868."),
+
+    ("FUN_080b4f68", "find_best_slot_from_bitmap_by_comparator",
+        "Filters bitmap candidates, scores each via caller-provided comparator fn, returns highest-scoring slot. "
+        "r0=player_id (-> lsls r4,r0,#4 for bit offset base), r1=slot_bitmap (->r6), "
+        "r2=comparator_fn_ptr (-> r10 via .hword 0x4692=mov r10,r2). "
+        "Phase 1: collect bitmap slots into stack buffer; if count<=0 return -1. "
+        "Phase 2: for each candidate read gDuelFieldSlots+slot card entry, call FUN_0810e5f0 (bx r10), "
+        "track max score (r7) and best slot_idx (r8). indeg=5. "
+        "Params: r0=player_id [0..1], r1=slot_bitmap [0..0x7ff], "
+        "r2=comparator_fn (fn(slot_entry_ptr)->s32 score, stored in r10). "
+        "Returns r0=s32 best_slot_idx [0..10] or -1. "
+        "Side effects: none (stack-local buffer only). "
+        "Constants: SLOT_MAX=10, FAIL=-1, player_stride=0x868, gDuelFieldSlots=0x0201c600."),
+
+    ("FUN_080b706c", "build_slot_bitmap_by_predicate",
+        "Enumerates all (player, slot) pairs over 2 players x 11 slots; calls predicate fn for each; "
+        "sets bit 1<<(player*16+slot) in r6 if predicate returns nonzero; returns accumulated bitmap. "
+        "r0=predicate_fn_ptr (-> r8 via .hword 0x4680=mov r8,r0). "
+        "Each iteration: calls FUN_0810e5e8 (bx r8) with r0=player, r1=slot, r2=0. "
+        "indeg=1, caller=FUN_080b70ac (card_ids, duel_field tags). "
+        "Params: r0=predicate_fn ptr (fn(player_id, slot_idx, 0)->bool, stored in r8). "
+        "Returns r0=u32 slot_bitmap (bit (player*16+slot) set if predicate true). "
+        "Side effects: none (predicate may have read-only access). "
+        "Constants: PLAYER_COUNT=2, SLOT_MAX=10, bit_pos=player*16+slot."),
+
+    ("FUN_080b4fd8", "eval_best_slot_score_by_lp_and_attr",
+        "Iterates LP check entries for current player (r0 bit0), calls caller-provided slot predicate (r1 -> FUN_0810e5d4=bx r3), "
+        "extracts card_id then queries get_card_extended_stat_field3 and lookup_rom_card_attribute_table_a, "
+        "compares against LP threshold (r9 cumulative) and attribute constraints (r2/r3/r7 three-way conditions), "
+        "tracks best_score (r6) and best_slot (sp[0x8]). Returns best_slot_idx or -1. "
+        "Single caller: FUN_080b70ac (card_ids, duel_field tags). "
+        "Params: r0=player_id [0..1] (bit0 selects gP1LifePoints branch), "
+        "r1=slot_predicate_fn ptr (fn(player,slot_iter,?,fn_ptr)->bool -> sp[0x4]), "
+        "r2=score_upper_enable [0..1] (>0: require score>best_score; callsite movs r2,#0x1), "
+        "r3=score_lower_enable [-1..1] (>0: require score>best; <0: require score<best; callsite movs r3,#0x1). "
+        "Returns r0=s32 best_slot_idx [0..10] or -1. "
+        "Side effects: none (read-only scan of gP1LifePoints LP entries and gDuelFieldSlots). "
+        "Constants: LP_STRIDE=0x868, gDuelFieldSlots_ext=0x0201c600, "
+        "player_stride=0x868, SLOT_ITER_BASE_OFFSET=0xc."),
+
+    ("FUN_080b70ac", "select_equip_target_slot_by_card_id",
+        "Dispatches equip target slot selection logic by equip card_id (r1->r5). "
+        "Writes player_id (r0->r7) to 0x0201afe0 and [gP1LifePoints+0x1d64]. "
+        "Calls build_slot_bitmap_by_predicate(r2) -> candidate bitmap (r8). "
+        "Multi-level cmp tree on r5 (card_id: 0x1578/0x12dc/0x139c/0x142a/0x1544/0x16df/0x1678/0x1888/0x1764 etc) "
+        "dispatches to per-case handler calling eval_best_slot_score_by_lp_and_attr or "
+        "select_equip_target_slot_by_eligible_set or select_equip_target_slot_full. "
+        "indeg=26 (C_util_high), widely called by duel_field equip activation path. "
+        "Params: r0=player_id [0..1] -> r7, r1=card_id [0..0x1fff] -> r5, "
+        "r2=slot_predicate_fn ptr (passed to build_slot_bitmap_by_predicate). "
+        "Returns r0=s32 best_slot_idx [0..10] or -1. "
+        "Side effects: [0x0201afe0]:=r0 (player_id); [gP1LifePoints+0x1d64]:=r0. "
+        "Constants: ACTIVE_ZONE_PLAYER_FIELD_OFFSET=0x1d64, gEquipPlayerState=0x0201afe0, "
+        "card_id_dispatch_table=[0x1578,0x12dc,0x139c,0x142a,0x1544,0x16df,0x1678,0x1888,0x1764,...]."),
+
+    ("FUN_0809757c", "refresh_slot_activation_display_if_changed",
+        "Detects if current slot activation state differs from cached state; triggers display update if changed. "
+        "Allocates 0x48-byte stack buffer; calls fill_slot_activation_state_array(sp+4) for 5 slots; "
+        "compares with cached values at [DAT_080975b0+0xec]/[+0xf0]. "
+        "If consistent, further checks via check_slot_card_activatable, memcmp 0x44 bytes, "
+        "check_player_field_spell_chain_eligible, eval_slot_activation_eligibility_full. "
+        "If changed (r6=1): sets [gP1LifePoints+0x1d28]=1, [gP1LifePoints+0x1d2c]=0 (activation refresh flags), "
+        "enqueue_sprite_attr_record (sprite 0x801b/0x177a), dispatch_card_display_op(0xb), "
+        "set_field_slot_bit_with_sprite_update(slot,0x15,1). "
+        "Called by FUN_08098264/FUN_08098564. Returns 1=state changed/refreshed, 0=no change. "
+        "Params: r0=slot_state_cache ptr (DAT_080975b0 region). "
+        "Side effects: [DAT_080975b0+0x8]:=0; [gP1LifePoints+0x1d2c]:=0, [gP1LifePoints+0x1d28]:=1; "
+        "OAM attr buffer via enqueue_sprite_attr_record; dispatch_card_display_op(0xb,...); "
+        "set_field_slot_bit_with_sprite_update. "
+        "Constants: SPRITE_ATTR_ACT=0x177a, SPRITE_ATTR_ALT=0x801b, "
+        "ACTIVATION_REFRESH_OFFSET=0x1d28, ACTIVATION_CTRL_OFFSET=0x1d2c."),
+
+    ("FUN_08098264", "tick_activation_display_state_machine",
+        "Single-frame tick of card activation display state machine. "
+        "Reads [gP1LifePoints+0x1d2c] state code (r4_in provides base ptr), dispatches via multi-level cmp tree. "
+        "State 0: checks slot activation permission; if not activatable enqueue_sprite_attr_record(oam=0x1b) and "
+        "set gP1LifePoints+0x1d28=1; if activatable calls fill_slot_activation_state_array, sets [base+0xc]=1. "
+        "State 0x64/0x65/0x66: checks chain/fieldspell activation conditions then refreshes sprites. "
+        "State 0xc8/0xc9: higher states (activation complete or confirm phase). "
+        "State 0x100..0x132: enters refresh path refresh_slot_activation_display_if_changed. "
+        "Returns void (indeg=1, driven by single caller FUN_0809be70). "
+        "Params: r0=slot_display_ctx ptr (DAT_080982dc=0x0201bb90 region) -> r4. "
+        "Side effects: [gP1LifePoints+0x1d28] may update (set 1); OAM attr buffer via enqueue_sprite_attr_record; "
+        "fill_slot_activation_state_array updates [base+0xec..] cache. "
+        "Constants: STATE_OFFSET=0x1d2c, REFRESH_FLAG_OFFSET=0x1d28, "
+        "STATE_CHECK=0x65, STATE_DONE=0xc8, oam_attr=0x1b."),
+
+    ("FUN_0803b81c", "write_slot_occupy_flag_bit",
+        "Sets or clears bit r0 in [gP1LifePoints + player&1*0x868 + 0x10d0] slot occupy flags word. "
+        "r1!=0: computes 1<<r0 then ORs into flags; r1==0: BIC clears bit. "
+        "Sibling of set_player_state_bit (0x0803b854, operates on +0x11c). "
+        "Called by set_player_state_bit_with_sprite_update (0x0804a8d8) and FUN_08040144. "
+        "Params: r0=bit_pos [0..31], r1=set_flag (0=clear BIC, nonzero=set OR). "
+        "Returns void (bx lr). "
+        "Side effects: [gP1LifePoints+0x10d0] bit OR or BIC. "
+        "Constants: flags_offset=0x10d0, player_stride=0x868."),
+
+    ("FUN_0804a8d8", "set_slot_occupy_bit_with_sprite_update",
+        "Conditionally sets or clears bit in [gP1LifePoints+player&1*0x868+0x10d0] and submits OAM sprite record on change. "
+        "Reads current flags word; extracts bit_pos value; if already equals set_flag returns (no-op). "
+        "Otherwise calls write_slot_occupy_flag_bit(bit_pos, set_flag); then calls "
+        "enqueue_sprite_attr_record(oam_y=0x9, bit_pos, set_flag, 0). "
+        "Sibling of set_player_state_bit_with_sprite_update (0x0804a970, operates on +0x11c flags). "
+        "Called by FUN_08098564 (card display state machine) and FUN_08098a88 (duel_field). indeg=4. "
+        "Params: r0=bit_pos [0..31] -> r4, r1=set_flag [0..1] -> r5. "
+        "Returns void. "
+        "Side effects: [gP1LifePoints+player&1*0x868+0x10d0] bit OR/BIC via write_slot_occupy_flag_bit; "
+        "OAM attr buffer via enqueue_sprite_attr_record(0x9, bit_pos, set_flag, 0) (conditional). "
+        "Constants: flags_offset=0x10d0, player_stride=0x868, oam_attr=0x9."),
+
+    ("FUN_08098564", "tick_card_activation_phase_by_state",
+        "Phase-indexed (0..4) card activation display state machine tick, reading [gP1LifePoints+0x1d2c] as phase index. "
+        "Reads 0x0201bb90+0x4 (duel turn struct word) then switches on phase: "
+        "case 0: calls fill_slot_activation_state_array, increments counter; "
+        "case 1: calls count_field_copies_of_card, if nonzero constructs slot_type/player_bit "
+        "then calls enqueue_sprite_attr_type11; "
+        "case 2/3/4: further phase handling (advanced activation/effect display stages). "
+        "Parallel to tick_activation_display_state_machine (0x08098264): this handles phases 0..4, "
+        "that one handles 0..0x132. "
+        "Driven by single caller FUN_0809be70 (indeg=1). "
+        "Params: r0=void (entry ldr r0,[r0,#0x4] uses internal load DAT_08098590=0x0201bb90; no APCS r0 input). "
+        "Returns void. "
+        "Side effects: [gP1LifePoints+0x1d2c] conditional increment (case 0/1); "
+        "OAM attr buffer via enqueue_sprite_attr_type11 (conditional). "
+        "Constants: MAX_PHASE=4, STATE_OFFSET=0x1d2c, gDuelTurnStruct=0x0201bb90."),
+
+    ("FUN_08048020", "render_slot_card_sprite_and_effects",
+        "Full sprite render pipeline for a slot's card: builds OAM attr word, submits card sprite, "
+        "scans equip/attach sprites, triggers LP bar row update and zone effect actions. "
+        "r0=slot_ptr -> r4, r1=player_id -> r5. If r5==0 reads turn word from 0x0201bb90+0x0; else +0x4. "
+        "Looks up card_id from gDuelFieldSlots; calls query_slot_card_type_eligibility; "
+        "check_card_equip_eligibility_in_field; count_field_copies_of_card; check_card_field8_is_9. "
+        "Builds OAM attr word r4 (priority/mode/type fields); enqueue_sprite_attr_record for main sprite; "
+        "if equip card: scan_field_slots_for_equip_sprite; check_card_field5_is_nonzero + "
+        "scan_field_slots_for_attached_sprite_by_id; dispatch_card_effect_sprite_render_by_card_id; "
+        "submit_lp_bar_sprite_row_by_type(0x16/0x1b); dispatch_card_effect_zone_action_by_card_id. "
+        "Returns 1 (rendered) or 0 (no card in slot). "
+        "Params: r0=slot_entry ptr (gDuelFieldSlots slot) -> r4, r1=player_id [0..1] -> r5. "
+        "Side effects: OAM attr buffer via enqueue_sprite_attr_record (main sprite); "
+        "LP bar buffer via submit_lp_bar_sprite_row_by_type; "
+        "effect zone OAM via dispatch_card_effect_zone_action_by_card_id. "
+        "Constants: gDuelTurnStruct=0x0201bb90, gDuelFieldSlots_ext=0x0201bc54."),
+
+    ("FUN_0809b146", "increment_counter_at_ptr",
+        "4-instruction leaf: ldr-adds-str-movs. Increments [r1] word in-place (+1), returns 0. "
+        "r1=gP1LifePoints+offset (constructed by caller FUN_0809a1a4 via ldr r1,PTR_gP1LifePoints + adds r1,offset). "
+        "Acts as activation display counter increment primitive. "
+        "Also used as prefix code block by 0x0809b14e (shared epilogue) via fall-through. "
+        "Returns 0 ('no change pending'; caller ignores return value). indeg=1. "
+        "Params: r0=void (entry r0 not used; first instr ldr r0,[r1] overwrites r0), "
+        "r1=counter_word ptr (gP1LifePoints+runtime_offset). "
+        "Returns r0=u32 0 (fixed). "
+        "Side effects: [r1] := [r1]+1 (gP1LifePoints+offset counter increment). "
+        "Constants: none."),
+
+    ("FUN_0809b14e", "restore_callee_high_regs_from_frame",
+        "Shared THUMB function epilogue: restores 0x48-byte stack frame, "
+        "pops r3/r4/r5 then uses 0x4698/46a1/46aa (mov r8,r3; mov r9,r4; mov r10,r5) to restore "
+        "callee-save high registers r8/r9/r10, then restores r4/r5/r6/r7, finally pop {r1}; bx r1 returns. "
+        "Caller FUN_0809a1a4 sets movs r0,#0x1 before bl; function only does stack/register restore, "
+        "does not modify r0. indeg=1. "
+        "Params: r0=return_value (set by caller before bl, pass-through; this fn does not modify r0; "
+        "caller FUN_0809a1a4 passes r0=0x1). "
+        "Returns r0=pass-through value from caller. "
+        "Side effects: none (pure stack/register restore). "
+        "Constants: FRAME_SIZE=0x48."),
+
+    ("FUN_08047f50", "render_slot_card_sprite_from_descriptor",
+        "Drives full card sprite render pipeline via packed slot descriptor word (r1). "
+        "r0=slot_entry_ptr -> r6, r1=slot_descriptor (player_bit bit[9], type_field bits[13:10], player_id bit[12]). "
+        "Unpacks fields; validates r2 (flags) and type [0..4]; builds OAM attr word r4 (multi-field OR/AND mask ops); "
+        "enqueue_sprite_attr_record for main sprite; if equip card: scan_field_slots_for_equip_sprite; "
+        "check_card_field5_is_nonzero + scan_field_slots_for_attached_sprite_by_id; "
+        "dispatch_card_effect_sprite_render_by_card_id; submit_lp_bar_sprite_row_by_type(0x16/0x1b); "
+        "count_field_copies_of_card; dispatch_card_effect_zone_action_by_card_id. "
+        "Sibling of render_slot_card_sprite_and_effects (0x08048020): this accepts packed descriptor, "
+        "that one accepts player_id as separate param. "
+        "Params: r0=slot_entry ptr -> r6, "
+        "r1=slot_descriptor u32 (bit[9]=player_bit, bits[13:10]=type_field [0..4]) -> sp[0x0]. "
+        "r2 is NOT a param: entry 08047f6e 'lsrs r2,r0,#0x13' overwrites r2 before any branch; "
+        "caller 0x0809a932 does not set r2; r2 derived from [r6+0x0]. "
+        "Side effects: OAM attr buffer via enqueue_sprite_attr_record; "
+        "LP bar via submit_lp_bar_sprite_row_by_type (0x16 or 0x1b); "
+        "zone effects via dispatch_card_effect_zone_action_by_card_id. "
+        "Constants: TYPE_MAX=4, PLAYER_BIT_SHIFT=0x16, TYPE_FIELD_SHIFT=0x12/0x1c, "
+        "gDuelFieldSlots=0x0201bc54."),
 ]
 
 
