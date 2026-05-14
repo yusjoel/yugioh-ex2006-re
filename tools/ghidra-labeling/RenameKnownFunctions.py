@@ -11700,6 +11700,148 @@ RENAMES = [
         "Called twice by FUN_0809d374 with r3=1 and r3=2; results multiplied to test "
         "simultaneous presence of type1 and type2 nodes. "
         "Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa."),
+    # --- campaign-55 batch #55 (2026-05-15) ---
+    ("FUN_080431f4", "enqueue_sprite_attr_for_chain_node_check",
+        "由 scan_equip_zone_for_super_rejuvenation_activation (0x0809d374) 在确认装备激活通过后调用. "
+        "入口保存 r0=player_id->r4, r1=slot_idx->r5, r2=idx->r7, r3=type_flag->r6. "
+        "调用 check_node_in_slot_chain(r4, r5, r7, r6); 若链中存在节点: 根据 r4(player) 选择 OAM attr 高位 (0x37/0x8037), "
+        "将 r5/r6 的 bit 域打包进 r1/r2/r3, 调用 enqueue_sprite_attr_record 将精灵属性提交到 OAM 缓冲. "
+        "若不存在直接跳过. 副作用: OAM 精灵属性缓冲 (via enqueue_sprite_attr_record). "
+        "Constants: OAM_P0=0x37, OAM_P1=0x8037."),
+    ("FUN_0802fe98", "get_zone_node_entity_hword_by_card_and_type",
+        "由 scan_equip_zone_for_super_rejuvenation_activation (0x0809d374) 调用, "
+        "用于在给定玩家/槽类型/区域 ID/类型标志下查找链节点并返回其 entity hword. "
+        "入口: bit0 of r0 -> r4 (player), r1=slot_type, r2=zone_id, r3=type_flag. "
+        "计算 slot_struct_addr = DAT_0x0201c510 + slot_type*20*4 + player*0x868; "
+        "读取 [slot_struct+0xa] hword; 调用 find_node_by_value_and_zone_type(hword, zone_id, type_flag); "
+        "若命中返回 [node+4] hword; 未命中路径见 LAB_0802fec8. "
+        "Side effects: 无外部写入. Constants: chain_base=0x0201c510, player_stride=0x868, node_entity_offset=0x4."),
+    ("FUN_0809d374", "scan_equip_zone_for_super_rejuvenation_activation",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用, 在每帧扫描装备区域检查 Super Rejuvenation (card_id=0x14e2) 是否满足激活条件. "
+        "函数读取 [gP1LifePoints+0x1d24] 计数器, 若 > 1 则提前退出 (激活锁). "
+        "对两个玩家视角逐次检查: 调用 get_zone_node_entity_hword_by_card_and_type 查询链节点数 r6; 若 r6<=0 跳过. "
+        "再调用 count_available_effect_zones 确认效果区可用; "
+        "双次调用 count_slot_chain_nodes_by_card_id_and_type (type=1, type=2) 求乘积 r5, 均非零时触发 apply_equip_activation_with_id_lookup. "
+        "最后调用 enqueue_sprite_attr_for_chain_node_check 入队精灵. "
+        "命中路径递增 [gP1LifePoints+0x1d24] 计数器并返回 0. "
+        "Side effects: equip activation state; OAM sprite buffer; [gP1LifePoints+0x1d24] counter. "
+        "Constants: CARD_ID=0x14e2 (Super Rejuvenation), effect_zone_card_id=0x178b, counter_offset=0x1d24, OAM_ATTR=0x0a5014e2."),
+    ("FUN_0809cb78", "scan_monster_zone_for_equip_activation_spiritual_energy_settle_machine",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用, 扫描怪兽区以检查并激活 Spiritual Energy Settle Machine (card_id=0x150e). "
+        "先调用 count_field_copies_of_card(0x150e) 检查场上复制数; 若 > 0 直接跳至激活路径 (LAB_0809cc3c); "
+        "否则进入循环: 遍历两侧玩家的怪兽区槽, 对每个槽调用 check_card_stat_field8_is_7 判断资格, "
+        "建立 OAM attr (0xa2<<0x14 prefix), 从槽数据提取 face_down/orientation bits, 调用 apply_equip_activation_with_id_lookup. "
+        "命中返回 0, 未命中返回 1. Side effects: equip activation state via apply_equip_activation_with_id_lookup. "
+        "Constants: CARD_ID=0x150e (Spiritual Energy Settle Machine), OAM_PREFIX=0xa2<<0x14."),
+    ("FUN_0809c978", "scan_monster_zone_for_equip_activation_dd_scout_plane",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用, 遍历两侧玩家怪兽区槽以检查并激活 D.D. Scout Plane (card_id=0x16be) 的装备效果. "
+        "入口 r0=player_id 保存至 r10 (0x4682=mov r10,r0), r1 保存至 r9 (0x4681=mov r9,r1). "
+        "外层循环 r3=0..1: 从 0x0201c4fc+r3 读取槽数 r5, 内层循环对每个槽调用 get_zone_card_attribute_by_type(player, type=0xf, slot); "
+        "对 [slot+0] 数据 ands 0x00301fff 比较 0x16be; 匹配时建立 OAM attr (0x0a4f0000 prefix), 调用 apply_equip_activation_with_id_lookup. "
+        "命中返回 0, 全程未命中返回 1. Side effects: equip activation state. "
+        "Constants: CARD_ID=0x16be (D.D. Scout Plane), MASK=0x00301fff, OAM_PREFIX=0x0a4f0000, outer_base=0x0201c4fc."),
+    ("FUN_0809c77c", "scan_all_monster_zone_slots_for_equip_activation_dd_guide",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用. 4 条指令 thin wrapper: "
+        "固定 r1 = 0xce<<5 = 0x19c0 (D.D. Guide card_id), "
+        "tail-call scan_all_monster_zone_slots_for_equip_activation_by_card(r0=player_id, r1=0x19c0). "
+        "入口 r0 透传. Side effects: via scan_all_monster_zone_slots_for_equip_activation_by_card on hit. "
+        "Constants: CARD_ID=0x19c0 (D.D. Guide)."),
+    ("FUN_0809c55c", "scan_spell_trap_zone_for_equip_activation_by_player_and_card",
+        "被 3 个 thin-wrapper 调用 (0x0809d180/d198/d1ac), 每个传入 player-invert 后的 r0 及各自的 card_id r1. "
+        "入口 r0=player_id (保存至 r7), r1=card_id (保存至 r6). 读取 [gP1LifePoints+DAT_offset] 槽计数, 若 > 4 则退出. "
+        "外层循环 r5=count..0: 调用 test_slot_has_active_card(r7, [slot_base]+5, r6) 检查槽内是否有激活卡; "
+        "命中时建立 OAM attr (0xa2<<0x14 prefix), 提取 face_down/orientation bit, "
+        "从 gDuelFieldSlots+player*0x868+slot*size+0x30 读取槽 card_id, 调用 apply_equip_activation_with_id_lookup. "
+        "命中递增计数器, 返回 0; 全程未命中返回 1. "
+        "Side effects: equip activation state; [gP1LifePoints+slot_count_offset] counter. "
+        "Constants: OAM_PREFIX=0xa2<<0x14, slot_stride=5, player_stride=0x868."),
+    ("FUN_0809d180", "scan_spell_trap_zone_for_equip_activation_destiny_board",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用. 5 条指令 thin wrapper: "
+        "将入口 r0 (player_id) 移至 r1, 计算 r0=1-r1 (对手侧 player-invert), "
+        "加载 r1=DAT_0809d194=0x1468 (Destiny Board card_id), "
+        "tail-call scan_spell_trap_zone_for_equip_activation_by_player_and_card. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1468 (Destiny Board)."),
+    ("FUN_0802fed4", "get_zone_node_entity_hword_or_miss",
+        "由 scan_equip_zone_for_entity_sprite_and_activation (0x0809f538) 及 duel_field 函数 FUN_0809bfd4 调用, "
+        "用于在给定玩家/槽类型/区域 ID 下查找链节点并返回 entity hword, 未命中返回 -1. "
+        "入口: bit0 of r0 -> r3 (player), r1=slot_type, r2=zone_id. "
+        "计算 slot_struct_addr = 0x0201c510 + slot_type*20*4 + player*0x868; "
+        "读取 [struct+0xa] hword; 以 zone_entity_flag=-1 调用 find_node_by_value_zone_entity(hword, zone_id, -1); "
+        "命中返回 [node+4] hword, 未命中返回 r4=-1. "
+        "Side effects: 无外部写入. Constants: chain_base=0x0201c510, player_stride=0x868, miss_sentinel=-1."),
+    ("FUN_0809f538", "scan_equip_zone_for_entity_sprite_and_activation",
+        "被 5 个 card-specific thin-wrapper 调用 (Revival Jam/Vampire Lord/Sacred Phoenix of Nephthys 等), "
+        "作为装备区实体查找+精灵入队+激活的通用枢纽. 入口 r0=player_id (->r4), r1=card_id (->r6). "
+        "调用 get_zone_node_entity_hword_or_miss(r4, slot=0xb, r6) 查询链节点实体 r5; 若 r5 < 0 (未命中) 返回 1. "
+        "命中后: 调用 enqueue_sprite_attr_for_chain_node_match(r4, 0xb, r6, r5) 入队精灵; "
+        "构建 OAM attr (player bit | DAT_0x044e0000 | (r6 & 0xffff)<<0), 调用 apply_equip_activation_with_id_lookup; 返回 0. "
+        "Side effects: sprite attr buffer via enqueue_sprite_attr_for_chain_node_match; equip activation state. "
+        "Constants: ZONE=0xb, OAM_BASE=0x044e0000."),
+    ("FUN_0809f584", "scan_equip_zone_for_equip_activation_revival_jam",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x13c7 (Revival Jam card_id), "
+        "tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x13c7). "
+        "入口 r0 透传. Side effects: via callee on hit. Constants: CARD_ID=0x13c7 (Revival Jam)."),
+    ("FUN_0809ef88", "scan_trap_zone_for_equip_activation_mask_of_dispel",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x13f0 (Mask of Dispel card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x13f0). "
+        "与 0x0809ef98 (Mask of the Accursed) 及 0x0809efa8 (Nightmare Wheel) 构成同族 sibling 簇. "
+        "Side effects: via scan_trap_zone_for_equip_activation_by_card on hit. Constants: CARD_ID=0x13f0 (Mask of Dispel)."),
+    ("FUN_0809c78c", "scan_all_monster_zone_slots_for_equip_activation_mirage_knight",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0809c798=0x1643 (Mirage Knight card_id), "
+        "tail-call scan_all_monster_zone_slots_for_equip_activation_by_card(r0=player_id, r1=0x1643). "
+        "与 0x0809c77c (D.D. Guide) 及 0x0809c79c (Crush D. Gandra) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1643 (Mirage Knight)."),
+    ("FUN_0809f594", "scan_equip_zone_for_equip_activation_vampire_lord",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x1522 (Vampire Lord card_id), "
+        "tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x1522). "
+        "与 0x0809f584 (Revival Jam) 及 0x0809f5a4 (Sacred Phoenix) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1522 (Vampire Lord)."),
+    ("FUN_0809d198", "scan_spell_trap_zone_for_equip_activation_bottomless_shifting_sand",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用. 5 条指令 thin wrapper: "
+        "将入口 r0 (player_id) 移至 r1, 计算 r0=1-r1 (对手侧 player-invert), "
+        "构建 r1=0xaa<<5=0x1540 (Bottomless Shifting Sand card_id, imm-build), "
+        "tail-call scan_spell_trap_zone_for_equip_activation_by_player_and_card. "
+        "与 0x0809d180 (Destiny Board) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x1540 (Bottomless Shifting Sand), imm=0xaa<<5."),
+    ("FUN_0809ef98", "scan_trap_zone_for_equip_activation_mask_of_accursed",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x13f3 (Mask of the Accursed card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x13f3). "
+        "与 0x0809ef88 (Mask of Dispel) 及 0x0809efa8 (Nightmare Wheel) 构成同族 sibling 簇; "
+        "Mask of Dispel/Accursed 相邻 card_id (0x13f0/0x13f3). "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x13f3 (Mask of the Accursed)."),
+    ("FUN_0809c79c", "scan_all_monster_zone_slots_for_equip_activation_crush_d_gandra",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0809c7a8=0x17bc (Crush D. Gandra card_id), "
+        "tail-call scan_all_monster_zone_slots_for_equip_activation_by_card(r0=player_id, r1=0x17bc). "
+        "与 0x0809c77c (D.D. Guide) 及 0x0809c78c (Mirage Knight) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x17bc (Crush D. Gandra)."),
+    ("FUN_0809d79c", "scan_equip_chain_for_power_bond_sprite_and_lp_indicator",
+        "由 duel_field 主调度枢纽 FUN_0809d984 调用, 检查装备链中是否存在 Power Bond (card_id=0x18fe), "
+        "若存在则提交精灵入队和 LP 变化指示器. 入口 r0=player_id (->r5). 先加载 DAT_0809d7b4=0x18fe. "
+        "调用 check_value_in_slot_chain(r5, zone=0xb, 0x18fe); 若链中不含该卡返回 1. "
+        "命中后: 调用 get_node_entity_id_in_slot(r5, 0xb, 0x18fe) 取实体 r4; "
+        "调用 enqueue_equip_zone_sprite_by_side(r5, 0x18fe) 入队装备区精灵; "
+        "调用 submit_lp_change_indicator_with_chain_check(r5, r4, 0=delta_type, 0x18fe) 提交 LP 变化指示器; "
+        "调用 enqueue_equip_slot_sprite_attr(r5, 0xb, 0x18fe, 0). 返回 0. "
+        "Side effects: OAM sprite buffer; LP change indicator buffer. "
+        "Constants: CARD_ID=0x18fe (Power Bond), ZONE=0xb."),
+    ("FUN_0809f5a4", "scan_equip_zone_for_equip_activation_sacred_phoenix",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x185c (Sacred Phoenix of Nephthys card_id), "
+        "tail-call scan_equip_zone_for_entity_sprite_and_activation(r0=player_id, r1=0x185c). "
+        "与 0x0809f584 (Revival Jam) 及 0x0809f594 (Vampire Lord) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x185c (Sacred Phoenix of Nephthys)."),
+    ("FUN_0809efa8", "scan_trap_zone_for_equip_activation_nightmare_wheel",
+        "由 duel_field 主调度枢纽 FUN_0809d984 及 FUN_0809fb16 调用. 4 条指令 thin wrapper: "
+        "加载 r1=DAT_0x14b2 (Nightmare Wheel card_id), "
+        "tail-call scan_trap_zone_for_equip_activation_by_card(r0=player_id, r1=0x14b2). "
+        "与 0x0809ef88 (Mask of Dispel) 及 0x0809ef98 (Mask of the Accursed) 构成同族 sibling 簇. "
+        "Side effects: via callee on hit. Constants: CARD_ID=0x14b2 (Nightmare Wheel)."),
 ]
 
 
