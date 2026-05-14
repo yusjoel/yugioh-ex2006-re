@@ -124,6 +124,7 @@ model: sonnet
 10. **R1 双动词检查**: proposed_name 不得含 `_and_` / `_or_` / `_then_` 连接两个动词; `_and_return` / `_then_return_` 永远不合法 (return 是隐含语义); 函数做副作用后返回固定值时只命名副作用 (`write_X_then_return_Y` → `set_X`), 返回值写进参数签名返回行; dispatcher/epilogue/wrapper 统一用单覆盖动词 + `_by_mode`/`_by_state` qualifier (见 `feedback_r1_dual_verb_in_name.md`)
 11. **R8 med/low 升级路径**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`)
 12. **R4 返回行存在性硬扫**: Grep `返回:` 或 `- 返回` 在参数签名段 → 必须 ≥ 1 条; 完全缺失返回行与"仅写数值无语义"等同 → R4=0; 确认存在后再检查含义+路径说明是否符合 `feedback_r4_fixed_return_semantic.md`
+13. **scratchpad 净化硬扫**: 提交前对 proposal 全文 grep 以下关键词: `wait`, `actually`, `let me`, `After decode:`, `re-check`, `Note:` (非结构字段内的)。任何命中 → 该段落含探索性中间过程文字, 必须替换为干净结构化内容 (`rN: <type> <name> [range]`)。reasoning 过程留在草稿; proposal 只提交结论。见 `feedback_executor_scratchpad_in_proposal.md` (batch #50 两函数 R3=0)
 
 ### Phase 5: 完成报告
 
