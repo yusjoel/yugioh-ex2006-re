@@ -83,6 +83,8 @@ model: sonnet
 | R4 返回描述含"透传"而 epilogue 为 `pop {r0}; bx r0`（r0 = 恢复的 lr，非 callee 返回值），或 R4 有具体返回类型但函数的唯一出口是无条件 `b LAB_xxx`（函数体无独立 r0 写）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_exit_mechanism_voids_return.md` (R4=0; 两种出口模式均强制 void；"void 透传" 对 pop{r0};bx r0 是 self-contradiction) |
 | R3 参数数量 < prologue push 保存的 callee-save 寄存器数，且函数体含 `ldr rN,[sp,#M]` M >= push帧大小F | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_stack_arg_beyond_r3.md` (R3=0; 每个 M>=F 的 sp-relative ldr 均是调用方传入的栈参数，必须列入 R3；F=saved_regs*4) |
 | Constants 块含 [0x0001..0x1fff] 范围 hex 字面量（疑似 card_id）但无括号卡名，或卡名与 data.md 不符 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_card_id_cross_reference.md` (R6=0; 须查 doc/dev/data.md 核实后写 `CARD_ID=0xNNNN (Card Name)`) |
+| R3 中 r4/r5/r7 被列为标准 APCS 参数但函数无自己的 push prologue，且无对应函数体内部 ldr 加载这些寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_inline_exit_fragment_parent_frame_registers.md` (R3=0; parent-frame inherited registers 必须附 callsite asm 证据注明来源; 0x080a02a0+0x080a02e8) |
+| R4 描述为 switch dispatcher 函数返回值时含"各 case 决定"/"各 case 返回语义依各 case 代码"等泛化短语 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_switch_dispatcher_return_enumeration.md` (R4=0; 必须枚举 ≥2 具体出口 LAB_ 地址+值; 三次复现 batch #65) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
