@@ -131,27 +131,30 @@ driver 在以下情况调本 phase 而非 Phase 3:
 - proposal 含零容忍词且 P0 修复后仍触发 → reason = `UNNAMABLE`
 
 动作:
-1. 在 PROGRESS.md "失败追踪" 段追加: `0x<ADDR> | <YYYY-MM-DD> | <reason> | <一句 why>`
-2. 函数列表对应行 `分析后` 列填 `⚠ FAIL (<reason>)`, `rev` 填轮数, `eval` 填链接 (保留)
-3. 不参与本 batch 的 Phase 3 落地 (跳过该函数的 RenameKnownFunctions.py 条目)
-4. batch 中其他 PASSED/BLOCKED-named 函数照常落地
+1. 在 PROGRESS.md "失败追踪" 段追加一行: `0x<ADDR> | <YYYY-MM-DD> | <reason> | <一句 why>`
+   - 首次写入时若表格仍是 `| _(空)_ | — | — | — |`, 用 Edit 把这行替换成首条失败记录
+2. 不参与本 batch 的 Phase 3 落地 (跳过该函数的 RenameKnownFunctions.py 条目)
+3. batch 中其他 PASSED/BLOCKED-named 函数照常落地
 
 不停下询问。下次 pick_batch 自动 skip 该函数及其 callers。
 
 ### Phase 4: 更新 PROGRESS.md (仅 PASSED 模式且 Phase 3 byte-identical OK)
 
 ```bash
-# 读 doc/dev/eval/PROGRESS.md
-# 找到对应 # 行 (匹配 0x<ADDR>):
-#   - "分析后函数名" 列填新 name
-#   - "rev" 列填本函数完成命名所需的 reviewer 轮数 (期望 ≤ 3)
-#   - "eval" 列填 [eval](eval/<ADDR>.md)
+# 读 doc/dev/eval/PROGRESS.md (现在只有 ~3K tokens, 不再含函数表)
 # 顶部状态:
-#   - "进度" 已分析数 +1
-#   - "当前步骤" 更新为下一个 candidate 的描述
-#   - "下一步" 字段更新为下一个 candidate (从 closure_topo_order.csv 选最小 topo_idx 未分析)
+#   - "进度" 行: 已分析数 +N (N = 本 batch PASSED 数), 同步更新百分比 X.XX%
+#   - "当前步骤" 更新为下一 batch 的描述
+#   - "下一步" 字段更新为下一 batch 候选 (从 doc/dev/naming-proposals.csv + topo 推下一 topo_idx)
 #   - "上次更新" 时间
-# "历史里程碑" 段追加一行
+#
+# 高 rev 异常段 (transient inbox, 不是历史档案):
+#   - 仅本批某函数 rev >= 3 时追加: | 0x<ADDR> | <rev> | <name> | <一句反复扣分的原因> |
+#   - rev < 3 的函数静默 PASSED, 不入表
+#   - 首次写入时若表格仍是 `| _(空)_ | — | — | — |`, 用 Edit 把这行替换成首条记录
+#   - 用户审阅后会处理掉表中条目并删行, 你不负责清空; 只管追加
+#
+# 不再维护"函数列表"表格 (已删除)。每函数命名结果由 doc/dev/naming-proposals.csv + doc/dev/eval/<ADDR>.md 承载。
 ```
 
 用 `Edit` 工具改 PROGRESS.md (不要 Write 重写整个文件)。

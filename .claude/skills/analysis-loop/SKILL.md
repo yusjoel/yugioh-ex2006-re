@@ -87,12 +87,12 @@ byte-identical = 红线; 失败立即 abort 并提示用户回滚 .rep。
 
 ## PROGRESS.md 更新协议
 
-fixer Phase 4 用 Edit (不 Write) 修改:
-- 顶部"进度": 已分析数 +1 / 百分比
+PROGRESS.md 已瘦身为 ~3K tokens 的状态镜像 (不再含 1000+ 行函数表)。已命名清单由 `doc/dev/naming-proposals.csv` 承载, fixer Phase 4 用 Edit (不 Write) 修改:
+- 顶部"进度": 已分析数 +N (N = 本 batch PASSED 数) / 百分比
 - 顶部"当前步骤" / "下一步" / "上次更新"
-- 函数列表对应行: 分析后函数名 + rev + eval 链接
-- 历史里程碑追加 1 行
+- 高 rev 异常段 (transient inbox): 仅本批某函数 rev >= 3 时追加 `| 0x<ADDR> | <rev> | <name> | <反复扣分原因> |` (用户审阅后删行, fixer 只管追加)
 - BLOCKED 追踪 (如有): SB-<ADDR>-N
+- 失败追踪 (如有): `0x<ADDR> | <YYYY-MM-DD> | <reason> | <一句 why>`
 
 ## 关键路径 (一次性参考)
 
