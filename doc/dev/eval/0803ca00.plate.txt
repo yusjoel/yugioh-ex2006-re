@@ -1,0 +1,3 @@
+Called by FUN_0803be4c (card_data/demo/duel_field tagged dispatcher). Reads chain_active field at gP1LifePoints+0x10d0, clears bit0 (~0x1 AND; movs r2,#0x2; rsbs r2,r2,#0 -> r2=0xFFFFFFFE=~0x1), writes back. Then calls rebuild_equip_chain_refs (FUN_0802eeac) for full chain ref rebuild scan. Finally clears EWRAM 0x0201bcc0+0x80c (chain slot state field).
+
+Constants: gP1LifePoints=0x0201b290 (via PTR_gP1LifePoints_0803ca24), chain_flag_offset=0x10d0 (DAT_0803ca28=0x10d0), chain_state_base=0x0201bcc0 (DAT_0803ca2c), chain_state_offset=0x80c (DAT_0803ca30=0x80c).

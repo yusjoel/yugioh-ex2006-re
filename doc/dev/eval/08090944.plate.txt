@@ -1,0 +1,3 @@
+Conditional effect node action executor called by FUN_08084cec and FUN_080a08fc. Calls find_card_effect_node_entry(card_ptr) to look up associated effect node. If not found (r0=0) or found but [node+0x14]=0 (no callback), returns 1 (skip-success; movs r0,#1 @ 0x08090962). If found with callback, calls FUN_0810e5d0 (effect node action executor) with r0=card_ptr, r1=r1. Returns 0 on action failure, or FUN_0810e5d0 return value on execution.
+
+Constants: effect_node_callback_offset=0x14.

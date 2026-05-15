@@ -1,0 +1,3 @@
+Called by FUN_0803be4c (duel_field dispatcher). Reads EWRAM 0x0201bcc0 player_id (bit15 of [+0]) and related fields ([+2] r3, [+4] r2), plus state counter [+0x810] (r0). If counter=0: calls dispatch_card_display_op(0x3b, ...) to start display sequence, then increments counter. If counter!=0: calls play_ui_effect(0x3b); when returns 0 clears [+0x80c].
+
+Constants: card_display_state_base=0x0201bcc0 (DAT_08040a2c), counter_offset=0x810 (0x81*0x10), reset_offset=0x80c (DAT_08040a48=0x80c), op_code=0x3b.

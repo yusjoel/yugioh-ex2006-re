@@ -1,0 +1,3 @@
+Called by FUN_080a0a8c (equip slot flag router) in bit5 (0x20) check branch. Reads equip slot count from EWRAM 0x0201b870+0x310 (r2), computes last slot pointer (r5=count>0 ? base+count*0x18-0x18 : 0). Reads status byte at offset 0x30e, dispatches by value 0/1/2: 0 -> writes zero to two EWRAM fields and increments count; 1 -> invoke_effect_node_action_if_found; 2 -> submit_sprite_row_data. Returns 1 when current tick is complete.
+
+Constants: equip_slot_base=0x0201b870, slot_count_offset=0x310 (0xc4*4), slot_stride=0x18, status_byte_offset=0x30e (DAT_080a0944=0x30e).

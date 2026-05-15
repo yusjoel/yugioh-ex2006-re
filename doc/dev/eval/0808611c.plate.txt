@@ -1,0 +1,3 @@
+Called by FUN_080a0a8c (equip slot flag router) when bit4 check passes and bit2 sub-branch hits. Reads current equip slot index from gP1LifePoints+0x594, reads auxiliary data at 0x0201b290+slot*0x18+0xba*4. Dispatches to sub-state handler via jump table (PTR_PTR_08086170, 11 entries [0..0xa]) using slot index as key. Out-of-range index (>0xa) returns r0=1 (LAB_0808641a: movs r0,#0x1). Sub-function writes handled by jump table targets.
+
+Constants: gP1LifePoints=0x0201b290, slot_index_offset=0x594, aux_base_offset=0x58c, jump_table=0x08086174 (11 entries [0..0xa]).

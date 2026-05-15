@@ -1,0 +1,3 @@
+Called by FUN_0803be4c (main duel_field dispatcher). Reads current display sequence counter from EWRAM 0x0201bcc0+0x810 (r0), compares with limit at [0x0201bcc0+0x2] (r3): if below limit increments and writes back; if at or above limit clears 0x0201bcc0+0x80c (resets sequence). ~10 instructions; card display sequence state machine step function.
+
+Constants: card_display_state_base=0x0201bcc0 (DAT_0804062c), counter_offset=0x810 (0x81*0x10=0x810), limit_offset=0x2, reset_offset=0x80c (DAT_08040630=0x80c).

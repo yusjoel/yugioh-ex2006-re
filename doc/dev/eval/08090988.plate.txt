@@ -1,0 +1,3 @@
+Equip LP delta commit function called by FUN_0807ae84 and FUN_080a09c8. Accepts effect_node pointer (r0) and LP delta (r1). Checks bit5 (0x20) of [r0+4]: if 0 jumps to find_card_effect_node_entry path; if 1 checks bit2 (0x4): if 0 reads player bit from [r0+2], inverts (1-bit0), calls FUN_080a1bc0 (apply_lp_delta_if_slot_active) with r0=flipped_player, r1=1, r2=1. Both paths set bit3 (0x8) in [r0+4] to mark node as committed.
+
+Constants: bit5_mask=0x20 (active check), bit2_mask=0x4 (player flip select), commit_bit=0x8 (bit3).

@@ -1,0 +1,3 @@
+Equip slot tick router called by FUN_080a0b14 (direct child of tick_equip_activation_main_sequence). Reads flag byte at EWRAM 0x0201b870+0x301; dispatches to three sub-paths by bit: bit4 (0x10) set -> calls update_equip_sprite_state_by_slot_status; on success clears bit4 and writes back flag; bit5 (0x20) set -> calls dispatch_equip_effect_by_slot_state (FUN_080a08fc); bit6 (0x40, via LAB_080a0ab8 from bit5 branch) -> calls dispatch_equip_lp_delta_by_slot_status (FUN_080a09c8). Returns 1 (tick complete) or 0 (pending).
+
+Constants: equip_slot_base=0x0201b870, flag_byte_offset=0x301 (DAT_080a0ab4=0x301), bit4_mask=0x10, bit5_mask=0x20, bit6_mask=0x40, clear_bit4_mask=~0x11.

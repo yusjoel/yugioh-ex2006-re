@@ -1,0 +1,3 @@
+Called by FUN_0803be4c (duel_field dispatcher). Symmetric structure with FUN_08040a04. Reads EWRAM 0x0201bcc0 player_id and fields; three-way dispatch by counter state (0/1/>1): state=0 -> dispatch_card_display_op(0x15, player_id, r3=0), increments counter; state=1 -> play_ui_effect(0x15), if returns 0 clears [+0x80c]; state>1 -> exits immediately.
+
+Constants: card_display_state_base=0x0201bcc0 (DAT_08040228), counter_offset=0x810 (0x81*0x10), reset_offset=0x80c (DAT_08040254=0x80c), op_code=0x15.

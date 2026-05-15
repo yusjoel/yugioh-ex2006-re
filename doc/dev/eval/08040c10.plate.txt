@@ -1,0 +1,3 @@
+Minimal reset function called by FUN_0803be4c (duel_field dispatcher). Only 3 effective instructions: loads address of 0x0201bcc0+0x80c, writes 0 to clear that field. Force-reset entry point for card display sequence state machine, called at sequence end or interrupt. No parameters, no return value.
+
+Constants: card_display_state_base=0x0201bcc0 (DAT_08040c1c), reset_field_offset=0x80c (DAT_08040c20=0x80c).

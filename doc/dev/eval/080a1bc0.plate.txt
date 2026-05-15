@@ -1,0 +1,3 @@
+LP delta update function shared by 11 callers. Precondition: gP1LifePoints+0x1d88 (player active flag) nonzero AND gP1LifePoints+0x1d8c equals r0 (player_id). If conditions not met: fallback calls set_lp_display_row_fields(r0=player_id, r1=3, r2=r2_u16, r3=r3_u16). When conditions met: reads current LP halfword at gP1LifePoints+0x1d9a, adds r2 (delta), writes back.
+
+Constants: gP1LifePoints=0x0201b290 (via PTR_gP1LifePoints_080a1bf4), active_flag_offset=0x1d88, player_id_offset=0x1d8c, lp_halfword_offset=0x1d9a.

@@ -1,0 +1,3 @@
+Called by FUN_080a0a8c in equip slot bit6 (0x40) set branch. Reads equip slot count from EWRAM 0x0201b870+0x310 (offset 0xc4*4=0x310) (r1), computes r1*0x18 offset to last slot (r5=r1>0 ? base+r1*0x18-0x18 : 0). Reads status byte at EWRAM 0x0201b870+0x30f; dispatches by value 0/1/2: 0 -> writes 0x80 to display flag at [base+0x1a0], clears [+0x1a4] and [+0x1a8], increments count, enters 0x080a0a2c path; 1 -> submit_sprite_row_data; 2 -> alternate branch. Returns 1 (complete) or 0 (pending).
+
+Constants: equip_slot_base=0x0201b870, slot_count_offset=0x310 (0xc4*4=0x310), slot_stride=0x18, status_byte_offset=0x30f, EWRAM_flag_0x1a0=0x1a0 (0xd0*2), EWRAM_flag_0x1a4=0x1a4 (0xd2*2), EWRAM_flag_0x1a8=0x1a8.
