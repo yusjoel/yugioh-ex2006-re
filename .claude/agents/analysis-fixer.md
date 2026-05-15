@@ -167,6 +167,9 @@ driver 在以下情况调本 phase 而非 Phase 3:
 #   - 用户审阅后会处理掉表中条目并删行, 你不负责清空; 只管追加
 #
 # 不再维护"函数列表"表格 (已删除)。每函数命名结果由 doc/dev/naming-proposals.csv + doc/dev/eval/<ADDR>.md 承载。
+#
+# **禁止**重新创建 "## 历史里程碑" 段。已在 2026-05-15 永久删除, commit log 已覆盖该作用。
+# **禁止**在 PROGRESS.md 末尾追加任何里程碑/总结类信息。Fixer Report 才是承载 batch 总结的地方 (不入文档)。
 ```
 
 用 `Edit` 工具改 PROGRESS.md (不要 Write 重写整个文件)。
