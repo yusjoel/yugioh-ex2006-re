@@ -13107,6 +13107,250 @@ RENAMES = [
         "Side effects: none (pure stack/register restore). "
         "Constants: FRAME_SIZE=0x48."),
 
+    # --- campaign-62 batch #62 (2026-05-15) ---
+    ("FUN_0809a1a4", "eval_equip_slot_pair_eligibility",
+        "Evaluates dual-slot paired equip activation eligibility and advances counter. "
+        "Reads gDuelBattleState activation-slot ptrs (sp[0x24]/sp[0x2c]), extracts card_type and slot_idx. "
+        "Calls check_card_equip_eligibility_in_field for each slot; on card_id match 0x13a4/0x147a: "
+        "find_first_eligible_zone_slot_for_player / count_paired_slots_with_field5_default. "
+        "Writes slot flag to [+0x30] when eligible. "
+        "Reads gDuelBattleState[+0x1cfc] activation counter (0=pair eval; 1=direct pair; 2=extended). "
+        "Finally calls increment_counter_at_ptr([gP1LifePoints+0x1d2c]). "
+        "Params: r0=u32 player_side [0..1]. "
+        "Returns r0=u32 done (fixed 1). "
+        "Side effects: [gDuelBattleState+field.slot0+0x30]:=slot_idx (cond); "
+        "[gDuelBattleState+field.slot1+0x30]:=1 (cond); [gP1LifePoints+0x1d2c]:=[+0x1d2c]+1."),
+
+    ("FUN_0809e5e0", "scan_equip_zone_for_toon_card_activation",
+        "Scans player equip zone 5 slots [0..4] for card_id=0x1954 (Toon World variant) "
+        "with [slot+0x8]!=0 (linked target). Synthesizes OAM attr (bits[28:21]=slot_y, 0xc0<<15 shape, "
+        "player_side bit[31], card_id low 13 bits) and calls apply_equip_activation_via_packed_attr. "
+        "Returns 0 (found/activated), 1 (none found). "
+        "Called from dispatch_equip_activation_state_by_substate case_3 and case_2 paths (2 callsites). "
+        "Params: r0=u32 player_side [0..1] -> bit[31] in OAM attr. "
+        "Returns r0=u32 not_found (0=activated, 1=no match). "
+        "Side effects: via apply_equip_activation_via_packed_attr (cond)."),
+
+    ("FUN_0809e6a4", "find_equip_slot_idx_with_entity_id_zero",
+        "Scans player equip zone 5 slots [0..4] for first get_node_entity_id_in_slot(player,slot,0x151e)==0. "
+        "Symmetric sibling of find_equip_slot_idx_with_entity_id_one; only difference is cmp r0,#0 vs cmp r0,#1. "
+        "r0=player_side &1 * 0x868 gives player offset into gDuelFieldSlots. "
+        "Returns slot_idx [0..4] if found, -1 if not found. "
+        "Called from dispatch_equip_activation_state_by_substate case_1 path to locate first empty target slot. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, entity_type=0x151e, SLOT_MAX=4. "
+        "Params: r0=u32 player_side [0..1]. "
+        "Returns r0=s32 slot_idx ([0..4] found, -1 not found). "
+        "Side effects: none."),
+
+    ("FUN_0809e904", "check_activation_phase_counter_is_six",
+        "Reads gP1LifePoints+0x1d34 (equip activation phase counter). Returns 1 if==6, else 0. "
+        "No APCS params (entry movs r1,#0 overwrites r1; function does not read r0/r1/r2/r3 at entry). "
+        "Called from dispatch_equip_activation_state_by_substate case_1 (0x080978a8) to gate phase completion. "
+        "Constants: gP1LifePoints=0x0201c4e0, phase_counter_offset=0x1d34, PHASE_COMPLETE=6. "
+        "Params: none. "
+        "Returns r0=u32 is_six (1=counter==6, 0=otherwise). "
+        "Side effects: none (pure read/compare)."),
+
+    ("FUN_0809347c", "invoke_card_display_op_0x31_sub4",
+        "4-instruction thunk: calls dispatch_card_display_op with fixed op=0x31, sub=0x4, r2=0xe7, r3=r0_in. "
+        "op=0x31 = copy_game_text_to_card_name_vram cluster; sub=0x4 is variant 4. "
+        "r0 input (card value) forwarded as r3. "
+        "Called from dispatch_equip_activation_state_by_substate (switchD case_3, 0x08097b54) and "
+        "FUN_0809e3c8/0x0809e46e (3 callsites total) on equip zone state transition to update field display. "
+        "Same family as invoke_card_display_op_0x31_sub1/sub8. "
+        "Params: r0=u32 state_val -> forwarded as dispatch_card_display_op r3. "
+        "Returns r0=u32 pass-through from dispatch_card_display_op (1=done, 0=invalid). "
+        "Side effects: via dispatch_card_display_op(0x31, 0x4, 0xe7, state_val) writes VRAM card name buffer."),
+
+    ("FUN_0809e654", "find_equip_slot_idx_with_entity_id_one",
+        "Scans player equip zone 5 slots [0..4] for first get_node_entity_id_in_slot(player,slot,0x151e)==1. "
+        "r0=player_side &1 * 0x868 gives gDuelFieldSlots player offset. "
+        "Each iteration: lsls#0x13+cmp checks slot occupied (bit9 nonzero), then calls get_node_entity_id_in_slot. "
+        "Returns slot_idx [0..4] if found, rsbs -1 if not found. "
+        "Called from dispatch_equip_activation_state_by_substate case_1 to locate first activated target slot. "
+        "Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, entity_type=0x151e, SLOT_MAX=4. "
+        "Params: r0=u32 player_side [0..1]. "
+        "Returns r0=s32 slot_idx ([0..4] found, -1 not found). "
+        "Side effects: none."),
+
+    ("FUN_08097278", "check_equip_slot_activation_blocked_by_chain",
+        "Multi-layer chain block check for equip slot activation. Returns 1=blocked, 0=not blocked. "
+        "Check sequence: (1) gP1LifePoints+0x1cf4 state==3 -> skip to activation loop; "
+        "(2) check_equip_effect_zone_preconditions: fail->return 1; "
+        "(3) check_equip_zone_has_frozen_soul_or_great_long_nose: found->return 1; "
+        "(4) card_id=0x15ff (Parasite Paracide) zone=0xb check_value_in_slot_chain + eval_slot_activation_guard_full loop; "
+        "(5) card_id=0x1669/0x14a6 check_value_in_slot_chain + eval_slot_activation_guard_full loop; "
+        "(6) card_id=0x16bf (Archfiend) test_slot_has_active_card + eval_slot_activation_guard_full. "
+        "Called from dispatch_equip_activation_state_by_substate (switchD case_1) and FUN_08099314 (8 callsites). "
+        "Params: r0=u32 player_side [0..1] -> r5. "
+        "Returns r0=u32 blocked (1=blocked, 0=can proceed). "
+        "Side effects: none (pure read checks)."),
+
+    ("FUN_08097828", "dispatch_equip_activation_state_by_substate",
+        "Equip activation substate machine driver: reads gDuelBattleState[+0x1d2c] sub_state [0..4], "
+        "dispatches via 5-way jump table. Entry r0=player_side -> r5; writes gDuelBattleState[0]=player_side. "
+        "case_0: enqueue OAM sprite (attr=0x15/0x8015) then increment [+0x1d2c]; "
+        "case_1: check_activation_phase_counter_is_six + find_equip_slot_idx_with_entity_id_one + "
+        "find_equip_slot_idx_with_entity_id_zero + eval_slot_activation_eligibility_full; "
+        "case_2: check_equip_slot_activation_blocked_by_chain + eval_equip_monster_zone_score; "
+        "case_3: eval_slot_activation_guard_full / scan_equip_zone_for_toon_card_activation / "
+        "invoke_card_display_op_0x31_sub4 paths; "
+        "case_4: 4/5 value paths writing [+0x1d28/0x1d2c/0x1d30]. default: return 0. "
+        "Params: r0=u32 player_side [0..1]. "
+        "Returns r0=u32 advance_flag (1=processed a step, 0=no-op/done). "
+        "Side effects: [gDuelBattleState+0x0]:=player_side; [+0x1d2c]:=[+0x1d2c]+1 (case_0/1 fail); "
+        "[gDuelBattleState+0x1c/+0x10/+0xc]:=case_1 success fields; "
+        "[gP1LifePoints+0x1d28/0x1d2c/0x1d30]:=case_3/4 display state; OAM attr buffer (case_0)."),
+
+    ("FUN_080916c0", "invoke_build_equip_candidate_score_table",
+        "3-instruction thunk: calls build_equip_candidate_score_table with fixed r0=0, then pop {r0}; bx r0. "
+        "No APCS params (r0 overwritten to 0 at entry). "
+        "Wrapper for no-arg equip candidate score table build, called from tick_equip_zone_activation_display_state "
+        "and FUN_08099314 (case_0 path) and 5 other callsites (7 total) at equip activation init phase. "
+        "Params: none (r0 overwritten at entry). "
+        "Returns r0=u32 pass-through from build_equip_candidate_score_table (0=success). "
+        "Side effects: via build_equip_candidate_score_table writes gDuelBattleState score table fields."),
+
+    ("FUN_080992e2", "restore_high_regs_epilogue_equip_tick",
+        "Shared tail epilogue of tick_equip_zone_activation_display_state (FUN_08098a88): "
+        "releases 0xc-byte stack frame (add sp,#0xc), pops r3/r4/r5, "
+        "restores callee-save high regs r8/r9/r10 via .hword 0x4698/46a1/46aa "
+        "(mov r8,r3; mov r9,r4; mov r10,r5), pops r4/r5/r6/r7, pop {r1}; bx r1 returns. "
+        "Called from FUN_08098a88 via both bl (movs r0,#1 before) and b (r0=0 path) (2 callsites). "
+        "Params: r0=u32 return_value (set by caller before bl/b; this fn does not modify r0). "
+        "Returns r0=pass-through. "
+        "Side effects: none (pure stack/register restore). "
+        "Constants: FRAME_SIZE=0xc."),
+
+    ("FUN_08048704", "enqueue_sprite_attr_for_slot_indicator",
+        "Selects OAM attr based on player_side (r0): r0==0->0x002b, r0!=0->0x802b (player-2 extended). "
+        "Truncates r1 (slot/position) to 16 bits then calls enqueue_sprite_attr_record "
+        "with fixed r2=1, r3=0 to submit slot indicator sprite. "
+        "15 callers across duel_field / card_frame / LP bar subsystems. "
+        "OAM attr 0x2b/0x802b = slot occupied indicator tile. "
+        "Params: r0=u32 player_side [0..1] (0->attr 0x002b, 1->attr 0x802b); "
+        "r1=u32 slot_or_pos [0..0xffff] (high 16 bits truncated). "
+        "Returns void. "
+        "Side effects: OAM attr buffer via enqueue_sprite_attr_record(attr, slot_or_pos&0xffff, 1, 0)."),
+
+    ("FUN_080976c8", "check_equip_slot_card_type_matches_active_state",
+        "Checks active equip slot card_type matches expected type recorded in gDuelBattleState, "
+        "plus paired slot card_type consistency. "
+        "Reads gDuelBattleState[0] (player_side), [+0x1c] (slot_idx); "
+        "extracts card_type (bits[8:7] via lsrs#0x19 lsrs#5, +0x10e1 offset); "
+        "compares with gDuelBattleState[+0xec] expected type; if match: reads [+0xf0] paired slot; "
+        "compares paired card_type with [+0x108] expected; both match->return 0, any mismatch->return 1. "
+        "Called from tick_equip_zone_activation_display_state (case_2, 0x08098e24) and "
+        "FUN_08099314 (case_0/4/7) (4 callsites total). "
+        "Params: none (all input from gDuelBattleState; high reg mov at entry = callee-save). "
+        "Returns r0=u32 mismatch (1=mismatch, 0=match). "
+        "Side effects: none (pure read checks)."),
+
+    ("FUN_08043714", "enqueue_slot_sprite_attr_by_card_type_and_state",
+        "Generates and enqueues OAM sprite attr record for a field slot based on card type (field6) and state. "
+        "r0=player_side, r1=slot_idx, r2=slot_base_offset (sp[0x30]), r3=extra_flag, sp[0]=has_equip_head. "
+        "Reads slot card_id (lsls#0x13 low 13 bits); "
+        "field6=0x17 (field_spell): check_slot_fieldspell_eligible_by_side; "
+        "field6=0x16 (equip/trap): query_slot_effect_eligibility_nonzero. "
+        "Synthesizes OAM attr word (bit9=player_side, bits[13:10]=slot_idx, bit14=equip_head, "
+        "bit15=extra_flag); calls enqueue_sprite_attr_record. "
+        "If slot_idx<=4 and condition met: strh [slot+0x8]=1, apply_equip_activation_with_id_lookup, "
+        "submit_lp_bar_sprite_row_by_type. "
+        "Params: r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; "
+        "r2=u32 slot_base_offset [0..9] (sp[0x30]); r3=u32 extra_flag [0..1]; sp[0]=u32 has_equip_head [0..1]. "
+        "Returns void. "
+        "Side effects: [gP1LifePoints+player_bit*0x868+slot_offset+0x8]:=1 (cond); "
+        "OAM attr buffer; LP bar OAM via submit_lp_bar_sprite_row_by_type."),
+
+    ("FUN_0803259c", "check_slot_equip_eligible_by_type_and_id",
+        "Checks two preconditions for equip activation on a field slot (player_side + slot_idx): "
+        "(1) slot has card: ldrh [slot+0x8] != 0; "
+        "(2) field slot [+0x10] bits: bit1 == 0 (face-up, no chain restriction). "
+        "Called from tick_equip_zone_activation_display_state and eval_equip_slot_pair_eligibility. "
+        "No external write side effects; pure read. "
+        "Addressing: player_side &1 * 0x868 + slot_idx * 0x14. "
+        "Params: r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. "
+        "Returns r0=u32 eligible (0=not eligible, 1=eligible). "
+        "Side effects: none."),
+
+    ("FUN_08098a88", "tick_equip_zone_activation_display_state",
+        "Equip zone activation display state machine main tick driver. "
+        "Reads gDuelBattleState player_side, slot_idx, packed display fields. "
+        "Dispatches on [+0x1cfc] state [0..3+]. "
+        "case_0 (state==0): set_slot_occupy_bit_with_sprite_update(0,1) + "
+        "enqueue_sprite_attr_record(0x1b/0x801b) + write [+0x24]=0 + increment [+0x1cfc]; "
+        "case_1 (state==1): fill_slot_activation_state_array + check_equip_slot_card_type_matches_active_state "
+        "+ enqueue_sprite_attr_type11/enqueue_sprite_attr_with_mode paths; "
+        "case_2 (state==2): check_equip_slot_card_type_matches_active_state + cond enqueue; "
+        "case_3 (state==3): check_equip_slot_card_type_matches_active_state, match-> "
+        "write [+0x1cf8]=0xb + jump restore_high_regs_epilogue_equip_tick; "
+        "final paths: apply_equip_activation_with_id_lookup (multiple). "
+        "No APCS params (entry .hword 0x4680 = callee-save mov r8,r0; all input from gDuelBattleState). "
+        "Returns void (via restore_high_regs_epilogue_equip_tick shared epilogue). "
+        "Side effects: [gDuelBattleState+0x24]:=0; [+0x1cfc]:=[+0x1cfc]+1; [+0x1cf8]:=0xb (cond); "
+        "OAM attr buffer (enqueue_sprite_attr_record/type11/with_mode); "
+        "equip activation via apply_equip_activation_with_id_lookup."),
+
+    ("FUN_08096a08", "init_zone_activation_display_state_p1_entry",
+        "Initializes P1 zone activation display state field group: "
+        "writes gP1LifePoints+0x1d4c=9 (display_type=zone_activation), "
+        "[+0x1d7c]=r0_in (zone_idx/card_param), [+0x1d58]=0 (clear counter), "
+        "[+0x1d24]=0 (clear scan counter), [+0x1d64]=[0x0201e2a0+4] (copy activation phase timestamp). "
+        "Called from FUN_08086e90/FUN_08086fa6 (card display field spell activation path) "
+        "and FUN_08097bec-FUN_08098020 (equip state machine internal) (3 callsites). "
+        "P1-fixed variant of init_zone_activation_display_fields (0x080969c4) which also writes P2 side. "
+        "Params: r0=u32 zone_or_card_param -> written to gP1LifePoints+0x1d7c. "
+        "Returns void (bx lr). "
+        "Side effects: [gP1LifePoints+0x1d4c]:=9; [+0x1d7c]:=r0; [+0x1d58]:=0; [+0x1d24]:=0; "
+        "[+0x1d64]:=[0x0201e2a0+4]."),
+
+    ("FUN_080a1cb4", "set_lp_display_row_type9",
+        "LP display row type-9 wrapper: truncates r1/r2 to u16 (lsls#0x10; lsrs#0x10 each), "
+        "then calls set_lp_display_row_fields(r0, 9, r1&0xffff, r2&0xffff). "
+        "Ensures row_value/row_max fields are 16-bit width when updating LP bar row display. "
+        "Constants: ROW_TYPE=9 (fixed; movs r1,#0x9). "
+        "Params: r0=ptr lp_row_ptr (passed to set_lp_display_row_fields r0); "
+        "r1=u32 row_value_raw -> u16 row_value; r2=u32 row_max_raw -> u16 row_max. "
+        "Returns r0=void. "
+        "Side effects: via set_lp_display_row_fields writes LP display row type=9 fields (cond)."),
+
+    ("FUN_0803594c", "count_activatable_slots_for_player",
+        "Enumerates player slots [0..4] (5 slots), calling eval_slot_activation_eligibility_full "
+        "(player, slot_base+slot, 1, slot) for each; counts eligible slots. "
+        "r1 arrives via r8 callee-save (.hword 0x4688) as slot_base. "
+        "Result r7 = activatable slot count [0..5]. "
+        "Called from FUN_08097c2c (state machine case_1 path, 0x08097e68) to check if any equip target exists. "
+        "Params: r0=u32 player_side [0..1]; r1 (via r8 .hword 0x4688)=u32 slot_base [0..9]. "
+        "Returns r0=u32 activatable_slot_count [0..5]. "
+        "Side effects: none (read-only; all writes inside eval_slot_activation_eligibility_full)."),
+
+    ("FUN_08097458", "init_equip_display_state_with_sprite",
+        "Initializes equip display state fields and conditionally submits sprite. "
+        "Writes gP1LifePoints+0x1d28=1 (display_active), [+0x1d2c]=0 (clear sub_state). "
+        "If gDuelBattleState[+0x18]!=0 (battle state active): selects OAM attr 0x1b (P1) or 0x801b (P2) "
+        "based on r0 (player_side); calls enqueue_sprite_attr_record(attr, slot_idx&0xffff, 1, 1). "
+        "Called from FUN_08097c2c (switchD case_1, 0x08098080) and FUN_08099314 (case_1, 0x08098174) (2 callsites). "
+        "Params: r0=u32 player_side [0..1] -> OAM attr select; r1=u32 slot_idx [0..9] -> sprite position. "
+        "Returns void. "
+        "Side effects: [gP1LifePoints+0x1d28]:=1; [+0x1d2c]:=0; "
+        "OAM attr buffer via enqueue_sprite_attr_record(0x1b or 0x801b, slot_idx&0xffff, 1, 1) (cond)."),
+
+    ("FUN_080b1078", "eval_fieldspell_placement_with_zone_scores",
+        "Scores all player x equip zone slots then evaluates field spell placement. "
+        "r0=player_side, r1=node_list_ptr, r2=mode_flag. "
+        "Writes player_side to 0x0201afe0 (global player select). "
+        "Outer loop r7=[0..1] players, inner loop r4=[0..4] equip slots: "
+        "indexes 0x0201aff8 score table (stride=0xb4/player, 0x24/slot); "
+        "checks gDuelFieldSlots[player*0x868+slot*0x14] bit9 (slot occupied); "
+        "if occupied: dispatch_zone_slot_score_by_player_flag(player, slot, score_node). "
+        "After loops: calls eval_fieldspell_equip_placement_full "
+        "(player_side, node_list_ptr, 1, mode_flag, score_buf=0x0201b18c). "
+        "Constants: player_select_global=0x0201afe0, zone_score_table=0x0201aff8 (stride=0xb4/player, 0x24/slot), "
+        "fieldspell_score_buf=0x0201b18c, gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4. "
+        "Params: r0=u32 player_side [0..1]; r1=ptr node_list_ptr; r2=u32 mode_flag [0..1] (bit0 extracted). "
+        "Returns r0=u32 score from eval_fieldspell_equip_placement_full. "
+        "Side effects: [0x0201afe0]:=player_side; zone score table via dispatch_zone_slot_score_by_player_flag."),
+
     ("FUN_08047f50", "render_slot_card_sprite_from_descriptor",
         "Drives full card sprite render pipeline via packed slot descriptor word (r1). "
         "r0=slot_entry_ptr -> r6, r1=slot_descriptor (player_bit bit[9], type_field bits[13:10], player_id bit[12]). "
