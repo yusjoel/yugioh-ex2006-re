@@ -69,13 +69,23 @@ TS=$(date +%Y%m%d-%H%M%S)
 cp -r "ghidra/Yu-Gi-Oh WCT 2006.rep" "ghidra/Yu-Gi-Oh WCT 2006.rep.bak-${TS}-pre-fix-<ADDR>"
 ```
 
-#### 3b. Ghidra rename + plate comment
+#### 3b. Ghidra rename + plate comment (CSV-driven, 2026-05-16 起)
 
-调用现有 Ghidra 脚本流水线:
-- 把命名条目追加到 `tools/ghidra-labeling/RenameKnownFunctions.py` 的 `(orig, new, plate)` 列表
-- `tools/asm-regen/ghidra-run-script.bat RenameKnownFunctions.py`
+新协议: 不再向 RenameKnownFunctions.py / RenameBatch<N>.py 追加 Python tuple. 数据走文件:
 
-> **Jython 2.7 plate 文本 ASCII-only**: plate 文本中禁用弯引号、全角括号、中文顿号等一切非 ASCII 排版字符，否则 Jython 脚本抛出解析异常 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`
+每个函数三步:
+1. **写 plate 文件**: `doc/dev/eval/<addr_8hex>.plate.txt` (纯 ASCII 英文 plate, 与 Ghidra 写入完全一致; addr_8hex = 不带 0x 的 8 位 hex, 全小写)
+2. **更新 CSV name 列**: `doc/dev/naming-proposals.csv` 第 2 列 `name` 改为 proposed_name (第 3 列 proposed_name 是历史 stub, 不动)
+3. **跑统一脚本** (本 batch 一次): `tools/asm-regen/ghidra-run-script.bat RenameFromCSV.py`
+
+RenameFromCSV.py 行为:
+- 读 CSV `name` 列 + 该 addr 对应 `plate.txt` 文件
+- 对每个 (addr, name): 若 .rep 现名 ≠ name → rename + 写 plate (要求 plate.txt 存在, 否则 [fail])
+- 若 .rep 现名 == name → skip (幂等, 历史 1642 函数 dry-run 测试通过)
+
+> **Jython 2.7 plate 文本 ASCII-only**: plate 文件中禁用弯引号、全角括号、中文顿号等一切非 ASCII 排版字符 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_jython_unicode_plate_comment.md`. plate.txt 写入前 grep `[^\x00-\x7f]` 自检.
+
+> **历史脚本** `RenameKnownFunctions.py` (1515 条) 和 `RenameBatch63.py` (21 条) 保留为 disaster recovery 一次性脚本, 不再追加.
 
 > **R3 栈参数漏填**: 若 reviewer 以"missing stack arg at [sp,#M]"扣 R3，须计算 push 帧大小 F=saved_regs*4，将所有 M>=F 的 ldr [sp,#M] 追踪唯一 caller 并补入参数行 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_stack_arg_beyond_r3.md`
 
@@ -99,7 +109,7 @@ sha1sum roms/2343.gba output/2343.gba
 两行 sha1 必须一致。**不一致 → 自动回滚 + 标失败 + 继续下一 batch (不停下询问)**:
 
 1. 恢复 Ghidra .rep 从本 batch 开始前的备份 (`Yu-Gi-Oh WCT 2006.rep.bak-<TS>-pre-batch*`)
-2. `git checkout -- asm/all.s tools/ghidra-labeling/RenameKnownFunctions.py doc/dev/naming-proposals.csv` 恢复仓库文件
+2. `git checkout -- asm/all.s doc/dev/naming-proposals.csv` + `rm doc/dev/eval/<addr>.plate.txt` (per addr) 恢复仓库文件
 3. 在 `doc/dev/eval/PROGRESS.md` "失败追踪" 段为 batch 中**所有** N 个函数追加行: `0x<ADDR> | <YYYY-MM-DD> | BUILD_FAIL | byte-identical 不一致, 整 batch 回滚`
 4. 函数列表对应 N 行 `分析后` 列填 `⚠ FAIL (BUILD_FAIL)`, eval 列填 `[eval](<ADDR>.md)` (proposal/eval 文件保留供 lesson-keeper 抽教训)
 5. 不增进度 (本 batch 0 PASSED)
@@ -115,6 +125,8 @@ python tools/ad-hoc/sync_ghidra_names_to_proposals.py
 ```
 
 确认 `doc/dev/naming-proposals.csv` 中该 addr 的 `name` 列已更新为新名 (不再是 FUN_)。
+
+注: 新协议 (3b) 已经在 rename 前把 CSV name 列写好, sync 步骤变成验证操作 (而非补写). 若 sync 报 diff 说明 RenameFromCSV.py 行为偏移, 应停下排查.
 
 #### 3f. (可选) ExportComments
 
