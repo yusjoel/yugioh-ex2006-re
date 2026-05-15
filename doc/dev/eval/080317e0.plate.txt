@@ -1,0 +1,2 @@
+Searches the hand array (gP1LP+0x260, count at gP1LP+0x10) for the element matching r9(=r1=slot_ptr), removes it by left-shifting subsequent elements, and decrements the count. r0=player_id [0..1], r1=slot_ptr (r9). Forward-scans from r8=0 to count-1, calling check_deref_words_equal each iteration; on match shifts elements left and updates count. Callers: FUN_08032194 (duel_field) and FUN_08040194 when a hand card leaves the field.
+Constants: hand_array_base=gP1LP+0x260, hand_count_offset=gP1LP+0x10, player_stride=0x868.

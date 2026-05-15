@@ -1,0 +1,2 @@
+Appends a card slot reference to the end of the player's equip array. r0=player_id [0..1], r1=slot_ptr (pointer to the source card slot). Reads count from [gP1LP+0x18+player*0x868], uses count*4 as offset to call write_word_from_deref_src writing slot_ptr into [gP1LP+0x3a0+player*0x868+count*4], then increments count. Callers: FUN_08032280 case 0xc (zone_type=equip direct insert) and FUN_08037630 (zone_type=0xb after equip type confirmation).
+Constants: equip_array_base=gP1LP+0x3a0 (0xe8<<2), equip_count_offset=0x18, player_stride=0x868.

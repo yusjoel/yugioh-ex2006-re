@@ -1,0 +1,1 @@
+Leaf utility, 3 instructions: reads one word from *r1 and writes it to *r0. Callers (FUN_08030be4, FUN_08030cc0, FUN_08031578, FUN_08031630, and 28 others, indeg=32) all call this when initializing field slots to copy a card pointer from the source slot into the destination slot's head word. Side effect: [r0] := [r1] (single word write).

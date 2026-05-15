@@ -1,0 +1,1 @@
+Leaf utility. Dereferences r0 and r1 each to get one word, compares them: returns 1 if equal, 0 otherwise. Callers (FUN_08036de8, FUN_0803720c, FUN_080317e0, FUN_08031978, FUN_080376a0, 6 total) use this in pointer-search-and-delete slot scan loops, comparing a target card pointer r1 against each array element [r0] in turn.

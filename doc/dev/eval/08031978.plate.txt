@@ -1,0 +1,2 @@
+Searches equip array B (gP1LP+0x3a0, count at gP1LP+0x18) for the element matching r9(=r1=slot_ptr), removes it by left-shifting subsequent elements, and decrements the count. r0=player_id [0..1], r1=slot_ptr (r9, confirmed by 0x4689=mov r9,r1 at entry). Fully symmetric with erase_slot_from_hand_array_by_ptr; differs only in array offset (0x3a0 vs 0x260) and count offset (0x18 vs 0x10). Caller FUN_08032194 (duel_field) invokes this when an equip card leaves the field.
+Constants: equip_array_B_base=gP1LP+0x3a0, equip_B_count_offset=0x18, player_stride=0x868.

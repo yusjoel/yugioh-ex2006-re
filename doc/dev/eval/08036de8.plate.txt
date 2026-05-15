@@ -1,0 +1,2 @@
+Searches equip array A (gP1LP+0x418, count at gP1LP+0x14) for the element matching r1(card_ptr), then calls remove_equip_slot_by_index_from_array_a to delete it; returns 1 on success, 0 if not found. r0=player_id [0..1], r1=card_ptr (r7). Backward scan from count-1 to 0, calling check_deref_words_equal each step. Caller FUN_08032194 (duel_field) invokes this to clean up equip array A when a card leaves the field.
+Constants: equip_array_A_base=gP1LP+0x418 (0x83<<3=0x418), equip_A_count_offset=0x14, player_stride=0x868.

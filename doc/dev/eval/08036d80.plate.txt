@@ -1,0 +1,2 @@
+Removes one element by index from equip array A (base gP1LP+0x418, count at gP1LP+0x14) and left-shifts subsequent elements. r0=player_id [0..1], r1=slot_idx [0..count-1]. If slot_idx>=count returns 0; otherwise: decrements count; if slot_idx<new_count shifts elements [idx+1..new_count] left via write_word_from_deref_src loop; returns 1. Caller FUN_08036de8 calls this after finding the matching slot_ptr.
+Constants: equip_array_A_base=gP1LP+0x418 (0x83<<3=0x418), equip_A_count_offset=0x14, player_stride=0x868.
