@@ -1,0 +1,10 @@
+LP counter sprite enqueue function, high-frequency utility (indeg=42), called by
+equip/duel_field display functions. r0 = player_side [0..1] (extracted by caller
+via lsrs bit31 or ldrb+lsls/lsrs #0x1f before bl).
+Reads gP1LifePoints (0x0201c4e0) + 0x1CE0 (= 0xe7*32) LP counter state dword.
+Selects OAM attr0 by player_side: player=0 -> 0x53 (Y=83, normal square 8x8),
+player=1 -> 0x8053 (Y=83, OBJ_DISABLE bit15 set). Passes low 16 bits as attr1,
+high 16 bits as attr2, calls enqueue_sprite_attr_record(attr0, attr1, attr2, 0).
+Exit via pop {r0}; bx r0 (void, r0 carries no return value).
+Constants: gP1LifePoints=0x0201c4e0, lp_counter_slot_offset=0x1CE0 (=0xe7<<5),
+OAM_P1=0x53 (Y=0x53, normal), OAM_P2=0x8053 (Y=0x53, OBJ disable).

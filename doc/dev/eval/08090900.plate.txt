@@ -1,0 +1,9 @@
+Card effect node handler invoker, called by update_equip_sprite_state_by_slot_status
+(0x080a0840) when sprite_buf status == 1 (indeg=1). r0 = card_id (from r4),
+r1 = slot_index (from r5). Calls find_card_effect_node_entry(r0, r1) to locate
+the effect node entry: if return is 0 (not found) -> b LAB_0809091e (movs r0,#1;
+return 1). If found, checks [node+0x10] (handler function pointer): if NULL ->
+return 1. If non-NULL -> bl FUN_0810e5d0(card_id, slot_index) (invoke effect
+node handler), return value passed via LAB_08090920.
+Role: "find effect node and call its handler, return 1 if no node".
+Constants: node_handler_offset=0x10.

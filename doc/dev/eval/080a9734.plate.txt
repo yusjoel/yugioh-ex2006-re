@@ -1,0 +1,12 @@
+Equip sub-entry control struct (0x0201e4d0) phase dispatcher, direct sub-dispatcher
+of dispatch_equip_entry_slot_by_mode (0x080ab200), called from a conditional branch
+(indeg=1). Extracts combined_index = (byte[0x14] & 1) << 7 | byte[0x13] >> 1 from
+struct, range [0..9]; out of range -> bl exit_equip_phase_oob_epilogue_wide (return 1).
+Uses combined_index*4 to index 10-entry jump table (DWORD_080a976c = 0x080a9770,
+11 entries including overflow; entries 4-8 point to same sub-function 0x080a9ba4).
+.hword 0x4647=bx r8 writes jump table entry to pc for indirect jump. Symmetric
+with dispatch_equip_entry_state_by_phase_index (0x080aa120), same range [0..9]
+but different table content, handling different sub-entry phase sets.
+Constants: STRUCT_BASE=0x0201e4d0, byte_a=0x13, byte_b=0x14,
+combined_index_range=[0..9], switch_table=0x080a9770,
+out_of_range_exit=exit_equip_phase_oob_epilogue_wide.

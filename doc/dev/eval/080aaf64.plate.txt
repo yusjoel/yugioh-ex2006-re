@@ -1,0 +1,11 @@
+Equip sub-entry control struct (0x0201e4d0) phase dispatcher, called by
+dispatch_equip_entry_slot_by_mode (0x080ab200) in a conditional branch (indeg=1).
+Extracts combined_index = (byte[0x14] & 1) << 7 | byte[0x13] >> 1 from struct.
+If combined_index > 7: b LAB_080ab1ac (jumps to LAB_080ab1ac which calls
+dispatch_equip_entry_slot_phase_c forming a fallthrough chain). Otherwise uses
+combined_index*4 to index 8-entry jump table (DWORD_080aaf8c = 0x080aaf90).
+Range [0..7], 2 fewer cases than dispatch_equip_entry_slot_phase_b/_c; high cases
+(>=4) target 0x080ab1a4. Symmetric with dispatch_equip_entry_slot_phase_b family.
+Constants: STRUCT_BASE=0x0201e4d0, byte_a=0x13, byte_b=0x14,
+combined_index_range=[0..7], switch_table=0x080aaf90,
+out_of_range_label=LAB_080ab1ac.

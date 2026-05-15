@@ -1,0 +1,16 @@
+Equip sub-entry main controller dispatcher, called by
+tick_equip_activation_main_sequence (0x08094cd4) (indeg=1). Reads struct
+0x0201e4d0 byte[0x12] bit flags and executes decision chain:
+(1) bit0=0: check bit4; if bit4=0 -> bl reset_equip_entry_phase_to_zero (return 0);
+    check bit5; if bit5=1 and additional condition met -> b LAB_080aba42.
+(2) bit0=1: bl dispatch_equip_phase_by_card_id_range (equip phase hub); if return 0
+    -> b LAB_080ab270.
+(3) LAB_080ab284: read struct[0x12] bits[11:9] (3-bit mode value [0..4]);
+    dispatch to four sub-dispatchers:
+    mode=1 -> bl dispatch_equip_entry_slot_phase_b (0x080a9734);
+    mode=2 -> bl dispatch_equip_entry_state_by_phase_index (0x080aa120);
+    mode=3 -> bl dispatch_equip_entry_slot_phase_c (0x080aa77c);
+    mode=4 -> bl dispatch_equip_entry_slot_phase_d (0x080aaf64).
+(4) LAB_080ab270: movs r0,#1; bl exit_equip_subentry_epilogue (fixed return 1).
+Constants: STRUCT_BASE=0x0201e4d0, flag_byte=0x12, mode_field=bits[11:9] of [0x12],
+mode_range=[1..4].

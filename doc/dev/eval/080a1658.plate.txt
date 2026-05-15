@@ -1,0 +1,8 @@
+Equip target slot state checker, called by tick_equip_activation_main_sequence
+(0x08094cd4) after play_equip_ui_effect_3_with_state_gate returns 0 (indeg=1).
+Reads gP1LifePoints+0x1d88 slot state dword: if 0, movs r0,#0; b LAB_080a1944
+(return 0 = slot empty/not ready). If nonzero, reads gP1LifePoints+extra_offset
+(DWORD_080a16a0 = 0x1d84) additional status, compares against 0x0201e2a0+4 player
+flag for equip ownership check; ultimately returns 0 (invalid) or 1 (valid).
+Constants: gP1LifePoints=0x0201c4e0, target_slot_offset=0x1d88,
+extra_offset=0x1d84 (adjacent field in equip struct), player_table=0x0201e2a0.

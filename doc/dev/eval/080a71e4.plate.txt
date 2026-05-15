@@ -1,0 +1,10 @@
+Equip phase tick function, called by dispatch_equip_phase_by_card_id_range
+(0x080a8c30) when specific card_id range hits LAB_080a8f36 (indeg=1). Reads
+struct 0x0201e4d0 byte[0x13] and byte[0x14], extracts combined_index =
+(byte[0x14] & 1) << 7 | byte[0x13] >> 1. If combined_index > 6: b LAB_080a763e
+(out of range). Otherwise uses combined_index*4 to index jump table
+(DWORD_080a7214) dispatching 7 case blocks. Frame: DWORD_080a720c = 0xfffffe00
+(-512 bytes, dynamic frame extension via add sp,r4).
+Symmetric with tick_equip_phase_by_lp_index_range_b/c, switch range [0..6].
+Constants: STRUCT_BASE=0x0201e4d0, byte_a=0x13, byte_b=0x14,
+combined_index_range=[0..6], frame_size=0xfffffe00 (-512 dynamic frame).

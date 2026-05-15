@@ -1,0 +1,9 @@
+Equip phase tick function, called by dispatch_equip_phase_by_card_id_range
+(0x080a8c30) via LAB_080a8f30 path (indeg=1). Reads struct 0x0201e4d0 byte[0x13]
+and byte[0x14], extracts combined_index = (byte[0x14] & 1) << 7 | byte[0x13] >> 1.
+Dispatches: combined_index == 0: LAB_080a6eb2; == 1: LAB_080a6f58;
+== 2: LAB_080a6fce; == 3: LAB_080a6ff0; > 3: LAB_080a7056 (out of range).
+Frame: DWORD_080a6e9c = 0xFFFFFE00 (-512 bytes), expanded via add sp,r4.
+Symmetric with tick_equip_phase_by_lp_index_range_a/c, switch range [0..3].
+Constants: STRUCT_BASE=0x0201e4d0, frame_delta=0xFFFFFE00 (-512 bytes),
+switch_range=[0..3].

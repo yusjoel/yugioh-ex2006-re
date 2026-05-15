@@ -1,0 +1,10 @@
+Equip activation UI effect trigger and state checker, called by
+tick_equip_activation_main_sequence (0x08094cd4) after play_card_ok_ui_effect
+returns 0 (indeg=1). Calls play_ui_effect with fixed arg 0x3 (UI sound ID=3).
+If play_ui_effect returns 0 (effect not playing or finished): jump LAB_080951dc
+for additional state check (reads gP1LifePoints+0x1d4c dword != 0, then reads
+gP1LifePoints+0x1d50 for further check; ultimately returns 0 or 1).
+If play_ui_effect returns nonzero (effect playing): movs r0,#1; b LAB_08095218
+(return 1 = waiting, this frame complete).
+Constants: gP1LifePoints=0x0201c4e0, ui_effect_id=3 (equip confirm sound),
+lp_status_offset_a=0x1d4c (equip slot status dword), lp_status_offset_b=0x1d50.

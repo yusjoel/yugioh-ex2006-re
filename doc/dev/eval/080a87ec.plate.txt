@@ -1,0 +1,10 @@
+Equip phase tick function for normal-summon-type cards, called by
+dispatch_equip_phase_by_card_id_range (0x080a8c30) at LAB_080a8f92 after
+check_card_id_is_normal_summon_type returns 1 (indeg=1). Reads struct
+(DWORD_080a8818 = 0x0201e4d0) byte[0x13] and byte[0x14], extracts combined_index
+= (byte[0x14] & 1) << 7 | byte[0x13] >> 1. Dispatches: == 0: LAB_080a881c;
+== 1: LAB_080a891c; > 1: LAB_080a89e2 (default). Frame: sub sp,#0x100 (256-byte
+large frame). High registers saved via .hword 0x4657/464e/4645.
+Switch range smaller [0..1] vs family, trigger condition limited to normal-summon
+type cards (guard from check_card_id_is_normal_summon_type).
+Constants: STRUCT_BASE=0x0201e4d0, frame_size=0x100, switch_range=[0..1].

@@ -1,0 +1,11 @@
+Equip sprite slot status updater, called by FUN_080a0a8c (equip sprite sequence
+controller) when DAT_080a0ab0 (0x0201b870) + 0x301 corresponding bit (bit27) is 1
+(indeg=1). Reads sprite_buf status byte from 0x0201b870 + 0x30d, routes by value:
+0 -> clear two sprite_buf slots (offsets 0x1ac/0x1b4), increment status counter;
+1 -> main path (read DAT_080a08d4+DAT_080a08d8 offset to store card_id, call
+     invoke_card_effect_node_handler(card_id, slot));
+2 -> second branch (LAB_080a08e4).
+Side effects include writing sprite_buf fields and updating counters.
+Constants: sprite_buf_base=0x0201b870, slot_idx_base=0xc4,
+sprite_buf_offset=0x0201b590, status_byte_offset=0x30d,
+card_id_store_base=0x0201b290, counter_offset=0x484.

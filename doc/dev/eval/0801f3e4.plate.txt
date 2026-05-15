@@ -1,0 +1,5 @@
+Minimal leaf stub, function body is two instructions: movs r0,#1; bx lr.
+Called by tick_equip_activation_main_sequence (0x08094cd4) unconditionally
+when [0x0201e2a0+8] == 3, reporting "done" signal (r0=1 = nonzero = complete this
+frame). Paired with FUN_0801f3dc (bx lr only, r0=0) as fixed-return-value stub family.
+No external side effects.

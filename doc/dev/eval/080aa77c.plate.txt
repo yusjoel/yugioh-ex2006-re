@@ -1,0 +1,11 @@
+Equip sub-entry control struct (0x0201e4d0, DWORD_080aa7ac) phase dispatcher,
+called by dispatch_equip_entry_slot_phase_d (0x080aaf64) and
+dispatch_equip_entry_slot_by_mode (0x080ab200) (indeg=2). Extracts combined_index
+= (byte[0x14] & 1) << 7 | byte[0x13] >> 1 from struct. If combined_index > 9:
+bl exit_equip_phase_oob_epilogue (0x080aaf54, return 1). Otherwise uses
+combined_index*4 to index jump table (DWORD_080aa7b0 = 0x080aa7b4) via
+.hword 0x4687=bx r0 (rd=7=pc, rm=r0) indirect jump. Symmetric with
+dispatch_equip_entry_slot_phase_b, frame size 0x8 vs 0x3c, r10 not restored.
+Constants: STRUCT_BASE=0x0201e4d0, byte_a=0x13, byte_b=0x14,
+combined_index_range=[0..9], switch_table=0x080aa7b4,
+out_of_range_exit=exit_equip_phase_oob_epilogue.

@@ -1,0 +1,8 @@
+Equip confirm sub-step dispatcher, called by tick_equip_confirm_slot_by_step
+(0x08095348) after confirm slot is valid (indeg=1). Reads gP1LifePoints+0x1d5c
+step value (dword), subtracts 1, compares with 9 (bls): if step-1 <= 9, uses
+(step-1)*4 to index 10-entry jump table (PTR_PTR_08095248) via .hword 0x4687=bx r0
+indirect jump; if step-1 > 9, LAB_08095334 clears gP1LifePoints+0x1d54 and
+returns void. 10 case blocks located in ROM_INCBIN region at 0x95274.
+Constants: gP1LifePoints=0x0201c4e0, step_offset=0x1d5c, clear_offset=0x1d54,
+step_range=[1..10], switch_table=0x0809524c.

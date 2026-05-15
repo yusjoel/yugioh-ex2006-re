@@ -1,0 +1,9 @@
+Shared out-of-range exit stub, called by dispatch_equip_entry_slot_phase_b
+(0x080a9734) when combined_index > 9 (bl exit_equip_phase_oob_epilogue_wide).
+Body: movs r0,#1; add sp,#0x3c; pop {r3,r4,r5}; .hword 0x4698=mov r8,r3;
+.hword 0x46a1=mov r9,r1; .hword 0x46aa=mov r10,r2; pop {r4,r5,r6,r7};
+pop {r1}; bx r1. Returns fixed 1 and restores callee-save high registers
+(r8/r9/r10) of dispatch_equip_entry_slot_phase_b. Frame size 0x3c matches
+dispatch_equip_entry_slot_phase_b sub sp,#0x3c. Symmetric with
+exit_equip_phase_oob_epilogue (0x080aaf54) but larger frame and restores
+additional r10.

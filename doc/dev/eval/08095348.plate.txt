@@ -1,0 +1,8 @@
+Equip confirm slot checker and sub-step dispatcher, called by
+tick_equip_activation_main_sequence (0x08094cd4) after dispatch_equip_entry_slot_by_mode
+returns 0 (indeg=1). Reads gP1LifePoints+0x1d58 confirm pending flag: if 0,
+movs r0,#0; b LAB_08095376 (return 0 = no pending confirm). If nonzero:
+bl dispatch_equip_confirm_phase_by_step to execute current step. Then reads
+gP1LifePoints+0x1d54 step status: if 0, clears gP1LifePoints+0x1d58 (confirm
+done); finally movs r0,#1; return 1 (confirm in progress).
+Constants: gP1LifePoints=0x0201c4e0, confirm_flag_offset=0x1d58, step_offset=0x1d54.

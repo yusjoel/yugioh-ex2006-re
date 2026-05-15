@@ -1,0 +1,18 @@
+Equip activation main sequence tick, top-level controller for equip activation
+flow (indeg=1). Called by FUN_08094c10 (equip activation state machine entry).
+Executes the following decision chain in order:
+(1) If [0x0201e2a0+8] == 3: bl return_one_leaf (early exit, return 1);
+(2) Read gP1LifePoints+0x1d08 (equip target count): if nonzero and
+    0x0201b870+0x300*byte has bit7 set: jump LAB_08094d70 (return 1);
+(3) Read gP1LifePoints+0x10dc (additional status): if nonzero -> LAB_08094d70;
+(4) bl play_card_ok_ui_effect: if return nonzero -> LAB_08094d54;
+(5) bl play_equip_ui_effect_3_with_state_gate: if nonzero -> LAB_08094d54;
+(6) bl check_equip_target_slot_state: if nonzero -> LAB_08094d54;
+(7) bl dispatch_equip_entry_slot_by_mode: if nonzero -> LAB_08094d54;
+(8) bl tick_equip_confirm_slot_by_step: if nonzero -> LAB_08094d54;
+(9) bl dispatch_equip_field_update_by_anim_state;
+LAB_08094d54: writes gP1LifePoints+0x1d10 based on r1; if r1=0:
+bl check_normal_summon_eligibility; if not met: LAB_08094d70 return 1;
+else dispatch equip_activation_dispatch_hub or FUN_080a0b14.
+Constants: gP1LifePoints=0x0201c4e0, state_table=0x0201e2a0,
+target_count_offset=0x1d08, status_offset=0x10dc, phase_step_offset=0x1d10.

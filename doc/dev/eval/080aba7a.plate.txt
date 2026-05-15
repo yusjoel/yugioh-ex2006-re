@@ -1,0 +1,7 @@
+Shared epilogue stub, reused return path for dispatch_equip_entry_slot_by_mode
+(0x080ab200) and sibling functions. Address 0x080aba78 is reset_equip_entry_phase_to_zero
+(movs r0,#0), fall-through to this function at 0x080aba7a. Executes: add sp,#0x18
+(restore frame); pop {r3,r4,r5}; .hword 0x4698=mov r8,r3; .hword 0x46a1=mov r9,r1;
+.hword 0x46aa=mov r10,r2 (restore callee-save high registers); pop {r4,r5,r6,r7};
+pop {r1}; bx r1. Standard THUMB callee-save restore sequence; r0 is preset by
+caller before jump (0 or 1). No external side effects.

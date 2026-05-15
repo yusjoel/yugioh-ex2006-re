@@ -1,0 +1,16 @@
+Equip phase hub dispatcher, called by dispatch_equip_entry_slot_by_mode (0x080ab200)
+in struct[0x12] bit0=1 path (indeg=1). Reads struct 0x0201e4d0[0x0] dword, extracts
+bits[16:8] as card_id (lsls #9; lsrs #17). Compares card_id against a series of
+threshold constants and dispatches to different equip tick functions:
+- card_id == 0x17c2: bl tick_equip_target_phase_with_lp_confirm_slot_context
+- card_id in bitmap-confirm range: bl tick_equip_target_phase_with_bitmap_confirm
+- card_id range including 0x1487-0x4: bl tick_equip_phase_by_lp_index_range_a
+- card_id ranges: bl tick_equip_phase_by_lp_index_range_b/c
+- check_card_id_is_normal_summon_type nonzero: bl tick_equip_phase_normal_summon_type
+- others: bl dispatch_equip_confirm_action_by_phase / dispatch_equip_phase_unless_activation_pending
+Exit LAB_080a8fb0 converges; failure exit LAB_080a8f18 goes to parent shared exit.
+Constants: STRUCT_BASE=0x0201e4d0, card_id_field=bits[16:8] of [+0x0],
+Threshold set: 0x17c2 (Blue-Eyes Shining Dragon), 0x1487 (Garuda the Wind Spirit),
+0x1299 (The Fiend Megacyber), 0x0fe9 (Perfectly Ultimate Great Moth),
+0x112e (Metalzoa), 0x128c (Red-Eyes Black Metal Dragon),
+0x13b5 (Moisture Creature), 0x19f8 (Helios Tris Megiste).
