@@ -1,0 +1,9 @@
+Located in switchD_0803be70__caseD_4d, called each frame by main state machine FUN_0803be4c
+during the player hand shuffle display sequence.
+Reads state word [0x0201bcc0] to extract player_id (r5=bit15); reads step_counter [+0x810].
+Step 0: calls play_ui_effect(-1) to start effect; if successful, writes state data to
+[0x0201bcc0+0x1ce0], calls shuffle_hand_by_player_deck_flag(player_id) to randomize hand order;
+if randomization complete calls dispatch_card_display_op(0x10) for hand display update,
+clears relevant slot flag bits.
+Step 1: calls play_ui_effect(0x10); if done, clears [+0x810] step state.
+Returns void via pop {r3}; pop {r0}; bx r0.

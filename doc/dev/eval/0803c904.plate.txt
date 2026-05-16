@@ -1,0 +1,10 @@
+Located in switchD_0803be70__caseD_1c, called by main state machine FUN_0803be4c
+during the cleanup phase of the equip detach/remove sequence.
+Reads zone field from [0x0201bcc0+2] (r3) and counter from [gP1LifePoints+0x1d08]:
+if counter nonzero and [gP1LifePoints+0x1ce8] equals [0x0201e2a0+4], skips chain ref replacement;
+otherwise if r3!=0 calls replace_equip_chain_slot_refs_by_match to fix chain refs.
+Then writes [gP1LifePoints+0x1d28]=0xc to mark equip chain state ready,
+[gP1LifePoints+0x1d2c]=0 to clear auxiliary field.
+Clears bit0 of [gP1LifePoints+0x10d0] (equip chain ref bitmap flag),
+calls rebuild_equip_chain_refs to rebuild the reference table.
+Finally writes [0x0201c4cc]=0 to release step lock, returns void via pop {r0}; bx r0.

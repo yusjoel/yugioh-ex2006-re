@@ -1,0 +1,11 @@
+Located in switchD_0803be70__caseD_47, called each frame by main state machine FUN_0803be4c
+during the multi-step display sequence for normal summon placement into the monster zone.
+Reads from [0x0201bcc0]: player_id (r7=bit15), zone_type (r6=bits[11:8]),
+slot_idx (r9=bits[7:0]); reads step_counter [+0x810] (r2) to dispatch steps.
+Step 0 (step<1): calls increment_player_chain_counter; packs zone_type/player_id into state
+word; calls place_card_into_monster_zone_slot; sets related LP fields; calls
+dispatch_card_display_op(0x1b) to trigger placement animation; step++.
+Step 1 (step=1): extracts card display data from gDuelFieldSlots; calls
+dispatch_card_display_op(0x34) to trigger position display; step++.
+Step 2 (step=2): calls play_ui_effect(0x34); if done clears step lock [0x0201c4cc]=0.
+Returns void via pop {r0}; bx r0.

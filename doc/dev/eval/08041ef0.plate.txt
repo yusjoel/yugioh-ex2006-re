@@ -1,0 +1,11 @@
+Located in switchD_0803be70__caseD_2c, called each frame by main state machine FUN_0803be4c
+during the card flip/reveal animation sequence.
+Reads from [0x0201bcc0]: player_id (r4=bit15), slot data (r5=[+4]),
+zone type (r7=[+6]); reads step_counter [+0x810] to dispatch steps.
+Step 0 (step<1): increments step_counter only, no other operation.
+Step 1 (step=1): calls play_ui_effect(-1) to start effect; if r7=2 calls
+dispatch_card_display_op(0x34) with zone slot data, otherwise calls
+dispatch_card_display_op(0x33); step++.
+Step 2 (step=2): calls play_ui_effect(0x33) or play_ui_effect(0x34) depending on r7=2;
+if done clears step lock [0x0201c4cc]=0.
+Returns void via pop {r0}; bx r0.

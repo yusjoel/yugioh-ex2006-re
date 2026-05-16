@@ -1,0 +1,9 @@
+Called by tick_display_slot_flag_clear_seq (0x080404c4) during display sequence init to
+perform a full scan and repair of all equip chain node references across all players and slots.
+No APCS inputs; prologue saves r8/r9/r10 via .hword 0x4657/464e/4645 callee-save pattern.
+Outer double loop: player 0 and player 1, each with 12 slots (index [0..0xb]).
+Inner: checks gDuelFieldSlots[player*0x868+slot*0x14]+0x13 active bit; if active reads
+[slot+0xa] chain_head and walks the chain nodes.
+Per node: if [node+2] low 4 bits == 0, calls replace_slot_chain_ref_by_id to replace
+chain head reference; otherwise updates [node+2] byte field based on high-bit condition.
+Returns void via pop {r0}; bx r0.

@@ -1,0 +1,9 @@
+Eighth sibling of clear_display_step_lock_a-g, identical structure, located in
+switchD_0803be70__caseD_71.
+Clears field [0x0201bcc0+0x80c] (= 0x0201c4cc) to 0, releasing the current
+frame-driven animation sequence lock.
+Called by main state machine FUN_0803be4c after the eighth specific display sequence ends.
+After the clear the state machine can advance to the next operation phase.
+
+r0: void (entry ldr r0,=0x0201bcc0 clobbers, no APCS input)
+Returns: void (bx lr)

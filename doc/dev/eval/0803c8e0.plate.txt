@@ -1,0 +1,7 @@
+Located in switchD_0803be70__caseD_16, called by main state machine FUN_0803be4c
+at the start of the equip candidate scan phase.
+Calls invoke_build_equip_candidate_score_table(0) to build the equip candidate score table,
+then calls trigger_equip_activation_candidate_scan(0) to trigger the equip activation scan.
+Afterwards clears [0x0201bcc0+0x80c] (step lock field) to 0, unblocking the animation sequence
+and allowing the state machine to advance.
+Returns void via pop {r0}; bx r0 (r0 = saved lr, not a return value).

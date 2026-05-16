@@ -1,0 +1,13 @@
+Called by tick_player_hand_shuffle_display_seq (0x08040ebc) at step 0 to perform
+the actual hand randomization.
+r0=player_id: first calls get_player_deck_flag_bit1(player_id) to check deck flag bit1;
+if already set, returns 0 immediately (randomization prohibited).
+Otherwise computes hand card count = [gP1LifePoints + player_id*0x868 + 0x0c] - 1;
+if count<=0 returns 1 directly.
+Performs Fisher-Yates style randomization for count iterations: each round calls
+sample_prng_scaled(count+1) to get a random index, then swaps hand entries via
+write_word_from_deref_src three times.
+Returns r0=1 (randomization complete), r0=0 (deck_flag_bit1 set, prohibited).
+
+r0: u8 player_id [0..1]
+Returns: u8, 1=randomization done/skipped(count<=0), 0=deck_flag_bit1 set

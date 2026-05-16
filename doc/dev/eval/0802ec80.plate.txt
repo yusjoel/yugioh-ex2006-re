@@ -1,0 +1,9 @@
+Called by tick_zone_slot_card_set_display_seq (FUN_0803d6f4) at step=1 when zone>4.
+Receives zone_slot_ptr in r0; reads chain_head from [r0+0xa].
+Walks equip chain nodes at 0x0201d9c0+idx*8: if zone_type(bits[3:0] of [node+2])<=5
+and ID != 0x164f (Guardian Tryce, sentinel guard), calls replace_slot_chain_ref_by_id
+to clear back-references; advances via next=[node+6] until 0.
+Side effect: clears low-zone chain node back-references for this slot.
+
+Constants:
+- SENTINEL_CARD_ID=0x164f (Guardian Tryce)

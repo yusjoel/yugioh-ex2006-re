@@ -1,0 +1,7 @@
+Located in switchD_0803be70__caseD_27, called by main state machine FUN_0803be4c
+during the equip chain entry reset phase.
+Reads player_id (bit15) from [0x0201bcc0]; iterates [0x0201bb90] array up to 2 entries
+(offsets +0xa8, +0xa8+0x14) looking for entries matching player_id.
+If a matching entry is found, clears its [+0x9c] field to 0 (activation state reset).
+Calls dispatch_card_display_op(0x0f, 0, 0, 0) to trigger display update.
+Clears step lock [0x0201c4cc]=0; returns void via pop {r0}; bx r0.

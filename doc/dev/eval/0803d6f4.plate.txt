@@ -1,0 +1,13 @@
+Located in switchD_0803be70__caseD_3d, called each frame by main state machine FUN_0803be4c
+during the zone slot card set-card placement display sequence step machine.
+Reads from [0x0201bcc0]: player_id (r8/r9 callee-save), zone_byte (r8=[+2] ldrb),
+zone_hiword (r7=[+2]>>8), slot_byte (r8=[+4] ldrb), slot_hiword (r6=[+4]>>8);
+reads step_counter [+0x810].
+Step 0: checks zone_hiword/slot against threshold 0xa; if exceeded writes step_counter
+to [+0x80c] and exits; if in range exits with r0=1; otherwise calls
+write_card_display_index_with_bit_offset(0x2d,1) to write display index.
+Step 1: gets zone_slot_ptr, calls copy_bytes_by_halfword and zero_fill_by_halfword
+for zone descriptor, calls FUN_0802f14c (zone chain node repair) and conditionally
+FUN_0802ec80 (zone>4); calls dispatch_card_display_op(0x18,...) to trigger placement
+animation; increments step.
+Step 2+: clears [+0x80c]=0 and exits. Returns void via pop {r0}; bx r0.

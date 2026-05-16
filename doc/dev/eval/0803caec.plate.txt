@@ -1,0 +1,11 @@
+Located in switchD_0803be70__caseD_21, called by main state machine FUN_0803be4c
+during the zone card removal and equip chain reference repair display sequence.
+Reads state word [0x0201bcc0]: player_id (bit15=r7), zone_info (r8=[+2]),
+slot_data (r6=[+4]); reads chain counter [0x0201c4d0] (r5).
+State 0: extracts slot_idx and player flag, calls replace_chain_refs_by_slot_id_for_player
+to replace slot references in chain; copies slot data from zone descriptor (copy_bytes_by_halfword),
+calls dispatch_card_display_op(0x18) to trigger display, increments step.
+State 1: calls zero_fill_by_halfword to zero target buffer, computes source zone entry
+from chain counter, processes display bit fields; increments step.
+State 2+: clears [0x0201c4d0] related fields, releases step lock [0x0201c4cc]=0;
+returns void via pop {r0}; bx r0.

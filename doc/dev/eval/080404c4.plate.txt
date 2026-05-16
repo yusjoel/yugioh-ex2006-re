@@ -1,0 +1,9 @@
+Located in switchD_0803be70__caseD_3, called by main state machine FUN_0803be4c
+during the display sequence initialization and clear phase.
+First calls dispatch_card_display_op(op=0x46, player_id, 0, 0) to broadcast clear operation.
+Then loops over both players x 12 slots (index [0..0xb]): reads
+gP1LifePoints[player*0x868+slot*0x14] word field, clears low 16 bits (=0xffff mask),
+writes back; also sets bit4 (0x10 | orig) on gDuelFieldSlots related entries.
+Performs symmetric operation on another zone entry group (gP1LifePoints offsets +0x41a/+0x5d2).
+Calls repair_slot_equip_chain_node_refs for full equip chain node reference repair.
+Finally writes [0x0201bcc0+0x80c]=0 to release step lock; returns void via pop {r0}; bx r0.

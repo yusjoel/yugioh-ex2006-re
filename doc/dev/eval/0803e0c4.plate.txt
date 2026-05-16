@@ -1,0 +1,10 @@
+Located in switchD_0803be70__caseD_36, called by main state machine FUN_0803be4c
+during the equip chain node linking phase.
+Reads from [0x0201bcc0]: player_id (r7=bit15), zone_byte (r5=[+2] low byte),
+zone_hiword (r6=[+2]>>8), slot_data (r4=[+4] & 0x7fff).
+Checks [+4] bit15: if set (r1!=0), calls append_equip_chain_node_at_tail with
+r0=player_id*2+zone_byte, r1=zone_hiword, r2=slot_data to append node at tail;
+otherwise reads [+6] halfword (r3) and calls link_equip_node_to_chain to link
+the node to an existing chain.
+Calls dispatch_card_display_op(0x24, 0, 0, 0) to trigger equip chain display update.
+Writes [0x0201bcc0+0x80c]=0 to release step lock, returns via epilogue void.

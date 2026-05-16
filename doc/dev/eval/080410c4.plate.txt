@@ -1,0 +1,17 @@
+Located in switchD_0803be70__caseD_4e, called each frame by main state machine FUN_0803be4c
+during the display sequence for finding a target slot by card_id and placing a card.
+Reads from [0x0201bcc0]: player_id (r7=bit15), zone type, slot_idx and other fields;
+calls find_slot_idx_by_card_id_in_player_zones to locate target slot.
+Reads step_counter [+0x810] to dispatch steps.
+Step 0 (<1): calls dispatch_card_display_op(0x42, player_id, ...) for placement preview; step++.
+Step 1 (=1): calls play_ui_effect(0x42); if done calls erase_slot_from_zone_array_by_type
++ place_card_into_monster_zone_slot + link_equip_node_to_chain + dispatch op=0x18/0x1c; step++.
+Step 2 (=2): for card_id=0x15c7 (Cost Down) calls check_value_in_slot_chain /
+count_slot_chain_nodes_by_card_id + link_equip_node_to_chain; handles gP1LifePoints chain
+counter field; dispatches op=0x1c; step++.
+
+Constants:
+- CARD_ID=0x15c7 (Cost Down)
+
+Step 3 (=3): play_ui_effect(0x1c); on completion clears step lock [0x0201c4cc]=0.
+Returns void via pop {r0}; bx r0.

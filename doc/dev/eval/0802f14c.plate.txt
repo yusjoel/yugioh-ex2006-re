@@ -1,0 +1,7 @@
+Called by FUN_0803d6f4/FUN_0803d91c/FUN_08041988 after zone slot card placement.
+r0=zone_position (low byte=zone_byte, high byte=zone_hiword), r1=u16 new slot ref value.
+Iterates both players x all slots (0..0xa): for active slots with equip chain nodes where
+zone_type(bits[3:0] of [node+2])>5 and [node+0] matches r0, writes r1 into [node+0] halfword.
+Updates global equip chain node zone slot back-references to maintain chain consistency.
+Side effect: [node+0] := r1 (matching high-zone nodes).
+Returns void via pop {r4,r5,r6,r7}; pop {r0}; bx r0.
