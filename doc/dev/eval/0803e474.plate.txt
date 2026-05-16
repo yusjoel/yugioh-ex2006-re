@@ -1,0 +1,13 @@
+Frame driver for hand zone card insert display sequence.
+Reads player_id (r5=bit15), slot_idx (r7=hword[+2]), zone_flags (r4=ldrh[+4] bit0) from [0x0201bcc0].
+Reads [base+0x810] step counter.
+Step 0: type=0xe (hand) calls find_hand_slot_idx_by_set_code;
+if not at tail calls insert_card_into_hand_list_by_zone_desc + dispatch op=0x16;
+type=0xf: calls find_hand_slot_idx_by_set_code_alt + insert_card_into_field_list_by_zone_desc + dispatch op=0x16.
+Step 1: polls play_ui_effect=0x16; on done step_counter+1 and exit.
+Step 2: polls play_ui_effect=0x17; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during hand/field slot insert display phase.
+Returns void.
+Constants: base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
+player_stride=0x868; hand_count_offset=0x14; field_count_offset=0x1c;
+op_hand_insert=0x16; effect_hand_insert=0x16/0x17.

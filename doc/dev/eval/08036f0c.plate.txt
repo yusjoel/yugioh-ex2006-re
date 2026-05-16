@@ -1,0 +1,12 @@
+Searches player field slot list for target card by zone descriptor, inserts it via write_word_from_deref_src + strh.
+r0=player_side (bit0, u32), r1=target zone_desc (u16, [0..0xffff]).
+Reads gP1LP+player*0x868+0x1c for field slot count;
+field slot array A base gP1LP+player*0x868+0x5d0 (0xba<<3),
+aux array B base gP1LP+player*0x868+0x788 (0xf1<<3).
+Inner loop: scans from count-1 down to 0 comparing zone_desc (same bit-field extraction as 08036e40);
+on match calls write_word_from_deref_src + strh (dual array shift).
+Called by main state machines in zone_type=0xf branches (symmetric to 08036e40 zone_type=0xe).
+Params: r0=u32 player_side (bit0=[0..1]); r1=u16 zone_desc [0..0xffff].
+Returns void (pop{r0};bx r0 tail return).
+Constants: player_stride=0x868; field_count_offset=0x1c; field_array_a_offset=0x5d0 (=0xba<<3);
+field_array_b_offset=0x788 (=0xf1<<3); list_base=0x0201cab0; list_neg_offset=0xfffffa4c (-0x5b4).

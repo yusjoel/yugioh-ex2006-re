@@ -1,0 +1,7 @@
+Fixed entry stub for equip animation mode 3.
+Calls invoke_card_display_op_by_equip_mode with r0=3,
+triggering the mode-3 equip card display animation sequence.
+Body: push lr / movs r0,#3 / bl hub / pop{r0};bx r0. Standard void tail call.
+One of 6 consecutive sibling stubs (0x08040450..0x0804048c), N=0..5.
+Called by FUN_0803be4c (main state machine) in equip mode3 branch.
+Returns void. Constants: equip_mode=3.

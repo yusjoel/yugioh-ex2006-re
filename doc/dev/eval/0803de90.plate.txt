@@ -1,0 +1,16 @@
+Frame driver for zone card removal display sequence.
+Reads state_word from [0x0201bcc0] (DAT_0803df00=0x0201bcc0);
+extracts player_id (r4=bit15), slot_idx (r5=hword[+2]), zone flags (bits from hword[+6]).
+Reads four bit flags (r3=bit0, [sp]=bit1, [sp+4]=bit2, [sp+8]=bit3).
+Step 0: if bit3==0 writes hword[+4] to [base+0x80c] (step lock init);
+dispatches op=0x45 (remove animation).
+Step 1: polls play_ui_effect=0x45; on done: if bit0 calls write_field_slot_bit_by_player;
+if bit1/bit2 dispatches op=0x1a (zone attribute update).
+Step 2: polls play_ui_effect=0x1a; on done calls purge_equip_chain_refs_for_zone_slot;
+if condition: write_card_display_index_with_bit_offset + write_field_slot_bit_by_player.
+Step 3: polls play_ui_effect=0x41; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during zone card removal display phase.
+Returns void.
+Constants: state_base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
+player_stride=0x868; card_data_base=0x0201c510; display_state_base=0x0201bb90;
+op_remove=0x45; op_attr_update=0x1a; op_equip=0x41.

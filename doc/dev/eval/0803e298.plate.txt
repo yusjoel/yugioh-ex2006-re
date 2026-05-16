@@ -1,0 +1,11 @@
+Reads zone slot parameters from current game state and writes display args to display struct.
+Loads state base from DAT_0803e2cc; reads hword[+0] bit15 -> r2=player_id,
+ldrb[+2] -> r2=slot_idx, hword[+6] high byte -> display_type, hword[+4] -> r1=card_type,
+hword[+2]>>8 -> extra_byte.
+If extra_byte != 0: computes zone_descriptor = slot_idx*0x14 (=5*4),
+adds player*0x868 + display_state_base + 0x14; reads slot_list[+0xc],
+ORs display_args, writes back to [slot_list+0xc].
+If extra_byte == 0: skips write and exits.
+Called by FUN_0803be4c (main state machine) each frame to write zone display arguments.
+Returns void.
+Constants: player_stride=0x868; slot_stride=0x14 (=5*4); display_struct_field=0xc.

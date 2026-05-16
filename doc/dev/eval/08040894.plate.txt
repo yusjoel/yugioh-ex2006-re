@@ -1,0 +1,12 @@
+Frame driver for random draw display sequence.
+Reads player_id (r7=bit15), card_type (r2=ldrh[+2]),
+slot_idx (r5=ldrb[+4]), extra_slot (r1=ldrh[+4]>>8) from [0x0201bcc0].
+Reads [base+0x810] step counter.
+Step 0: calls advance_prng_state to generate random number;
+reconstructs display_args from r2/r7; dispatches op=0x37 (random draw animation);
+writes [base+0x810]:=step+1.
+Step non-zero: polls play_ui_effect=0x37; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during random draw display phase.
+Returns void.
+Constants: state_base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
+op_random_draw=0x37; effect_random_draw=0x37.

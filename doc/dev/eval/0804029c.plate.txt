@@ -1,0 +1,12 @@
+Frame driver for card set display mode sequence.
+Reads player_id (r3=bit15), extra_flags (r2=hword[+2]) from [0x0201bcc0].
+Reads [base+0x810] step counter. Step 0: checks [0x0201e2a0+0x4] XOR player_id;
+if different dispatches op=0x2 directly;
+if same: switches r2 (1->2 or 2->1), writes [gP1LP+0x1cfc]:=r2 (mode field),
+[gP1LP+0x2c]:=hword[state+4], [gP1LP+0x894]:=hword[state+6];
+dispatches op=0x2, step+1.
+Step non-zero: polls play_ui_effect=0x2; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) during card face-up/face-down display toggle phase.
+Returns void.
+Constants: state_base=0x0201bcc0; player_ref=0x0201e2a0; step_lock_offset=0x80c;
+mode_field=gP1LP+0x1cfc=0x0201e1dc; op_set=0x2; effect_set=0x2.

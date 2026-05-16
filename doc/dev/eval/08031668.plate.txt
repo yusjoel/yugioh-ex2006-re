@@ -1,0 +1,9 @@
+Fisher-Yates shuffle of specified player hand list.
+r0=player_side (bit0=[0..1]); reads gP1LP+player*0x868+0x10 (hand capacity).
+Iterates from tail backward: calls sample_prng_scaled(count+1) for [0..count] random index,
+then swap_deref_words to exchange current and random hand entries.
+Hand array A base: gP1LP+player*0x868+0x260 (0x98<<2); entry stride=4 bytes.
+Called by tick_hand_shuffle_display_seq (0x080400a8) and FUN_08093660 during hand shuffle phase.
+Params: r0=u8 player_side [0..1] (bit0 extracted via ands).
+Returns void (pop{r4,r5,r6};pop{r0};bx r0 tail return).
+Constants: player_stride=0x868; hand_capacity_offset=0x10; hand_array_offset=0x260 (=0x98<<2); entry_stride=4.

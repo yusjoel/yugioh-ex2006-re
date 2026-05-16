@@ -1,0 +1,14 @@
+Frame driver for zone card placement (alternate) display sequence.
+Reads state_word from [0x0201bcc2] (DAT_0803cd0c); extracts player_id (r7=bit0),
+zone_type (r8=bits[5:1]), slot_idx (r4=bits[13:6]); calls find_zone_descriptor_by_slot_id.
+Step 0: branches by zone_type -- type=0xe (hand): calls find_hand_slot_idx_by_set_code;
+if not at tail calls insert_card_into_hand_list_by_zone_desc + dispatch op=0x16;
+type=0xf: calls find_hand_slot_idx_by_set_code_alt + insert_card_into_field_list_by_zone_desc + dispatch op=0x16;
+writes step+1. Step 1: polls play_ui_effect=0x16; on done calls get_zone_slot_ptr,
+clears slot flags, calls get_zone_slot_field6_by_type + get_zone_card_attribute_by_type +
+erase_slot_from_zone_array_by_type + dispatch_card_placement_by_zone_type + dispatch op=0x18/0x1d/0x41.
+Alternate variant of tick_zone_card_place_display_seq (reads base 0x0201bcc2 vs 0x0201bcc0).
+Called by FUN_0803be4c for alternate zone card placement display path.
+Returns void.
+Constants: state_base=0x0201bcc2; step_counter_offset=0x80e; step_lock_offset=0x80c;
+player_stride=0x868; op_hand_place=0x16; op_zone_update=0x18.

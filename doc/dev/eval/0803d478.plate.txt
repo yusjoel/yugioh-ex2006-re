@@ -1,0 +1,15 @@
+Frame driver for zone card placement display sequence.
+Reads state_word from [0x0201bcc2] (DAT_0803d4d8); extracts player_id (bit0),
+zone_type (bits[5:1]), slot_idx (bits[13:6]); calls find_zone_descriptor_by_slot_id.
+Reads [0x0201bcc0+0x80e] step counter via DAT_0803d4dc=0x80e.
+Step 0: type=0xe calls insert_card_into_hand_list_by_zone_desc + dispatch op=0x16;
+type=0xf calls insert_card_into_field_list_by_zone_desc; step+1.
+Step 1: polls play_ui_effect=0x16; on done: get_zone_slot_ptr, clears slot flags (multiple ands),
+write_word_from_deref_src + get_zone_slot_field6_by_type + get_zone_card_attribute_by_type,
+erase_slot_from_zone_array_by_type + dispatch_card_placement_by_zone_type + dispatch op=0x18.
+Step 2: polls play_ui_effect=0x41; on done clears [base+0x80a]:=0.
+Step 3: polls play_ui_effect=0x1a; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during zone card placement display phase.
+Returns void.
+Constants: state_base=0x0201bcc2; step_counter_offset=0x80e; step_lock_a=0x80a; step_lock_c=0x80c;
+player_stride=0x868; op_hand_place=0x16; op_zone_update=0x18; op_reveal=0x1a; op_equip=0x41.

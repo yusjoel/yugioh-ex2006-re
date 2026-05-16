@@ -1,0 +1,8 @@
+Clears step lock field [0x0201bcc0+0x80c] to zero, releasing the current frame-driven animation lock.
+Body: ldr r0,=0x0201bcc0; ldr r1,=0x80c; adds r0,r0,r1; movs r1,#0; str r1,[r0]; bx lr.
+0x0201bcc0+0x80c = 0x0201c4cc = step_lock field; non-zero indicates animation sequence in progress.
+Clearing allows main state machine to advance to next operation.
+Sibling of clear_display_step_lock_b (0x08040c88) and clear_display_step_lock_c (0x08040c9c).
+Called by FUN_0803be4c (main state machine) at end of a specific display sequence.
+Returns void (bx lr).
+Constants: base=0x0201bcc0; step_lock_offset=0x80c; effective_addr=0x0201c4cc.

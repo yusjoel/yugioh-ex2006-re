@@ -1,0 +1,12 @@
+Frame driver for hand shuffle display sequence.
+Reads player_id (r5=bit15), card_type (r4=hword[+4]<<16|hword[+2]) from DAT_080400cc=0x0201bcc0.
+Reads [base+0x810] step counter.
+Step 0: if gP1LP+player*0x868+0x10 <= 1 writes [base+0x80c]:=r2 and skips to step 2;
+else writes [gP1LP+player*0x868+0x80c] and dispatches op=0x13 (hand_shuffle_start).
+Step 1: polls play_ui_effect=0x13; on done clears [gP1LP+0xe7*0x20] related fields,
+calls shuffle_player_hand_list (FUN_08031668), dispatches op=0x14 (hand_shuffle_done).
+Step 2: polls play_ui_effect=0x14; on done clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during hand shuffle display phase.
+Returns void.
+Constants: state_base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
+op_shuffle_start=0x13; effect_shuffle_start=0x13; op_shuffle_done=0x14; effect_shuffle_done=0x14.

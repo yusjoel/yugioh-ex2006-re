@@ -13370,6 +13370,9 @@ RENAMES = [
         "zone effects via dispatch_card_effect_zone_action_by_card_id. "
         "Constants: TYPE_MAX=4, PLAYER_BIT_SHIFT=0x16, TYPE_FIELD_SHIFT=0x12/0x1c, "
         "gDuelFieldSlots=0x0201bc54."),
+
+    # NOTE: batch #72+ are handled by RenameFromCSV.py (CSV-driven, avoids Jython method size limit).
+    # Data truth source: doc/dev/naming-proposals.csv + doc/dev/eval/<addr>.plate.txt
 ]
 
 

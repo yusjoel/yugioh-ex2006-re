@@ -1,0 +1,14 @@
+Frame driver for equip link display sequence.
+Reads player_id (r3=bit0), card_type_b (r2=hword[+2]>>8),
+slot_idx (r5=ldrh[+4] bit0), extra_slot (r0=ldrh[+4]>>8 -> r8) from [0x0201bcc0].
+Reads [base+0x810] step counter.
+Step 0: writes [base+0x810]:=1; computes gP1LP+player*0x868+slot*0x14+card_data_base,
+extracts slot_descriptor field (bits[29:22]<<1 and bits[14]);
+dispatches op=0x22 (equip animation); exits without clearing lock.
+Step non-zero: polls play_ui_effect=0x22; on done calls link_equip_node_to_chain,
+dispatches op=0x24; clears [base+0x80c]:=0.
+Called by FUN_0803be4c (main state machine) each frame during equip card link display phase.
+Returns void.
+Constants: state_base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
+card_data_base=0x0201c510; player_stride=0x868; slot_stride=0x14;
+op_equip_link=0x22; effect_equip_link=0x22; op_equip_confirm=0x24.

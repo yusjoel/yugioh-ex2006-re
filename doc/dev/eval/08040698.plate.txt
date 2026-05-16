@@ -1,0 +1,8 @@
+Reads card flags from current state struct and OR-merges them into the player zone bitmap slot.
+Loads state base from DAT_080406c4; reads hword[+0] bit15 -> r2=player_id,
+hword[+2] -> r4=card_flags, hword[+4] -> extra_flags.
+If extra_flags == 0 skips. Otherwise: computes gP1LP + player_id*0x868 + 0x11c (=0x8e<<1)
+zone bitmap base; reads [bitmap_base + player_offset], ORs card_flags<<1, writes back.
+Called by FUN_0803be4c (main state machine) each frame to merge card flags into zone bitmap.
+Returns void (via b LAB_080406e8).
+Constants: player_stride=0x868; zone_bitmap_base_offset=0x11c (0x8e<<1).

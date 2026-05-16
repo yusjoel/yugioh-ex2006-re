@@ -1,0 +1,8 @@
+Polls UI effect 5 completion and commits card display index entry.
+If play_ui_effect(5) returns 0 (animation done),
+calls write_card_display_index_entry(op=0xa, slot=0), then clears
+[0x0201bcc0+0x80c]:=0 (step_lock clear), signaling end of current frame-driven sequence.
+If play_ui_effect returns non-zero (animation pending), skips write and returns.
+Called by FUN_0803be4c (main state machine) after specific card display animation completes.
+Returns void.
+Constants: effect_id=5; display_op=0xa; display_slot=0; step_lock=0x0201bcc0+0x80c=0x0201c4cc.

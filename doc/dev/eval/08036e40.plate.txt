@@ -1,0 +1,10 @@
+Searches player hand list for target card by zone descriptor, then shifts it to target position via swap_deref_words.
+r0=player_side (bit0), r1=target zone_desc (u16, [0..0xffff]).
+Reads gP1LP+player*0x868+0x14 for hand count; hand array base gP1LP+player*0x868+0x418 (0x83<<3).
+Inner loop: scans from count-1 down to 0 comparing each slot zone_desc field (bits[23:16] and bit[13]);
+on match calls swap_deref_words then write_word_from_deref_src to shift subsequent slots.
+Called by main state machines when moving a specific card to the front of the hand array.
+Params: r0=u8 player_side [0..1]; r1=u16 zone_desc [0..0xffff].
+Returns void (pop{r0};bx r0 tail return).
+Constants: player_stride=0x868; hand_count_offset=0x14; hand_array_a_offset=0x418 (=0x83<<3);
+list_b_base=0x0201c8f8; list_b_neg_offset=0xfffffbfc (-0x404).
