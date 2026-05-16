@@ -54,8 +54,8 @@ byte-identical 通过后自动 commit, 进入下一批。
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
 | **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 20 批 / 4×10 并行 |
-| **下一批** | `#84` (40 fns, 4 splits × 10) |
-| **上次更新** | 2026-05-16 (Phase 2 batch #83, 80/766 = 10.44%) |
+| **下一批** | `#85` (40 fns, 4 splits × 10) |
+| **上次更新** | 2026-05-16 (Phase 2 batch #84, 120/766 = 15.67%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -77,11 +77,12 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**80 / 766 已分析** (10.44%, 37 批待跑)
+**120 / 766 已分析** (15.67%, 36 批待跑)
 
 里程碑 commits:
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
 - batch #83 `c9c5102` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
+- batch #84 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
 
 #### Phase 2 ready 集合统计
 
@@ -102,7 +103,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
 | 闭包外 | 311 | 1637 | — |
-| **全 CSV** | **2000** | **1646** | **54.85%** |
+| **全 CSV** | **2040** | **1606** | **55.95%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

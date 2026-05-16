@@ -1,0 +1,6 @@
+Called by FUN_0807a9c8 (indeg=1). Updates equip target bitmap selecting zone_flags by card type (spell vs non-spell). Computes slot_bit=1<<(r1*0x10+r2). Reads gDuelFieldSlots[r2*20+player*0x868] card_word, extracts card_id (lsls/lsrs#0x13). Calls check_card_type_is_spell(card_id): if spell -> zone_flags=0xd, else zone_flags=0xc. Calls update_equip_target_bitmap_for_field(player_id, slot_bit, zone_flags, side_flags=2). Returns 1 if bitmap & slot_bit != 0, else 0.
+
+Params: r0=u8 player_id [0..1]; r1=u8 player_ref [0..1]; r2=u8 slot_idx [0..9]
+Returns: r0=u32 bool (1 if slot_bit in bitmap; 0 otherwise)
+Side effects: equip target bitmap updated via update_equip_target_bitmap_for_field
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; ZONE_SPELL=0xd; ZONE_MONSTER=0xc; SIDE_FLAGS_BOTH=2; CARD_ID_SHIFT=0x13

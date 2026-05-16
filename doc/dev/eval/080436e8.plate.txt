@@ -1,0 +1,6 @@
+Field slot sprite attribute dispatch function, extracts equip_head flag from chain node struct then forwards. Receives chain node ptr r0; extracts data from [r0+0x0] halfword and [r0+0x2] byte. [r0+0x2] bit0 XOR player_side determines has_equip_head flag (XOR nonzero -> flag=1, else 0). Stores result into sp[0], then calls enqueue_slot_sprite_attr_by_card_type_and_state with (player_side, slot_idx, card_type, sp[0]=has_equip_head). Multiple duel_field callers in equip zone sprite update scan.
+
+Params: r0=ptr chain_node_ptr; r1=u8 player_side [0..1]; r2=u8 slot_idx; r3=u8 card_type
+Returns: void
+Side effects: OAM sprite buffer via enqueue_slot_sprite_attr_by_card_type_and_state
+Constants: EQUIP_HEAD_FLAG: derived from [chain_node+0x2] bit0 XOR player_side; rsbs/orrs/lsrs#0x1f implement nonzero-check

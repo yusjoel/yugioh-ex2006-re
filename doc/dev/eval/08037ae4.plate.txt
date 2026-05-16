@@ -1,0 +1,6 @@
+Iterates all cards in the specified player field_array_C (gP1LifePoints+player*0x868+0x120, count from +0x0c). For each card, extracts bits[12:0] as card_icid and calls check_card_field5_is_nonzero; if field5 is nonzero, increments counter. Returns total count. No non-APCS params (prologue is only push {r4..r7,lr}, no .hword mov sequence); takes only r0=player_id. 4 callers all in duel_field, used to count field_zone cards with field5 attribute in duel state evaluation. Pure read-only.
+
+Params: r0=u8 player_id [0..1]
+Returns: r0=u32 count of field_zone cards with nonzero field5
+Side effects: none (read-only)
+Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c

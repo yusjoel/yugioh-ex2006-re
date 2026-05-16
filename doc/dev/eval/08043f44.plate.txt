@@ -1,0 +1,6 @@
+Equip chain dual-slot sprite enqueue with activation list scan. Receives player_side_a/packed_slot/packed_b, unpacks two player/slot field pairs. Checks that both corresponding gDuelFieldSlots slot card_ids are nonzero; if either is empty, returns. If both have cards, calls enqueue_equip_chain_pair_sprite_validated twice (for bidirectional relationship), selects OAM base (P0=0x3e, P1=0x803e), calls enqueue_sprite_attr_record for sprite attrs. Finally calls scan_equip_chain_list_for_activation_sprite once per slot. 2 duel_field callers in equip chain full sprite refresh.
+
+Params: r0=u8 player_side_a [0..1]; r1=u16 packed_slot; r2=u16 packed_b
+Returns: void
+Side effects: OAM sprite buffer via enqueue_equip_chain_pair_sprite_validated and enqueue_sprite_attr_record; activation chain sprite scan
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; OAM_ATTR0_P0=0x3e; OAM_ATTR0_P1=0x803e

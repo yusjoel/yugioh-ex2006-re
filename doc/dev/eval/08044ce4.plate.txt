@@ -1,0 +1,6 @@
+Called by multiple duel_field and card_stats paths (indeg=9+, including FUN_08069d08, FUN_08080d40). Enqueues equip slot OAM sprite attribute with additional display_code (r2) encoded as attr2. Compared to sibling enqueue_equip_slot_sprite_by_player (0x08044c84): this function additionally receives r2 (display_code), truncates it to 16-bit, and passes as attr2 to enqueue_sprite_attr_record. attr3 fixed to 0. attr0 still selected by player_id: 0x29 (P1) or 0x8029 (P2).
+
+Params: r0=u8 player_id [0..1]; r1=u16 tile_position; r2=u16 display_code (display_type*2+side_flag)
+Returns: void
+Side effects: OAM sprite attr queue write via enqueue_sprite_attr_record
+Constants: OAM_P1=0x29; OAM_P2=0x8029

@@ -1,0 +1,6 @@
+Equip zone sprite enqueue accepting zone_slot_ptr directly; row type fixed to 0xe. Called by 12 rendering functions (card_frame/card_ids/duel_field). r0=player_id [0..1], r1=zone_slot_ptr, r2=h_flip_ptr_or_flag. Saves r1 to r3, r2 to r1; selects attr_base by player_id: 0->0x33 (P1), else ldr 0x8033 (P2). Converts r1 (original r2) via rsbs/orrs/lsrs#0x1f to "r2_nonzero" bit (0 or 1) as H-flip flag. Reads [r3,#0] (zone_slot word), extracts col_idx (bits[25:24]<<1) and side_flag (bit[13]), packs as r3_packed. Calls enqueue_sprite_attr_record(attr_base, row_type=0xe, h_flip_bit, col_side_packed). void return (pop{r0}; bx r0).
+
+Params: r0=u8 player_id [0..1]; r1=ptr zone_slot_ptr; r2=u32 h_flip_ptr_or_flag
+Returns: void
+Side effects: OAM sprite buffer write (row_type=0xe record) via enqueue_sprite_attr_record
+Constants: OAM_P1_BASE=0x33; OAM_P2_BASE=0x8033; ROW_TYPE=0xe

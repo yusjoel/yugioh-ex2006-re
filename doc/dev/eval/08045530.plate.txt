@@ -1,0 +1,6 @@
+Stored as function pointer in dispatch_card_effect_sprite_render_by_card_id dispatch table (DAT_08045efc=0x08045531). Invoked when the equip chain dispatcher processes card_id=0x18d1 (Nitro Unit). r0=equip_node_ptr, r1=activation_ctx_ptr. First validates node zone_type==0xa (spell zone). Compares player_id (node byte[0] vs activation_ctx bit9); if mismatch, returns. Reads gDuelFieldSlots[player*0x868+slot*0x14] slot word, validates (slot_word<<0x13)==0xc6880000 (low 13 bits==0x18d1 plus matching activation fields). On pass, calls apply_equip_activation_with_id_lookup to register effect.
+
+Params: r0=ptr equip_node_ptr; r1=ptr activation_ctx_ptr
+Returns: void
+Side effects: equip activation state modified via apply_equip_activation_with_id_lookup
+Constants: CARD_ID=0x18d1 (Nitro Unit); ZONE_TYPE_SPELL=0xa; SLOT_WORD_FILTER=0xc6880000; gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14

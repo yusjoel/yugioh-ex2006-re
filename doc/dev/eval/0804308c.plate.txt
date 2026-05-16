@@ -1,0 +1,6 @@
+Checks whether the specified slot card (r0=card_slot_entry_ptr) can render a sprite for player (r1) on zone column (r2). Calls query_slot_card_type_eligibility(card_ptr, player_id, zone_col); if nonzero (ineligible), returns 0. If 0 (eligible), selects sprite base by player_id (P0=0x0036, P1=0x8036), packs OAM attr with r3 (u16, truncated to r8) and stack args sp[0x18]/sp[0x1c] (u16), calls enqueue_sprite_attr_record, returns 1. 26 callers all in duel_field.
+
+Params: r0=ptr card_slot_entry_ptr; r1=u8 player_id [0..1]; r2=u8 zone_col; r3=u16 oam_attr (saved to r8); sp[0x18]=u16 attr_b; sp[0x1c]=u16 attr_c
+Returns: r0=u32 (1 if sprite enqueued; 0 if ineligible)
+Side effects: OAM sprite buffer write via enqueue_sprite_attr_record
+Constants: SPRITE_BASE_P0=0x0036; SPRITE_BASE_P1=0x8036

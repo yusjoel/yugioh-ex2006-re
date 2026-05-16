@@ -1,0 +1,6 @@
+Scans the specified player field_array_C (gP1LP+player*0x868+0x120, count from gP1LP+player*0x868+0x0c) for the first card with field6==0x16 (equip/continuous type). Returns 0-based slot index; returns -1 (via rsbs r0,r0,#0) if no match. Skips card_id==0 slots. Symmetric sibling to find_field_zone_slot_with_fieldspell (0x08037894); only difference is field6 check value (0x16 vs 0x17). Caller FUN_0805e170 reads card byte[+2] bit0 as player param; result is bit-inverted (mvns+lsrs) before use as bool.
+
+Params: r0=u8 player_id [0..1]
+Returns: r0=s32 slot index (0-based) if found; -1 if not found
+Side effects: none (read-only)
+Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c; EQUIP_FIELD6=0x16

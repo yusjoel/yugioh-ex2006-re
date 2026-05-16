@@ -1,0 +1,6 @@
+Direct equip zone sprite enqueue without Banisher copy-count check. Reads slot fields directly from zone_slot_ptr. Called by FUN_08044618 and 6 rendering functions (card_frame/card_ids). r0=player_id [0..1], r1=zone_slot_ptr, r2=sub_zone_idx. Reads [r1,#0], extracts col_idx (bits[25:24]) and side_flag (bit[13]). attr_base: player_id==0 -> 0x33 (P1), else ldr 0x8033 (P2). sub_zone_idx XOR player_id bit0 -> H-flip bit (bit[11]). Calls enqueue_sprite_attr_record(attr_base, zone_type=0xb, sprite_attr, 0), then submit_lp_bar_sprite_row_by_type(0x1e, attr4). void return (pop{r0}; bx r0).
+
+Params: r0=u8 player_id [0..1]; r1=ptr zone_slot_ptr; r2=u8 sub_zone_idx
+Returns: void
+Side effects: OAM sprite buffer via enqueue_sprite_attr_record; LP bar sprite row via submit_lp_bar_sprite_row_by_type
+Constants: OAM_P1_BASE=0x33; OAM_P2_BASE=0x8033; ZONE_TYPE=0xb; LP_BAR_ROW=0x1e; HFLIP_BIT_SHIFT=0xb

@@ -1,0 +1,6 @@
+Fixed-card_type wrapper for enqueue_zone_slot_sprite_attr_by_card_type with card_type=0xa. Receives player_side/slot_idx/attr_a, zero-extends r1/r2 to 16-bit, injects card_type=0xa (equip special type) as r3, then tail-calls enqueue_zone_slot_sprite_attr_by_card_type. Callers need not supply card_type. Used in zone sprite update paths for equip-card-only scenarios. indeg>=4.
+
+Params: r0=u8 player_side [0..1]; r1=u16 slot_idx; r2=u16 attr_a
+Returns: void (tail call)
+Side effects: OAM sprite queue update via enqueue_zone_slot_sprite_attr_by_card_type
+Constants: CARD_TYPE_EQUIP_SPECIAL=0xa (injected as r3)

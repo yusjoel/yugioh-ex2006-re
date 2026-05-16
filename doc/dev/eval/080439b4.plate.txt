@@ -1,0 +1,6 @@
+Pre-filter wrapper for slot equip activation with eligibility check. First calls query_slot_card_type_eligibility(r0=player_side) to check card type eligibility. If nonzero (ineligible), returns 0 immediately. If 0 (eligible), sets sp[0]=0 (side_flag forced to 0), calls apply_slot_equip_activation_with_sprite with (slot_idx, extra, card_info, sp[0x14]=5th stack param), and propagates its return value. Multiple duel_field callers in equip activation sprite refresh path.
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u16 extra; r3=u32 card_info; sp[0x14]=5th stack param
+Returns: r0=u32 (propagated from apply_slot_equip_activation_with_sprite; 0 if ineligible)
+Side effects: equip activation and sprite update via apply_slot_equip_activation_with_sprite
+Constants: ELIGIBILITY_FAIL=nonzero; SIDE_FLAG_ZERO=0 (fixed sp[0])

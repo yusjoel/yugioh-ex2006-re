@@ -1,0 +1,6 @@
+Equip chain slot sprite enqueue with cross-field pair lookup. Receives player_side/slot_idx packed params, calls find_equip_chain_pair_across_field to locate the opposite side equip chain pair. If not found (returns 0xffff), falls back to card_type=0xa and calls enqueue_zone_slot_sprite_attr_by_card_type. If found, calls find_equip_chain_node_by_slot_pair to locate chain node, then calls enqueue_equip_chain_slot_sprite_attr to write equip chain slot sprite attrs, then calls enqueue_zone_slot_sprite_attr_by_card_type for zone sprite update. 3 duel_field callers in equip activation sprite refresh path.
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx
+Returns: void
+Side effects: OAM sprite buffer writes via enqueue_equip_chain_slot_sprite_attr and enqueue_zone_slot_sprite_attr_by_card_type
+Constants: NO_PAIR=0xffff; CARD_TYPE_EQUIP_FALLBACK=0xa

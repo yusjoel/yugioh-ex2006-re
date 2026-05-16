@@ -1,0 +1,6 @@
+Hand-zone sprite enqueue using find_hand_slot_idx_by_set_code_alt variant with zone_slot_ptr data. Called only by FUN_08077318 (indeg=1). r0=card_struct_ptr (struct[+2]=player_id_byte, struct[+6]=zone_flags_byte), r1=some_ptr, r2=zone_slot_ptr. Reads [zone_slot_ptr,#0] slot word, extracts col_idx and side_flag, passes to find_hand_slot_idx_by_set_code_alt. If not found (return<0), returns 0. If found: reads struct[+2] bit0 as player_id, reads [r1,#2] bit0 as additional flag. Selects OAM base 0x3f; attr1 includes col_idx/side_flag/player_id combo; attr2=0x1e|player_bit. Calls enqueue_sprite_attr_record. If check_card_type_is_spell returns 0 (non-spell), also calls enqueue_sprite_attr_with_type_select. Returns 1 on success. r8 (=r0 callee-save = card_struct_ptr) preserved across bl calls.
+
+Params: r0=ptr card_struct_ptr ([+2]=player_id_byte, [+6]=zone_flags_byte); r1=ptr some_ptr; r2=ptr zone_slot_ptr
+Returns: r0=u32 (1 if enqueued; 0 if slot not found)
+Side effects: OAM sprite buffer via enqueue_sprite_attr_record (and optionally enqueue_sprite_attr_with_type_select)
+Constants: OAM_ATTR0=0x3f; OAM_ROW_TYPE=0x1e; PLAYER_STRIDE=0x868

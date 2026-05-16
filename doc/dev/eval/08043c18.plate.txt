@@ -1,0 +1,6 @@
+Field slot equip sprite dispatch by card field6 type. Receives player_side/slot_idx/card_info/slot_offset. Reads slot card_id and calls check_card_field8_is_9; if field8!=9, sets internal flag and calls count_field_copies_of_card(0x135d) to check on-field copy count. If nonzero (duplicate present), skips. Otherwise selects path by field6: 0x17 (field spell) -> check_slot_fieldspell_eligible_by_side; 0x16 (equip/trap) -> query_slot_effect_eligibility_nonzero. If eligible, calls enqueue_slot_sprite_attr_by_card_type_and_state or invoke_equip_activation_with_zero_flag based on slot state. 4 duel_field callers in equip zone sprite state machine refresh.
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u32 card_info; r3=u8 slot_offset
+Returns: void
+Side effects: OAM sprite buffer and equip activation state via callee functions
+Constants: CARD_ID_CHECK=0x135d; FIELD6_FIELD_SPELL=0x17; FIELD6_EQUIP_TRAP=0x16; gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868

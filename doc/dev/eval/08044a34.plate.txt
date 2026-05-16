@@ -1,0 +1,6 @@
+Scans player hand array for zone_slot set_code match, enqueues sprite and submits LP bar row on hit. Called by FUN_08044a28 (r2=1) and FUN_0807cef0 (r2=0). r0=player_id [0..1], r1=zone_slot_ptr, r2=h_flip_flag [0..1]. Saves r0 to r9 (callee-save). Extracts set_code from zone_slot_ptr[#0] (col_idx<<1|side_flag). Computes hand array base=gP1LifePoints+0x10+player_id*0x868; if count==0 returns 0. Iterates hand array: reads each card col_side field (bits[25:24]<<1|bit[13]); if matches set_code: modifies hand slot attr (mask=0xfffffdff clear bit9, OR sp[8] H-flip bit, OR 0x400, mask=0xfffffe00); calls enqueue_sprite_attr_record(attr_base, 0x1a, sprite_attr, 0); if h_flip_flag!=0 calls enqueue_sprite_attr_with_type_select; if zone card_id==0x17cc (Watapon) calls apply_equip_activation_with_id_lookup; calls submit_lp_bar_sprite_row_by_type(0x1a, attr); returns 1. Returns 0 if no match.
+
+Params: r0=u8 player_id [0..1]; r1=ptr zone_slot_ptr; r2=u8 h_flip_flag [0..1]
+Returns: r0=u32 (1 if enqueued; 0 if no match)
+Side effects: EWRAM hand slot attr field modified; OAM sprite buffer via enqueue_sprite_attr_record; LP bar row via submit_lp_bar_sprite_row_by_type
+Constants: PLAYER_STRIDE=0x868; HAND_BASE_OFFSET=0x10; ATTR_CLEAR_MASK=0xfffffdff; ATTR_KEEP_MASK=0xfffffe00; ROW_TYPE=0x1a; CARD_ID_WATAPON=0x17cc

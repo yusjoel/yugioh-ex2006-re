@@ -1,0 +1,6 @@
+Called by 8 duel_field paths (including FUN_080576b0: card_frame;card_ids;card_stats;duel_field). Updates equip target bitmap with fixed zone_flags=0xf (15, full zone coverage). Computes slot_bit=1<<(r1*0x10+r2). Calls update_equip_target_bitmap_for_field(player_id=r0, slot_bit, zone_flags=0xf, side_flags=caller_r3). r3 not set in function body; passed by caller (observed: 0x0805779e callsite movs r3,#0 -> side_flags=0). Returns 1 if bitmap & slot_bit != 0, else 0. Sibling to update_equip_target_bitmap_zone14 (0x08047a14, zone=0xe, side=0xa).
+
+Params: r0=u8 player_id [0..1]; r1=u8 player_ref [0..1]; r2=u8 slot_idx [0..9]; r3=u8 side_flags (caller-provided)
+Returns: r0=u32 bool (1 if slot_bit in bitmap; 0 otherwise)
+Side effects: equip target bitmap updated via update_equip_target_bitmap_for_field
+Constants: ZONE_FLAGS=0xf (bits[3:0] all set -- all 4 zones); SIDE_FLAGS=caller_r3 (observed: 0)

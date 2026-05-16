@@ -1,0 +1,6 @@
+Called by equip chain display refresh path (FUN_0806e898, FUN_080744f8, both duel_field). Phase 1: packs r0(player_id), r1(display_slot_mask), r2(tile_attr), r3(flags) and 3 stack args into OAM sprite record with attr0=0x41 (P1)/0x8041 (P2), enqueues via enqueue_sprite_attr_record. Phase 2: reads equip chain head ref-count from gP1LifePoints+0x10c+player*0x868+0xa; if nonzero, iterates equip_node_pool (0x0201d9c0, stride=8); for nodes with zone_type<=5 and card_type in [0x17d2, 0x17d5, 0x1814], calls enqueue_sprite_attr_with_mode to generate secondary sprites.
+
+Params: r0=u8 player_id [0..1]; r1=u16 display_slot_mask; r2=u16 tile_attr; r3=u16 flags; plus 3 stack args
+Returns: void
+Side effects: OAM sprite attr queue (two enqueue calls)
+Constants: EQUIP_NODE_POOL=0x0201d9c0; EQUIP_CHAIN_BASE=0x0201c5ec; PLAYER_STRIDE=0x868; CHAIN_HEAD_OFFSET=0xa; OAM_P1=0x41; OAM_P2=0x8041; CARD_TYPE_A=0x17d5; CARD_TYPE_B=0x17d2; CARD_TYPE_C=0x1814; NODE_ZONE_TYPE_MAX=5

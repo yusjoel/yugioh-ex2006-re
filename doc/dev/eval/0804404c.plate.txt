@@ -1,0 +1,6 @@
+Hand-zone sprite enqueue based on spell type. r0=player_id [0..1], r1=packed_set_code (cols<<1|side), r2=h_flip_flag [0..1]. Calls find_hand_slot_idx_by_set_code(r0, r1) to locate hand slot; if return <0, returns 0 (not found). If found: reads slot card low 13 bits as card_type_id from gP1LifePoints+0x87*4+player*stride, calls check_card_type_is_spell; if spell -> row_attr=0xc, else row_attr=0xd. h_flip_flag==0 -> flip_bit=1 (P2 dir), else flip_bit=0. Assembles attr1/attr2/attr3, calls enqueue_sprite_attr_record(0x3f, attr1, attr2, 0). Returns 1 on success, 0 if not found. Multiple duel_field callers.
+
+Params: r0=u8 player_id [0..1]; r1=u16 packed_set_code (cols<<1|side); r2=u8 h_flip_flag [0..1]
+Returns: r0=u32 (1 if sprite enqueued; 0 if slot not found)
+Side effects: OAM sprite buffer write via enqueue_sprite_attr_record
+Constants: OAM_ATTR0=0x3f; ROW_SPELL=0xc; ROW_NON_SPELL=0xd; FIELD_STRIDE=0x87*4=0x21c

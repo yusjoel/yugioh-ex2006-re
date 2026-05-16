@@ -1,0 +1,6 @@
+Called by FUN_08072890 and FUN_0807c158 (indeg=2). Displays multi-slot selection marker sprite when multiple equip slots simultaneously meet activation conditions. Reads display control word r7 from gP1LifePoints+0x1ce0 (chain_entry_base=0x0201e1c0). Iterates gDuelFieldSlots[player*0x868+slot*0x14] slots 0..4: checks bit12 (active flag), slot[+8]==0 (not locked), slot[+6]!=0 (has equip chain head); if all 3 -> r5++. Clears corresponding bits in r4 (bitmask) for non-qualifying slots. If r5>1 (multiple qualifying): selects attr0=0x48 (P1) or 0x8048 (P2), splits r7 into two halfwords as attr1/attr2, truncates r4 as r3; calls enqueue_sprite_attr_record. OAM write is conditional (requires r5>1).
+
+Params: r0=u8 player_id [0..1]
+Returns: void
+Side effects: OAM sprite attr queue conditional write via enqueue_sprite_attr_record
+Constants: CHAIN_ENTRY_BASE=0x0201e1c0; gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14; SLOT_COUNT=5; OAM_P1=0x48; OAM_P2=0x8048

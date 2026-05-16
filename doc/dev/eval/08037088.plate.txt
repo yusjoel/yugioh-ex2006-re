@@ -1,0 +1,6 @@
+Searches the specified player graveyard array (base gP1LP+player*0x868+0x418, count from gP1LP+player*0x868+0x14) by pointer match, returns 1-based index of first matching entry. r0=player_id, r1=target_ptr (slot pointer, saved to r7). Computes graveyard base gP1LP+player*0x868+0x83*8, iterates each entry calling check_deref_words_equal(card_entry_ptr, target_ptr); on hit returns index+1 (1-based). Returns 0 if not found. 3 callers (0x08044674, 0x08044714, 0x080448a0) all in duel_field, used to confirm slot exists in graveyard.
+
+Params: r0=u8 player_id [0..1]; r1=ptr target_ptr (slot pointer to match)
+Returns: r0=u32 1-based index if found; 0 if not found
+Side effects: none (read-only)
+Constants: GY_BASE_OFFSET=0x83<<3=0x418; GY_COUNT_OFFSET=0x14

@@ -1,0 +1,6 @@
+Equip slot bitmap update function for type_d (chain node type 0xd). Receives player_side/slot_idx, calls find_equip_chain_node_by_type_d to find type-0xd node in the slot equip chain. If not found (returns 0xffff), returns immediately. If found, extracts entity_player/entity_slot fields from node info, reads corresponding slot card_id from gDuelFieldSlots (lsls#0x13, low 13 bits), then calls enqueue_equip_slot_bitmap_update(entity_player, entity_slot, card_id, 1). indeg=0 (isolated function, no bl callers, no pointer table refs).
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx
+Returns: void
+Side effects: equip slot bitmap update via enqueue_equip_slot_bitmap_update
+Constants: NO_NODE=0xffff; gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; WRITE_FLAG=1

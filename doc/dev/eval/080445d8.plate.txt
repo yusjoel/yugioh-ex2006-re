@@ -1,0 +1,6 @@
+Banisher of the Light (card_id=0x1332) equip zone sprite dispatch wrapper with LP row type fixed to 1. Called by 4 duel_field rendering functions. r0=player_id [0..1], r1=slot_idx (s16; <0 -> skips). Symmetric to sibling family: calls get_zone_slot_ptr(slot_idx, zone=0xb) then count_field_copies_of_card(0x1332) to determine zone_state=0xe (0 copies) or 0xf (>=1 copy). Sets sp[0]=0 (no H-flip), sp[4]=1 (LP row type), r2=0, calls dispatch_equip_zone_sprite_and_activation. Named siblings: dispatch_equip_zone_sprite_banisher_of_the_light (sp[0]=1,sp[4]=0); dispatch_equip_zone_sprite_banisher_lp_row2 (sp[0]=1,sp[4]=2). void return.
+
+Params: r0=u8 player_id [0..1]; r1=s16 slot_idx
+Returns: void
+Side effects: OAM sprite buffer and equip activation state via dispatch_equip_zone_sprite_and_activation
+Constants: CARD_ID_BANISHER=0x1332 (Banisher of the Light); ZONE_TYPE=0xb; ZONE_STATE_INACTIVE=0xe; ZONE_STATE_ACTIVE=0xf; NO_HFLIP_FLAG=0; LP_ROW_TYPE=1

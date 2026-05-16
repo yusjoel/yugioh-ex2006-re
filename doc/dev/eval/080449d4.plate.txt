@@ -1,0 +1,6 @@
+Equip zone OAM sprite attribute enqueue, shape_a variant (attr2 base=0x5c). Called by 3 duel_field rendering functions. r0=player_id [0..1], r1=packed_col_row (8-bit col/row encoding). Assembles attr1: (player_id&1)|0x1e|(r1&0xff)<<6|(player_id&1). Assembles attr2: (player_id&1)|0x1c|0x40=(player_id&1)|0x5c. Fixed attr0=0x3f, attr3=0. Calls enqueue_sprite_attr_record(0x3f, attr1, attr2, 0). Sibling to enqueue_equip_zone_sprite_attr_shape_b (0x08044a00); only difference is attr2 base value (0x5c vs 0x1a). void return (pop{r0}; bx r0).
+
+Params: r0=u8 player_id [0..1]; r1=u8 packed_col_row
+Returns: void
+Side effects: OAM sprite buffer write (attr0=0x3f record) via enqueue_sprite_attr_record
+Constants: OAM_ATTR0=0x3f; OAM_ATTR2_BASE_A=0x5c (=0x1c|0x40); OAM_ROW_TYPE=0x1e; PLAYER_BIT_MASK=0x1

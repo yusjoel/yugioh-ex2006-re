@@ -1,0 +1,6 @@
+Equip zone OAM sprite attribute enqueue. Receives player_side/slot_idx/attr_a/attr_b parameters. Selects OAM attr0 base by player_side bit0 (P0=0x36, P1=0x8036), merges slot_idx with 0x8000 high-bit flag as attr1 word, then calls enqueue_sprite_attr_record to write sprite attribute to OAM queue. Called by FUN_0806d4a4 (duel_field) in equip zone card sprite update path.
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u16 attr_a; r3=u16 attr_b
+Returns: void
+Side effects: OAM sprite queue write via enqueue_sprite_attr_record
+Constants: OAM_ATTR0_P0=0x36; OAM_ATTR0_P1=0x8036 (bit15=1 for P2)

@@ -1,0 +1,6 @@
+Iterates all cards in the specified player field_array_C (gP1LifePoints+player*0x868+0x120, count from +0x0c). For each card, extracts bits[12:0] as card_icid and calls get_card_extended_stat_field7; if return value equals target r8 (saved at entry via mov r8,r1; non-APCS), increments counter. Returns total count. Symmetric to count_gy_cards_by_field6 (0x08037974); differs in stat field (field7 vs field6) and array region (field_zone vs graveyard). Pure read-only.
+
+Params: r0=u8 player_id [0..1]; r1=u8 field7_target (saved to r8 via mov r8,r1) [0..255]
+Returns: r0=u32 count of field_zone cards where field7==r8
+Side effects: none (read-only)
+Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c

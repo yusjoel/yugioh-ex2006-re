@@ -1,0 +1,6 @@
+Equip zone sprite enqueue accepting pre-computed 16-bit sprite_attr directly instead of h_flip flag. Called only by FUN_0807fde8 (card_frame/card_ids/duel_field, indeg=1). r0=player_id [0..1], r1=zone_slot_ptr, r2=sprite_attr_u16. Highly similar to enqueue_equip_zone_sprite_by_slot_ptr (0x08044970): same player_id -> attr_base selection (0x33/0x8033), same [r1,#0] col_idx and side_flag extraction, same enqueue_sprite_attr_record(attr_base, 0xe, ...). Difference: r2 (sprite_attr_u16) is truncated to 16-bit via lsls/lsrs#0x10 and passed directly as 3rd arg without nonzero conversion. Suitable when caller already knows exact OAM attr value. void return (pop{r0}; bx r0).
+
+Params: r0=u8 player_id [0..1]; r1=ptr zone_slot_ptr; r2=u16 sprite_attr_u16
+Returns: void
+Side effects: OAM sprite buffer write (row_type=0xe record) via enqueue_sprite_attr_record
+Constants: OAM_P1_BASE=0x33; OAM_P2_BASE=0x8033; ROW_TYPE=0xe

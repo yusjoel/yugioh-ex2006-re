@@ -1,0 +1,6 @@
+Called by FUN_08080c9c (indeg=1, no tags) in duel_field equip slot sprite enqueue cluster. Enqueues one OAM sprite record for the specified player equip slot position. Selects attr0 by player_id: P1=0x29, P2=0x8029. Truncates r1 (tile_position) to 16-bit as attr1. Fixed attr2=0, attr3=0. Calls enqueue_sprite_attr_record. Symmetric siblings: FUN_08044ca4 (identical structure) and FUN_08044cc4 (attr3=2).
+
+Params: r0=u8 player_id [0..1]; r1=u16 tile_position
+Returns: void
+Side effects: OAM sprite attr queue write via enqueue_sprite_attr_record
+Constants: OAM_P1=0x29 (y=41, square, normal); OAM_P2=0x8029 (bit15=1 for P2)

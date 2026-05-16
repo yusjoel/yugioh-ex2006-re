@@ -1,0 +1,6 @@
+Checks equip card activation prerequisites for the specified zone slot (player r1, slot_idx r2) before full check_card_equip_eligible_for_slot. Check chain: (1) slot card_id==0 -> return 0 (empty slot, eligible); (2) slot[+8] halfword==0 -> return 1 (no equip link, cannot activate); (3) global flag [0x0201b74c]!=0 -> return 1 (globally disabled); (4) slot_idx>4: skip level check; (5) slot_idx<=4: read slot[+0x10] bit5; if 0, check card_id in [0x1386..0x1388] -> return 0. Effect zone path: calls get_slot_card_state_code; state==1 -> calls count_field_copies_of_card(0x128b=Lord of D.) and count_field_copies_of_card(0x1879=King Dragun), then count_available_effect_zones; if 0 -> return 1. Final: card_id in [0x17d2..0x17d4] (Horus cluster) check with 0x17dc (Horus' Servant) as arg. Returns 0=prerequisites met, 1=failed. 92 callers.
+
+Params: r0=ptr card_ptr ([+2] bit0=player side flag; saved to r8) [0..1]; r1=u8 player_id [0..1]; r2=u8 slot_idx [0..9]
+Returns: r0=u32 bool (0=prerequisites met; 1=prerequisites failed)
+Side effects: none (read-only)
+Constants: PLAYER_STRIDE=0x868; gDuelFieldSlots=0x0201c510; GLOBAL_FLAG_ADDR=0x0201b74c; LORD_OF_D_ID=0x128b; KING_DRAGUN_ID=0x1879; CARD_ID_RANGE=[0x1386..0x1388]; HORUS_LV8_ID=0x17d4; HORUS_SERVANT_ID=0x17dc

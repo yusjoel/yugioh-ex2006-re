@@ -1,0 +1,6 @@
+Face-down/flip-position card OAM sprite attribute enqueue. Receives player_side/slot_idx/flip_flag. Calls get_zone_slot_ptr(player_side, 0xb, slot_idx) to get slot ptr (zone_type=0xb fixed). Extracts from slot word: bit13 (flip state, lsls#0x12/lsrs#0x1f -> r5) and bits[21:14] (position sub-field, lsls#0x02/lsrs#0x18 -> r0). flip_flag==0: r7=1 (force flip); flip_flag!=0: r7=0. Assembles player_side|0x16 -> r6 (OAM attr0 low byte), flip_bit|0x1a -> r5 (attr1 low byte), position_subfield*2+r5 -> attr1. Calls enqueue_sprite_attr_record with tile=0x3f. 2 callers (card_frame+duel_field).
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u8 flip_flag [0..1]
+Returns: void
+Side effects: OAM sprite buffer write via enqueue_sprite_attr_record
+Constants: ZONE_TYPE=0xb; OAM_ATTR0_BASE=0x16; OAM_ATTR1_BASE=0x1a; OAM_TILE_IDX=0x3f

@@ -1,0 +1,6 @@
+Conditional field slot sprite attribute enqueue. Receives player_side/slot_idx/packed_col three params, reads gDuelFieldSlots slot word, checks via lsls#0x13 whether bits[12:0] (card_id) is nonzero. If slot empty, returns immediately. Otherwise selects OAM attr0 base by player_side (P0=0x35, P1=0x8035), combines slot_idx and packed_col as attr1, fixes r3=8 (OAM tile count), calls enqueue_sprite_attr_record to write OAM buffer. Multiple duel_field callers use this to refresh zone OAM sprite only when a card is present.
+
+Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u16 packed_col
+Returns: void
+Side effects: OAM sprite buffer write via enqueue_sprite_attr_record (conditional on card present)
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; OAM_ATTR0_P0=0x35; OAM_ATTR0_P1=0x8035; OAM_TILE_COUNT=8
