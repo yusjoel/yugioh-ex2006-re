@@ -1,0 +1,6 @@
+Called by duel_field equip card condition chain (indeg=5, callers: 0x0807fbf4/0x0807fcf0/0x0807ff24/0x08080526/0x08080768). Checks whether card_id belongs to equip exclusion set F. BST: IDs 0x18fb-0x18fd interval, 0x14c7, 0x14da, 0x1936, 0x1955, 0x19d6, and others are excluded (return 0); all others return 1. NOTE: return value semantics are inverted relative to equip_set series -- 0=hit/excluded, 1=not excluded.
+
+Inputs: r0=u16 card_id [0..0x1fff].
+Outputs: r0=u32 bool (0=excluded, 1=not excluded).
+Side effects: none.
+Constants: ANCHOR_ROOT=0x18fd, ANCHOR_B=0x14c7, ANCHOR_C=0x14da, ANCHOR_D=0x1955, ANCHOR_E=0x19d6.

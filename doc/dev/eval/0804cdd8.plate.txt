@@ -1,0 +1,8 @@
+indeg=0, called via function pointer dispatch. Accepts card slot struct pointer in r0, runs multi-layer condition filter to determine whether the slot is eligible for activation.
+
+Filter steps: (1) [r4+3] bits[5:4]==0x20 -> return 0 (rejected); (2) [r4+4] bit3 set -> return 1 (force-allowed); (3) card_id (ldrh [r4+0]) -> check_card_field5_is_nonzero -> nonzero -> return 0; (4) get_card_extended_stat_field9 -> result in [2..4] -> return 0; (5) BST whitelist match on card_id: on hit extracts [r4+4] bits[29:28]>>0x1d>>0x1f (1-bit field) as return value; on BST miss returns 1.
+
+Inputs: r0=u32* card_slot_ptr ([+0]=card_id, [+3]=flag_byte_a, [+4]=flag_byte_b); ptr saved to r4.
+Outputs: r0=u32 bool (0=not eligible, 1=eligible; BST whitelist hit returns 1-bit field from flag_byte_b[29]).
+Side effects: none.
+Constants: FLAG_A_BITS=0x30 (bits[5:4] of [r4+3]); FLAG_A_REJECT=0x20; FLAG_B_BIT3=0x8; BST_ROOT=0x1238; BST_B=0x1102; BST_C=0x0fee; BST_D=0x1231; BST_E=0x1514; BST_F=0x159c; BST_G=0xa0*0x20=0x1400; BST_H=0xcc*0x20=0x1980.

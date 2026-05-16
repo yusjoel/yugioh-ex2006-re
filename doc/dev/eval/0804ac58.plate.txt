@@ -1,0 +1,6 @@
+Called by banlist scan loop (0x080eefd0, 0x080ef1da, indeg=2). Maps an input card_id to the canonical ID used in the banlist table. If input==0x0fc9, returns 0x142d; if input==0x0fa6, returns 0x0fa7; if input falls in specific mid-range IDs, maps to corresponding representative ID; otherwise returns input unchanged. Pure leaf function, no callees, no side effects.
+
+Inputs: r0=u16 card_id [0..0x1fff].
+Outputs: r0=u16 canonical_id (mapped or unchanged).
+Side effects: none.
+Constants: CARD_ID_SPECIAL_A=0x0fc9, CARD_ID_SPECIAL_B=0x0fa6, CARD_ID_BLUE_EYES=0x0fa7, CARD_ID_SPECIAL_C=0x142d, CARD_ID_BOUNDARY_D=0x1303, CARD_ID_BOUNDARY_E=0x12e5.

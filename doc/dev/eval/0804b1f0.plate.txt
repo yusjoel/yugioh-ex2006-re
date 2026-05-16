@@ -1,0 +1,6 @@
+Called by duel_field effect slot handler (0x08050bee). Checks whether card_id belongs to effect monster subtype group C. BST whitelist covers range [0x166b..0x16b4], discrete ID 0x1681, [0x16cf..0x16cf], 0x17ee, [0x1945..0x1946] and other intervals. Returns 1 if member, 0 otherwise. Pure leaf, no callees, no side effects.
+
+Inputs: r0=u16 card_id [0..0x1fff].
+Outputs: r0=u32 bool (1=member, 0=not).
+Side effects: none.
+Constants: RANGE_MAX=0x16b4, ID_ANCHOR_A=0x1681, ID_ANCHOR_B=0x17ee, ID_ANCHOR_C=0x16cf, ID_ANCHOR_D=0x1946.

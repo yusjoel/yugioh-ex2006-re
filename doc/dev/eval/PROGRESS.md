@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 140 + 剩余 626 (32 批 #86..#117 / 20 每批) |
-| **下一批** | `#86` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #85, 140/766 = 18.28%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 160 + 剩余 606 (31 批 #87..#117 / 20 每批) |
+| **下一批** | `#87` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #86, 160/766 = 20.89%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,13 +78,14 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**140 / 766 已分析** (18.28%, 剩余 32 批待跑 #86..#117)
+**160 / 766 已分析** (20.89%, 剩余 31 批待跑 #87..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
 - batch #83 `c9c5102` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
 - batch #84 `3654958` 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
 - batch #85 `220ef3d` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
+- batch #86 `(pending)` 160/766 (20.89%) — equip set BST whitelist cluster + banlist canonical map + zone rank3 compaction
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -93,9 +94,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#85) | 140 |
-| - 剩余 (按 20/批 重组) | 626 |
-| 剩余分批数 (20/批) | 32 (`#86..#117`) |
+| - 已完成 (Phase 2 #82-#86) | 160 |
+| - 剩余 (按 20/批 重组) | 606 |
+| 剩余分批数 (20/批) | 31 (`#87..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 

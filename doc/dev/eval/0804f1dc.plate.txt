@@ -1,0 +1,6 @@
+Triggered implicitly by dispatch_equip_field_update_by_anim_state (0x0804f2e0) as a pre-compaction step. Scans the equip zone list at gP1LifePoints (0x0201b290) base+0x91*8=0x488, copies all equip zone entries with rank==3 compactly (0x18 bytes each via copy_bytes_by_halfword) to destination buffer at base+0x90*8=0x480, and updates the count field. After copy, clears [base+0x92*8] and [base+0x494]; writes [base+0x48c] as nonzero flag (rsb/orr/lsr pattern: count>0 -> 1). Always returns r0=1 (caller does not use return value).
+
+Inputs: no APCS params (r0 overwritten at prologue); r8 and r9 are inherited from parent frame (parent callee-save registers preserved via .hword 0x4646=mov r6,r8 and .hword 0x464f=mov r7,r9 then push, restored via mov r8,r3/mov r9,r4 at exit; function logic does not use their values).
+Outputs: r0=u32 1 (always; caller treats as void).
+Side effects: [0x0201b290+0x480] := strh count (rank-3 entries found); [0x0201b290+0x48c] := u32 nonzero flag; [0x0201b290+0x490] := u32 0; [0x0201b290+0x494] := u32 0.
+Constants: BASE=0x0201b290; DST_COUNT_OFFSET=0x90*8=0x480; SRC_LIST_OFFSET=0x91*8=0x488; CLEAR_FIELD_A=0x92*8=0x490; CLEAR_FIELD_B=0x494; ENTRY_SIZE=0x18; ANIM_STATE_OFFSET=0x48c; QUEUE_STATE_OFFSET=0x494; DELTA_STRIDE=0xfffffb80=-0x480.

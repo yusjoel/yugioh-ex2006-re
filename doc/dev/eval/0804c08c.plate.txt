@@ -1,0 +1,6 @@
+Called by duel_field equip card placement check chain (indeg=6, callers: 0x0807f9d6/0x0807fa4a/0x0807fc9a/0x0807fd4e/0x08080036 and others). BST whitelist: 0x1228, 0x10a8, 0x10b3, range [0x179c..0x1872], and others. Returns 1 if member, 0 otherwise. Fifth equip card ID whitelist checker; pure leaf function.
+
+Inputs: r0=u16 card_id [0..0x1fff].
+Outputs: r0=u32 bool (1=member of equip set E, 0=not).
+Side effects: none.
+Constants: ANCHOR_ROOT=0x1228, ANCHOR_B=0x10a8, ANCHOR_C=0x10b3, ANCHOR_D=0x179c.

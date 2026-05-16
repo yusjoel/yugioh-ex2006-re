@@ -1,0 +1,6 @@
+indeg=0, called via function pointer. Most complex equip slot eligibility checker in its cluster. After slot_idx<=4 + card_type_bits!=0 + [slot+8]!=0 pre-filters, calls query_slot_card_type_eligibility; on pass, dispatches by card_id (ldrh [r7+0]) via BST: hit on 0x17b3 -> check_slot_card_is_equip_type; hit on 0x15df -> eval_equip_chain_score_for_slot then compare vs [r7+0xc]; hit on 0x12cb -> read slot field at offset 0x1cb8 from gDuelFieldSlots; hit on 0x16e1 -> inline eor-rsb-orr-lsr bit logic; hit on 0x1988 -> check_card_id_is_normal_summon_type; BST miss -> return 0. Returns bool (1=eligible, 0=not). Note: .hword 0x4647=mov r7,r8 at entry saves parent r8 which is then used as internal constant base for gDuelFieldSlots.
+
+Inputs: r0=u32* card_ptr (saved to r7; [+0]=card_id); r1=u32 player_side [0..1] (saved to r6); r2=u32 slot_idx [0..4] (saved to r4).
+Outputs: r0=u32 bool (1=eligible; 0=not eligible or BST miss).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_IDX_MAX=4; BST_ROOT=0x17b3; BST_B=0x15df; BST_C=0x12cb; BST_D=0x16e1; BST_E=0x1988; BST_F=0x1840; SPECIAL_ID=0x18a7; SLOT_FIELD_OFFSET=0x1cb8.

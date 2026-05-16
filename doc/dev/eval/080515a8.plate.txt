@@ -1,0 +1,6 @@
+indeg=0, called via function pointer. Same cluster as 080507ac/080508cc, differing in final eligibility condition. Four pre-filters: player_side not equal to card_ptr[+2] bit0; slot_idx<=4; card_type_bits!=0; [slot+8]!=0. After filters, checks [card_ptr+6] low 3 bytes for field5 flag group (movs r0,#0x1c; ands r0,r1): if field5_flags==0 -> return 1 directly (no restriction). Otherwise calls get_slot_field5_score(player_side, slot_idx) and compares result to [card_ptr+8] halfword (threshold_score): equal -> return 1, not equal -> return 0.
+
+Inputs: r0=u32* card_ptr (saved to r5; [+2]=owner_bits, [+6]=field5_flags, [+8]=threshold_score); r1=u32 player_side [0..1] (saved to r4); r2=u32 slot_idx [0..4] (saved to r3).
+Outputs: r0=u32 bool (1=eligible, 0=not eligible).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_IDX_MAX=4; FIELD5_FLAG_MASK=0x1c (bits[4:2] of [r5+6]).

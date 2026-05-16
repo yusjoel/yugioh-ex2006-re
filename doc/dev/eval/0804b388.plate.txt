@@ -1,0 +1,6 @@
+Called by duel_field placement checker (0x080547fc, passes r1=0 to use stack output) and AI logic (0x0808752c). Accepts card_id (r0) and output pointer r1 (if r1==0, uses sp via mov r1,sp). Maps card_id to evolution target IDs via BST: if 1 target found, writes [r1]=target_id and returns 1; if 2 targets found, writes [r1]=id_a and [r1+4]=id_b and returns 2; if no match, returns 0. All matching card_ids are in the range 0x17D1-0x17DA (specific evolution/link card group). Pure leaf, no further callees.
+
+Inputs: r0=u16 card_id [0..0x1fff], r1=u32* output_ptr (0 means use sp).
+Outputs: r0=u32 target_count [0..2].
+Side effects: [r1+0] := target_id_1 (if count>=1); [r1+4] := target_id_2 (if count==2).
+Constants: CARD_ANCHOR_0=0x17da, CARD_ANCHOR_1=0x17d5, CARD_ANCHOR_2=0x17d2, CARD_ANCHOR_3=0x17d3, CARD_ANCHOR_4=0x17d4, CARD_TARGET_A=0x17d1, CARD_TARGET_B=0x1822, CARD_TARGET_C=0x17d3, CARD_TARGET_D=0x17d4, CARD_TARGET_E=0x1823.

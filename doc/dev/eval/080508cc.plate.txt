@@ -1,0 +1,6 @@
+indeg=0, called via function pointer. Same cluster as check_equip_slot_eligible_by_type_query (0x080507ac) but with a different call chain. Same slot_idx<=4 and card_type_bits!=0 pre-filters. Call sequence: (1) check_slot_equip_whitelist_with_monster_space(player, slot, card_id) where card_id=ldrh [r6+0] -> zero means ineligible, returns 0; (2) query_slot_card_type_eligibility(card_ptr, player, slot) -> nonzero means ineligible, returns 0. Both checks passing -> returns 1. Difference from 080507ac: uses whitelist check instead of check_card_equip_eligible_for_slot, and passes card_id as third param.
+
+Inputs: r0=u32* card_ptr ([+0]=card_id halfword); r1=u32 player_side [0..1]; r2=u32 slot_idx [0..4].
+Outputs: r0=u32 bool (1=eligible, 0=not eligible).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14; SLOT_IDX_MAX=4.

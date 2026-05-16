@@ -1,0 +1,6 @@
+Called by LP bar UI frame update functions (indeg=5+, e.g. 0x080664ee, 0x08067496, 0x08067c8a). Enqueues a sprite attribute record with type=0xA and a u16 halfword parameter. Entry clobbers r0 via lsls/lsrs to truncate to low 16 bits before passing as r1 to enqueue_sprite_attr_record. Exits via pop{r0};bx r0 tail-call; return value of enqueue_sprite_attr_record is discarded by callers.
+
+Inputs: r0=u16 halfword_param [0..0xffff] (low 16 bits passed to enqueue_sprite_attr_record as r1).
+Outputs: void (pop{r0};bx r0 tail exit; r0 forwarded from enqueue_sprite_attr_record but callers ignore it).
+Side effects: appends one type=0xA record to the global sprite attribute queue via enqueue_sprite_attr_record.
+Constants: SPRITE_ATTR_TYPE=0xa.

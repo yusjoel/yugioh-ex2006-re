@@ -1,0 +1,6 @@
+Called by duel_field configuration logic (0x080547f0) and AI logic (0x080b5d4a). Checks whether card_id belongs to a specific effect monster subtype group B. BST whitelist covers three main intervals and several discrete IDs: 0x181a, 0x1814, range [0x1812..0x181c], 0x185e, 0x1906, 0x198c, etc. Returns 1 if card_id is a member, 0 otherwise. Pure leaf, no side effects.
+
+Inputs: r0=u16 card_id [0..0x1fff].
+Outputs: r0=u32 bool (1=member, 0=not member).
+Side effects: none.
+Constants: ID_ANCHOR_A=0x181a, ID_ANCHOR_B=0x1814, ID_ANCHOR_C=0x185e, ID_ANCHOR_D=0x1906, ID_ANCHOR_E=0x198c.
