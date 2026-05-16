@@ -1,0 +1,5 @@
+Computes floor(log2(n)) for 32-bit integer r0. Implementation: r1=0, arithmetic right-shift r0 by 1 and increment r1 until r0==0; return r1-1. If r0==0 returns -1 (r1=0, subs r0,r1,#1 -> -1). Callers FUN_08017478 and FUN_080174e8 use result as bit-width for image quantization step computation. Pure leaf, bx lr exit, no side effects.
+
+Params: r0=s32 n (input integer; n=0 returns -1; n>0 counts via signed right-shift)
+Returns: r0=s32 floor(log2(n)) if n>0; -1 if n<=0
+Side effects: none

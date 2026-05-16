@@ -1,0 +1,6 @@
+GL/GL_Scrollbar.c line 117: scroll one step forward. Asserts pThis non-null, reads [pThis+0x4]=current_pos, [pThis+0x6]=total_count, [pThis+0xb]=visible_count. If current_pos >= total_count-visible_count (at end), returns 0. Else current_pos+=1, writes back, returns 1. Used for scroll-down/right one slot. Return value lets caller detect whether scroll actually occurred.
+
+Params: r0=GL_Scrollbar* pThis (non-null assert)
+Returns: r0=u8 moved (1=advanced, 0=already at end; pop {r1}=lr, r0 preserved)
+Side effects: [pThis+0x4]:=current_pos+1 (u16, only when not at end)
+Constants: GL_Scrollbar.c:117 / current_pos=[pThis+0x4] / total_count=[pThis+0x6] / visible_count=[pThis+0xb]

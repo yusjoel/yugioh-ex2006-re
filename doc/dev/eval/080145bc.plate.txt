@@ -1,0 +1,6 @@
+Computes pixel width of mixed-encoding string r0, given full-width char width r1 (pixels). Flow: (1) call count_str_charlen(r0) -> charlen r2; (2) check encoding mode [EWRAM+0x6c2c]&0x7 and [0x0202348c]; (3) OCG path: pixel_width=r2*r1; TCG path: pixel_width=r2*(r1>>1). Caller game_str_08017b44 passes r1=10 to compute JP string pixel width for OBJ sprite centering.
+
+Params: r0=u8* str (mixed encoding, NUL-terminated); r1=u32 full_char_width_px (e.g. 10)
+Returns: r0=u32 pixel_width (total string pixel width)
+Side effects: none (pure read-only computation)
+Constants: 0x02006c2c=EWRAM encoding flag byte; 0x0202348c=TCG/OCG override; asrs r3,r4,#1=r1/2 (half-width)

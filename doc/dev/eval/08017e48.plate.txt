@@ -1,0 +1,6 @@
+Finds pointer to char_idx-th character in name-input buffer (game_state+0x8d). Mode from gSettings bit[2:0]: JP mode (non-zero) steps 1 byte per char; EN mode (zero) steps 2 bytes per char. Sets target byte position = index*12, iterates by step until target reached; returns current ptr on match. Returns NULL if NUL byte encountered before target.
+
+Params: r0=u8 char_idx [0..13] (JP max 14 chars; EN max 7 chars from check_name_char_limit_reached thresholds MAX_JP=14, MAX_EN=7)
+Returns: r0=u8* ptr to char_idx-th character, or NULL if out of range
+Side effects: none (read-only)
+Constants: NAME_BUF=0x02029250+0x8d=0x020292dd; LANG_MASK=0x7; STEP_JP=1; STEP_EN=2; TARGET_SCALE=12

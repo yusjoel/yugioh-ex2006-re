@@ -1,0 +1,6 @@
+Checks whether name-input buffer has reached max char count. Reads game_state+0x31f (current char count), selects threshold from gSettings bit[2:0]: JP mode (non-zero) threshold=14, EN mode (zero) threshold=7. Returns 1 if full (count>threshold), 0 if room remains. Caller FUN_08018098 uses result to pick cursor tile index (0x34=has room, 0x48=full).
+
+Params: r0=void (entry clobber: ldr r0,DAT overwrites r0)
+Returns: r0=u8 is_full (0=not full, 1=at limit)
+Side effects: none (read-only leaf)
+Constants: CHAR_COUNT_FIELD=0x02029250+0x31f=0x0202956f; LANG_MASK=0x7; MAX_EN=7; MAX_JP=14=0xe

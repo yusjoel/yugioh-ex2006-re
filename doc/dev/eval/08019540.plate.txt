@@ -1,0 +1,6 @@
+Confirm-character dispatch entry point for name_input/banlist scene. Body: 3 instructions only -- loads hardcoded ROM data ptr 0x09e3b4a8 (name_input string target buffer) into r0, sets r1=0xb=11 (char code to commit), tail-calls page_state_dispatcher. Dispatcher reads current page state from gPrng+0x204; if valid, writes 0xb to [0x02029250+0x31f] then calls commit_input_name_to_buf to append char to result buffer.
+
+Params: r0=void (entry clobber: ldr r0,DAT overwrites r0); r1=void (movs r1,#0xb clobbers r1)
+Returns: r0=u32 page_state_done {0=state incomplete/waiting, 1=state done/char submitted} (pass-through from page_state_dispatcher; pop {r1}; bx r1 = normal return, not Pattern-B void)
+Side effects: (via page_state_dispatcher): [0x02029250+0x31f]:=0xb; (via commit_input_name_to_buf): name result buffer 0x09e3b4a8 appended
+Constants: NAME_BUF_PTR=0x09e3b4a8; CONFIRM_CHAR_CODE=0xB=11; CONFIRMED_CHAR_OFFSET=0x31f

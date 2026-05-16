@@ -1,0 +1,6 @@
+Validates complement checksum of a byte buffer. Buffer format: byte 0=stored_cs, bytes 1..=payload. Logic: (1) read stored_cs=[r0+0]; (2) get count from [r1+0]; (3) sum bytes [1..count-1] truncated to u8; (4) write count-1 back to [r1+0]; (5) if ~sum&0xFF==stored_cs return data_start (buf+1), else return NULL. Called by FUN_0801722c after XOR decode (FUN_080171d4) as frame integrity check; caller skips frame on fail.
+
+Params: r0=u8* buf_ptr ([r0+0]=checksum byte, [r0+1..]=payload); r1=void* state_ptr ([r1+0]=u32 remaining_count)
+Returns: r0=u8* data_ptr (buf+1 on pass, NULL on fail; pop {r1}=lr)
+Side effects: [r1+0]:=remaining_count-1 (u32, decremented regardless of result)
+Constants: checksum_formula=~(sum_of_payload_bytes)&0xFF (same as GBA BIOS header checksum)

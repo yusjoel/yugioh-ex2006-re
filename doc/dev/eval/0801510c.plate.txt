@@ -1,0 +1,6 @@
+Returns GL OAM entry pointer at slot_idx: base 0x02023490 + r0*0x20. If r0>0x1f, fires assert via suppress_assert_report (GL/GL_Oam.c "num < 32") then continues. Called by FUN_08015820 before writing PA/PB/PC/PD affine matrix coefficients.
+
+Params: r0=u8 slot_idx [0..31]
+Returns: r0=u8* ptr (0x02023490 + slot_idx*0x20)
+Side effects: none (assert path calls suppress_assert_report but does not abort)
+Constants: 0x02023490=GL state EWRAM base; 0x20=OAM entry size (32 bytes); 0x1f=max legal index; lsls r0,r4,#5=r4*32

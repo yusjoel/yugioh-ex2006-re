@@ -1,0 +1,6 @@
+Extracts [pThis+0xc] word bits[22:14] (9-bit field) from GL_Scrollbar entry (r0=pThis) and returns as unsigned int. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x38=56 "pThis"). Callers FUN_08018d3c/banlist_080186f0 read this param before rendering scrollbar for position calculation.
+
+Params: r0=ptr pThis GL_Scrollbar entry (non-NULL assert)
+Returns: r0=u32 param_field ([pThis+0xc] bits[22:14], 9-bit unsigned [0..511])
+Side effects: none
+Constants: lsls r0,r0,#0xe (clears bits[13:0]); lsrs r0,r0,#0x17 (>>23, net extract bits[22:14]); 0x09e39c68="GL/GL_Scrollbar.c" assert str; line 0x38=56

@@ -1,0 +1,6 @@
+Appends src string (r0) to the end of dst buffer (r1) and returns total char-unit count. Flow: (1) scan dst in encoding-aware mode to count existing char units r4 (OCG: bit7=1 double-byte +2, else +1; TCG: byte count); (2) call copy_str_unbounded(src, dst_end) to append; (3) return r4+copy_result. Encoding mode from [EWRAM+0x6c2c]&0x7 (0=OCG double-byte, else TCG). Extra flag [0x0202348c] can override OCG to byte-count mode.
+
+Params: r0=u8* src_str; r1=u8* dst_buf (append target)
+Returns: r0=u32 total_charlen (existing + appended char units)
+Side effects: [r1_end..] := src_str content via copy_str_unbounded
+Constants: 0x02006c2c=EWRAM encoding flag byte (bits[2:0]=0=>OCG); 0x0202348c=TCG/OCG override flag; 0x80=double-byte lead byte detection mask

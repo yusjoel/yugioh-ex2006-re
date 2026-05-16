@@ -1,0 +1,6 @@
+Initializes GL_Scrollbar.c OAM entry struct (r0=ptr). Source: GL/GL_Scrollbar.c (assert "num < 32"). Caller FUN_08017540 configures name_input scrollbar OAM slot with x=0xe0, size=0x20, count=0x8; FUN_0801a718 configures pass_input scene. Core steps: bios_cpu_set fill-0 clears first 16 bytes; writes attr0 Y-coord (bits[13:6]) + attr1 size (bits[22:15]); writes r3/tile_idx/palette/field_a/max_val/field_b to fields; combines r5+r7 into [r0+0xc] bits[17:9]; sets bit0|bit1.
+
+Params: r0=ptr oam_entry; r1=u32 y_coord; r2=u32 size_param; r3=u8 byte_field3; sp[0x0]=tile_idx; sp[0x4]=palette_id; sp[0x8]=field_a; sp[0xc]=u16 max_val; sp[0x10]=field_b
+Returns: void (pop {r3}; mov r8,r3; pop {r4-r7}; pop {r0}; bx r0)
+Side effects: [r0+0x0..0xf] zeroed then overwritten per field
+Constants: 0x05000004=bios_cpu_set fill control word; 0x000001ff=9-bit mask; 0xffff803f=attr0 Y-coord mask; 0xff007fff=attr1 size mask; 0xfffc01ff=field_c mask

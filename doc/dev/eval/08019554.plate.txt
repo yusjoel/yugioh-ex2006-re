@@ -1,0 +1,6 @@
+Writes r0 bit0 value to gPrng+0x23a (0x0300027a) bit0: clears old bit0 with 0xFE mask then ORs in r0&1. Called by name_input_page_init (0x08017574) with r0=0 to clear flag on page init, and by FUN_08018884 with r0=1 to set flag before char commit. This bit0 is name_input mode state flag read by advance_name_input_cursor_slot and retreat_name_input_cursor_slot to decide whether to skip slot 2 (JP mode behavior). Pure leaf, bx lr, no bl calls.
+
+Params: r0=u8 flag_value [0..1] (bit0 written to target byte bit0)
+Returns: void (bx lr)
+Side effects: [gPrng+0x23a 0x0300027a]:=strb (old_byte&0xFE)|(r0&1)
+Constants: PRNG_FLAG_ADDR=gPrng+0x23a=0x0300027a; FLAG_BIT_MASK=0x01; FLAG_CLEAR_MASK=0xFE

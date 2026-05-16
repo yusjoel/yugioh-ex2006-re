@@ -8,7 +8,7 @@
 ## 总目标 vs 当前目标
 
 - **总目标**: ROM 内所有函数完成分析 (~4539 个 callgraph distinct addresses; 当前已命名 2000 / 全 CSV 3646 行 = 54.85%)
-- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 39 批, 编号 `#82..#120`)
+- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 20 批 / 40 fns 每批 / 4×10 并行, 编号 `#82..#101`)
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **锁定策略**: 766 集合不动态刷新; 每批落地后不重新计算 ready, 下一轮再批量找 ready
 
@@ -19,22 +19,20 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中锁定的 766 个就绪函数 (39 批, #82..#120) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中锁定的 766 个就绪函数 (20 批 / 40 每批, #82..#101) 全部分析完毕。
 
-下一批挑选方法 (新版 — 按地址相邻):
-  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches.json')); idx=<NEXT_BATCH_IDX>-82; b=d['batches'][idx]; \
-    json.dump({'batch':[{'addr':a} for a in b['addrs']]}, open('temp/batch.json','w'), indent=2)"
+每批 4×10 并行模式 (效率优先, 不在意 token):
+  - executor: 4 个 sub-agent 并行, 每个 10 函数 → 40 份 proposal
+  - reviewer: 4 个 sub-agent 并行, 每个 10 函数 → 40 份 eval
+  - fixer iter (NEEDS_FIX): 视数量 ≥20 拆 2 个并行, 否则单 sub-agent
+  - fixer 落地: 1 个 sub-agent (Ghidra 单 session, 单 build, 单 sha1 verify)
+  - lesson-keeper: 1 个 sub-agent
 
-(NEXT_BATCH_IDX 从 PROGRESS.md "当前状态" 表的 "下一批" 字段读. 首次为 82.)
+splits 取批方法:
+  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches.json')); \
+    idx=<NEXT_BATCH_IDX>-82; b=d['batches'][idx]; print(b['splits'])"
 
-然后启动 4-agent loop (executor → reviewer → fixer → lesson-keeper) 处理 batch.json 全部函数,
-单 Ghidra session + 单 build + 单 sha1 verify, byte-identical 通过后自动 commit, 进入下一批。
-
-**强制单 call 模式 (token 经济优先)**:
-  - executor: 1 个 sub-agent 一次性产 batch 全部 20 份 proposal
-  - reviewer: 1 个 sub-agent 一次性评 20 份
-  - fixer iter (NEEDS_FIX): 1 个 sub-agent 处理本批所有 NEEDS_FIX
-  - 拆分并行 ~3× token 浪费
+byte-identical 通过后自动 commit, 进入下一批。
 
 任何函数失败 (byte-identical ❌ / MAX_ITER / agent 求助 / 无法命名) → 不停下询问:
   1. 在 PROGRESS.md "失败追踪" 段记录 (ADDR, reason, date)
@@ -55,9 +53,9 @@
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 39 批 |
-| **下一批** | `#82` (addrs 0x080001f0..0x080176c0, 20 fns) |
-| **上次更新** | 2026-05-16 (Phase 1 campaign_scene_handler 闭包 100% 完成, Phase 2 ready 清单已生成) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 20 批 / 4×10 并行 |
+| **下一批** | `#83` (40 fns, 4 splits × 10) |
+| **上次更新** | 2026-05-16 (Phase 2 batch #82, 40/766 = 5.22%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -79,7 +77,10 @@
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**0 / 766 已分析** (39 批待跑, 进度从 batch #82 开始)
+**40 / 766 已分析** (5.22%, 38 批待跑)
+
+里程碑 commits:
+- batch #82 `(pending)` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
 
 #### Phase 2 ready 集合统计
 

@@ -1,0 +1,6 @@
+Writes one row of character tile OAM attributes to GL sprite slot table in name_input/banlist render subtree. Outer loop over entry_count slots: each iteration calls alloc_palette_entry_slot for 8-byte slot record, writes tile number into slot[+4] low 10 bits, palette/color-depth flags into [+5] low 4 bits with bit4 (256-color) forced, priority flags into [+5] bits[6:4], flip attrs into [+0], and x-position (col*8+x_base) into [+2]. Tile offset sp[8] accumulates r2 (tile_step) each iteration.
+
+Params: r0=u16 tile_base; r1=u16 y_pixel_base; r2=u16 x_pixel_base; r3=u8 col_attr; sp[0x2c]=u8 entry_count; sp[0x30]=u8 flags; sp[0x34]=u8 palette_slot [0..127]
+Returns: void (pop {r0}; bx r0 exit)
+Side effects: [0x02023490+0x400+slot_idx*8+4]: tile_num|priority; [+5]: palette_nibble|0x10|priority; [+2]: x_pos&0x1ff; [+0]: row tile offset
+Constants: TILE_NUM_MASK=0x000003FF; TILE_CLEAR_MASK=0xFFFFFC00; HFLIP_VFLIP_PATTERN=0x40004000; COLOR_256_BIT=0x10; X_MASK=0x000001FF

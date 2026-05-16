@@ -1,0 +1,6 @@
+Called by FUN_08018884 (name_input key handler) on char commit and by FUN_08018f7c (name_input main render). Triggers GL global fade-out via gl_fade_out, then sets bit2 (0x4) of byte at name_input EWRAM (0x02029250+0x314). That bit is the exit-state flag; once set, page tick logic recognizes "confirmed exit" and stops accepting input.
+
+Params: r0=void (entry clobber: ldr r4 at entry confirms void)
+Returns: void (pop {r0}; bx r0 exit)
+Side effects: (via gl_fade_out): BLDCNT/BLDY IO regs updated; [0x02029250+0x314]: strb old_byte|0x04 (set bit2=exit_flag)
+Constants: NAME_INPUT_BUF=0x02029250; CURSOR_FIELD_OFFSET=0xC5*4=0x314; EXIT_FLAG_BIT=0x04

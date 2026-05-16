@@ -1,0 +1,6 @@
+Splits a decimal integer into digits and for each calls step_cell_anim_sequence_guarded to set animation frame then dispatch_isd_cell_anim_oam_setup to build OAM entry. Two execution paths: path A (r3!=0): loop divmod(10) to extract decimal digits, one cell anim tick and OAM build per digit; path B (r3==0): same OAM build logic for fixed sequence slots. Each iteration locates pCellAnim via r8 (array base + stride offset). indeg=0; caller not found in callgraph.
+
+Params: r0=void* pCellAnim_base; r1=u16 base_seq_idx; r2=NNS_G2dCellDataBank* pCellBank; r3=s32 value_to_display; sp[0x50]=void* oam_base; sp[0x54]=void* pCell; sp[0x58]=u16 digit_stride; sp[0x5c]=u16 digit_count; sp[0x60]=u32 extra_flag
+Returns: void (pop {r0}=lr overwrites r0)
+Side effects: [0x030007f8+offset]: OAM attrs written via dispatch_isd_cell_anim_oam_setup; cell anim state updated via step_cell_anim_sequence_guarded
+Constants: __divsi3/__modsi3 divisor=10 (decimal digit extraction); OAM_BUF=0x030007f8

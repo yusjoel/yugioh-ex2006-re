@@ -1,0 +1,6 @@
+Sets name list scroll step field (game_state+0x31a). Accepts direction value r0 (-1=left/up, +1=right/down); values outside {-1,+1} trigger suppress_assert_report defense assert. Writes direction<<2 (direction*4) as actual step into byte field. Caller FUN_08018938 passes r0=-1 after cursor reaches end to trigger left-scroll animation. get_name_scroll_step (0x08017f8c) reads the same field.
+
+Params: r0=s8 direction [-1, +1]; other values trigger assert
+Returns: void (pop {r0}; bx r0 tail-call exit)
+Side effects: [game_state+0x31a 0x0202956a]:=(r0<<2)&0xFF (-4 or +4)
+Constants: SCROLL_FIELD=0x02029250+0x31a=0x0202956a; DIR_LEFT=-1; DIR_RIGHT=1; STEP_SCALE=4; ASSERT_LINE=0x248

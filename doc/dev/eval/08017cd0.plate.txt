@@ -1,0 +1,6 @@
+Name-input page JP/EN string row renderer. Takes double-pointer r0 to string, start x r1, y/color r2, char horizontal step r3, max chars sp[0]. Per character: in JP mode (gSettings bit[2:0]==0) and char bit7 set, pack double-byte char and advance 2 bytes; else single byte. Calls dispatch_text_render_by_mode (mode=7, tile_size=8, stride=0x20) per char, advances x by r3. Updates string pointer back through r0 double-pointer so caller can track consumed position.
+
+Params: r0=u8** pp_str; r1=s16 x_pos; r2=s16 y_pos; r3=s16 char_step; sp[0]=u8 max_chars [0..12]
+Returns: void (pop {r0}; bx r0 tail-call exit)
+Side effects: [*r0]:=updated_ptr; BG VRAM glyph data written via dispatch_text_render_by_mode
+Constants: MODE=7; TILE_SIZE=8; STRIDE=0x20=32; JP_FLAG_BIT=0x80; LANG_MASK=0x7

@@ -1,0 +1,6 @@
+Advances NNS G2D cell animation for OBJ slot (slot_idx) and writes OAM entry at screen coordinates. First validates obj_id via read_obj_id_field (fires assert via suppress_assert_report nns_g2d_assert_anmID line 736 if out of bounds); gets NNS_G2dCellAnimation* from game_state[8+slot_idx*4]. If seq_id==-1 calls dispatch_cell_anim_frame_advance; else truncates seq_id to u16 and calls dispatch_cell_anim_sequence_step. Then packs x/y (left-shifted 12 to 12.4 fixed-point) + OAM flags into struct, calls dispatch_isd_cell_anim_oam_setup to submit OAM entry.
+
+Params: r0=u8 obj_slot_idx [0..obj_count-1]; r1=s16 seq_id (-1=frame advance only, [0..N-1]=set+step sequence); r2=u8 x_pos [0..255]; r3=u8 y_pos [0..191]; sp[0]=u32 oam_attr0_flags; sp[4]=u32 oam_palette_flags
+Returns: void (pop {r0}; bx r0 tail-call exit)
+Side effects: OAM via dispatch_isd_cell_anim_oam_setup; NNS_G2dCellAnimation state via dispatch_cell_anim_frame_advance or dispatch_cell_anim_sequence_step
+Constants: OBJ_TABLE_BASE=0x02029250; ANIM_PTR_OFFSET=0x8; SEQ_FRAME_ADV=-1; FP_SHIFT=12; ASSERT_LINE=0x2e0=736

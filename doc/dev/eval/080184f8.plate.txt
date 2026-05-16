@@ -1,0 +1,6 @@
+Symmetric sibling of advance_name_input_cursor_slot (0x0801848c). Called by FUN_08018938 on left/up direction input. Retreats 3-bit cursor slot index (bits[4:2]) at name_input EWRAM (0x02029250+0x314) by one slot. When current slot is 0 and language mode non-zero, wraps to slot 1 (skips slot 2); else wraps to slot 2. Non-zero current slot decrements directly. Writes backward direction marker 0xF8 (-8) to [0x02029250+0x31b].
+
+Params: r0=void (entry clobber: ldr r4 at entry confirms void)
+Returns: void (pop {r0}; bx r0 exit)
+Side effects: [0x02029250+0x314]: strb (cursor_slot-1 with JP wrap)<<3 into bits[5:3]; [0x02029250+0x31b]: strb 0xF8 (backward direction marker, signed -8)
+Constants: NAME_INPUT_BUF=0x02029250; CURSOR_SLOT_OFFSET=0xC5*4=0x314; SCROLL_DIR_OFFSET=0x31b; SCROLL_BWD=0xF8=-8; SLOT_MODULO=3

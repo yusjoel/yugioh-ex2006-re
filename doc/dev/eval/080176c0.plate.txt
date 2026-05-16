@@ -1,0 +1,6 @@
+Constructs GFX resource list header on stack for sprite type index, sets OAM attribute fields, then calls apply_gfx_resource_list to load graphics. Steps: (1) copy 16-byte resource list metadata from ROM 0x09e3afc8 to sp+0x24; (2) copy 4-byte palette base table from ROM 0x09e3afd8 to sp+0x34; (3) zero_struct_36bytes(sp); (4) read first entry ptr from [0x020292d8] into sp[+0x0]; (5) compute palette slot=PALETTE_TABLE[sprite_type]+palette_offset, write to OAM attr2 bits[13:7]; (6) set H-flip bit (r1<<7 -> attr1 bit7); (7) set rotscale bit6, attr0=0xFFFF; (8) bl apply_gfx_resource_list.
+
+Params: r0=u8 sprite_type [0..3]; r1=u8 flip_flag [0..1] H-flip written to attr1 bit7; r2=s8 palette_offset (added to PALETTE_TABLE[type]; callsite range [-5..0])
+Returns: void (pop {r0}=lr overwrites r0)
+Side effects: EWRAM sprite/OAM fields updated via apply_gfx_resource_list BGDT/OBJD/PALT handlers
+Constants: ROM_GFX_META=0x09e3afc8 / PALETTE_TABLE=0x09e3afd8 ([1,1,16,16] for types 0..3) / EWRAM_ENTRY_PTR=0x020292d8 / OAM_PALETTE_MASK=0xffffc07f / attr0_init=0xffff / attr1_rotscale_bit=0x40

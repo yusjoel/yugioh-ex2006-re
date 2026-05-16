@@ -1,0 +1,6 @@
+Reads name list scroll step field at game_state+0x31a (0x0202956a) and returns sign-extended s8. Written by set_name_scroll_step (0x08017fa4) as direction*4 (-4 or +4); 0 means no active scroll. Caller FUN_08018938 reads at start of each frame tick: non-zero means skip character input this frame (scroll-lock logic).
+
+Params: r0=void (entry clobber: ldr r0,DAT overwrites r0)
+Returns: r0=s8 scroll_step; 0=no scroll, -4=left, +4=right
+Side effects: none (read-only leaf)
+Constants: SCROLL_FIELD=0x02029250+0x31a=0x0202956a

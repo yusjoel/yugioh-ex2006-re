@@ -1,0 +1,6 @@
+BG3 vertical scroll register write helper. Receives shared scroll base value, subtracts fixed parallax bias 8, writes to BG3VOFS (0x0400001e). Part of three-layer BG parallax family with write_bg0_vofs_with_bias (0x08017cc4, bias=40) and write_bg1_vofs_with_bias (0x08018254, bias=4). FUN_08017fe4 calls all three in sequence for name-input page multi-layer BG parallax scrolling.
+
+Params: r0=s16 scroll_val [0..511] shared scroll base
+Returns: void (bx lr)
+Side effects: [BG3VOFS 0x0400001e]:=r0-8 (strh, updates BG3 vertical scroll)
+Constants: BG3VOFS=0x0400001e; BIAS=0x8=8

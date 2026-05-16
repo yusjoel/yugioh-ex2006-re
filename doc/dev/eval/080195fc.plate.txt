@@ -1,0 +1,6 @@
+Extracts character code from source char slot (r0=2-byte char_entry) into dst buffer (r1), returning byte count based on language mode. Reads [0x02006c2c] low 3 bits: if non-zero (JP mode) or src[0] bit7==0 (not JP double-byte), uses ASCII/single-byte path: copy src[0] to dst[0], write 0 to dst[1], return 1. If mode==0 and src[0] bit7==1 (JP double-byte), uses JP path: copy src[0] and src[1] to dst[0] and dst[1], write 0 to dst[2], return 2. indeg=0 in callgraph; caller not found in resolved data region.
+
+Params: r0=u8* src_char_entry (ptr to 2-byte char slot); r1=u8* dst_buf (output buffer, receives 1 or 2 bytes plus NUL)
+Returns: r0=u8 byte_count {1=ASCII written, 2=JP double-byte written}
+Side effects: [r1+0]:=src[0]; [r1+1]:=src[1] (JP path) or 0x00 (ASCII path); [r1+2]:=0x00 (JP path only)
+Constants: LANG_MODE_BASE=0x02000000; LANG_MODE_OFFSET=0x6c2c; LANG_MODE_MASK=0x07; JP_CHAR_FLAG=0x80

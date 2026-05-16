@@ -1,0 +1,6 @@
+Executes one step of RGB555 palette fade for r2 color entries, writing results to OBJ PALRAM at r1 (0x05000202). Per-frame call: (1) read fade step from [r3+0] ([0..0x1e]); (2) compute divisor=step if step<=0xf else 0x1e-step (symmetric triangle wave); (3) interpolate each R/G/B channel: new_ch=(ch*divisor+((ch+93)>>2)*(15-divisor))/15; (4) write RGB555 to dst PALRAM; (5) step++, wrap at >0x1d. Returns 1. Callers FUN_08018d3c and FUN_0801b178 both pass dst=0x05000202 (OBJ palette 0 colors 1-2) for scrollbar sprite palette fade.
+
+Params: r0=u16* src_palette; r1=u16* dst_palram (e.g. 0x05000202); r2=u32 count [1..N] (callers pass 2); r3=u8* fade_state_ptr ([r3+0]=step byte [0..0x1e])
+Returns: r0=1 (fixed, one step executed)
+Side effects: [dst_palram+0..2*(count-1)]: count interpolated RGB555 halfwords; [r3+0]:=(step+1)%0x1e
+Constants: 0x1f=RGB555 channel mask; 0xa=B-channel shift; 0x5=G-channel shift; 0x5d=93 interpolation base offset; 0xf=fade step max; 0x1e=fade period (30 steps); 0x1d=wrap threshold

@@ -1,0 +1,6 @@
+Called by FUN_08019d14 during banlist password-input page init to initialize font_jp render context (EWRAM 0x02006ed0, 104 bytes) targeting hardcoded BG VRAM address 0x06000020 (BG char base + 1 tile), with dimensions width_tiles=25, height_tiles=11. Sibling of init_font_jp_ctx_bg2_char_vram (0x080197dc) which uses dynamic get_bg2_char_vram_addr and 27x21 dimensions. Logic: init_font_jp_render_context -> set context[0x15] bit5 -> clear context[0x8] bit1 -> write font_jp_base_table[bit0] ptr to context[0x4].
+
+Params: r0=void (entry clobber: ldr r0,DWORD overwrites r0)
+Returns: void (pop {r0}; bx r0 Pattern-B exit)
+Side effects: [0x02006ed0..+103]: context zeroed and 3 fields set; [0x02006ed0+0x04]:=font_jp_base_table[bit0]; [0x02006ed0+0x08]: bit1 cleared; [0x02006ed0+0x15]: bit5 set
+Constants: BG_VRAM_TEXT_BASE=0x06000020; WIDTH_TILES=0x19=25; HEIGHT_TILES=0x0B=11; CTX_INIT_FLAG=0x20; CTX_MODE_BIT=0x02; FONT_JP_CTX_BASE=0x02006ED0

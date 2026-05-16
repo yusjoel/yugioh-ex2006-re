@@ -1,0 +1,6 @@
+Linearly searches GFX resource linked list by 4-byte type tag, returning pointer to first matching entry. Input: r0=list_header, r1=tag. list_header[+0xc]=first entry offset (stride), list_header[+0xe]=entry count. Entry format: [+0x0]=4-byte tag, [+0x4]=relative offset to next entry. Returns entry ptr on match, NULL on miss. Called by 9 sibling wrappers accessing BGDT/OBJD/PALT tag types.
+
+Params: r0=void* list_header; r1=u32 tag_key (e.g. 0x54444742='BGDT')
+Returns: r0=void* entry_ptr (matching entry, or NULL; pop {r1}=lr, r0 preserved)
+Side effects: none (pure search, no writes)
+Constants: tag_BGDT=0x54444742 / tag_OBJD=0x444a424f / tag_PALT=0x544c4150 / header[+0xc]=first_entry_offset / header[+0xe]=entry_count / entry[+0x0]=tag / entry[+0x4]=next_relative_offset

@@ -1,0 +1,6 @@
+Computes GL_Scrollbar thumb visual position. Formula: pos = field_c[23:15] + field_9 + (field_4 * (field_8 - 2*field_9 - field_a)) / (field_6 - field_b). Field meanings: field_c[23:15]=OAM Y base; field_4=cur_val (halfword); field_6=max_val (halfword); field_8=track_len (byte); field_9=margin_top (byte); field_a=extra_offset (byte); field_b=margin_bot (byte). Caller FUN_080155f4 reads result for OAM Y update. Pure computation, no writes.
+
+Params: r0=ptr pScrollbar GL_Scrollbar OAM entry struct
+Returns: r0=s32 thumb_y_pos (visual thumb Y pixel position)
+Side effects: none
+Constants: lsls r4,r4,#8; lsrs r4,r4,#0x17 => extract word[23:15] (9-bit Y base); field offsets: +0=word(attr), +4=halfword(cur_val), +6=halfword(max_val), +8=byte(track_len), +9=byte(margin_top), +a=byte(offset), +b=byte(margin_bot)

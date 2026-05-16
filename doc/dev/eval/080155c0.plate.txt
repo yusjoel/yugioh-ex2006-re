@@ -1,0 +1,6 @@
+GL/GL_Scrollbar.c line 144: page-up backward scroll. Symmetric sibling of advance_scrollbar_pos_page (0x08015584). Asserts pThis non-null, reads [pThis+0xb]=visible_count and [pThis+0x4]=current_pos. If current_pos<=visible_count, clamp to 0; else current_pos-=visible_count. Writes back. Implements Page Up -- retreats one full visible window. Returns void.
+
+Params: r0=GL_Scrollbar* pThis (non-null assert)
+Returns: void (pop {r0}=lr overwrites r0)
+Side effects: [pThis+0x4]:=max(0, current_pos-visible_count) (u16)
+Constants: GL_Scrollbar.c:144 / current_pos=[pThis+0x4] / visible_count=[pThis+0xb]

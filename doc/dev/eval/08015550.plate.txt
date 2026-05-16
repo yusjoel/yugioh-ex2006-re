@@ -1,0 +1,6 @@
+GL/GL_Scrollbar.c line 127: scroll one step backward. Symmetric sibling of advance_scrollbar_pos_one (0x08015518). Asserts pThis non-null, reads [pThis+0x4]=current_pos. If current_pos==0 (at top/left), returns 0. Else current_pos-=1, writes back, returns 1. Implements scroll-up/left one slot.
+
+Params: r0=GL_Scrollbar* pThis (non-null assert)
+Returns: r0=u8 moved (1=retreated, 0=already at start; pop {r1}=lr, r0 preserved)
+Side effects: [pThis+0x4]:=current_pos-1 (u16, only when current_pos!=0)
+Constants: GL_Scrollbar.c:127 / current_pos=[pThis+0x4]

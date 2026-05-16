@@ -1,0 +1,6 @@
+GL/GL_Scrollbar.c line 96: writes new_pos directly to [pThis+0x4] (u16 current_pos field). Asserts pThis non-null via suppress_assert_report. No bounds check; caller must ensure valid range.
+
+Params: r0=GL_Scrollbar* pThis (non-null assert); r1=u16 new_pos (target position [0..total_count-visible_count])
+Returns: void (pop {r0}=lr overwrites r0)
+Side effects: [pThis+0x4]:=new_pos (u16, current position field)
+Constants: GL_Scrollbar.c:96 / pThis=[r0] / current_pos_field=+0x4

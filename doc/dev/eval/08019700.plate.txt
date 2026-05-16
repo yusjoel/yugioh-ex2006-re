@@ -1,0 +1,6 @@
+Structural duplicate of dispatch_text_render_by_mode (0x080175f4) used by banlist/settings render subtree. Logic identical: checks sp[0x28] render_mode, dispatches via three paths: mode=0x20 adds 1 to each coordinate then calls text_render_wrapper once; mode=0x80 calls text_render_wrapper 8 times for 8-direction shadow then once for center foreground (9 total); other modes call center render directly. Two versions differ only in bl offsets due to different ROM addresses (linker code duplication).
+
+Params: r0=u8* char_entry_ptr; r1=u8 y_tile; r2=u16 x_tile; r3=u8 tile_color; sp[0x24]=u16 shadow_color; sp[0x28]=u8 render_mode (0x20=offset, 0x80=8dir-shadow, other=direct)
+Returns: void (pop {r0}; bx r0 Pattern-B exit)
+Side effects: OBJ/BG VRAM tile data written via text_render_wrapper (up to 9 calls)
+Constants: RENDER_MODE_OFFSET=0x28; RENDER_MODE_SINGLE=0x20; RENDER_MODE_SHADOW=0x80; SHADOW_COLOR_OFFSET=0x24

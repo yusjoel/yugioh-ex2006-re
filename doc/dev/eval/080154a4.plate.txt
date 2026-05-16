@@ -1,0 +1,6 @@
+Reads current-value field [pThis+0x4] (halfword) from GL_Scrollbar entry (r0=pThis) and returns u16. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x5a=90 "pThis"). Caller banlist_080186f0 reads current scroll position before direction-key input handling.
+
+Params: r0=ptr pThis GL_Scrollbar entry (non-NULL assert)
+Returns: r0=u16 cur_value ([pThis+0x4] halfword, current scroll value)
+Side effects: none
+Constants: ldrh r0,[r4,#4]=read halfword at pThis+0x4; 0x09e39c68="GL/GL_Scrollbar.c" assert str; line 0x5a=90

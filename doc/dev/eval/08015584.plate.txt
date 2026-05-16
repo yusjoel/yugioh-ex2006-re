@@ -1,0 +1,6 @@
+GL/GL_Scrollbar.c line 137: page-down forward scroll. Asserts pThis non-null, then: (1) reads [pThis+0x4]=current_pos, [pThis+0xb]=visible_count; (2) current_pos+=visible_count; (3) write temp; (4) reads [pThis+0x6]=total_count, computes ceiling=total_count-visible_count; (5) if new current_pos>ceiling, clamp to ceiling (>=0). Implements Page Down -- advances one full visible window. Returns void.
+
+Params: r0=GL_Scrollbar* pThis (non-null assert)
+Returns: void (pop {r0}=lr overwrites r0)
+Side effects: [pThis+0x4]:=clamp(current_pos+visible_count, 0, total_count-visible_count) (u16)
+Constants: GL_Scrollbar.c:137 / current_pos=[pThis+0x4] / total_count=[pThis+0x6] / visible_count=[pThis+0xb]

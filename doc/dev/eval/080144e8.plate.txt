@@ -1,0 +1,6 @@
+Advances pointer in mixed-encoding string r0 by exactly r1 char units; returns pointer at that position, or NULL if string ends before reaching r1. Encoding-aware: OCG mode bit7=1 double-byte chars advance ptr+2, else ptr+1. Mode from [EWRAM+0x6c2c]&0x7 and [0x0202348c].
+
+Params: r0=u8* str (mixed 1/2-byte encoding, NUL-terminated); r1=u32 char_offset [0..str_charlen]
+Returns: r0=u8* ptr at char #char_offset, or NULL if str_charlen < char_offset
+Side effects: none (pure read-only pointer arithmetic)
+Constants: 0x02006c2c=EWRAM encoding flag byte; 0x0202348c=TCG/OCG override flag; 0x80=double-byte lead mask

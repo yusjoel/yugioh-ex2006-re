@@ -1,0 +1,6 @@
+Called by FUN_08019f24 before rendering to initialize font_jp render context (EWRAM 0x02006ed0) targeting BG2 char VRAM. Gets BG2 char VRAM base address via get_bg2_char_vram_addr then adds +0x20 (1 tile=32 bytes) as render target, calls init_font_jp_render_context(vram_base+0x20, width=27, height=21), sets context[0x15] bit5 (init-complete flag=0x20), clears context[0x8] bit1 (forces single-byte mode), reads font_jp_base_table[bit0] and writes function ptr to context[0x4]. Sibling of init_font_jp_ctx_bg_vram_text (0x08019820) which uses hardcoded 0x06000020 and 25x11 dimensions.
+
+Params: r0=void (entry clobber: bl get_bg2_char_vram_addr clobbers r0)
+Returns: void (pop {r0}; bx r0 Pattern-B exit)
+Side effects: [0x02006ed0..+103]: context zeroed and 3 fields set; [0x02006ed0+0x04]:=font_jp_base_table[bit0]; [0x02006ed0+0x08]: bit1 cleared; [0x02006ed0+0x15]: bit5 set
+Constants: BG2_CHAR_VRAM_TILE_OFFSET=0x20; WIDTH_TILES=0x1B=27; HEIGHT_TILES=0x15=21; CTX_INIT_FLAG=0x20; CTX_MODE_BIT=0x02; FONT_JP_CTX_BASE=0x02006ED0

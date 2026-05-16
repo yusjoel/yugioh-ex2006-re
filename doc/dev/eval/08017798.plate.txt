@@ -1,0 +1,6 @@
+Name-input page font_jp render context initializer targeting fixed BG VRAM address 0x06000020. Calls init_font_jp_render_context to zero and write 22 entries/0xc-byte stride context; then sets [0x02006ed0+0x15] bit5 (0x20, glyph-active flag), sets [+0x8] bit1 (0x2, double-byte mode flag); finally reads function pointer from font_jp_base_table indexed by [+0x8] bit1+bit2 and writes to [+0x4]. Symmetric sibling of setup_font_jp_ctx_obj_vram_row (0x080177dc) which uses OBJ VRAM with row index param.
+
+Params: r0=void (entry clobber: ldr r0,DAT overwrites r0)
+Returns: void (pop {r0}; bx r0 tail-call exit)
+Side effects: [0x02006ed0+0x15]|=0x20; [0x02006ed0+0x08]|=0x02; [0x02006ed0+0x04]:=font_jp_base_table[idx]; [0x06000020..+len]:=0 via init_font_jp_render_context
+Constants: BG_VRAM_BASE=0x06000020; CTX_BASE=0x02006ed0; CTX_FLAG_ACTIVE=0x20; CTX_FLAG_MODE=0x2
