@@ -1,0 +1,2 @@
+Called by FUN_08094c10 in loop body LAB_08094c16 tail. No-op stub: body is single bx lr instruction, does not modify any register or memory; r0 retains value from previous bl (write_sprite_attrs_to_seq_buf return). Part of fixed-return stub family with return_zero_leaf (0x0801f3d8) and return_one_leaf (0x0801f3e4).
+Constants: (none).

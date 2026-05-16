@@ -1,0 +1,2 @@
+Called by FUN_08094c10 in loop body LAB_08094c16. Returns r0=0 as next operation base address or completion flag. Body: movs r0,#0; bx lr. Fixed return value 0. Part of fixed-return stub family with return_one_leaf (0x0801f3e4) and return_noop_leaf (0x0801f3dc).
+Constants: (none).

@@ -1,0 +1,2 @@
+Called by dispatch_duel_event_display_seq (event_code=0x25). Wrapper that calls tick_draw_card_display_seq with direction_flag=0 (reverse/no-negate). Body: push lr; movs r0,#0; bl tick_draw_card_display_seq; pop{r0}; bx r0. Parameter r0=0 causes tick_draw_card_display_seq to use zone_ref as-is (reverse/return-card direction). Symmetric pair with invoke_draw_display_seq_forward (case 0x24, r0=1).
+Constants: direction_flag=0 (r0 fixed).

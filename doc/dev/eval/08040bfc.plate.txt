@@ -1,0 +1,2 @@
+Called by dispatch_duel_event_display_seq (event_code=0x64). Clears display sequence state field [0x0201bcc0+0x80c]:=0. Identical byte structure to clear_display_step_lock_i (0x08040bd4, case 0x62) and clear_display_step_lock_j (0x08040be8, case 0x63). Single-shot state machine reset, no step logic.
+Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040c08); STATE_FIELD_OFFSET=0x0000080c (DAT_08040c0c).

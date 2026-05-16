@@ -1,0 +1,2 @@
+Called by dispatch_duel_event_display_seq (event_code=0x2b). One-shot trigger: calls dispatch_card_display_op(op=0x36, player_id=[base+2], 0, 0), then clears [0x0201bcc0+0x80c]:=0 to signal sequence done. Does not read step counter; single dispatch then exit.
+Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040bcc); STATE_FIELD_OFFSET=0x0000080c (DAT_08040bd0); OP_CODE=0x36.

@@ -1,0 +1,2 @@
+Called by dispatch_duel_event_display_seq (event_code=0x24). Wrapper that calls tick_draw_card_display_seq with direction_flag=1 (forward/negate). Body: push lr; movs r0,#1; bl tick_draw_card_display_seq; pop{r0}; bx r0. Parameter r0=1 causes tick_draw_card_display_seq to execute rsbs on zone_ref (forward draw direction). Symmetric pair with invoke_draw_display_seq_reverse (case 0x25, r0=0).
+Constants: direction_flag=1 (r0 fixed).
