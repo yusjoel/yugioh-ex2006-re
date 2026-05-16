@@ -1,0 +1,5 @@
+Advance demo_shuen scene WIN0 vertical window fade-out animation by one frame.
+Computes remaining=(r1-r0); interpolates result=(remaining*80)/r1; sets WIN0V: Y1=(80-result), Y2=(result+80) -- window shrinks from full-screen to center.
+On final frame (cur==total): calls gl_set_brightness(0x3f,-16), tick_blend_transition_step, gl_set_blend2_level(0x3f,0,cur_step).
+Symmetric sibling of apply_win0v_fadein_step (0x0801bc28); direction is reversed.
+Constants: WINDOW_HALF_HEIGHT=0x50=80; WIN0V=0x04000044.

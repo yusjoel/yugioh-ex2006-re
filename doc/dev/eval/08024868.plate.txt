@@ -1,0 +1,6 @@
+Check whether all 4 consecutive scene slot entries have their low 12 bits >= threshold.
+Base address = 0x02006e60 + (slot_idx-1)*20 (r0 is 1-based; stride = 5*4=20 bytes).
+Reads 4 halfwords at 4-byte intervals; extracts bits[11:0] of each via lsls/lsrs #0x14.
+Returns 1 if all 4 values >= r1 (threshold), 0 if any value < threshold.
+Pure read, no external writes.
+Constants: SCENE_SLOT_BASE=0x02006e60; SLOT_ENTRY_SIZE=20; ENTRY_VALUE_MASK=0xFFF; INNER_COUNT=4.

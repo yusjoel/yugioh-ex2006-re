@@ -1,0 +1,6 @@
+Batch-build OAM entries and allocate palette slots for a row of banlist card sprites.
+Outer loop iterates rows (0..stack_arg5-1); inner loop per-row calls alloc_palette_entry_slot then fills
+OAM attr0 (color mode), attr1 (X coord), attr2 (tile idx + palette), attr3 (Y coord) and attr_byte.
+X coord = r1 + column_offset accumulation; Y coord = r3 * r10 (row * row_height).
+Callers: FUN_0801a690 (indeg=1 from 0x0801b284) and FUN_0801b368 (banlist frame init).
+Constants: OAM_ATTR0_MASK=0x3ff; OAM_ATTR1_MASK=0x1ff; OAM_ATTR2_MASK=0xfc00; TILE_HALFTONE=0x40004000.

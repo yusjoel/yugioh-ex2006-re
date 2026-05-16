@@ -1,0 +1,5 @@
+Locate pointer to the password entry for the given page number in gBanlistPasswordBuffer.
+Step size is determined by 0x02006c2c bit[2:0]: 0 -> step=2, nonzero -> step=1.
+Skips r0*15 non-null entries from buffer start; returns pointer to that entry or NULL.
+15 entries per page; r0 is 0-based page index, so r0*15 = absolute entry index target.
+Constants: STATE_ADDR=0x02006c2c; ENTRIES_PER_PAGE=0x0f=15; STEP_DOUBLE=2; STEP_SINGLE=1.

@@ -1,0 +1,8 @@
+Count graveyard cards for the given player where field7 equals the target value.
+r0=player_side (bit0), r1=target_field7_val (saved to r8 via mov r8,r1).
+Reads gy count from gP1LifePoints+player*0x868+0x14; iterates gy array from +0x418 (0x83<<3) at 4-byte stride.
+Each entry: extract bits[18:0]=card_icid; call get_card_extended_stat_field7(card_icid);
+if return == r8 then r6++. Returns r6. Pure read, no external writes.
+Caller FUN_08061c10 (duel_field) calls with r1=1; compares result to another callee return value.
+Sibling of count_graveyard_equip_cards_by_field9 (0x08033f28, checks field6==0x16 and field9==target).
+Constants: gP1LifePoints=0x0201c4e0; player_stride=0x868; gy_count_offset=0x14; gy_array_offset=0x83<<3=0x418.

@@ -1,0 +1,8 @@
+Shuffle hand zone set_code sequence and write to display buffer.
+r0=turn_or_player_flag (bit0 = player side), r1=dest_display_buf ptr.
+Reads player hand zone count and zone_set_code array from gP1LifePoints+player*0x868+0x8.
+Writes 3 strh to display slot header: fixed value 5, (count-5), and zone[+8].
+Fisher-Yates shuffle (via sample_prng_scaled) randomizes zone set_code sequence.
+Repeats for second zone group; memcpy (lsls #1 bytes) writes result to dest_buf+0x210+player_offset.
+Caller FUN_080937a8 (duel_field) calls this twice in puzzle init for both player sides.
+Constants: gP1LifePoints (base); player_stride=0x868; hand_area_offset=0x84<<2=0x210; SET_CODE_MASK=0x1fff.

@@ -1,0 +1,6 @@
+Count nodes in zone_idx chain matching both card_id and zone_type.
+Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
+calls count_chain_nodes_by_card_id_and_type(r0=head, r1=card_id, r2=zone_type); passes through callee return value.
+Sibling of count_chain_by_card_id_in_zone_idx (0x0802ffb0); this adds zone_type constraint.
+Pure read, no external writes.
+Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); NODE_POOL=0x0201d9c0.

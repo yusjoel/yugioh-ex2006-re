@@ -1,0 +1,7 @@
+Banlist scene JP font render context init. Target: OBJ tile VRAM base 0x06010000 + r0*32.
+Caller FUN_0801a6b4 (font_jp) sets up context before calling dispatch_text_render_by_mode_banlist.
+Steps: (1) call init_font_jp_render_context with VRAM base r0*32+0x06010000;
+(2) set [0x02006ed0+0x15] bit5 (init-done flag 0x20);
+(3) update [0x02006ed0+0x8] render-mode field from 0x02006c2c bit[2:0] and r3 bit0;
+(4) write font_jp_base_table[mode_idx] function pointer to [0x02006ed0+0x4].
+Constants: OBJ_TILE_VRAM_BASE=0x06010000; FONT_CTX=0x02006ed0; INIT_FLAG=0x20 (bit5 ctx+0x15); STATE_BASE=0x02006c2c.

@@ -1,0 +1,5 @@
+Read field8 of a vija scene OBJ slot by index.
+r0 = slot_index; loads OBJ pointer from vija_state (0x02029EB0) + 0x8 + slot_index*4,
+then calls get_title_ex_obj_field8(ptr) and returns the u8 field8 value.
+Thin wrapper mapping logical slot index to object pointer for the vija scene OBJ array.
+Constants: VIJA_STATE_BASE=0x02029EB0; OBJ_PTR_ARRAY_OFFSET=0x8.

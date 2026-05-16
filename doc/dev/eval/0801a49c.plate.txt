@@ -1,0 +1,7 @@
+Advance banlist card slot sprite animation and build OAM entry for that slot.
+Reads NNS G2D CellAnimation pointer from gBanlistPasswordBuffer+0x5ac[r0*4].
+r1==-1: call dispatch_cell_anim_frame_advance (single frame advance);
+r1>=0: call dispatch_cell_anim_sequence_step(seq_idx=r1).
+Then call setup_isd_cell_anim_oam_entry; r2/r3 (<<12 fixed-point) control sprite screen position.
+Callers: FUN_0801a540 and FUN_0801b368 iterate over slots each frame.
+Constants: SPRITE_PTR_TABLE=gBanlistPasswordBuffer+0x5ac (0x02029d5c); SLOT_STRIDE=4; FRAME_ADVANCE_SEQ=-1=0xFFFFFFFF; COORD_SHIFT=12.

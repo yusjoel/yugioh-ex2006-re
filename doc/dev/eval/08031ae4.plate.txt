@@ -1,0 +1,8 @@
+Count chain zone cards that pair-allow with target_card_id for the given player.
+r0=player_side (bit0), r1=target_card_id (saved to r8 via mov r8,r1).
+Reads chain zone count from gP1LifePoints+player*0x868+0x18; iterates array from +0x3a0 (0xe8<<2).
+Each slot: extract bits[18:0]=card_icid; restore r1=r8=target_card_id; call check_card_pair_allowed. On hit: r6++.
+Returns r6. Pure read, no external writes.
+Caller FUN_080499c4 (duel_field) pairs this with count_zone_card_pair_allowed_for_card and sums via cmn.
+Sibling of count_zone_card_pair_allowed_for_card (0x08031a84, searches monster zone +0x10/+0x260); this searches chain zone +0x18/+0x3a0.
+Constants: gP1LifePoints=0x0201c4e0; player_stride=0x868; chain_zone_count_offset=0x18; chain_zone_array_offset=0xe8<<2=0x3a0.

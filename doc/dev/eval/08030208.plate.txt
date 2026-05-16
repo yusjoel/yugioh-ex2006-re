@@ -1,0 +1,11 @@
+Count set bits (popcount / Hamming weight) in a 32-bit word.
+Classic 5-step parallel bit-counting algorithm:
+(1) 2-bit groups: mask 0xAAAAAAAA/0x55555555;
+(2) 4-bit groups: mask 0xCCCCCCCC/0x33333333;
+(3) 8-bit groups: mask 0xF0F0F0F0/0x0F0F0F0F;
+(4) 16-bit groups: mask 0xFF00FF00/0x00FF00FF;
+(5) 32-bit merge: high16 + low16.
+No branches, O(1). indeg>=8, used across multiple subsystems.
+Caller FUN_08059a78 reads slot halfword then calls this; cmp r0,#3 checks equip slot usage.
+Constants: MASK_ODD=0xAAAAAAAA; MASK_EVEN=0x55555555; MASK_HI2=0xCCCCCCCC; MASK_LO2=0x33333333;
+MASK_HI4=0xF0F0F0F0; MASK_LO4=0x0F0F0F0F; MASK_HI8=0xFF00FF00; MASK_LO8=0x00FF00FF; MASK_LO16=0x0000FFFF.

@@ -1,0 +1,6 @@
+Zero OBJ tile VRAM range using BIOS CpuSet fill mode.
+Target = 0x06010000 + r0*32 (tile slot to byte offset); fill word count = r1*8 (tiles * 8 words/tile = 32 bytes/tile).
+Fill value = 0 from stack; control word = 0x05000000 | (r1*8 & 0x1fffff): bit24=fill, bit26=word mode.
+Caller FUN_08019b4c (banlist;font_jp;game_str;settings) clears tile slots before rendering password glyphs;
+FUN_0801b368 (banlist frame update) clears large tile regions.
+Constants: OBJ_TILE_VRAM_BASE=0x06010000; TILE_BYTES=32 (1<<5); WORDS_PER_TILE=8; CPU_SET_FILL_WORD=0x05000000 (bit24=fill, bit26=word).

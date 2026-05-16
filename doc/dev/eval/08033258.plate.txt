@@ -1,0 +1,7 @@
+Count the number of field slots for the given player where the card's field8 equals 9.
+Iterates gDuelFieldSlots+player*0x868 over 11 slots (r5 from 0xa down to 0, slot_entry=0x14 bytes).
+Each slot: extract bits[18:0]=card_icid; call check_card_field8_is_9(card_icid); on hit r6++.
+Returns r6. Pure read, no external writes.
+Caller eval_slot_score_entry_full (0x08037ec0) calls this twice (player=0 and player=1), sums both counts,
+then computes LP cost = total_count * 125.
+Constants: gDuelFieldSlots=0x0201c510; player_stride=0x868; slot_count=11; slot_entry=0x14; FIELD8_TARGET=9.

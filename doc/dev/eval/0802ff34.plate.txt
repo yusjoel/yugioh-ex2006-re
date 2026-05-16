@@ -1,0 +1,6 @@
+Zone_idx chain existence check: card_id + zone_type dual-match.
+Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
+then calls find_node_by_value_and_zone_type(r1=card_id, r2=zone_type).
+Returns 1 on match, 0 on miss.
+Sibling of check_zone_card_id_in_node_pool (0x0802ff10, no zone_type); this adds the zone_type dimension.
+Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); ZONE_CHAIN_ENTRY_SIZE=4.

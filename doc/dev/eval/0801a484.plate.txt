@@ -1,0 +1,5 @@
+Banlist password input scene BG3 vertical scroll register write with bias.
+Accepts shared scroll base r0; writes BG3VOFS = r0-14.
+Structurally identical to write_bg3_vofs_with_bias (0x08018248, name-input scene, bias=8) but bias differs.
+Callers: FUN_08019e2c (scene_pass_input;banlist, r0=0) and FUN_0801a1ac (frame update, computed scroll).
+Constants: BG3VOFS=0x0400001e; BIAS=0x0e=14.

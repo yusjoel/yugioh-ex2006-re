@@ -1,0 +1,6 @@
+Banlist password input interface cursor slot backward retreat function.
+Reads bits[5:3] of gBanlistPasswordBuffer+0x660 (current slot 0..2), decrements by 1, writes back.
+If current slot==0: non-JP mode wraps to slot 1 (skip slot 2); JP mode wraps to slot 2.
+Writes 0xF8 (-8, backward direction marker) to +0x667.
+Symmetric sibling of advance_banlist_password_cursor_slot (0x0801a7d0); direction is reversed.
+Constants: CURSOR_FIELD_OFFSET=0x660; DIR_FIELD_OFFSET=0x667; DIR_BACKWARD=0xF8; ENCODE_FLAG_ADDR=0x02006c2c.

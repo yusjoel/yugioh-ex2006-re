@@ -1,0 +1,5 @@
+Get entity_id from zone_idx chain by card_id + zone_type dual filter.
+Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
+calls find_node_by_value_and_zone_type(r1=card_id, r2=zone_type). On hit: returns node[+4] (entity_id). On miss: returns -1.
+Differs from get_entity_id_in_zone_idx_chain (0x0802ff58) only by the added zone_type constraint.
+Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); ENTITY_ID_OFFSET=4; NOT_FOUND=-1.

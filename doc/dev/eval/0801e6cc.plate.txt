@@ -1,0 +1,6 @@
+Adapter: convert internal card ID (icid) to card ID (cid) then open card info page.
+Called from function pointer table at ROM 0x082E9EE8 when player selects a card.
+Zero-extends r0 (icid) and r1 (origin_page) to u16, calls internal_card_id_to_card_id to map icid->cid,
+then passes cid + original r1/r2/r3 to card_list_on_select_to_info_page.
+Sibling of open_card_info_page_from_list (0x0801e6f4) which accepts cid directly; this variant adds the icid->cid step.
+Constants: FUNC_PTR_TABLE_REF=0x082E9EE8.

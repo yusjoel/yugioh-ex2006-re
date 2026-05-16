@@ -1,0 +1,6 @@
+Check whether an effect slot is in the equip-activatable ready state.
+Two conditions must both be true: (1) [ptr+4] bits[17:15] == 0b001 (mask 0x38000, cmp 0x8000);
+(2) read_effect_slot_side_and_type(ptr,0) bits[23:16] (type nibble) <= 4.
+Returns 1 if both pass, 0 otherwise. No external writes.
+Simpler than sibling check_effect_slot_zone_equip_valid (0x080309b8) which also checks type [5..10] and whitelist.
+Constants: SLOT_FIELD_MASK=0x38000 (bits[17:15] of [ptr+4]); SLOT_FIELD_VALUE=0x8000 (bits[17:15]==0b001); TYPE_LIMIT=4.

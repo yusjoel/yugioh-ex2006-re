@@ -1,0 +1,6 @@
+Load banlist password table from ROM into EWRAM gBanlistPasswordBuffer.
+Reads up to 671 (0x29f) 2-byte entries from ROM_PASSWORD_TABLE (0x09e3c044),
+stores each with byte-swap: high byte first, then low byte (ROM=little-endian halfword, EWRAM=big-endian byte pair).
+Secondary guard: byte offset <= 1442 (0x5a2); but 671*2=1342 < 1442 so entry counter triggers exit first.
+No parameters, no return value.
+Constants: ROM_PASSWORD_TABLE=0x09e3c044; MAX_ENTRIES=0x29f=671; BYTE_GUARD=0x5a2=1442; DEST=gBanlistPasswordBuffer (0x02029810).

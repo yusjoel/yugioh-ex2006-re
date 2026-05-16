@@ -1,0 +1,8 @@
+Validate that an effect node's zone type and side allow an equip operation on slot 0.
+Flow: (1) read_effect_slot_side_and_type(effect_node, slot_index=0) -> side=r3, type_nibble=r2;
+(2) extract bits[17:15] of effect_node[+4]; if != 0x8000 return 0;
+(3) if type_nibble in [5..10] return 1 (equip zone valid);
+(4) if type_nibble > 4 (not in [5..10]) return 0;
+(5) type_nibble in [0..4]: call check_slot_card_is_equip_whitelist(side, type_nibble).
+Caller FUN_08061688 (duel_field) checks equip target validity during spell/trap activation.
+Constants: ZONE_TYPE_MASK=0x38000 (bits[17:15] of effect_node[+4]); ZONE_TYPE_EQUIP=0x8000; EQUIP_ZONE_LO=5; EQUIP_ZONE_HI=10.

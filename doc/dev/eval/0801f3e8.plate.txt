@@ -1,0 +1,6 @@
+Linear search deck_record_table for a record whose first u16 matches search_key; return its index.
+Iterates deck_record_table (ROM 0x09E58D0C), 32 bytes per record, up to 120 records (0x78),
+comparing first halfword with r0. Returns index [0..119] on match, -1 on miss (rsbs on 1).
+Callers: FUN_0802d2fc and FUN_0802d3c4 (card tilemap upload), enter_limited_duel_page (0x080e1390),
+enter_duel_puzzle_page (0x080e1a50), enter_theme_duel_page (0x080e3904).
+Constants: deck_record_table=0x09E58D0C; RECORD_STRIDE=0x20=32; MAX_RECORDS=0x78=120; NOT_FOUND=-1.

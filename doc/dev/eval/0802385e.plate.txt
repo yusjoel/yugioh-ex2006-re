@@ -1,0 +1,7 @@
+Inline exit fragment on overflow path of parent state machine FUN_08022e2c.
+Triggered when field_state > 0x14.
+Unlike poll_fadein_exit_to_duel_state (0x0801fe92), skips tick_duel_field_fadein_step;
+directly reads [0x0201e2a0+0x224] (gDuelState+0x89*4) and returns the scene state word,
+then executes full parent epilogue: add sp,#0x8; pop {r3,r4}; high-reg restore; pop {r4-r7}; bx r1.
+Pointer table DAT_0x08022e64 indices 0xf..0x14 (6 entries) all point here.
+Constants: DUEL_STATE_SLOT=[0x0201e2a0+0x224] (gDuelState+0x89*4).

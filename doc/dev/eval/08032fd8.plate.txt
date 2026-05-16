@@ -1,0 +1,8 @@
+Count all field cards (both players' monster zones + special zones) that pair-allow with target_card_id.
+r0=player_side (bit[18]=player_side_tag), r1=target_card_id (saved to r8 via mov r8,r1).
+Outer loop 2 players; inner loop 10 monster slots each from gDuelFieldSlots (0x0201c510, slot_entry=0x14 bytes).
+Each slot: extract bits[18:0]=card_icid; call check_card_pair_allowed(card_icid, r8); on hit r7++.
+Also scans gP1LifePoints+0x418 (0x83<<3, gy_array_offset) special zone for same check.
+Returns r7 (total count). Pure read, no external writes.
+Callers: FUN_0807ed04 and FUN_0807ee74 (duel_field) in case 0x78 pair threshold checks.
+Constants: gDuelFieldSlots=0x0201c510; player_stride=0x868; slot_entry=0x14; slot_count=11; special_zone_array_offset=0x83<<3=0x418.

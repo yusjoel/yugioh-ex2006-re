@@ -1,0 +1,7 @@
+Search the given player's chain zone (offset 0x18/0x3a0) for the first slot whose card pairs with target_card_id; return slot index.
+r0=player_side (bit0), r1=target_card_id (saved to r7).
+Reads chain zone count from gP1LifePoints+player*0x868+0x18; iterates array from gP1LifePoints+player*0x868+0x3a0 (0xe8<<2).
+Each slot: extracts bits[18:0] as card_icid, calls check_card_pair_allowed(card_icid, target_card_id).
+On first hit: return current index r5. No hit: return -1 (rsbs).
+Callers: FUN_0807b77c, FUN_08080944, FUN_08096fe0 (all duel_field effect check flows).
+Constants: gP1LifePoints=0x0201c4e0; player_stride=0x868; chain_zone_count_offset=0x18; chain_zone_array_offset=0xe8<<2=0x3a0.

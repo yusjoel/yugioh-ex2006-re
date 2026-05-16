@@ -1,0 +1,7 @@
+Advance demo_shuen scene BG3 vertical scroll phase by one frame.
+Reads gDemoState+0x8C halfword bits[8:15] (8-bit vertical scroll counter); takes mod 0xF0=240 (GBA screen height),
+negates result, calls write_shuen_bg3_scroll_regs(r0=-(counter%240), r1=0) to update BG3HOFS (left-scroll visual parallax).
+Increments counter by 2 with 0xFF mask wraparound; if counter >= 0xF0 subtracts 0xF0 and re-masks.
+Writes updated counter back to [gDemoState+0x8C] bits[8:1].
+Symmetric sibling of tick_demo_shuen_bg3_hscroll (0x0801ba78, reads bits[23:16], horizontal phase).
+Constants: VSCROLL_WRAP=0xF0=240; COUNTER_STEP=2; COUNTER_MASK=0xFF.

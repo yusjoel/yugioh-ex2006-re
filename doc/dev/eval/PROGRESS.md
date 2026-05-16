@@ -54,8 +54,8 @@ byte-identical 通过后自动 commit, 进入下一批。
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
 | **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 20 批 / 4×10 并行 |
-| **下一批** | `#83` (40 fns, 4 splits × 10) |
-| **上次更新** | 2026-05-16 (Phase 2 batch #82, 40/766 = 5.22%) |
+| **下一批** | `#84` (40 fns, 4 splits × 10) |
+| **上次更新** | 2026-05-16 (Phase 2 batch #83, 80/766 = 10.44%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -77,10 +77,11 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**40 / 766 已分析** (5.22%, 38 批待跑)
+**80 / 766 已分析** (10.44%, 37 批待跑)
 
 里程碑 commits:
-- batch #82 `(pending)` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
+- batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
+- batch #83 `` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
 
 #### Phase 2 ready 集合统计
 

@@ -1,0 +1,6 @@
+Scale character width by current encoding mode.
+Reads [0x02006c2c] bits[2:0] (encoding_flag).
+flag==0 (JP mode): return r0 unchanged (full-width character, no reduction).
+flag!=0 (non-JP/ASCII mode): return r0/2 (half-width character = arithmetic right shift by 1).
+Caller FUN_0801a230 (font_jp;game_str;settings) uses return value * count_str_charlen to compute total render width.
+Constants: ENCODE_FLAG_ADDR=0x02006c2c.

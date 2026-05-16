@@ -1,0 +1,7 @@
+Advance demo_shuen scene WIN0 vertical window fade-in animation by one frame.
+Interpolates progress r6=(r0*80)/r1; sets WIN0V: Y1=(80-r6), Y2=(r6+80) -- window expands from center outward.
+On final frame (cur==total): sets WININ bits[5:0]=0x3B (enable all BG+OBJ layers), clears WINOUT bit5,
+sets WIN0H=0x00F0 (full width 240px), WIN0V=0x00A0 (full height 160px), calls gl_set_brightness(0x3f,0) and gl_set_blend2_level.
+Symmetric sibling of apply_win0v_fadeout_step (0x0801bcb8); direction is reversed.
+Constants: WINDOW_HALF_HEIGHT=0x50=80; WIN0V=0x04000044; WIN0H=0x04000040; WININ=0x04000048; WINOUT=0x0400004a;
+WININ_ENABLE_MASK=0x3B; DISPCNT_SETMASK=0x2000; DISPCNT_CLEARMASK=0xFFFF9FFF.

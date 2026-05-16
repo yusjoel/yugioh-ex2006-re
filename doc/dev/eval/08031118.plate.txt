@@ -1,0 +1,7 @@
+Search both players' full field (2 x 11 slots) for the first slot whose set_code matches r0; return packed location.
+Outer loop r5=[0..1] (player_id), inner loop r4=[0..10] (slot_index).
+Each slot from gDuelFieldSlots + player*0x868 + slot_idx*0x14; extracts set_code = bits[29:22]*2 + bit19.
+On match: return (slot_idx<<8)|player_id. No match: return -1.
+Caller FUN_080521a0 (duel_field) uses return value in equip chain validation (passes to find_zone_chain_node_by_card_id_pair).
+Sibling of find_slot_idx_by_set_code (0x08031184) which searches a single player.
+Constants: gDuelFieldSlots=0x0201c510; player_stride=0x868; slot_entry=0x14; slot_count_per_player=11.

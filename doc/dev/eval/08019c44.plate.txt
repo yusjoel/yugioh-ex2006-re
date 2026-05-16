@@ -1,0 +1,4 @@
+Banlist password input scene no-op input handler stub.
+Body: movs r0,#0 + bx lr. Accepts any r0 but discards it; always returns 0 (event not consumed).
+Sole caller FUN_08019d14 (scene_pass_input;banlist;font_jp;settings) installs this as pass_input handler during banlist list BG init.
+Constants: (none)

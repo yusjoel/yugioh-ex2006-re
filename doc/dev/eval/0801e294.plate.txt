@@ -1,0 +1,7 @@
+Write a 2x2 tile glyph block into BG VRAM with palette and tile data copy.
+Steps: (1) copy 32 bytes from PALRAM[palette_slot*32] to palette_dst;
+(2) copy 128 bytes from OBJ VRAM char area 0x06004000[source_tile*32] to tile_data_dst;
+(3) write 4 screen map entries at BG_SCREEN_BASE+screen_tile_offset*2 to form 2x2 glyph block
+    (entry = (palette_slot&0xF)<<12 | (source_tile+n); screen width=32 tiles, second row offset=+0x40).
+Low-level BG font blitter integrating palette copy, tile copy, and tilemap write.
+Constants: OBJ_CHAR_BASE=0x06004000; BG_SCREEN_BASE=0x06000000; BG_SCREEN_WIDTH=32; PALRAM_BASE=0x05000000; TILE_BYTES=32; PALETTE_ROW_BYTES=32.

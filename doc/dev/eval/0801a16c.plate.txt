@@ -1,0 +1,5 @@
+Validate and store banlist password list scroll direction step.
+r0 must be +1 (scroll down) or -1 (scroll up); otherwise calls suppress_assert_report (src 0x09e3c584 line 717).
+On valid input, writes r0*16 (+16 or -16) to gBanlistPasswordBuffer+0x666 as pixel scroll step.
+Caller FUN_08019fe4 (banlist;font_jp;settings) passes direction via r8->r0 on scroll events (4 call sites).
+Constants: STEP_FIELD=gBanlistPasswordBuffer+0x666 (0x02029e76); VALID_DOWN=+1; VALID_UP=-1; PIXEL_STEP=16=0x10 (r0<<4).

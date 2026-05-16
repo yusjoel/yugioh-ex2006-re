@@ -1,0 +1,8 @@
+Serialize field zone (monster/spell/extra) set_codes and write OAM attributes to destination buffer.
+r0=player_side (bit0), r1=dest_buf ptr.
+Reads counts from gP1LifePoints+0xc/0x10/0x18 (player_stride=0x868); writes 3 strh count headers to dest_buf.
+Extracts set_code from each zone: bits[23:16]<<1 | bit13; writes strh to dest_buf zone entries.
+Also writes OAM attr0 (strh+strb) and OAM attr2 tile_num (strh) for each zone slot.
+memcpy (0x100 bytes) from gP1LifePoints+0x84<<2 to r1+0x210+player_offset.
+Allocates large stack frame (sub sp,#0x10c).
+Constants: gP1LifePoints (base); player_stride=0x868; OAM_ATTR2_MASK=0xffffc03f; memcpy_len=0x80<<1=0x100.

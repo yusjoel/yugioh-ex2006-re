@@ -1,0 +1,7 @@
+Count monster zone cards where field5 is nonzero for the given player.
+Reads monster zone card count from gP1LifePoints+player*0x868+0x10; iterates array from +0x260 (0x98<<2).
+Each slot: extract bits[18:0] = card_icid; call check_card_field5_is_nonzero(card_icid); if nonzero increment r6.
+Returns r6 (count). Pure read, no external writes.
+Caller FUN_0807512c (card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings) in case 0x80:
+compares result to total monster count ([base+0x10]) to check if all satisfy field5>0.
+Constants: gP1LifePoints=0x0201c4e0; player_stride=0x868; monster_zone_count_offset=0x10; monster_zone_array_offset=0x98<<2=0x260.

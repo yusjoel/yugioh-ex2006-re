@@ -1,0 +1,7 @@
+Banlist password input interface cursor slot forward advance function.
+Reads bits[5:3] of gBanlistPasswordBuffer+0x660 (current slot 0..2), increments by 1, writes back;
+also writes 0x08 (forward direction marker) to +0x667.
+Non-JP encoding mode ([0x02006c2c] bits[2:0] != 0) and candidate==2: skip slot 2, wrap to 0.
+JP mode (bits[2:0]==0): modulo-3 wrap normally.
+Symmetric sibling of advance_name_input_cursor_slot (0x0801848c); same field offsets, different EWRAM base.
+Constants: CURSOR_FIELD_OFFSET=0x660; DIR_FIELD_OFFSET=0x667; DIR_FORWARD=0x08; ENCODE_FLAG_ADDR=0x02006c2c.

@@ -1,0 +1,6 @@
+Banlist password input scene BG2 scroll register write with bias.
+r0 = shared scroll base; writes BG2VOFS = r0-16 and BG2HOFS = -5 (fixed).
+Callers: FUN_08019e2c (scene_pass_input;banlist BG init, r0=0) and FUN_0801a1ac (frame update, computed scroll).
+Sibling of write_bg3_vofs_with_bias (0x08018248, bias=8) and write_bg0_vofs_with_bias (0x08017cc4, bias=40);
+this function writes two registers (BG2VOFS + BG2HOFS) unlike the single-register siblings.
+Constants: BG2VOFS=0x04000018; BG2HOFS=0x04000016 (BG2VOFS-2); VOFS_BIAS=0x10=16; HOFS_FIXED=-5=0xFFFB.
