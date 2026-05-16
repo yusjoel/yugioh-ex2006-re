@@ -86,7 +86,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #84 `3654958` 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
 - batch #85 `220ef3d` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
 - batch #86 `dbc64c6` 160/766 (20.89%) — equip set BST whitelist cluster + banlist canonical map + zone rank3 compaction
-- batch #87 `<HASH>` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
+- batch #87 `784c1bf` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
