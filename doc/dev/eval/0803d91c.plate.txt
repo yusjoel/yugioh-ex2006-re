@@ -1,0 +1,9 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x3e. Reads 0x0201bcc0 context: hword[+2] high byte=r7 (zone_hi), byte[+4]->r8 (saved), byte[+6] high byte=r9 (saved zone_hi2), hword[+4]>>8=r4 (count).
+Reads a control flag from 0x0201c4d0; if that word==1, jumps to LAB_0803daa0 (step 0 done path).
+Multi-way branch on cmp r2,#0/1/2, each path:
+- Step 0 (count==0): if [base+0x0201c510+zone_offset] card_id==0, clears [base+0x80c] and returns; else computes zone_offset to locate zone struct, writes zone struct address when [+0x80c] nonzero.
+- Step 1/2: extends computation with r9 (zone_hi2) for opposing player zone.
+Checks card IDs and updates field bitmaps for zone transition state across monster zone slots, then advances step counter.
+Side effects: [gP1LifePoints+0x80c]:=0 at sequence end; [0x0201c510+zone_offset+...] written with zone_ptr.
+
+Constants: STEP_COUNTER_BASE=0x0201c4d0, ZONE_ARRAY_BASE=0x0201c510, ZONE_STRIDE=0x868, STATE_FLAG_OFFSET=0x80c.

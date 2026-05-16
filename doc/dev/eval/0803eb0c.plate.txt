@@ -1,0 +1,7 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x32. Reads 0x0201bcc0 context: player_id (hword[0] bit15, saved to r8), slot_type_a (hword[+2]), slot_type_b (hword[+4] bit0), slot_type_c (hword[+6] bit0).
+Uses [base+0x810] as step state with up to 5-phase internal switchD (0..4), each phase calls dispatch_card_display_op(opcode=0x1e) and advances step.
+Step 0: checks active player LP field via cmp r8; performs equip node scan (link_equip_node_to_chain, test_slot_has_active_card, check_card_id_is_bes_type); submits opcode=0x1e to dispatch_card_display_op after slot state confirmed.
+Step 1: play_ui_effect(0x1e) waits for completion, then [base+0x810]+1; finally [base+0x814]:=0 ends sequence.
+Side effects: [0x0201bcc0+0x810] step counter incremented; [0x0201bcc0+0x814] cleared at end; link_equip_node_to_chain writes equip chain node.
+
+Constants: STEP_COUNTER_OFFSET=0x810, STEP_DONE_OFFSET=0x814, DISPLAY_OP=0x1e.

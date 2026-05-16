@@ -1,0 +1,9 @@
+Pure leaf function, no calls. Called by FUN_0803e594 and FUN_0803eb0c to determine if a card is a BES-series monster.
+Checks r0 (card_id) against four card IDs:
+- 0x1837 = Big Core (pw=14148099)
+- 0x1913 = B.E.S. Crystal Core (pw=22790789)
+- 0x1962 = B.E.S. Tetran (pw=44954628)
+- 0x19bf = B.E.S. Covered Core (pw=15317640)
+Returns 1 if card is BES series, 0 otherwise. No side effects.
+
+Constants: BIG_CORE_ID=0x1837, BES_CRYSTAL_CORE_ID=0x1913, BES_TETRAN_ID=0x1962, BES_COVERED_CORE_ID=0x19bf.

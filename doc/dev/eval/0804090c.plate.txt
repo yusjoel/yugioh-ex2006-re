@@ -1,0 +1,7 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x5c. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r6), hword[+2]=r7, hword[+4]->r8 (saved).
+Step 0 ([base+0x810]==0): calls advance_prng_state() to advance PRNG, then dispatch_card_display_op(r0=0x38, r1=player_id, r2=r7, r3=r8). Sets [base+0x810] from 0 to 1.
+Step 1: play_ui_effect(0x38) polls until done; on success clears [base+0x80c].
+Overall: one PRNG-rolling card display event-driven sequence.
+Side effects: advance_prng_state writes global PRNG state; [0x0201bcc0+0x810]:=1 after step 0; [0x0201bcc0+0x80c]:=0 after step 1.
+
+Constants: STEP_COUNTER_OFFSET=0x810, STATE_FLAG_OFFSET=0x80c, DISPLAY_OP=0x38.

@@ -1,0 +1,6 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x23. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r6), hword[+2]=zone_type (r5).
+Step 0 ([+0x810]==0): if zone_type!=0xb, calls dispatch_card_display_op(opcode=0x30, player_id, zone_type, 0); always calls dispatch_card_display_op(opcode=0xd, player_id, 0, 0); sets [+0x810]:=1.
+Step 1 ([+0x810]==1): if zone_type!=0xb, calls play_ui_effect(0x30) and waits; on done (r0==0): selects opposing player by player_id, clears gP1LifePoints+opp_player*0x868+[+0x2c] LP slot field; reads 0x0201e2a0[4] active_player to choose display mode (1 or 2); writes gP1LifePoints+player_id*0x868+0x1cfc (sequence state field); clears [base+0x80c]:=0 to end.
+Side effects: [0x0201bcc0+0x810] step counter incremented; gP1LifePoints+opp*0x868 cleared; gP1LifePoints+player*0x868+0x1cfc written; [0x0201bcc0+0x80c]:=0.
+
+Constants: STEP_COUNTER_OFFSET=0x810, STATE_FLAG_OFFSET=0x80c, ZONE_TYPE_FIELD=0xb, DISPLAY_OP_STEP0a=0x30, DISPLAY_OP_STEP0b=0xd, PLAYER_ZONE_STRIDE=0x868, LP_SLOT_OFFSET=0x2c, SEQ_STATE_OFFSET=0x1cfc.

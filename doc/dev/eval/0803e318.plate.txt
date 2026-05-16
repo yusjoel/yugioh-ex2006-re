@@ -1,0 +1,8 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x3c. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r7), hword[+2]=slot_type (r8), hword[+4]=count (r5), byte/hword[+6] split into zone_byte (r3) and zone_hi (r9/r1).
+Three-way branch on [base+0x810] (0/1/other):
+- Step 0 ([+0x810]==0): if count (r2)==0, calls get_card_effect_category to compute display index, then calls write_card_display_index_with_bit_offset with opcode=0x2f or 0x2e depending on player; advances [+0x810] to 1.
+- Step 1 ([+0x810]==1): play_ui_effect(0x25) waits; on completion calls dispatch_card_display_op(0x24, ...) and clears [+0x80c].
+Overall: one frame-driven display sequence with card effect category index calculation.
+Side effects: write_card_display_index_with_bit_offset writes global card display index table; [0x0201bcc0+0x810] incremented; [0x0201bcc0+0x80c]:=0 on completion.
+
+Constants: STEP_COUNTER_OFFSET=0x810, STATE_FLAG_OFFSET=0x80c, DISPLAY_OP_STEP0a=0x2f, DISPLAY_OP_STEP0b=0x2e, DISPLAY_OP_STEP1=0x25.

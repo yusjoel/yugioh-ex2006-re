@@ -1,0 +1,7 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x3b. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r5), hword[+2]=slot_type/zone_id (r6), hword[+4]->r9 (saved), hword[+6]=list_count (r0/r8).
+Pre-condition: if list_count (hword[+6])>0, takes step path; if list_count<=0 (LAB_0803f998 branch): locates zone slot from gDuelFieldSlots=0x0201c510+zone_type*0x14+player*0x868, reads card_id field (low 13 bits), calls check_card_id_is_equip_set_a; if equip set calls dispatch_card_display_op(0x23) and increments [+0x810]+1; converges to LAB_0803fa0c to call dispatch_card_display_op(0x24) and clear [card_display_state_base+0x80c]:=0.
+Step 0 ([+0x810]==0): calls find_slot_idx_in_dual_list_by_id(r0=player_id, r1=slot_type) to find slot in dual list; merges slot_idx with player_id: player_id|=0x1000 (0x80*0x20); calls dispatch_card_display_op(r0=0x23, r1=modified_player, r2=r9_saved, r3=slot_idx). Sets [+0x810]:=1.
+Step 1 ([+0x810]!=0): exits directly.
+Side effects: [0x0201bcc0+0x810]:=1 (step advance, list_count>0 path); [gDuelFieldSlots+zone_slot+0xc]+=1 (LAB_0803f998 path equip count increment); [0x0201bcc0+0x80c]:=0 (LAB_0803fa0c path, display state cleared).
+
+Constants: STEP_COUNTER_OFFSET=0x810, PLAYER_FLAG_OR=0x1000 (0x80 lsl 5), DISPLAY_OP=0x23.

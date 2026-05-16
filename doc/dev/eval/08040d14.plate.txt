@@ -1,0 +1,5 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x72 (highest-numbered case). Pure leaf function (no bl calls).
+Loads card_display_state_base=0x0201bcc0 (DAT_08040d20) and offset=0x80c (DAT_08040d24) from literal pool. Writes 0 to [card_display_state_base+0x80c]. Resets display sequence state flag (STATE_FLAG_OFFSET=0x80c) to signal display layer that current case handling is complete. No parameters, no return value.
+Side effects: [0x0201bcc0+0x80c]:=0 (resets display state flag).
+
+Constants: BASE_PTR=0x0201bcc0 (DAT_08040d20), STATE_FLAG_OFFSET=0x80c (DAT_08040d24).

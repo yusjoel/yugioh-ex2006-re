@@ -1,0 +1,5 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x38. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r0), byte[+2]=slot_type_a (r1), hword[+2]>>8=zone_hi (r2), hword[+4]=slot_type_b (r3), hword[+6]=extra_data (r4, pushed to stack for clear_zone_slot_card_ref_bits).
+Calls clear_zone_slot_card_ref_bits (FUN_0802f0d8) to clear zone node ref bits. Then calls dispatch_card_display_op(r0=0x24, r1=0, r2=0, r3=0) to notify display. Finally clears [base+0x80c] and returns via pop {r0}; bx r0. No step state machine; single-shot execution. Same type as commit_field_slot_bit_with_display_op24 (case 0x2a).
+Side effects: clear_zone_slot_card_ref_bits writes [0x0201d9c0+slot*8] zone node; [0x0201bcc0+0x80c]:=0 (resets state flag).
+
+Constants: DISPLAY_OP=0x24, STATE_FLAG_OFFSET=0x80c.

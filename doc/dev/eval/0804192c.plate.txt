@@ -1,0 +1,6 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x5f. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r1), hword[+2]=slot_type (r2), hword[+4]=slot_idx (r4), hword[+6]=extra_data (r3).
+Step 0 ([base+0x810]==0): merges r3 and r4 fields (lsls r3<<0x18 | lsls r4<<0x18 >>0x8, extracts as one 16-bit merged value). Calls dispatch_card_display_op(r0=0x3e, r1=player_id, r2=slot_type, r3=merged_field). Sets [base+0x810]:=1.
+Step 1 ([+0x810]!=0): bne skip, exits directly. Symmetric to tick_card_display_seq_op3b (case 0x5e).
+Side effects: [0x0201bcc0+0x810]:=1 (step 0 advance).
+
+Constants: STEP_COUNTER_OFFSET=0x810, DISPLAY_OP=0x3e.

@@ -1,0 +1,6 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x17. Reads 0x0201bcc0 context: hword[+2]->r8, hword[+4]->r9, ldrb/ldrh[+6]->r4/r7 composed.
+Step 0 ([base+0x810]==0): calls invoke_build_equip_candidate_score_table(r0=0) to build equip candidate score table, then trigger_equip_activation_candidate_scan(r0=0) to start candidate scan, then dispatch_card_display_op(opcode=0x0c, r1=r8, r2=r9) with composed byte params; increments step counter.
+Step 1 ([+0x810]>=1): bne skip, exits immediately. Full sequence covers one equip candidate selection display sync.
+Side effects: [0x0201bcc0+0x810] step counter incremented; global equip candidate data updated via callees.
+
+Constants: STEP_COUNTER_OFFSET=0x810, DISPLAY_OP=0x0c.

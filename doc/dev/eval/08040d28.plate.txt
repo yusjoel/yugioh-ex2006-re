@@ -1,0 +1,6 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x59. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r4).
+Step 0 ([base+0x810]==0): locates player zone ptr at gP1LifePoints+player_id*0x58+0x14, reads [+0x818] slot count (minus 1), calls get_zone_slot_ptr(r0=player_id, r1=0xe) to get slot ptr, calls write_word_from_deref_src to write slot data to [base+0x818]. Then checks card type via check_card_type_is_spell: if spell r1=0xc (spell zone), else r1=0xd (trap zone). Calls erase_slot_from_zone_array_by_type to remove slot from zone array, then dispatch_card_placement_by_zone_type for field card placement, finally dispatch_card_display_op(opcode=0x18) notifies display.
+Step 1: bne skip, exits directly.
+Side effects: write_word_from_deref_src writes [base+0x818]; erase_slot_from_zone_array_by_type removes zone array entry; dispatch_card_placement_by_zone_type updates field card placement.
+
+Constants: PLAYER_ZONE_STRIDE=0x58, ZONE_TYPE_HAND=0xe, ZONE_TYPE_SPELL=0xc, ZONE_TYPE_TRAP=0xd, DISPLAY_OP=0x18, FIELD_OFFSET_0x818=gP1LifePoints+0x818.

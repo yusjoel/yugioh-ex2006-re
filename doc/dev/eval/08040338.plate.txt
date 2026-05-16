@@ -1,0 +1,7 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 4. Reads 0x0201bcc0 hword[0] bit15=player_id (r1->r8 saved), reads current active player from 0x0201e2a0.
+Initializes multiple battle state fields: [gP1LifePoints+0x1ce8] XOR 1 (toggle facing flag); [gP1LifePoints+0x1cec] +1 (increment counter); [gP1LifePoints+0x1d18]:=0 and [+0x1d1c]:=0 (clear two state words); [gP1LifePoints+0x1cf4]:=7 (init value).
+Compares both players LP from gP1LifePoints+player*0x868+LP_OFFSET: if player1 LP >= player2 LP r7=0; else r7=1.
+Calls write_card_display_index_entry(r0=0x38, r1=r7=lp_result), then dispatch_card_display_op(opcode=5, ...). Finally clears [base+0x80c].
+Side effects: 5 IWRAM field writes for init/toggle/increment; write_card_display_index_entry writes display index; [0x0201bcc0+0x80c]:=0.
+
+Constants: FLAG_TOGGLE_OFFSET=0x1ce8, COUNTER_OFFSET=0x1cec, STATE1_OFFSET=0x1d18, STATE2_OFFSET=0x1d1c, INIT_VAL_OFFSET=0x1cf4 (init=7), PLAYER_ZONE_STRIDE=0x868, DISPLAY_INDEX_ENTRY=0x38, DISPLAY_OP=0x5, STATE_FLAG_OFFSET=0x80c.

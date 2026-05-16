@@ -1,0 +1,9 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x4f. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r7), hword[+2]=slot_type (r8 saved), word[+4] extracts slot_count (bits[29:25], lsls>>lsrs) and swap_flag (bit14->r9), hword[+6]=card_id (r2, pushed to stack).
+Calls find_slot_idx_by_card_id_in_player_zones(r0=player_id, r1=card_id) to search both player zones for matching card_id slot. Uses [base+0x810] as step state (0/1/2/3 four-way dispatch):
+- Step 0 (<1): dispatch_card_display_op(0x42, player_id, r8, ...) triggers card-found animation; step+1.
+- Step 1 (==1): play_ui_effect(0x42), on done if swap_flag calls write_card_display_index_with_bit_offset(0x1d); then dispatch_card_display_op(0x1c, player_id, ...) shows zone location; step+1.
+- Step 2 (==2): dispatch_card_display_op(0x18, ...) + write_card_display_index + step+1.
+- Step 3 (==3): erase_slot_from_zone_array_by_type + place_card_into_spelltrap_zone_slot + write_field_slot_bit_by_player.
+Side effects: [0x0201bcc0+0x810] incremented each step; write_card_display_index_with_bit_offset writes display index table; place_card_into_spelltrap_zone_slot writes spell/trap zone slot; write_field_slot_bit_by_player writes field bitmap.
+
+Constants: STEP_COUNTER_OFFSET=0x810, DISPLAY_OP_STEP0=0x42, DISPLAY_OP_STEP1=0x1c, DISPLAY_OP_STEP2=0x18, DISPLAY_OP_IDX=0x1d, PLAYER_ZONE_STRIDE=0x868.

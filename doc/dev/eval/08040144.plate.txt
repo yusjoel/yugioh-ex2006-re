@@ -1,0 +1,7 @@
+Triggered by FUN_0803be4c (duel event display hub) at case 0x58. Reads 0x0201bcc0 hword[+2]=slot_type; uses [base+0x810] as step state.
+Step 0 ([+0x810]==0): calls write_slot_occupy_flag_bit(r0=2) to mark slot occupy state; then calls sort_hand_cards_by_lp_score with r0=0 and r0=1 to sort both players' hand cards by LP score; finally calls dispatch_card_display_op(opcode=0x14, player=0, zone_type=0xd, extra=0) and dispatch_card_display_op(opcode=0x14, player=1, zone_type=0xd, extra=0) to trigger spell/trap zone display update.
+Step 1+: bne skip, exits.
+Entry point for hand reorder initialization display.
+Side effects: write_slot_occupy_flag_bit writes slot occupy flag; sort_hand_cards_by_lp_score reorders both players' hand arrays; [0x0201bcc0+0x80c]:=0 on completion.
+
+Constants: OCCUPY_FLAG_VAL=2, DISPLAY_OP=0x14, ZONE_TYPE=0xd, STEP_COUNTER_OFFSET=0x810, STATE_FLAG_OFFSET=0x80c.
