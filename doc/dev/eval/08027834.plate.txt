@@ -1,0 +1,8 @@
+Per-frame tick handler for campaign_scene_handler dispatch table index 31. Trigger: gPrng+0x202 bits[13:6] == 0x1f. Calls tick_lp_display_and_blend_step to advance LP digit sprite rendering and blend fade; if returns 0 (not done) calls SUB_08026714 to wait next frame. Otherwise clears gPrng+0x203 low 6 bits (AND 0x3f, slot_type mask) and clears bit6 (AND ~0x40) at gPrng+0x224+0x204, increments gPrng+0x202 frame counter bits[13:6], then tail-calls SUB_08026714 to advance to next step.
+
+Constants:
+- step_index=31 (0x1f)
+- gPrng_slot_offset=0x203 (low 6 bits=slot_type index)
+- slot_type_mask=0x3f
+- gPrng_bit6_addr=gPrng+0x203 (AND ~0x40 clears bit6)
+- frame_ctr_mask=0xffffc03f

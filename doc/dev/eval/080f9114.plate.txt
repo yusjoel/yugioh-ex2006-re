@@ -1,0 +1,8 @@
+Clears active flag bits for all OAM entries in the hand card range. Called by run_campaign_step26_init_duel_puzzle_scene (0x0802752c) during duel entry initialization. Reads hand entry count from ROM pointer 0x095b7cca and upper count from EWRAM+6 (0x02000006). If count is 0 returns immediately. Otherwise loops slot index from 1 to [0x095b7cca] count: for each entry (base=0x02000006, stride=2 bytes) ANDs byte+1 with 0xee (clears bit4=0x10 and bit0=0x01), zeroing active/visible flags. Ensures all hand card sprites are hidden before new duel starts.
+
+Constants:
+- OAM_count_rom_ptr=0x095b7cca (ROM hand entry count)
+- OAM_base=0x02000006 (EWRAM OAM hand entry array base)
+- OAM_entry_stride=2 (bytes per entry)
+- active_flag_mask=~0x11=0xee (clears bit4+bit0)
+- loop_range=[1..[0x095b7cca]] (starts from slot 1)

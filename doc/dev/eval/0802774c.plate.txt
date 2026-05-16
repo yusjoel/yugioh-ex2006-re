@@ -1,0 +1,6 @@
+Duel field fadein tick handler for campaign_scene_handler dispatch table index 29. Trigger: gPrng+0x202 bits[13:6] == 0x1d. Calls tick_duel_field_fadein_step to advance duel field fadein; if returns 0 (not done) tail-calls SUB_08026714 to wait. If done reads [0x02023130+0x226] byte0 bit0: if bit0==1 calls SUB_08027768 (trigger scene-enter complete event); otherwise increments gPrng+0x202 frame counter bits[13:6] and tail-calls SUB_08026714 to advance to step 30.
+
+Constants:
+- step_index=29 (0x1d)
+- state_flag_addr=0x02023130+0x226=0x02023356 bit0
+- frame_ctr_mask=0xffffc03f

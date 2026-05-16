@@ -1,0 +1,9 @@
+Pack name text renderer for campaign_scene_handler dispatch table index 12. Trigger: gPrng+0x202 bits[13:6] == 0x0c. Reads scene_ctx(0x02023360)+3 bits[4:3] as pack_count [0..3]. If pack_count==0 jumps to completion path. Otherwise loops r4=1..min(pack_count,3): calls game_str_id_to_row(r4+0xbe0) to get pack name string row, calls render_centered_text_to_bg_vram to draw centered text, calls write_tile_row_to_vram for separator tile. After loop calls render_opp_wins_display_oam, then tail-calls LAB_08026c56 (writes gPrng+0x202 scaler and jumps to SUB_08026714).
+
+Constants:
+- step_index=12 (0x0c)
+- scene_ctx=0x02023360
+- pack_count=scene_ctx+3 bits[4:3] [0..3]
+- game_str_id_base=0xbe0 (0xbe*0x10); loop: id=r4+0xbe0
+- max_loop=3 (loop guard cmp r4,#0x3; ble)
+- tile_row_data=0x09b953b4

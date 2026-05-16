@@ -1,0 +1,6 @@
+Adds r0 amount to player coin total at [0x02006c38], capped at 0x05f5e0ff (99999999). Called by run_campaign_step33_duel_reward_and_fadein_tick (0x080278c0), FUN_0801fec0 (duel_puzzle main loop), FUN_080283e8, and enter_theme_duel_page (4 callers total). Reads current coins from [0x02000000+0x6c38], adds r0; if sum <= 0x05f5e0fe (99999998) writes sum back; if over cap writes 0x05f5e0ff (99999999). Always calls init_puzzle_wram_and_checksum to update WRAM checksum.
+
+Constants:
+- money_addr=0x02000000+0x6c38=0x02006c38
+- cap_normal=0x05f5e0fe=99999998
+- cap_max=0x05f5e0ff=99999999

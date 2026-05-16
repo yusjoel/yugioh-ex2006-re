@@ -1,0 +1,6 @@
+Per-frame tick: advances LP digit sprite display and blend step. Called by run_campaign_step31_duel_lp_fadein_tick (0x08027834) and FUN_0801fec0 (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; ORs DISPCNT shadow with 0xf8*32=0x1f00 to set sprite display mode bits; calls tick_blend_step_by_delta(4) to advance blend fade. Returns tick_blend_step_by_delta result (0=fade in progress, nonzero=done) via pop {r1}; bx r1 (pattern B). Caller checks cmp r0,#0; bne to decide whether to keep waiting.
+
+Constants:
+- DISPCNT_shadow=0x80*32*0x13 (base area)
+- sprite_mode_mask=0xf8*32=0x1f00 (DISPCNT bits for sprite enable)
+- blend_delta=4

@@ -1,0 +1,15 @@
+Clears all EWRAM/VRAM data regions used by the duel_puzzle scene, resetting display and state buffers before a new duel starts. Callers: FUN_08093660 (duel_puzzle init hub) and FUN_080937d4 (scene_duel_puzzle main handler). Calls zero_fill_by_halfword 9 times on distinct EWRAM regions. At the end checks [scene_ctx2+8/0xc]==2 (player 0 mode is versus); if so writes 1 to gP1LifePoints+0x1d08 to mark two-player versus mode active. Finally clears [0x0201e2a0+0x224] and [0x0201e2a0+0x228] to 0.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- scene_ctx2=0x0201e2a0
+- clear_region_1=0x0201c4e0 (0x1db8 halfwords)
+- clear_region_2=0x0201e4f0 (0xc2*8=0x610 halfwords)
+- clear_region_3=0x0201bcc0 (0x081c halfwords)
+- clear_region_4=0x0201e4d0 (0x18 halfwords)
+- clear_region_5=0x0201b290 (0x05d4 halfwords)
+- clear_region_6=0x0201bb90 (0x98*2=0x130 halfwords)
+- clear_region_7=0x0201b1b0 (0xd8 halfwords)
+- clear_region_8=0x0201afe0 (0xe6*2=0x1cc halfwords)
+- clear_region_9=0x0201b870 (0xc5*4=0x314 halfwords)
+- flag_offset=0x1d08 (written 1 when mode==2)

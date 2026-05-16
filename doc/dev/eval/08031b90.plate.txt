@@ -1,0 +1,11 @@
+Initializes hand card OAM display slot structs for a given player. Called by duel_puzzle init hub (0x08093660) twice, once per player. Selects gP1LifePoints+player*0x868 region based on player_id bit0, sets [base+0x10] := 0, iterates hand list reading hand_count from data pointer. For each hand card updates OAM halfword attrs in EWRAM card display cache (0x0201c740 for player 0 / 0x0201c880 for player 1): slot index, card icon tile offset, frame counter field. On exit writes hand_count-1 to [base+0x8] and hand_count to [base+0x18] for subsequent per-frame animation driver.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- player_stride=0x868 (0x0201c4e0 and 0x0201ccf8 for player 0/1)
+- OAM_cache_p0=0x0201c740 (player 0 card display slot array)
+- OAM_cache_p1=0x0201c880 (player 1 card display slot array)
+- OAM_slot_stride=4 bytes per card entry
+- tile_base_offset=0x87*32=0x10e0 (icon tile row stride)
+- frame_ctr_mask=0xffffc03f (OAM attr bits[13:6])
+- card_id_mask=0x1fff

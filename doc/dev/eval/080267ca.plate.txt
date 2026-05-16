@@ -1,0 +1,9 @@
+Per-frame tick handler for campaign_scene_handler dispatch table index 6. Trigger: gPrng+0x202 bits[13:6] == 0x06. Calls render_opp_wins_display_oam to refresh opponent wins sprites. Reads scene_ctx(0x02023360)+8 word, extracts bits[22:15] as sprite_state [0..255]. If sprite_state > 7 jumps to LAB_08026830 (alternate update path writing gPrng+0x202 scaler then jumping to SUB_08027c22). Otherwise reads ROM table 0x09e59d18[sprite_state*4] as anim_code, writes (sprite_state+1)<<15 to scene_ctx+8 bits[22:15] and (anim_code&0xff)<<7 to bits[14:7], then tail-calls SUB_08026714.
+
+Constants:
+- step_index=6
+- scene_ctx=0x02023360
+- sprite_state=scene_ctx+8 bits[22:15] [0..7]
+- anim_table=0x09e59d18 (ROM sprite animation code table)
+- state_mask_clear=0xff807fff (clears bits[22:15])
+- anim_mask_clear=0xffff807f (clears bits[14:7])

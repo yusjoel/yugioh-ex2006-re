@@ -1,0 +1,7 @@
+Per-frame handler for campaign_scene_handler dispatch table index 26. Trigger: gPrng+0x202 bits[13:6] == 0x1a. Full duel_puzzle initialization sequence: (1) tick_aob_display_with_fadein; if returns 0 calls SUB_08026714 to wait; (2) clear DISPCNT shadow word to 0; (3) clear_oam_active_flags_in_hand_range; (4) zero_fill_by_halfword(0x02029e90, 0x10 halfwords); (5) clear [gPrng+0x23f] bit1 (0x02 mask); (6) zero_duel_scene_display_buffers; (7) clear [0x02023130+0x88*4] OAM cache field with 0xfffc03ff mask; (8) call find_card_index_in_rom_table with current hand card; (9) step_prng_and_get_rand15 then write rand15 to scene_ctx2 as initial seed; (10) fill_card_fs_display_entries_for_card_list; (11) init_duel_puzzle_field_and_hand_display; (12) init_duel_field_vram_layout; (13) compute pack_index (slot_type/5+9) and write OAM attrs; (14) increment gPrng+0x202 frame counter.
+
+Constants:
+- step_index=26 (0x1a)
+- DISPCNT_SHADOW=word at 0x04000400 (cleared to 0)
+- gPrng_scene_byte=gPrng+0x23f (bit1 cleared)
+- OAM_cache_mask=0xfffc03ff

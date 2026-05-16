@@ -1,0 +1,12 @@
+Init handler for campaign_scene_handler dispatch table index 5. Trigger: gPrng+0x202 bits[13:6] == 0x05. Initializes pack-select VRAM and text: (1) zero_fill_by_halfword(0x06001180, 0x80*8=0x400 halfwords) clears BG tile region 1; (2) load_pack_tile_and_map_to_vram(0x840, 0x50, 0x148, 0x09b96c2c) loads pack tile and tilemap; (3) zero_fill_by_halfword(0x06000800, 0xc0*8=0x600 halfwords) clears BG tile region 2; (4) loop r4=0..6 calls render_text_with_font_type_select(r4) 7 times; (5) clears scene_ctx(0x02023360)+8 halfword and word high bits; (6) increments gPrng+0x202 frame counter bits[13:6] and tail-calls SUB_08026714.
+
+Constants:
+- step_index=5
+- VRAM_clear_1=0x06001180 (0x80*8=0x400 halfwords)
+- pack_tile_data_ptr=0x09b96c2c
+- VRAM_clear_2=0x06000800 (0xc0*8=0x600 halfwords)
+- pack_tile_dest=0x840=0x84*0x10
+- pack_map_offset=0x148=0xa4*2
+- text_line_count=7 (loop 0..6)
+- scene_ctx=0x02023360
+- frame_ctr_mask=0xffffc03f

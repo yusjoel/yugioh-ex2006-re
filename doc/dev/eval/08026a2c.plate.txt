@@ -1,0 +1,11 @@
+Per-frame handler for campaign_scene_handler dispatch table index 10. Trigger: gPrng+0x202 bits[13:6] == 0x0a. Sequence: (1) call sync_state_and_init_sprite(1) to reset sprite state; (2) call game_str_id_to_row(0x0be4) and render_centered_text_to_bg_vram to render opponent card name row 1; (3) call write_tile_row_to_vram for separator tile row; (4) call game_str_id_to_row(0x0be5) and render_centered_text_to_bg_vram for row 2; (5) call write_tile_row_to_vram for second separator; (6) zero_fill_by_halfword(0x06000d80, 0x80) and zero_fill_by_halfword(0x06000900, 0x80); (7) clear scene_ctx+8 high bits with 0xff807fff mask; (8) increment gPrng+0x202 frame counter bits[13:6].
+
+Constants:
+- scene_ctx=0x02023360
+- game_str_id_opponent_name_1=0x0be4
+- game_str_id_opponent_name_2=0x0be5
+- VRAM_clear_1=0x06000d80 (0x80 halfwords)
+- VRAM_clear_2=0x06000900 (0x80 halfwords)
+- gPrng_frame_ctr=gPrng+0x202 bits[13:6]
+- mask_clear=0xff807fff (clears bits[14:15])
+- frame_ctr_mask=0xffffc03f

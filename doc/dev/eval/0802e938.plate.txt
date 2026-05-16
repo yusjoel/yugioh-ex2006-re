@@ -1,0 +1,5 @@
+Combined opponent AOB animation tick + fadein completion check. Called by FUN_0802727c (campaign step-24) and run_campaign_step26_init_duel_puzzle_scene (0x0802752c). Calls tick_opponent_aob_display to advance one AOB animation frame, then calls start_blend_fadein_with_target(4) to advance fadein. If fadein returns 0 (not done) returns 0; if done clears DISPCNT shadow (word at 0x04000400 := 0) and returns 1. Caller uses return value to decide whether to keep waiting (0 -> call SUB_08026714) or advance scene (1).
+
+Constants:
+- DISPCNT_SHADOW=0x04000400 (DISPCNT shadow register; 0x80*32*0x13=0x04000000)
+- fadein_target=4 (blend target value)

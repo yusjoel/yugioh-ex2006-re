@@ -1,0 +1,8 @@
+Full field/hand OAM initialization hub on duel_puzzle entry. Called by run_campaign_step26_init_duel_puzzle_scene (0x0802752c) and two other duel_puzzle scene functions. Sequence: (1) clear_duel_puzzle_wram_regions clears all EWRAM regions; (2) set gP1LifePoints[0] and gP1LifePoints[0x868/4] to 0xfa*32=0x1f40 (initial LP); (3) call init_player_hand_display_slots(0, base) and (1, base+0x108) for both players; (4) call shuffle_player_hand_list twice for both players; (5) issue 6 dispatch_card_display_op calls (0xd/0x14, player, op_code) covering both field and hand areas; (6) if [scene_ctx2+8]==3 call poll_sprite_seq_until_done(0) to wait for sprite sequence.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- initial_LP=0xfa*32=0x1f40 (8000, initial life points)
+- player_area_stride=0x868/4 (word offset between p0 and p1 LP regions)
+- dispatch_op_hand=0xd (hand card display op)
+- dispatch_op_field=0x14 (field card display op)

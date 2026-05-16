@@ -1,0 +1,8 @@
+Per-frame tick handler for campaign_scene_handler dispatch table index 1. Trigger: gPrng+0x202 bits[13:6] == 0x01. Sequence: (1) call set_channel_if_changed(4) to switch BGM channel; (2) call render_opp_wins_display_oam to refresh opponent wins sprites; (3) OR DISPCNT shadow with 0xf8*32=0x1f00 to enable sprite display mode; (4) call tick_blend_step_by_delta(4) to advance blend fade; (5) if returns 0 (fade not done) call SUB_08026714 to wait; (6) if done write incremented frame counter to gPrng+0x202 bits[13:6] and update scaler field; (7) tail-call SUB_08026714 to advance.
+
+Constants:
+- step_index=1
+- channel_id=4
+- sprite_mode_or=0xf8*32=0x1f00 (DISPCNT sprite enable mask)
+- blend_delta=4
+- frame_ctr_mask=0xffffc03f

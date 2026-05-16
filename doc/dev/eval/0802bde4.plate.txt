@@ -1,0 +1,5 @@
+Per-frame tick: advances LP digit sprite display and checks fadein completion. Called by run_campaign_step33_duel_reward_and_fadein_tick (0x080278c0) and FUN_0801fec0 (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; calls start_blend_fadein_with_target(4) to advance fadein. If fadein returns 0 (not done) returns 0; if done clears DISPCNT shadow (strh 0 at 0x04000400) and returns 1. Differs from tick_lp_display_and_blend_step: uses start_blend_fadein_with_target (with target detection) instead of tick_blend_step_by_delta (no target check), so it actively clears DISPCNT shadow on completion.
+
+Constants:
+- fadein_target=4
+- DISPCNT_shadow_clear=0x80*32*0x13=0x04000000 (strh 0)

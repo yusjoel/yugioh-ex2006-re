@@ -1,0 +1,10 @@
+Per-frame tick handler for campaign_scene_handler dispatch table index 33. Trigger: gPrng+0x202 bits[13:6] == 0x21. Sequence: (1) call tick_lp_display_and_fadein_check; if returns 0 tail-calls SUB_08026714 to wait; (2) read [scene_ctx+0x68] LP prize amount, call accrue_money_with_cap to award coins; (3) read [scene_ctx2+0x89*4] battle_result field (0=no_result, 1=player_win, 2=draw, 3=opp_win); dispatch on four paths each reading next scene ID from a different EWRAM slot and triggering scene transition.
+
+Constants:
+- step_index=33 (0x21)
+- scene_ctx=0x02023360
+- LP_reward_offset=0x68 (scene_ctx+0x68=LP prize amount)
+- scene_ctx2=0x0201e2a0
+- battle_result_offset=0x89*4=0x224 (dword at 0x0201e4c4)
+- battle_result: 1=player_win, 2=draw, 3=opp_win, 0/other=no_result
+- player_slot_base=0x02006e60 (player slot list for next scene select)

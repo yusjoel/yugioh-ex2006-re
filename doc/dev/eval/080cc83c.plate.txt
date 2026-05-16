@@ -1,0 +1,13 @@
+Clears all duel_puzzle scene display buffers and resets audio state, serving as the second stage of scene reset. Called by run_campaign_step26_init_duel_puzzle_scene (0x0802752c) and FUN_0801fec0 (duel_puzzle main loop). Calls zero_fill_by_halfword 8 times on EWRAM display buffers (card OAM entry cache, UI effect area, banner state area, etc.). Then calls request_sound_engine_code10 to reset audio engine. Finally clears gPrng+0x214 (gPrng[0x85]) bit31, which controls duel scene music track selection flag.
+
+Constants:
+- clear_region_1=0x0201ff60 (0x80*4=0x200 halfwords)
+- clear_region_2=0x02023130 (0x8a*4=0x228 halfwords)
+- gUIEffectState=0x02023110 (0x1c*2=0x38 halfwords)
+- clear_region_4=0x0201f440 (0xa2*16=0xa20 halfwords)
+- clear_region_5=0x0201ff30 (0x2c*2=0x58 halfwords)
+- clear_region_6=0x02020160 (0x2f5c halfwords)
+- gBannerState=0x0201fec0 (0x6c*2=0xd8 halfwords)
+- clear_region_8=0x0201fe60 (0x5c*2=0xb8 halfwords)
+- gPrng+0x214=gPrng[0x85] bit31 (music track flag, cleared to 0)
+- music_flag_mask=0x80000000

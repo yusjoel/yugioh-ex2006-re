@@ -1,0 +1,7 @@
+Single-step linear congruential PRNG (LCG) tick function. Called by run_campaign_step26_init_duel_puzzle_scene (0x0802752c) and 7 other callers in duel_puzzle scene functions (8 total callers). Executes one LCG iteration: new_val = gPrng[0]*0x343fd + 0x269ec3; swaps the high and low 16-bit words of the 32-bit result and writes back to gPrng[0]. Returns r0 = (swapped result >> 16 >> 1) = 15-bit random value [0..32767]. Provides a seedless global PRNG step interface for duel_puzzle random shuffles and animation frame jitter.
+
+Constants:
+- gPrng[0]=0x03000040 (global PRNG state register)
+- LCG_mul=0x000343fd
+- LCG_add=0x00269ec3
+- result_range=[0..32767] (15-bit)
