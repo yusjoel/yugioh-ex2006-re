@@ -81,7 +81,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 里程碑 commits:
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
-- batch #83 `` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
+- batch #83 `c9c5102` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
 
 #### Phase 2 ready 集合统计
 
