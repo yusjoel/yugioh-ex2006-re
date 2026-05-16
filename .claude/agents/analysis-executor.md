@@ -201,6 +201,7 @@ model: sonnet
 - batch 中 ≥5 个 sibling stub 函数共享同一 caller hub → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_executor_template_copy_blindspot.md` (模板复制盲点：R7 必须从 batch prompt 取实际 caller addr+tags+role，禁止用场景描述词替代；R4 透传后必须补 callee 的 0/1 语义；batch #53 13+7 函数同批触发)
 - 函数无 push prologue 或 r4/r5/r7 未在函数体内加载即被使用（parent-frame inherited register）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_inline_exit_fragment_parent_frame_registers.md` (R3 须附 callsite asm 证据：parent 函数中 ldr rN,PTR_xxx 的地址+指令；非 APCS input 注明 caller-frame 来源; 0x080a02a0+0x080a02e8)
 - R4 为 switch dispatcher 函数且准备写"各 case 决定/各 case 返回值由 case 代码决定"等泛化描述 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_switch_dispatcher_return_enumeration.md` (R4=0；必须枚举 ≥2 具体出口：越界哨兵 LAB_+movs r0,#V 地址+值；主 case 路径；default caseD；三次复现 batch #65)
+- 函数入口 `ldr r0, DAT_xxx`（IWRAM 基址覆盖 r0）+ 出口 `pop{...};pop{r0};bx r0` + 函数体写 [base+0x80c]=0 和 [base+0x810]+=1 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_tick_display_seq_iwram_cluster.md` (命名 tick_<event_noun>_display_seq；R3=void；R4=void；event_noun 从 callee 名或 op_code 推导；15 实例跨 batch-72 + batch-73)
 
 正常情况完全不需要读 feedback; 命中触发条件再 Read 单个文件。
 
