@@ -1,0 +1,7 @@
+campaign_scene_handler dispatch table index 4. Trigger: gPrng+0x202 bits[13:6] == 0x04. Sequence: (1) bl render_opp_wins_display_oam; (2) reads gPrng+0x203 bits[7:6] and gPrng+0x204 bits[5:0] to form frame_counter r0; (3) if r0 <= 0x1d (29): increments frame_counter, writes back split across +0x203/+0x204, then bl start_blend_fadein_with_target(4); if blend returns nonzero (complete) advances scene step via LAB_08026c56; (4) if r0 > 0x1d: directly bl start_blend_fadein_with_target(4) and waits.
+
+Constants:
+- frame_counter_max = 0x1d (29)
+- blend_target = 4
+- gPrng_frame_ctr = gPrng+0x203 bits[7:6] | gPrng+0x204 bits[5:0]
+- gPrng_frame_mask = 0xffffc03f

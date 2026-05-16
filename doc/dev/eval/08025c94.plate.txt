@@ -1,0 +1,7 @@
+Root dispatch function for the campaign scene. Called indirectly via gMenuState+0x234 function pointer (written by enter_campaign_page). Each frame: reads gPrng+0x202 bits[13:6] as step_index [0..34]. If step_index > 0x22 -> bl exit_campaign_scene_with_next_handler. Otherwise multiplies by 4 and jumps into 35-entry function pointer table at 0x08025ccc. Table entries 8/9/13..19 all point to exit_campaign_scene_with_next_handler (placeholder steps).
+
+Constants:
+- gPrng_step_ctr = gPrng+0x202 bits[13:6] [0..0xff]
+- step_max = 0x22 (34, 35 entries total)
+- dispatch_table = 0x08025ccc (35 * 4 = 0x8c bytes)
+- step_8/9/13..19 = 0x08027c78 (exit_campaign_scene_with_next_handler placeholder)

@@ -1,0 +1,7 @@
+campaign_scene_handler dispatch table index 23. Trigger: gPrng+0x202 bits[13:6] == 0x17. Sequence: (1) bl tick_campaign_card_select_display_state; (2) if returns 0 (not done): b SUB_08026714 to wait; (3) if returns nonzero (done): checks scene_ctx+0x39 bit4 (0x10) and bit3 (0x08) -- if both set, enters extended detail display path (LP panel/deck info rendering); exits via b LAB_08025d28 or b SUB_08026714.
+
+Constants:
+- scene_ctx = 0x02023360
+- bit4 = 0x10 (display complete flag)
+- bit3 = 0x08 (detail mode flag)
+- gPrng_step_ctr = gPrng+0x202 bits[13:6]

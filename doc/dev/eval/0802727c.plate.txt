@@ -1,0 +1,7 @@
+campaign_scene_handler dispatch table index 24. Trigger: gPrng+0x202 bits[13:6] == 0x18. Sequence: (1) bl tick_aob_display_with_fadein; if returns 0 (fade-in not complete): b SUB_08026714 to wait. If returns nonzero (complete): (2) bl build_field_slot_bitmask; (3) bl init_duel_field_icon_and_bg_vram; (4) branches on [0x02006c2c] bits[2:0] = deck_type [0..5] twice to select tile data and BG color data; (5) bl draw_decimal_with_offset(0x40, 0x210, src, 0x10f) and (0x80, 0x21c, 0x1, ..); (6) if scene_ctx+0x4 bits[7:5] > 2 and bits[4:3] > 5: bl game_str_id_to_row + bl render_centered_text_to_bg_vram + bl write_tile_row_to_vram; (7) OAM sprite batch-write loop for card condition sprites; exits via b SUB_08026714.
+
+Constants:
+- deck_type_reg = [0x02006c2c] bits[2:0] [0..5]
+- x_win_label = 0x40, y_win_label = 0x84*4 = 0x210
+- x_lp_label = 0x80, y_lp_label = 0x87*4 = 0x21c
+- oam_sprite_loop_stride = 0xc0<<4 = 0xc00

@@ -1,0 +1,15 @@
+Initializes VRAM data for the opponent card display screen. Called by tick_campaign_card_select_display_state when entering card display sub-state. Sequence: (1) r0/r1 select AOB animation frame type (4 combos: r0=0+r1=0->frame=1, r0=0+r1!=0->frame=0, r0!=0+r1=0->frame=3, r0!=0+r1!=0->frame=2); (2) bl tile_2d_row_copy(0x06014000, ROM 0x098977f8, 0x10, 0x10) copies card tiles; (3) bl copy_bytes_by_halfword(0x05000300, ROM 0x098997f8, 0x40) copies palette; (4) bl init_aob_ctx_from_ptnsect(ctx=0x020233ac, ROM 0x09899838, mode=0x02000007, 1); (5) ctx+0x13 bit0 := 1 (AOB active); (6) bl init_aob_ctx_with_anm_entry(ctx, frame_type, 0); (7) ctx+0x13 bit5 := 1 (animation running); (8) clears ctx+0x14 bits[2:0]; (9) bl setup_line_buf_pos_and_font(0x10, 4); (10) reads [0x02006c2c] bits[2:0] = deck_type [0..5] to select card name string pointer; (11) bl count_bytes_until_null for length; (12) computes center offset r4 = 0x20 - len*3; (13) two bl text_render_wrapper calls; (14) bl zero_fill_by_halfword(0x06014200, 0x100) and zero_fill_by_halfword(0x06014600, 0x100); (15) bl write_line_buf_to_bg_tile_vram(ctx, 0).
+
+Constants:
+- VRAM_tile_dst = 0x06014000 (BG tile VRAM)
+- ROM_tile_src = 0x098977f8
+- PAL_dst = 0x05000300 (BG palette slot 3)
+- ROM_pal_src = 0x098997f8
+- scene_ctx_sub = 0x020233ac (AOB context sub-block)
+- ROM_aob_ptnsect = 0x09899838
+- aob_mode = 0x02000007
+- font_height = 0x10, font_type = 4
+- VRAM_clear_1 = 0x06014200 (0x100 halfwords)
+- VRAM_clear_2 = 0x06014600 (0x100 halfwords)
+- text_x_center = 0x20, text_mode = 2
+- deck_type_reg = [0x02006c2c] bits[2:0] [0..5]

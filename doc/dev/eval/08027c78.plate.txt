@@ -1,0 +1,6 @@
+Fast exit function for campaign_scene_handler; also serves as placeholder for steps 8/9/13..19 and the out-of-range (step > 0x22) path. Loads next scene handler pointer from player_state+0x224 = [0x0201e4c4] into r0, then falls into SUB_08027c82 (campaign_scene_handler full epilogue): restores sp (add sp,#0x14), pops r8/r9/r10 via r3/r4/r5 aliases, pops callee-save r4/r5/r6/r7, pops lr into r1, bx r1. r0 = [0x0201e4c4] returned to campaign_scene_handler caller as next dispatch target.
+
+Constants:
+- player_state_base = 0x0201e2a0
+- next_handler_offset = 0x89*4 = 0x224
+- next_handler_addr = 0x0201e4c4

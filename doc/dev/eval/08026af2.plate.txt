@@ -1,0 +1,10 @@
+campaign_scene_handler dispatch table index 11. Trigger: gPrng+0x202 bits[13:6] == 0x0b. Sequence: (1) reads scene_ctx+0x8 word, checks bits[22:15] (8-bit timer); (2) if nonzero: decrements timer by 1, writes back; looks up ROM table 0x09e59d18 at index (new_timer)*4, takes result & 0xff, shifts left 7 to write anim_frame into scene_ctx+0x8 halfword bits[14:7]; (3) if zero: clears scene_ctx+0x8 bits[14:7] (mask 0xffff807f), reads gPrng+0x202, increments bits[13:6] by 1, writes back (advance to step 12); (4) both paths: bl render_opp_wins_display_oam then b SUB_08026714.
+
+Constants:
+- scene_ctx = 0x02023360
+- timer_field = scene_ctx+0x8 word bits[22:15] [0..255]
+- anim_frame_table = 0x09e59d18 (ROM lookup, 4 bytes/entry)
+- anim_frame_field = scene_ctx+0x8 halfword bits[14:7]
+- mask_clear_anim = 0xffff807f
+- mask_clear_timer = 0xff807fff
+- gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f

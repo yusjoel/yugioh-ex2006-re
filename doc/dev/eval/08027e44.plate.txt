@@ -1,0 +1,4 @@
+Minimal wrapper that calls build_campaign_sprite_row_by_type with fixed row_type=6. Called by tick_campaign_card_select_display_state (0x0802e108) in a specific display sub-state. Body: push{lr}; movs r0,#6; bl build_campaign_sprite_row_by_type; pop{r0}; bx r0. Forms a type5/type6 sibling pair with invoke_build_campaign_sprite_row_type5 (0x08027e38). No independent r0 return value.
+
+Constants:
+- row_type = 6 (sprite row type 6, scene_ctx+0x39 bit4 flag path)

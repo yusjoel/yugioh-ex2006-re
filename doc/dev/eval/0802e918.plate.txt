@@ -1,0 +1,6 @@
+Per-frame tick helper: advances opponent AOB animation + enables sprite display + steps blend fade-in. Called by run_campaign_step21 (0x08026e68). Sequence: (1) bl tick_opponent_aob_display; (2) reads DISPCNT shadow (0x04000000), ORs 0x1f00 (OBJ display enable bits[12:8]), writes back; (3) bl tick_blend_step_by_delta(8); (4) pop{r1}; bx r1 to return, r0 = tick_blend_step_by_delta result (0=in progress, 1=complete). Sibling of tick_aob_display_with_fadein (0x0802e938); differs in blend_delta=8 and DISPCNT sprite-enable step.
+
+Constants:
+- DISPCNT_shadow = 0x04000000 (0x80<<19)
+- sprite_enable_mask = 0xf8<<5 = 0x1f00 (DISPCNT bits[12:8])
+- blend_delta = 8

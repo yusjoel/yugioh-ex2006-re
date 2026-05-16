@@ -1,0 +1,8 @@
+campaign_scene_handler dispatch table index 7. Trigger: gPrng+0x202 bits[13:6] == 0x07. Sequence: (1) bl render_opp_wins_display_oam; (2) checks gPrng+0x148 bit6 (0x40): if set, reads scene_ctx+0xc halfword, extracts row offset index, if at limit decrements by 1 and bl render_text_with_font_type_select; (3) bl sync_state_and_init_sprite(0); (4) checks bit7 (0x80) path for opposite scroll direction, if row index <= 0x3a then adds 6 and renders; (5) checks bit1 (0x2): if set clears scene_ctx+0xb/+0xc scroll fields; (6) if gPrng+0x148 bit0 == 0 waits via SUB_08026714, else bl sync_state_and_init_sprite(0x24) and advances step.
+
+Constants:
+- scene_ctx = 0x02023360
+- gPrng_scroll_reg = gPrng+0xa4*2 = gPrng+0x148
+- bit6 = 0x40 (scroll up trigger), bit7 = 0x80 (scroll down trigger)
+- bit1 = 0x2 (reset path), bit0 = 0x1 (advance scene)
+- row_max_threshold = 0x3a (58), row_advance_step = 6

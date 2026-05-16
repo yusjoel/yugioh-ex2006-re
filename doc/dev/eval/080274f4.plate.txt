@@ -1,0 +1,4 @@
+campaign_scene_handler dispatch table index 25. Trigger: gPrng+0x202 bits[13:6] == 0x19. Symmetric to run_campaign_step23_card_select_tick (0x08026fe4): (1) bl tick_campaign_card_select_display_state; (2) if returns 0: b SUB_08026714 to wait; (3) if returns nonzero: reads gPrng+0x202, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 26. Steps 23 and 25 both use the same display state machine tick; they correspond to first and second entry into the card-select display phase.
+
+Constants:
+- gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f

@@ -1,0 +1,9 @@
+Per-frame state machine for the campaign card-select/display screen. Called by run_campaign_step23 (0x08026fe4) and run_campaign_step25 (0x080274f4). Sequence: (1) bl tick_opponent_aob_display; (2) reads scene_ctx+0x3b bits[7:1] and scene_ctx+0x3c bit0 to form phase_state r0 [0..0x64]; (3) dispatches on phase_state: 0 -> initializes scene_ctx+0x39 bit5 and writes deck_type to scene_ctx+0x3a, returns 0; 1 -> second-level switch on scene_ctx+0x38 bits[10:8] [0..7] dispatching to invoke_build_campaign_sprite_row_type5/6 and other handlers; 2 -> LAB_0802e518 (heavy sprite update logic); 0x14/0x64 -> returns 1 (done); 0x15/0x16/0x17 -> various wait/transition paths; default -> returns 0. Return: 0 = still running, 1 = display phase complete.
+
+Constants:
+- scene_ctx = 0x02023360
+- phase_state_reg = [scene_ctx+0x3b] bits[7:1] | [scene_ctx+0x3c] bit0<<7
+- phase_state range [0..0x64], sparse dispatch
+- second_switch_range [0..7] from scene_ctx+0x38 bits[10:8]
+- deck_type_table = 0x09e59dc4 (8 halfword entries)
+- mask_3a = 0xfffffe03 (clears bits[9:2])

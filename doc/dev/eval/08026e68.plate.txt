@@ -1,0 +1,4 @@
+campaign_scene_handler dispatch table index 21. Trigger: gPrng+0x202 bits[13:6] == 0x15. Sequence: (1) bl tick_aob_display_with_sprite_enable_blend; (2) if r0 == 0 (blend not complete): b SUB_08026714 to wait; (3) if r0 != 0 (blend complete): reads gPrng+0x202, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 22. Note: tick_aob_display_with_sprite_enable_blend exits via pop{r1};bx r1, r0 comes from tick_blend_step_by_delta return (0=not done, 1=done).
+
+Constants:
+- gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f

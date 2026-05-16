@@ -1,0 +1,4 @@
+campaign_scene_handler dispatch table index 27. Trigger: gPrng+0x202 bits[13:6] == 0x1b. Sequence: (1) bl tick_duel_field_fadeout_step; (2) if returns 0 (fadeout not complete): b SUB_08026714 to wait; (3) if returns nonzero (fadeout complete): reads gPrng+0x202 halfword, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 28. No direct r0 return value; both exit paths via b tail-call.
+
+Constants:
+- gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f

@@ -1,0 +1,9 @@
+Builds campaign sprite row data for a given row_type r0 [0..8] and writes to VRAM buffer. Called by wrapper functions that pass a fixed row_type constant. Switch with 9 cases: case 0 copies 4 bytes from ROM DAT 0x09e3ef46 + bl memcpy; case 1 builds 14-byte name data from [0x02000000+0x6e48] (player name/level fields) + bl write_sprite_row_to_vram_buffer(count=0x16); case 2 reads scene_ctx+0x36/0x37 halfword, extracts bits[10:8]/bit[7], writes 4-byte struct to sp+0x1c; case 3 writes type=3 to sp+0x13c + bl write_sprite_row_to_vram_buffer(count=2); case 4 bl copy_bytes_by_halfword(src=0x03000288, len=0x118) + bl write_sprite_row_to_vram_buffer(count=0x8d*2); case 5 reads scene_ctx+0x39 bit4/bit3 into sp+0x140; case 6 reads scene_ctx+0x39 bit4 into sp+0x148; case 7 reads player_profile(0x0201e2a0)+0x10/+0x0 into sp+0x14c; case 8 writes type=8 to sp+0x154. r0 > 8 -> default (no write). Returns via pop{r0};bx r0 (no r0 semantic).
+
+Constants:
+- scene_ctx = 0x02023360
+- player_profile = 0x0201e2a0
+- player_name_src = 0x02000000+0x6e48 (14-byte name region)
+- ROM_name_template = 0x09e3ef46 (case 0)
+- scratch_buf_src = 0x03000288 (case 4, OBJ scratch)
+- row_count_case1 = 0x16, row_count_case4 = 0x8d*2
