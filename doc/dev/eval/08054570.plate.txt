@@ -1,0 +1,5 @@
+Equip card eligibility predicate requiring exactly 3 cards in target player zone satisfying check_card_pair_allowed with the equipping card. Preamble guards: (1) gDuelFieldSlots[r1&1][r2] card_icid non-zero; (2) equipping slot[+2]bit0==r1 (same side); (3) r2<=4; (4) [slot,#8]!=0 (equip valid flag); (5) check_slot_card_is_monster_type(r1,r2) -- non-monster rejects; (6) check_card_field8_is_9(card_icid) must return 0 (field8==9 disallowed). Then zone 0..4 loop: for each slot with [+8]!=0, call check_card_pair_allowed(zone_card_icid, equip_card_icid); increment count on hit. Returns 1 if count==3, else 0. Read-only predicate, no side effects.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4].
+Outputs: r0=u32 bool (1=exactly 3 pair matches, 0=otherwise).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_entry_size=0x14, required_pair_count=3.

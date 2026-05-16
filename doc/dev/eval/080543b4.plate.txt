@@ -1,0 +1,5 @@
+Equip card eligibility predicate requiring target slot field6==0 (no extra condition) + equip valid flag + type match. Guards: (1) r2<=4; (2) gDuelFieldSlots[r1&1][r2] bits[18:0] non-zero; (3) ldrh [slot,#8]!=0 (equip valid flag); (4) ldrh [slot,#6]==0 -- non-zero rejects (field6 must be zero); (5) query_slot_card_type_eligibility(r0,r1,r2) must return 0. Returns 1=eligible. Complement of 0x08054284: handles field6==0 case vs field6!=0. Read-only predicate, no side effects.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4].
+Outputs: r0=u32 bool (1=eligible, 0=rejected).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.

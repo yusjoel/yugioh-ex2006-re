@@ -1,0 +1,5 @@
+Equip card eligibility predicate with player side consistency check. Called from equip activation chain. Guards: (1) read slot[+2] bit0 vs r1 -- side mismatch rejects; (2) if r2<=4, call check_slot_card_is_equip_whitelist(r1,r2); (3) read gDuelFieldSlots[r1&1][r2] slot word bits[18:0] non-zero + call check_card_equip_eligible_for_slot(r0,r1,r2,0). Variant of 0x08051998 with side_match pre-check. Read-only predicate, no side effects. Returns 1=eligible, 0=rejected.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..0x14].
+Outputs: r0=u32 bool (1=eligible, 0=rejected).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.

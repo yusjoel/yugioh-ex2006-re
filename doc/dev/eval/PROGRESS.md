@@ -20,7 +20,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 626 个就绪函数 (32 批, #86..#117, 每批 20) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 586 个就绪函数 (30 批, #88..#117, 每批 20) 全部分析完毕。
 
 20/批 单 sub-agent 串行模式 (不再拆分并行):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 160 + 剩余 606 (31 批 #87..#117 / 20 每批) |
-| **下一批** | `#87` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #86, 160/766 = 20.89%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 180 + 剩余 586 (30 批 #88..#117 / 20 每批) |
+| **下一批** | `#88` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #87, 180/766 = 23.50%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**160 / 766 已分析** (20.89%, 剩余 31 批待跑 #87..#117)
+**180 / 766 已分析** (23.50%, 剩余 30 批待跑 #88..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -86,6 +86,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #84 `3654958` 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
 - batch #85 `220ef3d` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
 - batch #86 `dbc64c6` 160/766 (20.89%) — equip set BST whitelist cluster + banlist canonical map + zone rank3 compaction
+- batch #87 `<HASH>` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -94,9 +95,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#86) | 160 |
-| - 剩余 (按 20/批 重组) | 606 |
-| 剩余分批数 (20/批) | 31 (`#87..#117`) |
+| - 已完成 (Phase 2 #82-#87) | 180 |
+| - 剩余 (按 20/批 重组) | 586 |
+| 剩余分批数 (20/批) | 30 (`#88..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 
@@ -105,7 +106,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2120** | **1526** | **58.16%** |
+| **全 CSV** | **2140** | **1506** | **58.70%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

@@ -1,0 +1,5 @@
+Equip slot eligibility predicate with side check + slot[+8] non-zero + type query. Called from equip activation chain. Guards: (1) read slot[+2] bit0 vs r1 -- side mismatch rejects; (2) if r2<=4, check_slot_card_is_equip_whitelist; (3) gDuelFieldSlots[r1&1][r2] bits[18:0] non-zero; (4) ldrh [slot,#8]!=0; (5) call query_slot_card_type_eligibility(r0,r1,r2). Variant of 0x08051abc substituting [+8]!=0 + type query for check_card_equip_eligible_for_slot. Referenced by function pointer tables at 0x0806ffb0 and 0x0806ffec. Read-only predicate.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4].
+Outputs: r0=u32 bool (1=eligible, 0=rejected).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.

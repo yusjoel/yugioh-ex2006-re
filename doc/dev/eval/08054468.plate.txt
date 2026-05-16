@@ -1,0 +1,5 @@
+Equip card eligibility predicate requiring target slot card field8!=9 + monster type + basic equip conditions. Guards: (1) compute gDuelFieldSlots[r1&1][r2] card_icid; (2) check_card_field8_is_9(card_icid) non-zero rejects (field8==9 disallowed); (3) check_slot_card_is_monster_type(r1,r2) -- non-monster rejects; (4) check_slot_card_can_be_equipped(equip_side, r1, r2) -- fail rejects; (5) if equip_slot side==r1 (same side): pass; if different side: ldrh [slot,#8]!=0 required. Read-only predicate, no side effects.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..0x14].
+Outputs: r0=u32 bool (1=eligible, 0=rejected).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.

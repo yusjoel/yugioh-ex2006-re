@@ -1,0 +1,5 @@
+Equip card eligibility predicate with same-side requirement + zone range + type match. Guards: (1) read slot[+2] bit0 vs r1 -- side mismatch rejects (requires same side); (2) r2<=4; (3) gDuelFieldSlots[r1&1][r2] bits[18:0] non-zero; (4) query_slot_card_type_eligibility(r4=equip_slot, r3=side_bit, r2) -- return 0 (matched) passes, non-zero rejects. Note: query r1 arg is side_bit (not original r1), so type check is based on target slot's player side. Read-only predicate, single bl call, no side effects.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4].
+Outputs: r0=u32 bool (1=eligible, 0=rejected).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.

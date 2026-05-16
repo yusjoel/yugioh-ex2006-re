@@ -1,0 +1,5 @@
+Equip slot eligibility predicate via dual-loop scan of gDuelFieldSlots[player 0..1][zone 0..4]. Called from 0x08051734 series. Entry: checks gDuelFieldSlots[r1&1][r2] bits[18:0] non-zero. Then double loop: outer player [0..1], inner zone [0..4]. Each cell calls find_zone_chain_node_by_card_id_pair(card_icid, player, zone) -- non-zero return yields immediate return 1 (eligible). If both loops complete without a hit, returns 0. Read-only predicate, no side effects.
+Inputs: r0=ptr equipping-card slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4].
+Outputs: r0=u32 bool (1=chain node found/eligible, 0=not found).
+Side effects: none.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_entry_size=0x14.
