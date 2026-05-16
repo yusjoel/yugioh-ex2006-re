@@ -1,0 +1,5 @@
+campaign_scene_handler dispatch table entry index 28, duel field main frame animation tick phase. Calls tick_duel_field_main_frame to execute field main frame logic; if return is 0 (frame not complete) calls SUB_08026714 to advance scene state. In all cases reads gPrng+0x202 frame counter bits[13:6], increments by 1 taking low 8 bits, writes back to bits[13:6], then calls SUB_08026714 again to advance scene state machine.
+
+Constants:
+- state counter = gPrng+0x202 bits[13:6]
+- counter mask = 0xffffc03f (clears bits[13:6])

@@ -1,0 +1,10 @@
+campaign_scene_handler dispatch table entry index 2, handles scroll state update for pack selection screen. Clears [scene_ctx+0x8] bit1 (0x02 mask). Reads [scene_ctx+0x3] bits[4:3] as scroll_dir [0..3]: if ==1 jump to LAB_08025fca (scroll right path), if ==2 enter scroll left logic. Left path: check gPrng+0x148 bit6, if set and slot_type > 4 call sync_state_and_init_sprite(0) to init new sprite, update slot_type = (slot_type-5) & 0x1f, set [scene_ctx+0x8] bit0. Right path: check gPrng+0x148 bit7, if set call sync_state_and_init_sprite(0), update slot_type = (slot_type+5) & 0x1f (cyclic clamp to slot_count-1), set bit0.
+
+Constants:
+- scene_ctx = 0x02023360
+- gPrng scroll register = gPrng+0xa4*2 = gPrng+0x148
+- bit6 = 0x40 (pack scroll left trigger)
+- bit7 = 0x80 (pack scroll right trigger)
+- scroll_dir = [scene_ctx+0x3] bits[4:3]
+- slot stride = 5 (scroll 5 slots per step)
+- slot_type mask = 0x1f [0..31]

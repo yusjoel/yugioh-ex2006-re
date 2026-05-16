@@ -1,0 +1,10 @@
+duel_puzzle scene display mode dispatch function, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step32_puzzle_display_tick (0x08027888). First calls render_puzzle_lp_digit_sprites to update LP digit OAM. Then reads one byte from gPrng+0x204, extracts bits[7:6] (2-bit high-priority mode r2) and bits[5:0]&0x3f (low 6-bit base mode field, shifted left 2), combines into mode_key = (byte&0x3f)<<2 | byte>>6, dispatches r0 to four paths: case 0 -> LAB_0802be58, case 1 -> LAB_0802be8e, case >1 -> LAB_0802be48, default -> LAB_0802c1a4.
+
+Constants:
+- mode byte = gPrng+0x204 (gPrng+0x81*4)
+- mode_key = ((byte & 0x3f) << 2) | (byte >> 6); enum [0..3]
+- case 0 = LAB_0802be58
+- case 1 = LAB_0802be8e
+- case >1 (bgt) = LAB_0802be48
+- default = LAB_0802c1a4
+- returns 0 = scene not ready/waiting, 1 = scene advanced (caller FUN_08027888 checks cmp r0,#0 -> bne)

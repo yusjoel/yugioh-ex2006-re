@@ -1,0 +1,11 @@
+duel_puzzle scene LP digit OAM sprite render function, called by FUN_0801fec0 (duel_puzzle main loop) and FUN_0802bdc4 / FUN_0802bde4 / dispatch_puzzle_display_mode (0x0802be08) each frame. Reads [0x02023360+0x68] as current LP value, copies it to gPrng+0x1ec as display shadow value, checks [0x02023360+0x6d] bit6 as LP display enable flag. If enabled, iterates: LP %10 -> digit; OAM Y coord = 0x9000_0000 | (r5 -= 6 per digit) | digit_x_offset; OAM tile = 0x8000; call write_oam_entry_from_packed_args; LP /= 10; until LP==0. Each digit y-coord decreases by 6 pixels (higher-order digits appear higher), tile index = 0x1008 + digit_value.
+
+Constants:
+- scene_ctx base = 0x02023360
+- LP value offset = 0x68 (word)
+- LP display shadow = gPrng+0x1ec (gPrng+0xf6*2)
+- LP display enable flag = [0x02023360+0x6d] bit6 (0x40)
+- digit tile base offset = 0x1008
+- OAM attr1 base = 0x8000 (8x8 sprite size)
+- digit y-step = 6 pixels per digit
+- modulo divisor = 10 (via __modsi3 / __divsi3)

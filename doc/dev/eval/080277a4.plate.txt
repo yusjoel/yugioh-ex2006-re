@@ -1,0 +1,6 @@
+campaign_scene_handler dispatch table entry index 30, initializes pack card info display screen. Symmetric structure with run_campaign_step34_field_rule_display (0x08027a0c): first reads [0x02000000+0x6c2c] low 3 bits rule_type [1..5], selects different ROM tile data pointers per rule_type (5 sets). Then: (1) calls init_pack_card_info_screen_vram (FUN_0802b590, r1=1) for pack VRAM full init and card name render; (2) calls init_puzzle_card_name_line_buf (FUN_0802b8bc) to init line buffer; (3) calls render_card_stats_to_line_buf to render card stat numbers; (4) calls zero_sprite_vram_with_tile_seq (FUN_0802bd64) to clear sprite VRAM and write tilemap; (5) reads gPrng+0x202 frame counter and increments by 1; (6) tail-jumps b SUB_08027c22 to advance scene state machine.
+
+Constants:
+- rule_type = [0x02000000+0x6c2c] bits[2:0] [1..5]
+- init_pack_card_info_screen_vram r1=1 (pack_index=1, fixed)
+- gPrng+0x202 = frame count field bits[13:6]

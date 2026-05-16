@@ -1,0 +1,4 @@
+campaign_scene_handler dispatch table entry index 22, opponent card AOB animation display phase per-frame tick. Calls tick_opponent_aob_by_phase (FUN_0802d4bc) for frame update; if return is 0 (animation not finished) tail-jumps via b SUB_08026714 to advance scene state machine; if nonzero continues with subsequent dispatch logic (display type selection / label render / state advance).
+
+Constants:
+- no additional constants (only bl + cmp + bne + b four instructions)

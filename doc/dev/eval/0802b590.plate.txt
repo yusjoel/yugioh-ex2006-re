@@ -1,0 +1,13 @@
+Pack buy/card info screen complete VRAM init + card name text render function, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4). Accepts r0=card_name_ptr, r1=pack_index [0..N]. Flow: writes DISPCNT shadow (gPrng+0x174 = 0x0401), writes DISPCNT register (0x04000000 = 0), calls reset_display_and_obj_vram, store_ewram_ctx_ptr_and_clear_mode_flags, writes BG0-BG3 control regs, reset_all_bg_scroll_regs_and_shadows, upload_pack_vram_and_palette; zero_fills three BG/OBJ tile regions; copies palette and pack tile data; calls load_pack_tile_and_map_to_vram three times (pack cover/title/background tile+map layers); inits line buffer (col=0x1e, font=2); computes name length to select font (long > 0xef bytes use narrow); two text_render_wrapper calls to render name; commit_line_buffer_to_sprite_vram; writes tilemap index row.
+
+Constants:
+- DISPCNT shadow = gPrng+0x174; value = 0x0401 (BG0+OBJ on)
+- BG0CNT=0x0005, BG1CNT=0x0104, BG2CNT=0x820a, BG3CNT=0x0407
+- OBJ VRAM = 0x06004000, size = 0xc000 bytes (zero_fill)
+- BG tile = 0x06010000, size = 0x8000 bytes (zero_fill)
+- pack palette src = 0x05000220 (0x20 halfwords)
+- pack tile data src = 0x09b8fb8c (0x2000 bytes)
+- load_pack_tile_and_map_to_vram: 3 calls for 3 pack graphic layers
+- line_buf setup: col=0x1e, font=2
+- long name threshold = 0xef (239 bytes; len*4 comparison)
+- commit target = 0x060053c0, tilemap area = 0x06000812

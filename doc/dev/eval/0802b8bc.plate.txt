@@ -1,0 +1,9 @@
+duel_puzzle scene card name display line buffer init function, called by run_campaign_step30_pack_card_info_display (0x080277a4). No parameters. Fixed call to setup_line_buf_with_font_and_align(col=0x18, width=0x2a, align=1, flags=0) to init line buffer. Reads [0x02000000+0x6c2c] (scene state byte) bits[2:0] as font_style, clears [0x02006ed0+0x8] bit1 via ~0x02 mask, computes (font_style&7 nonzero) -> bit0 set; looks up font_jp_base_table[bit_combo] to update [0x02006ed0+0x4] font pointer. Then zero_fill [0x02006ed0+?] region 0x20 halfwords (clear line-buf content). Writes 0 to [scene_ctx+0x62], [+0x64], [+0x68], clears [scene_ctx+0x6c] bit5.
+
+Constants:
+- line_buf_ctx = 0x02006ed0
+- font table = font_jp_base_table
+- setup params: col=0x18, width=0x2a, align=1, flags=0
+- zero_fill target = line-buf content area, 0x20 halfwords
+- scene_ctx = 0x02023360
+- fields cleared: [scene_ctx+0x62]=0, [+0x64]=0, [+0x68]=0, [+0x6c] &= ~0x20 (bit5)

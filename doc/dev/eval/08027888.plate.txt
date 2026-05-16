@@ -1,0 +1,5 @@
+campaign_scene_handler (FUN_08025c94) dispatch table entry index 32, duel_puzzle display phase per-frame tick. Calls dispatch_puzzle_display_mode (FUN_0802be08) for LP digit render and mode dispatch; if return is 0 (scene not ready) calls SUB_08026714 to advance state. In all cases reads gPrng+0x202 bits[13:6] (frame count field), increments by 1 taking low 8 bits, shifts left 6, writes back to same field position, then calls SUB_08026714 to advance scene state machine again.
+
+Constants:
+- state counter = gPrng+0x202 bits[13:6]
+- counter mask = 0xffffc03f (clears bits[13:6])

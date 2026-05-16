@@ -1,0 +1,10 @@
+General dual-label text render function, called by setup_label_render_ctx (0x0802dacc) during campaign card info display page. Accepts two optional C string pointers (r0=primary_label, r1=secondary_label), either may be NULL. Clears [0x02023360+0x38] render state bits (AND ~0x00038000), calls setup_line_buf_pos_and_font(col=8, font=4) to init line buffer. For primary_label: if non-NULL, count_bytes_until_null measures length, compute horizontal center offset (0x20-len*3)/2, two text_render_wrapper calls (layer=2, normal + shadow color rendering), update [0x02023360+0x38] bit[15]. For secondary_label: if non-NULL, same centering calculation (layer=0x12), update bit[16]. If both labels rendered, set [0x02023360+0x39] bit6, zero_fill four BG tile regions (0x06011000..0x06011c00 each 0x100 halfwords), call write_line_buf_to_bg_tile_vram to commit.
+
+Constants:
+- scene_ctx base = 0x02023360
+- render state field = [0x02023360+0x38] (word)
+- clear mask = 0xfffc7fff (AND clears bits[17:15])
+- primary label render = layer 2, shadow ch=0xf
+- secondary label render = layer 0x12, shadow ch=0xf
+- centered offset formula: 0x20 - len*3
+- BG tile targets: 0x06011000, 0x06011400, 0x06011800, 0x06011c00 (each 0x100 halfwords = 512 bytes)

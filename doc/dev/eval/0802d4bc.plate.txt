@@ -1,0 +1,10 @@
+Campaign opponent card AOB animation tick wrapper layer, called by run_campaign_step22_aob_tick (0x08026e9c). First calls tick_opponent_aob_display (FUN_0802dfb8) to execute frame animation tick. Then reads [scene_ctx+0x61] bits[4:2] as phase_state [0..7]: phase 0 -> error/wait path (LAB_0802d580); phase 7 -> LAB_0802d544 (phase complete); phase 8 -> LAB_0802d580 (out of range); others [1..6] -> LAB_0802d4f2 (normal frame advance), reads slot_type from [scene_ctx+0x61], computes VRAM write position and updates display state.
+
+Constants:
+- scene_ctx = 0x02023360
+- phase field = [scene_ctx+0x61] bits[4:2] (3 bits [0..7])
+- phase 0 = error/wait (LAB_0802d580)
+- phase 7 = complete (LAB_0802d544)
+- phase 8 = overflow (LAB_0802d580)
+- phase [1..6] = normal advance (LAB_0802d4f2)
+- returns r0 = u32 phase_status (0=waiting/not complete, nonzero=complete/advance)

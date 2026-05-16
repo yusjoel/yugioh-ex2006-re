@@ -1,0 +1,6 @@
+campaign_scene_handler dispatch table entry index 34, displays rule information after duel field initialization. Calls build_field_slot_bitmask to build field slot mask, then init_duel_field_icon_and_bg_vram to init field icon and BG VRAM. Reads [0x02000000+0x6c2c] low 3 bits as rule_type [1..5], selects ROM data pointer for each rule type (5 different graphic resources). Then calls draw_decimal_with_offset to render decimal number at screen position (turn_count or LP limit display), reads rule_type again and selects second set of data pointers, calls draw_decimal_with_offset again. Overall completes duel field rule number display.
+
+Constants:
+- rule_type = [0x02000000+0x6c2c] bits[2:0] [1..5]
+- rule ROM data ptrs: case1=0x09dcad08, case2=0x09dd6636, case3=0x09de29ae, case4=0x09deee62, case5=0x09dba750+0x3ab1e
+- draw position: col=0x40, row=0x84*4=0x210 (draw_decimal_with_offset args)

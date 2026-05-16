@@ -1,0 +1,7 @@
+campaign_scene_handler (FUN_08025c94) dispatch table entry index 20, responsible for full initialization sequence before entering opponent card display screen. Trigger: scene state word gPrng+0x202 bits[13:6] == 0x14. Flow: (1) clear scene state word flag bits; (2) call init_campaign_bg_and_obj_vram for BG/OBJ VRAM global init; (3) extract slot type code bits[4:0] and call init_opponent_card_bg_vram(slot_type); (4) call init_duel_scroll_params; (5) compute and write IWRAM scroll params (0x02023360+0x23c = 0xfa*32 | slot_type); (6) write secondary IWRAM byte; (7) read font mode byte and look up font_jp_base_table to update font pointer; (8) branch on slot_type (0x19/0x1a or other): if neither, call card_name_lookup_by_internal_id + game_str_id_to_row + render_opponent_card_icon_and_name to render card name; (9) jump to LAB_08026df2 to write scene counter.
+
+Constants:
+- IWRAM scene_ctx base = 0x02023360
+- scroll_param_target offset = 0x23c
+- scroll base value = 0xfa*32 = 0x1f40
+- slot_type special values: 0x19 (empty slot branch A), 0x1a (empty slot branch B)

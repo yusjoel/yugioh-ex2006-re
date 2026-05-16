@@ -1,0 +1,15 @@
+Opponent card display area OAM sprite dispatch function, called by tick_opponent_aob_display (0x0802dfb8) during animation frame update. Reads [0x02023360+0x38] bits[9:7] as current display phase (phase_idx = ((bits>>7)&7) - 1, [0..6]), out of range jumps to default. Dispatches via 7-way switch: cases 1/2/6/7 (idx=0/1/5/6) -> caseD_1 (normal slot phase: writes multiple OAM sprite entries including icon tiles and frame tiles); cases 3/4/5 (idx=2/3/4) -> caseD_3 (different phase OAM layout). r0=slot_oam_base_offset used as OAM base; each case calls write_oam_entry_from_packed_args to write sprite entries.
+
+Constants:
+- phase field = [0x02023360+0x38] bits[9:7]
+- valid phase range: 1-7 (subs r0,#1; cmp r0,#6; bls valid)
+- switch table at 0x0802db6c: 7 entries
+  case 0(ph=1): 0x0802db88 (caseD_1)
+  case 1(ph=2): 0x0802db88 (caseD_1)
+  case 2(ph=3): 0x0802dc90 (caseD_3)
+  case 3(ph=4): 0x0802dc90 (caseD_3)
+  case 4(ph=5): 0x0802dc90 (caseD_3)
+  case 5(ph=6): 0x0802db88 (caseD_1)
+  case 6(ph=7): 0x0802db88 (caseD_1)
+- OAM slot stride = 0x60
+- r0: u32 slot_oam_base_offset (saved to r6 on entry)

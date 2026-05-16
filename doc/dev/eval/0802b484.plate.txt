@@ -1,0 +1,13 @@
+Core function to render card name centered to sprite VRAM, called by FUN_0801fec0 (duel_puzzle main loop) and init_pack_card_info_screen_vram (0x0802b590). Accepts r0=card_name_ptr (card name C string). Inits line buffer (col=0xc, font=2), reads [0x02000000+0x6c2c] font_style bits[2:0], updates [0x02006ed0+0x8] render mode byte (bit1 by font_style, bit1 forced=1), looks up font_jp_base_table for font pointer. Computes name byte length len; if len*3 > 0x30 selects narrow font (font_style bit0=0, clears bit0, relooks up table). Center offset = (0x30 - len*3) / 2, calls text_render_wrapper twice (normal + shadow, row=2 both). Computes length again, center offset = (0x30 - len*3) >> 1. Finally calls commit_line_buffer_to_sprite_vram(0x060053c0, 0) to write line buffer to OBJ VRAM. Then loops to write tilemap indices (2 rows x 12 cols = 24 tiles) to 0x06000812 region.
+
+Constants:
+- line_buf_ctx = 0x02006ed0
+- font table = font_jp_base_table
+- setup params: col=0xc, font=2
+- name width budget = 0x30 (48 pixels)
+- len*3 formula: lsls r1,r0,#1; adds r1,r1,r0 (len*2+len=len*3)
+- narrow font threshold = 0x30 (if len*3 > 48 use narrow)
+- centered x = (0x30 - len*3) >> 1
+- OBJ VRAM commit target = 0x060053c0
+- tilemap area = 0x06000812; 2 rows x 12 cols
+- tile id start = 0x009e

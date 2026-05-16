@@ -1,0 +1,8 @@
+Called by run_campaign_step20_card_display_init (0x08026c88) to render a single opponent card's icon and name. Inputs: r0=slot_index [0..N-1], r1=card_row_ptr (card data row pointer), r2=dest_vram_base, r3=font_glyph_ptr, sp+0x68=name_str_ptr. Flow: call find_card_index_in_rom_table to get ROM table index, copy icon palette (0x05000240 base, row stride 0x20) and icon tiles (0x06011100 base), write 2x3 tile block via tile_2d_row_copy, init font line-buf (col=0x20, font=4) via setup_line_buf_pos_and_font, set render mode bit in line-buf byte+0x8, truncate card name by byte length in three tiers (<=0x26 / <=0x2f / >0x2f) and call text_render_wrapper twice (normal + shadow color) to render name.
+
+Constants:
+- icon_palettes_base = 0x09896290; row size = 0x20 halfwords; slot stride = 0x20 bytes
+- icon_tiles_base = 0x0888cf30; slot stride = 0x80 bytes (index*9*32)
+- OBJ palette dest = 0x05000240 + slot*0x20
+- BG tile dest = 0x06011100 + slot*0x80
+- name byte length thresholds: 0x26 (38), 0x2f (47); truncation suffix = 0x2e 0x2e 0x00 ".."

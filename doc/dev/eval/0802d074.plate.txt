@@ -1,0 +1,11 @@
+campaign_scene_handler step 20 VRAM init entry, called by run_campaign_step20_card_display_init (0x08026c88) before entering opponent card display screen. Sequence: reset DISPCNT and clear OBJ VRAM, call reset_display_and_obj_vram to clear OBJ tile region, call store_ewram_ctx_ptr_and_clear_mode_flags to set context pointer, write BG0-BG3 control regs (BG0CNT..BG3CNT), call reset_all_bg_scroll_regs_and_shadows, upload pack image and palette (upload_pack_vram_and_palette), zero_fill three BG tile regions (0x06004000/0x06010000 each 0x8000 bytes), copy palette rows, upload BG palette rows (9 rows), upload OBJ 4bpp tile rows (2 rows), upload tilemap rows, finally write 64 sequential tilemap index entries.
+
+Constants:
+- BG0CNT = 0x04000008; written: [BG0CNT]=0x0005, [BG1CNT]=0x0107, [BG2CNT]=0x0207, [BG3CNT]=0x0307
+- DISPCNT shadow = gPrng+0x174; write 0x0601
+- OBJ tile VRAM = 0x06004000 (zero_fill 0x8000 halfwords)
+- BG palette src = 0x05000220; 9 rows of 32 bytes
+- OBJ tile src = 0x0994f83c; 2 rows
+- Tilemap src = 0x0995383c; r=0, c=2, w=0x1e rows
+- palette copy src = 0x09ccd290; 0x20 halfwords to 0x050001e0
+- tilemap sequential: base=0x06001800, 64 entries starting at 0x0000f210

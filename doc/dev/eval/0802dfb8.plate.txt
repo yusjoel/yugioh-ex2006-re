@@ -1,0 +1,12 @@
+Opponent card AOB (animation object) display per-frame tick function, called by tick_opponent_aob_by_phase (0x0802d4bc), FUN_0802e108, FUN_0802e918, FUN_0802e938 (campaign different phases). Reads [scene_ctx+0x60] byte bit0 (AOB active flag): if not set, skips; if set, calls render_aob_frame_to_oam to write current frame to OAM. Then checks bit2 (frame counter running flag): if set calls tick_aob_frame_counter; if returns 0 (counter expired), clears bit0 and bit2 (stops AOB). Second segment checks bit1 (second AOB layer active flag): if set reads [scene_ctx+0x60] halfword, extracts bits[12:9] as second layer tile params, checks bit3=0x8 (special mode): if bit3 set takes alternate path; otherwise checks bits[12:9] >= 0x3c (60 frames), if not met skips; if met writes two OAM sprites (0x81<<7 size, using tile params from DAT_0802e0e8/0x0802e0f0).
+
+Constants:
+- scene_ctx = 0x02023360
+- AOB control byte = [scene_ctx+0x60]
+  bit0 = AOB active (triggers render_aob_frame_to_oam)
+  bit2 = frame counter running (triggers tick_aob_frame_counter)
+  bits[4:3] cleared when counter done (~0x05 mask)
+  bit1 = second AOB layer active
+- second layer params = [scene_ctx+0x60] halfword bits[12:9]
+- frame count threshold = 0x3c (60 frames)
+- OAM attr1 = 0x81<<7 = 0x4080 (large sprite)

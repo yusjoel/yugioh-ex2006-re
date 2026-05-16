@@ -1,0 +1,10 @@
+Campaign card info page label render pre-setup function, called by run_campaign_step22_aob_tick (0x08026e9c) and FUN_08026fe4 (campaign step-23 handler). Accepts r0=mode_idx [0..7], r1=primary_label_ptr, r2=secondary_label_ptr. Writes (mode_idx & 7) << 7 into [scene_ctx_base+0x38] bits[9:7] (display mode field), writes fixed value 0x00a00030 to [scene_ctx+0x40] (display params), clears [scene_ctx+0x3a] state bits (AND 0xfffffe03), retains only bit0 of [scene_ctx+0x3b], clears [scene_ctx+0x3c] bit1. Then clears four flag groups of [scene_ctx+0x39] (AND ~0x11, ~0x09, ~0x18, ~0x20). Finally forwards r1=primary_label, r2=secondary_label to render_dual_label_to_bg_vram.
+
+Constants:
+- scene_ctx = 0x02023360
+- mode field = [scene_ctx+0x38] bits[9:7] (AND mask = 0xfffffc7f)
+- display_param = 0x00a00030 -> [scene_ctx+0x40]
+- state_clear for [+0x3a] = 0xfffffe03
+- state_clear for [+0x3b]: keep bit0 only
+- state_clear for [+0x3c]: AND ~0x02
+- flag_clear for [+0x39]: ~0x11, ~0x09, ~0x18, ~0x20

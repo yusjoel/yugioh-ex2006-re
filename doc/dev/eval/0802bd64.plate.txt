@@ -1,0 +1,11 @@
+Utility function to clear a sprite VRAM region and write sequential tile index sequence, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4) during card name display init. First zero_fill_by_halfword at 0x06008020 (0xfc<<7=0x7e00 halfwords = 0xff00 bytes), then commit_line_buffer_to_sprite_vram(0x06008020, 0) to commit empty line buffer. Then loops from row=0 to row=41 (0x29): for each row writes 2 halfwords = 0x0000 prefix, then 24 consecutive tile indices (starting at r6=1 incrementing), then 5 halfwords = 0x0000 suffix. Total 0x2a rows (42 rows).
+
+Constants:
+- sprite VRAM target = 0x06008020
+- tilemap scratch = 0x06001440
+- zero_fill size = 0xfc<<7 = 0x7e00 halfwords
+- tile seq start = 1
+- tile seq len per row = 24 tiles (0x17+1)
+- zero prefix per row = 2 halfwords
+- zero suffix per row = 5 halfwords
+- row count = 0x2a = 42 rows
