@@ -1,194 +1,26 @@
 {
   "meta": {
     "generated": "2026-05-16",
-    "mode": "address-proximity, locked",
-    "criterion": "unnamed AND (no callees OR all callees named)",
-    "total_ready": 766,
-    "total_batches": 39,
+    "mode": "20/batch, single sub-agent per phase (no parallel splits)",
+    "criterion": "unnamed AND (no callees OR all callees named); set locked at Phase 2 start",
+    "phase2_completed": 120,
+    "phase2_completed_batches": [
+      82,
+      83,
+      84
+    ],
+    "remaining_ready": 646,
+    "remaining_batches": 33,
     "batch_size": 20,
-    "addr_range": [
-      "0x080001f0",
+    "addr_range_remaining": [
+      "0x08047aa0",
       "0x081141d8"
     ],
-    "note": "Lock current 766 set. Do NOT re-compute ready on subsequent runs."
+    "note": "Phase 2 mode switch (2026-05-16): from 40/batch 4x10 parallel back to 20/batch single sub-agent per phase. No parallel splits."
   },
   "batches": [
     {
-      "batch_idx": 82,
-      "lo": "0x080001f0",
-      "hi": "0x080176c0",
-      "span_bytes": 95440,
-      "count": 20,
-      "addrs": [
-        "0x080001f0",
-        "0x08014480",
-        "0x080144e8",
-        "0x080145bc",
-        "0x0801510c",
-        "0x080152b0",
-        "0x08015384",
-        "0x08015424",
-        "0x0801544c",
-        "0x080154a4",
-        "0x080154c8",
-        "0x08015518",
-        "0x08015550",
-        "0x08015584",
-        "0x080155c0",
-        "0x08015ea4",
-        "0x08016140",
-        "0x080171ec",
-        "0x08017464",
-        "0x080176c0"
-      ]
-    },
-    {
-      "batch_idx": 83,
-      "lo": "0x08017798",
-      "hi": "0x08019820",
-      "span_bytes": 8328,
-      "count": 20,
-      "addrs": [
-        "0x08017798",
-        "0x08017cc4",
-        "0x08017cd0",
-        "0x08017e48",
-        "0x08017f8c",
-        "0x08017fa4",
-        "0x0801805c",
-        "0x08018248",
-        "0x08018254",
-        "0x08018260",
-        "0x080182ec",
-        "0x0801848c",
-        "0x080184f8",
-        "0x08018e30",
-        "0x08019540",
-        "0x08019554",
-        "0x080195fc",
-        "0x08019700",
-        "0x080197dc",
-        "0x08019820"
-      ]
-    },
-    {
-      "batch_idx": 84,
-      "lo": "0x08019864",
-      "hi": "0x0801f3e8",
-      "span_bytes": 23428,
-      "count": 20,
-      "addrs": [
-        "0x08019864",
-        "0x08019c44",
-        "0x08019c48",
-        "0x08019c90",
-        "0x08019ed4",
-        "0x0801a16c",
-        "0x0801a484",
-        "0x0801a49c",
-        "0x0801a560",
-        "0x0801a6e4",
-        "0x0801a7d0",
-        "0x0801a83c",
-        "0x0801b77c",
-        "0x0801bad0",
-        "0x0801bc28",
-        "0x0801bcb8",
-        "0x0801c710",
-        "0x0801e294",
-        "0x0801e6cc",
-        "0x0801f3e8"
-      ]
-    },
-    {
       "batch_idx": 85,
-      "lo": "0x0801fe92",
-      "hi": "0x08033ecc",
-      "span_bytes": 81978,
-      "count": 20,
-      "addrs": [
-        "0x0801fe92",
-        "0x0802385e",
-        "0x08024868",
-        "0x0802ff34",
-        "0x0802ff58",
-        "0x0802ff84",
-        "0x0802ffb0",
-        "0x0802ffd0",
-        "0x08030208",
-        "0x08030988",
-        "0x080309b8",
-        "0x08031118",
-        "0x08031710",
-        "0x08031a34",
-        "0x08031ae4",
-        "0x08031d44",
-        "0x08031ebc",
-        "0x08032fd8",
-        "0x08033258",
-        "0x08033ecc"
-      ]
-    },
-    {
-      "batch_idx": 86,
-      "lo": "0x08033fa4",
-      "hi": "0x08043ff8",
-      "span_bytes": 65620,
-      "count": 20,
-      "addrs": [
-        "0x08033fa4",
-        "0x08036770",
-        "0x08036a10",
-        "0x08037088",
-        "0x0803735c",
-        "0x08037894",
-        "0x08037904",
-        "0x080379d0",
-        "0x08037ae4",
-        "0x0804308c",
-        "0x080430e4",
-        "0x080432a8",
-        "0x080433ec",
-        "0x0804369c",
-        "0x080436e8",
-        "0x08043900",
-        "0x080439b4",
-        "0x08043c18",
-        "0x08043f44",
-        "0x08043ff8"
-      ]
-    },
-    {
-      "batch_idx": 87,
-      "lo": "0x0804404c",
-      "hi": "0x08047a80",
-      "span_bytes": 14900,
-      "count": 20,
-      "addrs": [
-        "0x0804404c",
-        "0x0804440c",
-        "0x08044540",
-        "0x080445d8",
-        "0x080447d4",
-        "0x08044970",
-        "0x080449a4",
-        "0x080449d4",
-        "0x08044a00",
-        "0x08044a34",
-        "0x08044bac",
-        "0x08044c84",
-        "0x08044ce4",
-        "0x08044d08",
-        "0x08044d48",
-        "0x08045530",
-        "0x08047990",
-        "0x080479c4",
-        "0x08047a14",
-        "0x08047a80"
-      ]
-    },
-    {
-      "batch_idx": 88,
       "lo": "0x08047aa0",
       "hi": "0x0804a504",
       "span_bytes": 10852,
@@ -217,7 +49,7 @@
       ]
     },
     {
-      "batch_idx": 89,
+      "batch_idx": 86,
       "lo": "0x0804a754",
       "hi": "0x080515a8",
       "span_bytes": 28244,
@@ -246,7 +78,7 @@
       ]
     },
     {
-      "batch_idx": 90,
+      "batch_idx": 87,
       "lo": "0x08051998",
       "hi": "0x08054570",
       "span_bytes": 11224,
@@ -275,7 +107,7 @@
       ]
     },
     {
-      "batch_idx": 91,
+      "batch_idx": 88,
       "lo": "0x0805465c",
       "hi": "0x08056874",
       "span_bytes": 8728,
@@ -304,7 +136,7 @@
       ]
     },
     {
-      "batch_idx": 92,
+      "batch_idx": 89,
       "lo": "0x08057344",
       "hi": "0x0805cf3c",
       "span_bytes": 23544,
@@ -333,7 +165,7 @@
       ]
     },
     {
-      "batch_idx": 93,
+      "batch_idx": 90,
       "lo": "0x0805cf98",
       "hi": "0x0805ec00",
       "span_bytes": 7272,
@@ -362,7 +194,7 @@
       ]
     },
     {
-      "batch_idx": 94,
+      "batch_idx": 91,
       "lo": "0x0805ec40",
       "hi": "0x08061d40",
       "span_bytes": 12544,
@@ -391,7 +223,7 @@
       ]
     },
     {
-      "batch_idx": 95,
+      "batch_idx": 92,
       "lo": "0x0806234c",
       "hi": "0x080651ec",
       "span_bytes": 11936,
@@ -420,7 +252,7 @@
       ]
     },
     {
-      "batch_idx": 96,
+      "batch_idx": 93,
       "lo": "0x0806525c",
       "hi": "0x08067804",
       "span_bytes": 9640,
@@ -449,7 +281,7 @@
       ]
     },
     {
-      "batch_idx": 97,
+      "batch_idx": 94,
       "lo": "0x0806a760",
       "hi": "0x08080d84",
       "span_bytes": 91684,
@@ -478,7 +310,7 @@
       ]
     },
     {
-      "batch_idx": 98,
+      "batch_idx": 95,
       "lo": "0x08080d94",
       "hi": "0x080817f0",
       "span_bytes": 2652,
@@ -507,7 +339,7 @@
       ]
     },
     {
-      "batch_idx": 99,
+      "batch_idx": 96,
       "lo": "0x080817f4",
       "hi": "0x08093840",
       "span_bytes": 73804,
@@ -536,7 +368,7 @@
       ]
     },
     {
-      "batch_idx": 100,
+      "batch_idx": 97,
       "lo": "0x0809387c",
       "hi": "0x080a1c18",
       "span_bytes": 58268,
@@ -565,7 +397,7 @@
       ]
     },
     {
-      "batch_idx": 101,
+      "batch_idx": 98,
       "lo": "0x080a1c2c",
       "hi": "0x080a2a64",
       "span_bytes": 3640,
@@ -594,7 +426,7 @@
       ]
     },
     {
-      "batch_idx": 102,
+      "batch_idx": 99,
       "lo": "0x080a2c64",
       "hi": "0x080b5b50",
       "span_bytes": 77548,
@@ -623,7 +455,7 @@
       ]
     },
     {
-      "batch_idx": 103,
+      "batch_idx": 100,
       "lo": "0x080b5bac",
       "hi": "0x080babd4",
       "span_bytes": 20520,
@@ -652,7 +484,7 @@
       ]
     },
     {
-      "batch_idx": 104,
+      "batch_idx": 101,
       "lo": "0x080be9bc",
       "hi": "0x080d84b8",
       "span_bytes": 105212,
@@ -681,7 +513,7 @@
       ]
     },
     {
-      "batch_idx": 105,
+      "batch_idx": 102,
       "lo": "0x080d8804",
       "hi": "0x080dbcec",
       "span_bytes": 13544,
@@ -710,7 +542,7 @@
       ]
     },
     {
-      "batch_idx": 106,
+      "batch_idx": 103,
       "lo": "0x080dbcfc",
       "hi": "0x080dc82c",
       "span_bytes": 2864,
@@ -739,7 +571,7 @@
       ]
     },
     {
-      "batch_idx": 107,
+      "batch_idx": 104,
       "lo": "0x080dcae0",
       "hi": "0x080de0bc",
       "span_bytes": 5596,
@@ -768,7 +600,7 @@
       ]
     },
     {
-      "batch_idx": 108,
+      "batch_idx": 105,
       "lo": "0x080de0d4",
       "hi": "0x080e5658",
       "span_bytes": 30084,
@@ -797,7 +629,7 @@
       ]
     },
     {
-      "batch_idx": 109,
+      "batch_idx": 106,
       "lo": "0x080e568c",
       "hi": "0x080e850c",
       "span_bytes": 11904,
@@ -826,7 +658,7 @@
       ]
     },
     {
-      "batch_idx": 110,
+      "batch_idx": 107,
       "lo": "0x080e85c0",
       "hi": "0x080ea7c8",
       "span_bytes": 8712,
@@ -855,7 +687,7 @@
       ]
     },
     {
-      "batch_idx": 111,
+      "batch_idx": 108,
       "lo": "0x080ea838",
       "hi": "0x080eeca8",
       "span_bytes": 17520,
@@ -884,7 +716,7 @@
       ]
     },
     {
-      "batch_idx": 112,
+      "batch_idx": 109,
       "lo": "0x080eed50",
       "hi": "0x080f2d2c",
       "span_bytes": 16348,
@@ -913,7 +745,7 @@
       ]
     },
     {
-      "batch_idx": 113,
+      "batch_idx": 110,
       "lo": "0x080f34dc",
       "hi": "0x080f5fa0",
       "span_bytes": 10948,
@@ -942,7 +774,7 @@
       ]
     },
     {
-      "batch_idx": 114,
+      "batch_idx": 111,
       "lo": "0x080f6260",
       "hi": "0x080f9a90",
       "span_bytes": 14384,
@@ -971,7 +803,7 @@
       ]
     },
     {
-      "batch_idx": 115,
+      "batch_idx": 112,
       "lo": "0x080f9b70",
       "hi": "0x080fd9bc",
       "span_bytes": 15948,
@@ -1000,7 +832,7 @@
       ]
     },
     {
-      "batch_idx": 116,
+      "batch_idx": 113,
       "lo": "0x080fde90",
       "hi": "0x0810b16c",
       "span_bytes": 53980,
@@ -1029,7 +861,7 @@
       ]
     },
     {
-      "batch_idx": 117,
+      "batch_idx": 114,
       "lo": "0x0810ca20",
       "hi": "0x0810e408",
       "span_bytes": 6632,
@@ -1058,7 +890,7 @@
       ]
     },
     {
-      "batch_idx": 118,
+      "batch_idx": 115,
       "lo": "0x0810e420",
       "hi": "0x08110fbc",
       "span_bytes": 11164,
@@ -1087,7 +919,7 @@
       ]
     },
     {
-      "batch_idx": 119,
+      "batch_idx": 116,
       "lo": "0x081110a8",
       "hi": "0x08113b38",
       "span_bytes": 10896,
@@ -1116,7 +948,7 @@
       ]
     },
     {
-      "batch_idx": 120,
+      "batch_idx": 117,
       "lo": "0x08114070",
       "hi": "0x081141d8",
       "span_bytes": 360,

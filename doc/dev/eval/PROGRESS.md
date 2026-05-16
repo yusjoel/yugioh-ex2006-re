@@ -8,9 +8,10 @@
 ## 总目标 vs 当前目标
 
 - **总目标**: ROM 内所有函数完成分析 (~4539 个 callgraph distinct addresses; 当前已命名 2000 / 全 CSV 3646 行 = 54.85%)
-- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 20 批 / 40 fns 每批 / 4×10 并行, 编号 `#82..#101`)
+- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 20 fns 每批, **单 sub-agent 串行模式**, 已完成批次 #82-#84 (40/批模式, 120 fns), 剩余 33 批 `#85..#117` (20/批))
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **锁定策略**: 766 集合不动态刷新; 每批落地后不重新计算 ready, 下一轮再批量找 ready
+- **模式切换** (2026-05-16): 4×10 并行 → **20/批单 sub-agent**。Phase 2 内已完成 120 函数 (#82-#84 40/批模式), 剩余 646 函数按 20/批分 33 批 (#85..#117)。
 
 ---
 
@@ -19,18 +20,18 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中锁定的 766 个就绪函数 (20 批 / 40 每批, #82..#101) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 646 个就绪函数 (33 批, #85..#117, 每批 20) 全部分析完毕。
 
-每批 4×10 并行模式 (效率优先, 不在意 token):
-  - executor: 4 个 sub-agent 并行, 每个 10 函数 → 40 份 proposal
-  - reviewer: 4 个 sub-agent 并行, 每个 10 函数 → 40 份 eval
-  - fixer iter (NEEDS_FIX): 视数量 ≥20 拆 2 个并行, 否则单 sub-agent
+20/批 单 sub-agent 串行模式 (不再拆分并行):
+  - executor: 1 个 sub-agent 一次性产 20 份 proposal
+  - reviewer: 1 个 sub-agent 一次性评 20 份
+  - fixer iter (NEEDS_FIX): 1 个 sub-agent 处理本批所有 NEEDS_FIX
   - fixer 落地: 1 个 sub-agent (Ghidra 单 session, 单 build, 单 sha1 verify)
   - lesson-keeper: 1 个 sub-agent
 
-splits 取批方法:
+下一批取法:
   python -c "import json; d=json.load(open('doc/dev/eval/ready_batches.json')); \
-    idx=<NEXT_BATCH_IDX>-82; b=d['batches'][idx]; print(b['splits'])"
+    idx=<NEXT_BATCH_IDX>-85; b=d['batches'][idx]; print(b['addrs'])"
 
 byte-identical 通过后自动 commit, 进入下一批。
 
@@ -41,7 +42,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 仅 BLOCKED 但有命名的函数仍走落地 (BLOCKED 是 SB tracking 不阻塞 rename)。
 
-完成 39 批后: 重新跑 ready 计算脚本, 把 766 之外新就绪的函数纳入下一轮 ready_batches。
+完成 33 批 (#85..#117) 后: 重新跑 ready 计算脚本, 把 766 之外新就绪的函数纳入下一轮 ready_batches。
 ```
 
 注意: 旧版 `tools/ad-hoc/pick_batch.py` 是 campaign_scene_handler 闭包专用拓扑序 picker, **不再适用本阶段**; 新阶段从 `temp/ready_batches.json` 直接取批。
@@ -53,8 +54,8 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 20 批 / 4×10 并行 |
-| **下一批** | `#85` (40 fns, 4 splits × 10) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 120 + 剩余 646 (33 批 #85..#117 / 20 每批) |
+| **下一批** | `#85` (20 fns, 单 sub-agent 串行) — addrs 0x08047aa0..0x0804a504 |
 | **上次更新** | 2026-05-16 (Phase 2 batch #84, 120/766 = 15.67%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
@@ -77,33 +78,32 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**120 / 766 已分析** (15.67%, 36 批待跑)
+**120 / 766 已分析** (15.67%, 剩余 33 批待跑 #85..#117)
 
-里程碑 commits:
+里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
 - batch #83 `c9c5102` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
-- batch #84 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
+- batch #84 `3654958` 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
+
+**模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
 #### Phase 2 ready 集合统计
 
 | 维度 | 数量 |
 |------|-----:|
-| 就绪函数总数 | **766** |
-| - 纯叶子 (no callees) | 247 |
-| - 全 callee 已命名 | 519 |
-| 分批数 (20/批) | 39 (`#82..#120`) |
-| 末批大小 | 6 (#120) |
-| 单批地址 span 中位数 | 0x34e8 (~13 KB) |
-| 单批 span 范围 | 0x168 .. 0x19afc |
-| 地址覆盖区段 | 0x080001f0..0x081141d8 |
+| 就绪函数总数 (锁定) | **766** |
+| - 已完成 (Phase 2 #82-#84, 40/批) | 120 |
+| - 剩余 (按 20/批 重组) | 646 |
+| 剩余分批数 (20/批) | 33 (`#85..#117`) |
+| 末批大小 | 6 (#117) |
+| 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 
 #### ROM 全局命名比例
 
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| 闭包外 | 311 | 1637 | — |
-| **全 CSV** | **2040** | **1606** | **55.95%** |
+| **全 CSV** | **2120** | **1526** | **58.16%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

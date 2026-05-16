@@ -75,6 +75,9 @@ model: sonnet
 | R3 高寄存器被列为参数但函数体实为 push+立即覆盖（callee-save），或高寄存器被列为参数但函数体实际是 push+overwrite（正确应删除该行） | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_non_apcs_register_input.md` (Counter-pattern: callee-saved 必须整行删除，不得补范围；verify: 函数体首次 use 是 epilogue restore 而非计算 use) |
 | 函数地址在 0x08038xxx，体 = push+ldr r0,[sp,#0x3c]+bl+b LAB，R4 非 void | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_lp_cost_dispatch_stub_cluster.md` (R4=0; b LAB 无独立 r0 写; void 强制) |
 | R7 form (b) 中 caller addr == 本函数地址（自引用）或 caller addr 为地址相邻 sibling（非真实 bl 关系）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md` + `feedback_r7_self_reference.md` (R7=0; 自引用或 sibling 误引均属 mechanical error; reviewer 须验证 addr != self && addr ∈ callgraph callers; 4 批次 5 函数复现) |
+| R7 节显示 callgraph indeg=0 但同时声明了 bl 调用者地址，或 indeg=0 但未提供 form(c) grep 证据 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_indeg0_form_c.md` (R7=0; indeg=0 与 bl-caller 共存 = 自相矛盾；indeg=0 时唯一合法形式是 form(c): 附 `.word 0x<ADDR+1>` grep not-found + dead-code/runtime-ptr 结论；20 实例 batch#82+#83+#84) |
+| R7 节含 indeg=0 + grep `.word 0x<ADDR+1>` not-found + dead-code/runtime-ptr 结论，且三要素均存在 | **必须接受 form(c) 满分**；不得以"没有实际 caller"为由扣分；indeg=0 + grep not-found 已完整回答 R7 的 caller 锚定要求；reviewer 不得要求额外 bl callsite 证据（batch #84 三函数因此需用户介入强制重评）|
+| R7 form(b) 中 tags 字段为 `[]` 空列表或 `-` 破折号占位符 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_tags_empty_list.md` (R7=0; 两种占位符等效于缺失；须从 naming-proposals.csv 或地址区域推断) |
 | R2 plate 明显超过 500 字（目测 >35 密集行，或 proposal 注明字数超限）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md` (R2=0; 超过 500 字为硬限; 内容质量不作减免) |
 | R2 plate 正文含"推测/可能/大概/似乎/应该是"等主观推测词（不在置信度节内）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_speculative_language_in_plate.md` (R2=0; 必须以 caller-tag callsite 事实替代; 推测词不得出现在 plate 正文; batch #26 两函数复现) |
 | proposed_name 含 `_0x[0-9a-f]{3,}` 段（裸 hex card_id）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1=0; 必须查 doc/dev/data.md 替换为语义卡名) |
@@ -89,6 +92,7 @@ model: sonnet
 | 函数属于某 sibling cluster 且 PROGRESS.md 中有 >=1 个 sibling 已命名，但 proposed_name 省略了 cluster 前缀或使用不同的数字记法（`_0x3c_` vs `op3c`，`op31_sub8` vs `invoke_card_display_op_0x31_sub8`）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_sibling_cluster_naming_format.md` (R1=0; 两种 failure mode: A 前缀截断 / B 数字记法不一致；必须 grep PROGRESS.md 取 sibling 完整名后逐字符匹配) |
 | R5/R6 中的 str 偏移来自大型共享基址簇（如 tick_*_display_seq 基址 0x0201bcc0）但偏移值未对应函数自身 DAT 池验证 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_shared_cluster_field_offset_per_function.md` (R5+R6 均扣分; 须对每个 str 偏移追踪 DAT_xxxxxxxx:.word 值；[+0x810]=step_counter vs [+0x80c]=state_flag 混淆；9 函数 batch#75 复现) |
 | R2 plate 描述任意 LAB 路径时写"no-op"/"skip"/"无操作"/"辅助路径"，或主副路径状态值（state=1 vs state=2）角色倒置 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_path_description_contradicts_asm.md` (R2=0; reviewer 须独立扫描该 LAB 从起点到收敛点的所有指令；任何 bl/str 在描述中缺失均扣分; batch#74+#75 两次复现) |
+| R8 声明 high 置信度但正向证据层 <3（仅 2 层，第三项是"无 IO 副作用"或"结构简单"等排除性描述）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r8_high_confidence_evidence_layers.md` (R8=0 for high with <3 independent positive layers; L1 全静态短函数体是合法第三层但须显式写 asm 行范围; 排除性证据不计层数; batch#68+#82 复现) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 
