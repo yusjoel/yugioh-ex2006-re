@@ -1,0 +1,1 @@
+Forward wrapper for equip zone=0xb bitmap update. Called from multiple duel_field functions. r0/r1 passed through, injects r2=0xb (ZONE_EQUIP=11), r3=0 (side_flags=0), forwards to update_equip_target_bitmap_for_field. Exit: pop {r1}; bx r1 void return. Side effects: EWRAM equip bitmap via update_equip_target_bitmap_for_field(r0, r1, 0xb, 0). Constants: ZONE=0xb, SIDE_FLAGS=0x0.
