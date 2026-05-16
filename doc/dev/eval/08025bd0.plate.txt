@@ -1,0 +1,11 @@
+Selects a ROM font data pointer r0 based on gPrng+0x6c2c bits[2:0] (font_type, [1..5]),
+then calls render_game_string_with_number (FUN_0802b940) with fixed args (r1=3, r2=10)
+to render a game string. font_type==5 adds offset 0x3ab84 to ROM base 0x09dc01ac;
+font_type 4/3/2/1 each have independent ROM font pointers. Called only by
+render_card_stats_to_line_buf as the A-string (r2=10) render sub-path.
+
+Constants:
+- gPrng+0x6c2c = font_type field (0x02006c2c)
+- 0x09dc01ac = font_type 5 base (ROM offset)
+- 0x3ab84 = font_type 5 additional offset
+- r2=10 (0xa) = digit_value parameter for render_game_string_with_number

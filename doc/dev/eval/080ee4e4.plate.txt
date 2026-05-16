@@ -1,0 +1,11 @@
+Writes tilemap data from source (r0) row by row into BG VRAM tilemap region
+(0x06000000 + r1*0x800), adding r2 (tile_offset) to each nonzero tile entry.
+Outer loop controlled by r12 (row_count from sp+0x14), inner loop by r3 (height/columns):
+reads source halfword, if nonzero adds r7 (tile_offset) then writes to target;
+each row advances by 0x40 (adds r4,#0x40 = 64 halfwords = 32-tile row * 2 bytes).
+Called by duel field VRAM hub functions with r12=N (row count) for BG tilemap init.
+
+Constants:
+- 0x06000000 = BG VRAM tilemap base (0xc0<<19)
+- r1*0x800 = BG screen row/col offset (r1 * 2048)
+- 0x40 = 64 halfwords/row (32 tiles * 2 bytes = BG tilemap row stride)

@@ -1,0 +1,10 @@
+Traverses a game string (r0) counting renderable glyph units (r2 counter). For each byte:
+if control prefix 0x40, checks next byte: if in 0x30..0x39 (ASCII digits), pointer advances
+2 bytes but r2 increments by 1; if 0x40, skips 1 byte; otherwise skips 1 byte. Non-0x40
+bytes: skip 1 byte, r2++. Terminates on 0x00. Returns r0=r2 (glyph unit count).
+Called by draw_card_name_label_to_sprite_vram to compute centering position
+(0x78 - count*3 = x_offset).
+
+Constants:
+- 0x40 = game string control prefix byte (escape prefix)
+- 0x30..0x39 = ASCII '0'..'9' digit range (2-byte skip when digit follows control byte)

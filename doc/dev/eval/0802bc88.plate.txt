@@ -1,0 +1,13 @@
+Variant of render_game_string_with_number (FUN_0802b940): main difference is that
+text_render_wrapper is called with r2=6 (vs 7), representing a different render
+mode/width parameter. r0=text_ptr (card data string), r1=digit_value (card attribute
+value, from get_card_data_bit_by_index return). Writes to line buffer slot then renders
+text; if digit_value > 9, performs decimal decomposition loop (render_glyph_jp_single_layer);
+if <= 9, writes single character directly. Finally increments slot count bits[4:0]+1 and
+writes back. Called by FUN_0801fec0 (full scene hub) and render_card_stats_to_line_buf.
+
+Constants:
+- gPrng+0xb6*2 = 0x16c (line buffer slot base)
+- 0x02006ed0 = scene state region (halfword at +0xc, low 6 bits truncated)
+- 0x3f mask = low 6 bits slot count
+- r2=6 = render mode parameter (differs from render_game_string_with_number r2=7)

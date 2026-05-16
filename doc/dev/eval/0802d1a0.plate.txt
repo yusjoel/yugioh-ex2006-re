@@ -1,0 +1,17 @@
+Initializes BG/OBJ VRAM data for a specified opponent card (r0=opponent_index):
+computes palette address (opponent_palettes_base + r0*288 bytes = r0*9*32), computes
+tile offset (r0*0x2000 bytes via lsls r1,r0,#0xd) for opponent_top/bottom_tiles_base,
+and computes tilemap offset (r0*0x4b0 bytes = r0*(5*15)*4*16). Sequence: zero_fill x2
+(clears top/bottom tilemap), upload_palette_rows_to_bg_vram (8 palette rows), writes
+DISPCNT/0 to blank screen, upload_indexed_tile_rows_to_obj_vram x2 (top/bottom tile
+blocks), upload_tilemap_rows_with_offset x2 (top/bottom tilemap). Called by FUN_08026c88
+on duel scene switch.
+
+Constants:
+- opponent_palettes_base = 0x09b101ac (ROM opponent palette data start)
+- opponent_top_tiles_base = 0x09b1200c (ROM opponent top tile start)
+- opponent_bottom_tiles_base = 0x09b51cfc (ROM opponent bottom tile start)
+- opponent_top_tilemap_base = 0x09b4800c (asm DAT_0802d24c)
+- opponent_bottom_tilemap_base = 0x09b87cfc (asm DAT_0802d250)
+- 0x80*0x10=0x800 (zero_fill target size, single tilemap region)
+- 0x14 = 20 (tilemap row count passed via sp[0x0] to upload_tilemap_rows_with_offset)

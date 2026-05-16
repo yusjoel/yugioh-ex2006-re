@@ -1,0 +1,8 @@
+Copies one row (0x20 halfwords) of icon palette data from ROM to BG palette VRAM
+(0x05000220 + col*4 + row*0x80), and writes icon tile data via tile_2d_row_copy to
+OBJ VRAM (0x06010000 + row*0x20*0x20 + col_tile*0x20). Called by init_duel_field_icon_and_bg_vram
+during duel field initialization, one 3x3 tile block (width=3, height=3) per call.
+
+Constants:
+- 0x05000220 = BG palette VRAM base offset (palette slot base)
+- 0x06010000 = OBJ tile VRAM base

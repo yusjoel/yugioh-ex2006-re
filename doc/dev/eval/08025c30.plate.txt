@@ -1,0 +1,11 @@
+Symmetric sibling of render_game_text_with_font_type_a (FUN_08025bd0): only differences are
+(1) different font pointer constants (0x09dc01b2 vs 0x09dc01ac); (2) r2=2 (vs r2=10)
+passed to render_game_string_with_number (FUN_0802b940). Also selects font by
+gPrng+0x6c2c bits[2:0], renders with fixed r1=3. Called only by render_card_stats_to_line_buf
+as the B-string (r2=2) render sub-path.
+
+Constants:
+- gPrng+0x6c2c = font_type field (0x02006c2c)
+- 0x09dc01b2 = font_type 5/default ROM base for sibling B (+6 offset from A)
+- 0x3ab86 = font_type 5 additional offset (+2 from A's 0x3ab84)
+- r2=2 = mode parameter for render_game_string_with_number

@@ -1,0 +1,8 @@
+Copies r1*32 bytes (r1 rows * 32 bytes/row) of palette data from src (r0) to BG palette
+VRAM (0x05000000). Left-shifts r1 by 5 bits to get byte length, then calls
+copy_bytes_by_halfword with BG palette VRAM as destination. Called by init_opponent_card_bg_vram
+and several duel field scene hubs with r1 = row count (e.g. 9 rows).
+
+Constants:
+- 0x05000000 = BG palette VRAM base
+- r1*0x20 = actual byte count (32 bytes per row = 16 palette entries)

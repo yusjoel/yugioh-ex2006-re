@@ -1,0 +1,12 @@
+Card attribute render hub: first calls get_card_data_bit_by_index(4) to read card bit 4
+(e.g. ATK type flag); skips if zero. Otherwise selects font pointer from font_type
+(gPrng+0x6c2c bits[2:0]) and calls render_card_stat_with_number_alt (FUN_0802bc88)
+to render the first attribute group; then calls render_game_string_with_number
+(FUN_0802b940) with r2=100 for separator content; next calls get_card_data_bit_by_index(2)
+and if nonzero, selects font and calls render_game_string_with_number (r1=2, r2=2).
+Called by FUN_080277a4 in the card info display scene.
+
+Constants:
+- bit_index=4 = card data bit 4 (e.g. ATK/DEF type)
+- bit_index=2 = card data bit 2 (e.g. card category)
+- r2=0x64=100 = separator/value parameter for render_game_string_with_number

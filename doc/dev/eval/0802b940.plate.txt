@@ -1,0 +1,15 @@
+General game string + number combined render function. Writes r2 (text_ptr) to the
+gPrng scene struct line buffer slot (position determined by r0 bits[4:0] and bits[4:0]>>2),
+writes r1 (line_buf_y) to another slot, then truncates the low 6 bits of halfword at
+0x02006ed0+0xc, calls text_render_wrapper(2, line_buf_x, 7, text_ptr) to render the main
+string. Then based on r1: r1==7 -> updates line_buf_x += 0xc and branches; r1==8 ->
+branches to alternate render path; otherwise -> selects digit render branch based on
+whether r0 <= 9 (uses FUN_0802bb74 for <=9, FUN_0802bb68 for >9).
+Called by render_card_stats_to_line_buf / render_game_text_with_font_type_a /
+render_game_text_with_font_type_b and others.
+
+Constants:
+- gPrng+0xb6*2 = 0x16c (line buffer slot Y base address)
+- 0x02023360 = scene line buffer base
+- 0x02006ed0 = known EWRAM scene state region
+- 0x3f mask = low 6 bits truncation (line_buf x count)

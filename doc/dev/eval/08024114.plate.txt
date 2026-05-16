@@ -1,0 +1,16 @@
+Opponent wins display OAM update hub. First checks if the frame control word at
+gPrng+0x202 equals 0x140 (i.e. 0xa0<<1, compared as (halfword[gPrng+0x202]&0x3fc0)):
+if satisfied, extracts the card/mode flag at gPrng+0x203, tests bit2 to decide
+whether to activate the win digit render path. Then sets a fixed OAM entry sequence
+(4 rows x 4 columns of sprites), then based on bits[7:5] of byte at 0x02023360+0x4
+and gPrng+0x6c2c state selects the font address, calls card_name_lookup_by_internal_id
+to query card name, then calls draw_decimal_with_offset to render digits, and writes
+the mode flag byte at 0x02023360+8. Triggered by 8 callers at various duel field events.
+
+Constants:
+- gPrng+0x202 = 0x02000000+0x202 (frame control word 1)
+- gPrng+0x203 = 0x02000000+0x203 (frame control word 2)
+- 0x3fc0 = 0xff << 6 (halfword mask bits[13:6], extracts opponent wins control field)
+- 0x140 = 0xa0 << 1 (activation threshold for opponent wins render)
+- 0x204 = 0x81*4 (gPrng card data field offset)
+- gPrng+0x6e5c = scene frame counter offset (deck record table index)

@@ -1,0 +1,5 @@
+Thin wrapper around text_render_wrapper: zero-extends r2 (width/column parameter)
+to u16 before calling (lsls r2,r2,#0x10; lsrs r2,r2,#0x10), clearing any sign
+extension in the high 16 bits. Ensures text_render_wrapper receives a u16-range
+column offset. Used by multiple font render callers including render_text_with_font_type_select
+and several duel_field/vram/font_jp scene functions.

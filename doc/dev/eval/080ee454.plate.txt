@@ -1,0 +1,12 @@
+Similar to upload_indexed_tile_rows_to_obj_vram (FUN_080ee4ac) but uses a different
+nibble-pack algorithm: reads 4 bytes at a time from r0 source, cross-packs adjacent
+nibbles into two halfwords written to OBJ VRAM (0x06004000 + r1*0x20). Outer loop
+256 iterations (r0=0..0xff), inner loop 16 iterations (r5=0xf): takes [r3+0]&0xf,
+[r3+1]&0xf (low nibble pair) merged into bits[7:0]; takes [r3+2]&0xf, [r3+3]&0xf
+merged into high byte -> final 16-bit halfword written to VRAM. Called only by
+FUN_0802d074 with r1=2.
+
+Constants:
+- 0x06004000 = OBJ tile VRAM base
+- 0xf mask = low nibble extraction (4bpp tile pixel)
+- 256*16 = 4096 halfwords = 8KB tile data

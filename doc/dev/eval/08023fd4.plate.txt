@@ -1,0 +1,15 @@
+Renders a win count (or corresponding value) as three groups of OAM digit sprites,
+3 sprites per group (loop 3 times via movs r5,#0x2; bge). The three groups correspond
+to hundreds/tens/ones place, using __modsi3 + __divsi3 divide-by-10 to extract each digit,
+adding tile base 0x474 to get the digit tile index, then calling
+write_oam_entry_from_packed_args to write to OAM. Finally writes two fixed entries
+(0x4040 / 0x454). Called by render_opp_wins_display_oam (tag: opp_wins) in the
+opponent wins display scene.
+
+Constants:
+- 0x02000000+0x6e60 = gPrng+0x6e60 (frame scene control word offset 1)
+- 0x02000000+0x6e62 = gPrng+0x6e62 (frame scene control word offset 2)
+- 0x474 = digit tile base index
+- 0x4040 = OAM attr0[y=0x40] | attr1[x=0x40] (separator sprite coords, off-screen)
+- 0x454 = OAM attr2 tile index (DAT_08024110, first fixed sprite tile index)
+- 0x458 = 0x8b << 3 (second fixed sprite tile index, computed inline)

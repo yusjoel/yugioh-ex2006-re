@@ -1,0 +1,14 @@
+Duel field initialization entry: writes control word to gPrng+0x174, clears DISPCNT,
+calls reset_display_and_obj_vram + store_ewram_ctx_ptr_and_clear_mode_flags, then
+configures BG0-BG3 BGCNT registers, calls reset_all_bg_scroll_regs_and_shadows,
+uploads pack VRAM+palette, zero-fills BG tilemap/OBJ VRAM/EWRAM regions, copies palette,
+loads pack tiles+map, uploads two tile+palette structs, loads another pack tile/map segment,
+then iterates over player icon rows (gPlayerIcon array, up to 0x19 entries) calling
+copy_icon_tile_to_vram_row to write icon data to OBJ VRAM and BG palette.
+Called by three scene-switch functions (FUN_08025d58 / FUN_0802727c / FUN_08027a0c)
+on entering the duel main field.
+
+Constants:
+- gPrng+0x174 = duel field control word (0x464f/0x4646 decode: write at 0xba*2=0x174 offset)
+- BG0CNT = 0x04000008, set to 0x0004 (char base=1)
+- 0xc000000 = OBJ VRAM base (OBJ tile clear target)

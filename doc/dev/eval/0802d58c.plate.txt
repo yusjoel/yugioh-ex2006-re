@@ -1,0 +1,16 @@
+Renders a card name string as OBJ sprite VRAM rows. First zero-fills OBJ sprite buffer
+(0x06008200, 0x800 bytes); if r0 (string_ptr) is 0 returns immediately. Otherwise: calls
+setup_line_buf_pos_and_font (x=0x20, font_id=2) to configure line buffer; reads
+gPrng+0x6c2c bits[2:0] (font_type) and writes to buf[8]; extracts bits[1:0] to compute
+font_jp_base_table offset (font_ptr); calls count_rendered_glyph_units twice to compute
+first-half/second-half string widths, using 0x78 - count*3 = center_x for centering;
+calls text_render_wrapper twice to render the string; finally calls
+commit_line_buffer_to_sprite_vram (base=0x06008200) to commit to OBJ VRAM.
+Called by FUN_08026c88 / FUN_08026e9c / FUN_08026fe4 at different duel scene phases.
+
+Constants:
+- 0x06008200 = OBJ sprite line buffer VRAM base (DWORD_0802d620)
+- 0x800 = 0x80*0x10 = zero-fill target size (bytes)
+- 0x78 = 120 (centering x_offset reference)
+- gPrng+0x6c2c = font_type field (bits[2:0])
+- font_jp_base_table = 0x09e5f854 (Japanese font base table)

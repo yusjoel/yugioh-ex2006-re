@@ -1,0 +1,14 @@
+Writes initial duel scene scroll parameters: gPrng+0x1ea (offset 0xf5*2) := 0x60
+(BG horizontal scroll initial value or display region offset A), gPrng+0x1ec
+(offset 0xf6*2) := 0xa0 (BG vertical direction). Then reads byte at 0x02023360+0x61,
+clears bits[6:2] (rsbs r0,r0,#0 => -0x7d => byte mask 0x83 = 1000 0011b, ands retains
+bits[7,1,0]), writes back (clears mode flag bits[6:2]). Called only by FUN_08026c88
+on duel scene switch.
+
+Constants:
+- gPrng+0x1ea = 0x02001ea (scroll param A, 0xf5*2)
+- gPrng+0x1ec = 0x02001ec (scroll param B, 0xf6*2)
+- 0x60 = 96 (horizontal offset initial value)
+- 0xa0 = 160 (vertical offset initial value)
+- 0x02023360+0x61 = 0x020233c1 (mode flag byte)
+- 0x7d = 0111 1101b; rsbs => -0x7d => byte mask = 0x83 = 1000 0011b; ands clears bits[6:2]

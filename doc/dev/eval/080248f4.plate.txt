@@ -1,0 +1,14 @@
+Iterates all 27 field slots (r4 from 0 to 0x1a=26), checks each slot state via jump
+table (PTR_PTR_0802490c, 27 entries): if the handler returns nonzero (r1 != 0), sets
+the corresponding bit in r5 (movs r0,#0x1; lsls r0,r4; orrs r5,r0). After the loop,
+writes r5 to gPrng+0x6e5c (field slot activation bitmap), writes halfword 1 to
+0x02023360, then iterates active bits 0..0x1a writing each slot index into the deck
+slot count table (0x02023360+2*n). Finally calls init_puzzle_wram_then_copy to sync
+field state. Called by three scene-switch functions (FUN_08025d58 / FUN_0802727c /
+FUN_08027a0c) at duel start.
+
+Constants:
+- 0x1a = 26 (max slot index, 27 slots total)
+- PTR_PTR_0802490c jump table: 27 entries, indices 0..4 -> default path LAB_080249f8
+- gPrng+0x6e5c = 0x02000000+0x6e5c (field slot activation bitmap storage)
+- 0x02023360 = deck slot state table base

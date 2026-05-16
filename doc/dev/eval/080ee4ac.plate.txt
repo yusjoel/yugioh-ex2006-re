@@ -1,0 +1,11 @@
+Converts and uploads 4bpp indexed tile data from source (r0) to OBJ tile VRAM
+(0x06004000 + r1*0x20). Outer loop 256 iterations (r0 from 0 to 0xff), inner loop
+16 iterations (r3=0xf): reads 2 bytes (little-endian halfword, high then low merged),
+writes halfword to VRAM. Total 256*16=4096 halfwords = 8KB tile data. Called by
+init_opponent_card_bg_vram (2 calls, r1=0x10/0x88*2) and several duel field scene hubs.
+
+Constants:
+- 0x06004000 = OBJ tile VRAM base (duel field tile data region)
+- r1 * 0x20 = tile row offset (r1 left-shifted 5 bits, via lsls#0x10/lsrs#0xb = u16 * 32)
+- 256 outer loop iterations = 0x100 tiles (fixed block size)
+- 16 halfwords/tile = 32 bytes per tile
