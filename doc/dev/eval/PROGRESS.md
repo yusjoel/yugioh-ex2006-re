@@ -84,7 +84,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
 - batch #83 `c9c5102` 80/766 (10.44%) — banlist input + font_jp ctx + name_input cursor + zone chain ops + field slot counts
 - batch #84 `3654958` 120/766 (15.67%) — duel field equip cluster + zone sprite + bitmap update + Nitro Unit activation
-- batch #85 `TBD` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
+- batch #85 `220ef3d` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
