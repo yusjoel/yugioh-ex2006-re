@@ -1,0 +1,9 @@
+Called by duel_field/card_data scene main (0x0803be4c) to tick the flip-summon action state
+machine. Reads 0x0201bcc0 context for player/slot_type/slot_idx.
+State 0: calls dispatch_card_display_op(0x44,...) for flip display, updates zone_slot type_byte
+(bits 0-3), calls write_field_slot_bit_by_player, then dispatch_card_display_op(0x1a,...).
+State 1: calls play_ui_effect(0x44). State 2: calls play_ui_effect(0x1a); on completion calls
+purge_equip_chain_refs_for_zone_slot (0x0802ef84) and iterates zone slot list calling
+replace_chain_refs_by_id_filtered (0x0802ebbc). Increments [0x0201bcc0+0x810] or goes to
+LAB_0803de5c. No APCS parameters. Returns void (pop{r0};bx r0 tail-return). Confidence: med.
+Side effects: zone_slot type_byte modified; field bit set; equip chain refs cleared; display ops.

@@ -1,0 +1,5 @@
+Called by leaving-slot cleanup hub (0x08032194). Performs two-step cleanup on a zone slot:
+(1) calls replace_chain_refs_for_slot (0x0802eb94) to remove all equip chain references
+held by this slot; (2) calls zero_fill_by_halfword to clear the first 20 (0x14) bytes of the
+slot structure. r0=zone_slot_ptr. Returns void (pop{r0};bx r0 tail-return).
+Side effects: equip_node_pool refs cleared (transitive); zone slot memory zeroed [ptr+0..0x13].

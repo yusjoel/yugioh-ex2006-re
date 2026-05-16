@@ -1,0 +1,6 @@
+Called by duel_field scene main function (0x0803be4c) during equip AI initialization.
+Three steps: (1) calls invoke_build_equip_candidate_score_table(r0=0) to build the equip
+candidate score table; (2) writes [gP1LifePoints+0x1d28] = 0x9 (equip AI state initial value);
+(3) clears [gP1LifePoints+0x1d2c] and [0x0201bcc0+0x80c] to 0. No APCS parameters;
+all addresses loaded from literal pool. Returns void (pop{r0};bx r0 tail-return).
+Side effects: [gP1LifePoints+0x1d28]:=9; [gP1LifePoints+0x1d2c]:=0; [0x0201bcc0+0x80c]:=0.

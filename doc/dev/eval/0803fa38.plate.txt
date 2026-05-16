@@ -1,0 +1,10 @@
+Called by duel_field/card_frame scene main (0x0803be4c). Reads 0x0201bcc0 context for
+player/slot_type/zone_type. Computes zone slot display state: uses __modsi3/__divsi3 on
+zone_total to get row/column positions; packs multiple bit fields into sp[0x8] composite value.
+If zone_slot already has an entity (get_zone_slot_entity_ref_by_type != 0): calls get_zone_slot_ptr
+and updates gP1LifePoints+0x87*0x20 halfword display record.
+If zone_slot is empty (LAB_0803fb50): calls check_card_has_equip_placement_type, then
+increment_player_chain_counter (0x08030bac) to get chain counter; packs into sp[0x4];
+if zone_type <= 4 calls place_card_into_monster_zone_slot; updates adjacent zone display halfwords.
+No APCS parameters (all data from 0x0201bcc0). Returns void (pop{r0};bx r0 tail-return).
+Side effects: gP1LifePoints+0x10e0+... halfword fields updated; zone slot initialized (transitive).

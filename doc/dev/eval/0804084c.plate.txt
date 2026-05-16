@@ -1,0 +1,7 @@
+Called by duel_field/card_data scene main (0x0803be4c) to drive op=0x2f card display action
+two-phase state machine. Structurally symmetric to tick_card_normal_summon_display_state
+(0x080407fc), differing only in op number (0x2f vs 0x2e). Reads 0x0201bcc0 context for
+player/slot_type/slot_idx. State 0 (first frame): calls dispatch_card_display_op(0x2f, ...) and
+sets [base+0x810] := 1. State != 0 (subsequent frames): calls play_ui_effect(0x2f); if effect
+returns 0 clears [base+0x80c]. No APCS parameters. Returns void (pop{r0};bx r0 tail-return).
+Confidence: med. Side effects: [base+0x810] incremented; [base+0x80c] cleared on completion.

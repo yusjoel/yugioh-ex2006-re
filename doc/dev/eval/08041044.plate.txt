@@ -1,0 +1,10 @@
+Called by duel_field/card_data scene main (0x0803be4c) to tick the "change position"
+(attack/defense switch) display state machine. Reads 0x0201bcc0 context for
+player_side/slot_type/slot_idx.
+State 0: calls set_player_state_bit(player, 1, slot_type), calls
+dispatch_card_display_op(0x12, player, slot_type, 0); if slot_type != 0 sets bit2 (orrs #4) of
+[gP1LifePoints+0x11c+slot_idx*4+player_stride]; increments [base+0x810].
+State 1: calls play_ui_effect(0x12); if returns 0 clears [base+0x80c].
+Other states: returns immediately. No APCS parameters. Returns void (pop{r0};bx r0).
+Confidence: med. Symmetric to tick_card_normal_summon_display_state / tick_flip_attack_display_state.
+Side effects: player_state bit set; gP1LifePoints field bit2 set; op 0x12 triggered; state updated.

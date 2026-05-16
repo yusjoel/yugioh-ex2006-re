@@ -1,0 +1,6 @@
+Called by leaving-slot cleanup hub (0x08032194) and card_frame/duel_field path (0x0803caec).
+Scans all zone slots (zone_idx 0..0xb, 12 slots) for the specified player, matching each chain
+node against the given slot_id (r1); any match triggers replace_slot_chain_ref_by_id to replace
+the reference. Used to clean up reverse equip-chain references after a card leaves the field.
+r0=player_id [0..1], r1=slot_id [0..0xb]. Returns void (pop{r0};bx r0 tail-return).
+Side effects: equip_node_pool (0x0201d9c0) node reference fields modified via callee.

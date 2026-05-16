@@ -1,0 +1,13 @@
+Leaving-slot cleanup hub, indeg=12. Called from multiple duel_field/card_data paths when a card
+leaves the field (monster/equip/hand/graveyard/field zone). Calls get_zone_slot_ptr(r0, r1, r2)
+to fetch the slot pointer (r4), then dispatches on zone_type (r2, [0xb..0xf]):
+  0xb -> erase_slot_from_field_array_c_by_ptr
+  0xc -> erase_slot_from_equip_array_b_by_ptr
+  0xd -> erase_slot_from_hand_array_by_ptr
+  0xe -> erase_slot_from_equip_array_a_by_ptr + clear_equip_refs_for_leaving_slot
+  0xf -> erase_slot_from_graveyard_arrays_by_ptr
+  default (zone_type <= 0xa): if zone_count <= 0xa calls replace_chain_refs_by_slot_id_for_player
+    (0x0802ea3c); else calls clear_zone_slot_chain_refs (0x0803217c) and clears field_status_bitmask.
+r0=player_id [0..1], r1=slot_idx [0..9], r2=zone_type [0xb..0xf or <=0xa].
+Returns void (pop{r0};bx r0 tail-return).
+Side effects: corresponding zone array entry erased via callee; field_status bitmask bit cleared.

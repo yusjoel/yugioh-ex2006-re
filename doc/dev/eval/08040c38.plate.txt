@@ -1,0 +1,6 @@
+Called by duel_field/card_data scene main (0x0803be4c) on a different branch to reset the match
+context state word. Structurally identical to clear_match_state_field_at_80c (0x08040c24):
+loads 0x0201bcc0 and 0x80c from literal pool, stores 0 to [base+0x80c]. Leaf function (no bl).
+No parameters. Returns void (bx lr direct return). Confidence: med.
+Both functions share same base+offset; they are independent code copies called from separate branches.
+Side effects: [0x0201bcc0 + 0x80c] := 0.

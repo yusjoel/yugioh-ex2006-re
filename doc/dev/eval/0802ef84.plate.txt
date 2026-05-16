@@ -1,0 +1,9 @@
+Called by duel_field/card_data paths (0x0803dc34, 0x0803de90).
+Locates target zone_slot via r0=player_id, r1=slot_idx (base=0x0201c510, stride=0x868).
+Returns immediately if slot bit19==0 (empty slot). Otherwise reads slot_type and compares
+against thresholds (0x18c2/0x1343/0x1743/0x1957) to determine processing path; iterates all
+zones (2 players x 12 slots) calling replace_chain_refs_by_id_filtered (0x0802ebbc) to remove
+back-references to this slot from the equip chain; finally writes [slot+0xc]=0 and clears
+bits[0..4] of [gP1LifePoints+0x40+player_offset+slot_idx*4].
+r0=player_id [0..1], r1=slot_idx [0..0xb]. Returns void (pop{r0};bx r0 tail-return).
+Side effects: equip_node_pool refs cleared (transitive); slot state bits cleared.

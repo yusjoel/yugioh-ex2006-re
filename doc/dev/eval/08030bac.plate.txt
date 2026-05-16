@@ -1,0 +1,7 @@
+Called by duel_field path (0x0803fa38) and card_data/duel_field path (0x080422c4).
+Takes r0=player_id; computes player_stride = (player_id & 1) * 0x868; atomically increments
+[gP1LifePoints + 4 + player_stride]. If new value >= CHAIN_COUNTER_MAX (0x7f = 127), wraps
+around to [gP1LifePoints + 8 + player_stride] + 2 (minimum valid chain node ID).
+Returns r0 = old counter value (before increment). Leaf function, no bl.
+Constants: CHAIN_COUNTER_MAX=0x7f (127); wrap_start_id=counter_base[+8]+2.
+Side effects: [gP1LifePoints + 4 + player_stride] incremented or wrapped.

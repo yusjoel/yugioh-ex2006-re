@@ -1,0 +1,5 @@
+Called by duel_field/card_data scene main (0x0803be4c) to reset the match context state word.
+Loads base=0x0201bcc0 and offset=0x80c from literal pool, then stores 0 to [base+0x80c].
+No parameters. Returns void (bx lr direct return). Confidence: med.
+Sibling of clear_match_state_field_at_80c_alt (0x08040c38), which has identical behavior.
+Side effects: [0x0201bcc0 + 0x80c] := 0.

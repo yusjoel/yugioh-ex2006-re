@@ -1,0 +1,8 @@
+Called by duel_field/card_data scene main (0x0803be4c) to drive the normal-summon card display
+animation two-phase state machine. Reads 0x0201bcc0 context for player_bit/slot_idx/card_type.
+State 0 (first frame): calls dispatch_card_display_op(0x2e, player_bit, card_type_or_slot, r6),
+calls write_card_display_index_if_above_bit(0x25, slot_idx), sets [base+0x810] := 1.
+State != 0 (subsequent frames): calls play_ui_effect(0x2e); if effect returns 0 clears [base+0x80c].
+Symmetric sibling to tick_flip_attack_display_state (0x0804084c), which uses op=0x2f.
+No APCS parameters. Returns void (pop{r0};bx r0 tail-return). Confidence: med.
+Side effects: [base+0x810] state incremented; [base+0x80c] cleared on completion; op 0x2e triggered.

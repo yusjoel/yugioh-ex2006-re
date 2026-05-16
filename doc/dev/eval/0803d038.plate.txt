@@ -1,0 +1,10 @@
+Called by duel_field/card_frame scene main (0x0803be4c) to tick the normal/tribute-summon to
+monster zone state machine. Reads 0x0201bcc0 context for player_side/slot_type/slot_idx.
+State 0: calls get_zone_slot_ptr, updates slot type_byte (clears equip/face-down bits), checks
+equip conditions (check_card_field5_is_nonzero / check_card_field8_is_9); if met, calls
+link_equip_node_to_chain (r1=0xb). If zone_type in [0xb..0xd], calls
+write_card_display_index_with_bit_offset for indices 0x26/0x27/0x2b/0x2c/0x2a.
+State 1/2: calls play_ui_effect. Final switch on zone_type dispatches to
+erase_slot_from_zone_array_by_type paths. No APCS parameters; all data from 0x0201bcc0.
+Returns void (pop{r0};bx r0 tail-return). Confidence: med.
+Side effects: zone_slot type_byte updated; equip chain node inserted; display indices updated.

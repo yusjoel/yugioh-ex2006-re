@@ -1,0 +1,7 @@
+Called by duel_field/card_frame scene main (0x0803be4c). Reads 0x0201bcc0 context:
+slot_type (halfword[2]), flag (halfword[4]).
+If flag != 0: sets bit (1 << slot_type) in [gP1LifePoints+0x10d0] via orrs.
+If flag == 0: clears bit (1 << slot_type) in opponent player [gP1LifePoints+0x10d0] via bics.
+Then calls dispatch_card_display_op(0x24, 0, 0, 0) and clears [0x0201bcc0+0x80c] := 0.
+No APCS parameters. Returns void (pop{r0};bx r0 tail-return). Confidence: med.
+Side effects: [gP1LifePoints+0x10d0] bit(slot_type) set or cleared; op 0x24 triggered; state reset.

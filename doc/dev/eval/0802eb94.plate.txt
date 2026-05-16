@@ -1,0 +1,5 @@
+Called when a zone slot leaves the field. Takes r0=zone_slot_ptr, reads slot[+0xa] as chain-head
+node_id, then walks the equip_node_pool (base=0x0201d9c0, stride=8) calling
+replace_slot_chain_ref_by_id on each node to remove stale references.
+Returns void (pop{r0};bx r0 tail-return). No direct IO register writes.
+Side effects: equip_node_pool node reference fields modified (transitive via callee).

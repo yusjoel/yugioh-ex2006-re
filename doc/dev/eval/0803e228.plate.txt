@@ -1,0 +1,8 @@
+Called by duel_field/card_frame scene function (0x0803be4c). Reads 0x0201bcc0 context for
+player/slot_type/slot_idx/card_type; computes zone_slot pointer (base=0x0201c510, stride=0x868).
+If target slot bit19 != 0 (occupied): increments [base+0x1cb4+...+0x4] (zone slot counter),
+updates slot[4] (halfword); calls write_field_slot_bit_by_player(player, slot_type, 1, 0) to
+set field occupancy bit; calls dispatch_card_display_op(0x24, 0, 0, 0). Finally clears
+[0x0201bcc0+0x80c] := 0 (state reset). No APCS parameters. Returns void (pop{r0};bx r0).
+Confidence: med. Constants: zone_slot_base=0x0201c510, player_stride=0x868, counter_offset=0x1cb4.
+Side effects: zone_slot count field updated; field bit set; display op 0x24 triggered; state cleared.

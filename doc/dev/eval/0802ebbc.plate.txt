@@ -1,0 +1,9 @@
+Called by duel_field/card_data paths (0x0802ef84, 0x0803dc34, 0x0803e170).
+Walks equip_node_pool (base=0x0201d9c0, stride=8) starting at r0=chain_start_id.
+For each node: skips if slot_type (byte[+2] bits[3:0]) <= 5 (non-equip type);
+if slot_id (halfword[0]) == r1 (target_slot_id, low 16 bits), calls
+replace_slot_chain_ref_by_id(chain_id, extra=r2) to replace the reference;
+follows chain_next (halfword[+6]) to continue. If r2=0, stops after first match.
+r0=chain_start_id [0..?], r1=target_slot_id [0..?], r2=extra_ref [0..?].
+Returns void (pop{r0};bx r0 tail-return).
+Side effects: matching equip_node_pool node reference fields modified (transitive).

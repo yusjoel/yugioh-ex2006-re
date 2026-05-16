@@ -1,0 +1,7 @@
+Called by duel_field/card_frame scene main (0x0803be4c). Reads 0x0201bcc0 context:
+player_bit (halfword[0] bit15), slot_type (halfword[2]), slot_idx (halfword[4]).
+Calls dispatch_card_display_op(r0=0x7, r1=player_bit, r2=slot_type, r3=slot_idx).
+Then clears [0x0201bcc0+0x80c] := 0 (state reset). No other side effects.
+No APCS parameters (push {r4, lr} then literal-pool load of 0x0201bcc0).
+Returns void (pop{r0};bx r0 tail-return).
+Side effects: [0x0201bcc0+0x80c]:=0; display op 0x7 triggered.
