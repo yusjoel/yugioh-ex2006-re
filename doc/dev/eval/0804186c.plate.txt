@@ -1,0 +1,16 @@
+Frame-tick driver for the equip card attach display animation sequence.
+No APCS input params (reads player_id/slot from [0x0201bcc0], self-driven by step counter).
+Reads step counter from [0x0201c4d0] (base+0x810); three-state dispatch:
+Step 0: dispatch_card_display_op(op=0x3f, player_id, slot, flag) triggers attach preview;
+step counter +1.
+Step 1: play_ui_effect(0x3f) polls preview animation; on completion:
+dispatch_card_display_op(op=0x35, player_id, slot, depth) triggers attach confirm animation;
+iterates equip chain nodes calling append_equip_chain_node_at_tail for each;
+step counter +1.
+Step >=2: play_ui_effect(0x35) polls attach animation; on completion:
+calls write_card_display_index_with_bit_offset(0x23, 1); clears [base+0x80c]:=0.
+Called by main state machine FUN_0803be4c during equip attach phase.
+Constants: step_counter=0x0201c4d0=base+0x810; op_preview=0x3f; op_attach=0x35;
+equip_chain_data=0x0201e288; rule_struct=0x0201e2a0;
+link_offset_cst=0x12e5 (equip_chain_depth_table_offset).
+Returns void (pop{r0};bx r0 tail-call).

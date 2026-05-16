@@ -1,0 +1,14 @@
+Frame-tick driver for the equip slot scan highlight display animation.
+No APCS input params (r0 overwritten by ldr DAT_08040aac at entry).
+Reads player_id (r6=bit15) from [0x0201bcc0].
+Reads step counter [0x0201c4d0]; two-state dispatch:
+Step 0: double loop slot=0..4 x node=0..8 (9 nodes, stride=0x14, base=card_data_base+0x64):
+extracts card_id=bits[12:0]; compares with equip_chain_pool[slot] ref;
+on match: dispatch_card_display_op(op=0x3b, player_id, card_id|0x100, slot_flag).
+After all slots: step counter +1.
+Step >=1: play_ui_effect(0x3b) polls; on completion: [base+0x80c]:=0 (step lock clear).
+Called by main state machine FUN_0803be4c during equip slot highlight scan phase.
+Constants: step_counter=0x0201c4d0=base+0x810; card_data_base=0x0201c510;
+equip_chain_pool=ROM lookup table; player_stride=0x868; slot_count=5; node_count=9;
+node_stride=0x14; op_highlight=0x3b; card_id_mask=0x1FFF (bits[12:0]).
+Returns void (pop{r0};bx r0 tail-call).

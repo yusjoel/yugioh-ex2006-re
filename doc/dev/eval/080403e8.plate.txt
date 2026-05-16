@@ -1,0 +1,12 @@
+Frame-tick driver for equip card display animation, parameterized by mode code.
+r0=equip_mode ([0..4]) -- selects card slot / display position.
+Reads step counter from [0x0201c4d0] (0x0201bcc0+0x810).
+Step 0 (first frame): dispatch_card_display_op(op=0x4, slot=equip_mode, 0, 0);
+writes gP1LifePoints+0x1cf4:=equip_mode (current equip slot record);
+calls rebuild_equip_chain_refs; step counter +1.
+Step !=0 (polling): play_ui_effect(0x4) polls animation; on completion:
+dispatch_card_display_op(0x24, 0, 0, 0) clears display state; step counter:=0.
+Called by 5 fixed-mode stubs (0x08040450/5c/68/74/80) each passing r0=0..4.
+Constants: step_counter=0x0201c4d0; lp_equip_slot_ptr=gP1LifePoints+0x1cf4;
+op_start=0x4; op_clear=0x24.
+Returns void (pop{r0};bx r0 tail-call).

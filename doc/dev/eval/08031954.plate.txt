@@ -1,0 +1,11 @@
+Remove the first equip array slot and attempt to relink a matching equip card.
+r0=player_id ([0..1]).
+Allocates 4 bytes on stack as temporary slot buffer.
+Calls remove_slot_from_equip_array_by_index(r0=player_id, r1=0, r2=sp)
+to remove index 0 (first element); sp used as temporary slot pointer.
+If removal succeeded (r0!=0): calls place_equip_card_if_type_matches(r0=player_id, r1=sp_ptr)
+to attempt re-equip link for the target slot.
+Called by tick_equip_detach_sequence (0x0803fc70) during equip card detach flow.
+Constants: slot_index=0 (fixed, always removes first element).
+Returns void (pop{r0};bx r0 tail-call).
+Note: 0x466a=mov r2,r13 (sp), 0x4669=mov r1,r13 (sp) -- Thumb encoding.

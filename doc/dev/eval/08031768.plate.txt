@@ -1,0 +1,11 @@
+Remove a slot from the player's equip card array by index, shifting subsequent elements forward.
+r0=player_id (bit0, [0..1]), r1=slot_index (position to remove, saved to r4).
+Reads gP1LifePoints+player*0x868+0x10 (equip array count = upper bound).
+If slot_index >= count: skips (returns 0).
+Otherwise calls write_word_from_deref_src in a shift loop to compact the array,
+then writes count-1 back to +0x10.
+equip array base: gP1LP+player*0x868+0x260 (0x98<<2=0x260).
+Called by retire_equip_slot_with_relink (0x08031954) when an equip card leaves the field.
+Constants: player_stride=0x868; equip_count_offset=0x10;
+equip_array_offset=0x98<<2=0x260; equip_array_base=gP1LP+player*0x868+0x260.
+Returns r0=1 (removed) or 0 (not found) via pop{r1};bx r1.

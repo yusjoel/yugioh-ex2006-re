@@ -1,0 +1,11 @@
+Frame-tick state machine for the equip card detach animation sequence.
+No APCS input params (reads player_id/slot from [0x0201bcc0]).
+Reads step counter from [0x0201c4d0] (0x0201bcc0+0x810) and dispatches:
+Step 0: checks hand_count from [base+4]; if non-zero: writes [0x0201c4d0]:=player_id+1,
+reads gP1LP+player*0x868+0x10 (hand count); sets [gP1LP+player*0x868+0x20]:=1 (slot ready);
+calls write_word_from_deref_src to copy equip slot data to [base+0x80c].
+Step 1: calls retire_equip_slot_with_relink(player_id) to remove and relink; advances to step 2.
+Step 2: dispatches dispatch_card_display_op to finalize animation.
+Called by main state machine FUN_0803be4c during equip detach phase.
+Constants: step_counter=0x0201c4d0; player_stride=0x868; hand_count_offset=0x10; slot_ready_offset=0x20.
+Returns void (pop{r0};bx r0 tail-call).

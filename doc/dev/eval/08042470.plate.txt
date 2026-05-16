@@ -1,0 +1,13 @@
+Check equip chain node count and drive the chain-count display animation sequence.
+No APCS input params (reads player_id/slot_idx from [0x0201bcc0]).
+Calls find_equip_chain_node_min_count_by_pred(player_id, slot_idx) -> count.
+If count==0 or count<=upper_bound ([base+4]): r7=upper_bound; else r7=count.
+Reads step counter [0x0201c4d0]; three-state dispatch:
+Step 0: if chain node slot_id bits[12:0]==0: calls replace_equip_chain_slot_refs_by_match,
+then link_equip_node_to_chain; dispatch_card_display_op(op=0x26, player, slot, r7); step +1.
+Step 1: play_ui_effect(0x26) polls; on completion: dispatch(0x26,...); step +1.
+Step 2: play_ui_effect(0x26) polls; on completion: [base+0x80c]:=0 (step lock clear).
+Called by main state machine FUN_0803be4c during equip chain count check phase.
+Constants: step_counter=0x0201c4d0; op_equip_count=0x26; equip_node_pool=0x0201d9c0;
+upper_bound_offset=4.
+Returns void (pop{r0};bx r0 tail-call).

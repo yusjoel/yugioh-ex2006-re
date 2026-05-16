@@ -1,0 +1,12 @@
+Append a new node at the tail of the equip chain for a given zone slot.
+r0=zone_slot_idx (u8), r1=chain_depth (u8), r2=target_card_id (u16), r3=extra_flag (u8).
+Calls find_active_equip_chain_head(r0) to get chain_head_node_id (->r3).
+Computes head node address: equip_node_pool + chain_head_id*8.
+Traverses chain link sub-array (base offset 0xfffffc02 = -0x3fe) from slot+6 until
+ldrh==0 (empty tail sentinel), then writes:
+  [+0] strh chain_head_id (link), [+2] strb extra_flag,
+  [+4] strh chain_depth,          [+6] strh 0 (new sentinel).
+Called by FUN_0803e0c4 (card_frame path) and tick_equip_attach_display_sequence (0x0804186c).
+Constants: equip_node_pool=0x0201d9c0; node_stride=8;
+chain_link_offset=0xfffffc02 (-0x3fe); tail_sentinel_offset=6.
+Returns void (pop{r0};bx r0 tail-call).

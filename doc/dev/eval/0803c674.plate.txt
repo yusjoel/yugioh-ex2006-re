@@ -1,0 +1,12 @@
+Frame-tick driver for the equip-set card display animation sequence.
+No APCS input params (r0 overwritten by ldr DAT_0803c6f4 at entry).
+Reads player_id (r4=bit15) and slot_idx (r5=[+2]) from [0x0201bcc0].
+Reads step counter from [base+0x810] (=0x0201c4d0).
+Step 0: initializes display_state struct at 0x0201bb90 (active=1, player_id, opponent,
+slot_idx, display_type=5, step=0, card_type_bits); calls dispatch_card_display_op(op=0xb, slot_idx, ..., 5);
+increments step counter.
+Step !=0: polls play_ui_effect(0xb); on completion clears [base+0x80c]:=0 (step lock).
+Called by main state machine FUN_0803be4c during equip-set display phase.
+Constants: step_counter=[base+0x810]=0x0201c4d0; display_state_base=0x0201bb90;
+op_equip_set=0xb; effect_equip_set=0xb; player_stride=0x868; card_data_base=0x0201c510.
+Returns void (pop{r0};bx r0 tail-call).

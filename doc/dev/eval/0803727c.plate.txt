@@ -1,0 +1,11 @@
+Remove a slot from the player's field card array by index using swap-to-tail and decrement.
+r0=player_id (bit0, [0..1]), r1=slot_index (0-based, target to remove).
+r9 saved via .hword 0x4681 (mov r9,r0) for player_id; later ands r0,r1 extracts bit0.
+Reads gP1LifePoints+player*0x868+0x14 (field_count) and +0x10 (capacity upper bound).
+From array tail toward target: calls swap_deref_words to bubble target to tail, then count-=1.
+Writes swapped values: str r7,[+0x10] (original +0x14 count), str r8,[+0x14] (original +0x10 capacity).
+Array A base: gP1LP+player*0x868+0x260 (0x98<<2). Array B base: gP1LP+player*0x868+0x418 (0x83<<3).
+Called by tick_field_clear_display_sequence (0x08040e54) during field clear phase.
+Constants: player_stride=0x868; field_count_offset=0x14; capacity_offset=0x10;
+field_array_a_offset=0x260; field_array_b_offset=0x418; slot_stride=0x4.
+Returns void (pop{r0};bx r0 tail-call).

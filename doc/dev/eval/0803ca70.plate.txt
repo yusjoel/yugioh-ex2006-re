@@ -1,0 +1,12 @@
+Check equip slot conditions and establish node link when slot matches.
+No APCS input params (reads from [0x0201bcc0]).
+Reads player_id (r4=bit15) and slot_idx (r5=[+2]) from state base.
+Reads gP1LifePoints+player*0x868+0x1d08 (equip status field); if non-zero:
+compares [player*0x868+0x1d08-0x20] slot value with [0x0201e2a0+4] rule field.
+On condition match: writes gP1LP+player*0x868+0x1d28:=0xb (EQUIP_READY),
+gP1LP+player*0x868+0x1d2c:=0, then calls link_equip_node_by_card_type_check(r4,r5).
+Always writes [0x0201bcc0+0x80c]:=0 (step counter clear) before exit.
+Called by main state machine FUN_0803be4c during equip slot match check phase.
+Constants: state_base=0x0201bcc0; step_lock_offset=0x80c; player_stride=0x868;
+equip_status_offset=0x1d08; equip_ready_offset=0x1d28; equip_extra_offset=0x1d2c; EQUIP_READY=0xb.
+Returns void (pop{r0};bx r0 tail-call).

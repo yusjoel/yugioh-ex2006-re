@@ -1,0 +1,10 @@
+Traverse all equip chain nodes and replace slot refs where type<=5 and slot_id matches.
+r0=chain_head_ptr (u32*, non-NULL to start), r1=target_slot_id (u16, truncated via lsls+lsrs),
+r2=stop_flag (non-zero: stop after first replacement).
+Iterates equip_node_pool (0x0201d9c0, stride=8): reads node[+2] type_bits[3:0];
+if type<=5 and node[+0].slot_id==r5 (target_slot_id): calls replace_slot_chain_ref_by_id.
+If stop_flag!=0: breaks immediately after first replacement.
+Otherwise follows chain: r2 = ldrh[node+6] (next link).
+Called by FUN_0803c774, FUN_0803c904, FUN_0803e170, tick_equip_chain_count_check_sequence (0x08042470).
+Constants: equip_node_pool=0x0201d9c0; node_stride=8; type_mask=0xF; max_type=5.
+Returns void (pop{r0};bx r0 tail-call).

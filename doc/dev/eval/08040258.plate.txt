@@ -1,0 +1,10 @@
+Frame-tick driver for the equip preview display animation sequence.
+No APCS input params (self-driven by step counter).
+Reads step counter from [0x0201c4d0] (0x0201bcc0+0x810).
+Step 0: dispatch_card_display_op(op=0x1, slot=0, 0, 0) triggers preview animation; step counter +1.
+Step !=0: play_ui_effect(0x1) polls animation frame; on completion (r0==0):
+writes [0x0201c4cc] (=0x0201bcc0+0x80c):=0 (step lock clear).
+Called by main state machine FUN_0803be4c during equip preview preparation phase.
+Constants: step_counter=0x0201c4d0=base+0x810; step_lock=0x0201c4cc=base+0x80c;
+op_preview=0x1; effect_preview=0x1.
+Returns void (pop{r0};bx r0 tail-call).

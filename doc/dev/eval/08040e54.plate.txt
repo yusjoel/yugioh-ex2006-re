@@ -1,0 +1,13 @@
+Frame-tick driver for the field clear display animation sequence.
+No APCS input params (self-driven by step counter).
+Reads step counter from [0x0201c4d0] (0x0201bcc0+0x810) and dispatches:
+Step 0: calls remove_slot_from_field_array_by_player(0) and remove_slot_from_field_array_by_player(1)
+to remove both players' field slots from arrays; step counter +1.
+Step 1: loop r4=0..1 (player): dispatch_card_display_op(op=0x14, player, sub_op=0xd, 0)
+then dispatch_card_display_op(op=0x14, player, sub_op=0xe, 0) for field clear animation;
+after loop: step counter:=0 (via [base+0x80c]:=0).
+Other steps: exit immediately.
+Called by main state machine FUN_0803be4c during field clear phase.
+Constants: step_counter=0x0201c4d0=base+0x810; op_clear_display=0x14;
+sub_op_d=0xd; sub_op_e=0xe; player_loop=[0..1].
+Returns void (pop{r0};bx r0 tail-call).

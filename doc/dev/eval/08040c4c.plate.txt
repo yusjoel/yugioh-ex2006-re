@@ -1,0 +1,7 @@
+Clear the display step counter field (instance A).
+Loads base 0x0201bcc0, adds offset 0x80c, writes 0 to [0x0201c4cc].
+This field controls the current step of frame-driven animation sequences.
+Called by main state machine FUN_0803be4c on state transitions to reset animation step.
+Sibling of clear_display_step_counter_b (0x08040c60): identical code, separate call site.
+Constants: target=[0x0201bcc0+0x80c]=0x0201c4cc.
+Returns void (bx lr).

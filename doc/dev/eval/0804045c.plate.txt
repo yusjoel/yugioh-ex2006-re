@@ -1,0 +1,5 @@
+Fixed-mode stub: invokes invoke_card_display_op_by_equip_mode with equip_mode=1.
+Body: push lr / movs r0,#1 / bl invoke_card_display_op_by_equip_mode / pop{r0};bx r0.
+Standard void tail-call wrapper. Called by main state machine FUN_0803be4c (mode-1 equip branch).
+Constants: equip_mode=1.
+Returns void (pop{r0};bx r0 tail-call).
