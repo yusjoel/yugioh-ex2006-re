@@ -1,0 +1,12 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_1d (op=0x1d). Reads EWRAM 0x0201bcc0:
+slot_idx ([+2], r5). Unconditionally writes gP1LifePoints+0x1d28 := 0x6 (chain activation
+step marker value). Reads slot_idx bit0 (ands r0,r1): if bit0=0 then r1=1; otherwise r1
+keeps bit0 value. Writes gP1LifePoints+0x1d2c := r1 (chain active flag). Also OR-writes
+bit0 result into gP1LifePoints+0x10d0 (chain_active word). Clears [EWRAM+0x80c]
+(DAT_0803c9fc=0x80c).
+
+Constants:
+  CHAIN_STEP_FIELD=gP1LifePoints+0x1d28, CHAIN_ACTIVE_FIELD=gP1LifePoints+0x1d2c
+  CHAIN_ACTIVE_WORD=gP1LifePoints+0x10d0 (DAT_0803c9f8)
+  STATE_CLEAR=0x0201bcc0+0x80c (DAT_0803c9fc)
+  STEP_VALUE=6

@@ -1,0 +1,18 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_48 (op=0x48). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r8), zone_pair ([+4]<<16|[+2], r3), extra ([+6], r10).
+Checks step counter [+0x810]: state=1 -> directly jumps to LAB_08041b48 (play_ui_effect path);
+state>1 -> jumps to LAB_08041b5a (exit).
+state=0: iterates bits[0..4] (5 bits), for each set bit_i collects slot_idx to stack buffer
+  (up to 5, stmia to [r2,#0x14]), count in r7. If r7<=1 clears [EWRAM+0x80c] and exits.
+  If r7>1: Fisher-Yates shuffle (sample_prng_scaled + swap), updates equip chain zone slot
+  refs via update_equip_chain_zone_slot_refs, copies slot data via copy_bytes_by_halfword
+  (0x14 bytes/slot). Then calls dispatch_card_display_op with op_code=0x27 / player_id /
+  r10 / 0, increments step.
+play_ui_effect(0x27) path: returns 0 then clears [+0x810].
+
+Constants:
+  OP_CODE=0x27
+  SLOT_COPY_SIZE=0x14 (20 bytes per slot)
+  SLOT_STRUCT_BASE=0x0201c510 (DAT_08041b3c)
+  SLOT_STRUCT_ALT=0x0201c520 (DAT_08041b40)
+  PLAYER_STRIDE=0x868 (DAT_08041b38)

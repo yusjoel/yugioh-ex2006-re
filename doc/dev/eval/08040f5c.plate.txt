@@ -1,0 +1,14 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_52 (op=0x52). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r6). Reads LP field value via gP1LifePoints+0xc+player_id*0x868 (r1);
+if r1 <= 1 jumps to clear path: writes [EWRAM+0x80c]=0 then exits. Otherwise checks step
+counter [+0x810]: if > 0x20 (exceeds 32 steps) also clears and exits. Within valid range,
+computes (counter/2) mod counter to get cycle index r3, increments step, then calls
+dispatch_card_display_op with op_code=0x7 / player_id / 0x0b / r3 to execute LP change
+cycle display.
+
+Constants:
+  OP_CODE=0x07
+  DISPLAY_PARAM=0x0b
+  MAX_CYCLE=0x20 (max cycle steps)
+  LP_OFFSET=0xc (gP1LifePoints+0xc+player*0x868)
+  STATE_FIELD=0x0201bcc0+0x810

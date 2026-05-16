@@ -1,0 +1,11 @@
+Called by FUN_0803e170 (caseD_37). Traverses chain node array at EWRAM 0x0201d9c0 starting
+from initial node r0, for each node reads type (byte[+2] & 0xf) and zone_id (halfword[+0]):
+if type==r7 and zone_id==r5 (zone_id u16) calls replace_slot_chain_ref_by_id
+(node_idx, r5, r6, r3) to update chain reference; if r6 is zero stops traversal after match;
+if r6 nonzero continues to next node. Uses halfword[+6] (next_node_id) as chain pointer;
+exits when next==0.
+
+Constants:
+  CHAIN_NODE_ARRAY=0x0201d9c0 (DAT_0802ec7c)
+  NODE_STRIDE=8 (lsls #3)
+  NODE_TYPE_MASK=0xf (bits[3:0])

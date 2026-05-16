@@ -1,0 +1,15 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_19 (op=0x19). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r7), slot_idx ([+2], r6), secondary ([+4], r8), chain_val ([+6], r9).
+Checks step counter [+0x810]: if nonzero jumps to play_ui_effect path. If zero, initializes
+chain link info struct at DAT_0803c664 (writes r7/r2/base/r6/r8/r9/type fields), computes
+card_type and writes to [+0x28]. If chain_val ([+0x8]) nonzero and [+0x6] nonzero, calls
+count_slot_chain_copies_of_card to check duplicate cards; if count>0 calls
+link_equip_node_to_chain(player_id, 0xb, 4, chain_pool). Always calls dispatch_card_display_op
+with op_code=0x0b / slot_idx / chain_val / secondary and increments step.
+play_ui_effect(0x0b) path: returns 0 then clears [+0x810].
+
+Constants:
+  OP_CODE=0x0b
+  CHAIN_INFO_STRUCT=DAT_0803c664 (chain link info buffer)
+  SLOT_STRUCT_BASE=0x0201c510 (via DAT_0803c668)
+  STATE_CLEAR_OFFSET=0x80c (DAT_0803c670, EWRAM+0x80c step clear)

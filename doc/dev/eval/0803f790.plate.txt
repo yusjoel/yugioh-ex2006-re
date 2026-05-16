@@ -1,0 +1,17 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_43 (op=0x43). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r7), slot_idx ([+2], r4), secondary ([+4], r6). Calls
+find_zone_descriptor_by_slot_id with secondary to get zone descriptor (r1). Checks step
+counter [+0x810]:
+state=0: if slot_idx in [4..10] (not 0xb/0xf and <=0xf): if zone descriptor matches
+  player_id/slot_idx reads gDuelFieldSlots+slot card_type; if card_type=0 clears [+0x80c].
+  If slot_idx=0xe: reads spell flag from gP1LifePoints+player*4+0x87*0x20+0xa; on match calls
+  resolve_slot_id_to_zone_ptr and clears low 2 bits of [zone+0x2]. Finally calls
+  dispatch_card_display_op with op_code=0x21 / player_id / slot_idx / r11, increments step.
+state=1: calls play_ui_effect(0x21); returns 0 then clears [+0x810].
+
+Constants:
+  OP_CODE=0x21
+  SPELL_FLAG_CHECK=0xab880000 (DAT_0803f874, used for lsls #0x13 compare)
+  SLOT_STRUCT_BASE=0x0201c510 (via DAT_0803f81c)
+  PLAYER_STRIDE=0x868 (DAT_0803f818)
+  STATE_CLEAR=0x0201bcc0+0x80c (DAT_0803f824)

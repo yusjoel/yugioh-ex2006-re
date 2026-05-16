@@ -1,0 +1,10 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_6 (op=0x06). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15 of halfword, r1). Checks step counter [+0x810]: if nonzero jumps
+to play_ui_effect(0x3a) path. If 0: calls dispatch_card_display_op with op_code=0x3a /
+player_id / 0 / 0, then increments step counter. play_ui_effect(0x3a) path: if returns 0
+clears [0x0201bcc0+0x80c] (via DAT_080409ac=0x80c) and exits; if returns nonzero exits
+(waiting for effect to complete).
+
+Constants:
+  OP_CODE=0x3a
+  STATE_FIELD=0x0201bcc0+0x810

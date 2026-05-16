@@ -1,0 +1,9 @@
+Called by FUN_0804154c (caseD_44). No caller-passed parameters; function itself calls
+classify_spell_card_activation_type to get current card spell activation type. If result
+is nonzero (spell card has a defined activation type), calls
+write_card_display_index_with_bit_offset with index=0x1a / bit=1 to write the activation
+type flag bit into the display index buffer. If result is 0 (no activation type), returns
+immediately without writing.
+
+Constants:
+  DISP_INDEX_SPELL_ACT_TYPE=0x1a (display index 26)

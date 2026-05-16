@@ -1,0 +1,12 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_14 (op=0x14). Reads EWRAM 0x0201bcc0:
+player_id (halfword[+0] bit15), card_slot_idx ([+2]). Calls classify_card_effect_category
+to get current card effect category, writes result to gP1LifePoints+0x10d8 (effect category
+cache word near player LP). If step lock [0x0201bcc0+0x810]=0, calls dispatch_card_display_op
+with op_code=0x6 / player_id / slot_idx=0/0 and increments step counter; otherwise calls
+play_ui_effect(0x6), if it returns 0 calls dispatch_card_display_op with op_code=0x24 and
+clears step counter [+0x810].
+
+Constants:
+  OP_DISPATCH_FIRST=0x06, OP_DISPATCH_DONE=0x24
+  STATE_FIELD=0x0201bcc0+0x810 (step lock)
+  EFFECT_CATEGORY_CACHE=gP1LifePoints+0x10d8

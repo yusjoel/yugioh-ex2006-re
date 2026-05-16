@@ -1,0 +1,12 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_b (op=0x0b). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r4 base), slot_idx ([+2], r2). Checks step counter [+0x810]:
+If 0: if slot_idx=0 copies gP1LifePoints+0x1cec to gP1LifePoints+0x1cf0 (LP backup write);
+  then calls dispatch_card_display_op with op_code=0x3d / slot_idx / 0 / 0 and increments
+  step counter.
+If nonzero: calls play_ui_effect(0x3d); if returns 0 clears [gP1LifePoints+0x1cf0]+0x1cf8
+  and clears step counter.
+
+Constants:
+  OP_CODE=0x3d
+  STATE_FIELD=0x0201bcc0+0x810
+  LP_BACKUP_SRC=gP1LifePoints+0x1cec, LP_BACKUP_DST=gP1LifePoints+0x1cf0

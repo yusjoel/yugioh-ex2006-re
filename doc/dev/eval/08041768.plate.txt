@@ -1,0 +1,9 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_49 (op=0x49). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r1), slot_idx ([+2], r2). Unconditionally calls dispatch_card_display_op
+with op_code=0x28 / player_id / slot_idx / 0 to trigger display operation. After completion,
+clears [EWRAM+0x80c] (via DAT_0804178c=0x0000080c). No step state check; directly triggers
+display and immediately clears step counter field, one-shot sequence.
+
+Constants:
+  OP_CODE=0x28
+  STATE_FIELD_CLEAR=DAT_0804178c=0x80c (offset, EWRAM+0x80c)

@@ -1,0 +1,12 @@
+Called by FUN_0803e594 (caseD_31) and FUN_0807fde8. In the chain slot list starting at
+gP1LifePoints+player*0x868+0x18, searches for the slot index corresponding to zone_id.
+r0=player_id (bit0 determines player), r1=zone_id (target zone id). Count read from
+[gP1LifePoints+player*0x868+0x18+0]; search array base gP1LifePoints+player*0x868+0x3a0
+(=0xe8*4), stride=4. For each slot word extracts bits[23:16]*2+bit18 as key; if key==zone_id
+returns current index r3. Returns -1 if not found (rsbs r0,r0,#0).
+
+Constants:
+  BASE_OFFSET=0x18 (gP1LifePoints+player*0x868+0x18)
+  SEARCH_STRIDE=0x4 (4 bytes per slot entry)
+  PLAYER_STRIDE=0x868 (DAT_08031224)
+  NOT_FOUND=-1

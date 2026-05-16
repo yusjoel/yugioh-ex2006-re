@@ -1,0 +1,14 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_2f (op=0x2f). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r8), slot_idx ([+2], r6). Checks step counter [+0x810] (r4):
+state=0: checks check_card_field5_is_nonzero(slot_idx); if nonzero calls dispatch_card_display_op
+  with op_code=0x41 / player_id / slot_idx / 0 and increments step.
+state=1: calls play_ui_effect(0x41); if returns 0 calls dispatch_card_display_op again with
+  op=0x20 (OR-ing step_value 0x20 into r1) and increments step.
+state=2: calls play_ui_effect(0x20); if returns 0 clears [+0x80c] (via DAT_0803f614=0x80c).
+Three-path state: op=0x41 first frame (state=0/1) + play_ui_effect(0x20) completion (state=2,
+clears 0x80c).
+
+Constants:
+  OP_FIRST=0x41, OP_MULTI=0x20
+  FLAG_STEP0=0x20 (step=2 path OR flag)
+  STATE_FIELD=0x0201bcc0+0x810

@@ -1,0 +1,13 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_37 (op=0x37). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r6), sub_id ([+2] byte, r1), sub_id_high ([+2]>>8, r5),
+zone_pair ([+4] halfword, r3), extra_byte ([+6] byte, r4), extra_high ([+6]>>8, r0>>8).
+If extra_high (byte [+6]>>8) is 0, jumps to clear path (LAB_0803e1b8). Otherwise, computes
+zone slot struct offset from sub_id (sub_id*0x14+player*0x868+0x0201c510), reads slot[+0xa]
+(count). Constructs params: r0=count, r1=zone_id (slot[+0xa] derived), r2=sub_id_high (type),
+r3=extra_byte (stop_flag), calls FUN_0802ec3c (replace_chain_node_ref_by_zone_match) to
+traverse and replace matching node refs in 0x0201d9c0 chain node array. Finally jumps to
+LAB_0803e1fa to clear [+0x810].
+
+Constants:
+  SLOT_STRUCT_BASE=0x0201c510 (DAT_0803e1b4)
+  PLAYER_STRIDE=0x868 (DAT_0803e1b0)

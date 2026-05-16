@@ -1,0 +1,19 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_31 (op=0x31). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r10), sub_id ([+2] byte, r9), sub_id_high ([+2]>>8, sp[0xc]),
+zone_pair ([+4], r1 lsrs 0x8), extra (sp[0x10]). Five-path state dispatch ([+0x810] mod 5):
+- case 0: if zone_type=0xb -> find_slot_idx_by_set_code; if 0xc -> find_slot_idx_by_zone_id_in_chain_list;
+  if 0xd -> find_slot_idx_by_card_id_in_player_zones. Result written to sp[0xc], step+1.
+- case 1: get_zone_slot_ptr, checks slot flags, if nonzero calls dispatch_card_display_op with
+  op_code=0x1d; otherwise clears [+0x80c]. Step+1.
+- case 2 (play_ui_effect path): dispatch_card_placement_by_zone_type + get_zone_slot_field6_by_type
+  + get_zone_card_attribute_by_type to build params, calls dispatch_card_display_op with op_code=0x18.
+  Step+1.
+- case 3: if slot_idx+r9<=0xa calls dispatch_card_display_op with op_code=0x48 / player_id / card_type.
+  Step+1.
+- case 4: play_ui_effect(0x48); on completion clears [+0x80c].
+Sequence completes clearing [+0x810], covering op=0x1d/0x18/0x48 three display operations.
+
+Constants:
+  OP_FIND=0x1d, OP_PLACE=0x18, OP_ZONE=0x48
+  SLOT_STRUCT_BASE=0x0201c510, 0x0201c520
+  PLAYER_STRIDE=0x868

@@ -1,0 +1,18 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_18 (op=0x18). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r5). Uses player_id * 0x868 + gP1LifePoints + 0x30 to locate player
+slot list start (r4). Loops r6=4 down to 0 inclusive (5 iterations), reading slot_word
+([gP1LifePoints+0x40+player*0x868+loop*0x14]), clearing bit22 (AND 0xffbfffff) and bit23
+(AND 0xff7fffff). For each slot checks card_type (bits[0x12:0], lsls #0x13, lsrs #0x13):
+- if card_type = 0x18a6 (special type): calls replace_equip_chain_slot_refs_by_match
+- if card_type > 0x18a6: skip
+- if card_type = 0x186c (=0x18a6-0x3a): calls replace_equip_chain_slot_refs_by_match
+After 5 iterations writes [DAT_0803c808+0x28]=0 and clears [EWRAM+0x80c].
+
+Constants:
+  PLAYER_STRIDE=0x868 (DAT_0803c7c0)
+  SLOT_MASK_CLEAR_1=0xffbfffff (clear bit22)
+  SLOT_MASK_CLEAR_2=0xff7fffff (clear bit23)
+  CARD_TYPE_THRESHOLD=0x18a6
+  CARD_TYPE_ALT=0x186c (=0x18a6-0x3a)
+  CHAIN_STRUCT_BASE=0x0201bb90 (DAT_0803c808)
+  STATE_CLEAR=EWRAM+0x80c

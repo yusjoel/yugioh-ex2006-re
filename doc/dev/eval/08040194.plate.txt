@@ -1,0 +1,15 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_56 (op=0x56). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r5), slot_idx ([+2], r4), secondary ([+4], r0), dest_slot ([+6], r6).
+Calls find_zone_descriptor_by_slot_id with secondary to get zone descriptor (r2). Extracts
+player_byte ([+2]>>8) from descriptor and compares with r4 (slot_idx): if no match jumps to
+clear exit (LAB_080401f0). On match: calls get_zone_slot_ptr with descriptor low byte /
+slot_zone_high fields to get slot pointer; reads slot head word [slot,#0] to sp[0]; calls
+erase_slot_from_hand_array_by_ptr with player_id + r9(sp[0]) to remove old slot from hand
+array. If dest_slot(r6) nonzero: calls append_slot_ref_to_hand_array(player_id, r9); otherwise
+calls insert_slot_ref_into_hand_array. Finally calls dispatch_card_display_op with op_code=0x14
+/ player_id / 0xd / 0, then clears [EWRAM+0x80c].
+
+Constants:
+  OP_CODE=0x14
+  OP_PARAM=0xd
+  STATE_CLEAR=0x0201bcc0+0x80c

@@ -1,0 +1,12 @@
+Called by FUN_0803be4c (duel event dispatcher) caseD_4a (op=0x4a). Reads EWRAM 0x0201bcc0:
+player_id ([+0] bit15, r1), slot_idx ([+2], r2), secondary ([+4], r3). Unconditionally calls
+dispatch_card_display_op with op_code=0x2b / player_id / slot_idx / secondary. Then clears
+6 consecutive halfword fields of gP1LifePoints (offset via PTR+DAT_080417e0 start, stride +2,
+5 strh writes) and DAT_080417e8 offset halfword, and [EWRAM+0x80c] (via DAT_080417ec=0x80c).
+One-shot type: triggers op=0x2b display and immediately clears LP/step fields.
+
+Constants:
+  OP_CODE=0x2b
+  LP_CLEAR_BASE=gP1LifePoints+DAT_080417e0 (6 halfword fields)
+  LP_EXTRA_CLEAR=gP1LifePoints+DAT_080417e8
+  STATE_FIELD_CLEAR=EWRAM+DAT_080417ec (0x80c offset, =0x0201bcc0+0x80c)
