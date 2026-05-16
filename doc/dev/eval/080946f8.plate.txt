@@ -1,0 +1,9 @@
+Called by tick_duel_field_main_frame (0x0801e984) when duel start condition is met. Reads [gP1LifePoints+0x1cf0] and compares to 0xffff: if already set (!=0xffff) skips. If 0xffff (uninitialized): calls check_player_side_condition(r0=0) to check player side; if nonzero (bne skip) jumps to LAB_08094730 and returns. If condition met: writes [gP1LifePoints+0x1cec] to [gP1LifePoints+0x1cf0], reads DAT_0809474c=0x800b or 0x0b to select sprite attr type (determined by ROM_TABLE[4] XOR player_id), calls enqueue_sprite_attr_record(attr, 0xb, 0, 0). Exit: pop {r4,r5}; pop {r0}; bx r0 = void.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- INIT_GUARD_OFFSET=0x1cf0 (0xffff = uninitialized guard)
+- TARGET_FIELD_OFFSET=0x1cec (source written to [+0x1cf0])
+- ROM_TABLE=0x0201e2a0 (player side table, [+4]=player_id)
+- ATTR_P1=0xb (sprite ID=0x0b)
+- ATTR_P2=0x800b (player 2 side attr)

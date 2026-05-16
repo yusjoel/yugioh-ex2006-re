@@ -1,0 +1,9 @@
+Called only by advance_duel_turn_by_prng_anim (0x08094dac). Calls play_ui_effect(0) to check UI effect status: if nonzero (effect still running) jumps to tail returning 1. If 0 (effect done): reads gP1LifePoints+0x1d08 for duel state; if condition met calls dispatch_duel_anim_queue_step (FUN_0803c318); otherwise dispatches on gP1LifePoints+0xec*0x20 field value (0/1/2): handles duel field anim frame copy / sprite row attr write / OAM write. Multiple reads/writes to gP1LifePoints/0x0201bcc0/0x0201b870 regions. Exit: all paths via pop {r4-r7}; pop {r0}; bx r0 = void.
+
+Constants:
+- play_ui_effect_mode=0 (check effect complete)
+- gP1LifePoints=0x0201c4e0
+- DUEL_STATE_OFFSET=0x1d08 (main state word)
+- BIT_GUARD=0xc0*4=0x300 (bit check offset)
+- FLAG=0x0201bcc0+0x80c (queue flag)
+- SPRITE_ROW_BASE=0x0201b870

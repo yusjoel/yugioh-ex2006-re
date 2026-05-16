@@ -1,0 +1,10 @@
+Called by FUN_0801fec0 (large duel scene switch dispatcher) and FUN_08027714 (duel field prng). Main frame driver for the duel field, dispatches on global state flags via multiple paths: (1) checks [0x02023130+0x88*4] bit-mask 0xff<<10 - if 0 enters prng anim path: checks [BASE+0x21e] bit0 and [BASE+0x226] bit0, if met calls request_sound_engine_code10 + tick_duel_field_fadein_step; (2) checks multiple flags then calls advance_duel_turn_by_prng_anim; (3) conditionally calls enqueue_duel_phase_sprite_by_side; (4) conditionally calls init_duel_phase_display_flag_with_sprite; (5) unconditionally calls render_duel_field_oam_all; (6) multi-branch calls tick_card_list_scene_frame / tick_zone_display_frame / advance_duel_turn_by_prng_anim; (7) clears prng+0x213/0x217 bit7. Exit: LAB_0801ec84=movs r0,#1; LAB_0801eb70=movs r0,#0; via pop {r3}; restore r8-r10; pop {r4-r7}; pop {r1}; bx r1.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- BASE=0x02023130
+- PRNG_ANIM_MASK=0xff<<0xa (high 10-bit duel anim state check)
+- gPrng=0x03000040
+- TIMER_FIELD=gPrng+0x84*4 (duel timer, divide by 0x3c = minutes)
+- LP_RATIO_THRESHOLD=0xb4=180 (LP ratio card condition trigger)
+- FLAG_BASE=gBannerState=0x0201fec0 (banner state word)

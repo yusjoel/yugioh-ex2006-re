@@ -1,0 +1,9 @@
+Called by render_duel_field_oam_all (0x080ccdf4). Top-level LP zone OAM rendering function. Checks [0x02023130+0x21e] bit0: if nonzero jumps to tail (LP zone masked). Reads gP1LifePoints+0x1d14 (duel state): if nonzero calls render_lp_numeric_oam (FUN_080ca28c) then render_lp_value_digit_oam (FUN_080ca348). Checks gPrng+0x23f bit0: if nonzero and [flag+0x36] bit6 is zero, calls render_prng_anim_oam_items (FUN_080ca3a4). Then multi-condition checks (bit0 on 0x02020160+0x2f51, 0x0201f440, 0x0201ff30): if all met calls render_lp_zone_digit_oam_row. Finally conditionally calls render_card_view_scene_by_lp_time based on LP time ratio. Exit: void.
+
+Constants:
+- LP_ZONE_MASK_OFFSET=0x21e (0x02023130+0x21e bit0=1 -> skip all LP zone OAM rendering)
+- gP1LifePoints=0x0201c4e0
+- DUEL_STATE_OFFSET=0x1d14
+- gPrng=0x03000040
+- ANIM_ENABLE_OFFSET=0x23f (bit0=prng anim enabled)
+- FLAG_BASE=0x02023360 (+0x36=settings flag byte)

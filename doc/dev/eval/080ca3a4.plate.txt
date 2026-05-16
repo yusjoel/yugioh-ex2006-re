@@ -1,0 +1,9 @@
+Called by render_lp_zone_oam_full (0x080ca42c) when condition is met. Reads gPrng+0x241 (byte) right-shifted 1 as Y_count, reads gPrng+0x90*4 bit0 as player_flag, combines as upper_bound = Y_count | (player_flag<<7). Initializes loop count r6=0; if r6>=upper_bound skips loop. In loop reads [gPrng+r6+0x241] state byte, dispatches on 0/1/2/3 to r5 (OAM attr2 bits: 0->0, 1->2, 2->1, 3->3), computes OAM position (r6*8 Y offset, +0xf7 tile offset), calls write_oam_entry_from_packed_args twice for dual sprite entries (attr0=0x800000|r5<<13, attr0=0xc00000|r5<<13), r6++ until bound. Exit: void.
+
+Constants:
+- gPrng=0x03000040 (PRNG IWRAM base)
+- Y_COUNT_OFFSET=0x241 (gPrng+0x241 byte, >>1 = Y direction count)
+- PLAYER_FLAG_OFFSET=0x90*4=0x240 (bit0 = player flag)
+- OAM_HIDDEN_BITS=0x800000/0xc00000 (attr0 hide/show bits)
+- TILE_Y_STRIDE=0xf7 (OAM tile Y offset)
+- STATE_PALETTE: 0->attr2=0, 1->attr2=2, 2->attr2=1, 3->attr2=3

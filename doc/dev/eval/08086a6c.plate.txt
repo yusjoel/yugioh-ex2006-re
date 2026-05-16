@@ -1,0 +1,5 @@
+Called only by render_field_aob_slot_oam_row (0x080c8e6c). Pure read leaf function. Reads [0x0201b290+0x4a4] (IWRAM base + offset 0x4a4 DWORD), returns value via bx lr. No side effects. Purpose: get current duel field card count to supply rendering function with AOB slot total.
+
+Constants:
+- BASE=0x0201b290 (IWRAM card/duel field state region)
+- COUNT_OFFSET=0x4a4 (card count field offset)

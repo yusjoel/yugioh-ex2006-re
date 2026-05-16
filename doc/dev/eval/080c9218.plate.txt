@@ -1,0 +1,9 @@
+Called by render_duel_field_oam_all (0x080ccdf4) when [0x02023130+0xa] byte is nonzero (has card count). Reads [BASE+0xa]-1 as r8 (card count minus 1), switches on zone_col r2 (0-4 -> r1=0; 5-9 -> r1=5; 0xa-0xe -> r1=0xa, r2=0), calls resolve_zone_oam_base_coords_by_type for coords. With r4=count%10+0x8e as tile index, loops calling write_oam_entry_from_packed_args for each digit OAM, dividing r4 by 10 each iteration. Finally calls write_oam_entry_from_packed_args(r5_coord|r6_player_flag, 0, 0xda) to write background tile OAM. Exit: void.
+
+Constants:
+- BASE=0x02023130
+- CARD_COUNT_OFFSET=0xa (card count byte)
+- ZONE_RANGES: [0..4]=bottom, [5..9]=middle, [0xa..0xe]=top
+- DIGIT_BASE=0x8e (OAM tile index base, plus count%10 per digit)
+- BG_TILE=0xda (deck background OAM tile)
+- PLAYER_FLAG=0x88*4 (player 2 coordinate offset 0x110)

@@ -1,0 +1,11 @@
+Called by render_lp_zone_oam_full (0x080ca42c) when LP value is nonzero. Reads gP1LifePoints+0x1cf4 (halfword=current LP display value), reads gP1LifePoints+0x1cf4-0xc=gP1LifePoints+0x1ce8 (halfword=row index). Computes OAM X coord: X=row*0x16+8 lsls 16; Y coord from halfword*2+0x14. Checks 0x1f flag to determine player side (player==ROM_TABLE[4]^1 -> shift right 0x88*2=0x110). Calls write_oam_entry_from_packed_args(OAM_packed, tile_base=0x8080, attr1, attr2=player_x_coord). Exit: void.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- LP_DISPLAY_OFFSET=0x1cf4 (current display LP halfword)
+- ROW_INDEX_OFFSET=0x1ce8 (row index halfword, 0x1cf4-0xc)
+- X_STRIDE=0x16=22 (per-row X stride, pixels)
+- Y_OFFSET=0x14=20 (base Y offset)
+- TILE_BASE=0x8080 (LP digit sprite tile start)
+- P2_X_SHIFT=0x88*2=0x110 (player 2 side horizontal offset)
+- ROM_TABLE=0x0201e2a0 ([+4]=current player id)

@@ -1,0 +1,9 @@
+Called by render_duel_field_oam_all (0x080ccdf4) when gP1LifePoints+0x1cf4 field==3. First checks two global flags: [0x02023130+0x215] bit2 and [0x0201ff30] bit0 -> if either nonzero jumps to exit. Loops r5=0..4 (5 AOB zone slots): reads [0x020230c0+3] byte, shifts by r5 to get bit -> if 0 skips. Reads [0x0201e1c8]=AOB slot coord table base, calls resolve_zone_oam_base_coords_by_type(zone=0, player=0) for coords r1. Reads [0x0201fe60] bit1: if set and [0x0201fe60+8]==r5 -> calls write_zone_pair_oam_with_coords; else if bit0 set -> calls render_aob_frame_to_oam. If [0x0201fe60] bit1 set -> calls tick_aob_frame_counter. Finally calls tick_aob_frame_counter(AOB_ptr). Exit: void.
+
+Constants:
+- BASE=0x02023130
+- RENDER_GUARD_OFFSET=0x215 (bit2=render disabled)
+- SECOND_GUARD=0x0201ff30 (bit0=another mask flag)
+- AOB_STATUS_BYTE=0x020230c0+3 (5-bit slot status byte)
+- AOB_SLOT_BASE=0x0201e1c8 (AOB slot data table)
+- AOB_FRAME_STATE=0x0201fe60 (bit0=anim frame active, bit1=active pair)

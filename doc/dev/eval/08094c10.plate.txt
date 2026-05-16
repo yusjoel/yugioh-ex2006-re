@@ -1,0 +1,6 @@
+Called by tick_duel_anim_event_hub (0x0803c3b4) and FUN_08093660. Loops calling return_one_leaf to check if sequence is done; if not done calls return_zero_leaf to get OAM frame data (ldrh r4/r1/r2/r3), then calls write_sprite_attrs_to_seq_buf to write sprite attrs to sequence buffer, then return_noop_leaf. If r5==0 (null input) exits immediately. Exit: pop {r4,r5}; pop {r0}; bx r0 = void return. Purpose: drive a sprite animation sequence buffer until sequence ends.
+
+Constants:
+- return_one_leaf = sequence-not-done sentinel (nonzero -> continue loop)
+- return_zero_leaf = get next frame OAM data
+- write_sprite_attrs_to_seq_buf = write frame data to sequence buffer

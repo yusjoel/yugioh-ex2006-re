@@ -1,0 +1,6 @@
+Called by FUN_0801fec0, FUN_0802752c, and FUN_0802d638 (indeg=3). Takes r0=card_id as search key, reads ROM[0x098973f6] (halfword = table entry count), reads ROM[0x098972f0] (halfword array, 2 bytes per entry). Linear search: if table[i]==card_id returns i (found); if not found after full scan returns -1. Exit: pop {r4}; pop {r1}; bx r1.
+
+Constants:
+- ROM_TABLE_COUNT_PTR=0x098973f6 (halfword: entry count)
+- ROM_TABLE_DATA_PTR=0x098972f0 (halfword array: card id list)
+- NOT_FOUND=-1 (0xFFFFFFFF)

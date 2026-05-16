@@ -1,0 +1,9 @@
+Called by render_duel_field_oam_all (0x080ccdf4) when [0x02023130+0x215] bit3 condition is met. Loops r5=0..1 (two players), each iteration r6=1 (alternating bit mask). Reads [0x0201c4f0+r5*0x868+0] and compares to [0x0201c4f0+r5*0x868+0xcc4]; if equal r2=+8 (highlight offset). Calls resolve_zone_oam_base_coords_by_type(zone_type=0xd, player=r5) for coords; reads r4=player_x|player_y. After two-path coord processing calls write_oam_entry_from_packed_args to write zone active indicator OAM. If r5>0x18 writes additional OAM. Loop r5++, cmp r5,0x1 (bgt exit). Exit: void.
+
+Constants:
+- PLAYER_DATA_BASE=0x0201c4f0 (player state data base, =gP1LifePoints+0x10)
+- STRIDE=0x868 (per-player stride)
+- LP_CURRENT_OFFSET=0 (relative to PLAYER_DATA_BASE)
+- LP_COMPARE_OFFSET=0xcc4 (reference LP field)
+- ZONE_TYPE_HIGHLIGHT=0xd (highlight zone type)
+- HIGHLIGHT_SHIFT=0x8 (Y offset +8 when highlighted)

@@ -1,0 +1,8 @@
+Called only by tick_duel_field_main_frame (0x0801e984). Reads function pointer table ROM[0x09e5aadc + player_state*4] (player_state from gP1LifePoints+0x1d14); if ptr==0 jumps to LAB_08094e20 (writes sprite variant to gP1LifePoints+0x1cfc, loads player_data from gP1LifePoints+0x2c). If ptr nonzero: reads gP1LifePoints+0x1d08; if nonzero calls step_prng_anim_frame, if frame not done (r0=0) jumps to LAB_08094e66 (returns 1). Otherwise calls tick_duel_anim_event_hub (FUN_0803c3b4); if event not done (nonzero) jumps to LAB_08094e08 (returns 0). If event done: processes function pointer table via FUN_0810e5c8, increments [gP1LifePoints+0x1d14]+=1 to advance turn, clears [gP1LifePoints+0x1d1c]:=0. Exit: LAB_08094e66=movs r0,#1; LAB_08094e08=movs r0,#0; both via pop {r4-r6}; pop {r1}; bx r1.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- TURN_STATE_OFFSET=0x1d14 (current duel turn index)
+- ANIM_FLAG_OFFSET=0x1d08 (prng anim running flag)
+- FN_TABLE=0x09e5aadc (ROM function pointer table, 4 bytes/entry)
+- SPRITE_VARIANT_OFFSET=0x1d1c (sprite variant state, cleared to 0)

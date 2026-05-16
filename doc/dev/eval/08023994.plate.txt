@@ -1,0 +1,9 @@
+Called by FUN_08023b6c and 4 other callers (indeg=6). Renders one line of centered text to BG tile map VRAM. Entry: r0=x_base (tile column base, u16), r1=tile_row (row index, u16), r2=packed(palette<<24 | flags<<16), r3=y_offset (u16), [sp+0x2c]=string_ptr (u8*). Saves r5=x_base, r7=palette/flags, r6=tile_row, r8=y_offset, r9=another packed field. Calls count_bytes_until_null([sp+0x2c]) for byte count, computes center offset = x_base*4 - strlen*3, stores at [sp+8]. Reads [0x02000000+0x6c2c] = game language/settings byte, extracts bits[1:0] and bit0 for font mode flags, reads font_jp_base_table to select font set. Calls setup_line_buf_pos_and_font(x_base, flags) to init line buffer. Calls text_render_wrapper(offset, 3, string_ptr) to render to line buffer. Loops r4=0..2 (3 times): calls zero_fill_by_halfword on target BG tile row, wraps row number (r6 mod 0x1f+1). Calls commit_line_buffer_to_sprite_vram(target, 0). Then loops r4=0..5 writing BG tile map halfwords (tile index = r7+r4+base). Exit: void.
+
+Constants:
+- VRAM_BG_CHAR=0x06004000 (BG char data, write tile data)
+- VRAM_BG_MAP=0x06000800 (BG tile map, one halfword per map entry)
+- GAME_FLAGS=0x02000000+0x6c2c (language/font settings)
+- BG_MAP_STRIDE=0x80 halfwords=0x100 bytes (0x80 tile map entries per row)
+- TILE_ROW_MOD=0x1f+1=0x20 (tile row wraparound)
+- RENDER_PASSES=3 (3 text_render_wrapper + 3 zero_fill passes)

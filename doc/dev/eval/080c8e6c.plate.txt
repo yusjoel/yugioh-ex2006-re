@@ -1,0 +1,11 @@
+Called by render_duel_field_oam_all (0x080ccdf4) when bit4 condition is met. Reads [0x0201f440+0xa0e*2] 16-bit value, extracts bits[20..24] (lsls/lsrs) as slot_count r5 (max active AOB slots). Calls get_duel_field_card_count to get card_count stored as r10. Computes Y coord r0=(0xc8-slot_count*8)/2+0x28, X stride=0x64. If slot_count==0 skips loop. In loop (slot 0..slot_count-1): if slot_idx < r8 (=card_count, highlight boundary) then OAM_attr2|=0x3000 (highlight palette), else 0x0000; calls write_oam_entry_from_packed_args to write slot OAM. After loop writes 4 exit/arrow sprite entries (tile +0x10/+0x20/+0x30 and last via write_oam_entry_with_slot_check). If last returns 0 then strb [flag]+0x20 sets flag. Exit: void.
+
+Constants:
+- BASE=0x0201f440 (play_ui_effect state IWRAM)
+- SLOT_WORD_OFFSET=0xa0e*2=0x141c (slot count packed word)
+- SLOT_COUNT_BITS=bits[20..24] (lsls #0xb; lsrs #0x1b)
+- Y_CENTER=0xc8=200 (pixels, screen vertical center)
+- Y_OFFSET=0x28=40
+- X_STRIDE=0x64=100
+- HLPALETTE=0x3000 (highlight palette attr2 bits)
+- TILE_ARROW=0x01a1 (arrow/border sprite tile base)

@@ -1,0 +1,9 @@
+Called only by tick_duel_anim_event_hub (0x0803c3b4). Reads byte r6 from DAT_0803c334=0x0201b870+0xc3*4=0x0201bb0c, branches on r6 (0/1/2): case 0 - copy_bytes_by_halfword copies 8 bytes from DAT_0803c3a8=0x0201bcc0+0x80c to base, writes r6+1 back to [0x0201bb0c], calls pack_sprite_row_attr_words; case 1 - calls dispatch_duel_event_display_seq then checks [base+0x80c]==0 before +1; case 2 - calls pack_sprite_row_attr_words, clears [0x0201b870+0xc0*4] bits[2..1]=0. Exit: movs r0,#1; pop {r4-r7}; pop {r1}; bx r1 = returns 1. Purpose: advance duel animation queue by current state byte (0/1/2).
+
+Constants:
+- BASE=0x0201b870 (duel field sprite data base)
+- QUEUE_STATE_OFFSET=0xc3*4=0x30c (queue step byte)
+- COPY_SRC=0x0201bcc0+0x80c (source data)
+- STATE_0: copy data + set flag 0x1 + advance state r6+1
+- STATE_1: call dispatch_duel_event_display_seq
+- STATE_2: pack_sprite_row_attr_words + clear bit mask 0x5

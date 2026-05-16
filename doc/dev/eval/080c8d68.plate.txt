@@ -1,0 +1,11 @@
+Called by render_duel_field_oam_all (0x080ccdf4). Reads 16-bit OAM word from [0x02023130+0x84*4=0x210], decodes: bits[6:0]=zone_type (r4), bits[14:8]=zone_col (r5), bit7>>7=player_id (r6). Calls resolve_zone_data_ptr_by_oam_word to get zone data ptr r0; if null exits. Checks [0x02023130+0x215] bit2; if set exits. Checks zone_type+zone_col<=0xa (valid range) else exits. In nested loop (player 0..1, slot 0..0xa): reads ROM slot table [DAT_0201c510 + player*0x868 + slot*0x14] bit19; if set calls resolve_zone_oam_base_coords_by_type for coords, then calls write_oam_entry_from_packed_args to write zone grid OAM to buffer. Exit: void.
+
+Constants:
+- BASE=0x02023130 (IWRAM duel field state base)
+- OAM_WORD_OFFSET=0x84*4=0x210 (zone OAM word offset)
+- ZONE_FLAG_OFFSET=0x215 (bit2 = render-disable flag)
+- ZONE_MAX=0xa (max zone index)
+- SLOT_TABLE_BASE=0x0201c510 (slot data table)
+- STRIDE=0x868 (per-player stride)
+- SLOT_SIZE=0x14 (per-slot stride)
+- ACTIVE_BIT=bit19 (slot active flag)

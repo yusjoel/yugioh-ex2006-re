@@ -86,6 +86,9 @@ model: sonnet
 | R3 中 r4/r5/r7 被列为标准 APCS 参数但函数无自己的 push prologue，且无对应函数体内部 ldr 加载这些寄存器 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_inline_exit_fragment_parent_frame_registers.md` (R3=0; parent-frame inherited registers 必须附 callsite asm 证据注明来源; 0x080a02a0+0x080a02e8) |
 | R4 描述为 switch dispatcher 函数返回值时含"各 case 决定"/"各 case 返回语义依各 case 代码"等泛化短语 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r4_switch_dispatcher_return_enumeration.md` (R4=0; 必须枚举 ≥2 具体出口 LAB_ 地址+值; 三次复现 batch #65) |
 | proposed_name 不以 `tick_` 开头但函数入口为 `ldr r0, DAT_xxx`（IWRAM 覆盖）+ 出口 `pop{...};pop{r0};bx r0` + 副作用含 step_lock/step_counter 写 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_tick_display_seq_iwram_cluster.md` (R1=0; 命名格式必须为 tick_<event_noun>_display_seq; 15 实例跨 batch-72+73) |
+| 函数属于某 sibling cluster 且 PROGRESS.md 中有 >=1 个 sibling 已命名，但 proposed_name 省略了 cluster 前缀或使用不同的数字记法（`_0x3c_` vs `op3c`，`op31_sub8` vs `invoke_card_display_op_0x31_sub8`）| `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_sibling_cluster_naming_format.md` (R1=0; 两种 failure mode: A 前缀截断 / B 数字记法不一致；必须 grep PROGRESS.md 取 sibling 完整名后逐字符匹配) |
+| R5/R6 中的 str 偏移来自大型共享基址簇（如 tick_*_display_seq 基址 0x0201bcc0）但偏移值未对应函数自身 DAT 池验证 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_shared_cluster_field_offset_per_function.md` (R5+R6 均扣分; 须对每个 str 偏移追踪 DAT_xxxxxxxx:.word 值；[+0x810]=step_counter vs [+0x80c]=state_flag 混淆；9 函数 batch#75 复现) |
+| R2 plate 描述任意 LAB 路径时写"no-op"/"skip"/"无操作"/"辅助路径"，或主副路径状态值（state=1 vs state=2）角色倒置 | `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_path_description_contradicts_asm.md` (R2=0; reviewer 须独立扫描该 LAB 从起点到收敛点的所有指令；任何 bl/str 在描述中缺失均扣分; batch#74+#75 两次复现) |
 
 ### Phase 2: 逐条评分 (并行 9 项)
 

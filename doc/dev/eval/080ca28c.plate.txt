@@ -1,0 +1,11 @@
+Called by render_lp_zone_oam_full (0x080ca42c) when gP1LifePoints+0x1d14 is nonzero. Reads gP1LifePoints+0x1ce8 (player_state) and gP1LifePoints+0x1cec (lp_display_value). If lp_display_value equals ROM_TABLE[4] (current player LP base) sets r5=0x73 (special background tile). Reads [0x02023130+0x89*4] to check if LP target is written (nonzero: takes lp_target-1, computes delta r4, sets r7=1 for change display). Combines OAM attr0=(r5<<16)|r6 with 0x90*0x40=0x2400 base, calls write_oam_entry_from_packed_args to write LP background sprite. Then calls write_decimal_digits_to_oam(lp_value+0x5 tile offset, r5+7, 0, r4, 3) to write LP decimal digit OAM. Exit: void.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- PLAYER_STATE_OFFSET=0x1ce8
+- LP_VALUE_OFFSET=0x1cec
+- LP_BG_TILE=0x73 (special background tile when LP==base)
+- LP_BG_TILE_ALT=0xb (normal LP background tile)
+- BASE_X_OFFSET=0x89*4=0x224 (IWRAM LP target field)
+- OAM_ATTR2_BASE=0x90*0x40=0x2400 (attr2 palette/priority)
+- DIGIT_COUNT=3 (display 3 digits)
