@@ -1,0 +1,7 @@
+Called by 94 duel_field callers. Takes effect struct ptr (r0), slot_index (r1), optional output ptr (r2=sp or NULL). Reads slot word at [r0+8+slot_index*2], extracts slot_type (bits[4:1]) and player_bit (bit0), computes zone entry addr in gDuelFieldSlots (0x0201c510, stride=0x868). Checks 4 conditions: (1) slot_index < slot_count from [r0+6] bits[4:2]; (2) slot_type <= 0xa; (3) zone entry bit13 set (zone active); (4) zone stat count matches expected and [gDuelFieldSlots+slot_type*4+0x10b1] bits[6:5] match slot bits[15:14]. If r2 non-NULL, writes packed(slot_type<<8|player_bit) to [r2] on early path. Returns 1 if all conditions pass, 0 otherwise.
+
+Constants:
+- gDuelFieldSlots=0x0201c510 (effect zone slot array base)
+- player_stride=0x868 (per-player zone stride)
+- slot_type_max=0xa
+- zone_extra_table_offset=0x10b1

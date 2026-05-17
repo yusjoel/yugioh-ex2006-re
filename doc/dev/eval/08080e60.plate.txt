@@ -1,0 +1,1 @@
+Called by FUN_08081de4 (0x08081de4). Takes effect struct ptr, side byte, type byte. Packs key=(type<<8|side) then iterates slots 0..slot_count-1 (from [r0+6] bits[4:2]), calling read_effect_slot_side_and_type(r0, slot_idx) and comparing to key. Returns 1 on first match; 0 if no match found. Read-only, no external side effects.

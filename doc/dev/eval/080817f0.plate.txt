@@ -1,0 +1,4 @@
+Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x132a-0x9 range. Sets r2=0x80 (display op sub-code), jumps to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, 0x80).
+
+Constants:
+- sub_id=0x80 (display op sub-code)

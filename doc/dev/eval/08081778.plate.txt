@@ -1,0 +1,7 @@
+Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x1298 (Cyber Raider). Reads equip type halfword from [r5+0xc]; if equal to 2, uses sub_id=0x8b; otherwise uses DAT_08081788=0x119 as default sub_id. Both paths jump to shared tail LAB_080818e0, which extracts player_flag and calls trigger_card_display_op31_if_not_active(player_flag, sub_id).
+
+Constants:
+- CARD_ID=0x1298 (Cyber Raider)
+- equip_type_match=2
+- sub_id_type2=0x8b
+- sub_id_default=0x119

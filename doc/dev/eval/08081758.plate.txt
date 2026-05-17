@@ -1,0 +1,5 @@
+Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) near card ID 0x12a9 range. Takes r0=threshold, r1=card_id. If r1==r0 (exact match), tail-jumps to FUN_080817c8 (sub_id=0x6f); otherwise tail-jumps to FUN_080818dc (sub_id=0x112, default). Both branches are unconditional tail jumps; does not return to self.
+
+Constants:
+- sub_id_match=0x6f (display op sub-code on exact ID match)
+- sub_id_default=0x112 (0x89*2, default sub-code on no match)

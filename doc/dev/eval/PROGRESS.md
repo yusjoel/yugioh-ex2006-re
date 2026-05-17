@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 320 + 剩余 446 (23 批 #95..#117 / 20 每批) |
-| **下一批** | `#95` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #94, 320/766 = 41.78%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 340 + 剩余 426 (22 批 #96..#117 / 20 每批) |
+| **下一批** | `#96` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #95, 340/766 = 44.39%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**320 / 766 已分析** (41.78%, 剩余 23 批待跑 #95..#117)
+**340 / 766 已分析** (44.39%, 剩余 22 批待跑 #96..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -94,6 +94,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #92 `a5c2cf1` 280/766 (36.55%) — equip placeability predicates + LP-delta inline fragment cluster (FUN_08064880)
 - batch #93 `6bd1650` 300/766 (39.16%) — LP-delta card-specific fragments (14 sibs) + equip tick/sprite cluster
 - batch #94 `571c2c5` 320/766 (41.78%) — spirit monster zone sprites + effect slot circular buffer + Black Luster Soldier dispatch
+- batch #95 `COMMIT_HASH` 340/766 (44.39%) — card display dispatch micro-stub cluster (18 sibs op_0xNN) + effect slot utilities
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -104,7 +105,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 就绪函数总数 (锁定) | **766** |
 | - 已完成 (Phase 2 #82-#94) | 320 |
 | - 剩余 (按 20/批 重组) | 446 |
-| 剩余分批数 (20/批) | 23 (`#95..#117`) |
+| 剩余分批数 (20/批) | 22 (`#96..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 

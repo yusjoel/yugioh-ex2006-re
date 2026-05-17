@@ -1,0 +1,5 @@
+Called by card ID dispatch hub FUN_08080ea0 (0x08080ea0) for card ID 0x11c3 (Hane-Hane) range. Unlike simple sub-code stubs, first looks up card name string by internal ID icid=0x1f5, then formats with text template text_id=0x6c via format_game_text_with_text_arg(sp_buf, 0x6c, card_name), then passes formatted buffer ptr as r2 to LAB_08081896, which calls trigger_card_display_op31_if_not_active(player_flag, sp_buf). Formatted result written to hub-allocated 0x200-byte stack frame.
+
+Constants:
+- icid=0x1f5 (internal card ID for card_name_lookup_by_internal_id)
+- text_id=0x6c (text template number)
