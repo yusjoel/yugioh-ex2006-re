@@ -1,0 +1,8 @@
+Similar to set_lp_row_type2_with_attr_flags (0x080a1b1c) but with different parameter semantics.
+r2 (lp_delta) sign extracted via rsbs r0,r2,#0; orrs r0,r2; lsrs r4,r0,#0x1f: r4=0 if r2==0, r4=1 if r2!=0 (nonzero flag).
+If r3 (extra_flag) nonzero: flags|=0x8.
+Forces flags|=0x10 and flags|=0x20 (both bits set unconditionally), truncated to u16.
+Calls set_lp_display_row_fields(r5=lp_row_ptr, 2, r1_in&0xffff, flags).
+Used for LP change delta (positive/negative) display row update; flags encode sign/direction info.
+Callers (0x08057116, 0x08057ec0 etc.) call during LP increment/decrement animation.
+Constants: ROW_TYPE=2, SIGN_BIT=0x8, FORCED_BIT4=0x10, FORCED_BIT5=0x20, DELTA_MASK=0xffff.

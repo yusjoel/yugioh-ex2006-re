@@ -1,0 +1,5 @@
+Iterates slots 0..4, calls check_slot_card_activatable(player=r0, slot=i, mode=1) for each.
+Returns 1 immediately on first slot that returns nonzero (any slot activatable).
+Returns 0 if all 5 slots are not activatable.
+Caller tick_activation_display_state_machine (0x08098264) uses this at state-0 path to decide whether to enter activation selection display.
+Constants: SLOT_COUNT=5, MODE=1 (check_slot_card_activatable third arg).

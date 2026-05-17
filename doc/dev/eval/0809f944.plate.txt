@@ -1,0 +1,8 @@
+Checks if r0 (player_side) matches active player stored at gP1LifePoints+0x1ce8; returns 0 on mismatch.
+Computes combined_slot (r1+r2); if > 4 returns 0 (out of range).
+Calls check_slot_card_can_be_equipped(player_side, player_side, combined_slot) to check equippability.
+If not equippable returns 0.
+Checks if combined_slot equals already-recorded current slot index at gP1LifePoints+0x1d24; if equal returns 0 (prevents re-equipping same slot).
+Otherwise returns 0x800 (equippable).
+Used in dispatch_duel_field_ai_phase_by_state_code AI equip target selection path (fn-ptr ref at 0x080a01c8).
+Constants: gP1LifePoints=0x0201c4e0, ACTIVE_PLAYER_OFFSET=0x1ce8, CURRENT_SLOT_OFFSET=0x1d24, MAX_SLOT=4, ELIGIBLE_FLAG=0x800.

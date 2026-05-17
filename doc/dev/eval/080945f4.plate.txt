@@ -1,0 +1,6 @@
+Searches slot attribute table in gEffectContext (0x0201e4f0) for entry matching target palette ID (r0).
+Returns pointer to corresponding entry in extra data table (base+0x10, stride=4).
+Attr table stride=2 bytes; bits[15:8]=palette_id. Extra table stride=4 bytes.
+On match: returns address of extra data entry (r2). On no match: returns fallback r1*4 + gEffectContext+0x10.
+Callers (0x08049e04 etc.) use returned pointer to read slot extended data.
+Constants: gEffectContext=0x0201e4f0, slot_table_offset=0x82*8=0x410, extra_table_offset=0x10, attr_stride=2, extra_stride=4, PALETTE_ID_SHIFT=8.

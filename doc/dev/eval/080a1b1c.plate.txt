@@ -1,0 +1,6 @@
+Builds flags bitfield and calls set_lp_display_row_fields with row type 2.
+Flags: bit0=(r2==1); bit2=(r2==8); bit3=(r2==7); then forces bit4 set (orrs r3,#0x10), truncates to low 16 bits.
+Calls set_lp_display_row_fields(r4=lp_row_ptr, r1=2, r2=r1_in&0xffff, r3=flags).
+Compared to set_lp_row_type1_with_attr_flags (0x080a1aa4): no enable_flag gate; row type=2; bit4 forced set.
+Called as tail call by FUN_080a1b00 (0x080a1b12).
+Constants: ROW_TYPE=2, FORCED_BIT4=0x10, ATTR_CODE_MONO=1, ATTR_CODE_FIELD=7, ATTR_CODE_EQUIP=8.

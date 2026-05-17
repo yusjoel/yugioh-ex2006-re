@@ -1,0 +1,7 @@
+Writes r0 (slot_ref) to gP1LifePoints+0x1d68 and r2 (extra_param) to gP1LifePoints+0x1d48.
+Then calls apply_equip_entry_sprite_from_slot_context with fixed params (r0=1, r1=1, r2=0) to submit sprite.
+Returns fixed value 0.
+Symmetric sibling to submit_equip_slot_sprite_with_ref_b (0x080970a0); both write same fields but call different target offset of apply_equip_entry_sprite_from_slot_context.
+Both called via fn-ptr table in dispatch_equip_slot_display_state_by_phase case paths.
+Side effects: [gP1LifePoints+0x1d68] := r0; [gP1LifePoints+0x1d48] := r2; apply_equip_entry_sprite_from_slot_context side effects.
+Constants: gP1LifePoints=0x0201c4e0, SLOT_REF_OFFSET=0x1d68, EXTRA_PARAM_OFFSET=0x1d48.

@@ -1,0 +1,6 @@
+Reads animation step state from gP1LifePoints+0x1d60 (0xeb<<5), dispatches to 3 paths.
+State 0: reads frame counter at gP1LifePoints+0x1cec; if count+1<=9 calls trigger_card_display_op31_if_not_active(slot,0x52), clears pending flag; else calls invoke_card_display_op_0x31_sub1(6) and advances state.
+State 1: checks flag at gP1LifePoints+0x1d40; if nonzero reads gP1LifePoints+0x1d68, selects OAM attr (0x23 or 0x8023), calls enqueue_sprite_attr_record, then clears pending flag.
+State >=2: directly clears gP1LifePoints+0x1d54 pending flag.
+Called indirectly via fn-ptr dispatch table (advance_equip_display_phase_via_table / dispatch_equip_slot_display_state_by_phase).
+Constants: gP1LifePoints=0x0201c4e0, ANIM_STEP_OFFSET=0x1d60, FRAME_COUNT_OFFSET=0x1cec, FLAG_OFFSET=0x1d40, SLOT_PARAM_OFFSET=0x1d68, PENDING_FLAG_OFFSET=0x1d54, MAX_FRAME=9, OAM_P1=0x23, OAM_P2=0x8023.

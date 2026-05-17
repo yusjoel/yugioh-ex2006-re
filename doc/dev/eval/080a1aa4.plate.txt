@@ -1,0 +1,6 @@
+If r1 (enable_flag) is 0, returns immediately (no-op).
+Otherwise builds flags bitfield: bit0=(r2==1); bit1=(r3!=0); bit2=(r2==8); bit3=(r2==7).
+flags truncated to low 16 bits then passed as 4th arg to set_lp_display_row_fields(r0=player, r1=1, r2=r1_in&0xffff, r3=flags).
+Row type fixed to 1 (LP display row type 1, LP numeric value row).
+Caller (0x0806ec54) calls this after equip LP cost processing to update LP display row.
+Constants: ROW_TYPE=1, ATTR_CODE_MONO=1, ATTR_CODE_FIELD=7, ATTR_CODE_EQUIP=8, FLAGS_MASK=0xffff.

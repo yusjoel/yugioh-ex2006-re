@@ -1,0 +1,8 @@
+Checks if target slot can be equipped by the active card, excluding self-targeting (same-player same-slot).
+First checks combined_slot (r1+r2) <= 4; if out of range returns 0.
+Calls check_slot_card_can_be_equipped(active_player, r0, combined_slot) for equippability.
+If not equippable returns 0.
+If active player r0 equals player recorded in gDuelBattleState and combined_slot equals slot at gDuelBattleState+0x1c, returns 0 (prevents self-loop equip).
+Otherwise returns 0x800 (equippable flag).
+Called via fn-ptr in dispatch_equip_slot_display_state_by_phase case_5/case_6 paths.
+Constants: gDuelBattleState=0x0201bb90, MAX_SLOT=4, ELIGIBLE_FLAG=0x800.

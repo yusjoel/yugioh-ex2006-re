@@ -1,0 +1,7 @@
+Reads active player from gDuelBattleState (0x0201bb90) [+0x0] and compares with target r0; if same (equipping to self) returns 0.
+Computes combined_slot = r1+r2; if combined_slot > 4 returns 0 (slot out of range).
+Calls eval_slot_activation_eligibility_full(active_player, r0, combined_slot, stackarg=1) for full eligibility check.
+If nonzero: returns 0x800 (eligible bit11, slot is equippable).
+Otherwise returns 0.
+Called via fn-ptr in dispatch_equip_slot_display_state_by_phase case path.
+Constants: gDuelBattleState=0x0201bb90, MAX_SLOT=4, ELIGIBLE_FLAG=0x800 (0x80<<4).

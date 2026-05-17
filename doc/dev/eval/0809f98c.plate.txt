@@ -1,0 +1,6 @@
+Reads gP1LifePoints+0x1ce8 and gP1LifePoints+0x1d20 (offset+0x38) and XORs them; if result mismatches r0 (player_side) returns 0.
+Computes combined_slot (r1+r2); if > 10 (0xa) returns 0 (out of range).
+Calls get_slot_effect_card_value(player_side, combined_slot) to check if valid effect card exists at slot.
+If returns 0: returns 0 (invalid). Otherwise returns 0x800 (valid/eligible).
+Called via .word 0x0809f98d fn-ptr in dispatch_duel_field_ai_phase_by_state_code state=0x84 path (advance_display_slot_if_zone_active inline fragment).
+Constants: gP1LifePoints=0x0201c4e0, ACTIVE_PLAYER_OFFSET=0x1ce8, XOR_OFFSET=0x38, MAX_SLOT=10, ELIGIBLE_FLAG=0x800.

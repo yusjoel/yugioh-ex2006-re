@@ -1,0 +1,7 @@
+Reads phase state code from gP1LifePoints+0x1d94, dispatches to 3 paths.
+State 0: writes gP1LifePoints+0x1d28=6 (display_type), gP1LifePoints+0x1d2c=1 (phase_active), calls set_slot_occupy_bit_with_sprite_update(0,1). If r1 (extra_flag) nonzero: selects OAM attr 0x1b or 0x801b based on gDuelBattleState[0], calls enqueue_sprite_attr_record. Writes [gDuelBattleState+0x14]=1. Increments gP1LifePoints+0x1d94.
+State 1: calls advance_equip_display_phase_via_table(r0=player_side). Returns 1 if result > 8, else 0.
+State >=2: returns 0.
+Called indirectly via fn-ptr dispatch (invoked by FUN_0809be70 / advance_equip_display_phase_via_table hub).
+Side effects (state 0): [gP1LifePoints+0x1d28]:=6; [gP1LifePoints+0x1d2c]:=1; [gDuelBattleState+0x14]:=1; OAM attr (conditional); [gP1LifePoints+0x1d94]+=1.
+Constants: gP1LifePoints=0x0201c4e0, STATE_OFFSET=0x1d94, DISPLAY_TYPE_OFFSET=0x1d28, PHASE_ACTIVE_OFFSET=0x1d2c, MAX_PHASE=8, OAM_P1=0x1b, OAM_P2=0x801b.

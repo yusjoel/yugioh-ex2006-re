@@ -1,0 +1,6 @@
+Called by duel puzzle text parser (switch case 0x48) after sscanf extracts LP value.
+r0=player_side (0/1, extracted via ands r0,#1), r1=lp_value to write.
+Writes r1 into gP1LifePoints[player*0x868+0x4 + count*4] slot, increments count.
+Also updates VRAM attr halfword bits[12:0] at gP1LifePoints+player*0x868+0x1080.
+Side effects: [gP1LifePoints+player*0x868+0x4+count*4] := r1; VRAM halfword bits[12:0] updated; count += 1.
+Constants: STRIDE=0x868, ENTRY_SIZE=4, BASE_OFFSET=0x4, MASK_LOW13=0x1fff, MASK_HIGH=0xffffe000.

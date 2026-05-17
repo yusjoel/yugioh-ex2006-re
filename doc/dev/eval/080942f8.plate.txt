@@ -1,0 +1,6 @@
+Reads the 16-bit palette attribute of the current active slot from gEffectContext (0x0201e4f0).
+No input parameters (r0 overwritten at entry by ldr r0, DAT).
+Computes [gEffectContext+0x8]*2 + gEffectContext+0x82*8, reads 16-bit halfword, returns low 5 bits (bits[4:0]) as color index.
+Pure read function, no write side effects.
+Callers (0x08080828, 0x08081c20 etc.) use return value to select render color path after confirming slot palette.
+Constants: gEffectContext=0x0201e4f0, slot_word_offset=0x8, palette_table_offset=0x82*8=0x410, COLOR_MASK=0x1f.

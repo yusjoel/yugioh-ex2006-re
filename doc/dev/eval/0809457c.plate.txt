@@ -1,0 +1,5 @@
+Iterates all active slots (count from gEffectContext+0xc), calls read_slot_palette_index for each slot.
+If index equals target r0 (r5): calls set_tile_palette_index_in_buf(slot, 0) to reset palette to 0.
+If index greater than target: calls set_tile_palette_index_in_buf(slot, index-1) to compact down by one.
+Used after removing a palette entry to reorganize remaining slot indices.
+Constants: gEffectContext=0x0201e4f0, slot_count_offset=0xc, RESET_IDX=0.

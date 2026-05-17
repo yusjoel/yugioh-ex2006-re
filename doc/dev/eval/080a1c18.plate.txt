@@ -1,0 +1,5 @@
+Truncates r1 to low 16 bits, calls set_lp_display_row_fields(r0=player, r1=4, r2=0, r3=r1_in&0xffff) with fixed row type 4.
+LP display row type 4 corresponds to LP max value update scenario.
+Callers (0x080575a6, 0x0806904e etc.) call when LP upper limit changes to update display row.
+Minimal wrapper with no extra parameter construction.
+Constants: ROW_TYPE=4, LP_VALUE_MASK=0xffff.

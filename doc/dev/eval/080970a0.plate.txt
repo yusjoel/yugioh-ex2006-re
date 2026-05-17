@@ -1,0 +1,8 @@
+Symmetric sibling of submit_equip_slot_sprite_with_ref_a (0x08097070).
+Writes r0 (slot_ref) to gP1LifePoints+0x1d68 and r2 (extra_param) to gP1LifePoints+0x1d48.
+Then calls apply_equip_entry_sprite_from_slot_context with fixed params (r0=1, r1=1, r2=0) to submit sprite.
+Only difference from sibling: bl target offset differs (calls alternate entry of apply_equip_entry_sprite_from_slot_context).
+Returns fixed value 0.
+Called via fn-ptr table in dispatch_equip_slot_display_state_by_phase at different case path than sibling.
+Side effects: [gP1LifePoints+0x1d68] := r0; [gP1LifePoints+0x1d48] := r2; apply_equip_entry_sprite_from_slot_context side effects.
+Constants: gP1LifePoints=0x0201c4e0, SLOT_REF_OFFSET=0x1d68, EXTRA_PARAM_OFFSET=0x1d48.

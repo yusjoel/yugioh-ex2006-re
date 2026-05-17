@@ -1,0 +1,6 @@
+Checks if r0 low 16 bits is in [8..9] (LP animation phase code).
+If in range: reads gP1LifePoints+0x1d68 (slot_param) and sum of 0x1d6c+0x1d70 fields, calls apply_slot_equip_activation_with_sprite to trigger equip activation animation.
+Regardless: clears gP1LifePoints+0x1d54 (pending flag) to 0.
+Called by dispatch_lp_bar_animation_step as state-2 handler in animation state machine.
+Side effects: [gP1LifePoints+0x1d54] := 0 (always); apply_slot_equip_activation_with_sprite side effects (conditional).
+Constants: PHASE_LO=8, PHASE_HI=9, PARAM_OFFSET=0x1d68, PENDING_FLAG=0x1d54, PHASE_MASK=0xffff.

@@ -1,0 +1,6 @@
+Searches the slot attribute table in gEffectContext (0x0201e4f0) for an entry matching target palette ID (r0).
+Table item stride=2 bytes; bits[15:8] of each item stores palette ID.
+On match: writes slot index to gEffectContext+0x8 (current active slot).
+On no match: writes -1 (rsbs r0,r0,#0 = 0xffffffff) to gEffectContext+0x8.
+Callers (0x0808081a, 0x0808312a) call this before switching active slot by palette ID.
+Constants: gEffectContext=0x0201e4f0, slot_table_offset=0x82*8=0x410, item_stride=2, palette_id_shift=8, SLOT_IDX_FIELD=0x8, NOT_FOUND=-1.
