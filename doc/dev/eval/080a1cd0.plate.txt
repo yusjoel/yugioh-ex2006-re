@@ -1,0 +1,3 @@
+Checks if opponent player LP row object is valid, then calls set_lp_display_row_fields with type=7. r0 (player_id) inverted then multiplied by 0x868 to compute opponent offset in gP1LifePoints struct, reads pointer at gP1LifePoints+0x10+opponent*0x868; returns without action if null. When non-null calls set_lp_display_row_fields(r0=player_id, r1=7, r2=0, r3=0). Called by equip/LP cost paths (0x08059ca6, 0x08067086, 0x0806878e etc, tags=[duel_field]).
+Side effects: conditionally writes LP display row type=7 field via set_lp_display_row_fields.
+Constants: ROW_TYPE=7 (fixed; movs r1,#0x7), LP_STRUCT_SIZE=0x868, LP_ROW_OFFSET=0x10.

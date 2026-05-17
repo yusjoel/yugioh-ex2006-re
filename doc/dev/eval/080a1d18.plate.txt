@@ -1,0 +1,3 @@
+LP display row type 15 (0xf) dual-value wrapper: truncates r1/r2 to low 16 bits, calls set_lp_display_row_fields(r0, 0xf, r1&0xffff, r2&0xffff) with fixed type=0xf. Shares type=0xf with set_lp_display_row_all_slots (0x080a1d04) but passes two value params (r1/r2); all_slots passes only one. Frequently called by LP equip display paths (indeg>=10, 0x08056fd8/0x0805836c/0x08058e1c etc, tags=[duel_field]).
+Side effects: writes LP display row type=0xf fields via set_lp_display_row_fields.
+Constants: ROW_TYPE=0xf (15, fixed; movs r1,#0xf).

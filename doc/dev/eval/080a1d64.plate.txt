@@ -1,0 +1,3 @@
+LP display row type 14 (0xe) dual-value wrapper: truncates r1/r2 to low 16 bits, calls set_lp_display_row_fields(r0, 0xe, r1&0xffff, r2&0xffff) with fixed type=0xe. Symmetric with set_lp_display_row_type5/type6/type8/type9/type15. Called by LP display paths (0x08070612, 0x08083200, tags=[duel_field]).
+Side effects: writes LP display row type=0xe fields via set_lp_display_row_fields.
+Constants: ROW_TYPE=0xe (14, fixed; movs r1,#0xe).

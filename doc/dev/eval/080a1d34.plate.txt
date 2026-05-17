@@ -1,0 +1,3 @@
+LP display row type 11 (0xb) byte-merge wrapper: r1/r2 each low byte merged to 16 bits: bits[15:8]=r2&0xff, bits[7:0]=r1&0xff; calls set_lp_display_row_fields(r0, 0xb, merged, 0). Similar encoding to set_lp_row_type8_with_byte_flags (0x080a1c94), differs in type value (11 vs 8) and source registers (r1/r2 vs r2/r3). Called by LP status display paths (0x0806cc36, 0x0806cc54, 0x0807ae22 etc, tags=[duel_field]).
+Side effects: writes LP display row type=0xb field via set_lp_display_row_fields.
+Constants: ROW_TYPE=0xb (11, fixed; movs r1,#0xb), BYTE_SHIFT=0x18.

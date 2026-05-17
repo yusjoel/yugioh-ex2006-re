@@ -1,0 +1,3 @@
+Equip slot eligibility check (field5 nonzero variant): symmetric with check_equip_slot_card_stat8_is_7 (0x080a24f0) but calls check_card_field5_is_nonzero instead of check_card_stat_field8_is_7. Verifies player_id matches gP1LifePoints+0x1d8c record and type==0xb; computes slot address and extracts bits[18:0] card ID; calls check_card_field5_is_nonzero for effect eligibility. Returns 0x800 if eligible, 0 otherwise. Called by FUN_080a2590 (tags=[duel_field]) via function pointer table (DAT_080a25e0 = 0x080a2541) as case dispatch.
+Side effects: no external write operations.
+Constants: TARGET_TYPE=0xb, RESULT_TRUE=0x800 (=0x80<<4), LP_STRUCT_SIZE=0x868, LP_SLOT_BASE_OFFSET=0x120, LP_TARGET_OFFSET=0x1d8c.

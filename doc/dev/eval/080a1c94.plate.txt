@@ -1,0 +1,3 @@
+LP display row type 8 byte-merge wrapper: r1 truncated to low 16 bits as value arg; r2/r3 each low byte merged: bits[15:8]=r2&0xff, bits[7:0]=r3&0xff, forming 16-bit flags arg. Calls set_lp_display_row_fields(r0, 8, r1&0xffff, (r2_byte<<8)|r3_byte). Same encoding as enqueue_lp_display_row_type17 (0x080a1e0c), differs in type value (8 vs 17). Forms type8 dual-encoding pair with set_lp_display_row_type8 (0x080a1c78).
+Side effects: writes LP display row type=8 field via set_lp_display_row_fields.
+Constants: ROW_TYPE=8 (fixed; movs r1,#0x8), BYTE_SHIFT=0x18 (lsls#0x18; lsrs#0x8 -> byte extraction).
