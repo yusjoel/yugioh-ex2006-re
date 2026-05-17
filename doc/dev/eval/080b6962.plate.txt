@@ -1,0 +1,5 @@
+Equip target selection case fragment (effect chain entry match strategy). Inlined in FUN_080b5d98 (0x080b5d98). Parent frame r5=effect_chain_entry_ptr (may be 0). If r5==0 -> fails to FUN_080b6be0. Otherwise: reads r2 (from parent, equip zone bit0), takes [r5+0x2] bit0 = chain_player_bit, compares both player_id bit0: if same -> fails. Checks [r5+0x4] bits[18:16] (lsls #0xe/lsrs #0x1d) whether > 0 (link_count); if <=0 -> fails. If valid: iterates links [0..link_count-1], for each reads effect slot side+type via read_effect_slot_side_and_type; if side matches player_id AND type<=4 AND bitmap bit (side<<4|type) is set -> tail-jumps to LAB_080b6bc2 (success). Loop ends without hit -> fails. Side effects: via success path, writes target.
+
+Constants:
+- EFFECT_TYPE_MAX=4 (cmp r2,#0x4)
+- link_count_field=[r5+0x4] bits[18:16]

@@ -1,0 +1,4 @@
+Equip target selection case fragment (simple side jump). Inlined in FUN_080b5d98 (0x080b5d98). Minimal fragment: mov r3,r8 (r3=r8, bitmap/flag); extracts r3 bit31 = player_side; tail-jumps to LAB_080b6bf2 (calls FUN_080b5ad4(equip_slot, computed_player) + epilogue). This case does not call any select_equip function; directly passes current equip slot to default handler FUN_080b5ad4 for target initialization, using r3=r8 bit31 to determine opposing player_id. Side effects: via FUN_080b5ad4, writes target reference.
+
+Constants:
+- (none; 3-instruction fragment)

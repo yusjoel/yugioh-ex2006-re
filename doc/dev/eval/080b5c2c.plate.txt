@@ -1,0 +1,7 @@
+Equip target slot comparator (equip placement type check). Called from FUN_080b5d98 (0x080b5d98, equip target slot dispatch hub) as function pointer stored at DAT_080b655c (0x080b5c2d), passed to find_best_slot_from_bitmap_by_comparator. Inputs: r0=player_id bit0, r1=slot_idx. Computes slot entry address, extracts card_id (bits[12:0]), calls get_card_extended_stat_field5. If field5 > 4 -> returns 1. If field5 <= 4: calls check_card_has_equip_placement_type; if nonzero -> returns 1; else -> returns 0. Selects slots where field5>4 or where the card has a specific equip placement type. Side effects: none.
+
+Constants:
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+- slot_entry_size=0x14
+- FIELD5_EQUIP_THRESHOLD=4

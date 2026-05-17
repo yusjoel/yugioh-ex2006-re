@@ -1,0 +1,10 @@
+Equip target slot scorer (zone lock + slot type). Called from FUN_080b5d98 (0x080b5d98) as function pointer stored at DAT_080b6bb8 (0x080b5ce9), passed to find_best_slot_from_bitmap_by_comparator. r0=player_id, r1=slot_idx. Computes slot address (gP1LifePoints + player*0x868 + slot*0x14 + 0x40), reads zone state dword, checks bit7 (lsrs #0x7, ands #1): if bit7 nonzero (zone locked) -> returns 0. Otherwise: slot_idx<=4 -> returns 2 (monster zone); slot_idx>4 -> returns 1 (spell/trap zone). Locked zones not eligible; monster zones (<=4) preferred over spell/trap zones (>4). Side effects: none.
+
+Constants:
+- gP1LifePoints=0x0201c4e0 (PTR_gP1LifePoints_080b5d10)
+- player_stride=0x868 (DAT_080b5d14)
+- zone_entry_size=0x14
+- zone_base_offset=0x40
+- ZONE_LOCK_BIT=bit7 of zone dword
+- SCORE_MONSTER_ZONE=2, SCORE_SPELL_ZONE=1, SCORE_LOCKED=0
+- SLOT_IDX_MONSTER_MAX=4

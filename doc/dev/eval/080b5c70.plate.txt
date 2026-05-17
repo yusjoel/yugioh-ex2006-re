@@ -1,0 +1,7 @@
+Equip target slot scorer (field5 + zone boundary constraints). Called from FUN_080b5d98 (0x080b5d98, equip target slot dispatch hub) as function pointer stored at DAT_080b7234 (0x080b5c71), passed to find_best_slot_from_bitmap_by_comparator. r0=player_id, r1=slot_idx, r2=sp-passed context (score bound parameters from parent frame). Calls get_slot_field5_score(duelState->field0, duelState->field1c) for reference score; calls dispatch_zone_slot_score_by_player_flag(player, slot, sp_arg) for slot score; computes delta=slot_score-(field5_score-1), clamped to [0,0]. If zone active bit is 0 -> returns 0. If card_type bits[31:19]==0x9ce00000 marker -> adds 1. Returns adjusted score. Side effects: none.
+
+Constants:
+- gDuelFieldSlots=0x0201c510 (DAT_080b5cd0)
+- gDuelState=0x0201bb90 (DAT_080b5cc8)
+- player_stride=0x868 (DAT_080b5ccc)
+- MARKER=0x9ce00000 (DAT_080b5cd4, card_type marker check)

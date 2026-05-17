@@ -1,0 +1,4 @@
+Compares equip card owner vs opponent occupied monster zone counts; returns 1 if owner has more. Entry r0=equip_card_zone_ptr; extracts player_id from [r0+2] bit0. Calls count_occupied_monster_zones(1-player_id) -> r5 (opponent count); then calls count_occupied_monster_zones(player_id) -> r0 (self count). If r5 < r0 (opponent < self) returns 1; otherwise returns 0. Used as precondition predicate for equip AI target selection: equip attack value is maximized when self has more monsters than opponent. indeg=0; no direct bl callers.
+
+Constants:
+- (none beyond APCS calling convention)

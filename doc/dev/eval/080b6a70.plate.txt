@@ -1,0 +1,6 @@
+Equip target selection case fragment (effect chain type mask match). Inlined in FUN_080b5d98 (0x080b5d98). Parent frame r5=effect_chain_entry_ptr, r6=equip_card_zone_ptr. If r5==0 -> jumps to failure path LAB_080b6aba. Checks [r5+0x4] bits[22:20] (lsls #0xa -> 0xe0, lsrs #0x8 -> 0x80 mask for 0x80000) -> whether equals 0x8000 (specific effect type flag); no match -> fails. Calls read_effect_slot_side_and_type(r5, 0) twice: first takes type byte (bits[23:16]), checks <=0xa; second takes side (bits[31:24]) and type, builds bit_key=(side<<4)|type, checks bitmap (r9) at that bit: if set -> success, tail-jumps to FUN_080b6bd8. Side effects: via success path, writes target.
+
+Constants:
+- CHAIN_MASK=0x38000 (0xe0<<0xa; applied to [r5+4])
+- CHAIN_FLAG=0x8000 (0x80<<0x8; target value after mask: bits[17:15]==0b001)
+- type_max=0xa (cmp r0,#0xa; bhi -> skip)

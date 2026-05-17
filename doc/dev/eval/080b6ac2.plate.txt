@@ -1,0 +1,7 @@
+Equip target selection case fragment (effect chain type mask + zone type check). Inlined in FUN_080b5d98 (0x080b5d98). Highly symmetric with exec_equip_target_by_chain_effect_type_mask (080b6a70): checks r5=effect_chain_entry_ptr; same [r5+4] bits[22:20] check; same read_effect_slot_side_and_type calls; but uses r7 bitmap (mov r7,r9) instead of r9 directly. After bitmap check fails, enters additional zone_type check path (ldrh[r6+2] bits[12:2], cmp 0x480/0x4c0): if zone_type is 0x480 or 0x4c0 -> also checks gDuelState bitmap (DAT_080b6b4c=0x0201bb90) against player_id; on match at some branches -> jumps to FUN_080b6b50 (comparator fallback); final success -> jumps to FUN_080b6bd8. Side effects: via success path, writes target.
+
+Constants:
+- gDuelState=0x0201bb90 (DAT_080b6b4c)
+- ZONE_TYPE_EQUIP_A=0x480 (0x90<<0x3=0x480)
+- ZONE_TYPE_EQUIP_B=0x4c0 (0x480+0x40)
+- type_max=0xa

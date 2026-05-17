@@ -1,0 +1,7 @@
+Equip target slot comparator (variant). Called from FUN_080b5d98 (equip target slot dispatch hub) as function pointer stored at DAT_080b69dc/DAT_080b6b6c, passed to find_best_slot_from_bitmap_by_comparator. Inputs: r0=player_id bit0, r1=slot_idx. Computes slot entry address, extracts card_id, calls get_card_field_summon_restriction. If restriction==0, returns 0. If restriction!=0, reads slot[+0x8] halfword, applies rsbs/orrs/lsrs #0x1f to extract sign bit (0 if zero, 1 if nonzero) as score. Result: restriction nonzero AND slot[+0x8] nonzero -> 1; restriction nonzero but slot[+0x8]==0 -> 0; no restriction -> 0. Side effects: none.
+
+Constants:
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+- slot_entry_size=0x14
+- slot_field8_offset=+0x8

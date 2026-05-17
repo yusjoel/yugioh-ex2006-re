@@ -1,0 +1,4 @@
+Equip target selection case fragment (field5 comparator strategy). Inlined in FUN_080b5d98 (0x080b5d98); bl entry at 0x080b60de and 0x080b62c6. Parent frame r6=equip_card_zone_ptr, r9=equip_zone_bitmap. Computes player_id = 1 - [r6+2] bit0; calls find_best_slot_from_bitmap_by_comparator(player, bitmap, comparator=DAT_080b6bb8=0x080b5ce9 = score_slot_by_zone_lock_and_type THUMB ptr); if >=0 -> LAB_080b6bd4 success; if <0 -> FUN_080b6be0 fail. Side effects: via success path, writes target.
+
+Constants:
+- comparator_fn=0x080b5ce9 (DAT_080b6bb8, score_slot_by_zone_lock_and_type THUMB ptr)

@@ -1,0 +1,5 @@
+Equip target selection case fragment (active side bitmap test strategy). Inlined in FUN_080b5d98 (0x080b5d98) dispatch body. No independent frame; uses parent frame r6=equip_card_zone_ptr, r3=card_id_or_flag, r7=working_flag. Reads gDuelState (DAT_080b67c4=0x0201bb90); r3 bit31 selects opponent player (field0) vs self (field1c) attack_bitmap. Extracts r7 bit31 = slot_sub_index as column; computes bit_pos = column*16 + slot. Checks attack_bitmap at that bit: if set -> determines player_id and column then tail-jumps to FUN_080b6bd4 (success path); else -> tail-jumps to LAB_080b6bf2 (failure path -> calls FUN_080b5ad4 + epilogue). Side effects: via success path, writes equip target.
+
+Constants:
+- gDuelState=0x0201bb90 (DAT_080b67c4)
+- column_stride=16 (lsls r1,#0x4)

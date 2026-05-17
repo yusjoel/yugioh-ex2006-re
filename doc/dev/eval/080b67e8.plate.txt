@@ -1,0 +1,8 @@
+Equip target selection case fragment (field5 score scan strategy). Inlined in FUN_080b5d98 (0x080b5d98). No independent frame; parent frame r6=equip_card_zone_ptr, r10=gDuelFieldSlots offset base. Iterates monster slots [0..4]: for each slot reads active bit (bits[31:19]) checking if card present; if active and slot[+6]==0, calls get_slot_field5_score(player, slot) and tracks best score into r7. If after scan r7==0 (no valid slot) -> calls find_best_scored_slot_for_player_with_gate fallback. Finally clears slot[+6] low 5 bits (mask ~0x1d), then iterates bitmap [0..4] updating target; success tail-jumps to FUN_080b6bd4; failure tail-jumps to FUN_080b6be0. Side effects: strb -> slot[+6] (clears low 5 equip-gate flag bits).
+
+Constants:
+- gDuelFieldSlots=0x0201c510 (DAT_080b683c)
+- player_stride=0x868 (DAT_080b6840)
+- slot_entry_size=0x14 (adds r5,#0x14 in loop)
+- SLOT_COUNT=5 (loop r4=0..4)
+- SLOT_FIELD6_CLEAR_MASK=~0x1d=0xe2

@@ -1,0 +1,8 @@
+Checks whether a hand equip target with bonus value greater than 4 exists (sibling FUN_080b88c4 uses threshold 6, also has count_equip_placements precondition). Entry r0=equip_card_zone_ptr. Checks gP1LifePoints[player_id*0x868+0x11c] bit17; if set (equip activation blocked) returns 0. Inner loop counter r8 iterates [0..hand_count-1] (r8 initialized to 0 at LAB_080bac10, not a caller-set parameter). For each hand card: checks check_card_field5_is_nonzero==0 AND check_card_has_equip_placement_type==0; if both pass calls eval_equip_bonus_for_slot; if > 4 -> returns 1. Loop ends without match -> returns 0. Looser than check_hand_equip_target_meets_bonus_6: no count_equip_placements precondition, no count_available_monster_slots check, no resolve_equip_target_slot_for_player. indeg=0; no direct bl callers.
+
+Constants:
+- BONUS_THRESHOLD=4 (eval_equip_bonus_for_slot > 4 -> return 1)
+- LP_BLOCK_BIT=bit17 of [gP1LifePoints+player_id*0x868+0x11c]
+- PLAYER_STRIDE=0x868
+- gP1LifePoints=0x0201c4e0 (PTR_gP1LifePoints_080bac04)
+- HAND_ZONE_BASE=0x0201c4ec (DAT_080bacc8)

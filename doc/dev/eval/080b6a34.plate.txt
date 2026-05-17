@@ -1,0 +1,6 @@
+Equip target selection case fragment (field6 score + effect activation check). Inlined in FUN_080b5d98 (0x080b5d98). Parent frame r7=bitmap, r10=gDuelFieldSlots + player_offset. Initial r4=0 (slot_idx), r5 = 0x0cc<<1 + r10 = offset 0x198 in slot table. Iterates slots [0..4]: checks r7 (bitmap, mov r7,r9) bit (player_bit*16+slot) whether set; if set and [r5,#0]=link_count>1: calls get_slot_field6_score(player, slot); if score nonzero -> success tail-jump to LAB_080b6bce. No hit -> failure tail-jump to FUN_080b6be0. Side effects: via success path, writes target.
+
+Constants:
+- slot_bitmap_offset=0x198 (0xcc<<1=0x198 in gDuelFieldSlots area)
+- LINK_COUNT_MIN=2 (cmp r0,#0x1; bls -> skip if <=1)
+- SLOT_COUNT=5 (loop r4=0..4)

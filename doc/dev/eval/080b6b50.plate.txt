@@ -1,0 +1,4 @@
+Equip target selection case fragment (comparator function + scored fallback). Inlined in FUN_080b5d98 (0x080b5d98); also tail-called from FUN_080b6ac2. Parent frame r6=equip_card_zone_ptr, r9=equip_zone_bitmap. Computes player_id = 1 - [r6+2] bit0; calls find_best_slot_from_bitmap_by_comparator(player, r9_bitmap, comparator=DAT_080b6b6c=0x080b5bed); if result >=0 -> success path LAB_080b6bd2 -> FUN_080b6bd8; if <0 -> fallback: computes player (1-player_bit), calls find_best_scored_slot_from_bitmap(player, bitmap, 1, 0) with r9=bitmap; if still <0 -> FUN_080b6be0 (fail). Side effects: via success path, writes target.
+
+Constants:
+- comparator_fn=0x080b5bed (DAT_080b6b6c, score_slot_by_equip_chain_presence THUMB ptr)

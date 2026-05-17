@@ -1,0 +1,9 @@
+Equip card target slot commit function. Entry: r0=player_id, r1=card_id, r2=slot_predicate_fn_ptr. Writes player_id to global state [0x0201afe0] and [gP1LifePoints+0x1d64], then calls build_equip_zone_bitmap_for_player(r2) to generate candidate bitmap (stored in r9). Then uses multi-level BST (cmp/bgt tree) on r1=card_id to dispatch each special equip card to a different target search strategy: select_equip_target_slot_with_eligibility_check / select_equip_target_slot_full / select_equip_target_slot_by_eligible_set / find_best_scored_slot_from_bitmap / find_best_slot_from_bitmap_by_comparator / sample_random_slot_from_bitmap / eval_equip_chain_score_for_slot + dispatch_effect_handler_by_card_id / check_card_type_is_spell. On success: calls init_duel_zone_target_slot_refs(zone_ptr, slot_idx, 0, 0xb) to commit target reference. Called by FUN_08096a4c/FUN_08096ab0 after checking equip activation state flag ([0x0201e2a0+player*4+8]==1). Exit via pop {r0}; bx r0 (Pattern B, void return).
+
+Constants:
+- EQUIP_PLAYER_STATE=0x0201afe0
+- PLAYER_FIELD_OFFSET=0x1d64 (gP1LifePoints+0x1d64)
+- EQUIP_ZONE_BASE=0x0201b290, PLAYER_STRIDE=0x868 (offset 0x484 into base)
+- card_id_dispatch_tree: 0x1702=Anti-Aircraft Flower, 0x140b=Insect Imitation, 0x1254=Widespread Ruin, 0x11f0=Greenkappa, 0x0fff=Catapult Turtle, 0x1391=Riryoku, 0x13fc=Multiplication of Ants, 0x140a=Shift, 0x151e=Last Turn, 0x14c5=Throwstone Unit, 0x164b=Guardian Ceal, 0x169b=Checkmate, 0x17f5=Level Up!, 0x1715=Ultra Evolution Pill, 0x17e1=Ultimate Baseball Kid, 0x17ec=Hade-Hane, 0x17f2=Hammer Shot, 0x18ca=Gift of the Martyr, 0x187e=Release Restraint, 0x188c=Deck Devastation Virus, 0x192a=Spiritual Wind Art - Miyabi, 0x19a5=Raviel Lord of Phantasms, 0x19b5=Attack Reflector Unit, 0x15a3=Metamorphosis, 0x1927=Spiritual Earth Art - Kurogane, 0x1147=gap/reserved
+- gDuelFieldSlots=0x0201c510
+- EQUIP_ZONE_TYPE=0xb
