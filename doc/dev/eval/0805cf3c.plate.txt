@@ -1,0 +1,6 @@
+Check dual-player zone effect node activation counts meet two-threshold conditions. Read player_id from card_entry[+2] bit0, call count_effect_node_activations_by_zone(player_id, card_entry); if result <= 1 return 0 (self activation insufficient). Compute opponent = 1 - player_id, call count_effect_node_activations_by_zone(opponent, card_entry); if result <= 0 return 0 (opponent no activations). Both satisfied (self > 1, opponent > 0) returns 2 (dual active). Called via function pointer (indeg=0).
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1])
+Outputs: r0 = u32 (2=both players have sufficient activations; 0=either check failed)
+Side effects: none (read-only)
+Constants: SELF_ACTIVATION_MIN=2 (>1), OPP_ACTIVATION_MIN=1 (>0), RESULT_DUAL_ACTIVE=2

@@ -1,0 +1,10 @@
+Equip zone banisher LP display sequence frame driver. Read [0x0201b290+0x4ac] state word, dispatch on 0/1/2:
+- State 0: call increment_lp_bar_display_counter(), increment state step.
+- State 1: read card_entry[+2] bit0 player_id, check gP1LP[player*0x868+0xc] nonzero; if nonzero call dispatch_equip_zone_sprite_banisher_with_count_check(player_id, 0), advance state; if zero call decrement_lp_bar_display_counter(), then check r5[+0]==0x14e0 (0xa7<<5), if match copy r5[+0xc] to card_entry[+0xc].
+- State >= 2: no-op, return 1.
+Returns 0 if step advanced, 1 if no valid state.
+
+Inputs: r0 = ptr equip_card_entry (r6; byte[+2] bit0=player_id); r1 = ptr aux_entry (r5; [+0]=card_type_raw, [+0xc]=lp_value)
+Outputs: r0 = u32 (0=state advanced; 1=no-match guard)
+Side effects: [0x0201b290+0x4ac] := +1 (state 0 and 1 nonzero-LP paths); LP bar display counter (+1 state 0; -1 state 1 zero path); card_entry[+0xc] := aux_entry[+0xc] (conditional)
+Constants: STATE_BASE=0x0201b290, STEP_OFF=0x4ac, PLAYER_STRIDE=0x868, LP_OFFSET=0xc, CARD_TYPE_CHECK=0x14e0 (0xa7<<5)

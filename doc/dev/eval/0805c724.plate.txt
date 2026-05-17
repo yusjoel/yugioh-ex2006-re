@@ -1,0 +1,11 @@
+Check equip chain cross-field pair placement eligibility. Extract player_id (bit0 XOR card[+3].bit5=opposite flag) and slot_group (bits[5:1]) from card_entry[+2], call find_equip_chain_pair_across_field(XOR_player_id, slot_group); if result is 0xffff (no pair) return 0. Otherwise unpack pair result (low byte=slot_group, next byte=player_id) and run:
+(1) check_slot_card_can_be_equipped(pair_player, pair_slot, pair_zone)
+(2) count_monster_slots_accepting_card(pair_player): if 0 and pair_player==XOR_player, run (3) check_slot_placement_blocked_by_field_effect
+(4) check_field_spell_neo_daedalus_group_placeable(pair_player)
+(5) count_zone_card_pair_allowed_for_card(pair_player, 0x1117)
+All checks pass returns 1; any failure returns 0. Called via function pointer (indeg=0).
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1], bits[5:1]=slot_group [0..31]; byte[+3] bit5=opposite_flag)
+Outputs: r0 = u32 (1=eligible; 0=blocked)
+Side effects: none (read-only checks)
+Constants: INVALID_PAIR=0xffff, ZONE_CARD_CHECK_ID=0x1117 (Wall Shadow)

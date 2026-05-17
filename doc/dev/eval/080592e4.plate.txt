@@ -1,0 +1,6 @@
+Check if specified player_id (r0) meets zone type 0xb (equip zone) ATK buff activation conditions in the current equip activation context. Read current equip target card_entry ptr from [0x0201b290+0x484], extract its player_id (bit0), compare with r0; mismatch returns 0. Check r1==0xb (equip zone). If both match, read card field from gDuelFieldSlots_B (0x0201c600) at player_id*0x868+slot*4, call get_card_extended_stat_field3 for ATK bonus; write result to card_entry[+0xc], call count_effect_node_activations_by_zone; if node count nonzero return 0x800, else return 0. Called by FUN_0805934c as function pointer predicate passed to select_equip_target_slot_by_card_id.
+
+Inputs: r0 = u8 player_id [0..1]; r1 = u8 zone_type [0..0x18] (expects 0xb=equip); r2 = u8 slot_index [0..0x19]
+Outputs: r0 = u32 (0x800=ATK buff active; 0=not eligible)
+Side effects: card_entry[+0xc] := ATK field3 value (write to current equip target)
+Constants: STATE_BASE=0x0201b290, TARGET_PTR_OFF=0x484, SLOTS_B=0x0201c600 (gDuelFieldSlots_B), PLAYER_STRIDE=0x868, ZONE_EQUIP=0xb, ATK_BUFF_FLAG=0x800 (0x80<<4)

@@ -1,0 +1,6 @@
+Pass r1 (player_id) as r0 to count_available_monster_slots and return its result; r0 from caller is discarded (overwritten by adds r0,r1,#0 at entry). Called by multiple slot capacity checks (0x0805a216, 0x0805c22a, 0x0805c25e, 0x0805c64c, 0x0805c7ec, 0x0805cf02 etc.), passing player_id in r1 to query that player's current available monster slot count.
+
+Inputs: r0: discarded (entry adds r0,r1,#0 clobbers r0); r1 = u8 player_id [0..1]
+Outputs: r0 = u32 available monster slot count for player
+Side effects: none
+Constants: (none)

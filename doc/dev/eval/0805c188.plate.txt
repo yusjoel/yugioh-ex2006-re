@@ -1,0 +1,6 @@
+Read LP slot count for card_entry's player (gP1LP[player*0x868+0xc]); if find_slot_idx_by_card_id_in_player_zones finds the card (returns >=0), decrement count by 1 and return. Used to compute equip target slot count offset: if the equip card already occupies a zone slot, available count is reduced by 1. Called by multiple equip eligibility checks (0x0805cde4, 0x0805d72c, 0x0805ded2, 0x0805def2, 0x0805ed7c, 0x0805ee42 etc.).
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id for LP lookup; ldrh[+4] bits[10:1]=card_id for zone search); r1 = u8 player_id [0..1]
+Outputs: r0 = s32 (gP1LP[player*0x868+0xc] - 1 if card found in zone; else gP1LP[+0xc])
+Side effects: none (read-only)
+Constants: PLAYER_STRIDE=0x868, LP_SLOT_COUNT_OFF=0xc, CARD_ID_BITS=bits[10:1] of [+4]

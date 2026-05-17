@@ -20,7 +20,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 566 个就绪函数 (29 批, #89..#117, 每批 20) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 546 个就绪函数 (28 批, #90..#117, 每批 20) 全部分析完毕。
 
 20/批 单 sub-agent 串行模式 (不再拆分并行):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 200 + 剩余 566 (29 批 #89..#117 / 20 每批) |
-| **下一批** | `#89` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #88, 200/766 = 26.11%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 220 + 剩余 546 (28 批 #90..#117 / 20 每批) |
+| **下一批** | `#90` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #89, 220/766 = 28.72%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**200 / 766 已分析** (26.11%, 剩余 29 批待跑 #89..#117)
+**220 / 766 已分析** (28.72%, 剩余 28 批待跑 #90..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -88,6 +88,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #86 `dbc64c6` 160/766 (20.89%) — equip set BST whitelist cluster + banlist canonical map + zone rank3 compaction
 - batch #87 `784c1bf` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
 - batch #88 `e181488` 200/766 (26.11%) — equip slot eligibility + BST tier classifier + LP sprite cluster
+- batch #89 `(pending)` 220/766 (28.72%) — equip slot eligibility + zone placement + tick display cluster
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -96,9 +97,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#88) | 200 |
-| - 剩余 (按 20/批 重组) | 566 |
-| 剩余分批数 (20/批) | 29 (`#89..#117`) |
+| - 已完成 (Phase 2 #82-#89) | 220 |
+| - 剩余 (按 20/批 重组) | 546 |
+| 剩余分批数 (20/批) | 28 (`#90..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 

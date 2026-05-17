@@ -1,0 +1,6 @@
+Scan player monster slot list and count slots meeting equip target eligibility criteria. For each slot check: (1) card_type field vs r2; (2) if r3!=0 call check_card_field5_is_nonzero; (3) if r3==7 call get_card_extended_stat_field6==0x16; if r3==8 check field6==0x17; (4) call find_effect_node_in_zone(r0, zone=0xb, slot=0x12a1), if found do not decrement count. Each eligible slot decrements r1; returns 0 if r1>0 (slots remain), 1 if none. Wrapped and called by FUN_0805c044 (0x0805c044).
+
+Inputs: r0 = u8 player_id [0..1]; r1 = s32 slot_count (decremented per eligible slot); r2 = u16 card_type_composite; r3 = u8 stat_check_mode [0=none, 7=field6_0x16, 8=field6_0x17, other=field5]
+Outputs: r0 = u32 (0=eligible slots remain; 1=all slots ineligible)
+Side effects: none (read-only scan)
+Constants: PLAYER_STRIDE=0x868, SLOTS_B=0x0201c600 (gDuelFieldSlots_B), ZONE_EQUIP=0xb, SLOT_SENTINEL=0x12a1, FIELD6_CONTINUOUS=0x16, FIELD6_EQUIP_CONT=0x17

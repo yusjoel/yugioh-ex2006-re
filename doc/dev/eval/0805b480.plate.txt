@@ -1,0 +1,6 @@
+Search activation node list for a zone slot matching the card_entry by zone_type. Extract zone_type from card_entry[+2] bits[11:6] (ldrh lsls#0x14 lsrs#0x1a), subtract 6 for switch index; out-of-range or direction-independent zone types (cases 9-15,17-18) return 0. Otherwise scan node list (bound [0x0201b290+0x4cc], node zone_type from [+0x4d4+i]): compare node zone_type with card zone_type under direction-aware switch (cases 6-8,16,19-24); if same arm, compare card_entry[+0x14]&0x1ff vs node[+0x4f4+i*4]&0x1ff; equal returns 0 (match found). Returns 1 if all nodes exhausted with no match. Called by equip activation chains (0x08056408, 0x080572cc, 0x08083560).
+
+Inputs: r0 = ptr equip_card_entry ([+2] bits[11:6]=zone_type; [+0x14]=slot_field)
+Outputs: r0 = u32 (0=matching node found; 1=no match or out-of-range zone_type)
+Side effects: none
+Constants: NODE_LIST_BASE=0x0201b290, NODE_COUNT_OFF=0x4cc, NODE_ZONE_OFF=0x4d4, NODE_SLOT_OFF=0x4f4, ZONE_TYPE_EXTRACT=bits[11:6], SLOT_MASK=0x1ff, ZONE_MIN=6

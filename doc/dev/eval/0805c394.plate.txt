@@ -1,0 +1,10 @@
+Three-stage monster zone placement eligibility check from card_entry[+2] player_id (bit0):
+(1) Read gP1LP[player*0x868+0x11c] bit17 (lsrs #0x11 ands 1); if set return 0 (placement restricted by flag).
+(2) Call count_available_monster_slots(player_id); if 0 return 0 (no free slots).
+(3) If slot_group (bits[5:1] of card[+2]) > 0xa: call find_first_available_monster_slot_for_player(player_id); if < 0 return 0 (no usable slot). slot_group <= 0xa skips check (3).
+All checks passed returns 1 (eligible). Called via function pointer in equip and monster placement eligibility chains.
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1], bits[5:1]=slot_group [0..31])
+Outputs: r0 = u32 (1=placement eligible; 0=blocked)
+Side effects: none (read-only)
+Constants: PLAYER_STRIDE=0x868, PLACEMENT_FLAG_OFF=0x11c (0x8e<<1), PLACEMENT_FLAG_BIT=bit17, SLOT_GROUP_THRESHOLD=0xa

@@ -1,0 +1,6 @@
+Cache entity ID for equip zone slot and enqueue sprite attributes. Read player_id (byte[+2] bit0) and card_id (ldrh [+0]) from card_entry, call get_node_entity_id_in_slot(player_id, card_id, zone=0xb) to get slot entity ID, write back to card_entry[+0x14]; call enqueue_equip_slot_sprite_attr(player_id, card_id, zone=0xb, mode=0) to enqueue sprite attributes. Always returns 1. Called via function pointer in equip activation display chain.
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1]; [+0]=card_id)
+Outputs: r0 = u32 (1 = entity cached and sprite enqueued, fixed)
+Side effects: card_entry[+0x14] := get_node_entity_id_in_slot result; sprite render queue: enqueue_equip_slot_sprite_attr(player_id, card_id, zone=0xb, mode=0)
+Constants: ZONE_EQUIP=0xb, ENTITY_ID_OFF=0x14, MODE=0

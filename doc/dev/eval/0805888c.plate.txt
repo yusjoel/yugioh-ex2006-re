@@ -1,0 +1,10 @@
+Equip effect activation display sequence frame driver. Reads [0x0201b290+0x4ac] state word, dispatches on 0/1/2:
+- State 0: extract card_entry[+2] player_id and slot_group, call set_field_slot_bit_with_sprite_update(bit=4), call dispatch_card_effect_activation(r5, r6); if nonzero, scan activation node list (bound [0x0201b290+0x4cc]), check [+0x4d4]=zone_type==0x19, player_id match, read card_type via map_field8_to_card_type_category; if eligible strh slot_id to r5[+8] and increment [+0x4ac].
+- State 1: read [0x0201e2a0+player*4+8] confirm flag; if confirmed (==1), write 1 to gP1LP[+0x1d68], increment [+0x4ac]; else call card_name_lookup + format_game_text_with_text_arg + invoke_card_display_op_0x31_sub1.
+- State 2: check gP1LP[+0x1d70] nonzero; if so read stored player and card, call dispatch_equip_zone_sprite_banisher_lp_row1, increment [+0x4ac], return 1; else decrement counter.
+Returns 1 on no-match guard. r5=card_entry_ptr, r6=second_ptr (scene context).
+
+Inputs: r0 = ptr equip_card_entry (r5); r1 = ptr scene_context (r6)
+Outputs: r0 = u32 (0=step advanced, 1=step not applicable or complete)
+Side effects: [0x0201b290+0x4ac] := +1; gP1LP[+0x1d68] := 1 (state 1); set_field_slot_bit_with_sprite_update bit4 (state 0); sprite queue via enqueue_sprite_attr_with_type_select (state 2); card_entry[+8] := slot_id (state 0 match)
+Constants: STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac, NODE_COUNT_OFF=0x4cc, NODE_ZONE_OFF=0x4d4, NODE_SLOT_OFF=0x4f4, CONFIRM_TBL=0x0201e2a0, LP_CONFIRMED_OFF=0x1d68, LP_BANISHER_OFF=0x1d70, PLAYER_STRIDE=0x868, ZONE_TYPE_EQUIP=0x19

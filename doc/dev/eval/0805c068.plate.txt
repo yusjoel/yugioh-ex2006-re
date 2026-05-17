@@ -1,0 +1,6 @@
+Extends scan_equip_slots_eligible_for_card (0x0805bf20) with Banisher of the Light (0x1332) pre-guard: if count_field_copies_of_card(0x1332)>0, immediately return 0 (cannot equip). Otherwise scan player monster slots with multi-condition check (card_type/field5/field6(0x16)/find_effect_node_in_zone(zone=0xb, slot=0x12a1)), decrement r1 per eligible slot; return 0 if r1>0, 1 if none. Called by multiple equip target selection chains (0x08056bc4, 0x0805d118, 0x0805f698, 0x08063600, 0x08060b18).
+
+Inputs: r0 = u8 player_id [0..1]; r1 = s32 slot_count; r2 = u16 card_type_composite; r3 = u8 stat_check_mode [0=none, other=field5/6]; sp[0] = u8 field6_check_enabled [0=skip, 1=require_0x16]
+Outputs: r0 = u32 (0=slots available; 1=none eligible)
+Side effects: none (read-only)
+Constants: BANISHER_CARD_ID=0x1332 (Banisher of the Light), PLAYER_STRIDE=0x868, SLOTS_B=0x0201c600 (gDuelFieldSlots_B), ZONE_EQUIP=0xb, SLOT_SENTINEL=0x12a1, FIELD6_CONTINUOUS=0x16

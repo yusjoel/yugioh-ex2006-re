@@ -1,0 +1,6 @@
+Extract player_id (bit0) and slot_group (bits[5:1]) from card_entry byte[+2], call check_value_in_slot_chain(player_id, slot_group, 0x0fb6) to check if sentinel 0x0fb6 is present in chain; return inverted -- if chain does NOT contain 0x0fb6 return 1 (free), if contains return 0 (occupied). Called by equip slot eligibility chain (0x0805ca80, 0x0805cb2e) to confirm target slot chain is not equip-locked.
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1], bits[5:1]=slot_group [0..31])
+Outputs: r0 = u32 (1=chain does NOT contain sentinel 0x0fb6; 0=sentinel found)
+Side effects: none
+Constants: CHAIN_SENTINEL=0x0fb6 (equip chain occupied sentinel value)

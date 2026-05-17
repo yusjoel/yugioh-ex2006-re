@@ -1,0 +1,6 @@
+Extract player_id (bit0) and slot_group (bits[5:1]) from card_entry byte[+2], call submit_equip_sprite_if_slot_eligible(player_id, slot_group) to enqueue equip zone slot sprite with mode=4. Called by equip activation chain FUN_0805663c after FUN_080563cc returns 1 (slot valid). Always returns 1 (enqueued successfully).
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1], bits[5:1]=slot_group [0..31])
+Outputs: r0 = 1 (success, always)
+Side effects: sprite render queue: submit_equip_sprite_if_slot_eligible(player_id, slot_group)
+Constants: PLAYER_BIT=bit0, SLOT_BITS=bits[5:1]

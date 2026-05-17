@@ -1,0 +1,6 @@
+Extract player_id (bit0) and slot_group (bits[5:1]) from card_entry byte[+2], call enqueue_sprite_attr_with_mode(player_id, slot_group, 0x152a, 0, mode=1) to enqueue equip zone sprite with mode=1. Always returns 1. Sibling of enqueue_equip_zone_sprite_at_slot (0x080563a4, mode=2); only difference is mode param and sprite attr constant (0x152a vs 0x0fb6).
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1], bits[5:1]=slot_group [0..31])
+Outputs: r0 = 1 (success, always)
+Side effects: sprite render queue: enqueue_sprite_attr_with_mode(player_id, slot_group, 0x152a, 0, 1)
+Constants: SPRITE_ATTR=0x152a (equip zone sprite variant), MODE=1, ZERO_FLAG=0

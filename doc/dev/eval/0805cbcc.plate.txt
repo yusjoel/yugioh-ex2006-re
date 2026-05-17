@@ -1,0 +1,6 @@
+Check Neo-Daedalus placement eligibility and player LP slot count as dual guard. Read player_id from card_entry[+2] bit0, call check_field_spell_neo_daedalus_group_placeable(player_id); if returns 0 immediately return 0 (ineligible). If passes, read gP1LP[player*0x868+0xc] (LP slot count); if 0 return 0 (no LP slots); else return 1 (both conditions met). Called by 0x08060328 as dual guard before Neo-Daedalus equip card placement.
+
+Inputs: r0 = ptr equip_card_entry (byte[+2] bit0=player_id [0..1])
+Outputs: r0 = u32 (1=Neo-Daedalus eligible AND LP count > 0; 0=either check failed)
+Side effects: none (read-only)
+Constants: PLAYER_STRIDE=0x868, LP_SLOT_COUNT_OFF=0xc

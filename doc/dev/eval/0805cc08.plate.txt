@@ -1,0 +1,6 @@
+Comprehensive equip chain zone placement eligibility check for Toon World equip cards (type_code=0x580). Check card_entry[+2] type field (0xfc0 mask) equals 0x580 (0xb0<<3); if not return 0. Call check_field_spell_neo_daedalus_group_placeable(player_id); if fails return 0. Scan activation node list ([0x0201b290+0x4cc] nodes, zone_type from [+0x4d4+i]): count nodes with zone_type==0x16 and slot high field mask 0x798000 matches 0x718000; if count != 1 return 0. For the unique matching node: call find_zone_descriptor_by_slot_id, verify zone_slot==0xe, call get_zone_slot_ptr, then check check_card_field5_is_nonzero, check_zone_slot_equip_eligible, check_card_stat_field8_is_6, check_card_has_equip_placement_type, check_toon_world_equip_present. All pass returns 1. Called via function pointer (indeg=0).
+
+Inputs: r0 = ptr equip_card_entry ([+2] type_code; bit0=player_id [0..1]; [+0x14]=slot_id)
+Outputs: r0 = u32 (1=Toon World equip zone eligible; 0=blocked)
+Side effects: none (read-only checks)
+Constants: TYPE_MASK=0xfc0 (0xfc<<4), TOON_EQUIP_TYPE=0x580 (0xb0<<3), NODE_BASE=0x0201b290, NODE_COUNT_OFF=0x4cc, NODE_ZONE_OFF=0x4d4, NODE_SLOT_OFF=0x4f4, ZONE_EQUIP_TOON=0x16, TOON_SLOT_TARGET=0xe, SLOT_FIELD_MASK=0x798000, SLOT_FIELD_MATCH=0x718000

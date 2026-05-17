@@ -1,0 +1,6 @@
+Check card_entry for direct equip (type=0x80) bit4 eligibility. Read type_code from card_entry[+2] (ldrh[+2] & 0xfc0); if not 0x80 (direct equip type) return 1 (check not applicable). If type matches: extract player_id (bit0) and slot_group (bits[5:1]), compute gP1LP[player*0x868 + 0x40 + slot_group*20], check bit4; if bit4==0 return 0 (ineligible); if bit4==1 call check_slot_card_can_be_equipped(player_id, slot_group, card_id) and return its result. Called by direct equip placement chain (0x0805ca80, 0x0805cb2e).
+
+Inputs: r0 = ptr equip_card_entry ([+2] type_code in bits[11:6]; bit0=player_id [0..1]; bits[5:1]=slot_group [0..31]; [+0]=card_id)
+Outputs: r0 = u32 (1=eligible or not direct type; 0=direct type but bit4 not set)
+Side effects: none (read-only)
+Constants: TYPE_MASK=0xfc0 (0xfc<<4), DIRECT_EQUIP_TYPE=0x80, PLAYER_STRIDE=0x868, SLOT_ENTRY_SIZE=20 (slot*0x14), BASE_OFF=0x40
