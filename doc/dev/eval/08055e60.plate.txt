@@ -1,0 +1,5 @@
+Equip card_id three-tier BST classifier (returns 0/1/2). r0 = ptr card_struct; reads u16 card_id at [r0+0] via ldrh r1,[r0,#0], classifies via binary search tree: 1=tier_a, 2=tier_b, 0=no match. Covers a narrower card_id set than classify_equip_card_id_tier_abce (0x08055cd0) with no third tier code. BST root card_id = 0x1661 (Twin Swords of Flashing Light - Tryce) at DAT_08055e7c. No push prologue; returns via bx lr.
+Inputs: r0=ptr card_struct (reads u16 card_id at [r0+0])
+Outputs: r0=tier code (0=none, 1=tier_a, 2=tier_b)
+Side effects: none
+Constants: BST_ROOT=0x1661 (Twin Swords of Flashing Light - Tryce) at DAT_08055e7c, tier_a=1, tier_b=2

@@ -1,0 +1,5 @@
+Cross-player equip slot state==7 type eligibility predicate. Used in equip target candidate selection; requires cross-player AND slot_idx <= 4 AND zone card present AND card state==7 (special activation state) AND type compatible. Flow: (1) slot_idx > 4 returns 0; (2) reads card_entry byte[+2] bit0 = card_owner; if card_owner == player_id (same side) returns 0; (3) zone table is_present + card[+8] nonzero; (4) calls get_slot_card_state_code(player_id, slot_idx), takes low 16 bits; if state != 7 returns 0; (5) calls query_slot_card_type_eligibility; returns 1 if compatible.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if cross-player slot has state==7 and is type-eligible, 0 otherwise
+Side effects: none
+Constants: SLOT_MAX=4, STATE_TARGET=7, PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

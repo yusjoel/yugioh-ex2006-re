@@ -1,0 +1,5 @@
+Enqueue equip zone card slot sprite into render queue. Called from equip target display chain. Reads card_entry byte[+2]: bit0 = player_id, bits[5:1] = slot_group [0..31] via lsls/lsrs. Then calls enqueue_sprite_attr_with_mode(r0=player_id, r1=slot_group, r2=0x0fb6, r3=2, [sp]=0) to enqueue equip zone sprite with mode=2. Always returns 1.
+Inputs: r0=ptr equip_card_entry (reads byte[+2]: bit0=player_id, bits[5:1]=slot_group [0..31])
+Outputs: r0=1 (always success)
+Side effects: sprite render queue: enqueue_sprite_attr_with_mode(player_id, slot_group, 0x0fb6, 2, 0)
+Constants: SPRITE_ATTR=0x0fb6 (4022), MODE=2, ZERO_FLAG=0

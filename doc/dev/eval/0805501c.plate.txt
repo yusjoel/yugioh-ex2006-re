@@ -1,0 +1,5 @@
+Equip slot type eligibility predicate (no slot-range guard). Unlike sibling predicates, does not enforce slot_idx <= 4 before zone lookup. Main flow: (1) reads zone table is_present for player/slot; (2) if card present, extracts zone word bits[9:2] (level) and bit18 (type_subtype); (3) combines them into a comparison value and checks against card_entry[+4] halfword level field; (4) if equal (same-type card occupies slot), calls query_slot_card_type_eligibility for final type compatibility; returns 1 if compatible, 0 otherwise.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx (unchecked, caller-validated)
+Outputs: r0=1 if slot type is eligible, 0 otherwise
+Side effects: none
+Constants: PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

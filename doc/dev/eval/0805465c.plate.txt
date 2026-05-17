@@ -1,0 +1,5 @@
+Equip slot composite validity predicate. Caller passes target card_entry ptr, player_id, and slot_idx when assigning equip card to own monster. Four-step filter: (1) slot_idx > 4 returns 0; (2) reads zone table entry for player/slot, checks word[0] bit19 (is_present flag); (3) checks halfword[+2] & 0xfc0 == 0x3c0 (type_code == 15, specific OBJ type); (4) extracts word[+0x14] bit15 (player number) and bits[14:11] (position/score code), compares against player_id and slot_idx. Returns 1 if all pass, 0 if any fail.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if slot matches type+player+score, 0 otherwise
+Side effects: none (pure predicate)
+Constants: SLOT_MAX=4, TYPE_MASK=0xfc0, TYPE_VAL=0x3c0 (type_code=15), PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

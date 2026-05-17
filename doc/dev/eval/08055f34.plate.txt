@@ -1,0 +1,5 @@
+Look up equip card score by card_id and player_id via BST table. Largest equip card classifier in this file (~800 lines). r0 = u16 card_id (scalar, NOT pointer; saved to r2 at entry via adds r2,r0,#0); r1 = player_id [0..1]. Matches card_id via BST, then selects per-player score constant via cmp r1,#0 / cmp r1,#1 branch. Builds return value via movs r0,#N; lsls r0,r0,#1 or ldr r0,DAT. Unmatched card_id or player_id > 1 falls to LAB_08056356 = movs r0,#0xd6; lsls r0,r0,#1 = 0x1ac = 428 (default score). Called by get_card_lp_cost_by_id. No push prologue; returns via bx lr.
+Inputs: r0=u16 card_id [0x0001..0x1fff] (scalar, NOT pointer), r1=player_id [0..1]
+Outputs: r0=equip_score (card_id+player_id specific; default=428=0x1ac if card_id unmatched)
+Side effects: none
+Constants: DEFAULT_SCORE=0x1ac (0xd6*2=428), BST_ROOT=0x15cf (Kiryu) at DAT_08055f70

@@ -1,0 +1,5 @@
+Equip card_id five-tier BST classifier (returns 0/1/2/3/10). r0 = ptr card_struct; reads u16 card_id at [r0+0] via ldrh r1,[r0,#0], classifies via binary search tree: 1=tier_a, 2=tier_b, 3=tier_c, 10=tier_x (special tier), 0=no match. BST root card_id = 0x1617 (Breaker the Magical Warrior) at DAT_08055edc. Covers the most tier codes among the three classify_equip_card_id_tier_* siblings. No push prologue; returns via bx lr.
+Inputs: r0=ptr card_struct (reads u16 card_id at [r0+0])
+Outputs: r0=tier code (0=none, 1=tier_a, 2=tier_b, 3=tier_c, 10=tier_x)
+Side effects: none
+Constants: BST_ROOT=0x1617 (Breaker the Magical Warrior) at DAT_08055edc, tier_a=1, tier_b=2, tier_c=3, tier_x=0xa(10)

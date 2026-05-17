@@ -1,0 +1,5 @@
+Equip slot zone-present with score-match predicate. One stage in the equip target priority filter chain: checks zone has card and score condition is met. Flow: (1) slot_idx > 4 returns 0; (2) zone table is_present + card[+8] (ATK field) nonzero; (3) reads card_entry byte[+6] & 0x1c for type_flag bits[4:2]; if 0 (no type constraint) returns 1 directly; (4) if type_flag != 0: calls get_slot_field5_score(player_id, slot_idx); returns 1 only if score == card_entry[+8] (score_threshold). Simplified variant of check_equip_slot_score_and_field6_flags (0x0805474c) with no whitelist pre-check.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if zone present + score match, 0 otherwise
+Side effects: none
+Constants: SLOT_MAX=4, FLAG_MASK=0x1c (bits[4:2] of byte[+6]), PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

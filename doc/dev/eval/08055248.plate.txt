@@ -1,0 +1,5 @@
+Equip card slot effect-value vs card-category comparison predicate. During equip selection evaluation, reads zone table for player/slot is_present and card[+8] nonzero; then calls get_slot_effect_card_value to get target slot effect value, calls get_card_effect_category to get current equip card category value; returns 1 if effect_value < category_value (equip can improve the card). r0 at entry is overwritten immediately by slot address computation and is not used as a parameter.
+Inputs: r1=player_id [0..1], r2=slot_idx (no upper bound)
+Outputs: r0=1 if slot_effect_value < card_category_value, 0 otherwise
+Side effects: none (pure predicate)
+Constants: PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

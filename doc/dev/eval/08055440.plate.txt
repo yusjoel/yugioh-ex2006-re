@@ -1,0 +1,5 @@
+Same-side equip slot type-mismatch predicate (inverted result). Used as a negative filter in equip target candidate selection: returns 1 when slot card type does NOT match the equip card expected type (i.e. slot is a viable target). Flow: (1) reads card_entry byte[+2] bit0 = card_owner; if player_id == card_owner and slot_idx == 10 (special slot), returns 0; (2) zone table is_present check; (3) extracts zone word bits[9:2] (level) and bit18 (type_subtype), combines; (4) compares with card_entry[+4] u16 bits: equal means type already matched, returns 0; not equal returns 1.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..10]
+Outputs: r0=1 if slot card type does NOT match equip card type, 0 otherwise
+Side effects: none
+Constants: SLOT_SPECIAL=10 (0xa), PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

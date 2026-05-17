@@ -1,0 +1,5 @@
+Render equip card LP cost sprite entry point. Called by equip target display logic. Extracts display_player from card_entry: byte[+2] bit0 XOR byte[+3] bit6. Then calls get_card_lp_cost_by_id to look up LP cost value for the equip card, then calls enqueue_sprite_attr_clamped(display_player, lp_cost) to enqueue the cost sprite into the render queue. Always returns 1.
+Inputs: r0=ptr equip_card_entry ([+0]=card_id u16, [+2]=player byte, [+3]=flag byte)
+Outputs: r0=1 (always success)
+Side effects: sprite render queue: enqueue_sprite_attr_clamped(display_player, lp_cost)
+Constants: BIT_PLAYER=bit0 of byte[+2], BIT_DISPLAY_FLIP=bit6 of byte[+3]

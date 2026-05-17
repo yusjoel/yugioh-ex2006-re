@@ -1,0 +1,5 @@
+Equip slot whitelist and zone-bitmap combined validity predicate. Called from equip target selection chain to confirm target monster slot satisfies equip card whitelist and has not been allocated in the slot bitmap. Flow: (1) if slot_idx <= 4, calls check_slot_card_is_equip_whitelist(player_id, slot_idx); fails if not whitelisted; (2) zone table is_present check (bit19); (3) reads card_entry[+8 + player_id*2] u16 bitmap, extracts bit at slot_idx via asrs; bit!=0 means slot already occupied, returns 0; (4) calls check_card_equip_eligible_for_slot(r3=0) for final type confirmation; returns 1 if all pass.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if whitelist pass + zone present + bitmap bit clear + type eligible, 0 otherwise
+Side effects: none
+Constants: SLOT_MAX=4, PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20, BITMAP_WORD_OFFSET=+8

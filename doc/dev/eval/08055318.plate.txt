@@ -1,0 +1,5 @@
+Equip slot same-player match and field6 vacancy predicate. Opposite of check_equip_slot_cross_player_type_eligible: requires target slot card to belong to the same side as player_id (different player_id fails). Then checks zone table is_present; if present, checks card[+8] nonzero (ATK present) and card[+6] == 0 (field6 unassigned). Both conditions satisfied returns 1. Scenario: checks for slot that can accept a second equip card after one has already been assigned.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx (no range guard)
+Outputs: r0=1 if same-player slot has ATK!=0 and field6==0, 0 otherwise
+Side effects: none
+Constants: PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

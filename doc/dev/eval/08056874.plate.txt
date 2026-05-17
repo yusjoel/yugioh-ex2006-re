@@ -1,0 +1,5 @@
+Check whether equip slot zone contains a valid card. Reads card_entry byte[+2]: bit0 = player_id, bits[5:1] = slot_idx. Computes zone table address (player_id * 0x868 + slot_idx * 20 + ZONE_BASE) and reads zone word; checks is_present bit19 via lsls r0,r0,#0x13; if clear returns -1. Then reads zone_entry[+8] (ATK field); nonzero returns 1 (card present), zero returns -1 (no card or invalid).
+Inputs: r0=ptr equip_card_entry (reads byte[+2]: bit0=player_id [0..1], bits[5:1]=slot_idx [0..31])
+Outputs: r0=1 (card present with ATK) or -1 (empty or no ATK)
+Side effects: none
+Constants: PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

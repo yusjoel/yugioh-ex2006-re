@@ -1,0 +1,5 @@
+Equip slot score and field6 flags combined validity predicate. Called during equip target priority selection; additionally checks card byte[+6] type flag bits (bits[4:2], mask 0x1c). Flow: (1) slot_idx > 4 returns 0; (2) is_present check in zone table; (3) card[+8] nonzero (has ATK/DEF); (4) card[+6] & 0x1c == 0 returns 1 immediately (no type constraint); (5) else calls get_slot_field5_score and compares with card[+8] (score_threshold), returns 1 only on exact match.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if slot passes score/flags check, 0 otherwise
+Side effects: none
+Constants: SLOT_MAX=4, FLAG_MASK=0x1c (bits[4:2] of byte[+6]), PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510

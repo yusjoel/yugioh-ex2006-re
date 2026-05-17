@@ -1,0 +1,5 @@
+Update equip slot zone flag and enqueue zone sprite. Called at end of equip activation chain; handles two paths: (1) if card_entry byte[+3] bits[5:4] == 0x20 (direct equip type), skips zone descriptor lookup and goes directly to sprite enqueue; (2) else reads card[+0x14] bits[6:0] = slot_id, calls find_zone_descriptor_by_slot_id, verifies player_id and slot_group match card_entry; if match and zone_descriptor high 16 bits != 0xffff, calls set_field_slot_bit_with_sprite_update(player_id, slot_group, bit=4, val=1); mismatch path returns -1 (rsbs r0,r0,#0). Regardless of path, calls enqueue_sprite_attr_for_zone_card_id_lookup to refresh zone sprite.
+Inputs: r0=ptr equip_card_entry (byte[+2]=player/slot, byte[+3]=type_flags, [+0x14]=slot_id, [+4]=card_type_info)
+Outputs: r0=1 (success) or -1 (player/slot mismatch)
+Side effects: set_field_slot_bit_with_sprite_update field_slot.bit4 := 1 (on match path); sprite render queue: enqueue_sprite_attr_for_zone_card_id_lookup
+Constants: TYPE_FLAG_MASK=0x30, TYPE_DIRECT=0x20, SLOT_ID_MASK=0x7f, INVALID_ZONE=0xffff, FIELD_SLOT_BIT=4

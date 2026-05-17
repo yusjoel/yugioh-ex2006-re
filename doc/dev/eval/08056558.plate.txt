@@ -1,0 +1,5 @@
+Mark current player equip activation state bit. Called during equip card activation flow; no parameters. Reads current active player_id from [gP1LifePoints + 0x1d68] (= 0x0201e248), then calls set_player_state_bit_with_sprite_update(current_player, bit=0x11=17, val=1) to set player state bit 17. Always returns 1.
+Inputs: (void)
+Outputs: r0=1 (always success)
+Side effects: player_state_word[player_id].bit17 := 1 (via set_player_state_bit_with_sprite_update)
+Constants: CURRENT_PLAYER_OFFSET=0x1d68 (from gP1LifePoints base = 0x0201c4e0), STATE_BIT=0x11=17, BIT_VAL=1

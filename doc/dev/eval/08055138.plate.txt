@@ -1,0 +1,5 @@
+Cross-player equip slot type eligibility predicate. Used during equip target selection to confirm target slot belongs to opponent and is type-compatible. Reads card_entry byte[+2] bit0 for card owner player_id; if owner == passed player_id (same side), returns 0 immediately. Then checks zone table is_present and type compatibility via query_slot_card_type_eligibility. Returns 1 when query returns 0 (compatible).
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx (caller-validated)
+Outputs: r0=1 if cross-player slot is type eligible, 0 otherwise
+Side effects: none
+Constants: PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20

@@ -1,0 +1,5 @@
+Equip slot eligibility predicate with score-cap guard. Called when selecting optimal equip target; caller passes card_entry, player_id, slot_idx. Steps: (1) slot_idx > 4 returns 0; (2) reads card byte[+2] bit0, checks player_id consistency; (3) locates zone table entry for player/slot, checks is_present and card[+8] nonzero (ATK/DEF present); (4) calls check_card_equip_eligible_for_slot to verify card type compatibility; (5) calls get_slot_field5_score, rejects if score exceeds card halfword[+0xc] (current_best_score). Returns 1 if all pass.
+Inputs: r0=ptr equip_card_entry, r1=player_id [0..1], r2=slot_idx [0..4]
+Outputs: r0=1 if slot is eligible and score not exceeded, 0 otherwise
+Side effects: none (pure predicate)
+Constants: SLOT_MAX=4, PLAYER_BLOCK=0x868, ZONE_BASE=0x0201c510, SLOT_STRIDE=20
