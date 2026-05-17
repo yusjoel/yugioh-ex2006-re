@@ -91,6 +91,8 @@ RenameFromCSV.py 行为:
 
 > **Constants 块 card_id 核实**: 若 reviewer 以"card_id 0xNNNN 无卡名"扣 R6，须查 doc/dev/data.md 核实后更新 Constants 条目为 `CARD_ID=0xNNNN (Card Name)` — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_card_id_cross_reference.md`
 
+> **R7 caller-callee inversion + plate body 同步**: 若 reviewer 发现 R7 form(b) 所列 caller 地址实为 SELF 的 callees（方向反转），须：(1) 将 R7 节改写为 form(c)（附 grep `.word 0x<SELF_ADDR+1>` not-found 证据）；(2) 搜索 plate body 含"被.*调用"/"called by"的句子并删除或改写为功能性描述，消除与 form(c) 的内部矛盾 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_callee_inversion.md`
+
 #### 3c. 重导 asm/all.s
 
 ```bash
