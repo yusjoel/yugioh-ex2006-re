@@ -1,0 +1,3 @@
+Effect action trigger with temporary card_id substitution: r0=card_slot_ptr, r1=source_struct_ptr. Writes [source_struct_ptr+0] halfword into [card_slot_ptr+0] (temporarily replacing the card_id field), then calls invoke_effect_node_action_if_found(card_slot_ptr). After return, restores [card_slot_ptr+0]=0x183e (Serial Spell). Purpose: makes the card_slot temporarily hold another card's ID during effect node lookup, then restores to the fixed Serial Spell ID (0x183e). indeg=0: no bl/b callers visible; called via runtime function pointer.
+Side effects: [card_slot_ptr+0] temporarily overwritten by [source_struct+0], restored to 0x183e.
+Constants: RESTORE_CARD_ID=0x183e (Serial Spell).

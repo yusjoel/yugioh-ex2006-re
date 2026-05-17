@@ -1,0 +1,3 @@
+Equip zone bitmap query with active flag guard: r0=slot_info_ptr (r5). Calls find_card_effect_node_entry(r5); if node is null or [node+8]==0 returns -1. When node is valid: sets [0x0201b290+0x4bc] (global active flag) to 1, calls build_equip_zone_bitmap_for_player(r0=r5), then clears active flag to 0. Compared to query_equip_zone_bitmap_with_effect_guard (0x0809066c), this function additionally maintains the +0x4bc active flag around build_equip_zone_bitmap_for_player, ensuring FUN_0810e5e8 inside the builder can recognize the "actively activating" context vs passive query. Called by ~20 duel_field functions.
+Side effects: [0x0201b290+0x4bc] temporarily set to 1 then cleared to 0.
+Constants: IWRAM_BASE=0x0201b290, ACTIVE_FLAG_OFFSET=0x4bc.

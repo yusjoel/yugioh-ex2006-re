@@ -1,0 +1,3 @@
+card-display op default fallback stub: movs r2,#0x89; lsls r2,r2,#1 yields sub_id=0x112 (=0x89*2=274), then falls into shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5 byte[2]/[3], calls trigger_card_display_op31_if_not_active(player_flag, 0x112). In card-display hub FUN_08080ea0, serves as the final fallback for the vast majority of card_id branches: all paths that do not match a specific card_id jump here via b FUN_080818dc. Also entered from dispatch_card_display_op_by_id_match on the "no match" path.
+Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
+Constants: SUB_ID=0x112 (=0x89<<1).

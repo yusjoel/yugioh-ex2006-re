@@ -1,0 +1,3 @@
+card-display op dispatch stub: loads sub_id=0x119 from literal pool into r2, jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x119). Dispatched from card-display hub FUN_08080ea0 via b branch (not bl). sub_id=0x119 exceeds 8-bit immediate range hence loaded via literal pool.
+Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
+Constants: SUB_ID=0x119.

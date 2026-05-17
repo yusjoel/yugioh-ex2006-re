@@ -1,0 +1,4 @@
+Card slot display value lookup: reads card_id from [r0+0] halfword, dispatches via a large binary search tree over ~20 special card_ids using cmp/bgt/beq, returns the card-specific display field value. Default path returns 0; special card paths return values extracted from [ptr+0xa]/[ptr+0x8]/[ptr+0x4] bit fields or [ptr+0x14] field. Called by FUN_08081900 (card-display activation flow) and over ten duel_field activation functions to supply the correct display value for card-display ops.
+Special card_ids covered: Level Up!(0x17f5), Pandemonium(0x169f), Insect Imitation(0x140b), Guardian Elma(0x164a), The Kick Man(0x1745), Ninjitsu Art of Transformation(0x1768), Inferno Reckless Summon(0x198e), Trial of the Princesses(0x19d8), Samsara(0x19da), Generation Shift(0x19dd) and others.
+Side effects: none.
+Constants: see card_id list above.

@@ -1,0 +1,3 @@
+card-display op 0x31/sub10 trigger: r0=card_slot_ptr (r5), r1=u16 field (r4, 16-bit truncated), r2=byte_hi, r3=byte_lo. Truncates r1 to u16, shifts r2 left 0x18 then right 0x8 (retains byte 2), shifts r3 left 0x18 (retains byte 3), merges r4|r2|r3 as packed argument r3. Calls dispatch_card_display_op(op=0x31, sub=0xa, r2=r5, r3=packed). Same op_0x31 trigger cluster as invoke_card_display_op_0x31_sub1/sub4/sub8; this is the sub=10 (0xa) variant. Called by equip activation evaluation functions.
+Side effects: via dispatch_card_display_op(0x31, 0xa, ...): VRAM card-display.
+Constants: OP=0x31, SUB=0xa (=10).

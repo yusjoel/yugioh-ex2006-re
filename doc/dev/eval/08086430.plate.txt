@@ -1,0 +1,3 @@
+Equip target slot eligibility check by card_id: r0=card_id, r1=effect_record_index. Reads a DWORD from the ROM effect record table (0x09e5a0c4) at r1*4 offset, extracts bits[25..13] as the record's card_id; if equal to r0 returns 1 (exact match). If r0==0x1698 (Contract with the Abyss), validates via check_card_stat_field7_equals(card_id, 2); if r0==0x1716 (Earth Chant), validates field7==5. All other cases return 0. Called by FUN_08086a80 (equip zone activation scan) as a pre-check for "does the equip target satisfy special card rules".
+Side effects: none.
+Constants: CONTRACT_WITH_ABYSS=0x1698, EARTH_CHANT=0x1716, EFFECT_TABLE_BASE=0x09e5a0c4.

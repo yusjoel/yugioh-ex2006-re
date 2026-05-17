@@ -1,0 +1,3 @@
+Scan effect zones for a valid equip target: r0=player_id (bit0), r1=target_card_id. Computes player_stride=(player_id&1)*0x868, reads zone count from gP1LifePoints+0xc. Outer loop r4=[0..zone_count-1]; for each zone reads card_id from ROM effect table 0x09e5a0c4+player_stride+zone_idx*4, compares bits[12..0] against r1 (target_card_id); on match calls check_card_targeted_by_spell_zone_effect and returns 1 (found) if it returns 0 (not already targeted). Returns 0 if no eligible target found. Called by FUN_08086a80 (equip zone activation scan).
+Side effects: none.
+Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, EFFECT_TABLE=0x09e5a0c4.

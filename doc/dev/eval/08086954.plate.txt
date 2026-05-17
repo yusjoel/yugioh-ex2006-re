@@ -1,0 +1,3 @@
+Recursive range membership test on a sorted array: checks whether the sorted array (r0=base, r1=count) contains any element E satisfying r2 <= E < r2+r3. Algorithm: iterates from index r1 toward 0; if arr[i] >= r2, checks arr[i] < r2+r3 (r3 can be narrowed by min(arr[i], r6)); if arr[i] < r2, recurses with r1-1; any match returns 1, exhausted scan returns 0. Called by FUN_08086634 (equip target eligibility evaluation): caller first pushes qualifying slot word values onto stack, then calls this function to check whether any stack array value falls in [r2..r2+r3).
+Side effects: none.
+Constants: none.

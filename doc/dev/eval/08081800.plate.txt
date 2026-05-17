@@ -1,0 +1,3 @@
+card-display op dispatch micro-stub: sets sub_id=0x88, unconditionally jumps to shared tail LAB_080818e0. The tail extracts player_flag from effect struct r5, calls trigger_card_display_op31_if_not_active(player_flag, 0x88). Dispatched from card-display hub FUN_08080ea0 for specific card_id paths.
+Side effects: via trigger_card_display_op31_if_not_active writes card-display VRAM.
+Constants: SUB_ID=0x88.

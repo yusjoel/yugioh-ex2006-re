@@ -1,0 +1,3 @@
+card-display op 0x31/sub13 trigger: r0=card_slot_ptr (forwarded as r2), r1=u32 param (forwarded as r3). Directly sets op=0x31, sub=0xd (13), r2=r0, r3=r1, and calls dispatch_card_display_op. Same op_0x31 trigger cluster as invoke_card_display_op_0x31_sub1/sub4/sub8/sub10; simplest form (no parameter packing). Called by equip activation evaluation functions.
+Side effects: via dispatch_card_display_op(0x31, 0xd, ...): VRAM card-display buffer.
+Constants: OP=0x31, SUB=0xd (=13).
