@@ -93,7 +93,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #91 `611fdb6` 260/766 (33.94%) — card-effect eligibility predicates + dispatch hub (Neo Daedalus, Light of Intervention, Ojama Trio, Zera Ritual)
 - batch #92 `a5c2cf1` 280/766 (36.55%) — equip placeability predicates + LP-delta inline fragment cluster (FUN_08064880)
 - batch #93 `6bd1650` 300/766 (39.16%) — LP-delta card-specific fragments (14 sibs) + equip tick/sprite cluster
-- batch #94 `TBD` 320/766 (41.78%) — spirit monster zone sprites + effect slot circular buffer + Black Luster Soldier dispatch
+- batch #94 `571c2c5` 320/766 (41.78%) — spirit monster zone sprites + effect slot circular buffer + Black Luster Soldier dispatch
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
