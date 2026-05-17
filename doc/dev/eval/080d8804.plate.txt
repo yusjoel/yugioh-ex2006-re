@@ -1,0 +1,6 @@
+Triggered in the duel puzzle result screen of the pack shop. Calls reset_all_bg_scroll_regs_and_shadows to clear scroll registers, then queries text row for string ID=0x13f6(5110), computes game_str_pointer_table index using IWRAM[0x2006c2c] language flag, passes the text pointer to text_overlay_create at screen pos (x=0x10, y=0x1e). Finally sets pack_ui_state[+0x10] := 1 to mark the text overlay as active.
+
+Constants:
+- STR_ID=0x13f6 (5110) // duel puzzle result text string
+- TEXT_POS=0x0010001e // x=16, y=30 pixels
+- LANG_FLAG_OFFSET=0x6c2c // IWRAM language flag byte offset

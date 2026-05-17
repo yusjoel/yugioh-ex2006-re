@@ -1,0 +1,15 @@
+Copies pack card list tile rows from ROM to BG VRAM.
+No independent APCS params; entry immediately loads ROM table address via ldr r0,DAT, spills to r10.
+Outer loop 5 iterations (r1 from 0 to 4, cmp r1,#4; bls), inner loop 2 iterations each (r6=0..1).
+Each iteration reads tile source address from ROM card gfx table (0x09e49698) and card sequence table (0x09cebf3c),
+calls tile_2d_row_copy to write rows to BG VRAM 0x06010000.
+Called by pack card list render sequence.
+
+Constants:
+- ROM_CARD_GFX_IDX = 0x09e49698 (card gfx index table)
+- ROM_CARD_GFX_A = 0x09e4969a (card gfx table A)
+- ROM_CARD_GFX_B = 0x09e49684 (card gfx table B)
+- BG_VRAM_CARD_LIST = 0x06010000 (BG VRAM card list row write base)
+- ROM_CARD_SEQ = 0x09cebf3c (card sequence lookup table)
+- OUTER_LOOP = 5 (outer 5 iters, cmp r1,#4; bls)
+- INNER_LOOP = 2 (inner 2 iters, cmp r6,#1; bls)

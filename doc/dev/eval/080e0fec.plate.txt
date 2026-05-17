@@ -1,0 +1,8 @@
+Returns the total count of Standard Challenge duel records (41).
+Function body: movs r0,#0x29; bx lr.
+Used as loop upper bound in FUN_080e0ff0 searching ROM table 0x09e5e620 (0xc bytes/entry, 41 entries).
+Also used as validity bound in switch dispatcher 080e1020 case comparisons.
+Sibling pair with get_expert_challenge_count (0x23=35) for two challenge record tables.
+
+Constants:
+- STANDARD_CHALLENGE_COUNT = 0x29 = 41

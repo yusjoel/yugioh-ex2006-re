@@ -1,0 +1,7 @@
+Called in pack shop stat display area; renders the lifetime draw count stored at IWRAM[0x02006c38] (max 0x5f5e0ff=99,999,999) as digit graphics to sprite VRAM slot r0. Calls setup_line_buf_pos_and_font(9,2), configures [0x02006ed0] font state, calls render_decimal_digits_jp twice (two digit rows), queries stat label text via game_str_id_to_row(0x138f), renders via render_text_with_u16_width, then commit_line_buffer_to_sprite_vram(r0, 0) writes to VRAM.
+
+Constants:
+- DRAW_COUNT_ADDR=0x02006c38 // IWRAM lifetime draw total (pity counter)
+- DRAW_COUNT_MAX=0x05f5e0ff // 99,999,999: display clamp
+- STR_ID=0x138f // 5007: stat label string ID
+- STATE_ADDR=0x02006ed0 // IWRAM font state struct base

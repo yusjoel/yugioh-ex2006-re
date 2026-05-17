@@ -1,0 +1,8 @@
+Pack exchange/password page state machine step 1: render text and load palette. Calls upload_pack_vram_and_palette to upload VRAM tiles and palette; setup_line_buf_pos_and_font sets text line buffer position and font; two text_render_wrapper calls render two text rows (from ROM string pointers 0x09e5e618/0x09e5e61c); write_line_buf_to_bg_tile_vram writes to BG tile VRAM (target 0x0600e000); clears BG tilemap entries 0..0x3ff; DMA copies 0x20 bytes palette from 0x09ccd290; calls apply_blend_fadeout_flat; returns 1. Item 1 in ROM dispatch table 0x09e495d8.
+
+Constants:
+- 0x09e5e618: first text row string ptr (ROM)
+- 0x09e5e61c: second text row string ptr (ROM)
+- 0x0600e000: BG VRAM tilemap target base
+- 0x000003ff: tilemap clear range 0..1023
+- 0x09ccd290: palette source data (ROM, 32 bytes)

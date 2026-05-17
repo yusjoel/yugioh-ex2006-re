@@ -1,0 +1,7 @@
+Called when player adjusts pack purchase quantity; validates that new total card count does not exceed limit 0x5fff (24575). Reads pack_info_table[slot*16+2] ratio, computes candidate total = pack_ui_state[0xdf8] + (ratio+1)*r1. If over limit, calls game_str_id_to_row(0x13f5) to find the over-limit warning text and displays it via text_overlay_create; returns 0 (fail). Otherwise returns 1 (allow purchase).
+
+Constants:
+- LIMIT_MAX=0x5fff // 24575: single purchase total card count limit
+- STR_ID=0x13f5 // 5109: purchase limit warning string
+- TEXT_POS=0x0010001e // x=16, y=30: warning text position
+- LANG_FLAG_OFF=0x6c2c // IWRAM language flag offset

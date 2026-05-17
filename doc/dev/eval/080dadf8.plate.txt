@@ -1,0 +1,8 @@
+Called every frame in pack shop page; manages countdown timer for pack entry reveal animation. If pack_ui_state[0x724] bit1 (activated flag) is 0, initializes countdown to 5 and sets bit1; each frame decrements [+0xc+0x6] counter by 1; when it reaches 0, clears bits[1:0] and returns 1 (animation done), otherwise returns 0 (still counting).
+
+Constants:
+- FLAG_OFFSET=0x724 // pack_ui_state flag byte offset (bit1 = activated)
+- TIMER_FIELD=0x6 // counter field offset within pack_ui_state+0xc
+- INIT_COUNT=5 // reveal animation frame countdown init value
+- BIT_ACTIVE=0x02 // activated flag bit1
+- BIT_PAIR=0x03 // mask to clear bits[1:0]

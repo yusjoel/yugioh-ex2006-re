@@ -1,0 +1,5 @@
+Returns vertical pixel Y coordinate for a pack icon based on direction parameter r0. r0=0 returns 0x28=40 (upper area), r0=1 returns 0x78=120 (lower area). Values >=2 use the same 0x28 path. Used in OAM attr0 Y field to position pack icons vertically on screen.
+
+Constants:
+- Y_TOP=0x28 // 40 pixels: upper pack icon Y coordinate
+- Y_BOT=0x78 // 120 pixels: lower pack icon Y coordinate

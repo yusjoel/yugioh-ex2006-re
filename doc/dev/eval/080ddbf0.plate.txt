@@ -1,0 +1,1 @@
+Single bx lr release no-op stub. Called by FUN_080ddbf8 (pack page dispatcher) when pack_slot state is 1 (not 0 or 2). Placeholder handler for pack page state machine; no side effects.

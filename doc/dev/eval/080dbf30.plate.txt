@@ -1,0 +1,4 @@
+Zeros the first OBJ VRAM row buffer group in the pack shop (0x340 halfwords = 0x680 bytes). Called by caller 0x080d4e8c on pack card slot init to clear the specified OBJ VRAM region before rendering. Function body: single bl zero_fill_halfword_wrapper with r1=0x340.
+
+Constants:
+- FILL_COUNT=0xd0<<2=0x340 // halfwords to zero per call

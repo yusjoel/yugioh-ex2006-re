@@ -1,0 +1,8 @@
+Called during pack shop detail page init; sets BG3 parameters and decompresses graphic data from ROM. Writes 0x1f0f to BG3CNT (0x0400000e) (priority=3, charbase=block3=0xC000, 16-color, mapbase=block31=0xF800, 256x256). Clears BG3 tilemap (0x0600c000, 32 halfwords). Decompresses ROM[0x09cce2b0]->VRAM[0x0600c020] (tilemap) and ROM[0x09cce2d0]->VRAM[0x0600f800] (tile data) via bios_huff_uncomp. DMA copies palette ROM[0x09cce2c0]->BG palette[0x050001c0] (0x20 halfwords).
+
+Constants:
+- BG3CNT=0x0400000e // GBA BG3 control register
+- BG3CNT_VAL=0x1f0f // priority=3, charbase=3, mapbase=31, 256x256
+- TILEMAP_BASE=0x0600c000 // BG3 tilemap VRAM start
+- TILE_BASE=0x0600f800 // BG3 tile data VRAM
+- PALETTE_DST=0x050001c0 // BG palette destination (slot 14)

@@ -1,0 +1,7 @@
+Writes 2 rows x 13 cols of halfword tile attribute data to pack shop OBJ VRAM. Called by pack slot init; r0=VRAM dst, r1=base_attr, r2=color_index. Extracts r2 low 4 bits, shifts to OBJ palette bank encoding (<<0x1c>>0x10), then writes 2x13 halfwords (inner loop cmp #0xc bls; outer loop cmp #0x1 bls), row skip 0x26 bytes.
+
+Constants:
+- COLS=13 // inner loop 0..12 (13 columns)
+- ROWS=2 // outer loop 0..1 (2 rows)
+- ROW_SKIP=0x26 // row inter-stride bytes
+- COLOR_SHIFT=0x1c // palette bank encoding shift

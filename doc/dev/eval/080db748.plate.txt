@@ -1,0 +1,7 @@
+Recomputes all three pack selection totals from scratch. Zeroes pack_ui_state[+0xc+0xa] (total selected count), [+0xc+0xc] (total price), and [+0x6f8] (global card count), then iterates over [+8] slots, reads pack_info_table for price and ratio, and re-accumulates all three fields. Called after external modification of purchase quantities to restore field consistency.
+
+Constants:
+- UI_COUNT_OFF=0xa // selected count field (halfword)
+- UI_PRICE_OFF=0xc // selected total price field (word)
+- TOTAL_CARD_OFF=0x6f8 // global selected card count (halfword; 0xdf<<3=0x6f8)
+- PACK_INFO_STRIDE=0x10 // pack_info_table entry stride (16 bytes)

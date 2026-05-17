@@ -1,0 +1,13 @@
+Per-frame animation update for a row of 8 card sprites (OAM) in the pack scene.
+Entry r0 = slot_id (saved to r8 via .hword 0x4680=mov r8,r0).
+From pack_ui_state+0x6c iterates 8 animation slot structs (0x14 bytes each):
+if [+0xc] countdown > 0, linearly interpolates x/y (via bios_div), assembles OAM attr,
+calls write_oam_entry_from_packed_args. Outer loop 8 times (r7=0..7, cmp r7,#7; bls).
+
+Constants:
+- pack_ui_state = 0x03005850
+- CARD_ROW_SUBSTRUCT_OFFSET = 0x6c (card row animation sub-struct offset in pack_ui_state)
+- SUBSTRUCT_STRIDE = 0x14 (per animation slot size)
+- ROW_COUNT = 8 (outer loop, cmp r7,#7; bls)
+- OAM_ATTR_X_BASE = 0x100 (0x80<<1; OAM attr x-coord base offset)
+- OAM_ATTR_FLAGS = 0x2000 (0x80<<6; OAM attr2 priority/palette flags)

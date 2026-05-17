@@ -1,0 +1,5 @@
+Sets bit in pack slot bitmap (base=0x020363c0) for the given slot code. r0 high 4 bits = slot index, low 4 bits = bit offset within halfword. Loads halfword at bitmap_base + slot_index*2, ORs in (1 << bit_index), writes back. Called by pack scene render loop to mark revealed/selected card slots.
+
+Constants:
+- 0x020363c0: pack slot bitmap base (IWRAM)
+- 0xf: low nibble mask (bit index within halfword, [0..15])

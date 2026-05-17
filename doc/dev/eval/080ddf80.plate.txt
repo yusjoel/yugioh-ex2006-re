@@ -1,0 +1,5 @@
+Pack exchange/password page state machine step 4: advance fadeout animation frame and clear DISPCNT when complete. Calls start_blend_fadein_with_target(r0=4) to advance fadeout; returns 1 when complete: writes DISPCNT=0 (turn off all display layers), returns 1; otherwise returns 0. Item 4 in ROM dispatch table 0x09e495d8.
+
+Constants:
+- 4: blend delta
+- DISPCNT=0x04000000: GBA display control (0x80<<0x13)

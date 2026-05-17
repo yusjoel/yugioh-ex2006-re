@@ -1,0 +1,8 @@
+Copies the medium card frame graphic for the given card (r0=icid/frame_idx) from ROM to OBJ VRAM destination (r1=VRAM dst ptr). r2=palette byte offset, r3=0 for single DMA+palette fixup; r3!=0 for 6-segment mode, each segment DMA copies 0x100 bytes + palette fixup, advancing vram dst by 0x300 bytes. In JAPAN mode (IWRAM[0x02006c2c] low 3 bits nonzero) uses alternate card_image_index entry. After copy, adds palette offset r2 to nonzero pixels.
+
+Constants:
+- CARD_IMAGE_INDEX=card_image_index // card image index table (0x095b5c00)
+- CARD_FRAME_DATA=card_medium_frame_tile_data // medium frame graphic base (0x08fbc080)
+- FRAME_SIZE_SINGLE=0x600 // 0xc0<<3 bytes: single-segment mode size
+- FRAME_SEGMENTS=6 // r3!=0: 6 segments, each 0x100 halfwords
+- LANG_FLAG=0x02000000+0x6c2c // IWRAM language flag address

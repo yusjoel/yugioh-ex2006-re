@@ -1,0 +1,7 @@
+Writes 2 rows x 17 cols of halfword tile attributes to pack shop OBJ VRAM. Called by FUN_080d71bc during pack info page OBJ layout init; r0=VRAM dst, r1=base_attr, r2=color_index. Structure symmetric to fill_pack_obj_tile_region_13col but different column count (inner loop cmp #0x10 bls -> 17 cols) and row skip (adds r3,#0x1e).
+
+Constants:
+- COLS=17 // inner loop cmp #0x10 bls -> 17 cols [0..16]
+- ROWS=2 // outer loop cmp #0x1 bls -> 2 rows [0..1]
+- ROW_SKIP=0x1e // row inter-stride bytes
+- COLOR_SHIFT=0x1c // palette bank encoding shift

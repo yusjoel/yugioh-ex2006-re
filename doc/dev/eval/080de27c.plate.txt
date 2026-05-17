@@ -1,0 +1,14 @@
+Huffman-decompresses two compressed GFX streams for the pack scene and DMA-copies palette to PAL RAM.
+First ROM stream (0x09ceb930) decompressed to OBJ VRAM 0x06004020.
+Second stream (0x09ceb938) decompressed to BG VRAM 0x0600e000.
+Then reads 0x40 bytes palette from ROM 0x09ceb934 via copy_memory_dma3_with_cpu_fallback to PAL RAM 0x050001c0 (obj palette slots 28-31).
+No parameters; called once by pack scene init path on scene entry.
+
+Constants:
+- ROM_GFX_A = 0x09ceb930 (OBJ tiles huffman compressed data pointer table entry)
+- VRAM_OBJ_DST = 0x06004020 (OBJ VRAM decompress destination)
+- ROM_GFX_B = 0x09ceb938 (BG tiles huffman compressed data pointer table entry)
+- VRAM_BG_DST = 0x0600e000 (BG VRAM decompress destination)
+- ROM_PAL = 0x09ceb934 (palette source address)
+- PAL_DST = 0x050001c0 (PAL RAM destination)
+- PAL_SIZE = 0x40 (bytes copied = 32 colors * 2 bytes)

@@ -1,0 +1,8 @@
+Variant of load_overlay_bg_tiles_to_vram: writes overlay dialog BG tile data to a different group of VRAM addresses. Fetches overlay object ptr from gPrng+0x1d0; if NULL returns immediately; uses fixed destinations 0x06010000/0x06010020/0x06010040, copies multiple 0x20-byte tile rows. Called by text_overlay_create (BG mode=0 branch) and FUN_080dd464; forms _alt pair with load_overlay_bg_tiles_to_vram (0x080dcb54).
+
+Constants:
+- gPrng+0x1d0: overlay struct ptr
+- 0x09cede5c: overlay tile source data table (ROM)
+- 0x06010000: VRAM OBJ tile slot 0 (32 bytes)
+- 0x06010020: VRAM OBJ tile slot 1 (32 bytes)
+- 0x06010040: VRAM OBJ tile slot 2 (32 bytes)

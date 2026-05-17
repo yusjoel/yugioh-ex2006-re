@@ -1,0 +1,6 @@
+Initializes pack shop card slot AOB (animation object) context from ROM pattern section data and sets attribute flags. Only caller FUN_080d50e4 (scene_pack) on pack home init; r0=sprite_id (u16, written to AOB ctx +0x10), r1=anm_variant, r2=aob_ctx_ptr. Fetches ROM ptnsect ptr from 0x09ce826c+0x1c, calls init_aob_ctx_from_ptnsect; then clears bits[2:1] of [aob_ctx_ptr+0x13] and sets bit1 (mode=1), writes sprite_id to [aob_ctx_ptr+0x10].
+
+Constants:
+- ROM_PTNSECT_TABLE=0x09ce826c // offset +0x1c = AOB ptnsect ptr
+- ATTR_CLEAR_MASK=~0x6 // clear bits[2:1]
+- ATTR_MODE_BIT=0x2 // bit1 = mode flag

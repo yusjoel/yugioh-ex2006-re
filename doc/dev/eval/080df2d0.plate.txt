@@ -1,0 +1,13 @@
+Renders ATK values of 10 pack cards as JP digit tiles and writes to BG VRAM.
+No parameters. Selects font from pack_ui_state (IWRAM 0x02006ed0 display state struct).
+Loops 10 times (r4=0..9), reads each card ATK from ROM ATK table (0x09cebf64, 0x40 bytes/entry),
+copies tile template via tile_2d_row_copy, sets position via setup_line_buf_pos_and_font,
+draws signed decimal via render_decimal_digits_jp_signed, writes row to BG VRAM 0x06012000.
+After index 9, copies one extra tail row to 0x060113a0.
+
+Constants:
+- FONT_STATE_BASE = 0x02006ed0 (IWRAM font/display state struct base)
+- ROM_PACK_ATK_TABLE = 0x09cebf64 (ROM pack ATK data table, 0x40 bytes/entry)
+- BG_VRAM_DIGITS = 0x06012000 (BG VRAM ATK digit row write base)
+- BG_VRAM_TAIL = 0x060113a0 (last row tile copy destination)
+- LOOP_COUNT = 10 ([0..9], cmp r4,#9; bls)

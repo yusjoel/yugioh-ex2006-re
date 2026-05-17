@@ -1,0 +1,7 @@
+Maps card animation type code to pack_ui_state AOB (animation object) context variant and initializes it. Only caller FUN_080d5318 (scene_pack) on card slot anim init; r0=type_code (1/2/other), r1=aob_ctx_ptr (from pack_ui_state+0x70c), r2=anm_entry_id. Maps type_code to anm_variant (0 for type=1, 1 for type=2, 2 for other), then calls init_aob_ctx_with_anm_entry(r0=aob_ctx_ptr, r1=anm_variant, r2=0).
+
+Constants:
+- TYPE_1->anm_variant=0
+- TYPE_2->anm_variant=1
+- TYPE_OTHER->anm_variant=2
+- PACK_UI_STATE_AOB_OFFSET=0x70c // pack_ui_state AOB ctx offset

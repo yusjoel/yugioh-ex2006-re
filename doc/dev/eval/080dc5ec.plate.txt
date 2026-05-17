@@ -1,0 +1,7 @@
+Copies ROM pack card palette data to OBJ palette VRAM at specified slot. 4 callers (pack shop init/page switch paths); r0=pal_slot_index ([0..0xf]). If r0>0xf skips. Computes 0x05000200+r0*0x20 as OBJ palette destination, copies 0x20 bytes (16-color palette) from ROM table 0x09ccd290 via copy_memory_dma3_with_cpu_fallback.
+
+Constants:
+- OBJ_PAL_BASE=0x05000200 // OBJ palette VRAM base
+- ROM_PAL_DATA=0x09ccd290 // ROM palette data
+- PAL_SIZE=0x20 // 32 bytes = 16 colors
+- PAL_LIMIT=0xf // valid slot range [0..15]

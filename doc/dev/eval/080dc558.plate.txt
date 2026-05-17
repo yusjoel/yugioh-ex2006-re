@@ -1,0 +1,7 @@
+Zeros two adjacent OBJ line buffer slots in pack shop BG tile VRAM, then renders label text to BG tile VRAM. Called by 11 callers during pack sub-scene init (banner/info/list); r0=bg_tile_dest, r1=text_str_ptr (may be NULL). Zeros r0 and r0+0x400 slots (0x1a0 halfwords each) via zero_fill_halfword_wrapper; if r1==0 skips text render; otherwise setup_line_buf_pos_and_font + measure_string_pixel_width + centered text_render_wrapper + write_line_buf_to_bg_tile_vram renders the label.
+
+Constants:
+- FILL_COUNT=0xd0<<1=0x1a0 // halfwords per slot zero fill
+- SLOT_STRIDE=0x80<<3=0x400 // two-slot gap
+- X_CENTER_BASE=0x68 // centering: (0x68-width)/2
+- RENDER_ATTR=0x107 // text render color attr

@@ -1,0 +1,4 @@
+Zeros the second OBJ VRAM row buffer group in the pack shop (0x340 halfwords = 0x680 bytes). Called by caller 0x080d4e48 on pack slot second-path init to clear the target OBJ VRAM region. Structure is fully symmetric to zero_fill_pack_obj_vram_row_a (0x080dbf30), differing only in caller.
+
+Constants:
+- FILL_COUNT=0xd0<<2=0x340 // halfwords to zero

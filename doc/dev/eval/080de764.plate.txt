@@ -1,0 +1,10 @@
+Renders pack card thumbnail grid to OBJ VRAM.
+r0=data_src_ptr, r1=packed_xy1 (lo16=x1, hi16=row_count), r2=packed_xy2 (lo16=x2, hi16=col_stride), r3=step_count.
+First calls zero_fill_halfword_wrapper to clear target VRAM buffer.
+Then iterates in 2D loop over card grid, reading each card tile ID from EWRAM card data (0x0200af20),
+writing tile data to OBJ VRAM 0x06008040 region.
+Outer loop by row (hi16 of r2), inner loop by column (hi16 of r1).
+
+Constants:
+- EWRAM_CARD_GRID = 0x0200af20 (EWRAM card grid data start)
+- OBJ_VRAM_GRID = 0x06008040 (OBJ VRAM card grid write region)

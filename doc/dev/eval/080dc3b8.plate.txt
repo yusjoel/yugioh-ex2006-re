@@ -1,0 +1,8 @@
+Copies card tile row data (second field offset) from ROM to pack shop OBJ VRAM slot, optionally copying palette. Only caller pack_list_page_init (0x080d971c). Structure fully symmetric to load_pack_card_tile_row_to_obj_vram (0x080dc378); differs only in ROM pointer table offset [r1,#0x10] (vs #0x8), and tile_2d_row_copy parameters 2x2 (vs 4x2).
+
+Constants:
+- OBJ_VRAM_BASE=0x06010000
+- ROM_TILE_TABLE=0x09ce822c // offset +0x10 = second field
+- ROM_PAL_TABLE=0x09ce824c // offset +0x10
+- OBJ_PAL_BASE=0x05000200
+- PAL_LIMIT=0xf

@@ -1,0 +1,4 @@
+Zeros pack info page OBJ VRAM large region (0x440 halfwords = 0x880 bytes). Called by caller 0x080d715c when switching pack info page; clears corresponding OBJ VRAM region to remove previous frame residual. Function body: r1=0x88<<3=0x440, bl zero_fill_halfword_wrapper, void return.
+
+Constants:
+- FILL_COUNT=0x88<<3=0x440 // halfwords to zero (= 0x880 bytes)

@@ -1,0 +1,9 @@
+Checks if the card corresponding to given internal card ID (icid) has stock > 0.
+Calls internal_card_id_to_card_id to convert icid to cid, then indexes EWRAM+0x6 stock byte table
+(base 0x02000006) by cid*2, reads one byte, takes low 4 bits.
+Returns 1 if nonzero (has stock), 0 otherwise.
+Used by pack scene bulk filter loops to find purchasable/selectable cards.
+
+Constants:
+- EWRAM_STOCK_BASE = 0x02000006 (stock byte table base, halfword aligned per cid, cid*2 index)
+- STOCK_MASK = 0xf (low 4 bits = stock quantity field)

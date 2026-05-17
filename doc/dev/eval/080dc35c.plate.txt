@@ -1,0 +1,6 @@
+Writes 2 rows x 17 cols of palette-bank-encoded halfword tile region to specified VRAM address (leaf function, no push/pop). Only caller FUN_080d71bc on pack info page init, r0==1 branch calls this. r1 is encoded via lsls r1,r1,#0x1c; lsrs r1,r1,#0x10, then written as fixed halfword value; r2 at entry is immediately overwritten by movs r2,#0x0 (local row counter, not APCS parameter). Symmetric to fill_pack_obj_tile_region_17col (0x080dc32c).
+
+Constants:
+- COLS=17 // inner loop cmp #0x10 bls -> [0..16]
+- ROWS=2 // outer loop cmp #0x1 bls -> [0..1]
+- ROW_SKIP=0x1e // row inter-stride bytes

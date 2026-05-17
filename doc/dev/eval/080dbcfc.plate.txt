@@ -1,0 +1,7 @@
+In pack shop card slot display, renders card name string to OBJ VRAM sprite line buffer and returns width in tiles. Caller selects VRAM target slot before calling; r0=VRAM dst, r1=card name string ptr, r2=render_mode. Calls select_charset_then_load_name for the string (charset from IWRAM language flag [0x02000000+0x6c2c]), then setup_line_buf_pos_and_font sets font context. Branches on r4(=r2): mode==0 renders color-0, mode==2 small text, mode==3 large text, mode>3 uses 0x100|r6 attr. Finally text_render_wrapper writes to line buffer, commit_line_buffer_to_sprite_vram flushes to VRAM. Returns r7 = (pixel_width+8)>>3 (tile width).
+
+Constants:
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // charset/language flag
+- FONT_CTX=0x02006ed0 // font context base
+- OBJ_ATTR_BASE=0x00008108 // OBJ attribute constant
+- TILE_WIDTH_SHIFT=3 // pixel->tile: (w+8)>>3

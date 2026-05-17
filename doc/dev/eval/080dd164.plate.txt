@@ -1,0 +1,7 @@
+Renders overlay object as a stretched OAM sprite sequence. r0=scroll_x_offset, r1=scroll_y_offset. Fetches overlay object from gPrng+0x1d0; validates [+0x18] reference; computes OAM column distribution via binary search for POT level from [+0x10] width field; calls write_oam_entry_from_packed_args per column to write OAM attributes. Returns immediately if overlay uninitialized or has no data. Called by FUN_080dd748 when BG mode=0.
+
+Constants:
+- gPrng+0x1d0: overlay struct ptr
+- gPrng+0x1bc: overlay active flag
+- 0x09e49558: overlay tile/frame data table (ROM)
+- 0x0000ffff: empty tile marker

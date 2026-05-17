@@ -1,0 +1,9 @@
+Writes pack card tile row data (fifth field, extended) in multi-row mode to OBJ VRAM, optionally copies palette. Only caller FUN_080d50e4 (scene_pack) on pack home init. r0=card_slot_index (VRAM offset slot*32), r1=palette slot. Fetches ROM tile ptr from 0x09ce822c+0x1c (fifth field), calls write_tile_rows_to_vram_by_mode(r0=VRAM_dst, r1=tile_ptr, r2=8_cols, r3=6_rows, [sp]=0x10_rows). If r1<=0xf DMA copies palette.
+
+Constants:
+- OBJ_VRAM_BASE=0x06010000
+- ROM_TILE_TABLE=0x09ce822c // offset +0x1c = fifth field
+- ROM_PAL_TABLE=0x09ce824c // offset +0x1c
+- OBJ_PAL_BASE=0x05000200
+- MODE_ROWS_SP=0x10 // stack parameter row_count_mode
+- TILE_COLS=8; TILE_ROWS=6

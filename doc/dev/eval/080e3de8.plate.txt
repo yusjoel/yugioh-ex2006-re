@@ -1,0 +1,12 @@
+Counts total duel puzzle victories for a given category (r0=category, 0=Expert/1=Standard).
+Base: EWRAM 0x02006e60; iterates 27 (0x1b) 4-byte battle records.
+Each record bits[19:10] contribute base win count; category==0 also adds bits[31:22]
+and bits[15:6] from EWRAM+0x6e62.
+Returns r0 = sum of all win counts.
+Called by switch dispatchers 080e1020/080e17bc cases to check unlock conditions.
+
+Constants:
+- EWRAM_BATTLE_RECORDS = 0x02006e60 (battle puzzle record table base)
+- EWRAM_BATTLE_B = 0x02006e62 (supplemental battle field base)
+- RECORD_COUNT = 0x1b = 27 (loop count: movs r4,#0x1a; subs r4,1; bge)
+- RECORD_STRIDE = 4 (4 bytes per record, adds r3,#4)

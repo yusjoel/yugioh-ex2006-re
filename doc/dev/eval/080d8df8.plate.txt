@@ -1,0 +1,8 @@
+Computes pixel X coordinate for a pack slot in the horizontal scroll area based on pack_visible_count and slot index r0. When pack_visible_count==5 uses wide spacing: base=0x2b00, step=0x2680; otherwise uses narrow: base=0xba00/(count+1), step=0x1b00. Result X = (base + index * step) >> 8, distributing pack icons evenly across screen width.
+
+Constants:
+- WIDE_BASE=0x2b00 // 5-pack mode base offset (0xac<<6)
+- WIDE_STEP=0x2680 // 5-pack mode step (0x9a00/4)
+- NARROW_DIVISOR=0xba00 // non-5-pack numerator
+- NARROW_BASE_ADD=0x1b00 // non-5-pack base addend (0xd8<<5)
+- SHIFT=8 // final result right shift 8 bits to pixels

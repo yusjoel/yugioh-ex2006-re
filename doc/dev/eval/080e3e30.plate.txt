@@ -1,0 +1,10 @@
+Counts how many puzzles starting at stage_start have been cleared (bit0=1) within count entries.
+r0=stage_start (starting puzzle index), r1=count (number to check). Returns 0 if count==0.
+Base: EWRAM 0x02006c3c; reads each 4-byte record from [base + stage_start*4],
+checks bits[1:0]==1 (cleared flag), accumulates count into r4.
+Returns cleared puzzle count. Called by switch dispatcher cases comparing result to fixed thresholds.
+
+Constants:
+- EWRAM_PUZZLE_FLAGS = 0x02006c3c (puzzle clear flag array base, 4 bytes/entry)
+- CLEARED_FLAG_MASK = 0x3 (extract bits[1:0])
+- CLEARED_VALUE = 0x1 (bit0=1 means cleared)

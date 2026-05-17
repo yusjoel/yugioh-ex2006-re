@@ -1,0 +1,7 @@
+In the pack shop scene, writes 4 icon sprite OAM entries for the pack slot at direction index r0. Increments and wraps pack_ui_state[+0xc+0x24] frame animation index (0..4), looks up tile ID from animation frame table (0x09e49508), then calls write_oam_entry_from_packed_args for 4 OAM entries (icon body x3 + border x1). Exit via pop{r0}; bx r0, r0 has no semantic.
+
+Constants:
+- ANIM_TABLE=0x09e49508 // pack icon animation frame tile table
+- OAM_ATTR0_BASE=0x00700090 // 1st OAM entry attr0+attr1
+- ANIM_FRAME_MAX=5 // animation frame count (0..4)
+- OAM_ATTR2_MASK=0x0000a000 // 0xa0<<8: OAM attr2 (1st entry)

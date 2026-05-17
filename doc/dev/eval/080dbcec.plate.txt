@@ -1,0 +1,4 @@
+Identical function to zero_fill_pack_obj_vram_region (0x080dbbb0): calls zero_fill_halfword_wrapper(r0, 0xc00) to zero 6 KB of OBJ VRAM. Differs only in caller -- comes from FUN_080d4de4 (pack banner init function) which computes the pack banner OBJ VRAM region target address.
+
+Constants:
+- ZERO_COUNT=0xc00 // 0xc0<<4: number of halfwords to zero (= 6 KB)

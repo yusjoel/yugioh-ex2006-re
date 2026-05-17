@@ -1,0 +1,10 @@
+Given pack ID r1 and card internal ID r0 (icid), checks if the card matches the filter type for pack_ui_state filter r1. Dispatches via switch(r1-0x2d): case 0x2d/0x2e checks card_stats_table[icid] attribute field for 0 or 1 (attribute filter); case 0x2f checks card type enum (==3 returns 1); case 0x30/0x31 checks race field (==0x17 or 0x16 returns 1); case 0x32 unconditionally returns 1. Default returns 0. Used by callers iterating pack cards to count matching cards.
+
+Constants:
+- FILTER_BASE=0x2d // 45: minimum filter pack_id
+- ATTR_DARK=0 // case 0x2d: card attribute == 0 (DARK)
+- ATTR_LIGHT=1 // case 0x2e: card attribute == 1 (LIGHT)
+- TYPE_RITUAL=3 // case 0x2f: card type == 3 (Ritual)
+- RACE_AQUA=0x17 // case 0x30: card race == 0x17 (Aqua, =23)
+- RACE_WARRIOR=0x16 // case 0x31: card race == 0x16 (Warrior, =22)
+- CARD_STATS_STRIDE=0xb // card_stats_table entry stride (11 halfwords)

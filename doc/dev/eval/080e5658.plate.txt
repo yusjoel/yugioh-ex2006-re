@@ -1,0 +1,13 @@
+Configures pack scene alpha blend registers and installs per-frame palette callback.
+Writes 0x3b44 to BLDCNT (0x04000050), writes 0x041b to BLDALPHA (0x04000052),
+then writes 0x080e5619 (THUMB addr of cursor palette update fragment after FUN_080e560a)
+to gPrng+0x1f4 (per-frame callback slot).
+Called by two blend-tagged paths (0x080e7cda, 0x080e7d56) when entering pack preview UI.
+
+Constants:
+- BLDCNT = 0x04000050 (blend control register)
+- BLDALPHA = 0x04000052 (blend alpha coefficient register)
+- BLDCNT_VAL = 0x3b44 (enable BG2/BG3/OBJ as 1st target, BG0/BG1 as 2nd target, alpha blend)
+- BLDALPHA_VAL = 0x041b (eva=0x1b/32, evb=0x04/32)
+- CALLBACK_PTR = 0x080e5619 (per-frame cursor palette update THUMB entry)
+- GPRNG_CALLBACK_SLOT = gPrng+0x1f4 (per-frame callback function pointer slot)

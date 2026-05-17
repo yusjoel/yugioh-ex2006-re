@@ -1,0 +1,8 @@
+Formats pack card stat byte as text and renders it right-aligned to OBJ VRAM sprite line buffer. Called by pack info page (callers game_str_080d715c and game_str_080d90f8) when displaying card stat info. Uses game_str_id=0x13ef for first string row and 0x138f for suffix; reads stat byte from pack_ui_state+0x18, calls format_decimal_byte_to_buf, appends suffix via append_text_to_buf_end, sets up font at x=0x11, renders main and second color layers via text_render_wrapper, then right-aligns at x=0x82-pixel_width with two more renders; finally commit_line_buffer_to_sprite_vram outputs to r10's OBJ VRAM address.
+
+Constants:
+- GAME_STR_ID_VALUE=0x13ef // stat value format string ID
+- GAME_STR_ID_SUFFIX=0x138f // suffix string ID
+- X_OFFSET=0x11 // render start x
+- X_RALIGN_BASE=0x82 // right-align base: x = 0x82 - pixel_width
+- FONT_IDX=2

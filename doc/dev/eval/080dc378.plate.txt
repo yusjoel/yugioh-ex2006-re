@@ -1,0 +1,8 @@
+Copies card tile row data from ROM to pack shop OBJ VRAM at specified slot, and optionally copies the palette. r0=card_slot_index (VRAM offset r0<<5, written to 0x06010000+r0*32), r1=pal_slot_index. Calls tile_2d_row_copy (4x2 tiles) with tile ptr from ROM_TILE_TABLE[+0x8]; if r1<=0xf, DMA copies ROM palette [0x09ce824c+0x8] (0x20 bytes) to 0x05000200+r1*0x20.
+
+Constants:
+- OBJ_VRAM_BASE=0x06010000 // OBJ tile VRAM base
+- ROM_TILE_TABLE=0x09ce822c // ROM card tile pointer table
+- ROM_PAL_TABLE=0x09ce824c // ROM card palette table
+- OBJ_PAL_BASE=0x05000200 // OBJ palette VRAM base
+- PAL_LIMIT=0xf // r1 > 0xf skips palette copy

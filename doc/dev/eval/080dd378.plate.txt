@@ -1,0 +1,7 @@
+Copies overlay tile row data to destination address and appends palette data. r0=dst VRAM addr, r1=tile_row_index. Multiplies row index by 4 to get offset, looks up 0x09cede60 ROM table to fetch source tile row ptr, calls copy_bytes_by_halfword to copy 0x20 bytes of tile data; then appends 0x10 bytes from 0x09ccd292 palette data via copy_memory_dma3_with_cpu_fallback. Called by text_overlay_create and multiple overlay display functions.
+
+Constants:
+- 0x09cede60: overlay tile row pointer table (ROM), 4 bytes per ptr
+- 0x09ccd292: overlay palette/attribute data (ROM)
+- 0x20: tile row data size (32 bytes)
+- 0x10: palette/attribute block size (16 bytes)

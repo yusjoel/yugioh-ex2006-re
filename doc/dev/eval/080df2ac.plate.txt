@@ -1,0 +1,9 @@
+Inline exit fragment: writes parent-frame sp[0] pack selection result to pack_ui_state+0xe, returns 1.
+No independent push/pop; inherits parent function 080de924 stack frame.
+Parent stores pack type code at sp[0] on entry; this fragment reads it via .hword 0x466a (mov r2,sp) + ldrh,
+writes to pack_ui_state+0xe (selection result field), then runs parent-frame epilogue.
+Triggered when parent function 080de924 switch has [pack_ui_state+2] > 5 (0x080de93e bl site).
+
+Constants:
+- PACK_UI_STATE_BASE = 0x0300585c (= pack_ui_state + 0xc, sub-struct offset)
+- PACK_SELECT_FIELD = +0x2 (strh target = pack_ui_state+0xe, pack selection result field)

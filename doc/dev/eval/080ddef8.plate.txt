@@ -1,0 +1,7 @@
+Pack exchange/password page state machine step 3: handle input and update selection cursor OAM. Reads gPrng+0x148 (key state field) bit7=0x80 -> A confirm, bit6=0x40 -> B cancel. A key: sets [pack_ui_state+0xc+0x2]=1 (selected); B key: clears to 0. Uses [+0x2] state (0/1) to choose cursor size (0x10/0x20 pixels) and calls write_oam_entry_from_packed_args to write cursor OAM. Re-reads gPrng+0x148: bit0=1 -> step complete (return 1); bit1=2 -> sets [+0x4] bit0 then return 1; else return 0. Item 3 in ROM dispatch table 0x09e495d8.
+
+Constants:
+- gPrng+0x148: input key state field (IWRAM)
+- 0x80: A key pressed mask
+- 0x40: B key pressed mask
+- 0x10/0x20: cursor OAM height pixel values

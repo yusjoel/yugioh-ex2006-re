@@ -1,0 +1,13 @@
+Renders current pack name text and price digits to OBJ VRAM / sprite line buffer.
+Reads pack count from pack_ui_state (capped at 0x5f5e0ff), selects font via font_jp_base_table,
+calls render_decimal_digits_jp for quantity, then render_text_with_u16_width for pack name string.
+Calls zero_fill_halfword_wrapper to clear OAM tile region, commit_line_buffer_to_sprite_vram to commit.
+Finally writes tile index sequence (10 slots x 2 rows) to OAM map region 0x0600f8e8.
+Entry r0 is an offset (stored to r8 via .hword 0x4680); no other explicit APCS params.
+
+Constants:
+- pack_ui_state = 0x03005850 (IWRAM pack scene state base)
+- PACK_COUNT_OFFSET = 0x6c38 (pack count field offset within pack_ui_state)
+- MAX_PACK_COUNT = 0x5f5e0ff (count clamp upper bound)
+- OAM_TILE_BUF = 0x0600f8e8 (OAM tile map write region)
+- STR_ID_PACK_NAME = 0x0000138f (pack name string ID)

@@ -1,0 +1,4 @@
+Zeros OBJ VRAM region specified by caller-set r0 via zero_fill_halfword_wrapper. No parameters; r1 is fixed at 0xc0<<4=0xc00 (0xc00 halfwords = 6 KB). Called before pack graphic switch to clear old graphic data and prevent visual artifacts.
+
+Constants:
+- ZERO_COUNT=0xc00 // 0xc0<<4: number of halfwords to zero (= 6 KB)

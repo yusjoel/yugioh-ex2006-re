@@ -1,0 +1,7 @@
+Writes tile index sequence for pack name display region to OAM. r0=OAM dst ptr, r1=tile start index, r2=palette index (low 4 bits). Computes r5=(r2&0xf)<<12 as OAM attr2 palette field mask, then writes 2 rows x 9 tiles to OAM: outer loop 2 (rows), inner loop 9 (cols), each strh r5|r4 to [r3], r4 increments tile index; row gap 0x2e bytes between rows.
+
+Constants:
+- TILES_PER_ROW=9 // 9 tiles per row (inner loop 0..8)
+- ROWS=2 // 2 rows (outer loop)
+- ROW_GAP=0x2e // row end pointer skip (bytes)
+- PAL_SHIFT=12 // palette index at attr2 bit[15:12]

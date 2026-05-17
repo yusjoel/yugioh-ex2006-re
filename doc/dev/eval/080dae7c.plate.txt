@@ -1,0 +1,7 @@
+Returns total card count for the given pack slot ID r0. For r0 in [0x2d..0x32] (45..50) reads from pack_ui_state+0xc internal fields ([+0x26]..[+0x30]); outside this range reads pack_info_table[r0*16+4] standard count. Input r0 is clamped to [0..50]. Used as base data for pack list scroll and OAM layout calculations.
+
+Constants:
+- PACK_ID_MAX=0x32 // 50: max pack ID (clamp)
+- CASE_MIN=0x2d // 45: special pack ID lower bound
+- UI_FIELD_BASE=0x26 // pack_ui_state+0xc first special count field offset
+- PACK_INFO_CARD_COUNT_OFF=4 // card count field offset in pack_info_table entry

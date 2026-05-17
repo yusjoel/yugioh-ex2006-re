@@ -1,0 +1,5 @@
+Renders overlay object as a tiled OAM sprite sequence (supports multiple rows and columns). Packed parameters: r0=packed xy (y<<16|x), r1=packed wh (height<<16|width), r2=packed attrs (palette<<16|tile_base), r3=ctx_ptr. Unpacks parameters, looks up POT level from 0x09e49558 tile frame table, calls write_oam_entry_from_packed_args per row per col. Called by multiple pack/scene render functions.
+
+Constants:
+- 0x09e49558: overlay tile frame data table (ROM)
+- 0x0000ffff: empty tile sentinel

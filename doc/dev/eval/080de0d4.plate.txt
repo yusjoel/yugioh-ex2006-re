@@ -1,0 +1,9 @@
+Computes OAM attr0 y-coord field for a pack preview slot (r0=slot_index [0..2]).
+Clamps index to 2 if out of range.
+Formula: y = slot*5 << 4 + 8 = slot*80 + 8 (pixel y), return 32-bit packed value 0x920000 | y16.
+Multiple pack card-slot draw functions call this with fixed constants 0/1/2.
+
+Constants:
+- SLOT_Y_STEP = 80 (per-slot y spacing)
+- SLOT_Y_BASE = 8 (first slot y offset)
+- OAM_ATTR_HIGH = 0x920000 (attr0/attr2 upper field: flip+size flags)

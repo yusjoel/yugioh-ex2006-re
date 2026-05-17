@@ -1,0 +1,7 @@
+Copies pack palette data from ROM to BG palette VRAM for slot index 0/1/2. r0=slot_index, clamped to 2 if out of range. Computes target 0x05000200+slot*0x20, copies 32 bytes from ROM table 0x09cebf30 (pack palette per-slot entry) via DMA. Then copies 16 additional bytes from 0x09ccd292 to 0x05000202+slot*0x20. Called by pack scene init on slot 0/1/2 transitions.
+
+Constants:
+- 0x05000200: GBA BG palette area start (pack slot 0)
+- 0x09cebf30: pack palette data table (ROM, 0x20 bytes per slot)
+- 0x09ccd292: supplementary palette/attribute data (ROM, 0x10 bytes)
+- 0x20: palette slot size (32 bytes = 16 colors)

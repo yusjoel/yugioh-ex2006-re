@@ -1,0 +1,7 @@
+Called by pack_list_page_init during pack shop page init. Iterates all visible pack slots (pack_visible_count), for each slot with count > 0 renders the stock number to BG tile VRAM. First zeros two OBJ VRAM regions (0x06017ac0 and 0x06017ac0+0x400) and IWRAM state bytes ([0x02006ed0+0x15], [+0x08], [+0x14]), then sets up font_jp config and calls render_decimal_digits_jp x2 (two digit rows), finally write_line_buf_to_bg_tile_vram commits to BG.
+
+Constants:
+- OBJ_VRAM_BASE=0x06017ac0 // digit graphic OBJ VRAM start
+- OBJ_VRAM_STRIDE=0x400 // second region offset (0x80<<3=0x400)
+- STATE_ADDR=0x02006ed0 // IWRAM font state struct base
+- TILE_BASE_HALFWORD=0x8002 // digit tile render parameter

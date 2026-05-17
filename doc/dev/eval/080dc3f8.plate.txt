@@ -1,0 +1,8 @@
+Copies card tile row data (third field offset) from ROM to pack shop OBJ VRAM slot, optionally copying palette. Only caller FUN_080d733c (pack banner page render). Structure symmetric to siblings; reads offset [r1,#0xc] (third field), tile_2d_row_copy parameters 4x4 tiles.
+
+Constants:
+- OBJ_VRAM_BASE=0x06010000
+- ROM_TILE_TABLE=0x09ce822c // offset +0xc = third field
+- ROM_PAL_TABLE=0x09ce824c // offset +0xc
+- OBJ_PAL_BASE=0x05000200
+- PAL_LIMIT=0xf

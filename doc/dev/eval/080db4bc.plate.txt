@@ -1,0 +1,6 @@
+Single-frame driver for pack shop scene fadein animation on entry. Writes 0x0800 to DISPCNT (0x04000000) to keep only BG3 visible, then calls start_blend_fadein_with_target with delta=4 to advance fadein by one frame. When fadein completes (returns 1), clears DISPCNT to 0 and returns 1; otherwise returns 0. Symmetric counterpart to tick_pack_fadeout_step (0x080db428).
+
+Constants:
+- DISPCNT=0x04000000 // GBA display control register
+- DISPCNT_BG3_ONLY=0x0800 // bit11=BG3 enable
+- BLEND_DELTA=4 // blend step per frame

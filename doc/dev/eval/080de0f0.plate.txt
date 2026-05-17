@@ -1,0 +1,11 @@
+Computes pack slot OAM tile index and attr word from (r0=tile_x, r1=size_mode).
+size_mode=3: appends 0x30000 (priority/palette flag); size_mode=2: returns fixed tile 0x20000.
+Otherwise if tile_x==5 takes special path; else generates r1*5+r0+1 as tile index.
+Used for multi-size pack display scene OAM config.
+Callers typically read x/y from pack_ui_state animation sub-struct [+0] and [+2] signed shorts.
+
+Constants:
+- OAM_PRIO3_MASK = 0x30000 (size_mode=3 high flag)
+- OAM_PRIO2_MASK = 0x20000 (size_mode=2 high flag)
+- OAM_ALT_TILE_BASE = 0x10000 (tile_x==5 special path flag)
+- TILE_X_SPECIAL = 5 (tile_x value triggering special path)

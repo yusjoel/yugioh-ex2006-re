@@ -1,0 +1,6 @@
+Single-frame driver for pack shop fadeout animation on exit. Writes 0x0800 to DISPCNT (0x04000000) to keep only BG3 visible, then calls tick_blend_step_by_delta with delta=4 to advance blend fadeout by one frame. Returns 1 if fadeout complete; otherwise 0.
+
+Constants:
+- DISPCNT=0x04000000 // GBA display control register
+- DISPCNT_BG3_ONLY=0x0800 // bit11=BG3 enable, all other bits clear
+- BLEND_DELTA=4 // blend step per frame

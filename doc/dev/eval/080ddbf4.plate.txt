@@ -1,0 +1,1 @@
+Single bx lr release no-op stub. Called by FUN_080ddbf8 (pack page dispatcher) on second state check, condition symmetric to return_void_pack_page_stub_a. Another placeholder handler for pack page state machine; no side effects.

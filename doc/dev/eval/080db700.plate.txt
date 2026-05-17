@@ -1,0 +1,7 @@
+Called when player decreases purchase quantity for a pack slot. r0=slot_index, r1=delta. Reads pack_info_table[slot_id*16] for unit price (r2) and ratio (r3). Subtracts r1 from pack_ui_state[+0xc+0xa] (selected count), subtracts price*delta from [+0xc+0xc] (selected total price), subtracts (ratio+1)*delta from pack_ui_state[0xdf8] (global card count). Symmetric counterpart to increment_pack_slot_selection_count (0x080db6b8).
+
+Constants:
+- PACK_INFO_STRIDE=0x10 // pack_info_table entry stride (16 bytes)
+- UI_COUNT_OFF=0xa // selected count field
+- UI_PRICE_OFF=0xc // selected total price field
+- TOTAL_CARD_OFF=0xdf8 // global selected card count field

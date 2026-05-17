@@ -1,0 +1,6 @@
+Pack exchange/password page state machine step 2: enable display layers and advance fadein by one frame. Writes 0x1100 to DISPCNT (0x04000000) to enable BG0+BG1+OBJ layers; calls tick_blend_step_by_delta(r0=4) to advance fadein; returns 1 when animation complete, 0 while in progress. Item 2 in ROM dispatch table 0x09e495d8.
+
+Constants:
+- DISPCNT=0x04000000: GBA display control register (0x80<<0x13)
+- 0x1100: DISPCNT write value (BG0+BG1+OBJ enable; 0x88<<5=0x1100)
+- 4: tick_blend_step_by_delta delta

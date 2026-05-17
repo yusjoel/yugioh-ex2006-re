@@ -1,0 +1,6 @@
+Decomposes a packed GBA 15-bit color value into R/G/B channels and computes channel max/mid values. r0=packed color (GBA RGB555: bit[4:0]=R, bit[9:5]=G, bit[14:10]=B). Extracts three channels, finds max, uses bios_div to compute interpolation ratio if two channels are equal; writes results to r2/r3 output slots. Called by color interpolation functions for overlay fade effects.
+
+Constants:
+- 0x1f: GBA color channel 5-bit mask
+- 0x3e0=0xf8<<2: G channel mask (bits[9:5])
+- 0x7c00=0xf8<<7: B channel mask (bits[14:10])

@@ -1,0 +1,14 @@
+Formats the card name for a given internal card ID (icid) into a destination buffer
+by selecting a format template based on EWRAM game mode flags.
+r0=dst_buf (pointer; skips if null), r1=icid.
+Reads EWRAM+0x6c2c low 3 bits (mode flags 0..5), selects one of 5 ROM format string tables.
+Calls card_name_lookup_by_internal_id to get name string, then expand_format_text_to_buf to write to dst.
+
+Constants:
+- EWRAM_GAME_FLAGS = 0x02006c2c (game mode flags field address)
+- GAME_MODE_MASK = 0x7 (low 3 bits = mode index [1..5])
+- ROM_FORMAT_TABLE_1 = 0x09dcae7a (mode=1 format string base)
+- ROM_FORMAT_TABLE_2 = 0x09dd6804 (mode=2)
+- ROM_FORMAT_TABLE_3 = 0x09de2b74 (mode=3)
+- ROM_FORMAT_TABLE_4 = 0x09def018 (mode=4)
+- ROM_FORMAT_TABLE_5 = 0x09dc0094+0x0003ab4e (mode=5 offset)

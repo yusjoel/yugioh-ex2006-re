@@ -1,0 +1,9 @@
+Batch copies tile data for 3 cards from ROM to OBJ VRAM, optionally copying palette. Only caller pack_list_page_init (0x080d971c); r0=ptr to array of 3 OBJ attr halfwords, r1=sprite_col_index. Loops 3 times (r5 0..2): reads OBJ attr halfword, *0x20 for VRAM offset, fetches ROM tile ptr from [0x09ce822c+0x14]+r5*0x80, calls tile_2d_row_copy(2x2). After loop, if r6<=0xf DMA copies palette from [0x09ce824c+0x14] to 0x05000200+r6*0x20.
+
+Constants:
+- ROM_TILE_TABLE=0x09ce822c // offset +0x14 = fourth field
+- ROM_PAL_TABLE=0x09ce824c // offset +0x14
+- OBJ_VRAM_BASE=0x06010000
+- OBJ_PAL_BASE=0x05000200
+- CARD_COUNT=3 // loop cmp r5,#2 bls -> [0..2]
+- TILE_SLOT_STRIDE=0x80 // per-card tile slot interval

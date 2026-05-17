@@ -1,0 +1,8 @@
+Sets r0=1 (success return code) then falls through to FUN_080e560a common exit.
+This function and FUN_080e560a share the same machine code segment --
+080e5608 has only "movs r0,#0x1", then unconditionally falls through to
+FUN_080e560a stack restore sequence (add sp,#8; pop; pop; bx r1).
+Called by large pack scene event handler FUN_080e3ee8 switch cases via bl to signal success.
+
+Constants:
+- PACK_HANDLER_SUCCESS = 0x1 (operation success flag)

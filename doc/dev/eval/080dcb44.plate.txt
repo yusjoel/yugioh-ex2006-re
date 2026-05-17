@@ -1,0 +1,6 @@
+Reads halfword field at offset +0x2 from the specified pack_info_table entry. r0=pack_index; function shifts by *16 to get entry offset, loads halfword at +0x2 and returns it. Callers use the result as a bitfield: one caller compares to 5 (random path), another extracts low 4 bits as a sub-field.
+
+Constants:
+- pack_info_table: pack info table base (ROM 0x09e5e2e8)
+- 0x10: pack_info entry size (16 bytes)
+- +0x2: halfword field offset within entry

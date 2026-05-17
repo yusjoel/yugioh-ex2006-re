@@ -1,0 +1,7 @@
+Copies text overlay dialog BG tile data from ROM to VRAM and configures BG display parameters. r0=(height<<16)|width defines dialog size; fetches current overlay object ptr from gPrng+0x1d0; reads BG field and BGxCNT register to determine tile/map base; calls copy_memory_dma3_with_cpu_fallback multiple times to write tile rows to VRAM; finally zero_fill_halfword_wrapper clears boundary. Called by text_overlay_create and FUN_080dd464 as BG init phase.
+
+Constants:
+- gPrng+0x1d0: current overlay object ptr (IWRAM overlay struct ptr)
+- 0x09cede5c: overlay BG tile source data table base (ROM)
+- BG0CNT=0x04000008: BG0 control register
+- 0x000003ff: tilemap entry count (1023 tiles)

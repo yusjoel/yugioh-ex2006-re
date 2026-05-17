@@ -1,0 +1,11 @@
+Encodes pack slot index (0-7) as packed OAM attr value.
+r0 = slot_index [0..7], clamped to 7 if out of range.
+Computes y-coord: slot_index << 0x14 + 0xe400000 -> extract high to screen y.
+Computes x-coord: fixed base 0xc0<<0xe = 0x0300000.
+Returns r0 = (x_attr << 16) | y_attr packed OAM attribute pair.
+Called by multiple scene_pack render functions to determine OAM sprite x/y attrs.
+
+Constants:
+- 0x7: slot_index upper bound (clamp to 7)
+- 0xe4<<0xe = 0x0390000: OAM y base offset
+- 0xc0<<0xe = 0x0300000: OAM x base (fixed)

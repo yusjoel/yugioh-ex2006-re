@@ -1,0 +1,9 @@
+Sets BG horizontal/vertical scroll register offsets for overlay object. r0=scroll_x, r1=scroll_y. Fetches overlay ptr from gPrng+0x1d0; reads BG index from overlay flags bits[7:6]; computes BGxHOFS/BGxVOFS register offsets; writes computed scroll values; also reads BGxCNT tile/map base and writes back modified BGxCNT, sets DISPCNT BG bit. Called by FUN_080dd748 when BG mode != 0.
+
+Constants:
+- gPrng+0x1d0: overlay struct ptr
+- BG0HOFS=0x04000010: BG0 horizontal scroll
+- BG0VOFS=0x04000012: BG0 vertical scroll
+- BG0CNT=0x04000008: BG0 control
+- DISPCNT=0x04000000: display control
+- 0x0000fffc: BGxCNT mask (clear tile base bits)

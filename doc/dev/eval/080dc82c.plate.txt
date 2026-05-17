@@ -1,0 +1,7 @@
+Looks up pack name string from pack sequence number and creates a text overlay layer. Only caller pack_080d9c38 (font_jp; game_str; pack) on pack scene switch; r0=pack_index. Reads pack_info_table[r0*16+8] for game_str_id, calls game_str_id_to_row, computes string pointer via game_str_pointer_table + language flag; finally calls text_overlay_create(bg_tile_base=0x06010000, str_ptr, 0, {0x10, 0x1e}) to display pack name.
+
+Constants:
+- PACK_INFO_STRIDE=0x10 // pack_info_table entry stride (16 bytes)
+- PACK_STR_OFFSET=0x8 // game_str_id field offset in entry
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // language flag
+- OVERLAY_PARAMS={w=0x10, h=0x1e} // text overlay size parameters
