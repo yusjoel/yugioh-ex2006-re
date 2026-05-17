@@ -1,0 +1,3 @@
+Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x161d, Des Koala). Reads LP count from gP1LifePoints + (1-r2)*0x868 + 0x0c, then computes LP*400 via the shift chain: (((LP<<1+LP)<<3)+LP)<<4 = LP*400 (python: ((((1<<1)+1)<<3)+1)<<4 == 400). Writes the negated scaled value to [r7 + (1-r2)*4], then branches to LAB_080655d6.
+Side effects: [r7 + (1-r2)*4] := -(lp_count * 400) (LP-proportional equip effect delta).
+Constants: CARD_ID=0x161d (Des Koala), lp_scale=400 (python: ((((1<<1)+1)<<3)+1)<<4 == 400), player_stride=0x868, lp_state_offset=0x0c.

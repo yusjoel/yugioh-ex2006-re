@@ -1,0 +1,3 @@
+Called by count_hand_cards_by_field6 (0x08033e70) and check_spell_zone_slot_placeable (0x0803bc24). First calls check_spell_zone_slot_placeable to verify spell zone placement legality; if it passes, extracts player_id from slot byte[+0x2] and inverts it to get the opponent side, then calls count_hand_cards_by_field6 (field6=7) to check whether the opponent hand contains a card matching field6=7. Returns 2 if hand count > 0; returns 1 if spell zone is placeable but no matching hand card.
+Side effects: no external writes.
+Constants: hand_field6_type=7 (movs r1,#0x7).

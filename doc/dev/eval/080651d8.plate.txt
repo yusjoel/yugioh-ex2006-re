@@ -1,0 +1,3 @@
+Inline code fragment entry point inside FUN_08064880, branched to by equip effect dispatch switch (CARD_ID=0x14e0, Dragon's Gunfire). Loads r1 from r8 (value=1 from parent frame), subtracts r6 to get delta player index, shifts left 2 bits then branches to LAB_080651dc. Shared path stores fixed value 0xfffffce0 (-800) into [r7 + delta*4], then branches to FUN_080655da.
+Side effects: [r7 + (r1-r6)*4] := 0xfffffce0 (-800, equip LP delta).
+Constants: LP_DELTA=-800 (0xfffffce0), CARD_ID=0x14e0 (Dragon's Gunfire).

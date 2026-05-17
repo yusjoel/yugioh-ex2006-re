@@ -1,0 +1,3 @@
+Called by check_field_spell_neo_daedalus_group_placeable (0x0803bb7c). Checks the opponent's (relative to slot player_id) monster zone activation field and field spell placement conditions: reads gP1LifePoints + opp_player_id*0x868 + 0x10; if zero returns 0 immediately; otherwise calls check_field_spell_neo_daedalus_group_placeable with the opponent player_id to verify the field spell series condition. Returns 1 if both pass; returns 0 otherwise.
+Side effects: no external writes.
+Constants: player_stride=0x868, opp_zone_active_offset=0x10.

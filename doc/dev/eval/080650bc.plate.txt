@@ -1,0 +1,3 @@
+Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x118a, Ameba). Computes own-side player_id offset as r6<<2 then branches to LAB_080653ee which writes the LP delta for the own side to gDuelFieldOutput and continues to FUN_080655da shared tail. Two-instruction fragment; symmetric counterpart of write_equip_lp_delta_by_opponent_side (opponent side).
+Side effects: [r7 + r6*4] := LP delta value determined by LAB_080653ee path.
+Constants: CARD_ID=0x118a (Ameba).

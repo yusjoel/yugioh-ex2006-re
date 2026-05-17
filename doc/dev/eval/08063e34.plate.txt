@@ -1,0 +1,3 @@
+Called by eval_equip_chain_score_for_slot (0x0803a9a8). Checks that the current gDuelFieldState (0x0201bb90) equip chain is inactive and the score has not exceeded the threshold: reads [gDuelFieldState+0x8] to confirm no chain active; reads player_id from [+0x4] and zone_idx from [+0x20], locates the corresponding slot in gDuelFieldSlots (0x0201c510); verifies that slot[+0x8] (ATK) is nonzero; then calls eval_equip_chain_score_for_slot (r0=player_id, r1=zone_idx). Returns 1 if score <= 3 (within threshold); returns 0 if score exceeds threshold or any pre-check fails.
+Side effects: no external writes.
+Constants: player_stride=0x868, gDuelFieldState=0x0201bb90, gDuelFieldSlots=0x0201c510, score_threshold=3.

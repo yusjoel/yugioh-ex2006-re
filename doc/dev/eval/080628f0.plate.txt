@@ -1,0 +1,3 @@
+Checks whether the field spell zone for the side indicated by the slot structure is activated. Reads player_id from byte[slot+0x2] bit0, then checks gP1LifePoints + player_id*0x868 + 0x10 for the own-side field spell activation field; if 0, also checks the opponent side at +0x0c. Returns 1 if either field is nonzero; returns 0 if both are zero.
+Side effects: no external writes.
+Constants: player_stride=0x868, field_spell_active_offset=0x10, field_spell_alt_offset=0x0c.

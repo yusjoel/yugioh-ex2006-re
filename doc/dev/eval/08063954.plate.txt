@@ -1,0 +1,3 @@
+Called by FUN_0807d014 (tags: card_frame, card_ids, card_stats, duel_field, font_jp, game_str, settings). Comprehensively validates the equip card slot target: verifies slot type field (low 3 bits of ldrh[+0x2]) equals 0x480, slot[+0x14] is nonzero; then checks gDuelFieldState (0x0201bb90) attacking_side and attacking_slot fields against slot player_id and zone_idx, and confirms no_chain_flag is 0; finally locates the corresponding slot in gDuelFieldSlots (0x0201c510) and checks ATK/DEF are both nonzero. Returns 1 if all checks pass; 0 if any fail.
+Side effects: no external writes.
+Constants: SPELL_ZONE_TYPE=0x480 (0x90<<3), player_stride=0x868, gDuelFieldState_base=0x0201bb90, gDuelFieldSlots_base=0x0201c510.

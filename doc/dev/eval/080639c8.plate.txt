@@ -1,0 +1,3 @@
+Called by count_monster_slots_by_state (0x08032e80) and get_card_extended_stat_field6 (0x080eedf8). Comprehensively checks whether an equip slot can match the corresponding monster state: verifies slot[+0x2] upper nibble zone_type is in range [0x1f..0x21]; reads associated monster slot info from slot[+0x14] and validates ATK_mode/player_id match; calls get_card_extended_stat_field6 to obtain the card special attribute; then calls count_monster_slots_by_state to count matching monster zones. Returns 1 if all conditions pass; returns 0 otherwise.
+Side effects: no external writes.
+Constants: ZONE_TYPE_MIN=0x1f, ZONE_TYPE_MAX=0x21, player_stride=0x868, gDuelFieldSlots=0x0201c510, stat_table_offset=0x10b0, rsbs_val=-1.

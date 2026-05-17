@@ -1,0 +1,3 @@
+Called by count_paired_slots_with_field5_default (0x08032c94). Routes to a different field5 paired card table based on slot[+0x0] card_id: 0x1988 (Burst Return) maps to 0x18a7 (Elemental Hero Burstinatrix); 0x198a (Bubble Illusion) maps to 0x18f9 (Elemental Hero Bubbleman). Calls count_paired_slots_with_field5_default to check whether a paired slot exists. Returns 1 if paired count > 0; returns 0 otherwise.
+Side effects: no external writes.
+Constants: CARD_ID_BURST_RETURN=0x1988 (Burst Return), CARD_ID_BURSTINATRIX=0x18a7 (Elemental Hero Burstinatrix), CARD_ID_BUBBLEMAN=0x18f9 (Elemental Hero Bubbleman), CARD_ID_BUBBLE_ILLUSION=0x198a (Bubble Illusion).

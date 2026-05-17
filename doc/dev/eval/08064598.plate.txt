@@ -1,0 +1,3 @@
+Called by check_card_field5_is_nonzero (0x0804ad48). Verifies that the equip target slot (zone_type=0x580, 0xb0<<3) has an associated card with nonzero field5: checks slot type field against 0x580; reads slot[+0x14] to obtain associated monster data and verifies bit22 (facing flag) matches slot player_id; locates the corresponding monster slot in gDuelFieldSlots and reads the card_id (bits[12:0]); calls check_card_field5_is_nonzero to verify field5 attribute. Returns 1 if all checks pass; 0 otherwise.
+Side effects: no external writes.
+Constants: TARGET_ZONE_TYPE=0x580 (0xb0<<3), player_stride=0x868, facing_bit=bit22, stat_table_offset=0x10b0.

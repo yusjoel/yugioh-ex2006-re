@@ -1,0 +1,3 @@
+Called by check_slot_card_can_be_equipped (0x08033730) and check_field_spell_neo_daedalus_group_placeable (0x0803bb7c). Checks whether the card in the given slot satisfies the equip conditions for the Neo-Daedalus field spell series: first calls check_field_spell_neo_daedalus_group_placeable to evaluate field state, then extracts player_id and zone_idx from the slot and calls check_slot_card_can_be_equipped for concrete equip legality. Returns 1 if both predicates pass; returns 0 otherwise.
+Side effects: no external writes.
+Constants: none (all function calls + register ops).

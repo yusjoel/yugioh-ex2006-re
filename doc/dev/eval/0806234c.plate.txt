@@ -1,0 +1,3 @@
+Called by check_monster_slot_accepts_card (0x0803352c) to determine whether the controlling side of the given slot (bit0 of slot[+0x2]) has at least one monster zone that accepts the card. Reads the player_id bit from the slot control byte, inverts it, then iterates zone indices [0..4] calling check_monster_slot_accepts_card for each. Returns 1 immediately if any zone accepts; returns 0 if all reject.
+Side effects: no external writes; pure read-only predicate.
+Constants: max_slot_idx=4 (cmp r4,#0x4), check_monster_slot_accepts_card=0x0803352c.

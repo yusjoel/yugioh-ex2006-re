@@ -1,0 +1,3 @@
+Inline code fragment entry point inside FUN_08064880, branched to directly by the equip effect dispatch switch (card_type=0x13a8, Woodland Sprite). Computes the opponent player_id as (1-r6), shifts left by 2 to get word-aligned offset, then jumps to LAB_080651ac which stores the fixed LP delta 0xfffffe0c (-500) into [r7 + offset] and branches to FUN_080655da (shared tail). Does not return; effect is delivered entirely via side effect.
+Side effects: [r7 + (1-r6)*4] := 0xfffffe0c (-500, equip card LP deduction delta).
+Constants: LP_DELTA=-500 (0xfffffe0c), CARD_ID=0x13a8 (Woodland Sprite).

@@ -1,0 +1,3 @@
+Called by count_hand_cards_by_field6 (0x08033e70). Validates the revival/special summon condition for the current slot: first calls count_hand_cards_by_field6 (field6=0x16) to confirm the opponent hand contains a matching card; if none, returns 0 immediately. If a matching card exists, reads gP1LifePoints + player_id*0x868 + 0x0c to check the own-player monster zone control field; returns 1 if zero (condition met), otherwise returns 0.
+Side effects: no external writes.
+Constants: hand_field6_type=0x16, player_stride=0x868, zone_state_offset=0x0c.

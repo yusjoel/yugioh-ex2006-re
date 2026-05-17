@@ -1,0 +1,3 @@
+Called by count_equip_slots_with_active_chain (0x0802f61c) to determine whether the current slot can hold an equip spell. First compares the candidate card pointer r1 card_id against the slot card_id -- if equal, returns 0 (no self-equip). Then checks slot type field (ldrh [+0x2] & 0xfc0): for type 0x480 (spell zone) or 0x4c0 (effect zone), calls count_equip_slots_with_active_chain to verify chain; otherwise checks byte[+0x3] bits[5:4] status bits. Returns 1 if placeable, 0 if occupied or chain conflict, 2 if chain slot available.
+Side effects: no external writes.
+Constants: SPELL_ZONE_TYPE_A=0x480 (0x90<<3), SPELL_ZONE_TYPE_B=0x4c0, equip_chain_card=0x1318 (Ring of Magnetism), status_bits_mask=0x30.

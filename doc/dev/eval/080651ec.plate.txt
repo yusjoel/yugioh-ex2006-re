@@ -1,0 +1,3 @@
+Inline code fragment entry point inside FUN_08064880, branched to by the equip effect dispatch switch. Computes opponent player_id (1-r6), shifts left 2 bits and adds r7 to get the output address; reads ATK from slot[+0x8] via r4 (caller-frame slot pointer), negates it via rsbs r1,r4,#0, then stores -ATK into the output address and branches to FUN_080655da. Delivers -ATK as the equip effect LP delta for the opponent side.
+Side effects: [r7 + (1-r6)*4] := -slot_atk (equip effect LP delta based on target ATK negation).
+Constants: none.

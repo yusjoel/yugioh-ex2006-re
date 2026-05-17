@@ -1,0 +1,3 @@
+Called by get_slot_effect_card_value (0x0803149c) to read the equip effect value for the current slot and write it into the slot structure. Extracts player_id (bit0) and zone_idx (bits[6:1]) from byte[slot+0x2], calls get_slot_effect_card_value to retrieve the value, then stores it with strh into slot[+0xc]. Returns 1 if effect_value > 0; returns 0 otherwise.
+Side effects: [slot_ptr+0xc] := effect_value (u16, equip effect value).
+Constants: none.
