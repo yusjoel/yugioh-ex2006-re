@@ -1,0 +1,5 @@
+Fuhma Shuriken equip effect (card_id 0x16cc): writes fixed value -700 into the target player LP delta slot. Target player index is (r8 - r6) where r8=parent_player_id and r6=equip_owner_player_id; entry .hword 0x4643 = mov r3,r8 reads parent frame r8. Dispatched from FUN_08064880 on card_id 0x16cc.
+
+Constants:
+- CARD_ID_FUHMA_SHURIKEN = 0x16cc (Fuhma Shuriken)
+- LP_DELTA_FUHMA_SHURIKEN = 0xfffffd44 = -700 (fixed LP penalty)

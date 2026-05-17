@@ -1,0 +1,5 @@
+The Agent of Judgment - Saturn equip effect (card_id 0x173f): computes max(0, opponent_LP - own_LP), negates it, and writes into the opponent LP delta slot. Loads both LP values from gP1LifePoints[player_idx*0x868], subtracts; clips to 0 if negative; negates via rsbs. Net effect: opponent loses the amount by which their LP exceeds own LP; no effect if own LP >= opponent LP.
+
+Constants:
+- CARD_ID_SATURN = 0x173f (The Agent of Judgment - Saturn)
+- PLAYER_STRIDE = 0x868 (gP1LifePoints player offset stride)

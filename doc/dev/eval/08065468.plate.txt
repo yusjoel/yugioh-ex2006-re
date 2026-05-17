@@ -1,0 +1,7 @@
+Granadora equip effect (card_id 0x163f): checks the equipped card's position bits (bits[5:4] of [r4+0x3]); if == 0x10 (attack position) writes +1000 into own LP delta slot, otherwise writes -2000. Dispatched from FUN_08064880 on card_id 0x163f.
+
+Constants:
+- CARD_ID_GRANADORA = 0x163f (Granadora)
+- POSITION_ATK = 0x10 (attack position, bits[5:4] of card flags byte)
+- LP_DELTA_ATK_BONUS = 0x3e8 = +1000 (own gain when attack position)
+- LP_DELTA_DEFAULT = 0xfffff830 = -2000 (own penalty otherwise)

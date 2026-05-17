@@ -1,0 +1,5 @@
+Minar equip effect (card_id 0x11bc): calls get_slot_field5_score to get the field5 score of the equipped slot, negates it, and writes the result into the opponent player's LP delta slot. Dispatched from FUN_08064880 when card_id matches 0x11bc. Side effect: writes -(field5_score) into r7[opponent_idx*4]; accumulated upstream as opponent LP penalty.
+
+Constants:
+- CARD_ID_MINAR = 0x11bc (Minar)
+- gEquipEffectCtx = 0x0201bb90 (equip effect context base)

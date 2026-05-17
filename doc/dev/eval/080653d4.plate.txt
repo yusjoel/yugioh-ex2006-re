@@ -1,0 +1,5 @@
+Blasting the Ruins equip effect (card_id 0x16dc): writes fixed value -3000 into the opponent LP delta slot. No card stat query; uses literal DAT_080653e4 = 0xfffff448 (-3000). Opponent index computed as (1 - equip_owner_player_id). Dispatched from FUN_08064880 on card_id 0x16dc.
+
+Constants:
+- CARD_ID_BLASTING_THE_RUINS = 0x16dc (Blasting the Ruins)
+- LP_DELTA_BLASTING = 0xfffff448 = -3000 (fixed LP penalty)

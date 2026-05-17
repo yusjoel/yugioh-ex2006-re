@@ -1,0 +1,5 @@
+Greed equip effect (card_id 0x1802): calls scan_equip_node_pool_for_card_score to get a packed score word (high_score<<8 | low_score), multiplies each byte by 500 via shift arithmetic (n*31*4 + n = n*125; *4 = *500), negates, and writes into both player LP delta slots (r7[0] for player 0, r7[4] for player 1). Dispatched from FUN_08064880 on card_id 0x1802.
+
+Constants:
+- CARD_ID_GREED = 0x1802 (Greed)
+- LP_DELTA_PER_SCORE_UNIT = 500 (each score unit costs 500 LP)

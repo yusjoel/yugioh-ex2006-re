@@ -1,0 +1,8 @@
+Equip chain link sprite attr enqueue: checks if the current chain node's activation phase matches the incoming chain node, and if the slot activation flag is set; if both conditions hold, encodes a chain link counter (+1 or +2 depending on player_id match) into a halfword and calls enqueue_sprite_attr_with_mode(player, slot, mode=3, encoded_link). Extracts player_id (bit0) and slot_idx (bits[6:2]) from chain_node[+0x2]; locates gDuelFieldSlots entry via slot_idx*20 + player_idx*0x868. Returns 0 in all paths. Called via function pointer; callgraph indeg=0.
+
+Constants:
+- PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+- gDuelFieldSlots = 0x0201c510 (equip zone base)
+- CHAIN_LINK_COUNTER_OFFSET = 0x1cbc (gP1LifePoints chain link counter)
+- PLAYER_ID_FIELD_OFFSET = 0x1cb8 (gP1LifePoints player_id field)
+- SPRITE_MODE = 3 (chain link sprite enqueue mode)

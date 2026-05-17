@@ -1,0 +1,8 @@
+Iterates equip slots 5..8 and builds a target bitmap, then enqueues a type11 sprite attr. For each slot, checks opponent slot card_id against Swords of Revealing Light (0x1102) and own slot activation flag [+0x8]; if both match, sets the corresponding bit in bitmap r6. After loop, calls query_equip_target_bitmap_default to filter; if bitmap nonzero, reads LP fields and calls enqueue_sprite_attr_type11. Entry inherits parent frame r8/r9/r10 as constants (PLAYER_STRIDE/0x1102/gDuelFieldSlots base). Called via function pointer; callgraph indeg=0.
+
+Constants:
+- CARD_ID_SWORDS_OF_REVEALING_LIGHT = 0x1102 (filter target)
+- PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+- gDuelFieldSlots = 0x0201c510 (equip zone base)
+- SLOT_STRIDE = 0x14 (20 bytes per slot)
+- EQUIP_SLOT_START = 5 (loop from slot 5 to slot 8)

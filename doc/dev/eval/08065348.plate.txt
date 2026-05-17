@@ -1,0 +1,6 @@
+KA-2 Des Scissors (0x174a) or Needle Burrower (0x174b) equip effect: calls get_card_extended_stat_field5 to get the equipped card's field5 value, multiplies by 500 via five-step shift arithmetic (lsls/subs/lsls/adds/lsls), negates, and writes into the opponent LP delta slot. Dispatched from FUN_08064880 on either card_id.
+
+Constants:
+- CARD_ID_KA2_DES_SCISSORS = 0x174a (KA-2 Des Scissors)
+- CARD_ID_NEEDLE_BURROWER = 0x174b (Needle Burrower)
+- LP_DELTA_PER_FIELD5 = 500 (opponent loses 500 LP per field5 point)

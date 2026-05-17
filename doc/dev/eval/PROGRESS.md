@@ -8,7 +8,7 @@
 ## 总目标 vs 当前目标
 
 - **总目标**: ROM 内所有函数完成分析 (~4539 个 callgraph distinct addresses; 当前已命名 2000 / 全 CSV 3646 行 = 54.85%)
-- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 20 fns 每批, **单 sub-agent 串行模式**, 已完成批次 #82-#84 (40/批模式, 120 fns), 剩余 33 批 `#85..#117` (20/批))
+- **当前阶段目标**: 处理 `doc/dev/eval/ready_batches.json` 中**锁定的 766 个就绪函数** (按地址相邻分 20 fns 每批, **单 sub-agent 串行模式**, 已完成批次 #82-#93 (120+180 fns), 剩余 24 批 `#94..#117` (20/批))
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **锁定策略**: 766 集合不动态刷新; 每批落地后不重新计算 ready, 下一轮再批量找 ready
 - **模式切换** (2026-05-16): 4×10 并行 → **20/批单 sub-agent**。Phase 2 内已完成 120 函数 (#82-#84 40/批模式), 剩余 646 函数按 20/批分 33 批 (#85..#117)。
@@ -20,7 +20,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 486 个就绪函数 (25 批, #93..#117, 每批 20) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 466 个就绪函数 (24 批, #94..#117, 每批 20) 全部分析完毕。
 
 20/批 单 sub-agent 串行模式 (不再拆分并行):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 280 + 剩余 486 (25 批 #93..#117 / 20 每批) |
-| **下一批** | `#93` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #92, 280/766 = 36.55%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 300 + 剩余 466 (24 批 #94..#117 / 20 每批) |
+| **下一批** | `#94` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #93, 300/766 = 39.16%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**280 / 766 已分析** (36.55%, 剩余 25 批待跑 #93..#117)
+**300 / 766 已分析** (39.16%, 剩余 24 批待跑 #94..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -92,6 +92,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #90 `60ddde0` 240/766 (31.33%) — equip eligibility + zone field state predicate cluster (form(c) indeg=0 heavy)
 - batch #91 `611fdb6` 260/766 (33.94%) — card-effect eligibility predicates + dispatch hub (Neo Daedalus, Light of Intervention, Ojama Trio, Zera Ritual)
 - batch #92 `a5c2cf1` 280/766 (36.55%) — equip placeability predicates + LP-delta inline fragment cluster (FUN_08064880)
+- batch #93 `PENDING` 300/766 (39.16%) — LP-delta card-specific fragments (14 sibs) + equip tick/sprite cluster
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -100,9 +101,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#92) | 280 |
-| - 剩余 (按 20/批 重组) | 486 |
-| 剩余分批数 (20/批) | 25 (`#93..#117`) |
+| - 已完成 (Phase 2 #82-#93) | 300 |
+| - 剩余 (按 20/批 重组) | 466 |
+| 剩余分批数 (20/批) | 24 (`#94..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 
@@ -111,7 +112,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2200** | **1446** | **60.34%** |
+| **全 CSV** | **2300** | **1346** | **63.08%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

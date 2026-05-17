@@ -1,0 +1,7 @@
+Atomic Firefly (0x174e) and Kozaky's Self-Destruct Button (0x18d7) equip effect: extracts bit18 of card node [r4+0x14] as target_player_id (via lsls #0xd; lsrs #0x1f), then writes -1000 into that player's LP delta slot. Both card_ids share this handler via dispatch from FUN_08064880.
+
+Constants:
+- CARD_ID_ATOMIC_FIREFLY = 0x174e (Atomic Firefly)
+- CARD_ID_KOZAKY_SDB = 0x18d7 (Kozaky's Self-Destruct Button)
+- LP_DELTA = 0xfffffc18 = -1000 (fixed LP penalty)
+- BIT18_SHIFT_MASK = lsls #0x0d; lsrs #0x1f (extracts bit18 as target player index)

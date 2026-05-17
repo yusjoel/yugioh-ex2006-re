@@ -1,0 +1,9 @@
+Single-frame driver for the equip chain Banisher of the Light sprite state machine. Reads state from gDuelFieldState+0x4a0 and dispatches: state==0x80: calls tick_duel_field_zone_sprite_update_pipeline(player, card_id, 3); returns 0x7f. state==0x7f: calls check_value_in_slot_chain for chain slot 11; if valid calls increment_lp_bar_display_counter; returns 0x7e. state==0x7e: gets node entity_id, finds slot, calls dispatch_equip_zone_sprite_banisher_of_the_light and enqueue_sprite_attr_for_chain_node_match; returns 0x7e. Other states or failed checks return 0. Called via function pointer; callgraph indeg=0.
+
+Constants:
+- gDuelFieldState = 0x0201b290 (duel field state base)
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- STATE_PUSH_ZONE_SPRITE = 0x80
+- STATE_CHECK_CHAIN_SLOT = 0x7f
+- STATE_DISPATCH_BANISHER = 0x7e
+- CHAIN_SLOT_11 = 0xb

@@ -1,0 +1,6 @@
+Marshmallon equip effect (card_id 0x1770): reads current_player_id from global equip effect context (gEquipEffectCtx+0x0), then writes -1000 into that player's LP delta slot (r7[player_id*4]). Target player is given directly by context; no node attribute computation needed. Dispatched from FUN_08064880 on card_id 0x1770.
+
+Constants:
+- CARD_ID_MARSHMALLON = 0x1770 (Marshmallon)
+- gEquipEffectCtx = 0x0201bb90 (equip effect context base; [+0x0] = current_player_id)
+- LP_DELTA_MARSHMALLON = 0xfffffc18 = -1000 (fixed LP penalty)

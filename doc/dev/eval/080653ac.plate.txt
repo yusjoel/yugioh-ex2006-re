@@ -1,0 +1,5 @@
+Inferno equip effect (card_id 0x16c5): writes fixed value -1500 into the opponent LP delta slot. No card stat query; uses literal DAT_080653bc = 0xfffffa24 (-1500). Opponent index computed as (1 - equip_owner_player_id). Dispatched from FUN_08064880 on card_id 0x16c5.
+
+Constants:
+- CARD_ID_INFERNO = 0x16c5 (Inferno)
+- LP_DELTA_INFERNO = 0xfffffa24 = -1500 (fixed LP penalty)

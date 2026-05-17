@@ -1,0 +1,6 @@
+Goblin Thief equip effect (card_id 0x1761): writes -500 into the opponent LP delta slot, then fall-through into write_equip_lp_delta_dark_rabbit (0x08065458) to write +500 into the own LP delta slot. Net effect: opponent loses 500 LP, owner gains 500 LP. Dispatched from FUN_08064880 on card_id 0x1761.
+
+Constants:
+- CARD_ID_GOBLIN_THIEF = 0x1761 (Goblin Thief)
+- LP_DELTA_STEAL = 0xfffffe0c = -500 (opponent penalty)
+- LP_DELTA_GAIN = 0x1f4 = +500 (own gain, written by fallthrough into 0x08065458)

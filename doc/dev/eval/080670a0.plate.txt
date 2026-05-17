@@ -1,0 +1,9 @@
+Single-frame driver for the equip activation display state machine. Reads current state from gDuelFieldState+0x4a0 (= 0x0201b290 + 0x94<<3) and dispatches: state==0x80: if activation flag is set, calls sample_prng_scaled(2) and stores result at gP1LifePoints+0x1d40; otherwise calls invoke_card_display_op_0x31_sub8(0x38); returns 0x7f. state==0x7f: calls enqueue_lp_display_row_type17; returns 0x7e. state==0x7e: calls enqueue_sprite_attr_with_mode; returns 0xa. Other states return 0. Called via function pointer; callgraph indeg=0.
+
+Constants:
+- gDuelFieldState = 0x0201b290 (duel field state base)
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- STATE_PRNG = 0x80
+- STATE_ENQUEUE_LP_ROW = 0x7f
+- STATE_ENQUEUE_SPRITE = 0x7e
+- PRNG_RESULT_OFFSET = 0x1d40 (= 0xea<<5; stored in gP1LifePoints)

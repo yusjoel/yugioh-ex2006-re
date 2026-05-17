@@ -1,0 +1,5 @@
+Solar Ray equip effect (card_id 0x1767): calls count_eligible_zone_slots_all_flags to get the total eligible zone count, multiplies by 600 via shift arithmetic (count*5 via lsls+adds; *75 via *16-*5; *600 via <<3), negates, and writes into the opponent LP delta slot. Dispatched from FUN_08064880 on card_id 0x1767.
+
+Constants:
+- CARD_ID_SOLAR_RAY = 0x1767 (Solar Ray)
+- LP_DELTA_PER_ZONE = 600 (opponent loses 600 LP per eligible zone)

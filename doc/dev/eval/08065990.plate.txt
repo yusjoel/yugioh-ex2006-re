@@ -1,0 +1,8 @@
+Equip card activation check callback for chain slot 11: validates that the current equip zone node matches the given player_side_xor (equip_owner XOR equip_target) and chain_slot_idx == 0xb (11). Reads node from gDuelFieldState+0x4a0 (= 0x0201b290 + 0x94<<3). If card_id is Serial Spell (0x183e), back-reads the previous slot node for card_id. On full match, calls dispatch_effect_handler_by_card_id; returns 0x800 if dispatch returns nonzero, else 0. Called indirectly via function pointer table; callgraph indeg=0.
+
+Constants:
+- gDuelFieldState = 0x0201b290 (duel field state base)
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3; equip state node offset)
+- CARD_ID_SERIAL_SPELL = 0x183e (Serial Spell; triggers back-read logic)
+- CHAIN_SLOT_11 = 0xb (chain slot index checked)
+- RETURN_ACTIVATION_SUCCESS = 0x800 (0x80<<4; returned on successful activation)

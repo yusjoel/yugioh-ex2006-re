@@ -1,0 +1,5 @@
+Dark Rabbit equip effect (card_id 0x1126): writes fixed value +500 into the owner's own LP delta slot. Formula: r1 = 0xfa<<1 = 0x1f4 = 500. Target is r7[r6*4] (own player slot). Also serves as second phase of Goblin Thief fallthrough from 0x0806544c. Dispatched from FUN_08064880 on card_id 0x1126.
+
+Constants:
+- CARD_ID_DARK_RABBIT = 0x1126 (Dark Rabbit)
+- LP_DELTA_DARK_RABBIT = 0x1f4 = +500 (fixed LP gain)

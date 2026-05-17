@@ -1,0 +1,7 @@
+Mecha-Dog Marron equip effect (card_id 0x1869): unconditionally writes -1000 into the opponent LP delta slot; then checks [r4+0x2] bits[11:6] against 0x580 (0xb0<<3); if equal, also writes -1000 into own LP delta slot. Dual-penalty logic: opponent always loses 1000 LP, owner conditionally loses 1000 LP. Dispatched from FUN_08064880 on card_id 0x1869.
+
+Constants:
+- CARD_ID_MECHA_DOG_MARRON = 0x1869 (Mecha-Dog Marron)
+- LP_DELTA = 0xfffffc18 = -1000 (penalty applied to both slots)
+- FIELD_MASK = 0xfc0 (bits[11:6] mask)
+- CONDITION_VALUE = 0x580 (0xb0<<3; own-penalty activation condition)

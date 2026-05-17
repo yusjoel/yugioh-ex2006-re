@@ -1,0 +1,1 @@
+Shared epilogue for all write_equip_lp_delta_* siblings: all 14 sibling functions branch here via "b FUN_080655da". Restores parent frame FUN_08064880 callee-save high registers: pop {r3}; .hword 0x4698 = mov r8,r3 (restores r8); pop {r4,r5,r6,r7}; pop {r0}; bx r0 (frame return). No external side effects; pure stack pop epilogue.
