@@ -1,0 +1,6 @@
+indeg=0 (no direct bl callers); grep .word 0x080af7b5 asm/all.s -> not found; dead code or reachable only via runtime fn-ptr. r0=player_id. Computes hand_data_base = player_id&1*0x868+0x0201c4ec; r12=[base+0]=hand_card_count (inner loop limit); r8=0x0201c600 (hand slot area base). Outer loop r5=[0..23]: reads card_id from ROM table 0x09e5ab28[r5*2] (24 u16 equip candidate entries). Inner loop r3=[0..r12): iterates gHandSlots+player*0x868 every 4 bytes, extracts low 13 bits as card_id, compares with r4; on match returns inner loop index r3 (slot_idx). If no match across all entries returns -1.
+
+Inputs: r0=player_id [0..1]
+Outputs: r0=s32 slot_idx [0..r12-1] or -1 (not found)
+Side effects: none (read-only)
+Constants: HAND_DATA_BASE=0x0201c4ec, gHandSlots=0x0201c600, player_stride=0x868, ROM_CARD_TABLE=0x09e5ab28, TABLE_SIZE=24

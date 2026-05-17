@@ -1,0 +1,6 @@
+indeg=0 (Ghidra callgraph); fn-ptr not found in ROM data sections. r0=player_id (->r7); r8=player_base_offset (computed internally: player_id&1 * 0x868, not APCS param). Iterates monster zone slots [0..4] (r6=0..4, r3=slot*0x14 step): checks slot DWORD bits[31:19] (lsls #0x13) nonzero (card present); if card present: r0=r7=player_id, r1=r6=slot_idx, r2=sp (output buffer), calls dispatch_zone_slot_score_by_player_flag; if ldrh[slot+6] (score_field) nonzero uses sp[0x18] high score, else sp[0x14] score; compares against current best r5, keeps higher. After loop returns r5 = peak score (initial 0).
+
+Inputs: r0=player_id [0..1]
+Outputs: r0=s32 best_score (highest monster zone slot score, initial 0)
+Side effects: none (sp locals only)
+Constants: SLOT_MAX=4, player_stride=0x868, gDuelFieldSlots=0x0201c510, ACTIVE_SHIFT=0x13

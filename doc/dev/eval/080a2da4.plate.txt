@@ -1,0 +1,6 @@
+Called via fn-ptr from select_equip_target_slot_by_card_id (0x080b70ac); dispatch branch DAT_080a2ff0 = 0x080a2da5. r0=player_id, r1=zone_index, r2=slot_offset; total_slot=r1+r2, returns 0 if >4. Player ID filter via gP1LP[player*0x868+0x1d8c]. Reads slot DWORD bits[31:19] active check. Reads slot[+8] halfword (equip_count) -- returns 0 if 0. Calls check_card_field5_is_nonzero to confirm effect valid. Calls check_card_field8_is_9 to exclude field8==9 (removed state). Calls check_card_is_equip_target_eligible for final composite check. Returns 0x800 on success. Longest check chain variant in this cluster.
+
+Inputs: r0=player_side [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, LP_PLAYER_ID_OFFSET=0x1d8c, ACTIVE_SHIFT=0x13, RETURN_ELIGIBLE=0x800

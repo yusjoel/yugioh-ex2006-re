@@ -1,0 +1,6 @@
+indeg=0 (no direct bl callers); grep .word 0x080a585d asm/all.s -> not found; reachable only via runtime fn-ptr dispatch. r0=player_id (->r5), r1=zone_index (->r8), r2=slot_offset (->r7); total_slot=r1+r2 (->r4), cmp #4 guard. Reads EQUIP_CTX=0x0201e4d0: [+0] player_bit + check_slot_card_can_be_equipped; if passed, reads gDuelFieldSlots+player_side*0x868+total_slot*0x14 DWORD bits[31:19] active, adds [0x0201e4d0+8] offset for slot type compare (cmp slot_type, [CTX+8]+0x1119); returns 0 if type mismatch. Then count_available_monster_slots; if player==slot_player also check_slot_placement_blocked_by_field_effect. Scans [0x0201e4d0+8] sub-entry pair list: if packed match (player<<8|slot_idx), calls check_slot_placement_blocked_by_field_effect -- returns 0x800 on hit. Second scan pass: slot_phase [1..2] x slot_idx [0..4], check_slot_card_can_be_equipped + blocked check. Returns 0x800 on success.
+
+Inputs: r0=player_id [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, gDuelFieldSlots=0x0201c510, EQUIP_CTX=0x0201e4d0, SLOT_TYPE_BASE=0x1119, RETURN_ELIGIBLE=0x800

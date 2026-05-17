@@ -1,0 +1,6 @@
+Called by FUN_080b5d98 (0x080b5d98), FUN_080b68fc (0x080b68fc), FUN_080b693c (0x080b693c), FUN_080839b4 (0x080839b4, role: equip placement decision) (indeg=4). r0=player_id, r1=bitmap (->r4), r2=context (->r6), r3=comparator_param (->r8), sp[0]=slot_exclusion_info (->r5, 5th stack arg). Calls query_equip_zone_bitmap_with_effect_guard(player) -> r1 (filtered bitmap); writes r4 (original bitmap) to [0x0201afe0]. Computes exclusion bit: lsls r2,r4,#4; adds r2,r2,r5 -> bit_position; movs r0,#1; lsls r0,r2 -> bit_mask; bics r1,r0 -> clears current equip slot from result bitmap. Calls find_best_scored_slot_from_bitmap(player, masked_bitmap, context, r8); returns best_slot_idx.
+
+Inputs: r0=player_id [0..1], r1=slot_bitmap u32, r2=context_or_comparator u32, r3=comparator_param u32, [sp+0]=slot_exclusion_info u32
+Outputs: r0=s32 best_slot_idx [0..10] or -1 (not found)
+Side effects: [0x0201afe0]:=r4 (original bitmap written to global)
+Constants: player_stride=0x868, GLOBAL_BITMAP=0x0201afe0, PLAYER_BIT_SHIFT=4

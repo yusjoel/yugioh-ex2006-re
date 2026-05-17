@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 400 + 剩余 366 (19 批 #99..#117 / 20 每批) |
-| **下一批** | `#99` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #98, 400/766 = 52.22%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 420 + 剩余 346 (18 批 #100..#117 / 20 每批) |
+| **下一批** | `#100` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #99, 420/766 = 54.83%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**400 / 766 已分析** (52.22%, 剩余 19 批待跑 #99..#117)
+**420 / 766 已分析** (54.83%, 剩余 18 批待跑 #100..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -98,6 +98,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #96 `6d2784e` 360/766 (46.99%) — card display dispatch stubs (continued) + equip target/chain sum/zone bitmap
 - batch #97 `d70ffda` 380/766 (49.61%) — LP bar + equip slot + palette table cluster
 - batch #98 `eefa44e` 400/766 (52.22%) — LP row type wrapper sibling cluster + equip slot eligibility callbacks
+- batch #99 420/766 (54.83%) — equip target/sub-entry eligibility + bitmap scan + summon eligibility
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -106,9 +107,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#98) | 400 |
-| - 剩余 (按 20/批 重组) | 366 |
-| 剩余分批数 (20/批) | 19 (`#99..#117`) |
+| - 已完成 (Phase 2 #82-#99) | 420 |
+| - 剩余 (按 20/批 重组) | 346 |
+| 剩余分批数 (20/批) | 18 (`#100..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 
@@ -117,7 +118,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2300** | **1346** | **63.08%** |
+| **全 CSV** | **2320** | **1326** | **63.63%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

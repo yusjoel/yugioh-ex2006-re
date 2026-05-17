@@ -1,0 +1,6 @@
+Called by FUN_080b5d98 (0x080b5d98, [duel_field], role: equip slot selection dispatch) (indeg=1). r0=player_id (->r10), r1=slot_bitmap (->r4), r2=field6_type_filter (->r9). Initializes sp[0x54]=-1 (best_slot_idx) and sp[0x50]=-1 (best_score). Phase 1: iterates monster zone slots [0..4], checks bitmap bit 1<<(player_id*16+slot); on hit stores slot into sp buffer (r5++). Phase 2: Fisher-Yates random shuffle of buffer via sample_prng_scaled. Phase 3: iterates shuffled slot list: if r9>=0 checks ldrh[slot+6]==r9 (field6 filter), skips if mismatch; calls dispatch_zone_slot_score_by_player_flag for score; compares and updates sp[0x54]/sp[0x50] (best slot/score). Returns sp[0x54] = best_slot_idx (or -1).
+
+Inputs: r0=player_id [0..1], r1=slot_bitmap u32, r2=field6_type_filter s32 (<0=no filter, >=0=ldrh[slot+6] must match)
+Outputs: r0=s32 best_slot_idx [0..4] or -1 (no eligible slot)
+Side effects: none (sp locals only)
+Constants: SLOT_MAX=4, player_stride=0x868, gDuelFieldSlots=0x0201c510, BIT_PLAYER_SHIFT=16, FAIL=-1

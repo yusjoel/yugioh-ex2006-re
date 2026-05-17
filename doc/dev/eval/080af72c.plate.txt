@@ -1,0 +1,6 @@
+Called by FUN_080b7858 (0x080b7858) and FUN_080b7934 (0x080b7934) (indeg=2). r0=player_id (->r7); r8=0 (count init), r9=1 (constant mask). Base ptr: player_id&1*0x868+gDuelFieldSlots (monster zone base r4), +0x10 offset secondary struct r5. Iterates slots [r6=0..10]: skips if slot DWORD bits[31:19]==0 (no card); if slot_idx<=4 calls check_slot_card_is_equip_whitelist(player, slot) -- skips if returns 0. After whitelist (or slot_idx>4): checks ldrh[slot+8] (equip_count)!=0 OR r5[+0] bits[6:0] condition (lsrs #7, ands #1). Then calls check_card_id_in_eligible_set(card_id, mode=1); if passes: r8++. After loop mov r0,r8 returns count.
+
+Inputs: r0=player_id [0..1]
+Outputs: r0=u32 count (number of equip-whitelist eligible monster zone cards) [0..10]
+Side effects: none (read-only)
+Constants: SLOT_MAX=10, player_stride=0x868, gDuelFieldSlots=0x0201c510, ACTIVE_SHIFT=0x13

@@ -1,0 +1,6 @@
+Called via fn-ptr from select_equip_target_slot_by_card_id (0x080b70ac); dispatch branch DAT_080a2fc0 = 0x080a2d55. r0=player_id, r1=zone_index, r2=slot_offset; total_slot=r1+r2, returns 0 if >4. Reads gP1LP[player*0x868+0x1d8c] vs r0 for player ID filter. Reads slot DWORD bits[31:19] (lsls #0x13 cmp #0) to confirm card active. If active check passes, returns 0x800 directly (no whitelist check -- most minimal active-card verification variant).
+
+Inputs: r0=player_side [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, LP_PLAYER_ID_OFFSET=0x1d8c, ACTIVE_SHIFT=0x13, RETURN_ELIGIBLE=0x800

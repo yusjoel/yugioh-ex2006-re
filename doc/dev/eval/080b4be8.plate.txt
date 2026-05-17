@@ -1,0 +1,6 @@
+Called by FUN_0804ce78 (0x0804ce78, [card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings], role: card display decision hub) (indeg=1). r0=player_id (->r7), r1=card_context_ptr (->r6, struct: u16 card_id[+0], u8 player_bits[+2], u8 secondary_flag[+3]). Writes [0x0201afe0]:=player_id. Phase 1: iterates ROM table 0x09e47fc0 (0x44=68 entries, 8 bytes each); calls check_normal_summon_eligible_for_slot(player, entry, ctx); returns 1 on first hit. After phase 1: reads r6[+2] bit0 player_bits_flag and r6[+3] bit5 secondary_flag; XORs with player_id -- if mismatch goes to phase 2. If match: reads card_id from r6[+0], calls check_card_field5_is_nonzero; if nonzero goes to phase 2. Checks card_id vs 0x13f9 (Fairy Box) -- if equal goes to phase 2. Else returns 0. Phase 2: iterates ROM table 0x09e478d0 (0xdd=221 entries, 8 bytes each); same slot check; returns 1 on hit, 0 if exhausted.
+
+Inputs: r0=player_id [0..1], r1=card_context_ptr (struct: u16 card_id[+0], u8 player_bits[+2], u8 secondary[+3])
+Outputs: r0=u32 (1=eligible for normal summon, 0=not eligible)
+Side effects: [0x0201afe0]:=player_id
+Constants: ROM_TABLE1=0x09e47fc0 (68 entries), ROM_TABLE2=0x09e478d0 (221 entries), ENTRY_SIZE=8, Fairy_Box=0x13f9, player_stride=0x868

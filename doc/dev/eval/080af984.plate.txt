@@ -1,0 +1,6 @@
+indeg=0 (no direct bl callers); grep .word 0x080af985 asm/all.s -> not found; reachable only via runtime fn-ptr dispatch. r0=player_id, r1=zone_type_code, r2=slot_idx. If r1!=0xb (zone_type != 11 = spell/equip zone) returns 0 immediately. If zone_type==0xb: computes gDuelFieldSlots(0x0201c600)+player_id&1*0x868+slot_idx*4, reads slot DWORD low 13 bits (card_id), calls get_card_extended_stat_field6(card_id); if field6==0x16 (decimal 22, equip card type code) returns 1, else returns 0. Dual-level zone filter: first checks zone type is spell/equip zone, then confirms card field6 is equip card type.
+
+Inputs: r0=player_id [0..1], r1=zone_type_code u8, r2=slot_idx u32
+Outputs: r0=u32 (1=zone_type==0xb AND field6==0x16, else 0)
+Side effects: none (read-only)
+Constants: ZONE_TYPE_SPELL_EQUIP=0xb, FIELD6_EQUIP_TYPE=0x16, player_stride=0x868, gDuelFieldSlots=0x0201c600

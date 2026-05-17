@@ -1,0 +1,6 @@
+Called via fn-ptr from select_equip_target_slot_by_card_id (0x080b70ac); dispatch branch DAT_080a2fa0 = 0x080a2e81 (Spatial Collapse card 0x16df path). r0=player_id, r1=zone_index, r2=slot_offset; total_slot=r1+r2, returns 0 if >4. Player ID filter via gP1LP+0x1d8c. Builds r1=gP1LP+0x1d9a halfword (current activation context slot ID), r0=1-player_id (opponent flag), r3=total_slot. Calls eval_slot_activation_eligibility_full with sp[0x0]=1 (enable flag). Returns 0x800 if result nonzero.
+
+Inputs: r0=player_side [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, LP_PLAYER_ID_OFFSET=0x1d8c, LP_CURRENT_SLOT_OFFSET=0x1d9a, RETURN_ELIGIBLE=0x800

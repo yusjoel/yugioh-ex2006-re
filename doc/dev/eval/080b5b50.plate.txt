@@ -1,0 +1,6 @@
+indeg=0 (no direct bl callers); grep .word 0x080b5b51 asm/all.s -> not found; reachable only via runtime fn-ptr dispatch. r0=player_id, r1=slot_idx. Computes gDuelFieldSlots+player_id&1*0x868+slot_idx*0x14 -> slot ptr; reads slot[0] bits[12:0]=card_id (->r4); reads ldrh[slot+8]=equip_count. If equip_count!=0 AND card_id==Ameba (0x118a): returns 3 (max tier, equipped Ameba). Else: calls check_card_field8_is_9(card_id); if field8==9 returns 2 (removed state). Else: calls check_card_id_in_effect_target_whitelist(card_id); if in whitelist returns 1. Default: returns 0.
+
+Inputs: r0=player_id [0..1], r1=slot_idx [0..9]
+Outputs: r0=u32 score_tier (3=Ameba+equipped, 2=field8==9, 1=whitelist, 0=default)
+Side effects: none (read-only)
+Constants: player_stride=0x868, slot_stride=0x14, gDuelFieldSlots=0x0201c510, Ameba=0x118a, TIER_MAX=3, TIER_REMOVED=2, TIER_WHITELIST=1, TIER_DEFAULT=0

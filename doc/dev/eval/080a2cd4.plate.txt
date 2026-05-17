@@ -1,0 +1,6 @@
+Called via fn-ptr from select_equip_target_slot_by_card_id (0x080b70ac); dispatched for Patrician of Darkness (0x139c) branch (DAT_080b70b0). r0=player_id, r1=zone_index, r2=slot_offset; total_slot=r1+r2, returns 0 if >4. Extra check: reads gP1LP[player*0x868+0x1d8c] vs r0 for player ID filter. Reads slot DWORD bits[31:19] (lsls #0x13 cmp #0) to confirm card active. Calls check_slot_equip_whitelist_with_monster_space (DAT_080a2d44=0x142a, Creature Swap whitelist). Then reads gP1LP+0x1d9a halfword, XORs player_id to build direction flag, calls query_slot_effect_eligibility_nonzero. Returns 0x800 on success.
+
+Inputs: r0=player_side [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, LP_PLAYER_ID_OFFSET=0x1d8c, LP_CURRENT_CARD_OFFSET=0x1d9a, ACTIVE_SHIFT=0x13, WHITELIST_CARD=0x142a (Creature Swap), RETURN_ELIGIBLE=0x800

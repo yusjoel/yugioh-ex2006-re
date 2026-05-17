@@ -1,0 +1,6 @@
+indeg=0 (no direct bl callers); grep .word 0x080a5189 asm/all.s -> not found; reachable only via runtime fn-ptr dispatch. r0=player_id, r1=zone_index, r2=slot_offset; total_slot=r1+r2, returns 0 if >4. Reads EWRAM struct 0x0201e4d0: if bits[1] (0x2 mask) set, fast-path calls check_slot_card_can_be_equipped directly. Otherwise enters sub-entry loop (slot 0..8): for each entry calls get_paired_card_id_by_variant, compares with field card_id, checks active bits[31:19], ldrh[+8] equip_count, calls find_equip_chain_node_by_slot_pair to confirm chain free; sets sp[0]=1 on hit. After loop if no hit: calls check_slot_equip_eligibility; if [0x0201e4d0+8]==0 calls count_available_monster_slots + check_slot_placement_blocked_by_field_effect; if [+8]!=0 scans equip pair list excluding occupied slots. Returns 0x800 on success.
+
+Inputs: r0=player_id [0..1], r1=zone_index [0..4], r2=slot_offset [0..4]
+Outputs: r0=0x800 (eligible) or 0 (not eligible)
+Side effects: none (read-only)
+Constants: SLOT_MAX=4, player_stride=0x868, gDuelFieldSlots=0x0201c510, EQUIP_CTX=0x0201e4d0, ACTIVE_SHIFT=0x13, RETURN_ELIGIBLE=0x800
