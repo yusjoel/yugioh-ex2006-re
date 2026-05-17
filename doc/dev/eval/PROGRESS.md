@@ -87,7 +87,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #85 `220ef3d` 140/766 (18.28%) — equip zone bitmap chain + lp indicator + zone sprite pipeline cluster
 - batch #86 `dbc64c6` 160/766 (20.89%) — equip set BST whitelist cluster + banlist canonical map + zone rank3 compaction
 - batch #87 `784c1bf` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
-- batch #88 `TBD` 200/766 (26.11%) — equip slot eligibility + BST tier classifier + LP sprite cluster
+- batch #88 `e181488` 200/766 (26.11%) — equip slot eligibility + BST tier classifier + LP sprite cluster
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
