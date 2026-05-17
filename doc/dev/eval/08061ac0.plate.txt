@@ -1,0 +1,22 @@
+check_dragon_spell_target_slot_available @ 0x08061ac0
+Maps equip spell card_id to corresponding dragon target card_id:
+  0x175b (Burst Stream of Destruction, passcode=17655904) -> 0xfa7 (Blue-Eyes White Dragon, passcode=89631139)
+  0x17f6 (Inferno Fire Blast, passcode=52684508) -> 0xff8 (Red-Eyes B. Dragon, passcode=74677422)
+  0x17f6 = 0x175b + 0x9b (adds r0,#0x9b at 0x08061acc)
+Then: count_paired_slots_with_field5_default(player_id, target_card_id).
+  If count == 0 -> return 0 (target not on field).
+Then: check_value_in_slot_chain(player_id, type_code=0xb, target_card_id).
+  If chain contains target -> return 0 (already activated).
+Returns 1 if target dragon has a paired field5-active slot and is not in chain.
+Params: r0=SlotPtr* slot_ptr (ldrh[+0]=card_id (Burst Stream or Inferno Fire Blast),
+                              byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 1 if target dragon slot available and not in chain, 0 otherwise
+Side effects: none
+Constants:
+  0x175b: Burst Stream of Destruction (passcode=17655904)
+  0x17f6: Inferno Fire Blast (passcode=52684508); offset 0x9b from 0x175b
+  0xfa7:  Blue-Eyes White Dragon (passcode=89631139)
+  0xff8:  Red-Eyes B. Dragon (passcode=74677422)
+  0xb:    equip chain node type_code
+Callee: count_paired_slots_with_field5_default, check_value_in_slot_chain
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

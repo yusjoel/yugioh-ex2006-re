@@ -1,0 +1,14 @@
+check_equip_eligible_in_main_phase2 @ 0x080606cc
+Three-level compound predicate for equip effect activation during opponent Main Phase 2.
+Condition 1: count_occupied_monster_zones(opponent_id=1-player_id) > 0.
+Condition 2: gP1LifePoints+0x1cf4 (duel phase field) == 2 (Main Phase 2).
+Condition 3: check_equip_effect_zone_preconditions(player_id) passes.
+Returns 1 if all three pass; 0 if any fails.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 1 if all three conditions pass, 0 otherwise
+Side effects: none
+Constants:
+  0x1cf4: gP1LifePoints offset for duel phase state field (2=Main Phase 2)
+  gP1LifePoints = 0x0201c4e0: player LP / duel state global base
+Callee: count_occupied_monster_zones, check_equip_effect_zone_preconditions
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

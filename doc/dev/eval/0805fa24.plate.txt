@@ -1,0 +1,16 @@
+check_light_of_intervention_and_swarm_absent @ 0x0805fa24
+Check 1: count_field_copies_of_card(0x135d) -- Light of Intervention (passcode=62867251).
+  If field count > 0 -> return 0 (cannot activate).
+Check 2: extract player_id (byte[+2] bit0) and zone_idx (bits[6:2]) from slot_ptr;
+  check_value_in_slot_chain(player_id, zone_idx, 0x152a) -- Swarm of Scarabs (passcode=38538445).
+  If chain contains 0x152a -> return 0.
+Returns 1 if both cards are absent from field/chain.
+Dual-absence predicate for Light of Intervention and Swarm of Scarabs.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], bits[6:2]=zone_idx [0..31])
+Return: r0=u32 -- 1 if both absent, 0 if either present
+Side effects: none
+Constants:
+  0x135d: card_id = Light of Intervention (passcode=62867251)
+  0x152a: card_id = Swarm of Scarabs (passcode=38538445)
+Callee: count_field_copies_of_card, check_value_in_slot_chain
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

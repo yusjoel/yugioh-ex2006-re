@@ -1,0 +1,12 @@
+check_zera_ritual_absent_from_field @ 0x08061d40
+Void-param predicate: r0 is immediately overwritten at entry by ldr DAT_08061d50 = 0x1332.
+Calls count_field_copies_of_card(0x1332) -- Zera Ritual (passcode=81756897).
+Returns 1 if count == 0 (absent); 0 if any copy present on field.
+Inverse of the Zera Ritual presence check used in dispatch_effect_via_hand_slot_setcode.
+Params: (void) -- r0 overwritten at entry with 0x1332; no caller input accepted
+Return: r0=u32 -- 1 if Zera Ritual absent from field, 0 if present
+Side effects: none
+Constants:
+  0x1332: card_id = Zera Ritual (passcode=81756897)
+Callee: count_field_copies_of_card
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

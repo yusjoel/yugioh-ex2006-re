@@ -1,0 +1,11 @@
+check_effect_activations_both_sides @ 0x0805ec40
+Centering on slot_ptr, extracts player_id from byte[+2] bit0, then calls
+count_effect_node_activations_by_zone twice: once for player_id, once for
+1-player_id (opponent). Returns 2 if both sides have active effect nodes,
+0 otherwise. Pure query; no external writes.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]),
+        r1=u32 extra (second arg to count_effect_node_activations_by_zone)
+Return: r0=u32 -- 2 if both sides active, 0 otherwise
+Side effects: none
+Callee: count_effect_node_activations_by_zone (x2)
+Caller: FUN_080839b4 (equip effect chain dual-side activation check)

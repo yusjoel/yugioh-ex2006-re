@@ -1,0 +1,15 @@
+check_equippable_slots_with_player_status @ 0x08061b14
+Two-level predicate checking player has equippable slots and nonzero status.
+Condition 1: count_equippable_slots_for_card(player_id, card_id=-1) > 0.
+  -1 (0xFFFFFFFF) via rsbs r1,r1,#0 means wildcard: count all equippable slots.
+Condition 2: gP1LifePoints+0x10+player*0x868 (player status word) != 0.
+Returns 1 if both pass; 0 otherwise.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 1 if equippable slots > 0 and player status nonzero, 0 otherwise
+Side effects: none
+Constants:
+  -1 (0xFFFFFFFF): wildcard card_id for count_equippable_slots_for_card (all slots)
+  0x10: gP1LifePoints internal offset for player status word
+  0x868: player_stride
+Callee: count_equippable_slots_for_card
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

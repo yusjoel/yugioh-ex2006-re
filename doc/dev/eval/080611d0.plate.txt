@@ -1,0 +1,18 @@
+check_ojama_trio_all_paired_slots_present @ 0x080611d0
+Triple-check predicate: calls count_paired_slots_with_field5_default(player_id, card_id)
+for each of the three Ojama cards in sequence.
+  - 0x1681: Ojama Green  (passcode=12482652)
+  - 0x16b3: Ojama Yellow (passcode=42941100)
+  - 0x16b4: Ojama Black  (passcode=79335209)
+Returns 1 only if all three calls return nonzero (all present with field5 active).
+Any zero result short-circuits to return 0.
+Implements the Ojama three-color fusion field presence check.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 1 if all three Ojama cards have paired slots with field5 active, 0 otherwise
+Side effects: none
+Constants:
+  0x1681: card_id = Ojama Green  (passcode=12482652)
+  0x16b3: card_id = Ojama Yellow (passcode=42941100)
+  0x16b4: card_id = Ojama Black  (passcode=79335209)
+Callee: count_paired_slots_with_field5_default (x3)
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

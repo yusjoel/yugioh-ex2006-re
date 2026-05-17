@@ -1,0 +1,12 @@
+check_necrovalley_paired_slots_exist @ 0x0805ff9c
+Void-param predicate: r0 is immediately overwritten at entry by ldr DAT_0805ffac = 0x159d.
+Calls count_paired_slots_both_sides(0x159d) -- Necrovalley (passcode=47355498).
+Returns 1 if count > 0 (paired slots exist); 0 otherwise.
+Checks whether Necrovalley paired slots exist on either side of the field.
+Params: (void) -- r0 overwritten at entry with 0x159d; no caller input accepted
+Return: r0=u32 -- 1 if Necrovalley paired slots exist, 0 otherwise
+Side effects: none
+Constants:
+  0x159d: card_id = Necrovalley (passcode=47355498)
+Callee: count_paired_slots_both_sides
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

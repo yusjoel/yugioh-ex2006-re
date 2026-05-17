@@ -1,0 +1,11 @@
+dispatch_effect_handler_clamped_to_bool @ 0x0805f068
+Extracts player_id (byte[+2] bit0) and card_id (ldrh[+0]) from slot_ptr,
+calls dispatch_effect_handler_by_card_id(player_id, card_id, 0), then clamps
+the result: <=1 maps to 0, >1 maps to 1. Thin boolean-normalization wrapper
+over dispatch. 9 instructions total.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id)
+Return: r0=u32 -- 0 if dispatch returned <=1, 1 if dispatch returned >1
+Side effects: none direct; callee bears dispatch side effects
+Constants: clamp threshold cmp r0,#0x1; ble -> <=1 => 0; >1 => 1
+Callee: dispatch_effect_handler_by_card_id
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

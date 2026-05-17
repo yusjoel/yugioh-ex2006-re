@@ -1,0 +1,21 @@
+check_slot_entity_at_zone_descriptor_f @ 0x08060270
+Multi-step predicate: checks whether slot_ptr entity is attached to a zone with descriptor==0xf.
+Step 1: byte[+3] & 0x30 == 0x20 (bits[5:4]==0b10, specific spell/trap zone type flag).
+  If mismatch -> return 0.
+Step 2: get_node_entity_id_in_slot(player_id, card_id, type_code=0xb).
+  If entity_id < 0 -> return 0 (node not found).
+Step 3: slot_id = entity_id >> 2; find_zone_descriptor_by_slot_id(slot_id).
+  Extract bits[15:8]; if != 0xf -> return 0.
+Returns 1 if all steps pass.
+Params: r0=SlotPtr* slot_ptr (byte[+3] bits[5:4]=zone_type_flag, byte[+2] bit0=player_id [0..1],
+                              ldrh[+0]=card_id)
+Return: r0=u32 -- 1 if entity is at zone_descriptor==0xf, 0 otherwise
+Side effects: none
+Constants:
+  0x30: byte[+3] mask (bits[5:4])
+  0x20: target type value (bits[5:4]==0b10)
+  0xb: equip chain node type_code
+  >>2: entity_id -> slot_id conversion
+  0xf: zone_descriptor bits[15:8] target (zone F)
+Callee: get_node_entity_id_in_slot, find_zone_descriptor_by_slot_id
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

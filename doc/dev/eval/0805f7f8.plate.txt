@@ -1,0 +1,20 @@
+check_neo_daedalus_zone_effect_available @ 0x0805f7f8
+Entry: slot_ptr.
+Step 1: check_field_spell_neo_daedalus_group_placeable(player_id) -- gate; 0 -> return 0.
+Step 2: compute address gP1LifePoints+0x40+zone_idx*0x14+player_id*0x868;
+  read zone descriptor word; extract bit18 (lsrs #0x12; ands #1).
+  If bit18 != 0 -> return 0 (zone state restriction active).
+Step 3: dispatch_effect_handler_by_card_id(player_id, card_id=ldrh[+0], 0).
+  Normalize: dispatch>0 -> return 1, else return 0.
+Used to verify zone state flag before activating field-spell effects.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bits[6:2]=zone_idx [0..31], bit0=player_id [0..1],
+                              ldrh[+0]=card_id)
+Return: r0=u32 -- 0 if any check fails; 1 if dispatch succeeds
+Side effects: dispatch_effect_handler_by_card_id internal effects borne by callee
+Constants:
+  gP1LifePoints+0x40: zone descriptor array base
+  0x14: zone_struct stride (20 bytes/zone)
+  0x868: player_stride
+  bit18: zone state restriction flag
+Callee: check_field_spell_neo_daedalus_group_placeable, dispatch_effect_handler_by_card_id
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

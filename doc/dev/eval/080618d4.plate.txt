@@ -1,0 +1,15 @@
+check_equip_eligible_with_lp_advantage @ 0x080618d4
+Three-level compound predicate for equip effect activation with LP advantage in Main Phase 2.
+Condition 1: gP1LifePoints+0x1cf4 == 2 (current phase is Main Phase 2).
+Condition 2: check_slot_card_can_be_equipped(player_id, player_id, zone_idx) passes.
+Condition 3: gP1LifePoints[player*0x868] (player LP) > gP1LifePoints[(1-player)*0x868] (opponent LP).
+Returns 1 if all three pass; 0 otherwise.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], bits[6:2]=zone_idx [0..31])
+Return: r0=u32 -- 1 if all three conditions pass, 0 otherwise
+Side effects: none
+Constants:
+  0x1cf4: gP1LifePoints offset for duel phase field (2=Main Phase 2)
+  0x868: player_stride for LP array
+  gP1LifePoints[+0]: player LP word (ldr [r2,#0] / ldr [r0,#0])
+Callee: check_slot_card_can_be_equipped
+Caller: indeg=0; no direct bl caller; reachable only via runtime dispatch or dead code

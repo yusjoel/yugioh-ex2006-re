@@ -1,0 +1,16 @@
+check_slot_zone_type_facedown_flip @ 0x0805f7d0
+Leaf function (no push/pop, bx lr). Reads ldrh[+2] from slot_ptr.
+Check 1: halfword & 0xfc0 == 0x3c0 (bits[11:6] match; bits[9:6]==0xf, bits[11:10]==0).
+If mismatch -> return 0.
+Check 2: reads slot[+0x14] bit21 (flip/facedown indicator), XOR player_id (byte[+2] bit0).
+Returns XOR result. Tests whether a specific zone_type slot is in the facedown-flip
+state relative to the current player.
+Params: r0=SlotPtr* slot_ptr (ldrh[+2]=zone_type_halfword, byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 0 if zone_type mismatch; else slot[+0x14] bit21 XOR player_id
+Side effects: none
+Constants:
+  0xfc0 = 0xfc<<4: zone_type mask (halfword[+2] bits[11:6])
+  0x3c0 = 0xf0<<2: target zone_type value (bits[9:6]==0xf, bits[11:10]==0)
+  bit21 of slot[+0x14]: flip/facedown indicator
+Callee: none (pure leaf)
+Caller: FUN_0805f784 (zone enumeration path, zone_type filter)

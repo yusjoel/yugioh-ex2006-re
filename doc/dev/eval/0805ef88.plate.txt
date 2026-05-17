@@ -1,0 +1,11 @@
+check_neo_daedalus_group_effect_eligible @ 0x0805ef88
+Entry: slot_ptr. Extracts player_id (byte[+2] bit0).
+Step 1: check_field_spell_neo_daedalus_group_placeable(player_id). If 0 -> return 0.
+Step 2: dispatch_effect_handler_by_card_id(player_id, card_id=ldrh[+0], 0).
+Returns 1 if both steps pass; 0 otherwise. Slot-level activation eligibility
+for the Neo Daedalus effect group.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id)
+Return: r0=u32 -- 1 if Neo Daedalus group condition + dispatch pass, 0 otherwise
+Side effects: dispatch_effect_handler_by_card_id may write global effect chain state
+Callee: check_field_spell_neo_daedalus_group_placeable, dispatch_effect_handler_by_card_id
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

@@ -1,0 +1,24 @@
+dispatch_effect_via_hand_slot_setcode @ 0x080619f0
+Step 1: count_field_copies_of_card(0x1332) -- Zera Ritual (passcode=81756897).
+  If > 0 -> return 0 (Zera Ritual already on field).
+Step 2: read hand_count from gP1LifePoints+0xc+player*0x868.
+  Iterate hand slots (index 0..hand_count-1):
+    - read zone descriptor from gP1LifePoints+0x120+zone_idx*4;
+      extract bits[23:16] then <<1 -> zone_setcode.
+    - read slot[+4] bits[14:8] (7-bit set_code) -> slot_setcode.
+    - if zone_setcode == slot_setcode:
+        dispatch_effect_handler_by_card_id(player_id, card_id, zone_idx).
+        If dispatch returns nonzero -> return 1.
+Returns 0 if loop exhausted without match or Zera Ritual present.
+Called by 6+ callers; core hand-slot set_code matching logic.
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id,
+                              ldrh[+4]=set_code_field)
+Return: r0=u32 -- 1 if set_code match found and dispatch succeeds, 0 otherwise
+Side effects: dispatch_effect_handler_by_card_id internal effects borne by callee
+Constants:
+  0x1332: card_id = Zera Ritual (passcode=81756897)
+  0xc: hand card count offset in gP1LifePoints player block
+  0x120 = 0x90<<1: hand zone array base offset in gP1LifePoints
+  0x868: player_stride
+  bits[14:8] of ldrh slot[+4]: 7-bit set_code (lsls #0x11; lsrs #0x17)
+Callee: count_field_copies_of_card, dispatch_effect_handler_by_card_id

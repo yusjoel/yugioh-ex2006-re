@@ -1,0 +1,15 @@
+check_equip_eligible_by_slot_fields @ 0x0805f3bc
+Unpacks three fields from slot_ptr and forwards to check_slot_card_can_be_equipped:
+  r0 = byte[+2] bit0 (player_id) XOR byte[+3] bit6 (side inversion flag) = inverted_side
+  r1 = byte[+2] bit0 = player_id [0..1]
+  r2 = byte[+2] bits[6:2] = zone_type [0..31] (5-bit field)
+Returns 1 if check_slot_card_can_be_equipped passes, 0 otherwise.
+Thin unpacking wrapper over check_slot_card_can_be_equipped.
+Params: r0=SlotPtr* slot_ptr (byte[+2] and byte[+3] decoded internally)
+Return: r0=u32 -- 1 if equip eligible, 0 otherwise
+Side effects: none
+Constants:
+  bit6_of_byte3: lsls #0x19; lsrs #0x1f -> side inversion flag
+  bits[6:2]_of_byte2: lsls #0x1a; lsrs #0x1b -> zone_type [0..31]
+Callee: check_slot_card_can_be_equipped
+Caller: indeg=0; reachable only via runtime fn-ptr dispatch

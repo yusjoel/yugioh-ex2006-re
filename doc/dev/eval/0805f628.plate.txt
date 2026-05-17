@@ -1,0 +1,10 @@
+check_player_has_active_monster @ 0x0805f628
+Extracts player_id from slot_ptr byte[+2] bit0, calls
+count_monster_slots_by_state_all(player_id, state=1). Returns 1 if count > 0,
+0 otherwise. Boolean wrapper: does this player have at least one state==1 monster?
+Params: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Return: r0=u32 -- 1 if player has >=1 active (state==1) monster slot, 0 otherwise
+Side effects: none
+Constants: state=1 fixed second arg (active/face-up state)
+Callee: count_monster_slots_by_state_all
+Caller: FUN_0805f614 (converts result 1->2 for upper logic)
