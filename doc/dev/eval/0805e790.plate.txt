@@ -1,0 +1,13 @@
+Activation predicate. r0=main card_slot_ptr, r1=equip_slot_ptr (may be NULL). If r1 is
+not NULL and equip slot card_id != main slot card_id, enters main check path. Checks main
+slot spell type bits[11:6] is 0x480 (spell type A) or 0x4c0 (A+0x40, spell type B). Reads
+ACTIVE_DECK_GLOBAL (DAT_0805e804=0x0201bb90): [+0x0]=current player, [+0x4]=active player,
+[+0x20]=zone index. Validates player_id match and zone index<=4. Iterates zone; if field5
+nonzero calls count_paired_slots_with_field5 (card_id=0x13c7, Revival Jam). Returns 1 if
+count>0, else 0. Exit: pop{r4,r5}; pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16, +0x2 flags halfword bits[11:6]=type,
+bit0=player_id); r1=equip_slot_ptr [may be NULL, reads +0x0 card_id u16].
+Outputs: r0=1 (Revival Jam paired count>0) / 0 (not met). No external writes.
+Constants: SPELL_TYPE_MASK=0xfc0 (0xfc<<4), SPELL_TYPE_A=0x480 (0x90<<3),
+SPELL_TYPE_B=0x4c0 (SPELL_TYPE_A+0x40), ACTIVE_DECK_GLOBAL=0x0201bb90,
+PLAYER_STRUCT_STRIDE=0x868, ZONE_BASE=0x0201c510, CARD_ID_REVIVAL_JAM=0x13c7.

@@ -1,0 +1,11 @@
+Activation leaf predicate (no push, no bl, bx lr exit). r0=card_slot_ptr. Entry
+adds r2,r0,#0 clobbers r2 (alias; r0 retained). Extracts flags halfword (+0x2), applies
+mask 0xfc0; if not 0x500 (spell type B) returns 0. Reads ACTIVE_DECK_GLOBAL
+(DAT_0805e0dc=0x0201bb90): compares [+0x0] and [+0x4] word pair; if equal returns 0 (deck
+states same, activation disallowed). Further reads player_id and zone context, checks
+[0x0201c510 + player_zone_offset + 0x6] nonzero. Returns 1 if all met.
+Inputs: r0=card_slot_ptr (reads +0x2 flags halfword, bits[11:6]=type, bit0=player_id).
+Outputs: r0=1 (type 0x500 and deck states differ and target slot nonzero) / 0 (not met).
+No external writes.
+Constants: SPELL_TYPE_MASK=0xfc0 (0xfc<<4), SPELL_TYPE_B=0x500 (0xa0<<3),
+ACTIVE_DECK_GLOBAL=0x0201bb90, PLAYER_STRUCT_STRIDE=0x868, ZONE_BASE=0x0201c510.

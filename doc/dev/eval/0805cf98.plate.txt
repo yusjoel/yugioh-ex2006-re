@@ -1,0 +1,8 @@
+Activation predicate. r0=card_slot_ptr. Reads card_id u16 from slot+0x0 and classifies
+into three LP-cost tiers: tier 3 (Graceful Charity, card_id=0x12cc), tier 2 (Pot of Greed,
+card_id=0x12ec), all others tier 1. Reads player LP from PTR_gP1LifePoints +
+player_id*0x868. Returns 1 if LP >= tier threshold, 0 otherwise.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16, +0x2 flags bit0=player_id).
+Outputs: r0=1 (threshold met) / 0 (not met). No external writes.
+Constants: CARD_ID_GRACEFUL_CHARITY=0x12cc, CARD_ID_POT_OF_GREED=0x12ec,
+PLAYER_STRUCT_STRIDE=0x868.

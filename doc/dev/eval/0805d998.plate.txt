@@ -1,0 +1,8 @@
+Activation leaf predicate (no push, no bl). r0=card_slot_ptr. Extracts flags halfword
+(+0x2), applies mask 0xfc0; if not equal to 0x480 (spell type enum A) returns 0. Reads
+ACTIVE_DECK_GLOBAL (DAT_0805d9c4=0x0201bb90), compares with player_id-indexed deck
+identifier. Returns 1 if type matches and active deck matches current player, else 0.
+Inputs: r0=card_slot_ptr (reads +0x2 flags halfword, bits[11:6]=type, bit0=player_id).
+Outputs: r0=1 (met) / 0 (not met). No external writes.
+Constants: SPELL_TYPE_MASK=0xfc0 (0xfc<<4), SPELL_TYPE_A=0x480 (0x90<<3),
+ACTIVE_DECK_GLOBAL=0x0201bb90.

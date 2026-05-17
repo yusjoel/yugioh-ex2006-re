@@ -1,0 +1,10 @@
+Activation predicate. r0=card_slot_ptr. Reads slot+0x14 word; extracts player_id (bit9
+via lsls/lsrs 0x16/0x1f) and zone_index (bits[13:10] via lsls/lsrs 0x12/0x1c). Computes
+zone slot address (player_id*0x868 + zone_idx*20 + 0x0201c510). Checks [zone_addr+0x0]
+upper 13 bits nonzero (field5 nonzero) and [zone_addr+0x8] nonzero. Calls
+get_slot_field5_score; checks score<=0x578 (0xaf<<3=1400). Returns 1 if all met, 0 if not.
+Exit: pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x14 word, bit9=player_id, bits[13:10]=zone_index [0..4]).
+Outputs: r0=1 (field5 nonzero and score<=1400) / 0 (not met). No external writes.
+Constants: PLAYER_STRUCT_STRIDE=0x868, ZONE_BASE=0x0201c510,
+FIELD5_SCORE_MAX=0x578 (0xaf<<3=1400).

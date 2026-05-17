@@ -1,0 +1,11 @@
+Activation predicate. r0=card_slot_ptr. Extracts player_id (flags+0x2 bit0). Generates
+sentinel=-1 via rsbs idiom (movs r5,#1; rsbs r5,r5,#0). Calls count_available_effect_zones
+with card_id=0x0fc9 (Dark Magician); if result>0 returns 1. Otherwise calls again with
+card_id=0x142d (Dark Magician icid); if result>0 returns 1. If both calls return<=0
+returns 0. sentinel=-1 means search across all zone ranges. Exit: pop{r4,r5}; pop{r1};
+bx r1.
+Inputs: r0=card_slot_ptr (reads +0x2 flags bit0=player_id).
+Outputs: r0=1 (Dark Magician or icid has effect zone available) / 0 (none).
+No external writes.
+Constants: CARD_ID_DARK_MAGICIAN=0x0fc9, CARD_ID_DARK_MAGICIAN_ICID=0x142d,
+SENTINEL_ALL_ZONES=-1 (rsbs idiom).

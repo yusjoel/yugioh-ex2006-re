@@ -1,0 +1,7 @@
+Activation predicate. r0=card_slot_ptr. Calls check_spell_zone_slot_placeable; returns 0
+if not placeable. Extracts player_id (flags+0x2 bit0), calls
+dispatch_effect_handler_by_card_id. Returns 1 if dispatch result > 0, else 0.
+Inputs: r0=card_slot_ptr (reads +0x2 flags bit0=player_id).
+Outputs: r0=1 (placeable and dispatch >0) / 0 (not met).
+Side effects: dispatch_effect_handler_by_card_id may have internal state side effects.
+No direct external writes.

@@ -1,0 +1,8 @@
+Activation predicate. r0=card_slot_ptr. Calls count_field_copies_of_card with
+card_id=0x13f2 (Mask of Restrict); if result>0 returns 0 (cannot activate). Extracts
+player_id (flags+0x2 bit0), calls check_field_spell_neo_daedalus_group_placeable. If
+placeable (result>0) returns 1, else returns 0. Exit: pop{r4}; pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x2 flags byte bit0=player_id).
+Outputs: r0=1 (no Mask of Restrict and neo_daedalus_group placeable) / 0 (not met).
+No external writes.
+Constants: CARD_ID_MASK_OF_RESTRICT=0x13f2.

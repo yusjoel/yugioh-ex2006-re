@@ -1,0 +1,8 @@
+Activation predicate. r0=card_slot_ptr. Saves caller high registers r8/r9 via .hword
+0x464f=mov r7,r9 / 0x4646=mov r6,r8; second push saves r6/r7. r0 persisted to r7. Reads
+gP1LifePoints + opponent_player_id*0x868 + 0x14 (monster zone slot count), iterates all
+opponent monster slots. For each slot reads card_id and calls get_card_extended_stat_field6;
+checks return==0x16 (22). Returns 1 immediately if any slot satisfies, 0 if none found.
+Inputs: r0=card_slot_ptr (used to extract player_id then iterate opponent monster zone).
+Outputs: r0=1 (found field6==22 monster slot) / 0 (none). No external writes.
+Constants: PLAYER_STRUCT_STRIDE=0x868, MONSTER_ZONE_COUNT_OFFSET=0x14, FIELD6_TARGET=0x16.

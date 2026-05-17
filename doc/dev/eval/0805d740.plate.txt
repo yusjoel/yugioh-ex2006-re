@@ -1,0 +1,8 @@
+Activation predicate. r0=card_slot_ptr. Calls check_spell_zone_slot_placeable; returns 0
+if not placeable. Checks if chain zone (card_id=0xa520, zone=0xb) is active; if active
+calls count_occupied_monster_zones. Also checks gP1LifePoints+0x14 and +0x87c fields.
+Returns 1 if all conditions satisfied, 0 otherwise.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16, +0x2 flags bit0=player_id).
+Outputs: r0=1 (all conditions met) / 0 (not met). No external writes.
+Constants: CHAIN_CARD_ID=0xa520, CHAIN_ZONE=0xb, LP_FIELD_OFFSET_14=0x14,
+LP_FIELD_OFFSET_87C=0x87c.

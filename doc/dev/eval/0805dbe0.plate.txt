@@ -1,0 +1,7 @@
+Activation predicate. r0=card_slot_ptr. Entry adds r1,r0,#0 clobbers r1 (not independent
+param). Extracts player_id (flags+0x2 bit0), calls dispatch_effect_handler_by_card_id.
+Checks if dispatch result > 4; returns 1 if so, else 0.
+Inputs: r0=card_slot_ptr (reads +0x2 flags bit0=player_id). r1 clobbered at entry.
+Outputs: r0=1 (dispatch result >4) / 0 (<=4).
+Side effects: dispatch_effect_handler_by_card_id is responsible. No direct external writes.
+Constants: THRESHOLD=4.

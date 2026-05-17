@@ -1,0 +1,8 @@
+Activation predicate. r0=card_slot_ptr. Saves caller high registers r8-r10 into r5-r7
+via .hword 0x4657/464e/4645; r0 persisted to r8. Reads gP1LifePoints+0x1cf4 (field
+ownership flag word); if value is 2 or 4 enters extra check path. Main path loops calling
+eval_card_placement_flags_default for each possible position. Returns 2 (special field
+state pass) / 1 (normal pass) / 0 (not eligible).
+Inputs: r0=card_slot_ptr.
+Outputs: r0=2/1 (pass) / 0 (not eligible). No external writes.
+Constants: FIELD_STATE_OFFSET=0x1cf4, PLAYER_STRUCT_STRIDE=0x868.

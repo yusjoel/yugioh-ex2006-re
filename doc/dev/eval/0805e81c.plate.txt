@@ -1,0 +1,10 @@
+Activation predicate. r0=card_slot_ptr. Entry adds r1,r0,#0 clobbers r1 (not independent
+param). Reads gP1LifePoints+0x1cf4 (field ownership field); if not 2 returns 0. Extracts
+player_id (flags+0x2 bit0), computes offset 0x8e<<1=0x11c. Reads gP1LifePoints +
+player_id*0x868 + 0x11c; shifts right 0x13 bits and tests bit0. If bit19 set (equip
+inhibit flag) returns 0, else returns 1. Exit: pop{r4}; pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x2 flags byte bit0=player_id). r1 clobbered at entry.
+Outputs: r0=1 (field state==2 and bit19 clear, equip eligible) / 0 (not met).
+No external writes.
+Constants: FIELD_STATE_OFFSET=0x1cf4, FIELD_STATE_EQUIP_TARGET=2,
+PLAYER_STRUCT_STRIDE=0x868, EQUIP_FLAG_OFFSET=0x11c (0x8e<<1), BIT19_SHIFT=0x13.

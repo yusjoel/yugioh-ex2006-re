@@ -1,0 +1,13 @@
+Activation predicate. r0=card_slot_ptr. Entry adds r1,r0,#0 clobbers r1 (alias). Checks
+flags+0x3 bits[5:4] (mask 0x30)==0x20 (face-down flag); if not returns 0. Extracts
+player_id (flags+0x2 bit0) and card_id (+0x0). Sets zone_id=0xb, calls
+get_node_entity_id_in_slot; if result<0 returns 0. Shifts right 1 and calls
+find_zone_descriptor_by_slot_id. Extracts descriptor byte1 (bits[15:8]) and checks==0xf.
+Reads gP1LifePoints + player_id*0x868 + 0xf1<<3 + zone_offset; checks byte==0x40. Returns
+1 if all satisfied. Exit: pop{r4}; pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16, +0x2 flags bit0=player_id, +0x3 bits[5:4]).
+Outputs: r0=1 (face-down and descriptor zone_type==0xf and byte==0x40) / 0 (not met).
+No external writes.
+Constants: FACEDOWN_FLAG_MASK=0x30, FACEDOWN_FLAG_VALUE=0x20, ZONE_TYPE_TARGET=0xf,
+EQUIP_BYTE_ZONE_ID=0xb, EQUIP_BYTE_OFFSET=0x788 (0xf1<<3), EQUIP_ACTIVE_VALUE=0x40,
+PLAYER_STRUCT_STRIDE=0x868.

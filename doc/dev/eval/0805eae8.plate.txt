@@ -1,0 +1,13 @@
+Activation predicate. r0=card_slot_ptr. Saves caller high registers r8-r10 via .hword
+0x4657=mov r7,r10 / 0x464e=mov r6,r9 / 0x4645=mov r5,r8; r0 persisted to r5. Extracts
+player_id, calls count_occupied_monster_zones; if 0 returns 0. Uses gP1LifePoints +
+player_id*0x868 + 0x120 (0x90<<1) as monster zone array base. Loops each occupied monster
+slot: extracts slot set_code bits[11:6] via lsls/lsrs, compares with main slot set_code.
+On match calls get_zone_slot_ptr; checks field5 bit (lsls/lsrs 0x12/0x1f) and player_id
+mismatch returns 0. Otherwise calls eval_equip_placement_full_check; if result>0 returns 1.
+If all slots exhausted without pass returns 0. Exit: pop{r3,r4,r5}; pop{r4,r5,r6,r7};
+pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x2 flags bit0=player_id, +0x4 halfword bits[11:6]=set_code).
+Outputs: r0=1 (set_code match with full-check pass) / 0 (none). No external writes.
+Constants: PLAYER_STRUCT_STRIDE=0x868, MONSTER_ZONE_BASE_OFFSET=0x120 (0x90<<1),
+FIELD5_BIT_SHIFT=0x12.

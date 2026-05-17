@@ -1,0 +1,7 @@
+Activation predicate. r0=card_slot_ptr. Generates sentinel=-1 via rsbs idiom (movs r5,#1;
+rsbs r5,r5,#0). Calls count_equippable_slots_for_card twice: once for player0, once for
+player1. If either call returns > 0, returns 1 (at least one player has an equip slot
+available), else returns 0.
+Inputs: r0=card_slot_ptr.
+Outputs: r0=1 (at least one player has an equip slot) / 0 (neither does). No external writes.
+Constants: SENTINEL_ANY_PLAYER=-1 (rsbs idiom: initial r5=1 => result=-1).

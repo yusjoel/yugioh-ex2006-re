@@ -1,0 +1,11 @@
+Activation predicate. r0=main card_slot_ptr, r1=equip_slot_ptr (may be NULL). Returns 0
+if r1==NULL. Checks equip slot +0x3 bits[5:4] (mask 0x30)==0; nonzero returns 0. Reads
+main slot card_id and compares against three card IDs: 0x134f / 0x1350 / 0x1351 (unknown;
+not in data.md; range 0x134D=Driving Snow, 0x1352=Numinous Healer). Per match branch calls
+get_card_extended_stat_field6 checking 0x16 or 0x17, then get_card_extended_stat_field9
+checking 2 or 4. Returns 1 if all conditions satisfied. Exit: pop{r4,r5}; pop{r1}; bx r1.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16); r1=equip_slot_ptr [may be NULL, reads
++0x3 flags byte bits[5:4]].
+Outputs: r0=1 (all conditions met) / 0 (not met). No external writes.
+Constants: EQUIP_FILTER_MASK=0x30, CARD_ID_A=0x134f, CARD_ID_B=0x1350 (BST pivot),
+CARD_ID_C=0x1351, FIELD6_LO=0x16 (22), FIELD6_HI=0x17 (23), FIELD9_A=2, FIELD9_B=4.

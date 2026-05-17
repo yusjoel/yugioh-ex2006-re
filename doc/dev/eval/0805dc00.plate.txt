@@ -1,0 +1,11 @@
+Activation predicate. r0=card_slot_ptr. Extracts zone_type field bits[11:6] (mask 0xfc0)
+and checks if in range [0x16..0x1b] (equip-exclusive zone numbers). Returns 0 if out of
+range. Calls find_zone_descriptor_by_slot_id to get zone descriptor pointer, then
+get_zone_slot_ptr to get associated slot pointer. Checks that associated slot field5 is
+nonzero and player_id matches current slot. Returns 1 if all satisfied.
+Inputs: r0=card_slot_ptr (reads +0x2 flags halfword, bits[11:6]=zone_type [0x16..0x1b],
+bit0=player_id).
+Outputs: r0=1 (zone descriptor field5 nonzero and player match) / 0 (not met).
+No external writes.
+Constants: ZONE_TYPE_EQUIP_LO=0x16 (22), ZONE_TYPE_EQUIP_HI=0x1b (27),
+ZONE_TYPE_BITS_MASK=0xfc0 (bits[11:6]).

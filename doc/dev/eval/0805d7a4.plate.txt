@@ -1,0 +1,5 @@
+Activation predicate. r0=card_slot_ptr. Saves caller high registers r8/r9 into r6/r7 via
+.hword 0x464f/0x4646; r0 persisted to r6. Iterates all equip zone slots calling
+check_card_field5_is_nonzero on each. Returns 1 if any slot has field5 nonzero, 0 if none.
+Inputs: r0=card_slot_ptr.
+Outputs: r0=1 (at least one equip slot field5 nonzero) / 0 (none). No external writes.

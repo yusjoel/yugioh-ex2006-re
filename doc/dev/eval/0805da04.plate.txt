@@ -1,0 +1,11 @@
+Activation predicate. r0=card_slot_ptr. Reads gP1LifePoints+0x1cf4 (field ownership flag),
+checks value==1. Reads gP1LifePoints+0x1ce8 (active player), confirms match with slot
+player_id. Extracts zone_type bits and checks <=5 (valid equip zone range [0..5]). Calls
+find_slot_idx_by_card_id_in_player_zones to confirm no same card_id already on field.
+Calls count_occupied_monster_zones twice (both players) for threshold check. Returns 1 if
+all conditions satisfied, 0 otherwise.
+Inputs: r0=card_slot_ptr (reads +0x0 card_id u16, +0x2 flags bit0=player_id,
+bits[5:1]=zone_type [0..5]).
+Outputs: r0=1 (all conditions met) / 0 (not met). No external writes.
+Constants: FIELD_STATE_OFFSET=0x1cf4, ACTIVE_PLAYER_OFFSET=0x1ce8, ZONE_TYPE_MAX=5,
+PLAYER_STRUCT_STRIDE=0x868.
