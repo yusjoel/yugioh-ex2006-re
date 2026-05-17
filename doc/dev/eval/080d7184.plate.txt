@@ -1,0 +1,8 @@
+Fills tile IDs for a card image region in pack card info subpage BG tilemap (0x0600f000). Uses r0 (col) and r1 (row_group) to compute offset: (r1*32+r0)*2 bytes. Tile IDs start at 1 and increment consecutively, writing a 4-column x 8-row rectangle (row stride 0x40 bytes to next tilemap row). Used to fill the card image tile area when displaying a card in the info page.
+
+Constants:
+- TILEMAP_BASE = 0x0600f000 (card-info subpage BG tilemap)
+- COLS = 4 (columns per block [0..3])
+- ROWS = 8 (rows per block [0..7])
+- INITIAL_TILE_ID = 1 (set by movs r3,#0x1 at entry)
+- TILEMAP_ROW_STRIDE = 0x40 (row stride = 32 tiles * 2 bytes)

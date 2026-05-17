@@ -1,0 +1,7 @@
+qsort comparator for sort_zone_oam_entries_to_vram. Compares two 9-byte zone OAM entry structs by draw priority: extracts bits[3:2] of byte[+5] from each entry (lsls #0x1c; lsrs #0x1e) as the priority field; if unequal returns the difference; if equal uses byte[+8] as tiebreak key. qsort sorts ascending so lower priority values render first.
+
+Constants:
+- PRIORITY_SHIFT = 0x1c (left shift to extract bits[3:2])
+- PRIORITY_MASK_SHIFT = 0x1e (right shift to [1:0])
+- TIEBREAK_OFFSET = 0x8 (secondary sort field byte offset)
+- PRIORITY_OFFSET = 0x5 (primary sort field byte offset)

@@ -1,0 +1,11 @@
+Loads pack card info subpage BG tile graphics and palette, using the second data set from the shared ROM GFX tables (offset +0x8 vs main page +0xc). First zero_fill_halfword_wrapper clears 0x0600d000 (0x1000 HW); reads huffman-compressed tile ptr from ROM 0x09cce2b0+8, decompresses to 0x0600d000; reads from 0x09cce2d0+8, decompresses to 0x0600e800; DMA-copies 0x09cce2c0+8 palette (32 bytes) to 0x050001a0. Called immediately after init_pack_card_info_bg_and_vram on entering card info subpage.
+
+Constants:
+- ROM_GFX_TABLE_A = 0x09cce2b0 (pack GFX data table A, +0x8 = info page tile ptr)
+- ROM_GFX_TABLE_B = 0x09cce2d0 (pack GFX data table B)
+- ROM_PAL_TABLE = 0x09cce2c0 (pack palette table)
+- VRAM_CLEAR = 0x0600d000 (cleared then written)
+- VRAM_TILE_A = 0x0600d000, VRAM_TILE_B = 0x0600e800 (huffman decomp targets)
+- BG_PAL_DST = 0x050001a0
+- PAL_SIZE = 0x20 (32 bytes)
+- TABLE_OFFSET = 0x8 (info page data offset in ROM table, vs main page +0xc)

@@ -1,0 +1,7 @@
+Writes pack card sprite OAM attributes, dispatching to different write paths based on r2 (affine_param). Extracts coordinates from packed_xy (r0 high16=y_raw, low16=x_raw) and adjusts (x-=0x10, y-=0x20) to align to card sprite reference point. Entry `adds r3,r2,#0` transfers r2 to r3 for comparison. If r2==0x100 (OAM_AFFINE_BIT standard mode): calls write_oam_entry_with_tile_inc(packed_xy_adj, r1, OAM_BASE). Otherwise (rotation-scaling mode, r2 contains rotation param): shifts r3 left 0x10 and calls write_pack_obj_attr_by_dir_stacked.
+
+Constants:
+- X_ADJUST = 0x10 (x coordinate reference offset subtracted, 16 px)
+- Y_ADJUST = 0x20 (y coordinate reference offset subtracted, 32 px)
+- OAM_AFFINE_BIT = 0x100 (OAM_ROT_SCALE_FLAG; r2==0x100 -> standard non-affine path)
+- OAM_BASE = 0x000080c0 (pack OAM shadow base)

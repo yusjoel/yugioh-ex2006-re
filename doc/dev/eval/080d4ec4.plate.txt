@@ -1,0 +1,8 @@
+Fills tile IDs for a specified card slot in pack card shop BG tilemap (0x0600e80a). Uses r0 (col_group) and r1 (row_group) to compute tilemap offset: ((r1*5+r0)*24+1)*2 bytes. Loops writing 4 columns x 6 rows of tile block, tile IDs start at (r1*5+r0)*24+1 and increment consecutively. Used during card shop init to fill slot grid with valid tile IDs.
+
+Constants:
+- TILEMAP_BASE = 0x0600e80a (BG tilemap card slot region start)
+- COLS_PER_SLOT = 4 (columns per slot [0..3])
+- ROWS_PER_SLOT = 6 (rows per slot [0..5])
+- TILEMAP_ROW_STRIDE = 0x40 (32 tiles * 2 bytes per row)
+- FIRST_TILE_ID = (r1*5+r0)*24+1 (start tile ID, nonzero)

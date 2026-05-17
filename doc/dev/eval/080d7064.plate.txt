@@ -1,0 +1,9 @@
+pack card info subpage init: sets BG control registers and zero-fills all VRAM regions. Writes BG0CNT=0x1c00, BG1CNT=0x1d0d, BG2CNT=0x1e8a. Calls zero_fill_halfword_wrapper to clear 6 VRAM regions: 0x06000000 (0x4000 HW), 0x0600e000 (0x800 HW), 0x0600d000 (0x1000 HW), 0x0600e800 (0x800 HW), 0x06008000 (0x1000 HW), 0x0600f000 (0x800 HW). Calls reset_all_bg_scroll_regs_and_shadows. Called by pack_banner_080d733c on entering card info subpage; zero-parameter pure side-effect function.
+
+Constants:
+- BG0CNT = 0x04000008
+- BG0CNT_VAL = 0x1c00 (charblock 7, 256x256, 4bpp)
+- BG1CNT_VAL = 0x1d0d, BG2CNT_VAL = 0x1e8a
+- VRAM_TILEMAP = 0x06000000, VRAM_BG2 = 0x0600e000
+- VRAM_BG_CHAR_A = 0x0600d000, VRAM_BG3 = 0x0600e800
+- VRAM_BG_CHAR_B = 0x06008000, VRAM_BG_CHAR_C = 0x0600f000

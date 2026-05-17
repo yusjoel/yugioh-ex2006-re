@@ -1,0 +1,5 @@
+Maps pack card slot index r0 to screen Y pixel coordinate. r0==0 or r0==2/3: returns 0x28 (40 px, top row); r0==1: returns 0x78 (120 px, bottom row). No push/pop, pure combinational leaf function. Called by pack card info page when computing OAM sprite Y coordinate.
+
+Constants:
+- Y_TOP_ROW = 0x28 (40 px, top card slot row)
+- Y_BOTTOM_ROW = 0x78 (120 px, bottom card slot row)

@@ -1,0 +1,16 @@
+pack card shop entry: loads AOB (All-Or-Bust) sprite GFX based on mode parameter r0 in {0,5,7,8}. Copies palette (32 bytes) to BG palette slot 0x050002a0, then calls tile_2d_row_copy to write tile data to OBJ VRAM 0x06014000. Initializes AOB animation context at 0x0201fedc via init_aob_ctx_from_ptnsect + init_aob_ctx_with_anm_entry. Sets context flags [+0x13] |= 0x11, [+0xe] := 0x2. Returns r0=1 on success; r0=0 if mode not in {0,5,7,8}.
+
+Constants:
+- OBJ_VRAM_TILE_BASE = 0x06014000 (OBJ tile VRAM)
+- BG_PAL_SLOT = 0x050002a0 (BG palette pack banner slot)
+- AOB_CTX_BASE = 0x0201fedc (pack AOB animation context)
+- ROM_TILE_MODE0 = 0x098a3100 (mode0 tile ROM source; tile height r6=0xc)
+- ROM_PAL_MODE0 = 0x098a4900 (mode0 palette ROM source)
+- ROM_TILE_MODE5 = 0x098a17d8 (mode5 tile ROM source; tile height r6=0xc)
+- ROM_PAL_MODE5 = 0x098a2fd8 (mode5 palette ROM source)
+- ROM_TILE_MODE7 = 0x0989f670 (mode7 tile ROM source; tile height r6=0x10)
+- ROM_PAL_MODE7 = 0x098a1670 (mode7 palette ROM source)
+- ROM_TILE_MODE8 = 0x098a3100 (mode8 tile ROM source; tile height r6=0xc)
+- ROM_PAL_MODE8 = 0x098a4920 (mode8 palette ROM source)
+- FLAG_VIS = 0x11 (visible flag combination)
+- MODE_BYTE = 0x2 (animation mode number)

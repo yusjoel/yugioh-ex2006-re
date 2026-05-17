@@ -1,0 +1,10 @@
+pack card shop AOB animation state machine tick, called every frame. Reads phase byte [gBannerState+0x10] and dispatches on 0/1/other:
+- phase>=2: clears [+0x0] bit1 flag; writes 0x02023130+0x215 bitmask; returns 0.
+- phase=0: loads ROM palette+tiles to 0x050002a0/0x06014000; initializes AOB context (gBannerState+0x1c); calls sync_state_and_init_sprite; if r6==0xb syncs player LP delta and calls refresh_player_field_slot_tiles + update_zone_oam_card_count_tag; advances phase+1; returns 1.
+- phase=1: switch dispatch on r6 (0..0xf) selects animation frame coords; calls transform_zone_oam_coords_by_player; render_aob_frame_to_oam; tick_aob_frame_counter; if frame counter reaches 0 advances phase+1; returns 1.
+
+Constants:
+- gBannerState = 0x0201fec0 (pack banner state struct)
+- BG_PAL_DST = 0x050002a0, OBJ_TILE_DST = 0x06014000 (VRAM write targets)
+- ZONE_TYPE_B = 0xb (zone type triggering LP sync)
+- gP1LifePoints = 0x0201c4e0, PLAYER_STRIDE = 0x868 (LP struct)

@@ -1,0 +1,7 @@
+Clears tile IDs for a specified card slot in pack card shop BG tilemap (0x0600e80a), writing all-zero (transparent tile). Address calculation matches fill_pack_card_slot_tiles: r0 (col_group) and r1 (row_group) determine offset; writes 4 columns x 6 rows with fixed tile ID=0. Used to hide or refresh card slot patterns by clearing old content before refilling.
+
+Constants:
+- TILEMAP_BASE = 0x0600e80a (BG tilemap card slot region, same as fill_pack_card_slot_tiles)
+- TILE_ID_CLEAR = 0x0 (transparent tile)
+- COLS_PER_SLOT = 4, ROWS_PER_SLOT = 6
+- TILEMAP_ROW_STRIDE = 0x40 (row stride)

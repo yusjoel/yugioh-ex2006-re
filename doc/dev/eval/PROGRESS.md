@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 440 + 剩余 326 (17 批 #101..#117 / 20 每批) |
-| **下一批** | `#101` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batch #100 milestone, 440/766 = 57.44%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 460 + 剩余 306 (16 批 #102..#117 / 20 每批) |
+| **下一批** | `#102` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-17 (Phase 2 batch #101, 460/766 = 60.05%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**440 / 766 已分析** (57.44%, 剩余 17 批待跑 #101..#117)
+**460 / 766 已分析** (60.05%, 剩余 16 批待跑 #102..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -100,6 +100,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #98 `eefa44e` 400/766 (52.22%) — LP row type wrapper sibling cluster + equip slot eligibility callbacks
 - batch #99 420/766 (54.83%) — equip target/sub-entry eligibility + bitmap scan + summon eligibility
 - batch #100 440/766 (57.44%) — score_slot scoring cluster + exec_equip_target dispatch cluster + bonus check siblings (milestone batch #100)
+- batch #101 460/766 (60.05%) — scene_pack card shop UI subsystem (pack scroll + tiles + OAM + info page)
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -108,9 +109,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#100) | 440 |
-| - 剩余 (按 20/批 重组) | 326 |
-| 剩余分批数 (20/批) | 17 (`#101..#117`) |
+| - 已完成 (Phase 2 #82-#101) | 460 |
+| - 剩余 (按 20/批 重组) | 306 |
+| 剩余分批数 (20/批) | 16 (`#102..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
 

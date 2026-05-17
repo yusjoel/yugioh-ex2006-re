@@ -1,0 +1,11 @@
+pack scene init: sets BG control registers and zero-fills related VRAM regions. Writes BG0CNT=0x1c00 (4bpp, charblock 7), BG1CNT=0x1d86, BG2CNT=0x1e8a. Sets [gPrng+0x174] |= 0x200 (enables feature flag). Calls reset_all_bg_scroll_regs_and_shadows. Clears [pack_ui_state+0xc+0x3e]. Zero-fills 4 VRAM regions via zero_fill_halfword_wrapper: 0x06000000 (0x20 HW), 0x0600e000 (0x800 HW), 0x06004000 (0x40 HW), 0x0600e800 (0x800 HW). Called by pack main scene frame driver on entry.
+
+Constants:
+- BG0CNT = 0x04000008 (BG0 control register)
+- BG0CNT_VAL = 0x1c00 (charblock 7, 256x256, 4bpp)
+- BG1CNT_VAL = 0x1d86
+- BG2CNT_VAL = 0x1e8a
+- gPrng_FLAG_OFFSET = 0x174 (= 0xba << 1; gPrng+0x174 feature flag)
+- FLAG_BIT = 0x200 (= 0x80 << 2)
+- VRAM_0 = 0x06000000, VRAM_1 = 0x0600e000, VRAM_2 = 0x06004000, VRAM_3 = 0x0600e800
+- pack_ui_state = 0x03005850
