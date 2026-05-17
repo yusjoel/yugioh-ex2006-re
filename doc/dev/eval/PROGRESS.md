@@ -97,7 +97,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #95 `d9fe7c4` 340/766 (44.39%) — card display dispatch micro-stub cluster (18 sibs op_0xNN) + effect slot utilities
 - batch #96 `6d2784e` 360/766 (46.99%) — card display dispatch stubs (continued) + equip target/chain sum/zone bitmap
 - batch #97 `d70ffda` 380/766 (49.61%) — LP bar + equip slot + palette table cluster
-- batch #98 `(pending)` 400/766 (52.22%) — LP row type wrapper sibling cluster + equip slot eligibility callbacks
+- batch #98 `eefa44e` 400/766 (52.22%) — LP row type wrapper sibling cluster + equip slot eligibility callbacks
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
