@@ -1,0 +1,7 @@
+Neo-Daedalus group field spell activation pre-check: extracts player_id and extra_flag from effect_node [r0+2] bit0 and [r0+3] bit5, XOR to get effective_player, calls check_field_spell_neo_daedalus_group_placeable; returns 0 if not placeable. If placeable: checks Non-Fusion Area (0x197a) field copy count; returns 0 if > 0. Reads [0x0201e2a0+4] and compares with player_id; if match writes gP1LifePoints+0x1d78 := 0xe (sets special state). Finally calls dispatch_effect_handler_by_card_id(player, card_id, 0) and passes through result.
+
+Called by FUN_0807fde8 switch case 0x80 (caseD_80) as field spell effect activation check entry point.
+
+Side effects: [gP1LifePoints + 0x1d78] := 0xe (if player matches [0x0201e2a0+4]); dispatch_effect_handler_by_card_id may write effect state.
+
+Constants: CARD_NON_FUSION_AREA=0x197a (Non-Fusion Area, confirmed in data.md), EWRAM_BASE=0x0201e2a0, STATE_FIELD=0x1d78 (gP1LifePoints+0x1d78), STATE_VALUE=0xe.

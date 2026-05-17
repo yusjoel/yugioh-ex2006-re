@@ -1,0 +1,7 @@
+Checks whether card_id (ldrh [r4+0]) exists in the specified player's slot_chain with value 0xb: calls check_value_in_slot_chain(player, card_id, 0xb). If not in chain (bne falls through): reads type_code from gP1LifePoints + player*stride + 0x1cec, calls enqueue_sprite_attr_type11(player, card_id, type=0x5, type_code).
+
+Called via runtime function pointer dispatch (indeg=0). Acts as effect_node sprite enqueue handler.
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_type11.
+
+Constants: CHAIN_VALUE=0xb (slot chain detection value 11), gP1LifePoints_OFFSET=0x1cec, SPRITE_TYPE=0x5.

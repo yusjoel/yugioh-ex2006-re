@@ -1,0 +1,9 @@
+Extracts zone_type field (bits[13:5], 9-bit) from effect_node slot array entry: addr = r0 + r1*2 + 8; loads word; lsls#18 then lsrs#23 to extract bits[13:5] (9 bits, zone type, valid range [0..10]).
+
+Sibling of read_effect_slot_side_and_type (0x08080d6c) which extracts bit0=side and bits[4:1]=type_nibble; this function extracts the higher zone_type bits.
+
+High-frequency callee (25+ callers across full duel_field module). Callers use the result as a zone table index (multiplied by 4 for ROM table lookup).
+
+Side effects: none.
+
+Constants: SLOT_ARRAY_BASE_OFFSET=8, SLOT_STRIDE=2, ZONE_TYPE_SHIFT=5, ZONE_TYPE_WIDTH=9 (bits[13:5]).

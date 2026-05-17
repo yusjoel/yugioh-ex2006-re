@@ -1,0 +1,7 @@
+Similar structure to assemble_effect_slot_attr_with_zone_lookup (0x08080ba0) but with different r3 usage: extracts player_flag (r1 bit0), col_nibble (r2 bits[3:0]<<1), and type_flags (r3 bits[12:5] via lsls#0x17;lsrs#0x12); applies 0xffffc01f and 0xffff3fff dual masks to clear then merges into r5; advances [r0+6] slot_write_ptr and writes to [r0+8+slot*2].
+
+Called by FUN_08080d28 after enqueue_equip_slot_sprite_with_display_code.
+
+Side effects: [r0+6] bits[4:2] := advanced slot_write_ptr; [r0+8+slot*2] := r5 (packed u16 slot attribute).
+
+Constants: MASK_TYPE_CLEAR=0xffffc01f (DAT_08080c94), MASK_DIR_CLEAR=0xffff3fff (DAT_08080c98).

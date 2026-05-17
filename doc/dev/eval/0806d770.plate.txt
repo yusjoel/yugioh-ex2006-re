@@ -1,0 +1,12 @@
+Spirit monster LP animation state machine tick: reads animation state word at gP1LifePoints+0x4a0 (0x94*8), dispatches by current state:
+
+- State 0x80: calls increment_lp_bar_display_counter; if corresponding player LP != 0 calls enqueue_lp_display_row_if_enabled; returns 0x7f.
+- State 0x7f: similar, processes other player LP display; returns 0x7e.
+- State 0x7e: calls enqueue_lp_display_row_if_enabled again; returns 0x7d.
+- State 0x7d: calls decrement_lp_bar_display_counter; returns 0x0.
+
+Called via runtime function pointer dispatch (indeg=0). Same tick_*_display_seq cluster as tick_lp_compare_init_display_seq (0x08040338).
+
+Side effects: enqueue_lp_display_row_if_enabled writes LP display queue; increment/decrement modifies LP bar counter.
+
+Constants: LP_ANIM_STATE_OFFSET=0x4a0 (0x94*8, gP1LifePoints base offset), player_stride=0x868, LP_OFFSET=0xc, STATE_INIT=0x80, STATE_STEP1=0x7f, STATE_STEP2=0x7e, STATE_FINISH=0x7d.

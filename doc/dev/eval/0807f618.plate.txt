@@ -1,0 +1,7 @@
+Checks equip activation criteria by slot card state code (symmetric to check_card_equip_criteria_by_ext_field6): if criteria_code (r0) > 0x14=20, calls check_slot_card_pair_allowed(criteria=r4, slot_ptr=r1, card_ptr=r2); if <= 20, calls get_slot_card_state_code(slot=r1, card=r2), masks to low 16 bits, and compares with criteria_code, returning 1 if match else 0.
+
+Called by FUN_08054d5c and FUN_080598d8 (card frame / equip activation check chain) and FUN_0807f848/0807f8f0.
+
+Side effects: none.
+
+Threshold: criteria_code <= 0x14 uses state_code comparison; criteria_code > 0x14 uses check_slot_card_pair_allowed.

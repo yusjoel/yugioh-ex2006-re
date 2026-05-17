@@ -1,0 +1,7 @@
+Advances effect_node slot write pointer and stores value: reads slot_write_ptr (bits[4:2], 3-bit, range 0..7) from [r0+6]; increments and takes modulo 8 as next_slot; writes back to [r0+6] (preserving other bits); stores r1 (u16 value) at [r0 + 8 + next_slot*2].
+
+Called by FUN_08081ce8 and related effect node write routines; each call writes one equip effect node slot entry.
+
+Side effects: [r0+6] slot_write_ptr field bits[4:2] := (old+1) mod 8; [r0 + 8 + slot*2] := r1 (u16 write to slot array).
+
+Constants: SLOT_BITS_MASK=~0x1c (bits[4:2] clear mask), SLOT_COUNT=8, SLOT_ARRAY_BASE_OFFSET=8, SLOT_STRIDE=2.

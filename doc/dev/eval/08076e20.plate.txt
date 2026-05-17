@@ -1,0 +1,7 @@
+Black Luster Soldier - Envoy of the Beginning (0x16cb) dedicated effect zone sprite enqueue: extracts player_id (bit0) and zone_type (bits[6:2]) from effect_node [r0+2], computes gDuelFieldSlots (r12=0x0201c510) zone offset; if col+direction sum matches [r0+4] bits[9:3] and [slot+8] != 0, calls enqueue_sprite_attr_with_mode with card_id=0x16cb (Black Luster Soldier).
+
+Called via runtime function pointer dispatch (indeg=0). Same equip-zone-sprite cluster as enqueue_zone_equip_sprite_if_slot_matches (0x0806d514).
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_with_mode.
+
+Constants: CARD_BLACK_LUSTER_SOLDIER=0x16cb (Black Luster Soldier - Envoy of the Beginning, confirmed in data.md), gDuelFieldSlots=0x0201c510 (DAT_08076eb4), player_stride=0x868 (DAT_08076eb0), SPRITE_MODE=0x4.

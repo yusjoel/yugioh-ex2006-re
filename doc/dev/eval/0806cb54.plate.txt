@@ -1,0 +1,7 @@
+Spirit monster effect_node handler for Otohime (0x1503) / Solomon's Lawbook (0x137e): reads card_id ([r4+0]), checks against 0x137e (Solomon's Lawbook) and 0x14fd (Maharaghi) special cases; determines type_code (0/1/2) based on whether player LP equals opponent LP; calls enqueue_sprite_attr_type11 to enqueue sprite attribute.
+
+Called by FUN_08071d64 (spirit monster dispatcher) in the card_id == 0x1503 (Otohime) branch.
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_type11.
+
+Constants: CARD_OTOHIME=0x1503 (Otohime, via caller branch), CARD_SOLOMONS_LAWBOOK=0x137e (Solomon's Lawbook), CARD_MAHARAGHI=0x14fd (Maharaghi), player_stride=0x1ce8, opponent_lp_offset=0x1cf4, SPRITE_TYPE=0x11.

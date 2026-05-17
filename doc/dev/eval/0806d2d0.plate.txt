@@ -1,0 +1,7 @@
+effect_node handler wrapper: if guard_bit (bit2 of [r0+4]) is clear, extract player_id (bit0 of [r0+2]) and set_code (ldrh [r0+0x14]), then call submit_effect_zone_lp_and_shape_sprites(player_id, set_code) to submit effect zone LP and shape sprites.
+
+Called via runtime function pointer dispatch (indeg=0, no direct bl callers).
+
+Side effects: updates effect zone LP and shape sprites via submit_effect_zone_lp_and_shape_sprites.
+
+Constants: GUARD_BIT=0x4 (bit2 of flags byte [+4]).

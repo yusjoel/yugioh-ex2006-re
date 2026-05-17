@@ -1,0 +1,7 @@
+Serial Spell (0x183e) effect LP delta handler: reads card_id from source node [r1+0] and writes to effect_node [r4+0]; calls apply_equip_lp_delta_by_node_flag(r4) to apply LP delta; overwrites effect_node [r4+0] with 0x183e (Serial Spell) to mark this node as a Serial Spell effect.
+
+Called via runtime function pointer dispatch (indeg=0, no direct bl callers).
+
+Side effects: [r4+0] := [r1+0] (temporary copy of original card_id); apply_equip_lp_delta_by_node_flag modifies player LP and node committed bit; [r4+0] := 0x183e (Serial Spell card_id overwrite).
+
+Constants: CARD_SERIAL_SPELL=0x183e (Serial Spell, confirmed in data.md).

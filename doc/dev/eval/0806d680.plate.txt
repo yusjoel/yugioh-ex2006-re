@@ -1,0 +1,7 @@
+Spirit monster effect handler for Yamata Dragon (0x1501) and related cards: reads player_id (bit0 of [r0+2]), computes opponent_id (1 - player_id), checks gP1LifePoints + player_stride*opponent + 0x1ce8 (current LP) == 1. If LP == 1 uses type_code=0x21, else type_code=0x11. Calls enqueue_sprite_attr_type11(card_id=[r0+0], player, type).
+
+Called by FUN_08071d64 spirit monster dispatcher in the card_id == 0x1501 (Yamata Dragon) branch.
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_type11.
+
+Constants: CARD_YAMATA=0x1501 (Yamata Dragon, via caller branch), LP_OFFSET=0x1ce8, player_stride=0x868, TYPE_NORMAL=0x11, TYPE_LP_ONE=0x21.

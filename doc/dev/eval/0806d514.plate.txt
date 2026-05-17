@@ -1,0 +1,7 @@
+Extracts player_id (bit0) and zone_type (bits[6:2], 5-bit) from effect_node [r0+2]; computes zone offset in gDuelFieldSlots (stride: zone*5*4, player*0x868); extracts col_nibble and direction_bit from slot data. If col_nibble+direction_bit sum matches [r0+4] bits[9:3] and [slot+8] != 0 (slot occupied), calls enqueue_sprite_attr_with_mode to enqueue sprite.
+
+Called by FUN_08071404 when zone_type == 0x0d (equip zone 13).
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_with_mode.
+
+Constants: gDuelFieldSlots=0x0201c510 (DAT_0806d5ac), player_stride=0x868 (DAT_0806d5a8), zone_entry_stride=20 (zone*5*4), SPRITE_MODE=0x4.

@@ -1,0 +1,7 @@
+Symmetric variant of enqueue_zone_equip_sprite_if_slot_matches (0x0806d514), using r8 = gDuelFieldSlots (via .hword 0x4688) and r12 = DAT_0806d768 = 0x0201c510. Extracts player_id and zone_type from effect_node [r7+2], computes zone offset, compares col against [r7+4] bits[9:3]; if match and [slot+8] != 0, reads LP field [0x1cb8] for player-side check, calls enqueue_sprite_attr_with_mode to enqueue sprite.
+
+Called via runtime function pointer dispatch (indeg=0). Variant within the same equip zone sprite cluster as 0x0806d514.
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_with_mode.
+
+Constants: gDuelFieldSlots=0x0201c510 (DAT_0806d768), player_stride=0x868 (DAT_0806d764), lp_extra_offset=0x1cb8 (DAT_0806d76c), SPRITE_TYPE=0x12/0x22 (based on LP player check).

@@ -1,0 +1,7 @@
+Spirit monster effect handler for Fushi No Tori (0x1506): reads player_id (bit0 of [r2+2]), computes opponent_id (1 - player_id), calls enqueue_sprite_attr_type11(opponent_player, card_id=[r2+0], type_code=0x11, subtype=0).
+
+Called by FUN_08071d64 spirit monster effect dispatcher at LAB_08071e68, which corresponds to card_id == 0x1506 (Fushi No Tori). Simplest enqueue handler in the hub.
+
+Side effects: writes to sprite queue via enqueue_sprite_attr_type11.
+
+Constants: TYPE_CODE=0x11 (standard spirit effect type), SUBTYPE=0.

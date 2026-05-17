@@ -1,0 +1,7 @@
+Assembles effect slot attribute from player_flag (r1 bit0), col_nibble (r2 bits[3:0]), and gDuelFieldSlots zone field data (zone_type bits[14:9], direction bit[14]); combines into packed u16 slot attribute word; advances [r0+6] slot_write_ptr and writes result to [r0+8+slot*2].
+
+Called by FUN_08080c9c after enqueue_equip_slot_sprite_by_player to update effect_node slot attribute.
+
+Side effects: [r0+6] bits[4:2] := advanced slot_write_ptr; [r0+8+slot*2] := assembled r6 (u16).
+
+Constants: gDuelFieldSlots=0x0201c510 (DAT_08080c2c), player_stride=0x868 (DAT_08080c28), COL_MASK=0xf, COL_SHIFT=1, TYPE_MASK=0xffffc01f (DAT_08080c30), DIR_MASK=0xffff3fff (DAT_08080c38).

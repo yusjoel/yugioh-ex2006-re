@@ -1,0 +1,7 @@
+effect_node handler: if guard_bit (bit2 of [r0+4]) is clear, extract player_id (bit0 of [r0+2]) and call set_player_state_bit_with_sprite_update(player_id, 0x16, 1) to set player state bit 22 and refresh sprite.
+
+Called via runtime function pointer dispatch (indeg=0, no direct bl callers).
+
+Side effects: sets player state bit 22 := 1 via set_player_state_bit_with_sprite_update.
+
+Constants: GUARD_BIT=0x4 (bit2 of flags byte [+4]), STATE_BIT_IDX=0x16 (22 decimal), BIT_VALUE=1.

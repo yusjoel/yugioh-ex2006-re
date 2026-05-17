@@ -1,0 +1,7 @@
+Refreshes equip zone sprite display for both players: calls increment_lp_bar_display_counter to lock LP bar; loops r4=0..1 (two iterations): reads global equip side from EWRAM [0x0201e1c8], XOR with r4 and node player bit to get target player, calls enqueue_equip_zone_sprite_attr_full(player, 1); after loop calls decrement_lp_bar_display_counter to unlock.
+
+Called via runtime function pointer dispatch (indeg=0, no direct bl callers).
+
+Side effects: enqueue_equip_zone_sprite_attr_full writes sprite queue (twice); LP bar counter incremented then decremented.
+
+Constants: EWRAM_EQUIP_SIDE=0x0201e1c8 (DAT_0807db58), LOOP_COUNT=2 (r4=0..1).

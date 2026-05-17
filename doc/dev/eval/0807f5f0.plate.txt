@@ -1,0 +1,7 @@
+Checks whether a card satisfies the specified equip activation criteria: if criteria_code (r0) > 0x14=20, calls check_card_pair_allowed(criteria_code, card_ptr) for generic pair check; if <= 20, calls get_card_extended_stat_field6(card_ptr) and compares result with criteria_code, returning 1 if match, 0 otherwise.
+
+Called by FUN_0807f644 (equip display entry activation branch) and FUN_0807f800.
+
+Side effects: none.
+
+Threshold: criteria_code <= 0x14 uses ext_field6 comparison path; criteria_code > 0x14 uses check_card_pair_allowed path.

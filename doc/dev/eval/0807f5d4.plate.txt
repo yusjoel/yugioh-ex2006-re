@@ -1,0 +1,7 @@
+Linear search in ROM table (0x09e59e14, stride 8 bytes, max 0x55=85 entries) for an entry matching card_id (r0): reads [entry+0] u16 and compares with r0 each iteration; returns entry pointer if found, else returns 0 (NULL).
+
+Called by FUN_0807f644 and other equip activation check functions to look up card-specific equip display entries.
+
+Side effects: none.
+
+Constants: TABLE_BASE=0x09e59e14 (ROM read-only table), ENTRY_STRIDE=8, MAX_INDEX=0x55 (85, total 86 entries).
