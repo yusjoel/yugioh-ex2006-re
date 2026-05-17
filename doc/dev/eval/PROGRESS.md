@@ -91,7 +91,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #89 `54cdf59` 220/766 (28.72%) — equip slot eligibility + zone placement + tick display cluster
 - batch #90 `60ddde0` 240/766 (31.33%) — equip eligibility + zone field state predicate cluster (form(c) indeg=0 heavy)
 - batch #91 `611fdb6` 260/766 (33.94%) — card-effect eligibility predicates + dispatch hub (Neo Daedalus, Light of Intervention, Ojama Trio, Zera Ritual)
-- batch #92 `(pending)` 280/766 (36.55%) — equip placeability predicates + LP-delta inline fragment cluster (FUN_08064880)
+- batch #92 `a5c2cf1` 280/766 (36.55%) — equip placeability predicates + LP-delta inline fragment cluster (FUN_08064880)
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
