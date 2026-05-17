@@ -89,7 +89,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #87 `784c1bf` 180/766 (23.50%) — equip_slot eligibility predicate cluster (20 fns)
 - batch #88 `e181488` 200/766 (26.11%) — equip slot eligibility + BST tier classifier + LP sprite cluster
 - batch #89 `54cdf59` 220/766 (28.72%) — equip slot eligibility + zone placement + tick display cluster
-- batch #90 `(pending)` 240/766 (31.33%) — equip eligibility + zone field state predicate cluster (form(c) indeg=0 heavy)
+- batch #90 `60ddde0` 240/766 (31.33%) — equip eligibility + zone field state predicate cluster (form(c) indeg=0 heavy)
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
