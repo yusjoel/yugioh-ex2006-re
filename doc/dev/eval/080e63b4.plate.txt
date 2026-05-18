@@ -1,0 +1,12 @@
+pack UI tile and palette upload function. Sequentially performs 4 VRAM/CGRAM writes: (1) load_pack_tile_and_map_to_vram(0xc00, 0x09cf006c, 0x10, 2) loads main tiles and tilemap; (2) copy_bytes_by_halfword(0x05000040, 0x09cf203c, 0x20) writes 32 halfwords to CGRAM slot 0x40; (3) copy_bytes_by_halfword(0x050003e0, 0x09cf8074, 0x20) writes CGRAM slot 0x3e0 palette; (4) copy_bytes_by_halfword(0x06010000, 0x09cf8094, 0x800) writes 0x800 halfwords of tile data to OBJ tile VRAM at 0x06010000. No parameters, no return value. Called from FUN_080e7e0c scene init path.
+
+Constants:
+  TILE_LOAD_ID = 0xc00 = 0xc0<<4      // load_pack_tile tile_id start
+  TILE_MAP_SRC = 0x09cf006c            // ROM tilemap data
+  CGRAM_SLOT_A = 0x05000040            // CGRAM palette slot A
+  PAL_SRC_A    = 0x09cf203c            // ROM palette data A
+  CGRAM_SLOT_B = 0x050003e0            // CGRAM palette slot B
+  PAL_SRC_B    = 0x09cf8074            // ROM palette data B
+  OBJ_TILE_DST = 0x06010000            // OBJ VRAM tile destination
+  TILE_SRC     = 0x09cf8094            // ROM tile data
+  TILE_SIZE    = 0x800                 // tile copy halfword count

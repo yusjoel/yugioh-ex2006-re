@@ -1,0 +1,9 @@
+pack scene scroll input processing frame tick function. Reads gMenuState[0x10] bits[5:2] (scroll direction flags); if bit[6] (0x40) + high-side direction active: sets gMenuState[0xc]=0xffff (page-top jump), sets bit[3] in [0x10], calls sync_state_and_init_sprite(0); if bit[7] (0x80) + page not full: compares current scroll position r2 against deck count-1, if within bounds sets gMenuState[0xc]=1 (page-end advance), sets bit[3], sync_state_and_init_sprite(0); if bits[5:2] still active: computes new scroll position and writes back to [0xf/0x10], if bits cleared advances frame counter returns 0; if all inputs cleared returns 1. No parameters.
+
+Constants:
+  SCROLL_FLAGS   = bits[5:2] of gMenuState[0x10]  // scroll direction 4-bit mask 0x3c
+  TOP_FLAG       = 0x40     // gPrng+0x148 bit6 = at-top flag
+  BOTTOM_FLAG    = 0x80     // gPrng+0x148 bit7 = at-bottom flag
+  PAGE_TOP       = 0xffff   // gMenuState[0xc] = jump to page top
+  PAGE_ADV       = 1        // gMenuState[0xc] = advance one page
+  FRAME_MASK     = 0xfffffe3f  // gMenuState[0x10] frame mask

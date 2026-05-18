@@ -1,0 +1,6 @@
+pack scene single-row text render function, sibling of render_page_row_text (0x080e58a8). Target VRAM base 0x06004480 (vs page row base 0x06007480), ROM tile template 0x09cf205c (0x600 bytes). r0=pack_row_idx, r1=string_id, r2=row_offset; computes dest = 0x06004480 + idx*3*0x200; copies ROM tile template; calls setup_line_buf_pos_and_font(0x18,2); selects font_jp_base_table entry by gSettings.lang; calls game_str_id_to_row + text_render_wrapper twice for dual-line text; finally commit_line_buffer_to_sprite_vram writes to OBJ VRAM. Called from FUN_080e7e0c case render loop.
+
+Constants:
+  VRAM_BASE   = 0x06004480  // pack row OBJ tile VRAM base
+  TILE_TMPL   = 0x09cf205c  // ROM tile template (0x600 bytes)
+  ROW_STRIDE  = 3*0x200 = 0x600  // tile stride per row

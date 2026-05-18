@@ -1,0 +1,8 @@
+Renders a single line of text to BG tile VRAM at 0x06012800. r0 = text string pointer. Flow: selects font_jp_base_table entry by gSettings.lang; setup_line_buf_with_font_and_align(0x1c,0xa,1,2) initializes 28-pixel-wide line buffer; text_render_wrapper(0,0,1,str) renders text; 10-iteration loop (r4=0..9) calls zero_fill_by_halfword on 0x06012800 rows (0xe0*4=0x380 bytes each) to clear 10 rows; write_line_buf_to_bg_tile_vram(0x06012800,0) writes BG tile. Triggered by FUN_080e609c.
+
+Constants:
+  BG_DEST     = 0x06012800  // BG tile VRAM target base
+  BUF_WIDTH   = 0x1c = 28   // line buffer width
+  ALIGN       = 0xa = 10    // alignment param
+  CLEAR_ROWS  = 10          // rows to zero (r4: 0..9)
+  ROW_SIZE    = 0xe0<<2 = 0x380  // bytes per row to clear

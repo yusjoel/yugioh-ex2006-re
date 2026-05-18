@@ -1,0 +1,10 @@
+Renders card name and rarity text to BG tile VRAM at 0x06015000. r0 = card name string pointer, r1 = rarity string pointer. Flow: tile_2d_row_copy(0x06015000, 0x09cf447c, 0x18, 0xc) copies BG background pattern (24 rows x 12 cols); selects font_jp_base_table entry by gSettings.lang; setup_line_buf_with_font_and_align(0x16,0xc,1,2) initializes 22-pixel-wide line buffer; count_bytes_until_null measures card name length, computes right-align x offset (0x58 - len*3); text_render_wrapper renders card name at y=0; text_render_wrapper renders rarity at x=0,y=0x18; write_line_buf_to_bg_tile_vram(0x06015020, 0) writes result. Called from pack detail display path (0x080e786c, 0x080e78cc).
+
+Constants:
+  BG_DEST      = 0x06015000  // BG tile VRAM card name region
+  BG_TMPL_SRC  = 0x09cf447c  // ROM background pattern template
+  BG_TMPL_W    = 0x18 = 24   // template width (tile columns)
+  BG_TMPL_H    = 0xc  = 12   // template height (tile rows)
+  NAME_X_BASE  = 0x58 = 88   // right-align base x (88 - len*3)
+  RARITY_Y     = 0x18 = 24   // rarity render y offset
+  BG_WRITE_DEST = 0x06015020  // write_line_buf target

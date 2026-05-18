@@ -1,0 +1,4 @@
+Neutral initialization of a blend parameter struct. Writes {0x1000, 0, 0, 0x1000} to the 4-word struct at r0: [+0]=0x1000 (start scale), [+4]=0 (velocity a), [+8]=0 (velocity b), [+c]=0x1000 (end scale). 0x1000 = 0x80<<5 = 4096 = 1.0 in 20.12 fixed-point (blend full strength). Called from blend animation system during initialization.
+
+Constants:
+  SCALE_ONE = 0x80<<5 = 0x1000  // 20.12 fixed-point 1.0 (blend full strength)

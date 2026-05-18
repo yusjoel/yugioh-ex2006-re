@@ -1,0 +1,10 @@
+Renders a card name string to OBJ sprite tile VRAM. r0 = card name string pointer, r1 = target tile_idx (OBJ VRAM offset = 0x06004000 + tile_idx*32). Flow: setup_line_buf_pos_and_font(0x1a,2); selects font_jp_base_table entry by gSettings.lang; count_bytes_until_null measures string length, if >0x21 bytes switches to narrow font; calls text_render_wrapper(0x8,3,row=0/7,str) twice for dual-line text; zero_fill_by_halfword(0x06004000+tile_idx*0x20, 0xd0*3) clears tile area; commit_line_buffer_to_sprite_vram writes result. Called by FUN_080e5ac8 (pack card name batch render loop).
+
+Constants:
+  FONT_X      = 0x1a = 26    // line buffer start x
+  FONT_SIZE   = 2             // font size param
+  ROW_B       = 7             // second row y offset
+  LEN_NARROW  = 0x21 = 33    // switch to narrow font if length exceeds this
+  TILE_BASE   = 0x06004000   // OBJ tile VRAM base
+  TILE_SIZE   = 0x20 = 32    // bytes per tile
+  ZERO_SIZE   = 0xd0*3 = 0x270  // clear region size

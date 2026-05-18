@@ -1,0 +1,12 @@
+pack scene list scrollbar OAM write function. Reads scroll position and selection state from gMenuState[0xb/0xf/0x10/0xa]; writes 3 classes of OAM entries: (A) fixed track head/tail (tile 0xf80f, 0xf811, write_oam_entry_from_packed_args x2, plus 5-iteration loop for middle segment tile 0xf810); (B) write_obj_attr_packed variant (tile 0xfc15/0xfc16/0xfc17) for visible thumb track; (C) conditional highlight overlay (when gMenuState[0xe] bit1=1, write_oam_entry_with_tile_inc writes 4 highlight OAM entries, tile starts 0xc2*16=0xC20/0xc9*16/0xcd*16). No parameters, no return value.
+
+Constants:
+  TILE_TRACK_HEAD = 0xf80f  // track head tile
+  TILE_TRACK_MID  = 0xf810  // track middle tile (x5)
+  TILE_TRACK_TAIL = 0xf811  // track tail tile
+  TILE_THUMB_HEAD = 0xfc15  // thumb head tile (write_obj_attr_packed)
+  TILE_THUMB_MID  = 0xfc16  // thumb middle tile (x5)
+  TILE_THUMB_TAIL = 0xfc17  // thumb tail tile
+  TILE_HIGHLIGHT_A = 0xc2<<4 = 0xC20  // highlight start tile
+  TILE_HIGHLIGHT_B = 0xc9<<4 = 0xC90
+  TILE_HIGHLIGHT_C = 0xcd<<4 = 0xCD0

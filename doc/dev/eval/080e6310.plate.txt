@@ -1,0 +1,15 @@
+pack scene hardware register and VRAM full initialization function. On entry: writes gPrng+0x174 = 0x0f21 (pack state flag); writes DISPCNT = 0 (display off); calls reset_display_and_obj_vram(0x02039eb0); calls store_ewram_ctx_ptr_and_clear_mode_flags(0x02029eb0); configures 4 BG control registers (BG0CNT=0x4, BG1CNT=0x185, BG2CNT=0x206, BG3CNT=0x307); reset_all_bg_scroll_regs_and_shadows; upload_pack_vram_and_palette; clears BG tile region 0x06004000 (0x8000 halfwords), OBJ VRAM 0x06000000 (0x2000 halfwords; 0xc0<<0x13), 0x06010000 (0x8000 halfwords); finally clears gMenuState+0x2a bit1. Called from FUN_080e7e0c switch case scene reset paths.
+
+Constants:
+  STATE_FLAG     = gPrng + 0x174   // 0xba<<1 = 0x174; pack scene state flag
+  STATE_VAL      = 0x0f21          // pack initial state value
+  DISPCNT        = 0x04000000
+  EWRAM_CTX_A    = 0x02039eb0      // reset_display target
+  EWRAM_CTX_B    = 0x02029eb0      // ctx ptr store target
+  BG0CNT         = 0x04000008; value=0x0004   // BG0 16-color/char_base 0
+  BG1CNT         = 0x0400000a; value=0x0185   // BG1 16-color/char_base 1
+  BG2CNT         = 0x0400000c; value=0x0206   // BG2 16-color/char_base 2
+  BG3CNT         = 0x0400000e; value=0x0307   // BG3 16-color/char_base 3
+  BG_TILE_BASE   = 0x06004000  // BG tile zero region
+  OBJ_VRAM_BASE  = 0x06000000  // 0xc0<<0x13 = 0x06000000; OBJ VRAM zero base
+  BG_TILE_BASE2  = 0x06010000  // second BG tile zero region

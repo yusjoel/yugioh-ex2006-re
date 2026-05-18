@@ -1,0 +1,4 @@
+pack scene scroll state reset subroutine. Called from FUN_080e7e0c reset path (including case 0x11). Writes zero to gPrng+0x1f4 (gPrng+0xfa<<1), clearing the scroll offset buffer field. Function body is 7 instructions only, no parameters, no return value. Sole side effect: [gPrng+0x1f4] := 0.
+
+Constants:
+  FIELD_OFFSET = 0xfa<<1 = 0x1f4  // pack scroll current offset word

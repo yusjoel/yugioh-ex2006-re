@@ -1,0 +1,11 @@
+pack scene palette and tile VRAM upload function. On entry extracts bits[5:3] from gMenuState[0xb] as palette group index; copies 0x80 bytes of palette data from ROM 0x09cf8894 to CGRAM 0x05000200; then writes tile data from ROM 0x09cf8b94 to OBJ VRAM in two banks (0x06010800 and 0x06012400) via 7-iteration loop (r5 descends 6 to 0), 0x400 bytes each. Triggered by FUN_080e7e0c at callsites 0x080e7b74, 0x080e7ee2, 0x080e8466. No parameters, no return value.
+
+Constants:
+  CGRAM_DEST = 0x05000200  // CGRAM slot 1 start (pack UI palette region)
+  PAL_SRC    = 0x09cf8894  // ROM pack palette data
+  TILE_SRC   = 0x09cf8b94  // ROM pack tile data base
+  OBJ_BANK_A = 0x06010800  // OBJ VRAM bank A
+  OBJ_BANK_B = 0x06012400  // OBJ VRAM bank B
+  TILE_COPY_SIZE = 0x400    // 1024 bytes per iteration
+  PAL_COPY_SIZE  = 0x80     // palette 128 bytes (64 colors)
+  LOOP_COUNT = 7            // 7 blocks per bank

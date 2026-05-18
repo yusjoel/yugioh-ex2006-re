@@ -1,0 +1,7 @@
+Scales all 4 fields of a blend parameter struct by fixed-point multipliers. r0=src_ptr, r1=dst_ptr, r2=scale_lo (for words 0,1), r3=scale_hi (for words 2,3). For each of the 4 32-bit fields, multiplies by the corresponding scale using __muldi3 (64-bit multiply), extracts 32-bit result via 20.12 fixed-point shift (lsls r3,r1,#0x14 | lsrs r2,r0,#0xc), writes to dst. Contains two assert checks: src_ptr!=0 (line 0x70) and dst_ptr!=0 (line 0x71). No return value.
+
+Constants:
+  FP_SHIFT_HI   = 0x14 = 20  // high 20-bit left shift
+  FP_SHIFT_LO   = 0x0c = 12  // low 12-bit right shift (20.12 fixed-point)
+  ASSERT_LINE_A = 0x70        // src_ptr != 0 assert line
+  ASSERT_LINE_B = 0x71        // scale != 0 assert line

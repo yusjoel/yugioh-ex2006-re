@@ -1,0 +1,7 @@
+Sibling of write_scroll_list_tilemap_row (0x080e583c), for the second-layer scroll list BG tilemap write. Logic is fully symmetric with 0x080e583c: same row base calculation, 0x1e-slot loop, writes tile_id/attr within window or 0 outside; sole difference is VRAM base uses constant 0xd2<<0x11 instead of 0x90<<0xe. Called by FUN_080e7d50 (second scroll list render loop). Parameter semantics identical to 0x080e583c, with r3=count as the 4th argument.
+
+Constants:
+  ENTRY_COUNT = 0x1e      // 30 tilemap slots per row
+  WIN_SIZE    = 0x18      // visible window width
+  TILE_ATTR   = 0x2018    // tilemap entry attr base value
+  VRAM_BASE_CONST = 0xd2<<0x11 = 0x01a40000  // second-layer BG tilemap row offset base

@@ -1,0 +1,7 @@
+Velocity-parameterized initialization of a blend parameter struct. Writes {r2, r1, -r1, r2} to the 4-word struct at r0: [+0]=r2 (color_a), [+4]=r1 (velocity), [+8]=-r1 (negated velocity via rsbs), [+c]=r2 (color_b). Called from blend animation system when setting initial velocity and color values.
+
+Side effects:
+  [r0+0x0] := r2 (color_a)
+  [r0+0x4] := r1 (velocity)
+  [r0+0x8] := -r1 (negated velocity)
+  [r0+0xc] := r2 (color_b)

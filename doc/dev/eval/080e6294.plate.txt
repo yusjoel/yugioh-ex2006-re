@@ -1,0 +1,11 @@
+pack UI palette animation advance function. Reads one byte from gMenuState[0x30]; increments high nibble (hi_nibble+1 mod 16) and conditionally increments low nibble (lo_nibble+1 mod 10); if low nibble changed, copies 0x20 halfwords (0x40 bytes) from ROM 0x09cf325c + lo_nibble*0x40 to CGRAM 0x050003c0, switching palette animation frame. If low nibble unchanged, skips the write. No parameters, no return value. Called periodically from pack scene tick path.
+
+Constants:
+  STATE_ADDR   = gMenuState + 0x30     // palette animation state byte
+  HI_NIBBLE    = bits[7:4]             // frame counter (+1 mod 16 each call)
+  LO_NIBBLE    = bits[3:0]             // palette index (mod 10 carry)
+  MOD_CYCLE    = 10                    // lo_nibble modulus
+  PAL_SRC_BASE = 0x09cf325c            // ROM palette frame data base
+  PAL_DEST     = 0x050003c0            // CGRAM pack animation palette slot
+  PAL_COPY_SIZE = 0x20                 // halfword count (0x40 bytes)
+  PAL_STRIDE   = lo_nibble*0x40        // per-frame offset

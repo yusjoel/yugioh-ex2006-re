@@ -1,0 +1,6 @@
+pack scene fade-in animation advance and completion cleanup function. Calls start_blend_fadein_with_target(4) to advance fade-in; if return is 0 (fade-in not yet complete), returns 0 immediately; if return is non-zero (fade-in complete), writes DISPCNT=0 (display off), clears gPrng+0x1f4 (pack scroll offset state word), returns 1. Called periodically from pack scene frame tick paths; return value 1 notifies caller that fade-in is complete.
+
+Constants:
+  FADEIN_TARGET  = 4           // blend fade-in target intensity
+  DISPCNT        = 0x80<<19 = 0x04000000  // GBA display control register
+  STATE_FIELD    = gPrng + 0x1f4  // pack scroll offset state word (0xfa<<1)

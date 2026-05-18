@@ -1,0 +1,11 @@
+pack scene navigation state fields reset function. Clears multiple navigation fields in gMenuState: [0x26]=0, [0x25]=0, [0x27]=0x10; mask-clears [0x28] bits, [0x29] nav flag bits; mask-clears [0x2a] with 0xfffffc7f; [0x2c]=0; clears [0x2e] bits[1:0]. Conditionally writes bit[5] to gMenuState[0x2a] based on r0 bit[0]. Called from pack scene reset/init paths; r0=1 means "reset with highlight", r0=0 means "full reset".
+
+Constants:
+  FIELD_25     = gMenuState + 0x25   // nav field A
+  FIELD_26     = gMenuState + 0x26   // nav field B
+  FIELD_27     = gMenuState + 0x27   // value=0x10 reset value
+  FIELD_28     = gMenuState + 0x28   // mask ~0x80 = clear bit7
+  FIELD_29     = gMenuState + 0x29   // mask ~(0x05|0x79)
+  FIELD_2A     = gMenuState + 0x2a   // mask 0xfffffc7f
+  FIELD_2C     = gMenuState + 0x2c   // strh 0
+  FIELD_2E     = gMenuState + 0x2e   // mask ~0x2

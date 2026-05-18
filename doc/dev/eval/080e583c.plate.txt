@@ -1,0 +1,7 @@
+pack scroll list single-row BG tilemap write function. Takes row index r0, tile base column r1, visible slot count r2; fills 0x1e tilemap entries per row: slots in the valid window [r1..r1+0x17] get tile_id+attr, slots outside the window get 0 (clear). Inner loop writes two strh each: one to the "foreground" row address, one to the "background" row address. Called by FUN_080e7cd4 (pack scroll list render loop), rebuilding tilemap each frame for visible list rows.
+
+Constants:
+  ENTRY_COUNT = 0x1e     // 30 tilemap slots per row
+  WIN_SIZE    = 0x18     // visible display window width (24 slots)
+  TILE_ATTR   = 0x2018   // tilemap entry attr base value
+  COL_STRIDE  = 0x80<<6 = 0x2000  // adjacent row attr offset

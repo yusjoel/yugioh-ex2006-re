@@ -1,0 +1,9 @@
+pack scene card type label multi-row render function. r0 = lang_mode [0..5]; first clears BG tile region 0x06011a00 in 4-iteration loop (0x200 halfwords = 0x400 bytes per row, 4 rows total); setup_line_buf_pos_and_font(0x10,4) initializes; selects two text line pointers from 6 ROM string pointer groups based on lang_mode (0..5) (ROM 0x09dc0048/0x09dd6790/0x09de2b0e/0x09deefc0/0x09dcae26 etc.); each line calls count_bytes_until_null for right-align offset then text_render_wrapper to render; renders 4 text rows total; finally write_line_buf_to_bg_tile_vram(0x06011a00, 0) writes BG tile. Called from pack display loop at FUN_080e72f8 region.
+
+Constants:
+  BG_DEST     = 0x06011a00   // BG tile VRAM card type label region
+  CLEAR_ROWS  = 4            // rows to clear
+  ROW_SIZE_HW = 0x80<<2 = 0x200  // halfwords to clear per row
+  FONT_X      = 0x10 = 16   // line buffer start x
+  FONT_SIZE   = 4            // font size param
+  LANG_COUNT  = 6            // supported languages (0=default, 1..5=EN/DE/FR/IT/ES+JP)

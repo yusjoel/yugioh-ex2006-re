@@ -1,0 +1,10 @@
+pack scene scroll highlight state sync to gPrng fields function. Reads gMenuState[0x2a] bits to evaluate condition: if (gMenuState[0x2a] & 0x24) == 0x24, reads 3 halfwords from ROM table 0x09e5ec44 (offset = gMenuState[0x2a] bits[9:6]*2), writes them to gPrng+0x1e8, gPrng+0x1ea, gPrng+0x1ee; otherwise clears gPrng+0x1e8=0, gPrng+0x1ea=0, writes gMenuState+0x26 (u8 extended) to gPrng+0x1ec, clears gPrng+0x1ee=0. No parameters, no return value.
+
+Constants:
+  STATE_FIELD     = gMenuState + 0x2a    // pack scroll highlight state word
+  COND_MASK       = 0x24                 // both bits must be set
+  SCROLL_TBL      = 0x09e5ec44           // ROM scroll highlight param table
+  GPRNG_OFFSET_A  = 0xf4<<1 = 0x1e8     // gPrng scroll highlight field A
+  GPRNG_OFFSET_B  = 0xf5<<1 = 0x1ea     // gPrng scroll highlight field B
+  GPRNG_OFFSET_C  = 0xf6<<1 = 0x1ec     // gPrng scroll highlight field C
+  GPRNG_OFFSET_D  = 0xf7<<1 = 0x1ee     // gPrng scroll highlight field D

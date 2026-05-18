@@ -20,7 +20,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 226 个就绪函数 (12 批, #106..#117, 每批 20) 全部分析完毕。
+当前阶段: 把 doc/dev/eval/ready_batches.json 中剩余 206 个就绪函数 (11 批, #107..#117, 每批 20) 全部分析完毕。
 
 20/批 单 sub-agent 串行模式 (不再拆分并行):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 540 + 剩余 226 (12 批 #106..#117 / 20 每批, 末批 6) |
-| **下一批** | `#106` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-17 (Phase 2 batches #102-#105 unified landing, 540/766 = 70.50%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 560 + 剩余 206 (11 批 #107..#117 / 20 每批, 末批 6) |
+| **下一批** | `#107` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-18 (Phase 2 batch #106 landing, 560/766 = 73.11%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**540 / 766 已分析** (70.50%, 剩余 12 批待跑 #106..#117)
+**560 / 766 已分析** (73.11%, 剩余 11 批待跑 #107..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -102,6 +102,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #100 440/766 (57.44%) — score_slot scoring cluster + exec_equip_target dispatch cluster + bonus check siblings (milestone batch #100)
 - batch #101 460/766 (60.05%) — scene_pack card shop UI subsystem (pack scroll + tiles + OAM + info page)
 - batches #102-#105 540/766 (70.50%) — scene_pack deep dive: pack exchange + fadein/fadeout + card grid OAM + ATK rows + overlay sprites + challenge counts + puzzle stats + pack blend callback
+- batch #106 560/766 (73.11%) — scene_pack subsystem: scroll state + palette upload + row text render + tilemap write + card name sprite + BG text render + palette cycle + hw regs init + tile load + card type label + scrollbar OAM + highlight sync + nav reset + fadein + scroll input + blend param init/scale
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -110,18 +111,18 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#105) | 540 |
-| - 剩余 (按 20/批 重组) | 226 |
-| 剩余分批数 (20/批) | 12 (`#106..#117`) |
+| - 已完成 (Phase 2 #82-#106) | 560 |
+| - 剩余 (按 20/批 重组) | 206 |
+| 剩余分批数 (20/批) | 11 (`#107..#117`) |
 | 末批大小 | 6 (#117) |
-| 剩余地址覆盖区段 | 0x08047aa0..0x081141d8 |
+| 剩余地址覆盖区段 | 0x080e8870..0x081141d8 |
 
 #### ROM 全局命名比例
 
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2540** | **1106** | **69.67%** |
+| **全 CSV** | **2560** | **1086** | **70.22%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---
