@@ -1,0 +1,14 @@
+Copies byte_count (r2) bytes from src (r1) to dst (r0) using DMA3 in chunks. If r2 > 0xff, loops: each iteration writes DMA3SAD/DMA3DAD, fires DMA3CNT=0x80000080 (enable, 128 halfwords = 256 bytes), waits for bit31 to clear, then advances src/dst by 0x100 and subtracts 256 from remaining count; repeats while remaining > 0xff. Tail: converts remaining bytes to halfword count (ceil(remain/2)) and fires one final DMA3 transfer. Sister to copy_memory_dma3_with_cpu_fallback (0x080f4f08): this function is pure DMA3 chunked, no CPU byte loop fallback. Called by sprite/scene_duel_puzzle module (0x080f4adc) for bulk sprite data transfer.
+
+Params: r0=void* dst, r1=const void* src, r2=u32 byte_count [0..inf]. Returns void (pop{r0};bx r0).
+
+Side effects:
+[0x040000D4..+0xc]: DMA3 registers (SAD/DAD/CNT) written and waited
+[dst..dst+byte_count]: overwritten with src content
+
+Constants:
+DMA3SAD = 0x040000D4
+DMA3CNT = 0x040000DC
+DMA3_CTRL_128HW = 0x80000080 (enable + count=0x80 halfwords = 256 bytes)
+CHUNK_SIZE = 0x100 (256 bytes per DMA iteration)
+THRESHOLD = 0xff (chunks only when remaining > 255)

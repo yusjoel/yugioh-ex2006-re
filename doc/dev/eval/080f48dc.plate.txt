@@ -1,0 +1,10 @@
+Clears 16 consecutive halfwords (32 bytes) at gPrng+0x172 downward to gPrng+0x160 (IWRAM addresses 0x030004b2 down to 0x03000494). This region is the key-history circular buffer maintained by update_key_input_state (0x080f4764). Loop: r1 = 0xf (15 down to 0 = 16 iterations), each iteration writes 0x0000 halfword at r0 then decrements r0 by 2. Called by sys/display initializer (0x080f4c14) during system init or scene reset to clear key input history. Leaf function (no push/pop), r0 clobbered by ldr at entry -> void return.
+
+Params: r0=void. Returns void (bx lr).
+
+Side effects:
+[gPrng+0x172..gPrng+0x160]: 16 halfwords set to 0x0000
+
+Constants:
+CLEAR_COUNT = 0xf (loop 15..0 = 16 iterations)
+BUF_START_OFFSET = 0x172 (0xb9 * 2, top of circular buffer)

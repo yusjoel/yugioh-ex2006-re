@@ -1,0 +1,13 @@
+Format string expander with width-modifier support. Extended version of expand_format_decimal_to_buf (0x080f5228). Scans format string r1 (src) byte-by-byte and writes to output buffer r0 (dst). Recognizes three format specifiers: (1) %d -> decimal expand using format_decimal_halfword_to_buf or format_decimal_byte_to_buf selected by gPrng+0x6c2c bits[2:0] locale flag; (2) %Nd (N = digit '0'..'9') -> width-N decimal expand, space-padded on left; (3) other bytes copied verbatim. Stack arg at sp[0x1c] (5th param) influences expansion path selection. Called by font_jp/game_str/pack/settings render paths for HUD numeric formatting.
+
+Params: r0=char* dst output buffer, r1=const char* fmt format string (supports %d / %Nd), r2=u16 value decimal value to expand, r3=u8 use_decimal nonzero uses decimal expansion, [sp+0x1c]=u8 stack_flag 5th argument. Returns void (pop{r0};bx r0).
+
+Side effects:
+[r0..r0+N]: expanded text written (NUL terminated, N depends on format and value)
+
+Constants:
+FMT_PERCENT = 0x25 ('%')
+FMT_D = 0x64 ('d')
+PAD_CHAR = 0x20 (' ' space pad)
+LOCALE_FLAG_ADDR = 0x02006c2c (gPrng+0x6c2c)
+LOCALE_MASK = 0x7 (bits[2:0] controls halfword/byte output)

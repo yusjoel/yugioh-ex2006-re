@@ -1,0 +1,11 @@
+Iterates over ROM rule table (0x09e4f444, 8 entries x 8 bytes each). For each entry: reads gPrng+0x174 flag halfword AND ROM[entry+4] mask halfword; if nonzero (flags and mask intersect), writes gPrng+0x1e0[i] data halfword to ROM[entry+0] target address. Implements bitmask-activated rule dispatch: only when IWRAM flags share a set bit with the entry mask does data get copied to the target slot. ROM table static decode: entry+0 = dest ptr (BG scroll IO regs 0x04000010..0x0400001e, BG0/BG1/BG2/BG3 X/Y scroll), entry+4 = single-bit flag masks 0x0010/0x0020/0x0040/0x0080/0x0100/0x0200/0x0400/0x0800. Called by scene_duel_puzzle frame driver (0x080f4b78).
+
+Params: r0=void (all bases loaded from literal pool). Returns void (pop{r0};bx r0).
+
+Side effects:
+[*ROM_TABLE[i]+0x0] := gPrng+0x1e0[i] halfword (conditional write, i in [0..7])
+
+Constants:
+RULE_TABLE = 0x09e4f444 (8-entry ROM rule table, 8 bytes per entry)
+FLAG_BASE = gPrng+0x174 (IWRAM activation flag area)
+DATA_BASE = gPrng+0x1e0 (IWRAM data source area)

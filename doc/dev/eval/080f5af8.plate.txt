@@ -1,0 +1,12 @@
+Alpha-blends palette entry array. Reads 6-bit blend factor from gPrng+0x20e (AND 0x3f). For each of count (r2) BGR555 entries in src (r1): extracts R/G/B channels (5-bit each), multiplies each by factor then right-shifts 5 (Q5 fixed-point multiply), if result is negative adds 0xff correction, clamps to [0..0x1f]; packs result as BGR555 into dst (r0). r3 provides Q16 fixed-point blend base: bits[31:16] extracted via lsrs r0,r3,#0x10 then subs r3,r3,r0 for path B (factor > 0x1f); bits[15:0] retained via lsls r3,r3,#0x10 for path A. indeg=0 (no static bl callers; dead-code or runtime-ptr); r3 construction semantics must be verified at callsite if found.
+
+Params: r0=u16* dst output palette array, r1=const u16* src source palette array, r2=u8 count entry count [1..255], r3=u32 blend_base_q16 Q16 fixed-point base (bits[31:16]=positive addend base for path B factor>0x1f). Returns void (pop{r0};bx r0).
+
+Side effects:
+[r0..r0+count*2]: blended BGR555 halfwords written
+
+Constants:
+BLEND_FACTOR_ADDR = gPrng+0x20e (blend factor halfword, AND 0x3f used)
+CHANNEL_MASK = 0x1f (5-bit channel mask)
+FIXED_SHIFT = 5 (Q5 fixed-point scale: value*factor >> 5)
+FIX_NEG = 0xff (negative correction: adds #0xff before asrs)

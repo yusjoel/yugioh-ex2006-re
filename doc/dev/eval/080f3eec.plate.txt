@@ -1,0 +1,13 @@
+Expands 4bpp color index (r1) into pixel masks LSB-nibble-first and OR-writes into VRAM dst (r0) row by row. Mirror of blit_tile_nibble_row_msb (0x080f34dc): mask order is 0x0fff->0xfff0->0xff0f->0xf0ff (LSB first vs MSB first). Checks gPrng+0x14 bit7 (HIGH_COLOR_MODE_FLAG=0x80): if set, forwards to blit_tile_color_to_vram_region; otherwise expands nibble and writes via double loop (outer row, inner 16 columns). Called by font_jp/game_str render paths.
+
+Params: r0=u16* dst VRAM row base, r1=u16 color 4bpp index [0x0..0xf]. Returns void (pop{r0};bx r0).
+
+Side effects: writes VRAM[dst..dst+row_count*0x80] halfwords; dst advances 0x400 per row.
+
+Constants:
+HIGH_COLOR_MODE_FLAG = 0x80 (gPrng+0x14 bit7)
+MASK_NIBBLE0 = 0x0fff (LSB nibble AND mask bits[3:0])
+MASK_NIBBLE1 = 0xfff0 (bits[7:4])
+MASK_NIBBLE2 = 0xff0f (bits[11:8])
+MASK_NIBBLE3 = 0xf0ff (bits[15:12])
+ROW_STRIDE = 0x400 (dst row advance = 0x80 << 3)

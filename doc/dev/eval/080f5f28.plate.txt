@@ -1,0 +1,14 @@
+Sorts OBJ shadow list entries by priority. Reads OBJ shadow list base from [gPrng+0x1bc]; reads active entry count from [base+0x400] byte. Allocates 0x404 bytes on stack as temp buffer. Calls copy_bytes_by_halfword to copy count entries (8 bytes each) to stack buffer. Calls qsort with compare function pointer 0x080f5f91 (THUMB) to sort the buffer in-place. Writes sorted entries back to shadow list one by one. Frees stack allocation (+0x404). Called by sprite/scene_duel_puzzle frame driver (0x080f4adc) before OBJ list submission to ensure high-priority OBJ entries precede lower-priority ones.
+
+Params: r0=void (all bases from literal pool). Returns void (pop{r0};bx r0).
+
+Side effects:
+[gPrng+0x1bc -> shadow_list]: entries reordered by priority
+stack: temporary 0x404-byte allocation for sort buffer
+
+Constants:
+OBJ_SHADOW_LIST_PTR = gPrng+0x1bc (IWRAM pointer slot)
+ENTRY_COUNT_OFFSET = 0x400 (count stored at shadow_list+0x400)
+ENTRY_SIZE = 8 (bytes per entry)
+STACK_BUF_SIZE = 0x404 (bytes allocated on stack)
+COMPARE_FN = 0x080f5f91 (THUMB compare function pointer)

@@ -1,0 +1,15 @@
+Sister to clamp_blend_counter_to_target (0x080f55fc); writes BLDALPHA instead of BLDY. Compares current 6-bit blend step (gPrng+0x200 bits[5:0]) with target (r0): if step > target, subtracts target from step, masks with 0x3f, writes back, then writes BLDALPHA (EVA = 0x1f - step, EVB = step combined as halfword) and BLDCNT (r1); returns 0. If step <= target, clears bit6 (blend_active flag), calls disable_blend_and_clear_step (0x080f55d4), returns 1. indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u8 target target step value [0..0x3f], r1=u16 bldcnt BLDCNT control word to write. Returns r0=u8 1=blend reached/disabled, 0=still advancing (pop{r1};bx r1 Sub-case E).
+
+Side effects:
+[gPrng+0x200] byte: bits[5:0] (step) and bit6 (active flag) updated
+[BLDALPHA] (0x04000052): (EVA<<8|EVB) halfword written (conditional)
+[BLDCNT] (0x04000050): r1 control word written (conditional)
+
+Constants:
+BLEND_STEP_FIELD = gPrng+0x200 (bits[5:0]=step, bit6=active)
+STEP_MASK = 0x3f (6-bit step mask)
+ACTIVE_FLAG = 0x40 (bit6 = blend_active)
+BLDALPHA = 0x04000052
+BLDCNT = 0x04000050

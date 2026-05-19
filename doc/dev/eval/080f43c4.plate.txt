@@ -1,0 +1,14 @@
+Returns BGR555 highlight color for a given card type index and brightness flag. type_code is decremented by 1 internally (switch accepts 0..7, 8 cases): case 1=Monster (warm orange R=0x1f G=0x17 B=0x0), case 2/3=Spell (cyan R=0x0 G=0x1f B=0x1f), case 4/5=Trap (red-purple R=0x1f G=0x1 B=0x0), case 6/8=Green (R=0x0 G=0x1f B=0x0), case 7=Magenta (R=0x1f G=0x0 B=0x1f). When use_highlight != 0, scales each R/G/B component by 3/4 (muls*3 then asrs #2). Out-of-range type_code defaults to white (0x7fff). indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u16 type_code [1..8], r1=u8 use_highlight [0=direct combine, 1=scale by 3/4]. Returns r0=u16 BGR555 color.
+
+Side effects: none (pure computation).
+
+Constants:
+TYPE_MONSTER = 1 (R=0x1f G=0x17 B=0x0, orange)
+TYPE_SPELL = 2/3 (R=0x0 G=0x1f B=0x1f, cyan)
+TYPE_TRAP = 4/5 (R=0x1f G=0x1 B=0x0, red-purple)
+TYPE_GREEN = 6/8 (R=0x0 G=0x1f B=0x0)
+TYPE_YELLOW = 7 (R=0x1f G=0x0 B=0x1f)
+BGR555_G_SHIFT = 5
+BGR555_B_SHIFT = 10

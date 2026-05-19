@@ -1,0 +1,9 @@
+Performs one MSVC/ANSI C rand() linear-congruential generator (LCG) step: next = prev * 214013 + 2531011. Returns (next >> 16) | (addend_lo16 << 16): high 16 bits of new state ORed with low 16 bits of addend shifted up. Leaf function (9 instructions). Called by FUN_080ef35c (0x080ef35c, prng wrapper).
+
+Params: r0=u32 prev_state previous LCG state. Returns r0=u32 next LCG state (high 16 OR addend_lo16 packed).
+
+Side effects: none (pure arithmetic).
+
+Constants:
+LCG_MULTIPLIER = 0x343fd (214013, MSVC rand() multiplier)
+LCG_ADDEND = 0x269ec3 (2531011, MSVC rand() addend)

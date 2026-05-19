@@ -1,0 +1,13 @@
+Sister to blit_tile_nibble_row_lsb; adds third param x_stride: r1 left-shifted 5 bits gives per-row dst horizontal step (x_stride = r1<<5 = col*32 bytes). dst base per row = gPrng+0x0[base] + row*x_stride, enabling writes at specified column offset. Still checks gPrng+0x14 bit7 but has no high-color forward (no call to blit_tile_color_to_vram_region; directly takes nibble-expand path). Uses mask order 0x0fff/0xfff0/0xff0f/0xf0ff (LSB first). indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u16* dst VRAM row base, r1=u16 x_col_offset column offset [0..31] (x_stride=r1<<5), r2=u16 color 4bpp index [0x0..0xf]. Returns void (pop{r0};bx r0).
+
+Side effects: writes VRAM[gPrng+0x0[base]+row*x_stride..] halfwords (LSB nibble-first OR pattern).
+
+Constants:
+HIGH_COLOR_MODE_FLAG = 0x80 (gPrng+0x14 bit7)
+MASK_NIBBLE0 = 0x0fff
+MASK_NIBBLE1 = 0xfff0
+MASK_NIBBLE2 = 0xff0f
+MASK_NIBBLE3 = 0xf0ff
+X_STRIDE_SHIFT = 5 (r1 << 5 = x_stride in bytes)

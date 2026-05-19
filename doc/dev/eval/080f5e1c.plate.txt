@@ -1,0 +1,16 @@
+Iterates over 128-entry OBJ shadow list (8-byte stride, base from [0x030001fc]) in parallel with OAM (base 0x07000000). For each entry pair: reads shadow[+4] halfword AND 0x3ff to get palette index pal_idx; if pal_idx is in [r0..r1], clears shadow[+0] and shadow[+2] to 0x0000 and writes 0x0c00 to shadow[+4] (OBJ disabled). Applies same clear to the corresponding OAM entry. Loop is unrolled to two checks per iteration (shadow list and OAM). indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u16 pal_idx_lo palette index lower bound [0..0x3ff], r1=u16 pal_idx_hi palette index upper bound [0..0x3ff]. Returns void (pop{r0};bx r0).
+
+Side effects:
+[OBJ_shadow_list + matched*8 + 0]: written 0x0000
+[OBJ_shadow_list + matched*8 + 2]: written 0x0000
+[OBJ_shadow_list + matched*8 + 4]: written 0x0c00 (OBJ disabled)
+[OAM + matched*8 + 0/2/4]: same pattern written
+
+Constants:
+OBJ_LIST_PTR = 0x030001fc (IWRAM OBJ shadow list base pointer slot)
+OAM_BASE = 0x07000000
+PAL_IDX_MASK = 0x3ff (10-bit palette index mask)
+OBJ_DISABLED = 0x0c00 (OAM attr0 bits[11:10] = 11, disabled)
+LIST_ENTRY_SIZE = 8 (bytes per entry)

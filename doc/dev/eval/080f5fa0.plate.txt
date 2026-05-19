@@ -1,0 +1,17 @@
+Computes OAM affine matrix PA/PB/PC/PD from sin/cos lookup and scale, then writes into OBJ shadow list at affine slot r0. Loads sin values from rom_sin_table_q8 (0x09e5f8f0, 128 Q8 fixed-point entries) with 7-bit angle wrap: PB = sin[angle], PA = sin[(angle+0x20) & 0x7f] (cos = sin+90 deg), PC = sin[(angle+0x40) & 0x7f]. Affine matrix byte offset = affine_idx * 32 (4 OBJ * 8 bytes). Scale from r1 bits[15:12]: if scale_idx <= 7 divides by (scale+1) using __divsi3; if > 7 multiplies by (scale-8). Writes PA/PB/PC/PD halfwords to shadow list +6/+14/+22/+30 respectively (stride 8 per OBJ). indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u16 affine_matrix_idx OAM affine matrix index [0..31], r1=u16 angle_scale packed: bits[15:12]=scale_idx [0..15], bits[6:0]=angle [0..127]. Returns void (pop{r0};bx r0).
+
+Side effects:
+[OBJ_shadow_list + r0*32 + 6]:  PA halfword (cos(angle)/scale)
+[OBJ_shadow_list + r0*32 + 14]: PB halfword (sin(angle)/scale)
+[OBJ_shadow_list + r0*32 + 22]: PC halfword (sin(angle+180deg)/scale)
+[OBJ_shadow_list + r0*32 + 30]: PD halfword (= PA)
+
+Constants:
+SIN_TABLE = 0x09e5f8f0 (rom_sin_table_q8, 128 Q8 fixed-point entries)
+SIN_LUT_MASK = 0x7f (7-bit angle wrap)
+AFFINE_STRIDE = 32 (4 OBJ * 8 bytes per affine matrix slot)
+COS_PHASE = 0x20 (+32 entries = +90 degrees in 128-entry table)
+PC_PHASE = 0x40 (+64 entries = +180 degrees)
+PA_OFFSET = 6; PB_OFFSET = 14; PC_OFFSET = 22; PD_OFFSET = 30

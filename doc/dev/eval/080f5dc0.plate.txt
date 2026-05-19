@@ -1,0 +1,9 @@
+Copies byte_count bytes from src (r1) to dst (r0) rounding up to even byte count. Internally computes halfword_count = ceil((r2+1)/2) via asrs arithmetic, then calls copy_bytes_by_halfword (0x080f4ea4) with byte_count = halfword_count*2. Returns halfword_count in r0. Identical byte-for-byte to FUN_080f5de0 (GCC duplicate instance). indeg=0 (no static bl callers; dead-code or runtime-ptr path).
+
+Params: r0=void* dst, r1=const void* src, r2=u32 byte_count (rounded up to even). Returns r0=u32 actual halfword count copied (pop{r1};bx r1 Sub-case E).
+
+Side effects:
+[r0..r0+ceil((r2+1)/2)*2]: overwritten with src data (via copy_bytes_by_halfword)
+
+Constants:
+ALIGN_BIAS = 1 ((r2+1)>>1 ceiling-divide to halfword count)

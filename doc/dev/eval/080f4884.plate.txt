@@ -1,0 +1,9 @@
+Compares halfword array at r0 (length r1) against circular buffer at IWRAM 0x03000193. Returns 0 immediately if r1 > 0xf (sequence too long); returns 1 if r1 == 0 (empty sequence matches). Reads buffer head byte high-6-bits as current write index, then walks backward by i steps (index = (head - i) & 0xf) comparing src[i] vs buf[idx] halfword. Returns 1 if all match, 0 on any mismatch. Called by FUN_080f48c8 with ROM table at 0x09e5f8d4 and fixed count 0xa to detect a 10-key sequence.
+
+Params: r0=const u16* src match sequence base, r1=u8 count sequence length [0..0xf] (>0xf returns 0). Returns r0=u8 1=all match, 0=mismatch or too long.
+
+Side effects: none (read-only access to 0x03000193 circular buffer).
+
+Constants:
+CIRCULAR_BUF_ADDR = 0x03000193 (IWRAM input circular buffer)
+MAX_SEQ_LEN = 0xf (maximum supported sequence length [0..15])

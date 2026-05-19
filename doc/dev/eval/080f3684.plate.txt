@@ -1,0 +1,9 @@
+Writes tile source data into VRAM destination row at byte granularity. For each pixel slot reads two bytes (lo byte and hi byte); if nonzero, AND-OR-writes each into dst halfword. Sister to blit_tile_nibble_row_msb/lsb; uses single-byte pixel stepping (src+=1, dst+=2 per pixel) without nibble expansion, suited for 8bpp tile data. Reads tile width and row count from gPrng+0x8 to determine loop bounds. indeg=0 (no static bl callers; dead-code or runtime-ptr path).
+
+Params: r0=u16* dst VRAM row base. Returns void (pop{r0};bx r0).
+
+Side effects: writes VRAM[r0..r0+row_count*0x80] halfwords (byte-granularity AND+OR per pixel).
+
+Constants:
+BYTE_MASK_LO = 0xff00 (AND mask for low byte)
+GPRNG_BASE = 0x02006ed0

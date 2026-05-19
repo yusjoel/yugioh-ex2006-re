@@ -1,0 +1,16 @@
+Per-frame key input state update. Reads KEYINPUT (0x04000130), inverts (active-low to active-high) to get cur_keys. XORs with gPrng+0x146 (prev_keys) to get changed bits; AND cur_keys -> new_pressed stored at gPrng+0x148; AND prev_keys -> released stored at gPrng+0x14a. Updates prev_keys at gPrng+0x146 with cur_keys. Maintains 5-bit repeat counter at gPrng+0x152 (+1 with AND 0x1f wrap); when count exceeds threshold (gPrng+0x153), writes new_pressed to gPrng+0x14c to trigger key repeat. Called by scene_duel_puzzle frame driver (0x080f4b78) every frame.
+
+Params: r0=void. Returns void (pop{r0};bx r0).
+
+Side effects:
+[gPrng+0x146] := cur_keys (prev_keys updated to current)
+[gPrng+0x148] := new_pressed
+[gPrng+0x14a] := released
+[gPrng+0x14c]: repeat input counter field (5-bit +1 wrap)
+[gPrng+0x14e]: cleared to 0 when prev != cur
+[gPrng+0x150]: := new_pressed (when count exceeds threshold)
+
+Constants:
+KEYINPUT = 0x04000130 (GBA key register, active-low)
+REPEAT_COUNTER_MASK = 0x1f (5-bit counter)
+REPEAT_THRESH_OFFSET = 0x153 (gPrng+0x153 byte)

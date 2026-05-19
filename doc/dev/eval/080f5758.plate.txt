@@ -1,0 +1,16 @@
+Sister to tick_blend_step_with_bldcnt (0x080f5668); writes BLDALPHA instead of BLDY. First writes BLDCNT (r1) immediately. Then adds delta (r0) to gPrng+0x200 bits[5:0] step, masks with 0x3f; if step > 0x1f clamps to 0x1f; writes back. Writes BLDALPHA: EVA = (0x1f - step), EVB = step (packed as halfword: EVA bits[5:0] OR EVB bits[12:8]). Returns 1 if step reached 0x1f (complete), 0 otherwise. indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=u8 delta per-frame step increment [1..0x1e], r1=u16 bldcnt BLDCNT control word to write. Returns r0=u8 1=step reached 0x1f (done), 0=still advancing (pop{r1};bx r1 Sub-case E).
+
+Side effects:
+[BLDCNT] (0x04000050): r1 control word written
+[gPrng+0x200] byte: step incremented and clamped
+[BLDALPHA] (0x04000052): EVA/EVB halfword written
+
+Constants:
+BLEND_STEP_FIELD = gPrng+0x200 (bits[5:0]=step, bit6=active)
+STEP_MASK = 0x3f (6-bit step mask)
+MAX_STEP = 0x1e (threshold for returning complete)
+CAP_STEP = 0x1f (clamp upper bound)
+BLDALPHA = 0x04000052
+BLDCNT = 0x04000050

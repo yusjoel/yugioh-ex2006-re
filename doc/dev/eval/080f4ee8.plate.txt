@@ -1,0 +1,10 @@
+Copies byte_count bytes from src (r1) to dst (r0) using ldmia/stmia 8-byte blocks. Block count = ceil(r2/8) = (r2+7)>>3. Each iteration transfers 2 words (8 bytes) with ldmia/stmia. Sister to copy_bytes_by_halfword (0x080f4ea4) and copy_memory_dma3_with_cpu_fallback (0x080f4f08); dedicated to 8-byte-aligned bulk CPU copy. indeg=0 (no static bl callers; dead-code or runtime-ptr).
+
+Params: r0=void* dst, r1=const void* src, r2=u32 byte_count (rounded up to 8). Returns void (pop{r0};bx r0).
+
+Side effects:
+[r0..r0+ceil(r2/8)*8]: overwritten with src content (8-byte blocks)
+
+Constants:
+BLOCK_SIZE = 8 (ldmia/stmia transfers 2 words = 8 bytes per iteration)
+ALIGN_BIAS = 7 ((r2+7)>>3 ceiling divide)
