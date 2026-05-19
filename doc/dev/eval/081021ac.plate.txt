@@ -1,0 +1,7 @@
+card_list scene slot display buffer conditional refresh function. r0=flag; if flag==0 skips all operations and returns 1. Otherwise calls build_card_list_slot_display_entries to build slot display entries, then calls copy_bytes_by_halfword to copy 0x118 bytes from 0x0202a4d0[+0xc2*2] to 0x03000288. Returns 1. Called by card list scene state machine when display refresh is needed.
+
+Constants:
+- 0x0202a4d0 = card_list main state struct base
+- 0x03000288 = IWRAM display buffer target address
+- 0xc2*2=0x184 = source offset (slot display entries region)
+- 0x8c*2=0x118 = copy byte count

@@ -1,0 +1,6 @@
+card_list/card_stats UI card name and gfx-type text render function. r0=card_id; reads 0x02000000[+0x6c2c] language byte (low 3 bits), calls select_charset_then_load_name to load card name into stack buffer. If name length exceeds 0x1e truncates to 0x1e bytes and appends NUL. Calls text_render_wrapper to render name to rows 3/2/1 (col=6). Then calls resolve_card_gfx_pointer_by_type to load gfx-type string and renders to rows 1/0. Total 4 text_render_wrapper calls. Returns 1.
+
+Constants:
+- 0x02000000[+0x6c2c] = language setting byte, low 3 bits = charset_id [0..7]
+- 0x1e = card name max display bytes (30 bytes)
+- text_render_wrapper (row, col, r2, sp_buf) x4

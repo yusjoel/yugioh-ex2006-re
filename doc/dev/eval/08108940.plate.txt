@@ -1,0 +1,6 @@
+card_list scene variant entry, handles mode=0 exit/end phase. Calls dispatch_card_list_scene_state + render_card_list_oam_entries + return_one_scene_stub + return_one_card_list_oam_stub; if dispatch returns 0 returns 0. Otherwise: copies [0x0202a4d0+4] := [+0x1c] (restores preview_card_id to current_card_id), calls return_one_card_list_stub + clear_dispcnt_blendcnt_and_obj_list to clear display state; sets gPrng[0x91*4] bit0; clears gPrng[0x81*4] to (existing & 0xffffc03f). Returns 0 (dispatch=0 path) or 1.
+
+Constants:
+- 0x0202a4d0 = card_list main state struct; [+4]=current_card_id; [+0x1c]=preview_card_id
+- gPrng[0x91*4] = scene control byte; bit0 = exit confirmed flag
+- gPrng[0x81*4] = BG0CNT mirror; cleared on screen clear

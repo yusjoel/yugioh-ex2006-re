@@ -1,0 +1,12 @@
+Sound system DMA transfer buffer init function. First zeros 12 entries from IWRAM 0x0300546c ([+0xe] and [+0xc] each zeroed, stride 0x1c); then zeros 0x40 bytes from 0x030055c0. Then two DMA3 transfers: first copies ROM 0x084c7624 (8 words) in fill mode to 0x03005648 (CNT=0x80000008); second copies ROM 0x0810df38 (0x130 halfwords) to 0x03004c0c (CNT=0x84000130); polls DMA3CNT bit31 after each to wait for completion. No return value (pop{r4-r7};pop{r0};bx r0 -- Sub-case E void).
+
+Constants:
+- 0x0300546c = DMA source entry table base (stride=0x1c, 12 entries)
+- 0x030055c0 = DMA workspace (0x40 bytes)
+- 0x084c7624 = ROM DMA init data source 1 (8 words)
+- 0x03005648 = DMA target 1
+- DMA3CNT=0x80000008: bit31=enable, count=8, 32-bit, src-fixed (fill)
+- 0x0810df38 = ROM DMA init data source 2
+- 0x03004c0c = DMA target 2
+- DMA3CNT=0x84000130: bit31=enable, bit26=src-increment, count=0x130
+- DMA3SAD (0x040000D4) / DMA3DAD (0x040000D8) / DMA3CNT (0x040000DC)

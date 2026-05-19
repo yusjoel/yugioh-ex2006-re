@@ -1,0 +1,8 @@
+card_list scene card display work buffer zero-fill and set BG0CNT function. Calls zero_fill_by_halfword to zero 0x81*4=516 bytes from 0x0202a2c0 (card display work region). Then updates gPrng[0x81*4] = (existing & 0xffffc03f) | 0xe000: writes BG0CNT screen_base field to 0x38 (0xe000>>6). Returns 1. Called by enter_forb_ltd_lists_page indirect table on scene reset.
+
+Constants:
+- 0x0202a2c0 = card display work buffer base
+- 0x81*4=0x204 = zero-fill byte count (516 bytes)
+- gPrng[0x81*4] = BG0CNT mirror
+- 0xffffc03f = non-screen_base mask
+- 0xe000 = screen_base field (bits[12:8]=0x38=56)

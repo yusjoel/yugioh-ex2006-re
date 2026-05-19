@@ -1,0 +1,8 @@
+card_list scene card slot data load by list type function. r0=list_type [0..2], r1=card_index. list_type==0: checks 0x02000000[+0x53f0+(index/32)*4] bit(index%32); returns 0 if not set. list_type==1: validates card_index within format range (get_card_data_format_id); returns 0 if out of range. On valid: branches by list_type: 0=copies 0x118 bytes from 0x02001250+index*0x118 to r6 (IWRAM slot region); 1=calls load_card_name_from_fs_by_index; 2+=copies from 0x02001138. Finally calls reinit_deck_slots_and_data. Returns 1 or 0.
+
+Constants:
+- 0x0202a4d0[+0x6c] = target slot data region (r6)
+- 0x02001250 = full card data table (0x118 bytes per entry)
+- 0x02001138 = alternate card data source
+- 0x02000000[+0x53f0] = seen-card bitmap base
+- 0x118 = single card data size

@@ -1,0 +1,8 @@
+card_stats deck slot multi-key sort comparator; passed as qsort comparator (pointer 0x08103ca1). r0/r1 = pointers to two slot entries; extracts low 12 bits card_id (r6, r5) from each [+0x0]. Reads 0x0202f3c0[+0x7c] sort flags halfword, checks each sort dimension per bit0/1/2/3: bit0=ATK tier (lookup 0x09832604 tier table, stride card_id*6+lang); bit1=DEF tier (same table, card_stats_table[card_id*0xb+8]*4+DEF_tier_table); bit2=level+type (card_stats_table offset *0xb, +3 field signed); bit3=star (card_stats_table offset *0x16); returns difference at first unequal dimension. Fallback: subs r0,r6,r5 (card_id difference).
+
+Constants:
+- 0x0202f3c0[+0x7c] = sort flags halfword; bit0=ATK, bit1=DEF, bit2=level_type, bit3=star
+- 0x09832604 = ATK/DEF tier table base (indexed by lang)
+- card_stats_table (0x09816998) = global card attribute table
+- stride *0xb = card_stats_table bytes per entry
+- lsls/lsrs #0x14 = low 12-bit card_id extraction

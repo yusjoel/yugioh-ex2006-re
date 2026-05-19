@@ -1,0 +1,6 @@
+card_list scene BG register and scroll offset init function. Calls setup_card_list_scene_bg_regs to configure background layer registers, then calls reset_card_list_scroll_offset to reset scroll offset. Finally updates gPrng[0x81*4] = (existing & 0xffffc03f) | 0x100: writes BG0CNT screen_base field to 4 (0x100>>2=4). Returns 1. Called by enter_forb_ltd_lists_page indirect table on scene entry.
+
+Constants:
+- gPrng[0x81*4] (0x204 from gPrng) = BG0CNT mirror register
+- 0xffffc03f = non-screen_base bits mask
+- 0x100 = screen_base=4 (BG0CNT bits[12:8])

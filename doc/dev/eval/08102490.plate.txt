@@ -1,0 +1,1 @@
+card_list/scene_duel_puzzle scene no-op placeholder stub function. Body is only movs r0,#1; bx lr -- fixed return 1, no side effects. Exists as a hook function slot placeholder for scene driver; caller expects return value 1 (success/continue) while actual processing is in other functions.

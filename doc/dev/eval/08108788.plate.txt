@@ -1,0 +1,7 @@
+card_list scene variant entry, handles mode=2 (init) and mode=3 (fadeout) initialization phases. Calls tick_card_list_scene_frame + render_card_list_oam_entries + return_one_scene_card_list + return_one_card_list_oam_stub; if frame returns 0 returns 0. Otherwise reads [0x0202a4d0+2] (mode field): mode=2 calls return_one_card_list_stub + init_card_list_display_and_objs, writes [+0x18]=6 / [+0x1a]=0xffff / [+0x1c]=current selected card_id; looks up 0x02000000[+0x6c2c] language byte to match language region slot, writes [0x0202f3c0+0x24]; mode=3 calls apply_blend_fadeout_flat, writes gPrng[0x81*4] = (existing & 0xffffc03f) | 0x180; mode=0/1 writes gPrng[0x91*4] bit2=1.
+
+Constants:
+- 0x0202a4d0 = card_list main state struct; [+2]=mode; [+0x18]=sub_state; [+0x1a]=0xffff sentinel; [+0x1c]=preview_card_id
+- gPrng[0x81*4] (offset 0x204 from gPrng) = BG0CNT mirror register
+- 0xffffc03f = BG0CNT field mask (preserve non screen_base/char_base bits)
+- 0x180 = screen_base field = 6 (0x180>>2)

@@ -1,0 +1,8 @@
+Banlist data region type nibble write function. r0=index (halfword offset index), r1=nibble_value (high 4 bits write value). Computes address 0x02000006 + index*2, reads byte, clears low 4 bits (&0xf) then OR-merges with r1<<4, writes back. Returns 1. Called by card_stats scene when updating banlist entry type.
+
+Constants:
+- 0x02000006 = banlist/card data byte array base (2080 halfword entries)
+- 0x820 = 2080 = banlist total entry count (from ROM 0x095b7cca first word ldrh)
+- index*2 = halfword offset (2 bytes per entry stride)
+- nibble_value written to high 4 bits (bits [7:4])
+- low 4-bit mask 0xf preserves original low nibble

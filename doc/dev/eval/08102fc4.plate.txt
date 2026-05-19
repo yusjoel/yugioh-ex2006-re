@@ -1,0 +1,8 @@
+card_list scene slot entry load and mark-seen function. r0=card_index; calls build_card_list_slot_display_entries to build display entries for current card_index; computes card_index*0x118 offset (0x02001250 + index*0x118) and calls copy_bytes_by_halfword to copy 0x118 bytes to 0x0202a4d0[+0xc2*2] region. Finally sets bit (card_index%32) at 0x02000000[+0x53f0 + (card_index/32)*4] to mark card as seen. Returns 1.
+
+Constants:
+- 0x0202a4d0 = card_list main state struct base
+- 0x02001250 = full card data table base (0x118 bytes per entry)
+- 0x02000000[+0x53f0] = seen-card bitmap base (one u32 per 32 cards)
+- 0xc2*2=0x184 = slot display region offset
+- 0x118 = single card data size

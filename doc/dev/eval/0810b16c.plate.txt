@@ -1,0 +1,11 @@
+Sound system Timer0 playback rate set function. r0=rate_index [0..4]; if greater than 4 clamps to 0. Writes rate_index to 0x030050cc[+0x38a]; clears TM0CNT_L (stops timer); loads rate constant from ROM table 0x084c7634[rate*4], OR-masks 0x80000000 (auto-reload bit) then writes to TM0CNT_L to start. Then loops 3 times updating IWRAM 0x03005608 first 3 frequency slots: loads multiplier from 0x084c7568[rate*2], multiplies with slot [+0x0] then right-shifts 0xc and writes to [+0x8]. No return value (pop{r4};pop{r0};bx r0 -- Sub-case E void).
+
+Constants:
+- 0x030050cc[+0x38a] = current rate_index field
+- TM0CNT_L (0x04000100) = Timer0 count/reload register
+- 0x084c7634 = rate constant table (5 entries x 4 bytes)
+- 0x80000000 = TM0CNT auto-reload bit
+- 0x03005608 = frequency slot IWRAM base (3 slots, stride 0x14)
+- 0x084c7568 = frequency multiplier table (2 bytes per entry)
+- asrs r0,r0,#0xc = fixed-point Q12 right shift (extract high bits after multiply)
+- rate_index [0..4]; >4 -> clamp to 0

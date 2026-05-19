@@ -1,0 +1,8 @@
+card_list scene scroll-select handler. Calls compute_card_list_scroll_position; if result negative returns 0 (no selection). Otherwise calls clear_card_stats_render_flags and reset_card_list_scroll_state, then reads card_id (low 12 bits) from IWRAM 0x0202f3c0[+0x74] slot table and writes to [+0x8]; writes 0xb to [+0x6]; sets [+0x1f] bit0; returns 1 on success.
+
+Constants:
+- 0x0202f3c0 = card_list scene state struct base
+- [+0x8] = selected_card_id (halfword)
+- [+0x6] = display_mode (0xb = card detail page mode)
+- [+0x1f] bit0 = trigger detail refresh flag
+- lsls/lsrs #0x14 = low 20-bit extraction (card_id field)

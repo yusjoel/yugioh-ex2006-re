@@ -1,0 +1,11 @@
+Sound DMA mix channel A/B configure function. r0=channel_select (0=enable channel A, non-zero=switch to channel B). Reads current sound state halfword r4 from IWRAM 0x030050cc[+0xd9*4]; extracts bit4 (was_playing_flag) as r2. If r0==0: SOUNDCNT_H |= 0xcc00 (enable DMA channel A, vol x1; clear state bit4); if r0!=0: SOUNDCNT_H = (existing & 0xffffccff) | 0x8400 (switch to channel B vol x1/2, enable ch B). Both paths toggle bit4 of state halfword and write back to [+0xd9*4]; returns r2 (was_playing_flag). pop{r4,r5,r6};pop{r1};bx r1 -- Sub-case E, r0=r2 passthrough.
+
+Constants:
+- 0x030050cc = sound context IWRAM base
+- 0x030050cc[+0xd9*4=0x364] = DMA channel state halfword
+- SOUNDCNT_H (0x04000082) = sound DMA control register
+- 0xcc00 = SOUNDCNT_H: DMA A = Timer0, vol x1, ch A reset + enable (bits[15:8])
+- 0xffffccff = SOUNDCNT_H mask (clear bits[15:8])
+- 0x8400 = SOUNDCNT_H: ch B vol x1/2, Timer0, ch B enable (bits[15:8])
+- 0xffef = state word mask (clear bit4)
+- bit4 = was_playing_flag

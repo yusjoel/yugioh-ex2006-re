@@ -1,0 +1,10 @@
+Sound channel 3 wave pattern write function. Takes one 16-byte entry from ROM wave data table by instrument index and mode slot, writes to GBA WAVE_RAM (0x04000090), then switches SOUND3CNT_L (0x04000070) selected bank and re-enables channel 3. Implements double-buffering: writes data to non-playing bank then switches to that bank for playback. If wave_slot==0 takes silent path, writes all zeros to WAVE_RAM. r1 bit7=1 uses alternate instrument table (0x081143a0) with low 7 bits as instrument index; bit7=0 uses main table (0x084be710). All three callers invoke before channel 3 playback, role is wave switching.
+
+Constants:
+- WAVE_RAM (0x04000090) = channel 3 wave RAM, 16 bytes/bank (GBA dual bank)
+- SOUND3CNT_L (0x04000070) = NR30: bit7=ch3 enable, bit6=bank select
+- 0x084be710 = main instrument wave data table (each instrument 16 patterns x 16 bytes = 256 bytes)
+- 0x081143a0 = alternate instrument wave data table (same structure)
+- offset formula: (instr_idx * 16 + wave_slot) * 16 bytes
+- 0x200 = [snd_ctx+0x364] bit9 = current playing bank tracking bit
+- 0x80 = SOUND3CNT_L: ch3 enable + bank0; 0xC0 = ch3 enable + bank1

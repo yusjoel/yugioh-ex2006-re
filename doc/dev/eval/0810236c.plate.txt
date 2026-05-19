@@ -1,0 +1,8 @@
+card_stats scene banlist-driven deck slot populate function. No APCS input (entry .hword 0x464f/0x4646 = callee-save spill, not params). First calls zero_deck_slot_range_by_type for types 0..3. Then iterates banlist bitmap table (at 0x095b7cca, count from ldrh): reads byte bit7:4 (card type flags, requires &0xf0!=0) and bit1:0 (ban level, <=2 valid); writes corresponding type nibble to 0x0202a4d0[+0x1a0c*2]; accumulates r3=matching entry count / r4=cumulative type value; writes to [+0x1a0c] / [+0x1a14]. Then loops slot_idx 0..3 calling write_card_list_field_by_index / write_card_list_field_by_row_col / init_deck_slot_data. Returns 1.
+
+Constants:
+- 0x095b7cca = ROM banlist bitmap table base
+- 0x0202a4d0 = card_list main state struct base
+- 0x1a0c = slot type count field offset
+- 0x1a14 = slot cumulative value field offset
+- 0xf000 / 0x0fff = upper/lower 12-bit masks

@@ -1,0 +1,8 @@
+card_stats scene card type table lookup function. r0=mode (caller passes then subs #2, valid range 0..10 corresponding to original 2..12); r1=card_id. mode 0..10 corresponds to 11 ROM tables (0x09e60fc0, ec, 00, 24, 34, 5c, b4, d4...), each with different entry counts (r3: 11/5/9/4/10/22/8/33...). If r1==0 returns -1. Linearly scans selected table entries (4 bytes each, halfword[+2] = card_id); on match returns halfword[+0] (category value); no match returns -1.
+
+Constants:
+- subs r0,#2 -- original mode=2 maps to case 0; valid mode input [2..12]
+- 0x09e60fc0 = mode 2 table base (11 entries)
+- 0x09e60fec = mode 3 table base (5 entries)
+- 0x09e61000 = mode 4 table base (9 entries)
+- 0x09e61024 = mode 5 table base (4 entries)

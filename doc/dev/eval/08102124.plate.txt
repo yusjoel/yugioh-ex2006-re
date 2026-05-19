@@ -1,0 +1,6 @@
+card_stats scene deck slot full rebuild function. No APCS input; entry ldr r7=0x0202a4d0 (internal load). Sequence: (1) copy_bytes_by_halfword from 0x03000288 copying 0x118 bytes to r7[+0x6c]; (2) reset_all_deck_slots clears all slot state; (3) populate_deck_slots_from_card_list fills slots from card list; (4) loop slot_idx 0..3 calling write_card_list_field_by_index(slot,1) / write_card_list_field_by_row_col / init_deck_slot_data. Returns 1. Called by multiple card_stats scene init paths.
+
+Constants:
+- 0x0202a4d0 = card_list main state struct base
+- 0x03000288 = source data buffer (IWRAM)
+- 0x1a1c / 0x1a14 = struct slot field offsets
