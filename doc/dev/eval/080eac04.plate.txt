@@ -1,0 +1,6 @@
+nnsys/g2d/g2d_Image.c line 810/811. Upload NNS_G2dPaletteData palette data to 2DMAIN palette VRAM region (0x05000200). type must be 1 (2DMAIN), asserts otherwise. Reads palette count from pPltData[+0xc], source data ptr from pPltData[+8]. Computes write byte count via lsls#9, lsrs#0xb. Calls bios_cpu_fast_set to DMA data to 0x05000200 + type_offset.
+
+Constants:
+- PALETTE_2DMAIN_BASE = 0x05000200
+- assert line 0x32a=810 (pPltData!=NULL), 0x32b=811 (type<=2)
+- type must = 1 (2DMAIN), type!=1 asserts @ 0x080eac76, line 0x128=296

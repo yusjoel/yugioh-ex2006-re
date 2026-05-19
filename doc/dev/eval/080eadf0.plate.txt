@@ -1,0 +1,5 @@
+nnsys/g2d/g2d_Image.c line 846/847. Copy first two words from source palette proxy struct to dest, then call set_img_proxy_vram_slot to register the VRAM slot. Copies [pPltProxySrc+0] and [pPltProxySrc+4] to [pPltProxyDst+0] and [pPltProxyDst+4]. Then calls set_img_proxy_vram_slot (0x080e9c74) with pPltProxyDst, type, pImgProxy.
+
+Constants:
+- assert line 0x34e=846 (pPltProxy!=NULL), 0x34f=847 (type<=2)
+- assert DAT_080eae58 = 0x09e4b898: "pPltProxy" string anchor

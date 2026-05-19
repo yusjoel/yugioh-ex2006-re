@@ -1,0 +1,7 @@
+Initialize BG2 and BG3 affine transform matrices to identity and clear scroll offsets. For BG2: writes [BG2X+0]=0, [BG2X+4]=0 (BG2X/BG2Y scroll clear); writes [BG2X-8]=0x100 (BG2PA=1.0), [BG2X-6]=0 (BG2PB), [BG2X-4]=0 (BG2PC), [BG2X-2]=0x100 (BG2PD=1.0). Applies same 6-write layout for BG3 (base+0x12). Writes BG0CNT=0x4. Leaf function, no push/pop, indeg=6.
+
+Constants:
+- BG2X = 0x04000028 (PTR_BG2X_080ede9c)
+- BG2PA=0x04000020, BG2PB=0x04000022, BG2PC=0x04000024, BG2PD=0x04000026
+- IDENTITY = 0x100 (0x80<<1, 1.0 in 8.8 fixed point)
+- BG0CNT = 0x04000008, write value = 0x4

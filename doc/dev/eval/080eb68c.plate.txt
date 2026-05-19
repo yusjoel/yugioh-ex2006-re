@@ -1,0 +1,5 @@
+nnsys/g2d/g2d_NCL_load.c line 140 (0x8c). Fix up PCMP (Palette Compression) block pCmpInfo internal data pointer: adds relative offset [pPlttCmpInfo+0x4] to pPlttCmpInfo base to convert to absolute pointer. Assert pPlttCmpInfo != NULL (DAT_080eb6b0 = 0x09e4da30). Symmetric with relocate_ncl_pltt_data_ptr (0x080eb6b4); differs in field offset (+0x4 vs +0xc).
+
+Constants:
+- assert line 0x8c=140 (pPlttCmpInfo!=NULL)
+- DAT_080eb6b0 = 0x09e4da30: "pPlttCmpInfo" assert string anchor

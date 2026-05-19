@@ -1,0 +1,6 @@
+nnsys/g2d/g2d_NAN_load.c line 111/112. Load animation bank from NMAR (Multi-cell Animation Resource) file. Validates file header magic = 0x4e4d4152 ('NMAR'), checks [pNmarFile+6] halfword version >= 0x100. Calls link_nanr_anim_bank (0x080eaf58) for actual bank linking. Symmetric with load_nanr_anim_bank (same file, line 0x74=116/0x78=120 asserts), differs only in magic constant.
+
+Constants:
+- NMAR_MAGIC = 0x4e4d4152 (DAT_080eb0e8, 'N','M','A','R')
+- assert line 0x6f=111 (pNmarFile!=NULL), 0x70=112 (ppAnimBank!=NULL)
+- assert line 0x74=116 (magic check), 0x78=120 (version check)

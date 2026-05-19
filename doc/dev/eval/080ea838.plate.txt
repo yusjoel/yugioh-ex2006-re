@@ -1,0 +1,7 @@
+nnsys/g2d/g2d_Image.c line 753/754. Read slot value from NNS_G2dImageProxy VRAM location table by type index. Computes pVramLocation->slot[type] = [pVramLocation + type*4] and returns the raw u32 slot value. Unlike check_vram_location_slot (0x080eae5c), this function returns the raw value rather than a 0/1 boolean.
+
+Constants:
+- NNS_G2D_VRAM_TYPE_3DMAIN = 0
+- NNS_G2D_VRAM_TYPE_2DMAIN = 1
+- NNS_G2D_VRAM_TYPE_2DSUB  = 2
+- assert line 0x2f1=753 (pVramLocation!=NULL), 0x2f2=754 (type<=2)

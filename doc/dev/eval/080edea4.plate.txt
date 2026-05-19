@@ -1,0 +1,7 @@
+Zero-fill a range of BG VRAM tile rows. r1 high 11 bits (lsrs#0x15) = row_count, low 5 bits (lsrs#0x10 & 0x1f) = x_tile. r2 high 11 bits = fill_count, low 5 bits = tile_width. Computes start address: 0x06000000 (0xc0<<0x13) + x_tile + r0<<11 (row * 0x800 bytes per row). Loops row_count times: calls zero_fill_by_halfword(addr, tile_width), addr += 0x20 (32 bytes per row step).
+
+Constants:
+- BG_VRAM_BASE = 0x06000000 (0xc0<<0x13)
+- ROW_STRIDE = 0x20 = 32 bytes (tile row step)
+- x_tile = r1[4:0], row_count = r1[26:21]
+- tile_width = r2[4:0], fill_count = r2[26:21]

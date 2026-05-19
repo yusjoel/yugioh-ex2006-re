@@ -1,0 +1,8 @@
+Upload sprite tile data to OBJ tile VRAM (0x06004000) and write palette-blended OAM attributes. Spills r10->r7->r9->r6->r8->r5; saves r3 to r12 (.hword 0x469c). Calls copy_bytes_by_halfword twice to upload tile data from sprite frame descriptor struct. Then traverses frame attr1 array: if attr1 high byte nonzero, ORs palette index r6<<8; if low byte nonzero, adds r6. Writes combined halfword to OBJ VRAM 0x06000000 (0xc0<<0x13) + tile_slot*2 area.
+
+Constants:
+- OBJ_TILE_VRAM_BASE = 0x06004000 (DAT_080ee25c)
+- VRAM_SECONDARY_BASE = 0x06000000 (0xc0<<0x13)
+- PAL_MASK = 0xff00 (0xff<<8)
+- TILE_SLOT_STRIDE = 0x40 (r3*32 byte offset for tile slot)
+- OAM_ATTR_MASK = 0x0fff (DAT_080ee260)

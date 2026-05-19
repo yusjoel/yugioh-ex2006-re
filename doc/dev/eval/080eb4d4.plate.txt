@@ -1,0 +1,8 @@
+nnsys/g2d/g2d_NCL_load.c line 25/26. Debug palette entry dump function (suppressed in release build via suppress_display_output). Prints palette header "\n --- palette ---\n", loops i=0..0xff (256 iterations) outputting each palette entry: newline "\n" every 16 entries, each entry as " %04X ". Prints footer "\n" after loop. All suppress_display_output calls are no-ops in release build.
+
+Constants:
+- PALETTE_ENTRY_COUNT = 0x100 = 256 (0xff..0)
+- LINE_ENTRIES = 16 (every 0xf mask)
+- assert line 0x19=25 (pPlttData!=NULL), 0x1a=26 (pRawData!=NULL)
+- DAT_080eb534 = 0x09e4d8f0: "nnsys/g2d/g2d_NCL_load.c"
+- DAT_080eb53c = 0x09e4d918: "pPlttData->pRawData"

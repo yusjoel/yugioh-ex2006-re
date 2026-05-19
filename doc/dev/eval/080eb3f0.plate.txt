@@ -1,0 +1,7 @@
+nnsys/g2d/g2d_NCG_load.c line 195/196. Find CPOS (Character Position) block in NCGR file and write output pointer. Validates magic = 0x4e434752 ('NCGR'), version >= 0x101. Calls find_bin_block_by_type(pNcgrFile, 0x43504f53='CPOS'). If found: *ppCharPosInfo = block+8 (skip block header), returns 1. If not found: *ppCharPosInfo = NULL, returns 0.
+
+Constants:
+- NCGR_MAGIC = 0x4e434752 (DAT_080eb474, 'N','C','G','R')
+- CPOS_BLOCK_TYPE = 0x43504f53 (DAT_080eb484, 'C','P','O','S')
+- NCGR_VERSION_MIN = 0x101 (DAT_080eb47c)
+- assert line 0xc3=195 (pNcgrFile!=NULL), 0xc4=196 (ppCharPosInfo!=NULL)

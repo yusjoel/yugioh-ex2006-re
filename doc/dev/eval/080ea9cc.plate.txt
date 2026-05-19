@@ -1,0 +1,6 @@
+nnsys/g2d/g2d_Image.c line 794/795. Dispatch char data write to VRAM location by NNS file format type field. Spills r1 to r8 (.hword 0x4688), r2 to r7, r3 to r6. Reads pSrcData[+2] low 16 bits minus 1 as 32-entry switch index, maps format codes (2->1, 4->2, 8->3, 0x10->4, 0x20->5, else->0) and writes to pVramLocation[+0xc]. Applies same mapping for pSrcData[+0] to pVramLocation[+4]. If pSrcData[+8] != 0 reads slot directly. Calls set_img_proxy_vram_location to finalize.
+
+Constants:
+- format code map: 2->1(NNS_G2D_CHARA_COLORTYPE_16), 4->2, 8->3, 0x10->4, 0x20->5, else->0
+- assert line 0x31a=794 (pSrcData!=NULL), 0x31b=795 (type<=2)
+- 0x6d=109: pSrcData[0] sentinel check (-1)

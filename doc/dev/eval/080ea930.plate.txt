@@ -1,0 +1,6 @@
+nnsys/g2d/g2d_Image.c line 777/778. Copy NNS_G2dCharacterData pixel data to OBJ tile VRAM. type must be 1 (2DMAIN); asserts otherwise. Reads charFmt from pCharData[+0xc]: bit8 must be 0 (linear format). Passes pCharData[+0x14] (source ptr) and pCharData[+0x10] (byte count) to copy_to_obj_tile_vram.
+
+Constants:
+- type must = 1 (NNS_G2D_VRAM_TYPE_2DMAIN), assert @ 0x080ea9b8
+- charFmt bit8 must = 0 (linear format), assert @ 0x080ea96e, line 0x88=136
+- assert line 0x309=777 (pCharData!=NULL), 0x30a=778 (type<=2)

@@ -1,0 +1,8 @@
+Language Selection page OAM entry write. Called by enter_language_selection_page (0x080ebfb8) at state=0 render phase. Loop 1: i=5..0 (6 iterations), writes 6 OBJ sprite entries (cursor/selection icons), VRAM slot starting at r6=0x20000 (0x80<<0xa, lsrs#0x10=2 tile slot), increments 0x80000 (0x80<<0xf) each iteration. Loop 2: i=0..5 (6 iterations), uses modulo 3 / divide 3 for grid layout (3 columns), writes 3 OBJ sprites per iteration. If [0x020297e0+1] bit6 set: reads OBJ attr from DAT_080ebfa4 (0x09e5ee34) table, calls write_obj_attr_packed for 3 attrs.
+
+Constants:
+- TILE_SLOT_INIT = 0x20000 (0x80<<0xa), lsrs#0x10 = 2, OAM attr2 tile index start
+- GRID_COLS = 3
+- EWRAM_STATE = 0x020297e0
+- OBJ_ATTR_TABLE = 0x09e5ee34
+- 0x003c0020, 0x003c0040: OAM packed arg offset constants

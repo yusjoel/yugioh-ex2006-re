@@ -1,0 +1,8 @@
+Language Selection page tile/map loading and text rendering. Called by enter_language_selection_page (0x080ebfb8) at state=0 immediately after init_lang_select_vram_and_regs. Reads [0x080000ae] high byte to detect ROM region (0x45='E' selects alternate pack address). Calls load_pack_tile_and_map_to_vram 3 times to load background tiles and map. Zero-fills 0x06010000 VRAM. Copies two palette batches to 0x05000220. Sets line_buf start position (x=0x18, font=2). Reads gSettings language bits to select font from font_jp_base_table. Computes game title text width and centers it; calls text_render_wrapper to render title and subtitle rows into BG tile VRAM. Loops i=0..5 to render 6 language option strings into BG tile VRAM. Writes gPrng[+0x1f4] function pointer (0x080ebb15).
+
+Constants:
+- ROM_REGION_ADDR = 0x080000ae (region byte, 0x45='E' for US/EU)
+- BG_TILE_VRAM = 0x06010040, 0x06010800, 0x06010a00
+- PALETTE_2DMAIN = 0x05000220
+- gSettings = [0x02000000+0x6c2c]
+- gPrng+0x1f4 = 0xfa*2 (fn ptr)

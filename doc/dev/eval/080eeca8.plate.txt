@@ -1,0 +1,7 @@
+Return game string pointer for given string ID at current language offset. If r0=0 returns fixed empty string (DAT_080eecf8 = 0x09e4f348). Otherwise: adds 0x1f4 (0xfa*2) offset to r0, calls game_str_id_to_row to convert to row index; reads game_str_pointer_table[row] for relative offset; reads [0x02000000+0x6c2c] byte low 3 bits as language index (0=JA/JP, 1..5=other); computes lang_offset = lang*4 and returns game_str_ja + offset for that language.
+
+Constants:
+- ID_OFFSET = 0x1f4 (0xfa*2, language option string region start offset)
+- gSettings_LANG = [0x02000000+0x6c2c] low 3 bits [0..5] language index
+- game_str_pointer_table, game_str_ja: known string resource labels
+- NULL_STR = 0x09e4f348 (DAT_080eecf8, returned when r0=0)

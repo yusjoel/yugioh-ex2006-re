@@ -1,0 +1,7 @@
+nnsys/g2d/g2d_Image.c line 762/763. Check if NNS_G2dImageProxy VRAM slot[type] is nonzero (allocated). Reads pVramLocation->slot[type] = [pVramLocation + type*4], maps nonzero -> 1 and zero -> 0 using mvns+rsbs+orrs+lsrs#0x1f idiom. Same source as get_vram_location_slot_value (0x080ea838), differs in return type (boolean vs raw).
+
+Constants:
+- NNS_G2D_VRAM_TYPE_3DMAIN = 0
+- NNS_G2D_VRAM_TYPE_2DMAIN = 1
+- NNS_G2D_VRAM_TYPE_2DSUB  = 2
+- assert line 0x2fa=762 (pVramLocation!=NULL), 0x2fb=763 (type<=2)

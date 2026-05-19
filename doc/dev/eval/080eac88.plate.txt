@@ -1,0 +1,7 @@
+nnsys/g2d/g2d_Image.c line 829/830. Upload palette entries in batches to 2DMAIN palette VRAM. Spills r10->r7->r9->r6->r8->r5 to callee-save, r0 to r8, r1 to r6, r2 to stack, r3 to r10. Loops over pCmpInfo entry list by r5: reads entry color count (ldrh at [r6+i*2]), multiplies by stride (r7 = 0x20 or 0x200), computes dest = [pSrc+0xc] + dest_index*stride + 0x05000200, calls bios_cpu_fast_set to write r2 bytes.
+
+Constants:
+- PALETTE_2DMAIN_BASE = 0x05000200
+- stride = 0x20 (32 bytes, type==3 path) or 0x200 (512 bytes, type==4 path)
+- 0x1fffff mask: write byte count mask (DAT_080eadbc)
+- assert line 0x33d=829, 0x33e=830

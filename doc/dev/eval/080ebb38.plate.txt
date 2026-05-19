@@ -1,0 +1,10 @@
+Language Selection page VRAM and IO register initialization. Called by enter_language_selection_page (0x080ebfb8) at state=0. Writes gPrng[+0x174]=1 (page-enter flag), clears DISPCNT to disable display. Calls reset_display_and_obj_vram and store_ewram_ctx_ptr_and_clear_mode_flags. Reads [0x02000000+0x6c2c] (gSettings language field) and writes extracted bits to 0x020297e0 EWRAM state word. Sets BG0CNT=0x4, BG1CNT=0x105, BG2CNT=0x206, BG3CNT=0x307. Calls reset_all_bg_scroll_regs_and_shadows and upload_pack_vram_and_palette. Zero-fills three BG VRAM blocks: 0x06004000 / 0x06000000 / 0x06010000 each 0x8000 halfwords.
+
+Constants:
+- gPrng+0x174 = 0xba*2 (language page enter flag)
+- DISPCNT = 0x04000000
+- BG0CNT=0x4, BG1CNT=0x105, BG2CNT=0x206, BG3CNT=0x307
+- OBJ tile VRAM base = 0x06004000
+- BG VRAM zero-fill = 0x06000000 (0xc0<<0x13)
+- BG tile VRAM base = 0x06010000
+- EWRAM gSettings = [0x02000000+0x6c2c]

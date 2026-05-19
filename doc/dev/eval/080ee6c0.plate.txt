@@ -1,0 +1,7 @@
+Single-frame tick driving GL scene fade-out transition. Loads EWRAM struct ptr = 0x0201af20. Reads gPrng[+0x148] (0xa4*2) halfword bit1: if set, calls gl_fade_out and sets [r4+0x88] |= 1 (status flag). Then calls check_blend_transition_done: if returns 0 and [r4+0x88] bit0 already set -> returns 1 (transition complete). Otherwise calls tick_blend_transition_step to advance one frame and returns 0 (still in transition).
+
+Constants:
+- EWRAM_CTX_BASE = 0x0201af20 (DAT_080ee700)
+- gPrng+0x148 = 0xa4*2 (gl fade trigger flag halfword)
+- FADE_TRIGGER_BIT = bit1 (ands r0,#2)
+- FADE_STATUS_FLAG = [r4+0x88] bit0

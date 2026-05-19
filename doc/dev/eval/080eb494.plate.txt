@@ -1,0 +1,5 @@
+nnsys/g2d/g2d_NCG_load.c line 230 (0xe6). Fix up NCGR char data block internal data pointer: adds relative offset [pCharData+0x14] to pCharData base to convert to absolute pointer. Also checks [pCharData+0xc] charFmt low byte; if nonzero asserts failure (format must be linear, line 0xf6=246). Assert string DAT_080eb4d0 = 0x09e4d160 contains "NNSi_G2dGetCharacterFmtType".
+
+Constants:
+- assert line 0xe6=230 (pCharData!=NULL), 0xf6=246 (charFmt==0)
+- assert DAT_080eb4d0 = 0x09e4d160: "NNSi_G2dGetCharacterFmtType" string anchor
