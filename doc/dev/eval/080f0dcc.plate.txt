@@ -1,0 +1,9 @@
+Writes a single color byte to the specified pixel position in the EWRAM font_jp glyph tile buffer. Inputs r0=x_pixel, r1=y_pixel, r2=color_byte. Reads VRAM base pointer from [0x02006ed0+0], reads width_in_tiles (bits[21:16]) from [0x02006ed0+0x8], computes tile-internal offset: tile_col=(x&7)*4, tile_row=(y&7)*32, x_tile=(x>>3), y_tile=(y>>3), byte_offset=(y_tile*width_tiles+x_tile)*64+tile_row+tile_col, writes r2 to glyph_buf_base+byte_offset. Used for per-pixel fill of glyph tile buffer. indeg=0 in callgraph (dead-code or runtime function pointer).
+
+Constants:
+- FONT_CTX=0x02006ed0 // EWRAM font_jp context
+- TILE_SIZE_SHIFT=6 // tile size 64 bytes = 1<<6
+- PIXEL_BYTE_SHIFT=2 // 4bpp: (x&7)*4 = pixel byte offset
+
+Side effects:
+- [glyph_buf_base + byte_offset] := r2 (byte write to glyph tile buffer)

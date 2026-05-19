@@ -1,0 +1,13 @@
+Checks IWRAM link state ([0x030003a0+0x033f] != 0 AND [0x030003a0+0x0344] != 0) then starts SIO master transfer. When both conditions are met: writes SIOCNT+2 with SIO rate control word 0xfefe, reads SIOCNT and sets bit7 (START=1) then writes back to SIOCNT+0, finally writes TM3CNT_H=0xc0 to start Timer 3 driving SIO timing. Called only by SIO state machine (0x080ef958) during online battle handshake after confirming connection ready.
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO connection state structure base
+- READY_FLAG1_OFF=0x033f // connection ready flag 1 offset
+- READY_FLAG2_OFF=0x0344 // connection ready flag 2 offset
+- SIOCNT_RATE=0xfefe // SIO rate/format control word
+- TM3CNT_H_ENABLE=0xc0 // Timer3 enable (prescale=4, enable=1)
+
+Side effects:
+- [SIOCNT+0x2] := 0xfefe
+- [SIOCNT+0x0] := [SIOCNT] | 0x80 (set START bit)
+- [TM3CNT_H] := 0xc0

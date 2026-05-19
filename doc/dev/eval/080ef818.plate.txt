@@ -1,0 +1,14 @@
+Processes one frame of SIO link deck synchronization data. Called by 0x080ef958 (SIO state machine) after handshake completion. Reads IWRAM [+0x0341] connection active flag, swaps previous frame data pointer pair (d5/d6), updates round halfword [+0x0342], clears active flag; if active==0 jumps to tail OR-merge and exits. If active != 0: zeros IWRAM counter [+0x041c], loops 2 rounds (i=0..1), each round accumulates 10 card halfword values from card_stats_table offset into a checksum accumulator, branches on whether accumulation result == 0 (lsls r1,r0,#16), sets [OBJ_VRAM+0x4] flag bit; at tail OR-merges [0x030003a0+0x0342] |= [+0x0341].
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO state structure base
+- ACTIVE_FLAG_OFF=0x0341 // current frame active flag offset
+- ROUND_HALF_OFF=0x0342 // round halfword field offset
+- COUNTER_OFF=0x041c // round counter offset
+- OBJ_VRAM_FLAG=0x05000004 // OBJ attribute VRAM flag write address
+
+Side effects:
+- [0x030003a0+0x0341] := 0 (clear active flag)
+- [0x030003a0+0x0342] := updated round word
+- [0x030003a0+0x041c] := 0 (clear counter, conditional)
+- [0x05000004] := OBJ VRAM flag bit OR write

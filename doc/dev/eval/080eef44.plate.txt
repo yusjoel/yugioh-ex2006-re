@@ -1,0 +1,7 @@
+Reads field 3 (column index 3) u16 value from the ROM extended card attribute table (base 0x09821e04, 11 halfwords/row, stride=22 bytes). Returns 0 if card_id <= 0x0fa6 (4006, normal card upper bound). Otherwise: row=card_id-0xfa7; offset=(row*11+3)*2; reads u16. Sibling of get_card_extended_stat_field5/6/7/8/9 and lookup_rom_card_attribute_table_a (column 4 with sentinel check); this function uses column index 3 with no 0xffff sentinel filter.
+
+Constants:
+- TABLE_BASE=0x09821e04 // ROM extended card attribute table base
+- NORMAL_CARD_BOUND=0x0fa6 // normal card id upper bound (4006)
+- ROW_NEGATE=0xfffff059 // -0xfa7 (two's complement)
+- ROW_STRIDE=11 // halfwords per row

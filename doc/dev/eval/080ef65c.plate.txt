@@ -1,0 +1,18 @@
+SIO connection initialization entry point. Called by FUN_080edd90 (tags: sys,timer) during link establishment. Steps: (1) disable IME and mask IE serial bit (ands 0xff3f); (2) use bios_cpu_set fill mode to zero IWRAM [0x030003a0] for 0x116 words; (3) initialize three data pointer fields (d4/d5/d6 offsets); (4) set unknown_flags=0xff for one card slot; (5) clear halfword field [+0x0346]; (6) RCNT=0 (disable GPIO); (7) set SIOCNT=0x4003 (SIO normal 32bit mode); (8) write SIO state word [+0x34c]=0xc; (9) write SIOSTAT [+0x360]=0x1000; (10) register SIO callback (write 0x080ef535 to [+0x42c]); (11) read SIOCNT to [+0x434]; (12) re-enable IE serial bit, restore IME=1.
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO state structure base
+- ZERO_FILL_CTRL=0x05000116 // bios_cpu_set: fill mode, 0x116 words
+- SIO_MODE_NORMAL32=0x4003 // SIOCNT mode word (32bit normal)
+- SIO_BAUD_BITS=0x4000 // SIOCNT baud rate bits
+- SIO_CALLBACK=0x080ef535 // SIO receive callback (handle_sio_recv_packet+1)
+
+Side effects:
+- [IME] := 0 -> 1
+- [IE]: mask serial bit, restore+enable
+- [0x030003a0..+0x045f] := 0 (bios_cpu_set zero-fill 1112 bytes)
+- [RCNT] := 0
+- [SIOCNT] := 0x4003
+- [0x030003a0+0x034c] := 0xc
+- [0x030003a0+0x0360] := 0x1000
+- [0x030003a0+0x042c] := 0x080ef535 (callback pointer)

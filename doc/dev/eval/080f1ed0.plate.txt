@@ -1,0 +1,9 @@
+Scans a string until character count r3 reaches limit r1 or NUL is encountered. Uses the same 179-entry jump table dispatch as get_char_width_class (0x080f02a4, index = byte-0x9). Case 0x25 (space control char): advances byte pointer r2 only (no count); case 0x2e ('.') followed by 0x2e: increments line count r3+1 and loops back; default (normal byte): r2+=1, r3+=1. Entry: r2=str_ptr, r1=char_limit, r3=0. Exits when r3>=r1 or NUL; returns r0=current byte pointer (end_ptr). indeg=0 in callgraph.
+
+Constants:
+- SWITCH_TABLE_BASE=0x080f1ef4 // 179-entry jump table
+- CASE_DOUBLE_BYTE=0x25 // double-byte char control code (skip 1 extra byte)
+- CASE_PERIOD=0x2e // period; if followed by 0x2e counts as line break
+- INPUT_OFFSET=0x9 // all indices adjusted by -0x9 before table lookup
+
+R7 form(c): grep ".word 0x080f1ed1" asm/all.s -> 0 hits. callgraph indeg=0 + no function pointer references -> dead-code or runtime dynamic load.

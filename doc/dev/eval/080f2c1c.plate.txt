@@ -1,0 +1,4 @@
+Symmetric sibling of render_text_with_u16_width (0x080f2c2c). Identical function body: push {lr}; lsls r2,r2,#0x10; lsrs r2,r2,#0x10; bl text_render_wrapper; pop {r1}; bx r1. Zero-extends r2 (width/column offset) to u16 then calls text_render_wrapper, clearing sign-extended high 16 bits. Called by FUN_080df3f0 (vram,font_jp,game_str) and two font_jp helper functions for Japanese font rendering path width-safety wrapping. Forms three-sibling cluster with render_text_with_u16_width and FUN_080f2c3c.
+
+Side effects:
+- Inherits text_render_wrapper side effects (BG tile write / sprite VRAM write)

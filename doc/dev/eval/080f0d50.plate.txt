@@ -1,0 +1,10 @@
+Extended wrapper of setup_line_buf_pos_and_font: first calls setup_line_buf_pos_and_font with r0/r1 to establish render position and font type, then writes align mode bit (r2 low bit, shifted left 1 into bits[1:0]) to [0x02006ed0+0x15] while setting bit0=1 (wrap_enable), and writes glyph slot index (r3 low 5 bits, shifted left 2 into bits[6:2]) to [0x02006ed0+0x14] bits[6:2]. Called before font_jp character rendering initialization (vram and font_jp tags), paired with render_jp_string_glyph_loop for Japanese glyph output.
+
+Constants:
+- FONT_CTX=0x02006ed0 // EWRAM font_jp context base
+- SLOT_MASK=0x1f // glyph slot index 5-bit mask
+- ALIGN_MASK=0x1 // align mode bit mask
+
+Side effects:
+- [0x02006ed0+0x15] bits[1:0] := align_mode<<1 | 1 (wrap_enable=1)
+- [0x02006ed0+0x14] bits[6:2] := char_slot<<2

@@ -1,0 +1,14 @@
+Lightweight SIO reset: disables IME, masks IE serial bit, reads two data pointer fields stored at [0x030003a0+offset] and zeros their target memory (str 0 to [ptr]), restores IME=1, writes TM3CNT_L=0xb1fc (timer 3 reload value) and sets TM3CNT_H=0x4000 (start Timer 3, no cascade). No bios_cpu_set call -- lighter than init_sio_connection. Called by FUN_080edd90 (sys,timer) and FUN_080ede28 (sys) during SIO reset/disconnect.
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO state structure base
+- TM3_RELOAD=0xb1fc // Timer 3 reload value
+- TM3_START=0x4000 // TM3CNT_H: enable, prescale=1
+
+Side effects:
+- [IME] := 0 -> 1
+- [IE] &= 0xff3f (mask serial)
+- [ptr0] := 0
+- [ptr1] := 0
+- [TM3CNT_L] := 0xb1fc
+- [TM3CNT_H] := 0x4000

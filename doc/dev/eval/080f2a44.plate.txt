@@ -1,0 +1,4 @@
+Thin wrapper of render_jp_string_glyph_loop passing wrap_flag=0 and extra_offset=0. Allocates 8 bytes on sp, sets [sp+0]=0 (no-wrap), [sp+4]=0 (no-extra-offset), zero-extends r2 via lsls/lsrs #0x10 to clear high 16 bits, then calls render_jp_string_glyph_loop. Called by font_jp scenes (0x080dd070 font_jp tags, 0x080e1f00) when automatic line wrapping is not needed for Japanese string rendering.
+
+Side effects:
+- Inherits all render_jp_string_glyph_loop side effects (writes [0x02006ed0] context fields + tile buffer)

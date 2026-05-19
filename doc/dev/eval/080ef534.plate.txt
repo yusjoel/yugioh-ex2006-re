@@ -1,0 +1,15 @@
+Registered as SIO interrupt callback (address 0x080ef535 stored at [0x030003a0+0x042c], written by init_sio_connection). Called on each SIO transfer-complete interrupt: reads SIODATA32 (0x04000120/0x04000124) dword pair into IWRAM buffer [0x030003a0+0x07a4], validates frame header == 0xfefe, sets IWRAM state to -3 if frame sequence [base-0xb8] > 9; otherwise writes two players' card slot (10 rounds) halfwords into corresponding IWRAM offsets, and on round 9 additionally copies card ID and status; at end updates frame sequence number and conditionally stops TM3 timer / re-triggers SIO.
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO connection state structure base
+- RECV_BUF_OFF=0x07a4 // receive data buffer offset
+- SIODATA32=0x04000120 // serial data register base
+- FRAME_MAGIC=0xfefe // valid frame header identifier
+- MAX_ROUNDS=0x9 // up to 10 rounds (0..9) of data exchange
+
+Side effects:
+- [0x030003a0+0x07a4..+0x07a7] := SIODATA32[0..1]
+- [0x030003a0+0x040c..+0x0414] := card slot data
+- [TM3CNT_H] := 0 (stop timer, conditional path)
+- [SIOCNT+0x0] |= 0x80 (trigger next START)
+- [TM3CNT_H] := 0xc0 (restart timer, conditional path)

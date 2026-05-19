@@ -1,0 +1,4 @@
+Batch-writes palette-flagged tile indices into a rectangular region of a BG tilemap. Called by 8 font_jp/game_str scene functions; typical call: r0=0, r1=0, r2=0x16, r3=0xc (full-screen 22x12 grid). High-register parameters (r8/r9=start x/y, r10=row height, r12=col width) define the rectangle; outer loop iterates rows (0..r10-1), inner loop iterates columns (0..r12-1), each tile written as halfword `tile_idx[col] | r6 (palette/flags)`. Source tile index array from sp+0x28; destination VRAM base from sp+0x24. Return is void (pop {r0}; bx r0 = Sub-case E).
+
+Side effects:
+- [sp+0x24 VRAM base + rect offset] := tile_idx | palette_flags (halfword batch write)

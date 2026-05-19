@@ -1,0 +1,6 @@
+Called by card_frame/duel_field callers (0x080659e8, 0x0806cbe8, both with game_str+duel_field tags) to fetch card effect/description text. r0=0 returns fallback addr 0x09e4f348 directly; otherwise adds offset 0x212 to input ID to map into game_str_id_to_row, reads EWRAM [0x02006c2c] bits[2:0] as lang_code selector, computes pointer offset in game_str_pointer_table for the selected language column, returns game_str_ja base + offset as char*. Forms string-family B/C sibling with FUN_080eeda4 (offset 0x23a). No external write side effects.
+
+Constants:
+- ID_OFFSET_B=0x212 // base id offset for string family B
+- LANG_CODE_ADDR=0x02006c2c // EWRAM language/settings byte
+- FALLBACK_PTR=0x09e4f348 // empty string address returned when id=0

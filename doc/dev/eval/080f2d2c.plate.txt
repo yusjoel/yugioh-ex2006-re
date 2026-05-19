@@ -1,0 +1,10 @@
+Variant of render_decimal_digits_jp (0x080f2c8c): uses load_glyph_row_pair (0x080f1b60) instead of render_glyph_jp_single_layer, and advances left by a fixed 8 pixels per digit (subs r5,#0x8) rather than reading dynamic glyph width from [0x02006ed0+0x8]. Loop logic identical: r4 (decimal_value) % 10 -> char_code (+0x30), bl load_glyph_row_pair, r5 -= 8, r4 /= 10, until quotient is 0. Suited for dual-row glyph pair rendering (load_glyph_row_pair loads two rows) with fixed 8px character width. indeg=0 (dead-code or function pointer call).
+
+Constants:
+- CHAR_DIGIT_BASE=0x30 // ASCII '0' digit base char code
+- DIGIT_STEP=0x8 // fixed 8-pixel step per digit (replaces dynamic glyph width query)
+
+R7 form(c): grep ".word 0x080f2d2d" asm/all.s -> 0 hits. callgraph indeg=0 + no function pointer references -> dead-code or runtime dynamic load.
+
+Side effects:
+- Calls load_glyph_row_pair to write font_jp tile buffer (right-to-left per digit, fixed 8px step)

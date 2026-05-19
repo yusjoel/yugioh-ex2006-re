@@ -1,0 +1,11 @@
+Extended variant of render_decimal_digits_jp (0x080f2c8c): adds digit_count parameter (r4=sp+0x18) to limit rendering to at most N decimal digit characters. Loop identical to render_decimal_digits_jp: r3 % 10 -> char_code (+0x30), bl render_glyph_jp_single_layer, x -= glyph width (read from [0x02006ed0+0x8] bit0), r3 /= 10, repeat until digit_count decrements to 0. Parameter r1 (y_row) is spilled to r8 (.hword 0x4688) and passed into each bl via .hword 0x4642 (mov r2,r8). r8 is saved in prologue (mov r7,r8 + push {r7}) and restored in epilogue (pop {r3}; mov r8,r3). indeg=0 (dead-code or function pointer call).
+
+Constants:
+- FONT_CTX=0x02006ed0 // EWRAM font_jp context
+- CHAR_DIGIT_BASE=0x30 // ASCII '0' digit base char code
+- DIGIT_WIDTH_FLAG=[FONT_CTX+0x8] bit0 // 0=10px JP wide; 1=5px ASCII narrow
+
+R7 form(c): grep ".word 0x080f2cd5" asm/all.s -> 0 hits. callgraph indeg=0 + no function pointer references -> dead-code or runtime dynamic load.
+
+Side effects:
+- Calls render_glyph_jp_single_layer to write font_jp tile buffer (right-to-left per digit)

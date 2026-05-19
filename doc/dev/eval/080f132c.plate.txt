@@ -1,0 +1,8 @@
+Clears (AND mask) the bits corresponding to a specified pixel column range in the EWRAM font_jp glyph tile buffer. Called by banlist/font_jp settings screen (0x08019f24, 0x0801a9c4) after init_font_jp_ctx_bg2_char_vram to clear the target column area of the tile buffer for new glyph write. Computes tile row index and intra-tile row offset from r1=y_pixel_row, reads width_in_tiles from [0x02006ed0+0x8], then AND-masks each word spanning the column range (height r0+0xa columns). Two branches: total column range <=16 pixels (single word mask) and >16 pixels (dual word mask r3+r5).
+
+Constants:
+- FONT_CTX=0x02006ed0 // EWRAM font_jp context
+- COL_RANGE_THRESHOLD=0x10 // 16-pixel branch threshold
+
+Side effects:
+- [FONT_CTX glyph_buf + row_word_offset] &= clear_mask (AND zero target bit columns)

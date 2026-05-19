@@ -1,0 +1,6 @@
+Reads field 4 (column index 4) u16 value from the ROM extended card attribute table (base 0x09821e04, 11 halfwords/row). Returns 0 if card_id <= 0x0fa6. Otherwise: row=card_id-0xfa7; offset=(row*11+4)*2; reads u16. Symmetric sibling of lookup_rom_card_attribute_table_a (0x080eef0c, same column 4 but with 0xffff sentinel filter); this function returns the raw value without sentinel check. Called by 0x080878c8 (card attribute test scene) after check_card_field5_is_nonzero to compare against an upper bound.
+
+Constants:
+- TABLE_BASE=0x09821e04 // ROM extended card attribute table base
+- NORMAL_CARD_BOUND=0x0fa6 // normal card id upper bound
+- ROW_STRIDE=11 // halfwords per row

@@ -1,0 +1,4 @@
+Thin wrapper of render_jp_string_glyph_loop: wrap_flag=0 but extra_offset comes from the caller's 5th stack argument (sp+0x14 before push). Adds a render offset on top of the x base, used for character spacing or scroll offset. Distinguished from render_jp_string_nowrap (0x080f2a44) by passing extra_offset=sp[5th_arg] instead of 0. Called by FUN_080dced0 (vram,bg,font_jp) for BG tile character area rendering with offset.
+
+Side effects:
+- Inherits render_jp_string_glyph_loop side effects

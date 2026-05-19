@@ -1,0 +1,10 @@
+Computes IWRAM SIO link buffer checksum. First uses bios_cpu_set to zero the checksum field at [0x030003a0+0x035e] (2 bytes), then loops 10 times (i=0..9) accumulating halfwords from [0x030003a0+0x0360], finally bitwise-inverts the sum (mvns r1,r5) and writes it back to [0x030003a0+0x035e]. Return value is void (pop {r0}; bx r0 = Sub-case E, r0=lr). Called by multiple SIO state machine phases to update the link checksum field.
+
+Constants:
+- SIO_STATE_BASE=0x030003a0 // IWRAM SIO state structure base
+- CHECKSUM_OFF=0x035e // checksum field offset
+- DATA_START_OFF=0x0360 // data start offset
+- ROUND_COUNT=10 // accumulation loop count
+
+Side effects:
+- [0x030003a0+0x035e] := ~sum(halfword[0x030003a0+0x0360..+0x036e]) (10-round accumulation then invert)

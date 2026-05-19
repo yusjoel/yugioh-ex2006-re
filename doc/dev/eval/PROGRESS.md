@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 600 + 剩余 166 (9 批 #109..#117 / 20 每批, 末批 6) |
-| **下一批** | `#109` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-20 (Phase 2 batch #108 landing, 600/766 = 78.33%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 620 + 剩余 146 (8 批 #110..#117 / 20 每批, 末批 6) |
+| **下一批** | `#110` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-20 (Phase 2 batch #109 landing, 620/766 = 80.94%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**600 / 766 已分析** (78.33%, 剩余 9 批待跑 #109..#117)
+**620 / 766 已分析** (80.94%, 剩余 8 批待跑 #110..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -105,6 +105,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #106 560/766 (73.11%) — scene_pack subsystem: scroll state + palette upload + row text render + tilemap write + card name sprite + BG text render + palette cycle + hw regs init + tile load + card type label + scrollbar OAM + highlight sync + nav reset + fadein + scroll input + blend param init/scale
 - batch #107 580/766 (75.72%) — NNS G2D SRT matrix invert/multiply + anim frame ptr advance/index + cell anim sequence/callback setters + anim ctrl loop check/speed + img proxy VRAM getter/checker (1D+VT load + palette load + pltt bank load + renderer proxy)
 - batch #108 600/766 (78.33%) — NNS G2D g2d_Image.c VRAM slot readers + char/pltt upload cluster + NMAR/NCGR/NCLR loaders + lang-select VRAM/tile/OAM init + affine BG reset + GL fade tick + game-text lang-offset getter
+- batch #109 620/766 (80.94%) — game-text ptr getter B + extended card stat field3/4 raw + SIO cluster (master start/recv/init/reinit/checksum/deck-sync) + tilemap rect fill + font_jp line buf setup + glyph tile buf write/render + tile buf col clear + string scan + JP string render wrappers
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -113,18 +114,18 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#108) | 600 |
-| - 剩余 (按 20/批 重组) | 166 |
-| 剩余分批数 (20/批) | 9 (`#109..#117`) |
+| - 已完成 (Phase 2 #82-#109) | 620 |
+| - 剩余 (按 20/批 重组) | 146 |
+| 剩余分批数 (20/批) | 8 (`#110..#117`) |
 | 末批大小 | 6 (#117) |
-| 剩余地址覆盖区段 | 0x080eed50..0x081141d8 |
+| 剩余地址覆盖区段 | 0x080f34dc..0x081141d8 |
 
 #### ROM 全局命名比例
 
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2600** | **1041** | **71.46%** |
+| **全 CSV** | **2620** | **1021** | **72.00%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

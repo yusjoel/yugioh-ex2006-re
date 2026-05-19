@@ -1,0 +1,8 @@
+Renders source 4bpp bitmap data into the EWRAM font_jp tile buffer at a specified position. Called twice by FUN_080f0eec (at +0 and +0x8 row offsets) to render the upper/lower tile rows of a single glyph. Copies bitmap source data via copy_memory_dma3_with_cpu_fallback to a work area, then loops (outer=0..7 rows, inner=0..3 nibbles) extracting 4 pixels per row (4 bits each nibble), computes target tile buffer byte offset (formula: (x_tile>>3)*64 + (x&7)*4 + y_row*stride), writes each pixel byte via strb to [glyph_buf+offset]. Supports wide characters (outer loop groups 0..1).
+
+Constants:
+- FONT_CTX=0x02006ed0 // EWRAM font_jp context
+- NIBBLE_PER_ROW=4 // 4 nibbles per row (4 pixels x 4bpp)
+
+Side effects:
+- [FONT_CTX vram_buf + 4bpp tile offset] := 4bpp nibble bytes (per-row write)
