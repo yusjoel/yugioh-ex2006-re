@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 640 + 剩余 126 (7 批 #111..#117 / 20 每批, 末批 6) |
-| **下一批** | `#111` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-20 (Phase 2 batch #110 landing, 640/766 = 83.55%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 660 + 剩余 106 (6 批 #112..#117 / 20 每批, 末批 6) |
+| **下一批** | `#112` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-20 (Phase 2 batch #111 landing, 660/766 = 86.16%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**640 / 766 已分析** (83.55%, 剩余 7 批待跑 #111..#117)
+**660 / 766 已分析** (86.16%, 剩余 6 批待跑 #112..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -107,6 +107,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #108 600/766 (78.33%) — NNS G2D g2d_Image.c VRAM slot readers + char/pltt upload cluster + NMAR/NCGR/NCLR loaders + lang-select VRAM/tile/OAM init + affine BG reset + GL fade tick + game-text lang-offset getter
 - batch #109 620/766 (80.94%) — game-text ptr getter B + extended card stat field3/4 raw + SIO cluster (master start/recv/init/reinit/checksum/deck-sync) + tilemap rect fill + font_jp line buf setup + glyph tile buf write/render + tile buf col clear + string scan + JP string render wrappers
 - batch #110 640/766 (83.55%) — blit_tile nibble MSB/LSB/xstride + byte_row + compute_card_type_highlight_color + update_key_input_state + match/clear key circular buf + apply_rule_table + copy mem word_blocks/dma3_chunked + expand_format_decimal_width + clamp/tick blend BLDALPHA + blend_palette_entries + copy_halfwords_rounded_up + advance_lcg_rand_state + clear_obj_shadow_by_palette_range + sort_obj_shadow_list_by_priority + write_obj_affine_from_sin_table
+- batch #111 660/766 (86.16%) — pack OAM attr sibling cluster (4 fns: sq/tall x mosaic/diag/pairs) + upload_sprite_tile_and_palette + seek_anim_frame_cursor + render_aob_sprite_with_rot_scale/scale_diag + deduct/set money + hand OAM entry count/delta cluster + count_card_in_full/main_extra_deck + copy/clear_deck_slot_data + count_card_in_slot_hand + test/set_card_flag_bit
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -115,18 +116,18 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#109) | 620 |
-| - 剩余 (按 20/批 重组) | 126 |
-| 剩余分批数 (20/批) | 7 (`#111..#117`) |
+| - 已完成 (Phase 2 #82-#111) | 660 |
+| - 剩余 (按 20/批 重组) | 106 |
+| 剩余分批数 (20/批) | 6 (`#112..#117`) |
 | 末批大小 | 6 (#117) |
-| 剩余地址覆盖区段 | 0x080f34dc..0x081141d8 |
+| 剩余地址覆盖区段 | 0x080f9b70..0x081141d8 |
 
 #### ROM 全局命名比例
 
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2640** | **1001** | **72.50%** |
+| **全 CSV** | **2660** | **981** | **73.05%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

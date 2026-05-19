@@ -1,0 +1,11 @@
+Counts occurrences of card_id r0 across all three deck zones (main + side + extra) in EWRAM 0x02001150 region. Reads main deck count from +0x1150, iterates main data from +0x1154 (stride=2), compares against card_stats_table[card_id*0x16+0]. Then reads side deck count (+0x1151) and data (+0x11f4), then extra deck count (+0x1152) and data (+0x1212). Returns cumulative count r4. Called by card_stats module (0x080ef02c, [banlist;card_stats]).
+
+Constants:
+- DECK_BASE = 0x02000000
+- MAIN_COUNT_OFFSET = 0x1150
+- MAIN_DATA_OFFSET = 0x1154 (stride=2)
+- SIDE_COUNT_OFFSET = 0x1151
+- SIDE_DATA_OFFSET = 0x11f4
+- EXTRA_COUNT_OFFSET = 0x1152
+- EXTRA_DATA_OFFSET = 0x1212
+- CARD_STATS_STRIDE = 0x16 (card_stats_table bytes per card)

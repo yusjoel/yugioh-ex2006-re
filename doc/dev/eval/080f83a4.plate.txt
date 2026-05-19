@@ -1,0 +1,10 @@
+Renders an AOB (Animation Object Block) sprite in rotate/scale/flip mode to OAM shadow buffer. Source: system/s_opdobj.c (assert "PtnNo < ((AOB_PTNSECT_HEADER*)p_ptnsect)->PtnNum"). r0=aob_obj_ptr, r1=packed_xy (low16=x, high16=y), r2=flip_flags, r3=affine_mode, sp[0x94]=packed_extra. Main flow: (1) read affine index, call write_obj_affine_rot_scale; (2) check [struct+0x12]&0x40 for flip path; (3) iterate frame_count patterns, 15 shape branches, bios_div(offset<<8,scale) for rotated coords; (4) copy_bytes_by_halfword from 0x06010000; (5) assemble attr0/1/2, call push_oam_entry_to_aob_slot. Stack frame 0x74 bytes (5th stack param at sp+0x94). Returns r0=0 (movs r0,#0; pop{r1};bx r1, Sub-case E).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000
+- SLOT_OFFSET = 0x1bc (gPrng AOB slot ptr, 0xde*2)
+- STRIDE_OFFSET = 0x401 (DAT_080f84e4)
+- SKIP_SENTINEL = 0x20 (sub_type == 0x20 -> skip)
+- X_MASK = 0x1ff (DAT_080f8798)
+- SIN_TABLE = rom_sin_table_q8 (DAT_080f8720)
+- ASSERT_FILE = system/s_opdobj.c (DAT_080f862c)

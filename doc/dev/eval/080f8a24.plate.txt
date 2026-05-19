@@ -1,0 +1,8 @@
+Renders an AOB sprite in diagonal-scale (no rotation) mode to OAM shadow buffer. Source: system/s_opdobj.c (same as render_aob_sprite_with_rot_scale, DAT_080f8c10). Symmetric with render_aob_sprite_with_rot_scale (0x080f83a4): differences are (1) stack frame reduced to 0x50 (no 5th stack param); (2) no write_obj_affine_rot_scale call; (3) uses write_obj_affine_scale_diagonal (0x080f6074) path. 15 shape case branches identical. Returns r0=0 (movs r0,#0; pop{r1};bx r1, Sub-case E).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000 (DAT_080f8c1c)
+- SLOT_OFFSET = 0x1bc (0xde*2)
+- SKIP_SENTINEL = 0x20 (sub_type 0x20 -> skip)
+- X_MASK = 0x1ff (DAT_080f8ef0)
+- ASSERT_FILE = system/s_opdobj.c (DAT_080f8c10=0x09e4f4b8)

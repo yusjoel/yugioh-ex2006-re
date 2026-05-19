@@ -1,0 +1,4 @@
+Writes r0 directly to EWRAM [0x02006c38] (money storage address) with no bounds check, then calls init_puzzle_wram_and_checksum to sync checksum. Paired with deduct_money_clamped (0x080f8f50): deduct applies floor clamp, this function unconditionally assigns. indeg=0, runtime call.
+
+Constants:
+- MONEY_ADDR = 0x02006c38 (0x02000000 + 0x6c38)

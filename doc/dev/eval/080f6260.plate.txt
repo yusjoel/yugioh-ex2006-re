@@ -1,0 +1,9 @@
+Pack scene card sprite OAM writer (square+affine_double+mosaic). Dispatches x/y offsets for 15 direction codes, writes attr0/1/2 to gPrng sprite slot, increments two count bytes, calls write_obj_affine_rot_scale for affine matrix. attr0 = 0x0700 (shape=square, mode=affine_double, mosaic=on). One of four siblings: write_pack_obj_attr_by_dir_sq_mosaic / write_pack_obj_attr_by_dir_tall_mosaic / write_pack_obj_attr_by_dir_tall_diag / write_pack_obj_attr_by_dir_sq_pairs.
+
+Constants:
+- ATTR0_SQ_AFF_MOSAIC = 0x0700 (shape=0b00=square, mode=0b11=affine_double, mosaic=1)
+- MAX_SPRITE_SENTINEL = 0x80 (slot ptr == 0x80 -> skip)
+- SUB_TYPE_SKIP = 0x20 (sub_type == 0x20 -> skip)
+- SLOT_OFFSET = 0x1bc (gPrng sprite slot ptr offset, 0xde*2)
+- STRIDE_OFFSET = 0x401 (count byte offset, DAT_080f644c)
+- X_MASK = 0x1ff (attr1 x coord mask, DAT_080f6448)

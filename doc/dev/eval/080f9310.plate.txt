@@ -1,0 +1,8 @@
+Clears the three flag bytes of deck slot r0. Uses same 280*n offset formula as copy_deck_slot_data (0x080f9288). Writes 0 to +0x1268, +0x1269, +0x126a (strb each), then calls init_puzzle_wram_and_checksum. Short function (~15 instructions); does not copy card_data region. indeg=0, runtime call.
+
+Constants:
+- DECK_BASE = 0x02000000
+- SLOT_STRIDE = 280
+- FLAG0_OFFSET = 0x1268
+- FLAG1_OFFSET = 0x1269
+- FLAG2_OFFSET = 0x126a

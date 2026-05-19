@@ -1,0 +1,9 @@
+Counts occurrences of card_id r0 in main deck and extra deck only (excluding side deck). Two-zone version of count_card_in_full_deck (0x080f914c): iterates main deck (+0x1150 count, +0x1154 data, stride=2) and extra deck (+0x1152 count, +0x1212 data); compares against card_stats_table[card_id*0x16+0]. Returns two-zone cumulative count. indeg=1, called by card_stats module (0x080e3ee8, [banlist;card_ids;card_stats]).
+
+Constants:
+- DECK_BASE = 0x02000000
+- MAIN_COUNT_OFFSET = 0x1150
+- MAIN_DATA_OFFSET = 0x1154 (MAIN_COUNT_OFFSET + 4)
+- EXTRA_COUNT_OFFSET = 0x1152
+- EXTRA_DATA_OFFSET = 0x1212
+- CARD_STATS_STRIDE = 0x16

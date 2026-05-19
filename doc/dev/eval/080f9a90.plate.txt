@@ -1,0 +1,7 @@
+Sets a bit in the card flag bit array at EWRAM 0x02006e40. Same index encoding as test_card_flag_bit (0x080f9a60): r0[7:4]=word_index, r0[3:0]=bit_position. Generates mask (1 << bit_position), ORs into [0x02006e40 + word_index*2] (u16), writes back (strh). Leaf function; no checksum update. Caller: 0x080d88a8 ([scene_duel_puzzle;duel_puzzle;prng]).
+
+Constants:
+- FLAG_ARRAY_BASE = 0x02006e40 (0x02000000 + 0x6e40)
+- WORD_INDEX_SHIFT = 4
+- BIT_MASK = 0xf
+- WORD_STRIDE = 2

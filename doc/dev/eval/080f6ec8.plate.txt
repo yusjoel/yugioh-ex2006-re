@@ -1,0 +1,8 @@
+Pack scene card sprite OAM writer (tall+affine_double, no mosaic, diagonal scale). attr0 = 0x2300 (shape=tall, mode=affine_double, mosaic=off). Differs from write_pack_obj_attr_by_dir_tall_mosaic (0x080f6604): mosaic bit off, affine callee is write_obj_affine_scale_diagonal (0x080f6074). Extracts r3 low16/high16 to sp[0]/sp[4], passes both to write_obj_affine_scale_diagonal. Direct caller: 0x080d5264 (scene_pack).
+
+Constants:
+- ATTR0_TALL_AFF_NO_MOSAIC = 0x2300 (shape=0b10=tall, mode=0b11=affine_double, mosaic=0)
+- MAX_SPRITE_SENTINEL = 0x80
+- SLOT_OFFSET = 0x1bc (0xde*2)
+- STRIDE_OFFSET = 0x401 (DAT_080f70c0)
+- X_MASK = 0x1ff (DAT_080f70bc)

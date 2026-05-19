@@ -1,0 +1,7 @@
+Adds r0 (delta) to the low-4-bit field of every hand OAM entry in EWRAM 0x02000006 array, capping each result at 0x9. Reads total entry count (u16) from ROM 0x095b7cca; iterates: reads current low4, adds delta, if result > 8 writes 0x9, else writes result (with bit4 set). After loop calls init_puzzle_wram_and_checksum. indeg=0, runtime call. Batch counterpart to apply_delta_to_hand_oam_entry (0x080f9054) which processes one entry.
+
+Constants:
+- HAND_OAM_COUNT_ADDR = 0x095b7cca
+- HAND_OAM_BASE = 0x02000006
+- CAP_VALUE = 0x9 (low-4-bit upper limit)
+- ACTIVE_BIT = 0x10 (bit4 active flag, orrs into next byte)

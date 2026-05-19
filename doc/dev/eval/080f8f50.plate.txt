@@ -1,0 +1,5 @@
+Reads current money value from EWRAM [0x02006c38], subtracts r0 deduct_amount, clamps result to 0 if negative (floor protection), writes back, then calls init_puzzle_wram_and_checksum to sync checksum. Called by duel_puzzle money-deduction flow (caller 0x080d8be0, tags: [scene_duel_puzzle;duel_puzzle;money]).
+
+Constants:
+- MONEY_ADDR = 0x02006c38 (0x02000000 + 0x6c38, money storage)
+- FLOOR = 0 (minimum value; bls branch -> movs r0,#0)

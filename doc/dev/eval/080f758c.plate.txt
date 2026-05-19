@@ -1,0 +1,6 @@
+Uploads sprite tile data and palette data to GBA VRAM. r0 low16=sprite_tile_id, r1=tile_struct_ptr (struct with tile width/data/palette), r2=palette_slot_id. Computes OBJ VRAM address via tile_id>>11 (= 0x06010000 + tile_id*2), reads tile data from struct+8, calls copy_bytes_by_halfword to write OBJ VRAM. Computes OBJ PALRAM address (0x05000200 + palette_slot_id*2), writes palette via copy_bytes_by_halfword. Returns r0=tile_row_count (ldrh from struct+0; exit pop{r1};bx r1, Sub-case E). indeg=0, runtime call.
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000 (GBA OBJ tile area base)
+- OBJ_PALRAM_BASE = 0x05000200 (GBA OBJ palette RAM base)
+- TILE_ID_VRAM_SHIFT = 11 (lsrs #0xb -> tile_id * 2 VRAM byte offset)

@@ -1,0 +1,8 @@
+Pack scene card sprite OAM writer (square+affine_double, no mosaic, attr-pairs callee). attr0 = 0x0300 (shape=square, mode=affine_double, mosaic=off). Differs from write_pack_obj_attr_by_dir_sq_mosaic (0x080f6260): mosaic bit off, callee is write_oam_entry_attr_pairs (0x080f6144). r2 spilled to r9, r3 to r10 at prologue. 15 direction branches adjust x/y, write attr0/1/2, increment count bytes. indeg=0, runtime function-pointer call.
+
+Constants:
+- ATTR0_SQ_AFF_NO_MOSAIC = 0x0300 (shape=0b00=square, mode=0b11=affine_double, mosaic=0)
+- MAX_SPRITE_SENTINEL = 0x80
+- SLOT_OFFSET = 0x1bc (0xde*2)
+- STRIDE_OFFSET = 0x401 (DAT_080f72e4)
+- X_MASK = 0x1ff (DAT_080f72e0)

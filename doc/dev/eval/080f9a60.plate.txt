@@ -1,0 +1,7 @@
+Tests a bit in the card flag bit array at EWRAM 0x02006e40. Encoding: r0[7:4]=word_index (high nibble), r0[3:0]=bit_position (low nibble). Loads [0x02006e40 + word_index*2] (u16), arithmetic-right-shifts by bit_position, tests bit0: returns 0 if clear, 1 if set. Leaf function. Two callers in scene_pack module (0x080db1b4, 0x080db4f4).
+
+Constants:
+- FLAG_ARRAY_BASE = 0x02006e40 (0x02000000 + 0x6e40)
+- WORD_INDEX_SHIFT = 4 (asrs r2,r0,#4)
+- BIT_MASK = 0xf (r0 & 0xf = bit_position)
+- WORD_STRIDE = 2 (lsls r2,r2,#1)

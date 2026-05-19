@@ -1,0 +1,6 @@
+Initializes animation frame list read cursor to the current frame position. r0=anim_state_ptr. Reads [struct+0]=frame_list_ptr, loads [frame_list+0x20]=frame_count(u16), stores to [struct+0xe]. Computes frame data start: base+0x22+frame_count*4. Scans frame list: each frame header halfword left-shifted gives frame data size; advances read pointer frame_count times. Stores final read cursor to [struct+4], reads frame_size(u16) to [struct+0xa], clears [struct+0xc]=0. Four callers in display;palette module.
+
+Constants:
+- FRAME_COUNT_OFFSET = 0x20 (frame count field in frame list header)
+- FRAME_DATA_HEADER_SIZE = 0x22 (frame list header size; frame data begins here)
+- FRAME_SIZE_SHIFT = 2 (frame header halfword << 2 = frame data byte count)

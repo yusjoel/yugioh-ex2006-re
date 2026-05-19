@@ -1,0 +1,6 @@
+Adds r1 (delta) to the low-4-bit field of the single hand OAM entry at index r0 in EWRAM 0x02000006 array, capping at 0x9. r0 low16 is shifted (lsls#0x10/lsrs#0xf) to compute byte address offset (word_index*2). Leaf function; no checksum update. Called by 6 callers across campaign (0x080282a0/0x080282c2), duel_puzzle+deck (0x080d8be0/0x080e0d40), starter_deck (0x080f4468), game_str (0x080fbb60).
+
+Constants:
+- HAND_OAM_BASE = 0x02000006 (DAT_080f9094)
+- CAP_VALUE = 0x9 (low-4-bit upper limit)
+- INDEX_SHIFT = 0xf (lsls#0x10 / lsrs#0xf -> word_index * 2)

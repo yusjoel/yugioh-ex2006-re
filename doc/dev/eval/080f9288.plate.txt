@@ -1,0 +1,10 @@
+Copies deck slot data from src slot r1 to dst slot r0. Computes byte offsets using formula 280*n (lsls#3+adds+lsls#2-subs+lsls#3). Copies three flag bytes at +0x1268, +0x1269, +0x126a, then copies 80 card-slot halfwords (offset +0x130c, stride=2) via inner loop. Calls init_puzzle_wram_and_checksum after copy. indeg=0, runtime call.
+
+Constants:
+- DECK_BASE = 0x02000000
+- SLOT_STRIDE = 280 (0x118, computed by 5-step shift sequence)
+- FLAG0_OFFSET = 0x1268
+- FLAG1_OFFSET = 0x1269
+- FLAG2_OFFSET = 0x126a
+- CARD_DATA_OFFSET = 0x130c (DAT_080f930c)
+- CARD_DATA_COUNT = 80 (cmp r7,#0x4f; ble loop -> indices 0..0x4f)

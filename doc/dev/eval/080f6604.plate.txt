@@ -1,0 +1,8 @@
+Pack scene card sprite OAM writer (tall+affine_double+mosaic). Symmetric with write_pack_obj_attr_by_dir_sq_mosaic (0x080f6260); sole difference is attr0 constant: 0x2700 (shape=tall, mode=affine_double, mosaic=on). Dispatches 15 direction codes, writes attr0/1/2 to gPrng slot, calls write_obj_affine_rot_scale, increments two count bytes. For tall-shape card sprites.
+
+Constants:
+- ATTR0_TALL_AFF_MOSAIC = 0x2700 (shape=0b10=tall, mode=0b11=affine_double, mosaic=1)
+- MAX_SPRITE_SENTINEL = 0x80
+- SLOT_OFFSET = 0x1bc (0xde*2)
+- STRIDE_OFFSET = 0x401 (DAT_080f67f0)
+- X_MASK = 0x1ff (DAT_080f67ec)

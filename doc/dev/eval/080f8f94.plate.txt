@@ -1,0 +1,7 @@
+Iterates OAM hand-card entry array at EWRAM 0x02000006, counts entries whose low-4-bit field is nonzero (active entries). Reads total entry count (u16) from ROM 0x095b7cca; iterates 2-byte-stride entries. When r4=0 (filter mode): counts only entries with low4 > 0. When r4!=0: counts all entries unconditionally (absolute count). indeg=0, runtime call.
+
+Constants:
+- HAND_OAM_COUNT_ADDR = 0x095b7cca (ROM: total hand entry count)
+- HAND_OAM_BASE = 0x02000006 (EWRAM hand OAM entry array base)
+- ENTRY_STRIDE = 2 (bytes per entry)
+- ACTIVE_MASK = 0xf (low-4-bit field)

@@ -1,0 +1,8 @@
+Counts occurrences of card_id r1 in the hand list of deck slot r0. Guards: if slot_index > 0x3b (59) returns 0. Computes EWRAM offset via 280*n formula, reads [slot+0x126a]=hand_card_count(u8), iterates hand entries at [slot+0x132a] (stride=2, comparing ldrh against r1=card_id), accumulates count in r5, returns r5. Two callers (0x080f93c0 and 0x080f943c) use different slot field offsets (0x1268/0x126c and 0x130c/0x130c+4).
+
+Constants:
+- DECK_BASE = 0x02000000
+- SLOT_STRIDE = 280
+- HAND_COUNT_OFFSET = 0x126a (DAT_080f93ac)
+- HAND_DATA_OFFSET = 0x132a (DAT_080f93b0)
+- MAX_SLOT = 0x3b (59; out-of-range returns 0)
