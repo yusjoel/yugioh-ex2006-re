@@ -1,0 +1,2 @@
+Convert the animation controller position accumulator to a frame index. Called from NNS G2D animation frame advance path (g2d_Animation.c). Reads [pAnimCtrl+0xc] (position accumulator, 12.20 fixed-point left-shifted 0xc bits) and [pAnimCtrl+0][halfword+4] (per-frame speed, same shift), divides via bios_div, returns current absolute frame index. Assert pAnimCtrl non-NULL (line 0xac*2=0x158=344) and pCurrent non-NULL (line 0xac=172).
+Constants: POSITION_SHIFT=12 (12.20 fixed-point format).

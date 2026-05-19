@@ -1,0 +1,2 @@
+Write palette data from NNS_G2dImageProxy to OBJ palette VRAM and update the output proxy slot. Called from NNS G2D palette load path (g2d_Image.c line 0x29f=671, NNS_G2dLoadPaletteData). Assert pImgProxy non-NULL, type [0..2], pSrcData non-NULL. When type==1 (2D_MAIN OBJ), calls bios_cpu_fast_set to copy palette data to 0x05000200 (OBJ palette VRAM) + dst_word_offset; other types cause assert failure. Calls set_img_proxy_vram_slot to write output proxy.
+Constants: OBJ_PALETTE_VRAM=0x05000200.

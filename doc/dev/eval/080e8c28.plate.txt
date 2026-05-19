@@ -1,0 +1,2 @@
+Advance the animation frame pointer by one frame (+8 or -8 bytes) based on current direction flag, then clamp result to the valid range [pBank->base .. pBank->base + count*8). Called from NNS G2D animation driver (g2d_CellAnimation.c) in step_anim_ctrl_by_frames or frame-wrap logic. If frame pointer exceeds upper bound, forces wrap to upper bound; if below lower bound, holds at lower bound. Returns clamped frame data pointer [r5+0].
+Constants: FRAME_SIZE=8 (bytes per frame struct).

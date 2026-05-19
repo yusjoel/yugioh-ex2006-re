@@ -1,0 +1,2 @@
+Read the base address of the specified VRAM type slot from NNS_G2dImageProxy. Called from NNS G2D Image proxy read path (g2d_Image.c line 0xce*2=0x19c=412). Assert pProxy non-NULL, type [0..2]. Computes pProxy[type*4+0] and returns it. Differs from get_renderer_img_proxy_vram_location (0x080e9ce8): that function reads from slots starting at offset +0x8. Equivalent to NNS_G2dGetImageProxyData.
+Constants: NNS_G2D_VRAM_TYPE_MAX=3.

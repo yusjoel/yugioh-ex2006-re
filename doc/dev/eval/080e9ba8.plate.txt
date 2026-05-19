@@ -1,0 +1,2 @@
+Check whether the specified VRAM type slot of NNS_G2dImageProxy has been validly initialized (i.e. value != 0xFFFFFFFF/-1). Called from NNS G2D Image proxy validity check path (g2d_Image.c line 0x1af=431). Assert pProxy non-NULL, type [0..2]. Reads pProxy[type*4+0]; returns 1 if value != -1 (valid), 0 if -1 (uninitialized). Symmetric with check_renderer_img_proxy_vram_location_valid (0x080e9d54), differing only in read start offset.
+Constants: INVALID_VRAM_LOCATION=0xFFFFFFFF.

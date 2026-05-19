@@ -1,0 +1,2 @@
+Write the callback dispatch fields of NNS_G2dCellAnimation with loop_type forced to 2 (NNS_G2D_ANIMATIONTYPE_CELL2 mode). Called from NNS G2D CellAnimation init path (g2d_Animation.c line 0x2a2=674). Assert pCellAnim non-NULL (line 0x2a2), pDataA non-NULL (line 0x2a3). Complementary to set_cell_anim_callback_fields: that function rejects type==2; this one handles type==2 exclusively. Writes: [+0x1c]=2, [+0x24]=pDataA, [+0x20]=pDataB, [+0x28]=seqId_u16.
+Constants: LOOP_TYPE_CELL2=2.

@@ -1,0 +1,2 @@
+Multiply two 2x2 affine matrices and write result to output matrix. Called from NNS G2D SRT control module to combine two transform levels (e.g. parent-child SRT composition). r0=pMatA, r1=pMatB, r2=pMatOut (3rd param). Computes 4 output components: out[0]=A[0]*B[0]+A[4]*B[8], out[4]=A[0]*B[4]+A[4]*B[c], out[8]=A[8]*B[0]+A[c]*B[8], out[c]=A[8]*B[4]+A[c]*B[c] (12.20 fixed-point). Uses __muldi3 for 64-bit multiply then extracts 12.20 format high bits. If pMatB==pMatOut, uses sp-local frame as intermediate then writes back.
+Constants: FIXED_POINT_SHIFT=12 / FIXED_HI_SHIFT=20.

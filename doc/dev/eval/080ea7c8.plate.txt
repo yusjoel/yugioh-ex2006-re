@@ -1,0 +1,2 @@
+Write a base address to the specified VRAM type slot of NNS_G2dRendererImageProxy. Called from NNS G2D renderer image proxy set path (g2d_Image.c line 0x2e9=745). Assert pRendererProxy non-NULL, type [0..2] (twice). Calls check_vram_location_slot to validate baseAddr, then writes baseAddr to pRendererProxy[type*4]. Symmetric with set_img_proxy_vram_location (0x080e9acc); that function writes from offset [+0], this function writes to [+0] (pRendererProxy itself is the +0 start of the struct, no additional offset).
+Constants: NNS_G2D_VRAM_TYPE_MAX=3.

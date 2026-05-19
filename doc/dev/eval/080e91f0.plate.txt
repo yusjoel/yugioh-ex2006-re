@@ -1,0 +1,2 @@
+Write the callback dispatch fields of NNS_G2dCellAnimation for subsequent frame event triggering. Called from NNS G2D CellAnimation init path (g2d_Animation.c line 0x27f=639). Assert pCellAnim non-NULL (line 0x27f), pCallbackData non-NULL (line 0xa0*4=0x280=640), loop_type != 2 (line 0x283=643 -- type 2 must use set_cell_anim_callback_type2). Writes: [+0x1c]=loop_type, [+0x20]=pDataA, [+0x24]=pDataB, [+0x28]=0 (reset counter).
+Constants: LOOP_TYPE_CELL2_RESERVED=2 (not accepted by this interface).
