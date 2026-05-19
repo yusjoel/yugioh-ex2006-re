@@ -1,0 +1,10 @@
+render_card_detail_panel_to_vram
+Given card_id (r0), renders the card name / ATK / DEF values / card image tiles and commits them to sprite VRAM. Flow: initializes line buffer and font ctx; loads Japanese card name and renders; if CHARSET_FLAG is nonzero appends English name as second line; renders ATK/DEF values; commit_line_buffer_to_sprite_vram submits sprite tiles; copies medium/mini card frame tiles to OBJ VRAM. Called by pack scene state machine (0x080fa07c) and pack anim state machine (0x080fa138) during card preview panel init or refresh.
+Constants:
+  OBJ_VRAM_CARD_TEXT = 0x06004200 (sprite tile: card name + stat lines)
+  OBJ_VRAM_CARD_IMG_MED = 0x06008400 (card image medium frame)
+  OBJ_VRAM_CARD_IMG_MINI = 0x06008a00 (card image mini frame)
+  OBJ_VRAM_CARD2_IMG_MED = 0x06008e80 (second card image medium frame)
+  OBJ_VRAM_CARD2_IMG_MINI = 0x06009480 (second card image mini frame)
+  CHARSET_FLAG_ADDR = 0x02006c2c (EWRAM bits[2:0]=charset_id)
+  FONT_CTX_BASE = 0x02006ed0 (font_jp render context)

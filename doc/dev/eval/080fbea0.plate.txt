@@ -1,0 +1,6 @@
+init_pack_vram_minimal
+Pack scene lightweight VRAM/hardware init. Clears pack state flag, turns off display (DISPCNT=0), configures BG0CNT/BG1CNT; calls reset_all_bg_scroll_regs_and_shadows and upload_pack_vram_and_palette; clears three VRAM blocks (BG tile/OBJ tile/BG screen); finally load_pack_tile_and_map_to_vram loads pack tiles. Compared to init_pack_scene_vram_full (0x080fbf18), omits font rendering and BG2/BG3 configuration.
+Constants:
+  DISPCNT = 0x04000000
+  BG0CNT = 0x04000008
+  BG1CNT_VAL = 0x0105 (screen_base=4, char_base=1)

@@ -1,0 +1,2 @@
+compare_bytes_exact
+Compares two memory regions byte-by-byte. Returns 0 if all bytes equal, returns 1 on first mismatch (short-circuit). Equivalent to a simplified boolean memcmp. Called by FUN_080f9b98 (0x080f9b98) in puzzle init flow with fixed args r0=0x09e4f568 (ROM puzzle seed), r1=0x02000000 (EWRAM workspace), r2=8 for 8-byte integrity check; on pass jumps to FUN_080f9c40 for checksum second verification. Pure comparison leaf, no external write side effects.

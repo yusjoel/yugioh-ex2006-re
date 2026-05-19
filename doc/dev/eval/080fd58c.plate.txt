@@ -1,0 +1,6 @@
+load_title_ex_obj_resource_set
+Title_ex scene OBJ resource set initialization. Loads 4 words from ROM 0x09e50714 (ldmia 3 + ldr 1) into stack buffer [sp+0x14..+0x20]; sets stack params: [sp+0x0]=0, [sp+0x4]=1, [sp+0x8]=sp+0x14+r0*16 (per-slot resource ptr), [sp+0xc]=0, [sp+0x10]=0x200; calls load_g2d_obj_resource_set with r0=ctx_base (0x02029eb0), r1=ctx_base+4, r2=ctx_base+8, r3=0 to complete OBJ resource binding. r0=slot_index multiplied by 16 bytes selects ROM descriptor entry. Called by FUN_080fd5d4 (0x080fd5d4, tags: [fs]) with r0=0 fixed.
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  TITLE_EX_OBJ_RES_TABLE = 0x09e50714 (ROM OBJ resource descriptor table)
+  OBJ_ATTR_FLAG = 0x200

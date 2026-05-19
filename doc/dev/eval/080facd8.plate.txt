@@ -1,0 +1,4 @@
+write_decimal_oam_by_digit_count
+Decomposes an arbitrary decimal number r2 digit by digit and writes each digit as an OAM sprite entry until quotient reaches 0 (digit count self-adapting). Each iteration: r2 mod 10 gives current lowest digit, converted to tile_id (digit+0x60); r2 div 10 gives higher digits; writes OAM entry. OAM y coordinate starts at r1 decreasing by 8 per digit. Called repeatedly by FUN_080fad10 (0x080fad10, tags: [card_stats]) with different x/y coords and card_stats field values (card_id, ATK, DEF, etc.). Unlike render_decimal_oam_digit_pair (0x080fa4e4, fixed 2 digits), this function loops until quotient is 0, supporting arbitrary digit counts.
+Constants:
+  DIGIT_TILE_BASE = 0x60 (tile 0x60..0x69 = digits 0..9)

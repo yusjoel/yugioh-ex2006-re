@@ -1,0 +1,2 @@
+verify_puzzle_checksum
+Calls compute_puzzle_checksum (0x080f9c08) to compute a rolling checksum of EWRAM 0x02000000 over 0x6ecc halfwords, then compares with the stored u16 at [0x02000000+0x6ecc]. Returns 1 if equal (checksum valid), 0 if different (data corrupted). Called by FUN_080f9b98 (0x080f9b98) as the second step in puzzle EWRAM integrity verification after compare_bytes_exact passes, and by FUN_080f4d90 (0x080f4d90, tags: [frame_counter;prng;settings]) after puzzle data load. Pure read verification, no external write side effects.

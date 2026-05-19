@@ -1,0 +1,9 @@
+init_pack_scene_vram_full
+Pack scene full VRAM/hardware/font init. Initializes EWRAM ctx A/B (store_ewram_ctx_ptr_and_clear_mode_flags + reset_display_and_obj_vram); configures DISPCNT=0 and BG0-3 CNT registers; sets pack state active; reset_all_bg_scroll_regs_and_shadows + upload_pack_vram_and_palette; clears three VRAM blocks + copies BG screen map + palette; load_pack_tile_and_map_to_vram; selects ROM font data by charset (5-way branch), renders two title text lines and commit_line_buffer_to_sprite_vram; icon tile init double loop (20 rows x 5 cols). indeg>=8, called by multiple pack scene entry points.
+Constants:
+  BG0CNT_VAL = 0x4, BG1CNT_VAL = 0x105, BG2CNT_VAL = 0x206, BG3CNT_VAL = 0x307
+  PACK_STATE_ACTIVE = 0x21 (gPrng+0x174)
+  CHARSET_FONT_0 = 0x09dbefe0 (charset 0 font data)
+  CHARSET_FONT_1 = 0x09dbefe0+0x3aa50 (charset 1 offset)
+  CHARSET_FONT_2 = 0x09dd564e, CHARSET_FONT_3 = 0x09de1976
+  CHARSET_FONT_4 = 0x09dede3e, CHARSET_FONT_5 = 0x09dc9f24

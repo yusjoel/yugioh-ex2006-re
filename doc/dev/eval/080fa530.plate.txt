@@ -1,0 +1,4 @@
+render_nibble_pair_oam_from_table
+Extracts two low nibbles from r2, looks up tile_id from ROM table at 0x09e5fa04, and writes two OAM sprite entries. r0=OAM base (+0x10 offset), r1=y_pos, r2=packed nibble field. Loops 2 times: each iteration extracts low 4 bits (AND 0xf), multiplies by 2 to index into ROM table (ldrh), calls write_oam_entry_from_packed_args; then asrs r5,#4 to get next nibble. Called by FUN_080fa7e4 (0x080fa7e4, tags: [font_jp]) alongside render_decimal_oam_digit_pair to render the pack scene numeric panel second row. ROM table at 0x09e5fa04 is a nibble-to-tile mapping table (16 entries). med confidence: table contents unverified.
+Constants:
+  NIBBLE_TILE_TABLE = 0x09e5fa04 (16-entry nibble-to-tile-id ROM lookup)

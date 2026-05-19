@@ -1,0 +1,8 @@
+apply_title_ex_gfx_resource
+Applies a GFX resource descriptor set for the title_ex scene. Reads TITLE_EX_CTX+0x388 resource_ptr; memcpys two 8-byte ROM descriptors (TITLE_EX_RES_A/B) to stack; zero_struct_36bytes clears work struct; fills OAM fields (tile_group/tile_base_idx/palette/priority) from parameters; sets visible flag based on tile_shape being 0; finally apply_gfx_resource_list writes the result. Called by 0x080fd49c ([scene_title_ex]) with slot_index=0/1/2/3 etc.
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  TITLE_EX_RES_A = 0x09e50692 (GFX resource descriptor A)
+  TITLE_EX_RES_B = 0x09e5069a (GFX resource descriptor B)
+  OAM_PRIORITY_BIT = 0x40
+  OAM_TILE_IDX_MASK = 0xffffc07f

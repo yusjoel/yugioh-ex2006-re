@@ -1,0 +1,9 @@
+load_title_ex_pack_palette_entry
+Loads a single pack palette entry for title_ex scene. r0=pack_idx is located via two division and modulo steps within EWRAM 0x02029eb0: first pack_idx/0xf0 -> r5 (row group), then pack_idx/0x14 mod 0xc -> r1 (column [0..11]). Computes src = EWRAM_base + r5*384 + 0x88 + r1*32 (per-pack palette area in ctx grid layout). Calls bios_cpu_set(src, 0x050001e0, 0x04000008) to copy 8 halfwords (16 bytes) palette data from EWRAM to BG palette RAM tail area (0x050001e0). Called by FUN_080fda04 (title_ex scene main driver, tags: title_ex) with pack_idx.
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  BG_PAL_DEST = 0x050001e0 (BG palette RAM pack entry destination)
+  BIOS_CPUSET_CTRL = 0x04000008 (copy 8 halfwords = 16 bytes)
+  PACK_ROW_STRIDE = 384 (r5*384 = row group byte stride in EWRAM)
+  PACK_COL_STRIDE = 32 (r1*32 = per-column palette byte stride)
+  PACK_COL_COUNT = 0xc (grid column count [0..11])

@@ -1,0 +1,5 @@
+render_decimal_oam_digit_pair
+Renders a two-digit decimal number (r2) as two OAM sprite entries, writing to OAM slots starting at base+0x18. Loops 2 times (r7 counting down from 2): each iteration gets current digit via r2 mod 10 (tile_id = 0x60+digit), next digit via r2 div 10; calls write_oam_entry_from_packed_args to write OAM. OAM y_coord starts at r1 (saved in r8) and decreases by 8 each iteration (sprite moves up 8px). Called by FUN_080fa7e4 (0x080fa7e4, tags: [font_jp]) during pack scene numeric display init.
+Constants:
+  DIGIT_TILE_BASE = 0x60 (tile 0x60..0x69 = digits 0..9)
+  OAM_DIGIT_STEP = 8 (y offset per digit, upward)

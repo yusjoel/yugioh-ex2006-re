@@ -1,0 +1,6 @@
+set_bg1_scroll_xy
+Writes BG1 horizontal/vertical scroll register for title_ex scene. Leaf function, no push/pop frame. Writes r0 & 0x1ff to BG1HOFS (0x04000014), r1 & 0x1ff to BG1VOFS (0x04000016). The 9-bit mask ensures scroll values stay within GBA BG register valid range [0..511]. Called by three title_ex scroll driver functions: FUN_080fd600 (computes EWRAM ctx horizontal period offset then calls with r0=offset, r1=0), FUN_080fd63c (computes vertical period offset and negates, calls with r0=0, r1=neg_offset), FUN_080fd7d4 (computes linear coordinates then calls).
+Constants:
+  BG1HOFS = 0x04000014
+  BG1VOFS = 0x04000016
+  BG1_SCROLL_MASK = 0x1ff (GBA BG scroll register 9-bit mask [0..511])

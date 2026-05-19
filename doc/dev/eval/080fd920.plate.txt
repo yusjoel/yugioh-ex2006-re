@@ -1,0 +1,6 @@
+apply_title_ex_window_fade_out_step
+Single step of title_ex scene window fade-out animation. Structurally symmetric with apply_demo_window_fade_out_step (0x08013b84), title_ex scene variant. Computes (max-cur)*80/max = step vertical offset -> r0, writes WIN0V=[(0x50+r0):(0x50-r0)] (as step decreases, window narrows). When cur==max (fade-out complete): calls gl_set_brightness(0x3f, -16), tick_blend_transition_step, gl_set_blend2_level(0x3f, 0, cur). Paired with apply_title_ex_window_fade_in_step (0x080fd890): fade-in uses r5*80/r4 (window opens), fade-out uses (r4-r5)*80/r4 (window closes). indeg=0, invoked via runtime function pointer.
+Constants:
+  WIN0V = 0x04000044
+  WIN_CENTER = 0x50 (window center Y=80: screen 160 rows / 2)
+  WINDOW_SCALE_FACTOR = 80 ((max-cur)*80/max maps to pixel offset)

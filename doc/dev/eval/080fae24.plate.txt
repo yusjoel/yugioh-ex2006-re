@@ -1,0 +1,8 @@
+tick_pack_prng_anim_frame
+Pack scene animation frame tick function, called by 0x080faf18 ([prng]). Checks gPrng+0x744 bit0: if 1 returns 0 immediately (not ready). Otherwise dequeue_prng_anim_entry fetches next frame: frame type 4 sets ctx bit5 (ANIM_VISIBLE_FLAG) and returns 1; frame type 8 copies 0x118 bytes from PACK_FRAME_DATA_BASE at stride r1*280 (valid frame_idx [0..0x3b], 0xffff=special), then write_sprite_row_to_vram_buffer writes VRAM row. Returns 1=continue, 0=waiting/failed.
+Constants:
+  PACK_FRAME_DATA_BASE = 0x02001250 (frame data array, stride=0x118 bytes)
+  PACK_FRAME_DATA_SPECIAL = 0x02001138 (special frame: idx=0xffff)
+  ANIM_VISIBLE_FLAG = 0x20 (bit5 of ctrl byte)
+  FRAME_IDX_SPECIAL = 0xffff (special frame marker)
+  FRAME_IDX_MAX = 0x3b ([0..0x3b] = 60 frames)

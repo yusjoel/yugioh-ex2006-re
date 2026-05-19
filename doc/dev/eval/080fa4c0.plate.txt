@@ -1,0 +1,2 @@
+return_void_stub_a
+Single-instruction bx lr immediate return. Accepts no parameters, has no side effects. Called by FUN_080f4c14 (0x080f4c14, tags: [dma;sys;display]) in DMA/display system init sequence, immediately followed by suppress_display_output and return_void_noop calls. These three form a release build no-op stub cluster. Sibling of return_void_handler (0x080fa4d4) and return_void_noop (0x080fa4d8), all zero-parameter empty stubs, distinct from 4-parameter mute stub suppress_assert_report (0x080fa4dc). Type B zero-parameter no-op stub.

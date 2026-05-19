@@ -1,0 +1,6 @@
+tick_title_ex_cell_anim_slot
+Drives a single cell animation slot frame for title_ex scene. Fetches cell anim handle from TITLE_EX_CTX+slot_idx*4+8 and validates; if anim_cmd==-1: dispatch_cell_anim_frame_advance advances frame by frame, conditionally dispatch_cell_anim_sequence_step + set_title_ex_obj_field8 on field8; if anim_cmd>=0: dispatch_cell_anim_sequence_step(seq_id) directly. Finally dispatch_isd_cell_anim_oam_setup builds OAM frame unconditionally. x/y coordinates left-shifted by 12 and forwarded. Called by 0x080fd780 (batch slot loop) / 0x080fd970 (single slot) / 0x080fda04 (scene main tick).
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  ANIM_CMD_FRAME_ADVANCE = -1 (r1=-1 triggers dispatch_cell_anim_frame_advance)
+  CELL_ANIM_ADVANCE_FLAGS = 0x1000 (dispatch_cell_anim_frame_advance r1 param)
