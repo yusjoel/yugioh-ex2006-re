@@ -1,0 +1,7 @@
+Function: Calls check_name_char_limit_reached to check if name input buffer is full; returns cursor sprite tile index based on result: not full (result=0) returns 0x48, full (result=1) returns 0x34. Called by three name_input/settings scene functions to update cursor display state each frame.
+Trigger: name_input or settings scene each-frame processing, when cursor tile appearance needs to toggle based on char count.
+Side effects: None (read-only).
+
+Constants:
+- TILE_HAS_ROOM=0x48 (cursor tile index 72 when name has room)
+- TILE_FULL=0x34 (cursor tile index 52 when name is full)

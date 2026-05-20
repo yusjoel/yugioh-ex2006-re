@@ -1,0 +1,15 @@
+Function: Initialization entry for the banlist password input scene (pass_input). Performs: (1) bios_cpu_set FILL mode zeros gBanlistPasswordBuffer (0x02029810, 1656 bytes/414 words); (2) gl_clear_vram_palram_scroll clears VRAM/PALRAM/scroll registers; (3) configures DISPCNT=0x1f40, BG0CNT=0x1c00(0xe0<<5), BG1CNT=0x1d0d, BG2CNT=0x1e06 (=0x1d0d+0xf9), BG3CNT=0x1f0f; (4) gl_set_brightness(-16, 63)/gl_fade_in/gl_state_init/gl_clear_frame_callbacks init GL state; (5) zeros gPrng[0x23a] and writes gState[0x66e]=0x2d0 and gPrng[0x38a]=0x3f0. Called via function pointer from dispatch tables at 0x0801b634 and 0x0801b6a0.
+Trigger: Game enters banlist password input scene; called by scene_dispatcher via fn-ptr table.
+Side effects: gBanlistPasswordBuffer zeroed; VRAM/PALRAM cleared; DISPCNT/BGxCNT IO registers written; gPrng and gState fields zeroed/initialized; BG brightness/fade configured.
+
+Constants:
+- BANLIST_BUF=gBanlistPasswordBuffer=0x02029810 (bios_cpu_set target)
+- CLEAR_CTRL=0x0500019e (bios_cpu_set: fill=1, count=0x19e=414 words=1656 bytes)
+- DISPCNT=0x04000000; DISPCNT_VAL=0xfa<<5=0x1f40
+- BG0CNT=0x04000008; BG0CNT_VAL=0xe0<<5=0x1c00
+- BG1CNT_VAL=0x1d0d
+- BG2CNT_VAL=0x1e06 (=BG1CNT_VAL+0xf9)
+- BG3CNT_VAL=0x1f0f
+- BRIGHTNESS=-0x10=-16; BRIGHTNESS_MAX=0x3f
+- PRNG_FIELD_1=gPrng+0x23a; PRNG_FIELD_2=gPrng+0x38a=gPrng+0x23a+0x150
+- GSTATE_FIELD=gState+0x66e; GSTATE_FIELD_VAL=0xb4<<2=0x2d0

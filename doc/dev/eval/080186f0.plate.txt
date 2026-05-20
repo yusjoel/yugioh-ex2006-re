@@ -1,0 +1,12 @@
+Function: Computes current row/column index from scrollbar value (get_scrollbar_cur_value) and auxiliary offset field (gState[0x315] bits[5:2]), calls advance_text_ptr_by_charlen to locate corresponding char pointer r2 in banlist text table (gState+0x8d); if r2 is null writes 0 to r5; otherwise checks for space char (0x20) in EN mode and substitutes ROM constant bytes (0x09e3b2b4), then calls banlist_password_enter_char to write the char to output buffer r5. Called by FUN_080187e0 and FUN_08018938 (banlist/settings char input) on each char selection.
+Trigger: banlist password input interface when a character is selected (scrollbar position determines char); r0=output buf ptr.
+Side effects: [r5..] written with one char (via banlist_password_enter_char); if invalid [r5]=0.
+
+Constants:
+- SCROLLBAR_OAM_OFFSET=0xc1<<2=0x304 (gState+0x304 scrollbar slot)
+- BANLIST_TEXT_OFFSET=0x8d (gState+0x8d banlist text table start)
+- SCROLL_COL_FIELD=gState+0x315 (scroll column index field bits[5:2])
+- LANG_CHECK_OFFSET=gState+0x6c2c (language flag bits[2:0])
+- COL_STRIDE=0xc=12 (bytes per column: r2*3<<2=r2*12)
+- SPACE_PLACEHOLDER=0x09e3b2b4 (ROM addr: EN mode space substitute bytes)
+- ENTER_FLAG=1 (banlist_password_enter_char 3rd param)

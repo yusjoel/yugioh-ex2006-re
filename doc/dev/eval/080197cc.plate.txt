@@ -1,0 +1,3 @@
+Function: 2-byte no-op stub containing only bx lr. Sole direct caller FUN_080197d0 sets r2=0 before calling but this function uses no arguments and returns immediately. FUN_080197d0 is itself a no-op wrapper (push lr + bl FUN_080197cc + pop{r0}; bx r0), forming a stub chain. Release no-op stub type B: 0 params, bx lr direct return, caller chain above (matches release_noop_stub_fingerprint: bx-lr-only + zero-param callers).
+Trigger: Called by FUN_080197d0; FUN_080197d0 itself has no known direct callers (indeg=0, no fn-ptr table reference found).
+Side effects: None.

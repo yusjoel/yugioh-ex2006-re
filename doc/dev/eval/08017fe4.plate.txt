@@ -1,0 +1,9 @@
+Function: Reads current scrollbar value (gState+0x304 scrollbar slot via get_scrollbar_cur_value), uses value*16 as base offset r3; reads gState[0x031a] speed correction byte (signed): positive means scroll down (r0--/r3-=0x10), negative means scroll up (r0++/r3+=0x10), zero jumps to LAB_0801803e with no correction. Then uses abs(gState[0x031a]) as speed factor to adjust r3. Finally takes r3%0xff and calls write_bg0_vofs_with_bias and write_bg3_vofs_with_bias to synchronously write BG0 and BG3 vertical offset registers. Called each frame by FUN_08018e50 (banlist/font_jp/settings scroll renderer).
+Trigger: banlist/settings page each-frame refresh, after scrollbar value changes, to sync BG vertical offset.
+Side effects: write_bg0_vofs_with_bias and write_bg3_vofs_with_bias write BG0/BG3 vertical offset IO registers; gState[0x031a] byte may be modified.
+
+Constants:
+- SCROLLBAR_OAM_OFFSET=0xc1<<2=0x304 (scrollbar slot at gState+0x304)
+- GSTATE_VOFS_FIELD=0x031a (speed/offset correction byte offset)
+- VOFS_SCALE=0x10=16 (16 pixels per scrollbar unit)
+- VOFS_MODULO=0xff=255 (BG vertical offset modulo range)

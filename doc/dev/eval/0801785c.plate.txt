@@ -1,0 +1,6 @@
+Function: Computes char length of string r0 (count_str_charlen), takes remainder mod r1 (__modsi3); if nonzero, fills a stack temp buffer with enough space chars (0x20) to align total length to a multiple of r1, appends a null terminator, then calls append_text_to_buf_charlen to write the padded string to output buffer (r5/r0 param). If remainder is zero jumps directly to LAB_080178ac (no padding). All three callers are banlist/settings text input scenes, used to align render line widths.
+Trigger: banlist/settings text render path calls before writing to line buffer; r1 is the line-width divisor (alignment unit).
+Side effects: Writes to append_text_to_buf_charlen target buffer (padding + original string).
+
+Constants:
+- SPACE_CHAR=0x20 (ASCII space, used as pad character)

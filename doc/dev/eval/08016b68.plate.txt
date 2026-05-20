@@ -1,0 +1,8 @@
+Function: Receives a Shift-JIS double-byte char code (r0), computes offset index relative to base 0x8148; if offset exceeds range [0..0x152] jumps to shared return-0 exit LAB_080171d0; otherwise loads the corresponding handler fn-ptr from ROM jump table (base 0x08016b88, 4 bytes per entry) and tail-calls via mov pc, r0.
+Trigger: Called by FUN_0801722c (char frame decode loop) after each char code is XOR-decoded, to dispatch Shift-JIS range codes to their render/convert subroutines.
+Side effects: None independent; depends entirely on the dispatched target function.
+
+Constants:
+- CHAR_BASE=0x8148 (Shift-JIS zone-2 start code)
+- CHAR_RANGE=0x152 (max allowed offset, 338 chars)
+- TABLE_BASE=0x08016b88 (fn-ptr jump table base, 4 bytes per entry)

@@ -1,0 +1,14 @@
+Function: Initializes the scrollbar OAM entry structure for the settings/banlist page with fixed positional parameters. Retrieves scrollbar OAM slot pointer from gState+0x304 (0x02029554), passes r0 (current entry count from caller) as the ptr argument, and calls init_scrollbar_oam_entry with hardcoded size params (x=0xe0, size=0x20, tile_count=0x8, width=0x52, height=0x6, count=0x6, flags=0x5). Called by FUN_08017d64 (banlist/settings page loader) during page init.
+Trigger: During settings/banlist scene load, after entry count is determined (count_str_charlen + divsi3 computes row count r0).
+Side effects: [0x02029554] scrollbar OAM structure written by init_scrollbar_oam_entry (bios_cpu_set zero + attr fields).
+
+Constants:
+- SCROLLBAR_OAM_OFFSET=0xc1<<2=0x304 (gState+0x304 = scrollbar slot base)
+- SCROLLBAR_BASE=0x02029250+0x304=0x02029554
+- SCROLLBAR_X=0xe0 (screen x coord 224 px)
+- SCROLLBAR_SIZE=0x20 (OBJ size 32)
+- SCROLLBAR_TILE_COUNT=0x8
+- SCROLLBAR_WIDTH=0x52=82
+- SCROLLBAR_HEIGHT=0x6
+- SCROLLBAR_COUNT=0x6
+- SCROLLBAR_FLAGS=0x5

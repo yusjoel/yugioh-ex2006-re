@@ -1,0 +1,8 @@
+Function: Performs a backspace delete on the banlist name input buffer. Reads gState[0x31e] (char count); if 0 returns 0 (buffer empty, cannot delete). Otherwise: calls advance_text_ptr_by_charlen(gState+0x2c2, count-1) to locate last char position, calls copy_str_unbounded to copy that char to ROM aux buffer (0x09e3b0b0), decrements gState[0x31e] (logically truncates last char), calls refresh_selected_char_obj_tile to update cursor/char display, returns 1 (success). Called by FUN_08018884 and FUN_08018938 (banlist/settings keyboard handlers) on backspace press.
+Trigger: banlist password or name input, user presses backspace/cancel; executes delete when buffer is nonempty.
+Side effects: gState[0x31e] := count-1; [0x09e3b0b0..] written with deleted char data via copy_str_unbounded; refresh_selected_char_obj_tile updates OBJ tile.
+
+Constants:
+- BANLIST_BUF_OFFSET=0x2c2 (gState+0x2c2: name input byte buffer base)
+- CHAR_COUNT_OFFSET=0x31e (gState+0x31e=0x2c2+0x5c: current char count byte)
+- AUX_BUF=0x09e3b0b0 (ROM aux buffer address, copy_str_unbounded target)

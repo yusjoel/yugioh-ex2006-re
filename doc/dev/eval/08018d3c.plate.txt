@@ -1,0 +1,10 @@
+Function: Calls tick_palette_fade_to_oam_palram with fixed parameters to execute one-frame palette fade update for the settings/name_input scene OAM palette. Source palette offset is gState+0x2be, OAM palette target 0x05000202 (1st OAM palette slot color 1), speed control buffer gState+0x8c, step r2=2. Called each frame by FUN_08018d60 (palette frame driver) and FUN_08018f7c (combined settings renderer).
+Trigger: settings or name_input scene each-frame render path; advances palette fade-out/fade-in animation.
+Side effects: [0x05000202..]: OAM palette colors updated via tick_palette_fade_to_oam_palram; internal state machine fields updated.
+
+Constants:
+- PALETTE_SRC_OFFSET=0x2be (gState+0x2be: source palette data offset)
+- OAM_PALRAM_TARGET=0x05000202 (OAM palette RAM, 1st slot color 1)
+- CTRL_BUF_OFFSET=0x8c (gState+0x8c: fade speed control buffer)
+- FADE_STEP=2 (palette step per frame)
+- GSTATE_BASE=0x02029250

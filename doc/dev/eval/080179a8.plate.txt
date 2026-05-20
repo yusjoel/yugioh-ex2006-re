@@ -1,0 +1,7 @@
+Function: Receives a single Shift-JIS char code (r0 low 16 bits), queries glyph index via char_code_to_glyph_index; if no glyph, updates counters and returns. If glyph exists: builds a 2-byte char representation in stack buffer (high byte + low byte), calls append_text_to_buf_charlen to append to output line buffer r1(=r9), increments r5 (line char count) and r7 (global char count). When r5 reaches 11 (0xb), additionally appends a 3-byte delimiter sequence read from ROM constant 0x09e3b2b4 and resets r5=0. On exit writes r5 and r7 back to *r2 and *r3 respectively.
+Trigger: Called by FUN_08017a24 (banlist/settings font renderer) when processing JP strings char by char.
+Side effects: append_text_to_buf_charlen appends to output buffer (r9); *r2 := r5 (line char count update); *r3 := r7 (global count update).
+
+Constants:
+- LINE_BREAK_INTERVAL=0xb=11 (insert line break delimiter every 11 chars)
+- LINE_BREAK_BYTES=0x09e3b2b4 (ROM address: 3-byte line break delimiter sequence)

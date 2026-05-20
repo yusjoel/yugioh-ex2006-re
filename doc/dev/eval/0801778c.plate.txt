@@ -1,0 +1,3 @@
+Function: Calls apply_sprite_gfx_by_type with fixed r2=0, forwarding r0 (sprite index) and r1 (target address) unchanged, binding only the type parameter to 0. A single-parameter-bound wrapper of apply_sprite_gfx_by_type for initializing fixed-type sprite graphics during name_input scene load. Called by name_input_page_load_assets in the asset load phase.
+Trigger: During name_input page load; name_input_page_load_assets calls before initializing sprite graphics; r0 and r1 set by caller per specific sprite.
+Side effects: Forwarded to apply_sprite_gfx_by_type, which decides the actual write target.

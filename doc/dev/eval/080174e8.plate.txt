@@ -1,0 +1,7 @@
+Function: Reads pixel/glyph data from byte array (r5=r0), packs it into a VRAM halfword table (r8=r1) using bit steps of r7=compute_floor_log2(r3) per iteration. Each loop: loads one byte, computes target halfword address [r8 + (r4>>4)*2], shifts byte left by r4&0xf bits then ORs into target halfword (and carry into adjacent +2 halfword). r4 advances by step r7; loops r6=r2 times. Returns r0 = r4>>3 (total bits written / 8).
+Trigger: Called by FUN_0801722c (char frame decode pipeline) when writing byte data to target buffer; r2=r9 (VRAM target), r3=0x40 (stride 64 -> log2=6).
+Side effects: Writes [r8+stride*i..+2] halfword OR operations (VRAM region), r6 times.
+
+Constants:
+- BIT_STRIDE=0x40=64 (passed by caller FUN_0801722c), log2(64)=6
+- NIBBLE_MASK=0xf (low 4-bit mask)

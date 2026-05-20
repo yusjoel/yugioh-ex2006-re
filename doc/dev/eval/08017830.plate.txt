@@ -1,0 +1,9 @@
+Function: Obtains BG0 screen VRAM address then calls fill_tilemap_rect_with_palette with fixed params (x=0, y=0, w=0x16, h=0xc, palette=2, fill=0) to fill a 22x12 region of BG0 tilemap with tile index 0 at palette 2. Called by name_input_page_load_assets during name_input page init to clear/initialize the BG0 tilemap area.
+Trigger: name_input page asset load phase; called before setting other BG layers to clear/init BG0 tilemap.
+Side effects: [BG0_SCREEN_VRAM + rect(0,0,22,12)] filled with tile=0, palette=2.
+
+Constants:
+- BG0_RECT_W=0x16=22 (tilemap width 22 cells)
+- BG0_RECT_H=0xc=12 (tilemap height 12 cells)
+- BG0_PALETTE_IDX=2
+- BG0_FILL_TILE=0

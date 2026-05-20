@@ -1,0 +1,10 @@
+Function: Sets flag byte [0x0202348c]:=1 (pass_input page init-complete flag), obtains BG0 screen VRAM address, calls fill_tilemap_rect_with_palette with fixed params (x=0, y=0, w=0x19=25, h=0xb=11, palette=2, fill=0) to fill a 25x11 region of BG0 tilemap with tile 0 at palette 2. Is the pass_input scene variant of fill_bg0_tilemap_name_input (0x08017830, 22x12 region), with slightly different dimensions. Called by FUN_0801a328 (pass_input scene loader) during page init.
+Trigger: pass_input (password input) scene asset load phase; sets init-complete flag and clears BG0 tilemap region.
+Side effects: [0x0202348c] := 1 (init flag); [BG0_SCREEN_VRAM + rect(0,0,25,11)] := tile=0, palette=2.
+
+Constants:
+- PASS_INPUT_INIT_FLAG=0x0202348c (pass_input page init-complete flag)
+- BG0_RECT_W=0x19=25 (tilemap width 25 cells)
+- BG0_RECT_H=0xb=11 (tilemap height 11 cells)
+- BG0_PALETTE_IDX=2
+- BG0_FILL_TILE=0

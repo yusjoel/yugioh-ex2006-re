@@ -1,0 +1,12 @@
+Function: Renders the OBJ slot cell animation sequence (up to 5 cells) for the settings page selection cursor. Reads language flag (gState[0x6c2c]&7) and speed correction (gState[0x031b] signed abs); copies two animation data tables from ROM (0x09e3b46f 12 bytes / 0x09e3b47c 28 bytes) to stack; if speed nonzero sets [sp+0x3c]=8-speed as step factor; for r4 in [0..4]: computes OBJ slot offset based on current index and language flag, calls render_obj_slot_cell_anim for each cursor animation cell. Called each frame by FUN_08018e50 (banlist/settings frame renderer).
+Trigger: banlist/settings scene each-frame render, cursor OBJ animation update.
+Side effects: render_obj_slot_cell_anim writes OBJ VRAM and OAM (up to 5 calls per frame).
+
+Constants:
+- LANG_MASK=7 (gState[0x6c2c] low 3 bits)
+- ANIM_DATA_A=0x09e3b46f (ROM: 1st animation frame data, 12 bytes)
+- ANIM_DATA_B=0x09e3b47c (ROM: 2nd animation frame data, 28 bytes)
+- SPEED_FIELD=gState+0x031b (speed/position correction signed byte)
+- CURSOR_CELL_COUNT=5 (cursor animation cell count, r4 in 0..4)
+- STEP_BASE=8 (speed step base: step=8-abs(speed))
+- GSTATE_BASE=0x02029250

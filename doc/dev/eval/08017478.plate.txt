@@ -1,0 +1,6 @@
+Function: Extracts pixel/byte values from a compact bitfield table and writes them to an output buffer. Inputs: source table base (r9:=r0, assigned in prologue), output byte buffer (r7:=r1), entry count (r4:=r2), and bit stride (r3 -> compute_floor_log2 -> log2 step). Iterates bitfield table at step r3, extracts one byte value per offset position and writes to [r7++]. After the loop performs a final __divsi3 and returns the quotient. r8 is an internal work register (prologue mov r8,r1 assigned from r3-1, not an APCS input).
+Trigger: Called by FUN_0801722c (char frame decode pipeline) in the frame decompression stage to restore font/char data from compact bitfield format to per-byte format.
+Side effects: Writes [r7..r7+count-1], count bytes (output buffer).
+
+Constants:
+- BITS_MASK=0xf (low 4-bit mask, extracts nibble from bitfield)

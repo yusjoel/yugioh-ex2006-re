@@ -1,0 +1,13 @@
+Function: Computes BG VRAM target offset (0x06000000 + r1*0x580 + 0x20) for row index r1, calls bios_cpu_set to clear that row (1408 bytes), calls setup_font_jp_ctx_bg_vram_fixed to init BG VRAM font context, then calls render_jp_string_row in language-aware mode (r1=2/4 depending on gState[0x6c2c] low 3 bits) to render string row r0 to the BG VRAM row. Called row by row by FUN_08017f04 (settings/font_jp path) to render settings page JP text.
+Trigger: settings/font_jp scene whenever a BG display row needs refresh; r0 = string row ptr, r1 = display row index.
+Side effects: [0x06000000 + r1*0x580 + 0x20 .. +1408 bytes]: bios_cpu_set zeroed; render_jp_string_row writes JP glyph tile data.
+
+Constants:
+- BG_ROW_STRIDE=0x580=1408 (bytes per BG row; 44 tiles * 32 bytes = 1408)
+- BG_ROW_OFFSET=0x20 (initial tile offset, 1 tile = 32 bytes)
+- BG_BASE=0xc0<<0x13=0x06000000 (BG VRAM base)
+- CLEAR_CTRL=0x05000160 (bios_cpu_set ctrl: len=0x160=352 words, copy mode)
+- LANG_MASK=7 (gState[0x6c2c] low 3 bits, 0=EN, nonzero=JP)
+- JP_FONT_STRIDE=2 (EN), JP_FONT_STRIDE=4 (JP)
+- RENDER_WIDTH=0xc=12 (render_jp_string_row width param)
+- RENDER_HEIGHT=0x10=16 (render_jp_string_row height param)

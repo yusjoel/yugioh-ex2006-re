@@ -1,0 +1,6 @@
+Function: XOR-decrypts consecutive r1 bytes in a byte buffer in-place (^= 0x39). Returns immediately if r1<=0. Called by FUN_0801722c in the char frame processing pipeline to decrypt ROM/EWRAM char frame data with a fixed symmetric XOR key, restoring the plaintext byte stream.
+Trigger: Called before validate_complement_checksum on the frame payload buffer; XOR key is fixed at 0x39.
+Side effects: Modifies [r0..r0+r1-1], each byte ^= 0x39.
+
+Constants:
+- XOR_KEY=0x39 (fixed symmetric XOR key)

@@ -1,0 +1,16 @@
+Function: Renders 3 JP game strings (game_str ids: 0x1008, 0x1007, 0x100c) to fixed OBJ VRAM tile slots. For each string: (1) looks up string pointer from game_str_pointer_table (index synthesized from game_str_id_to_row + gState[0x6c2c] low 3 bits), (2) calls measure_text_pixel_width and stores at gState offsets (0x321/0x320/0x322), (3) calls zero_obj_vram_tiles to clear target tile region, (4) calls render_jp_text_to_vram_obj at 6 cols 2 rows to OBJ VRAM. Three string tile starts: 0xbe<<1=0x17c, 0x17c-0xc=0x170, 0x170+0x18=0x188. Called by name_input_page_load_assets during page asset load. r8 and r9 are loaded internally from literal pool (gState=0x02029250 and game_str_ja base respectively), not APCS inputs.
+Trigger: name_input page init; called after BG tilemap clear and scrollbar init.
+Side effects: OBJ VRAM three tile regions written with JP text; gState[0x321], [0x320], [0x322] store pixel widths.
+
+Constants:
+- STR_ID_A=0x1008 (1st string game_str id)
+- STR_ID_B=0x1007 (2nd string game_str id)
+- STR_ID_C=0x100c (3rd string game_str id)
+- TILE_A=0xbe<<1=0x17c (1st OBJ tile start)
+- TILE_B=0x17c-0xc=0x170 (2nd OBJ tile start)
+- TILE_C=0x170+0x18=0x188 (3rd OBJ tile start)
+- TILE_COUNT_EACH=0xc (12 tiles per segment)
+- WIDTH_COLS=6, HEIGHT_ROWS=2 (render_jp_text_to_vram_obj dimensions)
+- GSTATE_BASE=0x02029250 (loaded from literal pool, not APCS param)
+- STR_MODE_OFFSET=0x6c2c (gState+0x6c2c low 3 bits = language mode)
+- WIDTH_STORE_A=0x321, WIDTH_STORE_B=0xc8<<2=0x320, WIDTH_STORE_C=0x322
