@@ -22,11 +22,13 @@
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
 当前阶段 (Phase 3): 处理新一轮 ready 集合 1069 个函数。
-  - 候选清单: temp/ready_addrs_2026-05-20.txt (1069 行, 按地址升序)
-  - 按 20/批分 54 批 (末批 9), batch idx 从 #118 起
-  - 优先级建议: 先打高 indeg hub (indeg=78 0x08090624 / indeg=53 0x0805c218 / indeg=37 0x080abe40 / ...)
-    或按地址段顺序均衡推进
-  - 触发: 新一轮 ready 计算尚未生成 ready_batches.json; 第一步生成 batches 文件后再启动 executor
+  - 锁定清单: doc/dev/eval/ready_batches.json (Phase 3, 54 批 #118..#171, 末批 9)
+  - 排序策略: 按地址升序 (与 Phase 2 一致, 利于同区段函数复用簇方法论)
+  - 高 indeg hub (indeg=78 0x08090624 / indeg=53 0x0805c218 / indeg=37 0x080abe40 等) 已散在各批中, 不单独提前
+
+下一批取法:
+  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches.json')); \
+    idx=<NEXT_BATCH_IDX>-118; b=d['batches'][idx]; print(b['addrs'])"
 
 20/批 单 sub-agent 串行模式 (沿用 Phase 2 末期):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -55,12 +57,12 @@ byte-identical 通过后自动 commit, 进入下一批。
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-20 ExportFunctionInventory 重导) |
 | **已命名 (USER_DEFINED / ANALYSIS)** | 2766 (59.60%) |
 | **未命名 (FUN_*)** | 1875 |
-| **就绪函数集 (Phase 3)** | 1069 函数 (unnamed AND callees all named); 候选 `temp/ready_addrs_2026-05-20.txt` |
-| **下一批** | `#118` (Phase 3 第 1 批; 待生成 ready_batches.json) |
-| **上次更新** | 2026-05-20 (Phase 2 完结 + CSV/callgraph 重导 + Phase 3 ready 重算) |
+| **就绪函数集 (Phase 3)** | 1069 函数 (unnamed AND callees all named); 锁定清单 `doc/dev/eval/ready_batches.json` (54 批 #118..#171, 末批 9) |
+| **下一批** | `#118` (Phase 3 第 1 批; 20 函数 / 区间 0x08014398..0x08016908) |
+| **上次更新** | 2026-05-20 (Phase 3 ready_batches.json 生成 + callgraph/ready 锁定) |
 | **callgraph 时间戳** | 2026-05-20 12:55 (`temp/ghidra-funcs-callgraph.csv`) |
-| **callgraph_locked** | `false` (跨 Phase 边界已刷新; Phase 3 内再次锁定) |
-| **ready_locked** | `false` (1069 集合尚未生成 batches 文件, 生成后锁定) |
+| **callgraph_locked** | `true` (Phase 3 内不再 refresh; 完成 54 批后跨 Phase 边界再刷新) |
+| **ready_locked** | `true` (1069 集合 → 54 批已锁定; Phase 3 进行中不动态扩张) |
 
 ## 进度
 
@@ -87,7 +89,7 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 | 6-10 | 12 | 1% |
 | 11+ | 13 | <2% — 重点 hub |
 
-高 indeg 优先候选:
+高 indeg 优先候选 (已散在地址升序的 54 批中, 不单独提前):
 
 | indeg | addr |
 |------:|------|
@@ -99,7 +101,8 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 | 28 | 0x080dd5e4 |
 | 23 | 0x08080c9c |
 
-候选清单: `temp/ready_addrs_2026-05-20.txt` (1069 行升序)。
+候选源清单: `temp/ready_addrs_2026-05-20.txt` (1069 行升序)。
+锁定批次清单: `doc/dev/eval/ready_batches.json` (54 批 #118..#171, Phase 3 进行中不动态扩张)。
 
 #### ROM 全局命名比例
 
