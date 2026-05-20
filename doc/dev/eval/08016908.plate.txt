@@ -1,0 +1,15 @@
+Function: zero-fills a rectangular region in a VRAM screen map (clears tile indices).
+Uses dest = base_ptr + row_idx*64 + col_idx*2 as starting row address, loops row_count times
+calling bios_cpu_set (FILL mode, fill_value=0) filling words_per_row words each time,
+advancing destination by 0x40 bytes (= 32 halfwords = one standard GBA screen row of 32 tiles)
+per iteration. indeg=0; VRAM screen map rectangular zero-fill tool.
+
+Side effects:
+- [base_ptr + row_idx*64 + col_idx*2 + row_i*64 .. +words_per_row*4] := 0
+  (for each i in [0..row_count-1])
+
+Constants:
+- SCREEN_ROW_STRIDE = 0x40 (64 bytes = 32 halfwords per BG screen row)
+- BIOS_CPUSET_FILL_BIT = 0x1000000 (bit24=1: fill mode)
+- WORD_COUNT_MASK = 0x001fffff ([r3] & 0x001fffff = bios_cpu_set word count field)
+- FILL_VALUE = 0 (strh 0 written to stack as bios_cpu_set fill source)

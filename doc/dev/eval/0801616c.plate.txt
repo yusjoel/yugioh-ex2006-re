@@ -1,0 +1,10 @@
+Function: searches GFX resource list by "BGDT" tag (0x54444742), returns entry [+0xc] field
+value (or 0 if not found). [+0xc] is the first data field in a BGDT entry, inferred to be
+char/tile base or related data pointer. indeg=0; BGDT GFX query tool function family member
+(9 sibling functions sharing find_gfx_entry_by_tag).
+
+Side effects: none (pure query).
+
+Constants:
+- BGDT_TAG = 0x54444742 ("BGDT", DAT_08016184)
+- GFX_ENTRY_FIELD = [+0xc] (entry first data field)

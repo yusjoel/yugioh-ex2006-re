@@ -1,0 +1,12 @@
+Function: checks whether GL_Scrollbar can still advance forward (has more entries to display).
+Reads pThis[+0x6]=total_count (u16) and pThis[+0xb]=visible_count (u8), computes
+remaining = total_count - visible_count; returns 1 if pThis[+0x4]=current_pos (u16) < remaining
+(can advance), else 0 (at end). GL/GL_Scrollbar.c region; paired with advance_scrollbar_pos_one.
+indeg=0; GL_Scrollbar tool function family member.
+
+Side effects: none (pure read predicate).
+
+Constants:
+- GL_Scrollbar.current_pos = [pThis+0x4] (u16)
+- GL_Scrollbar.total_count = [pThis+0x6] (u16)
+- GL_Scrollbar.visible_count = [pThis+0xb] (u8)

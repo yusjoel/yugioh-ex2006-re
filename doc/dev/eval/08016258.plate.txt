@@ -1,0 +1,10 @@
+Function: searches GFX resource list by "OBJD" tag (0x444a424f), returns entry start address
++ 0x20 (the address of the first inline data blob in an OBJD entry). Symmetric with
+get_bgdt_inline_data_ptr; OBJD header is 4 bytes larger (0x20 vs 0x1c). indeg=0;
+OBJD data pointer retrieval tool function family member.
+
+Side effects: none (pure query).
+
+Constants:
+- OBJD_TAG = 0x444a424f ("OBJD", DWORD_08016268)
+- OBJD_DATA_OFFSET = 0x20 (entry header size, inline OBJ tile data start offset)

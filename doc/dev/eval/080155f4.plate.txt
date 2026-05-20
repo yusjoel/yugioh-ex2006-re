@@ -1,0 +1,17 @@
+Function: if GL_Scrollbar instance is non-null and pThis[+0x0] bit0 is 1 (visible/active flag),
+recomputes thumb position and writes to display control field. Non-null assertion at
+GL/GL_Scrollbar.c:154; then checks pThis[+0x0] bit0 (visibility); if visible: calls
+compute_scrollbar_thumb_position for position value, masks low 9 bits, shifts left 9 into
+pThis[+0xc] bits[17:9], preserving other bits (mask 0xfffc01ff clears old value then ORs new).
+Called by FUN_08018434 (tags: [scrollbar,name_input]) and FUN_0801a794 (tags: [scrollbar,banlist])
+in scrollbar state update scenarios.
+
+Side effects:
+- [pThis+0xc]: bits[17:9] := compute_scrollbar_thumb_position(pThis) & 0x1ff (only when bit0=1)
+
+Constants:
+- GL_Scrollbar.c line 154 = assert non-null (0x9a=154)
+- THUMB_FIELD_MASK = 0xfffc01ff (clears pThis[+0xc] bits[17:9])
+- THUMB_SHIFT = 9 (lsls r1,r1,#0x9)
+- THUMB_VAL_MASK = 0x000001ff (9-bit truncation)
+- VISIBLE_BIT = pThis[+0x0] bit0

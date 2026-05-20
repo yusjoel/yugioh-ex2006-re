@@ -1,0 +1,19 @@
+Function: gets OAM affine entry pointer, calls compute_bg_affine_matrix_scaled to compute
+PA/PB/PC/PD affine matrix parameters, then right-shifts each by 4 bits (fixed-point conversion)
+and writes into OAM entry affine fields (+0x6/+0xe/+0x16/+0x1e). Called by FUN_080ee654
+(tags: [oam,palette], allocates palette slot then initializes OAM affine matrix) with
+r0=0 (slot_idx), r1=0x1800, r2=0x1200, r3=oam_count, [sp+0]=stack_buf.
+Exit via pop {r1}; bx r1 = Sub-case E, r0 has no return value.
+
+Side effects:
+- [oam_entry+0x6] := PA >> 4 (OAM affine param A, s16)
+- [oam_entry+0xe] := PB >> 4 (OAM affine param B, s16)
+- [oam_entry+0x16] := PC >> 4 (OAM affine param C, s16)
+- [oam_entry+0x1e] := PD >> 4 (OAM affine param D, s16)
+
+Constants:
+- OAM_AFFINE_PA_OFFSET = +0x6 (GBA OAM affine entry PA slot)
+- OAM_AFFINE_PB_OFFSET = +0xe
+- OAM_AFFINE_PC_OFFSET = +0x16
+- OAM_AFFINE_PD_OFFSET = +0x1e
+- FIXED_POINT_SHIFT = 4 (asrs r0,r0,#4)

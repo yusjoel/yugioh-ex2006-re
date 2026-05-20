@@ -1,0 +1,13 @@
+Function: reads gPrng+0x204 bits[21:14] to get current step index, looks up step callback
+at STEP_TABLE[index*4] and calls it via invoke_r0; if step returns nonzero (step done),
+increments index (mod 256) and writes back to bits[21:14]; if step returns 0, calls
+return_void_handler and returns 0; if step pointer is NULL returns 1 (sequence end sentinel).
+
+Side effects: updates [gPrng+0x204] bits[21:14] (step counter +1 mod 256) when step completes.
+
+Constants:
+- gPrng = 0x03000040 (IWRAM global state)
+- STEP_FIELD_OFFSET = 0x204 (word offset within gPrng)
+- STEP_TABLE = 0x09e587d4 (ROM step function pointer array)
+- STEP_SHIFT = 14 (bits[21:14] extraction: lsls #0xa / lsrs #0x18)
+- STEP_MASK = 0xffc03fff (write-back clear mask)

@@ -1,0 +1,8 @@
+Function: calls get_anim_ctrl_frame_offset to get current animation controller frame offset,
+then truncates the return value to u16 (via lsls #0x10 / lsrs #0x10 to clear high 16 bits).
+u16-safe wrapper for the NNS G2D animation frame offset interface; ensures frame offset
+does not exceed 16-bit range. indeg=0; leaf trampoline wrapper pattern.
+
+Side effects: none.
+
+Constants: (no non-trivial literals)

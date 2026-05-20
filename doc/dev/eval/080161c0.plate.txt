@@ -1,0 +1,11 @@
+Function: searches GFX resource list by "PALT" tag (0x544c4150), reads [+0x8] field (entry count /
+size count) and left-shifts by 1 (*2) to get byte size, returns it. Returns 0 if entry not found.
+PALT palette entries are 2 bytes each (GBA 15-bit color), so count*2 = total byte size.
+indeg=0; PALT GFX query tool function family member.
+
+Side effects: none (pure query).
+
+Constants:
+- PALT_TAG = 0x544c4150 ("PALT", DAT_080161d4)
+- PALT_COUNT_FIELD = [+0x8] (entry/color count)
+- BYTE_SIZE = count * 2 (2 bytes per GBA color)

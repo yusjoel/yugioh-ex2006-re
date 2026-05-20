@@ -1,0 +1,15 @@
+Function: searches GFX resource list by "BGDT" tag (0x54444742), left-shifts entry [+0x10]
+(tile width) and [+0x12] (tile height) by 3 (*8) to convert to pixel dimensions, then writes
+results to caller-provided output pointers (*r1=width_pixels, *r2=height_pixels).
+GBA tile = 8x8 pixels, so tile_count*8 = pixel_size. indeg=0; BGDT dimension query tool,
+complementary to the single-field return variants in the same cluster.
+
+Side effects:
+- [r1] := bgdt_entry[+0x10] << 3 (width_pixels, u32)
+- [r2] := bgdt_entry[+0x12] << 3 (height_pixels, u32)
+
+Constants:
+- BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016200)
+- TILE_TO_PIXEL_SHIFT = 3 (lsls #3 = *8)
+- WIDTH_TILES_FIELD = [+0x10] (u16)
+- HEIGHT_TILES_FIELD = [+0x12] (u16)

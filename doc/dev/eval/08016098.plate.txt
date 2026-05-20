@@ -1,0 +1,15 @@
+Function: stores r1 (matrix data pointer) into the corresponding global ISD affine matrix pointer
+slot based on r0=affine_type {4,9}: type=4 -> [0x09e587e4]:=r1, type=9 -> [0x09e587e8]:=r1.
+Forms a write/read pair with resolve_isd_affine_matrix_ptr (read side) and
+get_isd_affine_matrix_ptr_from_obj (object-driven read side) for ISD affine matrix pointer
+management. GL/ISD_Draw.c:118 assert guards invalid types. indeg=0; ISD_Draw init path writer.
+
+Side effects:
+- [0x09e587e4] := r1 (when affine_type==4, ISD type-4 matrix pointer slot)
+- [0x09e587e8] := r1 (when affine_type==9, ISD type-9 matrix pointer slot)
+
+Constants:
+- GL/ISD_Draw.c assert line 0x76 = 118
+- DWORD_080160bc = 0x09e587e4 (type-4 matrix pointer global slot)
+- DWORD_080160c8 = 0x09e587e8 (type-9 matrix pointer global slot)
+- AFFINE_TYPE_4 = 4, AFFINE_TYPE_9 = 9

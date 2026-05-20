@@ -1,0 +1,12 @@
+Function: writes both HOFS and VOFS scroll values to the GBA BG scroll hardware register pair.
+r0 is the halfword-pair index (step 2 bytes each): writes BG0HOFS (0x04000010 + r0*2) <- r1
+and BG0VOFS (0x04000012 + r0*2) <- r2. indeg=0, no bl callers; standalone tool function
+(runtime function pointer or dead code).
+
+Side effects:
+- [BG0HOFS + r0*2] (0x04000010 + r0*2) := r1 (u16 horizontal scroll)
+- [BG0VOFS + r0*2] (0x04000012 + r0*2) := r2 (u16 vertical scroll)
+
+Constants:
+- BG0HOFS = 0x04000010 (IO register: BG0 horizontal scroll)
+- BG0VOFS = 0x04000012 (IO register: BG0 vertical scroll)

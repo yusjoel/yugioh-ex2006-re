@@ -1,0 +1,13 @@
+Function: searches GFX resource list by "OBJD" tag (0x444a424f), computes start address of
+second inline data blob: entry_ptr + 0x20 + align([entry+0xc], 4). [entry+0xc] is the
+first blob byte size (aligned to 4 bytes); skips it to locate the second blob.
+Structurally identical to get_bgdt_second_blob_ptr; difference is start offset 0x20 (OBJD)
+vs 0x1c (BGDT). indeg=0; OBJD multi-blob data layout access tool.
+
+Side effects: none (pure address computation).
+
+Constants:
+- OBJD_TAG = 0x444a424f ("OBJD", DWORD_08016254)
+- OBJD_DATA_OFFSET = 0x20 (first blob start offset, OBJD header 4 bytes larger than BGDT)
+- SIZE_FIELD = [entry+0xc] (first blob byte size)
+- WORD_ALIGN = 4 (lsrs r0,r0,#2; lsls r0,r0,#2 = floor(x/4)*4 downward align)

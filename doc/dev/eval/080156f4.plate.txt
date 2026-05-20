@@ -1,0 +1,13 @@
+Function: reads sequence_id field from NNS G2D animation controller object.
+If r0[+0x18] is NULL triggers assert (GL/ISD_Draw.c:0x65=101). After non-null check,
+reads [r4+0x0] (u16) as sequence ID and returns it. indeg=0; NNS G2D animation controller
+attribute accessor family member.
+
+Side effects: none (pure read).
+
+Constants:
+- GL/ISD_Draw.c assert line 0x65 = 101
+- DWORD_08015710 = 0x09e3a488 (source file string)
+- DWORD_08015714 = 0x09e3a4d8 (condition string)
+- ANIM_CTRL_FIELD = [r0+0x18] (non-null check target)
+- SEQ_ID_FIELD = [r4+0x0] (u16 sequence ID)

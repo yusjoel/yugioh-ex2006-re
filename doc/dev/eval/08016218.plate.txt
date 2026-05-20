@@ -1,0 +1,12 @@
+Function: searches GFX resource list by "BGDT" tag (0x54444742), computes start address of
+second inline data blob: entry_ptr + 0x1c + align_up([entry+0xc], 4). [entry+0xc] is the
+first blob byte size; align_up skips it to locate the second blob.
+indeg=0; BGDT multi-blob data layout access tool.
+
+Side effects: none (pure address computation).
+
+Constants:
+- BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016234)
+- BGDT_DATA_OFFSET = 0x1c (first blob start offset)
+- BGDT_SIZE_FIELD = [entry+0xc] (first blob byte size)
+- WORD_ALIGN = 4 (adds r0,#3; asrs/lsls #2 = ceil(x/4)*4)

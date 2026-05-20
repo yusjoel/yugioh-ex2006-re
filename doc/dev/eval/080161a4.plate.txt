@@ -1,0 +1,9 @@
+Function: searches GFX resource list by "OBJD" tag (0x444a424f), returns entry [+0x1c] field
+value (or 0 if not found). [+0x1c] is a data field in an OBJD entry (OBJ sprite data related).
+indeg=0; OBJD GFX query tool function family member.
+
+Side effects: none (pure query).
+
+Constants:
+- OBJD_TAG = 0x444a424f ("OBJD", DAT_080161bc)
+- GFX_ENTRY_FIELD = [+0x1c]

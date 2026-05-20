@@ -1,0 +1,10 @@
+Function: dispatches on r0=bg_index {0,1,2,3} to call the corresponding get_bgN_screen_vram_addr
+and returns that BG layer's screen map VRAM address. Input out of range (not 0-3) returns NULL (0).
+Unified index entry point for the four get_bg0/1/2/3_screen_vram_addr functions.
+indeg=0; GL BG screen map query tool function family member.
+
+Side effects: none (pure query).
+
+Constants:
+- bg_index {0,1,2,3} maps to get_bg0/1/2/3_screen_vram_addr
+- out-of-range returns 0 (NULL/invalid)

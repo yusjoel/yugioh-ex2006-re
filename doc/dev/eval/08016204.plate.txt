@@ -1,0 +1,9 @@
+Function: searches GFX resource list by "BGDT" tag (0x54444742), returns entry start address
++ 0x1c (the address of the first inline data blob immediately following the BGDT entry header).
+indeg=0; BGDT data pointer retrieval tool function family member.
+
+Side effects: none (pure query).
+
+Constants:
+- BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016214)
+- BGDT_DATA_OFFSET = 0x1c (entry header size, inline data start offset)

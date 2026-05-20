@@ -1,0 +1,9 @@
+Function: searches GFX resource list by "BGDT" tag (0x54444742), returns entry [+0x18] field
+value (or 0 if not found). [+0x18] is a second data field in a BGDT entry, distinct from [+0xc].
+indeg=0; BGDT GFX query tool function family member (same cluster as get_bgdt_entry_char_base).
+
+Side effects: none (pure query).
+
+Constants:
+- BGDT_TAG = 0x54444742 ("BGDT", DAT_080161a0)
+- GFX_ENTRY_FIELD = [+0x18] (entry field)

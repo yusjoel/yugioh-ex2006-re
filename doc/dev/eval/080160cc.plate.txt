@@ -1,0 +1,16 @@
+Function: reads [r0+0x14] byte low 4-bit nibble as affine_type {4,9}, then dereferences the
+corresponding global ISD affine matrix pointer slot and returns the matrix data pointer.
+Functionally equivalent to resolve_isd_affine_matrix_ptr (0x08016108, takes type_code directly)
+but extracts type_code automatically from an object field (indirect version).
+GL/ISD_Draw.c:130 assert guards invalid type; returns 0 on invalid. indeg=0; ISD_Draw
+object-driven matrix query accessor.
+
+Side effects: none (pure read).
+
+Constants:
+- GL/ISD_Draw.c assert line 0x82 = 130
+- DWORD_080160ec = 0x09e3a64c (source file string)
+- DWORD_080160f0 = 0x09e3a65c (condition string)
+- DWORD_080160f8 = 0x09e587e4 (type-4 matrix pointer slot)
+- DWORD_08016104 = 0x09e587e8 (type-9 matrix pointer slot)
+- TYPE_FIELD = [r0+0x14] bits[3:0] (4-bit type code field)
