@@ -1,0 +1,7 @@
+Mounted as gMenuState+0x234 step function by assignment at 0x080e1514, activated in scene_pack case 5 (after tick_pack_fadein completes). Reads gPrng+0x202 halfword, extracts bits[13:8] (6-bit scene step index, [0..20] normal range); if index > 0x14 (20) calls poll_fadein_exit_to_duel_state (fadein overflow handler); otherwise indexes ROM function pointer table (base 0x0801f47c) via step index and jumps via .hword 0x4687 (mov r15,r0 = bx r0). This function is the duel_puzzle scene step dispatch entry; does not return directly (tail call bx r0).
+
+Constants:
+STEP_IDX_OFFSET = 0x202 (gPrng+0x202, halfword, bits[13:6] = 8-bit step index field)
+MAX_STEP_IDX = 0x14 = 20 ([0..20] valid range)
+STEP_TABLE_BASE = 0x0801f47c (ROM step function pointer table)
+gPrng = 0x03000040

@@ -1,0 +1,6 @@
+Called by FUN_0801d208 (tile map update function). Accepts r0 = packed param, extracts bits[11:4] (8-bit palette slot index bank_idx [0..255]), computes target address = 0x05000000 + bank_idx*32 (PALRAM, 32 bytes per slot = 16 RGB15 colors), uses r1 as source address and calls copy_memory_dma3_with_cpu_fallback to copy 0x20 bytes (1 sixteen-color palette bank). Exit: pop {r0}; bx r0 (Sub-case E, r0=lr).
+
+Constants:
+PALRAM_BASE = 0x05000000 (0xa0 << 0x13 = 0xa0 * 524288; python: hex(0xa0<<0x13) -> 0x5000000)
+PALETTE_BANK_SIZE = 0x20 (32 bytes = 16 u16 colors = 1 sixteen-color palette bank)
+BANK_IDX_BITS = bits[11:4] of r0 (8 bits, [0..255])

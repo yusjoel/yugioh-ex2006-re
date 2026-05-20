@@ -1,0 +1,7 @@
+Called by FUN_080dafc4 (scene_pack/duel_puzzle/opp_wins), FUN_080e1020 (scene_duel_puzzle/opp_wins), FUN_080e328c (card_ids/duel_puzzle/opp_wins) to compute total challenge clear rate for percentage display. Sequentially calls get_expert_challenge_count (-> r4), get_duel_puzzle_count (-> r5), get_standard_challenge_count (-> r0); sums to total. If total is zero jumps to LAB_080248dc (r6=0, computes percentage directly). Otherwise iterates [0x02006c3c] entry array (4 bytes each, total_count entries): extracts bits[1:0] of each entry, counts entries equal to 1 (cleared) into r6. Finally computes r6*100/__divsi3(total_count) and returns r0 = clear percentage [0..100].
+
+Constants:
+ENTRY_ARRAY_BASE = 0x02006c3c (EWRAM challenge entry array base)
+ENTRY_STRIDE = 4 (bytes per entry)
+CLEARED_BIT_MASK = 0x3 (bits[1:0], value 1 => cleared)
+PERCENT_SCALE = 100 (multiplier before integer division)

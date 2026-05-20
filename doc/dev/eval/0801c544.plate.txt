@@ -1,0 +1,6 @@
+Called by FUN_0801c560 and FUN_0801c59c during background scroll frame updates. r0 = horizontal offset (BG3HOFS), r1 = vertical offset (BG3VOFS); both are ANDed with mask 0x1ff (9-bit width) then written to the corresponding IO registers. Side effects: BG3HOFS (0x04000016) := r0 & 0x1ff, BG3VOFS (0x04000018) := r1 & 0x1ff. Leaf tool function for 9-bit precision write to background layer 3 scroll registers.
+
+Constants:
+SCROLL_MASK = 0x1ff (BG scroll register valid bit width 9 bits, [0..511])
+BG3HOFS = 0x04000016 (background layer 3 horizontal scroll offset register)
+BG3VOFS = 0x04000018 (background layer 3 vertical scroll offset register)

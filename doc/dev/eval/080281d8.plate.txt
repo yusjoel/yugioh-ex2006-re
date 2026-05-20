@@ -1,0 +1,7 @@
+At index 9 of PTR_FUN_08027ec0 jump table (0x08027ee4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads [r0+2] halfword as current step value: if > 0x3b (59) branches to FUN_08028402 (out of range, exit); if < 0 branches to FUN_08028402 (below minimum, exit); if in [0..59] falls to LAB_080281e8 (reads sp+0x11c frame slot, writes 4 into [sp+0x11c], continues processing). Validates parent frame step value in valid range [0..0x3b]; exits early if out of range.
+
+Constants:
+STEP_MAX = 0x3b = 59 (valid step upper bound)
+STEP_MIN = 0 (lower bound)
+SP_STEP_OFFSET = 0x2 ([sp+2] = parent frame step value)
+SP_SLOT_OFFSET = 0x11c (sp+0x11c = subsequent processing slot)

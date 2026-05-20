@@ -1,0 +1,8 @@
+indeg=0, structure fully symmetric with render_lp_record_text_set_a (0x08020db4). Accepts r0 = card internal_id; maps it to a different set of format strings (0x09dc-0x09df series ROM addresses) via a separate binary comparison tree; calls find_lp_entry_by_flag_and_type to find LP record; if found reads [0x02006c2c] to select encoding mode; calls card_name_lookup_by_internal_id; calls expand_format_text_to_buf; calls render_game_string_with_number to render. Returns r0=1/0. Card ID set B handled: {0x16dc, 0x16a3, 0x17ca, 0x184e, ...}.
+
+Constants:
+STACK_BUF_SIZE = 0x100 (256-byte stack buffer)
+STATE_ADDR = 0x02006c2c
+LP_ENTRY_FLAG = 0
+CARD_ID_RANGE_B_MIN = 0x16a3 (Dark Scorpion Combination)
+CARD_ID_RANGE_B_MAX = 0x184e (Fuh-Rin-Ka-Zan)

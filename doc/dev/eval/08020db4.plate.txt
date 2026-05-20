@@ -1,0 +1,8 @@
+indeg=0, entered via function pointer table. Accepts r0 = card internal_id; maps it to a format string via multi-level binary comparison tree (ROM addresses 0x09dc... series); calls find_lp_entry_by_flag_and_type (r0=0, r1=card_id) to find matching LP record entry; if found reads [0x02006c2c] low 3 bits to select text encoding mode (0->JP, 1->EN etc) and picks format string; calls card_name_lookup_by_internal_id; calls expand_format_text_to_buf to fill card name into stack 0x100-byte buffer; calls render_game_string_with_number to render to screen. Returns r0=1 (found and rendered), r0=0 (not found). Card ID set A handled by this function: {0x1788, 0x146e, 0x112e, 0x0fe9, 0x111c, 0x1388, 0x138a, 0x15fa, 0x15b1, 0x1643, ...}.
+
+Constants:
+STACK_BUF_SIZE = 0x100 (256-byte stack buffer for format text)
+STATE_ADDR = 0x02006c2c (encoding mode select)
+LP_ENTRY_FLAG = 0 (find_lp_entry_by_flag_and_type r0 param)
+CARD_ID_RANGE_A_MIN = 0x0fe9 (Perfectly Ultimate Great Moth)
+CARD_ID_RANGE_A_MAX = 0x19ef (Elemental Hero Erikshieler)

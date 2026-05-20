@@ -1,0 +1,7 @@
+Called by FUN_08027f00 (campaign sprite row builder) and FUN_08028194 (same type) before building campaign row sprites to check SIO communication status. Reads SIOCNT (0x04000128) bits[5:4] (mask 0x30); if either bit set (SIO busy/transfer in progress) returns r0=0 (not ready); if both bits clear (SIO idle) returns r0=1 (ready). Used in campaign screen to verify link is idle before updating display data, preventing display updates during SIO transfer.
+
+Constants:
+SIOCNT = 0x04000128 (GBA SIO control register)
+LINK_BUSY_MASK = 0x30 (bits[5:4]: bit4=start/busy, bit5=SIO mode select)
+READY = 1 (both bits clear => link idle)
+BUSY = 0 (either bit set => link busy)

@@ -1,0 +1,8 @@
+indeg=0, no direct caller; entered via function pointer table in scene frame dispatch. Reads gPrng+0x204 (= gPrng + 0x81*4) for current scene step index (bits[21:14], 8 bits), multiplies by 4 to index step function table (base 0x09e589a4 = ROM step table A), loads step function ptr and calls via invoke_r0. If step function returns nonzero (step done), increments gPrng+0x204 bits[21:14] step index field by 1 (mod 256) and writes back; if returns zero (step not done), calls return_void_handler and returns r0=0. If step table empty, jumps to LAB_0801c2a4 returning r0=1. Exit: pop {r4}; pop {r1}; bx r1 (Sub-case E, r0 is return value not popped reg).
+
+Constants:
+STEP_TABLE_BASE_A = 0x09e589a4 (ROM step table A base)
+gPrng = 0x03000040 (global state base)
+STEP_IDX_FIELD_OFFSET = 0x204 (gPrng + 0x81*4)
+STEP_IDX_BITS = [21:14] (lsls r0,#0xa; lsrs r0,#0x18 -> net right shift 14 bits, 8-bit step index)
+STEP_ADVANCE_MASK = 0xffc03fff (step field clear mask)

@@ -1,0 +1,7 @@
+Function pointer assigned to gMenuState+0x234 by 0x080e3a88, activated in switchD_080e3924 case 5 (after tick_pack_fadein completes) as scene step function. Reads gPrng+0x202 halfword, extracts bits[13:8] (step index [0..20]); if > 0x14 calls fetch_duel_next_state_overflow_exit (non-fadein overflow exit); otherwise indexes ROM step function table (base 0x08022e64) and tail-calls step function via .hword 0x4687 (mov pc,r0). Fully symmetric with tick_duel_puzzle_scene_step (0x0801f444) but uses a different step table, serving a different scene.
+
+Constants:
+STEP_IDX_OFFSET = 0x202 (gPrng+0x202, halfword)
+MAX_STEP_IDX = 0x14 = 20
+STEP_TABLE_BASE_D = 0x08022e64 (this function's step table)
+gPrng = 0x03000040

@@ -1,0 +1,7 @@
+At index 2 of PTR_FUN_08027ec0 jump table (0x08027ec8). Inline exit fragment, no push prologue. Reads parent frame r0 (sp, .hword 0x4668=mov r0,sp) [r0+2] halfword: extracts bits[1:0] writes to 0x02023360+0x36 bits[8:7] (lsls #7), clears and ORs in; extracts bit[2] writes to 0x02023360+0x37 bits[1:0]; extracts bits[7:3] writes to same byte bits[6:2]. Then checks 0x02023360+0x36 bits[10:9] (lsls #5; lsrs #0x1e): if <= 2 branches to FUN_08028402; otherwise reads gPrng+0x202 step field, loads 0x02023360+step*2 halfword, ANDs with mask then merges high bits (0xf0<<3=0x780), writes back to gPrng+0x202 step word.
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360
+SP_DATA_OFFSET = 0x2 (parent frame [sp+2] halfword = current card mode word)
+MASK_CLEAR_HOFS = 0xfffffe7f (0x02023360+0x36 clear bits[8:7])
+STEP_HIGH_BITS = 0x780 (0xf0 << 3, step high bits mask)

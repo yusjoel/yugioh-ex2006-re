@@ -1,0 +1,7 @@
+At index 5 of PTR_FUN_08027ec0 jump table (0x08027ed4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads current sprite state byte from 0x02023360+0x39, updates bit3 from [r0+2] halfword bit0 (lsls r1,#3) and bit2 from [sp+4] bit0, then ORs 0x10 (bit4 fixed set), writes back to 0x02023360+0x39; calls sync_state_and_init_sprite(r0=0x24) to init sprite; reads 0x02023360+0x3b then falls through to LAB_0802814a (shared convergence path with run_campaign_card_select_handler_6 for animation step processing).
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360
+SPRITE_STATE_OFFSET = 0x39 (sprite state byte)
+SPRITE_OAM_FLAG = 0x10 (bit4, fixed set)
+SPRITE_ID = 0x24 (sprite slot passed to sync_state_and_init_sprite)

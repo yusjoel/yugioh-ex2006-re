@@ -1,0 +1,8 @@
+At index 4 of PTR_FUN_08027ec0 jump table (0x08027ed0). Inline exit fragment, no push prologue. Reads parent frame r3 (.hword 0x466b=mov r3,sp; adds r3,#2 => sp+2 = current card entry ptr). Loads card field from 0x02023360+0x17, extracts 5-bit value and writes to 0x0201e2a0+0x1e bits[7:3] (lsls #5); writes r5-sourced data to 0x0201e2a0+0x1f..0x34 (22-byte loop copy); reads [r5+4] flag, eors 1 (flips low bit), calls fill_card_fs_display_entries; reads gPrng+0x202 step word, checks bits[7:2] == 0x8 or 0x3c to decide branch path (write gPrng step +1 or direct epilogue). Fills card FS display data into EWRAM display buffer and updates step state.
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360
+CARD_DATA_BASE = 0x0201e2a0 (card data EWRAM base, entry write target)
+FS_DATA_LEN = 0x16 (22 bytes data copy)
+STEP_MODE_8 = 0x8 (step mode A)
+STEP_MODE_3C = 0x3c (step mode B)

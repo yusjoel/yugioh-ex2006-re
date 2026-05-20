@@ -1,0 +1,7 @@
+At index 1 of PTR_FUN_08027ec0 jump table (addr 0x08027ec4). Inline exit fragment, no push prologue; accesses parent frame data via r4 (= .hword 0x466c -> mov r4,sp; adds r4,#2 => sp+2 card data ptr). Copies r4+0..0xe (14 bytes) to destination struct (0x02023360+0xe), modifies 0x02023360+0x1d bit fields, handles r4[0xf] bit 0 (set/clear 0x02023360+0x1d bit 0x8), copies r4[0x10] bits to 0x02023360+0x1d, then increments gPrng+0x202 step counter field (+1 step) and branches to FUN_08028402 (parent frame epilogue). Syncs selected card data fields to display state struct 0x02023360 and advances card select step.
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360 (campaign card select display state base)
+FIELD_COPY_LEN = 0xe (field copy length in bytes)
+STEP_CTR_OFFSET = 0x202 (gPrng+0x202 step counter halfword)
+gPrng = 0x03000040

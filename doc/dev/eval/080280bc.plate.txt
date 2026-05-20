@@ -1,0 +1,6 @@
+At index 3 of PTR_FUN_08027ec0 jump table (0x08027ecc). Shortest inline exit fragment (8 instructions), no push prologue. Reads byte at 0x02023360+0x36, sets bit 5 (OR 0x20), writes back; then branches to FUN_08028402 (parent frame epilogue). Sets bit5 of display state word at offset 0x36 in campaign card select display context, then immediately returns to parent frame. No parent frame data read.
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360
+STATUS_OFFSET = 0x36 (status byte offset)
+READY_BIT = 0x20 (bit5, set to indicate a ready/loaded state)

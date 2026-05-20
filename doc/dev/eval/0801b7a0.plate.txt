@@ -1,0 +1,7 @@
+By caller: src byte ptr r0, dst buf ptr r1. Reads EWRAM global state byte [0x02006c2c] bits[2:0]; if nonzero (TCG mode) skips double-byte extraction. If zero (OCG/JP mode) checks src[0] bit7 (0x80 mask); if set writes src[0]->dst[0], src[1]->dst[1], 0->dst[2] and returns r0=2 (double-byte step). If state nonzero or bit7 clear, writes src[0]->dst[0] and returns r0=1 (single-byte step). Used in string decode iteration to decide single vs double byte advance. Leaf function.
+
+Constants:
+STATE_ADDR = 0x02006c2c (EWRAM encoding mode flag, bits[2:0]=0 => OCG mode)
+DOUBLE_BYTE_LEAD_MASK = 0x80 (src byte bit7 = double-byte lead flag)
+STEP_DOUBLE = 2 (r0 return, double-byte step)
+STEP_SINGLE = 1 (r0 return, single-byte step; LAB_0801b7d4 path)

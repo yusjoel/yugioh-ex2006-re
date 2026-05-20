@@ -1,0 +1,8 @@
+At index 6 of PTR_FUN_08027ec0 jump table (0x08027ed8). Inline exit fragment, no push prologue. Symmetric with handler index 5 (0x080280d0): reads parent frame r0 (.hword 0x4668=mov r0,sp), takes bit0 from [r0+2] halfword and eors 1 (flips it, unlike op5 which uses ands directly), updates 0x02023360+0x39 bit3 with flipped value (no bit2 update step); ORs 0x10 (bit4 fixed set), writes back; calls sync_state_and_init_sprite(r0=0x24); converges at LAB_0802814a (shared with op5 for animation step counter processing at 0x02023360+0x3a and 0x3c).
+
+Constants:
+DISPLAY_CTX_BASE = 0x02023360
+SPRITE_STATE_OFFSET = 0x39
+SPRITE_OAM_FLAG = 0x10 (bit4 fixed set)
+SPRITE_ID = 0x24 (sync_state_and_init_sprite param)
+BIT_FLIP_MASK = 0x1 (eors 1 => flips [r0+2] bit0, differs from op5 ands)

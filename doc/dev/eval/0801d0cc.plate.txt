@@ -1,0 +1,5 @@
+Called by FUN_0801d174 in inner loop for each of 4 sub-elements (r4 in [0..3]) of a map entry. Accepts r0/r1 packed coordinate fields and r2 attribute byte, r3 packed params; computes BG char data VRAM address (base 0x06004000) via multi-step bit shifts, loads 4-byte tile entry, writes r2 attribute byte into the specified position then writes back to VRAM. Heavy use of hi-reg to sp move instructions (.hword 0x466x = mov rN,sp) to stage intermediate bytes on stack. Low-level tile attribute write utility. Exit: pop {r0}; bx r0 (lr saved on stack, Sub-case E - r0 is not a return value).
+
+Constants:
+VRAM_CHAR_BASE = 0x06004000 (BG char data VRAM base)
+SUB_ELEM_COUNT = 4 (4 sub-elements per map entry, caller loop range [0..3])

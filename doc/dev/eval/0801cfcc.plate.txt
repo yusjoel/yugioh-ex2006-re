@@ -1,0 +1,7 @@
+indeg=0, no direct caller; entered via function pointer table in scene frame dispatch. Structure fully symmetric with 0x0801cf74, using the same step table address (0x09e589b4): reads gPrng+0x204 step index (bits[17:10]), multiplies by 4 to index step function table B (base 0x09e589b4, shared with tick_scene_step_by_step_table_b), calls step function via invoke_r0; if step done increments step index +1 (mod 256) writes back to gPrng+0x204, returns r0=0; if table empty returns r0=1. Exit: pop {r4}; pop {r1}; bx r1 (Sub-case E).
+
+Constants:
+STEP_TABLE_BASE_B = 0x09e589b4 (same address as tick_scene_step_by_step_table_b; two separate entry points share same table)
+gPrng = 0x03000040
+STEP_IDX_FIELD_OFFSET = 0x204
+STEP_ADVANCE_MASK = 0xffc03fff
