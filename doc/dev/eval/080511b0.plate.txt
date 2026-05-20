@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Trigger: slot_idx<=4 AND [slot+8]==0 (no existing equip) AND [slot+6] halfword != 0 (field6 data present).
+Note: does NOT check bit19 occupied flag (unlike most siblings).
+After triple filter: calls check_zone_slot_equip_prerequisites(card_ptr, player_side, slot_idx).
+Pass -> return 1. Uses [slot+6] instead of bit19 as activation condition for specific card effects.
+Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 @ 080511b8)

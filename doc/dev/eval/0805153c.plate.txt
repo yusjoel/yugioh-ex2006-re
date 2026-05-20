@@ -1,0 +1,14 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Steps: (1) slot_idx<=4; (2) owner_bit (card[+2] bit0) == player_side -> fail (target must be opponent side);
+(3) bit19=1 AND [slot+8]!=0; (4) check_zone_slot_equip_prerequisites; (5) read gDuelTurnStruct
+(0x0201bb90) [+0]=current_player and [+0x1c]=current_slot_idx: if current_player==player_side AND
+current_slot_idx==slot_idx -> return 0 (slot is in active equip sequence, re-activation blocked).
+Non-matching guard conditions allow eligible (return 1). Compared with 0x080514b4: this function
+returns 1 when guard passes, without further whitelist or type checks. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_08051598)
+- PLAYER_STRIDE = 0x868 (DAT_08051594)
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08051544)
+- gDuelTurnStruct = 0x0201bb90 (DAT_0805159c, current equip player/slot base)

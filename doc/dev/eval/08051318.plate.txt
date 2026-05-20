@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Referenced by function-pointer table at 0x0805df94 and 0x0806bb28.
+Steps: (1) bit19=1 (occupied) check first; (2) slot_idx<=4; (3) [slot+8]!=0;
+(4) check_slot_card_is_equip_type(player_side, slot_idx) -- is the target slot card of equip type?
+All pass -> return 1. r0 (card_ptr) is overwritten at entry and not used as an independent parameter.
+Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DWORD_08051358)
+- PLAYER_STRIDE = 0x868 (DWORD_08051354)
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 @ 0805133a)

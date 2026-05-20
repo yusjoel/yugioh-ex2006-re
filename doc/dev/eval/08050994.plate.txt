@@ -1,0 +1,12 @@
+Called by 0x08054118 (dispatch hub) when card[+0xa] halfword == 0x1706 (Torpedo Fish icid).
+Trigger: slot_idx <= 4 AND bit19=1.
+Execution order: (1) query_slot_card_type_eligibility -- nonzero (ineligible) returns 0 immediately;
+(2) check_zone_slot_equip_prerequisites; (3) check_card_equip_eligible_for_slot(r3=1).
+All pass -> return 1. Compared with sibling cluster: this function runs type query before prereqs.
+Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 0805099c)

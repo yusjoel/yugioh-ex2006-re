@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Unlike most siblings, uses gP1LifePoints (0x0201c4e0) as EWRAM base instead of gDuelFieldSlots.
+Steps: (1) load [gP1LifePoints+0x1ce8] (word), call check_slot_card_can_be_equipped(word, player_side),
+fail -> return 0; (2) compute player*0x868 + slot_idx*0x14 offset from gP1LifePoints base,
+read [slot+0x38] halfword, zero -> fail; (3) query_slot_card_type_eligibility(card_ptr, player_side, slot_idx),
+nonzero -> fail. All pass -> return 1. Pure read-only query.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (EWRAM base, DAT_08051304)
+- LP_ZONE_OFFSET = 0x1ce8 (DAT_08051308, equip zone offset)
+- PLAYER_STRIDE = 0x868 (DAT_0805130c)
+- SLOT_STRIDE = 0x14

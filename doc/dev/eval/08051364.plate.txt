@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Steps: (1) compute slot word, extract card_id (low 13 bits via lsls#0x13+lsrs#0x13);
+(2) slot_idx<=4 AND card_id!=0 AND [slot+8]!=0 triple filter; (3) check_card_field8_is_9(card_id) --
+nonzero (card is field8=9 type) -> fail (bne fail); (4) check_zone_slot_equip_prerequisites;
+(5) query_slot_card_type_eligibility, nonzero -> fail.
+All pass -> return 1. Core distinction: excludes cards of field8=9 type. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_080513c4)
+- PLAYER_STRIDE = 0x868 (DAT_080513c0)
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08051386)

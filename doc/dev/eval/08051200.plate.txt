@@ -1,0 +1,14 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Does NOT call check_zone_slot_equip_prerequisites (key difference from most siblings).
+Steps: (1) slot_idx<=4; (2) owner_bit (card[+2] bit0) == player_side -> fail (target must be opponent side);
+(3) bit19=1 AND [slot+8]!=0 AND [slot+6]==0 (beq enters field5 evaluation path).
+Field5 path: field5_flags = [card+6] & 0x1c; if zero -> return 1 directly; nonzero ->
+  call get_slot_field5_score(player_side, slot_idx), compare with [card+8] halfword (threshold_score),
+  equal -> return 1, unequal -> return 0. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 @ 08051208)
+- FIELD5_FLAG_MASK = 0x1c (bits[4:2] of card[+6])

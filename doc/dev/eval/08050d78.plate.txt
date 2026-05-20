@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Sibling cluster index 0 of 3 (whitelist-prereqs variant).
+Five-step check: (1) slot_idx<=4 -> check_slot_card_is_equip_whitelist(player_side, slot_idx),
+returns 0 on fail; slot_idx>4 skips whitelist; (2) bit19=1 (occupied); (3) [slot+8]==0
+(no existing equipped card), nonzero fails; (4) check_zone_slot_equip_prerequisites;
+(5) check_card_equip_eligible_for_slot(r3=0). All pass -> return 1. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08050d80)

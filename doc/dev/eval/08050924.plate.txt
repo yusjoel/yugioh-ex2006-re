@@ -1,0 +1,13 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Trigger: slot_idx <= 4 AND bit19=1.
+Calls check_zone_slot_equip_prerequisites first; if pass, extracts card_ptr[+2] bit0 (owner_bit).
+Branches by owner_bit vs player_side:
+  owner_bit == player_side -> check_slot_equip_whitelist_with_monster_space(player_side, slot_idx, card_id)
+  owner_bit != player_side -> check_card_equip_eligible_for_slot(card_ptr, player_side, slot_idx, r3=1)
+Each path determines the return value. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 0805092c)

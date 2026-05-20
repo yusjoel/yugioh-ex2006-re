@@ -1,0 +1,11 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Steps: (1) slot_idx<=4; (2) owner_bit (card[+2] bit0) == player_side -> fail (target must be opponent side);
+(3) bit19=1; (4) [slot+8]!=0; (5) check_zone_slot_equip_prerequisites -> pass -> return 1.
+Compared with siblings: no query_slot_card_type_eligibility final check and no gDuelTurnStruct guard.
+Most compact opposite-side + prereqs eligibility form in this cluster. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_08051664)
+- PLAYER_STRIDE = 0x868 (DAT_08051660)
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 @ 0805161c)

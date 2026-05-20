@@ -1,0 +1,11 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Trigger: target slot bit19 (occupied flag) is nonzero.
+Calls check_card_equip_eligible_for_slot(card_ptr, player_side, slot_idx, r3=1) then
+check_zone_slot_equip_prerequisites(card_ptr, player_side, slot_idx).
+Returns 1 (eligible) if all pass, 0 otherwise. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (EWRAM duel field slot base)
+- PLAYER_STRIDE = 0x868 (per-player stride)
+- SLOT_STRIDE = 0x14 (per-slot stride, slot_idx*5*4)
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08050818 -- monster zone upper bound)

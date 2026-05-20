@@ -1,0 +1,12 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Trigger: slot_idx <= 4 AND bit19=1.
+Execution order: (1) check_zone_slot_equip_prerequisites; (2) query_slot_card_type_eligibility --
+nonzero (ineligible) returns 0. Both pass -> return 1.
+Mirror of check_equip_slot_eligible_by_type_then_prereqs (0x08050994): this function runs prereqs
+before type query, the other runs type query first. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08050a04)

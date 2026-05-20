@@ -1,0 +1,24 @@
+Called by 0x08053294 when card[+0x6] bits[4:2] (field5 flags, mask 0x1c) is nonzero.
+Standard pre-filters: slot_idx<=4, bit19=1, [slot+8]!=0. Then query_slot_card_type_eligibility.
+After passing filters, dispatches on card_id via binary search tree (BST) across 12 special card IDs.
+BST miss -> return 0. Each card_id maps to a specific eligibility predicate:
+  0x1236 (Eternal Rest): count_active_extended_chain_nodes
+  0x14e4 (Burst Breath): get_slot_field6_score
+  0x1542 (Needle Ceiling): slot state comparison
+  0x161c (Tribe-Infecting Virus): slot state comparison
+  0x1945 (Ojamuscle): check_card_id_is_effect_monster_type_c
+  0x1977 (Weed Out): eval_equip_chain_score_for_slot
+  Others: slot state code or score comparisons. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08050a60)
+- BST_ROOT = 0x1304 (DAT_08050ae8)
+- CARD_ID_0x1236 = 0x1236 (Eternal Rest)
+- CARD_ID_0x14e4 = 0x14e4 (Burst Breath)
+- CARD_ID_0x1542 = 0x1542 (Needle Ceiling)
+- CARD_ID_0x161c = 0x161c (Tribe-Infecting Virus)
+- CARD_ID_0x1945 = 0x1945 (Ojamuscle)
+- CARD_ID_0x1977 = 0x1977 (Weed Out)

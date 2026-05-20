@@ -1,0 +1,14 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Steps: (1) slot_idx<=4; (2) owner_bit (card[+2] bit0) == player_side -> fail (target must be opponent side);
+(3) bit19=1; (4) [slot+8]!=0; (5) check_zone_slot_equip_prerequisites; (6) read gDuelTurnStruct
+(0x0201bb90) [+0]=current_player and [+0x1c]=current_slot: if current_player==player_side AND
+current_slot==slot_idx -> fail (prevents re-activation of slot already in active equip sequence);
+(7) check_slot_equip_whitelist_with_monster_space; (8) query_slot_card_type_eligibility (0=eligible).
+All pass -> return 1. Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_0805152c)
+- PLAYER_STRIDE = 0x868 (DAT_08051528)
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 080514bc)
+- gDuelTurnStruct = 0x0201bb90 (DAT_08051530, current equip player/slot base)

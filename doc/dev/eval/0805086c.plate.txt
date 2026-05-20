@@ -1,0 +1,13 @@
+Called as a function-pointer entry in the equip-slot eligibility dispatch pipeline.
+Trigger: slot_idx <= 4 AND bit19=1 (occupied) AND [slot+8] halfword != 0 (slot has mounted equip).
+Calls check_zone_slot_equip_prerequisites then query_slot_card_type_eligibility.
+query returns nonzero (ineligible) -> return 0. Both pass -> return 1.
+Compared with check_equip_slot_eligible_by_type_query (0x080507ac), this variant
+additionally requires [slot+8]!=0 (target slot must already have an equipped card).
+Pure read-only query.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 @ 08050874)
