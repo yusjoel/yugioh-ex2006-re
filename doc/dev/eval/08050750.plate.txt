@@ -1,0 +1,16 @@
+Function: Two-predicate equip slot eligibility check: type query then card match check.
+r0=card_ptr, r1=player_side, r2=slot_idx. Pre-filters: slot_idx>4 -> 0;
+card_type_bits[12:0]==0 -> 0.
+Then: query_slot_card_type_eligibility != 0 -> fail 0 (polarity: 0=eligible);
+      check_card_equip_eligible_for_slot(r3=0) -> fail 0.
+All pass returns 1. Note r3=0 differs from check_equip_slot_eligible_with_whitelist r3=1.
+indeg=0, pure predicate, no side effects.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DWORD_080507a0)
+- PLAYER_STRIDE = 0x868 (DWORD_0805079c)
+- EQUIP_FLAG_R3 = 0 (movs r3,#0 at 0805078c, differs from sibling r3=1)
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 at 0805075a)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=type and card eligible, 0=fail)

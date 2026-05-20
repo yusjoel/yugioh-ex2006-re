@@ -1,0 +1,12 @@
+Function: Calls get_card_extended_stat_field8(r0=card_id); if result==0 returns 1
+(is_zero=true), otherwise returns 0. Forms an accessor sibling pair with
+check_card_field8_is_normal (0x0804ad70), which checks whether field8 belongs to
+the normal type set (switch table). This function checks only whether field8 is 0
+(no extended type). indeg=0; see callgraph form(c): grep ".word 0x0804ad5d" -> 0 hits.
+Pure predicate, no side effects.
+
+Constants:
+- ZERO_THRESHOLD = 0 (cmp r0,#0 @ 0804ad64)
+
+Inputs: r0=card_id [0..0x172f]
+Returns: r0=bool (1=field8==0, 0=field8!=0)

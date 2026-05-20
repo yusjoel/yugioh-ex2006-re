@@ -1,0 +1,11 @@
+Function: Calls map_field8_to_card_type_category(r0=card_id); if result==2 returns 1
+(is_trap=true), otherwise returns 0. Forms a strict symmetric sibling pair with
+check_card_type_is_spell (0x0804adc8, which compares 3=TYPE_SPELL). TYPE_TRAP=2,
+TYPE_SPELL=3 matches in-game card category encoding. indeg=0; see callgraph form(c):
+grep ".word 0x0804addd" -> 0 hits. Pure predicate, no side effects.
+
+Constants:
+- TYPE_TRAP = 2 (cmp r0,#0x2 @ 0804ade4)
+
+Inputs: r0=card_id [0..0x172f]
+Returns: r0=bool (1=Trap, 0=non-Trap)

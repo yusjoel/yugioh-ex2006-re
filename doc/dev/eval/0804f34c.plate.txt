@@ -1,0 +1,22 @@
+Function: Reads IWRAM struct (DAT_0804f368=0x0201e4d0) offset 0x14 halfword, extracts
+bits[8:1] (lsls #0x17 / lsrs #0x18 = byte[1]) as current_rank [0..3+]:
+- rank==0: checks gDuelCtx[+0x498] flag; if 0 writes halfword[0x14] to set bit[1]=2
+  (rank=1 state), then falls into rank==1 branch;
+- rank==1: checks gDuelCtx[+0x48c]; if nonzero checks gDuelCtx[+0x488]; if +0x488!=0
+  calls compact_equip_zone_rank3_entries() and returns 1; else increments rank to 2;
+- rank==2: checks gDuelCtx[+0x48c] for sprite row anim; if present calls
+  dispatch_sprite_row_anim_by_state; else increments rank to 3;
+- rank==3: checks gDuelCtx[+0x498]; if nonzero calls dispatch_sprite_row_queue_by_state;
+  else increments rank.
+Returns 0 (default/still running) or 1 (compact done). indeg=0 state machine tick.
+
+Constants:
+- STRUCT_BASE = 0x0201e4d0 (DAT_0804f368)
+- gDuelCtx = 0x0201b290 (DAT_0804f3ac, 0x0804f41c)
+- ACTIVE_FLAG_OFFSET = 0x93*8 = 0x498
+- EQUIP_SPRITE_OFFSET_B = 0x48c (DAT_0804f3b4)
+- RANK_FIELD_MASK = 0xfffffe01 (DAT_0804f3b0)
+- RANK_1 = 2 (orrs r0,r1 where r1=2 at 0x0804f38a)
+
+Inputs: void (r0 clobbered at entry by ldr r1,DAT_0804f368)
+Returns: r0=u32 (0=still_running, 1=compact_done)

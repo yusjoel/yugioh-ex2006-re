@@ -1,0 +1,17 @@
+Function: Four-predicate equip slot eligibility check with whitelist monster-space check.
+r0=card_ptr, r1=player_side, r2=slot_idx. Pre-filters: owner bit==player_side -> 0;
+slot_idx>4 -> 0; card_type_bits==0 -> 0.
+Then: check_zone_slot_equip_prerequisites -> fail 0;
+      check_slot_equip_whitelist_with_monster_space(player_side, slot_idx, card_id=[card_ptr+0]) -> fail 0;
+      query_slot_card_type_eligibility != 0 -> fail 0 (polarity: 0=eligible).
+All pass returns 1. Compared to check_equip_slot_eligible_triple_predicate, adds
+whitelist_monster_space check but omits check_card_equip_eligible_for_slot.
+Called by FUN_08054d08 which continues with field7/zone_bit checks. indeg=1, pure predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_0804f67c)
+- PLAYER_STRIDE = 0x868 (DAT_0804f678)
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 at 0804f62c)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=eligible, 0=fail)

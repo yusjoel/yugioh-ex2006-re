@@ -1,0 +1,15 @@
+Function: Iterates the current player side (r8=r0=player_side) equip pair slot list
+(base gP1LifePoints+0x1ce8*player_side+0x10, stride=0x868). For each slot, calls
+check_card_pair_allowed(card_id, slot_cid); if allowed, extracts pair_code
+(bits[21:14]x2 + bit14) and calls enqueue_sprite_attr_for_zone_slot_packed.
+Called by FUN_0806d960 on equip pair card trigger.
+Side effect: conditionally appends records to sprite attr queue.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (via DWORD_08049dc4)
+- PLAYER_STRIDE = 0x868 (per-player slot data span)
+- PAIR_SLOT_COUNT_OFFSET = 0x10
+- SPRITE_ATTR_TYPE_REC = 0xd
+
+Inputs: r0=player_side [0..1], r1=card_id [0..0x172f], r2=target_slot_idx [0..4]
+Returns: r0=bool (1=found and enqueued, 0=not found)

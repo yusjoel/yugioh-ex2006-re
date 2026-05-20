@@ -1,0 +1,21 @@
+Function: Combined equip slot eligibility check. Params: r0=card_ptr, r1=player_side,
+r2=slot_idx. Reads (player_side, slot_idx) slot record from gDuelFieldSlots (0x0201c510),
+extracts card_type_bits (bits[12:0] via lsls/lsrs #0x13); if 0 returns 0.
+If slot_idx<=4 (monster zone): calls check_slot_card_is_equip_whitelist(player_side, slot_idx);
+fail returns 0.
+If slot_idx==0xa: unconditionally returns 0 (reserved slot).
+Otherwise calls check_zone_slot_equip_prerequisites(card_ptr, player_side, slot_idx),
+then check_card_equip_eligible_for_slot(card_ptr, player_side, slot_idx, r3=1).
+If all pass, checks slot[+8] halfword nonzero (spell/trap zone has field card);
+if nonzero also checks card_extended_stat_field6==0x17; else checks check_card_field5_is_nonzero.
+Returns 1 if final condition met, else 0. indeg=0, pure predicate, no side effects.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_0804f4a0, 0x0804f4d0)
+- PLAYER_STRIDE = 0x868 (DAT_0804f49c, 0x0804f4cc)
+- SLOT_IDX_MAX_MONSTER = 4 (cmp r4,#0x4)
+- RESERVED_SLOT_IDX = 0xa (cmp r4,#0xa)
+- FIELD6_SPECIAL = 0x17 (cmp r0,#0x17 at 0x0804f4c6)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..9]
+Returns: r0=bool (1=eligible, 0=not eligible)

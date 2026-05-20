@@ -1,0 +1,10 @@
+Function: Reads card_ptr[+2] byte, extracts bit0 (owner player side), then calls
+check_slot_card_can_be_equipped(player_side); if nonzero returns 1, else 0. Wraps
+owner bit extraction from card_ptr then delegates to check_slot_card_can_be_equipped.
+indeg=0; grep ".word 0x080500ad" -> 0 hits. Pure predicate, no side effects.
+
+Constants:
+- OWNER_BIT_MASK = bit0 of [card_ptr+2] (lsls #0x1f / lsrs #0x1f)
+
+Inputs: r0=card_ptr
+Returns: r0=bool (1=can be equipped, 0=cannot)

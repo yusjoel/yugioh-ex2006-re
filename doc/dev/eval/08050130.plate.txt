@@ -1,0 +1,15 @@
+Function: Type-only equip slot eligibility check, omitting prerequisites check.
+r0=card_ptr, r1=player_side, r2=slot_idx. First checks gDuelFieldSlots
+(player_side, slot_idx) card_type_bits[12:0] nonzero; then card_ptr[+2] bit0 (owner)
+==player_side -> fail 0; then slot_idx <= 4; checks slot[+8] halfword==0 (no field card).
+If slot[+8]==0, calls query_slot_card_type_eligibility(card_ptr, player_side, slot_idx);
+return==0 (eligible) returns 1, else 0. Compared to sibling functions, omits
+check_zone_slot_equip_prerequisites call. indeg=0, pure predicate, no side effects.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DWORD_08050180)
+- PLAYER_STRIDE = 0x868 (DWORD_0805017c)
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 at 0805015e)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=type-eligible, 0=fail)

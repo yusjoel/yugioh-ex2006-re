@@ -1,0 +1,16 @@
+Function: Uses r7=r0 (display_mode) as switch. Reads effect_slot_count from
+gP1LifePoints+0x1d40 (0xea<<5), then descending from (count-1), calls
+get_effect_slot_entry_ptr_by_palette_id twice per slot to get current and next
+entry ptrs, extracts bits[21:14]x2+bit14 as sprite pair_code, selects x_base
+(display_mode==0: 0x56, else DAT_08049e40), then calls enqueue_sprite_attr_record(type=0xd).
+Called by FUN_080665d4 (field spell/pair display chain) and FUN_0806abec (card_frame chain).
+No external memory writes; only appends to sprite queue.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (via PTR_gP1LifePoints_08049e3c)
+- EFFECT_SLOT_COUNT_OFFSET = 0xea * 0x20 = 0x1d40
+- X_BASE_0 = 0x56 (display_mode==0)
+- SPRITE_ATTR_TYPE = 0xd
+
+Inputs: r0=display_mode [0..nonzero]
+Returns: void (pop{r0};bx r0 tail exit)

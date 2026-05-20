@@ -1,0 +1,10 @@
+Function: Two-predicate equip slot eligibility check based on card_id whitelist and
+prerequisites. r0=card_ptr, r1=player_side, r2=slot_idx.
+First calls check_slot_card_eligible_by_card_id(card_ptr, player_side, slot_idx); if
+return value != 1 returns 0.
+Then calls check_zone_slot_equip_prerequisites(card_ptr, player_side, slot_idx); if 0
+returns 0. All pass returns 1. indeg=2, called by FUN_080538e8 and FUN_080af120 (both
+duel_field tag). Pure predicate, no side effects.
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=both checks pass, 0=fail)

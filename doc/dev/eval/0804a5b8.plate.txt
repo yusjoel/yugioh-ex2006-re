@@ -1,0 +1,25 @@
+Function: Double loop (outer r7=0..1=player_side, inner r9=0..slot_count-1=slot_idx).
+For each monster slot card with card_type_category==3 (Spell), extracts pair_code
+(bits[21:14]x2+bit14) and with flags (0x1c/0x18/0x40) calls enqueue_sprite_attr_record
+(type=0x3f). Also searches for effect node (find_effect_node_in_zone, type=0xb) and
+submits a second sprite attr with pair_code if found. After outer loop, appends one
+type=0x5a zero-sentinel record, then calls enqueue_lp_counter_sprite_by_player for both
+players. Called by FUN_080718c4 (LP bar update chain). No APCS inputs (entry clobbers r0).
+Side effect: appends multiple monster zone equip sprite attr records + sentinel + LP counter sprites.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (DWORD_0804a730)
+- PLAYER_SLOT_BASE_OFFSET = 0x1ce8 (DWORD_0804a734)
+- PLAYER_STRIDE = 0x868 (DWORD_0804a738)
+- SLOT_ARRAY_BASE = 0x0201c4f4 (DWORD_0804a73c)
+- DELTA_A = 0xffffe730 (DWORD_0804a740, sprite x offset A, negative)
+- DELTA_B = 0xffffe32c (DWORD_0804a744, sprite x offset B, negative)
+- EFFECT_NODE_SLOT_BASE = 0x0201c740 (DWORD_0804a74c)
+- CARD_TYPE_CATEGORY_SPELL = 3
+- EFFECT_NODE_TYPE = 0xb
+- FLAG_A = 0x1c, FLAG_B = 0x18
+- SENTINEL_TYPE = 0x5a
+- FIELD8_CMP = 0x12a1 (DWORD_0804a750, specific card type for effect node path)
+
+Inputs: void (r0 clobbered at entry by ldr r0,DWORD_0804a730)
+Returns: void (pop{r0};bx r0 tail exit)

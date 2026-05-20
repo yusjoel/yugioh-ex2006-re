@@ -1,0 +1,26 @@
+Function: Comprehensive equip slot scoring dispatcher based on target slot card_state_code.
+r0=card_ptr, r1=player_side, r2=slot_idx. Pre-filters: slot_idx>4 -> 0; card_type_bits==0
+-> 0; slot[+8]==0 -> 0. Calls check_zone_slot_equip_prerequisites + query_slot_card_type_eligibility
+dual filter. Then calls get_slot_card_state_code(player_side, slot_idx) and dispatches on
+known state_code values (0x1690/0x14c5/0x119a/0x14b9/0xa7*0x20/0x14b2/0x15e4/0x18c9/
+0x16ce/0x186a/0x19a9/0x19f1 etc). Some cases check r2 vs specific values (0xf/3/0x12)
+returning 0 or 1; others call get_slot_field6_score/get_slot_field5_score/
+get_card_extended_stat_field3/eval_slot_score_entry_full vs thresholds returning 0/1.
+Default (LAB_0805073c): returns 0. Called via function pointer 0x080502b1 at DAT_08050ff4
+(indirect call from FUN_0809078c). Large switch-dispatch, pure query, no external writes.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_08050358)
+- PLAYER_STRIDE = 0x868 (DAT_08050354)
+- STATE_CODE_0 = 0x1690 (DAT_0805035c)
+- STATE_CODE_1 = 0x14c5 (DAT_08050360)
+- STATE_CODE_2 = 0x119a (DAT_08050364)
+- STATE_CODE_3 = 0x14b9 (DAT_08050368)
+- STATE_CODE_4 = 0xa7*0x20 = 0x14e0 (movs r0,#0xa7; lsls #5)
+- STATE_CODE_5 = 0x15e4 (DAT_08050390)
+- SCORE_THRESHOLD_A = 0xc8 * 4 = 0x320 (movs r1,#0xc8; lsls #2)
+- SCORE_THRESHOLD_B = 0xfa * 4 = 0x3e8 (movs r0,#0xfa; lsls #2)
+- SLOT_IDX_MAX = 4 (cmp r5,#0x4 at 080502e8)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=u32 (0=not eligible/fail, 1=eligible/score pass)

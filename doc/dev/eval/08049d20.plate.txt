@@ -1,0 +1,13 @@
+Function: Based on r0 mode_flag, selects sprite base address (0=DAT_08049d18=0x0201c4f0
+gMonsterSlotSpriteBase, nonzero=DWORD_08049d40=0x00008033), then submits r2 (x_coord,
+low 16 bits) and r1 (y_coord, low 16 bits) with type=0xd to the sprite attr queue via
+enqueue_sprite_attr_record. Called by FUN_08073d84 in equip zone monster slot path 0x7e.
+Side effect: appends one type=0xd record to global sprite attr queue.
+
+Constants:
+- BASE_A = DAT_08049d18 = 0x0201c4f0 (gMonsterSlotSpriteBase, r0==0 path)
+- BASE_B = DWORD_08049d40 = 0x00008033 (r0!=0 path sprite attr base)
+- SPRITE_ATTR_TYPE = 0xd
+
+Inputs: r0=mode_flag [0..nonzero], r1=y_coord [0..0xffff], r2=x_coord [0..0xffff]
+Returns: void (pop{r0};bx r0 tail exit; r0 from enqueue_sprite_attr_record, caller discards)

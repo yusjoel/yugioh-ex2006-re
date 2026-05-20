@@ -1,0 +1,18 @@
+Function: Full equip slot eligibility check with field5 score upper bound. r0=card_ptr,
+r1=player_side, r2=slot_idx. Pre-filters: slot_idx>4 -> 0; card_type_bits==0 -> 0;
+slot[+8]==0 -> 0 (no field card). Extracts slot pair_code (bits[21:14]x2+bit14) and
+card_ptr[+4] bits[10:4] (card pair field); if equal returns 0 (self-equip guard).
+Then: check_card_equip_eligible_for_slot(r3=1) -> fail 0;
+      check_zone_slot_equip_prerequisites -> fail 0;
+      get_slot_field5_score(player_side, slot_idx) vs threshold 0xfa*4=0x3e8: score>0x3e8 -> 0.
+All pass returns 1. indeg=0, pure predicate, no side effects.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_08050208)
+- PLAYER_STRIDE = 0x868 (DAT_08050204)
+- SCORE_THRESHOLD = 0xfa * 4 = 0x3e8 (movs r1,#0xfa; lsls r1,#2; verified: 250*4=1000=0x3e8)
+- EQUIP_FLAG_R3 = 1 (movs r3,#1 at 080501d6)
+- SLOT_IDX_MAX = 4 (cmp r4,#0x4 at 08050196)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=eligible with score<=0x3e8, 0=fail)

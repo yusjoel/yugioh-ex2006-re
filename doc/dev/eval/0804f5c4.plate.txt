@@ -1,0 +1,14 @@
+Function: Single-prerequisites equip slot eligibility check. r0=card_ptr, r1=player_side,
+r2=slot_idx. Pre-filters: card_ptr[+2] bit0 (owner)==player_side -> 0 (equip target must
+belong to opponent); slot_idx > 4 -> 0; gDuelFieldSlots card_type_bits[12:0]==0 -> 0.
+Then calls check_zone_slot_equip_prerequisites(card_ptr, player_side, slot_idx); pass
+returns 1, fail returns 0. Compared to check_equip_slot_eligible_with_owner_and_type,
+omits query_slot_card_type_eligibility call. indeg=0, pure predicate, no side effects.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (DAT_0804f60c)
+- PLAYER_STRIDE = 0x868 (DAT_0804f608)
+- SLOT_IDX_MAX = 4 (cmp r3,#0x4 at 0804f5d8)
+
+Inputs: r0=card_ptr, r1=player_side [0..1], r2=slot_idx [0..4]
+Returns: r0=bool (1=prerequisites pass, 0=fail)
