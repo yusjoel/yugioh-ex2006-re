@@ -1,0 +1,4 @@
+C standard library strtol(3) public entry point: passes r0 (nptr), r1 (endptr), r2 (base) to _strtol_r (0x08110b4c), automatically binding the global reentrancy pointer (DAT_08110c90=0x09ed4d94). Returns long in r0. Used by __svfscanf (0x0810f218) as a format-specifier callback (function pointer stored at DAT_0810f528/f538/f648 for '%i'/'%d' etc.). Shares the same reent-binding pattern with strtod (0x08110b28) and strtoul (0x08110dac), all using the same _impure_ptr constant.
+
+Constants:
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr global reentrancy structure pointer)

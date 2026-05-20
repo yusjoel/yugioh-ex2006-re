@@ -1,0 +1,7 @@
+Shared return path of _strtod_r (0x0810fff4): handles optional endptr write-back, assembles the double result into r0:r1, conditionally negates it, then cleans up the stack frame and returns. Steps: (1) if [sp+0x10] (endptr out-param) is non-null, stores [sp+0x28] (parsed-end address) into *endptr; (2) r0=r6 (double low word), r1=r7 (double high word); (3) if [sp+0x20] (negate_flag) is non-zero, bl __negdf2 to negate the double; (4) releases local frame 0x68 bytes and restores all callee-save registers. Reached from multiple "b FUN_08110afe" branches inside _strtod_r.
+
+Constants:
+- ENDPTR_SP_OFFSET=0x10 (endptr out-param frame offset)
+- PARSED_END_SP_OFFSET=0x28 (parsed-end address frame offset)
+- NEGATE_FLAG_SP_OFFSET=0x20 (sign flag frame offset)
+- STRTOD_R_LOCAL_SIZE=0x68 (local frame size)

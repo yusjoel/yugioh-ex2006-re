@@ -1,0 +1,6 @@
+ROM stub for byte copy with WAITCNT setup, structurally identical to copy_bytes_with_waitcnt (0x0810e460). init_sram_stubs_in_iwram (0x0810e4ec) copies this stub's machine code from ROM address 0x0810e421 to IWRAM 0x030056f8 for faster execution. Logic: sets WAITCNT (0x04000204) bits[1:0]=3 (SRAM 8-cycle wait), then copies r2(count) bytes from r0(src) to r1(dst) one byte at a time. SRAM requires 8-bit access; WAITCNT ensures correct bus timing. No direct callers; address referenced as ROM source data via DAT_0810e500 inside init_sram_stubs_in_iwram.
+
+Constants:
+- WAITCNT=0x04000204 (wait state control register)
+- SRAM_WAIT_MASK=0x0000fffc (clear bits[1:0])
+- SRAM_WAIT_8CYCLES=0x3 (8 wait cycles)

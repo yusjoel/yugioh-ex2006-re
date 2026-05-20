@@ -1,0 +1,1 @@
+Thin fflush(3) wrapper used as a _fwalk callback. __srefill (0x0810ff00) stores this function's address (THUMB ptr 0x0810fef9) in DAT_0810ffd8 and passes it to _fwalk; _fwalk then calls callback(reent, fp) for each open FILE*. Body: push{lr}; bl fflush(r0); pop{pc}. No direct bl callers; referenced only as a function pointer via DAT_0810ffd8.

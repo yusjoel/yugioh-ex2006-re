@@ -1,0 +1,1 @@
+Single-instruction function pointer trampoline: executes bx r2 to jump to the target function held in r2. Caller places function pointer in r2; other registers carry arguments. Called from 14 sites, common in equip-effect and duel_field computation paths. Part of the invoke_r0/r1/r2/r3 GBA function-pointer dispatch trampoline cluster.

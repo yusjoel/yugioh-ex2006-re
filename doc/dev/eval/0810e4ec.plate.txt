@@ -1,0 +1,12 @@
+System init path: copies two SRAM access stubs from ROM to IWRAM so that SRAM read/write operations run from faster IWRAM. Stub 1: ROM 0x0810e421..0x0810e460 (64 bytes, byte-copy stub) -> IWRAM 0x030056f8; writes IWRAM entry (THUMB ptr 0x030056f9) to [0x02029ea0]. Stub 2: ROM 0x0810e4a1..0x0810e4ec (76 bytes, another copy stub) -> IWRAM 0x03005658; writes IWRAM entry (THUMB ptr 0x03005659) to [0x02029ea4]. Finally sets WAITCNT bits[1:0]=3 (SRAM 8-cycle wait). Called once by FUN_080f4c14 (tags: dma;sys;display) during DMA/display system init.
+
+Constants:
+- ROM_STUB1_START=0x0810e421 (copy_bytes_with_waitcnt_rom_stub THUMB ptr)
+- ROM_STUB1_END=0x0810e461
+- IWRAM_STUB1=0x030056f8
+- PTR_STUB1=[0x02029ea0]:=0x030056f9
+- ROM_STUB2_START=0x0810e4a1
+- ROM_STUB2_END=0x0810e4ed
+- IWRAM_STUB2=0x03005658
+- PTR_STUB2=[0x02029ea4]:=0x03005659
+- WAITCNT=0x04000204, SRAM_WAIT_8CYCLES=0x3

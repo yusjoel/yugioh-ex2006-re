@@ -1,0 +1,4 @@
+C standard library strtoul(3) public entry point: passes r0 (nptr), r1 (endptr), r2 (base) to _strtoul_r (0x08110c94), automatically binding the global reentrancy pointer (DAT_08110dc4=0x09ed4d94). Returns unsigned long in r0. Structurally symmetric with strtol (0x08110c78); differs only in callee (_strtoul_r returns unsigned long). Used by __svfscanf (0x0810f218) as a format-specifier callback for '%u'/'%o'/'%x' etc. (4 DAT references).
+
+Constants:
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr global reentrancy structure pointer)

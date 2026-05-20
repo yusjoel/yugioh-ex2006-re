@@ -1,0 +1,4 @@
+Conditional exit path of __svfscanf (0x0810f218): reads match_count from stack [sp+0x264]. If match_count != 0, jumps to restore_svfscanf_frame (0x0810fde0) returning match_count. If match_count == 0 (EOF or format mismatch before any conversion), sets r0 := -1 then jumps to restore_svfscanf_frame. Conforms to C99 sscanf/fscanf spec: "EOF before any conversion -> return EOF (-1)". Reached from multiple branch sites inside __svfscanf after cmp r0,#0/bne checks.
+
+Constants:
+- MATCH_COUNT_SP_OFFSET=0x264 (relative to __svfscanf frame)

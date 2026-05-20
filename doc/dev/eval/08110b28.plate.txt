@@ -1,0 +1,4 @@
+C standard library strtod(3) public entry point: passes r0 (nptr) and r1 (endptr) to _strtod_r (0x0810fff4), automatically binding the global reentrancy pointer (read from DAT_08110b3c=0x09ed4d94, _impure_ptr). Returns double as r0:r1 (lo:hi). Called by FUN_0810fe6c (single-argument form with endptr=NULL) and other string-to-float conversion paths. Shares the same reent-binding pattern with strtol (0x08110c78) and strtoul (0x08110dac).
+
+Constants:
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr global reentrancy structure pointer)

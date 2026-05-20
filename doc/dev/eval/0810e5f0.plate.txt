@@ -1,0 +1,1 @@
+Single-instruction function pointer trampoline: executes bx r10 to jump to the target function held in r10. r10 is a high non-APCS register. Called from 3 sites: 0x080b4f68 (find_best_slot_from_bitmap_by_comparator, duel_field) and 0x080f5d1c (bsearch_index_by_callback, display path). Sibling of invoke_r8 (0x0810e5e8) in the high-register trampoline sub-family.

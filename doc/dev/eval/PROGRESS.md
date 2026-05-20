@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 720 + 剩余 46 (3 批 #115..#117 / 20 每批, 末批 6) |
-| **下一批** | `#115` (20 fns, 单 sub-agent 串行) |
-| **上次更新** | 2026-05-20 (Phase 2 batch #114 landing, 720/766 = 93.99%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 740 + 剩余 26 (2 批 #116..#117 / 20 每批, 末批 6) |
+| **下一批** | `#116` (20 fns, 单 sub-agent 串行) |
+| **上次更新** | 2026-05-20 (Phase 2 batch #115 landing, 740/766 = 96.61%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**720 / 766 已分析** (93.99%, 剩余 3 批待跑 #115..#117)
+**740 / 766 已分析** (96.61%, 剩余 2 批待跑 #116..#117)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -111,6 +111,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #112 680/766 (88.77%) — puzzle integrity (compare_bytes_exact + verify_checksum + write_charset_flag) + render_card_detail_panel_to_vram + pack scene OAM digit renders (decimal_pair + nibble_table + by_digit_count) + tick prng anim entries + init_pack_vram minimal/full + exit_pack_init_with_failure + title_ex GFX/OBJ resource set + BG1 scroll + cell anim slot tick + window fade in/out + pack palette entry
 - batch #113 700/766 (91.38%) — card_list scroll-select + card name/gfx-type render + deck slot rebuild/refresh + banlist-driven slot populate + slot load/mark-seen + slot data by type + deck entry nibble write + deck slot sort comparator + card_list scene mode2-init/mode0-exit/BG-scroll/work-buf-clear + card type table lookup + sound DMA buffer init + wave pattern write + DMA channel configure + sound timer rate set
 - batch #114 720/766 (93.99%) — sound engine high-reg restore exit fragment + min active channel priority scan + channel loop phase advance + engine request set/clear flag + channel bytes equal check + sprite entry+engine ptr init + channel vol/id write + channel playback slot init + active DMA slot flag count + freq slot DMA buf clear + freq slot buf large/small init + freq slot note byte/mask/volume-pitch set + engine bit0 flag set + pitch scale by rate + bios div remainder + bios checksum parity
+- batch #115 740/766 (96.61%) — SRAM IWRAM stub copy+init + invoke_rN trampoline cluster (r0/r1/r2/r3/r6/r7/r8/r10) + ignore_div_by_zero + svfscanf exit cluster (on_zero_match/with_count/restore_frame) + flush_stream_callback + restore_strtod_r_frame + strtod/strtol/strtoul + init_sfp_entry
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -119,9 +120,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#114) | 720 |
-| - 剩余 (按 20/批 重组) | 46 |
-| 剩余分批数 (20/批) | 3 (`#115..#117`) |
+| - 已完成 (Phase 2 #82-#115) | 740 |
+| - 剩余 (按 20/批 重组) | 26 |
+| 剩余分批数 (20/批) | 2 (`#116..#117`) |
 | 末批大小 | 6 (#117) |
 | 剩余地址覆盖区段 | 0x0810e420..0x081141d8 |
 
@@ -130,7 +131,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2720** | **921** | **74.69%** |
+| **全 CSV** | **2740** | **906** | **75.15%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

@@ -1,0 +1,7 @@
+Initializes a single stdio __sFILE (FILE) struct entry: zeroes [+0x0..+0x8] (data/read-ptr/count), writes flags to [+0xc], fd (file descriptor number) to [+0xe], zeroes [+0x10]/[+0x18], writes self-reference [+0x1c]=r0 (ungetc buffer base), sets 4 function pointers ([+0x20]=_sread / [+0x24]=_swrite / [+0x28]=_sseek / [+0x2c]=_sclose), and writes reent pointer to [+0x54]. Called 3 times by __sinit (0x081110b8) to initialize stdin (fd=0)/stdout (fd=1)/stderr (fd=2) standard stream entries.
+
+Constants:
+- _SREAD=0x081125cd (_sread read method function pointer)
+- _SWRITE=0x08112601 (_swrite write method function pointer)
+- _SSEEK=0x08112641 (_sseek seek method function pointer)
+- _SCLOSE=0x08112681 (_sclose close method function pointer)

@@ -1,0 +1,1 @@
+Single-instruction function pointer trampoline: executes bx r1 to jump to the target function held in r1. Caller places function pointer in r1; r0/r2/r3 carry arguments. Called from 15 sites, common in card-effect/OBJ-layer/equip handling paths where r1 is used as a non-APCS function pointer slot. Part of the invoke_r0/r1/r2/r3/r6/r7/r8/r10 sibling family.
