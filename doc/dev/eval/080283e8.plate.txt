@@ -1,0 +1,6 @@
+Function: PTR_FUN_08027ec0 jump table index 15 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp gets parent frame sp; ldrh r0,[r0,#2] reads sp+2 halfword as money_delta low 16 bits; .hword 0x4669=mov r1,sp; ldrh r1,[r1,#4] reads sp+4 halfword as money_delta high 16 bits; orrs r0,r1<<16 combines to 32-bit money value; bl accrue_money_with_cap accumulates money (with cap). Then bl init_puzzle_wram_then_copy, movs r0,#8, bl build_campaign_sprite_row_by_type(8) refreshes sprite row, then enters parent frame epilogue.
+
+Side effects: player money state updated via accrue_money_with_cap; init_puzzle_wram_then_copy side effects; VRAM OBJ via build_campaign_sprite_row_by_type.
+
+Constants:
+- SPRITE_TYPE = 0x8

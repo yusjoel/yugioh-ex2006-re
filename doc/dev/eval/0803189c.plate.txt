@@ -1,0 +1,15 @@
+Function: search player zone slot table for entry matching card_id and remove it. r0=packed_player_id (bit0=side, saved to r7), r1=u16 card_id (lsls #0x10; lsrs #0x10 truncated, saved to r2 and r12). Reads count word at gP1LifePoints+side*0x868+0x10 (r4=count_ptr); if r8 (initial 0) >= count jumps to LAB_08031946 (return 0, not found). Computes table base r6=gP1LifePoints+0x98*4=gP1LifePoints+0x260, adds side*0x868 for correct player side; linearly scans all count slots (stride 4 bytes): reads [slot] bits[12:0] (card_id field) and compares with r2; on match: calls write_word_from_deref_src to overwrite that entry (remove); [count_ptr]-=1 (shrink count); if new count>r8 continues compaction loop (LAB_0803190c) shifting remaining entries forward; returns 1 (success). If full scan finds no match -> returns 0 (not found). Exit pop{r1};bx r1 (Sub-case E, preserves r0).
+
+Side effects:
+- [gP1LifePoints+side*0x868+0x10]: count -= 1 (on successful removal)
+- [zone_slot_table+side*0x868+0x260+match_idx*4]: entry overwritten (write_word_from_deref_src removes it)
+- subsequent slots compacted forward (loop LAB_0803190c)
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 // DWORD_08031928 referenced symbol
+- player_stride = 0x868
+- count_offset = 0x10 // [base+side*0x868+0x10] = slot count
+- zone_slot_base_offset = 0x98*4 = 0x260 // gP1LifePoints+0x260 = slot array base
+- slot_stride = 4 // 4 bytes per entry
+- gDuelFieldSlots_B = 0x0201c740 // DWORD_08031930 (side B field slot base)
+- slot_card_id_bits = bits[12:0] // lsls #0x13; lsrs #0x13

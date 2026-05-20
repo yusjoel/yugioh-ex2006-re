@@ -1,0 +1,24 @@
+Function: pack selection screen VRAM/palette init (deck type B, internal key=0x4e20). No APCS input. Entry through prologue completes high-register save, then immediately ldr r0, 0x4e20 calls find_deck_record_index_by_key, return value r0 is deck_record_index; subs r4,r4,r0 computes relative_deck_index (r4 at entry adds r4,r0 already initialized to 0). Then based on relative_deck_index computes 5 ROM data pointers: r5=palette (PALETTE_TABLE_B=0x09953cec, step idx*9*32), r10=tilemap A (0x09956c2c), r9=tilemap B (0x099ba04c), r8=tilemap C (0x099aac2c), r4=tilemap D (0x09a0e04c). Executes: (1) zero_fill_by_halfword x2 clears OBJ VRAM 0x06000800/0x06001000 (each 0x800 halfwords); (2) upload_palette_rows_to_bg_vram(r5_deck_palette, 8); (3) writes 0 to PAL_RAM 0x05000000 (clears background color); (4) upload_indexed_tile_rows_to_obj_vram(r8, 0x10); (5) upload_tilemap_rows_with_offset(r8_offset, 1, 0x10, 0x1e); (6) upload_indexed_tile_rows_to_obj_vram(r9+0x88*2, 0x14); (7) upload_tilemap_rows_with_offset(r4=tilemap, 2, 0x88*2, 0x1e). Structure fully symmetric with init_pack_selection_tile_vram_by_deck_a (0x0802d2fc); only deck_key and ROM table bases differ: deck_key_B=0x4e20 vs deck_key_A=0x2711.
+
+Side effects:
+- VRAM 0x06000800 (0x1000 bytes): zero cleared
+- VRAM 0x06001000 (0x1000 bytes): zero cleared
+- BG palette: deck-B-specific palette (8 rows) uploaded
+- PAL_RAM 0x05000000: cleared to 0
+- OBJ VRAM: deck-B-specific tile data uploaded
+- BG tilemap: deck-B-specific tilemap data uploaded
+
+Constants:
+- DECK_KEY_B = 0x4e20 // find_deck_record_index_by_key internal key (20000 decimal)
+- PALETTE_TABLE_B = 0x09953cec
+- TILEMAP_TABLE_A = 0x09956c2c
+- TILEMAP_TABLE_B = 0x099ba04c
+- TILEMAP_TABLE_C = 0x099aac2c
+- TILEMAP_TABLE_D = 0x09a0e04c
+- OBJ_VRAM_BASE_A = 0x06000800
+- OBJ_VRAM_BASE_B = 0x06001000
+- PAL_RAM_BASE = 0x05000000
+- PALETTE_ROWS = 8
+- TILE_ROWS_A = 0x10
+- TILE_ROWS_B = 0x14
+- TILEMAP_STRIDE = 0x1e

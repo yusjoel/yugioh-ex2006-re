@@ -1,0 +1,18 @@
+Function: select one of two pack tile loading paths based on r0 flag, then initialize palette flags. When r0==0: loads pack tile set B (0x09ba050c, 0x30 tiles, 2bpp mode 0x4e) to VRAM 0xc00 and pack tile set C (0x09b9fa20, 0x20 tiles, mode 0x2) to VRAM 0x800. When r0!=0: loads only pack tile set A (0x09b9e6e8, 0x10 tiles, mode 0x2) to VRAM 0xc00. Both paths converge: copy_bytes_by_halfword copies 0x20 halfwords from ROM 0x09b9e6c8 to PAL_RAM 0x05000220; tile_2d_row_copy copies 0x20x8 rows from ROM 0x09b9c6c8 to VRAM 0x06010000; sets bit0 of byte [0x02023360+0x36] (palette init flag). Exit pop {r0}; bx r0 (Sub-case E, void).
+
+Side effects:
+- VRAM tile offset 0xc00 (or 0x800): pack tile data written via load_pack_tile_and_map_to_vram
+- PAL_RAM 0x05000220: 0x20 halfwords (64 bytes) palette copy
+- VRAM 0x06010000: 0x20x8 = 0x100 rows tile 2D copy
+- [0x02023360+0x36] bit0 := 1 (palette init flag)
+
+Constants:
+- VRAM_TILE_BASE_C = 0xc00 (0xc0<<4, OBJ tile index)
+- VRAM_TILE_BASE_B = 0x800 (0x80<<4)
+- PACK_TILES_A = 0x09b9e6e8 (r0!=0 path: 16 tiles, mode 2)
+- PACK_TILES_B = 0x09ba050c (r0==0 path: 48 tiles, mode 0x4e)
+- PACK_TILES_C = 0x09b9fa20 (r0==0 path: 32 tiles, mode 2)
+- PACK_PAL_SRC = 0x09b9e6c8 // palette data source (32 halfwords)
+- PAL_RAM_DEST = 0x05000220
+- VRAM_BG_BASE = 0x06010000
+- PAL_INIT_FLAG_OFFSET = 0x36 // [0x02023360+0x36] bit0

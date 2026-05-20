@@ -1,0 +1,18 @@
+Function: evaluate campaign current duel victory state, returning enum value 0-3. No APCS input (r0 overwritten by internal load at entry). First reads state_word at 0x0201e2a0+0x8a*4=0x0201e4a8; if equal to 8 checks sub_state at 0x0201e2a0+0x89*4=0x0201e4a4: 1->return 1 (player wins), 2->return 2 (opponent wins). Otherwise reads bit6 of byte at 0x02023360+0x36 (0x40 mask); if bit6 set loads 0x0201e2a0+0x89*4 and returns its value. If bit6 clear: reads gPrng+0x23f byte bits[7:1] as win_count, reads gPrng+0x240 byte bit0 as lock_bit; computes score = win_count * (lock_bit<<7 | win_count>>1) and checks sign to decide winner; further reads multiple challenge sub-states for combined judgment. Returns {0=draw/continue, 1=player_wins, 2=opp_wins, 3=undecided}.
+
+Side effects: no external writes (pure state read).
+
+Constants:
+- CAMPAIGN_CTX_BASE = 0x0201e2a0 // campaign EWRAM context
+- STATE_FIELD_OFFSET = 0x8a*4 = 0x228 // main state word
+- SUB_STATE_OFFSET = 0x89*4 = 0x224
+- PLAYER_STRUCT = 0x02023360
+- FLAG_BIT6_OFFSET = 0x36 // player struct flags
+- IWRAM_WIN_COUNT_OFFSET = 0x23f // gPrng+0x23f: win count byte
+- IWRAM_LOCK_OFFSET = 0x240 // gPrng+0x240: lock bit byte
+- CHALLENGE_OFFSET_A = 0x241 // gPrng+0x241
+- STATE_VAL_MATCH = 8 // trigger for sub_state check
+- RETURN_PLAYER_WIN = 1
+- RETURN_OPP_WIN = 2
+- RETURN_DRAW = 0
+- RETURN_UNKNOWN = 3

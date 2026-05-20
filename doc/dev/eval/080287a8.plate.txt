@@ -1,0 +1,12 @@
+Function: write 3 OAM entries for pack scene sprite strip. Reads gPrng+0x20c halfword bits[4:2] as 3-bit index (0..7), fetches corresponding tile_id halfword from ROM table 0x09e59d78 (r4); using r0=x_pos [0x1b..0x4c], r1=y_row [0x40..0x8a] as position params, loops 3 times (r6=2..0): calls write_oam_entry_from_packed_args(packed_xy, attr1=0x4080 (0x81<<7), tile_id+delta), each iteration tile_id advances +4, x advances +0x20. Exit pop {r0}; bx r0 (Sub-case E, void).
+
+Side effects:
+- OAM: write_oam_entry_from_packed_args x3 writes 3 sprite entries
+
+Constants:
+- ROM_TILE_TABLE = 0x09e59d78 // 8-entry halfword table, indexed by gPrng field
+- PRNG_FIELD_OFFSET = 0x20c // gPrng+0x20c, bits[4:2]
+- OAM_ATTR1 = 0x4080 (0x81<<7)
+- TILE_Y_DELTA = 0x1000 (0x80<<5)
+- X_STEP = 0x20
+- TILE_STEP = 4

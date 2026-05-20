@@ -1,0 +1,11 @@
+Function: PTR_FUN_08027ec0 jump table index 10 handler for campaign card select. Reads parent frame sp+0x11c for sprite_row descriptor address, writes attr0=4 (8x8 obj), attr1 (y=0x1ff), attr2=1 (tile_idx=1), then calls copy_bytes_by_halfword to copy 0x8c*2=0x118 bytes of prototype row data from 0x02001138 into sp+0x11c, then calls write_sprite_row_to_vram_buffer with tile_base_y=0x11e (0x8f<<1) to commit OBJ VRAM row write. No own push prologue; this is a parent-frame inline exit fragment that jumps to parent frame shared epilogue via b FUN_08028402.
+
+Side effects: OBJ VRAM written via write_sprite_row_to_vram_buffer.
+
+Constants:
+- SPRITE_ROW_ATTR0 = 0x4 // 8x8 mode
+- SPRITE_ROW_ATTR1 = 0xffff // y=ATTR1_HIDDEN sentinel
+- SPRITE_ROW_ATTR2 = 0x1 // tile index 1
+- PROTO_DATA_SRC = 0x02001138 // EWRAM sprite row template source
+- COPY_LEN_HW = 0x8c*2 = 0x118 bytes (0x8c halfwords)
+- TILE_BASE_Y = 0x11e (0x8f<<1)

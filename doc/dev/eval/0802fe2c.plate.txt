@@ -1,0 +1,9 @@
+Function: search equip chain at specified slot for a node matching value (with zone_entity constraint), return bool. r0=packed_player_id (bit0=side), r1=slot_index [0..11], r2=u16 value, r3=zone_entity constraint param. Reads chain_head_index halfword from gDuelFieldSlots+side*0x868+slot*20+0xa; calls find_node_by_value_zone_entity(head, value, zone_entity_param, r3); returns 1 if non-NULL found (hit), else returns 0 (miss). Sibling pair with get_node_entity_id_in_slot (0x0802fe60): the latter has indeg=33 and returns entity_id; this function returns bool. Exit pop{r1};bx r1 (Sub-case E, preserves r0).
+
+Side effects: no external writes (pure read).
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- slot_entry = 20 // 0x14 bytes per slot
+- chain_head_offset = 0xa // chain_head field offset within slot_entry

@@ -1,0 +1,7 @@
+Function: extract card_id from slot record pointer and validate equip placement legality. r0=u32* slot_record_ptr (points to slot data word, saved to r4). Reads [r4+0] (card_data word), extracts bits[12:0] (card_id via lsls #0x13; lsrs #0x13); calls check_card_has_equip_placement_type(card_id). If return 0 (no equip placement type) -> directly returns 1 (eligible/placeable); if non-zero -> further extracts bit14 of [r4+0] (lsls #0x11; lsrs #0x1f), returns that bit value (1=activated/equipable, 0=not activated). Exit pop{r1};bx r1 (Sub-case E, preserves r0). Called by FUN_0807d2e0 in Neo Daedalus group placement check chain to confirm whether target slot card accepts equip.
+
+Side effects: no external writes (pure read).
+
+Constants:
+- card_id_bits = bits[12:0] // lsls #19; lsrs #19 -> 13-bit card_id [0..0x1fff]
+- placement_bit = bit14 // lsls #0x11; lsrs #0x1f -> bit14 activation flag [0..1]

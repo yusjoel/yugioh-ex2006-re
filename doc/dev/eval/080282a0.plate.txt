@@ -1,0 +1,6 @@
+Function: PTR_FUN_08027ec0 jump table index 11 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp to get parent frame stack pointer; ldrh r0,[r0,#2] reads sp+2 halfword as hand_oam_slot_id; movs r1,#1; bl apply_delta_to_hand_oam_entry applies delta=+1 to hand OAM entry (scroll forward). Then b LAB_080282b6 to init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(0x8) shared tail before entering parent frame epilogue.
+
+Side effects: OAM hand entry y-offset modified via apply_delta_to_hand_oam_entry.
+
+Constants:
+- HAND_OAM_DELTA = 1 // apply_delta_to_hand_oam_entry r1 parameter

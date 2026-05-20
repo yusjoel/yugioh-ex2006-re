@@ -1,0 +1,6 @@
+Function: shared epilogue fragment for campaign card select parent frame. PTR_FUN_08027ec0[8] points directly here; all handler_10..15 also jump here via "b FUN_08028402". Entry sets r0=1 (frame processing done / tick done), then restores r8/r9/r10/r4/r5/r6/r7 callee-save values via pop/mov sequence, then pop {r1}; bx r1 returns (Sub-case E: return value in r0 unaffected by pop). Essentially the unified exit path for the parent frame (large switch-driven frame function).
+
+Side effects: none; restores calling-convention registers.
+
+Constants:
+- DONE_FLAG = 1 // r0 exit value, frame tick complete

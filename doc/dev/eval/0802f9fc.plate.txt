@@ -1,0 +1,14 @@
+Function: parse equip chain node and write to slot record. r0=packed_player_slot (bit0=side, bits[5:1]=source_slot), r1=u32 target_slot_index [0..11]. First calls find_equip_chain_pair_across_field(r0, r1) to get cross-field pairing result r7=result_halfword; in sp buffer (0x18 bytes, memset cleared) writes chain node fields: [buf+0] = card_data bits[12:0] (card_id) from gDuelFieldSlots+side*0x868+slot*20; [node+2] low bit = side, bits[5:1] = target_slot, clears other fields; [node+3] low bits = clear bits[5:4:2] (keeps bits[7:6] and [1:0]); [node+4] field bits[14:6] = combined card_data bit fields (bits[21:14] and bit[13] extracted then merged, mask=0xffff803f). Result check: if r7==0xffff (no pairing) -> calls check_slot_card_eligible_by_card_id(side, target_slot, card_id); if r7==0xc -> movs r0,#0 (return 0=ineligible); if r7==0xd -> calls check_equip_chain_type_d_node_exists(side, target_slot, source) and returns its result. Exit pop{r1};bx r1 (Sub-case E, preserves r0).
+
+Side effects:
+- [sp temporary buffer 0x18 bytes]: chain node data written (stack local, not external)
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868 // per-side field record step
+- slot_entry = 20 // 20 bytes per slot (0x14)
+- chain_head_offset = 0x0
+- CHAIN_MASK = 0xffff803f // [node+4] attr mask
+- RESULT_NO_PAIR = 0xffff // find_equip_chain_pair_across_field no-pair return value
+- RESULT_IMMEDIATE_FAIL = 0xc // directly return 0
+- RESULT_TYPE_D = 0xd // call check_equip_chain_type_d_node_exists

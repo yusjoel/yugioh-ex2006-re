@@ -1,0 +1,21 @@
+Function: pack selection screen VRAM/palette init (deck type A, internal key=0x2711). No APCS input. Entry immediately ldr r0, 0x2711 then calls find_deck_record_index_by_key, return value r0 is deck_record_index; subs r4,r4,r0 computes relative_deck_index (r4 at entry was already assigned 0 by adds r4,r0). Then based on relative_deck_index computes 5 ROM data pointers (r5=palette, r8/r9/r10=3 tile sets, r4=tilemap): step formula r5=idx*9*32 + ROM_PALETTE_A, others use similar multiplication. Executes: (1) zero_fill_by_halfword x2 clears OBJ VRAM 0x06000800/0x06001000; (2) upload_palette_rows_to_bg_vram(r5, 8); (3) clears PAL_RAM 0x05000000; (4) upload_indexed_tile_rows_to_obj_vram(r8, 0x10); (5) upload_tilemap_rows_with_offset(r8_offset, 1, 0x10, 0x1e); (6) upload_indexed_tile_rows_to_obj_vram(r9=ROM_TILES+0x88*2, 0x14); (7) upload_tilemap_rows_with_offset(r4=tilemap, 2, 0x110, 0x1e). Structure fully symmetric with init_pack_selection_tile_vram_default; difference is all ROM pointers computed dynamically from deck_record_index rather than fixed constants.
+
+Side effects:
+- VRAM 0x06000800 (0x1000 bytes): zero cleared
+- VRAM 0x06001000 (0x1000 bytes): zero cleared
+- BG palette: deck-specific palette (8 rows) uploaded
+- PAL_RAM 0x05000000: cleared to 0
+- OBJ VRAM: deck-specific tile data uploaded
+
+Constants:
+- DECK_KEY_A = 0x2711 // find_deck_record_index_by_key internal key (10001 decimal)
+- PALETTE_TABLE_A = 0x09a1a52c
+- TILEMAP_TABLE_A = 0x09a1dfac
+- TILEMAP_TABLE_B = 0x09a98dec
+- OBJ_VRAM_BASE_A = 0x06000800
+- OBJ_VRAM_BASE_B = 0x06001000
+- PAL_RAM_BASE = 0x05000000
+- PALETTE_ROWS = 8
+- TILE_ROWS_A = 0x10
+- TILE_ROWS_B = 0x14
+- TILEMAP_STRIDE = 0x1e

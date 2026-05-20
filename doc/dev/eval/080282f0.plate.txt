@@ -1,0 +1,16 @@
+Function: PTR_FUN_08027ec0 jump table index 14 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh sprite row; then iterates 0x7d (125) challenge records (r5 in [0..0x7c]) in three segments: expert [0..0x22], standard [0x23..0x4b], duel_puzzle [0x4c..0x7c]. For each challenge record reads completion status halfword[+8]; if 0x7 (completed), modifies ROM flag byte [r4+0] bits[1:0] via bit operations (also computes y-sprite scale offset written back to [r4+0]); if 0x4 (special state, only duel_puzzle segment), clears that field. Each iteration advances r10/r9/r8/r4 by 0xc bytes. After loop calls init_puzzle_wram_then_copy, then b FUN_08028402.
+
+Side effects: ROM flag table [r4+0] challenge completion status bits modified; init_puzzle_wram_then_copy side effects.
+
+Constants:
+- SPRITE_TYPE = 0x8
+- CHALLENGE_COUNT = 0x7d // 125 entries total
+- EXPERT_RANGE = [0..0x22] (35 entries)
+- STANDARD_RANGE = [0x23..0x4b] (41 entries)
+- PUZZLE_RANGE = [0x4c..0x7c] (49 entries)
+- COMPLETED_STATUS = 0x7 // halfword[+8] value meaning completed
+- SPECIAL_STATUS = 0x4 // puzzle special clear state
+- ENTRY_STRIDE = 0xc // r10/r9/r8/r4 step per iteration
+- EXPERT_BASE = 0x09e5e80c // challenge record array base (expert)
+- STANDARD_BASE = 0x09e5e620
+- PUZZLE_BASE = 0x09e5e9cc

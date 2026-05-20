@@ -1,0 +1,21 @@
+Function: initialize pack selection screen default VRAM/palette (generic path with no specified deck). No APCS input. Loads three fixed ROM data sets: ROM_PALETTE=0x09b97b28 (palette), ROM_TILES=0x09b97d68 (tile data), ROM_TILEMAP=0x09b9bd68 (tilemap data). Executes in order: (1) zero_fill_by_halfword clears OBJ VRAM 0x06000800 and 0x06001000 (each 0x800 halfwords = 0x1000 bytes); (2) upload_palette_rows_to_bg_vram(ROM_PALETTE, 8) uploads 8 palette rows; (3) writes 0 to PAL_RAM 0x05000000 (clears background color); (4) upload_indexed_tile_rows_to_obj_vram(ROM_TILES+0x2000, 0x10) uploads 16 OBJ tile rows; (5) upload_tilemap_rows_with_offset(ROM_TILEMAP, 1, 0x10, 0x1e) uploads tilemap rows; (6) repeats upload_indexed_tile_rows_to_obj_vram(ROM_TILES+0x88*2=0x110, 0x14 rows); (7) upload_tilemap_rows_with_offset(tilemap_offset, 2, 0x88*2, 0x1e). Exit pop {r0}; bx r0 (Sub-case E, void).
+
+Side effects:
+- VRAM 0x06000800 (0x1000 bytes): zero cleared
+- VRAM 0x06001000 (0x1000 bytes): zero cleared
+- BG palette: ROM_PALETTE (8 rows) uploaded
+- PAL_RAM 0x05000000: cleared to 0
+- OBJ VRAM: ROM_TILES data uploaded (16 + 20 rows)
+- BG tilemap: ROM_TILEMAP rows uploaded
+
+Constants:
+- ROM_PALETTE = 0x09b97b28
+- ROM_TILES = 0x09b97d68
+- ROM_TILEMAP = 0x09b9bd68 + 0x96*8 = 0x09b9c218
+- OBJ_VRAM_BASE_A = 0x06000800
+- OBJ_VRAM_BASE_B = 0x06001000
+- PAL_RAM_BASE = 0x05000000 (0xa0<<19)
+- PALETTE_ROWS = 8
+- TILE_ROWS_A = 0x10
+- TILE_ROWS_B = 0x14
+- TILEMAP_STRIDE = 0x1e

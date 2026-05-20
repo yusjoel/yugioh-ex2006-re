@@ -1,0 +1,14 @@
+Function: campaign card select screen text line renderer (aligned variant). Structure highly symmetric with render_campaign_text_line_centered (0x08028418); differences: uses setup_line_buf_with_font_and_align instead of setup_line_buf_pos_and_font (extra align=2, color=1 params); reads sp[0x2c] as bool_center (6th param, frame=0x28, sp[0x2c]=2nd stack arg), performs center offset calculation (calls count_bytes_until_null) only when bool_center!=0; when bool_center==0 skips centering and calls setup directly with r0=r8 (col_x). Reads sp[0x28] as text_str passed to text_render_wrapper. Remaining flow (style bits write / text_render_wrapper / zero_fill / commit_line_buffer_to_sprite_vram / tile write loop) identical to centered variant. Exit pop {r1}; bx r1 (Sub-case E).
+
+Side effects:
+- [0x02006ed0+8] := style bits
+- VRAM 0x06004000 + tile_offset: zero fill + text pixels + tile index
+
+Constants:
+- GAME_STATE_FLAG_BASE = 0x02000000
+- GAME_STATE_OFFSET = 0x6c2c
+- LINE_BUF_STYLE_PTR = 0x02006ed0
+- FONT_BASE_TABLE = font_jp_base_table
+- BG_VRAM_BASE = 0x06004000
+- ALIGN_PARAM = 2 // setup_line_buf_with_font_and_align r3 arg
+- COLOR_PARAM = 1 // setup_line_buf_with_font_and_align r2 arg

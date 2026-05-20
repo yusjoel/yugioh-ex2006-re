@@ -1,0 +1,8 @@
+Function: PTR_FUN_08027ec0 jump table index 13 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh player profile sprite row; then iterates hand OAM entry array (reads hand_count halfword from 0x095b7cca, calls apply_delta_to_hand_oam_entry(idx, delta=1) for each index in [0..hand_count), scrolling all hand OAM entry y-offsets); skips loop if hand_count==0. Finally b FUN_08028402 to parent frame shared epilogue.
+
+Side effects: all hand OAM entry y-offsets +1; build_campaign_sprite_row_by_type writes VRAM.
+
+Constants:
+- SPRITE_TYPE = 0x8 // build_campaign_sprite_row_by_type parameter
+- HAND_ARRAY_BASE = 0x095b7cca // ROM hand array head (count halfword at +0)
+- HAND_OAM_DELTA = 1

@@ -1,0 +1,11 @@
+Function: write up to 2 OAM entries for pack card grid (10-column layout). r0 is row base pointer (+6), r1 is column index (pack position packed), r2 is tile_base (u32, saved to r8), r3 is y offset (saved to r5, scaled <<6). Computes tile_base % 10 (column position) + y_scaled -> r2 (column coordinate); generates initial r2 from r9=0x188; calls write_oam_entry_from_packed_args to write 1st OAM sprite (r0=packed_pos, r1=r10=0x8000, r2=column_pos). Then computes tile_base / 10: if tile_base/10 == 0 jumps to end; otherwise ORs 0x3f with row_base+6 bit field (orrs r6,r7) then computes %10 for 2nd sprite column position, calls write_oam_entry_from_packed_args to write 2nd OAM sprite. Exit pop {r0}; bx r0 (Sub-case E, void).
+
+Side effects:
+- OAM: write_oam_entry_from_packed_args x1 or x2 writes pack grid sprites
+
+Constants:
+- COL_COUNT = 10 // __modsi3 / __divsi3 divisor = 10 columns
+- TILE_Y_SCALE = 0x40 (r5 <<= 6)
+- ATTR1_BASE = 0x8000 (0x80<<8) // saved to r10
+- COL_BASE_OFFSET = 0x188 (0xc4<<1) // column base offset saved to r9
+- ROW_ADJUST = 6 // r7 = r0+6 (row base offset)

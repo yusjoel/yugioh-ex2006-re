@@ -1,0 +1,25 @@
+Function: initialize pack scene VRAM and display state. No APCS input params (r0 overwritten by ldr gPrng at entry). Execution order: (1) write 0x601 to gPrng+0xba*2=gPrng+0x174 (display control value); (2) write 0 to DISPCNT=0x04000000 (disable display); (3) call reset_display_and_obj_vram (clear OBJ VRAM and display registers); (4) call store_ewram_ctx_ptr_and_clear_mode_flags (write EWRAM context pointer, clear mode flags); (5) write 4 halfwords consecutively to BG0CNT-BG3CNT (bg_ctrl[0..3]={0x4,0x105,0x206,0x307}); (6) call reset_all_bg_scroll_regs_and_shadows + upload_pack_vram_and_palette; (7) three zero_fill_by_halfword calls to clear 0x06004000/0x06010000 and another region (r4=0x8000 halfwords = 0x10000 bytes each call). Exit pop {r0}; bx r0 (Sub-case E, r0 overwritten by pop -> void).
+
+Side effects:
+- [gPrng+0x174] := 0x601
+- [DISPCNT=0x04000000] := 0
+- [BG0CNT=0x04000004] := 0x0004
+- [BG1CNT=0x04000006] := 0x0105
+- [BG2CNT=0x04000008] := 0x0206
+- [BG3CNT=0x0400000a] := 0x0307
+- VRAM 0x06004000 (0x10000 bytes): zero fill
+- VRAM 0x06010000 (0x10000 bytes): zero fill
+- EWRAM ctx ptr: via store_ewram_ctx_ptr_and_clear_mode_flags
+
+Constants:
+- DISPCNT = 0x04000000
+- BG0CNT = 0x04000004
+- PRNG_CTRL_FIELD_OFFSET = 0xba*2 = 0x174
+- PRNG_CTRL_VALUE = 0x601
+- BG0_CTRL = 0x0004 // BG0 priority 0, tile base 0
+- BG1_CTRL = 0x0105 // BG1 priority 1, tile base 1
+- BG2_CTRL = 0x0206 // BG2 priority 2, tile base 2
+- BG3_CTRL = 0x0307 // BG3 priority 3, tile base 3
+- VRAM_OBJ_BASE = 0x06004000
+- VRAM_BG_BASE = 0x06010000
+- ZERO_FILL_SIZE = 0x80<<8 = 0x8000 halfwords (= 0x10000 bytes per call)

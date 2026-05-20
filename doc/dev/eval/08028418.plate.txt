@@ -1,0 +1,16 @@
+Function: campaign card select screen text line renderer (centered variant). Accepts col/row coordinates (r0/r1), packed col_width/row_count (r2), style flags (r3), text pointer (sp[0x20]). First calls count_bytes_until_null to get string byte count, subtracts 3*strlen/2 from col_width to get horizontal center offset, calls setup_line_buf_pos_and_font(col_centered, row) to set font line buffer position and font; reads 0x02006c2c game flags bit0-2 to set style bits at line buffer byte [0x02006ed0+8] (bit0=bold/italic, bit1=underline); calls text_render_wrapper twice to render two text lines; calls zero_fill_by_halfword to clear target tile in BG VRAM 0x06004000 region, then commit_line_buffer_to_sprite_vram to commit; finally writes tile index into VRAM row (strh loop). Exit pop {r1}; bx r1 (Sub-case E).
+
+Side effects:
+- [0x02006ed0+8] := style bits (bold/italic/underline flags)
+- VRAM 0x06004000 + tile_offset: zero_fill_by_halfword clear
+- VRAM 0x06004000 area: commit_line_buffer_to_sprite_vram writes text pixels
+- VRAM BG tile row: strh loop writes tile index
+
+Constants:
+- GAME_STATE_FLAG_BASE = 0x02000000
+- GAME_STATE_OFFSET = 0x6c2c // 0x02000000+0x6c2c=0x02006c2c
+- LINE_BUF_STYLE_PTR = 0x02006ed0 // style flags at [+8]
+- FONT_BASE_TABLE = font_jp_base_table (0x09e5f854)
+- BG_VRAM_BASE = 0x06004000
+- BOLD_BIT = 0x2 // style bit1
+- CENTER_DIVISOR = 3 // strlen * 3 / 2 = center pixel estimate
