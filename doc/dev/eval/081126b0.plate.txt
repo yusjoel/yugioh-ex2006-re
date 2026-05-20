@@ -1,0 +1,11 @@
+Resolves file descriptor fd to corresponding standard stream FILE pointer or computed offset.
+Compares fd field (FILE+0xe, ldrsh 16-bit signed) of stdin/stdout/stderr in sequence; on match returns pointer stored at corresponding buffer address (stdin=0x0300577c / stdout=0x03005780 / stderr=0x03005784).
+If no match and fd differs from third entry by 0x20, returns adjusted value; unknown fd takes r0=r2-0x20 path.
+Called by _swiread / _read / _swiwrite / _write / _swilseek as fd-to-FILE mapping.
+
+Constants:
+- STDIN_PTR_LOC=0x0300577c (stdin FILE* storage address, IWRAM)
+- STDOUT_PTR_LOC=0x03005780 (stdout FILE* storage address, IWRAM)
+- STDERR_PTR_LOC=0x03005784 (stderr FILE* storage address, IWRAM)
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr)
+- FD_FIELD_OFFSET=0xe (fd field offset within FILE struct)

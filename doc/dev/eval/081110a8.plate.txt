@@ -1,0 +1,6 @@
+newlib stdio atexit cleanup entry: binds global reent ptr then calls _cleanup_r to flush and close all open stdio FILE buffers.
+Trigger: called back via atexit mechanism when process exits; registered as function pointer during __sinit (0x081110b8) stdio initialization.
+Side effects: forwarded to _cleanup_r -> flush all __sFILE write buffers, close non-standard streams.
+
+Constants:
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr, newlib global reent structure pointer)

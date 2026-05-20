@@ -1,0 +1,7 @@
+newlib/libgcc single-precision floating-point add/subtract core: receives two unpacked float component structs (r0=A, r1=B, r2=result), performs NaN/Inf/zero propagation checks, aligns mantissas (max 0x1f shift), executes 32-bit sub/add and normalizes, writes result components.
+Called by __addsf3 (0x08113cb4) and __subsf3 (0x08113ce0); both share this core after unpacking float.
+Single-precision version symmetric with exec_addsubdf3_core (0x08112e88) but operates on 32-bit mantissa (not 64-bit).
+
+Constants:
+- MAX_EXP_DIFF_SF=0x1f (exponent difference threshold; operand with smaller exponent is zeroed if exceeded)
+- MANTISSA_BOUND=0x3ffffffe (normalized mantissa upper bound)

@@ -1,0 +1,3 @@
+isatty stub that always returns 1: function body is only movs r0,#1; bx lr, declaring any fd as a terminal device.
+In GBA semihosting environment all fds are treated as interactive terminal; no actual device type detection needed.
+Called by __smakebuf (0x081113d8) to decide whether to enable line buffering.

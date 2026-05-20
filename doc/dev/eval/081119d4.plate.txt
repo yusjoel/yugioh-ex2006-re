@@ -1,0 +1,3 @@
+dlmalloc mutex stub (unlock): function body is bx lr only, performs no operation.
+Called after _free_r / _malloc_r / _malloc_trim_r / _realloc_r exits critical section; replaces real mutex release in single-threaded embedded environment.
+GBA has no RTOS context so unlocking is a no-op; paired with stub_malloc_lock (0x081119d0).

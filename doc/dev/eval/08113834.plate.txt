@@ -1,0 +1,3 @@
+GCC libgcc double-precision floating-point less-or-equal comparison (__ledf2): unpacks two doubles, checks NaN (returns +1 = unordered, does not satisfy <=); normal path calls __fpcmp_parts_d.
+GCC convention: <=0 = A<=B, positive = A>B or contains NaN.
+Called by _strtod_r using "cmp r0,#0; bgt label" pattern (result >0 = greater or unordered, branch taken).

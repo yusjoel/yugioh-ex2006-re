@@ -1,0 +1,3 @@
+GCC libgcc double-precision floating-point inequality comparison (__nedf2): structure identical to compare_double_eq (0x081136b8); unpacks two doubles, checks NaN (returns 1) or calls __fpcmp_parts_d.
+GCC __nedf2 convention: nonzero = not equal (same return value semantics as __eqdf2; caller uses beq/bne to distinguish purpose).
+This function has callgraph indeg=0 (not directly called by any function), no function pointer references; unused symbol (dead code) from compiler output.

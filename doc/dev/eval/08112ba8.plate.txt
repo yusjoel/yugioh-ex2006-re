@@ -1,0 +1,6 @@
+Retrieves newlib global reent structure pointer: double-dereferences _impure_ptr (0x09ed4d94) to obtain current thread's struct _reent*.
+Function body is only ldr/ldr/bx lr; helper for reading global _impure_ptr.
+Called by FUN_08112780 (semihosting heap init) to obtain reent structure.
+
+Constants:
+- IMPURE_PTR=0x09ed4d94 (_impure_ptr, address of newlib global reent structure pointer variable)

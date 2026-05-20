@@ -1,0 +1,7 @@
+newlib/libgcc double-precision floating-point add/subtract core: receives two unpacked double component structs (r0=operand A ptr, r1=operand B ptr, r2=result ptr), performs NaN/Inf/zero propagation checks, aligns mantissas by exponent difference (max 0x3f shift), executes 64-bit signed add/sub with carry and normalization, writes result components.
+Called by __adddf3 (0x081130f4) and __subdf3 (0x08113124); both share this core after unpacking.
+Exit LAB_081130e4 -> pop returns to caller.
+
+Constants:
+- MAX_EXP_DIFF=0x3f (exponent difference threshold; operand with smaller exponent is zeroed if exceeded)
+- EXP_BOUND=0x0fffffff (exponent overflow detection upper limit)

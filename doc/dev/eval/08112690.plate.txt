@@ -1,0 +1,8 @@
+Linear search in semihosting file handle table (IWRAM 0x03005788, 20 entries, 8 bytes each) for entry matching specified fd.
+Iterates index 0..19; returns matching index [0..19] if found, or 20 if not found.
+Called by _read / _write / _lseek / _close and similar semihosting I/O functions to map file descriptor to IWRAM handle slot.
+
+Constants:
+- HANDLE_TABLE=0x03005788 (semihosting handle table base, IWRAM)
+- MAX_HANDLES=20 (maximum handle count, 0x13+1)
+- ENTRY_STRIDE=8 (bytes per entry)

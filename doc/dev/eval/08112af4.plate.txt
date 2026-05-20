@@ -1,0 +1,6 @@
+newlib _write_r reentrant wrapper: clears EWRAM errno cache, then forwards r1=fd / r2=buf / r3=len to _write.
+If _write returns -1 and errno is nonzero, writes errno back to caller-provided r0 pointer.
+Called by __swrite (0x08112600) on semihosting write path; symmetric with wrap_read_r (0x08112c38).
+
+Constants:
+- ERRNO_CACHE=0x02029ea8 (newlib global errno staging address, EWRAM)

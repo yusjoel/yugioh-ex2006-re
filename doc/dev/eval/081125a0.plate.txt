@@ -1,0 +1,7 @@
+newlib _sbrk_r reentrant wrapper: clears global errno cache (EWRAM 0x02029ea8), then calls _sbrk(nbytes) to expand heap.
+If _sbrk returns -1 (failure) and errno is nonzero, writes errno back to caller-provided error-code pointer.
+Called by dlmalloc internals (0x081112d8 _malloc_trim_r / 0x081114b4 / 0x081113d8 __smakebuf) to request more memory from OS.
+
+Constants:
+- ERRNO_CACHE=0x02029ea8 (newlib global errno staging address, EWRAM)
+- SBRK_FAIL=-1 (0xFFFFFFFF, _sbrk failure return value)

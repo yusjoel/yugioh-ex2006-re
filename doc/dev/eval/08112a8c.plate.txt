@@ -1,0 +1,6 @@
+Semihosting close stub implementation: writes 0x2000 (signifying 0 bytes not transferred / close success) to [r1+4] of result struct, then returns 0 (success).
+In GBA semihosting environment, close has no real filesystem resources to release, so only writes sentinel value and returns success.
+Called by FUN_08112bb4 (_sclose wrapper path).
+
+Constants:
+- CLOSE_SENTINEL=0x2000 (0x80<<6; semihosting result struct "bytes not transferred" field set to 0)

@@ -1,0 +1,3 @@
+GCC libgcc double-precision floating-point greater-than comparison (__gtdf2): unpacks two doubles, checks NaN (executes rsbs -> returns -1 = unordered, not greater); normal path calls __fpcmp_parts_d.
+GCC convention: positive = A>B, zero or negative = A<=B or contains NaN.
+Called by _strtod_r using "cmp r0,#0; ble label" pattern (result <=0 = not greater, branch taken).

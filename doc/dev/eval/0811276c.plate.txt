@@ -1,0 +1,6 @@
+Issues ARM semihosting SVC 0xAB call for SYS_HEAPINFO (opcode 0x13) to query heap/stack layout reported by debug host.
+r0=0x13, r1=0 (no parameter block); after svc 0xab returns host-reported heap info pointer.
+Called by FUN_08112780 to initialize semihosting heap tracking structure.
+
+Constants:
+- SYS_HEAPINFO=0x13 (ARM semihosting opcode: query heap info)
