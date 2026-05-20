@@ -1,0 +1,4 @@
+GCC libgcc single-precision float greater-than comparison (__gtsf2): unpacks two floats (r0, r1), checks NaN; NaN path executes rsbs r0,r0,#0 -> returns -1 (unordered, does not satisfy >), normal path calls __fpcmp_parts_f.
+GCC __gtsf2 contract: positive = A>B, zero or negative = A<=B or NaN. Caller pattern: bl compare_float_gt; cmp r0,#0; ble not_greater.
+indeg=0 in static callgraph: grep ".word 0x08114101" asm/all.s -> no hits; dead code (compiler-generated __gtsf2 not directly called in this ROM).
+Symmetric with compare_double_gt (0x08113750); rsbs (NaN -> -1) is the key distinction from eq/ne/lt/le (which return +1 for NaN).

@@ -1,0 +1,4 @@
+GCC libgcc single-precision float equal comparison (__eqsf2): unpacks two floats (r0, r1) then checks NaN (kind > 1 -> returns 1 = not-equal), normal path calls __fpcmp_parts_f and returns comparison result.
+GCC __eqsf2 contract: 0 = A==B, nonzero = A!=B or NaN. Caller pattern: bl compare_float_eq; cmp r0,#0; bne not_equal.
+indeg=0 in static callgraph: grep ".word 0x08114071" asm/all.s -> no hits; dead code (compiler-generated __eqsf2 not directly called in this ROM).
+Symmetric with compare_double_eq (0x081136b8); differs only in precision (__unpack_f vs __unpack_d, __fpcmp_parts_f vs __fpcmp_parts_d, r0/r1 only).

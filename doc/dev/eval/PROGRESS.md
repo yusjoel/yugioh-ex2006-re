@@ -54,9 +54,9 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 字段 | 值 |
 |------|----|
 | **阶段** | Phase 2 — 全 ROM 就绪函数批量推进 |
-| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 760 + 剩余 6 (1 批 #117 / 末批 6) |
-| **下一批** | `#117` (6 fns, 单 sub-agent 串行, 最终批) |
-| **上次更新** | 2026-05-20 (Phase 2 batch #116 landing, 760/766 = 99.22%) |
+| **就绪函数集** | `doc/dev/eval/ready_batches.json` 锁定 766 函数 / 已完成 766 + 剩余 0 — **Phase 2 完结** |
+| **下一批** | — (Phase 2 完结, 766 函数全部 PASSED; 等待下一轮 ready 集合刷新) |
+| **上次更新** | 2026-05-20 (Phase 2 batch #117 FINAL landing, 766/766 = 100.00%) |
 | **callgraph_locked** | `true` (本阶段不刷新拓扑; 仅每完成完整 ready 轮次后才考虑刷新) |
 | **ready_locked** | `true` (766 集合不动态扩张) |
 
@@ -78,7 +78,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 ### Phase 2 进行中 (全 ROM 就绪函数)
 
-**760 / 766 已分析** (99.22%, 剩余 1 批待跑 #117)
+**766 / 766 已分析** (**100.00%**, Phase 2 完结 — batch #117 FINAL)
 
 里程碑 commits (40/批 4×10 并行阶段, 已结束):
 - batch #82 `fd44184` 40/766 (5.22%) — BIOS ISR + GL_Scrollbar cluster + name_input + font_jp ctx + sprite gfx
@@ -113,6 +113,7 @@ byte-identical 通过后自动 commit, 进入下一批。
 - batch #114 720/766 (93.99%) — sound engine high-reg restore exit fragment + min active channel priority scan + channel loop phase advance + engine request set/clear flag + channel bytes equal check + sprite entry+engine ptr init + channel vol/id write + channel playback slot init + active DMA slot flag count + freq slot DMA buf clear + freq slot buf large/small init + freq slot note byte/mask/volume-pitch set + engine bit0 flag set + pitch scale by rate + bios div remainder + bios checksum parity
 - batch #115 740/766 (96.61%) — SRAM IWRAM stub copy+init + invoke_rN trampoline cluster (r0/r1/r2/r3/r6/r7/r8/r10) + ignore_div_by_zero + svfscanf exit cluster (on_zero_match/with_count/restore_frame) + flush_stream_callback + restore_strtod_r_frame + strtod/strtol/strtoul + init_sfp_entry
 - batch #116 760/766 (99.22%) — newlib stdio cleanup + dlmalloc lock/unlock stubs + sbrk/write/read reentrant wrappers + semihosting handle search/resolve/heap query/close stub + global reent getter + isatty stub + addsubdf3/addsubsf3 cores + compare_double_{eq,ne,gt,ge,lt,le} cluster
+- batch #117 766/766 (**100.00%** FINAL) — compare_float_{eq,ne,gt,ge,lt,le} cluster (GCC libgcc __eqsf2/__nesf2/__gtsf2/__gesf2/__ltsf2/__lesf2; all indeg=0 dead code); Phase 2 完结: 36 批 (#82..#117) 全部 byte-identical (zero red-line failures); 766/766 就绪函数命名完成
 
 **模式切换** (2026-05-16): 后续 #85+ 切回 20/批 单 sub-agent 串行模式。
 
@@ -121,18 +122,18 @@ byte-identical 通过后自动 commit, 进入下一批。
 | 维度 | 数量 |
 |------|-----:|
 | 就绪函数总数 (锁定) | **766** |
-| - 已完成 (Phase 2 #82-#116) | 760 |
-| - 剩余 (按 20/批 重组) | 6 |
-| 剩余分批数 (20/批) | 1 (`#117`, 末批 6 fns) |
-| 末批大小 | 6 (#117) |
-| 剩余地址覆盖区段 | 0x08114070..0x081141d8 |
+| - 已完成 (Phase 2 #82-#117) | **766** |
+| - 剩余 | **0** |
+| 剩余分批数 | **0** (Phase 2 完结) |
+| 末批大小 | 6 (#117, FINAL) |
+| 剩余地址覆盖区段 | — |
 
 #### ROM 全局命名比例
 
 | 范围 | 已命名 | 未命名 (FUN_*) | 占比 |
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
-| **全 CSV** | **2760** | **886** | **75.70%** |
+| **全 CSV** | **2766** | **880** | **75.87%** |
 | ROM 总 callgraph 函数 | — | — | ~4539 |
 
 ---

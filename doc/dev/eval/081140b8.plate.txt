@@ -1,0 +1,3 @@
+GCC libgcc single-precision float not-equal comparison (__nesf2): same structure as compare_float_eq (0x08114070); unpacks two floats, checks NaN (kind > 1 -> returns 1), normal path calls __fpcmp_parts_f.
+GCC __nesf2 contract: nonzero = not-equal (semantically same return value as __eqsf2; caller uses beq/bne to select behavior).
+indeg=0 in static callgraph: grep ".word 0x081140b9" asm/all.s -> no hits; dead code (compiler-generated __nesf2 not directly called in this ROM).

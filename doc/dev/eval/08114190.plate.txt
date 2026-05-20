@@ -1,0 +1,4 @@
+GCC libgcc single-precision float less-than comparison (__ltsf2): unpacks two floats (r0, r1), checks NaN (kind > 1 -> returns +1 = unordered, does not satisfy <), normal path calls __fpcmp_parts_f.
+GCC __ltsf2 contract: negative = A<B, >=0 = A>=B or NaN. Caller pattern: bl compare_float_lt; cmp r0,#0; bge not_less.
+indeg=0 in static callgraph: grep ".word 0x08114191" asm/all.s -> no hits; dead code (compiler-generated __ltsf2 not directly called in this ROM).
+Symmetric with compare_double_lt (0x081137e8); NaN returns +1 (no rsbs); 5th of 6 float comparison functions.

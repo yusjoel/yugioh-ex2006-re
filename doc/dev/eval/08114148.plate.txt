@@ -1,0 +1,4 @@
+GCC libgcc single-precision float greater-or-equal comparison (__gesf2): unpacks two floats (r0, r1), checks NaN; NaN path executes rsbs r0,r0,#0 -> returns -1 (unordered, does not satisfy >=), normal path calls __fpcmp_parts_f.
+GCC __gesf2 contract: >=0 = A>=B, negative = A<B or NaN. Caller pattern: bl compare_float_ge; cmp r0,#0; blt not_ge.
+indeg=0 in static callgraph: grep ".word 0x08114149" asm/all.s -> no hits; dead code (compiler-generated __gesf2 not directly called in this ROM).
+Symmetric with compare_double_ge (0x0811379c); same rsbs NaN->-1 as compare_float_gt (0x08114100); 4th of 6 float comparison functions (eq/ne/gt/ge/lt/le order).
