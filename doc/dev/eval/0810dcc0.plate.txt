@@ -1,0 +1,9 @@
+Locates an entry in the IWRAM frequency slot array (0x03005608, stride 0x14=20 bytes) by r0 (slot_index [0..2]), loads data_ptr from [slot+0]. Returns immediately if data_ptr is null. Otherwise loops 8 times (r4: 0..7): uses DMA3 to transfer a zero-filled stack region (512 halfwords = 0x400 bytes) to data_ptr, advances data_ptr by 0x400 each iteration, clearing 0x2000 bytes total. Called by the sound engine main loop (0x0810bc10) during channel reset.
+
+Constants:
+FREQ_SLOT_BASE=0x03005608 (IWRAM frequency slot array base)
+SLOT_STRIDE=0x14 (20 bytes per entry)
+DMA3SAD=0x040000D4
+DMA_CNT=0x81000200 (bit15=enable, count=0x200 halfwords, 16-bit, src/dst increment)
+DMA_BLOCK=0x400 (bytes cleared per DMA transfer, 0x200 halfwords * 2)
+DMA_ITERS=8 (iterations 0..7, total 0x2000 bytes cleared)

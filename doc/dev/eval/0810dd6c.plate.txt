@@ -1,0 +1,7 @@
+Writes r0 (buf_ptr) to [0x03005608+0] as the frequency slot data pointer, writes 0 to both [+0x28] and [+0x14] (end_ptr cleared), then byte-loops to zero [buf_ptr..buf_ptr+0x1fff] (0x2000 = 8192 bytes). Small-buffer variant; large-buffer counterpart is 0x0810dd40 (init_freq_slot_buf_large). Called by FUN_0810b3f4 in the sound initialization path.
+
+Constants:
+FREQ_SLOT_BASE=0x03005608 (IWRAM frequency slot struct base)
+END_OFFSET_A=0x28 (end_ptr field A, written 0)
+END_OFFSET_B=0x14 (end_ptr field B, written 0)
+ZERO_COUNT=0x2000 (bytes zeroed, 0x1fff+1)

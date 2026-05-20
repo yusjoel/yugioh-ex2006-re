@@ -1,0 +1,7 @@
+Iterates the IWRAM frequency slot array (0x0300546c, stride 0x1c, 12 entries, indices 0..11), checking bit7 (0x80 mask) of [+0xe] byte in each entry. Increments counter when bit7 is set. Returns the count of slots with bit7 set. callgraph indeg=0. Called by the sound engine during allocation or decision paths to query the current number of active DMA slots.
+
+Constants:
+DMA_SLOT_BASE=0x0300546c (IWRAM DMA entry array base)
+SLOT_STRIDE=0x1c (bytes per entry)
+SLOT_COUNT=12 (indices 0..11)
+ACTIVE_MASK=0x80 (bit7 = active flag)

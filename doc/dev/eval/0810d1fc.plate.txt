@@ -1,0 +1,5 @@
+Calls FUN_0810d150 (r0=sprite_id) then writes r1 (engine_ptr) to [0x030050cc+0] (sound engine struct first word). Combines sprite initialization and engine pointer registration in one step. Triggered by sound engine internal allocation flow; callgraph has 1 callee (0x0810d150).
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+ENGINE_PTR_OFF=0x0 (engine_ptr storage offset, first word)

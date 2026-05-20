@@ -1,0 +1,7 @@
+Writes both channel volume and channel ID to the IWRAM sound engine struct (0x030050cc). r1 (volume) is clamped to [0..0x7f] then written to halfword [base+0x378] (0xde*4); r0 (channel_id) is written to halfword [base+0x37a]. callgraph indeg=0. Called by the sound engine request-processing path to configure current channel playback parameters.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+VOL_OFF=0x378 (0xde*4, volume halfword)
+ID_OFF=0x37a (channel_id halfword)
+VOL_MAX=0x7f (volume clamp upper bound)

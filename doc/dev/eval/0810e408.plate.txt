@@ -1,0 +1,6 @@
+Invokes BIOS SVC 0xd (BiosCheckSum), subtracts the official GBA BIOS checksum constant 0xbaae187f from the return value, then ANDs with 0x1 to extract bit0 parity. Returns 0 if BIOS is intact and unmodified; returns 1 otherwise. Used for runtime BIOS integrity verification. Called by FUN_080f4c14 (dma;sys;display region) during DMA / display system initialization.
+
+Constants:
+BIOS_CHECKSUM_SVC=SVC 0xd (BiosCheckSum)
+OFFICIAL_CRC=0xbaae187f (official GBA BIOS checksum constant)
+PARITY_MASK=0x1 (bit0 parity mask)

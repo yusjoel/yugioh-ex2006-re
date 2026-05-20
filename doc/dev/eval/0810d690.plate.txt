@@ -1,0 +1,9 @@
+Selects an instrument table pointer from one of three paths based on flags (r1), then uses the low 12 bits of r1 as instrument_index to look up that table, loads the instrument data pointer, and extracts playback parameters. Initializes all fields of the playback struct (r0, ~0x1c bytes per slot): clears [+0x13]/[+0x12], writes r2 to [+0xf], writes 0x3f to [+0x11]/[+0x10], writes flags & 0xefff to [+0xc] halfword. Then memcpys 10 words from ROM 0x084c76b0 to stack, checks [0x030050cc+0x38a] rate field, computes pitch scaled by rate and stores in [r0+8]. Returns channel flags byte (r3). Wrapped by FUN_0810d78c / FUN_0810d7a4.
+
+Constants:
+INSTRUMENT_TABLE_DEFAULT=0x081d7ea0 (main instrument ptr table)
+INSTRUMENT_TABLE_ALT=0x08114a90 (alternate instrument ptr table)
+PITCH_TABLE=0x084c4d28 (pitch LUT, halfword entries)
+RATE_TABLE=0x084c76b0 (rate coefficient table, 10 words)
+FLAGS_LOW12_MASK=0x0fff (instrument_index extraction mask)
+FLAGS_EFFF_MASK=0xffffefff (AND mask for [+0xc])

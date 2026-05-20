@@ -1,0 +1,8 @@
+Scans the 8 audio channel slots at IWRAM 0x03005408 (stride 0x28 bytes, 7+1 iterations). For each slot checks [+0x1f] bit7 (channel active flag); if active and [+0x24] byte < current minimum, updates the minimum. Initial minimum is 0x10. Returns the minimum [+0x24] priority value among all active channels. Called by FUN_0810cad0 (sound channel allocator) to determine the lowest-priority preemptable channel.
+
+Constants:
+CHANNEL_BASE=0x03005408 (sound channel array IWRAM base)
+CHANNEL_STRIDE=0x28 (bytes per channel slot)
+CHANNEL_COUNT=8 (r3=7 down to 0)
+ACTIVE_BIT=0x80 (bit7 of [+0x1f])
+PRIORITY_INIT=0x10 (initial minimum upper bound)

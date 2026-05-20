@@ -1,0 +1,4 @@
+Shared exit fragment of FUN_0810bc10 (sound engine main tick). Restores high registers r8/r9/r10 from callee-save slots r3/r4/r5, then unwinds the main frame (add sp,#0xe0) and pops low callee-save registers plus return address. FUN_0810bc10 enters this fragment via bl at two early-exit points (0x0810be3e / 0x0810bebc) and via fall-through at the end (0x0810ca1e). No independent parameters. No external address writes. pop {r0}; bx r0 is Sub-case E exit: r0 carries saved lr for jump; void return to original caller.
+
+Constants:
+FRAME_SIZE=0xe0 (FUN_0810bc10 local frame size, reclaimed by this fragment)

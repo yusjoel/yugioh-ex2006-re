@@ -1,0 +1,6 @@
+Compares two adjacent byte fields in the IWRAM sound engine struct (0x030050cc): [base+0x37f] (channel current playback position byte) vs [base+0x381] (request status byte). Returns 1 if equal, 0 otherwise. callgraph indeg=0; grep ".word 0x0810d129" asm/all.s no match; called at runtime via function pointer table (no static callgraph in-edges). Used to detect that channel state has synchronized with the request.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+FIELD_A=0x37f (byte A: channel playback position/flag)
+FIELD_B=0x381 (byte B: request status byte; same as DAT_0810d14c=0x37f+2=0x381)

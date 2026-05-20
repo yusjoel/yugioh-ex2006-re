@@ -1,0 +1,8 @@
+Writes an "enabled" request to the IWRAM sound engine struct (0x030050cc): ORs [base+0x364] (0xd9*4) halfword with 0x100 (sets bit8=request_pending flag), writes [base+0x381]:=0 (clears status byte), writes [base+0x380] (0xe0*4):=r0 (command byte). callgraph indeg=0. Symmetric counterpart to clear_sound_engine_request_flag (FUN_0810d0f4): d0f4 clears bit8 and writes 0x10 to status byte; d0c0 sets bit8 and clears status byte.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+STATUS_OFF=0x364 (0xd9*4, request halfword)
+REQUEST_PENDING_BIT=0x100 (bit8 of status halfword)
+STATE_OFF=0x381 (status byte, cleared to 0)
+CMD_OFF=0x380 (0xe0*4, command byte = r0)

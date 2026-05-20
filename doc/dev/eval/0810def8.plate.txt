@@ -1,0 +1,8 @@
+Scales r0 (raw_pitch) by the sound engine rate field and returns the result. Memcpys the 10-byte rate coefficient table (0x084c76b0) to the stack, reads [engine+0x38a] rate byte; if rate==0 returns raw_pitch unchanged. Otherwise uses rate*2 as offset into the stack table to load a halfword coefficient, multiplies by raw_pitch, logical-right-shifts 0xc (fixed-point 1/4096 scale), and returns the result. Called by snd_init_all_channels (0x0810c6a6) when initializing per-channel pitch.
+
+Constants:
+RATE_TABLE=0x084c76b0 (rate coefficient table, 10 bytes = 5 halfword entries)
+RATE_TABLE_LEN=0xa (memcpy byte count)
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+RATE_OFF=0x38a (engine+0x38a = rate byte field)
+PITCH_SHIFT=0xc (asrs #12, fixed-point divide by 4096)

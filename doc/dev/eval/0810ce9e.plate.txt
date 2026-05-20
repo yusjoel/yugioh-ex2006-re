@@ -1,0 +1,8 @@
+Internal continuation entry of FUN_0810cda0 (sound channel stop/switch function). r5=0x030050cc IWRAM engine base; r1=offset 0x38b. Reads [base+0x38b] byte (level counter): if >0 sets loop_active flag in the corresponding level's 0x20-byte control block ([r5+(level-1)*0x20+0x3e]:=1). Then advances playback pointers: next_ptr([+8]->[+4]), next_ptr2([+10]->[+0xc]) both advanced and original slots cleared; updates channel_id halfword and status halfword [+0x364] (or bit7, and ~0x5000). Entered via fall-through from FUN_0810cda0; callgraph indeg=0.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+LEVEL_OFFSET=0x38b (level counter byte offset)
+LOOP_CTRL_STRIDE=0x20 (loop control block size in bytes)
+LOOP_ACTIVE_OFF=0x3e (loop_active flag byte offset within control block)
+STATUS_OFF=0x364 (0xd9*4, channel status halfword offset)

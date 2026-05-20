@@ -1,0 +1,8 @@
+Locates an IWRAM frequency slot (0x03005608, stride 20 bytes) by r0 (slot_index [0..2]). If [slot+0] (data_ptr) is null: clears [+0xb] and [+0x10] then returns. Otherwise: writes r1 (note_byte) to [+0x10] only if it differs from the current value; if r2 (apply_flag) is nonzero, copies [+0x10] to [+0xb]; if slot_index==2 also writes [+0xb] to the preceding slot (slot_index=1 entry's [+0xb]). Called by the sound engine main loop and sequencer path to update note fields.
+
+Constants:
+FREQ_SLOT_BASE=0x03005608 (IWRAM frequency slot array base)
+SLOT_STRIDE=0x14 (20 bytes per entry)
+NOTE_CURR_OFF=0x10 (current note byte field)
+NOTE_PREV_OFF=0x0b (previous note byte field)
+SLOT_IDX_MAX=2 (slot_index upper bound; index==2 triggers cross-slot write)

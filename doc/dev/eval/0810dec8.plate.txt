@@ -1,0 +1,6 @@
+Sets bit0 (0x1) of [IWRAM sound engine struct (0x030050cc) base+0x364] (request status halfword). No parameters, no prologue push. Forms a bit-set sibling pair with FUN_0810deb0 (sets bit2=0x4); together with clear_sound_engine_request_flag (0x0810d0f4, AND 0xfeff) and set_sound_engine_request_with_flag (0x0810d0c0, OR 0x100), belongs to the [+0x364] field operation cluster. Called by FUN_080f9b24 (writes [0x0200af10]:=0xffff then triggers bit0) and FUN_080f9b58.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+STATUS_OFF=0x364 (0xd9*4, request status halfword)
+BIT0_MASK=0x1 (set mask)

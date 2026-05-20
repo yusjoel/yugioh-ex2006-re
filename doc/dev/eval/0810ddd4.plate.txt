@@ -1,0 +1,9 @@
+Locates an IWRAM frequency slot (0x03005608, stride 20 bytes) by r0 (slot_index [0..2]) and r1 (note_step [0..0xb]). Returns immediately if out of bounds. If data_ptr ([slot+0]) is null: clears [+0x4] and [+0xc] then returns. Otherwise: sets or clears bit (0xb-note_step)*2 in [slot+0xc] based on r2 (set_flag) using orrs/bics. If the field is nonzero after modification, also sets bit31 (all-active flag). Called by sound engine main loop and note dispatch path to control the note activation mask.
+
+Constants:
+FREQ_SLOT_BASE=0x03005608 (IWRAM frequency slot array base)
+SLOT_STRIDE=0x14 (20 bytes per entry)
+NOTE_MASK_OFF=0x0c (note activation mask word field)
+NOTE_STEP_MAX=0xb (note_step upper bound [0..11])
+SLOT_IDX_MAX=2 (slot_index upper bound [0..2])
+ALL_ACTIVE_BIT=0x80000000 (bit31=0x80<<0x17, at-least-one-note-active flag)

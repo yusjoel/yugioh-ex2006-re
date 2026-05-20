@@ -1,0 +1,4 @@
+Invokes BIOS SVC 0x6 (Div, r0/r1 inputs); BIOS writes quotient to r0 and remainder to r1. Then `adds r0,r1,#0` overwrites r0 with r1 (remainder) and returns the remainder. Sibling of bios_div (0x0810e3fc, returns quotient directly); bios_div preserves the quotient, this function discards it and returns the remainder. Heavily called (~33 callers) by scene_pack / card_image regions for modulo operations such as sprite row/column coordinate computation.
+
+Constants:
+BIOS_DIV=SVC 0x6 (Div: r0=numerator, r1=denominator -> r0=quotient, r1=remainder)

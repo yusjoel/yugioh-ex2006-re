@@ -1,0 +1,12 @@
+Locates an IWRAM frequency slot (0x03005608, stride 20 bytes) by r0 (slot_index [0..2]). If data_ptr is null: writes 0x7f to [+0x9] and [+0x11] then returns. Otherwise, if r2 (apply_flag) is nonzero, writes r1 (volume_byte) to [+0x11] and [+0x9]. Then loads the pitch LUT (0x084c7568), reads [engine+0x38a] (rate), computes pitch = PITCH_LUT[rate] * r1 >> 0xc (fixed-point scale), and writes to [+0x8]. Updates both volume and pitch fields. Called by sound engine main loop and sequencer when activating a slot.
+
+Constants:
+FREQ_SLOT_BASE=0x03005608 (IWRAM frequency slot array base)
+SLOT_STRIDE=0x14 (20 bytes per entry)
+VOL_OFF_A=0x9 (volume field A)
+VOL_OFF_B=0x11 (volume field B)
+PITCH_OFF=0x8 (pitch byte field)
+VOL_MAX=0x7f (default max volume for null-slot path)
+PITCH_LUT=0x084c7568 (pitch lookup table, halfword entries)
+RATE_OFF=0x38a (engine+0x38a = rate byte field)
+PITCH_SHIFT=0xc (asrs #12, fixed-point divide by 4096)
