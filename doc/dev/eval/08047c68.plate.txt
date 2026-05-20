@@ -1,0 +1,1 @@
+Minimal wrapper over update_equip_target_bitmap_for_field: fixed zone=0xd (zone_d), r3=0 (no extra flag), pass-through r0/r1. pop{r1};bx r1 void exit. indeg=0. Sibling pair with 0x08047ef0 (zone=0xe, flag=0). Constants: ZONE_D=0xd, FLAG=0.

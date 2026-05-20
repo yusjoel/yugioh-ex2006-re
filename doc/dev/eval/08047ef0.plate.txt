@@ -1,0 +1,1 @@
+Minimal wrapper over update_equip_target_bitmap_for_field: fixed zone=0xe, r3=0 (no extra flag), pass-through r0/r1. pop{r1};bx r1 void exit. indeg=3, called by three field rendering functions FUN_080584cc / FUN_080777d8 / FUN_0807c474. Sibling pair with 0x08047c68 (zone=0xd). Constants: ZONE_E=0xe, FLAG=0.

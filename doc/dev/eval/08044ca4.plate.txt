@@ -1,0 +1,1 @@
+Select attr0 base by player_id (P1: 0x29, P2: 0x8029), truncate r1 to 16 bits, call enqueue_sprite_attr_record(attr0, r1_u16, 0, 0). Fixed row_type=0x29, attr2=0, attr3=0. Called by FUN_0807c388 in equip/effect activation state machine case=0x7d path, to enqueue fixed-row-0x29 sprite attribute record. pop{r0};bx r0 void exit. Constants: OAM_P1_ATTR0=0x29, OAM_P2_ATTR0=0x8029.
