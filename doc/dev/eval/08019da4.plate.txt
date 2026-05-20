@@ -1,0 +1,6 @@
+Function: Iterates a password string and renders in grid layout; every 5 characters increments column offset r8 (mod5==0 and not first char), calls banlist_password_enter_char + advance_text_ptr_by_charlen + dispatch_text_render_by_mode_banlist(mode=0) per character. Differs from render_banlist_password_chars_row in using __modsi3(counter,5) for 5-char column wrap and mode=0 instead of mode=7.
+Callers: FUN_08019f24 (banlist;font_jp;settings) and FUN_08019f78 (same tags), both grid render of password input.
+Side effects: updates *[sp+0xc] text pointer; writes OAM/VRAM via dispatch_text_render_by_mode_banlist.
+Constants:
+  COL_STRIDE = 0x5 // characters per column (mod5 triggers column increment)
+  RENDER_MODE = 0x0 // dispatch mode code (contrast: row variant uses 0x7)

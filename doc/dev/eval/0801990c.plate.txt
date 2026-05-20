@@ -1,0 +1,5 @@
+Function: Appends src string to dest buffer with column-width alignment padding. Computes charlen(src) mod col_width; if nonzero, fills spaces (0x20) up to alignment boundary then writes NUL terminator, then calls append_text_to_buf_charlen to append src.
+Callers: FUN_08019964 (banlist;game_str;pass_input;settings) builds password row text; FUN_080199fc (text_input;banlist;game_str;settings) aligns input text; FUN_08019a58 (banlist;font_jp;settings) aligns before font render.
+Side effects: writes to dest_buf [r3] - space-padding region and NUL terminator.
+Constants:
+  SPACE_CHAR = 0x20 // ASCII space, padding character

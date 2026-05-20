@@ -1,0 +1,5 @@
+Function: Reads the banlist scrollbar current value (get_scrollbar_cur_value), multiplies by 15 (v*16-v) to convert to pixel offset, and returns. Used by 5 upper-layer functions to compute BG scroll register write positions; core shared utility for banlist scroll list Y-direction offset calculation. indeg=5 high-frequency access.
+Side effects: none (read-only).
+Constants:
+  SCROLLBAR_OFFSET = 0x64c // gBanlistPasswordBuffer scrollbar struct offset
+  PIXELS_PER_UNIT = 0xf = 15 // pixels per scroll unit (v<<4 - v)

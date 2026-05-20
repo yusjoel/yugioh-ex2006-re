@@ -1,0 +1,10 @@
+Function: Locates a character from the password candidate character table using cursor slot info and writes it to the destination buffer via banlist_password_enter_char. Extracts bits[5:2] (4-bit slot index) from gBanlistPasswordBuffer+0x661, multiplies by 15 to compute primary offset, then reads column offset from gBanlistPasswordBuffer+0x660 halfword bits[9:6] and adds it; uses advance_text_ptr_by_charlen to locate target character in candidate string. If candidate is space and global mode flag (gPrng+0x6c2c bits[2:0]) is 0, uses alternate character string address. Called by FUN_0801aa54 when user selects a character.
+Side effects: [r0] (dest_char_buf) written via banlist_password_enter_char with selected character.
+Constants:
+  CURSOR_SLOT_OFFSET = 0x661 // gBanlistPasswordBuffer cursor slot byte
+  CURSOR_COL_OFFSET = 0x660 // gBanlistPasswordBuffer cursor halfword
+  SLOT_STRIDE = 0xf = 15 // 15 characters per slot (bits[5:2]*15)
+  SPACE_CHAR = 0x20 // ASCII space, detect empty character
+  MODE_FLAGS_PTR = 0x02006c2c // global mode flags address
+  ALT_CHAR_TABLE = 0x09e3c040 // alternate character table pointer (ROM)
+  CHAR_TABLE = 0x09e3bcb1 // primary character table pointer (ROM)

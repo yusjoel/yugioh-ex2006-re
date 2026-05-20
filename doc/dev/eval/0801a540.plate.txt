@@ -1,0 +1,5 @@
+Function: Passthrough wrapper for tick_banlist_card_slot_anim_oam. Fetches 5th and 6th caller stack arguments ([sp+0x1c] and [sp+0x20]) into local stack, appends fixed arguments 0 and 1, then forwards r0-r3 unchanged to tick_banlist_card_slot_anim_oam. Called by 4 upper frame-update functions to uniformly drive card slot OAM animation across different scene states.
+Side effects: fully forwarded to tick_banlist_card_slot_anim_oam (OAM attr update).
+Constants:
+  FIXED_ARG6 = 0x0 // appended fixed arg: animation flag set to 0
+  FIXED_ARG7 = 0x1 // appended fixed arg: enable flag set to 1

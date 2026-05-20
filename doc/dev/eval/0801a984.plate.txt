@@ -1,0 +1,10 @@
+Function: Clears the tile buffer column range before rendering, then renders banlist text to the specified column position. Column index is adjusted via __divsi3(col_idx,5)+col_idx then multiplied by 12 to obtain tile column start; reads font height multiplier from gBanlistPasswordBuffer+0x663; calls init_font_jp_ctx_bg2_char_vram to init BG2 char VRAM context; calls clear_tile_buf_col_range to clear target column; if text is non-null calls dispatch_text_render_by_mode_banlist(mode=7) to render. Called by 3 callers during banlist password input text update.
+Side effects:
+- tile buf col [col_tile..col_tile+width]: clear_tile_buf_col_range zeroed
+- BG2 char VRAM: init_font_jp_ctx_bg2_char_vram context initialised
+- OAM/VRAM: dispatch_text_render_by_mode_banlist conditional render (if [r7] != 0)
+Constants:
+  COL_DIV = 0x5 // column index divisor (every 5 password chars = 1 display column)
+  TILE_COL_STRIDE = 0xc = 12 // each column spans 12 tile-width units
+  FONT_SCALE_OFFSET = 0x663 // gBanlistPasswordBuffer font scale byte offset
+  RENDER_MODE = 0x7 // dispatch_text_render_by_mode_banlist mode

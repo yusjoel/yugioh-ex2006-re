@@ -1,0 +1,5 @@
+Function: Reads the signed byte at gBanlistPasswordBuffer+0x666 and returns it as a signed 8-bit integer representing the current background scroll direction. Caller FUN_0801af70 uses this value to decide whether to invoke tick_banlist_bg_scroll_step.
+Side effects: no external writes.
+Constants:
+  SCROLL_DIR_OFFSET = 0x666 // byte offset within gBanlistPasswordBuffer for scroll direction
+  // value semantics: -1=scroll up, 0=stopped, +1=scroll down (signed int8)

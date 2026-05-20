@@ -1,0 +1,5 @@
+Function: Calls advance_scrollbar_pos_one on the banlist scrollbar (gBanlistPasswordBuffer+0x64c) 4 times consecutively to implement page-forward stepping. Triggered by FUN_0801ae0c when the user presses the page-forward key.
+Side effects: gBanlistPasswordBuffer+0x64c scrollbar position advanced 4 steps.
+Constants:
+  PAGE_STEPS = 0x3 // loop count (r4 decrements from 3 to 0 = 4 iterations)
+  SCROLLBAR_OFFSET = 0x64c // gBanlistPasswordBuffer scrollbar offset

@@ -1,0 +1,6 @@
+Function: Iterates a password string and renders each character via banlist_password_enter_char into an intermediate buffer, then calls dispatch_text_render_by_mode_banlist(mode=7) to render to OAM row. Processes at most max_chars characters.
+Callers: FUN_08019d14 (scene_pass_input;banlist;font_jp;settings) first render of password row.
+Side effects: writes OAM/VRAM via dispatch_text_render_by_mode_banlist (banlist sprite character slots); updates *r0 text pointer (advanced by advance_text_ptr_by_charlen).
+Constants:
+  MAX_CHARS = [sp+0x2c] // 5th stack arg, maximum character count
+  RENDER_MODE = 0x7 // dispatch_text_render_by_mode_banlist mode code

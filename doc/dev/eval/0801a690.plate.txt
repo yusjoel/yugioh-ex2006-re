@@ -1,0 +1,4 @@
+Function: Passthrough wrapper for setup_banlist_sprite_oam_row_batch, specialised for FUN_0801b284 (banlist frame initialisation) scene. Fetches 5th/6th/7th caller stack arguments (offsets 0x28/0x2c/0x30), forwards them to callee stack positions [0..2], and appends 3 fixed zero values at [3..5]. Forwards r0-r3 unchanged.
+Side effects: forwarded to setup_banlist_sprite_oam_row_batch (OAM construction).
+Constants:
+  FIXED_ARG7_9 = 0x0 // three appended fixed zeros (clear subsequent OAM attributes)

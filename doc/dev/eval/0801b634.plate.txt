@@ -1,0 +1,8 @@
+Function: banlist scene frame-level input dispatcher. Reads handler index from gPrng+0x204 halfword bits[13:6]; fetches corresponding handler function from pointer table 0x09e58994; if pointer is null returns 0 (no more handlers). Calls invoke_r1(fn_ptr); if nonzero result writes (index+1) mod 256 back to bits[13:6], then calls return_void_handler and returns 0. callgraph has no direct bl callers (called indirectly via table by 0x08019660/0x0801a328/0x0801b5d8 scene dispatch tables).
+Side effects:
+- [gPrng+0x204] bits[13:6]: handler index advanced (incremented when invoke returns nonzero)
+Constants:
+  HANDLER_TABLE = 0x09e58994 // banlist handler function pointer table (ROM)
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 // gPrng dispatch field offset
+  HANDLER_IDX_BITS = bits[13:6] // 8-bit index field within halfword
+  HANDLER_IDX_MASK = 0xffffc03f // mask to clear bits[13:6]

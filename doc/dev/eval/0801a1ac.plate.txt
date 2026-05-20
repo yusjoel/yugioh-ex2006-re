@@ -1,0 +1,9 @@
+Function: banlist background scroll animation per-frame step handler. Reads gBanlistPasswordBuffer+0x666 (scroll direction: -1=up/+1=down/0=stopped); if nonzero, decrements direction one step toward 0 and computes corresponding pixel offset (step_nibble*56 +/- 56), then calls write_banlist_bg2_scroll_regs_biased and write_banlist_bg3_vofs_with_bias to update BG2/BG3 scroll registers. Called each frame by frame-update functions (0x08019fe4 / 0x0801b5d8).
+Side effects:
+- [gBanlistPasswordBuffer+0x666] := direction-1 (decrements toward 0, zeroed on scroll completion)
+- BG2/BG3 scroll registers: updated via write_banlist_bg2_scroll_regs_biased / write_banlist_bg3_vofs_with_bias
+Constants:
+  SCROLL_DIR_OFFSET = 0x666 // scroll direction byte
+  SCROLL_STEP_OFFSET = 0x663 // low nibble = current step intra-pixel phase
+  PIXEL_PER_STEP = 0x38 = 56 // pixels per scroll step
+  WRAP_MODULO = 0xff = 255 // __modsi3 mod 255 for pixel offset wrap

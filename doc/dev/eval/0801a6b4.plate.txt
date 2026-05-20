@@ -1,0 +1,7 @@
+Function: Establishes a JP font OBJ VRAM row context for banlist password character rendering, then calls dispatch_text_render_by_mode_banlist(mode=7) to render characters. Entry r0 is saved as the text/character data pointer (passed as first arg to dispatch); r1-r3 and [sp+0x10] are rearranged for setup_font_jp_ctx_obj_vram_row_banlist to complete context init, then dispatch is called with fixed args (x=1, y=1, mode=7, sp[0]=8, sp[4]=0x80).
+Callers: FUN_08019b4c (banlist;font_jp;game_str;settings) during first password row render; FUN_0801b368 for batch character row refresh during banlist frame update.
+Side effects: OBJ VRAM configured via setup_font_jp_ctx_obj_vram_row_banlist; OAM/tile written via dispatch_text_render_by_mode_banlist.
+Constants:
+  RENDER_MODE = 0x7 // banlist text render mode code
+  FONT_CTX_ARG0 = 0x8 // dispatch stack arg [sp+0]
+  FONT_CTX_ARG1 = 0x80 // dispatch stack arg [sp+4]

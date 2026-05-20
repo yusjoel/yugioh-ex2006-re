@@ -1,0 +1,7 @@
+Function: Calls tick_palette_fade_to_oam_palram with fixed banlist palette parameters. Fade target is OAM palette RAM (0x05000202); source data from gBanlistPasswordBuffer+0x630 (palette snapshot); reference data from gBanlistPasswordBuffer+0x676; step count 2. Called each frame by FUN_0801b1a0 during banlist scene frame update.
+Side effects: OAM palette RAM [0x05000202..]: tick_palette_fade_to_oam_palram writes faded palette data.
+Constants:
+  PAL_SNAPSHOT_OFFSET = 0xc6<<3 = 0x630 // gBanlistPasswordBuffer palette snapshot offset
+  OAM_PALRAM_BASE = 0x05000202 // OAM palette RAM write target address
+  PAL_REF_OFFSET = 0x676 // gBanlistPasswordBuffer reference palette offset
+  FADE_STEPS = 0x2 // fade steps per frame

@@ -1,0 +1,11 @@
+Function: Fetches game string ID 0x1037 (banlist category title), initialises JP font render context (height 24, format 2), computes string centre offset, calls dispatch_text_render_by_mode_banlist(mode=3) to render the title to background, then calls fill_tilemap_rect_with_palette to fill a BG0 background rectangle. Called by FUN_0801a328 (banlist;font_jp;fs;game_str;pass_input;settings) during banlist scene initialisation.
+Side effects:
+- VRAM/BG0 tilemap: fill_tilemap_rect_with_palette writes BG0 rectangle region
+- font JP context: init_font_jp_render_context initialised + strb sets font flag bit
+Constants:
+  GAME_STR_ID = 0x1037 = 4151 // banlist title string ID
+  FONT_HEIGHT = 0x18 = 24 // JP font render height
+  FONT_FORMAT = 0x2 // init_font_jp_render_context format parameter
+  TILE_RECT_W = 0x18 = 24 // fill_tilemap_rect width (tiles)
+  TILE_RECT_H = 0x2 // fill_tilemap_rect height (tiles)
+  TILE_RECT_PAL = 0x114 = 0x8a<<1 // fill_tilemap_rect palette/tile parameter

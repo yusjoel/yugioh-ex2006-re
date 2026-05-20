@@ -1,0 +1,8 @@
+Function: Checks banlist state-machine mode equals 0xe(14), gPrng+0x148 bit0 trigger flag is set, and cursor slot (gBanlistPasswordBuffer+0x661 bits[5:2]) is in [0..5]; then dispatches to the corresponding cursor action handler via jump table (6 entries). Jump table at 0x0801ad00 contains 6 handlers for different password input modes (letter/digit/symbol selection etc.). Called by FUN_0801af70 each frame to detect and trigger cursor action.
+Side effects: jumps to table[cursor_slot] handler (each handler has its own side effects); if condition unmet jumps to LAB_0801ae04 (nop path).
+Constants:
+  REQUIRED_MODE = 0xe = 14 // target state-machine mode to trigger dispatch
+  CURSOR_SLOT_MASK = bits[5:2] // gBanlistPasswordBuffer+0x661 slot field
+  SLOT_RANGE = [0..5] // jump table valid range (6 entries)
+  OAM_HALFWORD_OFFSET = 0xa4<<1 = 0x148 // gPrng+0x148 (bit0 = trigger flag)
+  JUMP_TABLE = 0x0801ad00 // 6-case jump table base address

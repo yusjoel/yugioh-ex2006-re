@@ -1,0 +1,5 @@
+Function: Calls retreat_scrollbar_pos_one on the banlist scrollbar (gBanlistPasswordBuffer+0x64c) 4 times consecutively to implement page-backward stepping. Symmetric counterpart to advance_banlist_scrollbar_pos_page. Triggered by FUN_0801aec8 when the user presses the reverse page key.
+Side effects: gBanlistPasswordBuffer+0x64c scrollbar position retreated 4 steps.
+Constants:
+  PAGE_STEPS = 0x3 // loop count (4 iterations)
+  SCROLLBAR_OFFSET = 0x64c // gBanlistPasswordBuffer scrollbar offset

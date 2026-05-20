@@ -1,0 +1,9 @@
+Function: Initialises the banlist list scrollbar OAM entry with fixed parameters. Fixed scrollbar struct address is gBanlistPasswordBuffer+0x64c, x position 226, height 14, and multiple fixed style parameters. Caller r0 is passed as the vertical offset into init_scrollbar_oam_entry 5th stack argument. Called by FUN_08019e2c (scene_pass_input) during banlist scene initialisation.
+Side effects: scrollbar struct at gBanlistPasswordBuffer+0x64c initialised via init_scrollbar_oam_entry; OAM entry written.
+Constants:
+  SCROLLBAR_OFFSET = 0x64c // scrollbar struct offset within gBanlistPasswordBuffer
+  SCROLLBAR_X = 0xe2 = 226 // scrollbar OAM x coordinate (pixels)
+  SCROLLBAR_H = 0xe = 14 // scrollbar height parameter
+  SCROLLBAR_ROWS = 0x39 = 57 // scrollbar total row height (pixels)
+  SCROLLBAR_W = 0x4 // scrollbar width parameter
+  SCROLLBAR_STYLE = 0x6 // style/colour parameter
