@@ -1,0 +1,14 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Steps: (1) Read [r0+2] bit0 = equipping_card side; reject if == r1 (player_id) (same side). (2) Compute target slot addr gDuelFieldSlots[r1&1][r2] (base=0x0201c510, stride=0x868, entry=0x14); check bit19 != 0 (occupied) and [slot+8] != 0 (equip chain present). (3) Verify [slot+0x14] owner/slot_idx vs r1/r2 via bit extracts (lsls<<22, lsrs>>31 for owner; lsls<<18, lsrs>>28 for slot_idx). (4) call check_zone_slot_equip_prerequisites + query_slot_card_type_eligibility. (5) Filter slot type field: (0xfc0 & [r6+2]) must be 0x180 or 0x1c0. (6) BST on equipping card_id [r6+0]: 0x1250 -> get_slot_field5_score; 0x124f (House of Adhesive Tape) -> get_slot_field6_score; 0x12e4 (Trap Hole) -> get_slot_field5_score with threshold 0x3e7. Pure read-only predicate, no external writes.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14 (= slot_idx*5*4)
+- SLOT_IDX_MAX = 4
+- slot_type_mask = 0xfc0
+- SLOT_TYPE_A = 0x180
+- SLOT_TYPE_B = 0x1c0
+- CARD_ID_house_of_adhesive_tape = 0x124f
+- CARD_ID_unknown_0x1250 = 0x1250 (not in data.md)
+- CARD_ID_trap_hole = 0x12e4
+- field_score_threshold = 0x3e7

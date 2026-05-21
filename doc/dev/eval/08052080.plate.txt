@@ -1,0 +1,13 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Chain filter: (1) cmp r4,#4 -> if <=4: compute slot addr, check bit19 occupancy + [r6+2] bit0 vs r5 (same side -> reject) + [slot+8]!=0. (2) check_zone_slot_equip_prerequisites. (3) check_slot_equip_whitelist_with_monster_space(r5, r4, card_id=[r6+0]). (4) query_slot_card_type_eligibility (nonzero -> reject). (5) get_slot_card_state_code(r5, r4), extract low 16 bits (r2); BST on equipping card_id [r6+0]: 0x13b0 -> state must be 3; 0x14cd (Shadow Tamer) -> state must be 7; 0x14ce (Dragon Manipulator) -> state must be 1; else return 1. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- CARD_ID_unknown_0x13b0 = 0x13b0 (between 0x13AC Souleater and 0x13B1 Timeater in data.md)
+- CARD_ID_shadow_tamer = 0x14cd
+- CARD_ID_dragon_manipulator = 0x14ce
+- STATE_CODE_shadow_tamer = 7
+- STATE_CODE_dragon_manipulator = 1
+- STATE_CODE_unknown_0x13b0 = 3

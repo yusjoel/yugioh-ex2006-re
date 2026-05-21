@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Sequence: (1) cmp r4,#4; bgt skips whitelist -> if r4<=4 call check_slot_card_is_equip_whitelist; reject on failure. (2) Read [r7+2] bit0 = equipping_card side, compare to r6 (player_id); reject if equal (same side). (3) Compute target slot addr, read full word bits[18:0] for occupancy (reject if 0), read [slot+8] for chain head (reject if 0). (4) check_zone_slot_equip_prerequisites. (5) query_slot_card_type_eligibility (nonzero -> reject). (6) Read [slot+6] halfword: if == 0 return 1 (slot available/unequipped), else return 0. Exit: pop{r1}; bx r1 (Sub-case E).
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- unequipped_field_offset = 0x6 ([slot+6]==0 means slot is unequipped/available)

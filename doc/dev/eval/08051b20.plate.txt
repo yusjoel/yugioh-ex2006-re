@@ -1,0 +1,9 @@
+Equip slot eligibility predicate, called by FUN_08053704 (tags: duel_field) and FUN_08054118 (indeg=2). Sequence: (1) cmp r4,#4; bgt skips whitelist -> if r4<=4 call check_slot_card_is_equip_whitelist(r5,r4); reject on failure. (2) Compute gDuelFieldSlots[r5&1][r4] slot addr, read full word, check bit19 occupancy (reject if 0). (3) Extract target slot set_code_a (bits[29:22]<<1 | bit14) and compare to equipping card [r6+4] bits[14:8]; reject if equal (same set-code cannot equip each other). (4) check_zone_slot_equip_prerequisites(r6,r5,r4). (5) check_card_equip_eligible_for_slot(r6,r5,r4,r3=1). Return 1 if all pass, 0 on failure. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- set_code_extract: slot_word bits[29:22]<<1 | bit14
+- equip_slot_setcode_bits: [r6+4] bits[14:8] (lsls<<17; lsrs>>23)

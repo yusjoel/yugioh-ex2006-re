@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Unlike pure gDuelFieldSlots functions, also reads IWRAM duel context at 0x0201bb90. Sequence: (1) sub sp,#4 (local stack frame); cmp r5,#4; bgt reject. (2) Read [r3+2] bit0 (equipping card side) vs r4; reject if not equal (bne fail = same side required). (3) check_zone_slot_equip_prerequisites(r3,r4,r5). (4) Read duel ctx [0x0201bb90+4]=current_player, [0x0201bb90+0x20]=current_slot; if current_player==r4 AND current_slot==r5 then return 0 (slot already in use by active activation). (5) Otherwise call eval_slot_activation_eligibility_full([r2+0], [r2+0x1c], 0, r4, r5). Return value passthrough. Exit: add sp,#4; pop{r1};bx r1.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510 (via check_zone_slot_equip_prerequisites)
+- SLOT_IDX_MAX = 4
+- duel_ctx_base = 0x0201bb90
+- duel_ctx_current_player_offset = 0x4
+- duel_ctx_current_slot_offset = 0x20

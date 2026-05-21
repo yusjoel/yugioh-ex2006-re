@@ -1,0 +1,10 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Only accepts slot_idx in range [5..10] (subs r0,r3,#5; cmp r0,#5; bhi LAB = reject if (slot_idx-5) > 5). Sequence: (1) Range check pass; compute slot addr. (2) Read full word bits[18:0] (r1=slot_card_id; reject if 0). (3) [slot+8]!=0 check (0 -> reject). (4) get_card_extended_stat_field6(r1=card_id) == 0x17 -> reject (beq LAB -- field6==0x17 cards not eligible). (5) Extract target slot set_code_a: [slot+0] bits[29:22]<<1 | bit14; compare to equipping card [r5+4] bits[14:8]; if set_codes differ -> return 1 (pass); if equal -> reject (beq LAB_0805272c -> return 0). Note: same set_code rejects. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_RANGE = [5..10]
+- FIELD6_EXCLUDED = 0x17 (field6==0x17 cards rejected)
+- setcode_extract: bits[29:22]<<1 | bit14
+- equip_setcode: [r5+4] bits[14:8]

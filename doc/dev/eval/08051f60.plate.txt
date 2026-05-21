@@ -1,0 +1,7 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Note: query_slot_card_type_eligibility runs before prerequisites. Sequence: (1) cmp r4,#4; bgt skips whitelist -> if <=4, compute slot addr, check bit19 occupancy (0 -> reject) and [slot+8]!=0 (0 -> reject). (2) query_slot_card_type_eligibility(r6,r5,r4) -- nonzero -> reject (type query before prerequisites, unlike other variants). (3) check_zone_slot_equip_prerequisites(r6,r5,r4). (4) check_card_equip_eligible_for_slot(r6,r5,r4,r3=1). Return 1 on all pass.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4

@@ -1,0 +1,7 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Sequence: (1) Compute gDuelFieldSlots[r5&1][r3] slot addr (r3=zone_slot_idx=r2), read full word bits[18:0] -> r4=card_id. (2) cmp r3,#4; bgt reject. (3) r4==0 reject. (4) [slot+8] halfword != 0 check (0 -> reject). (5) check_zone_slot_equip_prerequisites(r6,r5,r3). (6) check_card_type_is_spell(r4=card_id): 0 -> reject (target card must be Spell type). Return 1 on all pass. Checks that equip target is a Spell card, for special equip scenarios.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4

@@ -1,0 +1,9 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Unlike other variants, this function dispatches on specific card IDs via BST. Sequence: (1) Read [r6+2] bit0 (equipping card side), combined with r4 (player_id), call check_slot_card_can_be_equipped; reject on failure. (2) Compute gDuelFieldSlots[r4&1][r5] slot addr, read [slot+8] halfword; reject if 0. (3) Read equipping card_id [r6+0], BST dispatch: pivot=0x167d (Knight's Title), >0x167d -> 0x1768 (Ninjitsu Art of Transformation); <0x167d -> 0x12c5 (Multiply). Each card_id branch calls check_card_pair_allowed or similar. Default (no match) returns 1. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- CARD_ID_knights_title = 0x167d (BST pivot)
+- CARD_ID_ninjitsu_art_of_transformation = 0x1768
+- CARD_ID_multiply = 0x12c5

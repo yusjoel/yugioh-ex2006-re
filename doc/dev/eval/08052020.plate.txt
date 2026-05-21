@@ -1,0 +1,7 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Unlike other variants, slot_idx condition is > 4 (cmp r4,#4; ble LAB_08052078 -> slot_idx <= 4 is rejected; only slot_idx > 4 proceeds). Sequence: (1) Compute slot addr, read bit19 occupancy (0 -> reject). (2) Read [r3+2] byte: bit0 = equipping card side (r2), bits[6:2] = equipping card slot_idx (r3). (3) find_zone_chain_node_by_card_id_pair(r5=player_id, r4=zone_slot_idx, r2=side, r3=slot_idx); reject if 0 (not found). (4) check_slot_card_special_activation_eligible(r5, r4); reject if 0. Return 1 on pass. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MIN_GUARD = 5 (slot_idx <= 4 rejected; only slot 5..0x14 handled)

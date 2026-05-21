@@ -1,0 +1,7 @@
+Equip slot eligibility predicate, called via function pointer table at 0x08061eb0, passed to FUN_0809077c as callback. Sequence: (1) Read [r6+2] bit0 (equipping card side) vs r5 (player_id); reject if equal (beq fail = same side). (2) cmp r4,#4; bgt skips whitelist -> if <=4, check_slot_card_is_equip_whitelist(r5,r4); reject on failure. (3) Compute target slot addr, read full word bit19 check (0 -> reject). (4) check_zone_slot_equip_prerequisites(r6,r5,r4). (5) check_card_equip_eligible_for_slot(r6,r5,r4,r3=1). Return 1 on pass. Opposite-side variant: equipping card side must differ from player_id.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4

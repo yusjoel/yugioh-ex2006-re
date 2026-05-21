@@ -1,0 +1,12 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Specifically checks if target slot holds Revival Jam (0x13c7). Sequence: (1) cmp r4,#4; bgt reject. (2) Read [r6+2] bit0 vs r5 -- bne reject (side != player -> reject; same side required). (3) Compute slot addr, read full word. (4) lsls r0,r0,#0x13 then compare to DWORD_080527f0=0x9e380000 -- equivalent to slot bits[12:0] == 0x13c7 (Revival Jam; python: 0x9e380000>>19=0x13c7); bne -> reject. (5) check_zone_slot_equip_prerequisites. (6) Read IWRAM 0x0201bb90: [+4]=player vs r5, [+0x20]=slot vs r4; if both match -> reject. (7) rsbs/orrs on [slot+8] -> return ([slot+8]!=0)?1:0. Exit: pop{r1};bx r1 (Sub-case E).
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- CARD_ID_revival_jam = 0x13c7 (0x9e380000>>19=0x13c7)
+- DWORD_080527f0 = 0x9e380000 (Revival Jam card_id check mask after lsls #19)
+- duel_ctx_base = 0x0201bb90
+- duel_ctx_player_offset = 0x4
+- duel_ctx_slot_offset = 0x20

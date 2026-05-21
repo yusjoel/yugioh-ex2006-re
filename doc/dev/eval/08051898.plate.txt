@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Four-step filter: (1) If r2<=4, call check_slot_card_is_equip_whitelist(r1, r2); if whitelist passes, skip basic check. (2) Compute target slot addr gDuelFieldSlots[r1&1][r2], read full word bits[18:0] (r6=slot occupied card_id), reject if 0. (3) Read [slot+8] halfword, reject if 0 (equip chain head empty). (4) Call get_card_extended_stat_field6(r6=card_id) and compare to 0x17; reject if not equal. (5) check_zone_slot_equip_prerequisites(r0,r1,r2). (6) check_card_equip_eligible_for_slot(r0,r1,r2,r3=1). Return 1 if all pass, 0 on any failure. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- FIELD6_TARGET = 0x17 (expected return value of get_card_extended_stat_field6)

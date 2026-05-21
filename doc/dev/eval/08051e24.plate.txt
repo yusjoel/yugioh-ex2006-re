@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Unlike other variants, no early slot_idx<=4 whitelist guard -- starts directly from slot address computation. Sequence: (1) Compute gDuelFieldSlots[r5&1][r4] addr, read full word bits[18:0] into r7 (card_id; reject if 0). (2) check_zone_slot_equip_prerequisites(r6,r5,r4). (3) Read [r6+2] bit0 vs r5 -- reject if player_id != equipping_card_side (bne fail), i.e. requires same side. (4) cmp r4,#4; bgt fail (slot_idx > 4 reject). (5) r7==0 reject (double check). (6) check_card_field8_is_9(r7=card_id) -- nonzero -> reject. (7) check_value_in_slot_chain(r5, r4, card_id=[r6+0]). Return 1 on all pass, 0 on failure.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- field8_target_code = 9 (check_card_field8_is_9 expects field8==9 to reject)

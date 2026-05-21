@@ -1,0 +1,8 @@
+Compact equip slot eligibility predicate, called via function pointer (indeg=0). Checks three conditions on target slot: (1) zone_slot_idx<=4 and target slot bit19 != 0 (occupied). (2) Equipping card [r4+2] bit0 (side) != r3 (player_id) -- must be opposite side. (3) [slot+6] halfword == 0 (slot +6 field is empty, i.e. no chain link or unoccupied by another equip). Returns 1 if all conditions met. No whitelist call, no prerequisites call.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- slot6_vacant_offset = 0x6 ([slot+6]==0 -> vacant)

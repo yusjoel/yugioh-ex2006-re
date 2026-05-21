@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Sequence: (1) cmp r3,#4; bgt reject (r3=zone_slot_idx). (2) Compute gDuelFieldSlots[r4&1][r3] slot addr, check bit19 occupancy (0 -> reject) and [slot+8]!=0 (0 -> reject). (3) check_node_in_slot_chain(r4=player_id, r3=slot_idx, r2=card_id=[r5+0] halfword, r3_arg=4). Reject if 0 (node not found), return 1 if nonzero. Does not call check_zone_slot_equip_prerequisites or check_card_equip_eligible_for_slot; relies solely on check_node_in_slot_chain to confirm node presence. Pure read-only predicate.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- chain_node_mode = 4 (movs r3,#4 passed to check_node_in_slot_chain)

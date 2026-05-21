@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Same structure as 0x08051b20 (set_code_a compare + whitelist + prerequisites + eligible), but adds a final check: [slot+8] halfword == 0 returns 1 (slot available), != 0 returns 0 (slot occupied). Sequence: (1) whitelist (<=4); (2) slot occupancy bit19; (3) set_code_a extract vs equipping card [+4] (reject if equal); (4) check_zone_slot_equip_prerequisites; (5) check_card_equip_eligible_for_slot(r3=1); (6) bne LAB_cb0 -> check [r7+8]==0 -> return 1/0. Pure read-only predicate, no external writes.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- slot8_check_offset = 0x8 ([r7+8]==0 -> return 1)

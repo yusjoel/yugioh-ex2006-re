@@ -1,0 +1,9 @@
+Equip slot eligibility predicate, called by FUN_080556f0 (indeg=1). Sequence: (1) Compute gDuelFieldSlots[r6&1][r5] slot addr, read full word bits[18:0] (r1=slot_card_id); read [r4+2] bit0 (equipping card side) vs r6 -- reject if not equal (bne fail = opposite side rejected; requires same side). (2) cmp r5,#4; bgt reject (SLOT_IDX_MAX=4). (3) r1==0 reject (slot empty). (4) check_zone_slot_equip_prerequisites(r4,r6,r5). (5) query_slot_card_type_eligibility(r4,r6,r5) -- nonzero reject. (6) BST on [r4+0] halfword (equipping card_id): 0x1420 (Monster Recovery) -> check [slot+0] bit[14] vs equipping card [+2] bit0 (same side -> reject); 0x1957 (Elemental Hero Tempest) -> find_equip_chain_node_by_slot_pair, nonzero -> reject. Default -> return 1. Exit: pop{r1};bx r1 (Sub-case E).
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- CARD_ID_monster_recovery = 0x1420
+- CARD_ID_elemental_hero_tempest = 0x1957

@@ -1,0 +1,8 @@
+Equip slot eligibility predicate, called via function pointer (indeg=0). Sequence: (1) cmp r3,#4 (r3=zone_slot_idx); bgt skips -> if <=4, compute slot addr, check bit19 occupancy (0 -> reject). (2) check_zone_slot_equip_prerequisites(r6,r5,r3); reject on failure. (3) Read [slot+8] halfword, apply rsbs r0,r1,#0; orrs r0,r1; lsrs r0,r0,#0x1f pattern: returns 1 if r1!=0, 0 if r1==0. i.e. return ([slot+8] != 0). Exit: pop{r1};bx r1 (Sub-case E). No query_type / whitelist / check_eligible_for_slot calls; relies solely on prerequisites + slot[+8] nonzero check.
+
+Constants:
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- zone_entry_size = 0x14
+- SLOT_IDX_MAX = 4
+- slot8_nonzero_check: rsbs r0,r1,#0; orrs r0,r1; lsrs r0,r0,#0x1f = (r1 != 0) ? 1 : 0
