@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check requiring eval_equip_chain_score_for_slot return value to equal exactly equip card [+0xa] field. Verifies in order: (1) slot_idx [0..4] in range; (2) zone chain_field nonzero; (3) field8 != 0; (4) equip_card [+0xa] (ldrh) != 0; (5) eval_equip_chain_score_for_slot return value == [r6+0xa]. Returns 1 if all pass.
+
+Params: r0=u8* card_ptr (equip card; [+0xa] ldrh=target score threshold); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868

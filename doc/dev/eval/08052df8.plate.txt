@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check with additional active player match verification. Verifies in order: (1) slot_idx [0..4] in range; (2) equip_card.side[bit0] != owner_bit (beq fail = same-side reject); (3) zone chain_field nonzero; (4) check_zone_slot_equip_prerequisites passes; (5) reads IWRAM active context struct [0x0201bb90]: if [+0x0] == owner_bit AND [+0x1c] == slot_idx, rejects (bne LAB_08052e58 = success condition is mismatch). Returns 1 if all pass. Pure query, no external writes.
+
+Params: r0=u8* card_ptr (equip card; [+0x2] bit0=side); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, ACTIVE_CTX=0x0201bb90

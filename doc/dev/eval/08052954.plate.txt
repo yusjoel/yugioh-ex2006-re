@@ -1,0 +1,6 @@
+Function: Lightweight equip slot eligibility check (no external prerequisite calls). Verifies: (1) owner_bit != equip_card.side[bit0] (subs r5,1,card.side; cmp r1,r5; bne fail -- requires owner opposite side from equip card); (2) slot_idx [0..4] in range; (3) chain_field (bits[12:0]) nonzero; (4) field8 ([+0x8]) == 0; (5) field6 ([+0x6]) != 0. Returns 1 if all pass.
+
+Params: r0=u8* card_ptr (equip card; [+0x2] bit0=side); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (leaf function, no external writes)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868

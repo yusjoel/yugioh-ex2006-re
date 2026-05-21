@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check combining type eligibility query and zone extended field bits mask. Verifies in order: (1) slot_idx [0..4] in range; (2) zone chain_field nonzero; (3) query_slot_card_type_eligibility returns 0; (4) reads extended zone word at [ZONE_BASE+0x10+slot*4] (lsrs by 3) and ANDs with owner_bit (restored from r8). Result used directly as return value (not normalized to 0/1 bool).
+
+Params: r0=u8* card_ptr (equip card); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 zone_flag_bits (bit mask result; 0=ineligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, EXT_OFFSET=0x10

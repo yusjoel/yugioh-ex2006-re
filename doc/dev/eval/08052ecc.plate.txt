@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check verifying owner_bit equal and active context (ACTIVE_CTX 0x0201bb90) pointing to this player/slot combination. Verifies in order: (1) slot_idx [0..4] in range; (2) equip_card.side[bit0] == owner_bit (beq continue, bne fail); (3) check_zone_slot_equip_prerequisites; (4) ACTIVE_CTX [+0x4] == owner_bit AND [+0x20] == slot_idx => returns 0 (active slot reject); mismatch returns 1.
+
+Params: r0=u8* card_ptr (equip card; [+0x2] bit0=side); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, ACTIVE_CTX=0x0201bb90

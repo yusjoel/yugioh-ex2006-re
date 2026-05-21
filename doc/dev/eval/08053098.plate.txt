@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check with slot_idx=0xa special path and whitelist combination. If slot_idx == 0xa immediately fail; if slot_idx <= 4 calls check_slot_card_is_equip_whitelist (whitelist hit => fail); enters zone check: chain_field nonzero, field8==0, check_card_field5_is_nonzero (field5 nonzero => fail); then extracts zone setcode field and equip card [+0x4] setcode bits; mismatch only proceeds to return 1.
+
+Params: r0=u8* card_ptr (equip card; [+0x4] ldrh=setcode word); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4 or 0xa]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, SLOT_SPECIAL=0xa, ZONE_BASE=0x0201c510, STRIDE=0x868

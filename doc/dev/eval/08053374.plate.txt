@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check with dual paths: (A) if card_id == 0x1518 (Bottomless Trap Hole), calls get_slot_field5_score; if score > 0x5db (1499) then fail; (B) for other cards: field8==0 path scans equip chain list (0x0201b290+0x4cc) for type [6..8] node matching owner/slot; field8!=0 path calls find_equip_chain_node_by_slot_pair (passing card.side/zone bits). All paths require slot_idx nonzero, field8!=0, query_slot_card_type_eligibility==0 gate first.
+
+Params: r0=u8* card_ptr (equip card; [+0x0] ldrh=card_id, [+0x2]=side byte); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible; eors/rsbs/orrs/lsrs final bit31)
+Side effects: none (pure query; three callees are pure queries)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, CHAIN_LIST_BASE=0x0201b290, OFFSET_COUNT=0x4cc, OFFSET_CARD_ARR=0x4f4, CARD_ID_SPECIAL=0x1518 (Bottomless Trap Hole), FIELD5_SCORE_MAX=0x5db, TYPE_MIN=6, TYPE_MAX=8

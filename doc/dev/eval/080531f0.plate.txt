@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check with active context match and slot score percentage nonzero verification. Prerequisites: slot_idx [0..4], zone chain_field nonzero, owner_bit != card.side[bit0] (same-side reject). Checks ACTIVE_CTX 0x0201bb90 two paths: if [+0x0]==owner_bit && [+0x1c]==slot_idx, or [+0x4]==owner_bit && [+0x20]==slot_idx, either satisfied enters score path; else prereqs fail. Score path: check_zone_slot_equip_prerequisites + query_slot_card_type_eligibility + eval_slot_score_entry_full + takes max(sp[0x18], sp[0x14]) / 100 (via __divsi3); nonzero quotient returns 1.
+
+Params: r0=u8* card_ptr (equip card; [+0x2] bit0=side); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible; score/100 > 0 => 1)
+Side effects: sp-local writes only (eval_slot_score_entry_full fills stack frame), no external writes
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, ACTIVE_CTX=0x0201bb90, DIV=100 (0x64)

@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check: caps eval_equip_chain_score_for_slot result at 6, then compares with equip card [+0x8] (field8). Verifies in order: (1) slot_idx [0..4] in range; (2) zone chain_field nonzero; (3) monster slot field8 != 0 (else early return 1 via short-circuit at LAB_08052fa8); (4) equip card [+0x8] != 0; (5) eval_equip_chain_score_for_slot; (6) if score > 6 cap to 6; (7) score == card.field8 returns 1, else 0.
+
+Params: r0=u8* card_ptr (equip card; [+0x8] ldrh=required score threshold); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, SCORE_CAP=6

@@ -1,0 +1,6 @@
+Function: Equip slot eligibility check combining monster_space whitelist, type eligibility, and chain score <= 3. Verifies: (1) slot_idx [0..4]; (2) zone chain_field nonzero; (3) owner_bit != card.side[bit0] (same-side reject); (4) field8 != 0; (5) check_slot_equip_whitelist_with_monster_space (passes card_id [r6+0x0]); (6) query_slot_card_type_eligibility returns 0; (7) eval_equip_chain_score_for_slot: score <= 3 returns 1, score > 3 returns 0.
+
+Params: r0=u8* card_ptr (equip card; [+0x2] bit0=side, [+0x0] ldrh=card_id); r1=u8 owner_bit [0..1]; r2=u8 slot_idx [0..4]
+Returns: r0=u32 eligible (0=ineligible, 1=eligible; score<=3 => 1)
+Side effects: none (pure query)
+Constants: SLOT_IDX_MAX=4, ZONE_BASE=0x0201c510, STRIDE=0x868, SCORE_MAX=3
