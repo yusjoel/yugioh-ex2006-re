@@ -1,0 +1,14 @@
+enqueue_lp_display_row_from_card_byte2 @ 0x08056578
+
+Constructs LP display row from equip card entry byte[+2] field and enqueues it.
+Reads r0 (equip_card_entry) byte[+2]; extracts bit0 -> player_id;
+extracts bits[6:1] (via lsls r2,r2,#0x1a; lsrs r2,r2,#0x1b) -> slot_group;
+shifts slot_group left 8 bits then ORs with player_id to form parameter r1.
+Calls set_lp_display_row_type8(player_id=r0, row_data=r1, mode=2).
+Returns 1 always. Used to refresh LP display entries during equip activation flow.
+
+Constants: none (bit fields extracted from byte[+2])
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31])
+Output: r0 = 1 (always success)
+Side effects: LP display row queue -- set_lp_display_row_type8 entry enqueued

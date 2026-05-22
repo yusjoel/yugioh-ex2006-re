@@ -1,0 +1,24 @@
+check_equip_slot_eligible_by_rival_appears_effect @ 0x08055624
+
+Equip target eligibility predicate -- "A Rival Appears!" (icid 0x192b) effect chain scan.
+Requires slot_idx<=4 and target on opponent side (card_owner != player_id).
+Computes zone address, verifies is_present bit19 and zone[+8] (ATK) nonzero.
+Calls check_zone_slot_equip_prerequisites; if passes: checks card_entry[+0]==0x192b (A Rival Appears!);
+if match, calls eval_equip_chain_score_for_slot and writes result to card_entry[+0xc];
+enters loop calling dispatch_effect_handler_by_card_id(player_id, card_id, idx) for all effect nodes
+-- returns 1 if any returns nonzero (activatable effect found), otherwise continues until
+all count entries exhausted, then returns 0.
+If card_id != 0x192b jumps to additional path LAB_080556e0.
+"A Rival Appears!" is a general opponent monster equip card; this predicate confirms
+an activatable effect node exists in the effect chain.
+
+Constants:
+- SLOT_MAX = 4
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+- CARD_A_RIVAL_APPEARS = 0x192b (icid; "A Rival Appears!")
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..4]
+Output: r0 = 1 (effect handler found) or 0
+Side effects: [card_entry+0xc] := eval_equip_chain_score_for_slot result (only on card_id==0x192b path)

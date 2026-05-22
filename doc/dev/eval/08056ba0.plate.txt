@@ -1,0 +1,17 @@
+dispatch_equip_direct_type_zone_sprite @ 0x08056ba0
+
+Equip direct-type zone sprite dispatch. Checks card_entry h-word[+2] ANDed with mask 0xfc0
+(=0xfc<<4); if result !=0x80 (direct equip type flag), returns 1 immediately (skip).
+If match: extracts bit0 (player_id) and bits[6:1] (slot_group) from card_entry byte[+2]
+via lsls r1,r1,#0x1a; lsrs r1,r1,#0x1b; calls
+submit_equip_sprite_if_slot_eligible(player_id, slot_group).
+Returns 1 in both paths. Triggers zone sprite for direct-type equip (type_flag==0x80)
+in equip activation chain.
+
+Constants:
+- TYPE_FLAG_MASK = 0xfc0 (= 0xfc << 4)
+- TYPE_FLAG_DIRECT = 0x80
+
+Inputs: r0=equip_card_entry ptr (h-word[+2] contains type flag; byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31])
+Output: r0 = 1 (always success)
+Side effects: sprite render queue -- submit_equip_sprite_if_slot_eligible (only if type_flag==0x80)

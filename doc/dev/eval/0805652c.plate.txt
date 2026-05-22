@@ -1,0 +1,17 @@
+dispatch_equip_zone_sprite_by_card_in_zone @ 0x0805652c
+
+Equip zone sprite dispatch -- locate card in zones then trigger.
+Extracts bit0 (player_id) and bits[6:1] (card_type) from card_entry byte[+2]
+via lsls r0,r1,#0x11; lsrs r1,r1,#0x17.
+Calls find_slot_idx_by_card_id_in_player_zones(player_id, card_type) to locate
+the card's on-field slot; skips if return < 0.
+If slot found, re-reads card_entry byte[+2] bit0 as player_id_alt, calls
+dispatch_equip_zone_sprite_banisher_with_count_check(player_id_alt, slot_idx).
+Returns 1 regardless of whether slot was found. Used in equip activation flow
+to trigger zone sprite "banisher" display update for the target card's position.
+
+Constants: none (register-based only)
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id, bits[6:1]=card_type)
+Output: r0 = 1 (always success)
+Side effects: sprite render queue -- dispatch_equip_zone_sprite_banisher_with_count_check (on-hit path only)

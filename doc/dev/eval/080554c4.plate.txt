@@ -1,0 +1,21 @@
+check_equip_slot_eligible_by_cross_player_and_field6_zero @ 0x080554c4
+
+Equip target eligibility predicate -- cross-player opponent + slot<=4 + field6 empty.
+First requires slot_idx<=4 (special 0-4 zone limit); returns 0 otherwise.
+Reads card_entry byte[+2] bit0 as card_owner; if card_owner==player_id (same side) returns 0
+-- this predicate is for targets on the opponent's field. Computes zone address
+(player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE + ZONE_BASE), verifies is_present bit19;
+returns 0 if absent. Reads zone[+8] (ATK); returns 0 if zero. Reads zone[+6] (field6);
+returns 0 if nonzero (field6 must be empty/unoccupied). Finally calls
+check_zone_slot_equip_prerequisites to verify prerequisites; returns 1 if all pass.
+Used in equip activation chain to filter opponent-side empty-field6 targets.
+
+Constants:
+- SLOT_MAX = 4
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..4]
+Output: r0 = 1 (cross-player slot with ATK nonzero and field6 zero) or 0
+Side effects: none (pure predicate)

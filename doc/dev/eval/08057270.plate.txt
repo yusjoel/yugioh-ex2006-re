@@ -1,0 +1,16 @@
+enqueue_lp_display_row_from_slot_id_field @ 0x08057270
+
+Extracts slot_id related bits from equip card entry [+0x14] field and enqueues LP display row.
+Reads byte[+2] bit0 -> player_id (r2). Reads [r0+0x14] word -> r0;
+extracts bit9 (lsls r1,r0,#0x16; lsrs r1,r1,#0x1f) as sub_id;
+extracts bits[13:10] (lsls r0,r0,#0x12; lsrs r0,r0,#0x1c) and shifts left 8 bits -> high_field;
+combines: r1 = sub_id | high_field.
+Calls set_lp_display_row_type8(player_id, combined_param, mode=2).
+Returns 1 always. Refreshes LP display row from slot_id word during equip activation chain.
+
+Constants:
+- SLOT_ID_OFFSET = 0x14 (from equip_card_entry base)
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1]; [+0x14] bits[9..13] slot_id fields)
+Output: r0 = 1 (always success)
+Side effects: LP display row queue -- set_lp_display_row_type8 entry enqueued

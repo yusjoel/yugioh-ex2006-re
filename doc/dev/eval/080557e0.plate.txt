@@ -1,0 +1,28 @@
+check_equip_slot_eligible_by_card_id_bst_special_cases @ 0x080557e0
+
+Equip target eligibility predicate -- large card_id BST special case dispatch.
+Entry: r0=equip_card_entry, r1=player_id, r2=slot_idx; multiple high-register aliases saved.
+Computes zone entry via player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE + ZONE_BASE; extracts card_id.
+Verifies card_owner==player_id (same side), slot_idx<=4, zone is_present, and zone[+8] (ATK) nonzero.
+After prerequisites pass, dispatches on card_id via BST branches:
+(1) icid 0x1669 (Staunch Defender) -- enters chain state check; reads get_slot_card_state_code;
+    if state==7, reads get_slot_field5_score; if <=0x1f4 returns 1;
+(2) icid 0x1908 (Bubble Shuffle) -- checks r8-saved extra zone field combination;
+(3) icid 0x1713 (Dedication through Light and Darkness) -- calls map_field8_to_card_type_category;
+    if result 0, calls eval_equip_chain_score_for_slot; if <=2 returns 1;
+(4) icids near 0x1908 call check_card_matches_active_effect_slot or check_slot_card_pair_allowed;
+(5) unmatched card_id: default exit LAB_0805591e movs r0,#1 (general allow).
+Core filter for equip activation chain state=0/case=2 path.
+
+Constants:
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_MAX = 4
+- CARD_STAUNCH_DEFENDER = 0x1669 (icid; "Staunch Defender")
+- CARD_BUBBLE_SHUFFLE = 0x1908 (icid; "Bubble Shuffle")
+- CARD_DEDICATION_THRU_LIGHT = 0x1713 (icid; "Dedication through Light and Darkness")
+- SCORE_LIMIT = 0x1f4 (= 0xfa * 2; max field5 score threshold)
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..4]
+Output: r0 = 1 (eligible) or 0 (ineligible)
+Side effects: none (pure predicate; all str are sp-local)

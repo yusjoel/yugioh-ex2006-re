@@ -1,0 +1,19 @@
+dispatch_equip_zone_sprite_by_type_flag @ 0x08057538
+
+Selects zone sprite enqueue method based on equip card type flag.
+Reads card_entry byte[+3] ANDed with mask 0x30; compares with 0x20 (direct equip type):
+if ==0x20 (direct type), jumps to LAB_08057556 -- extracts player_id from byte[+2] bit0
+and card_id from [+0]; calls enqueue_equip_slot_sprite_attr(player_id, card_id, 0xb, 0) with mode=11.
+If !=0x20 (non-direct type), extracts player_id and slot_group from byte[+2];
+calls submit_equip_sprite_if_slot_eligible(player_id, slot_group).
+Both paths return 1. Selects appropriate sprite enqueue path based on equip type
+in equip activation chain.
+
+Constants:
+- TYPE_FLAG_MASK = 0x30 (byte[+3] bits[5:4])
+- TYPE_DIRECT = 0x20
+- CHAIN_MODE = 0xb (= 11)
+
+Inputs: r0=equip_card_entry ptr (byte[+3] bits[5:4]=type_flag; byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31]; [+0]=card_id)
+Output: r0 = 1 (always success)
+Side effects: sprite render queue -- enqueue_equip_slot_sprite_attr (if type==0x20) or submit_equip_sprite_if_slot_eligible (otherwise)

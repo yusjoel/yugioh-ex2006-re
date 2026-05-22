@@ -1,0 +1,16 @@
+enqueue_equip_card_sprite_mode3 @ 0x08056614
+
+Enqueues mode=3 sprite attribute record for equip card.
+Extracts bit0 (player_id) from card_entry byte[+2] -> r0;
+extracts bits[6:1] (slot_group) -> r1 (lsls r1,r1,#0x1a; lsrs r1,r1,#0x1b).
+Reads card_entry [+0] card_id (u16) -> r2.
+Passes card_data=0x1119 (fixed constant), mode=3, calls
+enqueue_sprite_attr_with_mode(player_id, slot_group, card_id, card_data=0x1119, sp[0]=0, mode=3).
+Returns 1 always. Updates equip card sprite display with mode=3 during equip activation flow.
+
+Constants:
+- SPRITE_DATA = 0x1119
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31], [+0]=card_id u16)
+Output: r0 = 1 (always success)
+Side effects: sprite render queue -- enqueue_sprite_attr_with_mode entry enqueued with mode=3

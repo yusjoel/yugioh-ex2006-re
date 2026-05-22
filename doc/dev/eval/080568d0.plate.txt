@@ -1,0 +1,22 @@
+update_equip_chain_pair_sprites_and_atk_field @ 0x080568d0
+
+Updates equip chain pair sprites and writes ATK field.
+Extracts player_id (bit0) and slot_group (bits[6:1]) from card_entry byte[+2];
+calls find_equip_chain_pair_across_field(player_id, slot_group) -> chain pair id (u16).
+Low byte of result as first slot: submit_equip_sprite_if_slot_eligible(low_byte & 0x1f, first_slot_low5).
+High byte (>>8) as second slot: submit_equip_sprite_if_slot_eligible(high_byte & 0x1f, second_slot).
+Re-reads card_entry byte[+2] for player_id_b and slot_group_b; computes
+ZONE_BASE + player_id_b*PLAYER_BLOCK + slot_group_b*SLOT_STRIDE; reads zone word bits[18:0],
+writes result to card_entry[+8] (strh). Returns 1 always.
+Refreshes chain pair sprite display and records target ATK after equip activation confirmed.
+
+Constants:
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31])
+Output: r0 = 1 (always success)
+Side effects:
+- sprite render queue: submit_equip_sprite_if_slot_eligible x2 (chain pair slots)
+- [card_entry+8] := zone_word.bits[18:0] (ATK field update, strh)

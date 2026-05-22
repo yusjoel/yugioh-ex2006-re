@@ -1,0 +1,19 @@
+check_equip_slot_eligible_by_effect_value_and_category @ 0x080552a0
+
+Equip target eligibility predicate -- effect value vs card effect category comparison.
+Computes ZONE_BASE + player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE; extracts is_present bit19
+and zone[+8] (ATK); returns 0 if either is zero. Extracts bits[9:2]*2 + bit18 (type encoding) from
+zone word, compares with card_entry[+4] corresponding field; if equal (type already matched) returns 0
+-- slot is invalid for this equip card. If types differ, calls check_zone_slot_equip_prerequisites
+to verify prerequisites, then get_slot_effect_card_value(player_id, slot_idx) for effect value
+and get_card_effect_category(card_id) for category value; returns 1 if effect_value < category_value
+(equip card can boost this slot). Used in equip target selection to filter benefitable targets.
+
+Constants:
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..10]
+Output: r0 = 1 (effect_value < category_value) or 0
+Side effects: none (pure predicate)

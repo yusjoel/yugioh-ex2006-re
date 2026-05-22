@@ -1,0 +1,14 @@
+enqueue_lp_display_row_clear_for_card_player @ 0x080567a0
+
+Extracts player_id from equip card entry and clears LP display row with row=0xffff.
+Reads card_entry byte[+2] bit0 -> player_id (r0);
+calls set_lp_display_row_type8(player_id, 0xffff, 1) with clear marker r1=0xffff.
+Returns 1 always. Used in equip activation chain to clear LP display row entry
+for the specific player.
+
+Constants:
+- LP_ROW_CLEAR = 0xffff
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1])
+Output: r0 = 1 (always success)
+Side effects: LP display row queue -- set_lp_display_row_type8(player_id, 0xffff, 1) clears row

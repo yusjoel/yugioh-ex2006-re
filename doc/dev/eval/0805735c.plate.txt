@@ -1,0 +1,17 @@
+enqueue_equip_slot_sprite_mode4_and_lp_cost @ 0x0805735c
+
+Enqueues mode=4 sprite for equip card slot and renders LP cost sprite.
+Extracts bit0 (player_id) -> r0 and bits[6:1] (slot_group) -> r1 from card_entry byte[+2];
+reads card_entry [+0] card_id -> r2. Calls enqueue_sprite_attr_with_mode(player_id, slot_group,
+card_id, NULL, 0, mode=4). Then calls render_equip_lp_cost_sprite(equip_entry, slot_idx).
+Returns void (pop {r4,r5}; pop {r1}; bx r1 pattern; no r0 write before exit).
+Triggers both sprite attribute write and LP cost display for target slot in equip selection UI.
+
+Constants:
+- SPRITE_MODE = 4
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1], bits[6:1]=slot_group [0..31], [+0]=card_id), r1=slot_idx [0..10]
+Output: void
+Side effects:
+- sprite render queue: enqueue_sprite_attr_with_mode(mode=4)
+- LP cost sprite: render_equip_lp_cost_sprite(equip_entry, slot_idx)

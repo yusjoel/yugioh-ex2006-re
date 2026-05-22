@@ -1,0 +1,27 @@
+trigger_equip_lp_sprite_by_activation_state @ 0x080566f4
+
+Dispatches LP sprite or display operation based on equip activation state.
+Extracts player_id from card_entry byte[+2] bit0 (spilled to r5).
+Reads DWORD_08056738 (=0x0201e2a0)[player_id*4+8] -> activation_state.
+(1) activation_state==1: compares LP values -- reads gP1LifePoints two offset fields, sums to combined_lp;
+    reads [0x0201e2a0 + player_id*0x868 + 0x3d0] as reference; if combined_lp + 0x3e8 (=1000) > reference
+    returns 1; otherwise calls enqueue_sprite_attr_clamped(player_id, 0xfa*8=0x7d0) and returns 1.
+(2) activation_state!=1 but [0x0201b290+0x4ac]==0: calls invoke_card_display_op_0x31_sub1(0x1d),
+    increments step counter, returns 0.
+(3) [0x4ac]==1 and LP zone valid: enqueue_sprite_attr_clamped(player_id, 0xfa*8=0x7d0) returns 1.
+(4) [0x4ac]>=2: returns 0.
+Decision point for LP display sprite triggering in equip activation chain.
+
+Constants:
+- ACTIVATION_STATE_BASE = 0x0201e2a0
+- PLAYER_BLOCK = 0x868
+- LP_BONUS = 0x3e8 (= 1000)
+- SPRITE_VAL = 0x7d0 (= 0xfa << 3 = 2000)
+- STEP_COUNTER_OFFSET = 0x4ac (from 0x0201b290)
+- OP31_CODE = 0x1d (= 29)
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1])
+Output: r0 = 1 (sprite enqueued or LP check pass) or 0 (counter advanced)
+Side effects:
+- sprite render queue: enqueue_sprite_attr_clamped(player_id, 0x7d0) (activation_state==1 or [0x4ac]==1 path)
+- [0x0201b290+0x4ac] += 1 (step counter advance, on [0x4ac]==0 path)

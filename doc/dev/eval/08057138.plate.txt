@@ -1,0 +1,19 @@
+enqueue_chain_node_sprite_for_equip_entry @ 0x08057138
+
+Extracts parameters from equip card entry and enqueues chain node sprite.
+Reads r0 (equip_card_entry): adds r1,r0,#0 saves entry address;
+ldrb r2,[r1,#2] reads byte[+2]; lsls+lsrs extracts bit0 -> player_id (r0);
+ldr r2, DWORD_08057158=0x12a1 (Parasite Paracide icid -- chain node match key_id);
+ldrh r1,[r1,#4] reads [+4] u16 card_type;
+lsls r3,r1,#0x11; lsrs r3,r3,#0x17 extracts bits[6:1] -> slot_group;
+movs r1,#0xb = mode=11.
+Calls enqueue_sprite_attr_for_chain_node_match(player_id, mode=0xb, key_id=0x12a1, slot_group).
+Returns 1 always.
+
+Constants:
+- CHAIN_NODE_KEY = 0x12a1 (icid; "Parasite Paracide")
+- CHAIN_NODE_MODE = 0xb (= 11)
+
+Inputs: r0=equip_card_entry ptr (byte[+2] bit0=player_id [0..1]; [+4] bits[6:1]=slot_group [0..31])
+Output: r0 = 1 (always success)
+Side effects: sprite render queue -- enqueue_sprite_attr_for_chain_node_match(player_id, 0xb, 0x12a1, slot_group)

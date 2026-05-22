@@ -1,0 +1,24 @@
+check_equip_slot_eligible_by_same_side_whitelist_and_space @ 0x08055590
+
+Equip target eligibility predicate -- same side + slot<=4 + whitelist and monster space joint check.
+Reads card_entry byte[+2] bit0 = card_owner; saves to r8 via .hword 0x4680 (mov r8,r0);
+requires r8==player_id (same side), returns 0 otherwise. Requires slot_idx<=4.
+Computes zone address (player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE + ZONE_BASE);
+checks is_present bit19; returns 0 if absent. Then:
+(1) check_zone_slot_equip_prerequisites(equip_entry, player_id, slot_idx);
+(2) check_slot_equip_whitelist_with_monster_space(player_id, slot_idx, card_id)
+    -- confirms target has free monster zone space;
+(3) query_slot_card_type_eligibility(equip_entry, player_id, slot_idx) (bne->0 type mismatch = fail);
+finally checks [0x0201b290+0x4bc] global flag is 0 and zone[+8]!=0.
+Returns 1 if all pass. Contains high-register parameter r8.
+
+Constants:
+- SLOT_MAX = 4
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+- GLOBAL_FLAG_OFFSET = 0x4bc (from 0x0201b290)
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..4]
+Output: r0 = 1 (same-side + whitelist + space all pass) or 0
+Side effects: none (pure predicate)

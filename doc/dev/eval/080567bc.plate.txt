@@ -1,0 +1,29 @@
+dispatch_equip_card_name_display_by_step @ 0x080567bc
+
+Equip card name display dispatch -- routes by activation step state.
+sub sp,#0x100 allocates local stack buffer. Checks card_entry[+2] h-word masked with 0xfc0:
+if value==0x80 (specific equip type flag) jumps directly to return 1.
+Otherwise reads global step counter [0x0201b290+0x4ac]:
+(0) step==0 -- reads ACTIVATION_STATE_BASE[player_id*4+8]; if ==1, reads gP1LifePoints[0xea*32]
+    zone data and writes 1; if !=1 calls card_name_lookup_by_internal_id(0x11cf=reserved icid)
+    then format_game_text_with_text_arg(sp, 0xe4) to fill text buffer;
+    calls invoke_card_display_op_0x31_sub1(sp) to display card name; increments step counter.
+(1) step==1 -- reads gP1LifePoints[0xea*32] zone value; returns -1 if zero;
+    otherwise calls enqueue_sprite_attr_clamped(player_id, 0x1f4) and returns 1.
+(2) step>=2 -- returns 1.
+
+Constants:
+- TYPE_FLAG_MASK = 0xfc0 (= 0xfc << 4)
+- TYPE_FLAG_DIRECT = 0x80
+- STEP_COUNTER_OFFSET = 0x4ac (from 0x0201b290)
+- ZONE_OFFSET = 0x1d40 (= 0xea << 5 = 7488; offset from base 0x0201c4e0 to LP zone target)
+- RESERVED_ICID = 0x11cf
+- TEXT_TEMPLATE = 0xe4
+
+Inputs: r0=equip_card_entry ptr (byte[+2]=player_id/type_flags)
+Output: r0 = 1 (step advanced or skip) or 0 (step 0 normal path) or -1 (LP zone empty)
+Side effects:
+- [0x0201b290+0x4ac] += 1 (step counter advance, step==0 path)
+- gP1LifePoints[0xea*32] := 1 (step==0, activation_state==1 path)
+- sprite render queue: enqueue_sprite_attr_clamped(player_id, 0x1f4) (step==1 path)
+- display system: invoke_card_display_op_0x31_sub1 (step==0, activation_state!=1)

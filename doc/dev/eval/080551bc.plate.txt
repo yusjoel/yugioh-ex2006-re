@@ -1,0 +1,20 @@
+check_equip_slot_eligible_by_setcode_g_and_field5 @ 0x080551bc
+
+Equip target eligibility predicate -- setcode group G + field5 nonzero dual filter.
+Computes zone entry address from ZONE_BASE (0x0201c510) via player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE;
+extracts is_present bit19; returns 0 if absent. Reads zone[+8] (ATK); returns 0 if zero.
+Two paths: (1) if check_card_field5_is_nonzero returns 0, requires slot_idx<=4;
+(2) if returns 1, only enters main chain when slot_idx<=4; slot_idx>4 always returns 0.
+Main chain calls check_zone_slot_equip_prerequisites, query_slot_card_type_eligibility (bne->0),
+check_card_equip_eligible_for_slot (r3=1). All pass -> returns 1.
+Called during equip activation target selection for cards with equip-set-G flag and nonzero field5.
+
+Constants:
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20 (0x5 * 4)
+- SLOT_MAX = 4
+
+Inputs: r0=player_id [0..1], r1=equip_flags [0..0xff], r2=slot_idx [0..10]
+Output: r0 = 1 (eligible) or 0 (ineligible)
+Side effects: none (pure predicate)

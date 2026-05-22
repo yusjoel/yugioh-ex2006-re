@@ -1,0 +1,20 @@
+check_equip_slot_eligible_by_type_mismatch_prereqs_and_eligible @ 0x08055360
+
+Equip target eligibility predicate -- type mismatch + prerequisites + final eligibility check.
+Computes ZONE_BASE zone entry address (player_id*PLAYER_BLOCK + slot_idx*SLOT_STRIDE);
+verifies is_present bit19; returns 0 if absent. Reads zone[+8] (ATK); continues if nonzero.
+Extracts zone type code (bits[9:2]*2 + bit18) and compares with card_entry[+4] field;
+if equal (type already matched) returns 0 -- slot already has matching type equip,
+this function is for the "type mismatch" path. If types differ, calls
+check_zone_slot_equip_prerequisites for prerequisites, then check_card_equip_eligible_for_slot(r3=1)
+to confirm equippable; returns 1 if both pass.
+Variant of check_equip_slot_eligible_by_type_mismatch_and_eligible (0x080540ec).
+
+Constants:
+- PLAYER_BLOCK = 0x868
+- ZONE_BASE = 0x0201c510
+- SLOT_STRIDE = 20
+
+Inputs: r0=equip_card_entry ptr, r1=player_id [0..1], r2=slot_idx [0..10]
+Output: r0 = 1 (type mismatch + prereqs pass + eligible) or 0
+Side effects: none (pure predicate)
