@@ -1,0 +1,10 @@
+check_equip_slot_eligible_with_prereqs_and_score_guard
+Equip slot eligibility wrapper combining prerequisite check and score upper-bound guard.
+Called in equip target selection priority calculation path.
+Sequential calls: (1) check_zone_slot_equip_prerequisites(r0,r1,r2) -> returns 0 if fails;
+(2) check_equip_slot_eligible_with_score_guard(r0,r1,r2) -> pass-through return value.
+Effectively a serial combination of prerequisite validation and score ceiling validation.
+Pure predicate wrapper, no external writes.
+Constants: gDuelFieldSlots=0x0201c510 (used by callees), player_stride=0x868 (used by callees)
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1], r2=u8 slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected; pass-through from check_equip_slot_eligible_with_score_guard)

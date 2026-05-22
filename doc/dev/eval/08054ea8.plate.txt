@@ -1,0 +1,10 @@
+check_equip_slot_eligible_by_same_side_field8_zero_field6_and_type
+Equip slot eligibility predicate requiring same side + [+8]==0 (primary equip unoccupied) + [+6]!=0 + type compatible.
+Caller: query_slot_card_type_eligibility (0x0803670c) during equip target enumeration.
+Checks in order: (1) slot_idx <= 4; (2) slot occupied (bits[18:0]!=0);
+(3) equip_slot[+2]bit0 == player_id (same side); (4) [slot+8] == 0 (primary equip chain head empty);
+(5) [slot+6] != 0 (secondary equip field nonzero); (6) query_slot_card_type_eligibility == 0.
+Returns 1 if all pass. Pure predicate, no external writes.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)

@@ -1,0 +1,13 @@
+check_equip_slot_eligible_by_evolution_target_and_space
+Equip slot eligibility predicate for evolution-target effect monsters.
+Calls check_slot_card_can_be_equipped (0x08033730) and check_slot_placement_blocked_by_field_effect (0x080333ac).
+Checks in order: (1) gDuelFieldSlots[r1&1][r2] bits[18:0] != 0 (slot occupied);
+(2) slot_idx <= 4 (monster zone); (3) equip_slot[+2]bit0 == player_id (same-side check);
+(4) [slot+8] != 0 (valid); (5) check_card_id_is_effect_monster_type_b(card_icid) != 0 (effect monster type B);
+(6) get_card_evolution_target_ids(card_icid, 0) != 0 (evolution target list exists);
+(7) count_available_monster_slots(equip_slot[+2]bit0) != 0 (target side has empty monster slot);
+(8) check_slot_placement_blocked_by_field_effect(player_id, slot_idx) == 0 (no field effect block).
+Returns 1 if all pass, 0 otherwise. Pure predicate, no external writes.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)

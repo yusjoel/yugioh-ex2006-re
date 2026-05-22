@@ -1,0 +1,15 @@
+check_equip_slot_eligible_by_equippable_and_type_code
+Equip slot eligibility predicate: equippability check + card type code comparison.
+Caller: check_slot_card_can_be_equipped (0x08033730) during equip candidate slot selection.
+Checks in order: (1) check_slot_card_can_be_equipped(equip_slot[+2]bit0, player_id) passes;
+(2) compute gDuelFieldSlots[player_id&1][slot_idx] slot address;
+(3) extract target slot word composite type code: bits[29:22]*2 + bit13;
+(4) extract equip card [+4] halfword bits[13:6];
+(5) equal => same type code => reject (return 0); not equal => return 1.
+Semantics: target slot card type must differ from equip card type code.
+Pure predicate, no external writes.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868,
+  TYPE_COMPOSITE=bits[29:22]*2+bit13 of zone_word,
+  EQUIP_TYPE_FIELD=bits[13:6] of equip_card[+4]
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx (unchecked)
+Returns: r0=u32 bool (1=eligible, 0=rejected)

@@ -1,0 +1,15 @@
+check_equip_slot_eligible_by_prereqs_and_effect_ctx
+Equip slot eligibility predicate: target slot prerequisites + effect activation context match check.
+Caller: check_zone_slot_equip_prerequisites (0x08036770) during equip card effect activation.
+Checks in order: (1) slot_idx <= 4; (2) equip_slot[+2]bit0 == player_id (same side);
+(3) gDuelFieldSlots[player_id&1][slot_idx] [+8] != 0 (slot occupied);
+(4) check_zone_slot_equip_prerequisites passes;
+(5) gDuelEffectCtx (0x0201bb90): [+4] == player_id (activating player match) AND
+  [+0x20] == slot_idx (activating slot match) => both match means current slot already activated => return 0 (reject);
+  any mismatch => return 1 (pass).
+Logic: reject if current activation context points to this same slot.
+Pure predicate, no external writes.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868,
+  gDuelEffectCtx=0x0201bb90, CTX_PLAYER_OFFSET=4, CTX_SLOT_OFFSET=0x20
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)

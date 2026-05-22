@@ -1,0 +1,17 @@
+check_equip_slot_eligible_by_card_specific_activation
+Multi-card specific equip activation eligibility predicate with BST dispatch on four special cards.
+Pre-filter: slot_idx <= 4, equip_slot[+2]bit0 == player_id (same side), target slot [+8] != 0 (occupied).
+Reads equip_slot[+0] low 16 bits; BST dispatch to four branches:
+(1) 0x17e1 (Ultimate Baseball Kid): check_slot_card_special_activation_eligible + zone bit check (r2=4);
+(2) 0x180e (Tricky's Magic 4): check_slot_card_special_activation_eligible + target icid masked vs 0xc0300000;
+(3) 0x1938 (Gilford the Legend): get_slot_card_state_code == 0xf + equip[+8] nonzero + memset 0x18-byte sp buf + write target slot fields + check_slot_card_eligible_by_card_id;
+(4) 0x1979 (Roll Out!): equip[+6] bits[4:2] nonzero + memset + write target slot fields + table DAT_08054ab0=0x10b0 lookup by equip[+0xa] + check_slot_card_eligible_by_card_id.
+Returns 1 on pass, 0 on reject.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868,
+  ICID_ULTIMATE_BASEBALL_KID=0x17e1, ICID_TRICKYS_MAGIC_4=0x180e,
+  ICID_GILFORD_THE_LEGEND=0x1938, ICID_ROLL_OUT=0x1979,
+  STACK_BUF_SIZE=0x18, BUF_BASE_OFFSET=0x10b0,
+  FIELD_MASK_A=0x000001ff, FIELD_MASK_B=0xffff803f,
+  STATE_CODE_FACE_DOWN=0xf, ZONE_BIT_PARAM=4, GILFORD_ICID_PATTERN=0xc0300000
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible or side-effect write complete, 0=rejected)

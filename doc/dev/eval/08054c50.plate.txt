@@ -1,0 +1,11 @@
+check_equip_slot_eligible_by_opposite_whitelist_space_and_type
+Equip slot eligibility predicate requiring opposite side + whitelist space validation + type compatible.
+Callers: check_slot_equip_whitelist_with_monster_space (0x08036450), query_slot_card_type_eligibility (0x0803670c).
+Checks in order: (1) slot_idx <= 4; (2) compute slot address, bits[18:0] != 0 (occupied);
+(3) bits[18:0] bit18 = slot side, if equal to player_id => same side => reject;
+(4) check_slot_equip_whitelist_with_monster_space(player_id, slot_idx, equip_card[+0]) passes;
+(5) query_slot_card_type_eligibility == 0.
+Returns 1 if all pass. Pure predicate, no external writes.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)

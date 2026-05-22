@@ -1,0 +1,11 @@
+check_equip_slot_eligible_by_same_side_prereqs_and_type
+Equip slot eligibility predicate requiring target slot belongs to same side as equip card.
+Callers: query_slot_card_type_eligibility (0x0803670c), check_zone_slot_equip_prerequisites (0x08036770).
+Checks in order: (1) gDuelFieldSlots[r1&1][r2] bits[18:0] != 0 (slot occupied);
+(2) equip_slot[+2]bit0 == player_id (same side); (3) slot_idx <= 4;
+(4) check_zone_slot_equip_prerequisites passes; (5) query_slot_card_type_eligibility == 0 (type compatible).
+Returns 1 if all pass. Symmetric opposite of check_equip_slot_eligible_by_opposite_prereqs_and_type (side check inverted).
+Pure predicate, no external writes.
+Constants: SLOT_IDX_MAX=4, gDuelFieldSlots=0x0201c510, player_stride=0x868
+Inputs: r0=ptr equip_card_slot, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)

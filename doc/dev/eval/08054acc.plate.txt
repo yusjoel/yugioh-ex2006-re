@@ -1,0 +1,12 @@
+check_equip_slot_eligible_by_union_type_and_occupied
+Equip slot eligibility predicate for Union cards (field6==0x17) with field9==4.
+Calls get_card_extended_stat_field6 (0x080eedf8) and get_card_extended_stat_field9 (0x080eee7c).
+r0 is unused (clobbered by first instruction lsls r0,r2,#0x2).
+Checks in order: (1) compute gDuelFieldSlots[r1&1][r2] slot address;
+(2) bits[18:0] = card_icid; (3) get_card_extended_stat_field6(card_icid) == 0x17 (Union type);
+(4) get_card_extended_stat_field9(card_icid) == 0x4 (Union subtype 4);
+(5) [slot+8] != 0 (slot has valid card).
+Returns 1 if all pass, 0 otherwise. Pure predicate, no external writes.
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, FIELD6_UNION=0x17, FIELD9_SUBTYPE=4
+Inputs: r0=(unused), r1=u8 player_id [0..1], r2=u8 zone_slot_idx (unchecked)
+Returns: r0=u32 bool (1=eligible, 0=rejected)
