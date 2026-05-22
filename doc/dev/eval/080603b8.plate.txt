@@ -1,0 +1,20 @@
+Equip slot eligibility predicate for Neo Daedalus group. Full six-layer guard.
+Called exclusively by FUN_0805f9e4 (tags: [duel_field]), which pre-checks LP slot count > 1.
+(1) XOR player_id ^ byte[+3].bit1 = effective_player; call check_field_spell_neo_daedalus_group_placeable(effective_player).
+(2) Read own LP slot [player*0x868+0x10]; if 0 -> lookup_slot_display_value_by_card_id + dispatch_effect_handler_by_card_id.
+(3) Call check_value_in_slot_chain(player_id, zone_idx, 0xfa7=Blue-Eyes White Dragon) -- fail if chain contains BEWD.
+(4) Extract zone_idx (bits[6:2]); call check_slot_card_can_be_equipped(effective_player, player_id, zone_idx).
+(5) Call count_monster_slots_for_player -- if nonzero -> succeed immediately.
+    If 0 -> check player direction equal + check_slot_placement_blocked_by_field_effect.
+Returns 1=pass, 0=fail.
+Pure predicate, no external writes.
+
+Constants:
+  CARD_ID=0x0fa7 (Blue-Eyes White Dragon, passcode=89631139)
+  0x868: player stride
+  +0x10: LP slot activation count field offset
+  gP1LifePoints (0x0201c4e0): global LP base
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], byte[+3] bit1=team_flag)
+Returns: r0 u32 (1=all conditions pass, 0=any fail)
+Callees: check_field_spell_neo_daedalus_group_placeable, lookup_slot_display_value_by_card_id, dispatch_effect_handler_by_card_id, check_value_in_slot_chain, check_slot_card_can_be_equipped, count_monster_slots_for_player, check_slot_placement_blocked_by_field_effect

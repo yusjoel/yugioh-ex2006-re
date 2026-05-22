@@ -1,0 +1,20 @@
+Equip slot eligibility predicate. Also called directly by FUN_0806001c (indeg=1).
+(1) Extract slot_ptr[+2] bits[10:4] (zone_type); fail if != 0x580 (0xb0<<3).
+(2) Extract slot_ptr[+0x14] bits[22:0] as slot_id; call resolve_slot_id_to_zone_ptr(slot_id) -- fail if NULL.
+(3) Verify zone_ptr player side (bit22 of [+0x14]) differs from slot player_id (byte[+2].bit0) -- bne to continue.
+(4) Read zone_ptr[+0] bit13 (lsls #0x12+lsrs #0x1f); verify equals (1 - player_id).
+(5) Extract bits[26:23] from [+0x14]; confirm equals 0xe (zone sub_type).
+(6) Call check_card_field5_is_nonzero -- return 1 if nonzero, else 0.
+Pure predicate, no external writes.
+
+Constants:
+  0xfc0 (0xfc<<4): zone_type mask bits[10:4]
+  0x580 (0xb0<<3): zone_type target value
+  bits[22:0]: slot_id extraction (lsls #0x17 + lsrs #0x17)
+  bit22 (lsls #0x16 + lsrs #0x1f): zone player direction flag
+  bits[26:23] (lsls #0x9 + lsrs #0x1c): zone sub_type field
+  0xe: zone sub_type target value
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+2] bits[10:4]=zone_type [0..127])
+Returns: r0 u32 (1=all conditions pass, 0=any fail)
+Callees: resolve_slot_id_to_zone_ptr, check_card_field5_is_nonzero

@@ -1,0 +1,19 @@
+Equip slot eligibility predicate. Three-step hand-slot and effect-node check.
+(1) Extract player_id (byte[+2].bit0) and set_code (slot_ptr[+4] bits[14:8]);
+    call find_hand_slot_idx_by_set_code(player_id, set_code) -- fail if result < 0 (no matching hand slot).
+(2) Read hand slot array [0x0201c8f8 + slot_idx*4 + player_id*0x868];
+    execute lsls #0xe; fail if result >= 0 (bit17 not set).
+(3) Call find_effect_node_in_zone(player_id, card_id, set_code, type=0xb) -- succeed if returns 0;
+    else check opposite player's effect node; return 1 if found.
+Pure predicate, no external writes.
+
+Constants:
+  0x0201c8f8: hand slot array base
+  0x868: player stride
+  lsls #0xe: tests bit17 (hand slot activation flag)
+  0xb: equip chain node type code
+  0xfffffbf4: opposite player hand slot offset (-0x40c)
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id, ldrh[+4] bits[14:8]=set_code [0..127])
+Returns: r0 u32 (1=all conditions pass, 0=any fail)
+Callees: find_hand_slot_idx_by_set_code, find_effect_node_in_zone

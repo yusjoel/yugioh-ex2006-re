@@ -1,0 +1,15 @@
+Equip slot eligibility predicate. Pure slot effect value vs card tier comparison.
+Called exclusively by FUN_080607b4 (indeg=0) which pre-checks LP slot existence.
+(1) Extract player_id (byte[+2].bit0) and zone_idx (bits[6:2]);
+    call get_slot_effect_card_value(player_id, zone_idx) to get effect value r4.
+(2) Call classify_equip_card_id_tier_abcx(slot_ptr) to get card tier.
+(3) If r4 >= card tier -> return 1 (effect value satisfies tier requirement); else return 0.
+Pure predicate, no external writes.
+
+Constants:
+  get_slot_effect_card_value: reads equip slot effect numeric value
+  classify_equip_card_id_tier_abcx: card tier A/B/C/X classification
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], bits[6:2]=zone_idx [0..31])
+Returns: r0 u32 (1=slot effect value >= card tier, 0=below tier)
+Callees: get_slot_effect_card_value, classify_equip_card_id_tier_abcx

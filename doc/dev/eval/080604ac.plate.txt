@@ -1,0 +1,16 @@
+Equip slot eligibility predicate for Neo Daedalus group with LP loop scan.
+(1) Call check_field_spell_neo_daedalus_group_placeable(player_id) -- return 0 if not placeable.
+(2) Read gP1LifePoints[player*0x868+0xc] (LP slot count / LP ceiling); fail if 0 >= lp_count (bcs).
+(3) Loop slot=0..lp_count-1: call dispatch_effect_handler_by_card_id(player_id, card_id, slot) --
+    if any returns nonzero -> return 1 immediately.
+(4) All iterations fail -> return 0.
+Pure predicate, no external writes.
+
+Constants:
+  gP1LifePoints (0x0201c4e0): global LP base
+  0x868: player stride
+  +0xc: LP slot count field offset (LP ceiling)
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id)
+Returns: r0 u32 (1=any LP slot effect handler passes, 0=none pass)
+Callees: check_field_spell_neo_daedalus_group_placeable, dispatch_effect_handler_by_card_id

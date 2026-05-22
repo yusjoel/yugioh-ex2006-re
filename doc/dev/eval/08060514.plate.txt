@@ -1,0 +1,19 @@
+Equip slot eligibility predicate. Triple-card group check: People Running About / Oppressed People / United Resistance.
+(1) Call count_paired_slots_with_field5_default(player_id, 0x15ca=People Running About) -- fail if 0.
+(2) Call count_paired_slots_with_field5_default(player_id, 0x15cb=Oppressed People) -- fail if 0.
+(3) Call count_paired_slots_with_field5_default(player_id, 0x15cc=United Resistance) -- fail if 0.
+(4) All three present: read gP1LifePoints[opponent_id*0x868+0xc] (opponent LP count);
+    if nonzero -> return 2; if zero -> return 1.
+Pure predicate, no external writes.
+
+Constants:
+  CARD_ID=0x15ca (People Running About, passcode=12143771)
+  CARD_ID=0x15cb (Oppressed People, passcode=58538870)
+  CARD_ID=0x15cc (United Resistance, passcode=85936485)
+  gP1LifePoints (0x0201c4e0): global LP base
+  0x868: player stride
+  +0xc: opponent LP count field offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (0=fail; 1=three cards present and opponent LP==0; 2=three cards present but opponent has LP)
+Callees: count_paired_slots_with_field5_default (x3)

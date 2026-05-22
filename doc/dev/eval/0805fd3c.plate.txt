@@ -1,0 +1,20 @@
+Equip slot eligibility predicate. Multi-zone-traverse + LP gate.
+High registers used for callee-save (r8=r0 via .hword 0x4680, r9=r1 via .hword 0x4691).
+(1) Extract player_id (byte[+2].bit0); read gP1LifePoints[player*0x868+0x10] (field effect activation count);
+    if <= 1 -> fail immediately.
+(2) Traverse monster zone slots 0..10: extract zone_flag bits[19:0], test bit19 (zone activation flag);
+    extract bits[9:2]*player+offset, compute hand slot addr; compare kicker field;
+    on match check lsls#0x11+lsrs#0x17 count field against limit field.
+(3) After full traverse, call get_lp_count_minus_zone_slot_offset for final LP gate.
+Pure predicate, no external writes.
+
+Constants:
+  gP1LifePoints (0x0201c4e0): player LP / field state global base
+  0x868: player stride
+  +0x10: field effect activation count offset
+  0xa: monster zone slot traverse upper bound (0..10)
+  +0x30: monster zone slot array base offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (1=all conditions pass, 0=any fail)
+Callees: get_lp_count_minus_zone_slot_offset

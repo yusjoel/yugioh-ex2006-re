@@ -1,0 +1,18 @@
+Equip slot eligibility predicate. LP slot existence + chain polarity dual check.
+(1) Read gP1LifePoints[player*0x868+0x10] (LP slot activation count);
+    if 0 -> return 0 immediately (no LP slot).
+(2) LP slot present: call check_value_in_slot_chain(player_id, card_id, type=0xb);
+    if chain contains target (nonzero) -> return 0 (chain contains value, no activation);
+    if chain does not contain target (zero) -> return 1 (allowed).
+Logic: LP slot exists AND chain does not contain target value.
+Pure predicate, no external writes.
+
+Constants:
+  gP1LifePoints (0x0201c4e0): global LP base
+  0x868: player stride
+  +0x10: LP slot activation count field offset
+  0xb: equip chain node type code
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id)
+Returns: r0 u32 (1=LP slot present and chain lacks target, 0=otherwise)
+Callees: check_value_in_slot_chain

@@ -1,0 +1,17 @@
+Equip slot eligibility predicate for Necrovalley (CARD_ID=0x159d, passcode=47355498).
+Three-step check:
+(1) Call count_paired_slots_with_field5_default(player_id, 0x159d) -- fail if 0 (no Necrovalley paired slot on field).
+(2) Read gP1LifePoints[opponent_id*0x868+0xc] (opponent LP count);
+    if nonzero -> go to step (3); else call count_field_zone_cards_with_field5(opponent_id) -- fail if 0.
+(3) If both are 0 -> fail; either nonzero -> return 1.
+Pure predicate, no external writes.
+
+Constants:
+  CARD_ID=0x159d (Necrovalley, passcode=47355498)
+  gP1LifePoints (0x0201c4e0): player LP global base
+  0x868: player stride
+  +0xc: opponent LP count field offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (1=all conditions pass, 0=any fail)
+Callees: count_paired_slots_with_field5_default, count_field_zone_cards_with_field5

@@ -1,0 +1,9 @@
+Equip slot eligibility predicate. Dual-condition check:
+(1) call get_lp_count_minus_zone_slot_offset(slot_ptr, player_id) -- returns 0 if LP slot insufficient -> return 0.
+(2) if LP slot OK, call check_spell_type480_active_deck_matches(slot_ptr, r1_arg) -- returns 1 if deck contains matching type-480 active spell, else 0.
+Pure predicate, no external writes.
+Returns 1 if LP slot sufficient AND deck has matching spell; 0 if either fails.
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]), r1=u32 arg1 (passed to spell check)
+Returns: r0 u32 (1=eligible, 0=ineligible)
+Callees: get_lp_count_minus_zone_slot_offset, check_spell_type480_active_deck_matches

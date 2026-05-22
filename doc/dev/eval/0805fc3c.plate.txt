@@ -1,0 +1,15 @@
+Equip slot eligibility predicate. Three-step check:
+(1) Extract player_id (bit0), zone_idx (bits[6:2]), card_id (ldrh[+0]); call check_value_in_slot_chain -- return 0 if chain already contains target.
+(2) Read global state [0x0201bb90+0x8] (field block flag); return 0 if nonzero.
+(3) Compute hand-slot HP address: base = zone_entry_count*5*4 + player_flag*0x868 + 0x0201c510; read [base+0x6] (hand HP field); return 0 if zero, else return 1.
+Pure predicate, no external writes.
+
+Constants:
+  0x0201bb90: global field state structure base
+  0x868: player stride
+  0x0201c510: hand slot array base
+  +0x6: hand HP field offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (1=all three conditions pass, 0=any fails)
+Callees: check_value_in_slot_chain

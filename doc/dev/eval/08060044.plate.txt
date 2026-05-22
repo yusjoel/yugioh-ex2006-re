@@ -1,0 +1,16 @@
+Equip slot eligibility predicate. Chain-absent gate + LP slot check.
+(1) Call check_equip_slot_chain_absent(slot_ptr) -- if chain is not empty jump to fail path.
+(2) If chain empty: read gP1LifePoints[player*0x868+0x10] (own LP slot activation count);
+    if nonzero -> succeed; else read opponent gP1LifePoints[(1-player)*0x868+0x10];
+    if nonzero -> succeed; both zero -> fail.
+(3) If chain not empty -> return 0.
+Pure predicate, no external writes.
+
+Constants:
+  gP1LifePoints (0x0201c4e0): global LP base
+  0x868: player stride
+  +0x10: LP slot activation count field offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (1=chain absent and LP slot present, 0=otherwise)
+Callees: check_equip_slot_chain_absent

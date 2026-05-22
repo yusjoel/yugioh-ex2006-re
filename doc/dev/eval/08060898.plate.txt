@@ -1,0 +1,17 @@
+Equip slot eligibility predicate. LP slot fast-path OR effect dispatch fallback.
+Called exclusively by FUN_08061660 (tags: [duel_field]) after Neo Daedalus group placeable check.
+(1) Read gP1LifePoints[player*0x868+0x10] (LP slot activation count);
+    if nonzero -> return 1 immediately (fast-pass: LP slot exists).
+(2) If LP slot is 0: call lookup_slot_display_value_by_card_id to get display value;
+    call dispatch_effect_handler_by_card_id(player_id, card_id, display_value);
+    if returns 0 -> return 0 (fail); if nonzero -> return 1 (success).
+Pure predicate, no external writes.
+
+Constants:
+  gP1LifePoints (0x0201c4e0): global LP base
+  0x868: player stride
+  +0x10: LP slot activation count field offset
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], ldrh[+0]=card_id)
+Returns: r0 u32 (1=LP slot exists OR effect handler passes, 0=neither)
+Callees: lookup_slot_display_value_by_card_id, dispatch_effect_handler_by_card_id

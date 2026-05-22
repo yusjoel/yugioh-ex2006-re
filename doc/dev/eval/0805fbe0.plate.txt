@@ -1,0 +1,13 @@
+Equip slot eligibility predicate. Counts total monster zones occupied by both players.
+Extracts player_id (byte[+2].bit0), opponent_id = 1 - player_id.
+Calls count_occupied_monster_zones(opponent_id) then count_occupied_monster_zones(player_id).
+Sums both results into total_count.
+Returns 1 if total_count > 3 (threshold); else 0.
+Pure predicate, no external writes.
+
+Constants:
+  0x3: monster count threshold -- total_count > 3 passes
+
+Inputs: r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 u32 (1=eligible, 0=ineligible)
+Callees: count_occupied_monster_zones (x2)
