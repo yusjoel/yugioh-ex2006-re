@@ -1,0 +1,21 @@
+check_equip_slot_eligible_zone_e_type580_with_field5
+
+Equip slot eligibility predicate. Four-level condition check.
+Cond 1: halfword[+2] & 0xfc0 == 0x580 (zone_type field matches 0x580).
+Cond 2: slot[+0x14] bit9 != player_id (direction flag differs from owner).
+Cond 3: slot[+0x14] bit14 == 0 (activation flag not set; bge check passes when bit14=0).
+Cond 4: slot[+0x14] bits[22:19] == 0xe (4-bit zone index is 14 = zone E).
+If all pass: reads zone card low-13-bit card_id from gP1LifePoints zone array,
+calls check_card_field5_is_nonzero(card_id). Returns 1 if field5 nonzero.
+Sibling of check_slot_at_zone_e_with_field5_active (0x08061018); adds bit14==0 condition.
+
+Constants:
+  ZONE_TYPE_MASK = 0xfc0 -- halfword[+2] bits[11:6] mask (0xfc<<4)
+  ZONE_TYPE_TARGET = 0x580 -- target zone_type value (0xb0<<3)
+  ZONE_E_INDEX = 0xe -- target 4-bit zone index (bits[22:19] of detail_word)
+  LP_ZONE_ARRAY_OFFSET = 0x10e0 -- zone card array base offset in gP1LifePoints (0x87<<5)
+  CARD_ID_MASK_SHIFT = 13 -- low-13-bit card_id extraction (lsls/lsrs #0x13)
+
+Inputs:  r0=SlotPtr* slot_ptr (halfword[+2]=zone_type_flags, slot[+0x14]=detail_word)
+Returns: r0=u32 (1 if all four conditions pass, 0 otherwise)
+Callees: check_card_field5_is_nonzero

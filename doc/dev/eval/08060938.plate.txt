@@ -1,0 +1,15 @@
+check_equip_slot_eligible_by_owner_match_and_effect_dispatch
+
+Equip slot eligibility predicate. Reads stored player_id from gP1LifePoints+0x1ce8.
+Compares against slot byte[+2] bit0 player_id; returns 0 if mismatch.
+On match: calls dispatch_effect_handler_by_card_id(player_id, card_id, 0).
+Returns 1 if dispatch result > 1, else 0.
+Allows equip only when global owner field matches slot controller.
+
+Constants:
+  OWNER_OFFSET = 0x1ce8 -- owner player_id field offset in gP1LifePoints struct
+  DISPATCH_MODE = 0 -- mode param to dispatch_effect_handler_by_card_id
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id, halfword[+0]=card_id)
+Returns: r0=u32 (1 if owner_match AND dispatch > 1, 0 otherwise)
+Callees: dispatch_effect_handler_by_card_id

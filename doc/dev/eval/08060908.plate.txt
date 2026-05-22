@@ -1,0 +1,12 @@
+check_equip_slot_eligible_by_combined_player_effect_sum
+
+Equip slot eligibility predicate. Extracts player_id from slot byte[+2] bit0.
+Calls sum_equip_slot_effect_values_for_player(player_id) -> r4 (own effect sum).
+Calls sum_equip_slot_effect_values_for_player(1-player_id) -> r0 (opp effect sum).
+Accumulates both into r4. Returns 1 if r4 > 0, 0 otherwise.
+Criterion: equip effect sum of both players is positive -> eligible.
+Member of check_equip_slot_eligible cluster.
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if own_sum + opp_sum > 0, 0 otherwise)
+Callees: sum_equip_slot_effect_values_for_player (x2)

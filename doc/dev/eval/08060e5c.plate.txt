@@ -1,0 +1,17 @@
+check_equip_slot_eligible_crimson_ninja_absent_with_spell_zone
+
+Equip slot eligibility predicate. Three-level condition check.
+Cond 1: find_effect_node_in_zone(player_id, zone=0xb, 0x16b8=Crimson Ninja, field6_bits).
+  If node found -> return 0 (Crimson Ninja present blocks equip).
+Cond 2: check_spell_zone_slot_placeable(player_id) -- if 0 -> return 0 (no spell zone).
+Cond 3: dispatch_effect_handler_by_card_id(player_id, card_id, 0) -- if <= 1 -> return 0.
+Returns 1 if all three conditions pass.
+
+Constants:
+  CARD_ID_CRIMSON_NINJA = 0x16b8 -- Crimson Ninja (passcode 14618326)
+  EFFECT_ZONE = 0xb -- zone parameter to find_effect_node_in_zone
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id, halfword[+4]=type_flags, halfword[+0]=card_id)
+Returns: r0=u32 (1 if all three conditions pass, 0 otherwise)
+Callees: find_effect_node_in_zone, check_spell_zone_slot_placeable,
+         dispatch_effect_handler_by_card_id

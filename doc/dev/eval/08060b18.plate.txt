@@ -1,0 +1,18 @@
+check_equip_slot_eligible_by_tier_and_banisher_scan
+
+Equip slot eligibility predicate wrapper. Extracts three params from slot:
+(1) tier via classify_equip_card_id_tier_abc_short(slot_ptr) -> r1,
+(2) player_id from byte[+2] bit0 -> r0,
+(3) field6 from halfword[+4] bits[13:6] -> r2.
+Pushes fixed 0 as fourth stack arg [sp+0].
+Calls scan_equip_slots_eligible_banisher_guard(player_id, tier, field6, 0).
+Includes Banisher of the Light (0x1332) pre-filter; returns 1 if scan nonzero, 0 otherwise.
+Called by 0x08064204 (equip target validity chain).
+
+Constants:
+  FIELD6_SHIFT = 6 -- halfword[+4] bits[13:6] extraction (lsls #0x11; lsrs #0x17)
+  SP_ARG_ZERO = 0 -- fixed fourth parameter at [sp+0]
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], halfword[+4]=type_flags)
+Returns: r0=u32 (1 if banisher-guarded scan finds eligible slots, 0 otherwise)
+Callees: classify_equip_card_id_tier_abc_short, scan_equip_slots_eligible_banisher_guard

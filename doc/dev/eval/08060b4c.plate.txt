@@ -1,0 +1,16 @@
+check_equip_slot_eligible_neo_daedalus_with_opponent_slot_count
+
+Equip slot eligibility predicate. Two-stage check.
+Stage 1: check_field_spell_neo_daedalus_group_placeable(player_id) -- if 0 -> return 0.
+Stage 2: count_monster_slots_for_player(1-player_id, 1) -> opponent monster slot count.
+Returns 1 only if count > 2 (opponent has 3+ monsters), else 0.
+Condition: Neo Daedalus field satisfied AND opponent field has at least 3 monsters.
+Member of check_equip_slot_eligible cluster.
+
+Constants:
+  OPP_PLAYER = 1 -- r1=1 arg to count_monster_slots_for_player (opponent side)
+  MIN_OPP_SLOTS = 2 -- cmp r0,#2; ble fail (need > 2, i.e. at least 3)
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if neo_daedalus_ok AND opp_monster_count > 2, 0 otherwise)
+Callees: check_field_spell_neo_daedalus_group_placeable, count_monster_slots_for_player

@@ -1,0 +1,11 @@
+check_equip_slot_eligible_by_effect_sum_vs_tier
+
+Equip slot eligibility predicate. Extracts player_id from slot byte[+2] bit0.
+Calls sum_equip_slot_effect_values_for_player(player_id) -> r5 (effect sum).
+Calls classify_equip_card_id_tier_abcx(slot_ptr) -> r0 (tier value).
+Returns 1 if effect_sum < tier_value (effect accumulation below tier threshold), 0 otherwise.
+Member of check_equip_slot_eligible cluster.
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if effect_sum < tier_value, 0 otherwise)
+Callees: sum_equip_slot_effect_values_for_player, classify_equip_card_id_tier_abcx

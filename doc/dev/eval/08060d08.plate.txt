@@ -1,0 +1,15 @@
+check_equip_slot_eligible_by_lp_advantage_2000
+
+Equip slot eligibility predicate. Compares life point values with 2000 threshold.
+Reads player_lp from gP1LifePoints + player*0x868 (word at base offset).
+Computes player_lp + 0x7d0 (2000). Reads opp_lp from gP1LifePoints + opp*0x868.
+Returns 1 if (player_lp + 2000) > opp_lp (player leads by more than 2000), else 0.
+Member of check_equip_slot_eligible cluster.
+
+Constants:
+  LP_ADVANTAGE_THRESHOLD = 0x7d0 -- 2000 LP (0xfa<<3; python: 0xfa*8=2000)
+  PLAYER_STRIDE = 0x868 -- per-player stride in gP1LifePoints
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if player_lp + 2000 > opp_lp, 0 otherwise)
+Callees: (none -- pure arithmetic on gP1LifePoints)

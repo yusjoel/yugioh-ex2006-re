@@ -1,0 +1,11 @@
+check_equip_slot_eligible_neo_daedalus_with_monster_placeable
+
+Equip slot eligibility predicate. Two-level condition check.
+Stage 1: find_first_placeable_monster_slot(player_id) -- returns < 0 if none available -> return 0.
+Stage 2: check_field_spell_neo_daedalus_group_placeable(player_id) -- if 0 -> return 0, else -> return 1.
+Requires both a free monster zone and Neo Daedalus field condition satisfied.
+Member of check_equip_slot_eligible cluster.
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if monster slot available AND neo_daedalus placeable, 0 otherwise)
+Callees: find_first_placeable_monster_slot, check_field_spell_neo_daedalus_group_placeable

@@ -1,0 +1,21 @@
+check_equip_slot_eligible_by_zone_slot_field_correlation
+
+Equip slot eligibility predicate. Two parallel verification paths.
+Path 1: Reads zone slot word from gDuelFieldSlots (0x0201c510) at
+zone_idx*20 + player*0x868 offset. Computes count*2 + bit9(opp_word).
+Compares against slot halfword[+4] bits[13:6] (field6). On match checks
+additional halfword[+8] and halfword[+6] fields in same zone.
+Path 2: Reads EWRAM 0x0201bb90 duel state struct ([+4]=player, [+0x20]=zone_idx,
+[+0xd8]=slot_word). If player/zone match and [+0xd8+6] nonzero, performs
+same count*2+flag vs field6 comparison.
+Returns 1 if either path passes, 0 otherwise.
+
+Constants:
+  DUEL_FIELD_SLOTS_BASE = 0x0201c510 -- gDuelFieldSlots EWRAM base address
+  DUEL_STATE_PTR = 0x0201bb90 -- duel state struct EWRAM address
+  PLAYER_STRIDE = 0x868 -- per-player stride
+  ZONE_STRUCT_SIZE = 20 -- zone struct size (zone_idx * 20 = 0x14)
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], bits[5:1]=zone_idx, halfword[+4]=type_flags)
+Returns: r0=u32 (1 if either path passes, 0 otherwise)
+Callees: (none -- pure struct reads)

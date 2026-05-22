@@ -1,0 +1,16 @@
+check_equip_slot_eligible_by_node_absent_in_chain_zone_b
+
+Equip slot eligibility predicate. Single zone chain node query, result inverted.
+Calls check_node_in_slot_chain(player_id, card_id, zone=0xb, type=0x2).
+If node present (nonzero) -> return 0 (ineligible).
+If node absent (zero) -> return 1 (eligible).
+Allows equip only when no corresponding node exists in zone 0xb slot chain.
+Member of check_equip_slot_eligible cluster.
+
+Constants:
+  CHAIN_ZONE = 0xb -- zone parameter to check_node_in_slot_chain
+  NODE_TYPE = 0x2 -- type parameter to check_node_in_slot_chain
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1], halfword[+0]=card_id)
+Returns: r0=u32 (1 if node NOT in zone_b chain, 0 if present)
+Callees: check_node_in_slot_chain

@@ -1,0 +1,16 @@
+check_equip_slot_eligible_by_effect_node_absent_in_zone_b
+
+Equip slot eligibility predicate. Single find_effect_node_in_zone query, result inverted.
+Extracts player_id, card_id (halfword[+0]), and field6 bits from halfword[+4].
+Calls find_effect_node_in_zone(player_id, zone=0xb, card_id, field6_bits).
+If node absent (returns 0) -> return 1 (eligible).
+If node present (nonzero) -> return 0 (ineligible).
+Pure absent-wrapper with no additional preconditions.
+Member of check_equip_slot_eligible cluster.
+
+Constants:
+  ZONE_B = 0xb -- zone parameter to find_effect_node_in_zone
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id, halfword[+0]=card_id, halfword[+4]=type_flags)
+Returns: r0=u32 (1 if effect node NOT in zone_b, 0 if present)
+Callees: find_effect_node_in_zone

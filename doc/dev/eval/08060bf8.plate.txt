@@ -1,0 +1,15 @@
+check_equip_slot_eligible_by_friendship_or_unity_in_extra
+
+Equip slot eligibility predicate. Checks for either Friendship or Unity in extra deck.
+Call 1: count_extra_deck_cards_by_id(player_id, 0x167a=Friendship) -- if nonzero -> return 1.
+Call 2: count_extra_deck_cards_by_id(player_id, 0x167b=Unity) -- if nonzero -> return 1.
+Returns 0 if neither card present in extra deck.
+Member of check_equip_slot_eligible cluster.
+
+Constants:
+  CARD_ID_FRIENDSHIP = 0x167a -- Friendship (passcode 81332143)
+  CARD_ID_UNITY = 0x167b -- Unity (passcode 14731897)
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (1 if Friendship or Unity present in extra deck, 0 otherwise)
+Callees: count_extra_deck_cards_by_id (x2)

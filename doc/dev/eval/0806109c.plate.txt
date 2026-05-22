@@ -1,0 +1,22 @@
+check_equip_slot_eligible_by_dual_zone_flags_and_chain
+
+Equip slot eligibility predicate. Dual zone activation flag check then chain test.
+Extracts zone_idx (bits[5:1]) and player_id (bit0) from slot byte[+2].
+Reads gP1LifePoints+0x40+zone_idx*20+player*0x868 word; extracts bit22 = active_flag1.
+Reads same zone at opp_player offset; extracts bit23 = active_flag2.
+If active_flag1 + active_flag2 != 0 -> return 0.
+If both zero: calls check_equip_slot_chain_absent(slot_ptr, r1_passthrough).
+r1 input saved via r12 and restored as second arg to check_equip_slot_chain_absent.
+Returns result of check_equip_slot_chain_absent.
+
+Constants:
+  ZONE_ARRAY_OFFSET = 0x40 -- zone array base offset in gP1LifePoints
+  PLAYER_STRIDE = 0x868 -- per-player stride
+  ZONE_STRUCT_SIZE = 20 -- zone struct size (zone_idx * 20)
+  FLAG1_BIT = 22 -- own zone active flag (lsrs #0x16, bit22)
+  FLAG2_BIT = 23 -- opp zone active flag (lsrs #0x17, bit23)
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bits[5:1]=zone_idx, bit0=player_id [0..1])
+         r1=u32 passthrough_arg (forwarded to check_equip_slot_chain_absent r1)
+Returns: r0=u32 (forwarded from check_equip_slot_chain_absent; 0=chain present, 1=absent)
+Callees: check_equip_slot_chain_absent

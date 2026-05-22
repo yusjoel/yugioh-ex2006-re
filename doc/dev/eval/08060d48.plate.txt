@@ -1,0 +1,26 @@
+check_equip_slot_eligible_dark_scorpion_full_team_paired
+
+Equip slot eligibility predicate. Checks all 5 Dark Scorpion members paired on field.
+Pre-cond 1: gP1LifePoints+0x1ce8 owner player_id must match slot player_id, else return 0.
+Pre-cond 2: gP1LifePoints+0x1cf4 count field must be <= 3, else return 0.
+Then calls count_paired_slots_with_field5_default 5 times for each team member:
+  0x1532 = Don Zaloog (passcode 76922029)
+  0x161e = Cliff the Trap Remover (passcode 06967870)
+  0x1656 = Dark Scorpion - Chick the Yellow (passcode 61587183)
+  0x1685 = Dark Scorpion - Gorg the Strong (passcode 48768179)
+  0x1686 = Dark Scorpion - Meanae the Thorn (passcode 74153887)
+Any call returning 0 -> return 0. All nonzero -> return 2.
+
+Constants:
+  OWNER_OFFSET = 0x1ce8 -- owner field offset in gP1LifePoints
+  COUNT_OFFSET = 0x1cf4 -- count field offset in gP1LifePoints (must be <= 3)
+  CARD_ID_DON_ZALOOG = 0x1532 -- Don Zaloog
+  CARD_ID_CLIFF = 0x161e -- Cliff the Trap Remover
+  CARD_ID_CHICK = 0x1656 -- Dark Scorpion - Chick the Yellow
+  CARD_ID_GORG = 0x1685 -- Dark Scorpion - Gorg the Strong
+  CARD_ID_MEANAE = 0x1686 -- Dark Scorpion - Meanae the Thorn
+  RETURN_VALUE_OK = 2 -- success returns 2 (not 1)
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 (2 if all 5 Dark Scorpion members present with field5, 0 otherwise)
+Callees: count_paired_slots_with_field5_default (x5)

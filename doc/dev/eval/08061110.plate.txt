@@ -1,0 +1,24 @@
+check_equip_slot_eligible_bls_envoy_absent_with_zone_field_match
+
+Equip slot eligibility predicate. Three-level zone field validation.
+Cond 1: Reads dual zone words from gDuelFieldSlots (0x0201c510) at
+zone_idx*20+player*0x868. Computes count*2 + bit13(opp_word).
+Compares with slot halfword[+4] bits[13:6] (field6). Mismatch -> return 0.
+Cond 2: check_node_in_slot_chain(player_id, zone_idx, 0x16cb=Black Luster Soldier - Envoy of the Beginning, type=2).
+If node found -> return 0 (BLS Envoy present blocks equip).
+Cond 3: gDuelFieldSlots+0x10+zone_idx*20+player*0x868 word bit23; if set -> return 0.
+All pass: calls check_equip_slot_chain_absent(slot_ptr, r10_passthrough) and returns its result.
+Called by 0x0806231c and 0x08064418 (equip dispatch stubs).
+
+Constants:
+  DUEL_FIELD_SLOTS_BASE = 0x0201c510 -- gDuelFieldSlots EWRAM base address
+  PLAYER_STRIDE = 0x868 -- per-player struct stride
+  ZONE_STRUCT_SIZE = 20 -- zone struct size
+  CARD_ID_BLS_ENVOY = 0x16cb -- Black Luster Soldier - Envoy of the Beginning (passcode 72989439)
+  ZONE_EXTRA_OFFSET = 0x10 -- secondary zone array offset within gDuelFieldSlots
+  NODE_TYPE = 0x2 -- type param to check_node_in_slot_chain
+
+Inputs:  r0=SlotPtr* slot_ptr (byte[+2] bits[5:1]=zone_idx, bit0=player_id [0..1], halfword[+4]=type_flags)
+         r1=u32 passthrough_arg (forwarded to check_equip_slot_chain_absent r1)
+Returns: r0=u32 (forwarded from check_equip_slot_chain_absent; 0=blocked, 1=eligible)
+Callees: check_node_in_slot_chain, check_equip_slot_chain_absent

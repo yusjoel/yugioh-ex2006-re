@@ -1,0 +1,23 @@
+check_equip_slot_eligible_terrorking_archfiend_with_banisher_guard
+
+Equip slot eligibility predicate with Banisher of the Light (0x1332) pre-filter.
+If count_field_copies_of_card(0x1332) > 0 -> return 0 (Banisher present blocks equip).
+Extracts card_type from halfword[+2] bits[11:6]; accepts only 0x16 (22) or 0x1b (27).
+Verifies: owner_bit == player_id, bits[13:10] of detail_word <= 4,
+(detail_word & 0xf88000) == 0x708000.
+Reads zone card low-13-bit card_id; calls check_card_pair_allowed(card_id, 0x1691=Terrorking Archfiend).
+Returns result of check_card_pair_allowed.
+
+Constants:
+  CARD_ID_BANISHER = 0x1332 -- Banisher of the Light (passcode 61528025); front-guard
+  CARD_TYPE_22 = 0x16 -- accepted card_type 22 (halfword[+2] bits[11:6])
+  CARD_TYPE_27 = 0x1b -- accepted card_type 27
+  ZONE_4BIT_MAX = 4 -- bits[13:10] of detail_word must be <= 4
+  FIELD_MASK = 0xf88000 -- bits[23:11] of detail_word; zone-field bitmask
+  FIELD_EXPECT = 0x708000 -- expected value after AND with FIELD_MASK (0xe1<<15)
+  CARD_ID_TERRORKING = 0x1691 -- Terrorking Archfiend (passcode 35975813)
+  LP_ZONE_OFFSET = 0x10e0 -- zone card array base offset (0x87<<5)
+
+Inputs:  r0=SlotPtr* slot_ptr (halfword[+2]=type_flags, slot[+0x14]=detail_word)
+Returns: r0=u32 (result of check_card_pair_allowed, or 0 if any guard fails)
+Callees: count_field_copies_of_card, check_card_pair_allowed
