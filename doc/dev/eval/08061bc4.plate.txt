@@ -1,0 +1,6 @@
+Equip slot activation eligibility predicate, three-level condition:
+(1) check_field_spell_neo_daedalus_group_placeable(player_id) == 0 return 0;
+(2) get_lp_count_minus_zone_slot_offset(slot_ptr, player_id) -> lp_minus;
+(3) read gP1LifePoints[player*0x868+0x10] (player status word) -> status;
+    if (lp_minus + status) == 0 return 0; else return 1.
+Constants: PLAYER_STATUS_OFFSET=0x10, PLAYER_STRIDE=0x868.

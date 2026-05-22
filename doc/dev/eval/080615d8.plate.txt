@@ -1,0 +1,8 @@
+Equip slot activation eligibility predicate, checks field spell effect type and zone field5:
+(1) slot[+2] halfword bits[10:6] must be 0x16 (field spell type, mask=0xfc0, target=0x580); else return 0;
+(2) slot[+0x14] bits[22:19] (4 bits) must == 0xe (effect type 14); else return 0;
+(3) extract zone_idx from slot[+0x14] (bits[8:0]*4 = zone offset), look up
+    gP1LifePoints[+0x10e0+zone_idx*4] card_id, call check_card_field5_is_nonzero;
+    returns 1 if field5 nonzero.
+Constants: SPELL_TYPE_MASK=0xfc0, FIELD_SPELL_TYPE=0x580, EFFECT_TYPE_E=0xe,
+ZONE_FIELD5_ARRAY=0x87<<5=0x10e0, ZONE_IDX_SHIFT: lsls #0x17 then lsrs #0x15 (net *4).

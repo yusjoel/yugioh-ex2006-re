@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, two-level condition:
+(1) read gP1LifePoints[player*0x868+0x1c] (hand alt count), if <= 1 reject;
+(2) call count_paired_slots_both_sides(BLS-Envoy=0x16cb) and count_paired_slots_both_sides(CED-Envoy=0x16e4);
+    if both return 0 reject; if either Envoy has a paired slot, return 1.
+Constants: ICID_BLS_ENVOY=0x16cb (Black Luster Soldier - Envoy of the Beginning, passcode=72989439),
+ICID_CED_ENVOY=0x16e4 (Chaos Emperor Dragon - Envoy of the End, passcode=82301904),
+HAND_COUNT_OFFSET=0x1c, PLAYER_STRIDE=0x868, HAND_COUNT_THRESHOLD=1.

@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, checks field spell type and effect context specific value:
+(1) slot[+2] halfword bits[10:6] must be 0x16 (field spell type, mask=0xfc0, target=0x580); else return 0;
+(2) read slot[+0x14] bits[8:0] and compare with gDuelEffectCtx[+0x70];
+    if match use offset=0x88, else use offset=0x50;
+(3) read gDuelEffectCtx[+offset], if == 0xa (10) return 1 else return 0.
+Constants: SPELL_TYPE_MASK=0xfc0, FIELD_SPELL_TYPE=0x580, EFFECT_CTX_BASE=0x0201bb90,
+CTX_ZONE_REF_OFFSET=0x70, CTX_SLOT_MATCH_OFFSET=0x88, CTX_SLOT_NO_MATCH_OFFSET=0x50, EXPECTED_VAL=0xa.

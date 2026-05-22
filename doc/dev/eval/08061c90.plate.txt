@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, three-level condition:
+(1) check_spell_type480_active_deck_matches() == 0 return 0;
+(2) count_activatable_slots_for_player(gDuelEffectCtx[+0x0], gDuelEffectCtx[+0x1c]) -> count;
+    if count > 1 return 1 (direct pass);
+    if count == 0 return 0;
+(3) count == 1: eval_slot_fieldspell_activation_full(gDuelEffectCtx[+0x0], gDuelEffectCtx[+0x1c]) == 1 return 1, else return 0.
+Constants: EFFECT_CTX_BASE=0x0201bb90, CTX_PLAYER_OFFSET=0x0, CTX_ZONE_OFFSET=0x1c.

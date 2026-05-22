@@ -1,0 +1,5 @@
+Equip slot activation eligibility predicate, no parameter used (slot_ptr not read):
+call count_field_copies_of_card(0x13f2=Mask of Restrict);
+if Mask of Restrict is on the field (count != 0) return 0;
+if Mask of Restrict is absent (count == 0) return 1.
+Constants: ICID_MASK_OF_RESTRICT=0x13f2 (Mask of Restrict, passcode=29549364).

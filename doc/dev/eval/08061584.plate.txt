@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, two-level condition:
+(1) count_field_copies_of_card(0x1332=Banisher of the Light) > 0, immediately return 0 (blocking condition);
+(2) read gP1LifePoints[player*0x868] monster zone slot data, extract card_id low 13 bits,
+    call check_card_pair_allowed(card_id, 0x10f4=Umi); pass through return value.
+Constants: ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light, passcode=61528025),
+ICID_UMI=0x10f4 (Umi, passcode=22702055), PLAYER_STRIDE=0x868,
+SLOT_BASE=0x0201c5d8, HAND_COUNT_OFFSET=0x8.

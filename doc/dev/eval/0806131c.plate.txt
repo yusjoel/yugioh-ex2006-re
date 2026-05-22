@@ -1,0 +1,4 @@
+Equip slot activation eligibility predicate, single-condition wrapper:
+extract player_id from slot[+2], call get_lp_count_minus_zone_slot_offset(slot_ptr, player_id);
+if return value > 0 return 1, else return 0.
+Minimal wrapper that performs a positive-value test on the lp_count_minus_zone_slot_offset result.

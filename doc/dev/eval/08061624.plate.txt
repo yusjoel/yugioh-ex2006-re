@@ -1,0 +1,6 @@
+Equip slot activation eligibility predicate, iterates both players (player_id=0 and 1), for each player performs three-level check:
+(1) count_monster_slots_for_player(slot_ptr, player_id) > 0;
+(2) check_field_spell_neo_daedalus_group_placeable(player_id) > 0;
+(3) dispatch_effect_handler_by_card_id(player_id, card_id_from_slot, zone_idx=0, extra=0) > 0;
+if any player passes all three return 1, if both players fail return 0.
+Constants: PLAYER_LOOP_MAX=1 (loop player_id=[0..1]).

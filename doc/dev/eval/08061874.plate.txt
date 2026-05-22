@@ -1,0 +1,6 @@
+Equip slot activation eligibility predicate, checks that player LP plus 7000 does not exceed opponent LP:
+read gP1LifePoints[player*0x868+0x0] (player LP word), add 0x1b58 (=7000);
+read gP1LifePoints[opponent*0x868+0x0] (opponent LP word);
+if (player_LP + 7000) > opponent_LP return 0; else return 1.
+Semantics: opponent LP must be at least 7000 higher than player LP for activation.
+Constants: LP_GAP_THRESHOLD=0x1b58 (=7000 decimal), PLAYER_STRIDE=0x868, LP_WORD_OFFSET=0x0.

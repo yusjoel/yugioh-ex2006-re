@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, three-level condition with tri-state return:
+(1) count_paired_slots_both_sides(0x175e=The Sanctuary in the Sky) == 0 return 0;
+(2) dispatch_effect_via_hand_slot_setcode(slot_ptr, zone_idx) == 0 return 0;
+(3) read gP1LifePoints[opponent*0x868+0xc] (opponent hand count);
+    if == 0 return 1; if nonzero return 2.
+Constants: ICID_SANCTUARY_IN_THE_SKY=0x175e (The Sanctuary in the Sky, passcode=56433456),
+PLAYER_STRIDE=0x868, HAND_COUNT_OFFSET=0xc.

@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, determines graveyard count threshold by card_id and checks player zone count:
+read card_id from r0[+0] (ldrh); compare with 0x14f0 (Reversal of Graves) -> threshold=0xf=15;
+compare with 0x16dc (Blasting the Ruins) -> threshold=0x1e=30; other cards -> threshold=1.
+read gP1LifePoints[player*0x868+0x14] (zone occupy count); if >= threshold return 1 else return 0.
+Constants: ICID_REVERSAL_OF_GRAVES=0x14f0 (Reversal of Graves, passcode=17484499),
+ICID_BLASTING_THE_RUINS=0x16dc (Blasting the Ruins, passcode=21466326),
+DEFAULT_THRESHOLD=1, ZONE_COUNT_OFFSET=0x14, PLAYER_STRIDE=0x868.

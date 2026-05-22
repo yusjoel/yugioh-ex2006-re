@@ -1,0 +1,10 @@
+Equip slot activation eligibility predicate, four-level composite condition:
+(1) check_field_spell_neo_daedalus_group_placeable(player_id) == 0 reject;
+(2) find_hand_slot_idx_by_set_code(player_id, set_code) < 0 reject;
+(3) count_field_copies_of_card(0x1332=Banisher of the Light) > 0 reject;
+(4) two-phase loop over gDuelFieldSlots[player] and gDuelFieldSlots second array (0x0201c600 base):
+    match condition: field8 != 9 and extended_stat_field6 in {0xb, 0xc, 0x10};
+all pass return 1.
+Constants: ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light, passcode=61528025),
+PLAYER_STRIDE=0x868, FIELD6_RANGE_LO=0xb, FIELD6_RANGE_HI=0xc, FIELD6_EXTRA=0x10,
+SLOT_STRIDE=0x14, MAX_SLOT_IDX=4, GDUELFIELDSLOTS_BASE=0x0201c510, SECOND_ARRAY_BASE=0x0201c600.

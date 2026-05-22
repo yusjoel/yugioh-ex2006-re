@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate, compares LP-minus-zone-offset value with graveyard field7 count:
+(1) get_lp_count_minus_zone_slot_offset(slot_ptr, player_id) -> lp_minus;
+(2) count_graveyard_cards_by_field7_value(player_id, 1) -> gy_count;
+    if gy_count == 0 or lp_minus == 0 return 0;
+(3) if lp_minus <= gy_count return 1; if lp_minus > gy_count return 0.
+Semantics: graveyard has field7==1 cards and LP-minus-zone value does not exceed that count.
+Constants: FIELD7_VALUE=1.

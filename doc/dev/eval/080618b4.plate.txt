@@ -1,0 +1,4 @@
+Equip slot activation eligibility predicate, two-level condition:
+(1) check_equip_slot_chain_absent(slot_ptr, zone_idx): if chain node already present return 0;
+(2) dispatch_effect_via_hand_slot_setcode(slot_ptr, zone_idx): pass through return value.
+Ensures equip effect chain is unoccupied and hand set code matches before allowing activation.

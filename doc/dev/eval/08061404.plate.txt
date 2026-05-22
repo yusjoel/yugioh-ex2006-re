@@ -1,0 +1,6 @@
+Equip slot activation eligibility predicate, checks that both players field zone occupation counts are <= 5:
+extract player_id from slot[+2].bit0, compute opponent_id=1-player_id;
+call count_occupied_all_field_zones(opponent_id), if > 5 return 0;
+call count_occupied_all_field_zones(player_id), if > 5 return 0;
+both <= 5 return 1.
+Constants: ZONE_LIMIT=5.

@@ -1,0 +1,3 @@
+Equip slot activation eligibility predicate, single-condition wrapper:
+extract player_id from slot[+2].bit0, call count_eligible_zone_slots_all_flags(player_id, 1) with flag=1;
+if return value > 0 return 1, else return 0.

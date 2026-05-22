@@ -1,0 +1,5 @@
+Equip slot activation eligibility predicate, two-level condition:
+(1) read gP1LifePoints[player*0x868+0x10] (player status word), if <= 2 return 0;
+(2) dispatch_effect_via_hand_slot_setcode(slot_ptr, zone_idx): pass through return value.
+Ensures player status > 2 and hand set code matches before activation.
+Constants: PLAYER_STATUS_OFFSET=0x10, PLAYER_STRIDE=0x868, STATUS_THRESHOLD=2.
