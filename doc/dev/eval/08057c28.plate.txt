@@ -1,0 +1,14 @@
+Three-state dispatch function. Reads [0x0201b290+0x4ac] state word to drive equip zone
+Banisher sprite and LP counter display sequence.
+- State 0: calls increment_lp_bar_display_counter, advances state.
+- State 1: extracts player_id from card_entry[+2].bit0, checks gP1LifePoints[+player_id*0x868+0xc]
+  for active record; if found calls dispatch_equip_zone_sprite_banisher_with_count_check(player_id,0)
+  and advances state returning 0; otherwise calls decrement_lp_bar_display_counter.
+- State 2: reads card_id/slot from equip slot entry, calls dispatch_effect_handler_by_card_id,
+  advances state.
+Exit: pop{r4,r5,r6}; pop{r1}; bx r1 void return.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- PLAYER_STRIDE=0x868

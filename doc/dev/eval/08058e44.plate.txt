@@ -1,0 +1,30 @@
+Two-state (0/1) equip zone target selection display sequence frame driver with card_id branches.
+Reads [0x0201b290+0x4ac] state word:
+- State 0: trigger_card_display_op31_if_not_active(0x29); reads confirm table
+  [0x0201e2a0+player*4+8]; if =1 calls select_equip_target_slot_by_card_id(player_id,
+  card_id=2, tbl=0x08065991); else init_zone_activation_display_fields(0x08065991). Advances.
+- State 1: check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d70],
+  calls dispatch_equip_zone_sprite_banisher_with_count_check(lp_a, lp_b); then branches by
+  card_entry[+0] icid:
+  - 0x1727 (Abyss Soldier, password=18318842): enqueue_equip_zone_sprite_at_slot +
+    eval_equip_bonus_for_slot
+  - 0x1895 (Vampire Genesis, password=22056710): enqueue_equip_zone_sprite_at_slot +
+    eval_equip_bonus_for_slot
+  - 0x18cb (Double Attack, password=34187685): eval_equip_bonus_for_slot
+  - other: returns 1. Writes result to card_entry[+0xc].
+  If not confirmed: decrements step counter, returns 0.
+Exit: pop{r4,...}; pop{r1}; bx r1 void return.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- CONFIRM_TBL=0x0201e2a0
+- LP_STORED_OFF=0x1d68
+- LP_BANISHER_OFF=0x1d70
+- SLOT_TBL=0x08065991
+- OP31_CODE=0x29
+- CARD_ID_PARAM=2
+- PLAYER_STRIDE=0x868
+- CARD_ID_ABYSS_SOLDIER=0x1727 (Abyss Soldier, password=18318842)
+- CARD_ID_VAMPIRE_GENESIS=0x1895 (Vampire Genesis, password=22056710)
+- CARD_ID_DOUBLE_ATTACK=0x18cb (Double Attack, password=34187685)

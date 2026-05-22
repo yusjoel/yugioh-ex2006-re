@@ -1,0 +1,9 @@
+Extracts from card_entry r0: player_id=[+2].bit0, card_id=[+0]u16,
+slot_field_bits from [+4].bits[14:8] (lsls #0x11; lsrs #0x17 = 7-bit field).
+Calls enqueue_sprite_attr_type11(player_id, card_id, slot_bits, 1) to write
+type11 attr record into OAM sprite queue.
+Exit: pop{r1}; bx r1 void return.
+
+Constants:
+- ATTR_MODE=1
+- SLOT_BITS_FIELD=[+4] bits[14:8]

@@ -1,0 +1,9 @@
+Symmetric sibling of 0x08057ea8 (set_lp_row_type2_for_equip_tier_abc): calls
+classify_equip_card_id_tier_abc_short, if result >0 calls
+set_lp_row_type2_with_sign_flags with sign_flags(r2=0, r3=0) to update LP display row.
+Only difference from sibling: r3=0 (neutral sign flag) vs sibling r3=1.
+Exit: pop{r4}; pop{r1}; bx r1 void return.
+
+Constants:
+- SIGN_R2=0
+- SIGN_R3=0

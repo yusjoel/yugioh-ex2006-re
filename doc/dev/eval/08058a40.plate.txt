@@ -1,0 +1,16 @@
+Predicate. r0=player_id, r1=zone_type_code, r3=card_entry_ptr.
+Reads activation slot ptr from [0x0201b290+0x484], takes its [+2].bit0, compares with r3 player_id:
+mismatch returns 0. Checks r1 in [0x4..0xb] (equip zone type range). If in range:
+(1) calls get_zone_slot_entity_ref_by_type(player_id, zone_type) -> r4;
+(2) calls check_card_field8_is_9(r4): nonzero returns 0;
+(3) calls get_card_extended_stat_field6(r4): if in [0xb..0xc] or ==0x10 returns 0x800, else 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- ACTIVATION_OFFSET=0x484
+- ZONE_TYPE_MIN=0x4
+- ZONE_TYPE_MAX=0xb
+- FIELD6_LOW=0xb
+- FIELD6_HIGH=0xc
+- FIELD6_ALT=0x10
+- RESULT_VALID=0x800 (=0x80<<4)

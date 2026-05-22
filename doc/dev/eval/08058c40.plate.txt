@@ -1,0 +1,20 @@
+Two-state (0/1) equip zone target selection short sequence frame driver.
+Reads [0x0201b290+0x4ac] state word:
+- State 0: trigger_card_display_op31_if_not_active(0x3a); reads confirm table
+  [0x0201e2a0+player*4+8]; if =1 calls select_equip_target_slot_by_card_id(player_id,
+  card_id=2, tbl=0x08065991); else init_zone_activation_display_fields(0x08065991).
+  Advances counter, returns 0.
+- State 1: check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d70]
+  calls dispatch_equip_zone_sprite_banisher_lp_row1(lp_val0, lp_val1), returns 1;
+  if not confirmed decrements counter, returns 0.
+Exit: pop{r4,r5}; pop{r1}; bx r1 void return.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- CONFIRM_TBL=0x0201e2a0
+- LP_STORED_OFF=0x1d68
+- LP_BANISHER_OFF=0x1d70
+- SLOT_TBL=0x08065991
+- OP31_CODE=0x3a
+- CARD_ID_PARAM=2

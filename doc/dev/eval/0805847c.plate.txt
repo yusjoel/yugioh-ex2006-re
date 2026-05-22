@@ -1,0 +1,12 @@
+Two-step sprite update for equip card slot: (1) reads xy coord from EWRAM slot table at
+[0x0201c510+player_id*0x868+slot_group*0x14+0xc], writes to card_entry[+8], calls
+set_field_slot_bit_with_sprite_update(player_id, slot_group, bit=4, 0) to set field slot flag
+and trigger sprite refresh; (2) calls enqueue_sprite_attr_with_xy_split(player_id, slot_group, 0)
+to submit split-xy sprite attr to OAM queue.
+
+Constants:
+- SLOT_TABLE_BASE=0x0201c510
+- PLAYER_STRIDE=0x868
+- SLOT_ENTRY_SIZE=0x14
+- XY_COORD_OFFSET=0xc
+- BIT_INDEX=4

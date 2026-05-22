@@ -1,0 +1,26 @@
+Four-state (0/1/2/3) equip score LP display sequence frame driver.
+Reads [0x0201b290+0x4ac] state word:
+- State 0: extracts player_id from card_entry[+2].bit0, calls
+  set_lp_display_row_type8(player_id, 0xffff, 0). Advances.
+- State 1: reads gP1LP[+0x1da8] slot info, calls eval_slot_score_entry_full; writes score to
+  card_entry[+8] and [+0xa] (capped at 0xffff); reads confirm table for sign; if confirmed and
+  has paired_count writes gP1LP[+0x1d68*player_stride]; else calls
+  invoke_card_display_op_0x31_sub3_with_packed_params(r1=0x198, r2=0x199, r0=0x81,
+  sp[0]=0, sp[4]=0xf). Advances.
+- State 2: reads gP1LP[+0x1da8] slot, calls submit_equip_sprite_if_slot_eligible. Advances.
+- State 3: reads gP1LP[+0x1d68] confirm; if =0 reads card_entry[+8], =1 reads card_entry[+0xa],
+  writes [+0xc]; reads player_id and gP1LP offset, computes LP, calls set_lp_display_row_type15.
+  Advances.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- LP_SCORE_OFF=0x1da8
+- LP_CONFIRM_OFF=0x1d68
+- SCORE_MAX=0xffff
+- OP31_R1=0x198 (=0xcc<<1)
+- OP31_R2=0x199
+- OP31_R0=0x81
+- OP31_SP0=0
+- OP31_SP4=0xf
+- PLAYER_STRIDE=0x868

@@ -1,0 +1,13 @@
+Predicate. r0=card_entry_ptr, r1=card_target_player, r2=slot_group.
+Entry ldrb r0,[r0,#2] dereferences r0 to get [+2] byte, extracts bit0 as internal player_id,
+compares with r1: if mismatch returns 0. Locates EWRAM slot table at
+[0x0201c510+player_id*0x868+slot_group*0x14], reads control word, extracts low 13 bits
+(lsls #0x13; lsrs #0x13); returns 0 if zero (slot inactive). Then checks [slot+8] h16 for
+nonzero slot_id. Finally calls get_slot_effect_card_value(player_id, slot_group);
+returns 1 if nonzero, else 0.
+
+Constants:
+- SLOT_TABLE_BASE=0x0201c510
+- PLAYER_STRIDE=0x868
+- SLOT_ENTRY_SIZE=0x14
+- ACTIVE_BITS_MASK=0x1fff (bits[12:0])

@@ -1,0 +1,5 @@
+Combined two-step sprite submission: first calls render_equip_lp_cost_sprite(card_entry, scene_ptr)
+to render LP cost sprite image; then calls enqueue_equip_zone_sprite_at_slot(card_entry, scene_ptr)
+to submit equip zone slot sprite record to OAM queue.
+r0=card_entry, r1=scene_ptr.
+Exit: pop{r4,r5}; pop{r1}; bx r1 void return.

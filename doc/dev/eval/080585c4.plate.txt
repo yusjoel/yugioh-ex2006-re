@@ -1,0 +1,6 @@
+Extracts player_id=bit0 and slot_group=bits[6:2] from card_entry[+2], calls
+classify_equip_card_id_tier_abcx for ABCX four-tier classification, negates result
+(rsbs r2,r2,#0 = -tier) as mode parameter, then calls
+enqueue_effect_card_slot_sprite_attr(player_id, slot_group, -tier) to write effect slot
+sprite attr into OAM queue.
+Exit: pop{r4,r5}; pop{r1}; bx r1 void return.

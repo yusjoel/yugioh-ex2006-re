@@ -1,0 +1,8 @@
+Calls classify_equip_card_id_tier_abc_short to classify equip card into ABC tiers; if result >0
+(non-tier-none), extracts player_id from card_entry[+2].bit0, then calls
+set_lp_row_type2_with_sign_flags(player_id, sign_r2=0, sign_r3=1) to update LP display row.
+Exit: pop{r4}; pop{r1}; bx r1 void return.
+
+Constants:
+- SIGN_R2=0
+- SIGN_R3=1

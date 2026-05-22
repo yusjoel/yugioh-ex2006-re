@@ -1,0 +1,9 @@
+Extracts player_id=[+2].bit0 and card_id=[+0]u16 from card_entry r0, calls
+enqueue_sprite_attr_type11(player_id, card_id, mode=1, extra=0) to write simplified
+type11 attr record into OAM sprite queue. Symmetric sibling of 0x0805845c
+(enqueue_sprite_type11_for_equip_slot); difference: r3 fixed=0, no slot_field_bits extraction.
+Exit: pop{r1}; bx r1 void return.
+
+Constants:
+- ATTR_MODE=1
+- EXTRA_FLAG=0

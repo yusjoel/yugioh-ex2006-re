@@ -1,0 +1,5 @@
+Extracts player_id=[+2].bit0 and slot_group=[+2].bits[6:2] from card_entry, calls
+get_equip_card_set_code_for_slot(player_id, slot_group) and writes result to card_entry[+0xa];
+then calls test_equip_target_zone14_with_ctx_clear(player_id, slot_group) to run equip target
+zone14 test and clear context.
+Exit: pop{r4}; pop{r1}; bx r1 void return.

@@ -1,0 +1,6 @@
+Extracts player_id from r0[+2].bit0, passes fixed row_index=2 to
+set_lp_row_type4_with_value(player_id, 2) to write type4 state into LP display row.
+Exit: pop{r1};bx r1 void return.
+
+Constants:
+- ROW_INDEX=2

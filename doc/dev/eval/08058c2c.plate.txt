@@ -1,0 +1,6 @@
+Extracts player_id=bit0 from card_entry r0[+2], passes fixed zone_code=10 (0xa) to
+test_equip_target_zone14_with_ctx_clear(player_id, zone_code=10) to run equip zone14 test
+and clear context. Exit: pop{r1}; bx r1 void return (r0=1 fixed). Lightweight case stub.
+
+Constants:
+- ZONE_CODE=0xa (=10)

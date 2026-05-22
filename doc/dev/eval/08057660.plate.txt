@@ -1,0 +1,7 @@
+Extracts player_id from r0[+2].bit0, passes fixed mode=0, delta_sign=1 to
+apply_lp_delta_if_slot_active(player_id, 0, 1) to apply LP delta to the LP pipeline.
+Exit: pop{r1};bx r1 void return.
+
+Constants:
+- MODE=0
+- DELTA_SIGN=1

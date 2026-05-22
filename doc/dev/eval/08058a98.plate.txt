@@ -1,0 +1,23 @@
+Four-state (0/1/2/3) equip zone target selection display sequence frame driver.
+Reads [0x0201b290+0x4ac] state word:
+- State 0: checks confirm table [0x0201e2a0+player*4+8]; if =1 writes gP1LP[+0x1d68]=state_value
+  and advances; else looks up card_name, calls format_game_text_with_text_arg(0xfa) +
+  invoke_card_display_op_0x31_sub1, advances.
+- State 1: reads gP1LP[+0x1d68]; if nonzero: count_paired_slots_with_field5_default, writes
+  gP1LP[+0x1d68]; else card_name_lookup + format + invoke_sub1. Advances.
+- State 2: trigger_card_display_op31_if_not_active(0x3a); reads confirm table; if =1 calls
+  select_equip_target_slot_by_card_id; else init_zone_activation_display_fields. Advances.
+- State 3: check_activation_display_state_is_confirmed; if confirmed reads LP+slot data, calls
+  dispatch_equip_zone_sprite_banisher_by_field_count or test_equip_target_zone14_with_ctx_clear;
+  if not confirmed decrements counter.
+Exit: pop{r4,r5,r6}; pop{r1}; bx r1 void return.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- CONFIRM_TBL=0x0201e2a0
+- LP_STATE_OFF=0x1d68
+- LP_STEP2_OFF=0x1d70
+- PLAYER_STRIDE=0x868
+- OP31_CODE_STATE2=0x3a
+- TEXT_ID=0xfa

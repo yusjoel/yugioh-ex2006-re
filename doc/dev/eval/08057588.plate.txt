@@ -1,0 +1,6 @@
+Extracts player_id from r0[+2].bit0 (0=P1, 1=P2), passes fixed slot_group=3 to
+enqueue_slot_sprite_attr_by_player to write equip zone slot sprite into OAM attr buffer.
+Exit: pop{r1};bx r1 void return. 16-byte lightweight case stub.
+
+Constants:
+- SLOT_GROUP=3

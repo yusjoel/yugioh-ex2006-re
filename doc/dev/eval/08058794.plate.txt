@@ -1,0 +1,5 @@
+Extracts player_id=[+2].bit0 and card_id from [+4].bits[14:8] from card_entry; calls
+find_slot_idx_by_card_id_in_player_zones(player_id, card_id) to find slot index holding that card;
+if result >=0 (found), calls dispatch_equip_zone_sprite_banisher_lp_row1(player_id) to trigger
+equip zone Banisher LP row sprite dispatch.
+Exit: pop{r4}; pop{r1}; bx r1 void return.
