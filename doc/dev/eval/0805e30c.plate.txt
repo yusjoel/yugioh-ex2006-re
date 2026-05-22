@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate (spell type 0x3c0). Checks card slot halfword[+2] bits[11:6] for 0x3c0 (0xf0*4). Reads global active deck struct 0x0201bb90: requires [+0x0] player_id matches slot byte[+2] bit0; requires [+0x8] nonzero (active equip slot has value). Loads [+0x1c] zone_idx and calls check_zone_slot_equip_prerequisites. Also checks slot halfword[+0x14] nonzero. Returns 1 when all conditions met.
+
+Constants:
+  SPELL_TYPE_MASK = 0xfc0 (0xfc<<4)
+  SPELL_TYPE_3C0 = 0x3c0 (0xf0*4)
+  ACTIVE_DECK_GLOBAL = 0x0201bb90
+  FIELD14_NONZERO_CHECK = halfword[+0x14] != 0

@@ -1,0 +1,6 @@
+Spell zone placeable with chain or monster condition predicate. Extracts player_id (byte[+2] bit0), calls check_spell_zone_slot_placeable(player_id); returns 0 if not placeable. Calls check_equip_slot_chain_absent(slot, equip_slot); returns 0 if chain not empty. Calls check_value_in_slot_chain(player_id, 0x14a0, 0xb): if found (nonzero), calls count_occupied_monster_zones(player_id); returns 1 if >1, else 0. If not found, calls dispatch_effect_handler_by_card_id(player_id, card_id, 0); returns 1 if >0, else 0.
+
+Constants:
+  CHAIN_VALUE_TYPE = 0x14a0 (0xa5*32)
+  CHAIN_ZONE_TYPE = 0xb
+  MIN_OCCUPIED_MONSTERS = 2 (> 1)

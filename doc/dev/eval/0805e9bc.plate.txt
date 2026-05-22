@@ -1,0 +1,10 @@
+Equip slot activation eligibility predicate (spell type 0x240, zone field6 nonzero). Checks halfword[+2] bits[11:6] for 0x240 (0x90*4) or 0x200 (0x90*4-0x40). Reads word[+0x14], extracts player_id (bit9) and zone_idx (bits[13:10]). Checks word[+0x14] bit14 must be 0 (lsls#0x11 bge fail) and bit15 must be 1 (lsls#0x10 blt fail). Requires player_id from [+0x14] differs from slot byte[+2] bit0 (cross-player). Computes zone address and checks [zone+0x0] field5 nonzero, [zone+0x6] field6 link nonzero, [zone+0x8] field9 zero. Calls check_zone_slot_equip_prerequisites. Returns 2 when all met.
+
+Constants:
+  SPELL_TYPE_MASK = 0xfc0 (0xfc<<4)
+  SPELL_TYPE_240 = 0x240 (0x90*4)
+  SPELL_TYPE_200 = 0x200 (0x90*4-0x40)
+  PLAYER_STRUCT_STRIDE = 0x868
+  ZONE_BASE = 0x0201c510
+  WORD14_BIT14 = must be 0 (lsls #0x11 bge fail)
+  WORD14_BIT15 = must be 1 (lsls #0x10 blt fail)

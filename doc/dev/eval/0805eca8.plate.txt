@@ -1,0 +1,9 @@
+Equip or face-down slot activation eligibility predicate (dual-path). Reads byte[+3] bits[5:4]: if not 0x20 (not face-down), takes equip path -- extracts player_id/field6_flag/zone_idx, calls check_slot_card_can_be_equipped. If 0x20 (face-down), takes activation path -- checks player_id matches gP1LP[+0x1ce8] active player, checks gP1LP+player*0x868+0x10d0 bit0 is zero (equip inhibit clear), calls check_value_in_slot_chain(player, card_id, 0xb); if chain found calls dispatch_effect_handler_by_card_id. Either path returning nonzero -> returns 1.
+
+Constants:
+  FACEDOWN_FLAG_MASK = 0x30
+  FACEDOWN_FLAG_VALUE = 0x20
+  ACTIVE_PLAYER_OFFSET = 0x1ce8 (in gP1LifePoints base)
+  EQUIP_INHIBIT_OFFSET = 0x10d0
+  CHAIN_ZONE_TYPE = 0xb
+  PLAYER_STRUCT_STRIDE = 0x868

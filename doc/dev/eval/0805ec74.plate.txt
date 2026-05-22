@@ -1,0 +1,6 @@
+Dual monster slot acceptance predicate. Outer loop player=[0..1], inner loop zone_slot=[0..4]; for each (player, zone_slot) calls check_monster_slot_accepts_card(player, zone_slot) and accumulates nonzero-return count in r7. After loops: returns 1 if r7>1, else 0. Used to determine whether two or more monster slots on the field can simultaneously accept the target card (dual-slot occupation condition).
+
+Constants:
+  PLAYER_RANGE = [0..1] (outer loop)
+  ZONE_SLOT_RANGE = [0..4] (inner loop)
+  MIN_ACCEPT_COUNT = 2 (r7 > 1 -> return 1)

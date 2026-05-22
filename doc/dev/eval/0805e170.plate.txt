@@ -1,0 +1,4 @@
+Equip slot existence predicate (opponent view). Extracts self player_id from card slot byte[+2] bit0, inverts to get opponent player_id (1-player_id), calls find_field_zone_slot_with_equip_type to search for an equip-type slot on opponent field. Applies mvns+lsrs #0x1f on result: -1 (no match) -> 0; >=0 (found) -> nonzero. Semantic: returns 1 when opponent has NO equip-type zone slot, 0 when opponent has one. Used for effects requiring opponent field to lack equip slots.
+
+Constants:
+  PLAYER_ID_INVERT = 1 - player_id

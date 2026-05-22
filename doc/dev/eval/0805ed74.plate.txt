@@ -1,0 +1,1 @@
+LP zone offset is zero predicate. Extracts player_id from card slot byte[+2] bit0. Calls get_lp_count_minus_zone_slot_offset(player_id). Returns 1 if result is 0 (LP zone offset equals zero), else 0. Gate for equip effects that activate only when LP-related zone offset calculation yields zero.

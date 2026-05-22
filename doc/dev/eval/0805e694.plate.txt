@@ -1,0 +1,8 @@
+Equip slot activation eligibility predicate (type field range 18..20). Reads global active deck 0x0201bb90 for [+0x0] player_id and [+0x1c] zone_idx. Extracts card slot halfword[+2] bits[11:6] (via lsls#0x14/lsrs#0x1a); requires value in [18..20] (0x12..0x14) via bgt/blt boundary checks. Takes [+0x0] bit0 (player_id_bit) and [+0x1c] zone_idx, computes zone address zone_idx*20+player_bit*0x868+0x0201c510; checks [zone+0x0] upper 13 bits nonzero and [zone+0x8] nonzero. Calls check_zone_slot_equip_prerequisites(slot, player_id, zone_idx). Returns 1 when all met.
+
+Constants:
+  ACTIVE_DECK_GLOBAL = 0x0201bb90
+  TYPE_RANGE_LOW = 18 (0x12)
+  TYPE_RANGE_HIGH = 20 (0x14)
+  PLAYER_STRUCT_STRIDE = 0x868
+  ZONE_BASE = 0x0201c510

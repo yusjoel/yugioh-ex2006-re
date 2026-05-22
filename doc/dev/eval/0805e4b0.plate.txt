@@ -1,0 +1,6 @@
+Zone state pair matches card set_code predicate. Entry .hword 0x4647 saves caller r8 to r7 then pushes (callee-save). Extracts player_id (bit0) and zone_idx_candidate (bits[5:1]) from card slot byte[+2]. For both player zone slots reads word[+0x0], extracts bits[29:24]*2 (via lsls#2/lsrs#24/lsls#1), adds the other slot field5 bit (lsls#0x12/lsrs#0x1f), accumulates into r3. Extracts card halfword[+0x4] bits[14:8] as set_code. If r3==set_code sets r7=1. Returns r7.
+
+Constants:
+  PLAYER_STRUCT_STRIDE = 0x868
+  ZONE_BASE = 0x0201c510
+  SET_CODE_FIELD_BITS = bits[14:8] of halfword[+4] (lsls #0x11 / lsrs #0x17)

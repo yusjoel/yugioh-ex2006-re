@@ -1,0 +1,5 @@
+Opponent has monsters and LP zone offset positive predicate. Extracts player_id from card slot byte[+2] bit0, inverts to get opponent player_id. Reads gP1LifePoints+opponent*0x868+0xc (opponent monster zone count); returns 0 if zero (no monsters). Calls get_lp_count_minus_zone_slot_offset(self_player_id); returns 0 if result<=0. Returns 1 when both conditions met.
+
+Constants:
+  PLAYER_STRUCT_STRIDE = 0x868
+  MONSTER_COUNT_OFFSET = 0xc (gP1LP + player*0x868 + 0xc)

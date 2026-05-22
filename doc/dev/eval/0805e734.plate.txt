@@ -1,0 +1,4 @@
+Umi active effect slot match predicate. Single-bl wrapper: loads card_id=0x10f4 (Umi) into r0, calls check_card_matches_active_effect_slot, passes through its return value. Returns nonzero when global active effect slot card ID equals Umi (0x10f4), else 0. Used to verify active slot matches Umi during Umi effect activation.
+
+Constants:
+  CARD_ID_UMI = 0x10f4 (Umi)

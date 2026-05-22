@@ -1,0 +1,7 @@
+Equip slot field6 score upper-bound predicate. Extracts player_id (bit9 via lsls#0x16/lsrs#0x1f) and zone_idx (bits[13:10] via lsls#0x12/lsrs#0x1c) from slot word[+0x14]. Requires player_id from [+0x14] differs from card slot byte[+2] bit0 (cross-player check). Computes zone address zone_idx*20+player_id*0x868+0x0201c510; checks [zone+0x0] upper 13 bits nonzero (field5) and [zone+0x8] nonzero. Calls get_slot_field6_score(player_id, zone_idx); requires score<=2000 (0xfa<<3=0x7d0). Returns 1 when all met.
+
+Constants:
+  PLAYER_STRUCT_STRIDE = 0x868
+  ZONE_BASE = 0x0201c510
+  FIELD6_SCORE_MAX = 0x7d0 (0xfa*8 = 2000)
+  ZONE_IDX_RANGE = [0..4] (bits[13:10] of word[+0x14])

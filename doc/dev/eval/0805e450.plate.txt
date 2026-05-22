@@ -1,0 +1,6 @@
+Equip slot state code equals 0xf predicate. Reads global active deck 0x0201bb90. Extracts player_id (bit0) and zone_idx (bits[5:1]) from card slot byte[+2]. If deck [+0x0] player_id matches self: compares [+0x1c] zone_idx; on match takes [+0x4] player and [+0x20] zone_idx into get_slot_card_state_code; else checks [+0x4] player_id and [+0x20] zone_idx match and takes [+0x0]/[+0x1c] path. Calls get_slot_card_state_code, extracts low 16 bits; returns 1 if equal to 0xf, else 0.
+
+Constants:
+  ACTIVE_DECK_GLOBAL = 0x0201bb90
+  STATE_CODE_TARGET = 0xf
+  RESULT_MASK = 0xffff (lsls/lsrs 0x10)

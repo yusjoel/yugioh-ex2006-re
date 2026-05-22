@@ -1,0 +1,8 @@
+Magnet Warrior trio equip eligibility predicate. Extracts player_id (bit0), field5_flag (bit3 XOR player_id), and zone_idx (bits[5:1]) from card slot byte[+2]. Calls check_slot_card_can_be_equipped for basic eligibility. Calls count_monster_slots_for_player; threshold depends on whether player_id matches field5_flag (same: >1, differ: >2). Calls check_field_spell_neo_daedalus_group_placeable. Checks all three Magnet Warriors in Extra Deck: count_extra_deck_cards_by_id for Alpha (0x1288), Beta (0x129b), and Gamma (0x12b8) must each be >0. Returns 2 when all conditions met.
+
+Constants:
+  CARD_ID_ALPHA_MAGNET_WARRIOR = 0x1288 (Alpha The Magnet Warrior)
+  CARD_ID_BETA_MAGNET_WARRIOR = 0x129b (Beta The Magnet Warrior)
+  CARD_ID_GAMMA_MAGNET_WARRIOR = 0x12b8 (Gamma The Magnet Warrior)
+  MONSTER_SLOT_MIN_SAME_PLAYER = 2 (>1 if player matches)
+  MONSTER_SLOT_MIN_DIFF_PLAYER = 3 (>2 if player differs)

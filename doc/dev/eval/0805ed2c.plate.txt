@@ -1,0 +1,5 @@
+Equippable slot count exceeds one predicate. Extracts player_id from card slot byte[+2] bit0. Calls count_equippable_slots_for_card(player_id, sentinel=-1) with sentinel all-zones (-1 via rsbs idiom). Returns 1 if count>1 (two or more equippable targets exist), else 0. Used for card effects requiring at least two equippable targets.
+
+Constants:
+  SENTINEL_ALL_ZONES = -1 (rsbs idiom: movs r1,#1; rsbs r1,r1,#0)
+  MIN_EQUIP_COUNT = 2 (> 1)

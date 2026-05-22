@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate (spell type 0x340, effect node absent). Checks card slot halfword[+2] bits[11:6] for 0x340 (0xd0*4). Extracts player_id (byte[+2] bit0) and zone_idx (bits[5:3] via lsls#0x1a/lsrs#0x1b). Calls find_effect_node_in_zone with card_id=halfword[+0x0] and zone_type=0; fails if effect node found (bne fail). Reads global active deck 0x0201bb90: checks [+0x0] player_id matches, [+0x4] player_id matches, and [+0x1c]/[+0x20] zone_idx matches (two-path or check). Returns 1 when all conditions met.
+
+Constants:
+  SPELL_TYPE_MASK = 0xfc0 (0xfc<<4)
+  SPELL_TYPE_340 = 0x340 (0xd0*4)
+  ACTIVE_DECK_GLOBAL = 0x0201bb90
+  ZONE_TYPE_QUERY = 0 (find_effect_node_in_zone arg3)

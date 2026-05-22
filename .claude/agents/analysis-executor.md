@@ -127,7 +127,7 @@ model: sonnet
     - [ ] **机械硬扫 `_then_`**: 同样切分, 紧跟词若属于上述列表 → 违规; `_then_return_` 无条件违规
     - [ ] 硬扫: proposed_name.split("_")[0] 是否为动词词根（非名词/形容词）
     - [ ] **批次级终检 (Phase 5 之前)**: batch 模式下, 在提交所有 proposals 之前, 对本批次全部 proposed_name 做一次集中正则扫描 `_and_[a-z]+` **和** `_with_[a-z]+` — batch#131 新增 `_with_<verb>` 子规则：`_with_zone_sprite_enqueue` 中 `enqueue` 是动词 = R1=0; batch#94 三个 `_and_` 违规同批暴露; 批次级正则扫描同时覆盖两种连接词，不受逐函数语境压制 (见 `feedback_r1_dual_verb_in_name.md`)
-11. **R8 置信度**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`). 置信度为 high 时, R8 节必须列出 >=3 层独立正向证据（L1 全静态短函数体 / L2 IO 魔数拆解 / L3 共享 label 锚 / L4 固定返回语义 / L5 assert 路径锚 / L6 命名 callee 图）；排除性证据（"无 IO 副作用"）不计层数；L1 须显式写出 asm 行范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r8_high_confidence_evidence_layers.md`
+11. **R8 置信度**: 置信度为 med 或 low 时, proposal 必须含独立 `## 置信度 / 升级路径` 节, 每个待验证项附一条可操作路径 (断点/caller asm 行/静态寄存器追踪); 缺此节 → R8=0 (见 `feedback_med_confidence_section_required.md`). 置信度为 high 时, R8 节必须列出 >=3 层独立正向证据（L1 全静态短函数体 / L2 IO 魔数拆解 / L3 共享 label 锚 / L4 固定返回语义 / L5 assert 路径锚 / L6 命名 callee 图）；**L6 合规形式**：必须引用 >=1 具体已命名 sibling 地址 + 该 sibling 在 PROGRESS.md 中的名字 + 命名模式匹配说明；**L6 排除性形式（禁止作为正向层）**："indeg=0 isolated" / "无 caller 约束" / "不被任何 hub 调用" 均是排除性陈述，不计入 3-layer 计数（batch#134 17 函数级联，Sub-variant 已加入 feedback）；排除性证据（"无 IO 副作用"/"indeg=0"）不计层数；L1 须显式写出 asm 行范围 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r8_high_confidence_evidence_layers.md`
 12. **R4 返回行存在性硬扫**: Grep `返回:` 或 `- 返回` 在参数签名段 → 必须 ≥ 1 条; 完全缺失返回行与"仅写数值无语义"等同 → R4=0; 确认存在后再检查含义+路径说明是否符合 `feedback_r4_fixed_return_semantic.md`
 13. **scratchpad 净化硬扫**: 提交前对 proposal 全文 grep 以下关键词: `wait`, `actually`, `let me`, `After decode:`, `re-check`, `Note:` (非结构字段内的)。任何命中 → 该段落含探索性中间过程文字, 必须替换为干净结构化内容 (`rN: <type> <name> [range]`)。reasoning 过程留在草稿; proposal 只提交结论。见 `feedback_executor_scratchpad_in_proposal.md` (batch #50 两函数 R3=0)
 14. **sibling-cluster 模板复制盲点硬扫 (batch ≥5 siblings 必须执行)**:
@@ -191,13 +191,23 @@ model: sonnet
 - R7 caller 地址填写时须自检：(1) addr != 本函数地址（禁止自引用）; (2) addr 必须存在于 complete_callgraph.csv 中以本函数为 callee 的 bl 记录（禁止将地址相邻的 sibling 误列为 caller）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_pending_caller_form.md` + `feedback_r7_self_reference.md`
 - R7 form(b) 写完后检查 tags 字段：若为 `[]`（空列表）或 `-`（破折号占位符）视同缺失，R7=0；须 grep naming-proposals.csv `<caller_addr>` 取 tags 列填入，若 caller 未命名则从 callsite 数据标签/地址区域推断模块 tags；**[HARD GATE 升级 batch#116]** 整批属于同一未处理库簇时须在批次开始前做 batch-level region 扫描，预计算该区域 callers 的 tag 词表，而非每函数独立推断（batch#116 17/20 命中新峰值）；**[HARD GATE 升级 Phase 3 batch#120]** batch 内 >=3 连续地址函数 caller CSV tags 为空 → 批次开始前必须做区域级 tag 词表枚举（banlist 区域 0x0801ae00-0x0801b600: 标准 `[banlist,scene_pass_input]`；font path → `[banlist,font_jp]`；settings path → `[banlist,settings]`；batch#120 12/20 新 Phase 3 峰值）；**Phase 3 附加规则**: caller 已命名但 CSV tags 列空 → 不得信任 CSV，fallback 到 caller asm body / 地址区域推断；trivial stub caller 仍属于某地址区域模块，不能作为 tags=[] 借口；**[HARD GATE v1.1 — batch#123 8 函数失败根因]** 区域级 tag 词表的"预计算"必须基于 caller asm body 证据，不得用地址区域猜测代替：对每个 caller 须 (a) 读 caller asm body 或 grep callgraph 找其 callees，(b) 从具体 callee 名 / IO 寄存器写 / DAT 常量中提取 1-2 个证据 token，(c) 基于这些 token 确定 tags；纯粹凭"此地址在 equip 区域故填 [duel_field]"而无 body 证据 = tags 等同于 []，R7=0；batch#123 8 个 caller 真实 tags 为 [graveyard,oam]/[equip,oam]/[equip,activation]，executor 统一猜 [duel_field] 全部错误；**[HARD GATE v1.2 — batch#125+#126 4 实例 evidence-tags desync]** 写完 caller body 证据子句（callee 名/IO 寄存器/DAT 常量）后，必须立即填写 `tags: [tag1, tag2]` 列表字段——两个字段独立存在，写了证据子句不等于自动填了 tags 列表；操作序列：(1)读 caller body → (2)提取证据 token → (3)写证据子句 → (4)**立即**将 token 转为 `[tag1,tag2]` 填入列表 → 继续下一函数；任何写完证据后 tags 仍为 [] 的 = HARD GATE v1.2 违规，R7=0 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_tags_empty_list.md`
 - callgraph indeg=0 函数：R7 必须用 form(c)（三要素：(1) 明确声明 indeg=0；(2) **实际执行** `grep ".word 0x<ADDR+1>" data/ asm/all.s` 并记录命中数+位置——0 hits=Sub-type A 无引用，1+ hits=Sub-type B fn-ptr 表赋值槽，两种均合规；(3) 结论句 dead-code/fn-ptr-table）；禁止用"appears unreachable"等描述性文字代替 grep 结果行（批#121 9 实例：仅描述未执行 grep → R7=0）；**[HARD GATE]** form(c) 是两步程序：声明 + 执行 grep + 记录，缺任一步 R7=0 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_indeg0_form_c.md`
-- [HARD GATE — batch#131 ALL-TIME PEAK 20/20, structural upgrade] R7 caller 方向自检（防止 caller/callee 混淆）：**R7 节是三步序列，缺任一步 reviewer 自动 R7=0**：
-    1. **打印锚点行**（强制）：在写 R7 section 内容之前，输出一行：`CALLEE-COLUMN GREP: grepping callee=0x<SELF_ADDR>` — 这个显式声明是有序执行 grep 的证明；缺此行 = gate 被跳过；
-    2. **执行 grep**（强制）：`grep ",<SELF_ADDR>," temp/complete_callgraph.csv`（callee 列 = SELF 的行 = 入边），不得读 caller 列 = SELF 的行（出边 callees）；或用 `grep "bl.*FUN_<SELF>" asm/all.s`；
-    3. **基于结果写 form**：命中 0 行 → indeg=0 → form(c)（须附 grep 命中数 "0 hits"）；命中 N 行 → form(b) 用命中行的 caller 地址；
+- [HARD GATE v1.4 — batch#134 SELECTIVE APPLICATION 18/20 regression → batch-level MANIFEST required] R7 caller 方向自检（防止 caller/callee 混淆）：**批次级前置条件 + 每函数三步序列，缺任一步 reviewer 自动 R7=0**：
+    0. **批次级 MANIFEST（强制，写任何提案前）**：在输出第一个函数提案之前，输出完整的 BATCH R7 ANCHOR MANIFEST 块，列出本批次全部 N 个函数的 grep 命令，格式：
+       ```
+       BATCH R7 ANCHOR MANIFEST (batch #NNN):
+       [1] CALLEE-COLUMN GREP: grepping callee=0x<ADDR1>
+       [2] CALLEE-COLUMN GREP: grepping callee=0x<ADDR2>
+       ...
+       [N] CALLEE-COLUMN GREP: grepping callee=0x<ADDRN>
+       ```
+       缺此 MANIFEST 块 = reviewer 将该批次所有 form(b) 自动 R7=0；MANIFEST 是确保 uniform coverage 的强制顺序锚点；
+    1. **打印锚点行**（强制，每函数）：在写各函数 R7 section 内容之前，输出对应的锚点行：`CALLEE-COLUMN GREP: grepping callee=0x<SELF_ADDR>` — 须与 MANIFEST 中对应行一致；缺此行 = gate 被跳过；
+    2. **执行 grep**（强制，每函数）：`grep ",<SELF_ADDR>," temp/complete_callgraph.csv`（callee 列 = SELF 的行 = 入边），不得读 caller 列 = SELF 的行（出边 callees）；或用 `grep "bl.*FUN_<SELF>" asm/all.s`；
+    3. **基于结果写 form**（每函数）：命中 0 行 → indeg=0 → form(c)（须附 grep 命中数 "0 hits"）；命中 N 行 → form(b) 用命中行的 caller 地址；
     - hub-heavy 区域、大型 sibling cluster 批次尤其危险：出边（callees）极多，更易误读；
+    - v1.3 失败模式：anchor-line 仅对前 2/20 函数应用后静默丢弃（selective application，batch#134 18/20）；v1.4 MANIFEST 使覆盖率在批次层可见；
     - 提供的 caller 地址若实为 SELF 的被调函数（callees）→ R7=0；
-    - 整批跳过 = batch-scale regression（batch#131 20/20 历史峰值）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_callee_inversion.md`
+    - 整批跳过 = batch-scale regression（batch#131 20/20；batch#134 18/20）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_callee_inversion.md`
 - plate comment **写前**先数函数体内 `bl` 目标数：≥4 callee → 立即进入压缩模式（Function: 3句、Side effects: 单子句、Constants: 仅键值行，禁止展开各 callee 参数细节）；**写后**估算字数：超过 500 字（≈35 行×13 词）→ 立即压缩 Side effects: 为单子句形式，压缩 Constants: 为 NAME=value // 一词说明，分析性prose 移至 proposal body → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md`
 - proposed_name 含 `_0x[0-9a-f]{3,}_` / `_card_[0-9a-f]+` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 单函数或 sibling cluster 均须在提交前一次性查 doc/dev/data.md 解析全部 card_id; batch #49 11 函数同批命中; 复现 0x08033088+0x080a3c2c+batch#49-cluster)
 - sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)

@@ -1,0 +1,4 @@
+Chain field match global predicate. Calls count_slots_with_chain_field_match(0,1,0) then count_slots_with_chain_field_match(1,1,0) for player 0 and player 1 respectively. Combines both counts via cmn (r4+r0 != 0): returns 1 if either player has a matching chain-field slot, 0 if neither. Used as global prerequisite for equip or effect activation when any player must have a chain-match slot.
+
+Constants:
+  CHAIN_FIELD_MATCH_ARGS = (0,1,0) then (1,1,0)

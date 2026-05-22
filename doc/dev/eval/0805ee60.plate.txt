@@ -1,0 +1,6 @@
+Face-down slot with free monster zone and matching set_code predicate. Checks byte[+3] bits[5:4]==0x20 (face-down); returns 0 if not face-down. Extracts player_id (byte[+2] bit0), calls find_first_available_monster_slot_for_player(player_id); returns 0 if no free slot (blt). Extracts halfword[+4] bits[14:8] as set_code, calls find_hand_slot_idx_by_set_code(player_id, set_code); returns 0 if not found in hand (blt). Returns 1 when all met.
+
+Constants:
+  FACEDOWN_FLAG_MASK = 0x30
+  FACEDOWN_FLAG_VALUE = 0x20
+  SET_CODE_BITS = halfword[+4] bits[14:8] (lsls #0x11 / lsrs #0x17)

@@ -1,0 +1,7 @@
+Equip slot activation eligibility predicate (deck player + prerequisites + card type). Checks card slot halfword[+2] bits[11:6] for 0x480 (spell type A) or 0x4c0 (type A+0x40). Reads global active deck struct 0x0201bb90: requires [+0x0] (current player) matches slot player_id. Loads [+0x1c] (target zone_idx) and passes to check_zone_slot_equip_prerequisites. If prerequisites pass, calls query_slot_card_type_eligibility (0=eligible). Returns 1 when all four conditions met.
+
+Constants:
+  SPELL_TYPE_MASK = 0xfc0 (0xfc<<4)
+  SPELL_TYPE_A = 0x480 (0x90*8)
+  SPELL_TYPE_A_PLUS = 0x4c0 (0x90*8+0x40)
+  ACTIVE_DECK_GLOBAL = 0x0201bb90
