@@ -1,0 +1,4 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id (bit0) from card_entry[+0x2], calls count_effect_node_activations_by_zone to count player's activatable effect zone nodes. If count equals 5 returns 2 (eligible), otherwise returns 0 (not eligible). Semantic: equip slot is valid only when player has exactly 5 effect zone activation nodes.
+
+Constants:
+- EFFECT_ZONE_COUNT_TARGET=5 (cmp r0,#0x5: exactly 5 effect zone activation nodes required)

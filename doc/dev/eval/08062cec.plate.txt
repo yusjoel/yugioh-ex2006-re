@@ -1,0 +1,7 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x180 (0xc0<<1). If not equal returns 0. If equal to 0x180: extracts player_id (bit0) and card_id (halfword[+0x0]). Calls dispatch_effect_handler_by_card_id(player, card_id, 0) -> effect value r0. Reads word[+0x14] bits[19:18] (lsls #0xc; lsrs #0x1e, width=2, lo=18, hi=19) as quota field r1. Compares r0 < r1: if so returns 0, otherwise returns 1.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc << 4)
+- ZONE_TYPE_180=0x180 (0xc0 << 1: specific zone type code)
+- DISPATCH_MODE=0 (movs r2,#0: effect dispatch mode 0)
+- QUOTA_BITS=lsls #0xc / lsrs #0x1e: width=32-30=2, lo=18, hi=19 -> word[+0x14] bits[19:18] (mask=0x000c0000)

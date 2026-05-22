@@ -1,0 +1,6 @@
+equip slot eligibility predicate, indeg=1, called by FUN_08059110 (0x08059110). Checks if player_id side spell zone slot is placeable (check_spell_zone_slot_placeable). If not placeable returns 0. Otherwise extracts set_code from card_entry[+0x4] bits[14:6] (lsls #0x11 / lsrs #0x17, width=9), calls find_hand_slot_idx_by_set_code to check if matching set_code exists in player hand; if not found (returns <0) returns 0. Then calls check_field_spell_neo_daedalus_group_placeable; if check fails returns 0. If gP1LifePoints[player_id*0x868 + 0x10] is nonzero (field zone active), calls lookup_slot_display_value_by_card_id and dispatch_effect_handler_by_card_id; if dispatch returns nonzero returns 1. Any unsatisfied condition returns 0.
+
+Constants:
+- SET_CODE_BITS=lsls #0x11 / lsrs #0x17: width=32-23=9, lo=6, hi=14 -> card_entry[+0x4] bits[14:6] = set_code
+- PLAYER_STRIDE=0x868
+- FIELD_ZONE_ACTIVE_OFFSET=0x10 (gP1LifePoints[player*stride + 0x10]: field activation word)

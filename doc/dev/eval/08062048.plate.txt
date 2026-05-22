@@ -1,0 +1,8 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x3c0 (0xf0<<2). If not equal returns 0. If equal to 0x3c0: checks word[+0x14] bit21 matches player_id (bit0 of [+0x2]) (mismatch returns 0). Reads gDuelFieldSlots_A[player_id][zone_idx] halfword[+0x0] and compares against ATK threshold 0xBB7 (2999), if <=2999 returns 0. Finally calls check_card_field5_is_nonzero; if field5 nonzero returns 1, otherwise returns 0. Semantic: only allows equip when zone type is 0x3c0 AND ATK>2999 AND field5 active.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc << 4)
+- ZONE_TYPE_3C0=0x3c0 (0xf0 << 2: specific zone type code)
+- ATK_THRESHOLD=0x0BB7 (2999: only ATK > 2999 i.e. >=3000 passes)
+- BIT21_CHECK=0xa (lsls #0xa: word[+0x14] bit21)
+- PLAYER_STRIDE=0x868

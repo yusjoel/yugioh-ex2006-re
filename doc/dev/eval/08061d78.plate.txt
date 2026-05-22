@@ -1,0 +1,6 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id (bit0) and slot_group (bits[6:1]) from card_entry[+0x2], calls count_paired_slots_with_field5 to count paired zones. If paired count <= 1 jumps to default return path (returns 2). Otherwise checks gP1LifePoints + 0x1cf4 for nonzero (global dual-field active flag); if nonzero: inverts player_id; calls count_available_effect_zones(opp_side, 0x178b, -1) counting Protector of the Sanctuary available effect zones; if returns 0 returns 2, else returns 0. Returns 2 when paired count <= 1 or no Protector restriction.
+
+Constants:
+- ICID_PROTECTOR_OF_SANCTUARY=0x178b (Protector of the Sanctuary)
+- DUAL_FIELD_ACTIVE_OFFSET=0x1cf4 (gP1LifePoints + 0x1cf4: global dual-field active count)
+- PLAYER_STRIDE=0x868

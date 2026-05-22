@@ -1,0 +1,7 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). r0=slot_ptr. Calls check_equip_slot_chain_absent; if chain exists (returns 0) returns 0. Reads gP1LifePoints + 0x1cf4 dual-field active flag: if nonzero, takes opp_player = 1-player_id; calls count_available_effect_zones(opp, 0x178b, -1) (counting Protector of the Sanctuary available effect zones); if == 0 jumps to loop below (no Protector restriction). If != 0 jumps to LAB_080629b6 returns 0. Loop: reads gP1LifePoints[player*0x868 + 0x0c] as upper bound, iterates calling dispatch_effect_handler_by_card_id(player, card_id, idx); any returning nonzero returns 1. All failed returns 0.
+
+Constants:
+- ICID_PROTECTOR_OF_SANCTUARY=0x178b (Protector of the Sanctuary)
+- DUAL_FIELD_ACTIVE_OFFSET=0x1cf4 (gP1LifePoints + 0x1cf4)
+- PLAYER_STRIDE=0x868
+- MONSTER_COUNT_OFFSET=0x0c (gP1LifePoints[player*0x868 + 0x0c]: loop upper bound)

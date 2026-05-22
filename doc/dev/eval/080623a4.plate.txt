@@ -1,0 +1,6 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id (bit0) from card_entry[+0x2]. Computes opp_player = 1-player. Checks if gP1LifePoints[opp*0x868 + 0x0c] is nonzero (opponent field active). If nonzero, further checks gP1LifePoints[player*0x868 + 0x10] for nonzero (own field active). Either path satisfied returns 1 (both sides field activation valid). Both zero returns 0.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- OPP_FIELD_ACTIVE_OFFSET=0x0c (gP1LifePoints[opp*0x868 + 0x0c])
+- OWN_FIELD_ACTIVE_OFFSET=0x10 (gP1LifePoints[player*0x868 + 0x10])

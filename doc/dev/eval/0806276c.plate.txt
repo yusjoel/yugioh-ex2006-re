@@ -1,0 +1,9 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). r0=slot_ptr (card_entry). First reads gP1LifePoints + 0x1cf4 to check dual-field active count equals 2; if not equal returns 0. If equal to 2: iterates slot_idx 0..4, for each slot reads gDuelFieldSlots_A[player_side][slot_idx] zone entry word[+0x0] bit19 nonzero, halfword[+0x8] nonzero, halfword[+0x6] is 0; if all three conditions met calls get_slot_card_state_code(player, slot_idx); if state_code low 16 bits equals 0x12, increments counter r8. After loop: if r8 > 1 (at least 2 slots with state==0x12) returns 1, otherwise returns 0.
+
+Constants:
+- DUAL_FIELD_ACTIVE_OFFSET=0x1cf4 (gP1LifePoints + 0x1cf4: dual-field active count, must==2)
+- PLAYER_STRIDE=0x868
+- ZONE_ENTRY_STRIDE=0x14 (slot entry stride 20)
+- ZONE_BASE_OFFSET=0x30 (gP1LifePoints + 0x30 = zone table start offset)
+- STATE_CODE_TARGET=0x12 (state code 18: equip active state)
+- SLOT_COUNT=4 (cmp r5,#0x4: iterate 5 slots [0..4])

@@ -1,0 +1,8 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks if Banisher of the Light (0x1332) is on field; if on field returns 0. Otherwise calls check_field_spell_neo_daedalus_group_placeable; if fails returns 0. Calls count_monster_slots_for_player(player) -> r4. Calls check_slot_placement_blocked_by_field_effect(player, slot_group) -> r0; r4 += r0. If r4 <= 1 returns 0 (monsters + blocked not exceeding 1 is not eligible). Reads gP1LifePoints[player*0x868 + 0x10] field activation word: if > 1 returns 1 (multiple monsters and field active). Otherwise returns 0.
+
+Constants:
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- PLAYER_STRIDE=0x868
+- MONSTER_QUOTA_MIN=1 (cmp r4,#1: requires monsters + blocked > 1)
+- FIELD_ZONE_ACTIVE_OFFSET=0x10 (gP1LifePoints[player*0x868 + 0x10])
+- FIELD_ACTIVE_THRESHOLD=1 (cmp r0,#1 bls: field activation value must be > 1 to pass)

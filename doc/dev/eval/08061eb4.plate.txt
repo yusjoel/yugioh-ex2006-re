@@ -1,0 +1,8 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts slot_group (bits[6:1]) and player_id (bit0) from card_entry[+0x2]. Computes address of gDuelFieldSlots_A[player_id*0x868 + slot_group*20 + 0x40]. Reads that zone entry halfword[+0x2]: if bit0 is nonzero returns 1. Otherwise inverts player_id, reads same-offset zone entry halfword[+0x2] on opposite side; further reads word[+0x0] bit17, if nonzero returns 1. All checks failed returns 0. Semantic: checks zone area status bit or opposite side zone activation bit.
+
+Constants:
+- PLAYER_STRIDE=0x868 (player_id * 0x868)
+- ZONE_ENTRY_STRIDE=0x14 (slot_group * 20)
+- ZONE_TABLE_OFFSET=0x40 (gDuelFieldSlots_A + 0x40)
+- FLAG_BIT0=0x1 (halfword[+0x2] bit0)
+- FLAG_BIT17=0x11 (word[+0x0] >> 17 & 1 = bit17 check)

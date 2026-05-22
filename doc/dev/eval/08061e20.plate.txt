@@ -1,0 +1,5 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type field in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x140. If not equal returns 1 (eligible). If equal to 0x140 (field zone type), extracts player_id (bit0) then calls count_available_field_zones_for_player: if player has available field zones (>0) returns 1, otherwise returns 0.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc << 4: card_entry[+0x2] halfword upper 6-bit zone type field)
+- FIELD_ZONE_TYPE=0x140 (0xa0 << 1: field zone type code)

@@ -1,0 +1,9 @@
+equip slot state predicate, indeg=1, called by FUN_080619c0 (0x080619c0). No parameters (directly reads gDuelActivation 0x0201bb90 global state). Checks if [gDuelActivation + 0x8] is 0; if nonzero returns 0. Reads [+0x4] bit0 = player_side, [+0x20] = slot_chain_idx. Computes gDuelFieldSlots_A[player_side][slot_chain_idx] offset (stride 0x868, slot stride 20). Reads that slot halfword[+0x8] if nonzero, if 0 returns 0. Reads halfword[+0x6] if nonzero, if 0 returns 0. All passed returns 1.
+
+Constants:
+- DUELIST_ACTIVATION_BASE=0x0201bb90 (gDuelActivation)
+- PLAYER_STRIDE=0x868
+- SLOT_STRIDE=0x14 (20: zone slot entry size)
+- GDUELFIELDSLOTS_A=0x0201c510
+- SLOT_FIELD8_OFFSET=0x8 (halfword, must be nonzero)
+- SLOT_FIELD6_OFFSET=0x6 (halfword, must be nonzero)

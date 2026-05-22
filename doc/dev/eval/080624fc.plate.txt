@@ -1,0 +1,4 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id and slot_group from card_entry[+0x2], calls get_equip_card_set_code_for_slot(player, slot_group). If set_code is 0 returns 0. Otherwise calls check_field_spell_neo_daedalus_group_placeable; if fails returns 0. Calls check_slot_card_can_be_equipped(player, slot_group); if fails returns 0. Calls count_monster_slots_for_player(player) -> r4. Calls check_slot_placement_blocked_by_field_effect(player, slot_group) -> r0; accumulates to r4. Compares set_code (r6) > (monsters + blocked) (r4): if set_code <= total returns 0; otherwise returns 1. Semantic: set_code value acts as available zone quota threshold, must exceed actual occupancy to allow equip.
+
+Constants:
+- (no non-trivial literals; 0 used as set_code null check)

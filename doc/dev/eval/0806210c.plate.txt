@@ -1,0 +1,6 @@
+equip slot eligibility core predicate, indeg=6. Checks if Banisher of the Light (icid 0x1332) is on field (count_field_copies_of_card). If on field returns 0 (not eligible). Otherwise calls check_field_spell_neo_daedalus_group_placeable; if fails returns 0. If gP1LifePoints[player_id*0x868 + 0x10] is nonzero (field activation word nonzero): reads card_entry[+0x0] as card_id, calls lookup_slot_display_value_by_card_id to get display value, then calls dispatch_effect_handler_by_card_id(player_id, card_id, display_val); if dispatch returns nonzero returns 1. All paths unsatisfied returns 0. Semantic: Banisher absent and field group conditions met, checks effect dispatch result.
+
+Constants:
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- PLAYER_STRIDE=0x868
+- FIELD_ZONE_ACTIVE_OFFSET=0x10 (gP1LifePoints[player*0x868 + 0x10]: field activation word)

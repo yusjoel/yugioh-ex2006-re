@@ -1,0 +1,6 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks if Banisher of the Light (0x1332) is on field; if on field returns 0. Otherwise extracts player_id, calls count_monster_slots_for_player to count player's monster zones; if >0 jumps to monster zone loop path. Otherwise checks check_slot_placement_blocked_by_field_effect(player, slot_group); if blocked returns 0. Monster zone loop: reads gP1LifePoints[player*0x868 + 0x0c] as loop upper bound, iterates calling dispatch_effect_handler_by_card_id(player, card_id, idx); if any returns nonzero returns 1. All failed returns 0. Also calls check_field_spell_neo_daedalus_group_placeable as second-stage condition.
+
+Constants:
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- PLAYER_STRIDE=0x868
+- MONSTER_ZONE_OFFSET=0x0c (gP1LifePoints[player*0x868 + 0x0c]: monster zone slot count)

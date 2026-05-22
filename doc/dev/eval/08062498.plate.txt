@@ -1,0 +1,4 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks if Banisher of the Light (0x1332) is on field; if on field returns 0. Otherwise calls check_field_spell_neo_daedalus_group_placeable; if fails returns 0. Takes opp_player = 1-player, calls count_occupied_monster_zones(opp): if opponent monster zones occupied continues; otherwise returns 0. Takes own_player, calls count_occupied_monster_zones(own): gets own occupied count. Calls count_available_monster_slots(own): gets own available zone count. Compares: if own_occupied <= own_available+1 returns 0; otherwise returns 1 (own monster zones nearly full).
+
+Constants:
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)

@@ -1,0 +1,5 @@
+equip slot eligibility predicate dispatch wrapper, indeg=0 (Sub-type A: no fn-ptr reference). Reads card_entry[+0x2] halfword masked with 0xfc0 to get zone_type. If zone_type == 0x80 (monster zone type), directly returns 2 (default eligible). Otherwise calls check_zone_slot_type_matches_card_type to perform full type match check and passes through its return value. Confirmed by check_zone_slot_type_matches_card_type (0x0805cb44) plate comment as its sole caller.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc << 4)
+- MONSTER_ZONE_TYPE=0x80 (cmp r0,#0x80: monster zone directly returns 2)

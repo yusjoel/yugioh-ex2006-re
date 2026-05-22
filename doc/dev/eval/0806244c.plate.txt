@@ -1,0 +1,4 @@
+equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id (bit0) and slot_group (bits[6:1]) from card_entry[+0x2], reads [+0x0] halfword as card_id. Calls check_value_in_slot_chain(player_id, slot_group, card_id): if target card ID exists in slot chain returns 1 (eligible), otherwise returns 0.
+
+Constants:
+- (no non-trivial literals)
