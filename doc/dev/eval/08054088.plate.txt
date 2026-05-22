@@ -1,0 +1,6 @@
+Equip slot eligibility check requiring target card extended_stat_field6 == 10. Guards: (1) zone [0..4]; (2) gDuelFieldSlots slot icid nonzero; (3) get_card_extended_stat_field6(icid) == 0xa (10); (4) check_slot_card_can_be_equipped(side_bit, r1, r2); (5) if slot side == player_id => pass immediately; else slot[+8] != 0 (equip valid). Dedicated to card class with field6==10 marker.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4, FIELD6_TARGET=0xa (10)

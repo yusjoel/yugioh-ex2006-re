@@ -1,0 +1,6 @@
+Equip slot eligibility check specialized for Gravekeeper series cards. Guards: (1) read gDuelFieldSlots slot card_icid (bits[18:0]); (2) zone [0..4]; (3) check_card_is_gravekeeper(icid) returns 1; (4) icid != 0x158c (Gravekeeper's Cannonholder excluded); (5) check_slot_card_can_be_equipped(side_bit, r1, r2); (6) if slot side == player_id return 1 immediately; else slot[+8] != 0 (equip valid). Dedicated Gravekeeper-series equip path.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4, GRAVEKEEPER_CANNONHOLDER_ICID=0x158c (Gravekeeper's Cannonholder)

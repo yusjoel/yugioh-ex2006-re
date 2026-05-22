@@ -1,0 +1,6 @@
+Equip eligibility dispatcher: branches on slot[+0xa] halfword (equip flag). If slot[+0xa] != 0: call check_equip_slot_eligible_by_setcode_whitelist. If slot[+0xa] == 0: call check_equip_slot_eligible_by_card_id_dispatch_alt. Pure 8-instruction dispatch stub; forwards r0/r1/r2 unmodified to callee.
+
+Params: r0=u8* equipping_slot (ptr; forwarded to callee)
+Returns: r0=u32 bool, callee return pass-through (0=rejected, 1=eligible)
+Side effects: none
+Constants: slot_equip_flag_offset=0xa

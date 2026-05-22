@@ -1,0 +1,6 @@
+Equip slot eligibility check, structurally symmetric sibling of 0x08053524; sole difference: side guard uses beq (same-side fail) instead of bne. Guards: (1) slot[+2] bit0 == r1 (same-side rejected); (2) zone [0..4] calls check_slot_card_is_equip_whitelist; (3) gDuelFieldSlots slot occupied; (4) slot[+8] == 0; (5) check_zone_slot_equip_prerequisites + check_card_equip_eligible_for_slot(r3=1). Returns 1 if all pass.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

@@ -1,0 +1,6 @@
+Equip slot eligibility check: requires (1) slot[+2] bit0 != r1 (opposite-side), (2) zone_slot_idx [0..4], (3) gDuelFieldSlots slot bits[18:0] != 0 (occupied), (4) query_slot_card_type_eligibility returns 0. Returns 1 if all pass.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

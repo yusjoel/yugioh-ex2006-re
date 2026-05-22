@@ -1,0 +1,6 @@
+Equip slot eligibility check with whitelist + field8 dual filter. Flow: (1) zone_slot_idx [0..4] calls check_slot_card_is_equip_whitelist; (2) gDuelFieldSlots slot bits[18:0] != 0 (occupied); (3) slot[+2] bit0 != player_id (opposite side); (4) slot[+8] == 0 (equip valid flag empty). Returns 1 if all pass.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

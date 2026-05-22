@@ -1,0 +1,6 @@
+Equip slot eligibility check: same-side match + field8==9 or special-activation fallback. Guards: (1) slot[+2] bit0 == r1 (same-side required, bne fail); (2) zone [0..4]; (3) gDuelFieldSlots slot icid nonzero. Dual exit: check_card_field8_is_9(icid) nonzero => pass; else check_slot_card_special_activation_eligible(side_bit, zone_idx). Called by FUN_08054e5c (equip chain scan dispatcher) in slot[+0xa]==0 path.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

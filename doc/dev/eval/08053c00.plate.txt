@@ -1,0 +1,6 @@
+Equip slot eligibility check with field6 nonzero precondition + full prerequisites. Guards: (1) zone [0..4]; (2) gDuelFieldSlots slot occupied; (3) slot[+6] != 0 (field6 extended attribute set); (4) check_zone_slot_equip_prerequisites; (5) check_card_equip_eligible_for_slot(r3=1); (6) query_slot_card_type_eligibility returns 0. Compared to check_equip_slot_eligible_by_setcode_and_valid_flag: adds field6!=0 precondition, calls eligible+type layers.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

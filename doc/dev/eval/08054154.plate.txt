@@ -1,0 +1,6 @@
+Equip slot eligibility check: same-side + whitelist + setcode dedup + eligible four-layer filter. Guards: (1) slot[+2] bit0 == r1 (same-side required, bne fail); (2) zone [0..4] calls check_slot_card_is_equip_whitelist; (3) gDuelFieldSlots slot occupied; (4) set_code_a != equipping slot[+4] bits[14:8]; (5) check_card_equip_eligible_for_slot(r0,r1,r2,r3=1). Compared to check_equip_slot_eligible_by_side_setcode_and_eligible (0x08053698): adds whitelist layer.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4

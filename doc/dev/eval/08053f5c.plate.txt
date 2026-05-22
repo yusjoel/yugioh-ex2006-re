@@ -1,0 +1,6 @@
+Equip slot eligibility check with score upper bound + chain scan dual branch. Guards: (1) gDuelFieldSlots slot occupied; (2) zone [0..4]; (3) slot[+8] != 0; (4) check_zone_slot_equip_prerequisites; (5) get_slot_field5_score(r1,r2) <= 1000 (0xfa<<2). Dual exit: if equip slot[+8]==0 scan chain list at gP1LifePoints+0x4cc for type [6..8] + side/zone match; if equip slot[+8]!=0 call find_equip_chain_node_by_slot_pair.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..4]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, SLOT_IDX_MAX=4, SCORE_BOUND=1000 (0xfa<<2), gP1LifePoints_chain_base=0x0201b290, chain_offset=0x4cc, type_lo=6, type_hi=8

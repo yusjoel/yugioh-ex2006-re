@@ -1,0 +1,6 @@
+Equip slot eligibility check focused on monster zone space. Guards: (1) check_slot_card_can_be_equipped(side_bit, r1, r2); (2) count_available_monster_slots(side_bit) > 0 => pass immediately; if count == 0: (3) slot side == player_id; (4) check_slot_placement_blocked_by_field_effect(r1, r2) returns nonzero. Handles equip when no monster zone is available via field-effect exemption.
+
+Params: r0=u8* equipping_slot (ptr); r1=u8 player_id [0..1]; r2=u8 zone_slot_idx [0..9]
+Returns: r0=u32 bool (1=eligible, 0=rejected)
+Side effects: none
+Constants: (via callees only)
