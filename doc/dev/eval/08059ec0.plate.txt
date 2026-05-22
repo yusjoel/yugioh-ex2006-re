@@ -1,0 +1,12 @@
+Two-state (0/1) equip-zone type-category sprite display sequence frame driver. r7=card_entry ptr (equip card), r4=aux_entry ptr. Computes card type category:
+- Calls map_field8_to_card_type_category(aux_entry[+0]) to get r6 = category;
+- Calls check_card_field5_is_nonzero(aux_entry[+0]) to check field5; if nonzero and aux_entry[+2] bits[5:1] in [5..10], forces category=7.
+Reads [0x0201b290+0x4ac] step:
+- State 0: calls set_lp_row_type2_with_attr_flags(player_id, 1, category); advances step, returns 0.
+- State 1: calls enqueue_equip_zone_sprite_at_slot(card_entry, aux_entry); advances step, returns 0.
+- Other: returns 1.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- SLOT_GROUP_MIN=0x5, SLOT_GROUP_MAX=0xa
+- CATEGORY_OVERRIDE=0x7

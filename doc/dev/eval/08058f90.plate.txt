@@ -1,0 +1,9 @@
+Two-state (0/1) equip-zone LP display sequence frame driver. Uses IWRAM [0x0201b290+0x4ac] as step counter, adjacent to batch#131 tick_equip_zone_select_display_seq_with_card_check, same tick sequence cluster.
+- State 0: extracts player_id (bit0) and card_id [+0] from card_entry[+2]; calls set_lp_display_row_type19(player_id, card_id, 0), advances step, returns 0.
+- State 1: reads gP1LifePoints[player*0x868+0x1da8] for LP value; computes LP*0x120 (= LP*(32-1)*4+LP*8); calls enqueue_sprite_attr_clamped, then enqueue_sprite_attr_with_xy_split with bit-split slot_idx. Advances step, returns 1.
+- Invalid state: returns 0.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- LP_OFFSET=0x1da8 (gP1LifePoints base + 0x1da8)
+- LP_SCALE=0x120 (= 0x1f*4 + 8 = 288)

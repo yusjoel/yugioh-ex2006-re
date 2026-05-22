@@ -1,0 +1,3 @@
+Equip slot count positive predicate wrapper (count>0 returns 1, ==0 returns 0). Nearly symmetric with 0x0805c3ec: same player_id extraction from card_entry[+2].bit0, same call to count_equippable_slots_for_card(player_id, -1). Difference is exit logic: this function uses cmp r0,#0; beq->0; movs r0,#1 (positive path is 1), while 0x0805c3ec uses r1 as intermediate. Semantically equivalent. Registered as fn-ptr in ROM dispatch table 0x9e45610.
+Constants:
+- SLOT_COUNT_ARG=-1 (movs r1,#0x1; rsbs r1,r1,#0 -> -1)

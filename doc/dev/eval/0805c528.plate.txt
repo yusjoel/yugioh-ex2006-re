@@ -1,0 +1,13 @@
+Equip slot eligibility predicate: checks type=0x340, Sanga_of_the_Thunder (icid=0x1119) chain node absent, activation context player/slot match, and zone equip prerequisites -- four conditions. From card_entry:
+(1) Type mask bits[11:2] = 0xfc<<4 masked to 0x340 (= 0xd0<<2): not satisfied returns 0.
+(2) Calls check_node_in_slot_chain(player_id, slot_idx, icid=0x1119, mode=3): if nonzero returns 0 (Sanga already in chain).
+(3) Reads activation context from [0x0201bb90]; checks r6 (1-player_id) == ctx[+0] and ctx[+0x4] == player_id: mismatch returns 0.
+(4) Checks ctx[+0x20] == slot_idx: mismatch returns 0.
+(5) Calls check_zone_slot_equip_prerequisites(card_entry, r6, ctx[+0x1c]); if 0 returns 0, nonzero returns 1.
+Registered as fn-ptr in 3 ROM dispatch tables.
+Constants:
+- TYPE_MASK=0xfc0 (= 0xfc<<4)
+- TYPE_CHECK=0x340 (= 0xd0<<2)
+- ICID_SANGA=0x1119 (Sanga of the Thunder)
+- NODE_MODE=3
+- EFFECT_CTX=0x0201bb90 (gDuelEffectCtx)

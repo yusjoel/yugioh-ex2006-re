@@ -1,0 +1,6 @@
+Neo Daedalus group card monster zone placement eligibility predicate. Extracts player_id (bit0 via lsls/lsrs #0x1f) and a team_flag (byte[+3].bit1 via lsls#0x19+lsrs#0x1f) from card_entry[+2], XOR gives r4 = effective_player. Two-phase check:
+(1) Calls count_monster_slots_for_player(effective_player); if <=1 returns -1 (rsbs).
+(2) Calls check_field_spell_neo_daedalus_group_placeable(effective_player); if returns 0 returns -1.
+If both checks pass returns 1. Registered as fn-ptr in ROM dispatch table 0x9e4631c.
+Constants:
+- MONSTER_SLOT_MIN=2 (cmp #0x1; ble -> fail)

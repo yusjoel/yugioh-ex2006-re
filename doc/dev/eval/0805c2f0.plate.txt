@@ -1,0 +1,6 @@
+Effect handler trigger with display value pre-lookup. Extracts player_id (bit0 -> r4) from card_entry[+2], reads card_id (halfword -> r5) from [+0]. Two steps:
+(1) Calls lookup_slot_display_value_by_card_id(card_entry) -> r2 = display_value.
+(2) Calls dispatch_effect_handler_by_card_id(player_id, card_id, display_value); returns 0/1.
+4 callers all in equip activation chain. Similar to 0x0805c248 but omits Neo Daedalus check, lighter single-card effect trigger wrapper.
+Constants:
+- No non-trivial literals

@@ -1,0 +1,3 @@
+Equip slot nonzero predicate with slot_idx encoding. Extracts player_id (bit0 -> r0) and slot_idx (bits[5:1] -> r2) from card_entry[+2]; encodes them: r1 = player_id | (slot_idx << 8); calls count_equippable_slots_for_card(player_id_encoded, r1). Returns 1 if >0, else 0. Symmetric with 0x0805c3ec but additionally encodes slot_idx into high byte of r1. Registered as fn-ptr in ROM dispatch table 0x9e46360.
+Constants:
+- SLOT_IDX_SHIFT=0x8 (lsls r2,r2,#0x8 -> slot_idx << 8)

@@ -1,0 +1,7 @@
+Equip slot scan dispatch wrapper with field6 validity mode override. Takes 5 parameters (r0..r3 + sp[0xc]):
+- If sp[0xc] != 0 forces r3 = 7 (field6 check mode override).
+- rsbs+orrs normalizes r3 to boolean (0->0, nonzero->1), lsrs #0x1f extracts sign bit.
+- Calls scan_equip_slots_eligible_for_card(r0=player_id, r1=slot_count, r2=card_type_composite, r3=stat_check_mode_bool, sp[0]=field6_enabled).
+Returns result pass-through. 9 callers all from equip target selection chain.
+Constants:
+- FIELD6_MODE_OVERRIDE=7 (if sp[0xc]!=0 then r3=7)

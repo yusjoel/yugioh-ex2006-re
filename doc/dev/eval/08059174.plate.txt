@@ -1,0 +1,12 @@
+Three-state (0/1/2) equip effect activation display sequence frame driver. Uses [0x0201b290+0x4ac] step counter. Two direct callers (0x080592c4 type-check trampoline and 0x0805951c type-0x80-check trampoline) are fn-ptr wrappers registered to the tick state machine.
+- State 0: computes player_id*0x868 + slot*0x14, reads card_id from [0x0201c510+offset]; extracts and compares two card field bits (bits[29:22] and equip-bit); if equal calls dispatch_effect_handler_by_card_id; writes [0x0201e2a0+player*4+0x8]=1/0 (confirm flag); calls invoke_card_display_op_0x31_sub1; advances step, returns 0.
+- State 1 (step==1): calls dispatch_effect_handler_by_card_id; if returns 0, looks up card_name_lookup_by_internal_id and calls format_game_text_with_text_arg(0xfa); else calls format_game_text_with_text_arg(0xec). Calls invoke_card_display_op_0x31_sub1; advances step, returns 0.
+- State 2 (step==2): reads [gP1LifePoints+0x1d40] (= 0xea<<5 offset) checks nonzero; if 0: extracts player_id, calls set_lp_display_row_all_slots(1-player_id, 0x10d6); advances step, returns 0. If nonzero: calls test_equip_target_zone14_with_ctx_clear. Returns 1.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- SLOTS_B=0x0201c510
+- PLAYER_STRIDE=0x868
+- CONFIRM_TBL=0x0201e2a0, CONFIRM_OFF=0x8
+- LP_CHECK_OFF=0x1d40 (= 0xea<<5)
+- TEXT_ID_A=0xfa, TEXT_ID_B=0xec

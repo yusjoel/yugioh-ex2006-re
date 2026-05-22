@@ -1,0 +1,6 @@
+Neo Daedalus group card monster zone placement eligibility predicate (high indeg=53 common hub). Extracts player_id (bit0) and team_flag (byte[+3].bit1 via lsls#0x19+lsrs#0x1f) from card_entry[+2], XOR gives effective_player. Two-phase check:
+(1) Calls count_monster_slots_for_player(effective_player); if ==0 returns 0.
+(2) Calls check_field_spell_neo_daedalus_group_placeable(effective_player); if returns 0 returns 0, else returns 1.
+Structurally symmetric with 0x0805a204 (check_neo_daedalus_placement_eligible_for_slot), but returns 0/1 instead of 1/-1, and slot count check is ==0 instead of <=1. Used by 53 callers as entry-filter across equip target chain.
+Constants:
+- No non-trivial literals

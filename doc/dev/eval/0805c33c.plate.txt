@@ -1,0 +1,13 @@
+Equip slot placement eligibility predicate: checks player context match, activation stage==3, and card type 0x380. Only runs checks when r1==0 (r1!=0 returns 0 immediately). Four serial conditions:
+(1) Extracts player_id from card_entry[+2]; compares with [gP1LP+0x1ce8]: mismatch returns 0.
+(2) Reads [gP1LP+0x1cf4] checks ==3: not satisfied returns 0.
+(3) Extracts type_mask from card_entry[+2] bits[11:2] (= 0xfc<<4); compares ==0xe0<<2=0x380: not satisfied returns 0.
+(4) Takes bit10 from card_entry[+0x14] (lsls#0xa/lsrs#0x1f); compares with player_id: mismatch returns 0.
+All four pass: returns 1. Registered as fn-ptr in ROM dispatch table 0x9e455e0.
+Constants:
+- PLAYER_CTX_OFF=0x1ce8
+- STAGE_OFF=0x1cf4
+- STAGE_REQUIRED=3
+- TYPE_MASK=0xfc0 (= 0xfc<<4)
+- TYPE_CHECK=0x380 (= 0xe0<<2)
+- BIT10_SHIFT=0xa

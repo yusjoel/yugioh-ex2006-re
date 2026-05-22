@@ -1,0 +1,10 @@
+Two-state (0/1) equip-zone Banisher field count display sequence frame driver. Entry adds r1,r0,#0 saves r0 (card_entry ptr) to r1, then loads internal constant from DWORD overwriting r0. Reads [0x0201b290+0x4ac] step:
+- State 0: calls increment_lp_bar_display_counter; advances step, returns 0.
+- State 1: .hword 0x4684 = mov r8,r4 (r4=gP1LifePoints base internal constant alias); checks LP value at [gP1LP+player*0x868+0xc] from card_entry[+2].bit0 player_id; if nonzero: calls dispatch_equip_zone_sprite_banisher_by_field_count(player_id, player_id&lp_val, field_base=gP1LP+player*0x868+0x120, mode=0). If zero: calls decrement_lp_bar_display_counter; advances step, returns 0.
+- Other: returns 1.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- PLAYER_STRIDE=0x868
+- LP_FIELD_OFF=0xc
+- FIELD_BASE_OFF=0x120 (= 0x90<<1)

@@ -1,0 +1,6 @@
+Equip slot sprite double-enqueue wrapper: enqueues slot sprite then enqueues negative-attr sprite. Extracts player_id (bit0) and slot_idx (bits[5:1]) from card_entry[+2]:
+(1) Calls enqueue_equip_zone_sprite_at_slot(card_entry) -- enqueues main OAM sprite.
+(2) rsbs r2,r2,#0 makes r2=-1, calls enqueue_equip_card_sprite_attr_for_slot(player_id, slot_idx, attr=-1) -- enqueues negative card attr sprite.
+Always returns 1. Registered as fn-ptr in ROM dispatch table 0x9e47384.
+Constants:
+- ATTR_NEG=-1 (rsbs r2,r2,#0; r2 was 1 -> r2=-1)

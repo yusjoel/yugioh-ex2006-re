@@ -1,0 +1,13 @@
+Two-state (0/1) equip Banisher-of-the-Light ATK activation display sequence frame driver. Uses [0x0201b290+0x4ac] step counter. r8=r0 internal alias (card_entry_a); r9 is caller-set implicit input (card_entry_b), set by apply_card_equip_activation (0x0805aea4) at 0x0805aeb0 before fn-ptr call chain.
+- State 0: calls trigger_card_display_op31_if_not_active(player_id, op_code=0x3a); reads [0x0201e2a0+player*4+8] confirm table; if ==1 calls select_equip_target_slot_by_card_id(player_id, card_id=2, fn_ptr=check_zone_atk_buff_active_for_equip); else calls init_zone_activation_display_fields(fn_ptr); advances step, returns.
+- State 1: calls check_activation_display_state_is_confirmed; if confirmed: reads gP1LP[+0x1d68] (player_a) and [+0x1d70] (player_b); calls dispatch_equip_zone_sprite_banisher_lp_row1(player_a, player_b); computes slot offset = (player_b & player_a)*0x868*4 + gP1LP+0x120; reads card field3 ATK value; writes r1[+0xc] = field3; returns 1 (success). If unconfirmed: step-1, returns 0.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- CONFIRM_TBL=0x0201e2a0
+- LP_OFF_A=0x1d68
+- LP_OFF_B=0x1d70
+- PLAYER_STRIDE=0x868
+- OP31_CODE=0x3a
+- CARD_ID_PARAM=2
+- ATK_PREDICATE=0x080592e5 (check_zone_atk_buff_active_for_equip)

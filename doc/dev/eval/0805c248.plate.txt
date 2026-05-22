@@ -1,0 +1,6 @@
+Composite function: Neo Daedalus placement eligibility check followed by effect handler dispatch (indeg=12). Extracts player_id (bit0) and team_flag (byte[+3].bit1), XOR gives effective_player. Three-step flow:
+(1) Calls count_monster_slots_for_player with card_entry ptr + effective_player; if 0 returns 0.
+(2) Calls check_field_spell_neo_daedalus_group_placeable(effective_player); if 0 returns 0.
+(3) Calls lookup_slot_display_value_by_card_id(card_entry) to get display_value; calls dispatch_effect_handler_by_card_id(effective_player, card_id, display_value); returns result (0 returns 0, nonzero returns 1).
+Constants:
+- No non-trivial literals

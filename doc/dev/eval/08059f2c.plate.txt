@@ -1,0 +1,9 @@
+Three-state (0/1/2) equip effect slot display sequence frame driver. r6=card_entry ptr. Reads [0x0201b290+0x4ac] step:
+- State 0: extracts player_id from card_entry[+2]; calls trigger_card_display_op31_if_not_active(player_id, op_code=0x56); advances step, returns 0.
+- State 1: extracts player_id from card_entry[+2]; calls init_effect_slot_display_context(player_id, card_id, op_type=8, mode=0); advances step, returns 0.
+- State 2: calls increment_lp_bar_display_counter; iterates all effect_slot entries in [gP1LP+0xba0] (count at offset): for each slot calls get_effect_slot_entry_ptr_by_palette_id(index), then calls enqueue_equip_zone_sprite_by_slot_ptr(player_id, ptr, mode=0); after loop calls decrement_lp_bar_display_counter. Step advance fails, returns 1.
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0x56
+- EFFECT_SLOT_OFF=0xba0 (= 0xea<<5)

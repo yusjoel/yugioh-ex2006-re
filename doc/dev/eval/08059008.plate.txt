@@ -1,0 +1,6 @@
+Equip-zone slot card OAM sprite dispatch function. Extracts zone_type (bits[14:8] of card_entry[+4], range 0..0x18, bhi 0x4 exits) and nonzero_flag (upper halfword bits[31:16]).
+- nonzero_flag!=0: reads current player from [0x0201bb90+4] and current slot from [+0x20]; if card_entry[+2].bit0 == current_player and bits[5:1] == current_slot, equip_flag=1, else 0; calls render_slot_card_sprite_with_chaos_equip_check(card_entry, equip_flag).
+- nonzero_flag==0: extracts player_id (bit0) and slot_idx (bits[5:1]), calls submit_equip_sprite_if_slot_eligible(player_id, slot_idx). Out-of-range zone_type (>4) or end of flow returns 1.
+Constants:
+- ZONE_TYPE_MAX=0x4
+- ACTIVATION_CTX=0x0201bb90

@@ -1,0 +1,6 @@
+Composite wrapper that enqueues equip slot sprite and caches set_code. Extracts player_id (bit0) and slot_idx (bits[5:1]) from card_entry[+2]:
+(1) Calls submit_equip_sprite_if_slot_eligible(player_id, slot_idx) -- enqueues OAM sprite.
+(2) Calls get_equip_card_set_code_for_slot(player_id, slot_idx) with same params, writes returned set_code to card_entry[+8].
+Always returns 1. Registered as fn-ptr in ROM dispatch table 0x9e46f4c.
+Constants:
+- No non-trivial literals

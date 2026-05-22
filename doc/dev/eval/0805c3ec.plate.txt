@@ -1,0 +1,3 @@
+Equip slot count nonzero predicate wrapper. Extracts player_id from card_entry[+2].bit0; calls count_equippable_slots_for_card(player_id, slot_count=-1): if return value >0 then r1=1, else r1=0; returns r1. Used to check whether at least one equippable slot exists for the given player. Registered as fn-ptr in 4 ROM dispatch tables.
+Constants:
+- SLOT_COUNT_ARG=-1 (movs r1,#0x1; rsbs r1,r1,#0 -> r1=-1; passed as "all" mode to count_equippable_slots_for_card)
