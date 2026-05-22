@@ -1,0 +1,22 @@
+scan_both_player_slots5_to_9_for_special_action
+Scans spell/equip zones (slot_idx 5..9) for both players (0 and 1).
+Outer loop: player in [0..1]; inner loop: slot_idx in [5..9].
+Indexes slot descriptor via PLAYER_STRIDE=0x868 and gDuelFieldSlots=0x0201c510,
+extracts card_id (low 13 bits via lsls#0x13; lsrs#0x13).
+If any slot returns nonzero from check_slot_card_eligible_for_special_action -> return 1 immediately.
+All fail -> return 0.
+
+Constants:
+- SLOT_IDX_MIN = 5, SLOT_IDX_MAX = 9 (5 spell/equip zones)
+- PLAYER_STRIDE = 0x868 (gDuelFieldSlots row stride)
+- gDuelFieldSlots_BASE = 0x0201c510
+- SLOT_ENTRY_OFFSET = 0x64 (slot array base within player row)
+- SLOT_STRIDE = 0x14 (20 bytes per slot)
+- CARD_ID_MASK = lsls#0x13; lsrs#0x13 (low 13 bits)
+
+Inputs: (void) -- r6/r7 initialized internally; no APCS parameters
+Returns: r0 = u32 -- 1 if any slot is special-action eligible, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f089" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: check_slot_card_eligible_for_special_action

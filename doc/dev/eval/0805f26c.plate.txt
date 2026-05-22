@@ -1,0 +1,19 @@
+check_equip_eligible_amazoness_monster_with_spell480
+Extracts player_id (byte[+2] bit0) from slot_ptr (r0).
+Calls count_monster_slots_by_fnptr(player_id, fn_ptr=0x0804b049) to count Amazoness-type monsters.
+If count == 0 -> return 0 (no Amazoness monster present).
+If count > 0 -> call check_spell_type480_active_deck_matches(slot_ptr, r1_arg) and return its result.
+Combined predicate: Amazoness monster present AND spell type 0x480 active.
+
+Constants:
+- FN_PTR_AMAZONESS = 0x0804b049 (check_card_is_amazoness_type thumb ptr)
+- ZONE_TYPE_FIELD_SPELL = 0x480 (spell type 0x480 = 0x90<<3)
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+        r1 = u32 equip_slot_arg (forwarded to check_spell_type480_active_deck_matches)
+Returns: r0 = u32 -- 0 if no Amazoness monster; else result of check_spell_type480_active_deck_matches
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f26d" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: count_monster_slots_by_fnptr (fn_ptr=check_card_is_amazoness_type),
+         check_spell_type480_active_deck_matches

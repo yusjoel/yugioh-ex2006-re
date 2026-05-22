@@ -1,0 +1,16 @@
+check_slot_has_life_absorbing_machine_node
+Extracts player_id (byte[+2] bit0) from slot_ptr (r0).
+Calls check_slot_has_node_by_card_id(player_id, zone_type=0xb, card_id=0x14c0=Life Absorbing Machine).
+Directly forwards callee return value.
+Lightweight wrapper for Life Absorbing Machine (card_id=0x14c0, 0xa6<<5) chain node existence check.
+
+Constants:
+- FIELD_SPELL_ZONE = 0xb (zone_type=11)
+- CARD_ID_LIFE_ABSORBING_MACHINE = 0x14c0 (0xa6<<5)
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 = u32 -- result of check_slot_has_node_by_card_id (1=node present, 0=absent)
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f3a5" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: check_slot_has_node_by_card_id

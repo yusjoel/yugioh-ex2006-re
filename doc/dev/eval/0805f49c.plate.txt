@@ -1,0 +1,23 @@
+check_equip_zone480_or_4c0_via_hand_slot_setcode
+Gate: halfword[+2] bits[11:6] must be 0x480 (field_spell, 0x90<<3) or 0x4c0 (zone_type 19);
+      otherwise return 0.
+Reads curr_turn_player from gP1LifePoints+0x1ce8; compares with slot player_id; mismatch -> return 0.
+From gDuelEffectCtx (0x0201bb90) reads player_id path fields [+0]/[+4]/[+0x1c]/[+0x20],
+compares with slot player_id and zone_idx.
+On match calls dispatch_effect_via_hand_slot_setcode(slot_ptr, r1_arg).
+No match -> return 0.
+
+Constants:
+- ZONE_TYPE_FIELD_SPELL = 0x480 (0x90<<3, zone_type 18)
+- ZONE_TYPE_0x13 = 0x4c0 (0x480+0x40, zone_type 19)
+- ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+- gP1LifePoints+0x1ce8: curr_turn_player
+- gDuelEffectCtx_BASE = 0x0201bb90
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; bits[6:2]=zone_idx; halfword[+2]=zone_type_raw)
+        r1 = u32 equip_slot_arg (forwarded to dispatch_effect_via_hand_slot_setcode)
+Returns: r0 = u32 -- 1 if conditions met and dispatch succeeded; 0 otherwise
+Side effects: via dispatch_effect_via_hand_slot_setcode (caller-borne)
+
+Callers: indeg=0; grep ".word 0x0805f49d" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: dispatch_effect_via_hand_slot_setcode

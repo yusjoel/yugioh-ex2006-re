@@ -1,0 +1,18 @@
+check_equip_field_spell_neo_daedalus_and_monster_slots
+Extracts player_id (byte[+2] bit0, XOR 1 = opponent) and card_id (ldrh[+0]) from slot_ptr (r0).
+Triple gate: (1) dispatch_effect_handler_by_card_id(opponent, card_id, mode=0) == 0 -> return 0;
+(2) count_monster_slots_for_player(slot_ptr, opponent) <= 0 -> return 0;
+(3) check_field_spell_neo_daedalus_group_placeable(opponent) == 0 -> return 0.
+All pass -> return 1. Predicate: opponent monster slots + field spell condition both met.
+
+Constants:
+- PLAYER_ID_BIT: byte[+2] bit0 = player_id; XOR 1 = opponent
+- card_id: ldrh[+0] of slot_ptr
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; ldrh[+0]=card_id)
+Returns: r0 = u32 -- 1 if all three checks pass, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f021" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: dispatch_effect_handler_by_card_id, count_monster_slots_for_player,
+         check_field_spell_neo_daedalus_group_placeable

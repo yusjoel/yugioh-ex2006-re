@@ -1,0 +1,19 @@
+check_equip_slot_zone500_state3_for_either_player
+Checks zone_type == 0x500 (bits[11:6] of halfword[+2] == 0xa0<<3); if not, return 0.
+Reads gDuelEffectCtx (0x0201bb90): [+8]=main context, [+4]=alt context.
+For each context, compares player_id and zone_idx with slot_ptr fields.
+On match, calls get_slot_card_state_code for the target slot and checks state_code == 3.
+Any matching state_code==3 path -> return 1; no match or state != 3 -> return 0.
+
+Constants:
+- ZONE_TYPE_0x14 = 0x500 (0xa0<<3, bits[11:6] = zone_type 20)
+- ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+- gDuelEffectCtx_BASE = 0x0201bb90
+- STATE_CODE_ACTIVE = 3
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; bits[11:6]=zone_type_raw; bits[6:2]=zone_idx)
+Returns: r0 = u32 -- 1 if zone_type matches and any context slot has state_code==3, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f33d" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: get_slot_card_state_code

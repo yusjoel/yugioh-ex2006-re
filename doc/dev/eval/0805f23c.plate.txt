@@ -1,0 +1,19 @@
+check_equip_eligible_banisher_absent_and_effect_above4
+Extracts player_id (byte[+2] bit0) and card_id (ldrh[+0]) from slot_ptr (r0).
+Dual gate: (1) count_field_copies_of_card(0x1332=Banisher of the Light) > 0 -> return 0
+           (Banisher on field blocks equip);
+           (2) dispatch_effect_handler_by_card_id(player_id, card_id, mode=0) <= 4 -> return 0
+           (effect strength insufficient).
+Only when Banisher absent AND effect > 4 -> return 1.
+Dedicated predicate blocking equip when Banisher of the Light (card_id=0x1332) is on field.
+
+Constants:
+- CARD_ID_BANISHER_OF_LIGHT = 0x1332 (Banisher of the Light)
+- EFFECT_THRESHOLD = 4 (dispatch result must be > 4)
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; ldrh[+0]=card_id)
+Returns: r0 = u32 -- 1 if Banisher absent AND effect > 4, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f23d" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: count_field_copies_of_card, dispatch_effect_handler_by_card_id

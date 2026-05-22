@@ -1,0 +1,24 @@
+dispatch_slot_placement_check_by_card_id
+Accepts slot_ptr (r0) and action_arg (r1). Dispatches by card_id (ldrh[+0]) and zone_type:
+(1) halfword[+2] bits[13:6] == 0x1140 (0x8a<<5, zone_type 69) -> return 2 (special allow);
+(2) card_id == 0x1506 (Fushi No Tori, spirit monster) ->
+    call check_slot_zone_type_facedown_flip(slot_ptr, action_arg), forward result;
+(3) card_id == 0x1694 (Tsukuyomi, spirit monster) ->
+    call check_light_of_intervention_absent(), forward result;
+(4) default -> return 1.
+Card-ID-driven placement check dispatcher; each card routes to its own zone eligibility path.
+
+Constants:
+- ZONE_TYPE_MASK_EXT = 0x3fc0 (0xff<<6, bits[13:6])
+- ZONE_TYPE_0x45 = 0x1140 (0x8a<<5, zone_type 69 early-return)
+- CARD_ID_FUSHI_NO_TORI = 0x1506 (Fushi No Tori spirit monster)
+- CARD_ID_TSUKUYOMI = 0x1694 (Tsukuyomi spirit monster)
+
+Inputs: r0 = SlotPtr* slot_ptr (halfword[+2] bits[13:6]=zone_type_raw; ldrh[+0]=card_id)
+        r1 = u32 action_arg (forwarded to check_slot_zone_type_facedown_flip and
+             check_light_of_intervention_absent)
+Returns: r0 = u32 -- 2 (zone match), 1 (default pass), or callee result for special cards
+Side effects: none (pure query through callees)
+
+Callers: indeg=0; grep ".word 0x0805f785" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: check_slot_zone_type_facedown_flip, check_light_of_intervention_absent

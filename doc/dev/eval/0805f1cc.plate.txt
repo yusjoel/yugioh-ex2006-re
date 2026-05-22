@@ -1,0 +1,22 @@
+check_equip_slot_at_turn_player_side
+Checks whether slot_ptr belongs to the current turn player side and passes card type eligibility.
+Flow: (1) load curr_turn_player from gP1LifePoints+0x1ce8; compute other_side = 1-curr_turn_player;
+(2) index gDuelEquipCtx[other_side] (base=0x0201bbbc, stride=0x38); check ctx[+8] nonzero;
+(3) compare slot halfword[+2] bits[11:6] against ZONE_TYPE_EQUIP=0x340 (0xd0<<2);
+(4) compare slot player_id (bit0) with other_side;
+(5) compare ldrh[+0x14] with ldrh[sibling+0x2];
+(6) call query_slot_card_type_eligibility. All pass -> return 1.
+
+Constants:
+- gP1LifePoints+0x1ce8: curr_turn_player field
+- gDuelEquipCtx_BASE = 0x0201bbbc
+- EQUIP_CTX_STRIDE = 0x38 (56 bytes per player entry)
+- ZONE_TYPE_EQUIP = 0x340 (0xd0<<2, bits[11:6] of halfword[+2])
+- ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; bits[15:6]=zone_type_raw)
+Returns: r0 = u32 -- 1 if equip context and type check pass, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f1cd" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: query_slot_card_type_eligibility

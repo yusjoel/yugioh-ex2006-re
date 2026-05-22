@@ -1,0 +1,12 @@
+check_player_has_field5_hand_card
+Extracts player_id (byte[+2] bit0) from slot_ptr (r0).
+Calls count_hand_cards_with_field5(player_id).
+If return value > 0 -> return 1 (player has at least one hand card with field5 flag).
+Otherwise -> return 0. Bool wrapper for count_hand_cards_with_field5, used as hand eligibility gate.
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1])
+Returns: r0 = u32 -- 1 if count > 0, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f1b1" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: count_hand_cards_with_field5

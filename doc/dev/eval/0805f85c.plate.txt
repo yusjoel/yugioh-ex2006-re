@@ -1,0 +1,22 @@
+check_slot_zone380_atk_above_1999_with_card_match
+Dual-argument predicate: slot_ptr_a (r0) and optional slot_ptr_b (r1).
+If r1 nonzero, first compares ldrh[r1+0] vs ldrh[r0+0] (card_id must match).
+Checks slot_ptr_a halfword[+2] bits[11:6] == 0x380 (zone_type 14, 0xe0<<2); else return 0.
+Reads slot[+0x14] dword: bit15 must equal 1-player_id (opponent flag);
+bit21 must equal player_id (own-side flag).
+Checks ldrh[+0x14] > 0x07cf (ATK >= 2000). All conditions met -> return 1.
+
+Constants:
+- ZONE_TYPE_0x0e = 0x380 (0xe0<<2, zone_type 14)
+- ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+- ATK_THRESHOLD = 0x07cf (1999; slot[+0x14] halfword must exceed, i.e., ATK >= 2000)
+- bit15 of [slot+0x14]: opponent-side flag (must == 1-player_id)
+- bit21 of [slot+0x14]: own-side flag (must == player_id)
+
+Inputs: r0 = SlotPtr* slot_ptr_a (halfword[+2] bits[11:6]=zone_type; byte[+2] bit0=player_id [0..1])
+        r1 = SlotPtr* slot_ptr_b (nullable; if non-null, card_id must match slot_ptr_a)
+Returns: r0 = u32 -- 1 if all checks pass, 0 otherwise
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f85d" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: (none -- pure leaf logic)

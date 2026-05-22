@@ -1,0 +1,12 @@
+check_player_has_active_monster_return2
+Calls check_player_has_active_monster(slot_ptr); if return==0 -> return 0.
+If return nonzero -> return 2 (not 1).
+Upcast wrapper: converts bool 1 to enum value 2 for three-value enum
+(0=none, 1=..., 2=active monster present) used by higher-level logic.
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; parsed internally by callee)
+Returns: r0 = u32 -- 0 if no active monster; 2 if player has active monster
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f615" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: check_player_has_active_monster

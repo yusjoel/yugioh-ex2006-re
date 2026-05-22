@@ -1,0 +1,19 @@
+check_equip_slots_eligible_banisher_and_effect_nonzero
+Extracts player_id (byte[+2] bit0), tier_result (classify_equip_card_id_tier_abc_short),
+and set_code (ldrh[+4] bits[14:7] = lsls#0x11; lsrs#0x17) from slot_ptr (r0).
+Calls scan_equip_slots_eligible_banisher_guard(player_id, tier_result, set_code, sp[0]=1, mode=0).
+If return==0 -> return 0. If nonzero, calls dispatch_effect_handler_by_card_id(player_id, ldrh[+0], mode=0);
+if return > 0 -> return 1; else -> return 0.
+Dual check: banisher guard AND effect handler nonzero.
+
+Constants:
+- SET_CODE_MASK: ldrh[+4] lsls#0x11; lsrs#0x17 = bits[14:7] of halfword[+4]
+- SP_ARG = 1 (stack arg to scan_equip_slots_eligible_banisher_guard)
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; ldrh[+0]=card_id; ldrh[+4] bits[14:7]=set_code)
+Returns: r0 = u32 -- 1 if banisher guard passes AND effect handler > 0, 0 otherwise
+Side effects: none (pure query through callees)
+
+Callers: indeg=0; grep ".word 0x0805f699" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: classify_equip_card_id_tier_abc_short, scan_equip_slots_eligible_banisher_guard,
+         dispatch_effect_handler_by_card_id

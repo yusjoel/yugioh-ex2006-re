@@ -1,0 +1,21 @@
+check_equip_zone340_slot_state_matches_ctx
+Extracts player_id (byte[+2] bit0) and zone_idx (bits[6:2]) from slot_ptr (r0).
+Indexes gDuelFieldSlots (base=0x0201c510, stride=0x868) by (player_id, zone_idx); reads [slot+0xc] -> r6.
+Checks halfword[+2] bits[11:6] (zone_type) == 0x340 (0xd0<<2); if zone_type != equip target -> return 1 (exempt).
+From gDuelEffectCtx (0x0201bb90) selects main/alt equip context matching player_id and zone_idx.
+Calls get_slot_card_state_code for target slot; compares state_code with r6:
+r6==0 -> return 0; r6==state_code -> return 1; else -> return 0.
+
+Constants:
+- ZONE_TYPE_EQUIP_TARGET = 0x340 (0xd0<<2)
+- ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+- gDuelFieldSlots_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- gDuelEffectCtx_BASE = 0x0201bb90
+
+Inputs: r0 = SlotPtr* slot_ptr (byte[+2] bit0=player_id [0..1]; bits[6:2]=zone_idx [0..31])
+Returns: r0 = u32 -- 0 if equip zone and state mismatch; 1 if non-equip zone or state match
+Side effects: none (pure query)
+
+Callers: indeg=0; grep ".word 0x0805f3e9" asm/all.s -> 0 hits (Sub-type A dead code)
+Callees: get_slot_card_state_code
