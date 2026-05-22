@@ -1,0 +1,15 @@
+Equip slot eligibility predicate gated on hand cards with field5 count >= 5.
+Extracts player_id from card_entry[+2] bit0.
+Calls count_hand_cards_with_field5(player_id): if <= 4, returns 0.
+If count > 4: reads card_entry[+0] halfword as card_id.
+Calls dispatch_effect_handler_by_card_id(player_id, card_id, 0).
+Returns 1 if result != 0, 0 if result == 0.
+
+Constants:
+  HAND_FIELD5_MIN = 5  (count must be > 4)
+
+Inputs:  r0 = ptr equip_card_entry ([+0]=card_id u16; [+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=hand field5 count >= 5 AND effect handler nonzero; 0=either check failed)
+Side effects: via dispatch_effect_handler_by_card_id
+Callees: count_hand_cards_with_field5 (0x0803730c), dispatch_effect_handler_by_card_id (0x0808dab0)
+Callers: indeg=0; grep ".word 0x0805df15" asm/all.s -> 0 hits (no fn-ptr ref)

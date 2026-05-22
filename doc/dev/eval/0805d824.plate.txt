@@ -1,0 +1,10 @@
+Minimal predicate: returns 1 if card_entry's player has available monster zone slots.
+Reads card_entry[+2] byte; extracts bit0 as player_id.
+Calls count_monster_slots_for_player(card_entry, player_id).
+Returns 1 if slot count > 0, 0 if count == 0.
+8-instruction body; no additional logic.
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=player has monster slots; 0=no monster slots)
+Callees: count_monster_slots_for_player (0x0805c17c)
+Callers: indeg=0; grep ".word 0x0805d825" asm/all.s -> 0 hits (no fn-ptr ref)

@@ -1,0 +1,20 @@
+LP offset threshold double-guard predicate for equip slot eligibility.
+Extracts player_id from card_entry[+2] bit0; computes opponent = 1 - player_id.
+Reads gP1LP[opponent * PLAYER_STRIDE + LP_COUNT_OFF (0xc)]: if <= LP_THRESHOLD (5): returns 0.
+Calls get_lp_count_minus_zone_slot_offset(card_entry, player_id) -> lp_offset.
+If lp_offset > LP_OFFSET_MAX (2): returns 0.
+Reads gP1LP[card_player * PLAYER_STRIDE + LP_COMPARE_OFF (0x10)] as lp_compare.
+Computes 5 - lp_offset; if > lp_compare: returns 0.
+Returns 1 if all threshold checks pass.
+
+Constants:
+  PLAYER_STRIDE  = 0x868
+  LP_COUNT_OFF   = 0xc
+  LP_COMPARE_OFF = 0x10
+  LP_OFFSET_MAX  = 2
+  LP_THRESHOLD   = 5
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=LP offset within thresholds; 0=any threshold exceeded)
+Callees: get_lp_count_minus_zone_slot_offset (0x0805c188)
+Callers: indeg=0; grep ".word 0x0805dead" asm/all.s -> 0 hits (no fn-ptr ref)

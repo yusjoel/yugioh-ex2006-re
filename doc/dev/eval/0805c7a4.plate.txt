@@ -1,0 +1,22 @@
+Equip slot eligibility predicate specialized for Scapegoat and Stray Lambs card IDs.
+Reads card_entry[+0] halfword as card_id:
+  card_id == SCAPEGOAT_ICID (0x12d2): sets min_monster_slots = 4
+  card_id == STRAY_LAMBS_ICID (0x1710): sets min_monster_slots = 2
+  other card_id: min_monster_slots = 0 (no threshold)
+Extracts player_id = [+2] bit0; reads gP1LP + player_id*PLAYER_STRIDE + SLOT_INFO_OFF (0x11c).
+Checks equip_chain_flag (bit0) of that halfword: if set, returns 0.
+Calls count_monster_slots_for_player(card_entry, player_id): if < min_monster_slots, returns 0.
+Calls check_field_spell_neo_daedalus_group_placeable: if 0, returns 0.
+Returns 1 if all checks pass.
+
+Constants:
+  SCAPEGOAT_ICID   = 0x12d2  (Scapegoat)
+  STRAY_LAMBS_ICID = 0x1710  (Stray Lambs)
+  PLAYER_STRIDE    = 0x868
+  SLOT_INFO_OFF    = 0x11c   (0x8e<<1)
+  EQUIP_CHAIN_FLAG = bit0
+
+Inputs:  r0 = ptr equip_card_entry ([+0]=card_id u16; [+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=eligible; 0=ineligible)
+Callees: count_monster_slots_for_player (0x0805c17c), check_field_spell_neo_daedalus_group_placeable (0x0803bb7c)
+Callers: indeg=0; grep ".word 0x0805c7a5" asm/all.s -> 0 hits (no fn-ptr ref)

@@ -1,0 +1,18 @@
+LP slot offset double-threshold guard predicate.
+Extracts player_id from card_entry[+2] bit0.
+Calls get_lp_count_minus_zone_slot_offset(player_id, card_entry) -> lp_offset (r3).
+Reads gP1LP[player_id * PLAYER_STRIDE + LP_COMPARE_OFF (0x10)] as lp_threshold.
+If lp_threshold < lp_offset: returns 0.
+If lp_offset == 0: additionally checks opponent gP1LP[(1-player_id)*PLAYER_STRIDE + LP_COUNT_OFF (0xc)] > 0.
+  If check fails: returns 0.
+If lp_offset > 0: returns 1 directly.
+
+Constants:
+  PLAYER_STRIDE  = 0x868
+  LP_COMPARE_OFF = 0x10
+  LP_COUNT_OFF   = 0xc
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=LP offset within limit; 0=limit exceeded or LP check failed)
+Callees: get_lp_count_minus_zone_slot_offset (0x0805c188)
+Callers: indeg=0; grep ".word 0x0805cdd9" asm/all.s -> 0 hits (no fn-ptr ref)

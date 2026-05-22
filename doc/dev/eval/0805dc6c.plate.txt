@@ -1,0 +1,28 @@
+Equip slot eligibility predicate for type_code 0x6c0 with Gust and Driving Snow card ID branches.
+Extracts type_code via mask 0xfc0; if != TYPE_6C0 (0x6c0 = 0xd8<<3): returns 0.
+Checks slot_field bit13 (opposite_player_flag) differs from card_player_id; else returns 0.
+Checks slot_field bit22 (side_flag) matches card_player_id; else returns 0.
+Reads gP1LP + player*PLAYER_STRIDE + (slot_field bits[22:20])*2 + SLOT_INDEX_OFF (0x10e0 = 0x87<<5)
+  to get field slot halfword; extracts bits[12:0] as slot_zone_id.
+Branches on card_id[+0]:
+  card_id == DRIVING_SNOW_ICID (0x134d): LAB_0805dcee path
+  card_id == GUST_ICID (0x134c): LAB_0805dcd8 path
+  card_id == RESERVED_ICID_A (0x135b, cid=0xFFFF no card): separate path
+Both GUST and DRIVING_SNOW paths check slot bits[21:18] <= 4; if > 4, requires
+  get_card_extended_stat_field6 == FIELD6_CONTINUOUS_EQUIP (0x17).
+RESERVED_ICID_A path additionally checks card_entry[+0x14] bits masked 0xf8 == 0x70.
+
+Constants:
+  TYPE_MASK               = 0xfc0  (0xfc<<4)
+  TYPE_6C0                = 0x6c0  (0xd8<<3)
+  GUST_ICID               = 0x134c  (Gust)
+  DRIVING_SNOW_ICID       = 0x134d  (Driving Snow)
+  RESERVED_ICID_A         = 0x135b  (reserved -- cid=0xFFFF, no card)
+  PLAYER_STRIDE           = 0x868
+  SLOT_INDEX_OFF          = 0x10e0  (0x87<<5)
+  FIELD6_CONTINUOUS_EQUIP = 0x17
+
+Inputs:  r0 = ptr equip_card_entry ([+0]=card_id u16; [+2] bit0=player_id [0..1]; bits[11:6]=type_code; [+14]=slot_field)
+Returns: r0 = u32  (1=eligible; 0=ineligible)
+Callees: get_card_extended_stat_field6 (0x080eedf8), check_card_field5_is_nonzero (0x0804ad48)
+Callers: indeg=0; grep ".word 0x0805dc6d" asm/all.s -> 0 hits (no fn-ptr ref)

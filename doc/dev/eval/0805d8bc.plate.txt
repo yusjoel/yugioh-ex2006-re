@@ -1,0 +1,18 @@
+Equip slot eligibility predicate for type_code [0x1f..0x21] with equippable slot count guard.
+Extracts card_entry[+2] bits[11:6] as type_code via lsls#0x14/lsrs#0x1a; out of [0x1f..0x21]: returns 0.
+Reads card_entry[+14] slot_field; extracts bit22 as player_id, bits[21:18] as slot_index.
+Reads gDuelFieldSlots (0x0201c510) slot entry dword; checks bit19 (slot active); if 0: returns 0.
+Combines player_id + slot_index as r1 argument.
+Calls count_equippable_slots_for_card(player_id, combined_slot_idx).
+Returns 1 if count > 0, 0 if count == 0.
+
+Constants:
+  TYPE_MIN      = 0x1f         (31)
+  TYPE_MAX      = 0x21         (33)
+  SLOTS_BASE    = 0x0201c510   (gDuelFieldSlots)
+  PLAYER_STRIDE = 0x868
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bits[11:6]=type_code [0x1f..0x21]; [+14]=slot_field)
+Returns: r0 = u32  (1=type in range AND slot active AND equippable slots > 0; 0=any check failed)
+Callees: count_equippable_slots_for_card (0x080339d8)
+Callers: indeg=0; grep ".word 0x0805d8bd" asm/all.s -> 0 hits (no fn-ptr ref)

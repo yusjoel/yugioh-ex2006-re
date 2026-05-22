@@ -1,0 +1,21 @@
+Equip slot eligibility predicate: active-player mismatch + field_state==3 + LP count guards.
+Reads gP1LP + ACTIVE_PLAYER_OFF (0x1ce8) as active_player_id.
+If active_player_id == card_entry player_id: returns 0 (must be opponent).
+Reads gP1LP + FIELD_STATE_OFF (0x1cf4) as field_state; if != 3: returns 0.
+Calls count_monster_slots_for_player(card_entry, card_player_id): if <= 1: returns 0.
+Reads gP1LP[card_player * PLAYER_STRIDE + LP_COMPARE_OFF (0x10)]: if <= 1: returns 0.
+Calls check_field_spell_neo_daedalus_group_placeable(card_player_id): if 0: returns 0.
+Returns 1 if all checks pass.
+
+Constants:
+  ACTIVE_PLAYER_OFF    = 0x1ce8
+  FIELD_STATE_OFF      = 0x1cf4
+  FIELD_STATE_REQUIRED = 3
+  PLAYER_STRIDE        = 0x868
+  LP_COMPARE_OFF       = 0x10
+  MONSTER_SLOT_MIN     = 2  (count must be > 1)
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=all thresholds met; 0=any failed)
+Callees: count_monster_slots_for_player (0x0805c17c), check_field_spell_neo_daedalus_group_placeable (0x0803bb7c)
+Callers: indeg=0; grep ".word 0x0805dfa1" asm/all.s -> 0 hits (no fn-ptr ref)

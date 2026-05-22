@@ -1,0 +1,15 @@
+Predicate: returns 1 if entry player still has monster zone slots available.
+Reads card_entry[+2] halfword; extracts type_code = bits[11:6] via mask 0xfc0.
+If type_code == DIRECT_EQUIP_TYPE (0x80): returns 1 immediately (no slot check needed).
+Otherwise: extracts player_id = bit0, computes opponent = 1 - player_id,
+calls count_monster_slots_for_player(card_entry, 1-player_id).
+Returns 1 if slot count > 0, 0 if count == 0.
+
+Constants:
+  TYPE_MASK         = 0xfc0  (0xfc<<4, extracts bits[11:6] from halfword[+2])
+  DIRECT_EQUIP_TYPE = 0x80
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1]; bits[11:6]=type_code)
+Returns: r0 = u32  (1=direct type OR monster slots exist; 0=monster slots empty)
+Callees: count_monster_slots_for_player (0x0805c17c)
+Callers: indeg=0; grep ".word 0x0805c631" asm/all.s -> 0 hits (no fn-ptr ref)

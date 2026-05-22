@@ -1,0 +1,17 @@
+Equip slot eligibility predicate for type_code 0x480 with active deck player matching.
+Extracts card_entry[+2] bits[11:6] via mask 0xfc0; if != TYPE_480 (0x480), returns 0.
+Checks card_entry[+14] dword != 0 (associated slot must be present).
+Reads DECK_BASE (0x0201bb90) field[0] as active_player_id and field[0x1c] as slot_index.
+Computes 1 - card_player_id; if != active_player_id, returns 0.
+Calls check_zone_slot_equip_prerequisites(card_entry, player_id, slot_index).
+Returns 1 if prereqs satisfied, 0 otherwise.
+
+Constants:
+  TYPE_MASK = 0xfc0       (0xfc<<4)
+  TYPE_480  = 0x480       (0x90<<3)
+  DECK_BASE = 0x0201bb90
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1]; bits[11:6]=type_code; [+14]=slot_id)
+Returns: r0 = u32  (1=type matches AND active deck player matches AND prereqs satisfied; 0=any failed)
+Callees: check_zone_slot_equip_prerequisites (0x08036770)
+Callers: indeg=0; grep ".word 0x0805cd21" asm/all.s -> 0 hits (no fn-ptr ref)

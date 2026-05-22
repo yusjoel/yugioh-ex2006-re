@@ -1,0 +1,18 @@
+Equip slot eligibility predicate checking for absence of type_d chain node.
+Reads card_entry[+2] bit0=player_id, bits[5:1]=slot_group.
+Calls find_equip_chain_node_by_type_d(player_id, slot_group).
+If result high-16 == 0xffff (node not found, INVALID_NODE):
+  Calls find_first_available_monster_slot_for_player(player_id).
+  If no slot (-1, detected via rsbs idiom): returns 0.
+  Otherwise calls check_equip_slot_chain_absent(card_entry, slot_group) and returns its result.
+If node found (high-16 != 0xffff): returns 0 directly.
+
+Constants:
+  INVALID_NODE = 0xffff0000  (high 16 bits == 0xffff means no node found)
+  NO_SLOT      = -1          (rsbs r0,r0,#0 idiom for no available slot)
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1]; bits[5:1]=slot_group [0..31])
+         r1 = u32 slot_context (passed to check_equip_slot_chain_absent)
+Returns: r0 = u32  (pass-through from check_equip_slot_chain_absent, or 0 if blocked)
+Callees: find_equip_chain_node_by_type_d (0x0802f8d8), find_first_available_monster_slot_for_player (0x08033bf4), check_equip_slot_chain_absent (0x0805c1c0)
+Callers: indeg=0; grep ".word 0x0805ca51" asm/all.s -> 0 hits (no fn-ptr ref)

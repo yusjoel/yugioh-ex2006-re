@@ -1,0 +1,22 @@
+Type-guard predicate for equip slot eligibility: checks type_code in {0x480, 0x4c0}.
+Extracts bits[11:6] of card_entry[+2] halfword via mask 0xfc0.
+If type_code not in {TYPE_A, TYPE_B}: returns 1 (pass-through, not applicable).
+If type matches: reads DECK_STRUCT_BASE (0x0201bb90) for active player_id and slot_index.
+Checks gDuelFieldSlots slot at player_id*PLAYER_STRIDE + slot_index*SLOT_SIZE has bit19 set.
+Also checks [slot+6] halfword == 0 (empty chain head).
+Calls check_zone_slot_equip_prerequisites(card_entry, player_id, slot_index).
+Returns 2 if prereqs satisfied, 0 if prereqs failed, 1 if type mismatch or guard pass.
+
+Constants:
+  TYPE_MASK   = 0xfc0        (0xfc<<4)
+  TYPE_A      = 0x480        (0x90<<3)
+  TYPE_B      = 0x4c0        (0x90<<3 + 0x40)
+  DECK_STRUCT_BASE = 0x0201bb90
+  PLAYER_STRIDE    = 0x868
+  SLOT_SIZE        = 0x14    (20 bytes)
+  SLOTS_BASE       = 0x0201c510  (gDuelFieldSlots)
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1]; bits[11:6]=type_code)
+Returns: r0 = u32  (2=prereqs satisfied; 1=type mismatch/guard pass; 0=prereqs failed)
+Callees: check_zone_slot_equip_prerequisites (0x08036770)
+Callers: indeg=0; grep ".word 0x0805c6b1" asm/all.s -> 0 hits (no fn-ptr ref)

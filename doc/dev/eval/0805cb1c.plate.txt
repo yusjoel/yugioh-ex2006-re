@@ -1,0 +1,13 @@
+Equip slot chain-absent check gated on field_state == 2.
+Reads gP1LifePoints + FIELD_STATE_OFF (0x1cf4) as field_state.
+If field_state != FIELD_STATE_REQUIRED (2): returns 0 immediately.
+If field_state == 2: calls check_equip_slot_chain_absent(card_entry) and returns its result.
+
+Constants:
+  FIELD_STATE_OFF      = 0x1cf4
+  FIELD_STATE_REQUIRED = 2
+
+Inputs:  r0 = ptr equip_card_entry
+Returns: r0 = u32  (pass-through from check_equip_slot_chain_absent; 1=chain absent AND state==2; 0=either failed)
+Callees: check_equip_slot_chain_absent (0x0805c1c0)
+Callers: indeg=0; grep ".word 0x0805cb1d" asm/all.s -> 0 hits (no fn-ptr ref)

@@ -1,0 +1,10 @@
+Minimal wrapper: extracts player_id from card_entry and checks Neo-Daedalus placeability.
+Reads card_entry[+2] byte; extracts bit0 as player_id via lsls/lsrs.
+Calls check_field_spell_neo_daedalus_group_placeable(player_id) and returns its result unchanged.
+8-instruction function body; no additional logic.
+Suitable for use in fn-ptr tables that require a card_entry pointer as input parameter.
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (pass-through; 1=Neo-Daedalus placeable; 0=blocked)
+Callees: check_field_spell_neo_daedalus_group_placeable (0x0803bb7c)
+Callers: indeg=0; grep ".word 0x0805cd6d" asm/all.s -> 0 hits (no fn-ptr ref)

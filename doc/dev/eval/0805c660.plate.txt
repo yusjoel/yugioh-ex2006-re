@@ -1,0 +1,13 @@
+Predicate: returns 1 if opponent's equip chain does NOT contain Swords of Revealing Light.
+Reads card_entry[+2] bit0 as player_id; computes opponent_id = 1 - player_id.
+Calls find_equip_slot_by_card_id(opponent_id, 0x1102).
+Result inversion: mvns r0,r0 / lsrs r0,r0,#0x1f converts -1 (not found) -> 0, else -> 1.
+Returns 1 if Swords of Revealing Light absent from opponent chain (equip eligible).
+
+Constants:
+  SWORDS_OF_LIGHT_ICID = 0x1102  (Swords of Revealing Light)
+
+Inputs:  r0 = ptr equip_card_entry ([+2] bit0=player_id [0..1])
+Returns: r0 = u32  (1=opponent chain does NOT contain Swords of Revealing Light; 0=it does)
+Callees: find_equip_slot_by_card_id (0x080324b4)
+Callers: indeg=0; grep ".word 0x0805c661" asm/all.s -> 0 hits (no fn-ptr ref)
