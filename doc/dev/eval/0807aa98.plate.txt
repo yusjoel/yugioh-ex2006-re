@@ -1,0 +1,15 @@
+Reads LP state machine (0x0201b290[0x4a0]). State 0x80: reads player_id from [ctx+0x2] bit0, reads [0x0201e2a0+0x8+player*4] activation state; if 1, calls sample_prng_scaled(2) and stores result in [gP1LifePoints+0xea<<5=0x1d40]; else calls invoke_card_display_op_0x31_sub8(0x38). Transitions to 0x7f. State 0x7f: reads player_id/slot_idx from [ctx+0x2], reads [gP1LifePoints+0x1d40] as r3, calls enqueue_lp_display_row_type17 with r2=1, transitions to 0x7e. State 0x7e: reads [gP1LifePoints+0x1daa] halfword; if 0, exits. If nonzero, reads equip struct (0x0201bb90) to verify player+slot match; if match calls test_equip_target_slot_in_bitmap with match params; else calls with struct default params.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_0807aab4)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- ACTIVATION_STATE_BASE=0x0201e2a0 (activation state array base, DWORD_0807aae4)
+- ACTIVATION_STATE_OFFSET=0x8 (player 0 activation offset; +4=player 1)
+- PRNG_STORE_OFFSET=0xea<<5=0x1d40 (PRNG result store offset, gP1LifePoints+0x1d40)
+- LP_COUNT_OFFSET=0x1daa (activation count halfword offset, DWORD_0807ab50)
+- EQUIP_STRUCT_BASE=0x0201bb90 (IWRAM equip struct base, DWORD_0807ab54)
+- OP_ID=0x38 (invoke_card_display_op_0x31_sub8 param, movs r0,#0x38)
+- LP_ROW_MODE=1 (enqueue_lp_display_row_type17 r2 param)
+- STATE_PRNG=0x80 (triggers PRNG sampling)
+- STATE_LP_ROW=0x7f (triggers LP row enqueue)
+- STATE_BITMAP=0x7e (triggers bitmap test)

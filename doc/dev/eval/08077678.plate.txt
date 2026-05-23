@@ -1,0 +1,7 @@
+Iterates both players' equip zone bitmaps, validates each pair via check_card_pair_allowed, and enqueues sprites via enqueue_equip_zone_sprite_direct + render_matched_pair_zone_sprites. If the paired card type is a spell, updates sp[0] flag. After the loop, if sp[0] is nonzero, enqueues an LP counter sprite. Entry params: r0=context_ptr ([+0x2] bit0=side), r8/r9/r10 are caller-frame inherited callee-save aliases.
+
+Constants:
+- STEP_COUNT_BASE=0x868 (player stride 2152 bytes)
+- LIST_A_BASE=0x0201c4ec (equip zone list A)
+- LIST_B_BASE=0x0201c600 (equip zone list B)
+- PAIR_MATCH_CTR=0x0201e1c8 (current frame pair counter)

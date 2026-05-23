@@ -1,0 +1,4 @@
+Checks bit2 flag at equip zone context [r0+0x4]. If flag is set, returns immediately without action. If flag is clear, calls query_equip_zone_bitmap_with_active_flag to get the active equip zone bitmap, then calls forward_equip_bitmap_update_with_full_mask with full-mask param r2=0 to broadcast bitmap refresh. Void return throughout. Typical gate-wrapper using bit2 as a skip-update control.
+
+Constants:
+- BIT2_SKIP_FLAG=0x4 (bit2 of [r0+0x4]: set means skip bitmap refresh)

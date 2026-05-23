@@ -1,0 +1,1 @@
+Reads current player ID from equip zone context [r0+0x2] bit0. Calls enqueue_sprite_attr_position_by_player with that player ID to write the local player's position attr to the sprite queue. Derives the opponent player ID by inverting bit0, then calls enqueue_sprite_attr_position_by_player again for the opponent. Void return. Symmetric dual-player position sprite enqueue wrapper.

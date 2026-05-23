@@ -1,0 +1,7 @@
+Reads player_id from [ctx+0x2] bit0 and card ID from [ctx+0x0]. Unconditionally calls enqueue_sprite_attr_type11(player, card_id, 1, 0) to enqueue equip sprite. Then checks [ctx+0x4] bit2: if 1, exits void. If 0, derives opponent player (1-player_id), calls get_card_extended_stat_field3(0x0ff8=Red-Eyes B. Dragon) to get extended stat r2, then calls submit_lp_indicator_with_slot_xor_flag(ctx, opponent, field3_val) to write LP indicator.
+
+Constants:
+- CARD_ID_RED_EYES=0x0ff8 (Red-Eyes B. Dragon, DWORD_0807a134)
+- SPRITE_TYPE=1 (enqueue_sprite_attr_type11 r2 param)
+- SPRITE_FLAG=0 (enqueue_sprite_attr_type11 r3 param)
+- LP_GATE_BIT=0x4 (bit2, ands #0x4 then cmp #0x0; 0=enable LP indicator path)

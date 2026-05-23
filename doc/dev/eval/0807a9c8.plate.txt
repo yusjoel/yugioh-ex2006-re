@@ -1,0 +1,15 @@
+Reads LP state machine (0x0201b290[0x4a0]). State 0x80: reads [+0x4] activation flag r5 (bit0=player_id) and [+0x20] slot_index from IWRAM equip struct (0x0201bb90), locates equip slot 0x0201c510+slot*20+player*0x868. Reads card word: bit8=0 exits; extracts bit13 vs r5 - if match checks [0x0201e2a0+0x8+player*4] activation state: if 1 writes 1 to [0x0201c510+0x1d10]; else calls invoke_card_display_op_0x31_sub1(0x137). If mismatch clears [0x0201c510+0x1d10]. Transitions to 0x7f. State 0x7f: reads [gP1LifePoints+0xea<<5=0x1d40]; if nonzero calls update_equip_target_bitmap_by_card_type(ctx, [struct+0x4], [struct+0x20]); if zero calls test_equip_target_slot_in_bitmap.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_0807aa14)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- EQUIP_STRUCT_BASE=0x0201bb90 (IWRAM equip struct base, DWORD_0807aa18/DWORD_0807aa7c/DWORD_0807aa94)
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, DWORD_0807aa20)
+- PLAYER_STRIDE=0x868 (per-player equip slot stride, DWORD_0807aa1c)
+- ACTIVATION_FLAG_OFFSET=0x1d10 (activation flag word offset, DWORD_0807aa24/DWORD_0807aa48)
+- ACTIVATION_STATE_BASE=0x0201e2a0 (activation state array base, DWORD_0807aa44)
+- ACTIVATION_STATE_OFFSET=0x8 (player 0 activation state offset; +4=player 1)
+- OP_ID=0x137 (invoke_card_display_op_0x31_sub1 param, DWORD_0807aa58)
+- LP_BANISHER_OFFSET=0xea<<5=0x1d40 (gP1LifePoints+0x1d40 Banisher check offset)
+- STATE_ACTIVATION=0x80 (triggers activation check)
+- STATE_BITMAP=0x7f (triggers bitmap update)

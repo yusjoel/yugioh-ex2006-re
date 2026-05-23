@@ -1,0 +1,7 @@
+Extracts bits[4:2] zone_type subfield from context [r0+0x6], compares with 0x4. If not equal, exits void. On match, calls read_effect_slot_zone_type(r0=ctx, r1=0) to get full zone_type r5. Reads player_id from [ctx+0x2] bit0, calls find_hand_slot_idx_by_set_code(r0=player_id, r1=zone_type) to get hand slot index. If < 0 (invalid), exits. Reads [ctx+0x0] card ID halfword: if equal to CARD_ID_RECYCLE=0x16d5 (Recycle), calls enqueue_hand_card_sprite_by_spell_type with spell_type=0; otherwise calls with spell_type=1.
+
+Constants:
+- ZONE_TYPE_RECYCLE=0x4 (bits[4:2]=1 after ands #0x1c; equip recycle zone subtype)
+- CARD_ID_RECYCLE=0x16d5 (Recycle, DWORD_08078994)
+- SPELL_TYPE_RECYCLE=0 (movs r2,#0x0; Recycle card spell type)
+- SPELL_TYPE_OTHER=1 (movs r2,#0x1; other hand spell type)

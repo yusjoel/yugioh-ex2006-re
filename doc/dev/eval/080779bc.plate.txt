@@ -1,0 +1,1 @@
+Reads player ID and slot index from equip zone context [r0], calls check_value_in_slot_chain to verify the target card is in the equip chain. If not in chain, returns void. If in chain, passes context ptr r0 / player ID r1 / slot r2 to test_equip_target_slot_in_bitmap for bitmap check. Two-phase gate: chain check then bitmap check.

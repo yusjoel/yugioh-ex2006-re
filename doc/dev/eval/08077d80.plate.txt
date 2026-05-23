@@ -1,0 +1,7 @@
+Reads bits[11:6] type field from context [r0+0x2], compares with SLOT_TYPE_TARGET=0x580 (0xb0<<3). If mismatch, returns void. On match, extracts slot ID from [r0+0x14] bits[8:0], looks up zone descriptor in IWRAM equip struct (0x0201bb90). If zone type byte [1:0] <= 4, calls get_slot_field5_score for score; otherwise reads card ID and calls get_card_extended_stat_field3 for extended stat. Finally calls submit_lp_indicator_with_slot_xor_flag to write LP display.
+
+Constants:
+- TYPE_MASK=0xfc0 (bits[11:6], 6-bit type field)
+- SLOT_TYPE_TARGET=0x580 (=0xb0<<3, target slot type value)
+- EQUIP_STRUCT_BASE=0x0201bb90 (IWRAM equip struct base address)
+- ZONE_TYPE_MAX=0x4 (zone type upper bound; <=4 uses field5 score path)

@@ -1,0 +1,8 @@
+Reads card ID and player/slot info from equip zone context [r0], calls check_value_in_slot_chain to verify the card is on the chain. If not on chain, returns immediately. If on chain, performs multi-way branch on card ID: Prickle Fairy (0x1700) -> test_equip_target_slot_zone11; Legendary Jujitsu Master (0x1749) -> test_equip_target_slot_zone13; Kangaroo Champ (0x1866) / Prickle Fairy (0x1703) -> checks opponent slot for a card and calls apply_slot_equip_activation_with_eligibility_check. All other card IDs return immediately.
+
+Constants:
+- CARD_PRICKLE_FAIRY=0x1703 (Prickle Fairy icid, zone11 test path)
+- CARD_LEGENDARY_JUJITSU=0x1749 (Legendary Jujitsu Master icid, zone13 test path)
+- CARD_KANGAROO_CHAMP=0x1866 (Kangaroo Champ icid, activation check path)
+- PLAYER_STRIDE=0x868 (per-player data stride)
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base address)

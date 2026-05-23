@@ -1,0 +1,14 @@
+Extracts bits[5:4] from [ctx+0x3], compares with 0x10. On match (fast path): extracts player_id (bit0) and slot_idx (bits[6:2]) from [ctx+0x2], locates equip slot at 0x0201c510+player*0x868+slot*20, reads card count word (bits[29:24]*2); also reads expected count from [ctx+0x4] bits[14:8]*2; if mismatch, exits. If match and [slot+0x8] nonzero, calls prepare_equip_slot_ctx_for_bitmap_update(player, slot, 0, 0). On mismatch (state machine path): reads 0x0201b290[0x4a0] state. State 0x80: calls query_equip_zone_bitmap_with_active_flag + forward_equip_bitmap_update_with_full_mask(r2=2), counts set bits and stores in [r9+0x4a4], transitions to 0x7f. State 0x7f: performs same count comparison; if match and slot active, computes sprite size params and calls enqueue_sprite_attr_with_mode(r3=3).
+
+Constants:
+- ZONE_TYPE_FLAG=0x10 (bits[5:4]=0x10, ands #0x30 then cmp #0x10; fast path trigger)
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, DWORD_0807993c/DWORD_08079860)
+- PLAYER_STRIDE=0x868 (per-player equip slot stride, DWORD_08079938/DWORD_0807985c)
+- SLOT_ENTRY_SIZE=20 (20 bytes per slot)
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_08079898)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- COUNT_STORE_OFFSET=0x4a4 (set_bits count storage offset)
+- SPRITE_MODE=3 (enqueue_sprite_attr_with_mode r3 param)
+- BITMAP_MASK_MODE=2 (forward_equip_bitmap_update_with_full_mask r2 param)
+- STATE_BITMAP=0x80 (triggers bitmap update)
+- STATE_SPRITE=0x7f (triggers sprite enqueue)

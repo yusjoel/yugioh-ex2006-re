@@ -1,0 +1,10 @@
+Extracts player ID (bit0) and slot index (bits[6:2]) from equip zone context [r0+0x2], computing two equip zone array indices (x*5*4 = x*20). Accesses IWRAM equip slot array (0x0201c510) via r8 (caller-frame inherited register). Aggregates current-frame equip count r2 (bit5 flag + bits[26:24] slot count), compares with expected count from context [+0x4] bits[14:8]. If mismatch, returns. On match, reads LP state machine (0x0201b290[0x94<<3]): state 0x80 calls set_lp_row_type18_with_value; state 0x7f reads DWORD_08077ec8=0x1d78 offset and calls enqueue_sprite_attr_with_mode (mode=3).
+
+Constants:
+- EQUIP_SLOT_STRIDE=0x868 (per-player equip slot stride)
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, inherited via r8)
+- LP_STATE_BASE=0x0201b290 (LP state machine base)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- SPRITE_DATA_OFFSET=0x1d78 (sprite data offset from r8, DWORD_08077ec8)
+- STATE_0x80=0x80 (triggers set_lp_row_type18_with_value)
+- STATE_0x7f=0x7f (triggers enqueue_sprite_attr_with_mode)

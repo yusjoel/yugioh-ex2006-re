@@ -1,0 +1,7 @@
+Reads activation state and target slot info from IWRAM equip struct (0x0201bb90). If [+0x14]=0, goes to simple path calling test_equip_target_slot_in_bitmap directly. If [+0x24] is nonzero, enters full path: reads [+0x4] bit0 (player_id) and [+0x20] (slot_index), computes equip slot offset (slot*20 + player*0x868) into 0x0201c510 base, reads [+0x8] halfword (old value) then writes 0 to [+0x8] via r9, then calls test_equip_target_slot_in_bitmap with caller ctx r0 / player r1 / slot r2. Void return throughout.
+
+Constants:
+- EQUIP_STRUCT_BASE=0x0201bb90 (IWRAM equip struct base, DWORD_080781b8)
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, DWORD_080781c0)
+- PLAYER_STRIDE=0x868 (per-player stride, DWORD_080781bc)
+- SLOT_ENTRY_SIZE=20 (20 bytes per slot, from lsls*2+adds*5 sequence)

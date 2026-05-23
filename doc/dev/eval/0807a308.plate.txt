@@ -1,0 +1,13 @@
+Reads player_id from [ctx+0x2] bit0, computes opponent r4=1-player. Reads LP state machine (0x0201b290[0x94<<3=0x4a0]). State 0x80: clears [base+0x95<<3=0x4a8] flag, then falls into 0x7f logic. State 0x7f: checks [gP1LifePoints+player*0x868+0xc] for activity; if active reads [base+0x90<<2+player*0x868] bit14 vs opponent; if different sets [base+0x4a8]=1; regardless calls enqueue_face_down_slot_sprite_attr(opponent, 0, 1), transitions to 0x7f or 0x7e. State 0x7e: calls enqueue_lp_counter_sprite_by_player(opponent); if [base+0x4a8]!=0 also enqueues LP counter sprite for player, transitions to 0x7d. State 0x7d: calls tick_zone_sprite_pipeline_with_update_flag(opponent, 2).
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_0807a32c)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- LP_FLAG_OFFSET=0x95<<3=0x4a8 (Banisher flag offset, movs r3,#0x95; lsls r3,r3,#0x3)
+- PLAYER_STRIDE=0x868 (per-player stride, DWORD_0807a384)
+- LP_FIELD_OFFSET=0xc (gP1LifePoints+player*0x868+0xc check offset)
+- SPRITE_PIPELINE_MODE=2 (tick_zone_sprite_pipeline_with_update_flag r1 param)
+- STATE_INIT=0x80 (init and enter 0x7f trigger state)
+- STATE_FACE_DOWN=0x7f (face-down sprite enqueue state)
+- STATE_LP_COUNTER=0x7e (LP counter sprite enqueue state)
+- STATE_TICK=0x7d (pipeline tick state)

@@ -1,0 +1,7 @@
+Extracts player_id (bit0, r3) and slot_idx (bits[6:2], r2) from [ctx+0x2]. Locates slot descriptor in equip slot array (0x0201c510) at slot_idx*20+player_id*0x868, reads card word bits[29:24]*2 (equip count*2, r3). Then reads bit13 (lsls #0x12, lsrs #0x1f) of the same slot word for current player_id, adds to r3. Reads [ctx+0x4] bits[14:8]*2 as expected count r0. If r3 != r0, exits void. If equal, calls enqueue_equip_slot_bitmap_update(player_id, slot_idx, 0, 0) to enqueue bitmap update.
+
+Constants:
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, DWORD_0807ac80)
+- PLAYER_STRIDE=0x868 (per-player equip slot stride, DWORD_0807ac7c; internal r12 alias)
+- SLOT_ENTRY_SIZE=20 (20 bytes per slot)
+- COUNT_SHIFT_PAIR=lsls#2+lsrs#0x18 -> bits[29:24] (card word equip count field, *2)

@@ -1,0 +1,11 @@
+Reads LP state machine (0x0201b290[0x94<<3=0x4a0]). State 0x80: extracts player_id (bit0) and slot_idx (bits[6:2]) from [ctx+0x2], calls enqueue_lp_display_row_type17 with r2=3 / r3=1 to enqueue LP display row, then transitions state to 0x7f. State 0x7f: reads [gP1LifePoints+0x1daa] activation count word; if 3, calls query_equip_zone_bitmap_with_active_flag + query_equip_target_bitmap_default for bitmap comparison; if 0, calls build_equip_zone_bitmap_for_player + query_equip_target_bitmap_default to rebuild bitmap. Other states exit. Void return.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_080789dc)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- LP_COUNT_OFFSET=0x1daa (gP1LifePoints+0x1daa activation count offset, DWORD_08078a00)
+- STATE_TRIGGER=0x80 (state that triggers LP row enqueue)
+- STATE_BITMAP=0x7f (state that performs bitmap operations)
+- LP_ROW_MODE=3 (enqueue_lp_display_row_type17 r2 param)
+- LP_ROW_FLAG=1 (enqueue_lp_display_row_type17 r3 param)
+- LP_COUNT_FULL=3 (cmp r0,#0x3; full activation count value)

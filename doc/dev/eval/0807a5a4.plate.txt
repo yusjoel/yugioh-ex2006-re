@@ -1,0 +1,12 @@
+Reads player_id from [ctx+0x2] bit0, computes opponent (1-player), calls count_occupied_monster_zones(opponent) to get occupied monster zone count r7. Reads LP state machine (0x0201b290[0x4a0]). State 0x80: calls count_available_monster_slots(player); if fewer than r7, exits. Calls check_field_spell_neo_daedalus_group_placeable to verify Neo-Daedalus condition; fails exits. On pass, calls increment_lp_bar_display_counter and clears [base+0x4a4] counter, transitions to 0x7f. State 0x7f: reads [base+0x4a4]; if < r7, builds OAM sprite attr (0x180d base | player_id<<13), calls setup_equip_oam_entry_with_sprite_attr to enqueue one sprite, increments counter, stays at 0x7f until count >= r7 then transitions to 0x7e. State 0x7e: calls decrement_lp_bar_display_counter and exits.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_0807a5d4)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- SPRITE_COUNT_OFFSET=0x4a4 (sprite enqueue counter offset)
+- OAM_SPRITE_ATTR_BASE=0x180d (Neo-Daedalus sprite attr base value, DWORD_0807a644; OAM attr constant, not card_id)
+- SPRITE_SETUP_R2=1 (setup_equip_oam_entry_with_sprite_attr r2 param)
+- SPRITE_SETUP_R3=1 (setup_equip_oam_entry_with_sprite_attr r3 param)
+- STATE_INIT=0x80 (init state: verify Neo-Daedalus condition)
+- STATE_SPRITE_LOOP=0x7f (sprite sequential enqueue state)
+- STATE_CLEANUP=0x7e (cleanup state: decrement LP bar)

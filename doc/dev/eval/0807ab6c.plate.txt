@@ -1,0 +1,15 @@
+Reads LP state machine (0x0201b290[0x4a0]). State 0x80: reads player_id from [ctx+0x2] bit0, computes opponent (1-player), reads [gP1LifePoints+opponent*0x868+0xc]; if 0, exits. If nonzero, calls apply_lp_delta_if_slot_active(opponent, 1, 1) to trigger LP change. Transitions to 0x7f. State 0x7f: calls count_field_copies_of_card(0x1332=Banisher of the Light); if >= 1 copy on field, exits. If 0 copies: reads slot index from [gP1LifePoints+0x1da8], looks up card field5 in gP1LifePoints; calls check_card_field5_is_nonzero to validate; on pass calls get_card_extended_stat_field5, then calls submit_lp_indicator_with_slot_xor_flag with field5*100 as r2 to write LP indicator.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_0807abb0)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- CARD_ID_BANISHER=0x1332 (Banisher of the Light, DWORD_0807ac10)
+- PLAYER_STRIDE=0x868 (per-player stride, DWORD_0807abb8)
+- LP_FIELD_OFFSET=0xc (gP1LifePoints+player*0x868+0xc check offset)
+- SLOT_IDX_OFFSET=0x1da8 (gP1LifePoints+0x1da8 slot index offset, DWORD_0807ac18)
+- FIELD5_LOOKUP_OFFSET=0x87<<5=0x10e0 (gP1LifePoints field5 lookup offset)
+- LP_MULTIPLIER=100 (field5*100 multiplier, movs r1,#0x64=100)
+- LP_DELTA_AMOUNT=1 (apply_lp_delta_if_slot_active r1 param)
+- LP_DELTA_MODE=1 (apply_lp_delta_if_slot_active r2 param)
+- STATE_LP_DELTA=0x80 (triggers LP change)
+- STATE_INDICATOR=0x7f (triggers LP indicator write)

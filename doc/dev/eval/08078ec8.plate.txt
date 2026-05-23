@@ -1,0 +1,10 @@
+Reads LP state machine (0x0201b290[0x94<<3=0x4a0]). State 0x80: reads player ID from [ctx+0x2] bit0, reads [gP1LifePoints+player*0x868+0xc] word; nonzero calls dispatch_equip_zone_sprite_banisher_of_the_light(player, 0, 0), stays at state 0x80; zero transitions to 0x7f. State 0x7f: reads opponent player (1-player), reads same gP1LifePoints field; nonzero calls dispatch_equip_zone_sprite_banisher_of_the_light(opponent, 0, 1), transitions to 0x7f or 0x7e. State 0x7e: calls query_equip_zone_bitmap_with_active_flag to get bitmap, inverts result then XORs bit(player*0x10+slot_idx), then calls query_equip_target_bitmap_default to write target bitmap.
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine base, DWORD_08078ee4)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- PLAYER_STRIDE=0x868 (per-player stride, DWORD_08078f14/DWORD_08078f48)
+- LP_FIELD_OFFSET=0xc (gP1LifePoints+player*0x868+0xc check word offset)
+- STATE_SPRITE_P1=0x80 (triggers P1 Banisher sprite)
+- STATE_SPRITE_P2=0x7f (triggers P2 Banisher sprite)
+- STATE_BITMAP=0x7e (bitmap invert operation state)

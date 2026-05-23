@@ -1,0 +1,8 @@
+Reads player ID from equip zone context [r0+0x2] bit0, locates slot descriptor in equip slot array (0x0201c5d8 = EQUIP_SLOT_BASE+0xc8) at player*0x868 offset. Reads [slot+0x8] halfword: if 0, exits void. If nonzero, reads [slot+0x0] word, shifts left 0x13 bits (extracts bits[31:19] 13-bit type field), compares with CARD_TYPE_FIELD8=0xb4f80000. If mismatch, exits. If match, calls apply_lp_delta_if_slot_active with opponent player ID / lp_amount=1 / mode=3 to trigger single-point LP change.
+
+Constants:
+- EQUIP_SLOT_BASE2=0x0201c5d8 (equip slot array base +0xc8 offset, DWORD_080787d8)
+- PLAYER_STRIDE=0x868 (per-player equip slot stride, DWORD_080787d4)
+- CARD_TYPE_FIELD8=0xb4f80000 (target card type field signature, bits[31:19]<<19 form, DWORD_080787dc)
+- LP_AMOUNT=1 (LP delta per trigger, movs r1,#0x1)
+- LP_MODE=3 (apply_lp_delta_if_slot_active mode param, movs r2,#0x3)
