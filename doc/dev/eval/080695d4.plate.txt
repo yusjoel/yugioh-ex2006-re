@@ -1,0 +1,29 @@
+Function: Executes Banisher of the Light equip zone sprite iterative dispatch by LP state machine code.
+Entry: r0=effect_slot_ptr. Checks [r0+0x4] bit2 (already-activated flag);
+  if active calls set_player_state_bit x2 then returns 0.
+Reads LP state (gP1LifePoints + 0x4a0) and dispatches:
+  state==0x80: initializes outer loop (r3=0..1, both player sides), inner iteration:
+    reads zone slot count from gP1LifePoints+0x1ce8 offset (r9=base_addr_ptr);
+    each iter XORs r5=player XOR r3, computes stride=0x868 halfword offset for opposite side,
+    writes to [r9+r5*2] (zone halfword update);
+    iterates r4 from count-1 to 0, calls dispatch_equip_zone_sprite_banisher_of_the_light(player_xor, idx, polarity);
+    outer r3 from 0..1 (both sides); on completion returns 0x7f.
+  state==0x7f: calls increment_lp_bar_display_counter;
+    reads slot state halfword from gP1LifePoints+0x1da8+0x1ce8 offset;
+    calls tick_zone_sprite_pipeline_with_update_flag(r7+0x8+slot_index*2, halfword_from_slot);
+    returns 0x7e.
+  state==0x7e: reads slot state from gP1LifePoints+0x1da8+0x1ce8;
+    subs r0,#1 (countdown), calls tick_zone_sprite_pipeline_with_update_flag;
+    calls decrement_lp_bar_display_counter; returns 0x7d.
+  other/already-active: set_player_state_bit_with_sprite_update(player, 0x14, 1) x2; returns 0.
+Side effects: OAM sprite: dispatch_equip_zone_sprite_banisher_of_the_light loop (state 0x80);
+  zone pipeline tick: tick_zone_sprite_pipeline_with_update_flag (state 0x7f/0x7e);
+  LP bar: increment/decrement_lp_bar_display_counter;
+  player state bits 0x14/0x15: set_player_state_bit_with_sprite_update x2 (exit path);
+  [gP1LifePoints+0x1da8+r5*2]: zone halfword written (state 0x80 path).
+Constants:
+  ACTIVATED_BIT=0x4  LP_STATE_0x7f=0x7f  LP_STATE_0x7e=0x7e  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0  BASE_ADDR=0x0201b290
+  ZONE_HALFWORD_OFFSET=0x1da8  SLOT_COUNT_OFFSET=0x1ce8
+  LP_PLAYER_STRIDE=0x868
+  PLAYER_STATE_BIT_A=0x14  PLAYER_STATE_BIT_B=0x15

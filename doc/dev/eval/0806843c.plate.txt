@@ -1,0 +1,15 @@
+Function: Handles equip LP indicator update logic for an effect slot.
+Entry: r0=effect_slot_ptr. Checks [r0+0x4] bit2 (activation flag); returns void if already active.
+Checks [r0+0x2] high bits[12:7]==0x80 (slot status code); if mismatch takes alternate path
+(set_field_slot_bit_with_sprite_update directly updates sprite bit).
+Main path: iterates 5 zone slots (r5=0..4) accumulating get_slot_field5_score total in r7;
+then calls query_equip_target_bitmap_default to query target bitmap;
+extracts slot parity flag (bit0 XOR), computes lp_delta = (r7+1)>>1;
+finally calls submit_lp_indicator_with_slot_xor_flag(slot_ptr, player_xor_flag, lp_delta).
+Side effects: Writes LP indicator to LP display queue via submit_lp_indicator_with_slot_xor_flag;
+updates sprite state bit via set_field_slot_bit_with_sprite_update (alternate path).
+Constants:
+  SLOT_STATUS_MASK=0xfc0 // bits[12:7] = 0x80 check
+  SLOT_SCORE_LOOP_MAX=0x4 // [0..4] inclusive, 5 iterations
+  BASE_STRIDE=0x868
+  BASE_ADDR=0x0201c510

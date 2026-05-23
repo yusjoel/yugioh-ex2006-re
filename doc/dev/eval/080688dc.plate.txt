@@ -1,0 +1,13 @@
+Function: Validates that an effect slot matches a zone slot and triggers equip activation.
+Entry: r0=effect_slot_ptr. Extracts player_id (bit0) and slot_type (bits[6:2]) from [r0+0x2].
+Locates two corresponding word values in zone slot array (base=0x0201c510, stride=0x868),
+compares aggregated card_type flag r2 with target count r0 from [r4+0x4] field;
+returns void if mismatch.
+On match: verifies LP presence at [zone_slot+0x8]; verifies count at [zone_slot+0x6];
+on pass calls apply_slot_equip_activation_with_eligibility_check(slot_ptr, player_id, slot_type, sp[0], flag=0).
+Side effects: Triggers equip activation logic via apply_slot_equip_activation_with_eligibility_check;
+writes [sp+0x0] (stack local) as flag word for argument passing (not external side effect).
+Constants:
+  BASE_STRIDE=0x868
+  BASE_ADDR=0x0201c510
+  FLAG_WORD=0x1 // [sp+0x0] = 1

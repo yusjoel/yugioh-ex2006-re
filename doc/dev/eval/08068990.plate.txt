@@ -1,0 +1,21 @@
+Function: Dispatches multiple equip slot sprite updates based on LP state machine code and equip zone index.
+Entry: r0=effect_slot_ptr. First checks [r0+0x3] bits[5:4]; if 0x20 enters state=0x7f/7e/80 branch.
+Main path (bits[5:4]!=0x20): extracts player_id and slot_type, locates corresponding word
+in zone slot array, compares card_type aggregate with [r0+0x4] target; on match checks [zone+0x8];
+on pass calls enqueue_sprite_attr_type11(player_xor, card_id, 5, lp_count>>0x17),
+then test_equip_target_zone13_with_slot_parity_flag to update zone13 state,
+finally enqueue_lp_counter_sprite_by_player(player_xor).
+State 0x7f branch: find_slot_idx_by_card_id_in_player_zones / count_available_monster_slots /
+check_field_spell_neo_daedalus_group_placeable triple checks;
+on pass: submit_equip_slot_sprite_zone11 or setup_equip_oam_entry_with_sprite_attr.
+State 0x7e branch: reads slot_idx from gP1LifePoints+0x4a4, calls enqueue_sprite_attr_with_mode.
+Side effects: OAM sprite queue: enqueue_sprite_attr_type11, enqueue_lp_counter_sprite_by_player,
+enqueue_sprite_attr_with_mode, submit_equip_slot_sprite_zone11;
+[gP1LifePoints+0x4a4]: writes slot_idx (state 0x7f path);
+[gP1LifePoints+0x950*3+8]: step counter write (state 0x7f path).
+Constants:
+  LP_STATE_0x7f=0x7f  LP_STATE_0x7e=0x7e  LP_STATE_0x80=0x80
+  SLOT_FLAG_0x20=0x20 // bits[5:4] == 0x20 trigger
+  BASE_STRIDE=0x868  BASE_ADDR=0x0201c510
+  ZONE11_BASE=0x0201c600
+  CARD_ID_SCAPEGOAT=0x12d2  CARD_ID_DARK_GRAY=0x1017 (Dark Gray)

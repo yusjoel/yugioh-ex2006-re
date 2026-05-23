@@ -1,0 +1,10 @@
+Function: Given r0 pointing to an effect slot struct, reads [r0+0x0] (u16 card_id),
+then calls enqueue_sprite_attr_type11 with player_id=0, card_id, mode=1, attr=0.
+Forces r0=0 for void return (epilogue pop{r1};bx r1). Single leaf operation.
+Trigger: Called when the invoker needs to emit a type-11 sprite attr record for a slot struct.
+Side effects: Writes one type-11 OAM sprite attr record via enqueue_sprite_attr_type11
+(card_id=[r0+0x0], player=0, mode=1, attr=0).
+Constants:
+  PLAYER_ID_FIXED=0x0 // fixed P1
+  SPRITE_MODE=0x1
+  SPRITE_ATTR=0x0

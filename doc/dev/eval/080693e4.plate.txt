@@ -1,0 +1,16 @@
+Function: Checks slot activation state; when not active reads zone slot match info
+and emits type-11 sprite attr.
+Entry: r0=effect_slot_ptr (passed via r1; r0 reused as mask).
+Reads [r1+0x8] bit0 -> r3 (zone_match_flag).
+Checks [r1+0x4] bit2 (already-activated flag); returns void if active.
+Not active: reads [r1+0x0] halfword (card_id), compares
+  zone state value at gP1LifePoints+0x1ce8 with r3 (zone_match_flag);
+  if not equal (state does not match zone_match): sprite_code=0x11;
+  if equal: sprite_code=0x1.
+Calls enqueue_sprite_attr_type11(r3, card_id, sprite_code, 0).
+Side effects: Writes type-11 attr to OAM sprite queue via enqueue_sprite_attr_type11.
+Constants:
+  ACTIVATED_BIT=0x4  // [r1+0x4] bit2
+  ZONE_MATCH_BIT=0x1  // [r1+0x8] bit0
+  SPRITE_CODE_MATCH=0x1  SPRITE_CODE_MISMATCH=0x11
+  LP_ZONE_OFFSET=0x1ce8  // gP1LifePoints+0x1ce8

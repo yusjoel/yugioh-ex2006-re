@@ -1,0 +1,23 @@
+Function: Identifies Graceful Charity or Spiral Spear Strike by card_id, reads associated data,
+then dispatches sprite updates by LP state machine.
+Entry: r0=effect_slot_ptr, [r1+0x0]=card_id halfword.
+card_id==0x12cc (Graceful Charity): r4=3, r7=[r1+0x8] bit0 (slot status bit).
+card_id==0x187d (Spiral Spear Strike): r4=2, r7=[r1+0x2] bit0 (player_id).
+other card_id: r4=0, r7=0, proceeds directly to LP state check.
+Reads LP state (gP1LifePoints + 0x4a0) and dispatches:
+  state==0x7f: iterates zone slot array (gP1LifePoints+0x4a4 base), for each slot
+    calls find_effect_node_in_zone to count matching nodes r5; if r5<=1 r9-1; if r5>1 r9-1-r5;
+    calls enqueue_lp_display_row_if_enabled(slot_ptr, r9, 0, 0); returns 0x7e.
+  state==0x80: reads LP field from gP1LifePoints+0x4a4 player slot,
+    writes updated value to gP1LifePoints+0x4a4,
+    calls tick_zone_sprite_pipeline_with_update_flag(player, r4); returns 0x7f.
+  other/already-active: returns 0.
+Side effects: LP display row write (state 0x7f); zone sprite pipeline tick (state 0x80).
+Constants:
+  CARD_ID_GRACEFUL_CHARITY=0x12cc
+  CARD_ID_SPIRAL_SPEAR_STRIKE=0x187d
+  LP_STATE_0x7f=0x7f  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0
+  SLOT_IDX_OFFSET=0x4a4
+  BASE_ADDR=0x0201b290  // gP1LifePoints
+  LP_PLAYER_STRIDE=0x868

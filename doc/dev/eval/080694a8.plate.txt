@@ -1,0 +1,31 @@
+Function: Identifies Scapegoat or Stray Lambs by card_id, then dispatches equip slot sprite
+by LP state machine.
+Entry: r0=effect_slot_ptr. Reads [r4+0x0] halfword (card_id).
+card_id==0x12d2 (Scapegoat): r7=4; loads Scapegoat-specific sprite data addr (0x09e3f11c).
+card_id==0x1710 (Stray Lambs): r7=2; loads Stray Lambs-specific sprite data addr (0x09e3f12c).
+other card_id: r7=0, r2=0 (no specific data).
+Checks [r4+0x4] bit2 (already-activated flag); if active calls:
+  set_player_state_bit_with_sprite_update(player, 0x14, 1) x2 then returns 0.
+Not active: reads LP state (gP1LifePoints + 0x4a0) and dispatches:
+  state==0x80: calls count_available_monster_slots(player) >= r7;
+    then check_field_spell_neo_daedalus_group_placeable;
+    reads gP1LifePoints+0x11c*2=0x238 slot bit; on pass:
+    calls increment_lp_bar_display_counter;
+    writes gP1LifePoints+0x4a4 = r5 (=0);
+    calls setup_equip_oam_entry_with_sprite_attr(player, &entry, 1, 1); returns 0x7f.
+  state==0x7f: reads gP1LifePoints+0x4a4 slot count vs r7;
+    if count<r7: setup_equip_oam_entry_with_sprite_attr + count++; returns 0x7f.
+    if count>=r7: returns 0x7e.
+  state==0x7e: calls decrement_lp_bar_display_counter; enters set_player_state_bit x2 then returns 0.
+  other: enters set_player_state_bit x2 then returns 0.
+Side effects: OAM sprite queue: setup_equip_oam_entry_with_sprite_attr (state 0x7f/0x80);
+  LP bar: increment/decrement_lp_bar_display_counter;
+  player state bit 0x14/0x15: set_player_state_bit_with_sprite_update x2 (exit path).
+  [gP1LifePoints+0x4a4]: counter incremented (state 0x7f path).
+Constants:
+  CARD_ID_SCAPEGOAT=0x12d2  CARD_ID_STRAY_LAMBS=0x1710
+  SCAPEGOAT_DATA_ADDR=0x09e3f11c  STRAY_LAMBS_DATA_ADDR=0x09e3f12c
+  ACTIVATED_BIT=0x4  LP_STATE_0x7f=0x7f  LP_STATE_0x7e=0x7e  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0  SLOT_IDX_OFFSET=0x4a4
+  PLAYER_STATE_BIT_A=0x14  PLAYER_STATE_BIT_B=0x15
+  MASK_CLEAR=0x1fff  // [sp+0x4] bitmask

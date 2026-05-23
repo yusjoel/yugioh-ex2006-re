@@ -1,0 +1,17 @@
+Function: Validates field placement conditions, looks up zone descriptor, and configures equip OAM attributes.
+Entry: r0=effect_slot_ptr. First checks [r0+0x4] bit2 (already-activated flag); returns void if active.
+Reads [r0+0x2] bit0 (player_id), calls count_available_monster_slots(player_id);
+returns void if no available monster slot.
+Calls check_field_spell_neo_daedalus_group_placeable(player_id); returns void if not satisfied.
+Extracts slot_id from [r0+0x14] (bits[8:0]), calls find_zone_descriptor_by_slot_id(slot_id),
+returns packed word: byte0=zone_idx, byte1=type (expected==0xe), word1=extra.
+Returns void if type!=0xe.
+Calls check_zone_slot_equip_eligible(player_id, zone_idx, extra);
+on pass calls get_zone_slot_ptr(player_id, 0xe, extra),
+then setup_equip_oam_entry_with_sprite_attr with slot_ptr/player_bit_a/player_bit_b/sp[0]=0x20/flag=1.
+Side effects: Writes OAM attr record via setup_equip_oam_entry_with_sprite_attr.
+Constants:
+  ACTIVATED_BIT=0x4  // [r0+0x4] bit2 = already activated
+  ZONE_TYPE_EQUIP=0xe  // zone descriptor byte1 expected value
+  SPRITE_ATTR_MODE=0x20  // sp[0]=0x20, OAM attr mode code
+  FLAG_1=0x1  // setup_equip_oam_entry_with_sprite_attr r2=1

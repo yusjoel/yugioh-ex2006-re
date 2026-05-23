@@ -1,0 +1,21 @@
+Function: Dispatches zone11 equip sprite or LP row update based on LP state machine code.
+Entry: r0=effect_slot_ptr. Checks [r0+0x4] bit2 (already-activated flag); returns 0 if active.
+Reads LP state machine (gP1LifePoints + 0x94*8 = 0x4a0) for two-way dispatch:
+  state==0x7f: reads gP1LifePoints+0x1da8 halfword (zone11 base);
+    extracts player_id (bit0 inverted), calls get_zone_slot_ptr with zone_idx=0xb;
+    reads zone slot card_type and LP bit fields, selects sprite_code (0x61 or 0x71),
+    calls enqueue_sprite_attr_type11(player_xor, card_id, sprite_code, card_info);
+    then calls enqueue_equip_zone_sprite_direct(player_xor, r8, 0x81).
+  state==0x80: reads gP1LifePoints+0xc player_id0/1 slot counts;
+    if target slot count is 0 returns 0; else calls set_lp_row_type4_with_value(opponent_player, 0); returns 0x7f.
+  other state: returns 0.
+Side effects: OAM sprite queue: enqueue_sprite_attr_type11 / enqueue_equip_zone_sprite_direct.
+  LP row write: set_lp_row_type4_with_value (state 0x80 path).
+Constants:
+  ACTIVATED_BIT=0x4
+  LP_STATE_0x7f=0x7f  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0
+  ZONE11_OFFSET=0x1da8  // gP1LifePoints+0x1da8 = zone11 entry base
+  LP_SLOT_OFFSET=0x1ce8  // gP1LifePoints+0x1ce8 = LP slot count area
+  SPRITE_CODE_A=0x61  SPRITE_CODE_B=0x71  // zone11 sprite codes
+  ZONE_IDX_11=0xb  EQUIP_ZONE_FLAG=0x81

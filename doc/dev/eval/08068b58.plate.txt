@@ -1,0 +1,12 @@
+Function: Structurally symmetric to apply_slot_equip_activation_by_zone_slot_match (0x080688dc).
+Entry: r0=effect_slot_ptr. Extracts player_id (bit0) and slot_type (bits[6:2]) from [r0+0x2].
+Locates corresponding word in zone slot array (base=0x0201c510, stride=0x868),
+compares card_type aggregate with target count at [r6+0x4]; returns void if mismatch.
+On match: checks [zone_slot+0x8] LP presence; on pass calls
+apply_slot_equip_activation_with_eligibility_check(slot_ptr, player_id, slot_type, sp[0]=lp_count, 0).
+Difference from 0x080688dc: sp[0] is loaded from [zone_slot+0x8] (LP presence count)
+rather than fixed value 0x1.
+Side effects: Triggers equip activation logic via apply_slot_equip_activation_with_eligibility_check.
+Constants:
+  BASE_STRIDE=0x868
+  BASE_ADDR=0x0201c510

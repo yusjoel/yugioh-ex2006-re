@@ -1,0 +1,16 @@
+Function: Checks if effect slot matches zone entry; on match validates card type eligibility
+and emits two sprite attr records.
+Entry: r0=effect_slot_ptr. Calls check_effect_slot_matches_zone_entry(slot, 0, 0);
+returns void if no match.
+On match: calls read_effect_slot_side_and_type(slot, 0), extracts side (bits[7:0]) and slot_type (bits[15:8]).
+Calls query_slot_card_type_eligibility(slot, side, slot_type);
+returns void if nonzero (ineligible).
+First sprite attr: if side==0 sprite_code=0x1b, else sprite_code=0x801b;
+calls enqueue_sprite_attr_record(code, slot_type, 1, 0).
+Second sprite attr: reads [r4+0x2] bit0 (player_id_alt);
+if player_id_alt==0 sprite_code2=0x1c, else sprite_code2=0x801c;
+calls enqueue_sprite_attr_record(code2, 0, 0, 0).
+Side effects: Writes two records to OAM sprite queue via enqueue_sprite_attr_record.
+Constants:
+  SPRITE_CODE_PLAYER0=0x1b  SPRITE_CODE_PLAYER1=0x801b
+  SPRITE_CODE2_P0=0x1c  SPRITE_CODE2_P1=0x801c

@@ -1,0 +1,21 @@
+Function: Dispatches equip LP field state sprite based on LP state machine code and card_id.
+Entry: r0=effect_slot_ptr. Checks [r0+0x4] bit2 (activation flag); returns void if active.
+Reads LP state machine current code at gP1LifePoints+0x94*8 (=0x4a0).
+state==0x7f: calls enqueue_lp_field_state_sprite_by_player(player_id) + type10 halfword
+  + enqueue_lp_field_state_sprite_by_player(opponent_id).
+state==0x80: calls dispatch_effect_handler_by_card_id([r0+0x0]) for card_id handler;
+  if dispatch returns 0 (no handler): trigger_card_display_op31_if_not_active(player, 0xd);
+  if dispatch returns nonzero: enqueue_lp_counter_sprite_by_player(player_id)
+  + selects sprite_code(0x8056/0x56) by player_id + reads gP1E500+0x0 zone entry word
+  extracting card_type field, calls enqueue_sprite_attr_record.
+  Returns: state==0x80 dispatch success r0=0x7f; state==0x7f returns r0=0x7e.
+Side effects: OAM sprite queue: enqueue_lp_field_state_sprite_by_player x2,
+enqueue_sprite_attr_type10_halfword, enqueue_lp_counter_sprite_by_player, enqueue_sprite_attr_record.
+Constants:
+  LP_STATE_0x7f=0x7f  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x94*8=0x4a0  // LP state machine offset
+  SPRITE_CODE_P1=0x56  SPRITE_CODE_P2=0x8056
+  OAM_TYPE10_HALFWORD=0x1e
+  SPRITE_ATTR_TYPE=0xd
+  BASE_ADDR=0x0201b290  // gP1LifePoints base
+  ZONE_ENTRY_BASE=0x0201e500

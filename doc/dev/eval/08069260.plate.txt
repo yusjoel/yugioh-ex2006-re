@@ -1,0 +1,26 @@
+Function: Reads effect slot side/type, dispatches equip slot sprites for zone11/12/13
+based on LP state machine code.
+Entry: r0=effect_slot_ptr. Calls read_effect_slot_side_and_type(slot, 0), extracts side -> r5.
+Reads [r7+0xc] halfword (zone handle), saves to r8.
+Checks [r7+0x4] bit2 (already-activated flag); returns 0 if active.
+Reads LP state (gP1LifePoints + 0x4a0) and dispatches:
+  state==0x7d: checks check_card_type_is_spell(r8); if not spell card:
+    emits enqueue_sprite_attr_type10_halfword(0xf) + enqueue_lp_counter_sprite_by_player(side);
+    returns 0x78.
+  state==0x7e (zone11): iterates gP1LifePoints slot array, for each valid card calls
+    check_card_pair_allowed + get_zone_slot_ptr + submit_equip_slot_sprite_zone11(side, idx, polarity);
+    returns 0x7e.
+  state==0x80 (zone11): similar, uses base=0x0201c740 for zone11 reverse iteration,
+    check_card_pair_allowed + get_zone_slot_ptr + enqueue_equip_slot_sprite_zone13(side, idx, polarity);
+    returns 0x7e.
+  state<=0x80 (zone12): similar, base=0x0201c880, calls enqueue_equip_slot_sprite_zone12;
+    returns 0x7d.
+  state not in above range: returns 0.
+Side effects: OAM sprite queue: submit_equip_slot_sprite_zone11 / enqueue_equip_slot_sprite_zone13 /
+  enqueue_equip_slot_sprite_zone12 / enqueue_sprite_attr_type10_halfword / enqueue_lp_counter_sprite_by_player.
+Constants:
+  ACTIVATED_BIT=0x4  LP_STATE_0x7d=0x7d  LP_STATE_0x7e=0x7e  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0  BASE_ADDR=0x0201b290
+  ZONE11_BASE=0x0201c740  ZONE12_BASE=0x0201c880
+  LP_PLAYER_STRIDE=0x868
+  TYPE10_CODE=0xf

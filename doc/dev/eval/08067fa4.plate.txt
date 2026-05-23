@@ -1,0 +1,35 @@
+Function: Scans effect slot array for entries with card_extended_stat_field6==0x17,
+emits OAM zone slot sprite attr records for each matching slot
+(enqueue_zone_slot_sprite_attr_if_occupied x2 + enqueue_sprite_attr_for_slot_indicator
++ enqueue_sprite_attr_type10_halfword).
+Entry: r0/r1 as two effect slot ptrs (saved to r8/r10), r2=zone_bitmap_ptr.
+Guard: if [r1+0x4] bit2 != 0 returns void immediately; if r2==0 skips.
+Scans three card_id ranges (0x0ffa..0x131c/0x16b8 etc.) to select handler path;
+on match calls check_effect_slot_matches_zone_entry + get_card_extended_stat_field6
+before emitting sprite queue entries.
+Side effects: Writes multiple records via enqueue_zone_slot_sprite_attr_if_occupied /
+enqueue_sprite_attr_for_slot_indicator to OAM sprite queue;
+sets zone bitmap bit4 flag via strb [r2+0x4] |= 0x10.
+Constants:
+  SLOT_BIT2_ACTIVE_MASK=0x4
+  LAB_08068204_LOOP_START_COUNT=0x5
+  LOOP_ITER_MAX=0xa (decimal: 10)
+  CARD_ID_RANGE_DELTA3=0xc
+  ZONE_BITMAP_BIT4_MASK=0x10
+  LOOP_STEP=0x14 (decimal: 20)
+  FIELD6_EQUIP_TYPE=0x17
+  OAM_TYPE10_HALFWORD=0x1e
+  CARD_ID_RANGE_DELTA4=0x2b
+  LOOP_SLOT_START_OFFSET=0x64
+  CARD_ID_RANGE_DELTA1=0x8c
+  CARD_ID_RANGE_DELTA2=0xa0
+  CARD_ID_REAPER=0x0ffa (Reaper of the Cards)
+  CARD_ID_GREENKAPPA=0x11f0 (Greenkappa)
+  CARD_ID_HARPIES_FEATHER_DUSTER=0x1246 (Harpie's Feather Duster)
+  CARD_ID_RANGE_UB1=0x131c (reserved -- cid=0xFFFF, no card assigned)
+  CARD_ID_DRIVING_SNOW=0x134d (Driving Snow)
+  CARD_ID_NOBLEMAN_OF_EXTERMINATION=0x1364 (Nobleman of Extermination)
+  CARD_ID_BAIT_DOLL=0x149b (Bait Doll)
+  CARD_ID_CRIMSON_NINJA=0x16b8 (Crimson Ninja)
+  BASE_STRIDE=0x868  // zone slot stride
+  BASE_ADDR=0x0201c510

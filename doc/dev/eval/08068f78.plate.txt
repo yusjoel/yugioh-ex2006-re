@@ -1,0 +1,20 @@
+Function: Checks Neo-Daedalus field spell placeability, then dispatches equip slot sprite update
+based on LP state machine code.
+Entry: r0=effect_slot_ptr. First checks [r0+0x4] bit2 (already-activated flag); returns 0 if active.
+Reads [r0+0x2] bit0 (player_id), calls check_field_spell_neo_daedalus_group_placeable(player_id);
+returns 0 if not satisfied.
+Reads LP state machine (gP1LifePoints + 0x94*8=0x4a0) for three-way dispatch:
+  state==0x7e: calls decrement_lp_bar_display_counter; returns 0.
+  state==0x7f: checks count_available_monster_slots(player_id);
+    if no available slot returns 0x7e; else setup_equip_oam_entry_with_sprite_attr(sp[0]=entry, flag=1);
+    returns 0x7f.
+  state==0x80: calls increment_lp_bar_display_counter; returns 0x7f.
+  other state: returns 0.
+Side effects: OAM sprite queue: setup_equip_oam_entry_with_sprite_attr writes equip attr (state 0x7f path).
+  LP bar counter: increment/decrement_lp_bar_display_counter.
+Constants:
+  ACTIVATED_BIT=0x4  // [r0+0x4] bit2
+  LP_STATE_0x7f=0x7f  LP_STATE_0x7e=0x7e  LP_STATE_0x80=0x80
+  STATE_OFFSET=0x4a0  // 0x94*8
+  BASE_ADDR=0x0201b290
+  SPRITE_ENTRY=0x000014f8  // setup_equip_oam_entry_with_sprite_attr sp[0] attr entry

@@ -1,0 +1,23 @@
+Function: Validates spell zone slot placeability, iterates effect slot zone entries,
+emits sprite for each valid equip zone.
+Entry: r0=effect_slot_ptr. Extracts player_id (bit0) from [r0+0x2],
+calls check_spell_zone_slot_placeable(player_id);
+returns void if not satisfied.
+Checks [r0+0x6] bits[4:2] (zone entry count mask 0x1c); returns void if zero.
+Calls increment_lp_bar_display_counter.
+Extracts entry_count from [r0+0x6] (bits[7:5]=lsls #0x1b / lsrs #0x1d), iterates idx from entry_count-1 to 0:
+  calls read_effect_slot_zone_type(slot, idx) to get zone_type_word;
+  calls find_zone_descriptor_by_slot_id(zone_type_word) to get packed descriptor;
+  extracts zone_type (bits[15:8]) expected==0xe;
+  if zone_type==0xe: extracts zone_idx (byte0) and zone_extra (word1),
+    calls get_zone_slot_ptr(player_id, 0xe, zone_extra),
+    extracts card_type_flag (bit13) from zone_slot[0],
+    computes polarity = (player_id XOR card_type_flag) ? sign(rsbs) : 0,
+    calls enqueue_equip_zone_sprite_by_slot_ptr(zone_ptr, polarity).
+After loop calls decrement_lp_bar_display_counter.
+Side effects: OAM sprite queue: enqueue_equip_zone_sprite_by_slot_ptr multiple writes;
+  LP bar: increment/decrement_lp_bar_display_counter.
+Constants:
+  ZONE_ENTRY_MASK=0x1c  // [r0+0x6] bits[4:2]
+  ZONE_TYPE_EQUIP=0xe  // find_zone_descriptor expected type
+  ZONE_CARD_TYPE_FLAG_BIT13=0x2000  // zone_slot[0] card type flag
