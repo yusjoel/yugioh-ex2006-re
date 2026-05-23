@@ -1,0 +1,15 @@
+Reads global display_state [0x0201b290 + 0x4a4]. If 0x80: zeros [gBase+0x4a4], continues execution; if 0x7f: skips initialization and continues.
+If effect node [r6+6] bits[4:2] (zone_count field) != 0, reads zone_type and calls find_hand_slot_idx_by_set_code to find the hand slot.
+If found (>= 0), reads sprite parameters from gGraveyardSlots[player_id][hand_slot] and calls enqueue_hand_card_sprite_by_spell_type.
+Then updates [gBase+0x4a4] count based on check_card_type_is_spell result (non-spell +1).
+Finally updates [r6+6] byte bits[4:2], returns 0x7f.
+If zone_count == 0: checks [gBase+0x4a4]; if non-zero calls enqueue_lp_counter_sprite_by_player.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- DISPLAY_STATE_ADDR=0x0201b290 (DWORD_080769c4)
+- DISPLAY_STATE_OFFSET=0x4a4 (DWORD_080769c8)
+- PLAYER_STRIDE=0x868 (DWORD_080769cc)
+- gGraveyardSlots=0x0201c8f8 (DWORD_080769d0)
+- HAND_SPELL_EXTRA=0x0cc8 (DWORD_080769d4, +0xcc8 offset)
+- ZONE_COUNT_MASK=0x1c (bits[4:2] of [r6+6])

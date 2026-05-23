@@ -1,0 +1,10 @@
+Iterates over all effect slots (slot_idx 0..0xa, stride 0x14), for each non-empty slot (ldrh [slot+8] != 0) calls get_slot_effect_card_value to get the effect value, if non-zero negates it as r2 and calls enqueue_effect_card_slot_sprite_attr to push the sprite into the OAM queue.
+The outer loop is driven by r8 (player_stride counter, initial value 0x1); after traversing all slots checks if r8 > 1; if so ends, else r8 += 1 to traverse the opponent player slots.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- SLOT_COUNT=0xa (per-player effect slots, [0..10])
+- SLOT_STRIDE=0x14 (0x14 bytes per slot entry)
+- gEffectSlots=0x0201e1c8 (DWORD_08075528, IWRAM effect slot base)
+- gSlotData=0x0201c510 (DWORD_0807552c, duel field slot data base)
+- PLAYER_STRIDE=0x868 (per-player data stride)

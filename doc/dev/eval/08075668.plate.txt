@@ -1,0 +1,14 @@
+Large effect slot sprite enqueue function. Extracts player_id and zone_type from effect node [r0+2], computes gDuelFieldSlots offset and compares col/dir with [r0+4] bits[9:3].
+On mismatch returns 0. On match calls read_effect_slot_zone_type and find_hand_slot_idx_by_set_code to determine the hand slot index, then calls find_first_available_monster_slot_for_player; if both fail returns 0.
+On success memsets the sp+0xc temporary structure to zero, writes player_id/zone_type fields, calls check_slot_card_eligible_by_card_id to verify card eligibility.
+If eligible (returns 1) calls enqueue_sprite_attr_for_zone_slot_packed and enqueue_zone_slot_sprite_attr_by_card_type to enqueue sprites.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DAT_080757e0)
+- gDuelFieldSlots=0x0201c510 (DAT_080757e4)
+- MASK_0x1ff=0x1ff (DAT_080757e8, bit mask)
+- CLEAR_MASK=0xffff803f (DAT_080757ec, clears bits[13:6])
+- ZONE_TYPE_VAL=0x16 (hardcoded zone type written to [sp+2])
+- SPRITE_ATTR_R1=0xe (enqueue_sprite_attr_for_zone_slot_packed 2nd arg)
+- SPRITE_ATTR_R3=0xa (enqueue_zone_slot_sprite_attr_by_card_type 4th arg)

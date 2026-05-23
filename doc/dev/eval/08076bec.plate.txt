@@ -1,0 +1,11 @@
+Extracts player_id and zone_type from effect node r4 ([r0+2]), computes gDuelFieldSlots offset, reads col/dir encoded value and compares with [r4+4] bits[9:3].
+On mismatch enters second path: checks if player_id equals [0x0201bb90+4] and zone_type equals [0x0201bb90+0x20]; if both match reads [0x0201bb90+0xd8] col/dir field and compares again.
+On match calls render_slot_card_sprite_and_effects(r0, 1).
+On first path direct match (col/dir directly matches): calls enqueue_equip_slot_bitmap_update(player_id, zone_type, 0, 0).
+Returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_08076c48)
+- gDuelFieldSlots=0x0201c510 (DWORD_08076c4c)
+- gActivationContext=0x0201bb90 (DWORD_08076c8c, activation context base)

@@ -1,0 +1,11 @@
+Checks effect node [r5+3] bits[5:4] == 0x30 (both must be set), otherwise returns 0.
+Extracts player_id and zone_type, uses r8=gDuelFieldSlots to compute col/dir encoding and compares with [r5+4] bits[9:3]; on mismatch returns 0.
+Also checks player_id side slot [slot+8] != 0 (valid slot). On pass calls update_equip_target_bitmap_zone15(effect_node, player_id, zone_type, 0); if it returns 0 skips.
+On success calls check_slot_equip_eligibility_by_type to verify type, then calls enqueue_sprite_attr_type11 to enqueue the sprite.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- ZONE_BIT_MASK=0x30 (bits[5:4] of [r5+3] must both be 1)
+- PLAYER_STRIDE=0x868 (DWORD_08076ae0)
+- gDuelFieldSlots=0x0201c510 (DWORD_08076ae4, stored in r8)
+- SPRITE_TYPE=1 (movs r2,#1)

@@ -1,0 +1,17 @@
+Large effect slot sprite dispatch function. Extracts player_id and zone_type from effect node [r6+2], uses r8=gDuelFieldSlots to compute col/dir and compares with [r6+4] bits[9:3]; on mismatch returns 0.
+On match reads display_state [0x0201b290+0x94*8]. Branches by state:
+- 0x80: calls check_spell_zone_slot_placeable(player_id); if placeable calls lookup_slot_display_value_by_card_id, dispatch_effect_handler_by_card_id, trigger_card_display_op31_if_not_active(0x56), returns 0x7f.
+- 0x7f: calls init_effect_slot_display_context(player_id, card_id, 0x29, 0), returns 0x7e.
+- 0x7e: iterates effect slots [0..count], calls get_effect_slot_entry_ptr_by_palette_id and enqueue_equip_zone_sprite_by_slot_ptr. On completion calls enqueue_sprite_attr_with_mode.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_08076d1c)
+- gDuelFieldSlots=0x0201c510 (DWORD_08076d20, r8)
+- DISPLAY_STATE_ADDR=0x0201b290 (DWORD_08076d24)
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0
+- SLOT_COUNT_OFFSET=0x1d10 (DWORD_08076dd8)
+- gP1LifePoints=DWORD_08076ddc
+- SPRITE_MODE=0x12 (movs r3,#0x12)
+- OP31_ARG=0x56 (trigger_card_display_op31 2nd arg)
+- INIT_CTX_ARG=0x29 (init_effect_slot_display_context 3rd arg)

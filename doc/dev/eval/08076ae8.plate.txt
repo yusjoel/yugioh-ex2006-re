@@ -1,0 +1,11 @@
+Extracts player_id (bit0) from effect node [r0+2], computes opponent_player_id = 1 - player_id.
+Reads LP table value r2 from gP1LifePoints base +0xc offset indexed by player_id, also reads adjacent slot r1=[gP1LifePoints+0xc+opponent*stride].
+Computes delta = 7 - r2, calls tick_zone_sprite_pipeline_with_update_flag(opponent_player, delta).
+Returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- gP1LifePoints=DWORD_08076b14 (gP1LifePoints base)
+- PLAYER_STRIDE=0x868 (DWORD_08076b18)
+- LP_TABLE_OFFSET=0xc ([gP1LifePoints+0xc] = LP count field)
+- DELTA_BASE=7 (movs r1,#7; subs r1,r1,r2 -- LP delta computation)

@@ -1,0 +1,13 @@
+Extracts player_id from effect node [r5+2], then corrects player_id via [r5+3] bit5 XOR.
+Extracts set_code (bits[9:3]) from [r5+4] and calls find_zone_descriptor_by_slot_id to get descriptor, extracts zone_row (byte2) and zone_col (byte1).
+Calls check_field_spell_neo_daedalus_group_placeable to verify placement group. Then checks if zone_col low byte is 0xf (must be zone_type_15).
+If pass: calls check_zone_slot_equip_eligible_alt to verify equip eligibility; if count_available_monster_slots > 0 calls setup_equip_oam_entry_with_sprite_attr; otherwise calls enqueue_equip_zone_sprite_attr_shape_a.
+Finally checks if card_id is D.D. Scout Plane (0x16be): if so calls enqueue_sprite_attr_for_chain_node_match.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- CARD_DD_SCOUT_PLANE=0x16be (icid 5822, D.D. Scout Plane)
+- ZONE_TYPE_15=0xf (must be zone_type=15)
+- PLAYER_STRIDE=0x868 (DWORD_08076ba8)
+- gEquipZoneSlots=0x0201cab0 (DWORD_08076bac)
+- CHAIN_VALUE=0xb (enqueue_sprite_attr_for_chain_node_match 5th arg)

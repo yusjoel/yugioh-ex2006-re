@@ -1,0 +1,15 @@
+Uses [0x0201b290+0x4a0] display_state as dispatch key to drive equip slot LP bar display state machine.
+state=0x80: zeros [0x0201b290+0x4a4] counter, calls increment_lp_bar_display_counter, returns 0x7f.
+state=0x7f: reads slot_count from gP1LifePoints[player_id]+0x14, iterates backward through equip slot array (step=-4), calls check_card_field5_is_nonzero per slot; if a non-zero slot is found calls enqueue_equip_zone_sprite_by_slot_ptr and returns 0x7f; if all zero returns 0x78.
+state=0x78: increments [0x0201b290+0x4a4] by 1; if new value <= 1 returns 0x7f, else calls decrement_lp_bar_display_counter and returns 0.
+Other state: returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- DISPLAY_STATE_ADDR=0x0201b290 (DAT_08077450)
+- DISPLAY_STATE_OFFSET=0x4a0 (DAT_08077454 - 4)
+- COUNTER_OFFSET=0x4a4 (DAT_08077454 = 0x4a0+4)
+- LP_TABLE_OFFSET=0x1ce8 (DAT_0807744c, [gP1LifePoints+0x1ce8])
+- SLOT_COUNT_OFFSET=0x14 (adds r0,#0x14; [gP1LifePoints+0x14+player_stride])
+- PLAYER_STRIDE=0x868 (DAT_080774ac)
+- SLOT_BASE_OFFSET=0x418 (0x83<<3, from gP1LifePoints+0x418)

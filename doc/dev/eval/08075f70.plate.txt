@@ -1,0 +1,8 @@
+Very short leaf function. Extracts player_id (bit0 of [+2]) from effect node r2=[r0], computes opponent_player_id = 1 - player_id.
+Reads [r0+0] = card_id halfword, [r0+0xc] = type_code halfword.
+Calls enqueue_sprite_attr_type11(opponent_player, card_id, type=1, type_code) to write a sprite record into the OAM queue.
+Returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- SPRITE_TYPE=1 (movs r2,#0x1)

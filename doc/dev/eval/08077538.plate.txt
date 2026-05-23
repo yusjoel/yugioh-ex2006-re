@@ -1,0 +1,9 @@
+Extracts player_id (bit0) and zone_type (bits[6:2]) from effect node [r4+2], reads card_id from [r4+0].
+Calls get_node_entity_id_in_slot(player_id, zone_type, card_id) to get slot entity ID (r5).
+Calls enqueue_equip_slot_bitmap_update(player_id, zone_type, 0, 0) to update the equip slot bitmap.
+If r5 >= 0 (entity valid), calls submit_lp_indicator_with_slot_xor_flag(effect_node, entity_id, 0xbb8).
+Returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- LP_THRESHOLD=0xbb8 (DWORD_08077578, = 3000 decimal, submit 3rd arg)

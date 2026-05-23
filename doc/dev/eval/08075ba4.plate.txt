@@ -1,0 +1,14 @@
+Reads global state word [0x0201b290 + 0x94*8] (display_state), branches on its value:
+- 0x80: calls dispatch_card_effect_activation(effect_node) to handle effect activation; on success calls increment_lp_bar_display_counter, zeros [gBase+0x4a4], returns 0x7f.
+- 0x7f: reads [gBase+0x4a4] count (equip_count); if <= 2 reads current card_id bitfield data and calls setup_equip_oam_entry_with_sprite_attr, increments [gBase+0x4a4], returns 0x7f; if > 2 returns 0x7e.
+- 0x7e: calls decrement_lp_bar_display_counter, returns 0.
+- other: returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- DISPLAY_STATE_ADDR=0x0201b290 (DWORD_08075bc4, display state base)
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 (state field offset)
+- EQUIP_COUNT_FIELD=0x4a4 (gBase+0x4a4, equip iteration counter)
+- CARD_ID_MASK=0x1fff (DWORD_08075c28)
+- STATE_ACTIVATING=0x80, STATE_EQUIP_ITER=0x7f, STATE_DECREMENT=0x7e
+- GLOBAL_IO_SRC=0x09e3f134 (DWORD_08075c24, card_id source word ptr)

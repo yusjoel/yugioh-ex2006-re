@@ -1,0 +1,8 @@
+Extracts player_id (bit0) and set_code (bits[9:3]) from effect node [r4+2].
+Calls enqueue_hand_card_sprite_by_spell_type(player_id, set_code, type=1) to enqueue the hand spell/trap sprite into the OAM queue.
+If return is non-zero (success) also calls enqueue_lp_counter_sprite_by_player(player_id) to update the LP counter sprite.
+Returns 0.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- SPRITE_TYPE=1 (movs r2,#1; hand display mode)

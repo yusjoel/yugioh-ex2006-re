@@ -1,0 +1,9 @@
+Extracts player_id (bit0) and zone_type (bits[6:2]) from effect node r4 ([r0+2]), computes gDuelFieldSlots offset, reads the col/dir encoded value and compares with [r4+4] bits[9:3].
+On mismatch returns 0. On match additionally checks a field of the player_id slot ([r0+4] bit14 = equip_dir_flag).
+If both satisfied calls set_field_slot_bit_with_sprite_update(player_id, zone_type, col_slot, equip_dir_bit, bit_index=5) to set the field bit and update sprites.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_08075ca8)
+- gDuelFieldSlots=0x0201c510 (DWORD_08075cac)
+- BIT_INDEX=5 (set_field_slot_bit_with_sprite_update 5th arg)

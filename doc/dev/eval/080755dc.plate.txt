@@ -1,0 +1,9 @@
+Extracts player_id (bit0) and zone_type (bits[6:2]) from effect node [r0+2], computes gDuelFieldSlots offset (r12=DWORD_08075664=0x0201c510), reads the current slot column+direction encoded value and compares with [r0+4] bits[9:3].
+On mismatch returns 0. On match additionally checks zone_type slot [slot+8] != 0 (slot valid). If valid calls query_equip_target_bitmap_with_zone_struct(player_id, zone_type, r2=0) to query the equip target bitmap.
+Sibling of check_equip_slot_placement_via_neo_daedalus (0x08075530); difference is the final verification call: the other uses the neo_daedalus path, this function uses the target_bitmap path.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_08075660)
+- gDuelFieldSlots=0x0201c510 (DWORD_08075664, stored in r12)
+- COL_SHIFT=0x1b, PLAYER_BIT=0x1f

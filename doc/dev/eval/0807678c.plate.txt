@@ -1,0 +1,9 @@
+Very short leaf function. Extracts player_id (bit0) from effect node [r0+2], computes opponent_player = 1 - player_id.
+Reads card_id halfword [r0+0], calls enqueue_sprite_attr_type11(opponent_player, card_id, 5, 0) with fixed type=5 and ext=0.
+Returns 0.
+Sibling of enqueue_effect_node_sprite_type11_from_slot (0x08075f70); only difference is the type parameter: that function uses type=1, this one uses type=5.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- SPRITE_TYPE=5 (movs r2,#5)
+- SPRITE_EXT=0 (movs r3,#0)

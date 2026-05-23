@@ -1,0 +1,17 @@
+Receives player_id (r0->r3), chain_value=0xb (r1), slot_idx (r2->r4) as three parameters.
+First reads global state [0x0201b290 + 0x484] effect slot current player_id field; if it does not match r3 returns 0.
+If r1 != 0xb returns 0 (only handles chain_value=0xb chain nodes).
+Computes gDuelFieldSlot[player_id][slot_idx] offset, reads the card ID and compares with multiple card_id constants (Dark Scorpion Burglars=0x1531, Dark Scorpion Chick=0x1656, Dark Scorpion Gorg=0x1685, Dark Scorpion Meanae=0x1686). Based on match loads the corresponding type_flag bitmask (1/2/4/8/16).
+Then ANDs [slot+8] (zone_flags): if the corresponding bit is already set returns 0; otherwise returns 0x800 (trigger allowed).
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- CHAIN_VALUE=0xb (chain node detection value 11)
+- CARD_DARK_SCORPION_BURGLARS=0x1531 (icid 5425, Dark Scorpion Burglars)
+- CARD_DARK_SCORPION_CHICK=0x1656 (icid 5718, Dark Scorpion - Chick the Yellow)
+- CARD_DARK_SCORPION_GORG=0x1685 (icid 5765, Dark Scorpion - Gorg the Strong)
+- CARD_DARK_SCORPION_MEANAE=0x1686 (icid 5766, Dark Scorpion - Meanae the Thorn)
+- DISPLAY_STATE_OFFSET=0x484 (DWORD_08076560)
+- PLAYER_STRIDE=0x868 (DWORD_08076564)
+- gDuelFieldSlot2=0x0201c600 (DWORD_08076568)
+- RETURN_ALLOWED=0x800 (movs r0,#0x80; lsls r0,r0,#4 = 0x800)

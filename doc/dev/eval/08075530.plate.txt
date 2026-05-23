@@ -1,0 +1,10 @@
+Extracts player_id (bit0) and zone_type (bits[6:2]) from effect node [r0+2], computes gDuelFieldSlots offset, reads the current slot column+direction encoded value and compares with [r0+4] bits[9:3].
+If not matching returns 0. On match calls find_first_placeable_monster_slot(player_id) to find a placeable monster slot; if none (return < 0) returns 0.
+Then calls check_field_spell_neo_daedalus_group_placeable(player_id) to verify placement group is allowed; if not returns 0.
+If all pass calls setup_equip_oam_entry_with_sprite_attr to configure the equip OAM entry.
+Dispatched via runtime function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_080755d4, per-player data stride)
+- gDuelFieldSlots=0x0201c510 (DWORD_080755d8)
+- COL_SHIFT=0x1b, PLAYER_BIT=0x1f (bit extraction from byte [r0+2])
