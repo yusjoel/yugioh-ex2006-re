@@ -1,0 +1,24 @@
+apply_equip_activation_if_zone_entry_vacant @ 0x0806ecb0
+
+When slot[4] bit2 is set: validates that the effect slot matches its zone entry
+(check_effect_slot_matches_zone_entry), reads side and type
+(read_effect_slot_side_and_type), then locates the zone entry. Only when
+zone[6]!=0 (zone valid) AND zone[8]==0 (zone vacant/unoccupied) does it call
+apply_slot_equip_activation_with_eligibility_check(slot, side, zone_type, 1,
+stack_arg=2) to perform equip activation. Always returns 0.
+
+Constants:
+  ZONE_TABLE_BASE            = 0x0201c510  (zone entry table base)
+  ZONE_TABLE_PLAYER_STRIDE   = 0x868
+  ZONE_ENTRY_SIZE            = 0x14
+  ZONE_VALID_FLAG            = zone[6] != 0
+  ZONE_VACANT_FLAG           = zone[8] == 0
+  STACK_ARG_ACTIVATION_MODE  = 2
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Conditionally calls apply_slot_equip_activation_with_eligibility_check,
+  updating equip activation state and display sequence (when zone valid+vacant).

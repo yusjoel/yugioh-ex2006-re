@@ -1,0 +1,23 @@
+submit_lp_indicator_if_tile_count_match @ 0x0806ef88
+
+Similar to check_zone_tile_count_for_equip_bitmap_refresh but additionally
+checks slot[8]!=0 (LP indicator valid). When the tile count in the zone entry
+matches the count field in slot[4], calls
+submit_lp_indicator_with_slot_xor_flag(slot, LP_DELTA=0x1f4).
+LP_DELTA = 0xfa * 2 = 500 is a fixed LP adjustment value.
+Always returns 0.
+
+Constants:
+  ZONE_TABLE_BASE           = 0x0201c510
+  ZONE_TABLE_PLAYER_STRIDE  = 0x868
+  ZONE_ENTRY_SIZE           = 0x14
+  LP_DELTA                  = 0x1f4  (= 0xfa * 2 = 500, LP adjustment)
+  SLOT8_LP_VALID_CHECK      = slot[8] != 0
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Conditionally calls submit_lp_indicator_with_slot_xor_flag to submit an
+  LP indicator update (when slot[8]!=0 and tile counts match).

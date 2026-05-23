@@ -1,0 +1,21 @@
+check_zone_tile_count_for_equip_bitmap_refresh @ 0x0806e6f8
+
+When slot[4] bit2 is set, computes the tile count of the corresponding zone entry
+in the current player-side zone table and compares it with the tile count field in
+slot[4]. If equal, calls query_equip_target_bitmap_default(slot, DISPCNT_SHADOW)
+to refresh the equip target bitmap. Always returns 0 (void semantic).
+
+Constants:
+  ZONE_TABLE_BASE         = 0x0201c510  (zone entry table base address)
+  ZONE_TABLE_PLAYER_STRIDE= 0x868       (stride between player sides)
+  ZONE_ENTRY_SIZE         = 0x14        (bytes per zone entry)
+  DISPCNT_SHADOW          = 0x04000400  (DISPCNT shadow register address)
+  TILE_COUNT_MATCH_FLAG   = bit2 of slot[4]
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer (EWRAM effect slot struct)
+Return: r0 = 0 (fixed, void semantic)
+
+Side effects:
+  Conditionally updates EWRAM equip target bitmap via
+  query_equip_target_bitmap_default when bit2 is set and tile counts match.

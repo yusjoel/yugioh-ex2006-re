@@ -1,0 +1,29 @@
+dispatch_dual_zone_equip_chain_sprite_by_state @ 0x0806f1c8
+
+Saves side/type info for two effect slot entries (idx=0 and idx=1) in high
+registers, then dispatches dual-zone equip chain sprites based on display state
+(0x7f/0x80).
+  State 0x7f: checks equip slot eligibility in target bitmap
+    (check_equip_slot_eligible_in_target_bitmap), enqueues slot card sprite
+    (enqueue_slot_card_sprite_if_eligible), queries slot card type eligibility
+    (query_slot_card_type_eligibility), and enqueues equip chain pair sprite
+    (enqueue_equip_chain_pair_sprite_if_eligible).
+Handles dual-zone equip chain sprite display for two zone entries.
+Always returns 0.
+
+Constants:
+  DISPLAY_STATE_STEP3      = 0x7f
+  DISPLAY_STATE_STEP4      = 0x80
+  ZONE_TABLE_BASE          = 0x0201c510
+  ZONE_TABLE_PLAYER_STRIDE = 0x868
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer (primary slot)
+  r1: u32 zone_idx -- zone index [0..12]
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls check_equip_slot_eligible_in_target_bitmap (reads bitmap eligibility).
+  Calls enqueue_slot_card_sprite_if_eligible (writes sprite attribute queue).
+  Calls enqueue_equip_chain_pair_sprite_if_eligible (writes sprite queue).
+  Calls query_slot_card_type_eligibility (reads card type eligibility).

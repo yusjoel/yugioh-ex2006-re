@@ -1,0 +1,25 @@
+enqueue_zone_sprite_by_special_monster_card_id @ 0x08070274
+
+After confirming slot[4] bit2 is set (tile count match flag), reads card_id from
+slot[0] and dispatches to one of 8 special monster card handlers. Each matching
+card calls enqueue_sprite_attr_with_mode(side, zone, set_code, mode=3) to enqueue
+a mode-3 sprite attribute. Returns 0 immediately if no card matches.
+
+Constants:
+  CARD_ID_RAGING_FLAME_SPRITE = 0x182d  (Raging Flame Sprite)
+  CARD_ID_GUARDIAN_BAOU       = 0x164d  (Guardian Baou)
+  CARD_ID_LEGENDARY_FIEND     = 0x154d  (Legendary Fiend)
+  CARD_ID_INSECT_PRINCESS     = 0x1704  (Insect Princess)
+  CARD_ID_FIREBIRD            = 0x1875  (Firebird)
+  CARD_ID_MAJI_GIRE_PANDA     = 0x1862  (Maji-Gire Panda)
+  CARD_ID_RESERVED_A          = 0x144c  (reserved -- cid=0xFFFF, no card assigned)
+  CARD_ID_RESERVED_B          = 0x1452  (reserved -- cid=0xFFFF, no card assigned)
+  SPRITE_MODE_3               = 3
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Conditionally calls enqueue_sprite_attr_with_mode (writes sprite attribute queue,
+  mode=3) for each matched card ID.

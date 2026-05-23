@@ -1,0 +1,21 @@
+dispatch_equip_zone_sprite_or_lp_row_type16 @ 0x080706f4
+
+2-state dispatch function (0x7f/0x80).
+  State 0x80: validates slot-zone match via check_effect_slot_matches_zone_entry,
+              then calls enqueue_sprite_attr_record to enqueue a sprite attribute.
+  State 0x7f: calls set_lp_row_type16_with_player_id to configure LP display row
+              type 16 (includes player_id).
+Returns 0.
+
+Constants:
+  DISPLAY_STATE_STEP3 = 0x7f
+  DISPLAY_STATE_STEP4 = 0x80
+  LP_ROW_TYPE16       = 0x10  (= 16)
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  State 0x80: calls enqueue_sprite_attr_record (writes sprite attribute queue).
+  State 0x7f: calls set_lp_row_type16_with_player_id (updates LP display row state).

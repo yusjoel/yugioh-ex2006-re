@@ -1,0 +1,20 @@
+enqueue_slot_sprite_type4_with_card_id @ 0x08070aa4
+
+Reads card_id from equip effect-slot slot[0] (halfword) and player_id from
+slot[2] bit0. Calls enqueue_sprite_attr_type11(player_id, card_id, type=4,
+flags=0) to enqueue a type-4 sprite attribute. Sibling of
+enqueue_slot_sprite_type11_with_card_id; differs in type parameter (4 vs 0x11)
+and in player_id being dynamically extracted from slot[2] bit0.
+Always returns 0.
+
+Constants:
+  SPRITE_TYPE_4  = 4
+  PLAYER_ID_BIT  = bit0 of slot[2]
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls enqueue_sprite_attr_type11 (writes one type-4 sprite attribute record
+  to the sprite attribute queue).

@@ -1,0 +1,26 @@
+tick_equip_chain_activation_display_seq @ 0x0806fb88
+
+Complex 4-state display state machine (0x7d/0x7e/0x7f/0x80) driving the
+equip chain activation display sequence.
+  State 0x7d/0x7e: calls apply_slot_equip_activation_with_eligibility_check
+                   to perform equip activation.
+  State 0x7f: checks check_slot_full_activation_eligibility and
+              eval_slot_activation_eligibility_full to determine activation path.
+  State 0x80: calls query_slot_card_type_eligibility to query card type eligibility.
+Triggered each frame by an external ticker. Returns 0.
+
+Constants:
+  DISPLAY_STATE_INIT  = 0x7d
+  DISPLAY_STATE_STEP2 = 0x7e
+  DISPLAY_STATE_STEP3 = 0x7f
+  DISPLAY_STATE_STEP4 = 0x80
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Conditionally calls apply_slot_equip_activation_with_eligibility_check
+  (updates equip activation state).
+  Conditionally calls eval_slot_activation_eligibility_full (evaluates eligibility).
+  Reads/writes EWRAM effect slot display state field.

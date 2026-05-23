@@ -1,0 +1,17 @@
+enqueue_hand_to_monster_slot_equip_sprite @ 0x0806f788
+
+Finds a hand slot index by set_code (find_hand_slot_idx_by_set_code), then
+locates the first available monster slot for the player
+(find_first_available_monster_slot_for_player). After confirming the effect slot
+matches its zone entry (check_effect_slot_matches_zone_entry), calls
+enqueue_sprite_attr_for_zone_slot_packed to enqueue packed zone-slot sprite
+attributes, then calls invoke_zone_slot_sprite_attr_for_equip_type to submit
+equip-type sprite attributes. Returns 0.
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls enqueue_sprite_attr_for_zone_slot_packed (writes sprite attribute queue).
+  Calls invoke_zone_slot_sprite_attr_for_equip_type (writes sprite attribute queue).

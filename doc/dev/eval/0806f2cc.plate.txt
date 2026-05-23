@@ -1,0 +1,23 @@
+enqueue_zone_subentry_sprites_with_xy_split @ 0x0806f2cc
+
+When the tile count in the zone entry matches the count field in slot[4]:
+iterates over zone sub-entries, builds a bitmap mask for each valid sub-entry,
+then calls enqueue_sprite_attr_with_xy_split to enqueue the sprite attribute
+split into X/Y coordinate components. After the loop, also calls
+enqueue_sprite_attr_type11 to submit a trailing type-11 record.
+Returns 0.
+
+Constants:
+  ZONE_TABLE_BASE           = 0x0201c510
+  ZONE_TABLE_PLAYER_STRIDE  = 0x868
+  ZONE_ENTRY_SIZE           = 0x14
+  TILE_COUNT_MATCH_FLAG     = bit2 of slot[4]
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls enqueue_sprite_attr_with_xy_split (writes sprite attribute queue,
+  X/Y split form) per valid sub-entry.
+  Calls enqueue_sprite_attr_type11 (writes type-11 sprite record at end).

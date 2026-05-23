@@ -1,0 +1,23 @@
+dispatch_monster_slots_equip_activation_loop @ 0x08070d2c
+
+Loops over 5 monster slots (indices 0..4), examining equip chain entries in each
+slot. For slots with valid equip chain entries, calls
+apply_slot_equip_activation_with_eligibility_check or the relevant activation
+function. For slots on the sprite rendering path, calls
+enqueue_slot_card_sprite_if_eligible to enqueue card sprites. After the loop,
+calls enqueue_sprite_attr_type11 for all slots as a trailing step.
+Returns 0.
+
+Constants:
+  MONSTER_SLOT_COUNT = 5  (monster zone slot count upper bound, [0..4])
+  SPRITE_TYPE_11     = 0x11
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer (top-level slot)
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Conditionally calls apply_slot_equip_activation_with_eligibility_check
+  (updates equip activation state per valid slot).
+  Calls enqueue_slot_card_sprite_if_eligible (writes sprite attribute queue).
+  Calls enqueue_sprite_attr_type11 (writes sprite queue at loop end).

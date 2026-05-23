@@ -1,0 +1,27 @@
+tick_lp_zone_sprite_display_seq @ 0x0806f5f0
+
+4-state display state machine (0x7d/0x7e/0x7f/0x80) for LP zone sprite display.
+  State 0x7d: calls enqueue_lp_counter_sprite_by_player to enqueue LP counter
+              sprite, then writes the LP value into slot[8] (halfword).
+  State 0x7e: calls set_lp_display_row_type5 to configure LP display row type 5.
+  State 0x7f/0x80: calls enqueue_sprite_attr_record to enqueue a sprite attribute
+                   record.
+Part of the equip display state machine cluster alongside
+tick_zone_slot_indicator_display_seq. Always returns 0.
+
+Constants:
+  DISPLAY_STATE_INIT  = 0x7d
+  DISPLAY_STATE_STEP2 = 0x7e
+  DISPLAY_STATE_STEP3 = 0x7f
+  DISPLAY_STATE_STEP4 = 0x80
+  LP_ROW_TYPE5        = 5
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Writes slot[8] halfword (LP value) in state 0x7d.
+  Calls enqueue_lp_counter_sprite_by_player (writes sprite queue).
+  Calls set_lp_display_row_type5 (updates LP display row state).
+  Calls enqueue_sprite_attr_record (writes sprite queue).

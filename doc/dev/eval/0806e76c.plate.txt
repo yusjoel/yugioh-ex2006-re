@@ -1,0 +1,19 @@
+enqueue_slot_sprite_type11_with_card_id @ 0x0806e76c
+
+Reads card_id from equip effect-slot slot[0] (halfword), then calls
+enqueue_sprite_attr_type11(player_id=0, card_id, type=0x11, flags=0)
+to enqueue a type-11 sprite attribute for the card. Applies to player-0 side
+only. Always returns 0.
+
+Constants:
+  SPRITE_TYPE_11 = 0x11  (sprite attribute type 11)
+  PLAYER_ID_0   = 0      (fixed: player 0 side)
+  FLAGS_ZERO    = 0      (sprite flags field, always 0)
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer (EWRAM effect slot struct)
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Writes one type-11 sprite attribute record to the sprite attribute queue
+  via enqueue_sprite_attr_type11.

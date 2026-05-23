@@ -1,0 +1,36 @@
+tick_equip_target_count_or_lp_sprite_by_card_id @ 0x08070ef4
+
+Skips immediately when slot[4] bit2 is clear. Reads IWRAM display state at
+[0x0201b290+0x4a4], then performs 2-state dispatch.
+  State 0x80: computes the AND intersection of equip zone bitmap and target
+    bitmap (query_equip_zone_bitmap_with_active_flag +
+    query_equip_target_bitmap_default), calls count_set_bits_in_word to count
+    set bits (equip target count), stores result at [0x0201b290+0x4a4].
+  State 0x7f: reads card_id from slot[0] and dispatches across 6 specific cards
+    (Thunder Crash, Enchanted Arrow, Token Thanksgiving, Token Feastevil,
+     Gryphon's Feather Duster, Cyclone Boomerang), calling
+    submit_effect_zone_lp_and_shape_sprites or
+    submit_lp_indicator_with_slot_xor_flag to submit LP sprites.
+Returns 0 (void via pop{r1};bx r1).
+
+Constants:
+  LP_DISPLAY_STATE_BASE            = 0x0201b290
+  LP_STATE_OFFSET                  = 0x4a4  (= 0x94*8 + 4)
+  DISPLAY_STATE_STEP3              = 0x7f
+  DISPLAY_STATE_STEP4              = 0x80
+  CARD_ID_THUNDER_CRASH            = 0x16d7  (Thunder Crash)
+  CARD_ID_ENCHANTED_ARROW          = 0x14aa  (Enchanted Arrow)
+  CARD_ID_TOKEN_THANKSGIVING       = 0x1665  (Token Thanksgiving)
+  CARD_ID_TOKEN_FEASTEVIL          = 0x18dc  (Token Feastevil)
+  CARD_ID_GRYPHONS_FEATHER_DUSTER  = 0x170f  (Gryphon's Feather Duster)
+  CARD_ID_CYCLONE_BOOMERANG        = 0x19b0  (Cyclone Boomerang)
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (void; pop{r1};bx r1 discards r0)
+
+Side effects:
+  State 0x80: str [0x0201b290+0x4a4] := count_set_bits(zone_bitmap AND
+              target_bitmap) (equip target count).
+  State 0x7f: calls submit_effect_zone_lp_and_shape_sprites or
+              submit_lp_indicator_with_slot_xor_flag (writes LP sprite queue).

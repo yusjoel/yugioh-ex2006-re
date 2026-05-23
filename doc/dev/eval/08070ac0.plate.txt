@@ -1,0 +1,26 @@
+dispatch_slot_lp_sync_by_display_state @ 0x08070ac0
+
+2-state dispatch function (0x7f/0x80).
+  State 0x7f: copies LP-related halfword into slot[8], calls
+              query_equip_zone_bitmap_with_active_flag to query the equip zone
+              bitmap, then calls query_equip_target_bitmap_default to refresh the
+              target bitmap.
+  State 0x80: calls set_lp_row_type18_with_value to configure LP display row
+              type 18 (includes a specific LP value).
+Returns 0.
+
+Constants:
+  DISPLAY_STATE_STEP3 = 0x7f
+  DISPLAY_STATE_STEP4 = 0x80
+  LP_ROW_TYPE18       = 0x12  (= 18)
+  DISPCNT_SHADOW      = 0x04000400
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  State 0x7f: writes slot[8] halfword (LP value sync).
+  State 0x7f: calls query_equip_zone_bitmap_with_active_flag (reads zone bitmap).
+  State 0x7f: calls query_equip_target_bitmap_default (updates target bitmap).
+  State 0x80: calls set_lp_row_type18_with_value (updates LP display row).

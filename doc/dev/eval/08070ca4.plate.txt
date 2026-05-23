@@ -1,0 +1,18 @@
+enqueue_equip_zone_shape_a_sprite_with_zone_type_step @ 0x08070ca4
+
+Reads zone count from slot[6], calls read_effect_slot_zone_type to get the zone
+type, then calls find_hand_slot_idx_by_set_code_alt to locate the hand slot.
+On success, calls enqueue_equip_zone_sprite_attr_shape_a to enqueue a shape-A
+equip zone sprite attribute. Finally increments (advances) the zone type field
+in slot[6]. Returns 0x80 if the sprite was enqueued, 0 if skipped.
+
+Constants:
+  ZONE_TYPE_FIELD_OFFSET = slot[6]
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0x80 (enqueue success) or 0 (skipped)
+
+Side effects:
+  Writes slot[6] zone type field (zone type index incremented/advanced).
+  Calls enqueue_equip_zone_sprite_attr_shape_a (writes sprite attribute queue).

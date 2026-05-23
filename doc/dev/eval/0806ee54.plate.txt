@@ -1,0 +1,24 @@
+tick_zone_slot_indicator_display_seq @ 0x0806ee54
+
+4-state display state machine (0x7d/0x7e/0x7f/0x80) driving the per-frame
+update of zone slot indicators and sprite attributes.
+  State 0x7d: enqueues zone-slot sprite attributes and advances state.
+  State 0x7e: enqueues slot indicator sprite.
+  State 0x7f/0x80: calls tick_zone_sprite_pipeline_with_update_flag and
+                   updates zone context fields.
+Reads the display-state word from the EWRAM effect slot before dispatching.
+Always returns 0.
+
+Constants:
+  DISPLAY_STATE_INIT  = 0x7d
+  DISPLAY_STATE_STEP2 = 0x7e
+  DISPLAY_STATE_STEP3 = 0x7f
+  DISPLAY_STATE_STEP4 = 0x80
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls tick_zone_sprite_pipeline_with_update_flag (updates zone sprite pipeline).
+  Writes zone context fields in EWRAM zone entry (display state and flags).

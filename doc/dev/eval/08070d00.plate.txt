@@ -1,0 +1,20 @@
+enqueue_slot_sprite_type1_with_set_code_if_super_rejuvenation @ 0x08070d00
+
+Reads card_id from slot[0]. If card_id == Super Rejuvenation (0x14e2), extracts
+set_code from slot[4]; otherwise set_code=0. Calls
+enqueue_sprite_attr_type11(player_id, card_id, type=1, set_code_or_0) to enqueue
+a type-1 sprite attribute. For Super Rejuvenation the real set_code is passed;
+all other cards pass 0. Always returns 0.
+
+Constants:
+  CARD_ID_SUPER_REJUVENATION = 0x14e2  (Super Rejuvenation)
+  SPRITE_TYPE_1              = 1
+  SET_CODE_ZERO              = 0       (flags=0 for non-Super-Rejuvenation cards)
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls enqueue_sprite_attr_type11 (writes one type-1 sprite attribute record to
+  the sprite attribute queue).

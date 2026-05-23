@@ -1,0 +1,29 @@
+tick_equip_zone_indicator_display_seq @ 0x08070b14
+
+3-state display state machine (0x64/0x7f/0x80) driving per-frame display updates
+for the equip zone indicator.
+  State 0x7f: dispatches equip-head-flag sprite attributes via
+              dispatch_slot_sprite_attr_with_equip_head_flag, then enqueues
+              slot indicator sprite.
+  State 0x80: validates slot-zone match via check_effect_slot_matches_zone_entry,
+              enqueues sprite attribute record; if card stat field6==0x17 triggers
+              a special processing path.
+  State 0x64: calls build_zone_activation_entry_blocked to build a blocked
+              activation entry.
+Returns 0.
+
+Constants:
+  DISPLAY_STATE_LEGACY       = 0x64
+  DISPLAY_STATE_STEP3        = 0x7f
+  DISPLAY_STATE_STEP4        = 0x80
+  CARD_STAT_FIELD6_SPECIAL   = 0x17
+
+Parameters:
+  r0: u8* slot_ptr -- equip effect-slot pointer
+Return: r0 = 0 (fixed)
+
+Side effects:
+  Calls dispatch_slot_sprite_attr_with_equip_head_flag (writes sprite queue).
+  Calls build_zone_activation_entry_blocked (updates EWRAM zone activation state).
+  Conditionally calls check_activation_display_state_is_confirmed (reads display
+  confirmation state).
