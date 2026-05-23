@@ -1,0 +1,15 @@
+Accepts effect_node_ptr (r0) and slot_ptr (r1). Sets bit2 of [r1+4] byte (activation flag). Extracts slot player_id (bit0) and zone_idx (bits[6:2]), computes slot offset in gDuelFieldSlots (base=0x0201c510), reads tile info from two adjacent slots.
+
+Compares sum of two slot tile counts with bits[14:9] field of [r1+4] hword; if equal calls enqueue_sprite_attr_with_mode to enqueue overlay sprite (attr=0x17c2, sp[0]=0, r3=3=mode).
+
+Exits early via bhi if zone_idx is out of range [0..5]. Used to overlay a sprite on a field slot when equip chain tile counts match.
+
+Side effects: sets [r1+4] bit2 via strb; writes sprite queue via enqueue_sprite_attr_with_mode (if tile counts match).
+
+Constants:
+SLOT_ACTIVE_BIT = 0x4 (bit2 of [slot+4])
+PLAYER_STRIDE = 0x868
+FIELD_SLOTS_BASE = 0x0201c510
+ZONE_IDX_MAX = 5 ([0..5])
+SPRITE_ATTR_CODE = 0x17c2
+SPRITE_MODE = 3

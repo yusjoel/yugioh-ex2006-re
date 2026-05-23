@@ -1,0 +1,15 @@
+Accepts slot_ptr (r0). Reads gP1LifePoints+0x4a0 (scene state code). Supports two states:
+
+State 0x80: calls FUN_08090714 (external check); if nonzero calls trigger_card_display_op31_if_not_active(player_id, 0x6e) and FUN_08096a4c; returns 0x7f.
+State 0x7f: checks gP1LP+0x4a4 (chain counter field) is nonzero; if nonzero calls tick_zone_sprite_pipeline_with_update_flag with player_id and update_flag=1, decrements counter field by 1; returns 0x7f.
+Other states: returns 0.
+
+Drives sprite pipeline updates and manages chain counter during equip chain activation.
+
+Side effects: decrements [gP1LP+0x4a4]; updates sprite state via tick_zone_sprite_pipeline_with_update_flag.
+
+Constants:
+SCENE_STATE_OFFSET = 0x4a0 (gP1LP+0x4a0 = 0x201b730)
+CHAIN_COUNT_OFFSET = 0x4a4 (gP1LP+0x4a4 = 0x201b734)
+STATE_ACTIVATE = 0x80
+STATE_TICK_PIPELINE = 0x7f

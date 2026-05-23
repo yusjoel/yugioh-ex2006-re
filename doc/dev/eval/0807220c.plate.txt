@@ -1,0 +1,8 @@
+Minimal wrapper. Accepts slot_ptr (r0). Calls query_equip_zone_bitmap_with_active_flag(slot_ptr) to get active equip zone bitmap (-> r1), then calls forward_equip_bitmap_update_with_full_mask(slot_ptr, bitmap, full_mask=2) to refresh the complete equip bitmap state. Returns 0 unconditionally.
+
+Forces a full-mask mode 2 sync of the equip zone bitmap; used after equip activation to refresh the complete bitmap state.
+
+Side effects: updates equip zone bitmap via forward_equip_bitmap_update_with_full_mask with mode=2.
+
+Constants:
+FULL_MASK_MODE = 2

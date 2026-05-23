@@ -1,0 +1,10 @@
+Accepts effect_node_ptr (r0). Extracts player_id (1 - bit0 of [r0+2]) and set_code (bits[22:9] of [r0+0x14]). Calls find_slot_idx_by_card_id_in_player_zones(1-player_id, set_code) to find the slot index for the card in player zones.
+
+Returns 0 if not found (< 0). If found: extracts player_id = 1-bit0, calls dispatch_equip_zone_sprite_banisher_of_the_light(player_id, slot_idx) to enqueue Banisher of the Light equip zone sprite. Returns 0.
+
+Target slot lookup wrapper for the dispatch_equip_zone_sprite_banisher_of_the_light family.
+
+Side effects: conditionally writes sprite queue via dispatch_equip_zone_sprite_banisher_of_the_light.
+
+Constants:
+SET_CODE_MASK = bits[22:9] of [+0x14] (0x17 << 9 = 0x2e00 max)

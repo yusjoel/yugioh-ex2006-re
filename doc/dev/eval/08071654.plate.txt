@@ -1,0 +1,12 @@
+Accepts effect_node_ptr (r0). Reads bits[4:2] of [r0+6] (zone count field, mask 0x1c). If zero, takes LP counter sprite path: calls enqueue_lp_counter_sprite_by_player with 1-player_id; returns 0.
+
+If nonzero: extracts (bits[4:2]-1) as zone_ref_idx [0..4], calls read_effect_slot_zone_type with player_id and 1-player_id to get zone type. Then calls find_hand_slot_idx_by_set_code(1-player_id, set_code_from_r0[+0x14]) to find hand slot index. If not found (< 0), updates slot[+6] lower bits and returns 0x80.
+
+If found: queries hand tile index from gP1LP+0x868*player+0x14, calls enqueue_hand_card_sprite_by_spell_type to enqueue hand card sprite; updates slot[+6] zone count field and returns 0x80.
+
+Side effects: modifies [r0+6] bits[4:2] field; writes sprite queue via enqueue_hand_card_sprite_by_spell_type or enqueue_lp_counter_sprite_by_player.
+
+Constants:
+ZONE_COUNT_MASK = 0x1c (bits[4:2] of slot[+6])
+PLAYER_STRIDE = 0x868
+HAND_SLOTS_BASE = 0x0201c8f8

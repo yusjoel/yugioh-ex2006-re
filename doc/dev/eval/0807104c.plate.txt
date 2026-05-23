@@ -1,0 +1,12 @@
+Routes a single effect slot chain sprite update based on scene state code stored at gP1LifePoints+0x4a0. State 0x80: calls dispatch_card_effect_activation; if nonzero reads player_id from r4[+2] bit0, calls count_field_zone_cards_with_field5 or set_lp_display_row_type5; returns 0x7f. State 0x7f: reads zone word and slot_id/player_id from gP1LP+0x4a0, reads sprite tile index from gDuelFieldSlots[player*0x868+slot*0x14], calls enqueue_sprite_attr_record; returns 0x7f. State 0x6e: calls trigger_card_display_op31_if_not_active(player_id, 0x11); returns 0x64. State 0x64: calls check_zone_eligible_with_deck_flag(1-player_id, r1=1).
+
+Side effects: writes sprite queue via enqueue_sprite_attr_record (0x7f path); writes LP display row via set_lp_display_row_type5 (0x80 path).
+
+Constants:
+STATE_FIELD_CARD_ACTIVATION = 0x80
+STATE_SPRITE_ENQUEUE = 0x7f
+STATE_TRIGGER_OP31 = 0x6e
+STATE_DECK_ELIGIBLE_CHECK = 0x64
+EFFECT_SLOT_STATE_OFFSET = 0x4a0 (0x94*8, from gP1LifePoints base)
+PLAYER_STRIDE = 0x868
+SPRITE_OP_PARAM = 0x3f (attr0 low byte)

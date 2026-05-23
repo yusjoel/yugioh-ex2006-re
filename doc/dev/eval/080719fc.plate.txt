@@ -1,0 +1,12 @@
+Compound guard function that configures an OAM equip entry for Neo-Daedalus group + zone_type 14. Performs four prerequisite checks: (1) count_available_monster_slots(player_id) > 0; (2) check_field_spell_neo_daedalus_group_placeable(player_id) nonzero; (3) slot[+6] bits[4:2] == 4 (zone count field); (4) read_effect_slot_zone_type returns zone_id, then find_zone_descriptor_by_slot_id returns zone_byte2 == 0x0e (zone_type 14).
+
+If all pass, calls check_zone_slot_equip_eligible(player_id, zone_y, zone_x) to verify equip eligibility. If eligible: computes OAM frame address (gHandSlotsBase + player*0x868 + zone_x*4), calls setup_equip_oam_entry_with_sprite_attr with sp[0]=card_id<<16 | 0x20. Returns 0x7f on success, 0 if any guard fails.
+
+Side effects: configures OAM equip entry via setup_equip_oam_entry_with_sprite_attr.
+
+Constants:
+ZONE_TYPE_14 = 0x0e
+ZONE_COUNT_EQ4 = 0x4 (slot[+6] bits[4:2])
+PLAYER_STRIDE = 0x868
+HAND_SLOTS_BASE = 0x0201c8f8
+OAM_FLAG_0x20 = 0x20

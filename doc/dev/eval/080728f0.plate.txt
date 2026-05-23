@@ -1,0 +1,10 @@
+Minimal wrapper. Accepts slot_ptr (r0). Reads player_id from [r0+2] bit0; computes shift = (1 - player_id) * 16 = (1-player_id) << 4; constructs mask = 0x1f << shift; calls forward_equip_bitmap_update_zone11(slot_ptr, mask) to forward zone11 equip bitmap update.
+
+mask is 0x1f0000 (P1=0) or 0x1f (P2=1) depending on player. Forwards zone11 bitmap update with a 5-bit mask from the opponent's perspective. Returns 0 unconditionally.
+
+Side effects: updates equip zone11 bitmap via forward_equip_bitmap_update_zone11 with player-determined mask.
+
+Constants:
+ZONE11_SLOT_MASK_BITS = 0x1f (5-bit slot mask)
+P1_SHIFT = 16
+P2_SHIFT = 0 (player determines mask position)

@@ -1,0 +1,11 @@
+Short wrapper. Accepts slot_ptr (r0). Reads player_id (bit0) from [r0+2], computes opponent player = 1-player_id (r0), calls find_equip_chain_node_by_pred with predicate callback check_effect_slot_equip_zone_pattern (0x08071259) and max_count=0xb.
+
+Iterates over equip chain nodes; for each node whose zone_word matches 0x14c0 pattern, the predicate internally triggers LP and shape sprite submission. Returns 0 unconditionally.
+
+Used to batch-scan equip chain nodes and submit sprites when specific equip zone pattern is present.
+
+Side effects: indirectly via predicate callback check_effect_slot_equip_zone_pattern which calls submit_effect_zone_lp_and_shape_sprites.
+
+Constants:
+PRED_PTR = 0x08071259 (check_effect_slot_equip_zone_pattern THUMB ptr)
+CHAIN_SCAN_LIMIT = 0xb

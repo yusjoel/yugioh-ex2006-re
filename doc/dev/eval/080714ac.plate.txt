@@ -1,0 +1,12 @@
+Accepts equip_data_ptr (r0) and slot_ptr (r1). Checks if [r0+0xc] hword is nonzero (equip bitmap active flag); returns 0 immediately if zero.
+
+If nonzero: sets bit2 of [r1+4] byte (activation flag); extracts slot player_id (bit0) and zone_idx (bits[6:2]); calls enqueue_field_slot_sprite_with_state_update(player_id, zone_idx, [r1+4] bits[14:9]). Then calls test_equip_target_slot_in_bitmap(equip_data_ptr, player_id, zone_idx) to check equip target slot bitmap.
+
+Used to update field slot sprites and verify equip target bitmap when equip chain has active entries.
+
+Side effects: sets [r1+4] bit2 conditionally; writes sprite queue via enqueue_field_slot_sprite_with_state_update; queries equip target bitmap via test_equip_target_slot_in_bitmap.
+
+Constants:
+ENTRY_COUNT_OFFSET = 0xc (equip_data [+0xc] hword = entry count)
+SLOT_ACTIVE_BIT = 0x4 (bit2 of slot[+4])
+PLAYER_STRIDE = 0x868

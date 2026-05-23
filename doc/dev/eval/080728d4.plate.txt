@@ -1,0 +1,12 @@
+Minimal unconditional wrapper. Accepts slot_ptr (r0). Extracts player_id (bit0) and zone_idx (bits[6:2]) from [r0+2] byte, reads card_id = [r0+0] (hword), calls dispatch_slot_equip_sprite_by_field6_type(player_id, zone_idx, card_id, r3=0) unconditionally.
+
+Same semantic as the 0x80 path of dispatch_equip_slot_sprite_by_activation_state (0x08072890), but skips state code check and executes dispatch directly. Returns 0 unconditionally.
+
+Side effects: writes sprite queue via dispatch_slot_equip_sprite_by_field6_type.
+
+Constants:
+PLAYER_ID_SHIFT_LO = 0x1f (= 31, lsls bit count for player_id bit0 extraction)
+PLAYER_ID_SHIFT_HI = 0x1f (= 31, lsrs bit count, net bit[0])
+ZONE_IDX_SHIFT_LO = 0x1a (= 26, lsls bit count for zone_idx extraction)
+ZONE_IDX_SHIFT_HI = 0x1b (= 27, lsrs bit count, net bits[6:2])
+SPRITE_SUBTYPE = 0 (fixed r3=0 passed to dispatch_slot_equip_sprite_by_field6_type)

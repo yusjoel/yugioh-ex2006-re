@@ -1,0 +1,7 @@
+Guards equip sprite enqueue by checking if slot zone type equals 0x0d (equip zone 13). Reads [r0+2] hword, extracts bits[11:6] (zone type field, mask 0xfc0), compares with 0x340 (= 0xd0<<2, zone_type 0x0d shifted). Returns 0 if no match. If match, delegates to enqueue_zone_equip_sprite_if_slot_matches with original r0/r1.
+
+Side effects: conditionally writes sprite queue via enqueue_zone_equip_sprite_if_slot_matches.
+
+Constants:
+ZONE_TYPE_MASK = 0xfc0 (= 0xfc<<4, hword bits[11:6])
+ZONE_TYPE_13_CMP = 0x340 (= 0xd0<<2, zone_type 0x0d in bits[11:6])

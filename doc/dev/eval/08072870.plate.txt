@@ -1,0 +1,11 @@
+Accepts slot_ptr (r0). Reads IWRAM chain context structure (base=0x0201bb90 = gP1LifePoints+0x900): checks [base+0x14] is nonzero; if nonzero returns 0 immediately (chain busy). If zero: reads [base+4] (r1) and [base+0x20] (r2), calls test_equip_target_slot_in_bitmap(slot_ptr, r1, r2) to check if slot is in equip target bitmap. Returns 0 unconditionally.
+
+Verifies whether the given slot is a valid equip target when the chain is not busy.
+
+Side effects: none (pure query; test_equip_target_slot_in_bitmap is read-only).
+
+Constants:
+CHAIN_CTX_BASE = 0x0201bb90 (gP1LP + 0x900)
+CHAIN_BUSY_OFFSET = 0x14 (chain status field)
+BITMAP_PTR_OFFSET = 0x4
+BITMAP_MASK_OFFSET = 0x20

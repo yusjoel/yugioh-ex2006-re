@@ -1,0 +1,18 @@
+Accepts effect_node_ptr (r0). Pre-computes r3 = [gP1LP+0x1ce8] XOR [gP1LP+0x4a4] (two LP field XOR value). Reads gP1LP+0x4a0 scene state, routes four paths:
+
+State 0x80 (init): clears [gP1LP+0x4a4] to zero; returns 0x7f.
+State 0x7f (waiting for first card): compares r0=player_id with r3; if equal calls set_lp_row_type18_with_value(r3, zone_idx), else calls with -1; returns 0x7e.
+State 0x7e (waiting for second card): reads card hword from gP1LP+0x1da8, stores to [r4+8+r3*2]; increments [gP1LP+0x4a4]; if count <= 1 returns 0x7f (waiting for more); if two card values are equal returns 0x80 (reset); otherwise computes LP delta = v*500 (v=6: fixed 0x1770=6000), calls submit_lp_indicator_with_slot_xor_flag(r0, player_order, delta); returns 0.
+Other states: returns 0.
+
+Tracks LP delta between a card pair and generates the corresponding LP display sprite. Typical use: ATK/DEF comparison display for adjacent equip zone cards.
+
+Side effects: [gP1LP+0x4a4] := 0 (state 0x80) or +=1 (state 0x7e); [[r4+8+r3*2]] := hword from gP1LP+0x1da8 (state 0x7e card value write); writes sprite queue via submit_lp_indicator_with_slot_xor_flag.
+
+Constants:
+SCENE_STATE_OFFSET = 0x4a0
+CHAIN_COUNT_OFFSET = 0x4a4 (= gP1LP+0x4a4)
+LP_FIELD1_OFFSET = 0x1ce8 (gP1LP+0x1ce8)
+CARD_SLOT_OFFSET = 0x1da8 (gP1LP+0x1da8)
+LP_FIXED_6000 = 0x1770 (v=6 special case)
+LP_MULT = 500 (v*500 general LP delta formula)

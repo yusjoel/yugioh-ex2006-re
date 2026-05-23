@@ -1,0 +1,11 @@
+Minimal sprite enqueue wrapper. Accepts slot_ptr (r0), reads player_id from it. Reads chain entry address from gP1LifePoints+0x1ce8 (chain base structure offset), then calls enqueue_sprite_attr_type11 with card_id=[r1+0] (hword), player_id, type=1, subtype=0.
+
+Enqueues a type-11 sprite for the current equip chain entry into the OAM sprite queue. Returns 0 unconditionally.
+
+Side effects: writes sprite queue via enqueue_sprite_attr_type11.
+
+Constants:
+LP_BASE = gP1LifePoints (0x0201b290)
+CHAIN_ENTRY_OFFSET = 0x1ce8
+SPRITE_TYPE = 1
+SPRITE_SUBTYPE = 0

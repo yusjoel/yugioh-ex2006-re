@@ -1,0 +1,14 @@
+Accepts slot_ptr (r0). Reads gP1LP+0x4a0 scene state code, handles two paths:
+
+State 0x80: extracts player_id (bit0) and zone_idx (bits[6:2]), calls dispatch_slot_equip_sprite_by_field6_type(player_id, zone_idx, card_id, r3=0) to dispatch equip sprite; returns 0x7f.
+State 0x7f: calls enqueue_equip_multi_slot_marker_sprite(player_id, 0x1f) to enqueue multi-slot selection marker sprite; returns 0.
+
+Handles field sprites for the two phases of equip activation: 0x80=initial sprite dispatch, 0x7f=multi-slot marker.
+
+Side effects: writes sprite queue via dispatch_slot_equip_sprite_by_field6_type or enqueue_equip_multi_slot_marker_sprite.
+
+Constants:
+SCENE_STATE_OFFSET = 0x4a0 (gP1LP+0x4a0)
+STATE_ACTIVATE = 0x80
+STATE_MULTI_MARKER = 0x7f
+MULTI_SLOT_MASK = 0x1f
