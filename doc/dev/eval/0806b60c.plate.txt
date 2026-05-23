@@ -1,0 +1,7 @@
+Effect node handler with state machine tick and LP display row trigger. Reads IWRAM state word at [0x0201b290+0x4a0] (offset=0x94<<3). State=0x80: extracts player_id (bit0) and zone_type (bits[6:2]) from node [r0+2], calls set_field_slot_bit_with_sprite_update with mode=4, flag=0, advances state to 0x7f. State=0x7f: calls enqueue_lp_display_row_if_enabled(player_opp, zone_idx, LP_val, 0, 1). Other states return 0.
+
+Constants: STATE_IWRAM=0x0201b290, STATE_OFFSET=0x4a0 (=0x94<<3), STATE_INIT=0x80, STATE_STEP1=0x7f, gDuelFieldSlots=0x0201c510, player_stride=0x868.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8 with player bit0 and zone bits[6:2]).
+Returns: r0=state advance code (0x7f=advanced, 0=unhandled/done).
+Side effects: [0x0201b290+0x4a0]:=0x7f (when state=0x80, via set_field_slot_bit_with_sprite_update); writes sprite queue (via set_field_slot_bit_with_sprite_update or enqueue_lp_display_row_if_enabled).

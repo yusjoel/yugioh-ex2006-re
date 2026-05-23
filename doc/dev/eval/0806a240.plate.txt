@@ -1,0 +1,13 @@
+Iterates all slot pairs on the equip chain, calling test_equip_target_slot_zone14 for each pair. Receives effect_slot_node ptr (r7=r0). Checks guard_bit ([r0+4] bit2); if set returns 0. Extracts player_id (bit0 of [r0+2]) into r4, slot_idx (bits[6..2] of [r0+2]) into r1. Computes slot offset in zone_slot_array (0x0201c510) based on player_id, reads two zone_slot_entry token fields. Outer loop r6=0/1 (two players), inner loop r5=0..4 (5 slots). Calls check_value_in_slot_chain (card_id=0x12ea, zone 14 chain check); for each chain slot calls test_equip_target_slot_zone14.
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+2] bit0=player_id, [r0+2] bits[6..2]=slot_idx)
+Returns: r0=0 (fixed return 0)
+Side effects: writes zone14 target bitmap via test_equip_target_slot_zone14
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of flags byte [r0+4])
+- PLAYER_STRIDE=0x868 (per-player stride)
+- ZONE_SLOT_ARRAY=0x0201c510 (gDuelFieldSlots zone slot array base)
+- CHAIN_CARD_ID=0x12ea (chain check card_id; equip chain group ID)
+- SLOT_IDX_MAX=4 (outer loop bound 0..4, 5 slots)
+- PLAYER_COUNT=2 (inner loop 0..1)

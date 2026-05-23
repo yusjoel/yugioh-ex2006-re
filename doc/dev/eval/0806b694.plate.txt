@@ -1,0 +1,7 @@
+Effect node handler with 4-step state machine. Reads [0x0201b290+0x4a0] current state. State=0x80: checks [0x0201e2a0+8+player*4]==1; if so calls sample_prng_scaled(2) and writes gP1LifePoints+0x1d40, else calls invoke_card_display_op_0x31_sub8(0x38); returns 0x7f. State=0x7f: reads gP1LifePoints+0x1daa, calls enqueue_lp_display_row_type17; returns 0x7e. State=0x7e: checks gP1LifePoints+0x1daa nonzero, looks up zone occupancy from gDuelFieldSlots, calls tick_zone_sprite_pipeline_with_update_flag or enqueue_sprite_attr_type11; returns 0xa. Other states return 0.
+
+Constants: STATE_IWRAM=0x0201b290, STATE_OFFSET=0x4a0 (=0x94<<3), STATE_INIT=0x80, STATE_STEP1=0x7f, STATE_STEP2=0x7e, STATE_DONE=0xa, gP1LifePoints=0x0201c4e0, LP_OFFSET_1=0x1daa, LP_OFFSET_2=0x1d40, gDuelFieldSlots=0x0201c510, player_stride=0x868, PRNG_RANGE=2.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8 with player bit0 and zone bits[6:2], [+4]=guard_bits u8 bit2=guard).
+Returns: r0=state advance code (0x7f/0x7e/0xa=advanced, 0=unhandled or done).
+Side effects: [gP1LifePoints+0x1d40]:=sample_prng_scaled(2) (state=0x80 conditional path); writes sprite queue (via enqueue_lp_display_row_type17, tick_zone_sprite_pipeline_with_update_flag, enqueue_sprite_attr_type11).

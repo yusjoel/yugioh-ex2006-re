@@ -1,0 +1,13 @@
+Leaf function (7 instructions). Reads player_id from effect_slot [r0+2] bit0,
+computes opponent_id = 1 - player_id, then calls enqueue_equip_zone_sprite_attr_full
+with fixed mode=1, update=1.
+
+Parameters:
+  r0: ptr effect_slot_entry* (ldrb r0,[r0,#2] deref at entry)
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes equip zone sprite queue via enqueue_equip_zone_sprite_attr_full.
+
+Constants:
+  MODE=1    -- enqueue_equip_zone_sprite_attr_full mode arg
+  UPDATE=1  -- update flag

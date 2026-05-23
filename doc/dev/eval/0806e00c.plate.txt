@@ -1,0 +1,7 @@
+Effect node handler. Calls check_effect_slot_matches_zone_entry for slot_index=0; on match calls read_effect_slot_side_and_type to get side/type. Computes gDuelFieldSlots[player][type] offset with player=side&1, checks [slot+8] nonzero (slot has card); exits if empty. When occupied: writes sp[0]=2 and sp[4]=0x2bc (LP delta parameter, 0xaf<<2=700) to stack, calls enqueue_slot_card_sprite_if_eligible(effect_node, side, type). Fixed return 0.
+
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, LP_DELTA=0x2bc (=0xaf<<2=700), SPRITE_PARAM=0x2.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via enqueue_slot_card_sprite_if_eligible).

@@ -1,0 +1,34 @@
+Equip LP display sequence state machine. Branches on step value at IWRAM
+[0x0201b290+0x4a0] (0x7d/0x7e/0x7f/0x80) to execute different LP display operations.
+
+Step 0x80: computes opponent player id; reads gP1LifePoints[+0xc], if nonzero calls
+  set_lp_row_type4_with_value and advances to 0x7f.
+Step 0x7f: reads current LP value into [gBase+0x4a4]; calls set_lp_display_row_all_slots
+  to update all slot LP displays and advances to 0x7e.
+Step 0x7e: calls lookup_equip_card_score_by_card_id_and_player /
+  format_game_text_with_text_arg to format text; calls
+  trigger_card_display_op31_if_not_active; advances to 0x7d.
+Step 0x7d: reads equip array for zone/side; branches on zone-type (0/1/2) to call
+  check_card_field5_is_nonzero, get_card_extended_stat_field6, or
+  test_equip_target_slot_zone11 for zone tests.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = step code (0x7d/0x7e/0x7f/0x80) or 0 (skip path, pop{r1};bx r1)
+
+Side effects:
+  [0x0201b290+0x4a4] written with LP display value
+  LP row and all-slots display updated via set_lp_row_type4_with_value /
+  set_lp_display_row_all_slots
+
+Constants:
+  STEP_0x7D=0x7d        -- state: zone type test
+  STEP_0x7E=0x7e        -- state: card display trigger
+  STEP_0x7F=0x7f        -- state: LP row update
+  STEP_0x80=0x80        -- state: LP value load
+  IWRAM_BASE=0x0201b290 -- IWRAM state base
+  STEP_OFFSET=0x4a0     -- step counter offset (0x94<<3)
+  LP_SAVE_OFFSET=0x4a4  -- LP value save offset
+  LP_EXT_OFFSET_1=0x1da8 -- gP1LifePoints LP ext offset
+  ZONE_STRIDE=0x868     -- zone row stride
+  SCORE_OFFSET=0x4a4    -- equip zone score offset

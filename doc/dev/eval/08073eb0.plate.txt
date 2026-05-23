@@ -1,0 +1,31 @@
+Equip zone eligibility display sequence state machine. Branches on step value at
+[0x0201b290+0x4a0] (0x7e/0x7f/0x80).
+
+Step 0x80: calls check_zone_eligible_with_deck_flag(side, flag=1) and
+  check_zone_eligible_with_deck_flag(opponent, flag=1) for both sides; clears
+  [base+0x4a4] to 0; advances to 0x7f.
+Step 0x7f: iterates equip chain; for each entry with nonzero card field5, calls
+  dispatch_equip_zone_sprite_banisher_by_field_count; increments [gBase+0x4a4]+1;
+  advances to 0x7e.
+Step 0x7e: calls check_zone_eligible_with_deck_flag(side, flag=0) and
+  check_zone_eligible_with_deck_flag(opponent, flag=0) for both sides.
+
+r0 receives effect_slot at entry; .hword 0x4681 spills to r9.
+
+Parameters:
+  r0: ptr effect_slot_entry* (spilled to r9 via .hword 0x4681 at entry)
+Returns: r0 = step code (0x7e/0x7f/0x80) or 0 (pop{r1};bx r1)
+
+Side effects:
+  [0x0201b290+0x4a4] written with banisher count and cleared on step 0x80
+  sprite queue updated via dispatch_equip_zone_sprite_banisher_by_field_count
+  zone eligibility flags updated via check_zone_eligible_with_deck_flag
+
+Constants:
+  STEP_0x7E=0x7e        -- state: dual-side eligibility check
+  STEP_0x7F=0x7f        -- state: banisher dispatch loop
+  STEP_0x80=0x80        -- state: initial eligibility + clear counter
+  IWRAM_BASE=0x0201b290 -- IWRAM state base
+  STEP_OFFSET=0x4a0     -- 0x94<<3
+  COUNTER_OFFSET=0x4a4  -- banisher counter offset
+  LP_COUNTER_OFFSET_V=0x1ce8 -- LP step state offset

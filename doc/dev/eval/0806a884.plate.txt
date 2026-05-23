@@ -1,0 +1,10 @@
+Advances zone sprite pipeline; if pipeline returns nonzero submits LP and shape sprites. Receives effect_slot_node ptr (r4=r0). Checks guard_bit ([r4+4] bit2); if set skips. Extracts player_id (bit0 of [r4+2]), calls tick_zone_sprite_pipeline_with_update_flag (player_id, flag=1). If returns 0 skips. Otherwise re-extracts player_id, computes opponent_side = 1-player_id, calls submit_effect_zone_lp_and_shape_sprites (opponent_side, 0xfa*4=0x3e8).
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+2] bit0=player_id)
+Returns: r0=0 (fixed return 0)
+Side effects: updates zone sprite pipeline state via tick_zone_sprite_pipeline_with_update_flag; submits LP and shape sprites via submit_effect_zone_lp_and_shape_sprites
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- UPDATE_FLAG=1 (tick_zone_sprite_pipeline flag)
+- LP_SHAPE_ARG=0xfa*4=0x3e8 (submit_effect_zone_lp arg; python: 0xfa*4=0x3e8=1000)

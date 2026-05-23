@@ -1,0 +1,17 @@
+State-machine dispatch entry for equip-slot activation display. Receives effect_slot_node ptr (r0). Checks guard_bit ([r0+4] bit2); if set, skips. Reads global activation display state code at [0x0201b290+0x94*8]. Dispatches by state: state 0x80 calls check_activation_display_state_is_confirmed; if confirmed, extracts zone/slot coords, computes sprite offset, calls enqueue_equip_slot_sprite_with_display_code (code=0xb), enqueue_sprite_attr_for_slot_indicator, enqueue_sprite_attr_with_type_select; if not confirmed returns 0x80. State 0x7f calls trigger_card_display_op31_if_not_active (op=0xf4) and init_zone_activation_display_fields, returns 0x7f. Other states return 0.
+
+Params: r0=ptr effect_slot_node (guard_bit+player_id+zone/slot fields in struct)
+Returns: r0=u8 new_display_state (0x7f/0x80 new state code, or 0=guard/skip)
+Side effects: [0x0201b290+0x4a4] zeroed via init_zone_activation_display_fields; OAM sprite buffer written via enqueue_equip_slot_sprite_with_display_code / enqueue_sprite_attr_for_slot_indicator / enqueue_sprite_attr_with_type_select
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of flags byte [+4])
+- STATE_DISPLAY_BASE=0x0201b290 (global display state IWRAM base)
+- STATE_IDX_OFFSET=0x94*8=0x4a0 (display_state field offset)
+- GPLP_BASE=gP1LifePoints (0x0201c4e0, player LP struct)
+- SLOT_STRIDE=0x868 (per-player stride)
+- EQUIP_SLOT_ARRAY_OFF=0x30 (base offset for equip slot array in LP struct)
+- SPRITE_CODE=0xb (equip slot sprite type code)
+- OP31_ARG=0xf4 (trigger_card_display_op31 argument)
+- STATE_0x80=0x80 (activation confirmed, awaiting sprite commit)
+- STATE_0x7f=0x7f (activation triggered, display init pending)

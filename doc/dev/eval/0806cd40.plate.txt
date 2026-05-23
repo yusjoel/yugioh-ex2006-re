@@ -1,0 +1,7 @@
+Effect node handler. Reads IWRAM state word [0x0201b290+0x10d0] and checks bit0/bit1 are clear (equip effect inactive exits). Checks effect_slot vs zone entry match. Reads side and type from effect_slot, looks up slot card data in gDuelFieldSlots. BST dispatch by card_id: 0x1380 (Enchanted Javelin) -> calls get_slot_field5_score + submit_effect_zone_lp_and_shape_sprites; 0x1404 (Magic Cylinder) -> calls query_slot_card_type_eligibility + enqueue_sprite_attr_record(0x20/0x8020) + submit_lp_indicator_with_slot_xor_flag; 0x176a (Draining Shield) -> calls query_slot_card_type_eligibility + enqueue_sprite_attr_record(0x20/0x8020) + get_slot_field5_score + submit_effect_zone_lp_and_shape_sprites. All paths return 0.
+
+Constants: STATE_IWRAM=0x0201b290, STATE_OFFSET=0x10d0, gDuelFieldSlots=0x0201c510, player_stride=0x868, CARD_ID_Enchanted_Javelin=0x1380, CARD_ID_Magic_Cylinder=0x1404, CARD_ID_Draining_Shield=0x176a, SPRITE_RECORD_DEFAULT=0x20, SPRITE_RECORD_ALT=0x8020.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8, [+4]=guard_bits).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via submit_effect_zone_lp_and_shape_sprites, submit_lp_indicator_with_slot_xor_flag, enqueue_sprite_attr_record).

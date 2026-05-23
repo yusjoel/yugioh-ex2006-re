@@ -1,0 +1,23 @@
+Dispatches equip sprite rendering after matching effect slot zone position and side info.
+Checks bit2 (0x4) flag to skip; reads side/zone bits from [r5+2] to compute zone index;
+looks up EWRAM equip table (0x0201c510) for zone-row attributes; extracts current counter
+(lsrs #0x1f + lsls #0x1) and compares with zone capacity. On side match, calls
+tick_zone_sprite_pipeline_with_update_flag to advance pipeline; if pipeline returns
+nonzero, calls enqueue_sprite_attr_with_mode to enqueue sprite. If LP status code
+equals 0x1cb8 (equal), calls get_node_entity_id_in_slot then apply_lp_delta_if_slot_active
+to apply LP gain/loss.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes sprite queue or adjusts LP via
+  tick_zone_sprite_pipeline_with_update_flag / enqueue_sprite_attr_with_mode /
+  apply_lp_delta_if_slot_active.
+
+Constants:
+  FLAG_BIT2=0x4              -- activation mask
+  ZONE_STRIDE=0x868          -- zone row stride
+  EWRAM_EQUIP_BASE=0x0201c510 -- equip area EWRAM base
+  LP_STATUS_EQUAL=0x1cb8     -- LP equal status code
+  SPRITE_MODE=0x11           -- mode arg for enqueue_sprite_attr_with_mode

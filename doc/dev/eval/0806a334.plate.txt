@@ -1,0 +1,15 @@
+Dispatches equip-slot sprite update based on target card field6 value range and zone14 condition. Receives effect_slot_node ptr (r5=r0) and optional target_card_entry ptr (r4=r1). Checks guard_bit ([r5+4] bit2); if set skips. If r4 nonzero, reads r4[0] card_id and calls get_card_extended_stat_field6; when field6 in [0x16..0x17]: extracts player_id/slot/attr, calls enqueue_field_slot_sprite_with_state_update, sets [r4+4] |= (0x2|0x4|0x8), calls update_equip_target_bitmap_zone14. If r4 is zero or field6 out of range, enters zone 21-33 path: reads r5[+0x14], checks bits[11..6] in [0x1f..0x21], extracts player/slot/card_info, checks bit19, calls enqueue_field_slot_sprite_with_state_update and update_equip_target_bitmap_zone14.
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+2] bit0=player_id); r1=ptr target_card_entry (may be 0; [r1+0]=card_id halfword)
+Returns: r0=0 (fixed return 0)
+Side effects: [r4+4] |= 0xe (target card entry flags set, r4 path); writes field slot sprite state via enqueue_field_slot_sprite_with_state_update; writes zone14 target bitmap via update_equip_target_bitmap_zone14
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r5+4])
+- FIELD6_MIN=0x16 (equip type threshold low, trap equip)
+- FIELD6_MAX=0x17 (equip type threshold high, spell equip)
+- FLAGS_MASK=0xe (bits 1-3: 0x2|0x4|0x8, set on equip process)
+- ZONE_IDX_MIN=0x1f (31 decimal, zone range lower bound)
+- ZONE_IDX_MAX=0x21 (33 decimal, zone range upper bound)
+- ZONE_SLOT_ARRAY=0x0201c510 (gDuelFieldSlots)
+- PLAYER_STRIDE=0x868

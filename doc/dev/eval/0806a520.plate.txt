@@ -1,0 +1,10 @@
+Selects sprite attribute value based on node [r0+2] bit0 (player_id) and enqueues it. Receives effect_slot_node ptr (r0). Reads [r0+2] bit0: if 0 (P1) uses attr=0x1c; if 1 (P2) uses attr=0x801c. Calls enqueue_sprite_attr_record (attr, slot=1, r2=0, r3=0). Returns 0.
+
+Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id)
+Returns: r0=0 (fixed return 0)
+Side effects: writes OAM sprite attribute record via enqueue_sprite_attr_record
+
+Constants:
+- ATTR_P1=0x1c (Player 1 sprite attribute value)
+- ATTR_P2=0x801c (Player 2 sprite attribute value)
+- PLAYER_BIT=bit0 of [r0+2]

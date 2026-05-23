@@ -1,0 +1,22 @@
+Iterates over all opponent-side equip zones (index 0 to zone_count-1) and calls
+dispatch_equip_zone_sprite_banisher_of_the_light for each, batch-enqueuing Banisher
+of the Light expulsion sprites. Reads player_id from [r5+2] bit0, computes opponent_id,
+reads gP1LifePoints[+0xc+opponent*0x868] for opponent zone_count. If zone_count > 0,
+loops from zone_count-1 down to 0, calling dispatch with (opponent_id, zone_idx, 1).
+After loop, calls query_equip_zone_bitmap_with_active_flag and
+query_equip_target_bitmap_default to update equip bitmaps.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects:
+  sprite queue updated via dispatch_equip_zone_sprite_banisher_of_the_light
+    (called zone_count times)
+  equip bitmap state updated via query_equip_zone_bitmap_with_active_flag /
+    query_equip_target_bitmap_default
+
+Constants:
+  LP_ZONE_COUNT_OFFSET=0xc -- gP1LifePoints zone count field offset
+  ZONE_STRIDE=0x868        -- zone row stride
+  UPDATE_MODE=1            -- dispatch_equip_zone_sprite_banisher update arg

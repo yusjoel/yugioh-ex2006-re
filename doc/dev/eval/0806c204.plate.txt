@@ -1,0 +1,7 @@
+Effect node handler. Checks [r0+4] bit2 guard; extracts player_id (bit0) and zone_type (bits[6:2]) then computes gDuelFieldSlots base offset. Compares col_nibble+dir_bit sum with [r0+4] bits[9:3] target_col; exits if unequal. On match: samples prng for random offset via sample_prng_scaled; dispatches by player to enqueue_equip_chain_pair_sprite_if_eligible, invoke_zone_slot_sprite_attr_for_equip_type, enqueue_sprite_attr_with_mode. Finally unconditionally calls enqueue_sprite_attr_record(0x1f,...). Completes full enqueue of equip chain zone sprites.
+
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, EQUIP_TYPE=0xb (zone_type 11), SPRITE_RECORD=0x1f, SPRITE_OBJ_0x52=0x52, SPRITE_OBJ_0x8052=0x8052.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8 with player bit0 and zone bits[6:2], [+4]=guard_bits u8 bit2=guard bits[9:3]=target_col).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via enqueue_equip_chain_pair_sprite_if_eligible, invoke_zone_slot_sprite_attr_for_equip_type, enqueue_sprite_attr_with_mode, enqueue_sprite_attr_for_slot_indicator, enqueue_sprite_attr_with_type_select, enqueue_sprite_attr_record).

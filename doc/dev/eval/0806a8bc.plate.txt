@@ -1,0 +1,15 @@
+Dispatches LP row sprite or Banisher of the Light equip-zone sprite based on global activation display state and player_id comparison. Receives effect_slot_node ptr (r4=r0). Extracts [r4+8] bit0 (player_bit_from_token) into r1. Checks guard_bit ([r4+4] bit2); if set skips. Reads global state code [0x0201b290+0x94*8]: state 0x80: if player_bit == player_id (bit0 of [r4+2]) calls enqueue_lp_display_row_if_enabled (r0=player_bit, r1=1, r2=0, r3=0); else computes opponent_side, checks LP active flag [gP1LifePoints+0xc+opponent*0x868]; if nonzero calls set_lp_display_row_type5 (player_id, [r4,#0], r2=1) returns 0x7f. State 0x7f: reads [gP1LifePoints+0x1da8] Banisher aux data, gets zone_slot_ptr, calls dispatch_equip_zone_sprite_banisher_of_the_light (player_bit, [banisher_slot], 1) then enqueue_lp_counter_sprite_by_player, returns 0x64.
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+2] bit0=player_id, [r0+8] bit0=token_player_bit)
+Returns: r0=u8 new_state (0x7f/0x64 or 0=guard/skip)
+Side effects: writes LP display row via enqueue_lp_display_row_if_enabled; writes LP row type5 via set_lp_display_row_type5; writes Banisher equip zone sprite via dispatch_equip_zone_sprite_banisher_of_the_light; writes LP counter sprite via enqueue_lp_counter_sprite_by_player
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- TOKEN_PLAYER_BIT=bit0 of [r4+8] halfword
+- STATE_DISPLAY_BASE=0x0201b290
+- STATE_IDX_OFFSET=0x94*8=0x4a0
+- GPLP_ACTIVE_OFF=0xc (LP struct active_flag offset, per-player)
+- GPLP_BANISHER_OFF=0x1da8 (Banisher aux data offset in LP struct)
+- PLAYER_STRIDE=0x868
+- STATE_0x80=0x80; STATE_0x7f=0x7f; STATE_0x64=0x64

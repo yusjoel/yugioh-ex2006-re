@@ -1,0 +1,20 @@
+Tests if effect slot corresponds to a spell zone type (0xb0<<3=0x580). If matched,
+looks up target slot_id from IWRAM [0x0201bb90+0x38/+0x70], calls
+find_zone_descriptor_by_slot_id to get zone_descriptor, verifies zone_type<=4,
+then calls test_equip_target_slot_in_bitmap for equip bitmap test.
+IWRAM base 0x0201bb90 [+0x38] and [+0x70] store current target slot_id for each side.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: reads equip bitmap and may write result flag via
+  test_equip_target_slot_in_bitmap.
+
+Constants:
+  ZONE_TYPE_MASK=0xfc0       -- [r4+2] zone type mask
+  ZONE_TYPE_SPELL=0x580      -- 0xb0<<3 hand spell zone type
+  IWRAM_EQUIP_STATE=0x0201bb90 -- equip state base
+  SLOT_OFFSET_A=0x38         -- player A target slot offset
+  SLOT_OFFSET_B=0x70         -- player B target slot offset (0x38+0x38)
+  ZONE_TYPE_MAX=4            -- zone type upper bound [0..4]

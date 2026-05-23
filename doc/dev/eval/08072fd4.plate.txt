@@ -1,0 +1,28 @@
+Equip LP display sequence state machine variant. Same structure as 0x08072d34 but adds
+equip_target_bitmap access in the 0x7d path. Branches on step value at
+IWRAM [0x0201b290+0x4a0] (0x7d/0x7e/0x7f/0x80).
+
+Step 0x80: computes opponent player id; if LP counter nonzero, calls
+  set_lp_display_row_all_slots and advances to 0x7f; else checks
+  count_occupied_monster_zones before proceeding.
+Step 0x7f: calls lookup_equip_card_score / format_game_text /
+  trigger_card_display_op31_if_not_active; advances to 0x7e.
+Step 0x7e: calls apply_lp_delta_if_slot_active or set_lp_display_row_type9
+  for LP adjustment; advances to 0x7d.
+Step 0x7d: calls test_equip_target_slot_in_bitmap for bitmap zone test.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = step code (0x7d/0x7e/0x7f) or 0 (pop{r1};bx r1)
+
+Side effects: LP display state updated via set_lp_display_row_all_slots /
+  apply_lp_delta_if_slot_active.
+
+Constants:
+  STEP_0x7D=0x7d        -- state: bitmap test
+  STEP_0x7E=0x7e        -- state: LP delta
+  STEP_0x7F=0x7f        -- state: card display
+  STEP_0x80=0x80        -- state: LP row
+  IWRAM_BASE=0x0201b290 -- IWRAM state base
+  STEP_OFFSET=0x4a0     -- 0x94<<3
+  LP_EXT_OFFSET=0x1da8  -- LP ext field offset

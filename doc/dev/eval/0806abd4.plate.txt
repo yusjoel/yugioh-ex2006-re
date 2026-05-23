@@ -1,0 +1,7 @@
+Queries equip-zone active bitmap and forwards result to zone11 bitmap update. Receives effect_slot_node ptr (r4=r0). Calls query_equip_zone_bitmap_with_active_flag (r0=r4) to get bitmap. Calls forward_equip_bitmap_update_zone11 (r0=r4, r1=bitmap). Returns 0.
+
+Params: r0=ptr effect_slot_node (passed to both callees)
+Returns: r0=0 (fixed return 0)
+Side effects: writes zone11 target bitmap via forward_equip_bitmap_update_zone11
+
+Constants: none (no non-trivial literals)

@@ -1,0 +1,20 @@
+Dispatches equip zone sprite enqueue based on effect slot activation flag and LP state code.
+First checks [r4+4] bit2 (mask 0x4) and skips if set.
+Calls tick_zone_sprite_pipeline_with_update_flag(side, update_mode=2) to advance pipeline.
+If pipeline returns nonzero, reads gP1LifePoints[+0x1ce8] to compare LP state:
+  0 = player  -> mode=0x31
+  nonzero     -> mode=0x41
+Finally calls enqueue_sprite_attr_type11(side, card_id, mode, subtype=0).
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes sprite attribute queue via enqueue_sprite_attr_type11.
+
+Constants:
+  FLAG_BIT2=0x4       -- activation mask bit2
+  UPDATE_MODE_2=0x2   -- tick_zone_sprite pipeline update mode
+  LP_STATE_BASE=0x1ce8 -- gP1LifePoints LP state offset
+  MODE_PLAYER=0x31    -- sprite mode: player side
+  MODE_OPPONENT=0x41  -- sprite mode: opponent side

@@ -1,0 +1,5 @@
+Effect node handler, very short leaf. Reads player_id (bit0) from effect_node [r0+2], computes opponent player_opp=1-player, calls set_player_state_bit_with_sprite_update for opponent with bit_index=0, value=1. Fixed return 0.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes player_state[player_opp] bit0:=1 (via set_player_state_bit_with_sprite_update).

@@ -1,0 +1,21 @@
+Selects player direction based on [r0+0xc] mode field (1 or 2), then calls
+enqueue_lp_counter_sprite_by_player.
+
+mode=1: reads player_id from [r0+2] bit0; reads gP1LifePoints[+0x10+player*0x868] LP
+  counter; if nonzero, calls enqueue_lp_counter_sprite_by_player(player_id).
+mode=2: takes opponent (1-player); reads opponent LP counter; if nonzero calls
+  enqueue_lp_counter_sprite_by_player(player); else calls with player fallback.
+Other mode values: return immediately.
+
+Parameters:
+  r0: ptr effect_slot_entry* (ldrh r2,[r0,#0xc] deref at entry)
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes LP counter sprite queue via enqueue_lp_counter_sprite_by_player.
+
+Constants:
+  MODE_1=1               -- mode: player direct direction
+  MODE_2=2               -- mode: opponent direction + fallback
+  LP_COUNTER_BASE=0x0201c4e0 -- gP1LifePoints base
+  LP_COUNTER_OFFSET=0x10 -- LP counter field offset
+  ZONE_STRIDE=0x868      -- zone row stride

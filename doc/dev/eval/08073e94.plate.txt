@@ -1,0 +1,14 @@
+Leaf function (8 instructions). Reads player_id from effect slot [r0+2] byte (bit0),
+reads card_id from [r0+0], then calls enqueue_sprite_attr_type11 with fixed mode=5,
+subtype=0. Same structure as enqueue_zone_sprite_attr_type11_from_slot (0x08072d20),
+only difference is mode=5 vs mode=0x11.
+
+Parameters:
+  r0: ptr effect_slot_entry* (ldrb r1,[r0,#2] deref at entry)
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes sprite attribute queue via enqueue_sprite_attr_type11.
+
+Constants:
+  SPRITE_MODE=0x5  -- sprite mode code 5
+  SUBTYPE=0        -- subtype

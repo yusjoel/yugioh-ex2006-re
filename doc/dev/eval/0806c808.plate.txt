@@ -1,0 +1,7 @@
+Effect node handler, very short leaf. Reads player_id (bit0) from effect_node [r0+2], computes opponent id (1-player), calls check_zone_eligible_with_deck_flag(opponent, 1) with flag=1, then calls enqueue_sprite_attr_type10_halfword(0x3c) with the result. Fixed return 0.
+
+Constants: SPRITE_CODE=0x3c, DECK_FLAG=0x1.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via enqueue_sprite_attr_type10_halfword).

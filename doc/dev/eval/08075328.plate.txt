@@ -1,0 +1,20 @@
+Checks whether the opponent LP counter is nonzero and LP state is not 1, then calls
+init_effect_slot_display_context(player, card_id, type=5, 0) to initialize the effect
+card display context. Reads player_id from [r4+2] bit0, computes opponent_id, reads
+gP1LifePoints[+0x10+opponent*0x868] LP counter; exits if zero. Then checks
+[0x0201e2a0+8+player*4] LP state; exits if state==1. Otherwise calls
+init_effect_slot_display_context(opponent_id, card_id=[r4+0], type=5, 0).
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: initializes effect card display state machine context in EWRAM via
+  init_effect_slot_display_context.
+
+Constants:
+  LP_COUNTER_OFFSET=0x10     -- gP1LifePoints LP count field offset
+  ZONE_STRIDE=0x868          -- zone row stride
+  LP_STATE_BASE=0x0201e2a0   -- LP state base
+  LP_STATE_BLOCKED=1         -- LP state 1 = block initialization
+  DISPLAY_TYPE=5             -- init_effect_slot_display_context type arg

@@ -1,0 +1,13 @@
+Effect-slot node display initialization entry. Receives effect_slot_node ptr (r4=r0). Reads gP1LifePoints + 0x10 + opponent_offset active flag (opponent_offset = (1 XOR player_id) * 0x868); if 0 (opponent field not active), skips. Checks 0x0201e2a0+8+player_id*4 display_flag; if 1 (already initialized), skips. Otherwise calls init_effect_slot_display_context with (player_id, card_id=[r4,#0], op=5, flip=0). Called via function pointer dispatch table (indeg=0).
+
+Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id, [r0+0]=card_id)
+Returns: r0=0 (fixed return 0, void semantics)
+Side effects: writes effect-slot display context fields via init_effect_slot_display_context
+
+Constants:
+- GPLP_BASE=gP1LifePoints (0x0201c4e0, LP struct base)
+- ACTIVE_FLAG_OFF=0x10 (LP struct active field offset)
+- PLAYER_STRIDE=0x868 (per-player stride in LP struct)
+- RULE_STRUCT=0x0201e2a0 (rule/context struct base)
+- DISPLAY_INIT_FLAG_OFF=0x8 (rule struct display_init_flag offset)
+- DISPLAY_OP=5 (op code for init_effect_slot_display_context)

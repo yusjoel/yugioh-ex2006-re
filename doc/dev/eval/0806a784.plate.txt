@@ -1,0 +1,11 @@
+Checks if opponent has available equip slots; if so submits LP row type8 sprite. Receives effect_slot_node ptr (r4=r0). Checks guard_bit ([r4+4] bit2); if set skips. Extracts player_id (bit0 of [r4+2]), computes opponent_side = 1-player_id. Calls count_equippable_slots_for_card (r0=opponent_side, r1=-1 via rsbs). If returns 0 (no equippable slots) skips. Otherwise re-reads player_id, computes opponent_side, calls set_lp_display_row_type8 (r0=opponent_side, r1=0xffff, r2=1).
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+2] bit0=player_id)
+Returns: r0=0 (fixed return 0)
+Side effects: writes LP display row type8 sprite state via set_lp_display_row_type8
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- RSBS_NEG1=rsbs r1,r1,#0 (r1=-1 as count_equippable_slots arg for "any card")
+- LP_ROW_TYPE8_ARG=0xffff (slot_mask=all slots)
+- TYPE8_FLAG=1 (r2 flag for set_lp_display_row_type8)

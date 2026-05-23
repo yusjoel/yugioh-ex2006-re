@@ -1,0 +1,14 @@
+Leaf function (8 instructions). Reads player_id from effect_slot [r0+2] bit0,
+card_id from [r0+0], and type_code from [r0+4] bits[14:8] (lsls #0x11; lsrs #0x17).
+Calls enqueue_sprite_attr_type11 with fixed mode=4. Same structure as
+enqueue_zone_sprite_attr_type11_from_slot (0x08072d20) but adds type_code from [+4].
+
+Parameters:
+  r0: ptr effect_slot_entry* (ldrb r1,[r0,#2] deref at entry)
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes sprite attribute queue via enqueue_sprite_attr_type11.
+
+Constants:
+  SPRITE_MODE=4            -- sprite mode code 4
+  TYPE_CODE_BITS=0x11/0x17 -- lsls+lsrs extracts bits[14:8]

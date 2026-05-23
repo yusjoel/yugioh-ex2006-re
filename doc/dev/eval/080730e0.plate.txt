@@ -1,0 +1,23 @@
+Minimal equip LP display sequence state machine variant. Checks step value at
+[0x0201b290+0x4a0].
+
+Step 0x80: reads side/zone from [r3+2]; calls set_lp_row_type18_with_value;
+  advances to 0x7f.
+Step 0x7f: reads [gP1LifePoints+0x1da8]; if value==6, returns step code 0x80 directly;
+  else reads [r3+2] side/zone and calls test_equip_target_slot_in_bitmap.
+
+Function body is only 25 instructions -- smallest variant in this family.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = step code (0x7f/0x80) or 0 (pop{r1};bx r1)
+
+Side effects: writes LP row type 18 via set_lp_row_type18_with_value.
+
+Constants:
+  STEP_0x7F=0x7f         -- state: bitmap test
+  STEP_0x80=0x80         -- state: type18 LP row
+  IWRAM_BASE=0x0201b290  -- IWRAM state base
+  STEP_OFFSET=0x4a0      -- 0x94<<3
+  LP_EXT_OFFSET=0x1da8   -- LP ext field offset
+  LP_STATE_VALUE_6=0x6   -- LP state special value 6 -> advance to 0x80

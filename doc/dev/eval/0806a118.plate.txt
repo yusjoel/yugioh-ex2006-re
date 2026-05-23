@@ -1,0 +1,16 @@
+Equip-zone sprite state-machine dispatch function. Receives effect_slot_node ptr (r0), extracts player_id (bit0 of [r0+2]) into r4, checks guard_bit ([r0+4] bit2); if set returns 0. Reads global display state code [0x0201b290+0x94*8] and dispatches: state 0x80: if display_init_flag ([rule_struct+0x4a4]) nonzero writes 3 and returns 0x7d; state 0x7f: calls check_equip_zone_has_field5_card; if absent skips; if present checks rule_struct+0x8+player_id*4 display_flag; if 1 loops checking card_id_placement_allowed and updates rule_struct fields, else calls invoke_card_display_op_0x31_sub1 (op=0x28) returns 0x7e; state 0x7e: calls enqueue_lp_display_row_if_enabled (r1=1, r2=1, r3=0) then decrements counter returns 0x7f; state 0x7d: reads rule_struct+0x4a4 and re-dispatches.
+
+Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id, [r0+4] bit2=guard_bit)
+Returns: r0=u8 new_state (0x7d/0x7e/0x7f or 0=guard/skip)
+Side effects: [gP1LifePoints+0x4a4]:=3 (state=0x80 path, sets display_init_flag); [gP1LifePoints+0x8+player_id*0x868] rule_struct display_flag may be modified; writes LP display row via enqueue_lp_display_row_if_enabled (state=0x7e)
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r0+4])
+- STATE_DISPLAY_BASE=0x0201b290 (global display state base)
+- STATE_IDX_OFFSET=0x94*8=0x4a0 (display state field offset)
+- RULE_STRUCT_BASE=gP1LifePoints (0x0201c4e0)
+- INIT_FLAG_OFF=0x4a4 (init_flag field in rule struct)
+- PLAYER_STRIDE=0x868
+- DISPLAY_FLAG_OFF=0x8 (display_flag array offset, per-player)
+- OP31_ARG=0x28 (invoke_card_display_op_0x31_sub1 argument)
+- STATE_0x80=0x80; STATE_0x7f=0x7f; STATE_0x7e=0x7e; STATE_0x7d=0x7d

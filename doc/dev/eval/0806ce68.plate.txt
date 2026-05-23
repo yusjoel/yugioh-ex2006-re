@@ -1,0 +1,7 @@
+Effect node handler. Loads equip chain node first word [+0] and [+0x1c] from gEquipNodeBase (0x0201bb90) into r8/r9. Checks guard bit. Extracts player_id/zone_type to compute gDuelFieldSlots offset, reads col_nibble+dir_bit sum, compares with [r0+4] bits[9:3]; exits if unequal. Checks [r0+2] bits[11:4] for 0x480 or 0x4c0 (two equip link states). If r8 (node first word)==player_bit exits (already owned by this player). Calls find_equip_chain_node_by_slot_pair(player1, zone_type, player2, slot_encoded); if nonzero (chain exists) exits. If chain slot empty calls enqueue_slot_card_sprite_if_eligible to submit sprite.
+
+Constants: gEquipNodeBase=0x0201bb90, gDuelFieldSlots=0x0201c510, player_stride=0x868, CHAIN_STATE_A=0x480, CHAIN_STATE_B=0x4c0.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u16 with player bit0/zone bits[6:2]/state bits[11:4], [+4]=guard_bits u8 bit2=guard bits[9:3]=col).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via enqueue_slot_card_sprite_if_eligible, only when chain slot is empty).

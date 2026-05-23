@@ -1,0 +1,37 @@
+Equip activation main handler. Executes when [0x0201b290+0x4a0] step value is 0x80 or 0x7f.
+Reads context from EWRAM equip table (r10=[0x0201b290+0x4a4]); verifies zone/side match
+and slot_idx <= 4.
+
+If in standard zone (slot_idx <= 4): calls check_effect_slot_matches_zone_entry /
+  read_effect_slot_side_and_type / find_first_available_monster_slot_for_player /
+  check_slot_card_eligible_by_card_id / update_equip_bitmap_with_cross_side_flag /
+  enqueue_zone_slot_sprite_attr_by_card_type to complete full equip activation and
+  update sprite.
+If slot_idx > 4: calls check_field_spell_neo_daedalus_group_placeable and based on
+  result calls setup_equip_oam_entry_with_sprite_attr.
+If step=0x7f: calls enqueue_sprite_attr_with_mode + write_card_display_index_with_bit_offset
+  for sprite display.
+
+Called by FUN_08074708 (0x08074762) and FUN_0807479c (0x08074826).
+
+Parameters:
+  r0: ptr effect_slot_entry* (spilled to r10 via .hword 0x4682 at entry)
+Returns: r0 = 0x7f step code or 0 (pop{r1};bx r1)
+
+Side effects:
+  equip bitmap updated via update_equip_bitmap_with_cross_side_flag
+  sprite queue updated via enqueue_zone_slot_sprite_attr_by_card_type
+  card display index written via write_card_display_index_with_bit_offset
+
+Constants:
+  STEP_0x7F=0x7f         -- state: sprite display
+  STEP_0x80=0x80         -- state: full activation
+  IWRAM_BASE=0x0201b290  -- IWRAM state base
+  STEP_OFFSET=0x4a0      -- 0x94<<3
+  SAVE_OFFSET=0x4a4      -- monster slot save offset
+  ZONE_STRIDE=0x868      -- zone row stride
+  EWRAM_EQUIP=0x0201c510 -- equip area EWRAM base
+  ZONE_TYPE_MAX=4        -- zone type upper bound [0..4]
+  CARD_IDX_DISPLAY=0x30  -- card display start index
+  CARD_IDX_DISPLAY_END=0x31 -- card display end index
+  SPRITE_MODE_CARD=0xfb6 -- sprite display mode constant

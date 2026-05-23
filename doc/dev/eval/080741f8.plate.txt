@@ -1,0 +1,37 @@
+Equip LP counter display sequence state machine. Branches on step value at
+[0x0201b290+0x4a0] (0x7c/0x7d/0x7e/0x7f/0x80). First compares [r3+0] card_id against
+three specific values (0x15aa/0x16d9/0x17f3) to correct player direction (r4).
+
+Step 0x80: clears [base+0x4a4] to 0, clears [base+0x4a8] to 0; falls through to 0x7f.
+Step 0x7f: reads gP1LifePoints counter; if nonzero calls enqueue_lp_counter_sprite_by_player;
+  if opponent counter nonempty and player matches, enqueues opposite side; advances to 0x7e.
+Step 0x7e: reads LP state; if condition met, calls enqueue_face_down_slot_sprite_attr;
+  advances to 0x7d.
+Step 0x7d: calls tick_zone_sprite_pipeline_with_update_flag to advance pipeline;
+  advances to 0x7c.
+Step 0x7c: calls enqueue_equip_zone_sprite_attr_full to enqueue equip zone sprite.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = step code (0x7c/0x7d/0x7e/0x7f/0x80) or 0 (pop{r1};bx r1)
+
+Side effects:
+  [0x0201b290+0x4a4] := 0 (step 0x80)
+  [0x0201b290+0x4a8] := 0 (step 0x80)
+  sprite queue updated via enqueue_lp_counter_sprite_by_player /
+    enqueue_face_down_slot_sprite_attr / enqueue_equip_zone_sprite_attr_full
+
+Constants:
+  CARD_ID_DISTURBANCE_STRATEGY=0x15aa (Disturbance Strategy)
+  CARD_ID_RELOAD=0x16d9 (Reload)
+  CARD_ID_MIND_WIPE=0x17f3 (Mind Wipe)
+  STEP_0x7C=0x7c        -- state: equip zone sprite
+  STEP_0x7D=0x7d        -- state: pipeline
+  STEP_0x7E=0x7e        -- state: face-down sprite
+  STEP_0x7F=0x7f        -- state: LP counter sprite
+  STEP_0x80=0x80        -- state: clear counters
+  IWRAM_BASE=0x0201b290 -- IWRAM state base
+  STEP_OFFSET=0x4a0     -- 0x94<<3
+  COUNTER_A_OFFSET=0x4a4 -- LP counter A offset
+  COUNTER_B_OFFSET=0x4a8 -- LP counter B offset (0x95<<3)
+  LP_STRIDE=0x868        -- zone row stride

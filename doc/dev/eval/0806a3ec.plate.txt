@@ -1,0 +1,12 @@
+Reads zone/slot info from effect_slot_node [+0x14] packed field and performs zone14 equip-slot sprite update. Receives effect_slot_node ptr (r4=r0). Checks guard_bit ([r4+4] bit2); if set skips. Reads r4[+0x14] packed word: extracts player_id (bit9 via lsls #0x16 / lsrs #0x1f), slot_idx (bits[13..10] via lsls #0x12 / lsrs #0x1c), card_type (bits[17..15] via lsls #0x17 / lsrs #0x17). Calls enqueue_field_slot_sprite_with_state_update (player_id, slot_idx, card_type). Reads r4[+0x14] again, re-extracts player_id and slot_idx, calls update_equip_target_bitmap_zone14 (player_id, slot_idx).
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit, [r0+0x14]=packed zone/slot/player word)
+Returns: r0=0 (fixed return 0)
+Side effects: writes field slot sprite state via enqueue_field_slot_sprite_with_state_update; writes zone14 target bitmap via update_equip_target_bitmap_zone14
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- NODE_FIELD_OFF=0x14 (offset into effect_slot_node for packed zone/slot/type info)
+- BIT_PLAYER=bit9 of packed word (at field [+0x14])
+- BIT_SLOT=bits[13..10] of packed word
+- BIT_CARD_TYPE=bits[17..15] of packed word

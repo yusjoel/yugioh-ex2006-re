@@ -1,0 +1,34 @@
+Checks card placeability on the field and, if conditions are met, looks up the OAM equip
+zone sprite config for the card ID and calls setup_equip_oam_entry_with_sprite_attr.
+First calls count_available_monster_slots; exits if no empty slots.
+Then compares [r4+0] card_id against specific card IDs to select a target token card_id.
+Verifies placement permission via check_field_spell_neo_daedalus_placeable or
+check_field_spell_neo_daedalus_group_placeable.
+Finally constructs sp[0x4] sprite attr and calls setup_equip_oam_entry_with_sprite_attr.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes OAM equip entry sprite attributes via
+  setup_equip_oam_entry_with_sprite_attr.
+
+Constants:
+  INPUT_CARD_ID_JAM_BREEDING_MACHINE=0x13ff (Jam Breeding Machine)
+  INPUT_CARD_ID_INSECT_QUEEN=0x12a0 (Insect Queen)
+  INPUT_CARD_ID_STATUE_OF_THE_WICKED=0x1543 (Statue of the Wicked)
+  INPUT_CARD_ID_COBRA_JAR=0x1595 (Cobra Jar)
+  INPUT_CARD_ID_LEKUNGA=0x15bc (Lekunga)
+  INPUT_CARD_ID_DES_DENDLE=0x15d5 (Des Dendle)
+  INPUT_CARD_ID_FIENDS_SANCTUARY=0x1600 (Fiend's Sanctuary)
+  INPUT_CARD_ID_RAVIEL=0x19a5 (Raviel, Lord of Phantasms)
+  RESULT_CARD_ID_TOKEN_A=0x13fb (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_B=0x14fa (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_C=0x154e (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_D=0x15bd (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_E=0x15be (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_F=0x1603 (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_G=0x1639 (token card, not in release list)
+  RESULT_CARD_ID_TOKEN_H=0x195a (token card, not in release list)
+  PLAYER_BIT_SHIFT=0xd   -- player id encode bit
+  MASK_DFFF=0xffffdfff   -- sprite attr mask

@@ -1,0 +1,12 @@
+Checks if a field-intervention card is absent on field; if absent and target zone is occupied triggers sprite dispatch. Receives effect_slot_node ptr (r4=r0). Checks guard_bit ([r4+4] bit2); if set skips. Calls count_field_copies_of_card with card_id=0x135d (Light of Intervention); if returns nonzero (card present on field) skips. Calls check_effect_slot_matches_zone_entry (r1=0, r2=sp+0) for zone/slot; if fail skips. Unpacks player_id (byte3) and slot_idx (byte2), computes zone_slot_ptr = ZONE_SLOT_ARRAY + player_side_bit * 0x868 + slot_stride. Reads zone_slot_ptr[+8] halfword; if 0 (zone slot empty) skips. Otherwise calls dispatch_slot_sprite_attr_with_equip_head_flag (r4, player_id, slot_idx, r3=0).
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit)
+Returns: r0=0 (fixed return 0)
+Side effects: writes sprite attributes via dispatch_slot_sprite_attr_with_equip_head_flag
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- CARD_ID_LIGHT_OF_INTERVENTION=0x135d (Light of Intervention)
+- ZONE_SLOT_ARRAY=0x0201c510 (gDuelFieldSlots)
+- PLAYER_STRIDE=0x868
+- SLOT_OCC_OFF=0x8 (zone_slot halfword occupancy offset)

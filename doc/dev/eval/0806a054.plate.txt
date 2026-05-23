@@ -1,0 +1,13 @@
+Dispatches equip-slot sprite update operation based on card ID range. Receives effect_slot_node ptr (r5=r0) and secondary slot ptr (r2=r1). Sets guard_bit ([r2+4] bit2) to mark as processed. Reads card_id=[r5,#0] (halfword) and dispatches by card ID: 0x12f7 calls query_equip_target_bitmap_default; 0x12f5 calls enqueue_field_slot_sprite_with_state_update then tick_zone_sprite_pipeline_with_update_flag; 0x12f6 similar; 0x131c calls query_equip_zone_bitmap_with_active_flag then query_equip_target_bitmap_default; 0x162a calls enqueue_field_slot_sprite_with_state_update then tick_zone_sprite_pipeline_with_update_flag. All paths return 0.
+
+Params: r0=ptr effect_slot_node_a ([r0,#0]=card_id, [r0,#2] bit0=player_id, [r0,#4] flags); r1=ptr effect_slot_node_b ([r1,#4] flags)
+Returns: r0=0 (fixed return 0)
+Side effects: [r2+4] |= 0x4 (guard_bit set, prevent reprocessing); writes field slot sprite state via enqueue_field_slot_sprite_with_state_update; triggers zone sprite pipeline refresh via tick_zone_sprite_pipeline_with_update_flag
+
+Constants:
+- CARD_ID_A=0x12f7 (equip bitmap target card)
+- CARD_ID_B=0x12f5 (0x12f7-2; field slot card variant A)
+- CARD_ID_C=0x12f6 (0x12f7-1; field slot card variant B)
+- CARD_ID_D=0x131c (reserved -- cid=0xFFFF, no card assigned)
+- CARD_ID_E=0x162a (field slot card variant C)
+- GUARD_BIT=0x4 (bit2 of [r2+4] flags byte, set on entry)

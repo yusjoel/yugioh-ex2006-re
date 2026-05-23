@@ -1,0 +1,7 @@
+Effect node handler. Extracts player_id (bit0) and zone_type (bits[6:2]) from [r0+2], computes gDuelFieldSlots[player][zone] and gDuelFieldSlots[opponent][zone] offsets. Reads both-side col_nibble (slot data bits[7:0]<<1) and sums them as col_sum. Compares [r0+4] bits[9:3] target_col with col_sum; returns 0 if unequal. On match calls set_field_slot_bit_with_sprite_update(player, zone_idx, 4, 1) to set field slot state bit and trigger sprite update.
+
+Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, BIT_MODE=0x4, BIT_VALUE=0x1.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0 and zone bits[6:2], [+4]=u16 bits[9:3]=target_col).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes player_state[player][zone] bit (via set_field_slot_bit_with_sprite_update); writes sprite queue (via set_field_slot_bit_with_sprite_update).

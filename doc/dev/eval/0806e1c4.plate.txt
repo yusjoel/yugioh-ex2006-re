@@ -1,0 +1,7 @@
+Effect node handler with 3-step state machine and PRNG-driven LP display sequence. First compares gDuelFieldSlots col_sum against [r0+4] bits[9:3]; exits if unequal. Reads gIwramState[+0x4a0]. State=0x80: checks gEquipNodeBase[0] matches this player; checks 0x0201e2a0[player*4+8]==1, if so calls sample_prng_scaled(2) and writes to gDuelFieldSlots[player+0x1d10], else calls invoke_card_display_op_0x31_sub8(0x38); returns 0x7f. State=0x7f: reads gDuelFieldSlots[player+0x1d10], calls enqueue_lp_display_row_type17; returns 0x7e. State=0x7e: checks gDuelFieldSlots[player+0x1d7a] nonzero and gEquipNodeBase chain flag matches; if so calls enqueue_slot_card_sprite_if_eligible; returns 0xa.
+
+Constants: gIwramState=0x0201b290, STATE_OFFSET=0x4a0, gDuelFieldSlots=0x0201c510, player_stride=0x868, LP_OFFSET=0x1d10, LP_CHECK_OFFSET=0x1d7a, gEquipNodeBase=0x0201bb90, PRNG_RANGE=2, STATE_INIT=0x80, STATE_STEP1=0x7f, STATE_STEP2=0x7e, STATE_DONE=0xa.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0 and zone bits[6:2], [+4]=u16 guard/col).
+Returns: r0=state advance code (0x7f/0x7e/0xa=advanced, 0=unhandled).
+Side effects: [gDuelFieldSlots[player+0x1d10]]:=sample_prng_scaled(2) (state=0x80 conditional path); writes sprite queue (via enqueue_lp_display_row_type17, enqueue_slot_card_sprite_if_eligible).

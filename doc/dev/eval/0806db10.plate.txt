@@ -1,0 +1,7 @@
+Equip placement evaluation function. Loads current active node from gIwramState[+0x484], verifies node player_id (bit0) equals r0 and r1==0xb (equip zone type 11). Reads zone slot card_type field (bits[18:0]) from gDuelFieldSlots into r4; reads node [+6] bits[4:2] (3-bit type code) for three-way dispatch: 0=calls check_card_field5_is_nonzero then eval_equip_placement_full_check, computes lsrs+orrs into nonzero flag in r6; 1=calls check_card_field5_is_nonzero, proceeds to LAB_0806dbba only if zero; 2=calls check_card_field5_is_nonzero + reads node [+0xa] word and xors with r7 for nonzero check. Returns 0x800 if r6!=0, else 0.
+
+Constants: gIwramState=0x0201b290, NODE_OFFSET=0x484, gDuelFieldSlots=0x0201c600, ZONE_TYPE_EQUIP=0xb, RET_VALID=0x800 (=0x80<<4).
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 zone_type (expected 0xb=equip zone 11); r2=u32 zone_idx [0..11] (slot index for gDuelFieldSlots lookup).
+Returns: r0=0x800 (placement valid) or 0 (invalid).
+Side effects: none (pure query function).

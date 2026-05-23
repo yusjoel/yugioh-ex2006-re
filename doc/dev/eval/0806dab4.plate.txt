@@ -1,0 +1,7 @@
+Effect node handler. Unconditionally extracts player_id (bit0) from [r0+2], calls set_player_state_bit_with_sprite_update with bit_index=0x12 (bit 18), value=1. Then checks guard bit2; returns if set. If guard clear: checks effect_slot vs zone entry match; reads side+type; calls enqueue_slot_card_sprite_if_eligible to submit equip zone card sprite. Fixed return 0.
+
+Constants: STATE_BIT=0x12 (bit 18), BIT_VALUE=0x1.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0, [+4]=guard_bits u8 bit2=guard).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes player_state[player] bit18:=1 (via set_player_state_bit_with_sprite_update, unconditional); writes sprite queue (via set_player_state_bit_with_sprite_update and enqueue_slot_card_sprite_if_eligible).

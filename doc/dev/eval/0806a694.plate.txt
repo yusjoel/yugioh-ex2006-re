@@ -1,0 +1,14 @@
+Reads equip-chain node data from LP chain struct, verifies zone/slot coordinate match, then calls test_equip_target_slot_zone11. Receives effect_slot_node ptr (r7=r0). Reads gP1LifePoints + 0x1ce8 (global LP chain index), computes LP chain entry offset (index * 7 * 8 = index * 0x38), accesses chain entry at base 0x0201bbbc. Reads entry [+0x2c] link_active_flag; if nonzero skips. Reads [+0] slot_data player_id (bit0) and [+4] slot_idx. Computes zone_slot_ptr = ZONE_SLOT_ARRAY + (player_id * 0x868) + 0x30 + (slot_idx * 5 * 4 * 4). Reads zone_slot token field, extracts display_code and compares with [+0xc]; if not equal skips. On pass calls test_equip_target_slot_zone11 (r0=r7, r1=slot_data, r2=slot_idx).
+
+Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id)
+Returns: r0=0 (fixed return 0)
+Side effects: writes zone11 target bitmap via test_equip_target_slot_zone11
+
+Constants:
+- GPLP_BASE=gP1LifePoints (0x0201c4e0)
+- LP_CHAIN_IDX_OFF=0x1ce8 (LP chain index offset in LP struct)
+- LP_CHAIN_BASE=0x0201bbbc (LP chain array base)
+- LP_CHAIN_ENTRY_STRIDE=0x38 (per-chain-entry stride; 7*8=56=0x38)
+- LINK_ACTIVE_FLAG_OFF=0x2c (offset in chain entry for link_active_flag)
+- ZONE_SLOT_ARRAY=gP1LifePoints+0x30 (equip slot array offset)
+- PLAYER_STRIDE=0x868

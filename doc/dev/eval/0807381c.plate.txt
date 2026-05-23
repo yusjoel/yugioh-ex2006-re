@@ -1,0 +1,16 @@
+Checks if effect slot card type flags match a specific hand spell zone type
+(0xfc0 mask, 0xb0<<3=0x580). If matched, reads set_code from [r4+0x14], calls
+find_hand_slot_idx_by_set_code to locate hand slot; if valid slot found, calls
+enqueue_hand_card_sprite_by_spell_type with update_mode=1 to enqueue hand card sprite.
+set_code extracted from [r4+0x14] bits[24:18] (lsls 0x17; lsrs 0x17).
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes hand card sprite queue via enqueue_hand_card_sprite_by_spell_type.
+
+Constants:
+  ZONE_TYPE_MASK=0xfc0   -- [r4+2] high bits zone type mask (0xfc<<4)
+  ZONE_TYPE_SPELL=0x580  -- 0xb0<<3 = hand spell zone type value
+  SET_CODE_BITS_HI=0x17  -- lsls/lsrs 0x17 extracts set_code bits[24:18]

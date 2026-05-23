@@ -1,0 +1,21 @@
+Reads player_id (bit0) and zone_idx (bits[6:2]) from effect slot [r0+2]. Computes
+EWRAM equip table (0x0201c510) zone-row offset, extracts current zone counter
+(bits[29:24]*2) plus is_bit14 flag from the opposite row, then compares total
+against capacity field ([r0+4] bits[14:8]). If counter equals capacity, calls
+enqueue_effect_card_slot_sprite_attr(player_id, zone_idx, update=1) to enqueue
+effect card sprite.
+
+Called by FUN_0807a680 (0x0807a680, duel_field context).
+
+Parameters:
+  r0: ptr effect_slot_entry* (ldrb r1,[r0,#2] deref at entry)
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: writes effect card sprite queue via enqueue_effect_card_slot_sprite_attr.
+
+Constants:
+  ZONE_STRIDE=0x868        -- zone row stride
+  EWRAM_EQUIP=0x0201c510   -- equip area EWRAM base
+  ZONE_IDX_BITS=0x1a/0x1b  -- extracts zone_idx bits[6:2] from [+2]
+  COUNTER_BITS=0x2/0x18/0x1 -- extracts counter bits[29:24] x2 from zone-row word
+  CAPACITY_BITS=0x11/0x17  -- extracts capacity bits[14:8] from [+4]

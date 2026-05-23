@@ -1,0 +1,12 @@
+Checks corresponding zone/slot is empty (halfword [zone_slot+6]==0); if empty triggers equip activation. Receives effect_slot_node ptr (r4=r0). Checks guard_bit ([r4+4] bit2); if set skips. Calls check_effect_slot_matches_zone_entry (r1=0, r2=sp+4) to get zone/slot match; if fail skips. Unpacks player_id (byte3) and slot_idx (byte2) from result. Extracts player_id bit0 as player_side_bit. Computes zone_slot_ptr = ZONE_SLOT_ARRAY + slot_stride*player_side + slot_idx*0x14. Reads zone_slot_ptr[+6] halfword; if nonzero (slot occupied) skips. Otherwise calls apply_slot_equip_activation_with_eligibility_check (r0=r4, r1=player_id, r2=slot_idx, r3=0, sp[0]=0).
+
+Params: r0=ptr effect_slot_node ([r0+4] bit2=guard_bit)
+Returns: r0=0 (fixed return 0)
+Side effects: writes equip activation state and sprites via apply_slot_equip_activation_with_eligibility_check
+
+Constants:
+- GUARD_BIT=0x4 (bit2 of [r4+4])
+- ZONE_SLOT_ARRAY=0x0201c510 (gDuelFieldSlots)
+- PLAYER_STRIDE=0x868 (per-player stride)
+- SLOT_ENTRY_SIZE=0x14 (size of each zone_slot entry)
+- SLOT_OCC_OFF=0x6 (halfword offset for slot occupancy flag)

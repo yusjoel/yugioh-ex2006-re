@@ -1,0 +1,7 @@
+Equip zone sprite enqueue function. Extracts player_id (bit0) from effect_node [r0+2], calls find_first_available_monster_slot_for_player(player) to get free slot r7. If no free slot (r7<0): calls enqueue_equip_slot_bitmap_update only and exits. Otherwise: combines player/zone_type/slot_idx, loads equip node data from gEquipNodeBase (0x0201bb90), calls enqueue_equip_chain_pair_sprite_if_eligible, invoke_zone_slot_sprite_attr_for_equip_type, enqueue_sprite_attr_with_mode(slot, card_id, 0x21, ...). Unconditionally calls enqueue_sprite_attr_record(0x1f,...) at tail.
+
+Constants: gEquipNodeBase=0x0201bb90, SPRITE_MODE=0x21, SPRITE_RECORD=0x1f.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0 and zone bits[6:2], [+0]=card_id u16).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via enqueue_equip_chain_pair_sprite_if_eligible, invoke_zone_slot_sprite_attr_for_equip_type, enqueue_sprite_attr_with_mode, enqueue_sprite_attr_record, enqueue_equip_slot_bitmap_update).

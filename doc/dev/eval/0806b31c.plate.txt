@@ -1,0 +1,18 @@
+Neo-Daedalus effect series specialized display dispatch function. Receives effect_slot_node ptr (r4=r0). Reads global state code [0x0201b290+0x94*8]. State 0x7e: returns 0 directly (already done). State 0x64: calls enqueue_lp_counter_sprite_by_player (player=bit0 of [r4+2]), checks [gP1LifePoints+0x4a4] if nonzero calls decrement_lp_bar_display_counter, returns 0. Other paths (state 0x7f/0x80): checks card_id=[r4,#0] against 0x1339: 0x1339 path calls submit_lp_indicator_with_slot_xor_flag (player_id, r1=(1-player)*0xfa*2, r0=r4); 0x133a path calls submit_effect_zone_lp_and_shape_sprites (player_id, 0xfa*4). Clears [gP1LifePoints+0x4a4] to 0, calls count_available_monster_slots; if 0 returns 0x64. Calls check_field_spell_neo_daedalus_group_placeable; if 0 returns 0x64. Calls dispatch_effect_handler_by_card_id; if 0 calls trigger_card_display_op31_if_not_active (op=0xd) returns 0x64. If success checks display_flag; if 1 writes [gP1LifePoints+0x4a4]:=1 and enters 0x7e handling; else formats card name and calls invoke_card_display_op_0x31_sub1 returns 0x7e. State 0x7e path: calls setup_equip_oam_entry_with_sprite_attr (two variants for 0x1339/0x133a).
+
+Params: r0=ptr effect_slot_node ([r0+2] bit0=player_id, [r0+0]=card_id)
+Returns: r0=u8 new_state (0x64/0x7e/0x7f or 0)
+Side effects: [gP1LifePoints+0x4a4]:=0 (clears init_flag, state=0x7f/0x80 path); [gP1LifePoints+0x4a4]:=1 (sets init_flag, state=0x7e display_flag=1 path); writes LP indicator sprite via submit_lp_indicator_with_slot_xor_flag; writes LP+shape sprites via submit_effect_zone_lp_and_shape_sprites; writes LP counter sprite via enqueue_lp_counter_sprite_by_player; writes OAM equip entry via setup_equip_oam_entry_with_sprite_attr
+
+Constants:
+- STATE_DISPLAY_BASE=0x0201b290
+- STATE_IDX_OFFSET=0x94*8=0x4a0
+- CARD_ID_0x1339=0x1339 (Neo-Daedalus group A)
+- CARD_ID_0x133a=0x133a (Neo-Daedalus group B)
+- INIT_FLAG_OFF=0x4a4 (gP1LifePoints init_flag field)
+- LP_ARG_A=0xfa*2=0x1f4 (submit_lp_indicator arg for 0x1339)
+- LP_ARG_B=0xfa*4=0x3e8 (submit_effect_zone_lp arg for 0x133a)
+- TEXT_FMT_A=0x35 (format string index for 0x1339 card name)
+- TEXT_FMT_B=0x34 (format string index for 0x133a card name)
+- PLAYER_STRIDE=0x868
+- DECK_ARRAY=0x0201c740+player*0x868+0x98*4=0x260 (card pair array offset)

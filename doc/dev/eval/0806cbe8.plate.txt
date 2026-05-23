@@ -1,0 +1,7 @@
+Effect node handler with multi-step state machine and equip target query logic. Reads [0x0201b290+0x4a0] state word. State=0x80: calls set_lp_row_type11_with_byte_flags(player, 2, 0xff), returns 0x7f. State=0x7f: reads gP1LifePoints+0x1da8 current LP, calls set_lp_row_type11_with_byte_flags with row data, returns 0x7e. State=0x7e: calls get_game_text_ptr_by_str_type_b + format_game_text_with_text_arg to prepare text, calls trigger_card_display_op31_if_not_active, returns 0x7d. State=0x7d: iterates up to 5 equip slots (r4=0..4), inner loop (r6+=0x14), calls resolve_best_target_slot_for_equip per valid slot and accumulates target bitmap; if count>=2 calls query_equip_target_bitmap_default. Primary driver of equip phase display sequence.
+
+Constants: STATE_IWRAM=0x0201b290, STATE_OFFSET=0x4a0, STATE_INIT=0x80, STATE_STEP1=0x7f, STATE_STEP2=0x7e, STATE_STEP3=0x7d, gP1LifePoints=0x0201c4e0, LP_OFFSET=0x1daa, player_stride=0x868, gDuelFieldSlots=0x0201c510, SLOT_COUNT=4, SLOT_STRIDE=0x14.
+
+Inputs: r0=ptr effect_node ([+2]=flags u8 with player bit0, [+4]=guard_bits u8 bit2=guard).
+Returns: r0=state advance code (0x7f/0x7e/0x7d=advanced, 0=unhandled).
+Side effects: writes LP row data (via set_lp_row_type11_with_byte_flags); writes sprite/text queue (via trigger_card_display_op31_if_not_active); writes equip target bitmap (via query_equip_target_bitmap_default).

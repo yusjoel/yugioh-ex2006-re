@@ -1,0 +1,20 @@
+Checks equip activation conditions for an effect slot (r0) and dispatches activation.
+First checks bit2 flag (mask 0x4) to confirm slot is in activatable state; if cleared,
+calls check_effect_slot_matches_zone_entry to verify zone entry match. On success,
+reads side/type info, computes zone index, looks up EWRAM equip table
+([0x0201c510+offset]) fields [+0x8] and [+0x6] to decide between
+apply_slot_equip_activation_with_eligibility_check path or
+dispatch_slot_sprite_attr_with_equip_head_flag path.
+
+Parameters:
+  r0: ptr effect_slot_entry*
+Returns: r0 = 0 (void semantics, pop{r1};bx r1)
+
+Side effects: indirectly modifies sprite queue and equip state via
+  apply_slot_equip_activation_with_eligibility_check or
+  dispatch_slot_sprite_attr_with_equip_head_flag.
+
+Constants:
+  FLAG_BIT2=0x4         -- bit2 activation check mask
+  ZONE_STRIDE=0x868     -- zone row stride
+  EWRAM_EQUIP_BASE=0x0201c510 -- equip area EWRAM base

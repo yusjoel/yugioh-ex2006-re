@@ -1,0 +1,11 @@
+Checks if target zone_slot is occupied (bit19 of zone_slot[0]); if occupied copies token halfword from source node [r0+8] to destination node [r1+8]. Receives source effect_slot_node ptr (r4=r0) and destination slot ptr (r5=r1). Calls check_effect_slot_matches_zone_entry (r1=0, r2=sp) for zone/slot match; if fail skips. Unpacks player_id (byte3) and slot_idx (byte2), computes zone_slot_ptr = ZONE_SLOT_ARRAY + player_side_bit * 0x868 + slot_stride. Reads zone_slot_ptr[0] word, checks bit19 (token active flag); if 0 skips. Executes strh r0,[r5,#8] (copies source [r4+8] halfword to dest [r5+8]).
+
+Params: r0=ptr src_effect_slot_node ([r0+8]=token halfword to copy); r1=ptr dst_effect_slot_node ([r1+8] will be overwritten)
+Returns: r0=0 (fixed return 0)
+Side effects: [r5+8] := [r4+8] halfword (conditionally copies token halfword from source to destination)
+
+Constants:
+- ZONE_SLOT_ARRAY=0x0201c510 (gDuelFieldSlots)
+- PLAYER_STRIDE=0x868
+- TOKEN_ACTIVE_BIT=bit19 (lsls r0,r0,#0x13 checks bit)
+- COPY_OFFSET=0x8 (halfword copy offset in both source and dest nodes)

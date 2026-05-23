@@ -1,0 +1,7 @@
+Effect node handler dispatched via effect_node table. Checks [r0+4] bit2 guard; returns if nonzero. Reads card_id from [r0+0]: if 0x1352 (Numinous Healer), loops count_extra_deck_cards_by_id times calling submit_effect_zone_lp_and_shape_sprites; if 0x135a (Attack and Receive), loops calling submit_lp_indicator_with_slot_xor_flag instead. Both paths use player bit0 and zone field to determine side.
+
+Constants: CARD_ID_Numinous_Healer=0x1352, CARD_ID_Attack_and_Receive=0x135a, GUARD_BIT_MASK=0x4.
+
+Inputs: r0=ptr effect_node ([+0]=card_id u16, [+2]=flags u8 with player bit0 and zone bits[6:2], [+4]=guard_bits u8).
+Returns: r0=0 (void semantic, fixed return 0).
+Side effects: writes sprite queue (via submit_effect_zone_lp_and_shape_sprites or submit_lp_indicator_with_slot_xor_flag, looped N times where N=count_extra_deck_cards_by_id).
