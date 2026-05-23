@@ -1,0 +1,11 @@
+Called to check whether slot r0 satisfies the Water Dragon (0x1951, Oxygeddon/Hydrogeddon pair) equip activation conditions. Three-step check: (1) count_monster_slots_for_player(player_id) > 2; (2) check_field_spell_neo_daedalus_group_placeable(player_id) returns nonzero; (3) dispatch_effect_handler_by_card_id(player_id, card_id, table_A=0x194f/Hydrogeddon) > 1 AND dispatch_effect_handler_by_card_id(player_id, card_id, table_B=0x1950/Oxygeddon) > 0. All pass returns 1, otherwise 0. Called from FUN_08059fc4 in the card_id==0x1951 Water Dragon branch.
+
+Constants:
+- CARD_ID_HYDROGEDDON=0x194f (Hydrogeddon; table A)
+- CARD_ID_OXYGEDDON=0x1950 (Oxygeddon; table B)
+- CARD_ID_WATER_DRAGON=0x1951 (Water Dragon; context of caller)
+- MONSTER_SLOT_THRESHOLD=2 (count must be > 2)
+
+Parameters:
+- r0: u32* slot_ptr (slot data pointer; byte[+2] bit0=player_id, halfword[+0]=card_id)
+- returns: r0 = u32 bool (1=all conditions met, 0=not eligible)

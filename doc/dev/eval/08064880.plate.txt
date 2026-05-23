@@ -1,0 +1,20 @@
+Called to compute and write LP delta amounts to output buffer based on equip card_id. Accepts slot pointer r0 and output address r1 (r7), clears [r7+0] and [r7+4] to zero, then routes via large switch on card_id to corresponding LP delta sub-functions: includes write_equip_lp_delta_scaled_by_lp_count (0x161d, Des Koala), write_equip_lp_delta_by_opponent_side (0x13a8, Woodland Sprite), write_equip_lp_delta_by_own_side (0x118a, Ameba), write_equip_lp_delta_by_alt_player, write_equip_lp_delta_negated_atk, write_equip_lp_delta_minar (0x11bc, Minar), write_equip_lp_delta_dark_rabbit and dozens of other named equip card effects. Ends via restore_equip_effect_frame to clean stack frame. Returns 0 via pop {r3}; bx r3 (Sub-case E).
+
+Constants:
+- CARD_ID_DES_KOALA=0x161d (Des Koala; scaled LP count path)
+- CARD_ID_WOODLAND_SPRITE=0x13a8 (Woodland Sprite; opponent side path)
+- CARD_ID_AMEBA=0x118a (Ameba; own side path)
+- CARD_ID_MINAR=0x11bc (Minar)
+- player_stride=0x868
+- gDuelFieldSlots=0x0201c510
+- gDuelFieldState=0x0201c5d8
+
+Parameters:
+- r0: u32* slot_ptr (equip slot pointer; byte[+2] bit0=player_id, byte[+3] bit25=facing, halfword[+0]=card_id, halfword[+8]=ATK)
+- r1: u32* lp_output_ptr (LP delta output address; [+0]=player0_delta, [+4]=player1_delta)
+- returns: r0 = u32 0 (always; pop {r3}; bx r3 exit)
+
+Side effects:
+- [r7+0x0] := 0 (initial clear LP output player0 delta)
+- [r7+0x4] := 0 (initial clear LP output player1 delta)
+- branch paths write [r7 + player_idx*4] via write_equip_lp_delta_* sub-functions

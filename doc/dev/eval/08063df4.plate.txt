@@ -1,0 +1,11 @@
+Called to check whether the equip chain node for a slot has an active marker at a specific zone offset. First calls check_equip_slot_chain_absent(r0=slot_ptr); if chain is empty (returns 0) returns 0 immediately. Otherwise extracts player_id (bit0) and zone_idx (bits[5:1]) from slot_ptr[+2], computes gDuelFieldSlots entry address (player*0x868 + slot_offset*20 + base), reads [slot+0xc] field and checks if nonzero. Returns 1 if nonzero, 0 if zero. Pure read.
+
+Constants:
+- player_stride=0x868
+- slot_entry_size=0x14 (20 bytes; r0*5<<2)
+- gDuelFieldSlots=0x0201c510
+- chain_flag_offset=0xc
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2] bit0=player_id, bits[5:1]=zone_idx)
+- returns: r0 = u32 bool (1=chain active at zone entry, 0=absent or inactive)

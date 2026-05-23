@@ -1,0 +1,30 @@
+Called to compute draw counter increment by equip card_id and drive sprite tick. Accepts slot pointer r0, extracts player_id and saves it; loads card_id for large switch dispatch. Each card routes to one of three terminal labels: LAB_0806589a (movs r1,#1; calls tick_zone_sprite_pipeline_with_update_flag with r1=1), LAB_08065934 (movs r0,#2; with r0=2), or LAB_0806596e (r0=r8 keeps original value). Some card paths include LP read (gP1LifePoints + player_stride*player) for special computation. Des Lacooda (0x1533) path calls check_value_in_slot_chain; Elemental Hero Bubbleman (0x18f9) path calls count_extra_deck_cards_by_id. Burst Return (0x1988) path reads [r7+0x14] chain data to determine player attribution and sets r8 increment. Ends with tick_zone_sprite_pipeline_with_update_flag(player_id, zone_idx, sprite_sub_zone). Returns 0 via pop {r1}; bx r1 (Sub-case E).
+
+Constants:
+- CARD_ID_PRECIOUS_CARDS=0x1662 (Precious Cards from Beyond)
+- CARD_ID_CARD_OF_SAFE_RETURN=0x1403 (Card of Safe Return)
+- CARD_ID_SKELENGEL=0x11c2 (Skelengel)
+- CARD_ID_MASKED_SORCERER=0x1082 (Masked Sorcerer)
+- CARD_ID_APPROPRIATE=0x1353 (Appropriate)
+- CARD_ID_AIRKNIGHT_PARSHATH=0x139f (Airknight Parshath)
+- CARD_ID_TOON_MASKED_SORCERER=0x1563 (Toon Masked Sorcerer)
+- CARD_ID_DES_LACOODA=0x1533 (Des Lacooda)
+- CARD_ID_HELPING_ROBO=0x15dc (Helping Robo For Combat)
+- CARD_ID_ROYAL_MAGICAL_LIBRARY=0x161a (Royal Magical Library)
+- CARD_ID_DARK_MIMIC_LV1=0x17d5 (Dark Mimic LV1)
+- CARD_ID_MOLTEN_ZOMBIE=0x16f7 (Molten Zombie)
+- CARD_ID_AVATAR_OF_POT=0x1748 (Avatar of The Pot)
+- CARD_ID_CORPSE_YATA=0x1776 (Corpse of Yata-Garasu)
+- CARD_ID_CYBER_ARCHFIEND=0x1911 (Cyber Archfiend)
+- CARD_ID_BUBBLEMAN=0x18f9 (Elemental Hero Bubbleman)
+- CARD_ID_BROWW=0x1966 (Broww, Huntsman of Dark World)
+- CARD_ID_CHAINSAW_INSECT=0x19c7 (Chainsaw Insect)
+- gP1LifePoints=0x0201c4e0
+- player_stride=0x868
+
+Parameters:
+- r0: u32* slot_ptr (equip slot pointer; byte[+2] bit0=player_id, bits[5:1]=zone_idx, halfword[+0]=card_id)
+- returns: r0 = u32 0 (always; pop {r1}; bx r1 Sub-case E)
+
+Side effects:
+- indirectly updates OAM sprite state via tick_zone_sprite_pipeline_with_update_flag

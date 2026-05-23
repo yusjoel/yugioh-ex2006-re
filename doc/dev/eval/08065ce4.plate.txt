@@ -1,0 +1,12 @@
+Called to check whether a slot paired with Dark Magician (0x0fc9) equip is placeable. Flow: (1) checks slot player_id (byte[+2] bit0) matches r1, returns 0 if not; (2) uses player_id and zone_idx to locate slot in gDuelFieldSlots, reads [+0x0] bits[12:0] card id, calls check_card_pair_allowed(card_id, 0x0fc9); (3) if allowed: calls check_slot_card_can_be_equipped(player_id, r1=target_player, zone_idx); (4) if same side (player_id==target_player) proceeds directly to equip check; otherwise reads halfword[+8] ATK nonzero before continuing; (5) calls count_available_monster_slots(player_id); (6) if returns 0 and same side, calls check_slot_placement_blocked_by_field_effect(target_player, zone_idx). All pass returns 1.
+
+Constants:
+- CARD_ID_DARK_MAGICIAN=0x0fc9 (Dark Magician; pair target)
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2] bit0=player_id, bits[5:1]=zone_idx, halfword[+0]=card_id)
+- r1: u32 target_player_id (target player id [0..1])
+- r2: u32 zone_idx (target zone index [0..4])
+- returns: r0 = u32 bool (1=pair placeable, 0=not placeable)

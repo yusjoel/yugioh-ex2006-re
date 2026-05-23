@@ -1,0 +1,12 @@
+Called to route to corresponding case handler based on current equip chain state code. Computes slot player_id XOR facing_bit (slot[+2] bit0 XOR slot[+3] bit7) as r5 (ownership_side), reads gDuelFieldState[+0x4a0] chain state code, subtracts 0x64 and compares with upper bound 0x1c (=28); out of range returns 0. Within range dispatches via jump table (29 entries, base 0x08066230): active cases include state==0x64 (100), 0x78 (120), 0x7d (125), 0x7e (126), 0x80 (128), others default return 0. Returns 0 via pop {r1}; bx r1 (Sub-case E for mismatch paths), or case handlers return state codes via r0. Called from FUN_080712a0 in equip chain state 0x80 + check_value_in_slot_chain match path.
+
+Constants:
+- gDuelFieldState=0x0201b290
+- EQUIP_STATE_OFFSET=0x4a0 (= 0x94<<3)
+- STATE_BASE=0x64 (switch base value; state range [0x64..0x80])
+- STATE_RANGE_MAX=0x1c (= 28; out-of-range check upper bound)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2] bit0=player_id, byte[+3] bit7=facing_bit)
+- r1: u32 chain_slot_context (chain slot context from caller r9)
+- returns: r0 = u32 (0=state out-of-range or unhandled case; various state codes per active case)

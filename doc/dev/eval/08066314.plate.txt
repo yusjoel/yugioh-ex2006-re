@@ -1,0 +1,12 @@
+Called to write OAM attributes to the sprite queue corresponding to the slot owner's player side. Reads slot[+2] bit0 (player_id): if player_id==0 uses attr=0x27; if player_id==1 loads DWORD_08066334=0x8027; calls enqueue_sprite_attr_record(attr, 0, 0, 0). Always returns 0 via pop {r1}; bx r1 (Sub-case E).
+
+Constants:
+- OAM_ATTR_P0=0x27 (player 0 sprite attr)
+- OAM_ATTR_P1=0x8027 (player 1 sprite attr; 0x8000=obj palette bank select bit)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2] bit0=player_id)
+- returns: r0 = u32 0 (always; pop {r1}; bx r1 Sub-case E)
+
+Side effects:
+- indirectly writes OAM sprite attribute queue via enqueue_sprite_attr_record

@@ -1,0 +1,10 @@
+Called to check whether a slot satisfies Elemental Hero Clayman (0x18a8) equip chain pairing conditions. Check chain: (1) halfword[+2] bits[11:2] AND 0xfc0 == 0x480 (0x90<<3, specific zone type); (2) gDuelFieldState[+0x8] == 0 (no active chain interrupt); (3) gDuelFieldState[+0x4] bit0 == slot.player_id; (4) check_slot_card_pair_allowed(player_id, zone_idx=gDuelFieldState[+0x20], card_id_B=0x18a8). All pass returns 1. Used during equip activation to confirm Clayman pairing is allowed.
+
+Constants:
+- ZONE_TYPE_MASK=0x480 (0x90<<3; equip zone type)
+- gDuelFieldState=0x0201bb90
+- CARD_ID_CLAYMAN=0x18a8 (Elemental Hero Clayman)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; halfword[+2]=type_flags, byte[+2]=packed player+zone)
+- returns: r0 = u32 bool (1=Clayman pair allowed, 0=not eligible)

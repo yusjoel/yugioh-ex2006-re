@@ -1,0 +1,16 @@
+Called when equip partner slot is nonempty to update equip state flags and refresh target bitmap. Accepts slot_ptr (r0) and partner_ptr (r1): if partner_ptr==NULL returns 0 immediately. Otherwise ORs partner[+4] byte with 0x2|partner[+4].byte|0x4|0x8 and writes back to partner[+4], then extracts player_id (bit0) and zone_idx (bits[5:1]) from partner[+2], extracts sprite zone field from partner[+4] halfword and calls enqueue_field_slot_sprite_with_state_update to enqueue sprite update, finally calls update_equip_target_bitmap_zone14 to refresh equip target bitmap. Returns 0 via pop {r1}; bx r1 (Sub-case E).
+
+Constants:
+- EQUIP_FLAG_MASK=0xe (0x2|partner[+4]|0x4|0x8 three-way OR flag merge)
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+
+Parameters:
+- r0: u32* slot_ptr (equip source slot pointer)
+- r1: u32* partner_ptr (partner slot pointer; NULL -> early return 0)
+- returns: r0 = u32 0 (always; pop {r1}; bx r1 Sub-case E)
+
+Side effects:
+- [r4+0x4] |= (0x2 | [r4+0x4].byte | 0x4 | 0x8) (partner slot[+4] three-way OR flag set)
+- indirectly updates OAM sprite attributes via enqueue_field_slot_sprite_with_state_update
+- indirectly updates EWRAM equip target bitmap via update_equip_target_bitmap_zone14

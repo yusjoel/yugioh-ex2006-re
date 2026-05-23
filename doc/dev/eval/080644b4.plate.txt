@@ -1,0 +1,16 @@
+Called to check whether a slot satisfies composite equip conditions based on equip chain pairing. Flow: (1) find_equip_chain_pair_across_field to find cross-field pair chain node, returns pair_id (0xFFFF = fail); (2) check_value_in_slot_chain(player_id, zone_idx, card_id) verifies target card is in chain; (3) splits pair_id high 8 bits (pair zone_idx) and low 8 bits (pair player_id); (4) check_slot_card_can_be_equipped(player_id, pair_zone_idx, pair_player_id); (5) count_monster_slots_accepting_card checks for accepting monster slot; (6) check_field_spell_neo_daedalus_group_placeable; (7) reads gP1LifePoints chain slot data, verifies chain slot nonempty; (8) lookup_slot_display_value_by_card_id + dispatch_effect_handler_by_card_id. All pass returns 1.
+
+Constants:
+- PAIR_NOT_FOUND=0xffff (find_equip_chain_pair_across_field invalid return)
+- gP1LifePoints=0x0201c4e0
+- player_stride=0x868
+- gDuelFieldSlots=0x0201c510
+- gDuelFieldState=0x0201b290 (+0x4cc=effect state; +0x4d4=base offset)
+- SCORE_MAX=0x5dc (1500)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2]=packed player+zone+flags, halfword[+0]=card_id, word[+0x14]=link_data)
+- returns: r0 = u32 bool (1=eligible, 0=not eligible)
+
+Side effects:
+- [r6+0xa] := r3 (strh r3,[r6,#0xa] - writes slot[+0xa] pair index)

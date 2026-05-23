@@ -1,0 +1,17 @@
+Called to verify equip zone bitmap count and enqueue sprite attributes for slots with state code 2. Checks equip_chain_slot[+4]&0x4 (block flag); if set returns 0 immediately. Extracts player_id and zone_idx from equip_chain_slot[+2], computes gDuelFieldSlots entry address, reads sprite zone field (bits[25:18]) and opposing facing bit, sums them as r2; compares with equip_count field from equip_chain_slot[+4] halfword, returns 0 if mismatch. If ATK is nonzero: calls set_field_slot_bit_with_sprite_update(player, zone_idx, 4, 1) to set bit and update sprite; then double loop (2 players x 5 slots) calls enqueue_sprite_attr_with_mode(player, zone_idx, pzone_pack, 0, mode=7) for slots with state_code==2. Returns 0 via pop {r1}; bx r1 (Sub-case E).
+
+Constants:
+- FLAG_BIT2=0x4 (equip_chain_slot[+4] bit2 = block flag)
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+- SPRITE_MODE_7=0x7 (state_code==2 slots use mode=7 sprite attributes)
+- EQUIP_BIT_FLAG=0x4 (set_field_slot_bit_with_sprite_update bit parameter)
+
+Parameters:
+- r0: u32* slot_ptr (outer slot pointer; used for loop base address computation)
+- r1: u32* equip_chain_slot_ptr (equip chain slot pointer; byte[+2]=zone/player, halfword[+4]=equip_count, halfword[+8]=ATK)
+- returns: r0 = u32 0 (always; pop {r1}; bx r1 Sub-case E)
+
+Side effects:
+- sets equip_chain_slot bit4 and updates sprite via set_field_slot_bit_with_sprite_update
+- indirectly writes OAM sprite queue via enqueue_sprite_attr_with_mode (state_code==2 slots)

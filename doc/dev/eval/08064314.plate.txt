@@ -1,0 +1,12 @@
+Called to check whether a slot satisfies the spell zone placeable condition and has no active chain link node. First verifies halfword[+2] bits[11:2] AND 0xfc0 == 0x140 (0xa0<<1, spell zone type); if passes calls check_spell_zone_slot_placeable(player_id); if placeable, locates the chain slot at gP1LifePoints [player*0x868 + zone_idx*20 + 0x14] and checks if field is nonzero. Returns 0 if chain_absent (field==0); returns 1 if field is nonzero. Pure read.
+
+Constants:
+- ZONE_TYPE_MASK=0x140 (0xa0<<1; spell zone type)
+- EQUIP_TYPE_MASK=0xfc0 (0xfc<<4)
+- gP1LifePoints=0x0201c4e0 (player LP base)
+- player_stride=0x868
+- slot_link_offset=0x14
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; halfword[+2]=type flags, byte[+2] bit0=player_id, bits[5:1]=zone_idx)
+- returns: r0 = u32 bool (1=placeable with nonzero chain link, 0=not placeable or chain absent)

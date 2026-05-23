@@ -1,0 +1,19 @@
+Called to update equip slot sprite attributes and conditionally trigger additional sprites based on card type. Accepts slot pointer r0, extracts player_id and zone_idx, computes zone_code values for both sides and sums them, compares with equip_count field halfword[+4]. If matched: (1) check_effect_slot_matches_zone_entry verifies effect slot matches zone entry; reads zone player_id and zone_idx; if check_slot_card_eligible_by_card_id fails, sets slot[+4] bit3 and exits; otherwise (2) checks card_extended_stat_field6, if ==0x17 and slot[+4] bit2 is set, sets bit3; (3) invoke_zone_slot_sprite_attr_for_equip_type updates sprite attributes; (4) if card_id==0x12c6 or 0x145b additionally calls enqueue_sprite_attr_with_xy_split. Always returns 0.
+
+Constants:
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+- FLAG_BIT3=0x8 (slot[+4] error/block flag)
+- FLAG_BIT2=0x4 (slot[+4] prerequisite flag)
+- FIELD6_VALUE=0x17 (extended stat field6 check value 23)
+- CARD_ID_A=0x12c6 (xy_split trigger card A)
+- CARD_ID_B=0x145b (Scroll of Bewitchment; xy_split trigger card B)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; byte[+2]=packed player+zone, halfword[+0]=card_id, halfword[+4]=equip_count)
+- r1: u16 zone_entry_ref (zone entry reference)
+- returns: r0 = u32 0 (always; side-effect only)
+
+Side effects:
+- [r7+4] |= 0x8 (slot[+4] bit3 set: error/block flag, conditional path)
+- indirectly updates OAM sprite attributes via invoke_zone_slot_sprite_attr_for_equip_type

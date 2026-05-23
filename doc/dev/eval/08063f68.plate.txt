@@ -1,0 +1,12 @@
+Called to check whether slot r1 (target slot) satisfies cross-side equip conditions. Accepts two slot pointers: r0 (equipper) / r1 (target). Returns 0 immediately if r1==NULL. Check chain: (1) r1[+2] bits[5:1] (zone_idx) <= 0xa (10); (2) r1[+3] bits[5:4] AND 0x30 == 0 (no block flags); (3) player_id differs across sides (r1.bit0 != r0.bit0); (4) get_card_extended_stat_field6(r1.card_id) == 0x16; (5) get_card_extended_stat_field9(r1.card_id) == 0; (6) get_lp_count_minus_zone_slot_offset(r0) nonzero. All pass returns 1.
+
+Constants:
+- ZONE_IDX_MAX=0xa (zone_idx <= 10)
+- BLOCK_FLAG_MASK=0x30 (bits[5:4] of byte[+3])
+- FIELD6_VALUE=0x16 (extended stat field6 required value 22)
+- FIELD9_VALUE=0 (extended stat field9 must be 0)
+
+Parameters:
+- r0: u32* equip_slot_ptr (equipper slot; byte[+2] bit0=player_id)
+- r1: u32* target_slot_ptr (target slot; byte[+2]=packed; halfword[+0]=card_id; NULL=skip)
+- returns: r0 = u32 bool (1=eligible, 0=not eligible)

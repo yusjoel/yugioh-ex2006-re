@@ -1,0 +1,8 @@
+Called to synchronize the equip zone bitmap and submit the default equip target bitmap. Only 4 effective instructions: (1) calls query_equip_zone_bitmap_with_active_flag(slot_ptr) to get equip zone bitmap into r1; (2) calls query_equip_target_bitmap_default(slot_ptr, r1) to submit update. Always returns 0. Called from FUN_080714ec (equip chain dispatcher) in state 0x7e branch to refresh zone bitmap state after equip chain activation.
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer)
+- returns: r0 = u32 0 (always; side-effect only)
+
+Side effects:
+- indirectly updates equip target bitmap (EWRAM equip bitmap field) via query_equip_target_bitmap_default

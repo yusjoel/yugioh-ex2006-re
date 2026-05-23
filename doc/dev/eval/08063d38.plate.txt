@@ -1,0 +1,12 @@
+Called to check whether a slot satisfies dark-attribute field equip conditions. Chains multiple static checks: (1) count_equippable_slots_for_card(player_id, allow_facedown=-1) != 0; (2) slot halfword[+2] bits[11:2] AND 0xfc0 == 0x200 (specific field spell zone type 0x80<<2); (3) extract linked monster slot index from slot[+0x14], read gP1LifePoints[player][slot].card_id, verify card_id passes check_card_type_is_spell; (4) check_card_id_is_equip_excluded_range(card_id) returns nonzero; (5) slot[+0x14] bit14 is negative. All pass returns 1.
+
+Constants:
+- EQUIP_TYPE_MASK=0xfc0 (0xfc<<4; slot halfword[+2] bits[11:2])
+- DARK_FIELD_ZONE_TYPE=0x200 (0x80<<2; specific field spell zone type)
+- gP1LifePoints=0x0201c4e0 (player LP/slot base)
+- player_stride=0x868
+- stat_table_offset=0x10c0 (0x87<<5)
+
+Parameters:
+- r0: u32* slot_ptr (slot data pointer; byte[+2]=packed fields, halfword[+0]=card_id, word[+0x14]=link_data)
+- returns: r0 = u32 bool (1=eligible, 0=not eligible)

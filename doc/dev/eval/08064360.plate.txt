@@ -1,0 +1,13 @@
+Called to check whether a slot satisfies zone mask eligibility within the active equip chain. Checks: (1) halfword[+2] bits[11:2] AND 0xfc0 == 0x500 (0xa0<<3, specific zone type); (2) gDuelFieldState[+0x8]==0 (no active chain interrupt); (3) ATK (halfword[+0x8]) of monster slot pointed by chain [gDuelFieldState[+0x4] player & gDuelFieldState[+0x20] zone_idx] is nonzero; (4) compute_slot_zone_eligibility_mask(chain_player_id, chain_zone_idx) to get zone mask; (5) chain slot [+0xc] AND mask result is nonzero. All pass returns 1.
+
+Constants:
+- ZONE_TYPE_MASK=0x500 (0xa0<<3)
+- EQUIP_TYPE_MASK=0xfc0 (0xfc<<4)
+- gDuelFieldState=0x0201bb90
+- gDuelFieldSlots=0x0201c510
+- player_stride=0x868
+- slot_entry_size=0x14 (20 bytes)
+
+Parameters:
+- r0: u32* slot_ptr (slot pointer; halfword[+2]=type_flags, byte[+2] bit0=player_id, bits[5:1]=zone_idx)
+- returns: r0 = u32 bool (1=zone mask eligible in active chain, 0=not eligible)
