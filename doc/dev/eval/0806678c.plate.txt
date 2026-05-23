@@ -1,0 +1,17 @@
+enqueue_equip_zone_sprite_with_chain_check: Equip zone chain sprite enqueue with count validation.
+Extracts player_id (bit0) and slot_col (bits[6:2]) from slot[+0x2].
+Locates dual-side slot entry in gDuelFieldSlots; compares actual occupancy count
+(bits[29:24] decoded) vs expected count from [+0x4].bits[14:7].
+If matched: checks chain_head [+0x8] nonzero; if valid ->
+  enqueue_sprite_attr_with_mode(player, slot_col, encoded_word, mode=2).
+card_id 0x19a5 (Raviel, Lord of Phantasms) hit: reads [+0x8] chain_link, replaces r7.
+All paths: movs r0,#0 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  CARD_ID_RAVIEL = 0x19a5 (Raviel, Lord of Phantasms)
+  SPRITE_MODE = 2 (enqueue_sprite_attr_with_mode mode parameter)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2]=flags, [+0x4]=count halfword, [+0x8]=chain halfword)
+Return: void (movs r0,#0 fixed)

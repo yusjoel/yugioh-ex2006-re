@@ -1,0 +1,19 @@
+enqueue_equip_zone_sprite_with_deck_count: Card-id-gated deck-count sprite enqueue.
+Reads card_id halfword from slot[+0x0]; compares against three cards:
+  Soul-Absorbing Bone Tower (0x1744) -> r2=2
+  Needle Worm (0x11d8) -> r2=5
+  Malice Ascendant (0x19d0) -> r2=count_extra_deck_cards_by_id(player)
+  default -> r2=1
+Extracts player_id from slot[+0x2].bit0; computes opponent_side=1-player_id.
+Calls enqueue_equip_zone_sprite_attr_full(opponent_side, r2, flag=1).
+Exit: movs r0,#0 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  CARD_ID_SOUL_ABSORBING_BONE_TOWER = 0x1744 (Soul-Absorbing Bone Tower; count=2)
+  CARD_ID_NEEDLE_WORM = 0x11d8 (Needle Worm; count=5)
+  CARD_ID_MALICE_ASCENDANT = 0x19d0 (Malice Ascendant; count from extra deck)
+  DEFAULT_COUNT = 1 (r2 default)
+  EQUIP_SPRITE_FLAG = 1 (enqueue_equip_zone_sprite_attr_full mode flag)
+
+Params: r0=slot_ptr (effect slot struct, [+0x0]=card_id halfword, [+0x2].bit0=player_id [0..1])
+Return: void (movs r0,#0 fixed)

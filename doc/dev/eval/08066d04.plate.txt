@@ -1,0 +1,16 @@
+enqueue_equip_zone_sprite_mode4_for_slot: Validation-gated sprite enqueue, mode=4.
+Calls check_effect_slot_matches_zone_entry; if not matched, return void.
+Calls read_effect_slot_side_and_type to decode player_id/slot_col.
+Locates gDuelFieldSlots slot entry; checks chain_head [+0x8] nonzero.
+If chain_head valid: pushes extra=0 on stack;
+  calls enqueue_sprite_attr_with_mode(player, slot_col, card_id=0x1119, mode=4).
+Exit: movs r0,#0; pop. indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  CARD_ID_SANGA_OF_THUNDER = 0x1119 (Sanga of the Thunder; used as r2 in enqueue)
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  SPRITE_MODE = 4 (enqueue_sprite_attr_with_mode mode parameter)
+
+Params: r0=slot_ptr (effect slot struct)
+Return: void (movs r0,#0 fixed)

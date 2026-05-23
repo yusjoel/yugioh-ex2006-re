@@ -1,0 +1,19 @@
+dispatch_equip_zone_sprite_by_effect_type: Jump-table dispatcher for equip zone sprite sub-paths.
+Reads gDuelFieldState+0x4a0 (EQUIP_STATE_OFFSET=0x4a0=0x94<<3).
+Table index = state - 0x75; table at 0x0806688c (12 entries, indices 0x0..0xb).
+Out-of-range (>0xb) or default -> LAB_08066a8c (return 0).
+Entry from slot[+0x2]: player_id (bit0) and XOR'd r5 flag (bit1 of [+0x3]).
+Jump via .hword 0x4687 (mov pc, r0). 5 callers in duel_field region.
+
+Constants:
+  gDuelFieldState = 0x0201b290
+  EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  EFFECT_TYPE_BASE = 0x75 (state - base -> table index)
+  EFFECT_TYPE_MAX = 0x0b (table size - 1)
+  JUMP_TABLE_ADDR = 0x0806688c (12 entries)
+
+Callers: 0x08074af4, 0x08078658, 0x08079f5c, 0x08079f80, 0x0807a65c [all duel_field]
+
+Params: r0=slot_ptr (effect slot struct, [+0x2]=flags, [+0x3]=flags2),
+        r1=u32 (second arg passed to sub-functions)
+Return: void (movs r0,#0 fixed; pop {r4,r5,r6}; pop {r1}; bx r1)

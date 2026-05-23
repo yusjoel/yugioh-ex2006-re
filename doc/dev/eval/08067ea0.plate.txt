@@ -1,0 +1,28 @@
+dispatch_equip_slot_sprite_with_field6_score: State-machine sprite dispatcher with field6 score gate.
+Checks slot[+0x4].bit2 (skip). Calls read_effect_slot_side_and_type -> player_id / slot_col.
+Reads gDuelFieldSlots slot entry card_id; reads gDuelFieldState+0x4a0 state; four-way dispatch:
+  state==0x80: check_effect_slot_matches_zone_entry; check [+0x6]!=0 and [+0x8]==0;
+    dispatch_slot_sprite_attr_with_equip_head_flag(slot, player, slot_col, 1);
+    set_field_slot_bit_with_sprite_update(player, slot_col, 1, 1) -> return 0x7f.
+  state==0x7f: enqueue_sprite_attr_for_slot_indicator;
+    enqueue_sprite_attr_type10_halfword(0x1e);
+    scan_field_for_equip_set_slot_sprite_update(-1, 0) -> return 0x7e.
+  state==0x7e: get_slot_field6_score(player, slot_col) vs FIELD6_SCORE_THRESHOLD=0x7d0 (=0xfa<<3=2000);
+    if score > 0x7d0 -> dispatch_slot_sprite_attr_with_equip_head_flag + set_field_slot_bit;
+    else -> check_equip_slot_eligible_in_target_bitmap.
+  default: return 0.
+indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  gDuelFieldState = 0x0201b290
+  gDuelFieldSlots = 0x0201c510
+  PLAYER_STRIDE = 0x868
+  STATE_PUSH_HEAD_SPRITE = 0x80
+  STATE_ENQUEUE_INDICATOR = 0x7f
+  STATE_CHECK_FIELD6 = 0x7e
+  FIELD6_SCORE_THRESHOLD = 0x7d0 (= 0xfa<<3 = 2000)
+  INDICATOR_TYPE = 0x1e (enqueue_sprite_attr_type10_halfword arg)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1], [+0x4].bit2=skip)
+Return: r0=u32 (state transition: 0x7f / 0x7e / 1 / 0)

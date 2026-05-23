@@ -1,0 +1,26 @@
+tick_equip_banisher_sprite_state_machine: Five-state machine for Banisher of the Light sprite.
+Checks slot[+0x4].bit2 (skip). Reads gDuelFieldState+0x4a0; five-way dispatch:
+  state==0x80: check gP1LifePoints+player*0x868+0xc nonzero ->
+    dispatch_equip_zone_sprite_banisher_of_the_light(opponent, 0, 0) -> return 0x80.
+  state==0x7f: check gP1LifePoints+opponent*0x868+0xc nonzero ->
+    dispatch_equip_zone_sprite_banisher_of_the_light(opponent, 0, 1) -> return 0x7f (else 0x7e).
+  state==0x7e: increment_lp_bar_display_counter + tick_zone_sprite_pipeline(opponent, 5) -> return 0x7d.
+  state==0x7d: tick_pipeline(opponent, 5) + decrement_lp_bar_display_counter -> return 0x7c.
+  default: return 0.
+player_id from slot[+0x2].bit0. indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  gDuelFieldState = 0x0201b290
+  gP1LifePoints = 0x0201c4e0
+  PLAYER_STRIDE = 0x868
+  LP_CHECK_OFFSET = 0xc
+  PIPELINE_UPDATE_FLAG = 5
+  STATE_DISP_BANISHER_OWN = 0x80
+  STATE_DISP_BANISHER_OPP = 0x7f
+  STATE_INC_LP = 0x7e
+  STATE_TICK_DEC_LP = 0x7d
+  STATE_TICK_PHASE2 = 0x7c
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1], [+0x4].bit2=skip)
+Return: r0=u32 (state transition: 0x80/0x7f/0x7e/0x7d/0x7c/0)

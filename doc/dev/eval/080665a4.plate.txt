@@ -1,0 +1,14 @@
+apply_lp_delta_for_slot_player: Minimal wrapper.
+Reads slot[+0x2].bit0 = player_id, computes opponent_side = 1-player_id,
+then calls apply_lp_delta_if_slot_active(opponent_side, delta=1, type=1).
+Fixed delta=1 and type=1 indicate unit LP change on equip activation.
+Exit: movs r0,#0; pop {r1}; bx r1 (void).
+
+Callers: FUN_08073428 (hand slot found), FUN_08074770 (slot type 0x3c0 branch).
+
+Constants:
+  LP_DELTA = 1 (fixed delta amount)
+  LP_TYPE = 1 (fixed type)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1])
+Return: void (movs r0,#0 fixed)

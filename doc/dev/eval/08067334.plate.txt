@@ -1,0 +1,11 @@
+tick_zone_sprite_pipeline_opponent_side: Minimal wrapper for opponent-side pipeline tick.
+Reads slot[+0x2].bit0 = player_id via lsls/lsrs #0x1f.
+Computes opponent_side = 1 - player_id.
+Calls tick_zone_sprite_pipeline_with_update_flag(opponent_side, update_flag=2).
+Exit: movs r0,#0; pop {r1}; bx r1 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  UPDATE_FLAG = 2 (tick_zone_sprite_pipeline_with_update_flag flag parameter)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1])
+Return: void (movs r0,#0 fixed)

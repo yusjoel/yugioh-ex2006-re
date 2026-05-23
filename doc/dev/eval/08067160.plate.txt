@@ -1,0 +1,18 @@
+dispatch_effect_zone_lp_sprites_by_slot_flags: LP and shape sprite dispatcher gated by slot flags.
+Checks slot[+0x4].bit2 (SLOT_SKIP_BIT=0x4); if set, skip all logic.
+Reads slot[+0x3].bits[5:4] (mask 0x30):
+  != 0x20: extract player_id (slot[+0x2].bit0); call submit_effect_zone_lp_and_shape_sprites(player, 0xbb8).
+  == 0x20 (FLAG_ACTIVE_PHASE): read slot[+0x14] (signed); if < 0 ->
+    submit_effect_zone_lp_and_shape_sprites(player, 0xbb8).
+In both cases, unconditionally call enqueue_sprite_attr_record_with_cap(player_id, 0x1388).
+Exit: movs r0,#0; pop {r4}; pop {r1}; bx r1 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  SLOT_SKIP_BIT = 0x4 (bit2 of slot[+0x4])
+  FLAG_MASK_BITS54 = 0x30 (bits[5:4] of slot[+0x3])
+  FLAG_ACTIVE_PHASE = 0x20 (specific phase value)
+  LP_SHAPE_PARAM = 0xbb8 (= 3000; r1 for submit_effect_zone_lp_and_shape_sprites)
+  SPRITE_CAP_PARAM = 0x1388 (= 5000; r1 for enqueue_sprite_attr_record_with_cap)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2]=flags, [+0x3]=phase_flags, [+0x4]=flags2, [+0x14]=signed field)
+Return: void (movs r0,#0 fixed)

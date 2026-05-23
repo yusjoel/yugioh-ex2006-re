@@ -1,0 +1,17 @@
+enqueue_dual_equip_slot_sprites_with_whitelist_check: Dual-side equip sprite enqueue with whitelist validation.
+Extracts player_id (bit0) and slot_col (bits[6:2]) from slot[+0x2].
+In gDuelFieldSlots compares actual occupancy count vs expected [+0x4].bits[14:7].
+If matched: calls check_effect_slot_matches_zone_entry to verify zone entry.
+After verification: checks two sides have different player_id (cmp r4,r6).
+Calls check_slot_equip_whitelist_with_monster_space for each side.
+If both pass: enqueue_equip_slot_sprite_attr x2 + enqueue_sprite_attr_with_mode(mode=5) x2 +
+  enqueue_equip_chain_dual_slot_sprite_with_activation_scan.
+Exit: movs r0,#0 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  SPRITE_MODE_CHAIN = 5 (enqueue_sprite_attr_with_mode mode parameter)
+
+Params: r0=slot_ptr (effect slot struct)
+Return: void (movs r0,#0 fixed)

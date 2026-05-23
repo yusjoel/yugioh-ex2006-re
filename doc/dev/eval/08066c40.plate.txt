@@ -1,0 +1,23 @@
+enqueue_equip_zone_sprite_with_spell_card_mode: Equip zone sprite enqueue with spell card mode select.
+Extracts player_id (bit0) and slot_col (bits[6:2]) from slot[+0x2].
+In gDuelFieldSlots compares actual occupancy count vs expected [+0x4].bits[14:7].
+If matched: calls check_effect_slot_matches_zone_entry; decodes zone entry player2/slot2;
+reads card_id [+0x0]; compares against:
+  Battle-Scarred (0x16a2), Shadow Spell (0x1243),
+  Ninjitsu Art of Decoy (0x17ff), Rare Metalmorph (0x184b).
+Special card hit: r3=0x7 (MODE_SPECIAL); else r3=0x6 (MODE_DEFAULT).
+r3 |= 0x10 (high mode bit set); calls enqueue_sprite_attr_with_mode(r4, encoded_r2, r3, 0).
+Exit: movs r0,#0 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  CARD_ID_BATTLE_SCARRED = 0x16a2 (Battle-Scarred)
+  CARD_ID_SHADOW_SPELL = 0x1243 (Shadow Spell)
+  CARD_ID_NINJITSU_DECOY = 0x17ff (Ninjitsu Art of Decoy)
+  CARD_ID_RARE_METALMORPH = 0x184b (Rare Metalmorph)
+  MODE_DEFAULT = 0x6
+  MODE_SPECIAL = 0x7
+
+Params: r0=slot_ptr (effect slot struct, [+0x2]=flags, [+0x4]=count halfword)
+Return: void (movs r0,#0 fixed)

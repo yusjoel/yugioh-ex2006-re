@@ -1,0 +1,8 @@
+enqueue_lp_counter_sprite_for_slot: Minimal wrapper.
+Reads slot[+0x2].bit0 = player_id via lsls/lsrs #0x1f,
+then calls enqueue_lp_counter_sprite_by_player(player_id).
+Adapts slot pointer to scalar player_id for LP counter sprite enqueue.
+Exit: movs r0,#0; pop {r1}; bx r1 (void). indeg=0 (fn-ptr: 0 hits).
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1])
+Return: void (movs r0,#0 fixed)

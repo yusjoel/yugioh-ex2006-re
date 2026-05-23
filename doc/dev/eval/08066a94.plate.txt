@@ -1,0 +1,18 @@
+apply_equip_activation_for_slot_with_chain_branch: Equip activation with chain/no-chain branch.
+Checks slot[+0x4].bit2 (SLOT_SKIP_BIT=0x4); if set, skip all logic and return 0.
+Calls check_effect_slot_matches_zone_entry; if matched, decodes player_id / slot_col.
+Verifies gDuelFieldSlots slot entry field_id [+0x6] != 0.
+Branches on chain_head [+0x8]:
+  chain_head!=0: apply_slot_equip_activation_with_eligibility_check(slot, player, slot_col, mode=0)
+  chain_head==0: apply_slot_equip_activation_with_eligibility_check(slot, player, slot_col, mode=1)
+Exit: movs r0,#0. indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  SLOT_SKIP_BIT = 0x4 (bit2 of slot[+0x4] = skip flag)
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  MODE_NO_CHAIN = 0 (mode when chain_head!=0)
+  MODE_WITH_CHAIN = 1 (mode when chain_head==0)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2]=flags, [+0x4]=flags2, [+0x6]=field_id, [+0x8]=chain_head)
+Return: void (movs r0,#0 fixed)

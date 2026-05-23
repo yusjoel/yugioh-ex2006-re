@@ -1,0 +1,12 @@
+enqueue_hand_spell_sprite_for_slot: Minimal wrapper.
+Reads slot[+0x2].bit0 = player_id; reads slot[+0x4] halfword,
+extracts spell_type via lsls#17/lsrs#23 (bits[14:7] -> [0..127]).
+Calls enqueue_hand_card_sprite_by_spell_type(player_id, spell_type, mode=1).
+Unpacks slot pointer into hand-spell sprite enqueue parameters.
+Exit: movs r0,#0; pop {r1}; bx r1 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  HAND_SPRITE_MODE = 1 (fixed mode)
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1], [+0x4].bits[14:7]=spell_type [0..127])
+Return: void (movs r0,#0 fixed)

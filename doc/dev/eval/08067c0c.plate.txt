@@ -1,0 +1,35 @@
+tick_equip_head_slot_sprite_state_machine: Large equip-head slot sprite state machine.
+Reads player_id from slot[+0x2].bit0; computes opponent_side.
+Reads gDuelFieldState+0x4a0 state; four-way dispatch:
+  state==0x80: increment_lp_bar; iterate slots 5..9; for each with card_id!=0 and chain_head==0:
+    check Crush Card (0x123b) -> get_card_extended_stat_field3 vs 0x5db;
+    or Deck Devastation Virus (0x188c) -> get_card_extended_stat_field3_raw;
+    if threshold met -> test_equip_target_slot_in_bitmap; else enqueue_zone_slot_sprite_attr_if_occupied;
+    after loop: clear [gDuelFieldState+0x4a4] -> return 0x7f.
+  state==0x7f: read gP1LifePoints+0x4a4 as chain_link_ptr; find slot_ptr; check card_id two-way
+    comparison + get_slot_field5_score threshold; if met -> test_equip_target_slot_in_bitmap;
+    after traversal: enqueue_sprite_attr_for_slot_indicator + enqueue_sprite_attr_with_type_select +
+    check_card_field5_is_nonzero; if nonzero -> submit_equip_slot_sprite_zone11 -> return 0x7f;
+    else step++ -> return 0x7f.
+  state==0x7e (low): enqueue_sprite_attr_type11 -> return void.
+  state==0x7e (chain branch): iterate slots, enqueue indicators; step++ -> return 0x7f.
+indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  STEP_COUNTER_OFFSET = 0x4a4 (gDuelFieldState relative)
+  gDuelFieldState = 0x0201b290
+  gDuelFieldSlots = 0x0201c510 (DWORD_08067ca4)
+  PLAYER_STRIDE = 0x868
+  SLOT_STRIDE = 0x14 (20 bytes)
+  CARD_ID_CRUSH_CARD = 0x123b (Crush Card)
+  CARD_ID_DECK_DEVASTATION_VIRUS = 0x188c (Deck Devastation Virus)
+  FIELD3_THRESHOLD_HI = 0x5db (get_card_extended_stat_field3 hi threshold)
+  FIELD3_THRESHOLD_LO = 0x5dc (get_card_extended_stat_field3_raw lo threshold)
+  gP1LifePoints = 0x0201c4e0 (DWORD_08067de4)
+  STATE_SCAN_BITMAP = 0x7f
+  STATE_PROCESS_CHAIN = 0x7e
+  STATE_PUSH_SPRITES = 0x80
+
+Params: r0=slot_ptr (effect slot struct, [+0x2].bit0=player_id [0..1])
+Return: r0=u32 (state transition: 0x7f / 0x7e / 0)

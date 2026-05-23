@@ -1,0 +1,20 @@
+dispatch_equip_zone_sprite_by_slot_state: Core equip zone slot sprite dispatcher.
+Reads card_id from slot[+0x0]; compares against Armed Ninja (0x117b) and De-Spell (0x12eb).
+If matched and check_effect_slot_matches_zone_entry returns nonzero, branches on chain_head [+0x8]:
+  chain_head==0: enqueue_zone_slot_sprite_attr_if_occupied + enqueue_sprite_attr_for_slot_indicator +
+    enqueue_sprite_attr_type10_halfword(0x1e) + check_equip_slot_eligible_in_target_bitmap.
+  chain_head!=0: get_card_extended_stat_field6; field6==0x17 and r8==1 -> eligible path,
+    field6==0 -> alternate path; then check_equip_slot_eligible_in_target_bitmap or
+    enqueue_zone_slot_sprite_attr_if_occupied.
+All paths: movs r0,#0; pop; bx r1 (void return). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  CARD_ID_ARMED_NINJA = 0x117b (Armed Ninja)
+  CARD_ID_DE_SPELL = 0x12eb (De-Spell)
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  INDICATOR_TYPE = 0x1e (enqueue_sprite_attr_type10_halfword arg)
+  FIELD6_SWORD_OF_THUNDER = 0x17 (Sword of Thunder card type marker)
+
+Params: r0=slot_ptr (effect slot struct, [+0x0]=card_id halfword, [+0x2]=flags, [+0x8]=chain_head)
+Return: void (movs r0,#0 fixed)

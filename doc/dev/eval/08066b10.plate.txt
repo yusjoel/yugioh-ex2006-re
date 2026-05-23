@@ -1,0 +1,21 @@
+apply_equip_activation_across_slots: Double loop (player [0..1] x slot [0..4]) equip scan.
+Outer: checks slot[+0x4].bit2 (skip flag) and compares occupancy count (r0/r1/r2 expected counts).
+Inner: for each gDuelFieldSlots entry checks chain_head [+0x8]!=0, [+0x6]==0 (unassigned),
+  lsls#19!=0 (valid card_id), get_slot_card_state_code==1 (active);
+  if all satisfied -> apply_slot_equip_activation_with_eligibility_check(slot, player, slot_col, mode=0).
+Outer loop: player [0..1]; inner loop: slot [0..4].
+Exit: movs r0,#0 (void). indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+  gDuelFieldSlots = 0x0201c510
+  SLOT_STRIDE = 0x14 (20 bytes per slot entry)
+  SLOT_MAX = 4 (inner loop bound)
+  PLAYER_MAX = 1 (outer loop bound)
+  SLOT_SKIP_BIT = 0x4 (slot[+0x4] bit2)
+  CARD_STATE_CODE_EQUIP_ACTIVE = 1 (get_slot_card_state_code return value)
+  ACTIVATION_MODE = 0 (apply_slot_equip_activation final r3)
+
+Params: r0=slot_ptr ([+0x2]=flags, [+0x4]=count/flags), r1=u32 (second slot ptr for count compare),
+        r2=ptr (third slot ptr for count compare)
+Return: void (movs r0,#0 fixed)

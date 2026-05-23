@@ -1,0 +1,25 @@
+dispatch_lp_counter_or_sprite_by_zone_state: Three-way zone state dispatcher.
+Reads gDuelFieldState+0x4a0 (EQUIP_STATE_OFFSET=0x4a0=0x94<<3) zone state word.
+  state==0x80: read gP1LifePoints+player*0x868+0x10; if nonzero ->
+    trigger_card_display_op31_if_not_active(player, 0xf5), return 0x7f.
+  state==0x7f: init_effect_slot_display_context -> return 0x7e.
+    (also enqueue_sprite_attr_record with attr=0x59 or 0x8059 per player)
+  state==0x7e: extract player_id, enqueue_lp_counter_sprite_by_player -> return 0.
+  default: return 0.
+player_id from slot struct r1[+0x2].bit0. indeg=0 (fn-ptr: 0 hits).
+
+Constants:
+  gDuelFieldState = 0x0201b290
+  EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  STATE_TRIGGER_OP31 = 0x80
+  STATE_INIT_CTX = 0x7f
+  STATE_ENQUEUE_LP = 0x7e
+  gP1LifePoints = 0x0201c4e0
+  PLAYER_STRIDE = 0x868
+  OP31_SUBCODE = 0xf5
+  LP_CHECK_OFFSET = 0x10
+  OAM_P1 = 0x59 (base sprite attr player1)
+  OAM_P2 = 0x8059 (base sprite attr player2)
+
+Params: r0=u32 (zone state ctx, overwritten), r1=slot_ptr ([+0x2].bit0=player_id [0..1])
+Return: r0=u32 (state transition: 0x7f / 0x7e / 0)
