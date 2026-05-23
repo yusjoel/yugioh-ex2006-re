@@ -1,0 +1,1 @@
+Check whether the opponent has at least one monster zone present. Extracts player_id from ldrb[r0+0x2] bit0, computes opp_player_id = 1 - player_id, calls count_monster_slots_for_player(opp_player_id); if count > 0 returns 1, otherwise returns 0.

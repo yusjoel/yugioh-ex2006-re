@@ -1,0 +1,1 @@
+Predicate testing whether the LP zone offset is a substantial value. Extracts player_id from ldrb[r0+0x2] bit0 (via lsls#0x1f/lsrs#0x1f), calls get_lp_count_minus_zone_slot_offset(player_id); if return value > 1 returns 1 (substantial positive offset), otherwise returns 0. Threshold: cmp r0,#0x1 (ble returns 0).

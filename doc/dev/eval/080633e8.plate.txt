@@ -1,0 +1,1 @@
+Simple field zone predicate: extracts player_id from slot ldrb[+0x2] bit0, calls count_field_zone_cards_with_field5(player_id); if count > 0 returns 1 (field5 card present), otherwise returns 0.

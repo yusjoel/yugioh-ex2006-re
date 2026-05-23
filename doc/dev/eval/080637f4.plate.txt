@@ -1,0 +1,1 @@
+Simple paired slot count equality check. Extracts player_id from ldrb[r0+0x2] bit0, calls count_paired_slots_with_field5_default(player_id, 0x1918); if returned count equals exactly 3 returns 1, otherwise returns 0. Constant 0x1918 is a fixed query parameter to count_paired_slots_with_field5_default. Constants: PAIR_SCAN_PARAM=0x1918, REQUIRED_COUNT=3.
