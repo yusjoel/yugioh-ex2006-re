@@ -1,0 +1,5 @@
+Iterates all equip zone slots accumulating score then submits LP indicator. Parameter r0=slot_node saved to r10. Calls increment_lp_bar_display_counter; queries zone_bitmap (query_equip_zone_bitmap_with_active_flag) and target_bitmap (query_equip_target_bitmap_default) using slot_node. Double loop r5=[0..1] player / r4=[0..4] slot: checks target_bitmap & (1 << (r5*16+r4)); if set calls get_slot_field7_score(player, slot_idx, 1) and accumulates to r9. After loop calls submit_lp_indicator_with_slot_xor_flag(slot_node, 1-player, r9); finally calls decrement_lp_bar_display_counter. Returns 0 fixed.
+
+Constants:
+- SLOT_COUNT = 5 ([0..4], inner loop bound)
+- PLAYER_COUNT = 2 ([0..1], outer loop bound)

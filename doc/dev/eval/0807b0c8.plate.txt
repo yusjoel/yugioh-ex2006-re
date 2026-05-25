@@ -1,0 +1,6 @@
+Dispatches equip slot sprite update based on zone descriptor. r0=slot_node, r1=zone_entry pointer (may be NULL). When zone_entry is non-null: sets bit1/2/3 flags in [zone_entry+4]; reads slot_id field from [zone_entry+4], calls find_zone_descriptor_by_slot_id to get descriptor. Based on slot_index (bits[5:2] of [zone_entry+2]) <= 0xa: calls enqueue_field_slot_sprite_with_state_update. Based on descriptor zone type byte: 0 -> calls test_equip_target_slot_in_bitmap; 0xb -> looks up 0x0201c600 table with player*0x868 offset and calls submit_equip_slot_sprite_zone11. When zone_entry is NULL skips all processing. Returns 0 fixed.
+
+Constants:
+- PLAYER_STRIDE = 0x868
+- ZONE11_TABLE_BASE = 0x0201c600
+- MONSTER_SLOT_BASE = 0x0201bb90

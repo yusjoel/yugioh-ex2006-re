@@ -1,0 +1,5 @@
+Driven by equip zone state machine. Input: slot_node (r0). Extracts player_id (bit0) and slot_index (bits[5:2]) from [r0+2]. Looks up zone table at EWRAM 0x0201c510 using offset 0x868*player+slot_index*20. Reads zone_count field of that entry and compares with target_count field at [r0+4]. If equal and zone entry active_bit is nonzero, calls enqueue_equip_card_sprite_attr_for_slot with player_id/slot_index/-1 to enqueue equip card sprite. Otherwise skips. Returns 0 fixed.
+
+Constants:
+- ZONE_TABLE_BASE = 0x0201c510 (equip zone array base address)
+- PLAYER_STRIDE = 0x868 (stride for indexing zone table by player_id, in bytes)

@@ -1,0 +1,5 @@
+Checks if equip slot targets a cross-zone placement then conditionally enqueues sprite. Reads target_id from slot_node [r4+0x14]; calls find_zone_descriptor_by_slot_id to get descriptor; extracts zone_side (bits[31:24]) and slot_pos (bits[23:16]) from descriptor. If zone_side != [r4+2].bit0 (player_id), meaning target is on opposite zone, calls enqueue_slot_card_sprite_if_eligible(slot_node, zone_side, slot_pos, card_id, type=5, player). When zone_side==player skips. Returns 0 fixed.
+
+Constants:
+- ENQUEUE_TYPE = 5 (type argument to enqueue_slot_card_sprite_if_eligible, cross-zone slot sprite type code)
+- TARGET_ID_MASK = 0x1ff (mask for bits[8:0] of target_id as argument to find_zone_descriptor_by_slot_id)

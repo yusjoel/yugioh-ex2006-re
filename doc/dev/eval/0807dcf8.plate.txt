@@ -1,0 +1,6 @@
+Builds equip bitmap from monster slot records and submits LP indicator. Checks [gP1LifePoints+0x10d0] for bit0==0 and bit1==1 (specific state gate); if not satisfied skips all logic. If satisfied calls increment_lp_bar_display_counter. From 0x0201bb90 monster slot records: slot0_id=[+0], slot1_id=[+4]; computes equip_bitmap = (1 << (slot0_id<<4 + [+0x1c])) | (1 << (slot1_id<<4 + [+0x20])). Calls query_equip_target_bitmap_default(slot_node, equip_bitmap, ?) to get target_bitmap; computes opp_player = 1-player; calls submit_lp_indicator_with_slot_xor_flag(slot_node, opp_player, 0xc8<<2=0x320). Finally calls decrement_lp_bar_display_counter. Returns 0 fixed.
+
+Constants:
+- LP_STATE_OFFSET = 0x10d0 (state field within gP1LifePoints)
+- MONSTER_SLOT_BASE = 0x0201bb90
+- LP_SCORE_ARG = 0xc8<<2 = 0x320 (hex(0xc8*4)=0x320, third argument to submit)

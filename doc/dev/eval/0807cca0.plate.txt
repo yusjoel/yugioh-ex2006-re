@@ -1,0 +1,9 @@
+Banisher equip zone sprite dispatch state machine. Reads [0x0201b290+0x4a0] state. State 0x80: reads [gP1LifePoints+0xc+opp_player*0x868]; if nonzero calls set_lp_display_row_type5(player, card_id, 1); advances to 0x7f. State 0x7f: computes opp_player, looks up 0x0201c600 table with opp_player*0x868 offset, adds offset from [0x0201c600+0x1c88] left-shifted by 2 to compute target pointer, calls dispatch_equip_zone_sprite_banisher_by_field_count(opp_ptr, base_ptr, 1). Returns 0x7f or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- PLAYER_STRIDE = 0x868
+- LP_CHECK_OFFSET = 0xc (LP check field offset within gP1LifePoints)
+- ZONE_TABLE_BASE = 0x0201c600
+- ZONE_COORD_OFFSET = 0x1c88 (zone coordinate field offset)

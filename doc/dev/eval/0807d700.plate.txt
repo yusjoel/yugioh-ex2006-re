@@ -1,0 +1,11 @@
+Enqueues sprite for Ritual summon related equip slots. Reads u16 from [node+2] and ANDs with mask 0xfc0: only enters main path if result equals 0x480 or 0x4c0 (Ritual/special summon card types). Main path: calls count_monster_slots_by_fnptr(player, 0x0804b165) to count matching monster slots; if nonzero reads bit0/bit1 of [gP1LifePoints+0x10d0] to check state; after conditions met searches 0x0201bb90 monster slot records matching player/slot; if query_slot_card_type_eligibility passes calls enqueue_sprite_attr_record(type_code, monster_slot_data, 0, 0). Otherwise calls enqueue_sprite_attr_type11(player, card_id, 1, 0) as fallback. Returns 0 fixed.
+
+Constants:
+- CARD_TYPE_MASK = 0xfc<<4 = 0xfc0 (card type field mask)
+- RITUAL_TYPE_A = 0x90<<3 = 0x480 (Ritual type code A)
+- RITUAL_TYPE_B = 0x90<<3+0x40 = 0x4c0 (Ritual type code B)
+- MONSTER_PREDICATE = 0x0804b165 (predicate function pointer for count_monster_slots_by_fnptr)
+- LP_STATE_OFFSET = 0x10d0 (state field offset within gP1LifePoints)
+- PLAYER_STRIDE = 0x868
+- MONSTER_SLOT_BASE = 0x0201bb90
+- FALLBACK_TYPE = 0x8020 (enqueue_sprite_attr_record type argument when [node+0]==0)

@@ -1,0 +1,9 @@
+Equip spell zone placement slot scan state machine. Reads [0x0201b290+0x4a0] state. State 0x80: calls increment_lp_bar_display_counter; queries zone bitmap with slot_node (query_equip_zone_bitmap_with_active_flag); calls forward_equip_bitmap_update_with_full_mask(node, bitmap, 0); advances to 0x7f. State 0x7f: calls check_spell_zone_slot_placeable(player); if passed searches forward in gP1LifePoints+0x14+opp*0x868 for slot with card_field6==7; if found calls enqueue_equip_zone_sprite_by_slot_ptr and returns 0x7f; otherwise advances to 0x7e. State 0x7e: calls decrement_lp_bar_display_counter. Returns 0x7f/0x7e or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- PLAYER_STRIDE = 0x868
+- SLOT_LIST_OFFSET = 0x14 (slot list offset within gP1LifePoints)
+- FIELD6_TARGET = 7 (enqueue condition: card_field6 == 7)
+- SLOT_SEARCH_BASE = 0x83<<3 = 0x418 (hex(0x83*8)=0x418, offset coefficient)

@@ -1,0 +1,7 @@
+Multi-phase state machine for equip activation to face-down display. Reads [0x0201b290+0x4a0] state. State 0x80: calls dispatch_card_effect_activation; on success calls trigger_card_display_op31_if_not_active(player, 0x1f) and clears [base+0x4a4] to zero; advances to 0x7f. State 0x7f: calls set_lp_row_type6_with_value(player, card_id); advances to 0x7e. State 0x7e: reads gP1LifePoints+0x1da8 as row_data, calls enqueue_face_down_slot_sprite_attr(player, row_data, 0); increments [base+0x4a4]; if [base+0x4a4] <= 1 returns 0x7f (continue), otherwise advances to 0x7d. State 0x7d: calls enqueue_lp_counter_sprite_by_player(player). Returns per-phase state code or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- COUNTER_OFFSET = 0x4a4
+- LP_ROW_OFFSET = 0x1da8 (LP row data offset within gP1LifePoints)

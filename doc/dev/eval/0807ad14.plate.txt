@@ -1,0 +1,7 @@
+State machine driver for equip zone paired slot counter. Reads current state from [0x0201b290 + 0x94<<3]. State 0x80: calls tick_zone_sprite_pipeline_with_update_flag(player,1) to advance sprite pipeline, then calls count_equipped_paired_slots_for_player(player, 0x181e) to count equipped paired slots, stores result at [0x0201b290+0x4a4]; state reverts to 0x7f. State 0x7f: if [base+0x4a4] is nonzero advances sprite pipeline and decrements counter by 1; otherwise terminates. Returns 0 (terminated) or 0x7f (still active).
+
+Constants:
+- STATE_BASE = 0x0201b290 (equip state machine EWRAM base)
+- STATE_OFFSET = 0x94<<3 = 0x4a0 (state byte offset, hex(0x94<<3)=0x4a0)
+- COUNTER_OFFSET = 0x4a4 (paired slot counter offset)
+- PAIR_PREDICATE = 0x181e (predicate argument to count_equipped_paired_slots_for_player)

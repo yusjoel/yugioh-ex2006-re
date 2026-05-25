@@ -1,0 +1,1 @@
+Extracts player_id (bit0) from slot_node [r0+2], calls enqueue_lp_display_row_if_enabled(player, 1, 0, 0) with fixed arguments. Enqueues LP display row for the player this node belongs to. Returns 0 fixed.

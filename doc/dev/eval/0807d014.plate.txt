@@ -1,0 +1,9 @@
+Equip target validity check + PRNG sampling or LP display state machine. Reads [0x0201b290+0x4a0] state. State 0x80: calls check_equip_slot_target_valid_in_zone(slot_node); if valid checks [0x0201e2a0+8+player*4]==1; if 1 stores sample_prng_scaled(2) result at [gP1LifePoints+0xea<<5=0x1d40]; otherwise calls invoke_card_display_op_0x31_sub8(0x38); advances to 0x7f. State 0x7f: calls enqueue_lp_display_row_type17 with (player, slot, gP1LifePoints+0x1d40 value, 1); advances to 0x7e. State 0x7e: if gP1LifePoints+0x1daa is nonzero reads 0x0201bb90 monster slot data and calls apply_slot_equip_activation_with_eligibility_check; otherwise reads field5/field6 score difference from 0x0201bb90 and calls submit_lp_indicator_with_slot_xor_flag. Returns 0x7f/0x7e or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- PRNG_FLAG_BASE = 0x0201e2a0
+- PRNG_STORE_OFFSET = 0xea<<5 = 0x1d40 (hex(0xea*32)=0x1d40)
+- LP_COORD_OFFSET = 0x1daa
+- MONSTER_SLOT_BASE = 0x0201bb90

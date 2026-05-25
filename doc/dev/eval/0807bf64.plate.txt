@@ -1,0 +1,7 @@
+Multi-phase state machine driver for equip chain dual slot activation sequence. Reads [0x0201b290+0x4a0] state. State 0x80: calls dispatch_card_effect_activation(slot_node); if activation succeeds computes opponent player, calls set_lp_display_row_type9(opp_player, card_id, player); advances to 0x7d. State 0x7d: reads [gP1LifePoints+0x1da8], right-shifts by 8 bits and stores at [base+0x4a4]; advances to 0x7c. State 0x7c: performs four eligibility checks (query_slot_card_type_eligibility + check_slot_equip_whitelist_with_monster_space x2); if all pass calls enqueue_sprite_attr_with_mode(mode=5) twice then calls enqueue_equip_chain_dual_slot_sprite_with_activation_scan. Returns 0x7d/0x7c or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- COUNTER_OFFSET = 0x4a4
+- LP_FIELD_OFFSET = 0x1da8 (field offset within gP1LifePoints)

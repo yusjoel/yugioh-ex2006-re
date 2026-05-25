@@ -1,0 +1,6 @@
+Scans all equip zone slots, builds eligibility bitmap and forwards update. r0=slot_node; r9 initialized to 0 (bitmap accumulator). Extracts total slot count from [slot_node+6] (bits[7:3]); loops r7=[0..count-1]: calls check_effect_slot_matches_zone_entry(slot_node, iter, sp); on match extracts player/slot_index, looks up zone table 0x0201c510 target entry, calls check_card_equip_eligible_for_slot(node, player, slot, 1); if eligible sets bit at (player*16+slot) in r9. After loop calls forward_equip_bitmap_update_with_full_mask(slot_node, r9, 2). Returns 0 fixed.
+
+Constants:
+- ZONE_TABLE_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- MASK_ARG = 2 (third argument to forward_equip_bitmap_update_with_full_mask, mask mode)

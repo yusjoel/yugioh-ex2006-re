@@ -1,0 +1,4 @@
+Extracts player_id (bit0) from slot_node [r0+2], calls enqueue_equip_multi_slot_marker_sprite(player, 0x1f) with fixed mask argument 0x1f. Enqueues equip multi-slot marker sprite. Returns 0 fixed.
+
+Constants:
+- MULTI_SLOT_MASK = 0x1f (fixed mask argument to enqueue_equip_multi_slot_marker_sprite)

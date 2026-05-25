@@ -1,0 +1,9 @@
+Equip zone PRNG sampling and LP indicator update state machine. Reads [0x0201b290+0x4a0] state. State 0x80: checks [0x0201e2a0+8+player*4] for value 1; if 1 calls sample_prng_scaled(2) and stores result at [gP1LifePoints+0xea<<5=0x1d40]; otherwise calls invoke_card_display_op_0x31_sub8(0x38). Advances to 0x7f. State 0x7f: reads gP1LifePoints+0x1daa, calls enqueue_lp_display_row_type17 with (player, slot, val, 1); advances to 0x7e. State 0x7e: reads gP1LifePoints+0x1daa; if nonzero calls submit_lp_indicator_with_slot_xor_flag(node, 1-player, 0xfa*4); otherwise calls submit_lp_indicator_with_slot_xor_flag(node, player, 0xfa*4). Returns 0x7f (active) or 0 (inactive state).
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0 (hex(0x94*8)=0x4a0)
+- PRNG_FLAG_BASE = 0x0201e2a0 (PRNG enable flag EWRAM base)
+- PRNG_STORE_OFFSET = 0xea<<5 = 0x1d40 (hex(0xea*32)=0x1d40, offset within gP1LifePoints)
+- LP_COORD_OFFSET = 0x1daa (LP coordinate offset within gP1LifePoints)
+- LP_SCORE_ARG = 0xfa*4 = 0x3e8 (third argument to submit_lp_indicator)

@@ -1,0 +1,9 @@
+State machine driver for equip zone target resolution and LP row type setting. Reads [0x0201b290+0x4a0] state. State 0x80: extracts player/slot fields from slot_node [r0+2], checks zone table 0x0201c510 that zone_count matches target_count and active_bit is nonzero; if passed calls resolve_best_target_slot_for_equip(player, slot_index) to compute optimal target bitmap, inverts it and passes to set_lp_row_type11_with_byte_flags(player,1,~bitmap); advances to 0x7f. State 0x7f: reads coordinates from gP1LifePoints+0x1daa and gP1LifePoints+0x1ce4, calls enqueue_sprite_attr_with_xy_split(player, slot, coords) and enqueue_sprite_attr_with_mode(player, slot, card_id, row_data, 3). Returns 0 (conditions not met) or 0x7f (continue).
+
+Constants:
+- STATE_BASE = 0x0201b290 (equip state machine EWRAM base)
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- ZONE_TABLE_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- LP_XY_OFFSET_A = 0x1daa (XY coordinate field A offset within gP1LifePoints)
+- LP_XY_OFFSET_B = 0x1ce4 (XY coordinate field B offset within gP1LifePoints)

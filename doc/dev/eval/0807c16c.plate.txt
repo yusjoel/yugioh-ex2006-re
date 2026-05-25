@@ -1,0 +1,6 @@
+Reads player_id and card_id from slot_node, selects sprite type code based on equip status field, then enqueues sprite. Extracts player_id = bit0 of [r0+2], computes opp_player = 1-player, reads card_id = [r0+0] (u16). Checks [gP1LifePoints+0x1ce8]: if player == read value then type_code=0x31, otherwise type_code=0x21. Calls enqueue_sprite_attr_type11(opp_player, card_id, type_code, 0). Returns 0 fixed.
+
+Constants:
+- TYPE_SELECT_FIELD = gP1LifePoints+0x1ce8 (type selection basis field, offset 0x1ce8)
+- TYPE_A = 0x21
+- TYPE_B = 0x31

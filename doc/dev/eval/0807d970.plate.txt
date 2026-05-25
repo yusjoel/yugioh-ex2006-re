@@ -1,0 +1,8 @@
+Hand spell match display sequence state machine. Reads [0x0201b290+0x4a0] state. State 0x80: iterates slot count from [node+6] (bits[7:3]); for each slot calls read_effect_slot_zone_type + find_hand_slot_idx_by_set_code to detect hand spell match; if all slots matched advances to 0x7f. If any unmatched exits. State 0x7f: takes last slot; calls read_effect_slot_zone_type + find_hand_slot_idx_by_set_code; on matching hand slot computes coordinates from zone table 0x0201c8f8, calls enqueue_hand_card_sprite_by_spell_type(player, coord, 1); updates [node+6] slot count (dec and mask 0x7 to 3 bits); advances to 0x7f. State 0x7e: calls enqueue_lp_counter_sprite_by_player(player), advances to 0x7d. State 0x7d: calls tick_zone_sprite_pipeline_with_update_flag(player, 2). Returns per-phase state code or 0.
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x94<<3 = 0x4a0
+- PLAYER_STRIDE = 0x868
+- HAND_ZONE_TABLE = 0x0201c8f8 (hand zone coordinate table)
+- SLOT_COUNT_MASK = 0x1c (bits[4:2] of [node+6], 3-bit slot count field)
