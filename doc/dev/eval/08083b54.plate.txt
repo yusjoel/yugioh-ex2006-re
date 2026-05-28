@@ -1,0 +1,3 @@
+Equip card slot pair occupancy check predicate. Receives card_ptr(r0), player_id(r1), slot_idx(r2). If slot_idx>4 or check_monster_slot_accepts_card returns 0, returns 0 (invalid). Otherwise reads card_ptr[+6] bits[4:2] (zone_flags); if zero, returns 1 (allowed). If nonzero: extracts bits[4:3]-1 as zone_offset, reads halfword port number from card_ptr[+8+zone_offset*2], compares against (player_id<<8)|slot_idx; if equal returns 0 (slot occupied), else returns 1. Called via fn-ptr table at 0x08083c18 (.word 0x08083b55).
+Side effects: none.
+Constants: SLOT_IDX_MAX=4, ZONE_FLAGS_MASK=0x1c (bits[4:2]).

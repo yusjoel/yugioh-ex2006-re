@@ -1,0 +1,3 @@
+Equip zone sprite enqueue wrapper function. Receives card_slot_ptr(r0); extracts player_id (byte[+2] bit0) and slot_idx (halfword[+0]); calls enqueue_equip_zone_sprite_by_side(player_id, slot_idx). Returns 1 (fixed; void semantics, caller does not use return value). Single-parameter extraction wrapper for enqueue_equip_zone_sprite_by_side for use when equip card slot is already known. Caller: 0x080486e4 (equip zone OAM row generation hub).
+Side effects: OAM sprite attr write via enqueue_equip_zone_sprite_by_side.
+Constants: (none -- player_id bit0 extraction is standard pattern).

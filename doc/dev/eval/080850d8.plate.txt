@@ -1,0 +1,3 @@
+Zero-parameter wrapper that reads two fields from gDuelBB and calls assemble_effect_slot_attr_with_zone_lookup. Reads DWORD[0x0201bb90] (gDuelBB base), then [+4] (player_flag) and [+0x20] (col_nibble); calls assemble_effect_slot_attr_with_zone_lookup(gDuelBB_ptr, player_flag, col_nibble). Returns 1 (fixed; meaning "dispatch done", used by fn-ptr table to confirm success; void semantics, caller does not use return value). indeg=0: Sub-type A dead code or runtime fn-ptr dispatch.
+Side effects: effect_slot array write via assemble_effect_slot_attr_with_zone_lookup.
+Constants: gDuelBB=0x0201bb90, PLAYER_FLAG_OFF=4, COL_NIBBLE_OFF=0x20.
