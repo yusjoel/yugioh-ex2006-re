@@ -1,0 +1,2 @@
+Check if two card slot records belong to different player sides. r0=slot_ptr_a (card record pointer), r1=slot_ptr_b. Extract slot[+2] byte bit0 (player_id field) from each; if values differ return 1, if same or r1==0 return 0. Called by FUN_080b41b4 (field6==0x16 path) and FUN_080b41dc (field6==0x17 path) when verifying cross-side pairing legality for equip card target slots (indeg=2). No side effects. Pure leaf predicate.
+Constants: PLAYER_BIT=bit0 of slot[+2].

@@ -1,0 +1,2 @@
+Count player monster zone 5 slots (slot 4 down to 0) where card_id falls in [0x0fb7..0x0fbb]. r0=player_id [0..1]. Difference from count_monster_slots_in_card_id_range (0x080af430): fixed 5 slots (loop r3 from 4 downto 0), array start = gDuelFieldSlots+player*0x868 (0x0201c510), step +0x14 per slot. Returns hit count.
+Constants: gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_COUNT=5, SLOT_STRIDE=0x14, CARD_ID_LO=0x0fb7, CARD_ID_HI=0x0fbb.

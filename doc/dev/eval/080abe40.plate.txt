@@ -1,0 +1,2 @@
+High-indeg (37) thin wrapper that injects fixed r3=2 then tail-calls setup_equip_oam_entry_with_sprite_attr. Called by 37 duel_field/card_ids/card_stats callers for equip card OAM entry construction (attr type code 2). Caller passes r0=player_id, r1=slot_data_ptr, r2=sub_slot_idx; this function overrides r3=2 then forwards all args. Side effect: writes OAM sprite attributes (equip type code 2) via setup_equip_oam_entry_with_sprite_attr.
+Constants: ATTR_TYPE=2.

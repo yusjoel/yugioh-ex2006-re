@@ -1,0 +1,2 @@
+Equip target slot selection: first calls build_equip_eligible_slot_bitmap to build player-side available slot bitmap, then calls select_equip_target_slot_by_bitmap_alt to randomly or sequentially pick the final target slot. indeg=0; inferred as internal tool or called via fn-ptr (no THUMB ptr 0x080ad5ed found in asm/all.s). r0=player_id, r1=card_id (equip spell). Return value forwarded from select_equip_target_slot_by_bitmap_alt: -1=no slot available, >=0: bits[31:24]=player, bits[7:0]=slot_idx.
+Constants: FAIL=-1.

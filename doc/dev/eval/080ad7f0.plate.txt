@@ -1,0 +1,2 @@
+Sequential search in player monster zone (gP1LifePoints[player*0x868+0x120] array, length from [player*0x868+0xc]) for first entry matching r1 low 16 bits card_id. r0=player_id, r1=card_id_packed (low 16 bits). Returns slot_idx [0..count-1] if found, -1 if not. indeg=0, no THUMB fn-ptr reference found.
+Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, COUNT_OFFSET=0xc, ARRAY_OFFSET=0x120 (=0x90<<1).

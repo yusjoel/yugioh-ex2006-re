@@ -1,0 +1,2 @@
+Check if effect zone or monster pair slot is available for specified player side. Called by FUN_080b777c which extracts player_id=struct[+2] bit0 (indeg=1). Logic: (1) call count_available_effect_zones(opponent, card_id=0x1256, mode=-1); if available (>0) return 0; (2) call count_available_effect_zones(player, card_id=0x144d, mode=-1); if available return 2; (3) call count_valid_monster_pair_slots + count_zone_card_pair_allowed_for_card; if sum>0 return 0 (slot exists), ==0 return 1 (no slot). No side effects.
+Constants: CARD_TYPE_A=0x1256, CARD_TYPE_B=0x144d, MODE_ANY=-1.

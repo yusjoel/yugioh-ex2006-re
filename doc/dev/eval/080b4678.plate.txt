@@ -1,0 +1,2 @@
+Activation eligibility check for Card Destruction (0x12d5) or Delinquent Duo (0x1325). r0=ctx_ptr (reads [+2] bit0 for player_id), r1=effect_node_ptr (reads [+0] halfword=card_id). If r1==0 return 0. card_id==0x12d5 (Card Destruction): return 1 directly. card_id==0x1325 (Delinquent Duo): check opponent monster zone count>3 (OPPONENT_THRESHOLD) then return 1, else 0. Other card_id: return 0. No side effects. indeg=0, fn-ptr refs=0 (Sub-type A dead code).
+Constants: CARD_DESTRUCTION_ID=0x12d5, DELINQUENT_DUO_ID=0x1325 (=0x12d5+0x50), OPPONENT_THRESHOLD=3.

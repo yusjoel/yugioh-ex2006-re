@@ -1,0 +1,2 @@
+Count player spell/trap zone slots (slot 0..count-1) where card_id falls in [0x0fb7..0x0fbb]. Fully symmetric with count_monster_slots_in_card_id_range (0x080af430). r0=player_id [0..1]. Reads gP1LifePoints[player*0x868+0x14] for spell_slot_count; array start = gP1LifePoints+player*0x868+0x418 (=0x83<<3); extracts card_id=bits[12:0], checks range; on hit r3++. Return count.
+Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, COUNT_OFFSET=0x14, ARRAY_OFFSET=0x418 (=0x83<<3), CARD_ID_LO=0x0fb7, CARD_ID_HI=0x0fbb.
