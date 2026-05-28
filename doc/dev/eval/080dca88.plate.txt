@@ -1,0 +1,12 @@
+Renders the pack label string for game_str_id=0x7ef to BG VRAM at the tile row specified by tile_row_base.
+r0=tile_row_base [0..653]; VRAM dst = 0x06010000 + r0*0x20.
+Dispatched by FUN_080d511c switch dispatcher (case 4). Forms a 0x7ee/0x7ef string pair with render_pack_label_str7ee_to_bg_vram (0x080dca30).
+
+Constants:
+- VRAM_BASE=0x06010000 // BG VRAM base
+- PACK_STRIDE=0x20 // tile stride
+- GAME_STR_ID=0x7ef // pack label string ID (low-range string, paired with 0x7ee)
+
+Inputs: r0=u16 tile_row_base [0..653] (FUN_080d511c passes r2=0x28d=653 or 0x280=640; caller-set fixed value)
+Returns: void (pop {r0}; bx r0)
+Side effects: [0x06010000 + tile_row_base*0x20 via render_pack_label_to_bg_tile_vram] tile data written

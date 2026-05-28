@@ -1,0 +1,14 @@
+Writes palette-encoded tile attribute halfwords to a pack shop BG tile row buffer.
+r0=VRAM dst, r1=base_attr, r2=packed_extra (high nibble=color_index encoded <<0x1c>>0x10), r3=extra_modifier.
+Uses bios_div(0x30=48) to compute row offset; outer loop 0..1 (2 rows), inner loop 0..0x1f (32 cols), strh each entry.
+Called by FUN_080d4de4 and FUN_080d4fa4 during pack shop init to fill card slot BG tile row data.
+
+Constants:
+- COLS=32 // inner loop cmp #0x1f bls -> 0..0x1f
+- ROWS=2 // outer loop cmp #0x1 bls -> 0..1
+- DIV_MOD=0x30 // bios_div divisor for row spacing offset
+- COLOR_SHIFT=0x1c // palette bank encoding left-shift count
+
+Inputs: r0=u16* dst_vram, r1=u16 base_attr, r2=u32 packed_extra, r3=u16 extra_modifier
+Returns: void (pop {r0}; bx r0)
+Side effects: [dst_vram + 0..0x3f] written with tile attribute halfwords (2 rows x 32 cols)

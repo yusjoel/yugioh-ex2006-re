@@ -55,11 +55,11 @@ byte-identical 通过后自动 commit, 进入下一批。
 |------|----|
 | **阶段** | Phase 3 — 全 ROM 就绪函数批量推进 (新一轮) |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-20 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 3626 (78.13%) |
-| **未命名 (FUN_*)** | 1015 |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 3646 (78.56%) |
+| **未命名 (FUN_*)** | 995 |
 | **就绪函数集 (Phase 3)** | 1069 函数 (unnamed AND callees all named); 锁定清单 `doc/dev/eval/ready_batches.json` (54 批 #118..#171, 末批 9) |
-| **下一批** | `#161` (Phase 3 第 44 批) |
-| **上次更新** | 2026-05-29 (batch #160 落地 +13 PASSED + 本轮追加 +7 PASSED, byte-identical OK, 3626/4641 = 78.13%) |
+| **下一批** | `#162` (Phase 3 第 45 批) |
+| **上次更新** | 2026-05-29 (batch #161 落地 +20 PASSED, byte-identical OK, 3646/4641 = 78.56%) |
 | **callgraph 时间戳** | 2026-05-20 12:55 (`temp/ghidra-funcs-callgraph.csv`) |
 | **callgraph_locked** | `true` (Phase 3 内不再 refresh; 完成 54 批后跨 Phase 边界再刷新) |
 | **ready_locked** | `true` (1069 集合 → 54 批已锁定; Phase 3 进行中不动态扩张) |
@@ -110,8 +110,8 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
 | Phase 2 ready 集合 (锁定 766) | 766 | 0 | 100.00% |
-| **全 Ghidra (4641 函数)** | **3626** | **1015** | **78.13%** |
-| **Phase 3 ready 集合 (新一轮)** | 860 (44 批完成) | **209** (待分析) | 80.45% |
+| **全 Ghidra (4641 函数)** | **3646** | **995** | **78.56%** |
+| **Phase 3 ready 集合 (新一轮)** | 880 (45 批完成) | **189** (待分析) | 82.32% |
 
 ---
 

@@ -1,0 +1,11 @@
+Refreshes the current text overlay palette row data to OBJ palette VRAM.
+Reads overlay_ptr from gPrng+0x1d0; returns void if null. Reads [overlay+0x14] flags bit0: if bit0=1 copies from OBJ palette VRAM at 0x05000200 + tile_row_idx*0x20; if bit0=0 copies from BG/OBJ palette base 0x05000200 (DAT_080dd4a8). Both paths read [overlay+0x4] as tile_row_idx and compute the palette row address. Called exclusively by FUN_080d6d30 (pack frame driver) each frame.
+
+Constants:
+- gPrng+0x1d0: global overlay struct pointer
+- 0x05000200: OBJ palette base + 0x200 (DAT_080dd4a8); python: 0xa0<<19=0x5000000+0x200=0x5000200
+- PALETTE_STRIDE=0x20 // tile_row_idx*0x20 = palette row byte offset
+
+Inputs: void (no params; ldr r0, gPrng loaded internally)
+Returns: void (pop {r0}; bx r0)
+Side effects: [OBJ palette 0x05000200 + tile_row_idx*0x20 via copy_overlay_tile_row_to_palette] palette row written

@@ -1,0 +1,20 @@
+Advances the current text overlay animation state machine by one step.
+Reads overlay_ptr from gPrng+0x1d0; returns 1 if null. Dispatches via switch([overlay+0x1c] step_counter [0..4]):
+- case 0 (enter): writes 0x78 frames to [+0x20], computes initial x position to [+0x22] (flags bit3 determines indent range 0..0xf or 1)
+- case 1 (fade-in): decrements [+0x1e] frame countdown; interpolates x position to [+0x22] using bios_div
+- case 2 (wait/condition): checks flags bits and frame markers to decide next action
+- case 3 (fade-out): decrements [+0x1e]; reverse-interpolates x position
+- case 4 (done): clears [+0x1c], returns 1
+- default path: based on [overlay+0x14] bit0 calls apply_overlay_bg_scroll_offset or render_overlay_oam_sprite_stretched; returns 0
+r0=update_flag [0..1]: if 1 sets [overlay+0x24] bit0 in default path.
+Called by 28+ pack/overlay frame driver functions; central hub for overlay animation progression.
+
+Constants:
+- gPrng+0x1d0: overlay struct pointer
+- ANIM_DURATION=0x78=120 // initial frame count written at case 0
+- INTERP_STEPS=0xf=15 // interpolation divisor for bios_div
+- STEP_BASE=0x50 // x interpolation base offset (case 1: lsls r0,r1,#0x2; adds #0x50)
+
+Inputs: r0=u8 update_flag [0..1]
+Returns: r0=u8 (0=animation in progress, 1=animation complete or overlay null) via pop {r1}; bx r1 (Sub-case E)
+Side effects: [overlay+0x1c] step_counter; [overlay+0x1e] frame_countdown; [overlay+0x20] anim_duration; [overlay+0x22] x_pos; [overlay+0x24] bit0/bit1; [BG scroll/OAM via apply_overlay_bg_scroll_offset/render_overlay_oam_sprite_stretched]

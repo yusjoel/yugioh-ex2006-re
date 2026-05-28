@@ -1,0 +1,17 @@
+Formats the owned card count percentage for the given pack slot and renders it to the OBJ VRAM sprite line buffer.
+r0=VRAM dst addr, r1=pack_index [0..4], r2=selected_count [0..total_count] (owned card count).
+Uses game_str_id=0x13ee format string; calls get_pack_total_card_count(r1) to get total_count; computes selected_count/total_count*100 clamped to [1..99] or 100 (full collection).
+Calls expand_format_decimal_width_to_buf, then setup_line_buf_pos_and_font + text_render_wrapper twice, finally commit_line_buffer_to_sprite_vram.
+Called by FUN_080d4e48 and FUN_080d8e98.
+
+Constants:
+- GAME_STR_ID=0x13ee // pack card count format string ID
+- PCT_MAX=0x64=100 // percentage upper limit
+- PCT_MIN=1 // percentage lower limit (at least 1%)
+- PCT_FULL=0x64=100 // displayed when all cards owned or total==0
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // language selection byte
+- FONT_IDX=2
+
+Inputs: r0=u16* dst_vram, r1=u8 pack_index [0..4], r2=u16 selected_count [0..total_count]
+Returns: void (pop {r0}; bx r0)
+Side effects: [OBJ VRAM via commit_line_buffer_to_sprite_vram]; [0x02006ed0+0x8/0x14/0x15] font control bytes

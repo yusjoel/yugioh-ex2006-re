@@ -1,0 +1,14 @@
+Formats the pack name string for the given pack slot and renders it to the OBJ VRAM sprite line buffer.
+r0=VRAM dst addr, r1=pack_index [0..4]. Uses game_str_id=0x13f9 to look up the pack name string via game_str_pointer_table; reads language flag at [0x02000000+0x6c2c] low 3 bits to select string branch. Reads pack_info_table[r1*16] halfword field as format parameter, calls expand_format_decimal_width_to_buf to format pack name width into stack buffer. Then calls setup_line_buf_pos_and_font + text_render_wrapper twice (two color layers) and finally commit_line_buffer_to_sprite_vram.
+Called by FUN_080d4e8c (pack slot init path) and FUN_080d8e98 (pack slot refresh).
+
+Constants:
+- GAME_STR_ID=0x13f9 // pack name string ID
+- PACK_INFO_STRIDE=0x10 // pack_info_table entry size
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // language selection byte
+- X_RALIGN_BASE=0x66 // right-align base x = 0x66 - pixel_width
+- FONT_IDX=2
+
+Inputs: r0=u16* dst_vram, r1=u8 pack_index [0..4]
+Returns: void (pop {r0}; bx r0)
+Side effects: [OBJ VRAM via commit_line_buffer_to_sprite_vram]; [0x02006ed0+0x8/0x14] font control bytes updated

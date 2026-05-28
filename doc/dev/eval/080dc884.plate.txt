@@ -1,0 +1,12 @@
+Advances one step of the pack animation/display sequence.
+Reads the current animation frame index from pack_ui_state+0x4; dispatches to the current frame handler via indirect function table at 0x09e4951c (4 bytes per entry) using invoke_r0. If the handler returns non-zero (frame complete), increments the frame index. If the next function pointer is NULL (sequence end, ldrh==0 -> LAB_080dc8b0), returns 1 (sequence finished); otherwise returns 0 (in progress).
+Called exclusively by FUN_080ddd5c (pack display state machine main loop) each frame.
+
+Constants:
+- PACK_UI_STATE=0x03005850 // pack_ui_state base
+- ANIM_STEP_IDX_OFFSET=0x4 // current animation frame index (halfword)
+- FUNC_TABLE=0x09e4951c // indirect function table (ROM)
+
+Inputs: void (no APCS params; ldr r4, pack_ui_state loaded internally)
+Returns: r0=u8 (0=animation in progress, 1=sequence ended or table empty)
+Side effects: [pack_ui_state+0x4] += 1 when frame completes

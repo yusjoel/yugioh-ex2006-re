@@ -1,0 +1,13 @@
+Renders the pack label string for game_str_id=0x13f1 to BG VRAM at the tile row specified by tile_row_base.
+r0=tile_row_base [0..848]; internally computes VRAM dst = 0x06010000 + r0*0x20.
+Looks up game_str_id=0x13f1 in game_str_pointer_table using language flag at [0x02000000+0x6c2c] low 3 bits; calls render_pack_label_to_bg_tile_vram.
+Called by FUN_080d713c (pack info page render; passes r0=0x140=320) and FUN_080d91e0 (pack info render; passes r0=0x350=848). Paired with render_pack_label_str1390_to_bg_vram (0x080dc928) in both callers.
+
+Constants:
+- VRAM_BASE=0x06010000 // BG VRAM base
+- PACK_STRIDE=0x20 // tile stride
+- GAME_STR_ID=0x13f1 // pack label string ID
+
+Inputs: r0=u16 tile_row_base [0..848] (observed: 0x140=320 from FUN_080d713c, 0x350=848 from FUN_080d91e0)
+Returns: void (pop {r0}; bx r0)
+Side effects: [0x06010000 + tile_row_base*0x20 via render_pack_label_to_bg_tile_vram] tile data written

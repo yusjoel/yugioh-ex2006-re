@@ -1,0 +1,16 @@
+Renders a JP text string to the BG VRAM area of the current text overlay layer.
+Reads overlay_ptr from gPrng+0x1d0; returns void if null or if overlay[+0x18] is null.
+Determines font width modifier (2 or 4) from overlay[+0x14] flags bit1; reads overlay[+0xe/+0x10] as content area width/height (each minus 2); calls setup_line_buf_font_with_align_and_slot.
+Manipulates 0x02006ed0 font control bytes (bit0..2 orrs/ands). Calls render_jp_string_nowrap_with_offset for the JP string; uses return width for horizontal centering. Calls text_render_wrapper twice. Updates overlay scroll field at overlay[+0xa]. Finally calls blit_tile_nibble_row_msb or blit_tile_nibble_row_lsb based on flags bit0 to write to BG tile VRAM.
+Called by FUN_080dd4ac (overlay size update) and text_overlay_create.
+
+Constants:
+- gPrng+0x1d0: overlay struct pointer (gPrng+0xe8*2)
+- 0x02006ed0: line buffer font control struct base
+- 0x06010420: blit_tile_nibble_row_lsb default target base (DAT_080dd06c)
+- 0x000003ff: tile index mask (DAT_080dd040)
+- 0xfffff003: tile clear mask (DAT_080dd044)
+
+Inputs: r0=const char* str_ptr (stored at [sp+0x4])
+Returns: void (pop {r0}; bx r0)
+Side effects: [0x02006ed0+0x8/0x14/0x15] font control bytes; [overlay+0xa] tile index scroll field; [BG tile VRAM via blit_tile_nibble_row_msb/lsb]

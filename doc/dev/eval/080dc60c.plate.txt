@@ -1,0 +1,14 @@
+Renders the pack label string A (game_str_id=0x13f8) to BG VRAM at the tile row for the given pack slot.
+r0=pack_index [0..4]; internally computes VRAM dst = 0x06010000 + r0*0x20.
+Looks up game_str_id=0x13f8 in game_str_pointer_table using language flag at [0x02000000+0x6c2c] low 3 bits; calls render_pack_label_to_bg_tile_vram(dst, str_ptr).
+indeg=0 (dead code / unreferenced; grep ".word 0x080dc60d" -> 0 hits). Sibling of render_pack_label_text_b_to_bg_vram (0x080dc664).
+
+Constants:
+- VRAM_BASE=0x06010000 // BG VRAM tile destination base
+- PACK_ENTRY_STRIDE=0x20 // per-pack tile stride (r0<<5)
+- GAME_STR_ID=0x13f8 // pack label string A ID
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // language byte
+
+Inputs: r0=u8 pack_index [0..4]
+Returns: void (pop {r0}; bx r0)
+Side effects: [0x06010000 + pack_index*0x20 via render_pack_label_to_bg_tile_vram] tile data written

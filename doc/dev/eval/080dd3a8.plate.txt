@@ -1,0 +1,15 @@
+Initializes a text overlay struct and selects the palette source based on mode_flags.
+r0=overlay_ptr (written to gPrng+0x1d0), r1=ewram_ctx_ptr, r2=tile_attr (low 14 bits), r3=tile_row_index [0..15] (written to [overlay+0x4]; all 6 observed callsites pass movs r3,#0xf=15), [sp+0x14]=mode_flags.
+Steps: (1) store r0 in gPrng+0x1d0; (2) zero_fill_halfword_wrapper clears 0x28 halfwords of overlay struct; (3) clear [overlay+0x3] bits[7:6], write tile_attr low 14 bits to [overlay+0x2], write tile_row_index to [overlay+0x4], clear [overlay+0x8]; (4) if mode_flags bit0 set: copy from OBJ palette 0x05000200 + tile_row_index*0x20 via copy_overlay_tile_row_to_palette; else copy from ROM table; (5) store ewram_ctx_ptr to [overlay+0x18], call store_ewram_ctx_ptr_and_clear_mode_flags; (6) store mode_flags to [overlay+0x14].
+Called by FUN_080d5604 / FUN_080d72f8 / FUN_080d87d0 / FUN_080d9694 and others.
+
+Constants:
+- gPrng+0x1d0: global overlay pointer slot (gPrng+0xe8<<1)
+- 0x05000200: OBJ palette base + 0x200 (palette source when mode_flags bit0=1)
+- 0x00003fff: tile_attr low 14 bits mask (DAT_080dd400)
+- 0xffffc000: tile_attr clear mask (DAT_080dd404)
+- ZERO_LEN=0x28 // zero_fill_halfword_wrapper clears this many halfwords
+
+Inputs: r0=void* overlay_ptr, r1=void* ewram_ctx_ptr, r2=u16 tile_attr [0..0x3fff], r3=u16 tile_row_index [0..15], [sp+0x14]=u32 mode_flags
+Returns: void (pop {r0}; bx r0)
+Side effects: [gPrng+0x1d0]:=overlay_ptr; [overlay_ptr+0x0..0x4f] cleared; [overlay_ptr+0x2/0x4/0x8/0x14/0x18] written; [OBJ palette via copy_overlay_tile_row_to_palette]; [via store_ewram_ctx_ptr_and_clear_mode_flags]

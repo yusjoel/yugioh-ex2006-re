@@ -1,0 +1,18 @@
+Renders the purchase-state label for the current pack selection to BG VRAM; creates a warning overlay if DP balance is insufficient.
+r0=target_vram_x (callee-save r9), r1=vram_param (callee-save r10).
+Calls recompute_pack_selection_totals to update pack_ui_state+0xc totals. Reads [+0xa] selected count: if 0, uses game_str_id=0x13f4 ("no selection"); else compares selected amount against DP balance at [0x02000000+0x6c38+4]: if sufficient uses game_str_id=0x13f2, if insufficient uses game_str_id=0x13f3 and calls text_overlay_create for a warning dialog.
+Finally calls render_pack_label_to_bg_tile_vram to write the label tile. Called by FUN_080d7ef4 (pack shop render) and FUN_080da924 (pack selection tick).
+
+Constants:
+- GAME_STR_ID_EMPTY=0x13f4 // no pack selected
+- GAME_STR_ID_OK=0x13f2 // purchase possible
+- GAME_STR_ID_NG=0x13f3 // insufficient DP
+- IWRAM_LANG_FLAG=[0x02000000+0x6c2c] // language flag
+- DP_BALANCE=[0x02000000+0x6c38+4] // current DP balance
+- OVERLAY_SIZE=0x0010001e // dialog size (w=0x10, h=0x1e)
+- GAME_STR_ID_LINE2=0x7d2 // dialog second line
+- GAME_STR_ID_LINE3=0x7d3 // dialog third line
+
+Inputs: r0=u16 target_vram_x, r1=u16 vram_param
+Returns: r0=u8 (0=no dialog created, 1=warning dialog created) via pop {r1}; bx r1 (Sub-case E)
+Side effects: [BG VRAM 0x06010000+offset via render_pack_label_to_bg_tile_vram]; [text_overlay_create] if DP insufficient; [pack_ui_state+0xc via recompute_pack_selection_totals]

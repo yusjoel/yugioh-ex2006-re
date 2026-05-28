@@ -1,0 +1,13 @@
+Measures the pixel width and height of a JP string under the current overlay font and returns the result packed.
+Reads overlay_ptr from gPrng+0x1d0; returns 0 if null. Reads overlay[+0x14] flags bit1 to determine font width (2 or 4). Uses r1=text_area_width and r2=text_area_height (each minus 2) to call setup_line_buf_font_with_align_and_slot. Manipulates 0x02006ed0 font control bytes. Updates overlay[+0xa] tile index field. Calls render_jp_string_nowrap to render the JP string and get pixel dimensions. Converts pixel width to tile count via (px+8)>>3, height likewise, returns (tile_h+2) | ((tile_w+2)<<16).
+Called exclusively by text_overlay_create (FUN_080dd53c) which passes: r1=overlay[+0xa]=text_area_width (low16 of packed size), r2=overlay[+0xc]=text_area_height (high16 of packed size).
+
+Constants:
+- gPrng+0x1d0: overlay struct pointer
+- 0x02006ed0: line buffer font control base
+- 0x000003ff: tile index mask (DAT_080dd15c)
+- 0xfffff003: tile clear mask (DAT_080dd160)
+
+Inputs: r0=u32 packed_xy (scroll position, callee-save via mov r8,r0), r1=u16 text_area_width [0..30] (tiles, from overlay[+0xa]), r2=u16 text_area_height [0..16] (tiles, from overlay[+0xc])
+Returns: r0=u32 packed (tile_height+2) | ((tile_width+2)<<16); 0 if overlay is null (pop {r1}; bx r1, Sub-case E)
+Side effects: [0x02006ed0+0x8/0x14/0x15] font control bytes; [overlay+0xa] tile index field (two strh updates)

@@ -1,0 +1,12 @@
+Renders the default (null) pack label to BG tile VRAM for the given pack index.
+r0=pack_index [0..4] (constrained by FUN_080d511c cmp r1,#0x4); computes VRAM dst = 0x06010000 + r0*0x20; passes r1=0 (null str_ptr) to render_pack_label_to_bg_tile_vram.
+Serves as the default case handler of the FUN_080d511c switch dispatcher (case > 4).
+Body is minimal: lsls #5 + ldr base + adds + bl + pop {r0};bx r0.
+
+Constants:
+- VRAM_BASE=0x06010000 // BG VRAM tile destination base
+- PACK_STRIDE=0x20 // per-pack tile stride (r0<<5)
+
+Inputs: r0=u8 pack_index [0..4]
+Returns: void (pop {r0}; bx r0)
+Side effects: [0x06010000 + pack_index*0x20 via render_pack_label_to_bg_tile_vram] default (null) label tile written

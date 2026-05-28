@@ -1,0 +1,13 @@
+Updates the scroll/direction bits and tile attribute extra field of the current text overlay struct.
+r0=packed_flags (low 2 bits written to [overlay+0x3] bits[7:6]), r1=packed_attr_extra (low 16 bits written to [overlay+0x6]).
+Reads overlay_ptr from gPrng+0x1d0; if null returns void. Otherwise: clears [overlay+0x3] bits[7:6] using mask 0x3f, ORs in r0 low 2 bits shifted left 6; stores r1 low 16 bits to [overlay+0x6].
+indeg=0 (dead code; grep ".word 0x080dd431" -> 0 hits).
+
+Constants:
+- gPrng+0x1d0: global overlay pointer slot
+- 0x3f: [overlay+0x3] bits[7:6] clear mask
+- DIR_BITS_SHIFT=6 // r0 low 2 bits shifted to bits[7:6]
+
+Inputs: r0=u16 packed_flags (low 2 bits = scroll dir/mode), r1=u16 packed_attr_extra (written to [overlay+0x6])
+Returns: void (pop {r0}; bx r0)
+Side effects: [overlay+0x3] bits[7:6] := r0 low 2 bits; [overlay+0x6] := r1 low 16 bits
