@@ -1,0 +1,10 @@
+Checks if opponent has more than 1 active equip slot.
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit, computes opponent = 1 - player_bit.
+Calls count_equip_slots_active_only(opponent).
+Returns 1 if count > 1, 0 if count <= 1.
+Used by AI to determine if opponent equip count reaches threshold to trigger a special effect
+(more than 1 equip required for activation).
+
+Constants:
+- EQUIP_COUNT_THRESHOLD=1 (cmp r0,#1; ble -> count<=1 -> return 0)

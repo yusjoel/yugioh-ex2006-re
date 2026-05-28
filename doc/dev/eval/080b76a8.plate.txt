@@ -1,0 +1,8 @@
+Checks if the opponent side has any active effect nodes.
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit from [r0+2] bit0; computes opponent = 1 - player_bit.
+Calls count_effect_node_activations_by_zone(opponent).
+Returns 1 if count > 0 (opponent has active effect nodes), 0 otherwise.
+Used to determine if opponent is in an active effect state before triggering own equip/effect.
+Symmetric counterpart to check_self_effect_node_active (0x080b76c8):
+that function passes player_bit (self), this function passes 1-player_bit (opponent).

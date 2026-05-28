@@ -1,0 +1,5 @@
+Checks if self zone score is better than opponent (score advantage check).
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit, calls compare_zone_max_scores_by_player(player_bit).
+Returns 1 if result > 0 (self max score higher than opponent), else 0.
+Used by AI to determine score advantage when deciding whether to activate trap/spell effects.

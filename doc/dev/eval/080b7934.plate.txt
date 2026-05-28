@@ -1,0 +1,19 @@
+Checks if equip activation is valid under field-wide level restriction cards.
+r0=zone_ptr -> r5 (struct[+2] bit0=player_side).
+Extracts player_bit; opponent = 1 - player_bit.
+Step 1: count_equip_slots_active_only(opponent) -> r6; if r6==0 -> return 0.
+Step 2: count_equip_whitelist_cards_in_monster_zone for both sides; self > opponent count -> return 1.
+If r6 > 1 and self active equip count >= opponent: continue to core check.
+Core: check_equip_effect_zone_preconditions(self) -> 0 then return 0.
+count_field_copies_of_card(0x140e=Gravity Bind) and count_field_copies_of_card(0x17a6=Level Limit Area B).
+If neither is on field -> return 0.
+find_best_activatable_slot_score_for_player(self, -1, 0) -> r4=score.
+Compare r4 against LP threshold and lower bound 0x095f (2399).
+If in range: compare_zone_max_scores_by_player; <= 0 -> fail; > 0 -> return 1.
+
+Constants:
+- CARD_Gravity_Bind=0x140e (cid=889)
+- CARD_Level_Limit_Area_B=0x17a6 (cid=1596)
+- SCORE_LOWER_BOUND=0x095f=2399
+- gP1LifePoints=0x0201c4e0
+- player_stride=0x868

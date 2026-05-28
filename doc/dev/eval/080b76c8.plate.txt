@@ -1,0 +1,8 @@
+Checks if the self side has any active effect nodes.
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit from [r0+2] bit0 (no flip).
+Calls count_effect_node_activations_by_zone(player_bit).
+Returns 1 if count > 0, 0 otherwise.
+Symmetric counterpart to check_opponent_effect_node_active (0x080b76a8):
+76a8 passes opponent side (1-player_bit), this function passes self (player_bit).
+Near-identical variant: check_self_effect_node_active_b (0x080b7760) uses bne instead of ble.

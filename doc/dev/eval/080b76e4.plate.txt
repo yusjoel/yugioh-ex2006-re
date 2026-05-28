@@ -1,0 +1,13 @@
+Checks if a card zone has sufficient pair slot count for activation eligibility.
+r0=zone_ptr (struct[+0]=card_id halfword, struct[+2]=player_bits and type bits[5:1]).
+Extracts player_bit and card_id, calls count_slot_card_pair_allowed_for_card(player, card_id) -> count.
+Extracts type from [r0+2] bits[5:1] (lsls #0x1a / lsrs #0x1b).
+If type <= 10 (standard zone): requires count > 1 (strict threshold, subs r0,r2,#1 > 0).
+If type > 10 (extended zone): requires count > 0 (relaxed threshold).
+Returns 1 if sufficient pair slots, 0 otherwise.
+Called by FUN_080b7f64 (0x080b7f64) and 0x080bad6c for compound pair eligibility checks.
+
+Constants:
+- TYPE_THRESHOLD=10 (cmp r0,#0xa)
+- COUNT_THRESHOLD=1 (subs r0,r2,#1 for strict check)
+- type_field=[r0+2] bits[5:1]

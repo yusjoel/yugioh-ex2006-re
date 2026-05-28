@@ -1,0 +1,7 @@
+Checks if the self side has active effect nodes (variant B).
+r0=zone_ptr (struct[+2] bit0=player_side).
+Identical behavior to check_self_effect_node_active (0x080b76c8):
+extracts player_bit from [r0+2] bit0, calls count_effect_node_activations_by_zone(player_bit),
+returns 1 if count > 0, else 0.
+Difference from 0x080b76c8: uses bne (count!=0 -> 1) instead of ble (count<=0 -> 0 path).
+Equivalent for non-negative counts; two independently compiled variants of same predicate.

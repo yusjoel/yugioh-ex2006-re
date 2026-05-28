@@ -1,0 +1,15 @@
+Inline exit fragment within FUN_080b5d98 equip target dispatch hub: direction-bit-driven target selection.
+Jumped to from a specific card_id branch at 0x080b5fe6 in the hub.
+Parent frame: r6=player_id, r3=direction_source (bit31 = sign bit), r8=equip_zone_bitmap.
+Extracts r3 bit31 via lsrs #0x1f as direction; computes r1 = 1 - direction (flipped side).
+Sets r2=-1 (rsbs, gate_param), stores as 5th stack arg.
+Calls find_best_slot_from_equip_bitmap_with_gate(r6, r1, mode=1, gate=1).
+If slot found (r4 >= 0): extracts self player from r6[+2] bit0, opponent = 1-self;
+then b LAB_080b6bd4 (success + target commit).
+If not found: b FUN_080b6be0 (fail exit).
+Unlike exec_equip_target_select_opponent_first (0x080b68fc), no fallback retry.
+
+Constants:
+- gate_param=-1 (rsbs r2,#0)
+- mode=1 (movs r3,#1)
+- direction = r3_parent >> 31 (sign bit)

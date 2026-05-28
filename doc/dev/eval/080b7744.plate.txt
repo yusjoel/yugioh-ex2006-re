@@ -1,0 +1,6 @@
+Checks if the player's hand contains an available equip target, using zone_ptr to identify the player.
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit from [r0+2] bit0 via lsls/lsrs.
+Calls check_hand_equip_target_available(player_bit).
+Normalizes result to 0/1 bool.
+Thin wrapper around check_hand_equip_target_available; auto-extracts player_side from zone struct.

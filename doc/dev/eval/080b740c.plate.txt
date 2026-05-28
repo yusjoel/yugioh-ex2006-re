@@ -1,0 +1,24 @@
+Scans player hand and field card lists for equip-activatable cards, initializing target slot refs.
+Called by FUN_080x08069e40 in switch case 0x7f (equip activation trigger path), r0=player_side.
+First writes player_id to [0x0201afe0] (duel active player marker).
+Three scan rounds:
+(1) Iterates gDuelFieldSlots2 (0x0201c600, extra card list) matching special IDs:
+    0x13b5=Moisture Creature, 0x154b=Gilford the Lightning, 0x1905=Dark Dreadroute and adjacent IDs.
+    On match: eval_card_placement_flags_default for placement bit,
+    eval_card_activation_score_with_lp_threshold for score,
+    then init_duel_zone_target_slot_refs(player, 0xb, slot, mode=4 or 6).
+(2) Iterates main card list (gP1LifePoints+0xc = hand count); checks summon restriction
+    and placement flags; init_duel_zone_target_slot_refs for eligible hand cards.
+(3) Extends to second player view with similar checks.
+Returns void (pop {r0}; bx r0 -> r0 overwritten with saved LR).
+
+Constants:
+- gDuelActivePlayer=0x0201afe0 (DAT_080b7470)
+- gP1LifePoints=0x0201c4e0 (PTR_gP1LifePoints_080b7474)
+- gDuelFieldSlots2=0x0201c600
+- player_stride=0x868
+- CARD_Moisture_Creature=0x13b5
+- CARD_Gilford_the_Lightning=0x154b
+- CARD_Dark_Dreadroute=0x1905
+- TARGET_MODE_A=4, TARGET_MODE_B=6
+- ZONE_TYPE=0xb

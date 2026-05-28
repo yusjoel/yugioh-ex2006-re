@@ -1,0 +1,7 @@
+Checks if opponent monster zone has any equip whitelist cards.
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit, computes opponent = 1 - player_bit.
+Calls count_equip_whitelist_cards_in_monster_zone(opponent).
+Returns 1 if count > 0, 0 otherwise.
+Used together with check_opponent_equip_count_exceeds_one (0x080b7838) and similar predicates
+as combined activation condition gate checks.

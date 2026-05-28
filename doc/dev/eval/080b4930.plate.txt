@@ -1,0 +1,14 @@
+Checks if two zone entries are cross-player and the second has an eligible type field.
+r0=zone_ptr_a (struct[+2] bit0=player_side_a),
+r1=zone_ptr_b (null -> return 0; struct[+2] bits[5:1]=type, bit0=player_side_b).
+Extracts player_bit from both structs. Same side -> return 0.
+Different: extracts bits[5:1] as type (lsls #0x1a / lsrs #0x1b); type > 4 -> return 0.
+Reads [gP1LifePoints+0x10d0] bit0 as LP status flag, returns it.
+Simplified variant of check_slot_effect_link_matches_equip_zone (0x080b4878),
+without effect link iteration; direct cross-player type check + LP flag.
+
+Constants:
+- TYPE_FIELD=[zone_ptr_b+2] bits[5:1]
+- EFFECT_TYPE_MAX=4
+- LP_STATUS_OFFSET=0x10d0 (gP1LifePoints + 0x10d0 = 0x0201d5b0)
+- gP1LifePoints=0x0201c4e0

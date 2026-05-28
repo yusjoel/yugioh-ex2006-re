@@ -1,0 +1,14 @@
+Inline exit fragment within FUN_080b5d98 equip target dispatch hub: opponent-first selection strategy.
+Jumped to from multiple card_id dispatch branches in the hub.
+Parent frame registers: r6=player_id, r8=equip_zone_ptr ([+2] bit0=player_side).
+Extracts equip zone player from r8 bit0; computes opponent = 1 - player.
+Sets r5=-1 (rsbs, gate_param), stores as 5th stack arg.
+Calls find_best_slot_from_equip_bitmap_with_gate(r6, opponent, mode=1, gate=-1).
+If slot found (result >= 0) -> b FUN_080b6bd8 (commit equip target).
+If not found: flips to self side, retries find_best_slot_from_equip_bitmap_with_gate.
+Both fail -> b FUN_080b6be0 (fail exit).
+Opponent-first strategy biases equip effect toward negative impact on opponent.
+
+Constants:
+- gate_param=-1 (rsbs r5,#0)
+- mode=1 (movs r5,#1)

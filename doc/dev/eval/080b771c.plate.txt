@@ -1,0 +1,8 @@
+Checks if the effect handler for a zone entry returns a positive (nonzero) result.
+r0=zone_ptr (struct[+0]=card_id halfword, struct[+2] bit0=player_side).
+Extracts player_bit -> r4; card_id -> r5.
+Calls lookup_slot_display_value_by_card_id(card_id) -> r2 (display value).
+Calls dispatch_effect_handler_by_card_id(player, card_id, display_value).
+Returns 1 if result > 0, 0 if result <= 0.
+Used to determine if a specific card's effect handler reports a valid activation state.
+Side effects depend on dispatch_effect_handler_by_card_id internal behavior.

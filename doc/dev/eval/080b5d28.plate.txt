@@ -1,0 +1,16 @@
+Searches equip zone slot_idx for an evolution target card ID for the given player.
+Called via fn-ptr table DAT_080b701c (0x080b5d29) from FUN_080b5d98 equip target slot dispatch hub.
+r0=player_id bit0, r1=slot_idx [0..10].
+Computes gDuelEffectZones + player*0x868 + slot_idx*0x14, loads slot DWORD,
+extracts 13-bit card_id via lsls/lsrs #0x13 -> r4.
+Calls check_card_id_is_effect_monster_type_b(r4); if 0 (not evolution type) -> return 0.
+Calls get_card_evolution_target_ids(r4) -> r0=count, r1=ptr to target ID array.
+If r4 >= max_target_id (already at max evolution) -> return 0.
+Tries find_zone_slot_idx_allowed_for_card(player) >= 0; then
+find_card_pair_in_player_deck_list(player, max_target_id) >= 0.
+Either success -> return max_target_id; both fail -> return 0.
+
+Constants:
+- gDuelEffectZones=0x0201c510 (DAT_080b5d88)
+- player_stride=0x868 (DAT_080b5d84)
+- CARD_ID_BITS=13 (lsls/lsrs #0x13)

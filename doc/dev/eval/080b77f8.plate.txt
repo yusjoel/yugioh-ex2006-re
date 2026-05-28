@@ -1,0 +1,14 @@
+Checks if self LP is behind by more than 500 points compared to opponent (LP disadvantage threshold check).
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit from [r0+2] bit0.
+Computes self LP base: gP1LifePoints + player*0x868; reads self LP value.
+Computes opponent LP base: gP1LifePoints + (1-player)*0x868; reads opponent LP value.
+Adds 500 (0xfa<<1 = 0x1f4) to self LP: if opponent LP < (self LP + 500)
+(i.e. self LP is behind by more than 500) -> returns 1, else returns 0.
+Note: bge branch keeps r5=0 when opponent LP >= self LP+500; else r5=1.
+Used by AI to trigger special effects when self is at LP disadvantage exceeding 500.
+
+Constants:
+- LP_MARGIN=500 (0xfa*2 = 0x1f4)
+- gP1LifePoints=0x0201c4e0 (DWORD_080b7830)
+- player_stride=0x868 (DWORD_080b7834)

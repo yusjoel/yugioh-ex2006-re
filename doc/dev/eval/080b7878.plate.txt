@@ -1,0 +1,22 @@
+Checks equip activation eligibility for Premature Burial (0x1366) or Call of the Haunted (0x137d).
+r0=zone_ptr -> r4 (struct[+2] bit0=player_side).
+First checks if Premature Burial already equipped in self zone via find_equip_slot_by_card_id(player, 0x1366);
+if slot >= 0 -> return 1 immediately (already present shortcut).
+Then: if opponent has no monsters (count_occupied_monster_zones(opponent)==0) -> return 0.
+If self has no monsters -> return 0.
+If opponent has no active equips (count_equip_slots_active_only(opponent)==0) -> return 0.
+Then: find_equip_slot_by_card_id(player, 0x137d) for Call of the Haunted slot -> r1.
+If r1 < 0 -> return 0.
+Calls find_equip_chain_pair_across_field(player) -> packed_slot_pair.
+Checks packed_pair bits[15:0] != 0xFFFF (valid pair).
+Checks associated slot card_id != 0x0fd6 (Sangan) and != 0x11e4 (Witch of the Black Forest).
+All checks pass -> return 1, any fail -> return 0.
+
+Constants:
+- CARD_Premature_Burial=0x1366 (DWORD_080b7910, cid=773)
+- CARD_Call_of_the_Haunted=0x137d (DWORD_080b7914, cid=793)
+- INVALID_SLOT=0xffff
+- CARD_Sangan=0x0fd6 (cid=53)
+- CARD_Witch_of_the_Black_Forest=0x11e4 (cid=477)
+- gDuelEffectZones=0x0201c510
+- player_stride=0x868

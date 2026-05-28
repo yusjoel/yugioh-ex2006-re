@@ -1,0 +1,13 @@
+Checks if activation slots are available for Dark Room of Nightmare (0x159b).
+r0=zone_ptr (struct[+2] bit0=player_side).
+Extracts player_bit. Uses DWORD_080b77ac=0x159b (Dark Room of Nightmare icid, cid=1183).
+First calls count_available_effect_zones(player, 0x159b, mode=-1):
+if count > 0 -> return 1 immediately.
+If no effect zone slot: calls count_valid_monster_pair_slots(player, 0x159b) -> r4
+and count_zone_card_pair_allowed_for_card(player, 0x159b) -> r0.
+Uses cmn r4,r0: if r4+r0 != 0 (either has slots) -> return 1, else return 0.
+Used by AI to confirm Dark Room of Nightmare has required field conditions for activation.
+
+Constants:
+- CARD_Dark_Room_of_Nightmare=0x159b (DWORD_080b77ac, cid=1183)
+- mode=-1 (rsbs r2,r2,#0)
