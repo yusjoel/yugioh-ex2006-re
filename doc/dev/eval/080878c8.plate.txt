@@ -1,0 +1,10 @@
+Equip activation scan callback, substate=0xd path, triple gate: (1) check_card_field5_is_nonzero, (2) get_card_extended_stat_field4_raw <= 0x5dc (ATK upper bound 1500), (3) find_effect_node_in_zone(player_id, zone=0xb, card_id=0x12a1) returns 0 (no existing node). Entry r0=player_id, r8=fn-ptr frame high-reg. Iterates gP1LifePoints+player*0x868+0x10 zone list; reads full slot DWORD from gDuelCardSlots (0x0201c740); extracts zone type. All pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_LIST_OFFSET=0x10
+- SUBSTATE=0xd
+- ATK_UPPER_BOUND=0x5dc (1500 ATK)
+- PARASITE_PARACIDE_ICID=0x12a1 (effect node key)
+- gDuelCardSlots=0x0201c740
+- ZONE_B=0xb

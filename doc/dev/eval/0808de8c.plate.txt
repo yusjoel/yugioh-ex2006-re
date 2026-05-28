@@ -1,0 +1,10 @@
+Equip effect activation scan, dual-player x 5-slot double loop. Entry r0=card_id_filter (sp[0] spill), r1=slot_idx_skip [0..4] (r10 alias via .hword 0x468a=mov r10,r1; inner loop cmp r6,r10 skips this slot_idx to prevent self-pair activation). Outer loop r0 in {0,1} (player side, initialized from [0x0201e1c8] eors r4,r0); inner r6=0..4 (slot index). Per slot: calls test_slot_has_active_card(player_side, slot_idx, 0x104c); passes -> reads card_id from gDuelFieldSlots (0x0201c510)+player*0x868+slot*0x14; builds packed_effect_id (player/slot/zone_type/sign_bit fields); calls apply_equip_activation_with_id_lookup(r0=0, r1=packed_effect_id, r2=card_id_from_slot). Batch driver shell for apply_equip_activation_with_id_lookup. indeg=0, Sub-type A fn-ptr callback.
+
+Constants:
+- EFFECT_TABLE_BASE=0x0201e1c8
+- gDuelFieldSlots=0x0201c510
+- ACTIVE_CARD_KEY=0x104c
+- PLAYER_STRIDE=0x868
+- SLOT_STRIDE=0x14
+- SLOT_COUNT=5 [0..4]
+- PLAYER_COUNT=2

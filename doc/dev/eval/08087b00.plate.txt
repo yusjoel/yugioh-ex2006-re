@@ -1,0 +1,11 @@
+Equip activation scan callback, substate=0xd path, Magical Labyrinth/Dark Magic Curtain family pair + full placement check. Entry r0=player_id, r1=card_id. Dispatch tree maps r1 to pair base r8: Magical Labyrinth(0x1232)->Wall Shadow(0x1117); Dark Magic Curtain(0x12de)->Dark Magician(0x0fc9). Iterates gP1LifePoints+player*0x868+0x10; reads from gDuelCardSlots (0x0201c740); checks check_card_pair_allowed(zone_card, r8). Pass -> eval_equip_placement_full_check(player_id, zone_card_id, 1). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xd, slot_idx).
+
+Constants:
+- MAGICAL_LABYRINTH_ICID=0x1232
+- DARK_MAGIC_CURTAIN_ICID=0x12de (=0x1232+0xac)
+- WALL_SHADOW_ICID=0x1117
+- DARK_MAGICIAN_ICID=0x0fc9
+- PLAYER_STRIDE=0x868
+- ZONE_LIST_OFFSET=0x10
+- gDuelCardSlots=0x0201c740
+- SUBSTATE=0xd

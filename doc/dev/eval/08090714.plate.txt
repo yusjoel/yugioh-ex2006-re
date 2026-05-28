@@ -1,0 +1,7 @@
+Effect node zone activation counter. Entry r0=card_ptr (r9 alias). Clears [0x0201b290+0x4bc] first; calls find_card_effect_node_entry(card_ptr) to get node (r7); if null or [node+8]==0, returns r8=0. If valid: double loop r5 in {0,1} (player_side) x r4 in {0..0xa} (zone_idx=11 zones); calls invoke_r3(card_ptr, player_side, zone_idx) using [node+8] as function pointer; non-zero return -> r8++. Returns r8 = number of successful zone activations. Sibling with count_effect_node_activations_by_zone (0x080907f4). indeg=35.
+
+Constants:
+- ACTIVE_FLAG_ADDR=0x0201b290+0x4bc
+- ZONE_COUNT=11 [0..0xa]
+- PLAYER_COUNT=2 [0..1]
+- NODE_HANDLER_OFFSET=0x8

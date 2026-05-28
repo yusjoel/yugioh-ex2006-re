@@ -1,0 +1,4 @@
+Effect node handler presence predicate. Entry r0=card_ptr. Calls find_card_effect_node_entry(card_ptr); if null, returns 0 (false). If non-null: reads [node+0x10] (handler_ptr); applies rsbs r0,r1,#0 | orrs r0,r1 -> r0 = r1|(-r1); then lsrs r1,r0,#0x1f -> r1 = bit31 = 1 if r1!=0, 0 if r1==0. Returns r1 = bool (1=handler exists, 0=absent). Standard nonzero-test pattern. Sibling with invoke_effect_node_action_if_found (0x08090944): this function only returns bool, does not invoke handler.
+
+Constants:
+- NODE_HANDLER_OFFSET=0x10 ([node+0x10] = handler function pointer)

@@ -1,0 +1,4 @@
+Effect node 2-argument callback dispatcher. Entry r0=card_ptr (r4), r1=param (r5). Calls find_card_effect_node_entry(card_ptr); if null or [node+0xc]==0 (no callback), returns 1 (blocked). If valid, calls invoke_r2(card_ptr, param) using [node+0xc] as function pointer. Success returns invoke_r2 result; blocked path returns 1. Sibling family with invoke_effect_node_handler_3arg (0x080905e8) and invoke_effect_node_with_active_flag_3arg (0x08090624): 2-arg / 3-arg-no-flag / 3-arg-with-flag. indeg=7.
+
+Constants:
+- NODE_HANDLER_OFFSET=0xc ([node+0xc] = unicast handler ptr)

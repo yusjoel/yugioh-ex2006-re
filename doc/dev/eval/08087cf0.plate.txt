@@ -1,0 +1,7 @@
+Equip activation scan callback, substate=0xe path, opponent-side field5 filter scan. Entry r0=player_id. Prefix: subs r3,r1,r0 (r1=1 fixed) -> r3=1-player_id=opponent_player_id; r7 alias holds opponent_player_id. Iterates gP1LifePoints+opponent*0x868+0x14; reads DWORD from monster zone area (0x83<<3=0x418 offset); extracts card_id; calls check_card_field5_is_nonzero(card_id). Pass -> write_equip_zone_entry_by_substate(opponent_id, 0xe, slot_idx). Contrast with scan_both_players_field5_eligible_substate_e (0x08087c4c): this function scans only opponent side, no check_zone_slot_equip_eligible call.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_LIST_OFFSET=0x14
+- MONSTER_ZONE_OFFSET=0x418 (=0x83<<3)
+- SUBSTATE=0xe

@@ -1,0 +1,6 @@
+Zone pair scan counter accepting a function pointer parameter. Entry r0=card_ptr (sp[0] spill), r1=fn_ptr (r10 via .hword 0x468a=mov r10,r1), r2=skip_pair [0..0x1ff] (r9 via .hword 0x4691=mov r9,r2). Clears [0x0201b290+0x4bc] first. Double loop r5 in {0,1} (player_side) x r4 in {0..0xa} (zone_idx): builds packed_pair=r5<<8|r4; compares with r9 (skip_pair) to skip self-pair; calls invoke_r10(card_ptr, player_side, zone_idx); non-zero -> count r7++. Returns r7 = hit count. Callers such as FUN_08050eac pass scan_zone_* callbacks (e.g. 080876dc cluster) via fn_ptr for equip placement enumeration. indeg=4 (including FUN_0809077c wrapper).
+
+Constants:
+- ACTIVE_FLAG_ADDR=0x0201b290+0x4bc
+- ZONE_COUNT=11 [0..0xa]
+- PLAYER_COUNT=2 [0..1]

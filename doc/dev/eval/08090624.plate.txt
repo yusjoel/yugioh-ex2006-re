@@ -1,0 +1,6 @@
+Effect node 3-argument callback dispatcher with symmetric active-flag set+clear fence. Entry r0=card_ptr (r4), r1=param1 (r5), r2=param2 (r6). Calls find_card_effect_node_entry(card_ptr); if null or [node+8]==0, jumps to LAB_08090650 (clear 0x4bc + return r2=1). If valid: sets [0x0201b290+0x4bc]=1 (activation flag), calls invoke_r3(card_ptr, param1, param2), saves result to r2; then unconditionally clears [0x4bc]=0 + returns r2. Key difference from invoke_effect_node_handler_3arg (0x080905e8): this function sets flag to 1 BEFORE invoke and clears on BOTH paths (symmetric fence). indeg=78, highest-frequency hub.
+
+Constants:
+- ACTIVE_FLAG_ADDR=0x0201b290+0x4bc=0x0201b74c
+- NODE_TARGET_OFFSET=0x8
+- BLOCKED_RESULT=1

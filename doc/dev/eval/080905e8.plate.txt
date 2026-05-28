@@ -1,0 +1,5 @@
+Effect node 3-argument callback dispatcher with global activation flag clear. Entry r0=card_ptr (r4), r1=param1 (r5), r2=param2 (r6). Calls find_card_effect_node_entry(card_ptr); if null or [node+8]==0 (no target), returns 1. If valid: clears [0x0201b290+0x4bc] (global activation flag) before invoke; calls invoke_r3(card_ptr, param1, param2). After invoke branches to return via b LAB_0809061e. Distinction from invoke_effect_node_handler_2arg (0x080905c0): this function has third parameter + clears 0x4bc flag (activation context isolation). indeg=18.
+
+Constants:
+- NODE_TARGET_OFFSET=0x8 ([node+8] = target ptr; NULL = no valid target)
+- ACTIVE_FLAG_ADDR=0x0201b290+0x4bc

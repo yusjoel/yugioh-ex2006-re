@@ -1,0 +1,7 @@
+Equip activation write callback, substate=0xc simplified path. Entry r0=player_id. Loads gP1LifePoints+player*0x868+0x18 zone entry count; for each slot directly calls write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx) without eligibility filtering. Sibling pair with scan_zone_equip_target_eligible_substate_c (0x080876dc): this function omits check_card_is_equip_target_eligible and check_card_id_is_equip_excluded_range, writes all player zone slots unconditionally.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_LIST_OFFSET=0x18
+- SUBSTATE=0xc
+- gP1LifePoints base (PTR_gP1LifePoints_0808778c)

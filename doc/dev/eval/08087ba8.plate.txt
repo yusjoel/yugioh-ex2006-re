@@ -1,0 +1,7 @@
+Equip activation scan callback, substate=0xb path, dual gate: (1) get_card_extended_stat_field6(zone_card)==1; (2) eval_equip_placement_full_check(player_id, zone_card_id, 0) passes. Entry r0=player_id (r5), r2=zone_slot_idx (r6). Reads gDuelCardSlots (0x0201c600)+player*0x868+slot_idx*4; extracts card_id (bits[18:0]). field6==1 and placement check pass -> write_equip_zone_entry_by_substate(player_id, 0xb, slot_idx). Sibling pair with scan_zone_field6_eq_eval_placement_substate_b (0x08087a20): this function compares field6 with fixed 1 rather than target card's field6.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- gDuelCardSlots=0x0201c600
+- FIELD6_EQUIP_ONE=0x1
+- SUBSTATE=0xb

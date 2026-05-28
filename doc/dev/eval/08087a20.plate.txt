@@ -1,0 +1,6 @@
+Equip activation scan callback, substate=0xb path, dual filter: (1) get_card_extended_stat_field6(zone_card)==get_card_extended_stat_field6(r1_card), (2) eval_equip_placement_full_check(player_id, zone_card_id, 0) passes. Entry r0=player_id, r1=target_card_id (r5), r2=zone_slot_idx (r8 via .hword 0x4690=mov r8,r2). Reads gDuelCardSlots (0x0201c600)+player*0x868+slot*4; extracts card_id (bits[18:0]). Both pass -> write_equip_zone_entry_by_substate(player_id, 0xb, zone_slot_idx).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_DATA_BASE=0x0201c600
+- SUBSTATE=0xb

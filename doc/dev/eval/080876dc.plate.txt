@@ -1,0 +1,8 @@
+Equip activation scan callback, substate=0xc path. Entry r0=player_id (bit0 extracted), r1=zone_slot_idx_packed (r8 high-reg passes outer zone count address). Iterates gP1LifePoints+player*0x868+0x18 zone slot list (up to [+0x0] entries); extracts card_id (bits[18:0] via lsls/lsrs #0x13); calls check_card_is_equip_target_eligible then check_card_id_is_equip_excluded_range as two gatekeepers. Both pass -> calls write_equip_zone_entry_by_substate(player_id, 0xc, slot_idx) to record eligible slot. Used as function pointer fed into FUN_0809078c (count_zone_pair_hits_with_fn_ptr) via invoke_r10.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_LIST_OFFSET=0x18
+- SUBSTATE=0xc
+- gP1LifePoints base (PTR_gP1LifePoints_0808774c)
+- ZONE_DATA_BASE=0x0201c880

@@ -1,0 +1,9 @@
+Equip zone write dispatcher, selects gP1LifePoints offset based on substate (r2=0xc/0xd/0xe/0xf) then batch-writes all zone entries via write_equip_zone_entry_by_substate. Entry r0=player_id (r7), r2=substate [0xc..0xf]. Dispatch tree: 0xc->+0x18; 0xd->+0x10; 0xe->+0x14; 0xf->+0x1c. Loads zone count (r5); if count>0 loops r4=0..count-1, calling write_equip_zone_entry_by_substate(player_id, substate, r4) each iteration. Out-of-range substate: r5 stays 0, loop skips.
+
+Constants:
+- PLAYER_STRIDE=0x868
+- ZONE_OFFSET_C=0x18 (substate 0xc)
+- ZONE_OFFSET_D=0x10 (substate 0xd)
+- ZONE_OFFSET_E=0x14 (substate 0xe)
+- ZONE_OFFSET_F=0x1c (substate 0xf)
+- SUBSTATE_RANGE=[0xc..0xf]

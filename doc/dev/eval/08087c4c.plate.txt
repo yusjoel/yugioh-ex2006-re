@@ -1,0 +1,8 @@
+Equip activation scan callback, substate=0xe path, dual-player iteration variant. Outer loop r2 in {0,1} (player side toggle via eors r5,r2); inner loop r4=0..zone_count-1. Reads gDuelCardSlots (0x0201c8f8) per slot; extracts card_id (bits[18:0]). Two gates: (1) check_card_field5_is_nonzero(card_id); (2) check_zone_slot_equip_eligible(r8, player_side, slot_idx). Both pass -> write_equip_zone_entry_by_substate(r8, 0xe, slot_idx). r8 holds original player_id throughout as write target; r5 is the scanning player_side variable.
+
+Constants:
+- ZONE_DATA_BASE=0x0201c8f8
+- ZONE_LIST_OFFSET=0x14
+- PLAYER_STRIDE=0x868
+- SUBSTATE=0xe
+- LOOP_PLAYER_COUNT=2
