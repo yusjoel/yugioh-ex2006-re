@@ -1,0 +1,1 @@
+Extracts player_id from effect node ptr (r0), byte[+2] bit0; calls push_to_effect_slot_array(r0=effect_node_ptr, r1=player_id); returns 1 always. Leaf wrapper encapsulating player_id extraction + push_to_effect_slot_array pattern. Used by push_to_effect_slot_array call chain (0x08080b74 hub). Side effects: via push_to_effect_slot_array: effect slot array write.
