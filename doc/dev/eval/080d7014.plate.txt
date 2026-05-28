@@ -1,0 +1,11 @@
+Advances pack card info page step state. Reads current step index from pack_ui_state+0xc scroll state [+0x4]; looks up function pointer in ROM table DAT_080d7054 (0x09e493e0). If pointer is non-null calls invoke_r0; if return is non-zero increments step index. If step index is non-zero, writes a scroll param to gPrng+0x1ea. Returns 0 if step done (null fn ptr), 1 if more steps remain. Exits via pop{r1}+bx r1 (Sub-case E).
+
+Constants:
+- pack_ui_state = 0x03005850 (DAT_080d7050)
+- STEP_TABLE_BASE = 0x09e493e0 (DAT_080d7054; ROM jump table)
+- gPrng = 0x03000040 (PTR_gPrng_080d7058)
+- PRNG_WRITE_OFFSET = 0x1ea (movs r2,#0xf5; lsls r2,r2,#1 -> 0xf5<<1=0x1ea)
+
+Inputs: none (entry: ldr r0, pack_ui_state)
+Returns: r0=u32 (0=step done, 1=more steps pending) (Sub-case E pop{r1}+bx r1)
+Side effects: [pack_ui_state+0xc+0x4] step_index += 1 if fn returns nonzero; [gPrng+0x1ea] strh scroll param

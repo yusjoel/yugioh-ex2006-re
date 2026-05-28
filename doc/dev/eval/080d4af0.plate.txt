@@ -1,0 +1,9 @@
+Fills the first fill_count pack card BG tilemap slots with valid tile IDs and clears the rest. r0=pack_context_ptr, r1=fill_count (clamped to 5). Loops [0..fill_count-1]: calls fill_pack_card_slot_tiles(slot, pack_ctx). Then loops [fill_count..4]: calls clear_pack_card_slot_tiles(slot, pack_ctx). Called from FUN_080d4a5c (pack card image hub dispatcher) and multiple pack frame drivers to switch the displayed card count.
+
+Constants:
+- MAX_SLOT_COUNT = 5 (cmp r1,#5; bls -> clamp)
+- LAST_SLOT_IDX = 4 (cmp r4,#4 -> clear loop bound)
+
+Inputs: r0=ptr pack_context_ptr; r1=u32 fill_count [0..5]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [VRAM tilemap via fill_pack_card_slot_tiles] writes BG tilemap card slot tile IDs; [VRAM tilemap via clear_pack_card_slot_tiles] clears remaining slots

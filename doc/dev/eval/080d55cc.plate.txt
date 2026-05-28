@@ -1,0 +1,12 @@
+Renders two overlay OAM sprites (top and bottom halves) at the pack card highlight position. r0=slot_node_ptr (passed as r3 to render_overlay_oam_sprite_tiled). First call: attr0=0x00900008, oam_params=0x0002000d, tile=0x000b0280. Second call: attr0=0x00900080, tile=0x000b028d. Called frequently by pack scene frame drivers to display the current card selection highlight box.
+
+Constants:
+- SPRITE_ATTR0_TOP = 0x00900008 (DAT_080d55f0)
+- OAM_PARAMS = 0x0002000d (DAT_080d55f4)
+- TILE_DATA_TOP = 0x000b0280 (DAT_080d55f8)
+- SPRITE_ATTR0_BOT = 0x00900080 (DAT_080d55fc)
+- TILE_DATA_BOT = 0x000b028d (DAT_080d5600)
+
+Inputs: r0=ptr slot_node_ptr (current selected card slot node ptr, passed as r3)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OAM shadow via render_overlay_oam_sprite_tiled x2] writes highlight box OAM entries

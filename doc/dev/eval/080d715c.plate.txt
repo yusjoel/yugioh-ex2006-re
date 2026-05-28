@@ -1,0 +1,10 @@
+Renders pack card stat byte sprite to the info page OBJ VRAM slot selected by player_id. r0=player_id (0 or 1). If r0==0 uses base 0x06000000 (movs r4,#0xc0; lsls r4,#0x13); else loads DAT_080d7180=0x06000680. Computes dest = base+0x240. Calls zero_fill_pack_info_obj_vram(dest) then render_pack_card_stat_byte_to_sprite(dest). Called by pack info page frame drivers.
+
+Constants:
+- VRAM_BASE_PLAYER0 = 0x06000000 (movs r4,#0xc0; lsls r4,r4,#0x13)
+- VRAM_BASE_PLAYER1 = 0x06000680 (DAT_080d7180)
+- VRAM_OFFSET = 0x240 (movs r0,#0x90; lsls r0,r0,#2 -> 0x90<<2=0x240)
+
+Inputs: r0=u32 player_id (0 or 1; selects VRAM base)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM base+0x240 via zero_fill_pack_info_obj_vram] clears stat sprite area; [OBJ VRAM base+0x240 via render_pack_card_stat_byte_to_sprite] writes stat sprite tiles

@@ -1,0 +1,12 @@
+Checks whether the opponent's LP is below the threshold (occupied_zone_count * 300). Sums both players' occupied field zone counts via count_occupied_all_field_zones(0) and (1), adds fields at gP1LifePoints+0xc and +0x874, multiplies total by 300 (shift chain). Loads opponent LP via opponent_id*0x868 offset; returns 1 if LP <= total*300, else 0. Exits via pop{r1}+bx r1 (Sub-case E).
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (DWORD_080bad60)
+- FIELD_COUNT_OFFSET_A = 0xc (gP1LifePoints+0xc extra count field A)
+- FIELD_COUNT_OFFSET_B = 0x874 (gP1LifePoints+0x874, DWORD_080bad64)
+- PLAYER_STRIDE = 0x868 (DWORD_080bad68)
+- LP_FACTOR = 300 (lsls+adds+lsls-subs multiply chain)
+
+Inputs: r0=ptr zone_ptr (field zone ptr, byte[2] bit0=player_id)
+Returns: r0=u32 flag (1=LP <= zone_count*300, 0=LP sufficient)
+Side effects: none (read-only)

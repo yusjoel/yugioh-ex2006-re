@@ -1,0 +1,15 @@
+Renders pack card info page card presence indicator sprites based on a presence bitfield. r0=card_slot [0..3]. Loads presence bitfield r6 from pack_ui_state+0xc at dynamic address r1+slot_row*32+0x58 where slot_row = ldrh r3,[r1,#0x32]. Tile attr r7 = 0xc00c|(card_slot<<10). Loops r5=0..9: if bit0 of r6 set, computes (r5%5, r5/5) -> OAM coords, calls write_oam_entry_from_packed_args; shifts r6 right. Called by pack info page frame drivers.
+
+Constants:
+- pack_ui_state = 0x03005850 (DAT_080d72f0)
+- STRUCT_LDRH_OFFSET = 0x32 (ldrh r3,[r1,#0x32] -> r3 = slot_row halfword at r1+0x32)
+- PRESENCE_FIELD_OFFSET = 0x58 (ldr r6,[r0,#0x58] -> r0 = r1+r3*32; presence bitfield at r1+slot_row*32+0x58, runtime dynamic address)
+- OAM_ATTR_BASE = 0xc00c (DAT_080d72f4)
+- LOOP_COUNT = 10 (cmp r5,#9; bls -> 0..9)
+- TILE_COL_MOD = 5 (get_bios_div_remainder(r5,5) -> col)
+- Y_START = 0x10 (adds r0,#0x10)
+- X_STRIDE = 0x18 (lsls r4,r0,#3)
+
+Inputs: r0=u32 card_slot [0..3]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OAM shadow via write_oam_entry_from_packed_args] writes up to 10 presence indicator sprite OAM entries

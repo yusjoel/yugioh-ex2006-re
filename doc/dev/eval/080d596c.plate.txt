@@ -1,0 +1,17 @@
+Initializes IO register set for the pack scene scroll animation. Calls init_pack_scroll_animation(pack_ui_state+0xc, 0x38, 0x50, 8); sets scroll state [+0x6]=8. Writes BLDCNT=0x2da, BLDY=0, BLDALPHA=0x1010; WIN0H/WIN1H=0xf0 (full width); WIN0V=0x1010, WIN1V=0x9090. ORs DISPCNT with WIN0_ENABLE=0x2000 and WIN1_ENABLE=0x4000. Called by FUN_080d5a08 for entering the pack card scroll display state.
+
+Constants:
+- pack_ui_state = 0x03005850 (DAT_080d59e0)
+- SCROLL_STRUCT_OFFSET = 0xc
+- SCROLL_PARAM_A = 0x38, SCROLL_PARAM_B = 0x50, SCROLL_PARAM_C = 8
+- BLDCNT = 0x04000050 (PTR_BLDCNT_080d59e4)
+- BLDCNT_VAL = 0x2da (DAT_080d59e8)
+- BLDY = 0x04000054 (PTR_BLDY_080d59ec)
+- WIN0H = 0x04000040 (PTR_WIN0H_080d59f8)
+- DISPCNT = 0x04000000 (movs r2,#0x80; lsls r2,#0x13)
+- WIN0_ENABLE = 0x2000 (movs r3,#0x80; lsls r3,#6)
+- WIN1_ENABLE = 0x4000 (movs r3,#0x80; lsls r3,#7)
+
+Inputs: none
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: BLDCNT:=0x2da; BLDY:=0; BLDALPHA:=0x1010; WIN0H/WIN1H:=0xf0; WIN0V/WIN1V set; DISPCNT |= 0x6000

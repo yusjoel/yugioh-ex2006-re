@@ -1,0 +1,11 @@
+Thin wrapper: advances one pack card AOB animation frame. r0=slot_linear, r1=frame_type [0..3]. Computes tile_id from slot_linear (slot*5+5, extract bits), ORs with OAM upper attr 0x380000. Loads pack_ui_state+0x70c as aob_state_base. Calls tick_pack_card_aob_frame(tile_attr, aob_state_base, frame_type). Automatically injects state_base and converts slot->tile param.
+
+Constants:
+- pack_ui_state = 0x03005850 (DAT_080d5364)
+- AOB_STATE_OFFSET = 0x70c (DAT_080d5368)
+- OAM_UPPER_ATTR = 0x380000 (movs r1,#0xe0; lsls r1,r1,#0xe -> 0xe0<<14 = 0x380000; python: 0xe0<<0xe == 0x380000)
+- FRAME_TYPE_MAX = 3 (cmp r3,#3; bls -> clamp)
+
+Inputs: r0=u32 slot_linear [0..?]; r1=u32 frame_type [0..3]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: passes through tick_pack_card_aob_frame side effects (AOB frame counter/pattern update)

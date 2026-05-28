@@ -1,0 +1,12 @@
+Initializes the pack card AOB (animated object) display row tile data. Loads AOB descriptor base from pack_ui_state+0x70c. First calls write_pack_card_tile_rows_to_obj_vram(0x1c8, 0xe) to write tile row data; then loops calling init_pack_card_slot_aob_from_ptn(0x1c8, 0xe, aob_ptr) with +0x14 step per slot. Loop condition: r5 wraps to 0 (adds r5,#1; cmp r5,#0; beq). Called from pack_banner_080d566c and pack_banner_080d6d30 for pack scene card row AOB init.
+
+Constants:
+- pack_ui_state = 0x03005850 (DAT_080d5114)
+- AOB_DESC_OFFSET = 0x70c (DAT_080d5118)
+- TILE_ROW_ID = 0x1c8 (movs r0,#0xe4; lsls r0,r0,#1 -> 0x1c8)
+- TILE_ROW_COUNT = 0xe
+- AOB_ENTRY_STRIDE = 0x14 (adds r4,#0x14)
+
+Inputs: none (entry: push then ldr r4, pack_ui_state)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM via write_pack_card_tile_rows_to_obj_vram] writes tile rows; [pack_ui_state+0x70c area via init_pack_card_slot_aob_from_ptn] initializes AOB descriptors

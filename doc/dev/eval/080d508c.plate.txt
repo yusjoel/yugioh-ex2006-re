@@ -1,0 +1,9 @@
+Renders a card image frame to the pack card info page OBJ VRAM slot (base 0x06010000, different offset formula from FUN_080d5034). r0=slot_linear, r1=card_icid (signed). Computes dest = 0x06010000 + ((col*3+row*6)*0x40+0x100)*0x20 where col=slot&3, row=slot>>2. If card_icid >= 0 calls copy_card_medium_frame_to_obj_vram; if < 0 loops 6 times calling zero_fill_halfword_wrapper. Called from FUN_080d5e84 (pack card image info page driver).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000 (DAT_080d50c0)
+- CLEAR_ITER = 6 (cmp r5,#5 -> 0..5)
+
+Inputs: r0=u32 slot_linear [0..?]; r1=s32 card_icid (<0=clear)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM 0x06010000+slot_offset] writes card tiles or zeros

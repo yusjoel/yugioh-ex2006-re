@@ -1,0 +1,12 @@
+Fills the pack info page card name OBJ VRAM tile ID region. r0=slot_idx [0..1], r1=player_id [0..1]. Selects tile_start: player_id==0->0x12, player_id!=0->0x46. If slot_idx==1 calls fill_pack_obj_tile_row_17col_leaf(dest, 0xf); else calls fill_pack_obj_tile_region_17col(dest, tile_start, 0xf). dest = 0x0600e000+0x404. Called by pack info page frame drivers.
+
+Constants:
+- OBJ_VRAM_BASE = 0x0600e000 (DAT_080d71d8)
+- TILE_REGION_OFFSET = 0x404 (DAT_080d71dc)
+- TILE_COUNT = 0xf (movs r2,#0xf)
+- TILE_START_P0 = 0x12 (player_id==0)
+- TILE_START_P1 = 0x46 (player_id!=0)
+
+Inputs: r0=u32 slot_idx [0..1]; r1=u32 player_id [0..1]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM 0x0600e000+0x404 via fill_pack_obj_tile_row_17col_leaf or fill_pack_obj_tile_region_17col] writes card name tile ID sequence

@@ -1,0 +1,11 @@
+Writes a pack card OAM sprite entry into OBJ VRAM shadow. r0=slot_linear, r1=pack_banner_ptr, r2=sprite_type [0..3]. Computes OBJ VRAM dest from slot row/col, adds 0x100 tile offset. Based on pack_banner_ptr equality test selects write_pack_obj_attr_by_dir_tall_diag or write_oam_entry_with_tile_inc; writes two OAM entries. Called by FUN_080d5f38 (pack frame driver).
+
+Constants:
+- OBJ_VRAM_TILE_OFFSET = 0x100 (movs r1,#0x80; lsls r1,r1,#0x1 -> 0x80<<1 = 0x100 tile base offset)
+- SPRITE_TYPE_MAX = 3 (cmp r4,#3; bls -> clamp)
+- OAM_ATTR_E0 = 0x380000 (movs r0,#0xe0; lsls r0,r0,#0xe -> 0xe0<<14 = 0x380000; python: 0xe0<<0xe == 0x380000)
+- OAM_ATTR_B0 = 0x580000 (movs r0,#0xb0; lsls r0,r0,#0xf -> 0xb0<<15 = 0x580000; python: 0xb0<<0xf == 0x580000)
+
+Inputs: r0=u32 slot_linear; r1=ptr pack_banner_ptr; r2=u32 sprite_type [0..3]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OAM shadow via write_pack_obj_attr_by_dir_tall_diag or write_oam_entry_with_tile_inc] writes OAM attr0/attr1/attr2

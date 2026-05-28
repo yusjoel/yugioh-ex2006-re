@@ -1,0 +1,8 @@
+Wrapper that calls count_occupied_monster_zones then discards the result and returns 0. Extracts player_id from zone_ptr->byte[2] bit0 via lsls/lsrs #0x1f. Calls count_occupied_monster_zones(player_id); ignores return value; movs r0,#0 fixes return to 0. Exits via pop{r1}+bx r1 (Sub-case E). For callsites that need zone_ptr as entry param but only need the count side-effect.
+
+Constants:
+- (no non-trivial literals)
+
+Inputs: r0=ptr zone_ptr (field zone ptr, byte[2] bit0=player_id)
+Returns: r0=u32 0 (fixed)
+Side effects: calls count_occupied_monster_zones(player_id); result unused

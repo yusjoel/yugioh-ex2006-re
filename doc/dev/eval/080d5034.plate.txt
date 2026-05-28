@@ -1,0 +1,11 @@
+Renders a pack banner image into an OBJ VRAM slot, or zeros the slot. r0=slot_idx, r1=pack_banner_ptr (signed; <0=clear). Divides slot_idx by 4 for col/row, computes dest = 0x06010000 + (col*4+row*8)*0x40. If pack_banner_ptr >= 0 calls pack_banner_tile_copy(ptr, dest, 0, 1); if < 0 loops 8 times calling zero_fill_halfword_wrapper(dest, 0x100). Called from FUN_080d4a5c (pack card image hub).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000 (DAT_080d5068)
+- SLOT_BLOCK_SIZE = 0x40 (lsls r5,r5,#6)
+- CLEAR_ITER = 8 (cmp r4,#7 -> 0..7)
+- CLEAR_SIZE_PER_ITER = 0x100 halfwords (movs r1,#0x80; lsls r1,r1,#1)
+
+Inputs: r0=u32 slot_idx [0..?]; r1=s32 pack_banner_ptr (<0=clear)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM 0x06010000+slot_offset] writes banner tiles or zeros

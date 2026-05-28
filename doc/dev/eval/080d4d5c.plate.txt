@@ -1,0 +1,10 @@
+Renders a card image frame into a pack card OBJ VRAM slot. r0=slot_col, r1=row_group, r2=card_icid (signed; <0=clear). Computes dest address: ((row_group*5+slot_col)*3*0x200) + 0x06004040. If card_icid >= 0 calls copy_card_medium_frame_to_obj_vram(card_icid, dest, 0, 0); if < 0 calls zero_fill_halfword_wrapper(dest, 0x600). Called from FUN_080d4a5c (pack card image hub).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06004040 (DAT_080d4d84)
+- SLOT_STRIDE = 0x200 (lsls r0,r2,#0x9 -> *512)
+- CLEAR_SIZE = 0x600 (movs r1,#0xc0; lsls r1,r1,#3)
+
+Inputs: r0=u32 slot_col [0..4]; r1=u32 row_group [0..?]; r2=s32 card_icid (<0=clear slot)
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OBJ VRAM 0x06004040+slot_offset] writes card tile data or zeros

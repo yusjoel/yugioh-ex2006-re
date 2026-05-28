@@ -1,0 +1,11 @@
+Renders card highlight box sprite (two OAM entries) on the pack info page. r0=card_slot [0..3]. Loads fixed OAM params r5=0x0002000d, first sprite attr0=0x00900044, second attr0=0x0090fff4. Sets color attr r4=0x000b0000 (movs r4,#0xb0; lsls r4,r4,#0xc -> 0xb0<<12=0xb0000; python: 0xb0<<0xc==0xb0000). Computes y_base=0x140 (0xa0<<1). Calls render_overlay_oam_sprite_tiled twice (second with y+0x40). Called by pack info page frame drivers.
+
+Constants:
+- OAM_PARAMS = 0x0002000d (DAT_080d7280)
+- SPRITE_ATTR0_A = 0x00900044 (DAT_080d727c)
+- SPRITE_ATTR0_B = 0x0090fff4 (DAT_080d7284)
+- COLOR_ATTR = 0x000b0000 (movs r4,#0xb0; lsls r4,r4,#0xc -> 0xb0<<12 = 0xb0000; python: 0xb0<<0xc == 0xb0000)
+
+Inputs: r0=u32 card_slot [0..3]
+Returns: void (pop{r0}+bx r0 Sub-case F)
+Side effects: [OAM shadow via render_overlay_oam_sprite_tiled x2] writes info page highlight box OAM entries
