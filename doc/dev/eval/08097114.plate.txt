@@ -1,0 +1,12 @@
+Scans ROM fixed card-type effect handler table (base 0x09e47560, up to 0x11=17 entries, stride 0x10 bytes), comparing entry[+0x0] with r1 (card_type); on hit reads function pointer at entry[+0x8+r3*0x10] and calls it via invoke_r2 with r5/r4/r6/r3 as 4 args. If no entry matches, returns 0. Entry r0=context_ptr (passed to invoke_r2 r0), r1=card_type (match key), r2=sub_param (passed to invoke_r2 r2). Symmetric with dispatch_to_effect_handler_by_card_type (0x08097150) but passes only 3 args (r5/r4/r6 no r3 sub_param channel), uses invoke_r2 while the other uses invoke_r3; both share table base 0x09e47560.
+
+Constants:
+- HANDLER_TABLE_BASE = 0x09e47560
+- TABLE_ENTRY_COUNT = 0x11 (=17)
+- ENTRY_STRIDE = 0x10
+- ENTRY_TYPE_OFFSET = 0x0
+- ENTRY_HANDLER_OFFSET = 0x8
+
+Inputs: r0=context_ptr, r1=u16 card_type, r2=u32 sub_param.
+Returns: r0=u32 (0=all entries missed, @ 0x08097148 movs r0,#0; hit path calls invoke_r2 then continues traversal to end returning 0; exit pop{r4,r5,r6}; pop{r1}; bx r1).
+Side effects: none (read-only table scan + indirect call).

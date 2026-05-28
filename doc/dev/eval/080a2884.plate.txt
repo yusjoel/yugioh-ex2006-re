@@ -1,0 +1,25 @@
+equip activation slot scan step advancer. Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
+- step=0: clears [+0x1da8]/writes [+0x1daa]=r1(card_id); iterates all slots for player_id, calls check_equip_slot_by_card_id_dispatch(player,0xb,slot_idx) for each; on hit records slot index r8=1+slot; multi-card_id branch dispatch (0x135b/0x137c/0x1579/0x16d3/0x17c3/0x1888 etc) -> trigger_card_display_op31_if_not_active or card_name_lookup_by_internal_id; [0x0201e2a0+player*4+8]==1 then select_equip_target_slot_by_card_id; advances step; returns 0.
+- step=1: check_activation_display_state_is_confirmed; if confirmed reads [+0x1d70] -> [+0x1da8]; advances step; returns 0.
+- step=2: reads [gP1LP+0x1da8] hword (slot_idx*4+player*0x868+0x120) -> enqueue_equip_slot_sprite_with_display_code; advances step.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- CARD_ID_SLOT = 0x1daa
+- LP_PACKED = 0x1da8
+- LP_DELTA = 0x1d70
+- ZONE_TYPE = 0xb
+- PLAYER_ZONE_TABLE = 0x0201e2a0
+- CARD_ID_1579 = 0x1579 (Monster Relief)
+- CARD_ID_17C3 = 0x17c3 (Familiar Knight)
+- CARD_ID_1888 = 0x1888 (Good Goblin Housekeeping)
+- CARD_ID_135B = 0x135b (reserved -- cid=0xFFFF, no card assigned)
+- CARD_ID_137C = 0x137c (Dust Tornado)
+- CARD_ID_16D3 = 0x16d3 (reserved -- cid=0xFFFF, no card assigned)
+- CARD_ID_1365 = 0x1365 (The Shallow Grave)
+- RESULT_ELIGIBLE = 0x800
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 card_id (internal card ID, 16-bit; written to [gP1LP+0x1daa]); r9 non-APCS implicit (parent-frame slot context, indeg=0).
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=0 (step=0 clear); [gP1LifePoints+0x1daa]:=r1 card_id; [gP1LifePoints+0x1da8]:=hword (step=1); [gP1LifePoints+0x1d94]+=1.

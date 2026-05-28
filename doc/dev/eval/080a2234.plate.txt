@@ -1,0 +1,17 @@
+equip LP bar display sequence phase-A step advancer. Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
+- step=0: if [gP1LP+0x1daa] non-zero -> player_id bit0 * 0x868 + 0xc LP row pointer non-zero -> calls increment_lp_bar_display_counter; advances step; returns 0. If zero directly returns 1.
+- step=1: calls check_activation_display_state_is_confirmed; if confirmed: reads [gP1LP+0x1d70] writes to [+0x1da8]; advances step; returns 0. If not confirmed: decrements step-1; returns 0.
+- step=2: calls decrement_lp_bar_display_counter; returns 1.
+High-register prologue: mov r8,r0 (spills r0=player_id to r8); no r9/r10 read.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- SLOT_OFFSET = 0x1daa
+- LP_DELTA_OFFSET = 0x1d70
+- LP_PACKED_OFFSET = 0x1da8
+- LP_STRIDE = 0x868
+
+Inputs: r0=u32 player_id [0..1] (spilled to r8 via .hword 0x4680); r8 non-APCS implicit (parent-frame, indeg=0).
+Returns: r0=i32 (0=step advance continue, 1=sequence done/skip; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=hword from [+0x1d70] (step=1 confirmed path); [gP1LifePoints+0x1d94]+=1; increment_lp_bar_display_counter side effect.

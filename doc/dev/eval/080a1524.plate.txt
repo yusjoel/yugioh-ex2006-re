@@ -1,0 +1,16 @@
+equip activation animation sequence phase-B step advancer, symmetric with tick_equip_zone_sprite_phase_a (0x080a1338). Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
+- step=0: calls sample_prng_scaled(6) to randomize hword and writes [+0x1da8]; loops writing enqueue_sprite_attr_record (OAM tile 0x5c/0x0000805c); advances step.
+- step=1: calls check_node_in_slot_chain(player,0xb,0x16a5,mode=1) + check_node_in_slot_chain(...,mode=2); if confirmed reads [0x0201e2a0+player*4+8]; writes [gP1LP+0x1d94 calc] or calls invoke_card_display_op_0x31_sub1; advances step.
+- step=2: calls enqueue_equip_zone_sprite_by_side + enqueue_sprite_attr_type11; clears [r5].
+Difference from phase_a: step=0 uses check_node_in_slot_chain (vs check_value_in_slot_chain), tile number 0x5c for right-side sprite; CARD_ID 0x16a5.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- SLOT_OFFSET = 0x1da8
+- CARD_ID_16A5 = 0x16a5 (Dice Re-Roll)
+- OAM_TILE_B = 0x5c (or 0x0000805c)
+
+Inputs: r8/r9/r10 non-APCS implicit (parent-frame context, indeg=0).
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=packed_sprite_attr (step=0); [gP1LifePoints+0x1d94]+=1; [0x0201e2a0+offset] written on step=1 path.

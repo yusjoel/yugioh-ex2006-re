@@ -1,0 +1,23 @@
+equip target slot predicate - extended stat variant, called via fn-ptr from select_equip_target_slot_by_card_id hub (sub-type B, 0x080a7574). r0=player_id, r1=zone_type, r2=slot_offset. Reads equip_state 0x0201e4d0 byte[0] player_bit to confirm player match; total_slot=r1+r2 <= 4. Reads equip_state word[0] extracts icid (bits[22:9] via lsls#9/lsrs#17); dispatches 7 branches by icid:
+- 0x1466/0x1531/0x166b/0x16cb/0x19ca: calls get_slot_card_state_code(player,total_slot) and compares with equip_state cached icid get_card_extended_stat_field6; if matching continues.
+- 0x16c9/0x16e4/0x18b4: reads equip_state hword[0x14] bits[22:15] -> converts slot type; check_slot_zone_bit_eligible.
+- other: get_card_extended_stat_field7 -> check_slot_zone_bit_eligible.
+All checks pass returns 0x800.
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- MONSTER_SLOT_BASE = 0x0201c510
+- MAX_TOTAL_SLOT = 4
+- RESULT_ELIGIBLE = 0x800
+- CARD_ID_1466 = 0x1466 (Dark Necrofear)
+- CARD_ID_1531 = 0x1531 (Dark Scorpion Burglars)
+- CARD_ID_166B = 0x166b (Arsenal Robber)
+- CARD_ID_16C9 = 0x16c9 (Chaos Sorcerer)
+- CARD_ID_16CB = 0x16cb (Black Luster Soldier - Envoy of the Beginning)
+- CARD_ID_16E4 = 0x16e4 (Chaos Emperor Dragon - Envoy of the End)
+- CARD_ID_18B4 = 0x18b4 (Megarock Dragon)
+- CARD_ID_19CA = 0x19ca (Doom Dozer)
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_type [0..4]; r2=u16 slot_offset [0..4].
+Returns: r0=0x800 (eligible) or 0; pop{r4,r5}; pop{r1}; bx r1.
+Side effects: none (read-only).

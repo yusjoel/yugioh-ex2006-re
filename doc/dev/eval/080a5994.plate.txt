@@ -1,0 +1,15 @@
+equip target slot comprehensive scan predicate. Called via fn-ptr from dispatch_equip_state_by_combined_phase_index (0x080a5f7c) (DAT_080a5995=0x080a5995). r0=player_id, r1=zone_type, r2=slot_offset. Reads equip_state 0x0201e4d0 byte[8] for zone index; calls get_zone_slot_entity_ref_by_type(player, zone_type, slot_offset) to confirm slot match; if mismatch returns 0 immediately. Double inner loop: iterates zone_player (0..2) x slot_idx (0..4), for each slot calls check_slot_card_can_be_equipped + check_slot_placement_blocked_by_field_effect; if all fail tries direct equip_state byte[0] player match + check_slot_card_can_be_equipped; if all checks pass returns 0x800. Covers wide zone_player scan (cmp r0,#4 bgt -> zone_player > 4 goes to final segment).
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- SLOT_TABLE_BASE = 0x09e478b0
+- MONSTER_SLOT_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- MAX_SLOT_IDX = 4
+- RESULT_ELIGIBLE = 0x800
+- ZONE_TYPE_B = 0xb
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_type [0..0xb]; r2=u16 slot_offset [0..4].
+Returns: r0=0x800 (eligible) or 0 (not eligible); pop{r3,r4,r5}; mov r8,r3; exit bx r1.
+Side effects: none (read-only scan).

@@ -1,0 +1,13 @@
+equip target slot predicate - display code match variant. Called via fn-ptr (0x080a712c hit). r0=player_id, r1=zone_type(must==0xb), r2=slot_idx. Reads equip_state 0x0201e4d0 byte[0] player_bit; confirms r0==player_bit and r1==0xb (zone type constraint). Reads equip_state hword[+2] bits[13:7] (lsrs#7 -> r3=display_code_ref). Computes slot addr from player_id bit0 * 0x868 + slot_idx*4 + 0x0201c600 (gMonsterSlot alt base); reads slot DWORD; extracts bits[29:22] (lsls#2/lsrs#18/lsls#1) and bit18 (lsls#18/lsrs#31) combined as display_code_slot. Compares: display_code_ref != display_code_slot -> returns 0x800; equal -> returns 0 (display code already matched, no need to re-enqueue).
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- MONSTER_SLOT_ALT_BASE = 0x0201c600
+- PLAYER_STRIDE = 0x868
+- ZONE_TYPE_B = 0xb
+- DISPLAY_CODE_SHIFT = 7 (hword[2] bits[13:7])
+- RESULT_ELIGIBLE = 0x800
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_type (must==0xb; bne->return 0); r2=u16 slot_idx [0..4].
+Returns: r0=0x800 (display_code mismatch -> eligible) or 0 (match -> not eligible); pop{r4,r5}; pop{r1}; bx r1.
+Side effects: none (read-only comparison).

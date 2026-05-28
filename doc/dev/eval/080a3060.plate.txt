@@ -1,0 +1,19 @@
+Effect slot activation step advancer. r0=player_id, r1=card_id_a (u16), r2=card_id_b (u16). Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
+- step=0: if [0x0201e2a0+player*4+8]==1 then calls activate_effect_slot_for_card(player, r4, r6); then double-calls get_monster_slot_entry_ptr to get slot pointer; reads slot DWORD extracts display_code bits; writes [gP1LP+0x1da8] hword; if card_id is 0x133b/0x1365/0x1488 then trigger_card_display_op31_if_not_active (op=0xef/0xf0); advances step; returns 1.
+- step=1: calls init_effect_slot_display_context(player,6,r4,r6); advances step; returns 0.
+- other: returns 1.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- PLAYER_ZONE_TABLE = 0x0201e2a0
+- LP_DISPLAY_CODE_OFFSET = 0x1da8
+- CARD_ID_133B = 0x133b (Spear Cretin)
+- CARD_ID_1365 = 0x1365 (The Shallow Grave)
+- CARD_ID_1488 = 0x1488 (Gilasaurus)
+- DISPLAY_OP_EF = 0xef
+- DISPLAY_OP_F0 = 0xf0
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 card_id_a (u16 truncated->r4); r2=u32 card_id_b (u16 truncated->r6).
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=hword display_code (step=0); [gP1LifePoints+0x1d94]+=1; activate_effect_slot_for_card side effect (effect slot state write).

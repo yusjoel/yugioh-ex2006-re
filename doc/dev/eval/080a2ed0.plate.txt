@@ -1,0 +1,18 @@
+equip target slot selection step advancer. Reads step counter at gP1LifePoints+0x1d94, three-way dispatch:
+- step=0: dispatches by r1(card_id) to one of several equip target slot predicate function pointers (check_equip_target_slot_eligible_for_equip_card/with_whitelist/active_card/with_field_checks/pair_check/via_activation_eval), corresponding to cards (0x1544=Dark Coffin/0x139c=Patrician of Darkness/0x142a=Creature Swap/0x16df=Spatial Collapse/0x18b5=Dummy Golem); trigger_card_display_op31_if_not_active for unmatched branch; [0x0201e2a0+player*4+8]==1 then select_equip_target_slot_by_card_id; advances step.
+- step=1: check_activation_display_state_is_confirmed; if confirmed reads [gP1LP+0x1d68/0x1d6c] computes slot_pair writes [+0x1da8]; advances step.
+- other step: returns 1.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- CARD_ID_1544 = 0x1544 (Dark Coffin)
+- CARD_ID_139C = 0x139c (Patrician of Darkness)
+- CARD_ID_142A = 0x142a (Creature Swap)
+- CARD_ID_16DF = 0x16df (Spatial Collapse)
+- CARD_ID_18B5 = 0x18b5 (Dummy Golem)
+- PLAYER_ZONE_TABLE = 0x0201e2a0
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 card_id (internal card ID 16-bit).
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=packed_slot_pair (step=1 confirmed); [gP1LifePoints+0x1d94]+=1.

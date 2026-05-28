@@ -1,0 +1,12 @@
+equip target slot predicate - monster space check variant. Called via fn-ptr (0x080a7a1c hit). r0=player_id, r1=zone_idx, r2=slot_offset. total_slot=r1+r2 <= 4. Reads equip_state 0x0201e4d0 byte[0] player_bit; opponent player = 1-player_bit; if r0 != 1-player_bit returns 0. Calls check_slot_card_can_be_equipped(r0, r0, total_slot); if fails returns 0. If equip_state byte[8]==0: reads gMonsterSlot[total_slot] icid; extracts player_bit; calls count_available_monster_slots(1-player_bit, 0); if space available then check_slot_placement_blocked_by_field_effect; if passes returns 0x800. If byte[8]!=0: iterates equip_state slot list (up to byte[8] entries), checks if packed_pair (player<<24|total_slot<<24)>>16 already exists in list; if unique returns 0x800.
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- MONSTER_SLOT_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- MAX_TOTAL_SLOT = 4
+- RESULT_ELIGIBLE = 0x800
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_idx [0..4]; r2=u16 slot_offset [0..4].
+Returns: r0=0x800 or 0; pop{r4,r5,r6,r7}; pop{r1}; bx r1.
+Side effects: none (read-only).

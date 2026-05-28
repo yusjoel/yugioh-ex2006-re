@@ -1,0 +1,11 @@
+Wrapper for set_lp_display_row_fields with type=2, simplified variant of set_lp_row_type2_with_sign_flags (0x080a1b58). Behavioral difference: this function only forces bit5 (0x20), not bit4 (0x10); 0x080a1b58 forces both bit4+bit5. Common logic: r2 nonzero extraction -> r4 nonzero_flag; r3!=0 -> r4 |= 0x8; truncates r1->r2 (u16 lp_delta); r1=2 type fixed. Called from LP animation delta paths (0x0807a8f0/0x0807be2c, tags=[duel_field]).
+
+Constants:
+- ROW_TYPE = 2 (fixed, movs r1,#2)
+- FORCED_BIT5 = 0x20
+- SIGN_BIT = 0x8 (set when r3!=0)
+- DELTA_MASK = 0xffff
+
+Inputs: r0=ptr lp_row_ptr; r1=i32 lp_delta_raw (u16 truncated->r2); r2=i32 delta_sign (nonzero->flag=1); r3=u32 extra_flag (!=0->flags|=0x8).
+Returns: r0=void (pop{r4,r5}; pop{r0}; bx r0).
+Side effects: via set_lp_display_row_fields writes gP1LifePoints LP row type=2 fields (conditional).

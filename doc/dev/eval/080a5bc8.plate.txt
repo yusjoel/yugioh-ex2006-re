@@ -1,0 +1,14 @@
+equip target slot predicate - activate-flag path variant. Called via fn-ptr (0x080a6edc hit). r0=player_id, r1=zone_idx, r2=slot_offset. total_slot = r1+r2 <= 4. Reads equip_state 0x0201e4d0 byte[0x12] bit1 (activate-flag): if set -> calls check_slot_card_can_be_equipped (equip state player version); if clear -> calls check_slot_equip_eligibility. After passing: if equip_state byte[8] == 0 -> reads gMonsterSlot[total_slot] icid, checks if 0x13e5 (Grand Tiki Elder) or 0x13e7 (Melchid the Four-Face Beast); if matching returns 0x800. If byte[8] != 0 -> iterates stored slot list checking player/slot pair uniqueness; if unique calls count_available_monster_slots + check_slot_placement_blocked_by_field_effect.
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- MONSTER_SLOT_BASE = 0x0201c510
+- ACTIVATE_FLAG_BIT1 = 0x2 (byte[0x12] & 2)
+- CARD_ID_13E5 = 0x13e5 (Grand Tiki Elder)
+- CARD_ID_13E7 = 0x13e7 (Melchid the Four-Face Beast)
+- MAX_TOTAL_SLOT = 4
+- RESULT_ELIGIBLE = 0x800
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_idx [0..4]; r2=u16 slot_offset [0..4]; r7 non-APCS implicit (parent-frame; spilled via .hword 0x4647=mov r7,r8).
+Returns: r0=0x800 or 0; pop{r3}; mov r8,r3; pop{r4,r5,r6,r7}; pop{r1}; bx r1.
+Side effects: none (read-only).

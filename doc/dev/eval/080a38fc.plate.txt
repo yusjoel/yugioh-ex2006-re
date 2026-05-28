@@ -1,0 +1,20 @@
+equip scoring/display op step advancer. r0=player_id, r1=card_id, r2=slot_context, r3=extra. Reads gP1LifePoints+0x1d94 step:
+- step=0: clears [+0x1d94]; writes [gP1LP+0x1d40] (SCORE_OFFSET=0xea<<5) then returns 0 directly.
+- step=1: dispatches by r1 card_id three branches (0x159a=Reasoning/0x1766=Wall of Revealing Light): if [0x0201e2a0+player*4+8]==1 -> 0x159a path: sample_prng_scaled(4)+4 writes [gP1LP+0x1d40]; 0x1766 path: [0x0201afe0]:=player; find_best_activatable_slot_score_for_player; computes LP/0x3e8 quotient; writes [gP1LP+0x1d40]; or invoke_card_display_op_0x31_sub10(DAT_0x12d, 0x12f, 2, 12).
+- step=2 or other: returns 1.
+High-register prologue: .hword 0x4647=mov r7,r8; r8 is parent-frame player_id.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- SCORE_OFFSET = 0x1d40
+- CARD_ID_159A = 0x159a (Reasoning)
+- CARD_ID_1766 = 0x1766 (Wall of Revealing Light)
+- LP_SCORE_BASE = 0x0201afe0
+- LP_DIVISOR = 0x3e8 (1000)
+- OP_ADDR_12D = 0x012d
+- OP_ADDR_12F = 0x012f
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 card_id (internal ID; dispatch key); r2=u32 slot_context; r3=u32 extra; r8 non-APCS implicit (parent-frame player/slot context, indeg=0).
+Returns: r0=i32 (0=step=0 clear then continue, 1=step=1/2+ sequence done; exit pop{r3}; mov r8,r3; pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1d94]:=0 (step=0 clear); [gP1LifePoints+0x1d40]:=score value (step=1); [0x0201afe0]:=player_id (step=1 0x1766 path).

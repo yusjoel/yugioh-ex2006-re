@@ -1,0 +1,16 @@
+Single-card effect display op step advancer (simpler variant). r0=player_id. Checks [0x0201e2a0+player*4+8]==1 (activation slot ready); if so returns 1 immediately. Otherwise reads step at gP1LifePoints+0x1d94:
+- step=0: trigger_card_display_op31_if_not_active(player, op=0xf9); advances step; returns 0.
+- step=1: init_effect_slot_display_context(1-player, 2, r3, 0xd); advances [gP1LP+0x1d94]; returns 0.
+- other: returns 1.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- PLAYER_ZONE_TABLE = 0x0201e2a0
+- DISPLAY_OP_F9 = 0xf9
+- EFFECT_CTX_MODE = 2
+- EFFECT_CTX_TYPE = 0xd
+
+Inputs: r0=u32 player_id [0..1].
+Returns: r0=i32 (0=step advance continue, 1=sequence done/already-confirmed early exit; exit pop{r4}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1d94]+=1 (step=0/1 paths); trigger_card_display_op31_if_not_active side effect; init_effect_slot_display_context side effect.

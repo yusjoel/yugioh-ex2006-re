@@ -1,0 +1,16 @@
+equip target slot predicate - LP bonus evaluation path. Called via fn-ptr (0x080a8b30 hit). r0=player_id, r1=zone_idx, r2=slot_offset. total=r1+r2 must be in [5..9] (cmp#4 bgt + cmp#9 bgt double boundary). Reads equip_state 0x0201e4d0 byte[0] player_bit; confirms r0==player_bit. Calls count_field_copies_of_card(0x13f2=Mask of Restrict) -> if nonzero returns 0 (card already on field). Calls test_slot_has_active_card(player, total, 0x19b2=Ancient Gear Castle) to confirm slot has active monster. Calls eval_equip_bonus_for_player(player, lp_code, slot_type) to compute bonus value r0. Reads gMonsterSlot[total_slot][+0xc] hword (equip_count). Two paths: r0>6 and equip_count>1 -> 0x800; r0<=6 and equip_count!=0 -> 0x800; otherwise 0.
+
+Constants:
+- EQUIP_STATE_BASE = 0x0201e4d0
+- MONSTER_SLOT_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- MIN_TOTAL_SLOT = 5
+- MAX_TOTAL_SLOT = 9
+- CARD_ID_13F2 = 0x13f2 (Mask of Restrict)
+- ACTIVE_CARD_TYPE = 0x19b2 (Ancient Gear Castle)
+- BONUS_THRESHOLD = 6
+- RESULT_ELIGIBLE = 0x800
+
+Inputs: r0=u32 player_id [0..1]; r1=u16 zone_idx [0..9]; r2=u16 slot_offset [0..9] (total=r1+r2 in [5..9]).
+Returns: r0=0x800 or 0; pop{r4,r5,r6}; pop{r1}; bx r1.
+Side effects: none (read-only evaluation).

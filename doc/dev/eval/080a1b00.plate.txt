@@ -1,0 +1,10 @@
+Wrapper for set_lp_display_row_fields with type=2, symmetric with set_lp_row_type2_with_attr_flags (0x080a1b1c). Extracts nonzero flag from r2 (rsbs r0,r2,#0; orrs r0,r2; lsrs r2,r0,#0x1f -> r2=0 if r2==0, r2=1 if r2!=0); if r3!=0 forces r2=0x7; discards r1; calls set_lp_row_type2_with_attr_flags(r4, r1, r2); exits pop{r4}; pop{r0}; bx r0 (void). Called from 5 LP bar render paths (0x08056380/0x08057458/0x08057470/0x080587c0/0x08058a04, tags=[duel_field]).
+
+Constants:
+- ROW_TYPE = 2 (via set_lp_row_type2_with_attr_flags)
+- FLAG_NONZERO = 0x1 (r2 nonzero -> flag=1)
+- FLAG_FIELD = 0x7 (r3!=0 override)
+
+Inputs: r0=ptr lp_row_ptr; r1=u32 lp_value_raw (u16 truncated); r2=i32 lp_delta (nonzero check); r3=u32 extra_flag (!=0 then flag:=0x7 override).
+Returns: r0=void (pop{r4}; pop{r0}; bx r0).
+Side effects: via set_lp_row_type2_with_attr_flags -> set_lp_display_row_fields writes gP1LifePoints LP row fields (conditional).

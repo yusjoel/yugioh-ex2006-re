@@ -1,0 +1,9 @@
+Wrapper for set_lp_display_row_fields with type=0x12 (18), symmetric with set_lp_row_type18_with_value (0x080a1e30), difference being subs r3,#1 (fourth arg decremented by 1). Specifically: r1 truncated to u16 -> r2 (lp_value); r2_in minus 1 truncated to u16 -> r3 (decremented_value); movs r1,#0x12; calls set_lp_display_row_fields(r0, 0x12, r1_u16, r2_dec_u16). Exit pop{r4}; pop{r0}; bx r0 (void). Called from LP display paths (0x080749e0/0x0807cc2c, tags=[duel_field]).
+
+Constants:
+- ROW_TYPE = 0x12 (18)
+- DEC_DELTA = 1 (subs r3,#1)
+
+Inputs: r0=ptr lp_row_ptr; r1=u32 lp_value_raw (u16 truncated->r2); r2=u32 limit_raw (subs #1 then truncated to u16->r3).
+Returns: r0=void (pop{r4}; pop{r0}; bx r0).
+Side effects: via set_lp_display_row_fields writes gP1LifePoints LP row type=0x12 fields (conditional).

@@ -1,0 +1,12 @@
+equip LP bar display sequence phase-B step advancer, symmetric with tick_equip_lp_bar_display_phase_a (0x080a2234). Main difference: reads step counter from 0x0201e274 (instead of gP1LP+0x1d94 directly); step=0 path writes [0x0201e28a] (equip zone specific pointer) hword; step=1 path calls enqueue_equip_zone_sprite_direct rather than dispatch_equip_zone_sprite_banisher. Overall flow: step=0 -> increment_lp_bar_display_counter; step=1 -> check_activation_display_state_is_confirmed; step=2 -> decrement_lp_bar_display_counter. High-register prologue same as phase_a.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_PTR = 0x0201e274
+- ZONE_SLOT_PTR = 0x0201e28a
+- LP_PACKED_OFFSET = 0x1da8
+- LP_STRIDE = 0x868
+
+Inputs: r0=u32 player_id [0..1] (spilled via .hword 0x4680=mov r8,r0); r1=u32 slot_param; r2=u32 direction_flag.
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [0x0201e28a+0x1da8 offset]:=hword (step=1 confirmed path); [0x0201e274] step counter advanced; increment/decrement_lp_bar_display_counter side effects.

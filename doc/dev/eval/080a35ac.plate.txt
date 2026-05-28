@@ -1,0 +1,18 @@
+equip display op by card_id dispatch step advancer. Reads gP1LifePoints+0x1d9a hword (activation flag) and +0x1d94 step counter. step=0 path: dispatches by r1(card_id) to display ops for multiple cards (trigger_card_display_op31_if_not_active with different op_ids); card IDs include 0x132f/0x14ee/0x1531/0x1712/0x166b/0x17f4/0x1796 among others; each branch calls corresponding op (0xde/0xef/0xf0/0x2e/0x7b etc). step=1: check_activation_display_state_is_confirmed; advances step. step=2: if [+0x1d94 calc] nonzero then enqueue_equip_zone_sprite_by_side; clears [+0x1d94]; returns 0. High-register prologue (.hword 0x4647=mov r7,r8).
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- STEP_OFFSET = 0x1d94
+- FLAG_OFFSET = 0x1d9a
+- LP_PACKED = 0x1da8
+- CARD_ID_132F = 0x132f (Painful Choice)
+- CARD_ID_14EE = 0x14ee (De-Spell Germ Weapon)
+- CARD_ID_1531 = 0x1531 (Dark Scorpion Burglars)
+- CARD_ID_1712 = 0x1712 (Dimension Fusion)
+- CARD_ID_166B = 0x166b (Arsenal Robber)
+- CARD_ID_17F4 = 0x17f4 (Abyssal Designator)
+- CARD_ID_1796 = 0x1796 (Emissary of the Afterlife)
+
+Inputs: r0=u32 player_id [0..1]; r1=u32 card_id (internal ID, 16-bit; dispatch key); r7/r8 non-APCS implicit (parent-frame context, indeg=0).
+Returns: r0=i32 (0=step advance continue, 1=sequence done; exit pop{r4,r5,r6,r7}; pop{r1}; bx r1).
+Side effects: [gP1LifePoints+0x1da8]:=slot data (step=2 confirmed path); [gP1LifePoints+0x1d94]+=1.
