@@ -1,0 +1,7 @@
+Fully symmetric variant of set_equip_activation_state_by_mode (0x08096a4c) (indeg=8). Identical logic: reads gDuelBattleState[+0x8+r0*4] for equip mode, if set calls commit_equip_target_slot_by_card_id; else writes multiple gP1LifePoints activation state fields. Only difference: state write path writes 0xa (10) instead of 0x8 to gP1LifePoints+0x1d4c. Both functions share the same offset set (0x1d4c/0x1d7c/0x1d58/0x1d54/0x1d64). Exit: pop {r4,r5}; pop {r0}; bx r0 (void: r0 overwritten by saved LR).
+
+Constants:
+- gDuelBattleState=0x0201e2a0
+- gP1LifePoints=0x0201c4e0
+- ZONE_TYPE_OFFSET=0x1d4c (write 0xa=10, vs sibling write 8)
+- PARAM_OFFSET=0x1d7c; FLAG_A=0x1d58; FLAG_B=0x1d54; SLOT_ID=0x1d64

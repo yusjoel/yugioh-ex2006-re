@@ -1,0 +1,5 @@
+Thunk calling dispatch_card_display_op(op=0x31, sub=0x7, r2=r4_in, r3=packed). Fully symmetric with sub6: saves r0 into r4, truncates r1 to u16 into r3, shifts r2 left 16 bits then ORs into r3, r4 becomes r2, hardcodes sub=7. Exit: pop {r4}; pop {r0}; bx r0 (void: r0 is overwritten by saved LR). indeg=0, no direct callers found.
+
+Constants:
+- OP_CODE=0x31
+- SUB_PARAM=0x7

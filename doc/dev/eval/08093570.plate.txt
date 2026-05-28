@@ -1,0 +1,5 @@
+Minimal thunk calling dispatch_card_display_op(op=0x31, sub=0xc, r2=r0_in, r3=0). Shifts r0 to r2, hardcodes r0=0x31, r1=0xc, r3=0, then calls dispatch. Exit: pop {r0}; bx r0 (void: r0 is overwritten by saved LR). Member of invoke_card_display_op_0x31_subN sibling cluster (simplest form, same structure as sub8/sub11). indeg=0, no direct callers.
+
+Constants:
+- OP_CODE=0x31
+- SUB_PARAM=0xc (12)

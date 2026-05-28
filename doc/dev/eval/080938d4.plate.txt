@@ -1,0 +1,8 @@
+Core token handler for the duel_puzzle text script parser. Entry param r0 is current line buffer pointer (r5). Reads first byte then dispatches via multi-level cmp/switch: 0x43 ('C') -> card name init; 0x45 ('E') -> end marker (return 1); 0x50 ('P') -> checks "LifeP" prefix (8-byte strncmp) then uses sscanf to parse LP value and write to gP1LifePoints; 0x5b ('[') -> checks 5-byte prefix then returns 1; other -> default return 0. Under 'S' prefix ("Score" etc.) sub-table, dispatches via secondary switch to up to 18 state field write operations. Caller FUN_08093fa8 (duel_puzzle text renderer) calls this in a loop until return is non-zero or text ends.
+
+Constants:
+- STRIDE=0x868 (gP1LifePoints player offset)
+- TOKEN_END=0x45 ('E')
+- TOKEN_CARD=0x43 ('C')
+- TOKEN_LP=0x50 ('P') ("LifeP..." prefix)
+- TOKEN_BRACKET=0x5b ('[')

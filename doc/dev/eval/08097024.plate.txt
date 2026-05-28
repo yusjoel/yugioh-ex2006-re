@@ -1,0 +1,6 @@
+Equip activation entry (ID lookup version A). Extracts bit0 from r0 (lsls #0x1f), masks r1 to low 16 bits, ORs with 0x500000 (=0xa0<<0xf) to build packed attr; calls apply_equip_activation_with_id_lookup(packed, 0, 0). Shares attribute build (0x500000) with apply_equip_activation_with_fixed_type_a (0x08096f20) but calls a different activation function (with_id_lookup vs via_packed_attr). Fixed return 0: movs r0,#0; pop {r1}; bx r1.
+
+Constants:
+- BASE_ATTR=0x500000 (=0xa0<<0xf)
+- PLAYER_BIT_SHIFT=0x1f
+- CARD_ATTR_MASK=0x0000ffff

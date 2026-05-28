@@ -1,0 +1,5 @@
+Thunk calling dispatch_card_display_op(op=0x31, sub=0x6, r2=r4_in, r3=packed). Forms symmetric triple with sub5/sub7. Saves r0 into r4, truncates r1 to low 16 bits (lsls+lsrs), shifts r2 left 16 bits then ORs into r3 to form packed param; r4 becomes r2. Exit: pop {r4}; pop {r0}; bx r0 (void: r0 is overwritten by saved LR). Sole caller: FUN_080a33a0 (card_ids region, duel_field scene).
+
+Constants:
+- OP_CODE=0x31
+- SUB_PARAM=0x6

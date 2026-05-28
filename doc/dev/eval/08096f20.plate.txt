@@ -1,0 +1,6 @@
+Equip activation entry point (indeg=0). Extracts bit0 from r0 as player_bit (lsls #0x1f), masks r1 to low 16 bits (ands r2,r1 w/ 0xffff), ORs with fixed base 0x500000 (=0xa0<<0xf) to build packed attr r0; ORs in player_bit. Calls apply_equip_activation_via_packed_attr(packed, 0, 0). Exit: pop {r1}; bx r1 (passes through return value). Forms sibling pair with apply_equip_activation_with_id_lookup_type_a (0x08097024) (the latter calls apply_equip_activation_with_id_lookup and returns fixed 0).
+
+Constants:
+- BASE_ATTR=0x500000 (=0xa0<<0xf, equip activation attribute base)
+- PLAYER_BIT_SHIFT=0x1f (extract bit0 from r0)
+- CARD_ATTR_MASK=0x0000ffff

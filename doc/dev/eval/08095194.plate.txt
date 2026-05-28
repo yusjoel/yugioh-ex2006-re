@@ -1,0 +1,5 @@
+Iterates a 2x11 matrix (r5=[0..1], r4=[0..10]) calling invoke_r8 with each (r5, r4, 0) triple; accumulates count of non-zero results in r7. Entry saves old r8 (.hword 0x4647=mov r7,r8) then loads fn_predicate from r0 (.hword 0x4680=mov r8,r0). Outer loop r5 from 0 to 1 (2 passes), inner r4 from 0 to 10 (11 passes). Returns r7 = total count of non-zero predicate results. Caller FUN_080a2ad0 (card_ids scene, duel_field) in switchD case 0 loads predicate pointer into r0 before calling; checks if count > 0 for follow-up logic.
+
+Constants:
+- ROW_MAX=1 (r5 upper bound inclusive, 2 rows)
+- COL_MAX=10 (r4 upper bound inclusive, 11 columns)

@@ -1,0 +1,6 @@
+Thunk calling dispatch_card_display_op(op=0x31, sub=0x9, r2=r0_in, r3=packed). Shifts r0 to r2; truncates r1 low 16 bits into r3[15:0]; builds 0x00ff0000 mask (movs #0xff; lsls #0x10) and ORs into r3, fixing r3[23:16]=0xff. Hardcodes op=0x31/sub=9. Exit: pop {r0}; bx r0 (void: r0 is overwritten by saved LR). Sole direct caller: FUN_08078004 (duel_field).
+
+Constants:
+- OP_CODE=0x31
+- SUB_PARAM=0x9
+- HIGH_BYTE_MASK=0x00ff0000 (sets r3[23:16] := 0xff)

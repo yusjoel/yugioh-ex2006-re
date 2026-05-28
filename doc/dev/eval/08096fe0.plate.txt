@@ -1,0 +1,5 @@
+Equip target evaluation entry (chain zone version). Calls find_chain_zone_slot_by_pair_card(r0=player_id) to find a chain zone paired card slot; if not found (r1 < 0) returns 0. If found: reads card attribute word from gP1LifePoints[player_offset + slot_idx*4] (base 0x0201c880); extracts bits[23:18] and bit[18] into r1; calls eval_equip_target_slot_flags(player_id, r1). Fully symmetric with eval_equip_target_via_player_deck_lookup (0x08096f9c), differing only in lookup function and base address.
+
+Constants:
+- CHAIN_BASE_P0=0x0201c880 (player 0 chain zone base)
+- PLAYER_STRIDE=0x868

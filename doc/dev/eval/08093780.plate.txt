@@ -1,0 +1,6 @@
+duel_puzzle scene initialization step: calls init_duel_puzzle_field_and_hand_display to perform field display init; then writes 0 to gP1LifePoints+0x1cf0 (clear status flag) and 1 to gP1LifePoints+0x1d04 (set ready flag). Exit: pop {r1}; bx r1 (void return). indeg=0, no direct bl callers; likely called via function pointer table by scene state machine.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- STATUS_OFFSET=0x1cf0 (write 0 = clear status)
+- READY_FLAG_OFFSET=0x1d04 (write 1 = mark ready)

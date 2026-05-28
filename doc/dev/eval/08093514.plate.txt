@@ -1,0 +1,5 @@
+Thunk calling dispatch_card_display_op(op=0x31, sub=0x9, r2=r4_in, r3=packed). Forms sibling pair with invoke_card_display_op_0x31_sub9 (0x080934f8), differing by retaining card_slot_ptr in r4 as r2. Saves r0 into r4; truncates r1 to u16, shifts r2 left 16 bits, ORs both into r3; hardcodes op=0x31/sub=9. Exit: pop {r4}; pop {r0}; bx r0 (void: r0 is overwritten by saved LR). Sole caller: FUN_080749e0 (duel_field, hand slot init path).
+
+Constants:
+- OP_CODE=0x31
+- SUB_PARAM=0x9

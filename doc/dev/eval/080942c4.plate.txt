@@ -1,0 +1,4 @@
+Minimal wrapper passing fixed ID=0x32 (50) to play_ui_effect then tail-calling. Exit: pop {r1}; bx r1 (passes through play_ui_effect return value). Member of play_ui_effect fixed-ID wrapper cluster; forms sibling pair with play_card_ok_ui_effect (ID=0x31). indeg=0, no direct bl callers; likely called via function pointer table.
+
+Constants:
+- UI_EFFECT_ID=0x32 (50, sound effect ID)

@@ -1,0 +1,4 @@
+Checks whether the given card has an effect node with a bound callback. Calls find_card_effect_node_entry(r0=card_ptr); if no node found, returns 0. If node exists, loads [node+0x14] callback pointer field; if zero (no callback) also returns 0. Uses rsbs/orrs/lsrs to collapse non-zero value to 1 (bool normalize). Forms sibling pair with check_card_effect_node_active: the latter checks [node+0x4] activation count; this function checks [node+0x14] callback pointer.
+
+Constants:
+- CALLBACK_OFFSET=0x14 (effect node callback function pointer field offset)

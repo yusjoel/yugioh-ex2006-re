@@ -1,0 +1,5 @@
+Equip target evaluation entry (player deck version). Calls find_card_pair_in_player_deck_list(r0=player_id) to find a paired card; if not found (r1 < 0) returns 0. If found: reads card attribute word from gP1LifePoints[player_offset + slot_idx*4]; extracts bits[23:18] combined with bit[18] into r1; calls eval_equip_target_slot_flags(player_id, r1). Forms sibling pair with eval_equip_target_via_chain_zone_lookup (0x08096fe0), differing in deck list vs chain zone slot lookup path.
+
+Constants:
+- DECK_BASE_P0=0x0201c740 (player 0 deck base)
+- PLAYER_STRIDE=0x868

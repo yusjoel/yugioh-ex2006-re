@@ -1,0 +1,12 @@
+Main dispatch function for equip target selection / activation state write (indeg=32). Reads gDuelBattleState[+0x8+r0*4] to check if current slot is in equip mode (==1); if so, calls commit_equip_target_slot_by_card_id(r0, r1). Otherwise writes activation state: gP1LifePoints+0x1d4c:=8, +0x1d7c:=r2, +0x1d58:=0, +0x1d54:=0, +0x1d64:=r0 (card_slot_id). Exit: pop {r4,r5}; pop {r0}; bx r0 (void: r0 is overwritten by saved LR regardless of path).
+
+Constants:
+- gDuelBattleState=0x0201e2a0
+- EQUIP_MODE_OFFSET=0x8 (per-slot, stride 4)
+- EQUIP_MODE_VALUE=0x1
+- gP1LifePoints=0x0201c4e0
+- ZONE_TYPE_OFFSET=0x1d4c (write 8)
+- PARAM_OFFSET=0x1d7c (write r2)
+- FLAG_A_OFFSET=0x1d58 (write 0)
+- FLAG_B_OFFSET=0x1d54 (write 0)
+- SLOT_ID_OFFSET=0x1d64 (write r0)

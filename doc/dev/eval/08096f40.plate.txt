@@ -1,0 +1,7 @@
+Equip activation entry: calls find_deck_slot_by_card_pair_match(r0=player_id) to search for a matching deck slot; if not found (r1 < 0) returns 0. If found: computes target card slot address gP1LifePoints[player_offset + slot_idx*4] and reads card attribute word; extracts bits[23:18] (lsls#2, lsrs#24, lsls#1) as byte_field and bit[18] (lsls#18, lsrs#31) as flag_bit, ORs them into r1; builds packed attr (r5=player_bit | 0x4e0000 | r0_lo16); calls apply_equip_activation_via_packed_attr(packed, r1, 0). Returns 1 or passes through apply return value.
+
+Constants:
+- DECK_BASE_P0=0x0201c8f8 (player 0 deck entry base)
+- PLAYER_STRIDE=0x868
+- EQUIP_ATTR_BASE=0x4e0000 (=0x9c<<0xf, equip activation attribute base)
+- CARD_ATTR_MASK=0x0000ffff

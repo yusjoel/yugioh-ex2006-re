@@ -1,0 +1,5 @@
+duel_puzzle scene initialization: calls init_duel_puzzle_field_and_hand_display; then reads gDuelBattleState[+0x10] as player_id, calls build_hand_zone_display_slots_shuffled(player_id, r5) for the local player's hand slots; then calls the same for the opponent (1-player_id). Both calls use same r1=r5 param, covering both sides' hand display slots. Returns fixed 1 (success). Caller clear_duel_puzzle_wram_regions invokes this function in the puzzle init path.
+
+Constants:
+- gDuelBattleState=0x0201e2a0
+- PLAYER_ID_OFFSET=0x10

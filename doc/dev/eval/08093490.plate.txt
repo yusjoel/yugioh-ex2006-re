@@ -1,0 +1,5 @@
+Minimal thunk calling dispatch_card_display_op(op=0x31, sub=0x5, r2=r0_in, r3=r1_in). Shifts r0/r1 to r2/r3, hardcodes r0=0x31 and r1=0x5, then calls dispatch. Exit: pop {r0}; bx r0 (void: r0 is overwritten by saved LR). Member of invoke_card_display_op_0x31_subN sibling cluster (sub=5). Sole caller: FUN_080a3130 (card_ids region, duel_field scene).
+
+Constants:
+- OP_CODE=0x31 (card display opcode)
+- SUB_PARAM=0x5

@@ -1,0 +1,6 @@
+Equip activation entry (ID lookup version B). Symmetric with apply_equip_activation_with_id_lookup_type_a (0x08097024), with two differences: (1) base attribute value 0x4e0000 (=0x9c<<0xf) vs 0x500000; (2) r2 is truncated to u16 (lsls #0x10; lsrs #0x10) then passed as r1 (2nd param) instead of fixed 0. Calls apply_equip_activation_with_id_lookup(packed, r2_truncated, 0). Fixed return 0.
+
+Constants:
+- BASE_ATTR=0x4e0000 (=0x9c<<0xf)
+- PLAYER_BIT_SHIFT=0x1f
+- CARD_ATTR_MASK=0x0000ffff
