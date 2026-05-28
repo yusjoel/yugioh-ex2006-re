@@ -1,0 +1,7 @@
+Pack scene card-select slot builder. r0=pack_index, r1=card_count, r2=card_mask_word, r3=player_cards_ptr. Reads pack_info_table for the pack's card list base, iterates each card, checks unlock status via check_pack_card_slot_filter or unlock bitmap, writes card_id/rarity/unlock_flag packed dword into EWRAM slot array at 0x0200af20. Returns r0=number of valid slots written.
+
+Constants:
+- SLOT_ARRAY=0x0200af20 // EWRAM card-select slot array base
+- UNLOCK_BITS=0x02000006 // IWRAM card unlock bitmap base
+- MAX_PACK_ID=0x32 // max pack ID (from DAT_080d86fc ldrh)
+- CARD_LOW4_CLEAR_MASK=0x0000fff0 // clears low 4 bits (keeps [15:4])

@@ -1,0 +1,6 @@
+Writes a contiguous tile-index strip for pack graphics into OBJ VRAM. r0=dst_ptr, r1=start_tile, r2=palette_flags, r3=tile_row_base_offset. Shifts r2 left 0xc to get OBJ palette bank field. Computes column offset as start_tile % 0x30. Outer loop runs 2 iterations (2 strips), inner loop runs 0x20 iterations (32 tiles), writes strh tile index to [r4,#0], increments tile number and wraps at row end. Called by pack banner and pack detail VRAM fill paths.
+
+Constants:
+- STRIP_TILES=0x20 // 32 tiles per strip
+- ROW_WIDTH=0x30 // 48: tile row width (OBJ VRAM 64x64 tile mode)
+- PAL_SHIFT=0xc // r6 = r2<<0xc: OBJ attr2 palette bank field

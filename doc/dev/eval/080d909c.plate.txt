@@ -1,0 +1,10 @@
+Writes pack banner graphic tiles to OBJ VRAM row B (base 0x06001180). Fully symmetric to render_pack_banner_tile_row_a (0x080d9040): if r0=0xffff calls zero_fill_pack_obj_vram_row_b; otherwise computes source as 0x02029eb7 + slot_id*0x1288 + 0x0f48, copies 0x340 bytes via copy_words_aligned, then calls fill_pack_obj_tile_region_13col_b (tile_id=0x8c, cols=15).
+
+Constants:
+- VRAM_ROW_B=0x06001180 // OBJ VRAM row B base address
+- SRC_BASE=0x02029eb7 // EWRAM pack graphic source data base
+- SLOT_STRIDE=0x1288 // per-slot graphic data stride
+- SRC_OFFSET_B=0x0f48 // intra-slot source offset for row B
+- WORD_COUNT=0x340 // bytes to copy
+- FILL_TILE=0x8c // tile ID passed to fill_pack_obj_tile_region_13col_b
+- FILL_COLS=0xf // number of columns to fill

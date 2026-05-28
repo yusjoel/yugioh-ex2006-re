@@ -1,0 +1,8 @@
+Renders the selection-highlight OBJ (two stacked layers) for the currently highlighted pack slot. r0=dir_index [0..3], clamped. Computes tile_base=0xd4<<2=0x350, uses DAT_080d9688 (attr0=0x0044, attr1=0x0090) and DAT_080d9690 (second layer attr), calls render_overlay_oam_sprite_tiled twice. Second call uses tile_base+0x40=0x390. dir_flags=dir_index<<10 encodes OAM priority.
+
+Constants:
+- TILE_BASE=0x350 // 0xd4<<2: highlight frame tile start
+- TILE_BASE2=0x390 // 0x350+0x40: second layer tile start
+- OAM_ATTR0_0=0x00900044 // layer 0: attr0(y=0x44)|attr1(x=0x90)
+- OAM_ATTR0_1=0x0090fff4 // layer 1: x=0xfff4=-12 offset
+- DIR_MAX=3 // dir_index clamp maximum

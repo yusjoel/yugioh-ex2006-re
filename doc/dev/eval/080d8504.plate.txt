@@ -1,0 +1,5 @@
+Pack purchase screen card-select scene frame-step driver. Calls handler from fn-ptr table 0x09e49438 at current step index stored in pack_ui_state+0xc[+0x4] via invoke_r0. If handler returns nonzero, increments step counter. Returns 0 while scene is running, returns 1 when current step completes.
+
+Constants:
+- FN_TABLE=0x09e49438 // pack card select step handler fn-ptr table
+- pack_ui_state=0x03005850

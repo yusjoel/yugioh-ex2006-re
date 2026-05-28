@@ -1,0 +1,8 @@
+Renders left/right arrow OBJ entries for the pack-list selection UI. r0=dir_index [0..3, clamped]. Iterates pack_visible_count visible slots; for each slot with slot[+0x18]!=0 (valid), calls compute_pack_slot_scroll_x for X coordinate, writes X-4 into attr0, combines dir_index<<10 (priority) with tile_id for attr1/attr2, calls write_oam_entry_from_packed_args. Works with the banner highlight-box OAM writer to display pack-select arrows.
+
+Constants:
+- SLOT_STRIDE=0x20 // slot struct stride
+- DIR_MAX=3 // max dir_index (clamp)
+- OBJ_TILE_BASE=0x000003d6 // arrow tile base (DAT_080d964c)
+- ATTR0_FLAG=0x5c0000 // 0xb8<<15: OBJ attr0 size/shape high bits
+- X_OFFSET=-4 // X coordinate adjustment

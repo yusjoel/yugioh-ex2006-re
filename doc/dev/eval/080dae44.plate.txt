@@ -1,0 +1,5 @@
+Pack list page scene frame-step driver. Reads current step from pack_ui_state+0xc[+0x4], looks up handler in fn-ptr table 0x09e494a8, calls via invoke_r0. If handler returns nonzero, increments step counter. Returns 0 while running, 1 when step ends (null ptr). Symmetric to tick_pack_card_select_step (0x080d8504) and tick_pack_duel_puzzle_step (0x080d8d4c). FUN_080db448 case 0.
+
+Constants:
+- FN_TABLE=0x09e494a8 // pack list page step fn-ptr table
+- pack_ui_state=0x03005850

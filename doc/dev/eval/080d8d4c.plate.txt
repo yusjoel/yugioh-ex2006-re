@@ -1,0 +1,5 @@
+Duel-puzzle scene frame-step driver. Reads current step from pack_ui_state+0xc[+0x4], looks up handler in fn-ptr table 0x09e49480, calls it via invoke_r0. If handler returns nonzero, increments step counter. Returns 0 while running, 1 when step ends or scene complete (null ptr). Symmetric to tick_pack_card_select_step (0x080d8504); uses different table (0x09e49480 vs 0x09e49438). FUN_080db448 case 2.
+
+Constants:
+- FN_TABLE=0x09e49480 // duel_puzzle scene step fn-ptr table
+- pack_ui_state=0x03005850

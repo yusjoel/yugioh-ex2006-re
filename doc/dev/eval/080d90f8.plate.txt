@@ -1,0 +1,6 @@
+Writes pack detail panel card-attribute graphics to OBJ VRAM info region (base 0x060014c0). If r0=0xffff calls zero_fill_pack_info_obj_vram to clear; otherwise calls render_pack_card_stat_byte_to_sprite to render card attribute byte as sprite data, then calls fill_pack_obj_tile_region_17col (tile_id=0xa6, cols=15) to write background fill. Third member of pack OBJ VRAM write cluster (row_a + row_b + info).
+
+Constants:
+- VRAM_INFO=0x060014c0 // pack info OBJ VRAM base address
+- FILL_TILE=0xa6 // tile ID passed to fill_pack_obj_tile_region_17col
+- FILL_COLS=0xf // number of columns to fill

@@ -1,0 +1,10 @@
+Writes pack banner graphic tiles to OBJ VRAM row A (base 0x06000e40). If r0=0xffff (invalid slot), calls zero_fill_pack_obj_vram_row_a to clear the region. Otherwise computes source offset as 0x02029eb7 + slot_id*0x1288 + 0x0c08, calls copy_words_aligned to copy 0xd0*4=0x340 bytes of tile data, then calls fill_pack_obj_tile_region_13col (tile_id=0x72, cols=15) to write background fill tiles.
+
+Constants:
+- VRAM_ROW_A=0x06000e40 // OBJ VRAM row A base address
+- SRC_BASE=0x02029eb7 // EWRAM pack graphic source data base
+- SLOT_STRIDE=0x1288 // per-slot graphic data stride
+- SRC_OFFSET=0x0c08 // intra-slot source offset for row A
+- WORD_COUNT=0x340 // bytes to copy (0xd0 words)
+- FILL_TILE=0x72 // tile ID passed to fill_pack_obj_tile_region_13col
+- FILL_COLS=0xf // number of columns to fill

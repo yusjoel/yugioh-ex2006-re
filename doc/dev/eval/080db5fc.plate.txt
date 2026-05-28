@@ -1,0 +1,7 @@
+Counts how many cards in the specified pack slot (r0=pack_id [0..50]) the player currently owns. If pack has a fixed card list (pack_info_table[r0*16+0xc] != 0), iterates each card entry, calls internal_card_id_to_card_id, checks the card-ownership bitmap at 0x020363c0. If list is empty (filter pack), iterates all cards using check_pack_card_slot_filter and does the same bitmap check. Returns r0 = owned card count.
+
+Constants:
+- pack_info_table=0x09e5e2e8 // pack info table base
+- CARD_OWN_BITMAP=0x020363c0 // EWRAM card ownership bitmap base
+- CARD_OWN_BIT_STRIDE=0x10 // 16 cards per group (lsrs r0,r5,#4 + lsls*2 = word index)
+- OWN_BIT_MASK=0x1 // ownership flag bit

@@ -1,0 +1,6 @@
+Checks whether the player meets the purchase prerequisites for a given pack slot. r0=pack_id [0..50], r1=ptr to player stats struct. Uses a switch table (0x50 entries at 0x080db1d0) indexed by pack_id: early packs (case 0..0xa) are always purchasable (r4=1); specific packs check player stats fields (win count, card count, etc.) against thresholds. Finally calls test_card_flag_bit__080f9a60 for card-flag check. Returns 1 if eligible, 0 otherwise.
+
+Constants:
+- PACK_ID_MAX=0x32 // maximum valid pack ID (50)
+- THRESHOLD_B=0x2 // case_b: player_stats[+6] > 2
+- THRESHOLD_C=0 // case_c: player_stats[+8] > 0

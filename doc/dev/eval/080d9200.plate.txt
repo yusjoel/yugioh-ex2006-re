@@ -1,0 +1,7 @@
+Writes a square-form pack-banner OBJ entry into OAM. r0=tile_index, r1=y_half_packed (high16=Y_top, low16=Y_bot), r2=dir_flags. Computes column/row offsets from tile_index mod/div 4, clamps dir_flags to [0..3], assembles attr0/attr1/attr2, calls write_oam_entry_with_tile_inc. Symmetric sibling to write_pack_banner_oam_entry_stacked (0x080d925c) which uses write_pack_obj_attr_by_dir_stacked.
+
+Constants:
+- OAM_BASE=0x000080c0 // OAM attr0/attr1 base value
+- TILE_DIV=4 // tile_index mod/div base
+- Y_ADJUST=-0x10 // Y coordinate adjustment
+- Y_ADJUST2=-0x20 // high Y adjustment

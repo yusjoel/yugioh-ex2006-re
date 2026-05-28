@@ -1,0 +1,5 @@
+Writes a stacked-form pack-banner OBJ entry into OAM. r0=tile_index, r1=y_packed (low16=Y_top, high16=Y_bot), r2=oam_attr1 (skip guard + forwarded), r3=dir_flags. Skips if tile_index % 4 == 0. Otherwise computes attr0/attr1/attr2, calls write_pack_obj_attr_by_dir_stacked. r2 loaded from slot struct+0xe (OAM attr1 field, typical value 0x0100=disable-affine); used as cmp r4,#0 skip gate then forwarded via lsls r3,r4,#0x10. Symmetric sibling to write_pack_banner_oam_entry_sq (0x080d9200).
+
+Constants:
+- OAM_BASE=0x000080c0 // OAM attribute base value
+- TILE_DIV=4 // tile mod/div base
