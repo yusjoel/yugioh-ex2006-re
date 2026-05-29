@@ -1,0 +1,14 @@
+SIO link session lightweight teardown function. Called by pack/campaign scene state machine
+on SIO link reset. Symmetric counterpart to setup_sio_link_session (0x080edd90).
+Steps: (1) clear IME (disable interrupts);
+(2) ldrh IE, mask off bit5 (serial interrupt bit) via ands 0x0000ffdf, strh back;
+(3) strh 1,[IME] restore interrupt enable;
+(4) str 0,[0x03000000+0x18] clear SIO interrupt callback ptr;
+(5) bl reinit_sio_link_with_timer3 to reset SIO link and Timer3.
+setup_sio_link_session sets IE serial bit and registers callback;
+teardown_sio_link_session clears IE serial bit and deregisters callback.
+
+Constants:
+- IE_SERIAL_MASK_OFF = 0x0000ffdf (DAT_080ede54, = ~0x20, clears serial bit)
+- IWRAM_SIO_BASE = 0x03000000 (DAT_080ede58)
+- SIO_CALLBACK_FIELD = +0x18

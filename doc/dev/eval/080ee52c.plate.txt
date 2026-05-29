@@ -1,0 +1,20 @@
+GL (OpenGL-style 3D rendering) scene state initialization function.
+Called indirectly by tick_gl_scene_state_machine (0x080ee714) dispatch table as case entry.
+Sequence: (1) allocate 4 bytes on sp, zero it, call bios_cpu_set(0x0201af20, 0x05000023)
+  in fill mode to zero EWRAM GL context;
+(2) call gl_clear_vram_palram_scroll to clear VRAM/palette/scroll regs;
+(3) write DISPCNT=0x1340 (0x9a<<5: OBJ 1D mapping + BG/OBJ enable);
+(4) write BG0CNT+8=0x189, BG0CNT+0xa=0x4;
+(5) call gl_set_brightness(-0x10, 0x3f) with initial brightness -16 and mask 0x3f;
+(6) call gl_fade_in to execute fade-in;
+(7) call gl_state_init to initialize GL state machine;
+return 1.
+
+Constants:
+- EWRAM_GL_CTX_BASE = 0x0201af20 (DWORD_080ee574)
+- BIOS_CPUSET_CTRL = 0x05000023 (DWORD_080ee578, fill mode, size=0x23 words)
+- DISPCNT = 0x04000000 (0x80<<0x13)
+- DISPCNT_VAL = 0x1340 (0x9a<<5: OBJ 1D mapping + BG/OBJ enable)
+- BG0CNT_OFFSET = 0x8
+- BRIGHTNESS_INIT = -0x10 = rsbs #0x10 (fade-in start brightness)
+- BRIGHTNESS_MASK = 0x3f

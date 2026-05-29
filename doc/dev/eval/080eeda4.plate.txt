@@ -1,0 +1,14 @@
+Game string pointer query function, string family D variant.
+r0=string_id (u16) [0..1650] (game_str_id_remap_count=0x0673=1651 entries).
+If r0==0: return NULL_STR address 0x09e4f348 (DWORD_080eedf4).
+Otherwise: r0 += 0x23a (DWORD_080eedd8, ID_OFFSET_D), call game_str_id_to_row,
+compute game_str_pointer_table[row][lang] offset, return game_str_ja + offset.
+asm line 405938 plate comment: "Forms string-family B/C sibling with FUN_080eeda4 (offset 0x23a)".
+Four-function string offset query family: type_b (0x212), type_c (0x226), lang_offset (0x1f4), type_d (0x23a).
+indeg=0 (grep ".word 0x080eeda5" = 0 hits).
+
+Constants:
+- ID_OFFSET_D = 0x23a (DWORD_080eedd8)
+- game_str_pointer_table, game_str_ja: named ROM labels
+- gSettings_LANG = [0x02006c2c] bits[2:0]
+- NULL_STR = 0x09e4f348 (DWORD_080eedf4)

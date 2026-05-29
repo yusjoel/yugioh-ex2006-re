@@ -1,0 +1,17 @@
+Query given card_id's hold limit in the current banlist (0=forbidden, 1=limited,
+2=semi-limited, 3=unlimited).
+r0=deck_slot_index (u8) [5..9] (callers 0x080e55d4/d6/de/e4/ec pass 5/6/7/8/9);
+r1=card_id (u16).
+Entry: .hword 0x464f=mov r7,r9, .hword 0x4646=mov r6,r8 from parent-frame callee-save.
+Calls map_card_id_to_banlist_canonical(r6) to get canonical card_id;
+compares with original to detect alias (eors/rsbs/orrs/lsrs -> r9=has_alias).
+Locates banlist_master_table + deck_slot_index*8 entry block;
+reads [block+4] as entry count r7; iterates r7 entries:
+if entry card_id==0, check direct card_id match; else call check_card_ids_banlist_compatible.
+On match: return ldrh [entry+2] (limit field).
+On no match: return 3 (LIMIT_UNLIMITED).
+
+Constants:
+- banlist_master_table = 0x09e5f6cc (PTR_banlist_master_table_080ef00c)
+- TABLE_ENTRY_SIZE = 4 bytes (lsls #3 => slot*8 bytes total per block)
+- LIMIT_UNLIMITED = 3 (movs r0,#3 default return)

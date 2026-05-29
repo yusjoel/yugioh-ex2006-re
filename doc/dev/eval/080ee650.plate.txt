@@ -1,0 +1,5 @@
+Single-instruction function: movs r0,#1; bx lr. Fixed return 1.
+Called indirectly by tick_gl_scene_state_machine (0x080ee714) dispatch table entry,
+sharing the same dispatch table as init_gl_scene_state (0x080ee52c).
+GL state machine fixed-return placeholder case handler: signals state complete/success
+(return 1) with no operation performed.

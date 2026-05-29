@@ -1,0 +1,11 @@
+Zero-fill a single BG2 tile VRAM row.
+r0=row_index (u16) [0..31], r1=tile_width (u16) [0..32].
+Entry: lsls r0,r0,#0x10; lsrs r0,r0,#0xb converts row_index to byte offset (row*0x20).
+Adds base 0x06004000 (BG2 tile VRAM area) to get target address.
+Calls zero_fill_by_halfword(target, tile_width) to clear tile_width halfwords.
+Inner single-row primitive; sibling of zero_fill_bg_vram_row_range (0x080edea4).
+indeg=0 (grep ".word 0x080edee5" = 0 hits).
+
+Constants:
+- BG2_VRAM_BASE = 0x06004000 (DWORD_080edefc)
+- ROW_STRIDE_SHIFT = 0x10-0xb = 0x15 (lsls 0x10 then lsrs 0xb => row*0x20 bytes)

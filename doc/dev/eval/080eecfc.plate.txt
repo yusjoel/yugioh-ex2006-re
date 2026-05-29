@@ -1,0 +1,15 @@
+Game string pointer query function, string family C variant.
+r0=string_id (u16) [0..1650] (game_str_id_remap_count=0x0673=1651 entries).
+If r0==0: return NULL_STR address 0x09e4f348.
+Otherwise: r0 += 0x226 (DWORD_080eed30, ID_OFFSET_C), call game_str_id_to_row
+to convert to master row index; compute offset into game_str_pointer_table
+using row and [0x02006c2c] bits[2:0] (lang_code); return game_str_ja + offset.
+Family C sibling of get_game_text_ptr_by_str_type_b (0x080eed50, offset 0x212)
+and get_game_text_ptr_by_lang_offset (0x080eeca8, offset 0x1f4); differs in ID_OFFSET only.
+indeg=0 (grep ".word 0x080eecfd" = 0 hits).
+
+Constants:
+- ID_OFFSET_C = 0x226 (DWORD_080eed30)
+- game_str_pointer_table, game_str_ja: named ROM labels
+- gSettings_LANG = [0x02006c2c] bits[2:0]
+- NULL_STR = 0x09e4f348 (DWORD_080eed4c)

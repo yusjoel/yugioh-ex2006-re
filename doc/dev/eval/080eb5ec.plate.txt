@@ -1,0 +1,17 @@
+nnsys/g2d/g2d_NCL_load.c NCLR palette compression (PCMP) block loader entry.
+r0=NNS_G2dBinaryFileHeader* pNclrFile, r1=NNS_G2dPlttCmpInfo** ppPlttCmpInfo.
+Asserts both ptrs non-NULL (lines 0x5f=95, 0x60=96).
+Verifies file magic == 0x4e434c52 ('NCLR') or 0x4e435052 ('NCPR') (line 0x68=104),
+checks version [pNclrFile+6] >= 0x100 (line 0x6d=109).
+Calls find_bin_block_by_type(pNclrFile, 0x50434d50='PCMP') to find palette compression block.
+If not found: *ppPlttCmpInfo=NULL, return 0.
+If found: r4=block+8, call fixup_pcmp_cmpinfo_data_ptr to convert internal relative offsets
+to absolute ptrs, *ppPlttCmpInfo=block+8, return 1.
+Symmetric sibling of load_nclr_pltt_data (0x080eb54c): same structure,
+differs in target block type ('PCMP' vs 'PLTT') and fixup function.
+
+Constants:
+- NCLR_MAGIC_1 = 0x4e434c52 ('NCLR', DAT_080eb664)
+- NCLR_MAGIC_2 = 0x4e435052 ('NCPR', DAT_080eb668)
+- PCMP_BLOCK_TYPE = 0x50434d50 ('PCMP', DAT_080eb674)
+- NCLR_VERSION_MIN = 0x100

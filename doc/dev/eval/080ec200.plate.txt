@@ -1,0 +1,21 @@
+Language selection page hardware register and VRAM initialization function.
+No independent APCS input (r0 overwritten by ldr gPrng at entry).
+Sequence: (1) write gPrng[+0xba*2=+0x174]=0x11 (page-enter flag);
+(2) write DISPCNT=0 (disable display);
+(3) call reset_display_and_obj_vram(0x02029eb0) to clear OBJ VRAM and display regs;
+(4) call store_ewram_ctx_ptr_and_clear_mode_flags(0x0202a2c0);
+(5) write BG0CNT=0x4, BG1CNT=0x105, BG2CNT=0x206, BG3CNT=0x307;
+(6) call reset_all_bg_scroll_regs_and_shadows;
+(7) call upload_pack_vram_and_palette;
+(8) three calls to zero_fill_by_halfword: BG VRAM 0x06004000 (0x8000 halfwords),
+0x06000000 (0x2000 halfwords), 0x06010000 (0x8000 halfwords).
+Called by language selection page state machine enter_language_selection_page at state=0.
+
+Constants:
+- gPrng+0x174 = gPrng+0xba*2 (page-enter flag offset)
+- DISPCNT = 0x04000000 (0x80<<0x13)
+- BG0CNT = 0x04000008
+- EWRAM_CTX_BASE = 0x0202a2c0
+- VRAM_BG0_TILE = 0x06004000
+- VRAM_OBJ = 0x06000000 (0xc0<<0x13)
+- VRAM_BG1_TILE = 0x06010000

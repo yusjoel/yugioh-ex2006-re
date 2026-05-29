@@ -1,0 +1,17 @@
+Query given card_id's hold limit in the FW (fixed-width EWRAM) banlist.
+r0=fw_slot_index (u8) [0..10] (FW_BANLIST_BASE=0x020053f8 = banlist pass-input CURSOR_POS_BASE;
+  MAX_PASS_INPUT_CTX=0xb=11 slots inferred); r1=card_id (u16).
+Symmetric sibling of get_banlist_limit_for_card (0x080eefc0) using different table.
+Calls map_card_id_to_banlist_canonical -> alias detection -> locate FW banlist block
+at FW_BANLIST_BASE + fw_slot_index*0x204 (lsls#7+adds+lsls#2 = *0x204).
+Reads [block+0x200] as entry count r7 (byte).
+Iterates r7 entries (2-byte entries): reads [entry+2] bits[15:2] (lsls#0x10/lsrs#0x12) as card_id,
+calls check_card_ids_banlist_compatible; on match returns [entry] bits[1:0] (limit field).
+On no match returns 3 (LIMIT_UNLIMITED).
+
+Constants:
+- FW_BANLIST_BASE = 0x020053f8 (DAT_080ef220)
+- FW_ENTRY_STRIDE = slot*0x204 (lsls#7 + adds + lsls#2 = *0x204 per slot)
+- COUNT_OFFSET = 0x200 (block base + 0x200; ldrb r7)
+- LIMIT_MASK = bits[1:0] (lsls#0x1e/lsrs#0x1e)
+- LIMIT_UNLIMITED = 3

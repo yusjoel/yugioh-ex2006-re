@@ -1,0 +1,15 @@
+Compute percentage of active (bit0==1) entries in a range of challenge slot entries.
+r0=slot_start_index (u16) [0..125], r1=slot_count (u16) [0..126].
+Challenge entry array at SLOT_TABLE_BASE=0x02006c3c (35 expert + 50 puzzle + 41 standard = 126 total).
+If slot_count==0, return 0 directly.
+Otherwise iterate slot_count entries starting at slot_start_index*4:
+read byte at SLOT_TABLE_BASE + (slot_start_index+i)*4, extract bits[1:0];
+if bits[1:0]==1, increment counter r4.
+At end: compute r4*100/slot_count via __divsi3, return integer percentage.
+indeg=0 (grep ".word 0x080ec2d1" = 0 hits).
+
+Constants:
+- SLOT_TABLE_BASE = 0x02000000 + 0x6c3c (DAT_080ec314 + DAT_080ec318)
+- ACTIVE_FLAG_MASK = 0x3 (bits[1:0])
+- ACTIVE_VALUE = 1
+- PERCENT_SCALE = 0x64 = 100

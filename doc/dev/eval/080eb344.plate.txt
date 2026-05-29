@@ -1,0 +1,17 @@
+nnsys/g2d/g2d_NCG_load.c NCGR character data block loader entry.
+r0=NNS_G2dBinaryFileHeader* pNcgrFile, r1=NNS_G2dCharacterData** ppCharData.
+Asserts both ptrs non-NULL (lines 0x84=132, 0x85=133), checks file magic==0x4e434752 ('NCGR')
+and version [pNcgrFile+6]>=0x100 (lines 0x89=137, 0x8d=141).
+Calls find_bin_block_by_type(pNcgrFile, 'CHAR') to locate 'CHAR' data block.
+If not found: *ppCharData=NULL, return 0.
+If found: skip 8-byte block header (+8), call fixup_ncgr_char_data_ptr to convert
+relative offsets to absolute ptrs, *ppCharData=block+8, return 1.
+Symmetric sibling of find_ncgr_char_pos_block (0x080eb3f0): same structure,
+differs in block type ('CHAR' vs 'CPOS') and version threshold (0x100 vs 0x101).
+
+Constants:
+- NCGR_MAGIC = 0x4e434752 ('NCGR')
+- CHAR_BLOCK_TYPE = 0x43484152 ('CHAR', DAT_080eb3d8)
+- NCGR_VERSION_MIN = 0x100 (0x80 << 1)
+- assert line 0x84=132 (pNcgrFile != NULL)
+- assert line 0x85=133 (ppCharData != NULL)

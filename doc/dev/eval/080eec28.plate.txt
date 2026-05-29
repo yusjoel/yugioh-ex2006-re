@@ -1,0 +1,11 @@
+Card data query wrapper using internal card ID (icid).
+r0=internal_card_id (u16).
+Calls internal_card_id_to_card_id(r0) to convert icid to standard card_id.
+Reads EWRAM [0x02000000+0x6c2c] bits[2:0] as lang_code (lsls#0x1d/lsrs#0x1d).
+Calls card_data_query(card_id, lang_code), returns its result.
+Called by card data read path; encapsulates two-step icid -> standard_id -> card_data chain.
+indeg=0 (grep ".word 0x080eec29" = 0 hits).
+
+Constants:
+- gSettings_LANG = [0x02000000+0x6c2c] bits[2:0] (DWORD_080eec50)
+- LANG_MASK = 3 bits (lsls 0x1d / lsrs 0x1d)

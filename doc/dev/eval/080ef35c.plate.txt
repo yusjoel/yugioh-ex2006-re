@@ -1,0 +1,7 @@
+XOR input value with LCG random step result.
+r0=input_val (u32), r1=lcg_seed (u32).
+Calls advance_lcg_rand_state(r1) to step LCG state, gets new random r0.
+Returns r4 = input_val XOR new_random.
+XOR-mixing wrapper over advance_lcg_rand_state.
+Called by FUN_080ef370 (card passcode XOR hash generator) to mix passcode values
+from ROM card_passcode_table with LCG random sequence to generate hash.

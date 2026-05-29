@@ -1,0 +1,16 @@
+nnsys/g2d SRT controller blend parameter initialization function (src variant).
+r0=NNS_G2dSRTControl* pSrcCtrl (saved to r5), r1=NNS_G2dBlendParam* pBlend (saved to r4).
+Asserts both ptrs non-NULL (lines 0xab=171, 0xac=172) and verifies pSrcCtrl type==1
+(line 0xad=173, [pSrcCtrl+0]==1).
+Calls init_blend_param_neutral(pBlend) to zero blend params to neutral state.
+Reads initial velocity r7 and offset velocity r6 from ROM velocity table
+(DAT_080eba78=0x09e399d0) indexed by [pSrcCtrl+0x10] (frame sequence type byte).
+Asserts pBlend non-NULL again (line 0x77=119).
+Calls init_blend_param_with_velocity(pBlend, r7, r6) to write velocity fields.
+Calls scale_blend_param_struct(pBlend, pBlend, [pSrcCtrl+4], [pSrcCtrl+8]) to finalize scaling.
+indeg=0 (grep ".word 0x080eb9d1" = 0 hits); sibling init_blend_param_from_srt_dst (0x080eba7c) has identical structure.
+
+Constants:
+- SRT_CTRL_TYPE_ACTIVE = 1 ([pSrcCtrl+0] type field)
+- velocity_table = 0x09e399d0 (DAT_080eba78, ROM velocity parameter table)
+- assert line 0xab=171, 0xac=172, 0xad=173, 0x30=48, 0x77=119

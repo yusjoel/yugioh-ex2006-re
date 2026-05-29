@@ -1,0 +1,17 @@
+GL scene state machine tick driver function.
+No independent APCS params (r0 overwritten by ldr gPrng at entry).
+Reads gPrng+0x81*4=gPrng+0x204 halfword, extracts bits[13:6] (lsls#0x12/lsrs#0x18)
+as state_index [0..N].
+Looks up dispatch table DAT_080ee758=0x09e5ef20 at state_index*4.
+If fn-ptr is NULL: return 1 (state machine done/exit).
+Otherwise calls fn-ptr via invoke_r0 to execute current state handler:
+if handler returns non-zero (state advances), increment state_index+1 & 0xff
+and write back to gPrng+0x204 bits[13:6]; then call return_void_handler, return 0 (continue).
+indeg=0 (grep ".word 0x080ee715" = 0 hits); called via state-machine registered fn-ptr.
+
+Constants:
+- gPrng+0x204 = gPrng+0x81*4 (GL state index halfword field)
+- STATE_INDEX_SHIFT = bits[13:6] (lsls#0x12/lsrs#0x18)
+- dispatch_table = 0x09e5ef20 (DAT_080ee758)
+- STATE_INDEX_MASK = 0xffffc03f (DAT_080ee760, clears bits[13:6])
+- STATE_INDEX_WRAP = 0xff (ands #0xff)

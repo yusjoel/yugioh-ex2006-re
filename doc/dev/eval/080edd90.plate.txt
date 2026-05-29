@@ -1,0 +1,23 @@
+SIO link session setup entry, called by FUN_080fa7e4 and FUN_080faf18 on link establishment.
+r0=void* pSioCtxBase (if non-NULL, written to gPrng[+0x1c0]); r1=u32 callback_ptr.
+Steps: (1) if r0 non-NULL, str r0 to gPrng+0x1c0;
+(2) bl reinit_sio_link_with_timer3;
+(3) call zero_fill_by_halfword to clear 0x938 halfwords at gPrng+0x1c0;
+(4) call init_sio_connection twice with IWRAM 0x03000000 as base;
+(5) write [base+0x160]=0x000f (SIO link state init value);
+(6) write [base+0x924]=r7 (callback function pointer);
+(7) clear gPrng+0x1f8;
+(8) write ROM fn-ptr 0x080edd59 to [0x03000000+0x18] as SIO interrupt handler;
+(9) clear IME, set IE |= 0x20 (serial interrupt bit), restore IME=1;
+(10) write TM2CNT_L=0x00c3feb9 (Timer 2 reload), set TM2CNT_H=0x4000 (start Timer 2).
+
+Constants:
+- gPrng+0x1c0 = gPrng+0xe0*2 (SIO context pointer store offset)
+- ZERO_FILL_SIZE = 0x938 halfwords (DAT_080ede08)
+- IWRAM_SIO_BASE = 0x03000000 (DAT_080ede0c)
+- SIO_LINK_STATE_OFFSET = 0xb0*2 = 0x160
+- CALLBACK_OFFSET = 0x924 (DAT_080ede10)
+- SIO_CALLBACK_PTR = 0x080edd59 (DAT_080ede14)
+- IE_SERIAL_BIT = 0x20 (SIO serial interrupt bit)
+- TM2_RELOAD = 0x00c3feb9 (DAT_080ede24)
+- TM2CNT_H_START = 0x4000 (start Timer 2)

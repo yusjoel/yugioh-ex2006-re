@@ -1,0 +1,21 @@
+Pack scene scrolling OAM sprite attribute write function.
+No independent APCS params: entry .hword 0x464f=mov r7,r9 and .hword 0x4646=mov r6,r8
+capture parent-frame callee-save registers (origin unknown; indeg=0, callsite untraceable).
+Calls write_oam_entry_from_packed_args(0x001d0014, 0x0082<<6, 0x80) to write base OBJ entry.
+Loads EWRAM_CTX=0x020297e0, checks [EWRAM_CTX+1] bit5 (0x20 mask):
+if set, reads pack_id from [EWRAM_CTX] bits[16:12] (lsls#0x13/lsrs#0x1c),
+computes column=pack_id%5 and row=pack_id/5,
+calculates OAM attr0/attr1 args, looks up DAT_080ece2c/0x09e5eee4 palette table,
+writes three OBJ sprite rows (offsets 0xc/0x2c/0x4c) via write_oam_entry_from_packed_args.
+Reads gPrng+0x20c (0x83<<2) halfword bits[4:2] as palette index.
+indeg=0 (grep ".word 0x080ecce9" = 0 hits); dead-code candidate or state-machine indirect call.
+
+Constants:
+- EWRAM_CTX = 0x020297e0 (DAT_080ece28)
+- PACK_FLAG_BIT5 = 0x20 ([EWRAM_CTX+1])
+- OAM_ATTR_FIXED = 0x0014001d (DAT_080ece24, attr0/r0 packed: y=0x1d, x=0x14)
+- gPrng+0x83*2 = gPrng+0x20c (OBJ palette read offset)
+- palette_table = 0x09e5eee4 (DAT_080ece2c)
+- SPRITE_Y_BASE = 0x900000 (0x90<<0x10)
+- row_offsets = 0xc, 0x2c, 0x4c (three OBJ entry y offsets)
+- OBJ_TILE_BASE = 0xe000 (0xe0<<5 = 0x1c00, written to attr2)

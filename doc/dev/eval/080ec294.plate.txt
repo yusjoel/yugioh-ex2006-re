@@ -1,0 +1,15 @@
+Upload icon tile and palette data to OBJ VRAM and palette RAM by slot index.
+r0=slot_index [0..13] (u16).
+Calls copy_words_aligned to copy 0x20 words (32 bytes = one 16-color palette) from
+icon_palettes_base + slot_index*0x20*4 to OBJ palette dest 0x05000240 + slot_index*0x20.
+Calls tile_2d_row_copy to write 3x3 tile block from icon_tiles_base + slot_index*9*0x20
+to OBJ tile VRAM 0x06011000 + slot_index*9*0x20.
+indeg=0 (grep ".word 0x080ec295" = 0 hits); called by pack/card icon display path.
+
+Constants:
+- PALETTE_BASE = 0x05000240 (DAT_080ec2c0)
+- PAL_STRIDE = 0x20 words (lsls slot,#5)
+- icon_palettes_base = DAT_080ec2c4 (ROM icon palette table base)
+- TILE_VRAM_BASE = 0x06011000 (DAT_080ec2c8)
+- icon_tiles_base = DAT_080ec2cc (ROM icon tile table base)
+- TILE_SLOT_STRIDE = slot*9 (lsls slot,#3 then adds slot => *9), *0x20
