@@ -1,0 +1,10 @@
+Advances the pack scene fade-in animation; when fade-in completes, performs the card-info page transition and clears DISPCNT.
+Calls tick_blend_fadein_and_poll_done; if not yet done (r0=0) returns immediately. On completion: (1) calls card_list_on_select_to_info_page to navigate to the pack info page; (2) writes 0 to DISPCNT (0x4000000); (3) updates two bit-fields in gPrng+0x204 state word.
+indeg=0 (CALLEE-COLUMN GREP 0 hits, Sub-type A; no direct bl callers in static callgraph).
+
+Constants:
+- PACK_CTX_BASE = 0x02029eb0 (pack display context EWRAM)
+- DISPCNT = 0x4000000 (0x80<<0x13)
+- FIELD_MASK_A = 0xffc03fff (gPrng+0x204 upper field mask)
+- FIELD_MASK_B = 0xffffc03f (gPrng+0x206 lower field mask)
+- STATE_FIELD_OFFSET = 0x204 (0x81<<2, pack state word offset in gPrng)

@@ -1,0 +1,2 @@
+Pack state machine B (table 0x09e5fa24) case 0 handler. Two-instruction body: movs r0,#1; bx lr.
+Returns 1 unconditionally, signaling to dispatch_pack_state_handler_b that the current state is ready to advance. No parameters or side-effects.

@@ -1,0 +1,6 @@
+Computes r0*1000/r1 as an integer (promille / per-mille ratio), used to convert an unlock count to per-mille progress.
+Multiplication by 1000 is implemented via shifts: r0*32-r0=r0*31, r0*31*4=r0*124, r0*124+r0=r0*125, r0*125*8=r0*1000.
+Then calls __divsi3 for integer division. No external write side-effects.
+
+Constants:
+- PROMILLE_FACTOR = 1000 (0x3e8, multiplier applied to numerator)

@@ -1,0 +1,6 @@
+Writes 0xffff (invalid value) to the active channel_id field at EWRAM 0x0200af10, then calls set_sound_engine_bit0_flag to trigger a sound engine reset signal.
+Caller 0x080fd2f0 uses this at scene exit or reset to clear the channel binding and reset the sound engine state.
+
+Constants:
+- ACTIVE_CHANNEL_ADDR = 0x0200af10 (EWRAM active channel field)
+- INVALID_CHANNEL_ID = 0xffff (invalid channel marker)

@@ -1,0 +1,6 @@
+Pack state machine B (table 0x09e5fa24) case 3 handler. Fully symmetric with tick_pack_state_fadein_done (0x080fa418): calls start_blend_fadein_with_target(4); returns 0 while in progress; when complete clears DISPCNT and returns 1.
+Dispatched by dispatch_pack_state_handler_b (0x080fac4c) when state=3. Both state machines (A/B) share the same case-3 fade-in completion pattern.
+
+Constants:
+- FADEIN_TARGET = 4 (fade-in target value)
+- DISPCNT = 0x4000000 (0x80<<0x13)

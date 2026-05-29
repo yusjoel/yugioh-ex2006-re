@@ -1,0 +1,6 @@
+Iterates over a struct array at r0, counting entries whose bits[1:0] equal 1, and returns the count.
+Entry stride is r1 bytes; total entries is r2. Caller (0x080f9944) uses this to count activated-flag entries in a pack scene context.
+
+Constants:
+- FLAG_MASK = 0x3 (bits[1:0])
+- FLAG_VALUE = 0x1 (target flag value)

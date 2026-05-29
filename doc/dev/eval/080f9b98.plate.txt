@@ -1,0 +1,7 @@
+Verifies puzzle EWRAM integrity: first calls compare_bytes_exact to compare the ROM seed (DAT 0x09e4f568) against 8 bytes at EWRAM 0x02000000, then calls verify_puzzle_checksum to validate the checksum.
+Returns 1 if both checks pass, 0 if either fails. Multiple scenes (language-select, puzzle load, puzzle verify) call this function as a precondition gate.
+
+Constants:
+- PUZZLE_SEED_ADDR = 0x09e4f568 (ROM puzzle seed address)
+- EWRAM_BASE = 0x02000000 (EWRAM start address)
+- SEED_LEN = 8 (number of bytes compared)

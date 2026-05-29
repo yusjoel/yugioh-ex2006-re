@@ -1,0 +1,1 @@
+Forwards the channel ID in r0 unchanged to set_channel_if_changed. Unconditional trampoline wrapper; indeg=0, no known direct callers.

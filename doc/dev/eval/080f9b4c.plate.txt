@@ -1,0 +1,1 @@
+Forwards the request value in r0 unchanged to write_sound_engine_request. Single trampoline wrapper; indeg=0, no additional logic.

@@ -1,0 +1,7 @@
+Pack state machine A (table 0x09e5f9f0) case 0 handler. Calls write_puzzle_charset_flag(0) to clear the charset flag; calls zero_fill_by_halfword on pack display context (0x02029eb0, 4 halfwords) to zero it; then writes [0x02029eb0] := 1 to set the initial state value.
+Dispatched by dispatch_pack_state_handler_a (0x080fa438) when state=0.
+
+Constants:
+- PACK_CTX_BASE = 0x02029eb0 (pack display context EWRAM)
+- CTX_CLEAR_LEN = 4 (halfword count for zero_fill_by_halfword)
+- INIT_STATE = 1 (initial value written to ctx first halfword)

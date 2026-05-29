@@ -1,0 +1,15 @@
+Renders the pack title string to Sprite VRAM 0x06005a00. Pipeline:
+(1) setup_line_buf_pos_and_font(0x20, 2) initializes line buffer and font mode;
+(2) reads [0x02006ed0+8] charset flag, applies rsbs/ands/orrs to set bit1:=1, selects font from font_jp_base_table via bit1 index, writes to [0x02006ed0+4];
+(3) resolves pack title string ID from game_str_pointer_table (base 0x02006c2c), calls game_str_id_to_row to get row offset, combines with game_str_ja base;
+(4) calls render_text_with_u16_width_a(r0=str, r1=1, r2=0x87) for first line;
+(5) second charset flag update and font re-select;
+(6) calls render_text_with_u16_width for second line;
+(7) commit_line_buffer_to_sprite_vram(0x06005a00, 0xc) flushes tile data to OBJ VRAM.
+Called by two pack state machine case handlers (0x080fa07c init path, 0x080fa138 animation path).
+
+Constants:
+- SPRITE_VRAM_TITLE = 0x06005a00 (pack title text target OBJ VRAM address)
+- FONT_JP_CTX = 0x02006ed0 (font_jp context EWRAM address)
+- FONT_JP_CHARSET_FLAG_OFFSET = 0x8 (bit1 = charset select bit)
+- GAME_STR_BASE = 0x02006c2c (game_str table base offset)

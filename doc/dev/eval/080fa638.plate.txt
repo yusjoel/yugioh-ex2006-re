@@ -1,0 +1,10 @@
+Renders the text string at r0 as tile data into Sprite VRAM region 0x06005c00.
+Calls setup_line_buf_pos_and_font(x=0x20, font_mode=4) to initialize the line buffer; selects a font from font_jp_base_table based on bit1 of font_jp context (0x02006ed0+0x8); calls render_text_with_u16_width_a to render the string; then commits via commit_line_buffer_to_sprite_vram.
+Called by font_jp path case2 handler (0x080fa7e4) to render pack label text.
+
+Constants:
+- LINE_BUF_X = 0x20 (horizontal start position)
+- FONT_MODE = 4 (font mode parameter)
+- FONT_JP_CTX = 0x02006ed0 (font_jp context EWRAM address)
+- FONT_JP_CHARSET_FLAG_OFFSET = 0x8 (bit1 = charset select bit)
+- SPRITE_VRAM_LABEL = 0x06005c00 (pack label text target VRAM)

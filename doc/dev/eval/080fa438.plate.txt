@@ -1,0 +1,14 @@
+Pack scene state machine A dispatcher. Manages fn-ptr table 0x09e5f9f0 (4 case handlers: case0=init, case1=setup, case2=anim, case3=fadein_done).
+Extracts bits[21:14] (8-bit state field) from gPrng+0x204, multiplies by 4 to get table offset, loads the function pointer, and calls via invoke_r0.
+Returns 1 if handler pointer is NULL; advances state field by +1 and clears gPrng flags when handler returns 1; returns 0 while handler is waiting.
+
+Constants:
+- FN_TABLE = 0x09e5f9f0 (case handler fn-ptr table, 4 entries)
+- STATE_FIELD_OFFSET = 0x204 (0x81<<2, state word offset in gPrng)
+- STATE_SHIFT_LO = 0xa (lsls #0xa)
+- STATE_SHIFT_HI = 0x18 (lsrs #0x18, extracts bits[21:14])
+- STATE_MASK = 0xff (8-bit state)
+- FIELD_MASK_A = 0xffc03fff (state field write mask)
+- FIELD_MASK_B = 0xffffc03f (+0x206 related field mask)
+- BYTE_MASK_3F = 0x3f (gPrng+0x207 byte mask)
+- BIT40_NEG = -0x40 (rsbs; gPrng+0x208 bit clear)

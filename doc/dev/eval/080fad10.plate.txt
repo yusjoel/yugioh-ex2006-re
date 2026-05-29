@@ -1,0 +1,12 @@
+Reads card statistics from EWRAM 0x02039eb0 and renders card number, ATK, DEF and other fields as OAM sprites.
+Checks [0x02039eb0] bit4 to select dual-OAM path (write_oam_entry_from_packed_args x2) or single path; then calls write_decimal_oam_by_digit_count in sequence to render: card number field ([+0x4] ldrh), ATK type (card_stats_table strided lookup, stride=22*2), DEF type, DEF label, ATK label, ATK value, DEF value, star level ([+0x8]). Saves/restores r8 as callee-save (mov r6,r8 / mov r8,r3).
+
+Constants:
+- STATS_BUF_BASE = 0x02039eb0 (second OAM stats buffer EWRAM)
+- OAM_ENTRY_ARGS = 0x000040c0 (write_oam_entry_from_packed_args first arg: packed attrs)
+- OAM_BLEND_FLAG = 0x220000 (0x88<<0xe, OAM attr blend attribute)
+- CARD_STATS_TABLE = card_stats_table (card attribute lookup table)
+- CARD_STATS_ENTRY_STRIDE_A = 0x2c (ATK type field stride, 22 entries * 2 bytes)
+- CARD_STATS_ENTRY_STRIDE_B = 0x18 (DEF type field stride, 11*2+2)
+- ATK_OAM_Y = 0x80 (write_decimal_oam_by_digit_count Y parameter for ATK)
+- DEF_OAM_Y = 0xa0 (write_decimal_oam_by_digit_count Y parameter for DEF)

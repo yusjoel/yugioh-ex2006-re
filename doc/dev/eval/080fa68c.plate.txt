@@ -1,0 +1,16 @@
+Pack state machine B (table 0x09e5fa24) case 1 handler. Manages three sub-phases of the pack scene initialization sequence.
+Sub-phase is determined by bits[13:6] of gPrng+0x206 (r4):
+  r4=0: full scene init (reset_affine_bg + store_ewram_ctx + reset_display_and_obj_vram + upload_pack_vram + reset_bg_scroll + disable_blend + apply_blend_fadeout);
+  r4=1: tile_2d_row_copy + render pack label text to VRAM;
+  r4>=2: set DISPCNT and call tick_blend_step_by_delta.
+Each sub-phase completion increments r4 and writes it back to the state field. Returns 0 (waiting) or 1 (done).
+
+Constants:
+- STATE_FIELD_OFFSET = 0x206 (gPrng+0x206)
+- STATE_BITS = bits[13:6] (lsls#0x12; lsrs#0x18)
+- DISPCNT = 0x4000000 (0x80<<0x13)
+- DISPCNT_BG_ENABLE = 0x1100 (0x88<<5, BG enable bits)
+- BLEND_DELTA = 4 (tick_blend_step_by_delta parameter)
+- BG0CNT = 0x4000008 (BG0 control register, written 5)
+- PACK_TILE_SRC = 0x06010000 (tile_2d_row_copy source)
+- TILE_COLS = 0x10; TILE_ROWS = 0x8 (tile_2d_row_copy parameters)

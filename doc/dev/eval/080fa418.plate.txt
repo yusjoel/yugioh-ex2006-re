@@ -1,0 +1,6 @@
+Pack state machine A (table 0x09e5f9f0) case 3 handler. Calls start_blend_fadein_with_target(4) to advance the fade-in; returns 0 while in progress. When fade-in completes (r0!=0), clears DISPCNT (0x4000000) and returns 1 to signal the state machine to advance.
+Dispatched by dispatch_pack_state_handler_a (0x080fa438) when state=3.
+
+Constants:
+- FADEIN_TARGET = 4 (fade-in target value passed to start_blend_fadein_with_target)
+- DISPCNT = 0x4000000 (0x80<<0x13)

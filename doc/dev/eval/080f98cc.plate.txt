@@ -1,0 +1,5 @@
+Iterates over bits[0..25] of gUnlockedDuelists and counts the number of set bits, returning the total count of unlocked duelists.
+Callers use this count to evaluate unlock progress or compute completion ratios. No external write side-effects; reads only the first word of gUnlockedDuelists.
+
+Constants:
+- DUELIST_COUNT = 26 (0x1a+1, bits[0..25], 26 duelist slots)

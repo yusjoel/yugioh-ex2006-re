@@ -1,0 +1,2 @@
+Second channel ID forwarding wrapper, fully symmetric with forward_channel_id_to_sound (0x080f9af8). Passes r0 unchanged to set_channel_if_changed.
+Adjacent sibling pair (offset 0xc bytes apart); indeg=0.

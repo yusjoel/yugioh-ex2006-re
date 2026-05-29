@@ -1,0 +1,16 @@
+Clears pack scene OBJ VRAM (base 0x06000000) then fills multiple sprite regions with sequentially incrementing tile indices.
+Pipeline:
+(1) zero_fill_by_halfword(0x06000000, 0x800) clears the first 0x1000 bytes of OBJ VRAM;
+(2) segment A: writes 0x40 sequential halfwords from r4=0x06000000 (start value 0xd0);
+(3) segment B: writes 0xc0 sequential halfwords from 0x06000080 (start value 0x10);
+(4) segments C-G: uses r12 (DWORD base addresses) and r6 (row offset driven by 0xa0/0xac<<0xe) to compute write addresses, covering three sprite region bases 0x06000008, 0x0600000e, 0x06000016.
+Called only by 0x080fa07c during pack scene case1 initialization.
+
+Constants:
+- OBJ_VRAM_BASE = 0x06000000 (0xc0<<0x13, OBJ VRAM start)
+- OBJ_VRAM_ZERO_LEN = 0x800 (0x80<<4, halfword count for zero_fill)
+- OBJ_VRAM_SEG_B = 0x06000080 (DWORD_080fa04c, segment B base)
+- OBJ_VRAM_SEG_C = 0x06000008 (DWORD_080fa050, segment C/D base)
+- OBJ_VRAM_SEG_E = 0x0600000e (DWORD_080fa054, segment E base)
+- OBJ_VRAM_SEG_F = 0x06000016 (DWORD_080fa058, segment F/G base)
+- ROW_STRIDE = 0x10000 (0x80<<9, row increment per outer-loop step)
