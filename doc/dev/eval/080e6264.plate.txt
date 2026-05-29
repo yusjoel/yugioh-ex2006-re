@@ -1,0 +1,18 @@
+Uploads pack scene card sprite tiles to OBJ VRAM, dispatching by slot parity.
+r0=pack_card_slot [0..4], r1=tile_data_ptr.
+Computes r4 = slot & 1 (0=even slot, 1=odd slot).
+Computes attr0_packed = r4*3*4 | 0xa8<<3 (Y base); attr1_x = r4*4+2 << 4 (X offset).
+Computes tile_id = slot//2 * 0xdc + 0x46 (even) or slot//2 * 0xdc + 0x122 (odd).
+Calls upload_sprite_tiles_to_obj_vram_with_pal(attr0, attr1, tile_id).
+Called by FUN_080e6404 and FUN_080e73b4 during pack card sprite initialization/update.
+
+Constants:
+  Y_BASE       = 0xa8*8 = 0x540   (OAM attr0 Y base packed; 0xa8=168, 168*8=1344=0x540)
+  TILE_STEP    = 0xdc              (tile stride per slot group)
+  TILE_OFF_EVEN = 0x46             (even-slot tile id base offset)
+  TILE_OFF_ODD  = 0x122            (odd-slot tile id base offset = 0xdc+0x46)
+
+Inputs: r0=s32 pack_card_slot [0..4], r1=ptr tile_data.
+Returns: void (pop {r0}; bx r0).
+Side effects: writes sprite tile data to OBJ VRAM
+              via upload_sprite_tiles_to_obj_vram_with_pal.

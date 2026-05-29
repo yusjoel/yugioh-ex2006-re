@@ -1,0 +1,25 @@
+Renders cursor and card icon OAM entries for the pack scroll list.
+Reads gMenuState[0x2a] status flags; if bits[5:2]==0x24: queries ROM cursor table
+0x09e5ec44 for current cursor icon index (stored as Y offset base in r7).
+If bit2 set: skips blank fill; otherwise writes 6 blank OAM entries (tile=0xf088).
+Checks gMenuState[0x20] callback; if none, exits.
+Reads gMenuState[0x2a] high-bit field; branches by invoke_r1 return value (0/1/2/3):
+  0: slot loop r5=0..3 with cursor state per slot;
+  1: writes cursor OAM tile=0xf002;
+  2: writes cursor OAM tile=0xf004;
+  3: computes dynamic tile (gPrng[0x83*4] bits[5:4] * 0x2000 + 0xf0060000).
+Also renders 6 card slot icons (strh loop), scroll bar, and page indicator OAM entries.
+Called by FUN_080e7188 and FUN_080e73b4.
+
+Constants:
+  CURSOR_TABLE    = 0x09e5ec44   (cursor icon index lookup table)
+  BLANK_TILE      = 0x0000f088   (blank OAM tile id)
+  CURSOR_TILE_A   = 0x0000f002   (cursor tile A, invoke_r1 returns 1)
+  CURSOR_TILE_B   = 0x0000f004   (cursor tile B, invoke_r1 returns 2)
+  CURSOR_TILE_DYN = 0xf0060000   (dynamic cursor tile base, returns 3)
+  SCROLL_ICON_OFF = 0x0300024c   (scroll icon OAM entry offset)
+
+Inputs: r0=u32 cursor_mode [0..1] (0=no cursor, 1=show cursor; .hword 0x4681=mov r9,r0).
+Returns: void (pop; bx r0).
+Side effects: writes cursor and icon OAM entries to OAM 0x07000000
+              via write_oam_entry_from_packed_args.

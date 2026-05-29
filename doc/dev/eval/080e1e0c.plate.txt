@@ -1,0 +1,15 @@
+Copies BG tile data from the descriptor block at r0 into VRAM.
+Reads [r0] halfword as tile count; computes tile_bytes = count*2.
+First copy_bytes_by_halfword: dest=0x06000000 (BG tile VRAM), src=[r0+4..], size=count*width.
+Second copy_bytes_by_halfword: dest=0x05000000 (palette VRAM), src=[r0+4], size=tile_bytes.
+Called by FUN_080e1e3c during scene initialization after BG reset.
+
+Constants:
+  VRAM_TILE_BASE = 0xc0<<0x13 = 0x06000000  (BG tile VRAM)
+  PAL_BASE       = 0xa0<<0x13 = 0x05000000  (palette VRAM)
+  COUNT_OFFSET   = 0x0                       ([r0]: tile count halfword)
+  DATA_OFFSET    = 0x4                       ([r0+4]: tile pixel data start)
+
+Inputs: r0=ptr tile_desc_block ([+0]=u16 tile_count, [+4..]=tile pixel data).
+Returns: void (pop {r0}; bx r0).
+Side effects: writes to BG tile VRAM 0x06000000 and palette VRAM 0x05000000.

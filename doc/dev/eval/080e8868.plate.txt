@@ -1,0 +1,19 @@
+Computes 64-bit signed product and returns the middle 32 bits (result >> 12).
+Entry: asrs r3,r2,#0x1f sign-extends r2 to 64-bit pair (r2,r3).
+Calls __muldi3(r0,r1, r2,r3) for 64-bit multiply.
+Extracts result: r0 = (r1 << 0x14) | (r0 >> 0x0c) = 64-bit product right-shifted by 12
+and truncated to 32 bits.
+Used by upper-level NNS G2D animation code (indeg=0, fn-ptr or inlined call).
+
+Constants:
+  SIGN_EXT = asrs r3,r2,#0x1f  (sign-extends r2 to r2:r3 64-bit pair)
+  SHIFT_HI = 0x14 = 20          (high 32-bit left shift amount)
+  SHIFT_LO = 0x0c = 12          (low 32-bit right shift amount)
+  NET_SHIFT = 12                 (net right shift of 64-bit result)
+
+Inputs: r0=s64 product_lo (64-bit multiplicand low 32), r1=s64 product_hi (high 32),
+        r2=s32 factor (32-bit signed multiplier, auto sign-extended).
+Returns: r0=s32 ((r0:r1 * sign_ext(r2)) >> 12 truncated to low 32 bits).
+Side effects: none.
+
+Confidence: med -- r0/r1 usage as s64 pair vs s32-only caller unclear; fn-ptr site not found.

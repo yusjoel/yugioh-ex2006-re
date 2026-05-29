@@ -1,0 +1,24 @@
+Initializes an NNS G2D CellAnimation sequence and resets frame position to start.
+r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dAnimSequence* pSequence.
+Asserts: pCellAnim!=NULL (file=g2d_CellAnimation.c, line=0x100);
+         pSequence!=NULL (line=0x101);
+         pSequence->type (halfword [+6]) == 1 = NNS_G2D_ANIMATIONTYPE_CELL (line=0x103).
+Calls get_anim_ctrl_frame_offset(pCellAnim) to get current frame offset.
+Stores pSequence into [pCellAnim+0x18] (pCurrentCell field).
+Calls set_cell_anim_sequence_raw(pCellAnim, frame_offset).
+If that returns 0: calls set_anim_ctrl_position_fwd(pCellAnim) to reset frame to start.
+Finally calls apply_cell_anim_frame(pCellAnim) to apply OAM data.
+indeg=0, fn-ptr entry; same translation unit as g2d_CellAnimation.c.
+
+Constants:
+  ASSERT_FILE_A = 0x09e4ae60  (g2d_CellAnimation.c ROM string)
+  ASSERT_NULL   = 0x09e4ad64  (assert string "pCellAnim != NULL")
+  SEQ_TYPE_CELL = 0x0001      (NNS_G2D_ANIMATIONTYPE_CELL, halfword [+6])
+  ASSERT_LINE_B = 0x101 = 257 (pSequence NULL check line)
+  ASSERT_LINE_C = 0x103 = 259 (anim type check line)
+  PSEQUENCE_OFF = 0x18        ([pCellAnim+0x18] = pCurrentCell sequence ptr)
+
+Inputs: r0=ptr pCellAnim [non-NULL], r1=ptr pSequence [non-NULL, type==1].
+Returns: void (pop {r0}; bx r0).
+Side effects: writes pSequence to [pCellAnim+0x18];
+              updates OAM via apply_cell_anim_frame.

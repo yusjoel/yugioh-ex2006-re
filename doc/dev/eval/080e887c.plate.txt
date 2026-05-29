@@ -1,0 +1,18 @@
+Invokes an NNS G2D animation functor callback when the target frame condition is met.
+r0=NNS_G2dAnimFunctor* pFunctor, r1=u16 frame_id.
+If pFunctor==NULL: triggers assert (nnsys/g2d/g2d_Animation.c, line 117=0x75).
+Reads [r0+0] type field:
+  type==2 (COMPARE): compares frame_id with threshold [r0+0xc]; if equal, calls [r0+4](ctx=[r0+8], frame=r1).
+  type==3 (ALWAYS): unconditionally calls [r0+4](ctx=[r0+8], frame=r1).
+Called by NNS G2D animation system (indeg=0, fn-ptr entry).
+
+Constants:
+  FUNCTOR_TYPE_COMPARE = 2     (invoke when frame_id matches threshold)
+  FUNCTOR_TYPE_ALWAYS  = 3     (invoke unconditionally)
+  ASSERT_FILE = 0x09e4a4a8     (nnsys/g2d/g2d_Animation.c)
+  ASSERT_LINE = 0x75 = 117     (assert pFunctor != NULL line)
+
+Inputs: r0=ptr pFunctor [non-NULL] ([+0]=type, [+4]=fn_ptr, [+8]=ctx, [+c]=frame_threshold),
+        r1=u16 frame_id [0..N-1] (truncated to u16 via lsls/lsrs).
+Returns: void (pop {r0}; bx r0).
+Side effects: indirectly calls [pFunctor+4](ctx, frame_id); effects depend on functor.

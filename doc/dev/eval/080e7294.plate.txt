@@ -1,0 +1,22 @@
+Initializes pack scene card list context fields in gMenuState and batch-calls invoke_r1.
+Writes r0..r3 and two stack arguments to gMenuState fields [0x14..0x23].
+Writes [sp+0x14] to [gMenuState+0x31] (extra byte field via strb).
+Clears bit0 of [gMenuState+0x24].
+Loops slot_index=0..(r7-1): calls invoke_r1(slot_index); on non-zero return, sets
+  (slot+1)*2 | existing_flags into [+0x24] flags.
+Called by enter_limited_duel_page / enter_duel_puzzle_page / enter_theme_duel_page
+to initialize card list context on scene entry.
+
+Constants:
+  FIELD_14 = gMenuState + 0x14   (list_ptr A, stored from r0)
+  FIELD_18 = gMenuState + 0x18   (list_ptr B, stored from r1)
+  FIELD_1C = gMenuState + 0x1c   (list_ptr C, stored from r2)
+  FIELD_20 = gMenuState + 0x20   (callback ptr, stored from r6=[sp+0x18])
+  FIELD_24 = gMenuState + 0x24   (slot flags byte)
+  FIELD_31 = gMenuState + 0x31   (extra byte, from sp+0x14)
+
+Inputs: r0=ptr list_ptr_a, r1=ptr list_ptr_b, r2=ptr list_ptr_c,
+        r3=u32 count [1..50] (enter_limited=41, enter_puzzle=35, enter_theme=50),
+        [sp+0x14]=u8 extra_byte, [sp+0x18]=ptr callback.
+Returns: void (pop {r0}; bx r0).
+Side effects: writes to gMenuState+0x14/0x18/0x1c/0x20/0x24/0x31.

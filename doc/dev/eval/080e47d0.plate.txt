@@ -1,0 +1,22 @@
+Validates ATK thresholds of two candidate card sets for pack eligibility;
+calls return_pack_handler_success on pass.
+Phase A: reads EWRAM[0x2001150] candidate count A; iterates EWRAM[0x2001154] icid list;
+  for each icid, looks up card_stats_table (stride=0xb words); if atk==0xffff or atk<=0x5db,
+  skip; otherwise calls FUN_080e40c2 (pack failure handler).
+Phase B: reads EWRAM[0x2001152] candidate count B; same check on EWRAM[0x2001212] list.
+If all pass: bl return_pack_handler_success.
+Called by FUN_080e3ee8 (pack draw main controller).
+
+Constants:
+  EWRAM_CAND_COUNT_A = 0x02001150   (candidate count A, byte)
+  EWRAM_CAND_LIST_A  = 0x02001154   (candidate icid list A, halfword array)
+  EWRAM_CAND_COUNT_B = 0x02001152   (candidate count B, byte)
+  EWRAM_CAND_LIST_B  = 0x02001212   (candidate icid list B, halfword array)
+  card_stats_table   = 0x098169b8   (card attribute table)
+  ATK_INVALID        = 0x0000ffff   (atk=0xffff means invalid/empty entry)
+  ATK_MIN_THRESHOLD  = 0x000005db   (minimum ATK threshold = 1499)
+  CARD_STAT_STRIDE   = 0xb          (11 words per card_stats entry)
+
+Inputs: none (entry movs r5,#0x0; no push; r1/r7/r6 all loaded internally).
+Returns: void (exits via bl return_pack_handler_success or bl FUN_080e40c2).
+Side effects: none direct; exits via callee.

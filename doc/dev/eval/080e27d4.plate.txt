@@ -1,0 +1,21 @@
+Copies card pack icon palette and tile data to VRAM.
+r0=pack_row_index [0..4], r1=icon_slot [0..4].
+First copies 0x20 halfwords from icon_palettes_base[icon_slot+0xa] to CGRAM 0x05000260 + row*0x20.
+Then copies tile data from icon_tiles_base[icon_slot*9*0x20] via tile_2d_row_copy to
+OBJ tile VRAM 0x06010000 + row*0x20, with 3 rows and 3 columns.
+indeg=0, no direct callers (fn-ptr entry).
+
+Constants:
+  CGRAM_PAL_BASE     = 0x05000260              (CGRAM icon palette start slot)
+  PAL_STRIDE         = row * 0x20              (0x20 halfwords = 0x40 bytes per row)
+  icon_palettes_base = 0x09896290              (ROM icon palette array)
+  OBJ_TILE_BASE      = 0x06010000              (OBJ tile VRAM base)
+  TILE_STRIDE        = row * 0x20              (lsls r4,r4,#0x5 = *0x20)
+  icon_tiles_base    = 0x0988cf30              (ROM icon tile array)
+  ICON_TILE_BYTES    = icon_slot*9*0x20 = slot*0x120
+  TILE_ROWS          = 3, TILE_COLS = 3        (tile_2d_row_copy row/col args)
+
+Inputs: r0=u16 pack_row_index [0..4], r1=u16 icon_slot [0..4].
+Returns: void (pop {r0}; bx r0).
+Side effects: writes icon palette to CGRAM 0x05000260+row*0x40;
+              writes icon tile to OBJ tile VRAM 0x06010000+row*0x20.

@@ -1,0 +1,20 @@
+Renders a string to a BG tile VRAM row.
+Uses setup_line_buf_pos_and_font to init line buffer; selects font from font_jp_base_table
+by gSettings.lang (bits[2:0]); measures string width vs r2 (max_width) and switches to
+narrow font if exceeded; calls render_jp_string_nowrap or text_render_wrapper; finally
+writes rendered line via write_line_buf_to_bg_tile_vram to 0x06010000 + row*0x20.
+Called by FUN_080e2050 and FUN_080e2224 during duel_puzzle scene text rendering.
+
+Constants:
+  FONT_BASE_PTR     = font_jp_base_table (0x09e5f854)
+  gSettings_lang    = [0x02000000+0x6c2c]   (bits[2:0] = language enum)
+  BG_TILE_DEST_BASE = 0x06010000             (write_line_buf target)
+  ROW_STRIDE        = 0x20 halfwords (0x40 bytes/row)
+  SP_STR_OFFSET     = 0x30 from sp           (5th stack arg: string ptr)
+
+Inputs: r0=u16 x_offset [0..0x21c], r1=u16 line_width [0..0x204],
+        r2=u16 max_pixel_width [0..0x204], r3=u16 narrow_font_flag,
+        [sp+0x30]=const char* str.
+Returns: void (bx r0 = pop {r0}).
+Side effects: writes rendered BG tile line to 0x06010000+row*0x40;
+              sets font selection byte at [0x02006ed0+0x8].

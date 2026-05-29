@@ -1,0 +1,22 @@
+Renders card description text to BG tile VRAM for the card pack scene.
+r0=pack_card_slot [0..4]. Clears 4 rows of BG tile area 0x06011800 (0x200 halfwords each).
+Reads gMenuState[0x20] callback; if non-null calls invoke_r1(slot).
+Reads card type from icid*stride+0x8 (bits[1:0]); branches:
+  0=exit, 4=type-4 path (reads [+0x31] extra field), 7=type-7 path.
+Selects description string pointer from gSettings.lang and card desc table.
+Calls copy_cstr_to_buf / append_text_to_buf_end to fill line buffer.
+Finally calls write_line_buf_to_bg_tile_vram or other path to write BG tile VRAM.
+Called by FUN_080e6404 and FUN_080e73b4 during pack description rendering.
+
+Constants:
+  BG_TILE_CLEAR_BASE = 0x06011800   (BG tile row base to clear)
+  CLEAR_HALFWORDS    = 0x80*4 = 0x200  (halfwords to clear per row)
+  gMenuState_BASE    = 0x02006ed0
+  CARD_TYPE_OFF      = slot*3*4+0x8  (card type field offset, bits[1:0])
+  EWRAM_LANG_OFF     = [0x02000000+0x6c2c]  (gSettings.lang)
+  DESC_TABLE_BASE    = 0x02000000+0x6c3c    (card description pointer table offset)
+
+Inputs: r0=s32 pack_card_slot [0..4].
+Returns: void (pop {r0}; bx r0).
+Side effects: zero-fills [0x06011800+row*0x100..+0x200] x4 rows;
+              writes description text tile rows to BG tile VRAM via write_line_buf_to_bg_tile_vram.

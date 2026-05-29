@@ -1,0 +1,19 @@
+Executes the pack scene per-frame callback if one is registered in gMenuState.
+Checks gMenuState[0x234] for a callback function pointer; if non-null:
+  reads gMenuState[0x238] as argument, calls invoke_r1(arg).
+  Stores return value in gMenuState[0x23c].
+  If return value bit7 (0x80 of lower word) is set: returns 0 (callback complete).
+  Otherwise returns 1 (still active).
+If no callback registered: returns 1 immediately.
+Called by enter_campaign_page / enter_link_duel_page / enter_limited_duel_page /
+enter_duel_puzzle_page / enter_theme_duel_page during scene tick.
+
+Constants:
+  CALLBACK_PTR_OFF = 0x8d*4 = 0x234  (gMenuState[0x234]: frame callback fn ptr)
+  CALLBACK_ARG_OFF = 0x8e*4 = 0x238  (gMenuState[0x238]: callback argument)
+  CALLBACK_RET_OFF = 0x8f*4 = 0x23c  (gMenuState[0x23c]: callback return value)
+  DONE_FLAG        = 0x80<<1 = 0x100  (bit7 set = callback done)
+
+Inputs: none (entry reads gMenuState base via ldr r4,DAT).
+Returns: r0=u32 (1=callback not done or no callback; 0=callback done via bit7).
+Side effects: writes callback return value to [gMenuState+0x23c].

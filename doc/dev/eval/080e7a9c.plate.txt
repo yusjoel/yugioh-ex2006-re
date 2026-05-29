@@ -1,0 +1,24 @@
+Per-frame tick that handles page transition state machine for the pack scroll list.
+Reads gMenuState[0xb] bits[3:0] (transition step); if 0 (no active transition):
+  Checks gPrng[0xa4*2=0x148] bit6 (forward page request); if set and bits[6:4] non-zero
+  and valid resources present: sets [0xc]=0xffff (page top), updates [0xb] flags,
+  clears [0xe] bits[1:0], calls sync_state_and_init_sprite(0).
+  Checks bit7 (backward page request); if set and [0xb] bits[27:24] < [+4]-1:
+  sets [0xc]=1 (page next), updates [0xb] flags, calls sync_state_and_init_sprite(0).
+If [0xb] non-zero: processes transition step; computes new position into [0xa];
+  decrements step bits[3:0]; on step=0: updates [0xb] color field bits and
+  calls copy_pack_palette_and_tiles_to_vram.
+Checks gPrng[0xa4*2] bit0 to determine return value.
+Called by FUN_080e7e0c (pack main scene switch dispatcher).
+
+Constants:
+  STATE_OFF    = 0xb      (gMenuState[0xb] transition state, bits[3:0]=step, bits[6:4]=type)
+  CURSOR_OFF   = 0xc      (gMenuState[0xc] cursor/page target, halfword)
+  SCROLL_A_OFF = 0xa      (gMenuState[0xa] current scroll position, byte)
+  GPRNG_PAGE   = 0xa4*2 = 0x148  (gPrng[0x148] page request flags)
+  PAGE_TOP     = 0xffff           (jump to page top)
+  PAGE_NEXT    = 1                (advance one page)
+
+Inputs: none (entry reads gMenuState and gPrng via DAT).
+Returns: r0=u32 (0=transition active/complete; 1=gPrng bit0 signal; pop {r1}; bx r1).
+Side effects: updates gMenuState[0xa/0xb/0xc/0xe]; calls copy_pack_palette_and_tiles_to_vram.

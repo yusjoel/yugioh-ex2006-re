@@ -1,0 +1,24 @@
+Renders a single card name to OBJ sprite tile VRAM for the card pack scene.
+r0=pack_card_slot [0..4]. Computes target tile offset as slot%5 * 0x34 + 0x1fe.
+Looks up icid from gMenuState[0x1c] card list at slot*3*4 offset.
+Calls game_str_id_to_row, expand_card_name_escape_to_buf to decode card name.
+If gMenuState[0x20] callback is non-null: calls invoke_r1(slot) for validation.
+Selects font offset from gSettings.lang (bits[2:0]).
+Calls render_card_name_to_sprite_tile to write tile data to OBJ sprite VRAM.
+Writes tile_id sequence (0x19 halfwords) to OAM 0x06001004 + tile_calc via strh loop.
+Called by FUN_080e6404 (pack card name batch renderer) and FUN_080e7188 (pack scroll update).
+
+Constants:
+  TILE_STRIDE      = 0x34   (tile block size per card, 0x34 tile indices)
+  TILE_OFFSET_BASE = 0xff*2 = 0x1fe  (starting tile offset)
+  SLOTS_PER_GROUP  = 5      (slot % 5 = group-internal index)
+  CARD_LIST_OFF    = 0x1c   (gMenuState[0x1c]: card list pointer)
+  CARD_STRIDE      = slot*3*4  (icid field offset, 3 words/entry)
+  OAM_TILE_BASE    = 0x06001004  (OAM tile VRAM base)
+  SP_FRAME         = 0x200       (stack frame size)
+  LANG_FIELD       = [0x02000000+0x6c2c]
+
+Inputs: r0=s32 pack_card_slot [0..4].
+Returns: void (pop; bx r0).
+Side effects: writes tile_id sequence to 0x06001004+tile_idx*2;
+              writes card name tile data to OBJ sprite VRAM via render_card_name_to_sprite_tile.
