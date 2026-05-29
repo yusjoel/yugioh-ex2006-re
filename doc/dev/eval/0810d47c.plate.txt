@@ -1,0 +1,15 @@
+Scans IWRAM channel slot array (0x030052f0, 8 entries, stride 0x28); for each entry where [+0x1f] bit7=1 (active) and [+0xe] signed halfword == r0 (entity_id), ORs bit3 (0x08) into [+0x1f]. Used in the sound engine to mark all active channel slots belonging to the specified entity as triggered/marked, so subsequent stop or update operations can identify them.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0 (IWRAM channel slot array)
+ENTRY_STRIDE=0x28 (bytes per slot entry)
+ENTRY_COUNT=8 ([0..7])
+ACTIVE_FLAG=0x80 (bit7 of [+0x1f] = slot active)
+MARK_BIT=0x08 (bit3 of [+0x1f] = tagged/mark flag)
+ENTITY_ID_OFF=0xe (signed halfword, entity ID field)
+
+Inputs: r0 = s16 entity_id [any] to match against [+0xe]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030052f0 + i*0x28 + 0x1f] |= 0x08 for each matching active entry

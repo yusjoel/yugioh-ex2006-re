@@ -1,0 +1,16 @@
+Extended playback slot reinitialization function. Extends reinit_playback_slot_from_channel with two additional byte parameters r3 (param_a) and sp[0x10] (param_b). First zeros [r0+0xe], calls init_sound_channel_playback_slot; then writes r3 to [r0+0x10] (volume/priority byte), sp[0x10] to [r0+0x11] (envelope byte); finally writes flags to [r0+0xe]. Used for channel re-trigger paths in sound engine that need to simultaneously set playback volume and envelope parameters. Called by sound engine tick main loop (0x0810c6a6 region).
+
+Constants:
+FLAGS_OFF=0xe (channel flags byte)
+VOL_OFF=0x10 (volume/priority byte = r3)
+ENV_OFF=0x11 (envelope byte = sp[0x10])
+
+Inputs: r0 = ptr channel_ptr (IWRAM playback struct pointer), r1 = u16 instrument_flags (passed to init_sound_channel_playback_slot, low 12 bits = instrument_index), r2 = u8 note (note byte passed to init_sound_channel_playback_slot), r3 = u8 param_a [0..0xff] written to [r0+0x10] (volume/priority byte), sp[0x10] = u8 param_b [0..0xff] written to [r0+0x11] (envelope byte), sp[0x14] = passed through to init_sound_channel_playback_slot as r3 arg
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[r0+0xe] := 0 (pre-clear)
+[r0+0x10] := r3 (volume/priority byte)
+[r0+0x11] := sp[0x10] (envelope byte)
+[r0+0xe] := init_sound_channel_playback_slot() flags byte
+All side effects of init_sound_channel_playback_slot

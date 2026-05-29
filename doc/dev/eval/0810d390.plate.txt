@@ -1,0 +1,14 @@
+Sprite init with simultaneous type byte and pan_mode write combination function. Calls init_sprite_entry_by_id with r0; writes r2 (sprite_type) to [base+0x387]; takes r1 & 0x3 (pan_mode) and writes to [base+0x388]. Compared to init_sprite_entry_with_type, additionally configures pan direction; compared to init_sprite_entry_with_pan_mode, additionally configures sprite type. Three-parameter full initialization path.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+SPRITE_TYPE_OFF=0x387 (type byte)
+PAN_MODE_OFF=0x388 (0xe2*4, pan mode byte, low 2 bits)
+
+Inputs: r0 = u16 entity_id [0..0x7fff], r1 = u8 pan_flags [0..0xff] low 2 bits as pan_mode [0..3], r2 = u8 sprite_type [0..0xff] written to [base+0x387]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x387] := r2 (sprite_type byte)
+[0x030050cc+0x388] := r1 & 0x3 (pan_mode byte)
+Also triggers init_sprite_entry_by_id side effects

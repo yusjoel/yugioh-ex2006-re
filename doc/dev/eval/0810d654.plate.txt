@@ -1,0 +1,18 @@
+Sets stop_pending (bit2) on all slots in IWRAM channel slot array (0x030052f0, 8 entries) where [+0x1f] bit7=1 (active). Does not filter by entity_id; directly applies stop signal to all active slots. Also checks bit0 (loop): if set, writes [+0xc]=1 to force loop end and clears bit0. Used for global stop of all currently playing channels in sound engine; corresponds to the unfiltered version of trigger_stop_on_channel_by_id.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0
+ENTRY_COUNT=8
+ACTIVE_FLAG=0x80 (bit7)
+STOP_BIT=0x04 (bit2 = stop_pending)
+LOOP_BIT=0x01 (bit0 = loop_active)
+LOOP_CLEAR_MASK=0xfe
+LOOP_FORCE_END=0x1
+
+Inputs: void (no APCS inputs; entry movs r4,8 setup, r0 not read before overwrite)
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030052f0 + i*0x28 + 0x1f] |= 0x04 for all active entries
+[0x030052f0 + i*0x28 + 0xc] := 1 (if bit0 set)
+[0x030052f0 + i*0x28 + 0x1f] &= 0xfe (if bit0 was set)

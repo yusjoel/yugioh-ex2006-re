@@ -1,0 +1,12 @@
+Sprite init + type byte write combination function. Calls init_sprite_entry_by_id with r0 (entity_id) to complete channel slot init, then writes r1 (sprite_type) to IWRAM sound engine struct [base+0x387] (byte offset). Serves initialization scenarios that need to specify sprite type simultaneously; when init_sprite_entry_by_id is called alone [+0x387] is written with fixed value 0x10, this function allows caller to specify any type.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+SPRITE_TYPE_OFF=0x387 (type byte)
+
+Inputs: r0 = u16 entity_id [0..0x7fff], r1 = u8 sprite_type [0..0xff] written to [base+0x387]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x387] := r1 (sprite_type byte overwriting init_sprite_entry_by_id's 0x10)
+Also triggers init_sprite_entry_by_id side effects (multiple field writes)

@@ -1,0 +1,17 @@
+Sound engine IWRAM struct (base 0x030050cc) channel position read function. Checks [base+0x364] halfword bit7 (REQUEST_PENDING_BIT=0x80): if not set, returns -1. If set, checks [base+0x381] (status byte) against r0 (channel_id); if equal (already acked), returns -1. Otherwise sets halfword [base+0x364] bit10 (0x400 OR), writes 0x40 to [base+0x380] (command byte), reads [base+0x36a] signed halfword as channel position return value. Serves the sound engine request polling path; reads playback position only when request is not yet ACKed.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+STATUS_OFF=0x364 (0xd9*4, request halfword)
+REQUEST_BIT=0x80 (bit7 = request pending flag)
+CONFIRM_BITS=0x400 (offset_0x381+0x7f = 0x381+0x7f = 0x400, bit10 of request halfword)
+CMD_OFF=0x380 (0xe0*4, command byte)
+ACK_OFF=0x381 (status/ack byte)
+POS_OFF=0x36a (DAT literal pool direct value, channel position halfword)
+
+Inputs: r0 = u8 channel_id [0..0xff] compared against [base+0x381] ACK byte
+Returns: r0 = s16 channel_position (Sub-case E: pop{r1};bx r1, r0 pass-through); -1 = engine inactive or already acked; >=0 = position value from [base+0x36a]
+
+Side effects:
+[0x030050cc+0x364] halfword |= 0x400 (set bit10)
+[0x030050cc+0x380] := 0x40 (command byte)

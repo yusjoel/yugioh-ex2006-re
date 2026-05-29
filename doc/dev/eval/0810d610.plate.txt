@@ -1,0 +1,19 @@
+Searches IWRAM channel slot array (0x030052f0, 8 entries) for all slots where [+0x1f] bit7=1 (active) and [+0xe]==r0 (entity_id), ORs bit2 (0x04) into [+0x1f] (stop_pending flag). Additional check: if bit0 is also set (loop flag), writes halfword [+0xc]=1 (force loop end) and clears bit0 (AND 0xfe). Called by sound engine stop playback path to send stop signal for a specific entity.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0
+ENTRY_COUNT=8
+ACTIVE_FLAG=0x80 (bit7)
+STOP_BIT=0x04 (bit2 = stop_pending)
+LOOP_BIT=0x01 (bit0 = loop_active)
+LOOP_CLEAR_MASK=0xfe
+LOOP_FORCE_END=0x1 (written to [+0xc] halfword)
+ENTITY_ID_OFF=0xe
+
+Inputs: r0 = s16 entity_id [any] target entity ID matching [+0xe]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030052f0 + i*0x28 + 0x1f] |= 0x04 (for each matching active entry)
+[0x030052f0 + i*0x28 + 0xc] := 1 (if bit0 was set, force loop end)
+[0x030052f0 + i*0x28 + 0x1f] &= 0xfe (clear loop bit if was set)

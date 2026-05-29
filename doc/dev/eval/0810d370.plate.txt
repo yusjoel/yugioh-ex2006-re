@@ -1,0 +1,13 @@
+Sprite init and pan_mode byte write combination function. Calls init_sprite_entry_by_id with r0; then takes r1 & 0x3 (low 2 bits = pan_mode, range [0..3]) and writes to [base+0x388] (0xe2*4 byte offset). Used to simultaneously set sprite state and channel pan mode (left=0/center=1/right=2/stereo=3 enum).
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+PAN_MODE_OFF=0x388 (0xe2*4, pan mode byte)
+PAN_MODE_MASK=0x3 (low 2 bits)
+
+Inputs: r0 = u16 entity_id [0..0x7fff], r1 = u8 pan_flags [0..0xff] low 2 bits as pan_mode [0..3] written to [base+0x388]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x388] := r1 & 0x3 (pan_mode byte)
+Also triggers init_sprite_entry_by_id side effects

@@ -1,0 +1,15 @@
+Computes index of a single channel slot from r1, checks if that slot is active and belongs to r0 (entity_id), and if so sets bit3 mark. When r1 bit7=1: takes low 4 bits minus 4 as offset index; otherwise uses r1 directly as index. Computes (idx*4+idx)*8 = idx*5*8 = idx*0x28 as byte offset, locates target entry in 0x03005390 array; checks [+0x1f] bit7=1 AND [+0xe]==r0; if matching ORs bit3 into [+0x1f]. Single-slot precise-index variant corresponding to mark_active_channel_entries_by_id full-scan version.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x03005390 (IWRAM DMA/frequency slot array)
+ENTRY_STRIDE=0x28 (lsls r1,#2; adds r1,r1; lsls r1,#3 = r1*5*8 = r1*0x28 per entry; python: 5*8=40=0x28)
+ACTIVE_FLAG=0x80 (bit7)
+MARK_BIT=0x08 (bit3)
+HIGH_NIBBLE_FLAG=0x80 (bit7 of r1)
+LOW_NIBBLE_MASK=0x0f
+
+Inputs: r0 = s16 entity_id [any], r1 = u8 slot_index_encoded [0..0xff] (bit7=1: (r1&0x0f)-4 = real index; bit7=0: r1 direct index; real index = [0..11])
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x03005390 + computed_offset + 0x1f] |= 0x08 (if active and matching)

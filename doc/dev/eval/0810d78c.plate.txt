@@ -1,0 +1,12 @@
+Using r0 (channel_ptr) as playback struct pointer, first zeros [r0+0xe] (flags byte), then calls init_sound_channel_playback_slot(r0), finally writes the return value (flags byte) back to [r0+0xe]. Equivalent to resetting and reinitializing the playback slot for an already-allocated channel, clearing old flags then refreshing with newly computed result. Serves sound engine update path when a channel needs to re-trigger playback parameters.
+
+Constants:
+FLAGS_OFF=0xe (playback struct channel flags byte)
+
+Inputs: r0 = ptr channel_ptr pointing to IWRAM playback struct (channel entry, size ~0x1c bytes)
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; flags byte written to [channel_ptr+0xe] as side effect, not passed to caller)
+
+Side effects:
+[r0+0xe] := 0 (pre-clear flags byte)
+[r0+0xe] := flags byte returned by init_sound_channel_playback_slot (overwrite)
+All side effects of init_sound_channel_playback_slot (instrument/pitch field init)

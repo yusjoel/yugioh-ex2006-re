@@ -1,0 +1,13 @@
+Searches IWRAM channel slot array (0x030052f0, 8 entries) for the first free slot (bit7=0). If found, returns that slot's [+0xe] signed halfword (entity_id / channel handle); if not found returns -1. Serves sound engine channel allocation path, queries available slot before allocating a new entity for playback.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0 (IWRAM channel slot array)
+ENTRY_COUNT=8 ([0..7])
+ENTRY_STRIDE=0x28
+ACTIVE_FLAG=0x80 (bit7 = active; 0 = free)
+ENTITY_ID_OFF=0xe (signed halfword)
+
+Inputs: void (no APCS inputs; r0-r3 unused at entry)
+Returns: r0 = s16 entity_id (Sub-case E via pop{r1};bx r1); -1 if no free slot found; >=0 = [+0xe] halfword of first free slot
+
+Side effects: none (read-only scan)

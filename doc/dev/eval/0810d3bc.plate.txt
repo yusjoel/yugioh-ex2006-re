@@ -1,0 +1,15 @@
+Sound channel volume/pan dual-byte write function. Input r0 = volume_raw [0..0x7f] (upper bound). If r0 <= 0x3f: writes r0 to [base+0x37c] (volume byte), writes 0x3f to [base+0x37d] (pan byte); if r0 > 0x3f: writes 0x3f to [base+0x37c], writes (0x7f-r0) to [base+0x37d]. Implements volume-pan coupling: small volume written directly, large volume uses complement as pan offset, creating panned stereo field effect.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+VOL_BYTE_OFF=0x37c (0xdf*4, volume byte)
+PAN_BYTE_OFF=0x37d (volume/pan secondary byte)
+VOL_THRESHOLD=0x3f (split point: below=direct, above=pan-complemented)
+PAN_MAX=0x7f (complement base: pan = 0x7f - r0)
+
+Inputs: r0 = u8 volume_raw [0..0x7f]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x37c] := min(r0, 0x3f) (volume byte)
+[0x030050cc+0x37d] := 0x3f (if r0<=0x3f) or (0x7f-r0) (if r0>0x3f) (pan byte)

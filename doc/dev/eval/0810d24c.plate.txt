@@ -1,0 +1,14 @@
+Sound engine channel priority-gated sprite initialization function. Input r0 = entity_id. Reads [base+0x368] (0xda*4) signed halfword: if <0, calls init_sprite_entry_by_id(r0) directly (no priority record, allow init). If >=0, uses (r0 & 0xfff)*9*4 as offset into ROM table 0x081143a0 to look up current entity's priority_byte ([+0x20] & 0xff); simultaneously uses r5 (= [base+0x368] & 0xfff) as index to look up occupied slot's priority_byte. If current entity priority >= occupied entity priority, skips init; otherwise calls init_sprite_entry_by_id(r0). Prevents low-priority entity from displacing high-priority already-allocated channel slot.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+CHANNEL_ID_OFF=0x368 (0xda*4, current channel entity_id halfword)
+PRIORITY_TABLE=0x081143a0 (ROM entity priority table, entry stride = 9*4 = 0x24)
+PRIORITY_BYTE_OFF=0x20 (priority byte within table entry)
+CHANNEL_ID_MASK=0x0fff (low 12 bits = instrument/entity index)
+
+Inputs: r0 = u16 entity_id [0..0x7fff]
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+Conditionally triggers init_sprite_entry_by_id(r0) writing multiple fields to [0x030050cc+xxx]

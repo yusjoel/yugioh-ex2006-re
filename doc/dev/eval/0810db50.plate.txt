@@ -1,0 +1,17 @@
+Searches IWRAM channel slot array (0x030052f0, up to 16 entries, stride 0x28) for all entries where [+0x1f] bit7=1 (active) and [+0xe] signed halfword == r0 (entity_id), writes r1 (loop_count) to [+0x20] byte. When r1 < 0, clamps to 0xf; when r1 > 0x10, clamps to 0x10. Serves sound engine loop playback control, allows runtime dynamic modification of loop count for matching channels.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0
+ENTRY_COUNT=16 ([0..15], count = 0xf initially)
+ENTRY_STRIDE=0x28
+ACTIVE_FLAG=0x80 (bit7 of [+0x1f])
+ENTITY_ID_OFF=0xe
+LOOP_COUNT_OFF=0x20
+LOOP_MIN=0xf (r1 < 0 -> clamp to 0xf)
+LOOP_MAX=0x10 (r1 > 0x10 -> clamp to 0x10)
+
+Inputs: r0 = s16 entity_id [any] target entity ID matching [+0xe], r1 = s16 loop_count [-inf..0x10] (loop count; <0 clamp to 0xf; >0x10 clamp to 0x10; [0..0x10] written directly)
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030052f0 + i*0x28 + 0x20] := clamped(r1) for each matching active entry

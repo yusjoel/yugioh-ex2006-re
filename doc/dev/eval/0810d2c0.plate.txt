@@ -1,0 +1,14 @@
+Sprite init with simultaneous type byte and channel offset write combination function. Calls init_sprite_entry_by_id with r0 to init slot; then writes r1 (sprite_type) to [base+0x387], writes r2 (channel_offset) to [base+0x36e] (halfword). Compared to init_sprite_entry_with_type, additionally configures the channel offset field, for initialization scenarios requiring precise playback offset.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+SPRITE_TYPE_OFF=0x387 (type byte)
+CHANNEL_OFFSET_OFF=0x36e (0xdc*4=0x370 - 2 = 0x36e, channel offset halfword)
+
+Inputs: r0 = u16 entity_id [0..0x7fff], r1 = u8 sprite_type [0..0xff] written to [base+0x387], r2 = u16 channel_offset [0..0xffff] written to [base+0x36e] halfword
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x387] := r1 (sprite_type byte)
+[0x030050cc+0x36e] := r2 (channel_offset halfword)
+Also triggers init_sprite_entry_by_id side effects

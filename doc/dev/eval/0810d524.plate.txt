@@ -1,0 +1,13 @@
+Channel slot status query function returning three-state result. When r0 < 0: scans 0x030052f0 array 8 entries; if any active slot (bit7=1) found returns 1; if none active checks [base+0x368] <0, if so returns 2, else returns 0. When r0 >= 0: scans for [+0xe]==r0 active slot; if found returns 1; if not found checks [base+0x368]==r0; if matching returns 2; else returns 0. Three states: 0=invalid/not present, 1=active in slot array, 2=active in engine default channel.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0
+ENGINE_BASE=0x030050cc
+CHANNEL_ID_OFF=0x368 (0xda*4, default channel entity_id halfword)
+ACTIVE_FLAG=0x80 (bit7)
+ENTITY_ID_OFF=0xe
+
+Inputs: r0 = s16 entity_id_or_wildcard (<0 = wildcard for any active slot; >=0 = specific entity_id [0..0x7fff])
+Returns: r0 = u8 status (Sub-case E via pop{r1};bx r1); 0=not found, 1=in_slot_array_active, 2=in_default_channel_active
+
+Side effects: none (read-only)

@@ -1,0 +1,13 @@
+Precisely locates a single channel slot via index encoding (r1), checks its active state and entity_id match. When r1 bit7=1: low 4 bits minus 4 = slot real index; otherwise r1 used directly as index. Computes (idx*9)*8 byte offset to locate entry in 0x03005390. When r0 < 0: checks active only (bit7), returns 1 if active. When r0 >= 0: checks active+entity_id match, returns 1 if matching. If not satisfied checks [base+0x368] signed halfword against r0: returns 2 if equal, else 0. Single-slot precise-index variant of query_channel_slot_status_by_id.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x03005390 (DMA/frequency slot array)
+ENGINE_BASE=0x030050cc
+CHANNEL_ID_OFF=0x368 (0xda*4)
+ACTIVE_FLAG=0x80 (bit7)
+ENTITY_ID_OFF=0xe
+
+Inputs: r0 = s16 entity_id_or_wildcard (<0 = wildcard; >=0 = specific entity_id), r1 = u8 slot_index_encoded [0..0xff] (bit7=1: (r1&0x0f)-4; bit7=0: r1 direct index [0..11])
+Returns: r0 = u8 status (Sub-case E via pop{r1};bx r1); 0=not found, 1=active_match, 2=in_default_channel
+
+Side effects: none (read-only)

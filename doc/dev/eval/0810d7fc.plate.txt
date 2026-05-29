@@ -1,0 +1,12 @@
+Checks sound engine IWRAM struct [base+0x364] halfword bit7 (REQUEST_PENDING_BIT=0x80): if not set returns -1 (engine inactive). If set, reads [base+0x36a] signed halfword (channel_id field) and returns it. Serves engine request handling path to query current active channel_id; is the simplified version of read_channel_position_if_active (0x0810d04c) -- no ACK comparison, no state writes.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+STATUS_OFF=0x364 (0xd9*4, request halfword)
+REQUEST_BIT=0x80 (bit7 = engine active/pending)
+CHANNEL_ID_OFF=0x36a (channel_id signed halfword)
+
+Inputs: void (no APCS inputs; entry checks [base+0x364] only)
+Returns: r0 = s16 channel_id (Sub-case E via pop{r1};bx r1); -1 = engine not active; >=0 or <0 = [base+0x36a] halfword
+
+Side effects: none (read-only)

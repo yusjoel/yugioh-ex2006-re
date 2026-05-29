@@ -1,0 +1,21 @@
+Searches IWRAM DMA slot array (0x03005390, 8 entries, stride 0x28, scan offset +0xe) for all entries where [+0x11] bit7=1 (active flag at offset 0x11) and [+0x0] signed halfword (entity_id) == r0 (channel_id). First applies threshold to r1 (volume_raw): when <=0x3f, r4=r1, r5=0x3f; when >0x3f, r4=0x3f, r5=0x7f-r1 (pan complement). For each matching entry writes r4 to [+0x18] (volume byte), r5 to [+0x19] (pan byte), and ORs r12 (= 0x80 set via mov r12,r0 at entry) into [+0x14]. Serves real-time volume/pan control in sound engine.
+
+Constants:
+DMA_SLOT_BASE=0x03005390 (IWRAM DMA slot array, +0xe offset start)
+ENTRY_COUNT=8 ([0..7])
+ENTRY_STRIDE=0x28
+ACTIVE_OFF=0x11 (byte, bit7 = slot active)
+ENTITY_ID_OFF=0x0 (signed halfword at entry base)
+VOL_OFF=0x18 (volume byte within entry)
+PAN_OFF=0x19 (pan byte within entry)
+FLAGS_OFF=0x14 (flags byte, bit7 OR'd in)
+VOL_THRESHOLD=0x3f
+PAN_MAX=0x7f
+
+Inputs: r0 = s16 channel_id [any] target entity ID matching [+0x0], r1 = u8 volume_raw [0..0x7f] (<=0x3f direct, >0x3f triggers pan complement mode)
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x03005390 + i*0x28 + 0xe + 0x18] := r4 (volume byte, for each matching active entry)
+[0x03005390 + i*0x28 + 0xe + 0x19] := r5 (pan byte)
+[0x03005390 + i*0x28 + 0xe + 0x14] |= 0x80 (active/update flag bit7)

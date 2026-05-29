@@ -1,0 +1,13 @@
+Sound channel slide (glide) range setup function. Writes r1 (end_val) to [base+0x370] (0xdc*4) halfword as end value; then computes (r1-r0)/r2 (via bios_div), where r0=start_val, r2=step_count; writes quotient to [base+0x372] halfword as per-step increment. Serves sound engine pitch/volume slide effect: [+0x370] stores target value, [+0x372] stores step amount.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct)
+SLIDE_END_OFF=0x370 (0xdc*4, slide end value halfword)
+SLIDE_STEP_OFF=0x372 (slide step increment halfword)
+
+Inputs: r0 = s16 start_val (subtrahend, [end-start] = total span), r1 = s16 end_val [any] written to [base+0x370], r2 = u16 step_count [1..N] divisor for per-frame step (must not be 0, bios_div)
+Returns: r0 = void (Pattern B: pop{r0};bx r0 overwrites r0; no independent return value)
+
+Side effects:
+[0x030050cc+0x370] := r1 (slide_end_val halfword)
+[0x030050cc+0x372] := (r1-r0)/r2 (slide_step halfword, via bios_div)
