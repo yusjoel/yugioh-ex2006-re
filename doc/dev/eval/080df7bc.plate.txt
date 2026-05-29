@@ -1,0 +1,7 @@
+Per-frame OAM update for a pack slot cover animation. r0=slot_index [0..3] (written to OAM attr2 bits[11:10] via <<0xa).
+Reads countdown [+0xc] and elapsed [+0xe] from pack_ui_state+0x30 animation sub-struct.
+Static display phase (countdown==0): increments elapsed, clamps to [0..0x27=39]; if elapsed<=0x13=19 calls encode_pack_slot_oam_attr to compute OAM xy, writes via write_oam_entry_from_packed_args (attr2=0x209d); elapsed>0x27 wraps by -0x28.
+Transition phase (countdown!=0): linearly interpolates x/y from start/end via bios_div, writes OAM entry.
+Constants: pack_ui_state=0x03005850, SLOT_SUBSTRUCT_OFFSET=0x30, ELAPSED_PERIOD=0x28=40, ELAPSED_OAM_THRESHOLD=0x13=19, OAM_ATTR2_FLAGS=0x209d, OAM_WRITE_STRIDE=0x40.
+Inputs: r0=u8 slot_index [0..3]. Returns: void (pop {r0}; bx r0).
+Side effects: OAM entry at [OAM+slot*0x40] updated; [pack_ui_state+0x30+0xe] elapsed incremented.

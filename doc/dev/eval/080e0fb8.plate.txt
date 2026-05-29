@@ -1,0 +1,6 @@
+Pack card selection sub-state-machine dispatch, symmetric with dispatch_pack_exchange_substep (0x080ddfd8).
+Reads sub-step index from pack_ui_state+0x4, dispatches via ROM function pointer table 0x09e495f4 (different sub-scene step table from 0x09e495d8); returns 1 if pointer is null (sequence complete). On non-zero return from step function increments sub-step index.
+Called indirectly as one of the step handlers of the pack main state machine (FUN_080ddd5c via indirect_table).
+Constants: pack_ui_state=0x03005850, FUNC_TABLE=0x09e495f4.
+Inputs: void (r0 overwritten by ldr r4,DAT at entry). Returns: r0=u32 (1=sub-sequence complete/null ptr, 0=in progress).
+Side effects: [pack_ui_state+0x4]: sub-step index +1 on step complete.

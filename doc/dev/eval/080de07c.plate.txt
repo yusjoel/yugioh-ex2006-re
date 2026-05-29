@@ -1,0 +1,6 @@
+Maps pack card grid slot index (0..10, clamped at 10) to OAM screen pixel coordinates; returns packed word (low16=x, high16=y).
+Biases input by +9, computes col=(input+9)%5 and row=(input+9 % 10)/5. x=col*24+0x22, y=row*0x1a+0x54.
+Called by multiple pack scene OAM render paths to determine slot pixel position.
+Constants: SLOT_INDEX_MAX=10, SLOT_BIAS=9, COL_MODULUS=5, ROW_DIVISOR=10, ROW_DIVISOR2=5, X_STEP=24, X_BASE=0x22=34, Y_STEP=0x1a=26, Y_BASE=0x54=84.
+Inputs: r0=u8 slot_index [0..10]. Returns: r0=u32 packed_oam_xy (high16=y_pixel, low16=x_pixel).
+Side effects: none (pure computation).

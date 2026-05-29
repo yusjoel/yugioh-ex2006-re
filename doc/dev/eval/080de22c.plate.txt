@@ -1,0 +1,7 @@
+Updates pack_ui_state OAM attribute sub-struct at offset 0x30 with new slot coordinates.
+r0=slot_x (new column position, written to [+0x30]), r1=slot_y (new row position, written to [+0x32] via r8).
+Reads old x/y from pack_ui_state+0x30, calls encode_pack_slot_oam_attr to encode OAM xy attr word, splits result into [+0x34]/[+0x36]; writes r0 to [+0x30] and r8 to [+0x32]; reads new x/y, calls encode_pack_slot_oam_attr again, writes to [+0x38]/[+0x3a]; writes fixed value 7 to [+0x3c] and [+0x3e].
+Called by pack scene OAM render path to refresh slot OAM during animation.
+Constants: pack_ui_state=0x03005850, SLOT_SUBSTRUCT_OFFSET=0x30, OAM_FIXED_ATTR=7.
+Inputs: r0=s16 slot_x [1..7], r1=s16 slot_y [-32768..32767]. Returns: void (pop {r0}; bx r0).
+Side effects: [pack_ui_state+0x30..0x3e]: x/y fields and OAM attr words updated.

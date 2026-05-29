@@ -1,0 +1,6 @@
+Renders pack slot 0 overlay OAM sprite. r0=ctx_ptr passed to render_overlay_oam_sprite_tiled.
+Calls encode_pack_slot_oam_attr(0, 0) to get slot 0 base OAM xy, adds offset 0x0002000a (x+10), renders 2-row x 10-col tile overlay using ROM tile data tables 0x09e49698/0x09e49684.
+Called by pack scene OAM render paths (pack_080e0448/0x080e049c/0x080e0510).
+Constants: SLOT_INDEX=0, XY_OFFSET=0x0002000a, ROM_TILE_TABLE=0x09e49698, ROM_TILE_TABLE2=0x09e49684.
+Inputs: r0=ptr ctx_ptr. Returns: void (pop {r0}; bx r0).
+Side effects: OAM entry written via render_overlay_oam_sprite_tiled (slot 0 position +x_offset, 2x10 tiles).

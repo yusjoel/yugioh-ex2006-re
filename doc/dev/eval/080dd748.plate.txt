@@ -1,0 +1,4 @@
+Called on pack scene entry; clears DISPCNT(0x04000000):=0 to disable all layers, then calls reset_affine_bg_matrix_and_scroll/reset_display_and_obj_vram/reset_all_bg_scroll_regs_and_shadows to reset BG matrices and scroll shadow registers, finally calls zero_fill_halfword_wrapper to zero VRAM 0x06000000..+0x18000*2 (covers all BG+OBJ tile area, ~192KB).
+Constants: DISPCNT=0x04000000, VRAM_BASE=0x06000000, VRAM_CLEAR_COUNT=0x18000.
+Inputs: void. Returns: void (pop {r0}; bx r0).
+Side effects: [DISPCNT]:=0; full VRAM zeroed.

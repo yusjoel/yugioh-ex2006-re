@@ -1,0 +1,7 @@
+Converts HSV (hue/saturation/value) color to GBA RGB555 packed format.
+r0=hue_phase [0..0x167] (divided by 0x168 to get 6-sector index 0..5), r1=saturation [0..0xff], r2=value [0..0xff].
+Computes p/q/t intermediate values, dispatches R/G/B channel assignments via switch(sector 0..5), normalizes via bios_div, and packs as GBA 15-bit color (R[4:0], G[9:5], B[14:10]).
+Called by overlay color fade/HSV-rotation paths to generate per-frame color animation.
+Constants: HUE_PERIOD=0x168=360, SATURATION_MAX=0xb4=180, VALUE_MAX=0xff=255, RGB_CHANNEL_BITS=0x1f, G_SHIFT=5, B_SHIFT=10.
+Inputs: r0=u16 hue_phase, r1=u8 saturation, r2=u8 value. Returns: r0=u16 packed GBA RGB555.
+Side effects: none (pure computation).

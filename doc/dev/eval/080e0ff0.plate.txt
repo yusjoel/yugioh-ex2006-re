@@ -1,0 +1,6 @@
+Linearly searches ROM standard challenge record table 0x09e5e620 for a matching challenge code, returns index or -1.
+Table has 41 records (get_standard_challenge_count returns 0x29=41), each 0xc bytes; reads record first halfword via ldrh [r5], compares with r0 (cmp r0,r6). Returns 0..40 on match; on no match: movs r0,#1; rsbs r0,r0,#0 = -1 (0xFFFFFFFF).
+callgraph indeg=0, grep ".word 0x080e0ff1" asm/all.s -> 0 hits, dead code.
+Constants: STANDARD_CHALLENGE_TABLE=0x09e5e620, STANDARD_CHALLENGE_COUNT=0x29=41, RECORD_STRIDE=0xc=12, NOT_FOUND_SENTINEL=-1.
+Inputs: r0=u16 challenge_code. Returns: r0=s32 (0..40=found index; -1=not found).
+Side effects: none (read-only ROM table).

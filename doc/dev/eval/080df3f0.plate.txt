@@ -1,0 +1,6 @@
+Renders pack card list scene text header row to BG tile VRAM; processes 3 pack slot positions.
+Copies pack icon tile data from ROM addresses 0x09cebf64/0x09cebf6c/0x09cebf78 via tile_2d_row_copy to BG VRAM rows (width 3, height 2); configures font context (setup_line_buf_pos_and_font), fetches pack name string (game_str_id 0x1390) and renders via render_text_with_u16_width_a, submits via blit_tile_nibble_row_lsb; increments VRAM by 0x120 per slot.
+Called by pack scene init path (0x080dfc18) to draw the title area.
+Constants: VRAM_HEADER_A=0x060103a0, VRAM_HEADER_B=0x06010ba0, VRAM_HEADER_C=0x06011200, ROM_PACK_TILE_TABLE=0x09cebf64, FONT_CTX=0x02006ed0, GAME_STR_ID=0x1390, VRAM_STEP=0x120.
+Inputs: void. Returns: void (pop {r0}; bx r0).
+Side effects: BG VRAM 0x060103a0/0x06010ba0/0x06011200 written with pack icon tiles; font flag bytes temporarily modified.

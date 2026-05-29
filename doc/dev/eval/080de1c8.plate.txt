@@ -1,0 +1,6 @@
+Per-frame countdown driver for a single pack slot animation frame. No APCS inputs.
+Checks gPrng+0x148 bit0; if set, ORs pack_ui_state+0x140 bit3 (OAM update request flag).
+Decrements pack_ui_state+0x52 (animation countdown); when countdown reaches 0: clears [+0x48..0x50] (5 OAM attr halfwords), recomputes tile attr via compute_pack_slot_oam_tile_attr and writes to [+0x54], sets r2=1. Returns r2 (0=countdown in progress, 1=countdown elapsed this frame).
+Constants: pack_ui_state=0x03005850, gPrng=0x03000040, ANIM_STRUCT_OFFSET=0x44, COUNTDOWN_FIELD_OFFSET=0xe, KEY_STATE_OFFSET=0x148, OAM_REQUEST_OFFSET=0x140, OAM_REQUEST_BIT=0x8.
+Inputs: void (r0 overwritten by ldr r3,DAT at entry). Returns: r0=u32 (0=countdown in progress, 1=countdown reached zero).
+Side effects: [pack_ui_state+0x140] bit3 set conditionally; [pack_ui_state+0x52] decremented; [pack_ui_state+0x48..0x50]:=0 and [+0x54] recomputed on zero.

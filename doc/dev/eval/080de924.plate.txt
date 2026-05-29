@@ -1,0 +1,5 @@
+Pack card list scene main state machine dispatch. Called each frame by pack scene hub.
+r0=ctx_val (stored in r7 for case functions). Reads step index from pack_ui_state+0xc (0x0300585c); if index > 5 calls store_pack_selection_to_state (returns 1 via parent epilogue). Otherwise dispatches via ROM function pointer table 0x080de954 (6 entries, bx r15 tail-call) for cases 0..5 covering pack card list sub-flows (init/card-select/confirm/exit etc.).
+Constants: pack_ui_state+0xc (0x0300585c+2=step_index), FUNC_TABLE=0x080de954, TERMINAL_STATE=5.
+Inputs: r0=u32 ctx_val. Returns: r0=u32 (out-of-bounds state>5 path: store_pack_selection_to_state writes r0=1 via parent epilogue; normal dispatch case path: 0=sub-step in progress, 1=sub-step complete; symmetric with dispatch_pack_page_state).
+Side effects: [pack_ui_state+0xc step field] modified by case functions or store_pack_selection_to_state.

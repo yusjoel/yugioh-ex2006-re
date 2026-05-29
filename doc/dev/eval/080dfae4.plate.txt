@@ -1,0 +1,7 @@
+Renders pack slot 1 overlay OAM sprite, corresponding to first row card slot position.
+r0=ctx_ptr passed to render_overlay_oam_sprite_tiled.
+Calls compute_pack_slot_oam_y_attr(0) to get slot 0 y-coord OAM attr, renders with fixed size w=9/h=2 tiles and ROM tile_attr 0x00020140.
+Called by pack scene per-frame OAM render paths (pack_080e097c/pack_080e0af8).
+Constants: SLOT_Y_INDEX=0, SPRITE_WH=0x00020009, SPRITE_ATTR=0x00020140.
+Inputs: r0=ptr ctx_ptr. Returns: void (pop {r0}; bx r0).
+Side effects: OAM entry written via render_overlay_oam_sprite_tiled (slot_y(0) coord, w=9 h=2).

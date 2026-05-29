@@ -1,0 +1,5 @@
+Renders pack scene right cover overlay OAM sprite. Writes a 2-col x 3-row tile overlay sprite at screen (x=0xc0=192, y=0x32=50), tile_attr/palette 0x005d/2. r0=ctx_ptr passed as r3 to render_overlay_oam_sprite_tiled for OAM write context.
+Called by pack scene per-frame OAM render paths (FUN_080df5c4 and pack_080dffdc) for the right cover sprite layer (x=192 vs left x=26).
+Constants: SPRITE_XY=0x003200c0, SPRITE_WH=0x00030002, SPRITE_ATTR=0x0002005d.
+Inputs: r0=ptr ctx_ptr. Returns: void (pop {r0}; bx r0).
+Side effects: OAM entry written via render_overlay_oam_sprite_tiled (x=192, y=50, 2x3 tiles).
