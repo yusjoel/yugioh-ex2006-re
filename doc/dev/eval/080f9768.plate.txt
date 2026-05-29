@@ -1,0 +1,17 @@
+Removes the first occurrence of card_id from deck Zone B (0x1269/0x130c) and Zone C (0x126a/0x132a) of the specified puzzle slot, then calls init_puzzle_wram_and_checksum to update the checksum. r0=slot_index, r1=card_id. Returns 0 immediately if card_id==0. Computes slot base (0x02000000+slot*280); first scan loop over Zone B array: on match, shifts subsequent elements forward and decrements count, calls checksum update, returns 1. If not found, scans Zone C array the same way. Returns 0 if not found in either zone. Symmetric with remove_card_from_slot_zones_ac (0x080f9604); only difference is Zone B instead of Zone A as first scan target.
+
+Constants:
+- SLOT_BASE = 0x02000000 (EWRAM)
+- SLOT_STRIDE = 280
+- ZONE_B_COUNT = 0x1269, ZONE_B_DATA = 0x130c
+- ZONE_C_COUNT = 0x126a, ZONE_C_DATA = 0x132a
+- SHIFT_OFFSET_B = 0xffffecf4 (= -0x130c, data base negative offset for shift loop)
+- SHIFT_OFFSET_C = 0xffffecd6 (= -0x132a)
+
+Inputs: r0=slot_index [0..0x3b], r1=card_id [1..0x1431] (0=invalid; max index 0x1431)
+Returns: r0=1 (removed and checksum updated) or 0 (not found) (Sub-case E: movs r0,#1/#0 then pass-through)
+
+Side effects:
+- Zone B remove path: [+0x1269] -= 1; [+0x130c] array compacted forward
+- Zone C remove path: [+0x126a] -= 1; [+0x132a] array compacted forward
+- on success: init_puzzle_wram_and_checksum global update

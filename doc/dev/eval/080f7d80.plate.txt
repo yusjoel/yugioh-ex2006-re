@@ -1,0 +1,14 @@
+Reads palette sub-offset [state+0x8] from the animation state struct, then copies palette data to the specified OBJ palette area slot. r0=anim_state_ptr, r1=pal_slot_index. [state+0x8] is sub_offset; state+sub_offset+0x4 is palette data source pointer; [state+sub_offset+0x0] is palette color count (halfword). pal_slot_index multiplied by 32 bytes (lsls #0x18 >> 0x13 = *32) plus OBJ_PAL_BASE (0x05000200) gives dst address; copies color_count*2 bytes. Calls copy_bytes_by_halfword. Leaf function. indeg=0.
+
+Constants:
+- OBJ_PAL_BASE = 0x05000200 (OBJ palette VRAM)
+- PAL_ENTRY_SIZE = 2 (bytes per color)
+- PAL_SLOT_SIZE = 0x20 (32 bytes = 16 colors * 2; slot_index<<5)
+- PAL_SLOT_SHIFT = 0x18 (<<0x18 >> 0x13 = <<5 = *32)
+- PALETTE_SUB_OFFSET = state+0x8 (sub offset field)
+
+Inputs: r0=anim_state_ptr, r1=pal_slot_index [0..15] (target OBJ palette slot, 16-color palette)
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [OBJ_PAL_BASE + pal_slot_index*32 .. +color_count*2): overwritten with animation palette data

@@ -1,0 +1,13 @@
+Reads from animation state struct current frame cursor position, copies frame data (frame_size*32 bytes) to BG VRAM at the specified tile slot. r0=anim_state_ptr, r1=tile_index. Computes dst address: BG_VRAM_BASE(0x06010000) + tile_index*32 (lsls/lsrs via <<16>>11). Frame data start address: [state+0xc] is sub_offset, state+sub_offset+0x4 is data pointer. Reads frame size [state+0x0] (halfword), multiplied by 32 for byte count; calls copy_bytes_by_halfword. Leaf function. indeg=0.
+
+Constants:
+- BG_VRAM_BASE = 0x06010000
+- TILE_SIZE = 0x20 (32 bytes)
+- TILE_SHIFT = 0xb (<<16 >>0xb = *32)
+- FRAME_DATA_OFFSET = 0x4 (state+sub_offset+4)
+
+Inputs: r0=anim_state_ptr, r1=tile_index [0..0x3ff]
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [BG_VRAM_BASE + tile_index*32 .. +frame_size*32): overwritten with animation frame data

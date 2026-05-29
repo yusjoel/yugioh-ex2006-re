@@ -1,0 +1,20 @@
+Advances animation state by one frame and writes to gPrng OAM shadow buffer; third variant in the tick_anim_frame_to_oam cluster. r0=packed parameter (low 16=x_offset, high 16=y_offset), r1=anim_state_ptr, r2=advance_flag, r3=frame_data_ptr (stored on stack at entry). First checks frame cursor out of bounds ([state+0xc] >= [state+0xa]); out-of-bounds triggers seek reset. Otherwise DISPCNT |= 0x40 (forced blank); reads frame sprite count from r3 into [state+0x10]; translates by x_offset/y_offset, writes to gPrng sprite table. If advance_flag ([sp+0x0]) is nonzero, updates cursor and increments [state+0xc]. indeg=0.
+
+Constants:
+- DISPCNT = 0x4000000, FORCED_BLANK = 0x40
+- gPrng = 0x03000040
+- SPRITE_TABLE_OFFSET = 0xde*2 = 0x1bc
+- X_COORD_MASK = 0x000001ff
+- X_MASK_INV = 0xfffffe00
+- WIDTH_MASK = 0x000003ff
+- WIDTH_MASK_INV = 0xfffffc00
+- DWORD_080f7cac = 0x030001fc (gPrng sprite list ptr slot)
+
+Inputs: r0=packed_xy (low16=x_offset [0..511], high16=y_offset [0..255]), r1=anim_state_ptr, r2=advance_flag [0..1] (nonzero=advance frame counter), r3=frame_data_ptr (frame read cursor pointer)
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [DISPCNT]: |= 0x40 (forced blank)
+- [gPrng sprite table slots]: multiple sprite attr0/1/2 overwritten
+- [anim_state+0xc]: if advance_flag != 0, +1
+- [anim_state+4]: if advance_flag != 0, updated to new cursor

@@ -1,0 +1,14 @@
+Counts occurrences of card_id in the deck Zone A (spell/trap area, offset 0x1268/0x126c) of the specified puzzle slot. r0=slot_index [0..0x3b], r1=card_id. If slot_index > 0x3b, delegates to count_card_in_slot_hand for hand zone. Otherwise computes slot EWRAM base (0x02000000 + slot*280); reads Zone A count from [base+0x1268]; reads Zone A data array from [base+0x126c] (stride=2); compares card_id entry by entry, increments counter on match. Returns r0=hit count. Symmetric with count_card_in_slot_deck_zone_b (0x080f943c).
+
+Constants:
+- SLOT_BASE = 0x02000000 (EWRAM)
+- SLOT_STRIDE = 280 (slot_index * 280)
+- ZONE_A_COUNT_OFFSET = 0x1268
+- ZONE_A_DATA_OFFSET = 0x126c
+- SLOT_MAX = 0x3b (slot_index [0..59])
+- CARD_ENTRY_STRIDE = 2 (halfword per entry)
+
+Inputs: r0=slot_index [0..0x3b=59] (>0x3b delegates to hand handler), r1=card_id [1..0x1431]
+Returns: r0=hit count [0..zone_count] (Sub-case E: adds r0,r6,#0 independent assign then pass-through)
+
+Side effects: (read-only, no external writes)

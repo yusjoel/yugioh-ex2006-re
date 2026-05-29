@@ -1,0 +1,14 @@
+Sets bit4 (0x10=active flag) on all hand OAM entry array entries (EWRAM 0x02000006) at indices [1..count]. Reads hand_count halfword from ROM pointer 0x095b7cca; if hand_count < 1 returns immediately. Otherwise loops slot=1..hand_count: computes entry addr = base+slot*2, ORs 0x10 into [addr+0x1] high byte. Symmetric counterpart to clear_oam_active_flags_in_hand_range (0x080f9114). indeg=0.
+
+Constants:
+- HAND_OAM_BASE = 0x02000006 (EWRAM hand OAM array base)
+- HAND_COUNT_ROM_PTR = 0x095b7cca (ROM hand entry count)
+- ENTRY_STRIDE = 2 (bytes per entry)
+- ACTIVE_FLAG = 0x10 (bit4)
+- LOOP_START = 1 (starts from index 1)
+
+Inputs: (none)
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [HAND_OAM_BASE + slot*2 + 0x1] |= 0x10 (slot in [1..hand_count])

@@ -1,0 +1,19 @@
+Initializes an animation state struct (anim_state) and uploads the initial palette from the pattern section (ptnsect_ptr) to the OBJ palette slot. Stores ptnsect_ptr to [state+0] and [state+4]; sets DISPCNT bit6 (force blank); copies 32 bytes from ptnsect_ptr to OBJ palette at 0x050003e0; reads frame_count from ptnsect+0x20 into [state+0xe]; computes frame data start offset into [state+4]; calls seek_anim_frame_cursor to seek to frame 0; finally calls suppress_display_output/return_void_noop to complete init. indeg=0.
+
+Constants:
+- DISPCNT = 0x4000000 (0x80<<0x13), bit6 = FORCED_BLANK
+- OBJ_PAL_SLOT = 0x050003e0 (OBJ palette + 0x1e0, block 15/16)
+- PALETTE_SIZE = 0x20 (32 bytes = 16 colors * 2)
+- BG_VRAM_BASE = 0x06010000
+- FRAME_COUNT_OFFSET = 0x20 (ptnsect frame count field)
+
+Inputs: r0=ptnsect_ptr (pattern section data pointer, contains palette+frame data), r1=anim_state_ptr (animation state struct pointer)
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [DISPCNT]: |= 0x40 (forced blank ON)
+- [anim_state+0]: := ptnsect_ptr
+- [anim_state+4]: := ptnsect_ptr (initial; later overwritten by seek as frame read cursor)
+- [anim_state+0xe]: := frame_count (from ptnsect+0x20)
+- [OBJ_PAL 0x050003e0..+32]: initial palette copied from ptnsect
+- [anim_state+0xa], [anim_state+0xc]: written by seek_anim_frame_cursor (frame size/cursor)

@@ -1,0 +1,17 @@
+Writes sprite attribute pairs to gPrng OAM shadow buffer, with second pair scale field set to the signed negation of r2. Structurally symmetric with write_oam_entry_attr_pairs (0x080f6144); difference is r2 is sign-extended via lsls/asrs then negated with rsbs r2,r2,#0 before writing to [entry+0x16]. Used for affine transform scaling in horizontal/vertical flip scenarios. indeg=0, no static callers.
+
+Constants:
+- gPrng = 0x03000040 (OAM shadow buffer base register)
+- SPRITE_TABLE_OFFSET = 0xde*2 = 0x1bc (sprite table byte offset in gPrng struct)
+- ENTRY_SHIFT = 0xb (r0>>0xb = entry_index)
+- OAM_ATTR1_X_OFF = 6, OAM_ATTR1_Y_OFF = 0xe
+- OAM_ATTR2_HI_OFF = 0x16 (negated scale written here), OAM_ATTR2_LO_OFF = 0x1e
+
+Inputs: r0=packed_key (upper 16 bits discarded; >>0xb gives sprite_entry_index [0..0x36]), r1=packed_attr1 lo16->[entry+0x6](attr1_x) hi16->[entry+0xe](attr1_y), r2=scale_value [0..0x7fff] (negated before store to [entry+0x16])
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [gPrng_sprite_table_ptr + entry_index + 0x6]: := r1[15:0] (attr1_x)
+- [gPrng_sprite_table_ptr + entry_index + 0xe]: := r2[15:0] (attr1_y/attr2_lo original)
+- [gPrng_sprite_table_ptr + entry_index + 0x16]: := -r2 (negated scale field)
+- [gPrng_sprite_table_ptr + entry_index + 0x1e]: := r1[15:0] (attr1_x written again)

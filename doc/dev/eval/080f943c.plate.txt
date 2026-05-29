@@ -1,0 +1,14 @@
+Counts occurrences of card_id in the deck Zone B (monster area, offset 0x1269/0x130c) of the specified puzzle slot. r0=slot_index [0..0x3b], r1=card_id. If slot_index > 0x3b, delegates to count_card_in_slot_hand. Otherwise computes slot EWRAM base (0x02000000 + slot*280); reads Zone B count from [base+0x1269]; reads Zone B data array from [base+0x130c] (stride=2); compares card_id entry by entry, increments counter on match. Returns r0=hit count. Symmetric with count_card_in_slot_deck_zone_a (0x080f93c0); only difference is zone offset.
+
+Constants:
+- SLOT_BASE = 0x02000000 (EWRAM)
+- SLOT_STRIDE = 280
+- ZONE_B_COUNT_OFFSET = 0x1269
+- ZONE_B_DATA_OFFSET = 0x130c
+- SLOT_MAX = 0x3b (slot_index [0..59])
+- CARD_ENTRY_STRIDE = 2
+
+Inputs: r0=slot_index [0..0x3b=59] (>0x3b delegates to hand handler), r1=card_id [1..0x1431]
+Returns: r0=hit count [0..zone_count] (Sub-case E: adds r0,r6 independent assign then pass-through)
+
+Side effects: (read-only, no external writes)

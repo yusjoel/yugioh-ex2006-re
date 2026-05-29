@@ -1,0 +1,15 @@
+Applies a signed delta adjustment to the low-4-bit count field of the specified index entry in the hand OAM entry array (EWRAM 0x02000006). r0=slot_index, r1=delta (signed). Computes entry address: 0x02000006 + slot_index*2 (lsls r0,#0x10; lsrs r0,#0xf = *2). Reads [entry] low-4-bit count; if count > delta, writes (count-delta) & 0xf back to low 4 bits; otherwise clears low 4 bits ([entry+0] &= ~0x10). Called by campaign card select path (0x080282ac) during frame advance to adjust frame-offset counts for all hand OAM entries.
+
+Constants:
+- HAND_OAM_BASE = 0x02000006 (EWRAM hand OAM array base)
+- ENTRY_STRIDE = 2 (bytes per entry)
+- COUNT_MASK = 0x0f (low 4 bits)
+- COUNT_CLEAR_MASK = ~0x10 = 0xf0 (bits[7:5] preserved, low 4 bits cleared)
+
+Inputs: r0=slot_index [0..9] (hand OAM array slot index; hand limit 10, indices 0..9), r1=delta [0..15] (count delta, signed)
+Returns: void (bx lr, leaf)
+
+Side effects:
+- [HAND_OAM_BASE + slot_index*2]: low-4-bit count field adjusted by +/- delta or cleared
+
+Confidence: med. delta parameter semantic (whether count is y_offset or frame_counter) not directly stated in caller body. Upgrade: trace r1=1 meaning in caller 0x080282ac; or runtime breakpoint to capture r0/r1.

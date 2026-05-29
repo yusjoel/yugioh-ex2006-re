@@ -1,0 +1,18 @@
+Inserts a card into the deck of the specified puzzle slot, then calls init_puzzle_wram_and_checksum to update the checksum on successful insert. Logic identical to insert_card_to_slot_deck (0x080f94b8): card_id==0 returns 0; check_card_type_is_spell partitions by type; spell/trap appended to Zone C (0x126a/0x132a), monster appended to Zone A (0x1268/0x126c); capacity limit 0x4f. Only difference is the additional init_puzzle_wram_and_checksum call at the end of the success path. Returns 1 on success, 0 on failure.
+
+Constants:
+- SLOT_BASE = 0x02000000 (EWRAM)
+- SLOT_STRIDE = 280
+- ZONE_A_COUNT = 0x1268, ZONE_A_DATA = 0x126c
+- ZONE_C_COUNT = 0x126a, ZONE_C_DATA = 0x132a
+- ZONE_B_COUNT = 0x1269, ZONE_B_DATA = 0x130c
+- DECK_CAP = 0x4f (79)
+- CARD_ENTRY_STRIDE = 2
+
+Inputs: r0=slot_index [0..0x3b], r1=card_id [1..0x1431] (0=invalid; max index 0x1431)
+Returns: r0=1 (insert success) or 0 (fail) (Sub-case E: movs r0,#1/#0 then pass-through)
+
+Side effects:
+- spell/trap path: [SLOT_BASE+slot*280+0x126a] += 1; [+0x132a + old_count*2] := card_id
+- monster path: [SLOT_BASE+slot*280+0x1268] += 1; [+0x126c + old_count*2] := card_id
+- on success: init_puzzle_wram_and_checksum global update

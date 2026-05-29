@@ -1,0 +1,19 @@
+Advances animation state by one frame and writes the current frame's sprite position/attribute data to the gPrng OAM shadow buffer. r0=x_offset, r1=y_offset, r2=anim_state_ptr, r3=advance_flag. First checks if frame cursor is out of bounds ([state+0xc] >= [state+0xa]): if so, calls seek_anim_frame_cursor to reset to frame 0 and exits. Otherwise sets DISPCNT forced blank, reads frame data (sprite count + per-sprite attr0/attr1/attr2), translates by x_offset/y_offset, and writes to corresponding gPrng sprite table slots. If advance_flag (r3) is nonzero, increments [state+0xc] frame counter. indeg=0.
+
+Constants:
+- DISPCNT = 0x4000000, FORCED_BLANK = 0x40
+- gPrng = 0x03000040
+- SPRITE_TABLE_OFFSET = 0xde*2 = 0x1bc
+- X_COORD_MASK = 0x000001ff (attr1 X 9 bits)
+- X_MASK_INV = 0xfffffe00
+- WIDTH_MASK = 0x000003ff (attr1 width/size mask)
+- WIDTH_MASK_INV = 0xfffffc00
+- AFFINE_FLIP_FULL = 0x80*8 = 0x400 (flip/scale flags threshold)
+
+Inputs: r0=x_offset [0..511], r1=y_offset [0..255], r2=anim_state_ptr, r3=advance_flag [0..1] (nonzero=advance frame counter)
+Returns: void (pop{r0};bx r0 Sub-case E)
+
+Side effects:
+- [DISPCNT]: |= 0x40 (forced blank to prevent OAM write tearing)
+- [gPrng sprite table slots]: multiple sprite attr0/1/2 overwritten (count from frame data)
+- [anim_state+0xc]: if advance_flag != 0, +1
