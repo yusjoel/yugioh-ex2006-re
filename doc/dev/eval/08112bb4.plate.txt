@@ -1,0 +1,6 @@
+Reentrant newlib _sclose wrapper function, forming a symmetric triplet with wrap_write_r (0x08112af4) / wrap_read_r (0x08112c38). Clears EWRAM errno cache (0x02029ea8), calls stub_semihost_close (r1=fd, r2=flags) to perform the close operation. If stub_semihost_close returns -1 (failure) and errno cache is non-zero, writes errno to the pointer provided by r0 (*reent_errno := errno). Returns the raw result of stub_semihost_close.
+
+Call context: __smakebuf (0x081113d8) calls this function to safely close a file descriptor while initializing stdio buffers; in the semihosting environment stub_semihost_close always succeeds (returns 0), so the errno write-back path is not triggered.
+
+Constants:
+ERRNO_CACHE=0x02029ea8 (newlib global errno staging address, EWRAM)

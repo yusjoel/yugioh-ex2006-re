@@ -1,0 +1,6 @@
+OR-sets bit2 (0x4) into IWRAM sound engine struct (0x030050cc) [+0x364] (0xd9*4, DMA channel status halfword). No parameters, no push prologue, directly operates on fixed address. Forms a bit-set sibling pair with set_sound_engine_bit0_flag (0x0810dec8, OR 0x1), both belonging to the [+0x364] field bit-operation cluster. Call context: FUN_080f9b58 calls bit0 then bit2 in the same sequence, then writes new channel_id=0x17, forming a complete sound channel switch/reset signal sequence.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base)
+STATUS_OFF=0x364 (0xd9*4, DMA channel status halfword offset)
+BIT2_MASK=0x4 (set mask)

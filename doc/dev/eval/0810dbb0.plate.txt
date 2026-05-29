@@ -1,0 +1,10 @@
+Sound engine DMA channel access query. r0=entity_id of requesting entity. Reads IWRAM sound engine struct (0x030050cc) [+0x364] status halfword bit7 to check if DMA is running: bit7=1 (DMA active): if entity_id<0 returns 1 (any entity allowed), else reads [+0x36a] current owner entity ID and compares; match returns 1, mismatch returns 0. bit7=0 (DMA idle): reads [+0x366] pending entity ID; if negative returns 0; if entity_id<0 or matches pending returns 2 (pending match); else returns 0.
+
+Call context: sound engine alloc/request path calls this before claiming DMA channel. Return: 0=unavailable/conflict, 1=immediately available, 2=pending match.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base)
+STATUS_OFF=0x364 (0xd9*4, DMA channel status halfword)
+ACTIVE_BIT=0x80 (bit7 = DMA running flag)
+ENTITY_PENDING_OFF=0x366 (pending entity ID halfword field)
+ENTITY_ACTIVE_OFF=0x36a (current active entity ID halfword field)

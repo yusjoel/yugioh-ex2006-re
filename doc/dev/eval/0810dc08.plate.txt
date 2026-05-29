@@ -1,0 +1,13 @@
+Iterates IWRAM DMA channel slot array (0x03005390, stride=0x28, 8 slots), writing an attenuation byte computed from vol_a*vol_b product to all active slots matching entity_id. Formula: attenuation = 0x10 - (vol_a * vol_b >> 4). Active check: [slot+0x1f] bit7=1. Entity match: [slot+0xe] signed halfword == entity_id. Write target: [slot+0x24] (volume/attenuation byte field). Returns computed attenuation in r4 (Sub-case E, pop{r1};bx r1 preserves r0).
+
+Call context: sound engine needs to batch-update volume attenuation of all active DMA channels for a given entity ID; attenuation is determined by pitch depth (vol_a) and amplitude (vol_b) product.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x03005390 (IWRAM DMA channel slot array base)
+ENTRY_COUNT=8 (slot count [0..7])
+ENTRY_STRIDE=0x28 (40 bytes per slot)
+ACTIVE_FLAG=0x80 (bit7 of [+0x1f])
+ENTITY_ID_OFF=0xe (entity ID signed halfword field)
+VOL_OFF=0x24 (volume/attenuation byte field)
+SCALE_SHIFT=0x4 (right-shift 4 = divide by 16, fixed-point normalization)
+VOL_MAX=0x10 (attenuation base value)

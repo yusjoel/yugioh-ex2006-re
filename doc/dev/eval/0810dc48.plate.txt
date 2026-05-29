@@ -1,0 +1,14 @@
+Given entity_id (r0), searches IWRAM channel slot array (0x030052f0, stride=0x28, 8 slots) for an active slot matching entity_id; maps channel slot index to DMA source slot index via ROM indirect table (0x084c7648, 8 bytes); then finds the corresponding entry in DMA source entry table (0x0300546c, stride=0x1c, 12 entries); if [+0xe] bit7=1 (active), returns [dma_slot+0x0] data pointer; returns 0 if not found or not active.
+
+First checks highest-priority slot (slot_idx=7, offset 0x8c<<1=0x118 from 0x030052f0); if hit uses ROM table [0x7] fixed mapping; otherwise iterates slot_idx=[7..4] in reverse. Call context: sound engine uses this to reverse-look up the current DMA buffer address in use by a given entity ID during alloc/free operations.
+
+Constants:
+CHANNEL_ARRAY_BASE=0x030052f0 (IWRAM main channel slot array base)
+CHANNEL_STRIDE=0x28 (40 bytes per slot)
+SLOT_IDX_INIT=7 (starting slot index, 0x8c<<1=0x118 = 7*0x28 offset)
+ACTIVE_FLAG=0x80 (bit7 of [+0x1f])
+ENTITY_ID_OFF=0xe (entity ID signed halfword)
+SLOT_MAP_LUT=0x084c7648 (ROM channel slot -> DMA source slot mapping byte table)
+DMA_SRC_TABLE=0x0300546c (IWRAM DMA source entry table base)
+DMA_SRC_STRIDE=0x1c (28 bytes per entry)
+DMA_ACTIVE_OFF=0xe (DMA source entry active bit7 byte)

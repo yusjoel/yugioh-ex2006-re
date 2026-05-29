@@ -1,0 +1,6 @@
+Single-argument wrapper for strtod(3) that forces endptr=NULL: sets r1 to 0 then calls strtod(r0, NULL), parsing the string pointed to by r0 (nptr) as a floating-point number without returning an end pointer. The double-precision result is passed through as r0:r1 (low 32 bits : high 32 bits) to the caller.
+
+Call context: __svfscanf (0x0810f23a) calls this function when handling '%f'/'%e'/'%g' format specifiers, after copying the input string to a stack buffer (sp+0x100), to convert the buffer content to a floating-point number; the conversion result is stored directly into the scanf output slot.
+
+Constants:
+ENDPTR_NULL=0 (r1=0, strtod second argument set to NULL)

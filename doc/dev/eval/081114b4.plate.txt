@@ -1,0 +1,15 @@
+dlmalloc internal heap expansion function. Takes reent_ptr (r0) and size_request (r1), calls wrap_sbrk_r twice to request more memory from the OS, and updates heap footprint/size statistics fields in the newlib reent struct (0x09ed4d98 region): 0x09ed51b4=footprint, 0x09ed51ac=max_footprint_a, 0x09ed51b0=max_footprint_b.
+
+First wrap_sbrk_r probes available contiguous address; returns if result is -1 (failure). After alignment adjustment, second wrap_sbrk_r obtains the aligned base. Updates footprint field and writes chunk header (prev_foot/size). If predecessor chunk exceeds threshold (r7>0xf), may call _free_r to release predecessor block.
+
+Call context: _malloc_r (0x08111610) calls this function to expand the heap via the GBA semihosting environment when dlmalloc cannot find a sufficient free block internally.
+
+Constants:
+REENT_BASE=0x09ed4d98 (newlib reent struct pointer)
+HEAP_SIZE_PTR=0x09ed51a4 (current heap size field pointer)
+HEAP_BASE_PTR=0x09ed51a8 (heap base pointer)
+FOOTPRINT=0x09ed51b4 (current footprint field)
+MAX_FOOTPRINT_A=0x09ed51ac (max footprint field A)
+MAX_FOOTPRINT_B=0x09ed51b0 (max footprint field B)
+ALIGN_MASK=0xfffff000 (4KB page alignment mask)
+ALIGN_BUMP=0x100f (pre-alignment addend, rounds up to 4KB page)

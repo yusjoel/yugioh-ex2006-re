@@ -1,0 +1,5 @@
+Conditionally clears IWRAM frequency slot buffers based on r0 (slot_index). When slot_index < 0, calls clear_freq_slot_dma_buf(0), clear_freq_slot_dma_buf(1), clear_freq_slot_dma_buf(2) sequentially to clear all 3 frequency slots. When slot_index >= 0, calls only clear_freq_slot_dma_buf(slot_index) to clear the specified slot. Wraps clear_freq_slot_dma_buf in an all-clear/single-clear dispatch, used in the sound engine reset path to clear frequency slot DMA buffers on demand.
+
+Constants:
+SLOT_IDX_ALL=-1 (slot_index < 0 triggers full clear of slots 0+1+2)
+SLOT_IDX_MAX=2 (frequency slot index upper bound [0..2])
