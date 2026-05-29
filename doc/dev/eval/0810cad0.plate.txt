@@ -1,0 +1,11 @@
+Called by FUN_0810cda0 / FUN_0810d23c / FUN_0810d318 / FUN_0810d460 when allocating audio requests. Reads IWRAM 0x030050cc audio engine struct; reads [+0xda*4=0x368] pending allocation request word r3; if r3<0, returns immediately. Checks r3 bit 0x2000 to decide base address source (0x030050cc local pool vs 0x081143a0 external pool). Iterates 8 frequency slots ([+0xcf*4] base, stride 0x28) to find the lowest-priority idle channel: compares [slot+0x1c] priority against candidate; if [slot+0xe]+2 equals request wave_id and [slot+0x23]!=0, reuses immediately. After finding: sets [+0xd9*4] bit11 (DMA request bit), calls find_min_active_channel_priority, computes priority increment and writes to channel control fields. Writes to channel: [slot+0x17]:=0x80 (activate), [slot+0x6]:=wave_id, [slot+0x14]:=reg_count, [slot+0x18]:=volume, [slot+0x1e]:=transpose, [slot+0x1a]:=pitch, [slot+0xe]:=note_id, [slot+0xc]:=seq_ptr, [slot+0x1b]:=sp_ref, [slot+0x1c]:=priority. Finally clears [+0xda*4] request word, writes 0xffff as nil. Exit: pop{r0}; bx r0 -> Sub-case E void.
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [+0x368=0xda*4] = pending allocation request halfword (cleared, then written 0xffff=nil)
+- [+0x364=0xd9*4] |= bit11 = DMA allocation request bit
+- 0x00000fff = wave_id mask (bits[11:0])
+- 0x081143a0 = external sound source pool base
+- 0x084c7657 / 0x084c7670 = internal wave table pointers
+- [slot+0x17] bit7 = channel active flag (0x80=active)
+- 0x0000effb = DMA control word mask

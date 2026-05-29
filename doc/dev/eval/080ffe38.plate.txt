@@ -1,0 +1,8 @@
+Handles type update and scroll-state maintenance for a single card entry during card_list scroll. Entry calls compute_card_list_scroll_position to get current scroll candidate index; if negative, returns 0 immediately. Otherwise checks candidate type: if type matches, zeroes [r5+0xc/0xe/0x10] (column/row/page counters); if not, calls write_deck_entry_type_nibble to update type nibble, then loops slot_idx=0..3 calling init_deck_slot_data to rebuild each slot. Then performs boundary decrement on [r5+0xe] (row_counter) and [r5+0x10] (page_counter) and [r5+0xc] (column_counter), using __modsi3 % 0xa to check column position within row. Returns r0=0 (early exit / invalid) or r0=1 (normal completion).
+
+Constants:
+- IWRAM 0x0202a4d0 = card_list scene main state struct (deck/scroll state)
+- IWRAM 0x0202f3c0 = card_list candidate card buffer
+- IWRAM 0x0202f438 = card_list page upper limit (halfword)
+- 0xa = 10 (row width, used for modsi3 column offset calculation)
+- [r5+0xc] = column_counter, [r5+0xe] = row_counter, [r5+0x10] = page_counter

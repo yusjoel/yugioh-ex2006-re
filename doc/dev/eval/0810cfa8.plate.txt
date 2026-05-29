@@ -1,0 +1,6 @@
+indeg=0, Sub-type A (no function pointer references). Takes r0=channel_id as input, checks audio engine [+0xd9*4=0x364] bit7 (channel active) and [base+0x36a] current channel ID against r0. If active and ID matches, returns 0 (no operation). If not active or ID mismatches (either condition), calls reset_sound_channel_entry with r0 to reset the channel, then returns 1. Exit: pop{r1}; bx r1 (Sub-case E, preserves r0).
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [+0x364=0xd9*4] = DMA state word; bit7=0x80 = channel active flag
+- [+0x36a] = current channel ID halfword

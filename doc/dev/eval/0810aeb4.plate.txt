@@ -1,0 +1,7 @@
+Called via the indirect call table of tick_card_list_hub_by_bg0cnt (0x0810ad20); is the display initialization entry for the duel puzzle card list. Sequentially calls four stubs: return_one_puzzle_card_list_stub / return_one_puzzle_deck_init_stub / return_one_card_list_stub / init_card_list_display_and_objs. Then reads [0x0202a4d0+2] (mode field), computes a non-zero flag for (mode XOR 1) using rsbs/orrs/lsrs sign bit, and calls refresh_card_slot_display_buf with this flag. Finally writes gPrng[0x81*4] = (existing & 0xffffc03f) | 0xc0 to set BG0CNT screen_base field to 3. Returns r0=1.
+
+Constants:
+- IWRAM 0x0202a4d0 = card_list scene main state; [+2] = mode field
+- gPrng[0x81*4=0x204] = BG0CNT mirror
+- 0xffffc03f = BG0CNT field mask
+- 0xc0 = screen_base=3 (bits[9:8] = 0b11)

@@ -1,0 +1,8 @@
+Called by FUN_0810d92c (audio channel full initialization caller). Takes r0=channel_id, r1=source_ptr, r2=type_code, r3=data_ptr as input. First calls reset_sound_channel_entry(r0) to reset the channel. Then: if r2>3, writes [base+0x38b]=r2+1 (channel type byte) and [base+0x8]=r1 (source pointer); regardless of r2, always writes [base+0x10]=r3 (data pointer). Combined version of init_sound_channel_with_source (0x0810cfe4, always writes [+0x38b]+[+0x8]) and init_sound_channel_with_data (0x0810d008, only writes [+0x10]): when type_code>3, writes all three fields; when type_code<=3, only writes data_ptr. Exit: pop{r4,r5,r6}; pop{r0}; bx r0 (Sub-case E).
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [base+0x38b] = channel type byte (written as type_code+1, condition: type_code>3)
+- [base+0x8] = channel source pointer field (condition: type_code>3)
+- [base+0x10] = channel data pointer field (unconditional)
+- 3 = type_code threshold (<=3 skips source pointer write)

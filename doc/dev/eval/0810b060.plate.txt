@@ -1,0 +1,10 @@
+Called by FUN_0810b1d0 (audio engine main init) and FUN_0810b408 (audio engine reset); is the complete reset entry for audio engine IWRAM state struct 0x030050cc. Zeroes/initializes fields: [+0xd9*4=0x364]=0 (DMA channel state); [+0x366]=0xffff; [+0xda*4=0x368]=-1 (0xffffffff); [+0x37e]=0; [+0x37f]=0x10; [+0x381]=0x10; [+0x380]=0x10; [+0x389]=0x10; [+0x18]=-1; [+0x20]=0; [+0x1c]=0. Then iterates 16 note slots ([+0x24+i*0x20+0x14]:=0, stride 0x20, i=0..15); then iterates 8 frequency slots ([+0xcf*4+j*(-0x28)] clears [+0x1f] and [+0x0]), stride 0x28, j=7..0. Calls write_wave_pattern_to_ch3(base,0,0) to write waveform; writes SOUND3CNT_X=0x8000 (stop ch3); calls init_sound_dma_transfer_buffers. Exit: pop{r4}; pop{r0}; bx r0 -> Pattern B, no return value.
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [+0x364=0xd9*4] = DMA channel state halfword
+- [+0x366] = initialized to 0xffff
+- [+0x368=0xda*4] = initialized to -1 (0xffffffff)
+- [+0x18] = initialized to -1
+- [+0x37e/0x37f/0x380/0x381/0x389] = initialized to 0 or 0x10
+- SOUND3CNT_X (0x04000074) = wave channel control register; 0x8000 = stop ch3

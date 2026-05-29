@@ -1,0 +1,8 @@
+Called via the indirect jump table of enter_forb_ltd_lists_page (0x08108558); is the initialization entry for the duel puzzle card list scene. Sequentially calls five stub functions to bring the scene ready: return_one_puzzle_card_list_stub / return_one_puzzle_deck_init_stub / return_one_card_list_stub / init_card_list_display_and_objs / return_one_card_list_slot_stub. Then reads display_mode byte from 0x0202a4d0+0x6c30 and reconstructs the mode flag byte in [0x02000000+0x6c30] with a 5-bit rearrangement write. Calls init_puzzle_wram_then_copy to complete puzzle WRAM init; finally writes gPrng[0x81*4] = (existing & 0xffffc03f) | 0x3c to set BG0CNT screen_base field. Returns r0=1.
+
+Constants:
+- IWRAM 0x0202a4d0 = card_list scene main state struct
+- 0x6c30 = scene language/mode byte offset relative to 0x02000000
+- gPrng[0x81*4=0x204] = BG0CNT mirror register
+- 0xffffc03f = BG0CNT field mask (preserves bits outside screen_base/char_base)
+- 0x3c = BG0CNT screen_base new value field (bits[12:8] = 0x3c>>2 = 15)

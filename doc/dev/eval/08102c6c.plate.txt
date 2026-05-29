@@ -1,0 +1,7 @@
+Called by FUN_080ffbec (card_list/deck_edit scene frame loop); is the complete update flow entry for a deck_slot candidate card entry. First calls insert_card_into_deck_slot to write the base entry; then selects the corresponding IWRAM offset by deck_type (r9/r2) (type0: +0x2b9c, type1: +0x3ecc, type2: +0x44cc, type3: +0x4acc) to construct candidate list pointer r7; calls filter_deck_slot_candidates to filter candidates; uses bsearch_index_by_callback to binary-search the candidate list for the target card; if found, branches by deck_type: inserts entry at found position (halfword shift), updates type nibble and count at [r9+0x1a4c+offset]; if not found, calls apply_card_obj_attr_by_type to set OBJ attr, then bsearch confirms position and writes entry. Returns r0=1.
+
+Constants:
+- IWRAM 0x0202a4d0 = card_list scene main state (deck slot data base)
+- 0x2b9c / 0x3ecc / 0x44cc / 0x4acc = type 0/1/2/3 candidate list offsets
+- IWRAM 0x0202f3a4 = deck slot sorted entry buffer
+- 0x00000fff = deck_type low 12-bit mask

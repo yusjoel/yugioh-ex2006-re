@@ -1,0 +1,6 @@
+indeg=0, Sub-type A (no function pointer references). Checks whether the DMA state word [+0xd9*4=0x364] bit7 in audio engine IWRAM 0x030050cc is set (channel active); if not active, returns 0. If active, reads [base+0x36a] halfword (channel ID) and compares with input r0 (channel_id): if equal returns 1, if not equal returns 0. Exit: pop{r4}; pop{r1}; bx r1 (Sub-case E, preserves r0).
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [+0x364=0xd9*4] = DMA state word; bit7=0x80 = channel active flag
+- [+0x36a] = current channel ID halfword

@@ -1,0 +1,9 @@
+Called by the main dispatch hub of the indirect call table (enter_forb_ltd_lists_page / banlist scene frame dispatch chain); is the main frame tick dispatch function for the card_list scene. Extracts bits[9:2] (screen_base field) of gPrng[0x81*4] (BG0CNT mirror) multiplied by 4 as function pointer table index, reads the corresponding function pointer from ROM table 0x09e61168, then calls invoke_r0 to execute it. If the return value is non-zero, clears the BG0CNT[9:2] field (zeroes screen_base), and also clears gPrng[0x82*4][bit6] and gPrng[0x207][bit6], indicating scene frame end. If the function pointer is 0 (no handler), returns 1 immediately. Returns r0=0 (frame incomplete) or r0=1 (frame complete / no handler).
+
+Constants:
+- gPrng = IWRAM gPrng base
+- gPrng[0x81*4=0x204] = BG0CNT mirror (bits[9:2] = screen_base field)
+- 0xffc03fff = BG0CNT mask (clears bits[21:14])
+- gPrng[0x82*4=0x208] bit6 = scene active flag
+- gPrng[0x207] bit6 = extra clear target
+- ROM 0x09e61168 = card_list frame handler function pointer table

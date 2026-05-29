@@ -1,0 +1,6 @@
+indeg=0 dead-code or indirect call entry. Implements a priority-based deck slot fill algorithm: outer loop driven by find_best_slot_for_card() return value r4 (terminates when r4=0); inner loop for the slot corresponding to r4, tries type3/type2/type1 in order, each calling count_valid_cards_by_slot_type to query valid card count; takes the highest-priority non-zero type branch and calls insert_card_into_deck_slot(r2, type, 0, 1) to insert one card. After the outer loop, iterates slot_idx=0..3 calling init_deck_slot_data to complete slot data struct initialization. Returns r0=1.
+
+Constants:
+- 4 = total deck slot count (loop 0..3, cmp r4,#3)
+- type 3 / 2 / 1 = slot priority order (movs r0,#3 / #2 / #1)
+- 0x24 = sp allocation size (sub sp,#0x24, 9 words temporary storage)

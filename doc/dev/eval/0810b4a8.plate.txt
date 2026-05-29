@@ -1,0 +1,10 @@
+Called by FUN_0810c6a6 (audio engine main tick outer loop) with r1=0..7; processes sequence data for a single audio channel. Reads channel control block at IWRAM 0x030050cc + r1 offset ([+0x89*4+r1*0x28*4]): current sequence pointer r6 ([+0x0]) and OBJ output slot pointer r7 (r2). If channel not active ([+0x1f] bit7=0), returns immediately. Active path: decrements pending-play count ([+0xc] strh); checks bit0 (loop restart), bit1 (pending stop), bit4 (trigger note) flags; reads opcodes byte-by-byte from sequence r6 and dispatches via large switch: 0xef=stop/rest, 0xf9=loop_restart, 0xf8=set_volume, 0xf7=set_pitch_flag, 0xf6=sequence_jump, 0xf5=set_soundcnt, 0xf4=set_transpose, 0xf3=set_freq, 0xf2=set_note_and_pitch, 0xfc=loop_control, 0xfd=end_sequence; non-control bytes (<=0xef) dispatch by pitch range to set_freq_slot_note_byte / set_freq_slot_volume_pitch / set_freq_slot_note_mask_bit. Exit: pop{r2..r7}; pop{r1}; bx r1 -> Sub-case E void.
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [+0x89*4=0x224] = channel block base offset (8 channels, stride per channel_slot)
+- [slot+0x1f] bit7 = channel active flag
+- [slot+0xc] = pending-play frame count halfword
+- [slot+0x1f] bit4 = trigger_note flag, bit1 = stop_pending, bit0 = loop_restart
+- 0x03005408 + slot*0x28 = DMA channel dispatch slot
+- SOUNDCNT_H (0x04000082) = 0x8800 (ch3+ch4 enable)

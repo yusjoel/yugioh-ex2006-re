@@ -1,0 +1,6 @@
+Called via the indirect call table of tick_card_list_hub_by_bg0cnt (0x0810ad20); is the generic frame handler entry for the card_list scene (mode=normal). Sequentially calls four standard frame functions: tick_card_list_scene_frame__080fe308 (main tick) / render_card_list_oam_entries (OAM render) / return_one_scene_card_list (scene container stub) / return_one_card_list_oam_stub (OAM stub). If tick returns 0, returns 0 (frame incomplete). Otherwise sets gPrng[0x81*4] = (existing & 0xffffc03f) | 0x80 to set BG0CNT screen_base=2. Returns r0=0 or r0=1.
+
+Constants:
+- gPrng[0x81*4=0x204] = BG0CNT mirror
+- 0xffffc03f = BG0CNT field mask
+- 0x80 = screen_base=2 (bit[8]=1)

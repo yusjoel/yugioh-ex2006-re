@@ -1,0 +1,11 @@
+Called via the indirect call table of tick_card_list_hub_by_bg0cnt (0x0810ad20); is the complete initialization entry for the card_list main scene. First zeroes 0x80 halfwords starting at 0x0202f3c0; reads gPrng[0x91*4] bit0 to check if deck data is already present: if bit0=0 calls rebuild_all_deck_slot_data to rebuild all slots. Then sequentially calls: reset_card_list_scene_state / card_list_screen_init / reset_card_list_scroll_offset / return_one_card_list_main_stub / return_one_card_list_scene_stub. Then clears gPrng[0x91*4] bit1, reads scene language byte (0x02000000+0x6c30), reconstructs the 5-bit mode flag in [0x0202a4d0+0x16] (same 5-bit rearrangement logic). Calls set_channel_if_changed(6) to set audio channel. Finally writes gPrng[0x81*4] = (existing & 0xffffc03f) | 0x40 to set BG0CNT screen_base. Returns r0=1.
+
+Constants:
+- IWRAM 0x0202f3c0 = card_list candidate card buffer (zeroing 0x80 halfwords)
+- gPrng[0x91*4=0x244] = scene control byte; bit0=deck data ready, bit1=mode flag
+- 0x02000000+0x6c30 = game language region byte
+- IWRAM 0x0202a4d0+0x16 = card_list scene display_mode byte
+- gPrng[0x81*4=0x204] = BG0CNT mirror
+- 0xffffc03f = BG0CNT field mask
+- 0x40 = BG0CNT screen_base initial value field
+- 6 = set_channel_if_changed audio channel parameter

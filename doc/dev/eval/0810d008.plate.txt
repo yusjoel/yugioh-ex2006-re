@@ -1,0 +1,5 @@
+indeg=0, Sub-type A (no function pointer references). Takes r0=channel_id, r1=data_ptr as input. First calls reset_sound_channel_entry(r0) to reset the channel. Then writes [0x030050cc+0x10] = r1 (data_ptr written to channel data pointer field). Exit: pop{r4}; pop{r0}; bx r0 (Sub-case E, preserves callee r0). Symmetric with init_sound_channel_with_source (0x0810cfe4): the latter writes [base+0x8]=source_ptr + [base+0x38b]=type+1; this function only writes [base+0x10]=data_ptr.
+
+Constants:
+- IWRAM 0x030050cc = audio engine control struct base
+- [base+0x10] = channel data pointer field
