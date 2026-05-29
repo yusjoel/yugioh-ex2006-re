@@ -1,0 +1,11 @@
+title_ex scene graphics resource conditional application wrapper.
+r0 = slot_gate: if r0 != 0, skips (adjusts stack then returns); if r0 == 0:
+reads 3 extra parameters from caller stack frame ([sp+0x14/0x18/0x1c]), combines with r1/r2/r3, then
+calls apply_title_ex_gfx_resource(r0=r1, r1=r2, r2=r3, r3=[sp+0x10]).
+Used in title_ex scene main driver (FUN_080fda04) to skip non-zero slots when calling in batch by slot index.
+Called by FUN_080fda04 (title_ex scene state machine, case 0/init steps) via bl directly.
+Constants:
+  SP_PARAM3_OFFSET = 0x10 (caller stack 4th parameter offset: [sp+0x10])
+  SP_PARAM4_OFFSET = 0x14 (caller stack 5th parameter offset: [sp+0x14])
+  SP_PARAM5_OFFSET = 0x18 (caller stack 6th parameter offset: [sp+0x18])
+  SP_PARAM6_OFFSET = 0x1c (caller stack 7th parameter offset: [sp+0x1c])

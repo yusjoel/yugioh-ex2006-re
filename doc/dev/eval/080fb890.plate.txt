@@ -1,0 +1,10 @@
+game_str/starter_deck scene step sequence dispatcher US/non-JP variant.
+Structure is fully symmetric with dispatch_game_text_step_handler_jp (0x080fb6f0):
+reads step index from gPrng+0x204 bits[21:14]; range [0..5] bls gate;
+if out of range: start_blend_fadein_with_target(2) and return.
+If in range: indexes inline table 0x080fb8bc (7 function pointers, 2 duplicate same-address entries), fetches pointer then .hword 0x4687 tail-calls.
+Called by FUN_080fba94 when [0x080000ae]>>8 != 0x4a (US/EU ROM region).
+Exit: pop {r4,r5}; pop {r1}; bx r1 (Sub-case E, r0 determined by tail-called function).
+Constants:
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  STEP_INDEX_MAX = 0x5 (US step range upper bound [0..5])

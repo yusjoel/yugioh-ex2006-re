@@ -1,0 +1,14 @@
+Renders two cursor OAM entries (left/right indicators) for the starter_deck selection UI.
+First checks [0x020297e4] bit0: if 0 enters alternate path (4 fixed-position OAM writes); if 1 executes main path.
+Main path: loops slot_idx=0,1 (2 iterations); each time computes x base = slot_idx*15 + 0x200,
+reads [0x020297e4] bit1 to decide whether to add 0x40 x offset (when slot_idx != bit1);
+inner loop 4 times calls write_oam_entry_from_packed_args with same OAM content, each iteration y += 0x20.
+Alternate path (bit0==0): loops slot_idx=0..3, writes 4 placeholder OAMs at fixed y=0x38+slot_idx*0x20 and x=0x020f0000 base + slot_idx*0x40000.
+Exit: pop{r4,r5,r6,r7}; pop{r0}; bx r0 (Pattern B void).
+Constants:
+  CURSOR_STATE_ADDR = 0x020297e4 (starter_deck cursor control state byte address)
+  X_BASE_OFFSCREEN = 0x80<<2 = 0x200 (OAM attr1 x base: offscreen initial position)
+  X_PLAYER_OFFSET = 0x40 (non-active player cursor x offset)
+  Y_STEP = 0x20 (OAM entry y spacing)
+  Y_ALT_BASE = 0x38 (alternate path y start value)
+  Y_OAM_STEP_PACKED = 0x80<<0xb = 0x40000 (packed OAM y+0x20 step high word)

@@ -1,0 +1,12 @@
+title_ex scene BG1 vertical scroll cycle frame driver; symmetric sibling of tick_bg1_hscroll_cycle.
+Reads same 1-byte counter from TITLE_EX_CTX+0x38c (shared with horizontal driver),
+takes modulo 0xf0 (240 pixels = GBA screen height) then negates (rsbs r0,r0,#0), calls set_bg1_scroll_xy(0, neg_offset).
+Counter +2; if new value > 0xf0, resets to old+0x12.
+Exit: pop{r4}; pop{r0}; bx r0 (Pattern B void).
+Called once per frame, cycles BG1 vertically in reverse direction with period of 240 pixels.
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  VSCROLL_CTR_OFFSET = 0x38c (ctx field: shared counter byte with h-scroll)
+  VSCROLL_PERIOD = 0xf0 (240 pixels = screen height)
+  VSCROLL_STEP = 2 (step per frame)
+  VSCROLL_WRAP_BIAS = 0x12 (wrap restart bias: old+0x12 resets)

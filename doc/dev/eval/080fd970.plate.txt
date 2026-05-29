@@ -1,0 +1,12 @@
+title_ex scene single-slot cell animation frame driver; selects animation slot index based on ctx flags.
+Reads 1-byte control byte from TITLE_EX_CTX+0x390 ([0x02029eb0+0xe4*4]):
+  bit1 (r3 = lsls#0x1e / lsrs#0x1f) = main slot select bit; if 0, uses bit3+1 directly as slot index.
+  if bit1=1: slot_index = (bit1*2 + bit2)*2 + (bit3+1), where bit2 = lsls#0x1d / lsrs#0x1f.
+Calls tick_title_ex_cell_anim_slot(slot_idx, -1, 0x78, 0x50) to drive corresponding slot animation.
+Exit: pop{r0}; bx r0 (Pattern B void).
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  ANIM_CTX_OFFSET = 0x390 (ctx field: cell anim slot select byte)
+  ANIM_W = 0x78 = 120 (cell anim width parameter)
+  ANIM_H = 0x50 = 80 (cell anim height parameter)
+  R1_FIXED = -1 (tick_title_ex_cell_anim_slot second parameter fixed value)

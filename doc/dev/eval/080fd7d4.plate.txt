@@ -1,0 +1,11 @@
+Utility function that linearly maps frame counter to BG1 scroll coordinates.
+Input r0 = time_param (range [0..0x3c=60]); formula:
+  offset = (0x3c - r0) * 8 / 0x3c = 8*(1 - r0/60)
+  result = 8 - offset = 8 * r0/60
+Final call set_bg1_scroll_xy(result, result): horizontal and vertical scroll set to same distance.
+When r0=0: result=0; when r0=0x3c=60: result=8.
+Linear animation entry effect: interpolates from (0,0) to (8,8).
+Exit: pop{r0}; bx r0 (Pattern B void).
+Constants:
+  FRAME_MAX = 0x3c = 60 (frame counter maximum value)
+  SCROLL_MAX = 8 (maximum pixel scroll distance)

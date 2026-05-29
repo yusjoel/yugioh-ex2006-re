@@ -1,0 +1,9 @@
+title_ex scene full-batch cell animation slot frame driver.
+r0 is raw animation parameter; divides by 0xb=11 to get upper bound r7 = r0 / 11.
+Copies 0x28 (40) bytes from ROM 0x09e50777 to stack frame buffer as slot configuration table.
+Loops r5=0..19 (20 iterations): if r5 <= r7, calls tick_title_ex_cell_anim_slot with slot_idx=r5, r1=-1, r2/r3 read from table; otherwise skips.
+Exit: pop{r4,r5,r6,r7}; pop{r0}; bx r0 (Pattern B void).
+Constants:
+  CELL_ANIM_TABLE = 0x09e50777 (ROM slot configuration table, 0x28 bytes)
+  BATCH_SIZE = 20 (maximum slot count r5=0..19)
+  ANIM_DIVISOR = 0xb = 11 (slot upper bound = r0 / 11)

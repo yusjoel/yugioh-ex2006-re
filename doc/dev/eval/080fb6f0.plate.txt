@@ -1,0 +1,9 @@
+game_str/starter_deck scene step sequence dispatcher JP variant.
+Reads step index from gPrng+0x204 bits[21:14]; cmp r0,#0x5 bls validates range [0..5].
+If out of range: calls start_blend_fadein_with_target(2) and returns.
+If in range: multiplies by 4 to index inline table 0x080fb71c (6 function pointers), fetches pointer then .hword 0x4687 (mov pc,r0) tail-calls.
+Called by FUN_080fba94 when [0x080000ae]>>8 == 0x4a (JP ROM region identifier).
+Exit: pop {r4,r5,r6}; pop {r1}; bx r1 (Sub-case E, r0 determined by tail-called function).
+Constants:
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  STEP_INDEX_MAX = 0x5 (JP step range upper bound [0..5])

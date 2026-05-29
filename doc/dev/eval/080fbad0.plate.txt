@@ -1,0 +1,12 @@
+game_str/starter_deck scene frame-level dispatcher.
+Reads current frame handler index from gPrng+0x204 bits[13:6] (8 bits),
+multiplies by 4 to index ROM function pointer table 0x09e5fa48, fetches callback pointer, calls invoke_r0.
+If callback returns non-zero (frame done): writes (index+1)&0xff back to bits[13:6] (mask 0xffffc03f);
+also clears [gPrng+0x206] bits[13:6] (mask 0xffffc03f) and [gPrng+0x207] low 6 bits.
+If frame handler pointer is NULL: returns r0=1 (dispatch chain done); normal frame returns r0=0.
+Exit: pop {r4,r5}; pop {r1}; bx r1 (Sub-case E, r0 is real return value).
+Referenced by ROM data table 0x09e5fa48 series; installed by FUN_080f4d90 (game_str scene init) via set_active_page_handler.
+Constants:
+  FRAME_HANDLER_TABLE = 0x09e5fa48 (game_str frame handler function pointer table)
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  FRAME_INDEX_MASK = 0xffffc03f (clear bits[13:6] mask)

@@ -1,0 +1,9 @@
+Loads background tileset pixels and palette from ROM data block to GBA VRAM.
+r0 = data block pointer, format: [count u16][palette_data (count*2 bytes)][width u16][height u16][pixel_data (width*height bytes)].
+Calls copy_bytes_by_halfword(dst=0x06000000, src=pixels_ptr, count=width*height) to write BG char VRAM;
+then calls copy_bytes_by_halfword(dst=0x05000000, src=palette_ptr, count=count*2) to write BG palette RAM.
+Exit: pop{r4,r5,r6,r7}; pop{r0}; bx r0 (Pattern B void, r0 overwritten by lr).
+Indirectly triggered by game_str/starter_deck scene step dispatch chain for scene background tileset initialization.
+Constants:
+  BG_CHAR_VRAM = 0xc0<<0x13 = 0x06000000 (GBA BG character VRAM base)
+  BG_PALETTE_RAM = 0xa0<<0x13 = 0x05000000 (GBA BG palette RAM base)

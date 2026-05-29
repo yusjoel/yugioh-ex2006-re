@@ -1,0 +1,18 @@
+Builds a single deck display entry for the starter_deck selection UI.
+r0=deck_index [0..5]; reads deck pointer and slot count from struct_deck_table (ROM 0x09e5fd54) at deck_index*8.
+Clears EWRAM 0x02001138 for 0x8c*2=0x118 bytes (zero_fill_by_halfword).
+Reads charset_id from [0x02006c2c] bits[2:0] and writes to buffer [+0x17].
+Gets game_str id = deck_index + 0x5e7 (Dragon's Roar=0x5e7 ... Spellcaster's Judgement=0x5ec),
+resolves to localized deck name via game_str_id_to_row + game_str_pointer_table, strncpy 0x16 bytes to buffer [+0].
+Iterates deck card entries (up to slot_count cards): calls apply_delta_to_hand_oam_entry (hand OAM update) and writes card_id to EWRAM 0x02001138 card slot array.
+Finally copy_bytes_by_halfword copies 0x118 bytes from 0x02001138 to 0x02001368 (display target buffer);
+sets bit1 at [0x02001368 + 0x4088].
+Exit: pop{r3,r4,r5}; mov r8,r3; mov r9,r4; mov r10,r5; pop{r4,r5,r6,r7}; pop{r0}; bx r0.
+Constants:
+  STRUCT_DECK_TABLE = 0x09e5fd54 (ROM preset deck pointer/slot count table)
+  DISP_BUF_BASE = 0x02001138 (deck display buffer base)
+  DISP_BUF_SIZE = 0x118 (display buffer size: 0x8c*2 bytes)
+  CHARSET_FIELD_OFFSET = 0x5af4 (from DISP_BUF_BASE to charset field: 0x02006c2c-0x02001138)
+  DECK_NAME_STR_BASE = 0x5e7 (first preset deck name game_str id: Dragon's Roar)
+  DISP_DST_BASE = 0x02001368 (display destination buffer base)
+  DONE_FLAG_OFFSET = 0x4088 (done flag field offset)

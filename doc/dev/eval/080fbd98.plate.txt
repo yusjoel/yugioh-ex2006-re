@@ -1,0 +1,15 @@
+Renders the full set of OAM entries for the starter_deck info panel (7+6 entries).
+r0 = visible_flag: if non-zero, first writes 1 card icon OAM entry at y=0x60/x=0x1c via write_oam_entry_with_tile_inc
+(tile_idx=0x4c=76, 0x4c tiles total; x base determined by [0x020297e4] bits[4:2]*32).
+Then loop1 (r5=0..5, 7 iterations including r5=-1 path): computes x=r5*0x20+0x1c (panel row x), y per loop body,
+each call to write_oam_entry_with_tile_inc writes 1 row OAM.
+loop2 (r5=0..5, 6 iterations): fixed attr 0x88<<0xf=0x440000 + tile offset,
+plus [0x020297e4] bits[4:2]<<6 (tile_base by selected deck) plus 0xe2<<7=0x7100 offset,
+each write_oam_entry_from_packed_args writes 1 supplemental OAM entry.
+Exit: pop{r4,r5}; pop{r0}; bx r0 (Pattern B void).
+Constants:
+  PANEL_STATE_ADDR = 0x020297e4 (starter_deck panel state control byte address)
+  ICON_Y = 0x60 (card icon OAM y = 96 px)
+  ICON_TILE_COUNT = 0x4c (card icon tile count = 76)
+  PANEL_ATTR0_BASE = 0x88<<0xf = 0x440000 (loop2 OAM attr0 type field)
+  PANEL_TILE_BASE_OFFSET = 0xe2<<7 = 0x7100 (loop2 tile base offset)

@@ -1,0 +1,10 @@
+starter_deck/game_str scene third-step sequence dispatcher. Reads current step index from gPrng+0x204 bits[21:14] (8 bits), multiplies by 4 to index ROM dispatch table 0x09e5fa38 and fetches callback pointer, then calls invoke_r0.
+If callback returns non-zero (step done): writes (index+1)&0xff back to bits[21:14] (mask 0xffc03fff); also clears [gPrng+0x204+0x2] field (mask 0xffffc03f, offset 0x206) and [gPrng+0x207] low 6 bits (mask 0x3f).
+If step pointer is NULL: returns r0=1 (sequence done); normal step returns r0=0.
+Exit: pop {r4,r5}; pop {r1}; bx r1 (Sub-case E, r0 is real return value).
+Indirectly triggered by a case handler in ROM dispatch table 0x09e5fa48 (FUN_080fbad0 system).
+Constants:
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  STEP_INDEX_MASK = 0xffc03fff (clear bits[21:14] mask)
+  AUX_FIELD_MASK = 0xffffc03f (clear bits[13:6] mask)
+  LOW6_MASK = 0x3f (clear low 6 bits mask)

@@ -1,0 +1,12 @@
+Pack scene initialization state machine main dispatcher. Reads step state code from gPrng+0x204 bits[13:6],
+subtracts offset 0xa to get table index [0..0x5a] (91 slots); if out of range jumps to exit_pack_init_with_failure.
+If in range, uses index*4 to index ROM function pointer table 0x080fc32c, tail-calls via .hword 0x4687 (mov pc,r0).
+Most indices (5..9 and 24..35 and 37..91) point to exit_pack_init_with_failure (default/empty step).
+Valid steps: indices 0/1/2/3/4/10/11/12/13/14/15/16/17/18/19/20/21/22/23/36 contain real case logic.
+Exit: pop {r1}; bx r1 (Sub-case E, r0 determined by tail-called function).
+Installed as frame handler by FUN_080fdd3c via set_active_page_handler(0x080fc2f5).
+Constants:
+  STEP_FN_TABLE = 0x080fc32c (pack init step function pointer table, 0x5b entries)
+  PRNG_DISPATCH_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  STATE_TABLE_OFFSET = 0xa (step state code to table index offset: index = state - 0xa)
+  STATE_INDEX_MAX = 0x5a (valid table index upper bound: 0..0x5a = 91 slots)

@@ -1,0 +1,11 @@
+title_ex scene BG1 horizontal scroll cycle frame driver.
+Reads 1-byte scroll counter from TITLE_EX_CTX+0x38c ([0x02029eb0+0xe3*4]),
+takes modulo 0xa0 (160 pixels = GBA screen width) to get horizontal offset, calls set_bg1_scroll_xy(offset, 0).
+Then counter +1; if new value > 0xa0, resets to old+0x61 (re-enters cycle from next frame).
+Exit: pop{r4}; pop{r0}; bx r0 (Pattern B void).
+Called once per frame, cycles BG1 horizontally with period of 160 pixels.
+Constants:
+  TITLE_EX_CTX = 0x02029eb0
+  HSCROLL_CTR_OFFSET = 0x38c (ctx field: BG1 h-scroll counter)
+  HSCROLL_PERIOD = 0xa0 (160 pixels = screen width)
+  HSCROLL_WRAP_BIAS = 0x61 (wrap restart bias: old+0x61 resets phase)

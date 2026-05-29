@@ -1,0 +1,8 @@
+game_str/starter_deck scene frame handler installation function.
+Writes 0 to DISPCNT (0x04000000) to disable display, then calls set_active_page_handler(0x080fde9d),
+registering FUN_080fde9c (game_str step sequence dispatcher) as the main-loop frame handler.
+Returns r0=0 (state machine continues). Exit: pop {r1}; bx r1 (Sub-case E, r0=0 is real return value).
+Called by FUN_080fbad0 (game_str scene frame dispatcher) via indirect table as the init case in the step sequence.
+Constants:
+  DISPCNT = 0x04000000 (GBA display control register)
+  FUN_080fde9c_THUMB_PTR = 0x080fde9d (game_str step dispatcher THUMB fn-ptr)

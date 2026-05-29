@@ -1,0 +1,12 @@
+Writes one cursor OAM entry at the current cursor position in the starter_deck 5x3 selection grid.
+Reads 1 byte from [0x02000000+0x6e57] = [0x02006e57], extracts bits[6:3] to get 4-bit grid position index [0..14].
+Computes: mod 5 -> col [0..4]; div 5 -> row [0..2].
+x = col*40 + 0x1c; y encoded to attr0 high word with 0x90<<0xf base.
+Calls write_oam_entry_from_packed_args(packed_attr, r1=0x80, r2=DWORD_080fbd94=0x1804).
+Exit: pop{r4,r5}; pop{r0}; bx r0 (Pattern B void).
+Constants:
+  CURSOR_STATE_BYTE = 0x02006e57 (starter_deck grid cursor state byte; 0x02000000+0x6e57)
+  X_START_OFFSET = 0x1c (x coordinate start offset = 28 px)
+  X_COL_STEP = 40 (column width = col*5*8)
+  Y_ATTR0_BASE = 0x90<<0xf = 0x480000 (OAM attr0 base y offset packed value)
+  OAM_CURSOR_ATTRS = 0x1804 (tile_idx=4, palette=1 packed cursor OAM attributes)

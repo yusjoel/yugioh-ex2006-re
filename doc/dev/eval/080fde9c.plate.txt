@@ -1,0 +1,15 @@
+game_str scene step sequence dispatcher. Reads current step index from gPrng+0x204 bits[21:14],
+looks up ROM function pointer table 0x09e5fd84 then calls current step handler via invoke_r0.
+Step handler returning 0 means continue (this function then calls return_void_handler and returns 0);
+returning non-zero: writes step+1 back to bits[21:14] (using mask 0xffc03fff to clear old value),
+then calls return_void_handler. If table entry is NULL (step index beyond table), returns 1 directly (scene done).
+Exit: pop{r4}; pop{r1}; bx r1 (Sub-case E, r0 passthrough).
+Installed by dispatch_game_text_scene_frame_handler (0x080fbad0) via 0x09e5fa48 frame handler table;
+fn-ptr written at 0x080fbacc (.word 0x080fde9d).
+Constants:
+  gPrng = 0x03000040 (IWRAM global PRNG/state struct)
+  STEP_FIELD_OFFSET = 0x81<<2 = 0x204 (gPrng step field offset)
+  STEP_FIELD_MASK = 0xffc03fff (clear bits[21:14] mask)
+  STEP_TABLE = 0x09e5fd84 (game_str step sequence function pointer table)
+  STEP_DONE = 1 (scene done return value)
+  STEP_CONTINUE = 0 (continue return value)

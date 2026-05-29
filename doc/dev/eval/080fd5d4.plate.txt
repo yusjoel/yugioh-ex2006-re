@@ -1,0 +1,6 @@
+title_ex scene step handler: calls load_title_ex_obj_resource_set with argument 0, then returns 1 indicating step complete.
+Function body is only 6 instructions: push{lr}; movs r0,#0; bl load_title_ex_obj_resource_set; movs r0,#1; pop{r1}; bx r1.
+Fixed return value 1 (step done). Called by dispatch_game_str_scene_step_by_table (0x080fde9c) via indirect table entry
+at game string step sequence table 0x09e5fd84. Single call completes the corresponding step.
+Constants:
+  STEP_DONE = 1 (step handler return value: 1=done, 0=continue)
