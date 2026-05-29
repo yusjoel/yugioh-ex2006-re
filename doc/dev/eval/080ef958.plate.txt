@@ -1,0 +1,30 @@
+Called each frame by the SIO deck-sync driver layer (0x080efb10 / 0x080efe48 / 0x080efeec).
+Advances the two-player deck-sync handshake state machine for the current frame.
+
+r7 (from caller sp save) = current frame context pointer.
+Reads IWRAM [0x030003a0+0x33f] status byte to dispatch three paths:
+  0 = active handshake: configure IME/IE/IF/SIOCNT and initiate transfer
+  1 = poll path: call process_sio_deck_sync_frame, check return bits[1:0],
+      conditionally bl start_sio_master_if_ready
+  other = skip all paths
+
+Returns: r0 = final status halfword read back from [0x030003a0+0x434]
+  (exit via pop{r1};bx r1)
+
+Constants:
+  IWRAM_SIO_BASE = 0x030003a0
+  SIO_STATUS_OFFSET = 0x33f  (status byte: 0=init, 1=poll, other=skip)
+  SIO_LINK_OFFSET = 0x33e    (link flag byte)
+  FRAME_STATUS_OFFSET = 0x434 (frame status halfword)
+  IE_MASK = 0x0000ff7f       (mask to clear IF dedicated bits)
+  IF_ACK = 0x00c0            (acknowledge SIO/VBlank/timer interrupts)
+
+Side effects:
+  [IME] := 0x0000 (disable global interrupts)
+  [IE] &= 0x0000ff7f; [IE] |= 0x0040 (enable SIO interrupt)
+  [IME] := 0x0001 (re-enable global interrupts)
+  [SIOCNT+1] &= ~0x41 (clear SIO control bit0/bit6)
+  [IF] := 0x00c0 (acknowledge SIO/timer interrupts)
+  [0x030003a0+0x33e] := r4 (link flag byte)
+  [0x030003a0+0x4c4] := 0x01 (status byte set to 1)
+  [0x030003a0+0x434 halfword] := process_sio_deck_sync_frame return value (conditional OR bit7)

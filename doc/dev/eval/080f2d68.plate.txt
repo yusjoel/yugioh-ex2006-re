@@ -1,0 +1,21 @@
+indeg=0 (no static callsite, no fn-ptr table reference). Sub-type A.
+Located between render_decimal_digits_jp_signed (0x080f2c4c) and
+commit_line_buffer_to_sprite_vram (0x080f2e4c).
+
+Reads 4 bytes from source array r0[0..3], extracts the low 4 bits of each byte,
+and packs them into a 16-bit halfword using a bit-reversal scheme:
+  byte[0] bits[3:0] -> result[3:0]
+  byte[1..3] bits are shifted and OR'd into successive nibble positions.
+Uses BIC+OR loop to merge the four 1-bit-packed nibble sequences.
+Writes the packed 16-bit value to [r1+0].
+Returns: r0 = ldrh [r1,#0] (readback of written value; exit via pop{r1};bx r1)
+
+r0 = ptr source 4-byte array (each byte's low 4 bits = one nibble)
+r1 = ptr destination halfword (receives merged 16-bit packed value)
+
+Constants:
+  NIBBLE_MASK = 0x0f       (extract low 4 bits per byte)
+  BIT_REVERSAL_SHIFT: bits[1]/[2]/[3] folded by right-shifting 1/2/3 respectively
+
+Side effects:
+  [r1+0x0] halfword := nibble-packed value extracted from r0[0..3]

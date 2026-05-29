@@ -1,0 +1,28 @@
+Called each frame by puzzle scene frame driver FUN_080f4b78.
+Commits the OBJ shadow list to OAM via DMA and resets list state.
+
+No input parameters.
+Returns: void (pop{r4,r5}; pop{r0}; bx r0)
+
+Checks gPrng+0x174 (IWRAM flag halfword) bit0: if 0, skips entirely.
+When bit0=1:
+  - If bit15 set: call sort_obj_shadow_list_by_priority first
+  - Load source address from [gPrng+0x1bc]
+  - Call copy_memory_dma3_chunked (0x400 halfwords = 128 OBJ * 4 halfwords)
+    to DMA-copy shadow list to OAM
+  - Call clear_obj_list_entries_range(0, 128) to clear OBJ list slots 0..127
+  - Write 0x00 to [gPrng+0x1bc]+0x401 and +0x400 (reset list head/tail pointers)
+
+Constants:
+  IWRAM_FLAG_OFFSET = 0x174       (gPrng+0x174 flag halfword; bit0=enable, bit15=sort_needed)
+  SHADOW_LIST_OFFSET = 0x1bc      (gPrng+0x1bc OBJ shadow list base pointer)
+  DMA_COPY_SIZE = 0x400           (halfwords = 128 OBJ * 8 bytes = 0x400 bytes)
+  OAM_ENTRY_COUNT = 0x80          (128 OBJ entries)
+  LIST_FLAG_OFFSET1 = 0x401       (shadow list head flag, DAT_080f4b38)
+  LIST_FLAG_OFFSET2 = 0x400       (shadow list tail flag; 0x80<<3=0x400)
+
+Side effects:
+  OAM (0x07000000) <= copy_memory_dma3_chunked (conditional: bit0=1)
+  [gPrng+0x1bc+0x401] := 0x00 (list head reset)
+  [gPrng+0x1bc+0x400] := 0x00 (list tail reset)
+  clear_obj_list_entries_range: OBJ list slots 0..127 cleared

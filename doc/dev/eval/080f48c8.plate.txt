@@ -1,0 +1,18 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Minimal wrapper: push{lr}; ldr r0, DAT_080f48d8 (= 0x09e5f8d4, ROM key sequence table);
+movs r1, #0xa (sequence length 10); bl match_key_seq_in_circular_buf; pop{r1}; bx r1.
+
+Passes hardcoded ROM address 0x09e5f8d4 and length 10 to match_key_seq_in_circular_buf,
+checking whether the current input history matches this specific 10-key sequence.
+Dedicated detection entry for a particular key sequence (specific sequence content
+requires reading ROM data at 0x09e5f8d4 to confirm).
+
+No input parameters.
+Returns: r0 = match_key_seq_in_circular_buf return value (0=no match / 1=match;
+  exit via pop{r1};bx r1)
+
+Constants:
+  KEY_SEQ_TABLE = 0x09e5f8d4  (ROM key sequence data, 10 entries)
+  SEQ_LEN = 0x0a              (sequence length 10)
+
+Side effects: none directly (forwarded from match_key_seq_in_circular_buf)

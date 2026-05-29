@@ -166,6 +166,23 @@ if ($remote -ne $local) {
 
 ---
 
+### gameboy-asm-book/
+
+**来源**：《Game Boy Assembly Programming for the Modern Game Developer》（电子书 PDF）
+**作用**：面向现代开发者的掌机汇编编程入门读物。
+
+> ⚠️ **平台差异**：本书讲的是**经典 Game Boy（DMG，Sharp LR35902 / 类 Z80 8 位指令集）**，而本项目目标是 **GBA（ARM7TDMI，ARM/Thumb 指令集）**——两者 CPU 和指令集完全不同，书中的具体汇编代码**不可直接套用**。
+>
+> 参考价值在于**通用方法论**：掌机硬件寄存器/中断/DMA 思维、ROM/RAM 内存布局观念、图形与瓦片数据组织方式、以及"贴着硬件读汇编"的逆向心态——这些跨平台相通，可作为背景读物。
+
+| 文件 | 说明 |
+|------|------|
+| `Game_Boy_Assembly_Programming_for_the_Modern_Game_Developer.pdf` | 全书 PDF，约 400 KB |
+
+迁移时间：2026-05-29。
+
+---
+
 ## 注意事项
 
 - 首次克隆仓库后，以上子目录均为空（不存在）。根据实际需要手动下载或迁移。

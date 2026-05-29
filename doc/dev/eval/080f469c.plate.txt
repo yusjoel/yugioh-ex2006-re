@@ -1,0 +1,22 @@
+Called by FUN_080f46dc (puzzle scene init sequence) during puzzle scene startup.
+Dedicated function to zero-clear and initialize the puzzle cursor state.
+
+No input parameters.
+Returns: void (pop{r4}; pop{r0}; bx r0)
+
+Loads EWRAM base 0x02006c30. Calls zero_fill_by_halfword([0x02006c30], 8 halfwords = 16 bytes)
+to clear the cursor state region. Then applies three rounds of rsbs mask operations on
+[0x02006c30+0x00] byte: AND ~2 AND ~3 (clear bit1/bit0), OR 4 (set bit2),
+AND ~9 AND ~0xf0 (clear bit3/bits4-7), leaving initial mode bits = 0x04.
+Finally writes 0x03 to [0x02006c30+0x03..+0x07] (5 bytes = initial cursor/option values).
+
+Constants:
+  CURSOR_STATE_BASE = 0x02006c30  (EWRAM cursor state region)
+  ZERO_FILL_COUNT = 0x08          (8 halfwords = 16 bytes)
+  INIT_FLAG = 0x04                (bit2, initialization complete flag)
+  CURSOR_INIT_VALUE = 0x03        (initial value for 5 cursor/direction bytes)
+
+Side effects:
+  [0x02006c30..+0x0f] 8 halfwords := 0x0000 (zero_fill_by_halfword)
+  [0x02006c30+0x00] byte := 0x04 (initial mode/flag byte)
+  [0x02006c30+0x03..+0x07] 5 bytes := 0x03 (initial cursor values)

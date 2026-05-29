@@ -1,0 +1,33 @@
+indeg=0 (no static callsite, no fn-ptr reference). Sub-type A.
+Located in the same region as init_font_jp_render_context; deeply interacts
+with EWRAM glyph context at 0x02006ed0.
+
+Renders one line of font_jp glyph data to the destination tile buffer.
+
+Entry checks [0x02006ed0+0x14] bit7 (busy/active flag): if set, returns 0 immediately.
+Otherwise loads the destination write pointer from [+0x18] and executes a
+per-tile per-character BIC+OR color nibble write loop:
+  - reads 4-byte blocks from line_buffer [base+0x20]
+  - extracts color nibble from each byte
+  - applies masks 0xfff0/0xff0f/0xf0ff/0x0fff to BIC-clear then OR-write each nibble field
+  - advances source pointer +4 / dest pointer +2 per character
+  - outer loop steps dest row by [+0x2a]*0x20 (tile_width * 32)
+Returns: r0 = 0 (row render complete) / 1 (rows remaining) / 0 (busy early exit)
+
+r0/r1: internal loads at entry (not independent APCS parameters)
+
+Constants:
+  EWRAM_CTX = 0x02006ed0
+  BUSY_FLAG = 0x80           (bit7 of [+0x14])
+  NIBBLE_MASKS = 0xfff0/0xff0f/0xf0ff/0x0fff (4 nibble field BIC masks)
+  MAX_CHARS_PER_LINE = 0x0f  (inner loop upper bound: cmp r0,#0x0f)
+  TILE_ROW_STRIDE = 0x20     (4bpp tile row = 32 bytes)
+
+Side effects:
+  [dest tile write ptr (0x02006ed0+0x1c)] halfwords: BIC+OR per-char color nibble writes
+  [0x02006ed0+0x30] halfword += 1 (char column count)
+  [0x02006ed0+0x32] halfword += 1 (tile column index)
+  [0x02006ed0+0x2e] halfword += 1 (row index)
+  [0x02006ed0+0x18] word += [+0x2a]*0x20 (dest ptr advances to next row)
+  [0x02006ed0+0x2c] halfword += 1 (row complete count)
+  [0x02006ed0+0x15] byte bits[2:0] &= ~0x05 (clear dirty/init flags)

@@ -1,0 +1,17 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Forms a numeric quantization utility sibling cluster with round_up_to_decade (0x080f5558)
+and compute_half_floor (0x080f5588).
+
+Computes ceil(r0 / 2): ceiling division by 2.
+Formula: (r0*5 + 5) / 10 = ceil(r0/2)
+Examples: ceil(1/2)=1, ceil(2/2)=1, ceil(3/2)=2, ceil(4/2)=2
+Typical use: computing the upper half tile count in dual-layer rendering.
+
+r0 = s32 input_value (character width or pixel value)
+Returns: r0 = ceil(input_value / 2) (exit via pop{r1};bx r1)
+
+Constants:
+  DIVISOR = 0x0a     (divide by 10, equivalent to /2 via *5/10)
+  HALF_BIAS = 0x05   (bias for ceiling rounding)
+
+Side effects: none

@@ -1,0 +1,30 @@
+Called by FUN_080ed484 (SIO multiplayer frame driver, indeg>=4) after receiving deck data from peer.
+Appends a deck-sync packet to the IWRAM SIO buffer with checksum.
+
+r0 = destination base pointer (IWRAM deck buffer offset)
+r1 = entry count to append [0..255]
+
+Reads IWRAM [0x030003a0+0x42c] bit[0] as internal player_side index (not an APCS parameter).
+Flow:
+  1. Check [base+0x83*2+player*2] halfword -- if nonzero return 0 (buffer busy)
+  2. Validate r1-1 <= 0xff -- if out of range return 1
+  3. Copy r1*2 halfwords via bios_cpu_set to IWRAM destination
+  4. Call compute_sio_link_checksum, write result to tail
+Returns: r0 = 1 (success) / 0 (buffer busy)
+
+Note: r2 is NOT an APCS parameter -- at entry, after push, function immediately
+ldrb from IWRAM [0x030003a0+0x42c] and extracts bit[0] via lsls/lsrs, overwriting r2.
+
+Constants:
+  IWRAM_SIO_BASE = 0x030003a0
+  BUSY_OFFSET = 0x42c        (halfword, nonzero = refuse write)
+  MAX_ENTRIES = 0xff         (entry count upper bound)
+  DATA_BUF_OFFSET = 0x414   (source data halfword array)
+  CHECKSUM_BUF = 0x030003aa  (checksum destination, DAT_080efb0c)
+
+Side effects:
+  [0x030003a0+0x83*2+player*2] halfword := rounded entry position value
+  [0x030003a0+0x83*2+player*2] halfword := entry_count+1 (updated count)
+  [0x030003a0+0x414+player*2] halfword := 0x0000 (clear old data)
+  [0x030003aa] := compute_sio_link_checksum result (checksum)
+  IWRAM write via bios_cpu_set: dest 0x030003aa..+N halfwords

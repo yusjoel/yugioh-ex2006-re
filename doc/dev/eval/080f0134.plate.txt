@@ -1,0 +1,17 @@
+indeg=0 (Sub-type A: no callsite, no fn-ptr table reference).
+Utility function in the glyph rendering subsystem.
+Counts the number of column positions (characters) in a byte sequence.
+
+r0 = byte sequence pointer (game string or glyph encoding sequence)
+Reads EWRAM [0x02006c2c] bits[2:0] to determine rendering mode:
+  - If mode bits nonzero: fast path -- scan r0 bytes until 0x00, count each byte (+1 per byte)
+  - If mode bits zero: double-byte path -- if byte bit7=1 advance pointer by 2 (double-byte char),
+    else advance by 1; r3 increments by 1 per character in both sub-paths
+Returns: r0 = r3 = character/column position count
+
+Constants:
+  EWRAM_SETTINGS = 0x02006c2c (global settings, bits[2:0] = render mode)
+  RENDER_MODE_MASK = 0x07     (low 3 bits)
+  DOUBLE_BYTE_FLAG = 0x80     (bit7=1 -> double-byte glyph, advance 2)
+
+Side effects: none (pure read-only traversal)

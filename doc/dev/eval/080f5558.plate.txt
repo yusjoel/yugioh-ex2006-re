@@ -1,0 +1,19 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Located after count_rendered_glyph_units (0x080f5522).
+Forms a numeric quantization utility sibling cluster with compute_half_ceil (0x080f5570)
+and compute_half_floor (0x080f5588).
+
+Rounds r0 up to the nearest multiple of 10.
+Formula: (r0 + 5) / 10 * 10
+The +5 bias maps:  x in [0..4] -> 0,  x in [5..14] -> 10, etc.
+Typical use: quantizing pixel coordinates or character widths to 10-pixel tile units.
+
+r0 = s32 input_value (pixel coordinate or character width)
+Returns: r0 = round_nearest_10(input_value) (exit via pop{r1};bx r1)
+
+Constants:
+  DECADE_BIAS = 0x05       (bias for round-to-nearest-10)
+  DIVISOR = 0x0a           (divide by 10)
+  MULTIPLIER_SHIFT: q*5 = q<<2+q, then lsls #1 -> q*10
+
+Side effects: none

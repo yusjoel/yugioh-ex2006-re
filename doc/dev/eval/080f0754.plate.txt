@@ -1,0 +1,25 @@
+Called by FUN_080f07ec and FUN_080f08ec (glyph row render loops) for each character row encoding pass.
+Encodes 4bpp nibble pairs from a ROM lookup table into a tile row word.
+
+r0 = destination tile row pointer (VRAM word ptr; writes [r0+0x0], [r0+0x20], [r0+0x40])
+r1 = y_offset row offset (shift right 3 = tile row number; low 3 bits = pixel row within tile)
+r2 = x_offset column offset (shift right 1 = nibble column)
+r3 = color_value (multiplied by nibble coefficient and written into tile word)
+r7/sp[0x14] (caller-frame): pixel_word encoding word
+  (bits[31:24]/[27:24]/[23:16] = nibble indices for three rows)
+
+Returns: void (pop{r4,r5,r6,r7}; pop{r0}; bx r0)
+
+Fetches upper/lower nibble indices from ROM table 0x09e4f422 (glyph nibble LUT),
+computes BIC+OR mask for color encoding, then writes color nibbles to tile row words.
+Third row write ([r0+0x40]) is conditional on pixel_word high byte being nonzero.
+
+Constants:
+  NIBBLE_LUT = 0x09e4f422    (ROM glyph nibble encoding table, 16 entries)
+  TILE_ROW_STRIDE = 0x20     (4bpp tile row byte count = 32)
+  MAX_NIBBLE_IDX = 0x0f      (nibble index mask)
+
+Side effects:
+  [r0 + 0x00] word := BIC/OR color nibble (row 0)
+  [r0 + 0x20] word := BIC/OR color nibble (row 1)
+  [r0 + 0x40] word := BIC/OR color nibble (row 2, conditional: pixel_word high byte nonzero)

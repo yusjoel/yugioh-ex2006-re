@@ -1,0 +1,26 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Game custom formatter variant with decimal field support.
+
+Scans format string r1, recognizing "@%Nd" and "%Nd" numeric format placeholders
+(N = '0'..'9' precision digit), and "@%d" / "%d" zero-width placeholders.
+When a numeric placeholder is found: computes leading spaces needed for width N,
+outputs space padding to r0, then calls format_decimal_byte_to_buf to write digit.
+When "%d" (N=0): writes null byte r3 placeholder directly.
+All other bytes are copied byte by byte.
+
+r0 = ptr destination output buffer
+r1 = ptr format string (contains %Nd placeholders)
+r2 = s32 integer value (used for digit width calculation and write)
+r3 = u8 null/separator byte (written in "%d" zero-width path)
+Returns: void (pop{r4,r5,r6,r7}; pop{r0}; bx r0)
+
+Constants:
+  CTRL_PREFIX = 0x40      (control escape prefix)
+  FORMAT_SPEC = 0x25      (= '%')
+  TYPE_DECIMAL = 0x64     (= 'd')
+  DIGIT_BASE = 0x30       (= '0', ASCII base for width digit)
+  MAX_WIDTH_DIGIT = 0x09  (width digit upper bound)
+  PAD_CHAR = 0x20         (= ' ', leading space padding)
+
+Side effects:
+  [r0..r0+N] bytes := formatted string

@@ -1,0 +1,19 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Forms a symmetric sibling pair with sort_array_by_callback_a (0x080f5bd4).
+Logic is identical to sort_array_by_callback_a: outer swap_flag loop + inner invoke_r3
+comparison + three copy_bytes_by_halfword element swaps.
+The only observable difference from sort_array_by_callback_a is in the internal
+high-register save/restore ordering (.hword 0x466a vs 0x466f), possibly corresponding
+to ascending vs descending comparison direction or a different internal temp buffer layout.
+
+r0 = ptr array base address [0..N-1]*stride
+r1 = u16 last_index [0..N-1]
+r2 = u16 element_stride element byte width
+r3 = ptr compare_callback fn-ptr
+Returns: void (pop{r3,r4,r5}; pop{r4,r5,r6,r7}; pop{r0}; bx r0)
+
+Constants:
+  WORD_ALIGN_ROUND = 0x3  (same as sort_array_by_callback_a)
+
+Side effects:
+  array [r0..r0+r1*r2] elements reordered in place

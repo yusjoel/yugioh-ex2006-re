@@ -1,0 +1,28 @@
+indeg=0 (no static callsite, no fn-ptr reference). Sub-type A.
+Located immediately before FUN_080f4174; directly interacts with the EWRAM
+glyph render context at 0x02006ed0.
+
+Initializes the font_jp color fields and status flag in the render context.
+
+r0 = palette data pointer (written to [0x02006ed0+0x18])
+r1 = color_attr halfword (palette/color index, written to [0x02006ed0+0x2a])
+r2 = color_index [0..15] (AND 0x0f -> nibble; expanded into [+0x28])
+Returns: void (pop{r4,r5}; pop{r0}; bx r0)
+
+Extracts r2 AND 0x0f nibble, then builds a 3-byte pattern
+(nibble | nibble<<4 | nibble<<8) into [0x02006ed0+0x28] as color_lo halfword.
+Writes r1 to [+0x2a] as color_hi, r0 to [+0x18] as palette ptr.
+Clears [+0x2c..+0x32] (4 halfwords := 0x0000).
+Finally OR-sets bit2 of [+0x15] to mark color as initialized.
+
+Constants:
+  EWRAM_CTX = 0x02006ed0     (font_jp render context base)
+  COLOR_NIBBLE_MASK = 0x0f   (r2 low 4 bits = color nibble)
+  STATUS_FLAG_BIT2 = 0x04    (OR-set [+0x15] = color initialized flag)
+
+Side effects:
+  [0x02006ed0+0x28] halfword := nibble-replicated color pattern
+  [0x02006ed0+0x2a] halfword := r1 (color_attr)
+  [0x02006ed0+0x18] word    := r0 (palette ptr)
+  [0x02006ed0+0x2c..+0x32] 4 halfwords := 0x0000
+  [0x02006ed0+0x15] byte bit2 := 1 (OR-set)

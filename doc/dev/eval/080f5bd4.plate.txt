@@ -1,0 +1,22 @@
+indeg=0 (Sub-type A: no static callsite, no fn-ptr reference).
+Forms a symmetric sibling pair with sort_array_by_callback_b (0x080f5c78).
+Both share nearly identical bodies (each containing invoke_r3 + copy_bytes_by_halfword x3).
+
+In-place array sort using a callback comparator (bubble sort variant).
+Outer loop traverses unsorted portion; inner loop calls invoke_r3(elem_a, elem_b):
+if return value < 0, swaps the two elements using three copy_bytes_by_halfword calls
+and sets swap_flag. Repeats until no swap occurs.
+
+r0 = ptr array base address
+r1 = u16 last_index (element count - 1) [0..N-1]
+     (u16-truncated at entry; stored in high register r10)
+r2 = u16 element_stride element byte width [1..N]
+     (u16-truncated at entry; stored r6)
+r3 = ptr compare_callback fn-ptr (stored at [r7,#4]; called indirectly via invoke_r3)
+Returns: void (pop{r3,r4,r5}; pop{r4,r5,r6,r7}; pop{r0}; bx r0)
+
+Constants:
+  WORD_ALIGN_ROUND = 0x3  (r2+3 >> 2 = ceil(stride/4), copy in words)
+
+Side effects:
+  array [r0..r0+r1*r2] elements reordered in place (based on compare_callback)

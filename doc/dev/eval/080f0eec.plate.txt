@@ -1,0 +1,24 @@
+indeg=0 (Sub-type A: no callsite, no fn-ptr table reference).
+Located near the font_jp glyph render cluster (0x080f0754/0x080f07ec/0x080f08ec);
+structure is highly symmetric with other glyph render functions in the same region.
+
+Renders four consecutive glyph bitmaps into a tile buffer.
+At entry, saves r0/r1/r2/r3 to high registers (r8..r11 via .hword 0x46XX encoding).
+Then makes four calls to render_glyph_bitmap_to_tile_buf, advancing the destination
+tile pointer by add r8,#0x20 (32 bytes = one tile row stride) between each call.
+Parameters r0=x+char_position, r1=y_row, r2=color_attr are passed via high registers
+across the four calls.
+
+r0 = x_start starting x pixel coordinate [0..239] (u16-truncated at entry, stored r4)
+r1 = y_row row index (u16-truncated at entry, stored r5)
+r2 = color_attr color attribute (saved to high register r9)
+r3 = tile_buf destination tile buffer pointer (saved to r7)
+Returns: void (pop{r3,r4,r5}; pop{r4,r5,r6,r7}; pop{r0}; bx r0)
+
+Constants:
+  TILE_ROW_STRIDE = 0x20  (= 32 bytes, 4bpp tile row stride)
+  GLYPH_X_STEP = 0x08    (x advance 8 pixels per glyph)
+
+Side effects:
+  Four calls to render_glyph_bitmap_to_tile_buf, writing tile pixel data
+  at [r8]...[r8+0x60] across four consecutive tile positions.

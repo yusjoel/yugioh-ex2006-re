@@ -1,0 +1,27 @@
+Called by FUN_080fb6c0 (pack/duel scene init sequence) after
+store_ewram_ctx_ptr_and_clear_mode_flags, to initialize blend rendering state
+at the fade-in start point.
+
+No input parameters.
+Returns: void (bx lr)
+
+Clears gPrng+0x200 (gFrameCounter byte) bit6 (blend_active flag) and sets
+bits[4:0] to 0x1f (BLDY_MAX, maximum opacity masking).
+Writes BLDCNT=0x3fbf (all BG layers and Backdrop participate in blend,
+bit6=OBJ excluded) and BLDY=bits[4:0] (read back gFrameCounter bits[5:0]).
+Sibling of apply_blend_fadeout_flat (0x080f57d0): that function uses
+BLDCNT=0x3fff+BLDY=0x1f for forced full masking; this function sets
+BLDCNT=0x3fbf+BLDY=max to initialize the fade-in start point.
+
+Constants:
+  EWRAM_BLEND_CTX = gPrng + 0x200 = 0x03000240  (gFrameCounter byte)
+  BLEND_ACTIVE_BIT = 0x40    (bit6, AND ~0x40 to clear)
+  BLDY_INIT = 0x1f           (bits[4:0] OR-set, initial max masking)
+  BLDCNT_VAL = 0x3fbf        (all BG/BD in blend, OBJ bit6 excluded)
+  BLDY_REG = 0x04000054      (GBA BLDY register)
+  BLDCNT = 0x04000050        (GBA BLDCNT register)
+
+Side effects:
+  [gPrng+0x200] byte := (&~0x40) | 0x1f (clear bit6, set bits[4:0]=0x1f)
+  [BLDCNT (0x04000050)] halfword := 0x3fbf
+  [BLDY (0x04000054)] halfword := gPrng+0x200 bits[5:0] (= 0x1f)

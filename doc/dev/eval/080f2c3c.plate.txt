@@ -1,0 +1,21 @@
+Sibling of render_text_with_u16_width_a (0x080f2c1c) and render_text_with_u16_width (0x080f2c2c).
+All three share the same body: push{lr}; lsls r2,r2,#0x10; lsrs r2,r2,#0x10; bl text_render_wrapper;
+pop{r1}; bx r1. The only difference is the bl offset to text_render_wrapper.
+
+Zero-extends r2 (width/column parameter) to u16 before forwarding to text_render_wrapper,
+clearing any sign-extension in the high 16 bits of r2.
+
+indeg=0: no static callsite and no fn-ptr reference; Sub-type A
+(grep ".word 0x080f2c3d" asm/all.s -> 0 hits).
+Likely a spare fn-ptr slot candidate, contrasting with the higher indeg of its two siblings.
+
+r0: forwarded as-is to text_render_wrapper r0
+r1: forwarded as-is to text_render_wrapper r1
+r2: u16 width/column_offset (high 16 bits zeroed before passing)
+r3: forwarded as-is to text_render_wrapper r3
+Returns: void (forwarded from text_render_wrapper; pop{r1};bx r1)
+
+Constants:
+  U16_MASK_SHIFT = 0x10  (lsls/lsrs pair removes high 16 bits of r2)
+
+Side effects: forwarded from text_render_wrapper (BG tile / sprite VRAM write)
