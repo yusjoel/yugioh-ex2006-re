@@ -1,0 +1,7 @@
+check_equip_slot_eligible_with_zone_success_count: Equip slot activation eligibility predicate (complex zone traversal). r0=card_slot_ptr. Saves/restores caller high registers r8/r9/r10 (prologue .hword 0x4645/0x464e/0x4657; epilogue 0x4698/0x46a1/0x46aa). Flow: (1) calls check_neo_daedalus_placement_eligible -- returns 0 on fail; (2) computes player monster zone count upper bound (gP1LifePoints[player*0x868+0xc]); if r9 (fail_count) >= bound jumps to result check; (3) iterates all monster zone slots: compares set_code bits[11:6] against slot_ptr set_code; on match calls check_card_field5_is_nonzero; if pass calls eval_equip_placement_full_check; if eval nonzero: sp[0] (success_count) +1; if eval 0: r9 (fail_count) +1; (4) after loop: sp[0]>0 AND r9<=1 returns 1, else 0. success_count > 0 AND fail count <= 1 means at least one placeable slot with acceptable failures.
+
+Constants:
+- ZONE_COUNT_OFFSET  = 0xc      (gP1LP[player*0x868]+0xc, from DAT_0805e67c=0x0201c4ec = gP1LP+0xc)
+- MONSTER_ZONE_BASE  = 0x120    (0x90<<1)
+- PLAYER_STRIDE      = 0x868
+- ZONE_IDX_STRIDE    = 0x14     (zone_idx*20 bytes)

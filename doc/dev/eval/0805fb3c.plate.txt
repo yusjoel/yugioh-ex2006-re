@@ -1,0 +1,5 @@
+check_equip_slot_eligible_with_empty_monster_zones_and_handlers: Equip slot activation eligibility predicate (no monster zone + effect handler loop). r0=card_slot_ptr, r1=player_id. Five sequential checks: (1) check_neo_daedalus_placement_eligible -- returns 0 on fail; (2) count_occupied_monster_zones(player_id) -- if nonzero (monsters present) returns 0; (3) check_equip_slot_chain_absent(slot_ptr, player_id) -- if chain nonempty returns 0; (4) reads gP1LifePoints[player_id*0x868+0xc] for zone_count upper bound, loops zone_idx=[0..zone_count-1]: calls dispatch_effect_handler_by_card_id(player_id, card_id, zone_idx) -- if any returns nonzero immediately returns 1; (5) all zones exhausted with no match returns 0.
+
+Constants:
+- ZONE_COUNT_OFFSET = 0xc  (gP1LP[player*0x868]+0xc)
+- PLAYER_STRIDE     = 0x868

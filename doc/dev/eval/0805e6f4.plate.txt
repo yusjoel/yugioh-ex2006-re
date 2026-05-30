@@ -1,0 +1,7 @@
+check_equip_slot_eligible_without_banisher_mode1: Equip slot activation eligibility predicate. r0=card_slot_ptr. Two checks: (1) calls count_field_copies_of_card(0x1332=Banisher of the Light, passcode=61528025) -- if present returns 0; (2) if Banisher of the Light absent, extracts player_id and zone_idx, calls dispatch_equip_slot_scan_with_field6_guard with max_count=1, stack_arg=0, mode=1; returns 1 if nonzero, else 0. Banisher of the Light on field removes non-Spellcaster monsters from play; this predicate guards absence then performs mode=1 single-slot scan.
+
+Constants:
+- BANISHER_OF_LIGHT_ID = 0x1332  (Banisher of the Light, passcode=61528025)
+- MAX_SCAN_COUNT       = 1
+- SCAN_STACK_ARG       = 0
+- SCAN_MODE            = 1

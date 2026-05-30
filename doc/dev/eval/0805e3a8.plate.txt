@@ -1,0 +1,4 @@
+check_equip_slot_eligible_with_pool_and_hand_slot: Equip slot activation eligibility predicate (indeg=1). r0=card_slot_ptr, r1=player_id. Three sequential checks: (1) extracts zone_idx (halfword[+4] bits[10:4]) and card_id (halfword[+0]), calls check_zone_card_id_in_node_pool(zone_idx, card_id) -- if nonzero (already in pool) returns 0; (2) calls check_neo_daedalus_placement_eligible(slot_ptr, player_id) -- if 0 returns 0; (3) extracts player_id (bit0) and set_code (bits[10:4]), calls find_hand_slot_idx_by_set_code(player_id, set_code) -- if < 0 returns 0 (no matching combo card in hand). All passed returns 1.
+
+Constants:
+- ZONE_IDX_MASK = bits[10:4]  (lsls#0x11 / lsrs#0x17 -> [0..63])

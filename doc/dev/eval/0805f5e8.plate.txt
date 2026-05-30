@@ -1,0 +1,5 @@
+check_effect_node_zone_activation_dual_state: Effect node zone activation state query. r0=effect_node_ptr. Executes two count_effect_node_zone_activations passes: (1) writes slot[+0xa]=1 (halfword, activate temp flag); calls count_effect_node_zone_activations -- if 0 returns 0 (fail); (2) if first count nonzero, writes slot[+0xa]=0 (clear temp flag); calls count_effect_node_zone_activations again -- if 0 returns 0 (fail); (3) if second count also nonzero, returns 2. Result: 2=dual activation confirmed, 0=either phase failed. Verifies effect node has zone activations under both flag=1 and flag=0 states.
+
+Constants:
+- FLAG_HALFWORD_OFFSET = 0xa  (effect_node temp activation flag field offset; strh r0,[r4,#0xa])
+- ACTIVATION_SUCCESS   = 2    (return value when both counts nonzero)

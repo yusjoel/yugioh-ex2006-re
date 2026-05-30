@@ -1,0 +1,8 @@
+invoke_effect_node_handler_with_zone_flag_guard: Effect node handler dispatch function (indeg=6 hub). r0=effect_node_ptr, r1=player_side_byte, r2=slot_type_byte. Flow: (1) r0=0 returns 0 immediately; (2) extracts player_id_bit (r7 bit0), computes zone_entry = zone_base + slot_type*0x14*... + player_id*0x868 + 0x0201c510, checks zone_word bit12 (lsls#0x13 -> bit31 == original bit12) -- if bit is 0 returns 0; (3) packs (r7 bit0, r2) combined byte, calls read_effect_slot_side_and_type -- if result matches packed value returns 0 (side/type already matched, no re-dispatch needed); (4) writes [gDuelEffectBase+0x4c0] = player_id_bit (set current active side flag); (5) calls invoke_effect_node_handler_3arg(effect_node, r7, r5); (6) writes [gDuelEffectBase+0x4c0] = 0 (clear active side flag). Returns invoke_effect_node_handler_3arg return value (0/nonzero).
+
+Constants:
+- ZONE_BASE        = 0x0201c510
+- PLAYER_STRIDE    = 0x868
+- ZONE_SLOT_STRIDE = 0x14  (slot_type*20)
+- ZONE_EFFECT_BIT  = bit12  (lsls#0x13 -> bit31 == original bit12)
+- EFFECT_SIDE_FLAG = 0x0201b290+0x4c0 = 0x0201b750

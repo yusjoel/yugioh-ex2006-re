@@ -1,0 +1,5 @@
+check_equip_slot_eligible_type_b0_with_bit17_and_not_bit14: Equip slot activation eligibility predicate (zone_type_b0 base + word[+0x14] dual-bit gate). r0=card_slot_ptr. Two checks: (1) calls check_equip_slot_eligible_by_zone_type_b0_with_field5 -- if 0 returns 0; (2) reads slot[+0x14] (word), checks bit17 and bit14: if bit17=0 (lsls#0xe -> result >= 0) returns 0; if bit14=1 (lsls#0x11 -> result < 0) returns 0. Requires bit17=1 AND bit14=0. Both checks passed returns 1. Part of check_equip_slot_eligible_* sibling cluster; adds word[+0x14] bit combination check on top of zone_type_b0 base predicate.
+
+Constants:
+- BIT17_CHECK = slot[+0x14] bit17 -- lsls#0xe -> bge fail (requires bit17=1)
+- BIT14_CHECK = slot[+0x14] bit14 -- lsls#0x11 -> blt fail (requires bit14=0)

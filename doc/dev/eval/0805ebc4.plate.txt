@@ -1,0 +1,7 @@
+check_equip_slot_eligible_max1_or_byte3_flag: Equip slot activation eligibility predicate (three-value return, indeg=1). r0=card_slot_ptr. Extracts player_id and zone_idx, calls dispatch_equip_slot_scan_with_field6_guard with max_count=1, stack_arg=1, mode=0: if nonzero returns 2 (high-priority success). If scan returns 0, reads slot[+3] bits[5:4] (mask 0x30): if both bits clear (0x30 AND result==0) returns 1 (secondary success); else (bits[5:4] nonzero) returns 0 (fail). Three-value result: 2=scan success, 1=byte3 flags clear, 0=fail. Caller 0x08057470 uses r0==2 as trigger threshold.
+
+Constants:
+- MAX_SCAN_COUNT  = 1
+- SCAN_STACK_ARG  = 1
+- SCAN_MODE       = 0
+- BYTE3_FLAG_MASK = 0x30  (bits[5:4])

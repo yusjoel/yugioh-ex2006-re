@@ -1,0 +1,9 @@
+check_equip_slot_eligible_type180_or_1c0_cross_player_handlers: Equip slot activation eligibility predicate (type 0x180/0x1c0 + cross-player handler loop). r0=card_slot_ptr, r1=player_id. Flow: (1) type_field = halfword[+2] bits[11:6] (via mask 0xfc0); if type_field != 0x180 (0xc0<<1) and != 0x1c0 (0x180+0x40) returns 0; (2) reads slot[+0x14] bit9 (lsls#0x16/lsrs#0x1f -> bit9); if bit9 == player_id bit0 returns 0 (must be opponent slot); (3) check_neo_daedalus_placement_eligible -- returns 0 on fail; (4) reads gP1LifePoints[player_id*0x868+0xc] for zone_count, loops zone_idx=[0..zone_count-1]: calls dispatch_effect_handler_by_card_id(player_id, card_id, zone_idx) -- on match returns 1; (5) no match returns 0.
+
+Constants:
+- TYPE_FIELD_MASK = 0xfc0     (0xfc<<4)
+- TYPE_180        = 0x180     (0xc0<<1; python: hex(0xc0<<1)=0x180)
+- TYPE_1C0        = 0x1c0     (0x180+0x40)
+- SLOT_BIT9       = bit9      (slot[+0x14] lsls#0x16/lsrs#0x1f)
+- ZONE_COUNT_OFF  = 0xc
+- PLAYER_STRIDE   = 0x868

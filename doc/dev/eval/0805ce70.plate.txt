@@ -1,0 +1,7 @@
+check_equip_slot_eligible_with_lp_slot_flag: Equip slot activation eligibility predicate. r0=card_slot_ptr. Three sequential checks: (1) calls check_neo_daedalus_placement_eligible -- returns 0 on fail; (2) reads gP1LifePoints[player_id*0x868+0x11c] (halfword), AND 0x1 -- if nonzero returns 0 (LP slot flag already occupied); (3) reads gP1LifePoints[player_id*0x868+0x10] (word) -- if 0 returns 0 (LP slot not active). All checks passed: returns 1. Part of check_equip_slot_eligible_* sibling cluster; guards LP slot activation flag is not occupied and base LP slot is active.
+
+Constants:
+- LP_SLOT_FLAG_OFFSET = 0x11c  (0x8e<<1)
+- LP_SLOT_FLAG_MASK   = 0x1
+- LP_BASE_OFFSET      = 0x10
+- PLAYER_STRIDE       = 0x868

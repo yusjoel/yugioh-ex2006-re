@@ -1,0 +1,4 @@
+check_equip_slot_eligible_without_reserved_field_card: Equip slot activation eligibility predicate. r0=card_slot_ptr, r1=player_id. Checks that reserved-field card (card_id=0x12fb, no released card) is not on the field: calls count_field_copies_of_card(0x12fb); if count > 0 returns 0 (reserved card present). If card not on field, calls dispatch_effect_for_neo_daedalus_eligible_slot(r0, r1) and passes through its return value (1=allow, 0=deny). Part of check_equip_slot_eligible_* sibling cluster; guard condition: reserved card absent before dispatching neo_daedalus effect slot check.
+
+Constants:
+- RESERVED_CARD_ID = 0x12fb  (no released card name, reserved icid)

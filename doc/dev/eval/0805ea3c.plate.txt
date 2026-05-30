@@ -1,0 +1,6 @@
+check_equip_slot_eligible_with_type_e_zone_and_toon: Equip slot activation eligibility predicate (multi-compound conditions). r0=card_slot_ptr, r1=player_id. Uses high register save frame (prologue .hword 0x4647/0x4688). Six sequential checks: (1) extracts player_id and zone_type_id=0x1415, calls get_node_entity_id_in_slot(player_id, 0x1415, 0xb); (2) check_neo_daedalus_placement_eligible; (3) entity_id >= 0; (4) find_zone_descriptor_by_slot_id parses zone_descriptor, extracts zone_type(byte[0]), player(byte[1]), zone_idx; (5) zone_type must == 0xe; (6) check_card_field5_is_nonzero and check_card_has_equip_placement_type both pass; final condition: if check_card_stat_field8_is_6 succeeds, skip check_toon_world_equip_present, else check_toon_world_equip_present must pass. All conditions met returns 1.
+
+Constants:
+- ZONE_TYPE_E      = 0xe
+- ENTITY_TYPE_1415 = 0x1415
+- SLOT_TYPE_B      = 0xb

@@ -1,0 +1,5 @@
+check_equip_slot_eligible_type80_neo_daedalus_hand: Equip slot activation eligibility predicate (type=0x80 dedicated path). r0=card_slot_ptr. Three sequential checks: (1) halfword[+2] bits[11:6] (type_field via mask 0xfc0) must equal 0x80, else returns 0; (2) calls check_neo_daedalus_placement_eligible -- returns 0 on fail; (3) extracts player_id (bit0) and set_code (halfword[+4] bits[10:4]), calls find_hand_slot_idx_by_set_code -- if < 0 returns 0. All passed returns 1. Differs from check_equip_slot_eligible_type580_or_neo_daedalus_hand (0x0805e518): this function handles only type=0x80 single path, no type=0x580 fast-pass branch.
+
+Constants:
+- TYPE_FIELD_MASK = 0xfc0  (0xfc<<4)
+- TYPE_80         = 0x80

@@ -1,0 +1,10 @@
+check_equip_slot_eligible_with_field_state_and_chain: Equip slot activation eligibility predicate. r0=card_slot_ptr, r1=u32 (must be 0, else immediate fail). Five sequential checks: (1) r1 != 0 returns 0; (2) gP1LifePoints[player_id*0x868+0x1ce8] word must equal card_slot_ptr player_id (field state pairing check); (3) gP1LifePoints[player_id*0x868+0x10d0] word bit0 must be 0 (global state flag clear); (4) calls check_neo_daedalus_placement_eligible(slot_ptr, 0); (5) gP1LifePoints[player_id*0x868+0x11c] byte[+3] bit0 must be 1 (LP slot byte flag); (6) calls check_value_in_slot_chain(player_id, card_id, 0xb). All passed returns 1. Part of check_equip_slot_eligible_* sibling cluster.
+
+Constants:
+- FIELD_STATE_OFFSET    = 0x1ce8
+- GLOBAL_FLAG_OFFSET    = 0x10d0
+- GLOBAL_FLAG_BIT_MASK  = 0x1
+- LP_SLOT_BYTE3_OFFSET  = 0x11c  (0x8e<<1)
+- LP_SLOT_BIT_MASK      = 0x1
+- PLAYER_STRIDE         = 0x868
+- CHAIN_TYPE_B          = 0xb

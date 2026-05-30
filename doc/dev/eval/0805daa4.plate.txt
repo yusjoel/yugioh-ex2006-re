@@ -1,0 +1,7 @@
+check_equip_slot_eligible_without_light_of_intervention_max2: Equip slot activation eligibility predicate. r0=card_slot_ptr. Two checks: (1) calls count_field_copies_of_card(0x135d=Light of Intervention, passcode=62867251) -- if present returns 0; (2) if Light of Intervention absent, extracts player_id and zone_idx, calls dispatch_equip_slot_scan_with_field6_guard with max_count=2, stack_arg=0, mode=0; returns 1 if nonzero, else 0. Light of Intervention on field prohibits special summon; this predicate guards absence then executes scan (max 2 slots).
+
+Constants:
+- LIGHT_OF_INTERVENTION_ID = 0x135d  (Light of Intervention, passcode=62867251)
+- MAX_SCAN_COUNT            = 2
+- SCAN_STACK_ARG            = 0
+- SCAN_MODE                 = 0

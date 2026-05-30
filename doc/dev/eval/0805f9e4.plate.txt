@@ -1,0 +1,8 @@
+check_equip_slot_eligible_with_monster_count_gate: Equip slot activation eligibility predicate (monster count gate wrapper). r0=card_slot_ptr, r1=player_id. First checks target zone monster count: computes zone_base = gDuelFieldSlots[player_id*0x868 + zone_idx*0x14], reads zone[+0xc] (monster count word); if zone[+0xc] <= 1 returns 0 (insufficient monsters). If monster count > 1, calls check_equip_slot_eligible_neo_daedalus_full_guard(slot_ptr, player_id) and passes through its return value. Part of check_equip_slot_eligible_* sibling cluster; monster count > 1 is precondition.
+
+Constants:
+- MONSTER_COUNT_OFFSET = 0xc
+- MONSTER_COUNT_MIN    = 2  (must be > 1)
+- ZONE_SLOT_STRIDE     = 0x14  (20 bytes)
+- PLAYER_STRIDE        = 0x868
+- ZONE_BASE            = 0x0201c510

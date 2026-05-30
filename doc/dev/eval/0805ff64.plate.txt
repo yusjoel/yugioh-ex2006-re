@@ -1,0 +1,5 @@
+check_equip_slot_eligible_with_lp_active_and_neo_daedalus: Equip slot activation eligibility predicate (LP active state + neo_daedalus). r0=card_slot_ptr, r1=player_id. Two checks: (1) reads gP1LifePoints[player_id*0x868+0x10] (word, LP activation count); if 0 returns 0 (LP slot not active); (2) if nonzero, calls check_neo_daedalus_placement_eligible(slot_ptr, player_id) and passes through return value (1=allow, 0=deny). Differs from check_equip_slot_eligible_with_lp_slot_flag (0x0805ce70): this function checks [+0x10] LP activation count (nonzero=active), that function checks [+0x11c] bit0 flag (zero=available).
+
+Constants:
+- LP_ACTIVE_OFFSET = 0x10
+- PLAYER_STRIDE    = 0x868

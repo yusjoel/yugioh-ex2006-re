@@ -1,0 +1,6 @@
+check_equip_slot_eligible_type580_or_neo_daedalus_hand: Equip slot activation eligibility predicate. r0=card_slot_ptr. Two-path conditional return: (1) if halfword[+2] bits[11:6] (type_field) == 0x580 (0xb0<<3), returns 1 immediately (no further check); (2) if type_field == 0x80, calls check_neo_daedalus_placement_eligible then find_hand_slot_idx_by_set_code(player_id, set_code); if hand_slot >= 0 returns 1, else 0; (3) other type values return 0. Part of check_equip_slot_eligible_* sibling cluster; covers type=0x580 fast-pass path and type=0x80 neo_daedalus + hand check path.
+
+Constants:
+- TYPE_FIELD_MASK = 0xfc0       (0xfc<<4)
+- TYPE_580        = 0x580       (0xb0<<3; python: hex(0xb0<<3)=0x580)
+- TYPE_80         = 0x80
