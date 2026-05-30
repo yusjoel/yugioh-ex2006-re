@@ -1,0 +1,12 @@
+Comprehensive equip eligibility check that chains chain-count verification, neo-daedalus placement eligibility, card pair ID resolution, field8 attribute, and field5 score checks before triggering effect. First calls count_slots_with_chain_field_match to confirm opponent field=1 chain slot exists; then check_neo_daedalus_placement_eligible; traverses gDuelFieldState+0x4cc/0x4d4 to confirm exactly 1 slot with code=8; checks zone_type=0x80<<2=0x200 slot flag; calls resolve_slot_card_id_for_pair to get paired card_id; checks field8 != 9; gets field5 score <= 0x5dc; if all pass writes slot[+0xa]:=r3 (pair_index) then calls lookup+dispatch_effect_handler_by_card_id.
+
+Constants:
+- gDuelFieldState = 0x0201b290
+- STATE_CHAIN_COUNT_OFFSET = 0x4cc (chain active count area)
+- STATE_CHAIN_BASE_OFFSET = 0x4d4
+- gDuelFieldSlots = 0x0201c510
+- player_stride = 0x868
+- CHAIN_CODE_TARGET = 8 (slot code to count)
+- ZONE_TYPE_MASK = 0xfc<<4 = 0xfc0
+- ZONE_TYPE_TARGET = 0x80<<2 = 0x200
+- SCORE_MAX = 0x5dc (1500)

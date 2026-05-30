@@ -1,0 +1,6 @@
+Checks whether equip slot satisfies Sacred Beast pair neo-daedalus placement conditions. Calls in sequence: (1) check_equip_slot_eligible_by_tier_and_banisher_scan for basic tier and banisher conditions; (2) check_field_spell_neo_daedalus_group_placeable to confirm placeable; (3) count_available_monster_slots > 2; (4) count_paired_slots_with_field5_default(player, icid=0x19a3/Uria) OR count_paired_slots_with_field5_default(player, icid=0x19a4/Hamon) > 0. All conditions met returns 1, else 0. Scenario is equip activation for Sacred Beast Uria (Uria, Lord of Searing Flames) or Hamon (Hamon, Lord of Striking Thunder).
+
+Constants:
+- ICID_URIA = 0x19a3 (Uria, Lord of Searing Flames; cid=2012)
+- ICID_HAMON = 0x19a4 (Hamon, Lord of Striking Thunder; cid=2013)
+- MIN_MONSTER_SLOTS = 2 (count_available_monster_slots must be > 2)

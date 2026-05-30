@@ -1,0 +1,12 @@
+Zone state machine dispatch for equip slots containing specific reserved icid values. Reads slot[+0] halfword = card_id; if matches icid=0x162c or icid=0x184c (both reserved/unreleased cards, cid=0xFFFF) sets r1=3; if matches icid=0x1051 (also reserved, cid=0xFFFF) sets r1=5; else r1=0. Then reads current zone state at gDuelFieldState+0x4a0: state 0x80 -> calls trigger_card_display_op31_if_not_active with player_id and op_code=0xf5, returns 0x7f; state 0x7f -> calls init_effect_slot_display_context with r1 (clamped <=0x20)+6 and card_id, returns 0x7e; state 0x7e -> calls enqueue_effect_slot_sprites_descending; default -> returns 0.
+
+Constants:
+- ICID_RESERVED_A = 0x162c (cid=0xFFFF, reserved; r1 selector=3)
+- ICID_RESERVED_B = 0x184c (cid=0xFFFF, reserved; same as 0x162c branch; r1=3)
+- ICID_RESERVED_C = 0x1051 (cid=0xFFFF, reserved; r1=5)
+- gDuelFieldState = 0x0201b290
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- OP_CODE = 0xf5 (trigger_card_display_op31 arg)
+- gP1LifePoints = 0x0201c4e0 (player_stride=0x868)
+- DISPLAY_CTX_ARG_CAP = 0x20 (clamp upper bound for r1 passed to init_effect_slot_display_context)
+- gDisplayState = 0x0201e2a0

@@ -1,0 +1,7 @@
+Iterates over all 11 zone slots (idx=0..10) for both players (player_id=0,1) to invoke effect nodes and dispatch sprite attributes. Entry: r0=slot_ptr saved to r6; r8=DWORD_08066c3c (0x0201e1c8, equip active zone count table base). Outer loop r0=0..1 (player_id); inner loop r5=0..10 (zone_idx). Each iteration: reads zone_player_id from [r8+player_id*0x38+zone_idx*8+0], XORs with player_id, then calls invoke_effect_node_with_active_flag_3arg(slot_ptr, zone_player_id, zone_idx). If returns nonzero calls dispatch_slot_sprite_attr_with_equip_head_flag(slot_ptr, zone_player_id, zone_idx, flag=1).
+
+Constants:
+- gEquipZoneCountTable = 0x0201e1c8 (via DWORD_08066c3c)
+- ZONE_COUNT = 11 (idx 0..10)
+- PLAYER_COUNT = 2 (player 0 and 1)
+- EQUIP_HEAD_FLAG = 1

@@ -1,0 +1,4 @@
+Equip activation LP effect submission function. First calls dispatch_equip_lp_delta_by_card_id to dispatch LP delta; then calls increment_lp_bar_display_counter to increment display counter. Based on slot[+2].bit0 player_id, performs two sentinel checks for each direction (>= 0 = positive; <= 0 = negative/zero), calling submit_lp_indicator_with_slot_xor_flag or submit_effect_zone_lp_and_shape_sprites respectively. Finally calls decrement_lp_bar_display_counter to restore counter. Called by 11 equip zone handlers (indeg=11).
+
+Constants:
+- PLAYER_BIT_MASK = bit0 of slot[+2] (lsls/lsrs #0x1f)

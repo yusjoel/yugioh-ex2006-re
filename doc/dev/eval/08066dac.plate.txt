@@ -1,0 +1,5 @@
+For both players (idx=0..1) checks equip zone entry match, triggers effect node, and updates equip target bitmap. Entry: r0=slot_ptr saved to r7; r8=0 (bitmap accumulator). Outer loop r6=0..1: calls check_effect_slot_matches_zone_entry(slot_ptr, idx, sp_out); if no match skips; decodes zone_player_id (bits[31:24]) and zone_idx (bits[23:16]) from sp output; calls invoke_effect_node_with_active_flag_3arg(slot_ptr, zone_player, zone_idx); if node inactive skips; sets bit(zone_player*4+zone_idx) into r8 (bitmap accumulator). After loop calls query_equip_target_bitmap_default(slot_ptr, r8) and returns 0.
+
+Constants:
+- PLAYER_COUNT = 2 (idx 0..1)
+- bitmap bit formula: 1 << (zone_player * 4 + zone_idx)

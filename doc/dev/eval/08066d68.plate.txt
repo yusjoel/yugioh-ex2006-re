@@ -1,0 +1,6 @@
+Searches player deck for Polymerization (icid=0x12e5) paired slot and enqueues graveyard spell sprite. Reads slot[+2].bit0=player_id; calls find_deck_slot_by_card_pair_match(player_id, card_id=0x12e5/Polymerization). If found (returns >= 0), computes gDuelFieldSlots hand slot address (player*0x868 + 0x0201c8f8 + found_idx*4), calls enqueue_graveyard_spell_sprite_with_zone_ref(slot_ptr, zone_ref). If not found skips. Returns 0 unconditionally.
+
+Constants:
+- ICID_POLYMERIZATION = 0x12e5 (Polymerization, cid=669)
+- player_stride = 0x868
+- gDuelFieldSlots_hand = 0x0201c8f8

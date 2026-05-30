@@ -1,0 +1,9 @@
+Iterates over both players (player_id=0,1) to check equip zone state and update sprites. Entry: r0=slot_ptr saved to r7; r8=gP1LifePoints base; r9=gDuelFieldSlots. Outer loop r6=0..1 (player_id). Each iteration: reads gDuelFieldState[0x1ce8 + r6*0x38 + 0x2c] (activity flag); if nonzero calls render_zone_sprite_with_effect_dispatch_by_slot(slot_ptr, player_id, 0). If zero reads [+0x0] slot entry and [+0x4] zone_idx, computes bitmap value from gDuelFieldSlots target slot vs expected; if equal calls update_equip_target_bitmap_zone15(slot_ptr, entry, zone_idx, 0).
+
+Constants:
+- gP1LifePoints_base = 0x0201c4e0 (via DWORD_08066730)
+- gDuelFieldState_zone15 = 0x0201bbbc (via DWORD_08066738)
+- gDuelFieldSlots_base = 0x0201c4e0 + 0x30 offset (r8+0x30)
+- STATE_ZONE_OFFSET = 0x1ce8 (sub-struct offset)
+- player_stride = 0x868
+- LOOP_COUNT = 2 (player 0 and 1)

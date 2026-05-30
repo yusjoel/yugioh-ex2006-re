@@ -1,0 +1,7 @@
+Verifies that opponent LP exceeds threshold before triggering neo-daedalus effect during equip activation. Extracts player_id from slot[+2].bit0, computes opponent=1^player_id, reads LP-related value at gP1LifePoints+opponent*0x868+0x10; if value > 1 calls dispatch_effect_for_neo_daedalus_eligible_slot; else returns 0. Used to ensure neo-daedalus effect triggers only when opponent LP is sufficient.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0 (player LP struct base)
+- player_stride = 0x868 (per-player offset)
+- LP_CHECK_OFFSET = 0x10 (offset within player LP struct)
+- LP_THRESHOLD = 1 (value must be > 1 to proceed)

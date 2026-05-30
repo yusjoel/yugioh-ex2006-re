@@ -1,0 +1,7 @@
+Dispatches equip OAM initialization based on current zone state at gDuelFieldState+0x4a0 with Cyber-Stein special handling. state=0x80: calls check_field_spell_neo_daedalus_group_placeable and count_available_monster_slots (both nonzero to continue); calls lookup_slot_display_value_by_card_id and dispatch_effect_handler_by_card_id; if handler returns nonzero calls trigger_card_display_op31_if_not_active(op=0x1a), returns 0x7f. state=0x7f: lookup_slot_display_value_by_card_id + init_effect_slot_display_context(player, 6, card_id, display_val), returns 0x7e. state=0x7e: if card_id=0x114a (Cyber-Stein, cid=361), calls get_monster_slot_entry_ptr + setup_equip_oam_entry_with_sprite_attr(sp[0]=0, mode=1); else get_monster_slot_entry_ptr + invoke_setup_equip_oam_with_attr2. default: returns 0.
+
+Constants:
+- gDuelFieldState = 0x0201b290
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- ICID_CYBER_STEIN = 0x114a (cid=361, Cyber-Stein; triggers special OAM setup)
+- OP_CODE_1A = 0x1a (trigger_card_display_op31 arg for state 0x80 path)

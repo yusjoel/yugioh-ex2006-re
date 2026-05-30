@@ -1,0 +1,12 @@
+Single-frame state machine driver for equip activation display sequence. Reads current state value from gDuelFieldState+0x4a0 (= 0x94<<3) and subtracts 0x64 (100); if out of range [0..0x1c] (28 cases) jumps to default (state=0x65, returns 0). Dispatches via jump table (29 cases, states 0x64..0x80): case 0x80: if card_id=0x1919 (T.A.D.P.O.L.E., cid=1910) writes gDuelFieldState[+0x4a4]=9, else writes [+0x4a4]=2, returns 0x7f. case 0x7f: find_card_pair_in_player_deck_list + enqueue_hand_sprite_with_flip_flag_set; if enqueued reads [gDuelFieldState+0x4a4]-=1 and if >0 returns 0x7e, else trigger_card_display_op31(0x15) returns 0x6f. case 0x7e: dispatch_effect_handler_by_card_id; if <=0 returns 0x64, else checks activation flag=1 path writes [gP1LifePoints+player*4+0x1d40]=1 returns 0x7d; else format_text + invoke_card_display_op_0x31_sub1 returns 0x7d. case 0x7d: checks [gP1LifePoints+player*4+0xd40]; nonzero returns 0x7f, zero returns 0x64. case 0x6f: set_lp_row_type7_if_opponent_linked -> returns 0x64. case 0x64: enqueue_lp_counter_sprite_by_player.
+
+Constants:
+- gDuelFieldState = 0x0201b290
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- STATE_MIN = 0x64 (100; subtracted before table lookup)
+- STATE_COUNT = 0x1d (29 cases, 0x64..0x80)
+- ICID_TADPOLE = 0x1919 (T.A.D.P.O.L.E., cid=1910; case 0x80 card_id check)
+- ACTIVATION_COUNTER_OFFSET = 0x4a4 (gDuelFieldState + 0x4a4)
+- LP_FLAG_OFFSET = 0x1d40 (= 0xea<<5; gP1LifePoints + player*4 + 0x1d40)
+- gDuelFieldSlots_hand = 0x0201c740 (hand slot base)
+- gDisplayState = 0x0201e2a0

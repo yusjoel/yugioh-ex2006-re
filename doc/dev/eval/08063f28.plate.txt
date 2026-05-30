@@ -1,0 +1,7 @@
+Guards neo-daedalus effect dispatch with LP area bit0 flag during equip activation. Reads LP halfword at gP1LifePoints+player*0x868+0x8e<<1, checks bit0; if bit0==1 (specific LP state active) returns 0; if bit0==0 calls dispatch_effect_for_neo_daedalus_eligible_slot. Scenario: equip activation where LP area specific flag is not yet set, allowing neo-daedalus effect to trigger.
+
+Constants:
+- gP1LifePoints = 0x0201c4e0
+- player_stride = 0x868
+- LP_OFFSET = 0x8e<<1 = 0x11c
+- LP_BIT0_FLAG = 1 (AND mask, bit0 of halfword at offset)

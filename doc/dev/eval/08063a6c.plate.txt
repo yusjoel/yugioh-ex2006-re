@@ -1,0 +1,5 @@
+Check whether target equip slot satisfies neo-daedalus special placement conditions during equip activation. Extracts player_id(bit0) and zone_idx(bits[6:2]) from slot[+2], passes flag=1 to dispatch_equip_slot_scan_with_field6_guard for field6 guard scan; if scan passes, calls check_equip_slot_chain_absent to confirm no chain node occupying the slot; if both pass, calls dispatch_effect_for_neo_daedalus_eligible_slot to trigger neo-daedalus effect. Returns 0 on any failure.
+
+Constants:
+- EQUIP_FLAG = 1 (scan_flag, r1 to dispatch_equip_slot_scan_with_field6_guard)
+- ZONE_IDX_SHIFT = 2 (bits[6:2] from slot[+2])

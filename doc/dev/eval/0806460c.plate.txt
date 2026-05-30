@@ -1,0 +1,5 @@
+Three-step equip eligibility verification: first calls check_effect_slot_matches_zone_entry to confirm effect slot matches zone entry; then decodes zone_player_id and zone_idx from output and calls invoke_effect_node_with_active_flag_3arg to trigger effect node; if effect node activates successfully, finally calls check_equip_slot_eligible_in_target_bitmap to verify slot eligibility in equip target bitmap. Any step failing returns 0. Called by multiple equip zone handlers (indeg=10).
+
+Constants:
+- ZONE_PLAYER_SHIFT = 0x18 (lsls #0x18; extracts bits[7:0] of zone entry output = zone_player_id)
+- ZONE_IDX_SHIFT = 0x10 (lsls #0x10; combined with lsrs #0x18 extracts bits[15:8] = zone_idx)

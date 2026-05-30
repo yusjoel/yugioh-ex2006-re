@@ -1,0 +1,5 @@
+Thin wrapper over check_neo_daedalus_placement_eligible, mapping bool return to {2, 0}. Used by callers that distinguish between eligible (2) and ineligible (0), carrying more semantic information than a plain bool. No parameter setup needed; r0 is passed directly to callee.
+
+Constants:
+- RETURN_ELIGIBLE = 2 (return value when eligible)
+- RETURN_FAIL = 0 (return value when ineligible)

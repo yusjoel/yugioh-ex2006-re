@@ -1,0 +1,7 @@
+Determines whether to enqueue a graveyard spell sprite based on equip slot zone flags. Reads slot[+6].bits[4:2] (3-bit zone flag); if all zero returns 0 directly. Otherwise extracts bits[4:2]-1 as zone_type_index, reads slot[+2].bit0 as player_id, calls read_effect_slot_zone_type(slot, zone_type_index-1) to get zone_type. Then calls find_hand_slot_idx_by_set_code(zone_type, player_id) to find hand slot index; if found (>= 0), computes gDuelFieldSlots player offset and calls enqueue_graveyard_spell_sprite_with_zone_ref. Finally clears slot[+6] zone bits and sets bit7=1, returns 0x80.
+
+Constants:
+- ZONE_FLAG_MASK = 0x1c (bits[4:2] of slot[+6])
+- player_stride = 0x868
+- gDuelFieldSlots = 0x0201c8f8 (hand slot array base)
+- RETURN_ZONE_CLEARED = 0x80 (zone bits cleared flag)

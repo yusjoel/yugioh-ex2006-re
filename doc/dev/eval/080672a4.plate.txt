@@ -1,0 +1,10 @@
+Gate-controls equip OAM dispatch based on slot[+4].bit2, then dispatches by zone state. Reads slot[+4] byte, ANDs 0x4; if bit2 nonzero returns 0 immediately (already processed). Else reads gDuelFieldState+0x4a0: state=0x80 -> checks gP1LifePoints[player*0x868+0x18] (activity flag) nonzero then calls trigger_card_display_op31_if_not_active(player, op=0x1b), returns 0x7f. state=0x7f -> calls init_effect_slot_display_context(player, 6, card_id, 0), returns 0x7e. state=0x7e -> calls get_monster_slot_entry_ptr + render_pair_zone_sprites_if_field_card_present, returns 0. default -> returns 0.
+
+Constants:
+- BIT2_GATE = 0x4 (slot[+4] bit2; non-zero = early exit)
+- gDuelFieldState = 0x0201b290
+- EQUIP_STATE_OFFSET = 0x4a0 (= 0x94<<3)
+- gP1LifePoints = 0x0201c4e0
+- player_stride = 0x868
+- ACTIVITY_FLAG_OFFSET = 0x18 (gP1LifePoints + player*0x868 + 0x18)
+- OP_CODE_1B = 0x1b (trigger_card_display_op31 arg)

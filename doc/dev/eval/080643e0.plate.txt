@@ -1,0 +1,4 @@
+Checks whether equip slot satisfies neo-daedalus placement eligibility under the condition that no equip slot is currently active. First calls count_equip_slots_active_only(player); if any active equip slot exists returns 0; then calls count_paired_slots_with_field5_default(player, card_id); if paired slot exists returns 0; finally calls check_neo_daedalus_placement_eligible. Scenario: equip activation requires no other equip in active state on field for this neo-daedalus effect to be allowed.
+
+Constants:
+- (no additional literals; all thresholds determined by callee internals)

@@ -1,0 +1,11 @@
+Three-way zone_type dispatcher that routes to different equip eligibility predicates based on slot[+2].bits[11:6] (zone_type). zone_type=6: returns 1 unconditionally eligible. zone_type=0xf: locates slot in gDuelFieldSlots, reads [+0xc] chain flag, checks bit1 (AND mask=2) nonzero then calls check_equip_slot_eligible_bls_envoy_absent_with_zone_field_match. zone_type=0x16: locates slot, checks chain flag bit2 (AND mask=4) nonzero then calls check_equip_slot_eligible_field_spell_effect_type_e_with_zone_field5. Other zone_type: returns 0.
+
+Constants:
+- ZONE_TYPE_ALWAYS_ELIGIBLE = 6 (unconditional eligible)
+- ZONE_TYPE_BLS_ENVOY = 0xf (15; chain flag bit1 required)
+- ZONE_TYPE_FIELD_SPELL_E = 0x16 (22, zone type for field-spell effect E path; chain flag bit2 required)
+- player_stride = 0x868
+- gDuelFieldSlots = 0x0201c510
+- CHAIN_FLAG_BIT1 = 0x2 (mask for zone_type=0xf path)
+- CHAIN_FLAG_BIT2 = 0x4 (mask for zone_type=0x16 path)
+- ZONE_TYPE_FIELD = slot[+2].bits[11:6] = lsls #0x14 / lsrs #0x1a
