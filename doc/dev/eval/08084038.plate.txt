@@ -1,0 +1,10 @@
+Equip LP score display sequence stepper. Driven by runtime function-pointer table; handles LP score display updates during equip activation.
+Reads gDuelCtx+0x4b0 step field: step <0 or >0xb returns 0 (skip); step 0 double loop (player[0..1] x slot[0..4]) calls invoke_effect_node_handler_3arg, on hit enqueues equip slot sprite and writes gDuelCtx+0x4b0=0xa; step 0xa reads effect slot type, computes LP value via eval_slot_score_entry_full, if nonzero calls set_lp_display_row_type19; step 0xb reads gP1LP+0x1da8 LP field multiplied by 0x64, enqueues via enqueue_sprite_attr_clamped.
+
+Constants:
+- DUEL_CTX = 0x0201b290
+- STEP_OFF = 0x4b0
+- STATE_INIT_FOUND = 0xa
+- STATE_LP_ENQUEUE = 0xb
+- gP1LP_LP_OFF = 0x1da8
+- SCORE_MULT = 0x64

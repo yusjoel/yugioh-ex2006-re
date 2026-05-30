@@ -1,0 +1,7 @@
+Evaluates equip zone score using field card data. Loads gDuelCtx+0x484 (current field card ID DWORD) and passes it as card_id to eval_equip_slot_score_in_range(player_id, slot_idx, field_card_id). Returns 0x800 (hit flag) if result is nonzero; otherwise returns 0.
+Called from runtime function-pointer table (indeg=0 Sub-type A). Used to determine whether the current field card yields a valid equip score for the target slot.
+
+Constants:
+- DUEL_CTX = 0x0201b290
+- FIELD_CARD_OFF = 0x484
+- HIT_FLAG = 0x800 (0x80 << 4)

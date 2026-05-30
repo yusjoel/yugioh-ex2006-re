@@ -1,0 +1,7 @@
+Checks equip card slot zone descriptor type; if type==0xe packs equip slot sprite attribute. Reads card_slot[+0x14] bits[8:0] as slot_id, looks up zone descriptor via find_zone_descriptor_by_slot_id, extracts descriptor high byte (type_byte); if type_byte==0xe calls pack_equip_slot_sprite_with_code_attr(code=0xe). Always returns 1.
+Called from runtime function-pointer table (indeg=0 Sub-type A).
+
+Constants:
+- SLOT_ID_MASK = 0x1ff (9-bit slot id)
+- ZONE_TYPE_EQUIP = 0xe
+- SPRITE_CODE = 0xe

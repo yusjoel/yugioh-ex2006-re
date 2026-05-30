@@ -1,0 +1,7 @@
+Dispatches equip effect handling for the Hydrogeddon/Oxygeddon card pair. First calls dispatch_card_effect_activation to verify activation (returns -1 on failure). On success dispatches dispatch_effect_handler_by_card_id for card_id=Hydrogeddon(0x194f); then double loop (player=0/1) calls get_effect_slot_entry_ptr x2, extracts SET_CODE_BITS and zone encoding, calls pack_equip_slot_sprite_with_code_attr(code=0xe). Finally dispatches Oxygeddon(0x1950) and repeats pack for slots 0/1. Returns -1 on failure, 1 on success.
+
+Constants:
+- CARD_ID_HYDROGEDDON = 0x194f (Hydrogeddon)
+- CARD_ID_OXYGEDDON = 0x1950 (Oxygeddon)
+- PACK_CODE = 0xe
+- SLOT_RANGE = [0..1]

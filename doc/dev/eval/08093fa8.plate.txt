@@ -1,0 +1,3 @@
+Renders duel puzzle text data and pushes entries to sprite queue. Called by FUN_080937d4 (duel puzzle scene main handler) as the text rendering step after scene initialization.
+Loops calling copy_text_line_to_buf + parse_duel_puzzle_text_token to parse text lines; then calls enqueue_sprite_attr_record multiple times to push text sprites to queue, and calls dispatch_card_display_op to update card display state.
+Returns void (Pattern B: pop{r0};bx r0; return value discarded by caller at 0x0809381a movs r0,#0x1 overwrite).

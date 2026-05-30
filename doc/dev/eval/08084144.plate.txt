@@ -1,0 +1,6 @@
+LP node state check and display advance. Checks whether bits[11:6] of card_slot[+2] halfword match the confirmed node state sentinel 0x340 (mask 0xfc0); if matched returns 1 immediately (fast-confirm path); otherwise delegates to tick_equip_lp_display_by_node_state and passes through its return value.
+Called from runtime function-pointer dispatch table.
+
+Constants:
+- NODE_STATE_MASK = 0xfc0 (bits[11:6] extract)
+- NODE_STATE_CONFIRMED = 0x340 (0xd0 << 2)

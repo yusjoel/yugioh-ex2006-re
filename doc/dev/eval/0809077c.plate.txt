@@ -1,0 +1,5 @@
+Calls count_zone_pair_hits_with_fn_ptr in full-range mode. Fixes r2=-1 (0xffffffff, no range limit) and delegates to count_zone_pair_hits_with_fn_ptr(r0=slot_ptr, r1=packed_key, r2=-1); passes through the return value.
+High-frequency hub (indeg=15); called by various equip eligibility predicate functions (0x08050eac, 0x0805df44, 0x08061d5c, etc.) to provide zone pair hit counting with no range restriction.
+
+Constants:
+- FULL_RANGE = -1 (0xffffffff)

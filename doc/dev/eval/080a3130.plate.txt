@@ -1,0 +1,12 @@
+Display sequence stepper for selecting equip targets for tribe-type cards. Handles Tribe-Infecting Virus (0x161c), The Regulation of Tribe (0x1358), Kinetic Soldier (0x13aa), Batteryman C (0x191c) equip card activation target selection flow.
+Reads gP1LifePoints+0x1d94 step field for multi-phase dispatch: step 0 checks card_id for Tribe-Infecting Virus or Regulation of Tribe, calls check_compound_pair_activation_eligible x3 to verify compound activation eligibility, then calls scan_zone_slots_for_best_scored_slot; step 1 handles special paths for Kinetic Soldier and Batteryman C by reading slot_card_state_code; steps 2/3 call invoke_card_display_op_0x31_sub5 to display activation UI and randomize via sample_prng_scaled.
+
+Constants:
+- CARD_ID_TRIBE_INFECTING_VIRUS = 0x161c (Tribe-Infecting Virus)
+- CARD_ID_REGULATION_OF_TRIBE = 0x1358 (The Regulation of Tribe)
+- CARD_ID_KINETIC_SOLDIER = 0x13aa (Kinetic Soldier)
+- CARD_ID_BATTERYMAN_C = 0x191c (Batteryman C)
+- gP1LP = 0x0201c4e0
+- STEP_OFF = 0x1d94
+- gDuelFieldSlots = 0x0201c510
+- PLAYER_STRIDE = 0x868

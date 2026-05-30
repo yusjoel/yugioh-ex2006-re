@@ -1,0 +1,13 @@
+Scans equip target slots filtered by attribute mask. Reads gP1LifePoints+0x1d94 step field: step=0 runs main scan; step=1 returns r0=0 immediately; step>=2 returns r0=1.
+Main scan: checks [PLAYER_ZONE_TABLE+player*PLAYER_STRIDE+0x8]==1 (zone type selector); if met loops slots [0..5] calling scan_zone_slots_for_best_scored_slot, then get_card_extended_stat_field7 to confirm field7 in [1..6], then bit-tests attribute_mask; on hit sets [gDuelFieldSlots+0x1d10] bit and increments count. If hit count>0 and random path fails, calls sample_prng_scaled(6)+__modsi3 to select random attribute bit. On zone type mismatch calls invoke_card_display_op_0x31_sub6_with_packed_params. Success writes strh [gP1LP+0x1da8] and [gP1LP+0x1daa], returns 1; step 0 advances step field and returns 0.
+
+Constants:
+- gP1LP = 0x0201c4e0
+- STEP_OFF = 0x1d94
+- PLAYER_ZONE_TABLE = 0x0201e2a0
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510
+- BITMAP_OFF = 0x1d10
+- TARGET_SLOT_OFF_A = 0x1da8
+- TARGET_SLOT_OFF_B = 0x1daa
+- PRNG_RANGE = 6

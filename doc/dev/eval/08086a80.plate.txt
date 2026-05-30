@@ -1,0 +1,9 @@
+Determines whether equip zone activation meets eligibility requirements. Runs multiple equip card condition checks: check_equip_target_slot_by_card_id, find_equip_target_in_effect_zones, eval_equip_slot_score_in_range, sum_equip_zone_bonus_scores_for_player, sum_equip_chain_scores_for_card, and special card checks for Earth Chant (0x1716) and End of the World (0x19d9).
+Compares accumulated equip_score against threshold (slot_byte[+3]>>2); returns 1 if score >= threshold (eligible), 0 otherwise.
+Called by FUN_080869a8 ([equip, zone_scan]) and FUN_08086c80 ([equip, chain_score]).
+
+Constants:
+- CARD_ID_EARTH_CHANT = 0x1716 (Earth Chant)
+- CARD_ID_END_OF_WORLD = 0x19d9 (End of the World)
+- DUEL_CTX = 0x0201b290
+- gP1LifePoints = 0x0201c4e0

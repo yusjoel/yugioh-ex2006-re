@@ -1,0 +1,7 @@
+Equip activation display sequence stepper A. Called from runtime function-pointer dispatch table; advances the equip activation display state machine one step per frame.
+Step counter at gDuelCtx+0x4b0: step 0 clears card_slot[+4] and [+6] flag bits, calls count_effect_node_zone_activations to verify activation count >1, formats text, triggers display_op31; step 2 triggers display_op31(op=0x7c); steps 1/3 check if activation display is confirmed and enqueue equip sprite rotation; other steps return 1 (sequence complete).
+
+Constants:
+- DUEL_CTX = 0x0201b290
+- STEP_OFF = 0x4b0 (step counter offset)
+- CARD_FLAGS_MASK = 0xfffc7fff

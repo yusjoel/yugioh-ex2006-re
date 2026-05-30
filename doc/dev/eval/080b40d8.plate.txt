@@ -1,0 +1,16 @@
+Checks whether the card on the target slot can be equipped by an equip effect. Accepts r0=target_slot_ptr and r1=equip_slot_ptr; three-stage conditional check.
+Stage 1: if r1==NULL or owner bits differ (target and equip not on same side) returns 0.
+Stage 2: calls map_card_id_to_anim_type(equip_slot_ptr):
+- anim_type==4 or ==6 (two-player equip): calls count_effect_node_activations_by_zone for r4, then invoke_effect_node_with_active_flag_3arg for r0; returns 1 if r4>r0 (vacant activation slot available), else 0.
+- anim_type==1 or ==2 (single special equip): checks [equip_slot+4] bits[17:15]==001 (EQUIP_TYPE_FLAG=0x8000); reads read_effect_slot_side_and_type to parse side+type; looks up card_id in gDuelFieldSlots; returns 0 if card_id is in blocked set {Seven Tools (0x12ff), Black Pendant (0x10dd), Dragon's Bead (0x14de), Spell Shield Type-8 (0x15f1)}.
+- other anim_type: returns 1 (default equippable).
+
+Constants:
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510
+- EQUIP_TYPE_FLAG = 0x8000 (bits[17:15]==001, mask 0x38000)
+- OWNER_BIT_MASK = 1 (bit0 at [slot+2])
+- CARD_ID_SEVEN_TOOLS = 0x12ff (Seven Tools of the Bandit)
+- CARD_ID_BLACK_PENDANT = 0x10dd (Black Pendant)
+- CARD_ID_DRAGONS_BEAD = 0x14de (The Dragon's Bead)
+- CARD_ID_SPELL_SHIELD_TYPE8 = 0x15f1 (Spell Shield Type-8)

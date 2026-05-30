@@ -1,0 +1,11 @@
+Checks equip target slot eligibility using composite conditions. Accepts r0=owner_flags, r1=slot_start_idx, r2=slot_count; filters invalid range where slot_start_idx+slot_count > 0xa.
+Main path: computes slot_idx=slot_start_idx+slot_count, checks card presence bit in [gDuelFieldSlots+slot_idx*STRIDE]; returns 0 if absent. If [gEquipCardSet+0x8]==0 (no special set) calls count_monster_slots_accepting_card and checks owner_bit match. If [gEquipCardSet+0x8]!=0 enters card_entry whitelist loop comparing each entry to packed_key; on match returns 0. After passing whitelist/owner/slot checks calls check_slot_placement_blocked_by_field_effect.
+Second phase: extracts card_type bits[17:9] from gEquipCardSet, dispatches to check_equip_target_slot_eligible_by_field6_eq17 / _by_field9_eq4_field6_eq16 / _by_whitelist_or_special based on thresholds 0x19a4 (Hamon) and 0x19c8 (Anteatereatingant).
+
+Constants:
+- SLOT_UPPER_BOUND = 0xa
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510
+- gEquipCardSet = 0x0201e4d0
+- CARD_ID_HAMON = 0x19a4 (Hamon, Lord of Striking Thunder)
+- CARD_ID_ANTEATEREATINGANT = 0x19c8 (Anteatereatingant)

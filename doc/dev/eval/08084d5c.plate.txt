@@ -1,0 +1,10 @@
+Equip activation display sequence stepper B. Symmetric to tick_equip_activation_display_seq_a (0x08083f4c) but uses different function-pointer arguments (0x080557e1/0x080554c5) for set_equip_activation_state_by_mode.
+Reads gDuelCtx+0x4b0 step field: step 0 triggers display_op31(op=0x7c) and sets activation state; step 2 triggers display_op31(op=0x64) and sets activation state; both advance step counter +1 and return 0; steps 1/3 check activation confirm state and enqueue equip sprite rotation; unmatched step returns 1.
+
+Constants:
+- DUEL_CTX = 0x0201b290
+- STEP_OFF = 0x4b0
+- OP_STATE0 = 0x7c
+- OP_STATE2 = 0x64
+- FN_PTR_MODE_A = 0x080557e1
+- FN_PTR_MODE_B = 0x080554c5

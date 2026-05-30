@@ -1,0 +1,8 @@
+Enqueues effect node sprites for both players. Double loop over player[0..1] x slot_idx[0..4]; for each (player, slot) calls invoke_effect_node_handler_3arg; on nonzero return extracts side/zone from card_slot[+2] and calls enqueue_sprite_attr_with_mode(mode=8). After both loops writes [card_slot_ptr+8]=1 (strh) as activation marker.
+Called from runtime function-pointer table (indeg=0 Sub-type A).
+
+Constants:
+- PLAYER_COUNT = 2 [0..1]
+- SLOT_COUNT = 5 [0..4]
+- MODE_ENQUEUE = 8
+- ACTIVE_MARKER = 1

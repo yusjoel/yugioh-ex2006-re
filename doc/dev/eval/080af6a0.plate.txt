@@ -1,0 +1,10 @@
+Counts effect nodes that pass eligibility check. Iterates player's 5 equip effect node slots (slot 0..4); for each active node (bit7=1) calls invoke_effect_node_handler_3arg(callback, player_id, slot_idx) and check_card_id_in_eligible_set; if both pass increments counter r10. Returns count in r0.
+r0=callback_ptr saved to stack for loop reuse; r1=player_id stored in r9 to persist across bl calls; r10 initialized to 0 as accumulator.
+
+Constants:
+- gP1LP = 0x0201c4e0
+- PLAYER_STRIDE = 0x868
+- NODE_ACTIVE_BIT = bit7 (lsrs r0,r0,#7; ands r0,#1)
+- NODE_SLOT_STRIDE = 0x14
+- BASE_OFF_A = 0x30
+- BASE_OFF_B = 0x40

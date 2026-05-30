@@ -1,0 +1,7 @@
+Equip target slot selection display sequence stepper. Reads gP1LifePoints+0x1d94 step field; drives equip target selection display phases via 5-case switch:
+Step 0: calls count_nonzero_results_in_zone_matrix to count available targets and triggers display_op31. Step 1: calls select_equip_target_slot_by_card_id to choose target slot. Step 2: checks activation confirm state via check_activation_display_state_is_confirmed, on confirm enqueues equip sprite. Step 3: calls submit_equip_sprite_if_slot_eligible. Step 4: initializes zone activation display fields via init_zone_activation_display_fields.
+
+Constants:
+- gP1LP = 0x0201c4e0
+- STEP_OFF = 0x1d94
+- PLAYER_ZONE_TABLE = 0x0201e2a0

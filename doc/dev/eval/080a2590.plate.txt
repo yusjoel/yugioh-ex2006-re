@@ -1,0 +1,9 @@
+Dispatches equip activation display sequence stepper by card type. More complex variant of tick_equip_activation_display_seq_*, uses 6-case switch to handle activation display logic for specific card types.
+Step 0 calls trigger_card_display_op31_if_not_active; step 1 calls check_activation_display_state_is_confirmed and enqueues equip sprite; steps 2/3 handle special paths for Fengsheng Mirror (0x1509) and Trap Dustshoot (0x1546), calling select_random_slot_by_callback; steps 4/5 check zone eligibility via check_zone_eligible_with_deck_flag; unmatched step returns 1.
+
+Constants:
+- CARD_ID_FENGSHENG_MIRROR = 0x1509 (Fengsheng Mirror)
+- CARD_ID_TRAP_DUSTSHOOT = 0x1546 (Trap Dustshoot)
+- DUEL_CTX = 0x0201b290
+- gP1LP = 0x0201c4e0
+- STEP_OFF = 0x1d94

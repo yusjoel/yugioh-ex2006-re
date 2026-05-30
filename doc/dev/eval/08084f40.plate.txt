@@ -1,0 +1,10 @@
+Equip activation display sequence stepper C. Third variant of tick_equip_activation_display_seq_a/b; step 0 additionally clears [card_slot_ptr+4] bits[4:5] (mask 0xffffe3ff) and runs full double loop over effect node slots for both players via invoke_effect_node_handler_3arg.
+Reads gDuelCtx+0x4b0; step 0 clears slot flag bits and loops player x slot; step 2 triggers display_op31 and sets activation state; steps 1/3 confirm activation state and enqueue sprite rotation; unmatched step returns 1.
+
+Constants:
+- DUEL_CTX = 0x0201b290
+- STEP_OFF = 0x4b0
+- FLAG_CLEAR_MASK = 0xffffe3ff (bits[4:5] cleared)
+- PLAYER_COUNT = 2
+- SLOT_COUNT = 5 [0..4]
+- gP1LP_STEP_OFF = 0x1d6c
