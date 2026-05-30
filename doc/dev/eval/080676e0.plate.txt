@@ -1,0 +1,4 @@
+Symmetric sibling of build_equip_target_bitmap_with_eligibility_gate (0x08067594); differs only in final callee: calls forward_equip_bitmap_update_zone11 instead of query_equip_target_bitmap_default. Entry inherits r8 as entry_count upper bound (.hword 0x4647 = mov r7,r8). Outer loop iterates over slot[+0x6] entry_count; per entry calls check_effect_slot_matches_zone_entry; on match calls invoke_effect_node_with_active_flag_3arg; on activation ORs (player_id<<4 | slot_idx) bit into r8 bitmap. After loop calls forward_equip_bitmap_update_zone11(r8) to update zone11 state. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- ENTRY_COUNT_BITS = bits[7:5] of slot[+0x6]

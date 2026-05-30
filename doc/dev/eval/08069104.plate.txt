@@ -1,0 +1,7 @@
+Entry: effect_slot_ptr (r0). Nested double loop over both players (r6=0..1) and all zones (r4=0..4): calls invoke_effect_node_with_active_flag_3arg(slot, player, slot_idx); if activated, calls enqueue_slot_card_sprite_if_eligible(slot, player, slot_idx, sp[0]=2, sp[4]=0). Outer loop increments r7=r6+1, terminates when r6 > 1; inner loop r4 from 0 to 4 (5 iterations). Final movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1); r0 returned to caller. Each matching (player, slot_idx) pair triggers one sprite enqueue. Called via function pointer (indeg=0).
+
+Constants:
+- PLAYER_COUNT = 2 (r6=0..1)
+- SLOT_COUNT = 5 (r4=0..4)
+- SP_ARG0 = 2 (sprite type arg at sp[0])
+- SP_ARG1 = 0 (sp[4])

@@ -1,0 +1,22 @@
+Entry: effect_slot_ptr (r0); r8 inherited from parent frame via .hword 0x4647. Checks slot[+0x4].bit2 skip_flag. Reads gDuelFieldState+0x4a0, four-way dispatch:
+
+state==0x80: initializes r4=-1 (rsbs), clears slot[+0x6].bits[4:2]; double loop r7=[0..1] x r5=[0..4] calls invoke_effect_node_with_active_flag_3arg. On activation, card_id dispatch: 0x1540 (Bottomless Shifting Sand) or 0x1254 (Widespread Ruin) calls get_slot_field5_score, accumulates max into r4; 0x195e (Chthonian Blast) calls get_slot_field5_score with threshold compare; 0x17f2 (Hammer Shot) calls get_slot_field6_score. After loop, if r4 >= 0 sets slot[+0x6].bit2=1, strh r4 to [slot+0x8], returns 0x7f.
+
+state==0x7f: count_effect_node_zone_activations > 1 check; on pass, card_id dispatch again (0x1540/0x17f2: query_equip_zone_bitmap_with_active_flag; 0x195e: trigger_card_display_op31_if_not_active(0x6d)); else calls trigger_card_display_op31_if_not_active(0x62); finally set_equip_activation_state_by_mode, returns 0x7e.
+
+state==0x7e: check_activation_display_state_is_confirmed; if not confirmed returns 0x7f; if confirmed reads LP scores from gP1LifePoints+0x1d68/+0x1d6c, shift-merges, stores to [r4+0x4a4], returns 0x78.
+
+state==0x78: query_equip_target_bitmap_default, returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
+
+Constants:
+- SKIP_BIT = 0x4 (slot[+0x4].bit2)
+- STATE_OFFSET = 0x4a0 (0x94<<3)
+- gDuelFieldState = 0x0201b290
+- gP1LifePoints = 0x0201c4e0
+- CARD_ID_BOTTOMLESS = 0x1540 (Bottomless Shifting Sand)
+- CARD_ID_WIDESPREAD = 0x1254 (Widespread Ruin)
+- CARD_ID_HAMMER = 0x17f2 (Hammer Shot)
+- CARD_ID_CHTHONIAN = 0x195e (Chthonian Blast)
+- LP_FIELD_A = 0x1d68 (gP1LifePoints score field A)
+- LP_FIELD_B = 0x1d6c (gP1LifePoints score field B)
+- BITMAP_OFFSET = 0x4a4 (gDuelFieldState activation bitmap field)

@@ -1,0 +1,8 @@
+Polymorphic state machine dispatcher for equip effect display system. Entry r0=effect_slot_ptr. Reads gDuelFieldState+0x4a0 (0x94<<3=0x4a0), subtracts 0x64, dispatches via 28-entry jump table. Key branches: state==0x80 (case_80): calls dispatch_effect_handler_by_card_id; if unhandled calls trigger_card_display_op31_if_not_active(0x15), returns 0x78; if handled returns 0x7f. state==0x7f (case_7f): if card_id==0x139d (Birdface) calls init_effect_slot_display_context(player, card_id, mode=6, 0); else write_effect_ctx_slot_index; returns 0x7e. state==0x7e (case_7e): extracts player_id, calls get_monster_slot_entry_ptr, enqueue_hand_sprite_with_flip_flag_set; returns 0x64. state==0x78 (case_78): computes opponent_side=1-player_id, calls set_lp_row_type7_if_opponent_linked; returns 0x64. state==0x64 (case_64): enqueue_lp_counter_sprite_by_player; falls through, returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
+
+Constants:
+- STATE_OFFSET = 0x4a0 (gDuelFieldState + 0x94<<3)
+- gDuelFieldState = 0x0201b290
+- CARD_ID_BIRDFACE = 0x139d (Birdface; init_effect_slot_display_context special case)
+- STATE_INIT = 0x80, STATE_DISPLAY_CTX = 0x7f, STATE_HAND_SPRITE = 0x7e, STATE_LP_LINKED = 0x78, STATE_LP_SPRITE = 0x64
+- STATE_BASE_SUBTRACT = 0x64 (switch table offset: state - 0x64, range [0..0x1c])

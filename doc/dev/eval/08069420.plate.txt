@@ -1,0 +1,8 @@
+Symmetric sibling of enqueue_effect_slot_sprites_for_two_players (0x08069104); adds LP row state preamble. Entry .hword 0x4647=mov r7,r8 (parent-frame). Reads gDuelFieldState+0x4a0: state==0x80 path first calls set_lp_row_type18_with_value(player, slot_idx), returns 0x7f; state==0x7f path enters double loop over both players and zones, calls invoke_effect_node_with_active_flag_3arg + enqueue_slot_card_sprite_if_eligible(sp[0]=2, sp[4]=slot_index*0x64). Other states return 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
+
+Constants:
+- STATE_OFFSET = 0x4a0 (0x94<<3)
+- gDuelFieldState = 0x0201b290
+- SLOT_LP_STRIDE = 0x64 (sp[4] = slot_index * 0x64 & 0xffff)
+- SP_ARG0 = 2, gDuelFieldState2 = 0x0201e288
+- PLAYER_COUNT = 2, SLOT_COUNT = 5

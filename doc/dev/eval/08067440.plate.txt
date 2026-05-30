@@ -1,0 +1,7 @@
+Entry: effect_slot_ptr (r0). Calls check_effect_slot_matches_zone_entry for zone match; on match extracts player_id/slot_idx; calls invoke_effect_node_with_active_flag_3arg to activate effect node. On activation success: (1) enqueue_zone_slot_sprite_attr_if_occupied(player, slot, flag=1) enqueue occupied flag; (2) computes gDuelFieldSlots slot array offset, extracts indicator_id (bits[12:0]), calls enqueue_sprite_attr_for_slot_indicator; (3) enqueue_sprite_attr_type10_halfword(0x1e) sends LP row type; (4) enqueue_zone_slot_sprite_attr_if_occupied(player, slot, flag=0) clears flag. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- SLOT_STRIDE = 0x14 (slot_idx*20 in zone array)
+- PLAYER_STRIDE = 0x868 (gDuelFieldSlots player offset)
+- gDuelFieldSlots = 0x0201c510
+- LP_ROW_TYPE = 0x1e (enqueue_sprite_attr_type10_halfword arg)

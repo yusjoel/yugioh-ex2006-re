@@ -1,0 +1,12 @@
+Entry: effect_slot_ptr (r0). Five-state machine driving field spell placement sprite sequence. Checks slot[+0x4].bit2 skip_flag; if set returns 0. Reads gDuelFieldState+0x4a0, five-way dispatch: state==0x80: calls check_field_spell_neo_daedalus_group_placeable + count_available_monster_slots dual check; if passed checks gP1LifePoints+0x238 slot bit cleared; if passed calls dispatch_effect_handler_by_card_id; if returns 0 calls trigger_card_display_op31_if_not_active(0xd), returns 0x7e; if nonzero returns 0x7f. state==0x7f: invoke_setup_equip_oam_with_attr2(player, slot_data_ptr, 1, 0), returns 0x7d. state==0x7e: opponent_side=1-player_id; set_lp_row_type7_if_opponent_linked(opponent), returns 0x7d. state==0x7d: enqueue_lp_counter_sprite_by_player(player), returns 0x7c. fail/other: two calls to set_player_state_bit_with_sprite_update(player, 0x14, 1) + (player, 0x15, 1), returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
+
+Constants:
+- SKIP_BIT = 0x4 (slot[+0x4].bit2)
+- STATE_OFFSET = 0x4a0 (0x94<<3)
+- gDuelFieldState = 0x0201b290
+- gP1LifePoints = 0x0201c4e0
+- PLAYER_STRIDE = 0x868
+- SLOT_FIELD_OFFSET = 0x11c*2 = 0x238 (gP1LifePoints slot occupancy bit)
+- PLAYER_STATE_BIT_14 = 0x14, PLAYER_STATE_BIT_15 = 0x15
+- STATE_INIT = 0x80, STATE_OAM = 0x7f, STATE_LP_LINKED = 0x7e, STATE_LP_COUNTER = 0x7d, STATE_DONE = 0x7c
+- OAM_DATA_PTR = 0x0201e500

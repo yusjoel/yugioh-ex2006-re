@@ -1,0 +1,5 @@
+Entry: effect_slot_ptr (r0). Calls check_effect_slot_matches_zone_entry to verify zone entry match (zone_entry_index=0, sp[0] returns zone_info_word). On match, extracts player_id (byte3) and slot_idx (byte2) from zone_info_word, forwards to invoke_effect_node_with_active_flag_3arg. On activation success, calls test_equip_target_slot_zone11 to write target into zone11 bitmap. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0, fn-ptr grep .word 0x0806734d: 0 hits).
+
+Constants:
+- PLAYER_ID_SHIFT = 0x18 (byte3 of zone_info_word)
+- SLOT_IDX_SHIFT = 0x10..0x18 (byte2 of zone_info_word)

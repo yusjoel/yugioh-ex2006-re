@@ -1,0 +1,7 @@
+Entry: effect_slot_ptr (r0). Entry .hword 0x4647 = mov r7,r8 (parent-frame). Checks slot[+0x2].bits[12:7] against 0x80; if not matched takes alternate path. Main path: extracts player_id (bit0) and slot_idx (bits[6:2]), locates gDuelFieldSlots slot; combines both-side card_type_flag as r2; reads slot[+0x4].bits[15:9] target count; if mismatch skips. On match calls increment_lp_bar_display_counter; calls find_equip_chain_pair_across_field to get chain pair (r5=player, r6=slot_idx); if card_id == 0x1286 (Blast Sphere) calls enqueue_equip_slot_bitmap_update; calls check_equip_eligibility_via_request_buf; if passed calls query_slot_effect_eligibility_nonzero; if 0 calls enqueue_equip_slot_bitmap_update. If card_id==0x1286 calls get_slot_field5_score then submit_lp_change_indicator_with_chain_check; finally decrement_lp_bar_display_counter. Alternate path (non-0x80): enqueue_equip_card_zone_sprites_at_free_slot. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- SLOT_STATUS_MASK = 0xfc0 (bits[12:7] == 0x80 check: 0xfc << 4 = 0xfc0)
+- CARD_ID_BLAST_SPHERE = 0x1286 (Blast Sphere)
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510

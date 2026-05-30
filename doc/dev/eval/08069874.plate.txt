@@ -1,0 +1,11 @@
+Entry: effect_slot_ptr (r0) and secondary param r1. r8/r9 inherited from parent frame via .hword 0x464f/0x4646. Checks slot[+0x4].bit2 skip_flag; if set jumps to LAB_08069972, returns 0. Reads gDuelFieldState+0x4a0 state: state==0x80 five sequential checks: (1) check_spell_type480_active_deck_matches(slot, r4) != 0; (2) gP1LifePoints+0x10d0 bit0==0 and bit1!=0 (LP activation link flag); (3) check_effect_slot_matches_zone_entry(slot,0,0) != 0; (4) invoke_effect_node_with_active_flag_3arg(slot, r8_player, r6_slot) != 0. On all pass: calls get_first_placeable_monster_slot(player_id) for target slot r4; packs (r4<<8|player), calls enqueue_sprite_attr_with_mode; calls enqueue_equip_chain_pair_sprite_if_eligible; calls check_slot_card_activatable(base, slot_ptr, 0); on pass selects sprite code 0x8019 (player_id==1) or 0x19 (player_id==0), calls enqueue_sprite_attr_record, returns 0x7f. state==0x7f: calls set_lp_row_type16_with_player_id(1), returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller. Called via function pointer (indeg=0).
+
+Constants:
+- SKIP_BIT = 0x4 (slot[+0x4].bit2)
+- STATE_OFFSET = 0x4a0 (0x94<<3)
+- gDuelFieldState = 0x0201b290
+- gP1LifePoints = 0x0201c4e0
+- LP_LINK_FLAG_OFFSET = 0x10d0 (gP1LifePoints LP activation link flag field)
+- SPRITE_CODE_A = 0x8019 (player_id==1)
+- SPRITE_CODE_B = 0x19 (player_id==0)
+- SLOT_BASE_PTR = 0x0201bb90 (slot data base for check_slot_card_activatable)

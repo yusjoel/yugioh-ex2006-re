@@ -1,0 +1,5 @@
+Entry: effect_slot_ptr (r0), inherits r8 (entry_count upper bound) and sp[0] (zone_info_word) from parent frame. Outer loop: r7 iterates 0..entry_count from slot[+0x6].bits[7:5]; entry .hword 0x4647 = mov r7,r8 is callee-save alias. Inner: calls check_effect_slot_matches_zone_entry per entry; on match calls invoke_effect_node_with_active_flag_3arg; on activation calls check_card_equip_eligible_for_slot; if eligible, ORs (player_id<<4 | slot_idx) bit into r8 bitmap. After loop calls query_equip_target_bitmap_default to flush bitmap to global target table. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- ENTRY_COUNT_BITS = bits[7:5] of slot[+0x6] (lsls #0x1b / lsrs #0x1d)
+- BITMAP_ENCODE = (player_id<<4 | slot_idx) -> bit position

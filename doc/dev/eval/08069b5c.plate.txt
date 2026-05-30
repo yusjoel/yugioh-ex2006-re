@@ -1,0 +1,6 @@
+Entry: effect_slot_ptr (r0); r8 inherited from parent frame via .hword 0x4647 (loop base). Checks slot[+0x6].bits[4:2] & 0x1c == 0xc (zone_entry_type gate); if not matched returns 0. Reads entry_count from slot[+0x6].bits[7:5] (lsls #0x1b / lsrs #0x1d); if r8 >= entry_count jumps to bitmap check. Else loops r7=0..entry_count-1: calls check_effect_slot_matches_zone_entry(slot, r7, sp[0]); if matched, unpacks player_byte=bits[31:24] and slot_byte=bits[23:16] from sp[0]; calls invoke_effect_node_with_active_flag_3arg(slot, player, slot_idx); if activated: lsls r1,r5,#0x4; adds r1,r4; movs r0,#1; lsls r0,r1; r8 |= r0 to accumulate bitmap. After loop calls count_set_bits_in_word(r8); if popcount==3 calls query_equip_target_bitmap_default(slot, r8). All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- ZONE_TYPE_GATE = 0xc (slot[+0x6].bits[4:2] expected value)
+- ZONE_ENTRY_MASK = 0x1c (bits[4:2])
+- REQUIRED_BITS = 3 (count_set_bits_in_word == 3 to trigger bitmap query)

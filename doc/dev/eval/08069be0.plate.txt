@@ -1,0 +1,8 @@
+Entry: effect_slot_ptr (r0) and auxiliary param r1. Four sequential checks: (1) count_field_copies_of_card(0x12fb) == 0 (no reserved card 0x12fb on field); (2) check_neo_daedalus_placement_eligible(slot, r4) != 0; (3) slot[+0x6].bits[4:2] & 0x1c == 0x4 (zone_entry_type must be 0x4); (4) calls read_effect_slot_zone_type(slot, 0) + find_zone_descriptor_by_slot_id to get zone_descriptor; extracts zone_type from bits[15:8], must equal 0xe. On all checks passed: calls check_zone_slot_equip_eligible(player_id, r4, r6); computes target addr = (player_id & 1) * 0x868 + gDuelFieldSlots + zone_idx*4; calls invoke_setup_equip_oam_with_attr2(player, zone_slot_ptr, card_id_low, 1) to init OAM. Any failure jumps to LAB_08069c52, returns 0. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- RESERVED_CARD_ID = 0x12fb (reserved/unlisted card ID, no entry in data.md)
+- ZONE_ENTRY_FLAG = 0x4 (slot[+0x6].bits[4:2] expected value)
+- ZONE_TYPE_14 = 0xe (zone descriptor type field expected value)
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c8f8 (hand/field slot base)

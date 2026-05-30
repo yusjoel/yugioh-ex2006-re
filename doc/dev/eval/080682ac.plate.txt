@@ -1,0 +1,7 @@
+Entry: effect_slot_ptr (r0). Extracts player_id (bit0) and slot_idx (bits[6:2]), locates two word values from gDuelFieldSlots for own and opponent sides; combines card_type_flag (bit13) as sprite_counter r2. Reads target count field from slot[+0x4].bits[15:9]; if mismatch skips. On match calls check_effect_slot_matches_zone_entry (sp[0x4] receives zone_info_word), extracts player_id2/slot_idx2, calls invoke_effect_node_with_active_flag_3arg. On activation packs (player_id<<8 | slot_idx) as r2, mode=0x106 (0x83<<1), calls enqueue_sprite_attr_with_mode. All paths set movs r0,#0; exits via Sub-case E epilogue (pop {r1}; bx r1). Called via function pointer (indeg=0).
+
+Constants:
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510
+- SPRITE_MODE = 0x106 (0x83 << 1)
+- FLAG_STACK = 0x0 ([sp+0x0] = 0)

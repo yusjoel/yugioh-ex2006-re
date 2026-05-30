@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 3995 / 全 CSV 4641 行 = **86.08%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4015 / 全 CSV 4641 行 = **86.51%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -54,13 +54,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #180 |
+| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #181 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-30 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 3995 (86.08%) |
-| **未命名 (FUN_*)** | 646 (其中 305 ready / 341 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 4)** | 305 函数 (批 #180..#195 未完成部分), 处理中 |
-| **下一批** | #180 (Phase 4 idx 8) — `ready_batches_phase4.json` |
-| **上次更新** | 2026-05-30 (batch #179 PASSED: neo-daedalus eligibility cluster + equip LP/OAM/zone state dispatcher cluster x20, 3995/4641 = 86.08%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4015 (86.51%) |
+| **未命名 (FUN_*)** | 626 (其中 285 ready / 341 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 4)** | 285 函数 (批 #181..#195 未完成部分), 处理中 |
+| **下一批** | #181 (Phase 4 idx 9) — `ready_batches_phase4.json` |
+| **上次更新** | 2026-05-30 (batch #180 PASSED: equip effect/sprite/oam/LP tick state machine cluster x20, 4015/4641 = 86.51%) |
 | **callgraph 时间戳** | 2026-05-30 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 4 已重导锁定; Phase 5 前须再重导) |
 | **ready_locked** | `true` (Phase 4 465 集合锁定; Phase 5 前须重算 ready) |

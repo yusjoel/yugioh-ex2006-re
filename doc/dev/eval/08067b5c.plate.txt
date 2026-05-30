@@ -1,0 +1,11 @@
+Entry: effect_slot_ptr (r0). Handles Neo Space/Neo-Spacian equip zone sprite state machine. Extracts player_id (bit0) from slot[+0x2] and modifier_bit from slot[+0x3].bit5, combines as r5=player_id XOR modifier_bit. If slot[+0x0] (card_id) == 0x1232 (Magical Labyrinth), redirects to 0x1117 (Wall Shadow). Checks slot[+0x4].bit2 (skip_flag); if set returns 0. Reads gDuelFieldState+0x4a0 state, four-way dispatch: state==0x80 -> count_zone_card_pair_allowed_for_card + check_field_spell_neo_daedalus_group_placeable + count_available_monster_slots triple check, on pass returns 0x7f; state==0x7f -> find_card_pair_in_player_deck_list, if found calls invoke_setup_equip_oam_with_attr2 to init OAM entry, returns 0x7e; state==0x7e -> enqueue_lp_counter_sprite_by_player; default/fail -> returns 0. Sub-case E epilogue (pop {r1}; bx r1); r0 = state code to caller.
+
+Constants:
+- CARD_ID_MAGICAL_LABYRINTH = 0x1232 (Magical Labyrinth -> redirect to Wall Shadow)
+- CARD_ID_WALL_SHADOW = 0x1117 (Wall Shadow)
+- SKIP_BIT = 0x4 (slot[+0x4].bit2)
+- STATE_OFFSET = 0x4a0 (gDuelFieldState + 0x94<<3)
+- gDuelFieldState = 0x0201b290
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c740
+- STATE_INIT = 0x80, STATE_OAM = 0x7f, STATE_LP_SPRITE = 0x7e
