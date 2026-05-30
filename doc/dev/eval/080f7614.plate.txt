@@ -1,0 +1,7 @@
+Copies a rectangular block of BG tiles to BG VRAM. Parameters: r0=dst_col_start (u16), r1=src_row_base (u16), r2=packed (bits[23:16]=col_count u8, bits[31:24]=row_count u8). Non-APCS: r8=src_col_base (caller-set spill r1->r8 via .hword 0x4688), r10=row_count (from r2 bits[31:24]). Double loop: outer r5=0..row_count-1, inner r4=0..col_count-1; each iteration calls copy_bg_tile_to_vram_slot with (r5*col_count+r4+dst_col_start) and (r8+col) to copy a single tile. Overwrites all dst rectangle slots in BG VRAM. indeg=0; no fn-ptr references. Returns void (Pattern B).
+
+Constants:
+- COL_COUNT_SHIFT = 0x10 (r2 bits[23:16] = col_count)
+- ROW_COUNT_SHIFT = 0x18 (r2 bits[31:24] = row_count)
+
+Params: r0=u16 dst_col_start [0..0x3ff], r1=u16 src_row_base [0..0x3ff], r2=u32 packed [bits[23:16]=col_count [1..32], bits[31:24]=row_count [1..32]]. Returns: void (Pattern B).

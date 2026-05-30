@@ -1,0 +1,11 @@
+SIO deck sync protocol receive-side driver. r0=unused (overridden by DAT_080f008c = 0x030007d6 as state ptr), r1=dest_ptr (stored to sp+0x4). Calls tick_sio_deck_sync_state, reads SIOCNT bits[5:4]: if >0x10 (link busy) return 0 immediately. Checks bits[5:4]==0 (player 0) => [sp+0]:=1. Reads IWRAM [base-2] bits[3:0] to confirm protocol phase==3 (receive ready); if not return 0. Main loop: iterates slots [0..N-1], reads each slot packet header state at 0x030003a0 offset, based on state (0x0002/0x0003) optionally uses bios_cpu_set to copy card block data to dest_ptr+offset. Increments write counter [base+0x9*4]. Returns last slot halfword value read. Called by 1 caller in deck-sync receive phase.
+
+Constants:
+- SYNC_STATE_BASE = 0x030007d6 (IWRAM SIO receive state ptr)
+- RECV_PHASE_MASK = 0x30 (SIOCNT bits[5:4])
+- READY_PHASE = 3 (protocol receive-ready value bits[3:0]==3)
+- SLOT_ENTRY_STRIDE = 2
+- CARD_BLOCK_OFF_A = 0x436
+- FIELD_MASK = 0x1ff
+
+Params: r1=ptr dest_ptr. Returns: r0=u16 0=busy/phase_mismatch or last slot halfword value (Sub-case E). Confidence: med; slot count upper bound N and dest_ptr write target need runtime verification.

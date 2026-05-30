@@ -1,0 +1,18 @@
+Pack scene card list full VRAM initialization. Triggered from pack scene reset path (FUN_080e7370 calls init_scene_pack_hardware_regs then this function). Steps: (1) zero OBJ VRAM 0x06010000 (0x8000 halfwords); (2) load_pack_tile_and_map_to_vram x2; (3) copy_bytes_by_halfword x5 to CGRAM 0x050003e0/0x050003c0/0x050003a0 and OBJ VRAM; (4) write callback ptr 0x080e6295 to gPrng+0x1f4; (5) select font_jp_base_table entry from gSettings.lang bits[2:0]; (6) setup_line_buf_pos_and_font(0x18,2) + text_render_wrapper x2; (7) write_line_buf_to_bg_tile_vram(0x06011100,0); (8) loop 5 cards (0..4) calling render_pack_card_name_to_sprite_vram; (9) write 0xfffc to gPrng+0x1e2, write pack offset to gPrng+0x1ec; (10) invoke_r1 then upload_pack_sprite_tiles_by_parity; (11) render_pack_card_desc_to_bg_tile. Returns void (Pattern B).
+
+Constants:
+- OBJ_VRAM_BASE = 0x06010000
+- OBJ_CLEAR_HW = 0x80<<8 = 0x8000 (halfwords to clear)
+- CGRAM_SLOT1 = 0x050003e0
+- CGRAM_SLOT2 = 0x050003c0
+- CGRAM_SLOT3 = 0x050003a0
+- OBJ_TILE_BANK2 = 0x06010800
+- GPRNG_CALLBACK_OFF = 0xfa<<1 = 0x1f4
+- PACK_CALLBACK_PTR = 0x080e6295
+- TEXT_X = 0x18 = 24
+- TEXT_FONT_SIZE = 2
+- GPRNG_1E2_OFF = 0xf1<<1 = 0x1e2
+- PACK_STATE_INIT = 0xfffc
+- CARD_SLOT_COUNT = 5
+
+Params: void. Returns: void (Pattern B).

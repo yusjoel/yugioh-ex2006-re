@@ -1,0 +1,9 @@
+Extracts a single bit field from the SIO deck sync protocol receive buffer. r0=bit_index (u8, selects which bit to extract), r1=dest_ptr (write destination). Steps: (1) .hword 0x4668 = mov r0,sp, call tick_sio_deck_sync_state with sp as base pointer; (2) zero-extend return value, shift right by bit_index via asrs r1,r5, AND with 1 to extract one bit; (3) if bit=0 return 0; (4) if bit=1 read 0x0300044c area entry at r5*4 offset, copy to dest_ptr via bios_cpu_set, extract bits[8:0] (mask 0x1ff) into r7; (5) clear IWRAM 0x030003a0 two slot halfwords; return r7. indeg=0; no fn-ptr references.
+
+Constants:
+- STATE_BUF_BASE = 0x0300044c (IWRAM SIO receive slot array)
+- FIELD_MASK = 0x1ff (bits[8:0] extraction mask)
+- SYNC_SLOT_A = 0x030003a0 (clear target A)
+- SYNC_SLOT_B = 0x030003a0 + 0x414 (clear target B)
+
+Params: r0=u8 bit_index [0..15], r1=ptr dest_ptr. Returns: r0=u16 extracted_field (0=bit clear; bits[8:0] of slot entry when set) (Sub-case E). Confidence: med; bit_index range and dest_ptr semantics need runtime verification.

@@ -1,0 +1,7 @@
+Looks up the 4-byte passcode for a given icid from card_passcode_table, then hashes it via xor_with_lcg_rand. Returns the hash for password input verification. Callers: (1) 080e02c8 (password input validator, compares user input against this hash); (2) 080ef38c (reverse icid lookup, iterates all icids to find hash match). Pure lookup; no external writes.
+
+Constants:
+- CARD_PASSCODE_TABLE = card_passcode_table (0x095b94cc)
+- TABLE_ENTRY_SIZE = 4 (icid*4 = byte offset)
+
+Params: r0=u16 icid [1..max_card_id]. Returns: r0=u32 passcode_hash (Sub-case E).

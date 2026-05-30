@@ -1,0 +1,11 @@
+Writes all card banlist limits for the specified banlist (banlist_id=r0) to the EWRAM banlist limit array. Triggered by FUN_080f4468 (starter deck init) with banlist_id=9. Steps: read total card count from [0x095b7cca] halfword, iterate card_index=1..max over card_stats_table (stride 0x16 bytes/card), call get_banlist_limit_for_card(banlist_id, card_id) to get limit [0..3], write bits[1:0] to [0x02000006+card_index*2+1] byte bits[1:0] (mask ~0x4). Also writes r5 (banlist_id) bits[5:0] shifted left 4 to gPrng+0x6c2c halfword bits[9:4]. Returns 1 always.
+
+Constants:
+- CARD_MAX_PTR = 0x095b7cca (total card count halfword ptr)
+- BANLIST_ARRAY_BASE = 0x02000006 (EWRAM banlist limit array)
+- CARD_ENTRY_STRIDE = 0x16
+- LIMIT_MASK_CLEAR = 0xfffffffb (clear bit[2], keep bits[1:0])
+- GPRNG_LANG_OFF = 0x6c2c (gPrng+0x6c2c gSettings area)
+- EWRAM_BASE = 0x02000000
+
+Params: r0=u8 banlist_id [5..9]. Returns: r0=1 fixed (Sub-case E).

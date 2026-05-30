@@ -1,0 +1,13 @@
+Allocates one OAM affine sprite entry and writes default attribute values. No parameters, indeg=0. Steps: (1) alloc_palette_entry_slot(0x10) allocate slot; (2) write 0xc000a300 to attr0[0..1] (affine mode + OBJ enabled + affine=3, shape=0); (3) clear attr1 bits[8:0] (mask 0xfffffe00), OR 0xd0 (x=0xd0); (4) strb [+0] := 0x30 (attr0 byte0 = Y pos 0x30); (5) clear attr2 bits[9:0] (mask 0xfffffc00), OR 0x320 (tile=0xc8); (6) clear attr2 bits[5:0] priority (mask 0xc0); (7) read current affine matrix index from IWRAM counter 0x03004c08, increment and write back; (8) setup_oam_affine_matrix_from_scale(affine_idx, sp+4, 0) init identity matrix. Returns void (Pattern B).
+
+Constants:
+- ATTR0_INIT = 0xc000a300 (affine sprite mode, attr0+attr1 word)
+- ATTR1_MASK = 0xfffffe00 (clear bits[8:0] = x position)
+- ATTR1_X = 0x68<<1 = 0xd0 (initial x position)
+- ATTR2_MASK = 0xfffffc00 (clear bits[9:0] = tile index)
+- ATTR2_TILE = 0xc8<<2 = 0x320 (initial tile index)
+- PRIORITY_MASK = 0xc0 (clear priority bits[5:0])
+- ATTR0_Y = 0x30 (initial Y position)
+- AFFINE_COUNTER = 0x03004c08 (IWRAM affine slot counter)
+
+Params: void. Returns: void (Pattern B).

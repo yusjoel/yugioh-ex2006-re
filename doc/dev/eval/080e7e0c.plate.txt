@@ -1,0 +1,9 @@
+Pack scene main state machine. Called each frame (indeg=0, scene frame tick entry). Reads gPrng+0x200 halfword bits[13:6] as current state index (0..0x14, 21 cases). Case 0: global init -- zero_fill state buffer, init_scene_pack_hardware_regs, load_pack_ui_tiles_and_palettes, render_pack_row_text loop, copy_pack_palette_and_tiles_to_vram, set_channel_if_changed(4), advance state to 1. Cases 1/18: OBJ VRAM scroll tilemap render + state advance to 2. Cases 2/19: continue advance. Cases 3-4: scroll list tilemap render + advance. Case 5: write_pack_list_scrollbar_oam + start_blend_fadein_with_target; on fadein done advance to 7. Case 6: pack_list_tile render loop. Case 7 (default): return 0 (idle). Cases 8-9: tick_pack_scroll_cursor_input-style loop. Cases 10-11: OAM/scroll state update. Cases 15/16: page switch. Case 20: fade out. Returns r0=0 (default/idle Sub-case E) or transparent from last sub-call.
+
+Constants:
+- STATE_FIELD_OFF = 0x80<<2 = 0x200 (gPrng+0x200 halfword)
+- STATE_BITS_SHIFT_HI = 0x12
+- STATE_BITS_SHIFT_LO = 0x18
+- STATE_MAX = 0x14 (21 states 0..0x14)
+
+Params: void. Returns: r0=0 idle or transparent sub-call result (Sub-case E).

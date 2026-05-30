@@ -1,0 +1,7 @@
+Resets the sound engine to fixed channel slot 0x17. No parameters. Steps: (1) call set_sound_engine_bit0_flag to set engine request bit 0; (2) call set_sound_engine_bit2_flag to set request bit 2; (3) write 0x17 to EWRAM 0x0200af10 (active channel_id field). Combined effect: sends dual reset signal (bit0+bit2) to sound engine and forces channel switch to slot 17. indeg=0; grep ".word 0x080f9b59" => 0 hits; no fn-ptr references. Returns void (Pattern B).
+
+Constants:
+- ACTIVE_CHANNEL_ADDR = 0x0200af10 (EWRAM active channel_id halfword)
+- CHANNEL_SLOT_17 = 0x17 (forced target channel number)
+
+Params: void. Returns: void (Pattern B).

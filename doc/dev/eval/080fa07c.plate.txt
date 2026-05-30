@@ -1,0 +1,17 @@
+Single-step driver for the pack scene display initialization state machine. No APCS parameters. Reads gPrng+0x206 halfword bits[13:6] (lsls #0x12; lsrs #0x18) as state index. State 0: clear gPrng+0x174 (0xba*2) + set DISPCNT (0x04000000) to 0; set blend step start value 0x40. State 1: call reset_affine_bg_matrix_and_scroll; write BG1CNT (0x0400000a) = 0x184 (0xc2<<1); call upload_pack_vram_and_palette, copy_bytes_by_halfword (palette copy 0x80 halfwords from 0x08510460 to 0x05000020), reset_all_bg_scroll_regs_and_shadows, disable_blend_and_clear_step, store_ewram_ctx_ptr_and_clear_mode_flags (gDemoState), render_pack_title_text_to_vram, render_card_detail_panel_to_vram, init_pack_obj_vram_tile_seq. State 2+: OR DISPCNT with 0x300 (blend mode enable), call tick_blend_step_by_delta(4) fadein. Each state end writes state+1 back to gPrng+0x206 bits[13:6] (mask 0xffffc03f). Returns 0 always. indeg=0; no fn-ptr references.
+
+Constants:
+- STATE_FIELD_ADDR = gPrng + 0x206 (bits[13:6] = state index)
+- STATE_MASK = 0xffffc03f (DWORD_080fa134)
+- STATE_SHIFT_LO = 6
+- BG1CNT = 0x0400000a
+- BG1CNT_INIT = 0x184 = 0xc2<<1
+- PALETTE_COPY_SRC = 0x08510460
+- PALETTE_DST = 0x05000020
+- PALETTE_HALFWORDS = 0x80
+- DISPCNT = 0x04000000
+- BLEND_ENABLE_BITS = 0x300 = 0xc0<<2
+- BLEND_DELTA = 4
+- SCROLL_FIELD_OFF = 0x174 = 0xba*2
+
+Params: void. Returns: r0=u32 0 fixed (Sub-case E).

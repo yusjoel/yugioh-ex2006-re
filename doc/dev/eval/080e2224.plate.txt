@@ -1,0 +1,12 @@
+Selects one of 5 font data pointers based on gSettings.lang bits[2:0] (lang 1=JP / 2=EU / 3=EU2 / 4=EU3 / 0,5=EN default), then renders two rows of score/string text to BG tile VRAM. Trigger: duel_puzzle scene score display, called directly from scene main loop (indeg=0). Side effects: writes glyph data to BG tile VRAM via render_string_to_bg_tile_row x2 (two rows).
+
+Constants:
+- STACK_ALLOC = 0xfffffdfc (sp-=4 frame extension)
+- GPRNG_BASE = 0x02000000+0x6c2c (gSettings.lang base)
+- FONT_EN_DEFAULT = 0x09dc0006 (lang=0/default EN font ptr)
+- FONT_OFFSET_LANG5 = 0x0003ab32 (lang=5 extra offset)
+- FONT_EU3 = 0x09deef70 (lang=4 font ptr)
+- FONT_EU2 = 0x09de2ac8 (lang=3 font ptr)
+- FONT_EU = 0x09dd6740 (lang=2 font ptr)
+
+Params: void. Returns: void (Pattern B epilogue).

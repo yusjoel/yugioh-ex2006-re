@@ -1,0 +1,11 @@
+Renders multiple rows of JP (Japanese) glyph pixel data to BG VRAM (0x06004000). Parameters: r0=char_code (u16), r1=packed_info (bits[31:24]=tile_row_base, bits[23:16]=col_offset, bits[15:8]=?, bits[7:3]=glyph_height), r2=src_ptr (byte sequence), r3=row_count. Reads DWORD_080f08b8 (0x09e5f844) and DWORD_080f08bc (0x02006ed0=gSettings) for font_jp table ptr and dimensions. Reads gSettings+0x8 byte bits[1] to select font variant (0=standard, 1=alt). For each row (0..row_count-1) calls encode_4bpp_nibbles_to_tile_row to write tile data to 0x06004000; advances to next tile slot after row 7 (8 rows per tile). Triggered by caller 080f09e0 string render loop for single-byte (narrow) glyph path. Returns void (Pattern B).
+
+Constants:
+- FONT_JP_TABLE_VARIANT_A = 0x09e5f844 (DWORD_080f08b8)
+- GSETTINGS_PTR = 0x02006ed0 (DWORD_080f08bc)
+- FONT_JP_DIM_TABLE = font_jp_dim_table (DWORD_080f08c0)
+- FONT_JP_BASE_TABLE = font_jp_base_table (DWORD_080f08c4)
+- BG_VRAM_BASE = 0x06004000
+- TILE_ROW_COUNT = 8 (pixel rows per tile)
+
+Params: r0=u16 char_code, r1=u32 packed_info, r2=ptr src_ptr, r3=u8 row_count [1..8]. Returns: void (Pattern B).

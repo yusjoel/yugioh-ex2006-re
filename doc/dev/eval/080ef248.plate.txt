@@ -1,0 +1,10 @@
+Writes all card banlist limits for the specified FW (fixed-width) banlist slot (r0=fw_slot_index) to the EWRAM banlist limit array. Symmetric with write_banlist_limits_to_ewram (0x080ef14c); sole difference: calls get_banlist_limit_for_card_by_fw instead of get_banlist_limit_for_card. Steps: read total card count from [0x095b7cca], iterate card_index=1..max over card_stats_table (stride 0x16), call get_banlist_limit_for_card_by_fw(fw_slot_index, card_id) to get limit [0..3], write to [0x02000006+card_index*2+1] bits[1:0]. Also writes r5 bits[5:0] shifted left 4 to gPrng+0x6c2c halfword bits[9:4]. Returns 1 always. indeg=0; no fn-ptr references.
+
+Constants:
+- CARD_MAX_PTR = 0x095b7cca
+- BANLIST_ARRAY_BASE = 0x02000006
+- CARD_ENTRY_STRIDE = 0x16
+- GPRNG_LANG_OFF = 0x6c2c
+- EWRAM_BASE = 0x02000000
+
+Params: r0=u8 fw_slot_index [0..10]. Returns: r0=1 fixed (Sub-case E).

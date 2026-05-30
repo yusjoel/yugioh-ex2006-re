@@ -1,0 +1,10 @@
+Renders multiple rows of JP glyph pixel data to BG VRAM (0x06004000) -- alternate wide glyph variant. Fully symmetric with render_jp_glyph_rows_to_bg_vram (0x080f07ec); sole difference: offsets into font_jp_dim_table/font_jp_base_table are +8 bytes (adds r2,#0x8 @ 080f0912 and adds r0,#0x8 @ 080f0940), selecting the double-byte (wide) glyph table entries instead of narrow glyph entries. Parameters/side effects/flow identical to sibling: r0=char_code (u16), r1=packed_info, r2=src_ptr, r3=row_count. Calls encode_4bpp_nibbles_to_tile_row per row writing to 0x06004000. Triggered by caller 080f09e0 for double-byte (wide) glyph path. Returns void (Pattern B).
+
+Constants:
+- FONT_JP_DIM_TABLE_ALT_OFF = +8 (wide glyph table entry offset)
+- FONT_JP_BASE_TABLE_ALT_OFF = +8 (wide glyph base table offset)
+- GSETTINGS_PTR = 0x02006ed0 (DWORD_080f09b8)
+- BG_VRAM_BASE = 0x06004000 (DWORD_080f09c0)
+- TILE_ROW_COUNT = 8
+
+Params: r0=u16 char_code, r1=u32 packed_info, r2=ptr src_ptr, r3=u8 row_count [1..8]. Returns: void (Pattern B).

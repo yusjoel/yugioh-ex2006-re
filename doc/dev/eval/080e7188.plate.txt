@@ -1,0 +1,11 @@
+Pack scene card list scroll cursor per-frame input handler. Triggered each frame by pack scene tick (caller FUN_080e73b4). Steps: (1) render_pack_scroll_cursor_oam(0) refresh cursor OAM; (2) check gMenuState+0x29 bits[6:4] non-zero (any direction key active); (3) if bit6=1 (LEFT): read gMenuState+0x28 bits[6:0], if non-zero write 0xffff to gMenuState+0x2c (scroll back marker), clear bits, call render_pack_card_name_to_sprite_vram(slot-1), sync_state_and_init_sprite(0); (4) if bit7=1 (RIGHT): check current slot index < max_slot/2, if so write 1 to gMenuState+0x2c, update gMenuState+0x29, call render_pack_card_name_to_sprite_vram(slot+1), sync_state_and_init_sprite(0); (5) if bit3 set: set gMenuState+0x29 bit7; (6) call tick_pack_scroll_position_fields. Returns transparent from tick_pack_scroll_position_fields (Sub-case E).
+
+Constants:
+- LEFT_INPUT_BIT = 0x40 (gPrng+0x148 halfword bit6 = LEFT key)
+- RIGHT_INPUT_BIT = 0x80 (gPrng+0x148 halfword bit7 = RIGHT key)
+- GPRNG_INPUT_OFF = 0xa4<<1 = 0x148
+- SCROLL_BACK_VAL = 0xffff
+- SCROLL_FWD_VAL = 1
+- FLAG_MASK_78 = 0x78 (gMenuState+0x29 direction bits[6:3])
+
+Params: void. Returns: r0=scroll state code (transparent from tick_pack_scroll_position_fields).

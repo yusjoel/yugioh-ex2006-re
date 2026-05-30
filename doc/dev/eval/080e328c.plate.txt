@@ -1,0 +1,19 @@
+Accepts r0=challenge_index (u16), adds offset 0xffffd8ef to normalize to switch domain [0..0x32] (51 cases). Each case checks a specific duel puzzle unlock condition: (a) holding a specific icid card (check_card_in_stock_by_icid chain); (b) expert/standard challenge cleared count threshold 2/5/8/11/15/19 (get_expert_challenge_count + count_cleared_puzzle_stages); (c) total challenge cleared count threshold 0x13/0x3b/0x4f/0x59 (get_total_challenge_cleared_count). Returns 1=condition met (unlock), 0=not met. Called by FUN_080e386c (duel_puzzle card unlock update) and FUN_080f4564 (duel_puzzle progress init batch scan).
+
+Constants:
+- ICID_FIRST = 0xac<<5 = 0x1580
+- ICID_0x15b0 = 0x15b0
+- ICID_0x15b3 = 0x15b3
+- ICID_0x1947 = 0x1947
+- ICID_0x194b = 0x194b
+- ICID_0x15b4 = 0x15b4
+- ICID_0x1953 = 0x1953
+- ICID_0x1954 = 0x1954
+- INDEX_OFFSET = 0xffffd8ef (switch normalizer)
+- CASE_COUNT = 0x33 (51 cases 0x00..0x32)
+- THRESHOLD_SMALL = 0x13
+- THRESHOLD_MED = 0x3b
+- THRESHOLD_LARGE = 0x4f
+- THRESHOLD_MAX = 0x59
+
+Params: r0=u16 challenge_index [0x2711..0x2746]. Returns: r0=1 unlock met / 0 not met (Sub-case E).

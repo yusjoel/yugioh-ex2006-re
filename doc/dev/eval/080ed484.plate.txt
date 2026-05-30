@@ -1,0 +1,15 @@
+SIO deck sync write function. Called by three send paths (callers 080ed52c / 080ed550 / 080eda30). Steps: (1) read SIOCNT bits[5:4]; if >0x10 (SIO busy) return 0 immediately; (2) load gPrng+0x1c0 ptr + offset 0x928, copy r0-pointed 0xe halfwords to sync slot; (3) clear old counter bits (mask 0xf0ff); (4) read packet sequence index from offset 0x57e, shift left 8 bits and merge into target slot; (5) call append_sio_deck_sync_packet; on success increment write counter wrapped to bits[3:0] (mod 0xf); (6) copy new entry to write position; return 1. On failure return 0.
+
+Constants:
+- SIOCNT = 0x04000128 (SIO Control Register)
+- SIO_BUSY_MASK = 0x30 (bits[5:4])
+- SIO_BUSY_THRESHOLD = 0x10
+- SYNC_SLOT_BASE = gPrng + 0x1c0 (0xe0<<1=0x1c0)
+- ENTRY_OFFSET = 0x928
+- ENTRY_SIZE_HW = 0xe
+- PKT_IDX_OFF = 0x57e
+- COUNTER_MASK = 0xf0ff
+- PKT_IDX_SHIFT = 0x8
+- WRITE_CTR_MOD = 0xf
+
+Params: r0=ptr source_entry (0xe-halfword block to write). Returns: r0=1 accepted / 0 busy (Sub-case E).

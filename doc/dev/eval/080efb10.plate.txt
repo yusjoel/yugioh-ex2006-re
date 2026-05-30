@@ -1,0 +1,14 @@
+SIO deck sync protocol send-side loop driver. No APCS parameters. Calls tick_sio_deck_sync_state to poll link status, checks state word bits[5:4] (SIOCNT 0x04000128 bits[5:4]) to determine communication phase. Branches on state codes (0x3000/0x2000/0x1000/0x4000) to read/increment/pack sync slots in IWRAM 0x030003a0/0x030003a8, then uses bios_cpu_set to copy card block (offset 0xac) to the corresponding SIO send buffer slot. Loop exit condition: loop counter [sp+0x3c] > 1. Returns r0=0 no data sent, nonzero=halfword count sent. indeg=0; no fn-ptr references.
+
+Constants:
+- SYNC_STATE_BASE = 0x030003a0 (IWRAM SIO send state base)
+- SYNC_COUNTER_BASE = 0x030003a8 (IWRAM SIO packet counter area)
+- SYNC_SLOT_BASE = 0x030007b4 (IWRAM sync slot data)
+- SIOCNT_PHASE_MASK = 0x30 (bits[5:4] = comm phase)
+- STATE_COMPLETE = 0x3000 = 0xc0<<6
+- STATE_ACK = 0x2000 = 0x80<<6
+- STATE_SEND = 0x1000 = 0x80<<5
+- STATE_RECV = 0x4000 = 0x80<<7
+- CARD_BLOCK_OFF = 0xac
+
+Params: void. Returns: r0=u16 transfer_count (0=no transfer, nonzero=halfwords sent) (Sub-case E). Confidence: med; SIO state code semantics need runtime verification.

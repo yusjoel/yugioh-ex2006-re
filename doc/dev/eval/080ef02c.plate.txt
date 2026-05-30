@@ -1,0 +1,14 @@
+Checks full deck (main + side + extra) for banlist compliance. r0=banlist_id (u8, passed to get_banlist_limit_for_card). Three loops iterate over main/side/extra deck slot arrays (counts from [EWRAM+0x1150]/[+0x1151]/[+0x1152], slots from [EWRAM+0x1154]/[+0x11f4]/[+0x1212]). For each card: load card_id from card_stats_table, call count_card_in_full_deck to count occurrences in full deck, call get_banlist_limit_for_card(banlist_id, card_id) to get limit; if count > limit return 0 (violation) immediately. All pass: return 1.
+
+Constants:
+- EWRAM_BASE = 0x02000000
+- MAIN_COUNT_OFF = 0x1150 (main deck slot count byte)
+- SIDE_COUNT_OFF = 0x1151 (side deck slot count byte)
+- EXTRA_COUNT_OFF = 0x1152 (extra deck slot count byte)
+- MAIN_SLOTS_OFF = 0x1154
+- SIDE_SLOTS_OFF = 0x11f4
+- EXTRA_SLOTS_OFF = 0x1212
+- CARD_ENTRY_STRIDE = 0x16 (card_stats_table entry size bytes)
+- CARD_STATS_BASE = card_stats_table (PTR at 0x09816998)
+
+Params: r0=u8 banlist_id [5..9]. Returns: r0=1 compliant / 0 violation (Sub-case E).

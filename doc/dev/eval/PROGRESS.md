@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4255 / 全 CSV 4641 行 = **91.68%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4275 / 全 CSV 4641 行 = **92.11%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -54,13 +54,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #193 |
+| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #194 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-30 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4255 (91.68%) |
-| **未命名 (FUN_*)** | 386 (其中 45 ready / 341 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 4)** | 45 函数 (批 #193..#195 未完成部分), 处理中 |
-| **下一批** | #193 (Phase 4 idx 21) — `ready_batches_phase4.json` |
-| **上次更新** | 2026-05-31 (batch #192 PASSED: pack-scene HSV pixel transforms + pack OAM tick hub (indeg=22 0x080df5c4) + challenge stats/unlock + duel puzzle scene vram/labels x20, 4255/4641 = 91.68%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4275 (92.11%) |
+| **未命名 (FUN_*)** | 366 (其中 25 ready / 341 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 4)** | 25 函数 (批 #194..#195 未完成部分), 处理中 |
+| **下一批** | #194 (Phase 4 idx 22) — `ready_batches_phase4.json` |
+| **上次更新** | 2026-05-31 (batch #193 PASSED: duel puzzle score/unlock + pack scene state machine/cursor + SIO deck sync entry/send/recv + banlist compliance/limits + jp glyph BG render + player rank x20, 4275/4641 = 92.11%) |
 | **callgraph 时间戳** | 2026-05-30 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 4 已重导锁定; Phase 5 前须再重导) |
 | **ready_locked** | `true` (Phase 4 465 集合锁定; Phase 5 前须重算 ready) |
