@@ -1,0 +1,10 @@
+Function: Performs zone match check on effect slot, activates effect node, then: first calls enqueue_sprite_attr_with_mode(side, type, card_id_halfword, sp[0]=0, mode=2) to enqueue mode=2 sprite; then calls enqueue_sprite_attr_type11(opponent_side, card_id, type=1, type_code=0) to append type11 record. Symmetric to enqueue_effect_slot_sprite_with_type11 (0x08074fb8): that function calls enqueue_slot_card_sprite_if_eligible; this function uses enqueue_sprite_attr_with_mode(mode=2) instead. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- SPRITE_MODE=2 -- enqueue_sprite_attr_with_mode fifth arg (passed via sp[0])
+- TYPE11_TYPE=1 -- enqueue_sprite_attr_type11 third arg
+- TYPE11_FLAG=0 -- enqueue_sprite_attr_type11 fourth arg
+
+Side effects:
+- sprite queue: enqueue_sprite_attr_with_mode(side, type, card_id, 0, 2) -- mode=2 enqueue
+- sprite queue: enqueue_sprite_attr_type11(opponent_side, card_id, 1, 0) -- type11 append

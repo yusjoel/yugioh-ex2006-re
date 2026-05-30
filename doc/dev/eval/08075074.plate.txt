@@ -1,0 +1,9 @@
+Function: Iterates both players (side=0,1) x slots (slot=0..10), calling invoke_effect_node_with_active_flag_3arg for each (side,slot); on activation success calls enqueue_effect_card_slot_sprite_attr(side, slot, update=1) to enqueue effect card sprite attr. Entry .hword 0x4647 (mov r7,r8) is callee-save restore; .hword 0x4688 (mov r8,r1) saves gEffectSlots base pointer r1 into r8. Slot upper bound is 10 (cmp r5,#0xa), covering more slots than enqueue_effect_slot_sprites_all_sides (which covers 0..4). Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- SIDE_MAX=1 -- side loop upper bound [0..1]
+- SLOT_MAX=10 -- slot loop upper bound [0..10], cmp r5,#0xa
+- gEffectSlots=0x0201e1c8 -- effect slot EWRAM base address (DWORD_080750bc)
+
+Side effects:
+- sprite attr queue: enqueue_effect_card_slot_sprite_attr(side, slot, 1) per active slot

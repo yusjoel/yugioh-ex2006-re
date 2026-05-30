@@ -1,0 +1,13 @@
+Function: Executes only when state==0x80: first calls enqueue_lp_field_state_sprite_by_player and enqueue_equip_zone_sprite_for_player to refresh LP/equip-zone sprites; then reads card_id_field (bits[12:0]) from gP1LifePoints_alt (0x0201c740) + player_id*STRIDE, reads [r4+8] card pair param, calls check_card_pair_allowed(card_id_field, pair_param); if allowed, calls enqueue_hand_sprite_with_flip_flag_set(opponent_player_id, zone_ref); if not allowed, calls enqueue_equip_zone_sprite_attr_full(opponent_player_id, 1, 0). Other states return 0 directly. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- DISPLAY_STATE_BASE=0x0201b290 -- state machine base (DAT_080764ec)
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 -- state field offset
+- gP1LifePoints_alt=0x0201c740 -- alternate LP field EWRAM base (DAT_080764f4)
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_080764f0)
+- CARD_ID_BITS=bits[12:0] -- lsls r0,r0,#0x13; lsrs r0,r0,#0x13 extracts field
+
+Side effects:
+- sprite queue: enqueue_lp_field_state_sprite_by_player (@ 080764a8)
+- sprite queue: enqueue_equip_zone_sprite_for_player (@ 080764b2)
+- sprite queue: enqueue_hand_sprite_with_flip_flag_set or enqueue_equip_zone_sprite_attr_full (@ 080764e6/08076502)

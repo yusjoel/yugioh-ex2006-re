@@ -1,0 +1,8 @@
+Function: Uses .hword 0x466a (mov r2,sp) to pass stack pointer as output buffer to check_effect_slot_matches_zone_entry, reads packed side/type from stack buffer; on successful effect node activation calls update_equip_target_bitmap_zone15(slot_entry, side, type, 0) to update equip target bitmap zone15 field. Structurally similar to invoke_equip_zone_lp_shape_with_lp_counter (0x08075cb0) but without LP counter calls, replacing the core operation with update_equip_target_bitmap_zone15. Note: 0x466a is mov r2,sp, not a function parameter. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- STACK_OUT_BUF -- 0x466a = mov r2,sp, not a parameter
+- ZONE15_ARG=0 -- update_equip_target_bitmap_zone15 fourth arg
+
+Side effects:
+- EWRAM write: update_equip_target_bitmap_zone15(slot_entry, side, type, 0) -- updates equip target bitmap

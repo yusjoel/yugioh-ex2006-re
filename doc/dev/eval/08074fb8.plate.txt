@@ -1,0 +1,10 @@
+Function: Performs zone match check on a single effect slot, activates effect node, then calls enqueue_slot_card_sprite_if_eligible(slot, side, type, sp[0]=2, sp[4]=1) to enqueue card sprite, then calls enqueue_sprite_attr_type11(side, card_id, type=1, type_code) to write type11 sprite attr record. No state machine branches -- single-slot sprite write utility. Sibling of enqueue_effect_slot_sprites_all_sides (0x08074f74): that function iterates both sides in batch; this function processes only the single zone-validated slot and additionally appends a type11 record.
+
+Constants:
+- SPRITE_FLAG1=2 -- enqueue_slot_card_sprite_if_eligible sp[0] arg
+- SPRITE_FLAG2=1 -- enqueue_slot_card_sprite_if_eligible sp[4] arg
+- TYPE11_TYPE=1 -- enqueue_sprite_attr_type11 third arg
+
+Side effects:
+- sprite attr queue: enqueue_slot_card_sprite_if_eligible(slot, side, type, 2, 1)
+- sprite attr queue: enqueue_sprite_attr_type11(side, card_id, 1, type_code)

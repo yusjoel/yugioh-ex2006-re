@@ -1,0 +1,15 @@
+Function: Large switch state machine dispatcher. Reads [gP1LifePoints+0x94*8] display state (range 0x62..0x80), dispatches via jump table (31 entries, @ 0x08075154) to handlers: 0x62=enqueue_lp_counter_sprite_by_player; 0x63=set_lp_row_type7_if_opponent_linked, returns 0x62; 0x64=trigger_card_display_op31_if_not_active, returns 0x63; 0x7c=decrement_lp_bar_display_counter, returns 0; 0x7d=reads gBase+0x98*4 equip fields, calls enqueue_sprite_attr_for_slot_indicator/enqueue_lp_field_state_sprite/enqueue_equip_zone_sprite/check_card_field5+enqueue_hand_sprite or enqueue_equip_zone_sprite_attr_full, returns 0x7c or 0x7d; 0x7e=increment_lp_bar_display_counter, returns 0x7d; 0x7f=reads gBase+0x95*8 count, if non-zero calls enqueue_sprite_attr_with_mode; 0x80=count_monster_slots, if count matches stored value returns 0x64 else 0x7e; default=0. r2 is saved at entry (adds r2,r0,#0) as effect slot pointer.
+
+Constants:
+- DISPLAY_STATE_BASE=gP1LifePoints=0x0201c4e0 -- state machine base address
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 -- state field offset
+- SWITCH_TABLE=0x08075154 -- jump table base (31 entries)
+- STATE_ENUM_MIN=0x62 -- minimum state code
+- STATE_ENUM_MAX=0x80 -- maximum state code
+- PLAYER_STRIDE=0x868 -- per-player stride
+- EQUIP_FIELD_OFFSET=0x98*4=0x260 -- gBase+0x260 equip-related field
+
+Side effects:
+- LP display: enqueue_lp_counter_sprite_by_player / increment_lp_bar_display_counter / decrement_lp_bar_display_counter
+- OAM queue: enqueue_sprite_attr_for_slot_indicator / enqueue_lp_field_state_sprite_by_player / enqueue_equip_zone_sprite_for_player / enqueue_hand_sprite_with_flip_flag_set / enqueue_equip_zone_sprite_attr_full / enqueue_sprite_attr_with_mode
+- triggers: trigger_card_display_op31_if_not_active / set_lp_row_type7_if_opponent_linked

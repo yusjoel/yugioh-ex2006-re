@@ -1,0 +1,23 @@
+Function: After zone match check and effect node activation, dispatches on card_id ([r6+0]) to 10 special-card paths computing score/count into r8 accumulator: 0x1492 (Deal of Phantom) = count_hand_cards_with_field5 + r1=0x64; 0x14be (Bark of Dark Ruler) = ldrh r0,[r6,#0xc] stored; 0x1511 (The Secret of the Bandit) = enqueue_hand_card_sprite_by_spell_type; 0x16ce (Wild Nature's Release) = get_slot_field6_score; 0x16e3 (Energy Drain) = reads gP1LifePoints opponent ATK field * 0xc8; 0x1890 (Union Attack) = score=0 init; 0x18ca (Gift of the Martyr) = opponent player score; 0x19ab (Hero Heart) = get_slot_field5_score; 0x19a7 (Hero Kid) = count_extra_deck_cards_by_id * scaled constant. All paths converge to LAB_08077084, calling enqueue_slot_card_sprite_if_eligible(slot, side, type, sp[0]=2, score_lo16). Entry .hword 0x4657+0x464e+0x4645 saves r10/r9/r8 to r7/r6/r5 (callee-save). Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- CARD_DEAL_OF_PHANTOM=0x1492 -- Deal of Phantom (data.md)
+- CARD_BARK_DARK_RULER=0x14be -- Bark of Dark Ruler (data.md)
+- CARD_SECRET_BANDIT=0x1511 -- The Secret of the Bandit (data.md)
+- CARD_WILD_NATURES_RELEASE=0x16ce -- Wild Nature's Release (data.md)
+- CARD_ENERGY_DRAIN=0x16e3 -- Energy Drain (data.md)
+- CARD_UNION_ATTACK=0x1890 -- Union Attack (data.md)
+- CARD_GIFT_MARTYR=0x18ca -- Gift of the Martyr (data.md)
+- CARD_HERO_HEART=0x19ab -- Hero Heart (data.md)
+- CARD_HERO_KID=0x19a7 -- Hero Kid (data.md, DAT_080770b0)
+- SCORE_CAP=0xffff -- score <= 0xffff validity check (DAT_08077044)
+- SPRITE_MODE=2 -- enqueue_slot_card_sprite_if_eligible sp[0]=2
+- gP1LifePoints=0x0201c4e0 -- used in Energy Drain path to read ATK field
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_0807703c)
+- gDuelFieldSlots=0x0201c510 -- duel field slot base (DAT_08077040)
+- SCORE_MULTIPLIER_ENERGY=0xc8 -- Energy Drain multiplier
+
+Side effects:
+- sprite queue: enqueue_slot_card_sprite_if_eligible(slot, side, type, 2, score_lo16) -- common exit
+- sprite queue: enqueue_hand_card_sprite_by_spell_type (@ 08076f6c path, CARD_SECRET_BANDIT=0x1511)
+- sprite queue: enqueue_slot_card_sprite_if_eligible x2 (@ 08077022, Hero Kid loop)

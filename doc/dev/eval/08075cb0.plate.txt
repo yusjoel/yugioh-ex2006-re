@@ -1,0 +1,10 @@
+Function: Uses .hword 0x466a (mov r2,sp) to pass stack pointer as output buffer to check_effect_slot_matches_zone_entry, reads side/type from stack buffer; activates effect node then calls increment_lp_bar_display_counter; calls check_equip_slot_eligible_in_target_bitmap to verify equip bitmap; if eligible, extracts opponent_side=1-player_id, computes sp_arg=0xfa<<2=0x3e8, calls submit_effect_zone_lp_and_shape_sprites(opponent_side, 0x3e8); unconditionally calls decrement_lp_bar_display_counter afterward. Note: 0x466a is mov r2,sp, not a function parameter. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- LP_SHAPE_ARG=0xfa<<2=0x3e8 -- submit_effect_zone_lp_and_shape_sprites second arg (=1000)
+- STACK_OUT_BUF -- 0x466a = mov r2,sp, makes stack buffer the check_effect_slot output arg
+
+Side effects:
+- LP display: increment_lp_bar_display_counter (@ 08075cda)
+- LP display: decrement_lp_bar_display_counter (@ 08075cfe, unconditional)
+- sprite queue: submit_effect_zone_lp_and_shape_sprites(opponent_side, 0x3e8) -- writes LP+shape sprites

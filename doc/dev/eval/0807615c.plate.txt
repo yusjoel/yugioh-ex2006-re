@@ -1,0 +1,12 @@
+Function: After zone match check and effect node activation, iterates 5 equip slot offsets (0, 0x14, 0x28, 0x3c, 0x50); for each slot where [r0+8] is non-zero, calls eval_slot_score_entry_full_with_sp_result(player_id, slot_offset) and accumulates result into r7. After loop, truncates score to low 16 bits and calls enqueue_sprite_attr_with_mode(side, type, card_id, score_sum_lo16, mode=2). Entry .hword 0x464f+0x4646 saves r9/r8 to r7/r6 (callee-save); .hword 0x4689/0x4680 saves side/type to r9/r8 after reading them. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- SLOT_STEP=0x14 -- per-slot stride (offsets 0,0x14,0x28,0x3c,0x50)
+- SLOT_COUNT=5 -- equip slot count [0..4]
+- SLOT_FIELD8_OFFSET=8 -- [gDuelFieldSlots+offset+8] must be non-zero to contribute to score
+- SPRITE_MODE=2 -- enqueue_sprite_attr_with_mode fifth arg
+- PLAYER_STRIDE=0x868 -- gDuelFieldSlots stride (DWORD_080761e0)
+- gDuelFieldSlots=0x0201c510 -- duel field slot base (DWORD_080761e4)
+
+Side effects:
+- sprite queue: enqueue_sprite_attr_with_mode(side, type, card_id, score_sum_lo16, 2)

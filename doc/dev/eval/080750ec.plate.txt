@@ -1,0 +1,7 @@
+Function: Performs zone match check on a single effect slot, on success reads side/type, activates effect node, then calls enqueue_effect_card_slot_sprite_attr(side, slot, update=1) to write effect card sprite attr. Sibling of enqueue_effect_card_sprites_all_players (0x08075074): that function iterates both sides across all slots; this function processes only the single zone-validated slot. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- UPDATE_FLAG=1 -- enqueue_effect_card_slot_sprite_attr third arg
+
+Side effects:
+- sprite attr queue: enqueue_effect_card_slot_sprite_attr(side, slot, 1)

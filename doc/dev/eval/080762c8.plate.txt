@@ -1,0 +1,12 @@
+Function: Checks Neo Daedalus placement eligibility, then additionally checks [r4+6] bits[4:2]==4 (i.e., (byte & 0x1c)==4), reads effect slot zone_type via read_effect_slot_zone_type, calls find_zone_descriptor_by_slot_id, confirms zone_type==0xe; verifies check_zone_slot_equip_eligible; finally calls invoke_setup_equip_oam_with_attr2. Sibling of invoke_equip_oam_for_zone_type_e_slot (0x080757f0): difference is this function adds [r4+6] bits[4:2]==4 gate and reads zone_type indirectly via read_effect_slot_zone_type rather than directly reading [r4+0x14]. Qualifier bits46 refers to the [r4+6] bits[4:2] gate condition. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- BITS46_MASK=0x1c -- ands r0,r1 extracts bits[4:2]
+- BITS46_VALUE=4 -- bits[4:2] must equal 4
+- ZONE_TYPE_E=0xe -- only handles zone_type==14 regions
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_08076334)
+- gGraveyardSlots=0x0201c8f8 -- graveyard/field zone base (DAT_08076338)
+- OAM_ATTR2_FLAG=1 -- invoke_setup_equip_oam_with_attr2 fourth arg
+
+Side effects:
+- OAM queue: invoke_setup_equip_oam_with_attr2(side, zone_ptr, card_id<<16, 1)

@@ -1,0 +1,10 @@
+Function: Iterates both players (side=0,1) x slots (slot=0..4), calling invoke_effect_node_with_active_flag_3arg for each (side,slot); on activation success calls enqueue_slot_card_sprite_if_eligible(slot_entry, side, slot, sp[0]=3, sp[4]=0) to enqueue the slot card sprite. Does not use display state machine -- no state field reads or writes. Pure batch sprite enqueue utility. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- SIDE_MAX=1 -- side loop upper bound [0..1]
+- SLOT_MAX=4 -- slot loop upper bound [0..4]
+- SPRITE_FLAG1=3 -- enqueue_slot_card_sprite_if_eligible sp[0] arg
+- SPRITE_FLAG2=0 -- enqueue_slot_card_sprite_if_eligible sp[4] arg
+
+Side effects:
+- sprite attr queue: enqueue_slot_card_sprite_if_eligible(slot_entry, side, slot, 3, 0) per active slot

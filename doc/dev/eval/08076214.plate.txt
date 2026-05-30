@@ -1,0 +1,14 @@
+Function: Reads [r5+0xc]=type_code, then reads [gBase+0x94*8] display state, branches on 0x80/0x7f. State 0x80: calls dispatch_effect_handler_by_card_id(player_id, card_id, type_code); on success calls init_effect_slot_display_context(player_id, card_id, type=6, type_code) and returns 0x7f; on failure if type_code==1 calls trigger_card_display_op31_if_not_active(player_id, 0x15). State 0x7f: type_code==1 -- get_monster_slot_entry_ptr then enqueue_hand_sprite_with_flip_flag_set; type_code!=1 -- get_monster_slot_entry_ptr then enqueue_graveyard_spell_sprite_with_zone_ref. Other states return 0.
+
+Constants:
+- DISPLAY_STATE_BASE=0x0201b290 -- state machine base (DAT_08076250)
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 -- state field offset
+- TYPE_CODE_HAND=1 -- type_code==1 takes hand sprite path
+- DISPLAY_CONTEXT_TYPE=6 -- init_effect_slot_display_context third arg
+- OP31_ARG=0x15 -- trigger_card_display_op31_if_not_active second arg
+
+Side effects:
+- display context: init_effect_slot_display_context(player_id, card_id, 6, type_code) (@ 08076260, state 0x80 success)
+- trigger: trigger_card_display_op31_if_not_active(player_id, 0x15) (@ 0807624a, state 0x80 failure+type1)
+- sprite queue: enqueue_hand_sprite_with_flip_flag_set (@ 0807627a, state 0x7f type1)
+- sprite queue: enqueue_graveyard_spell_sprite_with_zone_ref (@ 08076290, state 0x7f type!=1)

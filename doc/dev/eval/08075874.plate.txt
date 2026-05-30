@@ -1,0 +1,10 @@
+Function: Checks that available monster slots exist (count_available_monster_slots non-zero) and passes check_field_spell_neo_daedalus_group_placeable, then extracts set_code (bits[14:6]) from effect slot [r4+4], calls find_hand_slot_idx_by_set_code to locate hand slot; if found (>=0) calls check_zone_slot_equip_eligible to verify equip legality, finally calls invoke_setup_equip_oam_with_attr2 to write equip OAM where attr2 = card_id<<16 | 0x20 (bit5 set via orrs r3,r2). Returns 0 on failure or when hand slot not found.
+
+Constants:
+- SET_CODE_BITS=bits[14:6] (9-bit field) -- lsls r1,r2,#0x11; lsrs r1,r1,#0x17; net right shift=6, mask=9 bits
+- OAM_ATTR2_BIT5=0x20 -- orrs r3,r2 sets bit5 (@ 080758d6)
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_080758e8)
+- gGraveyardSlots=0x0201c8f8 -- graveyard/field zone EWRAM base (DAT_080758ec)
+
+Side effects:
+- OAM queue: invoke_setup_equip_oam_with_attr2(side, zone_ptr, card_id<<16|0x20, 1) -- writes equip OAM

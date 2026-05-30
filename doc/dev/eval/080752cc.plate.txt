@@ -1,0 +1,9 @@
+Function: Performs zone match check on effect slot (only if [r4+0xc] != 0), activates effect node, then calls enqueue_effect_card_slot_sprite_attr twice: first with update=rsbs r2,r2,#0 (negation of 1 yields -1), second with side=r6, slot=r5, update=1. The rsbs negation is the key distinguishing feature from enqueue_effect_card_sprite_single_slot -- first enqueue uses negative mode flag. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- NEGATED_FLAG=-1 -- rsbs r2,r2,#0 negates update_flag=1
+- UPDATE_FLAG=1 -- second call to enqueue_effect_card_slot_sprite_attr third arg
+
+Side effects:
+- sprite attr queue: enqueue_effect_card_slot_sprite_attr(player_id, zone_idx, -1) -- negated mode enqueue
+- sprite attr queue: enqueue_effect_card_slot_sprite_attr(side, slot, 1) -- normal enqueue

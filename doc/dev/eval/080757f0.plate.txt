@@ -1,0 +1,11 @@
+Function: Checks Neo Daedalus placement eligibility, reads effect slot [r4+0x14] slot_id, resolves zone descriptor via find_zone_descriptor_by_slot_id; continues only when zone_type==0xe: reads card_id from gP1LifePoints + slot_id*4 + 0x87<<5, verifies non-zero via check_card_field5_is_nonzero, confirms equip legality via check_zone_slot_equip_eligible, finally calls invoke_setup_equip_oam_with_attr2 to write equip OAM attr. All failure paths return 0.
+
+Constants:
+- ZONE_TYPE_E=0xe -- only handles zone_type==14 regions
+- CARD_ID_OFFSET=0x87<<5=0x10e0 -- gP1LifePoints + slot_id*4 + 0x10e0 locates card_id halfword
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_08075870)
+- gDuelFieldSlots=0x0201c510 -- via gP1LifePoints base address indirection
+- OAM_ATTR2_FLAG=1 -- invoke_setup_equip_oam_with_attr2 fourth arg
+
+Side effects:
+- OAM queue: invoke_setup_equip_oam_with_attr2(side, oam_ptr, card_id<<16, 1) -- writes equip OAM attr

@@ -1,0 +1,13 @@
+Function: Reads [gBase+0x94*8] display state, branches on 0x80/0x7f: state 0x80 -- calls read_effect_slot_zone_type and find_hand_slot_idx_by_set_code to locate hand slot, on success computes gGraveyardSlots zone_ref and calls enqueue_graveyard_spell_sprite_with_zone_ref, returns 0x7f; state 0x7f -- reads side/card_id then calls read_effect_slot_zone_type, then calls enqueue_sprite_attr_type11(side, card_id, zone_type_low16, 1); other states return 0. Two-step state machine for graveyard spell sprite display sequence.
+
+Constants:
+- DISPLAY_STATE_BASE=0x0201b290 -- state machine base (DAT_08075b10)
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 -- state field offset
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_08075b14)
+- gGraveyardSlots=0x0201c8f8 -- graveyard zone base (DAT_08075b18)
+- STATE_INIT=0x80 -- enqueue phase
+- STATE_TYPE11=0x7f -- type11 sprite phase
+
+Side effects:
+- sprite queue: enqueue_graveyard_spell_sprite_with_zone_ref (@ 08075b06, state 0x80 path)
+- sprite queue: enqueue_sprite_attr_type11(side, card_id, zone_type, 1) (@ 08075b38, state 0x7f path)

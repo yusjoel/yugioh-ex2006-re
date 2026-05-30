@@ -1,0 +1,18 @@
+Function: State machine driving equip-zone OAM refresh via effect-slot display state (0x0201b290+0x94*8). State 0x80: call check_effect_slot_matches_zone_entry to verify zone match, on success clear [r4+0xa], call increment_lp_bar_display_counter, return 0x7f. State 0x7f: call invoke_effect_node_with_active_flag_3arg to activate effect node, on success use find_equip_target_for_card_slot to locate equip target, verify via check_neo_daedalus_placement_eligible + check_value_in_slot_chain, then call invoke_setup_equip_oam_with_attr2 to write OAM attributes and return 0x7e. State 0x7e: read effect-slot field5 bit; if set, call enqueue_sprite_attr_record then decrement_lp_bar_display_counter, return 0. State 0x7d: same field5 check, enqueue_sprite_attr_record then decrement_lp_bar_display_counter.
+
+Constants:
+- DISPLAY_STATE_BASE=0x0201b290 -- display state machine base address
+- DISPLAY_STATE_OFFSET=0x94*8=0x4a0 -- state field offset
+- SLOT_CHAIN_ARG=0x00000fb6 -- third arg to check_value_in_slot_chain
+- SLOT_FIELD_OFFSET=0x000004a4 -- gBase+0x4a4, equip iteration target slot
+- PLAYER_STRIDE=0x868 -- per-player data stride
+- gDuelFieldSlots=0x0201c510 -- duel field slot base address
+- SIDE_MASK=0x1b -- enqueue_sprite_attr_record side_flag=0x1b/0x801b
+
+Side effects:
+- [r4+0xa] := 0 (effect slot state field cleared, @ 08074b7e)
+- [0x0201b290+0x4a4] := check_value_in_slot_chain result (target slot chain value, @ 08074bc6)
+- [0x0201b290+0x4a8] := get_first_placeable_monster_slot result (placeable monster slot, @ 08074bd6)
+- sprite attr queue: invoke_setup_equip_oam_with_attr2(side, oam_ptr, 1, 0) writes OAM
+- sprite attr queue: enqueue_sprite_attr_record(side_flag, slot_idx, 0, 0)
+- LP counter: increment_lp_bar_display_counter / decrement_lp_bar_display_counter

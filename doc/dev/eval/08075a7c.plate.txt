@@ -1,0 +1,9 @@
+Function: Extracts player_id (bit0) from effect slot [r4+2], extracts set_code (bits[14:6]) from [r4+4], calls find_hand_slot_idx_by_set_code to locate hand slot. If found (>=0), computes gGraveyardSlots + player_id*STRIDE + slot_idx*4 as zone_ref, calls enqueue_graveyard_spell_sprite_with_zone_ref(slot_entry, zone_ref) to enqueue graveyard spell sprite. Sibling of tick_graveyard_spell_display_by_state (0x08075ac0): that function contains state machine branches; this function is a pure leaf utility. Returns r0=0 (void via pop{r1};bx r1 exit).
+
+Constants:
+- SET_CODE_BITS=bits[14:6] (9-bit field) -- lsls r1,r2,#0x11; lsrs r1,r1,#0x17; net right shift=6, mask=9 bits
+- PLAYER_STRIDE=0x868 -- per-player stride (DAT_08075ab8)
+- gGraveyardSlots=0x0201c8f8 -- graveyard zone EWRAM base (DAT_08075abc)
+
+Side effects:
+- sprite queue: enqueue_graveyard_spell_sprite_with_zone_ref(slot_entry, gGraveyardSlots+player_id*STRIDE+slot_idx*4)
