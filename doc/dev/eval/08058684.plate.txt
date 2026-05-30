@@ -1,0 +1,16 @@
+Equip activation three-state sequence machine (State 0/1/2). Driven by [gDuelState+0x4ac]. State=0: loads r4=0x8e<<1=0x11c (text buffer offset), calls classify_equip_card_id_tier_abcx to tier-classify card, calls format_game_text_with_int_arg with tier value and r4 to format text, triggers trigger_card_display_op31_if_not_active(player_id), calls classify_equip_card_id_tier_abcx again to store into slot[+0xc], then increments. State=1: calls set_equip_activation_state_by_mode_alt(fn=0x08058639), increments. State=2: check_activation_display_state_is_confirmed; if confirmed reads LP (gP1LifePoints+0x1d68), calls enqueue_effect_card_slot_sprite_attr(player_id, lp_sum, -1), decrements slot[+0xc], checks if it reaches zero (returns 1); otherwise decrements state counter. Return mechanism: pop{r4,r5,r6}; pop{r1}; bx r1 Sub-case E (r0=1 tier count cleared/complete, r0=0 still decrementing).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- TEXT_BUF_OFFSET=0x8e<<1=0x11c
+- LP_OFFSET=0x1d68
+- MODE_FN_PTR_ALT=0x08058639 (DWORD_080586f0)
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (1=tier count cleared/sequence complete, 0=waiting for confirmation or still decrementing); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 / -1 (increment/decrement)
+- slot[+0xc] := tier (State=0) / -1 (State=2)
+- format_game_text_with_int_arg writes text buffer
+- enqueue_effect_card_slot_sprite_attr writes sprite queue

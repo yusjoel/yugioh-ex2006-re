@@ -1,0 +1,16 @@
+Equip activation three-state sequence machine. Driven by [gDuelState+0x4ac]. Entry computes opposite player_id (1-bit0) LP pointer offset and loads r7 (LP base value). State=0: extracts player_id, triggers trigger_card_display_op31(op=0x74), clears slot[+0xc] to zero, increments. State=1: count_effect_node_zone_activations; if activations exist and slot[+0xc] < r7 threshold, calls set_equip_activation_state_by_mode(fn=0x080905e9) and increments; otherwise returns 1 (waiting). State=2: check_activation_display_state_is_confirmed; if confirmed reads LP and calls submit_equip_sprite_if_slot_eligible, increments slot[+0xc]+=1, decrements state; otherwise checks if slot[+0xc] is zero to decide path. Return mechanism: pop{r4,r5,r6,r7}; pop{r1}; bx r1 Sub-case E (r0=1 activation threshold met, r0=0 fail or slot zero).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- LP_OFFSET=0x1d68
+- DISPLAY_OP=0x74
+- MODE_FN_PTR=0x080905e9 (DAT_08057f48)
+- PLAYER_STRIDE=0x868
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (1=slot activation count meets threshold/waiting, 0=activation confirm fail or slot zero); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 / -1 (state increment/decrement)
+- slot[+0xc] := 0 / +=1 (slot internal counter)
+- submit_equip_sprite_if_slot_eligible submits sprite

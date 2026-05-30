@@ -1,0 +1,13 @@
+Equip effect node trigger function. Called by the equip activation chain system when the Serial Spell (icid=0x183e) equip slot is processed. Writes the low 16 bits of card_entry[+0] with 0x183e (Serial Spell icid), then calls invoke_effect_node_handler_3arg with fixed 3-argument mode (r0=card_entry, r1=0, r2=0) to execute the card effect node logic.
+
+Constants:
+- SERIAL_SPELL_ICID=0x183e (Serial Spell)
+- ARG1=0, ARG2=0
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = transparent return from invoke_effect_node_handler_3arg (0=inactive/fail, nonzero=success)
+
+Side effects:
+- [card_entry+0x0] := halfword@[card_entry-0x18] (pre-write icid candidate, @ 08054b88)
+- [card_entry+0x0] := 0x183e (Serial Spell icid final overwrite, @ 08054b92)
+- invoke_effect_node_handler_3arg side effects (effect node state change)

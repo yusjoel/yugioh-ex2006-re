@@ -1,0 +1,13 @@
+Equip activation two-state sequence machine. Driven by [gDuelState+0x4ac]. State=0: calls trigger_card_display_op31(op=0x3a) to trigger display operation, calls set_equip_activation_state_by_mode(fn_ptr=DAT_080573cc=0x080905e9), increments [gDuelState+0x4ac]. State=1: calls check_activation_display_state_is_confirmed; if confirmed, reads LP, calls test_equip_target_zone14_with_ctx_clear on the equip slot zone to run zone14 test and clear context. Return mechanism: pop{r1}; bx r1 Sub-case E (r0=1 test complete, r0=0 waiting).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- DISPLAY_OP=0x3a
+- MODE_FN_PTR=0x080905e9 (DAT_080573cc)
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (1=zone14 test complete, 0=waiting for confirmation); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 (state increment)
+- test_equip_target_zone14_with_ctx_clear modifies equip target zone14 state

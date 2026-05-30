@@ -1,0 +1,11 @@
+Equip LP row display trigger function. Called by FUN_0805715c (tags: card_frame;card_ids;card_stats;duel_field) and FUN_08059be0 (callees: enqueue_equip_zone_sprite_at_slot) in the equip zone sprite display update flow. Calls classify_equip_card_id_tier_abce to tier-classify the equip card (A/B/C/E four tiers); if result > 0 (non-none tier), extracts card_entry[+2].bit0 as player_id, calls set_lp_row_type2_with_nonzero_flag(player_id, 0, 0) to update LP display row type2. Always returns 1.
+
+Constants:
+- TIER_THRESHOLD=0 (tier > 0 triggers)
+- LP_ROW_ARG1=0, LP_ROW_ARG2=0
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = 1 (fixed, always success)
+
+Side effects:
+- [LP display row buffer]: if tier > 0, set_lp_row_type2_with_nonzero_flag writes LP row type2 record

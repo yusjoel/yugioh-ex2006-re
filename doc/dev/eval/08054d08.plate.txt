@@ -1,0 +1,10 @@
+Equip slot predicate function. Part of the check_equip_slot_eligible_* cluster. Checks three conditions in sequence: (1) calls check_equip_slot_eligible_with_whitelist_and_type to verify whitelist and type match; (2) checks occupied state (occupied check); (3) calls get_card_extended_stat_field7 to read card extended attribute field7, then calls check_slot_zone_bit_eligible to confirm zone bit flag validity. All three must pass to return 1. Return mechanism: pop{r1}; bx r1, r0 transparently passes final predicate result.
+
+Constants:
+- No non-trivial magic numbers
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0 = bool (1=all conditions met, equippable; 0=not equippable)
+
+Side effects:
+- No external writes

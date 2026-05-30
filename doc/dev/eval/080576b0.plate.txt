@@ -1,0 +1,16 @@
+Equip activation chain sprite sequence machine. First calls check_value_in_slot_chain(player_id, 0x14a0, 0xb) to check chain value, stores result in r7. If chain is zero: calls enqueue_equip_zone_sprite_at_slot, clears slot[+8] to zero, calls check_spell_zone_slot_placeable, calls dispatch_effect_handler_by_card_id. If chain is nonzero: embedded three-state machine (State=0: enqueue_equip_zone_sprite_by_side(0x14a0) + trigger_card_display_op31(0x50); State=1: count_occupied_monster_zones + set_equip_activation_state_by_mode; State=2: check_activation_display_state_is_confirmed + update_equip_target_bitmap_zone15 + slot[+8]+=1). Return mechanism: pop{r1}; bx r1 Sub-case E (r0=1 sequence step complete).
+
+Constants:
+- CHAIN_VAL=0xa5<<5=0x14a0 (link chain query value)
+- CHAIN_FIELD=0xb
+- DISPLAY_OP=0x50
+- STEP_OFFSET=0x4ac
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1] (saved as alias via .hword 0x4688 mov r8,r1)
+Returns: r0 = u32 state indicator (1=sequence step complete, both chain/no-chain paths exit with 1); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [equip_slot+8] := 0 / +=1 (chain count field cleared or incremented)
+- [gDuelState+0x4ac] += 1 (state increment, chain path)
+- enqueue_equip_zone_sprite_at_slot writes sprite queue
+- update_equip_target_bitmap_zone15 updates target bitmap

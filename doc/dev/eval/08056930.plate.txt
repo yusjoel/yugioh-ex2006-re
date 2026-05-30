@@ -1,0 +1,17 @@
+Equip activation three-state sequence machine. Driven by [gDuelState+0x4ac] state word. State=0: BST search on card_id (covering Dedication through Light and Darkness/Knight's Title and specific equip cards), calls format_game_text_with_text_arg(op=0x13) to format text, triggers trigger_card_display_op31_if_not_active, then calls set_equip_activation_state_by_mode and increments [gDuelState+0x4ac]. State=1: calls check_activation_display_state_is_confirmed; if confirmed, reads both players' LP (gP1LifePoints[+0x1d68/0x1d6c]), calls eval_equip_chain_score_for_slot to compute chain score, calls get_slot_field5_score / get_slot_field7_score, calls enqueue_equip_zone_sprite_at_slot to enqueue sprite, calls submit_equip_sprite_if_slot_eligible. Return mechanism: pop{r1}; bx r1 Sub-case E (r0=1 sequence complete, r0=0 waiting).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- DEDICATION_ICID=0x1713 (Dedication through Light and Darkness)
+- KNIGHTS_TITLE_ICID=0x167d (Knight's Title)
+- LP_OFFSET_P1=0x1d68, LP_OFFSET_P2=0x1d6c
+- TEXT_OP=0x13
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1] (saved as alias via .hword 0x4688 mov r8,r1)
+Returns: r0 = u32 state indicator (1=sequence complete/sprite submitted, 0=waiting/incomplete); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 (state increment)
+- enqueue_equip_zone_sprite_at_slot writes sprite queue
+- submit_equip_sprite_if_slot_eligible submits sprite
+- format_game_text_with_text_arg writes text buffer

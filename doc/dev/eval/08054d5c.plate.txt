@@ -1,0 +1,10 @@
+Equip slot predicate function. Part of the check_equip_slot_eligible_* cluster. First calls check_slot_card_can_be_equipped to verify basic equippability. If passed, calls get_equip_display_type_code_by_card_id to get display type code count N, then loops over i in [0..N-1]: for each index calls get_equip_display_criteria_code_by_card_and_slot, then calls check_slot_card_equip_criteria_by_state_code to check the state code condition. Any condition satisfied within the loop short-circuits and returns 1. Return mechanism: pop{r1}; bx r1.
+
+Constants:
+- No non-trivial magic numbers
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0 = bool (1=condition met, equippable; 0=not equippable)
+
+Side effects:
+- No external writes

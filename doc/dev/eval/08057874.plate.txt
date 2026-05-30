@@ -1,0 +1,17 @@
+Equip activation multi-state (0..5+) sequence machine. Driven by [gDuelState+0x4ac]. State=0: calls eval_spell_zone_equip_eligibility to check equippability. State=1: reads LP, executes strh write to slot[+8]. State=2: calls trigger_card_display_op31(op=0xa4) and increments. State=3: count_occupied_monster_zones + if zero sets state=5, otherwise uses r8 (internal LP comparison value) to control slot loop, iterates all player/slot combos calling eval_equip_chain_score_for_slot to get scores; if a slot with score in range (r8..r9) is found, sets state=1 (r10 alias). State=4: check_activation_display_state_is_confirmed; if confirmed reads LP + update_equip_target_bitmap_zone15 + slot[+8b4]+=1; otherwise checks count_effect_node_zone_activations. State=5/6: reads slot[+8b4], writes via strh [r6+0xa], then increments. Return mechanism: pop{...}; pop{r1}; bx r1 Sub-case E (r0=1 sequence complete, r0=0 waiting).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- AUX_OFFSET=0x4b4
+- LP_OFFSET_P1=0x1d68, LP_OFFSET_P2=0x1d6c
+- DISPLAY_OP=0xa4
+- SLOT_STRIDE=0x14, PLAYER_STRIDE=0x868, SLOT_TABLE_BASE=0x0201c510
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (1=slot score sequence complete, 0=score unsatisfied/waiting); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 (state increment)
+- [gDuelState+0x4b4] := 0 / +1 (auxiliary state field)
+- [slot+0x8] strh write (chain count)
+- update_equip_target_bitmap_zone15 modifies target bitmap

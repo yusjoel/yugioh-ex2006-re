@@ -1,0 +1,15 @@
+Equip activation three-state sequence machine (State 0/1/2+). Driven by [gDuelState+0x4ac]. State=0: extracts player_id and slot_group from card_entry[+2], constructs bitmask (clears corresponding bits from 0xffff using player_id offset), calls forward_equip_bitmap_update_with_full_mask(card_entry, mask, 0), increments to state=1. State=1: reads gP1LifePoints[player_id*0x868+0xc] (card active flag); if active calls render_equip_zone_sprite_with_chain_lp(player_id, 0) to render sprite, increments to state=2; if not active sets state=2. State=2+: returns 0 (continue). Return mechanism: pop{r4,r5}; pop{r1}; bx r1 Sub-case E (r0=0 State=2+ continue waiting).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- FULL_MASK=0xffff (initial bitmask)
+- PLAYER_STRIDE=0x868
+- LP_ACTIVE_OFFSET=0xc
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (0=three-state sequence State=2+ continue waiting); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] := state+1 (increment)
+- forward_equip_bitmap_update_with_full_mask updates equip bitmap
+- render_equip_zone_sprite_with_chain_lp renders sprite (State=1 path)

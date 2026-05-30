@@ -1,0 +1,10 @@
+Equip slot predicate function. Part of the check_equip_slot_eligible_* cluster. Checks if card_entry[+0xa] is nonzero: if nonzero, calls check_equip_slot_eligible_by_type_and_card_id_pair and returns directly. If zero, performs a three-step combined check: (1) same-side type check; (2) type_composite match; (3) calls check_slot_card_special_activation_eligible; (4) calls count_zone_pair_hits_with_fn_ptr passing fn_ptr=DAT_08055770 (0x080525d1). All must pass to return 1. Return mechanism: pop{r1}; bx r1.
+
+Constants:
+- FN_PTR_ARG=0x080525d1 (zone_pair check function pointer, DAT_08055770)
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0 = bool (1=all conditions met; 0=not met)
+
+Side effects:
+- No external writes

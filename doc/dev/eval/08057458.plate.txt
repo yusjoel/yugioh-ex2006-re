@@ -1,0 +1,10 @@
+Equip LP row fixed-parameter wrapper function. Extracts player_id from card_entry[+2].bit0, calls set_lp_row_type2_with_nonzero_flag with fixed parameters (player_id, 1, 1, 0). Always returns 1. Distinct from trigger_lp_row_type2_if_equip_tier_nonzero (0x08056380): that function has a tier condition check; this function triggers unconditionally. Return mechanism: pop{r1}; bx r1.
+
+Constants:
+- LP_ROW_ARG1=1, LP_ROW_ARG2=1, LP_ROW_ARG3=0
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = 1 (fixed)
+
+Side effects:
+- [LP display row buffer]: set_lp_row_type2_with_nonzero_flag(player_id, 1, 1, 0) writes LP row type2

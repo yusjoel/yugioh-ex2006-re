@@ -1,0 +1,20 @@
+Equip activation multi-state sequence machine (State 0..2). Driven by [gDuelState+0x4ac]. State=0: performs multi-path BST dispatch on card_id (card_id = Cliff the Trap Remover 0x161e / Don Zaloog 0x1388 (reserved) / Don Zaloog 0x1532 / Dark Scorpion - Gorg the Strong 0x1685 / Dark Scorpion - Meanae the Thorn 0x1686 and other specific card groups). Based on card_id branch, executes different LP reads (gP1LifePoints opposite/same-side offset[+0x10]) and count_effect_node_zone_activations checks, finally calls dispatch_effect_handler_by_card_id(op=0xe). May also call lookup_equip_card_score_by_card_id_and_player and display via invoke_card_display_op_0x31_sub3_with_packed_params. State=1: reads LP[+0x1ce8/+0x1cf4] offset and increments. State=2: reads slot[+0xc] vs r1 (zone_id) to determine end condition, may call enqueue_sprite_attr_clamped. Return mechanism: pop{r3,r4}; pop{r4,r5,r6,r7}; pop{r1}; bx r1 Sub-case E (r0=0 waiting/incomplete).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- AUX_OFFSET_CE8=0x1ce8, AUX_OFFSET_CF4=0x1cf4
+- CLIFF_ICID=0x161e (Cliff the Trap Remover)
+- DON_ZALOOG_RESERVED_ICID=0x1388 (reserved/none)
+- DON_ZALOOG_ICID=0x1532 (Don Zaloog)
+- DARK_SCORPION_GORG_ICID=0x1685 (Dark Scorpion - Gorg the Strong)
+- DARK_SCORPION_MEANAE_ICID=0x1686 (Dark Scorpion - Meanae the Thorn)
+- EFFECT_OP=0xe, DISPLAY_ID=0xd6<<1=0x1ac
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (0=sequence incomplete/waiting, each State entry branch also returns 0); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 (state increment)
+- dispatch_effect_handler_by_card_id modifies effect processing state
+- gP1LifePoints[+0x1ce8] may be written (via score lookup)
+- enqueue_sprite_attr_clamped writes sprite queue (State=2 path)

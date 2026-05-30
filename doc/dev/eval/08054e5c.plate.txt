@@ -1,0 +1,10 @@
+Equip slot predicate dispatch function. Part of the check_equip_slot_eligible_* cluster. Checks if card_entry[+0xa] is nonzero: if nonzero, directly calls check_equip_slot_eligible_by_side_setcode_prereqs_and_type and returns the result. If zero, first calls check_equip_slot_eligible_by_same_side_and_field8_9, then iterates over all 5 slots (0..4), calling check_equip_slot_eligible_by_side_setcode_prereqs_and_type for each, marking if any pass. Return mechanism: pop{r1}; bx r1.
+
+Constants:
+- SLOT_COUNT=5 ([0..4])
+
+Inputs: r0=ptr equip_card_entry, r1=u8 player_id [0..1], r2=u8 zone_slot_idx [0..4]
+Returns: r0 = bool (1=condition met, equippable; 0=not equippable)
+
+Side effects:
+- No external writes

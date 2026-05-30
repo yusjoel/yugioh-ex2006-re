@@ -1,0 +1,14 @@
+Equip activation three-state sequence machine. Driven by [gDuelState+0x4ac]. State=0: calls trigger_card_display_op31(op=0x3a), calls set_equip_activation_state_by_mode, increments counter. State=1: calls check_activation_display_state_is_confirmed and increments after confirmation. State=2: reads LP (gP1LifePoints+0x1d68), calls increment_lp_bar_display_counter, calls test_equip_target_zone14_with_ctx_clear on zone14 and zone15 paths separately, then calls decrement_lp_bar_display_counter. Return mechanism: pop{r1}; bx r1 Sub-case E (r0=1 State=2 complete, r0=0 waiting).
+
+Constants:
+- STATE_BASE=0x0201b290, STEP_OFFSET=0x4ac
+- DISPLAY_OP=0x3a
+- LP_OFFSET=0x1d68
+
+Inputs: r0=ptr equip_card_entry
+Returns: r0 = u32 state indicator (1=three-state sequence State=2 complete, 0=waiting/unconfirmed); pop{r1};bx r1 Sub-case E
+
+Side effects:
+- [gDuelState+0x4ac] += 1 (state increment)
+- increment_lp_bar_display_counter / decrement_lp_bar_display_counter modify LP bar counter
+- test_equip_target_zone14_with_ctx_clear modifies zone14/15 state
