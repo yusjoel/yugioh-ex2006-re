@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Extracts player_id (bit0 of slot[+0x2]). Calls count_valid_monster_pair_slots(player_id, icid=0x190a=Dark Ruler Vandalgyon): returns 0 if no valid paired monsters found. If found: calls check_neo_daedalus_placement_eligible(slot, aux), passes through its result. indeg=0 (Sub-type A).
+
+Constants:
+- ICID_VANDALGYON=0x190a (Dark Ruler Vandalgyon)

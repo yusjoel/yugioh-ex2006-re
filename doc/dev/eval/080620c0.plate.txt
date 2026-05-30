@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Reads halfword from card_entry[+0x2], ANDs with mask 0xfc0, returns 1 immediately if result != 0x80 (zone_type mismatch = auto-pass). If zone_type == 0x80: calls check_equip_slot_eligible_banisher_absent_with_dispatch for full Banisher-absent + effect-dispatch validation, returns its result. indeg=0 (Sub-type A: no fn-ptr refs).
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc<<4)
+- ZONE_TYPE_0x80=0x80 (target zone type)

@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Extracts player_id (bit0 of slot[+0x2]). Calls find_deck_slot_by_card_pair_match(player_id, icid=0x12e5=Polymerization): returns 0 if result < 0 (pair not found in deck). If found: calls dispatch_effect_by_card_id_with_display_lookup(slot, aux), passes through its result. indeg=0 (Sub-type A).
+
+Constants:
+- ICID_POLYMERIZATION=0x12e5 (Polymerization)

@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Calls check_equip_slot_chain_absent(slot): returns 0 if chain present. Calls count_effect_node_zone_activations(slot): returns 0 if result <= 1 (insufficient activation count). Returns 2 if count > 1. indeg=0 (Sub-type A).
+
+Constants:
+- ACTIVATION_MIN=1 (cmp r0,#0x1; bgt -> must be > 1 to pass)

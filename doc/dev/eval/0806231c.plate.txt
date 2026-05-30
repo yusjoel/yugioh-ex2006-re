@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Calls count_eligible_zone_slots_all_flags(player=0, flag=0x6); if nonzero skips to BLS Envoy check. Else calls count_eligible_zone_slots_all_flags(player=1, flag=0x6); if both sides zero returns 0. If either side nonzero: calls check_equip_slot_eligible_bls_envoy_absent_with_zone_field_match with original slot_ptr and r1, returns its result. indeg=0 (Sub-type A: no fn-ptr refs).
+
+Constants:
+- ZONE_FLAG=0x6 (flag param for count_eligible_zone_slots_all_flags)

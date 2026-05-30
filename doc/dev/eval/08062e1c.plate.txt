@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot, aux): returns 0 on failure. Calls check_equip_slot_chain_absent(slot, aux): returns 0 if chain present. Reads gP1LifePoints[player*0x868+0x0c] as loop upper bound. For each slot_idx 0..upper_bound-1: calls dispatch_effect_handler_by_card_id(player, card_id, slot_idx); if any returns nonzero returns 1. Returns 0 if all fail. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- MONSTER_COUNT_OFFSET=0x0c (gP1LP[player*0x868+0x0c])

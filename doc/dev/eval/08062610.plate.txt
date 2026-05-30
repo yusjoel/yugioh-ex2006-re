@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Extracts player_id (bit0) and zone_idx (bits[6:1]) from card_entry[+0x2]. Calls check_slot_has_node_by_card_id(player, zone_idx, icid=0x1814=Silent Swordsman LV5): returns 0 if slot chain does not contain Silent Swordsman LV5. If present: calls check_equip_slot_eligible_banisher_absent_with_dispatch for full Banisher-absent + effect-dispatch validation, returns its result. indeg=0 (Sub-type A: no fn-ptr refs).
+
+Constants:
+- ICID_SILENT_SWORDSMAN_LV5=0x1814 (Silent Swordsman LV5)

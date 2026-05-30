@@ -1,0 +1,6 @@
+Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot): returns 0 on failure. Reads gP1LifePoints[player*0x868+0x10]: if nonzero jumps to T.A.D.P.O.L.E. count step. If zero: extracts card_id (halfword[+0x0]), calls lookup_slot_display_value_by_card_id, then dispatch_effect_handler_by_card_id(player, card_id, display_val); returns 0 if dispatch returns 0. Calls count_extra_deck_cards_by_id(player, icid=0x1919=T.A.D.P.O.L.E.): returns 1 if count > 0, else returns 0. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- FIELD_OFFSET=0x10 (gP1LP[player*0x868+0x10])
+- ICID_TADPOLE=0x1919 (T.A.D.P.O.L.E.)

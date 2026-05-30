@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot): returns 0 on failure. Extracts player_id (bit0 of slot[+0x2]), reads slot[+0x4] halfword, extracts set_code (bits[14:6] via lsls#0x11, lsrs#0x17). Calls find_hand_slot_idx_by_set_code(player, set_code): returns 0 if result < 0 (not found in hand). Returns 1 if found. indeg=0 (Sub-type A).
+
+Constants:
+- SET_CODE_BITS=bits[14:6] of slot[+0x4] (lsls#0x11, lsrs#0x17 -> lo=6, hi=14)

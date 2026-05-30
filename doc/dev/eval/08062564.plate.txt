@@ -1,0 +1,8 @@
+Equip slot eligibility predicate. Extracts zone_idx (bits[6:1]) and player_id (bit0) from card_entry[+0x2]. Computes gDuelFieldSlots[player][zone_idx] offset (stride 0x14), adds gP1LifePoints base + 0x40. Reads zone entry halfword[+0x2] bit0 (link flag): returns 0 if link present. Reads word[+0x0] bit18: returns 0 if set. Reads word[+0x0] bit17: returns 0 if set. Reads word[+0x0] bit19: returns 0 if set. If all checks pass: calls check_equip_slot_eligible_banisher_absent_with_dispatch(r8=slot_ptr, r9=slot_ptr2), returns its result. indeg=0 (Sub-type A).
+
+Constants:
+- ZONE_ENTRY_STRIDE=0x14 (slot entry stride)
+- PLAYER_STRIDE=0x868
+- ZONE_OFFSET_BASE=0x40 (gP1LifePoints + 0x40 = zone table offset)
+- LINK_FLAG_BIT=bit0 of halfword[+0x2] (chain link present)
+- BIT18, BIT17, BIT19 = equip status flags in zone word[+0x0]

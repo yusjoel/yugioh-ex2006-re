@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot): returns 0 on failure. Reads slot[+0x4] halfword, extracts bits[14:6] (lsls#0x11, lsrs#0x17) as slot_id. Calls find_zone_descriptor_by_slot_id. Extracts low byte of result (lsls#0x10, lsrs#0x18), compares vs 0x0f: returns 0 if mismatch, returns 1 if equals 0x0f. indeg=0 (Sub-type A).
+
+Constants:
+- SLOT_ID_BITS=bits[14:6] of slot[+0x4] (lsls#0x11, lsrs#0x17)
+- ZONE_DESCRIPTOR_TARGET=0x0f (zone descriptor byte must equal 0x0f)

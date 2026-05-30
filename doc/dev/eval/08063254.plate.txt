@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Extracts player_id (bit0 from card_entry[+0x2]). Calls check_spell_zone_slot_placeable(player_id): returns 0 if spell zone is not placeable. If placeable: calls dispatch_effect_by_card_id_with_display_lookup(slot, aux), passes through its return value. indeg=0 (Sub-type A).
+
+Constants:
+(no non-trivial literals)

@@ -1,0 +1,4 @@
+Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot, aux): returns 0 on failure. Calls check_equip_slot_chain_absent(slot, aux): returns 0 if chain present. Calls dispatch_effect_via_hand_slot_setcode(slot, aux): returns 0 if it returns 0, else returns 1. Differs from check_equip_slot_eligible_neo_daedalus_chain_absent_effect_loop (0x08062e1c) in final step: uses hand_slot_setcode dispatch instead of effect_table loop. indeg=0 (Sub-type A).
+
+Constants:
+(no non-trivial literals; all function calls + register operations)

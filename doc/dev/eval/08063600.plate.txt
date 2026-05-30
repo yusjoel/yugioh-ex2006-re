@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Calls classify_equip_card_id_tier_abc_short to get tier classification (r1). Extracts player_id (bit0 of slot[+0x2]) and set_code (bits[14:6] of slot[+0x4]). Calls scan_equip_slots_eligible_banisher_guard(slot_ptr, tier, player, set_code, sp[0]=0): returns 0 if it returns 0. Calls check_equip_slot_eligible_banisher_absent_with_dispatch(slot, aux), passes through its result. indeg=0 (Sub-type A).
+
+Constants:
+- SET_CODE_BITS=bits[14:6] of slot[+0x4] (lsls#0x11, lsrs#0x17 -> lo=6, hi=14)
+- SCAN_GUARD_PARAM=0 (sp[0]=0 as fourth stack argument)

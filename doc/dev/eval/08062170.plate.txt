@@ -1,0 +1,14 @@
+Equip slot eligibility predicate. First checks if Banisher of the Light (icid 0x1332) is on field; returns 0 if present. Extracts player_id (bit0 of slot[+0x2]), reads loop upper bound from gP1LifePoints[player*0x868+0x0c]. Iterates slot_idx 0..upper_bound-1: reads gDuelFieldSlots_A[player][slot_idx] word[+0x0], extracts bits[29:22] (card_count*2) + bit13 (extra_flag), compares with slot[+0x4] bits[14:6] target count. On match: calls check_card_field5_is_nonzero + get_card_extended_stat_field3 vs r8 threshold; updates r8 if r8 < stat_field3. After loop: if r8 < 0 returns 2, else writes slot[+0xc] then calls invoke_effect_node_handler_3arg loop. Returns 0 (fail) or 2 (success). indeg=0 (Sub-type A).
+
+Constants:
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- PLAYER_STRIDE=0x868
+- CARD_COUNT_FIELD=bits[29:22] of gDuelFieldSlots word[+0x0]
+- EXTRA_FLAG_FIELD=bit13 of gDuelFieldSlots word[+0x0]
+- TARGET_COUNT_FIELD=bits[14:6] of slot[+0x4]
+- EFFECT_LOOP_MAX=4 (cmp r5,#0x4)
+- SLOT_DATA_BASE=0x0201c600
+- PLAYER_ZONE_COUNT_OFFSET=0x0c
+
+Side effects:
+- [slot_ptr+0xc] := computed r8 value (strh r0,[r6,#0xc])

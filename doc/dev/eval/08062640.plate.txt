@@ -1,0 +1,11 @@
+Equip slot eligibility predicate. Extracts player_id (bit0) and zone_idx (bits[6:1]) from card_entry[+0x2]. Indexes gDuelFieldSlots[player][zone_idx], reads word[+0x0]: extracts bits[29:22]*2 + bit13 = count_a. Reads bit18 of second word[+0x0]. Compares count_a + bit18 vs slot[+0x4] bits[14:6] target: returns 0 if mismatch. On match: reads halfword[+0x2] bits[11:6] (mask 0xfc0), compares vs 0xc8<<3=0x640. If equals 0x640: calls get_slot_effect_card_value; returns 1 if value <= 4, else returns 0. If not 0x640: calls check_slot_has_node_by_card_id(player, zone_idx, 0x181a=Silent Magician LV8); if present calls get_slot_effect_card_value; if value > 4 calls check_equip_slot_eligible_banisher_absent_with_dispatch. Returns 0, 1, or passthrough. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- SLOT_DATA_BASE=0x0201c510 (gDuelFieldSlots)
+- CARD_COUNT_BITS=bits[29:22] (*2) + bit13 = zone entry word[+0x0]
+- TARGET_COUNT_BITS=bits[14:6] of slot[+0x4]
+- ZONE_TYPE_MASK=0xfc0 (0xfc<<4)
+- ZONE_TYPE_0x640=0x640 (0xc8<<3)
+- ICID_SILENT_MAGICIAN_LV8=0x181a (Silent Magician LV8)
+- EFFECT_THRESHOLD=4 (cmp r0,#0x4)

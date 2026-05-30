@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Calls check_equip_slot_eligible_banisher_absent_with_umi_pair(slot): returns 0 if it fails. Extracts player_id (bit0). Reads gP1LifePoints[player*0x868+0x0c]: if nonzero returns 2 (field already active). Reads gP1LifePoints[opp_player*0x868+0x0c]: if nonzero returns 2. If both sides zero returns 1. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- MONSTER_COUNT_OFFSET=0x0c (gP1LP[player*0x868+0x0c])

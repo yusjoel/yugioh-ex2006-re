@@ -1,0 +1,9 @@
+Equip slot eligibility predicate. Reads halfword from card_entry[+0x2], masks 0xfc0, compares vs 0x90<<3=0x480: returns 0 if zone_type != 0x480. Reads slot[+0x14] word: returns 0 if zero (activation field). Reads gDuelActivation (0x0201bb90) player_id and slot_chain_idx, calls get_slot_card_state_code; returns 0 if low 16 bits != 0x12. Calls check_neo_daedalus_placement_eligible: returns 0 on failure. Reads gP1LifePoints[player*0x868+0x10]: returns 1 if nonzero, else 0. indeg=0 (Sub-type A).
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc<<4)
+- ZONE_TYPE_0x480=0x480 (0x90<<3)
+- GDUELPACTIVATION_BASE=0x0201bb90
+- STATE_CODE_TARGET=0x12 (state code 18)
+- PLAYER_STRIDE=0x868
+- FIELD_ACTIVATION_OFFSET=0x10 (gP1LP[player*0x868+0x10])

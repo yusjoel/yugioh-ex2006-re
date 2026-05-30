@@ -1,0 +1,5 @@
+Equip slot eligibility predicate. Calls dispatch_effect_for_neo_daedalus_eligible_slot(slot, aux): returns 0 if it returns 0. Calls check_equip_slot_chain_absent(slot, aux): returns 0 if chain already exists. Reads gP1LifePoints[player*0x868+0x0c]: returns 0 if zero, returns 1 if nonzero. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- MONSTER_COUNT_OFFSET=0x0c (gP1LP[player*0x868+0x0c]: monster zone count)

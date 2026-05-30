@@ -1,0 +1,10 @@
+Equip slot eligibility predicate. Outer loop over player 0 and 1 (r6=0..1), inner loop over slot_idx 0..10 (r4=0..0xa). For each (player, slot_idx): calls invoke_effect_node_handler_3arg; if nonzero reads gDuelFieldSlots[player][slot_idx] word[+0x0], extracts bits[29:22]*2 + bit13 = count_a, compares vs slot[+0x4] bits[14:6] target; if match increments r8 counter. After loops: returns 1 if r8 > 1, else returns 0. indeg=0 (Sub-type A).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- SLOT_DATA_BASE=0x0201c510 (gDuelFieldSlots)
+- INNER_LOOP_MAX=0xa (slot_idx 0..10)
+- OUTER_LOOP_MAX=1 (player 0..1)
+- CARD_COUNT_BITS=bits[29:22]*2 + bit13
+- TARGET_COUNT_BITS=bits[14:6] of slot[+0x4]
+- ZONE_ENTRY_STRIDE=0x14
