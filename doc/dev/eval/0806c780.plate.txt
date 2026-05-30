@@ -1,0 +1,5 @@
+Graveyard spell sprite enqueue from hand function. Checks effect slot zone_type=0x4 (graveyard zone), if matched calls find_hand_slot_idx_by_set_code to find matching set_code slot in hand, on success calls enqueue_graveyard_spell_sprite_with_player_xor to enqueue player XOR graveyard spell sprite, finally calls enqueue_sprite_attr_type11 (type=0x11). Dispatched via function pointer by the effect display driver. Fixed return 0.
+
+Constants:
+- ZONE_TYPE_GRAVEYARD=0x4 ([+4] bit2 check)
+- SPRITE_TYPE_11=0x11

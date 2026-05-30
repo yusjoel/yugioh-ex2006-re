@@ -1,0 +1,12 @@
+Multi-slot card ID scoring sprite enqueue function. Loops r5=0..4 (5 slots), for each slot calls invoke_effect_node_with_active_flag_3arg to verify activation; on success dispatches by card_id BST to compute scoring param r2: Limiter Removal (0x1409) -> get_slot_field5_score, cap at 0xffff; Pyramid Energy (0x153d) -> ldrh [+8] direct read; D. Tribe (0x15ae) -> read gP1LifePoints+0x1ce4; The Big March of Animals (0x1882) -> count_monster_slots_by_state_all(state=0xb) * 0xc8. Finally calls enqueue_slot_card_sprite_if_eligible with r2 as scoring param. Fixed return 0.
+
+Constants:
+- SLOT_COUNT=5 (r5 in [0..4])
+- CARD_ID_Limiter_Removal=0x1409
+- CARD_ID_Pyramid_Energy=0x153d
+- CARD_ID_D_Tribe=0x15ae
+- CARD_ID_The_Big_March_of_Animals=0x1882
+- SCORE_CAP=0xffff
+- MONSTER_STATE=0xb
+- SCORE_MULTIPLIER=0xc8 (200)
+- gP1LifePoints=0x0201c4e0, LP_OFFSET=0x1ce4

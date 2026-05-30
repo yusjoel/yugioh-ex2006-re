@@ -1,0 +1,6 @@
+Dual-player x all-slots equip activation apply function. Outer loop r2=0..1 (2 players), inner loop r5=0..4 (5 slots), for each (player, slot) pair calls invoke_effect_node_with_active_flag_3arg (3-arg effect node activation), on success calls apply_slot_equip_activation_with_eligibility_check (slot equip activation + eligibility check). Base addr DAT=0x0201e1c8 (EWRAM equip state table). Fixed return 0.
+
+Constants:
+- EWRAM_EQUIP_BASE=0x0201e1c8
+- PLAYER_COUNT=2 (r2 in [0..1])
+- SLOT_COUNT=5 (r5 in [0..4])

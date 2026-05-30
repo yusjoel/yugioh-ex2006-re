@@ -1,0 +1,8 @@
+Neo-Space card placement state machine dispatch function. First reads card_id from effect node [+0] for BST dispatch: Valkyrion the Magna Warrior (0x138a) -> r7=3; Puppet Master (0x156a) -> r7=2; other -> r7=0. Then reads gIwramState[+0x4a0] state: state=0x80 calls count_available_monster_slots + check_field_spell_neo_daedalus_group_placeable, if pass calls invoke_setup_equip_oam_with_attr2; state=0x7e/0x7f calls find_hand_slot + check_zone_equip. Fixed return 0.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- CARD_ID_Valkyrion_the_Magna_Warrior=0x138a
+- CARD_ID_Puppet_Master=0x156a
+- STATE_INIT=0x80, STATE_7F=0x7f, STATE_7E=0x7e
+- CATEGORY_VALKYRION=3, CATEGORY_PUPPET_MASTER=2, CATEGORY_DEFAULT=0

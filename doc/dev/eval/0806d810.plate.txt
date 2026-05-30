@@ -1,0 +1,5 @@
+Neo-Daedalus/spirit monster zone sprite dual-path dispatch function. Reads effect node [+2] halfword bits[11:4] and compares with 0x80: equals 0x80 -> Neo-Daedalus path (calls setup_equip_oam_entry_with_sprite_attr); otherwise -> spirit path, reads LP value to determine player_id, calls enqueue_sprite_attr_type11 with type=0x11 or 0x21. Fixed return 0.
+
+Constants:
+- NEO_DAEDALUS_FIELD_CODE=0x80 (bits[11:4] of [+2])
+- SPIRIT_TYPE_11=0x11, SPIRIT_TYPE_21=0x21

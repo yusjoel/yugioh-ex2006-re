@@ -1,0 +1,5 @@
+Slot type dispatch sprite function. Reads effect node [+0xc] halfword slot type: type=1 calls check_effect_slot + invoke_effect_node + check_card_equip_eligible + update_equip_target_bitmap_zone15 (update zone15 equip target bitmap); type=2 performs col_sum comparison then calls enqueue_sprite_attr_with_xy_split (split XY sprite attr enqueue). [+4] bit2 guard -- if set, skip. Fixed return 0.
+
+Constants:
+- SLOT_TYPE_1=1, SLOT_TYPE_2=2
+- GUARD_BIT=bit2 of [+4]

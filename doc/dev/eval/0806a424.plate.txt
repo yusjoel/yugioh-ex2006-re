@@ -1,0 +1,6 @@
+Equip effect display state machine dispatch function. Reads gIwramState[0x0201b290+0x4a0] current state code, dispatches across 0x64/0x6f/0x80 paths. state=0x80: calls find_card_pair_in_player_deck_list; success -> enqueue_hand_sprite_with_flip_flag_set returns 0x64; failure -> trigger_card_display_op31_if_not_active(op=0x15) returns 0x6f. state=0x6f: calls set_lp_row_type7_if_opponent_linked, returns 0x64. state=0x64: calls enqueue_lp_counter_sprite_by_player, returns 0. Default path returns 0.
+
+Constants:
+- gIwramState=0x0201b290
+- STATE_OFFSET=0x4a0 (0x94<<3=0x4a0)
+- STATE_INIT=0x80, STATE_MID=0x6f, STATE_DONE=0x64

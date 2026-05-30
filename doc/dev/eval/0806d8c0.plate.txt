@@ -1,0 +1,4 @@
+Hand slot + monster slot dual lookup then zone sprite enqueue function. Calls find_hand_slot_idx_by_set_code to find set_code in hand, then find_first_available_monster_slot to find first available monster slot. Then calls check_effect_slot_matches_zone_entry + invoke_effect_node to verify activation, on success calls enqueue_sprite_attr_for_zone_slot_packed (packed zone slot sprite enqueue) and invoke_zone_slot_sprite_attr_for_equip_type (update equip type sprite). Fixed return 0.
+
+Constants:
+- SPRITE_MODE=0xe (r1 arg to enqueue_sprite_attr_for_zone_slot_packed at 0806d936: packed zone slot sprite attribute mode)

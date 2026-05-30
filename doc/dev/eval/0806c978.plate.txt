@@ -1,0 +1,10 @@
+Special card zone sprite multi-path dispatch function. Reads card_id from effect node, branches on Call of the Haunted (0x137d), Soul Resurrection (0x17b7), Re-Fusion (0x1881), Symbol of Heritage (0x19d7), Autonomous Action Unit (0x15e6). Then reads gIwramState[+0x4a0] state: state=0x80 calls enqueue_sprite_attr_with_mode; state=0x7f calls invoke_zone_slot_sprite_attr_for_equip_type. Fixed return 0.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- CARD_ID_Call_of_the_Haunted=0x137d
+- CARD_ID_Soul_Resurrection=0x17b7
+- CARD_ID_Re_Fusion=0x1881
+- CARD_ID_Symbol_of_Heritage=0x19d7
+- CARD_ID_Autonomous_Action_Unit=0x15e6
+- STATE_INIT=0x80, STATE_7F=0x7f

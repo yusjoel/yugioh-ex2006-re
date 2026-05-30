@@ -1,0 +1,5 @@
+Column-sum comparison + effect activation dual verification then sprite enqueue function. Reads effect node [+4] bit-field to extract col_sum value, compares with current zone col_sum; if equal calls invoke_effect_node_handler_2arg (effect node handler, dual-arg), on successful activation calls test_equip_target_slot_in_bitmap to check equip target slot bitmap. Fixed return 0.
+
+Constants:
+- PLAYER_STRIDE=0x868 (DAT_0806cfe0: per-player stride in gDuelFieldSlots)
+- gDuelFieldSlots=0x0201c510 (DAT_0806cfe4: duel field slot array base)

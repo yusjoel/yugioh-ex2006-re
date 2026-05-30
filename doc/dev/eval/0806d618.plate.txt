@@ -1,0 +1,6 @@
+LP chain sprite enqueue function. Checks effect slot match (check_effect_slot_matches_zone_entry), calls invoke_effect_node to verify activation, then reads player XOR value from LP chain (gP1LifePoints+0x1ce8), calls enqueue_sprite_attr_with_mode with mode=6 to enqueue LP chain sprite. Dispatched via function pointer by the effect display driver. Fixed return 0.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- LP_CHAIN_PLAYER_XOR_OFFSET=0x1ce8
+- SPRITE_MODE=6

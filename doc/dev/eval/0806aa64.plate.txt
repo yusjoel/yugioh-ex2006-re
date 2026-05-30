@@ -1,0 +1,4 @@
+Dual effect slot check + equip chain sprite enqueue function. Calls check_effect_slot_matches_zone_entry and invoke_effect_node for each of two effect slots to verify activation state; once both pass calls build_equip_chain_slot_entry to build chain entry, then calls find_equip_chain_pair_across_field twice to find field-wide pairing, finally calls enqueue_equip_chain_slot_sprite_with_pair_lookup to enqueue the equip chain slot sprite. Dispatched via function pointer by the effect display driver. Fixed return 0.
+
+Constants:
+- HIGH_HALFWORD_MASK=0xffff0000 (DAT_0806ab08: upper 16-bit sentinel used to skip enqueue when find_equip_chain_pair_across_field second result matches mask)

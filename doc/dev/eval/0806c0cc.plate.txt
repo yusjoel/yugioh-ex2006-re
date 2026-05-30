@@ -1,0 +1,6 @@
+Neo-Daedalus placement check three-step state machine function. Reads gIwramState[+0x4a0] state: state=0x80 calls check_field_spell_neo_daedalus_group_placeable (check whether Neo-Daedalus group can be placed) and find_hand_slot_idx_by_set_code (find slot with matching set_code in hand); state=0x7f calls check_zone_slot_equip_eligible (check zone slot equip eligibility); state=0x7e calls setup_equip_oam_entry_with_sprite_attr (setup OAM entry). Card constant Spear Cretin (0x133b). Fixed return 0. Called via bl from FUN_0806b53c.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- STATE_INIT=0x80, STATE_7F=0x7f, STATE_7E=0x7e
+- CARD_ID_Spear_Cretin=0x133b

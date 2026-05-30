@@ -1,0 +1,6 @@
+Equip effect slot display full state machine dispatch function. Reads gIwramState[+0x4a0] state code, dispatches across 0x64..0x80 range: state=0x80 calls init_effect_slot_display_context (init display context); state=0x7d calls enqueue_effect_slot_sprites_descending (descending enqueue) + setup_lp_row_type12_from_array; state=0x7a calls card_name_lookup + format (format card name) + enqueue_equip_zone_sprite_attr_full (enqueue full equip zone sprite attr); state=0x78 calls enqueue_lp_counter. Contains Spear Cretin (0x133b) card ID branch. Fixed return 0.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- STATE_INIT=0x80, STATE_7D=0x7d, STATE_7A=0x7a, STATE_78=0x78, STATE_DONE=0x64
+- CARD_ID_Spear_Cretin=0x133b

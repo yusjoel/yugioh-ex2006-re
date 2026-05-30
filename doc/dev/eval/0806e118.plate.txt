@@ -1,0 +1,9 @@
+Spirit monster zone sprite state machine dispatch function. First reads gP1LifePoints+0x1cf4 value, if equals 5 jumps to state dispatch; otherwise checks [+4] bit2 guard, if not set calls enqueue_sprite_attr_type11 (type=0x11, mode=1) to enqueue type-11 sprite. Reads gIwramState[+0x4a0]: state=0x80 calls dispatch_effect_handler_by_card_id, on success triggers trigger_card_display_op31_if_not_active (op=0x4d), returns 0x7f; state=0x7f calls init_effect_slot_display_context (type=6), returns 0x7e; state=0x7e calls get_monster_slot_entry_ptr + enqueue_graveyard_spell_sprite_with_zone_ref, returns 0x78. Fixed return 0.
+
+Constants:
+- gP1LifePoints=0x0201c4e0
+- LP_STATE_OFFSET=0x1cf4 (gP1LifePoints+0x1cf4)
+- LP_DONE_VAL=5
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- STATE_INIT=0x80, STATE_7F=0x7f, STATE_7E=0x7e, STATE_78=0x78
+- TRIGGER_OP=0x4d, SPRITE_TYPE=6

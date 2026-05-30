@@ -1,0 +1,7 @@
+Large zone sprite effect node dispatch function. Enumerates equip zone slots calling invoke_effect_node, then calls enqueue_zone_slot_sprite_attr_if_occupied and enqueue_sprite_attr_record. Reads gIwramState[+0x4a0] and dispatches on 0x7f/0x80: state=0x80 loads card constant Mind Haxorz (0x184d), calls enqueue_sprite_attr_with_mode; state=0x7f further calls enqueue_sprite_attr_record. Fixed return 0.
+
+Constants:
+- gDuelFieldSlots=0x0201c510, player_stride=0x868
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- CARD_ID_Mind_Haxorz=0x184d
+- STATE_INIT=0x80, STATE_STEP1=0x7f

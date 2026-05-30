@@ -1,0 +1,10 @@
+Equip node sprite state machine dispatch function. Reads gIwramState[+0x4a0]: state=0x80 reads gP1LifePoints+0x10d0 bit0/bit1 (LP activation flags), condition bit0=0 + bit1=1 met calls check_effect_slot_matches_zone_entry + read_effect_slot_side_and_type + invoke_effect_node_with_active_flag_3arg to verify activation; on pass reads gEquipNodeBase[0x1c] (zone_slot) to compute gDuelFieldSlots offset, checks bit13, selects sprite attr value (0x19 or 0x8019), calls enqueue_sprite_attr_record to enqueue. state=0x7f calls set_lp_row_type16_with_player_id. Fixed return 0.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- gP1LifePoints=0x0201c4e0
+- LP_ACTIVATE_FLAG_OFFSET=0x10d0
+- gEquipNodeBase=0x0201bb90
+- gDuelFieldSlots=0x0201c510, player_stride=0x868
+- BIT13_MASK = bit13 of zone entry word
+- SPRITE_ATTR_A=0x19, SPRITE_ATTR_B=0x8019

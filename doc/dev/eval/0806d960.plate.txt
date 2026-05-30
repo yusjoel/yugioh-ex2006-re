@@ -1,0 +1,6 @@
+Field spell placement display six-step state machine function. Loads reserved icid 0x13ea (unreleased card) as field spell card ID. Dispatches on gIwramState[+0x4a0] state: 0x1/0x78/0x7d/0x7e/0x7f/0x80 six paths. state=0x80: check_field_spell_placement_allowed + check_effect_slot + check_slot_card_eligible, if pass calls scan_equip_zone_candidates_with_snapshot. state=0x7f: render_pair_zone_sprites. state=0x7e: trigger_op31 + invoke_zone_slot_sprite_attr. state=0x7d: set_lp_row_type7. state=0x78: enqueue. state=0x1: done exit. Fixed return 0.
+
+Constants:
+- gIwramState=0x0201b290, STATE_OFFSET=0x4a0
+- CARD_ID_RESERVED=0x13ea (reserved -- cid=0xFFFF, no card assigned)
+- STATE_INIT=0x80, STATE_7F=0x7f, STATE_7E=0x7e, STATE_7D=0x7d, STATE_78=0x78, STATE_DONE=0x1
