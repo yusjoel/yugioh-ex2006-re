@@ -1,0 +1,8 @@
+Pack card list screen render main function. Initializes font, renders pack name text (game_str_id 0x1389), iterates all card slots rendering grid numbers, card info, confirm button labels. Finally calls render_pack_info_to_vram for pack summary info and DMAs palette to VRAM. Function body ~420 asm lines with 10+ named callees. Called by font_jp_080dfc18 (pack list page frame driver) when a full list redraw is needed.
+
+Constants:
+PACK_NAME_STR_ID = 0x1389
+CONFIRM_LABEL_1  = 0x138a
+
+Params: r0=void (first instruction ldr r0,DAT_080de720 clobbers r0; caller value discarded)
+Return: r0=u32 result (Sub-case E passthrough of last callee return)

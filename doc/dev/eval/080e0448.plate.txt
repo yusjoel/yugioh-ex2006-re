@@ -1,0 +1,11 @@
+Pack slot overlay animation frame advance. Increments pack_ui_state+0x10c (elapsed frames), compares with [+0x10e] (total frames); if end frame reached resets counter, calls render_pack_slot_overlay_oam0 to refresh OAM, sets state to 0xc and returns 1; otherwise calls render_pack_slot_overlay_oam0 every 6 frames. indeg=0, no callgraph caller; fn-ptr entry or pack animation state machine case.
+
+Constants:
+ELAPSED_OFF     = 0x10c
+TOTAL_OFF       = 0x10e
+FRAME_SKIP      = 6
+STATE_OFF       = 0x4
+ANIM_END_STATE  = 0xc
+
+Params: r0=void
+Return: r0=1 if end frame reached; r0=0 or render return value otherwise (Sub-case E passthrough)

@@ -1,0 +1,18 @@
+Duel puzzle scene VRAM initialization. Writes gPrng+0x174:=1 (scene active flag), writes DISPCNT-related reg (0x80<<0x13=0x4000000):=4 (BG mode), calls reset_display_and_obj_vram, calls store_ewram_ctx_ptr_and_clear_mode_flags(0x02029eb0) to bind duel_puzzle EWRAM context. Writes BG2CNT (0x0400000c):=1. Loads BG tile/map data from ROM: copy_bg_tile_data_to_vram(0x09dae9a4), zero_fill(0x06014000, 0x4000 halfwords), multiple copy_bytes_by_halfword and tile_2d_row_copy calls for palette/tile VRAM. indeg=0, no caller.
+
+Constants:
+PRNG_SCENE_FLAG_OFF  = 0x174
+DISPCNT_RELATED      = 0x4000000
+BG2CNT               = 0x0400000c
+EWRAM_CTX            = 0x02029eb0
+BG_TILE_DST          = 0x06014000
+ZERO_FILL_COUNT      = 0x4000
+ROM_TILE_SRC         = 0x09dae9a4
+PAL_SRC_1            = 0x09db81ac
+PAL_DST_1            = 0x05000200
+PAL_SRC_2            = 0x09db81cc
+PAL_SRC_3            = 0x09db89cc
+PAL_DST_3            = 0x05000220
+
+Params: r0=void
+Return: r0=void (Sub-case E passthrough of last callee)

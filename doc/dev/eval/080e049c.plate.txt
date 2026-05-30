@@ -1,0 +1,10 @@
+Pack purchase confirm text overlay creation. Calls game_str_id_to_row(0x138a) to get purchase confirm string row, calls text_overlay_create at screen coords (0x1e, 0x14) to display text overlay, calls render_pack_slot_overlay_oam0 to refresh OAM, then writes pack_ui_state+0x4 := 0xd (purchase confirm display state). Returns 1 fixed. indeg=0; purchase confirm flow entry.
+
+Constants:
+PURCHASE_STR_ID = 0x138a
+OVERLAY_X       = 0x1e
+OVERLAY_Y       = 0x14
+STATE_PURCHASE  = 0xd
+
+Params: r0=void
+Return: r0=1 (fixed; Sub-case E: pop {r4}; pop {r1}; bx r1)

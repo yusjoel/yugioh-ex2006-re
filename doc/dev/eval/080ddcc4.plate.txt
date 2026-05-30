@@ -1,0 +1,10 @@
+Pack scene full initialization. Zero-fills pack_ui_state+0xc for 0x1ca halfwords (bios_cpu_set fill mode), calls reset_display_and_obj_vram, calls reset_pack_scene_display, calls store_ewram_ctx_ptr_and_clear_mode_flags(0x0200af20) to bind EWRAM context and clear mode flags, writes gPrng+0x174=0x1001 to initialize PRNG-linked field, clears pack_ui_state bit range. Returns 1 on completion. Called by FUN_080ddd1c and FUN_080ddd3c (pack scene entry/reset paths).
+
+Constants:
+ZERO_RANGE_COUNT = 0x1ca
+EWRAM_CTX_PTR   = 0x0200af20
+PRNG_INIT_OFF   = 0x174
+PRNG_INIT_VAL   = 0x1001
+
+Params: r0=void
+Return: r0=1 (fixed success flag; Sub-case E: pop {r4}; pop {r1}; bx r1)

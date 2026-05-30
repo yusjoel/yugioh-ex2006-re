@@ -1,0 +1,17 @@
+Expert challenge unlock condition dispatcher (symmetric to check_standard_challenge_unlock_condition). Calls find_expert_challenge_slot_by_id(r0) to map external challenge_id to internal slot index [0..0x22]; out-of-range returns 0. 35 cases: case 0..9 return 1 unconditionally; case 0xa..0x22 call count_duel_puzzle_victories and compare to incrementing thresholds 0x4..0xc7. Returns 1=unlocked, 0=not satisfied. Called by duel_puzzle_080e19e0 and card_ids_080f4564.
+
+Constants:
+CASE_ALWAYS_UNLOCK_MAX  = 9
+CASE_THRESHOLD_START    = 0xa
+THRESHOLD_0x4           = 0x4
+THRESHOLD_0x9           = 0x9
+THRESHOLD_0xe           = 0xe
+THRESHOLD_0x13          = 0x13
+THRESHOLD_0x18          = 0x18
+THRESHOLD_0x1d          = 0x1d
+THRESHOLD_0x22          = 0x22
+THRESHOLD_0xc7          = 0xc7
+SLOT_MAX                = 0x22
+
+Params: r0=u16 expert_challenge_id
+Return: r0=1 if condition met; r0=0 if not met or invalid ID (Sub-case E)

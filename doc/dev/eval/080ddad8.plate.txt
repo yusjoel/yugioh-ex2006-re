@@ -1,0 +1,7 @@
+Per-pixel brightness normalization/scaling. Symmetric structure with rotate_pixel_hue_in_buffer but processes the value (brightness) channel: decodes each pixel, finds max of RGB channels, scales val channel so brightest pixel reaches BRIGHT_FULL=0x100, converts back to GBA RGB555 and writes. r8=0x100 is an internal constant (asm 080ddaf0: movs r0,#0x80; lsls r0,#0x1; mov r8,r0), not caller-set. Called by pack_banner_080d46a8 during cover image brightness equalization.
+
+Constants:
+BRIGHT_FULL = 0x100
+
+Params: r0=const u16* src_ptr; r1=u16* dst_ptr; r2=u32 packed_count (bits[15:0]=pixel_count [0..0xffff])
+Return: r0=u16* dst_end_ptr (Sub-case E passthrough)

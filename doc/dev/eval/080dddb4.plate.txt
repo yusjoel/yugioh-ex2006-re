@@ -1,0 +1,7 @@
+Single-line trampoline: loads function pointer from ROM address 0x09e49578, forwards to tick_pack_page_step. Body is very short (ldr + bl + return), decoupling ROM function table from tick_pack_page_step call site. indeg=0, no callgraph caller; dead code or fn-ptr table entry. No parameters, no independent return value (Sub-case E: pop {r1}; bx r1, r0 passthrough of tick_pack_page_step return).
+
+Constants:
+ROM_FN_PTR = 0x09e49578
+
+Params: r0=void (internal ldr at 080dddb6 sets r0=0x09e49578; caller passes nothing)
+Return: r0=tick_pack_page_step return value (Sub-case E passthrough)

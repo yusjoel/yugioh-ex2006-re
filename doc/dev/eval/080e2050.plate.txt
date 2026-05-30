@@ -1,0 +1,15 @@
+Duel puzzle scene label text rendering. Reads gSettings.lang (bits[2:0] from [0x02000000+0x6c2c]) to select language-specific ROM string pointer (5 language paths: 1..5; others=base pointer), calls render_string_to_bg_tile_row for first label (x=0x87*4=0x21c, y=0x81*4=0x204, narrow=0). Reads challenge clear stats [0x02000000+0x6e34] halfword, calls expand_format_decimal_to_buf to format clear count. Selects language again and renders second label (same x, y=0x90*4=0x240, narrow=1), third label (x=0x83*4=0x20c, y=0xb0*4=0x2c0, narrow=1) and fourth label (y=0xb4*4=0x2d0). indeg=0, no caller.
+
+Constants:
+gSettings_lang_base  = 0x02000000+0x6c2c
+LANG_MASK            = 0x7
+LABEL1_X             = 0x21c
+LABEL1_Y             = 0x204
+LABEL2_Y             = 0x240
+LABEL3_X             = 0x20c
+LABEL3_Y             = 0x2c0
+LABEL4_Y             = 0x2d0
+CHALLENGE_STAT_OFF   = 0x6e34
+
+Params: r0=void
+Return: r0=void (Sub-case E passthrough of last render callee)

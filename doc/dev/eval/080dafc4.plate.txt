@@ -1,0 +1,8 @@
+Reads challenge clear stats from EWRAM [0x02000000+0x6e34..0x6eb8], takes pairwise max, aggregates into output struct. Calls get_total_challenge_cleared_count for total, then writes 5 halfword stat fields (+0,+2,+4,+6,+8) into r5 output struct. Called by pack_080db4f4 when presenting clear stat summary. Side effects limited to output struct writes; EWRAM source fields unchanged.
+
+Constants:
+CHALLENGE_STATS_BASE = 0x02000000+0x6e34
+CHALLENGE_STATS_END  = 0x02000000+0x6eb8
+
+Params: r0=challenge_stats_out* out_ptr
+Return: r0=u16 max_stat_value (Sub-case E passthrough; last max value, written to [r5+0xe] before exit)

@@ -1,0 +1,6 @@
+Pack scene dual-reset entry point. Calls reset_pack_scene_display to clear pack UI display state, then calls reset_all_bg_scroll_regs_and_shadows to zero all BG scroll registers and shadows. Called by pack_080db418 (pack scene state machine) when a full display layer reset is needed. No parameters, no return value (Pattern B void).
+
+Constants: (no non-trivial literals)
+
+Params: r0=void
+Return: void (pop {r0}; bx r0 = Pattern B VOID)

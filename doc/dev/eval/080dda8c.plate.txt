@@ -1,0 +1,8 @@
+Per-pixel HSV hue rotation. Iterates over pixel_count pixels (r2 low16): for each pixel calls decode_overlay_color_channels to decode RGB channels, adds r7 to hue and wraps modulo 0x168 (full hue cycle), calls convert_hsv_to_gba_rgb555 to convert back, writes to dst buffer. Called by pack_080d5470 and pack_080d933c on pack cover hue rotation animation frames.
+
+Constants:
+HUE_CYCLE  = 0x168
+COUNT_MASK = 0xffff
+
+Params: r0=const u16* src_ptr; r1=u16* dst_ptr; r2=u32 packed_count_hue (bits[15:0]=pixel_count [0..0xffff]; bits[31:16]=hue_shift_base)
+Return: r0=u16* dst_end_ptr (Sub-case E passthrough)

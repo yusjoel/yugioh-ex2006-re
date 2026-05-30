@@ -1,0 +1,11 @@
+Pack overlay animation step tick. Checks gPrng duel state field [+0x1c]==4; if 4 triggers display clear sequence: DISPCNT &= ~0x400 (disable OBJ layer), writes pack_ui_state+0x100/+0x102 := 0x1e (reset anim params). Calls tick_overlay_animation_step to advance overlay animation. Finally calls render_pack_slot_overlay_oam0 to refresh OAM. Returns r6 (1 if duel-end clear was triggered, 0 otherwise). indeg=0; pack overlay animation drive entry.
+
+Constants:
+DUEL_STATE_DONE  = 0x4
+DISPCNT_OBJ_BIT  = 0x400
+ANIM_RESET_VAL   = 0x1e
+ANIM_OFF_A       = 0x100
+ANIM_OFF_B       = 0x102
+
+Params: r0=void
+Return: r0=u32 triggered_flag (Sub-case E: adds r0,r6,#0; r6=0 if no trigger, r6=1 if duel-end clear triggered)

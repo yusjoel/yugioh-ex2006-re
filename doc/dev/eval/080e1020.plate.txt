@@ -1,0 +1,16 @@
+Standard challenge unlock condition dispatcher. Input r0=challenge_id; adds offset 0xffffb1e0 (= -0x4e20) to get switch index [0..0x29] (42 cases). Cases check different clear count thresholds: some read EWRAM [0x02000000+0x6e34] halfword vs fixed value, others call count_duel_puzzle_victories / get_total_challenge_cleared_count / count_cleared_puzzle_stages and compare to threshold. Returns 1=unlocked, 0=locked. Called by duel_puzzle_080e1310, card_ids_080f4564, FUN_08105850.
+
+Constants:
+CHALLENGE_ID_OFFSET  = 0xffffb1e0
+CHALLENGE_ID_MIN     = 0x4e20
+CHALLENGE_ID_MAX     = 0x4e49
+EWRAM_CHALLENGE_OFF  = 0x6e34
+CASE_ALWAYS_UNLOCK   = 0x4e22
+THRESHOLD_0x1d       = 0x1d
+THRESHOLD_0x3b       = 0x3b
+THRESHOLD_0x77       = 0x77
+THRESHOLD_0x95       = 0x95
+THRESHOLD_0xc7       = 0xc7
+
+Params: r0=u16 challenge_id [0x4e20..0x4e49]
+Return: r0=1 if unlock condition met; r0=0 if not met or out of range (Sub-case E)

@@ -1,0 +1,11 @@
+Pack OAM attribute compute dispatcher. Input r0 is packed (high16=type_code, low16=slot_data); dispatches by type_code: 0=compute_pack_grid_slot_oam_xy (grid slot XY), 1=encode_pack_confirm_oam_attr (confirm button attr) minus 1, 2=fixed return 0x0091008f (specific OAM attr constant), 3=compute_pack_slot_oam_y_attr (slot Y attr) minus 1, other=return 0. Called by multiple pack scene OAM write functions when building pack slot OAM attributes.
+
+Constants:
+TYPE_GRID_XY      = 0
+TYPE_CONFIRM_ATTR = 1
+TYPE_FIXED_ATTR   = 2
+TYPE_SLOT_Y_ATTR  = 3
+FIXED_OAM_ATTR    = 0x0091008f
+
+Params: r0=u32 packed_type_slot (bits[31:16]=type_code [0..3]; bits[15:0]=slot_data passed to callees)
+Return: r0=u32 oam_attr (type0=XY packed; type1=confirm_attr-1; type2=0x0091008f; type3=y_attr-1; other=0; Sub-case E)

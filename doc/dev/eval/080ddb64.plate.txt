@@ -1,0 +1,7 @@
+Per-pixel saturation processing variant. Part of HSV processing trio with rotate_pixel_hue_in_buffer and scale_pixel_brightness_in_buffer. Operates on the saturation channel: decodes each source pixel, adjusts saturation parameter, converts back to GBA RGB555 and writes to dst. Called by FUN_080dbebc (pack scene palette path) during cover HSV saturation adjustment.
+
+Constants:
+SAT_FULL = 0x100
+
+Params: r0=const u16* src_ptr; r1=u16* dst_ptr; r2=u32 packed_count (bits[15:0]=pixel_count [0..0xffff])
+Return: r0=u16* dst_end_ptr (Sub-case E passthrough)

@@ -1,0 +1,11 @@
+Pack scene OAM animation struct initialization. Zero-fills pack_ui_state+0xc for 0x138 halfwords, calls reset_pack_scene_display, zeroes OAM animation sub-struct arrays at pack_ui_state+0x10/+0x30/+0x44, calls init_overlay_struct_and_palette to initialize overlay struct and palette, clears pack_ui_state+0x134 mode flag. Returns 1 on completion. indeg=0, no callgraph caller; fn-ptr or init path entry.
+
+Constants:
+ZERO_COUNT    = 0x138
+OAM_OFF_1     = 0x10
+OAM_OFF_2     = 0x30
+OAM_OFF_3     = 0x44
+MODE_FLAG_OFF = 0x134
+
+Params: r0=void
+Return: r0=1 (fixed; Sub-case E: pop {r4-r7}; pop {r1}; bx r1)

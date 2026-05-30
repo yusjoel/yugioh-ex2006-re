@@ -1,0 +1,14 @@
+Copies base palette from ROM 0x09ccd290, then generates 4 GBA RGB555 values at HSV hue steps (hue=0/0x2d/0x5a/0x87, sat=0xff, val=0xff), writing to dst+0x12/+0x14/+0x16/+0x18, then appends white 0x7fff at dst+0x1a. Called by pack_banner_080d566c (pack cover display) when initializing cover HSV gradient palette. Returns palette write end pointer (Sub-case E).
+
+Constants:
+ROM_PAL_BASE = 0x09ccd290
+HUE_STEP_0   = 0x00
+HUE_STEP_1   = 0x2d
+HUE_STEP_2   = 0x5a
+HUE_STEP_3   = 0x87
+SAT_FULL     = 0xff
+VAL_FULL     = 0xff
+WHITE_RGB555 = 0x7fff
+
+Params: r0=u16* dst_palette_ptr
+Return: r0=u16* end_ptr (Sub-case E passthrough)

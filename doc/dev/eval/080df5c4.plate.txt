@@ -1,0 +1,10 @@
+Pack scene per-frame OAM all-slot update hub (indeg=22). Executes two passes (r6=0,1), each iterating 8 slots (r5=0..7): calls encode_pack_slot_oam_attr to compute attributes, assembles OAM attr, calls write_oam_entry_from_packed_args to write OAM. After both passes checks pack_ui_state+0x104/+0x106 for non-zero overlay countdowns; if non-zero calls render_overlay_sprite_pack_cover_right/render_overlay_sprite_pack_cover_left and decrements. r10=pack_ui_state+0xc is an internal computed value (not caller-set). Returns last callee return value (Sub-case E).
+
+Constants:
+PASS_COUNT = 2
+SLOT_COUNT = 8
+OAM_BASE_X = 0x100
+OAM_FLAGS  = 0x2000
+
+Params: r0=u32 oam_bank_index (callsite movs r0,#0x2; lsls #0xa -> 0x800 OAM bank offset); r1=u32 extra_param
+Return: r0=u32 result (Sub-case E passthrough)

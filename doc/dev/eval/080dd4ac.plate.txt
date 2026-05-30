@@ -1,0 +1,14 @@
+Overlay frame render entry. Reads overlay state struct pointer from gPrng+0x1d0; if non-null writes frame size fields ([+0xe]/[+0xa]=r0 low16, [+0x10]/[+0xc]=r0 high16), selects normal or alt tile path based on [+0x14] bit0. Each path: palette row update (copy_overlay_tile_row_to_palette), BG tile load (load_overlay_bg_tiles_to_vram or _alt), overlay text render (render_overlay_text_to_bg_vram). Finally zeroes [+0x1c] and calls tick_overlay_animation_step.
+
+Constants:
+OVERLAY_PTR_OFF = 0x1d0
+FRAME_W_OFF     = 0xa
+FRAME_H_OFF     = 0xc
+FRAME_WE_OFF    = 0xe
+FRAME_HE_OFF    = 0x10
+MODE_FLAG_OFF   = 0x14
+PAL_ROW_OFF     = 0x8
+ANIM_FLAG_OFF   = 0x1c
+
+Params: r0=u32 packed_size (bits[31:16]=height, bits[15:0]=width); r1=u16 palette_row_index; r2=const char* text_ptr
+Return: r0=u32 tick_result (Sub-case E passthrough of tick_overlay_animation_step return)
