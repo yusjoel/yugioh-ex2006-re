@@ -1,0 +1,7 @@
+Dispatch equip chain activation when zone pair is aligned. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*. Reads [r5+0xc] type_code: if !=2, calls apply_equip_activation_for_zone_slot_sprite(r5) and returns. If ==2, extracts player_id (bit0) and zone_idx (bits[6:2]) from [r5+2], computes EWRAM slot ptrs for both players (base=0x0201c510, stride=0x868), reads corresponding slot field data, extracts bits[23:16]<<1 + bit[14] merged as comparison value r2; compares with [r5+4] bits[14:8]: if unequal returns 0; if equal calls find_equip_chain_pair_across_field(player_id, zone_idx) + apply_slot_equip_activation_with_eligibility_check(r5, pair_lo, pair_hi, 0, 0) to perform activation. Side effects: writes equip activation state.
+
+Constants:
+- EQUIP_TYPE_CODE=2 -- [slot+0xc] type_code value 2: triggers chain pair match path
+- EQUIP_TABLE_BASE=0x0201c510 -- EWRAM equip table base address
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- ZONE_IDX_LO=1, ZONE_IDX_HI=5 -- [slot+2] bits[6:2] extraction range (lsls#0x1a; lsrs#0x1b)

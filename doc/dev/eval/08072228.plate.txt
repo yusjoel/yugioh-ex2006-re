@@ -1,0 +1,6 @@
+Equip LP row and sprite extended field state machine frame driver. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry `.hword 0x464f` = `mov r7,r9`; `.hword 0x4646` = `mov r6,r8` (parent-frame callee-save values, function body immediately overwrites r6/r7). Reads scene step code and routes four states: 0x7d -> invoke_effect_node_handler_2arg + set_lp_row_type4_with_value; 0x7e -> invoke_card_display_op_0x31_sub3_with_packed_params + set_lp_display_row_type15 + enqueue_sprite_attr_with_type_select; 0x7f -> check_card_field5_is_nonzero + get_card_extended_stat_field6 + submit_lp_indicator_with_slot_xor_flag; 0x80 same path as 0x7e. Side effects: writes LP row struct and sprite attribute queue.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3
+- LP_XOR_FLAG=0x140 -- 0xa0<<1; flag param for submit_lp_indicator_with_slot_xor_flag

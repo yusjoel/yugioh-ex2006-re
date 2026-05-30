@@ -1,0 +1,8 @@
+Equip zone sprite and LP counter three-state frame driver. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Reads IWRAM [0x0201b290+0x4a0] scene step code, routes three states: 0x80 -> dispatch_effect_handler_by_card_id; on success calls trigger_card_display_op31_if_not_active, on failure ORs 0x8 onto [r6+4] (sets zone flag); 0x7f -> init_effect_slot_display_context (initializes display context); 0x7e -> get_monster_slot_entry_ptr (twice, two slots) + enqueue_equip_zone_sprite_with_mode + computes EWRAM zone coords + enqueue_sprite_attr_with_mode + enqueue_lp_counter_sprite_by_player (enqueue LP counter sprite). Side effects: writes sprite queue, LP counter queue, and zone flags.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3
+- EQUIP_TABLE_BASE=0x0201c510 -- EWRAM equip table base address
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- ZONE_FLAG_OR=0x8 -- flag value ORed onto [r6+4] when dispatch fails

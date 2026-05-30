@@ -1,0 +1,5 @@
+Equip Neo-Daedalus class card OAM display state machine frame driver. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Reads IWRAM [0x0201b290 + 0x4a0] scene step code, routes five states: 0x7d -> check_field_spell_neo_daedalus_group_placeable + count_available_monster_slots + set_lp_row_type18_with_value, returns 0x7e; 0x7e -> dispatch_effect_handler_by_card_id (if r0!=0 takes invoke_card_display_op_0x31_sub1 path), returns 0x7f; 0x7f -> init_effect_slot_display_context, returns 0x80; 0x80 -> get_monster_slot_entry_ptr + invoke_setup_equip_oam_with_attr2, returns 0. Side effects: writes LP row display struct and OAM attribute queue.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3; current step code field offset

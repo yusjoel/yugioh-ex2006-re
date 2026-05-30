@@ -1,0 +1,4 @@
+Equip slot LP bar display dispatch function. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry param r0 is effect_slot_entry* (ldrh/ldrb reads card_id, flags, zone fields at [+0],[+2],[+3]). First calls check_effect_slot_matches_zone_entry to verify slot-zone match, then invoke_effect_node_with_active_flag_3arg to activate effect node; if activation succeeds, calls check_equip_slot_eligible_in_target_bitmap to verify target bitmap, then submit_lp_indicator_with_slot_xor_flag(r5, opponent_player, 0xfa<<1=0x1f4) to submit LP indicator bar, finally uses increment/decrement_lp_bar_display_counter to maintain display counter. Side effects: writes LP indicator bar queue and display counter.
+
+Constants:
+- LP_XOR_FLAG=0x1f4 -- 0xfa<<1, flag param passed to submit_lp_indicator_with_slot_xor_flag

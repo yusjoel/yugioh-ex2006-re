@@ -1,0 +1,6 @@
+Enqueue slot sprite under chain flags and effect node activation condition. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry `.hword 0x4647` = `mov r7,r0` (saves effect_slot_entry* to r7; r0 is APCS input). Reads double-byte flags at [gP1LP + 0x10d0], checks if bit0 and bit1 are both set; if not, returns 0 directly. If both bits are set, calls invoke_effect_node_handler_2arg(r4?, r5?) and checks if return value ==2; if equal to 2, reads associated data from IWRAM chain context (0x0201bb90), then calls enqueue_slot_card_sprite_if_eligible to enqueue slot card sprite. Side effects: writes sprite attribute queue.
+
+Constants:
+- CHAIN_FLAGS_ADDR=0x0201d5b0 -- gP1LP+0x10d0; chain activation flags byte pair
+- CHAIN_CTX_BASE=0x0201bb90 -- IWRAM chain context base address
+- NODE_RESULT_EQ2=2 -- invoke_effect_node_handler_2arg return value condition

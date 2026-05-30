@@ -1,0 +1,7 @@
+Equip zone_type 0xe (14) OAM placement state machine frame driver. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Reads IWRAM scene step code, routes two states: state 0x80 -> reads [effect_slot+6]&0x1c zone type field, if 0xe (14) calls check_zone_slot_equip_eligible then invoke_setup_equip_oam_with_attr2; state 0x7f -> calls check_spell_zone_slot_placeable, if passes and zone_type==0xe, calls enqueue_equip_zone_sprite_by_slot_ptr. Both states return via pop{r1};bx r1. Side effects: writes OAM attribute queue or sprite enqueue.
+
+Constants:
+- EQUIP_TABLE_BASE=0x0201c8f8 -- alternate equip zone base (non-standard 0x0201c510+0x868 path)
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- ZONE_TYPE_MASK=0x1c -- [slot+6] bits[4:2] zone type mask
+- ZONE_TYPE_14=0xe -- zone_type value 14 (0xe): special placement zone type

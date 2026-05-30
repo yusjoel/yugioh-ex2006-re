@@ -1,0 +1,7 @@
+Equip zone sprite enqueue or set bit4 flag function. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*. First computes current slot zone struct address from EWRAM equip table (base=0x0201c510, stride=0x868). Checks [r7+4] bit4 (0x10): if set, ORs 0x8 onto [r7+4] and returns directly; if not set, calls check_effect_slot_matches_zone_entry + read_effect_slot_side_and_type + invoke_effect_node_with_active_flag_3arg + invoke_zone_slot_sprite_attr_for_equip_type to complete sprite enqueue. Side effects: modifies equip zone flag byte or writes sprite attribute queue.
+
+Constants:
+- EQUIP_TABLE_BASE=0x0201c510 -- EWRAM equip table base address
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- ZONE_BIT4_MASK=0x10 -- [zone+4] bit4 check mask
+- OR_BIT3=0x8 -- value ORed onto [zone+4] when bit4 is set

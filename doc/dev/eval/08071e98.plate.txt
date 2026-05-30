@@ -1,0 +1,5 @@
+Equip activation zone13 target OAM display state machine. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry `.hword 0x468c` = `mov r8,r1` saves second param to r8. Reads IWRAM [0x0201b290 + 0x4a0] scene step code, routes two states: 0x7f -> dispatch_card_effect_activation + test_equip_target_slot_zone13 + dispatch_effect_handler_by_card_id + write_effect_ctx_slot_index + invoke_setup_equip_oam_with_attr2, returns 0x80; 0x80 -> get_monster_slot_entry_ptr + invoke_setup_equip_oam_with_attr2, returns 0. Core purpose: writes OAM attributes for zone13 equip target slot during activation flow and advances state.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3

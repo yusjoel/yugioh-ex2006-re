@@ -1,0 +1,8 @@
+Enqueue type11 sprite at step 0x80 then dispatch equip zone sprite. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*, r1=second param (passed to dispatch_equip_zone_sprite_by_effect_type). Reads IWRAM [0x0201b290 + 0x4a0] scene step code: if ==0x80, extracts player_id (bit0) from [r4+2], reads card_id hword from [r4+0], calls enqueue_sprite_attr_type11(player_id, card_id, mode=1, flag=0); if step code is not 0x80, skips type11 enqueue. Regardless of step code, finally calls dispatch_equip_zone_sprite_by_effect_type(r4=slot_ptr, r5=r1) to dispatch equip zone sprite. Side effects: writes type11 sprite queue and equip zone sprite queue.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3
+- SPRITE_TYPE11_MODE=1 -- mode=1 for enqueue_sprite_attr_type11
+- SPRITE_TYPE11_FLAG=0 -- flag=0 for enqueue_sprite_attr_type11
+- STEP_CODE_0x80=0x80 -- step code condition that triggers type11 enqueue

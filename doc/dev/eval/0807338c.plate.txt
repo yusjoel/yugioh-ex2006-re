@@ -1,0 +1,10 @@
+Equip deck-pair search hand sprite state machine frame driver. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Reads [r4+8] hword as internal auxiliary state (different from scene step code, belongs to slot own state field), routes three states: 0x80 -> find_card_pair_in_player_deck_list to search deck pair; if fails calls trigger_card_display_op31_if_not_active and returns 0x78; if succeeds calls enqueue_hand_sprite_with_flip_flag_set and returns 0x64; 0x78 -> set_lp_row_type7_if_opponent_linked; 0x64 -> enqueue_lp_counter_sprite_by_player. Side effects: writes hand sprite queue and LP display.
+
+Constants:
+- SLOT_STATE_FIELD_OFFSET=0x8 -- [r4+8] hword slot internal state field offset
+- STATE_SEARCH=0x80 -- search deck-pair entry state code
+- STATE_LP_ROW=0x78 -- LP row set state code after search fail
+- STATE_LP_COUNTER=0x64 -- LP counter enqueue state code after search success
+- SCENE_STEP_MULTIPLIER=0x94 -- scene step base offset (0x94<<3=0x4a0)
+- OP31_SUBCODE_SEARCH=0xd -- r1 sub-opcode passed to trigger_card_display_op31_if_not_active on search-fail path
+- HAND_SPRITE_STRIDE=0x868 -- multiplier in muls r1,r2 for hand-sprite address calculation

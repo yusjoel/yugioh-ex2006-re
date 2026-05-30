@@ -1,0 +1,11 @@
+Dispatch equip zone bitmap sprite or Neo-Daedalus zone15 sprite function. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*; high registers r8/r9/r10 are parent-frame callee-save values, entry mov r5,r8/r6,r9/r7,r10 then r5/r6/r7 are immediately overwritten by function body, so only r0 is a valid APCS input. Reads [r5+3]&0x30: if 0, takes standard bitmap path (check_effect_slot + invoke_effect_node + render_equip_zone_bitmap_sprite_by_chain + check_card_field8_is_9 + check_slot_equip_eligibility_by_type + enqueue_sprite_attr_type11); if nonzero, takes Neo-Daedalus zone15 path (reads [r5+6]&0x1c==4 zone type, computes EWRAM slot ptr, reads scene step code 0x7f/0x80, calls find_zone_descriptor_by_slot_id + get_first_placeable_monster_slot, if zone_type==0xf enqueues enqueue_equip_zone_sprite_attr_shape_a or enqueue_equip_chain_sprite_attrs_for_slot + set_field_slot_bit_with_sprite_update). Side effects: writes sprite attribute queue and zone slot bit.
+
+Constants:
+- ZONE_FLAG_MASK=0x30 -- [slot+3] bits[5:4] path selection mask
+- ZONE_TYPE_MASK=0x1c -- [slot+6] bits[4:2] zone type mask
+- ZONE_TYPE_4=0x4 -- path entry zone type condition
+- ZONE_TYPE_15=0xf -- Neo-Daedalus dedicated zone type 15
+- EQUIP_TABLE_BASE=0x0201c510 -- EWRAM equip table base address
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3; read scene step code when [r5+3] bit 0x30 is nonzero

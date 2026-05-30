@@ -1,0 +1,4 @@
+Enqueue slot sprite with mode=3 after effect node activation. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*. First calls check_effect_slot_matches_zone_entry(r4,0,0) to verify slot-zone match; then calls read_effect_slot_side_and_type to read player_id(r7)/zone_idx(r6); then calls invoke_effect_node_with_active_flag_3arg to activate effect node; if activation returns nonzero, calls enqueue_sprite_attr_with_mode(r6=zone_idx, r5=player_id, card_id=[r4+0], mode=3, sp[0]=0) to enqueue mode=3 sprite. Same structure as enqueue_slot_card_sprite_if_effect_node_active (0x08072104), but final call uses enqueue_sprite_attr_with_mode instead of enqueue_slot_card_sprite_if_eligible.
+
+Constants:
+- SPRITE_MODE=3 -- mode param for enqueue_sprite_attr_with_mode

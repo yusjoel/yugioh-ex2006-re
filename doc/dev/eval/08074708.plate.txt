@@ -1,0 +1,8 @@
+Dispatch equip zone sprite mode=2 enqueue or activation handler function. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Entry r0=effect_slot_entry*. Reads [r5+0xc] type_code hword: if !=2, directly calls apply_equip_activation_for_zone_slot_sprite(r5) and returns; if ==2, reads [r5+0xe] (second field) and passes to find_zone_descriptor_by_slot_id to look up zone descriptor. If zone descriptor bits[23:16] (zone_type) >4, exits; otherwise computes EWRAM equip table slot pointer (base=0x0201c510, stride=0x868, zone_idx*20*player_stride), reads [slot+8] hword; if nonzero calls enqueue_sprite_attr_with_mode(slot_idx, zone_idx, card_id, mode=2, sp[0]=0) to enqueue mode=2 sprite. Side effects: writes sprite attribute queue.
+
+Constants:
+- EQUIP_TYPE_CODE=2 -- [slot+0xc] type_code value 2: triggers mode=2 sprite path
+- ZONE_TYPE_MAX=4 -- zone_descriptor bits[23:16] upper bound; exits if >4
+- EQUIP_TABLE_BASE=0x0201c510 -- EWRAM equip table base address
+- SLOT_STRIDE=0x868 -- per-player equip table stride
+- SPRITE_MODE=2 -- mode param for enqueue_sprite_attr_with_mode

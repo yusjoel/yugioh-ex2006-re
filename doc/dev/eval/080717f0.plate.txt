@@ -1,0 +1,5 @@
+Equip slot LP bar and spell zone sprite frame-driven state machine. Caller indeg=0, belongs to 0x0807xxxx equip/effect sprite driver cluster. Reads IWRAM [0x0201b290 + 0x94<<3=0x4a0] scene step code, routes five states: 0x7d -> dispatch_effect_handler_by_card_id; 0x7e -> render_spell_zone_sprite_with_field_copy_check + enqueue_lp_counter_sprite_by_player, returns 0; 0x7f -> set_lp_display_row_type12 + render_spell_zone_sprite_with_field_copy_check, returns 0x7e; 0x80 -> dispatch_effect_handler_by_card_id + set_lp_display_row_type12 + render_spell_zone_sprite + enqueue_lp_counter + set_lp_row_type7_if_opponent_linked, returns 0x7f. Side effects: writes LP row display struct and spell zone sprite queue.
+
+Constants:
+- SCENE_STEP_BASE=0x0201b290 -- scene step base address
+- STEP_OFFSET=0x4a0 -- 0x94<<3; current step code field offset
