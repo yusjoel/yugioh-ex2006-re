@@ -1,0 +1,10 @@
+Equip chain OAM setup function. Accepts slot_ptr (r0=r5), extracts player_id (bit0) and zone_idx (bits[6:2]) from slot[2]. Computes zone table offset for current side (base=0x0201c510, stride=0x868, entry=0x14 bytes) and reads tile_count field; also computes opposite side tile_count. Sums both tile_counts and compares to slot[4] bits[14:9]: mismatch returns 0.
+On match calls find_first_placeable_monster_slot(player_id): negative result returns 0.
+Then calls check_field_spell_neo_daedalus_group_placeable(player_id): 0 returns 0.
+After all pass, calls invoke_setup_equip_oam_with_attr2(player_id_corrected, zone_entry_ptr, 1, 1). Returns 0 (fixed).
+
+Constants:
+  ZONE_TABLE_BASE   = 0x0201c510
+  PLAYER_STRIDE     = 0x868
+  ZONE_ENTRY_SIZE   = 0x14
+  ATTR2_MODE        = 1

@@ -1,0 +1,8 @@
+Called from equip chain refresh path (same caller also calls FUN_0806e898). Reads slot[+4] bit2 (0x4 mask) to route by slot type: bit2=0 reads slot[+0xA] halfword; if ==1 calls copy_token_halfword_if_zone_slot_occupied for token placement; if ==2 reads gP1LifePoints+0x10d0 dword, checks bit0 (occupied flag) and bit1 (ready flag), if both set calls dispatch_equip_zone_sprite_or_lp_row_type16 to submit LP row tile. bit2!=0 takes caseD_65 path and returns 0. This function is the lightweight front-end router for equip zone token/LP sprite enqueue.
+
+Constants:
+  SLOT_TYPE_BIT = 0x4 (slot[+4] bit2, routing gate)
+  SLOT_KIND_TOKEN = 0x1 (slot[+0xA] == 1 -> token path)
+  SLOT_KIND_LP = 0x2 (slot[+0xA] == 2 -> LP display path)
+  LP_BASE = gP1LifePoints (0x0201b290)
+  LP_DISPLAY_OFFSET = 0x10d0

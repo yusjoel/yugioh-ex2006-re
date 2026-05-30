@@ -1,0 +1,11 @@
+Triggered from duel_field path (bl at 0x0806a752). Reads gP1LifePoints+0x4a0 (0x94<<3 offset, equip chain display state code), subtracts 0x64 and compares against upper bound 0x1c (29 cases); out of range jumps to caseD_65 returning 0. Within range dispatches via jump table (base 0x0806e8c0, 29 entries). Active cases: 0x64 (enqueue_lp_counter_sprite_by_player), 0x6e (set_lp_row_type7_if_opponent_linked), 0x7e (invoke_setup_equip_oam_with_attr2), 0x7f (init_effect_slot_display_context + lookup + dispatch_effect_handler_by_card_id), 0x80 (check_field_spell_neo_daedalus_group_placeable + count_available_monster_slots + dispatch_effect_handler_by_card_id). Returns state code produced by each case (0x64/0x6e/0x7e/0x7f/0x80) or 0 (out-of-range/caseD_65).
+
+Constants:
+  LP_STATE_BASE = 0x0201b290 (gP1LifePoints)
+  STATE_OFFSET = 0x4a0 (= 0x94<<3, equip chain state word offset)
+  STATE_MIN = 0x64
+  STATE_RANGE = 0x1c (= 28, number of cases)
+  JUMP_TABLE = 0x0806e8c0 (29 entries)
+  CARD_ID_INSECT_IMITATION = 0x140b (Insect Imitation, case 0x80 special check)
+  OP31_DISPATCH_ZERO    = 0xd  (op31 param when dispatch returns 0)
+  OP31_DISPATCH_NONZERO = 0x30 (op31 param when dispatch returns non-0)

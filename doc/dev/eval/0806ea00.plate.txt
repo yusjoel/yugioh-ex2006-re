@@ -1,0 +1,8 @@
+Called from equip chain refresh path. Function body routes in two segments: first segment (slot[3] bits4-5 == 0x00) calls check_effect_slot_matches_zone_entry -> read_effect_slot_side_and_type -> invoke_effect_node_with_active_flag_3arg; on match locates zone_entry via zone table (0x0201c510, stride=0x868), reads tile_count and entity_bit; if state==0x80 (r7 zone entry located) calls enqueue_equip_chain_sprite_attrs_for_slot and returns 0x7f; if state==0x7f reads opposite side slot[4] then calls render_equip_zone_bitmap_sprite_by_chain + check_card_field8_is_9 + check_slot_equip_eligibility_by_type + enqueue_sprite_attr_type11, returns 0. Second segment (slot[3] bit5==1 and slot[6] bits2-4==0x4) locates zone slot id, checks state again: 0x7f path enqueues bitmap sprite, 0x80 path refreshes set_field_slot_bit.
+
+Constants:
+  ZONE_TABLE_BASE          = 0x0201c510
+  ZONE_TABLE_PLAYER_STRIDE = 0x868
+  STATE_WORD_OFFSET        = 0x4a0 (= 0x94<<3)
+  STATE_STEP3              = 0x7f
+  STATE_STEP4              = 0x80

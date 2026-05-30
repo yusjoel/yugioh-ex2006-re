@@ -1,0 +1,11 @@
+Equip chain LP row/OAM sprite dispatch function. Accepts slot_ptr (r0=r6). First reads slot[4] bit2 gate; if set returns 0. Reads gP1LifePoints+0x4a0 state code and dispatches four ways:
+State 0x7e: reads gP1LifePoints+0x1da8 refcount; if non-zero extracts player_id from slot[2] and calls set_lp_display_row_type14(1-player_id, slot[0], 0), returns 0x7e; zero returns 0.
+State 0x7f: set_lp_display_row_all_slots(1-player_id, slot[0], 0); returns 0x7f.
+State 0x7e branch (secondary): reads gP1LifePoints+0x1da8; if non-zero reads slot[2] player_id, calls find_hand_slot_idx_by_set_code(1-player_id, set_code); then uses 0x868 stride to locate hand slot, calls invoke_setup_equip_oam_with_attr2(1-player_id, hand_zone_ptr, 1, 0x20); returns 0x7d.
+State 0x80: dispatch_effect_handler_by_card_id(1-player_id, slot[0], 0); 0 returns 0; non-zero calls count_available_monster_slots(1-player_id), 0 returns 0; then check_field_spell_neo_daedalus_group_placeable(1-player_id), 0 returns 0; finally set_lp_display_row_all_slots(1-player_id, slot[0], 0), returns 0x7f.
+
+Constants:
+  STATE_OFFSET      = 0x4a0 (= 0x94<<3)
+  LP_REFCOUNT_OFF   = 0x1da8
+  LP_HAND_STRIDE    = 0x868
+  ATTR2_MODE        = 0x20

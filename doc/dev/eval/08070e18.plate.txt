@@ -1,0 +1,10 @@
+Equip chain OAM/LP row dispatch function based on hand card count and state code. Accepts slot_ptr (r0=r4). Reads gP1LifePoints+0x4a0 state code and dispatches three ways:
+State 0x7e: decrement_lp_bar_display_counter, returns 0.
+State 0x80: check_neo_daedalus_placement_eligible(slot), 0 returns 0; calls increment_lp_bar_display_counter; sets gP1LifePoints+0x4a4 to 0, returns 0x7f.
+State 0x7f: reads gP1LifePoints+0x4a4 (chain count), compares to slot[6] bits[4:2] (loop_count field); if chain count >= loop_count returns 0x7e. Otherwise checks slot[8+loop_count*2] set_code, calls find_hand_slot_idx_by_set_code(player_id) to search hand; if negative jumps to LAB_08070ec2 (increments chain count +1 and returns 0x7f). If found calls check_zone_slot_equip_eligible; if not eligible jumps to LAB; if eligible computes zone_entry_ptr = 0x0201c8f8 + player*0x868 + hand_idx*4, calls invoke_setup_equip_oam_with_attr2(player_id, zone_entry, 1), chain count +1 returns 0x7f.
+
+Constants:
+  STATE_OFFSET      = 0x4a0 (= 0x94<<3)
+  LINK_COUNT_OFFSET = 0x4a4 (= 0x94<<3 + 4)
+  HAND_TABLE_BASE   = 0x0201c8f8
+  PLAYER_STRIDE     = 0x868

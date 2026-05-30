@@ -1,0 +1,10 @@
+Equip chain OAM/LP row dispatch function. Accepts slot_ptr (r0=r5). Reads gP1LifePoints+0x4a0 state code and dispatches four ways:
+State 0x7d: get_monster_slot_entry_ptr(player_id), calls invoke_setup_equip_oam_with_attr2(player_id, monster_entry_ptr, 1, slot[0]<<16); returns 0.
+State 0x7e: init_effect_slot_display_context(player_id, slot[0], 6, 0), returns 0x7d.
+State 0x7f: count_available_monster_slots(player_id) == 0 returns 0; otherwise trigger_card_display_op31_if_not_active(player_id, 0x1a), returns 0x7e.
+State 0x80: check_field_spell_neo_daedalus_group_placeable(player_id) == 0 returns 0; dispatch_effect_handler_by_card_id(player_id, slot[0], 0) == 0 returns 0. If slot[0]==0x1481 (Summoner of Illusions): count_equippable_slots_for_card; non-zero calls set_lp_display_row_type8. Returns 0x7f.
+
+Constants:
+  STATE_OFFSET    = 0x4a0 (= 0x94<<3)
+  CARD_ID_SUMMONER_OF_ILLUSIONS = 0x1481 (Summoner of Illusions)
+  OP31_PARAM_ZONE_ACTIVATE      = 0x1a  (op param for trigger_card_display_op31_if_not_active in 0x7f path)

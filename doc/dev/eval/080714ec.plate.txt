@@ -1,0 +1,12 @@
+Zone11 equip target activation state dispatch function. Accepts slot_ptr (r0=r4). Reads gP1LifePoints+0x4a0 state code and dispatches three ways:
+State 0x7f: calls check_activation_display_state_is_confirmed; if not confirmed returns 0x80. If confirmed reads gP1LifePoints+0x1d68 (r1) and sum of +0x1d6c/+0x1d70 (r2), calls test_equip_target_slot_zone11(slot, r1, r2); non-zero returns 0x7e, zero returns 0.
+State 0x80: calls count_effect_node_zone_activations(slot); 0 returns 0. Extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x6e); then set_equip_activation_state_by_mode(player_id, slot[0], 0x08090625); returns 0x7f.
+State 0x7e: writes slot[0xa] hword := 1, calls submit_equip_zone_bitmap_pair_update(slot); returns 0.
+
+Constants:
+  STATE_OFFSET  = 0x4a0  (= 0x94<<3, gP1LifePoints+0x4a0)
+  LP_FIELD_A    = 0x1d68
+  LP_FIELD_B    = 0x1d6c
+  LP_FIELD_C    = 0x1d70
+  OP31_PARAM    = 0x6e
+  MODE_PTR      = 0x08090625

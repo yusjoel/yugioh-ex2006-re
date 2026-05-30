@@ -1,0 +1,12 @@
+Equip chain slot scan and chain entry build function. Accepts two args: r0=slot_ptr (r8), r1=second_slot_ptr (r9). First reads second_slot_ptr[4] bit2 gate; if set returns 0. Calls check_effect_slot_matches_zone_entry to verify slot match, then read_effect_slot_side_and_type to unpack side(sp[8]) and type(sp[0xc]).
+Reads gP1LifePoints+0x4a0 state code and dispatches: state 0x7f enters main scan loop, state 0x7e enters bitmap query path, state 0x80 enters increment count path.
+0x80 path: clears second_slot_ptr[0xa/0xc] via strh, calls increment_lp_bar_display_counter, returns 0x7f.
+0x7f path: double outer loop (sp[0x10]=0/1, 2 rounds each) and inner loop (zone_idx=5..9, step 0x14): for each zone checks valid_flag (zone[0]>>19) non-zero; calls check_slot_card_eligible_for_special_action(slot, zone_idx); calls find_equip_chain_node_by_slot_pair(side, type, slot, zone_idx); if not found calls build_equip_chain_slot_entry(slot, zone_idx, side, type); on success reads gP1LifePoints+0x0201c520[+zone_bit], checks bit0; if set compares slot player/zone with second_slot and writes second_slot[8] hword returning; otherwise encodes zone_idx into sp[0x14], calls enqueue_equip_chain_slot_sprite_with_pair_lookup, returns 0x7f.
+0x7e path: reads second_slot_ptr[0xa/0xc], constructs bitmap param, calls query_equip_target_bitmap_default and decrement_lp_bar_display_counter, returns 0.
+
+Constants:
+  ZONE_TABLE_BASE   = 0x0201c510
+  ZONE_EXTRA_BASE   = 0x0201c520
+  PLAYER_STRIDE     = 0x868
+  STATE_OFFSET      = 0x4a0 (= 0x94<<3)
+  LP_CHAIN_OFFSET   = 0x1ce8

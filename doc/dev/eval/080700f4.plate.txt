@@ -1,0 +1,13 @@
+Equip chain LP/hand card sprite dispatch function. Accepts slot_ptr (r0=r4). Reads gP1LifePoints+0x4a0 state code and dispatches four ways:
+State 0x7d: enqueue_lp_counter_sprite_by_player(player_id), returns 0.
+State 0x7e: set_lp_row_type7_if_opponent_linked(1-player_id), returns 0x7d.
+State 0x7f: calls get_monster_slot_entry_ptr(player_id) twice, computes tile_index sum from two slots, calls render_spell_zone_sprite_with_field_copy_check(player_id, tile_sum, 0), returns 0x7d.
+State 0x80: dispatch_effect_handler_by_card_id(1-player_id, slot[0], 0); if zero calls trigger_card_display_op31_if_not_active(player_id, 0xd) returning 0x7e; if non-zero calls init_effect_slot_display_context(player_id, slot[0], 6, 0) returning 0x7f.
+
+Constants:
+  STATE_OFFSET = 0x4a0 (= 0x94<<3)
+  STATE_0x7d   = 0x7d
+  STATE_0x7e   = 0x7e
+  STATE_0x7f   = 0x7f
+  STATE_0x80   = 0x80
+  OP_PARAM     = 0xd

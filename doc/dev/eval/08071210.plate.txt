@@ -1,0 +1,7 @@
+Dual-side equip slot sprite enqueue function. Accepts slot_ptr (r0=r4). Outer loop player_id=0/1 (r6: 0 then 1); inner loop zone_idx=0..4 (r5: 0..4). For each (player_id, zone_idx) pair calls invoke_effect_node_with_active_flag_3arg(slot, player_id, zone_idx): if non-zero calls enqueue_slot_card_sprite_if_eligible with slot[0] card_id, player_id, r2=5 (type), sp[4]=player_id (flags); if zero skips that zone. After all traversal returns 0.
+Function iterates all 5 zones for both players (10 checks total), enqueuing type-5 sprite attributes for each active zone. Pure iteration, no gate branches.
+
+Constants:
+  PLAYER_COUNT = 2 ([0..1])
+  ZONE_COUNT   = 5 ([0..4])
+  SPRITE_TYPE  = 5

@@ -1,0 +1,16 @@
+Equip chain hand card sprite dispatch function. Accepts slot_ptr (r0=r5). First checks slot[3] bits[5:4] (mask 0x30): if !=0x20, takes fast path: computes player_id XOR facing_bit, calls enqueue_sprite_attr_type11 with slot[0] card_id + xor_player + r2=1 + r3=0, then trigger_card_display_op31_if_not_active(player_id, 0x9c); returns 0.
+If slot[3] bits[5:4]==0x20, reads gP1LifePoints+0x4a0 state code and dispatches:
+  State 0x7f: init_effect_slot_display_context(player_id, slot[0], mode=6, 0), returns 0x7e.
+  State 0x7e: calls get_monster_slot_entry_ptr(player_id) twice, computes tile_index sum from two slots, calls enqueue_hand_card_sprite_by_spell_type(player_id, tile_sum, 1). Compares card id: reserved_icid_a(0x144c) or CARD_ID_RESERVED_A_MINUS3(0x1449) -> op=0x4c; 0x1452 -> op=0x4e; The Forgiving Maiden(0x1457) -> op=0x4d; if >=0x144c checks graveyard slot path and calls enqueue_graveyard_spell_sprite_with_zone_ref.
+  State 0x80: dispatch_effect_handler_by_card_id(1-player_id, slot[0], 0); non-zero compares four card_id constants (RESERVED_ICID_A/CARD_ID_RESERVED_A_MINUS3/RESERVED_ICID_B/CARD_ID_THE_FORGIVING_MAIDEN) and calls trigger_card_display_op31_if_not_active; returns 0x7f.
+
+Constants:
+  STATE_OFFSET        = 0x4a0 (= 0x94<<3)
+  RESERVED_ICID_A     = 0x144c (reserved, cid=0xFFFF)
+  RESERVED_ICID_B     = 0x1452 (reserved, cid=0xFFFF)
+  SLOT_BITS_MASK      = 0x30 (slot[3] bits[5:4])
+  OP_A                = 0x4c
+  OP_B                = 0x4e
+  OP_C                = 0x4d
+  CARD_ID_RESERVED_A_MINUS3       = 0x1449  (reserved slot, no card assigned)
+  CARD_ID_THE_FORGIVING_MAIDEN    = 0x1457  (The Forgiving Maiden)

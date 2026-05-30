@@ -1,0 +1,4 @@
+Equip slot sprite dispatch function, invoked when zone entry is active. Accepts slot_ptr (r0=r4). First reads slot[4] bit2 gate; if set returns 0. Calls check_effect_slot_matches_zone_entry(slot,0,0) to verify zone match; mismatch returns 0. Calls read_effect_slot_side_and_type(slot,0) to unpack: r5=side, r6=type. Calls invoke_effect_node_with_active_flag_3arg(slot, side, type); returns 0 if skipped. If effect node active: reads slot[0] card_id (hword) and slot[2] player_id (bit0), computes ownership_flag = (player_id XOR side) != 0 (different side=1, same side=0). Calls dispatch_slot_equip_sprite_by_field6_type(side, type, card_id, ownership_flag). Returns 0 (fixed).
+
+Constants:
+  SLOT_GATE_BIT = 0x4   (slot[4] bit2 activation gate)

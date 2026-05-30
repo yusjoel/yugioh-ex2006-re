@@ -1,0 +1,11 @@
+Called from equip chain refresh path. Accepts two args: r0=slot_ptr, r1=secondary_ptr (may be NULL, used only in 0x7e path). First reads slot[4] bit2 gate; if set returns 0. Reads equip chain display state from gP1LifePoints+0x4a0 (0x94<<3 offset), dispatches three ways:
+State 0x7f: reads gP1LifePoints+0x1da8 refcount; if non-zero reads slot[2] bit0 for player_id, calls set_lp_row_type1_with_attr_flags(player_id, 1, 0x7, 1) to write LP row attr; returns 0 (early exit, state unchanged).
+State 0x80: extracts inverted player_id from slot[2] bit0, calls dispatch_equip_slot_scan_with_field6_guard with sp[0]=1, r1=1, r2=0, r3=0; non-zero calls set_lp_display_row_all_slots returning 0x7f, zero returns 0x7e.
+State 0x7e: if secondary_ptr is NULL returns 0; otherwise reads secondary_ptr[0] card id, calls get_card_extended_stat_field6; if field6==0x16 sets secondary_ptr[4] bits 0x2|0x4|0x8, calls enqueue_field_slot_sprite_with_state_update + update_equip_target_bitmap_zone14; returns 0.
+
+Constants:
+  STATE_OFFSET        = 0x4a0 (= 0x94<<3)
+  LP_REFCOUNT_OFFSET  = 0x1da8
+  CARD_FIELD6_EQUIP   = 0x16
+  SLOT_FLAG_BITS      = 0x2|0x4|0x8
+  LP_ROW_ATTR_FLAGS   = 0x7  (attr_flags param to set_lp_row_type1_with_attr_flags)

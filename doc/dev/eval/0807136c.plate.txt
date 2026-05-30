@@ -1,0 +1,6 @@
+Equip slot zone tile_count match check and overlay sprite enqueue function. Accepts two args: r0=slot_ptr (r7), r1=chain_pair_ptr (r9). Extracts player_id (bit0) and zone_idx (bits[6:2]) from slot[2], uses zone table (base=0x0201c510, stride=0x868, entry=0x14 bytes) to read tile_count from current side and opposite side; sums both and compares to slot[4] bits[14:9]: mismatch returns 0. Then checks zone[8] hword: if 0 returns 0. After both conditions pass, calls enqueue_field_slot_overlay_sprite_if_chain_matches(slot, chain_pair_ptr) to enqueue equip chain overlay sprite.
+
+Constants:
+  ZONE_TABLE_BASE = 0x0201c510
+  PLAYER_STRIDE   = 0x868
+  ZONE_ENTRY_SIZE = 0x14

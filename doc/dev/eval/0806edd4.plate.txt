@@ -1,0 +1,14 @@
+Equip chain OAM sprite setup function. Extracts player_id from slot[2] bit0, then passes through four guard predicates before calling invoke_setup_equip_oam_with_attr2:
+(1) check_field_spell_neo_daedalus_group_placeable(player_id) == 0 returns 0;
+(2) count_available_monster_slots(player_id) == 0 returns 0;
+(3) slot[6] bits[4:2] & 0x1c != 0x4 returns 0 (zone type is not 4);
+(4) find_zone_descriptor_by_slot_id(slot[8] hword) returns descriptor, checks byte[2]==0x0e (zone type 14), otherwise returns 0;
+(5) check_zone_slot_equip_eligible(player_id, slot_id, zone_idx) == 0 returns 0.
+After all pass, computes zone table offset (base=0x0201c8f8, stride=0x868), calls invoke_setup_equip_oam_with_attr2(player_id, zone_entry_ptr, 1, 0x20). Returns 0 (fixed).
+
+Constants:
+  ZONE_TABLE_BASE   = 0x0201c8f8
+  PLAYER_STRIDE     = 0x868
+  ZONE_TYPE_14      = 0x0e (zone type byte returned by find_zone_descriptor)
+  SLOT_ZONE_TYPE4   = 0x4 (slot[6] bits[4:2])
+  ATTR2_MODE        = 0x20

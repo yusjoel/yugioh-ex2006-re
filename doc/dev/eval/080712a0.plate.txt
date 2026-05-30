@@ -1,0 +1,10 @@
+Equip chain state conditional dispatch function. Accepts slot_ptr (r0=r7). Extracts player_id (r6 bit0) and zone_idx (r4 bits[6:2]) from slot[2], uses zone table (base=0x0201c510, stride=0x868, entry=0x14 bytes) to read both-side tile_counts and sum them, compares to slot[4] bits[14:9]: mismatch returns 0. zone[8] hword == 0 returns 0.
+Reads gP1LifePoints+0x4a0 state code: if !=0x80 jumps to dispatch_equip_chain_state_by_slot_ownership(slot); if ==0x80 calls check_value_in_slot_chain(player_id, 0xb, 0x14c4); 0 returns 0; non-zero first calls enqueue_sprite_attr_type11(player_id, 0x14c4, 1, 0), then calls dispatch_equip_chain_state_by_slot_ownership(slot).
+
+Constants:
+  ZONE_TABLE_BASE   = 0x0201c510
+  PLAYER_STRIDE     = 0x868
+  ZONE_ENTRY_SIZE   = 0x14
+  STATE_OFFSET      = 0x4a0 (= 0x94<<3)
+  CHAIN_VAL_PARAM   = 0x14c4  (Freed the Matchless General)
+  CHAIN_LIMIT       = 0xb

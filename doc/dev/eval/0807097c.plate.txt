@@ -1,0 +1,15 @@
+Equip target test function; performs zone match verification and target bitmap detection within the activation state machine. Accepts slot_ptr (r0=r7). First reads slot[4] bit2 gate; if set returns 0. Extracts player_id and zone_idx from slot[2], uses zone table (0x0201c510, stride 0x868, entry 0x14 bytes) to read both-side tile_counts; compares to slot[4] bits[14:9], mismatch returns 0. slot[8] == 0 returns 0.
+Reads gP1LifePoints+0x4a0 state code: 0x80 path calls count_effect_node_zone_activations(slot); 0 returns 0. Reads 0x0201e2a0+player_id*4+8 activation control word: if == 1 enters double loop (player_side=0/1, zone_idx=0..4) calling invoke_effect_node_with_active_flag_3arg(slot, side, type); non-zero calls test_equip_target_slot_in_bitmap(slot, side, type). If != 1 calls trigger_card_display_op31_if_not_active(player_id, 0x6d) + set_equip_activation_state_by_mode(player_id, slot[0], 0x08090625), returns 0x7f.
+0x7f path: calls check_activation_display_state_is_confirmed; if non-zero reads gP1LifePoints+0x1d38/0x1d3c/0x1d40 three fields summed, calls test_equip_target_slot_in_bitmap(slot, sum1, sum2); zero returns 0x80.
+
+Constants:
+  ZONE_TABLE_BASE        = 0x0201c510
+  PLAYER_STRIDE          = 0x868
+  ZONE_ENTRY_SIZE        = 0x14
+  STATE_OFFSET           = 0x4a0 (= 0x94<<3)
+  ACTIVATION_CTRL_BASE   = 0x0201e2a0
+  LP_FIELD_OFFSET_A      = 0x1d38
+  LP_FIELD_OFFSET_B      = 0x1d3c
+  LP_FIELD_OFFSET_C      = 0x1d40
+  MODE_PTR               = 0x08090625
+  OP31_ACTIVATION_TRIGGER = 0x6d  (op param for trigger_card_display_op31_if_not_active in activation path)

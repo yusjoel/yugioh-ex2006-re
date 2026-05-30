@@ -1,0 +1,10 @@
+Equip target bitmap build function. Accepts slot_ptr (r0=r8). First calls set_player_state_bit_with_sprite_update(player_id, 0x12, 1) to set player state bit. Reads slot[4] bit2 gate; if set returns 0.
+Calls check_effect_slot_matches_zone_entry(slot, 0, 0) to verify slot-zone match, then invoke_effect_node_with_active_flag_3arg(slot, side, type) to confirm effect node activation.
+After activation calls get_slot_field5_score(side, type) for baseline score, constructs player_side = 1 - side. Iterates zone table (base=0x0201c510, stride=0x868, entry_size=0x14) over 5 zones (idx=0..4): for each checks zone is valid (zone[0]>>19 non-zero) and slot[8] non-zero, calls get_slot_field6_score(side, zone_idx) and compares to baseline; if score <= baseline ORs player_side<<(3+zone_idx*4) into accumulated bitmap. Loops twice (slot_side=0/1). Finally calls query_equip_target_bitmap_default(slot, bitmap) to submit.
+
+Constants:
+  ZONE_TABLE_BASE  = 0x0201c510
+  PLAYER_STRIDE    = 0x868
+  ZONE_ENTRY_SIZE  = 0x14
+  ZONE_COUNT       = 5 ([0..4])
+  PLAYER_STATE_BIT = 0x12
