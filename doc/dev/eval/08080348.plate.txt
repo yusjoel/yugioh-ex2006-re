@@ -1,0 +1,6 @@
+装备槽合规性综合校验谓词, 是 check_equip_slot_eligible_with_criteria_and_target 的近似对称兄弟. 接收 effect_node_ptr(r0), player_id(r1), slot_idx(r2). 走 slot_idx<=4 路径: 调用 check_equip_slot_criteria_by_state_code_any 筛状态码, 调用 check_card_id_is_equip_set_e 验证卡组类别, 调用 get_first_placeable_monster_slot 查可放置怪兽槽, 调用 check_slot_placement_blocked_by_field_effect 判场地阻塞, 最后追加调用 check_zone_slot_equip_prerequisites 验证区域前置条件; 另有 slot_idx==0xe 的扩展路径. 返回 0/1.
+
+Constants:
+- SLOT_IDX_MAX = 4
+- ZONE_IDX_EXT = 0xe (扩展区索引)
+- ATTR_MASK = 0xfffc7fff

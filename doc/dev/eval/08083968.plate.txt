@@ -1,0 +1,4 @@
+effect_slot 区域玩家双路校验谓词, 被 fn-ptr 表引用. 接收 effect_node_ptr(r0). 读 [r4+6] bits[4:3] 作为 case 索引. case 0: XOR player_id 与 r5 比较. case 1: 直接比较 player_id 与 r5. 返回 0 (不匹配) 或 1 (匹配). r4/r5 是 caller-frame 继承的 effect_node 和比较值. fn-ptr 0x08083969 被 tick_equip_activation_display_with_card_routing (0x08081f28) 的 literal pool @ 08083aec 引用.
+
+Constants:
+- ZONE_FIELD_BITS = bits[4:3] of [r4+6] (case 索引 [0..1])

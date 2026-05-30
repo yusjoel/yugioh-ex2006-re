@@ -1,0 +1,6 @@
+小型装备精灵入队函数. 接收 effect_node_ptr(r0). 从固定基址 [0x0201bb90]+0 和 [0x0201bb90]+0x1c 分别读取两个参数, 再以 r0 和这两个参数调用 enqueue_equip_slot_sprite_with_code_rotation 入队精灵旋转属性. 固定返回 1 表示完成.
+
+Constants:
+- BASE_PTR = 0x0201bb90 (IWRAM 装备基址)
+- OFFSET_A = 0x0 (字段偏移 0)
+- OFFSET_B = 0x1c (字段偏移 0x1c)

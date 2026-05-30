@@ -1,0 +1,10 @@
+装备显示三状态机, 带函数指针路由. 接收 effect_node_ptr(r0). 先对 card_id 做三路 BST: 0x1327(Fairy's Hand Mirror), 0x140a(Shift), 0x1719(Fiend's Hand Mirror) 各映射到不同显示操作函数指针 (加载到 r7). 之后读 IWRAM 状态 [IWRAM_BASE+0x4b0]. 状态 0: 清 attr_bits + 调用 format_game_text_with_int_arg + trigger + set_equip_activation_state_by_mode, 步进+1, 返回 0. 状态 1: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation, 步进+1. 状态 2: 写 [IWRAM+0x484] := r5 (存储激活 slot 快照), 步进+1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- SLOT_SNAPSHOT_OFFSET = 0x484
+- ATTR_MASK = 0xfffc7fff
+- CARD_ID_A = 0x1327 (Fairy's Hand Mirror)
+- CARD_ID_B = 0x140a (Shift)
+- CARD_ID_C = 0x1719 (Fiend's Hand Mirror)

@@ -1,0 +1,8 @@
+装备激活显示四状态机, 带 card_id 路由. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 调用 count_effect_node_zone_activations; 若卡 ID 匹配 0x11f0 (Greenkappa) 或 0x184a (Xing Zhen Hu) 则调用 format_game_text_with_int_arg 格式化文本再 trigger; 否则直接 trigger+set_equip_activation_state_by_mode. 状态 1: 调用 set_equip_activation_state_by_mode_alt 设置替代模式, 步进+1. 状态 2: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation, 步进+1. 状态 3: 同状态 2.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- CARD_ID_A = 0x11f0 (Greenkappa)
+- CARD_ID_B = 0x184a (Xing Zhen Hu)
+- FORMAT_TEXT_SLOT = 0x9b (格式化文本槽编号)

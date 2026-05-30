@@ -1,0 +1,6 @@
+装备槽显示三状态机, 以卡 ID 查值分派. 接收 effect_node_ptr(r0). 先调用 lookup_slot_display_value_by_card_id 查 card_id 对应显示值. 从 [IWRAM_BASE+0x4b0] 读状态. 状态 0: 调用 dispatch_effect_handler_by_card_id; 若 handler 返回非零则调用 trigger_card_display_op31_if_not_active 触发显示后步进+1 返回 0(进行中); 若 handler 返回 0 且位域条件不满足则 movs r0,#1; rsbs r0,r0,#0 返回 -1(dispatch 失败). 状态 1: 调用 trigger_card_display_op31_if_not_active + init_effect_slot_display_context 后步进+1 返回 0(进行中). 状态 2: 调用 pack_equip_slot_sprite_with_code_attr 打包精灵属性后落入 LAB_08081c4a movs r0,#1 返回 1(完成). 其他状态值同样跳转 LAB_08081c4a 返回 1(完成).
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0 (0x96*8)
+- STATE2_OFFSET = 0x4b4

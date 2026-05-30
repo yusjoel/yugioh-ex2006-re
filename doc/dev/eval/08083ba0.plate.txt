@@ -1,0 +1,12 @@
+装备激活四状态机, 含精灵压入操作. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 清 attr_bits + format_game_text_with_int_arg(slot=0x9b) + trigger_card_display_op31_if_not_active, 步进+1, 返回 0. 状态 1/3 共享: check_activation_display_state_is_confirmed; 若确认则从 [gP1LifePoints+0x1d68]/[+0x1d6c]/[+0x1d70] 读三字段合成参数, enqueue_sprite_attr_row_0x29_with_flag2, 然后 push_to_effect_slot_array, 步进+1. 若未确认则步进-1. 状态 2: 清 attr_bits + set_equip_activation_state_by_mode_alt, 步进+1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- ATTR_MASK = 0xfffc7fff
+- FLAG_MASK_INV = ~0x1d = 0xe2
+- FORMAT_TEXT_SLOT = 0x9b
+- LP_FIELD_A = gP1LifePoints+0x1d68
+- LP_FIELD_B = gP1LifePoints+0x1d6c (offset diff = 4)
+- LP_FIELD_C = gP1LifePoints+0x1d70 (offset diff = 8)
+- FN_PTR_CHECK = 0x08083b55 (check_equip_slot_pair_blocked)

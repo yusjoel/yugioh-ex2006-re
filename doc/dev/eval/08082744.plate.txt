@@ -1,0 +1,6 @@
+装备槽精灵入队函数, 先剥离 attr 位域再入队. 接收 effect_node_ptr(r0). 将 [r0+4] 与 0xfffc7fff 做 AND 清除高属性位, 将 [r0+6] 与 ~0x1d=0xe2 做 AND 清除状态标志位. 从 [r0+0x14] 提取 bits[13:9] 作为 slot_idx. 调用 enqueue_equip_slot_sprite_with_code_rotation 以 node_ptr, player_id, slot_idx 入队精灵. 固定返回 1.
+
+Constants:
+- ATTR_MASK = 0xfffc7fff (清除 bits[15:14])
+- FLAG_MASK = ~0x1d = 0xe2 (清除 bits[4:0] 中的状态标志)
+- SLOT_IDX_SHIFT_LO = 0x9 (bits[13:9] 提取: lsls#0x12 / lsrs#0x17 = shift net 5)

@@ -1,0 +1,7 @@
+装备激活显示五状态机. 接收 effect_node_ptr(r0). 从 [IWRAM_BASE+0x4b0] 读状态. 状态 0: count_effect_node_zone_activations; 状态 1: trigger_card_display_op31_if_not_active(op_code=0x94)+set_equip_activation_state_by_mode, 步进+1, 返回 0; 状态 2: check_activation_display_state_is_confirmed, 若确认则 enqueue_equip_slot_sprite_with_code_rotation 并步进+1; 状态 3: trigger_card_display_op31_if_not_active(op_code=0x6a)+set_equip_activation_state_by_mode, 步进+1, 返回 0; 默认(>=4): 步进+1 返回 1. 与 tick_equip_activation_display_3state (0x08081900) 为扩展 5 状态版本.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0 (0x96*8)
+- OP_CODE_A = 0x94 (状态 1 用)
+- OP_CODE_B = 0x6a (状态 3 用)

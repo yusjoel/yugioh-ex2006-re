@@ -1,0 +1,1 @@
+装备链配对校验与槽条目构建谓词. 接收 effect_node_ptr(r0). 读取 effect slot 的 side/type (read_effect_slot_side_and_type). 调用 find_equip_chain_pair_across_field 在全场查找装备链配对. 若找到则调用 check_zone_slot_equip_prerequisites 验证区域前置条件, 通过后调用 build_equip_chain_slot_entry 构建槽条目. 返回 0 表示成功, 1 表示失败. fn-ptr 地址 0x08082c8d 被 0x08082dbc 引用.

@@ -1,0 +1,4 @@
+effect_slot 区域字段三路校验谓词. 接收 effect_node_ptr(r0), player_id_or_side(r1), slot_type_qualifier(r2). 入口 push {r4,r5,r6,r7,lr} 后 adds r5,r0,#0 / adds r6,r1,#0 / adds r7,r2,#0 将三个 APCS 参数 spill 到 callee-save. 先调用 invoke_effect_node_handler_3arg 触发节点处理器. 然后读取 [r5+6] bits[4:3] 作为 case 索引 (0/1/2). case 0 (LAB_080827be): 提取 effect_slot player_id 位与 r6(r1) 比较. case 1 (LAB_080827a8): 组合 r6/r7 为 16-bit 后与 read_effect_slot_side_and_type 结果比较. case 2 (LAB_08082794): XOR effect_slot player_id 与 r6(r1) 后判非零. 返回 0 (不匹配) 或 1 (匹配).
+
+Constants:
+- ZONE_FIELD_BITS = bits[4:3] of [r5+6] (case 索引, [0..2])

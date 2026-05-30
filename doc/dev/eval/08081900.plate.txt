@@ -1,0 +1,5 @@
+装备激活显示三状态机. 接收 effect_node_ptr(r0). 从 [IWRAM_BASE+0x96*8] 读当前状态. 状态 0: 调用 count_effect_node_zone_activations 计数激活区, 再调用 dispatch_equip_card_display_op_by_card_id 派发卡显示操作, 再调用 set_equip_activation_state_by_mode 设置激活状态, 步进计数器+1, 返回 0. 状态 1: 调用 check_activation_display_state_is_confirmed 查确认标志, 若已确认则调用 enqueue_equip_slot_sprite_with_code_rotation 入队精灵并步进+1, 未确认则步进-1, 返回 0. 状态>=2: 步进计数器+1 并返回 1 表示完成.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x96*8 = 0x4b0

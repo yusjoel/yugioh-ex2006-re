@@ -1,0 +1,15 @@
+装备激活三状态机, 专用于 Ancient Lamp / Dreamsprite 卡组. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 清 attr_bits + count_effect_node_zone_activations; 若激活数 >0, 对 card_id 做三路比较 (0x1476=Ancient Lamp, 0x140a(=0x1476-0x6c)=Shift, 0x148a=Dreamsprite): Ancient Lamp/Shift 路径调用 trigger_card_display_op31_if_not_active(op=0xf) 并写 [gP1LP+0xea<<5]:=1; Dreamsprite 路径读 [0x0201e2a0+player_id*4] 判断 [ptr+8]==1 后写 [gP1LP+0xea<<5]:=1 或 invoke_card_display_op_0x31_sub1(op=0xe2). 步进+1, 返回 0. 状态 1: 检查 [gP1LP+0x1d40] 是否非零; 若为 0 则返回 -1; 否则 set_equip_activation_state_by_mode, 步进+1, 返回 0. 状态 2: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation + 步进+1. 默认: 返回 1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- ATTR_MASK = 0xfffc7fff
+- FLAG_MASK_INV = ~0x1d = 0xe2
+- CARD_ID_A = 0x1476 (Ancient Lamp)
+- CARD_ID_B = 0x148a (Dreamsprite)
+- CARD_ID_C = 0x140a (Shift; 0x1476-0x6c)
+- OP_CODE_TRIGGER = 0xf
+- OP_CODE_ALT = 0xe2
+- ACTIVATION_FLAG_FIELD = gP1LifePoints + 0x1d40 (0xea<<5=0x1d40)
+- DREAM_DATA_BASE = 0x0201e2a0
+- FN_PTR_MODE = 0x080905e9 (invoke_effect_node_handler_3arg+1, fn-ptr)

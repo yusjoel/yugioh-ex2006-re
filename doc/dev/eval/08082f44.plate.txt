@@ -1,0 +1,21 @@
+装备显示三状态机, 卡 ID 组 B 路由. card_id BST 覆盖 11 张卡: 0x1359(Backup Soldier), 0x149e(Miracle Dig), 0x14e7(Keldo), 0x1630(Hidden Book of Spell), 0x16a8(Ray of Hope), 0x16d6(Primal Seed), 0x17f1(Dark Factory of Mass Production), 0x17f7(The Graveyard in the Fourth Dimension), 0x1864(Behemoth the King of All Animals), 0x196f(Pot of Avarice), 0x1974(The Forces of Darkness). 分派 r4=op_code, r7=sub_code. 0x17f7->special(count_available_monster_slots 动态计算 sub_code). 之后读 IWRAM 状态 [IWRAM_BASE+0x4b0]. 状态 0: 清 attr + dispatch_card_effect_activation + format_game_text + trigger, 步进+1, 返回 0. 状态 1: init_effect_slot_display_context, 写 [IWRAM+0x4b4]:=0, 步进+1. 状态 2: 读 palette 计数, get_effect_slot_entry_ptr + find_slot + get_current_slot_palette_color + pack_equip_slot_sprite, 步进+1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- SLOT_PALETTE_OFFSET = 0x4b4 (palette 计数器)
+- ATTR_MASK = 0xfffc7fff
+- SUB_CODE_DEFAULT = 0x37
+- CARD_ID_01 = 0x1359 (Backup Soldier, r4=8)
+- CARD_ID_02 = 0x149e (Miracle Dig, r4=8)
+- CARD_ID_03 = 0x14e7 (Keldo, r4=8)
+- CARD_ID_04 = 0x1630 (Hidden Book of Spell, r4=8)
+- CARD_ID_05 = 0x16a8 (Ray of Hope, r4=8)
+- CARD_ID_06 = 0x16d6 (Primal Seed, r4=8)
+- CARD_ID_07 = 0x17f1 (Dark Factory of Mass Production, r4=8)
+- CARD_ID_08 = 0x17f7 (The Graveyard in the Fourth Dimension, r7=0x011d, r4=8)
+- CARD_ID_09 = 0x1864 (Behemoth the King of All Animals, r4=0xb)
+- CARD_ID_10 = 0x196f (Pot of Avarice, r4=8, r7=0x4c)
+- CARD_ID_11 = 0x1974 (The Forces of Darkness, r4=8, r7=0x4c)
+- OP_CODE_42 = 0x2a (r4=0x2a for default unmatched)
+- MAX_PALETTE_COUNT = 0x20

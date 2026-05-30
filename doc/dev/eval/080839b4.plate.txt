@@ -1,0 +1,7 @@
+装备放置 bitmap 显示四状态机. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 调用 check_effect_activations_both_sides; 若 [activation_ctx+player_id*4+8]==1, 调用 find_best_slot_from_equip_bitmap_with_gate; 迭代有效槽 0..4 调用 invoke_effect_node_handler_3arg 查找匹配; 找到后 invoke_effect_node_handler_3arg + enqueue_equip_slot_sprite_with_code_rotation 反向遍历; 步进+1, 返回 0. 状态 1 (通过 check_effect_slot_zone_player_by_type fn-ptr): trigger_card_display_op31_if_not_active(op=0x94)+set_equip_activation_state_by_mode, 步进+1. 状态 2: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation, 步进+1. 状态>=3: 步进+1 返回 1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b0
+- SLOT_IDX_MAX = 4
+- FN_PTR_PREDICATE = 0x08083969 (check_effect_slot_zone_player_by_type)

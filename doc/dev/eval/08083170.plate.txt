@@ -1,0 +1,9 @@
+装备 LP 显示四状态机. 接收 effect_node_ptr(r0). 先从 [gP1LifePoints+0x1ce8] XOR [IWRAM+0x4b4] 计算 r4 值. 读 [IWRAM+0x4b4] 为状态. 状态 0: 清 attr_bits + 写 [IWRAM+0x4b4]:=0, 步进跳至 state-advance. 状态 1: count_available_monster_slots 检可用怪兽槽; 若 >0 且 check_field_spell_neo_daedalus_group_placeable 通过, 则调用 dispatch_effect_handler_by_card_id + set_lp_display_row_type14; 步进+1. 若失败则步进+2. 状态 2: find_hand_slot_idx_by_set_code 查手牌槽 + pack_equip_slot_sprite_with_code_attr 打包精灵. 状态 3: 递增 [IWRAM+0x4b4]+1, 若 >1 则返回 4 (完成), 否则返回 1.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x4b4 (此函数使用 0x4b4 非 0x4b0)
+- LP_OFFSET = 0x1ce8
+- ATTR_MASK = 0xfffc7fff
+- SET_CODE_OFFSET = 0x1da8 (gP1LifePoints+0x1da8)
+- PALETTE_STEP = 0x868

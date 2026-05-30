@@ -1,0 +1,1 @@
+effect_node 双重校验谓词, 被多处 fn-ptr 表引用. 接收 effect_node_ptr(r0). 先调用 invoke_effect_node_handler_3arg 调用节点 3 参数处理器; 若返回非零, 则调用 find_effect_slot_by_side_and_type 查询匹配槽; 若找到则返回 0. 若处理器返回 0 且无匹配槽, 则返回 1. 即返回 0 表示"有效激活条件成立", 返回 1 表示"条件未成立". fn-ptr 地址 0x08081de5 被 5 个不同调用方加载到函数指针表中.

@@ -76,6 +76,17 @@ model: sonnet
 
 ### Phase 1: 读函数体
 
+**[HARD GATE — FUNCTION BOUNDARY DELIMITATION, batch#187 3 functions got 10-25/45 from past-end overrun]**: 读函数体之前，必须先建立精确的 [start, end) 边界：
+
+```
+Step 1: Grep "@ <ADDR>" asm/all.s → 得到起始行号 LINE_START
+Step 2: 从 LINE_START+1 向下 Grep 下一个函数标签 (如 "@ 0[89][0-9a-f]{6}$") → 得到终止行号 LINE_END (不含)
+Step 3: Read asm/all.s offset=LINE_START limit=(LINE_END - LINE_START)
+Step 4: 所有 bl/callee/literal 分析严格限定在此范围内; 任何地址 >= ADDR_END 的 bl 目标属于相邻函数, 不得引用
+```
+
+**自检**: 写完 callee 列表后, 逐条验证每个 bl 目标地址 >= ADDR_START 且 < ADDR_END; 越界地址 = past-end overrun 直接信号; 完整重读 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_function_body_boundary_misread.md`
+
 `Read asm/all.s` 在 caller 提供的行号区间。如 prompt 没给区间, `Grep -n "@ <addr>" asm/all.s` 定位。
 
 ### Phase 2: 命中可用的 6 层证据 (按需, 不强求每层都查)
@@ -209,6 +220,7 @@ model: sonnet
     - v1.3 失败模式：anchor-line 仅对前 2/20 函数应用后静默丢弃（selective application，batch#134 18/20）；v1.4 MANIFEST 使覆盖率在批次层可见；
     - 提供的 caller 地址若实为 SELF 的被调函数（callees）→ R7=0；
     - 整批跳过 = batch-scale regression（batch#131 20/20；batch#134 18/20）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_callee_inversion.md`
+- **[ALWAYS — 每函数]** Phase 1 建立 [start..next_label) 边界后, 检查 callee 列表中每个 bl 目标地址是否 < ADDR_END; 越界 bl 目标 = past-end overrun → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_function_body_boundary_misread.md`
 - plate comment **写前**先数函数体内 `bl` 目标数：≥4 callee → 立即进入压缩模式（Function: 3句、Side effects: 单子句、Constants: 仅键值行，禁止展开各 callee 参数细节）；**写后**估算字数：超过 500 字（≈35 行×13 词）→ 立即压缩 Side effects: 为单子句形式，压缩 Constants: 为 NAME=value // 一词说明，分析性prose 移至 proposal body → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_plate_comment_word_overflow.md`
 - proposed_name 含 `_0x[0-9a-f]{3,}_` / `_card_[0-9a-f]+` 或以 hex 数字段结尾（如 `_0x12be`）→ `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_bare_card_id_in_name.md` (R1 违规; 单函数或 sibling cluster 均须在提交前一次性查 doc/dev/data.md 解析全部 card_id; batch #49 11 函数同批命中; 复现 0x08033088+0x080a3c2c+batch#49-cluster)
 - sibling pair 使用或考虑 `_alt` / `_init` qualifier 时 → `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_alt_init_sibling_qualifier.md` (优先级：精确语义词 > _init(重置状态入口) > _alt(资源路径变体) > 序号后缀; 均为 R1 合规的 sibling qualifier)
