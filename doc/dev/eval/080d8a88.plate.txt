@@ -1,0 +1,10 @@
+Called during the pack card select phase by the frame driver, builds the card select candidate array for each slot of the current pack and performs shuffles. Iterates all pack card slots; for each slot calls get_pack_info_attr2 to get the attribute type (0=empty/invalid, skip); computes candidate card type mask r4 from attribute bit fields; if r4!=1, repeatedly calls build_pack_card_select_slot_data to fill candidate data until successful (non-zero return), then calls shuffle_pack_card_select_slots to shuffle and advances the pointer (+4); if r4=1, fills once and shuffles. After all slots are done, performs 1000 random swap shuffles (0x3e8 iterations) on the pack_ui_state[+0x6ee] pointer array; then increments the pack_ui_state[+0x6ee] counter; if equal to pack[+0xa], writes pack_ui_state[+0x10]=4 to advance state; calls tick_overlay_animation_step(0). Returns r9: 0 (count still below pack[+0xa] target) or 1 (count reached pack[+0xa] target; epilogue .hword 0x4648 = mov r0,r9).
+
+Constants:
+- PACK_DATA_OFFSET = 0x6fc (DAT_080d8b00)
+- SLOT_INDEX_OFFSET = 0x6fa (DAT_080d8b04)
+- SLOT_ARRAY_OFFSET = 0x704 (DAT_080d8b08)
+- SHUFFLE_SLOT_ITER = 0x3e8 (DAT_080d8bd4 = 0x3e7 + 1 = 1000 shuffles)
+- REVEAL_COUNT_OFFSET = 0x6ee (DAT_080d8bd8)
+- TYPE_MASK_TOP4 = 0xf0 (bits[7:4] of slot[+0x1] type mask)
+- NEXT_STATE = 4 (strh 4,[pack_ui_state,#0x10])

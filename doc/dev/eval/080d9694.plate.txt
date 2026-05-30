@@ -1,0 +1,15 @@
+Called on the pack list page initialization path (indeg=0, Sub-type A). Reads pack_ui_state[+0x724] bit0; if 0, jumps directly to scroll reset phase. If set, iterates pack_ui_state[+0x50] slot list (0x20 bytes per slot), searching for a slot where [slot+0]==[+0x20] (match); on hit, computes page row offset via get_bios_div_remainder(slot_idx, 5), writes [+0x18]=scroll_page_pos and [+0x1e]=slot_idx-scroll_page_pos; if no match, both fields are cleared. Then calls set_pack_scroll_step_mode, recompute_pack_selection_totals, and init_overlay_struct_and_palette(pack_ui_state+0x6c4, 0x0200af20, 0, 0xf, 6). Returns fixed 1 (Sub-case E, pop{r1};bx r1).
+
+Constants:
+- FLAG_OFFSET = 0x724 (DAT_080d96d4 = pack_ui_state+0x724 = init control flag)
+- FLAG_BIT0 = 0x1 (ands r0,r1 with #1 = scroll-position flag)
+- SLOT_LIST_OFFSET = 0x50 (adds r1,#0x50 = slot list start offset)
+- SLOT_STRIDE = 0x20 (adds r1,#0x20 per slot)
+- SCROLL_PAGE_SIZE = 5 (get_bios_div_remainder(idx, 5) = 5 slots per page)
+- SCROLL_POS_OFFSET = 0x18 (strh [r5,#0x18] = page scroll position)
+- SCROLL_IDX_OFFSET = 0x1e (strh [r5,#0x1e] = selected slot relative to page start)
+- SCROLL_STEP_OFFSET = 0x1a (strh 0,[r5,#0x1a] = clear scroll step count)
+- OVERLAY_PALETTE_BASE = 0x0200af20 (DAT_080d9718 = EWRAM overlay palette)
+- OVERLAY_STRUCT_OFFSET = 0x6c4 (DAT_080d9714 = pack_ui_state+0x6c4 = overlay struct)
+- OVERLAY_PALETTE_COUNT = 0xf (movs r3,#0xf)
+- OVERLAY_PARAM5 = 6 (str r2,[sp,#0] with r2=#6 = 5th argument)

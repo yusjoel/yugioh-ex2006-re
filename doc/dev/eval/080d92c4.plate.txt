@@ -1,0 +1,7 @@
+Called by pack list page frame drivers (indeg=17), iterates all visible pack slots and dispatches OAM writes based on each slot's attr field at [+0xe]. r0 = dir_flags [0..3], clamped then stored as r8=0x100 (sq type sentinel). Calls pack_visible_count to get visible slot count r7; for each slot (stepping 0x20 bytes) reads [r4+0xe]: 0 = skip; equal to 0x100 = calls write_pack_banner_oam_entry_sq(slot_idx, oam_attr, dir_flags); otherwise calls write_pack_banner_oam_entry_stacked(slot_idx, oam_attr, attr0xe, dir_flags). Returns void (Pattern B: pop{r0};bx r0).
+
+Constants:
+- DIR_FLAGS_MAX = 3 (cmp r6,#3; bls = clamp upper bound)
+- SQ_SENTINEL = 0x80<<1 = 0x100 (movs r0,#0x80; lsls r0,#1; mov r8,r0 = sq type attr sentinel)
+- SLOT_STRUCT_STRIDE = 0x20 (adds r4,#0x20 per slot)
+- ATTR0E_OFFSET = 0xe (ldrsh r0,[r4,r1] r1=#0xe)

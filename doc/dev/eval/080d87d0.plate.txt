@@ -1,0 +1,8 @@
+Called by the state machine when the pack purchase confirm panel enters its display phase, to initialize the confirm panel overlay struct and palette. Passes the pack_ui_state[+0x6d0] offset region to init_overlay_struct_and_palette (EWRAM target 0x0200af20, buf_size=0xe, color_count=0xf); then clears pack_ui_state[+0x4] (panel state counter). Returns fixed value 1 indicating initialization complete.
+
+Constants:
+- OVERLAY_EWRAM = 0x0200af20 (DAT_080d8800)
+- OVERLAY_BUF_SIZE_IDX = 0xe (movs r2,#0xe; 5th stack argument)
+- OVERLAY_COLOR_COUNT = 0xf (movs r3,#0xf)
+- OVERLAY_OFFSET = 0xda<<3 = 0x6d0 (pack_ui_state[+0x6d0])
+- PANEL_STATE_OFFSET = +0x4 (strh 0,[r4,#0x4])

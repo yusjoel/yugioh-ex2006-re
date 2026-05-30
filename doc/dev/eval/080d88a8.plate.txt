@@ -1,0 +1,14 @@
+Called during the pack card drawing reveal phase by the frame driver, performing random card draw logic and filling reveal data for each pending card slot. Iterates all card slots (slot count from [r2,#8]); for each slot, uses the attribute type from get_pack_info_attr2 (=5 for flash/rare, otherwise common) to call tick_prng_lcg_rand15 multiple times to generate random card type and count; uses get_bios_div_remainder to modulate random values to determine per-column draw count (3 or 4); writes results into a temporary array on the stack; then performs 100 random swap shuffles (0x64 iterations) across 10 card slots (sp[0..9]); finally iterates 10 slots to call set_card_flag_bit to mark revealed cards and writes reveal info to pack_ui_state[+0x6f4/+0x6ee]; calls tick_overlay_animation_step(0) to advance the overlay animation; writes pack_ui_state[+0x10]=3 to advance the state machine. Returns 1 (fixed; Sub-case E).
+
+Constants:
+- pack_ui_state base = 0x03005850
+- REVEAL_DATA_OFFSET = 0x6f4 (DAT_080d8a7c)
+- REVEAL_COUNT_OFFSET = 0x6ee (DAT_080d8a80)
+- PACK_DATA_PTR = 0x6fc (DAT_080d8910 = 0x6fc, pack_ui_state[+0x6fc])
+- CARD_POOL_PTR = 0x02029eb0 (DAT_080d8914, pack card data pool)
+- PRNG_MASK_15BIT = 0x7fff (DAT_080d8918/DAT_080d8960)
+- SHUFFLE_ITER_COUNT = 0x64 (cmp r5,#0x63 + 1 = 100 shuffles)
+- SLOT_COUNT = 10 (cmp r5,#0x9 = 10 card slots)
+- NEXT_STATE = 3 (strh r0,[r1,#0x10])
+- AOB_SLOT_STRIDE = 4 (adds r4,#0x4 in inner loop)
+- ANIM_MODE = 0 (tick_overlay_animation_step(0))

@@ -1,0 +1,10 @@
+Called each frame during the pack card info page fade-in phase by the frame-driven state machine. First writes BLDALPHA to fully transparent (0x1f00, eva=0, evb=31) to begin fade-in; decrements pack_ui_state[+0x6] timer; if the timer is in (0..0x13] linearly computes BLDALPHA blend coefficient via bios_div and writes it; when the timer reaches 0, switches BG mode (BG0/BG1/BG1CNT+2/+3), sets BLDCNT to 0x3f3f and BLDALPHA to 0x1010, sets card slot [+0x1c] bit1; finally calls render_pack_info_card_presence_sprites and render_pack_info_card_highlight_sprite to update card presence/highlight sprites. Returns 0 (timer still counting) or 1 (switch complete; Sub-case E).
+
+Constants:
+- BLDALPHA_INIT = 0xf8<<5 = 0x1f00 (fully transparent: evb=0x1f, eva=0)
+- FADE_TIMER_MAX = 0x14 (movs r0,#0x14)
+- FADE_THRESHOLD = 0x13 (cmp r0,#0x13; linear fade when <=0x13)
+- BLDCNT_FINAL = 0x3f3f (DAT_080d77a8)
+- BLDALPHA_FINAL = 0x1010 (DAT_080d77ac, eva=0x10, evb=0x10)
+- BG0CNT = 0x04000008, BG1CNT = 0x0400000a, BLDCNT = 0x04000050, BLDALPHA = 0x04000052
+- CARD_FLAG_BIT = 0x2 (bit1 in slot[+0x1c])

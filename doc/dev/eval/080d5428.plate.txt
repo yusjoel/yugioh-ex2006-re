@@ -1,0 +1,7 @@
+Called by the pack scene state machine when the AOB animation frame loop needs to be reset. First clears pack_ui_state[+0x720] (frame counter) to zero to restart the fade-in animation; then iterates over (r0 offset +0x1 low 4 bits) AOB slots, calling dispatch_pack_aob_by_type_with_state_base for each active slot (bit[2:0] != 0) to set its animation type base address. Differs from tick_pack_aob_frame_loop: this function does not call tick_pack_aob_frame_with_state_base (does not advance frames) and clears the frame counter before iterating.
+
+Constants:
+- AOB_COUNT_MASK = 0xf (r0[+0x1] low 4 bits)
+- AOB_SLOT_STRIDE = 0x4 (4 bytes per slot)
+- FRAME_COUNT_OFFSET = 0xe4<<3 = 0x720 (pack_ui_state[+0x720])
+- pack_ui_state base = 0x03005850

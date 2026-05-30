@@ -1,0 +1,14 @@
+Called by the state machine when the pack card info page enters its display phase, to initialize the card info overlay struct and cache the current selected card data pointer. Clears pack_ui_state[+0x18] and [+0x1a] (scroll positions), then calls init_overlay_struct_and_palette with EWRAM address 0x0200af20 (mode=6, color_count=15) to initialize the overlay palette and struct. Finally reads the card data pointer from the currently selected card slot at offset +0x14 and writes it to pack_ui_state[+0x34] for use by subsequent frame render functions.
+
+Constants:
+- SCROLL_POS_0 = +0x18 (strh 0,[r5,#0x18])
+- SCROLL_POS_1 = +0x1a (strh 0,[r5,#0x1a])
+- OVERLAY_EWRAM = 0x0200af20 (DAT_080d7338)
+- OVERLAY_BUF_SIZE = 0x80<<2 = 0x200 (overlay color buffer size)
+- OVERLAY_MODE = 6
+- OVERLAY_COLOR_COUNT = 0xf
+- STRUCT_STRIDE = 0x20 (per slot, lsls r1,#5)
+- CARD_PTR_OFFSET = 0x14 (ldr r0,[r4,#0x14])
+- CARD_PTR_CACHE = +0x34 (str r0,[r5,#0x34])
+- SLOT_ARRAY_OFFSET = 0xda<<3 = 0x6d0 (r0 += 0x6d0 for overlay target)
+- SLOT_INDEX_FIELD = +0x32 (ldrh r1,[r5,#0x32] current slot index)

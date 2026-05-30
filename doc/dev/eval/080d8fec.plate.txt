@@ -1,0 +1,11 @@
+Called by the pack scene scroll frame driver (0x080d9c38) each frame to update the scroll angle field and conditionally rewrite the OBJ tile strip. Reads pack_ui_state[+0x10] angle value; if >0x1e, uses bits[15:8] of [+0x12] as the reference phase; otherwise phase is 0. Adds 8 to [+0x12] and takes modulo 0x3000 via bios_div_remainder, writing back to [+0x12]; if the resulting phase byte (bits[15:8]) differs from the saved reference phase, calls write_pack_obj_tile_strip(0x0600e000, 0x12, 0xf) to write 15 columns of OBJ tiles. Returns void (Pattern B: pop{r0};bx r0, no independent r0 write).
+
+Constants:
+- ANGLE_THRESHOLD = 0x1e (cmp r0,#0x1e = 30 frame threshold)
+- ANGLE_STEP = 8 (adds r0,#0x8 = per-frame step)
+- ANGLE_MOD = 0xc0<<6 = 0x3000 (movs r1,#0xc0; lsls r1,#6; 192<<6=12288=0x3000)
+- OBJ_VRAM_BASE = 0x0600e000 (DAT_080d903c)
+- TILE_START = 0x12 (movs r1,#0x12)
+- TILE_COUNT = 0xf (movs r2,#0xf)
+- ANGLE_OFFSET = +0x12 (ldrh/strh [r4,#0x12])
+- COUNT_OFFSET = +0x10 (ldrh [r4,#0x10])

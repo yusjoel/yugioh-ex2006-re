@@ -1,0 +1,6 @@
+Called during pack card info page initialization by two callers (0x080d733c contains init_pack_card_info_bg_and_vram; 0x080d7f3c contains tick_overlay_animation_step/init_pack_scroll_animation). Calls render_pack_label_str13f1_to_bg_vram(0x140) to render the first label string to BG VRAM; calls render_pack_label_str1390_to_bg_vram(0x180) to render the second label string; finally calls copy_pack_card_palette_to_obj_pal(0xb) to copy the card palette to OBJ palette slot 11.
+
+Constants:
+- LABEL_VRAM_OFFSET_0 = 0xa0<<1 = 0x140 (first label render offset)
+- LABEL_VRAM_OFFSET_1 = 0x140+0x40 = 0x180 (second label render offset)
+- OBJ_PAL_SLOT = 0xb (palette slot for copy_pack_card_palette_to_obj_pal)

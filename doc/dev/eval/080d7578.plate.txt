@@ -1,0 +1,11 @@
+Called by the state machine when the pack card info page enters its initial display phase. Executes in sequence: renders the pack draw counter OBJ sprite (render_pack_draw_counter_to_sprite_vram); writes the pack name OAM tile sequence to OBJ VRAM 0x0600e426 (write_pack_name_oam_tile_sequence, tile count 15); clears AOB status flags bit[2:0] in pack_ui_state[+0x725]; renders card attribute byte sprites (render_pack_stat_byte_to_info_slot); fills the card name tile area (fill_pack_info_card_name_tiles); clears scroll positions [+0x18] and [+0x1a]; computes initial scroll position via bios_div and calls set_pack_scroll_start_pos; finally selects BG mode based on current card slot bit1 (0 = BG0/BG2/BLDCNT mode 1+2; 1 = BG0/BG3/BLDCNT mode 2+3) and writes the corresponding IO registers.
+
+Constants:
+- OBJ_VRAM_OAM_TILE = 0x0600e426 (DAT_080d762c, pack name OAM tile target)
+- TILE_COUNT = 0xf (movs r2,#0xf)
+- AOB_FLAG_OFFSET = 0x725 (DAT_080d7630 = 0x725, pack_ui_state[+0x725] AOB flags)
+- BG_MASK = 0xfffc (DAT 0x0000fffc, clears low 2 bits of BG register)
+- BLDCNT_VAL = 0x1748 (DAT_080d76b0, BG blend control)
+- BLDALPHA_EVA = 0x10 (movs r0,#0x10 writes BLDALPHA eva component)
+- SCROLL_TIMER_INIT = 0x14 (strh r0,[r6,#0x6] = initial scroll timer)
+- BG0CNT = 0x04000008, BG2CNT = 0x0400000c, BG3CNT = 0x0400000e, BLDCNT = 0x04000050

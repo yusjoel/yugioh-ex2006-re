@@ -1,0 +1,6 @@
+Called by the pack slot initialization frame driver (indeg=0, Sub-type A), advances one slot's initialization per frame and renders the highlight. Reads pack_ui_state+0xc[+6] (current slot index), calls pack_entry_init(slot_idx) to initialize that slot, then increments [+6] by 1 and writes back. If the new slot index >= pack_visible_count (all slots complete), writes [+4]=9 to advance the state machine and sets r6=1. Finally calls render_pack_slot_highlight_oam(1) to update the slot highlight OAM. Returns r6: 0 (slots still pending) or 1 (all slots complete; Sub-case E pop{r1};bx r1).
+
+Constants:
+- SLOT_IDX_OFFSET = 0x6 (ldrsh/strh [r5,#0x6] = current slot index field)
+- NEXT_STATE = 9 (strh 9,[r5,#0x4] = advance state when all slots done)
+- HIGHLIGHT_MODE = 1 (render_pack_slot_highlight_oam(1) = highlight mode parameter)

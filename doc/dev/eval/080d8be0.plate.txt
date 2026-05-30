@@ -1,0 +1,13 @@
+Called during the pack card purchase finalization phase by the frame driver (indeg=0, Sub-type A), completing deal, coin deduction, and puzzle WRAM initialization. Iterates all card slots (count from pack[+0xa]); for each slot calls apply_delta_to_hand_oam_entry to update hand OAM (card-into-hand effect); if slot bit3=1, writes EWRAM card ownership flag (byte at 0x02000006+card_id*2+1, bit4 set to 1); after all slots, calls deduct_money_clamped to deduct coins (price from pack data [+0xc]), init_puzzle_wram_and_checksum and init_puzzle_wram_then_copy to initialize puzzle state; writes pack_ui_state[+0x6ee]=0, [+0xdf<<3] := [+0x6f4] reveal data pointer, [r1,+0x22]=0x3c; calls tick_overlay_animation_step(0); writes pack_ui_state[+0x10]=5 to advance state. Returns fixed 1.
+
+Constants:
+- PACK_DATA_OFFSET = 0x6fc (DAT_080d8c1c, pack data pointer)
+- SLOT_COUNT_FIELD = pack[+0xa] (ldrh r1,[r1,#0xa])
+- HAND_FLAG_OFFSET = 0xe0<<3 = 0x700 (pack_ui_state[+0x700])
+- EWRAM_CARD_TABLE = 0x02000006 (DAT_080d8cb8, card ownership flag base)
+- CARD_FLAG_BIT = 0x10 (bit4 of byte at EWRAM_CARD_TABLE[card_id*2+1])
+- REVEAL_COUNT_CLEAR = 0x6ee (DAT_080d8cbc, clear reveal count)
+- REVEAL_DATA_OFFSET = 0x6f4 (DAT_080d8cc0)
+- AOB_SLOT_STRIDE = 4 (4 bytes per card slot)
+- DEAL_COUNTER = 0x3c (strh 0x3c,[r1,#0x22])
+- NEXT_STATE = 5 (strh 5,[pack_ui_state,#0x10])

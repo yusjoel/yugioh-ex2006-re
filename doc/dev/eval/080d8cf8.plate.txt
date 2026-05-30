@@ -1,0 +1,7 @@
+Called during the pack scene fade-out end phase by the frame driver (indeg=0, Sub-type A). Calls tick_overlay_animation_step(1) to advance the overlay fade-out animation; if the animation completes this frame (returns 1), reads DISPCNT (0x04000000) and clears bit12 (AND with 0xffffefff), writes back to DISPCNT to disable an OBJ/BG display layer; then writes pack_ui_state[+0x10]=7 to advance the state machine. Returns 0 (animation in progress) or 1 (complete; Sub-case E r4 passthrough).
+
+Constants:
+- DISPCNT_MASK = 0xffffefff (DAT_080d8d24, clears bit12)
+- DISPCNT = 0x80<<0x13 = 0x04000000
+- NEXT_STATE = 7 (strh 7,[pack_ui_state,#0x10])
+- ANIM_MODE = 1 (tick_overlay_animation_step(1) = fade-out mode)

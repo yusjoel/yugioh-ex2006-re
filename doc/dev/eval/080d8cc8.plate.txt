@@ -1,0 +1,6 @@
+Called each frame during the pack card deal delay phase by the frame driver, decrementing the deal delay timer and advancing state when it reaches zero. Reads pack_ui_state[+0x22] (deal delay count), decrements by 1 and writes back; if the count decrements to 0 (lsls r0,#0x10; cmp r0,#0 zero detection), writes pack_ui_state[+0x4]=6 to advance to the next state and returns 1; otherwise returns 0. Calls tick_overlay_animation_step(0) each frame to advance the overlay animation.
+
+Constants:
+- DEAL_COUNTER_OFFSET = +0x22 (ldrh/strh at [r1,#0x22])
+- NEXT_STATE = 6 (strh r0,[r1,#0x4] = 6)
+- pack_ui_state base = 0x03005850

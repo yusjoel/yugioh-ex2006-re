@@ -54,13 +54,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #191 |
+| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #192 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-30 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4215 (90.82%) |
-| **未命名 (FUN_*)** | 426 (其中 85 ready / 341 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 4)** | 85 函数 (批 #191..#195 未完成部分), 处理中 |
-| **下一批** | #191 (Phase 4 idx 19) — `ready_batches_phase4.json` |
-| **上次更新** | 2026-05-31 (batch #190 PASSED: equip-eligibility predicate cluster + LP delta sign + pack-scene render_pack_*/tick_pack_*/dispatch_pack_* UI cluster x20, 4215/4641 = 90.82%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4235 (91.25%) |
+| **未命名 (FUN_*)** | 406 (其中 65 ready / 341 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 4)** | 65 函数 (批 #192..#195 未完成部分), 处理中 |
+| **下一批** | #192 (Phase 4 idx 20) — `ready_batches_phase4.json` |
+| **上次更新** | 2026-05-31 (batch #191 PASSED: pack-scene UI cluster -- aob frame loop/scroll + card info overlay tick/fade + card flip/reveal/deal + pack banner OAM hub (indeg=17 0x080d92c4) + list scroll/entry highlight x20, 4235/4641 = 91.25%) |
 | **callgraph 时间戳** | 2026-05-30 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 4 已重导锁定; Phase 5 前须再重导) |
 | **ready_locked** | `true` (Phase 4 465 集合锁定; Phase 5 前须重算 ready) |

@@ -1,0 +1,12 @@
+Called each frame by pack scene state machines to drive the AOB (animation-object-block) animation frame update loop for the current pack card display row. Iterates up to (r7 offset +0x1 low 4 bits) AOB slots; for each active slot calls dispatch_pack_aob_by_type_with_state_base to set the animation type base address, then calls tick_pack_aob_frame_with_state_base to advance the frame counter. Before the frame loop, computes a BLDALPHA brightness blend value linearly from the elapsed frame counter (pack_ui_state[+0x6f0]); if the frame counter exceeds 0x48 the blend is written at full brightness (0x1000), otherwise bios_div computes the current alpha and writes it to the BLDALPHA register.
+
+Constants:
+- AOB_COUNT_MASK = 0xf (r7[+0x1] low 4 bits, AOB slot count)
+- AOB_SLOT_STRIDE = 0x4 (4 bytes per slot, r5 step)
+- FRAME_COUNT_OFFSET = 0xe4<<3 = 0x720 (pack_ui_state[+0x720] frame counter)
+- FRAME_FADE_END = 0x48 (frame count upper bound; above this BLDALPHA is fixed full)
+- FRAME_FADE_TOTAL = 0x48 (lsls #4 = 0x480 numerator for linear interpolation)
+- BLDALPHA_FULL = 0x1000 (movs r3,#0x80; lsls r3,#5 = 0x1000)
+- BLDALPHA_MASK = 0xff (lsls #0x18; lsrs #0x18 keeps low 8 bits eva)
+- pack_ui_state[+0x714] = named AOB state offset base
+- pack_ui_state[+0xc] = scroll position reference offset

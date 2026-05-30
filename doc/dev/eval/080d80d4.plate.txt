@@ -1,0 +1,7 @@
+Called during the pack card info page display phase by the frame driver to advance the overlay animation and perform a one-time scroll reset after animation completes. Calls tick_overlay_animation_step(1) to advance the overlay animation; if the animation completes this frame (returns 1), reads the current selected pack slot screen Y coordinate, calls init_pack_scroll_animation to initialize scroll to the target position (r1=0x98, r2=1), then loops blocking on tick_pack_scroll_interp_step until scroll completes, and writes pack_ui_state[+0x10]=4 to advance the state machine. Each frame calls render_pack_info_card_presence_sprites(0) and render_pack_info_card_highlight_sprite(1). Returns the result of tick_overlay_animation_step (0=animating, 1=complete; Sub-case E).
+
+Constants:
+- pack_ui_state base = 0x03005850
+- SCROLL_TARGET_Y = 0x98 (movs r1,#0x98)
+- SCROLL_MODE = 1 (movs r2,#0x1)
+- NEXT_STATE = 4 (strh r0,[r1,#0x10] = 4)

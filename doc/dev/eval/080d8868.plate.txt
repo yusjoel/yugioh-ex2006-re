@@ -1,0 +1,8 @@
+Called during the pack card flip wait phase by the frame driver, monitoring the flip animation completion signal. First writes BLDALPHA to 0x1000 (full brightness, eva=0, evb=31); calls tick_overlay_animation_step(0) to advance the overlay animation; reads gPrng[0x1d0].halfword[+0x1c] (flip state field); if it equals 2, writes pack_ui_state[+0x10]=2 (advances state machine step) and returns 1; otherwise returns 0.
+
+Constants:
+- BLDALPHA_FULL = 0x80<<5 = 0x1000 (full brightness: eva=0, evb=0x10)
+- BLDALPHA_ADDR = 0x80<<0x13 = 0x04000000, BLDALPHA = 0x04000052
+- gPrng_FIELD_OFFSET = 0xe8<<1 = 0x1d0 (gPrng[+0x1d0])
+- FLIP_STATE_DONE = 2 (cmp r1,#0x2 = flip complete state code)
+- NEXT_STATE = 2 (strh r1,[r0,#0x10])

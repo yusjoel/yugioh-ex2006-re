@@ -1,0 +1,13 @@
+Called by the state machine when the pack scene enters the scroll/AOB display phase, to initialize AOB display area scroll state fields. Clears three halfwords at pack_ui_state offsets +0x18, +0x1a, +0x22 (scroll position/count), and clears or initializes control fields at [+0x6fa] and [+0x724]. Then calls init_overlay_struct_and_palette with EWRAM address 0x0200af20 as the overlay base (mode=0x6, color_count=0xf, target OAM/palette area). Returns fixed value 1 indicating successful initialization.
+
+Constants:
+- pack_ui_state base = 0x03005850
+- SCROLL_POS_OFFSET_0 = 0x18 (strh r4,[r5,#0x18])
+- SCROLL_POS_OFFSET_1 = 0x1a (strh r4,[r5,#0x1a])
+- SCROLL_POS_OFFSET_2 = 0x22 (strh r4,[r5,#0x22])
+- FIELD_OFFSET_6FA = 0x6fa (DAT_080d565c)
+- FIELD_OFFSET_704 = 0x704 (DAT_080d5660)
+- FIELD_OFFSET_724 = 0x724 (DAT_080d5664)
+- OVERLAY_EWRAM_BASE = 0x0200af20 (DAT_080d5668)
+- OVERLAY_MODE = 6 (str r3,[sp,#0] where r3=0x6)
+- OVERLAY_COLOR_COUNT = 0xf (movs r3,#0xf)
