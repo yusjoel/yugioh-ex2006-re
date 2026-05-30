@@ -1,0 +1,6 @@
+Pack scene SIO link protocol state machine per-frame tick. 4 main states: state 0=setup_sio_link_session (initialize SIO link); state 1=check [0x02039eb0+bit] sub-state and [0x030003a0+0x434] nibble to decide routing; state 2=7-case switch handles SIO protocol opcodes, writes sp stack buffer, calls write_sprite_row_to_vram_buffer/tick_pack_prng_anim_frame; state 3=tick_pack_prng_anim_frame then check; default=teardown_sio_link_session. Called by FUN_080fb350 (pack scene outer tick, tags: [pack_scene]) when gPrng+0x206 bits[21:14]==1.
+
+Constants:
+SIO_CTX_BASE=0x02039eb0 (pack B EWRAM context base address)
+SIO_STATE_OFF=0x434 (SIO sub-state nibble field offset)
+SIO_STATE_SHIFT=0x14 (bits[21:14] state index extraction shift)

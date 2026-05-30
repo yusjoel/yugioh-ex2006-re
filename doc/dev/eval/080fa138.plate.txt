@@ -1,0 +1,6 @@
+Pack scene card display animation state machine dispatcher. Reads gPrng+0x206 bits[21:14] to get current animation state field (lsls/lsrs extracts 8 bits), routes to three branches: state 1 calls start_blend_fadein_to_card_list_page + registers on_select handler; state 2 calls tick_card_info_page_by_state to drive card detail page; state 3 advances gPrng state and writes flag; other states call render_card_detail_panel_to_vram and handle key input check. This function is an independent scene tick entry with no callgraph in-edges, called indirectly by the frame driver via fn-ptr table slot.
+
+Constants:
+STATE_FIELD_SHIFT_LO=0xe (lsrs bits[21:14] = 14 -> shift)
+STATE_FIELD_SHIFT_HI=0x15 (lsls 32-21=0xb -> shift, then lsrs 0x18)
+GPRNG_AUX_OFF=0x206 (gPrng auxiliary animation state halfword)

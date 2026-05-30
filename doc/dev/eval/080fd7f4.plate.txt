@@ -1,0 +1,12 @@
+title_ex scene jump trigger tick function. Reads [0x02029eb0+0xe4*4] bit31 to check jump ready flag; if set and gPrng+0xa4*2 has bits 0x30: toggles that byte's bit2, calls sync_state_and_init_sprite(0x24). Then checks gPrng+0xa4*2 bits 0x9: if set writes [0x02029eb0+0x38d]=3, calls sync_state_and_init_sprite(0x24), writes [+0x38e]=0, sets [+0xe4*4] bit3, calls set_bg1_scroll_from_frame_counter(0), init_blend_transition_params(2,0x18,8,8). Pattern B void return. Called by FUN_080fda04 (title_ex scene main driver, tags: [title_ex]) as state machine case.
+
+Constants:
+TITLE_CTX=0x02029eb0 (title_ex EWRAM context base address)
+CTX_JUMP_FLAG=0xe4*4 (jump ready flag field offset = 0x390)
+CTX_JUMP_READY_BIT=0x80000000 (bit31: jump ready)
+CTX_JUMP_TRIG_BIT=0x8 (bit3: trigger bit)
+CTX_STEP_OFF=0x38d (scene step byte offset)
+CTX_SUBSTEP_OFF=0x38e (sub-step byte offset)
+GPRNG_ANIM_OFF=0xa4*2 (gPrng animation state byte offset = 0x148)
+SPRITE_ID=0x24 (sync_state_and_init_sprite sprite ID parameter)
+BLEND_PARAMS=(2,0x18,8,8) (blend transition parameters: mode=2, target=0x18, step=8, max=8)

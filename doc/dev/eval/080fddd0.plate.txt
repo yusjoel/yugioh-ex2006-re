@@ -1,0 +1,11 @@
+Charset and ROM region selection initialization function. First calls verify_puzzle_ewram_integrity: if returns non-zero clears gPrng+0x204 bits[21:14] and advances state machine with OR 0x8000, then returns 0. If returns zero reads [0x080000ae] >> 8 to get region ID: 0x4a(JP) calls write_puzzle_charset_flag(0) then advances; 0x45(EN) calls write_puzzle_charset_flag(1) then advances; 0x50(PT) calls write_puzzle_charset_flag(1) then advances to next step (+1). All paths return 0. indeg=0, fn-ptr table entry.
+
+Constants:
+ROM_REGION_ADDR=0x080000ae (ROM header region byte)
+REGION_JP=0x4a (Japanese version)
+REGION_EN=0x45 (English version)
+REGION_PT=0x50 (Portuguese version)
+GPRNG_STATE_OFF=0x204 (gPrng main state field offset)
+STATE_ADVANCE_MASK=0x8000 (state machine advance bit mask)
+CHARSET_JP=0 (write_puzzle_charset_flag JP charset ID)
+CHARSET_EN=1 (write_puzzle_charset_flag EN/PT charset ID)

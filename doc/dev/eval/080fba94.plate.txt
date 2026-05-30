@@ -1,0 +1,8 @@
+Game text step handler dispatch function by ROM region. Reads [0x080000ae] (ROM header region byte) shifted right 8 bits to get region ID; if equal to 0x4a (JP) calls dispatch_game_text_step_handler_jp; otherwise (EN=0x45/PT=0x50) calls dispatch_game_text_step_handler_us. Passes through the return value of the called handler. indeg=0, called via fn-ptr table slot by frame driver.
+
+Constants:
+ROM_REGION_ADDR=0x080000ae (ROM header region ID byte address)
+REGION_JP=0x4a (Japanese version region ID)
+REGION_EN=0x45 (English version region ID)
+REGION_PT=0x50 (Portuguese version region ID)
+REGION_SHIFT=0x8 (halfword high byte extraction shift amount)

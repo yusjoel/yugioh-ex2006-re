@@ -1,0 +1,12 @@
+Sound engine all-channel tick function (FUN_0810bc10 internal tick body). Uses parent frame r9 as sound engine IWRAM base 0x030050cc. Writes [r9+0xe1*4]=0x10 (writes OAM control byte); checks [r9+0xd9*4] bit6 (channel enable flag): if set calls tick_sound_channel_sequence for 8 channels (r1=0..7), then checks auxiliary flag to decide whether to clear [r9+0xd9*4] bit6. Then processes 4 sound hardware channels: SOUND1/2 (lookup pitch from ROM table 0x084c5928), SOUND3 (write_wave_pattern_to_ch3), SOUND4 (lookup noise params from ROM table 0x084bf110). Channel processing loop: from IWRAM table 0x030055a0 (stride 0x1c, 0xb entries) calls reinit_playback_slot_with_extra_params or scale_pitch_by_engine_rate for each entry. Writes result to SOUNDCNT_H (0x04000081). No independent push/pop - parent frame FUN_0810bc10 frame registers. Called by FUN_0810bc10 via bl (0x0810bd18/0x0810be9c).
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base address)
+CH_ENABLE_OFF=0xd9*4 (channel enable halfword field offset = 0x364)
+CH_ENABLE_BIT6=0x40 (bit6: all-channel tick enable bit)
+OAM_CTRL_OFF=0xe1*4 (OAM control byte offset = 0x384, :=0x10)
+SOUNDCNT_H=0x04000081 (GBA sound DMA control register high byte)
+SOUND1_TABLE=0x084c5928 (SOUND1/2 pitch ROM lookup table base)
+SOUND4_TABLE=0x084bf110 (SOUND4 noise params ROM lookup table base)
+PLAYBACK_TABLE=0x030055a0 (IWRAM playback slot table base, stride=0x1c, 0xb entries)
+CHANNEL_COUNT=8 (tick_sound_channel_sequence loop count)

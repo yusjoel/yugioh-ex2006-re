@@ -1,0 +1,5 @@
+Pack scene step-0 initialization function. Writes [gPrng+0x174]=0 (resets frame driver state flag), calls reset_affine_bg_matrix_and_scroll (clears BG affine transform matrix and scroll offsets), store_ewram_ctx_ptr_and_clear_mode_flags(0x02029eb0) (writes EWRAM pack A context base address and clears mode flags), reset_all_bg_scroll_regs_and_shadows (resets all BG scroll registers and shadows), init_blend_fadein_state (initializes fade-in state machine). Returns 1. indeg=0, called via fn-ptr table slot by frame driver as scene init entry.
+
+Constants:
+GPRNG_STEP_FLAG=0x174 (gPrng step activation flag field, :=0)
+PACK_CTX_A=0x02029eb0 (pack A EWRAM context base address)

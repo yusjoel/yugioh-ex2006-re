@@ -1,0 +1,12 @@
+Update sound channel frequency by entity ID function. Reads [base2+0xa2*2] (base2=0x030052f0) signed halfword: if equal to r0 (entity_id) calls allocate_sound_channel_slot. Then loops 8 channel slots (stride 0x28 bytes): checks [slot+0x1f] bit7 (active flag) and [slot+0xe] entity_id match against r0; if match: computes [+0x14] = [+0x8] + r1 (freq_base + freq_delta), computes per-step increment via bios_div(r1, r2) and writes to [+0x16], returns 1. If all 8 slots have no match returns 0. indeg=0.
+
+Constants:
+BASE2=0x030052f0 (auxiliary IWRAM sound control struct base address)
+BASE2_ENTITY_OFF=0xa2*2 (entity_id halfword offset = 0x144)
+SLOT_STRIDE=0x28 (each channel slot size in bytes)
+SLOT_ACTIVE_OFF=0x1f (active flag byte offset, bit7=active)
+SLOT_ENTITY_OFF=0xe (entity_id halfword offset)
+SLOT_FREQ_BASE_OFF=0x8 (frequency base halfword offset)
+SLOT_FREQ_TARGET_OFF=0x14 (frequency target halfword offset)
+SLOT_FREQ_STEP_OFF=0x16 (frequency step halfword offset, computed by bios_div)
+SLOT_COUNT=8 (slots checked in loop [0..7])

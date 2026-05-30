@@ -1,0 +1,5 @@
+Pack scene fade-in animation driver, simultaneously renders card OAM stats panel. Each frame calls render_card_oam_stats_panel to update card attribute display, then calls start_blend_fadein_with_target(8) to advance fade-in progress. Returns 0 while fade-in is in progress; when fade-in completes writes DISPCNT=0 (disable display for subsequent page switch) and returns 1. indeg=0, called via fn-ptr table slot by frame driver.
+
+Constants:
+FADEIN_TARGET=0x8 (start_blend_fadein_with_target target brightness parameter)
+DISPCNT=0x04000000 (GBA display control register, :=0 on completion)

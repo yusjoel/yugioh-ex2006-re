@@ -1,0 +1,18 @@
+GBA sound hardware full initialization function. Execution order: (1) IE &= ~0x0208 (mask Timer0/SIO interrupts); (2) DMA1SAD=0x030055c0, DMA1DAD=0x030055bc, DMA1CNT_H=0x440 (DMA1 sound FIFO transfer setup); (3) DMA2 same config; (4) clear DMA1CNT_L; (5) SOUNDCNT_X=0x80 (enable Gameboy sound); (6) SOUNDCNT_L=0; SOUNDCNT_H=0x8800; (7) clear SOUND1..3 related registers; (8) FIFO_A/FIFO_B each written zero x8; (9) call reset_sound_engine_state; (10) call set_sound_timer_rate([0x030050cc+0x38a]); (11) configure SOUNDCNT_L=0xbb77, SOUNDCNT_H=0xa90e; (12) configure_sound_dma_channel(1); (13) IE |= 0x200. Called by FUN_0810b310 (sound engine outer init, tags: [sound_engine]).
+
+Constants:
+DMA1SAD=0x040000bc (DMA1 source address register)
+DMA1DAD=0x040000c0 (DMA1 destination address register)
+DMA1CNT_H=0x040000c6 (DMA1 control high word)
+DMA2CNT_H=0x040000d2 (DMA2 control high word)
+DMA_SOUND_CNT=0x440 (DMA sound mode control word: repeat+32-bit+special-timing)
+SOUNDCNT_X=0x04000084 (sound master control register, :=0x80 enable)
+SOUNDCNT_L=0x04000080 (channel volume/enable register, init:=0, final:=0xbb77)
+SOUNDCNT_H=0x04000082 (direct sound control, init:=0x8800, final:=0xa90e)
+FIFO_A=0x040000a0 (direct sound FIFO A)
+FIFO_B=0x040000a4 (direct sound FIFO B)
+IE=0x04000200 (interrupt enable register)
+IE_CLEAR_MASK=0xfdf7 (mask bit3=Timer0 + bit9=SIO interrupts)
+IE_ENABLE_BITS=0x200 (bit9=SIO interrupt re-enable)
+SOUND_BUF_A=0x030055c0 (IWRAM sound DMA buffer A)
+SOUND_BUF_B=0x030055bc (IWRAM sound DMA buffer B)

@@ -1,0 +1,7 @@
+Combined sound sprite entry initialization with volume/pan byte setting function. Calls init_sprite_entry_by_id(r0) to initialize IWRAM sprite entry; then calls set_channel_volume_and_pan_bytes with r1 (volume_raw), writing to [base+0x37c] (volume) and [base+0x37d] (pan). Compared to calling init_sprite_entry_by_id alone, additionally allows caller to specify volume/pan parameters. Pattern B void. indeg=0, no fn-ptr reference.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base address)
+VOL_BYTE_OFF=0x37c (volume byte offset, min(r1, 0x3f))
+PAN_BYTE_OFF=0x37d (pan byte offset, 0x3f or 0x7f-r1)
+VOL_THRESHOLD=0x3f (volume/pan boundary value)

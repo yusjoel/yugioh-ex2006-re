@@ -1,0 +1,12 @@
+Banlist password input scene to card list scene transition function. Calls dispatch_banlist_pass_input_frame(0x0202a2c0): if returns 0 continues waiting for input, returns 0. If returns non-zero: calls reset_display_and_obj_vram + store_ewram_ctx_ptr_and_clear_mode_flags(0x0202f440) to switch EWRAM context; checks gPrng+0x23a bit0 state: bit0=0 initializes [0x0202a4d0] card_list context fields (mode=5, max_index=0xffff, pack_card_count), calls query_card_list_max_index, scans check_card_index_in_format_range to determine valid format index, finally sets gPrng+0x204 OR 0xc0; bit0 non-zero: restores [+0x4] from [+0x1c], sets gPrng+0x244 bit0, clears gPrng+0x204. Returns 1. indeg=0.
+
+Constants:
+BANLIST_CTX=0x0202a2c0 (banlist password input EWRAM context base address)
+CARD_LIST_CTX=0x0202a4d0 (card_list EWRAM context base address)
+CARD_LIST_EWRAM2=0x0202f440 (card_list second EWRAM context base address)
+CARD_LIST_MODE=5 (card_list initialization mode field value)
+CARD_LIST_MAX_IDX_INIT=0xffff (max_index initial sentinel value)
+GPRNG_STATE_OFF=0x204 (gPrng main state field)
+GPRNG_BRANCH_OFF=0x23a (gPrng branch flag field)
+GPRNG_BRANCH_BIT=0x1 (bit0: select path A/B)
+STATE_ADVANCE_VAL=0xc0 (state advance OR mask)

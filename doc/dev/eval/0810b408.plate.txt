@@ -1,0 +1,14 @@
+Sound engine DMA channel fast re-initialization function (lighter than init_sound_hardware_full). Calls reset_sound_engine_state to zero engine state; configures DMA1SAD=0x030055c0, DMA1DAD=0x030055bc, DMA1CNT_H=0x440 (same constants as full init); same config DMA2CNT_H=0x440; clears DMA1CNT_L and offset +0x3c same register; IE &= 0xfdf7 (mask Timer0/SIO interrupts); SOUNDCNT_H=0x8800, SOUNDCNT_L=0, [sound_engine+4]=0; calls set_freq_slot_note_byte(0,0,0) and set_freq_slot_note_byte(1,0,0) to clear two frequency slots. Pattern B void. indeg=0.
+
+Constants:
+DMA1SAD=0x040000bc (DMA1 source address)
+DMA1DAD=0x040000c0 (DMA1 destination address)
+DMA1CNT_H=0x040000c6 (DMA1 control high word)
+DMA2CNT_H=0x040000d2 (DMA2 control high word)
+DMA_SOUND_CNT=0x440 (sound DMA control word)
+SOUNDCNT_H=0x04000082 (:=0x8800)
+SOUNDCNT_L=0x04000080 (:=0)
+IE_CLEAR_MASK=0xfdf7 (mask bit3+bit9)
+SOUND_BUF_A=0x030055c0 (IWRAM DMA buffer A)
+SOUND_BUF_B=0x030055bc (IWRAM DMA buffer B)
+FREQ_SLOT_COUNT=2 (set_freq_slot_note_byte call count)

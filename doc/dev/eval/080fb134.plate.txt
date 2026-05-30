@@ -1,0 +1,9 @@
+Pack scene card info page full initialization function. First reads gPrng+0x206 bits[21:14]: if non-zero calls render_card_oam_stats_panel + tick_blend_step_by_delta then returns immediately (already in display). If zero: executes full page init sequence - write_puzzle_charset_flag(0), zero_fill_by_halfword(0x02039eb0, 0x40c), writes gPrng+0x174=1, clears DISPCNT, sets BG0CNT=5, bios_cpu_fast_set, reset_affine_bg_matrix_and_scroll, store_ewram_ctx_ptr_and_clear_mode_flags, reset_display_and_obj_vram, upload_pack_vram_and_palette, tile_2d_row_copy, reset_all_bg_scroll_regs_and_shadows, apply_blend_fadeout_flat, then 8x text_render_wrapper with setup_line_buf_pos_and_font + commit_line_buffer_to_sprite_vram + write_line_buf_to_bg_tile_vram to render card text info, finally sets [0x02039eb0+4/6]=1, [+8]=0x3e8. indeg=0, fn-ptr table entry.
+
+Constants:
+PACK_CTX_B=0x02039eb0 (pack B EWRAM context base address)
+CTX_CLEAR_SIZE=0x40c (bytes to zero, counted in halfwords)
+CTX_DISPLAY_OFF4=0x4 (display done flag field +4, :=1)
+CTX_DISPLAY_OFF6=0x6 (display done flag field +6, :=1)
+CTX_TICK_COUNT=0x8 (tick counter field +8, :=0x3e8=1000)
+BG0CNT_VAL=0x5 (BG0 control register initial value)

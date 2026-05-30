@@ -1,0 +1,15 @@
+Sound channel playback start function. Calls allocate_sound_channel_slot to allocate channel slot; reads [base+0x366] signed halfword (current channel ID): if <0 no valid slot, exits directly. If >=0: checks [base+0x364] bit7 (channel active flag); if active checks pending channel ID [base+0x36a] against current ID - if mismatch writes [base+0x380]=0x10, checks [base+0x37f]; if non-zero clears [base+0x381] and exits (aborts switch). Match/inactive path: initializes 0x10 loop control blocks (writes control byte 0xc0 + pitch halfword, stride 0x20); sets [base+0x364] |= 0x1000; loads note data from ROM table 0x08194180 (stride 0x24). Falls through to advance_sound_channel_loop_phase. Pattern B void.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base address)
+CH_ID_OFF=0x366 (current channel ID signed halfword, :=-1 means no valid slot)
+CH_STATUS_OFF=0x364 (0xd9*4, channel status halfword)
+CH_ACTIVE_BIT7=0x80 (bit7: channel active flag)
+CH_STATUS_PLAY_BIT=0x1000 (bit12: playback trigger bit)
+PENDING_CH_OFF=0x36a (pending channel ID halfword)
+LOOP_CTRL_BYTE=0xc0 (loop control block initial control byte)
+LOOP_BLOCK_COUNT=0x10 (loop control block count)
+NOTE_TABLE=0x08194180 (ROM note data lookup, stride 0x24)
+PREEMPT_CTRL_OFF=0x380 (preempt control byte, :=0x10)
+PREEMPT_FLAG_OFF=0x37f (preempt flag byte)
+ABORT_FLAG_OFF=0x381 (abort flag byte, :=0)

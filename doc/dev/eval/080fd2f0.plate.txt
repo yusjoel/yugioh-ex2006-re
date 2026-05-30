@@ -1,0 +1,11 @@
+GL scene hardware initialization function. Calls bios_cpu_set to zero 0x02029eb0 (EWRAM GL context, control word 0x050000e7), calls gl_clear_vram_palram_scroll to clear VRAM/palette/scroll, writes DISPCNT=0x40 (force blank), BG0CNT=0x1e01, BG1CNT=0x1f02, BG3CNT=0x9b0b (configures each BG layer), calls gl_set_brightness(-0x10, 0x3f) to set initial brightness, gl_state_init to initialize GL state, gl_clear_frame_callbacks to clear frame callback list, verify_puzzle_ewram_integrity to verify EWRAM integrity, invalidate_active_channel_id to invalidate audio channel ID. Returns 1. indeg=0.
+
+Constants:
+GL_CTX_EWRAM=0x02029eb0 (GL scene EWRAM context base address)
+BIOS_CPUSET_CTRL=0x050000e7 (bios_cpu_set control word: word-fill, len=0xe7)
+DISPCNT=0x04000000 (GBA display control register, :=0x40)
+BG0CNT=0x04000008 (BG0 control register, :=0x1e01)
+BG1CNT=0x0400000a (BG1 control register, :=0x1f02)
+BG3CNT=0x0400000e (BG3 control register, :=0x9b0b)
+GL_BRIGHTNESS_START=-0x10 (initial brightness offset, fade-in start point)
+GL_BRIGHTNESS_MAX=0x3f (maximum brightness parameter)

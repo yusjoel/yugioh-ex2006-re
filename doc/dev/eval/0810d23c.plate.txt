@@ -1,0 +1,4 @@
+Combined sound sprite entry initialization and channel slot pre-allocation function. Sequentially calls init_sprite_entry_by_id(r0) to initialize IWRAM sound sprite entry, then calls allocate_sound_channel_slot to allocate sound channel slot. Pattern B void. indeg=0, no fn-ptr reference.
+
+Constants:
+(no non-trivial literals; both callees handle all ENGINE_BASE accesses internally)

@@ -1,0 +1,6 @@
+Pack scene frame dispatcher, 12-case switch. Entry .hword 0x4647 (mov pc,r7) jumps into switch table. case 0: zero_fill + setup_sio + render_pack_label; case 1/2: write_sprite_row_to_vram_buffer; case A(10): counter reaches 0x3c then teardown_sio_link_session; case B(11): clear gPrng specified field. cases 3..9 (default): update OAM sprite coordinates, drive pack card display. This function is the pack scene main frame handler, called indirectly by the frame driver via fn-ptr table, indeg=0.
+
+Constants:
+SIO_COUNTER_MAX=0x3c (SIO frame counter upper limit, case A triggers teardown)
+GPRNG_AUX_OFF=0x206 (case B clears gPrng auxiliary field)
+CASE_COUNT=0xc (switch branch total count 0..0xb)

@@ -1,0 +1,11 @@
+Card list scroll position update function. First calls compute_card_list_scroll_position; if returns negative immediately returns 0 (cannot scroll). Reads display_mode field [+0x44] (0..3 -> r7). Checks [0x0202f3c0+2] (link_battle flag): in link mode compares scroll delta with threshold 0x100; non-link mode uses different thresholds by mode (0/1/2/3): 0x50/0xf/0x1e. After threshold condition met calls count_valid_cards_by_slot_type (slot types 1/2/3), update_deck_slot_card_entry, __modsi3 (modulo). Normal completion returns 1. indeg=0, fn-ptr table entry.
+
+Constants:
+CARD_LIST_CTX=0x0202a4d0 (card_list EWRAM context base address)
+CANDIDATE_BUF=0x0202f3c0 (card_list candidate buffer base address)
+LINK_FLAG_OFF=0x2 (link_battle flag byte offset)
+DISPLAY_MODE_OFF=0x44 (display_mode field offset, [0..3])
+LINK_SCROLL_THRESHOLD=0x100 (link mode scroll threshold)
+MODE1_THRESHOLD=0x50 (non-link mode 0 scroll threshold)
+MODE2_THRESHOLD=0xf (non-link mode 1 scroll threshold)
+MODE3_THRESHOLD=0x1e (non-link mode 2 scroll threshold)
