@@ -1,0 +1,11 @@
+驱动装备激活显示序列的四态帧状态机 (0x80 -> 0x7f -> 0x7d -> 0x7c -> 0x0).
+入口 r0=effect_slot_entry*, ldrh [r4+0xc] 作为循环上界 r6; 以 IWRAM[IWRAM_BASE+STATE_OFFSET] 状态码路由:
+0x80 -> 调用 count_effect_node_zone_activations; 若 >0 则清 IWRAM 字段, 清 [r4+8], 调用 format_game_text_with_int_arg (msg=0x71, val=r6), 再调用 trigger_card_display_op31_if_not_active, 返回 0x7f; 若 =0 返回 0x0.
+0x7f -> 调用 count_effect_node_zone_activations; 若 =0 返回 0x7c; 若 >0 则调用 set_equip_activation_state_by_mode(player_id, slot_hword, mode_ptr), 返回 0x7d.
+0x7d -> 调用 check_activation_display_state_is_confirmed; 若 =0 返回 0x7f; 若非 0 则循环调用 enqueue_sprite_attr_row_0x29_by_player 并递增 IWRAM 计数器直至 >=r6, 达上界返回 0x7c, 未达返回 0x7f.
+0x7c -> 调用 query_equip_target_bitmap_default, 返回 0x0. 其余状态返回 0x0.
+副作用: 清 IWRAM activation 字段; 写 [r4+8]; 写 IWRAM 计数器; 调用精灵入队; 调用 query_equip_target_bitmap_default.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0 (DWORD_0807c3e4/DWORD_0807c458 = 0x4a4 = STATE_OFFSET+4 for counter)

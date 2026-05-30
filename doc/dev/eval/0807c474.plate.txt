@@ -1,0 +1,6 @@
+驱动装备区 LP 条形显示的两步状态机帧驱动.
+以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> 调用 dispatch_equip_zone_sprite_banisher_by_field_count 更新精灵, 随后调用 increment_lp_bar_display_counter 增加 LP 条计数器, 返回 0x7f; 0x7f -> 调用 submit_lp_indicator_with_slot_xor_flag 提交 LP 条目, 随后调用 decrement_lp_bar_display_counter 递减计数器, 返回 0x0. 副作用: 更新装备区精灵 Banisher 字段; 写 LP 条目队列; 修改 LP 条形显示计数器.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0

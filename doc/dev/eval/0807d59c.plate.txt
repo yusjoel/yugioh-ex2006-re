@@ -1,0 +1,9 @@
+检查效果槽匹配并激活节点, 依据占用怪兽 zone 数量和槽链查询结果分发不同精灵属性入队.
+入口 r0=effect_slot_entry*; 调用 check_effect_slot_matches_zone_entry 确认槽-zone 匹配 (含 sp 出参); 调用 invoke_effect_node_with_active_flag_3arg 激活节点; 若成功, 提取 player_id/slot_idx 后调用 enqueue_sprite_attr_with_mode 以 mode=0x2 推送精灵属性; 调用 count_occupied_monster_zones 统计占用 zone 数; 调用 check_value_in_slot_chain(player, 0xb, chain_base) 查链; 若链中存在则调用 get_node_entity_id_in_slot 取实体 id, 若与 r7 不同则: 调用 enqueue_equip_slot_sprite_attr; 调用 enqueue_sprite_attr_type11; 反之 (链中不存在) 则调用 enqueue_sprite_attr_type11(r7 entity). 所有路径均返回 0. 副作用: OAM 精灵属性队列写入 (enqueue_sprite_attr_with_mode + enqueue_equip_slot_sprite_attr + enqueue_sprite_attr_type11 x2).
+
+Constants:
+- SPRITE_MODE = 0x2 (enqueue_sprite_attr_with_mode third arg, asm line 206087)
+- CHAIN_TYPE = 0xb (check_value_in_slot_chain / get_node_entity_id_in_slot second arg, asm lines 206091/206097/206103)
+- CHAIN_BASE = 0x0000195b (DWORD_0807d640, chain base address, asm line 206117)
+- PLAYER_STRIDE = 0x868 (DWORD_0807d638, asm line 206114)
+- FIELD_SLOTS_BASE = 0x0201c510 (DWORD_0807d63c, asm line 206116)

@@ -1,0 +1,5 @@
+推送区域精灵管线更新, 经多重门控后初始化装备 OAM 的驱动函数.
+入口 r0=effect_slot_entry*; 读 [slot+2] 取 player_id; 调用 tick_zone_sprite_pipeline_with_update_flag 推送精灵管线; 调用 count_available_monster_slots 检查可用怪兽槽数量 (为 0 则提前返回); 调用 check_field_spell_neo_daedalus_group_placeable 检查 Neo-Daedalus 组放置条件; 若通过则用 ZONE_TYPE_MASK=0x1c 对 [slot+6] 掩码后与 0x4 比较作为区域类型门控; 通过后调用 read_effect_slot_zone_type 读取区域类型, 调用 find_hand_slot_idx_by_set_code 查找手牌槽索引 (若 <0 则退出); 调用 check_equip_placement_eligible_from_slot_record 验证放置合法性; 最后调用 invoke_setup_equip_oam_with_attr2 初始化装备 OAM 属性. 所有路径返回 0. 副作用: 触发精灵管线更新; 条件初始化装备 OAM attr2 字段.
+
+Constants:
+- ZONE_TYPE_MASK = 0x1c (mask applied to [slot+6] to extract zone_type field before gate compare with 0x4; asm line 205729)

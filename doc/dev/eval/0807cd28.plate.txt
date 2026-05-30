@@ -1,0 +1,5 @@
+检查效果槽与跨侧 zone13 区域条目匹配, 激活效果节点, 成功后调用 test_equip_target_slot_zone13_crossside 测试对侧 zone13 目标槽合法性.
+入口 r0=effect_slot_entry*; 先调用 check_effect_slot_matches_zone_entry 确认槽-zone 匹配; 再调用 invoke_effect_node_with_active_flag_3arg; 若激活则调用 test_equip_target_slot_zone13_crossside 检测 zone13 对侧目标槽是否合法. 所有路径返回 0. 副作用: 由 test_equip_target_slot_zone13_crossside 内部执行只读查询, 无直接外部写入.
+
+Constants:
+- (无非平凡字面量)

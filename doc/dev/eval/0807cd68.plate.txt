@@ -1,0 +1,6 @@
+驱动效果槽激活-评分-OAM 设置三步状态机帧驱动.
+以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> 调用 check_effect_slot_matches_zone_entry 确认槽匹配, 再调用 invoke_effect_node_with_active_flag_3arg, 成功进入 0x7f, 失败返回 0x0; 0x7f -> 调用 check_equip_slot_eligible_in_target_bitmap 或 sample_prng_scaled 评估链分, 设置 OAM 位置; 0x7e -> 调用 enqueue_sprite_attr_for_zone_slot_packed 推送精灵. 副作用: 写装备激活状态; 推送精灵属性队列.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0

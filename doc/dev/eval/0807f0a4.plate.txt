@@ -1,0 +1,10 @@
+驱动 prng 抽样后渲染卡牌配对 zone 精灵的三步帧状态机.
+以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> increment_lp_bar_display_counter; 写 [IWRAM+0x4a4]=0 (COUNTER_OFFSET 重置); 返回 0x7f; 0x7f -> 读 [IWRAM+0x4a4] 计数器; 若 > 1 返回 0x7e (等待); 否则 sample_prng_scaled 取随机索引; 读 gP1LifePoints[player*0x868+0x18+rand_offset] card_id, 调用 render_pair_zone_sprites_if_field_card_present(opponent, card_id_bits13, 0, 1); 返回 0x7f; 0x7e -> decrement_lp_bar_display_counter; 返回 0x0. 副作用: 写 IWRAM COUNTER_OFFSET; LP bar 计数器 +1/-1; 渲染配对 zone 精灵.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0
+- COUNTER_OFFSET = 0x4a4
+- PLAYER_STRIDE = 0x868
+- HAND_ENTRY_OFFSET = 0x18 (gP1LifePoints base + player*0x868 + 0x18)
+- RENDER_ZONE_FLAG = 1 (render_pair_zone_sprites_if_field_card_present last param)

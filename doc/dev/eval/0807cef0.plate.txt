@@ -1,0 +1,5 @@
+检查效果槽区域匹配,激活节点,验证 Neo-Daedalus 放置许可并提交 LP 指示条的综合激活流程.
+入口 r0=effect_slot_entry*; 调用 check_effect_slot_matches_zone_entry 确认槽匹配; 若匹配调用 invoke_effect_node_with_active_flag_3arg 激活节点; 成功则调用 check_field_spell_neo_daedalus_group_placeable 检查 Neo-Daedalus 是否可放置; 在 Neo-Daedalus 合法路径下调用 apply_slot_equip_activation_with_eligibility_check; 最后调用 submit_lp_indicator_with_slot_xor_flag 提交 LP 指示条. 若任一步失败返回 0. 副作用: 写装备激活状态; 写 LP 指示条队列.
+
+Constants:
+- (无裸字面量; 所有参数由 effect_slot_entry 字段提取)

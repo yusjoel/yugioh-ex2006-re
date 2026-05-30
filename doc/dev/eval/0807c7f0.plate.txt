@@ -1,0 +1,8 @@
+对 effect_slot_entry [slot+2] 的类型字段用掩码 0xfc0 门控: 若字段等于 TYPE_TARGET=0x140 则查表 gDuelFieldSlots 比较 zone 字段并条件调用 enqueue_equip_slot_bitmap_update; 否则调用 dispatch_equip_draw_counter_sprite_tick.
+入口 r0=effect_slot_entry*, r1=extra_param; 读 [r6+2] 取 slot_data, mask CARD_TYPE_MASK=0xfc0, 与 TYPE_TARGET=0x140 (0xa0<<1) 比较; 不等则调用 dispatch_equip_draw_counter_sprite_tick(r6, r1), 返回 0; 相等则从 [r6+2] 提取 player_id/slot_idx, 以 PLAYER_STRIDE=0x868 和 FIELD_SLOTS_BASE=0x0201c510 索引 gDuelFieldSlots 读两个字段做比较; 若相等则调用 enqueue_equip_slot_bitmap_update(player_id, slot_idx, 0, 0), 返回 0; 否则返回 0. 副作用: 条件调用 dispatch_equip_draw_counter_sprite_tick; 条件调用 enqueue_equip_slot_bitmap_update.
+
+Constants:
+- CARD_TYPE_MASK = 0xfc0 (0xfc<<4, mask for bits[9:6] of [slot+2], asm line 204520-204523)
+- TYPE_TARGET = 0x140 (0xa0<<1, expected type field value for bitmap-update path, asm line 204524-204526)
+- PLAYER_STRIDE = 0x868 (DWORD_0807c854, field slot table stride per player, asm line 204567)
+- FIELD_SLOTS_BASE = 0x0201c510 (DWORD_0807c858, gDuelFieldSlots base address, asm line 204570)

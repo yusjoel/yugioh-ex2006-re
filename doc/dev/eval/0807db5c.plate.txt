@@ -1,0 +1,14 @@
+驱动装备 OAM 激活文本显示,精灵属性填充的三步状态机帧驱动.
+以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> 调用 read_effect_slot_zone_type 读区域类型; find_first_available_monster_slot_for_player 检查可用怪兽槽; find_hand_slot_idx_by_set_code 检查手牌索引; count_effect_node_zone_activations 统计激活数; 全部通过则写 [slot+0xa] 并返回 0x7f, 任一失败返回 0x0; 0x7f -> 读 gP1LifePoints+0x1d68 提取 card_id; card_name_lookup_by_internal_id 取卡名; format_game_text_with_text_arg 格式化文本; trigger_card_display_op31_if_not_active; set_equip_activation_state_by_mode 写激活模式; 返回 0x7e; 0x7e -> check_activation_display_state_is_confirmed; 未确认返回 0x7f 循环; 确认后 find_first_available_monster_slot_for_player + enqueue_sprite_attr_for_zone_slot_packed + enqueue_zone_slot_sprite_attr_by_card_type; 若 player == [0x0201e2a0+0x4] 则 write_card_display_index_with_bit_offset; 返回 0x0. 副作用: 写 LP 行字段; 写 OAM 精灵属性队列; 写卡牌显示索引.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0
+- LP_DATA_OFFSET = 0x1d68 (gP1LifePoints+0x1d68 card_id field)
+- ZONE_TABLE = 0x0201e2a0
+- TEXT_FMT_ID = 0x45 (format_game_text_with_text_arg arg)
+- TRIGGER_OP = 0x10d3 (trigger_card_display op mode)
+- ACTIVATION_MODE_PTR = 0x08090625
+- ENQUEUE_DISPLAY_MODE = 0xe (enqueue_sprite_attr_for_zone_slot_packed arg)
+- CARD_TYPE_ARG = 0xb (enqueue_zone_slot_sprite_attr_by_card_type arg)
+- INDEX_OFFSET = 0x30, BIT_OFFSET = 1 (write_card_display_index_with_bit_offset args)

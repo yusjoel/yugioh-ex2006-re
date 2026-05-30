@@ -1,0 +1,5 @@
+检查效果槽与区域条目匹配后激活效果节点, 成功则读取槽侧/类型并调用 apply_slot_equip_activation_with_eligibility_check, 然后条件调用 enqueue_equip_card_sprite_attr_for_slot 和 enqueue_equip_slot_bitmap_update 更新装备位图.
+入口 r0=effect_slot_entry*; 调用 check_effect_slot_matches_zone_entry 确认槽-区域匹配; 调用 read_effect_slot_side_and_type 读取 side/type 字段; 再调用 invoke_effect_node_with_active_flag_3arg 激活节点; 若节点激活成功则调用 apply_slot_equip_activation_with_eligibility_check 写入装备激活状态; 调用 enqueue_equip_card_sprite_attr_for_slot 推入装备卡牌精灵属性; 最后调用 enqueue_equip_slot_bitmap_update 推送位图更新请求. 所有分支均返回 0. 副作用: 写装备激活状态 EWRAM 字段; 推送装备卡牌精灵属性队列; 推送装备槽位图更新至队列.
+
+Constants:
+- (无非平凡字面量)

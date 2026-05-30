@@ -1,0 +1,7 @@
+在玩家牌组中搜索 Ojama 三兄弟 (Ojama Green/Yellow/Black) 是否同时存在, 据结果推送手牌精灵和 LP 计数精灵并返回状态码.
+入口 r0=effect_slot_entry*; 读 IWRAM 状态路由: 0x80 路径依次调用 find_card_pair_in_player_deck_list 搜索 Ojama Green (CARD_ID=0x1681), Ojama Yellow (CARD_ID=0x16b3), Ojama Black (CARD_ID=0x16b4); 若全部找到则调用 increment_lp_bar_display_counter, 再调用 enqueue_hand_sprite_with_flip_flag_set x3 (每张 Ojama 各一次, asm 行 205881/205891/205902), 再调用 decrement_lp_bar_display_counter, 返回 0x64; 若未全找到则调用 trigger_card_display_op31_if_not_active (asm 行 205921), 返回 0x6f. 0x6f 路径调用 set_lp_row_type7_if_opponent_linked, 返回 0x64. 0x64 路径调用 enqueue_lp_counter_sprite_by_player (asm 行 205937), 返回 0x0. 副作用: 条件递增/递减 LP 计数器; 条件推送手牌精灵 x3; 条件触发 display op31; 条件推送 LP 计数器精灵.
+
+Constants:
+- CARD_ID_OJAMA_GREEN = 0x1681 (Ojama Green)
+- CARD_ID_OJAMA_YELLOW = 0x16b3 (Ojama Yellow)
+- CARD_ID_OJAMA_BLACK = 0x16b4 (Ojama Black)

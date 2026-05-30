@@ -1,0 +1,5 @@
+构建装备区位图并查询目标位图, 检查效果槽匹配后激活节点, 成功则统计位域并推送卡牌精灵.
+入口 r0=effect_slot_entry*; 调用 build_equip_zone_bitmap_for_player 构建装备区玩家位图; 调用 query_equip_target_bitmap_default 查询装备目标位图 (结果保存至 r7); 调用 check_effect_slot_matches_zone_entry 确认槽-zone 匹配; 若匹配则调用 read_effect_slot_side_and_type 读取 side/type; 再调用 invoke_effect_node_with_active_flag_3arg 激活节点; 成功则调用 count_set_bits_in_word(r7) 统计目标位图位数, 最后调用 enqueue_slot_card_sprite_if_eligible(player_id, slot_idx, zone_side, sprite_mode=0x3) 推送卡牌精灵. 所有路径返回 0. 副作用: 写装备区 EWRAM 位图 (via build_equip_zone_bitmap_for_player); 条件推送装备槽卡牌精灵至显示队列.
+
+Constants:
+- SPRITE_MODE = 0x3 (enqueue_slot_card_sprite_if_eligible third arg at asm line 205813)

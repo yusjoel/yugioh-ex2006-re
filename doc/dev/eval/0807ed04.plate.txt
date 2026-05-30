@@ -1,0 +1,9 @@
+驱动装备卡牌效果显示的 29 步 switch 状态机帧驱动, 与 0807d104 形成同族 sibling.
+以 IWRAM[0x0201b290+0x4a0] 状态码减 0x64 作 switch 索引 (0x1c+1=29 case): 0x80 -> lookup_slot_display_value_by_card_id + dispatch_effect_handler_by_card_id; 成功 -> trigger_card_display_op31_if_not_active(0x3a) 返回 0x7e; 失败且非法术 -> trigger_card_display_op31(0xd) 返回 0x78; 失败且是法术 -> 0x0; 0x7e -> init_effect_slot_display_context(player, 6, card_id, display_val) 返回 0x7d; 0x7d -> get_monster_slot_entry_ptr x2 取两侧槽; extract tile_col/flip; render_spell_zone_sprite_with_field_copy_check 返回 0x64; 0x78 -> count_field_cards_pair_allowed_for_card + get_card_type_bits; 如果 count < type_bits 则 set_lp_row_type7_if_opponent_linked; 返回 0x64; 0x64 -> check_card_type_is_spell; 非法术 -> enqueue_lp_counter_sprite_by_player; 返回 0x0.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0
+- TRIGGER_OP1 = 0x3a (trigger op success path)
+- TRIGGER_OP2 = 0xd (trigger op spell_fail path)
+- DISPLAY_CTX_MODE = 6 (init_effect_slot_display_context mode)

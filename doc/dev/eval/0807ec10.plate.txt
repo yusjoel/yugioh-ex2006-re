@@ -1,0 +1,9 @@
+驱动 zone15 装备目标位图更新和装备精灵枚举的四步状态机帧驱动.
+以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> check_effect_slot_matches_zone_entry(0,0) + read_effect_slot_side_and_type 取 side/slot_type; invoke_effect_node_with_active_flag_3arg 激活节点; update_equip_target_bitmap_zone15 更新 zone15 目标位图; 成功读 gDuelFieldSlots[player*0x868+slot_type*20] card_id 写 [slot+0xc]; 返回 0x7f; 0x7f -> check_spell_zone_slot_placeable 验证法术区可放置性; 成功 increment_lp_bar_display_counter 返回 0x7e; 失败返回 0x0; 0x7e -> find_deck_slot_by_card_pair_match(opponent, [slot+0xc]) 找配对卡; 找到则 enqueue_equip_zone_sprite_by_slot_ptr 推送精灵返回 0x7e 循环; 未找到返回 0x7d; 0x7d -> decrement_lp_bar_display_counter 返回 0x0.
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- STATE_OFFSET = 0x94*8 = 0x4a0
+- PLAYER_STRIDE = 0x868
+- gDuelFieldSlots = 0x0201c510
+- ZONE_TABLE_2 = 0x0201c8f8 (enqueue_equip_zone_sprite_by_slot_ptr base)

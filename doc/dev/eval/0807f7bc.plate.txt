@@ -1,0 +1,8 @@
+遍历 IWRAM 装备判断条件数组, 对每个条目调用 get_equip_display_criteria_code_by_card_and_slot 获取显示码, 并将结果写入条目偏移 0x5ac 处的显示码数组.
+入口无参数 (void); 读 [IWRAM+0xb4*8] 取条件数组长度 count; 读 [IWRAM+0xb3*8] 取条件数组基址; 循环 i=0..count-1: 调用 get_equip_display_criteria_code_by_card_and_slot(base_ptr, i) 取第 i 项的显示码; 写入 [IWRAM+0x5ac + i*4]. 无返回值 (Pattern B void). 副作用: 写 IWRAM 显示码数组 [IWRAM_BASE+0x5ac .. IWRAM_BASE+0x5ac+(count-1)*4].
+
+Constants:
+- IWRAM_BASE = 0x0201b290
+- CRITERIA_ARRAY_OFFSET = 0xb3*8 = 0x598 (condition array base)
+- CRITERIA_COUNT_OFFSET = 0xb4*8 = 0x5a0 (condition count)
+- DISPLAY_CODE_ARRAY_OFFSET = 0x5ac (output display code array)
