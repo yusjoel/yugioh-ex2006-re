@@ -1,0 +1,6 @@
+equip 槽激活资格谓词, 返回 0/1. 三级条件链: (1) check_value_in_slot_chain(player_id, card_id, type=0xb) -- 若链中无目标值则返回 0; (2) 读 gP1LifePoints[player*0x868+0x10] (LP 状态字) -- 若为 0 则返回 0; (3) check_neo_daedalus_placement_eligible(slot_ptr, arg) -- 透传返回值. 语义: equip 链已含目标值 且 LP 状态非零 才评估 Neo Daedalus 条件.
+
+Constants:
+  CHAIN_TYPE = 0xb -- equip 链节点类型码
+  PLAYER_STRIDE = 0x868
+  LP_STATUS_OFFSET = 0x10

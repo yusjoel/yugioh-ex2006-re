@@ -1,0 +1,12 @@
+equip 槽激活资格谓词, 返回 0/1. 前置调用 check_neo_daedalus_placement_eligible; 若失败则返回 0. 通过后读取 gP1LifePoints[player*0x868+0x10] (玩家状态字); 若为 0 返回 0. 再从 slot[+2] 提取 zone_type mask 0xfc0 比较 0x6c0 (0xd8<<3); 不符则返回 0. 接着校验 detail_word bits[22:19] <= 4 且 (detail_word & 0xf88000) == 0x708000. 从 gP1LifePoints 区域卡阵读取低 13-bit card_id, 依次调用 check_card_field8_is_9 (为 9 则失败) 和 check_card_field5_is_nonzero (为 0 则失败). 全部通过返回 1.
+
+Constants:
+  ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+  ZONE_TYPE_TARGET = 0x6c0 (0xd8<<3)
+  PLAYER_STRIDE = 0x868
+  LP_STATUS_OFFSET = 0x10
+  DETAIL_4BIT_MAX = 4 -- detail_word bits[22:19] <= 4
+  FIELD_MASK = 0xf88000 -- bits[23:11]
+  FIELD_EXPECT = 0x708000 (0xe1<<15)
+  LP_ZONE_OFFSET = 0x10e0 (0x87<<5)
+  CARD_ID_BITS = 13 -- lsls/lsrs #0x13

@@ -1,0 +1,8 @@
+equip 槽激活资格谓词, 返回 0/1. 前置 check_neo_daedalus_placement_eligible; 失败则返回 0. 通过后读取 slot ldrh[+0] card_id, 按如下映射选取伴侣卡: card_id == 0x167e (Sage's Stone) -> 伴侣 0x129e (Dark Magician Girl); card_id == 0x15b6 -> 伴侣 0x157f (Queen's Knight); card_id == 0x169e (Mustering of the Dark Scorpions) -> 伴侣 0x1532 (Don Zaloog). 选定伴侣 card_id 后调用 count_paired_slots_with_field5_default(player_id, companion_card_id); 返回 1 若有配对槽, 0 否则.
+
+Constants:
+  CARD_ID_SAGE_STONE = 0x167e (Sage's Stone, passcode=13604200)
+  CARD_ID_MUSTERING = 0x169e (Mustering of the Dark Scorpions, passcode=68191243)
+  CARD_ID_DARK_MAGICIAN_GIRL = 0x129e (Dark Magician Girl, passcode=38033121)
+  CARD_ID_QUEENS_KNIGHT = 0x157f (Queen's Knight, passcode=25652259)
+  CARD_ID_DON_ZALOOG = 0x1532 (Don Zaloog, passcode=76922029)

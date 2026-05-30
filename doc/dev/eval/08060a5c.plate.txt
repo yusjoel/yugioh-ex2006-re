@@ -1,0 +1,4 @@
+equip 槽激活资格谓词, 返回 0/1. 调用 check_value_in_slot_chain(player_id, card_id, type=0xb); 若链中包含目标值 (返回非零) 则调用 check_neo_daedalus_placement_eligible(slot_ptr, arg) 并透传其返回值. 若链中不含目标值则返回 0. 语义: 仅当 equip 链中已有目标卡牌时才评估 Neo Daedalus 放置条件. 与 check_equip_slot_eligible_with_chain_absent_and_lp_slot 为逆向对称兄弟函数.
+
+Constants:
+  CHAIN_TYPE = 0xb -- equip 链节点类型码

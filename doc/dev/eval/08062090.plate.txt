@@ -1,0 +1,6 @@
+equip 槽激活资格谓词, 返回 0/1. 从 slot[+2] 提取 zone_idx (bits[6:2] = lsls #0x1a; lsrs #0x1b) 和 player_id (bit0). 调用 check_value_in_slot_chain(player_id, zone_idx, card_id=0x17d2=Horus the Black Flame Dragon LV4, type=0xb): 若链中包含 Horus LV4 则调用 check_equip_slot_eligible_banisher_absent_with_dispatch(slot_ptr, arg) 并透传; 若链中无 Horus LV4 则返回 0. 语义: equip 链含 Horus LV4 时才评估 Banisher 守卫分发条件.
+
+Constants:
+  CARD_ID_HORUS_LV4 = 0x17d2 (Horus the Black Flame Dragon LV4, passcode=75830094)
+  CHAIN_TYPE = 0xb -- equip 链节点类型码
+  ZONE_IDX_SHIFT = 0x1a/0x1b -- slot[+2] bits[6:2] 提取

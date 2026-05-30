@@ -1,0 +1,6 @@
+equip 槽激活资格谓词, 返回 0/1. 从 slot ldrh[+4] bits[13:6] 提取 field6 值 (lsls #0x11; lsrs #0x17 = 8-bit field). 调用 dispatch_equip_slot_scan_with_field6_guard(player_id, field6, 1, 0): 若返回 0 则直接返回 0. 否则调用 check_equip_slot_chain_absent(slot_ptr, arg) 并透传返回值. 语义: field6 扫描通过且 equip 链为空时合格.
+
+Constants:
+  FIELD6_SHIFT = 0x11/0x17 -- ldrh[+4] bits[13:6] 提取 (net shift = 0x17-0x11=6)
+  SCAN_ARG3 = 1 -- dispatch_equip_slot_scan_with_field6_guard 第三参数 (固定 1)
+  SCAN_ARG4 = 0 -- 第四参数 (sp[0] = 0)

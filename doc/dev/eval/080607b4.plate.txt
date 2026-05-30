@@ -1,0 +1,5 @@
+equip 槽激活资格谓词, 返回 0/1. 读取 gP1LifePoints[player*0x868+0x10] (玩家 LP 状态字); 若为 0 则直接返回 0 (无 LP 槽). 若非 0 则调用 check_equip_slot_eligible_by_slot_value_vs_tier(slot_ptr, arg) 并透传其返回值. 语义: LP 状态非零时才评估槽值与 tier 的比较条件.
+
+Constants:
+  PLAYER_STRIDE = 0x868
+  LP_STATUS_OFFSET = 0x10 -- gP1LifePoints player block 中玩家 LP 状态字

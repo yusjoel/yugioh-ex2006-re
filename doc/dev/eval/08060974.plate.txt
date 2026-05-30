@@ -1,0 +1,4 @@
+equip 槽激活资格谓词, 返回 0 或 dispatch 结果. 调用 sum_equip_slot_effect_values_for_player(player_id) 累加效果值; 再调用 classify_equip_card_id_tier_abcx(slot_ptr) 获取卡牌 tier. 若累加值 < tier 则返回 0 (不足门槛). 若 >= tier 则调用 dispatch_effect_for_neo_daedalus_eligible_slot(slot_ptr, arg) 并透传返回值. 语义: 玩家效果值累和达到卡牌 tier 阈值时触发 Neo Daedalus 合格槽效果分发.
+
+Constants:
+  (tier 由 classify_equip_card_id_tier_abcx 动态返回, 无静态字面量)

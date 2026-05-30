@@ -1,0 +1,7 @@
+equip 槽激活资格谓词, 返回 0/1. 前置 check_equip_slot_state_active_with_card_present; 若失败 (0) 返回 0. 通过后读取 gDuelEffectCtx[+0x4] (激活上下文玩家 ID) 和 [+0x20] (zone_idx), 调用 get_slot_field6_score(player_id, zone_idx) 获取槽的 field6 分值; 若 score > 0x7cf (1999) 则返回 1, 否则返回 0. 语义: equip 槽已激活且激活上下文中目标区槽 field6 分值超过 1999 时合格.
+
+Constants:
+  gDuelEffectCtx = 0x0201bb90 -- 激活上下文基址
+  CTX_PLAYER_OFFSET = 0x4 -- 上下文玩家 ID 字段
+  CTX_ZONE_OFFSET = 0x20 -- 上下文 zone_idx 字段
+  SCORE_THRESHOLD = 0x7cf = 1999 -- field6 分值门槛 (score > 1999 通过)

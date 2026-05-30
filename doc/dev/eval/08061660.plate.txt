@@ -1,0 +1,1 @@
+equip 槽激活资格谓词, 返回 0 或 dispatch 结果. 调用 check_field_spell_neo_daedalus_group_placeable(player_id); 若失败 (0) 则返回 0. 通过后调用 check_equip_slot_eligible_by_lp_slot_and_effect_dispatch(slot_ptr, arg) 并透传其返回值. 语义: Neo Daedalus 字段组条件满足时才评估 LP 槽效果分发资格.

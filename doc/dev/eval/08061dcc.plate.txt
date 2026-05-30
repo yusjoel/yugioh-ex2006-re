@@ -1,0 +1,6 @@
+equip 槽激活资格谓词, 返回 0/1. 读取 gP1LifePoints[player*0x868+0x10] (LP 状态字); 若 <= 3 则直接返回 0. 若 > 3 则调用 check_neo_daedalus_placement_eligible(slot_ptr, arg) 并透传返回值. 语义: 仅当 LP 状态字 > 3 时才评估 Neo Daedalus 放置条件. 与 check_equip_slot_eligible_by_duel_phase3_neo_daedalus (0x08060484) 同构, 区别在于门槛值 (3 vs ==3 vs >3) 和读取方式 (全局 vs 玩家专属).
+
+Constants:
+  PLAYER_STRIDE = 0x868
+  LP_STATUS_OFFSET = 0x10 -- 玩家 LP 状态字偏移
+  LP_STATUS_THRESHOLD = 3 -- 须 > 3 (bls 跳过 = <= 3 失败)

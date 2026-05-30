@@ -1,0 +1,8 @@
+equip 槽激活资格谓词, 三路返回 (0/1/2). 前置条件: check_equip_slot_chain_absent 通过 (无激活链). 通过后从 slot[+2] bits[10:6] 提取 zone_type (ZONE_TYPE_MASK=0xfc0, 右移 1 位得 5-bit zone). 若 zone_type <= 4 (怪兽区), 调用 find_first_available_monster_slot_for_player(player_id) -- 返回 >= 0 则返回 1; 否则调用 check_neo_daedalus_placement_eligible(slot_ptr, arg) -- 通过返回 2. 任一条件失败返回 0.
+
+Constants:
+  ZONE_TYPE_MASK = 0xfc0 (0xfc<<4)
+  MONSTER_ZONE_MAX = 4 -- zone_type bits[10:6] <= 4 为怪兽区
+  RET_MONSTER = 1 -- 怪兽区有空位路径
+  RET_NEO_DAEDALUS = 2 -- Neo Daedalus 路径
+  ZONE_TYPE_SHIFT = 1 -- bits[10:6] = (lsls #0x1a; lsrs #0x1b)

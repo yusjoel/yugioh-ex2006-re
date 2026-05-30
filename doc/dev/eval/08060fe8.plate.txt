@@ -1,0 +1,1 @@
+equip 槽激活资格谓词, 返回 0 或 dispatch 结果. 三级条件链: (1) check_equip_slot_chain_absent(slot_ptr) -- 链存在则返回 0; (2) check_spell_zone_slot_placeable(player_id) -- 法术区不可用则返回 0; (3) dispatch_effect_by_card_id_with_display_lookup(slot_ptr, arg) -- 透传返回值. 与 check_equip_slot_eligible_with_chain_absent_and_spell_dispatch 同构, 第三步使用带 display lookup 变体.

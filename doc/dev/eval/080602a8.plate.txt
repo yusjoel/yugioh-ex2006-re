@@ -1,0 +1,5 @@
+equip 槽激活资格谓词, 返回 0/1. 三级条件链: (1) check_spell_zone_slot_placeable(player_id) -- 法术区不可放置则返回 0; (2) dispatch_effect_handler_by_card_id(player_id, card_id, mode=0) -- 返回 <= 1 则返回 0; (3) check_neo_daedalus_placement_eligible(slot_ptr, arg) -- 透传返回值. 语义: 法术区可用 且 效果处理器确认 且 Neo Daedalus 放置条件满足.
+
+Constants:
+  MODE_ZERO = 0 -- dispatch_effect_handler_by_card_id 第三参数固定为 0
+  DISPATCH_THRESHOLD = 1 -- 返回值须 > 1 才继续

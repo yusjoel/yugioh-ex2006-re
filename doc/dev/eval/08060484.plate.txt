@@ -1,0 +1,5 @@
+equip 槽激活资格谓词, 返回 0/1. 读取 gP1LifePoints[+0x1cf4] (全局决斗阶段字段); 仅当值 == 3 时调用 check_neo_daedalus_placement_eligible(slot_ptr, r1_passthrough) 并透传其返回值. 若阶段 != 3 则直接返回 0. 语义: 仅在决斗阶段 3 (特定阶段) 时评估 Neo Daedalus 放置条件.
+
+Constants:
+  DUEL_PHASE_OFFSET = 0x1cf4 -- gP1LifePoints 全局阶段字段偏移
+  REQUIRED_PHASE = 3 -- 仅阶段 3 触发 Neo Daedalus 检查

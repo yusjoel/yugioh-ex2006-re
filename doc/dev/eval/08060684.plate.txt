@@ -1,0 +1,6 @@
+equip 槽激活资格谓词, 有副作用写入, 返回 0/2. 入口立即写 strh 1 -> slot[+0xc] (初始化槽状态字). 调用 find_first_available_monster_slot_for_player(player_id): 若有空怪兽槽 (>=0) 则调用 count_effect_node_zone_activations(slot_ptr); 若激活数 > 0 则返回 2. 若无空怪兽槽或激活数为 0, 写 strh 2 -> slot[+0xc] (更新槽状态为已评估), 再调用 check_neo_daedalus_placement_eligible; 若通过且 count_effect_node_zone_activations > 0 则返回 2. 所有条件失败返回 0.
+
+Constants:
+  SLOT_STATE_INIT = 1 -- slot[+0xc] 初始写入值
+  SLOT_STATE_EVALUATED = 2 -- slot[+0xc] 无空怪兽槽时写入值
+  RETURN_ELIGIBLE = 2 -- 合格时固定返回 2

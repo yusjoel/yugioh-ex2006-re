@@ -1,0 +1,5 @@
+equip 槽激活资格谓词, 返回 0/1. 前置 check_neo_daedalus_placement_eligible; 失败返回 0. 通过后读取 gP1LifePoints[player*0x868+0x10] (LP 状态字); 若为 0: 先调用 lookup_slot_display_value_by_card_id(slot_ptr) 获取 display 值 r2, 再调用 dispatch_effect_handler_by_card_id(player_id, card_id, display_value); 若返回非零返回 1. 若 LP 状态 != 0: 直接返回 1 (快速通过路径). 未通过条件返回 0.
+
+Constants:
+  PLAYER_STRIDE = 0x868
+  LP_STATUS_OFFSET = 0x10 -- 玩家 LP 状态字偏移
