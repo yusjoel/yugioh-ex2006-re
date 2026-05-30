@@ -1,0 +1,5 @@
+Equip sprite dispatch wrapper. Extracts type field from slot_node [r0+2] (bits[11:7], mask 0xfc0): if type==0x80 (bit7 set), calls dispatch_equip_zone_sprite_by_effect_type(node); otherwise calls dispatch_equip_draw_counter_sprite_tick(node). Routes to two different sprite handler paths based on equip effect type code. Called via function pointer table (Sub-type B).
+
+Constants:
+- TYPE_MASK=0xfc0 (0xfc<<4=0xfc0, bits[11:6] of halfword at [r0+2])
+- TYPE_ZONE=0x80 (zone sprite path branch value)

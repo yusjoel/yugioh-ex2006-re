@@ -1,0 +1,8 @@
+Effect node function pointer table handler. Saves high registers via .hword 0x464f/0x4646/0x4689 (r7=r0 node ptr, r9=r1, r8=r1 from DWORD). Extracts player_id (bit0, r5) and slot_index (bits[5:2], r4) from slot_node [r7+2]. Computes equip count for both players from EWRAM 0x0201c510+player*0x868+slot*20: extracts bits[29:24]*2 (equip count*2) plus bit13 (active bit), sums both players and compares with [r7+4] bits[14:8]*2 target. If count mismatches, skips. If matches and active_bit nonzero, calls set_equip_partner_flags_with_bitmap_refresh. Called via function pointer table (Sub-type B).
+
+Constants:
+- EQUIP_SLOT_BASE=0x0201c510 (equip slot array base, DWORD_08079f48)
+- PLAYER_STRIDE=0x868 (per-player stride, DWORD_08079f44)
+- SLOT_ENTRY_SIZE=20 (bytes per slot entry)
+- COUNT_BITS=[29:24] (equip count bit-field, lsls#2/lsrs#0x18)
+- ACTIVE_BIT=bit13 (lsls#0x12/lsrs#0x1f)

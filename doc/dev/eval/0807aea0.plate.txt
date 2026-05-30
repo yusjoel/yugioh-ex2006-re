@@ -1,0 +1,8 @@
+Effect node function pointer table handler. Double nested loop: outer r6=0..1 (player_id), inner r4=0..4 (slot_index). For each (player, slot) pair calls invoke_effect_node_with_active_flag_3arg(node, player, slot) to confirm active; if active calls enqueue_slot_card_sprite_if_eligible(node, player, slot, sp[0]=2, sp[4]=0). After loops, extracts player_id (bit0 of [node+2]) to compute opp_player=player+1, reads card_id [node+0] (u16), calls enqueue_sprite_attr_type11(opp_player, card_id, 1, 0). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- PLAYER_COUNT=2 (r6=[0..1])
+- SLOT_COUNT=5 (r4=[0..4])
+- SP_MODE=2 (enqueue_slot_card_sprite_if_eligible sp[0])
+- SP_FLAG=0 (enqueue_slot_card_sprite_if_eligible sp[4])
+- TYPE11_TYPE=1 (enqueue_sprite_attr_type11 type arg)

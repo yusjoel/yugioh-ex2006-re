@@ -1,0 +1,6 @@
+Effect node function pointer table handler. Entry saves high regs via .hword 0x4647/0x4688 (r7=r3 spill, r8=r0 node ptr). Double nested loop: outer r0=0..1 (player_id, toggled via eors r4,r0 between two players), inner r5=0..0xa (slot_index [0..10]). Reads base from DWORD_0807bb88=0x0201e1c8, outer r4 is current player XOR toggle. For each (player, slot) calls invoke_effect_node_with_active_flag_3arg(node, player, slot) to confirm active; if active reads card_id [node+0] (u16 -> r2), computes opp_or_same = player XOR node_player (rsbs + orrs + lsrs), calls dispatch_slot_equip_sprite_by_field6_type(player, slot, opp_flag). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- ZONE_BASE=0x0201e1c8 (DWORD_0807bb88)
+- SLOT_MAX=0xa (r5=[0..0xa], 11 slots)
+- PLAYER_LOOP=2 (outer r0=[0..1])

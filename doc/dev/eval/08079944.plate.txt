@@ -1,0 +1,7 @@
+State machine for Neo-Daedalus equip LP display sequence. Reads state code from IWRAM state machine at 0x0201b290+0x4a0. State 0x80: checks Neo-Daedalus condition and verifies monster slots via count_available_monster_slots; calls dispatch_effect_for_neo_daedalus_eligible_slot and dispatch_effect_handler_by_card_id, writes result to [slot+0xa], calls trigger_card_display_op31_if_not_active. State 0x7e: reads processed count vs target, calls invoke_setup_equip_oam_with_attr2 to enqueue OAM sprites, increments counter. State 0x7d: calls decrement_lp_bar_display_counter. Called via effect node function pointer table (Sub-type B, fn-ptr at ROM 0x09e42218).
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (LP state machine EWRAM base)
+- LP_STATE_OFFSET=0x94<<3=0x4a0 (state variable offset)
+- OP_ID_TRIGGER=0x11d (trigger_card_display_op31_if_not_active r1 param)
+- STATE_INIT=0x80, STATE_LP_COUNTER=0x7e, STATE_TICK=0x7d

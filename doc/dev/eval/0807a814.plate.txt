@@ -1,0 +1,8 @@
+Effect node function pointer table handler. Saves high registers via .hword 0x464f/0x4646/0x4680 (r7=r1, r6=r0 node ptr, r8=r0 int). Calls check_effect_slot_matches_zone_entry(node, 0, 0) to check zone match; returns 0 if no match. Then calls read_effect_slot_side_and_type to get side and slot_type, calls invoke_effect_node_with_active_flag_3arg to confirm active. If active, calls enqueue_slot_card_sprite_if_eligible(node, side, slot_type, sp[0]=2, sp[4]=1) first time. Then loops r7=0..4: reads slot state word from EWRAM 0x0201c510+player*0x868+r8*0x14, checks bit13 nonzero, [+0x8] count nonzero, [+0x6] (field4) zero, calls get_slot_card_state_code to confirm state==0x12; if all met calls enqueue_slot_card_sprite_if_eligible again. Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- PLAYER_STRIDE=0x868 (per-player EWRAM stride)
+- EQUIP_SLOT_BASE=0x0201c510 (DWORD_0807a8ec)
+- SLOT_ENTRY_SIZE=0x14 (r8 step per loop iter)
+- STATE_CODE_ACTIVE=0x12 (get_slot_card_state_code expected value)
+- SP_MODE=2 (enqueue_slot_card_sprite_if_eligible sp[0])

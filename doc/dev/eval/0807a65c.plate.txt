@@ -1,0 +1,5 @@
+Equip sprite three-path dispatch wrapper (dual-param version). Sibling of 08079f5c and 08079f80 in equip sprite dispatch cluster, adds r1 parameter forwarding. Extracts type field from slot_node [r2+2] (mask 0xfc0, compare value 0x640=0xc8<<3): if type==0x640, calls enqueue_effect_slot_sprite_by_zone_capacity_check(node, r1) for capacity check path; otherwise calls dispatch_equip_zone_sprite_by_effect_type(node, r1) for standard zone sprite path. Called via function pointer table (Sub-type B).
+
+Constants:
+- TYPE_MASK=0xfc0 (0xfc<<4=0xfc0)
+- TYPE_CAPACITY=0x640 (0xc8<<3=0x640, zone capacity path branch value)

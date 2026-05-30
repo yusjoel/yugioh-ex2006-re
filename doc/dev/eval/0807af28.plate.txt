@@ -1,0 +1,4 @@
+Effect node function pointer table handler. Calls check_effect_slot_matches_zone_entry(node, 0, &out) to check if effect slot matches zone entry; returns 0 on no match. Extracts side (byte3 via lsls#0x18/lsrs#0x18 -> r6) and slot_type (byte2 via lsls#0x10/lsrs#0x18 -> r5) from output word at [sp+0]. Calls invoke_effect_node_with_active_flag_3arg(node, side, slot_type) to confirm active; returns 0 if not active. If active, calls test_equip_target_slot_zone13(node, side, slot_type). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- SP_OUT_OFFSET=0 (check_effect_slot_matches_zone_entry output word at [sp+0])

@@ -1,0 +1,5 @@
+Equip sprite two-path dispatch wrapper with second parameter. Sibling of 08079f5c and 0807a65c in equip sprite dispatch cluster, adds r1 parameter forwarding. Extracts type field from slot_node [r2+2] (mask 0xfc0, compare value 0x140=0xa0<<1): if type==0x140, calls dispatch_equip_zone_sprite_by_effect_type(node, r1); otherwise calls check_equip_target_slot_in_chain_context_bitmap(node, r1). Called via function pointer table (Sub-type B).
+
+Constants:
+- TYPE_MASK=0xfc0 (0xfc<<4=0xfc0)
+- TYPE_CHAIN=0x140 (0xa0<<1=0x140, chain bitmap path branch value)

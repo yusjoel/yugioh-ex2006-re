@@ -1,0 +1,6 @@
+Effect node function pointer table handler. Calls check_effect_slot_matches_zone_entry(node, 0, &out) to check if effect slot matches zone entry; returns 0 on no match. Extracts player_id (byte3) and slot_type (byte2) from output word at [sp+4]. Calls invoke_effect_node_with_active_flag_3arg to confirm node active state. If active, calls enqueue_sprite_attr_with_mode(player_id, slot_type, card_id=halfword[node+0], mode_flags, r3=1) to enqueue sprite attr. Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- SPRITE_R3=1 (enqueue_sprite_attr_with_mode 5th param)
+- SP_OUT_BYTE3=player_id from check_effect_slot_matches_zone_entry output byte3
+- SP_OUT_BYTE2=slot_type from output byte2

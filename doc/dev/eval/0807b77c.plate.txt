@@ -1,0 +1,6 @@
+Effect node function pointer table handler. Extracts player_id (bit0) from slot_node [r4+2]. Calls find_chain_zone_slot_by_pair_card(player, card_id=[r4+8]) to find paired card chain zone slot index r5. Re-extracts player_id, calls check_field_spell_neo_daedalus_group_placeable(player); returns 0 if not placeable. Calls count_available_monster_slots(player); returns 0 if no empty slots. Returns 0 if r5 (find result) < 0. On all checks passing, computes OAM address: EWRAM 0x0201c880 + player*0x868 + slot*4, calls invoke_setup_equip_oam_with_attr2(player, addr, 1, 0) to set OAM attr2. Returns fixed 0. Called via function pointer table (Sub-type B, appears at 0x09e470a8/0x09e470c0/0x09e470d8).
+
+Constants:
+- EQUIP_ZONE_BASE=0x0201c880 (DWORD_0807b7d8)
+- PLAYER_STRIDE=0x868 (DWORD_0807b7d4)
+- SLOT_WORD_SIZE=4 (lsls r2,r5,#2)

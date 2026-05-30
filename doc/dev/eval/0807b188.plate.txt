@@ -1,0 +1,11 @@
+Effect node function pointer table handler. Extracts player_id (bit0, r2) and slot_index (bits[5:2], r1) from slot_node [r7+2]. Computes dual-player equip count from EWRAM 0x0201c510+player*0x868+slot_index*20: extracts bits[29:24]*2 (equip count*2) plus bit14 (active bit), accumulates both players. Compares with [node+4] bits[14:8]*2 target; skips if not equal. On match, loops over i=0..[node+6]bits[4:2] entries: calls check_effect_slot_matches_zone_entry(node, i, &out), extracts side/slot_type, calls invoke_effect_node_with_active_flag_3arg to confirm active, if active calls enqueue_slot_card_sprite_if_eligible(node, side, slot_type, sp[0]=0x16, sp[4]=0). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_0807b1dc, per-player stride)
+- EQUIP_SLOT_BASE=0x0201c510 (DWORD_0807b1e0)
+- SLOT_ENTRY_SIZE=20 (slot_index * 20)
+- COUNT_BITS=[29:24] (lsls#2/lsrs#0x18 extracts bits 29:24)
+- ACTIVE_BIT=bit14 (lsls#0x12/lsrs#0x1f, added to count)
+- TARGET_COUNT=[node+4] bits[14:8]*2 (lsls#0x11/lsrs#0x17)
+- ITER_LIMIT=[node+6] bits[4:2] (lsls#0x1b/lsrs#0x1d)
+- SP_MODE=0x16 (enqueue_slot_card_sprite_if_eligible sp[0])

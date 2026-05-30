@@ -1,0 +1,7 @@
+Effect node function pointer table handler. Symmetric double nested loop structure identical to 0807aea0: outer r6=0..1 (player_id), inner r4=0..4 (slot_index). For each (player, slot) pair calls invoke_effect_node_with_active_flag_3arg(node, player, slot) to confirm active; if active calls enqueue_slot_card_sprite_if_eligible(node, player, slot, sp[0]=5, sp[4]=0). Only difference from 0807aea0: sp[0]=5 instead of 2 (different sprite display mode). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- PLAYER_COUNT=2 (r6=[0..1])
+- SLOT_COUNT=5 (r4=[0..4])
+- SP_MODE=5 (enqueue_slot_card_sprite_if_eligible sp[0], distinct from sibling mode=2)
+- SP_FLAG=0 (enqueue_slot_card_sprite_if_eligible sp[4])

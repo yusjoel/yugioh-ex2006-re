@@ -1,0 +1,11 @@
+Effect node LP display sequence state machine (slot_node version). Entry saves r0/r1/r2 as r5/r6/r7 via .hword 0x4657/0x464e/0x4645. Reads gP1LifePoints + 0x1ce8 (XOR candidate word), XORs with 0x0201b734 word, left-shifts 3 bits to get bit offset. Extracts flag_byte4 (lsrs+0xff mask -> r4, clamped to 1). r1/r2 are overwritten by ldr at entry (gP1LifePoints and XOR_FIELD_OFF constants) -- caller r1/r2 are not APCS params. Reads LP state from LP_STATE_BASE=0x0201b290 + 0x4a0. State 0x80: clears [0x0201b734]; if r4 (flag) nonzero and player LP nonzero, calls set_lp_row_type2_with_sign_flag_only(player, r4, 0, 0), returns 0x7e. State 0x7e: reads previous saved word + 1 into [0x0201b734]; if <=1 returns 0x7f, else returns 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- gP1LifePoints=0x0201c4e0 (DWORD_0807bee8)
+- XOR_FIELD_OFF=0x1ce8 (DWORD_0807beec, gP1LifePoints+0x1ce8)
+- XOR_BASE=0x0201b734 (DWORD_0807bef0)
+- LP_STATE_BASE=0x0201b290 (DWORD_0807bef8)
+- STATE_OFFSET=0x94*8=0x4a0
+- PLAYER_STRIDE=0x868 (DWORD_0807bef4)
+- LP_COL_OFF=0xc (gP1LifePoints + player*0x868 + 0xc)
+- STATE_ACTIVE=0x80, STATE_ADVANCE=0x7e, STATE_RETRY=0x7f

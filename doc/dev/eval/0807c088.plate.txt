@@ -1,0 +1,10 @@
+Effect node function pointer table handler. Entry saves high reg via .hword 0x4647 (mov r7,r8); adds r7,r0,#0 stores node ptr in r7. Extracts player_id (bit0 -> r2) and slot_idx (bits[5:2] -> r1) from [node+2]. Reads DAT_0807c150=0x868 player stride; high-reg alias chain .hword 0x4688/0x4641/0x468c stores DWORD_0807c154=0x0201c510 base. Reads EWRAM 0x0201c510+player*0x868+slot_idx*20, extracts bits[29:24]*2 (equip count*2) + bit14 (active), accumulates both players and compares with [node+4] target count. Returns 0 if mismatch. On match checks [+0x8] nonzero. Calls check_effect_slot_matches_zone_entry, read_effect_slot_side_and_type -> r5=side/r4=slot_type, invoke_effect_node_with_active_flag_3arg. If active calls enqueue_sprite_attr_with_mode(side, slot_type, orr(slot_idx_packed, player), sp[0]=player, r3=6). Returns fixed 0. Called via function pointer table (Sub-type B, at 0x09e45128/0x09e45140/0x09e45158).
+
+Constants:
+- PLAYER_STRIDE=0x868 (DAT_0807c150)
+- EQUIP_SLOT_BASE=0x0201c510 (DAT_0807c154)
+- SLOT_ENTRY_SIZE=20 (slot_idx * 20)
+- COUNT_BITS=[29:24] (lsls#2/lsrs#0x18)
+- ACTIVE_BIT=bit14 (lsls#0x12/lsrs#0x1f)
+- TARGET_COUNT=[node+4] bits[14:8]*2 (lsls#0x11/lsrs#0x17)
+- SPRITE_MODE=6 (r3=6 in enqueue_sprite_attr_with_mode)

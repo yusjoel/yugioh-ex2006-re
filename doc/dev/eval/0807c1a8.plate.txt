@@ -1,0 +1,8 @@
+Effect node LP indicator sequence state machine. Reads state code from LP_STATE_BASE=0x0201b290 + 0x94*8=0x4a0. State 0x80: extracts player_id (bit0) from [node+2], computes opp_player=1-player (r4). Calls count_effect_node_zone_activations(node) to get activation count r0. Computes scaled_value = count*1000 (sequence: lsls#5=*32, subs=*31, lsls#2=*124, adds=*125, lsls#3=*1000). Calls submit_lp_indicator_with_slot_xor_flag(node, opp_player, count*1000) to submit LP indicator. Returns 0x7f (advance state). State 0x7f: calls submit_equip_zone_bitmap_pair_update(node) to submit zone bitmap pair update, transparently returns callee value. All other states return 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- LP_STATE_BASE=0x0201b290 (DWORD_0807c1e4)
+- STATE_OFFSET=0x94*8=0x4a0 (movs r2,#0x94; lsls r2,r2,#3)
+- STATE_ACTIVE=0x80 (LP indicator path)
+- STATE_BITMAP=0x7f (bitmap pair update path)
+- SCALE_EXPR=count*1000 (5-instruction multiply: lsls#5, subs, lsls#2, adds, lsls#3)

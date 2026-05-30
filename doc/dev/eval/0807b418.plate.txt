@@ -1,0 +1,7 @@
+Effect node function pointer table handler. Entry saves high regs via .hword 0x4647 (mov r7,r3); reads DWORD_0807b48c=0x0201bb90 to get [+4] into r7 (side_ref) and [+0x20] into r8 (type_ref). Calls invoke_effect_node_handler_2arg(node, ...) to check initial condition; returns 0 if fails. Then calls check_effect_slot_matches_zone_entry(node, 0, 0); returns 0 if no match. Calls read_effect_slot_side_and_type(node, 0) to get side (r6) and slot_type (r5). Calls invoke_effect_node_with_active_flag_3arg(node, side, slot_type) to confirm active. If active, calls get_slot_field5_score(side, slot_type) to get field5 score (u16), reads card_id [node+0] (u16 -> r3). Calls enqueue_slot_card_sprite_if_eligible(node, r7, r2=r8, sp[0]=4, sp[4]=field5_score). Returns fixed 0. Called via function pointer table (Sub-type B).
+
+Constants:
+- EFFECT_BASE=0x0201bb90 (DWORD_0807b48c)
+- EFFECT_SIDE_OFF=4 ([base+4] -> r7)
+- EFFECT_TYPE_OFF=0x20 ([base+0x20] -> r8)
+- SP_MODE=4 (enqueue_slot_card_sprite_if_eligible sp[0])
