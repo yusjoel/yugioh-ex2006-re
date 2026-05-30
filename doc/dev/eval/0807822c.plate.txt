@@ -1,0 +1,15 @@
+Checks [effect_node+0x4] bit2 flag; if set returns 0 immediately (activation lock).
+Otherwise iterates over 5 equip slots (slot 0..4):
+  1. Reads equip slot array 0x0201c510[player*0x868+slot*0x14] card_id (13-bit field).
+  2. Calls check_card_pair_allowed(card_id, 0xfa7) to check pairing eligibility.
+  3. If eligible, calls query_slot_card_type_eligibility(effect_node, player, slot) to check card type eligibility.
+  4. If both pass, calls enqueue_sprite_attr_with_mode(player, slot, card_id, 0, mode=1) to enqueue sprite.
+After the loop, calls enqueue_sprite_attr_type11(player, card_id, 1, 0) and submit_equip_zone_bitmap_pair_update.
+
+Constants:
+- EQUIP_SLOT_BASE=0x0201c510
+- PLAYER_STRIDE=0x868
+- SLOT_STRIDE=0x14 (20 bytes per slot)
+- SLOT_MAX=0x4 (range [0..4])
+- CARD_PAIR_KEY=0xfa7 (check_card_pair_allowed threshold)
+- ACTIVATION_LOCK_BIT=bit2 of [effect_node+0x4]

@@ -1,0 +1,12 @@
+Reads current active effect node pointer from IWRAM state table 0x0201b290[0x484].
+Reads [active_node+0x2] bit0 to get active player_id; if equal to the incoming r0 (player_id), returns 0 immediately (same player, no action).
+If players differ:
+  - If r1 == 0xb (sub-opcode=11): branches directly to LAB_08078538, returns 0x800.
+  - If r1 <= 0xa: computes r2+r1 merged argument, calls invoke_effect_node_with_active_flag_3arg(active_node, player, r2+r1_merged); if non-zero result returns 0x800.
+  - Other r1 (>0xb): returns 0.
+
+Constants:
+- ACTIVE_NODE_OFFSET=0x484 (0x0201b290[0x484] = active effect node ptr)
+- SUB_OP_MAX=0xa (range [0..10])
+- SUB_OP_DIRECT=0xb (unconditional trigger threshold)
+- RESULT_TRIGGER=0x800 (movs r0,#0x80; lsls r0,r0,#0x4 = 0x800)

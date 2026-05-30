@@ -1,0 +1,9 @@
+Reads LP state machine 0x0201b290[0x94*8=0x4a0].
+If state == 1: reads [state_base+0x4a4] counter; reads gP1LifePoints[player*0x868+0x4a4] value; combines player_id (bit0) and zone bits[6:2] into r2 value (player << 8 | zone_bits); calls enqueue_sprite_attr_with_mode(r1, r2, 0, mode=0x17) to enqueue sprite with mode 0x17. Returns 0.
+If state != 1: calls dispatch_equip_zone_sprite_by_effect_type(effect_node), returns callee result.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0
+- SPRITE_MODE=0x17 (enqueue_sprite_attr_with_mode mode param)
+- COUNTER_OFFSET=0x4a4

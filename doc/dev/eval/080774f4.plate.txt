@@ -1,0 +1,9 @@
+Reads current state from LP state machine 0x0201b290[0x94*8=0x4a0] and routes as follows:
+- State 0x80: reads [effect_node+0x2] bit0 (player_id), inverts to get opponent player, reads card_id halfword from r3 and [r3] halfword, calls enqueue_sprite_attr_type11 (mode=5) to enqueue sprite, returns 0x7f.
+- State 0x7f: calls set_equip_partner_flags_with_bitmap_refresh(r2, r3), returns 0 (fall-through).
+- Other states: returns 0.
+Parameters r2/r3 are passed directly to the respective callee. Exit mechanism: pop{r1};bx r1 Sub-case E: r0=0x7f (state 0x80 path, explicit movs r0,#0x7f); r0=0 (state 0x7f and default paths, explicit movs r0,#0x0).
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0

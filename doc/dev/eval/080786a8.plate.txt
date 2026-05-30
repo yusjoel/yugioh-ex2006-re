@@ -1,0 +1,15 @@
+Reads LP state machine 0x0201b290[0x94*8=0x4a0] and routes through multiple states:
+State 0x80: reads gP1LifePoints[player*0x868+0xc] value, writes to [state_base+0x4a4]. Returns 0x7f.
+State 0x7f: reads gP1LifePoints[player*0x868+0xc]; if non-zero calls dispatch_equip_zone_sprite_banisher_of_the_light(player, 0, 0). Returns 0x7f/0x7e.
+State 0x7e: reads [state_base+0x4a4] as loop counter, reads gP1LifePoints series; if count < limit reads effect_slot_entry_ptr_by_palette_id, calls enqueue_graveyard_spell_sprite_with_zone_ref(effect_node, player, entry_ptr), increments counter. Returns 0x7d.
+State 0x7d: compares [state_base+0x4a4] against [gP1LifePoints+0xea<<5]; if counter not exhausted, calls enqueue_sprite_attr_record(sprite_data, 0xd, 0) to enqueue record. Returns 0x7e/0x64.
+Other states: returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0
+- COUNTER_OFFSET=0x4a4
+- PLAYER_STRIDE=0x868
+- SPRITE_RECORD_TYPE=0xd (enqueue_sprite_attr_record second argument)
+- LP_EA_OFFSET=0xea<<5=0x1d00
+- SPRITE_DATA_DEFAULT=0x56 / 0x8056

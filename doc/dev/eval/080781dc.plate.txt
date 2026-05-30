@@ -1,0 +1,10 @@
+Reads equip slot array 0x0201c5d8[player*0x868+8] halfword; if zero returns immediately.
+If non-zero, reads same slot entry [+0x0] word upper 13 bits (lsls #0x13) and compares against CARD_TYPE_SPELL=0xbaf00000.
+If card type does not match, returns.
+If card type matches, calls submit_equip_zone_bitmap_pair_update(effect_node, second_arg) to update equip bitmap pair.
+Overall: when equip slot holds a spell-type card, triggers bitmap pair update.
+
+Constants:
+- EQUIP_SLOT_BASE=0x0201c5d8 (equip slot +0xc8 offset)
+- PLAYER_STRIDE=0x868
+- CARD_TYPE_SPELL=0xbaf00000 (bits[31:19] type field, spell-type mask)

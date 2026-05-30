@@ -1,0 +1,14 @@
+Reads LP state machine 0x0201b290[0x94*8=0x4a0] and routes through multiple states:
+State 0x80: reads 0x0201e2a0[player*4+8]; if equals 1, writes gP1LifePoints[0xea<<5=0x1d00] := 0x60; otherwise calls invoke_card_display_op_0x31_sub9(0x94*2, 2). Returns 0x7f.
+State 0x7f: reads [state_base+0x4a4] slot counter; reads gP1LifePoints[0x1d00] and writes value to [state_base+0x4a4]; reads opponent player, calls set_lp_display_row_type15. Returns 0x7e.
+State 0x7e: calls set_lp_row_type18_with_value(-1=opponent). Returns 0x7d.
+State 0x7d: reads gP1LifePoints+0x1da8 bit shift, checks activation condition; if present calls tick_zone_sprite_pipeline_with_update_flag, otherwise calls enqueue_equip_zone_sprite_attr_full. Returns 0.
+Other states: returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0
+- GAME_STATE_BASE=0x0201e2a0
+- PLAYER_STRIDE=0x868
+- LP_1D00_OFFSET=0xea<<5=0x1d00 (gP1LifePoints score field)
+- LP_1DA8_OFFSET=0x1da8

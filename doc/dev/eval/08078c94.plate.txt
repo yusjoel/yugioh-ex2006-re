@@ -1,0 +1,18 @@
+Reads LP state machine 0x0201b290[0x94*8=0x4a0] and routes through four states:
+State 0x80: iterates r6=[0..3] equip slots, reads slot data from gP1LifePoints[player*0x868] zone table, writes (zone_bit|attr) combined value to [effect_node+8+r6*2] halfword. Calls check_field_spell_neo_daedalus_group_placeable(player), writes result to [effect_node+0x10]. Clears [STATE_BASE+0x4a4], calls increment_lp_bar_display_counter. Returns 0x7f.
+State 0x7f: reads [STATE_BASE+0x4a4] counter; if == 4 returns 0x64. Reads [gP1LifePoints+player*0x868+0x10]; if 0 returns 0x64. Otherwise selects sprite_data=0x56 or SPRITE_DATA_ALT=0x8056 by player bit, calls enqueue_sprite_attr_record(sprite_data, 0xd, slot_halfword, 0). Returns 0x7e.
+State 0x7e: calls get_zone_card_attribute_by_type(player, 0xd, 0); if 0 calls enqueue_lp_field_state_sprite_by_player. Calls enqueue_equip_zone_sprite_for_player. Reads [gP1LifePoints+player*0x868] field8 via map_field8_to_card_type_category: if ==0 and [effect_node+0x10]!=0 and count_available_monster_slots>0 calls invoke_setup_equip_oam_with_attr2; otherwise calls enqueue_equip_zone_sprite_attr_full. Increments [STATE_BASE+0x4a4]. Returns 0x7f.
+State 0x64: calls decrement_lp_bar_display_counter + enqueue_lp_counter_sprite_by_player. Returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0
+- COUNTER_OFFSET=0x4a4
+- PLAYER_STRIDE=0x868
+- LP_BASE=gP1LifePoints=0x0201c4e0
+- SPRITE_DATA_DEFAULT=0x56
+- SPRITE_DATA_ALT=0x8056 (DWORD_08078dcc)
+- SPRITE_ATTR_TYPE=0xd (enqueue_sprite_attr_record second argument)
+- EQUIP_ZONE_BASE=0x0201c740 (DWORD_08078e64)
+- SLOT_LOOP_MAX=3 (cmp r6,#0x3)
+- COUNTER_MAX=4 (cmp r6,#0x4 in state 0x7f)

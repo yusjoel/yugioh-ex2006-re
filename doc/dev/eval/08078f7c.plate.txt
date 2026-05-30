@@ -1,0 +1,6 @@
+Double loop: outer player=[0..1], inner slot=[0..4]. For each (player, slot) combination calls invoke_effect_node_with_active_flag_3arg(effect_node, player, slot); skips if returns 0. On non-zero return calls check_value_in_slot_chain(card_id, player, slot); skips if node already in chain. Otherwise calls enqueue_slot_card_sprite_if_eligible(effect_node, player, slot, 2, 0) with card_id=2 and flags=0 to enqueue equip sprite. After both loops, calls enqueue_sprite_attr_type11(player, card_id, 1, 0) to submit trailing sprite. Always returns 0.
+
+Constants:
+- SLOT_MAX=4 (cmp r4,#0x4 -- slot [0..4])
+- PLAYER_MAX=1 (cmp r6,#0x1 -- player [0..1])
+- CARD_ID_PARAM=2 (movs r0,#0x2 -- passed to enqueue_slot_card_sprite_if_eligible)

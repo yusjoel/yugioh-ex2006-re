@@ -1,0 +1,11 @@
+Reads LP state machine 0x0201b290[0x94*8=0x4a0] and routes:
+State 0x80: calls count_available_monster_slots(player) to confirm available slot; calls check_field_spell_neo_daedalus_group_placeable(player) to check Neo Daedalus field spell; reads gP1LifePoints[player]+0xc non-zero check. If all pass, calls set_lp_display_row_type5(player, card_id, 0), returns 0x7f.
+State 0x7f: reads current equip state halfword from gP1LifePoints+0x1da8; reads equip slot array (0x0201cab0+player*0x868+slot*4); calls check_card_field5_is_nonzero to validate; if passed calls eval_equip_placement_full_check; if passed calls invoke_setup_equip_oam_with_attr2, otherwise calls dispatch_equip_zone_sprite_banisher_of_the_light. Returns 0.
+Other states: returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0
+- PLAYER_STRIDE=0x868
+- HAND_ZONE_SLOTS=0x0201cab0
+- LP_DA8_OFFSET=0x1da8 (gP1LifePoints+0x1da8)

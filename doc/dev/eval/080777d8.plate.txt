@@ -1,0 +1,12 @@
+Reads opcode from LP state machine 0x0201b290[0x94*8=0x4a0] and routes by state:
+State 0x80: clears [state_base+0x4a4] counter; double for-loop (player 0/1 x slot 0..9) calls check_slot_card_special_activation_eligible to count eligible activation slots; if any eligible slots, calls update_equip_target_bitmap_zone_e_no_flag(-1), returns 0x7f.
+State 0x7f: reads gP1LifePoints[player]+0xc non-zero condition, computes player*0x868+0x120 base, calls dispatch_equip_zone_sprite_banisher_by_field_count(player, slot_base, 0), increments [state_base+0x4a4], returns 0x7f.
+State 0x7e: symmetric to state 0x7f (opponent player), same dispatch call, returns 0x7e.
+State 0x7d: reads [state_base+0x4a4] multiplied by 0x4a0, calls submit_lp_indicator_with_slot_xor_flag, returns 0.
+Other states: returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x4a4 (counter offset)
+- PLAYER_STRIDE=0x868
+- SLOT_COUNT_MAX=0xa (cmp r4,#0xa; range 0..10)

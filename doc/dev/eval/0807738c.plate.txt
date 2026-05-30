@@ -1,0 +1,13 @@
+Calls invoke_setup_equip_oam_with_attr2 to write OAM equip sprite attributes when all five conditions are met:
+Condition 1: count_available_monster_slots(player) > 0 (opponent has available monster slot).
+Condition 2: check_field_spell_neo_daedalus_group_placeable(player) != 0 (field allows Neo Daedalus series placement).
+Condition 3: [effect_node+6] bits[4:2] == 0x4 (zone_count field == 4).
+Condition 4: read_effect_slot_zone_type(node, 0) result passed to find_zone_descriptor_by_slot_id; byte[2]==0xf (zone type == 0xf).
+Condition 5: check_zone_slot_equip_eligible_alt(player, zone_slot) != 0 (zone slot is equippable).
+If any condition fails, returns 0 immediately. Return value is always r0=0 (all failure paths use explicit movs r0,#0x0; pop{r1};bx r1 Sub-case E).
+
+Constants:
+- ZONE_COUNT_FIELD=bits[4:2] of [effect_node+6], value 4
+- ZONE_TYPE_TARGET=0xf (find_zone_descriptor_by_slot_id result byte[2])
+- PLAYER_STRIDE=0x868
+- HAND_ZONE_SLOTS=0x0201cab0

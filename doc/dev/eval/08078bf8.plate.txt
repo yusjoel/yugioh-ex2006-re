@@ -1,0 +1,6 @@
+Extracts player_id (bit0) from effect_node [+0x2]; extracts set_code from [+0x4] bits[14:6] (lsls #0x11 / lsrs #0x17). Calls find_hand_slot_idx_by_set_code(player, set_code) to find hand slot index. If result < 0, skips; otherwise computes HAND_ZONE_SLOTS[player*PLAYER_STRIDE + slot*4] as target address, calls enqueue_graveyard_spell_sprite_with_zone_ref(effect_node, player, zone_entry_ptr) to enqueue graveyard spell sprite. Returns r0: enqueue callee result (slot >= 0 path); if slot < 0, r0 = find_hand_slot_idx_by_set_code negative value; pop{r1};bx r1 Sub-case E.
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_08078c34)
+- HAND_ZONE_SLOTS=0x0201c8f8 (DWORD_08078c38)
+- SET_CODE_SHIFT_LO=0x11; SET_CODE_SHIFT_HI=0x17 (bit-field [14:6], width=9)

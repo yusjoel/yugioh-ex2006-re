@@ -1,0 +1,8 @@
+Reads slot_count word from effect_node [+0x14]; subtracts 1.
+If new value != -1: enters downward search loop, decrements r1 by step -0x18, decrements r0 by 1, until r0 == -1; writes final r0 back to [+0x14].
+Finally calls update_zone_entry_sprite_by_descriptor(effect_node) to trigger sprite update.
+Overall: decrements the effect node zone slot count by 1 (searches to nearest lower valid entry) and refreshes the corresponding sprite.
+
+Constants:
+- ZONE_ENTRY_STEP=0x18 (zone entry array step stride, subs r1,#0x18 per iteration)
+- SLOT_EMPTY_SENTINEL=-1 (rsbs #0: slot_count == -1 means no valid slot)

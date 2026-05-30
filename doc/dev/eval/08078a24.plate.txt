@@ -1,0 +1,6 @@
+Applies triple gate on effect_node: (1) check_neo_daedalus_placement_eligible returns 0 -- skip; (2) find_zone_descriptor_by_slot_id gets zone descriptor, validates zone_type == 0xe (zone E type), skip if not; (3) check_zone_slot_equip_eligible(player, zone_row, zone_col) returns 0 -- skip. When all three conditions pass, computes target OAM slot as player_id + zone_row*PLAYER_STRIDE + zone_col*4 + HAND_ZONE_SLOTS, calls setup_equip_oam_entry_with_sprite_attr(player, slot_ptr, 0, 1, 1) to write equip OAM sprite attributes. This is the zone E path of the Neo Daedalus equip activation phase. Always returns r0=0 (gate-fail paths all converge to explicit movs r0,#0x0; pop{r1};bx r1 Sub-case E).
+
+Constants:
+- ZONE_TYPE_E=0xe (cmp r0,#0xe -- zone type E)
+- PLAYER_STRIDE=0x868 (DWORD_08078a88)
+- HAND_ZONE_SLOTS=0x0201c8f8 (DWORD_08078a8c)

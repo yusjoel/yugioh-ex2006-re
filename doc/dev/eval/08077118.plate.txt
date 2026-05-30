@@ -1,0 +1,15 @@
+Reads opcode from IWRAM state table 0x0201b290[0x94*8=0x4a0], subtracts 0x64, then dispatches via jump table to 0x1d case handlers.
+Opcode 0x80 path: calls invoke_effect_node_handler_2arg to check effect node activation; if passed, calls check_zone_eligible_with_deck_flag and enqueue_sprite_attr_type10_halfword, then iterates valid monster pair slots; if pair_count==1 reads gP1LifePoints table and calls check_card_pair_allowed, writes pair record to [EQUIP_PAIR_BASE+0x1c88].
+Opcode 0x7f path: calls set_lp_display_row_type6.
+Opcode 0x7e path: calls enqueue_equip_zone_sprite_direct.
+Opcode 0x78 path: calls trigger_card_display_op31_if_not_active.
+Opcode 0x77 path: calls set_lp_row_type4_with_value.
+Opcode 0x64 path: calls check_zone_eligible_with_deck_flag, returns 0.
+Out-of-range/default: returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STATE_OFFSET=0x94*8=0x4a0 (opcode word)
+- PLAYER_STRIDE=0x868 (gP1LifePoints per-player stride)
+- EQUIP_PAIR_BASE=0x0201c600 (equip pair list base)
+- PAIR_OFFSET=0x1c88 (pair record offset)

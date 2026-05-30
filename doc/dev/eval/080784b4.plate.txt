@@ -1,0 +1,11 @@
+Double loop over player 0 and player 1, each with 5 equip slots (slot 0..4), calling invoke_effect_node_with_active_flag_3arg to check node activation state.
+If activated, pushes sp[0]:=1 as eligible flag and calls apply_slot_equip_activation_with_eligibility_check(ctx, player, slot, 0) to apply equip activation.
+Outer loop counter 0 to 1 (player 0/1); inner loop 0 to 4 (slot 0..4).
+pair_match_ctr read from 0x0201e1c8 is used for outer loop player XOR operation (eors r4,r0).
+Overall: scans all player/slot combinations and triggers equip activation evaluation.
+
+Constants:
+- PAIR_MATCH_CTR=0x0201e1c8 (outer loop base counter)
+- PLAYER_MAX=1 (range [0..1])
+- SLOT_MAX=4 (range [0..4])
+- ELIGIBLE_FLAG=1 (sp[0] passed to apply_slot_equip_activation_with_eligibility_check)
