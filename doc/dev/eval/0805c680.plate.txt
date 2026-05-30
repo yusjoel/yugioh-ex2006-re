@@ -1,0 +1,4 @@
+Effect zone activation count threshold predicate. Calls count_effect_node_zone_activations(r0=card_entry); if return value > 1 returns 2, else returns 0. Uses no input beyond r0. pop{r1};bx r1 exit. Used to determine if more than 1 effect node is active in a zone, as threshold predicate in equip slot eligibility chain.
+
+Constants:
+- ZONE_COUNT_THRESHOLD=1 (count > 1 returns 2)

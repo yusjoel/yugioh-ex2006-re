@@ -1,0 +1,15 @@
+Equip LP row and spell zone sprite multi-state sequence driver. Reads [0x0201b290+0x4ac] step, dispatches on 0/1/5/0xa:
+- State 0: calls dispatch_effect_handler_by_card_id(player_id, card_id, 0); if returns 0 calls trigger_card_display_op31_if_not_active(player_id, 0xd), step set to 5; if nonzero calls init_effect_slot_display_context(player_id, card_id, 6, 0), step +1.
+- State 1: extracts player_id, calls get_monster_slot_entry_ptr twice; reads slot_word extracting bits[13:6]*2 + bit[14] combined flag, calls render_spell_zone_sprite_with_field_copy_check; step set to 0xfa<<1=0x1f4.
+- State 5: set_lp_row_type7_if_opponent_linked(1-player_id); step set to 0xa, card_entry[+0x8]:=0.
+- State 0xa: enqueue_lp_counter_sprite_by_player(player_id).
+- Other: returns 1.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0xd
+- INIT_OP_TYPE=6
+- STEP_SPELL=5
+- STEP_LP=0xa
+- STEP_RENDER=0xfa<<1=0x1f4

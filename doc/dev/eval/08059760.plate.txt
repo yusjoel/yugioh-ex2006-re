@@ -1,0 +1,14 @@
+Banisher of the Light equip slot sprite 3-state sequence driver. Reads [0x0201b290+0x4ac] step counter, dispatches on 0/1/2:
+- State 0: extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x12).
+- State 1: calls set_equip_activation_state_by_mode_alt(player_id, 1, 0x080905e9).
+- State 2: calls check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d6c/+0x1d70] three player slot words, calls increment_lp_bar_display_counter, then two calls to submit_equip_sprite_if_slot_eligible, finally decrement_lp_bar_display_counter; if unconfirmed step counter -1.
+- Other: returns 1. Returns 0 (state advanced) or 1 (invalid state/unconfirmed).
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0x12
+- LP_OFF_A=0x1d68
+- LP_OFF_B=0x1d6c
+- LP_OFF_C=0x1d70
+- FN_PTR=0x080905e9

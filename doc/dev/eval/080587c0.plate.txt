@@ -1,0 +1,6 @@
+Called in equip activation display chain. Extracts player_id from card_entry[+2].bit0, calls enqueue_equip_zone_sprite_at_slot to queue sprite attr, then reads byte[+2].bit0 (nonzero_flag) and passes to set_lp_row_type2_with_nonzero_flag(player_id, flag1=1, unused=0, type=1). Fixed return 1 (signals slot handling complete). pop{r1};bx r1 exit.
+
+Constants:
+- LP_ROW_FLAG1=1 // set_lp_row_type2_with_nonzero_flag arg
+- LP_ROW_UNUSED=0
+- LP_ROW_TYPE=1

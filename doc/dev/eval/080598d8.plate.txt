@@ -1,0 +1,18 @@
+Equip ATK zone sprite display 6-state sequence driver. Reads [0x0201b290+0x4ac] step:
+- State 0: extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x1a). Step +1.
+- State 1: calls init_effect_slot_display_context(player_id, card_id, 6, 0) + increment_lp_bar. Step +1.
+- State 2: get_monster_slot_entry_ptr, writes card_entry[+0x8/+0xa/+0xc]=0, trigger op31(0x12). Step skip.
+- State 3: set_equip_activation_state_by_mode_alt(player_id, 1, 0x080905e9). Step +1.
+- State 4: check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d6c], get_equip_display_type_code_by_card_id; enumerates card_entry[+0xa] flag bits calling get_equip_display_criteria_code_by_card_and_slot + check_slot_card_equip_criteria_by_state_code; on success submit_equip_sprite_if_slot_eligible, increments card_entry[+0xa], compares card_entry[+0xc] with max. Else step -1.
+- State 5: extracts player_id+slot_idx, submit_equip_sprite_if_slot_eligible + decrement_lp_bar. Step +1.
+- Default: returns 1.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_1A=0x1a
+- OP31_12=0x12
+- INIT_OP_TYPE=6
+- LP_OFF_A=0x1d68
+- LP_OFF_B=0x1d6c
+- FN_PTR=0x080905e9

@@ -1,0 +1,11 @@
+Neo Daedalus equip slot 3-state sequence driver. Reads [0x0201b290+0x4ac] step:
+- State 0: extracts player_id, calls check_spell_zone_slot_placeable(player_id); returns -1 (0xffffffff) if 0. If nonzero calls dispatch_effect_for_neo_daedalus_eligible_slot(card_entry, aux); if 0 exits (-1). Else extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x56).
+- State 1: extracts player_id+card_id+slot_group, calls init_effect_slot_display_context(player_id, card_id, 6, slot_group).
+- State 2: extracts player_id, calls get_monster_slot_entry_ptr(player_id); calls enqueue_equip_zone_sprite_by_slot_ptr(player_id, ptr, 0).
+- Other: returns 1. Step +1 then returns 0.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0x56
+- INIT_OP_TYPE=6

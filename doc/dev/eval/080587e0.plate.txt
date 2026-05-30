@@ -1,0 +1,7 @@
+Equip display sequence frame driver. Reads [0x0201b290+0x4ac] step counter; if 0 executes sprite enqueue: reads card_entry[+2].bit0 (nonzero_flag), reads [+4].bits[14:8] (slot_group), calls enqueue_sprite_attr_type11(nonzero_flag, 0x16b8, slot_group, 1) to queue attr11 sprite, then calls enqueue_equip_zone_sprite_at_slot. Regardless of step, finally calls tick_equip_effect_slot_display_seq to advance main sequence. pop{r1};bx r1 exit.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- SPRITE_PARAM=0x16b8 // attr11 sprite index
+- SLOT_MASK_HI: lsls r3,r2,#0x11; lsrs r3,r3,#0x17 // bits[14:8]

@@ -1,0 +1,5 @@
+Type 0x80 filter dispatch wrapper for equip activation sequence. Reads card_entry[+2] halfword, extracts bits[11:6] with 0xfc0 mask; if equal to 0x80 calls tick_equip_effect_activation_display_seq__08059174(card_entry) to advance sequence; otherwise returns 1 (type mismatch). Structurally identical to 080592c4 (dispatch_equip_activation_seq_by_type25_or_5), sole difference is type check condition is 0x80 instead of 2/5. pop{r1};bx r1 exit.
+
+Constants:
+- TYPE_MASK=0xfc0 // 0xfc<<4
+- TYPE_CHECK=0x80

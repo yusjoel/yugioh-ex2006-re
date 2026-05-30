@@ -1,0 +1,13 @@
+Zone 14 equip activation 3-state sequence driver. Reads [0x0201b290+0x4ac] step:
+- State 0: extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x3a); calls set_equip_activation_state_by_mode(player_id, card_id, 0x080905e9). Step +1.
+- State 1: check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d6c], calls test_equip_target_zone14_with_ctx_clear(card_entry, player_b+player_c). Step +1. If unconfirmed step -1.
+- State 2: extracts player_id, calls classify_equip_card_id_tier_abc_short(card_entry) -> tier; calls set_lp_row_type2_with_sign_flags(player_id, tier, 0, 0). Returns 1 (complete).
+- Other: returns 1.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0x3a
+- LP_OFF_A=0x1d68
+- LP_OFF_B=0x1d6c
+- FN_PTR_MODE=0x080905e9

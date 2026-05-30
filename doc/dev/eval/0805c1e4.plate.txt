@@ -1,0 +1,4 @@
+Equip slot eligibility predicate (indeg=12, high-frequency hub). Reads card_entry, calls classify_equip_card_id_tier_abce(card_entry) -> tier; extracts byte[+2].bit0=player_id, halfword[+4].bits[14:8]=slot_group (lsls#0x11 lsrs#0x17, range [0..127]). Calls dispatch_equip_slot_scan_with_field6_guard(player_id, tier, slot_group, 0): if nonzero returns 1 (eligible), else returns 0 (not eligible). 12 direct bl callers spread across multiple subsystems (equip activation chain + banisher cluster).
+
+Constants:
+- No non-trivial literals (tier from classify, slot_group from bits[14:8])

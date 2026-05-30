@@ -1,0 +1,5 @@
+Simplified variant of equip display sequence frame driver. Reads [0x0201b290+0x4ac] step counter; if 0 calls enqueue_equip_zone_sprite_at_slot to queue sprite; regardless of step result, finally calls tick_equip_effect_slot_display_seq to advance main sequence. Compared to 080587e0, omits attr11 sprite enqueue step; suitable for slots that do not need type11 attribute sprites. pop{r1};bx r1 exit.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac

@@ -1,0 +1,14 @@
+Equip zone bitmap slot sprite 3-state sequence driver. Reads [0x0201b290+0x4ac] step:
+- State 0: writes card_entry[+0x8]=0, [+0xa]=0; extracts player_id, calls trigger_card_display_op31_if_not_active(player_id, 0x12). Step +1.
+- State 1: extracts player_id + card_id, calls set_equip_activation_state_by_mode(player_id, card_id, 0x08050ead). Step +1.
+- State 2: check_activation_display_state_is_confirmed; if confirmed reads gP1LP[+0x1d68/+0x1d6c], calls compute_slot_zone_eligibility_mask + count_set_bits_in_word; if bits>1 increments card_entry[+0xa]; calls submit_equip_sprite_if_slot_eligible; if count+[+0xa]>3 returns 1 (complete). Else step -1.
+- Other: returns 1.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- OP31_CODE=0x12
+- LP_OFF_A=0x1d68
+- LP_OFF_B=0x1d6c
+- FN_PTR_MODE=0x08050ead
+- MIN_BITS_THRESHOLD=3

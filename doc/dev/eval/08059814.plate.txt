@@ -1,0 +1,12 @@
+Equip effect node count display sequence driver. Reads [0x0201b290+0x4ac] step counter:
+- State 0: reads player_id and slot_idx from card_entry[+2], calls get_slot_effect_card_value to get effect count upper bound r6; increments r5 from 1, writes card_entry[+0xc]=r5 then calls count_effect_node_zone_activations for each, until first active node value r5 or r5>=r6. Reads [0x0201e2a0+player*4+8] confirm flag; if confirmed writes gP1LP[+0x1d40]=r6; else calls invoke_card_display_op_0x31_sub10(0x13d, r5, r6). Step +1, returns 0.
+- State 1: reads gP1LP[+0x1d40]=r2, writes card_entry[+0xc]=r2; calls enqueue_effect_card_slot_sprite_attr(player_id, slot_idx, -r2). Returns 1 (complete).
+- Other: returns 1.
+
+Constants:
+- STATE_BASE=0x0201b290
+- STEP_OFFSET=0x4ac
+- CONFIRM_TBL=0x0201e2a0
+- LP_COUNT_OFF=0x1d40 // 0xea<<5
+- OP31_SUB10_ARG=0x13d
+- LP_ROW_OFF=0x9e // 0x9f<<1 -- for invoke sub10

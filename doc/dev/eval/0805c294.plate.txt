@@ -1,0 +1,5 @@
+Neo Daedalus slot effect activation dispatch (7 direct bl callers). Extracts player_id from card_entry[+2].bit0 XOR byte[+3].bit5 (team_flag) = effective_player. Calls check_neo_daedalus_placement_eligible(card_entry); if 0 returns 0 (not eligible). If eligible: reads gP1LP[effective_player*0x868+0xc] for slot count upper bound r0; loops 0 to upper bound, each iteration calls dispatch_effect_handler_by_card_id(effective_player, card_id, slot_idx); if nonzero immediately returns 1 (found active slot). Loop end returns 0 (none found).
+
+Constants:
+- PLAYER_STRIDE=0x868
+- SLOT_COUNT_OFF=0xc // gP1LP[+0xc] = slot count

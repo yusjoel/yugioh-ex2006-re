@@ -1,0 +1,11 @@
+Equip zone bitmap update preprocessing function. Reads card_entry[+2] halfword bits[11:2] (0xfc0 mask); if equal to 0xa0<<1=0x140 (direct equip type) skips all checks. Otherwise scans 8 field slots (player_side*0x868 + slot*0x14), reads slot card_id; if card_id in [0x17ad..0x17af] (The First Sarcophagus related cards) accumulates position code into internal bitmap register. After loop calls update_equip_bitmap_zone_e_with_slot_save to update equip E zone bitmap, then calls count_field_copies_of_card(0x1332=Banisher of the Light); if none on field writes strh 1 to card_entry[+0xc], else writes 0. Fixed return 1.
+
+Constants:
+- FIELD_SLOTS=0x0201c510 (gDuelFieldSlots)
+- PLAYER_STRIDE=0x868
+- SLOT_SIZE=0x14
+- DIRECT_TYPE_CHECK=0x140 // 0xa0<<1
+- CARD_ID_LO=0x17ad // The First Sarcophagus range low
+- CARD_ID_HI=0x17af // The First Sarcophagus range high
+- BANISHER_ICID=0x1332 // Banisher of the Light
+- SLOT_COUNT=8 // loop [1..8]

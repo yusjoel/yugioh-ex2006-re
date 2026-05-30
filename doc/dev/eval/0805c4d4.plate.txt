@@ -1,0 +1,9 @@
+Neo Daedalus paired field slot effect activation dispatch. Triple check then triggers effect:
+(1) check_neo_daedalus_placement_eligible(card_entry) -> 0 returns 0.
+(2) count_paired_slots_both_sides(0xfe4) -> 0 returns 0 (no paired slots).
+(3) reads gP1LP[effective_player*0x868+0x10] = current state word; if nonzero returns 1 (already active). Else calls dispatch_effect_handler_by_card_id(effective_player, card_id, 0); if nonzero returns 1, else returns 0.
+
+Constants:
+- PAIRED_SLOT_ARG=0xfe4 // count_paired_slots_both_sides arg
+- PLAYER_STRIDE=0x868
+- ACTIVE_FLAG_OFF=0x10 // gP1LP[player*0x868+0x10] = activation state word

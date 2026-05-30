@@ -1,0 +1,5 @@
+Equip LP delta nonzero predicate wrapper. Allocates 8-byte stack buffer, passes sp as output pointer to dispatch_equip_lp_delta_by_card_id(card_entry, sp); that function writes two LP delta values to [sp+0] and [sp+4]. Reads [sp+0] and [sp+4]: if either nonzero returns 1 (LP change exists), if both zero returns 0. Used to determine if an equip card produces LP cost or gain. pop{r1};bx r1 exit.
+
+Constants:
+- STACK_FRAME=8 // sub sp,#8 for two delta outputs
+- .hword 0x4669 = mov r1,sp // pass sp as output buffer

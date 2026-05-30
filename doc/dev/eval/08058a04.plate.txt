@@ -1,0 +1,6 @@
+LP row type2 set wrapper in equip activation chain. Reads byte from card_entry[+2], extracts bit0 as player_id, calls set_lp_row_type2_with_nonzero_flag(player_id, 1, 0, 1). Fixed return 1. pop{r1};bx r1 exit. Compared to 080587c0, omits sprite enqueue step; only performs LP row type set; suitable for cases that only need to update LP row display state.
+
+Constants:
+- LP_ROW_FLAG1=1
+- LP_ROW_UNUSED=0
+- LP_ROW_TYPE=1
