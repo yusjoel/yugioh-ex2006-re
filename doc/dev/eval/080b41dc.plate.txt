@@ -1,0 +1,4 @@
+Equip target slot eligibility predicate for field6==0x17 effect nodes with cross-side check. Sibling pair with check_equip_slot_eligible_with_field6_0x16_cross_side (0x080b41b4); only difference is cmp r0,#0x17. Caller routes to this function by field6 value; verifies card field6=0x17 and ctx/effect_node are on different player sides. No external writes; pure predicate.
+
+Constants:
+- FIELD6_MATCH = 0x17

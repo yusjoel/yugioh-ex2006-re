@@ -1,0 +1,8 @@
+Equip activation composite eligibility predicate for Rapid-Fire Magician (0x1964) and Dark Eradicator Warlock (0x1982) special effect zone availability check. Flow: (1) calls dispatch_equip_lp_delta_by_card_id to compute LP delta for both players into stack; (2) reads own current LP + delta; if <= 0 returns 1 (LP insufficient -> effect available); (3) calls count_available_effect_zones(opponent, 0x1964, -1); non-zero -> return 1; (4) calls count_available_effect_zones(self, 0x1982, -1); non-zero -> return 1; (5) both zero -> return 0. Used by AI to evaluate equip activation for these two specific spell caster cards.
+
+Constants:
+- CARD_Rapid_Fire_Magician = 0x1964
+- CARD_Dark_Eradicator_Warlock = 0x1982
+- gP1LifePoints = 0x0201c4e0
+- PLAYER_STRIDE = 0x868
+- mode = -1 (rsbs r4,r4,#0)

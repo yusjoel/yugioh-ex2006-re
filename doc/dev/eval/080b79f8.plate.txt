@@ -1,0 +1,7 @@
+Equip activation eligibility predicate; iterates 5 effect node slots (index 0..4), calls invoke_effect_node_handler_3arg for each; if handler returns non-zero and node count > 1, calls get_slot_field6_score to verify non-zero score; first passing slot returns 1, all fail returns 0. Used in AI decision layer to determine whether any favorable activatable effect node exists.
+
+Constants:
+- BASE = 0x0201afe0 (gDuelEffectZones base)
+- NODE_STRIDE = 0x4 (r6 advances +4 per iteration)
+- SLOT_COUNT = 5 ([0..4])
+- MIN_NODE_COUNT = 2 (cmp r0,#1; bls -> needs > 1)

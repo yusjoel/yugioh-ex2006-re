@@ -1,0 +1,9 @@
+Renders card name to OBJ sprite VRAM row and updates BG palette row. Caller passes r0=pack_ctx_ptr, r1=scroll_state_ptr, r2=player_idx during pack card list refresh. Flow: computes OBJ VRAM row address (0xc0<<0x13 + row_offset*0x20); calls zero_fill_pack_obj_vram_region_alt to clear target region; clears scroll_state_ptr[+0x16]; if r0 non-null calls render_pack_card_name_to_sprite and writes return value to scroll_state_ptr[+0x14]; calls fill_pack_bg_tile_row_with_palette to fill BG palette row.
+
+Constants:
+- OBJ_VRAM_BASE = 0x6000000 (0xc0 << 0x13)
+- ROW_STRIDE = 0x20 (lsls #5)
+- ROW_STEP = 0x95 (r2==0) or 0x8a (r2!=0)
+- BG_BASE = 0x0600e000
+- BG_COLS = 0xa
+- pack_ui_state = 0x03005850

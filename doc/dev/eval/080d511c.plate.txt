@@ -1,0 +1,6 @@
+Pack label string render dispatch function; selects render_pack_label_str*_to_bg_vram based on r1=category [0..4] and r0=alt_mode [0..2]. Caller passes pack category index and display mode; function first adjusts base offset (r0==2: 0x28d - 0xd = 0x280), then uses r1 as jump table index (0..4 valid, else default) to dispatch to one of 6 render functions.
+
+Constants:
+- BASE_OFFSET = 0x28d (r0!=2)
+- ALT_OFFSET = 0x280 (r0==2, subs r2,#0xd)
+- MAX_CATEGORY = 4 (cmp r1,#4; bhi -> default)

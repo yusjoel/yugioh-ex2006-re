@@ -1,0 +1,7 @@
+Equip target slot composite eligibility predicate for field6==0x16 effect nodes; dual invoke_effect_node_handler_3arg validation. Similar to 0x080b4304 but adds a second handler invocation: first invoke confirms candidate validity; then temporarily clears effect_zone slot[+8] and writes side/type to slot[+6], invokes again; restores both fields before return. Returns 1 if both invocations pass. Side effects: temporarily modifies gDuelEffectZones slot [+8] and [+6] fields (restored on return).
+
+Constants:
+- FIELD6_MATCH = 0x16
+- SPELL_ZONE_FLAG = bits[28:26] (mask 0xe0 << 0xa)
+- PLAYER_STRIDE = 0x868
+- gDuelEffectZones = 0x0201c510

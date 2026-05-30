@@ -1,0 +1,5 @@
+Equip target random slot scan function. r0=effect_node_ptr (equip zone entry pointer), r1=player_id [0..1]. Builds 11-element slot index array [10..0] on stack; uses sample_prng_scaled for Fisher-Yates shuffle. Then performs two-player sweep (own player first, then opponent): for each shuffled slot index calls invoke_effect_node_handler_3arg(effect_node_ptr, player, slot_idx); if non-zero, calls enqueue_equip_slot_sprite_with_code_rotation and returns 1. Both sweeps fail -> return 0. Called by FUN_080b6be0 (equip target BST dispatch failure/default path) at LAB_080b6bf2.
+
+Constants:
+- SLOT_COUNT = 11 (slot index range [0..10])
+- PLAYER_COUNT = 2

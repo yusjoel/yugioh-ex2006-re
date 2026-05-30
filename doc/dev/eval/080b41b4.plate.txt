@@ -1,0 +1,4 @@
+Equip target slot eligibility predicate for field6==0x16 effect nodes with cross-side check. Called during equip activation when iterating effect node candidates with field6==0x16; verifies target slot card_id has field6=0x16 via get_card_extended_stat_field6, and that ctx and effect_node are on opposing player sides via check_slots_on_different_player_sides. No external writes; pure predicate.
+
+Constants:
+- FIELD6_MATCH = 0x16

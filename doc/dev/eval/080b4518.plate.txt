@@ -1,0 +1,9 @@
+Advanced equip target slot eligibility predicate combining equip target search, card stat field8 validation, and Neo Daedalus special path check. Called during equip activation to evaluate whether effect_node (r1) is a valid equip target. Core flow: (1) player_id cross-side check; (2) effect_node[+4] spell zone bit check; (3) read_effect_slot_side_and_type type <= 0xa; (4) find_equip_target_for_card_slot returns valid slot (not 0xffff); (5) check_card_stat_field8_is_8; (6) slot_idx > 4 -> Neo Daedalus path via check_neo_daedalus_placement_eligible, else find_first_available_monster_slot_for_player; (7) invoke_effect_node_handler_3arg final confirmation.
+
+Constants:
+- SPELL_ZONE_FLAG = bits[28:26] (mask 0xe0 << 0xa)
+- MAX_TYPE = 0xa
+- INVALID_SLOT = 0xffff
+- SLOT_THRESHOLD = 4
+- PLAYER_STRIDE = 0x868
+- gDuelEffectZones = 0x0201c510

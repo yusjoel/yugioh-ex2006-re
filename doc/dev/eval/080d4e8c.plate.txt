@@ -1,0 +1,7 @@
+Renders pack label name to OBJ sprite VRAM row and fills OBJ tile region. Caller passes r0=pack_ctx_ptr, r1=player_idx [0..1] during pack UI refresh. Flow: computes OBJ VRAM row address (0xc0<<0x13 + row_offset*0x20); calls zero_fill_pack_obj_vram_row_a to clear row; calls render_pack_label_name_to_sprite_vram to render label name; calls fill_pack_obj_tile_region_13col(0x0600e084, row, 0xf) to fill 13-column OBJ tile region.
+
+Constants:
+- OBJ_VRAM_BASE = 0x6000000 (0xc0 << 0x13)
+- ROW_STEP = 0x7b (player_idx==0 -> r5=0x7b; player_idx!=0 -> r5=0x70)
+- TILE_OBJ_LABEL = 0x0600e084
+- TILE_COLS = 0xf

@@ -1,0 +1,6 @@
+Equip target slot composite eligibility predicate for field6==0x16 effect nodes; five-gate validation chain. Called during equip activation to filter valid effect_node candidates; returns 0 if r1==NULL. Gate chain: (1) player_id sides differ; (2) effect_node[+4] bits[28:26] equals spell zone flag; (3) read_effect_slot_side_and_type type byte <= 0xa; (4) side byte matches r0 player_id; (5) invoke_effect_node_handler_3arg returns non-zero. All gates pass -> return 1. No external writes; pure predicate.
+
+Constants:
+- FIELD6_MATCH = 0x16
+- SPELL_ZONE_FLAG = 0x08000000 (bits[28:26] mask = 0xe0 << 0xa)
+- MAX_TYPE = 0xa

@@ -1,0 +1,7 @@
+Equip activation eligibility predicate; routes between two validation paths based on zone_ptr[+3] bits[5:4] flag. Path A (flags==0): delegates to check_card_pair_slot_count_eligible for card pair slot count check. Path B (flags!=0): iterates 5 effect zone slots [0..4] checking: (1) slot card_id upper 13 bits non-zero (valid card); (2) slot [+8] == 0 (unoccupied); (3) specific bit7 flag == 1. All satisfied -> return 1; no match after iteration -> return 0. No external writes; pure predicate.
+
+Constants:
+- SLOT_FLAG_MASK = 0x30 (bits[5:4] of zone_ptr[+3])
+- SLOT_COUNT = 5 ([0..4])
+- gDuelEffectZones = 0x0201c510
+- PLAYER_STRIDE = 0x868

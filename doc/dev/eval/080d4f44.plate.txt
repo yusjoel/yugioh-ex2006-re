@@ -1,0 +1,9 @@
+Pack name OBJ sprite scroll strip frame tick function for row 0. Each frame: reads pack_ui_state+0xc+0x10 counter; if > 0x1e (30), reads [+0x12] current offset, advances by +8 and mods by 0xc0<<6=0x3000 (12288); else sets offset to 0. If offset changed (r5 != r3), calls write_pack_obj_tile_strip(0x0600e000, row_offset, 0xf) to update tile strip. Side effects: updates [pack_ui_state+0xc+0x12] = (old + 8) % 0x3000; conditionally writes OBJ tile strip.
+
+Constants:
+- SCROLL_THRESHOLD = 0x1e (cmp r0,#0x1e)
+- SCROLL_STEP = 8 (adds r0,#8)
+- SCROLL_MOD = 0x3000 (0xc0 << 6 = 12288)
+- TILE_OBJ_BASE = 0x0600e000
+- TILE_COLS = 0xf
+- pack_ui_state = 0x03005850

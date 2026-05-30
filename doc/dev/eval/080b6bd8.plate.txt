@@ -1,0 +1,4 @@
+Equip sprite enqueue success exit stub. No independent inputs (r0/r1/r2 passed through from caller FUN_080b5d98 equip target BST dispatch context). Calls enqueue_equip_slot_sprite_with_code_rotation to enqueue equip sprite rotation animation, sets r0=1, then branches to restore_equip_dispatch_frame at shared exit frame. Serves as the convergence tail-jump point for multiple success branches of FUN_080b5d98; symmetric to failure exit FUN_080b6be0.
+
+Constants:
+- SUCCESS_CODE = 1 (fixed return value, movs r0,#1)

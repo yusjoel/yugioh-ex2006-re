@@ -1,0 +1,7 @@
+Pack card image render dispatch hub; routes render tasks based on r1 (banner_data_ptr) and r2 (card_frame_list_ptr) presence. Called during pack UI refresh. (1) r1 != NULL: extracts pack_id low 7 bits from banner_data[+0], calls render_pack_banner_to_slot; r1 == NULL: calls render_pack_banner_to_slot with -1 to clear banner. (2) r2 != NULL: iterates card_frame entries (up to 5), calls render_pack_card_frame_to_slot per entry; r2 == NULL: calls render_pack_card_frame_to_slot(-1) for all 5 slots. (3) reads banner_data[+0] bit7: non-zero -> fill_pack_card_slots_up_to_count(banner[+1] & 0xf); zero -> loops clear_pack_card_slot_tiles [0..4]. Side effects: writes OBJ VRAM banner region and BG tilemap card frame region.
+
+Constants:
+- MAX_CARD_SLOTS = 5 (cmp r4,#4 -> [0..4])
+- BANNER_ENABLE_BIT = 0x80 (bit7 of banner_data[+0])
+- CARD_COUNT_MASK = 0x0f (banner_data[+1] & 0xf)
+- PACK_ID_BITS = bits[6:0] of banner_data[+0]

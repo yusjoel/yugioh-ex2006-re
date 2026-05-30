@@ -1,0 +1,4 @@
+Equip activation eligibility predicate via LP delta sign check; determines whether equip effect is favorable by LP impact. Inputs r0=ctx_slot_ptr, r1=effect_node_ptr; returns 0 if r1==NULL. Calls dispatch_equip_lp_delta_by_card_id to compute LP delta for both players into stack buffer [sp+0]/[sp+4]. Reads player_id from ctx_slot_ptr[+2] bit0; extracts sign bit (bit31) of the corresponding LP delta: sign=0 (LP non-negative) -> return 0, sign=1 (LP decreases) -> return 1. Used in AI equip strategy evaluation.
+
+Constants:
+- PLAYER_STRIDE = 0x4 (sp slot stride: player_id<<2 selects [sp+0] or [sp+4])

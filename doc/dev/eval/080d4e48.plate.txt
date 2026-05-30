@@ -1,0 +1,7 @@
+Renders player-owned card count for a pack slot to OBJ sprite VRAM row. Caller passes r0=pack_ctx_ptr, r1=player_idx [0..1] during pack UI refresh. Flow: computes OBJ VRAM row address (0xc0<<0x13 + row_offset*0x20); calls count_owned_cards_in_pack_slot to get count; calls zero_fill_pack_obj_vram_row_b to clear row; calls render_pack_card_count_to_sprite_vram to render digit; calls fill_pack_obj_tile_region_13col_b(0x0600e09e, row, 0xf) to fill 13-column OBJ tile region.
+
+Constants:
+- OBJ_VRAM_BASE = 0x6000000 (0xc0 << 0x13)
+- ROW_STEP = 0x61 (player_idx==0 -> r6=0x61; player_idx!=0 -> r6=0x56)
+- TILE_OBJ_ALT = 0x0600e09e
+- TILE_COLS = 0xf
