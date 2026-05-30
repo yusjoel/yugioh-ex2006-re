@@ -1,0 +1,6 @@
+Writes a 4-column-wide tile attribute strip into VRAM. r0 high 16 bits = col_base_offset (saved to r10), low 16 bits = start_col (saved to sp+8); r1 = palette/attr base value (u16, written to sp+0); r2 = source tile attribute halfword array pointer; r3 = VRAM target row base pointer (saved to sp+4). Outer loop 8 rows (r9 from 0, cmp #7 bls), inner loop 4 columns (r4=0..3): reads halfword from r2, shifts right by col*4 to extract 4-bit nibble; if nibble != 0 calls write_tile_attr_byte_to_vram(col_base+r4, row_base+r5, nibble+palette_base, r3). Outer loop increments r2 by 2 each row. Called 4 consecutive times by 0x0801d208 with different column segments and attr bases. Returns void (Pattern B).
+
+Params: r0=u32 packed_col_info (hi16=col_base_offset [0..N], lo16=start_col [0..N]); r1=u16 palette_attr_base [0..0xff]; r2=ptr u16[] tile attribute nibble stream; r3=ptr u8[] VRAM row target base
+Returns: void (Pattern B: pop {r0}; bx r0)
+Side effects: via write_tile_attr_byte_to_vram: up to 4*8=32 tile attribute bytes written to VRAM
+Constants: COLS_PER_STRIP=4; ROWS_PER_STRIP=8

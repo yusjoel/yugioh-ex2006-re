@@ -1,0 +1,6 @@
+Banlist password input column cursor advance function. Reads gBanlistPasswordBuffer+0x66a bits[9:2] (column index) and +0x66b row_height byte; compares total offset to scroll limit at +0x66c; if at limit returns 0. Otherwise: increments column index by 1 (mod 0x7f), writes back to bits[9:2]; if new index==0xf and page is full (gBanlistPasswordBuffer+0x66e equals +0x66c), fixes index to 0x38 and returns 3 (page-full). Otherwise updates row_height; if row_height==4 calls advance_banlist_scrollbar_pos_page and clears row_height, returns 2. Normal step returns 1. Called by banlist character input frame (0x0801aa54) and banlist frame update (0x0801af70).
+
+Params: r0=(void -- no APCS input; entry clobbered by get_banlist_scroll_pixel_offset)
+Returns: r0=u32 status (0=at limit; 1=normal step; 2=page advance; 3=page-full)
+Side effects: [gBanlistPasswordBuffer+0x66a] bits[9:2] := new_col_idx; [gBanlistPasswordBuffer+0x66b] bits[3:1] := new_row_height
+Constants: BUF_BASE=gBanlistPasswordBuffer; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; LIMIT_HALFWORD_OFF=0x66c; COL_WRAP_MASK=0x7f; ROW_MAX=4; COL_IDX_FULL=0xf; FIXED_FULL_IDX=0x38; MASK_CLEAR_COL=0xfffffe03

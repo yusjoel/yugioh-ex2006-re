@@ -1,0 +1,6 @@
+Campaign card-select UI OAM frame tick. Reads 0x02023360+0x36 byte bits[6:3] as display_mode [0..3] and dispatches four ways: mode 0/2: using ROM table base 0x09e59d38 and OAM attr table 0x0300024c, loops 0x1d times (29 OAM entries), calls write_oam_entry_from_packed_args and write_oam_entry_with_slot_check to write OAM attrs; mode 1: checks gPrng+0x20c halfword bit4 (mask 0x10), if condition met enters alternate branch render; mode 3: reads effect_slot data, validates slot match, then calls write_oam_entry_from_packed_args + write_oam_entry_with_slot_check. indeg=0, Sub-type A (no fn-ptr table reference found). Returns void (Pattern B).
+
+Params: r0=(none -- no APCS input; push {r4..r7}; internal load r7=0x02023360 at entry)
+Returns: void (Pattern B: pop {r0}; bx r0)
+Side effects: via write_oam_entry_from_packed_args: OAM entry attr0/attr1/attr2 written (mode 0/2/3 paths); via write_oam_entry_with_slot_check: OAM entry written after validity check (mode 0/2/3 paths)
+Constants: SCENE_BASE=0x02023360; DISPLAY_MODE_OFF=0x36 (bits[6:3]=[0..3]); OAM_TABLE_BASE=0x09e59d38; OAM_ATTR_BASE=0x0300024c; LOOP_COUNT=0x1d=29; OAM_ATTR0_BASE=0x90<<14=0x240000; OAM_ATTR1_BASE=0x8c<<15=0x460000

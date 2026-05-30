@@ -1,0 +1,6 @@
+Banlist password input scroll view frame tick. Reads gBanlistPasswordBuffer+0x665 byte bits[7:4] as view_state [0..2] and dispatches three ways: state==0: calls zero_obj_tile_vram_range+render_banlist_char_obj_row to render character row, writes gBanlistPasswordBuffer+0x672/0x673 and calls gl_set_blend2_level; state==1: calls tick_banlist_card_slot_anim_oam+setup_banlist_sprite_oam_row_batch to drive OAM animation row; state==2: checks gPrng state random bit, if satisfied calls gl_set_blend2_level+sync_state_and_init_sprite(0x24), then tick_banlist_card_slot_anim_oam+setup_banlist_sprite_oam_row_batch. Returns void (Pattern B). Called by 0x0801b5d8 (banlist scene main frame tick) on state==1 branch.
+
+Params: r0=(none -- push {r4..r7,lr}; r10 alias of r0 via internal literal 0x14; no APCS input)
+Returns: void (Pattern B: pop {r0}; bx r0)
+Side effects: state==0: VRAM obj tiles 0x144..0x144+0x90 zeroed; character OBJ row written; [gBanlistPasswordBuffer+0x672]:=0x8; [gBanlistPasswordBuffer+0x673]:=state_mode+1; blend register updated. state==1/2: OAM sprite row attributes batch-written. state==2: sprite state initialized.
+Constants: BUF_BASE=gBanlistPasswordBuffer; VIEW_STATE_OFF=0x665 (bits[7:4]=[0..2]); OBJ_TILE_START=0x144 (0xa2<<1); OBJ_TILE_COUNT=0x90; BLEND2_TARGET_REG=0x2f; SYNC_SPRITE_CODE=0x24; PRNG_RNG_MASK=0x30f

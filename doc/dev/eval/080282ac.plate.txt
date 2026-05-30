@@ -1,0 +1,6 @@
+Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 12 handler. No independent push prologue (inline exit fragment). .hword 0x4668=mov r0,sp reads parent frame stack; ldrh r0,[r0+2] reads SIO received halfword; movs r1,#1; bl apply_delta_to_hand_oam_entry__080f90a8 applies delta=+1 to hand OAM entry (scroll up). Then jumps to LAB_080282b6 shared tail: init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(8) + b finalize_campaign_card_select_frame. Only difference from run_campaign_card_select_handler_11 (0x080282a0): calls apply_delta_to_hand_oam_entry__080f90a8 instead of apply_delta_to_hand_oam_entry. Called via PTR_FUN_08027ec0 entry index 12 at table addr 0x08027ef0.
+
+Params: r0=(none -- inline fragment, no APCS input)
+Returns: void (b finalize_campaign_card_select_frame)
+Side effects: via apply_delta_to_hand_oam_entry__080f90a8: hand OAM entry y offset +1; via init_puzzle_wram_then_copy: puzzle WRAM initialized; via build_campaign_sprite_row_by_type(8): VRAM sprite row written
+Constants: HAND_OAM_DELTA=1; SPRITE_ROW_TYPE=8

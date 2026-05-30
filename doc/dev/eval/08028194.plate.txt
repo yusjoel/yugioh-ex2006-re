@@ -1,0 +1,6 @@
+Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 7 handler. No independent push prologue (inline exit fragment). Calls check_siocnt_link_ready; if SIO ready: reads parent frame sp+2 halfword (SIO received data), writes to 0x0201e2a0+0x10 (card_cmd field) and +0x0 (card_id field); calls build_campaign_sprite_row_by_type(7). Regardless of SIO state: reads gPrng+OAM field to update OAM attr (clears/sets bit1 by 3-bit truncation), sets r3=0xf0<<3=0x780, branches LAB_080281c0 to execute strh + b finalize_campaign_card_select_frame. Called via PTR_FUN_08027ec0 entry index 7 at table addr 0x08027edc.
+
+Params: r0=(none -- inline fragment, no APCS input)
+Returns: void (b finalize_campaign_card_select_frame)
+Side effects: [0x0201e2a0+0x10] := SIO sp+2 halfword (card_cmd); [0x0201e2a0+0x0] := SIO sp+4 halfword (card_id); via build_campaign_sprite_row_by_type(7): VRAM sprite row written
+Constants: CARD_CMD_BASE=0x0201e2a0; CARD_CMD_OFF=0x10; CARD_ID_OFF=0x0; SPRITE_ROW_TYPE=7; OAM_ATTR_MASK=0xf0<<3=0x780

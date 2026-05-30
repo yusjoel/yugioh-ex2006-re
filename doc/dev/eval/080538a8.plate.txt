@@ -1,0 +1,6 @@
+Equip slot eligibility two-path dispatch predicate. r0=card_slot_ptr, r1=player_id [0..1], r2=zone_slot_idx [0..0x14]. Reads slot[+0xc] halfword type field: if type==2 (direct equip type): uses slot[+0] card_id (ldrh r4,[r5+0]) to call check_slot_equip_whitelist_with_monster_space(r1, r2, card_id); if whitelist passes calls query_slot_card_type_eligibility(r0,r1,r2); if type eligibility==0 returns 0 (reject); if type!=2: directly calls check_equip_slot_eligible_by_opposite_type_and_prereqs(r0,r1,r2). Returns transparent result of called function (Sub-case E).
+
+Params: r0=ptr card_slot (equip slot pointer); r1=u32 player_id [0..1]; r2=u32 zone_slot_idx [0..0x14]
+Returns: r0=u32 bool (1=eligible, 0=rejected; Sub-case E: pop {r1}; bx r1)
+Side effects: none (pure read-only predicate)
+Constants: SLOT_TYPE_DIRECT=2 ([+0xc]==2 whitelist path)

@@ -1,0 +1,6 @@
+Banlist secondary card slot animation tick, symmetric sibling of tick_banlist_card_slot_anim_primary (0x0801b1a0). Reads gBanlistPasswordBuffer+0x66a bits[9:2] as scroll_col_idx [0..127] and +0x66b bits[3:1] as row_height; calls __divsi3(scroll_col_idx, 5) to get quotient q; computes x=q*12+scroll_col_idx*12, y=row_height*(14*2)+0x16; calls call_tick_banlist_card_slot_anim with flag=-1, frame=0xe. Returns void (Pattern B). Called each frame by 0x0801b284 immediately after primary slot animation, driving the password column secondary slot animation.
+
+Params: r0=(void -- no APCS input; push {r4,r5,r6,lr})
+Returns: void (Pattern B: pop {r4,r5,r6}; pop {r0}; bx r0)
+Side effects: via call_tick_banlist_card_slot_anim: secondary slot OAM animation state updated
+Constants: BUF_BASE=gBanlistPasswordBuffer; SCROLL_COL_OFF=0x66a (bits[9:2]=[0..127]); ROW_HEIGHT_OFF=0x66b (bits[3:1]=[0..4]); COL_STEP=12; ROW_STEP=0x1c (14*2); BASE_Y=0x16; ANIM_FRAME_ID=0xe; FLAG_ACTIVATE=-1

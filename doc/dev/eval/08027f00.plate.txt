@@ -1,0 +1,6 @@
+Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 0 handler. No independent push prologue (inline exit fragment, inherits parent frame registers). Entry .hword 0x4668=mov r0,sp reads parent frame stack pointer; ldrh r1,[r0+2] reads SIO message sub_cmd; compares to 0x2c06 -- if not equal jumps LAB_08028404 (notifies parent frame no action taken). If equal: calls check_siocnt_link_ready to verify SIO ready; if not ready skips build_campaign_sprite_row_by_type(0); continues to read gPrng+OAM field to update OAM tile frame, then branches to LAB_080280b2 shared frame-end path. Called via PTR_FUN_08027ec0 entry index 0.
+
+Params: r0=(none -- inline fragment, parent frame stack via mov r0,sp; no independent APCS input)
+Returns: void (b LAB_08028404 shared epilogue)
+Side effects: via build_campaign_sprite_row_by_type(0): VRAM sprite row written
+Constants: SIO_CMD_MATCH=0x2c06; SPRITE_ROW_TYPE=0

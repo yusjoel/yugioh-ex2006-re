@@ -1,0 +1,6 @@
+Vija scene BG3 forward scroll tick. Each frame reads 0x02029eb0+0x8c (vija_state.scroll_phase, u8), takes mod 0xa0 to get scroll_offset [0..0x9f], passes to apply_bg3_scroll_masked(0, scroll_offset) to update BG3 horizontal scroll; then increments scroll_phase by 2, wraps back if new value exceeds 0xa0 (subtracts 0x9e). Symmetric sibling tick_vija_bg3_scroll_backward (0x0801c59c) scrolls in reverse with period 0xf0. Returns void (Pattern B). indeg=0, Sub-type A (no fn-ptr table reference found).
+
+Params: r0=(none -- no APCS input; push {r4,lr}; entry ldr r0=VIJA_STATE)
+Returns: void (Pattern B: pop {r0}; bx r0)
+Side effects: [0x02029eb0+0x8c] := (scroll_phase+2) mod 0xa0; via apply_bg3_scroll_masked: BG3 H-scroll register updated
+Constants: VIJA_STATE=0x02029eb0; SCROLL_PHASE_OFF=0x8c; SCROLL_PERIOD=0xa0; SCROLL_STEP=2

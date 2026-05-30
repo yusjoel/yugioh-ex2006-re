@@ -1,0 +1,6 @@
+Equip slot eligibility predicate dispatching by slot[+0xc] type field through three chain verification paths. r0=card_slot_ptr, r1=player_id [0..1], r2=zone_slot_idx. type==1: calls check_equip_slot_eligible_by_card_id_dispatch_b to confirm card ID eligibility; builds temporary node (memset 0x18 bytes to sp), writes side/slot attribute bytes; loops slot [0..4] calling check_equip_slot_eligible_by_card_id_and_prereqs to find match. type==2: verifies slot[+2] bit0==player_id (same side), zone_slot_idx [5..9]; double-loops player x slot calling find_equip_chain_node_by_slot_pair, checks return value in range [0xa..0xb] (chain node type). type==3: calls read_effect_slot_side_and_type to read effect slot; verifies player side consistent and zone differs; calls find_zone_chain_node_by_card_id_pair + check_slot_card_special_activation_eligible + count_zone_pair_hits_with_fn_ptr. Returns 1 on success, 0 on fail (Sub-case E).
+
+Params: r0=ptr card_slot; r1=u32 player_id [0..1]; r2=u32 zone_slot_idx [0..0x14]
+Returns: r0=u32 bool (1=eligible, 0=rejected; Sub-case E: pop {r1}; bx r1)
+Side effects: none (pure read-only predicate; sp temp buffer is local only)
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14; CHAIN_NODE_TYPE_MIN=0xa; CHAIN_NODE_TYPE_MAX=0xb

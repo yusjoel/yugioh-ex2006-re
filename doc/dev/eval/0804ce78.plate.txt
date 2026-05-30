@@ -1,0 +1,6 @@
+Card target eligibility state machine frame dispatch. Reads gP1LifePoints+0x574 state word [0..0x1f], dispatches via 32-entry switch table (switchD_0804ce98): case 0: increments counter (+1) then falls through to case 1; case 1: verifies r1-indexed slot card bits[18:0] non-zero, calls check_equip_target_card_id_eligible + check_normal_summon_eligible_by_card_tables; if both pass writes gP1LifePoints+0x574=0xb and returns 0 (success), otherwise returns 1 (reject); cases 0xa/0xb: calls check_card_stat_field_validity series; cases 0x14/0x15: reads gP1LifePoints+0x584; cases 0x1e/0x1f: writes gP1LifePoints+0x584=1; states beyond 0x1f jump caseD_3 returning 1. r0=card_slot_ptr, r1=slot_idx [0..4]; Sub-case E exit.
+
+Params: r0=ptr card_slot (equip slot pointer); r1=u32 slot_idx (target zone slot [0..4])
+Returns: r0=u32 result (0=success/advance, 1=reject/fail; Sub-case E: pop {r1}; bx r1)
+Side effects: [gP1LifePoints+0x574] := new_state (updated by various cases); [gP1LifePoints+0x584] := 1 (cases 0x1e/0x1f path); via check_* callees: indirectly reads gDuelFieldSlots
+Constants: STATE_BASE=gP1LifePoints=0x0201b290; STATE_OFF=0x574 (state_word [0..0x1f]); NEXT_STATE_ELIGIBLE=0xb; MAX_STATE_IDX=0x1f

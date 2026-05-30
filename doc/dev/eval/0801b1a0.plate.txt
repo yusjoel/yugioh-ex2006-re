@@ -1,0 +1,6 @@
+Banlist primary card slot animation tick. Reads gBanlistPasswordBuffer+0x660 halfword bits[13:10] as state_mode (4-bit [0..0xe]) and bits[5:2] from +0x661 as cursor_slot (4-bit [0..5]); computes OAM y offset (mode*14*2+0x48) and x (cursor_slot*14*2). Special case: state_mode==0xe and cursor_slot==5 uses fixed y=0x90, x=0xc8, count=9. Calls call_tick_banlist_card_slot_anim(r0=0, r1=count, r2=x, r3=y, sp[0]=0, sp[4]=0xe) to drive primary slot animation; then calls tick_banlist_oam_palette_fade. Returns void (Pattern B: pop {r0}; bx r0). Called each frame by 0x0801b284.
+
+Params: r0=(void -- no APCS input; clobbered at entry by gBanlistPasswordBuffer load)
+Returns: void (Pattern B)
+Side effects: via call_tick_banlist_card_slot_anim: OAM slot animation state updated; via tick_banlist_oam_palette_fade: OAM palette fade state updated
+Constants: BUF_BASE=gBanlistPasswordBuffer; MODE_FIELD_OFF=0x660 (0xcc<<3); CURSOR_SLOT_OFF=0x661; MODE_STEP=0x1c (14*2); BASE_Y=0x48; SPECIAL_MODE=0xe; SPECIAL_SLOT=5; SPECIAL_Y=0x90; SPECIAL_X=0xc8; SPECIAL_COUNT=9; ANIM_FRAME_ID=0xe

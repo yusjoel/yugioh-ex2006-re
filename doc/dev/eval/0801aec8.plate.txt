@@ -1,0 +1,6 @@
+Banlist password input column cursor retreat function. Symmetric counterpart of advance_banlist_scroll_column_and_page (0x0801ae0c). Reads gBanlistPasswordBuffer+0x66a bits[9:2] column index plus row_height offset; if total offset<=0 checks scroll_pixel_offset and returns 0 if also <=0. If column index is 0: calls retreat_banlist_scrollbar_pos_page then fixes column index to 0x38, returns 2 (page retreat). Otherwise decrements column index by 1 (mod 0x7f) and returns 1. Called by banlist character back frame (0x0801ab00) and banlist main frame (0x0801af70).
+
+Params: r0=(void -- no APCS input; push {r4,r5,lr})
+Returns: r0=u32 status (0=at start; 1=normal retreat; 2=page retreat; 3=page-boundary)
+Side effects: [gBanlistPasswordBuffer+0x66a] bits[9:2] := new_col_idx (decremented); [gBanlistPasswordBuffer+0x66b] bits[3:1] := new_row_height (some paths)
+Constants: BUF_BASE=gBanlistPasswordBuffer; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; COL_WRAP_MASK=0x7f; FIXED_RETREAT_IDX=0x38; MASK_CLEAR_COL=0xfffffe03

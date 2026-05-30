@@ -7,11 +7,11 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 3855 / 全 CSV 4641 行 = **83.07%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 3875 / 全 CSV 4641 行 = **83.50%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
-- **Phase 4 进行中**: 重导后 ready 集合 **465 函数** (batches #172..#195, 24 批, 2026-05-30 锁定)。剩余 341 FUN_* 被未命名 callee 阻塞 → Phase 5 重算解锁。
+- **Phase 4 进行中**: 重导后 ready 集合 **465 函数** (batches #172..#195, 24 批, 2026-05-30 锁定)。已完成 40/465 (batches #172..#173)。剩余 341 FUN_* 被未命名 callee 阻塞 → Phase 5 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -54,13 +54,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #173 |
+| **阶段** | Phase 4 进行中 — 24 批 (#172..#195) 锁定; 下一批 #174 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-30 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 3855 (83.07%) |
-| **未命名 (FUN_*)** | 786 (其中 445 ready / 341 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 4)** | 445 函数 (批 #173..#195 未完成部分), 处理中 |
-| **下一批** | #173 (Phase 4 idx 1) — `ready_batches_phase4.json` |
-| **上次更新** | 2026-05-30 (batch #172 PASSED: name-input/banlist pass-input cluster, 3855/4641 = 83.07%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 3875 (83.50%) |
+| **未命名 (FUN_*)** | 766 (其中 425 ready / 341 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 4)** | 425 函数 (批 #174..#195 未完成部分), 处理中 |
+| **下一批** | #174 (Phase 4 idx 2) — `ready_batches_phase4.json` |
+| **上次更新** | 2026-05-30 (batch #173 PASSED: banlist scroll/Vija BG3 + campaign card-select handlers + equip-chain/eligibility cluster, 3875/4641 = 83.50%) |
 | **callgraph 时间戳** | 2026-05-30 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 4 已重导锁定; Phase 5 前须再重导) |
 | **ready_locked** | `true` (Phase 4 465 集合锁定; Phase 5 前须重算 ready) |
@@ -111,7 +111,7 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 |------|-------:|--------------:|-----:|
 | Phase 1 campaign 闭包 | 1689 (1526 + 跨根 池 163) | 9 (B_invoker/B_runtime) | ~99.5% |
 | Phase 2 ready 集合 (锁定 766) | 766 | 0 | 100.00% |
-| **全 Ghidra (4641 函数)** | **3855** | **786** | **83.07%** |
+| **全 Ghidra (4641 函数)** | **3875** | **766** | **83.50%** |
 | **Phase 3 ready 集合 (新一轮)** | 1069 (54 批全部完成) | **0** | 100.00% |
 
 ---

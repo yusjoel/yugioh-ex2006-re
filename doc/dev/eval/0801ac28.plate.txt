@@ -1,0 +1,6 @@
+Banlist scroll position step function. Reads gBanlistPasswordBuffer+0x66a halfword bits[9:2] (current scroll column index [0..127]) plus row_height weight from +0x66b bits[3:1] (row*(row>>1)*14); compares to scroll limit at +0x66c. If at limit returns 0 (cannot step). Otherwise: calls get_banlist_scroll_pixel_offset, computes sub-step via __modsi3(offset, SCROLL_SUBSTEP_DIV=0xf), merges (sub_step & SCROLL_COL_MASK=0x7f)<<2 into bits[9:2]; divides via __divsi3 for row step, writes to bits[1:0]. Returns 1 on success. Used by banlist character grid forward scroll.
+
+Params: r0=(none, clobbered at entry)
+Returns: r0=u32 bool (1=stepped, 0=at limit)
+Side effects: [gBanlistPasswordBuffer+0x66a] bits[9:2] := new_scroll_idx [0..127]; [gBanlistPasswordBuffer+0x66b] bits[1:0] := div_step
+Constants: BUF_BASE=gBanlistPasswordBuffer=0x02029810; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; LIMIT_HALFWORD_OFF=0x66c; SCROLL_SUBSTEP_DIV=0xf; SCROLL_COL_MASK=0x7f
