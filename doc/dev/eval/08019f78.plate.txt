@@ -1,0 +1,7 @@
+refresh_banlist_pass_chars_font_rows: Banlist pass-input scene -- refreshes up to 4 rows of password char font display. First zeros BG2 char VRAM for specified region (based on row number r6 and stride 0xbd<<5=0x17a0), re-inits BG2 font context; then loops up to 4 times: for each valid (non-null) password pointer, computes col offset and calls render_banlist_password_chars_grid. Called after char append/delete to incrementally refresh display.
+
+Constants:
+- MAX_ROWS = 4
+- CHAR_VRAM_STRIDE = 0xbd<<5 = 0x17a0 = 6048
+- FILL_CTRL = 0x80<<0x11 = 0x01000000
+- COL_WIDTH = 0xc = 12

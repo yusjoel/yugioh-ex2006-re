@@ -1,0 +1,3 @@
+invoke_noop_text_variant_zero: Minimal wrapper -- sets r2=0 then branches to return_noop_text_variant (0x080197cc). return_noop_text_variant is a no-op text variant stub in banlist/pass_input region; this function presets r2=0 to select variant=0 path. indeg=0 leaf, likely an unconnected placeholder wrapper.
+
+No non-trivial constants (single movs r2,#0 before bl).

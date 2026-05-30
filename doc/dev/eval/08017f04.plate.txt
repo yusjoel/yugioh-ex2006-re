@@ -1,0 +1,5 @@
+render_name_input_scroll_row: Name-input scene scroll-row render. Takes scroll direction r0; reads current scrollbar state; if direction==1 calls find_name_char_at_idx to locate target char; then calls render_jp_string_to_bg_row to render JP string to BG row; finally calls fill_tilemap_rect_with_palette. Triggered on user up/down scroll to refresh one BG tile row.
+
+Constants:
+- SCROLL_UP = 1
+- SCROLL_DOWN = 0

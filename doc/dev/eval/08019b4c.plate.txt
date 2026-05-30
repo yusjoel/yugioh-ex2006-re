@@ -1,0 +1,5 @@
+render_banlist_pass_char_obj_rows_pair: Banlist pass-input scene -- renders two strings (ID 0x1038 + 0x1039) as OBJ tile rows. Loads each string, measures pixel width, zeros the corresponding OBJ tile VRAM region, then calls render_banlist_char_obj_row for each. Called during password-input interface init to generate OBJ display data for two label rows.
+
+Constants:
+- STR_ID_A = 0x1038
+- STR_ID_B = 0x1039

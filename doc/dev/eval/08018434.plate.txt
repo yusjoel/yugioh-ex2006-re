@@ -1,0 +1,8 @@
+tick_name_input_scrollbar_and_anims: Name-input scene per-frame tick. Three OAM updates: (1) calls update_scrollbar_thumb_display to refresh scrollbar thumb; (2) calls render_obj_slot_cell_anim for OBJ slot A cell animation; (3) calls render_obj_slot_cell_anim for OBJ slot B cell animation. The two render_obj_slot_cell_anim calls pass different slot params, typically cursor and selection-box animations.
+
+Constants:
+- SCROLLBAR_STRUCT_OFF = 0xc1<<2 = 0x304
+- LANG_CHECK_OFF = 0xc6<<2 = 0x318
+- ANIM_SLOT_A_RANGE = 0xe0 = 224
+- ANIM_SLOT_B_RANGE = 0xe1 = 225
+- ANIM_SLOT_PARAM = 0x20 = 32

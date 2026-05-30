@@ -1,0 +1,5 @@
+tick_name_input_cursor_sprite: Name-input scene per-frame tick. Reads char count field; if at limit (== char_limit) skips tile update. Otherwise calls get_name_input_cursor_tile to get current cursor tile number, then calls render_obj_slot_cell_anim to write cursor animation to OBJ slot. Called each frame by name_input_page_tick to drive cursor blink.
+
+Constants:
+- CHAR_COUNT_OFF = 0x31e
+- CHAR_LIMIT_OFF = 0x31f

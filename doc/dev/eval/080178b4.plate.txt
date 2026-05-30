@@ -1,0 +1,7 @@
+load_game_str_pair_1004_to_state: Name-input scene init -- loads game strings ID 0x1004 and 0x1005 into gState+0x8d buffer, calls pad_str_to_char_multiple to align each to 12-char multiple. Reads game_str_pointer_table and game_str_ja tables. Called during name_input / banlist BG init flow to pre-fill name display rows.
+
+Constants:
+- STR_ID_A = 0x1004
+- STR_ID_B = 0x1005
+- PAD_UNIT = 12
+- STATE_BUF_OFF = 0x8d

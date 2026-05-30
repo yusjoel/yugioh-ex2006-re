@@ -1,0 +1,9 @@
+init_banlist_pass_input_bg0_page: BG0 init for banlist password-input scene. Steps: (1) get_bg0_screen_vram_addr + bios_cpu_fast_set zeros BG0 tilemap; (2) get_bg0_char_vram_addr + bios_cpu_fast_set zeros BG0 char VRAM at offset 0x20; (3) reject_banlist_input_event installs password-input reject event handler; (4) init_font_jp_ctx_bg_vram_text inits JP font context; (5) 6-iteration loop calls render_banlist_password_chars_row per row (14 chars/row, step=14); (6) fill_tilemap_rect_with_palette fills BG0 tilemap 25x11 region at (0,0). Called as one of the scene init steps when entering the password-input interface.
+
+Constants:
+- BIOS_CPUSET_SCREEN = 0x01000200
+- BIOS_CPUSET_CHAR = 0x01000898
+- ROW_COUNT = 6
+- CHARS_PER_ROW = 14
+- TILEMAP_W = 0x19 = 25
+- TILEMAP_H = 0xb = 11

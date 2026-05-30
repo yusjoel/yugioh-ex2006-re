@@ -1,0 +1,9 @@
+tick_name_input_oam_fade: Name-input scene per-frame tick. Two OAM updates: (1) calls render_obj_slot_cell_anim to advance an OBJ slot cell-frame animation; (2) calls tick_oam_palette_fade_settings to advance OAM palette fade. Sibling of tick_name_input_scrollbar_and_anims (0x08018434); the two cover scrollbar+dual-anim and single-anim+palette-fade respectively.
+
+Constants:
+- LANG_MODE_OFF = 0xc5<<2 = 0x314
+- LANG_MODE_THRESHOLD = 0xb = 11
+- CELL_ANIM_SLOT_A = 0xc = 12
+- CELL_ANIM_SLOT_B = 0xd = 13
+- CELL_ANIM_PARAM = 0x8 = 8
+- CURSOR_FIELD_OFF = 0x315

@@ -1,0 +1,5 @@
+append_banlist_input_char: Appends one character to the input buffer in the banlist name-input scene. Checks if current char count (gState+0x31e) has reached the limit (gState+0x31f); if full, returns 0 (fail). Otherwise calls read_banlist_char_at_scroll_pos to get the char at scroll position, appends it to the buffer end, calls refresh_selected_char_obj_tile to refresh the OBJ tile, and returns 1 (success). Return value preserved via pop {r1}; bx r1 exit (Sub-case E).
+
+Constants:
+- CHAR_COUNT_OFF = 0x31e
+- CHAR_LIMIT_OFF = 0x31f

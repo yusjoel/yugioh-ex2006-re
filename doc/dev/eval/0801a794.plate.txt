@@ -1,0 +1,6 @@
+tick_banlist_scrollbar_and_slot_anim: Banlist pass-input scene per-frame tick. Three updates: (1) calls update_scrollbar_thumb_display with gBanlistPasswordBuffer+0x64c to refresh scrollbar thumb; (2) calls get_scrollbar_range_param to get range, subtracts 1; (3) calls call_tick_banlist_card_slot_anim(r0=0, r1=2, r2=0xe0, r3=range-1) to advance slot animation. Cross-scene sibling of tick_name_input_scrollbar_and_anims (0x08018434).
+
+Constants:
+- SCROLLBAR_OFFSET = 0x64c
+- ANIM_R1 = 2
+- ANIM_R2 = 0xe0 = 224

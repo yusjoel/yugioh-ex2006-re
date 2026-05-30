@@ -1,0 +1,9 @@
+decode_char_frame_to_vram: Main character-frame decode function in name-input scene. Takes input buffer ptr (r0), char count (r1), encode mode (r2), VRAM target base (r3). Completes in ~0x5a0-byte stack frame: (1) reads 2-byte chars by mode 0/1, calls dispatch_jp_char_handler for conversion, fills internal stack buffer; (2) calls pack_bytes_to_vram_bits to compress byte sequence into VRAM bitmap format; (3) calls xor_buf_bytes to XOR-scramble result; (4) calls validate_complement_checksum -- on fail calls suppress_display_output and returns -1; (5) runs two-level bit-field decode loop writing char attributes to VRAM target region. Returns decoded bit-field count on success, -1 on failure.
+
+Constants:
+- STACK_FRAME_SIZE = 0x5a0
+- MODE_IDENTITY = 0
+- MODE_BYTE_SWAP = 1
+- BIOS_CPUSET_CTRL = 0x01000168
+- CHAR_DECODE_LIMIT = 0x86
+- PACK_COUNT = 0x40

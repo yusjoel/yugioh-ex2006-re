@@ -1,0 +1,6 @@
+init_banlist_pass_chars_grid_row: Banlist pass-input scene -- inits single-row password char grid display. Takes row index (r1) and password ptr (r0); calls init_font_jp_ctx_bg2_char_vram to init BG2 font context (col-width 0xc); then 14 iterations of clear_tile_buf_col_range; finally calls render_banlist_password_chars_grid to render char grid to that row. Called per-row during password interface init.
+
+Constants:
+- COL_WIDTH = 0xc = 12
+- ROWS_PER_CALL = 0xe = 14
+- ITER_COUNT = 0xe = 14

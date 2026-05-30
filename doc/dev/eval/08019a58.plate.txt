@@ -1,0 +1,6 @@
+encode_pass_table_entry_to_line_buf: Banlist pass-input scene -- takes password char table entry pointed to by caller-frame r10, encodes each char via encode_char_to_line_buf into line buffer, then calls pad_str_to_char_multiple to align to 90 or 15 cols. Cross-scene sibling of encode_str_table_entry_to_line_buf (0x08017a24); symmetric structure, only state base and alignment widths differ (name_input: 60/12, pass_input: 90/15).
+
+Constants:
+- PAD_WIDE = 90
+- PAD_NARROW = 15
+- PASS_TABLE_ENTRY_STRIDE = 8

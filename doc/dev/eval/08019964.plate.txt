@@ -1,0 +1,7 @@
+load_game_str_pair_1036_to_pass_buf: Banlist password-input scene init -- loads game strings ID 0x1036 and 0x1037 into gBanlistPasswordBuffer+0x8d, calls append_col_padded_text_to_buf to align each to 15 cols. Cross-scene sibling of load_game_str_pair_1004_to_state (0x080178b4); symmetric structure, differs only in target buffer and string IDs.
+
+Constants:
+- STR_ID_A = 0x1036
+- STR_ID_B = 0x1037
+- PAD_UNIT = 15
+- PASS_BUF_OFF = 0x8d

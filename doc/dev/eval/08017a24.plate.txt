@@ -1,0 +1,6 @@
+encode_str_table_entry_to_line_buf: Name-input scene -- takes string table entry pointed to by caller-frame r6, encodes each char via encode_char_to_line_buf into line buffer, then calls pad_str_to_char_multiple to align to 60 or 12 cols. No push prologue; r4/r5/r6/r7 are caller-frame registers (inline exit fragment pattern).
+
+Constants:
+- PAD_WIDE = 60
+- PAD_NARROW = 12
+- STR_TABLE_ENTRY_STRIDE = 8

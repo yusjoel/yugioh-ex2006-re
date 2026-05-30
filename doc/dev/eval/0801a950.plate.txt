@@ -1,0 +1,6 @@
+get_banlist_password_entry_ptr: Banlist pass-input scene -- computes and returns current password entry pointer from scroll offset and cursor row/col fields. Calls get_banlist_scroll_pixel_offset for base; reads gBanlistPasswordBuffer+0x66a halfword to extract row (bits[8:0] via lsls #0x17; lsrs #0x19) and col (bits[3:1] via lsrs #0x1); computes row*15 + col offset; final ptr = gBanlistPasswordBuffer + (scroll_offset + row*15 + col)*2. Return via Sub-case E (pop {r1}; bx r1).
+
+Constants:
+- CURSOR_HW_OFFSET = 0x66a
+- ENTRY_STRIDE = 15
+- ENTRY_SIZE = 2
