@@ -1,0 +1,9 @@
+Write pan_mode byte then allocate sound channel slot. Takes r0 & 0x3 (low 2 bits = pan_mode) and writes to IWRAM sound engine struct [base+0x388] (PAN_MODE_OFF); then calls allocate_sound_channel_slot to allocate a channel slot. Pattern B void; allocate_sound_channel_slot returns via pop{r0};bx r0, result not propagated upward. indeg=0, no fn-ptr refs.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base)
+PAN_MODE_OFF=0x388 (0xe2<<2=0x388, pan mode byte offset; 0=left/1=center/2=right/3=stereo)
+PAN_MODE_MASK=0x3 (r0 low 2 bits, pan_mode range [0..3])
+
+Params: r0=pan_mode [0..3] (low 2 bits; written to [base+0x388] then passed to allocate_sound_channel_slot)
+Side effects: [0x030050cc+0x388]:=r0&0x3; allocates sound channel slot via allocate_sound_channel_slot

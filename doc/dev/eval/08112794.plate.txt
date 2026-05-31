@@ -1,0 +1,8 @@
+newlib semihosting I/O layer error-path forwarding function. Receives semihosting bottom-level operation return value (r0); if -1 (error flag), calls init_reent_heap_ptr_via_semihost to re-synchronize newlib reent heap pointer state, then returns -1; if non-(-1), passes value through directly. Called by _swilseek wrapper (0x0811289c) and _swiclose wrapper (0x08112a00) as the unified error-handling exit after semihosting syscall return.
+
+Constants:
+ERROR_SENTINEL=-1 (0xffffffff, semihosting operation failure flag)
+
+Params: r0=semihost_result [any] (-1=error, >=0=success)
+Returns: r0=semihost_result (passthrough; -1 path also triggers init_reent_heap_ptr_via_semihost side effect)
+Side effects: if r0==-1: calls init_reent_heap_ptr_via_semihost(-1), re-syncing newlib reent heap pointer [reent_struct+0x0]

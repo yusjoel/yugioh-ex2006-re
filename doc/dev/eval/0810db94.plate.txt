@@ -1,0 +1,12 @@
+Update volume/pan and loop count for all matching active sound channel slots by entity ID. Calls set_channel_volume_pan_by_id(r0=entity_id, r1=r2_orig=volume_raw) to iterate IWRAM DMA channel slot array (0x03005390, 8 entries, stride 0x28), writing volume/pan bytes on slots where [+0x1f] bit7=1 and [+0xe]==entity_id; then calls set_channel_loop_count_by_id(r0=entity_id, r1=loop_count) to write loop count byte [+0x20] (clamped). Pattern B void. indeg=0, no fn-ptr refs.
+
+Constants:
+DMA_ARRAY_BASE=0x03005390 (DMA channel slot array base, 8 entries)
+CHANNEL_ARRAY_BASE=0x030052f0 (channel slot array base, 16 entries)
+ENTRY_STRIDE=0x28 (slot entry stride)
+ACTIVE_FLAG=0x80 (bit7 of [+0x1f] = active flag)
+LOOP_MIN=0xf (loop_count<0 clamped to 0xf)
+LOOP_MAX=0x10 (loop_count>0x10 clamped to 0x10)
+
+Params: r0=entity_id [any], r1=loop_count [any], r2=volume_raw [any]
+Side effects: [0x03005390+i*0x28+0x18]:=volume; [0x03005390+i*0x28+0x19]:=pan; [0x030052f0+i*0x28+0x20]:=clamp(loop_count,0xf,0x10)

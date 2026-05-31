@@ -1,0 +1,10 @@
+Sound sprite entry init with sprite_type and volume_raw. Calls init_sprite_entry_with_type(r0=entity_id, r1=sprite_type) to init IWRAM sprite entry and write [base+0x387] sprite_type byte; then passes r2 (volume_raw) to set_channel_volume_and_pan_bytes, writing [base+0x37c] (volume) and [base+0x37d] (pan). Pattern B void. indeg=0, no fn-ptr refs.
+
+Constants:
+ENGINE_BASE=0x030050cc (IWRAM sound engine struct base)
+SPRITE_TYPE_OFF=0x387 (sprite type byte offset, written by init_sprite_entry_with_type)
+VOL_BYTE_OFF=0x37c (volume byte offset)
+PAN_BYTE_OFF=0x37d (pan byte offset)
+
+Params: r0=entity_id [0..0x7fff], r1=sprite_type [0..0xff], r2=volume_raw [0..0x7f]
+Side effects: [0x030050cc+0x387]:=r1; [0x030050cc+0x37c]:=min(r2,0x3f); [0x030050cc+0x37d]:=pan_from_volume
