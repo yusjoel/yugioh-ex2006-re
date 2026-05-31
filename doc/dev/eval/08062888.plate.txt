@@ -1,0 +1,11 @@
+Equip slot activation eligibility predicate, returns 0/2. r0=slotA, r1=cardB (candidate card entry). If cardB is null returns 0. Multi-level guards: cardB byte[+0x2] bits[6:2] (zone_idx) <= 0xa; cardB byte[+0x3] status bits (mask 0x30) == 0; cardB and slotA player_id (each byte[+0x2] bit0) equal; cardB get_card_extended_stat_field6 == 0x16; get_card_extended_stat_field9 == 0; count_field_copies_of_card(0x1332 Banisher of the Light) <= 0 (no Banisher on field). After all pass, calls check_equip_slot_eligible_by_tier_and_field6(slotA, cardB); if pass returns 2, otherwise returns 0. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- ZONE_IDX_FIELD=bits[6:2] of cardB byte[+0x2] (lsls #0x1a; lsrs #0x1b)
+- ZONE_IDX_MAX=0xa (cmp #0xa; bhi fail)
+- STATUS_MASK=0x30 (cardB byte[+0x3] bits[5:4], must be 0)
+- PLAYER_BIT_MASK=bit0 of byte[+0x2]
+- FIELD6_TYPE=0x16 (get_card_extended_stat_field6 expected value)
+- FIELD9_VALUE=0 (get_card_extended_stat_field9 expected value)
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- RET_NEO_DAEDALUS=2

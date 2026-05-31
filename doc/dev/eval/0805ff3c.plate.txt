@@ -1,0 +1,3 @@
+Equip slot activation eligibility predicate. First calls check_spell_type480_active_deck_matches(slot) to test whether the 0x480-type spell zone matches the active deck; if not matched, returns 0. If matched, extracts player_id (slot byte[+0x2] bit0) and calls dispatch_effect_for_neo_daedalus_slot_with_monster_count(slot, player_id) to dispatch the Neo-Daedalus effect series, passing through its 0/1 result. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants: none non-trivial (all are function calls and register bit extraction).

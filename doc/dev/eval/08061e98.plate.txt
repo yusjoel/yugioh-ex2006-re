@@ -1,0 +1,5 @@
+Equip slot eligibility predicate, returns 0/1. Thin wrapper: loads fixed fn-ptr 0x08051e95 as the second argument, calls invoke_count_zone_pair_hits_full_range(slot, fn_ptr) to count the zone-pair hits of that predicate over the full range. If hit count > 0 returns 1, otherwise returns 0. Isomorphic to 0x08061d5c, only the predicate fn-ptr differs. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- ZONE_PAIR_PREDICATE_FN=0x08051e95 (predicate fn-ptr passed to invoke_count_zone_pair_hits_full_range, +1 for thumb bit)
+- HIT_THRESHOLD=0 (count > 0 is eligible)

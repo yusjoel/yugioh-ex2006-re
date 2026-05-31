@@ -1,0 +1,4 @@
+Equip slot activation eligibility classifier, returns 0/2. Directly calls check_equip_slot_eligible_by_tier_and_field6(slot, arg); if that core predicate returns 0 (ineligible) returns 0, otherwise returns 2 (eligible, encoded as activation result code 2). A thin wrapper that remaps the 0/1-form tier predicate result to a 0/2 result code. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- RET_NEO_DAEDALUS=2 (result code when tier predicate passes)

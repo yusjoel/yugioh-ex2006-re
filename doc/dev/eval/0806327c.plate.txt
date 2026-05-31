@@ -1,0 +1,4 @@
+Equip slot activation eligibility predicate, returns 0/passthrough. r0=slotA, r1=cardB (candidate card entry). First calls count_available_monster_slots(player_id) to count the player's available monster zone slots; if the count is 0 (beq) returns 0 directly; otherwise passes through the return value of check_equip_slot_eligible_by_field6_guard_and_chain_absent(slotA, cardB) (0=ineligible, nonzero=eligible). Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- (none non-trivial, all indirect via named callees)

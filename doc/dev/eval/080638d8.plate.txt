@@ -1,0 +1,9 @@
+Equip slot activation eligibility predicate, returns 0/2. r0=slot. Takes zone_type from slot byte[+0x2] (ldrh) (mask 0xfc0). If zone_type == 0x240 (0x90<<2) or zone_type-0x40 == 0x200 (i.e. 0x240) continues, otherwise returns 0. Then count_effect_node_zone_activations(slot) must == 1 (cmp #1; bne -> 0); invoke_count_zone_pair_hits_full_range(slot, 0x08054899) hit (bne, nonzero; beq -> 0); all satisfied returns 2, otherwise returns 0. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc<<4, slot byte[+0x2] bits[11:6])
+- ZONE_TYPE_TARGET_A=0x240 (0x90<<2)
+- ZONE_TYPE_TARGET_B=0x200 (0x240-0x40 then compare)
+- ZONE_PAIR_PREDICATE_FN=0x08054899 (predicate fn-ptr passed to invoke_count_zone_pair_hits_full_range, +1 thumb bit)
+- NODE_ACTIVATION_COUNT=1 (count_effect_node_zone_activations expected value)
+- RET_VALUE=2

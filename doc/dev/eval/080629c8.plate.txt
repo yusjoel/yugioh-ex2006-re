@@ -1,0 +1,5 @@
+Equip slot activation eligibility predicate, returns 0/passthrough. r0=slotA, r1=cardB (candidate card entry). If cardB is null returns 0. Applies four card-field guards to cardB card_id (halfword[+0x0]) in sequence: check_card_is_zone_pair_restricted must be false (restricted => returns 0); check_card_field5_is_nonzero must be true; check_card_field8_is_normal must be true; cardB byte[+0x2] & 0x3e != 0x1a (specific packed field not equal to 0x1a). After all pass, passes through the return value of check_equip_slot_eligible_by_tier_and_field6(slotA, cardB). Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- PACKED_FIELD_MASK=0x3e (cardB byte[+0x2] bits[5:1])
+- PACKED_FIELD_REJECT=0x1a (equals 0x1a after mask => ineligible)

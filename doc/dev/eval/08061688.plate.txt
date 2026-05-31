@@ -1,0 +1,12 @@
+Scans both players' monster zones, registers a zone mark for the matching equip effect node and returns whether successful. On entry, if effect_slot_ptr (r1) is 0, takes the teardown path returning 0. Otherwise validates: check_effect_slot_zone_equip_valid passes; effect_slot owner (byte[+2] bit0 ^ byte[+3] bit2) equals slot opponent (1 - slot player_id); get_card_extended_stat_field6 == 0x16; effect_slot byte[+3] status bits (mask 0x30) == 0. After validation, first clears/swaps the halfword[+0x8] of the two-side corresponding zone entries in gDuelFieldSlots, then a double loop (outer player r5=0..1, inner slot_idx r4=0..0xa) calls check_slot_card_is_equip_whitelist (when r4<=4), check_zone_slot_equip_prerequisites, invoke_effect_node_handler_with_zone_flag_guard; if any node hits, writes effect_slot card_id into the hit zone entry halfword[+0x8] and returns 1. If none hit, returns 0.
+
+Constants:
+- PLAYER_STRIDE=0x868 (DWORD_080616bc / DWORD_080617a4)
+- SLOT_DATA_BASE=0x0201c510 (gDuelFieldSlots; DWORD_080616c0 / DWORD_080617a8)
+- ZONE_ENTRY_STRIDE=0x14 (slot_group*5*4, expanded via lsls/adds)
+- ZONE_ENTRY_MARK_OFFSET=0x8 (zone entry halfword[+0x8] mark field)
+- FIELD6_TYPE=0x16 (get_card_extended_stat_field6 expected value)
+- STATUS_MASK=0x30 (byte[+3] bits[5:4], must be 0)
+- WHITELIST_SLOT_MAX=4 (inner r4 <= 4 checks whitelist)
+- INNER_LOOP_MAX=0xa (slot_idx 0..0xa, cmp r4,#0xa ble)
+- OUTER_LOOP_MAX=1 (player 0..1, cmp r5,#1 ble)

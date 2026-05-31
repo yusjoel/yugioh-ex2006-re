@@ -1,0 +1,9 @@
+Equip slot activation eligibility predicate, three-way return (0/2/passthrough). Extracts zone_type from slot byte[+0x2] bits[10:6] (lsls #0x1a; lsrs #0x1b). If zone_type > 4 (not a monster zone), and gP1LifePoints[+0x1cf4] (duel_phase) == 2, and count_field_copies_of_card(0x1332 Banisher of the Light) == 0 (no Banisher on field), then returns 2. Otherwise (zone_type <= 4 or any of the above fails) passes through check_equip_slot_eligible_zone_type_or_neo_daedalus(slot, arg). Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- ZONE_TYPE_SHIFT_FIELD=bits[10:6] of slot byte[+0x2] (lsls #0x1a; lsrs #0x1b)
+- MONSTER_ZONE_MAX=4 (zone_type <= 4 takes passthrough, bls)
+- DUEL_PHASE_OFFSET=0x1cf4 (gP1LifePoints global phase field)
+- DUEL_PHASE_VALUE=2
+- ICID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light)
+- RET_NEO_DAEDALUS=2

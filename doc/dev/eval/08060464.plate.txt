@@ -1,0 +1,3 @@
+Equip slot activation eligibility predicate, returns 0/passthrough. First calls check_equip_slot_chain_absent(slot) to determine whether the activation chain is absent; if the chain already exists (returns 0) returns 0. When the chain is absent, calls dispatch_effect_for_neo_daedalus_slot_with_monster_count(slot, player) to dispatch the Neo Daedalus effect series and passes through its return value. Semantics: evaluate Neo Daedalus placement only when no existing activation chain. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants: none non-trivial (all are function calls and register transfers).

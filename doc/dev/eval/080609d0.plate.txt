@@ -1,0 +1,6 @@
+Equip slot activation eligibility predicate, returns 0/1. First calls check_equip_slot_eligible_by_tier_and_field6(slot); if ineligible (returns 0) returns 0. On pass, takes player_id from slot byte[+0x2] bit0 and card_id from slot halfword[+0x0], calls dispatch_effect_handler_by_card_id(player_id, card_id, mode=0); if dispatch returns nonzero returns 1, otherwise returns 0. Semantics: tier predicate passes and the card effect handler confirms activatable. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- DISPATCH_MODE=0 (dispatch_effect_handler_by_card_id third arg fixed 0)
+- PLAYER_BIT_MASK=bit0 of slot byte[+0x2]
+- CARD_ID_FIELD=slot halfword[+0x0]

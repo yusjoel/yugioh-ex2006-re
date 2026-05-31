@@ -1,0 +1,5 @@
+Equip slot activation eligibility predicate, two-way dispatch. Takes zone_type from slot byte[+0x2] (ldrh) (mask 0xfc0). If zone_type == 0x140 (0xa0<<1) calls check_equip_slot_eligible_horus_lv4_chain_with_banisher(slot, arg) and passes through; otherwise calls check_equip_ctx_slot6_has_card_no_chain(slot, arg) and passes through. Dispatches between two equip eligibility predicates based on whether zone_type is the 0x140 zone. Statically dispatched from the equip eligibility scan chain, indeg=0.
+
+Constants:
+- ZONE_TYPE_MASK=0xfc0 (0xfc<<4, slot byte[+0x2] bits[11:6])
+- ZONE_TYPE_TARGET=0x140 (0xa0<<1)

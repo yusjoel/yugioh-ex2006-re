@@ -12,7 +12,7 @@
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
-- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
+- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 40, 剩 124)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -55,13 +55,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #197 |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #198 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4320 (93.08%) |
-| **未命名 (FUN_*)** | 321 (其中 144 ready / 177 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (144 剩余) |
-| **下一批** | #197 (Phase 5 idx 1) — `ready_batches_phase5.json` |
-| **上次更新** | 2026-05-31 batch #196 PASSED — banlist scene dispatch/scroll/render + campaign prng dispatch + palette strip + equip-eligibility/activation/LP cluster x20 (4320/4641 = 93.08%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4340 (93.51%) |
+| **未命名 (FUN_*)** | 301 (其中 124 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (124 剩余) |
+| **下一批** | #198 (Phase 5 idx 2) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-05-31 batch #197 PASSED — equip-eligibility predicate cluster: check_equip_slot_eligible_* + zone_pair_hit trampolines + classify by tier + commit effect node x20 (4340/4641 = 93.51%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
 | **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |
