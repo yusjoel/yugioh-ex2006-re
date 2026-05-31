@@ -1,0 +1,9 @@
+Leaf dispatcher that routes equip node display by the effect node's type_code field. Reads [node+0xc] u16 type_code: when 1 calls check_equip_slot_eligible_via_effect_node_and_bitmap to do an equip-slot eligibility check; when 2 takes node+2 bit0 inverted to get the opponent player_id and calls enqueue_equip_zone_sprite_attr_full(opponent_player, 2, 1) to enqueue equip-zone sprite attributes; other values do nothing. Returns 0 fixed. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x080750c0 => 0 hits
+
+Params: r0=effect_node* (node+0xc=type_code u16, node+2=player byte bit0)
+Returns: r0=0 fixed (no return semantics, side-effect only; movs r0,#0 before exit)
+Side effects: no direct external write; equip eligibility write and sprite enqueue done internally by callees
+Constants: TYPE_CODE_ELIGIBILITY=1; TYPE_CODE_SPRITE=2; SPRITE_MODE=2; SPRITE_FLAG=1
+Exit: pop {r1};bx r1 (r0 already fixed to 0)

@@ -1,0 +1,9 @@
+Equip-zone bitmap display state machine; called per frame by the display main loop. Reads global display state at [0x0201b290+0x4a0] and dispatches. State 0x80: takes player and slot bits from node+2, set_lp_row_type18_with_value writes the LP row, advances returning 0x7f. State 0x7f: reads [gP1LifePoints+0x1da8] LP value minus 1 as a case index (1..6) dispatched via a jump table: case 1/2 -> build_equip_zone_bitmap_for_player(0x080507ad) + query_equip_target_bitmap_default; case 3/4/5 -> invoke_count_zone_pair_hits_full_range, on hit advances returning 0x7e; case 6 -> build_equip_zone_bitmap_for_player(0x08053f11) + query_equip_target_bitmap_default; out of range returns 0. State 0x7e: trigger_card_display_op31_if_not_active(player, 0x62) + set_equip_activation_state_by_mode, advances returning 0x7d. State 0x7d: check_activation_display_state_is_confirmed then computes bitmap params from [gP1LifePoints+0x1d68]+[gP1LifePoints+0x1d6c+4] and calls test_equip_target_slot_in_bitmap, returns 0. Others return 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807633c => 0 hits
+
+Params: r0=effect_node* (node+2=player/slot byte, node+0=card_id u16)
+Returns: r0=u32 next display state code {0x7f, 0x7e, 0x7d, 0} (0=out of range / no hit / no advance)
+Side effects: no direct external write; LP row / activation state / sprite enqueue all done internally by callees
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); LP_VALUE_OFF=0x1da8; BITMAP_WORD_OFF_A=0x1d68; BITMAP_WORD_OFF_B=0x1d6c; PREDICATE_LOW=0x080507ad; PREDICATE_HIGH=0x08053f11; OP31_TRIGGER_CODE=0x62
+Exit: pop {r1};bx r1 = Sub-case E (r0 preserved as return state code)

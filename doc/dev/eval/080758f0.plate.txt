@@ -1,0 +1,9 @@
+Type_code-dispatched equip-zone display state machine; called per frame by the display main loop. Reads [node+0xc] type_code. type_code==1: calls invoke_equip_zone_entry_with_zone11_gate to process the equip-zone entry (with zone11 gate), returns its result. type_code==2: reads global display state at [0x0201b290+0x4a0] and dispatches. State 0x80: verifies [gP1LifePoints+0x10+player*0x868] nonzero, checks [0x0201e2a0+0x8+player*4] != 1 then init_effect_slot_display_context, advances returning 0x7f. State 0x7f: checks the effect context count, on hit writes [gP1LifePoints+0x1d40] or per packed params invoke_card_display_op_0x31_sub3_with_packed_params, returns 0x7e. State 0x7e: writes [gP1LifePoints+0x1d40] into the [STATE_BASE+0x4a4] slot, set_lp_display_row_type15 writes the LP row, returns 0x7d. State 0x7d: verifies [STATE_BASE+0x4a4] nonzero then enqueue_sprite_attr_record enqueues the sprite. Others return 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x080758f0 => 0 hits
+
+Params: r0=effect_node* (node+0xc=type_code u16, node+2=player byte bit0, node+0=card_id u16)
+Returns: r0=u32 next display state code {0x7f, 0x7e, 0x7d, 0} or passthrough of invoke_equip_zone_entry_with_zone11_gate (type_code==1 path)
+Side effects: [gP1LifePoints+0x1d40] := value from [STATE_BASE+0x4a4] (state 0x7e); [0x0201b290+0x4a4] := [gP1LifePoints+0x1d40] (state 0x7f hit path); indirect: set_lp_display_row_type15 writes LP row, invoke_card_display_op_0x31_sub3 / enqueue_sprite_attr_record write display queue
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); ITER_SLOT_OFF=0x4a4; PLAYER_STRIDE=0x868; LP_TABLE_OFF=0x1d40 (0xea<<5); EFFECT_CTX_BASE=0x0201e2a0; OP31_SUB3_PARAM=0x1b7; SPRITE_TYPE_CODE=0x56 (player==1) / 0x8056 (player==0)
+Exit: pop {r1};bx r1 = Sub-case E (r0 preserved as return state code)

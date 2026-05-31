@@ -1,0 +1,9 @@
+Leaf dispatcher that routes zone13 equip node display by the effect node's type_code field. Reads [node+0xc] u16 type_code: when 1 calls test_zone13_slot_via_side_type_from_zone_entry to test the zone13 equip slot; when 2 takes node+2 bit0 inverted to get the opponent player_id and calls enqueue_equip_zone_sprite_attr_full(opponent_player, 1, 1) to enqueue equip-zone sprite attributes; other values do nothing. The type_code==1 path, after calling the callee, takes b LAB_08076210 to bypass exit zeroing so r0 passes through the test_zone13_slot_via_side_type_from_zone_entry return value; type_code==2 and the default path go through LAB_0807620e movs r0,#0 returning 0. Not fully isomorphic to 0x080750c0: at 0x080750c0 type_code==1 jumps to the movs r0,#0 itself (zeroes), here type_code==1 jumps past it to pop (return differs). Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x080761e8 => 0 hits
+
+Params: r0=effect_node* (node+0xc=type_code u16, node+2=player byte bit0)
+Returns: r0=u32; type_code==1 path (@080761f6) passes through test_zone13_slot_via_side_type_from_zone_entry return value (b LAB_08076210 bypasses zeroing); type_code==2 and default path go through LAB_0807620e movs r0,#0 returning 0
+Side effects: no direct external write; zone13 test and sprite enqueue done internally by callees
+Constants: TYPE_CODE_ZONE13=1; TYPE_CODE_SPRITE=2; SPRITE_MODE=1; SPRITE_FLAG=1
+Exit: pop {r1};bx r1

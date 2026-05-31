@@ -1,0 +1,9 @@
+Leaf function that submits the equip LP indicator bar and enqueues the corresponding equip slot sprite. First calls submit_equip_lp_indicators_with_bar(node) to submit the LP indicator bar. Then takes player(bit0) and slot(bits[6:3]) from node+2 and card_id from node+0, and calls enqueue_equip_slot_sprite_attr(player, slot, card_id, 1) to enqueue equip slot sprite attributes. Returns 0 fixed. A sprite-submit utility at the tail of the equip display chain. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807a580 => 0 hits
+
+Params: r0=effect_node* (node+2=player(bit0)/slot(bits[6:3]) byte, node+0=card_id u16)
+Returns: r0=0 fixed (no return semantics, side-effect only)
+Side effects: no direct external write; LP indicator bar and sprite enqueue done internally by the two callees
+Constants: SPRITE_FLAG=1 (enqueue_equip_slot_sprite_attr 4th arg)
+Exit: pop {r1};bx r1 (r0 already fixed to 0)

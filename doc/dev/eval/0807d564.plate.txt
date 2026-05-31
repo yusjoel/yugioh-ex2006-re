@@ -1,0 +1,9 @@
+Leaf function that performs field6 eligibility-gated activation when the global equip activation status bits meet the pending condition, r0=effect node. Reads the status word at [gP1LifePoints+0x10d0]: checks bit0, if set (bit0==1) ends without activating; otherwise checks bit1, only when bit1 is set (bit0==0 and bit1==1) calls apply_equip_activation_by_field6_gate(node) to perform field6-gated activation, takes b LAB_0807d596 to bypass exit zeroing so r0 passes through that callee's return value; the bit0==1 / bit1==0 skip paths go through LAB_0807d594 movs r0,#0 returning 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807d564 => 0 hits
+
+Params: r0=effect_node* (entry adds r4,r0,#0 save, passed through to apply_equip_activation_by_field6_gate)
+Returns: r0=u32; gate-pass path (bit0==0 and bit1==1, @0807d582) passes through apply_equip_activation_by_field6_gate return value (b LAB_0807d596 bypasses zeroing); bit0==1 / bit1==0 skip paths go through LAB_0807d594 movs r0,#0 returning 0
+Side effects: no direct external write; field6-gated activation done internally by apply_equip_activation_by_field6_gate
+Constants: gP1LifePoints=0x0201c4e0; ACTIVATION_STATE_OFF=0x10d0 (global activation status word); GATE_BIT0=0x1 (already-active bit, set => skip); GATE_BIT1=0x2 (pending bit, set => activate)
+Exit: pop {r4};pop {r1};bx r1 = Sub-case E (r0 not clobbered by pop, exit value preserved)

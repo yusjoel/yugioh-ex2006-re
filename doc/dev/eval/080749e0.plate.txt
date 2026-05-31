@@ -1,0 +1,9 @@
+Equip activation LP display state machine; scheduled per frame by the display main loop via state code. Reads global display state at [0x0201b290+0x4a0] and dispatches. State 0x80: takes player and slot bits from node+2, set_lp_row_type18_with_decremented_value writes the LP row, advances returning 0x7f. State 0x7f: compares the two u16 LP values [gP1LifePoints+0x1da8] and [gP1LifePoints+0x1daa]; if unequal packs shifted params and calls invoke_card_display_op_0x31_sub9_with_packed_params to trigger display, if equal writes (1<<lp_a) into [gP1LifePoints+0x1da8+0xea*0x20], returns 0x7e. State 0x7e: scans zone hit bits (1..5) writing node+0xc, invoke_count_zone_pair_hits_full_range counts hits, on hit trigger_card_display_op31_if_not_active + set_equip_activation_state_by_mode, advances returning 0x7d. State 0x7d: check_activation_display_state_is_confirmed then test_equip_target_slot_in_bitmap, returns 0. Others return 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x080749e0 => 0 hits
+
+Params: r0=effect_node* (node+2=player/slot byte, node+0=card_id u16, node+0xc=zone hit bits u16 field)
+Returns: r0=u32 next display state code {0x7f, 0x7e, 0x7d, 0} (0=no advance this frame)
+Side effects: [r0+0xc] strh zone hit bitmask (state 0x7e scan loop); [gP1LifePoints+0x1da8+0xea*0x20] := (1<<lp_value_a) (state 0x7f LP-equal path, 0xea<<5=0x1d40); indirect: set_lp_row_type18_with_decremented_value writes LP row, invoke_card_display_op_0x31_sub9_with_packed_params / trigger_card_display_op31_if_not_active write display queue
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); LP_VALUE_OFF_A=0x1da8; LP_VALUE_OFF_B=0x1daa; LP_BITMASK_TABLE_OFF=0x1d40 (0xea<<5); OP31_TRIGGER_CODE=0x6d
+Exit: pop {r1};bx r1 = Sub-case E (r1 holds saved lr, r0 preserved as return state code)

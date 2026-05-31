@@ -1,0 +1,9 @@
+Equip LP indicator display state machine; called per frame by the display main loop, r0=effect node. Reads global display state at [0x0201b290+0x4a0]. State 0x78: calls increment_lp_bar_display_counter to raise the LP bar display counter; takes the iteration slot from [STATE+0x4a4] passed into query_equip_target_bitmap_default(node) to query the target bitmap; takes player from node+2 bit0 to compute the other side, takes node+8 u16 shifted right 1 as slot, calls submit_lp_indicator_with_slot_xor_flag(node, player_xor, slot) twice for this side and the other side to submit LP indicator bars; calls decrement_lp_bar_display_counter to finish, returns 0. Other states: delegates to tick_equip_multi_card_score_state_machine(node) to handle multi-card score display and passes through its return value. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807d69c => 0 hits
+
+Params: r0=effect_node* (entry adds r4,r0,#0 save; node+2=player byte bit0; node+8=u16 slot source field)
+Returns: r0=u32 display state code; state 0x78 path fixed 0; other paths pass through tick_equip_multi_card_score_state_machine return value (that callee is a state machine returning the next state code)
+Side effects: no direct external write; LP counter/indicator/bitmap all done internally by callees
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); ITER_SLOT_OFF=0x4a4; STATE_LP_INDICATOR=0x78 (state code that triggers LP indicator display)
+Exit: pop {r4,r5};pop {r1};bx r1 = Sub-case E (r0 preserved as state code)

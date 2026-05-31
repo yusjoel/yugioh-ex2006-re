@@ -1,0 +1,9 @@
+Equip zone-pair bitmap display state machine; called per frame by the display main loop. Reads global display state at [0x0201b290+0x4a0] and dispatches. State 0x80: calls invoke_count_zone_pair_hits_full_range(node) twice with two zone table groups, folding the hit results into bit0/bit1 of bitmask r6; then per player takes column state from [gP1LifePoints+player*0x868+0xc] and +0x10 setting bit2; sets bit3 when LP value > 1 and [gP1LifePoints+0x1cf4] nonzero and count_available_effect_zones is 0; if bitmask nonzero selects the effect context slot per player, and when the slot value is 1 fetches 4 score components via lookup_equip_card_score_by_card_id_and_player one by one and calls invoke_card_display_op_0x31_sub3_with_packed_params to push display returning 0x7f; otherwise clears the [gP1LifePoints+0x1d40] field and returns 0x7f. State 0x7e: takes player and calls set_lp_display_row_type15 to write the LP row returning 0x7e. Others return 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807b240 => 0 hits
+
+Params: r0=effect_node* (entry adds r7,r0,#0 save; node+2=player byte bit0; node+0=card_id u16)
+Returns: r0=u32 next display state code {0x7f, 0x7e, 0} (0=no dispatch; 0x7f=paired bitmap push complete; 0x7e=LP row written)
+Side effects: [gP1LifePoints+player*0x868+0x1d40] := 0 (no-score path clears LP display field, @0807b322)
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); gP1LifePoints=0x0201c4e0; PLAYER_STRIDE=0x868; LP_DISPLAY_FIELD_OFF=0x1d40 (0xea<<5); LP_COL_OFF=0xc; LP_ROW_OFF=0x10; LP_CHECK_OFF=0x1cf4; EFFECT_CTX_BASE=0x0201e2a0; SCORE_OP_PARAM=0x103
+Exit: pop {r4..r7};pop {r1};bx r1 = Sub-case E (r0 preserved as return state code)

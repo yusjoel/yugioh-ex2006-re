@@ -1,0 +1,9 @@
+Equip zone sprite display state machine; called per frame by the display main loop, r0=effect slot node. Reads global display state at [0x0201b290+0x4a0] and dispatches. State 0x80: calls check_equip_slot_eligible_via_effect_node_and_bitmap(node) to check slot eligibility, on pass (nonzero) returns 0x7f to advance, else returns 0. State 0x7f: takes player from node+2 bit0, computes the other side via 1-player, calls enqueue_equip_zone_sprite_attr_full(side, 2, 1) to enqueue zone sprite attributes, returns 0. Other states return 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807bdb8 => 0 hits
+
+Params: r0=effect_node* (entry adds r1,r0,#0 save; node+2=player byte bit0)
+Returns: r0=u32 next display state code {0x7f, 0} (0x7f=eligibility passed advance; 0=ineligible/enqueued/no dispatch)
+Side effects: no direct external write; zone sprite enqueue done internally by enqueue_equip_zone_sprite_attr_full
+Constants: STATE_BASE=0x0201b290; STATE_OFFSET=0x4a0 (0x94<<3); ZONE_SPRITE_MODE=2; ZONE_SPRITE_FLAG=1
+Exit: pop {r1};bx r1 = Sub-case E (r0 preserved as state code)

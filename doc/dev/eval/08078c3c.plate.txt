@@ -1,0 +1,9 @@
+Leaf dispatcher that routes the equip LP indicator bar or the paired-zone sprite by the effect node's state bits. Takes node+3 byte high 2 bits (mask 0x30): if equal to 0x20 calls submit_equip_lp_indicators_with_bar to submit the LP indicator bar and returns. Otherwise checks node+4 bit2: if set, skips. When unset, takes player(bit0) and slot(bits[6:3]) from node+2 and calls count_paired_slots_with_field5 to count paired slots; when the paired count is greater than 1 calls tick_zone_sprite_pipeline_with_update_flag(player, 3), query_equip_zone_bitmap_with_active_flag(node), query_equip_target_bitmap_default(node) in turn to complete paired-zone sprite display. The LP-bar path, after calling the submit callee, takes b LAB_08078c8c to bypass exit zeroing so r0 passes through that callee's return value; the paired-zone path and skip path go through LAB_08078c8a movs r0,#0 returning 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x08078c3c => 0 hits
+
+Params: r0=effect_node* (node+3=state byte bits[5:4] mask 0x30, node+4=flag byte bit2, node+2=player/slot byte, node+0=card_id u16)
+Returns: r0=u32; LP-bar path (node+3&0x30==0x20, @08078c4a) passes through submit_equip_lp_indicators_with_bar return value (b LAB_08078c8c bypasses zeroing); paired-zone path and skip path go through LAB_08078c8a movs r0,#0 returning 0
+Side effects: no direct external write; LP indicator bar and zone sprite display done internally by callees
+Constants: NODE3_MASK=0x30 (node+3 bits[5:4] state field mask); NODE3_LP_BAR_STATE=0x20 (value that triggers LP bar submit); NODE4_SKIP_BIT=0x4 (node+4 bit2 skip paired-zone path); PAIRED_PIPELINE_MODE=3 (tick_zone_sprite_pipeline_with_update_flag 2nd arg)
+Exit: pop {r1};bx r1 = Sub-case E (r0 preserved as exit value)

@@ -1,0 +1,9 @@
+Loop driver that applies equip activation and sprite enqueue across all equip slots of both players; not a state machine. On entry increment_lp_bar_display_counter raises the LP bar display counter. The outer loop iterates the two players via [0x0201e1c8]^player_toggle; the inner loop iterates slot 0..4 (5 slots). Each slot calls invoke_effect_node_with_active_flag_3arg(effect_node, player, slot) to activate the effect node, on hit reads [0x0201c510+player*0x868+slot*0x14+6] u16, and when 0 calls apply_slot_equip_activation_with_eligibility_check(node, player, slot, 0) to activate after an eligibility check. After all slots are processed and the hit count is greater than 1, advances to the next player iteration. Finally calls enqueue_effect_slot_sprites_for_two_players(node, ctx) to enqueue both players' sprites and decrement_lp_bar_display_counter to finish. Returns 0 fixed. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x08079500 => 0 hits
+
+Params: r0=effect_node* (passed to invoke/apply callees inside loop); r1=u32 display context ctx (saved via mov r10,r1 on entry, restored via mov r1,r10 at end, passed through to enqueue_effect_slot_sprites_for_two_players)
+Returns: r0=0 fixed (no return semantics, side-effect only)
+Side effects: no external write (sole str is [sp,#0] stack-local used as the 5th arg buffer of apply_slot_equip_activation_with_eligibility_check; activation and sprite enqueue done internally by callees)
+Constants: EQUIP_NODE_BASE=0x0201e1c8 (player toggle base); EQUIP_SLOT_BASE=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14 (20 bytes/slot); SLOT_MAX=4 (slot index upper bound, 0..4 = 5 slots)
+Exit: pop {r1};bx r1 (r0 already fixed to 0)

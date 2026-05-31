@@ -1,0 +1,9 @@
+Enqueues the type11 equip sprite and, when the effect slot matches a specific card signature, additionally submits the LP indicator bar. Takes node+2 bit0 as player and node+0 as card_id, unconditionally calls enqueue_sprite_attr_type11(player, card_id, 1, 0). Then checks node+4 bit2: if already set, skips; otherwise per player takes the equip slot table entry at [0x0201c5d8+player*0x868], verifies slot+8 u16 nonzero, and compares slot+0 word shifted left 0x13 against 0xbaf00000 (i.e. the high-field equals 0x175e card signature); on match calls submit_equip_lp_indicators_with_bar(node, ctx) to submit the LP indicator bar, takes b LAB_08078152 to bypass exit zeroing so r0 passes through that callee's return value; three miss paths (node+4 bit2 already set / slot+8==0 / signature mismatch) go through LAB_08078150 movs r0,#0 returning 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x080780f0 => 0 hits
+
+Params: r0=effect_node* (node+2=player byte bit0, node+0=card_id u16, node+4=flag byte bit2); r1=u32 display context ctx passed through to submit_equip_lp_indicators_with_bar
+Returns: r0=u32; signature-hit path (@0807813a) passes through submit_equip_lp_indicators_with_bar return value (b LAB_08078152 bypasses zeroing); three miss paths (node+4 bit2 set / slot+8==0 / signature mismatch) go through LAB_08078150 movs r0,#0 returning 0
+Side effects: no direct external write; type11 sprite enqueue and LP bar submit done internally by callees
+Constants: PLAYER_STRIDE=0x868; EQUIP_SLOT_BASE=0x0201c5d8 (per-player equip slot table); TYPE11_MODE=1; TYPE11_FLAG=0; SLOT_FLAG_BIT2=0x4 (node+4 bit2 skip bit); SIGNATURE_PACKED=0xbaf00000 (slot+0 word <<0x13 comparison constant, high-field value 0x175e = 0xbaf00000>>0x13)
+Exit: pop {r1};bx r1
