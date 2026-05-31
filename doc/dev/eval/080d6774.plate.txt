@@ -1,0 +1,1 @@
+拆包场景翻到下一张卡的转场. 先调 init_pack_scroll_animation(0x14, 0x50, 8) 启动横向滚动动画 (起点 0x14, 终点 0x50, 步进 8), 然后读取 pack_ui_state+0x724 状态字节的最高位 (bit7) 作为方向标志, 以 (0,0,方向) 调 render_pack_card_name_to_sprite_row 重绘卡名精灵行, 最后将 pack_ui_state+0xc 区 [+0x6] 滚动计数写为 8 重置动画进度. 供拆包翻页状态机在选择下一卡时调用.

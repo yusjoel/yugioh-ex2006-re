@@ -1,0 +1,1 @@
+装备目标选择的默认随机分支片段. 属于 commit_equip_target_slot_by_card_id 卡牌 ID 分派树的兜底路径: 从父帧继承的 r6 (装备效果节点指针) 读 [r6+2] bit0 与 [r6+3] bit6 异或得到出战玩家, 再用 1 减得到对手玩家编号, 然后以对手编号转调 find_equip_target_by_random_order(zone_ptr, opponent_player) 在对手场上随机扫描装备目标槽. 无独立 prologue, 复用父函数寄存器并经 restore_equip_dispatch_frame 退出.

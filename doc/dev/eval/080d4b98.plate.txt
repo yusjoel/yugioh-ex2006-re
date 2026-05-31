@@ -1,0 +1,1 @@
+拆包场景卡牌图正向滚动动画的逐帧 tick. 读取 pack_ui_state+0xc 工作结构: 比较帧计数 [+0x1a]+2 与上限 [+0xa], 未到上限时按当前卡牌索引 [+0x6fa] 从槽数组 [+0x6fc] 取卡牌记录, 累加色板偏移后调 dispatch_pack_card_image_render_by_state 渲染该帧卡图; 到上限则以 0 参数渲染. 随后用 get_bios_div_remainder 推进动画子帧 [+0x38] (mod 4), 更新滚动位置 [+0x3a]/[+0x3c] (基于 [+0x1a]<<6), 写入状态 [+0]=8, 并将帧计数 [+0x1a] 自增 1 (正向).

@@ -1,0 +1,1 @@
+拆包场景的完整初始布局与渲染. 先调 init_pack_scene_bg_and_vram 与 load_pack_bg_tiles_and_palette 建立背景与 VRAM, 计算并写入卡牌起始滚动位置 [+0x3e]; 然后从当前卡牌索引 [+0x1a] 起遍历可见卡槽, 逐张调 dispatch_pack_card_image_render_by_state 渲染卡图; 接着经 copy_memory_dma3_with_cpu_fallback 拷贝图块, 渲染卡名/拥有数量/标签精灵行, 加载卡图 tile, 设置滚动起点 set_pack_scroll_start_pos(0x14) 与步进模式, 初始化 AOB 显示行与色板, 渲染两组标签文本, 最后生成 HSV 色板条. 整场景一次性铺设.

@@ -1,0 +1,1 @@
+按卡牌 ID 分派单卡专属效果逻辑的大型分派器. 入口从 r0 指向的卡牌上下文读取 [r0+2] bit0 与 [r0+3] bit6, 异或得到出战玩家标志并写入全局 [0x0201afe0]. 随后读取卡牌 ID (ldrh [r0+0]) 并用二分比较树 (cmp/bgt) 逐级匹配特定卡牌 ID, 命中后跳入该卡的效果处理片段, 调用 count_equip_slots_active_only / dispatch_effect_handler_by_card_id / check_card_special_summon_eligible_full / count_field_copies_of_card 等具体逻辑. 无匹配则走默认路径返回 1. 供 duel_field 效果结算流程调用.

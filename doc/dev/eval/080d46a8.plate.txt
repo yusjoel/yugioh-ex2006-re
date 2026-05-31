@@ -1,0 +1,1 @@
+拆包场景卡牌精灵的翻转/缩放 OAM 渲染入口, 由各拆包状态 tick 处理器高频调用 (indeg=34). 读取 pack_ui_state+0x6b0 工作结构的状态字 [+0]: 状态 1 与状态 2 分别取不同的卡牌尺寸 (减偏移 0x28/0x8 或 0x10/0x20) 与不同的 OBJ 属性, 默认态走第三套参数; 在栈上构造 OAM 仿射缩放矩阵 (基准 0x4080 = 8.8 定点 1.0), 调用 write_oam_entry_from_packed_args 与 write_pack_obj_attr_by_dir_split 写出精灵, 并用 bios_div 做尺寸插值后调 scale_pixel_brightness_in_buffer 调整亮度. r0 选择渲染模式/精灵组.

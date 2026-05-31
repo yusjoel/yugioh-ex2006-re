@@ -1,0 +1,1 @@
+拆包场景卡牌旋转/缩放精灵的 OAM 渲染, 由多个拆包动画状态调用 (indeg=9). r0 选模式 (上限钳到 3), r1 为辅助参数. 读取 pack_ui_state+0xc 工作结构, 用 get_bios_div_remainder 与 bios_div 基于循环计数 [+0x22] (0..0x1d) 计算正弦式仿射缩放系数 (0x100 减插值量), 计数前 15 帧放大, 后段缩小. 随后调 rotate_pixel_hue_in_buffer 旋转色相, write_pack_obj_attr_by_dir_split 与 render_overlay_oam_sprite_tiled 写出卡牌旋转精灵 (上下两半).
