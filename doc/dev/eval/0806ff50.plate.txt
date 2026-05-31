@@ -1,0 +1,8 @@
+Per-frame display state machine for the equip partner LP indicator; dispatches by the phase code (0x7d/0x7e/0x7f/0x80) at gDuelFieldState[+0x4a0] and returns the next phase code. Phase == 0x80 calls set_equip_partner_flags_with_bitmap_refresh(slot) then returns 0x7f; phase == 0x7f calls invoke_count_zone_pair_hits_full_range, returns 0 if hit count is 0, else by [0x0201e2a0 + side*4 + 8] slot state: ==1 writes the gP1LifePoints[+0x1d40] frame flag, else calls invoke_card_display_op_0x31_sub1(0x68), returns 0x7e; phase == 0x7e after gP1LifePoints[+0x1d40] nonempty calls set_equip_activation_state_by_mode_alt(player, card_id, table), returns 0x7d; phase == 0x7d calls check_activation_display_state_is_confirmed, returns 0x7f if not confirmed, else increment_lp_bar_display_counter + test_equip_target_slot_in_bitmap + get_slot_field5_score + submit_lp_indicator_with_slot_xor_flag + decrement_lp_bar_display_counter, returns 0; other phases return 0. Statically dispatched per-frame via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806ff50 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+2] bit0=player_id [0..1], halfword[+0]=card_id)
+Returns: r0=u32 phase code {0x80=0x7f, 0x7f=0x7e, 0x7e=0x7d, 0x7d confirmed=0, 0x7d not confirmed=0x7f, other/count 0=0}
+Side effects: [gP1LifePoints + 0x1d40 (0xea<<5)]:=1 (str; 0x7f path writes frame flag when [0x0201e2a0 + side*4 + 8] slot state==1)
+Constants: gDuelFieldState=0x0201b290 +0x4a0=0x94<<3; gP1LifePoints+0x1d40=0xea<<5 frame flag; slot state table 0x0201e2a0; STATE 0x7d/0x7e/0x7f/0x80; op imm 0x68

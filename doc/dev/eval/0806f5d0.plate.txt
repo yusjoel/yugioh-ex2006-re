@@ -1,0 +1,8 @@
+Sets the player display state bit after refreshing the equip-slot eligibility bitmap. First calls check_equip_slot_eligible_via_effect_node_and_bitmap(slot) to refresh the eligibility bitmap (return value not used for branching), then takes player_id from slot[+2] bit0 and calls set_player_state_bit_with_sprite_update(player_id, 0, 1) to set the player-side display state bit and trigger a sprite update. Returns 0 fixed. Called via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806f5d0 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+2] bit0=player_id [0..1])
+Returns: r0=u32 0 (fixed; movs r0,#0 unconditional, side effects only)
+Side effects: no direct external memory write; indirect via check_equip_slot_eligible_via_effect_node_and_bitmap (eligibility bitmap refresh) and set_player_state_bit_with_sprite_update (set bit + sprite update) internal side effects
+Constants: player_id bit0 lsls#0x1f/lsrs#0x1f; set_player_state_bit args mode=0 / value=1

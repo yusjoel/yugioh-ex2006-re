@@ -1,0 +1,8 @@
+Checks equip-slot eligibility and builds the equip OAM sprite when the hand slot is eligible. First calls check_equip_slot_eligible_with_pool_and_hand_slot(slot), returns 0 if not eligible; otherwise takes set_code (slot[+4] bits[14:6]) and card_id, calls enqueue_equip_zone_sprite_attr_by_player with mode=5 to enqueue the zone sprite; then calls find_hand_slot_idx_by_set_code(player_id, set_code) to locate the hand slot index, returns 0 if < 0; calls check_zone_slot_equip_eligible(player_id, hand_slot) to recheck, returns 0 if not eligible; finally locates the slot data at [0x0201c8f8 + player*0x868 + hand_slot*4] and calls invoke_setup_equip_oam_with_attr2 with attr2=1/flag=1 to build the OAM. Returns 0 fixed. Called via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806d4a4 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+2] bit0=player_id [0..1], halfword[+4] bits[14:6]=set_code, halfword[+0]=card_id)
+Returns: r0=u32 0 (fixed; movs r0,#0 unconditional, side effects only)
+Side effects: no direct external memory write; indirect OAM-queue side effects via enqueue_equip_zone_sprite_attr_by_player / invoke_setup_equip_oam_with_attr2
+Constants: set_code=slot[+4] bits[14:6] (lsls#0x11/lsrs#0x17, lo=6 hi=14 width=9); base=0x0201c8f8; PLAYER_STRIDE=0x868; mode=5

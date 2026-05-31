@@ -1,0 +1,8 @@
+Dispatches two render paths by equip-slot card type and returns the result. First takes the type field slot[+2] AND 0xfc0: if == 0x80 (LP indicator type), forwards to submit_equip_lp_indicators_with_bar(slot) and passes through its return value; otherwise takes the sprite path: takes player_id and zone_idx, calls enqueue_equip_slot_sprite_attr to enqueue this-side slot sprite, then calls enqueue_sprite_attr_with_mode with opponent_side=1-player_id + mode=5 to enqueue the opposite-side sprite, returns 0 fixed. Statically dispatched via fn-ptr by the equip activation display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806738c => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; halfword[+2] AND 0xfc0=card type field + bit0=player_id [0..1] + bits[5:1]=zone_idx [0..0x1f], halfword[+0]=card_id)
+Returns: r0=u32 {sprite path=0 fixed, type 0x80 path=passthrough of submit_equip_lp_indicators_with_bar}
+Side effects: no direct external write; indirect OAM-queue side effects via enqueue_equip_slot_sprite_attr / enqueue_sprite_attr_with_mode / submit_equip_lp_indicators_with_bar
+Constants: TYPE_MASK=0xfc0 (0xfc<<4); TYPE_VALUE=0x80; mode=5

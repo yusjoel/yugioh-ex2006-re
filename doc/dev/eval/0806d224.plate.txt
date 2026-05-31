@@ -1,0 +1,8 @@
+Effect-node display handler; submits LP indicator sprites on both sides for Ring of Destruction style zone effects. First checks slot[+4] bit2 block bit, returns 0 if set; calls check_effect_slot_matches_zone_entry(slot, &zone_info) to verify the slot against the zone entry and extract player_id/zone_idx (output via sp local buffer), returns 0 if no match; reads slot occupancy from gDuelFieldSlots[player*0x868 + zone_idx*20] (field bit18 nonempty + halfword[+8] nonempty), returns 0 if either empty; then takes a display param by card_id (== 0x138d Ring of Destruction -> get_slot_field5_score, else 0x3e8); calls increment_lp_bar_display_counter, check_equip_slot_eligible_via_effect_node_and_bitmap, and if eligible calls submit_lp_indicator_with_slot_xor_flag once for this side and once for the opposite side, finally decrement_lp_bar_display_counter. Returns 0 fixed. Called via fn-ptr by the effect-node display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806d224 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_node ptr; byte[+4] bit2=block bit, byte[+2] bit0=player_id [0..1], halfword[+0]=card_id)
+Returns: r0=u32 0 (fixed; movs r0,#0 unconditional, side effects only)
+Side effects: no external memory write; indirect LP-display-queue side effects via submit_lp_indicator_with_slot_xor_flag (x2) / increment_lp_bar_display_counter / decrement_lp_bar_display_counter (the check_effect_slot_matches_zone_entry sp local buffer is a stack local, not an external write)
+Constants: gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14; card_id 0x138d (Ring of Destruction); display_param 0xfa<<2=0x3e8

@@ -1,0 +1,8 @@
+Submits equip LP indicator sprites when a hand slot exists. Takes player_id from slot[+2] bit0 and set_code from slot[+4] bits[14:6], calls find_hand_slot_idx_by_set_code(player_id, set_code) to locate the hand slot index: if index < 0 returns 0; otherwise calls submit_equip_lp_indicators_with_bar(slot, r1) and passes through its return value. An LP indicator submission entry with a hand-slot precondition gate. Called via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806f5a4 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+2] bit0=player_id [0..1], halfword[+4] bits[14:6]=set_code); r1=u32 display context / player-side handle (caller-set; entry adds r5,r1,#0 save, passed through only as 2nd arg of submit_equip_lp_indicators_with_bar)
+Returns: r0=u32 {hand slot index >= 0=passthrough of submit_equip_lp_indicators_with_bar, hand slot index < 0=0 fixed}
+Side effects: no direct external memory write; indirect via submit_equip_lp_indicators_with_bar internal side effects
+Constants: player_id bit0 lsls#0x1f/lsrs#0x1f; set_code bits[14:6] lsls#0x11/lsrs#0x17

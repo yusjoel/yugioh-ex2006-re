@@ -1,0 +1,7 @@
+Checks whether an equip slot meets the dual activation eligibility "available monster slot + tier/field6 gate". Flow: takes player_id from slot[+2] bit0, calls count_monster_slots_by_fnptr(player_id, 0x0804b30d) to count available monster slots for that player; if 0 returns 0. Otherwise locates the field at gP1LifePoints[player_id*0x868 + 0x10] and reads it; if 0 returns 0. Otherwise calls check_equip_slot_eligible_by_tier_and_field6(slot, r1) for tier/field6 recheck and passes through its return value. Called via fn-ptr by the equip activation eligibility dispatch cluster (indeg=0). Returns 1 if eligible, 0 if any gate fails.
+
+CALLEE-COLUMN GREP: grepping callee=0x080641b8 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+2] bit0=player_id [0..1]); r1=u32* aux_ptr (passed through to check_equip_slot_eligible_by_tier_and_field6 as 2nd arg)
+Returns: r0=u32 bool {0=any gate fails, 1=check_equip_slot_eligible_by_tier_and_field6 returns nonzero}
+Side effects: none (pure read + forward call)

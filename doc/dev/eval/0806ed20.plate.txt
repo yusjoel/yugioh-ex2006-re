@@ -1,0 +1,8 @@
+Per-frame display state machine for equip zone-slot sprites; advances by the phase code at gDuelFieldState[+0x4a0]. First calls read_effect_slot_side_and_type(slot) to take side bit0 and zone_type, locating the slot entry from gDuelFieldSlots[player*0x868 + zone_type*20]. Reads phase: phase == 0x80 calls check_effect_slot_matches_zone_entry to verify the match, and when slot halfword[+8]==0 and halfword[+6] nonempty calls enqueue_zone_slot_sprite_attr_if_occupied(side, zone_type, 1) to enqueue the sprite, returns 0x7f; phase == 0x7f calls enqueue_sprite_attr_for_slot_indicator(side) and enqueue_sprite_attr_type10_halfword(0x1e), returns 0x7e; phase == 0x7e calls check_card_field8_is_normal, if it holds rechecks via check_equip_slot_eligible_via_effect_node_and_bitmap, and if either does not hold calls enqueue_zone_slot_sprite_attr_if_occupied(side, zone_type, 0), returns 0; other phases return 0. Statically dispatched per-frame via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806ed20 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; via read_effect_slot_side_and_type extracts side bit0=player_id [0..1] and zone_type [0..0xff])
+Returns: r0=u32 phase code {0x80 path=0x7f, 0x7f path=0x7e, 0x7e path=0, other=0}
+Side effects: no direct external memory write; indirect OAM-queue side effects via enqueue_zone_slot_sprite_attr_if_occupied / enqueue_sprite_attr_for_slot_indicator / enqueue_sprite_attr_type10_halfword
+Constants: gDuelFieldState=0x0201b290 +0x4a0=0x94<<3; gDuelFieldSlots=0x0201c510; PLAYER_STRIDE=0x868; SLOT_STRIDE=0x14; STATE 0x7e/0x7f/0x80; type10 imm 0x1e

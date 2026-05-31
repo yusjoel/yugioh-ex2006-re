@@ -1,0 +1,7 @@
+Checks Neo Daedalus / LP-slot effect activation eligibility via the effect_slot pointer and returns a tier code. Flow: first calls check_equip_slot_eligible_neo_daedalus_with_lp_slot_effect(slot_ptr); if not eligible returns 0. Otherwise clears slot[+0xc] then calls count_effect_node_zone_activations to count zone activations; if <=1 returns 0. Otherwise writes slot[+0xc]=2 and recounts; if result is 0 returns 0, else returns 2. Statically dispatched via fn-ptr by the 0x0806xxxx equip effect display state-machine cluster (indeg=0). Return value lets the caller decide the slot activation tier.
+
+CALLEE-COLUMN GREP: grepping callee=0x08063d04 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; halfword[+0xc]=activation tier field, read/written here)
+Returns: r0=u32 tier code {0=ineligible or insufficient activations, 2=double-activation eligible}
+Side effects: [slot_ptr+0xc]:=0 (strh; clear tier field before first count); [slot_ptr+0xc]:=2 (strh; write tier=2 before second count)

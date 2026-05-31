@@ -1,0 +1,8 @@
+Zone-match guard for the equip effect display state machine; at phases 0x80/0x7f it verifies the slot against the zone and advances the phase code. First checks slot[+4] bit2 (block/processed bit), returns 0 if set; otherwise calls check_effect_slot_matches_zone_entry(slot), returns 0 if no match; on match reads gDuelFieldState[+0x4a0] current phase: phase == 0x80 takes player_id/zone_idx and calls enqueue_lp_display_row_type17 to enqueue the LP-row sprite and returns 0x7f (advance to next phase); phase == 0x7f reads gP1LifePoints[+0x1daa] count, if >1 calls check_equip_slot_eligible_via_effect_node_and_bitmap then returns 0, else returns 0 directly; other phases return 0. Called via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x08068618 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+4] bit2=block bit, byte[+2] bit0=player_id [0..1] + bits[5:1]=zone_idx [0..0x1f])
+Returns: r0=u32 phase code {0x80 path=0x7f (advance), 0x7f path=0, block/no-match/other=0}
+Side effects: no direct external write; indirect via enqueue_lp_display_row_type17 (enqueue LP-row sprite) / check_equip_slot_eligible_via_effect_node_and_bitmap internal side effects
+Constants: gDuelFieldState=0x0201b290; +0x4a0=0x94<<3 phase field; gP1LifePoints+0x1daa count

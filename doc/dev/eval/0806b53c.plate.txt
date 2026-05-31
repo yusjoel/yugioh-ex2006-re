@@ -1,0 +1,8 @@
+Conditionally forwards to Neo Daedalus placement check by equip-slot subtype. Takes the subtype field slot[+3] AND 0x30: if == 0x20 (chain subtype), forwards to dispatch_neo_daedalus_placement_check_by_state(slot) and passes through its return value; otherwise returns 0 fixed. A thin filter entry for the chain subtype, entering the Neo Daedalus placement state dispatch only when the subtype matches. Called via fn-ptr by the equip chain display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806b53c => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+3] AND 0x30=subtype field)
+Returns: r0=u32 {subtype 0x20 path=passthrough of dispatch_neo_daedalus_placement_check_by_state, else=0 fixed}
+Side effects: no direct external write; indirect via dispatch_neo_daedalus_placement_check_by_state internal side effects
+Constants: SUBTYPE_MASK=0x30; SUBTYPE_VALUE=0x20

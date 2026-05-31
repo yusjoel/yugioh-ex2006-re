@@ -1,0 +1,7 @@
+Checks whether Neo Daedalus / LP-slot effect meets "double activation" eligibility and returns a bool. Flow: first calls check_equip_slot_eligible_neo_daedalus_with_lp_slot_effect(slot); if not eligible returns 0. Otherwise calls count_effect_node_zone_activations(slot); if >1 returns 1, else 0. Shares the same callee pair with neighbor 0x08063d04, but this function does not write the tier field and returns only a {0,1} bool (the former returns a tier code {0,2}). Statically dispatched via fn-ptr by the equip effect display state-machine cluster (indeg=0). Return value lets the caller decide whether to trigger the double-activation path.
+
+CALLEE-COLUMN GREP: grepping callee=0x08064260 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr, passed through to both callees)
+Returns: r0=u32 bool {0=ineligible or activations<=1, 1=eligible and zone activations>1}
+Side effects: none (pure read + forward call)

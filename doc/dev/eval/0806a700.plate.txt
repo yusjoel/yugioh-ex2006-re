@@ -1,0 +1,8 @@
+Dispatches two sprite paths by equip-slot subtype. Takes the subtype field slot[+3] AND 0x30: if != 0x20 (normal path), takes player_id and calls enqueue_sprite_attr_type11 to enqueue a type11 sprite, then trigger_card_display_op31_if_not_active(player, 0xa2) to trigger card display, returns 0 fixed; if == 0x20 (chain subtype), first reads gDuelFieldState[+0x4a0], and when phase == 0x80 additionally calls enqueue_equip_slot_sprite_attr with mode=0xb to enqueue the slot sprite, then unconditionally forwards to dispatch_equip_chain_state_sprite_by_slot(slot, aux) and passes through its return value. Statically dispatched via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806a700 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+3] AND 0x30=subtype field, byte[+2] bit0=player_id [0..1], halfword[+0]=card_id); r1=u32* aux_ptr (passed through to dispatch_equip_chain_state_sprite_by_slot 2nd arg)
+Returns: r0=u32 {normal path=0 fixed, chain subtype 0x20 path=passthrough of dispatch_equip_chain_state_sprite_by_slot}
+Side effects: no direct external write; indirect OAM-queue side effects via enqueue_sprite_attr_type11 / enqueue_equip_slot_sprite_attr / trigger_card_display_op31_if_not_active
+Constants: SUBTYPE_MASK=0x30; SUBTYPE_VALUE=0x20; gDuelFieldState=0x0201b290 +0x4a0=0x94<<3; STATE=0x80; op31_arg=0xa2; mode=0xb

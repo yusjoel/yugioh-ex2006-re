@@ -1,0 +1,8 @@
+Per-frame display state machine for an equip effect node; dispatches by the phase code (0x7d/0x7e/0x7f/0x80) at gDuelFieldState[+0x4a0] and returns the next phase code. First checks slot[+4] bit2 block bit, returns 0 if set; phase == 0x80 calls check_equip_slot_eligible_via_effect_node_and_bitmap, returns 0x7f on success else 0; phase == 0x7f after gP1LifePoints[player*0x868 + 0xc] field is nonempty and check_zone_has_no_field_spell_node holds, loops dispatch_effect_handler_by_card_id until it returns nonzero or traversal completes, on hit clears the gP1LifePoints[+0x1d40] frame flag if [0x0201e2a0] slot state==1 or else calls invoke_card_display_op_0x31_sub1(0x2d), returns 0x7e; phase == 0x7e after gP1LifePoints[+0x1d40] nonempty calls set_lp_row_type6_with_value returns 0x7d; phase == 0x7d calls render_monster_slot_card_with_lp_bar then returns 0; other phases return 0. Statically dispatched per-frame via fn-ptr by the equip display driver (indeg=0).
+
+CALLEE-COLUMN GREP: grepping callee=0x0806c828 => 0 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr; byte[+4] bit2=block bit, byte[+2] bit0=player_id [0..1], halfword[+0]=card_id)
+Returns: r0=u32 phase code {0x80 success=0x7f, 0x7f=0x7e, 0x7e=0x7d, 0x7d=0, block/fail/other=0}
+Side effects: [gP1LifePoints + 0x1d40 (0xea<<5)]:=0 (str; 0x7f path clears frame flag when [0x0201e2a0] slot state==1)
+Constants: gDuelFieldState=0x0201b290 +0x4a0=0x94<<3; gP1LifePoints+0x1d40=0xea<<5 frame flag; PLAYER_STRIDE=0x868; STATE 0x7d/0x7e/0x7f/0x80

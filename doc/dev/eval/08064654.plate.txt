@@ -1,0 +1,7 @@
+Thin wrapper: forwards once to check_equip_slot_eligible_via_effect_node_and_bitmap(slot), then unconditionally clears r0 and returns 0. The callee verifies equip-slot eligibility via the effect-node + bitmap path and produces its internal side effects; this wrapper discards the return value and always returns 0. Called by 4 upper-level functions of the equip activation dispatch cluster as a trampoline entry that only needs to trigger the eligibility-check side effects, not the result bool.
+
+CALLEE-COLUMN GREP: grepping callee=0x08064654 => 4 hits
+
+Params: r0=u32* slot_ptr (effect_slot ptr, passed through to check_equip_slot_eligible_via_effect_node_and_bitmap)
+Returns: r0=u32 0 (fixed; movs r0,#0 unconditional, discards callee return, takes only its side effects)
+Side effects: no direct external write; indirect via check_equip_slot_eligible_via_effect_node_and_bitmap internal side effects
