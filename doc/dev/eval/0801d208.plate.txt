@@ -1,0 +1,6 @@
+Applies one palette bank + four 4-wide tile attribute strips. r2=palette_slot_packed saved to r9 @ 0801d216; r3=palette_src saved to r8 @ 0801d218. Calls copy_palette_bank_by_slot to copy palette bank to PALRAM, then calls write_tile_attr_strip_4wide four times with r8 incrementing by 0x20 each call (4 segments of 8 rows x 4 cols). Typical use: card image VRAM refresh combining palette + tile attributes. Returns void (Pattern B: pop {r0}; bx r0 @ 0801d28a).
+
+Constants:
+- COL_STRIDE = 0x20
+- COLS_PER_STRIP = 4
+- ROWS_PER_STRIP = 8

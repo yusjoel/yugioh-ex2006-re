@@ -1,0 +1,11 @@
+Equip slot eligibility classifier; returns 0/1/2. Calls check_equip_slot_eligible_by_tier_and_field6(r5,?); fail => fallback. r4 (effect_slot_ptr) null => fallback. Reads [r4,#4] card_type, extracts bits[17:15] (mask=0xe0<<0xa=0x38000), expects 0x80<<0x8=0x8000; mismatch => fallback. Calls check_card_is_zone_pair_restricted; calls get_card_extended_stat_field6 expecting field6==0x17. Calls read_effect_slot_side_and_type to extract slot_type [0..4]; indexes gDuelFieldSlots by player_id+slot_type, reads [+8] expecting nonzero. Calls get_slot_card_state_code expecting state_code==1 => return 2. Fallback path: reads [r5,#3] & 0x30; ==0 => return 1; !=0 => return 0.
+
+Constants:
+- TYPE_MASK = 0x38000
+- TYPE_EXPECTED = 0x8000
+- FIELD6_REQUIRED = 0x17
+- TYPE_FLAGS_MASK = 0x30
+- SLOT_TYPE_MAX = 4
+- gDuelFieldSlots_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- STATE_CODE_ACTIVE = 1

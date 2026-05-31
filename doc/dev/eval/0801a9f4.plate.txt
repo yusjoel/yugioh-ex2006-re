@@ -1,0 +1,8 @@
+Banlist password chars render to font-row buffer. Calls get_banlist_password_entry_ptr to get current entry ptr r6; reads col offset r5 from [gBanlistPasswordBuffer+0x66a] bits[8:2] (7-bit field); reads row r4 from [+0x66b] >>1. Main loop: reads [r6] byte, if nonzero and r4<=3: (1) banlist_password_enter_char(r6,r5,1); (2) render_banlist_text_col_cleared(buf,r5,r4); r5++ wraps at 0xf; r4++; r6+=2 advance. Returns void (Pattern B: pop {r0}; bx r0).
+
+Constants:
+- ENTRY_PTR_OFFSET = 0x66a
+- STEP_BYTE_OFFSET = 0x66b
+- COL_BITS = bits[8:2]
+- COL_WRAP = 0xf
+- ROW_MAX = 3

@@ -1,0 +1,7 @@
+Campaign scene main dispatcher by PRNG state. Reads gPrng+0x202 halfword, extracts bits[13:6] (lsls#0x12; lsrs#0x18 => 8-bit index [0..0xfd]); if index>0xfd calls load_campaign_state_post_sio to correct. Uses index to look up 256-entry function pointer table @ DAT_08028d78, loads target address, tail-calls via bx r7. Return value is the dispatched case handler's return value (tail-call passthrough). Function pointer 0x08028d41 referenced at 0x080e7a88 (Sub-type B).
+
+Constants:
+- INDEX_OFFSET = 0x202
+- INDEX_BITS = bits[13:6]
+- INDEX_RANGE = [0..0xfd]
+- DISPATCH_TABLE = 0x08028d78

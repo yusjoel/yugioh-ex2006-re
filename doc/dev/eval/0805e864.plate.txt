@@ -1,0 +1,8 @@
+Equip zone slot activation eligibility check with slot scan; returns 0/1/2. Entry: r5=effect_slot_ptr null => return 0. Calls check_effect_slot_is_equip_activatable; extracts player_id XOR side_flag for opponent check; calls check_card_field5_is_nonzero; two calls to read_effect_slot_side_and_type for side consistency and slot_type <= 4. Inner loop slot=[0..4]: calls check_zone_slot_equip_prerequisites; if passed calls invoke_effect_node_handler_with_zone_flag_guard => nonzero => return 2. After loop: checks [r6,#2] bits[11:6] zone_type & 0xfc0 == 0x480, AND [0x0201bb90+8]=0, AND player_id context match => return 1; else return 0.
+
+Constants:
+- SLOT_RANGE = [0..4]
+- ZONE_TYPE_MASK = 0xfc0
+- ZONE_TYPE_REQUIRED = 0x480
+- FIELD_CTX_BASE = 0x0201bb90
+- FIELD_CTX_GATE_OFF = 0x8

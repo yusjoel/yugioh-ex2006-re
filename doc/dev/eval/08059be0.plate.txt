@@ -1,0 +1,1 @@
+Enqueues equip zone sprite and triggers LP row update. Calls enqueue_equip_zone_sprite_at_slot to add equip zone sprite to render queue; then calls trigger_lp_row_type2_if_equip_tier_nonzero to trigger LP row type2 update if tier nonzero. Two calls execute unconditionally in sequence. Returns 0=no trigger / 1=triggered (Sub-case E: pop {r1}; bx r1).

@@ -1,0 +1,9 @@
+Equip zone effect eligibility check: large card_id BST dispatcher. Entry validates r1 (effect_slot_ptr) nonzero; checks [r1,#0x2] bits[9:5] <= 0xa (zone_type check); checks [r1,#0x3] & 0x30 == 0 (type_flags filter); calls check_card_is_zone_pair_restricted. All pre-checks passed: reads equip_slot card_id, enters card_id BST covering: Dark Hole (0x10f6), Raigeki (0x10f7), Harpie's Feather Duster (0x1246), Monster Reborn (0x12ea), Pot of Greed (0x12ec), Seven Tools of the Bandit (0x12ff), Banisher of the Light (0x1332), Magic Drain (0x140d), Riryoku Field (0x148f), Dark Balter the Terrible (0x14b6), Tutan Mask (0x153e), Curse of Royal (0x1541), Spell Shield Type-8 (0x15f1), Anti-Spell (0x1634), Spell Vanishing (0x16a6), Trap Jammer (0x1721), Armor Break (0x176b), Sorcerer of Dark Magic (0x17c6), Elemental Hero Avian (0x18a6), Spell-Stopping Statute (0x18dd), Royal Surrender (0x18de), Goblin Out of the Frying Pan (0x19e1), Malfunction (0x19e2). Unmatched card_id => returns 0. Returns 0=fail / 1=pass (Sub-case E).
+
+Constants:
+- ZONE_TYPE_MAX = 0xa
+- TYPE_FLAGS_MASK = 0x30
+- CARD_ID_DARK_HOLE = 0x10f6
+- CARD_ID_RAIGEKI = 0x10f7
+- CARD_ID_BANISHER = 0x1332
+- RESERVED_ICID_131C = 0x131c

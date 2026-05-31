@@ -1,0 +1,6 @@
+Equip LP display sequence two-phase tick. Reads same state word as 0x0805715c [0x0201b290+0x4ac]: phase=0 => writes gP1LifePoints+0x1d40 := 1 when type_flags=0x30 condition met (str @ 080574a4), returns 0; phase=1 => strh @ 08057516 writes equip_slot+0x8 := [gP1LifePoints+0x1d40] halfword, returns 0 or 1. Symmetric sibling of tick_equip_activation_state_by_phase (0x0805715c). Returns 0 or 1 (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x4ac
+- LP_FIELD_OFFSET = 0x1d40

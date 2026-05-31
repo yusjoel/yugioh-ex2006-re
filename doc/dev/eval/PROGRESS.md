@@ -55,13 +55,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #196 |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #197 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4300 (92.65%) |
-| **未命名 (FUN_*)** | 341 (其中 164 ready / 177 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 |
-| **下一批** | #196 (Phase 5 idx 0) — `ready_batches_phase5.json` |
-| **上次更新** | 2026-05-31 (Phase 4 完成 465/465; Phase 5 重导锁定: ready=164, 9 批 #196..#204, blocked=177) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4320 (93.08%) |
+| **未命名 (FUN_*)** | 321 (其中 144 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (144 剩余) |
+| **下一批** | #197 (Phase 5 idx 1) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-05-31 batch #196 PASSED — banlist scene dispatch/scroll/render + campaign prng dispatch + palette strip + equip-eligibility/activation/LP cluster x20 (4320/4641 = 93.08%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
 | **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |

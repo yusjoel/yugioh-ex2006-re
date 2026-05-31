@@ -1,0 +1,4 @@
+Equip slot eligibility check: card_id binary search tree dispatch entry. r0=card_slot_ptr, r1=player_id saved to r4, r2=slot_idx saved to r5. Reads card_id from [r0,#0x0] halfword; dispatches via BST to specific check_equip_slot_eligible_* predicate functions. Unmatched card_id (default path) returns 0 (not equippable). Writes [equip_slot_ptr+0x8] halfword (strh @ 08051002, conditional path). Referenced by 3 fn-ptr tables @ 0x080569ec / 0x08059acc / 0x08063890 (Sub-type B). Returns 0 or 1 (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- CARD_ID_OFFSET = 0x0

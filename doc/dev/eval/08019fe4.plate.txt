@@ -1,0 +1,8 @@
+Banlist password input scene scrollbar per-frame input handler. r0=direction_flag saved to r8 @ 08019fec. Reads scrollbar cur value from gBanlistPasswordBuffer+0x64c into r5. If r8==-1 (no external direction): reads nibble from [+0x663], computes (nibble+1)%3 char step, calls advance_text_ptr_by_charlen, updates [+0x663] low-bit flag, calls refresh_banlist_pass_chars_font_rows, then set_banlist_scroll_step + tick_banlist_bg_scroll_step. r8!=-1: external direction branch via cmp r2,#0x1. Returns void (Pattern B: pop {r0}; bx r0).
+
+Constants:
+- SCROLLBAR_OFFSET = 0x64c
+- CHAR_STEP_BUF_OFFSET = 0x663
+- NIBBLE_WRAP_MOD = 3
+- CLEAR_FLAG_MASK = 0xf0
+- SET_FLAG_BIT = 0x1

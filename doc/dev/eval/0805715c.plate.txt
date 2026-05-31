@@ -1,0 +1,9 @@
+Equip activation state machine two-phase tick. Reads [0x0201b290+0x4ac] state: phase=0 => initial condition check, compares card_id against 0x14de (The Dragon's Bead) / 0x12f3 (Ultimate Offering) / 0x1624 (Pitch-Black Power Stone) to determine LP field write, str @ 080571e0/080571fc state advance +1, returns 0; phase=1 => strh @ 08057216 writes equip_slot+0xc, returns 0 or 1; other => return 0. Shares state word with dispatch_equip_activation_score_by_card_id (0x08056bc4). Returns 0 or 1 (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x4ac
+- CARD_ID_DRAGONS_BEAD = 0x14de
+- CARD_ID_ULTIMATE_OFFERING = 0x12f3
+- CARD_ID_PITCH_BLACK_POWER_STONE = 0x1624
+- LP_FIELD_OFFSET = 0x1d40

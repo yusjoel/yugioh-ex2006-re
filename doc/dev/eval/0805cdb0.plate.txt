@@ -1,0 +1,4 @@
+Lord of D. (CARD_ID=0x128b) effect dispatch function. Calls count_paired_slots_both_sides(card_id=0x128b) to count paired slots for Lord of D. on both sides; passes result as monster_count to dispatch_effect_for_neo_daedalus_slot_with_monster_count. count=0 => dispatch returns 0 (no effect); nonzero => returns dispatch result. Dedicated entry for Lord of D. in equip/field effect chain. Returns 0 or dispatch result (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- CARD_ID_LORD_OF_D = 0x128b

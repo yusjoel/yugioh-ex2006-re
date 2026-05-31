@@ -1,0 +1,7 @@
+Equip zone 14 eligibility check: dual-player x slot [0..4] double loop. Entry: r1 null or type_flags & 0x30 != 0 => return 0. Calls check_effect_slot_is_equip_activatable; checks player_id XOR side_flag for opponent relationship (1-player_id); calls get_card_extended_stat_field6 verifying field6==0x16. Then outer loop player=0..1, inner loop slot=0..4: calls check_zone_slot_equip_prerequisites; if passed calls invoke_effect_node_handler_with_zone_flag_guard. Any invoke nonzero => return 1; all traversed no trigger => return 0. Returns 0 or 1 (Sub-case E).
+
+Constants:
+- TYPE_FLAGS_MASK = 0x30
+- FIELD6_REQUIRED = 0x16
+- PLAYER_RANGE = [0..1]
+- SLOT_RANGE = [0..4]

@@ -1,0 +1,9 @@
+Equip activation score dispatcher by card_id BST + 3-state machine routing. Reads [0x0201b290+0x4ac] state: state=0 => card_id BST dispatch to activation score handlers; state=1 => LAB_08056fc0; state=2 => LAB_08056fe8; other => return 0. card_id dispatch covers: Cyber Raider (0x1298), Kiryu (0x15cf), Second Goblin (0x15d3), Poison of the Old Man (0x15e7) and others. Returns -1/0/positive (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- STATE_BASE = 0x0201b290
+- STATE_OFFSET = 0x4ac
+- CARD_ID_CYBER_RAIDER = 0x1298
+- CARD_ID_KIRYU = 0x15cf
+- CARD_ID_SECOND_GOBLIN = 0x15d3
+- CARD_ID_POISON_OLD_MAN = 0x15e7

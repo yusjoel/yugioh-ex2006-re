@@ -1,0 +1,4 @@
+Traverses equip zone node chain and triggers LP score tick. If no node (null check fails): returns -1 (early exit). With nodes: iterates node chain, calls tick_equip_lp_score_and_card_id_seq for each node; if result nonzero returns that result immediately; all nodes processed without trigger returns 0 or -1. Returns -1=no node / 0=no trigger / positive=tick result (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- NULL_SENTINEL = -1

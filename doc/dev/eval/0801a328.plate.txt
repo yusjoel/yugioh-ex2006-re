@@ -1,0 +1,6 @@
+Banlist password input scene resource load init. Copies gBanlistPasswordBuffer state to stack-local struct (ldmia/stmia, 16 bytes); computes 3 IWRAM offset addresses (r9+offset series) as GFX targets; calls load_g2d_obj_resource_set for OBJ gfx set; calls zero_struct_36bytes + fs_load x2 for two FS file resources; calls apply_gfx_resource_list to commit GFX config; sets struct fields (strb/strh/str: width=0x40, resource flags). All paths converge at movs r0,#0x1 @ 0801a442; returns 1 fixed (Sub-case E).
+
+Constants:
+- COPY_SIZE_WORDS = 4
+- WIDTH_VAL = 0x40
+- FLAG_BIT1 = 0x1

@@ -1,0 +1,6 @@
+Banlist password input scene string load dispatcher. r0=key [0..3] selects load operation: key=0 -> load_game_str_pair_1004_to_state; key=1 -> load_game_str_1006_to_state; key=2 -> copy_str_unbounded (src=DAT_08017ca8, dst=r1+0x8d); key=3 -> encode_str_table_entry_to_line_buf. All paths converge at movs r0,#0x1 @ 08017cbc; returns 1 fixed. Sub-case E epilogue: pop {r1}; bx r1.
+
+Constants:
+- BUFFER_OFFSET_0x8D = 0x8d
+- STR_SRC_ADDR = 0x09e3afdc
+- KEY_RANGE = [0..3]

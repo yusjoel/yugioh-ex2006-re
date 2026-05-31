@@ -1,0 +1,10 @@
+Checks if any active equip slot or valid zone pair exists in gDuelFieldSlots. Outer loop player=[0..1], inner loop slot=[0..4] (step SLOT_STRIDE=0x14): checks bit19 nonzero AND [+8]=0 AND [+6]!=0; any match => return 1. If no matching slot: calls invoke_count_zone_pair_hits_full_range(equip_slot_ptr, fn_ptr=0x08051319); result > 0 => return 1, else return 0.
+
+Constants:
+- gDuelFieldSlots_BASE = 0x0201c510
+- PLAYER_STRIDE = 0x868
+- SLOT_STRIDE = 0x14
+- SLOT_COUNT = 5
+- PLAYER_COUNT = 2
+- BIT19_MASK = 0x80000
+- FN_PTR = 0x08051319

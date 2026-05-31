@@ -1,0 +1,6 @@
+Equip slot eligibility check with field_state=2 gate. Reads [gP1LifePoints+0x1cf4] state word; if not equal to 2 => return 0 immediately. State=2: calls check_equip_slot_chain_absent(r4,r5); if returns 0 => return 0. Then calls check_equip_slot_eligible_by_tier_and_field6(r4,r5); if returns 0 => return 0. All three conditions passed => return 1. State-gated serial predicate for chain_absent + tier/field6. Returns 0 or 1 (Sub-case E: pop {r1}; bx r1).
+
+Constants:
+- gP1LifePoints_BASE = 0x0201c4e0
+- FIELD_STATE_OFF = 0x1cf4
+- REQUIRED_STATE = 2
