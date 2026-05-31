@@ -1,0 +1,11 @@
+Build the equip eligibility state and mark the set-f flag. First calls check_card_id_is_equip_excluded_range; if the card id is not in the equip excluded range, returns 0. Otherwise writes card_id into IWRAM [base+0xb3*8], writes the get_equip_display_type_code_by_card_id result into [base+0xb4*8], and writes the negated flag of check_card_id_is_equip_excluded_set_f into [base+0xb5*8]; calls fill_equip_criteria_display_code_array to fill the display code array. Then iterates the display code entries (count from [base+0xb4*8]), calling clear_equip_slot_criteria_on_ext_field6_match and check_card_id_is_equip_set_e for each entry, setting the set-f flag on a hit. Returns 1 (complete) or 0 (excluded).
+
+CALLEE-COLUMN GREP: grepping callee=0x0807fcc0 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807fcc1" asm/all.s => 0 hits.
+
+Params: r0=card_id internal card id [1..0x1431] (entry adds r4,r0,#0); r1=context processing context (entry mov r8,r1; r8 is callee-save alias of r1)
+Note: entry .hword 0x4657=mov r7,r10 / 0x464e=mov r6,r9 / 0x4645=mov r5,r8 + push is the r8/r9/r10 callee-save save sequence, not parameters
+Returns: r0=int 1 (all entries complete) or 0 (card excluded, early return)
+Side effects: [0x0201b290+0xb3*8] := card_id; [0x0201b290+0xb4*8] := display type code (get_equip_display_type_code_by_card_id); [0x0201b290+0xb5*8] := set-f flag (set to 1 in loop on check_card_id_is_equip_set_e hit)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_0807fd74 movs r0,#1 (loop complete); LAB_0807fd56 movs r0,#0 (card excluded early return)
+Constants: IWRAM_BASE=0x0201b290, CARD_SLOT=0xb3*8=0x598, TYPE_CODE_SLOT=0xb4*8=0x5a0, SET_F_FLAG_SLOT=0xb5*8=0x5a8

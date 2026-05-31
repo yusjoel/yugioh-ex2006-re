@@ -1,0 +1,10 @@
+Equip activation display four-state stepper. Reads state (0/1/2/3) at IWRAM [0x0201b290+0x96*8]. State 0: clears the bit field of effect node [r4+4] (AND mask), clears low bits of [r4+6] (AND ~0x1d), calls count_effect_node_zone_activations and check_zone_slot_equip_prerequisites to validate the zone prerequisites. State 1/3: triggers op31 display (param 0x65/0x79), calls set_equip_activation_state_by_mode, after confirmation via check_activation_display_state_is_confirmed calls enqueue_equip_slot_sprite_with_code_rotation to submit the sprite and returns 1; if unconfirmed, rolls back the step counter and returns 0. Most paths advance the counter and return 0; the confirmed-complete path returns 1.
+
+CALLEE-COLUMN GREP: grepping callee=0x08082290 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x08082291" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r4,r0,#0)
+Returns: r0=int 0 (stepping) or 1 (confirmed and sprite submitted complete)
+Side effects: [effect_node+4] AND mask (state 0/1, clear bits); [effect_node+6] AND ~0x1d (state 0/1, clear low bits); [0x0201b290+0x96*8] += 1 / -= 1 (step counter); OAM sprite submission (via enqueue_equip_slot_sprite_with_code_rotation)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_0808247e movs r0,#1 (state 3 confirmed and submitted); LAB_0808249a movs r0,#0 (stepping)
+Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x96*8=0x4b0, NODE_FLAG_OFFSET=0x4, BYTE6_CLEAR_MASK=~0x1d=0xe2, OP31_PARAM_S1=0x65, OP31_PARAM_S3=0x79, gP1LP_OFF=0x1d68/0x1d6c

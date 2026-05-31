@@ -7,12 +7,12 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4380 / 全 CSV 4641 行 = **94.38%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4400 / 全 CSV 4641 行 = **94.81%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
-- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 80, 剩 84)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
+- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 100, 剩 64)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -23,7 +23,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段 (Phase 5): 处理重导后 ready 集合 164 个函数 (已落地 80, 剩 84)。
+当前阶段 (Phase 5): 处理重导后 ready 集合 164 个函数 (已落地 100, 剩 64)。
   - 锁定清单: doc/dev/eval/ready_batches_phase5.json (Phase 5, 9 批 #196..#204)
   - 排序策略: 按地址升序 (与 Phase 2/3/4 一致, 利于同区段函数复用簇方法论)
   - 高 indeg hub (indeg=34 0x080d46a8 / indeg=10 0x080d933c / indeg=9 0x080dfa44 / indeg=9 0x080d5470 等) 已散在各批中, 不单独提前
@@ -55,13 +55,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #200 |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #201 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4380 (94.38%) |
-| **未命名 (FUN_*)** | 261 (其中 84 ready / 177 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (84 剩余) |
-| **下一批** | #200 (Phase 5 idx 4) — `ready_batches_phase5.json` |
-| **上次更新** | 2026-05-31 batch #199 PASSED — equip display state machine (tick_*_display_seq) + type_code/state dispatch + LP bar/zone sprite enqueue cluster x20 (4380/4641 = 94.38%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4400 (94.81%) |
+| **未命名 (FUN_*)** | 241 (其中 64 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (64 剩余) |
+| **下一批** | #201 (Phase 5 idx 5) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-05-31 batch #200 PASSED — equip activation/slot/chain/best-target/polymerization display state machines + effect-node fn-ptr slot guards + zone eligibility scan + duel puzzle scene init cluster x20 (4400/4641 = 94.81%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
 | **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |

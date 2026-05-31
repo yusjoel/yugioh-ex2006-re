@@ -1,0 +1,10 @@
+Polymerization equip display three-state stepper. Reads state (0/1/2) at IWRAM [0x0201b290+0x96*8]. State 0: calls check_equip_slot_eligible_polymerization_deck_pair_effect to validate whether the card meets the fusion-material pairing condition; if it fails (returns 0), jumps to the end branch and returns 1. State 1: passes through (effect_node, card_context) to tick_equip_slot_display_by_card_id_3state to advance the card-face display sub-state-machine, returning its result (Sub-case G passthrough). State 2: reads the player bit at [effect_node+2], calls find_deck_slot_by_card_pair_match to find the slot by fusion pairing in the deck, on a hit reads the slot attributes (palette/code) from the monster slot table and calls pack_equip_slot_sprite_with_code_attr twice to submit the sprite. The complete path returns 1. This card is Polymerization (icid 0x12e5).
+
+CALLEE-COLUMN GREP: grepping callee=0x08084e70 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x08084e71" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r7,r0,#0); r1=card_context card context/deck pairing parameter (entry adds r4,r1,#0, passed to fusion-material check and display sub-state-machine)
+Returns: r0=int 1 (complete/fail early end) or state-1-path passthrough of tick_equip_slot_display_by_card_id_3state return value
+Side effects: no external str (this function only reads IWRAM state + calls sub-functions; sprite submission happens inside pack_equip_slot_sprite_with_code_attr)
+Exit: pop {r4,r5,r6,r7}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08084f2a movs r0,#1 (state 0 fail / state 2 complete); LAB_08084ea6 state 1 bl tick_equip_slot_display_by_card_id_3state; b LAB_08084f2c (Sub-case G, skips movs r0,#1, passes through callee return value)
+Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x96*8=0x4b0, CARD_ID_POLYMERIZATION=0x12e5, SPRITE_CODE=0xe (movs r2,#0xe)

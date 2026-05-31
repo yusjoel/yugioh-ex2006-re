@@ -1,0 +1,10 @@
+Equip effect node display stepper; dispatches on IWRAM state code via two paths. Reads the state byte at [0x0201b290+0x94*8]: when state==0x7f, calls enqueue_lp_display_row_if_enabled to push the LP indicator row into the display queue; when state==0x80, first calls check_equip_slot_eligible_via_effect_node_and_bitmap to verify the equip slot is usable, and on pass returns 0x7f to advance to the next state. All other states return 0. Used to refresh LP/eligibility display per frame during equip activation animation.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807da70 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807da71" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node struct pointer (passed through to both callees)
+Returns: r0=int next state code; 0x7f (advance to LP display) or 0 (no-op for other states)
+Side effects: no external str/strh/strb (this function only reads IWRAM state + calls callees; writes happen inside callees)
+Exit: pop {r1};bx r1 = Sub-case E (r1=saved LR, r0 not clobbered, r0 is the return value)
+Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x94*8=0x4a0, STATE_LP=0x7f, STATE_ELIGIBLE=0x80

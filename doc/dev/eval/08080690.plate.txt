@@ -1,0 +1,11 @@
+Equip slot sprite display six-state stepper. Reads the step state (0..5) at IWRAM [0x0201b290+0x96*8] and dispatches via a 6-entry jump table: each case calls trigger_card_display_op31_if_not_active / init_effect_slot_display_context / format_game_text_with_int_arg / pack_equip_slot_sprite_with_code_attr / enqueue_equip_slot_sprite_with_code_rotation respectively to complete that frame's display, then increments the step counter by 1. A handled state returns 0 (continue); an out-of-range/unhandled state returns 1 (complete). Used to advance the equip entrance animation frame by frame.
+
+CALLEE-COLUMN GREP: grepping callee=0x08080690 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x08080691" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r6,r0,#0)
+Note: entry .hword 0x4657/464e/4645 + push is r8/r9/r10 callee-save save; 0x4680=mov r8,r0 with 0x4643=mov r3,r8 / 0x4698=mov r8,r3 are internal player/flag computation aliases, not extra parameters
+Returns: r0=int 0 (stepping) or 1 (complete/out-of-range)
+Side effects: [0x0201b290+0x96*8] += 1 (step counter, each case); display queue / OAM write (via each case's callee)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_0808092c movs r0,#0 (stepping, all valid cases); LAB_08080930 movs r0,#1 (default/out-of-range)
+Constants: IWRAM_BASE=0x0201b290, STEP_OFFSET=0x96*8=0x4b0, STATE_MAX=5, CRITERIA_COUNT_SLOT=0xb4*8=0x5a0

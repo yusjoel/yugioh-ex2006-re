@@ -1,0 +1,10 @@
+Equip best target display four-state stepper. Reads state (0/1/2/3) at IWRAM [0x0201b290+0x96*8]. State 0: clears bits of effect node [r4+4] (AND 0xfffc7fff) and low bits of [r4+6] (AND ~0x1d); calls find_zone_slot_match_by_type_in_node_list, on a hit triggers op31 display (param 0x107) then returns -1; otherwise validates via find_first_available_monster_slot_for_player and count_effect_node_zone_activations, advancing the step and returning 0 on pass. State 1: calls find_best_equip_target_slot_scored to pick the highest-scored equip target slot, then after card_name and count_equip_chain_default_flags checks calls enqueue_equip_slot_sprite_with_code_rotation to submit the sprite. State 2/3: submits the sprite after confirm, step +1. Advancing returns 0, complete returns 1, no slot found returns -1.
+
+CALLEE-COLUMN GREP: grepping callee=0x08083560 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x08083561" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r4,r0,#0)
+Returns: r0=int 0 (stepping) / 1 (complete) / -1 (no available target slot, early-return sentinel)
+Side effects: [effect_node+4] AND 0xfffc7fff (state 0 clear bits); [effect_node+6] AND ~0x1d (state 0 clear low bits); [0x0201b290+0x96*8] := next state (step); OAM sprite submission (via enqueue_equip_slot_sprite_with_code_rotation)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_080836f4 movs r0,#0 (advance, after writing state); LAB_080835ba movs r0,#1; rsbs r0,r0,#0 -> -1 (no-slot-found sentinel); LAB_080836f8 movs r0,#1 (complete/default)
+Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x96*8=0x4b0, NODE_FLAG_MASK=0xfffc7fff, BYTE6_CLEAR=~0x1d=0xe2, OP31_PARAM=0x107, CHAIN_FLAG_PARAM=0xb3<<5=0x1660, gP1LP_OFF=0x1d68/0x1d6c

@@ -1,0 +1,11 @@
+Submit LP indicator display from the equip slot bitmap. Reads the player/slot bit field at effect node [r7+2], indexes the ROM card data table by player number and card slot index (via the r12 base), compares the slot bitmap entry by entry and computes the LP indicator parameters, and calls submit_equip_lp_indicators_with_bar to push the LP bar into the display queue. Used to render the LP-change indicator of affected cards during equip activation.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807f53c => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807f53d" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r7,r0,#0; r7 is internal alias); r1=card_table_context card data table context base (entry mov r9,r1 / mov r8,r1 / mov r12,r1 are all internal callee-save aliases of r1)
+Note: entry .hword 0x464f=mov r7,r9 + .hword 0x4646=mov r6,r8 + push is the r8/r9 callee-save save sequence, not parameters
+Returns: r0=int 0 (default) or submit_equip_lp_indicators_with_bar passthrough value
+Side effects: LP indicator bar submission (via submit_equip_lp_indicators_with_bar)
+Exit: pop {rN};bx rN = Sub-case E (r0 not clobbered); main path returns callee result (passthrough) or default movs r0,#0
+Constants: NODE_FLAGS_OFFSET=0x2, card data stride via 0x868 (see DWORD_0807f5bc/c0)

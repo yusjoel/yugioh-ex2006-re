@@ -1,0 +1,10 @@
+Find the first equippable slot entry for the given player. Input r0 bit0 selects the player. The first pass iterates the player's LP-region zone entries (starting at [gP1LifePoints+0xc], stride 4, count from a counter field), calling check_equip_slot_eligible_with_criteria_and_target(player, criteria=0xb, slot) for each slot, returning that entry pointer on a hit. The second pass iterates the duel field card slots (starting at [0x0201c510], stride 0x14, slots 0..4), calling check_equip_slot_eligible_with_criteria_and_target(player, slot, 0), returning that entry pointer on a hit. Returns NULL if neither pass hits.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807fb14 => 1 hit
+indeg=1, form(b). caller: addr 0x0807fb9c (tags: [equip, eligibility]; role: equip eligibility evaluator, calls this function in a loop to find equippable slots for card type category 3).
+
+Params: r0=player_packed packed player selection word (entry adds r6,r0,#0; bit0 selects player [0..1])
+Returns: r0=slot entry pointer (hit) or 0 (NULL, no equippable slot)
+Side effects: no external str (pure lookup, reads LP region and card slot table only)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); two hit paths each adds r0,<entry>; b LAB_0807fb96 (Sub-case G, r0=entry pointer); all-miss LAB_0807fb94 movs r0,#0 (NULL)
+Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, ZONE_BASE_OFFSET=0xc, FIELD_SLOT_BASE=0x0201c510, FIELD_SLOT_STRIDE=0x14, CRITERIA=0xb, SLOT_MAX=4

@@ -1,0 +1,10 @@
+Prerequisite gate that decides Neo Daedalus field-spell equip activation eligibility. Reads the player bit at [effect_node+2], calls check_field_spell_neo_daedalus_group_placeable(player_id) to validate that the field spell is placeable, returning 0 if it fails (returns 0). Then calls count_field_copies_of_card(0x13f2) to count the number of Mask of Restrict on the field; if any exist (nonzero) the equip is blocked and returns 0. After both gates pass, iterates the field card entries (zone list 0x09e5a0c4, stride 4), calling eval_equip_zone_activation_eligible(effect_node, slot_idx) for each non-empty entry; returns 1 on any hit, 0 if none hit.
+
+CALLEE-COLUMN GREP: grepping callee=0x08086c80 => 1 hit
+indeg=1, form(b). caller: addr 0x08086cdc (tags: [equip, activation_display]; role: equip activation display switch dispatcher, in case D_80 it first clears the state word then calls this function as a prerequisite eligibility gate; call site @ 0x08086da6).
+
+Params: r0=effect_node* equip effect node pointer (entry adds r6,r0,#0; reads [+2] player bit, passed to the field zone eligibility evaluation)
+Returns: r0=int 1 (has eligible equip field zone) or 0 (field spell not placeable/blocked by Mask of Restrict/no eligible zone)
+Side effects: no external str (reads [effect_node+2] + zone list only; evaluation inside callee)
+Exit: pop {r4,r5,r6}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08086ca4 movs r0,#1 (has eligible equip field zone); LAB_08086cce movs r0,#0 (field spell not placeable / Mask of Restrict block / no eligible zone)
+Constants: CARD_ID_MASK_OF_RESTRICT=0x13f2 (Mask of Restrict), ZONE_LIST=0x09e5a0c4, ZONE_FIELD_MASK=0x13 (lsls #0x13 to take the non-empty bit)

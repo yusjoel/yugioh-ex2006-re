@@ -1,0 +1,10 @@
+Slot index range and slot type dual guard: calls the effect node handler only when slot_idx <= 4 and the slot type matches. First compares r2 (slot_idx) with 4, returning 0 when out of range; then calls read_effect_slot_side_and_type to read the slot's side/type byte and compares it with input r1, returning 0 when not equal; on full pass, passes through (r0,r1,r2) to invoke_effect_node_handler_with_zone_flag_guard. Serves as a function-pointer table slot (DWORD_08082bc4) for tick_equip_display_with_fn_ptr_routing_3state to route to.
+
+CALLEE-COLUMN GREP: grepping callee=0x08082b2c => 0 hits
+indeg=0 but Sub-type B (fn-ptr table slot DWORD_08082bc4; invoked indirectly by tick_equip_display_with_fn_ptr_routing_3state @ 0x08082b88 via the routing table). fn-ptr check: grep ".word 0x08082b2d" asm/all.s => 1 hit.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r4,r0,#0); r1=expected_slot_type expected slot type [0..0xff] (entry adds r5,r1,#0, compared with read slot type); r2=slot_idx card slot index [0..4] (entry adds r6,r2,#0, compared with 4)
+Returns: r0=int callee passthrough result (pass) or 0 (out of range/type mismatch)
+Side effects: no external str (guard read + passthrough call only)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); bl invoke_effect_node_handler_with_zone_flag_guard; b LAB_08082b56 (Sub-case G, passes through callee result); LAB_08082b54 movs r0,#0 (out of range or type mismatch)
+Constants: SLOT_IDX_MAX=4, SLOT_TYPE_BYTE_MASK=0xff (lsls #0x18; lsrs #0x18)

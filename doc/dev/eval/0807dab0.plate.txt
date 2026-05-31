@@ -1,0 +1,10 @@
+Sync equip hand slot OAM with player state bits. Checks bit2 of effect node [r4+4]; if set, skips OAM submission; otherwise locates the gP1LifePoints+0x11c slot by the player bit at [r4+2], reads the [+2] halfword bit0, and when inactive calls invoke_equip_hand_slot_oam_if_eligible to push the hand slot sprite into OAM. Then calls set_player_state_bit_with_sprite_update twice, setting player state bit 0x14 and 0x15 respectively and triggering a sprite refresh. Used for display and player-state sync when an equip card enters from the hand.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807dab0 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807dab1" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r4,r0,#0, saved as r4); r1=context_arg context parameter (entry adds r5,r1,#0, saved as r5)
+Returns: r0=int fixed 0 (no explicit return semantics, side-effect only)
+Side effects: OAM sprite submission (via invoke_equip_hand_slot_oam_if_eligible); player state bit 0x14 / 0x15 set (via set_player_state_bit_with_sprite_update x2)
+Exit: pop {r4,r5}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); single r0 write at LAB_0807db02 movs r0,#0; three branches (bit2 set / slot already active / normal) all converge here -> fixed return 0
+Constants: gP1LifePoints=0x0201c4e0, SLOT_TABLE_OFF=0x8e<<1=0x11c, SLOT_STRIDE=0x868, NODE_FLAG_OFFSET=0x4 bit2, PLAYER_BIT_A=0x14, PLAYER_BIT_B=0x15

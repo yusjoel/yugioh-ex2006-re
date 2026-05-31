@@ -1,0 +1,10 @@
+Initialize the duel puzzle scene state. First calls clear_duel_puzzle_wram_regions to zero all EWRAM/VRAM data regions. Then writes several state words in the gP1LifePoints region: [+0x1d00]:=1 (puzzle mode active flag), [+0x1cec]:=9 (a counter/stage initial value), [+0x1cf0]:=0xffff (sentinel/invalid card id), [+0x1ce0]:=0 (clear), [+0x1ce8]:=0 (clear); and writes EWRAM [0x0201e2a0+0/4/8]:=0, [+0xc]:=1, [+0x10]:=0 to initialize the scene control struct. Finally passes r0 through to render_duel_puzzle_text_to_sprite_queue to render the puzzle text into the sprite queue. Returns a fixed 1 (init complete).
+
+CALLEE-COLUMN GREP: grepping callee=0x080937d4 => 1 hit
+indeg=1, form(b). caller: addr 0x0801fec0 (tags: [duel_flow, vram]; role: duel scene switch dispatcher (large duel scene switch), calls this function inside the duel_puzzle scene case to do scene init; call site @ 0x0801ffb4).
+
+Params: r0=scene_arg scene parameter/context (entry adds r4,r0,#0; passed through to render_duel_puzzle_text_to_sprite_queue)
+Returns: r0=int 1 (fixed value, init complete flag; caller decides the scene is ready by this)
+Side effects: [gP1LifePoints+0x1d00] := 1 (puzzle mode active flag); [gP1LifePoints+0x1cec] := 9 (stage/counter initial value); [gP1LifePoints+0x1cf0] := 0xffff (sentinel/invalid card id); [gP1LifePoints+0x1ce0] := 0; [gP1LifePoints+0x1ce8] := 0; [0x0201e2a0+0] := 0, [+4] := 0, [+8] := 0, [+0xc] := 1, [+0x10] := 0 (scene control struct init)
+Exit: pop {r4}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); single path @ 0809381a movs r0,#1 -> returns fixed 1 (init complete); no other exit
+Constants: gP1LifePoints=0x0201c4e0, MODE_FLAG_OFF=0x1d00 (0xe8<<5), CLEAR_OFF_A=0x1ce0 (0xe7<<5), STAGE_OFF=0x1cec=9, SENTINEL_OFF=0x1cf0:=0xffff, CLEAR_OFF_B=0x1ce8, SCENE_CTX=0x0201e2a0

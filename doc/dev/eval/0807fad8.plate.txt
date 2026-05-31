@@ -1,0 +1,10 @@
+Validate equip slot eligibility only when the effect node player matches. Reads the [+2]bit0 and [+3]bit6 of the current effect node item at IWRAM [0x0201b290+0x484], XORs them to get the player number, and compares it with input r0; if equal, calls check_equip_slot_eligible_with_criteria_and_target and passes through its result, otherwise returns 0. Serves as a function-pointer table slot for the equip state machine dispatch.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807fad8 => 0 hits
+indeg=0 but Sub-type B (fn-ptr table slot DAT_0807ff88, asm line 210365). fn-ptr check: grep ".word 0x0807fad9" asm/all.s => 1 hit. Invoked indirectly via the function pointer table by the state machine near 0x0807ff86.
+
+Params: r0=player_id player number [0..1] (entry adds r3,r0,#0, compared with node player number); r1=criteria_context eligibility check context (entry adds r4,r1,#0, passed through to callee)
+Returns: r0=int callee result passthrough when player matches, 0 when not matched
+Side effects: no external str (reads IWRAM + calls callee only)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); match path bl check_equip_slot_eligible_with_criteria_and_target; b LAB_0807fb0e (Sub-case G, bypasses movs r0,#0, passes through callee return value); no-match path LAB_0807fb0c movs r0,#0
+Constants: IWRAM_BASE=0x0201b290, NODE_PTR_OFFSET=0x484, BYTE2_BIT0, BYTE3_BIT6

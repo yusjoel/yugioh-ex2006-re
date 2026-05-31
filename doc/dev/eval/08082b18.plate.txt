@@ -1,0 +1,10 @@
+Slot index range guard: calls the effect node handler only when slot_idx <= 4. Compares r2 (slot_idx) with 4, returning 0 directly when greater; otherwise passes through (r0,r1,r2) to invoke_effect_node_handler_with_zone_flag_guard and returns its result. Serves as a function-pointer table slot (DWORD_08082bbc) for tick_equip_display_with_fn_ptr_routing_3state to route to; the simplest of the three guard variants.
+
+CALLEE-COLUMN GREP: grepping callee=0x08082b18 => 0 hits
+indeg=0 but Sub-type B (fn-ptr table slot DWORD_08082bbc; invoked indirectly by tick_equip_display_with_fn_ptr_routing_3state @ 0x08082b88 via the r7 routing table). fn-ptr check: grep ".word 0x08082b19" asm/all.s => 1 hit.
+
+Params: r0=effect_node* equip effect node pointer (passthrough); r1=type_or_side type/side parameter (passthrough); r2=slot_idx card slot index [0..4] (gate value compared with 4)
+Returns: r0=int callee passthrough result (slot valid) or 0 (slot_idx > 4)
+Side effects: no external str (passthrough call only; writes happen inside callee)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); bl invoke_effect_node_handler_with_zone_flag_guard; b LAB_08082b26 (Sub-case G, bypasses movs r0,#0, passes through callee result); LAB_08082b24 movs r0,#0 (slot out of range)
+Constants: SLOT_IDX_MAX=4

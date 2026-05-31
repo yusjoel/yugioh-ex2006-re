@@ -1,0 +1,10 @@
+Freed the Matchless General (card 0x14c4) equip display dispatch. If IWRAM state==0x80, first calls check_value_in_slot_chain to confirm the target value exists in the slot chain, and on pass calls enqueue_sprite_attr_type11 to push the type11 sprite attribute; also calls enqueue_graveyard_spell_for_hand_set_code to enqueue the graveyard spell/trap by set code into the hand. Dedicated to this card's activation special-effect display.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807dca4 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807dca5" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r4,r0,#0, saved as r4); r1=context_arg context parameter (entry adds r6,r1,#0, saved as r6)
+Returns: r0=int 0 (default path) or callee passthrough value (see Exit)
+Side effects: type11 sprite attribute enqueue (via enqueue_sprite_attr_type11); graveyard spell set code enqueue (via enqueue_graveyard_spell_for_hand_set_code)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); default movs r0,#0; main path ends with movs r0,#0
+Constants: CARD_ID=0x14c4 (Freed the Matchless General), STATE_ACTIVE=0x80, SPRITE_TYPE=11

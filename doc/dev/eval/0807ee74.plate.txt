@@ -1,0 +1,10 @@
+Equip display state-code dispatcher. Reads the IWRAM state code (range 0x64..0x80), subtracts the base 0x64, and dispatches via a 29-entry jump table to each sub-handler path. Each case handles a different stage of the equip activation animation, returning the corresponding next state code (0x7f / 0x78 / 0x7e / 0x7d / 0x64 / 0). The central dispatch point of the equip display state machine.
+
+CALLEE-COLUMN GREP: grepping callee=0x0807ee74 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x0807ee75" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry saved as r6)
+Returns: r0=int next state code (enumeration in Exit)
+Side effects: no external str (state dispatch + callee calls only; writes happen inside each case's callee)
+Exit: pop {rN};bx rN = Sub-case E (r0 not clobbered); each case path movs r0 to 0x7f / 0x78 / 0x7e / 0x7d / 0x64; default/out-of-range movs r0,#0
+Constants: STATE_BASE=0x64, JUMP_TABLE_SIZE=29, exit states {0x7f, 0x78, 0x7e, 0x7d, 0x64, 0}

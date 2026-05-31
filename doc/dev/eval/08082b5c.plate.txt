@@ -1,0 +1,10 @@
+Slot index range and whitelist dual guard: when slot_idx <= 4, the equip whitelist check must also pass before calling the effect node handler. If slot_idx <= 4, calls check_slot_card_is_equip_whitelist(r1,r2); if that slot's card is not in the equip whitelist (returns 0), this function returns 0. When slot_idx > 4 or the whitelist passes, passes through (r0,r1,r2) to invoke_effect_node_handler_with_zone_flag_guard. Serves as a function-pointer table slot (DWORD_08082be4) for tick_equip_display_with_fn_ptr_routing_3state to route to.
+
+CALLEE-COLUMN GREP: grepping callee=0x08082b5c => 0 hits
+indeg=0 but Sub-type B (fn-ptr table slot DWORD_08082be4; invoked indirectly by tick_equip_display_with_fn_ptr_routing_3state @ 0x08082b88 via the routing table). fn-ptr check: grep ".word 0x08082b5d" asm/all.s => 1 hit.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r6,r0,#0); r1=slot_context slot context/player parameter (entry adds r5,r1,#0, passed to whitelist check); r2=slot_idx card slot index [0..4] (entry adds r4,r2,#0, compared with 4 and passed to whitelist check)
+Returns: r0=int callee passthrough result or 0 (in range but whitelist not passed)
+Side effects: no external str (guard read + passthrough call only)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08082b78 path bl invoke_effect_node_handler_with_zone_flag_guard then falls into epilogue (Sub-case G, passes through callee result); LAB_08082b74 movs r0,#0 (slot in range but whitelist not passed)
+Constants: SLOT_IDX_MAX=4

@@ -1,0 +1,11 @@
+Build the equip eligibility state for a category 3 card. First calls map_field8_to_card_type_category(card_ptr), continuing only when the result==3; then calls check_card_targeted_by_spell_zone_effect and check_card_id_is_equip_excluded_range as gates, returning 0 if either fails. On pass, writes card_id into IWRAM [base+0xb3*8], the display type code into [base+0xb4*8], the targeted flag into [base+0x5b0], and the negated set-f flag into [base+0xb5*8]; calls fill_equip_criteria_display_code_array. Then double-loops the display code entries, calling clear_equip_slot_criteria_on_ext_field6_match / check_card_id_is_equip_set_e for each entry and writing available slot indices into the [base+0xb8*8] entry array. Returns 1 (equippable) when all complete, or 0 if any gate fails.
+
+CALLEE-COLUMN GREP: grepping callee=0x080804c8 => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x080804c9" asm/all.s => 0 hits.
+
+Params: r0=card_id internal card id [1..0x1431] (entry mov r8,r0; r8 is internal alias of r0); r1=card_ptr card data struct pointer (entry adds r4,r1,#0, passed to map_field8_to_card_type_category)
+Note: entry .hword 0x4657=mov r7,r10 / 0x464e=mov r6,r9 / 0x4645=mov r5,r8 + push is r8/r9/r10 callee-save save; 0x4680=mov r8,r0 is the parameter alias
+Returns: r0=int 1 (category 3 and equippable) or 0 (gate failed)
+Side effects: [0x0201b290+0xb3*8] := card_id; [0x0201b290+0xb4*8] := display type code; [0x0201b290+0x5b0] := targeted flag (check_card_targeted result r6); [0x0201b290+0xb5*8] := set-f flag; [0x0201b290+0xb8*8 + ...] := available slot index entry array
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08080500 movs r0,#1 (equippable); LAB_0808065c movs r0,#0 (category not 3 / targeted / excluded gate failed)
+Constants: IWRAM_BASE=0x0201b290, CATEGORY=3, CARD_SLOT=0xb3*8=0x598, TYPE_CODE_SLOT=0xb4*8=0x5a0, SET_F_FLAG_SLOT=0xb5*8=0x5a8, CRITERIA_ARRAY=0xb8*8=0x5c0

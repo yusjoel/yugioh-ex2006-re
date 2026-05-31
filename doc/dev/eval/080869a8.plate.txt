@@ -1,0 +1,10 @@
+Scan the equip field zones for a target of type 0xb that is scored as eligible. First reads the field context pointer at IWRAM [0x0201b290+0x484], takes the [+2] player bit and compares it with input r0 (player_packed), returning 0 if mismatched; then requires r1 (expected type) to equal 0xb, otherwise returns 0. Then iterates the field card entries (zone list 0x09e5a0c4, stride 4), and for each non-empty entry that matches by type calls eval_equip_zone_activation_eligible(field_ctx, slot_idx) to evaluate its equip activation eligibility; returns 0x800 (hit flag) on a hit, returns 0 if none hit.
+
+CALLEE-COLUMN GREP: grepping callee=0x080869a8 => 1 hit
+indeg=1, form(b). caller: addr 0x08086cdc (tags: [equip, activation_display]; role: equip activation display switch dispatcher, calls this function in a loop over each field zone inside one case to scan eligible targets; call site @ 0x08086e06).
+
+Params: r0=player_packed packed player word [0..0xff] (entry adds r4,r0,#0; bit0 compared with the field context player bit); r1=expected_type expected card type [0..0xff] (cmp r1,#0xb; must equal 0xb or early return); r2=slot_idx card slot index [0..4] (lsls r2,r2,#0x2 as word offset, used to locate the field entry)
+Returns: r0=int 0x800 (eligible target found, hit flag) or 0 (player mismatch/type not 0xb/no eligible target)
+Side effects: no external str (reads IWRAM field context + zone list only; evaluation inside eval_equip_zone_activation_eligible)
+Exit: pop {r4,r5,r6}; pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08086a2e via 08086a00 movs r0,#0x80; lsls #4 -> 0x800 (hit); LAB_08086a2c movs r0,#0 (player mismatch/type not 0xb/no eligible target)
+Constants: DUEL_CTX=0x0201b290, FIELD_CTX_OFF=0x484, ZONE_LIST=0x09e5a0c4, SLOT_STRIDE=0x868 (zone entry stride), FIELD_SLOT_TABLE=0x0201c600, EXPECTED_TYPE=0xb, HIT_FLAG=0x800 (0x80<<4)

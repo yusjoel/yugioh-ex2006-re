@@ -1,0 +1,10 @@
+Equip chain pair display four-state stepper. Reads state (0/1/2/3) at IWRAM [0x0201b290+0x96*8]. State 0: calls count_effect_node_zone_activations, returning 1 if there is no activation; otherwise reads the EWRAM [0x0201e2a0+8+player*4] slot value, enters a double loop calling build_equip_chain_pair_slot_entry to search the whole field and build the equip chain pair slot entry, on a hit calls enqueue_equip_slot_sprite_with_code_rotation to submit the sprite and returns 1; also renders the card name text via card_name_lookup_by_internal_id + format_game_text_with_text_arg and advances via set_equip_activation_state_by_mode. State 1/2/3: submits the sprite after confirmation via check_activation_display_state_is_confirmed, step counter +1/-1. Advancing paths return 0; complete/no-activation returns 1.
+
+CALLEE-COLUMN GREP: grepping callee=0x08082d0c => 0 hits
+indeg=0, form(c), Sub-type A (no references, dead-code / not yet hooked). fn-ptr check: grep ".word 0x08082d0d" asm/all.s => 0 hits.
+
+Params: r0=effect_node* equip effect node pointer (entry adds r6,r0,#0)
+Returns: r0=int 0 (stepping) or 1 (complete/no activation)
+Side effects: [0x0201b290+0x96*8] += 1 / -= 1 (step counter); equip chain slot entry build (via build_equip_chain_pair_slot_entry, writes EWRAM slot internally); OAM sprite submission (via enqueue_equip_slot_sprite_with_code_rotation)
+Exit: pop {r1};bx r1 = Sub-case E (r0 not clobbered); LAB_08082e1a movs r0,#0 (advance); LAB_08082e7a movs r0,#0 (state 1+ advance); LAB_08082e8e movs r0,#1 (chain hit submitted); state 0 no-activation b LAB_08082e8e movs r0,#1
+Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x96*8=0x4b0, EWRAM_SLOT=0x0201e2a0, CARD_NAME_TEXT_ARG=0x8c, gP1LP_OFF=0x1d68/0x1d6c, SLOT_LOOP_MAX=4
