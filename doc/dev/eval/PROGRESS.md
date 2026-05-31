@@ -11,7 +11,8 @@
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
-- **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。剩余 341 FUN_* 被未命名 callee 阻塞 → Phase 5 重算解锁。
+- **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
+- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -22,14 +23,14 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段 (Phase 4): 处理重导后 ready 集合 465 个函数。
-  - 锁定清单: doc/dev/eval/ready_batches_phase4.json (Phase 4, 24 批 #172..#195)
-  - 排序策略: 按地址升序 (与 Phase 2/3 一致, 利于同区段函数复用簇方法论)
-  - 高 indeg hub (indeg=22 0x080df5c4 / indeg=17 0x080d92c4 / indeg=15 0x0809077c 等) 已散在各批中, 不单独提前
+当前阶段 (Phase 5): 处理重导后 ready 集合 164 个函数。
+  - 锁定清单: doc/dev/eval/ready_batches_phase5.json (Phase 5, 9 批 #196..#204)
+  - 排序策略: 按地址升序 (与 Phase 2/3/4 一致, 利于同区段函数复用簇方法论)
+  - 高 indeg hub (indeg=34 0x080d46a8 / indeg=10 0x080d933c / indeg=9 0x080dfa44 / indeg=9 0x080d5470 等) 已散在各批中, 不单独提前
 
 下一批取法:
-  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches_phase4.json')); \
-    idx=<NEXT_BATCH_IDX>-172; b=d['batches'][idx]; print(b['addrs'])"  # batch #172 = idx 0
+  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches_phase5.json')); \
+    idx=<NEXT_BATCH_IDX>-196; b=d['batches'][idx]; print(' '.join(b['addrs']))"  # batch #196 = idx 0
 
 20/批 单 sub-agent 串行模式 (沿用 Phase 2 末期):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -45,7 +46,7 @@ byte-identical 通过后自动 commit, 进入下一批。
   2. 该 ADDR 跳过落地, 继续下一批
   3. 仅 BLOCKED 但有命名的函数仍走落地 (BLOCKED 是 SB tracking 不阻塞 rename)
 
-完成 24 批后: 再次 (a) ghidra-run ExportFunctionInventory + ExportFunctionCallGraph (b) sync 到 CSV (c) 重算 ready, 进入 Phase 5 (解锁被阻塞的 341 函数)。
+完成 9 批后: 再次 (a) ghidra-run ExportFunctionInventory + ExportFunctionCallGraph (b) sync 到 CSV (c) 重算 ready, 进入 Phase 6 (解锁被阻塞的 177 函数)。
 ```
 
 ---
@@ -54,16 +55,16 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 4 完成 — 24 批 (#172..#195) 全部 PASSED byte-identical; 下一步 Phase 5 重导解锁 341 FUN_* |
-| **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-30 ExportFunctionInventory 重导) |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #196 |
+| **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
 | **已命名 (USER_DEFINED / ANALYSIS)** | 4300 (92.65%) |
-| **未命名 (FUN_*)** | 341 (全部被未命名 callee 阻塞; Phase 5 重算 ready 解锁) |
-| **就绪函数集 (Phase 4)** | 465/465 完成 (24 批全部落地) |
-| **下一批** | Phase 5 — 重导 ExportFunctionInventory + ExportFunctionCallGraph, sync CSV, 重算 ready 集合 |
-| **上次更新** | 2026-05-31 (batch #195 PASSED: sound channel sprite-entry init + semihost io result cluster x5, 4300/4641 = 92.65%; Phase 4 完成 465/465) |
-| **callgraph 时间戳** | 2026-05-30 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
-| **callgraph_locked** | `true` (Phase 4 已重导锁定; Phase 5 前须再重导) |
-| **ready_locked** | `true` (Phase 4 465 集合锁定; Phase 5 前须重算 ready) |
+| **未命名 (FUN_*)** | 341 (其中 164 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 |
+| **下一批** | #196 (Phase 5 idx 0) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-05-31 (Phase 4 完成 465/465; Phase 5 重导锁定: ready=164, 9 批 #196..#204, blocked=177) |
+| **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
+| **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
+| **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |
 
 ## 进度
 
