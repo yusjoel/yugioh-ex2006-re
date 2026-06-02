@@ -7,14 +7,14 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4547 / 全 CSV 4641 行 = **97.97%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4567 / 全 CSV 4641 行 = **98.41%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
 - **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
 - **Phase 6 完成**: Phase 5 命名 164 后重算 ready 解锁 **83/83 函数全部落地** (batches #205..#209, 5 批, 2026-06-02 锁定, 2026-06-03 全部 byte-identical)。
-- **Phase 7 进行中**: Phase 6 命名 83 后重算 ready 解锁 **32 函数** (batches #210..#211, 2 批, 2026-06-03 锁定)。仍有 62 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
+- **Phase 7 进行中**: Phase 6 命名 83 后重算 ready 解锁 **32 函数** (batches #210..#211, 2 批, 2026-06-03 锁定); batch #210 PASSED (20 函数落地)。仍有 62 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -53,13 +53,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 7 进行中 — 2 批 (#210..#211) 锁定; 下一批 #210 |
-| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 6 rename) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4547 (97.97%) |
-| **未命名 (FUN_*)** | 94 (32 ready Phase 7 / 62 阻塞, 含 13 个不可解递归 SCC) |
-| **就绪函数集 (Phase 7)** | 32 函数 (2 批 #210..#211), 处理中 (32 剩余) |
-| **下一批** | #210 (Phase 7 idx 0) — `ready_batches_phase7.json` |
-| **上次更新** | 2026-06-03 batch #209 PASSED (Phase 6 FINAL) — restart_sound_channel_blocking + close_fd_reentrant + lseek_fd_reentrant (4547/4641 = 97.97%) |
+| **阶段** | Phase 7 进行中 — 2 批 (#210..#211) 锁定; 下一批 #211 (FINAL) |
+| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 7 batch#210 rename) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4567 (98.41%) |
+| **未命名 (FUN_*)** | 74 (12 ready Phase 7 batch#211 / 62 阻塞, 含 13 个不可解递归 SCC) |
+| **就绪函数集 (Phase 7)** | 32 函数 (2 批 #210..#211), 处理中 (剩 12 — batch#211 待处理) |
+| **下一批** | #211 (Phase 7 idx 1, FINAL Phase 7 batch, 12 函数) — `ready_batches_phase7.json` |
+| **上次更新** | 2026-06-03 batch #210 PASSED — dispatch_name_input_key_by_state + tick_name_input_render_by_state + tick_banlist_password_backspace_input + 17x equip/display SM cluster (4567/4641 = 98.41%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
 | **ready_locked** | `true` (Phase 6 83 集合锁定; Phase 7 前须重算 ready) |

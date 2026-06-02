@@ -1,0 +1,1 @@
+装备激活状态机有条件入口包装函数, 以 Neo Daedalus 放置资格为前置条件. indeg=0, Sub-type A. 接收 card_entry_ptr(r0) 和 secondary_ptr(r1). 先调用 check_neo_daedalus_placement_eligible(r0) 验证场地是否满足 Neo Daedalus 组放置条件; 若返回 0 (不满足) 则直接返回 -1 (rsbs); 若通过则调用 tick_equip_activation_state_machine 驱动核心状态机并透传结果.

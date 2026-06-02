@@ -1,0 +1,1 @@
+装备激活状态机有条件入口包装函数, 以 dispatch_effect_by_card_id_with_display_lookup 为前置条件. indeg=0, Sub-type A. 接收 card_entry_ptr(r0) 和 secondary_ptr(r1). 先调用 dispatch_effect_by_card_id_with_display_lookup(card_entry, secondary_ptr) 检查并分派卡效果; 若返回 0 (效果未激活/不可用) 则直接返回 -1; 若通过则调用 tick_equip_activation_state_machine 驱动核心状态机并透传结果.

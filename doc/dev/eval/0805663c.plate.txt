@@ -1,0 +1,1 @@
+装备激活状态机入口包装函数, 附 slot 精灵 mode4 入队. indeg=0, Sub-type A (callgraph callee-column grep indeg=0; .word 0x0805663d asm/all.s grep 0 hits; 无直接调用者亦无 fn-ptr 表引用). 接收 card_entry_ptr(r0) 和 secondary_ptr(r1). 调用 tick_equip_activation_state_machine 驱动核心状态机; 若返回 1 (slot 选定), 调用 enqueue_equip_slot_sprite_mode4(card_entry, secondary_ptr) 为选定槽入队 mode=4 的装备精灵属性. 透传 tick 返回值.

@@ -1,0 +1,1 @@
+装备激活状态机入口包装函数, 附 LP 费用精灵入队. 由 FUN_08057430 (tags: [equip,activation,lp_cost]; indeg=1) 在 bits[11:6]==type_code 条件下调用. 先调用 tick_equip_activation_state_machine 驱动核心状态机; 若返回 1 (slot 已选定), 从 card_entry[+2] 提取 player_id (bit0), 调用 get_card_lp_cost_by_id 获取当前卡的 LP 费用, 再调用 enqueue_sprite_attr_clamped(player_id, lp_cost) 将费用数值入队到精灵属性. 始终透传 tick 返回值.

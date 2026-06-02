@@ -1,0 +1,1 @@
+banlist 密码输入页退格键每帧处理函数. 由 FUN_0801af70 (banlist 密码输入主帧驱动, tags: [banlist,pass_input]) 调用. 读 gBanlistPasswordBuffer+0x66c halfword (滚动上限); 若为 0 则跳至同步状态 2 (无字符可删); 否则调用 retreat_banlist_password_char_and_render 执行退格渲染并获取返回状态; 状态==3 时需要翻页, 调用 tick_banlist_scroll_input_handler 处理滚动输入; 其他非零状态调用 sync_state_and_init_sprite(1) 更新精灵. 出口 pop {r0};bx r0 = Pattern B (void 返回).

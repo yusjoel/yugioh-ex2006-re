@@ -1,0 +1,1 @@
+装备激活状态机入口包装函数, 附 type11 精灵入队. indeg=0, Sub-type A. 接收 card_entry_ptr(r0). 调用 tick_equip_activation_state_machine 驱动核心状态机并保存返回值到 r5; 若 r5<0 (负值, 即状态机返回失败/特殊信号), 从 card_entry[+2] 提取 player_id (bit0) 和 card_id ([+0] u16), 调用 enqueue_sprite_attr_type11(player_id, card_id, 1, 0) 入队 type11 精灵属性. 透传 tick 返回值 r5.
