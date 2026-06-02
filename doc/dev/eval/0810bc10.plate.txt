@@ -1,0 +1,3 @@
+声音引擎每帧主循环入口, 由各播放控制 hub 在需要更新声道状态时调用. r0 = IWRAM 声音引擎基址(0x030050cc 区域), 保存至 r9 供全函数使用.
+操作: 读取并更新音量/音调包络差值, 更新声道控制字 [r9+0xd9*4], 若通道激活则依次为 0xf 个音序条目调用 tick_sound_all_channels, 处理 freq_slot 数组(0x03005608, 步长 0x14)的音符字节与掩码, 写混音结果至 [0x03005644](SOUNDCNT_H 控制槽), 激活 SOUND3 时调用 write_wave_pattern_to_ch3, 最终通过 restore_sound_engine_high_regs 返回.
+函数体横跨 0x0810bc10..0x0810ca1e, 共约 1952 行; 通过 bl restore_sound_engine_high_regs 在两处早退出点(0x0810be3e/0x0810bebc)提前返回.

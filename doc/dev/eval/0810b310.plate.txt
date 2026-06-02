@@ -1,0 +1,3 @@
+声音引擎硬件初始化外层入口, 供两个变体包装器 (大/小 freq slot 缓冲) 共同调用.
+操作流程: (1) 读 SOUNDBIAS(0x04000088), 保留低 14 位, 置 bit14(0x4000), 写回; (2) 将 SOUNDCNT_X(0x04000084) 写入 0x4000(启用声音主开关); (3) 配置 DMA1(SAD=0x030055c0, DAD=0x030055bc, CNT_H=0x440) 和 DMA2 为同一对 IWRAM 音频 FIFO 缓冲; (4) 清零 DMA1CNT_L; (5) 若 r0 非空, 在 [r0] 写入 freq_slot 数组基址 0x03004c0c; (6) 写 IWRAM 音量/速率字段 [0x03005456]=0x40; (7) 清零 SOUNDCNT_H 控制槽(0x03005644); (8) 循环初始化 3 个 freq_slot 结构体(0x03005608, 步长 0x14); (9) 调用 init_sound_hardware_full 完成完整声音硬件重置.
+副作用覆盖 APU 寄存器与 IWRAM 声音引擎状态区, 调用后声音 DMA 即激活.

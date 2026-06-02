@@ -1,0 +1,3 @@
+newlib semihosting close 重入包装器, 与 wrap_write_r(0x08112af4)/wrap_read_r(0x08112c38)/wrap_lseek_r(0x0811289c) 构成对称四元组.
+调用链: _swiclose (解析 stdio fd -> semihosting handle slot, 清无效标记, svc 0xab SYS_CLOSE) -> handle_semihost_io_result (错误路径调用 init_reent_heap_ptr_via_semihost 同步 reent 堆指针; 非错误路径透传结果 0=成功).
+调用方 FUN_08112b7c(0x08112b7c) 在调用前清零 EWRAM errno 缓存(0x02029ea8), 调用后若返回 -1 且 errno 非零则回写 errno 至调用方 reent 结构体; 本函数自身不持有 errno 逻辑, 仅封装 close + 统一错误处理.
