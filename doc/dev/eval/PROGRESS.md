@@ -12,7 +12,8 @@
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
-- **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 需重导 callgraph + 重算 ready 解锁。
+- **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
+- **Phase 6 进行中**: Phase 5 命名 164 后重算 ready 解锁 **83 函数** (batches #205..#209, 5 批, 2026-06-02 锁定)。仍有 94 FUN_* 被更深层未命名 callee 阻塞 → Phase 7 再重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -23,14 +24,15 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段 (Phase 5 COMPLETE): 164/164 函数全部落地。Phase 6 准备: 重导 callgraph + 重算 ready (解锁被阻塞 177 FUN_*)。
-  - 锁定清单: doc/dev/eval/ready_batches_phase5.json (Phase 5, 9 批 #196..#204)
-  - 排序策略: 按地址升序 (与 Phase 2/3/4 一致, 利于同区段函数复用簇方法论)
-  - 高 indeg hub (indeg=34 0x080d46a8 / indeg=10 0x080d933c / indeg=9 0x080dfa44 / indeg=9 0x080d5470 等) 已散在各批中, 不单独提前
+当前阶段 (Phase 6 进行中): 处理重算后 ready 集合 83 个函数 (5 批 #205..#209)。
+  - 锁定清单: doc/dev/eval/ready_batches_phase6.json (Phase 6, 5 批 #205..#209)
+  - 排序策略: 按地址升序 (与 Phase 2/3/4/5 一致, 利于同区段函数复用簇方法论)
+  - 高 indeg hub (indeg=11 0x080563cc / indeg=8 0x080b5d98 / indeg=4 0x08017d64 等) 已散在各批中, 不单独提前
+  - 说明: rename 不改拓扑, callgraph 复用 Phase 5 锁定版 (13158 边); ready 用最新 ExportFunctionInventory (177 DEFAULT) 重算
 
 下一批取法:
-  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches_phase5.json')); \
-    idx=<NEXT_BATCH_IDX>-196; b=d['batches'][idx]; print(' '.join(b['addrs']))"  # batch #196 = idx 0
+  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches_phase6.json')); \
+    idx=<NEXT_BATCH_IDX>-205; b=d['batches'][idx]; print(' '.join(b['addrs']))"  # batch #205 = idx 0
 
 20/批 单 sub-agent 串行模式 (沿用 Phase 2 末期):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -46,7 +48,7 @@ byte-identical 通过后自动 commit, 进入下一批。
   2. 该 ADDR 跳过落地, 继续下一批
   3. 仅 BLOCKED 但有命名的函数仍走落地 (BLOCKED 是 SB tracking 不阻塞 rename)
 
-完成 9 批后: 再次 (a) ghidra-run ExportFunctionInventory + ExportFunctionCallGraph (b) sync 到 CSV (c) 重算 ready, 进入 Phase 6 (解锁被阻塞的 177 函数)。
+完成 5 批后: 再次 ExportFunctionInventory + 重算 ready (python tools/ad-hoc/compute_ready_phaseN.py), 进入 Phase 7 (解锁剩余 94 函数; 若出现不可解的递归 SCC 则登记并求助)。
 ```
 
 ---
@@ -55,16 +57,16 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 COMPLETE — 9 批 (#196..#204) 全部落地; Phase 6 准备中 |
-| **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
+| **阶段** | Phase 6 进行中 — 5 批 (#205..#209) 锁定; 下一批 #205 |
+| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 5 rename) |
 | **已命名 (USER_DEFINED / ANALYSIS)** | 4464 (96.19%) |
-| **未命名 (FUN_*)** | 177 (全部被未命名 callee 阻塞; Phase 6 重算后解锁) |
-| **就绪函数集 (Phase 5)** | 164/164 函数全部落地 (9 批 #196..#204, 全 byte-identical) |
-| **下一批** | Phase 6 准备 (重导 callgraph + 重算 ready) |
-| **上次更新** | 2026-06-02 batch #204 PASSED — sound engine init/tick + semihost lseek/close wrappers (init_sound_engine_hardware / tick_sound_engine_main / wrap_lseek_r / wrap_close_r) x4 (4464/4641 = 96.19%); Phase 5 COMPLETE |
-| **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
-| **callgraph_locked** | `true` (Phase 5 完成; Phase 6 前须重导 ExportFunctionCallGraph) |
-| **ready_locked** | `true` (Phase 5 164 集合已全部落地; Phase 6 前须重算 ready) |
+| **未命名 (FUN_*)** | 177 (83 ready Phase 6 / 94 被更深层 callee 阻塞 → Phase 7) |
+| **就绪函数集 (Phase 6)** | 83 函数 (5 批 #205..#209), 处理中 (83 剩余) |
+| **下一批** | #205 (Phase 6 idx 0) — `ready_batches_phase6.json` |
+| **上次更新** | 2026-06-02 batch #204 PASSED — sound engine init/tick + semihost lseek/close wrappers x4 (4464/4641 = 96.19%); Phase 5 COMPLETE; Phase 6 ready 重算 83 解锁 |
+| **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
+| **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
+| **ready_locked** | `true` (Phase 6 83 集合锁定; Phase 7 前须重算 ready) |
 
 ## 进度
 

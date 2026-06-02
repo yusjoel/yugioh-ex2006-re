@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "generated": "2026-06-02",
+    "phase": 6,
+    "mode": "20/batch, single sub-agent per phase (serial executor/reviewer/fixer/lesson-keeper)",
+    "criterion": "unnamed AND (no callees OR all callees named); set locked at Phase 6 start (recomputed after Phase 5 named 164)",
+    "source_addr_list": "temp/ready_addrs_phase6.txt",
+    "callgraph_source": "temp/ghidra-funcs-callgraph.csv (2026-05-31, 4641 fns / 13158 edges)",
+    "total_ready": 83,
+    "total_batches": 5,
+    "batch_size": 20,
+    "addr_range": [
+      "0x08017d64",
+      "0x08112c08"
+    ],
+    "first_batch_idx": 205,
+    "indeg_dist": {
+      "0": 68,
+      "1-2": 12,
+      "3-5": 1,
+      "6-10": 1,
+      "11+": 1
+    },
+    "blocked_unnamed": 94
+  },
+  "batches": [
+    {
+      "batch_idx": 205,
+      "addrs": [
+        "0x08017d64",
+        "0x0801aa54",
+        "0x0801ab00",
+        "0x0801fec0",
+        "0x08053294",
+        "0x08053704",
+        "0x08054118",
+        "0x080563cc",
+        "0x08058578",
+        "0x080585e8",
+        "0x0806882c",
+        "0x080690dc",
+        "0x0806d3d8",
+        "0x0807158c",
+        "0x08072ce4",
+        "0x08074770",
+        "0x0807c590",
+        "0x0807c750",
+        "0x0807fb9c",
+        "0x08083704"
+      ]
+    },
+    {
+      "batch_idx": 206,
+      "addrs": [
+        "0x08086cdc",
+        "0x080b5d98",
+        "0x080d4fa4",
+        "0x080d5870",
+        "0x080d5a08",
+        "0x080d5cf0",
+        "0x080d5d64",
+        "0x080d5e84",
+        "0x080d5f38",
+        "0x080d6304",
+        "0x080d64e4",
+        "0x080d6548",
+        "0x080d6628",
+        "0x080d6b50",
+        "0x080d6d30",
+        "0x080d6f28",
+        "0x080d6fbc",
+        "0x080d77c4",
+        "0x080d7c88",
+        "0x080d7cd8"
+      ]
+    },
+    {
+      "batch_idx": 207,
+      "addrs": [
+        "0x080d7dbc",
+        "0x080d7ef4",
+        "0x080d7f3c",
+        "0x080d811c",
+        "0x080d8178",
+        "0x080d81b0",
+        "0x080d8330",
+        "0x080d9ae8",
+        "0x080d9c38",
+        "0x080da388",
+        "0x080da410",
+        "0x080da924",
+        "0x080da974",
+        "0x080dab24",
+        "0x080dab8c",
+        "0x080dabd0",
+        "0x080dac24",
+        "0x080dada8",
+        "0x080db368",
+        "0x080dfc74"
+      ]
+    },
+    {
+      "batch_idx": 208,
+      "addrs": [
+        "0x080dfcb0",
+        "0x080dffdc",
+        "0x080e0074",
+        "0x080e00ac",
+        "0x080e0134",
+        "0x080e01a8",
+        "0x080e01e8",
+        "0x080e05c4",
+        "0x080e097c",
+        "0x080e0af8",
+        "0x080e0b3c",
+        "0x080ed62c",
+        "0x080ee580",
+        "0x080f46dc",
+        "0x081085d0",
+        "0x0810b3e0",
+        "0x0810b3f4",
+        "0x0810ca38",
+        "0x0810d82c",
+        "0x0810d92c"
+      ]
+    },
+    {
+      "batch_idx": 209,
+      "addrs": [
+        "0x0810d9e0",
+        "0x08112b7c",
+        "0x08112c08"
+      ]
+    }
+  ]
+}
