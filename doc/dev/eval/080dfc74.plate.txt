@@ -1,0 +1,15 @@
+Called via step-table dispatch from dispatch_pack_card_select_substep (0x080e0fb8), step index 2.
+Single-frame driver for the pack slot cover fade-in animation. First writes DISPCNT=0x1301
+(BG0+BG3+OBJ, mode 1). Calls tick_blend_step_by_delta(4) to advance blend fade-in (r4=return);
+if complete (r4==1): continues. Unconditionally calls tick_pack_slot_cover_oam(1) to update
+cover OAM, render_pack_slot_brightness_blend(1) to render brightness blend,
+render_pack_slot_cover_oam_sprite(1) to render cover sprite, tick_pack_oam_slots_and_overlay(2)
+to advance OAM slots and overlay. Returns r4 (0=fading, 1=complete; Sub-case E).
+
+Params: none (r4 initialized internally via movs r4,#0)
+Returns: r0=u8 (0=fading, 1=complete; Sub-case E adds r0,r4 @ 080dfca4)
+Side effects:
+  [DISPCNT] (0x04000000): := 0x1301
+Constants:
+  DISPCNT = 0x04000000, DISPCNT_VAL = 0x1301
+  BLEND_DELTA = 4

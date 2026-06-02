@@ -1,0 +1,29 @@
+Called via step-table dispatch from tick_pack_animation_step (0x080dc884), step index 0.
+Executes selection state initialization when entering the pack scene. First calls
+zero_fill_halfword_wrapper(pack_ui_state+0xc, 0x71c) to clear the first 0x71c/2 halfwords
+of the struct. Then iterates over all enabled cards in card_stats_table to classify by type:
+card type 0x16 (spell) -> [+0x2e]++; 0x17 (trap) -> [+0x2c]++; if pack_type_table[pack<<2]=3
+(ritual) -> [+0x2a]++; if monster_type=1 -> [+0x28]++; else -> [+0x26]++. After loop reads
+0x095b7cca[0] (owned card count) and writes to [+0x30]. Calls build_pack_slot_selection_list
+to build slot selection list, then reset_pack_scene_display to reset display state.
+Returns fixed 1 (movs r0,#1 @ 080db40c; Sub-case E pop{r1};bx r1).
+
+Params: none (r0 immediately clobbered by ldr r0,DAT_080db3a4)
+Returns: r0=u8 1 (step-complete flag)
+Side effects:
+  [pack_ui_state+0xc .. +0xc+0x71c]: zero-filled
+  [pack_ui_state+0xc+0x2e] += 1 per spell card
+  [pack_ui_state+0xc+0x2c] += 1 per trap card
+  [pack_ui_state+0xc+0x2a] += 1 per ritual-pack card
+  [pack_ui_state+0xc+0x28] += 1 per monster-type-1 card
+  [pack_ui_state+0xc+0x26] += 1 per other card
+  [pack_ui_state+0xc+0x30] := owned_card_count
+Constants:
+  pack_ui_state = 0x03005850
+  ZERO_FILL_SIZE = 0x71c
+  CARD_COUNT_PTR = 0x095b7cca
+  card_stats_table = 0x098169b8
+  pack_type_table = 0x09e4f1c4
+  CARD_TYPE_SPELL = 0x16
+  CARD_TYPE_TRAP = 0x17
+  PACK_TYPE_RITUAL = 3

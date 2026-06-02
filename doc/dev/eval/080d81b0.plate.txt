@@ -1,0 +1,35 @@
+Called via step-table dispatch from tick_pack_card_select_step (0x080d8504), step index 0xe.
+Executes BG fade-in animation for the pack card info page (variant A: clears BG3 priority,
+sets BG0/BG1/BG2 priorities 1/2/3). On first entry (pack_ui_state+0x724 bit1 not set):
+clears BG3CNT low 2 bits, sets BG0CNT/BG1CNT/BG2CNT priorities 1/2/3, writes BLDCNT=0x1748,
+BLDALPHA:=0x1000, sets frame counter [+0x6]:=0xa, sets bit1. Each frame decrements counter;
+while counter>0: interpolates BLDALPHA linearly via bios_div(count*0x10/0xa); when counter<=0:
+restores BG layer config, writes BLDCNT=0x3f3f, BLDALPHA=0x1010, syncs [+0x18]:=[+0x1c],
+writes [+0x10]:=0xf to advance state machine. Calls render_pack_card_sprite_by_flip_state(1),
+render_pack_info_card_presence_sprites(1), render_pack_info_card_highlight_sprite(2).
+Returns r7 (0=fading, 1=complete; Sub-case E).
+
+Params: none (r0 immediately clobbered by ldr r0,DAT_080d825c)
+Returns: r0=u8 (0=fading, 1=complete; Sub-case E adds r0,r7 @ 080d830c)
+Side effects:
+  [BG3CNT] (0x0400000e): cleared & 0xfffc
+  [BG0CNT] (0x04000008): cleared then |= 1
+  [BG1CNT] (0x0400000a): cleared then |= 2
+  [BG2CNT] (0x0400000c): cleared then |= 3
+  [BLDCNT] (0x04000050): := 0x1748 (init) or 0x3f3f (final)
+  [BLDALPHA] (0x04000052): linear interpolation each frame, final 0x1010
+  [DISPCNT] (0x04000000): |= 0x800 (OBJ tile 1D mapping)
+  [pack_ui_state+0xc+0x6] := 0xa (frame counter)
+  [pack_ui_state+0x724] |= 0x2 (init bit)
+  [pack_ui_state+0xc+0x18] := [+0x1c] (sync selected slot, on complete)
+  [pack_ui_state+0xc+0x10] := 0xf (state machine advance, on complete)
+  [pack_ui_state+0x718] byte &= ~0x3 (on complete)
+Constants:
+  pack_ui_state = 0x03005850
+  STATE_FLAGS_OFFSET = 0x724
+  FADE_FRAMES = 0xa
+  DISPCNT = 0x04000000, OBJ_TILE_MAP_1D_BIT = 0x800
+  BG3CNT = 0x0400000e, BG0CNT = 0x04000008
+  BLDCNT = 0x04000050, BLDCNT_VAL_INIT = 0x1748, BLDCNT_VAL_FINAL = 0x3f3f
+  BLDALPHA = 0x04000052, BLDALPHA_INIT = 0x1000, BLDALPHA_FINAL = 0x1010
+  NEXT_STATE = 0xf, PRIORITY_MASK = 0xfffc

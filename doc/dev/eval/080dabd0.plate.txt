@@ -1,0 +1,18 @@
+Called via step-table dispatch from tick_pack_list_scene_step (0x080dae44), step index 0x11.
+One-shot scroll triggered after overlay animation completes on the pack list page. Calls
+tick_overlay_animation_step(1) to advance overlay (r5=return value); if complete (r5==1):
+reads [+0x18], calls get_pack_icon_y_by_dir to get target Y, calls
+init_pack_scroll_animation(y, 0x98, mode=1), then blocks in tick_pack_scroll_interp_step loop
+until scroll complete, writes [+0x10]:=4 to advance state machine. Unconditionally calls
+render_pack_slot_arrow_oam(0), render_pack_card_highlight_pulse_by_mode(0),
+render_pack_slot_highlight_oam(1), write_pack_banner_oam_for_all_slots(3).
+Returns r5 (Sub-case E).
+
+Params: none (r0 immediately clobbered by ldr r0,DAT_080dac20)
+Returns: r0=u8 (0=overlay animating, 1=complete; Sub-case E adds r0,r5 @ 080dac18)
+Side effects:
+  [pack_ui_state+0xc+0x10] := 4 (on complete)
+Constants:
+  pack_ui_state = 0x03005850
+  SCROLL_Y = 0x98, SCROLL_MODE = 1
+  NEXT_STATE = 4

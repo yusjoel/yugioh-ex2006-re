@@ -1,0 +1,25 @@
+Called via step-table dispatch from tick_pack_list_scene_step (0x080dae44), step index 0xe.
+Per-frame handler for vertical (up/down) input on the pack list page. First calls
+tick_overlay_animation_step(0) to advance overlay. Reads gPrng+0x1d0 scene type [+0x1c]=2
+to confirm; checks gPrng+0x148 bit1 (DOWN): if [+0x18]=1, clears direction and calls
+init_pack_scroll_animation(down), sets step=0x10; else sets step=0x10 and calls
+render_pack_list_label_sprites_and_palette. Checks bit0 (UP): based on [+0x18] state,
+determines upward scroll params or clears [+0x724] bit. Checks bit4/bit5 for fast up/down.
+All input branches set r6=1. On exit based on r6: clears [+0x718] bit5; unconditionally calls
+render_pack_card_sprite_by_flip_state(0), render_pack_slot_arrow_oam(0),
+render_pack_card_highlight_pulse_by_mode(0), render_pack_slot_highlight_oam(1),
+write_pack_banner_oam_for_all_slots(3). Returns r6 (Sub-case E).
+
+Params: none (r0 immediately clobbered by ldr r4,DAT_080da9d0)
+Returns: r0=u8 (0=no input, 1=input handled; Sub-case E adds r0,r6 @ 080dab14)
+Side effects:
+  [pack_ui_state+0xc+0x18]: direction/slot updated
+  [pack_ui_state+0xc+0x4]: := 0xf or 0x10 or 0x11 (step advance)
+  [pack_ui_state+0x724] byte: bit5 cleared
+  [pack_ui_state+0x718] byte: bit5 cleared (r6=0 path)
+Constants:
+  pack_ui_state = 0x03005850
+  INPUT_FIELD = 0x148
+  SCROLL_Y = 0x98, SCROLL_STEP = 8
+  NEXT_STEP_UP = 0xf, NEXT_STEP_DOWN = 0x10, NEXT_STEP_CONFIRM = 0x11
+  STATE_FLAGS_OFFSET = 0x724, SPRITE_CTRL_OFFSET = 0x718

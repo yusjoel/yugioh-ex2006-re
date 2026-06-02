@@ -7,13 +7,13 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4504 / 全 CSV 4641 行 = **97.05%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4524 / 全 CSV 4641 行 = **97.48%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
 - **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
-- **Phase 6 进行中**: Phase 5 命名 164 后重算 ready 解锁 **83 函数** (batches #205..#209, 5 批, 2026-06-02 锁定)。batch #205+#206 完成 40 函数落地 (4504/4641 = 97.05%)。仍有 94 FUN_* 被更深层未命名 callee 阻塞 → Phase 7 再重算解锁。
+- **Phase 6 进行中**: Phase 5 命名 164 后重算 ready 解锁 **83 函数** (batches #205..#209, 5 批, 2026-06-02 锁定)。batch #205+#206+#207 完成 60 函数落地 (4524/4641 = 97.48%)。仍有 94 FUN_* 被更深层未命名 callee 阻塞 → Phase 7 再重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -24,7 +24,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段 (Phase 6 进行中): 处理重算后 ready 集合 83 个函数 (5 批 #205..#209), batch #205+#206 已完成, 剩余 43 函数 (3 批 #207..#209)。
+当前阶段 (Phase 6 进行中): 处理重算后 ready 集合 83 个函数 (5 批 #205..#209), batch #205+#206+#207 已完成, 剩余 23 函数 (2 批 #208..#209)。
   - 锁定清单: doc/dev/eval/ready_batches_phase6.json (Phase 6, 5 批 #205..#209)
   - 排序策略: 按地址升序 (与 Phase 2/3/4/5 一致, 利于同区段函数复用簇方法论)
   - 高 indeg hub (indeg=11 0x080563cc / indeg=8 0x080b5d98 / indeg=4 0x08017d64 等) 已散在各批中, 不单独提前
@@ -57,13 +57,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 6 进行中 — 5 批 (#205..#209) 锁定; 下一批 #207 |
-| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 6 batch#206 rename) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4504 (97.05%) |
-| **未命名 (FUN_*)** | 137 (43 ready Phase 6 / 94 被更深层 callee 阻塞 → Phase 7) |
-| **就绪函数集 (Phase 6)** | 83 函数 (5 批 #205..#209), 处理中 (43 剩余) |
-| **下一批** | #207 (Phase 6 idx 2) — `ready_batches_phase6.json` |
-| **上次更新** | 2026-06-03 batch #206 PASSED — equip zone activation SM + equip target slot strategy dispatch + pack card blend/scroll/hue/overlay/reveal/detail page state machine cluster (4504/4641 = 97.05%) |
+| **阶段** | Phase 6 进行中 — 5 批 (#205..#209) 锁定; 下一批 #208 |
+| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 6 batch#207 rename) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4524 (97.48%) |
+| **未命名 (FUN_*)** | 117 (23 ready Phase 6 / 94 被更深层 callee 阻塞 → Phase 7) |
+| **就绪函数集 (Phase 6)** | 83 函数 (5 批 #205..#209), 处理中 (23 剩余) |
+| **下一批** | #208 (Phase 6 idx 3) — `ready_batches_phase6.json` |
+| **上次更新** | 2026-06-03 batch #207 PASSED — pack card info page SM (selection/label/input/confirm/scroll/fadein) + pack list page SM (scroll-fadein/navigation/scroll-interp/banner/label/input/confirm/scroll-interp-v/overlay-scroll/fadein/overlay-anim) + init_pack_scene_selection_state + tick_pack_slot_cover_fadein cluster (4524/4641 = 97.48%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
 | **ready_locked** | `true` (Phase 6 83 集合锁定; Phase 7 前须重算 ready) |

@@ -1,0 +1,17 @@
+Called via step-table dispatch from tick_pack_list_scene_step (0x080dae44), step index 0xf.
+Per-frame handler that checks A-key confirm input and advances the pack list page state.
+Reads gPrng+0x1d0 scene type [+0x1c]=2 to confirm; checks gPrng+0x148 bit0 (confirm key).
+If confirm key pressed: calls sync_state_and_init_sprite(0x24), writes [+0x10]:=0x10 to
+advance state machine, sets r4=1. Unconditionally calls tick_overlay_animation_step(0),
+render_pack_card_sprite_by_flip_state(0), render_pack_slot_arrow_oam(0),
+render_pack_card_highlight_pulse_by_mode(0), render_pack_slot_highlight_oam(1),
+write_pack_banner_oam_for_all_slots(3). Returns r4 (0=waiting, 1=confirmed; Sub-case E).
+
+Params: none (r4 initialized internally via movs r4,#0)
+Returns: r0=u8 (0=waiting, 1=confirmed; Sub-case E adds r0,r4 @ 080dab7a)
+Side effects:
+  [pack_ui_state+0xc+0x10] := 0x10 (on confirm-key path)
+Constants:
+  pack_ui_state = 0x03005850
+  NEXT_STATE = 0x10
+  SPRITE_INIT_CODE = 0x24

@@ -1,0 +1,26 @@
+Called via step-table dispatch from tick_pack_list_scene_step (0x080dae44), step index 4.
+Single-frame driver for the pack list scene scroll-start fade-in. First writes DISPCNT=0x1d00
+(BG0-BG3+OBJ all enabled). Reads frame counter [+0x6] from pack_ui_state+0xc and decrements;
+if count>0 and <=0x13: computes BLDALPHA blend value via bios_div(count*0x10, 0x14) and writes
+register. When count<=0: configures BG0CNT (priority 1), BG1CNT (priority 1), BG3CNT (priority 3),
+writes BLDCNT=0x3f3f, BLDALPHA=0x1010, sets r4=1. Calls compute_pack_slot_scroll_x([+0x18]),
+set_pack_scroll_start_pos(r0, 0x50); based on pack_ui_state+0x718 bit0: calls
+render_pack_card_sprite_by_flip_state(0) + write_pack_banner_oam_for_all_slots(0 or 3);
+calls render_pack_slot_highlight_oam(1 or 2). Returns r4 (0=animating, 1=complete; Sub-case E).
+
+Params: none (r0 immediately clobbered by ldr r0,DAT_080d9b1c)
+Returns: r0=u8 (0=fade-in in progress, 1=complete; Sub-case E adds r0,r4 @ 080d9c06)
+Side effects:
+  [DISPCNT] (0x04000000): := 0x1d00
+  [BLDALPHA] (0x04000052): linear update while count>0, final 0x1010
+  [BG0CNT] (0x04000008): cleared then |= 1 (on complete)
+  [BG3CNT] (0x0400000e): cleared then |= 3 (on complete)
+  [BLDCNT] (0x04000050): final 0x3f3f
+  [pack_ui_state+0xc+0x6]: -=1 each frame
+Constants:
+  pack_ui_state = 0x03005850
+  DISPCNT = 0x04000000, DISPCNT_VAL = 0x1d00
+  BLDALPHA_DIV = 0x14
+  BG0CNT = 0x04000008, BG3CNT = 0x0400000e
+  BLDCNT = 0x04000050, BLDCNT_FINAL = 0x3f3f, BLDALPHA_FINAL = 0x1010
+  SCROLL_Y = 0x50
