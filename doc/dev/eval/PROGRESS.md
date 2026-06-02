@@ -7,12 +7,12 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4400 / 全 CSV 4641 行 = **94.81%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4440 / 全 CSV 4641 行 = **95.67%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
-- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 120, 剩 44)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
+- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 140, 剩 24)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -55,13 +55,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #202 |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #203 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4420 (95.24%) |
-| **未命名 (FUN_*)** | 221 (其中 44 ready / 177 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (44 剩余) |
-| **下一批** | #202 (Phase 5 idx 6) — `ready_batches_phase5.json` |
-| **上次更新** | 2026-05-31 batch #201 PASSED — pack scene card render/label text/image scroll/spin OAM + full layout/detail screen init + slot scroll layout (collapsed/fanned/centered/out) state machines + card effect dispatch by card_id + equippable predicates cluster x20 (4420/4641 = 95.24%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4440 (95.67%) |
+| **未命名 (FUN_*)** | 201 (其中 24 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (24 剩余) |
+| **下一批** | #203 (Phase 5 idx 7) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-06-02 batch #202 PASSED — pack scene card detail view init + slot selection list build + hue gradient palette + scene entry points (from_list/from_shop) + OAM attr pair update + slot cover brightness blend/OAM sprite + card list scene init + cursor advance + card list/cover scroll/blend fadeout step drivers + purchase confirm/result overlays (create + tick) + cover fadein blend + card name reveal/anim x20 (4440/4641 = 95.67%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
 | **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |
