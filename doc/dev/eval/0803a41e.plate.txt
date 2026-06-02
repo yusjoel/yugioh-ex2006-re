@@ -1,0 +1,2 @@
+Equip node chain step-advance checkpoint. Called by dispatch_equip_node_by_type when type_code > 13 (out of dispatch table range). Reads sp[0x44] (successor node index written by dispatch_equip_node_by_type from node[+6]): if zero, chain is at tail, tail-jumps to adjust_slot_score_by_chain_and_zone; if non-zero, sets r5 to the successor index and bl-s dispatch_equip_node_by_type to continue traversing the equip chain. No own prologue; shares eval_slot_score_entry_full stack frame.
+Constants: EQUIP_NODE_POOL=0x0201d9c0, CHAIN_END_SENTINEL=0x0.
