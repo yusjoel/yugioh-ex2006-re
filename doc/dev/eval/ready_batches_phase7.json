@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "generated": "2026-06-03",
+    "phase": 7,
+    "mode": "20/batch, single sub-agent per phase (serial executor/reviewer/fixer/lesson-keeper)",
+    "criterion": "unnamed AND (no callees OR all callees named); set locked at Phase 7 start (recomputed after Phase 5 named 164)",
+    "source_addr_list": "temp/ready_addrs_phase7.txt",
+    "callgraph_source": "temp/ghidra-funcs-callgraph.csv (2026-05-31, 4641 fns / 13158 edges)",
+    "total_ready": 32,
+    "total_batches": 2,
+    "batch_size": 20,
+    "addr_range": [
+      "0x08018884",
+      "0x0810dab4"
+    ],
+    "first_batch_idx": 210,
+    "indeg_dist": {
+      "0": 21,
+      "1-2": 9,
+      "3-5": 1,
+      "6-10": 1,
+      "11+": 0
+    },
+    "blocked_unnamed": 62
+  },
+  "batches": [
+    {
+      "batch_idx": 210,
+      "addrs": [
+        "0x08018884",
+        "0x08018f7c",
+        "0x0801abec",
+        "0x08056598",
+        "0x080565e8",
+        "0x0805663c",
+        "0x080566cc",
+        "0x08057294",
+        "0x08057f98",
+        "0x08058858",
+        "0x08058a1c",
+        "0x08059110",
+        "0x08059448",
+        "0x08059fc4",
+        "0x0807fde8",
+        "0x0808198c",
+        "0x08081c54",
+        "0x080824a4",
+        "0x08082510",
+        "0x0808263c"
+      ]
+    },
+    {
+      "batch_idx": 211,
+      "addrs": [
+        "0x08083450",
+        "0x08083d38",
+        "0x08087bf4",
+        "0x080d6374",
+        "0x080d67a8",
+        "0x080d6a90",
+        "0x080eda30",
+        "0x080f473c",
+        "0x080f4a18",
+        "0x080f4c14",
+        "0x0810da84",
+        "0x0810dab4"
+      ]
+    }
+  ]
+}

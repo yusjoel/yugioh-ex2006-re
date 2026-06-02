@@ -13,7 +13,8 @@
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
 - **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
-- **Phase 6 完成**: Phase 5 命名 164 后重算 ready 解锁 **83/83 函数全部落地** (batches #205..#209, 5 批, 2026-06-02 锁定, 2026-06-03 全部 byte-identical)。仍有 94 FUN_* 被更深层未命名 callee 阻塞 → Phase 7 ExportFunctionInventory 重算 ready 解锁。
+- **Phase 6 完成**: Phase 5 命名 164 后重算 ready 解锁 **83/83 函数全部落地** (batches #205..#209, 5 批, 2026-06-02 锁定, 2026-06-03 全部 byte-identical)。
+- **Phase 7 进行中**: Phase 6 命名 83 后重算 ready 解锁 **32 函数** (batches #210..#211, 2 批, 2026-06-03 锁定)。仍有 62 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -24,9 +25,10 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-Phase 6 已完成 (5 批 #205..#209, 83/83 函数全部落地, 2026-06-03)。
+Phase 7 进行中 (2 批 #210..#211, 32 函数, ready 已重算锁定 doc/dev/eval/ready_batches_phase7.json)。
 
-下一步: Phase 7 准备 — ExportFunctionInventory + 重算 ready (python tools/ad-hoc/compute_ready_phaseN.py), 解锁剩余 ~94 FUN_* 中已就绪的函数。
+下一批取法:
+  python -c "import json; d=json.load(open('doc/dev/eval/ready_batches_phase7.json')); idx=<N>-210; print(' '.join(d['batches'][idx]['addrs']))"  # batch #210 = idx 0
 
 20/批 单 sub-agent 串行模式 (沿用 Phase 2 末期):
   - executor: 1 个 sub-agent 一次性产 20 份 proposal
@@ -51,12 +53,12 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 6 完成 — 83/83 函数全部落地 (#205..#209, 5 批); 下一步 Phase 7 准备 (ExportFunctionInventory + 重算 ready) |
-| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 6 batch#209 rename) |
+| **阶段** | Phase 7 进行中 — 2 批 (#210..#211) 锁定; 下一批 #210 |
+| **Ghidra 函数总数** | 4641 (ROM main code 范围, ExportFunctionInventory 最新重导含全 Phase 6 rename) |
 | **已命名 (USER_DEFINED / ANALYSIS)** | 4547 (97.97%) |
-| **未命名 (FUN_*)** | 94 (全部被更深层 callee 阻塞 → Phase 7 重算解锁) |
-| **就绪函数集 (Phase 6)** | 83 函数 (5 批 #205..#209), 全部完成 |
-| **下一批** | Phase 7 准备 (ExportFunctionInventory + 重算 ready) |
+| **未命名 (FUN_*)** | 94 (32 ready Phase 7 / 62 阻塞, 含 13 个不可解递归 SCC) |
+| **就绪函数集 (Phase 7)** | 32 函数 (2 批 #210..#211), 处理中 (32 剩余) |
+| **下一批** | #210 (Phase 7 idx 0) — `ready_batches_phase7.json` |
 | **上次更新** | 2026-06-03 batch #209 PASSED (Phase 6 FINAL) — restart_sound_channel_blocking + close_fd_reentrant + lseek_fd_reentrant (4547/4641 = 97.97%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
@@ -147,4 +149,5 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 
 | ADDR | 日期 | 失败原因 | 备注 |
 |------|------|----------|------|
-| _(空)_ | — | — | — |
+| SCC-11 (0x080e40c2 簇) | 2026-06-03 | 不可解递归 SCC (11 函数互相调用, bottom-up 永不就绪) | 成员: 0x080e40c2 0x080e4af4 0x080e4b30 0x080e4b50 0x080e4bbc 0x080e4c28 0x080e4cd0 0x080e4d0c (+3 见 ready_addrs); 需作为簇协同命名, 放宽 R7 簇内边; 待 Phase 7/8 peeling 收敛后处理 |
+| SCC-2 (0x080392da↔0x0803a41e) | 2026-06-03 | 不可解递归 SCC (2 函数互相调用) | 同上, 需协同命名 |
