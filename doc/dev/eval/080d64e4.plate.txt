@@ -1,0 +1,1 @@
+拆包场景卡片 BLDY 淡出动画帧驱动. 从 pack_ui_state+0xc+0x6 读帧计数器递减; 以 ldrsh 取有符号值计算 BLDY = (counter<<4)/0x10 线性递减; 写 BLDY 寄存器. 当计数器归零时: 写 BLDCNT=0x3f (清除 blend 模式), BLDY=0, state_code=2, r5=1. 末尾无条件调 render_pack_card_highlight_sprite(1) + render_pack_card_spin_oam_by_mode(1,0) + render_pack_card_sprite_by_flip_state(1) + render_pack_card_slot_oam(3). 返回 r5 (0 或 1).

@@ -1,0 +1,1 @@
+拆包场景卡片 overlay 开场动画帧驱动. 读取 gPrng+0xa4*2=0x148 halfword 的 bit0 和 bit1: 若 bit0 或 bit1 置位则初始化 overlay: 写 [pack_ui_state+0xc+0x6]=8, BLDCNT=0x3fbf, BLDY=0, state_code=9, r4=1. 随后无条件调 tick_overlay_animation_step(0) 执行 overlay 动画一步. 末尾 render_pack_card_highlight_sprite(1) + render_pack_card_sprite_by_flip_state(1) + render_pack_card_slot_oam(3). 返回 r4 (0 或 1).

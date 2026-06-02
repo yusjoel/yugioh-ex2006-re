@@ -1,0 +1,1 @@
+拆包场景卡片选择列表初始化帧驱动. 从 pack_ui_state+0xc+0x6 帧计数器递减; 若仍 >0 返回 0 继续等待. 当计数器归零时: 清 gPrng+0xba*2=0x174 halfword 的 bit9 (AND 0xfdff), 调 build_pack_slot_selection_list 建立卡片选择列表; 写 [+0x2]=0 (重置索引), 清 pack_ui_state+0x724 低 2 bit (AND ~0x3), 返回 1. 此为拆包选卡 UI 进入选择状态前的一次性初始化步骤.
