@@ -1,0 +1,1 @@
+游戏主入口 (AgbMain), 由 crt0 @ 0x080000c0 调用. init_system_hardware_and_drivers 初始化驱动; strh 0xffff 到 0x0200af10 (场景 ID := -1); invoke_r3([gState+0x6ed0]) 初始化 puzzle charset; verify_puzzle_checksum: 失败则清零 puzzle 数据区 8 字节, 读 ROM[0x080000ae] bits[15:8] 判断 'J'(0x4a) 决定 write_puzzle_charset_flag(0/1); set_active_page_handler(0x080fbad1) 安装主页面; bl main_dispatch_loop 进入主循环 (不返回).

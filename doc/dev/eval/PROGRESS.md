@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4579 / 全 CSV 4641 行 = **98.66%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4599 / 全 CSV 4641 行 = **99.10%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -15,7 +15,8 @@
 - **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
 - **Phase 6 完成**: Phase 5 命名 164 后重算 ready 解锁 **83/83 函数全部落地** (batches #205..#209, 5 批, 2026-06-02 锁定, 2026-06-03 全部 byte-identical)。
 - **Phase 7 完成**: Phase 6 命名 83 后重算 ready 解锁 **32/32 函数** (batches #210..#211, 2 批, 2026-06-03 全部 byte-identical)。
-- **Phase 8 进行中**: Phase 7 命名 32 后重算 ready 解锁 **20 函数** (batch #212, 1 批, 2026-06-03 锁定)。仍有 42 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
+- **Phase 8 完成**: Phase 7 命名 32 后重算 ready 解锁 **20/20 函数全部落地** (batch #212, 1 批, 2026-06-03 全部 byte-identical)。仍有 42 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
+- **Phase 9 准备**: Phase 8 命名 20 后须 ExportFunctionInventory + 重算 ready (python tools/ad-hoc/compute_ready_phaseN.py); 预期解锁波次来自 42 FUN_* 中非 SCC 部分 (约 29 函数); SCC 13 函数需协同命名。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -54,16 +55,16 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 8 进行中 — 1 批 (#212, 20 函数) 锁定; 下一批 #212 |
+| **阶段** | Phase 8 COMPLETE; 下一步 Phase 9 准备 (ExportFunctionInventory + 重算 ready) |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4579 (98.66%) |
-| **未命名 (FUN_*)** | 62 (20 ready Phase 8 / 42 阻塞, 含 13 个不可解递归 SCC) |
-| **就绪函数集 (Phase 8)** | 20 函数 (1 批 #212), 处理中 — `ready_batches_phase8.json` |
-| **下一批** | #212 (Phase 8 idx 0); 之后 42 FUN_* 阻塞, 其中 13 个为 2 个不可解 SCC; Phase 9 重算续解锁非 SCC 波次; SCC 簇 (13 函数) 最终需全簇协同命名 |
-| **上次更新** | 2026-06-03 batch #211 PASSED — tick_equip_target_select_4state + tick_equip_card_display_3state + scan_player_zone_equip_criteria_substate_c + tick_pack_card_reveal_fade_in + tick_pack_card_scroll_by_nav_input + tick_pack_card_scroll_final_step + tick_sio_deck_sync_session + init_puzzle_scene_with_charset + tick_scene_frame_driver + init_system_hardware_and_drivers + tick_sound_engine_n_frames + restart_sound_channel_with_config (4579/4641 = 98.66%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4599 (99.10%) |
+| **未命名 (FUN_*)** | 42 (全部阻塞, 含 13 个不可解递归 SCC; Phase 9 重算后确认非 SCC 波次) |
+| **就绪函数集 (Phase 9)** | 未重算; 须 ExportFunctionInventory + compute_ready_phaseN.py; 预期约 29 非 SCC 函数 |
+| **下一批** | Phase 9 batch #213 起; 先重算 ready; SCC 簇 (13 函数) 最终需全簇协同命名 |
+| **上次更新** | 2026-06-03 batch #212 PASSED — tick_name_input_frame + tick_banlist_password_frame + tick_equip_activation_lp_cost_sprite_by_type + tick_equip_activation_neo_daedalus_gate + tick_equip_activation_sprite_mode2_by_type + build_equip_criteria_for_target_slots + dispatch_equip_display_if_confirm_state_one + tick_equip_lp_row_display_by_state + dispatch_equip_display_if_confirm_state_two + dispatch_equip_display_by_type_code_or_card_id + dispatch_equip_display_by_activity_if_slot_group_le4 + tick_equip_display_with_target_selection + dispatch_equip_display_if_confirm_state_nonzero + scan_equip_target_slots_for_sprites + dispatch_equip_display_if_monster_slot_and_activation + dispatch_equip_display_unless_type_code_80 + dispatch_equip_display_by_ext_field6_type + dispatch_equip_display_with_pair_card_id + tick_sio_deck_sync_scene + run_game_main (4599/4641 = 99.10%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
-| **ready_locked** | `true` (Phase 6 83 集合锁定; Phase 7 前须重算 ready) |
+| **ready_locked** | `false` (Phase 8 完成; Phase 9 前须重算 ready via compute_ready_phaseN.py) |
 
 ## 进度
 

@@ -1,0 +1,1 @@
+装备激活确认状态非零门控分派函数. 读取 card_slot[+0xc] halfword; 若等于 0 则直接返回 1 (跳过); 若非零则调用 dispatch_equip_activation_display_by_confirm_state 并透传其返回值. 与 dispatch_equip_display_if_confirm_state_one/two (0x080833a8/0x0808416c) 同族, 差异在于触发条件为任意非零值而非特定值.

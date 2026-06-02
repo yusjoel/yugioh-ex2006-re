@@ -1,0 +1,1 @@
+SIO 卡组同步场景的每帧驱动函数. 调用 tick_sio_deck_sync_session 执行一帧 SIO 卡组同步会话逻辑; 然后读取 gPrng+0xe0*2=0x1c0 处的 SIO 上下文指针, 加上偏移 0x924 取函数指针; 若非 NULL 则调用 invoke_r0 执行场景回调. 最后向 TM2CNT_L (0x04000108) 写入 0x00c3feb9 重置 Timer 2 重载值.

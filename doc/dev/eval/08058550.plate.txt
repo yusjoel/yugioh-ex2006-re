@@ -1,0 +1,1 @@
+装备激活 Neo Daedalus 路径条件路由包装函数. 读取 card_entry[+2] bits[11:2] (mask 0xfc0) 提取 slot_type_code; 若 slot_type_code == 0xf0<<2 = 0x3c0 则跳过直接返回 1; 若不等于 0x3c0 则原样透传 r0/r1 到 tick_equip_activation_if_neo_daedalus_with_lp_row 并透传其返回值. 与 0x08057430 互为同族类型门控 stub, 差异在于条件方向取反 (本函数在类型不匹配时才调用 callee).

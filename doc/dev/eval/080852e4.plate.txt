@@ -1,0 +1,1 @@
+装备激活显示分派并解析配对卡 ID 的组合函数. 调用 dispatch_equip_activation_display_by_confirm_state: 若返回 0 则输出 0 (未完成); 若非零则继续: 检查 card_slot[+6] bits[4:2] (mask 0x1c = SLOT_HAS_PAIR_FLAG); 若为 0 则直接返回 1; 若非零则调用 read_effect_slot_side_and_type(card_slot, 0) 提取 (side, type), 调用 resolve_slot_card_id_for_pair(type, side) 获取配对槽的卡 ID, 写入 card_slot[+0xa] halfword (strh). 返回 1.

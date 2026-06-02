@@ -1,0 +1,1 @@
+装备激活确认状态条件分派包装函数. 读取 card_slot[+0xc] halfword (ldrh [r0,#0xc]) 作为 confirm_state; 若 confirm_state == 1 则调用 dispatch_equip_activation_display_by_confirm_state 并透传其返回值; 若 confirm_state != 1 则直接返回 1 (跳过). 作为 fn-ptr 表 stub, 仅在状态为 1 时激活 display dispatch.

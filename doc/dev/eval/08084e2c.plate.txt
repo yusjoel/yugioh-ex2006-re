@@ -1,0 +1,1 @@
+按装备卡扩展属性 field6 值路由显示分派函数. 读取 card_slot[+0x14] 指针, 调用 get_card_extended_stat_field6 取 ext_field6 值. 若 ext_field6 == 0x16 则返回 1 (此类型由其他路径处理, 跳过). 若 ext_field6 == 0x17 则调用 dispatch_equip_activation_display_by_confirm_state 并透传返回值. 否则: 调用 dispatch_effect_for_neo_daedalus_eligible_slot; 若返回 0 则返回 1; 若非零则调用 tick_equip_slot_display_by_card_id_3state 并透传其返回值.

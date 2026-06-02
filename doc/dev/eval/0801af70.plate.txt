@@ -1,0 +1,1 @@
+禁卡表密码输入场景每帧驱动. 由 0x0801b284 banlist 帧初始化调用. 先读 get_banlist_scroll_direction; 非零跳过. 读 D-pad 位: 上/下键调整 gBanlistPasswordBuffer+0x661 光标位; 左键 advance_banlist_scroll_column_and_page (返回2触发scroll); 右键 retreat 对称. dispatch_banlist_cursor_action 确认; advance_banlist_password_char_and_render 渲染密码; 上限时更新 +0x660 strh 并 sync_state_and_init_sprite; 退格走 tick_banlist_password_backspace_input.

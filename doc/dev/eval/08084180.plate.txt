@@ -1,0 +1,1 @@
+装备激活显示双条件门控分派函数. indeg=0, fn-ptr 表驱动. 提取 card_slot[+2] bits[13:6] (mask 0x3fc0); 等于 0x8a<<5=0x1140 则调 dispatch_equip_activation_display_by_confirm_state. 否则检查 card_slot[+0] card_id: 0x1503 (D. D. Assailant) 或 0x1694 (Magician's Circle) 任一匹配则调同一 callee 并透传返回值; 无匹配返回 1.

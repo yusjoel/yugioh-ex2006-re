@@ -1,0 +1,1 @@
+装备激活带 LP 消耗精灵的条件路由包装函数. 读取 card_entry[+2] bits[11:2] (mask 0xfc0, 即 lsls#2 -> 0xfc0) 提取 slot_type_code; 若 slot_type_code != 0xb0*8 = 0x580 则直接返回 1 (跳过). 若匹配则原样透传 r0/r1 到 tick_equip_activation_with_lp_cost_sprite 并透传其返回值. 作为 fn-ptr 表中的类型门控 stub 使用.

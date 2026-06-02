@@ -1,0 +1,1 @@
+装备显示活动分派门控函数. 读取 card_slot[+2] bits[6:2] (5-bit slot_group via lsls#0x1a;lsrs#0x1b); 若 slot_group > 4 则直接返回 1 (超出范围跳过); 若 slot_group <= 4 则调用 dispatch_equip_display_by_type_flag_and_node_activity 并透传其返回值. 为 slot_group 范围门控的 display dispatch 包装, 与 dispatch_equip_zone_sprite_by_slot_group (0x08058578) 逻辑互补.
