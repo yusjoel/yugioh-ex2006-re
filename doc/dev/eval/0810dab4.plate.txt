@@ -1,0 +1,1 @@
+Resets audio channel and writes config bytes. Saves r2 to r5 (config byte). Loads audio engine base r4=0x030050cc. Calls restart_sound_channel_blocking(r0, r1) to reset specified channel. Writes r5 to [r4+0x380] (channel config byte); writes 0x10 to [r4+0x381] (channel param A); writes 0 to [r4+0x37f] (param B); writes 0 to [r4+0x37e] (param C). Returns void.
