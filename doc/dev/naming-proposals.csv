@@ -254,7 +254,7 @@ address,name,proposed_name,score,tags
 0x0801b264,trigger_banlist_fade_out_exit,,,
 0x0801b284,tick_banlist_oam_and_card_slots,,,
 0x0801b368,tick_banlist_scroll_view_by_state,,,
-0x0801b5d8,FUN_0801b5d8,,,
+0x0801b5d8,tick_banlist_scene_frame,,,
 0x0801b634,dispatch_banlist_scene_handler_frame,,,
 0x0801b6a0,dispatch_banlist_pass_input_frame,pass_input_0801b6a0,4,pass_input
 0x0801b77c,scale_char_width_by_encoding,,,

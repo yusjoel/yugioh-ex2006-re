@@ -1,0 +1,11 @@
+Top-level per-frame driver for the banlist scene.
+Called via fn-ptr table by dispatch_banlist_scene_handler_frame (and dispatch_banlist_pass_input_frame).
+Reads gBanlistPasswordBuffer+0x662 bits[7:6] to select sub-mode
+(0=tick_oam_slots path, 1=scroll_by_state path).
+Unconditionally advances bg_scroll/OAM/palette/blend transition each frame.
+Returns 0 if blend transition in progress OR exit_flag(+0x660 bit2)=0 (scene continues).
+Returns 1 if transition done AND exit_flag bit2=1 (scene exit requested).
+
+Constants:
+  STATE_BYTE = gBanlistPasswordBuffer+0x662 // bits[7:6] = sub-mode selector
+  EXIT_FLAG  = gBanlistPasswordBuffer+0x660 // bit2 = scene-exit request flag
