@@ -154,7 +154,7 @@ address,name,proposed_name,score,tags
 0x08017c7c,dispatch_banlist_text_by_key,game_str_08017c7c,2,banlist;font_jp;game_str;settings
 0x08017cc4,write_bg0_vofs_with_bias,,,bg
 0x08017cd0,render_jp_string_row,font_jp_08017cd0,2,font_jp
-0x08017d64,FUN_08017d64,font_jp_08017d64,2,banlist;font_jp;game_str;settings
+0x08017d64,init_banlist_name_input_page_layout,font_jp_08017d64,2,banlist;font_jp;game_str;settings
 0x08017e48,find_name_char_at_idx,settings_08017e48,3,settings
 0x08017e9c,render_jp_string_to_bg_row,font_jp_08017e9c,2,palette;font_jp
 0x08017f04,render_name_input_scroll_row,,,font_jp;settings
@@ -240,8 +240,8 @@ address,name,proposed_name,score,tags
 0x0801a950,get_banlist_password_entry_ptr,,,
 0x0801a984,render_banlist_text_col_cleared,,,
 0x0801a9f4,render_banlist_password_chars_to_buf,,,
-0x0801aa54,FUN_0801aa54,,,
-0x0801ab00,FUN_0801ab00,,,
+0x0801aa54,advance_banlist_password_char_and_render,,,
+0x0801ab00,retreat_banlist_password_char_and_render,,,
 0x0801abec,FUN_0801abec,,,
 0x0801ac28,advance_banlist_scroll_pos_step,,,
 0x0801acac,dispatch_banlist_cursor_action,,,
@@ -348,7 +348,7 @@ address,name,proposed_name,score,tags
 0x0801f40c,find_card_index_in_rom_table,,,scene_duel_puzzle
 0x0801f444,tick_duel_puzzle_scene_step,prng_0801f444,3,scene_duel_puzzle;frame_counter;prng
 0x0801fe92,poll_fadein_exit_to_duel_state,,,scene_duel_puzzle;frame_counter
-0x0801fec0,FUN_0801fec0,duel_puzzle_0801fec0,3,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;duel_puzzle;font_jp;frame_counter;fs;game_str;money;pack;prng;settings
+0x0801fec0,run_duel_puzzle_scene_state_machine,duel_puzzle_0801fec0,3,card_data;card_desc;card_frame;card_ids;card_image;card_info;card_list;card_name;card_stats;demo;duel_field;duel_puzzle;font_jp;frame_counter;fs;game_str;money;pack;prng;settings
 0x08020db4,render_lp_record_text_set_a,,,
 0x08020fa8,render_lp_record_text_set_b,,,
 0x08022e2c,tick_scene_step_by_step_table_d,,,
@@ -1184,7 +1184,7 @@ address,name,proposed_name,score,tags
 0x08053110,check_equip_slot_eligible_by_field6_not17_owner_mismatch,,,
 0x08053178,check_equip_slot_eligible_by_monster_space_type_score3,,,
 0x080531f0,check_equip_slot_eligible_by_active_ctx_score_nonzero,,,
-0x08053294,FUN_08053294,,,
+0x08053294,dispatch_equip_slot_eligible_by_field6_bit,,,
 0x080532b8,check_equip_slot_eligible_by_owner_mismatch_field8_no_field6,,,
 0x0805330c,check_equip_slot_eligible_by_field6_not17_owner_match,,,
 0x08053374,check_equip_slot_eligible_by_field5_score_or_chain_type,,,
@@ -1194,7 +1194,7 @@ address,name,proposed_name,score,tags
 0x080535b0,check_equip_slot_eligible_with_whitelist_prereqs_and_eligible_b,,,
 0x0805363c,check_equip_slot_eligible_by_prereqs_with_zone_guard,,,
 0x08053698,check_equip_slot_eligible_by_side_setcode_and_eligible,,,
-0x08053704,FUN_08053704,,,duel_field
+0x08053704,dispatch_equip_slot_eligible_by_card_id_tier,,,duel_field
 0x08053760,check_equip_slot_eligible_by_setcode_and_prereqs_no_whitelist,,,
 0x080537c0,dispatch_equip_eligibility_by_slot_equip_flag,,,
 0x080537dc,check_equip_slot_eligible_by_side_setcode_and_activation,,,
@@ -1216,7 +1216,7 @@ address,name,proposed_name,score,tags
 0x0805402c,check_equip_slot_eligible_by_opposite_side_field6_and_type,,,
 0x08054088,check_equip_slot_eligible_by_field6_10_and_equippable,,,
 0x080540ec,check_equip_slot_eligible_by_type_mismatch_and_eligible,,,
-0x08054118,FUN_08054118,,,
+0x08054118,dispatch_equip_slot_eligible_by_type_prereqs_or_setcode,,,
 0x08054154,check_equip_slot_eligible_by_side_whitelist_setcode_and_eligible,,,
 0x080541cc,check_equip_slot_eligible_by_side_setcode_prereqs_and_type,,,
 0x08054234,check_equip_slot_eligible_by_field8_9_and_type,,,
@@ -1279,7 +1279,7 @@ address,name,proposed_name,score,tags
 0x0805635c,render_equip_lp_cost_sprite,,,duel_field
 0x08056380,trigger_lp_row_type2_if_equip_tier_nonzero,,,
 0x080563a4,enqueue_equip_zone_sprite_at_slot,,,
-0x080563cc,FUN_080563cc,card_name_080563cc,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
+0x080563cc,tick_equip_activation_state_machine,card_name_080563cc,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
 0x0805652c,dispatch_equip_zone_sprite_by_card_in_zone,,,
 0x08056558,set_equip_activation_player_state_bit,,,
 0x08056578,enqueue_lp_display_row_from_card_byte2,,,
@@ -1329,10 +1329,10 @@ address,name,proposed_name,score,tags
 0x0805847c,enqueue_equip_slot_sprite_with_field_bit_update,,,
 0x080584cc,tick_equip_zone_bitmap_banisher_lp_seq,,,
 0x08058550,FUN_08058550,,,
-0x08058578,FUN_08058578,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
+0x08058578,dispatch_equip_zone_sprite_by_slot_group,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08058598,load_equip_set_code_with_zone14_test,,,duel_field
 0x080585c4,enqueue_effect_slot_sprite_by_equip_tier,,,duel_field
-0x080585e8,FUN_080585e8,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
+0x080585e8,tick_equip_activation_phase_with_effect_enqueue,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x0805861c,enqueue_sprite_type11_plain_for_slot,,,
 0x08058638,check_equip_slot_has_active_effect_value,,,
 0x08058684,tick_equip_tier_abcx_sprite_display_seq,,,
@@ -1836,7 +1836,7 @@ address,name,proposed_name,score,tags
 0x08068618,advance_equip_effect_display_zone_match_guard,,,duel_field
 0x08068684,tick_equip_effect_display_state_machine,card_ids_08068684,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x080687a8,invoke_equip_hand_slot_oam_if_eligible,,,
-0x0806882c,FUN_0806882c,,,duel_field
+0x0806882c,dispatch_equip_slot_sprite_by_zone_type,,,duel_field
 0x080688dc,apply_slot_equip_activation_by_zone_slot_match,,,duel_field
 0x08068990,dispatch_equip_slot_sprite_by_state_and_zone,,,duel_field
 0x08068b58,apply_equip_activation_by_zone_slot_state,,,duel_field
@@ -1848,7 +1848,7 @@ address,name,proposed_name,score,tags
 0x08068f0c,enqueue_equip_sprite_attrs_via_zone_entry_check,,,
 0x08068f78,dispatch_equip_slot_sprite_by_lp_state_neo_daedalus,,,
 0x08069008,dispatch_equip_zone11_sprite_or_lp_row_by_state,,,
-0x080690dc,FUN_080690dc,,,
+0x080690dc,tick_dragon_summon_display_if_slots_paired,,,
 0x08069104,enqueue_effect_slot_sprites_for_two_players,,,
 0x08069148,dispatch_equip_sprite_by_card_id_graceful_or_spiral,,,
 0x08069260,dispatch_equip_zone_sprite_multi_zone_by_lp_state,,,
@@ -1918,7 +1918,7 @@ address,name,proposed_name,score,tags
 0x0806d224,submit_ring_of_destruction_lp_indicators_if_zone_matched,,,duel_field
 0x0806d2d0,submit_effect_zone_sprites_if_unguarded,,,duel_field
 0x0806d2f0,enqueue_dual_zone_slot_sprites_if_both_occupied,,,duel_field
-0x0806d3d8,FUN_0806d3d8,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
+0x0806d3d8,tick_equip_lp_display_state_by_zone_match,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x0806d4a4,setup_equip_slot_oam_if_hand_slot_eligible,,,
 0x0806d514,enqueue_zone_equip_sprite_if_slot_matches,,,
 0x0806d5b0,set_field_slot_bit_if_zone_col_matches,,,
@@ -1991,7 +1991,7 @@ address,name,proposed_name,score,tags
 0x08071488,enqueue_sprite_attr_type11_from_chain_entry,,,
 0x080714ac,enqueue_slot_overlay_sprite_if_equip_bitmap_active,,,
 0x080714ec,dispatch_equip_zone11_target_by_activation_state,,,
-0x0807158c,FUN_0807158c,,,duel_field
+0x0807158c,dispatch_equip_lp_bar_or_bitmap_by_zone_type,,,duel_field
 0x080715ac,dispatch_equip_lp_bar_with_bitmap_filter,,,
 0x08071604,tick_zone_sprite_pipeline_with_chain_counter,,,
 0x08071654,dispatch_hand_card_sprite_by_effect_slot_zone,,,
@@ -2018,7 +2018,7 @@ address,name,proposed_name,score,tags
 0x08072aac,tick_equip_zone_type14_oam_placement_state,,,
 0x08072b7c,apply_equip_activation_by_zone_slot_head_check,,,
 0x08072bfc,dispatch_equip_sprite_by_zone_side_match,,,
-0x08072ce4,FUN_08072ce4,,,
+0x08072ce4,tick_dragon_summon_display_if_monster_zones_occupied,,,
 0x08072d20,enqueue_zone_sprite_attr_type11_from_slot,,,
 0x08072d34,tick_equip_lp_display_state_by_slot,,,
 0x08072eb4,setup_equip_oam_by_placeable_card_id_and_zone,,,
@@ -2043,7 +2043,7 @@ address,name,proposed_name,score,tags
 0x080744f8,dispatch_equip_zone_bitmap_or_neo_daedalus_sprite,,,duel_field
 0x080746ec,enqueue_equip_zone_sprite_full_from_slot,,,
 0x08074708,dispatch_equip_zone_sprite_mode2_or_activation,,,duel_field
-0x08074770,FUN_08074770,,,
+0x08074770,dispatch_dragon_summon_or_lp_delta_by_slot_type,,,
 0x0807479c,dispatch_equip_chain_activation_if_zone_pair_aligned,,,duel_field
 0x08074834,enqueue_slot_sprite_type4_from_entry_attr,,,
 0x080749e0,tick_equip_activation_lp_display_seq,,,
@@ -2182,9 +2182,9 @@ address,name,proposed_name,score,tags
 0x0807c388,tick_equip_activation_display_state,,,
 0x0807c474,tick_equip_lp_bar_display_two_step,,,
 0x0807c510,submit_equip_zone_score_lp_indicator,,,
-0x0807c590,FUN_0807c590,,,
+0x0807c590,tick_equip_activation_zone_scan_2state,,,
 0x0807c660,apply_equip_slot_node_activation_on_zone_match,,,
-0x0807c750,FUN_0807c750,,,duel_field
+0x0807c750,dispatch_equip_oam_by_zone_type_and_eligibility,,,duel_field
 0x0807c7f0,dispatch_equip_slot_update_by_type_gate,,,
 0x0807ca84,tick_equip_spell_zone_placement_scan,,,
 0x0807cb80,tick_equip_activation_face_down_display_seq,,,
@@ -2239,7 +2239,7 @@ address,name,proposed_name,score,tags
 0x0807f974,check_equip_slot_eligible_with_criteria_and_target,,,
 0x0807fad8,check_equip_slot_eligible_by_node_player,,,
 0x0807fb14,find_equip_eligible_slot_entry_for_player,duel_field_0807fb14,3,duel_field
-0x0807fb9c,FUN_0807fb9c,,,duel_field
+0x0807fb9c,build_equip_slot_criteria_from_card_range,,,duel_field
 0x0807fcc0,build_equip_set_f_criteria_state,,,
 0x0807fd84,activate_field_spell_neo_daedalus_group_if_placeable,,,
 0x0807fde8,FUN_0807fde8,game_str_0807fde8,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
@@ -2314,7 +2314,7 @@ address,name,proposed_name,score,tags
 0x080833bc,enqueue_equip_slot_sprites_for_pair_loop,,,
 0x08083450,FUN_08083450,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08083560,tick_equip_best_target_display_4state,card_name_08083560,2,card_frame;card_ids;card_name;card_stats;duel_field;font_jp;game_str;settings
-0x08083704,FUN_08083704,,,
+0x08083704,tick_equip_lamp_dream_zone_activation_3state,,,
 0x08083824,enqueue_equip_slot_sprite_if_equipped,,,
 0x0808386c,advance_equip_zone_slot_display_seq,,,
 0x08083968,check_effect_slot_zone_player_by_type,,,

@@ -1,0 +1,1 @@
+装备链龙族召唤显示条件驱动函数. 接收 card_entry_ptr(r0) 和 scene_ptr(r1). 读 [0x0201b290+0x4a0] step code; 若 step==0x80 则从 byte[+2] bit0 读 player_id, 调用 count_occupied_monster_zones(player_id) 统计已占用怪兽区槽数; 若结果==0 (无占用怪兽区) 则返回 0 (跳过). 若 step!=0x80 或怪兽区已占用, 调用 tick_dragon_summon_effect_display_state_machine(r4, r5) 推进状态机并返回结果. indeg=0, fn-ptr 表驱动.

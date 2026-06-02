@@ -1,0 +1,1 @@
+装备槽类型路由函数: 读 halfword[+2] bits[11:6] (mask 0xfc0 = 0xfc<<4), 与比较值 0x3c0 (0xf0<<2) 比较; 若相等则调用 apply_lp_delta_for_slot_player 直接更新 LP 差值; 否则调用 tick_dragon_summon_effect_display_state_machine 推进龙族召唤效果状态机. 透传被调函数返回值. 短函数, 类型编码 0x3c0 对应特定装备路径, indeg=0.

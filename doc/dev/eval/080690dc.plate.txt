@@ -1,0 +1,1 @@
+装备链配对校验后驱动龙族召唤效果显示状态机. 接收 card_entry_ptr(r0) 和 scene_ptr(r1). 首先以固定卡 id 0x128b (Stamping Destruction) 调用 count_paired_slots_both_sides 统计两侧配对槽数量; 若返回 0 (无配对) 则直接返回 0 (跳过). 若配对存在则调用 tick_dragon_summon_effect_display_state_machine(r4, r5) 推进龙族召唤效果显示状态机并返回其结果. indeg=0, fn-ptr 表驱动.

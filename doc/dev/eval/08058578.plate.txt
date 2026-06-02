@@ -1,0 +1,1 @@
+装备区域精灵派发路由函数. 接收 card_entry_ptr(r0). 从 byte[+2] bits[6:2] (5-bit slot_group, via lsls #0x1a; lsrs #0x1b) 提取 slot_group; 若 slot_group > 4 则调用 dispatch_equip_activation_score_by_card_id 走特殊路径 (slot_group [5..31] = 非标准装备区域); 否则 slot_group [0..4] 调用 enqueue_equip_zone_sprite_at_slot 写普通 OAM 精灵. 透传被调函数返回值. 作为 slot_group 范围门控的 dispatcher, indeg=0 (fn-ptr 表驱动).

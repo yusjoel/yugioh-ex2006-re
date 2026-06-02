@@ -1,0 +1,1 @@
+装备槽资格判定双路派发谓词. 读取 card_entry byte[+6] bits[4:3] (mask 0x1c), 根据结果分两路: 若 bits[4:3] != 0 (field6 非零), 调用 check_equip_slot_eligible_by_card_id_bst (基于 BST 查找 card_id 白名单); 若 bits[4:3] == 0, 调用 check_equip_slot_eligible_by_card_id_tree (基于树遍历的宽泛 card_id 检查). 透传被调函数返回值 (0=不符合, 1=符合). 作为 equip eligibility 谓词链中间调度层, indeg=0 (Sub-type A, 由更高层 fn-ptr 驱动).

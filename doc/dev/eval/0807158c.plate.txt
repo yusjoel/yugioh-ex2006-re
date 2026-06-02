@@ -1,0 +1,1 @@
+装备 LP 栏 / bitmap 派发函数, 根据 halfword[+0xc] zone_type_code 选路: type==1 -> submit_equip_lp_indicators_with_bar; type==2 -> invoke_equip_slot_eligibility_via_effect_node_bitmap; 其余 type 返回 0. 透传被调函数返回值. 短函数, 仅 5 条有效指令, indeg=0.
