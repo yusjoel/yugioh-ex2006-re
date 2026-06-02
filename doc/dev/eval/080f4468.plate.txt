@@ -1,0 +1,19 @@
+Called by FUN_080f46dc (duel puzzle scene init sequence) to initialize all display state data needed for the starter deck selection UI.
+First applies byte mask 0x3f|0x30 (sets display flag bits) to all deck file entries (up to max_card_count) in EWRAM flag table [0x02000006+i*2].
+Calls write_banlist_limits_to_ewram(9) to write banlist rule set 9 into EWRAM.
+Zeroes two 0x118-byte regions of EWRAM [0x02001138], then copies game_str[0x5e6] (starter deck name string) into that buffer (up to 0x16 bytes, null-padded).
+Loops over starter_deck_file 40 cards (indices 0..0x27): converts icid->cid then calls apply_delta_to_hand_oam_entry(cid,1) and writes cid into [0x02001138+0x1c+slot*2].
+Finally sets card count byte and flag bits, sets [0x02000000+0x53f0] bit0 to mark init done.
+
+Constants:
+  EWRAM_FLAG_BASE = 0x02000006 (card flag table base addr)
+  DISPLAY_FLAG_MASK = 0x0f (ands r1,r7 -> keep bits[3:0])
+  DISPLAY_FLAG_SET = 0x30 (orrs r1,r4 -> set bits[5:4])
+  BANLIST_MODE = 9 (write_banlist_limits_to_ewram argument)
+  DECK_BUF_BASE = 0x02001138 (DAT_080f4544; starter deck display buffer base addr)
+  DECK_BUF_SIZE = 0x118 (0x8c*2; bytes zeroed per region)
+  STR_ID_DECK_NAME = 0x5e6 (game_str index 0x5e6 = starter deck name)
+  STR_MAX_LEN = 0x16 (22; strncpy copy limit)
+  STARTER_DECK_OFFSET = 0x59dc (DAT_080f4548; EWRAM deck metadata offset)
+  CARD_COUNT = 40 (0..0x27; starter deck fixed 40 cards)
+  DONE_FLAG_OFF = 0x53f0 (DAT_080f4560; done flag offset)

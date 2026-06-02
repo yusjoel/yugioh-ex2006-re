@@ -1,0 +1,8 @@
+indeg=0; no .word 0x080ef38d fn-ptr table reference; Sub-type A unreferenced function.
+Receives target passcode_hash (r0); starting from card index 1 iterates calls to get_card_passcode_hash(index) and compares with target;
+returns card index (1-based) on match; returns 0 after full table scan without match.
+Upper bound read from [0x095b7cca] (card count halfword); loop terminates when index > max_card_count.
+
+Constants:
+  MAX_CARD_COUNT_PTR = 0x095b7cca (ROM card count halfword field pointer)
+  SEARCH_START = 1 (starts from index 1; index 0 is typically empty slot)

@@ -93,7 +93,7 @@ RenameFromCSV.py 行为:
 
 > **R7 caller-callee inversion + plate body 同步**: 若 reviewer 发现 R7 form(b) 所列 caller 地址实为 SELF 的 callees（方向反转），须：(1) 将 R7 节改写为 form(c)（附 grep `.word 0x<SELF_ADDR+1>` not-found 证据）；(2) 搜索 plate body 含"被.*调用"/"called by"的句子并删除或改写为功能性描述，消除与 form(c) 的内部矛盾 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r7_caller_callee_inversion.md`
 
-> **R5 漏列外部写**: 若 reviewer 以"missing external store"扣 R5，须 grep 函数体全部 str/strh/strb，把每条外部写（基址来自参数/全局/IO）补入 R5，并把对应非平凡 offset（如 LP_FIELD_OFFSET=0x1d40）加入 Constants 块 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r5_missed_external_write.md`
+> **R5 漏列外部写**: 若 reviewer 以"missing external store"扣 R5，须 grep 函数体全部 str/strh/strb，把每条外部写（基址来自参数/全局/IO）补入 R5，并把对应非平凡 offset（如 LP_FIELD_OFFSET=0x1d40）加入 Constants 块。**base-register-bias 陷阱**：若写目标 `[rBase, #N]` 而 rBase 本身 = pack_ui_state+0xc 等带偏移加载，effective_offset = BIAS + N（如 r9=pack_ui_state+0xc，asm 操作数 0x134 → 实际字段偏移 0x140）；禁止直接用 asm 操作数 N 作为最终字段偏移 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r5_missed_external_write.md`
 
 > **R3 intra-APCS-repositioning**: 若 reviewer 以入口 `mov rD,rS`/`adds rD,rS,#0`（rS ∈ {r0..r3}）相关扣 R3，须把源 rS 列为参数、目标 rD 标为内部别名（不列参数也不据此把 rS 标 void）；与 ldr/movs clobber（=void）相反 — 见 `~/.claude/projects/E--Workspace-yugioh-ex2006-re/memory/feedback_r3_param_role_swap.md`
 

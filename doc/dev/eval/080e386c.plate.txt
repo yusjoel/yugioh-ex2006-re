@@ -1,0 +1,14 @@
+Called via fn-ptr table entry (.word 0x080e386d at 0x080e3a14) as duel puzzle scene init callback.
+Receives puzzle index r0; reads unlock flag byte at EWRAM puzzle progress table [0x02006c3c+(r0+0x4c)*4]; skips if bits[1:0] already set.
+Otherwise reads puzzle ID from puzzle data table (0x09e5e9cc) and passes to check_duel_puzzle_unlock_condition_by_index; if returns 1, sets bits[1:0]=3.
+Further reads puzzle type field (entry+8 halfword): type=4 keeps only bits[1:0]; type=7 applies 0xe0fc mask to update evaluation bit-field. Returns current unlock level.
+
+Constants:
+  EWRAM_BASE = 0x02000000
+  CHALLENGE_RECORD_OFFSET = 0x6c3c (gDuelPuzzleProgress base offset)
+  PUZZLE_TABLE = 0x09e5e9cc (duel puzzle data table base)
+  PUZZLE_OFFSET = 0x4c (76; base offset for duel puzzles in combined record table)
+  UNLOCK_BITS = 0x3 (bits[1:0]: set = fully unlocked)
+  PROGRESS_FIELD_MASK = 0xe0fc (composite field mask for type-7 update)
+  TYPE_BRONZE = 0x4 (puzzle sub-type that clears upper bits)
+  TYPE_GOLD = 0x7 (puzzle sub-type that applies full 0xe0fc evaluation)

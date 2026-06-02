@@ -1,0 +1,18 @@
+Called by dispatch_game_text_scene_step_by_table (0x080fde9c) via indirect step table as the title_ex scene main state machine tick function.
+Reads [0x02029eb0+0x38d] byte as current state (0..5), 6-way switch:
+State0: loads 4 FS resources (fs_load x4), calls apply_title_ex_gfx_resource_if_slot_zero to install GFX resource, bios_cpu_set inits audio region, gl_set_blend2_level sets blend level, set_channel_if_changed(0), advances step counter;
+State1: waits for blend transition done (check_blend_transition_done), on complete inits blend params and starts transition animation, advances counter;
+State2: BG1 scroll tick, cell anim tick, jump trigger check;
+State3: cell anim tick only, no jump trigger check;
+State4: init blend params+tick, cell anim tick, advances counter;
+State5: waits for blend transition done, on complete sets brightness/blend level, advances counter.
+Default path: loads pack palette, copies sprite attr table to OAM, refreshes GL palette slot, checks transition-done+exit-bit -> returns 1 (scene done) or ticks transition then returns 0.
+
+Constants:
+  SCENE_STATE_BASE = 0x02029eb0 (DAT_080fda28; title_ex/pack state struct base addr)
+  STATE_OFF = 0x38d (state counter byte offset)
+  BLEND_CTR_OFF = 0x38e (blend counter byte offset)
+  FS_RESULT_OFF = 0x390 (FS load result pointer offset)
+  EXIT_FLAG_OFF = 0x388 (blend exit flag byte offset)
+  DISPCNT = 0x04000000 (GBA display control register)
+  DISPCNT_ENABLE_MASK = 0x1f00 (enable WIN0/WIN1/WINOBJ/OBJ/forced-blank)

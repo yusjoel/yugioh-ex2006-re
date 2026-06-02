@@ -1,0 +1,9 @@
+indeg=0; no .word 0x080ed52d fn-ptr reference found; Sub-type A unreferenced function (dead code or runtime pointer call).
+Receives r0=u16 card_id (high 16 bits truncated), r1=additional value; builds a 3-halfword sync entry on the stack:
+[sp+0]=0x8006 (command type field), [sp+2]=u16(r0), [sp+4]=r1;
+then calls write_sio_deck_sync_entry with sp as argument.
+Typed wrapper for write_sio_deck_sync_entry with fixed command word 0x8006.
+
+Constants:
+  SIO_SYNC_CMD = 0x8006 (DAT_080ed54c; SIO deck sync command type field)
+  STACK_FRAME = 0x10 (sub sp,#0x10 allocated local frame size)

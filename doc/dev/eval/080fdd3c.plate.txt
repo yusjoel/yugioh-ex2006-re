@@ -1,0 +1,19 @@
+Called by dispatch_game_text_scene_step_by_table (0x080fde9c) via indirect step table; decides whether to enter duel puzzle scene or pack scene based on EWRAM integrity flag.
+First reads [0x02029eb0+0x390] bit1 and writes to gPrng+0x23a bit1 (syncs integrity flag).
+If bit1=0 (integrity check passed): calls set_active_page_handler(0x080fc2f5) to install puzzle scene handler, calls verify_puzzle_ewram_integrity for re-check;
+On pass (non-zero): calls init_puzzle_scene for full puzzle scene init, then sets gPrng+0x204 to (old & 0xffffc03f)|0x2c0 (puzzle BG0CNT field), returns 0;
+On fail (zero): calls init_pack_vram_minimal for minimal pack VRAM init, sets gPrng+0x204 to (old & 0xffffc03f)|0x500 (pack minimal BG0CNT), returns 0.
+If bit1=1: calls set_active_page_handler(0x080e7e0d) to restore default handler, returns 0.
+All paths return 0 (scene switch handled by page handler).
+
+Constants:
+  EWRAM_STATE_BASE = 0x02029eb0 (DAT_080fdd88; title_ex/pack state struct base addr)
+  INTEGRITY_FLAG_OFF = 0x390 (0xe4*4; EWRAM integrity flag offset)
+  INTEGRITY_BIT = 0x2 (bit1; integrity verification flag bit)
+  PRNG_FLAG_OFF = 0x23a (DAT_080fdd90; gPrng flag byte offset)
+  PUZZLE_HANDLER = 0x080fc2f5 (DAT_080fdd94; puzzle scene page handler THUMB ptr)
+  DEFAULT_HANDLER = 0x080e7e0d (DAT_080fddcc; default page handler THUMB ptr)
+  BG0CNT_MASK = 0xffffc03f (DAT_080fdd98; clear BG0CNT screen_base bits)
+  PUZZLE_BG0CNT = 0x2c0 (0xb0*4; bits[9:8] for puzzle scene screen base)
+  PACK_BG0CNT = 0x500 (0xa0*8; bits[10:8] for pack minimal scene)
+  GPRNG_BG0CNT_OFF = 0x204 (0x81*4; gPrng BG0CNT mirror field offset)

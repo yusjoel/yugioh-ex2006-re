@@ -1,0 +1,11 @@
+Called by three challenge scene entry functions (enter_limited_duel_page / enter_duel_puzzle_page / enter_theme_duel_page) as conditional pack scene initializer or blend fade-in tick.
+Reads gMenuState+0x24 bit0: if 0 (first entry) sets the flag, calls init_scene_pack_hardware_regs and init_pack_card_list_vram_and_sprites to complete scene hardware and sprite init, returns 0.
+If bit0 already set (re-entry path) ORs DISPCNT with 0x1f00 (enables WIN0/WIN1/WINOBJ/OBJ/forced-blank), then calls tick_blend_step_by_delta(4) to advance fade-in progress; returns tick result (0=in-progress, non-zero=done).
+
+Constants:
+  GMENUSTATE_BASE = 0x02029590 (gMenuState EWRAM base)
+  GMENUSTATE_FLAG_OFF = 0x24 (initialized flag byte offset)
+  INIT_FLAG_BIT = 0x1 (bit0: first-time init marker)
+  DISPCNT = 0x04000000 (GBA display control register)
+  DISPCNT_ENABLE_MASK = 0x1f00 (bits 8-12: enable WIN0+WIN1+WINOBJ+OBJ+forced_blank)
+  BLEND_DELTA = 4 (tick_blend_step_by_delta delta parameter)

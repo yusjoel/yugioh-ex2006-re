@@ -7,12 +7,12 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4440 / 全 CSV 4641 行 = **95.67%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4460 / 全 CSV 4641 行 = **96.10%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
-- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 140, 剩 24)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
+- **Phase 5 进行中**: 重导后 ready 集合 **164 函数** (batches #196..#204, 9 批, 2026-05-31 锁定; 已落地 160, 剩 4)。剩余 177 FUN_* 仍被未命名 callee 阻塞 → Phase 6 重算解锁。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -23,7 +23,7 @@
 ```
 读 doc/dev/eval/PROGRESS.md 续接反汇编命名工作。
 
-当前阶段 (Phase 5): 处理重导后 ready 集合 164 个函数 (已落地 120, 剩 44)。
+当前阶段 (Phase 5): 处理重导后 ready 集合 164 个函数 (已落地 160, 剩 4)。
   - 锁定清单: doc/dev/eval/ready_batches_phase5.json (Phase 5, 9 批 #196..#204)
   - 排序策略: 按地址升序 (与 Phase 2/3/4 一致, 利于同区段函数复用簇方法论)
   - 高 indeg hub (indeg=34 0x080d46a8 / indeg=10 0x080d933c / indeg=9 0x080dfa44 / indeg=9 0x080d5470 等) 已散在各批中, 不单独提前
@@ -55,13 +55,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #203 |
+| **阶段** | Phase 5 进行中 — 9 批 (#196..#204) 锁定; 下一批 #204 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围, 2026-05-31 ExportFunctionInventory 重导) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4440 (95.67%) |
-| **未命名 (FUN_*)** | 201 (其中 24 ready / 177 被未命名 callee 阻塞) |
-| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (24 剩余) |
-| **下一批** | #203 (Phase 5 idx 7) — `ready_batches_phase5.json` |
-| **上次更新** | 2026-06-02 batch #202 PASSED — pack scene card detail view init + slot selection list build + hue gradient palette + scene entry points (from_list/from_shop) + OAM attr pair update + slot cover brightness blend/OAM sprite + card list scene init + cursor advance + card list/cover scroll/blend fadeout step drivers + purchase confirm/result overlays (create + tick) + cover fadein blend + card name reveal/anim x20 (4440/4641 = 95.67%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4460 (96.10%) |
+| **未命名 (FUN_*)** | 181 (其中 4 ready / 177 被未命名 callee 阻塞) |
+| **就绪函数集 (Phase 5)** | 164 函数 (9 批 #196..#204), 处理中 (4 剩余) |
+| **下一批** | #204 (Phase 5 idx 8, FINAL Phase 5 batch) — `ready_batches_phase5.json` |
+| **上次更新** | 2026-06-02 batch #203 PASSED — challenge/puzzle unlock callbacks (apply_standard/expert/duel_puzzle_unlock_by_id) + banlist compliance trampolines (mode5-9) + pack scene display init + SIO deck sync (write_typed/tick_round) + passcode hash search + JP string BG render + starter deck display init + challenge unlock flag rebuild + duel puzzle scene frame driver + pack scene SIO+controls tick + title_ex scene SM + puzzle/pack scene init by flag + card list category unlock check x20 (4460/4641 = 96.10%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges) |
 | **callgraph_locked** | `true` (Phase 5 已重导锁定; Phase 6 前须再重导) |
 | **ready_locked** | `true` (Phase 5 164 集合锁定; Phase 6 前须重算 ready) |
@@ -128,6 +128,7 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 | 0x0809bdfc | 3 | scan_equip_chain_slots_for_attr_enqueue | .hword 0x4680/4681 解码错误 + r1 callee-save 误判 (post-rewrite-register-side-effect feedback 复现) |
 | 0x080a1658 | 3 | check_equip_target_slot_state | R6 DAT 符号化 + R9 零容忍词残留 ("可能是") |
 | 0x080fa3a8 | 3 | advance_pack_fadein_to_card_info | R2 推测词反复 (v1 "或为辅助函数" -> fixer 引入 "疑为" -> v3 删除) |
+| 0x080e0d40 | 3 | (pack_ui_state tick step=1 branch) | R5 fixer-base-bias: iter-2 fixer cited [+0x134] ignoring r9=pack_ui_state+0xc base bias; effective offset = 0xc+0x134 = 0x140; iter-3 corrected; root cause: fixer used bare asm operand without resolving rBase bias (pool entry: fixer-base-register-bias-wrong-offset) |
 
 ---
 

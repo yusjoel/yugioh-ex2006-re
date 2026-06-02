@@ -1,0 +1,11 @@
+Called via fn-ptr table entry (.word 0x080e19e1 at 0x080e1b60) as expert challenge scene init callback.
+Receives expert challenge scene-local index r0; reads unlock flag byte at EWRAM challenge progress table [0x02006c3c+r0*4]; skips if bits[1:0] already set.
+Otherwise reads challenge ID from expert challenge data table (0x09e5e80c) and passes to check_expert_challenge_unlock_condition; if returns 1, sets bits[1:0] to 0x3 and applies 0xe0fc mask to update progress bit-field. Returns current unlock level bits[1:0].
+
+Constants:
+  EWRAM_BASE = 0x02000000
+  CHALLENGE_RECORD_OFFSET = 0x6c3c (gDuelPuzzleProgress base offset)
+  EXPERT_CHALLENGE_TABLE = 0x09e5e80c (expert challenge data table base)
+  EXPERT_RECORD_STRIDE = 4 (bytes per unlock record: r0*4 direct index)
+  UNLOCK_BITS = 0x3 (bits[1:0]: set = fully unlocked)
+  PROGRESS_FIELD_MASK = 0xe0fc (composite field mask for progress update)

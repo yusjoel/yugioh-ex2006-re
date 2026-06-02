@@ -1,0 +1,17 @@
+Called by dispatch_game_text_scene_step_by_table_fa38 (0x080fb638, tags: [pack_scene,sio]) via indirect table as the pack scene core per-frame tick function.
+First calls render_card_oam_stats_panel to refresh card attribute panel OAM display.
+Reads gPrng+0x206 bits[13:6] as current SIO state field: if 1 calls tick_sio_link_state; on failure returns 0, on success clears SIO bit-field and returns 0.
+If state != 1 enters pack scene operation branch: by current UI state value (bits[3:0] of [0x02039eb0+0]) handles 6 paths processing gPrng+0x148 key state (A/B/LEFT/RIGHT/UP/DOWN); updates two card compare values ([0x02039eb0+0x4] and +0x6 halfword) with boundary clamp/step. Checks exit condition (gPrng+0x14a bits[1:0]) to return 0 (continue) or 1 (trigger scene switch).
+
+Constants:
+  PACK_STATE_BASE = 0x02039eb0 (DWORD_080fb3fc; pack scene UI state struct base addr)
+  SIO_FIELD_OFF = 0x206 (gPrng+0x206; SIO state field, bits[13:6])
+  SIO_MASK_CLEAR = 0xffffc03f (DWORD_080fb384; clear SIO state bits)
+  KEY_UP_MASK = 0x0040 (gPrng+0x148 bit6 = UP key)
+  KEY_DOWN_MASK = 0x0080 (gPrng+0x148 bit7 = DOWN key)
+  KEY_RIGHT_MASK = 0x0100 (bit8 = RIGHT)
+  KEY_A_MASK = 0x0200 (bit9 = A)
+  MAX_CARD_COUNT = 0x095b7cca (halfword, total card count upper bound)
+  STEP_FINE = 0x9 (fine step size)
+  STEP_COARSE = 0x63 (coarse step size 99)
+  LP_THRESHOLD = 0x000f423f (DWORD_080fb5dc; LP upper bound 999999)

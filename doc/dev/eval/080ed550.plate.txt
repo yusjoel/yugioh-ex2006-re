@@ -1,0 +1,14 @@
+Called by FUN_080ed62c and FUN_080eda30 (two SIO deck sync flow functions) to advance one step of the SIO deck sync state machine.
+Reads gPrng+0x1c0 (SIO link state struct base addr); branches on current connection state (+0x460):
+Path1 (connected): reads deck index from struct offset 0x57e, locates corresponding entry (stride=14 bytes), checks OAM attribute field (0xf000 mask) for full; if full adjusts attribute value, then calls write_sio_deck_sync_entry to submit current deck entry.
+Path2 (not connected): compares local deck state from +0x464/+0x468 fields; mismatch triggers write_sio_deck_sync_entry.
+Each path decrements +0x46c counter after submission. Finally calls suppress_display_output or returns directly.
+
+Constants:
+  SIO_STATE_BASE_OFF = 0x1c0 (gPrng+0x1c0 = SIO link state struct pointer slot)
+  CONNECTED_FLAG_OFF = 0x460 (gPrng_sio_base + 0x8c*8 = connection flag word)
+  DECK_INDEX_OFF = 0x57e (DAT_080ed5c4; deck index offset)
+  DECK_ENTRY_STRIDE = 14 (lsls #3 - lsls #1 = *7*2)
+  OAM_FULL_MASK = 0xf000 (DAT_080ed5c8=0xfffff000; OAM full flag mask, high 4 bits)
+  COUNTER_OFF = 0x46c (DAT_080ed618; decrement counter offset)
+  LOCAL_DECK_OFF = 0x928 (DAT_080ed5d0; local deck state offset)

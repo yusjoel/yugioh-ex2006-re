@@ -1,0 +1,10 @@
+Called by FUN_080ee580 (tags: [glyph,font_jp]; JP string line render prepare function).
+Receives x-column position r0, packed row/column coords r1 (bits[23:16]=column_x, bits[31:24]=row_y), color attribute r2, and 0x00-terminated JP string pointer r3.
+Iterates over string bytes: if byte >= 0x80 (bit7=1, two-byte JP sequence) reads double-byte to form char_code, calls char_code_to_glyph_index then render_jp_glyph_rows_to_bg_vram; if byte < 0x80 (ASCII/single-byte) directly calls render_jp_glyph_rows_to_bg_vram_alt.
+After each character fetches width from font_jp_dim_table and accumulates x coordinate until 0x00 terminator.
+
+Constants:
+  FONT_JP_DIM_TABLE = 0x09e5f834 (DWORD_080f0a34; JP font width dimension table)
+  RENDER_STATE = 0x02006ed0 (DWORD_080f0a38; IWRAM render state struct base addr)
+  WIDTH_TABLE_PTR = 0x09e5f83c (DWORD_080f0a3c; font width pointer table)
+  HIGH_BYTE_FLAG = 0x80 (bit7=1: two-byte JP sequence flag)

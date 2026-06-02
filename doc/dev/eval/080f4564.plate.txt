@@ -1,0 +1,14 @@
+Called by FUN_080f46dc (duel puzzle scene init sequence) immediately after init_starter_deck_display_state; rebuilds all challenge and puzzle unlock flags from scratch.
+First zeroes gDuelPuzzleProgress (0x02006c3c) region by 0xfc*2 bytes.
+Three loop rounds: (1) iterates all expert challenges, calls check_expert_challenge_unlock_condition and sets bits[1:0]=3 plus 0xe0fc bit-field in EWRAM record on pass; (2) iterates all standard challenges, calls check_standard_challenge_unlock_condition similarly; (3) iterates all duel puzzles, calls check_duel_puzzle_unlock_condition_by_index and writes different bit-fields by type (0x4/0x7).
+After execution each satisfied challenge/puzzle in gDuelPuzzleProgress is marked unlocked.
+
+Constants:
+  PUZZLE_PROGRESS_BASE = 0x02006c3c (PTR_gDuelPuzzleProgress_080f4578)
+  CLEAR_SIZE = 0xfc*2 (zero_fill_by_halfword clear byte count = 0x1f8)
+  EXPERT_CHALLENGE_TABLE = 0x09e5e80c (DAT_080f457c)
+  STANDARD_CHALLENGE_TABLE_OFF = 0x6cc8 (DAT_080f45e0; EWRAM standard challenge table offset)
+  UNLOCK_BITS = 0x3 (bits[1:0]: fully unlocked flag)
+  PROGRESS_MASK = 0xe0fc (composite field mask for level update)
+  PUZZLE_TYPE_BRONZE = 0x4 (keep only bits[1:0])
+  PUZZLE_TYPE_GOLD = 0x7 (apply 0xe0fc mask update)

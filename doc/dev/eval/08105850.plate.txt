@@ -1,0 +1,17 @@
+Called by FUN_081085d0 (tags: [card_list,init]; card list scene init, loops r4=0..9 calling this function to build available category index table).
+Receives card list category index r0 ([0..9]); uses switch to check if category is unlocked:
+Categories 0-4: fixed return 0 (always locked; basic packs need no unlock check);
+Category 5: calls check_standard_challenge_unlock_condition(0x4e49);
+Category 6: calls check_standard_challenge_unlock_condition(0x4e48);
+Category 7: calls check_standard_challenge_unlock_condition(0x4e47);
+Category 8: calls check_standard_challenge_unlock_condition(0x4e46);
+Category 9: fixed return 1 (always unlocked);
+Out-of-range (>9): returns 0.
+Returns 1=unlocked, 0=locked or not applicable.
+
+Constants:
+  CAT_CHALLENGE5_ID = 0x4e49 (challenge ID for category 5 unlock condition)
+  CAT_CHALLENGE6_ID = 0x4e48 (challenge ID for category 6)
+  CAT_CHALLENGE7_ID = 0x4e47 (challenge ID for category 7)
+  CAT_CHALLENGE8_ID = 0x4e46 (challenge ID for category 8)
+  CAT_COUNT = 10 (category count 0..9; <=9 valid, else 0)

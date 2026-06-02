@@ -1,0 +1,14 @@
+Called via fn-ptr table entry (.word 0x080e1311 at 0x080e14a0) as standard challenge scene init callback.
+Receives standard challenge scene-local index r0; reads unlock flag byte at EWRAM challenge progress table [0x02006c3c+(r0+0x23)*4]; skips if bits[1:0] already set.
+Otherwise reads challenge ID from standard challenge data table (0x09e5e620) and passes to check_standard_challenge_unlock_condition; if returns 1, sets bits[1:0] to 0x3 (unlocked).
+If challenge type field (entry+8 halfword) equals 0x7, additionally applies 0xe0fc mask to perform composite bit-field update on progress word. Returns current unlock level bits[1:0].
+
+Constants:
+  EWRAM_BASE = 0x02000000
+  CHALLENGE_RECORD_OFFSET = 0x6c3c (gDuelPuzzleProgress base offset)
+  STANDARD_CHALLENGE_TABLE = 0x09e5e620 (challenge data table base)
+  CHALLENGE_STRIDE = 0x0c (entry stride: 12 bytes)
+  CHALLENGE_RECORD_STRIDE = 4 (bytes per unlock record in EWRAM)
+  STANDARD_OFFSET = 0x23 (35; base offset for standard challenges in combined record table)
+  UNLOCK_BITS = 0x3 (bits[1:0]: set = fully unlocked)
+  PROGRESS_FIELD_MASK = 0xe0fc (bits[1:0] preserved + composite field mask for type-7 update)

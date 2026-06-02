@@ -1,0 +1,5 @@
+Called every frame by main_dispatch_loop (0x080f4b94) as the duel puzzle scene per-frame driver.
+Serially calls five system sub-functions in fixed order: update_key_input_state (key state update), commit_obj_shadow_list_to_oam (OAM sprite write), apply_rule_table_to_flagged_slots (rule slot apply), start_sound_channel_playback (audio playback), tick_prng_lcg_rand15 (PRNG advance).
+Function body unconditionally executes all five steps with no branches and no direct external writes.
+
+No constants needed.

@@ -1,0 +1,7 @@
+Called from FUN_080e3ee8 (pack scene event handler) via jump table as mode=9 banlist compliance check entry.
+Loads r0=9 then tail-calls check_deck_banlist_compliance, then tail-jumps exit_pack_scene_handler to return.
+One of five identical-structure banlist mode check trampoline family (modes 5-9); each is only 3 instructions.
+Return value is pass-through from check_deck_banlist_compliance.
+
+Constants:
+  BANLIST_MODE = 9 (movs r0,#0x9; always checks mode 9)
