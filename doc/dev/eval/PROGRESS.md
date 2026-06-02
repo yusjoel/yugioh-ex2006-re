@@ -14,7 +14,8 @@
 - **Phase 4 完成**: 重导后 ready 集合 **465/465 函数** (batches #172..#195, 24 批, 2026-05-31 全部 byte-identical)。
 - **Phase 5 完成**: 重导后 ready 集合 **164/164 函数全部落地** (batches #196..#204, 9 批, 2026-05-31 锁定, 2026-06-02 全部 byte-identical)。
 - **Phase 6 完成**: Phase 5 命名 164 后重算 ready 解锁 **83/83 函数全部落地** (batches #205..#209, 5 批, 2026-06-02 锁定, 2026-06-03 全部 byte-identical)。
-- **Phase 7 完成**: Phase 6 命名 83 后重算 ready 解锁 **32/32 函数** (batches #210..#211, 2 批, 2026-06-03 全部 byte-identical)。仍有 62 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
+- **Phase 7 完成**: Phase 6 命名 83 后重算 ready 解锁 **32/32 函数** (batches #210..#211, 2 批, 2026-06-03 全部 byte-identical)。
+- **Phase 8 进行中**: Phase 7 命名 32 后重算 ready 解锁 **20 函数** (batch #212, 1 批, 2026-06-03 锁定)。仍有 42 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -53,12 +54,12 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 7 COMPLETE (2 批 #210..#211, 32/32 函数落地); 下一步 → Phase 8 准备 (ExportFunctionInventory + 重算 ready) |
+| **阶段** | Phase 8 进行中 — 1 批 (#212, 20 函数) 锁定; 下一批 #212 |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围) |
 | **已命名 (USER_DEFINED / ANALYSIS)** | 4579 (98.66%) |
-| **未命名 (FUN_*)** | 62 (全部阻塞; 含 13 个不可解递归 SCC) |
-| **就绪函数集 (Phase 7)** | 32/32 全部落地 (batches #210..#211 COMPLETE) |
-| **下一批** | Phase 8 准备 (ExportFunctionInventory + 重算 ready); 62 FUN_* 阻塞, 其中 13 个为 2 个不可解 SCC; Phase 8 重算将解锁下一非 SCC 波次; SCC 簇 (13 函数) 需全簇协同命名 |
+| **未命名 (FUN_*)** | 62 (20 ready Phase 8 / 42 阻塞, 含 13 个不可解递归 SCC) |
+| **就绪函数集 (Phase 8)** | 20 函数 (1 批 #212), 处理中 — `ready_batches_phase8.json` |
+| **下一批** | #212 (Phase 8 idx 0); 之后 42 FUN_* 阻塞, 其中 13 个为 2 个不可解 SCC; Phase 9 重算续解锁非 SCC 波次; SCC 簇 (13 函数) 最终需全簇协同命名 |
 | **上次更新** | 2026-06-03 batch #211 PASSED — tick_equip_target_select_4state + tick_equip_card_display_3state + scan_player_zone_equip_criteria_substate_c + tick_pack_card_reveal_fade_in + tick_pack_card_scroll_by_nav_input + tick_pack_card_scroll_final_step + tick_sio_deck_sync_session + init_puzzle_scene_with_charset + tick_scene_frame_driver + init_system_hardware_and_drivers + tick_sound_engine_n_frames + restart_sound_channel_with_config (4579/4641 = 98.66%) |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
