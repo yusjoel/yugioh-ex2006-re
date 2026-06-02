@@ -1,0 +1,1 @@
+禁卡密码输入场景每帧 OAM+卡槽动画驱动. 由 FUN_0801b5d8 banlist 帧 tick state==0 分支调用. tick_banlist_password_frame 处理按键; call_tick_banlist_card_slot_anim 5 次刷新 slot OAM; 读 gState+0x6c2c bits[0..2] 修正 y 偏移; call_setup_banlist_sprite_oam_row x2 建立 sprite 行; tick_banlist_card_slot_anim_primary/secondary+scrollbar_and_slot_anim 完成帧刷新. void.

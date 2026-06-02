@@ -1,0 +1,1 @@
+名称输入场景每帧 OAM+滚动驱动. 由 name_input_page_tick state==0 调用. 调 tick_name_input_frame 处理按键; 同步 BG 滚动; 依 gState+0x31a bits[4:2] 渲染 2-3 OBJ slot; build_sprite_oam_row 输出 4 行光标 OAM; 末调 tick_name_input_oam_fade/scrollbar_and_anims/render_settings_cursor_cell_anims 完成帧刷新. void.

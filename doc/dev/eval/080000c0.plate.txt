@@ -1,0 +1,1 @@
+GBA ROM 启动入口 (crt0). 硬件复位后 CPU 跳转至此. 13 条 ARM 指令完成初始化: cpsr=0x12 (IRQ mode) + SP_irq=0x03007e00; cpsr=0x1f (System mode) + SP_sys=0x03007800; 将 dispatch_thumb_isr_from_arm (DWORD_080000fc) 写入 BIOS 中断向量 [0x03007ffc]; mov lr,pc; bx run_game_main 启动游戏 (不返回). 末尾 b 为不可达安全死循环.

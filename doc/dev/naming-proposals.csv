@@ -1,5 +1,5 @@
 address,name,proposed_name,score,tags
-0x080000c0,FUN_080000c0,,,frame_counter;prng;settings
+0x080000c0,init_cpu_stacks_and_irq_vector,,,frame_counter;prng;settings
 0x080001f0,dispatch_thumb_isr_from_arm,,,
 0x08013510,reset_display_and_gl_state,,,bg;display;palette
 0x08013578,setup_demo_sprite_entry,,,scene_demo;settings
@@ -184,7 +184,7 @@ address,name,proposed_name,score,tags
 0x08018d60,tick_name_input_oam_fade,,,
 0x08018db8,tick_name_input_cursor_sprite,,,scene_name_input;settings
 0x08018e30,signal_name_input_exit,,,
-0x08018e50,FUN_08018e50,,,banlist;font_jp;game_str;settings
+0x08018e50,tick_name_input_oam_and_scrollbar,,,banlist;font_jp;game_str;settings
 0x08018f7c,tick_name_input_render_by_state,game_str_08018f7c,4,window;bg;display;vram;banlist;duel_field;font_jp;game_str;settings
 0x08019494,name_input_page_tick,,,banlist;duel_field;font_jp;game_str;name_input;settings
 0x080194ec,name_input_page_exit,,,banlist;name_input
@@ -252,7 +252,7 @@ address,name,proposed_name,score,tags
 0x0801b1a0,tick_banlist_card_slot_anim_primary,,,
 0x0801b20c,tick_banlist_card_slot_anim_secondary,,,
 0x0801b264,trigger_banlist_fade_out_exit,,,
-0x0801b284,FUN_0801b284,,,
+0x0801b284,tick_banlist_oam_and_card_slots,,,
 0x0801b368,tick_banlist_scroll_view_by_state,,,
 0x0801b5d8,FUN_0801b5d8,,,
 0x0801b634,dispatch_banlist_scene_handler_frame,,,
