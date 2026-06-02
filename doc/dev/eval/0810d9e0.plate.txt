@@ -1,0 +1,11 @@
+声音引擎通道重启阻塞包装器. 接收通道描述符(r0)和节拍计数(r1), 先设置通道状态字(base+0x364)的 DMA busy|start 位(0x2001)并等待引擎就绪(自旋调用 tick_sound_engine_main 至 bits 0x81 清零), 再调用 reset_sound_channel_entry 重置通道条目后调用 start_sound_channel_playback 启动播放, 最后以倒计数循环(r4 递减至 0)持续驱动引擎 tick. 与 play_sound_channel_blocking(0x0810d82c, 无全量 init) 和 load_sound_channel_batch_blocking(0x0810d92c, 调用 init_sound_channel_full) 构成三元组; 本函数使用 reset_sound_channel_entry(最小重置路径)区别于批量加载变体. r0=-1 时跳过 reset+start, 仅执行 tick 循环(纯等待模式).
+
+Constants:
+- SOUND_ENGINE_BASE=0x030050cc (声音引擎 IWRAM 基址)
+- CHANNEL_STATUS_OFFSET=0x364 (0xd9<<2, 通道状态字偏移)
+- DMA_BUSY_START=0x2001 (0x2000|0x1, bit13=DMA_busy, bit0=start)
+- ENGINE_BUSY_MASK=0x81 (bit7|bit0, 等待清零的引擎忙标志)
+- STATE_BYTE_OFFSET=0x381 (通道活跃状态字节偏移)
+- COUNTER_CLEAR_OFFSET=0x37e (启动后清零的计数器偏移)
+- CHANNEL_ACTIVE_FLAG=0x10 (写入 state byte 表示通道播放中)
+- CLEAR_DMA_BUSY=0xdfff (~0x2000, 清 bit13 掩码)

@@ -1,0 +1,5 @@
+newlib reentrant lseek 分派层. 接收 reent 指针(r0), 文件描述符 fd(r1), 偏移量 offset(r2), 定位模式 whence(r3), 先将 EWRAM errno 缓存(0x02029ea8)清零, 再调用 wrap_lseek_r(fd, offset, whence) 执行底层 _swilseek 定位操作. 若 wrap_lseek_r 返回 -1(失败)且 errno 缓存非零, 则将 errno 回写至 *reent_ptr, 最终透传 wrap_lseek_r 原始返回值. 与 close_fd_reentrant(0x08112b7c)/wrap_write_r(0x08112af4)/wrap_read_r(0x08112c38)/wrap_sclose_r(0x08112bb4) 构成对称 errno 传播五元组. 由 __swrite(0x08112600) 在追加模式下定位到文件末尾, 由 __sseek(0x08112640) 在通用定位场景中调用.
+
+Constants:
+- ERRNO_CACHE=0x02029ea8 (newlib errno 暂存地址, EWRAM)
+- ERR_FLAG=-1 (rsbs r0,r0,#0 of movs r0,#1 构造 -1 用于比较)
