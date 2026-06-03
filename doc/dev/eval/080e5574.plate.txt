@@ -1,0 +1,8 @@
+Pack eligibility gate: all cards in candidate list A must have field5 == 0 (inactive state). Iterates EWRAM+0x1154 icid array (count at EWRAM+0x1150); for each icid, multiplies by 0x16 to index card_stats_table, then calls check_card_field5_is_nonzero. If field5 != 0, tail-calls fail_pack_eligibility to abort the check chain. On full pass, falls through to fail_pack_if_cand_list_b_nonempty to continue checking list B. Called by FUN_080e3ee8 at branch LAB_080e41ec; polarity opposite to enforce_pack_cand_list_a_field5_is_nonzero (0x080e5528).
+
+Constants:
+- EWRAM_BASE=0x02000000
+- CAND_COUNT_A_OFFSET=0x1150 (candidate list A count byte at EWRAM+0x1150)
+- CAND_LIST_A_OFFSET=0x1154 (candidate icid array A base offset, halfword stride 2)
+- CAND_COUNT_B_OFFSET=0x1152 (candidate list B count byte, passed to fail_pack_if_cand_list_b_nonempty)
+- CARD_STATS_STRIDE=0x16 (card_stats_table entry width = 22 bytes)
