@@ -1,0 +1,11 @@
+Called every frame by 3 duel-mode scene entries: enter_limited_duel_page (0x080e1390), enter_duel_puzzle_page (0x080e1a50), enter_theme_duel_page (0x080e3904). Checks gMenuState[+0x2a] bit2 (SCROLL_ANIM_BIT): if active, updates scroll OAM; otherwise polls tick_pack_scroll_cursor_input for direction input. On confirm: calls invoke_r1 for external filter, zero-fills scratch_buf, calls eval_pack_card_eligibility_by_ruleset_id and writes bit0 result into gMenuState[+0x2a]. Renders card name/rarity/type/desc to BG. Runs switch(step_counter [0..SUBSTATE_MAX=0x11]) 18-case sub-state animation. Returns 0=waiting, 1=card selected+eligible, 2=advance scene.
+
+Constants:
+- SCROLL_ANIM_BIT = 0x4 (gMenuState[+0x2a] bit2: scroll animation active)
+- STEP_COUNTER_OFF = 0x2e (gMenuState[+0x2e]: sub-state step counter [0..0x11])
+- SCRATCH_BUF = 0x0203a2c0 (size=0x80 halfwords; zero-filled before eligibility check)
+- SUBSTATE_MAX = 0x11 = 17 (switch default branch threshold)
+- GPRNG_SCROLL_DIR_OFF = 0xa3*2 = 0x146 (gPrng+0x146: scroll direction halfword; asm movs r2,#0xa3; lsls r2,r2,#0x1)
+- GPRNG_INPUT_FLAGS_OFF = 0xa4*2 = 0x148 (gPrng+0x148: input flags halfword; asm movs r0,#0xa4; lsls r0,r0,#0x1)
+- GPRNG_SCROLL_OAM_Y_OFF = 0xf1*2 = 0x1e2 (gPrng+0x1e2: scroll OAM Y strh write; asm movs r2,#0xf1; lsls r2,r2,#0x1)
+- SCROLL_DIR_MASK = 0xc0 (gPrng+0x146 bits[7:6]: 2-bit scroll direction field)

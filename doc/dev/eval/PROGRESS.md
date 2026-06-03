@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4639 / 全 CSV 4641 行 = **99.96%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; **已命名 4641 / 全 CSV 4641 行 = 100.00% — ROM 函数命名全部完成, 无 FUN_* 残留**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -19,6 +19,7 @@
 - **Phase 10 进行中**: batch #214 (1 函数: tick_banlist_scene_frame 0x0801b5d8) 2026-06-03 byte-identical PASSED (4603/4641 = 99.18%); 38 FUN_* remain — ALL in/behind the 2 irreducible SCCs (SCC-2 0x080392da↔0x0803a41e + SCC-11 0x080e40c2 cluster + their ~25 downstream dependents). Bottom-up peeling EXHAUSTED. 下一步: SCC co-analysis (analyze each cycle's members together, relaxing R7 for intra-cycle edges), which cascade-unblocks the downstream dependents.
 - **SCC-2 RESOLVED** (2026-06-03): dispatch_equip_node_by_type (0x080392da) + advance_equip_node_chain_step (0x0803a41e) co-analyzed + landed (4605/4641 = 99.22%). 36 FUN_* remain (SCC-11 11 fn + ~25 downstream dependents).
 - **SCC-11 RESOLVED** (2026-06-03): fail_pack_eligibility (0x080e40c2) + 10 pack-cand-list eligibility enforcement gates co-analyzed + landed (4616/4641 = 99.46%). 25 FUN_* remain (0x080e3ee8, 0x080e4874..0x080e55fc, 0x080e73b4 — downstream dependents now cascade-unblocked). Confirmed Ghidra mis-attribution artifact: indeg=32 stub + field8/field6/effect-type enforcement cluster.
+- **Phase 12 COMPLETE** (2026-06-03): batches #213..#217 peeled the post-SCC-11 cascade; SCC-2 + SCC-11 co-analyzed; final 2 functions — eval_pack_card_eligibility_by_ruleset_id (0x080e3ee8) + tick_duel_card_select_page (0x080e73b4) — landed (4641/4641 = **100.00%**). **ALL FUNCTIONS NAMED. ROM disassembly function-naming COMPLETE. No FUN_* remain. SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b.**
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -57,13 +58,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | Phase 11 #215+#216 done. Only 2 FUN_* remain: 0x080e3ee8 (pack-cand eligibility dispatch hub -- now all its callees named, should be ready) + 0x080e73b4 (calls 0x080e3ee8, unblocks after it). 下一步: Phase 12 recompute -> final 2 functions. |
+| **阶段** | **ALL FUNCTIONS NAMED — 4641/4641 = 100.00%. ROM disassembly function-naming COMPLETE. No FUN_* remain. callgraph_locked/ready_locked moot (no unnamed functions).** |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4639 (99.96%) |
-| **未命名 (FUN_*)** | 2 (0x080e3ee8, 0x080e73b4) |
-| **就绪函数集** | 0x080e3ee8 now ready (all callees named); 0x080e73b4 unblocks after 0x080e3ee8 |
-| **下一批** | Phase 12: analyze 0x080e3ee8 then 0x080e73b4 (final 2 functions) |
-| **上次更新** | 2026-06-03 Phase 11 batch#216 PASSED: enforce_pack_cand_list_a_field5_is_nonzero + enforce_pack_cand_list_a_field5_is_zero + fail_pack_with_card_name landed (4639/4641 = 99.96%), SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b |
+| **已命名 (USER_DEFINED / ANALYSIS)** | **4641 (100.00%)** |
+| **未命名 (FUN_*)** | **0 (ZERO)** |
+| **就绪函数集** | N/A — all named |
+| **下一批** | N/A — naming complete |
+| **上次更新** | 2026-06-03 Phase 12 batch#217 PASSED (FINAL): eval_pack_card_eligibility_by_ruleset_id (0x080e3ee8) + tick_duel_card_select_page (0x080e73b4) landed (4641/4641 = 100.00%), SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
 | **ready_locked** | `false` (bottom-up peeling exhausted; 剩余全为 SCC-locked, 须 SCC co-analysis 而非 compute_ready_phaseN.py) |

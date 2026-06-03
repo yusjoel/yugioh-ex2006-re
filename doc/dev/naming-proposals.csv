@@ -3664,7 +3664,7 @@ address,name,proposed_name,score,tags
 0x080e3de8,count_duel_puzzle_victories,opp_wins_080e3de8,4,scene_duel_puzzle;opp_wins
 0x080e3e30,count_cleared_puzzle_stages,duel_puzzle_080e3e30,3,scene_duel_puzzle;duel_puzzle
 0x080e3e74,format_card_name_to_buf,card_name_080e3e74,2,card_ids;card_name;font_jp
-0x080e3ee8,FUN_080e3ee8,card_stats_080e3ee8,3,banlist;card_ids;card_name;card_stats;font_jp
+0x080e3ee8,eval_pack_card_eligibility_by_ruleset_id,card_stats_080e3ee8,3,banlist;card_ids;card_name;card_stats;font_jp
 0x080e40c2,fail_pack_eligibility,card_stats_080e40c2,2,card_stats
 0x080e47d0,check_pack_card_eligibility_by_atk,card_stats_080e47d0,3,card_stats
 0x080e4874,enforce_pack_cand_lists_atk_min_1500,card_stats_080e4874,3,card_stats
@@ -3734,7 +3734,7 @@ address,name,proposed_name,score,tags
 0x080e7294,init_pack_scene_card_list_fields,,,
 0x080e72f8,reset_pack_nav_state_fields,,,scene_pack
 0x080e7370,init_pack_scene_display,font_jp_080e7370,2,display;card_ids;font_jp;frame_counter;game_str;settings
-0x080e73b4,FUN_080e73b4,settings_080e73b4,3,banlist;card_ids;card_name;card_stats;font_jp;game_str;settings
+0x080e73b4,tick_duel_card_select_page,settings_080e73b4,3,banlist;card_ids;card_name;card_stats;font_jp;game_str;settings
 0x080e7924,tick_pack_fadein,,,display;frame_counter;scene_pack
 0x080e7954,invoke_pack_scene_frame_callback,,,
 0x080e7994,enter_campaign_page,,,frame_counter
