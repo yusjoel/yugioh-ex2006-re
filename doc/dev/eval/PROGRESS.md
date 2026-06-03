@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4616 / 全 CSV 4641 行 = **99.46%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4636 / 全 CSV 4641 行 = **99.89%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -57,13 +57,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | SCC-2 + SCC-11 both resolved. Remaining: 25 downstream FUN_* (0x080e3ee8, 0x080e4874..0x080e55fc, 0x080e73b4) that called the now-named SCC members — these cascade-unblock. Next: Phase 11 recompute ready. |
+| **阶段** | Phase 11 batch#215 done. Remaining 5 FUN_*: batch#216 (3: 0x080e5528/5574/55fc) + 2 final (0x080e3ee8 the pack-eligibility dispatch hub + 0x080e73b4, will unblock after #216). |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4616 (99.46%) |
-| **未命名 (FUN_*)** | 25 (downstream dependents of SCC-11, now cascade-unblocked) |
-| **就绪函数集** | SCC-11 landed; recompute ready to identify the 25 newly unblocked functions |
-| **下一批** | Phase 11 recompute ready (python tools/ad-hoc/compute_ready_phaseN.py or manual pick from 0x080e4874 cluster), then name the ~25 downstream dependents |
-| **上次更新** | 2026-06-03 SCC-11 PASSED (co-analyzed + landed): fail_pack_eligibility + 10 enforcement gates (4616/4641 = 99.46%), SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4636 (99.89%) |
+| **未命名 (FUN_*)** | 5 (0x080e3ee8, 0x080e5528, 0x080e5574, 0x080e55fc, 0x080e73b4) |
+| **就绪函数集** | batch#216: 3 functions (0x080e5528/5574/55fc); after #216: 0x080e3ee8 + 0x080e73b4 unblock |
+| **下一批** | batch#216: 0x080e5528, 0x080e5574, 0x080e55fc (enforce_pack_cand cluster tail) |
+| **上次更新** | 2026-06-03 Phase 11 batch#215 PASSED: 20 enforce_pack_cand_* gates landed (4636/4641 = 99.89%), SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
 | **ready_locked** | `false` (bottom-up peeling exhausted; 剩余全为 SCC-locked, 须 SCC co-analysis 而非 compute_ready_phaseN.py) |
