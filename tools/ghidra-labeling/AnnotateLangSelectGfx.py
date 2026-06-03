@@ -30,13 +30,17 @@ GFX = [
     (0x0800b588, "lang_select_gfx_1"),
     (0x0800c240, "lang_select_gfx_2"),
     (0x0800cd18, "lang_select_gfx_3"),
+    (0x0800dd90, "lang_select_palette"),      # 16 色 -> PALRAM 0x05000220
+    (0x0800ddb0, "lang_select_extra_tiles"),  # 4 tile -> BG VRAM 0x06010800
 ]
-# render_lang_select 字面量池 .word (pool_addr -> 目标 block)
+# render_lang_select 字面量池 .word (pool_addr -> 目标)
 POOL_REFS = [
     (0x080ebcb4, 0x0800b588),
     (0x080ebcb8, 0x0800aa10),
     (0x080ebcbc, 0x0800c240),
     (0x080ebcc0, 0x0800cd18),
+    (0x080ebccc, 0x0800dd90),
+    (0x080ebcd4, 0x0800ddb0),
 ]
 
 WTR_PLATE = (

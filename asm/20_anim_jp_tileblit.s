@@ -5889,11 +5889,11 @@ DAT_080ebcc4:
 DAT_080ebcc8:
     .word  0x05000220                     @ 080ebcc8 20020005
 DAT_080ebccc:
-    .word  0x0800dd90                     @ 080ebccc 90dd0008
+    .word  lang_select_palette            @ 080ebccc 90dd0008
 DAT_080ebcd0:
     .word  0x06010800                     @ 080ebcd0 00080106
 DAT_080ebcd4:
-    .word  0x0800ddb0                     @ 080ebcd4 b0dd0008
+    .word  lang_select_extra_tiles        @ 080ebcd4 b0dd0008
 DAT_080ebcd8:
     .word  0x02006ed0                     @ 080ebcd8 d06e0002
 DAT_080ebcdc:

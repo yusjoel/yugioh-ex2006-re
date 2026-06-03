@@ -30,7 +30,10 @@ IMG_DIR = Path('graphics/images/lang-select')
 ASM_OUT = Path('data/lang-select-tiles.s')
 
 REGION_START = 0xAA10
-REGION_END = 0xDD90
+BLOCKS_END = 0xDD90               # 4 个打包块结束
+REGION_END = 0xDE30              # + lang_select 调色板(0xDD90,0x20) + extra tiles(0xDDB0,0x80)
+EXTRA_PAL = (0xDD90, 0x20)       # render_lang_select copy -> PALRAM 0x05000220 (16 色)
+EXTRA_TILES = (0xDDB0, 0x80)     # render_lang_select copy -> BG VRAM 0x06010800 (4 tile)
 
 
 def u16(d, o):
@@ -124,11 +127,11 @@ def main():
 
     blocks = []
     off = REGION_START
-    while off < REGION_END:
+    while off < BLOCKS_END:
         blk = parse_block(d, off)
         blocks.append(blk)
         off = blk['end']
-    assert off == REGION_END, 'block walk 未对齐: 0x%x' % off
+    assert off == BLOCKS_END, 'block walk 未对齐: 0x%x' % off
 
     asm = [
         '@ data/lang-select-tiles.s',
@@ -163,8 +166,31 @@ def main():
         print('[ok] block %d @0x%08x pal=%d tile=%d map=%d' % (
             i, addr, blk['n_pal'], blk['n_tile'], blk['n_map']))
 
+    # lang_select 额外资产 (render_lang_select 直接 copy 的裸 palette + tiles)
+    pal_off, pal_len = EXTRA_PAL
+    tile_off2, tile_len = EXTRA_TILES
+    (PAL_DIR / 'extra_palette.bin').write_bytes(d[pal_off:pal_off + pal_len])
+    (TILE_DIR / 'extra_tiles.bin').write_bytes(d[tile_off2:tile_off2 + tile_len])
+    # 用该 palette 渲染那 4 个 tile
+    epal = [bgr555_to_rgb(u16(d, pal_off + 2 * i)) for i in range(pal_len // 2)]
+    while len(epal) < 16:
+        epal.append((255, 0, 255))
+    from PIL import Image
+    nt = tile_len // 32
+    eimg = Image.new('RGB', (nt * 8, 8), (255, 0, 255))
+    epx = eimg.load()
+    for t in range(nt):
+        blit_tile(epx, d, tile_off2, t, epal, t * 8, 0)
+    eimg.resize((eimg.width * 4, eimg.height * 4), Image.NEAREST).save(IMG_DIR / 'extra_tiles.png')
+
+    asm.append('lang_select_palette:              @ 0x%08x  16 色 -> PALRAM 0x05000220' % (0x08000000 + pal_off))
+    asm.append('\t.incbin "graphics/bin/lang-select/palettes/extra_palette.bin"')
+    asm.append('lang_select_extra_tiles:          @ 0x%08x  %d tile -> BG VRAM 0x06010800' % (0x08000000 + tile_off2, nt))
+    asm.append('\t.incbin "graphics/bin/lang-select/tiles/extra_tiles.bin"')
+    print('[ok] extra palette(0x%x) + %d tiles' % (pal_len, nt))
+
     ASM_OUT.write_text('\n'.join(asm) + '\n', encoding='utf-8', newline='\n')
-    print('[ok] %s + bins(palettes/tiles/tilemaps) + %d pngs' % (ASM_OUT, len(blocks)))
+    print('[ok] %s + bins(palettes/tiles/tilemaps) + pngs' % ASM_OUT)
 
 
 if __name__ == '__main__':

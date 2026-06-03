@@ -6,9 +6,12 @@
 
 | 项 | 值 |
 |---|---|
-| ROM 区间 | `0x0800AA10 ~ 0x0800DD90` (4 块, 0x3380 B) |
-| 消费者 | `render_lang_select_tiles_and_text` (@0x080ebbxx) → `load_pack_tile_and_map_to_vram` |
-| 后续 (0xDD90~0x13510) | 另一段异构数据 (0xDD90/0xDDB0 为 `copy_bytes_by_halfword` 直拷源 + 未结构化数据), 不属本表 |
+| ROM 区间 | `0x0800AA10 ~ 0x0800DE30` |
+| └ 4 个打包块 | `0x0800AA10 ~ 0x0800DD90` (国旗+UI, `load_pack_tile_and_map_to_vram`) |
+| └ `lang_select_palette` | `0x0800DD90` (16 色, render_lang_select copy → PALRAM 0x05000220) |
+| └ `lang_select_extra_tiles` | `0x0800DDB0` (4 tile 边框角片, copy → BG VRAM 0x06010800) |
+| 消费者 | `render_lang_select_tiles_and_text` (@0x080ebbfe); 据 `[0x080000ae]` 区域字节选 US/EU 旗版 |
+| 后续 (0xDE30~0x13510) | **另一段图形 (交错 tile/tilemap 段, ~21KB), 无静态代码消费者 (间接寻址), 需 mGBA 动态追踪确定加载画面+调色板; 暂留 ROM_INCBIN** |
 
 ## 块结构
 
