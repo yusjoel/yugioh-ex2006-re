@@ -42,6 +42,9 @@ UNDEF_INCBIN_THRESHOLD = 16
 # 配 (start_gba, end_gba_exclusive, include_directive)
 # 用例: 大型结构化数据表 (master pointer table 等), 已抽到 data/*.s 用 label 减法表达
 SKIP_REGIONS = [
+    # game string ID -> row remap 表; 游标在 count(0x240) 后落在 0x242, 故 skip 起点取 0x242
+    # (.s 内含 0x242..0x24f 的 14B 零填充 + game_str_id_remap_table@0x250 1651 x u16)
+    (0x08000242, 0x08000F36, '.include "data/game-strings-remap-table.s"'),
     # game-strings master pointer table @ 0x08000F40, 1651 行 x 24 B + 8 B pad = 39632 B
     (0x08000F40, 0x0800AA10, '.include "data/game-strings-pointer-table.s"'),
 ]
@@ -686,12 +689,18 @@ def find_undef_run(listing, start_addr, end_addr):
     return n
 
 def emit_undef_run(bw, program, start_addr, run_len):
+    # 全 0 填充优先用 .zero N (byte-identical, 比 .byte/ROM_INCBIN 可读).
+    # 大区段先读字节判零; read_bytes 失败 (返回 []) 则退回 ROM_INCBIN/.byte.
+    bs = read_bytes(program.getMemory(), start_addr, run_len)
+    if bs and len(bs) == run_len and all(b == 0 for b in bs):
+        bw.write("    .zero  0x%x\n" % run_len)
+        return
+
     if run_len > UNDEF_INCBIN_THRESHOLD:
         off = addr_to_rom_offset(start_addr)
         bw.write("    ROM_INCBIN 0x%x, 0x%x\n" % (off, run_len))
         return
 
-    bs = read_bytes(program.getMemory(), start_addr, run_len)
     if not bs:
         for _ in range(run_len):
             bw.write("    .byte  0x00\n")

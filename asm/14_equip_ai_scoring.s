@@ -23,7 +23,7 @@ LAB_080a78f8:
     adds r0,r0,r1    @ 080a78fc 4018
     ldr r0,[r0,#0x0]                         @ 080a78fe 0068
     .hword 0x4687    @ 080a7900 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7904:
     .word  0x0201e4d0                     @ 080a7904 d0e40102
 DWORD_080a7908:
@@ -44,7 +44,7 @@ LAB_080a7ac0:
     pop {r4,r5}                              @ 080a7ac4 30bc
     pop {r1}                                 @ 080a7ac6 02bc
     bx r1                                    @ 080a7ac8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip target slot validity check, called via fn-ptr (0x080a7d38 / 0x080a7d44) from equip placement decision dispatch tree. Conditions: r0=player_id, r1+r2=slot_idx (combined), slot<=10 and global struct [0x0201e4d0] byte[0] bit0 == player_id. Logic: compute gDuelFieldSlots[player*0x868 + slot*0x14] card_word, extract card_id (bits[12:0]=r6); if card_id==0 fail. Then check r6 against table@(gDuelActivationTable+0x5ac); if hit return 0x800 (1<<11, slot is in activation table); else return 0.
 @ Constants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_STRIDE=0x14, ACT_TABLE_BASE=0x0201b290, ACT_TABLE_OFF=0x5ac, HIT_RETURN=0x800 (=0x80<<4).
@@ -95,7 +95,7 @@ check_equip_target_slot_in_active_table:
     cmp r0,#0x0                              @ 080a7b28 0028
     bne LAB_080a7b42                         @ 080a7b2a 0ad1
     b LAB_080a7b66                           @ 080a7b2c 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7b30:
     .word  0x0201e4d0                     @ 080a7b30 d0e40102
 DWORD_080a7b34:
@@ -132,7 +132,7 @@ LAB_080a7b68:
     pop {r4,r5,r6,r7}                        @ 080a7b68 f0bc
     pop {r1}                                 @ 080a7b6a 02bc
     bx r1                                    @ 080a7b6c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7b70:
     .word  0x0201b290                     @ 080a7b70 90b20102
 DWORD_080a7b74:
@@ -208,7 +208,7 @@ LAB_080a7bba:
     cmp r2,r0                                @ 080a7be0 8242
     beq LAB_080a7c30                         @ 080a7be2 25d0
     b LAB_080a7cbc                           @ 080a7be4 6ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7be8:
     .word  0x0201b290                     @ 080a7be8 90b20102
 DWORD_080a7bec:
@@ -223,7 +223,7 @@ LAB_080a7bf0:
     cmp r2,r0                                @ 080a7bfc 8242
     beq LAB_080a7c74                         @ 080a7bfe 39d0
     b LAB_080a7cbc                           @ 080a7c00 5ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7c04:
     .word  0x00001953                     @ 080a7c04 53190000
 DWORD_080a7c08:
@@ -266,7 +266,7 @@ LAB_080a7c30:
     movs r0,#0x3    @ 080a7c4c 0320
     str r0,[r3,#0x0]                         @ 080a7c4e 1860
     b LAB_080a7cbc                           @ 080a7c50 34e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7c54:
     .word  0x000005ac                     @ 080a7c54 ac050000
 DWORD_080a7c58:
@@ -294,7 +294,7 @@ LAB_080a7c74:
     add r1,r10                               @ 080a7c80 5144
     adds r0,#0x3    @ 080a7c82 0330
     b LAB_080a7cba                           @ 080a7c84 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7c88:
     .word  0x000005ac                     @ 080a7c88 ac050000
 DWORD_080a7c8c:
@@ -309,7 +309,7 @@ LAB_080a7c90:
     add r1,r10                               @ 080a7c9c 5144
     adds r0,#0x4    @ 080a7c9e 0430
     b LAB_080a7cba                           @ 080a7ca0 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7ca4:
     .word  0x000005ac                     @ 080a7ca4 ac050000
 DWORD_080a7ca8:
@@ -485,7 +485,7 @@ LAB_080a7de4:
     orrs r1,r0    @ 080a7df4 0143
     subs r1,#0x1    @ 080a7df6 0139
     b LAB_080a7f08                           @ 080a7df8 86e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a7dfc:
     .word  gP1LifePoints                  @ 080a7dfc e0c40102
 DWORD_080a7e00:
@@ -661,7 +661,7 @@ LAB_080a7f3a:
     pop {r4,r5,r6,r7}                        @ 080a7f44 f0bc
     pop {r1}                                 @ 080a7f46 02bc
     bx r1                                    @ 080a7f48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called exclusively by FUN_080a8c30 (equip hub, LAB_080a8f54). Computes combined_index=(struct[0x14]&1)<<7|struct[0x13]>>1, special dispatch: index==1 branches to LAB_080a8068 for subsequent processing; index==0 or index==0x1e enters LAB_080a7f7a; others advance to LAB_080a809a and return. LAB_080a7f7a: clears gP1LifePoints+0xea<<5 field; if struct[0x0] bit7/bit6 set, counts card_id=0x135d copies on field, skips if copies<=0; memsets 0x18 bytes to prepare equip struct; calls apply_card_equip_activation; on failure: calls invoke_card_display_op_0x31_sub1(card_id=0x123, Dream Clown dec 291); updates struct[0x13/0x14]; returns 0. LAB_080a8068 path (text_id=0xea): formats text and calls invoke_card_display_op_0x31_sub1. No APCS inputs. Returns: r0=int32 phase status. Side effects: clears gP1LifePoints+0x1d40 (=0xea<<5); updates struct[0x13/0x14]. Constants: STRUCT_BASE=0x0201e4d0, CARD_ID_CHECK=0x135d (4957 decimal, icid above standard range), CARD_ID_DISPLAY=0x123 (Dream Clown, dec 291), LP_FIELD_OFFSET=0x1d40 (=0xea<<5), EQUIP_STRUCT_SIZE=0x18.
 tick_equip_card_phase_with_placement_apply:
@@ -803,7 +803,7 @@ LAB_080a803e:
     strb r0,[r2,#0x14]                       @ 080a8058 1075
     movs r0,#0x0    @ 080a805a 0020
     b LAB_080a809e                           @ 080a805c 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8060:
     .word  0x00000123                     @ 080a8060 23010000
 DWORD_080a8064:
@@ -843,7 +843,7 @@ LAB_080a809e:
     pop {r4,r5}                              @ 080a80a0 30bc
     pop {r1}                                 @ 080a80a2 02bc
     bx r1                                    @ 080a80a4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check whether monster slot (r12=base_slot_idx, non-APCS) is a valid equip target for player (r0). Reads gSpellContext+0 (0x0201e4d0) bit0 (player_bit) and extracts equip_card_id; gSpellContext+8 == 0: BST on equip_card_id to get expected field7, compare via get_card_extended_stat_field7; triple filter: check_slot_zone_bit_eligible + count_available_monster_slots + check_slot_placement_blocked_by_field_effect. Pass -> return 0x800 (valid flag). r0=u32 player_side [0..1]; r12 (non-APCS, caller-set)=u32 base_slot_idx [0..4]. Returns u32 (0x800=eligible, 0=not). Constants: gSpellContext=0x0201e4d0, gDuelFieldSlots=0x0201c510, valid_return=0x800.
 check_slot_equip_target_eligible:
@@ -899,7 +899,7 @@ LAB_080a80ec:
     cmp r1,r0                                @ 080a8104 8142
     beq LAB_080a8130                         @ 080a8106 13d0
     b LAB_080a814a                           @ 080a8108 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080a810c:
     .word  0x0201e4d0                     @ 080a810c d0e40102
 DAT_080a8110:
@@ -916,7 +916,7 @@ LAB_080a811c:
     cmp r1,r0                                @ 080a8124 8142
     beq LAB_080a8148                         @ 080a8126 0fd0
     b LAB_080a814a                           @ 080a8128 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080a812c:
     .word  0x0000196d                     @ 080a812c 6d190000
 LAB_080a8130:
@@ -931,7 +931,7 @@ LAB_080a8138:
 LAB_080a813e:
     ldr r7, DAT_080a8144                     @ 080a813e 014f
     b LAB_080a814a                           @ 080a8140 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080a8144:
     .word  0x000018c1                     @ 080a8144 c1180000
 LAB_080a8148:
@@ -1022,7 +1022,7 @@ LAB_080a81f0:
     pop {r4,r5,r6,r7}                        @ 080a81f4 f0bc
     pop {r1}                                 @ 080a81f6 02bc
     bx r1                                    @ 080a81f8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called exclusively by FUN_080a8c30 (equip hub, by card_id segment dispatch). First checks equip struct[0x12] bit1 (mask=0x2); if not set delegates to dispatch_equip_state_by_combined_phase_index for generic phase advance and returns its result. If set, computes combined_index=(struct[0x14]&1)<<7|struct[0x13]>>1, range [0..5], dispatches via 6-entry jump table (PTR_PTR_080a8234->0x080a8238) to per-phase handlers; index out-of-range (>5) enters LAB_080a8394 returning 0. No APCS inputs (hub direct bl, no args). Returns: r0=int32 phase status (dispatch_equip_state_by_combined_phase_index return, or jump table case return, or 0 for out-of-range). Side effects: determined by jump table target functions; this function only computes index and dispatches. Constants: STRUCT_BASE=0x0201e4d0, ACTIVATION_BIT_MASK=0x2 (byte[0x12] bit1), MAX_PHASE_INDEX=0x5 (6-entry jump table), JUMP_TABLE_BASE=0x080a8238.
 tick_equip_card_phase_by_activation_jump_table:
@@ -1054,7 +1054,7 @@ LAB_080a8228:
     adds r0,r0,r1    @ 080a822c 4018
     ldr r0,[r0,#0x0]                         @ 080a822e 0068
     .hword 0x4687    @ 080a8230 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_PTR_080a8234:
     .word  0x080a8238                     @ 080a8234 38820a08
 PTR_DAT_080a8238:
@@ -1120,7 +1120,7 @@ LAB_080a83f0:
     movs r0,#0x80    @ 080a83f0 8020
     lsls r0,r0,#0x4    @ 080a83f2 0001
     b LAB_080a8406                           @ 080a83f4 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a83f8:
     .word  0x0201e4d0                     @ 080a83f8 d0e40102
 DWORD_080a83fc:
@@ -1306,7 +1306,7 @@ check_equip_target_slot_by_composite:
     cmp r0,#0x0                              @ 080a8538 0028
     bne LAB_080a8572                         @ 080a853a 1ad1
     b LAB_080a85c4                           @ 080a853c 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8540:
     .word  0x00000868                     @ 080a8540 68080000
 DWORD_080a8544:
@@ -1431,7 +1431,7 @@ LAB_080a87e0:
     pop {r4,r5,r6}                           @ 080a87e4 70bc
     pop {r1}                                 @ 080a87e6 02bc
     bx r1                                    @ 080a87e8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip phase tick function for normal-summon-type cards, called by
 @ dispatch_equip_phase_by_card_id_range (0x080a8c30) at LAB_080a8f92 after
@@ -1466,7 +1466,7 @@ tick_equip_phase_normal_summon_type:
     b LAB_080a891c                           @ 080a8812 83e0
 LAB_080a8814:
     b LAB_080a89e2                           @ 080a8814 e5e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8818:
     .word  0x0201e4d0                     @ 080a8818 d0e40102
 LAB_080a881c:
@@ -1512,7 +1512,7 @@ LAB_080a8828:
     adds r0,r0,r1    @ 080a886c 4018
     str r7,[r0,#0x0]                         @ 080a886e 0760
     b LAB_080a88b2                           @ 080a8870 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8874:
     .word  0x0201e2a0                     @ 080a8874 a0e20102
 DWORD_080a8878:
@@ -1711,7 +1711,7 @@ LAB_080a89e6:
     pop {r4,r5,r6,r7}                        @ 080a89f0 f0bc
     pop {r1}                                 @ 080a89f2 02bc
     bx r1                                    @ 080a89f4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_080a8c30 (equip hub) at LAB_080a8fa6 when check_card_id_is_special_summon_type returns nonzero. Computes combined_index=(struct[0x14]&1)<<7|struct[0x13]>>1; if index<=bound dispatches via jump table; if out-of-range enters LAB_080a8c24 returning generic status. This is the "fallback to summon-type-specific handler" branch in hub -- invoked when card_id does not match any specific equip function and card belongs to a special summon type. sub sp,0x100 large frame. 3-way dispatch: index>1 path at LAB_080a8a20; index==0 path at LAB_080a8a2e; out-of-range at LAB_080a8c24. No APCS inputs. Returns: r0=int32 phase status. Side effects: determined by per-case handlers; may update struct[0x13/0x14]. Constants: STRUCT_BASE=0x0201e4d0.
 tick_equip_card_phase_with_summon_type_dispatch:
@@ -1972,7 +1972,7 @@ LAB_080a8b78:
     strb r0,[r6,#0x14]                       @ 080a8bf4 3075
     movs r0,#0x0    @ 080a8bf6 0020
     b LAB_080a8c28                           @ 080a8bf8 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8bfc:
     .word  gP1LifePoints                  @ 080a8bfc e0c40102
 DWORD_080a8c00:
@@ -1992,7 +1992,7 @@ LAB_080a8c12:
     strh r0,[r6,#0x6]                        @ 080a8c18 f080
     movs r0,#0x1    @ 080a8c1a 0120
     b LAB_080a8c28                           @ 080a8c1c 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8c20:
     .word  0x000019b2                     @ 080a8c20 b2190000
 LAB_080a8c24:
@@ -2095,7 +2095,7 @@ LAB_080a8ca4:
     b LAB_080a8f12                           @ 080a8cae 30e1
 LAB_080a8cb0:
     b LAB_080a8f84                           @ 080a8cb0 68e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8cb4:
     .word  0x0000112e                     @ 080a8cb4 2e110000
 LAB_080a8cb8:
@@ -2127,7 +2127,7 @@ LAB_080a8cdc:
     b LAB_080a8f2a                           @ 080a8ce2 22e1
 LAB_080a8ce4:
     b LAB_080a8f84                           @ 080a8ce4 4ee1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8ce8:
     .word  0x000013b5                     @ 080a8ce8 b5130000
 LAB_080a8cec:
@@ -2144,7 +2144,7 @@ LAB_080a8cf4:
     b LAB_080a8f30                           @ 080a8cfe 17e1
 LAB_080a8d00:
     b LAB_080a8f84                           @ 080a8d00 40e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8d04:
     .word  0x00001466                     @ 080a8d04 66140000
 LAB_080a8d08:
@@ -2154,7 +2154,7 @@ LAB_080a8d08:
     b LAB_080a8f3c                           @ 080a8d0e 15e1
 LAB_080a8d10:
     b LAB_080a8f84                           @ 080a8d10 38e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8d14:
     .word  0x0000147b                     @ 080a8d14 7b140000
 LAB_080a8d18:
@@ -2197,7 +2197,7 @@ LAB_080a8d50:
     b LAB_080a8f4e                           @ 080a8d56 fae0
 LAB_080a8d58:
     b LAB_080a8f84                           @ 080a8d58 14e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8d5c:
     .word  0x000015b1                     @ 080a8d5c b1150000
 LAB_080a8d60:
@@ -2286,7 +2286,7 @@ LAB_080a8de4:
     b LAB_080a8f5a                           @ 080a8dea b6e0
 LAB_080a8dec:
     b LAB_080a8f84                           @ 080a8dec cae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8df0:
     .word  0x00001954                     @ 080a8df0 54190000
 LAB_080a8df4:
@@ -2303,7 +2303,7 @@ LAB_080a8dfc:
     b LAB_080a8f72                           @ 080a8e06 b4e0
 LAB_080a8e08:
     b LAB_080a8f84                           @ 080a8e08 bce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8e0c:
     .word  0x00001838                     @ 080a8e0c 38180000
 LAB_080a8e10:
@@ -2313,7 +2313,7 @@ LAB_080a8e10:
     b LAB_080a8f42                           @ 080a8e16 94e0
 LAB_080a8e18:
     b LAB_080a8f84                           @ 080a8e18 b4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8e1c:
     .word  0x00001864                     @ 080a8e1c 64180000
 LAB_080a8e20:
@@ -2337,7 +2337,7 @@ LAB_080a8e34:
     b LAB_080a8f6c                           @ 080a8e3e 95e0
 LAB_080a8e40:
     b LAB_080a8f84                           @ 080a8e40 a0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8e44:
     .word  0x000018e8                     @ 080a8e44 e8180000
 LAB_080a8e48:
@@ -2356,7 +2356,7 @@ LAB_080a8e5c:
     cmp r2,r0                                @ 080a8e5c 8242
     beq LAB_080a8f1e                         @ 080a8e5e 5ed0
     b LAB_080a8f84                           @ 080a8e60 90e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8e64:
     .word  0x000018f9                     @ 080a8e64 f9180000
 LAB_080a8e68:
@@ -2367,7 +2367,7 @@ LAB_080a8e6a:
     b LAB_080a8f7e                           @ 080a8e6e 86e0
 LAB_080a8e70:
     b LAB_080a8f84                           @ 080a8e70 88e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8e74:
     .word  0x00001905                     @ 080a8e74 05190000
 LAB_080a8e78:
@@ -2392,7 +2392,7 @@ LAB_080a8e86:
     blt LAB_080a8f84                         @ 080a8e9a 73db
     bl tick_equip_card_phase_by_activation_jump_table @ 080a8e9c fff7aef9
     b LAB_080a8fb0                           @ 080a8ea0 86e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8ea4:
     .word  0x000019a4                     @ 080a8ea4 a4190000
 LAB_080a8ea8:
@@ -2437,7 +2437,7 @@ LAB_080a8eec:
     cmp r2,r0                                @ 080a8eec 8242
     beq LAB_080a8f36                         @ 080a8eee 22d0
     b LAB_080a8f84                           @ 080a8ef0 48e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8ef4:
     .word  0x000019f0                     @ 080a8ef4 f0190000
 LAB_080a8ef8:
@@ -2448,7 +2448,7 @@ LAB_080a8ef8:
     cmp r2,r0                                @ 080a8f00 8242
     blt LAB_080a8f84                         @ 080a8f02 3fdb
     b LAB_080a8f18                           @ 080a8f04 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a8f08:
     .word  0x000019f8                     @ 080a8f08 f8190000
 LAB_080a8f0c:
@@ -2611,7 +2611,7 @@ LAB_080a9032:
     movs r3,#0x0    @ 080a903e 0023
     bl dispatch_card_display_op              @ 080a9040 75f72cfe
     b LAB_080a9098                           @ 080a9044 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080a9048:
     .word  0x0201e4d0                     @ 080a9048 d0e40102
 DWORD_080a904c:
@@ -2817,7 +2817,7 @@ exit_equip_phase_oob_epilogue_wide:
     pop {r4,r5,r6,r7}                        @ 080aa118 f0bc
     pop {r1}                                 @ 080aa11a 02bc
     bx r1                                    @ 080aa11c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_080ab200 (equip sub-entry main control, indeg=1) in one branch. Complex prologue: push {r4,r5,r6,r7,lr}; multiple .hword 0x46xx callee-save; sub sp,#8. Reads DWORD_080aa154=0x0201e4d0 (equip sub-entry control struct): byte[0x13] and byte[0x14]; extracts combined_index = (byte[0x14] & 1) << 7 | byte[0x13] >> 1. If combined_index > 9 jumps LAB_080aa768 (return 1). Otherwise uses combined_index*4 to index switch_table (DWORD_080aa158=0x080aa15c, 10 entries): dispatches to 10 case code blocks (0x080aa184 ROM_INCBIN region). Exit: movs r0,#1; pop; bx lr (return 1 = out of range; each case returns internally via FUN_080aba7a shared exit). Structurally symmetric to FUN_080a5f7c but different switch range (>9 vs >0x21).
 @ Constants: STRUCT_BASE=0x0201e4d0, byte_offset_a=0x13, byte_offset_b=0x14, combined_index=(byte[0x14]&1)<<7|byte[0x13]>>1, switch_range=[0..9], switch_table=0x080aa15c, out_of_range_return=1.
@@ -2848,7 +2848,7 @@ LAB_080aa148:
     adds r0,r0,r1    @ 080aa14c 4018
     ldr r0,[r0,#0x0]                         @ 080aa14e 0068
     .hword 0x4687    @ 080aa150 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aa154:
     .word  0x0201e4d0                     @ 080aa154 d0e40102
 DWORD_080aa158:
@@ -2875,7 +2875,7 @@ LAB_080aa768:
     pop {r4,r5,r6,r7}                        @ 080aa774 f0bc
     pop {r1}                                 @ 080aa776 02bc
     bx r1                                    @ 080aa778 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip sub-entry control struct (0x0201e4d0, DWORD_080aa7ac) phase dispatcher,
 @ called by dispatch_equip_entry_slot_phase_d (0x080aaf64) and
@@ -2912,7 +2912,7 @@ LAB_080aa7a0:
     adds r0,r0,r1    @ 080aa7a4 4018
     ldr r0,[r0,#0x0]                         @ 080aa7a6 0068
     .hword 0x4687    @ 080aa7a8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aa7ac:
     .word  0x0201e4d0                     @ 080aa7ac d0e40102
 DWORD_080aa7b0:
@@ -3003,7 +3003,7 @@ LAB_080aad78:
     beq LAB_080aae58                         @ 080aad7c 6cd0
     ldr r0, DWORD_080aad88                   @ 080aad7e 0248
     b LAB_080aad64                           @ 080aad80 f0e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aad84:
     .word  0x000014fc                     @ 080aad84 fc140000
 DWORD_080aad88:
@@ -3029,7 +3029,7 @@ LAB_080aada4:
     cmp r2,r0                                @ 080aadac 8242
     beq LAB_080aae24                         @ 080aadae 39d0
     b LAB_080aae54                           @ 080aadb0 50e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aadb4:
     .word  0x00001745                     @ 080aadb4 45170000
 LAB_080aadb8:
@@ -3046,7 +3046,7 @@ LAB_080aadb8:
     bgt LAB_080aadd8                         @ 080aadcc 04dc
     subs r0,#0x25    @ 080aadce 2538
     b LAB_080aad64                           @ 080aadd0 c8e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aadd4:
     .word  0x0000180c                     @ 080aadd4 0c180000
 LAB_080aadd8:
@@ -3079,7 +3079,7 @@ LAB_080aae00:
     cmp r2,r0                                @ 080aae08 8242
     beq LAB_080aae4c                         @ 080aae0a 1fd0
     b LAB_080aae54                           @ 080aae0c 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aae10:
     .word  0x000019a7                     @ 080aae10 a7190000
 LAB_080aae14:
@@ -3088,7 +3088,7 @@ LAB_080aae14:
     lsrs r3,r0,#0x5    @ 080aae18 4309
     movs r0,#0x1    @ 080aae1a 0120
     b LAB_080aae52                           @ 080aae1c 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aae20:
     .word  0x0201e4d0                     @ 080aae20 d0e40102
 LAB_080aae24:
@@ -3228,7 +3228,7 @@ LAB_080aaef4:
     strb r0,[r3,#0x14]                       @ 080aaf24 1875
     movs r0,#0x0    @ 080aaf26 0020
     b LAB_080aaf56                           @ 080aaf28 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080aaf2c:
     .word  0x0201e4d0                     @ 080aaf2c d0e40102
 DWORD_080aaf30:
@@ -3349,7 +3349,7 @@ LAB_080ab1e0:
 LAB_080ab1ea:
     movs r0,#0x1    @ 080ab1ea 0120
     b LAB_080ab1f6                           @ 080ab1ec 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab1f0:
     .word  0x0000196e                     @ 080ab1f0 6e190000
 LAB_080ab1f4:
@@ -3359,7 +3359,7 @@ LAB_080ab1f6:
     pop {r4,r5,r6}                           @ 080ab1f8 70bc
     pop {r1}                                 @ 080ab1fa 02bc
     bx r1                                    @ 080ab1fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip sub-entry main controller dispatcher, called by
 @ tick_equip_activation_main_sequence (0x08094cd4) (indeg=1). Reads struct
@@ -3600,7 +3600,7 @@ LAB_080ab398:
     movs r0,#0x8    @ 080ab3a8 0820
     str r0,[sp,#0x8]                         @ 080ab3aa 0290
     b LAB_080ab40c                           @ 080ab3ac 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab3b0:
     .word  0x0201e4d0                     @ 080ab3b0 d0e40102
 DWORD_080ab3b4:
@@ -3708,7 +3708,7 @@ LAB_080ab44a:
     lsrs r2,r2,#0x17    @ 080ab47a d20d
     bl enqueue_sprite_attr_with_xy_split     @ 080ab47c 99f7e0fe
     b LAB_080ab4c4                           @ 080ab480 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab484:
     .word  0x0201e4d0                     @ 080ab484 d0e40102
 DWORD_080ab488:
@@ -4072,7 +4072,7 @@ LAB_080ab71c:
     cmp r5,r0                                @ 080ab748 8542
     beq LAB_080ab7aa                         @ 080ab74a 2ed0
     b LAB_080ab7d6                           @ 080ab74c 43e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab750:
     .word  0x002a183f                     @ 080ab750 3f182a00
 DWORD_080ab754:
@@ -4110,7 +4110,7 @@ LAB_080ab77c:
     cmp r2,r0                                @ 080ab790 8242
     beq LAB_080ab7aa                         @ 080ab792 0ad0
     b LAB_080ab7d6                           @ 080ab794 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab798:
     .word  0x0000163f                     @ 080ab798 3f160000
 LAB_080ab79c:
@@ -4186,7 +4186,7 @@ LAB_080ab7d6:
     cmp r5,r0                                @ 080ab824 8542
     blt LAB_080ab85e                         @ 080ab826 1adb
     b LAB_080ab84e                           @ 080ab828 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ab82c:
     .word  0x000018f9                     @ 080ab82c f9180000
 DWORD_080ab830:
@@ -4506,7 +4506,7 @@ exit_equip_subentry_epilogue:
     pop {r4,r5,r6,r7}                        @ 080aba84 f0bc
     pop {r1}                                 @ 080aba86 02bc
     bx r1                                    @ 080aba88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 equip sprite 处理簇四个对称函数 (0x080abbd8/0x080abcac/0x080abd60/0x080abe54) 调用 (indeg=4). 加载全局 equip 子条目控制结构体指针 (DAT_080abb74=0x0201e4d0). 重置结构体标志: AND 0x01 保留 [+0x13] bit0; AND 0xFD 清 [+0x14] bit1; 掩码 0xFFFFFE01 清 [+0x14]; AND mask 清 [+0x16]; 置位 [+0x12] bit4 (0x10). 遍历子条目数组 (struct[+0x8] 个条目, 每条目 2 字节, 从 struct+9 起): 提取 player_bit (bit0) 和 slot_idx (byte1), 查 gDuelFieldSlots 条目, 提取 face/orient 编码 (bits[23:22]<<1|bit18) 存入子条目 [0]. struct[0] bit6 设置时: set_player_state_bit_with_sprite_update(player_bit, 0x10, 1). [0x0201e2a0+player*4+8]==2 时: 置位 struct[+0x12] bit5 (0x20); submit_sprite_row_data(-1, 0x15, 0x18); 清除 [0x0201b870+0xc00] bits 1:0. Side effects: 0x0201e4d0 结构体多字段; via set_player_state_bit_with_sprite_update: player flags; via submit_sprite_row_data: sprite row buffer. Constants: STRUCT_BASE=0x0201e4d0, gDuelFieldSlots=0x0201c510, player_stride=0x868, SPRITE_BUF=0x0201b870, ROM_DISPLAY_TABLE=0x0201e2a0.
 init_equip_sub_entry_state_with_sprite_submit:
@@ -4675,7 +4675,7 @@ reset_sprite_attr_record_flags:
     orrs r0,r1    @ 080abbc4 0843
     strb r0,[r2,#0x12]                       @ 080abbc6 9074
     bx lr                                    @ 080abbc8 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080abbcc:
     .word  0x0201e4d0                     @ 080abbcc d0e40102
 DAT_080abbd0:
@@ -4783,7 +4783,7 @@ LAB_080abc90:
     pop {r4,r5,r6,r7}                        @ 080abc90 f0bc
     pop {r0}                                 @ 080abc92 01bc
     bx r0                                    @ 080abc94 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080abc98:
     .word  0x0000135d                     @ 080abc98 5d130000
 DAT_080abc9c:
@@ -4875,7 +4875,7 @@ LAB_080abd3e:
     pop {r4,r5}                              @ 080abd44 30bc
     pop {r0}                                 @ 080abd46 01bc
     bx r0                                    @ 080abd48 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080abd4c:
     .word  0x0201e4d0                     @ 080abd4c d0e40102
 DAT_080abd50:
@@ -5017,7 +5017,7 @@ invoke_setup_equip_oam_with_attr2:
     add sp,#0x4                              @ 080abe4c 01b0
     pop {r0}                                 @ 080abe4e 01bc
     bx r0                                    @ 080abe50 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called exclusively by FUN_080a8c30 (equip hub body, LAB_080a906e) when struct[0x0] bit0=1 (confirm path). Inputs: r0=player_id [0..1], r1=slot_data_ptr, r2=sub_slot_idx (int32, <0 skips to LAB_080abefc), r3=player_bit [0..1] (used for attr[0x12] bit9), sp[0x14]=copy_flag_arg. Builds OAM attr: reads struct[0x0] (DWORD_080abf04=0x0201e4d0) byte[0]; computes attr0 with mask=~0x2=0xfd retaining player bit0 and slot flags; attr1 clearing [0x1f] low 5 bits and setting slot_idx<<1 (bits[5:1]); attr[0x2] highbyte. Reads gP1LifePoints+r1*4+0x87<<5 for card_iid, extracts bits[22:12] as attr2 card image ID. Writes attr[0x0] via mask=0xff8000ff. Writes attr[0x12] via mask=0xfffffe3f with bit9 (r3*0x100); writes attr[0x6]=iid>>9; attr[0x4]=4 (sprite type). Calls check_card_has_equip_placement_type; if placement type then attr[0x4]|=1. Calls find_slot_idx_by_card_id_in_player_zones; if >=0 calls render_field_card_copy_count. Finally calls init_equip_sub_entry_state_with_sprite_submit. Returns: void (pop{r0}; bx r0). Side effects: writes sprite attr fields [r4+0x0/0x2/0x4/0x6/0x8/0x12]; submits sprite entry. Constants: STRUCT_BASE=0x0201e4d0, LP_BASE=gP1LifePoints (0x0201c4e0), LP_SLOT_STRIDE=0x10e0 (=0x87<<5), OAM_ATTR0_MASK=0xff8000ff, OAM_ATTR1_SLOT_MASK=0xfffffe3f, OAM_ATTR1_VALID_BIT=0x100 (r3*0x100), SPRITE_TYPE_DEFAULT=4, SPRITE_TYPE_PLACEMENT=5 (4|1).
 init_equip_slot_entry_with_placement_type_check:
@@ -5108,7 +5108,7 @@ LAB_080abefc:
     pop {r4,r5,r6,r7}                        @ 080abefc f0bc
     pop {r0}                                 @ 080abefe 01bc
     bx r0                                    @ 080abf00 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080abf04:
     .word  0x0201e4d0                     @ 080abf04 d0e40102
 DWORD_080abf08:
@@ -5231,7 +5231,7 @@ LAB_080abfde:
     str r0,[r4,#0x4]                         @ 080abfe4 6060
     str r0,[r4,#0x0]                         @ 080abfe6 2060
     b LAB_080abffa                           @ 080abfe8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080abfec:
     .word  0x00000834                     @ 080abfec 34080000
 LAB_080abff0:
@@ -5265,7 +5265,7 @@ LAB_080ac01c:
 LAB_080ac022:
     pop {r0}                                 @ 080ac022 01bc
     bx r0                                    @ 080ac024 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 被 FUN_080ac0bc 调用一次 (indeg=1 from 080ac0bc), 也被 0x080a39fa 调用 (indeg>=2). 入口 r0=player_id [0..1], r1=activation_gate (saved to r9; 0=full eligibility check, 非0=activatable check), r2=loop_limit (saved to r10; slot 扫描上限). 遍历当前玩家侧 monster 格 slot [0..r2]: 检查 gDuelFieldSlots[player*0x868+slot*0x14].word[0] bits[13..0] 是否非 0 (有卡); 若 r1 (activation_gate) 非 0, 调用 check_slot_card_activatable; 若 r1==0, 调用 check_slot_full_activation_eligibility; 通过则调用 dispatch_zone_slot_score_by_player_flag 获取得分写入 sp[0x14]; 若 sp[0x14] > r7 (初始 -1) 则更新 r7. 循环结束后返回 r7 (最高分或 -1). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, SLOT_MAX=4, INIT_BEST=-1.
 find_best_activatable_slot_score_for_player:
@@ -5343,7 +5343,7 @@ LAB_080ac0a0:
     pop {r4,r5,r6,r7}                        @ 080ac0b4 f0bc
     pop {r1}                                 @ 080ac0b6 02bc
     bx r1                                    @ 080ac0b8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 被 FUN_080ac4cc / FUN_080ac56e 各调用一次 (indeg=2). 入口 r0=player_id [0..1], r1=score_context_ptr. 综合评估当前玩家的激活格得分与 LP 阈值, 返回激活决策 bool. 函数体: (1) r6=opponent=(1-player), r4=-1(初始阈值); (2) 以 r0=opponent, r2=0 调用 find_best_activatable_slot_score_for_player, 得分暂存 r9; (3) 以 r0=player, r1=player, r2=-1, r3=1 调用 find_best_scored_slot_for_player_with_gate (activation=1), 返回 sp[0x4]; (4) 再以 r3=0 调用同函数, 返回 sp[0x8]; (5) sp[0xc]=0x64 (初始比较分); (6) 调用 count_occupied_monster_zones (opponent); (7) 若为 0: 计算 gP1LifePoints[player*0x868]+0x40 (LP 值), 调用 FUN_080af374 (total slot score), 比较 LP vs score 差值; 若通过调用 check_equip_effect_zone_preconditions. (8) 多层 score/LP 比较判断; 最终返回 0=可激活, 1=不可. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, LP_THRESHOLD_BASE=0x64=100, 0x13f9, 0x3e7, 0x130c.
 eval_player_activation_score_and_lp_threshold:
@@ -5507,7 +5507,7 @@ LAB_080ac1ee:
     movs r0,#0x1    @ 080ac1f8 0120
     rsbs r0,r0,#0    @ 080ac1fa 4042
     b LAB_080ac20a                           @ 080ac1fc 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac200:
     .word  0x000006a3                     @ 080ac200 a3060000
 DAT_080ac204:
@@ -5523,7 +5523,7 @@ LAB_080ac20a:
     pop {r4,r5,r6,r7}                        @ 080ac214 f0bc
     pop {r1}                                 @ 080ac216 02bc
     bx r1                                    @ 080ac218 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks whether equip card (card_id) is valid for a target monster slot. r0=player_key (bit0=player_id [0..1]) -> r6; r1=target_slot_ptr (ptr to gDuelFieldSlots monster slot) -> r8 (via .hword 0x4688); r2=equip_slot_idx [0..4] -> r10 (via .hword 0x4642). Extracts player_id=r6&1; computes equip_slot_idx*4 + target_slot_ptr*4 -> reads gDuelFieldSlots dword -> extracts card_id (lsls/lsrs 0x13 = bits[18:0]). Executes large switch (20+ cmp chain) on card_id (0x14af, 0x13a7, 0x129a, 0x12a3, 0x157c, 0x1476, 0x147a, 0x147f, 0x1370 etc); each case calls different validity checker. Called exclusively by eval_equip_slot_target_eligibility_full (0x080bc418). Params: r0=u32 player_key (bit0=player_id [0..1]); r1=ptr target_slot_ptr (gDuelFieldSlots monster slot); r2=u32 equip_slot_idx [0..4]. Returns r0=u32 1=equip valid, 0=invalid. Side effects: none (read-only check). Constants: CARD_ID=0x13a7 (Injection Fairy Lily); CARD_ID=0x129a (Reflect Bounder); CARD_ID=0x12a3 (Little-Winguard); CARD_ID=0x1476 (Ancient Lamp); CARD_ID=0x147a (Mystical Beast Serket); CARD_ID=0x147f (Jowgen the Spiritualist); CARD_ID=0x1370 (Kiseitai); CARD_ID=0x157c (unknown; not in data.md or cards-ids-array.s).
 check_equip_card_valid_for_target_slot:
@@ -5595,7 +5595,7 @@ LAB_080ac294:
     cmp r4,r0                                @ 080ac294 8442
     beq LAB_080ac33e                         @ 080ac296 52d0
     b LAB_080ac454                           @ 080ac298 dce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac29c:
     .word  0x000012a3                     @ 080ac29c a3120000
 LAB_080ac2a0:
@@ -5643,7 +5643,7 @@ LAB_080ac2d0:
     cmp r4,r0                                @ 080ac2ec 8442
     beq LAB_080ac374                         @ 080ac2ee 41d0
     b LAB_080ac454                           @ 080ac2f0 b0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac2f4:
     .word  0x000018c3                     @ 080ac2f4 c3180000
 DAT_080ac2f8:
@@ -5656,7 +5656,7 @@ LAB_080ac300:
     beq LAB_080ac392                         @ 080ac304 45d0
     adds r0,#0x6    @ 080ac306 0630
     b LAB_080ac326                           @ 080ac308 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac30c:
     .word  0x0000180d                     @ 080ac30c 0d180000
 LAB_080ac310:
@@ -5700,7 +5700,7 @@ LAB_080ac33e:
     add r0,r9                                @ 080ac350 4844
     ldrh r0,[r0,#0x8]                        @ 080ac352 0089
     b LAB_080ac430                           @ 080ac354 6ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac358:
     .word  0x000019bd                     @ 080ac358 bd190000
 DAT_080ac35c:
@@ -5808,7 +5808,7 @@ LAB_080ac410:
     cmp r7,#0x0                              @ 080ac418 002f
     beq LAB_080ac454                         @ 080ac41a 1bd0
     b LAB_080ac374                           @ 080ac41c aae7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac420:
     .word  0x00000868                     @ 080ac420 68080000
 DAT_080ac424:
@@ -5821,7 +5821,7 @@ LAB_080ac430:
     cmp r0,#0x0                              @ 080ac430 0028
     bne LAB_080ac454                         @ 080ac432 0fd1
     b LAB_080ac392                           @ 080ac434 ade7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac438:
     .word  0x0000146f                     @ 080ac438 6f140000
 LAB_080ac43c:
@@ -5883,7 +5883,7 @@ LAB_080ac4a2:
     .hword 0x466a    @ 080ac4a6 6a46
     bl eval_slot_score_entry_full            @ 080ac4a8 8bf70afd
     b LAB_080ac4c6                           @ 080ac4ac 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac4b0:
     .word  0x00000868                     @ 080ac4b0 68080000
 DAT_080ac4b4:
@@ -5946,7 +5946,7 @@ LAB_080ac51c:
     cmp r4,r0                                @ 080ac51c 8442
     beq LAB_080ac52e                         @ 080ac51e 06d0
     b LAB_080ac538                           @ 080ac520 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac524:
     .word  0x0000152e                     @ 080ac524 2e150000
 LAB_080ac528:
@@ -5956,7 +5956,7 @@ LAB_080ac528:
 LAB_080ac52e:
     movs r0,#0x1    @ 080ac52e 0120
     b LAB_080ac53a                           @ 080ac530 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac534:
     .word  0x000019bd                     @ 080ac534 bd190000
 LAB_080ac538:
@@ -6003,7 +6003,7 @@ LAB_080ac578:
     pop {r4,r5,r6,r7}                        @ 080ac57c f0bc
     pop {r1}                                 @ 080ac57e 02bc
     bx r1                                    @ 080ac580 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 以 r5=card_id (r1 入口) 执行大型综合激活资格检查, 覆盖场地/手牌/墓地等多种激活路径. 入口 .hword 0x464f=mov r7,r9 / .hword 0x4646=mov r6,r8 为 callee-save. r0=player_side (mov r8,r0), r1=ctx (r5), r2=card_context (mov r9,r2), r3=extra (r4). 执行流程: check_value_in_slot_chain + 大型 BST 分派 (含 count_field_copies_of_card, check_card_normal_summon_restricted, count_gy_cards_by_field6, check_hand_equip_target_available, scan_monster_slots_for_best_scored_slot). 返回 1=eligible, 0=not_eligible, -1=special. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868.
 check_card_activation_eligible_by_id:
@@ -6115,7 +6115,7 @@ LAB_080ac63c:
     b LAB_080ac952                           @ 080ac642 86e1
 LAB_080ac644:
     b LAB_080acba4                           @ 080ac644 aee2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac648:
     .word  0x00001281                     @ 080ac648 81120000
 LAB_080ac64c:
@@ -6238,7 +6238,7 @@ LAB_080ac708:
     b LAB_080ac994                           @ 080ac70e 41e1
 LAB_080ac710:
     b LAB_080acba4                           @ 080ac710 48e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac714:
     .word  0x000014d7                     @ 080ac714 d7140000
 LAB_080ac718:
@@ -6265,7 +6265,7 @@ LAB_080ac734:
     b LAB_080aca20                           @ 080ac73a 71e1
 LAB_080ac73c:
     b LAB_080acba4                           @ 080ac73c 32e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac740:
     .word  0x00001617                     @ 080ac740 17160000
 LAB_080ac744:
@@ -6308,7 +6308,7 @@ LAB_080ac77c:
     b LAB_080acb12                           @ 080ac782 c6e1
 LAB_080ac784:
     b LAB_080acba4                           @ 080ac784 0ee2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac788:
     .word  0x000016bc                     @ 080ac788 bc160000
 LAB_080ac78c:
@@ -6326,7 +6326,7 @@ LAB_080ac79a:
     b LAB_080ac95e                           @ 080ac79e dee0
 LAB_080ac7a0:
     b LAB_080acba4                           @ 080ac7a0 00e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac7a4:
     .word  0x0000170c                     @ 080ac7a4 0c170000
 LAB_080ac7a8:
@@ -6337,7 +6337,7 @@ LAB_080ac7aa:
     b LAB_080ac90a                           @ 080ac7ae ace0
 LAB_080ac7b0:
     b LAB_080acba4                           @ 080ac7b0 f8e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac7b4:
     .word  0x00001743                     @ 080ac7b4 43170000
 LAB_080ac7b8:
@@ -6361,7 +6361,7 @@ LAB_080ac7ce:
 LAB_080ac7d6:
     adds r0,#0xb1    @ 080ac7d6 b130
     b LAB_080ac842                           @ 080ac7d8 33e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac7dc:
     .word  0x0000180c                     @ 080ac7dc 0c180000
 LAB_080ac7e0:
@@ -6378,7 +6378,7 @@ LAB_080ac7e8:
     b LAB_080ac9b2                           @ 080ac7f2 dee0
 LAB_080ac7f4:
     b LAB_080acba4                           @ 080ac7f4 d6e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac7f8:
     .word  0x00001813                     @ 080ac7f8 13180000
 LAB_080ac7fc:
@@ -6388,7 +6388,7 @@ LAB_080ac7fc:
     b LAB_080acae0                           @ 080ac802 6de1
 LAB_080ac804:
     b LAB_080acba4                           @ 080ac804 cee1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac808:
     .word  0x00001821                     @ 080ac808 21180000
 LAB_080ac80c:
@@ -6419,7 +6419,7 @@ LAB_080ac82c:
     b LAB_080acb58                           @ 080ac836 8fe1
 LAB_080ac838:
     b LAB_080acba4                           @ 080ac838 b4e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac83c:
     .word  0x000018b4                     @ 080ac83c b4180000
 LAB_080ac840:
@@ -6451,7 +6451,7 @@ LAB_080ac864:
     b LAB_080acacc                           @ 080ac86a 2fe1
 LAB_080ac86c:
     b LAB_080acba4                           @ 080ac86c 9ae1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac870:
     .word  0x0000189a                     @ 080ac870 9a180000
 LAB_080ac874:
@@ -6471,7 +6471,7 @@ LAB_080ac874:
     b LAB_080acb00                           @ 080ac88e 37e1
 LAB_080ac890:
     b LAB_080acba4                           @ 080ac890 88e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac894:
     .word  0x00001918                     @ 080ac894 18190000
 LAB_080ac898:
@@ -6481,7 +6481,7 @@ LAB_080ac898:
     b LAB_080acb78                           @ 080ac89e 6be1
 LAB_080ac8a0:
     b LAB_080acba4                           @ 080ac8a0 80e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac8a4:
     .word  0x00001914                     @ 080ac8a4 14190000
 LAB_080ac8a8:
@@ -6498,7 +6498,7 @@ LAB_080ac8b0:
     b LAB_080acb26                           @ 080ac8ba 34e1
 LAB_080ac8bc:
     b LAB_080acba4                           @ 080ac8bc 72e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac8c0:
     .word  0x0000195a                     @ 080ac8c0 5a190000
 LAB_080ac8c4:
@@ -6510,7 +6510,7 @@ LAB_080ac8cc:
     cmp r5,r0                                @ 080ac8cc 8542
     beq LAB_080ac8fc                         @ 080ac8ce 15d0
     b LAB_080acba4                           @ 080ac8d0 68e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac8d4:
     .word  0x000019bc                     @ 080ac8d4 bc190000
 LAB_080ac8d8:
@@ -6529,7 +6529,7 @@ LAB_080ac8ec:
     .hword 0x4640    @ 080ac8ee 4046
     bl count_slot_card_pair_allowed_for_card @ 080ac8f0 86f744fb
     b LAB_080acb6a                           @ 080ac8f4 39e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac8f8:
     .word  0x000012c5                     @ 080ac8f8 c5120000
 LAB_080ac8fc:
@@ -6597,7 +6597,7 @@ LAB_080ac966:
     ldr r0, DAT_080ac970                     @ 080ac966 0248
     bl check_card_matches_active_effect_slot @ 080ac968 87f7e0fb
     b LAB_080acb6a                           @ 080ac96c fde0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac970:
     .word  0x000010f4                     @ 080ac970 f4100000
 LAB_080ac974:
@@ -6612,7 +6612,7 @@ LAB_080ac974:
     movs r0,#0xfa    @ 080ac984 fa20
     lsls r0,r0,#0x3    @ 080ac986 c000
     b LAB_080aca84                           @ 080ac988 7ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ac98c:
     .word  gP1LifePoints                  @ 080ac98c e0c40102
 DAT_080ac990:
@@ -6636,7 +6636,7 @@ LAB_080ac9a4:
 LAB_080ac9b2:
     movs r0,#0x1    @ 080ac9b2 0120
     b LAB_080acbdc                           @ 080ac9b4 12e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac9b8:
     .word  0x0000146f                     @ 080ac9b8 6f140000
 LAB_080ac9bc:
@@ -6644,7 +6644,7 @@ LAB_080ac9bc:
     .hword 0x4640    @ 080ac9be 4046
     bl check_any_pair_slot_available_for_card @ 080ac9c0 02f0a8ff
     b LAB_080acb6a                           @ 080ac9c4 d1e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ac9c8:
     .word  0x0000142a                     @ 080ac9c8 2a140000
 LAB_080ac9cc:
@@ -6780,7 +6780,7 @@ LAB_080acaa0:
     cmp r0,r1                                @ 080acabc 8842
     bls LAB_080acba4                         @ 080acabe 71d9
     b LAB_080ac90a                           @ 080acac0 23e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acac4:
     .word  0xfffffbb3                     @ 080acac4 b3fbffff
 DAT_080acac8:
@@ -6849,7 +6849,7 @@ LAB_080acb34:
     .hword 0x4640    @ 080acb46 4046
     bl check_any_pair_slot_available_for_card @ 080acb48 02f0e4fe
     b LAB_080acb6a                           @ 080acb4c 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acb50:
     .word  0x00001357                     @ 080acb50 57130000
 DAT_080acb54:
@@ -6928,7 +6928,7 @@ LAB_080acbdc:
     pop {r4,r5,r6,r7}                        @ 080acbe4 f0bc
     pop {r1}                                 @ 080acbe6 02bc
     bx r1                                    @ 080acbe8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acbec:
     .word  0x0000142a                     @ 080acbec 2a140000
 
@@ -6959,7 +6959,7 @@ LAB_080acc1a:
     pop {r4,r5}                              @ 080acc1c 30bc
     pop {r1}                                 @ 080acc1e 02bc
     bx r1                                    @ 080acc20 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acc24:
     .word  0x0000132c                     @ 080acc24 2c130000
 PTR_gP1LifePoints_080acc28:
@@ -7014,7 +7014,7 @@ LAB_080acc74:
     b LAB_080acd82                           @ 080acc7e 80e0
 LAB_080acc80:
     b LAB_080accb0                           @ 080acc80 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acc84:
     .word  0x00001729                     @ 080acc84 29170000
 LAB_080acc88:
@@ -7026,7 +7026,7 @@ LAB_080acc90:
     cmp r4,r0                                @ 080acc90 8442
     blt LAB_080accb0                         @ 080acc92 0ddb
     b LAB_080acd82                           @ 080acc94 75e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acc98:
     .word  0x00001986                     @ 080acc98 86190000
 LAB_080acc9c:
@@ -7082,7 +7082,7 @@ LAB_080accf0:
     bgt LAB_080acd04                         @ 080accf8 04dc
     subs r0,#0x3b    @ 080accfa 3b38
     b LAB_080acd36                           @ 080accfc 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acd00:
     .word  0x00001281                     @ 080acd00 81120000
 LAB_080acd04:
@@ -7091,7 +7091,7 @@ LAB_080acd04:
     beq LAB_080acd82                         @ 080acd08 3bd0
     adds r0,#0x2c    @ 080acd0a 2c30
     b LAB_080acd36                           @ 080acd0c 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acd10:
     .word  0x000012be                     @ 080acd10 be120000
 LAB_080acd14:
@@ -7108,7 +7108,7 @@ LAB_080acd14:
     bge LAB_080acd82                         @ 080acd28 2bda
     subs r0,#0x2    @ 080acd2a 0238
     b LAB_080acd36                           @ 080acd2c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acd30:
     .word  0x0000131b                     @ 080acd30 1b130000
 LAB_080acd34:
@@ -7144,7 +7144,7 @@ LAB_080acd60:
     cmp r4,r0                                @ 080acd68 8442
     beq LAB_080acd8c                         @ 080acd6a 0fd0
     b LAB_080acd98                           @ 080acd6c 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acd70:
     .word  0x000014f0                     @ 080acd70 f0140000
 DAT_080acd74:
@@ -7208,7 +7208,7 @@ LAB_080acdcc:
     b LAB_080ad068                           @ 080acdd6 47e1
 LAB_080acdd8:
     b LAB_080ad264                           @ 080acdd8 44e2
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080acddc:
     .word  gP1LifePoints                  @ 080acddc e0c40102
 DAT_080acde0:
@@ -7276,7 +7276,7 @@ LAB_080ace42:
     b LAB_080ad054                           @ 080ace46 05e1
 LAB_080ace48:
     b LAB_080ad264                           @ 080ace48 0ce2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ace4c:
     .word  0x0000118a                     @ 080ace4c 8a110000
 LAB_080ace50:
@@ -7294,7 +7294,7 @@ LAB_080ace5e:
     b LAB_080ad010                           @ 080ace62 d5e0
 LAB_080ace64:
     b LAB_080ad264                           @ 080ace64 fee1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ace68:
     .word  0x00001221                     @ 080ace68 21120000
 LAB_080ace6c:
@@ -7342,7 +7342,7 @@ LAB_080aceac:
     b LAB_080ad088                           @ 080aceb2 e9e0
 LAB_080aceb4:
     b LAB_080ad264                           @ 080aceb4 d6e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080aceb8:
     .word  0x000014cb                     @ 080aceb8 cb140000
 LAB_080acebc:
@@ -7372,7 +7372,7 @@ LAB_080acede:
     b LAB_080ad022                           @ 080acee2 9ee0
 LAB_080acee4:
     b LAB_080ad264                           @ 080acee4 bee1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acee8:
     .word  0x00001706                     @ 080acee8 06170000
 LAB_080aceec:
@@ -7396,7 +7396,7 @@ LAB_080acf00:
     b LAB_080ad0d0                           @ 080acf0a e1e0
 LAB_080acf0c:
     b LAB_080ad264                           @ 080acf0c aae1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acf10:
     .word  0x000018f6                     @ 080acf10 f6180000
 DAT_080acf14:
@@ -7413,7 +7413,7 @@ LAB_080acf20:
     b LAB_080ad0ac                           @ 080acf26 c1e0
 LAB_080acf28:
     b LAB_080ad264                           @ 080acf28 9ce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acf2c:
     .word  0x0000185d                     @ 080acf2c 5d180000
 LAB_080acf30:
@@ -7430,7 +7430,7 @@ LAB_080acf38:
     b LAB_080ad1d2                           @ 080acf42 46e1
 LAB_080acf44:
     b LAB_080ad264                           @ 080acf44 8ee1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acf48:
     .word  0x00001914                     @ 080acf48 14190000
 LAB_080acf4c:
@@ -7445,7 +7445,7 @@ LAB_080acf54:
     b LAB_080ad222                           @ 080acf5a 62e1
 LAB_080acf5c:
     b LAB_080ad264                           @ 080acf5c 82e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acf60:
     .word  0x00001918                     @ 080acf60 18190000
 LAB_080acf64:
@@ -7458,7 +7458,7 @@ LAB_080acf64:
     b LAB_080ad21e                           @ 080acf72 54e1
 LAB_080acf74:
     b LAB_080ad21c                           @ 080acf74 52e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acf78:
     .word  0x000012c5                     @ 080acf78 c5120000
 LAB_080acf7c:
@@ -7492,7 +7492,7 @@ LAB_080acf92:
     adds r0,r5,#0x0    @ 080acfb4 281c
     adds r1,r6,#0x0    @ 080acfb6 311c
     b LAB_080ad03e                           @ 080acfb8 41e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080acfbc:
     .word  0x00001102                     @ 080acfbc 02110000
 LAB_080acfc0:
@@ -7568,7 +7568,7 @@ LAB_080ad03e:
 LAB_080ad04a:
     adds r0,r7,#0x0    @ 080ad04a 381c
     b LAB_080ad266                           @ 080ad04c 0be1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad050:
     .word  0x000010f4                     @ 080ad050 f4100000
 LAB_080ad054:
@@ -7596,7 +7596,7 @@ LAB_080ad070:
     b LAB_080ad21e                           @ 080ad07e cee0
 LAB_080ad080:
     b LAB_080ad21c                           @ 080ad080 cce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad084:
     .word  0x0000146f                     @ 080ad084 6f140000
 LAB_080ad088:
@@ -7777,7 +7777,7 @@ LAB_080ad1d2:
     cmp r0,#0x0                              @ 080ad1dc 0028
     bne LAB_080ad21e                         @ 080ad1de 1ed1
     b LAB_080ad21c                           @ 080ad1e0 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad1e4:
     .word  0x000012e5                     @ 080ad1e4 e5120000
 LAB_080ad1e8:
@@ -7798,7 +7798,7 @@ LAB_080ad200:
 LAB_080ad206:
     adds r0,r5,#0x0    @ 080ad206 281c
     b LAB_080ad266                           @ 080ad208 2de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad20c:
     .word  0x00001784                     @ 080ad20c 84170000
 LAB_080ad210:
@@ -7840,7 +7840,7 @@ LAB_080ad254:
 LAB_080ad256:
     adds r0,r4,#0x0    @ 080ad256 201c
     b LAB_080ad266                           @ 080ad258 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad25c:
     .word  0x000019b5                     @ 080ad25c b5190000
 DAT_080ad260:
@@ -7904,7 +7904,7 @@ LAB_080ad2c0:
     beq LAB_080ad330                         @ 080ad2c4 34d0
     ldr r0, DAT_080ad2d0                     @ 080ad2c6 0248
     b LAB_080ad31a                           @ 080ad2c8 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad2cc:
     .word  0x000011e4                     @ 080ad2cc e4110000
 DAT_080ad2d0:
@@ -7923,7 +7923,7 @@ LAB_080ad2d4:
     bgt LAB_080ad2f4                         @ 080ad2e8 04dc
     subs r0,#0x2    @ 080ad2ea 0238
     b LAB_080ad31a                           @ 080ad2ec 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad2f0:
     .word  0x0000133f                     @ 080ad2f0 3f130000
 LAB_080ad2f4:
@@ -7934,7 +7934,7 @@ LAB_080ad2f4:
     cmp r1,r0                                @ 080ad2fc 8142
     blt LAB_080ad33c                         @ 080ad2fe 1ddb
     b LAB_080ad330                           @ 080ad300 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad304:
     .word  0x0000133c                     @ 080ad304 3c130000
 LAB_080ad308:
@@ -8001,7 +8001,7 @@ LAB_080ad35c:
     beq LAB_080ad442                         @ 080ad36c 69d0
     adds r0,#0x2    @ 080ad36e 0230
     b LAB_080ad430                           @ 080ad370 5ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad374:
     .word  0x000014f6                     @ 080ad374 f6140000
 DAT_080ad378:
@@ -8029,7 +8029,7 @@ LAB_080ad384:
     cmp r1,r0                                @ 080ad3a0 8142
     blt LAB_080ad44c                         @ 080ad3a2 53db
     b LAB_080ad442                           @ 080ad3a4 4de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad3a8:
     .word  0x000013c7                     @ 080ad3a8 c7130000
 LAB_080ad3ac:
@@ -8040,7 +8040,7 @@ LAB_080ad3ac:
     bgt LAB_080ad3c0                         @ 080ad3b4 04dc
     subs r0,#0x32    @ 080ad3b6 3238
     b LAB_080ad430                           @ 080ad3b8 3ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad3bc:
     .word  0x000014dd                     @ 080ad3bc dd140000
 LAB_080ad3c0:
@@ -8075,7 +8075,7 @@ LAB_080ad3ec:
     bgt LAB_080ad404                         @ 080ad3f4 06dc
     ldr r0, DAT_080ad400                     @ 080ad3f6 0248
     b LAB_080ad430                           @ 080ad3f8 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad3fc:
     .word  0x000017c3                     @ 080ad3fc c3170000
 DAT_080ad400:
@@ -8109,7 +8109,7 @@ LAB_080ad430:
     cmp r1,r0                                @ 080ad430 8142
     beq LAB_080ad442                         @ 080ad432 06d0
     b LAB_080ad44c                           @ 080ad434 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad438:
     .word  0x0000196a                     @ 080ad438 6a190000
 LAB_080ad43c:
@@ -8119,7 +8119,7 @@ LAB_080ad43c:
 LAB_080ad442:
     movs r0,#0x1    @ 080ad442 0120
     b LAB_080ad44e                           @ 080ad444 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad448:
     .word  0x000019c5                     @ 080ad448 c5190000
 LAB_080ad44c:
@@ -8194,7 +8194,7 @@ resolve_equip_target_slot_for_player:
     pop {r4,r5}                              @ 080ad4c0 30bc
     pop {r1}                                 @ 080ad4c2 02bc
     bx r1                                    @ 080ad4c4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080ad510/FUN_080ad4ac 调用 (indeg>=2), 是装备目标槽位选择的核心分派器. 入口 r0=player_id, r1=slot_bitmap (caller-set). 首先以 (1-player_id) 作为主玩家, 调用 FUN_080b5348 (装备目标随机候选选择器, mode=0 对手侧); 若返回 >=0 则将结果编码为 (1-player)<<24|result 返回; 否则调用 FUN_080b55ac (mode=1, 本方侧) 选择; 若仍失败返回 -1. 返回值高字节=player_id, 低字节=slot_idx (或 -1 失败). Side effects: 通过 FUN_080b5348/FUN_080b55ac 的副作用传播. Constants: opponent_first=1-player, FAIL=-1.
 select_equip_target_slot_by_bitmap:
@@ -8235,7 +8235,7 @@ LAB_080ad508:
     pop {r4,r5}                              @ 080ad508 30bc
     pop {r1}                                 @ 080ad50a 02bc
     bx r1                                    @ 080ad50c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080ad720 (装备目标迭代主循环) 调用 (indeg=1). 入口 r0=player_id, r1=equip_slot_idx, r2=exclude_bitmap_ptr, r3=count; 非 APCS r9=equip_card_slot (caller-set). 首先调用 build_equip_eligible_slot_bitmap 得到 eligible_bitmap; 若 count>0 则从 sp[0x40] 读取排除列表, 从 bitmap 中清除已排除槽位; 随后两路: 先以 mode=0 调用 select_equip_target_slot_by_bitmap (FUN_080ad4c8), 若未找到则以 mode=1 调用 FUN_080ad608 (对称 alt); 若两路均失败返回 -1; 成功后调用 eval_slot_score_entry_full 获取得分, 检查特定卡牌 ID (0x1654/0x1388/0x1688) 做得分修正, 最终返回编码目标槽位或 -1. Side effects: 通过 eval_slot_score_entry_full 写 score_out. Constants: CARD_IDS=[0x1654, 0x1388, 0x1688], FAIL=-1.
 eval_equip_target_slot_with_score:
@@ -8340,7 +8340,7 @@ LAB_080ad5bc:
 LAB_080ad5ce:
     adds r0,r4,#0x0    @ 080ad5ce 201c
     b LAB_080ad5dc                           @ 080ad5d0 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad5d4:
     .word  0x00001688                     @ 080ad5d4 88160000
 LAB_080ad5d8:
@@ -8354,7 +8354,7 @@ LAB_080ad5dc:
     pop {r4,r5,r6,r7}                        @ 080ad5e4 f0bc
     pop {r1}                                 @ 080ad5e6 02bc
     bx r1                                    @ 080ad5e8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip target slot selection: first calls build_equip_eligible_slot_bitmap to build player-side available slot bitmap, then calls select_equip_target_slot_by_bitmap_alt to randomly or sequentially pick the final target slot. indeg=0; inferred as internal tool or called via fn-ptr (no THUMB ptr 0x080ad5ed found in asm/all.s). r0=player_id, r1=card_id (equip spell). Return value forwarded from select_equip_target_slot_by_bitmap_alt: -1=no slot available, >=0: bits[31:24]=player, bits[7:0]=slot_idx.
 @ Constants: FAIL=-1.
@@ -8370,7 +8370,7 @@ select_equip_target_slot_by_bitmap_for_player:
     pop {r4,r5}                              @ 080ad600 30bc
     pop {r1}                                 @ 080ad602 02bc
     bx r1                                    @ 080ad604 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080ad510/FUN_080ad5ec 调用 (indeg>=2), 是 select_equip_target_slot_by_bitmap (0x080ad4c8) 的对称变体. 两者结构完全一致, 唯一差异: mode 参数传给 FUN_080b55ac 时本函数使用 r2=0 而 0x080ad4c8 使用 r2=1. 同样先以对手侧 (1-player) 调用 FUN_080b5348 (mode=0), 成功则编码返回; 失败则以本方侧调用 FUN_080b55ac (mode=0). 返回格式与 select_equip_target_slot_by_bitmap 相同: -1=失败, >=0: bits[31:24]=player, bits[7:0]=slot_idx. Side effects: 通过 FUN_080b5348/FUN_080b55ac 读取 PRNG. Constants: mode=0 (both calls), FAIL=-1.
 select_equip_target_slot_by_bitmap_alt:
@@ -8411,7 +8411,7 @@ LAB_080ad648:
     pop {r4,r5}                              @ 080ad648 30bc
     pop {r1}                                 @ 080ad64a 02bc
     bx r1                                    @ 080ad64c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080ad720/FUN_080bbde8 调用 (indeg>=2), 为 AI 装备放置决策评分. 入口 r0=player_id, r1=equip_slot_idx, 非 APCS r8=card_id (caller 通过 .hword 0x4690 注入). 首先从 gP1LifePoints+player*4+0x87*0x20 读 slot hword, 提取 icid (bits[12:0]); 调用 eval_equip_bonus_for_slot 获取装备加成 r7; 随后对特定卡牌 ID (0x1725/0x1386..0x1388/0x16ec/0x1729/0x1986) 做二分查找: 命中则返回 3 (高优先级); 未命中则检查 equip_bonus: bonus<=4 返回 0; bonus>4 调用 eval_card_placement_flags_for_ai, 根据 flags bit6/bit4 和 card_id=0x1864 做修正返回 0/1/2. Side effects: 无外部写入. Constants: SCORE_HIGH=3, SCORE_MED=2, SCORE_LOW=1, SCORE_SKIP=0, bonus_threshold=4, LP_stride=0x868, CARD_IDS=[0x1725,0x1386,0x1388,0x16ec,0x1729,0x1986,0x1864].
 score_equip_slot_placement_for_ai:
@@ -8449,7 +8449,7 @@ score_equip_slot_placement_for_ai:
     cmp r4,r0                                @ 080ad690 8442
     beq LAB_080ad6be                         @ 080ad692 14d0
     b LAB_080ad6cc                           @ 080ad694 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ad698:
     .word  gP1LifePoints                  @ 080ad698 e0c40102
 DAT_080ad69c:
@@ -8473,7 +8473,7 @@ LAB_080ad6a8:
 LAB_080ad6be:
     movs r0,#0x3    @ 080ad6be 0320
     b LAB_080ad716                           @ 080ad6c0 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad6c4:
     .word  0x00001729                     @ 080ad6c4 29170000
 DAT_080ad6c8:
@@ -8511,7 +8511,7 @@ LAB_080ad6f8:
 LAB_080ad702:
     adds r0,r1,#0x0    @ 080ad702 081c
     b LAB_080ad716                           @ 080ad704 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad708:
     .word  0x00001864                     @ 080ad708 64180000
 LAB_080ad70c:
@@ -8570,7 +8570,7 @@ LAB_080ad754:
     bne LAB_080ad778                         @ 080ad76c 04d1
     movs r0,#0x0    @ 080ad76e 0020
     b LAB_080ad784                           @ 080ad770 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ad774:
     .word  gP1LifePoints                  @ 080ad774 e0c40102
 LAB_080ad778:
@@ -8589,7 +8589,7 @@ LAB_080ad784:
     pop {r4,r5,r6,r7}                        @ 080ad78c f0bc
     pop {r1}                                 @ 080ad78e 02bc
     bx r1                                    @ 080ad790 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check if effect zone or monster pair slot is available for specified player side. Called by FUN_080b777c which extracts player_id=struct[+2] bit0 (indeg=1). Logic: (1) call count_available_effect_zones(opponent, card_id=0x1256, mode=-1); if available (>0) return 0; (2) call count_available_effect_zones(player, card_id=0x144d, mode=-1); if available return 2; (3) call count_valid_monster_pair_slots + count_zone_card_pair_allowed_for_card; if sum>0 return 0 (slot exists), ==0 return 1 (no slot). No side effects.
 @ Constants: CARD_TYPE_A=0x1256, CARD_TYPE_B=0x144d, MODE_ANY=-1.
@@ -8672,7 +8672,7 @@ LAB_080ad818:
     bne LAB_080ad830                         @ 080ad820 06d1
     adds r0,r2,#0x0    @ 080ad822 101c
     b LAB_080ad83c                           @ 080ad824 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ad828:
     .word  gP1LifePoints                  @ 080ad828 e0c40102
 DWORD_080ad82c:
@@ -8689,7 +8689,7 @@ LAB_080ad83c:
     pop {r4}                                 @ 080ad83c 10bc
     pop {r1}                                 @ 080ad83e 02bc
     bx r1                                    @ 080ad840 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Symmetric variant of find_monster_slot_by_card_id_in_player_zone (0x080ad7f0). Difference: reads count from +0x18 (not +0xc) and array base offset is 0x3a0 (=0xe8<<2) instead of 0x120. Inferred to be a different array field in the same player zone (effect or equip chain). r0=player_id, r1=card_id_packed (low 16 bits). Returns first matching slot_idx or -1. indeg=0, no THUMB fn-ptr reference.
 @ Constants: gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, COUNT_OFFSET=0x18, ARRAY_OFFSET=0x3a0 (=0xe8<<2).
@@ -8722,7 +8722,7 @@ LAB_080ad86c:
     bne LAB_080ad884                         @ 080ad874 06d1
     adds r0,r2,#0x0    @ 080ad876 101c
     b LAB_080ad890                           @ 080ad878 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ad87c:
     .word  gP1LifePoints                  @ 080ad87c e0c40102
 DWORD_080ad880:
@@ -8739,7 +8739,7 @@ LAB_080ad890:
     pop {r4}                                 @ 080ad890 10bc
     pop {r1}                                 @ 080ad892 02bc
     bx r1                                    @ 080ad894 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 以 r0=card_id 执行多分支 BST 检查, 返回放置许可状态. 路径 A: r0=((r2!=0)?1:0); 路径 B: 固定返回 1 (允许); 路径 C: 固定返回 0 (不允许); 路径 D: 依赖 r1 是否非零. BST card_id 范围 0x11bc..0x19fe (大量特定怪物卡). 被 scan_hand_for_best_equip_target_slot 用于筛选手牌可放置卡牌. Constants: BST range 0x11bc..0x19fe; return 0=forbidden, 1=allowed.
 check_card_id_placement_allowed:
@@ -8762,7 +8762,7 @@ check_card_id_placement_allowed:
     bgt LAB_080ad8cc                         @ 080ad8b8 08dc
     subs r0,#0x47    @ 080ad8ba 4738
     b LAB_080ad914                           @ 080ad8bc 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad8c0:
     .word  0x00001794                     @ 080ad8c0 94170000
 DAT_080ad8c4:
@@ -8782,7 +8782,7 @@ LAB_080ad8d4:
     bgt LAB_080ad8ec                         @ 080ad8dc 06dc
     ldr r0, DAT_080ad8e8                     @ 080ad8de 0248
     b LAB_080ad94a                           @ 080ad8e0 33e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad8e4:
     .word  0x00001653                     @ 080ad8e4 53160000
 DAT_080ad8e8:
@@ -8793,7 +8793,7 @@ LAB_080ad8ec:
     beq LAB_080ad954                         @ 080ad8f0 30d0
     adds r0,#0xa4    @ 080ad8f2 a430
     b LAB_080ad94a                           @ 080ad8f4 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad8f8:
     .word  0x00001655                     @ 080ad8f8 55160000
 LAB_080ad8fc:
@@ -8813,7 +8813,7 @@ LAB_080ad914:
     cmp r3,r0                                @ 080ad914 8342
     beq LAB_080ad954                         @ 080ad916 1dd0
     b LAB_080ad970                           @ 080ad918 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad91c:
     .word  0x00001966                     @ 080ad91c 66190000
 DAT_080ad920:
@@ -8924,7 +8924,7 @@ LAB_080ad9c8:
     b LAB_080adb74                           @ 080ad9d2 cfe0
 LAB_080ad9d4:
     b LAB_080ade20                           @ 080ad9d4 24e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad9d8:
     .word  0x0201afe0                     @ 080ad9d8 e0af0102
 DAT_080ad9dc:
@@ -8945,7 +8945,7 @@ LAB_080ad9f0:
     b LAB_080adb84                           @ 080ad9f6 c5e0
 LAB_080ad9f8:
     b LAB_080ade20                           @ 080ad9f8 12e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ad9fc:
     .word  0x00001293                     @ 080ad9fc 93120000
 LAB_080ada00:
@@ -8964,7 +8964,7 @@ LAB_080ada0e:
 LAB_080ada16:
     adds r0,#0x7    @ 080ada16 0730
     b LAB_080adb4e                           @ 080ada18 99e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ada1c:
     .word  0x0000133f                     @ 080ada1c 3f130000
 LAB_080ada20:
@@ -9058,7 +9058,7 @@ LAB_080adaa8:
     b LAB_080adcac                           @ 080adab2 fbe0
 LAB_080adab4:
     b LAB_080ade20                           @ 080adab4 b4e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adab8:
     .word  0x00001867                     @ 080adab8 67180000
 LAB_080adabc:
@@ -9086,7 +9086,7 @@ LAB_080adad8:
     b LAB_080ade20                           @ 080adade 9fe1
 LAB_080adae0:
     b LAB_080adcf8                           @ 080adae0 0ae1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adae4:
     .word  0x00001826                     @ 080adae4 26180000
 LAB_080adae8:
@@ -9102,7 +9102,7 @@ LAB_080adaf2:
     b LAB_080add12                           @ 080adaf6 0ce1
 LAB_080adaf8:
     b LAB_080ade20                           @ 080adaf8 92e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adafc:
     .word  0x0000183d                     @ 080adafc 3d180000
 LAB_080adb00:
@@ -9159,7 +9159,7 @@ LAB_080adb4e:
     b LAB_080adcf8                           @ 080adb52 d1e0
 LAB_080adb54:
     b LAB_080ade20                           @ 080adb54 64e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adb58:
     .word  0x000019cb                     @ 080adb58 cb190000
 LAB_080adb5c:
@@ -9174,7 +9174,7 @@ LAB_080adb64:
     b LAB_080ade20                           @ 080adb6a 59e1
 LAB_080adb6c:
     b LAB_080add12                           @ 080adb6c d1e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adb70:
     .word  0x000019d4                     @ 080adb70 d4190000
 LAB_080adb74:
@@ -9303,7 +9303,7 @@ LAB_080adc40:
     b LAB_080ade20                           @ 080adc5e dfe0
 LAB_080adc60:
     b LAB_080adde4                           @ 080adc60 c0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adc64:
     .word  0x0201bb90                     @ 080adc64 90bb0102
 DAT_080adc68:
@@ -9324,7 +9324,7 @@ LAB_080adc80:
 LAB_080adc82:
     adds r0,r3,#0x0    @ 080adc82 181c
     b LAB_080ade22                           @ 080adc84 cde0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080adc88:
     .word  gP1LifePoints                  @ 080adc88 e0c40102
 DAT_080adc8c:
@@ -9550,7 +9550,7 @@ LAB_080ade22:
     pop {r4,r5,r6,r7}                        @ 080ade2c f0bc
     pop {r1}                                 @ 080ade2e 02bc
     bx r1                                    @ 080ade30 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Boolean wrapper around read_slot_palette_index. Returns 1 if palette_index > 0 (slot occupied/active), 0 if empty. r0=u32 slot_index [0..N-1]. Returns u32 is_active [0..1]. Callers: find_first_empty_slot_for_card_type, find_random_empty_slot_excluding_card_id, find_slot_by_card_type_and_player, FUN_080ae050.
 check_slot_palette_nonzero:
@@ -9586,7 +9586,7 @@ LAB_080ade50:
     bne LAB_080ade74                         @ 080ade68 04d1
     adds r0,r4,#0x0    @ 080ade6a 201c
     b LAB_080ade82                           @ 080ade6c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ade70:
     .word  0x0201e500                     @ 080ade70 00e50102
 LAB_080ade74:
@@ -9654,7 +9654,7 @@ LAB_080aded2:
     cmp r4,r0                                @ 080adee0 8442
     bcc LAB_080aded2                         @ 080adee2 f6d3
     b LAB_080adf2e                           @ 080adee4 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adee8:
     .word  0x0201e4f0                     @ 080adee8 f0e40102
 DAT_080adeec:
@@ -9762,7 +9762,7 @@ check_special_card_activation_eligible:
     cmp r2,r0                                @ 080adf9c 8242
     beq LAB_080ae02c                         @ 080adf9e 45d0
     b LAB_080ae048                           @ 080adfa0 52e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adfa4:
     .word  0x00001366                     @ 080adfa4 66130000
 LAB_080adfa8:
@@ -9788,7 +9788,7 @@ LAB_080adfb4:
     cmp r1,r0                                @ 080adfcc 8142
     beq LAB_080adff4                         @ 080adfce 11d0
     b LAB_080ae048                           @ 080adfd0 3ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080adfd4:
     .word  0x0000137d                     @ 080adfd4 7d130000
 DAT_080adfd8:
@@ -9832,7 +9832,7 @@ LAB_080ae004:
 LAB_080ae022:
     adds r0,r5,#0x0    @ 080ae022 281c
     b LAB_080ae04a                           @ 080ae024 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae028:
     .word  0x00001784                     @ 080ae028 84170000
 LAB_080ae02c:
@@ -9949,7 +9949,7 @@ LAB_080ae0f8:
     beq LAB_080ae172                         @ 080ae100 37d0
     ldr r0, DAT_080ae130                     @ 080ae102 0b48
     b LAB_080ae15a                           @ 080ae104 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae108:
     .word  0x0201e4f0                     @ 080ae108 f0e40102
 DAT_080ae10c:
@@ -10040,7 +10040,7 @@ LAB_080ae1b2:
     ldr r0, DAT_080ae1d4                     @ 080ae1b2 0848
     bl find_first_empty_slot_for_card_type   @ 080ae1b4 fff748fe
     b LAB_080ae226                           @ 080ae1b8 35e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae1bc:
     .word  0x0000137d                     @ 080ae1bc 7d130000
 DAT_080ae1c0:
@@ -10181,7 +10181,7 @@ LAB_080ae2c2:
     b LAB_080ae552                           @ 080ae2c6 44e1
 LAB_080ae2c8:
     b LAB_080aea5a                           @ 080ae2c8 c7e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae2cc:
     .word  0x0000114a                     @ 080ae2cc 4a110000
 LAB_080ae2d0:
@@ -10203,7 +10203,7 @@ LAB_080ae2e4:
     b LAB_080ae694                           @ 080ae2ea d3e1
 LAB_080ae2ec:
     b LAB_080aea5a                           @ 080ae2ec b5e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae2f0:
     .word  0x00001333                     @ 080ae2f0 33130000
 LAB_080ae2f4:
@@ -10218,7 +10218,7 @@ LAB_080ae2fc:
     b LAB_080ae638                           @ 080ae302 99e1
 LAB_080ae304:
     b LAB_080aea5a                           @ 080ae304 a9e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae308:
     .word  0x00001335                     @ 080ae308 35130000
 LAB_080ae30c:
@@ -10247,7 +10247,7 @@ LAB_080ae32c:
     b LAB_080aea5a                           @ 080ae332 92e3
 LAB_080ae334:
     b LAB_080ae91c                           @ 080ae334 f2e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae338:
     .word  0x00001366                     @ 080ae338 66130000
 LAB_080ae33c:
@@ -10262,7 +10262,7 @@ LAB_080ae344:
     b LAB_080ae4c4                           @ 080ae34a bbe0
 LAB_080ae34c:
     b LAB_080aea5a                           @ 080ae34c 85e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae350:
     .word  0x00001362                     @ 080ae350 62130000
 LAB_080ae354:
@@ -10284,7 +10284,7 @@ LAB_080ae368:
     b LAB_080ae480                           @ 080ae36e 87e0
 LAB_080ae370:
     b LAB_080aea5a                           @ 080ae370 73e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae374:
     .word  0x000013ed                     @ 080ae374 ed130000
 LAB_080ae378:
@@ -10299,7 +10299,7 @@ LAB_080ae380:
     b LAB_080ae846                           @ 080ae386 5ee2
 LAB_080ae388:
     b LAB_080aea5a                           @ 080ae388 67e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae38c:
     .word  0x00001466                     @ 080ae38c 66140000
 LAB_080ae390:
@@ -10330,7 +10330,7 @@ LAB_080ae3b0:
     b LAB_080ae59c                           @ 080ae3ba efe0
 LAB_080ae3bc:
     b LAB_080aea5a                           @ 080ae3bc 4de3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae3c0:
     .word  0x00001638                     @ 080ae3c0 38160000
 DAT_080ae3c4:
@@ -10364,7 +10364,7 @@ LAB_080ae3ec:
     b LAB_080ae810                           @ 080ae3f2 0de2
 LAB_080ae3f4:
     b LAB_080aea5a                           @ 080ae3f4 31e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae3f8:
     .word  0x00001590                     @ 080ae3f8 90150000
 LAB_080ae3fc:
@@ -10379,7 +10379,7 @@ LAB_080ae404:
     b LAB_080ae8ec                           @ 080ae40a 6fe2
 LAB_080ae40c:
     b LAB_080aea5a                           @ 080ae40c 25e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae410:
     .word  0x0000159c                     @ 080ae410 9c150000
 LAB_080ae414:
@@ -10400,7 +10400,7 @@ LAB_080ae42a:
     bgt LAB_080ae438                         @ 080ae42c 04dc
     subs r0,#0xa1    @ 080ae42e a138
     b LAB_080ae43a                           @ 080ae430 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae434:
     .word  0x000017e6                     @ 080ae434 e6170000
 LAB_080ae438:
@@ -10411,7 +10411,7 @@ LAB_080ae43a:
     b LAB_080aea20                           @ 080ae43e efe2
 LAB_080ae440:
     b LAB_080aea5a                           @ 080ae440 0be3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae444:
     .word  0x00001746                     @ 080ae444 46170000
 LAB_080ae448:
@@ -10445,7 +10445,7 @@ LAB_080ae470:
     b LAB_080ae91c                           @ 080ae476 51e2
 LAB_080ae478:
     b LAB_080aea5a                           @ 080ae478 efe2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae47c:
     .word  0x0000191f                     @ 080ae47c 1f190000
 LAB_080ae480:
@@ -10475,7 +10475,7 @@ LAB_080ae4a8:
     adds r0,r6,#0x0    @ 080ae4aa 301c
     bl find_slot_by_card_type_and_player     @ 080ae4ac fff748fd
     b LAB_080ae9ea                           @ 080ae4b0 9be2
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ae4b4:
     .word  gP1LifePoints                  @ 080ae4b4 e0c40102
 DAT_080ae4b8:
@@ -10513,7 +10513,7 @@ LAB_080ae4f4:
     adds r0,r6,#0x0    @ 080ae4f6 301c
     bl find_slot_by_card_type_and_player     @ 080ae4f8 fff722fd
     b LAB_080ae9ea                           @ 080ae4fc 75e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae500:
     .word  0x000011d8                     @ 080ae500 d8110000
 DAT_080ae504:
@@ -10527,7 +10527,7 @@ LAB_080ae510:
     adds r0,r6,#0x0    @ 080ae512 301c
     bl find_slot_by_card_type_and_player     @ 080ae514 fff714fd
     b LAB_080ae9ea                           @ 080ae518 67e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae51c:
     .word  0x000018f6                     @ 080ae51c f6180000
 LAB_080ae520:
@@ -10624,7 +10624,7 @@ LAB_080ae5aa:
     adds r0,r6,#0x0    @ 080ae5d2 301c
     bl get_card_extended_stat_field3         @ 080ae5d4 40f07efc
     b LAB_080ae5e6                           @ 080ae5d8 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae5dc:
     .word  0x0201e500                     @ 080ae5dc 00e50102
 LAB_080ae5e0:
@@ -10676,7 +10676,7 @@ LAB_080ae62c:
     movs r0,#0x1    @ 080ae62c 0120
     rsbs r0,r0,#0    @ 080ae62e 4042
     b exit_slot_search_with_result           @ 080ae630 23e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae634:
     .word  0x0201e500                     @ 080ae634 00e50102
 LAB_080ae638:
@@ -10723,7 +10723,7 @@ LAB_080ae678:
 LAB_080ae686:
     ldr r0, DAT_080ae690                     @ 080ae686 0248
     b LAB_080ae9e6                           @ 080ae688 ade1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae68c:
     .word  0x00000fe5                     @ 080ae68c e50f0000
 DAT_080ae690:
@@ -10753,7 +10753,7 @@ LAB_080ae6a6:
     adds r1,r1,r2    @ 080ae6c0 8918
     .hword 0x4688    @ 080ae6c2 8846
     b LAB_080ae6d4                           @ 080ae6c4 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ae6c8:
     .word  gP1LifePoints                  @ 080ae6c8 e0c40102
 DAT_080ae6cc:
@@ -10820,7 +10820,7 @@ LAB_080ae73c:
     adds r0,r6,#0x0    @ 080ae73e 301c
     bl find_slot_by_card_type_and_player     @ 080ae740 fff7fefb
     b LAB_080ae9ea                           @ 080ae744 51e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae748:
     .word  0x00001409                     @ 080ae748 09140000
 DAT_080ae74c:
@@ -10867,7 +10867,7 @@ LAB_080ae79c:
     adds r0,r6,#0x0    @ 080ae79e 301c
     bl find_slot_by_card_type_and_player     @ 080ae7a0 fff7cefb
     b LAB_080ae9ea                           @ 080ae7a4 21e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae7a8:
     .word  0x00001468                     @ 080ae7a8 68140000
 DAT_080ae7ac:
@@ -10909,7 +10909,7 @@ LAB_080ae7f0:
     adds r0,r6,#0x0    @ 080ae7f2 301c
     bl find_slot_by_card_type_and_player     @ 080ae7f4 fff7a4fb
     b LAB_080ae9ea                           @ 080ae7f8 f7e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae7fc:
     .word  0x00001386                     @ 080ae7fc 86130000
 DAT_080ae800:
@@ -10938,7 +10938,7 @@ LAB_080ae82c:
     adds r1,r4,#0x0    @ 080ae82e 211c
     bl find_slot_by_card_type_and_player     @ 080ae830 fff786fb
     b LAB_080ae9ea                           @ 080ae834 d9e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae838:
     .word  0x000012be                     @ 080ae838 be120000
 LAB_080ae83c:
@@ -10996,7 +10996,7 @@ LAB_080ae898:
 LAB_080ae8a6:
     ldr r0, DAT_080ae8c8                     @ 080ae8a6 0848
     b LAB_080ae9e6                           @ 080ae8a8 9de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae8ac:
     .word  0x00000fb7                     @ 080ae8ac b70f0000
 DAT_080ae8b0:
@@ -11025,7 +11025,7 @@ LAB_080ae8cc:
 LAB_080ae8de:
     ldr r0, DAT_080ae8e8                     @ 080ae8de 0248
     b LAB_080ae9e6                           @ 080ae8e0 81e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae8e4:
     .word  0x00001357                     @ 080ae8e4 57130000
 DAT_080ae8e8:
@@ -11040,7 +11040,7 @@ LAB_080ae8ec:
 LAB_080ae8fa:
     ldr r0, DAT_080ae900                     @ 080ae8fa 0148
     b LAB_080ae9e6                           @ 080ae8fc 73e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ae900:
     .word  0x00001152                     @ 080ae900 52110000
 LAB_080ae904:
@@ -11164,7 +11164,7 @@ LAB_080ae9ea:
     cmp r5,#0x0                              @ 080ae9ec 002d
     blt LAB_080aea5a                         @ 080ae9ee 34db
     b exit_slot_search_with_result           @ 080ae9f0 43e1
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080ae9f4:
     .word  gP1LifePoints                  @ 080ae9f4 e0c40102
 DAT_080ae9f8:
@@ -11281,7 +11281,7 @@ LAB_080aead2:
     cmp r5,r9                                @ 080aead4 4d45
     blt LAB_080aea96                         @ 080aead6 dedb
     b LAB_080aec2e                           @ 080aead8 a9e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080aeadc:
     .word  0x0201e500                     @ 080aeadc 00e50102
 LAB_080aeae0:
@@ -11514,7 +11514,7 @@ exit_slot_search_with_result:
     pop {r4,r5,r6,r7}                        @ 080aec84 f0bc
     pop {r1}                                 @ 080aec86 02bc
     bx r1                                    @ 080aec88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Activates a single effect slot for one card: calls dispatch_effect_handler_by_card_id; if non-zero writes [0x0201afe0]=card_slot_ptr, calls find_empty_slot_for_card_id_dispatch to get slot r4, then write_effect_ctx_slot_index(r4) + set_tile_palette_index_in_buf(r4,1) + [gP1LifePoints+0x1d40]=1. Triggered by init_effect_slot_display_context for card_type==6 or 0x49. r0=ptr card_slot_ptr; r1=u16 card_id; r2=u32 context_param. Returns s32 slot_index (>=0) or -1. Side effects: [0x0201afe0]=card_slot_ptr; [gP1LifePoints+0x1d40]=1.
 activate_effect_slot_for_card:
@@ -11547,7 +11547,7 @@ activate_effect_slot_for_card:
     str r1,[r0,#0x0]                         @ 080aecc8 0160
     adds r0,r4,#0x0    @ 080aecca 201c
     b LAB_080aecdc                           @ 080aeccc 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080aecd0:
     .word  0x0201afe0                     @ 080aecd0 e0af0102
 PTR_gP1LifePoints_080aecd4:
@@ -11559,7 +11559,7 @@ LAB_080aecdc:
     pop {r4,r5,r6,r7}                        @ 080aecdc f0bc
     pop {r1}                                 @ 080aecde 02bc
     bx r1                                    @ 080aece0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Loops calling find_empty_slot_for_card_id_dispatch (FUN_080ae050) to fill up to max_count effect slots, then calls write_effect_ctx_slot_index + set_tile_palette_index_in_buf for each found slot (palette index = loop counter r4). Triggered by init_effect_slot_display_context (FUN_080941c4) for card effect type [0x7..0x26]. Side effects: [gP1LifePoints+0x1d40]=r4 (final slot count); [0x0201afe0]=card_slot_ptr (via FUN_080ae050). r0=ptr card_slot_ptr; r1=u16 card_id_a; r2=u16 card_id_b; r3=u32 max_count [0..N]. Returns u32 actual_filled_count [0..max_count]. Constants: gP1LifePoints+0x1d40 = effect_slot_count_field.
 fill_effect_slots_up_to_count:
@@ -11653,7 +11653,7 @@ LAB_080aed84:
 LAB_080aed8a:
     movs r4,#0x0    @ 080aed8a 0024
     b LAB_080aeda4                           @ 080aed8c 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080aed90:
     .word  0x0201afe0                     @ 080aed90 e0af0102
 LAB_080aed94:
@@ -11806,7 +11806,7 @@ LAB_080aee8e:
     pop {r4,r5,r6,r7}                        @ 080aeea0 f0bc
     pop {r0}                                 @ 080aeea2 01bc
     bx r0                                    @ 080aeea4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080aeea8:
     .word  0x00000868                     @ 080aeea8 68080000
 DAT_080aeeac:
@@ -11969,7 +11969,7 @@ LAB_080aefa8:
     pop {r4,r5,r6,r7}                        @ 080aefbc f0bc
     pop {r1}                                 @ 080aefbe 02bc
     bx r1                                    @ 080aefc0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Variable slot count zone best-scored slot scan. Called by FUN_080a3130 and FUN_080a33a0 (indeg=2), both duel_field pair activation scoring paths. Takes r0=player_id, r1=zone_base (slot 0 offset), r2=slot_count, r3=diff_flag (selects call path), non-APCS r8=score_threshold (caller-set). Loop r5=[0..slot_count-1]: for each non-empty slot, if sp[0x24]==zone_base call eval_zone_slot_score_for_player_with_activation_guard, else call eval_zone_slot_score_for_player; if score exceeds r8 threshold update r9 (best_idx) and r10 (best_score). Returns best_slot_idx via r0 (from r9). Symmetric with scan_monster_slots_for_best_scored_slot (0x080af070), difference is slot count controlled by r2 parameter.
 @ Constants: gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_STRIDE=0x14.
@@ -12017,7 +12017,7 @@ LAB_080aeff0:
     .hword 0x466a    @ 080af012 6a46
     bl eval_zone_slot_score_for_player_with_activation_guard @ 080af014 fcf77eff
     b LAB_080af02e                           @ 080af018 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080af01c:
     .word  0x00000868                     @ 080af01c 68080000
 DWORD_080af020:
@@ -12294,7 +12294,7 @@ LAB_080af1d0:
     cmp r2,r0                                @ 080af1d8 8242
     beq LAB_080af210                         @ 080af1da 19d0
     b LAB_080af228                           @ 080af1dc 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af1e0:
     .word  0x00001661                     @ 080af1e0 61160000
 DAT_080af1e4:
@@ -12507,7 +12507,7 @@ LAB_080af356:
     pop {r4,r5,r6,r7}                        @ 080af360 f0bc
     pop {r1}                                 @ 080af362 02bc
     bx r1                                    @ 080af364 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af368:
     .word  0x0000150c                     @ 080af368 0c150000
 DAT_080af36c:
@@ -12547,7 +12547,7 @@ LAB_080af39a:
     pop {r4,r5,r6,r7}                        @ 080af3a8 f0bc
     pop {r1}                                 @ 080af3aa 02bc
     bx r1                                    @ 080af3ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by eval_field_spell_equip_activation_candidate (0x080bb9b8, duel_field AI) with r0=player_id, r1=card_id (indeg=1). Checks whether target card_id is dual-field type (get_card_extended_stat_field9==2); if not, returns 0 immediately. If dual-field: takes r0 (player_id) bit0, multiplies by 0x868 and adds field slot base 0x0201c5d8, reads the field slot word's low 13 bits (lsls 0x13 / lsrs 0x13) as resident card icid; XORs it with card_id (eors r1,r4); then computes (r0 OR -r0)>>31 nonzero-test. Returns 1 if resident dual-field card differs from input card_id (owner mismatch or different card already occupying slot), returns 0 if consistent or no conflict. Pure read-only query. Inputs: r0=u8 player_id [0..1], r1=u16 card_id [0..0x1fff]. Returns: r0=u32 bool (0=no conflict or non-dual-field, 1=dual-field slot occupied by different card). Side effects: none. Constants: gDuelFieldSlots_base=0x0201c5d8 (field slot base address), player_stride=0x868 (per-player-side byte stride), icid_bits=13 (lsls/lsrs 0x13 extracts low 13-bit icid), dual_field_type=2 (field9==2 identifies dual-field card type).
 check_dual_field_slot_owner_mismatch:
@@ -12573,7 +12573,7 @@ check_dual_field_slot_owner_mismatch:
     orrs r0,r1    @ 080af3d8 0843
     lsrs r0,r0,#0x1f    @ 080af3da c00f
     b LAB_080af420                           @ 080af3dc 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af3e0:
     .word  0x00000868                     @ 080af3e0 68080000
 DAT_080af3e4:
@@ -12614,7 +12614,7 @@ LAB_080af420:
     pop {r4,r5}                              @ 080af420 30bc
     pop {r1}                                 @ 080af422 02bc
     bx r1                                    @ 080af424 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af428:
     .word  0x00000868                     @ 080af428 68080000
 DAT_080af42c:
@@ -12663,7 +12663,7 @@ LAB_080af472:
     pop {r4,r5,r6,r7}                        @ 080af474 f0bc
     pop {r1}                                 @ 080af476 02bc
     bx r1                                    @ 080af478 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080af47c:
     .word  gP1LifePoints                  @ 080af47c e0c40102
 DWORD_080af480:
@@ -12716,7 +12716,7 @@ LAB_080af4ce:
     pop {r4,r5,r6,r7}                        @ 080af4d0 f0bc
     pop {r1}                                 @ 080af4d2 02bc
     bx r1                                    @ 080af4d4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080af4d8:
     .word  gP1LifePoints                  @ 080af4d8 e0c40102
 DWORD_080af4dc:
@@ -12760,7 +12760,7 @@ LAB_080af512:
     pop {r4,r5,r6}                           @ 080af51c 70bc
     pop {r1}                                 @ 080af51e 02bc
     bx r1                                    @ 080af520 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080af524:
     .word  0x00000868                     @ 080af524 68080000
 DWORD_080af528:
@@ -12803,7 +12803,7 @@ LAB_080af562:
     bgt LAB_080af578                         @ 080af564 08dc
     subs r0,#0x4e    @ 080af566 4e38
     b LAB_080af67c                           @ 080af568 88e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af56c:
     .word  0x000014ac                     @ 080af56c ac140000
 DAT_080af570:
@@ -12864,7 +12864,7 @@ LAB_080af5c4:
     bgt LAB_080af5d8                         @ 080af5cc 04dc
     subs r0,#0x2    @ 080af5ce 0238
     b LAB_080af60a                           @ 080af5d0 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af5d4:
     .word  0x00001468                     @ 080af5d4 68140000
 LAB_080af5d8:
@@ -12873,7 +12873,7 @@ LAB_080af5d8:
     beq LAB_080af696                         @ 080af5dc 5bd0
     adds r0,#0x28    @ 080af5de 2830
     b LAB_080af67c                           @ 080af5e0 4ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af5e4:
     .word  0x0000147c                     @ 080af5e4 7c140000
 LAB_080af5e8:
@@ -12908,7 +12908,7 @@ LAB_080af614:
     bgt LAB_080af628                         @ 080af61c 04dc
     subs r0,#0x56    @ 080af61e 5638
     b LAB_080af67c                           @ 080af620 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af624:
     .word  0x000015ee                     @ 080af624 ee150000
 LAB_080af628:
@@ -12917,7 +12917,7 @@ LAB_080af628:
     beq LAB_080af696                         @ 080af62c 33d0
     adds r0,#0x3    @ 080af62e 0330
     b LAB_080af67c                           @ 080af630 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af634:
     .word  0x00001636                     @ 080af634 36160000
 LAB_080af638:
@@ -12950,7 +12950,7 @@ LAB_080af660:
     bgt LAB_080af674                         @ 080af668 04dc
     subs r0,#0xaf    @ 080af66a af38
     b LAB_080af67c                           @ 080af66c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af670:
     .word  0x00001855                     @ 080af670 55180000
 LAB_080af674:
@@ -12962,7 +12962,7 @@ LAB_080af67c:
     cmp r2,r0                                @ 080af67c 8242
     beq LAB_080af696                         @ 080af67e 0ad0
     b LAB_080af69a                           @ 080af680 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af684:
     .word  0x0000185c                     @ 080af684 5c180000
 DAT_080af688:
@@ -12980,7 +12980,7 @@ LAB_080af69a:
     movs r0,#0x0    @ 080af69a 0020
 LAB_080af69c:
     bx lr                                    @ 080af69c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Counts effect nodes that pass eligibility check. Iterates player's 5 equip effect node slots (slot 0..4); for each active node (bit7=1) calls invoke_effect_node_handler_3arg(callback, player_id, slot_idx) and check_card_id_in_eligible_set; if both pass increments counter r10. Returns count in r0.
 @ r0=callback_ptr saved to stack for loop reuse; r1=player_id stored in r9 to persist across bl calls; r10 initialized to 0 as accumulator.
@@ -13058,7 +13058,7 @@ LAB_080af704:
     pop {r4,r5,r6,r7}                        @ 080af71c f0bc
     pop {r1}                                 @ 080af71e 02bc
     bx r1                                    @ 080af720 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080af724:
     .word  gP1LifePoints                  @ 080af724 e0c40102
 DAT_080af728:
@@ -13136,7 +13136,7 @@ LAB_080af792:
     pop {r4,r5,r6,r7}                        @ 080af7a4 f0bc
     pop {r1}                                 @ 080af7a6 02bc
     bx r1                                    @ 080af7a8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af7ac:
     .word  0x0201c510                     @ 080af7ac 10c50102
 DAT_080af7b0:
@@ -13186,7 +13186,7 @@ LAB_080af7ec:
     bne LAB_080af808                         @ 080af7f4 08d1
     adds r0,r3,#0x0    @ 080af7f6 181c
     b LAB_080af81a                           @ 080af7f8 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af7fc:
     .word  0x00000868                     @ 080af7fc 68080000
 DAT_080af800:
@@ -13338,7 +13338,7 @@ LAB_080af90c:
     pop {r4,r5,r6}                           @ 080af90c 70bc
     pop {r1}                                 @ 080af90e 02bc
     bx r1                                    @ 080af910 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Dual slot availability check for a card. First calls count_valid_monster_pair_slots(player, card_id & 0xffff); if non-zero returns 1. Then calls count_slot_card_pair_allowed_for_card(player, card_id); if non-zero returns 1. Returns 0 if both are zero. r0=u32 player_side [0..1]; r1=u32 card_id_packed (low 16 bits = card_id). Returns u32 any_slot_available [0..1]. Callers: FUN_080ac584, FUN_080acc30, FUN_080ae050, FUN_080bbf38.
 check_any_pair_slot_available_for_card:
@@ -13363,7 +13363,7 @@ LAB_080af938:
     pop {r4,r5}                              @ 080af938 30bc
     pop {r1}                                 @ 080af93a 02bc
     bx r1                                    @ 080af93c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks if specified player side has any available effect zone slot. Reads gP1LifePoints[player_side&1 * 0x868 + 0xc] (zone count); if > 6 returns 1 (full). Otherwise calls count_available_effect_zones(player_side, 0x1387, -1). count > 0 -> return 0 (slot available); count == 0 -> return 1 (no slot). r0=u32 player_side [0..1]. Returns u32: 0=available, 1=no slot. Constants: player_stride=0x868, zone_count_offset=0xc, zone_limit=6, zone_id=0x1387, quota=-1. Callers: FUN_080b499c, FUN_080baed0, FUN_080bb9b8 (duel_field activation eval).
 check_effect_zone_available_for_player:
@@ -13400,7 +13400,7 @@ LAB_080af978:
 LAB_080af97a:
     pop {r1}                                 @ 080af97a 02bc
     bx r1                                    @ 080af97c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
     movs r0,#0x1    @ 080af980 0120
     bx lr                                    @ 080af982 7047
 
@@ -13436,7 +13436,7 @@ LAB_080af9ae:
     pop {r4}                                 @ 080af9b0 10bc
     pop {r1}                                 @ 080af9b2 02bc
     bx r1                                    @ 080af9b4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af9b8:
     .word  0x00000868                     @ 080af9b8 68080000
 DAT_080af9bc:
@@ -13471,7 +13471,7 @@ check_hand_equip_target_available:
     bne LAB_080afa08                         @ 080af9f4 08d1
     movs r0,#0x1    @ 080af9f6 0120
     b LAB_080afa0a                           @ 080af9f8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080af9fc:
     .word  0x080af981                     @ 080af9fc 81f90a08
 DAT_080afa00:
@@ -13519,7 +13519,7 @@ check_hand_equip_target_available_via_field_check:
     bne LAB_080afa58                         @ 080afa44 08d1
     movs r0,#0x1    @ 080afa46 0120
     b LAB_080afa5a                           @ 080afa48 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afa4c:
     .word  0x080af985                     @ 080afa4c 85f90a08
 DAT_080afa50:
@@ -13570,7 +13570,7 @@ check_equip_target_slot_card_eligible_by_id:
     beq LAB_080afb00                         @ 080afaa0 2ed0
     adds r0,#0xbc    @ 080afaa2 bc30
     b LAB_080afae2                           @ 080afaa4 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afaa8:
     .word  0x00000868                     @ 080afaa8 68080000
 DAT_080afaac:
@@ -13591,7 +13591,7 @@ LAB_080afac0:
     b LAB_080afc1c                           @ 080afac6 a9e0
 LAB_080afac8:
     b LAB_080afb00                           @ 080afac8 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afacc:
     .word  0x000017d8                     @ 080afacc d8170000
 LAB_080afad0:
@@ -13618,7 +13618,7 @@ LAB_080afaec:
     cmp r1,r0                                @ 080afaf4 8142
     beq LAB_080afbd8                         @ 080afaf6 6fd0
     b LAB_080afc1c                           @ 080afaf8 90e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afafc:
     .word  0x00001963                     @ 080afafc 63190000
 LAB_080afb00:
@@ -13688,7 +13688,7 @@ LAB_080afb48:
     bgt LAB_080afc12                         @ 080afb78 4bdc
     movs r7,#0x1    @ 080afb7a 0127
     b LAB_080afc12                           @ 080afb7c 49e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afb80:
     .word  0x0201afe0                     @ 080afb80 e0af0102
 LAB_080afb84:
@@ -13769,7 +13769,7 @@ LAB_080afc0c:
 LAB_080afc12:
     adds r0,r7,#0x0    @ 080afc12 381c
     b LAB_080afc1e                           @ 080afc14 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afc18:
     .word  0x0201afe0                     @ 080afc18 e0af0102
 LAB_080afc1c:
@@ -13848,7 +13848,7 @@ LAB_080afc8a:
     pop {r4,r5,r6,r7}                        @ 080afca0 f0bc
     pop {r1}                                 @ 080afca2 02bc
     bx r1                                    @ 080afca4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afca8:
     .word  0x00000868                     @ 080afca8 68080000
 DAT_080afcac:
@@ -13986,7 +13986,7 @@ LAB_080afda4:
     adds r0,r0,r1    @ 080afdb0 4018
     str r0,[r6,#0x18]                        @ 080afdb2 b061
     b LAB_080afdc8                           @ 080afdb4 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afdb8:
     .word  0x0201bb90                     @ 080afdb8 90bb0102
 DAT_080afdbc:
@@ -14055,7 +14055,7 @@ LAB_080afe2c:
     cmp r1,r0                                @ 080afe34 8142
     beq LAB_080afe46                         @ 080afe36 06d0
     b LAB_080afe84                           @ 080afe38 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afe3c:
     .word  0x000016bf                     @ 080afe3c bf160000
 LAB_080afe40:
@@ -14133,7 +14133,7 @@ LAB_080afe84:
     cmp r1,r0                                @ 080afec8 8142
     beq LAB_080afef4                         @ 080afeca 13d0
     b LAB_080aff2a                           @ 080afecc 2de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afed0:
     .word  0x00000868                     @ 080afed0 68080000
 DAT_080afed4:
@@ -14150,7 +14150,7 @@ LAB_080afee0:
     cmp r1,r0                                @ 080afee8 8142
     beq LAB_080afefc                         @ 080afeea 07d0
     b LAB_080aff2a                           @ 080afeec 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080afef0:
     .word  0x00001657                     @ 080afef0 57160000
 LAB_080afef4:
@@ -14433,7 +14433,7 @@ LAB_080b00fe:
     pop {r4,r5,r6,r7}                        @ 080b0108 f0bc
     pop {r0}                                 @ 080b010a 01bc
     bx r0                                    @ 080b010c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b0110:
     .word  gP1LifePoints                  @ 080b0110 e0c40102
 DAT_080b0114:
@@ -14669,7 +14669,7 @@ LAB_080b02aa:
     cmp r4,#0x0                              @ 080b02b4 002c
     bne LAB_080b0390                         @ 080b02b6 6bd1
     b LAB_080b0258                           @ 080b02b8 cee7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b02bc:
     .word  0x0201afe0                     @ 080b02bc e0af0102
 DAT_080b02c0:
@@ -14858,7 +14858,7 @@ LAB_080b03ea:
     .hword 0x4648    @ 080b0414 4846
     adds r1,r5,#0x0    @ 080b0416 291c
     b LAB_080b047a                           @ 080b0418 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b041c:
     .word  0x00000868                     @ 080b041c 68080000
 DAT_080b0420:
@@ -15047,7 +15047,7 @@ LAB_080b0584:
     b LAB_080b0690                           @ 080b058a 81e0
 LAB_080b058c:
     b LAB_080b068e                           @ 080b058c 7fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0590:
     .word  0x000017fe                     @ 080b0590 fe170000
 DAT_080b0594:
@@ -15193,7 +15193,7 @@ LAB_080b0692:
     pop {r4,r5,r6,r7}                        @ 080b069c f0bc
     pop {r1}                                 @ 080b069e 02bc
     bx r1                                    @ 080b06a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b06a4:
     .word  0xffff0000                     @ 080b06a4 0000ffff
 DAT_080b06a8:
@@ -15354,7 +15354,7 @@ LAB_080b07cc:
     bl copy_bytes_by_halfword                @ 080b07d2 44f067fb
     movs r0,#0x1    @ 080b07d6 0120
     b LAB_080b0b52                           @ 080b07d8 bbe1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b07dc:
     .word  0x0201b18c                     @ 080b07dc 8cb10102
 LAB_080b07e0:
@@ -15474,7 +15474,7 @@ LAB_080b08a8:
     b LAB_080b0aac                           @ 080b08ae fde0
 LAB_080b08b0:
     b LAB_080b0ab0                           @ 080b08b0 fee0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b08b4:
     .word  gP1LifePoints                  @ 080b08b4 e0c40102
 DAT_080b08b8:
@@ -15578,7 +15578,7 @@ LAB_080b0950:
 LAB_080b095e:
     subs r0,#0x1f    @ 080b095e 1f38
     b LAB_080b0a3a                           @ 080b0960 6be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0964:
     .word  0x0000172b                     @ 080b0964 2b170000
 LAB_080b0968:
@@ -15592,7 +15592,7 @@ LAB_080b0970:
     ble LAB_080b0a56                         @ 080b0974 6fdd
     adds r0,#0x7    @ 080b0976 0730
     b LAB_080b09ea                           @ 080b0978 37e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b097c:
     .word  0x0000174a                     @ 080b097c 4a170000
 LAB_080b0980:
@@ -15626,7 +15626,7 @@ LAB_080b09ac:
     b LAB_080b0ab0                           @ 080b09b2 7de0
 LAB_080b09b4:
     b LAB_080b0a56                           @ 080b09b4 4fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b09b8:
     .word  0x00001861                     @ 080b09b8 61180000
 LAB_080b09bc:
@@ -15650,7 +15650,7 @@ LAB_080b09d4:
     bgt LAB_080b09e8                         @ 080b09dc 04dc
     subs r0,#0x3    @ 080b09de 0338
     b LAB_080b09ea                           @ 080b09e0 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b09e4:
     .word  0x00001826                     @ 080b09e4 26180000
 LAB_080b09e8:
@@ -15677,7 +15677,7 @@ LAB_080b09f4:
     beq LAB_080b0a56                         @ 080b0a0c 23d0
     adds r0,#0x1a    @ 080b0a0e 1a30
     b LAB_080b0a3a                           @ 080b0a10 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0a14:
     .word  0x00001963                     @ 080b0a14 63190000
 LAB_080b0a18:
@@ -15686,7 +15686,7 @@ LAB_080b0a18:
     beq LAB_080b0a56                         @ 080b0a1c 1bd0
     adds r0,#0xc    @ 080b0a1e 0c30
     b LAB_080b0a3a                           @ 080b0a20 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0a24:
     .word  0x00001943                     @ 080b0a24 43190000
 LAB_080b0a28:
@@ -15718,7 +15718,7 @@ LAB_080b0a44:
 LAB_080b0a56:
     subs r3,#0x1    @ 080b0a56 013b
     b LAB_080b0aae                           @ 080b0a58 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0a5c:
     .word  0x000019d3                     @ 080b0a5c d3190000
 LAB_080b0a60:
@@ -15756,7 +15756,7 @@ LAB_080b0a68:
     beq LAB_080b0a66                         @ 080b0a9c e3d0
     subs r3,#0x1    @ 080b0a9e 013b
     b LAB_080b0ab0                           @ 080b0aa0 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0aa4:
     .word  0x00000868                     @ 080b0aa4 68080000
 DAT_080b0aa8:
@@ -15863,7 +15863,7 @@ LAB_080b0b52:
     pop {r4,r5,r6,r7}                        @ 080b0b5c f0bc
     pop {r1}                                 @ 080b0b5e 02bc
     bx r1                                    @ 080b0b60 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 将 gDuelFieldSlots 中两个玩家侧前 5 个格子条目 (各 0x64 字节) 复制到 r0 指定缓冲区. 第一次 copy_bytes_by_halfword(dst=r4, src=gDuelFieldSlots, len=0x64) 拷贝 P1 侧; 然后 dst+=0x64, src+=0x868; 第二次拷贝 P2 侧. 与 restore_field_slots_from_buffer (0x080b0b90) 构成保存/恢复对. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, copy_size=0x64 (5 slots*0x14).
 save_field_slots_to_buffer:
@@ -15907,7 +15907,7 @@ restore_field_slots_from_buffer:
     pop {r4,r5}                              @ 080b0bb0 30bc
     pop {r0}                                 @ 080b0bb2 01bc
     bx r0                                    @ 080b0bb4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0bb8:
     .word  0x0201c510                     @ 080b0bb8 10c50102
 DAT_080b0bbc:
@@ -15990,7 +15990,7 @@ LAB_080b0c3c:
     pop {r4,r5,r6,r7}                        @ 080b0c50 f0bc
     pop {r0}                                 @ 080b0c52 01bc
     bx r0                                    @ 080b0c54 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b0c58:
     .word  0x00000868                     @ 080b0c58 68080000
 DAT_080b0c5c:
@@ -16533,7 +16533,7 @@ LAB_080b103e:
     pop {r4,r5,r6,r7}                        @ 080b1060 f0bc
     pop {r1}                                 @ 080b1062 02bc
     bx r1                                    @ 080b1064 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b1068:
     .word  0x0201afe0                     @ 080b1068 e0af0102
 DAT_080b106c:
@@ -16907,7 +16907,7 @@ LAB_080b1330:
     pop {r4,r5,r6,r7}                        @ 080b133c f0bc
     pop {r1}                                 @ 080b133e 02bc
     bx r1                                    @ 080b1340 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b1344:
     .word  0x0201afe0                     @ 080b1344 e0af0102
 DAT_080b1348:
@@ -16964,7 +16964,7 @@ select_optimal_monster_placement_slot:
     adds r1,r4,#0x0    @ 080b13ae 211c
     bl get_slot_field6_score                 @ 080b13b0 89f7e6fa
     b LAB_080b13e8                           @ 080b13b4 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b13b8:
     .word  0x00000868                     @ 080b13b8 68080000
 DAT_080b13bc:
@@ -16996,7 +16996,7 @@ LAB_080b13e8:
     pop {r4,r5,r6,r7}                        @ 080b13f8 f0bc
     pop {r0}                                 @ 080b13fa 01bc
     bx r0                                    @ 080b13fc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Composite activation eligibility check and optimal placement slot selection. Called from eval_player_activation_score_and_lp_threshold (0x080ac0bc) and check_card_activation_eligible_by_id (0x080ac584) chains (indeg=0, fn-ptr refs=0). r0=player_id, r1=card_id, r2=context_flag, r3=extra, sp[0x40]=sp_arg. Logic: (1) write 0x0201afe0[0]=player_id; (2) call check_card_activation_eligible_by_id; (3) if returns -1 early exit; (4) call select_optimal_monster_placement_slot; (5) call eval_player_activation_score_and_lp_threshold; (6) if not -1: compare sp[0x18] vs sp[0x1c], set r2=0 if sp[0x18]>sp[0x1c] else r2=1. Returns -1=ineligible, 0=sp[0x18] placement preferred, 1=sp[0x1c] preferred.
 @ Constants: EFFECT_CTX_PTR=0x0201afe0, FAIL=-1.
@@ -17041,7 +17041,7 @@ LAB_080b144a:
     pop {r4,r5,r6,r7}                        @ 080b144c f0bc
     pop {r1}                                 @ 080b144e 02bc
     bx r1                                    @ 080b1450 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b1454:
     .word  0x0201afe0                     @ 080b1454 e0af0102
 
@@ -17075,7 +17075,7 @@ LAB_080b146c:
     cmp r4,r0                                @ 080b148c 8442
     beq LAB_080b14ee                         @ 080b148e 2ed0
     b LAB_080b1532                           @ 080b1490 4fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b1494:
     .word  0x000011c3                     @ 080b1494 c3110000
 DAT_080b1498:
@@ -17086,7 +17086,7 @@ LAB_080b149c:
     beq LAB_080b14d4                         @ 080b14a0 18d0
     adds r0,#0x27    @ 080b14a2 2730
     b LAB_080b14b8                           @ 080b14a4 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b14a8:
     .word  0x0000119b                     @ 080b14a8 9b110000
 LAB_080b14ac:
@@ -17100,7 +17100,7 @@ LAB_080b14b8:
     cmp r4,r0                                @ 080b14b8 8442
     beq LAB_080b1502                         @ 080b14ba 22d0
     b LAB_080b1532                           @ 080b14bc 39e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b14c0:
     .word  0x00001331                     @ 080b14c0 31130000
 DAT_080b14c4:
@@ -17117,7 +17117,7 @@ LAB_080b14d4:
     subs r0,r0,r5    @ 080b14d6 401b
     bl count_occupied_monster_zones          @ 080b14d8 81f756fe
     b LAB_080b14f6                           @ 080b14dc 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b14e0:
     .word  0x00001369                     @ 080b14e0 69130000
 DAT_080b14e4:
@@ -17155,7 +17155,7 @@ LAB_080b1502:
 LAB_080b151a:
     adds r0,r3,#0x0    @ 080b151a 181c
     b LAB_080b1534                           @ 080b151c 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b1520:
     .word  gP1LifePoints                  @ 080b1520 e0c40102
 DAT_080b1524:
@@ -17171,7 +17171,7 @@ LAB_080b1534:
     pop {r4,r5}                              @ 080b1534 30bc
     pop {r1}                                 @ 080b1536 02bc
     bx r1                                    @ 080b1538 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 被 FUN_080bc388 (try_execute_toon_world_equip_placement) 以 r0=player_id, r1=sp (caller stack frame ptr) 调用 (indeg>=1). 大型综合选择器: (1) 调用 resolve_equip_target_slot_for_player(player, 1) 确认装备目标格可用性; (2) 两次调用 scan_monster_slots_for_max_zone_score (分别扫 opponent 和 self 侧), 结果存 sp[0x30..0x3c]; (3) 检查 player LP > 0; (4) 遍历 gDuelFieldSlots + player_side (0x0201c600 侧, 约 0x100 条目): 对每个有效卡牌条目调用 check_card_field5_is_nonzero -> check_card_effect_activation_eligible_by_id -> eval_card_placement_flags_default -> score_equip_slot_placement_for_ai, 累计候选列表; (5) 遍历候选列表调用 eval_equip_target_slot_with_score; (6) 若有候选, 调用 check_card_activation_eligible_by_id -> select_optimal_monster_placement_slot -> FUN_080ac0bc (LP 阈值) -> FUN_080b1458 (field spell 放置检查); (7) 在第二遍 gDuelFieldSlots 扫描中额外调用 eval_equip_bonus_for_slot. 最终将最优格子索引写入 r1 指向的 caller stack 区域; 返回最优得分 (>=0) 或 -1 (无匹配). Constants: gDuelFieldSlots=0x0201c510, gDuelFieldSlots2=0x0201c600, player_stride=0x868, INIT_BEST=-1.
 select_equip_placement_slot_with_score:
@@ -17623,7 +17623,7 @@ LAB_080b1826:
     ldr r3,[sp,#0x40]                        @ 080b1898 109b
     str r1,[r3,#0x0]                         @ 080b189a 1960
     b LAB_080b18ac                           @ 080b189c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b18a0:
     .word  gP1LifePoints                  @ 080b18a0 e0c40102
 DAT_080b18a4:
@@ -17658,7 +17658,7 @@ LAB_080b18ca:
     pop {r4,r5,r6,r7}                        @ 080b18d4 f0bc
     pop {r1}                                 @ 080b18d6 02bc
     bx r1                                    @ 080b18d8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b18dc:
     .word  0x00000868                     @ 080b18dc 68080000
     ROM_INCBIN 0xb18e0, 0x27d8
@@ -17813,7 +17813,7 @@ LAB_080b41ac:
     pop {r4,r5,r6}                           @ 080b41ac 70bc
     pop {r1}                                 @ 080b41ae 02bc
     bx r1                                    @ 080b41b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip target slot eligibility predicate for field6==0x16 effect nodes with cross-side check. Called during equip activation when iterating effect node candidates with field6==0x16; verifies target slot card_id has field6=0x16 via get_card_extended_stat_field6, and that ctx and effect_node are on opposing player sides via check_slots_on_different_player_sides. No external writes; pure predicate.
 @ 
@@ -17839,7 +17839,7 @@ LAB_080b41d4:
     pop {r4,r5}                              @ 080b41d4 30bc
     pop {r1}                                 @ 080b41d6 02bc
     bx r1                                    @ 080b41d8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip target slot eligibility predicate for field6==0x17 effect nodes with cross-side check. Sibling pair with check_equip_slot_eligible_with_field6_0x16_cross_side (0x080b41b4); only difference is cmp r0,#0x17. Caller routes to this function by field6 value; verifies card field6=0x17 and ctx/effect_node are on different player sides. No external writes; pure predicate.
 @ 
@@ -17865,7 +17865,7 @@ LAB_080b41fc:
     pop {r4,r5}                              @ 080b41fc 30bc
     pop {r1}                                 @ 080b41fe 02bc
     bx r1                                    @ 080b4200 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 带玩家 LP 阈值前置门的装备可用性谓词. 先从 r0 槽记录读取 [r0+2] bit0 得到玩家编号, 索引 gP1LifePoints + player*0x868 取该玩家的 LP 区域值, 若该值大于 0x9c4 则直接返回 0 (LP 过高时此装备路径不可用). 否则转调 check_slot_card_is_equippable(r0, r1) 给出最终装备可用性. 纯只读查询, 无外部副作用.
 check_slot_card_equippable_under_lp_threshold:
@@ -17887,7 +17887,7 @@ check_slot_card_equippable_under_lp_threshold:
     adds r1,r4,#0x0    @ 080b4222 211c
     bl check_slot_card_is_equippable         @ 080b4224 fff758ff
     b LAB_080b423a                           @ 080b4228 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b422c:
     .word  gP1LifePoints                  @ 080b422c e0c40102
 DWORD_080b4230:
@@ -18160,7 +18160,7 @@ check_effect_node_equip_target_eligible:
     beq LAB_080b445c                         @ 080b441c 1ed0
     ldr r0, DWORD_080b4434                   @ 080b441e 0548
     b LAB_080b444e                           @ 080b4420 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b4424:
     .word  0x00000868                     @ 080b4424 68080000
 DWORD_080b4428:
@@ -18189,7 +18189,7 @@ LAB_080b444e:
     beq LAB_080b445c                         @ 080b4450 04d0
     movs r0,#0x1    @ 080b4452 0120
     b LAB_080b445e                           @ 080b4454 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b4458:
     .word  0x0000159c                     @ 080b4458 9c150000
 LAB_080b445c:
@@ -18395,7 +18395,7 @@ LAB_080b4592:
     ldrb r2,[r4,#0x2]                        @ 080b45cc a278
     lsls r1,r2,#0x1f    @ 080b45ce d107
     b LAB_080b45f4                           @ 080b45d0 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b45d4:
     .word  0x0000ffff                     @ 080b45d4 ffff0000
 DWORD_080b45d8:
@@ -18427,7 +18427,7 @@ LAB_080b4608:
     pop {r4,r5,r6,r7}                        @ 080b4608 f0bc
     pop {r1}                                 @ 080b460a 02bc
     bx r1                                    @ 080b460c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check opponent monster zone full condition and effect node type eligibility. indeg=0, fn-ptr refs=0. r0=ctx_ptr (reads [+2] bit0=player_id), r1=effect_node_ptr. Logic: (1) call count_monster_slots_for_player(opponent), require==3 (full); (2) call count_occupied_monster_zones(opponent), if==0 jump to success (LAB_080b466a); (3) if r5 (effect_node_ptr)!=0 and same player_id: check r5[+4] bits[28:26]==0; (4) call read_effect_slot_side_and_type(r5, 0), extract byte field, require type>0xa (>10) to continue; (5) all conditions pass -> return 1, else return 0.
 @ Constants: MONSTER_ZONE_FULL=3, MAX_EFFECT_TYPE=0xa.
@@ -18483,7 +18483,7 @@ LAB_080b4670:
     pop {r4,r5,r6}                           @ 080b4670 70bc
     pop {r1}                                 @ 080b4672 02bc
     bx r1                                    @ 080b4674 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Activation eligibility check for Card Destruction (0x12d5) or Delinquent Duo (0x1325). r0=ctx_ptr (reads [+2] bit0 for player_id), r1=effect_node_ptr (reads [+0] halfword=card_id). If r1==0 return 0. card_id==0x12d5 (Card Destruction): return 1 directly. card_id==0x1325 (Delinquent Duo): check opponent monster zone count>3 (OPPONENT_THRESHOLD) then return 1, else 0. Other card_id: return 0. No side effects. indeg=0, fn-ptr refs=0 (Sub-type A dead code).
 @ Constants: CARD_DESTRUCTION_ID=0x12d5, DELINQUENT_DUO_ID=0x1325 (=0x12d5+0x50), OPPONENT_THRESHOLD=3.
@@ -18502,7 +18502,7 @@ check_destruction_or_delinquent_eligible:
 LAB_080b468e:
     movs r0,#0x0    @ 080b468e 0020
     b LAB_080b46bc                           @ 080b4690 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b4694:
     .word  0x000012d5                     @ 080b4694 d5120000
 LAB_080b4698:
@@ -18530,7 +18530,7 @@ LAB_080b46bc:
     pop {r4}                                 @ 080b46bc 10bc
     pop {r1}                                 @ 080b46be 02bc
     bx r1                                    @ 080b46c0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b46c4:
     .word  gP1LifePoints                  @ 080b46c4 e0c40102
 DWORD_080b46c8:
@@ -18643,7 +18643,7 @@ LAB_080b491a:
     pop {r4,r5,r6,r7}                        @ 080b4920 f0bc
     pop {r1}                                 @ 080b4922 02bc
     bx r1                                    @ 080b4924 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b4928:
     .word  0x00000868                     @ 080b4928 68080000
 DWORD_080b492c:
@@ -18687,7 +18687,7 @@ check_effect_slot_cross_player_type_eligible:
     ldr r0,[r0,#0x0]                         @ 080b4958 0068
     ands r0,r4    @ 080b495a 2040
     b LAB_080b496a                           @ 080b495c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080b4960:
     .word  gP1LifePoints                  @ 080b4960 e0c40102
 DWORD_080b4964:
@@ -18989,7 +18989,7 @@ LAB_080b4b96:
     pop {r4,r5,r6,r7}                        @ 080b4ba0 f0bc
     pop {r1}                                 @ 080b4ba2 02bc
     bx r1                                    @ 080b4ba4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks whether player r0 has any card slot or effect zone satisfying normal summon eligibility. Writes r0 to [0x0201afe0] (current player ptr). Iterates gDuelCardMain (0x09e478d0) up to 0xdd slots (stride=8): calls check_normal_summon_eligible_for_slot(player, slot, 0) per slot; returns 1 on first pass. Falls back to check_normal_summon_eligible_for_any_effect_zone(player). Returns u32: 1=eligible slot exists, 0=none. r0=u32 player_id [0..1]. Constants: player_ptr=0x0201afe0, gDuelCardMain=0x09e478d0, max_slots=0xdd.
 check_normal_summon_eligible_any_slot:
@@ -19070,7 +19070,7 @@ LAB_080b4bf6:
     cmp r1,r0                                @ 080b4c2c 8142
     beq LAB_080b4c44                         @ 080b4c2e 09d0
     b LAB_080b4c5e                           @ 080b4c30 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b4c34:
     .word  0x0201afe0                     @ 080b4c34 e0af0102
 DAT_080b4c38:
@@ -19100,7 +19100,7 @@ LAB_080b4c60:
     pop {r4,r5,r6,r7}                        @ 080b4c60 f0bc
     pop {r1}                                 @ 080b4c62 02bc
     bx r1                                    @ 080b4c64 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b4c68:
     .word  0x09e478d0                     @ 080b4c68 d078e409
 
@@ -19364,7 +19364,7 @@ LAB_080b4e2c:
     pop {r4,r5,r6,r7}                        @ 080b4e38 f0bc
     pop {r1}                                 @ 080b4e3a 02bc
     bx r1                                    @ 080b4e3c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_080b5d98 (0x080b5d98, [duel_field], role: equip slot selection dispatch) (indeg=1). r0=player_id (->r10), r1=slot_bitmap (->r4), r2=field6_type_filter (->r9). Initializes sp[0x54]=-1 (best_slot_idx) and sp[0x50]=-1 (best_score). Phase 1: iterates monster zone slots [0..4], checks bitmap bit 1<<(player_id*16+slot); on hit stores slot into sp buffer (r5++). Phase 2: Fisher-Yates random shuffle of buffer via sample_prng_scaled. Phase 3: iterates shuffled slot list: if r9>=0 checks ldrh[slot+6]==r9 (field6 filter), skips if mismatch; calls dispatch_zone_slot_score_by_player_flag for score; compares and updates sp[0x54]/sp[0x50] (best slot/score). Returns sp[0x54] = best_slot_idx (or -1).
 @ 
@@ -19499,7 +19499,7 @@ LAB_080b4f18:
     pop {r4,r5,r6,r7}                        @ 080b4f24 f0bc
     pop {r1}                                 @ 080b4f26 02bc
     bx r1                                    @ 080b4f28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_080b5d98 (0x080b5d98), FUN_080b68fc (0x080b68fc), FUN_080b693c (0x080b693c), FUN_080839b4 (0x080839b4, role: equip placement decision) (indeg=4). r0=player_id, r1=bitmap (->r4), r2=context (->r6), r3=comparator_param (->r8), sp[0]=slot_exclusion_info (->r5, 5th stack arg). Calls query_equip_zone_bitmap_with_effect_guard(player) -> r1 (filtered bitmap); writes r4 (original bitmap) to [0x0201afe0]. Computes exclusion bit: lsls r2,r4,#4; adds r2,r2,r5 -> bit_position; movs r0,#1; lsls r0,r2 -> bit_mask; bics r1,r0 -> clears current equip slot from result bitmap. Calls find_best_scored_slot_from_bitmap(player, masked_bitmap, context, r8); returns best_slot_idx.
 @ 
@@ -19533,7 +19533,7 @@ find_best_slot_from_equip_bitmap_with_gate:
     pop {r4,r5,r6}                           @ 080b4f5c 70bc
     pop {r1}                                 @ 080b4f5e 02bc
     bx r1                                    @ 080b4f60 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080b4f64:
     .word  0x0201afe0                     @ 080b4f64 e0af0102
 
@@ -19598,7 +19598,7 @@ LAB_080b4fc4:
     pop {r4,r5,r6,r7}                        @ 080b4fd0 f0bc
     pop {r1}                                 @ 080b4fd2 02bc
     bx r1                                    @ 080b4fd4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates LP check entries for current player (r0 bit0), calls caller-provided slot predicate (r1 -> FUN_0810e5d4=bx r3), extracts card_id then queries get_card_extended_stat_field3 and lookup_rom_card_attribute_table_a, compares against LP threshold (r9 cumulative) and attribute constraints (r2/r3/r7 three-way conditions), tracks best_score (r6) and best_slot (sp[0x8]). Returns best_slot_idx or -1. Single caller: FUN_080b70ac (card_ids, duel_field tags). Params: r0=player_id [0..1] (bit0 selects gP1LifePoints branch), r1=slot_predicate_fn ptr (fn(player,slot_iter,?,fn_ptr)->bool -> sp[0x4]), r2=score_upper_enable [0..1] (>0: require score>best_score; callsite movs r2,#0x1), r3=score_lower_enable [-1..1] (>0: require score>best; <0: require score<best; callsite movs r3,#0x1). Returns r0=s32 best_slot_idx [0..10] or -1. Side effects: none (read-only scan of gP1LifePoints LP entries and gDuelFieldSlots). Constants: LP_STRIDE=0x868, gDuelFieldSlots_ext=0x0201c600, player_stride=0x868, SLOT_ITER_BASE_OFFSET=0xc.
 eval_best_slot_score_by_lp_and_attr:
@@ -19662,7 +19662,7 @@ LAB_080b5010:
     adds r0,r5,#0x0    @ 080b504e 281c
     bl lookup_rom_card_attribute_table_a     @ 080b5050 39f05cff
     b LAB_080b5076                           @ 080b5054 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b5058:
     .word  gP1LifePoints                  @ 080b5058 e0c40102
 DAT_080b505c:
@@ -20057,7 +20057,7 @@ LAB_080b5308:
     movs r0,#0x1    @ 080b530c 0120
     rsbs r0,r0,#0    @ 080b530e 4042
     b LAB_080b5338                           @ 080b5310 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080b5314:
     .word  gP1LifePoints                  @ 080b5314 e0c40102
 DAT_080b5318:

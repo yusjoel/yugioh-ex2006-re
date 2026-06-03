@@ -50,7 +50,7 @@ LAB_08107920:
     pop {r4,r5,r6,r7}                        @ 0810792c f0bc
     pop {r1}                                 @ 0810792e 02bc
     bx r1                                    @ 08107930 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107934:
     .word  0x02006ed0                     @ 08107934 d06e0002
 DAT_08107938:
@@ -71,7 +71,7 @@ load_card_mini_frame_tile_and_pal:
     movs r0,#0x1    @ 08107954 0120
     pop {r1}                                 @ 08107956 02bc
     bx r1                                    @ 08107958 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810795c:
     .word  0x06017800                     @ 0810795c 00780106
 DAT_08107960:
@@ -111,7 +111,7 @@ LAB_08107988:
     lsls r0,r0,#0x4    @ 0810799c 0001
     ldr r1, DAT_081079ac                     @ 0810799e 0349
     b LAB_081079b8                           @ 081079a0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081079a4:
     .word  0x02000000                     @ 081079a4 00000002
 DAT_081079a8:
@@ -199,7 +199,7 @@ LAB_08107a36:
     pop {r4,r5,r6,r7}                        @ 08107a3c f0bc
     pop {r1}                                 @ 08107a3e 02bc
     bx r1                                    @ 08107a40 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107a44:
     .word  0x000097c8                     @ 08107a44 c8970000
 
@@ -543,7 +543,7 @@ LAB_08107ca8:
     ldr r0,[r0,#0x0]                         @ 08107cae 0068
 switchD_08107cb0__switchD:
     .hword 0x4687    @ 08107cb0 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_switchdataD_08107cb8_08107cb4:
     .word  0x08107cb8                     @ 08107cb4 b87c1008
 switchD_08107cb0__switchdataD_08107cb8:
@@ -678,7 +678,7 @@ LAB_08107db0:
     lsrs r2,r2,#0x10    @ 08107dc0 120c
     adds r0,r1,#0x0    @ 08107dc2 081c
     b LAB_08107e12                           @ 08107dc4 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107dc8:
     .word  0x000097c7                     @ 08107dc8 c7970000
 DAT_08107dcc:
@@ -749,7 +749,7 @@ switchD_08107cb0__caseD_8:
     pop {r4,r5,r6,r7}                        @ 08107e4c f0bc
     pop {r1}                                 @ 08107e4e 02bc
     bx r1                                    @ 08107e50 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107e54:
     .word  0xffff0000                     @ 08107e54 0000ffff
     .byte  0x01, 0x20, 0x70, 0x47
@@ -874,7 +874,7 @@ LAB_08107f2c:
     ldr r0,[r0,#0x0]                         @ 08107f32 0068
 switchD_08107f34__switchD:
     .hword 0x4687    @ 08107f34 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107f38:
     .word  0x0202a4d0                     @ 08107f38 d0a40202
 DAT_08107f3c:
@@ -966,7 +966,7 @@ LAB_08107fe4:
     cmp r6,#0x3                              @ 08107ff0 032e
     ble LAB_08107fbe                         @ 08107ff2 e4dd
     b switchD_08107f34__caseD_8              @ 08107ff4 c4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107ff8:
     .word  0x0202f41a                     @ 08107ff8 1af40202
 switchD_08107f34__caseD_3:
@@ -1042,7 +1042,7 @@ LAB_08108074:
     cmp r6,#0x3                              @ 08108080 032e
     ble LAB_0810804e                         @ 08108082 e4dd
     b switchD_08107f34__caseD_8              @ 08108084 7ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108088:
     .word  0x0202f41a                     @ 08108088 1af40202
 switchD_08107f34__caseD_6:
@@ -1079,7 +1079,7 @@ switchD_08107f34__caseD_a:
     .hword 0x4641    @ 081080c4 4146
     adds r1,#0x5d    @ 081080c6 5d31
     b LAB_0810817a                           @ 081080c8 57e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081080cc:
     .word  0x02000006                     @ 081080cc 06000002
 switchD_08107f34__caseD_4:
@@ -1109,7 +1109,7 @@ LAB_081080e0:
     adds r1,#0x5d    @ 08108100 5d31
     movs r0,#0x0    @ 08108102 0020
     b LAB_0810817a                           @ 08108104 39e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108108:
     .word  0x06011000                     @ 08108108 00100106
 switchD_08107f34__caseD_5:
@@ -1134,7 +1134,7 @@ LAB_08108114:
     adds r1,#0x5d    @ 08108134 5d31
     movs r0,#0x0    @ 08108136 0020
     b LAB_0810817a                           @ 08108138 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810813c:
     .word  0x06011000                     @ 0810813c 00100106
 switchD_08107f34__caseD_7:
@@ -1158,7 +1158,7 @@ switchD_08107f34__caseD_7:
     adds r1,#0x5d    @ 08108168 5d31
     movs r0,#0x0    @ 0810816a 0020
     b LAB_0810817a                           @ 0810816c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108170:
     .word  0x06011000                     @ 08108170 00100106
 LAB_08108174:
@@ -1194,7 +1194,7 @@ set_card_stats_display_position:
     strh r1,[r2,#0x36]                       @ 081081a4 d186
     movs r0,#0x1    @ 081081a6 0120
     bx lr                                    @ 081081a8 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081081ac:
     .word  0x0202f3c0                     @ 081081ac c0f30202
     .byte  0x00, 0xb5, 0x02, 0xf0, 0x97, 0xfb, 0x01, 0x20, 0x02, 0xbc, 0x08, 0x47
@@ -1264,7 +1264,7 @@ LAB_0810822c:
     pop {r4,r5,r6,r7}                        @ 0810822c f0bc
     pop {r1}                                 @ 0810822e 02bc
     bx r1                                    @ 08108230 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108234:
     .word  0xffff9000                     @ 08108234 0090ffff
 DAT_08108238:
@@ -1351,7 +1351,7 @@ LAB_081082ca:
     ldr r0,[r0,#0x0]                         @ 081082d6 0068
 switchD_081082d8__switchD:
     .hword 0x4687    @ 081082d8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_switchdataD_081082e0_081082dc:
     .word  0x081082e0                     @ 081082dc e0821008
 switchD_081082d8__switchdataD_081082e0:
@@ -1473,7 +1473,7 @@ render_card_type_badge_oam:
     bne LAB_081083d8                         @ 081083c8 06d1
     movs r0,#0x0    @ 081083ca 0020
     b LAB_08108542                           @ 081083cc b9e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081083d0:
     .word  0x0202a4d0                     @ 081083d0 d0a40202
 DAT_081083d4:
@@ -1651,7 +1651,7 @@ LAB_08108516:
     bne LAB_0810852e                         @ 08108520 05d1
     adds r1,#0x40    @ 08108522 4031
     b LAB_0810852e                           @ 08108524 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108528:
     .word  0x00008040                     @ 08108528 40800000
 LAB_0810852c:
@@ -1676,7 +1676,7 @@ LAB_08108542:
     pop {r4,r5,r6,r7}                        @ 0810854c f0bc
     pop {r1}                                 @ 0810854e 02bc
     bx r1                                    @ 08108550 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108554:
     .word  0x00009b98                     @ 08108554 989b0000
 
@@ -1867,7 +1867,7 @@ LAB_08108696:
     pop {r4,r5,r6}                           @ 081086c8 70bc
     pop {r1}                                 @ 081086ca 02bc
     bx r1                                    @ 081086cc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081086d0:
     .word  0x0202f3c0                     @ 081086d0 c0f30202
 PTR_gPrng_081086d4:
@@ -1999,7 +1999,7 @@ LAB_081087b4:
     cmp r0,#0x3                              @ 081087b8 0328
     beq LAB_08108890                         @ 081087ba 69d0
     b LAB_081088d4                           @ 081087bc 8ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081087c0:
     .word  0x0202a4d0                     @ 081087c0 d0a40202
 LAB_081087c4:
@@ -2100,7 +2100,7 @@ LAB_0810886a:
     ands r0,r1    @ 08108878 0840
     movs r1,#0xc0    @ 0810887a c021
     b LAB_081088f4                           @ 0810887c 3ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108880:
     .word  0x0202f3c0                     @ 08108880 c0f30202
 DAT_08108884:
@@ -2126,7 +2126,7 @@ LAB_08108890:
     orrs r1,r2    @ 081088b0 1143
     strh r1,[r0,#0x0]                        @ 081088b2 0180
     b LAB_081088f8                           @ 081088b4 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_081088b8:
     .word  gPrng                          @ 081088b8 40000003
 DAT_081088bc:
@@ -2291,7 +2291,7 @@ clear_card_display_work_buf:
     pop {r4}                                 @ 081089c0 10bc
     pop {r1}                                 @ 081089c2 02bc
     bx r1                                    @ 081089c4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081089c8:
     .word  0x0202a2c0                     @ 081089c8 c0a20202
 PTR_gPrng_081089cc:
@@ -2400,7 +2400,7 @@ LAB_08108a62:
     orrs r0,r1    @ 08108a78 0843
     strh r0,[r2,#0x0]                        @ 08108a7a 1080
     b LAB_08108aaa                           @ 08108a7c 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_08108a80:
     .word  gPrng                          @ 08108a80 40000003
 DAT_08108a84:
@@ -2426,7 +2426,7 @@ LAB_08108a88:
 LAB_08108aaa:
     movs r0,#0x1    @ 08108aaa 0120
     b LAB_08108aba                           @ 08108aac 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108ab0:
     .word  0x0202a4d0                     @ 08108ab0 d0a40202
 DAT_08108ab4:
@@ -2615,7 +2615,7 @@ LAB_08108be2:
     pop {r4,r5,r6,r7}                        @ 08108c20 f0bc
     pop {r1}                                 @ 08108c22 02bc
     bx r1                                    @ 08108c24 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108c28:
     .word  0x0202f3c0                     @ 08108c28 c0f30202
 PTR_gPrng_08108c2c:
@@ -2743,7 +2743,7 @@ tick_deck_edit_card_list_scene:
     orrs r0,r1    @ 08108d2c 0843
     strh r0,[r2,#0x0]                        @ 08108d2e 1080
     b LAB_08108d5c                           @ 08108d30 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108d34:
     .word  0x0202a4d0                     @ 08108d34 d0a40202
 DAT_08108d38:
@@ -2877,7 +2877,7 @@ LAB_08108e12:
     cmp r0,#0x0                              @ 08108e24 0028
     bne LAB_08108e10                         @ 08108e26 f3d1
     b LAB_08108e3a                           @ 08108e28 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108e2c:
     .word  0x0202a4d0                     @ 08108e2c d0a40202
 LAB_08108e30:
@@ -2940,7 +2940,7 @@ switchD_08108dd2__caseD_0:
 LAB_08108ea2:
     movs r0,#0x1    @ 08108ea2 0120
     b LAB_08108eb2                           @ 08108ea4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_08108ea8:
     .word  gPrng                          @ 08108ea8 40000003
 DAT_08108eac:
@@ -3041,7 +3041,7 @@ LAB_08108f40:
 LAB_08108f66:
     movs r0,#0x1    @ 08108f66 0120
     b LAB_08108f7a                           @ 08108f68 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08108f6c:
     .word  0x0202a4d0                     @ 08108f6c d0a40202
 PTR_gPrng_08108f70:
@@ -3138,7 +3138,7 @@ LAB_08109020:
     pop {r4}                                 @ 08109020 10bc
     pop {r1}                                 @ 08109022 02bc
     bx r1                                    @ 08109024 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109028:
     .word  0x0202a4d0                     @ 08109028 d0a40202
 PTR_gPrng_0810902c:
@@ -3192,7 +3192,7 @@ LAB_0810906e:
     orrs r0,r1    @ 08109078 0843
     strb r0,[r5,#0x1e]                       @ 0810907a a877
     b LAB_081092ea                           @ 0810907c 35e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109080:
     .word  0x0202f3c0                     @ 08109080 c0f30202
 PTR_gPrng_08109084:
@@ -3213,7 +3213,7 @@ LAB_08109088:
     lsls r1,r1,#0x2    @ 081090a0 8900
     ldr r0, DAT_081090b0                     @ 081090a2 0348
     b LAB_081090c0                           @ 081090a4 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081090a8:
     .word  0x02000000                     @ 081090a8 00000002
 DAT_081090ac:
@@ -3264,7 +3264,7 @@ LAB_081090c0:
     ldrb r2,[r5,#0x1e]                       @ 08109104 aa7f
     orrs r0,r2    @ 08109106 1043
     b LAB_081091e4                           @ 08109108 6ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810910c:
     .word  0x09e60e44                     @ 0810910c 440ee609
 LAB_08109110:
@@ -3286,7 +3286,7 @@ LAB_08109118:
     ldrb r3,[r5,#0x1e]                       @ 08109130 ab7f
     orrs r0,r3    @ 08109132 1843
     b LAB_081091e4                           @ 08109134 56e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109138:
     .word  0x0000ffff                     @ 08109138 ffff0000
 LAB_0810913c:
@@ -3555,7 +3555,7 @@ render_card_frame_slot_to_vram:
     lsls r0,r0,#0x2    @ 0810932c 8000
     ldr r1, DAT_08109340                     @ 0810932e 0449
     b LAB_0810934e                           @ 08109330 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109334:
     .word  0x0202f3c0                     @ 08109334 c0f30202
 DAT_08109338:
@@ -3765,7 +3765,7 @@ LAB_081094aa:
 LAB_081094ba:
     movs r7,#0x0    @ 081094ba 0027
     b LAB_0810957a                           @ 081094bc 5de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081094c0:
     .word  0x09e60e44                     @ 081094c0 440ee609
 DAT_081094c4:
@@ -3825,7 +3825,7 @@ LAB_0810950a:
     ldrb r3,[r5,#0x5]                        @ 0810952c 6b79
     lsls r0,r3,#0x2    @ 0810952e 9800
     b LAB_0810953c                           @ 08109530 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109534:
     .word  0xffffb000                     @ 08109534 00b0ffff
 LAB_08109538:
@@ -3989,7 +3989,7 @@ LAB_08109654:
     bgt LAB_08109670                         @ 08109664 04dc
     movs r3,#0x4    @ 08109666 0423
     b LAB_0810967e                           @ 08109668 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810966c:
     .word  0x09e60e44                     @ 0810966c 440ee609
 LAB_08109670:
@@ -4160,7 +4160,7 @@ resolve_card_frame_palette_by_type:
     ldr r0,[r0,#0x0]                         @ 08109796 0068
 switchD_08109798__switchD:
     .hword 0x4687    @ 08109798 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810979c:
     .word  0x081097a0                     @ 0810979c a0971008
 switchD_08109798__switchdataD_081097a0:
@@ -4266,7 +4266,7 @@ resolve_card_gfx_row_by_type:
     ldr r0,[r0,#0x0]                         @ 0810985a 0068
 switchD_0810985c__switchD:
     .hword 0x4687    @ 0810985c 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109860:
     .word  0x08109864                     @ 08109860 64981008
 switchD_0810985c__switchdataD_08109864:
@@ -4285,49 +4285,49 @@ switchD_0810985c__caseD_2:
     ldr r1, DAT_08109898                     @ 08109890 0149
     movs r3,#0xb    @ 08109892 0b23
     b switchD_0810985c__default              @ 08109894 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109898:
     .word  0x09e60fc0                     @ 08109898 c00fe609
 switchD_0810985c__caseD_3:
     ldr r1, DAT_081098a4                     @ 0810989c 0149
     movs r3,#0x5    @ 0810989e 0523
     b switchD_0810985c__default              @ 081098a0 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098a4:
     .word  0x09e60fec                     @ 081098a4 ec0fe609
 switchD_0810985c__caseD_4:
     ldr r1, DAT_081098b0                     @ 081098a8 0149
     movs r3,#0x9    @ 081098aa 0923
     b switchD_0810985c__default              @ 081098ac 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098b0:
     .word  0x09e61000                     @ 081098b0 0010e609
 switchD_0810985c__caseD_5:
     ldr r1, DAT_081098bc                     @ 081098b4 0149
     movs r3,#0x4    @ 081098b6 0423
     b switchD_0810985c__default              @ 081098b8 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098bc:
     .word  0x09e61024                     @ 081098bc 2410e609
 switchD_0810985c__caseD_6:
     ldr r1, DAT_081098c8                     @ 081098c0 0149
     movs r3,#0xa    @ 081098c2 0a23
     b switchD_0810985c__default              @ 081098c4 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098c8:
     .word  0x09e61034                     @ 081098c8 3410e609
 switchD_0810985c__caseD_7:
     ldr r1, DAT_081098d4                     @ 081098cc 0149
     movs r3,#0x16    @ 081098ce 1623
     b switchD_0810985c__default              @ 081098d0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098d4:
     .word  0x09e6105c                     @ 081098d4 5c10e609
 switchD_0810985c__caseD_8:
     ldr r1, DAT_081098e0                     @ 081098d8 0149
     movs r3,#0x8    @ 081098da 0823
     b switchD_0810985c__default              @ 081098dc 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098e0:
     .word  0x09e610b4                     @ 081098e0 b410e609
 switchD_0810985c__caseD_9:
@@ -4337,7 +4337,7 @@ switchD_0810985c__default:
     cmp r1,#0x0                              @ 081098e8 0029
     bne LAB_081098fa                         @ 081098ea 06d1
     b LAB_08109910                           @ 081098ec 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081098f0:
     .word  0x09e610d4                     @ 081098f0 d410e609
 LAB_081098f4:
@@ -4364,7 +4364,7 @@ LAB_08109914:
     pop {r4,r5}                              @ 08109914 30bc
     pop {r1}                                 @ 08109916 02bc
     bx r1                                    @ 08109918 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_stats scene card type table lookup function. r0=mode (caller passes then subs #2, valid range 0..10 corresponding to original 2..12); r1=card_id. mode 0..10 corresponds to 11 ROM tables (0x09e60fc0, ec, 00, 24, 34, 5c, b4, d4...), each with different entry counts (r3: 11/5/9/4/10/22/8/33...). If r1==0 returns -1. Linearly scans selected table entries (4 bytes each, halfword[+2] = card_id); on match returns halfword[+0] (category value); no match returns -1.
 @ 
@@ -4387,7 +4387,7 @@ find_card_in_type_table_by_mode:
     ldr r0,[r0,#0x0]                         @ 0810992e 0068
 switchD_08109930__switchD:
     .hword 0x4687    @ 08109930 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109934:
     .word  0x08109938                     @ 08109934 38991008
 switchD_08109930__switchdataD_08109938:
@@ -4406,49 +4406,49 @@ switchD_08109930__caseD_2:
     ldr r1, DAT_0810996c                     @ 08109964 0149
     movs r3,#0xb    @ 08109966 0b23
     b switchD_08109930__default              @ 08109968 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810996c:
     .word  0x09e60fc0                     @ 0810996c c00fe609
 switchD_08109930__caseD_3:
     ldr r1, DAT_08109978                     @ 08109970 0149
     movs r3,#0x5    @ 08109972 0523
     b switchD_08109930__default              @ 08109974 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109978:
     .word  0x09e60fec                     @ 08109978 ec0fe609
 switchD_08109930__caseD_4:
     ldr r1, DAT_08109984                     @ 0810997c 0149
     movs r3,#0x9    @ 0810997e 0923
     b switchD_08109930__default              @ 08109980 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109984:
     .word  0x09e61000                     @ 08109984 0010e609
 switchD_08109930__caseD_5:
     ldr r1, DAT_08109990                     @ 08109988 0149
     movs r3,#0x4    @ 0810998a 0423
     b switchD_08109930__default              @ 0810998c 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109990:
     .word  0x09e61024                     @ 08109990 2410e609
 switchD_08109930__caseD_6:
     ldr r1, DAT_0810999c                     @ 08109994 0149
     movs r3,#0xa    @ 08109996 0a23
     b switchD_08109930__default              @ 08109998 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810999c:
     .word  0x09e61034                     @ 0810999c 3410e609
 switchD_08109930__caseD_7:
     ldr r1, DAT_081099a8                     @ 081099a0 0149
     movs r3,#0x16    @ 081099a2 1623
     b switchD_08109930__default              @ 081099a4 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081099a8:
     .word  0x09e6105c                     @ 081099a8 5c10e609
 switchD_08109930__caseD_8:
     ldr r1, DAT_081099b4                     @ 081099ac 0149
     movs r3,#0x8    @ 081099ae 0823
     b switchD_08109930__default              @ 081099b0 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081099b4:
     .word  0x09e610b4                     @ 081099b4 b410e609
 switchD_08109930__caseD_9:
@@ -4458,7 +4458,7 @@ switchD_08109930__default:
     cmp r1,#0x0                              @ 081099bc 0029
     bne LAB_081099ce                         @ 081099be 06d1
     b LAB_081099e4                           @ 081099c0 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081099c4:
     .word  0x09e610d4                     @ 081099c4 d410e609
 LAB_081099c8:
@@ -4485,7 +4485,7 @@ LAB_081099e8:
     pop {r4,r5}                              @ 081099e8 30bc
     pop {r1}                                 @ 081099ea 02bc
     bx r1                                    @ 081099ec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_08109300 (vram+palette+scene_card_list+settings 场景渲染器) 在 load_card_frame_tile_row_by_index 之后唯一调用, 负责将卡帧 tile 行数据批量复制到 VRAM. 函数以固定参数调用 tile_2d_row_copy 两次: 第一次以目标 r0=DAT_08109a40, row=0, cols=4, rows=4; 第二次以同一目标, 另一调色板 r1=DAT_08109a44, cols=3, rows=3. 两次调用覆盖卡帧的大/小两种 tile 区域, 完成 VRAM 数据写入. 固定返回 r0=0.
 copy_card_frame_tile_rows_to_vram:
@@ -4607,7 +4607,7 @@ LAB_08109aae:
     movs r3,#0x2    @ 08109acc 0223
     str r3,[sp,#0x4]                         @ 08109ace 0193
     b LAB_08109ae6                           @ 08109ad0 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109ad4:
     .word  0x09e60e44                     @ 08109ad4 440ee609
 LAB_08109ad8:
@@ -4645,7 +4645,7 @@ LAB_08109af0:
     lsls r1,r1,#0x1    @ 08109b12 4900
     bl zero_fill_by_halfword                 @ 08109b14 ebf7aef9
     b LAB_08109b28                           @ 08109b18 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109b1c:
     .word  0x0600e800                     @ 08109b1c 00e80006
 LAB_08109b20:
@@ -4709,7 +4709,7 @@ LAB_08109b28:
     adds r1,r1,r0    @ 08109b98 0918
     str r1,[sp,#0x0]                         @ 08109b9a 0091
     b LAB_08109bbc                           @ 08109b9c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109ba0:
     .word  0x06009800                     @ 08109ba0 00980006
 DAT_08109ba4:
@@ -5042,7 +5042,7 @@ LAB_08109df2:
     pop {r4,r5,r6,r7}                        @ 08109dfc f0bc
     pop {r1}                                 @ 08109dfe 02bc
     bx r1                                    @ 08109e00 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109e04:
     .word  0x06009800                     @ 08109e04 00980006
 
@@ -5080,7 +5080,7 @@ LAB_08109e28:
     lsls r1,r1,#0x2    @ 08109e40 8900
     ldr r0, DAT_08109e50                     @ 08109e42 0348
     b LAB_08109e60                           @ 08109e44 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08109e48:
     .word  0x02000000                     @ 08109e48 00000002
 DAT_08109e4c:
@@ -5355,7 +5355,7 @@ LAB_0810a02a:
     beq LAB_0810a048                         @ 0810a03c 04d0
     adds r0,r3,#0x0    @ 0810a03e 181c
     b LAB_0810a04a                           @ 0810a040 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a044:
     .word  0xfffc0000                     @ 0810a044 0000fcff
 LAB_0810a048:
@@ -5416,7 +5416,7 @@ LAB_0810a0a6:
     bne LAB_0810a0be                         @ 0810a0b0 05d1
     adds r1,#0x40    @ 0810a0b2 4031
     b LAB_0810a0be                           @ 0810a0b4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a0b8:
     .word  0x00008040                     @ 0810a0b8 40800000
 LAB_0810a0bc:
@@ -5441,7 +5441,7 @@ LAB_0810a0d2:
     pop {r4,r5,r6,r7}                        @ 0810a0dc f0bc
     pop {r1}                                 @ 0810a0de 02bc
     bx r1                                    @ 0810a0e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a0e4:
     .word  0x00009b98                     @ 0810a0e4 989b0000
 
@@ -5555,7 +5555,7 @@ lookup_sjis_font_index_by_char:
     adds r1,r0,r1    @ 0810a1a8 4118
     ldrh r0,[r1,#0x0]                        @ 0810a1aa 0888
     b LAB_0810a1ea                           @ 0810a1ac 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a1b0:
     .word  0x09e61158                     @ 0810a1b0 5811e609
 LAB_0810a1b4:
@@ -5603,7 +5603,7 @@ LAB_0810a1fe:
     pop {r4,r5,r6,r7}                        @ 0810a204 f0bc
     pop {r1}                                 @ 0810a206 02bc
     bx r1                                    @ 0810a208 0847
-    .byte  0x00, 0x00
+    .zero  0x2
     ldrh r0,[r0,#0x0]                        @ 0810a20c 0088
     lsrs r2,r0,#0x8    @ 0810a20e 020a
     lsls r0,r0,#0x18    @ 0810a210 0006
@@ -5991,7 +5991,7 @@ LAB_0810a4e2:
     adds r0,#0x56    @ 0810a4ec 5630
     strh r4,[r0,#0x0]                        @ 0810a4ee 0480
     b LAB_0810a514                           @ 0810a4f0 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a4f4:
     .word  0x0202f414                     @ 0810a4f4 14f40202
 LAB_0810a4f8:
@@ -6183,7 +6183,7 @@ LAB_0810a63a:
     movs r0,#0xd    @ 0810a658 0d20
     strb r0,[r1,#0x0]                        @ 0810a65a 0870
     b LAB_0810a6ae                           @ 0810a65c 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a660:
     .word  0x0202f3c0                     @ 0810a660 c0f30202
 PTR_card_stats_table_0810a664:
@@ -6447,7 +6447,7 @@ LAB_0810a856:
     bne LAB_0810a87c                         @ 0810a86c 06d1
     movs r0,#0x0    @ 0810a86e 0020
     b LAB_0810a8b0                           @ 0810a870 1ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a874:
     .word  0x06011000                     @ 0810a874 00100106
 DAT_0810a878:
@@ -6509,7 +6509,7 @@ set_card_stats_sprite_position:
     strh r1,[r2,#0x36]                       @ 0810a8d8 d186
     movs r0,#0x1    @ 0810a8da 0120
     bx lr                                    @ 0810a8dc 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a8e0:
     .word  0x0202f3c0                     @ 0810a8e0 c0f30202
 
@@ -6584,7 +6584,7 @@ render_card_name_text_to_vram:
     bne LAB_0810a978                         @ 0810a964 08d1
     movs r0,#0x0    @ 0810a966 0020
     b LAB_0810ab7a                           @ 0810a968 07e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810a96c:
     .word  0x0202a4d0                     @ 0810a96c d0a40202
 DAT_0810a970:
@@ -6688,7 +6688,7 @@ LAB_0810aa16:
     cmp r0,#0x28                             @ 0810aa3c 2828
     ble LAB_0810aa5c                         @ 0810aa3e 0ddd
     b LAB_0810aa82                           @ 0810aa40 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810aa44:
     .word  0x02000000                     @ 0810aa44 00000002
 DAT_0810aa48:
@@ -6867,7 +6867,7 @@ LAB_0810ab7a:
     pop {r4,r5,r6,r7}                        @ 0810ab84 f0bc
     pop {r1}                                 @ 0810ab86 02bc
     bx r1                                    @ 0810ab88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ab8c:
     .word  0xffff9000                     @ 0810ab8c 0090ffff
 
@@ -6888,7 +6888,7 @@ render_card_type_icon_oam:
     bne LAB_0810abb8                         @ 0810aba8 06d1
     movs r0,#0x0    @ 0810abaa 0020
     b LAB_0810ad0a                           @ 0810abac ade0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810abb0:
     .word  0x0202a4d0                     @ 0810abb0 d0a40202
 DAT_0810abb4:
@@ -7060,7 +7060,7 @@ LAB_0810acde:
     bne LAB_0810acf6                         @ 0810ace8 05d1
     adds r1,#0x40    @ 0810acea 4031
     b LAB_0810acf6                           @ 0810acec 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810acf0:
     .word  0x00008040                     @ 0810acf0 40800000
 LAB_0810acf4:
@@ -7085,7 +7085,7 @@ LAB_0810ad0a:
     pop {r4,r5,r6,r7}                        @ 0810ad14 f0bc
     pop {r1}                                 @ 0810ad16 02bc
     bx r1                                    @ 0810ad18 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ad1c:
     .word  0x00009b98                     @ 0810ad1c 989b0000
 
@@ -7286,7 +7286,7 @@ LAB_0810ae48:
     pop {r4,r5,r6,r7}                        @ 0810ae84 f0bc
     pop {r1}                                 @ 0810ae86 02bc
     bx r1                                    @ 0810ae88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ae8c:
     .word  0x0202f3c0                     @ 0810ae8c c0f30202
 PTR_gPrng_0810ae90:
@@ -7462,7 +7462,7 @@ LAB_0810afa8:
     pop {r4,r5,r6,r7}                        @ 0810afa8 f0bc
     pop {r0}                                 @ 0810afaa 01bc
     bx r0                                    @ 0810afac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810afb0:
     .word  0x0300546c                     @ 0810afb0 6c540003
 DAT_0810afb4:
@@ -7523,7 +7523,7 @@ LAB_0810afec:
     ldr r0,[r3,#0xc]                         @ 0810b008 d868
     str r0,[r1,#0x0]                         @ 0810b00a 0860
     b LAB_0810b02c                           @ 0810b00c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810b010:
     .word  0x084be710                     @ 0810b010 10e74b08
 DAT_0810b014:
@@ -7652,7 +7652,7 @@ LAB_0810b0c8:
     pop {r4}                                 @ 0810b0ec 10bc
     pop {r0}                                 @ 0810b0ee 01bc
     bx r0                                    @ 0810b0f0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810b0f4:
     .word  0x030050cc                     @ 0810b0f4 cc500003
 DAT_0810b0f8:
@@ -7931,7 +7931,7 @@ LAB_0810b25e:
     pop {r4,r5,r6}                           @ 0810b2b8 70bc
     pop {r0}                                 @ 0810b2ba 01bc
     bx r0                                    @ 0810b2bc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_IE_0810b2c0:
     .word  IE                             @ 0810b2c0 00020004
 DAT_0810b2c4:
@@ -8053,7 +8053,7 @@ LAB_0810b382:
     pop {r4,r5,r6,r7}                        @ 0810b3a0 f0bc
     pop {r0}                                 @ 0810b3a2 01bc
     bx r0                                    @ 0810b3a4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_SOUNDBIAS_0810b3a8:
     .word  SOUNDBIAS                      @ 0810b3a8 88000004
 DAT_0810b3ac:
@@ -8530,7 +8530,7 @@ LAB_0810b6ee:
     orrs r1,r2    @ 0810b6f8 1143
     strh r1,[r0,#0x0]                        @ 0810b6fa 0180
     b LAB_0810bbb6                           @ 0810b6fc 5be2
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_SOUNDCNT_H_0810b700:
     .word  SOUNDCNT_H                     @ 0810b700 82000004
 LAB_0810b704:
@@ -8567,7 +8567,7 @@ LAB_0810b72e:
     strb r1,[r0,#0x0]                        @ 0810b740 0170
     str r6,[r5,#0x0]                         @ 0810b742 2e60
     b LAB_0810bbb6                           @ 0810b744 37e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810b748:
     .word  0x00000242                     @ 0810b748 42020000
 LAB_0810b74c:
@@ -8863,7 +8863,7 @@ LAB_0810b950:
     ldrb r1,[r5,#0xb]                        @ 0810b954 e97a
     adds r0,r3,r1    @ 0810b956 5818
     b LAB_0810b9aa                           @ 0810b958 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810b95c:
     .word  0xfffffc00                     @ 0810b95c 00fcffff
 LAB_0810b960:
@@ -9008,7 +9008,7 @@ LAB_0810ba58:
     strb r0,[r7,#0x5]                        @ 0810ba58 7871
     strb r0,[r7,#0x4]                        @ 0810ba5a 3871
     b LAB_0810bbb6                           @ 0810ba5c abe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ba60:
     .word  0xffff8000                     @ 0810ba60 0080ffff
 LAB_0810ba64:
@@ -9128,7 +9128,7 @@ LAB_0810bb28:
     strh r0,[r7,#0x0]                        @ 0810bb2c 3880
     movs r0,#0x2    @ 0810bb2e 0220
     b LAB_0810bbb4                           @ 0810bb30 40e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810bb34:
     .word  0xfffffc00                     @ 0810bb34 00fcffff
 LAB_0810bb38:
@@ -9249,7 +9249,7 @@ LAB_0810bbfe:
     pop {r4,r5,r6,r7}                        @ 0810bc04 f0bc
     pop {r0}                                 @ 0810bc06 01bc
     bx r0                                    @ 0810bc08 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810bc0c:
     .word  0x00000382                     @ 0810bc0c 82030000
 
@@ -9306,7 +9306,7 @@ tick_sound_engine_main:
     orrs r0,r1    @ 0810bc6c 0843
     strh r0,[r3,#0x0]                        @ 0810bc6e 1880
     b LAB_0810bce0                           @ 0810bc70 36e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810bc74:
     .word  0x0000037f                     @ 0810bc74 7f030000
 DAT_0810bc78:
@@ -9450,7 +9450,7 @@ LAB_0810bd6a:
     cmp r4,r5                                @ 0810bd78 ac42
     bge LAB_0810bd90                         @ 0810bd7a 09da
     b LAB_0810bd8e                           @ 0810bd7c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810bd80:
     .word  0x03005608                     @ 0810bd80 08560003
 DAT_0810bd84:
@@ -10007,7 +10007,7 @@ LAB_0810c17e:
     ldrh r0,[r6,#0x2]                        @ 0810c194 7088
     strh r0,[r1,#0x2]                        @ 0810c196 4880
     b LAB_0810c494                           @ 0810c198 7ce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c19c:
     .word  0x000083ff                     @ 0810c19c ff830000
 LAB_0810c1a0:
@@ -10305,7 +10305,7 @@ LAB_0810c37c:
     ldr r0, DAT_0810c3b4                     @ 0810c3a8 0248
     ands r2,r0    @ 0810c3aa 0240
     b LAB_0810c3d0                           @ 0810c3ac 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c3b0:
     .word  0xffffafff                     @ 0810c3b0 ffafffff
 DAT_0810c3b4:
@@ -10356,7 +10356,7 @@ LAB_0810c3fc:
     .hword 0x4645    @ 0810c408 4546
     strh r4,[r5,#0x0]                        @ 0810c40a 2c80
     b LAB_0810c422                           @ 0810c40c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c410:
     .word  0x0000ffff                     @ 0810c410 ffff0000
 DAT_0810c414:
@@ -10418,7 +10418,7 @@ LAB_0810c472:
     ands r0,r4    @ 0810c47c 2040
     lsls r4,r0,#0x6    @ 0810c47e 8401
     b LAB_0810c48e                           @ 0810c480 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c484:
     .word  0x0000036a                     @ 0810c484 6a030000
 DAT_0810c488:
@@ -10534,7 +10534,7 @@ LAB_0810c53a:
     strb r2,[r6,#0xe]                        @ 0810c550 b273
     movs r4,#0x0    @ 0810c552 0024
     b LAB_0810c578                           @ 0810c554 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c558:
     .word  0x00000376                     @ 0810c558 76030000
 DAT_0810c55c:
@@ -10607,7 +10607,7 @@ LAB_0810c5d0:
     movs r4,#0x1    @ 0810c5d8 0124
     strb r4,[r3,#0x4]                        @ 0810c5da 1c71
     b LAB_0810c626                           @ 0810c5dc 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810c5e0:
     .word  0x084c7368                     @ 0810c5e0 68734c08
 DAT_0810c5e4:
@@ -10937,7 +10937,7 @@ LAB_0810c838:
     adds r0,r0,r1    @ 0810c83c 4018
     ldrh r5,[r0,#0x0]                        @ 0810c83e 0588
     b LAB_0810c85a                           @ 0810c840 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_SOUND1CNT_X_0810c844:
     .word  SOUND1CNT_X                    @ 0810c844 64000004
 DAT_0810c848:
@@ -10995,7 +10995,7 @@ LAB_0810c88a:
     ldr r0, PTR_SOUND3CNT_H_0810c8bc         @ 0810c8a8 0448
     strh r1,[r0,#0x0]                        @ 0810c8aa 0180
     b LAB_0810c8dc                           @ 0810c8ac 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_SOUND2CNT_H_0810c8b0:
     .word  SOUND2CNT_H                    @ 0810c8b0 6c000004
 DAT_0810c8b4:
@@ -11045,7 +11045,7 @@ LAB_0810c8e0:
     ldrh r0,[r0,#0x0]                        @ 0810c908 0088
     strh r0,[r2,#0x0]                        @ 0810c90a 1080
     b LAB_0810c934                           @ 0810c90c 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_SOUND3CNT_H_0810c910:
     .word  SOUND3CNT_H                    @ 0810c910 72000004
 PTR_SOUND3CNT_X_0810c914:
@@ -11342,7 +11342,7 @@ LAB_0810caee:
     adds r0,r0,r1    @ 0810cb04 4018
     str r0,[sp,#0x0]                         @ 0810cb06 0090
     b LAB_0810cb24                           @ 0810cb08 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810cb0c:
     .word  0x030050cc                     @ 0810cb0c cc500003
 DAT_0810cb10:
@@ -11680,7 +11680,7 @@ LAB_0810cd76:
     pop {r4,r5,r6,r7}                        @ 0810cd80 f0bc
     pop {r0}                                 @ 0810cd82 01bc
     bx r0                                    @ 0810cd84 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810cd88:
     .word  0x00000387                     @ 0810cd88 87030000
 DAT_0810cd8c:
@@ -11751,7 +11751,7 @@ LAB_0810cdb6:
     movs r0,#0x0    @ 0810cdec 0020
     strb r0,[r1,#0x0]                        @ 0810cdee 0870
     b LAB_0810cee8                           @ 0810cdf0 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810cdf4:
     .word  0x030050cc                     @ 0810cdf4 cc500003
 DAT_0810cdf8:
@@ -11776,7 +11776,7 @@ LAB_0810ce08:
     adds r0,r5,r2    @ 0810ce1c a818
     strb r1,[r0,#0x0]                        @ 0810ce1e 0170
     b LAB_0810ce40                           @ 0810ce20 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ce24:
     .word  0x00000386                     @ 0810ce24 86030000
 DAT_0810ce28:
@@ -11893,7 +11893,7 @@ LAB_0810cee8:
     pop {r4,r5,r6}                           @ 0810cee8 70bc
     pop {r0}                                 @ 0810ceea 01bc
     bx r0                                    @ 0810ceec 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810cef0:
     .word  0x00000381                     @ 0810cef0 81030000
 DAT_0810cef4:
@@ -11962,7 +11962,7 @@ init_sound_channel_entry_trampoline:
     bl init_sound_channel_entry              @ 0810cf62 fff7d5ff
     pop {r0}                                 @ 0810cf66 01bc
     bx r0                                    @ 0810cf68 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ indeg=0, Sub-type A (no function pointer references). Checks whether the DMA state word [+0xd9*4=0x364] bit7 in audio engine IWRAM 0x030050cc is set (channel active); if not active, returns 0. If active, reads [base+0x36a] halfword (channel ID) and compares with input r0 (channel_id): if equal returns 1, if not equal returns 0. Exit: pop{r4}; pop{r1}; bx r1 (Sub-case E, preserves r0).
 @ 
@@ -11993,7 +11993,7 @@ check_sound_channel_id_match:
 LAB_0810cf92:
     adds r0,r1,#0x0    @ 0810cf92 081c
     b LAB_0810cfa2                           @ 0810cf94 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810cf98:
     .word  0x030050cc                     @ 0810cf98 cc500003
 DWORD_0810cf9c:
@@ -12031,7 +12031,7 @@ reset_sound_channel_if_mismatch:
     bne LAB_0810cfd8                         @ 0810cfc8 06d1
     movs r0,#0x0    @ 0810cfca 0020
     b LAB_0810cfe0                           @ 0810cfcc 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810cfd0:
     .word  0x030050cc                     @ 0810cfd0 cc500003
 DWORD_0810cfd4:
@@ -12083,7 +12083,7 @@ init_sound_channel_with_data:
     pop {r4}                                 @ 0810d014 10bc
     pop {r0}                                 @ 0810d016 01bc
     bx r0                                    @ 0810d018 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d01c:
     .word  0x030050cc                     @ 0810d01c cc500003
 
@@ -12168,7 +12168,7 @@ read_channel_position_if_active:
     movs r6,#0x0    @ 0810d084 0026
     ldrsh r0,[r0,r6]                         @ 0810d086 805f
     b LAB_0810d09c                           @ 0810d088 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d08c:
     .word  0x030050cc                     @ 0810d08c cc500003
 DWORD_0810d090:
@@ -12182,7 +12182,7 @@ LAB_0810d09c:
     pop {r4,r5,r6}                           @ 0810d09c 70bc
     pop {r1}                                 @ 0810d09e 02bc
     bx r1                                    @ 0810d0a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Writes a request byte to the IWRAM sound engine management struct (base 0x030050cc) and clears the adjacent status byte: [0x030050cc+0x381] := 0 (status/ack byte cleared), [0x030050cc+0x380] := r0 (request_code). Called by request_sound_engine_code10 (FUN_080f9b40, r0=0x10) and FUN_080f9b4c (transparent r0). r0=u8 request_code [0..0xff]. Returns void. Constants: 0x030050cc=sound engine IWRAM struct base; 0x380=request code byte offset; 0x381=status/ack byte offset.
 write_sound_engine_request:
@@ -12296,7 +12296,7 @@ LAB_0810d140:
     adds r0,r2,#0x0    @ 0810d140 101c
     pop {r1}                                 @ 0810d142 02bc
     bx r1                                    @ 0810d144 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810d148:
     .word  0x030050cc                     @ 0810d148 cc500003
 DAT_0810d14c:
@@ -12409,7 +12409,7 @@ init_sprite_entry_with_engine_ptr:
     pop {r4}                                 @ 0810d208 10bc
     pop {r0}                                 @ 0810d20a 01bc
     bx r0                                    @ 0810d20c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810d210:
     .word  0x030050cc                     @ 0810d210 cc500003
 
@@ -12453,7 +12453,7 @@ init_sprite_channel_entry:
     bl allocate_sound_channel_slot           @ 0810d242 fff745fc
     pop {r0}                                 @ 0810d246 01bc
     bx r0                                    @ 0810d248 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Sound engine channel priority-gated sprite initialization function. Input r0 = entity_id. Reads [base+0x368] (0xda*4) signed halfword: if <0, calls init_sprite_entry_by_id(r0) directly (no priority record, allow init). If >=0, uses (r0 & 0xfff)*9*4 as offset into ROM table 0x081143a0 to look up current entity's priority_byte ([+0x20] & 0xff); simultaneously uses r5 (= [base+0x368] & 0xfff) as index to look up occupied slot's priority_byte. If current entity priority >= occupied entity priority, skips init; otherwise calls init_sprite_entry_by_id(r0). Prevents low-priority entity from displacing high-priority already-allocated channel slot.
 @ 
@@ -12537,7 +12537,7 @@ init_sprite_entry_with_type:
     pop {r4}                                 @ 0810d2b0 10bc
     pop {r0}                                 @ 0810d2b2 01bc
     bx r0                                    @ 0810d2b4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d2b8:
     .word  0x030050cc                     @ 0810d2b8 cc500003
 DWORD_0810d2bc:
@@ -12572,7 +12572,7 @@ init_sprite_entry_with_type_and_offset:
     pop {r4,r5}                              @ 0810d2d8 30bc
     pop {r0}                                 @ 0810d2da 01bc
     bx r0                                    @ 0810d2dc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d2e0:
     .word  0x030050cc                     @ 0810d2e0 cc500003
 DWORD_0810d2e4:
@@ -12610,7 +12610,7 @@ set_channel_slide_range:
     pop {r4,r5}                              @ 0810d308 30bc
     pop {r0}                                 @ 0810d30a 01bc
     bx r0                                    @ 0810d30c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d310:
     .word  0x030050cc                     @ 0810d310 cc500003
 DWORD_0810d314:
@@ -12792,7 +12792,7 @@ LAB_0810d3e0:
 LAB_0810d3f6:
     pop {r0}                                 @ 0810d3f6 01bc
     bx r0                                    @ 0810d3f8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d3fc:
     .word  0x030050cc                     @ 0810d3fc cc500003
 DWORD_0810d400:
@@ -12940,7 +12940,7 @@ LAB_0810d4a0:
     pop {r4,r5,r6,r7}                        @ 0810d4a8 f0bc
     pop {r0}                                 @ 0810d4aa 01bc
     bx r0                                    @ 0810d4ac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d4b0:
     .word  0x030052f0                     @ 0810d4b0 f0520003
 
@@ -13035,7 +13035,7 @@ LAB_0810d51c:
     pop {r4}                                 @ 0810d51c 10bc
     pop {r1}                                 @ 0810d51e 02bc
     bx r1                                    @ 0810d520 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Channel slot status query function returning three-state result. When r0 < 0: scans 0x030052f0 array 8 entries; if any active slot (bit7=1) found returns 1; if none active checks [base+0x368] <0, if so returns 2, else returns 0. When r0 >= 0: scans for [+0xe]==r0 active slot; if found returns 1; if not found checks [base+0x368]==r0; if matching returns 2; else returns 0. Three states: 0=invalid/not present, 1=active in slot array, 2=active in engine default channel.
 @ 
@@ -13077,7 +13077,7 @@ LAB_0810d532:
     cmp r0,#0x0                              @ 0810d550 0028
     bge LAB_0810d59c                         @ 0810d552 23da
     b LAB_0810d58e                           @ 0810d554 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d558:
     .word  0x030052f0                     @ 0810d558 f0520003
 DWORD_0810d55c:
@@ -13111,7 +13111,7 @@ LAB_0810d576:
 LAB_0810d58e:
     movs r0,#0x0    @ 0810d58e 0020
     b LAB_0810d59e                           @ 0810d590 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d594:
     .word  0x030050cc                     @ 0810d594 cc500003
 LAB_0810d598:
@@ -13162,7 +13162,7 @@ LAB_0810d5b8:
     cmp r0,#0x0                              @ 0810d5cc 0028
     bne LAB_0810d5ea                         @ 0810d5ce 0cd1
     b LAB_0810d5fe                           @ 0810d5d0 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d5d4:
     .word  0x03005390                     @ 0810d5d4 90530003
 LAB_0810d5d8:
@@ -13190,7 +13190,7 @@ LAB_0810d5ee:
 LAB_0810d5fe:
     movs r0,#0x0    @ 0810d5fe 0020
     b LAB_0810d60a                           @ 0810d600 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d604:
     .word  0x030050cc                     @ 0810d604 cc500003
 LAB_0810d608:
@@ -13347,7 +13347,7 @@ LAB_0810d6b8:
     bne LAB_0810d6cc                         @ 0810d6c0 04d1
     ldr r1, DAT_0810d6c8                     @ 0810d6c2 0149
     b LAB_0810d6d0                           @ 0810d6c4 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810d6c8:
     .word  0x08114a90                     @ 0810d6c8 904a1108
 LAB_0810d6cc:
@@ -13382,7 +13382,7 @@ LAB_0810d6d0:
     bne LAB_0810d71c                         @ 0810d704 0ad1
     adds r2,r6,#0x0    @ 0810d706 321c
     b LAB_0810d726                           @ 0810d708 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810d70c:
     .word  0x030050cc                     @ 0810d70c cc500003
 DAT_0810d710:
@@ -13477,7 +13477,7 @@ reinit_playback_slot_from_channel:
     pop {r4}                                 @ 0810d79c 10bc
     pop {r0}                                 @ 0810d79e 01bc
     bx r0                                    @ 0810d7a0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Extended playback slot reinitialization function. Extends reinit_playback_slot_from_channel with two additional byte parameters r3 (param_a) and sp[0x10] (param_b). First zeros [r0+0xe], calls init_sound_channel_playback_slot; then writes r3 to [r0+0x10] (volume/priority byte), sp[0x10] to [r0+0x11] (envelope byte); finally writes flags to [r0+0xe]. Used for channel re-trigger paths in sound engine that need to simultaneously set playback volume and envelope parameters. Called by sound engine tick main loop (0x0810c6a6 region).
 @ 
@@ -13541,7 +13541,7 @@ LAB_0810d7da:
     pop {r4,r5}                              @ 0810d7e4 30bc
     pop {r1}                                 @ 0810d7e6 02bc
     bx r1                                    @ 0810d7e8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810d7ec:
     .word  0x0300546c                     @ 0810d7ec 6c540003
     .byte  0x01, 0x48, 0x80, 0x69, 0x70, 0x47, 0x00, 0x00, 0xcc, 0x50, 0x00, 0x03
@@ -13574,7 +13574,7 @@ read_channel_id_if_active:
     movs r1,#0x0    @ 0810d814 0021
     ldrsh r0,[r0,r1]                         @ 0810d816 405e
     b LAB_0810d828                           @ 0810d818 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d81c:
     .word  0x030050cc                     @ 0810d81c cc500003
 DWORD_0810d820:
@@ -13806,7 +13806,7 @@ LAB_0810d9ae:
     pop {r4,r5,r6,r7}                        @ 0810d9d0 f0bc
     pop {r0}                                 @ 0810d9d2 01bc
     bx r0                                    @ 0810d9d4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810d9d8:
     .word  0x00000381                     @ 0810d9d8 81030000
 DWORD_0810d9dc:
@@ -13872,7 +13872,7 @@ LAB_0810da1e:
     strh r1,[r0,#0x0]                        @ 0810da3c 0180
     movs r7,#0x10    @ 0810da3e 1027
     b LAB_0810da56                           @ 0810da40 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810da44:
     .word  0x030050cc                     @ 0810da44 cc500003
 DWORD_0810da48:
@@ -13901,7 +13901,7 @@ LAB_0810da56:
     pop {r4,r5,r6,r7}                        @ 0810da74 f0bc
     pop {r0}                                 @ 0810da76 01bc
     bx r0                                    @ 0810da78 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810da7c:
     .word  0x00000381                     @ 0810da7c 81030000
 DWORD_0810da80:
@@ -13934,7 +13934,7 @@ LAB_0810daac:
     pop {r4,r5}                              @ 0810daac 30bc
     pop {r0}                                 @ 0810daae 01bc
     bx r0                                    @ 0810dab0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Resets audio channel and writes config bytes. Saves r2 to r5 (config byte). Loads audio engine base r4=0x030050cc. Calls restart_sound_channel_blocking(r0, r1) to reset specified channel. Writes r5 to [r4+0x380] (channel config byte); writes 0x10 to [r4+0x381] (channel param A); writes 0 to [r4+0x37f] (param B); writes 0 to [r4+0x37e] (param C). Returns void.
 restart_sound_channel_with_config:
@@ -13960,7 +13960,7 @@ restart_sound_channel_with_config:
     pop {r4,r5}                              @ 0810dadc 30bc
     pop {r0}                                 @ 0810dade 01bc
     bx r0                                    @ 0810dae0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810dae4:
     .word  0x030050cc                     @ 0810dae4 cc500003
 DWORD_0810dae8:
@@ -14039,7 +14039,7 @@ LAB_0810db38:
     pop {r4,r5,r6,r7}                        @ 0810db44 f0bc
     pop {r0}                                 @ 0810db46 01bc
     bx r0                                    @ 0810db48 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810db4c:
     .word  0x03005390                     @ 0810db4c 90530003
 
@@ -14096,7 +14096,7 @@ LAB_0810db80:
     pop {r4,r5,r6}                           @ 0810db88 70bc
     pop {r0}                                 @ 0810db8a 01bc
     bx r0                                    @ 0810db8c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810db90:
     .word  0x030052f0                     @ 0810db90 f0520003
 
@@ -14124,7 +14124,7 @@ set_channel_volume_pan_and_loop_by_id:
     pop {r4,r5}                              @ 0810dba8 30bc
     pop {r0}                                 @ 0810dbaa 01bc
     bx r0                                    @ 0810dbac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Sound engine DMA channel access query. r0=entity_id of requesting entity. Reads IWRAM sound engine struct (0x030050cc) [+0x364] status halfword bit7 to check if DMA is running: bit7=1 (DMA active): if entity_id<0 returns 1 (any entity allowed), else reads [+0x36a] current owner entity ID and compares; match returns 1, mismatch returns 0. bit7=0 (DMA idle): reads [+0x366] pending entity ID; if negative returns 0; if entity_id<0 or matches pending returns 2 (pending match); else returns 0.
 @ 
@@ -14159,7 +14159,7 @@ query_engine_dma_channel_access:
 LAB_0810dbd6:
     movs r0,#0x1    @ 0810dbd6 0120
     b LAB_0810dc02                           @ 0810dbd8 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810dbdc:
     .word  0x030050cc                     @ 0810dbdc cc500003
 DWORD_0810dbe0:
@@ -14185,7 +14185,7 @@ LAB_0810dc00:
 LAB_0810dc02:
     pop {r1}                                 @ 0810dc02 02bc
     bx r1                                    @ 0810dc04 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates IWRAM DMA channel slot array (0x03005390, stride=0x28, 8 slots), writing an attenuation byte computed from vol_a*vol_b product to all active slots matching entity_id. Formula: attenuation = 0x10 - (vol_a * vol_b >> 4). Active check: [slot+0x1f] bit7=1. Entity match: [slot+0xe] signed halfword == entity_id. Write target: [slot+0x24] (volume/attenuation byte field). Returns computed attenuation in r4 (Sub-case E, pop{r1};bx r1 preserves r0).
 @ 
@@ -14369,7 +14369,7 @@ LAB_0810dd06:
     pop {r4,r5,r6}                           @ 0810dd08 70bc
     pop {r0}                                 @ 0810dd0a 01bc
     bx r0                                    @ 0810dd0c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810dd10:
     .word  0x03005608                     @ 0810dd10 08560003
 PTR_DMA3SAD_0810dd14:
@@ -14398,7 +14398,7 @@ LAB_0810dd36:
 LAB_0810dd3a:
     pop {r0}                                 @ 0810dd3a 01bc
     bx r0                                    @ 0810dd3c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Writes r0 (buf_ptr) to [0x03005608+0] as the frequency slot data pointer, computes end_ptr = buf_ptr + 0x2000 and writes it to both [+0x28] and [+0x14], then byte-loops to zero [buf_ptr..buf_ptr+0x3fff] (0x4000 = 16384 bytes). Large-buffer variant; small-buffer counterpart is 0x0810dd6c (init_freq_slot_buf_small, zeros 0x2000 bytes). Called by FUN_0810b3e0 in the sound initialization path.
 @ 
@@ -14568,7 +14568,7 @@ LAB_0810de28:
     pop {r4,r5}                              @ 0810de28 30bc
     pop {r0}                                 @ 0810de2a 01bc
     bx r0                                    @ 0810de2c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Locates an IWRAM frequency slot (0x03005608, stride 20 bytes) by r0 (slot_index [0..2]). If data_ptr is null: writes 0x7f to [+0x9] and [+0x11] then returns. Otherwise, if r2 (apply_flag) is nonzero, writes r1 (volume_byte) to [+0x11] and [+0x9]. Then loads the pitch LUT (0x084c7568), reads [engine+0x38a] (rate), computes pitch = PITCH_LUT[rate] * r1 >> 0xc (fixed-point scale), and writes to [+0x8]. Updates both volume and pitch fields. Called by sound engine main loop and sequencer when activating a slot.
 @ 
@@ -14621,7 +14621,7 @@ LAB_0810de70:
     pop {r4}                                 @ 0810de70 10bc
     pop {r0}                                 @ 0810de72 01bc
     bx r0                                    @ 0810de74 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810de78:
     .word  0x084c7568                     @ 0810de78 68754c08
 DAT_0810de7c:
@@ -14646,7 +14646,7 @@ set_sound_engine_bit2_flag:
     orrs r1,r2    @ 0810debc 1143
     strh r1,[r0,#0x0]                        @ 0810debe 0180
     bx lr                                    @ 0810dec0 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810dec4:
     .word  0x030050cc                     @ 0810dec4 cc500003
 
@@ -14666,7 +14666,7 @@ set_sound_engine_bit0_flag:
     orrs r1,r2    @ 0810ded4 1143
     strh r1,[r0,#0x0]                        @ 0810ded6 0180
     bx lr                                    @ 0810ded8 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810dedc:
     .word  0x030050cc                     @ 0810dedc cc500003
     ROM_INCBIN 0x10dee0, 0x18
@@ -14712,7 +14712,7 @@ LAB_0810df2e:
     pop {r4}                                 @ 0810df30 10bc
     pop {r1}                                 @ 0810df32 02bc
     bx r1                                    @ 0810df34 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0810df38:
     .word  0xe92d5ff0                     @ 0810df38 f05f2de9
 .arm
@@ -15088,7 +15088,7 @@ get_bios_div_remainder:
     svc 0x6                                  @ 0810e400 06df
     adds r0,r1,#0x0    @ 0810e402 081c
     bx lr                                    @ 0810e404 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Invokes BIOS SVC 0xd (BiosCheckSum), subtracts the official GBA BIOS checksum constant 0xbaae187f from the return value, then ANDs with 0x1 to extract bit0 parity. Returns 0 if BIOS is intact and unmodified; returns 1 otherwise. Used for runtime BIOS integrity verification. Called by FUN_080f4c14 (dma;sys;display region) during DMA / display system initialization.
 @ 
@@ -15151,7 +15151,7 @@ LAB_0810e450:
     pop {r4,r5}                              @ 0810e450 30bc
     pop {r0}                                 @ 0810e452 01bc
     bx r0                                    @ 0810e454 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_WAITCNT_0810e458:
     .word  WAITCNT                        @ 0810e458 04020004
 DAT_0810e45c:
@@ -15188,7 +15188,7 @@ LAB_0810e490:
     pop {r4,r5}                              @ 0810e490 30bc
     pop {r0}                                 @ 0810e492 01bc
     bx r0                                    @ 0810e494 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_WAITCNT_0810e498:
     .word  WAITCNT                        @ 0810e498 04020004
 DAT_0810e49c:
@@ -15249,7 +15249,7 @@ LAB_0810e518:
     subs r0,r0,r1    @ 0810e530 401a
     lsls r0,r0,#0xf    @ 0810e532 c003
     b LAB_0810e558                           @ 0810e534 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810e538:
     .word  0x02029ea0                     @ 0810e538 a09e0202
 DAT_0810e53c:
@@ -15283,7 +15283,7 @@ LAB_0810e558:
     strh r0,[r2,#0x0]                        @ 0810e570 1080
     pop {r0}                                 @ 0810e572 01bc
     bx r0                                    @ 0810e574 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810e578:
     .word  0x02029ea4                     @ 0810e578 a49e0202
 DAT_0810e57c:
@@ -15454,12 +15454,12 @@ LAB_0810e68c:
     bl ignore_div_by_zero                    @ 0810e68e 00f003f8
     movs r0,#0x0    @ 0810e692 0020
     pop {pc}                                 @ 0810e694 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Divide-by-zero handler stub for software integer division library (__divsi3/__modsi3/__udivsi3/__umodsi3): returns immediately via mov pc,lr (0x46f7) without doing anything. Callers check r1==0 and bl here before setting r0:=0 and returning, so the actual "return 0 on divide-by-zero" semantic is handled by the caller after return. All 4 callers are soft integer division/modulo functions. Acts as a replaceable divide-by-zero callback placeholder.
 ignore_div_by_zero:
     .hword 0x46f7    @ 0810e698 f746
-    .byte  0x00, 0x00
+    .zero  0x2
 __modsi3:
     movs r3,#0x1    @ 0810e69c 0123
     cmp r1,#0x0                              @ 0810e69e 0029
@@ -15579,7 +15579,7 @@ LAB_0810e760:
     bl ignore_div_by_zero                    @ 0810e762 fff799ff
     movs r0,#0x0    @ 0810e766 0020
     pop {pc}                                 @ 0810e768 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __muldi3:
     push {r4,r5,r6,r7,lr}                    @ 0810e76c f0b5
     sub sp,#0x10                             @ 0810e76e 84b0
@@ -15916,7 +15916,7 @@ LAB_0810e9a8:
 LAB_0810e9b6:
     adds r0,r5,#0x0    @ 0810e9b6 281c
     pop {r4,r5,pc}                           @ 0810e9b8 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 memset:
     push {r4,r5,lr}                          @ 0810e9bc 30b5
     adds r5,r0,#0x0    @ 0810e9be 051c
@@ -15964,7 +15964,7 @@ LAB_0810ea02:
     bne LAB_0810e9fe                         @ 0810ea08 f9d1
     adds r0,r5,#0x0    @ 0810ea0a 281c
     pop {r4,r5,pc}                           @ 0810ea0c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 qsort:
     push {r4,r5,r6,r7,lr}                    @ 0810ea10 f0b5
     .hword 0x4657    @ 0810ea12 5746
@@ -16763,7 +16763,7 @@ sscanf:
     pop {r3}                                 @ 0810efdc 08bc
     add sp,#0xc                              @ 0810efde 03b0
     bx r3                                    @ 0810efe0 1847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810efe4:
     .word  0x0810efa1                     @ 0810efe4 a1ef1008
 DAT_0810efe8:
@@ -16860,7 +16860,7 @@ LAB_0810f086:
     subs r0,r2,r3    @ 0810f08a d01a
 LAB_0810f08c:
     pop {r4,r5,pc}                           @ 0810f08c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 strcpy:
     push {r4,r5,r6,lr}                       @ 0810f090 70b5
     adds r6,r0,#0x0    @ 0810f092 061c
@@ -16902,7 +16902,7 @@ LAB_0810f0c8:
     bne LAB_0810f0c8                         @ 0810f0d4 f8d1
     adds r0,r6,#0x0    @ 0810f0d6 301c
     pop {r4,r5,r6,pc}                        @ 0810f0d8 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 strlen:
     push {r4,r5,lr}                          @ 0810f0dc 30b5
     adds r1,r0,#0x0    @ 0810f0de 011c
@@ -16941,7 +16941,7 @@ LAB_0810f114:
     bne LAB_0810f112                         @ 0810f118 fbd1
     subs r0,r1,r5    @ 0810f11a 481b
     pop {r4,r5,pc}                           @ 0810f11c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 strncmp:
     push {r4,r5,r6,lr}                       @ 0810f120 70b5
     adds r6,r0,#0x0    @ 0810f122 061c
@@ -16991,7 +16991,7 @@ LAB_0810f170:
     cmp r0,#0x0                              @ 0810f174 0028
     beq LAB_0810f19e                         @ 0810f176 12d0
     b LAB_0810f196                           @ 0810f178 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f17c:
     .word  0xfefefeff                     @ 0810f17c fffefefe
 DAT_0810f180:
@@ -17019,7 +17019,7 @@ LAB_0810f19e:
     subs r0,r6,r4    @ 0810f1a2 301b
 LAB_0810f1a4:
     pop {r4,r5,r6,pc}                        @ 0810f1a4 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 strncpy:
     push {r4,r5,r6,r7,lr}                    @ 0810f1a8 f0b5
     adds r7,r0,#0x0    @ 0810f1aa 071c
@@ -17153,7 +17153,7 @@ LAB_0810f28a:
     cmp r0,#0x0                              @ 0810f298 0028
     bne LAB_0810f268                         @ 0810f29a e5d1
     b switchD_0810f690__default              @ 0810f29c cde7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f2a0:
     .word  0x09e58579                     @ 0810f2a0 7985e509
 LAB_0810f2a4:
@@ -17178,7 +17178,7 @@ LAB_0810f2bc:
     ldr r0,[r0,#0x0]                         @ 0810f2c2 0068
 switchD_0810f2c4__switchD:
     .hword 0x4687    @ 0810f2c4 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f2c8:
     .word  0x0810f2cc                     @ 0810f2c8 ccf21008
 switchD_0810f2c4__switchdataD_0810f2cc:
@@ -17391,7 +17391,7 @@ switchD_0810f2c4__caseD_6f:
     str r0,[sp,#0x268]                       @ 0810f544 9a90
     movs r1,#0x8    @ 0810f546 0821
     b LAB_0810f620                           @ 0810f548 6ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f54c:
     .word  0x08110dad                     @ 0810f54c ad0d1108
 switchD_0810f2c4__caseD_75:
@@ -17414,7 +17414,7 @@ switchD_0810f2c4__caseD_58:
     movs r2,#0x10    @ 0810f56c 1022
     .hword 0x4692    @ 0810f56e 9246
     b LAB_0810f622                           @ 0810f570 57e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f574:
     .word  0x08110dad                     @ 0810f574 ad0d1108
 switchD_0810f2c4__caseD_45:
@@ -17448,7 +17448,7 @@ switchD_0810f2c4__caseD_70:
     str r0,[sp,#0x268]                       @ 0810f5a8 9a90
     movs r1,#0x10    @ 0810f5aa 1021
     b LAB_0810f620                           @ 0810f5ac 38e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f5b0:
     .word  0x08110dad                     @ 0810f5b0 ad0d1108
 switchD_0810f2c4__caseD_6e:
@@ -17530,7 +17530,7 @@ LAB_0810f638:
     cmp r0,#0x0                              @ 0810f63c 0028
     bne LAB_0810f682                         @ 0810f63e 20d1
     b LAB_0810f670                           @ 0810f640 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f644:
     .word  0x09e58579                     @ 0810f644 7985e509
 DAT_0810f648:
@@ -17575,7 +17575,7 @@ LAB_0810f688:
     ldr r0,[r0,#0x0]                         @ 0810f68e 0068
 switchD_0810f690__switchD:
     .hword 0x4687    @ 0810f690 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f694:
     .word  0x09e58579                     @ 0810f694 7985e509
 DAT_0810f698:
@@ -17778,7 +17778,7 @@ LAB_0810f7e6:
     bne LAB_0810f844                         @ 0810f800 20d1
     movs r7,#0x1    @ 0810f802 0127
     b LAB_0810f834                           @ 0810f804 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810f808:
     .word  0x09e58579                     @ 0810f808 7985e509
 LAB_0810f80c:
@@ -18007,7 +18007,7 @@ LAB_0810fa40:
     beq LAB_0810fa54                         @ 0810fa48 04d0
     ldr r0, DAT_0810fa50                     @ 0810fa4a 0148
     b LAB_0810face                           @ 0810fa4c 3fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810fa50:
     .word  0xfffffd3f                     @ 0810fa50 3ffdffff
 LAB_0810fa54:
@@ -18025,7 +18025,7 @@ switchD_0810f8f2__caseD_31:
     .hword 0x4682    @ 0810fa68 8246
     ldr r0, DAT_0810fa74                     @ 0810fa6a 0248
     b LAB_0810face                           @ 0810fa6c 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810fa70:
     .word  0x09e58554                     @ 0810fa70 5485e509
 DAT_0810fa74:
@@ -18042,7 +18042,7 @@ switchD_0810f8f2__caseD_38:
     ble switchD_0810f8f2__caseD_2c           @ 0810fa88 3ddd
     ldr r0, DAT_0810fa94                     @ 0810fa8a 0248
     b LAB_0810face                           @ 0810fa8c 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810fa90:
     .word  0x09e58554                     @ 0810fa90 5485e509
 DAT_0810fa94:
@@ -18053,7 +18053,7 @@ switchD_0810f8f2__caseD_41:
     ble switchD_0810f8f2__caseD_2c           @ 0810fa9c 33dd
     ldr r0, DAT_0810faa4                     @ 0810fa9e 0148
     b LAB_0810face                           @ 0810faa0 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810faa4:
     .word  0xfffffe3f                     @ 0810faa4 3ffeffff
 switchD_0810f8f2__caseD_2b:
@@ -18090,7 +18090,7 @@ LAB_0810face:
     adds r0,#0x1    @ 0810fae0 0130
     str r0,[r5,#0x0]                         @ 0810fae2 2860
     b LAB_0810fafe                           @ 0810fae4 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810fae8:
     .word  0x00000101                     @ 0810fae8 01010000
 DAT_0810faec:
@@ -18215,7 +18215,7 @@ LAB_0810fbbc:
     ldr r0,[r0,#0x0]                         @ 0810fbc2 0068
 switchD_0810fbc4__switchD:
     .hword 0x4687    @ 0810fbc4 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810fbc8:
     .word  0x0810fbcc                     @ 0810fbc8 ccfb1008
 switchD_0810fbc4__switchdataD_0810fbcc:
@@ -18537,7 +18537,7 @@ LAB_0810fe64:
     b LAB_0810fe1e                           @ 0810fe66 dae7
 LAB_0810fe68:
     pop {r4,r5,r6,pc}                        @ 0810fe68 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Single-argument wrapper for strtod(3) that forces endptr=NULL: sets r1 to 0 then calls strtod(r0, NULL), parsing the string pointed to by r0 (nptr) as a floating-point number without returning an end pointer. The double-precision result is passed through as r0:r1 (low 32 bits : high 32 bits) to the caller.
 @ 
@@ -18550,7 +18550,7 @@ invoke_strtod_no_endptr:
     movs r1,#0x0    @ 0810fe6e 0021
     bl strtod                                @ 0810fe70 00f05afe
     pop {pc}                                 @ 0810fe74 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 fread:
     push {r4,r5,r6,r7,lr}                    @ 0810fe78 f0b5
     .hword 0x4657    @ 0810fe7a 5746
@@ -18679,7 +18679,7 @@ LAB_0810ff60:
     orrs r0,r2    @ 0810ff64 1043
     strh r0,[r4,#0xc]                        @ 0810ff66 a081
     b LAB_0810ff94                           @ 0810ff68 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810ff6c:
     .word  0x09ed4d94                     @ 0810ff6c 944ded09
 LAB_0810ff70:
@@ -18782,7 +18782,7 @@ LAB_08110014:
     ldr r0,[r0,#0x0]                         @ 08110022 0068
 switchD_08110024__switchD:
     .hword 0x4687    @ 08110024 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110028:
     .word  0x0811002c                     @ 08110028 2c001108
 switchD_08110024__switchdataD_0811002c:
@@ -19263,7 +19263,7 @@ LAB_081103f0:
     adds r7,r1,#0x0    @ 081103f4 0f1c
     adds r6,r0,#0x0    @ 081103f6 061c
     b restore_strtod_r_frame                 @ 081103f8 81e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081103fc:
     .word  0x09e5868c                     @ 081103fc 8c86e509
 LAB_08110400:
@@ -19283,7 +19283,7 @@ LAB_08110400:
     adds r7,r1,#0x0    @ 0811041c 0f1c
     adds r6,r0,#0x0    @ 0811041e 061c
     b restore_strtod_r_frame                 @ 08110420 6de3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110424:
     .word  0x09e5868c                     @ 08110424 8c86e509
 LAB_08110428:
@@ -19335,7 +19335,7 @@ LAB_0811046c:
     b LAB_08110ad6                           @ 0811047e 2ae3
 LAB_08110480:
     b restore_strtod_r_frame                 @ 08110480 3de3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110484:
     .word  0x09e5868c                     @ 08110484 8c86e509
 DAT_08110488:
@@ -19404,7 +19404,7 @@ LAB_081104ce:
     movs r7,#0x1    @ 08110500 0127
     rsbs r7,r7,#0    @ 08110502 7f42
     b LAB_08110632                           @ 08110504 95e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110508:
     .word  0x09e58754                     @ 08110508 5487e509
 DAT_0811050c:
@@ -19534,7 +19534,7 @@ LAB_081105f2:
     b LAB_08110ad6                           @ 08110602 68e2
 LAB_08110604:
     b restore_strtod_r_frame                 @ 08110604 7be2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110608:
     .word  0x09e5868c                     @ 08110608 8c86e509
 DAT_0811060c:
@@ -19732,7 +19732,7 @@ LAB_08110774:
     ldr r4, DAT_08110794                     @ 08110784 034c
     ldr r5, DAT_08110798                     @ 08110786 044d
     b LAB_081107ac                           @ 08110788 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811078c:
     .word  0x3ff00000                     @ 0811078c 0000f03f
 DAT_08110790:
@@ -19753,7 +19753,7 @@ LAB_081107ac:
     adds r1,r5,#0x0    @ 081107ac 291c
     adds r0,r4,#0x0    @ 081107ae 201c
     b LAB_081107d6                           @ 081107b0 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081107b4:
     .word  0x3fe00000                     @ 081107b4 0000e03f
 DAT_081107b8:
@@ -19822,7 +19822,7 @@ LAB_08110836:
     movs r7,#0x1    @ 08110838 0127
     rsbs r7,r7,#0    @ 0811083a 7f42
     b LAB_08110962                           @ 0811083c 91e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110840:
     .word  0x3fe00000                     @ 08110840 0000e03f
 DAT_08110844:
@@ -20192,7 +20192,7 @@ LAB_08110b16:
     .hword 0x46a1    @ 08110b1c a146
     .hword 0x46aa    @ 08110b1e aa46
     pop {r4,r5,r6,r7,pc}                     @ 08110b20 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110b24:
     .word  0x000fffff                     @ 08110b24 ffff0f00
 
@@ -20209,7 +20209,7 @@ strtod:
     adds r1,r3,#0x0    @ 08110b32 191c
     bl _strtod_r                             @ 08110b34 fff75efa
     pop {pc}                                 @ 08110b38 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110b3c:
     .word  0x09ed4d94                     @ 08110b3c 944ded09
     .byte  0x00, 0xb5, 0xff, 0xf7, 0xf1, 0xff, 0x02, 0xf0, 0x3b, 0xff, 0x00, 0xbd
@@ -20357,7 +20357,7 @@ LAB_08110c42:
     ldr r1,[sp,#0x0]                         @ 08110c44 0099
     str r0,[r1,#0x0]                         @ 08110c46 0860
     b LAB_08110c58                           @ 08110c48 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110c4c:
     .word  0x7fffffff                     @ 08110c4c ffffff7f
 LAB_08110c50:
@@ -20400,7 +20400,7 @@ strtol:
     adds r2,r5,#0x0    @ 08110c86 2a1c
     bl _strtol_r                             @ 08110c88 fff760ff
     pop {r4,r5,pc}                           @ 08110c8c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110c90:
     .word  0x09ed4d94                     @ 08110c90 944ded09
 _strtoul_r:
@@ -20561,7 +20561,7 @@ LAB_08110d9c:
     .hword 0x46a1    @ 08110da4 a146
     .hword 0x46aa    @ 08110da6 aa46
     pop {r4,r5,r6,r7,pc}                     @ 08110da8 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ C standard library strtoul(3) public entry point: passes r0 (nptr), r1 (endptr), r2 (base) to _strtoul_r (0x08110c94), automatically binding the global reentrancy pointer (DAT_08110dc4=0x09ed4d94). Returns unsigned long in r0. Structurally symmetric with strtol (0x08110c78); differs only in callee (_strtoul_r returns unsigned long). Used by __svfscanf (0x0810f218) as a format-specifier callback for '%u'/'%o'/'%x' etc. (4 DAT references).
 @ 
@@ -20578,6 +20578,6 @@ strtoul:
     adds r2,r5,#0x0    @ 08110dba 2a1c
     bl _strtoul_r                            @ 08110dbc fff76aff
     pop {r4,r5,pc}                           @ 08110dc0 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110dc4:
     .word  0x09ed4d94                     @ 08110dc4 944ded09

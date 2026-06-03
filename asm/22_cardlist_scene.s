@@ -55,7 +55,7 @@ init_puzzle_scene_or_pack_by_ewram_flag:
     movs r3,#0xb0    @ 080fdd80 b023
     lsls r3,r3,#0x2    @ 080fdd82 9b00
     b LAB_080fddb0                           @ 080fdd84 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080fdd88:
     .word  0x02029eb0                     @ 080fdd88 b09e0202
 PTR_gPrng_080fdd8c:
@@ -91,7 +91,7 @@ LAB_080fddc2:
     pop {r4}                                 @ 080fddc4 10bc
     pop {r1}                                 @ 080fddc6 02bc
     bx r1                                    @ 080fddc8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080fddcc:
     .word  0x080e7e0d                     @ 080fddcc 0d7e0e08
 
@@ -121,7 +121,7 @@ select_charset_by_region:
     movs r1,#0x80    @ 080fdde8 8021
     lsls r1,r1,#0x8    @ 080fddea 0902
     b LAB_080fde7c                           @ 080fddec 46e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080fddf0:
     .word  gPrng                          @ 080fddf0 40000003
 DAT_080fddf4:
@@ -173,7 +173,7 @@ LAB_080fde38:
     movs r1,#0x80    @ 080fde4c 8021
     lsls r1,r1,#0x8    @ 080fde4e 0902
     b LAB_080fde7c                           @ 080fde50 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080fde54:
     .word  gPrng                          @ 080fde54 40000003
 DAT_080fde58:
@@ -201,7 +201,7 @@ LAB_080fde80:
     movs r0,#0x0    @ 080fde80 0020
     pop {r1}                                 @ 080fde82 02bc
     bx r1                                    @ 080fde84 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080fde88:
     .word  gPrng                          @ 080fde88 40000003
 DAT_080fde8c:
@@ -213,7 +213,7 @@ invoke_language_selection_page:
     bl enter_language_selection_page         @ 080fde92 eef791f8
     pop {r1}                                 @ 080fde96 02bc
     bx r1                                    @ 080fde98 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ game_str scene step sequence dispatcher. Reads current step index from gPrng+0x204 bits[21:14],
 @ looks up ROM function pointer table 0x09e5fd84 then calls current step handler via invoke_r0.
@@ -263,7 +263,7 @@ LAB_080fded6:
     bl return_void_handler                   @ 080fded6 fcf7fdfa
     movs r0,#0x0    @ 080fdeda 0020
     b LAB_080fdeee                           @ 080fdedc 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080fdee0:
     .word  0x09e5fd84                     @ 080fdee0 84fde509
 DWORD_080fdee4:
@@ -604,7 +604,7 @@ LAB_080fe144:
     cmp r0,#0x3                              @ 080fe178 0328
     beq LAB_080fe192                         @ 080fe17a 0ad0
     b LAB_080fe196                           @ 080fe17c 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080fe180:
     .word  0x00000107                     @ 080fe180 07010000
 DAT_080fe184:
@@ -783,7 +783,7 @@ LAB_080fe2d4:
     strh r0,[r1,#0x12]                       @ 080fe2e0 4882
     movs r0,#0x1    @ 080fe2e2 0120
     bx lr                                    @ 080fe2e4 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_list 界面显示硬件初始化函数. 调用 clear_all_card_list_slot_flags 批量清零所有槽标志, 再将 DISPCNT(0x04000000) 和 PAL_BG 基址(0x05000000) 均写 0 以关闭显示并清调色板首字, 最后调用 init_scene_obj_list 初始化场景 OBJ 列表. 由 6 个不同场景的过渡/切换函数调用, 是进入 card_list 界面前的硬件准备步骤.
 init_card_list_display_and_objs:
@@ -800,7 +800,7 @@ init_card_list_display_and_objs:
     movs r0,#0x1    @ 080fe300 0120
     pop {r1}                                 @ 080fe302 02bc
     bx r1                                    @ 080fe304 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_list 场景每帧主 tick 函数, 由四个高层场景管理函数 (FUN_08108788/08108cdc/08108fd8/0810af00) 调用. 从 IWRAM gPrng 区域读取状态标记: [gPrng+0xa4*2] (r1) 和 [gPrng+0xa7*2] (r0), 计算 r5 = r1 & ~r0 (活跃 tick 掩码); 检查 [r7+0x1e] bit0, 若为零则直接跳过; 若非零则调用 dispatch_card_info_list_tick_by_state 执行状态机 tick. 若 dispatch 返回 0 则再调用 return_zero_epilogue_stub. dispatch 返回非零时清除 [r7+0x1e] bit1 并再次调用 return_zero_epilogue_stub.
 tick_card_list_scene_frame__080fe308:
@@ -2377,7 +2377,7 @@ LAB_080ff084:
     movs r0,#0x2    @ 080ff088 0220
     ldrsh r4,[r1,r0]                         @ 080ff08a 0c5e
     b LAB_080ff0be                           @ 080ff08c 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff090:
     .word  0x09e6011c                     @ 080ff090 1c01e609
 LAB_080ff094:
@@ -2523,7 +2523,7 @@ LAB_080ff18e:
     bne LAB_080ff1b0                         @ 080ff1a2 05d1
     bl render_card_stats_panel_if_scrolled   @ 080ff1a4 00f0b8fb
     b LAB_080ff1b8                           @ 080ff1a8 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff1ac:
     .word  0x09e600f4                     @ 080ff1ac f400e609
 LAB_080ff1b0:
@@ -2601,7 +2601,7 @@ LAB_080ff214:
     lsls r5,r5,#0x2    @ 080ff240 ad00
     adds r1,r5,#0x0    @ 080ff242 291c
     b LAB_080ff274                           @ 080ff244 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BG1HOFS_080ff248:
     .word  BG1HOFS                        @ 080ff248 14000004
 PTR_BG1VOFS_080ff24c:
@@ -2666,7 +2666,7 @@ LAB_080ff280:
     adds r1,r3,#0x0    @ 080ff2bc 191c
     orrs r0,r1    @ 080ff2be 0843
     b LAB_080ff2d2                           @ 080ff2c0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BG1HOFS_080ff2c4:
     .word  BG1HOFS                        @ 080ff2c4 14000004
 LAB_080ff2c8:
@@ -2725,7 +2725,7 @@ LAB_080ff2d4:
     adds r1,r3,#0x0    @ 080ff32c 191c
     orrs r0,r1    @ 080ff32e 0843
     b LAB_080ff3a6                           @ 080ff330 39e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff334:
     .word  0x0000fdff                     @ 080ff334 fffd0000
 PTR_WIN0H_080ff338:
@@ -2769,7 +2769,7 @@ LAB_080ff366:
     adds r1,r4,#0x0    @ 080ff380 211c
     orrs r0,r1    @ 080ff382 0843
     b LAB_080ff3a6                           @ 080ff384 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_WIN0H_080ff388:
     .word  WIN0H                          @ 080ff388 40000004
 DAT_080ff38c:
@@ -2838,7 +2838,7 @@ LAB_080ff3e8:
     movs r0,#0x6    @ 080ff404 0620
     strh r0,[r1,#0x0]                        @ 080ff406 0880
     b return_zero_epilogue_stub              @ 080ff408 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BLDCNT_080ff40c:
     .word  BLDCNT                         @ 080ff40c 50000004
 DAT_080ff410:
@@ -2861,7 +2861,7 @@ restore_regs_epilogue:
     pop {r4,r5,r6,r7}                        @ 080ff424 f0bc
     pop {r1}                                 @ 080ff426 02bc
     bx r1                                    @ 080ff428 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BLDCNT_080ff42c:
     .word  BLDCNT                         @ 080ff42c 50000004
 
@@ -2880,7 +2880,7 @@ apply_card_list_scroll_selection:
     bge LAB_080ff450                         @ 080ff440 06da
     movs r0,#0x0    @ 080ff442 0020
     b LAB_080ff49e                           @ 080ff444 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff448:
     .word  0x0202a4d0                     @ 080ff448 d0a40202
 DAT_080ff44c:
@@ -2968,7 +2968,7 @@ LAB_080ff4e4:
 LAB_080ff4ea:
     pop {r1}                                 @ 080ff4ea 02bc
     bx r1                                    @ 080ff4ec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080fe308 (卡牌列表场景大型主循环) 唯一调用, 重新初始化滚动视图状态 (重新定位滚动位置 + 清除渲染脏标志 + 重置并初始化滚动条目). 函数首先调用 compute_card_list_scroll_position 计算滚动位置; 若返回值 <0 (无有效卡片) 则跳过后续操作返回 0. 位置有效时依次调用: clear_card_stats_render_flags (清除卡片统计渲染脏标志), reset_card_list_scroll_state (重置滚动状态), 然后从 [0x0202f3c0+0x74] 指针表读取 scroll_pos 对应的 card_id (lsls/lsrs 提取低 20 位), 最后调用 init_card_list_scroll_entry (08106b94) 写入目标 card_id 的显示坐标和滚动入口参数. 返回 1 表示重置完成.
 reinit_card_list_scroll_view:
@@ -2989,7 +2989,7 @@ reinit_card_list_scroll_view:
     bl init_card_list_scroll_entry           @ 080ff512 07f03ffb
     movs r0,#0x1    @ 080ff516 0120
     b LAB_080ff522                           @ 080ff518 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff51c:
     .word  0x0202f3c0                     @ 080ff51c c0f30202
 LAB_080ff520:
@@ -3021,7 +3021,7 @@ trigger_card_name_render_if_idle:
     strb r0,[r4,#0x1e]                       @ 080ff54c a077
     movs r0,#0x1    @ 080ff54e 0120
     b LAB_080ff566                           @ 080ff550 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff554:
     .word  0x0202a4d0                     @ 080ff554 d0a40202
 DAT_080ff558:
@@ -3190,7 +3190,7 @@ LAB_080ff65c:
     rsbs r2,r2,#0    @ 080ff69c 5242
     movs r0,#0x9    @ 080ff69e 0920
     b LAB_080ff714                           @ 080ff6a0 38e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff6a4:
     .word  0x09e4f1c4                     @ 080ff6a4 c4f1e409
 PTR_card_stats_table_080ff6a8:
@@ -3388,7 +3388,7 @@ trigger_card_stats_render_on_timeout:
     strb r0,[r4,#0x1e]                       @ 080ff804 a077
     movs r0,#0x1    @ 080ff806 0120
     b LAB_080ff81e                           @ 080ff808 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ff80c:
     .word  0x0202a4d0                     @ 080ff80c d0a40202
 DAT_080ff810:
@@ -3828,7 +3828,7 @@ update_card_list_scroll_page_state:
     strh r3,[r6,#0xe]                        @ 080ffb20 f381
     strh r3,[r6,#0x10]                       @ 080ffb22 3382
     b LAB_080ffbe0                           @ 080ffb24 5ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ffb28:
     .word  0x0202a4d0                     @ 080ffb28 d0a40202
 DAT_080ffb2c:
@@ -3964,7 +3964,7 @@ LAB_080ffc12:
 LAB_080ffc16:
     movs r0,#0x0    @ 080ffc16 0020
     b LAB_080ffe28                           @ 080ffc18 06e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ffc1c:
     .word  0x0202a4d0                     @ 080ffc1c d0a40202
 DAT_080ffc20:
@@ -4329,7 +4329,7 @@ LAB_080ffe80:
 LAB_080ffeaa:
     movs r0,#0x0    @ 080ffeaa 0020
     b LAB_080fffb4                           @ 080ffeac 82e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ffeb0:
     .word  0x0202a4d0                     @ 080ffeb0 d0a40202
 DAT_080ffeb4:
@@ -4431,7 +4431,7 @@ LAB_080fff6e:
     cmp r4,r0                                @ 080fff74 8442
     bge LAB_080fff4c                         @ 080fff76 e9da
     b LAB_080fffb2                           @ 080fff78 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080fff7c:
     .word  0x0202f438                     @ 080fff7c 38f40202
 LAB_080fff80:
@@ -4573,7 +4573,7 @@ LAB_08100076:
     strh r0,[r1,#0x0]                        @ 08100080 0880
     ldr r3, DAT_0810008c                     @ 08100082 024b
     b LAB_0810014a                           @ 08100084 61e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100088:
     .word  0x00004ed4                     @ 08100088 d44e0000
 DAT_0810008c:
@@ -4586,7 +4586,7 @@ LAB_08100090:
     ldr r3, DAT_081000a0                     @ 08100098 014b
     adds r0,r2,r3    @ 0810009a d018
     b LAB_081000a8                           @ 0810009c 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081000a0:
     .word  0x00004ede                     @ 081000a0 de4e0000
 LAB_081000a4:
@@ -4604,7 +4604,7 @@ LAB_081000a8:
     beq LAB_081000c8                         @ 081000b8 06d0
     ldr r3, DAT_081000c4                     @ 081000ba 024b
     b LAB_0810014a                           @ 081000bc 45e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081000c0:
     .word  0x00004ed6                     @ 081000c0 d64e0000
 DAT_081000c4:
@@ -4640,7 +4640,7 @@ LAB_081000e8:
     beq LAB_08100108                         @ 081000f8 06d0
     ldr r3, DAT_08100104                     @ 081000fa 024b
     b LAB_0810014a                           @ 081000fc 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100100:
     .word  0x00004ed8                     @ 08100100 d84e0000
 DAT_08100104:
@@ -4676,7 +4676,7 @@ LAB_08100128:
     beq LAB_08100148                         @ 08100138 06d0
     ldr r3, DAT_08100144                     @ 0810013a 024b
     b LAB_0810014a                           @ 0810013c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100140:
     .word  0x00004eda                     @ 08100140 da4e0000
 DAT_08100144:
@@ -4811,7 +4811,7 @@ LAB_0810022a:
     pop {r4,r5,r6,r7}                        @ 0810022c f0bc
     pop {r1}                                 @ 0810022e 02bc
     bx r1                                    @ 08100230 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100234:
     .word  0x06008000                     @ 08100234 00800006
 
@@ -5025,7 +5025,7 @@ LAB_081003be:
     b LAB_0810025e                           @ 081003c6 4ae7
 LAB_081003c8:
     b LAB_0810094e                           @ 081003c8 c1e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081003cc:
     .word  0x0202f3c0                     @ 081003cc c0f30202
 DAT_081003d0:
@@ -5202,7 +5202,7 @@ LAB_081004f2:
     lsls r1,r7,#0x8    @ 08100528 3902
     ldr r0, DAT_08100560                     @ 0810052a 0d48
     b LAB_081005b2                           @ 0810052c 41e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100530:
     .word  0x0202a4d0                     @ 08100530 d0a40202
 DAT_08100534:
@@ -5517,7 +5517,7 @@ LAB_08100798:
     bge LAB_081007dc                         @ 0810079c 1eda
     strh r2,[r6,#0x0]                        @ 0810079e 3280
     b LAB_081007de                           @ 081007a0 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081007a4:
     .word  0x06008000                     @ 081007a4 00800006
 DAT_081007a8:
@@ -5567,7 +5567,7 @@ LAB_081007e6:
     movs r1,#0x1a    @ 081007fa 1a21
     bl zero_fill_by_halfword                 @ 081007fc f4f73afb
     b LAB_08100944                           @ 08100800 a0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100804:
     .word  0x0600e000                     @ 08100804 00e00006
 LAB_08100808:
@@ -5605,7 +5605,7 @@ LAB_08100808:
     lsls r5,r5,#0x10    @ 08100848 2d04
     .hword 0x46a8    @ 0810084a a846
     b LAB_081008c0                           @ 0810084c 38e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100850:
     .word  0x0600e000                     @ 08100850 00e00006
 DAT_08100854:
@@ -5644,7 +5644,7 @@ LAB_0810087e:
     ldr r3, DAT_081008a0                     @ 08100894 024b
     orrs r0,r3    @ 08100896 1843
     b LAB_081008aa                           @ 08100898 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810089c:
     .word  0x00000202                     @ 0810089c 02020000
 DAT_081008a0:
@@ -5763,7 +5763,7 @@ dispatch_render_card_name_with_flags:
     bl render_card_name_label                @ 08100972 00f005f8
     pop {r1}                                 @ 08100976 02bc
     bx r1                                    @ 08100978 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810097c:
     .word  0x0202a4d0                     @ 0810097c d0a40202
 
@@ -5943,7 +5943,7 @@ render_card_name_gfx_type_text:
     adds r1,r4,#0x0    @ 08100ad6 211c
     bl strcpy                                @ 08100ad8 0ef0dafa
     b LAB_08100afa                           @ 08100adc 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100ae0:
     .word  0x02000000                     @ 08100ae0 00000002
 DAT_08100ae4:
@@ -6084,7 +6084,7 @@ LAB_08100bde:
     cmp r0,#0x0                              @ 08100bec 0028
     beq LAB_08100c02                         @ 08100bee 08d0
     b LAB_08100c34                           @ 08100bf0 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100bf4:
     .word  0x0202a4d0                     @ 08100bf4 d0a40202
 LAB_08100bf8:
@@ -6107,14 +6107,14 @@ LAB_08100c0c:
     lsls r1,r3,#0x2    @ 08100c14 9900
     ldr r0, DAT_08100c1c                     @ 08100c16 0148
     b LAB_08100c30                           @ 08100c18 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100c1c:
     .word  0x09e5ffb0                     @ 08100c1c b0ffe509
 LAB_08100c20:
     lsls r1,r3,#0x2    @ 08100c20 9900
     ldr r0, DAT_08100c28                     @ 08100c22 0148
     b LAB_08100c30                           @ 08100c24 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100c28:
     .word  0x09e5ffc8                     @ 08100c28 c8ffe509
 LAB_08100c2c:
@@ -6190,7 +6190,7 @@ LAB_08100c98:
     pop {r4,r5,r6,r7}                        @ 08100ca8 f0bc
     pop {r1}                                 @ 08100caa 02bc
     bx r1                                    @ 08100cac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100cb0:
     .word  0x09e5ffe0                     @ 08100cb0 e0ffe509
 DAT_08100cb4:
@@ -6359,7 +6359,7 @@ LAB_08100d7e:
     ldr r0, PTR_game_str_ja_08100e18         @ 08100dec 0a48
     adds r5,r1,r0    @ 08100dee 0d18
     b LAB_08100e9e                           @ 08100df0 55e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100df4:
     .word  0x0202a4d0                     @ 08100df4 d0a40202
 DAT_08100df8:
@@ -6506,7 +6506,7 @@ LAB_08100f10:
     pop {r4,r5,r6}                           @ 08100f14 70bc
     pop {r1}                                 @ 08100f16 02bc
     bx r1                                    @ 08100f18 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08100f1c:
     .word  0x000006c3                     @ 08100f1c c3060000
 PTR_game_str_pointer_table_08100f20:
@@ -6649,7 +6649,7 @@ LAB_08101032:
     pop {r4,r5,r6,r7}                        @ 08101038 f0bc
     pop {r1}                                 @ 0810103a 02bc
     bx r1                                    @ 0810103c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101040:
     .word  0x0202a4d0                     @ 08101040 d0a40202
 DAT_08101044:
@@ -6925,7 +6925,7 @@ LAB_08101264:
     cmp r5,#0x3                              @ 0810126c 032d
     ble LAB_081011e8                         @ 0810126e bbdd
     b LAB_0810132a                           @ 08101270 5be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101274:
     .word  0x0202f3c0                     @ 08101274 c0f30202
 DAT_08101278:
@@ -7115,7 +7115,7 @@ LAB_081013bc:
     ldr r2, DAT_081013e8                     @ 081013d0 054a
     adds r0,r2,#0x0    @ 081013d2 101c
     b LAB_08101432                           @ 081013d4 2de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081013d8:
     .word  0x0202a4d0                     @ 081013d8 d0a40202
 DAT_081013dc:
@@ -7175,7 +7175,7 @@ LAB_08101432:
     pop {r4,r5,r6,r7}                        @ 08101440 f0bc
     pop {r1}                                 @ 08101442 02bc
     bx r1                                    @ 08101444 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BG2HOFS_08101448:
     .word  BG2HOFS                        @ 08101448 18000004
 DAT_0810144c:
@@ -7197,7 +7197,7 @@ dispatch_card_frame_tile_load_by_type:
     cmp r0,#0x0                              @ 08101468 0028
     beq LAB_0810147e                         @ 0810146a 08d0
     b LAB_081014dc                           @ 0810146c 36e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101470:
     .word  0x0202a4d0                     @ 08101470 d0a40202
 LAB_08101474:
@@ -7328,7 +7328,7 @@ LAB_08101528:
     pop {r4,r5,r6,r7}                        @ 08101560 f0bc
     pop {r1}                                 @ 08101562 02bc
     bx r1                                    @ 08101564 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101568:
     .word  0x0202a4d0                     @ 08101568 d0a40202
 DAT_0810156c:
@@ -7519,7 +7519,7 @@ load_card_mini_frame_tiles_by_type:
     cmp r0,#0x3                              @ 081016cc 0328
     beq LAB_08101724                         @ 081016ce 29d0
     b LAB_0810174a                           @ 081016d0 3be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081016d4:
     .word  0x0202a4d0                     @ 081016d4 d0a40202
 LAB_081016d8:
@@ -7583,7 +7583,7 @@ LAB_0810174a:
     pop {r4,r5}                              @ 0810174c 30bc
     pop {r1}                                 @ 0810174e 02bc
     bx r1                                    @ 08101750 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101754:
     .word  0x06016a80                     @ 08101754 806a0106
 DAT_08101758:
@@ -7636,7 +7636,7 @@ LAB_0810179a:
     cmp r0,#0x0                              @ 081017a8 0028
     beq LAB_081017bc                         @ 081017aa 07d0
     b LAB_081017dc                           @ 081017ac 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081017b0:
     .word  0x0202a4d0                     @ 081017b0 d0a40202
 LAB_081017b4:
@@ -7648,14 +7648,14 @@ LAB_081017bc:
     lsls r1,r7,#0x2    @ 081017bc b900
     ldr r0, DAT_081017c4                     @ 081017be 0148
     b LAB_081017d8                           @ 081017c0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081017c4:
     .word  0x09e60010                     @ 081017c4 1000e609
 LAB_081017c8:
     lsls r1,r7,#0x2    @ 081017c8 b900
     ldr r0, DAT_081017d0                     @ 081017ca 0148
     b LAB_081017d8                           @ 081017cc 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081017d0:
     .word  0x09e60020                     @ 081017d0 2000e609
 LAB_081017d4:
@@ -7711,7 +7711,7 @@ LAB_08101816:
     adds r0,r2,#0x1    @ 0810182c 501c
     lsls r4,r0,#0x10    @ 0810182e 0404
     b LAB_0810184a                           @ 08101830 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101834:
     .word  0x09e60030                     @ 08101834 3000e609
 DAT_08101838:
@@ -7854,7 +7854,7 @@ LAB_08101942:
     cmp r0,#0x3                              @ 0810194c 0328
     beq LAB_08101a3c                         @ 0810194e 75d0
     b LAB_08101a6e                           @ 08101950 8de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101954:
     .word  0xffff8c00                     @ 08101954 008cffff
 DAT_08101958:
@@ -7901,7 +7901,7 @@ LAB_0810199a:
     .hword 0x4653    @ 081019a4 5346
     orrs r4,r3    @ 081019a6 1c43
     b LAB_081019c0                           @ 081019a8 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081019ac:
     .word  0x0202a4d0                     @ 081019ac d0a40202
 DAT_081019b0:
@@ -8159,7 +8159,7 @@ LAB_08101b92:
     pop {r4,r5,r6,r7}                        @ 08101b9c f0bc
     pop {r1}                                 @ 08101b9e 02bc
     bx r1                                    @ 08101ba0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101ba4:
     .word  0x05000360                     @ 08101ba4 60030005
 
@@ -8277,7 +8277,7 @@ LAB_08101c72:
 LAB_08101c82:
     pop {r1}                                 @ 08101c82 02bc
     bx r1                                    @ 08101c84 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_08101c88:
     .word  gPrng                          @ 08101c88 40000003
 DAT_08101c8c:
@@ -8346,7 +8346,7 @@ LAB_08101cfc:
     pop {r4,r5}                              @ 08101d00 30bc
     pop {r1}                                 @ 08101d02 02bc
     bx r1                                    @ 08101d04 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101d08:
     .word  0x05000162                     @ 08101d08 62010005
 
@@ -8461,7 +8461,7 @@ LAB_08101dca:
     cmp r0,#0x0                              @ 08101ddc 0028
     bge LAB_08101d78                         @ 08101dde cbda
     b LAB_08101e10                           @ 08101de0 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101de4:
     .word  0x09e60068                     @ 08101de4 6800e609
 DAT_08101de8:
@@ -8554,7 +8554,7 @@ LAB_08101e84:
     str r3,[r0,#0x0]                         @ 08101e88 0360
     subs r5,#0x4    @ 08101e8a 043d
     b LAB_08101ea6                           @ 08101e8c 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08101e90:
     .word  0x0202a4d0                     @ 08101e90 d0a40202
 DAT_08101e94:
@@ -8844,7 +8844,7 @@ LAB_0810207c:
     pop {r4,r5,r6}                           @ 081020cc 70bc
     pop {r1}                                 @ 081020ce 02bc
     bx r1                                    @ 081020d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081020d4:
     .word  0x0202a4d0                     @ 081020d4 d0a40202
 DAT_081020d8:
@@ -8950,7 +8950,7 @@ LAB_0810218c:
     pop {r4,r5,r6,r7}                        @ 08102194 f0bc
     pop {r1}                                 @ 08102196 02bc
     bx r1                                    @ 08102198 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810219c:
     .word  0x0202a4d0                     @ 0810219c d0a40202
 DAT_081021a0:
@@ -8986,7 +8986,7 @@ LAB_081021ca:
     pop {r4}                                 @ 081021cc 10bc
     pop {r1}                                 @ 081021ce 02bc
     bx r1                                    @ 081021d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081021d4:
     .word  0x0202a4d0                     @ 081021d4 d0a40202
 DAT_081021d8:
@@ -9027,7 +9027,7 @@ LAB_081021fc:
 LAB_08102216:
     movs r0,#0x0    @ 08102216 0020
     b LAB_081022fc                           @ 08102218 70e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810221c:
     .word  0x0202a4d0                     @ 0810221c d0a40202
 DAT_08102220:
@@ -9058,7 +9058,7 @@ LAB_08102238:
     adds r0,r6,#0x0    @ 08102252 301c
     bl copy_bytes_by_halfword                @ 08102254 f2f726fe
     b LAB_0810227a                           @ 08102258 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810225c:
     .word  0x02001250                     @ 0810225c 50120002
 LAB_08102260:
@@ -9187,7 +9187,7 @@ LAB_0810233a:
     pop {r4,r5,r6}                           @ 0810235c 70bc
     pop {r1}                                 @ 0810235e 02bc
     bx r1                                    @ 08102360 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102364:
     .word  0x0202a4d0                     @ 08102364 d0a40202
 DAT_08102368:
@@ -9378,7 +9378,7 @@ search_card_list_subtable_by_key:
     cmp r3,#0x0                              @ 081024b4 002b
     beq LAB_081024ce                         @ 081024b6 0ad0
     b LAB_081024f0                           @ 081024b8 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081024bc:
     .word  0x0202a4d0                     @ 081024bc d0a40202
 DAT_081024c0:
@@ -9397,14 +9397,14 @@ LAB_081024d4:
     ldr r2, DAT_081024dc                     @ 081024d4 014a
     adds r5,r4,r2    @ 081024d6 a518
     b LAB_081024f0                           @ 081024d8 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081024dc:
     .word  0x0000140c                     @ 081024dc 0c140000
 LAB_081024e0:
     ldr r6, DAT_081024e8                     @ 081024e0 014e
     adds r5,r4,r6    @ 081024e2 a519
     b LAB_081024f0                           @ 081024e4 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081024e8:
     .word  0x0000160c                     @ 081024e8 0c160000
 LAB_081024ec:
@@ -9435,7 +9435,7 @@ LAB_08102510:
     ldrb r0,[r0,#0x1]                        @ 08102518 4078
     lsrs r0,r0,#0x4    @ 0810251a 0009
     b LAB_0810252e                           @ 0810251c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102520:
     .word  0x0000180c                     @ 08102520 0c180000
 DAT_08102524:
@@ -9449,7 +9449,7 @@ LAB_0810252e:
     pop {r4,r5,r6}                           @ 08102530 70bc
     pop {r1}                                 @ 08102532 02bc
     bx r1                                    @ 08102534 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 在卡组构建场景中被调用, 按 r0 指定的 slot 类型 (0=主卡, 1=融合, 2=魔法/陷阱, 3=仪式等) 遍历 IWRAM 0x0202a4d0 所指向的卡片结构, 调用 check_card_pair_allowed 验证每张候选卡是否可加入该 slot, 统计满足条件的卡片数量并写入 r7 结构的输出区域. 返回 r0=满足条件的计数, 供上层 find_best_slot_for_card 汇总三路结果后判断最优 deck slot.
 count_valid_cards_by_slot_type:
@@ -9611,7 +9611,7 @@ LAB_08102648:
 LAB_0810264e:
     ldr r0, DAT_08102654                     @ 0810264e 0148
     b LAB_08102662                           @ 08102650 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102654:
     .word  0x0000140c                     @ 08102654 0c140000
 LAB_08102658:
@@ -9737,7 +9737,7 @@ LAB_08102734:
     movs r0,#0x1    @ 08102734 0120
     rsbs r0,r0,#0    @ 08102736 4042
     b LAB_08102816                           @ 08102738 6de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810273c:
     .word  0x0202a4d0                     @ 0810273c d0a40202
 DAT_08102740:
@@ -9767,7 +9767,7 @@ LAB_08102758:
     .hword 0x4640    @ 0810276e 4046
     bl copy_bytes_by_halfword                @ 08102770 f2f798fb
     b LAB_0810279a                           @ 08102774 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102778:
     .word  0x02001250                     @ 08102778 50120002
 LAB_0810277c:
@@ -9798,7 +9798,7 @@ LAB_0810279c:
     cmp r7,#0x1                              @ 081027a8 012f
     beq LAB_081027ba                         @ 081027aa 06d0
     b LAB_081027e2                           @ 081027ac 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081027b0:
     .word  0x02001138                     @ 081027b0 38110002
 LAB_081027b4:
@@ -9904,7 +9904,7 @@ LAB_0810285c:
 LAB_08102866:
     ldr r2, DAT_0810286c                     @ 08102866 014a
     b LAB_081028b2                           @ 08102868 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810286c:
     .word  0x00002b9c                     @ 0810286c 9c2b0000
 LAB_08102870:
@@ -9913,7 +9913,7 @@ LAB_08102870:
     ldr r0, DAT_0810287c                     @ 08102874 0148
     adds r5,r4,r0    @ 08102876 2518
     b LAB_081028b4                           @ 08102878 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810287c:
     .word  0x000040cc                     @ 0810287c cc400000
 LAB_08102880:
@@ -9927,7 +9927,7 @@ LAB_08102888:
     ldr r0, DAT_08102894                     @ 0810288c 0148
     adds r5,r4,r0    @ 0810288e 2518
     b LAB_081028b4                           @ 08102890 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102894:
     .word  0x000046cc                     @ 08102894 cc460000
 LAB_08102898:
@@ -9941,7 +9941,7 @@ LAB_081028a0:
     ldr r0, DAT_081028ac                     @ 081028a4 0148
     adds r5,r4,r0    @ 081028a6 2518
     b LAB_081028b4                           @ 081028a8 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081028ac:
     .word  0x00004ccc                     @ 081028ac cc4c0000
 LAB_081028b0:
@@ -9956,7 +9956,7 @@ LAB_081028b4:
     lsls r1,r3,#0x1    @ 081028bc 5900
     ldr r2, DAT_081028c8                     @ 081028be 024a
     b LAB_081028d0                           @ 081028c0 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081028c4:
     .word  0x00004acc                     @ 081028c4 cc4a0000
 DAT_081028c8:
@@ -9992,7 +9992,7 @@ LAB_081028fa:
     bge LAB_08102908                         @ 081028fc 04da
     adds r0,r3,#0x0    @ 081028fe 181c
     b LAB_0810290a                           @ 08102900 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102904:
     .word  0x00004ed4                     @ 08102904 d44e0000
 LAB_08102908:
@@ -10002,7 +10002,7 @@ LAB_0810290a:
     pop {r4,r5,r6,r7}                        @ 0810290c f0bc
     pop {r1}                                 @ 0810290e 02bc
     bx r1                                    @ 08102910 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 从 IWRAM 0x02000006 + r0*2 处读取一个字节, 右移 4 位取高 nibble 后返回. r0 为下标参数. 被 FUN_08100238 / FUN_080ff56c / FUN_080ffe38 三个 card_list 相关函数调用, 用于提取 card_list IWRAM 某表中每个条目字节的类型高位编码. 函数体为纯只读叶子, 4 条指令.
 read_card_list_type_hi_nibble:
@@ -10197,7 +10197,7 @@ LAB_08102a6a:
     add r2,r10                               @ 08102a6c 5244
     .hword 0x4690    @ 08102a6e 9046
     b LAB_08102a8a                           @ 08102a70 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102a74:
     .word  0x0000140c                     @ 08102a74 0c140000
 LAB_08102a78:
@@ -10325,7 +10325,7 @@ LAB_08102b54:
     cmp r3,r4                                @ 08102b5c a342
     bge LAB_08102b54                         @ 08102b5e f9da
     b LAB_08102bb4                           @ 08102b60 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_08102b64:
     .word  gPrng                          @ 08102b64 40000003
 LAB_08102b68:
@@ -10434,7 +10434,7 @@ LAB_08102bfc:
     orrs r0,r1    @ 08102c28 0843
     strb r0,[r3,#0x1]                        @ 08102c2a 5870
     b LAB_08102c56                           @ 08102c2c 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102c30:
     .word  0x00001a14                     @ 08102c30 141a0000
 LAB_08102c34:
@@ -10559,7 +10559,7 @@ LAB_08102d04:
     ldr r3, DAT_08102d0c                     @ 08102d04 014b
     ldr r0, DAT_08102d10                     @ 08102d06 0248
     b LAB_08102d28                           @ 08102d08 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102d0c:
     .word  0x0202a4d0                     @ 08102d0c d0a40202
 DAT_08102d10:
@@ -10635,7 +10635,7 @@ LAB_08102d8e:
     add r0,r10                               @ 08102d90 5044
     strh r4,[r0,#0x0]                        @ 08102d92 0480
     b LAB_08102fa2                           @ 08102d94 05e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102d98:
     .word  0x0202a4d0                     @ 08102d98 d0a40202
 DAT_08102d9c:
@@ -10689,7 +10689,7 @@ LAB_08102df0:
     ldr r1, DAT_08102df8                     @ 08102df0 0149
     ldr r2, DAT_08102dfc                     @ 08102df2 024a
     b LAB_08102e14                           @ 08102df4 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102df8:
     .word  0x0202a4d0                     @ 08102df8 d0a40202
 DAT_08102dfc:
@@ -10755,7 +10755,7 @@ LAB_08102e48:
     .hword 0x4641    @ 08102e6c 4146
     strh r0,[r1,#0x0]                        @ 08102e6e 0880
     b LAB_08102f82                           @ 08102e70 87e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08102e74:
     .word  0x0202a4d0                     @ 08102e74 d0a40202
 DAT_08102e78:
@@ -10789,7 +10789,7 @@ LAB_08102e88:
     add r1,r9                                @ 08102eb0 4944
     .hword 0x4688    @ 08102eb2 8846
     b LAB_08102ebe                           @ 08102eb4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_08102eb8:
     .word  gPrng                          @ 08102eb8 40000003
 LAB_08102ebc:
@@ -11062,7 +11062,7 @@ LAB_08103074:
     adds r0,r6,#0x0    @ 0810308a 301c
     bl copy_bytes_by_halfword                @ 0810308c f1f70aff
     b LAB_081030b2                           @ 08103090 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103094:
     .word  0x02001250                     @ 08103094 50120002
 LAB_08103098:
@@ -11085,7 +11085,7 @@ LAB_081030b8:
     pop {r4,r5,r6}                           @ 081030b8 70bc
     pop {r1}                                 @ 081030ba 02bc
     bx r1                                    @ 081030bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081030c0:
     .word  0x02001138                     @ 081030c0 38110002
 
@@ -11200,7 +11200,7 @@ LAB_08103170:
     pop {r4}                                 @ 08103180 10bc
     pop {r1}                                 @ 08103182 02bc
     bx r1                                    @ 08103184 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Banlist data region type nibble write function. r0=index (halfword offset index), r1=nibble_value (high 4 bits write value). Computes address 0x02000006 + index*2, reads byte, clears low 4 bits (&0xf) then OR-merges with r1<<4, writes back. Returns 1. Called by card_stats scene when updating banlist entry type.
 @ 
@@ -11222,7 +11222,7 @@ write_deck_entry_type_nibble:
     strb r2,[r0,#0x0]                        @ 08103198 0270
     movs r0,#0x1    @ 0810319a 0120
     bx lr                                    @ 0810319c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081031a0:
     .word  0x02000006                     @ 081031a0 06000002
 
@@ -11265,7 +11265,7 @@ LAB_081031e4:
     ldr r0, DAT_081031ec                     @ 081031e4 0148
     adds r6,r4,r0    @ 081031e6 2618
     b LAB_081031f4                           @ 081031e8 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081031ec:
     .word  0x000044cc                     @ 081031ec cc440000
 LAB_081031f0:
@@ -11291,7 +11291,7 @@ LAB_081031f4:
     pop {r4,r5,r6}                           @ 08103218 70bc
     pop {r1}                                 @ 0810321a 02bc
     bx r1                                    @ 0810321c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103220:
     .word  0x00004acc                     @ 08103220 cc4a0000
 DAT_08103224:
@@ -11310,7 +11310,7 @@ write_card_list_field_by_index:
     strh r1,[r0,#0x0]                        @ 08103238 0180
     movs r0,#0x1    @ 0810323a 0120
     bx lr                                    @ 0810323c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103240:
     .word  0x0202a4d0                     @ 08103240 d0a40202
 
@@ -11325,7 +11325,7 @@ read_card_list_field_by_index:
     movs r1,#0x0    @ 08103250 0021
     ldrsh r0,[r0,r1]                         @ 08103252 405e
     bx lr                                    @ 08103254 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103258:
     .word  0x0202a4d0                     @ 08103258 d0a40202
 
@@ -11346,7 +11346,7 @@ write_card_list_field_by_row_col:
     pop {r4}                                 @ 08103274 10bc
     pop {r1}                                 @ 08103276 02bc
     bx r1                                    @ 08103278 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810327c:
     .word  0x0202a4d0                     @ 0810327c d0a40202
 
@@ -11446,7 +11446,7 @@ LAB_0810330e:
     pop {r4,r5,r6,r7}                        @ 0810332c f0bc
     pop {r1}                                 @ 0810332e 02bc
     bx r1                                    @ 08103330 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103334:
     .word  0x0202a4d0                     @ 08103334 d0a40202
 DAT_08103338:
@@ -11699,7 +11699,7 @@ LAB_081034f2:
     pop {r4,r5,r6,r7}                        @ 08103500 f0bc
     pop {r1}                                 @ 08103502 02bc
     bx r1                                    @ 08103504 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103508:
     .word  0x0202a4d0                     @ 08103508 d0a40202
 DAT_0810350c:
@@ -11818,7 +11818,7 @@ LAB_081035e0:
     pop {r4,r5,r6,r7}                        @ 081035ec f0bc
     pop {r1}                                 @ 081035ee 02bc
     bx r1                                    @ 081035f0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 init_deck_slot_data 和 FUN_08102c6c (card_stats 场景) 调用, 负责对指定 deck_type (r0=[0..3]) 的候选卡片列表进行合法性过滤. 函数根据 deck_type 从 IWRAM 0x0202a4d0 选取对应源列表偏移 (type0: +0x1a6c, type1: +0x3ccc, type2: +0x42cc, type3: +0x48cc), 清零目标区 0x0202f3c0+0x7e 的计数字段; 然后遍历源列表每对 (card_entry), 对每张卡调用 check_card_valid_for_deck_slot 验证; 通过验证的写入结果区并更新计数; 最后将计数写入 0x0202a4d0+0x4ecc 偏移. 返回 r0=1.
 filter_deck_slot_candidates:
@@ -11839,7 +11839,7 @@ filter_deck_slot_candidates:
     cmp r7,#0x0                              @ 08103610 002f
     beq LAB_0810362a                         @ 08103612 0ad0
     b LAB_0810366e                           @ 08103614 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103618:
     .word  0x0202a4d0                     @ 08103618 d0a40202
 DAT_0810361c:
@@ -11857,7 +11857,7 @@ LAB_0810362a:
     movs r5,#0xb7    @ 08103630 b725
     lsls r5,r5,#0x2    @ 08103632 ad00
     b LAB_0810366c                           @ 08103634 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103638:
     .word  0x00001a6c                     @ 08103638 6c1a0000
 LAB_0810363c:
@@ -11866,7 +11866,7 @@ LAB_0810363c:
     .hword 0x46b4    @ 08103640 b446
     ldr r5, DAT_0810364c                     @ 08103642 024d
     b LAB_0810366c                           @ 08103644 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103648:
     .word  0x00003ccc                     @ 08103648 cc3c0000
 DAT_0810364c:
@@ -11877,7 +11877,7 @@ LAB_08103650:
     .hword 0x4684    @ 08103654 8446
     ldr r5, DAT_08103660                     @ 08103656 024d
     b LAB_0810366c                           @ 08103658 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810365c:
     .word  0x000042cc                     @ 0810365c cc420000
 DAT_08103660:
@@ -11978,7 +11978,7 @@ LAB_081036fc:
     pop {r4,r5,r6,r7}                        @ 08103710 f0bc
     pop {r1}                                 @ 08103712 02bc
     bx r1                                    @ 08103714 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103718:
     .word  0x000048cc                     @ 08103718 cc480000
 DAT_0810371c:
@@ -12003,7 +12003,7 @@ copy_deck_slot_card_data:
     cmp r5,#0x0                              @ 0810373c 002d
     beq LAB_08103752                         @ 0810373e 08d0
     b LAB_081037ec                           @ 08103740 54e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103744:
     .word  0x0202a4d0                     @ 08103744 d0a40202
 LAB_08103748:
@@ -12032,7 +12032,7 @@ LAB_0810376e:
     ldr r2, DAT_08103778                     @ 0810376e 024a
     bl copy_bytes_by_halfword                @ 08103770 f1f798fb
     b LAB_081037ec                           @ 08103774 3ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103778:
     .word  0x00001130                     @ 08103778 30110000
 LAB_0810377c:
@@ -12043,7 +12043,7 @@ LAB_0810377c:
     ldr r2, DAT_08103790                     @ 08103784 024a
     adds r1,r4,r2    @ 08103786 a118
     b LAB_081037b8                           @ 08103788 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810378c:
     .word  0x00003ecc                     @ 0810378c cc3e0000
 DAT_08103790:
@@ -12061,7 +12061,7 @@ LAB_0810379c:
     ldr r2, DAT_081037b0                     @ 081037a4 024a
     adds r1,r4,r2    @ 081037a6 a118
     b LAB_081037b8                           @ 081037a8 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081037ac:
     .word  0x000044cc                     @ 081037ac cc440000
 DAT_081037b0:
@@ -12075,7 +12075,7 @@ LAB_081037b8:
     lsls r2,r2,#0x2    @ 081037ba 9200
     bl copy_bytes_by_halfword                @ 081037bc f1f772fb
     b LAB_081037ec                           @ 081037c0 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081037c4:
     .word  0x0000160c                     @ 081037c4 0c160000
 LAB_081037c8:
@@ -12086,7 +12086,7 @@ LAB_081037c8:
     ldr r2, DAT_081037dc                     @ 081037d0 024a
     adds r1,r4,r2    @ 081037d2 a118
     b LAB_081037e4                           @ 081037d4 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081037d8:
     .word  0x00004acc                     @ 081037d8 cc4a0000
 DAT_081037dc:
@@ -12124,7 +12124,7 @@ LAB_0810380a:
     pop {r4,r5,r6}                           @ 08103814 70bc
     pop {r1}                                 @ 08103816 02bc
     bx r1                                    @ 08103818 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810381c:
     .word  0x00001a0c                     @ 0810381c 0c1a0000
 
@@ -12141,7 +12141,7 @@ zero_deck_slot_range_by_type:
     cmp r4,#0x0                              @ 08103830 002c
     beq LAB_08103846                         @ 08103832 08d0
     b LAB_081038c0                           @ 08103834 44e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103838:
     .word  0x0202a4d0                     @ 08103838 d0a40202
 LAB_0810383c:
@@ -12166,7 +12166,7 @@ LAB_0810385a:
     ldr r1, DAT_08103864                     @ 0810385a 0249
     bl zero_fill_by_halfword                 @ 0810385c f1f70afb
     b LAB_081038c0                           @ 08103860 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103864:
     .word  0x00001130                     @ 08103864 30110000
 LAB_08103868:
@@ -12175,7 +12175,7 @@ LAB_08103868:
     ldr r1, DAT_08103874                     @ 0810386c 0149
     adds r0,r6,r1    @ 0810386e 7018
     b LAB_08103894                           @ 08103870 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103874:
     .word  0x00003ccc                     @ 08103874 cc3c0000
 LAB_08103878:
@@ -12189,7 +12189,7 @@ LAB_08103880:
     ldr r1, DAT_0810388c                     @ 08103884 0149
     adds r0,r6,r1    @ 08103886 7018
     b LAB_08103894                           @ 08103888 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810388c:
     .word  0x000042cc                     @ 0810388c cc420000
 LAB_08103890:
@@ -12201,7 +12201,7 @@ LAB_08103894:
     lsls r1,r1,#0x2    @ 08103896 8900
     bl zero_fill_by_halfword                 @ 08103898 f1f7ecfa
     b LAB_081038c0                           @ 0810389c 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081038a0:
     .word  0x0000160c                     @ 081038a0 0c160000
 LAB_081038a4:
@@ -12210,7 +12210,7 @@ LAB_081038a4:
     ldr r1, DAT_081038b0                     @ 081038a8 0149
     adds r0,r6,r1    @ 081038aa 7018
     b LAB_081038b8                           @ 081038ac 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081038b0:
     .word  0x000048cc                     @ 081038b0 cc480000
 LAB_081038b4:
@@ -12230,7 +12230,7 @@ LAB_081038c0:
     movs r0,#0x0    @ 081038cc 0020
     strh r0,[r1,#0x0]                        @ 081038ce 0880
     b LAB_081038ee                           @ 081038d0 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081038d4:
     .word  0x0000180c                     @ 081038d4 0c180000
 DAT_081038d8:
@@ -12250,7 +12250,7 @@ LAB_081038ee:
     pop {r4,r5,r6}                           @ 081038f0 70bc
     pop {r1}                                 @ 081038f2 02bc
     bx r1                                    @ 081038f4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081038f8:
     .word  0x00001a0c                     @ 081038f8 0c1a0000
 
@@ -12285,7 +12285,7 @@ LAB_0810392a:
     str r1,[sp,#0x0]                         @ 0810392c 0091
     ldr r2, DAT_08103934                     @ 0810392e 014a
     b LAB_08103970                           @ 08103930 1ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103934:
     .word  0x00002b9c                     @ 08103934 9c2b0000
 LAB_08103938:
@@ -12296,7 +12296,7 @@ LAB_08103938:
     add r6,r9                                @ 08103940 4e44
     str r6,[sp,#0x4]                         @ 08103942 0196
     b LAB_08103974                           @ 08103944 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103948:
     .word  0x000040cc                     @ 08103948 cc400000
 DAT_0810394c:
@@ -12309,7 +12309,7 @@ LAB_08103950:
     add r0,r9                                @ 08103958 4844
     str r0,[sp,#0x4]                         @ 0810395a 0190
     b LAB_08103974                           @ 0810395c 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103960:
     .word  0x000046cc                     @ 08103960 cc460000
 DAT_08103964:
@@ -12349,7 +12349,7 @@ LAB_08103998:
     bge LAB_08103998                         @ 081039a0 fada
     movs r3,#0x0    @ 081039a2 0023
     b LAB_08103b0c                           @ 081039a4 b2e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081039a8:
     .word  0x00004ccc                     @ 081039a8 cc4c0000
 DAT_081039ac:
@@ -12436,7 +12436,7 @@ LAB_08103a1c:
     ldr r0,[r0,#0x0]                         @ 08103a46 0068
 switchD_08103a48__switchD:
     .hword 0x4687    @ 08103a48 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103a4c:
     .word  0x00000fff                     @ 08103a4c ff0f0000
 DAT_08103a50:
@@ -12507,7 +12507,7 @@ LAB_08103ab6:
     ble LAB_08103ae0                         @ 08103ad0 06dd
     movs r3,#0x8    @ 08103ad2 0823
     b LAB_08103af2                           @ 08103ad4 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103ad8:
     .word  0x00001a24                     @ 08103ad8 241a0000
 PTR_card_stats_table_08103adc:
@@ -12560,7 +12560,7 @@ LAB_08103b14:
     pop {r4,r5,r6,r7}                        @ 08103b2c f0bc
     pop {r1}                                 @ 08103b2e 02bc
     bx r1                                    @ 08103b30 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103b34:
     .word  0x00001a24                     @ 08103b34 241a0000
 DAT_08103b38:
@@ -12852,7 +12852,7 @@ LAB_08103d00:
     beq LAB_08103d4c                         @ 08103d3c 06d0
     subs r0,r4,r0    @ 08103d3e 201a
     b LAB_0810412a                           @ 08103d40 f3e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103d44:
     .word  0x09e4f1c4                     @ 08103d44 c4f1e409
 PTR_card_stats_table_08103d48:
@@ -13043,7 +13043,7 @@ LAB_08103e6c:
     beq LAB_08103eb0                         @ 08103ea0 06d0
     subs r0,r3,r0    @ 08103ea2 181a
     b LAB_0810412a                           @ 08103ea4 41e1
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_stats_table_08103ea8:
     .word  card_stats_table               @ 08103ea8 b8698109
 DAT_08103eac:
@@ -13078,7 +13078,7 @@ LAB_08103eb0:
     beq LAB_08103ef4                         @ 08103ee4 06d0
     subs r0,r3,r0    @ 08103ee6 181a
     b LAB_0810412a                           @ 08103ee8 1fe1
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_stats_table_08103eec:
     .word  card_stats_table               @ 08103eec b8698109
 DAT_08103ef0:
@@ -13107,7 +13107,7 @@ LAB_08103ef4:
     beq LAB_08103f28                         @ 08103f1c 04d0
     subs r0,r0,r3    @ 08103f1e c01a
     b LAB_0810412a                           @ 08103f20 03e1
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_stats_table_08103f24:
     .word  card_stats_table               @ 08103f24 b8698109
 LAB_08103f28:
@@ -13146,7 +13146,7 @@ LAB_08103f28:
     beq LAB_08103f7c                         @ 08103f68 08d0
     adds r1,r4,#0x0    @ 08103f6a 211c
     b LAB_08103f7c                           @ 08103f6c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103f70:
     .word  0x09e4f1c4                     @ 08103f70 c4f1e409
 PTR_card_stats_table_08103f74:
@@ -13197,7 +13197,7 @@ LAB_08103f98:
     beq LAB_08104008                         @ 08103fc4 20d0
     subs r0,r3,r0    @ 08103fc6 181a
     b LAB_0810412a                           @ 08103fc8 afe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08103fcc:
     .word  0x09e4f310                     @ 08103fcc 10f3e409
 LAB_08103fd0:
@@ -13226,7 +13226,7 @@ LAB_08103fd0:
     beq LAB_08104008                         @ 08103ffc 04d0
     subs r0,r3,r0    @ 08103ffe 181a
     b LAB_0810412a                           @ 08104000 93e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104004:
     .word  0x09e4f32c                     @ 08104004 2cf3e409
 LAB_08104008:
@@ -13251,7 +13251,7 @@ LAB_08104008:
     beq LAB_08104038                         @ 0810402c 04d0
     subs r0,r2,r1    @ 0810402e 501a
     b LAB_0810412a                           @ 08104030 7be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104034:
     .word  0x02000006                     @ 08104034 06000002
 LAB_08104038:
@@ -13299,7 +13299,7 @@ LAB_08104068:
     beq LAB_08104094                         @ 08104088 04d0
     subs r0,r0,r2    @ 0810408a 801a
     b LAB_0810412a                           @ 0810408c 4de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104090:
     .word  0x02000006                     @ 08104090 06000002
 LAB_08104094:
@@ -13334,7 +13334,7 @@ LAB_08104094:
     beq LAB_081040dc                         @ 081040cc 06d0
     subs r0,r4,r0    @ 081040ce 201a
     b LAB_0810412a                           @ 081040d0 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081040d4:
     .word  0x09e4f1c4                     @ 081040d4 c4f1e409
 PTR_card_stats_table_081040d8:
@@ -13371,7 +13371,7 @@ LAB_081040dc:
     beq LAB_08104128                         @ 08104114 08d0
     subs r0,r3,r0    @ 08104116 181a
     b LAB_0810412a                           @ 08104118 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810411c:
     .word  0x02000000                     @ 0810411c 00000002
 DAT_08104120:
@@ -13452,7 +13452,7 @@ LAB_08104168:
 LAB_081041aa:
     movs r0,#0x0    @ 081041aa 0020
     b LAB_08104300                           @ 081041ac a8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081041b0:
     .word  0x0202a4d0                     @ 081041b0 d0a40202
 DAT_081041b4:
@@ -13637,7 +13637,7 @@ LAB_08104300:
     pop {r4,r5,r6,r7}                        @ 08104300 f0bc
     pop {r1}                                 @ 08104302 02bc
     bx r1                                    @ 08104304 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_stats_table_08104308:
     .word  card_stats_table               @ 08104308 b8698109
 DAT_0810430c:
@@ -13654,7 +13654,7 @@ reset_card_list_scroll_offset:
     strh r0,[r1,#0x32]                       @ 0810431c 4886
     movs r0,#0x1    @ 0810431e 0120
     bx lr                                    @ 08104320 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104324:
     .word  0x0202f3c0                     @ 08104324 c0f30202
 
@@ -13781,7 +13781,7 @@ LAB_081043e0:
     movs r2,#0xa8    @ 08104404 a822
     lsls r2,r2,#0x8    @ 08104406 1202
     b LAB_0810441c                           @ 08104408 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810440c:
     .word  0x0202a4d0                     @ 0810440c d0a40202
 DAT_08104410:
@@ -13821,7 +13821,7 @@ LAB_08104444:
     pop {r4,r5,r6,r7}                        @ 08104450 f0bc
     pop {r1}                                 @ 08104452 02bc
     bx r1                                    @ 08104454 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_list 场景 OAM 渲染链中的无操作成功占位函数. 仅执行 movs r0,#1; bx lr, 始终返回 1. indeg=7, 被与 render_card_list_oam_entries (0810432c) 完全相同的 7 个 caller 调用, 构成'做实际工作的函数 + 无操作存根'配对模式.
 return_one_card_list_oam_stub:
@@ -13892,7 +13892,7 @@ write_slot_display_coords:
     strh r2,[r0,#0x36]                       @ 081044c8 c286
     movs r0,#0x1    @ 081044ca 0120
     bx lr                                    @ 081044cc 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081044d0:
     .word  0x0202a4d0                     @ 081044d0 d0a40202
 
@@ -13911,7 +13911,7 @@ blend_palette_entry_by_scroll_pos:
     bgt LAB_081044f4                         @ 081044e8 04dc
     adds r7,r0,#0x0    @ 081044ea 071c
     b LAB_081044fe                           @ 081044ec 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081044f0:
     .word  0x0202f3c0                     @ 081044f0 c0f30202
 LAB_081044f4:
@@ -14226,7 +14226,7 @@ LAB_08104722:
     cmp r1,#0x1                              @ 08104758 0129
     beq LAB_0810476e                         @ 0810475a 08d0
     b LAB_08104778                           @ 0810475c 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104760:
     .word  0x09e60558                     @ 08104760 5805e609
 LAB_08104764:
@@ -14286,7 +14286,7 @@ LAB_081047c2:
     pop {r4,r5,r6,r7}                        @ 081047c4 f0bc
     pop {r1}                                 @ 081047c6 02bc
     bx r1                                    @ 081047c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 清零 DISPCNT 与 BLDCNT 寄存器并清空场景 OBJ 列表的小函数. 向 DISPCNT (0x04000000) 写 0 关闭所有 BG/OBJ 显示, 向 BLDCNT (0x04000050) 写 0 关闭混合效果, 再调用 init_scene_obj_list 清空 OBJ 列表; 返回固定值 1. 被 dispatch_card_list_scene_state 等 4 个 card_list 场景变体初始化路径调用, 作为每次场景切换前统一的显示/OBJ 复位步骤.
 clear_dispcnt_blendcnt_and_obj_list:
@@ -14302,7 +14302,7 @@ clear_dispcnt_blendcnt_and_obj_list:
     movs r0,#0x1    @ 081047e0 0120
     pop {r1}                                 @ 081047e2 02bc
     bx r1                                    @ 081047e4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_list 场景主状态机分派函数. 读取 0x0202f3c0[+0x1f] bit7 判断场景是否激活; 若未激活则进入 animating counter 路径. 激活时检查 0x0202a4d0[+0x18] (s16 mode) 决定进入新场景初始化还是已激活场景更新两大路径. 初始化路径: 检查 gSave 是否为 pass_input/banlist 模式, 选择合适的 page_state_dispatcher 表, 调用 page_state_dispatcher 后按 flag 决定调用 setup_card_list_scene_bg_regs / reset_card_list_scroll_offset / write_vram_bg_tilemap_card_list 等完整初始化链. 更新路径: 基于 0x0202f3c0[+0x38] 的 sub_state 字段进行 16 路 switch 分派, 各 case 处理卡牌选择/滚动/确认/取消等交互. 被 FUN_08108940 / FUN_08108da4 / FUN_08108eec 3 个场景驱动调用.
 dispatch_card_list_scene_state:
@@ -14371,7 +14371,7 @@ LAB_08104854:
     cmp r3,#0x0                              @ 08104860 002b
     beq LAB_0810488a                         @ 08104862 12d0
     b LAB_08104884                           @ 08104864 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104868:
     .word  0x0202a4d0                     @ 08104868 d0a40202
 DAT_0810486c:
@@ -14490,7 +14490,7 @@ LAB_08104932:
     cmp r3,#0x0                              @ 0810494c 002b
     beq LAB_08104978                         @ 0810494e 13d0
     b LAB_08104964                           @ 08104950 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104954:
     .word  0x02000000                     @ 08104954 00000002
 DAT_08104958:
@@ -14508,7 +14508,7 @@ LAB_08104964:
     ldr r1, DAT_08104974                     @ 0810496c 0149
     adds r2,r0,r1    @ 0810496e 4218
     b LAB_0810497a                           @ 08104970 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104974:
     .word  0x02001250                     @ 08104974 50120002
 LAB_08104978:
@@ -14696,7 +14696,7 @@ LAB_08104c30:
     adds r0,r0,r1    @ 08104c34 4018
     ldr r0,[r0,#0x0]                         @ 08104c36 0068
     .hword 0x4687    @ 08104c38 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_PTR_08104c3c:
     .word  0x08104c40                     @ 08104c3c 404c1008
 PTR_DAT_08104c40:
@@ -14752,7 +14752,7 @@ LAB_08104d28:
     adds r0,r0,r1    @ 08104d2c 4018
     ldr r0,[r0,#0x0]                         @ 08104d2e 0068
     .hword 0x4687    @ 08104d30 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_PTR_08104d34:
     .word  0x08104d38                     @ 08104d34 384d1008
 PTR_DAT_08104d38:
@@ -14924,7 +14924,7 @@ LAB_08104ea2:
     cmp r0,#0x0                              @ 08104eb8 0028
     bne LAB_08104eee                         @ 08104eba 18d1
     b LAB_08105270                           @ 08104ebc d8e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104ec0:
     .word  0x02000000                     @ 08104ec0 00000002
 DAT_08104ec4:
@@ -15020,7 +15020,7 @@ LAB_08104f68:
     cmp r4,r0                                @ 08104f78 8442
     blt LAB_08104ff0                         @ 08104f7a 39db
     b LAB_08104ffc                           @ 08104f7c 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104f80:
     .word  0x0202a4d0                     @ 08104f80 d0a40202
 LAB_08104f84:
@@ -15056,7 +15056,7 @@ LAB_08104fa6:
     cmp r0,#0x0                              @ 08104fbc 0028
     bne LAB_08104ff0                         @ 08104fbe 17d1
     b LAB_08104ffc                           @ 08104fc0 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08104fc4:
     .word  0x02000000                     @ 08104fc4 00000002
 DAT_08104fc8:
@@ -15138,7 +15138,7 @@ LAB_0810503a:
     cmp r0,#0x0                              @ 08105050 0028
     bne LAB_08105086                         @ 08105052 18d1
     b LAB_08105270                           @ 08105054 0ce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105058:
     .word  0x02000000                     @ 08105058 00000002
 DAT_0810505c:
@@ -15220,7 +15220,7 @@ LAB_081050d2:
     cmp r0,#0x0                              @ 081050e8 0028
     bne LAB_0810511e                         @ 081050ea 18d1
     b LAB_08105270                           @ 081050ec c0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081050f0:
     .word  0x02000000                     @ 081050f0 00000002
 DAT_081050f4:
@@ -15250,7 +15250,7 @@ LAB_0810511e:
     movs r0,#0x24    @ 0810511e 2420
     bl sync_state_and_init_sprite            @ 08105120 f4f7c8fc
     b LAB_08104d96                           @ 08105124 37e6
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105128:
     .word  0x02000000                     @ 08105128 00000002
 DAT_0810512c:
@@ -15276,7 +15276,7 @@ LAB_08105144:
     cmp r4,r0                                @ 08105154 8442
     blt LAB_081051cc                         @ 08105156 39db
     b LAB_081051d8                           @ 08105158 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810515c:
     .word  0x0202a4d0                     @ 0810515c d0a40202
 LAB_08105160:
@@ -15312,7 +15312,7 @@ LAB_08105182:
     cmp r0,#0x0                              @ 08105198 0028
     bne LAB_081051cc                         @ 0810519a 17d1
     b LAB_081051d8                           @ 0810519c 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081051a0:
     .word  0x02000000                     @ 081051a0 00000002
 DAT_081051a4:
@@ -15390,7 +15390,7 @@ LAB_08105212:
     cmp r0,#0x0                              @ 08105228 0028
     bne LAB_0810525c                         @ 0810522a 17d1
     b LAB_08105270                           @ 0810522c 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105230:
     .word  0x02000000                     @ 08105230 00000002
 DAT_08105234:
@@ -15420,7 +15420,7 @@ LAB_0810525c:
     bl sync_state_and_init_sprite            @ 0810525e f4f729fc
     movs r0,#0x13    @ 08105262 1320
     b LAB_0810529a                           @ 08105264 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105268:
     .word  0x02000000                     @ 08105268 00000002
 DAT_0810526c:
@@ -15590,7 +15590,7 @@ LAB_08105386:
     bl get_card_data_format_id               @ 08105392 19f711fa
     subs r0,#0x8    @ 08105396 0838
     b LAB_081053b0                           @ 08105398 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810539c:
     .word  0x0202a4d0                     @ 0810539c d0a40202
 LAB_081053a0:
@@ -15888,7 +15888,7 @@ LAB_0810558e:
     adds r1,r3,#0x0    @ 081055b4 191c
     orrs r0,r1    @ 081055b6 0843
     b LAB_081055ce                           @ 081055b8 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BG1HOFS_081055bc:
     .word  BG1HOFS                        @ 081055bc 14000004
 PTR_BG1VOFS_081055c0:
@@ -15924,7 +15924,7 @@ LAB_081055dc:
     cmp r4,r0                                @ 081055f8 8442
     blt LAB_08105674                         @ 081055fa 3bdb
     b LAB_08105684                           @ 081055fc 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105600:
     .word  0x0000fdff                     @ 08105600 fffd0000
 DAT_08105604:
@@ -15962,7 +15962,7 @@ LAB_0810562a:
     cmp r0,#0x0                              @ 08105640 0028
     bne LAB_08105674                         @ 08105642 17d1
     b LAB_08105684                           @ 08105644 1ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105648:
     .word  0x02000000                     @ 08105648 00000002
 DAT_0810564c:
@@ -16069,7 +16069,7 @@ LAB_081056ea:
 set_scene_mode_flag:
     strb r0,[r5,#0x1f]                       @ 08105702 e877
     b return_zero_from_scene_dispatch        @ 08105704 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105708:
     .word  0x0000dfff                     @ 08105708 ffdf0000
 LAB_0810570c:
@@ -16162,7 +16162,7 @@ check_card_index_in_format_range:
     bne LAB_081057a0                         @ 08105792 05d1
     bl get_card_data_format_id               @ 08105794 19f710f8
     b LAB_081057b0                           @ 08105798 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810579c:
     .word  0x0202a4d0                     @ 0810579c d0a40202
 LAB_081057a0:
@@ -16231,7 +16231,7 @@ LAB_081057fa:
     cmp r0,#0x0                              @ 08105810 0028
     beq LAB_08105840                         @ 08105812 15d0
     b LAB_081057d2                           @ 08105814 dde7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105818:
     .word  0x02000000                     @ 08105818 00000002
 DAT_0810581c:
@@ -16337,7 +16337,7 @@ switchD_0810585e__caseD_0:
 LAB_081058c2:
     pop {r1}                                 @ 081058c2 02bc
     bx r1                                    @ 081058c4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 按照当前动画帧计数器 0x0202f3c0[+0x28] 的相位, 为 card_list 场景构建一行调色板数据并写入 OBJ 调色板 slot 0x05000360. 对计数器值 [0xb..0xe] 范围内的每个颜色索引 (0..14), 由 0x09e31754 表查出基准 RGB565 颜色, 按计数器偏移量调整亮度后写入临时缓冲区; 越界索引直接透传原始颜色. 最后调用 copy_bytes_by_halfword 将 16 色 (0x20 字节) 写入 OBJ PAL 0x05000360, 帧计数器加 1 模 0x20 后写回. 被 caller 0x08105520 每帧调用, 实现卡框调色板闪烁动画.
 build_palette_row_to_obj_pal_slot:
@@ -16373,7 +16373,7 @@ LAB_081058f8:
     subs r0,r1,r0    @ 081058fc 081a
     adds r0,#0xb    @ 081058fe 0b30
     b LAB_0810590e                           @ 08105900 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105904:
     .word  0x0202f3c0                     @ 08105904 c0f30202
 DAT_08105908:
@@ -16507,7 +16507,7 @@ LAB_081059de:
     cmp r0,#0x0                              @ 081059f4 0028
     bne LAB_08105a2a                         @ 081059f6 18d1
     b switchD_08105982__default              @ 081059f8 f6e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081059fc:
     .word  0x02000000                     @ 081059fc 00000002
 DAT_08105a00:
@@ -16536,7 +16536,7 @@ LAB_08105a0e:
 LAB_08105a2a:
     movs r0,#0x0    @ 08105a2a 0020
     b LAB_08105b4a                           @ 08105a2c 8de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105a30:
     .word  0x02000000                     @ 08105a30 00000002
 DAT_08105a34:
@@ -16588,7 +16588,7 @@ LAB_08105a72:
     cmp r0,#0x0                              @ 08105a88 0028
     bne LAB_08105abc                         @ 08105a8a 17d1
     b LAB_08105b72                           @ 08105a8c 71e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105a90:
     .word  0x02000000                     @ 08105a90 00000002
 DAT_08105a94:
@@ -16663,7 +16663,7 @@ LAB_08105afe:
     cmp r0,#0x0                              @ 08105b14 0028
     bne LAB_08105b48                         @ 08105b16 17d1
     b LAB_08105b72                           @ 08105b18 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105b1c:
     .word  0x02000000                     @ 08105b1c 00000002
 DAT_08105b20:
@@ -16699,7 +16699,7 @@ LAB_08105b4a:
 LAB_08105b56:
     adds r1,r0,#0x0    @ 08105b56 011c
     b LAB_08105bea                           @ 08105b58 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105b5c:
     .word  0x02000000                     @ 08105b5c 00000002
 DAT_08105b60:
@@ -16784,7 +16784,7 @@ LAB_08105bea:
     pop {r4,r5}                              @ 08105bec 30bc
     pop {r1}                                 @ 08105bee 02bc
     bx r1                                    @ 08105bf0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105bf4:
     .word  0x02000000                     @ 08105bf4 00000002
 DAT_08105bf8:
@@ -16924,7 +16924,7 @@ LAB_08105ce0:
 LAB_08105cfc:
     bl render_game_string_line_to_sprite_vram @ 08105cfc 00f04af8
     b LAB_08105d6c                           @ 08105d00 34e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105d04:
     .word  0x0202a4d0                     @ 08105d04 d0a40202
 DAT_08105d08:
@@ -16993,7 +16993,7 @@ LAB_08105d6c:
     pop {r4,r5,r6,r7}                        @ 08105d84 f0bc
     pop {r1}                                 @ 08105d86 02bc
     bx r1                                    @ 08105d88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105d8c:
     .word  0xffffa000                     @ 08105d8c 00a0ffff
 DAT_08105d90:
@@ -17169,7 +17169,7 @@ LAB_08105ee4:
     pop {r4,r5,r6,r7}                        @ 08105ef0 f0bc
     pop {r1}                                 @ 08105ef2 02bc
     bx r1                                    @ 08105ef4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105ef8:
     .word  0x0202a4d0                     @ 08105ef8 d0a40202
 DAT_08105efc:
@@ -17247,7 +17247,7 @@ render_card_type_text_row_to_sprite:
     ldr r0,[r0,#0x0]                         @ 08105f8a 0068
 switchD_08105f8c__switchD:
     .hword 0x4687    @ 08105f8c 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105f90:
     .word  0x0202a4d0                     @ 08105f90 d0a40202
 DAT_08105f94:
@@ -17271,7 +17271,7 @@ switchD_08105f8c__caseD_0:
     ldr r5, DAT_08105fc8                     @ 08105fc0 014d
     movs r6,#0x4    @ 08105fc2 0426
     b switchD_08105f8c__default              @ 08105fc4 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105fc8:
     .word  0x0000069c                     @ 08105fc8 9c060000
 switchD_08105f8c__caseD_1:
@@ -17283,14 +17283,14 @@ switchD_08105f8c__caseD_2:
     ldr r5, DAT_08105fdc                     @ 08105fd4 014d
     movs r6,#0x6    @ 08105fd6 0626
     b switchD_08105f8c__default              @ 08105fd8 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105fdc:
     .word  0x0000069e                     @ 08105fdc 9e060000
 switchD_08105f8c__caseD_4:
     ldr r5, DAT_08105fe8                     @ 08105fe0 014d
     movs r6,#0x4    @ 08105fe2 0426
     b switchD_08105f8c__default              @ 08105fe4 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08105fe8:
     .word  0x000006cd                     @ 08105fe8 cd060000
 switchD_08105f8c__caseD_5:
@@ -17395,7 +17395,7 @@ LAB_081060a2:
     pop {r4,r5,r6,r7}                        @ 081060bc f0bc
     pop {r1}                                 @ 081060be 02bc
     bx r1                                    @ 081060c0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081060c4:
     .word  0x000006cc                     @ 081060c4 cc060000
 PTR_game_str_pointer_table_081060c8:
@@ -17450,7 +17450,7 @@ render_text_dual_pass_with_shadow:
     pop {r4,r5,r6}                           @ 08106128 70bc
     pop {r1}                                 @ 0810612a 02bc
     bx r1                                    @ 0810612c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ card_list 场景 BG tilemap 区域填写函数, 无外部参数. 内部 ldr 加载 VRAM 基址 0x0600e000 存入 r8. 从 IWRAM 0x0202f3c0[+0x26] 读取当前滚动偏移 (s16), 对 8 取模得到像素内偏移 (r7 = offset % 8), 再除以 8 得到 tile 行偏移. 外层循环遍历 2 行, 内层遍历每行 8 个列组, 计算目标 tilemap 地址: 基址 0x0600e000 + 行号*0x28*0x10 + 列偏移; 以 0xffffa000 (tile_attr 掩码) 构建属性, 对 24 个 halfword 条目调用 strh 写入 tilemap. 由 card_list 场景初始化驱动和文字渲染链中间层各调用一次.
 write_vram_bg_tilemap_card_list:
@@ -17848,7 +17848,7 @@ LAB_08106420:
     bl resolve_prhlist_entry_name_ptr        @ 0810642e 10f765fb
     adds r5,r0,#0x0    @ 08106432 051c
     b LAB_08106516                           @ 08106434 6fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106438:
     .word  0x000053f8                     @ 08106438 f8530000
 LAB_0810643c:
@@ -17899,7 +17899,7 @@ LAB_0810643c:
     movs r0,#0x0    @ 08106498 0020
     strb r0,[r1,#0x0]                        @ 0810649a 0870
     b LAB_081062fc                           @ 0810649c 2ee7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081064a0:
     .word  0x02006ed0                     @ 081064a0 d06e0002
 DAT_081064a4:
@@ -18039,7 +18039,7 @@ copy_card_frame_tile_row_to_vram:
     movs r0,#0x1    @ 081065ac 0120
     pop {r1}                                 @ 081065ae 02bc
     bx r1                                    @ 081065b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081065b4:
     .word  0x0202a4d0                     @ 081065b4 d0a40202
 DAT_081065b8:
@@ -18133,7 +18133,7 @@ LAB_0810662e:
     adds r0,r1,#0x0    @ 0810665c 081c
     adds r0,#0x18    @ 0810665e 1830
     b LAB_08106674                           @ 08106660 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106664:
     .word  0x0202f3c0                     @ 08106664 c0f30202
 DAT_08106668:
@@ -18232,7 +18232,7 @@ load_card_frame_tile_to_vram_slot_b:
     movs r0,#0x1    @ 08106714 0120
     pop {r1}                                 @ 08106716 02bc
     bx r1                                    @ 08106718 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810671c:
     .word  0x06016300                     @ 0810671c 00630106
 DAT_08106720:
@@ -18331,7 +18331,7 @@ LAB_081067ca:
     pop {r4,r5,r6}                           @ 081067cc 70bc
     pop {r1}                                 @ 081067ce 02bc
     bx r1                                    @ 081067d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081067d4:
     .word  0x00008f1e                     @ 081067d4 1e8f0000
     .byte  0x01, 0x20, 0x70, 0x47, 0x01, 0x20, 0x70, 0x47
@@ -18393,7 +18393,7 @@ LAB_0810680a:
     cmp r1,#0x2f                             @ 08106850 2f29
     ble LAB_08106864                         @ 08106852 07dd
     b LAB_0810687c                           @ 08106854 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106858:
     .word  0x0202f3c0                     @ 08106858 c0f30202
 PTR_gPrng_0810685c:
@@ -18411,7 +18411,7 @@ LAB_08106864:
     movs r1,#0x50    @ 08106870 5021
     subs r1,r1,r0    @ 08106872 091a
     b LAB_0810688c                           @ 08106874 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106878:
     .word  0x0202f42a                     @ 08106878 2af40202
 LAB_0810687c:
@@ -18431,7 +18431,7 @@ LAB_0810688c:
     orrs r0,r4    @ 08106894 2043
     strb r0,[r3,#0x1e]                       @ 08106896 9877
     b LAB_08106b7a                           @ 08106898 6fe1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810689c:
     .word  0x0202f3c0                     @ 0810689c c0f30202
 LAB_081068a0:
@@ -18468,7 +18468,7 @@ LAB_081068be:
     movs r0,#0x0    @ 081068d8 0020
     strh r0,[r7,#0x0]                        @ 081068da 3880
     b LAB_0810696c                           @ 081068dc 46e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081068e0:
     .word  0x0202f426                     @ 081068e0 26f40202
 LAB_081068e4:
@@ -18493,7 +18493,7 @@ LAB_081068e4:
     cmp r4,r0                                @ 08106908 8442
     bgt LAB_0810691c                         @ 0810690a 07dc
     b LAB_0810696c                           @ 0810690c 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106910:
     .word  0x0202f426                     @ 08106910 26f40202
 LAB_08106914:
@@ -18632,7 +18632,7 @@ LAB_08106a00:
     cmp r1,r0                                @ 08106a08 8142
     bgt LAB_08106a20                         @ 08106a0a 09dc
     b LAB_08106a68                           @ 08106a0c 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106a10:
     .word  0x0202f426                     @ 08106a10 26f40202
 DAT_08106a14:
@@ -18758,7 +18758,7 @@ LAB_08106ad2:
     adds r0,r2,#0x0    @ 08106af0 101c
     adds r0,#0x30    @ 08106af2 3030
     b LAB_08106b00                           @ 08106af4 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106af8:
     .word  0x0202f3c0                     @ 08106af8 c0f30202
 LAB_08106afc:
@@ -18803,7 +18803,7 @@ LAB_08106b34:
     movs r1,#0x50    @ 08106b40 5021
     subs r2,r1,r0    @ 08106b42 0a1a
     b LAB_08106b68                           @ 08106b44 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106b48:
     .word  0x0202f42a                     @ 08106b48 2af40202
 LAB_08106b4c:
@@ -18898,7 +18898,7 @@ LAB_08106bd6:
     pop {r4}                                 @ 08106bec 10bc
     pop {r1}                                 @ 08106bee 02bc
     bx r1                                    @ 08106bf0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106bf4:
     .word  0x0202f3c0                     @ 08106bf4 c0f30202
 DAT_08106bf8:
@@ -19330,7 +19330,7 @@ LAB_08106f08:
     lsls r0,r0,#0x4    @ 08106f1c 0001
     ldr r1, DAT_08106f2c                     @ 08106f1e 0349
     b LAB_08106f38                           @ 08106f20 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08106f24:
     .word  0x02000000                     @ 08106f24 00000002
 DAT_08106f28:
@@ -19913,7 +19913,7 @@ LAB_08107354:
     movs r2,#0x1a    @ 08107362 1a22
     bl copy_bytes_by_halfword                @ 08107364 edf79efd
     b LAB_081073ba                           @ 08107368 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810736c:
     .word  0x09e60894                     @ 0810736c 9408e609
 DAT_08107370:
@@ -19974,7 +19974,7 @@ LAB_081073cc:
     bl select_charset_then_load_name         @ 081073da e7f7e7f9
     .hword 0x4681    @ 081073de 8146
     b LAB_08107424                           @ 081073e0 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081073e4:
     .word  0x05000160                     @ 081073e4 60010005
 PTR_card_mini_frame_pal_144_081073e8:
@@ -20048,7 +20048,7 @@ LAB_0810742c:
     ldr r0,[sp,#0x114]                       @ 0810746e 4598
     bl select_charset_then_load_name         @ 08107470 e7f79cf9
     b LAB_08107494                           @ 08107474 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_game_str_pointer_table_08107478:
     .word  game_str_pointer_table         @ 08107478 400f0008
 DAT_0810747c:
@@ -20070,7 +20070,7 @@ LAB_08107494:
     adds r2,r7,#0x0    @ 0810749a 3a1c
     bl expand_format_text_to_buf             @ 0810749c edf754fe
     b LAB_081074b0                           @ 081074a0 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081074a4:
     .word  0x0202a2c0                     @ 081074a4 c0a20202
 LAB_081074a8:
@@ -20195,7 +20195,7 @@ LAB_0810754e:
     add r3,sp,#0x8                           @ 08107592 02ab
     bl render_jp_text_pair_with_flag         @ 08107594 00f0b0f9
     b LAB_081075ec                           @ 08107598 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0810759c:
     .word  0x02000000                     @ 0810759c 00000002
 DAT_081075a0:
@@ -20267,7 +20267,7 @@ LAB_0810761c:
     movs r3,#0x1    @ 08107620 0123
     str r3,[sp,#0x120]                       @ 08107622 4893
     b LAB_081076b6                           @ 08107624 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107628:
     .word  0x09e606e6                     @ 08107628 e606e609
 LAB_0810762c:
@@ -20276,7 +20276,7 @@ LAB_0810762c:
     movs r5,#0x1    @ 08107630 0125
     str r5,[sp,#0x120]                       @ 08107632 4895
     b LAB_081076b6                           @ 08107634 3fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107638:
     .word  0x09e606ea                     @ 08107638 ea06e609
 LAB_0810763c:
@@ -20579,7 +20579,7 @@ LAB_08107880:
     movs r2,#0xb0    @ 0810788a b022
     bl write_slot_display_coords             @ 0810788c fcf718fe
     b LAB_081078be                           @ 08107890 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08107894:
     .word  0x0202a4d0                     @ 08107894 d0a40202
 LAB_08107898:

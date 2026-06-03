@@ -38,7 +38,7 @@ LAB_080cbf44:
     pop {r4,r5,r6,r7}                        @ 080cbf4c f0bc
     pop {r0}                                 @ 080cbf4e 01bc
     bx r0                                    @ 080cbf50 0047  -- epilogue (无返回值)
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cbf54:
     .word  0x02023130                     @ 080cbf54 30310202
 
@@ -365,7 +365,7 @@ LAB_080cc1cc:
     bl expand_format_decimal_to_buf          @ 080cc1ce 29f02bf8
     .hword 0x466c    @ 080cc1d2 6c46
     b LAB_080cc1e4                           @ 080cc1d4 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cc1d8:
     .word  0x00000251                     @ 080cc1d8 51020000
 LAB_080cc1dc:
@@ -464,7 +464,7 @@ LAB_080cc26c:
 LAB_080cc286:
     ldr r6, DWORD_080cc294                   @ 080cc286 034e
     b LAB_080cc29a                           @ 080cc288 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc28c:
     .word  0x00002f57                     @ 080cc28c 572f0000
 DWORD_080cc290:
@@ -518,7 +518,7 @@ LAB_080cc29a:
     strb r0,[r7,#0x0]                        @ 080cc2f0 3870
     movs r0,#0x0    @ 080cc2f2 0020
     b LAB_080cc332                           @ 080cc2f4 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc2f8:
     .word  0x0988b178                     @ 080cc2f8 78b18809
 DWORD_080cc2fc:
@@ -552,7 +552,7 @@ LAB_080cc332:
     pop {r4,r5,r6,r7}                        @ 080cc334 f0bc
     pop {r1}                                 @ 080cc336 02bc
     bx r1                                    @ 080cc338 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc33c:
     .word  0x00002f54                     @ 080cc33c 542f0000
 
@@ -619,7 +619,7 @@ tick_zone_field_info_panel:
     cmp r0,#0x5                              @ 080cc3ac 0528
     bgt LAB_080cc3e6                         @ 080cc3ae 1adc
     b LAB_080cc3f8                           @ 080cc3b0 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc3b4:
     .word  0x0600f00a                     @ 080cc3b4 0af00006
 DWORD_080cc3b8:
@@ -776,7 +776,7 @@ LAB_080cc4b4:
     strb r0,[r1,#0x0]                        @ 080cc4d4 0870
     movs r0,#0x0    @ 080cc4d6 0020
     b LAB_080cc516                           @ 080cc4d8 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc4dc:
     .word  0x02020160                     @ 080cc4dc 60010202
 DWORD_080cc4e0:
@@ -799,7 +799,7 @@ LAB_080cc4ec:
     strb r0,[r4,#0x0]                        @ 080cc504 2070
     movs r0,#0x0    @ 080cc506 0020
     b LAB_080cc516                           @ 080cc508 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080cc50c:
     .word  0x050002e0                     @ 080cc50c e0020005
 DWORD_080cc510:
@@ -815,7 +815,7 @@ LAB_080cc516:
     pop {r4,r5,r6,r7}                        @ 080cc520 f0bc
     pop {r1}                                 @ 080cc522 02bc
     bx r1                                    @ 080cc524 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Top-level zone display frame tick dispatcher; selects one sub-system per frame based on gDuelCtx animation state. Called by FUN_0801e984 (scene main dispatcher). Flow: (1) checks gP1LifePoints+0x1d08 (LP alive); if nonzero reads gPrng+0x85*4 random value, divides by 0x3c=60; if quotient>0xb3=179 sets gPrng+0x23130+0x222 bits |= 0x4. (2) reads gDuelCtx+0x2f4c (animation selector) and dispatches: 0->sort_zone_oam_entries_to_vram + advance state; 1->tick_zone_detail_render_step (0x080cc208); 2->tick_zone_detail_panel_by_anim_state (0x080cc228); 3..6->tick_zone_field_info_panel (0x080cc354); 7->invert_zone_tick_result (0x080cc340). (3) calls sort_zone_oam_entries_to_vram at end. Returns 0 or 1. Side effects: strb gDuelCtx+0x2f4c (selector advance); strb gDuelCtx+0x2f4d; strb gPrng bits (random LP effect); gDuelCtx+0x2f51 &= ~2; gDuelCtx+0x2f52 &= ~5. Constants: gDuelCtx=0x02020160, selector_offset=0x2f4c, gP1LifePoints_LP_offset=0x1d08, gPrng_rand_offset=0x85*4=0x214, rand_threshold=0xb3=179, rand_div=0x3c=60, LP_flag_offset=0x23130+0x222.
 tick_zone_display_frame:
@@ -875,7 +875,7 @@ LAB_080cc592:
     bl sort_zone_oam_entries_to_vram         @ 080cc592 00f041f8
     movs r0,#0x0    @ 080cc596 0020
     b LAB_080cc5e0                           @ 080cc598 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080cc59c:
     .word  gP1LifePoints                  @ 080cc59c e0c40102
 DAT_080cc5a0:
@@ -915,7 +915,7 @@ LAB_080cc5e0:
     pop {r4,r5}                              @ 080cc5e0 30bc
     pop {r1}                                 @ 080cc5e2 02bc
     bx r1                                    @ 080cc5e4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cc5e8:
     .word  0x00002f51                     @ 080cc5e8 512f0000
 DAT_080cc5ec:
@@ -1008,7 +1008,7 @@ LAB_080cc676:
     pop {r4,r5,r6,r7}                        @ 080cc67c f0bc
     pop {r0}                                 @ 080cc67e 01bc
     bx r0                                    @ 080cc680 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cc684:
     .word  0xfffffa00                     @ 080cc684 00faffff
 PTR_gPrng_080cc688:
@@ -1031,7 +1031,7 @@ compute_duel_zone_dir_for_player:
     movs r0,#0x1    @ 080cc6a4 0120
     bics r0,r1    @ 080cc6a6 8843
     b LAB_080cc6be                           @ 080cc6a8 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080cc6ac:
     .word  gP1LifePoints                  @ 080cc6ac e0c40102
 DAT_080cc6b0:
@@ -1314,7 +1314,7 @@ zero_duel_scene_display_buffers:
     str r0,[r1,#0x0]                         @ 080cc898 0860
     pop {r0}                                 @ 080cc89a 01bc
     bx r0                                    @ 080cc89c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cc8a0:
     .word  0x0201ff60                     @ 080cc8a0 60ff0102
 DAT_080cc8a4:
@@ -1363,7 +1363,7 @@ LAB_080cc8f4:
     pop {r4}                                 @ 080cc8f4 10bc
     pop {r1}                                 @ 080cc8f6 02bc
     bx r1                                    @ 080cc8f8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cc8fc:
     .word  0x0201ff60                     @ 080cc8fc 60ff0102
 PTR_gP1LifePoints_080cc900:
@@ -1525,7 +1525,7 @@ tick_duel_field_fadeout_step:
     bl tick_blend_step_by_delta              @ 080cca4a 28f035ff
     pop {r1}                                 @ 080cca4e 02bc
     bx r1                                    @ 080cca50 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cca54:
     .word  0x02023130                     @ 080cca54 30310202
 DAT_080cca58:
@@ -1582,7 +1582,7 @@ LAB_080ccaa8:
     ldr r0,[r0,#0x0]                         @ 080ccaae 0068
 switchD_080ccab0__switchD:
     .hword 0x4687    @ 080ccab0 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccab4:
     .word  0x02023130                     @ 080ccab4 30310202
 DAT_080ccab8:
@@ -1679,7 +1679,7 @@ LAB_080ccb6c:
     movs r0,#0x24    @ 080ccb72 2420
     bl sync_state_and_init_sprite            @ 080ccb74 2cf09eff
     b switchD_080ccab0__default              @ 080ccb78 38e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccb7c:
     .word  0x02023130                     @ 080ccb7c 30310202
 LAB_080ccb80:
@@ -1700,7 +1700,7 @@ LAB_080ccb80:
 LAB_080ccb9c:
     bl zero_duel_lp_display_counters         @ 080ccb9c caf796f9
     b switchD_080ccab0__default              @ 080ccba0 24e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccba4:
     .word  0x0201fe60                     @ 080ccba4 60fe0102
 LAB_080ccba8:
@@ -1857,7 +1857,7 @@ LAB_080cccce:
     movs r0,#0x0    @ 080cccd0 0020
     strb r0,[r1,#0x0]                        @ 080cccd2 0870
     b LAB_080ccdee                           @ 080cccd4 8be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cccd8:
     .word  0x02023130                     @ 080cccd8 30310202
 switchD_080ccab0__caseD_2:
@@ -1872,7 +1872,7 @@ LAB_080ccce6:
     movs r0,#0x11    @ 080cccec 1120
     rsbs r0,r0,#0    @ 080cccee 4042
     b LAB_080ccd46                           @ 080cccf0 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cccf4:
     .word  0x02023130                     @ 080cccf4 30310202
 DAT_080cccf8:
@@ -1921,7 +1921,7 @@ LAB_080ccd46:
     movs r0,#0x0    @ 080ccd4c 0020
     strb r0,[r2,#0x0]                        @ 080ccd4e 1070
     b LAB_080ccdee                           @ 080ccd50 4de0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ccd54:
     .word  gPrng                          @ 080ccd54 40000003
 DAT_080ccd58:
@@ -1962,7 +1962,7 @@ LAB_080ccd7e:
     ldrh r0,[r0,#0x0]                        @ 080ccd9a 0088
     bl init_card_name_result_screen          @ 080ccd9c 5ff764ff
     b LAB_080ccddc                           @ 080ccda0 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccda4:
     .word  0x00000215                     @ 080ccda4 15020000
 PTR_gPrng_080ccda8:
@@ -1982,7 +1982,7 @@ LAB_080ccdb2:
     ands r1,r2    @ 080ccdc8 1140
     strb r1,[r0,#0x0]                        @ 080ccdca 0170
     b LAB_080ccddc                           @ 080ccdcc 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccdd0:
     .word  0x00000215                     @ 080ccdd0 15020000
 LAB_080ccdd4:
@@ -2228,7 +2228,7 @@ LAB_080ccf5e:
     ldr r0, DAT_080ccfa4                     @ 080ccf88 0648
     adds r1,r1,r0    @ 080ccf8a 0918
     b LAB_080ccfc2                           @ 080ccf8c 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccf90:
     .word  0x09dc882a                     @ 080ccf90 2a88dc09
 DAT_080ccf94:
@@ -2269,7 +2269,7 @@ LAB_080ccfc8:
     strb r1,[r0,#0x0]                        @ 080ccfd0 0170
     pop {r0}                                 @ 080ccfd2 01bc
     bx r0                                    @ 080ccfd4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ccfd8:
     .word  0x09dc8830                     @ 080ccfd8 3088dc09
 DAT_080ccfdc:
@@ -2387,7 +2387,7 @@ LAB_080cd0aa:
     pop {r4,r5,r6,r7}                        @ 080cd0b8 f0bc
     pop {r0}                                 @ 080cd0ba 01bc
     bx r0                                    @ 080cd0bc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd0c0:
     .word  0x02006ed0                     @ 080cd0c0 d06e0002
 DAT_080cd0c4:
@@ -2442,7 +2442,7 @@ LAB_080cd120:
     pop {r4,r5}                              @ 080cd120 30bc
     pop {r0}                                 @ 080cd122 01bc
     bx r0                                    @ 080cd124 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd128:
     .word  0x0201f440                     @ 080cd128 40f40102
 DAT_080cd12c:
@@ -2504,7 +2504,7 @@ LAB_080cd178:
     movs r0,#0x0    @ 080cd196 0020
     bl sync_state_and_init_sprite            @ 080cd198 2cf08cfc
     b LAB_080cd244                           @ 080cd19c 52e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080cd1a0:
     .word  gPrng                          @ 080cd1a0 40000003
 DAT_080cd1a4:
@@ -2583,7 +2583,7 @@ LAB_080cd1f4:
     bls LAB_080cd244                         @ 080cd234 06d9
     movs r0,#0x1    @ 080cd236 0120
     b LAB_080cd246                           @ 080cd238 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd23c:
     .word  0x00000a1b                     @ 080cd23c 1b0a0000
 DAT_080cd240:
@@ -3091,7 +3091,7 @@ render_card_list_oam_row_by_nibble_rotate:
     b LAB_080cd814                           @ 080cd61e f9e0
 LAB_080cd620:
     b LAB_080cd864                           @ 080cd620 20e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd624:
     .word  0x0201f440                     @ 080cd624 40f40102
 DAT_080cd628:
@@ -3150,7 +3150,7 @@ LAB_080cd688:
     movs r0,#0x0    @ 080cd68a 0020
     bl sync_state_and_init_sprite            @ 080cd68c 2cf012fa
     b LAB_080cd864                           @ 080cd690 e8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080cd694:
     .word  gPrng                          @ 080cd694 40000003
 DAT_080cd698:
@@ -3234,7 +3234,7 @@ LAB_080cd72a:
     movs r0,#0x1    @ 080cd72a 0120
     bl sync_state_and_init_sprite            @ 080cd72c 2cf0c2f9
     b LAB_080cd864                           @ 080cd730 98e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd734:
     .word  0x00000a0a                     @ 080cd734 0a0a0000
 DAT_080cd738:
@@ -3249,7 +3249,7 @@ LAB_080cd73c:
     adds r2,#0x1    @ 080cd748 0132
     movs r0,#0x0    @ 080cd74a 0020
     b LAB_080cd756                           @ 080cd74c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd750:
     .word  0x00000a08                     @ 080cd750 080a0000
 LAB_080cd754:
@@ -3328,7 +3328,7 @@ LAB_080cd7da:
     movs r0,#0x24    @ 080cd7da 2420
     bl sync_state_and_init_sprite            @ 080cd7dc 2cf06af9
     b LAB_080cd864                           @ 080cd7e0 40e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd7e4:
     .word  0x00000a0a                     @ 080cd7e4 0a0a0000
 LAB_080cd7e8:
@@ -3347,7 +3347,7 @@ LAB_080cd7e8:
     subs r0,r1,#0x1    @ 080cd800 481e
     strh r0,[r2,#0x0]                        @ 080cd802 1080
     b LAB_080cd72a                           @ 080cd804 91e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd808:
     .word  0x00000a08                     @ 080cd808 080a0000
 LAB_080cd80c:
@@ -3390,7 +3390,7 @@ LAB_080cd814:
     bls LAB_080cd864                         @ 080cd854 06d9
     movs r0,#0x1    @ 080cd856 0120
     b LAB_080cd866                           @ 080cd858 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cd85c:
     .word  0x00000a1b                     @ 080cd85c 1b0a0000
 DAT_080cd860:
@@ -3561,7 +3561,7 @@ LAB_080cd998:
 LAB_080cd99a:
     pop {r1}                                 @ 080cd99a 02bc
     bx r1                                    @ 080cd99c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Initialize palette and tile VRAM regions for the card display screen. Fills OBJ palette and BG palette with card display colors from ROM palette table; zero-fills BG tile VRAM region for text layer. No APCS params (reads display state from globals). Returns void. Side effects: OBJ palette, BG palette, BG tile VRAM written. Constants: card_palette_table_base in ROM; bios_cpu_set fill mode.
 init_card_palette_and_tile_vram:
@@ -3808,7 +3808,7 @@ LAB_080cdb70:
     pop {r4,r5,r6,r7}                        @ 080cdb78 f0bc
     pop {r0}                                 @ 080cdb7a 01bc
     bx r0                                    @ 080cdb7c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cdb80:
     .word  0x02006ed0                     @ 080cdb80 d06e0002
 DAT_080cdb84:
@@ -4082,7 +4082,7 @@ render_card_list_oam_row_by_lp_nibble:
     b LAB_080cdf10                           @ 080cdda2 b5e0
 LAB_080cdda4:
     b LAB_080cdf60                           @ 080cdda4 dce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cdda8:
     .word  0x0201f440                     @ 080cdda8 40f40102
 DAT_080cddac:
@@ -4141,7 +4141,7 @@ LAB_080cde0c:
     movs r0,#0x0    @ 080cde0e 0020
     bl sync_state_and_init_sprite            @ 080cde10 2bf050fe
     b LAB_080cdf60                           @ 080cde14 a4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080cde18:
     .word  gPrng                          @ 080cde18 40000003
 DAT_080cde1c:
@@ -4305,7 +4305,7 @@ LAB_080cdf10:
     bls LAB_080cdf60                         @ 080cdf50 06d9
     movs r0,#0x1    @ 080cdf52 0120
     b LAB_080cdf62                           @ 080cdf54 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cdf58:
     .word  0x00000a1b                     @ 080cdf58 1b0a0000
 DAT_080cdf5c:
@@ -4906,7 +4906,7 @@ LAB_080ce3c8:
     .hword 0x4653    @ 080ce3d4 5346
     lsls r0,r3,#0xc    @ 080ce3d6 1803
     b LAB_080ce400                           @ 080ce3d8 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce3dc:
     .word  0x0201f440                     @ 080ce3dc 40f40102
 DAT_080ce3e0:
@@ -4982,7 +4982,7 @@ LAB_080ce460:
     cmp r0,#0x0                              @ 080ce464 0028
     beq LAB_080ce48a                         @ 080ce466 10d0
     b LAB_080ce7e4                           @ 080ce468 bce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce46c:
     .word  0x0201f440                     @ 080ce46c 40f40102
 DAT_080ce470:
@@ -5162,7 +5162,7 @@ LAB_080ce5a8:
     movs r1,#0xc0    @ 080ce5c4 c021
     lsls r1,r1,#0x3    @ 080ce5c6 c900
     b LAB_080ce612                           @ 080ce5c8 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce5cc:
     .word  0x0201f440                     @ 080ce5cc 40f40102
 DAT_080ce5d0:
@@ -5349,7 +5349,7 @@ LAB_080ce6e4:
     ands r0,r1    @ 080ce73c 0840
     str r0,[r5,#0x0]                         @ 080ce73e 2860
     b LAB_080ce7e4                           @ 080ce740 50e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce744:
     .word  0x00000a14                     @ 080ce744 140a0000
 DAT_080ce748:
@@ -5424,7 +5424,7 @@ LAB_080ce772:
     bls LAB_080ce7e4                         @ 080ce7d0 08d9
     movs r0,#0x1    @ 080ce7d2 0120
     b LAB_080ce7e6                           @ 080ce7d4 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce7d8:
     .word  0x0201f440                     @ 080ce7d8 40f40102
 DAT_080ce7dc:
@@ -5493,7 +5493,7 @@ LAB_080ce830:
     ands r0,r3    @ 080ce850 1840
     strb r0,[r4,#0x11]                       @ 080ce852 6074
     b LAB_080ce87e                           @ 080ce854 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce858:
     .word  0x06014000                     @ 080ce858 00400106
 DAT_080ce85c:
@@ -5683,7 +5683,7 @@ LAB_080ce9c0:
     movs r3,#0x1    @ 080ce9c6 0123
     bl tile_2d_row_copy                      @ 080ce9c8 28f084fd
     b LAB_080cea22                           @ 080ce9cc 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ce9d0:
     .word  0x0201f641                     @ 080ce9d0 41f60102
 DAT_080ce9d4:
@@ -5876,7 +5876,7 @@ LAB_080ceb40:
     movs r0,#0x1    @ 080ceb40 0120
     add r8,r0                                @ 080ceb42 8044
     b LAB_080ceca0                           @ 080ceb44 ace0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ceb48:
     .word  0x02006ed0                     @ 080ceb48 d06e0002
 DAT_080ceb4c:
@@ -6177,7 +6177,7 @@ LAB_080ced60:
     movs r2,#0x60    @ 080ced86 6022
     bl write_oam_entry_with_slot_check       @ 080ced88 27f034fd
     b LAB_080cedc6                           @ 080ced8c 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ced90:
     .word  0x0201f440                     @ 080ced90 40f40102
 DAT_080ced94:
@@ -6266,7 +6266,7 @@ LAB_080cee2c:
     cmp r0,#0x0                              @ 080cee30 0028
     beq LAB_080cee5a                         @ 080cee32 12d0
     b LAB_080cf238                           @ 080cee34 00e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cee38:
     .word  0x0201f440                     @ 080cee38 40f40102
 DAT_080cee3c:
@@ -6331,7 +6331,7 @@ LAB_080ceeac:
     orrs r0,r1    @ 080ceeac 0843
     str r0,[r7,#0x0]                         @ 080ceeae 3860
     b LAB_080cf238                           @ 080ceeb0 c2e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ceeb4:
     .word  0x00000a04                     @ 080ceeb4 040a0000
 DAT_080ceeb8:
@@ -6416,7 +6416,7 @@ LAB_080cef3c:
     cmp r4,#0x0                              @ 080cef40 002c
     bge LAB_080cef32                         @ 080cef42 f6da
     b LAB_080cf238                           @ 080cef44 78e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cef48:
     .word  0x00000a14                     @ 080cef48 140a0000
 DAT_080cef4c:
@@ -6588,7 +6588,7 @@ LAB_080cf04c:
     .hword 0x4650    @ 080cf098 5046
     ands r2,r0    @ 080cf09a 0240
     b LAB_080cf1da                           @ 080cf09c 9de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf0a0:
     .word  0x00000a04                     @ 080cf0a0 040a0000
 DAT_080cf0a4:
@@ -6722,7 +6722,7 @@ LAB_080cf188:
     movs r0,#0x0    @ 080cf196 0020
     bl sync_state_and_init_sprite            @ 080cf198 2af08cfc
     b LAB_080cf238                           @ 080cf19c 4ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf1a0:
     .word  0x00000a14                     @ 080cf1a0 140a0000
 DAT_080cf1a4:
@@ -6764,7 +6764,7 @@ LAB_080cf1da:
     bls LAB_080cf238                         @ 080cf1e8 26d9
     movs r0,#0x1    @ 080cf1ea 0120
     b LAB_080cf23a                           @ 080cf1ec 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf1f0:
     .word  0x00000a1b                     @ 080cf1f0 1b0a0000
 DAT_080cf1f4:
@@ -6777,7 +6777,7 @@ LAB_080cf1f8:
     ldr r0,[r1,#0x0]                         @ 080cf200 0868
     adds r0,#0x1    @ 080cf202 0130
     b LAB_080cf218                           @ 080cf204 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf208:
     .word  0x0201f440                     @ 080cf208 40f40102
 LAB_080cf20c:
@@ -6816,7 +6816,7 @@ LAB_080cf23a:
     pop {r4,r5,r6,r7}                        @ 080cf244 f0bc
     pop {r1}                                 @ 080cf246 02bc
     bx r1                                    @ 080cf248 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf24c:
     .word  0x0201f440                     @ 080cf24c 40f40102
 DAT_080cf250:
@@ -6908,7 +6908,7 @@ render_card_numeric_stat_to_bg:
     pop {r4,r5}                              @ 080cf304 30bc
     pop {r0}                                 @ 080cf306 01bc
     bx r0                                    @ 080cf308 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf30c:
     .word  0x0201f641                     @ 080cf30c 41f60102
 DAT_080cf310:
@@ -7217,7 +7217,7 @@ render_card_list_oam_row_by_stat_display:
 LAB_080cf55e:
     movs r0,#0x1    @ 080cf55e 0120
     b LAB_080cf6c6                           @ 080cf560 b1e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf564:
     .word  0x0201f440                     @ 080cf564 40f40102
 DAT_080cf568:
@@ -7255,7 +7255,7 @@ LAB_080cf594:
     orrs r1,r0    @ 080cf5a4 0143
     strh r1,[r3,#0x0]                        @ 080cf5a6 1980
     b LAB_080cf5ee                           @ 080cf5a8 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080cf5ac:
     .word  gPrng                          @ 080cf5ac 40000003
 DAT_080cf5b0:
@@ -7295,7 +7295,7 @@ LAB_080cf5ee:
     movs r0,#0x0    @ 080cf5f2 0020
     bl sync_state_and_init_sprite            @ 080cf5f4 2af05efa
     b LAB_080cf6c4                           @ 080cf5f8 64e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf5fc:
     .word  0x00000a0e                     @ 080cf5fc 0e0a0000
 DAT_080cf600:
@@ -7479,7 +7479,7 @@ LAB_080cf74c:
     pop {r4,r5,r6}                           @ 080cf74c 70bc
     pop {r1}                                 @ 080cf74e 02bc
     bx r1                                    @ 080cf750 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Backward circular search for next occupied slot in card-list slot bitmap. Symmetric sibling of find_next_occupied_slot_forward (0x080cf6d8). r0=start_slot_idx [0..9]; returns r0=found_slot_idx (decreasing direction). Reads gFontState[0x0a10] word; r2-- each iteration; wraps 0->9. No external writes; read-only query. caller: render_card_list_oam_row_by_stat_state (0x080cfbdc) bit5/0xc0 paths. Constants: SLOT_BITMASK_OFFSET=0x0a10; SLOT_COUNT=10.
 find_next_occupied_slot_backward:
@@ -7556,7 +7556,7 @@ LAB_080cf7cc:
     pop {r4,r5,r6}                           @ 080cf7cc 70bc
     pop {r1}                                 @ 080cf7ce 02bc
     bx r1                                    @ 080cf7d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 FUN_080c7950 (vram/card_stats/font_jp) 和 FUN_080c7ea0 (window/vram/display/card) 调用. 首先 zero_fill_by_halfword 清零 BG tile VRAM (0x06014000, 0x80<<7=0x4000 halfword); 读取状态结构体 (0x0201f440 + 0x0a17/0x0a18) 的 bit[0]/bit[1] 判断是否需要渲染. 若条件不满足直接跳至末尾. 满足后: 读 r4 (入口参数) 作为 stat 值, 计算显示行列位置 (modsi3/divsi3 各 1 次, 除数 0xa=10), 调用 copy_bytes_by_halfword 拷贝调色板数据两次 (来自 ROM 0x09850c5c/0x0984ee2c 到 0x05000260/0x05000280), 然后 tile_2d_row_copy 拷贝 tile 数据到 VRAM (0x06010000), 调用 setup_line_buf + render_jp (game_str) 渲染统计数字字符到 BG tile; 最后 write_line_buf_to_bg_tile_vram 写回 VRAM. 函数使用 r8/r9/r10 为 callee-save 别名. r0: s32 stat_value (caller1 080c7a74 从卡牌 ATK/DEF 字段传入; caller2 080c80da 固定传 0). Constants: VRAM_BG_CLEAR=0x06014000, STATE_BASE=0x0201f440, PAL_DST_A=0x05000260, PAL_SRC_A=0x09850c5c, PAL_DST_B=0x05000280, PAL_SRC_B=0x0984ee2c, TILE_VRAM_BASE=0x06010000, STAT_ROWS=0x13, STAT_COLS=0xa.
 render_card_stat_tiles_to_vram:
@@ -7779,7 +7779,7 @@ LAB_080cf878:
     pop {r4,r5,r6,r7}                        @ 080cf998 f0bc
     pop {r0}                                 @ 080cf99a 01bc
     bx r0                                    @ 080cf99c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cf9a0:
     .word  0x06014000                     @ 080cf9a0 00400106
 DAT_080cf9a4:
@@ -8045,7 +8045,7 @@ LAB_080cfb5e:
     orrs r0,r4    @ 080cfb9c 2043
     lsls r0,r0,#0x10    @ 080cfb9e 0004
     b LAB_080cfbbc                           @ 080cfba0 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfba4:
     .word  0x0201f440                     @ 080cfba4 40f40102
 DAT_080cfba8:
@@ -8074,7 +8074,7 @@ LAB_080cfbbc:
     pop {r4,r5,r6,r7}                        @ 080cfbd4 f0bc
     pop {r0}                                 @ 080cfbd6 01bc
     bx r0                                    @ 080cfbd8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Card-list OAM row render branch for stat_state variant. indeg=1; caller: FUN_080c82e4 (card display master tick). Reads gFontState[0x0a03] row_count -> OAM Y; gFontState[0x0a04] x_base; gFontState[0x0a0e] slot_nibble bits[23:16]; gFontState[0x0a18] state_val bits[23:16]. Four-way dispatch on state_val: state=0: writes 4 OAM strips (write_oam_entry_from_packed_args, attr0=0x32, slot=0x60); then checks gPrng[0x148] bit4(0x10)->find_next_occupied_slot_forward+nibble write+sync; bit5(0x20)->find_next_occupied_slot_backward+nibble write+sync; bits6-7(0xc0)->mod20+find_next_occupied_slot_backward+sync; bit0(0x01)->write gP1LifePoints+0x148+sync. state=1: nibble_B/C update loop (gFontState[0x0a1b/0x0a1c]). Side effects: [gFontState+0x0a0e] nibble bits[11:4] updated; [gFontState+0x0a18] state bits updated; [gP1LifePoints+0x148] written (state=0 bit0). Constants: SLOT_NIBBLE_OFFSET=0x0a0e; STATE_OFFSET=0x0a18; OAM_STRIP_COUNT=4; ATTR0_STRIP=0x32; OAM_SLOT=0x60; WRAP_MODULO=0x14.
 render_card_list_oam_row_by_stat_state:
@@ -8112,7 +8112,7 @@ LAB_080cfc14:
     cmp r0,#0x0                              @ 080cfc18 0028
     beq LAB_080cfc42                         @ 080cfc1a 12d0
     b LAB_080cff44                           @ 080cfc1c 92e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfc20:
     .word  0x0201f440                     @ 080cfc20 40f40102
 DAT_080cfc24:
@@ -8212,7 +8212,7 @@ LAB_080cfcc8:
     ldr r1, DAT_080cfce4                     @ 080cfcd8 0249
     adds r3,r2,r1    @ 080cfcda 5318
     b LAB_080cfc86                           @ 080cfcdc d3e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfce0:
     .word  0x0201f440                     @ 080cfce0 40f40102
 DAT_080cfce4:
@@ -8248,7 +8248,7 @@ LAB_080cfce8:
     orrs r0,r1    @ 080cfd20 0843
     strh r0,[r2,#0x0]                        @ 080cfd22 1080
     b LAB_080cfd4e                           @ 080cfd24 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfd28:
     .word  0x0201f440                     @ 080cfd28 40f40102
 DAT_080cfd2c:
@@ -8273,7 +8273,7 @@ LAB_080cfd4e:
     ldr r4, DAT_080cfd64                     @ 080cfd50 044c
     adds r2,r2,r4    @ 080cfd52 1219
     b LAB_080cfc9a                           @ 080cfd54 a1e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfd58:
     .word  0x00000a0e                     @ 080cfd58 0e0a0000
 DAT_080cfd5c:
@@ -8312,7 +8312,7 @@ LAB_080cfd9c:
     orrs r0,r1    @ 080cfd9c 0843
     str r0,[r4,#0x0]                         @ 080cfd9e 2060
     b LAB_080cff44                           @ 080cfda0 d0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080cfda4:
     .word  gP1LifePoints                  @ 080cfda4 e0c40102
 DAT_080cfda8:
@@ -8382,7 +8382,7 @@ LAB_080cfdca:
     movs r1,#0x80    @ 080cfe28 8021
     lsls r1,r1,#0x3    @ 080cfe2a c900
     b LAB_080cfd9c                           @ 080cfe2c b6e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfe30:
     .word  0x02006ed0                     @ 080cfe30 d06e0002
 DAT_080cfe34:
@@ -8439,7 +8439,7 @@ LAB_080cfe48:
     ands r0,r1    @ 080cfea0 0840
     str r0,[r4,#0x0]                         @ 080cfea2 2060
     b LAB_080cff44                           @ 080cfea4 4ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cfea8:
     .word  0x000001f5                     @ 080cfea8 f5010000
 PTR_game_str_pointer_table_080cfeac:
@@ -8577,7 +8577,7 @@ LAB_080cffa0:
     pop {r4,r5}                              @ 080cffa8 30bc
     pop {r0}                                 @ 080cffaa 01bc
     bx r0                                    @ 080cffac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080cffb0:
     .word  0x06014000                     @ 080cffb0 00400106
 DAT_080cffb4:
@@ -9005,7 +9005,7 @@ LAB_080d02dc:
     movs r0,#0x0    @ 080d02fa 0020
     bl sync_state_and_init_sprite            @ 080d02fc 29f0dafb
     b LAB_080d03a4                           @ 080d0300 50e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080d0304:
     .word  gPrng                          @ 080d0304 40000003
 DAT_080d0308:
@@ -9082,7 +9082,7 @@ LAB_080d0354:
     bls LAB_080d03a4                         @ 080d0394 06d9
     movs r0,#0x1    @ 080d0396 0120
     b LAB_080d03a6                           @ 080d0398 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d039c:
     .word  0x00000a1b                     @ 080d039c 1b0a0000
 DAT_080d03a0:
@@ -9207,7 +9207,7 @@ LAB_080d0456:
     ldr r0, DAT_080d049c                     @ 080d0480 0648
     adds r1,r1,r0    @ 080d0482 0918
     b LAB_080d04ba                           @ 080d0484 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d0488:
     .word  0x09dcab1e                     @ 080d0488 1eabdc09
 DAT_080d048c:
@@ -9248,7 +9248,7 @@ LAB_080d04c0:
     strb r1,[r0,#0x0]                        @ 080d04c8 0170
     pop {r0}                                 @ 080d04ca 01bc
     bx r0                                    @ 080d04cc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d04d0:
     .word  0x09dcab22                     @ 080d04d0 22abdc09
 DAT_080d04d4:
@@ -9430,7 +9430,7 @@ LAB_080d0628:
     pop {r4,r5}                              @ 080d0628 30bc
     pop {r0}                                 @ 080d062a 01bc
     bx r0                                    @ 080d062c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d0630:
     .word  0x0201f440                     @ 080d0630 40f40102
 DAT_080d0634:
@@ -9492,7 +9492,7 @@ LAB_080d0680:
     movs r0,#0x0    @ 080d069e 0020
     bl sync_state_and_init_sprite            @ 080d06a0 29f008fa
     b LAB_080d0778                           @ 080d06a4 68e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080d06a8:
     .word  gPrng                          @ 080d06a8 40000003
 DAT_080d06ac:
@@ -9550,7 +9550,7 @@ LAB_080d06ec:
     bl sync_state_and_init_sprite            @ 080d0712 29f0cff9
     movs r0,#0x1    @ 080d0716 0120
     b LAB_080d077a                           @ 080d0718 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080d071c:
     .word  gP1LifePoints                  @ 080d071c e0c40102
 DAT_080d0720:
@@ -9593,7 +9593,7 @@ LAB_080d0728:
     bls LAB_080d0778                         @ 080d0768 06d9
     movs r0,#0x1    @ 080d076a 0120
     b LAB_080d077a                           @ 080d076c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d0770:
     .word  0x00000a1b                     @ 080d0770 1b0a0000
 DAT_080d0774:
@@ -9646,7 +9646,7 @@ LAB_080d07c4:
 LAB_080d07c6:
     pop {r1}                                 @ 080d07c6 02bc
     bx r1                                    @ 080d07c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Linear search in gDuelCtx+0x2e00 (gDuelCtx+0xb8*0x40) halfword array for entry matching r0. Array length read from gDuelCtx+0x2e40 (gDuelCtx+0xb9*0x40). Compares each [gDuelCtx+0x2e00+i*2] with r4 (=r0 input); sets r5=1 on match. Returns r5 (1=found, 0=not_found). Called exclusively by render_zone_card_anim_oam_with_base (0x080d136c). Side effects: read-only. Constants: gDuelCtx=0x02020160, anim_table_base=0x2e00 (0xb8*0x40), count_offset=0x2e40 (0xb9*0x40), entry_size=2.
 check_zone_anim_id_in_table:
@@ -9764,7 +9764,7 @@ LAB_080d089a:
     pop {r4,r5,r6,r7}                        @ 080d089c f0bc
     pop {r0}                                 @ 080d089e 01bc
     bx r0                                    @ 080d08a0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Full render pipeline for duel field selected zone card detail panel (indeg=2). 8 sequential steps: (1) copy_bytes_by_halfword(dst=0x0600b0e0, src=0x0988ad78, size=0x3e0) -> BG tile frame; (2) copy_bytes_by_halfword(dst=0x05000160, src=0x0988b158, size=0x40) -> OBJ palette; (3) setup_line_buf_with_font_and_align(font=0x1b, align=2, flag=1, param=0) -> JP font; (4) read gDuelCtx+0x6c2c+0x2e40 bits[2:0] (card_attr) -> update card_info_ctx+0x8/+0x4; (5) text_render_wrapper x2 -> render two JP card name lines; (6) zero_fill_by_halfword(0x0600bc00, 0x6c0) + commit_line_buffer_to_sprite_vram -> sprite VRAM; (7) tile_2d_row_copy x10+ for card frame sub-regions; (8) game_str_id_to_row x3 + measure_string_pixel_width -> centered card description. No APCS input (void); callee-save r7/r6/r5 via .hword 0x4657/464e/4645. Constants: BG_TILE_DST=0x0600b0e0; PAL_DST=0x05000160; SPRITE_BUF=0x0600bc00; FONT_ID=0x1b; CARD_ATTR_OFFSET=gDuelCtx+0x6c2c+0x2e40; GAME_STR_ID=0x3e9.
 render_zone_card_detail_panel:
@@ -10378,7 +10378,7 @@ LAB_080d0d6e:
     adds r2,r2,r3    @ 080d0d80 d218
     .hword 0x4690    @ 080d0d82 9046
     b LAB_080d0e2a                           @ 080d0d84 51e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d0d88:
     .word  0x02020160                     @ 080d0d88 60010202
 DWORD_080d0d8c:
@@ -10397,7 +10397,7 @@ LAB_080d0d94:
     lsls r1,r1,#0x3    @ 080d0da4 c900
     orrs r1,r0    @ 080d0da6 0143
     b LAB_080d0e4c                           @ 080d0da8 50e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d0dac:
     .word  0x00002f57                     @ 080d0dac 572f0000
 LAB_080d0db0:
@@ -10434,7 +10434,7 @@ LAB_080d0db0:
     lsls r1,r0,#0x13    @ 080d0dec c104
     lsrs r1,r1,#0x18    @ 080d0dee 090e
     b LAB_080d0e14                           @ 080d0df0 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d0df4:
     .word  0x02020160                     @ 080d0df4 60010202
 DWORD_080d0df8:
@@ -10583,7 +10583,7 @@ LAB_080d0ed6:
     lsls r1,r0,#0x13    @ 080d0f14 c104
     lsrs r1,r1,#0x18    @ 080d0f16 090e
     b LAB_080d0f4a                           @ 080d0f18 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d0f1c:
     .word  0x02020160                     @ 080d0f1c 60010202
 DWORD_080d0f20:
@@ -10768,7 +10768,7 @@ LAB_080d106e:
     pop {r4,r5,r6,r7}                        @ 080d1078 f0bc
     pop {r0}                                 @ 080d107a 01bc
     bx r0                                    @ 080d107c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1080:
     .word  0x02020160                     @ 080d1080 60010202
 DWORD_080d1084:
@@ -10849,7 +10849,7 @@ LAB_080d10ee:
     lsls r0,r0,#0x13    @ 080d1110 c004
     lsrs r3,r0,#0x18    @ 080d1112 030e
     b LAB_080d114a                           @ 080d1114 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1118:
     .word  0x00002f57                     @ 080d1118 572f0000
 DWORD_080d111c:
@@ -10926,7 +10926,7 @@ LAB_080d117e:
     bhi LAB_080d11b0                         @ 080d11a0 06d8
     adds r3,r0,#0x0    @ 080d11a2 031c
     b LAB_080d11b2                           @ 080d11a4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d11a8:
     .word  0x00002f53                     @ 080d11a8 532f0000
 DWORD_080d11ac:
@@ -10969,7 +10969,7 @@ LAB_080d11b2:
     movs r1,#0x80    @ 080d11f6 8021
     bl write_oam_entry_from_packed_args      @ 080d11f8 24f0b8ff
     b LAB_080d1280                           @ 080d11fc 40e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1200:
     .word  0x02020160                     @ 080d1200 60010202
 DWORD_080d1204:
@@ -10988,7 +10988,7 @@ LAB_080d120c:
     ldr r3, DWORD_080d1228                   @ 080d121c 024b
     str r3,[sp,#0x0]                         @ 080d121e 0093
     b LAB_080d1280                           @ 080d1220 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1224:
     .word  gPrng                          @ 080d1224 40000003
 DWORD_080d1228:
@@ -11009,7 +11009,7 @@ LAB_080d122c:
     adds r3,#0x1    @ 080d1244 0133
     str r3,[sp,#0x4]                         @ 080d1246 0193
     b LAB_080d1280                           @ 080d1248 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d124c:
     .word  gPrng                          @ 080d124c 40000003
 LAB_080d1250:
@@ -11133,7 +11133,7 @@ LAB_080d1280:
     pop {r4,r5,r6,r7}                        @ 080d134c f0bc
     pop {r0}                                 @ 080d134e 01bc
     bx r0                                    @ 080d1350 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1354:
     .word  0x0080007c                     @ 080d1354 7c008000
 DWORD_080d1358:
@@ -11180,7 +11180,7 @@ render_zone_card_anim_oam_with_base:
     cmp r0,#0x5                              @ 080d13a4 0528
     ble LAB_080d13d6                         @ 080d13a6 16dd
     b LAB_080d1430                           @ 080d13a8 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d13ac:
     .word  0x02020160                     @ 080d13ac 60010202
 DWORD_080d13b0:
@@ -11224,7 +11224,7 @@ LAB_080d13d6:
     lsls r0,r0,#0x13    @ 080d13f8 c004
     lsrs r0,r0,#0x18    @ 080d13fa 000e
     b LAB_080d1432                           @ 080d13fc 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1400:
     .word  0x00002f57                     @ 080d1400 572f0000
 DWORD_080d1404:
@@ -11523,7 +11523,7 @@ LAB_080d1628:
     movs r1,#0xa8    @ 080d1650 a821
     lsls r1,r1,#0x6    @ 080d1652 8901
     b LAB_080d1672                           @ 080d1654 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1658:
     .word  0x02020160                     @ 080d1658 60010202
 DWORD_080d165c:
@@ -11629,7 +11629,7 @@ LAB_080d170e:
     adds r0,r0,r1    @ 080d172c 4018
     ldr r0,[r0,#0x0]                         @ 080d172e 0068
     .hword 0x4687    @ 080d1730 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_PTR_080d1734:
     .word  0x080d1738                     @ 080d1734 38170d08
 PTR_DAT_080d1738:
@@ -12019,7 +12019,7 @@ render_zone_card_anim_dual_pass:
     cmp r0,#0x5                              @ 080d1b6c 0528
     bgt LAB_080d1ba2                         @ 080d1b6e 18dc
     b LAB_080d1ba6                           @ 080d1b70 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d1b74:
     .word  0x02020160                     @ 080d1b74 60010202
 DWORD_080d1b78:
@@ -12266,7 +12266,7 @@ LAB_080d22f2:
     movs r3,#0xb    @ 080d22fe 0b23
     bl apply_palette_offset_to_tile_row      @ 080d2300 1cf052f8
     b LAB_080d232e                           @ 080d2304 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2308:
     .word  0x00002f57                     @ 080d2308 572f0000
 DWORD_080d230c:
@@ -12332,7 +12332,7 @@ LAB_080d2376:
     pop {r4,r5,r6,r7}                        @ 080d2380 f0bc
     pop {r0}                                 @ 080d2382 01bc
     bx r0                                    @ 080d2384 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2388:
     .word  0x02023130                     @ 080d2388 30310202
 DWORD_080d238c:
@@ -12437,7 +12437,7 @@ LAB_080d2434:
     ands r0,r2    @ 080d243c 1040
     strh r0,[r1,#0x0]                        @ 080d243e 0880
     b LAB_080d25c4                           @ 080d2440 c0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2444:
     .word  0x00002f58                     @ 080d2444 582f0000
 DWORD_080d2448:
@@ -12590,7 +12590,7 @@ LAB_080d24d8:
     ldr r3, DWORD_080d257c                   @ 080d2568 044b
     strb r0,[r3,#0x0]                        @ 080d256a 1870
     b LAB_080d24c8                           @ 080d256c ace7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2570:
     .word  0x00002f53                     @ 080d2570 532f0000
 DWORD_080d2574:
@@ -12617,7 +12617,7 @@ LAB_080d259a:
     movs r0,#0x2    @ 080d259a 0220
     bl sync_state_and_init_sprite            @ 080d259c 27f08afa
     b LAB_080d25c4                           @ 080d25a0 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d25a4:
     .word  0x00002f58                     @ 080d25a4 582f0000
 LAB_080d25a8:
@@ -12646,7 +12646,7 @@ LAB_080d25c4:
     pop {r4,r5,r6,r7}                        @ 080d25d0 f0bc
     pop {r1}                                 @ 080d25d2 02bc
     bx r1                                    @ 080d25d4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d25d8:
     .word  0x00002f51                     @ 080d25d8 512f0000
 DWORD_080d25dc:
@@ -12669,7 +12669,7 @@ check_field_scroll_phase_ready:
     cmp r0,#0x0                              @ 080d25f8 0028
     beq LAB_080d2610                         @ 080d25fa 09d0
     b LAB_080d2626                           @ 080d25fc 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2600:
     .word  0x0201e4f0                     @ 080d2600 f0e40102
 DWORD_080d2604:
@@ -12697,7 +12697,7 @@ LAB_080d2628:
     pop {r4}                                 @ 080d2628 10bc
     pop {r1}                                 @ 080d262a 02bc
     bx r1                                    @ 080d262c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2630:
     .word  0x02020160                     @ 080d2630 60010202
 
@@ -12773,7 +12773,7 @@ LAB_080d26a4:
     adds r0,r0,r1    @ 080d26a8 4018
     ldr r0,[r0,#0x0]                         @ 080d26aa 0068
     .hword 0x4687    @ 080d26ac 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d26b0:
     .word  0x02020160                     @ 080d26b0 60010202
 DWORD_080d26b4:
@@ -12876,7 +12876,7 @@ LAB_080d2a88:
     adds r0,r0,r1    @ 080d2a8c 4018
     ldr r0,[r0,#0x0]                         @ 080d2a8e 0068
     .hword 0x4687    @ 080d2a90 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2a94:
     .word  0x00002f56                     @ 080d2a94 562f0000
 DWORD_080d2a98:
@@ -12899,7 +12899,7 @@ LAB_080d2c54:
     pop {r4,r5}                              @ 080d2c58 30bc
     pop {r1}                                 @ 080d2c5a 02bc
     bx r1                                    @ 080d2c5c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 4-state machine tick for duel field zone card detail view (indeg=1). Called by FUN_080d2ef4 (duel scene outer state machine). Reads [gDuelCtx+0x2f4e] view_state byte; dispatches: state=0 (fade-in): bl tick_duel_field_fadein_step; on done: open_card_info_page_from_list, set gFontState+0x0222 bit4, strh [WIN0H=0x04000004]=0x28f0, increment view_state. state=1 (card info page): bl tick_card_info_page_by_state; on done: increment view_state. state=2 (rebuild field): read slot card_id, bl init_duel_field_vram_layout, bl render_zone_card_detail_panel (0x080d08a4), bl check_zone_slot_attr_visible (0x080d0784), bl dispatch_zone_card_display_by_mode (0x080d0818), apply_palette_offset_to_tile_row, write WIN0H/WIN0V/WININ, increment view_state; return 1. state=3 (fade-out): bl tick_duel_field_fadeout_step; on done: clear gFontState+0x0222 bits[4:0], increment view_state; return 1. other: write [gDuelCtx+0x2f4e]=0 (reset), return 0. Returns r0: 1=state_advanced / 0=waiting_or_reset. Constants: DUEL_CTX=0x02020160; VIEW_STATE_OFFSET=0x2f4e; WIN0H=0x04000004; WIN0H_VAL=0x28f0; CARD_PAGE_BUF1=0x0203eeb0; CARD_PAGE_BUF2=0x02029eb0.
 tick_zone_card_detail_view:
@@ -12961,7 +12961,7 @@ LAB_080d2c9a:
     movs r3,#0xa8    @ 080d2cc8 a823
     lsls r3,r3,#0x6    @ 080d2cca 9b01
     b LAB_080d2cf4                           @ 080d2ccc 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2cd0:
     .word  0x00002f53                     @ 080d2cd0 532f0000
 DWORD_080d2cd4:
@@ -13012,7 +13012,7 @@ LAB_080d2cf4:
     adds r0,#0x1    @ 080d2d2c 0130
     strb r0,[r4,#0x0]                        @ 080d2d2e 2070
     b LAB_080d2e98                           @ 080d2d30 b2e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2d34:
     .word  0x00002f56                     @ 080d2d34 562f0000
 DWORD_080d2d38:
@@ -13064,7 +13064,7 @@ LAB_080d2d62:
     movs r3,#0xa8    @ 080d2d90 a823
     lsls r3,r3,#0x6    @ 080d2d92 9b01
     b LAB_080d2dbc                           @ 080d2d94 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2d98:
     .word  0x00002f53                     @ 080d2d98 532f0000
 DWORD_080d2d9c:
@@ -13118,7 +13118,7 @@ LAB_080d2dbc:
     cmp r0,#0x5                              @ 080d2e00 0528
     bgt LAB_080d2e36                         @ 080d2e02 18dc
     b LAB_080d2e60                           @ 080d2e04 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2e08:
     .word  0x00002f56                     @ 080d2e08 562f0000
 DWORD_080d2e0c:
@@ -13153,7 +13153,7 @@ LAB_080d2e36:
     movs r3,#0xb    @ 080d2e42 0b23
     bl apply_palette_offset_to_tile_row      @ 080d2e44 1bf0b0fa
     b LAB_080d2e72                           @ 080d2e48 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2e4c:
     .word  0x00002f57                     @ 080d2e4c 572f0000
 DWORD_080d2e50:
@@ -13270,7 +13270,7 @@ tick_zone_card_list_view:
     cmp r0,#0x5                              @ 080d2f20 0528
     ble LAB_080d2f52                         @ 080d2f22 16dd
     b LAB_080d2fac                           @ 080d2f24 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2f28:
     .word  0x02020160                     @ 080d2f28 60010202
 DWORD_080d2f2c:
@@ -13314,7 +13314,7 @@ LAB_080d2f52:
     lsls r0,r0,#0x13    @ 080d2f74 c004
     lsrs r6,r0,#0x18    @ 080d2f76 060e
     b LAB_080d2fae                           @ 080d2f78 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2f7c:
     .word  0x00002f57                     @ 080d2f7c 572f0000
 DWORD_080d2f80:
@@ -13355,7 +13355,7 @@ LAB_080d2fae:
     cmp r0,#0x4                              @ 080d2fc0 0428
     beq LAB_080d2fd2                         @ 080d2fc2 06d0
     b LAB_080d3028                           @ 080d2fc4 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d2fc8:
     .word  0x00002f54                     @ 080d2fc8 542f0000
 LAB_080d2fcc:
@@ -13493,7 +13493,7 @@ LAB_080d30c0:
     movs r1,#0x40    @ 080d30cc 4021
     orrs r0,r1    @ 080d30ce 0843
     b LAB_080d30ae                           @ 080d30d0 ede7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d30d4:
     .word  0xffffe01f                     @ 080d30d4 1fe0ffff
 LAB_080d30d8:
@@ -13609,7 +13609,7 @@ LAB_080d319e:
     str r1,[r0,#0x0]                         @ 080d31b0 0160
     movs r0,#0x24    @ 080d31b2 2420
     b LAB_080d37d6                           @ 080d31b4 0fe3
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d31b8:
     .word  0x00002f56                     @ 080d31b8 562f0000
 DWORD_080d31bc:
@@ -13627,7 +13627,7 @@ LAB_080d31ce:
     ands r0,r2    @ 080d31d0 1040
     strh r0,[r3,#0x0]                        @ 080d31d2 1880
     b signal_zone_tick_done                  @ 080d31d4 27e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d31d8:
     .word  0xffffe01f                     @ 080d31d8 1fe0ffff
 LAB_080d31dc:
@@ -13714,7 +13714,7 @@ LAB_080d3262:
     ands r1,r2    @ 080d3278 1140
     movs r2,#0xc0    @ 080d327a c022
     b LAB_080d37b2                           @ 080d327c 99e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d3280:
     .word  0x00002f56                     @ 080d3280 562f0000
 DWORD_080d3284:
@@ -13801,7 +13801,7 @@ LAB_080d3316:
     ands r1,r2    @ 080d3320 1140
     movs r2,#0xa0    @ 080d3322 a022
     b LAB_080d37b2                           @ 080d3324 45e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d3328:
     .word  0x00002f56                     @ 080d3328 562f0000
 DWORD_080d332c:
@@ -13918,7 +13918,7 @@ LAB_080d33b6:
     lsls r3,r3,#0x6    @ 080d3400 9b01
     adds r1,r7,r3    @ 080d3402 f918
     b LAB_080d3434                           @ 080d3404 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d3408:
     .word  0x02020160                     @ 080d3408 60010202
 DWORD_080d340c:
@@ -14476,7 +14476,7 @@ exit_zone_tick_frame:
     pop {r4,r5,r6,r7}                        @ 080d3828 f0bc
     pop {r1}                                 @ 080d382a 02bc
     bx r1                                    @ 080d382c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Render card icon tile for duel field zone slot to OBJ VRAM (indeg=4). r0=slot_index; reads gDuelCtx+0x2f53 card_status byte; extracts bits[7:5] (high 3) and bits[4:0] (low 5); if combined==0 -> direct write to OAM addr (zero-vector path). Else: copy slot card metadata (9 words via ldmia/stmia); compute slot_mod5 = slot_index % 5 (bl __modsi3); VRAM row offset = (slot_mod5*4 + 0x1e0) << 5; bl tile_2d_row_copy(src, row=0, width=4, height=2) -> write 4x2 icon block to OBJ VRAM 0x06010000. No return value (void); side effects: OBJ VRAM 0x06010000+row_offset written. Constants: DUEL_CTX=0x02020160; CARD_STATUS_OFFSET=0x2f53; CARD_LOW_MASK=0x1f; STRIDE=0x28; MOD_DIVISOR=5; TILE_VRAM=0x06010000; TILE_WIDTH=4; TILE_HEIGHT=2.
 render_zone_slot_card_icon_tile:
@@ -14507,7 +14507,7 @@ render_zone_slot_card_icon_tile:
     lsls r2,r2,#0x6    @ 080d3860 9201
     adds r1,r4,r2    @ 080d3862 a118
     b LAB_080d387e                           @ 080d3864 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d3868:
     .word  0x02020160                     @ 080d3868 60010202
 DWORD_080d386c:
@@ -14567,7 +14567,7 @@ LAB_080d38ce:
     b LAB_080d3abc                           @ 080d38d6 f1e0
 LAB_080d38d8:
     b LAB_080d3b4e                           @ 080d38d8 39e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d38dc:
     .word  0x06010000                     @ 080d38dc 00000106
 DWORD_080d38e0:
@@ -14762,7 +14762,7 @@ LAB_080d3a30:
     adds r4,r4,r1    @ 080d3a64 6418
     adds r1,r4,#0x0    @ 080d3a66 211c
     b LAB_080d3afa                           @ 080d3a68 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d3a6c:
     .word  0x05000260                     @ 080d3a6c 60020005
 DWORD_080d3a70:
@@ -14944,7 +14944,7 @@ LAB_080d3b9c:
     ldrh r0,[r0,#0x0]                        @ 080d3bd0 0088
     subs r0,r1,r0    @ 080d3bd2 081a
     b LAB_080d3be8                           @ 080d3bd4 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d3bd8:
     .word  0x09832604                     @ 080d3bd8 04268309
 DAT_080d3bdc:
@@ -14958,7 +14958,7 @@ LAB_080d3be8:
     pop {r4,r5,r6}                           @ 080d3be8 70bc
     pop {r1}                                 @ 080d3bea 02bc
     bx r1                                    @ 080d3bec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zone slot comparator with card type correction; returns sort key for zone sort pipeline. Called by sort_zone_slots_by_stat_insertion (0x080d403c) and sort_zone_slots_by_stat_quicksort (0x080d4148). Symmetric with compare_zone_slot_card_stat_pair (0x080d3c8c): push {r4-r7, lr}, high-reg save (0x4657/0x464e/0x4645); calls check_zone_slot_attr_visible for each slot; both visible: ldmia batch read 24 bytes card_stats; if r1 (slot_b raw)==0x16 returns -2; if 0x17 returns -3; else computes difference via card_stats_table. Invisible path returns -4 or 0x18. Side effects: read-only (IWRAM gDuelCtx + ROM). Constants: gDuelCtx=0x02020160, card_stats_table=PTR@080d3e9c, card_type_range=[0x16..0x17], slot_stride=0x28.
 compare_zone_slot_stat_with_type_alt:
@@ -15251,7 +15251,7 @@ LAB_080d3dee:
     beq LAB_080d3e10                         @ 080d3dfc 08d0
     movs r0,#0x9    @ 080d3dfe 0920
     b LAB_080d3e2e                           @ 080d3e00 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d3e04:
     .word  0x09e4f1c4                     @ 080d3e04 c4f1e409
 PTR_card_stats_table_080d3e08:
@@ -15291,7 +15291,7 @@ LAB_080d3e2e:
     pop {r4,r5,r6,r7}                        @ 080d3e48 f0bc
     pop {r1}                                 @ 080d3e4a 02bc
     bx r1                                    @ 080d3e4c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zone slot comparator with ATK/DEF value correction; returns sort key. Called by sort_zone_slots_by_stat_insertion (0x080d403c) and sort_zone_slots_by_stat_quicksort (0x080d4148). Symmetric with compare_zone_slot_card_stat_pair cluster; difference: uses additional ATK/DEF offset tables (0x09e4f310 for type 0x16, 0x09e4f32c for type 0x17, 0x09e4f2ac fallback). r5 loop_count=0 init; invisible path returns 0x18. End: r0=sp[0x2c]-r7[0x4] difference returned. Side effects: read-only (IWRAM/ROM). Constants: gDuelCtx=0x02020160, card_stats_table=PTR@080d3e9c, atk_table_16=0x09e4f310, atk_table_17=0x09e4f32c, fallback=0x09e4f2ac, slot_stride=0x28, loop_count=2.
 compare_zone_slot_card_stat_with_atk:
@@ -15382,7 +15382,7 @@ LAB_080d3ee0:
     ldr r0,[r3,#0x24]                        @ 080d3ef4 586a
     adds r0,r0,r1    @ 080d3ef6 4018
     b LAB_080d3f24                           @ 080d3ef8 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d3efc:
     .word  0x02020160                     @ 080d3efc 60010202
 DAT_080d3f00:
@@ -15397,7 +15397,7 @@ LAB_080d3f04:
     adds r1,r1,r0    @ 080d3f10 0918
     str r1,[r4,#0x0]                         @ 080d3f12 2160
     b LAB_080d3f26                           @ 080d3f14 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d3f18:
     .word  0x09e4f310                     @ 080d3f18 10f3e409
 LAB_080d3f1c:
@@ -15463,7 +15463,7 @@ LAB_080d3f7c:
     beq LAB_080d3f98                         @ 080d3f88 06d0
     movs r0,#0x27    @ 080d3f8a 2720
     b LAB_080d4014                           @ 080d3f8c 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d3f90:
     .word  0x02020160                     @ 080d3f90 60010202
 PTR_card_stats_table_080d3f94:
@@ -15641,7 +15641,7 @@ LAB_080d40d4:
     cmp r2,#0x0                              @ 080d40d4 002a
     ble LAB_080d40f2                         @ 080d40d6 0cdd
     b LAB_080d40f0                           @ 080d40d8 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d40dc:
     .word  0x02020160                     @ 080d40dc 60010202
 DAT_080d40e0:
@@ -15888,7 +15888,7 @@ LAB_080d42ac:
     cmp r5,r0                                @ 080d42c0 8542
     blt LAB_080d42ac                         @ 080d42c2 f3db
     b LAB_080d42f8                           @ 080d42c4 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d42c8:
     .word  0x02020160                     @ 080d42c8 60010202
 DWORD_080d42cc:
@@ -16159,7 +16159,7 @@ LAB_080d44cc:
     orrs r1,r2    @ 080d44cc 1143
     strh r1,[r0,#0x0]                        @ 080d44ce 0180
     b LAB_080d45ee                           @ 080d44d0 8de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d44d4:
     .word  gPrng                          @ 080d44d4 40000003
 DWORD_080d44d8:
@@ -16178,7 +16178,7 @@ LAB_080d44e0:
     ands r1,r2    @ 080d44f0 1140
     movs r2,#0x20    @ 080d44f2 2022
     b LAB_080d44cc                           @ 080d44f4 eae7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d44f8:
     .word  0x00002f54                     @ 080d44f8 542f0000
 DWORD_080d44fc:
@@ -16207,7 +16207,7 @@ LAB_080d4500:
     orrs r1,r0    @ 080d4528 0143
     strh r1,[r5,#0x0]                        @ 080d452a 2980
     b LAB_080d4542                           @ 080d452c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d4530:
     .word  0x00002f52                     @ 080d4530 522f0000
 DWORD_080d4534:
@@ -16233,7 +16233,7 @@ LAB_080d454e:
     movs r0,#0x0    @ 080d4556 0020
     bl sync_state_and_init_sprite            @ 080d4558 25f0acfa
     b LAB_080d45ee                           @ 080d455c 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d4560:
     .word  0xffffe01f                     @ 080d4560 1fe0ffff
 DWORD_080d4564:
@@ -16290,7 +16290,7 @@ LAB_080d45bc:
     ands r0,r2    @ 080d45c4 1040
     strh r0,[r1,#0x0]                        @ 080d45c6 0880
     b LAB_080d45ee                           @ 080d45c8 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d45cc:
     .word  0x00002f54                     @ 080d45cc 542f0000
 DWORD_080d45d0:
@@ -16315,7 +16315,7 @@ LAB_080d45ee:
     pop {r4,r5,r6,r7}                        @ 080d45f0 f0bc
     pop {r1}                                 @ 080d45f2 02bc
     bx r1                                    @ 080d45f4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080d45f8:
     .word  0x00002f51                     @ 080d45f8 512f0000
 
@@ -16459,7 +16459,7 @@ LAB_080d46cc:
     ldr r0, DAT_080d46fc                     @ 080d46f0 0248
     strh r0,[r1,#0x0]                        @ 080d46f2 0880
     b LAB_080d4774                           @ 080d46f4 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d46f8:
     .word  pack_ui_state                  @ 080d46f8 50580003
 DAT_080d46fc:
@@ -16724,7 +16724,7 @@ tick_pack_scroll_interp_step:
     bne LAB_080d48e8                         @ 080d48dc 04d1
     movs r0,#0x1    @ 080d48de 0120
     b LAB_080d4938                           @ 080d48e0 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d48e4:
     .word  pack_ui_state                  @ 080d48e4 50580003
 LAB_080d48e8:
@@ -16771,7 +16771,7 @@ LAB_080d4938:
     pop {r4,r5}                              @ 080d4938 30bc
     pop {r1}                                 @ 080d493a 02bc
     bx r1                                    @ 080d493c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Sets pack_ui_state scroll substruct start position fields. Writes r0 to [pack_ui_state+0x6b2] (scroll start x), r1 to [pack_ui_state+0x6b4] (scroll start y). Called by pack card shop before starting a new scroll animation to record the animation start coordinates.
 @ 
@@ -16791,7 +16791,7 @@ set_pack_scroll_start_pos:
     pop {r4}                                 @ 080d4950 10bc
     pop {r0}                                 @ 080d4952 01bc
     bx r0                                    @ 080d4954 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4958:
     .word  pack_ui_state                  @ 080d4958 50580003
 DAT_080d495c:
@@ -16927,7 +16927,7 @@ init_pack_scene_bg_and_vram:
     pop {r4,r5}                              @ 080d4a38 30bc
     pop {r0}                                 @ 080d4a3a 01bc
     bx r0                                    @ 080d4a3c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4a40:
     .word  pack_ui_state                  @ 080d4a40 50580003
 PTR_BG0CNT_080d4a44:
@@ -17029,7 +17029,7 @@ LAB_080d4ae8:
     pop {r4,r5,r6,r7}                        @ 080d4ae8 f0bc
     pop {r0}                                 @ 080d4aea 01bc
     bx r0                                    @ 080d4aec 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Fills the first fill_count pack card BG tilemap slots with valid tile IDs and clears the rest. r0=pack_context_ptr, r1=fill_count (clamped to 5). Loops [0..fill_count-1]: calls fill_pack_card_slot_tiles(slot, pack_ctx). Then loops [fill_count..4]: calls clear_pack_card_slot_tiles(slot, pack_ctx). Called from FUN_080d4a5c (pack card image hub dispatcher) and multiple pack frame drivers to switch the displayed card count.
 @ 
@@ -17070,7 +17070,7 @@ LAB_080d4b1c:
     pop {r4,r5,r6}                           @ 080d4b20 70bc
     pop {r0}                                 @ 080d4b22 01bc
     bx r0                                    @ 080d4b24 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 按状态标志渲染拆包场景标签文本组. 读取 r0 指针字节 [r0+0] 的 bit7: 若为 0 则渲染 (类别 2, 子项 1) 与 (类别 1, 子项 0) 两组标签; 若 bit7 置位则先渲染 (类别 1, 子项 5), 再检查 pack_ui_state+0x724 字节的 bit3 决定渲染 (类别 2, 子项 1) 或 (类别 2, 子项 4). 全程经 dispatch_pack_label_text_render_by_category 输出文本精灵. 供拆包 UI 刷新标签时调用.
 render_pack_label_text_by_flags:
@@ -17115,7 +17115,7 @@ LAB_080d4b78:
     pop {r4}                                 @ 080d4b78 10bc
     pop {r0}                                 @ 080d4b7a 01bc
     bx r0                                    @ 080d4b7c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 渲染拆包场景的默认标签文本对. 无条件先调 dispatch_pack_label_text_render_by_category(类别 2, 子项 3), 再调 (类别 1, 子项 2), 写出两组固定标签文本精灵. 无参数无分支, 供拆包 UI 在固定布局状态下刷新标签.
 render_pack_label_text_default_pair:
@@ -17128,7 +17128,7 @@ render_pack_label_text_default_pair:
     bl dispatch_pack_label_text_render_by_category @ 080d4b8e 00f0c5fa
     pop {r0}                                 @ 080d4b92 01bc
     bx r0                                    @ 080d4b94 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 拆包场景卡牌图正向滚动动画的逐帧 tick. 读取 pack_ui_state+0xc 工作结构: 比较帧计数 [+0x1a]+2 与上限 [+0xa], 未到上限时按当前卡牌索引 [+0x6fa] 从槽数组 [+0x6fc] 取卡牌记录, 累加色板偏移后调 dispatch_pack_card_image_render_by_state 渲染该帧卡图; 到上限则以 0 参数渲染. 随后用 get_bios_div_remainder 推进动画子帧 [+0x38] (mod 4), 更新滚动位置 [+0x3a]/[+0x3c] (基于 [+0x1a]<<6), 写入状态 [+0]=8, 并将帧计数 [+0x1a] 自增 1 (正向).
 tick_pack_card_image_scroll_forward:
@@ -17167,7 +17167,7 @@ LAB_080d4bc4:
     adds r1,r4,#0x0    @ 080d4bd6 211c
     bl dispatch_pack_card_image_render_by_state @ 080d4bd8 fff740ff
     b LAB_080d4bf8                           @ 080d4bdc 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4be0:
     .word  pack_ui_state                  @ 080d4be0 50580003
 DAT_080d4be4:
@@ -17225,7 +17225,7 @@ LAB_080d4bf8:
     pop {r4,r5,r6}                           @ 080d4c4c 70bc
     pop {r0}                                 @ 080d4c4e 01bc
     bx r0                                    @ 080d4c50 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4c54:
     .word  0x000006ee                     @ 080d4c54 ee060000
 
@@ -17266,7 +17266,7 @@ LAB_080d4c82:
     adds r1,r3,#0x0    @ 080d4c96 191c
     bl dispatch_pack_card_image_render_by_state @ 080d4c98 fff7e0fe
     b LAB_080d4cbc                           @ 080d4c9c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4ca0:
     .word  pack_ui_state                  @ 080d4ca0 50580003
 DAT_080d4ca4:
@@ -17326,7 +17326,7 @@ LAB_080d4cbc:
     pop {r4,r5,r6}                           @ 080d4d10 70bc
     pop {r0}                                 @ 080d4d12 01bc
     bx r0                                    @ 080d4d14 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4d18:
     .word  0x000006ee                     @ 080d4d18 ee060000
 
@@ -17357,7 +17357,7 @@ load_pack_bg_tiles_and_palette:
     bl copy_memory_dma3_with_cpu_fallback    @ 080d4d3a 20f0e5f8
     pop {r0}                                 @ 080d4d3e 01bc
     bx r0                                    @ 080d4d40 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4d44:
     .word  0x09cce2b0                     @ 080d4d44 b0e2cc09
 DAT_080d4d48:
@@ -17400,7 +17400,7 @@ render_pack_card_frame_to_slot:
     movs r3,#0x0    @ 080d4d7a 0023
     bl copy_card_medium_frame_to_obj_vram    @ 080d4d7c 06f0c8fd
     b LAB_080d4d92                           @ 080d4d80 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4d84:
     .word  0x06004040                     @ 080d4d84 40400006
 LAB_080d4d88:
@@ -17411,7 +17411,7 @@ LAB_080d4d88:
 LAB_080d4d92:
     pop {r0}                                 @ 080d4d92 01bc
     bx r0                                    @ 080d4d94 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Renders pack name string to OBJ sprite VRAM row. Caller passes r0=pack_name_ptr, r1=player_idx [0..1] during pack UI init or refresh. Flow: computes OBJ VRAM base address (0xc0<<0x13 + row_offset*0x20); calls zero_fill_pack_obj_vram_region to clear target region; calls pack_name_text_render to render name text and returns tile write count; writes count to pack_ui_state+0xc+0x10/0x12; calls write_pack_obj_tile_strip to write tile strip.
 @ 
@@ -17452,7 +17452,7 @@ LAB_080d4dae:
     pop {r4,r5,r6,r7}                        @ 080d4dd4 f0bc
     pop {r0}                                 @ 080d4dd6 01bc
     bx r0                                    @ 080d4dd8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4ddc:
     .word  pack_ui_state                  @ 080d4ddc 50580003
 DAT_080d4de0:
@@ -17554,7 +17554,7 @@ LAB_080d4e58:
     pop {r4,r5,r6,r7}                        @ 080d4e80 f0bc
     pop {r0}                                 @ 080d4e82 01bc
     bx r0                                    @ 080d4e84 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4e88:
     .word  0x0600e09e                     @ 080d4e88 9ee00006
 
@@ -17641,7 +17641,7 @@ LAB_080d4ef0:
     pop {r4}                                 @ 080d4f08 10bc
     pop {r0}                                 @ 080d4f0a 01bc
     bx r0                                    @ 080d4f0c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4f10:
     .word  0x0600e80a                     @ 080d4f10 0ae80006
 
@@ -17706,7 +17706,7 @@ LAB_080d4f54:
     ldrh r0,[r4,#0x12]                       @ 080d4f5c 608a
     lsrs r5,r0,#0x8    @ 080d4f5e 050a
     b LAB_080d4f6c                           @ 080d4f60 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4f64:
     .word  pack_ui_state                  @ 080d4f64 50580003
 LAB_080d4f68:
@@ -17739,7 +17739,7 @@ LAB_080d4f98:
     pop {r4,r5,r6}                           @ 080d4f98 70bc
     pop {r0}                                 @ 080d4f9a 01bc
     bx r0                                    @ 080d4f9c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4fa0:
     .word  0x0600e000                     @ 080d4fa0 00e00006
 
@@ -17761,7 +17761,7 @@ LAB_080d4fb4:
     ldrh r0,[r4,#0x16]                       @ 080d4fbc e08a
     lsrs r5,r0,#0x8    @ 080d4fbe 050a
     b LAB_080d4fcc                           @ 080d4fc0 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d4fc4:
     .word  pack_ui_state                  @ 080d4fc4 50580003
 LAB_080d4fc8:
@@ -17873,7 +17873,7 @@ LAB_080d5084:
     pop {r4,r5,r6}                           @ 080d5084 70bc
     pop {r0}                                 @ 080d5086 01bc
     bx r0                                    @ 080d5088 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Renders a card image frame to the pack card info page OBJ VRAM slot (base 0x06010000, different offset formula from FUN_080d5034). r0=slot_linear, r1=card_icid (signed). Computes dest = 0x06010000 + ((col*3+row*6)*0x40+0x100)*0x20 where col=slot&3, row=slot>>2. If card_icid >= 0 calls copy_card_medium_frame_to_obj_vram; if < 0 loops 6 times calling zero_fill_halfword_wrapper. Called from FUN_080d5e84 (pack card image info page driver).
 @ 
@@ -17909,7 +17909,7 @@ render_pack_card_frame_to_info_slot:
     movs r3,#0x1    @ 080d50b6 0123
     bl copy_card_medium_frame_to_obj_vram    @ 080d50b8 06f02afc
     b LAB_080d50dc                           @ 080d50bc 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d50c0:
     .word  0x06010000                     @ 080d50c0 00000106
 LAB_080d50c4:
@@ -17929,7 +17929,7 @@ LAB_080d50dc:
     pop {r4,r5}                              @ 080d50dc 30bc
     pop {r0}                                 @ 080d50de 01bc
     bx r0                                    @ 080d50e0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Initializes the pack card AOB (animated object) display row tile data. Loads AOB descriptor base from pack_ui_state+0x70c. First calls write_pack_card_tile_rows_to_obj_vram(0x1c8, 0xe) to write tile row data; then loops calling init_pack_card_slot_aob_from_ptn(0x1c8, 0xe, aob_ptr) with +0x14 step per slot. Loop condition: r5 wraps to 0 (adds r5,#1; cmp r5,#0; beq). Called from pack_banner_080d566c and pack_banner_080d6d30 for pack scene card row AOB init.
 @ 
@@ -17966,7 +17966,7 @@ LAB_080d50f8:
     pop {r4,r5}                              @ 080d510c 30bc
     pop {r0}                                 @ 080d510e 01bc
     bx r0                                    @ 080d5110 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5114:
     .word  pack_ui_state                  @ 080d5114 50580003
 DAT_080d5118:
@@ -18029,7 +18029,7 @@ switchD_080d5132__default:
 LAB_080d517e:
     pop {r0}                                 @ 080d517e 01bc
     bx r0                                    @ 080d5180 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ pack card shop per-frame OAM sprite renderer for a specified card slot. r0 is the card slot/card parameter (saved to r9). Reads current frame position and count fields from pack_ui_state+0xc scroll state struct, determines visible OAM entry range, loops calling write_oam_entry_with_tile_inc to write up to 4 OAM entries to OAM shadow 0x000080c0. Internally uses r8=pack_ui_state+0xc, r9=r0 (card slot param).
 @ 
@@ -18160,7 +18160,7 @@ LAB_080d5252:
     pop {r4,r5,r6,r7}                        @ 080d5258 f0bc
     pop {r0}                                 @ 080d525a 01bc
     bx r0                                    @ 080d525c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5260:
     .word  0x000080c0                     @ 080d5260 c0800000
 
@@ -18284,7 +18284,7 @@ dispatch_pack_aob_by_type_with_state_base:
     bl dispatch_pack_card_aob_by_type        @ 080d5322 07f0b3f8
     pop {r0}                                 @ 080d5326 01bc
     bx r0                                    @ 080d5328 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d532c:
     .word  pack_ui_state                  @ 080d532c 50580003
 DAT_080d5330:
@@ -18325,7 +18325,7 @@ LAB_080d5342:
     pop {r4}                                 @ 080d535c 10bc
     pop {r0}                                 @ 080d535e 01bc
     bx r0                                    @ 080d5360 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5364:
     .word  pack_ui_state                  @ 080d5364 50580003
 DAT_080d5368:
@@ -18386,7 +18386,7 @@ LAB_080d539a:
     orrs r0,r1    @ 080d53b8 0843
     strh r0,[r2,#0x0]                        @ 080d53ba 1080
     b LAB_080d53d2                           @ 080d53bc 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d53c0:
     .word  pack_ui_state                  @ 080d53c0 50580003
 PTR_BLDALPHA_080d53c4:
@@ -18438,7 +18438,7 @@ LAB_080d5414:
     pop {r4,r5,r6,r7}                        @ 080d5418 f0bc
     pop {r0}                                 @ 080d541a 01bc
     bx r0                                    @ 080d541c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BLDALPHA_080d5420:
     .word  BLDALPHA                       @ 080d5420 52000004
 DAT_080d5424:
@@ -18463,7 +18463,7 @@ dispatch_pack_aob_frame_loop_by_reset:
     str r1,[r0,#0x0]                         @ 080d5438 0160
     movs r5,#0x0    @ 080d543a 0025
     b LAB_080d545e                           @ 080d543c 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5440:
     .word  pack_ui_state                  @ 080d5440 50580003
 LAB_080d5444:
@@ -18489,7 +18489,7 @@ LAB_080d545e:
     pop {r4,r5,r6}                           @ 080d5468 70bc
     pop {r0}                                 @ 080d546a 01bc
     bx r0                                    @ 080d546c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 拆包场景卡牌旋转/缩放精灵的 OAM 渲染, 由多个拆包动画状态调用 (indeg=9). r0 选模式 (上限钳到 3), r1 为辅助参数. 读取 pack_ui_state+0xc 工作结构, 用 get_bios_div_remainder 与 bios_div 基于循环计数 [+0x22] (0..0x1d) 计算正弦式仿射缩放系数 (0x100 减插值量), 计数前 15 帧放大, 后段缩小. 随后调 rotate_pixel_hue_in_buffer 旋转色相, write_pack_obj_attr_by_dir_split 与 render_overlay_oam_sprite_tiled 写出卡牌旋转精灵 (上下两半).
 render_pack_card_spin_oam_by_mode:
@@ -18554,7 +18554,7 @@ LAB_080d54cc:
     lsrs r1,r1,#0x10    @ 080d54e4 090c
     .hword 0x4688    @ 080d54e6 8846
     b LAB_080d5510                           @ 080d54e8 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d54ec:
     .word  pack_ui_state                  @ 080d54ec 50580003
 DAT_080d54f0:
@@ -19078,7 +19078,7 @@ LAB_080d58ae:
     orrs r2,r1    @ 080d58d0 0a43
     strh r2,[r3,#0x0]                        @ 080d58d2 1a80
     b LAB_080d5938                           @ 080d58d4 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BLDALPHA_080d58d8:
     .word  BLDALPHA                       @ 080d58d8 52000004
 LAB_080d58dc:
@@ -19139,7 +19139,7 @@ LAB_080d5938:
     pop {r4,r5,r6,r7}                        @ 080d594c f0bc
     pop {r1}                                 @ 080d594e 02bc
     bx r1                                    @ 080d5950 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_BG0CNT_080d5954:
     .word  BG0CNT                         @ 080d5954 08000004
 DAT_080d5958:
@@ -19299,7 +19299,7 @@ tick_pack_card_scroll_with_spin:
     strb r0,[r4,#0x0]                        @ 080d5a64 2070
     movs r0,#0x7    @ 080d5a66 0720
     b LAB_080d5c3a                           @ 080d5a68 e7e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5a6c:
     .word  pack_ui_state                  @ 080d5a6c 50580003
 DAT_080d5a70:
@@ -19430,7 +19430,7 @@ LAB_080d5b42:
     strb r0,[r2,#0x0]                        @ 080d5b64 1070
     movs r0,#0x3    @ 080d5b66 0320
     b LAB_080d5c3a                           @ 080d5b68 67e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5b6c:
     .word  0x00000724                     @ 080d5b6c 24070000
 LAB_080d5b70:
@@ -19465,14 +19465,14 @@ LAB_080d5b70:
     strb r0,[r2,#0x0]                        @ 080d5bac 1070
     movs r0,#0x3    @ 080d5bae 0320
     b LAB_080d5c3a                           @ 080d5bb0 43e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5bb4:
     .word  0x00000724                     @ 080d5bb4 24070000
 LAB_080d5bb8:
     ldr r2, DAT_080d5bc0                     @ 080d5bb8 014a
     adds r4,r4,r2    @ 080d5bba a418
     b LAB_080d5c4a                           @ 080d5bbc 45e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5bc0:
     .word  0x00000724                     @ 080d5bc0 24070000
 LAB_080d5bc4:
@@ -19506,7 +19506,7 @@ LAB_080d5bfc:
     ldr r2, DAT_080d5c04                     @ 080d5bfc 014a
     adds r4,r4,r2    @ 080d5bfe a418
     b LAB_080d5c4a                           @ 080d5c00 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5c04:
     .word  0x00000724                     @ 080d5c04 24070000
 LAB_080d5c08:
@@ -19622,7 +19622,7 @@ LAB_080d5cc2:
     pop {r4,r5,r6,r7}                        @ 080d5ce4 f0bc
     pop {r1}                                 @ 080d5ce6 02bc
     bx r1                                    @ 080d5ce8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080d5cec:
     .word  gPrng                          @ 080d5cec 40000003
 
@@ -19678,7 +19678,7 @@ LAB_080d5d38:
     pop {r4,r5,r6,r7}                        @ 080d5d54 f0bc
     pop {r1}                                 @ 080d5d56 02bc
     bx r1                                    @ 080d5d58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080d5d5c:
     .word  pack_ui_state                  @ 080d5d5c 50580003
 DAT_080d5d60:

@@ -127,7 +127,7 @@ apply_partner_flags_on_equip_pair_slot_count_hit:
     .hword 0x4649    @ 08079f3a 4946
     bl set_equip_partner_flags_with_bitmap_refresh @ 08079f3c ebf7acfb
     b LAB_08079f4e                           @ 08079f40 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08079f44:
     .word  0x00000868                     @ 08079f44 68080000
 DWORD_08079f48:
@@ -141,7 +141,7 @@ LAB_08079f4e:
     pop {r4,r5,r6,r7}                        @ 08079f54 f0bc
     pop {r1}                                 @ 08079f56 02bc
     bx r1                                    @ 08079f58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip sprite dispatch wrapper. Extracts type field from slot_node [r0+2] (bits[11:7], mask 0xfc0): if type==0x80 (bit7 set), calls dispatch_equip_zone_sprite_by_effect_type(node); otherwise calls dispatch_equip_draw_counter_sprite_tick(node). Routes to two different sprite handler paths based on equip effect type code. Called via function pointer table (Sub-type B).
 @ 
@@ -166,7 +166,7 @@ LAB_08079f74:
 LAB_08079f7a:
     pop {r1}                                 @ 08079f7a 02bc
     bx r1                                    @ 08079f7c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip sprite two-path dispatch wrapper with second parameter. Sibling of 08079f5c and 0807a65c in equip sprite dispatch cluster, adds r1 parameter forwarding. Extracts type field from slot_node [r2+2] (mask 0xfc0, compare value 0x140=0xa0<<1): if type==0x140, calls dispatch_equip_zone_sprite_by_effect_type(node, r1); otherwise calls check_equip_target_slot_in_chain_context_bitmap(node, r1). Called via function pointer table (Sub-type B).
 @ 
@@ -467,7 +467,7 @@ submit_equip_lp_bar_with_slot_sprite:
     pop {r4}                                 @ 0807a59c 10bc
     pop {r1}                                 @ 0807a59e 02bc
     bx r1                                    @ 0807a5a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Reads player_id from [ctx+0x2] bit0, computes opponent (1-player), calls count_occupied_monster_zones(opponent) to get occupied monster zone count r7. Reads LP state machine (0x0201b290[0x4a0]). State 0x80: calls count_available_monster_slots(player); if fewer than r7, exits. Calls check_field_spell_neo_daedalus_group_placeable to verify Neo-Daedalus condition; fails exits. On pass, calls increment_lp_bar_display_counter and clears [base+0x4a4] counter, transitions to 0x7f. State 0x7f: reads [base+0x4a4]; if < r7, builds OAM sprite attr (0x180d base | player_id<<13), calls setup_equip_oam_entry_with_sprite_attr to enqueue one sprite, increments counter, stays at 0x7f until count >= r7 then transitions to 0x7e. State 0x7e: calls decrement_lp_bar_display_counter and exits.
 @ 
@@ -504,7 +504,7 @@ dispatch_neo_daedalus_equip_sprite_by_monster_count:
     cmp r0,#0x7e                             @ 0807a5cc 7e28
     beq LAB_0807a64c                         @ 0807a5ce 3dd0
     b LAB_0807a650                           @ 0807a5d0 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807a5d4:
     .word  0x0201b290                     @ 0807a5d4 90b20102
 LAB_0807a5d8:
@@ -556,7 +556,7 @@ LAB_0807a60c:
     str r0,[r5,#0x0]                         @ 0807a638 2860
     movs r0,#0x7f    @ 0807a63a 7f20
     b LAB_0807a652                           @ 0807a63c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807a640:
     .word  0x000004a4                     @ 0807a640 a4040000
 DWORD_0807a644:
@@ -573,7 +573,7 @@ LAB_0807a652:
     pop {r4,r5,r6,r7}                        @ 0807a654 f0bc
     pop {r1}                                 @ 0807a656 02bc
     bx r1                                    @ 0807a658 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip sprite three-path dispatch wrapper (dual-param version). Sibling of 08079f5c and 08079f80 in equip sprite dispatch cluster, adds r1 parameter forwarding. Extracts type field from slot_node [r2+2] (mask 0xfc0, compare value 0x640=0xc8<<3): if type==0x640, calls enqueue_effect_slot_sprite_by_zone_capacity_check(node, r1) for capacity check path; otherwise calls dispatch_equip_zone_sprite_by_effect_type(node, r1) for standard zone sprite path. Called via function pointer table (Sub-type B).
 @ 
@@ -920,7 +920,7 @@ dispatch_equip_banisher_activation_by_state:
     movs r0,#0x0    @ 0807aa0c 0020
     str r0,[r1,#0x0]                         @ 0807aa0e 0860
     b LAB_0807aa52                           @ 0807aa10 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807aa14:
     .word  0x0201b290                     @ 0807aa14 90b20102
 DWORD_0807aa18:
@@ -956,7 +956,7 @@ LAB_0807aa4c:
 LAB_0807aa52:
     movs r0,#0x7f    @ 0807aa52 7f20
     b LAB_0807aa8e                           @ 0807aa54 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807aa58:
     .word  0x00000137                     @ 0807aa58 37010000
 LAB_0807aa5c:
@@ -1045,7 +1045,7 @@ LAB_0807aab8:
     adds r1,r1,r2    @ 0807aadc 8918
     str r0,[r1,#0x0]                         @ 0807aade 0860
     b LAB_0807aaf2                           @ 0807aae0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807aae4:
     .word  0x0201e2a0                     @ 0807aae4 a0e20102
 DWORD_0807aae8:
@@ -1098,7 +1098,7 @@ LAB_0807ab18:
     adds r0,r5,#0x0    @ 0807ab42 281c
     bl test_equip_target_slot_in_bitmap      @ 0807ab44 ccf714ff
     b LAB_0807ab62                           @ 0807ab48 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807ab4c:
     .word  gP1LifePoints                  @ 0807ab4c e0c40102
 DWORD_0807ab50:
@@ -1116,7 +1116,7 @@ LAB_0807ab64:
     pop {r4,r5}                              @ 0807ab64 30bc
     pop {r1}                                 @ 0807ab66 02bc
     bx r1                                    @ 0807ab68 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Reads LP state machine (0x0201b290[0x4a0]). State 0x80: reads player_id from [ctx+0x2] bit0, computes opponent (1-player), reads [gP1LifePoints+opponent*0x868+0xc]; if 0, exits. If nonzero, calls apply_lp_delta_if_slot_active(opponent, 1, 1) to trigger LP change. Transitions to 0x7f. State 0x7f: calls count_field_copies_of_card(0x1332=Banisher of the Light); if >= 1 copy on field, exits. If 0 copies: reads slot index from [gP1LifePoints+0x1da8], looks up card field5 in gP1LifePoints; calls check_card_field5_is_nonzero to validate; on pass calls get_card_extended_stat_field5, then calls submit_lp_indicator_with_slot_xor_flag with field5*100 as r2 to write LP indicator.
 @ 
@@ -1166,7 +1166,7 @@ dispatch_banisher_lp_penalty_by_field_count:
     bl apply_lp_delta_if_slot_active         @ 0807aba6 27f00bf8
     movs r0,#0x7f    @ 0807abaa 7f20
     b LAB_0807ac08                           @ 0807abac 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807abb0:
     .word  0x0201b290                     @ 0807abb0 90b20102
 DWORD_0807abb4:
@@ -1213,7 +1213,7 @@ LAB_0807ac08:
     pop {r4,r5,r6}                           @ 0807ac08 70bc
     pop {r1}                                 @ 0807ac0a 02bc
     bx r1                                    @ 0807ac0c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807ac10:
     .word  0x00001332                     @ 0807ac10 32130000
 DWORD_0807ac14:
@@ -1355,7 +1355,7 @@ LAB_0807acfe:
     pop {r4,r5,r6,r7}                        @ 0807ad04 f0bc
     pop {r1}                                 @ 0807ad06 02bc
     bx r1                                    @ 0807ad08 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807ad0c:
     .word  0x00000868                     @ 0807ad0c 68080000
 DWORD_0807ad10:
@@ -1517,7 +1517,7 @@ tick_equip_zone_match_lp_row_type11:
     bl set_lp_row_type11_with_byte_flags     @ 0807ae22 26f087ff
     movs r0,#0x7f    @ 0807ae26 7f20
     b LAB_0807ae6a                           @ 0807ae28 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807ae2c:
     .word  0x0201b290                     @ 0807ae2c 90b20102
 DWORD_0807ae30:
@@ -1556,7 +1556,7 @@ LAB_0807ae6a:
     pop {r4,r5,r6,r7}                        @ 0807ae70 f0bc
     pop {r1}                                 @ 0807ae72 02bc
     bx r1                                    @ 0807ae74 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807ae78:
     .word  gP1LifePoints                  @ 0807ae78 e0c40102
 DWORD_0807ae7c:
@@ -1873,7 +1873,7 @@ enqueue_slot_sprite_for_zone_entry_count_range:
     bne LAB_0807b236                         @ 0807b1d4 2fd1
     movs r6,#0x0    @ 0807b1d6 0026
     b LAB_0807b22c                           @ 0807b1d8 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b1dc:
     .word  0x00000868                     @ 0807b1dc 68080000
 DWORD_0807b1e0:
@@ -1957,7 +1957,7 @@ LAB_0807b25a:
     b LAB_0807b3a8                           @ 0807b262 a1e0
 LAB_0807b264:
     b LAB_0807b408                           @ 0807b264 d0e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b268:
     .word  0x0201b290                     @ 0807b268 90b20102
 LAB_0807b26c:
@@ -2059,7 +2059,7 @@ LAB_0807b31c:
     adds r0,r2,r1    @ 0807b320 5018
     str r3,[r0,#0x0]                         @ 0807b322 0360
     b LAB_0807b37c                           @ 0807b324 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b328:
     .word  0x080507ad                     @ 0807b328 ad070508
 DWORD_0807b32c:
@@ -2118,7 +2118,7 @@ LAB_0807b384:
     bl set_lp_display_row_type15             @ 0807b39a 26f0bdfc
     movs r0,#0x7e    @ 0807b39e 7e20
     b LAB_0807b40a                           @ 0807b3a0 33e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b3a4:
     .word  gP1LifePoints                  @ 0807b3a4 e0c40102
 LAB_0807b3a8:
@@ -2152,7 +2152,7 @@ LAB_0807b3d2:
     adds r0,r7,#0x0    @ 0807b3da 381c
     bl query_equip_target_bitmap_default     @ 0807b3dc ccf78efa
     b LAB_0807b408                           @ 0807b3e0 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b3e4:
     .word  0x08051abd                     @ 0807b3e4 bd1a0508
 LAB_0807b3e8:
@@ -2180,7 +2180,7 @@ LAB_0807b40a:
     pop {r4,r5,r6,r7}                        @ 0807b410 f0bc
     pop {r1}                                 @ 0807b412 02bc
     bx r1                                    @ 0807b414 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Effect node function pointer table handler. Entry saves high regs via .hword 0x4647 (mov r7,r3); reads DWORD_0807b48c=0x0201bb90 to get [+4] into r7 (side_ref) and [+0x20] into r8 (type_ref). Calls invoke_effect_node_handler_2arg(node, ...) to check initial condition; returns 0 if fails. Then calls check_effect_slot_matches_zone_entry(node, 0, 0); returns 0 if no match. Calls read_effect_slot_side_and_type(node, 0) to get side (r6) and slot_type (r5). Calls invoke_effect_node_with_active_flag_3arg(node, side, slot_type) to confirm active. If active, calls get_slot_field5_score(side, slot_type) to get field5 score (u16), reads card_id [node+0] (u16 -> r3). Calls enqueue_slot_card_sprite_if_eligible(node, r7, r2=r8, sp[0]=4, sp[4]=field5_score). Returns fixed 0. Called via function pointer table (Sub-type B).
 @ 
@@ -2369,7 +2369,7 @@ LAB_0807b6d8:
     adds r1,r1,r2    @ 0807b6fc 8918
     str r0,[r1,#0x0]                         @ 0807b6fe 0860
     b LAB_0807b712                           @ 0807b700 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b704:
     .word  0x0201e2a0                     @ 0807b704 a0e20102
 DWORD_0807b708:
@@ -2414,7 +2414,7 @@ LAB_0807b738:
     adds r0,r3,#0x0    @ 0807b752 181c
     bl submit_lp_indicator_with_slot_xor_flag @ 0807b754 cdf72cf8
     b LAB_0807b774                           @ 0807b758 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b75c:
     .word  gP1LifePoints                  @ 0807b75c e0c40102
 DWORD_0807b760:
@@ -2432,7 +2432,7 @@ LAB_0807b774:
 LAB_0807b776:
     pop {r1}                                 @ 0807b776 02bc
     bx r1                                    @ 0807b778 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Effect node function pointer table handler. Extracts player_id (bit0) from slot_node [r4+2]. Calls find_chain_zone_slot_by_pair_card(player, card_id=[r4+8]) to find paired card chain zone slot index r5. Re-extracts player_id, calls check_field_spell_neo_daedalus_group_placeable(player); returns 0 if not placeable. Calls count_available_monster_slots(player); returns 0 if no empty slots. Returns 0 if r5 (find result) < 0. On all checks passing, computes OAM address: EWRAM 0x0201c880 + player*0x868 + slot*4, calls invoke_setup_equip_oam_with_attr2(player, addr, 1, 0) to set OAM attr2. Returns fixed 0. Called via function pointer table (Sub-type B, appears at 0x09e470a8/0x09e470c0/0x09e470d8).
 @ 
@@ -2481,7 +2481,7 @@ LAB_0807b7ca:
     pop {r4,r5}                              @ 0807b7cc 30bc
     pop {r1}                                 @ 0807b7ce 02bc
     bx r1                                    @ 0807b7d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807b7d4:
     .word  0x00000868                     @ 0807b7d4 68080000
 DWORD_0807b7d8:
@@ -2663,7 +2663,7 @@ LAB_0807bb6e:
     pop {r4,r5,r6,r7}                        @ 0807bb80 f0bc
     pop {r1}                                 @ 0807bb82 02bc
     bx r1                                    @ 0807bb84 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807bb88:
     .word  0x0201e1c8                     @ 0807bb88 c8e10102
 
@@ -3051,7 +3051,7 @@ LAB_0807be10:
 LAB_0807be26:
     pop {r1}                                 @ 0807be26 02bc
     bx r1                                    @ 0807be28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Effect node LP display sequence state machine (slot_node version). Entry saves r0/r1/r2 as r5/r6/r7 via .hword 0x4657/0x464e/0x4645. Reads gP1LifePoints + 0x1ce8 (XOR candidate word), XORs with 0x0201b734 word, left-shifts 3 bits to get bit offset. Extracts flag_byte4 (lsrs+0xff mask -> r4, clamped to 1). r1/r2 are overwritten by ldr at entry (gP1LifePoints and XOR_FIELD_OFF constants) -- caller r1/r2 are not APCS params. Reads LP state from LP_STATE_BASE=0x0201b290 + 0x4a0. State 0x80: clears [0x0201b734]; if r4 (flag) nonzero and player LP nonzero, calls set_lp_row_type2_with_sign_flag_only(player, r4, 0, 0), returns 0x7e. State 0x7e: reads previous saved word + 1 into [0x0201b734]; if <=1 returns 0x7f, else returns 0. Called via function pointer table (Sub-type B).
 @ 
@@ -3159,7 +3159,7 @@ LAB_0807be60:
     cmp r0,#0x7e                             @ 0807bee0 7e28
     beq LAB_0807bf3c                         @ 0807bee2 2bd0
     b LAB_0807bf50                           @ 0807bee4 34e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807bee8:
     .word  gP1LifePoints                  @ 0807bee8 e0c40102
 DWORD_0807beec:
@@ -3226,7 +3226,7 @@ LAB_0807bf52:
     pop {r4,r5,r6,r7}                        @ 0807bf5c f0bc
     pop {r1}                                 @ 0807bf5e 02bc
     bx r1                                    @ 0807bf60 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Multi-phase state machine driver for equip chain dual slot activation sequence. Reads [0x0201b290+0x4a0] state. State 0x80: calls dispatch_card_effect_activation(slot_node); if activation succeeds computes opponent player, calls set_lp_display_row_type9(opp_player, card_id, player); advances to 0x7d. State 0x7d: reads [gP1LifePoints+0x1da8], right-shifts by 8 bits and stores at [base+0x4a4]; advances to 0x7c. State 0x7c: performs four eligibility checks (query_slot_card_type_eligibility + check_slot_equip_whitelist_with_monster_space x2); if all pass calls enqueue_sprite_attr_with_mode(mode=5) twice then calls enqueue_equip_chain_dual_slot_sprite_with_activation_scan. Returns 0x7d/0x7c or 0.
 @ 
@@ -3251,7 +3251,7 @@ tick_equip_chain_dual_slot_activation_seq:
     cmp r0,#0x7c                             @ 0807bf7c 7c28
     beq LAB_0807bfcc                         @ 0807bf7e 25d0
     b LAB_0807c078                           @ 0807bf80 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807bf84:
     .word  0x0201b290                     @ 0807bf84 90b20102
 LAB_0807bf88:
@@ -3375,7 +3375,7 @@ LAB_0807c07a:
     pop {r4,r5,r6,r7}                        @ 0807c07c f0bc
     pop {r1}                                 @ 0807c07e 02bc
     bx r1                                    @ 0807c080 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c084:
     .word  0x000004a4                     @ 0807c084 a4040000
 
@@ -3651,7 +3651,7 @@ LAB_0807c22e:
     ldr r2, DWORD_0807c254                   @ 0807c246 034a
     bl select_equip_target_slot_by_card_id   @ 0807c248 3af030ff
     b LAB_0807c266                           @ 0807c24c 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c250:
     .word  0x0201e2a0                     @ 0807c250 a0e20102
 DWORD_0807c254:
@@ -3665,7 +3665,7 @@ LAB_0807c258:
 LAB_0807c266:
     movs r0,#0x7f    @ 0807c266 7f20
     b LAB_0807c37a                           @ 0807c268 87e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c26c:
     .word  0x08065991                     @ 0807c26c 91590608
 LAB_0807c270:
@@ -3706,7 +3706,7 @@ LAB_0807c270:
     bl enqueue_sprite_attr_with_type_select  @ 0807c2b6 cef7f9f8
     movs r0,#0x7e    @ 0807c2ba 7e20
     b LAB_0807c37a                           @ 0807c2bc 5de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c2c0:
     .word  0x000004a4                     @ 0807c2c0 a4040000
 DWORD_0807c2c4:
@@ -3753,7 +3753,7 @@ LAB_0807c2e6:
     movs r2,#0x0    @ 0807c312 0022
     bl dispatch_equip_zone_sprite_banisher_by_field_count @ 0807c314 c8f746f9
     b LAB_0807c378                           @ 0807c318 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c31c:
     .word  gP1LifePoints                  @ 0807c31c e0c40102
 DWORD_0807c320:
@@ -3867,7 +3867,7 @@ LAB_0807c3ac:
 LAB_0807c3de:
     movs r0,#0x7f    @ 0807c3de 7f20
     b LAB_0807c46c                           @ 0807c3e0 44e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807c3e4:
     .word  0x000004a4                     @ 0807c3e4 a4040000
 LAB_0807c3e8:
@@ -4029,7 +4029,7 @@ LAB_0807c508:
     pop {r4,r5}                              @ 0807c508 30bc
     pop {r1}                                 @ 0807c50a 02bc
     bx r1                                    @ 0807c50c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates all equip zone slots accumulating score then submits LP indicator. Parameter r0=slot_node saved to r10. Calls increment_lp_bar_display_counter; queries zone_bitmap (query_equip_zone_bitmap_with_active_flag) and target_bitmap (query_equip_target_bitmap_default) using slot_node. Double loop r5=[0..1] player / r4=[0..4] slot: checks target_bitmap & (1 << (r5*16+r4)); if set calls get_slot_field7_score(player, slot_idx, 1) and accumulates to r9. After loop calls submit_lp_indicator_with_slot_xor_flag(slot_node, 1-player, r9); finally calls decrement_lp_bar_display_counter. Returns 0 fixed.
 @ 
@@ -4203,7 +4203,7 @@ LAB_0807c656:
     pop {r4,r5,r6}                           @ 0807c658 70bc
     pop {r1}                                 @ 0807c65a 02bc
     bx r1                                    @ 0807c65c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 检查效果槽与区域条目匹配后激活效果节点, 成功则读取槽侧/类型并调用 apply_slot_equip_activation_with_eligibility_check, 然后条件调用 enqueue_equip_card_sprite_attr_for_slot 和 enqueue_equip_slot_bitmap_update 更新装备位图.
 @ 入口 r0=effect_slot_entry*; 调用 check_effect_slot_matches_zone_entry 确认槽-区域匹配; 调用 read_effect_slot_side_and_type 读取 side/type 字段; 再调用 invoke_effect_node_with_active_flag_3arg 激活节点; 若节点激活成功则调用 apply_slot_equip_activation_with_eligibility_check 写入装备激活状态; 调用 enqueue_equip_card_sprite_attr_for_slot 推入装备卡牌精灵属性; 最后调用 enqueue_equip_slot_bitmap_update 推送位图更新请求. 所有分支均返回 0. 副作用: 写装备激活状态 EWRAM 字段; 推送装备卡牌精灵属性队列; 推送装备槽位图更新至队列.
@@ -4405,7 +4405,7 @@ LAB_0807c7e8:
     pop {r4,r5,r6}                           @ 0807c7e8 70bc
     pop {r1}                                 @ 0807c7ea 02bc
     bx r1                                    @ 0807c7ec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 对 effect_slot_entry [slot+2] 的类型字段用掩码 0xfc0 门控: 若字段等于 TYPE_TARGET=0x140 则查表 gDuelFieldSlots 比较 zone 字段并条件调用 enqueue_equip_slot_bitmap_update; 否则调用 dispatch_equip_draw_counter_sprite_tick.
 @ 入口 r0=effect_slot_entry*, r1=extra_param; 读 [r6+2] 取 slot_data, mask CARD_TYPE_MASK=0xfc0, 与 TYPE_TARGET=0x140 (0xa0<<1) 比较; 不等则调用 dispatch_equip_draw_counter_sprite_tick(r6, r1), 返回 0; 相等则从 [r6+2] 提取 player_id/slot_idx, 以 PLAYER_STRIDE=0x868 和 FIELD_SLOTS_BASE=0x0201c510 索引 gDuelFieldSlots 读两个字段做比较; 若相等则调用 enqueue_equip_slot_bitmap_update(player_id, slot_idx, 0, 0), 返回 0; 否则返回 0. 副作用: 条件调用 dispatch_equip_draw_counter_sprite_tick; 条件调用 enqueue_equip_slot_bitmap_update.
@@ -4621,7 +4621,7 @@ LAB_0807cb34:
 LAB_0807cb3a:
     movs r0,#0x7e    @ 0807cb3a 7e20
     b LAB_0807cb72                           @ 0807cb3c 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cb40:
     .word  gP1LifePoints                  @ 0807cb40 e0c40102
 DWORD_0807cb44:
@@ -4701,7 +4701,7 @@ LAB_0807cba0:
     str r0,[r1,#0x0]                         @ 0807cbc4 0860
     movs r0,#0x7f    @ 0807cbc6 7f20
     b LAB_0807cc24                           @ 0807cbc8 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cbcc:
     .word  0x000004a4                     @ 0807cbcc a4040000
 LAB_0807cbd0:
@@ -4731,7 +4731,7 @@ LAB_0807cbe0:
     bgt LAB_0807cc14                         @ 0807cc00 08dc
     movs r0,#0x7f    @ 0807cc02 7f20
     b LAB_0807cc24                           @ 0807cc04 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cc08:
     .word  gP1LifePoints                  @ 0807cc08 e0c40102
 DWORD_0807cc0c:
@@ -4752,7 +4752,7 @@ LAB_0807cc24:
     pop {r4,r5}                              @ 0807cc24 30bc
     pop {r1}                                 @ 0807cc26 02bc
     bx r1                                    @ 0807cc28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 驱动装备 LP 行类型 18 递减和 LP 变化提交的两步状态机帧驱动.
 @ 以 IWRAM[0x0201b290+0x4a0] 状态码路由: 0x80 -> 调用 set_lp_row_type18_with_decremented_value(player_id, slot_idx, 0x3) 写 LP 行类型 18 递减值, 返回 0x7f; 0x7f -> 合计 LP 变化量(从 gP1LifePoints+0x1da8/0x1dac 偏移读取), 乘以 LP_UNIT_MULTIPLIER=0x64, 调用 submit_lp_change_indicator_with_chain_check 提交 LP 变化指示条, 返回 0x0. 其余状态返回 0x0. 副作用: 写 LP 行类型 18 递减显示字段; 提交 LP 变化指示条队列.
@@ -4782,7 +4782,7 @@ tick_equip_lp_type18_display_seq:
     bl set_lp_row_type18_with_decremented_value @ 0807cc4e 25f0f9f8
     movs r0,#0x7f    @ 0807cc52 7f20
     b LAB_0807cc8c                           @ 0807cc54 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cc58:
     .word  0x0201b290                     @ 0807cc58 90b20102
 LAB_0807cc5c:
@@ -4814,7 +4814,7 @@ LAB_0807cc8c:
     pop {r4,r5}                              @ 0807cc8c 30bc
     pop {r1}                                 @ 0807cc8e 02bc
     bx r1                                    @ 0807cc90 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cc94:
     .word  gP1LifePoints                  @ 0807cc94 e0c40102
 DWORD_0807cc98:
@@ -4862,7 +4862,7 @@ tick_banisher_equip_zone_sprite_dispatch:
     bl set_lp_display_row_type5              @ 0807ccd6 24f0a9ff
     movs r0,#0x7f    @ 0807ccda 7f20
     b LAB_0807cd16                           @ 0807ccdc 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807cce0:
     .word  0x0201b290                     @ 0807cce0 90b20102
 DWORD_0807cce4:
@@ -5006,7 +5006,7 @@ LAB_0807cdc6:
     ldr r2, DAT_0807cdec                     @ 0807cdde 034a
     bl select_equip_target_slot_by_card_id   @ 0807cde0 3af064f9
     b LAB_0807ce00                           @ 0807cde4 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807cde8:
     .word  0x0201e2a0                     @ 0807cde8 a0e20102
 DAT_0807cdec:
@@ -5053,7 +5053,7 @@ LAB_0807ce3c:
     pop {r4,r5,r6}                           @ 0807ce3c 70bc
     pop {r1}                                 @ 0807ce3e 02bc
     bx r1                                    @ 0807ce40 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0807ce44:
     .word  gP1LifePoints                  @ 0807ce44 e0c40102
 DAT_0807ce48:
@@ -5244,7 +5244,7 @@ LAB_0807cf4a:
     movs r3,#0x0    @ 0807cfaa 0023
     bl invoke_setup_equip_oam_with_attr2     @ 0807cfac 2ef048ff
     b LAB_0807d000                           @ 0807cfb0 26e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0807cfb4:
     .word  gP1LifePoints                  @ 0807cfb4 e0c40102
 DAT_0807cfb8:
@@ -5319,7 +5319,7 @@ tick_equip_target_validity_prng_lp_display:
     cmp r0,#0x7e                             @ 0807d02c 7e28
     beq LAB_0807d0a0                         @ 0807d02e 37d0
     b LAB_0807d0f4                           @ 0807d030 60e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807d034:
     .word  0x0201b290                     @ 0807d034 90b20102
 LAB_0807d038:
@@ -5422,7 +5422,7 @@ LAB_0807d0f6:
     pop {r4,r5,r6}                           @ 0807d0f8 70bc
     pop {r1}                                 @ 0807d0fa 02bc
     bx r1                                    @ 0807d0fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807d100:
     .word  0x0201bb90                     @ 0807d100 90bb0102
 
@@ -5515,7 +5515,7 @@ switchD_0807d126__caseD_7f:
     bl trigger_card_display_op31_if_not_active @ 0807d1ce 16f0dff8
     movs r0,#0x7e    @ 0807d1d2 7e20
     b LAB_0807d2d6                           @ 0807d1d4 7fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807d1d8:
     .word  0x00000139                     @ 0807d1d8 39010000
 LAB_0807d1dc:
@@ -5642,7 +5642,7 @@ LAB_0807d2d6:
     pop {r4,r5,r6,r7}                        @ 0807d2d8 f0bc
     pop {r1}                                 @ 0807d2da 02bc
     bx r1                                    @ 0807d2dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 推送区域精灵管线更新, 经多重门控后初始化装备 OAM 的驱动函数.
 @ 入口 r0=effect_slot_entry*; 读 [slot+2] 取 player_id; 调用 tick_zone_sprite_pipeline_with_update_flag 推送精灵管线; 调用 count_available_monster_slots 检查可用怪兽槽数量 (为 0 则提前返回); 调用 check_field_spell_neo_daedalus_group_placeable 检查 Neo-Daedalus 组放置条件; 若通过则用 ZONE_TYPE_MASK=0x1c 对 [slot+6] 掩码后与 0x4 比较作为区域类型门控; 通过后调用 read_effect_slot_zone_type 读取区域类型, 调用 find_hand_slot_idx_by_set_code 查找手牌槽索引 (若 <0 则退出); 调用 check_equip_placement_eligible_from_slot_record 验证放置合法性; 最后调用 invoke_setup_equip_oam_with_attr2 初始化装备 OAM 属性. 所有路径返回 0. 副作用: 触发精灵管线更新; 条件初始化装备 OAM attr2 字段.
@@ -5709,7 +5709,7 @@ LAB_0807d35a:
     pop {r4,r5,r6}                           @ 0807d35c 70bc
     pop {r1}                                 @ 0807d35e 02bc
     bx r1                                    @ 0807d360 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807d364:
     .word  0x00000868                     @ 0807d364 68080000
 DWORD_0807d368:
@@ -5957,7 +5957,7 @@ apply_equip_activation_by_field6_gate:
     movs r3,#0x1    @ 0807d536 0123
     bl apply_slot_equip_activation_with_eligibility_check @ 0807d538 c6f73cfa
     b LAB_0807d558                           @ 0807d53c 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807d540:
     .word  0x00000868                     @ 0807d540 68080000
 DAT_0807d544:
@@ -5976,7 +5976,7 @@ LAB_0807d558:
     pop {r4,r5,r6}                           @ 0807d55c 70bc
     pop {r1}                                 @ 0807d55e 02bc
     bx r1                                    @ 0807d560 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Leaf function that performs field6 eligibility-gated activation when the global equip activation status bits meet the pending condition, r0=effect node. Reads the status word at [gP1LifePoints+0x10d0]: checks bit0, if set (bit0==1) ends without activating; otherwise checks bit1, only when bit1 is set (bit0==0 and bit1==1) calls apply_equip_activation_by_field6_gate(node) to perform field6-gated activation, takes b LAB_0807d596 to bypass exit zeroing so r0 passes through that callee's return value; the bit0==1 / bit1==0 skip paths go through LAB_0807d594 movs r0,#0 returning 0. Statically dispatched via fn-ptr by the display main loop (indeg=0).
 @ 
@@ -6006,7 +6006,7 @@ apply_equip_activation_if_field6_gate_pending:
     adds r0,r4,#0x0    @ 0807d582 201c
     bl apply_equip_activation_by_field6_gate @ 0807d584 fff7aaff
     b LAB_0807d596                           @ 0807d588 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807d58c:
     .word  gP1LifePoints                  @ 0807d58c e0c40102
 DWORD_0807d590:
@@ -6116,7 +6116,7 @@ LAB_0807d650:
     pop {r4,r5,r6,r7}                        @ 0807d654 f0bc
     pop {r1}                                 @ 0807d656 02bc
     bx r1                                    @ 0807d658 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks if equip slot targets a cross-zone placement then conditionally enqueues sprite. Reads target_id from slot_node [r4+0x14]; calls find_zone_descriptor_by_slot_id to get descriptor; extracts zone_side (bits[31:24]) and slot_pos (bits[23:16]) from descriptor. If zone_side != [r4+2].bit0 (player_id), meaning target is on opposite zone, calls enqueue_slot_card_sprite_if_eligible(slot_node, zone_side, slot_pos, card_id, type=5, player). When zone_side==player skips. Returns 0 fixed.
 @ 
@@ -6200,7 +6200,7 @@ tick_equip_lp_indicator_or_score_display_seq:
     bl decrement_lp_bar_display_counter      @ 0807d6e2 cdf7c5f8
     movs r0,#0x0    @ 0807d6e6 0020
     b LAB_0807d6fa                           @ 0807d6e8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807d6ec:
     .word  0x0201b290                     @ 0807d6ec 90b20102
 DWORD_0807d6f0:
@@ -6511,7 +6511,7 @@ LAB_0807da22:
     strb r0,[r6,#0x6]                        @ 0807da38 b071
     movs r0,#0x7f    @ 0807da3a 7f20
     b LAB_0807da68                           @ 0807da3c 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807da40:
     .word  0x00000868                     @ 0807da40 68080000
 DWORD_0807da44:
@@ -6538,7 +6538,7 @@ LAB_0807da68:
     pop {r4,r5,r6}                           @ 0807da68 70bc
     pop {r1}                                 @ 0807da6a 02bc
     bx r1                                    @ 0807da6c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip effect node display stepper; dispatches on IWRAM state code via two paths. Reads the state byte at [0x0201b290+0x94*8]: when state==0x7f, calls enqueue_lp_display_row_if_enabled to push the LP indicator row into the display queue; when state==0x80, first calls check_equip_slot_eligible_via_effect_node_and_bitmap to verify the equip slot is usable, and on pass returns 0x7f to advance to the next state. All other states return 0. Used to refresh LP/eligibility display per frame during equip activation animation.
 @ 
@@ -6583,7 +6583,7 @@ LAB_0807daa8:
 LAB_0807daaa:
     pop {r1}                                 @ 0807daaa 02bc
     bx r1                                    @ 0807daac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Sync equip hand slot OAM with player state bits. Checks bit2 of effect node [r4+4]; if set, skips OAM submission; otherwise locates the gP1LifePoints+0x11c slot by the player bit at [r4+2], reads the [+2] halfword bit0, and when inactive calls invoke_equip_hand_slot_oam_if_eligible to push the hand slot sprite into OAM. Then calls set_player_state_bit_with_sprite_update twice, setting player state bit 0x14 and 0x15 respectively and triggering a sprite refresh. Used for display and player-state sync when an equip card enters from the hand.
 @ 
@@ -6640,7 +6640,7 @@ LAB_0807db02:
     pop {r4,r5}                              @ 0807db04 30bc
     pop {r1}                                 @ 0807db06 02bc
     bx r1                                    @ 0807db08 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807db0c:
     .word  gP1LifePoints                  @ 0807db0c e0c40102
 DWORD_0807db10:
@@ -6680,7 +6680,7 @@ LAB_0807db2c:
     pop {r4,r5,r6}                           @ 0807db50 70bc
     pop {r1}                                 @ 0807db52 02bc
     bx r1                                    @ 0807db54 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807db58:
     .word  0x0201e1c8                     @ 0807db58 c8e10102
 
@@ -6719,7 +6719,7 @@ tick_equip_oam_activation_text_display:
     cmp r0,#0x7e                             @ 0807db80 7e28
     beq LAB_0807dc0c                         @ 0807db82 43d0
     b LAB_0807dc88                           @ 0807db84 80e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807db88:
     .word  0x0201b290                     @ 0807db88 90b20102
 LAB_0807db8c:
@@ -6849,7 +6849,7 @@ LAB_0807dc8a:
     pop {r4,r5,r6,r7}                        @ 0807dc90 f0bc
     pop {r1}                                 @ 0807dc92 02bc
     bx r1                                    @ 0807dc94 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0807dc98:
     .word  gP1LifePoints                  @ 0807dc98 e0c40102
 DAT_0807dc9c:
@@ -6909,7 +6909,7 @@ LAB_0807dcf0:
     pop {r4,r5,r6}                           @ 0807dcf0 70bc
     pop {r1}                                 @ 0807dcf2 02bc
     bx r1                                    @ 0807dcf4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Builds equip bitmap from monster slot records and submits LP indicator. Checks [gP1LifePoints+0x10d0] for bit0==0 and bit1==1 (specific state gate); if not satisfied skips all logic. If satisfied calls increment_lp_bar_display_counter. From 0x0201bb90 monster slot records: slot0_id=[+0], slot1_id=[+4]; computes equip_bitmap = (1 << (slot0_id<<4 + [+0x1c])) | (1 << (slot1_id<<4 + [+0x20])). Calls query_equip_target_bitmap_default(slot_node, equip_bitmap, ?) to get target_bitmap; computes opp_player = 1-player; calls submit_lp_indicator_with_slot_xor_flag(slot_node, opp_player, 0xc8<<2=0x320). Finally calls decrement_lp_bar_display_counter. Returns 0 fixed.
 @ 
@@ -6964,7 +6964,7 @@ LAB_0807dd52:
     pop {r4,r5}                              @ 0807dd54 30bc
     pop {r1}                                 @ 0807dd56 02bc
     bx r1                                    @ 0807dd58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807dd5c:
     .word  gP1LifePoints                  @ 0807dd5c e0c40102
 DWORD_0807dd60:
@@ -7093,7 +7093,7 @@ LAB_0807e2e2:
 LAB_0807e2e6:
     movs r0,#0x7f    @ 0807e2e6 7f20
     b LAB_0807e37e                           @ 0807e2e8 49e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807e2ec:
     .word  0x0201b290                     @ 0807e2ec 90b20102
 DWORD_0807e2f0:
@@ -7702,7 +7702,7 @@ LAB_0807efe4:
     pop {r4,r5,r6}                           @ 0807efe4 70bc
     pop {r1}                                 @ 0807efe6 02bc
     bx r1                                    @ 0807efe8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Dispatches Banisher of the Light equip zone sprite or LP indicator based on IWRAM state code ([0x0201b290+0x94*8]). 0x80 path: clear [IWRAM+0x4a4]; read equip display slot ptr from gP1LifePoints[player_id*0x868+0xc]; if nonzero call dispatch_equip_zone_sprite_banisher_by_field_count with r2=0; [IWRAM+0x4a4]+=1; return 0x7f. 0x7e path: call count_field_copies_of_card(0x1332=Banisher of the Light); if no copies call submit_lp_indicator_with_slot_xor_flag(player_id_inv, card_id_copy_count*0xc8). 0x7f path: increment_lp_bar_display_counter; clear [IWRAM+0x4a4]; return 0x7f. Side effects: [IWRAM+0x4a4] write (0 or +=1); OAM sprite via dispatch_equip_zone_sprite_banisher_by_field_count. Constants: STATE_80=0x80, STATE_7F=0x7f, STATE_7E=0x7e, CARD_ID_BANISHER=0x1332 (Banisher of the Light), LP_COUNT_SCALE=0xc8, gP1LifePoints=0x0201c4e0, PLAYER_STRIDE=0x868, IWRAM_BASE=0x0201b290, counter_offset=0x4a4.
 dispatch_equip_zone_sprite_banisher_or_lp:
@@ -7762,7 +7762,7 @@ LAB_0807f018:
     str r0,[r1,#0x0]                         @ 0807f054 0860
     movs r0,#0x7f    @ 0807f056 7f20
     b LAB_0807f096                           @ 0807f058 1de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807f05c:
     .word  0x000004a4                     @ 0807f05c a4040000
 DWORD_0807f060:
@@ -7887,7 +7887,7 @@ LAB_0807f0dc:
     bl render_pair_zone_sprites_if_field_card_present @ 0807f132 caf747fc
     movs r0,#0x7f    @ 0807f136 7f20
     b LAB_0807f152                           @ 0807f138 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807f13c:
     .word  0x000004a4                     @ 0807f13c a4040000
 DWORD_0807f140:
@@ -7976,7 +7976,7 @@ LAB_0807f1d6:
     pop {r4,r5,r6,r7}                        @ 0807f1dc f0bc
     pop {r1}                                 @ 0807f1de 02bc
     bx r1                                    @ 0807f1e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807f1e4:
     .word  0x00000868                     @ 0807f1e4 68080000
 DWORD_0807f1e8:
@@ -8183,7 +8183,7 @@ LAB_0807f4d8:
     bl enqueue_equip_zone_sprite_attr_shape_b @ 0807f502 c5f77dfa
     movs r0,#0x7e    @ 0807f506 7e20
     b LAB_0807f534                           @ 0807f508 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807f50c:
     .word  0x00000868                     @ 0807f50c 68080000
 DWORD_0807f510:
@@ -8210,7 +8210,7 @@ LAB_0807f534:
     pop {r4,r5,r6}                           @ 0807f534 70bc
     pop {r1}                                 @ 0807f536 02bc
     bx r1                                    @ 0807f538 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Submit LP indicator display from the equip slot bitmap. Reads the player/slot bit field at effect node [r7+2], indexes the ROM card data table by player number and card slot index (via the r12 base), compares the slot bitmap entry by entry and computes the LP indicator parameters, and calls submit_equip_lp_indicators_with_bar to push the LP bar into the display queue. Used to render the LP-change indicator of affected cards during equip activation.
 @ 
@@ -8286,7 +8286,7 @@ submit_equip_slot_lp_indicators_from_bitmap:
     .hword 0x4649    @ 0807f5b2 4946
     bl submit_equip_lp_indicators_with_bar   @ 0807f5b4 e6f71af8
     b LAB_0807f5c6                           @ 0807f5b8 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0807f5bc:
     .word  0x00000868                     @ 0807f5bc 68080000
 DWORD_0807f5c0:
@@ -8300,7 +8300,7 @@ LAB_0807f5c6:
     pop {r4,r5,r6,r7}                        @ 0807f5cc f0bc
     pop {r1}                                 @ 0807f5ce 02bc
     bx r1                                    @ 0807f5d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Linear search in ROM table (0x09e59e14, stride 8 bytes, max 0x55=85 entries) for an entry matching card_id (r0): reads [entry+0] u16 and compares with r0 each iteration; returns entry pointer if found, else returns 0 (NULL).
 @ 
@@ -8355,7 +8355,7 @@ LAB_0807f610:
     pop {r4}                                 @ 0807f610 10bc
     pop {r1}                                 @ 0807f612 02bc
     bx r1                                    @ 0807f614 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks equip activation criteria by slot card state code (symmetric to check_card_equip_criteria_by_ext_field6): if criteria_code (r0) > 0x14=20, calls check_slot_card_pair_allowed(criteria=r4, slot_ptr=r1, card_ptr=r2); if <= 20, calls get_slot_card_state_code(slot=r1, card=r2), masks to low 16 bits, and compares with criteria_code, returning 1 if match else 0.
 @ 
@@ -8460,7 +8460,7 @@ LAB_0807f6a2:
 LAB_0807f6d2:
     movs r0,#0x0    @ 0807f6d2 0020
     b LAB_0807f6ea                           @ 0807f6d4 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807f6d8:
     .word  0x000018a6                     @ 0807f6d8 a6180000
 DAT_0807f6dc:
@@ -8492,7 +8492,7 @@ get_equip_display_type_code_by_card_id:
     bne LAB_0807f720                         @ 0807f708 0ad1
     movs r0,#0x0    @ 0807f70a 0020
     b LAB_0807f72c                           @ 0807f70c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807f710:
     .word  0x0000157e                     @ 0807f710 7e150000
 DAT_0807f714:
@@ -8599,7 +8599,7 @@ LAB_0807f7b4:
     pop {r4}                                 @ 0807f7b4 10bc
     pop {r1}                                 @ 0807f7b6 02bc
     bx r1                                    @ 0807f7b8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 遍历 IWRAM 装备判断条件数组, 对每个条目调用 get_equip_display_criteria_code_by_card_and_slot 获取显示码, 并将结果写入条目偏移 0x5ac 处的显示码数组.
 @ 入口无参数 (void); 读 [IWRAM+0xb4*8] 取条件数组长度 count; 读 [IWRAM+0xb3*8] 取条件数组基址; 循环 i=0..count-1: 调用 get_equip_display_criteria_code_by_card_and_slot(base_ptr, i) 取第 i 项的显示码; 写入 [IWRAM+0x5ac + i*4]. 无返回值 (Pattern B void). 副作用: 写 IWRAM 显示码数组 [IWRAM_BASE+0x5ac .. IWRAM_BASE+0x5ac+(count-1)*4].
@@ -8831,7 +8831,7 @@ LAB_0807f93e:
     bge LAB_0807f954                         @ 0807f940 08da
     movs r0,#0x0    @ 0807f942 0020
     b LAB_0807f962                           @ 0807f944 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807f948:
     .word  0x0201b290                     @ 0807f948 90b20102
 DAT_0807f94c:
@@ -8854,7 +8854,7 @@ LAB_0807f962:
     pop {r4,r5,r6,r7}                        @ 0807f968 f0bc
     pop {r1}                                 @ 0807f96a 02bc
     bx r1                                    @ 0807f96c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807f970:
     .word  0x000005ac                     @ 0807f970 ac050000
 
@@ -8929,7 +8929,7 @@ check_equip_slot_eligible_with_criteria_and_target:
     lsls r2,r2,#0x3    @ 0807f9f4 d200
     adds r0,r0,r2    @ 0807f9f6 8018
     b LAB_0807fa5a                           @ 0807f9f8 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807f9fc:
     .word  0x00000868                     @ 0807f9fc 68080000
 DAT_0807fa00:
@@ -9038,7 +9038,7 @@ LAB_0807fac0:
     pop {r4,r5,r6,r7}                        @ 0807fac8 f0bc
     pop {r1}                                 @ 0807faca 02bc
     bx r1                                    @ 0807facc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807fad0:
     .word  0x0201b290                     @ 0807fad0 90b20102
 DAT_0807fad4:
@@ -9075,7 +9075,7 @@ check_equip_slot_eligible_by_node_player:
     adds r1,r4,#0x0    @ 0807fafa 211c
     bl check_equip_slot_eligible_with_criteria_and_target @ 0807fafc fff73aff
     b LAB_0807fb0e                           @ 0807fb00 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807fb04:
     .word  0x0201b290                     @ 0807fb04 90b20102
 DAT_0807fb08:
@@ -9127,7 +9127,7 @@ LAB_0807fb3c:
     beq LAB_0807fb58                         @ 0807fb48 06d0
     adds r0,r4,#0x0    @ 0807fb4a 201c
     b LAB_0807fb96                           @ 0807fb4c 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0807fb50:
     .word  gP1LifePoints                  @ 0807fb50 e0c40102
 DAT_0807fb54:
@@ -9403,7 +9403,7 @@ LAB_0807fd16:
 LAB_0807fd56:
     movs r0,#0x0    @ 0807fd56 0020
     b LAB_0807fd76                           @ 0807fd58 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807fd5c:
     .word  0x0201b290                     @ 0807fd5c 90b20102
 PTR_gP1LifePoints_0807fd60:
@@ -9472,7 +9472,7 @@ LAB_0807fdbc:
     beq LAB_0807fde0                         @ 0807fdc8 0ad0
     movs r0,#0x1    @ 0807fdca 0120
     b LAB_0807fde2                           @ 0807fdcc 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807fdd0:
     .word  0x0000197a                     @ 0807fdd0 7a190000
 DAT_0807fdd4:
@@ -9641,7 +9641,7 @@ LAB_0807ff36:
     bne LAB_0807ff64                         @ 0807ff4c 0ad1
     movs r0,#0x64    @ 0807ff4e 6420
     b LAB_08080326                           @ 0807ff50 e9e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0807ff54:
     .word  0x0201b290                     @ 0807ff54 90b20102
 DAT_0807ff58:
@@ -9719,7 +9719,7 @@ switchD_0807fe22__caseD_7c:
     .hword 0x4650    @ 0807fff6 5046
     bl clear_equip_slot_criteria_on_ext_field6_match @ 0807fff8 fff750fc
     b LAB_0808001e                           @ 0807fffc 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08080000:
     .word  gP1LifePoints                  @ 08080000 e0c40102
 DAT_08080004:
@@ -9768,7 +9768,7 @@ LAB_08080048:
     bcs LAB_08080068                         @ 08080058 06d2
     movs r0,#0x7d    @ 0808005a 7d20
     b LAB_08080326                           @ 0808005c 63e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080060:
     .word  0x0201b290                     @ 08080060 90b20102
 DAT_08080064:
@@ -9939,7 +9939,7 @@ LAB_08080198:
     lsrs r0,r0,#0x13    @ 080801a6 c00c
     bl get_card_extended_stat_field3         @ 080801a8 6ef094fe
     b LAB_080802a8                           @ 080801ac 7ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080801b0:
     .word  0x00000868                     @ 080801b0 68080000
 DAT_080801b4:
@@ -10037,7 +10037,7 @@ LAB_08080264:
     adds r3,r5,#0x0    @ 0808026a 2b1c
     bl update_equip_target_bitmap_zone15     @ 0808026c c7f708fc
     b LAB_08080290                           @ 08080270 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080274:
     .word  0x000012e5                     @ 08080274 e5120000
 DAT_08080278:
@@ -10080,7 +10080,7 @@ LAB_080802b2:
     str r0,[r1,#0x0]                         @ 080802bc 0860
     movs r0,#0x64    @ 080802be 6420
     b LAB_08080326                           @ 080802c0 31e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080802c4:
     .word  0x0201b290                     @ 080802c4 90b20102
 DAT_080802c8:
@@ -10140,7 +10140,7 @@ LAB_08080326:
     pop {r4,r5,r6,r7}                        @ 08080330 f0bc
     pop {r1}                                 @ 08080332 02bc
     bx r1                                    @ 08080334 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080338:
     .word  0x0000804c                     @ 08080338 4c800000
 DAT_0808033c:
@@ -10232,7 +10232,7 @@ check_equip_slot_eligible_with_criteria_and_prerequisites:
     lsls r2,r2,#0x3    @ 080803e0 d200
     adds r0,r1,r2    @ 080803e2 8818
     b LAB_0808044a                           @ 080803e4 31e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080803e8:
     .word  0x00000868                     @ 080803e8 68080000
 DAT_080803ec:
@@ -10636,7 +10636,7 @@ LAB_080806c4:
     ldr r0,[r0,#0x0]                         @ 080806ca 0068
 switchD_080806cc__switchD:
     .hword 0x4687    @ 080806cc 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080806d0:
     .word  0x0201b290                     @ 080806d0 90b20102
 DAT_080806d4:
@@ -10657,7 +10657,7 @@ switchD_080806cc__caseD_0:
     lsls r3,r3,#0x3    @ 080806fc db00
     adds r1,r1,r3    @ 080806fe c918
     b LAB_08080926                           @ 08080700 11e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080704:
     .word  0x0201b290                     @ 08080704 90b20102
 switchD_080806cc__caseD_1:
@@ -10671,7 +10671,7 @@ switchD_080806cc__caseD_1:
     lsls r0,r0,#0x3    @ 08080718 c000
     adds r1,r1,r0    @ 0808071a 0918
     b LAB_08080926                           @ 0808071c 03e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080720:
     .word  0x0201b290                     @ 08080720 90b20102
 switchD_080806cc__caseD_2:
@@ -10731,7 +10731,7 @@ LAB_0808077a:
     lsls r2,r2,#0x3    @ 0808079c d200
     adds r1,r6,r2    @ 0808079e b118
     b LAB_08080926                           @ 080807a0 c1e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080807a4:
     .word  0x0201b290                     @ 080807a4 90b20102
 DAT_080807a8:
@@ -10777,7 +10777,7 @@ LAB_080807f4:
     lsls r2,r2,#0x3    @ 080807f8 d200
     adds r1,r1,r2    @ 080807fa 8918
     b LAB_08080926                           @ 080807fc 93e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080800:
     .word  0x0201b290                     @ 08080800 90b20102
 switchD_080806cc__caseD_4:
@@ -10805,7 +10805,7 @@ LAB_08080816:
     adds r0,r7,#0x0    @ 08080832 381c
     bl clear_equip_slot_criteria_on_ext_field6_match @ 08080834 fff732f8
     b LAB_0808084c                           @ 08080838 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0808083c:
     .word  gP1LifePoints                  @ 0808083c e0c40102
 LAB_08080840:
@@ -10943,7 +10943,7 @@ LAB_08080932:
     pop {r4,r5,r6,r7}                        @ 0808093c f0bc
     pop {r1}                                 @ 0808093e 02bc
     bx r1                                    @ 08080940 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备目标候选槽构建函数. indeg=0, fn-ptr 表驱动. 提取 effective_player (player_id XOR team_flag); 校验 [gDuelCtx+0x4a0]=0x80, 不符则走 display dispatch. 前置检查: Neo Daedalus 可放置 + field 无副本 + chain zone 槽存在. 写 card_id/zone_attr/display_type 到 gDuelCtx+0x598..0x5a8; 调 fill_equip_criteria_display_code_array. 循环对每个 effect_slot 验证 zone_entry 匹配和 criteria 条件, 满足则 push_to_effect_slot_array 并递增计数. 结束后 count_monster_slots_accepting_card >0 或 blocked_flag=1 返回 0x64 (成功), 否则返回 0.
 build_equip_criteria_for_target_slots:
@@ -11096,7 +11096,7 @@ LAB_08080a6e:
     adds r0,r6,#0x0    @ 08080a6e 301c
     bl clear_equip_slot_criteria_on_ext_field6_match @ 08080a70 fef714ff
     b LAB_08080b00                           @ 08080a74 44e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08080a78:
     .word  0x0201b290                     @ 08080a78 90b20102
 DWORD_08080a7c:
@@ -11224,7 +11224,7 @@ LAB_08080b62:
     pop {r4,r5,r6,r7}                        @ 08080b6c f0bc
     pop {r1}                                 @ 08080b6e 02bc
     bx r1                                    @ 08080b70 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Advances effect_node slot write pointer and stores value: reads slot_write_ptr (bits[4:2], 3-bit, range 0..7) from [r0+6]; increments and takes modulo 8 as next_slot; writes back to [r0+6] (preserving other bits); stores r1 (u16 value) at [r0 + 8 + next_slot*2].
 @ 
@@ -11255,7 +11255,7 @@ push_to_effect_slot_array:
     pop {r4,r5}                              @ 08080b98 30bc
     pop {r0}                                 @ 08080b9a 01bc
     bx r0                                    @ 08080b9c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Assembles effect slot attribute from player_flag (r1 bit0), col_nibble (r2 bits[3:0]), and gDuelFieldSlots zone field data (zone_type bits[14:9], direction bit[14]); combines into packed u16 slot attribute word; advances [r0+6] slot_write_ptr and writes result to [r0+8+slot*2].
 @ 
@@ -11395,7 +11395,7 @@ pack_effect_slot_attr_with_type_flags:
     pop {r4,r5}                              @ 08080c8c 30bc
     pop {r0}                                 @ 08080c8e 01bc
     bx r0                                    @ 08080c90 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080c94:
     .word  0xffffc01f                     @ 08080c94 1fc0ffff
 DAT_08080c98:
@@ -11461,7 +11461,7 @@ LAB_08080d0a:
     pop {r4,r5,r6}                           @ 08080d0c 70bc
     pop {r0}                                 @ 08080d0e 01bc
     bx r0                                    @ 08080d10 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080d14:
     .word  0xfffc7fff                     @ 08080d14 ff7ffcff
 DAT_08080d18:
@@ -11521,7 +11521,7 @@ read_effect_slot_side_and_type:
     lsls r1,r1,#0x8    @ 08080d7c 0902
     orrs r0,r1    @ 08080d7e 0843
     bx lr                                    @ 08080d80 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Extracts zone_type field (bits[13:5], 9-bit) from effect_node slot array entry: addr = r0 + r1*2 + 8; loads word; lsls#18 then lsrs#23 to extract bits[13:5] (9 bits, zone type, valid range [0..10]).
 @ 
@@ -11540,7 +11540,7 @@ read_effect_slot_zone_type:
     lsls r0,r0,#0x12    @ 08080d8c 8004
     lsrs r0,r0,#0x17    @ 08080d8e c00d
     bx lr                                    @ 08080d90 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by 94 duel_field callers. Takes effect struct ptr (r0), slot_index (r1), optional output ptr (r2=sp or NULL). Reads slot word at [r0+8+slot_index*2], extracts slot_type (bits[4:1]) and player_bit (bit0), computes zone entry addr in gDuelFieldSlots (0x0201c510, stride=0x868). Checks 4 conditions: (1) slot_index < slot_count from [r0+6] bits[4:2]; (2) slot_type <= 0xa; (3) zone entry bit13 set (zone active); (4) zone stat count matches expected and [gDuelFieldSlots+slot_type*4+0x10b1] bits[6:5] match slot bits[15:14]. If r2 non-NULL, writes packed(slot_type<<8|player_bit) to [r2] on early path. Returns 1 if all conditions pass, 0 otherwise.
 @ 
@@ -11642,7 +11642,7 @@ LAB_08080db4:
     bne LAB_08080e58                         @ 08080e44 08d1
     movs r0,#0x1    @ 08080e46 0120
     b LAB_08080e5a                           @ 08080e48 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080e4c:
     .word  0x00000868                     @ 08080e4c 68080000
 DAT_08080e50:
@@ -11692,7 +11692,7 @@ LAB_08080e98:
     pop {r4,r5,r6}                           @ 08080e98 70bc
     pop {r1}                                 @ 08080e9a 02bc
     bx r1                                    @ 08080e9c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Large card_id dispatch hub (indeg=2, game_str/card_ids/duel_field context). Reads effect struct [+0] u16 card_id (ldrh r1,[r5,#0]); uses binary search tree in ROM to find display op handler stub and tail-jump. Each branch calls a prenamed trigger_card_display_op_0xNN stub (0x5f/0x62/0x63/0x64/0x66/0x6b/0x6c/0x6d/0x6e/0x6f/0x76/0x77/0x78/0x7a/0x80/0x112/0x119 etc.). Also has trigger_card_display_op_by_equip_type (0x1298=Cyber Raider) for equip type sub-dispatch. sp allocated via add sp,r4 (r4=0xfffffe00, 0x200 bytes) for game_str format buffer. Side effects: card display op state (IWRAM) via trigger_card_display_op31_if_not_active. Constants: SP_FRAME=0x200 (r4=0xfffffe00), first check card_id=0x15a8->trigger_card_display_op_0x119, card_id=0x13ab->trigger_card_display_op_0x77.
 dispatch_equip_card_display_op_by_card_id:
@@ -11756,7 +11756,7 @@ LAB_08080f00:
 LAB_08080f0e:
     adds r0,#0xb    @ 08080f0e 0b30
     b LAB_08081606                           @ 08080f10 79e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080f14:
     .word  0xfffffe00                     @ 08080f14 00feffff
 DAT_08080f18:
@@ -11798,7 +11798,7 @@ LAB_08080f58:
     bl trigger_card_display_op_with_card_name_0x6c @ 08080f5e 00f029fc
 LAB_08080f62:
     bl trigger_card_display_op_0x112         @ 08080f62 00f0bbfc
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080f68:
     .word  0x0000119b                     @ 08080f68 9b110000
 LAB_08080f6c:
@@ -11809,7 +11809,7 @@ LAB_08080f6c:
 LAB_08080f76:
     adds r0,#0x27    @ 08080f76 2730
     b LAB_08081352                           @ 08080f78 ebe1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08080f7c:
     .word  0x000011c3                     @ 08080f7c c3110000
 LAB_08080f80:
@@ -11922,7 +11922,7 @@ LAB_0808104a:
     bl trigger_card_display_op_0x5f          @ 0808104e 00f0a3fb
 LAB_08081052:
     bl trigger_card_display_op_0x112         @ 08081052 00f043fc
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081058:
     .word  0x0000132a                     @ 08081058 2a130000
 LAB_0808105c:
@@ -11958,7 +11958,7 @@ LAB_08081090:
     bl trigger_card_display_op_0x88          @ 08081096 00f0b3fb
 LAB_0808109a:
     bl trigger_card_display_op_0x112         @ 0808109a 00f01ffc
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080810a0:
     .word  0x00001322                     @ 080810a0 22130000
 LAB_080810a4:
@@ -11969,7 +11969,7 @@ LAB_080810a4:
 LAB_080810ae:
     adds r0,#0x3    @ 080810ae 0330
     b LAB_080816da                           @ 080810b0 13e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080810b4:
     .word  0x00001326                     @ 080810b4 26130000
 LAB_080810b8:
@@ -12161,7 +12161,7 @@ LAB_080811ec:
     b LAB_0808181c                           @ 080811f2 13e3
 LAB_080811f4:
     b trigger_card_display_op_0x112          @ 080811f4 72e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080811f8:
     .word  0x0000148d                     @ 080811f8 8d140000
 LAB_080811fc:
@@ -12176,7 +12176,7 @@ LAB_08081204:
     b LAB_08081790                           @ 0808120a c1e2
 LAB_0808120c:
     b trigger_card_display_op_0x112          @ 0808120c 66e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081210:
     .word  0x00001485                     @ 08081210 85140000
 LAB_08081214:
@@ -12198,7 +12198,7 @@ LAB_08081228:
     b LAB_080818b8                           @ 0808122e 43e3
 LAB_08081230:
     b trigger_card_display_op_0x112          @ 08081230 54e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081234:
     .word  0x000014ac                     @ 08081234 ac140000
 LAB_08081238:
@@ -12246,7 +12246,7 @@ LAB_08081274:
     b trigger_card_display_op_0x6d           @ 0808127e 9fe2
 LAB_08081280:
     b LAB_08081722                           @ 08081280 4fe2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081284:
     .word  0x00001514                     @ 08081284 14150000
 LAB_08081288:
@@ -12261,7 +12261,7 @@ LAB_08081290:
     b LAB_080818c8                           @ 08081296 17e3
 LAB_08081298:
     b trigger_card_display_op_0x112          @ 08081298 20e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808129c:
     .word  0x000014ce                     @ 0808129c ce140000
 LAB_080812a0:
@@ -12295,7 +12295,7 @@ LAB_080812c4:
     b LAB_08081878                           @ 080812ce d3e2
 LAB_080812d0:
     b trigger_card_display_op_0x112          @ 080812d0 04e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080812d4:
     .word  0x00001503                     @ 080812d4 03150000
 LAB_080812d8:
@@ -12369,7 +12369,7 @@ LAB_08081342:
     b trigger_card_display_op_0x6e           @ 08081346 3de2
 LAB_08081348:
     b trigger_card_display_op_0x112          @ 08081348 c8e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808134c:
     .word  0x0000158d                     @ 0808134c 8d150000
 LAB_08081350:
@@ -12380,7 +12380,7 @@ LAB_08081352:
     b LAB_080817cc                           @ 08081356 39e2
 LAB_08081358:
     b trigger_card_display_op_0x112          @ 08081358 c0e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808135c:
     .word  0x0000158e                     @ 0808135c 8e150000
 LAB_08081360:
@@ -12446,7 +12446,7 @@ LAB_080813bc:
     b trigger_card_display_op_0x112          @ 080813c2 8be2
 LAB_080813c4:
     b LAB_08081808                           @ 080813c4 20e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080813c8:
     .word  0x000015d7                     @ 080813c8 d7150000
 LAB_080813cc:
@@ -12547,7 +12547,7 @@ LAB_08081462:
     b trigger_card_display_op_0x78           @ 08081466 b7e1
 LAB_08081468:
     b trigger_card_display_op_0x112          @ 08081468 38e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808146c:
     .word  0x0000169a                     @ 0808146c 9a160000
 LAB_08081470:
@@ -12588,7 +12588,7 @@ LAB_080814a4:
     b LAB_08081794                           @ 080814aa 73e1
 LAB_080814ac:
     b LAB_08081722                           @ 080814ac 39e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080814b0:
     .word  0x000016ba                     @ 080814b0 ba160000
 LAB_080814b4:
@@ -12620,7 +12620,7 @@ LAB_080814d8:
     b LAB_080817e0                           @ 080814de 7fe1
 LAB_080814e0:
     b trigger_card_display_op_0x112          @ 080814e0 fce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080814e4:
     .word  0x00001708                     @ 080814e4 08170000
 LAB_080814e8:
@@ -12650,7 +12650,7 @@ LAB_0808150a:
     b trigger_card_display_op_0x119          @ 0808150e d7e1
 LAB_08081510:
     b trigger_card_display_op_0x112          @ 08081510 e4e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081514:
     .word  0x00001773                     @ 08081514 73170000
 LAB_08081518:
@@ -12748,7 +12748,7 @@ LAB_080815a8:
     b LAB_080817a8                           @ 080815ae fbe0
 LAB_080815b0:
     b trigger_card_display_op_0x112          @ 080815b0 94e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080815b4:
     .word  0x0000183f                     @ 080815b4 3f180000
 LAB_080815b8:
@@ -12805,7 +12805,7 @@ LAB_08081606:
     b LAB_08081794                           @ 0808160a c3e0
 LAB_0808160c:
     b trigger_card_display_op_0x112          @ 0808160c 66e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081610:
     .word  0x00001893                     @ 08081610 93180000
 LAB_08081614:
@@ -12838,7 +12838,7 @@ LAB_0808163a:
     b trigger_card_display_op_0x62           @ 0808163e ade0
 LAB_08081640:
     b trigger_card_display_op_0x112          @ 08081640 4ce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081644:
     .word  0x000018be                     @ 08081644 be180000
 LAB_08081648:
@@ -12854,7 +12854,7 @@ LAB_08081652:
     b trigger_card_display_op_0x77           @ 08081656 bde0
 LAB_08081658:
     b trigger_card_display_op_0x112          @ 08081658 40e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808165c:
     .word  0x000018c2                     @ 0808165c c2180000
 LAB_08081660:
@@ -12891,7 +12891,7 @@ LAB_0808168e:
     b LAB_080817e4                           @ 08081692 a7e0
 LAB_08081694:
     b trigger_card_display_op_0x112          @ 08081694 22e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081698:
     .word  0x00001957                     @ 08081698 57190000
 LAB_0808169c:
@@ -12938,7 +12938,7 @@ LAB_080816da:
     b trigger_card_display_op_0x85           @ 080816de 89e0
 LAB_080816e0:
     b trigger_card_display_op_0x112          @ 080816e0 fce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080816e4:
     .word  0x00001945                     @ 080816e4 45190000
 LAB_080816e8:
@@ -12982,7 +12982,7 @@ LAB_08081724:
     cmp r1,r0                                @ 08081724 8142
     beq trigger_card_display_op_0x6d         @ 08081726 4bd0
     b trigger_card_display_op_0x112          @ 08081728 d8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808172c:
     .word  0x000019a3                     @ 0808172c a3190000
 LAB_08081730:
@@ -13018,7 +13018,7 @@ dispatch_card_display_op_by_id_match:
     cmp r1,r0                                @ 08081758 8142
     beq trigger_card_display_op_0x6f         @ 0808175a 35d0
     b trigger_card_display_op_0x112          @ 0808175c bee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081760:
     .word  0x000019dd                     @ 08081760 dd190000
 LAB_08081764:
@@ -13028,7 +13028,7 @@ LAB_08081764:
     .hword 0x4668    @ 0808176c 6846
     movs r1,#0x45    @ 0808176e 4521
     b LAB_08081896                           @ 08081770 91e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081774:
     .word  0x000013ea                     @ 08081774 ea130000
 
@@ -13048,7 +13048,7 @@ trigger_card_display_op_by_equip_type:
 LAB_08081782:
     movs r2,#0x8b    @ 08081782 8b22
     b LAB_080818e0                           @ 08081784 ace0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081788:
     .word  0x00000119                     @ 08081788 19010000
 
@@ -13267,7 +13267,7 @@ LAB_0808181c:
     movs r0,#0x13    @ 0808182e 1320
     bl get_game_text_ptr_by_lang_offset      @ 08081830 6df03afa
     b LAB_08081890                           @ 08081834 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081838:
     .word  0x00000fbc                     @ 08081838 bc0f0000
 LAB_0808183c:
@@ -13304,7 +13304,7 @@ LAB_08081878:
     ldr r4, DAT_08081880                     @ 08081878 014c
     ldr r0, DAT_08081884                     @ 0808187a 0248
     b LAB_0808188c                           @ 0808187c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081880:
     .word  0x00000127                     @ 08081880 27010000
 DAT_08081884:
@@ -13322,7 +13322,7 @@ LAB_08081896:
     bl format_game_text_with_text_arg        @ 08081896 9df715fd
     .hword 0x466a    @ 0808189a 6a46
     b LAB_080818e0                           @ 0808189c 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080818a0:
     .word  0x00000127                     @ 080818a0 27010000
 DAT_080818a4:
@@ -13361,7 +13361,7 @@ LAB_080818c8:
 LAB_080818ce:
     ldr r2, DAT_080818d4                     @ 080818ce 014a
     b LAB_080818e0                           @ 080818d0 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080818d4:
     .word  0x00000125                     @ 080818d4 25010000
 LAB_080818d8:
@@ -13410,7 +13410,7 @@ tick_equip_activation_display_3state:
     cmp r0,#0x1                              @ 08081914 0128
     beq LAB_0808194c                         @ 08081916 19d0
     b LAB_08081970                           @ 08081918 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808191c:
     .word  0x0201b290                     @ 0808191c 90b20102
 LAB_08081920:
@@ -13430,7 +13430,7 @@ LAB_08081920:
     ldr r0,[r5,#0x0]                         @ 08081940 2868
     adds r0,#0x1    @ 08081942 0130
     b LAB_08081980                           @ 08081944 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081948:
     .word  0x080905e9                     @ 08081948 e9050908
 LAB_0808194c:
@@ -13467,7 +13467,7 @@ LAB_08081984:
     pop {r4,r5,r6}                           @ 08081984 70bc
     pop {r1}                                 @ 08081986 02bc
     bx r1                                    @ 08081988 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活显示路由函数 (hub, indeg=8). 由 8 个不同调用方 (0x080833a8/0x0808416c/0x08084180/0x08084460/0x08084594/0x08084d08/0x08084e2c/0x080852e4, 均属 equip/activation 路由层) 调用. 接收 card_entry_ptr(r0) 和 secondary_ptr(r1). 从 gActivationConfirmTable (0x0201e2a0) 读 [player_id*4+8] confirm_flag; 若==1 则调用 select_equip_target_slot_by_effect_strategy 执行装备目标槽选择; 否则调用 tick_equip_activation_display_3state 驱动三状态显示机. 出口 pop {r1};bx r1 Sub-case E.
 dispatch_equip_activation_display_by_confirm_state:
@@ -13537,7 +13537,7 @@ LAB_080819f0:
     b LAB_08081b78                           @ 080819fa bde0
 LAB_080819fc:
     b LAB_08081b7c                           @ 080819fc bee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081a00:
     .word  0x000017f5                     @ 08081a00 f5170000
 DAT_08081a04:
@@ -13560,7 +13560,7 @@ LAB_08081a20:
     cmp r1,r0                                @ 08081a20 8142
     beq LAB_08081aa0                         @ 08081a22 3dd0
     b LAB_08081b7c                           @ 08081a24 aae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081a28:
     .word  0x00001745                     @ 08081a28 45170000
 LAB_08081a2c:
@@ -13600,7 +13600,7 @@ LAB_08081a60:
     cmp r1,r0                                @ 08081a68 8142
     beq LAB_08081afc                         @ 08081a6a 47d0
     b LAB_08081b7c                           @ 08081a6c 86e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081a70:
     .word  0x00001927                     @ 08081a70 27190000
 LAB_08081a74:
@@ -13613,7 +13613,7 @@ LAB_08081a74:
     cmp r1,r0                                @ 08081a80 8142
     beq LAB_08081b24                         @ 08081a82 4fd0
     b LAB_08081b7c                           @ 08081a84 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081a88:
     .word  0x000019d8                     @ 08081a88 d8190000
 LAB_08081a8c:
@@ -13624,7 +13624,7 @@ LAB_08081a8c:
     cmp r1,r0                                @ 08081a94 8142
     blt LAB_08081b7c                         @ 08081a96 71db
     b LAB_08081af8                           @ 08081a98 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081a9c:
     .word  0x000019dd                     @ 08081a9c dd190000
 LAB_08081aa0:
@@ -13747,7 +13747,7 @@ LAB_08081b7c:
 LAB_08081b7e:
     pop {r1}                                 @ 08081b7e 02bc
     bx r1                                    @ 08081b80 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备槽显示三状态机, 以卡 ID 查值分派. 接收 effect_node_ptr(r0). 先调用 lookup_slot_display_value_by_card_id 查 card_id 对应显示值. 从 [IWRAM_BASE+0x4b0] 读状态. 状态 0: 调用 dispatch_effect_handler_by_card_id; 若 handler 返回非零则调用 trigger_card_display_op31_if_not_active 触发显示后步进+1 返回 0(进行中); 若 handler 返回 0 且位域条件不满足则 movs r0,#1; rsbs r0,r0,#0 返回 -1(dispatch 失败). 状态 1: 调用 trigger_card_display_op31_if_not_active + init_effect_slot_display_context 后步进+1 返回 0(进行中). 状态 2: 调用 pack_equip_slot_sprite_with_code_attr 打包精灵属性后落入 LAB_08081c4a movs r0,#1 返回 1(完成). 其他状态值同样跳转 LAB_08081c4a 返回 1(完成).
 @ 
@@ -13780,7 +13780,7 @@ tick_equip_slot_display_by_card_id_3state:
     cmp r0,#0x0                              @ 08081bb0 0028
     beq LAB_08081bc2                         @ 08081bb2 06d0
     b LAB_08081c4a                           @ 08081bb4 49e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081bb8:
     .word  0x0201b290                     @ 08081bb8 90b20102
 LAB_08081bbc:
@@ -13811,7 +13811,7 @@ LAB_08081bc2:
     movs r0,#0x1    @ 08081bec 0120
     rsbs r0,r0,#0    @ 08081bee 4042
     b LAB_08081c4c                           @ 08081bf0 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081bf4:
     .word  0xfffc7fff                     @ 08081bf4 ff7ffcff
 LAB_08081bf8:
@@ -13858,7 +13858,7 @@ LAB_08081c4c:
     pop {r4,r5,r6,r7}                        @ 08081c4c f0bc
     pop {r1}                                 @ 08081c4e 02bc
     bx r1                                    @ 08081c50 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备显示路由函数 (indeg=4). 由 0x08083c98/0x080843fc/0x08084674/0x08084d3c 调用. 读 card_entry[+3] bits[5:4]: 若==0x20 (direct type flag) 直接返回 1; 若 confirm_flag==1 调用 select_equip_target_slot_by_effect_strategy(strategy=0x10d3); 否则按 count_effect_node_zone_activations 结果分派: 非零则 trigger_card_display_op31_if_not_active(op=0x65) + set_equip_activation_state_by_mode; 零则 tick_equip_activation_display_3state. 出口 pop {r1};bx r1 Sub-case E.
 dispatch_equip_display_by_type_flag_and_node_activity:
@@ -13935,7 +13935,7 @@ LAB_08081ce0:
     pop {r4,r5}                              @ 08081ce0 30bc
     pop {r1}                                 @ 08081ce2 02bc
     bx r1                                    @ 08081ce4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Drives equip effect slot display state machine. Reads [0x0201b290+0x96*8] (IWRAM state counter) and branches: =0 (first tick): reads equip slot link head from [0x0201e2a0+player_id*4+8]; if valid writes [gP1LifePoints+0xea*0x20=0x1d40]:=0; calls invoke_card_display_op_0x31_sub3_with_packed_params with r0=0x67, r1=0xcb*2=0x196, r2=0x197, r3=0; [IWRAM+0x96*8]+=1. =1 (second tick): reads equip ptr from [gP1LifePoints+0x1d40], extracts player_id, xors with r6; calls push_to_effect_slot_array(effect_ptr, player_xor_r6); calls set_lp_display_row_type15; [IWRAM+0x96*8]+=1. >=2: return 1 (done). Side effects: [0x0201b290+0x4b0] state counter; [gP1LifePoints+0x1d40]:=0 (state=0); effect slot array push; card display op invoke. Constants: IWRAM_BASE=0x0201b290, STATE_OFFSET=0x96*8=0x4b0, EQUIP_LINK_BASE=0x0201e2a0, gP1LifePoints=0x0201c4e0, LP_AREA_OFFSET=0xea*0x20=0x1d40, sub3_r0=0x67, r1=0xcb*2=0x196, r2=0x197.
 tick_equip_effect_slot_display_state:
@@ -14043,7 +14043,7 @@ push_effect_slot_by_player_from_node:
     movs r0,#0x1    @ 08081da8 0120
     pop {r1}                                 @ 08081daa 02bc
     bx r1                                    @ 08081dac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Extracts player_id from effect node ptr (r0), byte[+2] bit0; inverts to opponent_id = 1 - player_id; calls push_to_effect_slot_array with r1=opponent_id; returns 1 always. Only difference from push_effect_slot_by_player_from_node (0x08081d9c): passes opponent side (1-player_id) instead of player side. Side effects: via push_to_effect_slot_array: effect slot array write (opponent side).
 push_effect_slot_by_opponent_from_node:
@@ -14059,7 +14059,7 @@ push_effect_slot_by_opponent_from_node:
     movs r0,#0x1    @ 08081dc4 0120
     pop {r1}                                 @ 08081dc6 02bc
     bx r1                                    @ 08081dc8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 小型装备精灵入队函数. 接收 effect_node_ptr(r0). 从固定基址 [0x0201bb90]+0 和 [0x0201bb90]+0x1c 分别读取两个参数, 再以 r0 和这两个参数调用 enqueue_equip_slot_sprite_with_code_rotation 入队精灵旋转属性. 固定返回 1 表示完成.
 @ 
@@ -14076,7 +14076,7 @@ enqueue_equip_slot_sprite_from_base_offset:
     movs r0,#0x1    @ 08081dd8 0120
     pop {r1}                                 @ 08081dda 02bc
     bx r1                                    @ 08081ddc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08081de0:
     .word  0x0201bb90                     @ 08081de0 90bb0102
 
@@ -14103,7 +14103,7 @@ LAB_08081e08:
     pop {r4,r5,r6}                           @ 08081e08 70bc
     pop {r1}                                 @ 08081e0a 02bc
     bx r1                                    @ 08081e0c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活显示五状态机. 接收 effect_node_ptr(r0). 从 [IWRAM_BASE+0x4b0] 读状态. 状态 0: count_effect_node_zone_activations; 状态 1: trigger_card_display_op31_if_not_active(op_code=0x94)+set_equip_activation_state_by_mode, 步进+1, 返回 0; 状态 2: check_activation_display_state_is_confirmed, 若确认则 enqueue_equip_slot_sprite_with_code_rotation 并步进+1; 状态 3: trigger_card_display_op31_if_not_active(op_code=0x6a)+set_equip_activation_state_by_mode, 步进+1, 返回 0; 默认(>=4): 步进+1 返回 1. 与 tick_equip_activation_display_3state (0x08081900) 为扩展 5 状态版本.
 @ 
@@ -14130,7 +14130,7 @@ LAB_08081e24:
     ldr r0,[r0,#0x0]                         @ 08081e2a 0068
 switchD_08081e2c__switchD:
     .hword 0x4687    @ 08081e2c 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081e30:
     .word  0x0201b290                     @ 08081e30 90b20102
 DAT_08081e34:
@@ -14225,7 +14225,7 @@ switchD_08081e2c__caseD_2:
     ldr r0,[r1,#0x0]                         @ 08081ef4 0868
     adds r0,#0x1    @ 08081ef6 0130
     b LAB_08081f14                           @ 08081ef8 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08081efc:
     .word  gP1LifePoints                  @ 08081efc e0c40102
 DAT_08081f00:
@@ -14243,7 +14243,7 @@ LAB_08081f14:
     str r0,[r1,#0x0]                         @ 08081f14 0860
     movs r0,#0x0    @ 08081f16 0020
     b LAB_08081f22                           @ 08081f18 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081f1c:
     .word  0x0201b290                     @ 08081f1c 90b20102
 switchD_08081e2c__default:
@@ -14277,7 +14277,7 @@ tick_equip_activation_display_with_card_routing:
     cmp r0,#0x0                              @ 08081f40 0028
     beq LAB_08081f56                         @ 08081f42 08d0
     b LAB_0808203c                           @ 08081f44 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081f48:
     .word  0x0201b290                     @ 08081f48 90b20102
 LAB_08081f4c:
@@ -14305,7 +14305,7 @@ LAB_08081f66:
     cmp r1,r0                                @ 08081f74 8142
     beq LAB_08081f90                         @ 08081f76 0bd0
     b LAB_08081fae                           @ 08081f78 19e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081f7c:
     .word  0x000017ea                     @ 08081f7c ea170000
 DAT_08081f80:
@@ -14354,7 +14354,7 @@ LAB_08081fba:
     ldr r0,[r1,#0x0]                         @ 08081fd0 0868
     adds r0,#0x1    @ 08081fd2 0130
     b LAB_08082030                           @ 08081fd4 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08081fd8:
     .word  0x08081de5                     @ 08081fd8 e51d0808
 DAT_08081fdc:
@@ -14383,7 +14383,7 @@ LAB_08081fe0:
     ldr r0,[r1,#0x0]                         @ 0808200c 0868
     adds r0,#0x1    @ 0808200e 0130
     b LAB_08082030                           @ 08082010 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08082014:
     .word  gP1LifePoints                  @ 08082014 e0c40102
 DAT_08082018:
@@ -14403,7 +14403,7 @@ LAB_08082030:
     str r0,[r1,#0x0]                         @ 08082030 0860
     movs r0,#0x0    @ 08082032 0020
     b LAB_0808203e                           @ 08082034 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08082038:
     .word  0x0201b290                     @ 08082038 90b20102
 LAB_0808203c:
@@ -14571,7 +14571,7 @@ LAB_0808237c:
     str r4,[sp,#0x4]                         @ 0808238e 0194
     bl invoke_card_display_op_0x31_sub3_with_packed_params @ 08082390 11f024f8
     b LAB_080823c4                           @ 08082394 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082398:
     .word  0x00000103                     @ 08082398 03010000
 DWORD_0808239c:
@@ -14661,7 +14661,7 @@ LAB_08082412:
     lsls r1,r3,#0x1f    @ 08082438 d907
     lsrs r1,r1,#0x1f    @ 0808243a c90f
     b LAB_0808247e                           @ 0808243c 1fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082440:
     .word  0x0201e2a0                     @ 08082440 a0e20102
 LAB_08082444:
@@ -14743,7 +14743,7 @@ dispatch_equip_activation_display_if_slot_card_id_ok:
     movs r0,#0x1    @ 080824d0 0120
     rsbs r0,r0,#0    @ 080824d2 4042
     b LAB_08082508                           @ 080824d4 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080824d8:
     .word  0x00000868                     @ 080824d8 68080000
 DAT_080824dc:
@@ -14761,7 +14761,7 @@ LAB_080824e0:
     adds r1,r5,#0x0    @ 080824f2 291c
     bl tick_equip_activation_display_3state  @ 080824f4 fff704fa
     b LAB_08082508                           @ 080824f8 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080824fc:
     .word  0x0201e2a0                     @ 080824fc a0e20102
 LAB_08082500:
@@ -14772,7 +14772,7 @@ LAB_08082508:
     pop {r4,r5}                              @ 08082508 30bc
     pop {r1}                                 @ 0808250a 02bc
     bx r1                                    @ 0808250c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备显示四状态机, 附效果槽数组推送. indeg=0, Sub-type A. confirm_flag==1 快速路由: select_equip_target_slot_by_effect_strategy + push_to_effect_slot_array, 返回 1. 否则四状态机 [gDuelState+0x96*8]: state 0: trigger op 0x65 + clear card_entry flags + set_equip_activation_state_by_mode; state 1: check_activation_display_state_is_confirmed, 确认则 enqueue_equip_slot_sprite_with_code_rotation; state 2: invoke sub3(0x7f,0x198,0x199); state 3: push_to_effect_slot_array + set_lp_display_row_type15, 返回 1. 出口 Sub-case E.
 tick_equip_display_4state_with_effect_slot_array:
@@ -14799,7 +14799,7 @@ tick_equip_display_4state_with_effect_slot_array:
     bl push_to_effect_slot_array             @ 0808253a fef71bfb
     movs r0,#0x1    @ 0808253e 0120
     b LAB_08082632                           @ 08082540 77e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082544:
     .word  0x0201e2a0                     @ 08082544 a0e20102
 DWORD_08082548:
@@ -14849,7 +14849,7 @@ LAB_0808259a:
     adds r0,#0x1    @ 0808259c 0130
     str r0,[r4,#0x0]                         @ 0808259e 2060
     b LAB_08082630                           @ 080825a0 46e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080825a4:
     .word  0xfffc7fff                     @ 080825a4 ff7ffcff
 DWORD_080825a8:
@@ -14872,7 +14872,7 @@ LAB_080825ac:
     adds r0,r5,#0x0    @ 080825ca 281c
     bl enqueue_equip_slot_sprite_with_code_rotation @ 080825cc fef766fb
     b LAB_0808259a                           @ 080825d0 e3e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080825d4:
     .word  gP1LifePoints                  @ 080825d4 e0c40102
 DWORD_080825d8:
@@ -14926,7 +14926,7 @@ LAB_08082632:
     pop {r4,r5}                              @ 08082634 30bc
     pop {r1}                                 @ 08082636 02bc
     bx r1                                    @ 08082638 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备显示三状态机, 附效果节点双维度扫描. indeg=0, Sub-type A. 读 [gDuelState+0x96*8]: state 0: 清 flags; node_count>1 且确认则 select_equip_target_slot; 未确认则 trigger op 0x10f + set_equip_activation_state; count<=1 则双循环 invoke_effect_node_handler_3arg(slot 0..1, zone 0..4), 命中则 enqueue_sprite + state:=2. state 1: tick_equip_activation_display_3state. state 2: resolve_slot_card_id_for_pair -> strh card_id to [entry+0xc], 返回 1. 出口 Sub-case E.
 tick_equip_display_3state_with_effect_node_probe:
@@ -14945,7 +14945,7 @@ tick_equip_display_3state_with_effect_node_probe:
     cmp r0,#0x0                              @ 08082654 0028
     beq LAB_08082666                         @ 08082656 06d0
     b LAB_08082736                           @ 08082658 6de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0808265c:
     .word  0x0201b290                     @ 0808265c 90b20102
 LAB_08082660:
@@ -14983,7 +14983,7 @@ LAB_08082666:
     movs r0,#0x2    @ 080826a0 0220
     str r0,[r4,#0x0]                         @ 080826a2 2060
     b LAB_08082736                           @ 080826a4 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080826a8:
     .word  0xfffc7fff                     @ 080826a8 ff7ffcff
 DWORD_080826ac:
@@ -15062,7 +15062,7 @@ LAB_08082738:
     pop {r4,r5,r6}                           @ 08082738 70bc
     pop {r1}                                 @ 0808273a 02bc
     bx r1                                    @ 0808273c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082740:
     .word  0x0201b290                     @ 08082740 90b20102
 
@@ -15192,7 +15192,7 @@ tick_equip_display_by_card_id_group_a_4state:
     beq LAB_08082a08                         @ 080829d4 18d0
     adds r0,#0xc    @ 080829d6 0c30
     b LAB_080829fe                           @ 080829d8 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080829dc:
     .word  0x000012ed                     @ 080829dc ed120000
 LAB_080829e0:
@@ -15205,7 +15205,7 @@ LAB_080829e0:
     cmp r2,r0                                @ 080829ec 8242
     beq LAB_08082a14                         @ 080829ee 11d0
     b LAB_08082a16                           @ 080829f0 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080829f4:
     .word  0x0000183c                     @ 080829f4 3c180000
 DWORD_080829f8:
@@ -15242,7 +15242,7 @@ LAB_08082a16:
     cmp r0,#0x0                              @ 08082a28 0028
     beq LAB_08082a3e                         @ 08082a2a 08d0
     b LAB_08082b0a                           @ 08082a2c 6de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082a30:
     .word  0x0201b290                     @ 08082a30 90b20102
 LAB_08082a34:
@@ -15282,7 +15282,7 @@ LAB_08082a3e:
     movs r1,#0x1    @ 08082a78 0121
     str r1,[r0,#0x0]                         @ 08082a7a 0160
     b LAB_08082aca                           @ 08082a7c 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082a80:
     .word  0xfffc7fff                     @ 08082a80 ff7ffcff
 DWORD_08082a84:
@@ -15360,7 +15360,7 @@ LAB_08082b0c:
     pop {r4,r5,r6}                           @ 08082b0c 70bc
     pop {r1}                                 @ 08082b0e 02bc
     bx r1                                    @ 08082b10 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082b14:
     .word  gP1LifePoints                  @ 08082b14 e0c40102
 
@@ -15385,7 +15385,7 @@ LAB_08082b24:
 LAB_08082b26:
     pop {r1}                                 @ 08082b26 02bc
     bx r1                                    @ 08082b28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Slot index range and slot type dual guard: calls the effect node handler only when slot_idx <= 4 and the slot type matches. First compares r2 (slot_idx) with 4, returning 0 when out of range; then calls read_effect_slot_side_and_type to read the slot's side/type byte and compares it with input r1, returning 0 when not equal; on full pass, passes through (r0,r1,r2) to invoke_effect_node_handler_with_zone_flag_guard. Serves as a function-pointer table slot (DWORD_08082bc4) for tick_equip_display_with_fn_ptr_routing_3state to route to.
 @ 
@@ -15518,7 +15518,7 @@ LAB_08082bca:
     cmp r0,#0x0                              @ 08082bdc 0028
     beq LAB_08082bf2                         @ 08082bde 08d0
     b LAB_08082c7c                           @ 08082be0 4ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082be4:
     .word  0x08082b5d                     @ 08082be4 5d2b0808
 DWORD_08082be8:
@@ -15555,7 +15555,7 @@ LAB_08082c26:
     adds r0,#0x1    @ 08082c28 0130
     str r0,[r4,#0x0]                         @ 08082c2a 2060
     b LAB_08082c7c                           @ 08082c2c 26e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082c30:
     .word  0x00000484                     @ 08082c30 84040000
 LAB_08082c34:
@@ -15576,7 +15576,7 @@ LAB_08082c34:
     adds r0,r5,#0x0    @ 08082c52 281c
     bl enqueue_equip_slot_sprite_with_code_rotation @ 08082c54 fef722f8
     b LAB_08082c26                           @ 08082c58 e5e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082c5c:
     .word  gP1LifePoints                  @ 08082c5c e0c40102
 DWORD_08082c60:
@@ -15592,7 +15592,7 @@ LAB_08082c6c:
     str r5,[r0,#0x0]                         @ 08082c70 0560
     movs r0,#0x1    @ 08082c72 0120
     b LAB_08082c7e                           @ 08082c74 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082c78:
     .word  0x00000484                     @ 08082c78 84040000
 LAB_08082c7c:
@@ -15604,7 +15604,7 @@ LAB_08082c7e:
     pop {r4,r5,r6,r7}                        @ 08082c84 f0bc
     pop {r1}                                 @ 08082c86 02bc
     bx r1                                    @ 08082c88 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备链配对校验与槽条目构建谓词. 接收 effect_node_ptr(r0). 读取 effect slot 的 side/type (read_effect_slot_side_and_type). 调用 find_equip_chain_pair_across_field 在全场查找装备链配对. 若找到则调用 check_zone_slot_equip_prerequisites 验证区域前置条件, 通过后调用 build_equip_chain_slot_entry 构建槽条目. 返回 0 表示成功, 1 表示失败. fn-ptr 地址 0x08082c8d 被 0x08082dbc 引用.
 build_equip_chain_pair_slot_entry:
@@ -15656,7 +15656,7 @@ build_equip_chain_pair_slot_entry:
     beq LAB_08082cfc                         @ 08082cf0 04d0
     movs r0,#0x1    @ 08082cf2 0120
     b LAB_08082cfe                           @ 08082cf4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082cf8:
     .word  0x0000ffff                     @ 08082cf8 ffff0000
 LAB_08082cfc:
@@ -15668,7 +15668,7 @@ LAB_08082cfe:
     pop {r4,r5,r6,r7}                        @ 08082d04 f0bc
     pop {r1}                                 @ 08082d06 02bc
     bx r1                                    @ 08082d08 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip chain pair display four-state stepper. Reads state (0/1/2/3) at IWRAM [0x0201b290+0x96*8]. State 0: calls count_effect_node_zone_activations, returning 1 if there is no activation; otherwise reads the EWRAM [0x0201e2a0+8+player*4] slot value, enters a double loop calling build_equip_chain_pair_slot_entry to search the whole field and build the equip chain pair slot entry, on a hit calls enqueue_equip_slot_sprite_with_code_rotation to submit the sprite and returns 1; also renders the card name text via card_name_lookup_by_internal_id + format_game_text_with_text_arg and advances via set_equip_activation_state_by_mode. State 1/2/3: submits the sprite after confirmation via check_activation_display_state_is_confirmed, step counter +1/-1. Advancing paths return 0; complete/no-activation returns 1.
 @ 
@@ -15724,7 +15724,7 @@ LAB_08082d46:
     ldrh r1,[r6,#0x0]                        @ 08082d58 3188
     ldr r2, DWORD_08082d60                   @ 08082d5a 014a
     b LAB_08082e10                           @ 08082d5c 58e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082d60:
     .word  0x080905e9                     @ 08082d60 e9050908
 LAB_08082d64:
@@ -15771,7 +15771,7 @@ LAB_08082d9a:
     cmp r7,#0x1                              @ 08082db4 012f
     ble LAB_08082d98                         @ 08082db6 efdd
     b LAB_08082e90                           @ 08082db8 6ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082dbc:
     .word  0x08082c8d                     @ 08082dbc 8d2c0808
 DWORD_08082dc0:
@@ -15818,7 +15818,7 @@ LAB_08082e10:
     str r0,[r4,#0x0]                         @ 08082e18 2060
     movs r0,#0x0    @ 08082e1a 0020
     b LAB_08082e90                           @ 08082e1c 38e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082e20:
     .word  0x00000868                     @ 08082e20 68080000
 DWORD_08082e24:
@@ -15847,7 +15847,7 @@ LAB_08082e28:
     ldr r0,[r1,#0x0]                         @ 08082e54 0868
     adds r0,#0x1    @ 08082e56 0130
     b LAB_08082e78                           @ 08082e58 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082e5c:
     .word  gP1LifePoints                  @ 08082e5c e0c40102
 DWORD_08082e60:
@@ -15867,7 +15867,7 @@ LAB_08082e78:
     str r0,[r1,#0x0]                         @ 08082e78 0860
     movs r0,#0x0    @ 08082e7a 0020
     b LAB_08082e90                           @ 08082e7c 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08082e80:
     .word  0x0201b290                     @ 08082e80 90b20102
 LAB_08082e84:
@@ -15921,7 +15921,7 @@ LAB_08082ebe:
     ldrh r1,[r5,#0x0]                        @ 08082ed6 2988
     bl set_lp_row_type10_with_value          @ 08082ed8 1ef03aff
     b LAB_08082f24                           @ 08082edc 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08082ee0:
     .word  0xfffc7fff                     @ 08082ee0 ff7ffcff
 LAB_08082ee4:
@@ -15961,7 +15961,7 @@ LAB_08082f24:
     str r0,[r6,#0x0]                         @ 08082f28 3060
     movs r0,#0x0    @ 08082f2a 0020
     b LAB_08082f3e                           @ 08082f2c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08082f30:
     .word  0x00001357                     @ 08082f30 57130000
 PTR_gP1LifePoints_08082f34:
@@ -16048,7 +16048,7 @@ LAB_08082f94:
     cmp r1,r0                                @ 08082fa0 8142
     beq LAB_08083008                         @ 08082fa2 31d0
     b LAB_0808306c                           @ 08082fa4 62e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08082fa8:
     .word  0x00001630                     @ 08082fa8 30160000
 LAB_08082fac:
@@ -16088,7 +16088,7 @@ LAB_08082fdc:
     cmp r1,r0                                @ 08082fe8 8142
     beq LAB_0808305e                         @ 08082fea 38d0
     b LAB_0808306c                           @ 08082fec 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08082ff0:
     .word  0x0000196f                     @ 08082ff0 6f190000
 DAT_08082ff4:
@@ -16109,7 +16109,7 @@ LAB_08083008:
 LAB_0808300a:
     movs r4,#0x8    @ 0808300a 0824
     b LAB_0808306c                           @ 0808300c 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083010:
     .word  0x0000011d                     @ 08083010 1d010000
 LAB_08083014:
@@ -16149,7 +16149,7 @@ LAB_0808304c:
     adds r4,r0,#0x0    @ 0808304c 041c
     adds r4,#0x27    @ 0808304e 2734
     b LAB_0808306c                           @ 08083050 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083054:
     .word  0x0000011d                     @ 08083054 1d010000
 LAB_08083058:
@@ -16179,7 +16179,7 @@ LAB_0808306c:
     cmp r0,#0x0                              @ 08083080 0028
     beq LAB_08083092                         @ 08083082 06d0
     b LAB_0808315e                           @ 08083084 6be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083088:
     .word  0x0201b290                     @ 08083088 90b20102
 LAB_0808308c:
@@ -16214,7 +16214,7 @@ LAB_08083092:
     ldr r0,[r1,#0x0]                         @ 080830c8 0868
     adds r0,#0x1    @ 080830ca 0130
     b LAB_08083158                           @ 080830cc 44e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080830d0:
     .word  0xfffc7fff                     @ 080830d0 ff7ffcff
 LAB_080830d4:
@@ -16234,7 +16234,7 @@ LAB_080830d4:
     movs r0,#0x0    @ 080830f0 0020
     str r0,[r1,#0x0]                         @ 080830f2 0860
     b LAB_08083160                           @ 080830f4 34e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080830f8:
     .word  0x000004b4                     @ 080830f8 b4040000
 LAB_080830fc:
@@ -16273,7 +16273,7 @@ LAB_080830fc:
     bl pack_equip_slot_sprite_with_code_attr @ 08083142 fdf7f1fd
     movs r0,#0x0    @ 08083146 0020
     b LAB_08083160                           @ 08083148 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0808314c:
     .word  0x000004b4                     @ 0808314c b4040000
 PTR_gP1LifePoints_08083150:
@@ -16295,7 +16295,7 @@ LAB_08083160:
     pop {r4,r5,r6,r7}                        @ 08083168 f0bc
     pop {r1}                                 @ 0808316a 02bc
     bx r1                                    @ 0808316c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备 LP 显示四状态机. 接收 effect_node_ptr(r0). 先从 [gP1LifePoints+0x1ce8] XOR [IWRAM+0x4b4] 计算 r4 值. 读 [IWRAM+0x4b4] 为状态. 状态 0: 清 attr_bits + 写 [IWRAM+0x4b4]:=0, 步进跳至 state-advance. 状态 1: count_available_monster_slots 检可用怪兽槽; 若 >0 且 check_field_spell_neo_daedalus_group_placeable 通过, 则调用 dispatch_effect_handler_by_card_id + set_lp_display_row_type14; 步进+1. 若失败则步进+2. 状态 2: find_hand_slot_idx_by_set_code 查手牌槽 + pack_equip_slot_sprite_with_code_attr 打包精灵. 状态 3: 递增 [IWRAM+0x4b4]+1, 若 >1 则返回 4 (完成), 否则返回 1.
 @ 
@@ -16328,7 +16328,7 @@ tick_equip_lp_display_by_node_state_4state:
     cmp r2,#0x0                              @ 08083194 002a
     beq LAB_080831b6                         @ 08083196 0ed0
     b LAB_08083278                           @ 08083198 6ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0808319c:
     .word  gP1LifePoints                  @ 0808319c e0c40102
 DWORD_080831a0:
@@ -16392,7 +16392,7 @@ LAB_0808320a:
     adds r0,#0x2    @ 08083214 0230
     str r0,[r1,#0x0]                         @ 08083216 0860
     b LAB_08083274                           @ 08083218 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0808321c:
     .word  0x0201b290                     @ 0808321c 90b20102
 LAB_08083220:
@@ -16491,7 +16491,7 @@ LAB_080832aa:
     movs r1,#0x91    @ 080832c2 9121
     bl trigger_card_display_op31_if_not_active @ 080832c4 10f064f8
     b LAB_0808337c                           @ 080832c8 58e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080832cc:
     .word  0xfffc7fff                     @ 080832cc ff7ffcff
 LAB_080832d0:
@@ -16508,7 +16508,7 @@ LAB_080832d0:
     cmp r1,r0                                @ 080832e4 8142
     beq LAB_08083322                         @ 080832e6 1cd0
     b LAB_08083344                           @ 080832e8 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080832ec:
     .word  0x000015de                     @ 080832ec de150000
 DWORD_080832f0:
@@ -16523,7 +16523,7 @@ LAB_080832f8:
     bgt LAB_0808330c                         @ 08083300 04dc
     subs r0,#0x36    @ 08083302 3638
     b LAB_0808330e                           @ 08083304 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083308:
     .word  0x000016d3                     @ 08083308 d3160000
 LAB_0808330c:
@@ -16568,7 +16568,7 @@ LAB_08083344:
     str r0,[r1,#0x0]                         @ 08083350 0860
     movs r0,#0x0    @ 08083352 0020
     b LAB_080833a0                           @ 08083354 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083358:
     .word  0x0201b290                     @ 08083358 90b20102
 LAB_0808335c:
@@ -16592,7 +16592,7 @@ LAB_0808337c:
     str r0,[r5,#0x0]                         @ 08083380 2860
     movs r0,#0x0    @ 08083382 0020
     b LAB_080833a0                           @ 08083384 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083388:
     .word  gP1LifePoints                  @ 08083388 e0c40102
 LAB_0808338c:
@@ -16610,7 +16610,7 @@ LAB_080833a0:
     pop {r4,r5}                              @ 080833a0 30bc
     pop {r1}                                 @ 080833a2 02bc
     bx r1                                    @ 080833a4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活确认状态条件分派包装函数. 读取 card_slot[+0xc] halfword (ldrh [r0,#0xc]) 作为 confirm_state; 若 confirm_state == 1 则调用 dispatch_equip_activation_display_by_confirm_state 并透传其返回值; 若 confirm_state != 1 则直接返回 1 (跳过). 作为 fn-ptr 表 stub, 仅在状态为 1 时激活 display dispatch.
 dispatch_equip_display_if_confirm_state_one:
@@ -16727,7 +16727,7 @@ tick_equip_target_select_4state:
     cmp r0,#0x0                              @ 08083468 0028
     beq LAB_0808347e                         @ 0808346a 08d0
     b LAB_08083558                           @ 0808346c 74e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083470:
     .word  0x0201b290                     @ 08083470 90b20102
 LAB_08083474:
@@ -16772,7 +16772,7 @@ LAB_0808347e:
     ldr r0,[r5,#0x0]                         @ 080834c4 2868
     adds r0,#0x2    @ 080834c6 0230
     b LAB_080834f6                           @ 080834c8 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080834cc:
     .word  0xfffc7fff                     @ 080834cc ff7ffcff
 DAT_080834d0:
@@ -16825,7 +16825,7 @@ LAB_08083500:
     ldr r0,[r1,#0x0]                         @ 0808352c 0868
     adds r0,#0x1    @ 0808352e 0130
     b LAB_0808354c                           @ 08083530 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08083534:
     .word  gP1LifePoints                  @ 08083534 e0c40102
 DAT_08083538:
@@ -16843,7 +16843,7 @@ LAB_0808354c:
     str r0,[r1,#0x0]                         @ 0808354c 0860
     movs r0,#0x0    @ 0808354e 0020
     b LAB_0808355a                           @ 08083550 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083554:
     .word  0x0201b290                     @ 08083554 90b20102
 LAB_08083558:
@@ -16879,7 +16879,7 @@ tick_equip_best_target_display_4state:
     cmp r0,#0x0                              @ 08083578 0028
     beq LAB_08083592                         @ 0808357a 0ad0
     b LAB_080836f8                           @ 0808357c bce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083580:
     .word  0x0201b290                     @ 08083580 90b20102
 LAB_08083584:
@@ -16991,7 +16991,7 @@ LAB_080835ea:
     adds r2,r5,#0x0    @ 08083656 2a1c
     bl enqueue_equip_slot_sprite_with_code_rotation @ 08083658 fdf720fb
     b LAB_080836f8                           @ 0808365c 4ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08083660:
     .word  0x0201e2a0                     @ 08083660 a0e20102
 DAT_08083664:
@@ -17029,7 +17029,7 @@ LAB_0808368c:
     ldr r0,[r7,#0x0]                         @ 080836a8 3868
     adds r0,#0x1    @ 080836aa 0130
     b LAB_080836f2                           @ 080836ac 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080836b0:
     .word  gP1LifePoints                  @ 080836b0 e0c40102
 DAT_080836b4:
@@ -17054,7 +17054,7 @@ LAB_080836b8:
     ldr r0,[r7,#0x0]                         @ 080836dc 3868
     adds r0,#0x1    @ 080836de 0130
     b LAB_080836f2                           @ 080836e0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080836e4:
     .word  gP1LifePoints                  @ 080836e4 e0c40102
 DAT_080836e8:
@@ -17074,7 +17074,7 @@ LAB_080836fa:
     pop {r4,r5,r6,r7}                        @ 080836fc f0bc
     pop {r1}                                 @ 080836fe 02bc
     bx r1                                    @ 08083700 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备 Lamp/Dream 类区域激活三态显示状态机. 接收 card_entry_ptr(r0) 和 scene_ptr(r1). 读 [0x0201b290+0x96*8=0x4b0] 当前状态; 状态==0: 调用 check_equip_zone_slot_activation_eligible 判定装备区激活资格, 若返回 2 则设 r7=1 (标记); 检查 halfword[+2] bits[11:6] (mask 0xfc0) == 0x90*8=0x480 且 [0x0201bb90] player_id 匹配条件, 满足时调用 count_effect_node_zone_activations 设 r6 (激活计数); 若 r7&&r6 则写 [0x0201b290+0x4b0]=10 返回 0; 若 r7&&!r6 则写 strh 1 到 [r4+0xa], 返回; 若 !r7 则 strh 2 到 [r4+0xa], 返回. 状态==10: 从 player/slot_flag 确认后从 [0x0201e2a0+player*4+8] 读 confirm_flag, 若==1 写 [gP1LifePoints+0x1d40]:=2 并 ++step, 否则 invoke_card_display_op_0x31_sub1(0x109), ++step, 返回 0. 状态==11: 读 gP1LifePoints+0x1d40+0xea*0x20, 写 [r4+0xa]++, 清 [step]=0, 返回 [r4+0xa] halfword. 其余状态: tick_equip_display_with_fn_ptr_routing_3state (state==[r4+0xa]==1) 或 tick_equip_lamp_dream_activation_3state (state==[r4+0xa]==2).
 tick_equip_lamp_dream_zone_activation_3state:
@@ -17095,7 +17095,7 @@ tick_equip_lamp_dream_zone_activation_3state:
     cmp r0,#0xb                              @ 08083720 0b28
     beq LAB_080837e8                         @ 08083722 61d0
     b LAB_080837fa                           @ 08083724 69e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083728:
     .word  0x0201b290                     @ 08083728 90b20102
 LAB_0808372c:
@@ -17144,7 +17144,7 @@ LAB_0808376e:
     str r1,[r0,#0x0]                         @ 08083780 0160
     movs r0,#0x0    @ 08083782 0020
     b LAB_0808381e                           @ 08083784 4be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083788:
     .word  0x0201bb90                     @ 08083788 90bb0102
 DWORD_0808378c:
@@ -17175,7 +17175,7 @@ LAB_0808379c:
     movs r1,#0x2    @ 080837b8 0221
     str r1,[r0,#0x0]                         @ 080837ba 0160
     b LAB_080837ce                           @ 080837bc 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080837c0:
     .word  0x0201e2a0                     @ 080837c0 a0e20102
 DWORD_080837c4:
@@ -17289,7 +17289,7 @@ advance_equip_zone_slot_display_seq:
     cmp r0,#0x1                              @ 08083880 0128
     beq LAB_08083944                         @ 08083882 5fd0
     b LAB_0808395c                           @ 08083884 6ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083888:
     .word  0x0201b290                     @ 08083888 90b20102
 LAB_0808388c:
@@ -17400,7 +17400,7 @@ LAB_0808395e:
     pop {r4,r5,r6}                           @ 08083960 70bc
     pop {r1}                                 @ 08083962 02bc
     bx r1                                    @ 08083964 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ effect_slot 区域玩家双路校验谓词, 被 fn-ptr 表引用. 接收 effect_node_ptr(r0). 读 [r4+6] bits[4:3] 作为 case 索引. case 0: XOR player_id 与 r5 比较. case 1: 直接比较 player_id 与 r5. 返回 0 (不匹配) 或 1 (匹配). r4/r5 是 caller-frame 继承的 effect_node 和比较值. fn-ptr 0x08083969 被 tick_equip_activation_display_with_card_routing (0x08081f28) 的 literal pool @ 08083aec 引用.
 @ 
@@ -17448,7 +17448,7 @@ LAB_080839ac:
     pop {r4,r5}                              @ 080839ac 30bc
     pop {r1}                                 @ 080839ae 02bc
     bx r1                                    @ 080839b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备放置 bitmap 显示四状态机. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 调用 check_effect_activations_both_sides; 若 [activation_ctx+player_id*4+8]==1, 调用 find_best_slot_from_equip_bitmap_with_gate; 迭代有效槽 0..4 调用 invoke_effect_node_handler_3arg 查找匹配; 找到后 invoke_effect_node_handler_3arg + enqueue_equip_slot_sprite_with_code_rotation 反向遍历; 步进+1, 返回 0. 状态 1 (通过 check_effect_slot_zone_player_by_type fn-ptr): trigger_card_display_op31_if_not_active(op=0x94)+set_equip_activation_state_by_mode, 步进+1. 状态 2: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation, 步进+1. 状态>=3: 步进+1 返回 1.
 @ 
@@ -17476,7 +17476,7 @@ LAB_080839cc:
     cmp r0,#0x0                              @ 080839d0 0028
     beq LAB_080839e8                         @ 080839d2 09d0
     b LAB_08083b48                           @ 080839d4 b8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080839d8:
     .word  0x0201b290                     @ 080839d8 90b20102
 LAB_080839dc:
@@ -17528,7 +17528,7 @@ LAB_08083a08:
     bge LAB_08083a60                         @ 08083a34 14da
     movs r4,#0x0    @ 08083a36 0024
     b LAB_08083a46                           @ 08083a38 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083a3c:
     .word  0xfffc7fff                     @ 08083a3c ff7ffcff
 DWORD_08083a40:
@@ -17617,7 +17617,7 @@ LAB_08083ad6:
     str r0,[r4,#0x0]                         @ 08083ae4 2060
     movs r0,#0x0    @ 08083ae6 0020
     b LAB_08083b4a                           @ 08083ae8 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083aec:
     .word  0x08083969                     @ 08083aec 69390808
 LAB_08083af0:
@@ -17644,7 +17644,7 @@ LAB_08083af0:
     ldr r0,[r1,#0x0]                         @ 08083b1c 0868
     adds r0,#0x1    @ 08083b1e 0130
     b LAB_08083b3c                           @ 08083b20 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083b24:
     .word  gP1LifePoints                  @ 08083b24 e0c40102
 DWORD_08083b28:
@@ -17662,7 +17662,7 @@ LAB_08083b3c:
     str r0,[r1,#0x0]                         @ 08083b3c 0860
     movs r0,#0x0    @ 08083b3e 0020
     b LAB_08083b4a                           @ 08083b40 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083b44:
     .word  0x0201b290                     @ 08083b44 90b20102
 LAB_08083b48:
@@ -17672,7 +17672,7 @@ LAB_08083b4a:
     pop {r4,r5}                              @ 08083b4c 30bc
     pop {r1}                                 @ 08083b4e 02bc
     bx r1                                    @ 08083b50 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip card slot pair occupancy check predicate. Receives card_ptr(r0), player_id(r1), slot_idx(r2). If slot_idx>4 or check_monster_slot_accepts_card returns 0, returns 0 (invalid). Otherwise reads card_ptr[+6] bits[4:2] (zone_flags); if zero, returns 1 (allowed). If nonzero: extracts bits[4:3]-1 as zone_offset, reads halfword port number from card_ptr[+8+zone_offset*2], compares against (player_id<<8)|slot_idx; if equal returns 0 (slot occupied), else returns 1. Called via fn-ptr table at 0x08083c18 (.word 0x08083b55).
 @ Side effects: none.
@@ -17747,7 +17747,7 @@ tick_equip_activation_sprite_array_4state:
     cmp r0,#0x0                              @ 08083bb8 0028
     beq LAB_08083bce                         @ 08083bba 08d0
     b LAB_08083c8c                           @ 08083bbc 66e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083bc0:
     .word  0x0201b290                     @ 08083bc0 90b20102
 LAB_08083bc4:
@@ -17789,7 +17789,7 @@ LAB_08083bf6:
     ldr r0,[r1,#0x0]                         @ 08083c0c 0868
     adds r0,#0x1    @ 08083c0e 0130
     b LAB_08083c80                           @ 08083c10 36e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083c14:
     .word  0xfffc7fff                     @ 08083c14 ff7ffcff
 DWORD_08083c18:
@@ -17829,7 +17829,7 @@ LAB_08083c20:
     ldr r0,[r1,#0x0]                         @ 08083c60 0868
     adds r0,#0x1    @ 08083c62 0130
     b LAB_08083c80                           @ 08083c64 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083c68:
     .word  gP1LifePoints                  @ 08083c68 e0c40102
 DWORD_08083c6c:
@@ -17847,7 +17847,7 @@ LAB_08083c80:
     str r0,[r1,#0x0]                         @ 08083c80 0860
     movs r0,#0x0    @ 08083c82 0020
     b LAB_08083c8e                           @ 08083c84 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083c88:
     .word  0x0201b290                     @ 08083c88 90b20102
 LAB_08083c8c:
@@ -17857,7 +17857,7 @@ LAB_08083c8e:
     pop {r4,r5,r6}                           @ 08083c90 70bc
     pop {r1}                                 @ 08083c92 02bc
     bx r1                                    @ 08083c94 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备 LP 行显示状态机步进函数. indeg=0, fn-ptr 表驱动. 读 gDuelCtx+0x4b0: 状态<0/>3 返回1; 状态0/1 调 dispatch_equip_display_by_type_flag_and_node_activity, 返回0则输出0, 非零步进+2. 状态2: read_effect_slot_side_and_type -> resolve_best_target_slot_for_equip -> set_lp_row_type11_with_byte_flags(player_id,1,~bitmask). 状态3: 读 gP1LifePoints+0x1daa halfword, push_to_effect_slot_array, set_lp_display_row_type15(player,halfword,0x171f). 步进后写回 gDuelCtx+0x4b0.
 tick_equip_lp_row_display_by_state:
@@ -17930,7 +17930,7 @@ LAB_08083d1c:
 LAB_08083d1e:
     movs r0,#0x0    @ 08083d1e 0020
     b LAB_08083d32                           @ 08083d20 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083d24:
     .word  gP1LifePoints                  @ 08083d24 e0c40102
 DWORD_08083d28:
@@ -17961,7 +17961,7 @@ tick_equip_card_display_3state:
     cmp r0,#0x0                              @ 08083d50 0028
     beq LAB_08083d62                         @ 08083d52 06d0
     b LAB_08083e0a                           @ 08083d54 59e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083d58:
     .word  0x0201b290                     @ 08083d58 90b20102
 LAB_08083d5c:
@@ -17989,7 +17989,7 @@ LAB_08083d62:
     adds r1,r6,#0x0    @ 08083d86 311c
     bl select_equip_target_slot_by_effect_strategy @ 08083d88 32f006f8
     b LAB_08083e0c                           @ 08083d8c 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083d90:
     .word  0x0201bb90                     @ 08083d90 90bb0102
 DWORD_08083d94:
@@ -18037,7 +18037,7 @@ LAB_08083dc8:
     ldr r0,[r5,#0x0]                         @ 08083dec 2868
     adds r0,#0x1    @ 08083dee 0130
     b LAB_08083e04                           @ 08083df0 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083df4:
     .word  gP1LifePoints                  @ 08083df4 e0c40102
 DWORD_08083df8:
@@ -18057,7 +18057,7 @@ LAB_08083e0c:
     pop {r4,r5,r6}                           @ 08083e0c 70bc
     pop {r1}                                 @ 08083e0e 02bc
     bx r1                                    @ 08083e10 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活三状态机, 专用于 Ancient Lamp / Dreamsprite 卡组. 接收 effect_node_ptr(r0). 读 [IWRAM_BASE+0x4b0] 状态. 状态 0: 清 attr_bits + count_effect_node_zone_activations; 若激活数 >0, 对 card_id 做三路比较 (0x1476=Ancient Lamp, 0x140a(=0x1476-0x6c)=Shift, 0x148a=Dreamsprite): Ancient Lamp/Shift 路径调用 trigger_card_display_op31_if_not_active(op=0xf) 并写 [gP1LP+0xea<<5]:=1; Dreamsprite 路径读 [0x0201e2a0+player_id*4] 判断 [ptr+8]==1 后写 [gP1LP+0xea<<5]:=1 或 invoke_card_display_op_0x31_sub1(op=0xe2). 步进+1, 返回 0. 状态 1: 检查 [gP1LP+0x1d40] 是否非零; 若为 0 则返回 -1; 否则 set_equip_activation_state_by_mode, 步进+1, 返回 0. 状态 2: check_activation_display_state_is_confirmed -> enqueue_equip_slot_sprite_with_code_rotation + 步进+1. 默认: 返回 1.
 @ 
@@ -18119,7 +18119,7 @@ LAB_08083e3a:
     cmp r1,r0                                @ 08083e64 8142
     beq LAB_08083e7a                         @ 08083e66 08d0
     b LAB_08083eca                           @ 08083e68 2fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083e6c:
     .word  0xfffc7fff                     @ 08083e6c ff7ffcff
 DWORD_08083e70:
@@ -18229,7 +18229,7 @@ LAB_08083f34:
     str r0,[r5,#0x0]                         @ 08083f34 2860
     movs r0,#0x0    @ 08083f36 0020
     b LAB_08083f46                           @ 08083f38 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083f3c:
     .word  gP1LifePoints                  @ 08083f3c e0c40102
 DWORD_08083f40:
@@ -18264,7 +18264,7 @@ tick_equip_activation_display_seq_a:
     cmp r0,#0x0                              @ 08083f64 0028
     beq LAB_08083f7a                         @ 08083f66 08d0
     b LAB_0808402c                           @ 08083f68 60e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08083f6c:
     .word  0x0201b290                     @ 08083f6c 90b20102
 LAB_08083f70:
@@ -18340,7 +18340,7 @@ LAB_08083fd4:
     ldr r0,[r1,#0x0]                         @ 08084000 0868
     adds r0,#0x1    @ 08084002 0130
     b LAB_08084020                           @ 08084004 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084008:
     .word  gP1LifePoints                  @ 08084008 e0c40102
 DWORD_0808400c:
@@ -18358,7 +18358,7 @@ LAB_08084020:
     str r0,[r1,#0x0]                         @ 08084020 0860
     movs r0,#0x0    @ 08084022 0020
     b LAB_0808402e                           @ 08084024 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084028:
     .word  0x0201b290                     @ 08084028 90b20102
 LAB_0808402c:
@@ -18368,7 +18368,7 @@ LAB_0808402e:
     pop {r4}                                 @ 08084030 10bc
     pop {r1}                                 @ 08084032 02bc
     bx r1                                    @ 08084034 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip LP score display sequence stepper. Driven by runtime function-pointer table; handles LP score display updates during equip activation.
 @ Reads gDuelCtx+0x4b0 step field: step <0 or >0xb returns 0 (skip); step 0 double loop (player[0..1] x slot[0..4]) calls invoke_effect_node_handler_3arg, on hit enqueues equip slot sprite and writes gDuelCtx+0x4b0=0xa; step 0xa reads effect slot type, computes LP value via eval_slot_score_entry_full, if nonzero calls set_lp_display_row_type19; step 0xb reads gP1LP+0x1da8 LP field multiplied by 0x64, enqueues via enqueue_sprite_attr_clamped.
@@ -18398,7 +18398,7 @@ tick_equip_lp_score_display_seq:
     cmp r0,#0xb                              @ 08084054 0b28
     beq LAB_080840f6                         @ 08084056 4ed0
     b LAB_08084136                           @ 08084058 6de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0808405c:
     .word  0x0201b290                     @ 0808405c 90b20102
 LAB_08084060:
@@ -18495,7 +18495,7 @@ LAB_080840f6:
     strh r4,[r6,#0xc]                        @ 08084110 b481
     movs r0,#0x1    @ 08084112 0120
     b LAB_08084138                           @ 08084114 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084118:
     .word  gP1LifePoints                  @ 08084118 e0c40102
 DWORD_0808411c:
@@ -18548,7 +18548,7 @@ LAB_0808415e:
 LAB_08084166:
     pop {r1}                                 @ 08084166 02bc
     bx r1                                    @ 08084168 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活确认状态 2 门控分派函数. 读取 card_slot[+0xc] halfword; 若等于 2 则调用 dispatch_equip_activation_display_by_confirm_state 并透传其返回值; 否则返回 1. 与 dispatch_equip_display_if_confirm_state_one (0x080833a8) 为同族 sibling, 差异仅在触发值 (1 vs 2).
 dispatch_equip_display_if_confirm_state_two:
@@ -18589,7 +18589,7 @@ LAB_080841a4:
     adds r1,r3,#0x0    @ 080841a6 191c
     bl dispatch_equip_activation_display_by_confirm_state @ 080841a8 fdf7f0fb
     b LAB_080841ba                           @ 080841ac 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080841b0:
     .word  0x00001503                     @ 080841b0 03150000
 DAT_080841b4:
@@ -18599,7 +18599,7 @@ LAB_080841b8:
 LAB_080841ba:
     pop {r1}                                 @ 080841ba 02bc
     bx r1                                    @ 080841bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Enqueues effect node sprites for both players. Double loop over player[0..1] x slot_idx[0..4]; for each (player, slot) calls invoke_effect_node_handler_3arg; on nonzero return extracts side/zone from card_slot[+2] and calls enqueue_sprite_attr_with_mode(mode=8). After both loops writes [card_slot_ptr+8]=1 (strh) as activation marker.
 @ Called from runtime function-pointer table (indeg=0 Sub-type A).
@@ -18702,7 +18702,7 @@ LAB_08084338:
     adds r0,r0,r1    @ 0808435c 4018
     str r6,[r0,#0x0]                         @ 0808435e 0660
     b LAB_080843ac                           @ 08084360 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084364:
     .word  0x0201e2a0                     @ 08084364 a0e20102
 DWORD_08084368:
@@ -18750,7 +18750,7 @@ LAB_080843ac:
     str r0,[r1,#0x0]                         @ 080843b8 0860
     movs r0,#0x0    @ 080843ba 0020
     b LAB_080843f0                           @ 080843bc 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080843c0:
     .word  0x00000199                     @ 080843c0 99010000
 DWORD_080843c4:
@@ -18947,7 +18947,7 @@ LAB_080844dc:
     ldr r0,[r5,#0x0]                         @ 0808452c 2868
     adds r0,#0x1    @ 0808452e 0130
     b LAB_08084578                           @ 08084530 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08084534:
     .word  0x00000868                     @ 08084534 68080000
 DAT_08084538:
@@ -18972,7 +18972,7 @@ LAB_08084540:
     adds r0,r4,#0x0    @ 0808455e 201c
     bl enqueue_equip_slot_sprite_with_code_rotation @ 08084560 fcf79cfb
     b LAB_08084588                           @ 08084564 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08084568:
     .word  gP1LifePoints                  @ 08084568 e0c40102
 DAT_0808456c:
@@ -18999,7 +18999,7 @@ LAB_0808458a:
     pop {r4,r5}                              @ 0808458c 30bc
     pop {r1}                                 @ 0808458e 02bc
     bx r1                                    @ 08084590 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 装备激活确认状态非零门控分派函数. 读取 card_slot[+0xc] halfword; 若等于 0 则直接返回 1 (跳过); 若非零则调用 dispatch_equip_activation_display_by_confirm_state 并透传其返回值. 与 dispatch_equip_display_if_confirm_state_one/two (0x080833a8/0x0808416c) 同族, 差异在于触发条件为任意非零值而非特定值.
 dispatch_equip_display_if_confirm_state_nonzero:
@@ -19049,7 +19049,7 @@ LAB_080845d6:
     pop {r4}                                 @ 080845d8 10bc
     pop {r1}                                 @ 080845da 02bc
     bx r1                                    @ 080845dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip LP bar display sequence advance function. Reads display_state_code from gDuelCtx+0x4b0, dispatches on [0,1,else]. state=0: clear card_slot[+4] flags (mask 0xfffc7fff) and [+6] bits[4:0]; extract player_id (byte[+2] bit0); call set_lp_row_type11_with_byte_flags(player_id, 1, 0xff); advance display_state+1, return 0. state=1: read gP1LifePoints+0x1daa LP bar slot halfword as lp_value; call enqueue_sprite_attr_with_xy_split(player_id, zone_idx, lp_value); push_to_effect_slot_array(lp_value); call set_lp_display_row_type15(player_id+lp_value, sentinel=0x171f); advance +1, return 0. other states: return 1. indeg=0: Sub-type A runtime fn-ptr dispatch.
 @ Side effects: [card_slot_ptr+4] &= 0xfffc7fff; [card_slot_ptr+6] bits[4:0] cleared; [gDuelCtx+0x4b0] := old+1; LP bar row data write via set_lp_row_type11_with_byte_flags/set_lp_display_row_type15.
@@ -19068,7 +19068,7 @@ advance_equip_lp_bar_display_seq:
     beq LAB_08084628                         @ 080845f4 18d0
     movs r0,#0x1    @ 080845f6 0120
     b LAB_08084660                           @ 080845f8 32e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080845fc:
     .word  0x0201b290                     @ 080845fc 90b20102
 LAB_08084600:
@@ -19088,7 +19088,7 @@ LAB_08084600:
     movs r2,#0xff    @ 0808461a ff22
     bl set_lp_row_type11_with_byte_flags     @ 0808461c 1df08afb
     b LAB_08084658                           @ 08084620 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084624:
     .word  0xfffc7fff                     @ 08084624 ff7ffcff
 LAB_08084628:
@@ -19122,7 +19122,7 @@ LAB_08084660:
     pop {r4,r5,r6,r7}                        @ 08084660 f0bc
     pop {r1}                                 @ 08084662 02bc
     bx r1                                    @ 08084664 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084668:
     .word  gP1LifePoints                  @ 08084668 e0c40102
 DWORD_0808466c:
@@ -19223,7 +19223,7 @@ LAB_08084724:
     pop {r4,r5,r6,r7}                        @ 08084728 f0bc
     pop {r1}                                 @ 0808472a 02bc
     bx r1                                    @ 0808472c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084730:
     .word  0x00000868                     @ 08084730 68080000
 DWORD_08084734:
@@ -19486,7 +19486,7 @@ LAB_08084d54:
 LAB_08084d56:
     pop {r1}                                 @ 08084d56 02bc
     bx r1                                    @ 08084d58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip activation display sequence stepper B. Symmetric to tick_equip_activation_display_seq_a (0x08083f4c) but uses different function-pointer arguments (0x080557e1/0x080554c5) for set_equip_activation_state_by_mode.
 @ Reads gDuelCtx+0x4b0 step field: step 0 triggers display_op31(op=0x7c) and sets activation state; step 2 triggers display_op31(op=0x64) and sets activation state; both advance step counter +1 and return 0; steps 1/3 check activation confirm state and enqueue equip sprite rotation; unmatched step returns 1.
@@ -19533,7 +19533,7 @@ LAB_08084d86:
     ldrh r1,[r4,#0x0]                        @ 08084d98 2188
     ldr r2, DWORD_08084da0                   @ 08084d9a 014a
     b LAB_08084dba                           @ 08084d9c 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084da0:
     .word  0x080557e1                     @ 08084da0 e1570508
 LAB_08084da4:
@@ -19580,7 +19580,7 @@ LAB_08084dcc:
     ldr r0,[r1,#0x0]                         @ 08084df8 0868
     adds r0,#0x1    @ 08084dfa 0130
     b LAB_08084e18                           @ 08084dfc 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084e00:
     .word  gP1LifePoints                  @ 08084e00 e0c40102
 DWORD_08084e04:
@@ -19598,7 +19598,7 @@ LAB_08084e18:
     str r0,[r1,#0x0]                         @ 08084e18 0860
     movs r0,#0x0    @ 08084e1a 0020
     b LAB_08084e26                           @ 08084e1c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084e20:
     .word  0x0201b290                     @ 08084e20 90b20102
 LAB_08084e24:
@@ -19641,7 +19641,7 @@ LAB_08084e68:
     pop {r4,r5}                              @ 08084e68 30bc
     pop {r1}                                 @ 08084e6a 02bc
     bx r1                                    @ 08084e6c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Polymerization equip display three-state stepper. Reads state (0/1/2) at IWRAM [0x0201b290+0x96*8]. State 0: calls check_equip_slot_eligible_polymerization_deck_pair_effect to validate whether the card meets the fusion-material pairing condition; if it fails (returns 0), jumps to the end branch and returns 1. State 1: passes through (effect_node, card_context) to tick_equip_slot_display_by_card_id_3state to advance the card-face display sub-state-machine, returning its result (Sub-case G passthrough). State 2: reads the player bit at [effect_node+2], calls find_deck_slot_by_card_pair_match to find the slot by fusion pairing in the deck, on a hit reads the slot attributes (palette/code) from the monster slot table and calls pack_equip_slot_sprite_with_code_attr twice to submit the sprite. The complete path returns 1. This card is Polymerization (icid 0x12e5).
 @ 
@@ -19669,7 +19669,7 @@ tick_equip_polymerization_display_3state:
     cmp r0,#0x0                              @ 08084e88 0028
     beq LAB_08084e9a                         @ 08084e8a 06d0
     b LAB_08084f2a                           @ 08084e8c 4de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084e90:
     .word  0x0201b290                     @ 08084e90 90b20102
 LAB_08084e94:
@@ -19748,7 +19748,7 @@ LAB_08084f2c:
     pop {r4,r5,r6,r7}                        @ 08084f2c f0bc
     pop {r1}                                 @ 08084f2e 02bc
     bx r1                                    @ 08084f30 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084f34:
     .word  0x000012e5                     @ 08084f34 e5120000
 DWORD_08084f38:
@@ -19837,7 +19837,7 @@ LAB_08084fb2:
     ldr r0,[r4,#0x0]                         @ 08084fc0 2068
     adds r0,#0x1    @ 08084fc2 0130
     b LAB_08085004                           @ 08084fc4 1ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084fc8:
     .word  0x08054899                     @ 08084fc8 99480508
 LAB_08084fcc:
@@ -19858,7 +19858,7 @@ LAB_08084fcc:
     adds r0,r6,#0x0    @ 08084fea 301c
     bl enqueue_equip_slot_sprite_with_code_rotation @ 08084fec fbf756fe
     b LAB_0808502c                           @ 08084ff0 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08084ff4:
     .word  gP1LifePoints                  @ 08084ff4 e0c40102
 DWORD_08084ff8:
@@ -19886,7 +19886,7 @@ LAB_0808500a:
     str r0,[r1,#0x0]                         @ 08085020 0860
     movs r0,#0x0    @ 08085022 0020
     b LAB_0808502e                           @ 08085024 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08085028:
     .word  0x0201b290                     @ 08085028 90b20102
 LAB_0808502c:
@@ -19975,7 +19975,7 @@ LAB_080850c8:
     pop {r4,r5,r6,r7}                        @ 080850c8 f0bc
     pop {r1}                                 @ 080850ca 02bc
     bx r1                                    @ 080850cc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080850d0:
     .word  0x0000194f                     @ 080850d0 4f190000
 DWORD_080850d4:

@@ -88,7 +88,7 @@ LAB_0802c2c0:
     pop {r4,r5,r6,r7}                        @ 0802c2e8 f0bc
     pop {r1}                                 @ 0802c2ea 02bc
     bx r1                                    @ 0802c2ec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c2f0:
     .word  0x00000c1c                     @ 0802c2f0 1c0c0000
 PTR_game_str_pointer_table_0802c2f4:
@@ -135,7 +135,7 @@ render_card_name_format_to_line:
     pop {r4,r5,r6}                           @ 0802c348 70bc
     pop {r1}                                 @ 0802c34a 02bc
     bx r1                                    @ 0802c34c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c350:
     .word  0x00008008                     @ 0802c350 08800000
 DAT_0802c354:
@@ -206,7 +206,7 @@ LAB_0802c3d0:
     ldr r0,[r0,#0x0]                         @ 0802c3d6 0068
 switchD_0802c3d8__switchD:
     .hword 0x4687    @ 0802c3d8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_game_str_pointer_table_0802c3dc:
     .word  game_str_pointer_table         @ 0802c3dc 400f0008
 DAT_0802c3e0:
@@ -331,7 +331,7 @@ switchD_0802c3d8__caseD_2714:
     ldr r0, DAT_0802c544                     @ 0802c530 0448
     adds r2,r2,r0    @ 0802c532 1218
     b LAB_0802c562                           @ 0802c534 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c538:
     .word  0x02000000                     @ 0802c538 00000002
 DAT_0802c53c:
@@ -390,7 +390,7 @@ LAB_0802c562:
     ldr r0, DAT_0802c5b8                     @ 0802c5a0 0548
     adds r2,r2,r0    @ 0802c5a2 1218
     b LAB_0802c5d6                           @ 0802c5a4 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c5a8:
     .word  0x09dcd97e                     @ 0802c5a8 7ed9dc09
 DAT_0802c5ac:
@@ -644,7 +644,7 @@ LAB_0802c744:
 LAB_0802c752:
     movs r7,#0x1    @ 0802c752 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c754 4be1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c758:
     .word  0x0201e2a0                     @ 0802c758 a0e20102
 switchD_0802c3d8__caseD_272c:
@@ -667,7 +667,7 @@ LAB_0802c76c:
 LAB_0802c77a:
     movs r7,#0x1    @ 0802c77a 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c77c 37e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c780:
     .word  0x0201e2a0                     @ 0802c780 a0e20102
 switchD_0802c3d8__caseD_272d:
@@ -707,7 +707,7 @@ switchD_0802c3d8__caseD_272f:
 LAB_0802c7c6:
     ldr r0, DAT_0802c7cc                     @ 0802c7c6 0148
     b LAB_0802c4d6                           @ 0802c7c8 85e6
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802c7cc:
     .word  0x00001f3f                     @ 0802c7cc 3f1f0000
 switchD_0802c3d8__caseD_2733:
@@ -943,7 +943,7 @@ switchD_0802c3d8__caseD_273c:
     bhi LAB_0802c9f4                         @ 0802c994 2ed8
     movs r7,#0x1    @ 0802c996 0127
     b LAB_0802c9f4                           @ 0802c998 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802c99c:
     .word  gP1LifePoints                  @ 0802c99c e0c40102
 DAT_0802c9a0:
@@ -1245,7 +1245,7 @@ init_jp_font_linebuf_for_render:
     bl zero_fill_by_halfword                 @ 0802cbea c8f043f9
     pop {r0}                                 @ 0802cbee 01bc
     bx r0                                    @ 0802cbf0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802cbf4:
     .word  0x02006ed0                     @ 0802cbf4 d06e0002
 DAT_0802cbf8:
@@ -1525,7 +1525,7 @@ LAB_0802cdee:
     ldr r4, DAT_0802ce34                     @ 0802ce1c 054c
     adds r3,r3,r4    @ 0802ce1e 1b19
     b LAB_0802ce52                           @ 0802ce20 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ce24:
     .word  0x09dcb012                     @ 0802ce24 12b0dc09
 DAT_0802ce28:
@@ -1633,7 +1633,7 @@ LAB_0802ceb6:
     ldr r4, DAT_0802cefc                     @ 0802cee4 054c
     adds r3,r3,r4    @ 0802cee6 1b19
     b LAB_0802cf1a                           @ 0802cee8 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ceec:
     .word  0x09dcb012                     @ 0802ceec 12b0dc09
 DAT_0802cef0:
@@ -1758,7 +1758,7 @@ LAB_0802cfc4:
 LAB_0802cfce:
     pop {r1}                                 @ 0802cfce 02bc
     bx r1                                    @ 0802cfd0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Fadeout-fadein state machine for scene blend transition. Reads phase_state from 0x02023360+0x118; phase 0: calls tick_scene_blend_fadeout_step; phase 1: calls tick_scene_blend_fadein_step; advances phase on completion. Always returns 0. r0=void. Caller: frame_counter-driven state machine hub. Constants: phase_state_addr=0x02023360+0x118.
 tick_scene_blend_fade_sequence:
@@ -1776,7 +1776,7 @@ tick_scene_blend_fade_sequence:
     beq LAB_0802d008                         @ 0802cfea 0dd0
     bl tick_scene_blend_fadein_step          @ 0802cfec fff7e2ff
     b LAB_0802d06c                           @ 0802cff0 3ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802cff4:
     .word  0x02023360                     @ 0802cff4 60330202
 LAB_0802cff8:
@@ -1801,7 +1801,7 @@ LAB_0802d008:
     adds r0,r5,#0x1    @ 0802d01c 681c
     strb r0,[r4,#0x0]                        @ 0802d01e 2070
     b LAB_0802d06a                           @ 0802d020 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_0802d024:
     .word  gPrng                          @ 0802d024 40000003
 LAB_0802d028:
@@ -1845,7 +1845,7 @@ LAB_0802d06c:
     pop {r4,r5}                              @ 0802d06c 30bc
     pop {r1}                                 @ 0802d06e 02bc
     bx r1                                    @ 0802d070 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ campaign_scene_handler step 20 VRAM init entry, called by run_campaign_step20_card_display_init (0x08026c88) before entering opponent card display screen. Sequence: reset DISPCNT and clear OBJ VRAM, call reset_display_and_obj_vram to clear OBJ tile region, call store_ewram_ctx_ptr_and_clear_mode_flags to set context pointer, write BG0-BG3 control regs (BG0CNT..BG3CNT), call reset_all_bg_scroll_regs_and_shadows, upload pack image and palette (upload_pack_vram_and_palette), zero_fill three BG tile regions (0x06004000/0x06010000 each 0x8000 bytes), copy palette rows, upload BG palette rows (9 rows), upload OBJ 4bpp tile rows (2 rows), upload tilemap rows, finally write 64 sequential tilemap index entries.
 @ 
@@ -2088,7 +2088,7 @@ init_opponent_card_bg_vram:
     pop {r4,r5,r6}                           @ 0802d238 70bc
     pop {r0}                                 @ 0802d23a 01bc
     bx r0                                    @ 0802d23c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_opponent_palettes_base_0802d240:
     .word  opponent_palettes_base         @ 0802d240 ac01b109
 PTR_opponent_top_tiles_base_0802d244:
@@ -2188,7 +2188,7 @@ init_pack_selection_tile_vram_default:
     pop {r4,r5,r6}                           @ 0802d2e0 70bc
     pop {r0}                                 @ 0802d2e2 01bc
     bx r0                                    @ 0802d2e4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d2e8:
     .word  0x09b97b28                     @ 0802d2e8 287bb909
 DWORD_0802d2ec:
@@ -2467,7 +2467,7 @@ init_duel_scroll_params:
     ands r0,r2    @ 0802d4ac 1040
     strb r0,[r1,#0x0]                        @ 0802d4ae 0870
     bx lr                                    @ 0802d4b0 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d4b4:
     .word  gPrng                          @ 0802d4b4 40000003
 DWORD_0802d4b8:
@@ -2789,7 +2789,7 @@ LAB_0802d6b6:
     adds r0,#0x1    @ 0802d6f4 0130
     strb r2,[r0,#0x0]                        @ 0802d6f6 0270
     b LAB_0802d71c                           @ 0802d6f8 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d6fc:
     .word  0x05000240                     @ 0802d6fc 40020005
 DWORD_0802d700:
@@ -2822,7 +2822,7 @@ LAB_0802d71c:
     str r0,[r1,#0x4]                         @ 0802d734 4860
     movs r5,#0x5    @ 0802d736 0525
     b LAB_0802d766                           @ 0802d738 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d73c:
     .word  0x02006ed0                     @ 0802d73c d06e0002
 DWORD_0802d740:
@@ -2892,7 +2892,7 @@ LAB_0802d766:
     str r0,[r4,#0x4]                         @ 0802d7c8 6060
     movs r5,#0x5    @ 0802d7ca 0525
     b LAB_0802d7fc                           @ 0802d7cc 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d7d0:
     .word  0x00008002                     @ 0802d7d0 02800000
 DWORD_0802d7d4:
@@ -2936,7 +2936,7 @@ LAB_0802d7fc:
     .hword 0x4653    @ 0802d822 5346
     bl text_render_wrapper                   @ 0802d824 c5f02af9
     b LAB_0802d91a                           @ 0802d828 77e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d82c:
     .word  font_jp_base_table             @ 0802d82c 54f8e509
 DWORD_0802d830:
@@ -3009,7 +3009,7 @@ LAB_0802d87e:
     ldr r0,[r0,#0x0]                         @ 0802d8b8 0068
     str r0,[r1,#0x4]                         @ 0802d8ba 4860
     b LAB_0802d8ec                           @ 0802d8bc 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802d8c0:
     .word  0x00008001                     @ 0802d8c0 01800000
 DWORD_0802d8c4:
@@ -3506,7 +3506,7 @@ LAB_0802dc36:
     cmp r2,#0x1                              @ 0802dc6c 012a
     ble LAB_0802db8a                         @ 0802dc6e 8cdd
     b switchD_0802db62__default              @ 0802dc70 89e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802dc74:
     .word  0x02023360                     @ 0802dc74 60330202
 DAT_0802dc78:
@@ -3668,7 +3668,7 @@ switchD_0802db62__default:
     pop {r4,r5,r6,r7}                        @ 0802ddc0 f0bc
     pop {r0}                                 @ 0802ddc2 01bc
     bx r0                                    @ 0802ddc4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ddc8:
     .word  0x02023360                     @ 0802ddc8 60330202
 DAT_0802ddcc:
@@ -4095,7 +4095,7 @@ LAB_0802e09e:
     pop {r4,r5,r6,r7}                        @ 0802e0dc f0bc
     pop {r0}                                 @ 0802e0de 01bc
     bx r0                                    @ 0802e0e0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802e0e4:
     .word  0x02023360                     @ 0802e0e4 60330202
 DAT_0802e0e8:
@@ -4154,7 +4154,7 @@ LAB_0802e130:
     cmp r0,#0x0                              @ 0802e13c 0028
     beq LAB_0802e16a                         @ 0802e13e 14d0
     b LAB_0802e8e0                           @ 0802e140 cee3
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e144:
     .word  0x02023360                     @ 0802e144 60330202
 LAB_0802e148:
@@ -4213,7 +4213,7 @@ LAB_0802e16a:
 LAB_0802e1a2:
     movs r0,#0x0    @ 0802e1a2 0020
     b LAB_0802e90e                           @ 0802e1a4 b3e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e1a8:
     .word  0x09e59dc4                     @ 0802e1a8 c49de509
 DWORD_0802e1ac:
@@ -4318,7 +4318,7 @@ LAB_0802e3c8:
     strb r0,[r5,#0x0]                        @ 0802e416 2870
     bl invoke_build_campaign_sprite_row_type5 @ 0802e418 f9f70efd
     b LAB_0802e430                           @ 0802e41c 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e420:
     .word  gPrng                          @ 0802e420 40000003
 DWORD_0802e424:
@@ -4355,7 +4355,7 @@ LAB_0802e430:
     ldrb r4,[r3,#0x0]                        @ 0802e460 1c78
     ands r0,r4    @ 0802e462 2040
     b LAB_0802e512                           @ 0802e464 55e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e468:
     .word  0x02023360                     @ 0802e468 60330202
 LAB_0802e46c:
@@ -4370,7 +4370,7 @@ LAB_0802e46c:
     cmp r0,#0x4                              @ 0802e47c 0428
     beq LAB_0802e4ba                         @ 0802e47e 1cd0
     b LAB_0802e1a2                           @ 0802e480 8fe6
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e484:
     .word  0x02023360                     @ 0802e484 60330202
 LAB_0802e488:
@@ -4465,7 +4465,7 @@ LAB_0802e524:
     adds r0,r0,r1    @ 0802e528 4018
     ldr r0,[r0,#0x0]                         @ 0802e52a 0068
     .hword 0x4687    @ 0802e52c 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_PTR_0802e530:
     .word  0x0802e534                     @ 0802e530 34e50208
 PTR_DAT_0802e534:
@@ -4612,7 +4612,7 @@ LAB_0802e75a:
     orrs r0,r1    @ 0802e798 0843
     strh r0,[r3,#0x0]                        @ 0802e79a 1880
     b LAB_0802e1a2                           @ 0802e79c 01e5
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e7a0:
     .word  0x02023360                     @ 0802e7a0 60330202
 DWORD_0802e7a4:
@@ -4666,7 +4666,7 @@ LAB_0802e7c0:
     orrs r0,r1    @ 0802e800 0843
     strb r0,[r4,#0x0]                        @ 0802e802 2070
     b LAB_0802e1a2                           @ 0802e804 cde4
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e808:
     .word  0x00680068                     @ 0802e808 68006800
 DWORD_0802e80c:
@@ -4729,7 +4729,7 @@ LAB_0802e848:
     orrs r0,r1    @ 0802e878 0843
     str r0,[r3,#0x40]                        @ 0802e87a 1864
     b LAB_0802e1a2                           @ 0802e87c 91e4
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e880:
     .word  0x02023360                     @ 0802e880 60330202
 DWORD_0802e884:
@@ -4776,7 +4776,7 @@ LAB_0802e88c:
     orrs r0,r1    @ 0802e8d4 0843
     strb r0,[r4,#0x0]                        @ 0802e8d6 2070
     b LAB_0802e1a2                           @ 0802e8d8 63e4
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0802e8dc:
     .word  0xfffffe03                     @ 0802e8dc 03feffff
 LAB_0802e8e0:
@@ -4858,7 +4858,7 @@ LAB_0802e94c:
 LAB_0802e956:
     pop {r1}                                 @ 0802e956 02bc
     bx r1                                    @ 0802e958 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Pure-read equip chain head locator. Called by FUN_0802eac8 and FUN_0802eb3c. No APCS parameters; entry movs r2,#1 is internal counter init. Iterates gP1LifePoints+0x14ea byte field in 8-byte strides, checking bit4 of each entry byte (lsls #0x1c). Returns 1-based index of first entry with bit4=1. Returns 1 if no match found.
 @ 
@@ -4883,7 +4883,7 @@ LAB_0802e96e:
 LAB_0802e97a:
     adds r0,r2,#0x0    @ 0802e97a 101c
     bx lr                                    @ 0802e97c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802e980:
     .word  gP1LifePoints                  @ 0802e980 e0c40102
 DAT_0802e984:
@@ -5190,7 +5190,7 @@ LAB_0802eb72:
     pop {r4,r5,r6,r7}                        @ 0802eb84 f0bc
     pop {r0}                                 @ 0802eb86 01bc
     bx r0                                    @ 0802eb88 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802eb8c:
     .word  0x0201d9c0                     @ 0802eb8c c0d90102
 DAT_0802eb90:
@@ -5220,7 +5220,7 @@ LAB_0802ebb0:
     pop {r4,r5}                              @ 0802ebb0 30bc
     pop {r0}                                 @ 0802ebb2 01bc
     bx r0                                    @ 0802ebb4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ebb8:
     .word  0x0201d9c0                     @ 0802ebb8 c0d90102
 
@@ -5360,7 +5360,7 @@ LAB_0802ec74:
     pop {r4,r5,r6,r7}                        @ 0802ec74 f0bc
     pop {r0}                                 @ 0802ec76 01bc
     bx r0                                    @ 0802ec78 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ec7c:
     .word  0x0201d9c0                     @ 0802ec7c c0d90102
 
@@ -5565,7 +5565,7 @@ LAB_0802eddc:
     pop {r4}                                 @ 0802eddc 10bc
     pop {r0}                                 @ 0802edde 01bc
     bx r0                                    @ 0802ede0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802ede4:
     .word  gP1LifePoints                  @ 0802ede4 e0c40102
 DAT_0802ede8:
@@ -5637,7 +5637,7 @@ LAB_0802ee3c:
     adds r0,r3,#0x0    @ 0802ee4e 181c
     bl replace_slot_chain_ref_by_id          @ 0802ee50 fff79afd
     b LAB_0802ee8c                           @ 0802ee54 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ee58:
     .word  0x00000868                     @ 0802ee58 68080000
 DAT_0802ee5c:
@@ -5797,7 +5797,7 @@ LAB_0802ef60:
     pop {r4,r5,r6,r7}                        @ 0802ef74 f0bc
     pop {r0}                                 @ 0802ef76 01bc
     bx r0                                    @ 0802ef78 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802ef7c:
     .word  0x00001561                     @ 0802ef7c 61150000
 DAT_0802ef80:
@@ -5862,7 +5862,7 @@ LAB_0802efc2:
     cmp r0,#0x2                              @ 0802efdc 0228
     blt LAB_0802effa                         @ 0802efde 0cdb
     b LAB_0802eff4                           @ 0802efe0 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802efe4:
     .word  0x00000868                     @ 0802efe4 68080000
 DAT_0802efe8:
@@ -5905,7 +5905,7 @@ LAB_0802f000:
     beq LAB_0802f054                         @ 0802f02c 12d0
     ldr r0, DAT_0802f044                     @ 0802f02e 0548
     b LAB_0802f04a                           @ 0802f030 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f034:
     .word  0x00000868                     @ 0802f034 68080000
 DAT_0802f038:
@@ -6156,7 +6156,7 @@ LAB_0802f1ce:
     pop {r4,r5,r6,r7}                        @ 0802f1e4 f0bc
     pop {r0}                                 @ 0802f1e6 01bc
     bx r0                                    @ 0802f1e8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f1ec:
     .word  0x0201c510                     @ 0802f1ec 10c50102
 DAT_0802f1f0:
@@ -6226,7 +6226,7 @@ LAB_0802f262:
     pop {r4,r5,r6,r7}                        @ 0802f264 f0bc
     pop {r1}                                 @ 0802f266 02bc
     bx r1                                    @ 0802f268 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f26c:
     .word  0x00000868                     @ 0802f26c 68080000
 DAT_0802f270:
@@ -6383,7 +6383,7 @@ LAB_0802f380:
     pop {r4,r5,r6,r7}                        @ 0802f38c f0bc
     pop {r1}                                 @ 0802f38e 02bc
     bx r1                                    @ 0802f390 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zero-flags wrapper around count_zone_chain_eligible_cards. Pushes 0 as sp[0] (fieldspell_eligible=0, disables extended eligibility filters), forwards r0/r1/r2 (player_side/slot_idx/filter_value) and r3=0. Used when only simple chain traversal is needed without extra eligibility checks. Sibling FUN_0802f3a8 passes real eligibility flags computed from check_slot_card_effect_eligibility+check_slot_card_fieldspell_eligibility. r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u16 filter_value. Returns u32 match_count (0=no match). Constants: inherited from count_zone_chain_eligible_cards.
 count_equip_chain_default_flags:
@@ -6395,7 +6395,7 @@ count_equip_chain_default_flags:
     add sp,#0x4                              @ 0802f3a0 01b0
     pop {r1}                                 @ 0802f3a2 02bc
     bx r1                                    @ 0802f3a4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Wrapper around count_zone_chain_eligible_cards that dynamically computes both eligibility flags. Flow: bl check_slot_card_effect_eligibility(r0,r1)->r6; bl check_slot_card_fieldspell_eligibility(r0,r1)->sp[0]; bl count_zone_chain_eligible_cards(player, slot, r8, r6, sp[0]). r0: player_side [0..1]; r1: slot_idx [0..4]; r8 (non-APCS, caller-set): filter_value. Returns r0=match_count [0..chain_len].
 query_zone_chain_count_with_eligibility:
@@ -6423,7 +6423,7 @@ query_zone_chain_count_with_eligibility:
     pop {r4,r5,r6}                           @ 0802f3d8 70bc
     pop {r1}                                 @ 0802f3da 02bc
     bx r1                                    @ 0802f3dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Selects path based on card_id (r2) field6 value: field6==0x17 (Union type) -> computes player_side XOR r3 nonzero as r2 flag, calls check_slot_fieldspell_eligible_by_side(r0, r1, r2); other field6 -> computes r2 flag similarly, calls query_slot_effect_eligibility_nonzero(r0, r1, r2). If above result==0 -> calls count_slot_equip_list_matches(r0, r1, card_id, r3) and returns equip count. indeg=3. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; r2=u32 card_id; r3=u32 filter_value. Returns u32 count_or_flag. Constants: field6_union_type=0x17.
 query_slot_effect_eligibility_with_equip_fallback:
@@ -6677,7 +6677,7 @@ LAB_0802f5a8:
     pop {r4,r5,r6}                           @ 0802f5a8 70bc
     pop {r1}                                 @ 0802f5aa 02bc
     bx r1                                    @ 0802f5ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ In the equip chain of slot (r0 bit0=player_side, r1=slot_idx), find a node that matches r2=ref_player and r3=ref_slot. Flow: read gDuelFieldSlots[player][slot]+0xa = chain_head_index; return 0 if chain empty. Traverse gDuelNodePool (0x0201d9c0, stride 8): [node+0]=byte(ref_player), [node+0 high>>8]=byte(ref_slot), [node+2]&0xF=zone_type <= 5 (valid zone). Hit: return packed(zone_type<<28 | zone_idx<<16); end of chain: return 0. Caller FUN_0802f680 calls this for all 2x11 slots to find a paired node. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, player_stride=0x868, slot_entry_size=0x14, chain_head_offset=0xa, node_stride=8, zone_type_max=5.
 find_equip_chain_node_by_slot_pair:
@@ -6738,7 +6738,7 @@ LAB_0802f610:
     pop {r4,r5,r6}                           @ 0802f610 70bc
     pop {r1}                                 @ 0802f612 02bc
     bx r1                                    @ 0802f614 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f618:
     .word  0x000014b0                     @ 0802f618 b0140000
 
@@ -6790,7 +6790,7 @@ LAB_0802f660:
     pop {r4,r5,r6,r7}                        @ 0802f670 f0bc
     pop {r1}                                 @ 0802f672 02bc
     bx r1                                    @ 0802f674 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f678:
     .word  0x00000868                     @ 0802f678 68080000
 DAT_0802f67c:
@@ -6897,7 +6897,7 @@ LAB_0802f704:
     ldrb r3,[r3,#0x0]                        @ 0802f72c 1b78
     orrs r0,r3    @ 0802f72e 1843
     b LAB_0802f758                           @ 0802f730 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f734:
     .word  0x0201bc54                     @ 0802f734 54bc0102
 DAT_0802f738:
@@ -6925,7 +6925,7 @@ LAB_0802f758:
     pop {r4,r5,r6,r7}                        @ 0802f75c f0bc
     pop {r1}                                 @ 0802f75e 02bc
     bx r1                                    @ 0802f760 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f764:
     .word  0x0000ffff                     @ 0802f764 ffff0000
 
@@ -7023,7 +7023,7 @@ LAB_0802f80c:
     pop {r4,r5,r6,r7}                        @ 0802f810 f0bc
     pop {r1}                                 @ 0802f812 02bc
     bx r1                                    @ 0802f814 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f818:
     .word  0x0000ffff                     @ 0802f818 ffff0000
 
@@ -7103,7 +7103,7 @@ LAB_0802f84a:
     bne LAB_0802f8c0                         @ 0802f8a8 0ad1
     adds r0,r5,#0x0    @ 0802f8aa 281c
     b LAB_0802f8c8                           @ 0802f8ac 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f8b0:
     .word  0x00000868                     @ 0802f8b0 68080000
 DAT_0802f8b4:
@@ -7158,7 +7158,7 @@ LAB_0802f8fa:
     bne LAB_0802f91c                         @ 0802f908 08d1
     ldrh r0,[r1,#0x0]                        @ 0802f90a 0888
     b LAB_0802f924                           @ 0802f90c 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f910:
     .word  0x00000868                     @ 0802f910 68080000
 DAT_0802f914:
@@ -7175,7 +7175,7 @@ LAB_0802f924:
     pop {r4,r5}                              @ 0802f924 30bc
     pop {r1}                                 @ 0802f926 02bc
     bx r1                                    @ 0802f928 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802f92c:
     .word  0x0000ffff                     @ 0802f92c ffff0000
 
@@ -7389,7 +7389,7 @@ build_equip_chain_slot_entry:
     cmp r0,#0xd                              @ 0802faa8 0d28
     beq LAB_0802fac4                         @ 0802faaa 0bd0
     b LAB_0802fad0                           @ 0802faac 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fab0:
     .word  0x00000868                     @ 0802fab0 68080000
 DAT_0802fab4:
@@ -7448,7 +7448,7 @@ LAB_0802fafc:
     bne LAB_0802fb1c                         @ 0802fb10 04d1
     adds r0,r2,#0x0    @ 0802fb12 101c
     b LAB_0802fb24                           @ 0802fb14 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fb18:
     .word  0x0201d9c0                     @ 0802fb18 c0d90102
 LAB_0802fb1c:
@@ -7461,7 +7461,7 @@ LAB_0802fb24:
     pop {r4,r5}                              @ 0802fb24 30bc
     pop {r1}                                 @ 0802fb26 02bc
     bx r1                                    @ 0802fb28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Traverses EWRAM node pool (0x0201d9c0, stride 8 bytes) via linked list, returning first node ptr where [node+0]==value (r1) and [node+2]&0xF==zone_type (r2, [0..5]). r0=u32 head_index [1..139] (0=empty list -> return NULL). Node layout: [+0]=u16 value, [+2]=type_byte (low 4 bits=zone_type), [+6]=u16 next_index, stride 8. Returns u32* node pointer or NULL (0) if not found. Leaf function (no callees). Callers: check_node_in_slot_chain (FUN_0802fdc0), FUN_0802fe98, FUN_0802ff34, FUN_0802ff84. Constants: 0x0201d9c0=node pool base, NODE_STRIDE=8, ZONE_TYPE_MAX=5.
 find_node_by_value_and_zone_type:
@@ -7500,7 +7500,7 @@ LAB_0802fb64:
     pop {r4,r5,r6}                           @ 0802fb64 70bc
     pop {r1}                                 @ 0802fb66 02bc
     bx r1                                    @ 0802fb68 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Traverses gDuelNodePool (0x0201d9c0, stride=8) from head_index, returning the first node where [node+0](u16)==r1(card_id), [node+2]&0xF(zone_type) in [1..2], [node+2]&0xF0==0 (upper flags clear), and if r2>=0 then [node+4](u16 entity_id)==r2. r2<0 acts as wildcard (skip entity_id check). r0=u16 head_index [0..139]; r1=u16 card_id; r2=s32 entity_id (-1=wildcard). Returns u32* matching node ptr, or 0 (NULL) if not found. Read-only leaf. indeg=3. Constants: gDuelNodePool=0x0201d9c0, node_stride=8, zone_type_range=[1..2], flag_mask=0xF0.
 find_node_by_value_zone_entity:
@@ -7548,7 +7548,7 @@ LAB_0802fbb4:
     pop {r4,r5}                              @ 0802fbb4 30bc
     pop {r1}                                 @ 0802fbb6 02bc
     bx r1                                    @ 0802fbb8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Traverse gDuelNodePool from head_index (r0) counting nodes where card_id (node[+0] low 13 bits) == r1 (target_card_id) and zone_type<=5. r0: head_index [0..139]; r1: target_card_id [0..0x19b7]. Returns u32 match_count. Constants: gDuelNodePool=0x0201d9c0, node_stride=8, zone_type_mask=0xf, zone_type_max=5.
 count_chain_nodes_by_card_id:
@@ -7580,7 +7580,7 @@ LAB_0802fbe6:
     pop {r4,r5,r6}                           @ 0802fbe8 70bc
     pop {r1}                                 @ 0802fbea 02bc
     bx r1                                    @ 0802fbec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fbf0:
     .word  0x0201d9c0                     @ 0802fbf0 c0d90102
 
@@ -7618,7 +7618,7 @@ LAB_0802fc26:
     pop {r4,r5,r6,r7}                        @ 0802fc28 f0bc
     pop {r1}                                 @ 0802fc2a 02bc
     bx r1                                    @ 0802fc2c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fc30:
     .word  0x0201d9c0                     @ 0802fc30 c0d90102
 
@@ -7640,7 +7640,7 @@ count_slot_chain_nodes_by_card_id:
     bl count_chain_nodes_by_card_id          @ 0802fc4e fff7b5ff
     pop {r1}                                 @ 0802fc52 02bc
     bx r1                                    @ 0802fc54 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fc58:
     .word  0x00000868                     @ 0802fc58 68080000
 DAT_0802fc5c:
@@ -7666,7 +7666,7 @@ count_slot_chain_nodes_by_card_id_and_type:
     pop {r4}                                 @ 0802fc80 10bc
     pop {r1}                                 @ 0802fc82 02bc
     bx r1                                    @ 0802fc84 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fc88:
     .word  0x00000868                     @ 0802fc88 68080000
 DAT_0802fc8c:
@@ -7730,7 +7730,7 @@ LAB_0802fcf0:
     pop {r4,r5}                              @ 0802fcf0 30bc
     pop {r1}                                 @ 0802fcf2 02bc
     bx r1                                    @ 0802fcf4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fcf8:
     .word  0x0201bb90                     @ 0802fcf8 90bb0102
 DAT_0802fcfc:
@@ -7789,7 +7789,7 @@ LAB_0802fd58:
     pop {r4,r5,r6,r7}                        @ 0802fd58 f0bc
     pop {r1}                                 @ 0802fd5a 02bc
     bx r1                                    @ 0802fd5c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Searches the slot chain for a node matching effect_code ([node+0]==r2), entity_id ([node+4]==r3), and valid zone_type ([node+2]&0xF<=5). Player slot address: 0x0201c510 + (r0 bit0)*0x868 + r1*20; [slot+0xa]=chain head index. Node pool: EWRAM 0x0201d9c0, stride 8 bytes. Returns 1 if found, 0 if not. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 effect_code, r3=u16 entity_id. Callers: FUN_08033730 (duel_field effect activation check); get_zone_card_attribute_by_type case_d (slot 0xb effect presence check). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
 find_effect_node_in_zone:
@@ -7827,7 +7827,7 @@ LAB_0802fd82:
     bne LAB_0802fdb0                         @ 0802fd9c 08d1
     movs r0,#0x1    @ 0802fd9e 0120
     b LAB_0802fdb8                           @ 0802fda0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fda4:
     .word  0x00000868                     @ 0802fda4 68080000
 DAT_0802fda8:
@@ -7844,7 +7844,7 @@ LAB_0802fdb8:
     pop {r4,r5,r6}                           @ 0802fdb8 70bc
     pop {r1}                                 @ 0802fdba 02bc
     bx r1                                    @ 0802fdbc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Computes slot entry address (0x0201c510 + (r0 bit0)*0x868 + r1*20), reads [slot+0xa] chain head index, then calls find_node_by_value_and_zone_type with r2=value and r3=zone_type to search EWRAM node pool (0x0201d9c0). Returns 1 if matching node found, 0 otherwise. Simplified variant of find_effect_node_in_zone (FUN_0802fd60) -- that function additionally checks [node+4]==entity_id; this one only does dual-field match. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 card_id, r3=u8 zone_type [0..5]. Returns u32 bool. Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
 check_node_in_slot_chain:
@@ -7900,7 +7900,7 @@ check_slot_has_node_by_card_id:
 LAB_0802fe1e:
     pop {r1}                                 @ 0802fe1e 02bc
     bx r1                                    @ 0802fe20 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fe24:
     .word  0x00000868                     @ 0802fe24 68080000
 DAT_0802fe28:
@@ -7963,7 +7963,7 @@ get_node_entity_id_in_slot:
     beq LAB_0802fe90                         @ 0802fe80 06d0
     ldrh r0,[r0,#0x4]                        @ 0802fe82 8088
     b LAB_0802fe94                           @ 0802fe84 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0802fe88:
     .word  0x00000868                     @ 0802fe88 68080000
 DAT_0802fe8c:
@@ -8007,7 +8007,7 @@ LAB_0802fecc:
     pop {r4}                                 @ 0802fecc 10bc
     pop {r1}                                 @ 0802fece 02bc
     bx r1                                    @ 0802fed0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 由 scan_equip_zone_for_entity_sprite_and_activation (0x0809f538) 及 duel_field 函数 FUN_0809bfd4 调用, 用于在给定玩家/槽类型/区域 ID 下查找链节点并返回 entity hword, 未命中返回 -1. 入口: bit0 of r0 -> r3 (player), r1=slot_type, r2=zone_id. 计算 slot_struct_addr = 0x0201c510 + slot_type*20*4 + player*0x868; 读取 [struct+0xa] hword; 以 zone_entity_flag=-1 调用 find_node_by_value_zone_entity(hword, zone_id, -1); 命中返回 [node+4] hword, 未命中返回 r4=-1. Side effects: 无外部写入. Constants: chain_base=0x0201c510, player_stride=0x868, miss_sentinel=-1.
 get_zone_node_entity_hword_or_miss:
@@ -8108,7 +8108,7 @@ get_entity_id_in_zone_idx_chain:
     beq LAB_0802ff7c                         @ 0802ff6c 06d0
     ldrh r0,[r0,#0x4]                        @ 0802ff6e 8088
     b LAB_0802ff80                           @ 0802ff70 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802ff74:
     .word  gP1LifePoints                  @ 0802ff74 e0c40102
 DAT_0802ff78:
@@ -8138,7 +8138,7 @@ get_entity_id_in_zone_idx_chain_by_type:
     beq LAB_0802ffa8                         @ 0802ff98 06d0
     ldrh r0,[r0,#0x4]                        @ 0802ff9a 8088
     b LAB_0802ffac                           @ 0802ff9c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802ffa0:
     .word  gP1LifePoints                  @ 0802ffa0 e0c40102
 DAT_0802ffa4:
@@ -8167,7 +8167,7 @@ count_chain_by_card_id_in_zone_idx:
     bl count_chain_nodes_by_card_id          @ 0802ffbe fff7fdfd
     pop {r1}                                 @ 0802ffc2 02bc
     bx r1                                    @ 0802ffc4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802ffc8:
     .word  gP1LifePoints                  @ 0802ffc8 e0c40102
 DAT_0802ffcc:
@@ -8190,7 +8190,7 @@ count_chain_by_card_id_and_type_in_zone_idx:
     bl count_chain_nodes_by_card_id_and_type @ 0802ffde fff709fe
     pop {r1}                                 @ 0802ffe2 02bc
     bx r1                                    @ 0802ffe4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0802ffe8:
     .word  gP1LifePoints                  @ 0802ffe8 e0c40102
 DAT_0802ffec:
@@ -8292,7 +8292,7 @@ LAB_08030094:
     pop {r4,r5,r6,r7}                        @ 08030094 f0bc
     pop {r1}                                 @ 08030096 02bc
     bx r1                                    @ 08030098 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zone-slot chain node finder: reads [r0+0xa] chain head, then scans node pool @0x0201d9c0 (stride 8) calling FUN_0810e5e4(node, r6=cmp_key) on each, returns first matching node pointer. Empty chain or no hit returns 0. r0=ptr<DuelFieldSlot> slot_ptr; r1=u32 r7_payload (callee-save alias unused in body); r2=u32 cmp_key -> r6 (forwarded to FUN_0810e5e4 r1). Returns ptr<Node> on hit, 0 on miss. Single caller FUN_0804559c (duel_field, batch). No side effects, pure read of node pool + chain head. Constants: NODE_POOL=0x0201d9c0, chain_head_offset=0xa, node_stride=8.
 find_zone_node_by_card_id_match:
@@ -8326,7 +8326,7 @@ LAB_080300cc:
     pop {r4,r5,r6,r7}                        @ 080300cc f0bc
     pop {r1}                                 @ 080300ce 02bc
     bx r1                                    @ 080300d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zone slot special state checker by field5 dispatch: reads card_record [r0+2] low 4 bits (field5) and dispatches: field5 in [6..9] checks gDuelFieldSlots active_bit at slot[+0]&0x10000; field5 in [0xa..0xd] does card_id table-match on 0x14b2/0x1243/0x1103/0x137d/0x17b7/0x14fc/0x16a2/0x184b followed by gP1LifePoints+0x40 bit5 check. r0=ptr<CardEntry> (reads [+0]=card_id, [+2] low 4=field5); r1=u32 r6_payload (returned on hit at LAB_080301cc as fallback value). Returns u32 (0=miss, 1=hit with non-branch return, r6=branch hit return). Callers: FUN_0804659c, FUN_08046bd0 (duel_field, batch). No side effects, reads gDuelFieldSlots@0x0201c510 + gP1LifePoints+0x40 only. Constants: gDuelFieldSlots=0x0201c510, BIT5_MASK=0x20, FIELD5_RANGE_A=[6..9], FIELD5_RANGE_B=[0xa..0xd].
 check_zone_card_special_state_by_field5:
@@ -8397,7 +8397,7 @@ LAB_0803011c:
     cmp r1,r0                                @ 0803014c 8142
     beq LAB_080301ac                         @ 0803014e 2dd0
     b LAB_080301f6                           @ 08030150 51e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030154:
     .word  0x00000868                     @ 08030154 68080000
 DAT_08030158:
@@ -8414,7 +8414,7 @@ LAB_08030168:
     beq LAB_080301ac                         @ 0803016c 1ed0
     adds r0,#0x73    @ 0803016e 7330
     b LAB_080301a0                           @ 08030170 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030174:
     .word  0x0000137d                     @ 08030174 7d130000
 LAB_08030178:
@@ -8443,7 +8443,7 @@ LAB_080301a0:
     cmp r1,r0                                @ 080301a0 8142
     beq LAB_080301d8                         @ 080301a2 19d0
     b LAB_080301f6                           @ 080301a4 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080301a8:
     .word  0x0000184b                     @ 080301a8 4b180000
 LAB_080301ac:
@@ -8464,7 +8464,7 @@ LAB_080301ac:
     bne LAB_080301f6                         @ 080301c8 15d1
     adds r0,r6,#0x0    @ 080301ca 301c
     b LAB_080301f8                           @ 080301cc 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080301d0:
     .word  gP1LifePoints                  @ 080301d0 e0c40102
 DAT_080301d4:
@@ -8491,7 +8491,7 @@ LAB_080301f8:
     pop {r4,r5,r6}                           @ 080301f8 70bc
     pop {r1}                                 @ 080301fa 02bc
     bx r1                                    @ 080301fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08030200:
     .word  gP1LifePoints                  @ 08030200 e0c40102
 DAT_08030204:
@@ -8540,7 +8540,7 @@ count_set_bits_in_word:
     adds r2,r1,r0    @ 08030240 0a18
     adds r0,r2,#0x0    @ 08030242 101c
     bx lr                                    @ 08030244 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030248:
     .word  0xaaaaaaaa                     @ 08030248 aaaaaaaa
 DAT_0803024c:
@@ -8686,7 +8686,7 @@ LAB_08030342:
 LAB_0803034e:
     adds r0,#0x7    @ 0803034e 0730
     b LAB_08030420                           @ 08030350 66e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030354:
     .word  0x00001409                     @ 08030354 09140000
 DAT_08030358:
@@ -8717,7 +8717,7 @@ LAB_0803037a:
     b switchD_080302ee__caseD_11             @ 0803037e bbe0
 LAB_08030380:
     b LAB_080304f0                           @ 08030380 b6e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030384:
     .word  0x00001330                     @ 08030384 30130000
 LAB_08030388:
@@ -8815,7 +8815,7 @@ LAB_08030420:
     cmp r4,r0                                @ 08030420 8442
     beq LAB_080304f0                         @ 08030422 65d0
     b switchD_080302ee__caseD_11             @ 08030424 68e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030428:
     .word  0x0000192d                     @ 08030428 2d190000
 LAB_0803042c:
@@ -8846,7 +8846,7 @@ LAB_08030450:
     bgt LAB_08030464                         @ 08030458 04dc
     subs r0,#0x8a    @ 0803045a 8a38
     b LAB_08030420                           @ 0803045c e0e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030460:
     .word  0x0000195e                     @ 08030460 5e190000
 LAB_08030464:
@@ -8864,7 +8864,7 @@ switchD_080302ee__caseD_d:
     bgt switchD_080302ee__caseD_11           @ 08030478 3edc
     subs r0,#0x2    @ 0803047a 0238
     b LAB_0803037a                           @ 0803047c 7de7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030480:
     .word  0x000013a7                     @ 08030480 a7130000
 DAT_08030484:
@@ -8877,7 +8877,7 @@ LAB_08030488:
     bgt LAB_080304a0                         @ 08030490 06dc
     ldr r0, DAT_0803049c                     @ 08030492 0248
     b LAB_08030420                           @ 08030494 c4e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030498:
     .word  0x00001853                     @ 08030498 53180000
 DAT_0803049c:
@@ -8915,7 +8915,7 @@ LAB_080304d0:
     beq LAB_080304f0                         @ 080304d4 0cd0
     ldr r0, DAT_080304e0                     @ 080304d6 0248
     b LAB_080304ec                           @ 080304d8 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080304dc:
     .word  0x000017ca                     @ 080304dc ca170000
 DAT_080304e0:
@@ -8985,7 +8985,7 @@ LAB_08030542:
     bgt LAB_0803055c                         @ 08030544 0adc
     subs r0,#0x8c    @ 08030546 8c38
     b LAB_08030772                           @ 08030548 13e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803054c:
     .word  0x000015f1                     @ 0803054c f1150000
 DAT_08030550:
@@ -9028,7 +9028,7 @@ LAB_08030588:
     b LAB_08030866                           @ 0803058e 6ae1
 LAB_08030590:
     b LAB_08030884                           @ 08030590 78e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030594:
     .word  0x000012eb                     @ 08030594 eb120000
 LAB_08030598:
@@ -9132,7 +9132,7 @@ LAB_08030630:
     b LAB_08030878                           @ 0803063a 1de1
 LAB_0803063c:
     b LAB_08030884                           @ 0803063c 22e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030640:
     .word  0x000014df                     @ 08030640 df140000
 LAB_08030644:
@@ -9309,7 +9309,7 @@ LAB_0803074c:
 LAB_0803075e:
     adds r0,#0x12    @ 0803075e 1230
     b LAB_08030772                           @ 08030760 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030764:
     .word  0x0000174c                     @ 08030764 4c170000
 LAB_08030768:
@@ -9325,7 +9325,7 @@ LAB_08030772:
     b LAB_08030874                           @ 08030776 7de0
 LAB_08030778:
     b LAB_08030884                           @ 08030778 84e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803077c:
     .word  0x00001753                     @ 0803077c 53170000
 LAB_08030780:
@@ -9353,7 +9353,7 @@ LAB_080307a4:
     beq LAB_08030874                         @ 080307a8 64d0
     adds r0,#0x66    @ 080307aa 6630
     b LAB_080307f6                           @ 080307ac 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080307b0:
     .word  0x000017e2                     @ 080307b0 e2170000
 LAB_080307b4:
@@ -9377,7 +9377,7 @@ LAB_080307cc:
     cmp r1,r0                                @ 080307d4 8142
     blt LAB_08030884                         @ 080307d6 55db
     b LAB_08030874                           @ 080307d8 4ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080307dc:
     .word  0x000018de                     @ 080307dc de180000
 LAB_080307e0:
@@ -9427,7 +9427,7 @@ LAB_0803082c:
     cmp r1,r0                                @ 0803082c 8142
     beq LAB_08030850                         @ 0803082e 0fd0
     b LAB_08030884                           @ 08030830 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030834:
     .word  0x000019c8                     @ 08030834 c8190000
 LAB_08030838:
@@ -9477,7 +9477,7 @@ LAB_08030884:
 LAB_08030886:
     pop {r1}                                 @ 08030886 02bc
     bx r1                                    @ 08030888 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates effect slot group pointed to by r0; skips slots with type==0xe (bits[23:16] from read_effect_slot_side_and_type). After loop: calls classify_card_id_summon_category on slot[+0x0] (card_id). category==1 -> return 1 (eligible); category==2 -> checks specific card_ids (0x1534/0x133b/0x1449/0x1452 etc.) and slot[+3] bit4/5 (0x10/0x20 summon flags) -> return 0 or 1; category==0 -> return 0. r0=ptr effect_slot_group (contains [+0]=card_id, [+3]=flags, [+4]=slot_count). Returns u32: 1=normal-summon-path eligible, 0=not. Constants: type_skip=0xe; summon path card_ids: 0x1534/0x133b/0x1449/0x1452/0x19c0 etc.
 check_effect_slot_summon_path_eligible:
@@ -9522,7 +9522,7 @@ LAB_080308a6:
     beq LAB_08030938                         @ 080308d8 2ed0
     ldr r0, DAT_080308e8                     @ 080308da 0348
     b LAB_080308f4                           @ 080308dc 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080308e0:
     .word  0x00001534                     @ 080308e0 34150000
 DAT_080308e4:
@@ -9538,7 +9538,7 @@ LAB_080308f4:
     cmp r1,r0                                @ 080308f4 8142
     beq LAB_08030938                         @ 080308f6 1fd0
     b LAB_08030980                           @ 080308f8 42e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080308fc:
     .word  0x00001452                     @ 080308fc 52140000
 LAB_08030900:
@@ -9754,7 +9754,7 @@ check_slot_card_is_equip_whitelist:
     cmp r1,r0                                @ 08030a5c 8142
     beq LAB_08030a80                         @ 08030a5e 0fd0
     b LAB_08030a9c                           @ 08030a60 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030a64:
     .word  0x00000868                     @ 08030a64 68080000
 DAT_08030a68:
@@ -9818,7 +9818,7 @@ check_slot_card_is_equip_type:
     cmp r1,r0                                @ 08030ad0 8142
     beq LAB_08030aea                         @ 08030ad2 0ad0
     b LAB_08030b00                           @ 08030ad4 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030ad8:
     .word  0x00000868                     @ 08030ad8 68080000
 DAT_08030adc:
@@ -9874,7 +9874,7 @@ check_slot_card_is_monster_type:
     cmp r0,#0x0                              @ 08030b38 0028
     beq LAB_08030b4e                         @ 08030b3a 08d0
     b LAB_08030b66                           @ 08030b3c 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030b40:
     .word  0x00000868                     @ 08030b40 68080000
 DAT_08030b44:
@@ -9903,7 +9903,7 @@ LAB_08030b68:
     pop {r4,r5}                              @ 08030b68 30bc
     pop {r1}                                 @ 08030b6a 02bc
     bx r1                                    @ 08030b6c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Read card stat field7 for card_id (r0) and compare to r1 (target_value). Returns 1 if field7==target_value, 0 otherwise. r0: card_id [0..0x19b7]; r1: target_value [0..0xff]. Returns u32 bool. Pure read-only leaf. Constants: card_stat_table_base=ROM card stat table, field7_offset=7.
 check_card_stat_field7_equals:
@@ -9925,7 +9925,7 @@ write_word_from_deref_src:
     ldr r1,[r1,#0x0]                         @ 08030b88 0968
     str r1,[r0,#0x0]                         @ 08030b8a 0160
     bx lr                                    @ 08030b8c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Swap the word values at two memory addresses in-place.
 @ Reads [r0]->r3, [r1]->r2, writes [r0]:=r2, [r1]:=r3.
@@ -9940,7 +9940,7 @@ swap_deref_words:
     str r2,[r0,#0x0]                         @ 08030b94 0260
     str r3,[r1,#0x0]                         @ 08030b96 0b60
     bx lr                                    @ 08030b98 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Leaf utility. Dereferences r0 and r1 each to get one word, compares them: returns 1 if equal, 0 otherwise. Callers (FUN_08036de8, FUN_0803720c, FUN_080317e0, FUN_08031978, FUN_080376a0, 6 total) use this in pointer-search-and-delete slot scan loops, comparing a target card pointer r1 against each array element [r0] in turn.
 check_deref_words_equal:
@@ -9986,7 +9986,7 @@ LAB_08030bd2:
     pop {r4}                                 @ 08030bd4 10bc
     pop {r1}                                 @ 08030bd6 02bc
     bx r1                                    @ 08030bd8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08030bdc:
     .word  gP1LifePoints                  @ 08030bdc e0c40102
 DAT_08030be0:
@@ -10235,7 +10235,7 @@ LAB_08030dbe:
     pop {r4,r5,r6,r7}                        @ 08030dc8 f0bc
     pop {r0}                                 @ 08030dca 01bc
     bx r0                                    @ 08030dcc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08030dd0:
     .word  0x00000868                     @ 08030dd0 68080000
 DAT_08030dd4:
@@ -10610,7 +10610,7 @@ LAB_08031074:
     bne LAB_08031094                         @ 08031088 04d1
     ldr r0,[r2,#0x0]                         @ 0803108a 1068
     b LAB_08031096                           @ 0803108c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031090:
     .word  0x0201bc54                     @ 08031090 54bc0102
 LAB_08031094:
@@ -10648,7 +10648,7 @@ LAB_080310c0:
     pop {r4,r5,r6,r7}                        @ 080310c8 f0bc
     pop {r1}                                 @ 080310ca 02bc
     bx r1                                    @ 080310cc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Searches two player slot lists sequentially for an entry matching a target ID; returns its logical index. r0=u32 player_side [0..1]; r1=u16 target_id [0..0x1FFF] (low 13 bits matched). Base: gP1LifePoints+0x10e0 (0x87<<5). Outer loop r4=[0..1] (lists); inner loop r3=[0..0x7e] (127 entries, 8 bytes each). Each entry: ldrh, extract low 13 bits (lsls#0x13/lsrs#0x13), cmp with target. Hit: returns r1 = r6 XOR r4 (player_side XOR list_idx). Miss: returns 0. Pure read; no side effects. Constants: gP1LifePoints=0x0201c4e0, base_offset=0x10e0 (0x87<<5), entry_size=8, entry_count=0x7f, id_bits=13.
 find_slot_idx_in_dual_list_by_id:
@@ -10794,7 +10794,7 @@ LAB_080311ac:
     bne LAB_080311cc                         @ 080311bc 06d1
     adds r0,r3,#0x0    @ 080311be 181c
     b LAB_080311d8                           @ 080311c0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080311c4:
     .word  gP1LifePoints                  @ 080311c4 e0c40102
 DAT_080311c8:
@@ -10811,7 +10811,7 @@ LAB_080311d8:
     pop {r4,r5}                              @ 080311d8 30bc
     pop {r1}                                 @ 080311da 02bc
     bx r1                                    @ 080311dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_0803e594 (caseD_31) and FUN_0807fde8. In the chain slot list starting at
 @ gP1LifePoints+player*0x868+0x18, searches for the slot index corresponding to zone_id.
@@ -10858,7 +10858,7 @@ LAB_08031208:
     bne LAB_08031228                         @ 08031218 06d1
     adds r0,r3,#0x0    @ 0803121a 181c
     b LAB_08031234                           @ 0803121c 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08031220:
     .word  gP1LifePoints                  @ 08031220 e0c40102
 DAT_08031224:
@@ -10875,7 +10875,7 @@ LAB_08031234:
     pop {r4,r5}                              @ 08031234 30bc
     pop {r1}                                 @ 08031236 02bc
     bx r1                                    @ 08031238 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Gets hand card count from gP1LifePoints[player*0x868+0x14], iterates gP1LifePoints[player*0x868+0x418] hand array (entry_size=4), extracts set_code encoding (lsls #2/lsrs #0x18 + lsls #0x12/lsrs #0x1f) and compares with r1; returns slot index on match or -1 (rsbs) if not found. Sibling of find_slot_idx_by_set_code (0x08031184, count_offset=0x10, base=0x260); differs in count_offset=0x14 / base=0x418. indeg=43, C_util_high. Side effects: read-only. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, count_offset=0x14, array_offset=0x83*8=0x418, entry_size=4.
 find_hand_slot_idx_by_set_code:
@@ -10926,7 +10926,7 @@ LAB_0803128c:
     pop {r4,r5,r6}                           @ 0803128c 70bc
     pop {r1}                                 @ 0803128e 02bc
     bx r1                                    @ 08031290 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates gP1LifePoints[player*0x868+0x1c] count and gP1LifePoints[player*0x868+0x5d0] array (entry_size=4), extracts set_code encoding (lsls #2/lsrs #0x18 + lsls #0x12/lsrs #0x1f) and compares with r1; returns slot index on match or -1 if not found. Alt variant of find_hand_slot_idx_by_set_code (count_offset=0x14, base=0x418); this function uses count_offset=0x1c / array_offset=0xba*8=0x5d0. Confirmed by PASSED count_hand_cards_by_field6_alt (0x08034020) using same offsets. Side effects: read-only. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, count_offset=0x1c, array_offset=0xba*8=0x5d0, entry_size=4.
 find_hand_slot_idx_by_set_code_alt:
@@ -10977,7 +10977,7 @@ LAB_080312e4:
     pop {r4,r5,r6}                           @ 080312e4 70bc
     pop {r1}                                 @ 080312e6 02bc
     bx r1                                    @ 080312e8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Linear scan gDuelFieldSlots[side*0x868+slot*0x14] for card_id match; return slot index or -1. Entry: r0=player_side (bit0), r1=card_id. Extracts zone_type (lsls #2/lsrs #0x18) and side_bit (lsls #0x12/lsrs #0x1f) per slot; match bits[12:0]==r1 -> return slot_idx. Not found -> return -1 (rsbs). indeg=21; used by duel_field hub to locate card slot index by card_id. r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. Returns s32 slot_index [0..count-1] or -1. Read-only. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14.
 find_slot_idx_by_card_id_in_player_zones:
@@ -11013,7 +11013,7 @@ LAB_08031314:
     bne LAB_08031334                         @ 08031324 06d1
     adds r0,r3,#0x0    @ 08031326 181c
     b LAB_08031340                           @ 08031328 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0803132c:
     .word  gP1LifePoints                  @ 0803132c e0c40102
 DAT_08031330:
@@ -11030,7 +11030,7 @@ LAB_08031340:
     pop {r4,r5}                              @ 08031340 30bc
     pop {r1}                                 @ 08031342 02bc
     bx r1                                    @ 08031344 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Linear scan of gP1LifePoints+4 array (step=4, max 0xff entries) for an entry matching flag bit0 == r0, entry_type (low 13 bits of halfword at [entry+0x10e0]) == 1, and valid_mark bit7 of [entry+0x10e0+1] set. Returns 1 if matching entry found, 0 if not found. r0=u32 flag_value [0..1]. Returns u32 found_flag. Callers: FUN_08020db4, FUN_08020fa8, FUN_0802c358 (result_screen LP record display). Constants: array_step=4, field_offset=0x10e0, max_count=0xff, type_value=1, valid_bit7=1.
 find_lp_entry_by_flag_and_type:
@@ -11060,7 +11060,7 @@ LAB_08031352:
     beq LAB_08031380                         @ 08031374 04d0
     movs r0,#0x1    @ 08031376 0120
     b LAB_0803138a                           @ 08031378 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0803137c:
     .word  gP1LifePoints                  @ 0803137c e0c40102
 LAB_08031380:
@@ -11095,7 +11095,7 @@ LAB_080313a4:
 LAB_080313b2:
     pop {r1}                                 @ 080313b2 02bc
     bx r1                                    @ 080313b4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Function: extract card_id from slot record pointer and validate equip placement legality. r0=u32* slot_record_ptr (points to slot data word, saved to r4). Reads [r4+0] (card_data word), extracts bits[12:0] (card_id via lsls #0x13; lsrs #0x13); calls check_card_has_equip_placement_type(card_id). If return 0 (no equip placement type) -> directly returns 1 (eligible/placeable); if non-zero -> further extracts bit14 of [r4+0] (lsls #0x11; lsrs #0x1f), returns that bit value (1=activated/equipable, 0=not activated). Exit pop{r1};bx r1 (Sub-case E, preserves r0). Called by FUN_0807d2e0 in Neo Daedalus group placement check chain to confirm whether target slot card accepts equip.
 @ 
@@ -11123,7 +11123,7 @@ LAB_080313d4:
     pop {r4}                                 @ 080313d4 10bc
     pop {r1}                                 @ 080313d6 02bc
     bx r1                                    @ 080313d8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Read the equip card set_code for slot (r0=player_side bit0, r1=slot_idx). Flow: locate gDuelFieldSlots[player][slot_idx] (stride 0x14); extract card_id low 13 bits; if not equip set A (check_card_id_is_equip_set_a) -> return 0. If active flag 0xa5600000: if slot_idx<=4 call find_equip_chain_pair_across_field(player,slot_idx); result lsls #0x10 == 0xffff0000 (no pair) -> return 0; else return ldrh[slot+0xc] (set_code). Not active: return ldrh[slot+0xc] directly. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]. Returns u16 set_code (0=invalid or no pair). Read-only. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, active_flag=0xa5600000, no_pair_sentinel=0xffff0000, set_code_offset=0xc.
 get_equip_card_set_code_for_slot:
@@ -11173,7 +11173,7 @@ LAB_08031422:
     adds r0,r0,r1    @ 08031434 4018
     ldrh r0,[r0,#0xc]                        @ 08031436 8089
     b LAB_0803144e                           @ 08031438 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803143c:
     .word  0x00000868                     @ 0803143c 68080000
 DAT_08031440:
@@ -11203,7 +11203,7 @@ LAB_08031468:
 LAB_0803146a:
     movs r0,#0x0    @ 0803146a 0020
     bx lr                                    @ 0803146c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031470:
     .word  0x00001130                     @ 08031470 30110000
 
@@ -11223,7 +11223,7 @@ find_equip_chain_node_min_count_by_pred:
     add sp,#0x4                              @ 0803148c 01b0
     pop {r1}                                 @ 0803148e 02bc
     bx r1                                    @ 08031490 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031494:
     .word  0x08031455                     @ 08031494 55140308
 DAT_08031498:
@@ -11284,7 +11284,7 @@ resolve_slot_card_id_for_pair:
     cmp r4,r0                                @ 080314f8 8442
     beq LAB_08031534                         @ 080314fa 1bd0
     b LAB_0803155c                           @ 080314fc 2ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031500:
     .word  0x00000868                     @ 08031500 68080000
 DAT_08031504:
@@ -11309,7 +11309,7 @@ LAB_0803150c:
     beq LAB_0803155c                         @ 08031528 18d0
     ldr r0, DAT_08031530                     @ 0803152a 0148
     b LAB_0803155e                           @ 0803152c 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031530:
     .word  0x000018f9                     @ 08031530 f9180000
 LAB_08031534:
@@ -11330,7 +11330,7 @@ LAB_08031534:
     beq LAB_0803155c                         @ 08031550 04d0
     ldr r0, DAT_08031558                     @ 08031552 0148
     b LAB_0803155e                           @ 08031554 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08031558:
     .word  0x000018f6                     @ 08031558 f6180000
 LAB_0803155c:
@@ -11526,7 +11526,7 @@ LAB_080316a8:
     pop {r4,r5,r6}                           @ 080316a8 70bc
     pop {r0}                                 @ 080316aa 01bc
     bx r0                                    @ 080316ac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080316b0:
     .word  gP1LifePoints                  @ 080316b0 e0c40102
 DAT_080316b4:
@@ -11563,7 +11563,7 @@ LAB_080316de:
     beq LAB_080316fc                         @ 080316ec 06d0
     adds r0,r5,#0x0    @ 080316ee 281c
     b LAB_0803170a                           @ 080316f0 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080316f4:
     .word  gP1LifePoints                  @ 080316f4 e0c40102
 DAT_080316f8:
@@ -11619,7 +11619,7 @@ LAB_08031736:
     beq LAB_08031754                         @ 08031744 06d0
     adds r0,r5,#0x0    @ 08031746 281c
     b LAB_08031762                           @ 08031748 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0803174c:
     .word  gP1LifePoints                  @ 0803174c e0c40102
 DAT_08031750:
@@ -11711,7 +11711,7 @@ LAB_080317d2:
     pop {r4,r5,r6,r7}                        @ 080317d8 f0bc
     pop {r1}                                 @ 080317da 02bc
     bx r1                                    @ 080317dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Searches the hand array (gP1LP+0x260, count at gP1LP+0x10) for the element matching r9(=r1=slot_ptr), removes it by left-shifting subsequent elements, and decrements the count. r0=player_id [0..1], r1=slot_ptr (r9). Forward-scans from r8=0 to count-1, calling check_deref_words_equal each iteration; on match shifts elements left and updates count. Callers: FUN_08032194 (duel_field) and FUN_08040194 when a hand card leaves the field.
 @ Constants: hand_array_base=gP1LP+0x260, hand_count_offset=gP1LP+0x10, player_stride=0x868.
@@ -11813,7 +11813,7 @@ LAB_0803188a:
     pop {r4,r5,r6,r7}                        @ 08031894 f0bc
     pop {r1}                                 @ 08031896 02bc
     bx r1                                    @ 08031898 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Function: search player zone slot table for entry matching card_id and remove it. r0=packed_player_id (bit0=side, saved to r7), r1=u16 card_id (lsls #0x10; lsrs #0x10 truncated, saved to r2 and r12). Reads count word at gP1LifePoints+side*0x868+0x10 (r4=count_ptr); if r8 (initial 0) >= count jumps to LAB_08031946 (return 0, not found). Computes table base r6=gP1LifePoints+0x98*4=gP1LifePoints+0x260, adds side*0x868 for correct player side; linearly scans all count slots (stride 4 bytes): reads [slot] bits[12:0] (card_id field) and compares with r2; on match: calls write_word_from_deref_src to overwrite that entry (remove); [count_ptr]-=1 (shrink count); if new count>r8 continues compaction loop (LAB_0803190c) shifting remaining entries forward; returns 1 (success). If full scan finds no match -> returns 0 (not found). Exit pop{r1};bx r1 (Sub-case E, preserves r0).
 @ 
@@ -11956,7 +11956,7 @@ LAB_0803196e:
     pop {r4}                                 @ 08031970 10bc
     pop {r0}                                 @ 08031972 01bc
     bx r0                                    @ 08031974 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Searches equip array B (gP1LP+0x3a0, count at gP1LP+0x18) for the element matching r9(=r1=slot_ptr), removes it by left-shifting subsequent elements, and decrements the count. r0=player_id [0..1], r1=slot_ptr (r9, confirmed by 0x4689=mov r9,r1 at entry). Fully symmetric with erase_slot_from_hand_array_by_ptr; differs only in array offset (0x3a0 vs 0x260) and count offset (0x18 vs 0x10). Caller FUN_08032194 (duel_field) invokes this when an equip card leaves the field.
 @ Constants: equip_array_B_base=gP1LP+0x3a0, equip_B_count_offset=0x18, player_stride=0x868.
@@ -12058,7 +12058,7 @@ LAB_08031a22:
     pop {r4,r5,r6,r7}                        @ 08031a2c f0bc
     pop {r1}                                 @ 08031a2e 02bc
     bx r1                                    @ 08031a30 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Count monster zone cards where field5 is nonzero for the given player.
 @ Reads monster zone card count from gP1LifePoints+player*0x868+0x10; iterates array from +0x260 (0x98<<2).
@@ -12698,7 +12698,7 @@ LAB_08031e78:
     pop {r4,r5,r6,r7}                        @ 08031ea4 f0bc
     pop {r0}                                 @ 08031ea6 01bc
     bx r0                                    @ 08031ea8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08031eac:
     .word  gP1LifePoints                  @ 08031eac e0c40102
 DAT_08031eb0:
@@ -13096,7 +13096,7 @@ clear_zone_slot_chain_refs:
     pop {r4}                                 @ 0803218c 10bc
     pop {r0}                                 @ 0803218e 01bc
     bx r0                                    @ 08032190 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Leaving-slot cleanup hub, indeg=12. Called from multiple duel_field/card_data paths when a card
 @ leaves the field (monster/equip/hand/graveyard/field zone). Calls get_zone_slot_ptr(r0, r1, r2)
@@ -13131,7 +13131,7 @@ erase_slot_from_zone_array_by_type:
     ldr r0,[r0,#0x0]                         @ 080321b6 0068
 switchD_080321b8__switchD:
     .hword 0x4687    @ 080321b8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080321bc:
     .word  0x080321c0                     @ 080321bc c0210308
 switchD_080321b8__switchdataD_080321c0:
@@ -13365,7 +13365,7 @@ LAB_0803236e:
     cmp r1,r0                                @ 08032384 8142
     beq LAB_08032458                         @ 08032386 67d0
     b LAB_080324b0                           @ 08032388 92e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803238c:
     .word  0x00001348                     @ 0803238c 48130000
 DAT_08032390:
@@ -13378,7 +13378,7 @@ LAB_08032394:
     cmp r1,r0                                @ 0803239c 8142
     beq LAB_08032464                         @ 0803239e 61d0
     b LAB_080324b0                           @ 080323a0 86e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080323a4:
     .word  0x000010f3                     @ 080323a4 f3100000
 LAB_080323a8:
@@ -13404,7 +13404,7 @@ LAB_080323c4:
     cmp r1,r0                                @ 080323cc 8142
     beq LAB_0803247c                         @ 080323ce 55d0
     b LAB_080324b0                           @ 080323d0 6ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080323d4:
     .word  0x00001346                     @ 080323d4 46130000
 LAB_080323d8:
@@ -13425,7 +13425,7 @@ LAB_080323d8:
     cmp r1,r0                                @ 080323f4 8142
     beq LAB_08032488                         @ 080323f6 47d0
     b LAB_080324b0                           @ 080323f8 5ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080323fc:
     .word  0x0000169f                     @ 080323fc 9f160000
 DAT_08032400:
@@ -13442,7 +13442,7 @@ LAB_0803240c:
     cmp r1,r0                                @ 08032414 8142
     beq LAB_08032494                         @ 08032416 3dd0
     b LAB_080324b0                           @ 08032418 4ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803241c:
     .word  0x0000150b                     @ 0803241c 0b150000
 LAB_08032420:
@@ -13470,7 +13470,7 @@ LAB_08032440:
     cmp r1,r0                                @ 08032448 8142
     beq LAB_080324ac                         @ 0803244a 2fd0
     b LAB_080324b0                           @ 0803244c 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032450:
     .word  0x000018ff                     @ 08032450 ff180000
 LAB_08032454:
@@ -13573,7 +13573,7 @@ LAB_080324c8:
     bne LAB_080324ec                         @ 080324dc 06d1
     adds r0,r4,#0x0    @ 080324de 201c
     b LAB_080324f8                           @ 080324e0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080324e4:
     .word  0x00000868                     @ 080324e4 68080000
 DAT_080324e8:
@@ -13589,7 +13589,7 @@ LAB_080324f8:
     pop {r4,r5,r6}                           @ 080324f8 70bc
     pop {r1}                                 @ 080324fa 02bc
     bx r1                                    @ 080324fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Traverse player-side field slots (slot 0..4, stride 0x14), read slot[0] low 13 bits (card_id), compare with target card_id; also require slot[+8] != 0 (equip_chain_head attached). If match, return current slot index r4 immediately; if no match after full scan, return -1 (rsbs #1,#0). indeg=0; grep 08032501 asm/all.s -> 0 hits; dead code or runtime fn-ptr. Constants: gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_COUNT=5.
 find_field_slot_idx_by_card_id:
@@ -13615,7 +13615,7 @@ LAB_08032510:
     bne LAB_08032534                         @ 08032524 06d1
     adds r0,r4,#0x0    @ 08032526 201c
     b LAB_08032540                           @ 08032528 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0803252c:
     .word  0x00000868                     @ 0803252c 68080000
 DWORD_08032530:
@@ -13631,7 +13631,7 @@ LAB_08032540:
     pop {r4,r5,r6}                           @ 08032540 70bc
     pop {r1}                                 @ 08032542 02bc
     bx r1                                    @ 08032544 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Ultra-high-frequency utility (indeg=57) called by nearly all duel field logic modules. Checks whether the specified slot (r0 bit0=player_side, r1=slot_index) is active and holds the target card (r2=card_id). Three conditions must all be true to return 1: (1) slot.word[0] low 13 bits == r2 (exact card_id match); (2) slot.hword[0x8] != 0 (active field non-zero); (3) slot.word[0x10] bit5==0 AND bit1==0 (no pairing-disable flags). Read-only. r0=u8 side_flags (bit0=player_side), r1=u16 slot_index [0..0x44], r2=u16 card_id. Returns u32 (1=slot active with card, 0=not). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=0x14 bytes, slot+0x0=card_id word, slot+0x8=active hword, slot+0x10=flag word (bit5/bit1).
 test_slot_has_active_card:
@@ -13673,7 +13673,7 @@ LAB_0803258a:
     pop {r4,r5,r6}                           @ 0803258c 70bc
     pop {r1}                                 @ 0803258e 02bc
     bx r1                                    @ 08032590 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032594:
     .word  0x00000868                     @ 08032594 68080000
 DAT_08032598:
@@ -13898,7 +13898,7 @@ LAB_08032734:
     cmp r3,#0x9                              @ 08032738 092b
     ble LAB_08032708                         @ 0803273a e5dd
     b LAB_08032782                           @ 0803273c 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032740:
     .word  0x0201c510                     @ 08032740 10c50102
 DAT_08032744:
@@ -14025,7 +14025,7 @@ LAB_0803281c:
     cmp r4,#0x1                              @ 08032828 012c
     ble LAB_080327ca                         @ 0803282a cedd
     b LAB_080328ea                           @ 0803282c 5de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032830:
     .word  0x0201c510                     @ 08032830 10c50102
 DAT_08032834:
@@ -14084,7 +14084,7 @@ LAB_0803288e:
     cmp r4,#0x1                              @ 08032898 012c
     ble LAB_0803284e                         @ 0803289a d8dd
     b LAB_080328ea                           @ 0803289c 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080328a0:
     .word  0x0201c510                     @ 080328a0 10c50102
 DAT_080328a4:
@@ -14188,7 +14188,7 @@ LAB_08032954:
     pop {r4,r5,r6,r7}                        @ 08032958 f0bc
     pop {r1}                                 @ 0803295a 02bc
     bx r1                                    @ 0803295c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_08032a6c (both-players wrapper) and FUN_080490b4 (duel_field). Receives card_id (r1; saved to r8 via .hword 0x4688=mov r8,r1) and player_id (r0 low bit). Scans 5 monster-zone slots for given player (gDuelFieldSlots + player*0x868 + 0x10a4 + slot*0x14, slot 0..4). For each slot: extracts card_id bits[12:0] and compares with r8; checks [slot+0x10] active flags (bit5, bit1); computes bitmask (1<<(player*16+slot)). Calls check_card_equip_eligibility_in_field (FUN_080325dc) for qualifying slots. Returns count of eligible slots. Pure query, no write side effects. r0=u8 player_id [0..1], r1=u16 card_id [0..0x1fff]. Returns u32 eligible_slot_count. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, zone_offset=0x10a4. Callers: FUN_08032a6c, FUN_080490b4.
 count_equip_eligible_slots_for_player:
@@ -14419,7 +14419,7 @@ LAB_08032b0a:
     cmp r4,#0x4                              @ 08032b10 042c
     ble LAB_08032ac2                         @ 08032b12 d6dd
     b LAB_08032b7e                           @ 08032b14 33e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032b18:
     .word  0x0201c510                     @ 08032b18 10c50102
 DAT_08032b1c:
@@ -14484,7 +14484,7 @@ LAB_08032b7e:
     pop {r4,r5,r6,r7}                        @ 08032b88 f0bc
     pop {r1}                                 @ 08032b8a 02bc
     bx r1                                    @ 08032b8c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032b90:
     .word  0x0201c510                     @ 08032b90 10c50102
 DAT_08032b94:
@@ -14515,7 +14515,7 @@ LAB_08032bc0:
     pop {r4,r5}                              @ 08032bc0 30bc
     pop {r1}                                 @ 08032bc2 02bc
     bx r1                                    @ 08032bc4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Count slots on player's field satisfying paired+field5-nonzero conditions. Path A (check_card_field5_is_nonzero != 0): scan monster zone (slots 0..4), skip r9-specified slot, call check_slot_card_pair_allowed(player, slot, r2, r10) and [slot+0x8]!=0 -> count++. Path B (check_card_field5_is_nonzero == 0): scan trap zone (slots 5..10), skip r9-specified slot, check active bit + card_id>0 + [slot+0x10]>>1 bit clear + card_id==r8 -> count++. Non-APCS inputs: r8=card_id_filter (caller-set); r9=skip_slot (caller-set); r10=equip_ref (caller-set, passed to check_slot_card_pair_allowed). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry_size=0x14, monster_zone=0..4, trap_zone=5..10.
 count_paired_slots_with_field5:
@@ -14572,7 +14572,7 @@ LAB_08032c28:
     cmp r5,#0x4                              @ 08032c2c 042d
     ble LAB_08032bfa                         @ 08032c2e e4dd
     b LAB_08032c7a                           @ 08032c30 23e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032c34:
     .word  0x00000868                     @ 08032c34 68080000
 DAT_08032c38:
@@ -14634,7 +14634,7 @@ count_paired_slots_with_field5_default:
     bl count_paired_slots_with_field5        @ 08032c9a fff795ff
     pop {r1}                                 @ 08032c9e 02bc
     bx r1                                    @ 08032ca0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Call count_paired_slots_with_field5(player=0, card_id, -1) and count_paired_slots_with_field5(player=1, card_id, -1), sum results. r0: card_id [0..0x19b7]. Returns r0=total_count [0..10]. Full-field wrapper analogous to count_monster_slots_by_state_all. indeg=9. Constants: r2=-1 fixed (rsbs #0).
 count_paired_slots_both_sides:
@@ -14695,7 +14695,7 @@ LAB_08032cfe:
     pop {r4,r5,r6,r7}                        @ 08032d0c f0bc
     pop {r1}                                 @ 08032d0e 02bc
     bx r1                                    @ 08032d10 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032d14:
     .word  0x00000868                     @ 08032d14 68080000
 DAT_08032d18:
@@ -14771,7 +14771,7 @@ LAB_08032d86:
     pop {r4,r5,r6,r7}                        @ 08032d9c f0bc
     pop {r1}                                 @ 08032d9e 02bc
     bx r1                                    @ 08032da0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032da4:
     .word  0x0201c510                     @ 08032da4 10c50102
 DAT_08032da8:
@@ -14834,7 +14834,7 @@ LAB_08032e00:
     pop {r4,r5,r6,r7}                        @ 08032e10 f0bc
     pop {r1}                                 @ 08032e12 02bc
     bx r1                                    @ 08032e14 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032e18:
     .word  0x0201c510                     @ 08032e18 10c50102
 DAT_08032e1c:
@@ -14947,7 +14947,7 @@ LAB_08032ece:
     pop {r4,r5,r6,r7}                        @ 08032ee0 f0bc
     pop {r1}                                 @ 08032ee2 02bc
     bx r1                                    @ 08032ee4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08032ee8:
     .word  0x00000868                     @ 08032ee8 68080000
 DAT_08032eec:
@@ -14961,7 +14961,7 @@ count_monster_slots_by_state_all:
     bl count_monster_slots_by_state          @ 08032ef6 fff7c3ff
     pop {r1}                                 @ 08032efa 02bc
     bx r1                                    @ 08032efc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates 5 field slots (slot 0..4, stride 0x14) for given player side (r0=player_id, r2=zone_flag). For each slot checks: (1) bit12 activation flag nonzero; (2) [slot+0x8] nonzero (valid card); (3) check_slot_zone_bit_eligible passes. Increments counter if all three pass. Returns count of eligible slots [0..5]. Called by count_eligible_zone_slots_all_flags with r2=-1. Params: r0=u8 player_id [0..1], r2=i32 zone_flag (zone bit mask, -1=all). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14.
 count_eligible_zone_slots_for_player:
@@ -15029,7 +15029,7 @@ count_eligible_zone_slots_all_flags:
     bl count_eligible_zone_slots_for_player  @ 08032f72 fff7c5ff
     pop {r1}                                 @ 08032f76 02bc
     bx r1                                    @ 08032f78 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Iterates slots 0..10 for player r0, calls check_slot_card_pair_allowed(player, slot_idx, card_id) for each, and counts allowed slots. Returns count [0..11]. r0=u32 player_side [0..1]; r1=u16 card_id [0..0x1fff]. Callers: FUN_080ac584, FUN_080acc30, check_compound_pair_activation_eligible, check_any_pair_slot_available_for_card, FUN_080b76e4.
 count_slot_card_pair_allowed_for_card:
@@ -15317,7 +15317,7 @@ LAB_0803316e:
     pop {r4,r5,r6}                           @ 08033170 70bc
     pop {r1}                                 @ 08033172 02bc
     bx r1                                    @ 08033174 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08033178:
     .word  gP1LifePoints                  @ 08033178 e0c40102
 DAT_0803317c:
@@ -15919,7 +15919,7 @@ LAB_08033592:
     beq LAB_080335b0                         @ 0803359c 08d0
     movs r0,#0x1    @ 0803359e 0120
     b LAB_080335b2                           @ 080335a0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080335a4:
     .word  0x00000868                     @ 080335a4 68080000
 DAT_080335a8:
@@ -15964,7 +15964,7 @@ LAB_080335ce:
     bl count_occupied_all_field_zones        @ 080335ee fff78dfd
     subs r0,r4,r0    @ 080335f2 201a
     b LAB_080335fe                           @ 080335f4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080335f8:
     .word  0x000016df                     @ 080335f8 df160000
 LAB_080335fc:
@@ -15979,7 +15979,7 @@ LAB_08033606:
     pop {r4,r5,r6}                           @ 08033608 70bc
     pop {r1}                                 @ 0803360a 02bc
     bx r1                                    @ 0803360c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Count monster zone slots [0..4] for player (r0) that accept new card placement. Loops slot_idx 0..4 calling check_monster_slot_accepts_card(player, slot_idx); counts returns of 1. Returns r5=total accepting slot count [0..5]. Counting sibling of count_available_monster_slots (which only checks presence). Called by check_equip_card_activation_valid and check_banisher_of_light_activatable. r0=u32 player_side [0..1]. Returns u32 count [0..5]. Constants: slot_count=5 [0..4].
 count_monster_slots_accepting_card:
@@ -16020,7 +16020,7 @@ LAB_0803364c:
     pop {r4}                                 @ 0803364c 10bc
     pop {r1}                                 @ 0803364e 02bc
     bx r1                                    @ 08033650 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Reads from ROM slot-order table at 0x09e3ef4c (5 entries x 4 bytes); for each slot_idx calls check_monster_slot_accepts_card(player, slot_idx); returns first slot_idx that returns 1. All 5 fail -> returns -1 (0xFFFFFFFF). Variant sibling of count_available_monster_slots: finds index vs counts. r0=u32 player_side [0..1]. Returns s32 slot_idx [0..4] or -1. indeg=5, class D. Constants: slot_order_table=0x09e3ef4c, table_count=5.
 find_first_placeable_monster_slot:
@@ -16037,7 +16037,7 @@ LAB_0803365c:
     beq LAB_08033674                         @ 08033668 04d0
     adds r0,r4,#0x0    @ 0803366a 201c
     b LAB_08033680                           @ 0803366c 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033670:
     .word  0x09e3ef4c                     @ 08033670 4cefe309
 LAB_08033674:
@@ -16051,7 +16051,7 @@ LAB_08033680:
     pop {r4,r5,r6,r7}                        @ 08033680 f0bc
     pop {r1}                                 @ 08033682 02bc
     bx r1                                    @ 08033684 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Whitelist pre-filter layer before check_slot_card_can_be_equipped. Reads card_id from gDuelFieldSlots[target_side][slot_idx] low 13 bits; BST whitelist over special IDs: 0x14f9 -> extra unoccupied check -> return 0; 0x1836 -> extra bit-flag check -> return 0; 0x1670/0x19ee -> other special logic -> return 0. No whitelist hit: call check_slot_card_can_be_equipped(equip_player, target_player, slot_idx). r8 (non-APCS, caller-set): u32 equip_player_side (loaded via .hword 0x4684 = mov r4,r8 at entry); r1=u32 target_player_side [0..1]; r2=u32 slot_idx [0..4]. Returns u32 bool (1=equippable, 0=not or blocked by whitelist). indeg=6, class D. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, whitelist_ids=0x14f9/0x1836/0x1670/0x19ee.
 check_slot_equip_eligibility:
@@ -16098,7 +16098,7 @@ LAB_080336d4:
     cmp r1,r0                                @ 080336d4 8142
     beq LAB_0803371a                         @ 080336d6 20d0
     b LAB_0803371e                           @ 080336d8 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080336dc:
     .word  0x00001836                     @ 080336dc 36180000
 DAT_080336e0:
@@ -16145,7 +16145,7 @@ LAB_08033728:
     pop {r4,r5,r6,r7}                        @ 08033728 f0bc
     pop {r1}                                 @ 0803372a 02bc
     bx r1                                    @ 0803372c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Determines whether the monster in slot (target_player, slot_idx) can be equipped by equip_player. Reads card_id from gDuelFieldSlots low 13 bits; returns 0 if card_id==0 or slot_idx>4. count_field_copies_of_card(0x13f2)>0 -> return 0. If equip_player != target_player: find_effect_node_in_zone(target, slot_idx, 0x13eb, equip_player); absent -> return 0. check_value_in_slot_chain twice: 0x16a4 (equip_lock_A) and 0x12d1 (equip_lock_B). Special: card_id==0x1900 extra VRAM bit flag check. All pass -> return 1. r0=u32 equip_player_side [0..1]; r1=u32 target_player_side [0..1]; r2=u32 slot_idx [0..4]. Returns u32 bool (1=equippable, 0=not). Read-only. indeg=53, class C. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, field_lock_card=0x13f2, equip_blocker=0x13eb, lock_A=0x16a4, lock_B=0x12d1, special=0x1900.
 check_slot_card_can_be_equipped:
@@ -16339,7 +16339,7 @@ LAB_08033870:
 LAB_0803389e:
     adds r0,r1,#0x0    @ 0803389e 081c
     b LAB_080338b2                           @ 080338a0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080338a4:
     .word  0x00001874                     @ 080338a4 74180000
 DAT_080338a8:
@@ -16495,7 +16495,7 @@ LAB_080339ba:
     pop {r4,r5,r6,r7}                        @ 080339c4 f0bc
     pop {r1}                                 @ 080339c6 02bc
     bx r1                                    @ 080339c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080339cc:
     .word  0x00000868                     @ 080339cc 68080000
 DAT_080339d0:
@@ -16521,7 +16521,7 @@ count_equippable_slots_for_card:
     ble LAB_08033a00                         @ 080339f4 04dd
     movs r0,#0x0    @ 080339f6 0020
     b LAB_08033a52                           @ 080339f8 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080339fc:
     .word  0x000013f2                     @ 080339fc f2130000
 LAB_08033a00:
@@ -16577,7 +16577,7 @@ LAB_08033a52:
     pop {r4,r5,r6,r7}                        @ 08033a5c f0bc
     pop {r1}                                 @ 08033a5e 02bc
     bx r1                                    @ 08033a60 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033a64:
     .word  0x00000868                     @ 08033a64 68080000
 DAT_08033a68:
@@ -16601,7 +16601,7 @@ count_slots_equippable_by_state_code:
     ble LAB_08033a94                         @ 08033a88 04dd
     movs r0,#0x0    @ 08033a8a 0020
     b LAB_08033af0                           @ 08033a8c 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033a90:
     .word  0x000013f2                     @ 08033a90 f2130000
 LAB_08033a94:
@@ -16726,7 +16726,7 @@ LAB_08033b64:
     cmp r6,#0x0                              @ 08033b6c 002e
     bne LAB_08033b88                         @ 08033b6e 0bd1
     b LAB_08033b82                           @ 08033b70 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033b74:
     .word  0x00000868                     @ 08033b74 68080000
 DAT_08033b78:
@@ -16763,7 +16763,7 @@ LAB_08033b9e:
     pop {r4,r5,r6,r7}                        @ 08033ba8 f0bc
     pop {r1}                                 @ 08033baa 02bc
     bx r1                                    @ 08033bac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Returns 1 if slot is empty and placement is not blocked by field effect; 0 otherwise. Tests active bit (lsls #0x13) of gDuelFieldSlots[player*0x868+slot*0x14]; if occupied returns 0. If free calls check_slot_placement_blocked_by_field_effect; returns its result. Used by find_first_available_monster_slot_for_player inner loop. r0=u8 player_id [0..1], r1=u8 slot_idx [0..4]. Returns u32 bool (1=available, 0=not). Constants: active_bit_shift=0x13, gDuelFieldSlots=0x0201c510, player_stride=0x868.
 check_slot_available_for_card:
@@ -16791,7 +16791,7 @@ check_slot_available_for_card:
     beq LAB_08033bec                         @ 08033bdc 06d0
     movs r0,#0x1    @ 08033bde 0120
     b LAB_08033bee                           @ 08033be0 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033be4:
     .word  0x00000868                     @ 08033be4 68080000
 DAT_08033be8:
@@ -16816,7 +16816,7 @@ find_first_available_monster_slot_for_player:
     cmp r0,#0x4                              @ 08033c08 0428
     ble LAB_08033c18                         @ 08033c0a 05dd
     b LAB_08033c34                           @ 08033c0c 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033c10:
     .word  0x000016df                     @ 08033c10 df160000
 LAB_08033c14:
@@ -16844,7 +16844,7 @@ LAB_08033c38:
     pop {r4,r5,r6,r7}                        @ 08033c38 f0bc
     pop {r1}                                 @ 08033c3a 02bc
     bx r1                                    @ 08033c3c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033c40:
     .word  0x09e3ef60                     @ 08033c40 60efe309
 
@@ -16879,7 +16879,7 @@ LAB_08033c5a:
     bl count_occupied_all_field_zones        @ 08033c7a fff747fa
     subs r0,r4,r0    @ 08033c7e 201a
     b LAB_08033c8a                           @ 08033c80 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033c84:
     .word  0x000016df                     @ 08033c84 df160000
 LAB_08033c88:
@@ -16894,7 +16894,7 @@ LAB_08033c92:
     pop {r4,r5,r6}                           @ 08033c94 70bc
     pop {r1}                                 @ 08033c96 02bc
     bx r1                                    @ 08033c98 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Returns 1 if field spell card_id can be placed for player; 0 if blocked. If get_card_extended_stat_field9(card_id)==2 (dual field): checks count_field_copies_of_card(0x16df), reads gDuelFieldSlots active bit, calls count_occupied_all_field_zones; >4->return 0. Else: calls find_first_available_monster_slot_for_player; <0->return 0. r0=u8 player_id [0..1], r1=u16 card_id [0..0x1fff]. Returns u32 bool. Pure read. Constants: field9_dual_field=2, full_zone_threshold=4, special_card=0x16df.
 check_field_spell_placement_allowed:
@@ -16943,7 +16943,7 @@ LAB_08033cf0:
     pop {r4}                                 @ 08033cf0 10bc
     pop {r1}                                 @ 08033cf2 02bc
     bx r1                                    @ 08033cf4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Scans player (r0 bit0) 5 monster zone slots (slot_idx 0..4), checks if any slot has equip-type card (field8==6). Per slot: (1) card_id low 13 bits nonzero; (2) ldrh slot+0x8 (equip_chain_head) nonzero; (3) check_card_stat_field8_is_6(card_id) true. All three satisfied -> return 1 immediately. Leaf function (check_card_stat_field8_is_6 is named callee). indeg=3. r0=u32 player_side [0..1]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot_count=5 [0..4], slot+0x8=equip_chain_head.
 check_player_has_equip_type_in_slots:
@@ -17019,7 +17019,7 @@ LAB_08033d56:
     beq LAB_08033d88                         @ 08033d78 06d0
     movs r0,#0x0    @ 08033d7a 0020
     b LAB_08033d92                           @ 08033d7c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033d80:
     .word  0x00000868                     @ 08033d80 68080000
 DAT_08033d84:
@@ -17150,7 +17150,7 @@ LAB_08033e56:
     pop {r4,r5}                              @ 08033e60 30bc
     pop {r1}                                 @ 08033e62 02bc
     bx r1                                    @ 08033e64 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08033e68:
     .word  0x00000868                     @ 08033e68 68080000
 DAT_08033e6c:
@@ -17201,7 +17201,7 @@ LAB_08033eb6:
     pop {r4,r5,r6,r7}                        @ 08033ebc f0bc
     pop {r1}                                 @ 08033ebe 02bc
     bx r1                                    @ 08033ec0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08033ec4:
     .word  gP1LifePoints                  @ 08033ec4 e0c40102
 DAT_08033ec8:
@@ -17259,7 +17259,7 @@ LAB_08033f12:
     pop {r4,r5,r6,r7}                        @ 08033f18 f0bc
     pop {r1}                                 @ 08033f1a 02bc
     bx r1                                    @ 08033f1c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08033f20:
     .word  gP1LifePoints                  @ 08033f20 e0c40102
 DAT_08033f24:
@@ -17447,7 +17447,7 @@ LAB_08034066:
     pop {r4,r5,r6,r7}                        @ 0803406c f0bc
     pop {r1}                                 @ 0803406e 02bc
     bx r1                                    @ 08034070 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08034074:
     .word  gP1LifePoints                  @ 08034074 e0c40102
 DAT_08034078:
@@ -17486,7 +17486,7 @@ eval_slot_target_eligibility_full:
 LAB_080340b6:
     movs r0,#0x0    @ 080340b6 0020
     b LAB_08034114                           @ 080340b8 2ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080340bc:
     .word  0x00000868                     @ 080340bc 68080000
 DAT_080340c0:
@@ -17589,7 +17589,7 @@ LAB_08034170:
     pop {r4,r5}                              @ 08034170 30bc
     pop {r1}                                 @ 08034172 02bc
     bx r1                                    @ 08034174 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08034178:
     .word  gP1LifePoints                  @ 08034178 e0c40102
 DAT_0803417c:
@@ -17620,7 +17620,7 @@ find_paired_zone_entry_for_card:
     cmp r0,#0x0                              @ 080341a8 0028
     bne LAB_080341bc                         @ 080341aa 07d1
     b LAB_0803427a                           @ 080341ac 65e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080341b0:
     .word  0x00000868                     @ 080341b0 68080000
 DAT_080341b4:
@@ -17837,7 +17837,7 @@ LAB_08034336:
     pop {r4,r5,r6,r7}                        @ 08034340 f0bc
     pop {r1}                                 @ 08034342 02bc
     bx r1                                    @ 08034344 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034348:
     .word  0x00000868                     @ 08034348 68080000
 DAT_0803434c:
@@ -17987,7 +17987,7 @@ LAB_0803444c:
     b LAB_080345b4                           @ 08034466 a5e0
 LAB_08034468:
     b LAB_08034496                           @ 08034468 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803446c:
     .word  0x000012ce                     @ 0803446c ce120000
 DAT_08034470:
@@ -18141,7 +18141,7 @@ LAB_08034570:
 LAB_0803459a:
     movs r0,#0x1    @ 0803459a 0120
     b LAB_080345c8                           @ 0803459c 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080345a0:
     .word  0x00000868                     @ 080345a0 68080000
 DAT_080345a4:
@@ -18250,7 +18250,7 @@ LAB_08034644:
     cmp r1,r0                                @ 0803466c 8142
     beq LAB_0803468c                         @ 0803466e 0dd0
     b LAB_080346b6                           @ 08034670 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034674:
     .word  0x00000868                     @ 08034674 68080000
 DAT_08034678:
@@ -18292,7 +18292,7 @@ LAB_080346b8:
     pop {r4,r5,r6}                           @ 080346b8 70bc
     pop {r1}                                 @ 080346ba 02bc
     bx r1                                    @ 080346bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080346c0:
     .word  0x0804aea1                     @ 080346c0 a1ae0408
 
@@ -18372,7 +18372,7 @@ LAB_0803474c:
     cmp r2,r0                                @ 0803474c 8242
     beq LAB_080347ac                         @ 0803474e 2dd0
     b LAB_080347d0                           @ 08034750 3ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034754:
     .word  0x000014dc                     @ 08034754 dc140000
 DAT_08034758:
@@ -18387,7 +18387,7 @@ LAB_0803475c:
     cmp r2,r0                                @ 08034768 8242
     beq LAB_0803478c                         @ 0803476a 0fd0
     b LAB_080347d0                           @ 0803476c 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034770:
     .word  0x000018b9                     @ 08034770 b9180000
 DAT_08034774:
@@ -18400,7 +18400,7 @@ LAB_08034778:
     cmp r2,r0                                @ 08034780 8242
     beq LAB_080347b0                         @ 08034782 15d0
     b LAB_080347d0                           @ 08034784 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034788:
     .word  0x000018fc                     @ 08034788 fc180000
 LAB_0803478c:
@@ -18508,7 +18508,7 @@ LAB_0803480a:
     bl get_node_entity_id_in_slot            @ 0803485e fbf7fffa
     movs r1,#0x0    @ 08034862 0021
     b LAB_08034946                           @ 08034864 6fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034868:
     .word  0x0201bb90                     @ 08034868 90bb0102
 DAT_0803486c:
@@ -18567,7 +18567,7 @@ LAB_0803488c:
     cmp r5,r0                                @ 080348d4 8542
     beq LAB_08034904                         @ 080348d6 15d0
     b LAB_08034950                           @ 080348d8 3ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080348dc:
     .word  0x00000868                     @ 080348dc 68080000
 DAT_080348e0:
@@ -18586,7 +18586,7 @@ LAB_080348f0:
     cmp r5,r0                                @ 080348f8 8542
     beq LAB_0803492e                         @ 080348fa 18d0
     b LAB_08034950                           @ 080348fc 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034900:
     .word  0x00001958                     @ 08034900 58190000
 LAB_08034904:
@@ -18681,7 +18681,7 @@ LAB_080349a6:
     pop {r4,r5,r6,r7}                        @ 080349a8 f0bc
     pop {r1}                                 @ 080349aa 02bc
     bx r1                                    @ 080349ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks if card in gDuelFieldSlots[player_side][slot_idx] is activatable. Reads slot card_id and slot+0x8 (equip_chain_head); card_id==0 -> return 0 (empty slot). slot+0x6 (chain_field) nonzero: branch by card_id: 0x12b4=Total Defense Shogun -> reads slot[+0x10] bit5 as activation flag; 0x1956=EHero Rampart Blaster -> bit5 inverted and calls count_occupied_monster_zones; other -> return 0. slot+0x6==0: calls check_slot_monster_activation_eligible; if returns 0 calls check_slot_full_activation_eligibility. indeg=8. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, 0x12b4=Total Defense Shogun, 0x1956=Elemental Hero Rampart Blaster.
 check_slot_card_activatable:
@@ -18720,7 +18720,7 @@ check_slot_card_activatable:
     cmp r2,r0                                @ 080349f0 8242
     beq LAB_08034a1a                         @ 080349f2 12d0
     b LAB_08034a4a                           @ 080349f4 29e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080349f8:
     .word  0x00000868                     @ 080349f8 68080000
 DAT_080349fc:
@@ -18771,7 +18771,7 @@ LAB_08034a4c:
     pop {r4,r5,r6,r7}                        @ 08034a50 f0bc
     pop {r1}                                 @ 08034a52 02bc
     bx r1                                    @ 08034a54 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Comprehensive activation eligibility check for gDuelFieldSlots[player_side][slot_idx]. Core composite function for field activation decisions (200+ instructions). Entry: push callee-save regs + sub sp,#0x40 (0x40-byte frame); reads slot card_id and slot[+0x10] flags; slot+0x10 bit24 nonzero -> b exit_slot_activation_with_state_write (fail exit). Calls in sequence: find_paired_zone_entry_for_card / eval_slot_score_entry_full / check_slot_card_effect_eligibility / check_slot_card_fieldspell_eligibility / query_zone_chain_count_with_eligibility (multiple) / count_equip_chain_default_flags (x3) / count_field_copies_of_card / count_available_effect_zones. Exits via exit_slot_activation_with_state_write writing activation state then returns 0. indeg=2. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, gDuelActivation=0x0201e2a0, 0x1d48=activation_field, 0x1d78=second_activation_field.
 check_slot_full_activation_eligibility:
@@ -18832,7 +18832,7 @@ LAB_08034ac0:
     movs r0,#0x10    @ 08034ac4 1020
     str r0,[r1,#0x0]                         @ 08034ac6 0860
     b LAB_08035292                           @ 08034ac8 e3e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034acc:
     .word  0x00000868                     @ 08034acc 68080000
 DAT_08034ad0:
@@ -19314,7 +19314,7 @@ LAB_08034e78:
     cmp r7,r0                                @ 08034e80 8742
     beq LAB_08034ee8                         @ 08034e82 31d0
     b LAB_08034fa4                           @ 08034e84 8ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034e88:
     .word  0x0000161b                     @ 08034e88 1b160000
 LAB_08034e8c:
@@ -19330,7 +19330,7 @@ LAB_08034e8c:
 LAB_08034e9e:
     adds r0,#0x90    @ 08034e9e 9030
     b LAB_08034eb8                           @ 08034ea0 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034ea4:
     .word  0x000016cb                     @ 08034ea4 cb160000
 LAB_08034ea8:
@@ -19347,7 +19347,7 @@ LAB_08034eb8:
     cmp r7,r0                                @ 08034eb8 8742
     beq LAB_08034f18                         @ 08034eba 2dd0
     b LAB_08034fa4                           @ 08034ebc 72e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034ec0:
     .word  0x000017c7                     @ 08034ec0 c7170000
 DAT_08034ec4:
@@ -19365,7 +19365,7 @@ LAB_08034ed6:
     movs r1,#0xb    @ 08034eda 0b21
     bl check_value_in_slot_chain             @ 08034edc faf7d8fe
     b LAB_08034f9e                           @ 08034ee0 5de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08034ee4:
     .word  0x000017f6                     @ 08034ee4 f6170000
 LAB_08034ee8:
@@ -19388,7 +19388,7 @@ LAB_08034efa:
     adds r0,r0,r2    @ 08034f08 8018
     ldr r0,[r0,#0x0]                         @ 08034f0a 0068
     b LAB_08034f9e                           @ 08034f0c 47e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08034f10:
     .word  gP1LifePoints                  @ 08034f10 e0c40102
 DAT_08034f14:
@@ -19722,7 +19722,7 @@ LAB_08035184:
     b exit_slot_activation_with_state_write  @ 0803518a 79e0
 LAB_0803518c:
     b LAB_080351ac                           @ 0803518c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035190:
     .word  0x00001813                     @ 08035190 13180000
 DAT_08035194:
@@ -19997,7 +19997,7 @@ LAB_0803534e:
     b LAB_08035582                           @ 08035396 f4e0
 LAB_08035398:
     b LAB_080353dc                           @ 08035398 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0803539c:
     .word  0x00000868                     @ 0803539c 68080000
 DAT_080353a0:
@@ -20107,7 +20107,7 @@ LAB_08035458:
     muls r2,r1    @ 08035470 4a43
     .hword 0x4692    @ 08035472 9246
     b LAB_08035482                           @ 08035474 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035478:
     .word  0x00000868                     @ 08035478 68080000
 LAB_0803547c:
@@ -20229,7 +20229,7 @@ LAB_08035550:
     cmp r9,r0                                @ 08035558 8145
     beq LAB_0803556e                         @ 0803555a 08d0
     b LAB_080355c0                           @ 0803555c 30e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035560:
     .word  0x0000179d                     @ 08035560 9d170000
 LAB_08035564:
@@ -20403,7 +20403,7 @@ LAB_0803566c:
     cmp r1,r0                                @ 080356b4 8142
     blt LAB_08035712                         @ 080356b6 2cdb
     b LAB_080356e0                           @ 080356b8 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080356bc:
     .word  0x0201c510                     @ 080356bc 10c50102
 DAT_080356c0:
@@ -20483,7 +20483,7 @@ LAB_08035712:
     cmp r9,r0                                @ 08035750 8145
     beq LAB_08035780                         @ 08035752 15d0
     b LAB_080357a8                           @ 08035754 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035758:
     .word  0x0000154a                     @ 08035758 4a150000
 DAT_0803575c:
@@ -20552,7 +20552,7 @@ LAB_080357a8:
     bne LAB_080357f8                         @ 080357d4 10d1
     ldr r1, DAT_080357e4                     @ 080357d6 0349
     b LAB_080357ea                           @ 080357d8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080357dc:
     .word  0x00000868                     @ 080357dc 68080000
 DAT_080357e0:
@@ -20775,7 +20775,7 @@ LAB_08035972:
     pop {r4,r5,r6,r7}                        @ 08035980 f0bc
     pop {r1}                                 @ 08035982 02bc
     bx r1                                    @ 08035984 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks field-chain equip eligibility for slot (player_side=r0, slot_idx=r1). Calls check_slot_card_fieldspell_eligibility for eligibility flags. Computes slot address from player_side bit0 and slot_idx; reads slot[+0x10] flags extracting bit5/bit1 with slot+0x8 (equip_chain_head) for triple filter. On pass branches by slot card_id: 0x147d=Zombyra, 0x127d..0x1283=Toon range, 0x154a=Toon Dark Magician Girl etc.; each branch calls check_card_matches_active_effect_slot / find_equip_chain_node_by_slot_pair. indeg=4. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot+0x10=flags_word, bit5/bit1=restriction_flags.
 check_slot_field_spell_chain_eligible:
@@ -20849,7 +20849,7 @@ LAB_08035a04:
     bgt LAB_08035a18                         @ 08035a0c 04dc
     subs r0,#0x45    @ 08035a0e 4538
     b LAB_08035a20                           @ 08035a10 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035a14:
     .word  0x0000154a                     @ 08035a14 4a150000
 LAB_08035a18:
@@ -20961,7 +20961,7 @@ LAB_08035ab6:
     bne LAB_08035b14                         @ 08035aec 12d1
     movs r0,#0x1    @ 08035aee 0120
     b LAB_08035b16                           @ 08035af0 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035af4:
     .word  0x000015ff                     @ 08035af4 ff150000
 DAT_08035af8:
@@ -20987,7 +20987,7 @@ LAB_08035b16:
     pop {r4,r5,r6,r7}                        @ 08035b1c f0bc
     pop {r1}                                 @ 08035b1e 02bc
     bx r1                                    @ 08035b20 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks trap-chain eligibility for player (r0 bit0) field spell zone slots. Scans 5 slots (r6=0..4) from gDuelFieldSlots+player*0x868. Per slot: card_id low 13 bits nonzero; slot[+0x10] bit5/bit1 dual filter pass; card_id==0x13cd=The Legendary Fisherman -> calls check_card_matches_active_effect_slot(0x10f4=Umi). No match in 5 slots -> return 0. indeg=2. r0=u32 player_side [0..1]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, 0x13cd=The Legendary Fisherman, 0x10f4=Umi.
 check_field_spell_trap_chain_eligible:
@@ -21027,7 +21027,7 @@ LAB_08035b3a:
     cmp r2,r0                                @ 08035b64 8242
     beq LAB_08035b90                         @ 08035b66 13d0
     b LAB_08035b86                           @ 08035b68 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035b6c:
     .word  0x0201c510                     @ 08035b6c 10c50102
 DAT_08035b70:
@@ -21044,7 +21044,7 @@ LAB_08035b7c:
 LAB_08035b86:
     movs r0,#0x1    @ 08035b86 0120
     b LAB_08035b9c                           @ 08035b88 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035b8c:
     .word  0x000010f4                     @ 08035b8c f4100000
 LAB_08035b90:
@@ -21058,7 +21058,7 @@ LAB_08035b9c:
     pop {r4,r5,r6,r7}                        @ 08035b9c f0bc
     pop {r1}                                 @ 08035b9e 02bc
     bx r1                                    @ 08035ba0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks if player (r0) has activation eligibility in field spell chain. Calls check_slot_field_spell_chain_eligible(r0); if returns 0 -> return 0. If nonzero, calls check_field_spell_trap_chain_eligible(1-r4=opponent); if opponent returns 0 -> return 1 (player eligible, no opponent conflict). If opponent also nonzero -> return 0. Result: player has field chain eligibility AND opponent has no conflict -> 1; else 0. indeg=6. r0=u32 player_side [0..1]. Returns u32 0/1.
 check_player_field_spell_chain_eligible:
@@ -21185,7 +21185,7 @@ LAB_08035c78:
 LAB_08035c8a:
     subs r0,#0xa    @ 08035c8a 0a38
     b LAB_08035cb6                           @ 08035c8c 13e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035c90:
     .word  0x00001561                     @ 08035c90 61150000
 DAT_08035c94:
@@ -21213,7 +21213,7 @@ LAB_08035cb6:
     b LAB_08035f44                           @ 08035cba 43e1
 LAB_08035cbc:
     b LAB_08035eb0                           @ 08035cbc f8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035cc0:
     .word  0x0000114c                     @ 08035cc0 4c110000
 LAB_08035cc4:
@@ -21243,7 +21243,7 @@ LAB_08035ce4:
     cmp r2,r0                                @ 08035cec 8242
     beq LAB_08035db0                         @ 08035cee 5fd0
     b LAB_08035eb0                           @ 08035cf0 dee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035cf4:
     .word  0x000012a5                     @ 08035cf4 a5120000
 LAB_08035cf8:
@@ -21284,7 +21284,7 @@ LAB_08035d2c:
     b LAB_08035eb0                           @ 08035d36 bbe0
 LAB_08035d38:
     b LAB_08035d90                           @ 08035d38 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035d3c:
     .word  0x00001566                     @ 08035d3c 66150000
 LAB_08035d40:
@@ -21300,7 +21300,7 @@ LAB_08035d48:
     beq LAB_08035db8                         @ 08035d50 32d0
     ldr r0, DAT_08035d60                     @ 08035d52 0348
     b LAB_08035d72                           @ 08035d54 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035d58:
     .word  0x00001705                     @ 08035d58 05170000
 DAT_08035d5c:
@@ -21329,7 +21329,7 @@ LAB_08035d7c:
     b LAB_08035e9c                           @ 08035d82 8be0
 LAB_08035d84:
     b LAB_08035eb0                           @ 08035d84 94e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035d88:
     .word  0x0000186d                     @ 08035d88 6d180000
 LAB_08035d8c:
@@ -21432,7 +21432,7 @@ LAB_08035e32:
     cmp r1,#0x0                              @ 08035e3c 0029
     beq LAB_08035eb0                         @ 08035e3e 37d0
     b LAB_08035f44                           @ 08035e40 80e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035e44:
     .word  0x00000868                     @ 08035e44 68080000
 DAT_08035e48:
@@ -21487,7 +21487,7 @@ LAB_08035e9c:
     movs r2,#0x1    @ 08035ea2 0122
     bl count_slots_with_chain_field_match    @ 08035ea4 fdf7f6f9
     b LAB_08035d98                           @ 08035ea8 76e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08035eac:
     .word  0x00000868                     @ 08035eac 68080000
 LAB_08035eb0:

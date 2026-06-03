@@ -53,7 +53,7 @@ LAB_0805c332:
     add sp,#0x8                              @ 0805c334 02b0
     pop {r1}                                 @ 0805c336 02bc
     bx r1                                    @ 0805c338 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot placement eligibility predicate: checks player context match, activation stage==3, and card type 0x380. Only runs checks when r1==0 (r1!=0 returns 0 immediately). Four serial conditions:
 @ (1) Extracts player_id from card_entry[+2]; compares with [gP1LP+0x1ce8]: mismatch returns 0.
@@ -278,7 +278,7 @@ dispatch_effect_for_neo_daedalus_paired_slot:
 LAB_0805c50e:
     movs r0,#0x0    @ 0805c50e 0020
     b LAB_0805c522                           @ 0805c510 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c514:
     .word  0x00000fe4                     @ 0805c514 e40f0000
 PTR_gP1LifePoints_0805c518:
@@ -351,7 +351,7 @@ check_equip_slot_eligible_with_sanga_and_prereqs:
     beq LAB_0805c590                         @ 0805c580 06d0
     movs r0,#0x1    @ 0805c582 0120
     b LAB_0805c592                           @ 0805c584 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c588:
     .word  0x00001119                     @ 0805c588 19110000
 DAT_0805c58c:
@@ -480,7 +480,7 @@ LAB_0805c658:
 LAB_0805c65a:
     pop {r1}                                 @ 0805c65a 02bc
     bx r1                                    @ 0805c65c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Predicate: returns 1 if opponent's equip chain does NOT contain Swords of Revealing Light.
 @ Reads card_entry[+2] bit0 as player_id; computes opponent_id = 1 - player_id.
@@ -508,7 +508,7 @@ check_equip_slot_absent_for_swords_of_light:
     lsrs r0,r0,#0x1f    @ 0805c674 c00f
     pop {r1}                                 @ 0805c676 02bc
     bx r1                                    @ 0805c678 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805c67c:
     .word  0x00001102                     @ 0805c67c 02110000
 
@@ -613,7 +613,7 @@ LAB_0805c6ca:
     beq LAB_0805c71c                         @ 0805c708 08d0
     movs r0,#0x2    @ 0805c70a 0220
     b LAB_0805c71e                           @ 0805c70c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c710:
     .word  0x0201bb90                     @ 0805c710 90bb0102
 DAT_0805c714:
@@ -689,7 +689,7 @@ LAB_0805c778:
     beq LAB_0805c79c                         @ 0805c78c 06d0
     movs r0,#0x1    @ 0805c78e 0120
     b LAB_0805c79e                           @ 0805c790 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c794:
     .word  0x0000ffff                     @ 0805c794 ffff0000
 DAT_0805c798:
@@ -735,7 +735,7 @@ check_equip_slot_eligible_by_scapegoat_or_stray_lambs:
     cmp r1,r0                                @ 0805c7b4 8142
     beq LAB_0805c7c8                         @ 0805c7b6 07d0
     b LAB_0805c7ca                           @ 0805c7b8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c7bc:
     .word  0x000012d2                     @ 0805c7bc d2120000
 DAT_0805c7c0:
@@ -774,7 +774,7 @@ LAB_0805c7ca:
     beq LAB_0805c810                         @ 0805c800 06d0
     movs r0,#0x1    @ 0805c802 0120
     b LAB_0805c812                           @ 0805c804 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805c808:
     .word  gP1LifePoints                  @ 0805c808 e0c40102
 DAT_0805c80c:
@@ -882,7 +882,7 @@ LAB_0805c8b0:
     cmp r1,r0                                @ 0805c8b0 8142
     beq LAB_0805c8c8                         @ 0805c8b2 09d0
     b LAB_0805ca40                           @ 0805c8b4 c4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c8b8:
     .word  0x0000149b                     @ 0805c8b8 9b140000
 DAT_0805c8bc:
@@ -937,7 +937,7 @@ LAB_0805c910:
     b LAB_0805ca3c                           @ 0805c91a 8fe0
 LAB_0805c91c:
     b LAB_0805ca40                           @ 0805c91c 90e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c920:
     .word  0x000016b8                     @ 0805c920 b8160000
 DAT_0805c924:
@@ -988,7 +988,7 @@ LAB_0805c970:
     adds r2,r4,#0x0    @ 0805c97e 221c
     bl build_zone_activation_entry_blocked   @ 0805c980 fef7a4fb
     b LAB_0805ca40                           @ 0805c984 5ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805c988:
     .word  0x00000868                     @ 0805c988 68080000
 DAT_0805c98c:
@@ -1095,7 +1095,7 @@ LAB_0805ca42:
     pop {r4,r5,r6,r7}                        @ 0805ca48 f0bc
     pop {r1}                                 @ 0805ca4a 02bc
     bx r1                                    @ 0805ca4c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate checking for absence of type_d chain node.
 @ Reads card_entry[+2] bit0=player_id, bits[5:1]=slot_group.
@@ -1140,7 +1140,7 @@ check_equip_slot_eligible_with_chain_node_type_d:
     adds r1,r6,#0x0    @ 0805ca7e 311c
     bl check_equip_slot_chain_absent         @ 0805ca80 fff79efb
     b LAB_0805ca8e                           @ 0805ca84 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805ca88:
     .word  0xffff0000                     @ 0805ca88 0000ffff
 LAB_0805ca8c:
@@ -1194,7 +1194,7 @@ check_direct_equip_slot_bit4_eligible:
 LAB_0805cada:
     movs r0,#0x0    @ 0805cada 0020
     b LAB_0805caea                           @ 0805cadc 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805cae0:
     .word  gP1LifePoints                  @ 0805cae0 e0c40102
 DAT_0805cae4:
@@ -1280,7 +1280,7 @@ LAB_0805cb3c:
 LAB_0805cb3e:
     pop {r1}                                 @ 0805cb3e 02bc
     bx r1                                    @ 0805cb40 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check if the zone slot composite type for card_entry's player/slot matches the card type field. Extract player_id (bit0) and slot_group (bits[5:1]) from card_entry[+2], index gDuelFieldSlots_A (0x0201c510) at player_id*0x868 + slot_group*20; extract bits[7:1] and bit9 combined as composite type r3; read second field bit9 to supplement r3; read card_entry[+4] bits[10:1] as card_type; if r3==card_type further check card_entry[+8] nonzero. All pass returns 1 (match), else 0. Called by 0x08062dfc.
 @ 
@@ -1346,7 +1346,7 @@ check_zone_slot_type_matches_card_type:
     beq LAB_0805cbc0                         @ 0805cbb0 06d0
     movs r0,#0x1    @ 0805cbb2 0120
     b LAB_0805cbc2                           @ 0805cbb4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805cbb8:
     .word  0x00000868                     @ 0805cbb8 68080000
 DAT_0805cbbc:
@@ -1592,7 +1592,7 @@ check_equip_slot_eligible_type480_with_active_deck:
     beq LAB_0805cd64                         @ 0805cd58 04d0
     movs r0,#0x1    @ 0805cd5a 0120
     b LAB_0805cd66                           @ 0805cd5c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805cd60:
     .word  0x0201bb90                     @ 0805cd60 90bb0102
 LAB_0805cd64:
@@ -1645,7 +1645,7 @@ dispatch_lord_of_d_effect_by_slot_pair:
     adds r1,r5,#0x0    @ 0805cdc2 291c
     bl dispatch_effect_for_neo_daedalus_slot_with_monster_count @ 0805cdc4 fff766fa
     b LAB_0805cdd2                           @ 0805cdc8 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805cdcc:
     .word  0x0000128b                     @ 0805cdcc 8b120000
 LAB_0805cdd0:
@@ -1819,7 +1819,7 @@ check_equip_slot_eligible_with_lp_slot_flag:
     beq LAB_0805cec0                         @ 0805ceb0 06d0
     movs r0,#0x1    @ 0805ceb2 0120
     b LAB_0805cec2                           @ 0805ceb4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805ceb8:
     .word  gP1LifePoints                  @ 0805ceb8 e0c40102
 DWORD_0805cebc:
@@ -1882,7 +1882,7 @@ check_equip_slot_eligible_type480_with_occupied_and_monster:
     beq LAB_0805cf14                         @ 0805cf08 04d0
     movs r0,#0x1    @ 0805cf0a 0120
     b LAB_0805cf16                           @ 0805cf0c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805cf10:
     .word  0x0201bb90                     @ 0805cf10 90bb0102
 LAB_0805cf14:
@@ -1943,7 +1943,7 @@ check_equip_slot_eligible_without_reserved_field_card:
     adds r1,r5,#0x0    @ 0805cf82 291c
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 0805cf84 fff760f9
     b LAB_0805cf92                           @ 0805cf88 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805cf8c:
     .word  0x000012fb                     @ 0805cf8c fb120000
 LAB_0805cf90:
@@ -1973,7 +1973,7 @@ check_lp_draw_card_tier_threshold:
     beq LAB_0805cfb8                         @ 0805cfa8 06d0
     movs r4,#0x1    @ 0805cfaa 0124
     b LAB_0805cfba                           @ 0805cfac 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805cfb0:
     .word  0x000012cc                     @ 0805cfb0 cc120000
 LAB_0805cfb4:
@@ -2079,7 +2079,7 @@ check_monster_zone_field_state_eligible:
     cmp r0,#0x4                              @ 0805d04c 0428
     bne LAB_0805d06e                         @ 0805d04e 0ed1
     b LAB_0805d072                           @ 0805d050 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805d054:
     .word  gP1LifePoints                  @ 0805d054 e0c40102
 DAT_0805d058:
@@ -2167,7 +2167,7 @@ LAB_0805d0ea:
     beq LAB_0805d108                         @ 0805d0f4 08d0
     movs r0,#0x1    @ 0805d0f6 0120
     b LAB_0805d10a                           @ 0805d0f8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d0fc:
     .word  0x00001cf4                     @ 0805d0fc f41c0000
 DAT_0805d100:
@@ -2286,7 +2286,7 @@ LAB_0805d1a8:
     b LAB_0805d360                           @ 0805d1ae d7e0
 LAB_0805d1b0:
     b LAB_0805d736                           @ 0805d1b0 c1e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d1b4:
     .word  0x0000131c                     @ 0805d1b4 1c130000
 LAB_0805d1b8:
@@ -2310,7 +2310,7 @@ LAB_0805d1cc:
     b LAB_0805d3f0                           @ 0805d1d6 0be1
 LAB_0805d1d8:
     b LAB_0805d736                           @ 0805d1d8 ade2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d1dc:
     .word  0x000014b6                     @ 0805d1dc b6140000
 LAB_0805d1e0:
@@ -2320,7 +2320,7 @@ LAB_0805d1e0:
     b LAB_0805d424                           @ 0805d1e6 1de1
 LAB_0805d1e8:
     b LAB_0805d736                           @ 0805d1e8 a5e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d1ec:
     .word  0x0000148f                     @ 0805d1ec 8f140000
 LAB_0805d1f0:
@@ -2337,7 +2337,7 @@ LAB_0805d1f8:
     b LAB_0805d65a                           @ 0805d202 2ae2
 LAB_0805d204:
     b LAB_0805d736                           @ 0805d204 97e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d208:
     .word  0x0000153e                     @ 0805d208 3e150000
 LAB_0805d20c:
@@ -2347,7 +2347,7 @@ LAB_0805d20c:
     b LAB_0805d4ac                           @ 0805d212 4be1
 LAB_0805d214:
     b LAB_0805d736                           @ 0805d214 8fe2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d218:
     .word  0x00001541                     @ 0805d218 41150000
 LAB_0805d21c:
@@ -2379,7 +2379,7 @@ LAB_0805d242:
     b LAB_0805d388                           @ 0805d246 9fe0
 LAB_0805d248:
     b LAB_0805d736                           @ 0805d248 75e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d24c:
     .word  0x000017c6                     @ 0805d24c c6170000
 DAT_0805d250:
@@ -2391,7 +2391,7 @@ LAB_0805d254:
     b LAB_0805d528                           @ 0805d25a 65e1
 LAB_0805d25c:
     b LAB_0805d736                           @ 0805d25c 6be2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d260:
     .word  0x00001634                     @ 0805d260 34160000
 LAB_0805d264:
@@ -2408,7 +2408,7 @@ LAB_0805d26c:
     b LAB_0805d550                           @ 0805d276 6be1
 LAB_0805d278:
     b LAB_0805d736                           @ 0805d278 5de2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d27c:
     .word  0x00001721                     @ 0805d27c 21170000
 LAB_0805d280:
@@ -2418,7 +2418,7 @@ LAB_0805d280:
     b LAB_0805d574                           @ 0805d286 75e1
 LAB_0805d288:
     b LAB_0805d736                           @ 0805d288 55e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d28c:
     .word  0x0000176b                     @ 0805d28c 6b170000
 LAB_0805d290:
@@ -2442,7 +2442,7 @@ LAB_0805d2a4:
     b LAB_0805d674                           @ 0805d2ae e1e1
 LAB_0805d2b0:
     b LAB_0805d736                           @ 0805d2b0 41e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d2b4:
     .word  0x000018de                     @ 0805d2b4 de180000
 LAB_0805d2b8:
@@ -2452,7 +2452,7 @@ LAB_0805d2b8:
     b LAB_0805d58e                           @ 0805d2be 66e1
 LAB_0805d2c0:
     b LAB_0805d736                           @ 0805d2c0 39e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d2c4:
     .word  0x000018dd                     @ 0805d2c4 dd180000
 LAB_0805d2c8:
@@ -2469,7 +2469,7 @@ LAB_0805d2d0:
     b LAB_0805d5da                           @ 0805d2da 7ee1
 LAB_0805d2dc:
     b LAB_0805d736                           @ 0805d2dc 2be2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d2e0:
     .word  0x000019e1                     @ 0805d2e0 e1190000
 LAB_0805d2e4:
@@ -2479,7 +2479,7 @@ LAB_0805d2e4:
     b LAB_0805d666                           @ 0805d2ea bce1
 LAB_0805d2ec:
     b LAB_0805d736                           @ 0805d2ec 23e2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d2f0:
     .word  0x000019e2                     @ 0805d2f0 e2190000
 LAB_0805d2f4:
@@ -2565,7 +2565,7 @@ LAB_0805d372:
 LAB_0805d37e:
     movs r1,#0x2    @ 0805d37e 0221
     b LAB_0805d682                           @ 0805d380 7fe1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d384:
     .word  0x00001246                     @ 0805d384 46120000
 LAB_0805d388:
@@ -2604,7 +2604,7 @@ LAB_0805d3b6:
     b LAB_0805d736                           @ 0805d3c2 b8e1
 LAB_0805d3c4:
     b LAB_0805d396                           @ 0805d3c4 e7e7
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805d3c8:
     .word  gP1LifePoints                  @ 0805d3c8 e0c40102
 DAT_0805d3cc:
@@ -2722,7 +2722,7 @@ LAB_0805d48e:
     b LAB_0805d732                           @ 0805d49e 48e1
 LAB_0805d4a0:
     b LAB_0805d736                           @ 0805d4a0 49e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d4a4:
     .word  0x00000868                     @ 0805d4a4 68080000
 DAT_0805d4a8:
@@ -2775,7 +2775,7 @@ LAB_0805d4f6:
     movs r3,#0x0    @ 0805d506 0023
     bl scan_equip_slots_eligible_banisher_guard @ 0805d508 fef7aefd
     b LAB_0805d716                           @ 0805d50c 03e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d510:
     .word  0x00001332                     @ 0805d510 32130000
 LAB_0805d514:
@@ -2787,7 +2787,7 @@ LAB_0805d514:
     b LAB_0805d682                           @ 0805d51e b0e0
 LAB_0805d520:
     b LAB_0805d680                           @ 0805d520 aee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d524:
     .word  0x000012ec                     @ 0805d524 ec120000
 LAB_0805d528:
@@ -2894,7 +2894,7 @@ LAB_0805d5da:
     cmp r0,#0x0                              @ 0805d5e8 0028
     ble LAB_0805d682                         @ 0805d5ea 4add
     b LAB_0805d680                           @ 0805d5ec 48e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d5f0:
     .word  0x000018a6                     @ 0805d5f0 a6180000
 LAB_0805d5f4:
@@ -2934,7 +2934,7 @@ LAB_0805d62e:
     cmp r0,#0x16                             @ 0805d634 1628
     beq LAB_0805d6b0                         @ 0805d636 3bd0
     b LAB_0805d736                           @ 0805d638 7de0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805d63c:
     .word  gP1LifePoints                  @ 0805d63c e0c40102
 DAT_0805d640:
@@ -3124,7 +3124,7 @@ LAB_0805d77c:
 LAB_0805d78e:
     movs r0,#0x0    @ 0805d78e 0020
     b LAB_0805d79e                           @ 0805d790 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805d794:
     .word  gP1LifePoints                  @ 0805d794 e0c40102
 DAT_0805d798:
@@ -3235,7 +3235,7 @@ LAB_0805d838:
 LAB_0805d83a:
     pop {r1}                                 @ 0805d83a 02bc
     bx r1                                    @ 0805d83c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate for type_code in range [0x1f..0x21] with target pointer path.
 @ Extracts card_entry[+2] bits[11:6] as type_code; if > 0x21 or < 0x1f: returns 0.
@@ -3294,7 +3294,7 @@ check_equip_slot_eligible_type_range1f21_with_target:
 LAB_0805d87a:
     movs r0,#0x1    @ 0805d87a 0120
     b LAB_0805d8b6                           @ 0805d87c 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805d880:
     .word  0x00000868                     @ 0805d880 68080000
 DWORD_0805d884:
@@ -3454,7 +3454,7 @@ check_equip_slot_eligible_with_field_state_and_chain:
     beq LAB_0805d990                         @ 0805d978 0ad0
     movs r0,#0x1    @ 0805d97a 0120
     b LAB_0805d992                           @ 0805d97c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805d980:
     .word  gP1LifePoints                  @ 0805d980 e0c40102
 DWORD_0805d984:
@@ -3500,7 +3500,7 @@ check_spell_type480_active_deck_matches:
     beq LAB_0805d9c8                         @ 0805d9bc 04d0
     movs r0,#0x1    @ 0805d9be 0120
     b LAB_0805d9ca                           @ 0805d9c0 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805d9c4:
     .word  0x0201bb90                     @ 0805d9c4 90bb0102
 LAB_0805d9c8:
@@ -3646,7 +3646,7 @@ LAB_0805da9c:
     add sp,#0x4                              @ 0805da9c 01b0
     pop {r1}                                 @ 0805da9e 02bc
     bx r1                                    @ 0805daa0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_without_light_of_intervention_max2: Equip slot activation eligibility predicate. r0=card_slot_ptr. Two checks: (1) calls count_field_copies_of_card(0x135d=Light of Intervention, passcode=62867251) -- if present returns 0; (2) if Light of Intervention absent, extracts player_id and zone_idx, calls dispatch_equip_slot_scan_with_field6_guard with max_count=2, stack_arg=0, mode=0; returns 1 if nonzero, else 0. Light of Intervention on field prohibits special summon; this predicate guards absence then executes scan (max 2 slots).
 @ 
@@ -3687,7 +3687,7 @@ LAB_0805dada:
     pop {r4}                                 @ 0805dadc 10bc
     pop {r1}                                 @ 0805dade 02bc
     bx r1                                    @ 0805dae0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ invoke_effect_node_handler_with_zone_flag_guard: Effect node handler dispatch function (indeg=6 hub). r0=effect_node_ptr, r1=player_side_byte, r2=slot_type_byte. Flow: (1) r0=0 returns 0 immediately; (2) extracts player_id_bit (r7 bit0), computes zone_entry = zone_base + slot_type*0x14*... + player_id*0x868 + 0x0201c510, checks zone_word bit12 (lsls#0x13 -> bit31 == original bit12) -- if bit is 0 returns 0; (3) packs (r7 bit0, r2) combined byte, calls read_effect_slot_side_and_type -- if result matches packed value returns 0 (side/type already matched, no re-dispatch needed); (4) writes [gDuelEffectBase+0x4c0] = player_id_bit (set current active side flag); (5) calls invoke_effect_node_handler_3arg(effect_node, r7, r5); (6) writes [gDuelEffectBase+0x4c0] = 0 (clear active side flag). Returns invoke_effect_node_handler_3arg return value (0/nonzero).
 @ 
@@ -3745,7 +3745,7 @@ invoke_effect_node_handler_with_zone_flag_guard:
     movs r1,#0x0    @ 0805db40 0021
     str r1,[r4,#0x0]                         @ 0805db42 2160
     b LAB_0805db56                           @ 0805db44 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805db48:
     .word  0x00000868                     @ 0805db48 68080000
 DAT_0805db4c:
@@ -3835,7 +3835,7 @@ LAB_0805dbd8:
     pop {r4,r5,r6,r7}                        @ 0805dbd8 f0bc
     pop {r1}                                 @ 0805dbda 02bc
     bx r1                                    @ 0805dbdc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Activation predicate. r0=card_slot_ptr. Entry adds r1,r0,#0 clobbers r1 (not independent
 @ param). Extracts player_id (flags+0x2 bit0), calls dispatch_effect_handler_by_card_id.
@@ -3927,7 +3927,7 @@ LAB_0805dc64:
     pop {r4}                                 @ 0805dc64 10bc
     pop {r1}                                 @ 0805dc66 02bc
     bx r1                                    @ 0805dc68 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate for type_code 0x6c0 with Gust and Driving Snow card ID branches.
 @ Extracts type_code via mask 0xfc0; if != TYPE_6C0 (0x6c0 = 0xd8<<3): returns 0.
@@ -4495,7 +4495,7 @@ check_field_state1_player_not_active_with_opponent_monsters:
     beq LAB_0805e094                         @ 0805e07c 0ad0
     movs r0,#0x1    @ 0805e07e 0120
     b LAB_0805e096                           @ 0805e080 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805e084:
     .word  gP1LifePoints                  @ 0805e084 e0c40102
 DWORD_0805e088:
@@ -4794,7 +4794,7 @@ LAB_0805e258:
 LAB_0805e25a:
     pop {r1}                                 @ 0805e25a 02bc
     bx r1                                    @ 0805e25c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
     ldr r2, PTR_gP1LifePoints_0805e278       @ 0805e260 054a
     ldrb r0,[r0,#0x2]                        @ 0805e262 8078
     lsls r0,r0,#0x1f    @ 0805e264 c007
@@ -4878,7 +4878,7 @@ LAB_0805e2c4:
     beq LAB_0805e304                         @ 0805e2f0 08d0
     movs r0,#0x2    @ 0805e2f2 0220
     b LAB_0805e306                           @ 0805e2f4 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805e2f8:
     .word  0x00001288                     @ 0805e2f8 88120000
 DAT_0805e2fc:
@@ -4930,7 +4930,7 @@ check_equip_slot_eligible_type3c0_with_deck_prereqs_and_field14:
     beq LAB_0805e350                         @ 0805e344 04d0
     movs r0,#0x1    @ 0805e346 0120
     b LAB_0805e352                           @ 0805e348 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805e34c:
     .word  0x0201bb90                     @ 0805e34c 90bb0102
 LAB_0805e350:
@@ -4981,7 +4981,7 @@ check_monster_slot_field5_score_in_range:
     bgt LAB_0805e3a0                         @ 0805e390 06dc
     movs r0,#0x1    @ 0805e392 0120
     b LAB_0805e3a2                           @ 0805e394 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805e398:
     .word  0x00000868                     @ 0805e398 68080000
 DAT_0805e39c:
@@ -4991,7 +4991,7 @@ LAB_0805e3a0:
 LAB_0805e3a2:
     pop {r1}                                 @ 0805e3a2 02bc
     bx r1                                    @ 0805e3a4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_with_pool_and_hand_slot: Equip slot activation eligibility predicate (indeg=1). r0=card_slot_ptr, r1=player_id. Three sequential checks: (1) extracts zone_idx (halfword[+4] bits[10:4]) and card_id (halfword[+0]), calls check_zone_card_id_in_node_pool(zone_idx, card_id) -- if nonzero (already in pool) returns 0; (2) calls check_neo_daedalus_placement_eligible(slot_ptr, player_id) -- if 0 returns 0; (3) extracts player_id (bit0) and set_code (bits[10:4]), calls find_hand_slot_idx_by_set_code(player_id, set_code) -- if < 0 returns 0 (no matching combo card in hand). All passed returns 1.
 @ 
@@ -5030,7 +5030,7 @@ LAB_0805e3e4:
     pop {r4,r5}                              @ 0805e3e4 30bc
     pop {r1}                                 @ 0805e3e6 02bc
     bx r1                                    @ 0805e3e8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate (spell type 0x340, effect node absent). Checks card slot halfword[+2] bits[11:6] for 0x340 (0xd0*4). Extracts player_id (byte[+2] bit0) and zone_idx (bits[5:3] via lsls#0x1a/lsrs#0x1b). Calls find_effect_node_in_zone with card_id=halfword[+0x0] and zone_type=0; fails if effect node found (bne fail). Reads global active deck 0x0201bb90: checks [+0x0] player_id matches, [+0x4] player_id matches, and [+0x1c]/[+0x20] zone_idx matches (two-path or check). Returns 1 when all conditions met.
 @ 
@@ -5152,7 +5152,7 @@ LAB_0805e4a8:
     pop {r4,r5}                              @ 0805e4a8 30bc
     pop {r1}                                 @ 0805e4aa 02bc
     bx r1                                    @ 0805e4ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zone state pair matches card set_code predicate. Entry .hword 0x4647 saves caller r8 to r7 then pushes (callee-save). Extracts player_id (bit0) and zone_idx_candidate (bits[5:1]) from card slot byte[+2]. For both player zone slots reads word[+0x0], extracts bits[29:24]*2 (via lsls#2/lsrs#24/lsls#1), adds the other slot field5 bit (lsls#0x12/lsrs#0x1f), accumulates into r3. Extracts card halfword[+0x4] bits[14:8] as set_code. If r3==set_code sets r7=1. Returns r7.
 @ 
@@ -5257,7 +5257,7 @@ LAB_0805e554:
     pop {r4}                                 @ 0805e554 10bc
     pop {r1}                                 @ 0805e556 02bc
     bx r1                                    @ 0805e558 0847
-    .byte  0x00, 0x00
+    .zero  0x2
     ldr r0, PTR_gP1LifePoints_0805e56c       @ 0805e55c 0348
     ldr r1, DAT_0805e570                     @ 0805e55e 0449
     adds r0,r0,r1    @ 0805e560 4018
@@ -5411,7 +5411,7 @@ LAB_0805e666:
     ble LAB_0805e680                         @ 0805e670 06dd
     movs r0,#0x1    @ 0805e672 0120
     b LAB_0805e682                           @ 0805e674 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805e678:
     .word  0x00000868                     @ 0805e678 68080000
 DAT_0805e67c:
@@ -5427,7 +5427,7 @@ LAB_0805e682:
     pop {r4,r5,r6,r7}                        @ 0805e68c f0bc
     pop {r1}                                 @ 0805e68e 02bc
     bx r1                                    @ 0805e690 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate (type field range 18..20). Reads global active deck 0x0201bb90 for [+0x0] player_id and [+0x1c] zone_idx. Extracts card slot halfword[+2] bits[11:6] (via lsls#0x14/lsrs#0x1a); requires value in [18..20] (0x12..0x14) via bgt/blt boundary checks. Takes [+0x0] bit0 (player_id_bit) and [+0x1c] zone_idx, computes zone address zone_idx*20+player_bit*0x868+0x0201c510; checks [zone+0x0] upper 13 bits nonzero and [zone+0x8] nonzero. Calls check_zone_slot_equip_prerequisites(slot, player_id, zone_idx). Returns 1 when all met.
 @ 
@@ -5527,7 +5527,7 @@ LAB_0805e72a:
     pop {r4}                                 @ 0805e72c 10bc
     pop {r1}                                 @ 0805e72e 02bc
     bx r1                                    @ 0805e730 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Umi active effect slot match predicate. Single-bl wrapper: loads card_id=0x10f4 (Umi) into r0, calls check_card_matches_active_effect_slot, passes through its return value. Returns nonzero when global active effect slot card ID equals Umi (0x10f4), else 0. Used to verify active slot matches Umi during Umi effect activation.
 @ 
@@ -5667,7 +5667,7 @@ check_field_state2_bit19_equip_eligible:
     bne LAB_0805e85c                         @ 0805e848 08d1
     movs r0,#0x1    @ 0805e84a 0120
     b LAB_0805e85e                           @ 0805e84c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805e850:
     .word  gP1LifePoints                  @ 0805e850 e0c40102
 DAT_0805e854:
@@ -5778,7 +5778,7 @@ LAB_0805e8ec:
     bne LAB_0805e924                         @ 0805e914 06d1
     movs r0,#0x1    @ 0805e916 0120
     b LAB_0805e926                           @ 0805e918 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805e91c:
     .word  0x0201bb90                     @ 0805e91c 90bb0102
 LAB_0805e920:
@@ -5954,7 +5954,7 @@ LAB_0805e9d6:
     beq LAB_0805ea34                         @ 0805ea24 06d0
     movs r0,#0x2    @ 0805ea26 0220
     b LAB_0805ea36                           @ 0805ea28 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805ea2c:
     .word  0x00000868                     @ 0805ea2c 68080000
 DAT_0805ea30:
@@ -6042,7 +6042,7 @@ check_equip_slot_eligible_with_type_e_zone_and_toon:
 LAB_0805ead2:
     movs r0,#0x1    @ 0805ead2 0120
     b LAB_0805eade                           @ 0805ead4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805ead8:
     .word  0x00001415                     @ 0805ead8 15140000
 LAB_0805eadc:
@@ -6175,7 +6175,7 @@ LAB_0805eba8:
     pop {r4,r5,r6,r7}                        @ 0805ebb0 f0bc
     pop {r1}                                 @ 0805ebb2 02bc
     bx r1                                    @ 0805ebb4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805ebb8:
     .word  gP1LifePoints                  @ 0805ebb8 e0c40102
 DAT_0805ebbc:
@@ -6343,7 +6343,7 @@ LAB_0805eca0:
     pop {r4,r5,r6,r7}                        @ 0805eca0 f0bc
     pop {r1}                                 @ 0805eca2 02bc
     bx r1                                    @ 0805eca4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip or face-down slot activation eligibility predicate (dual-path). Reads byte[+3] bits[5:4]: if not 0x20 (not face-down), takes equip path -- extracts player_id/field6_flag/zone_idx, calls check_slot_card_can_be_equipped. If 0x20 (face-down), takes activation path -- checks player_id matches gP1LP[+0x1ce8] active player, checks gP1LP+player*0x868+0x10d0 bit0 is zero (equip inhibit clear), calls check_value_in_slot_chain(player, card_id, 0xb); if chain found calls dispatch_effect_handler_by_card_id. Either path returning nonzero -> returns 1.
 @ 
@@ -6410,7 +6410,7 @@ LAB_0805ed0e:
 LAB_0805ed12:
     movs r0,#0x0    @ 0805ed12 0020
     b LAB_0805ed26                           @ 0805ed14 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805ed18:
     .word  gP1LifePoints                  @ 0805ed18 e0c40102
 DWORD_0805ed1c:
@@ -6494,7 +6494,7 @@ check_opponent_has_monsters_and_lp_zone_positive:
     ble LAB_0805ee58                         @ 0805ee48 06dd
     movs r0,#0x1    @ 0805ee4a 0120
     b LAB_0805ee5a                           @ 0805ee4c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805ee50:
     .word  gP1LifePoints                  @ 0805ee50 e0c40102
 DWORD_0805ee54:
@@ -6774,7 +6774,7 @@ LAB_0805f09c:
     beq LAB_0805f0c0                         @ 0805f0b0 06d0
     movs r0,#0x1    @ 0805f0b2 0120
     b LAB_0805f0d0                           @ 0805f0b4 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f0b8:
     .word  0x00000868                     @ 0805f0b8 68080000
 DWORD_0805f0bc:
@@ -6792,7 +6792,7 @@ LAB_0805f0d0:
     pop {r4,r5,r6,r7}                        @ 0805f0d0 f0bc
     pop {r1}                                 @ 0805f0d2 02bc
     bx r1                                    @ 0805f0d4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ eval_spell_zone_equip_eligibility @ 0x0805f0d8
 @ Entry: slot_ptr. Evaluates equip placement eligibility for the current slot.
@@ -6910,7 +6910,7 @@ LAB_0805f17e:
     beq LAB_0805f19c                         @ 0805f188 08d0
     movs r0,#0x3    @ 0805f18a 0320
     b LAB_0805f19e                           @ 0805f18c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805f190:
     .word  0x00000868                     @ 0805f190 68080000
 DAT_0805f194:
@@ -6929,7 +6929,7 @@ LAB_0805f19e:
     pop {r4,r5,r6,r7}                        @ 0805f1a8 f0bc
     pop {r1}                                 @ 0805f1aa 02bc
     bx r1                                    @ 0805f1ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_player_has_field5_hand_card
 @ Extracts player_id (byte[+2] bit0) from slot_ptr (r0).
@@ -6957,7 +6957,7 @@ LAB_0805f1c4:
     adds r0,r1,#0x0    @ 0805f1c4 081c
     pop {r1}                                 @ 0805f1c6 02bc
     bx r1                                    @ 0805f1c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_at_turn_player_side
 @ Checks whether slot_ptr belongs to the current turn player side and passes card type eligibility.
@@ -7149,7 +7149,7 @@ LAB_0805f2b8:
     pop {r4,r5}                              @ 0805f2b8 30bc
     pop {r1}                                 @ 0805f2ba 02bc
     bx r1                                    @ 0805f2bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_chain_pair_card_id_matches
 @ Extracts player_id (byte[+2] bit0) and zone_idx (bits[6:2]) from slot_ptr (r0).
@@ -7222,7 +7222,7 @@ check_equip_chain_pair_card_id_matches:
     lsrs r1,r1,#0x1f    @ 0805f320 c90f
     adds r0,r1,#0x0    @ 0805f322 081c
     b LAB_0805f336                           @ 0805f324 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f328:
     .word  0x00000868                     @ 0805f328 68080000
 DWORD_0805f32c:
@@ -7301,7 +7301,7 @@ LAB_0805f374:
 LAB_0805f392:
     movs r0,#0x1    @ 0805f392 0120
     b LAB_0805f39e                           @ 0805f394 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f398:
     .word  0x0201bb90                     @ 0805f398 90bb0102
 LAB_0805f39c:
@@ -7338,7 +7338,7 @@ check_slot_has_life_absorbing_machine_node:
     bl check_slot_has_node_by_card_id        @ 0805f3b2 d0f71ffd
     pop {r1}                                 @ 0805f3b6 02bc
     bx r1                                    @ 0805f3b8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_eligible_by_slot_fields @ 0x0805f3bc
 @ Unpacks three fields from slot_ptr and forwards to check_slot_card_can_be_equipped:
@@ -7378,7 +7378,7 @@ LAB_0805f3e0:
 LAB_0805f3e2:
     pop {r1}                                 @ 0805f3e2 02bc
     bx r1                                    @ 0805f3e4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_zone340_slot_state_matches_ctx
 @ Extracts player_id (byte[+2] bit0) and zone_idx (bits[6:2]) from slot_ptr (r0).
@@ -7446,7 +7446,7 @@ LAB_0805f424:
     ldr r0,[r3,#0x4]                         @ 0805f438 5868
     ldr r1,[r3,#0x20]                        @ 0805f43a 196a
     b LAB_0805f45e                           @ 0805f43c 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f440:
     .word  0x0201bb90                     @ 0805f440 90bb0102
 LAB_0805f444:
@@ -7557,7 +7557,7 @@ LAB_0805f4f0:
     adds r1,r6,#0x0    @ 0805f4f2 311c
     bl dispatch_effect_via_hand_slot_setcode @ 0805f4f4 02f07cfa
     b LAB_0805f50a                           @ 0805f4f8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f4fc:
     .word  gP1LifePoints                  @ 0805f4fc e0c40102
 DWORD_0805f500:
@@ -7599,7 +7599,7 @@ check_equip_slot_eligible_by_chain_and_tier_at_state2:
     beq LAB_0805f548                         @ 0805f538 06d0
     movs r0,#0x1    @ 0805f53a 0120
     b LAB_0805f54a                           @ 0805f53c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f540:
     .word  gP1LifePoints                  @ 0805f540 e0c40102
 DWORD_0805f544:
@@ -7696,7 +7696,7 @@ LAB_0805f5e0:
     pop {r4,r5}                              @ 0805f5e0 30bc
     pop {r1}                                 @ 0805f5e2 02bc
     bx r1                                    @ 0805f5e4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_effect_node_zone_activation_dual_state: Effect node zone activation state query. r0=effect_node_ptr. Executes two count_effect_node_zone_activations passes: (1) writes slot[+0xa]=1 (halfword, activate temp flag); calls count_effect_node_zone_activations -- if 0 returns 0 (fail); (2) if first count nonzero, writes slot[+0xa]=0 (clear temp flag); calls count_effect_node_zone_activations again -- if 0 returns 0 (fail); (3) if second count also nonzero, returns 2. Result: 2=dual activation confirmed, 0=either phase failed. Verifies effect node has zone activations under both flag=1 and flag=0 states.
 @ 
@@ -7831,7 +7831,7 @@ check_equip_eligible_by_lp_count_and_zone_offset:
     ble LAB_0805f690                         @ 0805f680 06dd
     movs r0,#0x1    @ 0805f682 0120
     b LAB_0805f692                           @ 0805f684 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805f688:
     .word  gP1LifePoints                  @ 0805f688 e0c40102
 DAT_0805f68c:
@@ -7900,7 +7900,7 @@ LAB_0805f6da:
     pop {r4}                                 @ 0805f6dc 10bc
     pop {r1}                                 @ 0805f6de 02bc
     bx r1                                    @ 0805f6e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_field_spell_zone480_equip_type_eligible
 @ Gate: halfword[+2] bits[11:6] must be 0x480 (field spell zone, 0x90<<3); else return 0.
@@ -7991,7 +7991,7 @@ check_field_spell_zone480_equip_type_eligible:
     bge LAB_0805f778                         @ 0805f764 08da
     movs r0,#0x1    @ 0805f766 0120
     b LAB_0805f77a                           @ 0805f768 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f76c:
     .word  0x0201bb90                     @ 0805f76c 90bb0102
 DWORD_0805f770:
@@ -8071,7 +8071,7 @@ LAB_0805f7c2:
 LAB_0805f7ca:
     pop {r1}                                 @ 0805f7ca 02bc
     bx r1                                    @ 0805f7cc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_slot_zone_type_facedown_flip @ 0x0805f7d0
 @ Leaf function (no push/pop, bx lr). Reads ldrh[+2] from slot_ptr.
@@ -8111,7 +8111,7 @@ LAB_0805f7e6:
     eors r0,r1    @ 0805f7f2 4840
 LAB_0805f7f4:
     bx lr                                    @ 0805f7f4 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_neo_daedalus_zone_effect_available @ 0x0805f7f8
 @ Entry: slot_ptr.
@@ -8165,7 +8165,7 @@ check_neo_daedalus_zone_effect_available:
 LAB_0805f832:
     movs r0,#0x0    @ 0805f832 0020
     b LAB_0805f854                           @ 0805f834 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0805f838:
     .word  gP1LifePoints                  @ 0805f838 e0c40102
 DAT_0805f83c:
@@ -8185,7 +8185,7 @@ LAB_0805f854:
     pop {r4,r5,r6}                           @ 0805f854 70bc
     pop {r1}                                 @ 0805f856 02bc
     bx r1                                    @ 0805f858 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_slot_zone380_atk_above_1999_with_card_match
 @ Dual-argument predicate: slot_ptr_a (r0) and optional slot_ptr_b (r1).
@@ -8248,7 +8248,7 @@ LAB_0805f86c:
     bls LAB_0805f8ac                         @ 0805f8a0 04d9
     movs r0,#0x1    @ 0805f8a2 0120
     b LAB_0805f8ae                           @ 0805f8a4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f8a8:
     .word  0x000007cf                     @ 0805f8a8 cf070000
 LAB_0805f8ac:
@@ -8297,7 +8297,7 @@ check_spell_zone_placeable_with_opponent_lp14:
     beq LAB_0805f928                         @ 0805f918 06d0
     movs r0,#0x1    @ 0805f91a 0120
     b LAB_0805f92a                           @ 0805f91c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805f920:
     .word  gP1LifePoints                  @ 0805f920 e0c40102
 DWORD_0805f924:
@@ -8344,7 +8344,7 @@ LAB_0805f99c:
     pop {r4}                                 @ 0805f99c 10bc
     pop {r1}                                 @ 0805f99e 02bc
     bx r1                                    @ 0805f9a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_ctx_slot6_has_card_no_chain
 @ No-push leaf function (bx lr exit). Reads gDuelEffectCtx (0x0201bb90):
@@ -8480,7 +8480,7 @@ check_light_of_intervention_and_swarm_absent:
     bne LAB_0805fa54                         @ 0805fa44 06d1
     movs r0,#0x1    @ 0805fa46 0120
     b LAB_0805fa56                           @ 0805fa48 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0805fa4c:
     .word  0x0000135d                     @ 0805fa4c 5d130000
 DAT_0805fa50:
@@ -8530,7 +8530,7 @@ LAB_0805fac8:
     pop {r4,r5}                              @ 0805fac8 30bc
     pop {r1}                                 @ 0805faca 02bc
     bx r1                                    @ 0805facc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_light_of_intervention_absent @ 0x0805fad0
 @ Void-param predicate: r0 is immediately overwritten at entry by ldr DAT_0805fae0 = 0x135d.
@@ -8558,7 +8558,7 @@ LAB_0805fae4:
 LAB_0805fae6:
     pop {r1}                                 @ 0805fae6 02bc
     bx r1                                    @ 0805fae8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_eligible_by_turn_player_lp_or_chain
 @ Extracts player_id (byte[+2] bit0) from slot_ptr (r0).
@@ -8606,7 +8606,7 @@ check_equip_eligible_by_turn_player_lp_or_chain:
 LAB_0805fb16:
     adds r0,r3,#0x0    @ 0805fb16 181c
     b LAB_0805fb34                           @ 0805fb18 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805fb1c:
     .word  gP1LifePoints                  @ 0805fb1c e0c40102
 DWORD_0805fb20:
@@ -8623,7 +8623,7 @@ LAB_0805fb34:
     pop {r4,r5}                              @ 0805fb34 30bc
     pop {r1}                                 @ 0805fb36 02bc
     bx r1                                    @ 0805fb38 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_with_empty_monster_zones_and_handlers: Equip slot activation eligibility predicate (no monster zone + effect handler loop). r0=card_slot_ptr, r1=player_id. Five sequential checks: (1) check_neo_daedalus_placement_eligible -- returns 0 on fail; (2) count_occupied_monster_zones(player_id) -- if nonzero (monsters present) returns 0; (3) check_equip_slot_chain_absent(slot_ptr, player_id) -- if chain nonempty returns 0; (4) reads gP1LifePoints[player_id*0x868+0xc] for zone_count upper bound, loops zone_idx=[0..zone_count-1]: calls dispatch_effect_handler_by_card_id(player_id, card_id, zone_idx) -- if any returns nonzero immediately returns 1; (5) all zones exhausted with no match returns 0.
 @ 
@@ -8813,7 +8813,7 @@ check_equip_slot_eligible_with_slot_chain_and_hand_hp:
     beq LAB_0805fc8c                         @ 0805fc78 08d0
     movs r0,#0x1    @ 0805fc7a 0120
     b LAB_0805fc8e                           @ 0805fc7c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805fc80:
     .word  0x0201bb90                     @ 0805fc80 90bb0102
 DWORD_0805fc84:
@@ -8825,7 +8825,7 @@ LAB_0805fc8c:
 LAB_0805fc8e:
     pop {r1}                                 @ 0805fc8e 02bc
     bx r1                                    @ 0805fc90 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Multi-condition composite check.
 @ (A) If r1 != NULL and r1[+0].card_id == slot_ptr[+0].card_id -> return 0 (same card, no activation).
@@ -8933,7 +8933,7 @@ LAB_0805fd34:
     pop {r4,r5,r6,r7}                        @ 0805fd34 f0bc
     pop {r1}                                 @ 0805fd36 02bc
     bx r1                                    @ 0805fd38 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Multi-zone-traverse + LP gate.
 @ High registers used for callee-save (r8=r0 via .hword 0x4680, r9=r1 via .hword 0x4691).
@@ -9101,7 +9101,7 @@ LAB_0805fe30:
     pop {r4}                                 @ 0805fe30 10bc
     pop {r1}                                 @ 0805fe32 02bc
     bx r1                                    @ 0805fe34 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Three-step hand-slot and effect-node check.
 @ (1) Extract player_id (byte[+2].bit0) and set_code (slot_ptr[+4] bits[14:8]);
@@ -9293,7 +9293,7 @@ LAB_0805ff5c:
     pop {r4,r5}                              @ 0805ff5c 30bc
     pop {r1}                                 @ 0805ff5e 02bc
     bx r1                                    @ 0805ff60 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_with_lp_active_and_neo_daedalus: Equip slot activation eligibility predicate (LP active state + neo_daedalus). r0=card_slot_ptr, r1=player_id. Two checks: (1) reads gP1LifePoints[player_id*0x868+0x10] (word, LP activation count); if 0 returns 0 (LP slot not active); (2) if nonzero, calls check_neo_daedalus_placement_eligible(slot_ptr, player_id) and passes through return value (1=allow, 0=deny). Differs from check_equip_slot_eligible_with_lp_slot_flag (0x0805ce70): this function checks [+0x10] LP activation count (nonzero=active), that function checks [+0x11c] bit0 flag (zero=available).
 @ 
@@ -9319,7 +9319,7 @@ check_equip_slot_eligible_with_lp_active_and_neo_daedalus:
     adds r1,r4,#0x0    @ 0805ff82 211c
     bl check_neo_daedalus_placement_eligible @ 0805ff84 fcf748f9
     b LAB_0805ff96                           @ 0805ff88 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0805ff8c:
     .word  gP1LifePoints                  @ 0805ff8c e0c40102
 DWORD_0805ff90:
@@ -9358,7 +9358,7 @@ LAB_0805ffb0:
 LAB_0805ffb2:
     pop {r1}                                 @ 0805ffb2 02bc
     bx r1                                    @ 0805ffb4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Also called directly by FUN_0806001c (indeg=1).
 @ (1) Extract slot_ptr[+2] bits[10:4] (zone_type); fail if != 0x580 (0xb0<<3).
@@ -9458,7 +9458,7 @@ LAB_0806003c:
     pop {r4}                                 @ 0806003c 10bc
     pop {r1}                                 @ 0806003e 02bc
     bx r1                                    @ 08060040 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Chain-absent gate + LP slot check.
 @ (1) Call check_equip_slot_chain_absent(slot_ptr) -- if chain is not empty jump to fail path.
@@ -9628,7 +9628,7 @@ LAB_08060138:
 LAB_08060142:
     movs r0,#0x0    @ 08060142 0020
     b LAB_08060156                           @ 08060144 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08060148:
     .word  gP1LifePoints                  @ 08060148 e0c40102
 DAT_0806014c:
@@ -9799,7 +9799,7 @@ check_equip_slot_eligible_neo_daedalus_with_zone_field_guard:
     beq LAB_08060268                         @ 08060254 08d0
     movs r0,#0x1    @ 08060256 0120
     b LAB_0806026a                           @ 08060258 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0806025c:
     .word  gP1LifePoints                  @ 0806025c e0c40102
 DAT_08060260:
@@ -9928,7 +9928,7 @@ check_equip_slot_eligible_mask_restrict_absent_dual_phase:
     bne LAB_08060318                         @ 08060304 08d1
     movs r0,#0x2    @ 08060306 0220
     b LAB_08060320                           @ 08060308 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_0806030c:
     .word  gP1LifePoints                  @ 0806030c e0c40102
 DAT_08060310:
@@ -9943,7 +9943,7 @@ LAB_08060320:
     pop {r4,r5}                              @ 08060320 30bc
     pop {r1}                                 @ 08060322 02bc
     bx r1                                    @ 08060324 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Neo Daedalus special-path branch.
 @ Checks slot_ptr[+2] bits[10:4] (zone_type mask 0xfc0) against 0x3c0 (0xf0<<2).
@@ -9979,7 +9979,7 @@ LAB_08060348:
 LAB_0806034a:
     pop {r1}                                 @ 0806034a 02bc
     bx r1                                    @ 0806034c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, three-way return (0/2/passthrough). Extracts zone_type from slot byte[+0x2] bits[10:6]. If zone_type > 4 (not a monster zone), takes player_id (bit0) and zone_idx (bits[10:6]), calls check_value_in_slot_chain(player_id, zone_idx, 0x15d3 Second Goblin); if the chain does not contain Second Goblin (returns 0), returns 2. Otherwise (zone_type <= 4 or chain contains target) passes through check_equip_slot_eligible_zone_type_or_neo_daedalus(slot, arg). Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -10109,7 +10109,7 @@ LAB_08060402:
 LAB_0806044a:
     movs r0,#0x1    @ 0806044a 0120
     b LAB_0806045e                           @ 0806044c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08060450:
     .word  gP1LifePoints                  @ 08060450 e0c40102
 DAT_08060454:
@@ -10170,7 +10170,7 @@ LAB_080604a4:
 LAB_080604a6:
     pop {r1}                                 @ 080604a6 02bc
     bx r1                                    @ 080604a8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate for Neo Daedalus group with LP loop scan.
 @ (1) Call check_field_spell_neo_daedalus_group_placeable(player_id) -- return 0 if not placeable.
@@ -10239,7 +10239,7 @@ LAB_08060504:
     pop {r4,r5,r6}                           @ 08060504 70bc
     pop {r1}                                 @ 08060506 02bc
     bx r1                                    @ 08060508 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806050c:
     .word  gP1LifePoints                  @ 0806050c e0c40102
 DWORD_08060510:
@@ -10313,7 +10313,7 @@ LAB_08060558:
     bne LAB_08060580                         @ 08060570 06d1
     movs r0,#0x1    @ 08060572 0120
     b LAB_08060582                           @ 08060574 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060578:
     .word  gP1LifePoints                  @ 08060578 e0c40102
 DWORD_0806057c:
@@ -10355,7 +10355,7 @@ LAB_08060638:
     pop {r4,r5}                              @ 08060638 30bc
     pop {r1}                                 @ 0806063a 02bc
     bx r1                                    @ 0806063c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Opponent zone occupancy + own LP count dual check.
 @ Extracts player_id (byte[+2].bit0), computes opponent_id = 1 - player_id.
@@ -10402,7 +10402,7 @@ LAB_08060672:
     pop {r4,r5}                              @ 08060674 30bc
     pop {r1}                                 @ 08060676 02bc
     bx r1                                    @ 08060678 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806067c:
     .word  gP1LifePoints                  @ 0806067c e0c40102
 DWORD_08060680:
@@ -10612,7 +10612,7 @@ LAB_080607aa:
     pop {r4,r5}                              @ 080607ac 30bc
     pop {r1}                                 @ 080607ae 02bc
     bx r1                                    @ 080607b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip 槽激活资格谓词, 返回 0/1. 读取 gP1LifePoints[player*0x868+0x10] (玩家 LP 状态字); 若为 0 则直接返回 0 (无 LP 槽). 若非 0 则调用 check_equip_slot_eligible_by_slot_value_vs_tier(slot_ptr, arg) 并透传其返回值. 语义: LP 状态非零时才评估槽值与 tier 的比较条件.
 @ 
@@ -10638,7 +10638,7 @@ check_equip_slot_eligible_by_lp_status_and_slot_value:
     adds r1,r4,#0x0    @ 080607d2 211c
     bl check_equip_slot_eligible_by_slot_value_vs_tier @ 080607d4 fff7d8ff
     b LAB_080607e6                           @ 080607d8 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080607dc:
     .word  gP1LifePoints                  @ 080607dc e0c40102
 DWORD_080607e0:
@@ -10703,7 +10703,7 @@ LAB_0806084c:
     pop {r4}                                 @ 0806084c 10bc
     pop {r1}                                 @ 0806084e 02bc
     bx r1                                    @ 08060850 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. LP slot existence + chain polarity dual check.
 @ (1) Read gP1LifePoints[player*0x868+0x10] (LP slot activation count);
@@ -10739,7 +10739,7 @@ check_equip_slot_eligible_with_lp_slot_and_chain_polarity:
     bne LAB_0806087c                         @ 0806086c 06d1
     movs r0,#0x0    @ 0806086e 0020
     b LAB_08060890                           @ 08060870 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060874:
     .word  gP1LifePoints                  @ 08060874 e0c40102
 DWORD_08060878:
@@ -10759,7 +10759,7 @@ LAB_08060890:
     pop {r4}                                 @ 08060890 10bc
     pop {r1}                                 @ 08060892 02bc
     bx r1                                    @ 08060894 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. LP slot fast-path OR effect dispatch fallback.
 @ Called exclusively by FUN_08061660 (tags: [duel_field]) after Neo Daedalus group placeable check.
@@ -10804,7 +10804,7 @@ check_equip_slot_eligible_by_lp_slot_and_effect_dispatch:
     bne LAB_080608d8                         @ 080608c8 06d1
     movs r0,#0x0    @ 080608ca 0020
     b LAB_080608da                           @ 080608cc 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080608d0:
     .word  gP1LifePoints                  @ 080608d0 e0c40102
 DAT_080608d4:
@@ -10846,7 +10846,7 @@ LAB_080608fe:
     pop {r4,r5}                              @ 08060900 30bc
     pop {r1}                                 @ 08060902 02bc
     bx r1                                    @ 08060904 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_by_combined_player_effect_sum
 @ 
@@ -10883,7 +10883,7 @@ LAB_08060930:
     pop {r4,r5}                              @ 08060930 30bc
     pop {r1}                                 @ 08060932 02bc
     bx r1                                    @ 08060934 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_by_owner_match_and_effect_dispatch
 @ 
@@ -10914,7 +10914,7 @@ check_equip_slot_eligible_by_owner_match_and_effect_dispatch:
     beq LAB_0806095c                         @ 0806094c 06d0
     movs r0,#0x0    @ 0806094e 0020
     b LAB_08060970                           @ 08060950 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060954:
     .word  gP1LifePoints                  @ 08060954 e0c40102
 DWORD_08060958:
@@ -10961,7 +10961,7 @@ LAB_0806099c:
     pop {r4,r5,r6}                           @ 0806099c 70bc
     pop {r1}                                 @ 0806099e 02bc
     bx r1                                    @ 080609a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_neo_daedalus_with_monster_placeable
 @ 
@@ -11026,7 +11026,7 @@ LAB_080609f4:
     pop {r4}                                 @ 080609f4 10bc
     pop {r1}                                 @ 080609f6 02bc
     bx r1                                    @ 080609f8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_zone_e_type580_with_field5
 @ 
@@ -11090,7 +11090,7 @@ check_equip_slot_eligible_zone_e_type580_with_field5:
     beq LAB_08060a54                         @ 08060a48 04d0
     movs r0,#0x1    @ 08060a4a 0120
     b LAB_08060a56                           @ 08060a4c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060a50:
     .word  gP1LifePoints                  @ 08060a50 e0c40102
 LAB_08060a54:
@@ -11098,7 +11098,7 @@ LAB_08060a54:
 LAB_08060a56:
     pop {r1}                                 @ 08060a56 02bc
     bx r1                                    @ 08060a58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip 槽激活资格谓词, 返回 0/1. 调用 check_value_in_slot_chain(player_id, card_id, type=0xb); 若链中包含目标值 (返回非零) 则调用 check_neo_daedalus_placement_eligible(slot_ptr, arg) 并透传其返回值. 若链中不含目标值则返回 0. 语义: 仅当 equip 链中已有目标卡牌时才评估 Neo Daedalus 放置条件. 与 check_equip_slot_eligible_with_chain_absent_and_lp_slot 为逆向对称兄弟函数.
 @ 
@@ -11175,7 +11175,7 @@ LAB_08060b42:
     pop {r4}                                 @ 08060b44 10bc
     pop {r1}                                 @ 08060b46 02bc
     bx r1                                    @ 08060b48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_neo_daedalus_with_opponent_slot_count
 @ 
@@ -11219,7 +11219,7 @@ LAB_08060b78:
     pop {r4}                                 @ 08060b78 10bc
     pop {r1}                                 @ 08060b7a 02bc
     bx r1                                    @ 08060b7c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_neo_daedalus_with_state12_loop
 @ 
@@ -11297,7 +11297,7 @@ LAB_08060be8:
     pop {r4,r5,r6}                           @ 08060be8 70bc
     pop {r1}                                 @ 08060bea 02bc
     bx r1                                    @ 08060bec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060bf0:
     .word  gP1LifePoints                  @ 08060bf0 e0c40102
 DWORD_08060bf4:
@@ -11403,7 +11403,7 @@ LAB_08060c72:
     beq LAB_08060c8c                         @ 08060c80 04d0
     movs r0,#0x1    @ 08060c82 0120
     b LAB_08060c8e                           @ 08060c84 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060c88:
     .word  0x00001532                     @ 08060c88 32150000
 LAB_08060c8c:
@@ -11541,7 +11541,7 @@ LAB_08060d36:
     pop {r4,r5}                              @ 08060d38 30bc
     pop {r1}                                 @ 08060d3a 02bc
     bx r1                                    @ 08060d3c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060d40:
     .word  gP1LifePoints                  @ 08060d40 e0c40102
 DWORD_08060d44:
@@ -11683,7 +11683,7 @@ LAB_08060dfc:
 LAB_08060dfe:
     pop {r1}                                 @ 08060dfe 02bc
     bx r1                                    @ 08060e00 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_by_effect_dispatch_result
 @ 
@@ -11752,7 +11752,7 @@ LAB_08060e52:
     pop {r4,r5}                              @ 08060e54 30bc
     pop {r1}                                 @ 08060e56 02bc
     bx r1                                    @ 08060e58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_crimson_ninja_absent_with_spell_zone
 @ 
@@ -11889,7 +11889,7 @@ LAB_08060f00:
 LAB_08060f02:
     pop {r1}                                 @ 08060f02 02bc
     bx r1                                    @ 08060f04 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_equip_slot_eligible_by_zone_slot_field_correlation
 @ 
@@ -11987,7 +11987,7 @@ check_equip_slot_eligible_by_zone_slot_field_correlation:
 LAB_08060f96:
     adds r0,r3,#0x0    @ 08060f96 181c
     b LAB_08060fde                           @ 08060f98 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08060f9c:
     .word  0x00000868                     @ 08060f9c 68080000
 DWORD_08060fa0:
@@ -12054,7 +12054,7 @@ LAB_08061010:
     pop {r4,r5}                              @ 08061010 30bc
     pop {r1}                                 @ 08061012 02bc
     bx r1                                    @ 08061014 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ check_slot_at_zone_e_with_field5_active @ 0x08061018
 @ Four-level predicate: slot is at zone E and zone card field5 is nonzero.
@@ -12436,7 +12436,7 @@ LAB_0806128a:
     pop {r4,r5}                              @ 0806128c 30bc
     pop {r1}                                 @ 0806128e 02bc
     bx r1                                    @ 08061290 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061294:
     .word  gP1LifePoints                  @ 08061294 e0c40102
 DWORD_08061298:
@@ -12486,7 +12486,7 @@ LAB_080612dc:
 LAB_080612de:
     pop {r1}                                 @ 080612de 02bc
     bx r1                                    @ 080612e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Neo Daedalus 装备槽激活资格谓词, 触发条件为装备方手牌数为 0 时才允许 dispatch Neo Daedalus
 @ 效果槽激活. 从 card_slot[+2] 提取 player_id (bit0), 以 player_id*0x868+0x14 索引
@@ -12519,7 +12519,7 @@ check_equip_slot_eligible_neo_daedalus_with_hand_empty:
     adds r1,r4,#0x0    @ 08061302 211c
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 08061304 faf7a0ff
     b LAB_08061316                           @ 08061308 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806130c:
     .word  gP1LifePoints                  @ 0806130c e0c40102
 DWORD_08061310:
@@ -12549,7 +12549,7 @@ LAB_08061330:
     adds r0,r1,#0x0    @ 08061330 081c
     pop {r1}                                 @ 08061332 02bc
     bx r1                                    @ 08061334 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, checks paired slot effect type and zone field5:
 @ (1) r1 (second_slot_ptr) non-NULL check;
@@ -12623,7 +12623,7 @@ LAB_080613a8:
     pop {r4,r5}                              @ 080613a8 30bc
     pop {r1}                                 @ 080613aa 02bc
     bx r1                                    @ 080613ac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080613b0:
     .word  gP1LifePoints                  @ 080613b0 e0c40102
 
@@ -12646,7 +12646,7 @@ check_equip_slot_eligible_by_card_id_graveyard_threshold:
     cmp r1,r0                                @ 080613c4 8142
     beq LAB_080613d8                         @ 080613c6 07d0
     b LAB_080613da                           @ 080613c8 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080613cc:
     .word  0x000014f0                     @ 080613cc f0140000
 DWORD_080613d0:
@@ -12852,7 +12852,7 @@ LAB_0806152c:
     pop {r4,r5,r6,r7}                        @ 08061530 f0bc
     pop {r1}                                 @ 08061532 02bc
     bx r1                                    @ 08061534 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061538:
     .word  0x00000868                     @ 08061538 68080000
 
@@ -12895,7 +12895,7 @@ LAB_08061564:
 LAB_08061572:
     adds r0,r4,#0x0    @ 08061572 201c
     b LAB_0806157e                           @ 08061574 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061578:
     .word  0x0201bb90                     @ 08061578 90bb0102
 LAB_0806157c:
@@ -12995,7 +12995,7 @@ check_equip_slot_eligible_field_spell_effect_type_e_with_zone_field5:
     beq LAB_0806161c                         @ 08061610 04d0
     movs r0,#0x1    @ 08061612 0120
     b LAB_0806161e                           @ 08061614 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061618:
     .word  gP1LifePoints                  @ 08061618 e0c40102
 LAB_0806161c:
@@ -13003,7 +13003,7 @@ LAB_0806161c:
 LAB_0806161e:
     pop {r1}                                 @ 0806161e 02bc
     bx r1                                    @ 08061620 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, iterates both players (player_id=0 and 1), for each player performs three-level check:
 @ (1) count_monster_slots_for_player(slot_ptr, player_id) > 0;
@@ -13064,7 +13064,7 @@ LAB_08061680:
     pop {r4,r5}                              @ 08061680 30bc
     pop {r1}                                 @ 08061682 02bc
     bx r1                                    @ 08061684 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Scans both players' monster zones, registers a zone mark for the matching equip effect node and returns whether successful. On entry, if effect_slot_ptr (r1) is 0, takes the teardown path returning 0. Otherwise validates: check_effect_slot_zone_equip_valid passes; effect_slot owner (byte[+2] bit0 ^ byte[+3] bit2) equals slot opponent (1 - slot player_id); get_card_extended_stat_field6 == 0x16; effect_slot byte[+3] status bits (mask 0x30) == 0. After validation, first clears/swaps the halfword[+0x8] of the two-side corresponding zone entries in gDuelFieldSlots, then a double loop (outer player r5=0..1, inner slot_idx r4=0..0xa) calls check_slot_card_is_equip_whitelist (when r4<=4), check_zone_slot_equip_prerequisites, invoke_effect_node_handler_with_zone_flag_guard; if any node hits, writes effect_slot card_id into the hit zone entry halfword[+0x8] and returns 1. If none hit, returns 0.
 @ 
@@ -13474,7 +13474,7 @@ LAB_0806192c:
     pop {r4,r5,r6}                           @ 0806192c 70bc
     pop {r1}                                 @ 0806192e 02bc
     bx r1                                    @ 08061930 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08061934:
     .word  0x00000868                     @ 08061934 68080000
 
@@ -13513,7 +13513,7 @@ check_equip_slot_eligible_neo_daedalus_with_lp_status_lookup:
 LAB_08061972:
     movs r0,#0x0    @ 08061972 0020
     b LAB_08061982                           @ 08061974 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08061978:
     .word  gP1LifePoints                  @ 08061978 e0c40102
 DAT_0806197c:
@@ -13549,7 +13549,7 @@ check_equip_slot_eligible_by_player_status_gt2_with_setcode_dispatch:
     adds r1,r4,#0x0    @ 080619a6 211c
     bl dispatch_effect_via_hand_slot_setcode @ 080619a8 00f022f8
     b LAB_080619ba                           @ 080619ac 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080619b0:
     .word  gP1LifePoints                  @ 080619b0 e0c40102
 DAT_080619b4:
@@ -13582,7 +13582,7 @@ check_equip_slot_eligible_by_active_ctx_score_threshold:
     ble LAB_080619e8                         @ 080619d8 06dd
     movs r0,#0x1    @ 080619da 0120
     b LAB_080619ea                           @ 080619dc 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080619e0:
     .word  0x0201bb90                     @ 080619e0 90bb0102
 DWORD_080619e4:
@@ -13592,7 +13592,7 @@ LAB_080619e8:
 LAB_080619ea:
     pop {r1}                                 @ 080619ea 02bc
     bx r1                                    @ 080619ec 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ dispatch_effect_via_hand_slot_setcode @ 0x080619f0
 @ Step 1: count_field_copies_of_card(0x1332) -- Zera Ritual (passcode=81756897).
@@ -13882,7 +13882,7 @@ check_equip_slot_eligible_sanctuary_paired_with_setcode_dispatch:
     beq LAB_08061b9c                         @ 08061b88 08d0
     movs r0,#0x2    @ 08061b8a 0220
     b LAB_08061ba2                           @ 08061b8c 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08061b90:
     .word  0x0000175e                     @ 08061b90 5e170000
 PTR_gP1LifePoints_08061b94:
@@ -13958,7 +13958,7 @@ LAB_08061c00:
     pop {r4}                                 @ 08061c00 10bc
     pop {r1}                                 @ 08061c02 02bc
     bx r1                                    @ 08061c04 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061c08:
     .word  gP1LifePoints                  @ 08061c08 e0c40102
 DWORD_08061c0c:
@@ -14003,7 +14003,7 @@ LAB_08061c44:
     pop {r4,r5}                              @ 08061c44 30bc
     pop {r1}                                 @ 08061c46 02bc
     bx r1                                    @ 08061c48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, no parameter used (slot_ptr not read):
 @ call count_field_copies_of_card(0x13f2=Mask of Restrict);
@@ -14161,7 +14161,7 @@ LAB_08061d54:
 LAB_08061d56:
     pop {r1}                                 @ 08061d56 02bc
     bx r1                                    @ 08061d58 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate, returns 0/1. Thin wrapper: loads fixed fn-ptr 0x080507ad as the second argument, calls invoke_count_zone_pair_hits_full_range(slot, fn_ptr) to count the zone-pair hits of that predicate over the full range. If hit count > 0 returns 1, otherwise returns 0. Normalizes the count result to a boolean eligibility. Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -14180,7 +14180,7 @@ LAB_08061d6c:
     adds r0,r1,#0x0    @ 08061d6c 081c
     pop {r1}                                 @ 08061d6e 02bc
     bx r1                                    @ 08061d70 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061d74:
     .word  0x080507ad                     @ 08061d74 ad070508
 
@@ -14259,7 +14259,7 @@ check_equip_slot_eligible_by_lp_status_tier3_neo_daedalus:
     adds r1,r4,#0x0    @ 08061dea 211c
     bl check_neo_daedalus_placement_eligible @ 08061dec faf714fa
     b LAB_08061dfe                           @ 08061df0 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061df4:
     .word  gP1LifePoints                  @ 08061df4 e0c40102
 DWORD_08061df8:
@@ -14290,7 +14290,7 @@ LAB_08061e18:
 LAB_08061e1a:
     pop {r1}                                 @ 08061e1a 02bc
     bx r1                                    @ 08061e1c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type field in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x140. If not equal returns 1 (eligible). If equal to 0x140 (field zone type), extracts player_id (bit0) then calls count_available_field_zones_for_player: if player has available field zones (>0) returns 1, otherwise returns 0.
 @ 
@@ -14386,7 +14386,7 @@ LAB_08061ea8:
     adds r0,r1,#0x0    @ 08061ea8 081c
     pop {r1}                                 @ 08061eaa 02bc
     bx r1                                    @ 08061eac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061eb0:
     .word  0x08051e95                     @ 08061eb0 951e0508
 
@@ -14571,7 +14571,7 @@ check_equip_slot_eligible_field_spell_by_hand_set_code_dispatch:
 LAB_08061fe2:
     movs r0,#0x0    @ 08061fe2 0020
     b LAB_08061ff2                           @ 08061fe4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08061fe8:
     .word  gP1LifePoints                  @ 08061fe8 e0c40102
 DWORD_08061fec:
@@ -14633,7 +14633,7 @@ LAB_08062040:
 LAB_08062042:
     pop {r1}                                 @ 08062042 02bc
     bx r1                                    @ 08062044 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x3c0 (0xf0<<2). If not equal returns 0. If equal to 0x3c0: checks word[+0x14] bit21 matches player_id (bit0 of [+0x2]) (mismatch returns 0). Reads gDuelFieldSlots_A[player_id][zone_idx] halfword[+0x0] and compares against ATK threshold 0xBB7 (2999), if <=2999 returns 0. Finally calls check_card_field5_is_nonzero; if field5 nonzero returns 1, otherwise returns 0. Semantic: only allows equip when zone type is 0x3c0 AND ATK>2999 AND field5 active.
 @ 
@@ -14672,7 +14672,7 @@ check_equip_slot_eligible_zone_type3c0_high_atk_field5:
     beq LAB_08062088                         @ 0806207c 04d0
     movs r0,#0x1    @ 0806207e 0120
     b LAB_0806208a                           @ 08062080 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08062084:
     .word  0x00000bb7                     @ 08062084 b70b0000
 LAB_08062088:
@@ -14680,7 +14680,7 @@ LAB_08062088:
 LAB_0806208a:
     pop {r1}                                 @ 0806208a 02bc
     bx r1                                    @ 0806208c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip 槽激活资格谓词, 返回 0/1. 从 slot[+2] 提取 zone_idx (bits[6:2] = lsls #0x1a; lsrs #0x1b) 和 player_id (bit0). 调用 check_value_in_slot_chain(player_id, zone_idx, card_id=0x17d2=Horus the Black Flame Dragon LV4, type=0xb): 若链中包含 Horus LV4 则调用 check_equip_slot_eligible_banisher_absent_with_dispatch(slot_ptr, arg) 并透传; 若链中无 Horus LV4 则返回 0. 语义: equip 链含 Horus LV4 时才评估 Banisher 守卫分发条件.
 @ 
@@ -14736,7 +14736,7 @@ LAB_080620d4:
 LAB_080620da:
     pop {r1}                                 @ 080620da 02bc
     bx r1                                    @ 080620dc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, two-way dispatch. Takes zone_type from slot byte[+0x2] (ldrh) (mask 0xfc0). If zone_type == 0x140 (0xa0<<1) calls check_equip_slot_eligible_horus_lv4_chain_with_banisher(slot, arg) and passes through; otherwise calls check_equip_ctx_slot6_has_card_no_chain(slot, arg) and passes through. Dispatches between two equip eligibility predicates based on whether zone_type is the 0x140 zone. Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -14810,7 +14810,7 @@ check_equip_slot_eligible_banisher_absent_with_dispatch:
 LAB_08062156:
     movs r0,#0x0    @ 08062156 0020
     b LAB_0806216a                           @ 08062158 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806215c:
     .word  0x00001332                     @ 0806215c 32130000
 DWORD_08062160:
@@ -14909,7 +14909,7 @@ LAB_080621f6:
     cmp r1,#0x0                              @ 080621f8 0029
     bge LAB_08062214                         @ 080621fa 0bda
     b LAB_08062236                           @ 080621fc 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08062200:
     .word  0x00001332                     @ 08062200 32130000
 PTR_gP1LifePoints_08062204:
@@ -15028,7 +15028,7 @@ LAB_080622cc:
     pop {r4,r5,r6}                           @ 080622cc 70bc
     pop {r1}                                 @ 080622ce 02bc
     bx r1                                    @ 080622d0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080622d4:
     .word  gP1LifePoints                  @ 080622d4 e0c40102
 DAT_080622d8:
@@ -15179,7 +15179,7 @@ LAB_080623da:
     pop {r4,r5,r6}                           @ 080623dc 70bc
     pop {r1}                                 @ 080623de 02bc
     bx r1                                    @ 080623e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080623e4:
     .word  gP1LifePoints                  @ 080623e4 e0c40102
 DWORD_080623e8:
@@ -15239,7 +15239,7 @@ check_equip_slot_eligible_banisher_absent_monster_zone_ratio:
 LAB_080624c6:
     movs r0,#0x0    @ 080624c6 0020
     b LAB_080624f4                           @ 080624c8 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080624cc:
     .word  0x00001332                     @ 080624cc 32130000
 LAB_080624d0:
@@ -15264,7 +15264,7 @@ LAB_080624f4:
     pop {r4,r5}                              @ 080624f4 30bc
     pop {r1}                                 @ 080624f6 02bc
     bx r1                                    @ 080624f8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Extracts player_id and slot_group from card_entry[+0x2], calls get_equip_card_set_code_for_slot(player, slot_group). If set_code is 0 returns 0. Otherwise calls check_field_spell_neo_daedalus_group_placeable; if fails returns 0. Calls check_slot_card_can_be_equipped(player, slot_group); if fails returns 0. Calls count_monster_slots_for_player(player) -> r4. Calls check_slot_placement_blocked_by_field_effect(player, slot_group) -> r0; accumulates to r4. Compares set_code (r6) > (monsters + blocked) (r4): if set_code <= total returns 0; otherwise returns 1. Semantic: set_code value acts as available zone quota threshold, must exceed actual occupancy to allow equip.
 @ 
@@ -15404,7 +15404,7 @@ check_equip_slot_eligible_zone_flags_vs_slot_target_count:
     .hword 0x4641    @ 080625f2 4146
     bl check_equip_slot_eligible_banisher_absent_with_dispatch @ 080625f4 fff78afd
     b LAB_08062606                           @ 080625f8 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080625fc:
     .word  gP1LifePoints                  @ 080625fc e0c40102
 DWORD_08062600:
@@ -15557,7 +15557,7 @@ LAB_080626f6:
     pop {r4,r5,r6,r7}                        @ 080626fc f0bc
     pop {r1}                                 @ 080626fe 02bc
     bx r1                                    @ 08062700 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Reads halfword from card_entry[+0x2], masks 0xfc0, compares vs 0x90<<3=0x480: returns 0 if zone_type != 0x480. Reads slot[+0x14] word: returns 0 if zero (activation field). Reads gDuelActivation (0x0201bb90) player_id and slot_chain_idx, calls get_slot_card_state_code; returns 0 if low 16 bits != 0x12. Calls check_neo_daedalus_placement_eligible: returns 0 on failure. Reads gP1LifePoints[player*0x868+0x10]: returns 1 if nonzero, else 0. indeg=0 (Sub-type A).
 @ 
@@ -15718,7 +15718,7 @@ LAB_08062804:
     pop {r4,r5,r6,r7}                        @ 0806280c f0bc
     pop {r1}                                 @ 0806280e 02bc
     bx r1                                    @ 08062810 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08062814:
     .word  0x00000868                     @ 08062814 68080000
 
@@ -15844,7 +15844,7 @@ check_equip_slot_eligible_banisher_absent_field6_match:
     beq LAB_080628e8                         @ 080628dc 04d0
     movs r0,#0x2    @ 080628de 0220
     b LAB_080628ea                           @ 080628e0 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080628e4:
     .word  0x00001332                     @ 080628e4 32130000
 LAB_080628e8:
@@ -15883,7 +15883,7 @@ check_field_spell_zone_activated_by_side:
     bne LAB_0806292c                         @ 0806291c 06d1
     movs r0,#0x0    @ 0806291e 0020
     b LAB_0806292e                           @ 08062920 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08062924:
     .word  gP1LifePoints                  @ 08062924 e0c40102
 DAT_08062928:
@@ -15926,7 +15926,7 @@ check_equip_slot_eligible_chain_absent_by_protector_guard_dispatch:
     cmp r0,#0x0                              @ 08062960 0028
     beq LAB_08062978                         @ 08062962 09d0
     b LAB_080629b6                           @ 08062964 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08062968:
     .word  gP1LifePoints                  @ 08062968 e0c40102
 DAT_0806296c:
@@ -15974,7 +15974,7 @@ LAB_080629b8:
     pop {r4,r5,r6}                           @ 080629b8 70bc
     pop {r1}                                 @ 080629ba 02bc
     bx r1                                    @ 080629bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080629c0:
     .word  gP1LifePoints                  @ 080629c0 e0c40102
 DAT_080629c4:
@@ -16100,7 +16100,7 @@ LAB_08062a82:
     pop {r4,r5,r6,r7}                        @ 08062a8c f0bc
     pop {r1}                                 @ 08062a8e 02bc
     bx r1                                    @ 08062a90 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08062a94:
     .word  0x00000868                     @ 08062a94 68080000
 DAT_08062a98:
@@ -16242,7 +16242,7 @@ LAB_08062b5c:
 LAB_08062bc2:
     movs r0,#0x1    @ 08062bc2 0120
     b LAB_08062be2                           @ 08062bc4 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08062bc8:
     .word  0x080507ad                     @ 08062bc8 ad070508
 DAT_08062bcc:
@@ -16304,7 +16304,7 @@ LAB_08062c0e:
     bne LAB_08062c3c                         @ 08062c2c 06d1
     movs r0,#0x2    @ 08062c2e 0220
     b LAB_08062c4c                           @ 08062c30 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08062c34:
     .word  0x0201bb90                     @ 08062c34 90bb0102
 DAT_08062c38:
@@ -16355,7 +16355,7 @@ LAB_08062ce4:
     pop {r4}                                 @ 08062ce4 10bc
     pop {r1}                                 @ 08062ce6 02bc
     bx r1                                    @ 08062ce8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ equip slot eligibility predicate, indeg=0 (Sub-type A: no fn-ptr reference). Checks zone_type in card_entry[+0x2]: masks halfword with 0xfc0 and compares to 0x180 (0xc0<<1). If not equal returns 0. If equal to 0x180: extracts player_id (bit0) and card_id (halfword[+0x0]). Calls dispatch_effect_handler_by_card_id(player, card_id, 0) -> effect value r0. Reads word[+0x14] bits[19:18] (lsls #0xc; lsrs #0x1e, width=2, lo=18, hi=19) as quota field r1. Compares r0 < r1: if so returns 0, otherwise returns 1.
 @ 
@@ -16543,7 +16543,7 @@ LAB_08062e14:
 LAB_08062e16:
     pop {r1}                                 @ 08062e16 02bc
     bx r1                                    @ 08062e18 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Calls check_neo_daedalus_placement_eligible(slot, aux): returns 0 on failure. Calls check_equip_slot_chain_absent(slot, aux): returns 0 if chain present. Reads gP1LifePoints[player*0x868+0x0c] as loop upper bound. For each slot_idx 0..upper_bound-1: calls dispatch_effect_handler_by_card_id(player, card_id, slot_idx); if any returns nonzero returns 1. Returns 0 if all fail. indeg=0 (Sub-type A).
 @ 
@@ -16604,7 +16604,7 @@ LAB_08062e7c:
     pop {r4,r5,r6}                           @ 08062e7c 70bc
     pop {r1}                                 @ 08062e7e 02bc
     bx r1                                    @ 08062e80 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08062e84:
     .word  gP1LifePoints                  @ 08062e84 e0c40102
 DWORD_08062e88:
@@ -16736,7 +16736,7 @@ LAB_08062fbc:
     adds r0,#0x1    @ 08062fd0 0130
     str r0,[sp,#0x0]                         @ 08062fd2 0090
     b LAB_08062fe6                           @ 08062fd4 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08062fd8:
     .word  0x00000868                     @ 08062fd8 68080000
 DWORD_08062fdc:
@@ -16808,7 +16808,7 @@ LAB_08063054:
 LAB_08063056:
     pop {r1}                                 @ 08063056 02bc
     bx r1                                    @ 08063058 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Composite equip eligibility check with effect table dispatch. Accepts a slot pointer and sequentially: (1) check_slot_card_can_be_equipped verifies basic equip conditions; (2) count_monster_slots_for_player confirms opponent has a monster zone; (3) if monster zone is empty calls check_slot_placement_blocked_by_field_effect; (4) check_field_spell_neo_daedalus_group_placeable verifies field spell series compatibility; (5) traverses effect table at gP1LifePoints+0x0c+player_id*0x868, calling dispatch_effect_handler_by_card_id for each entry. Returns 0 if any prerequisite fails; returns 1 on successful dispatch. Constants: PLAYER_STRIDE=0x868, EFFECT_TABLE_COUNT_OFFSET=0x0c, SLOT_ZONE_IDX_BITS=bits[5:1] of slot[+0x2].
 check_equip_slot_eligible_with_monster_zone_dispatch:
@@ -16960,7 +16960,7 @@ check_zone_card_count_with_activation_match:
     beq LAB_08063188                         @ 08063178 06d0
     movs r0,#0x2    @ 0806317a 0220
     b LAB_0806318a                           @ 0806317c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08063180:
     .word  0x00000868                     @ 08063180 68080000
 DWORD_08063184:
@@ -17001,7 +17001,7 @@ LAB_080631b8:
     pop {r4}                                 @ 080631b8 10bc
     pop {r1}                                 @ 080631ba 02bc
     bx r1                                    @ 080631bc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Structurally symmetric sibling of check_zone_card_count_with_activation_match (0x080630f8); differs only in the final verification step: instead of count_effect_node_activations_by_zone, calls count_monster_slots_for_player to confirm the specified player has monster zone slots. Extracts player_id and zone_idx from slot[+0x2], indexes gDuelFieldSlots[player_id][zone_idx], extracts 8-bit count * 2 plus extra_flag bit and compares with slot[+0x4] bits[14:6] target count; on match verifies zone link field non-zero and opponent monster zone non-empty; returns 1 if all pass, 0 otherwise. Constants: PLAYER_STRIDE=0x868, SLOT_DATA_BASE=0x0201c510 (gDuelFieldSlots), ZONE_ENTRY_SIZE=0x14, CARD_COUNT_FIELD_BITS=bits[29:22], EXTRA_FLAG_FIELD_BITS=bit13, TARGET_COUNT_BITS=bits[14:6].
 check_zone_card_count_with_monster_slot_match:
@@ -17105,7 +17105,7 @@ LAB_08063274:
     pop {r4,r5}                              @ 08063274 30bc
     pop {r1}                                 @ 08063276 02bc
     bx r1                                    @ 08063278 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, returns 0/passthrough. r0=slotA, r1=cardB (candidate card entry). First calls count_available_monster_slots(player_id) to count the player's available monster zone slots; if the count is 0 (beq) returns 0 directly; otherwise passes through the return value of check_equip_slot_eligible_by_field6_guard_and_chain_absent(slotA, cardB) (0=ineligible, nonzero=eligible). Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -17131,7 +17131,7 @@ LAB_0806329c:
     pop {r4,r5}                              @ 0806329c 30bc
     pop {r1}                                 @ 0806329e 02bc
     bx r1                                    @ 080632a0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, returns 0/1. r0=slotA, r1=cardB (candidate card entry). First calls check_equip_slot_chain_absent(slotA) to verify the slot has no chain; if a chain exists (returns 0, beq) returns 0 directly; if no chain (nonzero) calls check_equip_slot_eligible_by_tier_and_field6(slotA, cardB), returns 1 on pass, otherwise returns 0. Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -17157,7 +17157,7 @@ LAB_080632c4:
     pop {r4,r5}                              @ 080632c4 30bc
     pop {r1}                                 @ 080632c6 02bc
     bx r1                                    @ 080632c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Entry point for hand slot setcode effect dispatch during duel phase 2 (chain/response phase). Reads the duel phase field at gP1LifePoints+0x1cf4; if not equal to 2, returns 0. If in phase 2, passes the slot pointer through to dispatch_effect_via_hand_slot_setcode; if that function returns non-zero (success), returns 2 (activation success flag); on dispatch failure or phase mismatch returns 0. Constants: DUEL_PHASE_CHAIN=2, DUEL_PHASE_OFFSET=0x1cf4.
 dispatch_hand_slot_setcode_in_phase2:
@@ -17176,7 +17176,7 @@ dispatch_hand_slot_setcode_in_phase2:
 LAB_080632e6:
     movs r0,#0x0    @ 080632e6 0020
     b LAB_080632f6                           @ 080632e8 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080632ec:
     .word  gP1LifePoints                  @ 080632ec e0c40102
 DAT_080632f0:
@@ -17186,7 +17186,7 @@ LAB_080632f4:
 LAB_080632f6:
     pop {r1}                                 @ 080632f6 02bc
     bx r1                                    @ 080632f8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot eligibility predicate. Calls check_equip_slot_chain_absent(slot): returns 0 if chain present. Calls count_effect_node_zone_activations(slot): returns 0 if result <= 1 (insufficient activation count). Returns 2 if count > 1. indeg=0 (Sub-type A).
 @ 
@@ -17211,7 +17211,7 @@ LAB_08063318:
     pop {r4}                                 @ 08063318 10bc
     pop {r1}                                 @ 0806331a 02bc
     bx r1                                    @ 0806331c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Composite equip placement validator combining field effect series compatibility with effect dispatch result. First calls check_field_spell_neo_daedalus_group_placeable; if passed and hand zone count field at gP1LP+0x10+player_id*0x868 is zero, calls lookup_slot_display_value_by_card_id + dispatch_effect_handler_by_card_id; on successful dispatch (non-zero) checks zone type mask (bits[11:6] of ldrh[+0x2]) equals 0x580 (0xb0<<3), and chain flag byte masked by 0x79 equals 0x71, and zone_idx <= 4. All checks passing returns 1, any failure returns 0. Constants: PLAYER_STRIDE=0x868, HAND_ZONE_COUNT_OFFSET=0x10, ZONE_TYPE_MASK=0xfc0, ZONE_TYPE_0x580=0x580, ZONE_IDX_MAX=4, CHAIN_FLAG_MASK=0x79, CHAIN_FLAG_REQUIRED=0x71.
 check_equip_slot_eligible_with_field_dispatch_and_zone:
@@ -17274,7 +17274,7 @@ LAB_08063360:
     bne LAB_080633a4                         @ 08063394 06d1
     movs r0,#0x1    @ 08063396 0120
     b LAB_080633a6                           @ 08063398 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806339c:
     .word  gP1LifePoints                  @ 0806339c e0c40102
 DWORD_080633a0:
@@ -17316,7 +17316,7 @@ LAB_080633c4:
 LAB_080633de:
     pop {r1}                                 @ 080633de 02bc
     bx r1                                    @ 080633e0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080633e4:
     .word  gP1LifePoints                  @ 080633e4 e0c40102
 
@@ -17335,7 +17335,7 @@ LAB_080633fc:
     adds r0,r1,#0x0    @ 080633fc 081c
     pop {r1}                                 @ 080633fe 02bc
     bx r1                                    @ 08063400 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Structurally symmetric sibling of check_slot_linked_card_type_spell (0x080633ac); differs only in the final call: uses check_card_field8_is_9 instead of check_card_type_is_spell. Extracts zone type bits[11:6] via mask 0xfc0 from slot ldrh[+0x2]; if not equal to MONSTER_ZONE_TYPE=0x200 returns 0. If 0x200, extracts card DB index from slot[+0x14] bits[8:0] (*4), adds gP1LP base + offset 0x10e0 (=0x87<<5), reads type_code bits[12:0], calls check_card_field8_is_9(type_code) and passes through the return value. Sibling pair with 0x080633ac checking spell type vs field8==9 attribute. Constants: ZONE_TYPE_MASK=0xfc0, MONSTER_ZONE_TYPE=0x200 (0x80<<2), CARD_DB_BASE_OFFSET=0x10e0 (0x87<<5), DB_INDEX_BITS=bits[8:0], TYPE_CODE_BITS=bits[12:0].
 check_slot_linked_card_field8_restricted:
@@ -17367,7 +17367,7 @@ LAB_0806341c:
 LAB_08063436:
     pop {r1}                                 @ 08063436 02bc
     bx r1                                    @ 08063438 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_0806343c:
     .word  gP1LifePoints                  @ 0806343c e0c40102
 
@@ -17472,7 +17472,7 @@ LAB_080634ce:
 LAB_080634ee:
     movs r0,#0x0    @ 080634ee 0020
     b LAB_0806356c                           @ 080634f0 3ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080634f4:
     .word  gP1LifePoints                  @ 080634f4 e0c40102
 DWORD_080634f8:
@@ -17543,7 +17543,7 @@ LAB_0806356c:
     pop {r4,r5,r6,r7}                        @ 08063574 f0bc
     pop {r1}                                 @ 08063576 02bc
     bx r1                                    @ 08063578 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip slot activation eligibility predicate, returns 0/passthrough. r0=slotA, r1=cardB (candidate card entry). First reads gP1LifePoints[player_id*0x868+0x10] (LP slot activation count); if 0 (beq) returns 0 directly; otherwise calls check_neo_daedalus_placement_eligible(slotA, cardB) to verify Neo Daedalus placement conditions, fail (beq) returns 0; on pass, passes through the return value of check_equip_slot_eligible_by_field6_guard_and_chain_absent(slotA, cardB). Statically dispatched from the equip eligibility scan chain, indeg=0.
 @ 
@@ -17575,7 +17575,7 @@ check_equip_slot_eligible_lp_slot_neo_daedalus_guard:
     adds r1,r5,#0x0    @ 080635a6 291c
     bl check_equip_slot_eligible_by_field6_guard_and_chain_absent @ 080635a8 fdf73cfc
     b LAB_080635ba                           @ 080635ac 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080635b0:
     .word  gP1LifePoints                  @ 080635b0 e0c40102
 DWORD_080635b4:
@@ -17657,7 +17657,7 @@ LAB_08063632:
     pop {r4,r5}                              @ 08063634 30bc
     pop {r1}                                 @ 08063636 02bc
     bx r1                                    @ 08063638 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Equip eligibility check with dual activation node confirmation followed by effect dispatch. Steps: (1) count_effect_node_activations_by_zone(opp_player_id, zone_idx) > 0; (2) same call a second time > 0 (double confirmation); (3) check_field_spell_neo_daedalus_group_placeable passes; then iterates effect table calling dispatch_effect_handler_by_card_id for each entry. Returns 2 if dispatch succeeds (non-zero), returns 0 if any prerequisite fails or no dispatch hit. Constants: PLAYER_STRIDE=0x868, HAND_ZONE_COUNT_OFFSET=0x0c (gP1LP+0x0c+player_id*0x868 = effect table entry count).
 check_equip_slot_eligible_with_dual_activation_dispatch:
@@ -17729,7 +17729,7 @@ LAB_080636bc:
     pop {r4,r5,r6}                           @ 080636bc 70bc
     pop {r1}                                 @ 080636be 02bc
     bx r1                                    @ 080636c0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080636c4:
     .word  gP1LifePoints                  @ 080636c4 e0c40102
 DWORD_080636c8:
@@ -17807,7 +17807,7 @@ LAB_0806376a:
     beq LAB_0806378c                         @ 08063778 08d0
     movs r0,#0x1    @ 0806377a 0120
     b LAB_0806378e                           @ 0806377c 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08063780:
     .word  gP1LifePoints                  @ 08063780 e0c40102
 DAT_08063784:
@@ -17878,7 +17878,7 @@ LAB_080637ec:
     pop {r4}                                 @ 080637ec 10bc
     pop {r1}                                 @ 080637ee 02bc
     bx r1                                    @ 080637f0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Simple paired slot count equality check. Extracts player_id from ldrb[r0+0x2] bit0, calls count_paired_slots_with_field5_default(player_id, 0x1918); if returned count equals exactly 3 returns 1, otherwise returns 0. Constant 0x1918 is a fixed query parameter to count_paired_slots_with_field5_default. Constants: PAIR_SCAN_PARAM=0x1918, REQUIRED_COUNT=3.
 check_field5_paired_slot_trio_complete:
@@ -17915,7 +17915,7 @@ LAB_08063828:
 LAB_0806382a:
     pop {r1}                                 @ 0806382a 02bc
     bx r1                                    @ 0806382c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check whether the opponent has at least one monster zone present. Extracts player_id from ldrb[r0+0x2] bit0, computes opp_player_id = 1 - player_id, calls count_monster_slots_for_player(opp_player_id); if count > 0 returns 1, otherwise returns 0.
 check_opponent_monster_slot_present:
@@ -17954,7 +17954,7 @@ LAB_08063888:
     adds r0,r1,#0x0    @ 08063888 081c
     pop {r1}                                 @ 0806388a 02bc
     bx r1                                    @ 0806388c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08063890:
     .word  0x08050ead                     @ 08063890 ad0e0508
 
@@ -17993,7 +17993,7 @@ LAB_080638c8:
     pop {r4}                                 @ 080638c8 10bc
     pop {r1}                                 @ 080638ca 02bc
     bx r1                                    @ 080638cc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_080638d0:
     .word  gP1LifePoints                  @ 080638d0 e0c40102
 DAT_080638d4:
@@ -18067,7 +18067,7 @@ check_field_spell_placeable_with_opp_zone:
     beq LAB_0806394c                         @ 0806393c 06d0
     movs r0,#0x1    @ 0806393e 0120
     b LAB_0806394e                           @ 08063940 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08063944:
     .word  gP1LifePoints                  @ 08063944 e0c40102
 DAT_08063948:
@@ -18077,7 +18077,7 @@ LAB_0806394c:
 LAB_0806394e:
     pop {r1}                                 @ 0806394e 02bc
     bx r1                                    @ 08063950 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_0807d014 (tags: card_frame, card_ids, card_stats, duel_field, font_jp, game_str, settings). Comprehensively validates the equip card slot target: verifies slot type field (low 3 bits of ldrh[+0x2]) equals 0x480, slot[+0x14] is nonzero; then checks gDuelFieldState (0x0201bb90) attacking_side and attacking_slot fields against slot player_id and zone_idx, and confirms no_chain_flag is 0; finally locates the corresponding slot in gDuelFieldSlots (0x0201c510) and checks ATK/DEF are both nonzero. Returns 1 if all checks pass; 0 if any fail.
 @ Side effects: no external writes.
@@ -18130,7 +18130,7 @@ check_equip_slot_target_valid_in_zone:
     beq LAB_080639c0                         @ 080639ac 08d0
     movs r0,#0x1    @ 080639ae 0120
     b LAB_080639c2                           @ 080639b0 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080639b4:
     .word  0x0201bb90                     @ 080639b4 90bb0102
 DAT_080639b8:
@@ -18233,7 +18233,7 @@ LAB_08063a64:
     pop {r4,r5,r6}                           @ 08063a64 70bc
     pop {r1}                                 @ 08063a66 02bc
     bx r1                                    @ 08063a68 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Check whether target equip slot satisfies neo-daedalus special placement conditions during equip activation. Extracts player_id(bit0) and zone_idx(bits[6:2]) from slot[+2], passes flag=1 to dispatch_equip_slot_scan_with_field6_guard for field6 guard scan; if scan passes, calls check_equip_slot_chain_absent to confirm no chain node occupying the slot; if both pass, calls dispatch_effect_for_neo_daedalus_eligible_slot to trigger neo-daedalus effect. Returns 0 on any failure.
 @ 
@@ -18273,7 +18273,7 @@ LAB_08063aa6:
     pop {r4,r5}                              @ 08063aa8 30bc
     pop {r1}                                 @ 08063aaa 02bc
     bx r1                                    @ 08063aac 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Composite predicate for equip card target legality with effect slot match verification. Returns 0 immediately if r1 (equip_card_ptr) is null. Then sequentially: check_card_is_zone_pair_restricted(card_id) -- zone-pair restriction rejects; check_equip_slot_chain_absent(slot_ptr) -- chain occupied rejects; check_card_field5_is_nonzero(card_id) -- if field5 non-zero and zone_idx-5 not in [0..5] (i.e. zone_idx not in [5..10]) checks card category bits; extracts map_field8_to_card_type_category result; if field5 non-zero and zone_idx in [5..10] forces category=7; calls scan_equip_slots_eligible_for_card. Then iterates effect slot list, calls read_effect_slot_side_and_type for each slot and compares with (slot player_id<<8 | zone_idx); match returns 1. No match returns 0. Constants: CATEGORY_OVERRIDE=7, ZONE_IDX_OVERRIDE_MIN=5, CARD_BITS_MASK=0x30.
 check_equip_target_eligible_with_effect_slot_match:
@@ -18370,7 +18370,7 @@ LAB_08063b60:
     pop {r4,r5,r6}                           @ 08063b60 70bc
     pop {r1}                                 @ 08063b62 02bc
     bx r1                                    @ 08063b64 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Trigger effect dispatch for the first free monster zone of the current player. Extracts player_id from ldrb[r0+0x2] bit0, calls find_first_available_monster_slot_for_player(player_id); if no free slot (return < 0) returns 0. If a free slot exists: reads player_id and card_id (ldrh[+0x0]), calls lookup_slot_display_value_by_card_id(slot_ptr) to get display value, then calls dispatch_effect_handler_by_card_id(player_id, card_id, display_val). Returns 2 if dispatch succeeds (non-zero), 0 otherwise.
 dispatch_effect_to_first_free_monster_slot:
@@ -18402,7 +18402,7 @@ LAB_08063b9c:
     pop {r4,r5,r6}                           @ 08063b9c 70bc
     pop {r1}                                 @ 08063b9e 02bc
     bx r1                                    @ 08063ba0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Two-stage equip validation combining deck pair match with spell zone placement. Returns 0 immediately if r1 != 0 (gate flag restricts to specific call paths). With r1==0: reads active player ID at gP1LP+0x1ce8, compares with player_id, returns 0 on mismatch. Reads duel phase at gP1LP+0x1cf4; if not 2 and not 4 returns 0. On valid phase: calls find_deck_slot_by_card_pair_match(player_id, card_id); if no match (< 0) returns 0. If matched: calls check_spell_zone_slot_placeable(player_id); on pass calls dispatch_effect_handler_by_card_id(..., card_id, 0). Returns 1 if dispatch result > 1, 0 otherwise. Constants: ACTIVE_PLAYER_OFFSET=0x1ce8, DUEL_PHASE_OFFSET=0x1cf4, DUEL_PHASE_CHAIN=2, DUEL_PHASE_SPECIAL=4.
 check_equip_slot_eligible_deck_pair_with_spell_zone:
@@ -18449,7 +18449,7 @@ LAB_08063bcc:
     ble LAB_08063c0c                         @ 08063bf8 08dd
     movs r0,#0x1    @ 08063bfa 0120
     b LAB_08063c0e                           @ 08063bfc 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08063c00:
     .word  gP1LifePoints                  @ 08063c00 e0c40102
 DWORD_08063c04:
@@ -18491,7 +18491,7 @@ check_equip_slot_eligible_neo_daedalus_with_lp_threshold:
     adds r1,r4,#0x0    @ 08063c36 211c
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 08063c38 f8f706fb
     b LAB_08063c4a                           @ 08063c3c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08063c40:
     .word  gP1LifePoints                  @ 08063c40 e0c40102
 DWORD_08063c44:
@@ -18523,7 +18523,7 @@ LAB_08063c64:
 LAB_08063c66:
     pop {r1}                                 @ 08063c66 02bc
     bx r1                                    @ 08063c68 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called to check whether a corresponding effect node exists in the equip chain for the given slot. Extracts player_id (byte[+2] bit0) and slot_idx (byte[+4] bits[7:1]) from slot_ptr, plus card_id (halfword[+0]), then calls find_effect_node_in_zone(player_id, slot_idx, card_id, zone_type=0xb). Returns 1 if node found, 0 if absent. Pure read, no external side effects.
 @ 
@@ -18555,7 +18555,7 @@ LAB_08063c8c:
 LAB_08063c8e:
     pop {r1}                                 @ 08063c8e 02bc
     bx r1                                    @ 08063c90 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called to check whether slot r0 satisfies the Water Dragon (0x1951, Oxygeddon/Hydrogeddon pair) equip activation conditions. Three-step check: (1) count_monster_slots_for_player(player_id) > 2; (2) check_field_spell_neo_daedalus_group_placeable(player_id) returns nonzero; (3) dispatch_effect_handler_by_card_id(player_id, card_id, table_A=0x194f/Hydrogeddon) > 1 AND dispatch_effect_handler_by_card_id(player_id, card_id, table_B=0x1950/Oxygeddon) > 0. All pass returns 1, otherwise 0. Called from FUN_08059fc4 in the card_id==0x1951 Water Dragon branch.
 @ 
@@ -18602,7 +18602,7 @@ check_slot_eligible_water_dragon_pair:
     ble LAB_08063ce8                         @ 08063cd8 06dd
     movs r0,#0x1    @ 08063cda 0120
     b LAB_08063cea                           @ 08063cdc 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08063ce0:
     .word  0x0000194f                     @ 08063ce0 4f190000
 DAT_08063ce4:
@@ -18714,7 +18714,7 @@ check_slot_eligible_dark_field_equip:
     bge LAB_08063dac                         @ 08063da0 04da
     movs r0,#0x1    @ 08063da2 0120
     b LAB_08063dae                           @ 08063da4 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gP1LifePoints_08063da8:
     .word  gP1LifePoints                  @ 08063da8 e0c40102
 LAB_08063dac:
@@ -18875,7 +18875,7 @@ check_equip_slot_eligible_neo_daedalus_with_offering_guard:
     bne LAB_08063f20                         @ 08063ed0 26d1
     movs r0,#0x1    @ 08063ed2 0120
     b LAB_08063f22                           @ 08063ed4 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08063ed8:
     .word  gP1LifePoints                  @ 08063ed8 e0c40102
 DWORD_08063edc:
@@ -18948,7 +18948,7 @@ check_equip_slot_eligible_neo_daedalus_with_lp_bit_guard:
     adds r1,r5,#0x0    @ 08063f4e 291c
     bl dispatch_effect_for_neo_daedalus_eligible_slot @ 08063f50 f8f77af9
     b LAB_08063f62                           @ 08063f54 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08063f58:
     .word  gP1LifePoints                  @ 08063f58 e0c40102
 DWORD_08063f5c:
@@ -19059,7 +19059,7 @@ LAB_08064020:
 LAB_08064022:
     pop {r1}                                 @ 08064022 02bc
     bx r1                                    @ 08064024 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called to check whether a slot satisfies Elemental Hero Clayman (0x18a8) equip chain pairing conditions. Check chain: (1) halfword[+2] bits[11:2] AND 0xfc0 == 0x480 (0x90<<3, specific zone type); (2) gDuelFieldState[+0x8] == 0 (no active chain interrupt); (3) gDuelFieldState[+0x4] bit0 == slot.player_id; (4) check_slot_card_pair_allowed(player_id, zone_idx=gDuelFieldState[+0x20], card_id_B=0x18a8). All pass returns 1. Used during equip activation to confirm Clayman pairing is allowed.
 @ 
@@ -19100,7 +19100,7 @@ check_slot_clayman_pair_in_active_chain:
     beq LAB_0806406c                         @ 0806405c 06d0
     movs r0,#0x1    @ 0806405e 0120
     b LAB_0806406e                           @ 08064060 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_08064064:
     .word  0x0201bb90                     @ 08064064 90bb0102
 DWORD_08064068:
@@ -19110,7 +19110,7 @@ LAB_0806406c:
 LAB_0806406e:
     pop {r1}                                 @ 0806406e 02bc
     bx r1                                    @ 08064070 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Comprehensive equip eligibility check that chains chain-count verification, neo-daedalus placement eligibility, card pair ID resolution, field8 attribute, and field5 score checks before triggering effect. First calls count_slots_with_chain_field_match to confirm opponent field=1 chain slot exists; then check_neo_daedalus_placement_eligible; traverses gDuelFieldState+0x4cc/0x4d4 to confirm exactly 1 slot with code=8; checks zone_type=0x80<<2=0x200 slot flag; calls resolve_slot_card_id_for_pair to get paired card_id; checks field8 != 9; gets field5 score <= 0x5dc; if all pass writes slot[+0xa]:=r3 (pair_index) then calls lookup+dispatch_effect_handler_by_card_id.
 @ 
@@ -19322,7 +19322,7 @@ check_equip_slot_eligible_with_monster_slot_and_field6:
     adds r1,r5,#0x0    @ 080641e6 291c
     bl check_equip_slot_eligible_by_tier_and_field6 @ 080641e8 f7f7fcff
     b LAB_080641fe                           @ 080641ec 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080641f0:
     .word  0x0804b30d                     @ 080641f0 0db30408
 DWORD_080641f4:
@@ -19416,7 +19416,7 @@ LAB_08064280:
     pop {r4}                                 @ 08064280 10bc
     pop {r1}                                 @ 08064282 02bc
     bx r1                                    @ 08064284 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called to check whether the player associated with the slot has Hero Kid (0x19a7) in the extra deck. Extracts player_id from r0.byte[+2] bit0, calls count_extra_deck_cards_by_id(player_id, HERO_KID=0x19a7). Returns 1 if count > 0, otherwise 0. Single-bl leaf predicate, no external writes.
 @ 
@@ -19437,7 +19437,7 @@ check_slot_hero_kid_in_extra_deck:
     beq LAB_080642a4                         @ 08064298 04d0
     movs r0,#0x1    @ 0806429a 0120
     b LAB_080642a6                           @ 0806429c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080642a0:
     .word  0x000019a7                     @ 080642a0 a7190000
 LAB_080642a4:
@@ -19445,7 +19445,7 @@ LAB_080642a4:
 LAB_080642a6:
     pop {r1}                                 @ 080642a6 02bc
     bx r1                                    @ 080642a8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks whether an equip slot meets all of "card type == 0x3c0 + owner match + Neo Daedalus placement eligibility + tier/field6 gate + nonempty LP-slot field" and returns a bool. Flow: type gate slot[+2] AND 0xfc0 == 0x3c0, fail returns 0; compare slot[+0x14] bit21 with slot[+2] bit0 (owner consistency), mismatch returns 0; then call check_neo_daedalus_placement_eligible(slot, aux) and check_equip_slot_eligible_by_tier_and_field6(slot, aux), short-circuit if either returns 0; finally read gP1LifePoints[player*0x868 + 0x10] field, returns 0 if zero, else 1. Called via fn-ptr by the equip activation eligibility dispatch cluster (indeg=0).
 @ 

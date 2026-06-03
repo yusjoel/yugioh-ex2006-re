@@ -100,6 +100,8 @@ hi byte 0x9E 偏离常规 0xF0-0xFE 范围。
 
 | 文件 | 内容 |
 |---|---|
+| `data/game-strings-remap-table.s` | ID→row 索引表 (ROM 0x250, 1651×u16, `game_str_id_to_row` 二分查找用)；由 `tools/game-strings/build_remap_table.py` 生成 |
+| `data/game-strings-pointer-table.s` | master 指针表 (ROM 0xF40, 1651 行×24B)；由 `build_pointer_table.py` 生成 |
 | `data/game-strings.s` | 6 lang wrapper (JA → EN → DE → FR → IT → ES) |
 | `data/game-strings-ja.s` | JA 区 `.byte` form |
 | `data/game-strings-{en,de,fr,it,es}.s` | 5 lang `.ascii` form (CP1252 编码写盘) |

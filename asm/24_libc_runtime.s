@@ -35,7 +35,7 @@ LAB_08110df6:
     str r5,[r7,#0x0]                         @ 08110e04 3d60
     movs r0,#0x0    @ 08110e06 0020
     b LAB_08110e42                           @ 08110e08 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110e0c:
     .word  0x000003fd                     @ 08110e0c fd030000
 LAB_08110e10:
@@ -141,7 +141,7 @@ LAB_08110ed0:
     movs r0,#0x1    @ 08110ed0 0120
     rsbs r0,r0,#0    @ 08110ed2 4042
     b LAB_08110f24                           @ 08110ed4 26e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110ed8:
     .word  0x09ed4d94                     @ 08110ed8 944ded09
 LAB_08110edc:
@@ -186,7 +186,7 @@ LAB_08110f20:
     adds r0,r5,#0x0    @ 08110f22 281c
 LAB_08110f24:
     pop {r4,r5,r6,pc}                        @ 08110f24 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 fflush:
     push {r4,r5,r6,lr}                       @ 08110f28 70b5
     adds r4,r0,#0x0    @ 08110f2a 041c
@@ -234,7 +234,7 @@ LAB_08110f5e:
     bne LAB_08110f96                         @ 08110f7c 0bd1
     ldr r0,[r4,#0x14]                        @ 08110f7e 6069
     b LAB_08110f98                           @ 08110f80 0ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08110f84:
     .word  0x09ed4d94                     @ 08110f84 944ded09
 LAB_08110f88:
@@ -391,7 +391,7 @@ LAB_08111070:
     adds r0,r2,#0x0    @ 0811108e 101c
 LAB_08111090:
     pop {r4,r5,pc}                           @ 08111090 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111094:
     .word  0x0000ffff                     @ 08111094 ffff0000
 _cleanup_r:
@@ -399,7 +399,7 @@ _cleanup_r:
     ldr r1, DAT_081110a4                     @ 0811109a 0249
     bl _fwalk                                @ 0811109c 00f07cf9
     pop {pc}                                 @ 081110a0 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081110a4:
     .word  0x08110f29                     @ 081110a4 290f1108
 
@@ -521,7 +521,7 @@ LAB_08111182:
     .hword 0x4648    @ 08111182 4846
     bl stub_malloc_unlock                    @ 08111184 00f026fc
     b LAB_081112ce                           @ 08111188 a1e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811118c:
     .word  0x09ed4d98                     @ 0811118c 984ded09
 DAT_08111190:
@@ -574,7 +574,7 @@ LAB_081111c4:
     str r1,[r5,#0xc]                         @ 081111e8 e960
     str r1,[r5,#0x8]                         @ 081111ea a960
     b LAB_081111fc                           @ 081111ec 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081111f0:
     .word  0x09ed4da0                     @ 081111f0 a04ded09
 LAB_081111f4:
@@ -654,7 +654,7 @@ LAB_08111270:
     adds r4,r0,#0x0    @ 08111278 041c
     adds r4,#0x7c    @ 0811127a 7c34
     b LAB_08111286                           @ 0811127c 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111280:
     .word  0x00000554                     @ 08111280 54050000
 LAB_08111284:
@@ -674,7 +674,7 @@ LAB_08111286:
     orrs r0,r1    @ 0811129c 0843
     str r0,[r7,#0x4]                         @ 0811129e 7860
     b LAB_081112c0                           @ 081112a0 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081112a4:
     .word  0x09ed4d98                     @ 081112a4 984ded09
 LAB_081112a8:
@@ -706,7 +706,7 @@ LAB_081112ce:
     .hword 0x4698    @ 081112d0 9846
     .hword 0x46a1    @ 081112d2 a146
     pop {r4,r5,r6,r7,pc}                     @ 081112d4 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _malloc_trim_r:
     push {r4,r5,r6,r7,lr}                    @ 081112d8 f0b5
     .hword 0x4647    @ 081112da 4746
@@ -797,7 +797,7 @@ LAB_0811138c:
     pop {r3}                                 @ 0811138c 08bc
     .hword 0x4698    @ 0811138e 9846
     pop {r4,r5,r6,r7,pc}                     @ 08111390 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111394:
     .word  0x09ed51b4                     @ 08111394 b451ed09
 _fwalk:
@@ -895,7 +895,7 @@ LAB_08111426:
     strh r0,[r4,#0xc]                        @ 08111440 a081
     str r6,[r4,#0x4c]                        @ 08111442 e664
     b LAB_08111458                           @ 08111444 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111448:
     .word  0x08112641                     @ 08111448 41261108
 LAB_0811144c:
@@ -951,7 +951,7 @@ LAB_0811147c:
 LAB_081114aa:
     add sp,#0x3c                             @ 081114aa 0fb0
     pop {r4,r5,r6,r7,pc}                     @ 081114ac f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081114b0:
     .word  0x08111099                     @ 081114b0 99101108
 
@@ -1101,7 +1101,7 @@ LAB_08111568:
     bhi LAB_081115b8                         @ 081115a8 06d8
     str r3,[r5,#0x4]                         @ 081115aa 6b60
     b LAB_081115f8                           @ 081115ac 24e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081115b0:
     .word  0x09ed51b4                     @ 081115b0 b451ed09
 DAT_081115b4:
@@ -1209,7 +1209,7 @@ LAB_0811165e:
     orrs r0,r1    @ 08111674 0843
     str r0,[r2,#0x4]                         @ 08111676 5060
     b LAB_081119b6                           @ 08111678 9de1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811167c:
     .word  0x000001f7                     @ 0811167c f7010000
 DAT_08111680:
@@ -1266,7 +1266,7 @@ LAB_081116ce:
     adds r0,#0x7c    @ 081116d8 7c30
     .hword 0x4684    @ 081116da 8446
     b LAB_081116e8                           @ 081116dc 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081116e0:
     .word  0x00000554                     @ 081116e0 54050000
 LAB_081116e4:
@@ -1348,7 +1348,7 @@ LAB_08111742:
     adds r0,r2,r3    @ 0811176c d018
     str r3,[r0,#0x0]                         @ 0811176e 0360
     b LAB_081119b6                           @ 08111770 21e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111774:
     .word  0x09ed4da0                     @ 08111774 a04ded09
 LAB_08111778:
@@ -1691,14 +1691,14 @@ DAT_081119cc:
 @ GBA has no RTOS context so locking is a no-op; paired with stub_malloc_unlock (0x081119d4).
 stub_malloc_lock:
     bx lr                                    @ 081119d0 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ dlmalloc mutex stub (unlock): function body is bx lr only, performs no operation.
 @ Called after _free_r / _malloc_r / _malloc_trim_r / _realloc_r exits critical section; replaces real mutex release in single-threaded embedded environment.
 @ GBA has no RTOS context so unlocking is a no-op; paired with stub_malloc_lock (0x081119d0).
 stub_malloc_unlock:
     bx lr                                    @ 081119d4 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 _Balloc:
     push {r4,r5,r6,lr}                       @ 081119d8 70b5
     adds r4,r0,#0x0    @ 081119da 041c
@@ -1747,7 +1747,7 @@ LAB_08111a24:
     adds r0,r1,#0x0    @ 08111a2a 081c
 LAB_08111a2c:
     pop {r4,r5,r6,pc}                        @ 08111a2c 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _Bfree:
     adds r3,r0,#0x0    @ 08111a30 031c
     adds r2,r1,#0x0    @ 08111a32 0a1c
@@ -1908,7 +1908,7 @@ LAB_08111b5a:
     pop {r3}                                 @ 08111b5c 08bc
     .hword 0x4698    @ 08111b5e 9846
     pop {r4,r5,r6,r7,pc}                     @ 08111b60 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _hi0bits:
     adds r1,r0,#0x0    @ 08111b64 011c
     movs r2,#0x0    @ 08111b66 0022
@@ -1953,7 +1953,7 @@ LAB_08111b9e:
     bne LAB_08111bb8                         @ 08111bac 04d1
     movs r0,#0x20    @ 08111bae 2020
     b LAB_08111bba                           @ 08111bb0 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111bb4:
     .word  0xffff0000                     @ 08111bb4 0000ffff
 LAB_08111bb8:
@@ -2027,7 +2027,7 @@ LAB_08111c1e:
     bne LAB_08111c38                         @ 08111c2c 04d1
     movs r0,#0x20    @ 08111c2e 2020
     b LAB_08111c3c                           @ 08111c30 04e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111c34:
     .word  0x0000ffff                     @ 08111c34 ffff0000
 LAB_08111c38:
@@ -2035,7 +2035,7 @@ LAB_08111c38:
     adds r0,r2,#0x0    @ 08111c3a 101c
 LAB_08111c3c:
     bx lr                                    @ 08111c3c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 _i2b:
     push {r4,lr}                             @ 08111c40 10b5
     adds r4,r1,#0x0    @ 08111c42 0c1c
@@ -2045,7 +2045,7 @@ _i2b:
     movs r1,#0x1    @ 08111c4c 0121
     str r1,[r0,#0x10]                        @ 08111c4e 0161
     pop {r4,pc}                              @ 08111c50 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _multiply:
     push {r4,r5,r6,r7,lr}                    @ 08111c54 f0b5
     .hword 0x4657    @ 08111c56 5746
@@ -2240,7 +2240,7 @@ LAB_08111daa:
     .hword 0x46a1    @ 08111db8 a146
     .hword 0x46aa    @ 08111dba aa46
     pop {r4,r5,r6,r7,pc}                     @ 08111dbc f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _pow5mult:
     push {r4,r5,r6,r7,lr}                    @ 08111dc0 f0b5
     .hword 0x4647    @ 08111dc2 4746
@@ -2278,7 +2278,7 @@ LAB_08111dea:
     adds r5,r0,#0x0    @ 08111e04 051c
     str r4,[r5,#0x0]                         @ 08111e06 2c60
     b LAB_08111e2c                           @ 08111e08 10e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08111e0c:
     .word  0x09e58680                     @ 08111e0c 8086e509
 DAT_08111e10:
@@ -2404,7 +2404,7 @@ LAB_08111edc:
     .hword 0x46a1    @ 08111ef0 a146
     .hword 0x46aa    @ 08111ef2 aa46
     pop {r4,r5,r6,r7,pc}                     @ 08111ef4 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __mcmp:
     push {r4,r5,lr}                          @ 08111ef8 30b5
     adds r2,r0,#0x0    @ 08111efa 021c
@@ -2441,7 +2441,7 @@ LAB_08111f2e:
     movs r0,#0x0    @ 08111f32 0020
 LAB_08111f34:
     pop {r4,r5,pc}                           @ 08111f34 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __mdiff:
     push {r4,r5,r6,r7,lr}                    @ 08111f38 f0b5
     .hword 0x4657    @ 08111f3a 5746
@@ -2688,7 +2688,7 @@ LAB_081120e0:
     subs r5,#0x4    @ 081120fc 043d
     ldr r2,[r5,#0x0]                         @ 081120fe 2a68
     b LAB_0811210a                           @ 08112100 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112104:
     .word  0x3ff00000                     @ 08112104 0000f03f
 LAB_08112108:
@@ -2766,7 +2766,7 @@ LAB_0811216e:
     lsrs r0,r2    @ 08112190 d040
     str r0,[sp,#0x4]                         @ 08112192 0190
     b LAB_081121a4                           @ 08112194 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112198:
     .word  0x000fffff                     @ 08112198 ffff0f00
 DAT_0811219c:
@@ -2833,7 +2833,7 @@ LAB_08112204:
     .hword 0x46a1    @ 0811220c a146
     .hword 0x46aa    @ 0811220e aa46
     pop {r4,r5,r6,r7,pc}                     @ 08112210 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112214:
     .word  0xfffffbce                     @ 08112214 cefbffff
 _ratio:
@@ -3005,7 +3005,7 @@ LAB_08112324:
     bl stub_malloc_unlock                    @ 08112356 fff73dfb
     adds r0,r7,#0x0    @ 0811235a 381c
     b LAB_08112590                           @ 0811235c 18e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112360:
     .word  0x09ed4d98                     @ 08112360 984ded09
 LAB_08112364:
@@ -3113,7 +3113,7 @@ LAB_0811240e:
     orrs r0,r5    @ 08112424 2843
     str r0,[r4,#0x4]                         @ 08112426 6060
     b LAB_0811253a                           @ 08112428 87e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811242c:
     .word  0x09ed4d98                     @ 0811242c 984ded09
 LAB_08112430:
@@ -3308,7 +3308,7 @@ LAB_08112592:
     .hword 0x46a1    @ 08112598 a146
     .hword 0x46aa    @ 0811259a aa46
     pop {r4,r5,r6,r7,pc}                     @ 0811259c f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ newlib _sbrk_r reentrant wrapper: clears global errno cache (EWRAM 0x02029ea8), then calls _sbrk(nbytes) to expand heap.
 @ If _sbrk returns -1 (failure) and errno is nonzero, writes errno back to caller-provided error-code pointer.
@@ -3337,7 +3337,7 @@ wrap_sbrk_r:
 LAB_081125c2:
     adds r0,r1,#0x0    @ 081125c2 081c
     pop {r4,r5,pc}                           @ 081125c4 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081125c8:
     .word  0x02029ea8                     @ 081125c8 a89e0202
 __sread:
@@ -3365,7 +3365,7 @@ LAB_081125ee:
 LAB_081125f6:
     adds r0,r1,#0x0    @ 081125f6 081c
     pop {r4,r5,pc}                           @ 081125f8 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081125fc:
     .word  0xffffefff                     @ 081125fc ffefffff
 __swrite:
@@ -3397,7 +3397,7 @@ LAB_08112622:
     adds r3,r6,#0x0    @ 08112632 331c
     bl wrap_write_r                          @ 08112634 00f05efa
     pop {r4,r5,r6,pc}                        @ 08112638 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811263c:
     .word  0xffffefff                     @ 0811263c ffefffff
 __sseek:
@@ -3433,7 +3433,7 @@ LAB_0811266c:
 LAB_0811267a:
     adds r0,r1,#0x0    @ 0811267a 081c
     pop {r4,r5,pc}                           @ 0811267c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __sclose:
     push {lr}                                @ 08112680 00b5
     ldr r2,[r0,#0x54]                        @ 08112682 426d
@@ -3470,7 +3470,7 @@ LAB_081126a4:
 LAB_081126aa:
     adds r0,r1,#0x0    @ 081126aa 081c
     bx lr                                    @ 081126ac 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Resolves file descriptor fd to corresponding standard stream FILE pointer or computed offset.
 @ Compares fd field (FILE+0xe, ldrsh 16-bit signed) of stdin/stdout/stderr in sequence; on match returns pointer stored at corresponding buffer address (stdin=0x0300577c / stdout=0x03005780 / stderr=0x03005784).
@@ -3506,7 +3506,7 @@ LAB_081126cc:
     bne LAB_081126e0                         @ 081126d4 04d1
     ldr r0, DAT_081126dc                     @ 081126d6 0148
     b LAB_081126f2                           @ 081126d8 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081126dc:
     .word  0x03005780                     @ 081126dc 80570003
 LAB_081126e0:
@@ -3524,7 +3524,7 @@ LAB_081126f2:
     ldr r0,[r0,#0x0]                         @ 081126f2 0068
 LAB_081126f4:
     bx lr                                    @ 081126f4 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081126f8:
     .word  0x03005784                     @ 081126f8 84570003
 initialise_monitor_handles:
@@ -3602,7 +3602,7 @@ query_semihost_heap_info:
     adds r2,r0,#0x0    @ 08112778 021c
     adds r0,r2,#0x0    @ 0811277a 101c
     pop {r4,pc}                              @ 0811277c 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Initializes the heap pointer field in the newlib reent struct via the semihosting interface. Calls get_global_reent to get the global reent pointer (r4), then calls query_semihost_heap_info to query heap layout information from the host (SYS_HEAPINFO, opcode 0x13), and stores the query result into reent[+0x0] (heap info pointer field). Returns the input r0 (original passed-in value, transparently passed through to the caller for error path use).
 @ 
@@ -3656,7 +3656,7 @@ _swiread:
     adds r0,r2,#0x0    @ 081127c8 101c
     add sp,#0xc                              @ 081127ca 03b0
     pop {r4,r5,pc}                           @ 081127cc 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _read:
     push {r4,r5,r6,r7,lr}                    @ 081127d0 f0b5
     adds r4,r0,#0x0    @ 081127d2 041c
@@ -3690,7 +3690,7 @@ LAB_0811280e:
     adds r0,r2,#0x0    @ 0811280e 101c
 LAB_08112810:
     pop {r4,r5,r6,r7,pc}                     @ 08112810 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112814:
     .word  0x03005788                     @ 08112814 88570003
 _swilseek:
@@ -3788,7 +3788,7 @@ _swiwrite:
     adds r0,r2,#0x0    @ 081128c4 101c
     add sp,#0xc                              @ 081128c6 03b0
     pop {r4,r5,pc}                           @ 081128c8 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 _write:
     push {r4,r5,r6,r7,lr}                    @ 081128cc f0b5
     adds r4,r0,#0x0    @ 081128ce 041c
@@ -3901,7 +3901,7 @@ LAB_08112970:
     adds r0,r3,#0x0    @ 0811299c 181c
     adds r0,#0x20    @ 0811299e 2030
     b LAB_081129ae                           @ 081129a0 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081129a4:
     .word  0x03005788                     @ 081129a4 88570003
 LAB_081129a8:
@@ -4038,7 +4038,7 @@ _times:
 LAB_08112aee:
     adds r0,r3,#0x0    @ 08112aee 181c
     pop {r4,r5,pc}                           @ 08112af0 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ newlib _write_r reentrant wrapper: clears EWRAM errno cache, then forwards r1=fd / r2=buf / r3=len to _write.
 @ If _write returns -1 and errno is nonzero, writes errno back to caller-provided r0 pointer.
@@ -4068,7 +4068,7 @@ wrap_write_r:
 LAB_08112b1a:
     adds r0,r1,#0x0    @ 08112b1a 081c
     pop {r4,r5,pc}                           @ 08112b1c 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112b20:
     .word  0x02029ea8                     @ 08112b20 a89e0202
 _calloc_r:
@@ -4145,7 +4145,7 @@ close_fd_reentrant:
 LAB_08112b9e:
     adds r0,r1,#0x0    @ 08112b9e 081c
     pop {r4,r5,pc}                           @ 08112ba0 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112ba4:
     .word  0x02029ea8                     @ 08112ba4 a89e0202
 
@@ -4159,7 +4159,7 @@ get_global_reent:
     ldr r0, DAT_08112bb0                     @ 08112ba8 0148
     ldr r0,[r0,#0x0]                         @ 08112baa 0068
     bx lr                                    @ 08112bac 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112bb0:
     .word  0x09ed4d94                     @ 08112bb0 944ded09
 
@@ -4206,7 +4206,7 @@ abort:
     pop {r3}                                 @ 08112bf4 08bc
     .hword 0x4698    @ 08112bf6 9846
     bx lr                                    @ 08112bf8 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112bfc:
     .word  0x00020022                     @ 08112bfc 22000200
 
@@ -4245,7 +4245,7 @@ lseek_fd_reentrant:
 LAB_08112c2e:
     adds r0,r1,#0x0    @ 08112c2e 081c
     pop {r4,r5,pc}                           @ 08112c30 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112c34:
     .word  0x02029ea8                     @ 08112c34 a89e0202
 
@@ -4277,7 +4277,7 @@ wrap_read_r:
 LAB_08112c5e:
     adds r0,r1,#0x0    @ 08112c5e 081c
     pop {r4,r5,pc}                           @ 08112c60 30bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112c64:
     .word  0x02029ea8                     @ 08112c64 a89e0202
 __pack_d:
@@ -4303,7 +4303,7 @@ LAB_08112c80:
     adds r1,r5,#0x0    @ 08112c8c 291c
     orrs r1,r3    @ 08112c8e 1943
     b LAB_08112d58                           @ 08112c90 62e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112c94:
     .word  0x000007ff                     @ 08112c94 ff070000
 DAT_08112c98:
@@ -4343,7 +4343,7 @@ LAB_08112cbe:
     movs r4,#0x0    @ 08112cd4 0024
     movs r5,#0x0    @ 08112cd6 0025
     b LAB_08112d4e                           @ 08112cd8 39e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112cdc:
     .word  0xfffffc02                     @ 08112cdc 02fcffff
 LAB_08112ce0:
@@ -4530,7 +4530,7 @@ LAB_08112e24:
     movs r0,#0x4    @ 08112e30 0420
     str r0,[r6,#0x0]                         @ 08112e32 3060
     b LAB_08112e78                           @ 08112e34 20e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112e38:
     .word  0x000007ff                     @ 08112e38 ff070000
 LAB_08112e3c:
@@ -4634,7 +4634,7 @@ LAB_08112ece:
     beq LAB_08112ea8                         @ 08112ed8 e6d0
     ldr r0, DAT_08112ee0                     @ 08112eda 0148
     b LAB_081130e4                           @ 08112edc 02e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08112ee0:
     .word  0x03005828                     @ 08112ee0 28580003
 LAB_08112ee4:
@@ -4870,7 +4870,7 @@ LAB_0811306a:
     rsbs r2,r2,#0    @ 08113088 5242
     asrs r3,r2,#0x1f    @ 0811308a d317
     b LAB_08113054                           @ 0811308c e2e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113090:
     .word  0x0fffffff                     @ 08113090 ffffff0f
 LAB_08113094:
@@ -5044,7 +5044,7 @@ LAB_081131d6:
 LAB_081131da:
     ldr r0, DAT_081131e0                     @ 081131da 0148
     b LAB_081133e2                           @ 081131dc 01e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081131e0:
     .word  0x03005828                     @ 081131e0 28580003
 LAB_081131e4:
@@ -5326,7 +5326,7 @@ LAB_081133e2:
     .hword 0x46a1    @ 081133ec a146
     .hword 0x46aa    @ 081133ee aa46
     pop {r4,r5,r6,r7,pc}                     @ 081133f0 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081133f4:
     .word  0x00000000                     @ 081133f4 00000000
 DAT_081133f8:
@@ -5546,7 +5546,7 @@ LAB_08113578:
     bl __pack_d                              @ 0811357a fff775fb
     add sp,#0x48                             @ 0811357e 12b0
     pop {r4,r5,r6,r7,pc}                     @ 08113580 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113584:
     .word  0x00000000                     @ 08113584 00000000
 DAT_08113588:
@@ -5705,7 +5705,7 @@ LAB_08113686:
     movs r0,#0x0    @ 08113686 0020
 LAB_08113688:
     pop {r4,r5,r6,pc}                        @ 08113688 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __cmpdf2:
     push {r4,lr}                             @ 0811368c 10b5
     sub sp,#0x38                             @ 0811368e 8eb0
@@ -5725,7 +5725,7 @@ __cmpdf2:
     bl __fpcmp_parts_d                       @ 081136ae fff76dff
     add sp,#0x38                             @ 081136b2 0eb0
     pop {r4,pc}                              @ 081136b4 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc double-precision floating-point equality comparison (__eqdf2): unpacks two doubles (r0:r1=A, r2:r3=B), checks for NaN/Inf; if either operand is NaN returns 1 (nonzero = not equal); otherwise calls __fpcmp_parts_d to compare mantissas, returns 0 for equal, nonzero for unequal.
 @ Called by _strtod_r three times; usage pattern: "bl compare_double_eq; cmp r0,#0; bne not_equal".
@@ -5770,7 +5770,7 @@ LAB_081136f6:
 LAB_081136fe:
     add sp,#0x38                             @ 081136fe 0eb0
     pop {r4,pc}                              @ 08113700 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc double-precision floating-point inequality comparison (__nedf2): structure identical to compare_double_eq (0x081136b8); unpacks two doubles, checks NaN (returns 1) or calls __fpcmp_parts_d.
 @ GCC __nedf2 convention: nonzero = not equal (same return value semantics as __eqdf2; caller uses beq/bne to distinguish purpose).
@@ -5815,7 +5815,7 @@ LAB_08113742:
 LAB_0811374a:
     add sp,#0x38                             @ 0811374a 0eb0
     pop {r4,pc}                              @ 0811374c 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc double-precision floating-point greater-than comparison (__gtdf2): unpacks two doubles, checks NaN (executes rsbs -> returns -1 = unordered, not greater); normal path calls __fpcmp_parts_d.
 @ GCC convention: positive = A>B, zero or negative = A<=B or contains NaN.
@@ -5950,7 +5950,7 @@ LAB_08113826:
 LAB_0811382e:
     add sp,#0x38                             @ 0811382e 0eb0
     pop {r4,pc}                              @ 08113830 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc double-precision floating-point less-or-equal comparison (__ledf2): unpacks two doubles, checks NaN (returns +1 = unordered, does not satisfy <=); normal path calls __fpcmp_parts_d.
 @ GCC convention: <=0 = A<=B, positive = A>B or contains NaN.
@@ -5995,7 +5995,7 @@ LAB_08113872:
 LAB_0811387a:
     add sp,#0x38                             @ 0811387a 0eb0
     pop {r4,pc}                              @ 0811387c 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __floatsidf:
     push {r4,r5,lr}                          @ 08113880 30b5
     sub sp,#0x14                             @ 08113882 85b0
@@ -6021,7 +6021,7 @@ LAB_08113898:
     ldr r1, DAT_081138b4                     @ 081138a8 0249
     ldr r0, DAT_081138b0                     @ 081138aa 0148
     b LAB_081138f4                           @ 081138ac 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_081138b0:
     .word  0xc1e00000                     @ 081138b0 0000e0c1
 DAT_081138b4:
@@ -6102,7 +6102,7 @@ LAB_08113932:
     beq LAB_08113968                         @ 08113938 16d0
     adds r1,#0x1    @ 0811393a 0131
     b LAB_08113968                           @ 0811393c 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113940:
     .word  0x7fffffff                     @ 08113940 ffffff7f
 LAB_08113944:
@@ -6130,7 +6130,7 @@ LAB_08113968:
 LAB_0811396a:
     add sp,#0x1c                             @ 0811396a 07b0
     pop {pc}                                 @ 0811396c 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __negdf2:
     push {lr}                                @ 08113970 00b5
     sub sp,#0x1c                             @ 08113972 87b0
@@ -6150,7 +6150,7 @@ LAB_0811398a:
     bl __pack_d                              @ 0811398e fff76bf9
     add sp,#0x1c                             @ 08113992 07b0
     pop {pc}                                 @ 08113994 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __make_dp:
     sub sp,#0x4                              @ 08113998 81b0
     push {r4,lr}                             @ 0811399a 10b5
@@ -6170,7 +6170,7 @@ __make_dp:
     pop {r3}                                 @ 081139b8 08bc
     add sp,#0x4                              @ 081139ba 01b0
     bx r3                                    @ 081139bc 1847
-    .byte  0x00, 0x00
+    .zero  0x2
 __truncdfsf2:
     push {r4,r5,lr}                          @ 081139c0 30b5
     sub sp,#0x1c                             @ 081139c2 87b0
@@ -6381,7 +6381,7 @@ LAB_08113b20:
     str r0,[r3,#0xc]                         @ 08113b32 d860
 LAB_08113b34:
     pop {r4,pc}                              @ 08113b34 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ newlib/libgcc single-precision floating-point add/subtract core: receives two unpacked float component structs (r0=A, r1=B, r2=result), performs NaN/Inf/zero propagation checks, aligns mantissas (max 0x1f shift), executes 32-bit sub/add and normalizes, writes result components.
 @ Called by __addsf3 (0x08113cb4) and __subsf3 (0x08113ce0); both share this core after unpacking float.
@@ -6583,7 +6583,7 @@ LAB_08113c6e:
     cmp r0,r2                                @ 08113c7c 9042
     bls LAB_08113c6e                         @ 08113c7e f6d9
     b LAB_08113c90                           @ 08113c80 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113c84:
     .word  0x3ffffffe                     @ 08113c84 feffff3f
 LAB_08113c88:
@@ -6611,7 +6611,7 @@ LAB_08113cac:
     pop {r3}                                 @ 08113cac 08bc
     .hword 0x4698    @ 08113cae 9846
     pop {r4,r5,r6,r7,pc}                     @ 08113cb0 f0bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __addsf3:
     push {r4,lr}                             @ 08113cb4 10b5
     sub sp,#0x38                             @ 08113cb6 8eb0
@@ -6725,7 +6725,7 @@ LAB_08113d8a:
 LAB_08113d8e:
     ldr r0, DAT_08113d94                     @ 08113d8e 0148
     b LAB_08113e66                           @ 08113d90 69e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113d94:
     .word  0x03005840                     @ 08113d94 40580003
 LAB_08113d98:
@@ -6916,7 +6916,7 @@ LAB_08113eda:
     bne LAB_08113f58                         @ 08113ee0 3ad1
     ldr r1, DAT_08113ee8                     @ 08113ee2 0149
     b LAB_08113f58                           @ 08113ee4 38e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_08113ee8:
     .word  0x03005840                     @ 08113ee8 40580003
 LAB_08113eec:
@@ -6989,7 +6989,7 @@ LAB_08113f58:
     bl __pack_f                              @ 08113f5a fff753fd
     add sp,#0x28                             @ 08113f5e 0ab0
     pop {r4,r5,r6,pc}                        @ 08113f60 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __fpcmp_parts_f:
     push {r4,lr}                             @ 08113f64 10b5
     adds r4,r0,#0x0    @ 08113f66 041c
@@ -7147,7 +7147,7 @@ __cmpsf2:
     bl __fpcmp_parts_f                       @ 08114066 fff77dff
     add sp,#0x28                             @ 0811406a 0ab0
     pop {r4,pc}                              @ 0811406c 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc single-precision float equal comparison (__eqsf2): unpacks two floats (r0, r1) then checks NaN (kind > 1 -> returns 1 = not-equal), normal path calls __fpcmp_parts_f and returns comparison result.
 @ GCC __eqsf2 contract: 0 = A==B, nonzero = A!=B or NaN. Caller pattern: bl compare_float_eq; cmp r0,#0; bne not_equal.
@@ -7191,7 +7191,7 @@ LAB_081140aa:
 LAB_081140b2:
     add sp,#0x28                             @ 081140b2 0ab0
     pop {r4,pc}                              @ 081140b4 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc single-precision float not-equal comparison (__nesf2): same structure as compare_float_eq (0x08114070); unpacks two floats, checks NaN (kind > 1 -> returns 1), normal path calls __fpcmp_parts_f.
 @ GCC __nesf2 contract: nonzero = not-equal (semantically same return value as __eqsf2; caller uses beq/bne to select behavior).
@@ -7234,7 +7234,7 @@ LAB_081140f2:
 LAB_081140fa:
     add sp,#0x28                             @ 081140fa 0ab0
     pop {r4,pc}                              @ 081140fc 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc single-precision float greater-than comparison (__gtsf2): unpacks two floats (r0, r1), checks NaN; NaN path executes rsbs r0,r0,#0 -> returns -1 (unordered, does not satisfy >), normal path calls __fpcmp_parts_f.
 @ GCC __gtsf2 contract: positive = A>B, zero or negative = A<=B or NaN. Caller pattern: bl compare_float_gt; cmp r0,#0; ble not_greater.
@@ -7366,7 +7366,7 @@ LAB_081141ca:
 LAB_081141d2:
     add sp,#0x28                             @ 081141d2 0ab0
     pop {r4,pc}                              @ 081141d4 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GCC libgcc single-precision float less-or-equal comparison (__lesf2): unpacks two floats (r0, r1), checks NaN (kind > 1 -> returns +1 = unordered, does not satisfy <=), normal path calls __fpcmp_parts_f.
 @ GCC __lesf2 contract: <=0 = A<=B, positive = A>B or NaN. Caller pattern: bl compare_float_le; cmp r0,#0; bgt not_le.
@@ -7410,7 +7410,7 @@ LAB_08114212:
 LAB_0811421a:
     add sp,#0x28                             @ 0811421a 0ab0
     pop {r4,pc}                              @ 0811421c 10bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __floatsisf:
     push {lr}                                @ 08114220 00b5
     sub sp,#0x10                             @ 08114222 84b0
@@ -7463,7 +7463,7 @@ LAB_08114270:
 LAB_08114276:
     add sp,#0x10                             @ 08114276 04b0
     pop {pc}                                 @ 08114278 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_0811427c:
     .word  0x3fffffff                     @ 0811427c ffffff3f
 __fixsfsi:
@@ -7556,7 +7556,7 @@ __make_fp:
     bl __pack_f                              @ 0811431a fff773fb
     add sp,#0x10                             @ 0811431e 04b0
     pop {pc}                                 @ 08114320 00bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __extendsfdf2:
     push {r4,r5,r6,lr}                       @ 08114324 70b5
     sub sp,#0x18                             @ 08114326 86b0
@@ -7607,7 +7607,7 @@ LAB_0811437c:
     adds r0,r3,#0x0    @ 0811437e 181c
 LAB_08114380:
     pop {r4,r5,r6,pc}                        @ 08114380 70bd
-    .byte  0x00, 0x00
+    .zero  0x2
 __negdi2:
     push {r4,lr}                             @ 08114384 10b5
     rsbs r2,r0,#0    @ 08114386 4242
@@ -7621,7 +7621,7 @@ LAB_08114392:
     adds r1,r4,#0x0    @ 08114394 211c
     adds r0,r3,#0x0    @ 08114396 181c
     pop {r4,pc}                              @ 08114398 10bd
-    .byte  0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    .zero  0x6
 DWORD_081143a0:
     .word  0x00000000                     @ 081143a0 00000000
 DWORD_081143a4:

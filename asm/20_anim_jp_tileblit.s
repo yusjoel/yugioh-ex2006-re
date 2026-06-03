@@ -171,7 +171,7 @@ LAB_080e91d0:
     pop {r4,r5}                              @ 080e91d8 30bc
     pop {r0}                                 @ 080e91da 01bc
     bx r0                                    @ 080e91dc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e91e0:
     .word  0x09e4a4a8                     @ 080e91e0 a8a4e409
 DAT_080e91e4:
@@ -354,7 +354,7 @@ LAB_080e9326:
     pop {r4}                                 @ 080e9328 10bc
     pop {r1}                                 @ 080e932a 02bc
     bx r1                                    @ 080e932c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9330:
     .word  0x09e4a4a8                     @ 080e9330 a8a4e409
 DAT_080e9334:
@@ -422,7 +422,7 @@ LAB_080e93a0:
     adds r0,r5,#0x0    @ 080e93be 281c
     bl set_nob_cell_position                 @ 080e93c0 02f072fa
     b LAB_080e93f8                           @ 080e93c4 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e93c8:
     .word  0x09e4ae60                     @ 080e93c8 60aee409
 DAT_080e93cc:
@@ -449,7 +449,7 @@ LAB_080e93f8:
     pop {r4,r5,r6}                           @ 080e93f8 70bc
     pop {r0}                                 @ 080e93fa 01bc
     bx r0                                    @ 080e93fc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ nnsys/g2d/g2d_CellAnimation.c -- main CellAnimation init entry. Called by game layer 0x08015d30 (fs tag). Asserts pCellAnim/pCellDataBank/pAnimSeq non-NULL (line 0x87/0x88/0x89 and 0x64/0x65/0x66). Calls bind_srt_ctrl_data(pCellAnim+0x38), init_anim_ctrl(pCellAnim), init_cell_anim_with_seq(pCellAnim, pAnimSeq). Writes pCellDataBank to [pCellAnim+0x30], -1 to [pCellAnim+0x34] (frame counter). Equivalent to NNS_G2dInitCellAnimation. r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dCellDataBank* pCellDataBank, r2=NNS_G2dAnimSequence* pAnimSeq. Constants: CELL_ANIM_SRT_CTRL_OFFSET=0x38 / CELL_ANIM_CELL_DATA_BANK_OFFSET=0x30 / CELL_ANIM_FRAME_COUNTER_OFFSET=0x34.
 bind_cell_anim_to_bank:
@@ -521,7 +521,7 @@ LAB_080e9468:
     pop {r4,r5,r6}                           @ 080e9488 70bc
     pop {r0}                                 @ 080e948a 01bc
     bx r0                                    @ 080e948c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9490:
     .word  0x09e4ae60                     @ 080e9490 60aee409
 DAT_080e9494:
@@ -708,7 +708,7 @@ LAB_080e95cc:
     pop {r4,r5}                              @ 080e95cc 30bc
     pop {r0}                                 @ 080e95ce 01bc
     bx r0                                    @ 080e95d0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e95d4:
     .word  0x09e4ae60                     @ 080e95d4 60aee409
 DAT_080e95d8:
@@ -801,7 +801,7 @@ LAB_080e967a:
     pop {r4,r5}                              @ 080e967c 30bc
     pop {r0}                                 @ 080e967e 01bc
     bx r0                                    @ 080e9680 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9684:
     .word  0x09e4ae60                     @ 080e9684 60aee409
 DAT_080e9688:
@@ -930,7 +930,7 @@ LAB_080e9752:
 LAB_080e976a:
     adds r0,r1,#0x0    @ 080e976a 081c
     b LAB_080e978c                           @ 080e976c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9770:
     .word  0x09e4ac6c                     @ 080e9770 6cace409
 DAT_080e9774:
@@ -1111,7 +1111,7 @@ LAB_080e98ba:
     .hword 0x4642    @ 080e98d0 4246
     orrs r0,r2    @ 080e98d2 1043
     b LAB_080e9910                           @ 080e98d4 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e98d8:
     .word  0xc000c000                     @ 080e98d8 00c000c0
 DAT_080e98dc:
@@ -1315,7 +1315,7 @@ LAB_080e9a3c:
     cmp r1,r0                                @ 080e9a44 8142
     beq LAB_080e9a7c                         @ 080e9a46 19d0
     b LAB_080e9a8e                           @ 080e9a48 21e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9a4c:
     .word  0x00200010                     @ 080e9a4c 10002000
 DAT_080e9a50:
@@ -1360,7 +1360,7 @@ LAB_080e9a8e:
     movs r0,#0x0    @ 080e9a8e 0020
 LAB_080e9a90:
     bx lr                                    @ 080e9a90 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ GL/IG2D_Main.c g2d_Image.c line 373. r0=NNS_G2dImageProxy* pProxy (non-NULL). Asserts pProxy != NULL, then writes 0xFFFFFFFF (-1) to fields [pProxy+0x0], [pProxy+0x4], [pProxy+0x8] (3 VRAM slot fields). Side-effect: all 3 ImageProxy VRAM slots marked invalid (NNS init pattern).
 init_img_proxy_fields:
@@ -1386,7 +1386,7 @@ LAB_080e9ab0:
     pop {r4}                                 @ 080e9ab8 10bc
     pop {r0}                                 @ 080e9aba 01bc
     bx r0                                    @ 080e9abc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9ac0:
     .word  0x09e4b61c                     @ 080e9ac0 1cb6e409
 DAT_080e9ac4:
@@ -1442,7 +1442,7 @@ LAB_080e9b16:
     pop {r4,r5,r6}                           @ 080e9b24 70bc
     pop {r0}                                 @ 080e9b26 01bc
     bx r0                                    @ 080e9b28 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9b2c:
     .word  0x09e4b61c                     @ 080e9b2c 1cb6e409
 DAT_080e9b30:
@@ -1612,7 +1612,7 @@ LAB_080e9c56:
     pop {r4}                                 @ 080e9c60 10bc
     pop {r0}                                 @ 080e9c62 01bc
     bx r0                                    @ 080e9c64 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9c68:
     .word  0x09e4b61c                     @ 080e9c68 1cb6e409
 DAT_080e9c6c:
@@ -1726,7 +1726,7 @@ LAB_080e9d32:
     pop {r4,r5}                              @ 080e9d38 30bc
     pop {r1}                                 @ 080e9d3a 02bc
     bx r1                                    @ 080e9d3c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9d40:
     .word  0x09e4b61c                     @ 080e9d40 1cb6e409
 DAT_080e9d44:
@@ -1804,7 +1804,7 @@ LAB_080e9dbe:
     pop {r4,r5}                              @ 080e9dcc 30bc
     pop {r1}                                 @ 080e9dce 02bc
     bx r1                                    @ 080e9dd0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9dd4:
     .word  0x09e4b61c                     @ 080e9dd4 1cb6e409
 DAT_080e9dd8:
@@ -1892,7 +1892,7 @@ LAB_080e9e76:
     .hword 0x4641    @ 080e9e7a 4146
     bl copy_to_obj_tile_vram                 @ 080e9e7c 2af7caff
     b LAB_080e9eb8                           @ 080e9e80 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9e84:
     .word  0x09e4b61c                     @ 080e9e84 1cb6e409
 DAT_080e9e88:
@@ -1953,7 +1953,7 @@ LAB_080e9ee4:
     ldr r0,[r0,#0x0]                         @ 080e9ef2 0068
 switchD_080e9ef4__switchD:
     .hword 0x4687    @ 080e9ef4 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9ef8:
     .word  0x09e4b61c                     @ 080e9ef8 1cb6e409
 DAT_080e9efc:
@@ -2026,7 +2026,7 @@ LAB_080e9fa2:
     ldr r0,[r0,#0x0]                         @ 080e9fb2 0068
 switchD_080e9fb4__switchD:
     .hword 0x4687    @ 080e9fb4 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080e9fb8:
     .word  0x080e9fbc                     @ 080e9fb8 bc9f0e08
 switchD_080e9fb4__switchdataD_080e9fbc:
@@ -2195,7 +2195,7 @@ LAB_080ea126:
     .hword 0x4641    @ 080ea12a 4146
     bl copy_to_obj_tile_vram                 @ 080ea12c 2af772fe
     b LAB_080ea16c                           @ 080ea130 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea134:
     .word  0x09e4b61c                     @ 080ea134 1cb6e409
 DAT_080ea138:
@@ -2258,7 +2258,7 @@ LAB_080ea198:
     ldr r0,[r0,#0x0]                         @ 080ea1a6 0068
 switchD_080ea1a8__switchD:
     .hword 0x4687    @ 080ea1a8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea1ac:
     .word  0x09e4b61c                     @ 080ea1ac 1cb6e409
 DAT_080ea1b0:
@@ -2331,7 +2331,7 @@ LAB_080ea256:
     ldr r0,[r0,#0x0]                         @ 080ea266 0068
 switchD_080ea268__switchD:
     .hword 0x4687    @ 080ea268 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea26c:
     .word  0x080ea270                     @ 080ea26c 70a20e08
 switchD_080ea268__switchdataD_080ea270:
@@ -2482,7 +2482,7 @@ LAB_080ea3a8:
     ldr r0,[r0,#0x0]                         @ 080ea3b6 0068
 switchD_080ea3b8__switchD:
     .hword 0x4687    @ 080ea3b8 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea3bc:
     .word  0x09e4b61c                     @ 080ea3bc 1cb6e409
 DAT_080ea3c0:
@@ -2555,7 +2555,7 @@ LAB_080ea466:
     ldr r0,[r0,#0x0]                         @ 080ea476 0068
 switchD_080ea478__switchD:
     .hword 0x4687    @ 080ea478 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea47c:
     .word  0x080ea480                     @ 080ea47c 80a40e08
 switchD_080ea478__switchdataD_080ea480:
@@ -2739,7 +2739,7 @@ LAB_080ea5f6:
     pop {r4,r5,r6,r7}                        @ 080ea60c f0bc
     pop {r0}                                 @ 080ea60e 01bc
     bx r0                                    @ 080ea610 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea614:
     .word  0x09e4b61c                     @ 080ea614 1cb6e409
 DAT_080ea618:
@@ -2833,7 +2833,7 @@ LAB_080ea6ba:
     movs r3,#0x20    @ 080ea6c0 2023
     .hword 0x4698    @ 080ea6c2 9846
     b LAB_080ea70c                           @ 080ea6c4 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea6c8:
     .word  0x09e4b61c                     @ 080ea6c8 1cb6e409
 DAT_080ea6cc:
@@ -3065,7 +3065,7 @@ LAB_080ea87e:
     pop {r4,r5}                              @ 080ea884 30bc
     pop {r1}                                 @ 080ea886 02bc
     bx r1                                    @ 080ea888 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea88c:
     .word  0x09e4b61c                     @ 080ea88c 1cb6e409
 DAT_080ea890:
@@ -3146,7 +3146,7 @@ LAB_080ea906:
     pop {r4,r5}                              @ 080ea914 30bc
     pop {r1}                                 @ 080ea916 02bc
     bx r1                                    @ 080ea918 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea91c:
     .word  0x09e4b61c                     @ 080ea91c 1cb6e409
 DAT_080ea920:
@@ -3213,7 +3213,7 @@ LAB_080ea986:
     adds r1,r7,#0x0    @ 080ea98a 391c
     bl copy_to_obj_tile_vram                 @ 080ea98c 2af742fa
     b LAB_080ea9bc                           @ 080ea990 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea994:
     .word  0x09e4b61c                     @ 080ea994 1cb6e409
 DAT_080ea998:
@@ -3238,7 +3238,7 @@ LAB_080ea9bc:
     pop {r4,r5,r6,r7}                        @ 080ea9bc f0bc
     pop {r0}                                 @ 080ea9be 01bc
     bx r0                                    @ 080ea9c0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ea9c4:
     .word  0x09e4b61c                     @ 080ea9c4 1cb6e409
 DAT_080ea9c8:
@@ -3316,7 +3316,7 @@ LAB_080eaa38:
     ldr r0,[r0,#0x0]                         @ 080eaa46 0068
 switchD_080eaa48__switchD:
     .hword 0x4687    @ 080eaa48 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eaa4c:
     .word  0x09e4b61c                     @ 080eaa4c 1cb6e409
 DAT_080eaa50:
@@ -3397,7 +3397,7 @@ LAB_080eab06:
     ldr r0,[r0,#0x0]                         @ 080eab16 0068
 switchD_080eab18__switchD:
     .hword 0x4687    @ 080eab18 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eab1c:
     .word  0x080eab20                     @ 080eab1c 20ab0e08
 switchD_080eab18__switchdataD_080eab20:
@@ -3721,7 +3721,7 @@ LAB_080ead7c:
     ands r2,r3    @ 080eada2 1a40
     bl bios_cpu_fast_set                     @ 080eada4 23f026fb
     b LAB_080eadce                           @ 080eada8 11e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eadac:
     .word  0x09e4b61c                     @ 080eadac 1cb6e409
 DAT_080eadb0:
@@ -3866,7 +3866,7 @@ LAB_080eaea2:
     pop {r4,r5}                              @ 080eaeb0 30bc
     pop {r1}                                 @ 080eaeb2 02bc
     bx r1                                    @ 080eaeb4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eaeb8:
     .word  0x09e4b61c                     @ 080eaeb8 1cb6e409
 DAT_080eaebc:
@@ -3891,7 +3891,7 @@ LAB_080eaeda:
     adds r4,r0,r6    @ 080eaedc 8419
     movs r5,#0x0    @ 080eaede 0025
     b LAB_080eaf1a                           @ 080eaee0 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eaee4:
     .word  0x09e4bfdc                     @ 080eaee4 dcbfe409
 DAT_080eaee8:
@@ -3910,7 +3910,7 @@ LAB_080eaefc:
     bne LAB_080eaf10                         @ 080eaf00 06d1
     adds r0,r4,#0x0    @ 080eaf02 201c
     b LAB_080eaf22                           @ 080eaf04 0de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eaf08:
     .word  0x09e4bfdc                     @ 080eaf08 dcbfe409
 DAT_080eaf0c:
@@ -4029,7 +4029,7 @@ LAB_080eafc6:
 LAB_080eafce:
     adds r0,r3,#0x0    @ 080eafce 181c
     bx lr                                    @ 080eafd0 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ nnsys/g2d/g2d_NAN_load.c line 92. NANR anim file loader top-level entry: validates magic, calls link_nanr_anim_bank. r0=NNS_G2dBinaryFileHeader* pNanrFile, r1=NNS_G2dAnimBankData** ppAnimBank. Asserts both non-NULL (line 92/93); verifies [pNanrFile+0]=='NANR' (0x4e414e52) and [pNanrFile+6] u16 >= 0x100 (version check); then calls link_nanr_anim_bank. Returns 1=success, 0=failure. Constants: NANR_SIGNATURE=0x4e414e52, VERSION_MIN=0x100.
 load_nanr_anim_bank:
@@ -4093,7 +4093,7 @@ LAB_080eb03c:
     pop {r4,r5}                              @ 080eb044 30bc
     pop {r1}                                 @ 080eb046 02bc
     bx r1                                    @ 080eb048 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb04c:
     .word  0x09e4c744                     @ 080eb04c 44c7e409
 DAT_080eb050:
@@ -4174,7 +4174,7 @@ LAB_080eb0cc:
     pop {r4,r5}                              @ 080eb0d4 30bc
     pop {r1}                                 @ 080eb0d6 02bc
     bx r1                                    @ 080eb0d8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb0dc:
     .word  0x09e4c744                     @ 080eb0dc 44c7e409
 DAT_080eb0e0:
@@ -4430,7 +4430,7 @@ LAB_080eb2a4:
     str r0,[r5,#0x0]                         @ 080eb2b0 2860
     movs r0,#0x0    @ 080eb2b2 0020
     b LAB_080eb2e2                           @ 080eb2b4 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb2b8:
     .word  0x09e4cfa4                     @ 080eb2b8 a4cfe409
 DAT_080eb2bc:
@@ -4500,7 +4500,7 @@ LAB_080eb330:
     pop {r4}                                 @ 080eb330 10bc
     pop {r0}                                 @ 080eb332 01bc
     bx r0                                    @ 080eb334 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb338:
     .word  0x09e4cfa4                     @ 080eb338 a4cfe409
 DAT_080eb33c:
@@ -4588,7 +4588,7 @@ LAB_080eb3ac:
     str r0,[r5,#0x0]                         @ 080eb3b8 2860
     movs r0,#0x0    @ 080eb3ba 0020
     b LAB_080eb3ea                           @ 080eb3bc 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb3c0:
     .word  0x09e4cfa4                     @ 080eb3c0 a4cfe409
 DAT_080eb3c4:
@@ -4740,7 +4740,7 @@ LAB_080eb4c0:
     pop {r4}                                 @ 080eb4c0 10bc
     pop {r0}                                 @ 080eb4c2 01bc
     bx r0                                    @ 080eb4c4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb4c8:
     .word  0x09e4cfa4                     @ 080eb4c8 a4cfe409
 DAT_080eb4cc:
@@ -5083,7 +5083,7 @@ LAB_080eb70c:
     pop {r4}                                 @ 080eb710 10bc
     pop {r1}                                 @ 080eb712 02bc
     bx r1                                    @ 080eb714 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ nnsys/g2d/g2d_NOB_load.c line 28 (pExData). Relocate internal pointers in a NOB extra-data block. r0=NNS_G2dBinaryBlockHeader* pExData (non-NULL assert). Skips 8-byte block header (r0+8) then calls relocate_bin_block_ptrs to patch all relative offsets to absolute addresses. Called by relocate_nob_cell_bank_ptrs when [pNcerData+0x14] exdata is present.
 relocate_nob_exdata_block_ptrs:
@@ -5103,7 +5103,7 @@ LAB_080eb72c:
     pop {r4}                                 @ 080eb734 10bc
     pop {r0}                                 @ 080eb736 01bc
     bx r0                                    @ 080eb738 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb73c:
     .word  0x09e4e178                     @ 080eb73c 78e1e409
 DAT_080eb740:
@@ -5173,7 +5173,7 @@ LAB_080eb7ac:
     str r0,[r5,#0x0]                         @ 080eb7b8 2860
     movs r0,#0x0    @ 080eb7ba 0020
     b LAB_080eb7ea                           @ 080eb7bc 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb7c0:
     .word  0x09e4e178                     @ 080eb7c0 78e1e409
 DAT_080eb7c4:
@@ -5241,7 +5241,7 @@ LAB_080eb830:
     pop {r4,r5,r6}                           @ 080eb830 70bc
     pop {r1}                                 @ 080eb832 02bc
     bx r1                                    @ 080eb834 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ nnsys/g2d/g2d_NOB_load.c line 110 (pCellData). Full internal pointer relocation for a NCER cell bank data block. r0=NNS_G2dCellBank* pNcerData (block body after 8-byte header). [pNcerData+4]+=pNcerData (cell array base abs); iterates each cell via get_nob_cell_data_offset: [cell+4]+=r6 (cell data ptr abs); if [pNcerData+0xc]!=0: abs + patch [ext+4]; if [pNcerData+0x14]!=0: abs + call relocate_nob_exdata_block_ptrs. Called by load_ncer_cell_bank.
 relocate_nob_cell_bank_ptrs:
@@ -5263,7 +5263,7 @@ LAB_080eb84c:
     adds r6,r0,#0x0    @ 080eb858 061c
     movs r5,#0x0    @ 080eb85a 0025
     b LAB_080eb87c                           @ 080eb85c 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb860:
     .word  0x09e4e178                     @ 080eb860 78e1e409
 DAT_080eb864:
@@ -5301,7 +5301,7 @@ LAB_080eb8a0:
     pop {r4,r5,r6}                           @ 080eb8a0 70bc
     pop {r0}                                 @ 080eb8a2 01bc
     bx r0                                    @ 080eb8a4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ NitroSDK nnsys/g2d/g2d_NOB_load.c -- set X/Y position of a NOB cell entry. Called by FUN_080e9350. Checks [pCell+0]==1 (CELL_TYPE_ACTIVE); if ok: sets [pCell+0x12] bit3 (position valid flag), writes strh x_pos to [pCell+0xc], strh y_pos to [pCell+0xe]. Type mismatch triggers suppress_assert_report (line 0x27). r0=ptr pCell (NNS_G2dNOBCell), r1=u16 x_pos[0..65535], r2=u16 y_pos[0..65535]. Constants: CELL_TYPE_ACTIVE=1 / CELL_FLAG_POS_SET=0x8 / CELL_X_OFFSET=0xc / CELL_Y_OFFSET=0xe.
 set_nob_cell_position:
@@ -5331,7 +5331,7 @@ LAB_080eb8d4:
     pop {r4}                                 @ 080eb8d4 10bc
     pop {r0}                                 @ 080eb8d6 01bc
     bx r0                                    @ 080eb8d8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb8dc:
     .word  0x09e4e91c                     @ 080eb8dc 1ce9e409
 DAT_080eb8e0:
@@ -5361,7 +5361,7 @@ LAB_080eb8fe:
 LAB_080eb90a:
     pop {r0}                                 @ 080eb90a 01bc
     bx r0                                    @ 080eb90c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb910:
     .word  0x09e4e91c                     @ 080eb910 1ce9e409
 DAT_080eb914:
@@ -5391,7 +5391,7 @@ LAB_080eb93c:
     pop {r4}                                 @ 080eb93c 10bc
     pop {r0}                                 @ 080eb93e 01bc
     bx r0                                    @ 080eb940 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eb944:
     .word  0x09e4e91c                     @ 080eb944 1ce9e409
 DAT_080eb948:
@@ -5644,7 +5644,7 @@ LAB_080ebada:
     pop {r4,r5,r6,r7}                        @ 080ebaf0 f0bc
     pop {r0}                                 @ 080ebaf2 01bc
     bx r0                                    @ 080ebaf4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ebaf8:
     .word  0x09e4e91c                     @ 080ebaf8 1ce9e409
 DAT_080ebafc:
@@ -5749,7 +5749,7 @@ init_lang_select_vram_and_regs:
     pop {r4}                                 @ 080ebbb8 10bc
     pop {r0}                                 @ 080ebbba 01bc
     bx r0                                    @ 080ebbbc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ebbc0:
     .word  gPrng                          @ 080ebbc0 40000003
 PTR_DAT_080ebbc4:
@@ -5873,7 +5873,7 @@ LAB_080ebc0c:
     ldr r1, DAT_080ebcec                     @ 080ebca8 1049
     adds r0,r0,r1    @ 080ebcaa 4018
     b LAB_080ebd0a                           @ 080ebcac 2de0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ebcb0:
     .word  0x080000ae                     @ 080ebcb0 ae000008
 DAT_080ebcb4:
@@ -5949,7 +5949,7 @@ LAB_080ebd0a:
     ldr r0, DAT_080ebd50                     @ 080ebd38 0548
     adds r3,r3,r0    @ 080ebd3a 1b18
     b LAB_080ebd6e                           @ 080ebd3c 17e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ebd40:
     .word  0x09dcad60                     @ 080ebd40 60addc09
 DAT_080ebd44:
@@ -6255,7 +6255,7 @@ LAB_080ebf8a:
     pop {r4,r5,r6,r7}                        @ 080ebf90 f0bc
     pop {r0}                                 @ 080ebf92 01bc
     bx r0                                    @ 080ebf94 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ebf98:
     .word  0x003c0020                     @ 080ebf98 20003c00
 DAT_080ebf9c:
@@ -6311,7 +6311,7 @@ LAB_080ebfe8:
     ands r0,r2    @ 080ebff8 1040
     strb r0,[r1,#0x1]                        @ 080ebffa 4870
     b LAB_080ec1c6                           @ 080ebffc e3e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ec000:
     .word  0x020297e0                     @ 080ec000 e0970202
 LAB_080ec004:
@@ -6549,7 +6549,7 @@ LAB_080ec1c6:
     orrs r0,r1    @ 080ec1d8 0843
     strh r0,[r6,#0x0]                        @ 080ec1da 3080
     b LAB_080ec1ac                           @ 080ec1dc e6e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ec1e0:
     .word  0xffffc03f                     @ 080ec1e0 3fc0ffff
 LAB_080ec1e4:
@@ -6567,7 +6567,7 @@ LAB_080ec1f8:
     pop {r4,r5,r6,r7}                        @ 080ec1f8 f0bc
     pop {r1}                                 @ 080ec1fa 02bc
     bx r1                                    @ 080ec1fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Language selection page hardware register and VRAM initialization function.
 @ No independent APCS input (r0 overwritten by ldr gPrng at entry).
@@ -6639,7 +6639,7 @@ init_lang_select_vram_and_regs__080ec200:
     pop {r4}                                 @ 080ec268 10bc
     pop {r0}                                 @ 080ec26a 01bc
     bx r0                                    @ 080ec26c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ec270:
     .word  gPrng                          @ 080ec270 40000003
 DWORD_080ec274:
@@ -6977,7 +6977,7 @@ LAB_080ece58:
     adds r0,r0,r1    @ 080ece5c 4018
     ldr r0,[r0,#0x0]                         @ 080ece5e 0068
     .hword 0x4687    @ 080ece60 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ece64:
     .word  gPrng                          @ 080ece64 40000003
 DWORD_080ece68:
@@ -7192,7 +7192,7 @@ LAB_080ed592:
     ldr r1,[r4,#0x0]                         @ 080ed5b8 2168
     adds r1,r1,r7    @ 080ed5ba c919
     b LAB_080ed60a                           @ 080ed5bc 25e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ed5c0:
     .word  gPrng                          @ 080ed5c0 40000003
 DAT_080ed5c4:
@@ -7235,7 +7235,7 @@ LAB_080ed60a:
     subs r0,#0x1    @ 080ed60c 0138
     str r0,[r1,#0x0]                         @ 080ed60e 0860
     b LAB_080ed622                           @ 080ed610 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ed614:
     .word  0x00000464                     @ 080ed614 64040000
 DAT_080ed618:
@@ -7283,7 +7283,7 @@ advance_sio_deck_sync_slot:
     pop {r4,r5}                              @ 080ed668 30bc
     pop {r0}                                 @ 080ed66a 01bc
     bx r0                                    @ 080ed66c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ed670:
     .word  gPrng                          @ 080ed670 40000003
 
@@ -7316,7 +7316,7 @@ check_prng_anim_frame_slot_occupied:
     movs r4,#0x0    @ 080ed6a4 0024
     .hword 0x4690    @ 080ed6a6 9046
     b LAB_080ed6e2                           @ 080ed6a8 1be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ed6ac:
     .word  gPrng                          @ 080ed6ac 40000003
 LAB_080ed6b0:
@@ -7341,7 +7341,7 @@ LAB_080ed6b0:
     bne LAB_080ed6e0                         @ 080ed6d4 04d1
     movs r0,#0x1    @ 080ed6d6 0120
     b LAB_080ed6f2                           @ 080ed6d8 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ed6dc:
     .word  0x0000f0ff                     @ 080ed6dc fff00000
 LAB_080ed6e0:
@@ -7521,7 +7521,7 @@ LAB_080ed81a:
     adds r0,r0,r1    @ 080ed82c 4018
     adds r5,r2,r0    @ 080ed82e 1518
     b LAB_080ed7b6                           @ 080ed830 c1e7
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ed834:
     .word  0x0000059c                     @ 080ed834 9c050000
 LAB_080ed838:
@@ -7608,7 +7608,7 @@ LAB_080ed8b4:
     movs r0,#0x2    @ 080ed8c8 0220
     add r8,r0                                @ 080ed8ca 8044
     b LAB_080ed8e6                           @ 080ed8cc 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ed8d0:
     .word  gPrng                          @ 080ed8d0 40000003
 DAT_080ed8d4:
@@ -7656,7 +7656,7 @@ LAB_080ed8e6:
     ldrb r5,[r1,#0x0]                        @ 080ed924 0d78
     orrs r0,r5    @ 080ed926 2843
     b LAB_080ed9b6                           @ 080ed928 45e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_IME_080ed92c:
     .word  IME                            @ 080ed92c 08020004
 DAT_080ed930:
@@ -7794,7 +7794,7 @@ LAB_080eda1e:
     pop {r4,r5,r6,r7}                        @ 080eda28 f0bc
     pop {r1}                                 @ 080eda2a 02bc
     bx r1                                    @ 080eda2c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ SIO deck sync session main frame driver. Checks busy flag(0x588); if busy returns 0 immediately. Sets busy=1, reads SIOCNT bits[5:4] for link_role, calls recv_sio_deck_sync_packets to receive packets and write count. Dispatches by phase_code(bits[11:8]: 0x80..0xf0): 0x90/0xa0 calls advance_sio_deck_sync_slot; 0xe0 calls tick_sio_deck_sync_round or write_sio_deck_sync_entry by round_flag; other phases call tick_sio_deck_sync_round or write entry. If packet count exceeds 0x5a(90) calls suppress_display_output and sets done flag. Clears busy, returns 0.
 tick_sio_deck_sync_session:
@@ -7902,7 +7902,7 @@ LAB_080edac2:
     add r0,r9                                @ 080edaf8 4844
     str r4,[r0,#0x0]                         @ 080edafa 0460
     b LAB_080edd38                           @ 080edafc 1ce1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080edb00:
     .word  0x00000594                     @ 080edb00 94050000
 DAT_080edb04:
@@ -7914,7 +7914,7 @@ LAB_080edb08:
     add r0,r9                                @ 080edb10 4844
     str r4,[r0,#0x0]                         @ 080edb12 0460
     b LAB_080edd38                           @ 080edb14 10e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080edb18:
     .word  0x09e5ef02                     @ 080edb18 02efe509
 LAB_080edb1c:
@@ -8068,7 +8068,7 @@ LAB_080edc28:
     movs r1,#0x0    @ 080edc3c 0021
     str r1,[r0,#0x0]                         @ 080edc3e 0160
     b LAB_080edd38                           @ 080edc40 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080edc44:
     .word  gPrng                          @ 080edc44 40000003
 LAB_080edc48:
@@ -8096,7 +8096,7 @@ LAB_080edc5c:
     lsls r3,r3,#0x3    @ 080edc74 db00
     adds r0,r0,r3    @ 080edc76 c018
     b LAB_080edcca                           @ 080edc78 27e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080edc7c:
     .word  0x00000592                     @ 080edc7c 92050000
 LAB_080edc80:
@@ -8114,7 +8114,7 @@ LAB_080edc80:
     lsls r3,r3,#0x3    @ 080edc98 db00
     adds r0,r0,r3    @ 080edc9a c018
     b LAB_080edcca                           @ 080edc9c 15e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080edca0:
     .word  0x00000592                     @ 080edca0 92050000
 LAB_080edca4:
@@ -8322,7 +8322,7 @@ LAB_080edda4:
     pop {r4,r5,r6,r7}                        @ 080eddfc f0bc
     pop {r0}                                 @ 080eddfe 01bc
     bx r0                                    @ 080ede00 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_gPrng_080ede04:
     .word  gPrng                          @ 080ede04 40000003
 DAT_080ede08:
@@ -8468,7 +8468,7 @@ LAB_080ededc:
     pop {r4,r5,r6}                           @ 080ededc 70bc
     pop {r0}                                 @ 080edede 01bc
     bx r0                                    @ 080edee0 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Zero-fill a single BG2 tile VRAM row.
 @ r0=row_index (u16) [0..31], r1=tile_width (u16) [0..32].
@@ -8492,7 +8492,7 @@ zero_fill_vram_bg2_row:
     bl zero_fill_by_halfword                 @ 080edef2 06f0bfff
     pop {r0}                                 @ 080edef6 01bc
     bx r0                                    @ 080edef8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080edefc:
     .word  0x06004000                     @ 080edefc 00400006
 
@@ -8633,7 +8633,7 @@ LAB_080edff2:
     pop {r4,r5,r6,r7}                        @ 080ee000 f0bc
     pop {r1}                                 @ 080ee002 02bc
     bx r1                                    @ 080ee004 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee008:
     .word  0x06000800                     @ 080ee008 00080006
 DAT_080ee00c:
@@ -8670,7 +8670,7 @@ load_pack_tile_and_map_to_vram:
     pop {r4,r5,r6}                           @ 080ee048 70bc
     pop {r1}                                 @ 080ee04a 02bc
     bx r1                                    @ 080ee04c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_08105bfc (vram/banlist/deck scene). r0=x_base, r1=y_base, r2=tile_slot, r3=sprite_frame_desc ptr, [sp+0x30]=packed_extra. Reads tile_count from r3, calls copy_bytes_by_halfword twice to upload tile data to OBJ VRAM (0x06000800+tile_slot*32 and 0x06008000 second bank), then iterates OAM entry list writing attr0/attr1/attr2 via strh. Returns tile count written (u16).
 upload_sprite_tiles_and_write_oam:
@@ -8804,7 +8804,7 @@ LAB_080ee13e:
     pop {r4,r5,r6,r7}                        @ 080ee14c f0bc
     pop {r1}                                 @ 080ee14e 02bc
     bx r1                                    @ 080ee150 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee154:
     .word  0x06000800                     @ 080ee154 00080006
 DAT_080ee158:
@@ -8951,7 +8951,7 @@ LAB_080ee246:
     pop {r4,r5,r6,r7}                        @ 080ee254 f0bc
     pop {r1}                                 @ 080ee256 02bc
     bx r1                                    @ 080ee258 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee25c:
     .word  0x06004000                     @ 080ee25c 00400006
 DAT_080ee260:
@@ -9204,7 +9204,7 @@ LAB_080ee422:
     pop {r4,r5,r6,r7}                        @ 080ee42c f0bc
     pop {r0}                                 @ 080ee42e 01bc
     bx r0                                    @ 080ee430 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee434:
     .word  0x00000fff                     @ 080ee434 ff0f0000
 DAT_080ee438:
@@ -9229,7 +9229,7 @@ upload_palette_rows_to_bg_vram:
     bl copy_bytes_by_halfword                @ 080ee44a 06f02bfd
     pop {r0}                                 @ 080ee44e 01bc
     bx r0                                    @ 080ee450 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Similar to upload_indexed_tile_rows_to_obj_vram (FUN_080ee4ac) but uses a different
 @ nibble-pack algorithm: reads 4 bytes at a time from r0 source, cross-packs adjacent
@@ -9287,7 +9287,7 @@ LAB_080ee46a:
     pop {r4,r5,r6,r7}                        @ 080ee4a0 f0bc
     pop {r0}                                 @ 080ee4a2 01bc
     bx r0                                    @ 080ee4a4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ee4a8:
     .word  0x06004000                     @ 080ee4a8 00400006
 
@@ -9330,7 +9330,7 @@ LAB_080ee4be:
     pop {r4,r5}                              @ 080ee4d8 30bc
     pop {r0}                                 @ 080ee4da 01bc
     bx r0                                    @ 080ee4dc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ee4e0:
     .word  0x06004000                     @ 080ee4e0 00400006
 
@@ -9439,7 +9439,7 @@ init_gl_scene_state:
     add sp,#0x4                              @ 080ee56c 01b0
     pop {r1}                                 @ 080ee56e 02bc
     bx r1                                    @ 080ee570 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080ee574:
     .word  0x0201af20                     @ 080ee574 20af0102
 DWORD_080ee578:
@@ -9728,7 +9728,7 @@ LAB_080ee74e:
     bl return_void_handler                   @ 080ee74e 0bf0c1fe
     movs r0,#0x0    @ 080ee752 0020
     b LAB_080ee766                           @ 080ee754 07e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee758:
     .word  0x09e5ef20                     @ 080ee758 20efe509
 PTR_gPrng_080ee75c:
@@ -9808,7 +9808,7 @@ LAB_080ee7c2:
     cmp r1,r0                                @ 080ee7d8 8142
     beq LAB_080ee800                         @ 080ee7da 11d0
     b LAB_080ee968                           @ 080ee7dc c4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee7e0:
     .word  0x080000ae                     @ 080ee7e0 ae000008
 PTR_card_stats_table_080ee7e4:
@@ -9850,7 +9850,7 @@ LAB_080ee824:
     ldr r1, DAT_080ee838                     @ 080ee824 0449
     adds r0,r0,r1    @ 080ee826 4018
     b LAB_080ee97c                           @ 080ee828 a8e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee82c:
     .word  0x02000000                     @ 080ee82c 00000002
 DAT_080ee830:
@@ -9902,7 +9902,7 @@ LAB_080ee880:
     ldr r1, DAT_080ee894                     @ 080ee880 0449
     adds r0,r0,r1    @ 080ee882 4018
     b LAB_080ee97c                           @ 080ee884 7ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee888:
     .word  0x02000000                     @ 080ee888 00000002
 DAT_080ee88c:
@@ -10042,7 +10042,7 @@ LAB_080ee968:
     adds r0,r0,r1    @ 080ee97a 4018
 LAB_080ee97c:
     bx lr                                    @ 080ee97c 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_name_pointer_table_080ee980:
     .word  card_name_pointer_table        @ 080ee980 5c3a5f09
 PTR_card_names_table_080ee984:
@@ -10072,7 +10072,7 @@ LAB_080ee996:
     cmp r1,r0                                @ 080ee9ac 8142
     beq LAB_080ee9d4                         @ 080ee9ae 11d0
     b LAB_080eeb3c                           @ 080ee9b0 c4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ee9b4:
     .word  0x080000ae                     @ 080ee9b4 ae000008
 PTR_card_stats_table_080ee9b8:
@@ -10114,7 +10114,7 @@ LAB_080ee9f8:
     ldr r1, DAT_080eea0c                     @ 080ee9f8 0449
     adds r0,r0,r1    @ 080ee9fa 4018
     b LAB_080eeb48                           @ 080ee9fc a4e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eea00:
     .word  0x02000000                     @ 080eea00 00000002
 DAT_080eea04:
@@ -10166,7 +10166,7 @@ LAB_080eea54:
     ldr r1, DAT_080eea68                     @ 080eea54 0449
     adds r0,r0,r1    @ 080eea56 4018
     b LAB_080eeb48                           @ 080eea58 76e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eea5c:
     .word  0x02000000                     @ 080eea5c 00000002
 DAT_080eea60:
@@ -10302,7 +10302,7 @@ LAB_080eeb3c:
     adds r0,r0,r1    @ 080eeb46 4018
 LAB_080eeb48:
     bx lr                                    @ 080eeb48 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eeb4c:
     .word  0x0983885c                     @ 080eeb4c 5c888309
 DAT_080eeb50:
@@ -10347,7 +10347,7 @@ card_data_query:
     ldr r1, DAT_080eebb8                     @ 080eeb98 0749
     adds r0,r0,r1    @ 080eeb9a 4018
     b LAB_080eebf0                           @ 080eeb9c 28e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eeba0:
     .word  0x080000ae                     @ 080eeba0 ae000008
 PTR_card_stats_table_080eeba4:
@@ -10395,7 +10395,7 @@ LAB_080eebdc:
     adds r0,r0,r1    @ 080eebee 4018
 LAB_080eebf0:
     bx lr                                    @ 080eebf0 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_desc_pointer_table_080eebf4:
     .word  card_desc_pointer_table        @ 080eebf4 08a58009
 PTR_card_descs_table_080eebf8:
@@ -10418,7 +10418,7 @@ card_name_lookup_by_internal_id:
     bl select_charset_then_load_name         @ 080eec16 fff7c9fd
     pop {r1}                                 @ 080eec1a 02bc
     bx r1                                    @ 080eec1c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eec20:
     .word  0x02000000                     @ 080eec20 00000002
 DAT_080eec24:
@@ -10451,7 +10451,7 @@ query_card_data_by_internal_id:
     bl card_data_query                       @ 080eec42 fff787ff
     pop {r1}                                 @ 080eec46 02bc
     bx r1                                    @ 080eec48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080eec4c:
     .word  0x02000000                     @ 080eec4c 00000002
 DWORD_080eec50:
@@ -10501,7 +10501,7 @@ LAB_080eeca0:
 LAB_080eeca2:
     pop {r1}                                 @ 080eeca2 02bc
     bx r1                                    @ 080eeca4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Return game string pointer for given string ID at current language offset. If r0=0 returns fixed empty string (DAT_080eecf8 = 0x09e4f348). Otherwise: adds 0x1f4 (0xfa*2) offset to r0, calls game_str_id_to_row to convert to row index; reads game_str_pointer_table[row] for relative offset; reads [0x02000000+0x6c2c] byte low 3 bits as language index (0=JA/JP, 1..5=other); computes lang_offset = lang*4 and returns game_str_ja + offset for that language.
 @ 
@@ -10537,7 +10537,7 @@ get_game_text_ptr_by_lang_offset:
     ldr r1, PTR_game_str_ja_080eecec         @ 080eecd8 0449
     adds r0,r0,r1    @ 080eecda 4018
     b LAB_080eecf2                           @ 080eecdc 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_game_str_pointer_table_080eece0:
     .word  game_str_pointer_table         @ 080eece0 400f0008
 DAT_080eece4:
@@ -10551,7 +10551,7 @@ LAB_080eecf0:
 LAB_080eecf2:
     pop {r1}                                 @ 080eecf2 02bc
     bx r1                                    @ 080eecf4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eecf8:
     .word  0x09e4f348                     @ 080eecf8 48f3e409
 
@@ -10611,7 +10611,7 @@ LAB_080eed44:
 LAB_080eed46:
     pop {r1}                                 @ 080eed46 02bc
     bx r1                                    @ 080eed48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080eed4c:
     .word  0x09e4f348                     @ 080eed4c 48f3e409
 
@@ -10662,7 +10662,7 @@ LAB_080eed98:
 LAB_080eed9a:
     pop {r1}                                 @ 080eed9a 02bc
     bx r1                                    @ 080eed9c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eeda0:
     .word  0x09e4f348                     @ 080eeda0 48f3e409
 
@@ -10721,7 +10721,7 @@ LAB_080eedec:
 LAB_080eedee:
     pop {r1}                                 @ 080eedee 02bc
     bx r1                                    @ 080eedf0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080eedf4:
     .word  0x09e4f348                     @ 080eedf4 48f3e409
 
@@ -11007,7 +11007,7 @@ get_card_type_bits_by_internal_id:
     adds r0,r1,#0x0    @ 080eefb4 081c
     pop {r1}                                 @ 080eefb6 02bc
     bx r1                                    @ 080eefb8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080eefbc:
     .word  0x02000006                     @ 080eefbc 06000002
 
@@ -11086,7 +11086,7 @@ LAB_080ef01e:
     pop {r4,r5,r6,r7}                        @ 080ef024 f0bc
     pop {r1}                                 @ 080ef026 02bc
     bx r1                                    @ 080ef028 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Checks full deck (main + side + extra) for banlist compliance. r0=banlist_id (u8, passed to get_banlist_limit_for_card). Three loops iterate over main/side/extra deck slot arrays (counts from [EWRAM+0x1150]/[+0x1151]/[+0x1152], slots from [EWRAM+0x1154]/[+0x11f4]/[+0x1212]). For each card: load card_id from card_stats_table, call count_card_in_full_deck to count occurrences in full deck, call get_banlist_limit_for_card(banlist_id, card_id) to get limit; if count > limit return 0 (violation) immediately. All pass: return 1.
 @ 
@@ -11249,7 +11249,7 @@ LAB_080ef13c:
     pop {r4,r5,r6,r7}                        @ 080ef144 f0bc
     pop {r1}                                 @ 080ef146 02bc
     bx r1                                    @ 080ef148 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Writes all card banlist limits for the specified banlist (banlist_id=r0) to the EWRAM banlist limit array. Triggered by FUN_080f4468 (starter deck init) with banlist_id=9. Steps: read total card count from [0x095b7cca] halfword, iterate card_index=1..max over card_stats_table (stride 0x16 bytes/card), call get_banlist_limit_for_card(banlist_id, card_id) to get limit [0..3], write bits[1:0] to [0x02000006+card_index*2+1] byte bits[1:0] (mask ~0x4). Also writes r5 (banlist_id) bits[5:0] shifted left 4 to gPrng+0x6c2c halfword bits[9:4]. Returns 1 always.
 @ 
@@ -11315,7 +11315,7 @@ LAB_080ef194:
     pop {r4,r5,r6}                           @ 080ef1ac 70bc
     pop {r1}                                 @ 080ef1ae 02bc
     bx r1                                    @ 080ef1b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef1b4:
     .word  0x095b7cca                     @ 080ef1b4 ca7c5b09
 PTR_card_stats_table_080ef1b8:
@@ -11478,7 +11478,7 @@ LAB_080ef290:
     pop {r4,r5,r6}                           @ 080ef2ac 70bc
     pop {r1}                                 @ 080ef2ae 02bc
     bx r1                                    @ 080ef2b0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef2b4:
     .word  0x095b7cca                     @ 080ef2b4 ca7c5b09
 PTR_card_stats_table_080ef2b8:
@@ -11520,7 +11520,7 @@ LAB_080ef2e4:
     bne LAB_080ef310                         @ 080ef2f8 0ad1
     ldr r0, DAT_080ef304                     @ 080ef2fa 0248
     b LAB_080ef356                           @ 080ef2fc 2be0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_card_stats_table_080ef300:
     .word  card_stats_table               @ 080ef300 b8698109
 DAT_080ef304:
@@ -11546,7 +11546,7 @@ LAB_080ef310:
     cmp r0,#0x1                              @ 080ef328 0128
     beq LAB_080ef33a                         @ 080ef32a 06d0
     b LAB_080ef354                           @ 080ef32c 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef330:
     .word  0x09e4f1c4                     @ 080ef330 c4f1e409
 LAB_080ef334:
@@ -11556,7 +11556,7 @@ LAB_080ef334:
 LAB_080ef33a:
     ldr r0, DAT_080ef340                     @ 080ef33a 0148
     b LAB_080ef356                           @ 080ef33c 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef340:
     .word  0x0984cf4c                     @ 080ef340 4ccf8409
 LAB_080ef344:
@@ -11693,7 +11693,7 @@ LAB_080ef3f8:
     bgt LAB_080ef40c                         @ 080ef400 04dc
     subs r0,#0x76    @ 080ef402 7638
     b LAB_080ef426                           @ 080ef404 0fe0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef408:
     .word  0x000016ca                     @ 080ef408 ca160000
 LAB_080ef40c:
@@ -11733,7 +11733,7 @@ LAB_080ef442:
 LAB_080ef446:
     movs r0,#0x1    @ 080ef446 0120
     b LAB_080ef452                           @ 080ef448 03e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef44c:
     .word  0x000019c4                     @ 080ef44c c4190000
 LAB_080ef450:
@@ -11771,7 +11771,7 @@ LAB_080ef478:
     rsbs r0,r0,#0    @ 080ef482 4042
 LAB_080ef484:
     bx lr                                    @ 080ef484 7047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ 仅被 FUN_080ef4bc (scene_card_info) 调用. 接收卡片索引 (r0, u16 截断), 与常量 FIELD_card_flag_table_idx=0x0fa6=4006 比较: 若 <= FIELD_card_flag_table_idx 则返回 0; 若在 PTR_card_flag_table 所指扩展表范围内, 则计算 base-relative 偏移 (card_index - 0x0fa7 得扩展区行号) 并返回指向 ROM 卡片标志表的指针; 否则返回 0.
 resolve_card_flag_table_ptr:
@@ -12041,7 +12041,7 @@ LAB_080ef638:
     pop {r4,r5,r6,r7}                        @ 080ef638 f0bc
     pop {r0}                                 @ 080ef63a 01bc
     bx r0                                    @ 080ef63c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef640:
     .word  0x030003a0                     @ 080ef640 a0030003
 DAT_080ef644:
@@ -12319,7 +12319,7 @@ LAB_080ef7ea:
     pop {r4,r5}                              @ 080ef804 30bc
     pop {r0}                                 @ 080ef806 01bc
     bx r0                                    @ 080ef808 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef80c:
     .word  0x030003a0                     @ 080ef80c a0030003
 DAT_080ef810:
@@ -12440,7 +12440,7 @@ LAB_080ef89e:
     ldrh r2,[r5,#0x0]                        @ 080ef8d4 2a88
     orrs r0,r2    @ 080ef8d6 1043
     b LAB_080ef908                           @ 080ef8d8 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_IME_080ef8dc:
     .word  IME                            @ 080ef8dc 08020004
 DAT_080ef8e0:
@@ -12548,7 +12548,7 @@ tick_sio_deck_sync_state:
     cmp r0,#0x1                              @ 080ef968 0128
     beq LAB_080ef9fe                         @ 080ef96a 48d0
     b LAB_080efa22                           @ 080ef96c 59e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080ef970:
     .word  0x030003a0                     @ 080ef970 a0030003
 DAT_080ef974:
@@ -12658,7 +12658,7 @@ LAB_080efa38:
     pop {r4,r5,r6,r7}                        @ 080efa3c f0bc
     pop {r1}                                 @ 080efa3e 02bc
     bx r1                                    @ 080efa40 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efa44:
     .word  0x0000042c                     @ 080efa44 2c040000
 PTR_SIOCNT_080efa48:
@@ -12732,7 +12732,7 @@ append_sio_deck_sync_packet:
     beq LAB_080efaa0                         @ 080efa90 06d0
     movs r0,#0x0    @ 080efa92 0020
     b LAB_080efb04                           @ 080efa94 36e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efa98:
     .word  0x030003a0                     @ 080efa98 a0030003
 DAT_080efa9c:
@@ -12766,7 +12766,7 @@ LAB_080efab8:
     lsls r0,r0,#0x6    @ 080efad0 8001
     adds r1,r0,#0x0    @ 080efad2 011c
     b LAB_080efae2                           @ 080efad4 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efad8:
     .word  0x00000414                     @ 080efad8 14040000
 LAB_080efadc:
@@ -12794,7 +12794,7 @@ LAB_080efb04:
     pop {r4,r5,r6,r7}                        @ 080efb04 f0bc
     pop {r1}                                 @ 080efb06 02bc
     bx r1                                    @ 080efb08 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efb0c:
     .word  0x030003aa                     @ 080efb0c aa030003
 
@@ -12896,7 +12896,7 @@ LAB_080efba4:
     cmp r2,r0                                @ 080efba8 8242
     beq LAB_080efbcc                         @ 080efbaa 0fd0
     b LAB_080efdc0                           @ 080efbac 08e1
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efbb0:
     .word  0x030007b4                     @ 080efbb0 b4070003
 LAB_080efbb4:
@@ -12987,7 +12987,7 @@ LAB_080efbfa:
     .hword 0x4653    @ 080efc58 5346
     strh r0,[r3,#0x0]                        @ 080efc5a 1880
     b LAB_080efc94                           @ 080efc5c 1ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efc60:
     .word  0x030003a0                     @ 080efc60 a0030003
 DAT_080efc64:
@@ -13037,7 +13037,7 @@ LAB_080efcb2:
     adds r0,#0x1    @ 080efcb8 0130
     strh r0,[r1,#0x0]                        @ 080efcba 0880
     b LAB_080efdc0                           @ 080efcbc 80e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efcc0:
     .word  0x030003a8                     @ 080efcc0 a8030003
 LAB_080efcc4:
@@ -13226,7 +13226,7 @@ LAB_080efe20:
     bne LAB_080efe34                         @ 080efe24 06d1
     movs r0,#0x0    @ 080efe26 0020
     b LAB_080efe36                           @ 080efe28 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080efe2c:
     .word  0x030003a8                     @ 080efe2c a8030003
 DAT_080efe30:
@@ -13242,7 +13242,7 @@ LAB_080efe36:
     pop {r4,r5,r6,r7}                        @ 080efe40 f0bc
     pop {r1}                                 @ 080efe42 02bc
     bx r1                                    @ 080efe44 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Extracts a single bit field from the SIO deck sync protocol receive buffer. r0=bit_index (u8, selects which bit to extract), r1=dest_ptr (write destination). Steps: (1) .hword 0x4668 = mov r0,sp, call tick_sio_deck_sync_state with sp as base pointer; (2) zero-extend return value, shift right by bit_index via asrs r1,r5, AND with 1 to extract one bit; (3) if bit=0 return 0; (4) if bit=1 read 0x0300044c area entry at r5*4 offset, copy to dest_ptr via bios_cpu_set, extract bits[8:0] (mask 0x1ff) into r7; (5) clear IWRAM 0x030003a0 two slot halfwords; return r7. indeg=0; no fn-ptr references.
 @ 
@@ -13319,7 +13319,7 @@ LAB_080efeb2:
     strh r3,[r2,#0x0]                        @ 080efec8 1380
     adds r0,r7,#0x0    @ 080efeca 381c
     b LAB_080efee2                           @ 080efecc 09e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080efed0:
     .word  0x0300044c                     @ 080efed0 4c040003
 DWORD_080efed4:
@@ -13335,7 +13335,7 @@ LAB_080efee2:
     pop {r4,r5,r6,r7}                        @ 080efee4 f0bc
     pop {r1}                                 @ 080efee6 02bc
     bx r1                                    @ 080efee8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ SIO deck sync protocol receive-side driver. r0=unused (overridden by DAT_080f008c = 0x030007d6 as state ptr), r1=dest_ptr (stored to sp+0x4). Calls tick_sio_deck_sync_state, reads SIOCNT bits[5:4]: if >0x10 (link busy) return 0 immediately. Checks bits[5:4]==0 (player 0) => [sp+0]:=1. Reads IWRAM [base-2] bits[3:0] to confirm protocol phase==3 (receive ready); if not return 0. Main loop: iterates slots [0..N-1], reads each slot packet header state at 0x030003a0 offset, based on state (0x0002/0x0003) optionally uses bios_cpu_set to copy card block data to dest_ptr+offset. Increments write counter [base+0x9*4]. Returns last slot halfword value read. Called by 1 caller in deck-sync receive phase.
 @ 
@@ -13594,7 +13594,7 @@ LAB_080f00ba:
     pop {r4,r5,r6,r7}                        @ 080f00c4 f0bc
     pop {r1}                                 @ 080f00c6 02bc
     bx r1                                    @ 080f00c8 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Batch-writes palette-flagged tile indices into a rectangular region of a BG tilemap. Called by 8 font_jp/game_str scene functions; typical call: r0=0, r1=0, r2=0x16, r3=0xc (full-screen 22x12 grid). High-register parameters (r8/r9=start x/y, r10=row height, r12=col width) define the rectangle; outer loop iterates rows (0..r10-1), inner loop iterates columns (0..r12-1), each tile written as halfword `tile_idx[col] | r6 (palette/flags)`. Source tile index array from sp+0x28; destination VRAM base from sp+0x24. Return is void (pop {r0}; bx r0 = Sub-case E).
 @ 
@@ -13656,7 +13656,7 @@ LAB_080f0124:
     pop {r4,r5,r6,r7}                        @ 080f012c f0bc
     pop {r0}                                 @ 080f012e 01bc
     bx r0                                    @ 080f0130 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ indeg=0 (Sub-type A: no callsite, no fn-ptr table reference).
 @ Utility function in the glyph rendering subsystem.
@@ -13698,7 +13698,7 @@ LAB_080f0152:
     beq LAB_080f0168                         @ 080f0158 06d0
     adds r2,#0x2    @ 080f015a 0232
     b LAB_080f016a                           @ 080f015c 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080f0160:
     .word  0x02000000                     @ 080f0160 00000002
 DWORD_080f0164:
@@ -13723,7 +13723,7 @@ LAB_080f017e:
     pop {r4}                                 @ 080f0180 10bc
     pop {r1}                                 @ 080f0182 02bc
     bx r1                                    @ 080f0184 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ code > 0xEFFF: 公式 (hi&0xF)<<7|(lo&0x7F); 否则二分查找 font_jp_sjis_lookup_table[1925]
 char_code_to_glyph_index:
@@ -13764,7 +13764,7 @@ LAB_080f01b6:
     bne LAB_080f01d4                         @ 080f01c8 04d1
     adds r0,r2,#0x0    @ 080f01ca 101c
     b LAB_080f01f8                           @ 080f01cc 14e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_font_jp_sjis_lookup_table_080f01d0:
     .word  font_jp_sjis_lookup_table      @ 080f01d0 2415ba09
 LAB_080f01d4:
@@ -13793,7 +13793,7 @@ LAB_080f01f8:
     pop {r4,r5,r6}                           @ 080f01f8 70bc
     pop {r1}                                 @ 080f01fa 02bc
     bx r1                                    @ 080f01fc 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ p2: 窄字宽度 5px
 char_width_narrow_5:
@@ -13874,7 +13874,7 @@ LAB_080f02c4:
     ldr r0,[r0,#0x0]                         @ 080f02ca 0068
 switchD_080f02cc__switchD:
     .hword 0x4687    @ 080f02cc 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f02d0:
     .word  0x080f02d4                     @ 080f02d0 d4020f08
 switchD_080f02cc__switchdataD_080f02d4:
@@ -14138,7 +14138,7 @@ LAB_080f0614:
     b LAB_080f0718                           @ 080f061a 7de0
 LAB_080f061c:
     b LAB_080f0710                           @ 080f061c 78e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_font_jp_sjis_lookup_table_080f0620:
     .word  font_jp_sjis_lookup_table      @ 080f0620 2415ba09
 DAT_080f0624:
@@ -14156,7 +14156,7 @@ LAB_080f0634:
     ble LAB_080f0710                         @ 080f0638 6add
     adds r0,#0x12    @ 080f063a 1230
     b LAB_080f06f8                           @ 080f063c 5ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0640:
     .word  0x00008148                     @ 080f0640 48810000
 LAB_080f0644:
@@ -14187,7 +14187,7 @@ LAB_080f0668:
     ble LAB_080f06f6                         @ 080f0670 41dd
     ldr r0, DAT_080f067c                     @ 080f0672 0248
     b LAB_080f06f8                           @ 080f0674 40e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0678:
     .word  0x000082a1                     @ 080f0678 a1820000
 DAT_080f067c:
@@ -14210,7 +14210,7 @@ LAB_080f0680:
     bgt LAB_080f06a8                         @ 080f069c 04dc
     subs r0,#0x1a    @ 080f069e 1a38
     b LAB_080f06f8                           @ 080f06a0 2ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f06a4:
     .word  0x00008344                     @ 080f06a4 44830000
 LAB_080f06a8:
@@ -14226,7 +14226,7 @@ LAB_080f06b0:
     bgt LAB_080f06c4                         @ 080f06b8 04dc
     subs r0,#0x5b    @ 080f06ba 5b38
     b LAB_080f06f8                           @ 080f06bc 1ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f06c0:
     .word  0x00008340                     @ 080f06c0 40830000
 LAB_080f06c4:
@@ -14263,7 +14263,7 @@ LAB_080f06f8:
     cmp r1,r0                                @ 080f06f8 8142
     beq LAB_080f0710                         @ 080f06fa 09d0
     b LAB_080f0718                           @ 080f06fc 0ce0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0700:
     .word  0x00008387                     @ 080f0700 87830000
 LAB_080f0704:
@@ -14304,7 +14304,7 @@ test_char_kinsoku_tail:
 LAB_080f073e:
     movs r0,#0x1    @ 080f073e 0120
     b LAB_080f074e                           @ 080f0740 05e0
-    .byte  0x00, 0x00
+    .zero  0x2
 PTR_font_jp_sjis_lookup_table_080f0744:
     .word  font_jp_sjis_lookup_table      @ 080f0744 2415ba09
 DAT_080f0748:
@@ -14534,7 +14534,7 @@ LAB_080f0882:
     adds r4,r0,r3    @ 080f08b0 c418
     movs r5,#0x0    @ 080f08b2 0025
     b LAB_080f08ce                           @ 080f08b4 0be0
-    .byte  0x00, 0x00
+    .zero  0x2
 DWORD_080f08b8:
     .word  0x09e5f844                     @ 080f08b8 44f8e509
 DWORD_080f08bc:
@@ -14563,7 +14563,7 @@ LAB_080f08da:
     pop {r4,r5,r6,r7}                        @ 080f08e4 f0bc
     pop {r0}                                 @ 080f08e6 01bc
     bx r0                                    @ 080f08e8 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Renders multiple rows of JP glyph pixel data to BG VRAM (0x06004000) -- alternate wide glyph variant. Fully symmetric with render_jp_glyph_rows_to_bg_vram (0x080f07ec); sole difference: offsets into font_jp_dim_table/font_jp_base_table are +8 bytes (adds r2,#0x8 @ 080f0912 and adds r0,#0x8 @ 080f0940), selecting the double-byte (wide) glyph table entries instead of narrow glyph entries. Parameters/side effects/flow identical to sibling: r0=char_code (u16), r1=packed_info, r2=src_ptr, r3=row_count. Calls encode_4bpp_nibbles_to_tile_row per row writing to 0x06004000. Triggered by caller 080f09e0 for double-byte (wide) glyph path. Returns void (Pattern B).
 @ 
@@ -14701,7 +14701,7 @@ LAB_080f09ce:
     pop {r4,r5,r6,r7}                        @ 080f09d8 f0bc
     pop {r0}                                 @ 080f09da 01bc
     bx r0                                    @ 080f09dc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Called by FUN_080ee580 (tags: [glyph,font_jp]; JP string line render prepare function).
 @ Receives x-column position r0, packed row/column coords r1 (bits[23:16]=column_x, bits[31:24]=row_y), color attribute r2, and 0x00-terminated JP string pointer r3.
@@ -14921,7 +14921,7 @@ LAB_080f0c64:
     pop {r4,r5,r6}                           @ 080f0c98 70bc
     pop {r0}                                 @ 080f0c9a 01bc
     bx r0                                    @ 080f0c9c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0ca0:
     .word  0x02006ed0                     @ 080f0ca0 d06e0002
 DAT_080f0ca4:
@@ -15007,7 +15007,7 @@ setup_line_buf_font_align_and_tile_fields:
     pop {r4,r5}                              @ 080f0d3c 30bc
     pop {r0}                                 @ 080f0d3e 01bc
     bx r0                                    @ 080f0d40 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0d44:
     .word  0x02006ed0                     @ 080f0d44 d06e0002
 DAT_080f0d48:
@@ -15074,7 +15074,7 @@ setup_line_buf_font_with_char_index:
     pop {r4}                                 @ 080f0da8 10bc
     pop {r0}                                 @ 080f0daa 01bc
     bx r0                                    @ 080f0dac 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f0db0:
     .word  0x02006ed0                     @ 080f0db0 d06e0002
 
@@ -15436,7 +15436,7 @@ LAB_080f1012:
     cmp r5,#0x7                              @ 080f1014 072d
     ble LAB_080f0fb6                         @ 080f1016 cedd
     b LAB_080f1060                           @ 080f1018 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f101c:
     .word  0x02006ed0                     @ 080f101c d06e0002
 LAB_080f1020:
@@ -15583,7 +15583,7 @@ LAB_080f1122:
     cmp r5,#0x9                              @ 080f1124 092d
     ble LAB_080f10c6                         @ 080f1126 cedd
     b LAB_080f1170                           @ 080f1128 22e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f112c:
     .word  0x02006ed0                     @ 080f112c d06e0002
 LAB_080f1130:
@@ -16219,7 +16219,7 @@ LAB_080f14c4:
     b LAB_080f14c4                           @ 080f15da 73e7
 LAB_080f15dc:
     b LAB_080f1704                           @ 080f15dc 92e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f15e0:
     .word  0x02006ed0                     @ 080f15e0 d06e0002
 PTR_font_jp_charset_table_080f15e4:
@@ -16410,7 +16410,7 @@ render_glyph_indexed_dual_layer:
     cmp r4,#0xc                              @ 080f1748 0c2c
     beq LAB_080f1764                         @ 080f174a 0bd0
     b LAB_080f1864                           @ 080f174c 8ae0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1750:
     .word  0x02006ed0                     @ 080f1750 d06e0002
 LAB_080f1754:
@@ -16419,7 +16419,7 @@ LAB_080f1754:
     lsls r0,r0,#0x1    @ 080f1758 4000
     ldr r1, DAT_080f1760                     @ 080f175a 0149
     b LAB_080f176c                           @ 080f175c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1760:
     .word  0x09ccb490                     @ 080f1760 90b4cc09
 LAB_080f1764:
@@ -16715,7 +16715,7 @@ LAB_080f1984:
     pop {r4,r5,r6,r7}                        @ 080f1990 f0bc
     pop {r1}                                 @ 080f1992 02bc
     bx r1                                    @ 080f1994 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1998:
     .word  0x02006ed0                     @ 080f1998 d06e0002
 PTR_font_jp_charset_table_080f199c:
@@ -16788,7 +16788,7 @@ LAB_080f1a14:
     lsls r0,r0,#0x1    @ 080f1a18 4000
     ldr r1, DAT_080f1a20                     @ 080f1a1a 0149
     b LAB_080f1a2c                           @ 080f1a1c 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1a20:
     .word  0x09ccb490                     @ 080f1a20 90b4cc09
 LAB_080f1a24:
@@ -16947,7 +16947,7 @@ LAB_080f1b22:
     pop {r4,r5,r6,r7}                        @ 080f1b58 f0bc
     pop {r0}                                 @ 080f1b5a 01bc
     bx r0                                    @ 080f1b5c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ p2: 从 0x09CCCA90+ch*8 读 8 bytes, 循环 4 轮每轮 2 字节 blit
 load_glyph_row_pair:
@@ -17015,7 +17015,7 @@ LAB_080f1bcc:
     ldr r0,[r0,#0x0]                         @ 080f1bd2 0068
 switchD_080f1bd4__switchD:
     .hword 0x4687    @ 080f1bd4 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1bd8:
     .word  0x080f1bdc                     @ 080f1bd8 dc1b0f08
 switchD_080f1bd4__switchdataD_080f1bdc:
@@ -17256,7 +17256,7 @@ LAB_080f1ee4:
     ldr r0,[r0,#0x0]                         @ 080f1eea 0068
 switchD_080f1eec__switchD:
     .hword 0x4687    @ 080f1eec 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f1ef0:
     .word  0x080f1ef4                     @ 080f1ef0 f41e0f08
 switchD_080f1eec__switchdataD_080f1ef4:
@@ -17464,7 +17464,7 @@ switchD_080f1eec__caseD_9:
     pop {r4}                                 @ 080f21e0 10bc
     pop {r1}                                 @ 080f21e2 02bc
     bx r1                                    @ 080f21e4 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ font_jp 模块主字形渲染循环. 被 text_render_wrapper(0x080f2a7c,wrap=1)/FUN_080f2a44(wrap=0)/FUN_080f2a60(wrap=0,extra_x_offset) 三个薄包装调用. 入参: r0=x_start(格), r1=y_tile_offset, r2=line_width(格), r3=str_ptr, sp+0x0=wrap_flag, sp+0x4=extra_offset. 初始化 gfx_ctx[0x02006ed0] 各字段, 逐字节遍历字符串, 按编码范围+[gfx_ctx+0x15]标志位派发到四条渲染路径: render_glyph_jp_dual_layer(8bpp默认双层)/render_glyph_jp_4bpp_dual_layer(bit4=1时4bpp路径)/render_glyph_indexed_dual_layer(glyph_index直传4bpp路径)/render_glyph_jp_single_layer(单字节字符). 换行前调 count_word_charlen 测量词元宽度, 调 test_char_kinsoku_head 实现行首禁則检测. 推进 [gfx_ctx+0x24] 游标, 遇0x00或超行宽退出. 返回 r0=cursor_end_packed ([gfx_ctx+0xe]<<6|[gfx_ctx+0xc]).
 render_jp_string_glyph_loop:
@@ -17602,7 +17602,7 @@ LAB_080f22d0:
     b LAB_080f23f0                           @ 080f22ea 81e0
 LAB_080f22ec:
     b LAB_080f23b4                           @ 080f22ec 62e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f22f0:
     .word  0x02006ed0                     @ 080f22f0 d06e0002
 LAB_080f22f4:
@@ -17628,7 +17628,7 @@ LAB_080f22fa:
     cmp r0,#0x0                              @ 080f2318 0028
     beq LAB_080f23d8                         @ 080f231a 5dd0
     b LAB_080f23c4                           @ 080f231c 52e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2320:
     .word  0x02006ed0                     @ 080f2320 d06e0002
 LAB_080f2324:
@@ -17698,7 +17698,7 @@ LAB_080f232e:
     ldrh r2,[r2,#0xc]                        @ 080f23a0 9289
     orrs r0,r2    @ 080f23a2 1043
     b LAB_080f2a2c                           @ 080f23a4 42e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f23a8:
     .word  0x02006ed0                     @ 080f23a8 d06e0002
 DAT_080f23ac:
@@ -17711,7 +17711,7 @@ LAB_080f23b4:
     adds r0,#0x1    @ 080f23b8 0130
     str r0,[r3,#0x24]                        @ 080f23ba 5862
     b LAB_080f23f0                           @ 080f23bc 18e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f23c0:
     .word  0x02006ed0                     @ 080f23c0 d06e0002
 LAB_080f23c4:
@@ -17731,7 +17731,7 @@ LAB_080f23d8:
     adds r0,#0x2    @ 080f23dc 0230
     str r0,[r1,#0x24]                        @ 080f23de 4862
     b LAB_080f23f0                           @ 080f23e0 06e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f23e4:
     .word  0x0000fff0                     @ 080f23e4 f0ff0000
 DAT_080f23e8:
@@ -18073,7 +18073,7 @@ LAB_080f2648:
     .hword 0x4653    @ 080f266a 5346
     bl render_glyph_indexed_dual_layer       @ 080f266c fff758f8
     b LAB_080f2698                           @ 080f2670 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2674:
     .word  0x02006ed0                     @ 080f2674 d06e0002
 DAT_080f2678:
@@ -18176,7 +18176,7 @@ LAB_080f2724:
     ldr r0,[r0,#0x0]                         @ 080f2732 0068
 switchD_080f2734__switchD:
     .hword 0x4687    @ 080f2734 8746
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2738:
     .word  0x02006ed0                     @ 080f2738 d06e0002
 DAT_080f273c:
@@ -18236,7 +18236,7 @@ LAB_080f27d4:
     b LAB_080f24dc                           @ 080f27de 7de6
 LAB_080f27e0:
     b LAB_080f29c8                           @ 080f27e0 f2e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f27e4:
     .word  0x02006ed0                     @ 080f27e4 d06e0002
 LAB_080f27e8:
@@ -18430,7 +18430,7 @@ LAB_080f2934:
     .hword 0x4653    @ 080f2956 5346
     bl render_glyph_jp_4bpp_dual_layer       @ 080f2958 fef772fd
     b LAB_080f298c                           @ 080f295c 16e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2960:
     .word  0x02006ed0                     @ 080f2960 d06e0002
 DAT_080f2964:
@@ -18516,7 +18516,7 @@ LAB_080f29c8:
     ldrh r1,[r7,#0xc]                        @ 080f2a00 b989
     orrs r0,r1    @ 080f2a02 0843
     b LAB_080f2a2c                           @ 080f2a04 12e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2a08:
     .word  0x02006ed0                     @ 080f2a08 d06e0002
 DAT_080f2a0c:
@@ -18549,7 +18549,7 @@ LAB_080f2a2c:
     pop {r4,r5,r6,r7}                        @ 080f2a38 f0bc
     pop {r1}                                 @ 080f2a3a 02bc
     bx r1                                    @ 080f2a3c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2a40:
     .word  0x02006ed0                     @ 080f2a40 d06e0002
 
@@ -18570,7 +18570,7 @@ render_jp_string_nowrap:
     pop {r4}                                 @ 080f2a58 10bc
     pop {r1}                                 @ 080f2a5a 02bc
     bx r1                                    @ 080f2a5c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Thin wrapper of render_jp_string_glyph_loop: wrap_flag=0 but extra_offset comes from the caller's 5th stack argument (sp+0x14 before push). Adds a render offset on top of the x base, used for character spacing or scroll offset. Distinguished from render_jp_string_nowrap (0x080f2a44) by passing extra_offset=sp[5th_arg] instead of 0. Called by FUN_080dced0 (vram,bg,font_jp) for BG tile character area rendering with offset.
 @ 
@@ -18611,7 +18611,7 @@ text_render_wrapper:
     pop {r4}                                 @ 080f2a9c 10bc
     pop {r1}                                 @ 080f2a9e 02bc
     bx r1                                    @ 080f2aa0 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2aa4:
     .word  0x02006ed0                     @ 080f2aa4 d06e0002
 
@@ -18644,7 +18644,7 @@ render_string_to_line_buffer:
     ands r0,r2    @ 080f2ad8 1040
     strh r0,[r1,#0xe]                        @ 080f2ada c881
     b LAB_080f2bf2                           @ 080f2adc 89e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2ae0:
     .word  0x02006ed0                     @ 080f2ae0 d06e0002
 DAT_080f2ae4:
@@ -18659,7 +18659,7 @@ LAB_080f2ae8:
     cmp r0,#0x9                              @ 080f2af4 0928
     beq LAB_080f2b16                         @ 080f2af6 0ed0
     b LAB_080f2b18                           @ 080f2af8 0ee0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2afc:
     .word  0x02006ed0                     @ 080f2afc d06e0002
 LAB_080f2b00:
@@ -18809,7 +18809,7 @@ LAB_080f2bfe:
     pop {r4,r5,r6,r7}                        @ 080f2c08 f0bc
     pop {r1}                                 @ 080f2c0a 02bc
     bx r1                                    @ 080f2c0c 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2c10:
     .word  0x02006ed0                     @ 080f2c10 d06e0002
 DAT_080f2c14:
@@ -18828,7 +18828,7 @@ render_text_with_u16_width_a:
     bl text_render_wrapper                   @ 080f2c22 fff72bff
     pop {r1}                                 @ 080f2c26 02bc
     bx r1                                    @ 080f2c28 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Thin wrapper around text_render_wrapper: zero-extends r2 (width/column parameter)
 @ to u16 before calling (lsls r2,r2,#0x10; lsrs r2,r2,#0x10), clearing any sign
@@ -18842,7 +18842,7 @@ render_text_with_u16_width:
     bl text_render_wrapper                   @ 080f2c32 fff723ff
     pop {r1}                                 @ 080f2c36 02bc
     bx r1                                    @ 080f2c38 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Sibling of render_text_with_u16_width_a (0x080f2c1c) and render_text_with_u16_width (0x080f2c2c).
 @ All three share the same body: push{lr}; lsls r2,r2,#0x10; lsrs r2,r2,#0x10; bl text_render_wrapper;
@@ -18872,7 +18872,7 @@ render_text_with_u16_width_b:
     bl text_render_wrapper                   @ 080f2c42 fff71bff
     pop {r1}                                 @ 080f2c46 02bc
     bx r1                                    @ 080f2c48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ Render signed decimal integer as digit tiles in JP glyph style. r0: value (s32 signed integer); r1: dest_ptr (sprite VRAM or BG tile dest). Decomposes value into decimal digits, maps each digit to JP tile index, writes tiles to dest. Handles sign (negative prefix tile). Returns void. Side effects: dest_ptr region written with digit tiles. Constants: JP digit tile base index in glyph tile set.
 render_decimal_digits_jp_signed:
@@ -19038,7 +19038,7 @@ LAB_080f2d38:
     pop {r4,r5,r6,r7}                        @ 080f2d60 f0bc
     pop {r0}                                 @ 080f2d62 01bc
     bx r0                                    @ 080f2d64 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ indeg=0 (no static callsite, no fn-ptr table reference). Sub-type A.
 @ Located between render_decimal_digits_jp_signed (0x080f2c4c) and
@@ -19175,7 +19175,7 @@ pack_4bit_pairs_to_halfword:
     pop {r4,r5,r6}                           @ 080f2e44 70bc
     pop {r1}                                 @ 080f2e46 02bc
     bx r1                                    @ 080f2e48 0847
-    .byte  0x00, 0x00
+    .zero  0x2
 
 @ p2: line buffer -> 0x06010040+ sprite tile
 commit_line_buffer_to_sprite_vram:
@@ -19199,7 +19199,7 @@ commit_line_buffer_to_sprite_vram:
     adds r1,r6,#0x0    @ 080f2e6e 311c
     bl blit_tile_color_to_vram_region        @ 080f2e70 00f0bafb
     b LAB_080f34c6                           @ 080f2e74 27e3
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2e78:
     .word  0x02006ed0                     @ 080f2e78 d06e0002
 LAB_080f2e7c:
@@ -19249,7 +19249,7 @@ LAB_080f2eb8:
     adds r4,#0x20    @ 080f2ed0 2034
     ldr r3,[sp,#0x0]                         @ 080f2ed2 009b
     b LAB_080f34ac                           @ 080f2ed4 eae2
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f2ed8:
     .word  0x0000fff0                     @ 080f2ed8 f0ff0000
 DAT_080f2edc:
@@ -20100,7 +20100,7 @@ LAB_080f34c6:
     pop {r4,r5,r6,r7}                        @ 080f34d0 f0bc
     pop {r0}                                 @ 080f34d2 01bc
     bx r0                                    @ 080f34d4 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f34d8:
     .word  0x02006ed0                     @ 080f34d8 d06e0002
 
@@ -20342,7 +20342,7 @@ LAB_080f3670:
     pop {r4,r5,r6,r7}                        @ 080f3678 f0bc
     pop {r0}                                 @ 080f367a 01bc
     bx r0                                    @ 080f367c 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f3680:
     .word  0x02006ed0                     @ 080f3680 d06e0002
 
@@ -20426,7 +20426,7 @@ LAB_080f36fc:
     pop {r4,r5,r6,r7}                        @ 080f3700 f0bc
     pop {r0}                                 @ 080f3702 01bc
     bx r0                                    @ 080f3704 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f3708:
     .word  0x02006ed0                     @ 080f3708 d06e0002
 
@@ -20536,7 +20536,7 @@ LAB_080f37be:
     pop {r4,r5,r6,r7}                        @ 080f37c8 f0bc
     pop {r0}                                 @ 080f37ca 01bc
     bx r0                                    @ 080f37cc 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f37d0:
     .word  0x02006ed0                     @ 080f37d0 d06e0002
 
@@ -21053,7 +21053,7 @@ LAB_080f3b74:
     ldrb r0,[r3,#0x0]                        @ 080f3b74 1878
     cmp r0,#0x0                              @ 080f3b76 0028
     b LAB_080f3b8c                           @ 080f3b78 08e0
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f3b7c:
     .word  0x0000fff0                     @ 080f3b7c f0ff0000
 DAT_080f3b80:
@@ -21872,7 +21872,7 @@ LAB_080f4116:
     pop {r4,r5,r6,r7}                        @ 080f4120 f0bc
     pop {r0}                                 @ 080f4122 01bc
     bx r0                                    @ 080f4124 0047
-    .byte  0x00, 0x00
+    .zero  0x2
 DAT_080f4128:
     .word  0x02006ed0                     @ 080f4128 d06e0002
 DAT_080f412c:
