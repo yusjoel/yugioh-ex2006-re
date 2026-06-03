@@ -1,0 +1,4 @@
+Pack scene card eligibility check fail exit. When any candidate card fails the constraint enforced by the calling gate, the gate branches here via `b fail_pack_eligibility`; sets r0=0 then tail-calls exit_pack_scene_handler(0), forcing the pack eligibility check to terminate with a failure status. All 32 callers are pack candidate list attribute enforcement functions. No parameters read; no side effects; serves only as the unified failure exit point.
+
+Constants:
+- FAIL_CODE=0 (movs r0,#0x0; exit_pack_scene_handler treats this value as failure)

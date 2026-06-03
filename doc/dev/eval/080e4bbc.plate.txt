@@ -1,0 +1,7 @@
+Pack eligibility check: all active cards in candidate list A must pass check_card_id_is_effect_monster_type_b. Iterates EWRAM+0x1154 icid list (count at EWRAM+0x1150); per card first checks field5 nonzero (active), then calls check_card_id_is_effect_monster_type_b; if return==0, tail-calls fail_pack_eligibility to terminate. On full pass, tail-calls fail_pack_if_cand_list_b_nonempty to check list B. Called by FUN_080e3ee8 (pack scene dispatcher) via LAB_080e40f0 branch.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150
+- EWRAM_CAND_LIST_A=0x02001154
+- EWRAM_CAND_COUNT_A_STEP_OFFSET=0xffffeeac
+- EWRAM_CAND_COUNT_B=0x02001152

@@ -1,0 +1,9 @@
+Pack eligibility dual-list check: all qualifying cards in both candidate lists must have get_card_extended_stat_field6 return value==0x12 (18). Structure is fully symmetric with enforce_pack_cand_lists_field6_is_0xf, only constraint value changes from 0xf to 0x12. Phase A: iterates list A, checks field6==0x12 for active (field5!=0) cards; fail if not satisfied. Phase B: iterates list B, no field5 precondition, checks field6==0x12. On full pass, branches to return_pack_handler_success. Called by FUN_080e3ee8 via LAB_080e4126.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150
+- EWRAM_CAND_LIST_A=0x02001154
+- EWRAM_CAND_COUNT_B=0x02001152
+- EWRAM_CAND_LIST_B=0x02001212
+- FIELD6_TARGET=0x12 (18)
+- STEP_OFFSET_A=0xffffeeac

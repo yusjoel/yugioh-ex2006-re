@@ -1,0 +1,9 @@
+Pack eligibility dual-list check: all cards in both candidate lists must pass check_card_id_is_normal_summon_type. Phase A: iterates list A (EWRAM+0x1154, count +0x1150), active (field5!=0) cards that are not normal_summon type cause fail. Phase B: iterates list B (EWRAM+0x1212, count +0x1152), no field5 precondition, non-normal_summon cards cause fail. On full pass, tail-calls return_pack_handler_success. Called by FUN_080e3ee8.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150
+- EWRAM_CAND_LIST_A=0x02001154
+- EWRAM_CAND_COUNT_B=0x02001152
+- EWRAM_CAND_LIST_B=0x02001212
+- CARD_STATS_STRIDE=0x16
+- STEP_OFFSET=0xffffeeac (address step compensation constant)

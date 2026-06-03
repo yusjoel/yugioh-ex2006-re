@@ -1,0 +1,4 @@
+Candidate list B empty gate: reads the byte at the address passed in r0 (candidate count); if 0 (list B empty), branches to return_pack_handler_success; otherwise tail-calls fail_pack_eligibility to abort the pack flow. Called by enforce_pack_cand_list_b_empty (0x080e4b30), enforce_pack_cand_list_a_field8_is_7 (0x080e4b50), and enforce_pack_cand_list_a_effect_type_b (0x080e4bbc) after list A validation; callers uniformly pass r0=EWRAM+0x1152 (EWRAM_CAND_COUNT_B byte address).
+
+Constants:
+- (no extra constants; address passed in r0 by caller)

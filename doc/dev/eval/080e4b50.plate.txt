@@ -1,0 +1,9 @@
+Pack eligibility check: all active candidate list A cards must have field8==7 (Fusion/Ritual type). Initializes r5=0, reads EWRAM+0x1150 as loop bound, iterates EWRAM+0x1154 icid array; calls check_card_field5_is_nonzero per card, then check_card_stat_field8_is_7 for active cards; field8!=7 causes tail-call to fail_pack_eligibility. On full pass, tail-calls fail_pack_if_cand_list_b_nonempty to check list B is empty. Called by FUN_080e3ee8 (pack scene dispatcher) via branch.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150
+- EWRAM_CAND_LIST_A=0x02001154
+- EWRAM_CAND_COUNT_A_ALT_OFFSET=0xffffeeac (DAT_080e4bb4, address step compensation)
+- EWRAM_CAND_COUNT_B=0x02001152
+- CARD_STATS_STRIDE=0x16
+- FIELD8_FUSION=7 (Fusion/Ritual card type code)

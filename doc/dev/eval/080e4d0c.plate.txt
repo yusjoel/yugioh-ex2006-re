@@ -1,0 +1,6 @@
+Pack eligibility check: all candidate list B cards must have extended_stat_field6==1. Reads EWRAM+0x1152 count; if 0, immediately calls return_pack_handler_success. Otherwise iterates EWRAM+0x1212 icid array; field6!=1 causes tail-call to fail_pack_eligibility. Called by fall-through from enforce_pack_cand_list_a_field6_is_1 or directly by FUN_080e3ee8.
+
+Constants:
+- EWRAM_CAND_COUNT_B=0x02001152
+- EWRAM_CAND_LIST_B=0x02001212
+- FIELD6_TARGET=1

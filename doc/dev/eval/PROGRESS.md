@@ -7,7 +7,7 @@
 
 ## 总目标 vs 当前目标
 
-- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4605 / 全 CSV 4641 行 = **99.22%**)
+- **总目标**: ROM 内所有函数完成分析 (Ghidra 全 ROM main code 范围 4641 函数; 当前已命名 4616 / 全 CSV 4641 行 = **99.46%**)
 - **Phase 1 完成**: campaign_scene_handler 闭包 1526/1526 = 100% (batches #1-#81)
 - **Phase 2 完成**: 锁定 766 就绪函数 766/766 = 100% (batches #82-#117, 全 byte-identical, zero red-line)
 - **Phase 3 完成**: 新一轮 ready 集合 **1069 函数全部落地** (batches #118..#171, 54 批, 末批 9 函数, 2026-05-30 全部 byte-identical)。
@@ -18,6 +18,7 @@
 - **Phase 8 完成**: Phase 7 命名 32 后重算 ready 解锁 **20/20 函数全部落地** (batch #212, 1 批, 2026-06-03 全部 byte-identical)。仍有 42 FUN_* 阻塞, 其中 **13 个属 2 个不可解递归 SCC** (size-11 簇 0x080e40c2.. + size-2 簇 0x080392da↔0x0803a41e), 纯 bottom-up 永不解锁, 需作为簇协同命名 (放宽 R7 簇内边) → 见失败追踪段。
 - **Phase 10 进行中**: batch #214 (1 函数: tick_banlist_scene_frame 0x0801b5d8) 2026-06-03 byte-identical PASSED (4603/4641 = 99.18%); 38 FUN_* remain — ALL in/behind the 2 irreducible SCCs (SCC-2 0x080392da↔0x0803a41e + SCC-11 0x080e40c2 cluster + their ~25 downstream dependents). Bottom-up peeling EXHAUSTED. 下一步: SCC co-analysis (analyze each cycle's members together, relaxing R7 for intra-cycle edges), which cascade-unblocks the downstream dependents.
 - **SCC-2 RESOLVED** (2026-06-03): dispatch_equip_node_by_type (0x080392da) + advance_equip_node_chain_step (0x0803a41e) co-analyzed + landed (4605/4641 = 99.22%). 36 FUN_* remain (SCC-11 11 fn + ~25 downstream dependents).
+- **SCC-11 RESOLVED** (2026-06-03): fail_pack_eligibility (0x080e40c2) + 10 pack-cand-list eligibility enforcement gates co-analyzed + landed (4616/4641 = 99.46%). 25 FUN_* remain (0x080e3ee8, 0x080e4874..0x080e55fc, 0x080e73b4 — downstream dependents now cascade-unblocked). Confirmed Ghidra mis-attribution artifact: indeg=32 stub + field8/field6/effect-type enforcement cluster.
 - **就绪定义**: `unnamed AND (no callees OR all callees named)`
 - **模式**: 20/批 单 sub-agent 串行 (executor → reviewer → fixer iter → fixer 落地 → lesson-keeper)
 
@@ -56,13 +57,13 @@ byte-identical 通过后自动 commit, 进入下一批。
 
 | 字段 | 值 |
 |------|----|
-| **阶段** | SCC-2 resolved via co-analysis. Remaining: SCC-11 (0x080e40c2 cluster, 11 fn) + 25 downstream dependents = 36 FUN_*. Next: SCC-11 co-analysis, then recompute to cascade-unblock downstream. |
+| **阶段** | SCC-2 + SCC-11 both resolved. Remaining: 25 downstream FUN_* (0x080e3ee8, 0x080e4874..0x080e55fc, 0x080e73b4) that called the now-named SCC members — these cascade-unblock. Next: Phase 11 recompute ready. |
 | **Ghidra 函数总数** | 4641 (ROM main code 范围) |
-| **已命名 (USER_DEFINED / ANALYSIS)** | 4605 (99.22%) |
-| **未命名 (FUN_*)** | 36 (全部在/下游 SCC-11 0x080e40c2 cluster (11 fn) + ~25 downstream dependents) |
-| **就绪函数集** | SCC-2 landed; SCC-11 co-analysis next (11 fn 互相调用, 放宽 R7 簇内边) |
-| **下一批** | SCC-11 co-analysis (0x080e40c2 cluster, 11 functions), then recompute to cascade-unblock |
-| **上次更新** | 2026-06-03 SCC-2 PASSED (co-analyzed + landed): dispatch_equip_node_by_type (0x080392da) + advance_equip_node_chain_step (0x0803a41e) (4605/4641 = 99.22%) |
+| **已命名 (USER_DEFINED / ANALYSIS)** | 4616 (99.46%) |
+| **未命名 (FUN_*)** | 25 (downstream dependents of SCC-11, now cascade-unblocked) |
+| **就绪函数集** | SCC-11 landed; recompute ready to identify the 25 newly unblocked functions |
+| **下一批** | Phase 11 recompute ready (python tools/ad-hoc/compute_ready_phaseN.py or manual pick from 0x080e4874 cluster), then name the ~25 downstream dependents |
+| **上次更新** | 2026-06-03 SCC-11 PASSED (co-analyzed + landed): fail_pack_eligibility + 10 enforcement gates (4616/4641 = 99.46%), SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b |
 | **callgraph 时间戳** | 2026-05-31 (`temp/ghidra-funcs-callgraph.csv`, 13158 edges; rename 不改拓扑, Phase 6 复用) |
 | **callgraph_locked** | `true` (拓扑稳定, 复用 Phase 5 版; 全任务只需 refresh 一次) |
 | **ready_locked** | `false` (bottom-up peeling exhausted; 剩余全为 SCC-locked, 须 SCC co-analysis 而非 compute_ready_phaseN.py) |
@@ -152,5 +153,5 @@ Phase 3 ready 集合 (1069 函数) indeg 分布:
 
 | ADDR | 日期 | 失败原因 | 备注 |
 |------|------|----------|------|
-| SCC-11 (0x080e40c2 簇) | 2026-06-03 | 不可解递归 SCC (11 函数互相调用, bottom-up 永不就绪) | 成员: 0x080e40c2 0x080e4af4 0x080e4b30 0x080e4b50 0x080e4bbc 0x080e4c28 0x080e4cd0 0x080e4d0c (+3 见 ready_addrs); 需作为簇协同命名, 放宽 R7 簇内边; 待 Phase 7/8 peeling 收敛后处理 |
+| SCC-11 (0x080e40c2 簇) | 2026-06-03 | ~~不可解递归 SCC~~ **RESOLVED** 2026-06-03: co-analyzed + landed — fail_pack_eligibility + enforce_pack_cand_list_a_field8_is_6/7 + enforce_pack_cand_list_b_empty + enforce_pack_cand_list_a_effect_type_b + enforce_pack_cand_lists_normal_summon_type + enforce_pack_cand_list_a/b_field6_is_1 + enforce_pack_cand_lists_field6_is_0xf/0x12 + fail_pack_if_cand_list_b_nonempty; byte-identical SHA1 9689337d (4616/4641 = 99.46%); confirmed Ghidra mis-attribution artifact |
 | SCC-2 (0x080392da↔0x0803a41e) | 2026-06-03 | ~~不可解递归 SCC~~ **RESOLVED** 2026-06-03: co-analyzed + landed — dispatch_equip_node_by_type + advance_equip_node_chain_step, byte-identical SHA1 9689337d |

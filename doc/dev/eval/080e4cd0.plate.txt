@@ -1,0 +1,7 @@
+Pack eligibility check: all active candidate list A cards must have get_card_extended_stat_field6 return value==1. Reads icid from EWRAM+0x1154 (count at EWRAM+0x1150); per card checks field5!=0 (active), then calls get_card_extended_stat_field6; if return!=1, tail-calls fail_pack_eligibility. On full pass, falls through to enforce_pack_cand_list_b_field6_is_1 to continue checking list B. Called by FUN_080e3ee8 via LAB_080e413c branch.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150
+- EWRAM_CAND_LIST_A=0x02001154
+- FIELD6_TARGET=1 (extended stat field6 must equal 1)
+- CARD_STATS_STRIDE=0x16

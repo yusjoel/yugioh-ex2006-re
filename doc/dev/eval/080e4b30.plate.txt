@@ -1,0 +1,4 @@
+Pack eligibility gate: requires candidate list B count to be zero to pass. Loads EWRAM+0x1152 address then tail-calls fail_pack_if_cand_list_b_nonempty; if count byte is 0 (list B empty), branches to return_pack_handler_success; otherwise tail-calls fail_pack_eligibility. This function is the successor step after enforce_pack_cand_list_a_field8_is_6 (0x080e4af4) loop completion, and also an independent entry for enforce_pack_cand_list_a_field8_is_7 (0x080e4b50). Called directly by three SCC sibling members.
+
+Constants:
+- EWRAM_CAND_COUNT_B=0x02001152 (candidate list B count byte)

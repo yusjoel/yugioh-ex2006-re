@@ -1,0 +1,7 @@
+Pack eligibility check: all active cards (field5!=0) in candidate list A must have field8==6 (Spell type). Iterates EWRAM+0x1154 icid array (count at EWRAM+0x1150); active cards with field8!=6 cause tail-call to fail_pack_eligibility. On full pass, falls through to enforce_pack_cand_list_b_empty. Called by FUN_080e3ee8.
+
+Constants:
+- EWRAM_CAND_COUNT_A=0x02001150 (candidate list A count, byte)
+- EWRAM_CAND_LIST_A=0x02001154 (candidate icid array A, halfword stride 2)
+- CARD_STATS_STRIDE=0x16 (card_stats_table entry size in halfwords = 0x2c bytes)
+- FIELD8_SPELL=6 (Spell card type code)
