@@ -1,0 +1,32 @@
+# asm/all.s 模块拆分边界定义 (阶段 A: 粗粒度 25 段, 按 all.s 行数均衡 + 子系统转变吸附)
+# 格式: <start_addr_hex><TAB><filename><TAB><description>
+# 每行定义一个文件, 覆盖 [start, 下一行 start) 连续地址区间。最后一段到 all.s 末尾。
+# 第一行 start 必须是 all.s 第一个函数 (0x080000c0), 其前 preamble 自动并入首文件。
+# 文件名 NN 前缀 = .include 顺序 (= 地址序), 改名/调边界后重跑 split_all_s.py 即可。
+# 校验边界命中: python tools/asm-regen/split_all_s.py --check
+# 重新拆分:     python tools/asm-regen/split_all_s.py
+0x080000c0	00_system_str_vija.s	系统初始化(crt0/IRQ) + 字符串工具 + vija obj 动画
+0x0801cb00	01_vija_scene_text.s	vija 场景状态机 + 文本渲染 + puzzle 显示派发
+0x0802c238	02_text_lp_fieldspell.s	游戏文本十进制渲染 + LP 条目查找 + 场地魔法发动判定
+0x08035f54	03_equip_chain_hand.s	装备节点链接 + slot 链最优目标 + 手牌区交换显示
+0x0804020c	04_card_zone_sprite.s	卡牌显示序列 + 区域卡 sprite attr + 装备 slot sprite
+0x08049014	05_equip_eligibility_a.s	效果区 LP/形状 sprite + 装备 slot 资格判定 (一)
+0x080537c0	06_equip_eligibility_b.s	装备资格按 slot flag 派发 + neo daedalus 效果
+0x0805c2f0	07_equip_effect_chain.s	按卡 ID 效果派发 + 装备链极性资格判定
+0x080643e0	08_equip_oam_neodaed.s	neo daedalus 资格 + 装备 OAM 写入 + zone tile 计数
+0x0806e76c	09_equip_lp_display.s	slot sprite type11 + 装备 LP 计数显示状态机
+0x08079e60	10_equip_effect_dispatch.s	neo daedalus zone OAM + 装备判据/效果按类型派发
+0x080850d8	11_effect_slot_puzzletext.s	效果 slot attr + 交换 sprite + duel puzzle 文本队列
+0x080941c4	12_equip_activation_scan.s	效果 slot 显示上下文 + 装备发动链阻断 + 手牌扫描
+0x0809d718	13_equip_placement.s	装备 zone 扫描 + LP 行显示 + 放置动作按阶段派发
+0x080a78dc	14_equip_ai_scoring.s	装备阶段 7 步表 + 怪兽 slot 评分/采样 (AI 决策)
+0x080b5348	15_equip_target_summon_zoom.s	装备目标选择 + 召唤资格 + 卡牌放大 OAM 网格
+0x080c1448	16_duelfield_zone.s	UI 音效 + zone OAM 光标解码 + duel 场地区域信息
+0x080cbf0c	17_duelfield_pack_frame.s	duel 场地刷新 + zone 卡动画 OAM + pack 卡静态帧
+0x080d5e84	18_pack_card_info.s	pack 卡信息帧/淡入步进/ATK 行渲染
+0x080df368	19_pack_eligibility_anim.s	卡表 tile 拷贝 + pack 候选表资格门 + anim_ctrl
+0x080e90a0	20_anim_jp_tileblit.s	anim_ctrl 辅助字段 + 日文字串渲染 + tile nibble blit
+0x080f413c	21_font_title_scene.s	日文字库颜色/状态 + AOB OAM + title_ex 场景状态机
+0x080fdd3c	22_cardlist_scene.s	puzzle/pack 场景初始化 + 卡表类型 + 卡框场景
+0x081078d4	23_sound_cardlist_libc.s	卡表 slot 清理 + 声道音量/ID + strtoul
+0x08110dc8	24_libc_runtime.s	编译器运行时 (__muldi3/__negdi2/_sbrk 等 newlib/libgcc)

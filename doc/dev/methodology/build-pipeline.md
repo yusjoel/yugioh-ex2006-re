@@ -149,9 +149,16 @@ tools/asm-regen/ghidra-run-script.bat ExportRomLabelsToInc.py
 ```bash
 tools/asm-regen/ghidra-export-range.bat 080000c0 084c7637 asm/all.s 0
 python tools/asm-regen/inject_modes.py    # 无参 = 原地改 asm/all.s
+python tools/asm-regen/split_all_s.py     # all.s → asm/*.s 拆分模块 (见 §七)
+rm -f asm/all.s asm/all.s.raw asm/all.s.raw.nomode   # 拆分后中间产物即可删
 NOPAUSE=1 ./build.bat                       # bash harness 下必须 NOPAUSE=1
 sha1sum roms/2343.gba output/2343.gba       # 必须一致
 ```
+
+⚠️ 自 2026-06-03 起 `asm/all.s` 不再被 `rom.s` 直接 `.include`，而是经 `split_all_s.py`
+拆成 `asm/NN_*.s` 多模块 (rom.s 改 `.include "asm/includes.inc"`)。**Ghidra 再生成后必须
+补跑 `split_all_s.py`**，否则 build 用的是旧的拆分文件。`all.s` 及 `.raw`/`.raw.nomode`
+都是中间产物，拆分完即可删除（已入库的是 `asm/NN_*.s`）。详见 §七。
 
 导出后 `bl FUN_080db860` 变 `bl pack_banner_tile_copy`，`.word 0x08000240` 变 `.word game_str_id_remap_count`。再次 byte-identical 验证。
 
@@ -330,6 +337,8 @@ Python 3 后处理脚本。**强烈依赖 Jython 导出每行末尾注释中的 
 cmd //c "tools\asm-regen\ghidra-export-range.bat 080000c0 08ffffff doc\temp\all.s.raw"
 grep -v -E '^\.(thumb|arm)\s*$' doc/temp/all.s.raw > doc/temp/all.s.raw.nomode
 python tools/asm-regen/inject_modes.py doc/temp/all.s.raw.nomode asm/all.s
+python tools/asm-regen/split_all_s.py            # 拆成 asm/NN_*.s (见 §七)
+rm -f asm/all.s asm/all.s.raw asm/all.s.raw.nomode
 
 # 验证 byte-identical
 rm -rf output && mkdir -p output
@@ -338,6 +347,58 @@ ld.exe -T ld_script.txt -o output/2343.elf output/rom.o
 objcopy.exe -O binary output/2343.elf output/2343.gba
 cmp roms/2343.gba output/2343.gba && echo OK
 ```
+
+---
+
+## 七、asm/*.s 模块拆分
+
+**背景**：`asm/all.s` 是 49.5 万行 / 25 MB 的 Ghidra 单体导出，编辑、git diff、检索都吃力。
+4641 函数全部命名完成后（2026-06-03），按子系统拆成 `asm/NN_*.s` 多文件，**入库的是这些
+拆分文件**；`asm/all.s` 及其 `.raw`/`.raw.nomode` 全部降级为可删的中间产物。
+
+**核心约束**：
+1. 拆分流（all.s）是**生成产物**（§二管线），拆分规则必须能在再生成后重新套用 →
+   用 **manifest（以地址为 key）** 驱动，不手切。
+2. byte-identical 要求**按地址顺序连续 emit**。`.include` = 纯文本拼接，所以"切在函数
+   边界 + 按地址序 include" ⇒ 拼接等价 ⇒ 必然 byte-identical。
+3. 因此**每个模块文件只能是一段连续 `[start, next_start)` 地址区间**，不能把散落各处的
+   同子系统函数收进一个文件（会打乱地址序）。好在原编译单元本就连续排布，子系统天然成簇。
+4. 全 ROM **无 local label**（无 `1:`/`.L`），切分零作用域风险。
+5. mode（`.thumb`/`.arm`）状态在同一汇编单元内跨 `.include` 自然延续；split 脚本另在每个
+   非首文件开头注入 3 行 header（`@ ==== 名 ====` / `@ 描述` / 当前 mode），零字节，纯为
+   可读 + 可独立汇编。
+
+**组件**：
+| 文件 | 作用 |
+|------|------|
+| `tools/asm-regen/split_manifest.tsv` | 边界定义（`start_addr<TAB>filename<TAB>desc`），唯一手维护 |
+| `tools/asm-regen/split_all_s.py` | 拆分器：规范流 + manifest → `asm/NN_*.s` + `asm/includes.inc` |
+| `tools/asm-regen/generate_split_manifest.py` | 按行数均衡 + 子系统转变吸附，生成 manifest 初稿 |
+| `asm/includes.inc` | 自动生成的有序 `.include` 清单，被 `rom.s` 引用 |
+
+**规范流（canonical stream）来源**，`split_all_s.py` 自动按优先级选：
+1. `asm/all.s` 存在（Ghidra 再生成 + inject_modes 刚产出）→ 直接用；
+2. 否则从已入库的 `asm/NN_*.s` **反向合并**（剥掉注入 header）重建。
+
+⇒ 所以 `asm/all.s` 删除后，阶段 B「改 manifest 重切」仍可工作，**无需保留 all.s**。
+需要单体 all.s（如做 Ghidra round-trip / 整体 diff）时：`split_all_s.py --merge asm/all.s`。
+
+**入库策略**：`asm/all.s` / `.raw` / `.raw.nomode` 都 `.gitignore`；git 跟踪 `asm/NN_*.s`
++ `asm/includes.inc`。`rom.s` 用 `.include "asm/includes.inc"`。**build.bat 保持纯汇编**
+（直接 as/ld/objcopy 入库的拆分文件，不跑 split）。
+
+**日常构建**：拆分文件已入库，`./build.bat` 直接用，无需任何额外步骤。
+
+**阶段 B 调边界 / 再细分**：只改 `split_manifest.tsv`（增删行、改文件名/边界地址），然后：
+```bash
+python tools/asm-regen/split_all_s.py --check     # 校验全部边界命中
+python tools/asm-regen/split_all_s.py             # 重切 (all.s 缺失时自动反向合并)
+NOPAUSE=1 ./build.bat && sha1sum roms/2343.gba output/2343.gba   # 验证 byte-identical
+```
+风险隔离在 manifest 一处；改完务必 build 验证。
+
+**已验证**：2026-06-03 阶段 A 25 段拆分（含删 all.s 后反向合并往返）byte-identical 通过，
+SHA1 `9689337d6aac1ce9699ab60aac73fc2cfdccad9b`。
 
 ---
 

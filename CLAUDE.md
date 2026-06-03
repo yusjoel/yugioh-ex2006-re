@@ -29,6 +29,7 @@ build-all.bat    :: export_all.py → build.bat → ROM 校验 → temp 比对 (
 ## 代码布局要点
 
 - `asm/rom_header.s` (0x000–0x0BF) + `asm/crt0.s` (0x0C0–0x0FF) + `asm/rom.s`（主串联文件，引用 `data/*.s` 和 `.incbin`）
+- `asm/NN_*.s`（25 个反汇编代码模块，原 `asm/all.s` 单体按子系统连续地址区间拆分；由 `tools/asm-regen/split_all_s.py` 据 `split_manifest.tsv` 生成）+ `asm/includes.inc`（有序 `.include` 清单，被 `rom.s` 引用）。`asm/all.s`/`.raw`/`.raw.nomode` 均为可删中间产物（已 gitignore）。Ghidra 再生成后须补跑 `split_all_s.py`；调边界见 `doc/dev/methodology/build-pipeline.md` §七。
 - `data/*.s`：已结构化的数据区（见 `PLAN.md` 表格）。新增数据区必须保持 byte-identical——通常流程是：`.incbin` 原始字节 → 脚本生成 `.s` → diff 验证 → 替换。
 - `include/macros.inc`：核心宏 `deck_entry so_code, qty` / `banlist_entry so_code, limit` / `deck_card so_code`。`so_code` 用十进制（编码时自动 `so_code*4 | qty` 等运算）。
 - `constants/gba_constants.inc`：GBA 硬件寄存器

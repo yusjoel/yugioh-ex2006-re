@@ -21,6 +21,8 @@ temp/
 __pycache__/
 
 # asm/all.s 再生中间产物 (由 ghidra-export-range.bat → inject_modes.py 生成)
+# all.s 现为 split_all_s.py 的输入中间产物; 入库的是拆分后的 asm/all/*.s
+asm/all.s
 asm/all.s.raw
 asm/all.s.raw.nomode
 

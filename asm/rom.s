@@ -27,7 +27,7 @@
 Start:
 	.include "asm/crt0.s"
 
-	.include "asm/all.s"
+	.include "asm/includes.inc"
 
 @ ── 大卡图数据段（原在 all.s 末尾，移出以保持 all.s 纯代码）───────────────
 @ ROM 偏移 0x4C7638 - 0x1000000，共约 11.5 MB
