@@ -12,29 +12,91 @@
 .endm
 
 
-@ GBA ROM 启动入口 (crt0). 硬件复位后 CPU 跳转至此. 13 条 ARM 指令完成初始化: cpsr=0x12 (IRQ mode) + SP_irq=0x03007e00; cpsr=0x1f (System mode) + SP_sys=0x03007800; 将 dispatch_thumb_isr_from_arm (DWORD_080000fc) 写入 BIOS 中断向量 [0x03007ffc]; mov lr,pc; bx run_game_main 启动游戏 (不返回). 末尾 b 为不可达安全死循环.
+@ GBA ROM 启动入口 (crt0/Init). 复位后 BIOS 跳转至此. 依次: 进 IRQ 模式设 IRQ 栈顶 sp_irq_init=0x03007e00; 进 System 模式设主栈 sp_sys_init=0x03007800; 将 IntrMain (本游戏 ARM 中断处理器, @0x080000fc) 地址写入 BIOS IRQ 向量 [0x03007ffc]; bx 跳到 run_game_main (AgbMain, 0x080f4d91 thumb) 启动游戏, 不返回. 末尾 b 为不可达死循环.
 init_cpu_stacks_and_irq_vector:
-    mov r0,#0x12                             @ 080000c0 1200a0e3
+    mov r0,#PSR_IRQ_MODE                     @ 080000c0 1200a0e3
     msr cpsr_cf,r0                           @ 080000c4 00f029e1
-    ldr sp, DAT_080000f8                     @ 080000c8 28d09fe5
-    mov r0,#0x1f                             @ 080000cc 1f00a0e3
+    ldr sp, sp_irq_init                      @ 080000c8 28d09fe5
+    mov r0,#PSR_SYS_MODE                     @ 080000cc 1f00a0e3
     msr cpsr_cf,r0                           @ 080000d0 00f029e1
-    ldr sp, DAT_080000f4                     @ 080000d4 18d09fe5
-    ldr r1, DAT_0800022c                     @ 080000d8 4c119fe5
-    adr r0, DWORD_080000fc                   @ 080000dc 18008fe2
+    ldr sp, sp_sys_init                      @ 080000d4 18d09fe5
+    ldr r1, ptr_intr_vector                  @ 080000d8 4c119fe5
+    adr r0, IntrMain                         @ 080000dc 18008fe2
     str r0,[r1,#0x0]                         @ 080000e0 000081e5
-    ldr r1, DAT_08000230                     @ 080000e4 44119fe5
+    ldr r1, ptr_run_game_main                @ 080000e4 44119fe5
     mov lr,pc                                @ 080000e8 0fe0a0e1
     bx r1                                    @ 080000ec 11ff2fe1
     b init_cpu_stacks_and_irq_vector         @ 080000f0 f2ffffea
-DAT_080000f4:
+sp_sys_init:
     .word  0x03007800                     @ 080000f4 00780003
-DAT_080000f8:
+sp_irq_init:
     .word  0x03007e00                     @ 080000f8 007e0003
-DWORD_080000fc:
-    .word  0xe3a03301                     @ 080000fc 0133a0e3
-    ROM_INCBIN 0x100, 0xec
-    ldr r0,[r1,#0x0]                         @ 080001ec 000091e5
+
+@ ARM 模式中断主处理器 (AGB IntrMain). 被 crt0 注册进 BIOS IRQ 向量 [0x03007ffc], 每次硬件 IRQ 由 BIOS 跳入. 流程: 读 REG_IE/IF(0x4000200)/REG_IME(0x4000208)+SPSR 入栈; 按优先级扫描挂起中断求 gIntrTable(@0x03000000) 槽偏移; 写 REG_IF 应答; 设 REG_IE=允许嵌套子集(0x26c0); 切 System 模式开嵌套; 取 gIntrTable[槽] 的 Thumb ISR 指针; 尾段 (dispatch_thumb_isr_from_arm @0x1f0) 调用之并恢复现场返回. GamePak(卡带拔出)中断 → 关声音(SOUNDCNT_X)后死循环.
+IntrMain:
+    mov r3,#0x4000000                        @ 080000fc 0133a0e3
+    add r3,r3,#0x200                         @ 08000100 023c83e2
+    ldr r2,[r3,#0x0]                         @ 08000104 002093e5  -- r2 = REG_IF<<16 | REG_IE
+    ldrh r1,[r3,#0x8]                        @ 08000108 b810d3e1
+    mrs r0,spsr                              @ 0800010c 00004fe1
+    stmdb sp!,{r0,r1,r2,r3,lr}               @ 08000110 0f402de9
+    mov r0,#0x1                              @ 08000114 0100a0e3
+    strh r0,[r3,#0x8]                        @ 08000118 b800c3e1
+    and r1,r2,r2, lsr #0x10                  @ 0800011c 221802e0  -- r1 = IE & IF (已使能且挂起的中断)
+    mov r12,#0x0                             @ 08000120 00c0a0e3
+    ands r0,r1,#0xc0                         @ 08000124 c00011e2  -- 优先级扫描起点: 槽0 = Serial|Timer3 (0xc0)
+    bne LAB_080001c0                         @ 08000128 2400001a
+    add r12,r12,#0x4                         @ 0800012c 04c08ce2
+    ands r0,r1,#0x2                          @ 08000130 020011e2
+    bne LAB_080001c0                         @ 08000134 2100001a
+    add r12,r12,#0x4                         @ 08000138 04c08ce2
+    ands r0,r1,#0x1                          @ 0800013c 010011e2
+    bne LAB_080001c0                         @ 08000140 1e00001a
+    add r12,r12,#0x4                         @ 08000144 04c08ce2
+    ands r0,r1,#0x4                          @ 08000148 040011e2
+    bne LAB_080001c0                         @ 0800014c 1b00001a
+    add r12,r12,#0x4                         @ 08000150 04c08ce2
+    ands r0,r1,#0x8                          @ 08000154 080011e2
+    bne LAB_080001c0                         @ 08000158 1800001a
+    add r12,r12,#0x4                         @ 0800015c 04c08ce2
+    ands r0,r1,#0x10                         @ 08000160 100011e2
+    bne LAB_080001c0                         @ 08000164 1500001a
+    add r12,r12,#0x4                         @ 08000168 04c08ce2
+    ands r0,r1,#0x20                         @ 0800016c 200011e2
+    bne LAB_080001c0                         @ 08000170 1200001a
+    add r12,r12,#0x4                         @ 08000174 04c08ce2
+    ands r0,r1,#0x100                        @ 08000178 010c11e2
+    bne LAB_080001c0                         @ 0800017c 0f00001a
+    add r12,r12,#0x4                         @ 08000180 04c08ce2
+    ands r0,r1,#0x200                        @ 08000184 020c11e2
+    bne LAB_080001c0                         @ 08000188 0c00001a
+    add r12,r12,#0x4                         @ 0800018c 04c08ce2
+    ands r0,r1,#0x400                        @ 08000190 010b11e2
+    bne LAB_080001c0                         @ 08000194 0900001a
+    add r12,r12,#0x4                         @ 08000198 04c08ce2
+    ands r0,r1,#0x800                        @ 0800019c 020b11e2
+    bne LAB_080001c0                         @ 080001a0 0600001a
+    add r12,r12,#0x4                         @ 080001a4 04c08ce2
+    ands r0,r1,#0x1000                       @ 080001a8 010a11e2
+    bne LAB_080001c0                         @ 080001ac 0300001a
+    add r12,r12,#0x4                         @ 080001b0 04c08ce2
+    ands r0,r1,#0x2000                       @ 080001b4 020a11e2
+    strbne r0,[r3,#-0x17c]                   @ 080001b8 7c014315  -- GamePak(卡带拔出) → 关 SOUNDCNT_X (0x4000084)
+LAB_080001bc:
+    bne LAB_080001bc                         @ 080001bc feffff1a
+LAB_080001c0:
+    strh r0,[r3,#0x2]                        @ 080001c0 b200c3e1  -- REG_IF = r0 (写 1 应答已处理中断)
+    mov r1,#0x26c0                           @ 080001c4 9b1da0e3
+    bic r2,r2,r0                             @ 080001c8 0020c2e1
+    and r1,r1,r2                             @ 080001cc 021001e0
+    strh r1,[r3,#0x0]                        @ 080001d0 b010c3e1  -- REG_IE = 允许嵌套的中断子集 (0x26c0)
+    mrs r3,cpsr                              @ 080001d4 00300fe1
+    bic r3,r3,#0xdf                          @ 080001d8 df30c3e3
+    orr r3,r3,#PSR_SYS_MODE                  @ 080001dc 1f3083e3
+    msr cpsr_cf,r3                           @ 080001e0 03f029e1
+    ldr r1, ptr_gIntrTable                   @ 080001e4 48109fe5
+    add r1,r1,r12                            @ 080001e8 0c1081e0
+    ldr r0,[r1,#0x0]                         @ 080001ec 000091e5  -- r0 = gIntrTable[槽] = 该中断的 Thumb ISR 指针
 
 @ ARM-mode bridge called by CRT0 ARM ISR (0x080000fc) on every IRQ. Sets LR=0x080001fc return stub, calls Thumb ISR via bx r0, then restores IRQ mode via cpsr manipulation and writes IO registers. No game-layer callers (indeg=0); activated by hardware IRQ mechanism only.
 @ 
@@ -58,11 +120,13 @@ LAB_080001fc:
     msr spsr_cf,r0                           @ 0800021c 00f069e1
     bx lr                                    @ 08000220 1eff2fe1
     .byte  0x00, 0x00, 0xa0, 0xe1, 0x00, 0x00, 0xa0, 0xe1
-DAT_0800022c:
-    .word  0x03007ffc                     @ 0800022c fc7f0003
-DAT_08000230:
+ptr_intr_vector:
+    .word  INTR_VECTOR                    @ 0800022c fc7f0003
+ptr_run_game_main:
     .word  0x080f4d91                     @ 08000230 914d0f08
-    .byte  0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+ptr_gIntrTable:
+    .word  gIntrTable                     @ 08000234 00000003
+    .byte  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 game_str_id_remap_count:
     .hword 0x0673                         @ 08000240 7306
     ROM_INCBIN 0x242, 0x680

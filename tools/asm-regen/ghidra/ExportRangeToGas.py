@@ -438,6 +438,35 @@ def fix_branch_target_to_label(program, text, start_addr, end_addr):
 
     return text
 
+def apply_equates(program, ins, text):
+    """
+    外科式 equate 替换：仅当某操作数在 Ghidra EquateTable 设了 equate 时，
+    把该立即数文本 (#0x..) 替换为 equate 名 (如 #PSR_IRQ_MODE)。
+    无 equate 的指令完全不动 -> 不影响全 ROM byte-identical。
+    GAS 端靠 .set/.equ (constants/*.inc) 解析 equate 名 = 同值 -> 同字节。
+    """
+    addr = ins.getAddress()
+    et = program.getEquateTable()
+    try:
+        eqs = iter_any(et.getEquates(addr))
+    except:
+        eqs = []
+    if not eqs:
+        return text
+    for eq in eqs:
+        try:
+            name = sanitize_label(eq.getName())
+            v = int(eq.getValue())
+        except:
+            continue
+        # ARM/Thumb 立即数在 toString 里的常见形态
+        for form in ("#0x%x" % (v & 0xffffffff), "#0x%X" % (v & 0xffffffff), "#%d" % v):
+            if form in text:
+                text = text.replace(form, "#" + name, 1)
+                break
+    return text
+
+
 def fix_adr_immediate_to_label(program, text, start_addr, end_addr):
     """
     adr r0,0xADDR -> adr r0, DAT_xxx（目标在范围内：优先现有label，否则合成DAT_）
@@ -814,6 +843,7 @@ def run():
                 text = fix_ldr_abs_bracket(program, ins, text, start_addr, end_addr)
                 text = fix_branch_target_to_label(program, text, start_addr, end_addr)
                 text = fix_adr_immediate_to_label(program, text, start_addr, end_addr)
+                text = apply_equates(program, ins, text)
 
                 hexbytes = bytes_hex_from_java_bytes(ins.getBytes())
                 # EOL comment: 首行追加到现有 '@ <addr> <hex>' 注释末尾 (同一 @ 注释延续);

@@ -9978,21 +9978,21 @@ DWORD_081e0600:
     .byte  0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4d, 0x4b, 0x44, 0x2c, 0x00 @ 081f0694 4d4d4d4d4d4d4d4d4b442c00
     ROM_INCBIN 0x1f06a0, 0x1740
     .word  0x03000300                     @ 081f1de0 00030003
-    .word  0x03000000                     @ 081f1de4 00000003
-    .word  0x03000000                     @ 081f1de8 00000003
-    .word  0x03000000                     @ 081f1dec 00000003
-    .word  0x03000000                     @ 081f1df0 00000003
-    .word  0x03000000                     @ 081f1df4 00000003
-    .word  0x03000000                     @ 081f1df8 00000003
-    .word  0x03000000                     @ 081f1dfc 00000003
-    .word  0x03000000                     @ 081f1e00 00000003
-    .word  0x03000000                     @ 081f1e04 00000003
-    .word  0x03000000                     @ 081f1e08 00000003
-    .word  0x03000000                     @ 081f1e0c 00000003
-    .word  0x03000000                     @ 081f1e10 00000003
-    .word  0x03000000                     @ 081f1e14 00000003
-    .word  0x03000000                     @ 081f1e18 00000003
-    .word  0x03000000                     @ 081f1e1c 00000003
+    .word  gIntrTable                     @ 081f1de4 00000003
+    .word  gIntrTable                     @ 081f1de8 00000003
+    .word  gIntrTable                     @ 081f1dec 00000003
+    .word  gIntrTable                     @ 081f1df0 00000003
+    .word  gIntrTable                     @ 081f1df4 00000003
+    .word  gIntrTable                     @ 081f1df8 00000003
+    .word  gIntrTable                     @ 081f1dfc 00000003
+    .word  gIntrTable                     @ 081f1e00 00000003
+    .word  gIntrTable                     @ 081f1e04 00000003
+    .word  gIntrTable                     @ 081f1e08 00000003
+    .word  gIntrTable                     @ 081f1e0c 00000003
+    .word  gIntrTable                     @ 081f1e10 00000003
+    .word  gIntrTable                     @ 081f1e14 00000003
+    .word  gIntrTable                     @ 081f1e18 00000003
+    .word  gIntrTable                     @ 081f1e1c 00000003
     ROM_INCBIN 0x1f1e20, 0x102c4
     .word  0x02020201                     @ 082020e4 01020202
     .word  0x02020202                     @ 082020e8 02020202

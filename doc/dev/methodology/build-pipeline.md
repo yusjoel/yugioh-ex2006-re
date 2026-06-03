@@ -260,6 +260,7 @@ Windows 批处理包装，调用 Ghidra `support/analyzeHeadless.bat` 以无 GUI
 - **UNDEF 连续区**：`> 16 字节` 用 `ROM_INCBIN` 宏（`.incbin` 原 ROM）；否则 `.byte`
 - **label**：Ghidra 已有 symbol 直接输出；ADR 目标若范围内无 symbol 则合成 `DAT_<addr>`
 - **label 全局去重**：避免 `switchD` 等同名符号在不同地址重复定义
+- **equate 符号化**（`apply_equates`，2026-06-03 加）：若某指令操作数在 Ghidra EquateTable 设了 equate，把立即数 `#0x..` 替换为 equate 名（如 `#PSR_IRQ_MODE`）。仅对有 equate 的操作数生效，其余指令零影响 → 全 ROM byte-identical 不受扰。GAS 端靠 `constants/*.inc` 的 `.set`/`.equ` 解析回同值。设 equate 用 `tools/ghidra-labeling/SetBootEquates.py` 式脚本（`EquateTable.createEquate` + `addReference(addr, opIndex)`）。⚠ `ins.toString()` 本身不应用 equate，故必须由本步替换。
 
 **GAS 语法修正**：
 

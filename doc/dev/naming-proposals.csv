@@ -1,5 +1,6 @@
 address,name,proposed_name,score,tags
 0x080000c0,init_cpu_stacks_and_irq_vector,,,frame_counter;prng;settings
+0x080000fc,IntrMain,,,irq;interrupt_dispatch
 0x080001f0,dispatch_thumb_isr_from_arm,,,
 0x08013510,reset_display_and_gl_state,,,bg;display;palette
 0x08013578,setup_demo_sprite_entry,,,scene_demo;settings
