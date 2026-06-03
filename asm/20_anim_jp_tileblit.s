@@ -5877,13 +5877,13 @@ LAB_080ebc0c:
 DAT_080ebcb0:
     .word  0x080000ae                     @ 080ebcb0 ae000008
 DAT_080ebcb4:
-    .word  0x0800b588                     @ 080ebcb4 88b50008
+    .word  lang_select_gfx_1              @ 080ebcb4 88b50008
 DAT_080ebcb8:
-    .word  0x0800aa10                     @ 080ebcb8 10aa0008
+    .word  lang_select_gfx_0              @ 080ebcb8 10aa0008
 DAT_080ebcbc:
-    .word  0x0800c240                     @ 080ebcbc 40c20008
+    .word  lang_select_gfx_2              @ 080ebcbc 40c20008
 DAT_080ebcc0:
-    .word  0x0800cd18                     @ 080ebcc0 18cd0008
+    .word  lang_select_gfx_3              @ 080ebcc0 18cd0008
 DAT_080ebcc4:
     .word  0x06010000                     @ 080ebcc4 00000106
 DAT_080ebcc8:
@@ -8535,7 +8535,7 @@ upload_tile_and_palette_from_struct:
 DAT_080edf48:
     .word  0x06004000                     @ 080edf48 00400006
 
-@ 被 load_pack_tile_and_map_to_vram (FUN_080ee010) 和 FUN_08023b6c (duel_field) 调用. 以 r3 指向的 tile 结构体为数据源, 按行迭代将 tile 数据写入 VRAM 目标地址 (0x06000800 区域). 每次迭代从源结构体读 2 个 u16 (tile_index/attr), 计算目标行偏移后以 strh 写入 VRAM. 副作用: 写入 [VRAM 0x06000800+按行偏移] 若干 halfword.
+@ 由 load_pack_tile_and_map_to_vram 与 init_duel_field_icon_and_bg_vram 调用. 从 r3 指向的图形块取 map 子块 (在 palette+tile 子块之后, 格式 [u16 count][6B][count×4B]), 逐项把 BG tilemap 写入 VRAM. 每项 2×u16: A = (Y<<8)|X (X=A&0x3f 列, Y=A>>8 行; X>31 走第二 screenblock; 屏幕位置 = X + Y*32 + param0); B = GBA BG tilemap 项 (B&0x3ff = tile 索引 + param2 base, B&0x400 = hflip, B&0x800 = vflip, B&0xf000 = 调色板). VRAM 目标 = 0x06000000 + screenblock + 位置*2. 参数: r0=param0 屏幕位置基址, r2=param2 tile 基号, r3=图形块指针.
 write_tile_row_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 080edf4c f0b5
     .hword 0x4657    @ 080edf4e 5746

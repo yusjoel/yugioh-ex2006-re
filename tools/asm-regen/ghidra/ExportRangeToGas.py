@@ -47,6 +47,8 @@ SKIP_REGIONS = [
     (0x08000242, 0x08000F36, '.include "data/game-strings-remap-table.s"'),
     # game-strings master pointer table @ 0x08000F40, 1651 行 x 24 B + 8 B pad = 39632 B
     (0x08000F40, 0x0800AA10, '.include "data/game-strings-pointer-table.s"'),
+    # 语言选择画面图形块 (4 块 tile+palette+map, 国旗 UI), render_lang_select 引用
+    (0x0800AA10, 0x0800DD90, '.include "data/lang-select-tiles.s"'),
 ]
 
 # --------------------------

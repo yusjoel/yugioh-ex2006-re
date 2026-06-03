@@ -64,6 +64,7 @@ EXPORT_PIPELINE = [
     (None, 'export_starter_deck.py'),           # data/starter-deck.s
     (None, 'export_struct_decks.py'),           # data/struct-decks.s
     (None, 'export_opponent_card_values.py'),   # data/opponent-card-values.s
+    (None, 'export_ui_tile_blocks.py'),         # data/lang-select-tiles.s + graphics/bin|images/lang-select/
 
     # Step 4: data/<text-dataset>.s → text/<text-dataset>/*.txt (UTF-8 源, 刷新)
     # ⚠ 覆盖 text/ 现内容; 编辑过 text/ 的话先备份再跑
