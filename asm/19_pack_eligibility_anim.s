@@ -18809,8 +18809,8 @@ scale_blend_param_struct:
     .hword 0x4699    @ 080e851a 9946
     cmp r6,#0x0                              @ 080e851c 002e
     bne LAB_080e852c                         @ 080e851e 05d1
-    ldr r0, DAT_080e85b4                     @ 080e8520 2448
-    ldr r2, DAT_080e85b8                     @ 080e8522 254a
+    ldr r0, scale_blend_param_struct_fx_mtx22_c_filename @ 080e8520 2448
+    ldr r2, scale_blend_param_struct_assert_psrc_null @ 080e8522 254a
     movs r1,#0x70    @ 080e8524 7021
     movs r3,#0x1    @ 080e8526 0123
     bl suppress_assert_report                @ 080e8528 11f0d8ff
@@ -18818,8 +18818,8 @@ LAB_080e852c:
     .hword 0x4640    @ 080e852c 4046
     cmp r0,#0x0                              @ 080e852e 0028
     bne LAB_080e853e                         @ 080e8530 05d1
-    ldr r0, DAT_080e85b4                     @ 080e8532 2048
-    ldr r2, DAT_080e85bc                     @ 080e8534 214a
+    ldr r0, scale_blend_param_struct_fx_mtx22_c_filename @ 080e8532 2048
+    ldr r2, scale_blend_param_struct_assert_pdst_null @ 080e8534 214a
     movs r1,#0x71    @ 080e8536 7121
     movs r3,#0x1    @ 080e8538 0123
     bl suppress_assert_report                @ 080e853a 11f0cfff
@@ -18879,12 +18879,12 @@ LAB_080e853e:
     pop {r0}                                 @ 080e85ae 01bc
     bx r0                                    @ 080e85b0 0047
     .zero  0x2
-DAT_080e85b4:
-    .word  0x09e49d2c                     @ 080e85b4 2c9de409
-DAT_080e85b8:
-    .word  0x09e49d1c                     @ 080e85b8 1c9de409
-DAT_080e85bc:
-    .word  0x09e49d0c                     @ 080e85bc 0c9de409
+scale_blend_param_struct_fx_mtx22_c_filename:
+    .word  fx_mtx22_c_filename            @ 080e85b4 2c9de409  nnsys/g2d/fx_mtx22.c
+scale_blend_param_struct_assert_psrc_null:
+    .word  assert_psrc_null               @ 080e85b8 1c9de409  (pSrc) != NULL
+scale_blend_param_struct_assert_pdst_null:
+    .word  assert_pdst_null               @ 080e85bc 0c9de409  (pDst) != NULL
 
 @ Compute the inverse of a 2x2 affine matrix and write result to output struct. Called from NNS G2D SRT control module when reverse transform is needed. Input matrix: [pIn+0], [pIn+4], [pIn+8], [pIn+0xc] (12.20 fixed-point, row-major 2x2). Computes det = [0]*[c] - [4]*[8]; returns -1 if det==0 (singular). Otherwise uses SCALE_UNITY/det as scale factor, writes adjugate components to pOut. If pIn==pOut, uses sp-local frame as intermediate buffer, then bios_cpu_set (count=4 words, copy mode) writes back in-place.
 @ Constants: SCALE_UNITY=0x01000000 (movs r0,#0x80; lsls r0,r0,#0x11; python: 128*131072=16777216=0x1000000; 12.20 fixed-point 1.0) / BIOS_CPUSET_CTRL_COPY_4W=0x04000004 (count=4 words, bit24=0 copy mode) / ROUNDING_HALF=0x800 / SINGULAR_RETURN=-1.
@@ -18898,8 +18898,8 @@ invert_srt_matrix:
     .hword 0x4689    @ 080e85cc 8946
     cmp r7,#0x0                              @ 080e85ce 002f
     bne LAB_080e85de                         @ 080e85d0 05d1
-    ldr r0, DAT_080e863c                     @ 080e85d2 1a48
-    ldr r2, DAT_080e8640                     @ 080e85d4 1a4a
+    ldr r0, invert_srt_matrix_fx_mtx22_c_filename @ 080e85d2 1a48
+    ldr r2, invert_srt_matrix_assert_psrc_null @ 080e85d4 1a4a
     movs r1,#0x8e    @ 080e85d6 8e21
     movs r3,#0x1    @ 080e85d8 0123
     bl suppress_assert_report                @ 080e85da 11f07fff
@@ -18907,8 +18907,8 @@ LAB_080e85de:
     .hword 0x4648    @ 080e85de 4846
     cmp r0,#0x0                              @ 080e85e0 0028
     bne LAB_080e85f0                         @ 080e85e2 05d1
-    ldr r0, DAT_080e863c                     @ 080e85e4 1548
-    ldr r2, DAT_080e8644                     @ 080e85e6 174a
+    ldr r0, invert_srt_matrix_fx_mtx22_c_filename @ 080e85e4 1548
+    ldr r2, invert_srt_matrix_assert_pdst_null @ 080e85e6 174a
     movs r1,#0x8f    @ 080e85e8 8f21
     movs r3,#0x1    @ 080e85ea 0123
     bl suppress_assert_report                @ 080e85ec 11f076ff
@@ -18950,12 +18950,12 @@ LAB_080e85f8:
     rsbs r0,r0,#0    @ 080e8636 4042
     b LAB_080e86da                           @ 080e8638 4fe0
     .zero  0x2
-DAT_080e863c:
-    .word  0x09e49d2c                     @ 080e863c 2c9de409
-DAT_080e8640:
-    .word  0x09e49d1c                     @ 080e8640 1c9de409
-DAT_080e8644:
-    .word  0x09e49d0c                     @ 080e8644 0c9de409
+invert_srt_matrix_fx_mtx22_c_filename:
+    .word  fx_mtx22_c_filename            @ 080e863c 2c9de409  nnsys/g2d/fx_mtx22.c
+invert_srt_matrix_assert_psrc_null:
+    .word  assert_psrc_null               @ 080e8640 1c9de409  (pSrc) != NULL
+invert_srt_matrix_assert_pdst_null:
+    .word  assert_pdst_null               @ 080e8644 0c9de409  (pDst) != NULL
 DAT_080e8648:
     .word  0x00000800                     @ 080e8648 00080000
 DAT_080e864c:
@@ -19050,8 +19050,8 @@ multiply_srt_matrices:
     str r2,[sp,#0x10]                        @ 080e86fc 0492
     cmp r0,#0x0                              @ 080e86fe 0028
     bne LAB_080e870e                         @ 080e8700 05d1
-    ldr r0, DAT_080e8858                     @ 080e8702 5548
-    ldr r2, DAT_080e885c                     @ 080e8704 554a
+    ldr r0, multiply_srt_matrices_fx_mtx22_c_filename @ 080e8702 5548
+    ldr r2, multiply_srt_matrices_assert_a_null @ 080e8704 554a
     movs r1,#0xcb    @ 080e8706 cb21
     movs r3,#0x1    @ 080e8708 0123
     bl suppress_assert_report                @ 080e870a 11f0e7fe
@@ -19059,8 +19059,8 @@ LAB_080e870e:
     .hword 0x4648    @ 080e870e 4846
     cmp r0,#0x0                              @ 080e8710 0028
     bne LAB_080e8720                         @ 080e8712 05d1
-    ldr r0, DAT_080e8858                     @ 080e8714 5048
-    ldr r2, DAT_080e8860                     @ 080e8716 524a
+    ldr r0, multiply_srt_matrices_fx_mtx22_c_filename @ 080e8714 5048
+    ldr r2, multiply_srt_matrices_assert_b_null @ 080e8716 524a
     movs r1,#0xcc    @ 080e8718 cc21
     movs r3,#0x1    @ 080e871a 0123
     bl suppress_assert_report                @ 080e871c 11f0defe
@@ -19068,8 +19068,8 @@ LAB_080e8720:
     ldr r1,[sp,#0x10]                        @ 080e8720 0499
     cmp r1,#0x0                              @ 080e8722 0029
     bne LAB_080e8732                         @ 080e8724 05d1
-    ldr r0, DAT_080e8858                     @ 080e8726 4c48
-    ldr r2, DAT_080e8864                     @ 080e8728 4e4a
+    ldr r0, multiply_srt_matrices_fx_mtx22_c_filename @ 080e8726 4c48
+    ldr r2, multiply_srt_matrices_assert_ab_null @ 080e8728 4e4a
     movs r1,#0xcd    @ 080e872a cd21
     movs r3,#0x1    @ 080e872c 0123
     bl suppress_assert_report                @ 080e872e 11f0d5fe
@@ -19215,14 +19215,14 @@ LAB_080e8846:
     pop {r0}                                 @ 080e8852 01bc
     bx r0                                    @ 080e8854 0047
     .zero  0x2
-DAT_080e8858:
-    .word  0x09e49d2c                     @ 080e8858 2c9de409
-DAT_080e885c:
-    .word  0x09e49d44                     @ 080e885c 449de409
-DAT_080e8860:
-    .word  0x09e49d50                     @ 080e8860 509de409
-DAT_080e8864:
-    .word  0x09e49d5c                     @ 080e8864 5c9de409
+multiply_srt_matrices_fx_mtx22_c_filename:
+    .word  fx_mtx22_c_filename            @ 080e8858 2c9de409  nnsys/g2d/fx_mtx22.c
+multiply_srt_matrices_assert_a_null:
+    .word  assert_a_null                  @ 080e885c 449de409  (a) != NULL
+multiply_srt_matrices_assert_b_null:
+    .word  assert_b_null                  @ 080e8860 509de409  (b) != NULL
+multiply_srt_matrices_assert_ab_null:
+    .word  assert_ab_null                 @ 080e8864 5c9de409  (ab) != NULL
 
 @ Computes 64-bit signed product and returns the middle 32 bits (result >> 12).
 @ Entry: asrs r3,r2,#0x1f sign-extends r2 to 64-bit pair (r2,r3).
@@ -19279,8 +19279,8 @@ invoke_anim_functor_at_frame:
     lsrs r5,r1,#0x10    @ 080e8882 0d0c
     cmp r4,#0x0                              @ 080e8884 002c
     bne LAB_080e8894                         @ 080e8886 05d1
-    ldr r0, DWORD_080e88a0                   @ 080e8888 0548
-    ldr r2, DWORD_080e88a4                   @ 080e888a 064a
+    ldr r0, invoke_anim_functor_at_frame_g2d_animation_c_filename @ 080e8888 0548
+    ldr r2, invoke_anim_functor_at_frame_assert_pfunctor @ 080e888a 064a
     movs r1,#0x75    @ 080e888c 7521
     movs r3,#0x1    @ 080e888e 0123
     bl suppress_assert_report                @ 080e8890 11f024fe
@@ -19291,10 +19291,10 @@ LAB_080e8894:
     cmp r0,#0x3                              @ 080e889a 0328
     beq LAB_080e88ba                         @ 080e889c 0dd0
     b LAB_080e88c4                           @ 080e889e 11e0
-DWORD_080e88a0:
-    .word  0x09e4a4a8                     @ 080e88a0 a8a4e409
-DWORD_080e88a4:
-    .word  0x09e4a500                     @ 080e88a4 00a5e409
+invoke_anim_functor_at_frame_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e88a0 a8a4e409  nnsys/g2d/g2d_Animation.c
+invoke_anim_functor_at_frame_assert_pfunctor:
+    .word  assert_pfunctor                @ 080e88a4 00a5e409  pFunctor
 LAB_080e88a8:
     ldrh r0,[r4,#0xc]                        @ 080e88a8 a089
     cmp r5,r0                                @ 080e88aa 8542
@@ -19321,8 +19321,8 @@ advance_anim_ctrl_frame:
     adds r6,r0,#0x0    @ 080e88ce 061c
     cmp r6,#0x0                              @ 080e88d0 002e
     bne LAB_080e88f0                         @ 080e88d2 0dd1
-    ldr r4, DAT_080e89f4                     @ 080e88d4 474c
-    ldr r5, DAT_080e89f8                     @ 080e88d6 484d
+    ldr r4, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e88d4 474c
+    ldr r5, advance_anim_ctrl_frame_assert_panimctrl @ 080e88d6 484d
     adds r0,r4,#0x0    @ 080e88d8 201c
     movs r1,#0xf8    @ 080e88da f821
     adds r2,r5,#0x0    @ 080e88dc 2a1c
@@ -19337,16 +19337,16 @@ LAB_080e88f0:
     ldr r0,[r6,#0x18]                        @ 080e88f0 b069
     cmp r0,#0x0                              @ 080e88f2 0028
     bne LAB_080e8902                         @ 080e88f4 05d1
-    ldr r0, DAT_080e89f4                     @ 080e88f6 3f48
-    ldr r2, DAT_080e89fc                     @ 080e88f8 404a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e88f6 3f48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence @ 080e88f8 404a
     movs r1,#0x4e    @ 080e88fa 4e21
     movs r3,#0x1    @ 080e88fc 0123
     bl suppress_assert_report                @ 080e88fe 11f0edfd
 LAB_080e8902:
     cmp r6,#0x0                              @ 080e8902 002e
     bne LAB_080e8912                         @ 080e8904 05d1
-    ldr r0, DAT_080e89f4                     @ 080e8906 3b48
-    ldr r2, DAT_080e89f8                     @ 080e8908 3b4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e8906 3b48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl @ 080e8908 3b4a
     movs r1,#0x2c    @ 080e890a 2c21
     movs r3,#0x1    @ 080e890c 0123
     bl suppress_assert_report                @ 080e890e 11f0e5fd
@@ -19354,8 +19354,8 @@ LAB_080e8912:
     ldr r0,[r6,#0x18]                        @ 080e8912 b069
     cmp r0,#0x0                              @ 080e8914 0028
     bne LAB_080e8924                         @ 080e8916 05d1
-    ldr r0, DAT_080e89f4                     @ 080e8918 3648
-    ldr r2, DAT_080e89fc                     @ 080e891a 384a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e8918 3648
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence @ 080e891a 384a
     movs r1,#0x2d    @ 080e891c 2d21
     movs r3,#0x1    @ 080e891e 0123
     bl suppress_assert_report                @ 080e8920 11f0dcfd
@@ -19376,8 +19376,8 @@ LAB_080e8938:
     beq LAB_080e8a14                         @ 080e893a 6bd0
     cmp r6,#0x0                              @ 080e893c 002e
     bne LAB_080e894c                         @ 080e893e 05d1
-    ldr r0, DAT_080e89f4                     @ 080e8940 2c48
-    ldr r2, DAT_080e89f8                     @ 080e8942 2d4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e8940 2c48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl @ 080e8942 2d4a
     movs r1,#0xd5    @ 080e8944 d521
     movs r3,#0x1    @ 080e8946 0123
     bl suppress_assert_report                @ 080e8948 11f0c8fd
@@ -19389,8 +19389,8 @@ LAB_080e894c:
     ldr r5,[r6,#0x0]                         @ 080e8954 3568
     cmp r5,#0x0                              @ 080e8956 002d
     bne LAB_080e8966                         @ 080e8958 05d1
-    ldr r0, DAT_080e89f4                     @ 080e895a 2648
-    ldr r2, DAT_080e8a00                     @ 080e895c 284a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e895a 2648
+    ldr r2, advance_anim_ctrl_frame_assert_pframe @ 080e895c 284a
     movs r1,#0x92    @ 080e895e 9221
     movs r3,#0x1    @ 080e8960 0123
     bl suppress_assert_report                @ 080e8962 11f0bbfd
@@ -19398,8 +19398,8 @@ LAB_080e8966:
     ldr r4,[r6,#0x18]                        @ 080e8966 b469
     cmp r4,#0x0                              @ 080e8968 002c
     bne LAB_080e8978                         @ 080e896a 05d1
-    ldr r0, DAT_080e89f4                     @ 080e896c 2148
-    ldr r2, DAT_080e8a04                     @ 080e896e 254a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e896c 2148
+    ldr r2, advance_anim_ctrl_frame_assert_psequence_4c4 @ 080e896e 254a
     movs r1,#0x19    @ 080e8970 1921
     movs r3,#0x1    @ 080e8972 0123
     bl suppress_assert_report                @ 080e8974 11f0b2fd
@@ -19424,8 +19424,8 @@ LAB_080e8990:
     ldr r0,[r6,#0x24]                        @ 080e8996 706a
     cmp r0,#0x0                              @ 080e8998 0028
     bne LAB_080e89a8                         @ 080e899a 05d1
-    ldr r0, DAT_080e89f4                     @ 080e899c 1548
-    ldr r2, DAT_080e8a08                     @ 080e899e 1a4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e899c 1548
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_callbackfunctor_pfun @ 080e899e 1a4a
     movs r1,#0xc2    @ 080e89a0 c221
     movs r3,#0x1    @ 080e89a2 0123
     bl suppress_assert_report                @ 080e89a4 11f09afd
@@ -19438,16 +19438,16 @@ LAB_080e89b2:
     ldr r0,[r6,#0x18]                        @ 080e89b2 b069
     cmp r0,#0x0                              @ 080e89b4 0028
     bne LAB_080e89d6                         @ 080e89b6 0ed1
-    ldr r0, DAT_080e89f4                     @ 080e89b8 0e48
-    ldr r2, DAT_080e89fc                     @ 080e89ba 104a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e89b8 0e48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence @ 080e89ba 104a
     movs r1,#0x3f    @ 080e89bc 3f21
     movs r3,#0x1    @ 080e89be 0123
     bl suppress_assert_report                @ 080e89c0 11f08cfd
     ldr r0,[r6,#0x18]                        @ 080e89c4 b069
     cmp r0,#0x0                              @ 080e89c6 0028
     bne LAB_080e89d6                         @ 080e89c8 05d1
-    ldr r0, DAT_080e89f4                     @ 080e89ca 0a48
-    ldr r2, DAT_080e89fc                     @ 080e89cc 0b4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename @ 080e89ca 0a48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence @ 080e89cc 0b4a
     movs r1,#0x2d    @ 080e89ce 2d21
     movs r3,#0x1    @ 080e89d0 0123
     bl suppress_assert_report                @ 080e89d2 11f083fd
@@ -19470,18 +19470,18 @@ LAB_080e89ec:
     bne LAB_080e8a0c                         @ 080e89ee 0dd1
     str r1,[r6,#0x8]                         @ 080e89f0 b160
     b LAB_080e8ae2                           @ 080e89f2 76e0
-DAT_080e89f4:
-    .word  0x09e4a4a8                     @ 080e89f4 a8a4e409
-DAT_080e89f8:
-    .word  0x09e4a49c                     @ 080e89f8 9ca4e409
-DAT_080e89fc:
-    .word  0x09e4a4d0                     @ 080e89fc d0a4e409
-DAT_080e8a00:
-    .word  0x09e4a50c                     @ 080e8a00 0ca5e409
-DAT_080e8a04:
-    .word  0x09e4a4c4                     @ 080e8a04 c4a4e409
-DAT_080e8a08:
-    .word  0x09e4a514                     @ 080e8a08 14a5e409
+advance_anim_ctrl_frame_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e89f4 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_ctrl_frame_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e89f8 9ca4e409  pAnimCtrl
+advance_anim_ctrl_frame_assert_panimctrl_panimsequence:
+    .word  assert_panimctrl_panimsequence @ 080e89fc d0a4e409  pAnimCtrl->pAnimSequence
+advance_anim_ctrl_frame_assert_pframe:
+    .word  assert_pframe                  @ 080e8a00 0ca5e409  pFrame
+advance_anim_ctrl_frame_assert_psequence_4c4:
+    .word  assert_psequence_4c4           @ 080e8a04 c4a4e409  pSequence
+advance_anim_ctrl_frame_assert_panimctrl_callbackfunctor_pfun:
+    .word  assert_panimctrl_callbackfunctor_pfun @ 080e8a08 14a5e409  pAnimCtrl->callbackFunctor.pFunc
 LAB_080e8a0c:
     adds r0,r6,#0x0    @ 080e8a0c 301c
     bl set_anim_ctrl_position_fwd            @ 080e8a0e 00f075fb
@@ -19489,8 +19489,8 @@ LAB_080e8a0c:
 LAB_080e8a14:
     cmp r6,#0x0                              @ 080e8a14 002e
     bne LAB_080e8a34                         @ 080e8a16 0dd1
-    ldr r4, DAT_080e8ac8                     @ 080e8a18 2b4c
-    ldr r5, DAT_080e8acc                     @ 080e8a1a 2c4d
+    ldr r4, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a18 2b4c
+    ldr r5, advance_anim_ctrl_frame_assert_panimctrl_acc @ 080e8a1a 2c4d
     adds r0,r4,#0x0    @ 080e8a1c 201c
     movs r1,#0xe6    @ 080e8a1e e621
     adds r2,r5,#0x0    @ 080e8a20 2a1c
@@ -19508,8 +19508,8 @@ LAB_080e8a34:
     ldr r0,[r6,#0x24]                        @ 080e8a3a 706a
     cmp r0,#0x0                              @ 080e8a3c 0028
     bne LAB_080e8a4c                         @ 080e8a3e 05d1
-    ldr r0, DAT_080e8ac8                     @ 080e8a40 2148
-    ldr r2, DAT_080e8ad0                     @ 080e8a42 234a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a40 2148
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_callbackfunctor_pfun_ad0 @ 080e8a42 234a
     movs r1,#0xc2    @ 080e8a44 c221
     movs r3,#0x1    @ 080e8a46 0123
     bl suppress_assert_report                @ 080e8a48 11f048fd
@@ -19521,8 +19521,8 @@ LAB_080e8a4c:
 LAB_080e8a56:
     cmp r6,#0x0                              @ 080e8a56 002e
     bne LAB_080e8a66                         @ 080e8a58 05d1
-    ldr r0, DAT_080e8ac8                     @ 080e8a5a 1b48
-    ldr r2, DAT_080e8acc                     @ 080e8a5c 1b4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a5a 1b48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_acc @ 080e8a5c 1b4a
     movs r1,#0x3e    @ 080e8a5e 3e21
     movs r3,#0x1    @ 080e8a60 0123
     bl suppress_assert_report                @ 080e8a62 11f03bfd
@@ -19530,16 +19530,16 @@ LAB_080e8a66:
     ldr r0,[r6,#0x18]                        @ 080e8a66 b069
     cmp r0,#0x0                              @ 080e8a68 0028
     bne LAB_080e8a78                         @ 080e8a6a 05d1
-    ldr r0, DAT_080e8ac8                     @ 080e8a6c 1648
-    ldr r2, DAT_080e8ad4                     @ 080e8a6e 194a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a6c 1648
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence_ad4 @ 080e8a6e 194a
     movs r1,#0x3f    @ 080e8a70 3f21
     movs r3,#0x1    @ 080e8a72 0123
     bl suppress_assert_report                @ 080e8a74 11f032fd
 LAB_080e8a78:
     cmp r6,#0x0                              @ 080e8a78 002e
     bne LAB_080e8a88                         @ 080e8a7a 05d1
-    ldr r0, DAT_080e8ac8                     @ 080e8a7c 1248
-    ldr r2, DAT_080e8acc                     @ 080e8a7e 134a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a7c 1248
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_acc @ 080e8a7e 134a
     movs r1,#0x2c    @ 080e8a80 2c21
     movs r3,#0x1    @ 080e8a82 0123
     bl suppress_assert_report                @ 080e8a84 11f02afd
@@ -19547,8 +19547,8 @@ LAB_080e8a88:
     ldr r0,[r6,#0x18]                        @ 080e8a88 b069
     cmp r0,#0x0                              @ 080e8a8a 0028
     bne LAB_080e8a9a                         @ 080e8a8c 05d1
-    ldr r0, DAT_080e8ac8                     @ 080e8a8e 0e48
-    ldr r2, DAT_080e8ad4                     @ 080e8a90 104a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_ac8 @ 080e8a8e 0e48
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_panimsequence_ad4 @ 080e8a90 104a
     movs r1,#0x2d    @ 080e8a92 2d21
     movs r3,#0x1    @ 080e8a94 0123
     bl suppress_assert_report                @ 080e8a96 11f021fd
@@ -19571,24 +19571,24 @@ LAB_080e8ab0:
     bne LAB_080e8adc                         @ 080e8ab2 13d1
     cmp r6,#0x0                              @ 080e8ab4 002e
     bne LAB_080e8ac4                         @ 080e8ab6 05d1
-    ldr r0, DAT_080e8ad8                     @ 080e8ab8 0748
-    ldr r2, DAT_080e8acc                     @ 080e8aba 044a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_inline_h_filename @ 080e8ab8 0748
+    ldr r2, advance_anim_ctrl_frame_assert_panimctrl_acc @ 080e8aba 044a
     movs r1,#0x9d    @ 080e8abc 9d21
     movs r3,#0x1    @ 080e8abe 0123
     bl suppress_assert_report                @ 080e8ac0 11f00cfd
 LAB_080e8ac4:
     str r4,[r6,#0x8]                         @ 080e8ac4 b460
     b LAB_080e8ae2                           @ 080e8ac6 0ce0
-DAT_080e8ac8:
-    .word  0x09e4a4a8                     @ 080e8ac8 a8a4e409
-DAT_080e8acc:
-    .word  0x09e4a49c                     @ 080e8acc 9ca4e409
-DAT_080e8ad0:
-    .word  0x09e4a514                     @ 080e8ad0 14a5e409
-DAT_080e8ad4:
-    .word  0x09e4a4d0                     @ 080e8ad4 d0a4e409
-DAT_080e8ad8:
-    .word  0x09e4a474                     @ 080e8ad8 74a4e409
+advance_anim_ctrl_frame_g2d_animation_c_filename_ac8:
+    .word  g2d_animation_c_filename       @ 080e8ac8 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_ctrl_frame_assert_panimctrl_acc:
+    .word  assert_panimctrl               @ 080e8acc 9ca4e409  pAnimCtrl
+advance_anim_ctrl_frame_assert_panimctrl_callbackfunctor_pfun_ad0:
+    .word  assert_panimctrl_callbackfunctor_pfun @ 080e8ad0 14a5e409  pAnimCtrl->callbackFunctor.pFunc
+advance_anim_ctrl_frame_assert_panimctrl_panimsequence_ad4:
+    .word  assert_panimctrl_panimsequence @ 080e8ad4 d0a4e409  pAnimCtrl->pAnimSequence
+advance_anim_ctrl_frame_g2d_animation_inline_h_filename:
+    .word  g2d_animation_inline_h_filename @ 080e8ad8 74a4e409  inc/nnsys/g2d/g2d_Animation_inline.h
 LAB_080e8adc:
     adds r0,r6,#0x0    @ 080e8adc 301c
     bl set_anim_ctrl_position_fwd            @ 080e8ade 00f00dfb
@@ -19596,8 +19596,8 @@ LAB_080e8ae2:
     ldr r4,[r6,#0x18]                        @ 080e8ae2 b469
     cmp r4,#0x0                              @ 080e8ae4 002c
     bne LAB_080e8af4                         @ 080e8ae6 05d1
-    ldr r0, DAT_080e8b24                     @ 080e8ae8 0e48
-    ldr r2, DAT_080e8b28                     @ 080e8aea 0f4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_b24 @ 080e8ae8 0e48
+    ldr r2, advance_anim_ctrl_frame_assert_psequence_4c4_b28 @ 080e8aea 0f4a
     movs r1,#0x13    @ 080e8aec 1321
     movs r3,#0x1    @ 080e8aee 0123
     bl suppress_assert_report                @ 080e8af0 11f0f4fc
@@ -19613,8 +19613,8 @@ LAB_080e8af4:
     ldr r4,[r6,#0x18]                        @ 080e8b04 b469
     cmp r4,#0x0                              @ 080e8b06 002c
     bne LAB_080e8b16                         @ 080e8b08 05d1
-    ldr r0, DAT_080e8b24                     @ 080e8b0a 0648
-    ldr r2, DAT_080e8b28                     @ 080e8b0c 064a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_b24 @ 080e8b0a 0648
+    ldr r2, advance_anim_ctrl_frame_assert_psequence_4c4_b28 @ 080e8b0c 064a
     movs r1,#0x13    @ 080e8b0e 1321
     movs r3,#0x1    @ 080e8b10 0123
     bl suppress_assert_report                @ 080e8b12 11f0e3fc
@@ -19626,16 +19626,16 @@ LAB_080e8b16:
     subs r0,#0x8    @ 080e8b1e 0838
     b LAB_080e8b5a                           @ 080e8b20 1be0
     .zero  0x2
-DAT_080e8b24:
-    .word  0x09e4a4a8                     @ 080e8b24 a8a4e409
-DAT_080e8b28:
-    .word  0x09e4a4c4                     @ 080e8b28 c4a4e409
+advance_anim_ctrl_frame_g2d_animation_c_filename_b24:
+    .word  g2d_animation_c_filename       @ 080e8b24 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_ctrl_frame_assert_psequence_4c4_b28:
+    .word  assert_psequence_4c4           @ 080e8b28 c4a4e409  pSequence
 LAB_080e8b2c:
     ldr r4,[r6,#0x18]                        @ 080e8b2c b469
     cmp r4,#0x0                              @ 080e8b2e 002c
     bne LAB_080e8b3e                         @ 080e8b30 05d1
-    ldr r0, DAT_080e8b64                     @ 080e8b32 0c48
-    ldr r2, DAT_080e8b68                     @ 080e8b34 0c4a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_b64 @ 080e8b32 0c48
+    ldr r2, advance_anim_ctrl_frame_assert_psequence_4c4_b68 @ 080e8b34 0c4a
     movs r1,#0xd    @ 080e8b36 0d21
     movs r3,#0x1    @ 080e8b38 0123
     bl suppress_assert_report                @ 080e8b3a 11f0cffc
@@ -19647,8 +19647,8 @@ LAB_080e8b3e:
     ldr r4,[r6,#0x18]                        @ 080e8b46 b469
     cmp r4,#0x0                              @ 080e8b48 002c
     bne LAB_080e8b58                         @ 080e8b4a 05d1
-    ldr r0, DAT_080e8b64                     @ 080e8b4c 0548
-    ldr r2, DAT_080e8b68                     @ 080e8b4e 064a
+    ldr r0, advance_anim_ctrl_frame_g2d_animation_c_filename_b64 @ 080e8b4c 0548
+    ldr r2, advance_anim_ctrl_frame_assert_psequence_4c4_b68 @ 080e8b4e 064a
     movs r1,#0xd    @ 080e8b50 0d21
     movs r3,#0x1    @ 080e8b52 0123
     bl suppress_assert_report                @ 080e8b54 11f0c2fc
@@ -19661,10 +19661,10 @@ LAB_080e8b5c:
     pop {r0}                                 @ 080e8b5e 01bc
     bx r0                                    @ 080e8b60 0047
     .zero  0x2
-DAT_080e8b64:
-    .word  0x09e4a4a8                     @ 080e8b64 a8a4e409
-DAT_080e8b68:
-    .word  0x09e4a4c4                     @ 080e8b68 c4a4e409
+advance_anim_ctrl_frame_g2d_animation_c_filename_b64:
+    .word  g2d_animation_c_filename       @ 080e8b64 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_ctrl_frame_assert_psequence_4c4_b68:
+    .word  assert_psequence_4c4           @ 080e8b68 c4a4e409  pSequence
 
 @ g2d_Animation.c line 272-273. r0=NNS_G2dCellAnimation* pAnimCtrl (non-NULL), r1=u16 seqId [0..numSequences-1] (high 16 bits truncated), r2=NNS_G2dAnimBankData* pAnimBank (must already be bound). Asserts pAnimCtrl != NULL and pAnimCtrl->pAnimSequence != NULL, checks seqId < pAnimBank->numSequences, then writes &pAnimBank->pSequenceArrayHead[seqId*8] to pAnimCtrl->pAnimSequence (+0). Returns 1=success, 0=out-of-bounds. Side-effect: pAnimCtrl active sequence pointer updated.
 set_cell_anim_sequence_by_index:
@@ -19675,19 +19675,19 @@ set_cell_anim_sequence_by_index:
     adds r6,r5,#0x0    @ 080e8b74 2e1c
     cmp r4,#0x0                              @ 080e8b76 002c
     bne LAB_080e8b88                         @ 080e8b78 06d1
-    ldr r0, DAT_080e8ba8                     @ 080e8b7a 0b48
+    ldr r0, set_cell_anim_sequence_by_index_g2d_animation_c_filename @ 080e8b7a 0b48
     movs r1,#0x88    @ 080e8b7c 8821
     lsls r1,r1,#0x1    @ 080e8b7e 4900
-    ldr r2, DAT_080e8bac                     @ 080e8b80 0a4a
+    ldr r2, set_cell_anim_sequence_by_index_assert_panimctrl @ 080e8b80 0a4a
     movs r3,#0x1    @ 080e8b82 0123
     bl suppress_assert_report                @ 080e8b84 11f0aafc
 LAB_080e8b88:
     ldr r0,[r4,#0x18]                        @ 080e8b88 a069
     cmp r0,#0x0                              @ 080e8b8a 0028
     bne LAB_080e8b9a                         @ 080e8b8c 05d1
-    ldr r0, DAT_080e8ba8                     @ 080e8b8e 0648
+    ldr r0, set_cell_anim_sequence_by_index_g2d_animation_c_filename @ 080e8b8e 0648
     ldr r1, DAT_080e8bb0                     @ 080e8b90 0749
-    ldr r2, DAT_080e8bb4                     @ 080e8b92 084a
+    ldr r2, set_cell_anim_sequence_by_index_assert_panimctrl_panimsequence @ 080e8b92 084a
     movs r3,#0x1    @ 080e8b94 0123
     bl suppress_assert_report                @ 080e8b96 11f0a1fc
 LAB_080e8b9a:
@@ -19698,14 +19698,14 @@ LAB_080e8b9a:
     movs r0,#0x0    @ 080e8ba2 0020
     b LAB_080e8bc2                           @ 080e8ba4 0de0
     .zero  0x2
-DAT_080e8ba8:
-    .word  0x09e4a4a8                     @ 080e8ba8 a8a4e409
-DAT_080e8bac:
-    .word  0x09e4a49c                     @ 080e8bac 9ca4e409
+set_cell_anim_sequence_by_index_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8ba8 a8a4e409  nnsys/g2d/g2d_Animation.c
+set_cell_anim_sequence_by_index_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8bac 9ca4e409  pAnimCtrl
 DAT_080e8bb0:
     .word  0x00000111                     @ 080e8bb0 11010000
-DAT_080e8bb4:
-    .word  0x09e4a4d0                     @ 080e8bb4 d0a4e409
+set_cell_anim_sequence_by_index_assert_panimctrl_panimsequence:
+    .word  assert_panimctrl_panimsequence @ 080e8bb4 d0a4e409  pAnimCtrl->pAnimSequence
 LAB_080e8bb8:
     lsls r1,r6,#0x3    @ 080e8bb8 f100
     ldr r0,[r0,#0xc]                         @ 080e8bba c068
@@ -19723,19 +19723,19 @@ get_anim_ctrl_current_frame_ptr:
     adds r4,r0,#0x0    @ 080e8bca 041c
     cmp r4,#0x0                              @ 080e8bcc 002c
     bne LAB_080e8bdc                         @ 080e8bce 05d1
-    ldr r0, DAT_080e8c10                     @ 080e8bd0 0f48
+    ldr r0, get_anim_ctrl_current_frame_ptr_g2d_animation_c_filename @ 080e8bd0 0f48
     ldr r1, DAT_080e8c14                     @ 080e8bd2 1049
-    ldr r2, DAT_080e8c18                     @ 080e8bd4 104a
+    ldr r2, get_anim_ctrl_current_frame_ptr_assert_panimctrl @ 080e8bd4 104a
     movs r3,#0x1    @ 080e8bd6 0123
     bl suppress_assert_report                @ 080e8bd8 11f080fc
 LAB_080e8bdc:
     ldr r0,[r4,#0x0]                         @ 080e8bdc 2068
     cmp r0,#0x0                              @ 080e8bde 0028
     bne LAB_080e8bf0                         @ 080e8be0 06d1
-    ldr r0, DAT_080e8c10                     @ 080e8be2 0b48
+    ldr r0, get_anim_ctrl_current_frame_ptr_g2d_animation_c_filename @ 080e8be2 0b48
     movs r1,#0x98    @ 080e8be4 9821
     lsls r1,r1,#0x1    @ 080e8be6 4900
-    ldr r2, DAT_080e8c1c                     @ 080e8be8 0c4a
+    ldr r2, get_anim_ctrl_current_frame_ptr_assert_panimctrl_pcurrent @ 080e8be8 0c4a
     movs r3,#0x1    @ 080e8bea 0123
     bl suppress_assert_report                @ 080e8bec 11f076fc
 LAB_080e8bf0:
@@ -19743,9 +19743,9 @@ LAB_080e8bf0:
     ldr r0,[r0,#0x0]                         @ 080e8bf2 0068
     cmp r0,#0x0                              @ 080e8bf4 0028
     bne LAB_080e8c04                         @ 080e8bf6 05d1
-    ldr r0, DAT_080e8c10                     @ 080e8bf8 0548
+    ldr r0, get_anim_ctrl_current_frame_ptr_g2d_animation_c_filename @ 080e8bf8 0548
     ldr r1, DAT_080e8c20                     @ 080e8bfa 0949
-    ldr r2, DAT_080e8c24                     @ 080e8bfc 094a
+    ldr r2, get_anim_ctrl_current_frame_ptr_assert_void_panimctrl_pcurrent_pconte @ 080e8bfc 094a
     movs r3,#0x1    @ 080e8bfe 0123
     bl suppress_assert_report                @ 080e8c00 11f06cfc
 LAB_080e8c04:
@@ -19755,18 +19755,18 @@ LAB_080e8c04:
     pop {r1}                                 @ 080e8c0a 02bc
     bx r1                                    @ 080e8c0c 0847
     .zero  0x2
-DAT_080e8c10:
-    .word  0x09e4a4a8                     @ 080e8c10 a8a4e409
+get_anim_ctrl_current_frame_ptr_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8c10 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e8c14:
     .word  0x0000012f                     @ 080e8c14 2f010000
-DAT_080e8c18:
-    .word  0x09e4a49c                     @ 080e8c18 9ca4e409
-DAT_080e8c1c:
-    .word  0x09e4a4ec                     @ 080e8c1c eca4e409
+get_anim_ctrl_current_frame_ptr_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8c18 9ca4e409  pAnimCtrl
+get_anim_ctrl_current_frame_ptr_assert_panimctrl_pcurrent:
+    .word  assert_panimctrl_pcurrent      @ 080e8c1c eca4e409  pAnimCtrl->pCurrent
 DAT_080e8c20:
     .word  0x00000131                     @ 080e8c20 31010000
-DAT_080e8c24:
-    .word  0x09e4a538                     @ 080e8c24 38a5e409
+get_anim_ctrl_current_frame_ptr_assert_void_panimctrl_pcurrent_pconte:
+    .word  assert_void_panimctrl_pcurrent_pconte @ 080e8c24 38a5e409  (void*)pAnimCtrl->pCurrent->pContent
 
 @ Advance the animation frame pointer by one frame (+8 or -8 bytes) based on current direction flag, then clamp result to the valid range [pBank->base .. pBank->base + count*8). Called from NNS G2D animation driver (g2d_CellAnimation.c) in step_anim_ctrl_by_frames or frame-wrap logic. If frame pointer exceeds upper bound, forces wrap to upper bound; if below lower bound, holds at lower bound. Returns clamped frame data pointer [r5+0].
 @ Constants: FRAME_SIZE=8 (bytes per frame struct).
@@ -19775,17 +19775,17 @@ advance_anim_frame_ptr_clamped:
     adds r6,r0,#0x0    @ 080e8c2a 061c
     cmp r6,#0x0                              @ 080e8c2c 002e
     bne LAB_080e8c3e                         @ 080e8c2e 06d1
-    ldr r0, DAT_080e8c64                     @ 080e8c30 0c48
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename @ 080e8c30 0c48
     movs r1,#0x9c    @ 080e8c32 9c21
     lsls r1,r1,#0x1    @ 080e8c34 4900
-    ldr r2, DAT_080e8c68                     @ 080e8c36 0c4a
+    ldr r2, advance_anim_frame_ptr_clamped_assert_panimctrl @ 080e8c36 0c4a
     movs r3,#0x1    @ 080e8c38 0123
     bl suppress_assert_report                @ 080e8c3a 11f04ffc
 LAB_080e8c3e:
     cmp r6,#0x0                              @ 080e8c3e 002e
     bne LAB_080e8c4e                         @ 080e8c40 05d1
-    ldr r0, DAT_080e8c64                     @ 080e8c42 0848
-    ldr r2, DAT_080e8c68                     @ 080e8c44 084a
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename @ 080e8c42 0848
+    ldr r2, advance_anim_frame_ptr_clamped_assert_panimctrl @ 080e8c44 084a
     movs r1,#0x5c    @ 080e8c46 5c21
     movs r3,#0x1    @ 080e8c48 0123
     bl suppress_assert_report                @ 080e8c4a 11f047fc
@@ -19801,10 +19801,10 @@ LAB_080e8c4e:
     lsrs r1,r1,#0x1f    @ 080e8c5e c90f
     b LAB_080e8c74                           @ 080e8c60 08e0
     .zero  0x2
-DAT_080e8c64:
-    .word  0x09e4a4a8                     @ 080e8c64 a8a4e409
-DAT_080e8c68:
-    .word  0x09e4a49c                     @ 080e8c68 9ca4e409
+advance_anim_frame_ptr_clamped_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8c64 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_frame_ptr_clamped_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8c68 9ca4e409  pAnimCtrl
 LAB_080e8c6c:
     ldr r1,[r6,#0x4]                         @ 080e8c6c 7168
     cmp r1,#0x0                              @ 080e8c6e 0029
@@ -19825,8 +19825,8 @@ LAB_080e8c86:
     ldr r4,[r6,#0x18]                        @ 080e8c86 b469
     cmp r4,#0x0                              @ 080e8c88 002c
     bne LAB_080e8c98                         @ 080e8c8a 05d1
-    ldr r0, DAT_080e8cc8                     @ 080e8c8c 0e48
-    ldr r2, DAT_080e8ccc                     @ 080e8c8e 0f4a
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename_cc8 @ 080e8c8c 0e48
+    ldr r2, advance_anim_frame_ptr_clamped_assert_psequence_4c4 @ 080e8c8e 0f4a
     movs r1,#0x13    @ 080e8c90 1321
     movs r3,#0x1    @ 080e8c92 0123
     bl suppress_assert_report                @ 080e8c94 11f022fc
@@ -19841,8 +19841,8 @@ LAB_080e8c98:
     ldr r4,[r6,#0x18]                        @ 080e8ca6 b469
     cmp r4,#0x0                              @ 080e8ca8 002c
     bne LAB_080e8cb8                         @ 080e8caa 05d1
-    ldr r0, DAT_080e8cc8                     @ 080e8cac 0648
-    ldr r2, DAT_080e8ccc                     @ 080e8cae 074a
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename_cc8 @ 080e8cac 0648
+    ldr r2, advance_anim_frame_ptr_clamped_assert_psequence_4c4 @ 080e8cae 074a
     movs r1,#0x13    @ 080e8cb0 1321
     movs r3,#0x1    @ 080e8cb2 0123
     bl suppress_assert_report                @ 080e8cb4 11f012fc
@@ -19855,16 +19855,16 @@ LAB_080e8cb8:
     subs r5,#0x8    @ 080e8cc2 083d
     b LAB_080e8cfc                           @ 080e8cc4 1ae0
     .zero  0x2
-DAT_080e8cc8:
-    .word  0x09e4a4a8                     @ 080e8cc8 a8a4e409
-DAT_080e8ccc:
-    .word  0x09e4a4c4                     @ 080e8ccc c4a4e409
+advance_anim_frame_ptr_clamped_g2d_animation_c_filename_cc8:
+    .word  g2d_animation_c_filename       @ 080e8cc8 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_frame_ptr_clamped_assert_psequence_4c4:
+    .word  assert_psequence_4c4           @ 080e8ccc c4a4e409  pSequence
 LAB_080e8cd0:
     ldr r4,[r6,#0x18]                        @ 080e8cd0 b469
     cmp r4,#0x0                              @ 080e8cd2 002c
     bne LAB_080e8ce2                         @ 080e8cd4 05d1
-    ldr r0, DAT_080e8d18                     @ 080e8cd6 1048
-    ldr r2, DAT_080e8d1c                     @ 080e8cd8 104a
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename_d18 @ 080e8cd6 1048
+    ldr r2, advance_anim_frame_ptr_clamped_assert_psequence_4c4_d1c @ 080e8cd8 104a
     movs r1,#0xd    @ 080e8cda 0d21
     movs r3,#0x1    @ 080e8cdc 0123
     bl suppress_assert_report                @ 080e8cde 11f0fdfb
@@ -19875,8 +19875,8 @@ LAB_080e8ce2:
     ldr r4,[r6,#0x18]                        @ 080e8ce8 b469
     cmp r4,#0x0                              @ 080e8cea 002c
     bne LAB_080e8cfa                         @ 080e8cec 05d1
-    ldr r0, DAT_080e8d18                     @ 080e8cee 0a48
-    ldr r2, DAT_080e8d1c                     @ 080e8cf0 0a4a
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename_d18 @ 080e8cee 0a48
+    ldr r2, advance_anim_frame_ptr_clamped_assert_psequence_4c4_d1c @ 080e8cf0 0a4a
     movs r1,#0xd    @ 080e8cf2 0d21
     movs r3,#0x1    @ 080e8cf4 0123
     bl suppress_assert_report                @ 080e8cf6 11f0f1fb
@@ -19886,10 +19886,10 @@ LAB_080e8cfc:
     ldr r0,[r5,#0x0]                         @ 080e8cfc 2868
     cmp r0,#0x0                              @ 080e8cfe 0028
     bne LAB_080e8d10                         @ 080e8d00 06d1
-    ldr r0, DAT_080e8d18                     @ 080e8d02 0548
+    ldr r0, advance_anim_frame_ptr_clamped_g2d_animation_c_filename_d18 @ 080e8d02 0548
     movs r1,#0xa2    @ 080e8d04 a221
     lsls r1,r1,#0x1    @ 080e8d06 4900
-    ldr r2, DAT_080e8d20                     @ 080e8d08 054a
+    ldr r2, advance_anim_frame_ptr_clamped_assert_pnext_pcontent @ 080e8d08 054a
     movs r3,#0x1    @ 080e8d0a 0123
     bl suppress_assert_report                @ 080e8d0c 11f0e6fb
 LAB_080e8d10:
@@ -19897,12 +19897,12 @@ LAB_080e8d10:
     pop {r4,r5,r6}                           @ 080e8d12 70bc
     pop {r1}                                 @ 080e8d14 02bc
     bx r1                                    @ 080e8d16 0847
-DAT_080e8d18:
-    .word  0x09e4a4a8                     @ 080e8d18 a8a4e409
-DAT_080e8d1c:
-    .word  0x09e4a4c4                     @ 080e8d1c c4a4e409
-DAT_080e8d20:
-    .word  0x09e4a560                     @ 080e8d20 60a5e409
+advance_anim_frame_ptr_clamped_g2d_animation_c_filename_d18:
+    .word  g2d_animation_c_filename       @ 080e8d18 a8a4e409  nnsys/g2d/g2d_Animation.c
+advance_anim_frame_ptr_clamped_assert_psequence_4c4_d1c:
+    .word  assert_psequence_4c4           @ 080e8d1c c4a4e409  pSequence
+advance_anim_frame_ptr_clamped_assert_pnext_pcontent:
+    .word  assert_pnext_pcontent          @ 080e8d20 60a5e409  pNext->pContent
 
 @ Convert the animation controller position accumulator to a frame index. Called from NNS G2D animation frame advance path (g2d_Animation.c). Reads [pAnimCtrl+0xc] (position accumulator, 12.20 fixed-point left-shifted 0xc bits) and [pAnimCtrl+0][halfword+4] (per-frame speed, same shift), divides via bios_div, returns current absolute frame index. Assert pAnimCtrl non-NULL (line 0xac*2=0x158=344) and pCurrent non-NULL (line 0xac=172).
 @ Constants: POSITION_SHIFT=12 (12.20 fixed-point format).
@@ -19911,19 +19911,19 @@ compute_anim_frame_index_from_pos:
     adds r4,r0,#0x0    @ 080e8d26 041c
     cmp r4,#0x0                              @ 080e8d28 002c
     bne LAB_080e8d38                         @ 080e8d2a 05d1
-    ldr r0, DAT_080e8d60                     @ 080e8d2c 0c48
+    ldr r0, compute_anim_frame_index_from_pos_g2d_animation_c_filename @ 080e8d2c 0c48
     ldr r1, DAT_080e8d64                     @ 080e8d2e 0d49
-    ldr r2, DAT_080e8d68                     @ 080e8d30 0d4a
+    ldr r2, compute_anim_frame_index_from_pos_assert_panimctrl @ 080e8d30 0d4a
     movs r3,#0x1    @ 080e8d32 0123
     bl suppress_assert_report                @ 080e8d34 11f0d2fb
 LAB_080e8d38:
     ldr r0,[r4,#0x0]                         @ 080e8d38 2068
     cmp r0,#0x0                              @ 080e8d3a 0028
     bne LAB_080e8d4c                         @ 080e8d3c 06d1
-    ldr r0, DAT_080e8d60                     @ 080e8d3e 0848
+    ldr r0, compute_anim_frame_index_from_pos_g2d_animation_c_filename @ 080e8d3e 0848
     movs r1,#0xac    @ 080e8d40 ac21
     lsls r1,r1,#0x1    @ 080e8d42 4900
-    ldr r2, DAT_080e8d6c                     @ 080e8d44 094a
+    ldr r2, compute_anim_frame_index_from_pos_assert_panimctrl_pcurrent @ 080e8d44 094a
     movs r3,#0x1    @ 080e8d46 0123
     bl suppress_assert_report                @ 080e8d48 11f0c8fb
 LAB_080e8d4c:
@@ -19936,14 +19936,14 @@ LAB_080e8d4c:
     pop {r4}                                 @ 080e8d5a 10bc
     pop {r1}                                 @ 080e8d5c 02bc
     bx r1                                    @ 080e8d5e 0847
-DAT_080e8d60:
-    .word  0x09e4a4a8                     @ 080e8d60 a8a4e409
+compute_anim_frame_index_from_pos_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8d60 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e8d64:
     .word  0x00000157                     @ 080e8d64 57010000
-DAT_080e8d68:
-    .word  0x09e4a49c                     @ 080e8d68 9ca4e409
-DAT_080e8d6c:
-    .word  0x09e4a4ec                     @ 080e8d6c eca4e409
+compute_anim_frame_index_from_pos_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8d68 9ca4e409  pAnimCtrl
+compute_anim_frame_index_from_pos_assert_panimctrl_pcurrent:
+    .word  assert_panimctrl_pcurrent      @ 080e8d6c eca4e409  pAnimCtrl->pCurrent
 
 @ NitroSDK nnsys/g2d/g2d_Animation.c -- advance animation controller by N frames. Called by set_anim_ctrl_position_fwd (0x080e90fc) and FUN_080e957c. Asserts pAnimCtrl != NULL (suppress line 0x16d), pCurrent != NULL (line 0xb7), frames >= 0 (line 0x16f). If [pAnimCtrl+0x8]==1 (active): computes frames * pCurrent->speed (__muldi3) + 0x800 rounding, adds to [pAnimCtrl+0xc] (position accumulator). Returns new [pAnimCtrl+0xc] or 0 if inactive. r0=ptr pAnimCtrl, r1=s32 frames[0..MAX_INT]. Constants: ANIM_SPEED_SHIFT=12 / ROUNDING_OFFSET=0x800 / ACTIVE_FLAG=1.
 step_anim_ctrl_by_frames:
@@ -19953,27 +19953,27 @@ step_anim_ctrl_by_frames:
     movs r7,#0x0    @ 080e8d76 0027
     cmp r5,#0x0                              @ 080e8d78 002d
     bne LAB_080e8d88                         @ 080e8d7a 05d1
-    ldr r0, DAT_080e8db8                     @ 080e8d7c 0e48
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename @ 080e8d7c 0e48
     ldr r1, DAT_080e8dbc                     @ 080e8d7e 0f49
-    ldr r2, DAT_080e8dc0                     @ 080e8d80 0f4a
+    ldr r2, step_anim_ctrl_by_frames_assert_panimctrl @ 080e8d80 0f4a
     movs r3,#0x1    @ 080e8d82 0123
     bl suppress_assert_report                @ 080e8d84 11f0aafb
 LAB_080e8d88:
     ldr r0,[r5,#0x0]                         @ 080e8d88 2868
     cmp r0,#0x0                              @ 080e8d8a 0028
     bne LAB_080e8d9c                         @ 080e8d8c 06d1
-    ldr r0, DAT_080e8db8                     @ 080e8d8e 0a48
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename @ 080e8d8e 0a48
     movs r1,#0xb7    @ 080e8d90 b721
     lsls r1,r1,#0x1    @ 080e8d92 4900
-    ldr r2, DAT_080e8dc4                     @ 080e8d94 0b4a
+    ldr r2, step_anim_ctrl_by_frames_assert_panimctrl_pcurrent @ 080e8d94 0b4a
     movs r3,#0x1    @ 080e8d96 0123
     bl suppress_assert_report                @ 080e8d98 11f0a0fb
 LAB_080e8d9c:
     cmp r4,#0x0                              @ 080e8d9c 002c
     bge LAB_080e8dac                         @ 080e8d9e 05da
-    ldr r0, DAT_080e8db8                     @ 080e8da0 0548
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename @ 080e8da0 0548
     ldr r1, DAT_080e8dc8                     @ 080e8da2 0949
-    ldr r2, DAT_080e8dcc                     @ 080e8da4 094a
+    ldr r2, step_anim_ctrl_by_frames_assert_frames_0 @ 080e8da4 094a
     movs r3,#0x1    @ 080e8da6 0123
     bl suppress_assert_report                @ 080e8da8 11f098fb
 LAB_080e8dac:
@@ -19983,18 +19983,18 @@ LAB_080e8dac:
     movs r0,#0x0    @ 080e8db2 0020
     b LAB_080e8f78                           @ 080e8db4 e0e0
     .zero  0x2
-DAT_080e8db8:
-    .word  0x09e4a4a8                     @ 080e8db8 a8a4e409
+step_anim_ctrl_by_frames_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8db8 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e8dbc:
     .word  0x0000016d                     @ 080e8dbc 6d010000
-DAT_080e8dc0:
-    .word  0x09e4a49c                     @ 080e8dc0 9ca4e409
-DAT_080e8dc4:
-    .word  0x09e4a4ec                     @ 080e8dc4 eca4e409
+step_anim_ctrl_by_frames_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8dc0 9ca4e409  pAnimCtrl
+step_anim_ctrl_by_frames_assert_panimctrl_pcurrent:
+    .word  assert_panimctrl_pcurrent      @ 080e8dc4 eca4e409  pAnimCtrl->pCurrent
 DAT_080e8dc8:
     .word  0x0000016f                     @ 080e8dc8 6f010000
-DAT_080e8dcc:
-    .word  0x09e4a570                     @ 080e8dcc 70a5e409
+step_anim_ctrl_by_frames_assert_frames_0:
+    .word  assert_frames_0                @ 080e8dcc 70a5e409  frames >= 0
 LAB_080e8dd0:
     ldr r2,[r5,#0x10]                        @ 080e8dd0 2a69
     adds r0,r2,#0x0    @ 080e8dd2 101c
@@ -20060,9 +20060,9 @@ LAB_080e8e3e:
     ldr r6,[r5,#0x0]                         @ 080e8e40 2e68
     cmp r6,#0x0                              @ 080e8e42 002e
     bne LAB_080e8e52                         @ 080e8e44 05d1
-    ldr r0, DAT_080e8e68                     @ 080e8e46 0848
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_e68 @ 080e8e46 0848
     movs r1,#0x9b    @ 080e8e48 9b21
-    ldr r2, DAT_080e8e6c                     @ 080e8e4a 084a
+    ldr r2, step_anim_ctrl_by_frames_assert_pframe @ 080e8e4a 084a
     movs r3,#0x1    @ 080e8e4c 0123
     bl suppress_assert_report                @ 080e8e4e 11f045fb
 LAB_080e8e52:
@@ -20077,10 +20077,10 @@ LAB_080e8e52:
     lsrs r0,r0,#0x1f    @ 080e8e62 c00f
     b LAB_080e8e78                           @ 080e8e64 08e0
     .zero  0x2
-DAT_080e8e68:
-    .word  0x09e4a4a8                     @ 080e8e68 a8a4e409
-DAT_080e8e6c:
-    .word  0x09e4a50c                     @ 080e8e6c 0ca5e409
+step_anim_ctrl_by_frames_g2d_animation_c_filename_e68:
+    .word  g2d_animation_c_filename       @ 080e8e68 a8a4e409  nnsys/g2d/g2d_Animation.c
+step_anim_ctrl_by_frames_assert_pframe:
+    .word  assert_pframe                  @ 080e8e6c 0ca5e409  pFrame
 LAB_080e8e70:
     ldr r0,[r5,#0x4]                         @ 080e8e70 6868
     cmp r0,#0x0                              @ 080e8e72 0028
@@ -20092,9 +20092,9 @@ LAB_080e8e78:
     ldr r4,[r5,#0x18]                        @ 080e8e7c ac69
     cmp r4,#0x0                              @ 080e8e7e 002c
     bne LAB_080e8e8e                         @ 080e8e80 05d1
-    ldr r0, DAT_080e8ea0                     @ 080e8e82 0748
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_ea0 @ 080e8e82 0748
     movs r1,#0x13    @ 080e8e84 1321
-    ldr r2, DAT_080e8ea4                     @ 080e8e86 074a
+    ldr r2, step_anim_ctrl_by_frames_assert_psequence_4c4 @ 080e8e86 074a
     movs r3,#0x1    @ 080e8e88 0123
     bl suppress_assert_report                @ 080e8e8a 11f027fb
 LAB_080e8e8e:
@@ -20107,25 +20107,25 @@ LAB_080e8e8e:
     bcc LAB_080e8edc                         @ 080e8e9a 1fd3
     b LAB_080e8eda                           @ 080e8e9c 1de0
     .zero  0x2
-DAT_080e8ea0:
-    .word  0x09e4a4a8                     @ 080e8ea0 a8a4e409
-DAT_080e8ea4:
-    .word  0x09e4a4c4                     @ 080e8ea4 c4a4e409
+step_anim_ctrl_by_frames_g2d_animation_c_filename_ea0:
+    .word  g2d_animation_c_filename       @ 080e8ea0 a8a4e409  nnsys/g2d/g2d_Animation.c
+step_anim_ctrl_by_frames_assert_psequence_4c4:
+    .word  assert_psequence_4c4           @ 080e8ea4 c4a4e409  pSequence
 LAB_080e8ea8:
     cmp r6,#0x0                              @ 080e8ea8 002e
     bne LAB_080e8eb8                         @ 080e8eaa 05d1
-    ldr r0, DAT_080e8f1c                     @ 080e8eac 1b48
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_f1c @ 080e8eac 1b48
     movs r1,#0x92    @ 080e8eae 9221
-    ldr r2, DAT_080e8f20                     @ 080e8eb0 1b4a
+    ldr r2, step_anim_ctrl_by_frames_assert_pframe_f20 @ 080e8eb0 1b4a
     movs r3,#0x1    @ 080e8eb2 0123
     bl suppress_assert_report                @ 080e8eb4 11f012fb
 LAB_080e8eb8:
     ldr r4,[r5,#0x18]                        @ 080e8eb8 ac69
     cmp r4,#0x0                              @ 080e8eba 002c
     bne LAB_080e8eca                         @ 080e8ebc 05d1
-    ldr r0, DAT_080e8f1c                     @ 080e8ebe 1748
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_f1c @ 080e8ebe 1748
     movs r1,#0x19    @ 080e8ec0 1921
-    ldr r2, DAT_080e8f24                     @ 080e8ec2 184a
+    ldr r2, step_anim_ctrl_by_frames_assert_psequence_4c4_f24 @ 080e8ec2 184a
     movs r3,#0x1    @ 080e8ec4 0123
     bl suppress_assert_report                @ 080e8ec6 11f009fb
 LAB_080e8eca:
@@ -20159,9 +20159,9 @@ LAB_080e8ee8:
     adds r4,#0x1c    @ 080e8efc 1c34
     cmp r4,#0x0                              @ 080e8efe 002c
     bne LAB_080e8f0e                         @ 080e8f00 05d1
-    ldr r0, DAT_080e8f1c                     @ 080e8f02 0648
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_f1c @ 080e8f02 0648
     movs r1,#0x75    @ 080e8f04 7521
-    ldr r2, DAT_080e8f28                     @ 080e8f06 084a
+    ldr r2, step_anim_ctrl_by_frames_assert_pfunctor @ 080e8f06 084a
     movs r3,#0x1    @ 080e8f08 0123
     bl suppress_assert_report                @ 080e8f0a 11f0e7fa
 LAB_080e8f0e:
@@ -20172,14 +20172,14 @@ LAB_080e8f0e:
     beq LAB_080e8f3e                         @ 080e8f16 12d0
     b LAB_080e8f48                           @ 080e8f18 16e0
     .zero  0x2
-DAT_080e8f1c:
-    .word  0x09e4a4a8                     @ 080e8f1c a8a4e409
-DAT_080e8f20:
-    .word  0x09e4a50c                     @ 080e8f20 0ca5e409
-DAT_080e8f24:
-    .word  0x09e4a4c4                     @ 080e8f24 c4a4e409
-DAT_080e8f28:
-    .word  0x09e4a500                     @ 080e8f28 00a5e409
+step_anim_ctrl_by_frames_g2d_animation_c_filename_f1c:
+    .word  g2d_animation_c_filename       @ 080e8f1c a8a4e409  nnsys/g2d/g2d_Animation.c
+step_anim_ctrl_by_frames_assert_pframe_f20:
+    .word  assert_pframe                  @ 080e8f20 0ca5e409  pFrame
+step_anim_ctrl_by_frames_assert_psequence_4c4_f24:
+    .word  assert_psequence_4c4           @ 080e8f24 c4a4e409  pSequence
+step_anim_ctrl_by_frames_assert_pfunctor:
+    .word  assert_pfunctor                @ 080e8f28 00a5e409  pFunctor
 LAB_080e8f2c:
     ldrh r0,[r4,#0xc]                        @ 080e8f2c a089
     cmp r6,r0                                @ 080e8f2e 8642
@@ -20198,9 +20198,9 @@ LAB_080e8f48:
     ldr r0,[r5,#0x0]                         @ 080e8f48 2868
     cmp r0,#0x0                              @ 080e8f4a 0028
     bne LAB_080e8f5a                         @ 080e8f4c 05d1
-    ldr r0, DAT_080e8f80                     @ 080e8f4e 0c48
+    ldr r0, step_anim_ctrl_by_frames_g2d_animation_c_filename_f80 @ 080e8f4e 0c48
     movs r1,#0x67    @ 080e8f50 6721
-    ldr r2, DAT_080e8f84                     @ 080e8f52 0c4a
+    ldr r2, step_anim_ctrl_by_frames_assert_panimctrl_pcurrent_f84 @ 080e8f52 0c4a
     movs r3,#0x1    @ 080e8f54 0123
     bl suppress_assert_report                @ 080e8f56 11f0c1fa
 LAB_080e8f5a:
@@ -20226,10 +20226,10 @@ LAB_080e8f78:
     pop {r1}                                 @ 080e8f7a 02bc
     bx r1                                    @ 080e8f7c 0847
     .zero  0x2
-DAT_080e8f80:
-    .word  0x09e4a4a8                     @ 080e8f80 a8a4e409
-DAT_080e8f84:
-    .word  0x09e4a4ec                     @ 080e8f84 eca4e409
+step_anim_ctrl_by_frames_g2d_animation_c_filename_f80:
+    .word  g2d_animation_c_filename       @ 080e8f80 a8a4e409  nnsys/g2d/g2d_Animation.c
+step_anim_ctrl_by_frames_assert_panimctrl_pcurrent_f84:
+    .word  assert_panimctrl_pcurrent      @ 080e8f84 eca4e409  pAnimCtrl->pCurrent
 
 @ nnsys/g2d/g2d_Animation.c line 0x1a9=425. Called by step_cell_anim_sequence_guarded (0x080e95ec). Asserts pCellAnim != NULL (line 425) and pCellAnim->pCurrentCell (+0x18) non-NULL (line 427). Calls set_cell_anim_sequence_by_index(pCellAnim, sequence_idx); if return non-zero: clears [pCellAnim+0xc] (reset sequence-changed flag). r0=NNS_G2dCellAnimation* pCellAnim [non-NULL], r1=u16 sequence_idx. Returns set_cell_anim_sequence_by_index return value.
 set_cell_anim_sequence_by_idx_guarded:
@@ -20239,19 +20239,19 @@ set_cell_anim_sequence_by_idx_guarded:
     lsrs r5,r1,#0x10    @ 080e8f8e 0d0c
     cmp r4,#0x0                              @ 080e8f90 002c
     bne LAB_080e8fa0                         @ 080e8f92 05d1
-    ldr r0, DAT_080e8fd0                     @ 080e8f94 0e48
+    ldr r0, set_cell_anim_sequence_by_idx_guarded_g2d_animation_c_filename @ 080e8f94 0e48
     ldr r1, DAT_080e8fd4                     @ 080e8f96 0f49
-    ldr r2, DAT_080e8fd8                     @ 080e8f98 0f4a
+    ldr r2, set_cell_anim_sequence_by_idx_guarded_assert_panimctrl @ 080e8f98 0f4a
     movs r3,#0x1    @ 080e8f9a 0123
     bl suppress_assert_report                @ 080e8f9c 11f09efa
 LAB_080e8fa0:
     ldr r0,[r4,#0x18]                        @ 080e8fa0 a069
     cmp r0,#0x0                              @ 080e8fa2 0028
     bne LAB_080e8fb4                         @ 080e8fa4 06d1
-    ldr r0, DAT_080e8fd0                     @ 080e8fa6 0a48
+    ldr r0, set_cell_anim_sequence_by_idx_guarded_g2d_animation_c_filename @ 080e8fa6 0a48
     movs r1,#0xd5    @ 080e8fa8 d521
     lsls r1,r1,#0x1    @ 080e8faa 4900
-    ldr r2, DAT_080e8fdc                     @ 080e8fac 0b4a
+    ldr r2, set_cell_anim_sequence_by_idx_guarded_assert_panimctrl_panimsequence @ 080e8fac 0b4a
     movs r3,#0x1    @ 080e8fae 0123
     bl suppress_assert_report                @ 080e8fb0 11f094fa
 LAB_080e8fb4:
@@ -20269,14 +20269,14 @@ LAB_080e8fc6:
     pop {r1}                                 @ 080e8fca 02bc
     bx r1                                    @ 080e8fcc 0847
     .zero  0x2
-DAT_080e8fd0:
-    .word  0x09e4a4a8                     @ 080e8fd0 a8a4e409
+set_cell_anim_sequence_by_idx_guarded_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e8fd0 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e8fd4:
     .word  0x000001a9                     @ 080e8fd4 a9010000
-DAT_080e8fd8:
-    .word  0x09e4a49c                     @ 080e8fd8 9ca4e409
-DAT_080e8fdc:
-    .word  0x09e4a4d0                     @ 080e8fdc d0a4e409
+set_cell_anim_sequence_by_idx_guarded_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e8fd8 9ca4e409  pAnimCtrl
+set_cell_anim_sequence_by_idx_guarded_assert_panimctrl_panimsequence:
+    .word  assert_panimctrl_panimsequence @ 080e8fdc d0a4e409  pAnimCtrl->pAnimSequence
 
 @ Directly calls set_cell_anim_sequence_by_index to switch sequence without checking return value semantics or clearing the sequence-change flag at [pCellAnim+0xc]. Transparently passes through raw return value to caller. Exit is pop{r4,r5};pop{r1};bx r1 so r0 is not clobbered (Sub-case E: pop{r1};bx r1 does not void r0). Caller: 0x080e9500 (tags: [g2d]; role: set new sequence then conditionally reset frame position). Differs from set_cell_anim_sequence_by_idx_guarded: that variant clears sequence-change flag on success; this function only binds sequence and passes through result. Assert pCellAnim != NULL (line 0x1cf=463), pCurrent (+0x18) != NULL (line 0xe8*2=0x1d0=464).
 @ Constants: ANIM_TYPE_CELL=1.
@@ -20287,19 +20287,19 @@ set_cell_anim_sequence_raw:
     lsrs r5,r1,#0x10    @ 080e8fe6 0d0c
     cmp r4,#0x0                              @ 080e8fe8 002c
     bne LAB_080e8ff8                         @ 080e8fea 05d1
-    ldr r0, DAT_080e901c                     @ 080e8fec 0b48
+    ldr r0, set_cell_anim_sequence_raw_g2d_animation_c_filename @ 080e8fec 0b48
     ldr r1, DAT_080e9020                     @ 080e8fee 0c49
-    ldr r2, DAT_080e9024                     @ 080e8ff0 0c4a
+    ldr r2, set_cell_anim_sequence_raw_assert_panimctrl @ 080e8ff0 0c4a
     movs r3,#0x1    @ 080e8ff2 0123
     bl suppress_assert_report                @ 080e8ff4 11f072fa
 LAB_080e8ff8:
     ldr r0,[r4,#0x18]                        @ 080e8ff8 a069
     cmp r0,#0x0                              @ 080e8ffa 0028
     bne LAB_080e900c                         @ 080e8ffc 06d1
-    ldr r0, DAT_080e901c                     @ 080e8ffe 0748
+    ldr r0, set_cell_anim_sequence_raw_g2d_animation_c_filename @ 080e8ffe 0748
     movs r1,#0xe8    @ 080e9000 e821
     lsls r1,r1,#0x1    @ 080e9002 4900
-    ldr r2, DAT_080e9028                     @ 080e9004 084a
+    ldr r2, set_cell_anim_sequence_raw_assert_panimctrl_panimsequence @ 080e9004 084a
     movs r3,#0x1    @ 080e9006 0123
     bl suppress_assert_report                @ 080e9008 11f068fa
 LAB_080e900c:
@@ -20310,14 +20310,14 @@ LAB_080e900c:
     pop {r1}                                 @ 080e9016 02bc
     bx r1                                    @ 080e9018 0847
     .zero  0x2
-DAT_080e901c:
-    .word  0x09e4a4a8                     @ 080e901c a8a4e409
+set_cell_anim_sequence_raw_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e901c a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e9020:
     .word  0x000001cf                     @ 080e9020 cf010000
-DAT_080e9024:
-    .word  0x09e4a49c                     @ 080e9024 9ca4e409
-DAT_080e9028:
-    .word  0x09e4a4d0                     @ 080e9028 d0a4e409
+set_cell_anim_sequence_raw_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e9024 9ca4e409  pAnimCtrl
+set_cell_anim_sequence_raw_assert_panimctrl_panimsequence:
+    .word  assert_panimctrl_panimsequence @ 080e9028 d0a4e409  pAnimCtrl->pAnimSequence
 
 @ Compute the offset of the current frame pointer relative to the pContent base address of the sequence, convert to an 8-byte-unit frame number, and return truncated as u16. Callers: 0x080156d0 (tags: [g2d]; role: u16 wrapper for frame offset getter) and 0x080e9500 (tags: [g2d]; role: query current frame offset before sequence reset). Computation: (([pAnimCtrl+0]-[pAnimCtrl->pCurrent+0xc]) << 0xd) >> 0x10 => (frame_ptr - base) >> 3 = frame index (net effect <<13>>16 = >>3 = /8; python: x<<13>>16 == x>>3). Assert pAnimCtrl != NULL (line 0x21=33).
 @ Constants: FRAME_SIZE_SHIFT=0xd (lsls r0,r0,#0xd; lsrs r0,r0,#0x10; net effect >>3 = /8 = 8 bytes per frame; python: x<<13>>16 == x>>3).
@@ -20326,8 +20326,8 @@ get_anim_ctrl_frame_offset:
     adds r4,r0,#0x0    @ 080e902e 041c
     cmp r4,#0x0                              @ 080e9030 002c
     bne LAB_080e9040                         @ 080e9032 05d1
-    ldr r0, DAT_080e9054                     @ 080e9034 0748
-    ldr r2, DAT_080e9058                     @ 080e9036 084a
+    ldr r0, get_anim_ctrl_frame_offset_g2d_animation_c_filename @ 080e9034 0748
+    ldr r2, get_anim_ctrl_frame_offset_assert_panimctrl @ 080e9036 084a
     movs r1,#0x21    @ 080e9038 2121
     movs r3,#0x1    @ 080e903a 0123
     bl suppress_assert_report                @ 080e903c 11f04efa
@@ -20342,10 +20342,10 @@ LAB_080e9040:
     pop {r1}                                 @ 080e904e 02bc
     bx r1                                    @ 080e9050 0847
     .zero  0x2
-DAT_080e9054:
-    .word  0x09e4a4a8                     @ 080e9054 a8a4e409
-DAT_080e9058:
-    .word  0x09e4a49c                     @ 080e9058 9ca4e409
+get_anim_ctrl_frame_offset_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e9054 a8a4e409  nnsys/g2d/g2d_Animation.c
+get_anim_ctrl_frame_offset_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e9058 9ca4e409  pAnimCtrl
 
 @ nnsys/g2d/g2d_Animation.c -- full NNS_G2dAnimController initialisation. Called by bind_cell_anim_to_bank (0x080e9400). Asserts pAnimCtrl != NULL (line 0x1F7=503). Calls zero_anim_ctrl_fields(pAnimCtrl+0x1C), then sets main struct: [+0x0]=0, [+0x4]=0, [+0x8]=1, [+0xC]=0, [+0x10]=0x1000 (speed), [+0x14]=0, [+0x18]=0. Equivalent to NNS_G2dInitAnimCtrl. r0=NNS_G2dAnimController* pAnimCtrl [non-NULL]. Constants: ANIM_CTRL_DEFAULT_SPEED=0x1000 / ANIM_CTRL_DEFAULT_LOOP_COUNT=1.
 init_anim_ctrl:
@@ -20353,9 +20353,9 @@ init_anim_ctrl:
     adds r4,r0,#0x0    @ 080e905e 041c
     cmp r4,#0x0                              @ 080e9060 002c
     bne LAB_080e9070                         @ 080e9062 05d1
-    ldr r0, DAT_080e9094                     @ 080e9064 0b48
+    ldr r0, init_anim_ctrl_g2d_animation_c_filename @ 080e9064 0b48
     ldr r1, DAT_080e9098                     @ 080e9066 0c49
-    ldr r2, DAT_080e909c                     @ 080e9068 0c4a
+    ldr r2, init_anim_ctrl_assert_panimctrl  @ 080e9068 0c4a
     movs r3,#0x1    @ 080e906a 0123
     bl suppress_assert_report                @ 080e906c 11f036fa
 LAB_080e9070:
@@ -20376,10 +20376,10 @@ LAB_080e9070:
     pop {r4}                                 @ 080e908e 10bc
     pop {r0}                                 @ 080e9090 01bc
     bx r0                                    @ 080e9092 0047
-DAT_080e9094:
-    .word  0x09e4a4a8                     @ 080e9094 a8a4e409
+init_anim_ctrl_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e9094 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e9098:
     .word  0x000001f7                     @ 080e9098 f7010000
-DAT_080e909c:
-    .word  0x09e4a49c                     @ 080e909c 9ca4e409
+init_anim_ctrl_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e909c 9ca4e409  pAnimCtrl
 

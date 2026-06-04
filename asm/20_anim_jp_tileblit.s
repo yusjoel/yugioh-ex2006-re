@@ -7,10 +7,10 @@ clear_anim_ctrl_aux_fields:
     adds r4,r0,#0x0    @ 080e90a2 041c
     cmp r4,#0x0                              @ 080e90a4 002c
     bne LAB_080e90b6                         @ 080e90a6 06d1
-    ldr r0, DAT_080e90c4                     @ 080e90a8 0648
+    ldr r0, clear_anim_ctrl_aux_fields_g2d_animation_c_filename @ 080e90a8 0648
     movs r1,#0x85    @ 080e90aa 8521
     lsls r1,r1,#0x2    @ 080e90ac 8900
-    ldr r2, DAT_080e90c8                     @ 080e90ae 064a
+    ldr r2, clear_anim_ctrl_aux_fields_assert_panimctrl @ 080e90ae 064a
     movs r3,#0x1    @ 080e90b0 0123
     bl suppress_assert_report                @ 080e90b2 11f013fa
 LAB_080e90b6:
@@ -20,10 +20,10 @@ LAB_080e90b6:
     pop {r4}                                 @ 080e90be 10bc
     pop {r0}                                 @ 080e90c0 01bc
     bx r0                                    @ 080e90c2 0047
-DAT_080e90c4:
-    .word  0x09e4a4a8                     @ 080e90c4 a8a4e409
-DAT_080e90c8:
-    .word  0x09e4a49c                     @ 080e90c8 9ca4e409
+clear_anim_ctrl_aux_fields_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e90c4 a8a4e409  nnsys/g2d/g2d_Animation.c
+clear_anim_ctrl_aux_fields_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e90c8 9ca4e409  pAnimCtrl
 
 @ nnsys/g2d/g2d_Animation.c -- zero animation controller sub-struct fields. Called by init_anim_ctrl (0x080e905c) and FUN_080e90a0. Asserts pAnimCtrl != NULL (line 0x225=549). Writes 0 to [pAnimCtrl+0x0], [+0x4], [+0x8] (word each), and halfword 0 to [pAnimCtrl+0xC]. r0=NNS_G2dAnimController* pAnimCtrl (caller passes pAnim+0x1C sub-struct). Constants: ANIM_CTRL_SUB_STRUCT_OFFSET=0x1C.
 zero_anim_ctrl_fields:
@@ -31,9 +31,9 @@ zero_anim_ctrl_fields:
     adds r4,r0,#0x0    @ 080e90ce 041c
     cmp r4,#0x0                              @ 080e90d0 002c
     bne LAB_080e90e0                         @ 080e90d2 05d1
-    ldr r0, DAT_080e90f0                     @ 080e90d4 0648
+    ldr r0, zero_anim_ctrl_fields_g2d_animation_c_filename @ 080e90d4 0648
     ldr r1, DAT_080e90f4                     @ 080e90d6 0749
-    ldr r2, DAT_080e90f8                     @ 080e90d8 074a
+    ldr r2, zero_anim_ctrl_fields_assert_pcallback @ 080e90d8 074a
     movs r3,#0x1    @ 080e90da 0123
     bl suppress_assert_report                @ 080e90dc 11f0fef9
 LAB_080e90e0:
@@ -45,12 +45,12 @@ LAB_080e90e0:
     pop {r4}                                 @ 080e90ea 10bc
     pop {r0}                                 @ 080e90ec 01bc
     bx r0                                    @ 080e90ee 0047
-DAT_080e90f0:
-    .word  0x09e4a4a8                     @ 080e90f0 a8a4e409
+zero_anim_ctrl_fields_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e90f0 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e90f4:
     .word  0x00000225                     @ 080e90f4 25020000
-DAT_080e90f8:
-    .word  0x09e4a57c                     @ 080e90f8 7ca5e409
+zero_anim_ctrl_fields_assert_pcallback:
+    .word  assert_pcallback               @ 080e90f8 7ca5e409  pCallBack
 
 @ NitroSDK nnsys/g2d/g2d_Animation.c -- reset animation controller frame pointer to sequence start. Called by advance_anim_ctrl_frame (0x080e88cc), bind_anim_ctrl_callback (0x080e91a8), FUN_080e9500. Asserts pAnimCtrl != NULL. Reads [pAnimCtrl+0x10] speed: if speed>0 computes forward base = pContent + count*8; else base = pContent + totalFrames*8 - 8. Writes [pAnimCtrl+0x0]=base, [pAnimCtrl+0xc]=0, then calls step_anim_ctrl_by_frames(pAnimCtrl,0). r0=ptr pAnimCtrl (NNS_G2dAnimController). Constants: FRAME_SIZE=8 / POSITION_INIT=0.
 set_anim_ctrl_position_fwd:
@@ -98,8 +98,8 @@ LAB_080e9148:
     ldr r4,[r6,#0x18]                        @ 080e914c b469
     cmp r4,#0x0                              @ 080e914e 002c
     bne LAB_080e915e                         @ 080e9150 05d1
-    ldr r0, DAT_080e9168                     @ 080e9152 0548
-    ldr r2, DAT_080e916c                     @ 080e9154 054a
+    ldr r0, set_anim_ctrl_position_fwd_g2d_animation_c_filename @ 080e9152 0548
+    ldr r2, set_anim_ctrl_position_fwd_assert_psequence_4c4 @ 080e9154 054a
     movs r1,#0x19    @ 080e9156 1921
     movs r3,#0x1    @ 080e9158 0123
     bl suppress_assert_report                @ 080e915a 11f0bff9
@@ -109,16 +109,16 @@ LAB_080e915e:
     ldr r0,[r4,#0xc]                         @ 080e9162 e068
     adds r0,r0,r1    @ 080e9164 4018
     b LAB_080e918c                           @ 080e9166 11e0
-DAT_080e9168:
-    .word  0x09e4a4a8                     @ 080e9168 a8a4e409
-DAT_080e916c:
-    .word  0x09e4a4c4                     @ 080e916c c4a4e409
+set_anim_ctrl_position_fwd_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e9168 a8a4e409  nnsys/g2d/g2d_Animation.c
+set_anim_ctrl_position_fwd_assert_psequence_4c4:
+    .word  assert_psequence_4c4           @ 080e916c c4a4e409  pSequence
 LAB_080e9170:
     ldr r4,[r6,#0x18]                        @ 080e9170 b469
     cmp r4,#0x0                              @ 080e9172 002c
     bne LAB_080e9182                         @ 080e9174 05d1
-    ldr r0, DAT_080e91a0                     @ 080e9176 0a48
-    ldr r2, DAT_080e91a4                     @ 080e9178 0a4a
+    ldr r0, set_anim_ctrl_position_fwd_g2d_animation_c_filename_1a0 @ 080e9176 0a48
+    ldr r2, set_anim_ctrl_position_fwd_assert_psequence_4c4_1a4 @ 080e9178 0a4a
     movs r1,#0x13    @ 080e917a 1321
     movs r3,#0x1    @ 080e917c 0123
     bl suppress_assert_report                @ 080e917e 11f0adf9
@@ -138,10 +138,10 @@ LAB_080e918c:
     pop {r4,r5,r6}                           @ 080e919a 70bc
     pop {r0}                                 @ 080e919c 01bc
     bx r0                                    @ 080e919e 0047
-DAT_080e91a0:
-    .word  0x09e4a4a8                     @ 080e91a0 a8a4e409
-DAT_080e91a4:
-    .word  0x09e4a4c4                     @ 080e91a4 c4a4e409
+set_anim_ctrl_position_fwd_g2d_animation_c_filename_1a0:
+    .word  g2d_animation_c_filename       @ 080e91a0 a8a4e409  nnsys/g2d/g2d_Animation.c
+set_anim_ctrl_position_fwd_assert_psequence_4c4_1a4:
+    .word  assert_psequence_4c4           @ 080e91a4 c4a4e409  pSequence
 
 @ NitroSDK nnsys/g2d/g2d_Animation.c -- bind animation sequence to controller and reset position. Called by FUN_080e94a4. Asserts pAnimCtrl != NULL (suppress line 0x260) and pCallBack != NULL. Stores pCallBack to [pAnimCtrl+0x18] (pCurrent field), then calls set_anim_ctrl_position_fwd (FUN_080e90fc) to reset frame pointer. Equivalent to NNS_G2dSetAnimCtrlCurrentAnimSequence. r0=ptr pAnimCtrl, r1=ptr pCallBack (NNS_G2dAnimSequence). Constants: ANIM_CTRL_PCURRENT_OFFSET=0x18.
 bind_anim_ctrl_callback:
@@ -150,18 +150,18 @@ bind_anim_ctrl_callback:
     adds r5,r1,#0x0    @ 080e91ac 0d1c
     cmp r4,#0x0                              @ 080e91ae 002c
     bne LAB_080e91c0                         @ 080e91b0 06d1
-    ldr r0, DAT_080e91e0                     @ 080e91b2 0b48
+    ldr r0, bind_anim_ctrl_callback_g2d_animation_c_filename @ 080e91b2 0b48
     movs r1,#0x98    @ 080e91b4 9821
     lsls r1,r1,#0x2    @ 080e91b6 8900
-    ldr r2, DAT_080e91e4                     @ 080e91b8 0a4a
+    ldr r2, bind_anim_ctrl_callback_assert_panimctrl @ 080e91b8 0a4a
     movs r3,#0x1    @ 080e91ba 0123
     bl suppress_assert_report                @ 080e91bc 11f08ef9
 LAB_080e91c0:
     cmp r5,#0x0                              @ 080e91c0 002d
     bne LAB_080e91d0                         @ 080e91c2 05d1
-    ldr r0, DAT_080e91e0                     @ 080e91c4 0648
+    ldr r0, bind_anim_ctrl_callback_g2d_animation_c_filename @ 080e91c4 0648
     ldr r1, DAT_080e91e8                     @ 080e91c6 0849
-    ldr r2, DAT_080e91ec                     @ 080e91c8 084a
+    ldr r2, bind_anim_ctrl_callback_assert_panimsequence @ 080e91c8 084a
     movs r3,#0x1    @ 080e91ca 0123
     bl suppress_assert_report                @ 080e91cc 11f086f9
 LAB_080e91d0:
@@ -172,14 +172,14 @@ LAB_080e91d0:
     pop {r0}                                 @ 080e91da 01bc
     bx r0                                    @ 080e91dc 0047
     .zero  0x2
-DAT_080e91e0:
-    .word  0x09e4a4a8                     @ 080e91e0 a8a4e409
-DAT_080e91e4:
-    .word  0x09e4a49c                     @ 080e91e4 9ca4e409
+bind_anim_ctrl_callback_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e91e0 a8a4e409  nnsys/g2d/g2d_Animation.c
+bind_anim_ctrl_callback_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e91e4 9ca4e409  pAnimCtrl
 DAT_080e91e8:
     .word  0x00000261                     @ 080e91e8 61020000
-DAT_080e91ec:
-    .word  0x09e4a588                     @ 080e91ec 88a5e409
+bind_anim_ctrl_callback_assert_panimsequence:
+    .word  assert_panimsequence           @ 080e91ec 88a5e409  pAnimSequence
 
 @ Write the callback dispatch fields of NNS_G2dCellAnimation for subsequent frame event triggering. Called from NNS G2D CellAnimation init path (g2d_Animation.c line 0x27f=639). Assert pCellAnim non-NULL (line 0x27f), pCallbackData non-NULL (line 0xa0*4=0x280=640), loop_type != 2 (line 0x283=643 -- type 2 must use set_cell_anim_callback_type2). Writes: [+0x1c]=loop_type, [+0x20]=pDataA, [+0x24]=pDataB, [+0x28]=0 (reset counter).
 @ Constants: LOOP_TYPE_CELL2_RESERVED=2 (not accepted by this interface).
@@ -191,26 +191,26 @@ set_cell_anim_callback_fields:
     adds r5,r3,#0x0    @ 080e91f8 1d1c
     cmp r4,#0x0                              @ 080e91fa 002c
     bne LAB_080e920a                         @ 080e91fc 05d1
-    ldr r0, DAT_080e923c                     @ 080e91fe 0f48
+    ldr r0, set_cell_anim_callback_fields_g2d_animation_c_filename @ 080e91fe 0f48
     ldr r1, DAT_080e9240                     @ 080e9200 0f49
-    ldr r2, DAT_080e9244                     @ 080e9202 104a
+    ldr r2, set_cell_anim_callback_fields_assert_panimctrl @ 080e9202 104a
     movs r3,#0x1    @ 080e9204 0123
     bl suppress_assert_report                @ 080e9206 11f069f9
 LAB_080e920a:
     cmp r5,#0x0                              @ 080e920a 002d
     bne LAB_080e921c                         @ 080e920c 06d1
-    ldr r0, DAT_080e923c                     @ 080e920e 0b48
+    ldr r0, set_cell_anim_callback_fields_g2d_animation_c_filename @ 080e920e 0b48
     movs r1,#0xa0    @ 080e9210 a021
     lsls r1,r1,#0x2    @ 080e9212 8900
-    ldr r2, DAT_080e9248                     @ 080e9214 0c4a
+    ldr r2, set_cell_anim_callback_fields_assert_void_pfunc @ 080e9214 0c4a
     movs r3,#0x1    @ 080e9216 0123
     bl suppress_assert_report                @ 080e9218 11f060f9
 LAB_080e921c:
     cmp r6,#0x2                              @ 080e921c 022e
     bne LAB_080e922c                         @ 080e921e 05d1
-    ldr r0, DAT_080e923c                     @ 080e9220 0648
+    ldr r0, set_cell_anim_callback_fields_g2d_animation_c_filename @ 080e9220 0648
     ldr r1, DAT_080e924c                     @ 080e9222 0a49
-    ldr r2, DAT_080e9250                     @ 080e9224 0a4a
+    ldr r2, set_cell_anim_callback_fields_assert_type_nns_g2d_anmcallbacktype_s @ 080e9224 0a4a
     movs r3,#0x1    @ 080e9226 0123
     bl suppress_assert_report                @ 080e9228 11f058f9
 LAB_080e922c:
@@ -222,18 +222,18 @@ LAB_080e922c:
     pop {r4,r5,r6,r7}                        @ 080e9236 f0bc
     pop {r0}                                 @ 080e9238 01bc
     bx r0                                    @ 080e923a 0047
-DAT_080e923c:
-    .word  0x09e4a4a8                     @ 080e923c a8a4e409
+set_cell_anim_callback_fields_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e923c a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e9240:
     .word  0x0000027f                     @ 080e9240 7f020000
-DAT_080e9244:
-    .word  0x09e4a49c                     @ 080e9244 9ca4e409
-DAT_080e9248:
-    .word  0x09e4a598                     @ 080e9248 98a5e409
+set_cell_anim_callback_fields_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e9244 9ca4e409  pAnimCtrl
+set_cell_anim_callback_fields_assert_void_pfunc:
+    .word  assert_void_pfunc              @ 080e9248 98a5e409  (void*)pFunc
 DAT_080e924c:
     .word  0x00000283                     @ 080e924c 83020000
-DAT_080e9250:
-    .word  0x09e4a5a8                     @ 080e9250 a8a5e409
+set_cell_anim_callback_fields_assert_type_nns_g2d_anmcallbacktype_s:
+    .word  assert_type_nns_g2d_anmcallbacktype_s @ 080e9250 a8a5e409  type != NNS_G2D_ANMCALLBACKTYPE_SPEC_FRM
 
 @ Write the callback dispatch fields of NNS_G2dCellAnimation with loop_type forced to 2 (NNS_G2D_ANIMATIONTYPE_CELL2 mode). Called from NNS G2D CellAnimation init path (g2d_Animation.c line 0x2a2=674). Assert pCellAnim non-NULL (line 0x2a2), pDataA non-NULL (line 0x2a3). Complementary to set_cell_anim_callback_fields: that function rejects type==2; this one handles type==2 exclusively. Writes: [+0x1c]=2, [+0x24]=pDataA, [+0x20]=pDataB, [+0x28]=seqId_u16.
 @ Constants: LOOP_TYPE_CELL2=2.
@@ -246,17 +246,17 @@ set_cell_anim_callback_type2:
     lsrs r6,r3,#0x10    @ 080e925e 1e0c
     cmp r4,#0x0                              @ 080e9260 002c
     bne LAB_080e9270                         @ 080e9262 05d1
-    ldr r0, DAT_080e9290                     @ 080e9264 0a48
+    ldr r0, set_cell_anim_callback_type2_g2d_animation_c_filename @ 080e9264 0a48
     ldr r1, DAT_080e9294                     @ 080e9266 0b49
-    ldr r2, DAT_080e9298                     @ 080e9268 0b4a
+    ldr r2, set_cell_anim_callback_type2_assert_panimctrl @ 080e9268 0b4a
     movs r3,#0x1    @ 080e926a 0123
     bl suppress_assert_report                @ 080e926c 11f036f9
 LAB_080e9270:
     cmp r5,#0x0                              @ 080e9270 002d
     bne LAB_080e9280                         @ 080e9272 05d1
-    ldr r0, DAT_080e9290                     @ 080e9274 0648
+    ldr r0, set_cell_anim_callback_type2_g2d_animation_c_filename @ 080e9274 0648
     ldr r1, DAT_080e929c                     @ 080e9276 0949
-    ldr r2, DAT_080e92a0                     @ 080e9278 094a
+    ldr r2, set_cell_anim_callback_type2_assert_void_pfunc @ 080e9278 094a
     movs r3,#0x1    @ 080e927a 0123
     bl suppress_assert_report                @ 080e927c 11f02ef9
 LAB_080e9280:
@@ -268,16 +268,16 @@ LAB_080e9280:
     pop {r4,r5,r6,r7}                        @ 080e928a f0bc
     pop {r0}                                 @ 080e928c 01bc
     bx r0                                    @ 080e928e 0047
-DAT_080e9290:
-    .word  0x09e4a4a8                     @ 080e9290 a8a4e409
+set_cell_anim_callback_type2_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e9290 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e9294:
     .word  0x000002a2                     @ 080e9294 a2020000
-DAT_080e9298:
-    .word  0x09e4a49c                     @ 080e9298 9ca4e409
+set_cell_anim_callback_type2_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e9298 9ca4e409  pAnimCtrl
 DAT_080e929c:
     .word  0x000002a3                     @ 080e929c a3020000
-DAT_080e92a0:
-    .word  0x09e4a598                     @ 080e92a0 98a5e409
+set_cell_anim_callback_type2_assert_void_pfunc:
+    .word  assert_void_pfunc              @ 080e92a0 98a5e409  (void*)pFunc
 
 @ Check whether animation controller is in reversible (LOOP or REVERSE) mode; returns 1 if reversible, 0 if unidirectional. Called from NNS G2D animation direction control path (g2d_Animation.c line 0x2bb=699). Assert pAnimCtrl non-NULL (lines 0x2bb and 0x3e). If [pAnimCtrl+0x14] is nonzero, uses that field as type; otherwise reads [pAnimCtrl+0x18][+0x8] (pCurrent->type). Returns 1 if type==2 (LOOP) or type==4 (REVERSE).
 @ Constants: ANIM_TYPE_LOOP=2 / ANIM_TYPE_REVERSE=4.
@@ -286,26 +286,26 @@ check_anim_ctrl_loop_is_reversible:
     adds r4,r0,#0x0    @ 080e92a6 041c
     cmp r4,#0x0                              @ 080e92a8 002c
     bne LAB_080e92b8                         @ 080e92aa 05d1
-    ldr r0, DAT_080e9330                     @ 080e92ac 2048
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e92ac 2048
     ldr r1, DAT_080e9334                     @ 080e92ae 2149
-    ldr r2, DAT_080e9338                     @ 080e92b0 214a
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl @ 080e92b0 214a
     movs r3,#0x1    @ 080e92b2 0123
     bl suppress_assert_report                @ 080e92b4 11f012f9
 LAB_080e92b8:
     ldr r0,[r4,#0x18]                        @ 080e92b8 a069
     cmp r0,#0x0                              @ 080e92ba 0028
     bne LAB_080e92cc                         @ 080e92bc 06d1
-    ldr r0, DAT_080e9330                     @ 080e92be 1c48
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e92be 1c48
     movs r1,#0xaf    @ 080e92c0 af21
     lsls r1,r1,#0x2    @ 080e92c2 8900
-    ldr r2, DAT_080e933c                     @ 080e92c4 1d4a
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl_panimsequence @ 080e92c4 1d4a
     movs r3,#0x1    @ 080e92c6 0123
     bl suppress_assert_report                @ 080e92c8 11f008f9
 LAB_080e92cc:
     cmp r4,#0x0                              @ 080e92cc 002c
     bne LAB_080e92dc                         @ 080e92ce 05d1
-    ldr r0, DAT_080e9330                     @ 080e92d0 1748
-    ldr r2, DAT_080e9338                     @ 080e92d2 194a
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e92d0 1748
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl @ 080e92d2 194a
     movs r1,#0x3e    @ 080e92d4 3e21
     movs r3,#0x1    @ 080e92d6 0123
     bl suppress_assert_report                @ 080e92d8 11f000f9
@@ -313,16 +313,16 @@ LAB_080e92dc:
     ldr r0,[r4,#0x18]                        @ 080e92dc a069
     cmp r0,#0x0                              @ 080e92de 0028
     bne LAB_080e92ee                         @ 080e92e0 05d1
-    ldr r0, DAT_080e9330                     @ 080e92e2 1348
-    ldr r2, DAT_080e933c                     @ 080e92e4 154a
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e92e2 1348
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl_panimsequence @ 080e92e4 154a
     movs r1,#0x3f    @ 080e92e6 3f21
     movs r3,#0x1    @ 080e92e8 0123
     bl suppress_assert_report                @ 080e92ea 11f0f7f8
 LAB_080e92ee:
     cmp r4,#0x0                              @ 080e92ee 002c
     bne LAB_080e92fe                         @ 080e92f0 05d1
-    ldr r0, DAT_080e9330                     @ 080e92f2 0f48
-    ldr r2, DAT_080e9338                     @ 080e92f4 104a
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e92f2 0f48
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl @ 080e92f4 104a
     movs r1,#0x2c    @ 080e92f6 2c21
     movs r3,#0x1    @ 080e92f8 0123
     bl suppress_assert_report                @ 080e92fa 11f0eff8
@@ -330,8 +330,8 @@ LAB_080e92fe:
     ldr r0,[r4,#0x18]                        @ 080e92fe a069
     cmp r0,#0x0                              @ 080e9300 0028
     bne LAB_080e9310                         @ 080e9302 05d1
-    ldr r0, DAT_080e9330                     @ 080e9304 0a48
-    ldr r2, DAT_080e933c                     @ 080e9306 0d4a
+    ldr r0, check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename @ 080e9304 0a48
+    ldr r2, check_anim_ctrl_loop_is_reversible_assert_panimctrl_panimsequence @ 080e9306 0d4a
     movs r1,#0x2d    @ 080e9308 2d21
     movs r3,#0x1    @ 080e930a 0123
     bl suppress_assert_report                @ 080e930c 11f0e6f8
@@ -355,14 +355,14 @@ LAB_080e9326:
     pop {r1}                                 @ 080e932a 02bc
     bx r1                                    @ 080e932c 0847
     .zero  0x2
-DAT_080e9330:
-    .word  0x09e4a4a8                     @ 080e9330 a8a4e409
+check_anim_ctrl_loop_is_reversible_g2d_animation_c_filename:
+    .word  g2d_animation_c_filename       @ 080e9330 a8a4e409  nnsys/g2d/g2d_Animation.c
 DAT_080e9334:
     .word  0x000002bb                     @ 080e9334 bb020000
-DAT_080e9338:
-    .word  0x09e4a49c                     @ 080e9338 9ca4e409
-DAT_080e933c:
-    .word  0x09e4a4d0                     @ 080e933c d0a4e409
+check_anim_ctrl_loop_is_reversible_assert_panimctrl:
+    .word  assert_panimctrl               @ 080e9338 9ca4e409  pAnimCtrl
+check_anim_ctrl_loop_is_reversible_assert_panimctrl_panimsequence:
+    .word  assert_panimctrl_panimsequence @ 080e933c d0a4e409  pAnimCtrl->pAnimSequence
     .byte  0x01, 0x1c, 0x03, 0x31, 0x80, 0x20, 0x40, 0x02, 0x88, 0x40, 0x00, 0x0c, 0x70, 0x47, 0x00, 0x00
 
 @ nnsys/g2d/g2d_CellAnimation.c -- apply current animation frame to CellAnimation controller. Called by init_cell_anim_with_seq (0x080e94a4) and update paths. Asserts pCellAnim != NULL (line 0x16), pCellAnim->pCellDataBank != NULL (line 0x17). Reads current frame ptr via get_anim_ctrl_current_frame_ptr, calls get_nob_cell_data_ptr -> stores result at [pCellAnim+0x2C]; calls bind_srt_ctrl_data to init SRT sub-controller at [pCellAnim+0x38]; dispatch on frame transform type (0/2/6): type 2 -> set_nob_cell_position; type 6 -> set_srt_ctrl_translate. r0=NNS_G2dCellAnimation* pCellAnim [non-NULL]. Constants: CELL_ANIM_CELL_DATA_BANK_OFFSET=0x30 / CELL_ANIM_CURRENT_CELL_OFFSET=0x2C / CELL_ANIM_SRT_CTRL_OFFSET=0x38.
@@ -371,8 +371,8 @@ apply_cell_anim_frame:
     adds r5,r0,#0x0    @ 080e9352 051c
     cmp r5,#0x0                              @ 080e9354 002d
     bne LAB_080e9364                         @ 080e9356 05d1
-    ldr r0, DAT_080e93c8                     @ 080e9358 1b48
-    ldr r2, DAT_080e93cc                     @ 080e935a 1c4a
+    ldr r0, apply_cell_anim_frame_g2d_cellanimation_c_filename @ 080e9358 1b48
+    ldr r2, apply_cell_anim_frame_assert_pcellanim @ 080e935a 1c4a
     movs r1,#0x16    @ 080e935c 1621
     movs r3,#0x1    @ 080e935e 0123
     bl suppress_assert_report                @ 080e9360 11f0bcf8
@@ -380,8 +380,8 @@ LAB_080e9364:
     ldr r0,[r5,#0x30]                        @ 080e9364 286b
     cmp r0,#0x0                              @ 080e9366 0028
     bne LAB_080e9376                         @ 080e9368 05d1
-    ldr r0, DAT_080e93c8                     @ 080e936a 1748
-    ldr r2, DAT_080e93d0                     @ 080e936c 184a
+    ldr r0, apply_cell_anim_frame_g2d_cellanimation_c_filename @ 080e936a 1748
+    ldr r2, apply_cell_anim_frame_assert_pcellanim_pcelldatabank @ 080e936c 184a
     movs r1,#0x17    @ 080e936e 1721
     movs r3,#0x1    @ 080e9370 0123
     bl suppress_assert_report                @ 080e9372 11f0b3f8
@@ -399,8 +399,8 @@ LAB_080e9376:
     str r0,[r5,#0x2c]                        @ 080e938e e862
     cmp r0,#0x0                              @ 080e9390 0028
     bne LAB_080e93a0                         @ 080e9392 05d1
-    ldr r0, DAT_080e93c8                     @ 080e9394 0c48
-    ldr r2, DAT_080e93d4                     @ 080e9396 0f4a
+    ldr r0, apply_cell_anim_frame_g2d_cellanimation_c_filename @ 080e9394 0c48
+    ldr r2, apply_cell_anim_frame_assert_pcellanim_pcurrentcell @ 080e9396 0f4a
     movs r1,#0x2b    @ 080e9398 2b21
     movs r3,#0x1    @ 080e939a 0123
     bl suppress_assert_report                @ 080e939c 11f09ef8
@@ -423,14 +423,14 @@ LAB_080e93a0:
     bl set_nob_cell_position                 @ 080e93c0 02f072fa
     b LAB_080e93f8                           @ 080e93c4 18e0
     .zero  0x2
-DAT_080e93c8:
-    .word  0x09e4ae60                     @ 080e93c8 60aee409
-DAT_080e93cc:
-    .word  0x09e4ad64                     @ 080e93cc 64ade409
-DAT_080e93d0:
-    .word  0x09e4ae80                     @ 080e93d0 80aee409
-DAT_080e93d4:
-    .word  0x09e4ae9c                     @ 080e93d4 9caee409
+apply_cell_anim_frame_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e93c8 60aee409  nnsys/g2d/g2d_CellAnimation.c
+apply_cell_anim_frame_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e93cc 64ade409  pCellAnim
+apply_cell_anim_frame_assert_pcellanim_pcelldatabank:
+    .word  assert_pcellanim_pcelldatabank @ 080e93d0 80aee409  pCellAnim->pCellDataBank
+apply_cell_anim_frame_assert_pcellanim_pcurrentcell:
+    .word  assert_pcellanim_pcurrentcell  @ 080e93d4 9caee409  pCellAnim->pCurrentCell
 LAB_080e93d8:
     ldr r1,[r4,#0x4]                         @ 080e93d8 6168
     ldr r2,[r4,#0x8]                         @ 080e93da a268
@@ -459,48 +459,48 @@ bind_cell_anim_to_bank:
     adds r5,r2,#0x0    @ 080e9406 151c
     cmp r4,#0x0                              @ 080e9408 002c
     bne LAB_080e9418                         @ 080e940a 05d1
-    ldr r0, DAT_080e9490                     @ 080e940c 2048
-    ldr r2, DAT_080e9494                     @ 080e940e 214a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e940c 2048
+    ldr r2, bind_cell_anim_to_bank_assert_pcellanim @ 080e940e 214a
     movs r1,#0x87    @ 080e9410 8721
     movs r3,#0x1    @ 080e9412 0123
     bl suppress_assert_report                @ 080e9414 11f062f8
 LAB_080e9418:
     cmp r6,#0x0                              @ 080e9418 002e
     bne LAB_080e9428                         @ 080e941a 05d1
-    ldr r0, DAT_080e9490                     @ 080e941c 1c48
-    ldr r2, DAT_080e9498                     @ 080e941e 1e4a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e941c 1c48
+    ldr r2, bind_cell_anim_to_bank_assert_panimseq @ 080e941e 1e4a
     movs r1,#0x88    @ 080e9420 8821
     movs r3,#0x1    @ 080e9422 0123
     bl suppress_assert_report                @ 080e9424 11f05af8
 LAB_080e9428:
     cmp r5,#0x0                              @ 080e9428 002d
     bne LAB_080e9438                         @ 080e942a 05d1
-    ldr r0, DAT_080e9490                     @ 080e942c 1848
-    ldr r2, DAT_080e949c                     @ 080e942e 1b4a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e942c 1848
+    ldr r2, bind_cell_anim_to_bank_assert_pcelldatabank @ 080e942e 1b4a
     movs r1,#0x89    @ 080e9430 8921
     movs r3,#0x1    @ 080e9432 0123
     bl suppress_assert_report                @ 080e9434 11f052f8
 LAB_080e9438:
     cmp r4,#0x0                              @ 080e9438 002c
     bne LAB_080e9448                         @ 080e943a 05d1
-    ldr r0, DAT_080e9490                     @ 080e943c 1448
-    ldr r2, DAT_080e9494                     @ 080e943e 154a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e943c 1448
+    ldr r2, bind_cell_anim_to_bank_assert_pcellanim @ 080e943e 154a
     movs r1,#0x64    @ 080e9440 6421
     movs r3,#0x1    @ 080e9442 0123
     bl suppress_assert_report                @ 080e9444 11f04af8
 LAB_080e9448:
     cmp r6,#0x0                              @ 080e9448 002e
     bne LAB_080e9458                         @ 080e944a 05d1
-    ldr r0, DAT_080e9490                     @ 080e944c 1048
-    ldr r2, DAT_080e9498                     @ 080e944e 124a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e944c 1048
+    ldr r2, bind_cell_anim_to_bank_assert_panimseq @ 080e944e 124a
     movs r1,#0x65    @ 080e9450 6521
     movs r3,#0x1    @ 080e9452 0123
     bl suppress_assert_report                @ 080e9454 11f042f8
 LAB_080e9458:
     cmp r5,#0x0                              @ 080e9458 002d
     bne LAB_080e9468                         @ 080e945a 05d1
-    ldr r0, DAT_080e9490                     @ 080e945c 0c48
-    ldr r2, DAT_080e949c                     @ 080e945e 0f4a
+    ldr r0, bind_cell_anim_to_bank_g2d_cellanimation_c_filename @ 080e945c 0c48
+    ldr r2, bind_cell_anim_to_bank_assert_pcelldatabank @ 080e945e 0f4a
     movs r1,#0x66    @ 080e9460 6621
     movs r3,#0x1    @ 080e9462 0123
     bl suppress_assert_report                @ 080e9464 11f03af8
@@ -522,14 +522,14 @@ LAB_080e9468:
     pop {r0}                                 @ 080e948a 01bc
     bx r0                                    @ 080e948c 0047
     .zero  0x2
-DAT_080e9490:
-    .word  0x09e4ae60                     @ 080e9490 60aee409
-DAT_080e9494:
-    .word  0x09e4ad64                     @ 080e9494 64ade409
-DAT_080e9498:
-    .word  0x09e4aeb4                     @ 080e9498 b4aee409
-DAT_080e949c:
-    .word  0x09e4aec0                     @ 080e949c c0aee409
+bind_cell_anim_to_bank_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e9490 60aee409  nnsys/g2d/g2d_CellAnimation.c
+bind_cell_anim_to_bank_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e9494 64ade409  pCellAnim
+bind_cell_anim_to_bank_assert_panimseq:
+    .word  assert_panimseq                @ 080e9498 b4aee409  pAnimSeq
+bind_cell_anim_to_bank_assert_pcelldatabank:
+    .word  assert_pcelldatabank           @ 080e949c c0aee409  pCellDataBank
     .byte  0x70, 0x47, 0x00, 0x00
 
 @ nnsys/g2d/g2d_CellAnimation.c -- bind animation sequence to CellAnimation and apply first frame. Called by bind_cell_anim_to_bank (0x080e9400). Asserts pCellAnim != NULL (line 0xE5), pAnimSeq != NULL (line 0xE6), pAnimSeq type == NNS_G2D_ANIMATIONTYPE_CELL (line 0xE8). Calls bind_anim_ctrl_callback to bind sequence, then apply_cell_anim_frame to write first frame. Equivalent to NNS_G2dSetCellAnimationSequence. r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dAnimSequence* pAnimSeq. Constants: ANIM_TYPE_CELL=1.
@@ -539,16 +539,16 @@ init_cell_anim_with_seq:
     adds r4,r1,#0x0    @ 080e94a8 0c1c
     cmp r5,#0x0                              @ 080e94aa 002d
     bne LAB_080e94ba                         @ 080e94ac 05d1
-    ldr r0, DAT_080e94f0                     @ 080e94ae 1048
-    ldr r2, DAT_080e94f4                     @ 080e94b0 104a
+    ldr r0, init_cell_anim_with_seq_g2d_cellanimation_c_filename @ 080e94ae 1048
+    ldr r2, init_cell_anim_with_seq_assert_pcellanim @ 080e94b0 104a
     movs r1,#0xe5    @ 080e94b2 e521
     movs r3,#0x1    @ 080e94b4 0123
     bl suppress_assert_report                @ 080e94b6 11f011f8
 LAB_080e94ba:
     cmp r4,#0x0                              @ 080e94ba 002c
     bne LAB_080e94ca                         @ 080e94bc 05d1
-    ldr r0, DAT_080e94f0                     @ 080e94be 0c48
-    ldr r2, DAT_080e94f8                     @ 080e94c0 0d4a
+    ldr r0, init_cell_anim_with_seq_g2d_cellanimation_c_filename @ 080e94be 0c48
+    ldr r2, init_cell_anim_with_seq_assert_panimseq @ 080e94c0 0d4a
     movs r1,#0xe6    @ 080e94c2 e621
     movs r3,#0x1    @ 080e94c4 0123
     bl suppress_assert_report                @ 080e94c6 11f009f8
@@ -556,8 +556,8 @@ LAB_080e94ca:
     ldrh r0,[r4,#0x6]                        @ 080e94ca e088
     cmp r0,#0x1                              @ 080e94cc 0128
     beq LAB_080e94dc                         @ 080e94ce 05d0
-    ldr r0, DAT_080e94f0                     @ 080e94d0 0748
-    ldr r2, DAT_080e94fc                     @ 080e94d2 0a4a
+    ldr r0, init_cell_anim_with_seq_g2d_cellanimation_c_filename @ 080e94d0 0748
+    ldr r2, init_cell_anim_with_seq_assert_nns_g2dgetanimsequenceanimtype @ 080e94d2 0a4a
     movs r1,#0xe8    @ 080e94d4 e821
     movs r3,#0x1    @ 080e94d6 0123
     bl suppress_assert_report                @ 080e94d8 11f000f8
@@ -570,14 +570,14 @@ LAB_080e94dc:
     pop {r4,r5}                              @ 080e94ea 30bc
     pop {r0}                                 @ 080e94ec 01bc
     bx r0                                    @ 080e94ee 0047
-DAT_080e94f0:
-    .word  0x09e4ae60                     @ 080e94f0 60aee409
-DAT_080e94f4:
-    .word  0x09e4ad64                     @ 080e94f4 64ade409
-DAT_080e94f8:
-    .word  0x09e4aeb4                     @ 080e94f8 b4aee409
-DAT_080e94fc:
-    .word  0x09e4aed0                     @ 080e94fc d0aee409
+init_cell_anim_with_seq_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e94f0 60aee409  nnsys/g2d/g2d_CellAnimation.c
+init_cell_anim_with_seq_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e94f4 64ade409  pCellAnim
+init_cell_anim_with_seq_assert_panimseq:
+    .word  assert_panimseq                @ 080e94f8 b4aee409  pAnimSeq
+init_cell_anim_with_seq_assert_nns_g2dgetanimsequenceanimtype:
+    .word  assert_nns_g2dgetanimsequenceanimtype @ 080e94fc d0aee409  NNS_G2dGetAnimSequenceAnimType( pAnimSeq ) == NNS_G2D_ANIMAT
 
 @ Initializes an NNS G2D CellAnimation sequence and resets frame position to start.
 @ r0=NNS_G2dCellAnimation* pCellAnim, r1=NNS_G2dAnimSequence* pSequence.
@@ -609,27 +609,27 @@ init_cell_anim_sequence_and_frame:
     adds r5,r1,#0x0    @ 080e9504 0d1c
     cmp r4,#0x0                              @ 080e9506 002c
     bne LAB_080e9518                         @ 080e9508 06d1
-    ldr r0, DAT_080e9564                     @ 080e950a 1648
+    ldr r0, init_cell_anim_sequence_and_frame_g2d_cellanimation_c_filename @ 080e950a 1648
     movs r1,#0x80    @ 080e950c 8021
     lsls r1,r1,#0x1    @ 080e950e 4900
-    ldr r2, DAT_080e9568                     @ 080e9510 154a
+    ldr r2, init_cell_anim_sequence_and_frame_assert_pcellanim @ 080e9510 154a
     movs r3,#0x1    @ 080e9512 0123
     bl suppress_assert_report                @ 080e9514 10f0e2ff
 LAB_080e9518:
     cmp r5,#0x0                              @ 080e9518 002d
     bne LAB_080e9528                         @ 080e951a 05d1
-    ldr r0, DAT_080e9564                     @ 080e951c 1148
+    ldr r0, init_cell_anim_sequence_and_frame_g2d_cellanimation_c_filename @ 080e951c 1148
     ldr r1, DAT_080e956c                     @ 080e951e 1349
-    ldr r2, DAT_080e9570                     @ 080e9520 134a
+    ldr r2, init_cell_anim_sequence_and_frame_assert_panimseq @ 080e9520 134a
     movs r3,#0x1    @ 080e9522 0123
     bl suppress_assert_report                @ 080e9524 10f0daff
 LAB_080e9528:
     ldrh r0,[r5,#0x6]                        @ 080e9528 e888
     cmp r0,#0x1                              @ 080e952a 0128
     beq LAB_080e953a                         @ 080e952c 05d0
-    ldr r0, DAT_080e9564                     @ 080e952e 0d48
+    ldr r0, init_cell_anim_sequence_and_frame_g2d_cellanimation_c_filename @ 080e952e 0d48
     ldr r1, DAT_080e9574                     @ 080e9530 1049
-    ldr r2, DAT_080e9578                     @ 080e9532 114a
+    ldr r2, init_cell_anim_sequence_and_frame_assert_nns_g2dgetanimsequenceanimtype @ 080e9532 114a
     movs r3,#0x1    @ 080e9534 0123
     bl suppress_assert_report                @ 080e9536 10f0d1ff
 LAB_080e953a:
@@ -651,18 +651,18 @@ LAB_080e9558:
     pop {r4,r5}                              @ 080e955e 30bc
     pop {r0}                                 @ 080e9560 01bc
     bx r0                                    @ 080e9562 0047
-DAT_080e9564:
-    .word  0x09e4ae60                     @ 080e9564 60aee409
-DAT_080e9568:
-    .word  0x09e4ad64                     @ 080e9568 64ade409
+init_cell_anim_sequence_and_frame_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e9564 60aee409  nnsys/g2d/g2d_CellAnimation.c
+init_cell_anim_sequence_and_frame_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e9568 64ade409  pCellAnim
 DAT_080e956c:
     .word  0x00000101                     @ 080e956c 01010000
-DAT_080e9570:
-    .word  0x09e4aeb4                     @ 080e9570 b4aee409
+init_cell_anim_sequence_and_frame_assert_panimseq:
+    .word  assert_panimseq                @ 080e9570 b4aee409  pAnimSeq
 DAT_080e9574:
     .word  0x00000103                     @ 080e9574 03010000
-DAT_080e9578:
-    .word  0x09e4aed0                     @ 080e9578 d0aee409
+init_cell_anim_sequence_and_frame_assert_nns_g2dgetanimsequenceanimtype:
+    .word  assert_nns_g2dgetanimsequenceanimtype @ 080e9578 d0aee409  NNS_G2dGetAnimSequenceAnimType( pAnimSeq ) == NNS_G2D_ANIMAT
 
 @ nnsys/g2d/g2d_CellAnimation.c line 0x122=290. Called by dispatch_cell_anim_frame_advance (0x0801571c, D_shared_mid hub indeg=6). Asserts pCellAnim != NULL (line 290), pCellAnim->pCurrentCell (+0x18) non-NULL (line 291), animation sequence type == NNS_G2D_ANIMATIONTYPE_CELL (line 293). Calls step_anim_ctrl_by_frames(pCellAnim, frames); if return non-zero (frame changed): calls apply_cell_anim_frame to update OAM. Sibling of step_cell_anim_sequence_guarded: this advances frames, that switches sequences. r0=NNS_G2dCellAnimation* pCellAnim, r1=s16 frames [0..N]. Returns 0=no change, non-zero=frame changed.
 advance_cell_anim_frame_guarded:
@@ -671,19 +671,19 @@ advance_cell_anim_frame_guarded:
     adds r5,r1,#0x0    @ 080e9580 0d1c
     cmp r4,#0x0                              @ 080e9582 002c
     bne LAB_080e9594                         @ 080e9584 06d1
-    ldr r0, DAT_080e95d4                     @ 080e9586 1348
+    ldr r0, advance_cell_anim_frame_guarded_g2d_cellanimation_c_filename @ 080e9586 1348
     movs r1,#0x91    @ 080e9588 9121
     lsls r1,r1,#0x1    @ 080e958a 4900
-    ldr r2, DAT_080e95d8                     @ 080e958c 124a
+    ldr r2, advance_cell_anim_frame_guarded_assert_pcellanim @ 080e958c 124a
     movs r3,#0x1    @ 080e958e 0123
     bl suppress_assert_report                @ 080e9590 10f0a4ff
 LAB_080e9594:
     ldr r0,[r4,#0x18]                        @ 080e9594 a069
     cmp r0,#0x0                              @ 080e9596 0028
     bne LAB_080e95a6                         @ 080e9598 05d1
-    ldr r0, DAT_080e95d4                     @ 080e959a 0e48
+    ldr r0, advance_cell_anim_frame_guarded_g2d_cellanimation_c_filename @ 080e959a 0e48
     ldr r1, DAT_080e95dc                     @ 080e959c 0f49
-    ldr r2, DAT_080e95e0                     @ 080e959e 104a
+    ldr r2, advance_cell_anim_frame_guarded_assert_pcellanim_animctrl_panimsequen @ 080e959e 104a
     movs r3,#0x1    @ 080e95a0 0123
     bl suppress_assert_report                @ 080e95a2 10f09bff
 LAB_080e95a6:
@@ -691,9 +691,9 @@ LAB_080e95a6:
     ldrh r0,[r0,#0x6]                        @ 080e95a8 c088
     cmp r0,#0x1                              @ 080e95aa 0128
     beq LAB_080e95ba                         @ 080e95ac 05d0
-    ldr r0, DAT_080e95d4                     @ 080e95ae 0948
+    ldr r0, advance_cell_anim_frame_guarded_g2d_cellanimation_c_filename @ 080e95ae 0948
     ldr r1, DAT_080e95e4                     @ 080e95b0 0c49
-    ldr r2, DAT_080e95e8                     @ 080e95b2 0d4a
+    ldr r2, advance_cell_anim_frame_guarded_assert_nns_g2dgetanimsequenceanimtype_f40 @ 080e95b2 0d4a
     movs r3,#0x1    @ 080e95b4 0123
     bl suppress_assert_report                @ 080e95b6 10f091ff
 LAB_080e95ba:
@@ -709,18 +709,18 @@ LAB_080e95cc:
     pop {r0}                                 @ 080e95ce 01bc
     bx r0                                    @ 080e95d0 0047
     .zero  0x2
-DAT_080e95d4:
-    .word  0x09e4ae60                     @ 080e95d4 60aee409
-DAT_080e95d8:
-    .word  0x09e4ad64                     @ 080e95d8 64ade409
+advance_cell_anim_frame_guarded_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e95d4 60aee409  nnsys/g2d/g2d_CellAnimation.c
+advance_cell_anim_frame_guarded_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e95d8 64ade409  pCellAnim
 DAT_080e95dc:
     .word  0x00000123                     @ 080e95dc 23010000
-DAT_080e95e0:
-    .word  0x09e4af1c                     @ 080e95e0 1cafe409
+advance_cell_anim_frame_guarded_assert_pcellanim_animctrl_panimsequen:
+    .word  assert_pcellanim_animctrl_panimsequen @ 080e95e0 1cafe409  pCellAnim->animCtrl.pAnimSequence
 DAT_080e95e4:
     .word  0x00000125                     @ 080e95e4 25010000
-DAT_080e95e8:
-    .word  0x09e4af40                     @ 080e95e8 40afe409
+advance_cell_anim_frame_guarded_assert_nns_g2dgetanimsequenceanimtype_f40:
+    .word  assert_nns_g2dgetanimsequenceanimtype_f40 @ 080e95e8 40afe409  NNS_G2dGetAnimSequenceAnimType( pCellAnim->animCtrl.pAnimSeq
 
 @ nnsys/g2d/g2d_CellAnimation.c. Called by dispatch_cell_anim_sequence_step (0x080156e0, D_shared_mid hub indeg=6) and FUN_08015ea4. Asserts pCellAnim != NULL (g2d_Animation.c:0x143=323), pCellAnim->pCurrentCell (+0x18) non-NULL. Calls set_cell_anim_sequence_by_idx_guarded(pCellAnim, seq_idx); if return non-zero: calls apply_cell_anim_frame to apply OAM data. r0=NNS_G2dCellAnimation* pCellAnim, r1=u16 sequence_idx. Returns 0=no frame change, non-zero=frame applied.
 step_cell_anim_sequence_guarded:
@@ -730,19 +730,19 @@ step_cell_anim_sequence_guarded:
     lsrs r5,r1,#0x10    @ 080e95f2 0d0c
     cmp r4,#0x0                              @ 080e95f4 002c
     bne LAB_080e9606                         @ 080e95f6 06d1
-    ldr r0, DAT_080e9630                     @ 080e95f8 0d48
+    ldr r0, step_cell_anim_sequence_guarded_g2d_cellanimation_c_filename @ 080e95f8 0d48
     movs r1,#0xa1    @ 080e95fa a121
     lsls r1,r1,#0x1    @ 080e95fc 4900
-    ldr r2, DAT_080e9634                     @ 080e95fe 0d4a
+    ldr r2, step_cell_anim_sequence_guarded_assert_pcellanim @ 080e95fe 0d4a
     movs r3,#0x1    @ 080e9600 0123
     bl suppress_assert_report                @ 080e9602 10f06bff
 LAB_080e9606:
     ldr r0,[r4,#0x18]                        @ 080e9606 a069
     cmp r0,#0x0                              @ 080e9608 0028
     bne LAB_080e9618                         @ 080e960a 05d1
-    ldr r0, DAT_080e9630                     @ 080e960c 0848
+    ldr r0, step_cell_anim_sequence_guarded_g2d_cellanimation_c_filename @ 080e960c 0848
     ldr r1, DAT_080e9638                     @ 080e960e 0a49
-    ldr r2, DAT_080e963c                     @ 080e9610 0a4a
+    ldr r2, step_cell_anim_sequence_guarded_assert_pcellanim_animctrl_panimsequen @ 080e9610 0a4a
     movs r3,#0x1    @ 080e9612 0123
     bl suppress_assert_report                @ 080e9614 10f062ff
 LAB_080e9618:
@@ -757,14 +757,14 @@ LAB_080e962a:
     pop {r4,r5}                              @ 080e962a 30bc
     pop {r0}                                 @ 080e962c 01bc
     bx r0                                    @ 080e962e 0047
-DAT_080e9630:
-    .word  0x09e4ae60                     @ 080e9630 60aee409
-DAT_080e9634:
-    .word  0x09e4ad64                     @ 080e9634 64ade409
+step_cell_anim_sequence_guarded_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e9630 60aee409  nnsys/g2d/g2d_CellAnimation.c
+step_cell_anim_sequence_guarded_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e9634 64ade409  pCellAnim
 DAT_080e9638:
     .word  0x00000143                     @ 080e9638 43010000
-DAT_080e963c:
-    .word  0x09e4af1c                     @ 080e963c 1cafe409
+step_cell_anim_sequence_guarded_assert_pcellanim_animctrl_panimsequen:
+    .word  assert_pcellanim_animctrl_panimsequen @ 080e963c 1cafe409  pCellAnim->animCtrl.pAnimSequence
 
 @ Set the animation playback speed field [+0x10] of NNS_G2dCellAnimation. Called from NNS G2D CellAnimation config path (g2d_CellAnimation.c line 0x15f=351). Assert pCellAnim non-NULL (line 0x15f=351 and two NULL checks 0xb0*2=0x160=352). Also checks [pCellAnim+0x18] (pCurrent) is non-NULL. Writes r1 (speed) to [pCellAnim+0x10]. Side effect: animation playback rate takes effect immediately on next step_anim_ctrl_by_frames call.
 set_cell_anim_ctrl_speed:
@@ -773,26 +773,26 @@ set_cell_anim_ctrl_speed:
     adds r5,r1,#0x0    @ 080e9644 0d1c
     cmp r4,#0x0                              @ 080e9646 002c
     bne LAB_080e9656                         @ 080e9648 05d1
-    ldr r0, DAT_080e9684                     @ 080e964a 0e48
+    ldr r0, set_cell_anim_ctrl_speed_g2d_cellanimation_c_filename @ 080e964a 0e48
     ldr r1, DAT_080e9688                     @ 080e964c 0e49
-    ldr r2, DAT_080e968c                     @ 080e964e 0f4a
+    ldr r2, set_cell_anim_ctrl_speed_assert_pcellanim @ 080e964e 0f4a
     movs r3,#0x1    @ 080e9650 0123
     bl suppress_assert_report                @ 080e9652 10f043ff
 LAB_080e9656:
     ldr r0,[r4,#0x18]                        @ 080e9656 a069
     cmp r0,#0x0                              @ 080e9658 0028
     bne LAB_080e966a                         @ 080e965a 06d1
-    ldr r0, DAT_080e9684                     @ 080e965c 0948
+    ldr r0, set_cell_anim_ctrl_speed_g2d_cellanimation_c_filename @ 080e965c 0948
     movs r1,#0xb0    @ 080e965e b021
     lsls r1,r1,#0x1    @ 080e9660 4900
-    ldr r2, DAT_080e9690                     @ 080e9662 0b4a
+    ldr r2, set_cell_anim_ctrl_speed_assert_pcellanim_animctrl_panimsequen @ 080e9662 0b4a
     movs r3,#0x1    @ 080e9664 0123
     bl suppress_assert_report                @ 080e9666 10f039ff
 LAB_080e966a:
     cmp r4,#0x0                              @ 080e966a 002c
     bne LAB_080e967a                         @ 080e966c 05d1
-    ldr r0, DAT_080e9694                     @ 080e966e 0948
-    ldr r2, DAT_080e9698                     @ 080e9670 094a
+    ldr r0, set_cell_anim_ctrl_speed_g2d_animation_inline_h_filename_cdc @ 080e966e 0948
+    ldr r2, set_cell_anim_ctrl_speed_assert_panimctrl_d04 @ 080e9670 094a
     movs r1,#0x5e    @ 080e9672 5e21
     movs r3,#0x1    @ 080e9674 0123
     bl suppress_assert_report                @ 080e9676 10f031ff
@@ -802,18 +802,18 @@ LAB_080e967a:
     pop {r0}                                 @ 080e967e 01bc
     bx r0                                    @ 080e9680 0047
     .zero  0x2
-DAT_080e9684:
-    .word  0x09e4ae60                     @ 080e9684 60aee409
+set_cell_anim_ctrl_speed_g2d_cellanimation_c_filename:
+    .word  g2d_cellanimation_c_filename   @ 080e9684 60aee409  nnsys/g2d/g2d_CellAnimation.c
 DAT_080e9688:
     .word  0x0000015f                     @ 080e9688 5f010000
-DAT_080e968c:
-    .word  0x09e4ad64                     @ 080e968c 64ade409
-DAT_080e9690:
-    .word  0x09e4af1c                     @ 080e9690 1cafe409
-DAT_080e9694:
-    .word  0x09e4acdc                     @ 080e9694 dcace409
-DAT_080e9698:
-    .word  0x09e4ad04                     @ 080e9698 04ade409
+set_cell_anim_ctrl_speed_assert_pcellanim:
+    .word  assert_pcellanim               @ 080e968c 64ade409  pCellAnim
+set_cell_anim_ctrl_speed_assert_pcellanim_animctrl_panimsequen:
+    .word  assert_pcellanim_animctrl_panimsequen @ 080e9690 1cafe409  pCellAnim->animCtrl.pAnimSequence
+set_cell_anim_ctrl_speed_g2d_animation_inline_h_filename_cdc:
+    .word  g2d_animation_inline_h_filename_cdc @ 080e9694 dcace409  inc/nnsys/g2d/g2d_Animation_inline.h
+set_cell_anim_ctrl_speed_assert_panimctrl_d04:
+    .word  assert_panimctrl_d04           @ 080e9698 04ade409  pAnimCtrl
 
 @ Called by setup_isd_cell_anim_oam_entry (0x08015954). Transforms all cell OAM objects of current NNS_G2dCellAnimation frame via SRT affine and writes result to output buffer (pDst). Source: inc/nnsys/g2d/fmt/g2d_Cell_data.h + g2d_Animation_inline.h asserts. Core loop: reads attr0/attr1/attr2 (3x u16), extracts flip flags and OAM mode, applies SRT transform via __muldi3 (12.20 fixed-point matrix multiply), re-encodes transformed X/Y into attr0/attr1. Loop from 0 to min(cell_oam_count, max_limit). r0=void* pDst_base [0x030007f8 at callsite], r1=u16 max_oam_count [0..128], r2=NNS_G2dCellData* pCell, r3=NNS_G2dAnimController* pAnimCtrl. Returns u16 actual OAM count written. Side-effects: [pDst+i*8] per-entry OAM attr0/attr1 pair written.
 build_oam_attrs_from_cell_with_affine:
@@ -857,9 +857,9 @@ LAB_080e96da:
     adds r7,r1,r0    @ 080e96e0 0f18
     cmp r7,#0x0                              @ 080e96e2 002f
     bne LAB_080e96f2                         @ 080e96e4 05d1
-    ldr r0, DAT_080e9770                     @ 080e96e6 2248
+    ldr r0, build_oam_attrs_from_cell_with_affine_g2d_cell_data_h_filename @ 080e96e6 2248
     ldr r1, DAT_080e9774                     @ 080e96e8 2249
-    ldr r2, DAT_080e9778                     @ 080e96ea 234a
+    ldr r2, build_oam_attrs_from_cell_with_affine_assert_pdst @ 080e96ea 234a
     movs r3,#0x1    @ 080e96ec 0123
     bl suppress_assert_report                @ 080e96ee 10f0f5fe
 LAB_080e96f2:
@@ -931,12 +931,12 @@ LAB_080e976a:
     adds r0,r1,#0x0    @ 080e976a 081c
     b LAB_080e978c                           @ 080e976c 0ee0
     .zero  0x2
-DAT_080e9770:
-    .word  0x09e4ac6c                     @ 080e9770 6cace409
+build_oam_attrs_from_cell_with_affine_g2d_cell_data_h_filename:
+    .word  g2d_cell_data_h_filename       @ 080e9770 6cace409  inc/nnsys/g2d/fmt/g2d_Cell_data.h
 DAT_080e9774:
     .word  0x000002ab                     @ 080e9774 ab020000
-DAT_080e9778:
-    .word  0x09e4aca4                     @ 080e9778 a4ace409
+build_oam_attrs_from_cell_with_affine_assert_pdst:
+    .word  assert_pdst                    @ 080e9778 a4ace409  pDst
 DAT_080e977c:
     .word  0x000001ff                     @ 080e977c ff010000
 DAT_080e9780:
@@ -1081,19 +1081,19 @@ LAB_080e97de:
     beq LAB_080e98a6                         @ 080e9894 07d0
     cmp r8,r10                               @ 080e9896 d045
     beq LAB_080e98a6                         @ 080e9898 05d0
-    ldr r0, DAT_080e98ec                     @ 080e989a 1448
+    ldr r0, build_oam_attrs_from_cell_with_affine_g2_oam_h_filename @ 080e989a 1448
     ldr r1, DAT_080e98f0                     @ 080e989c 1449
-    ldr r2, DAT_080e98f4                     @ 080e989e 154a
+    ldr r2, build_oam_attrs_from_cell_with_affine_assert_effect_gx_oam_effect_none_effe @ 080e989e 154a
     movs r3,#0x1    @ 080e98a0 0123
     bl suppress_assert_report                @ 080e98a2 10f01bfe
 LAB_080e98a6:
     ldr r1,[sp,#0x18]                        @ 080e98a6 0699
     cmp r1,#0x1f                             @ 080e98a8 1f29
     bls LAB_080e98ba                         @ 080e98aa 06d9
-    ldr r0, DAT_080e98ec                     @ 080e98ac 0f48
+    ldr r0, build_oam_attrs_from_cell_with_affine_g2_oam_h_filename @ 080e98ac 0f48
     movs r1,#0xeb    @ 080e98ae eb21
     lsls r1,r1,#0x1    @ 080e98b0 4900
-    ldr r2, DAT_080e98f8                     @ 080e98b2 114a
+    ldr r2, build_oam_attrs_from_cell_with_affine_assert_rsparam_0_rsparam_31 @ 080e98b2 114a
     movs r3,#0x1    @ 080e98b4 0123
     bl suppress_assert_report                @ 080e98b6 10f011fe
 LAB_080e98ba:
@@ -1122,14 +1122,14 @@ DAT_080e98e4:
     .word  0x00001000                     @ 080e98e4 00100000
 DAT_080e98e8:
     .word  0x00000000                     @ 080e98e8 00000000
-DAT_080e98ec:
-    .word  0x09e4a5d4                     @ 080e98ec d4a5e409
+build_oam_attrs_from_cell_with_affine_g2_oam_h_filename:
+    .word  g2_oam_h_filename              @ 080e98ec d4a5e409  inc/nitro/g2_oam.h
 DAT_080e98f0:
     .word  0x000001d5                     @ 080e98f0 d5010000
-DAT_080e98f4:
-    .word  0x09e4a6ac                     @ 080e98f4 aca6e409
-DAT_080e98f8:
-    .word  0x09e4a7b0                     @ 080e98f8 b0a7e409
+build_oam_attrs_from_cell_with_affine_assert_effect_gx_oam_effect_none_effe:
+    .word  assert_effect_gx_oam_effect_none_effe @ 080e98f4 aca6e409  (effect) == GX_OAM_EFFECT_NONE || (effect) == GX_OAM_EFFECT_
+build_oam_attrs_from_cell_with_affine_assert_rsparam_0_rsparam_31:
+    .word  assert_rsparam_0_rsparam_31    @ 080e98f8 b0a7e409  (rsParam) >= ( 0) && (rsParam) <= ( 31)
 DAT_080e98fc:
     .word  0xc1fffcff                     @ 080e98fc fffcffc1
 LAB_080e9900:
@@ -1368,9 +1368,9 @@ init_img_proxy_fields:
     adds r4,r0,#0x0    @ 080e9a96 041c
     cmp r4,#0x0                              @ 080e9a98 002c
     bne LAB_080e9aa8                         @ 080e9a9a 05d1
-    ldr r0, DAT_080e9ac0                     @ 080e9a9c 0848
+    ldr r0, init_img_proxy_fields_g2d_image_c_filename @ 080e9a9c 0848
     ldr r1, DAT_080e9ac4                     @ 080e9a9e 0949
-    ldr r2, DAT_080e9ac8                     @ 080e9aa0 094a
+    ldr r2, init_img_proxy_fields_assert_pimg @ 080e9aa0 094a
     movs r3,#0x1    @ 080e9aa2 0123
     bl suppress_assert_report                @ 080e9aa4 10f01afd
 LAB_080e9aa8:
@@ -1387,12 +1387,12 @@ LAB_080e9ab0:
     pop {r0}                                 @ 080e9aba 01bc
     bx r0                                    @ 080e9abc 0047
     .zero  0x2
-DAT_080e9ac0:
-    .word  0x09e4b61c                     @ 080e9ac0 1cb6e409
+init_img_proxy_fields_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9ac0 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080e9ac4:
     .word  0x00000175                     @ 080e9ac4 75010000
-DAT_080e9ac8:
-    .word  0x09e4b7cc                     @ 080e9ac8 ccb7e409
+init_img_proxy_fields_assert_pimg:
+    .word  assert_pimg                    @ 080e9ac8 ccb7e409  pImg
 
 @ nnsys/g2d/g2d_Image.c -- write VRAM base address into image proxy slot. Called by load_img_proxy_to_vram (0x080e9de8) and 3 other image load paths. Asserts pImgProxy != NULL (line 0xC8=200), type <= 2 (line 0x189=393 and 0x20=32), pImgProxy != NULL (line 0x1F=31). Calls check_vram_location_slot, then writes baseAddr to [pImgProxy + type*4]. r0=NNS_G2dImageProxy* pImgProxy [non-NULL], r1=u32 type [0..2], r2=u32 baseAddr. Constants: NNS_G2D_VRAM_TYPE_MAX=3 / IMG_PROXY_SLOT_STRIDE=4.
 set_img_proxy_vram_location:
@@ -1402,33 +1402,33 @@ set_img_proxy_vram_location:
     adds r6,r2,#0x0    @ 080e9ad2 161c
     cmp r5,#0x0                              @ 080e9ad4 002d
     bne LAB_080e9ae6                         @ 080e9ad6 06d1
-    ldr r0, DAT_080e9b2c                     @ 080e9ad8 1448
+    ldr r0, set_img_proxy_vram_location_g2d_image_c_filename @ 080e9ad8 1448
     movs r1,#0xc4    @ 080e9ada c421
     lsls r1,r1,#0x1    @ 080e9adc 4900
-    ldr r2, DAT_080e9b30                     @ 080e9ade 144a
+    ldr r2, set_img_proxy_vram_location_assert_pimg @ 080e9ade 144a
     movs r3,#0x1    @ 080e9ae0 0123
     bl suppress_assert_report                @ 080e9ae2 10f0fbfc
 LAB_080e9ae6:
     cmp r4,#0x2                              @ 080e9ae6 022c
     bls LAB_080e9af6                         @ 080e9ae8 05d9
-    ldr r0, DAT_080e9b2c                     @ 080e9aea 1048
+    ldr r0, set_img_proxy_vram_location_g2d_image_c_filename @ 080e9aea 1048
     ldr r1, DAT_080e9b34                     @ 080e9aec 1149
-    ldr r2, DAT_080e9b38                     @ 080e9aee 124a
+    ldr r2, set_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9aee 124a
     movs r3,#0x1    @ 080e9af0 0123
     bl suppress_assert_report                @ 080e9af2 10f0f3fc
 LAB_080e9af6:
     cmp r5,#0x0                              @ 080e9af6 002d
     bne LAB_080e9b06                         @ 080e9af8 05d1
-    ldr r0, DAT_080e9b2c                     @ 080e9afa 0c48
-    ldr r2, DAT_080e9b3c                     @ 080e9afc 0f4a
+    ldr r0, set_img_proxy_vram_location_g2d_image_c_filename @ 080e9afa 0c48
+    ldr r2, set_img_proxy_vram_location_assert_pvramlocation @ 080e9afc 0f4a
     movs r1,#0x1f    @ 080e9afe 1f21
     movs r3,#0x1    @ 080e9b00 0123
     bl suppress_assert_report                @ 080e9b02 10f0ebfc
 LAB_080e9b06:
     cmp r4,#0x2                              @ 080e9b06 022c
     bls LAB_080e9b16                         @ 080e9b08 05d9
-    ldr r0, DAT_080e9b2c                     @ 080e9b0a 0848
-    ldr r2, DAT_080e9b38                     @ 080e9b0c 0a4a
+    ldr r0, set_img_proxy_vram_location_g2d_image_c_filename @ 080e9b0a 0848
+    ldr r2, set_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9b0c 0a4a
     movs r1,#0x20    @ 080e9b0e 2021
     movs r3,#0x1    @ 080e9b10 0123
     bl suppress_assert_report                @ 080e9b12 10f0e3fc
@@ -1443,16 +1443,16 @@ LAB_080e9b16:
     pop {r0}                                 @ 080e9b26 01bc
     bx r0                                    @ 080e9b28 0047
     .zero  0x2
-DAT_080e9b2c:
-    .word  0x09e4b61c                     @ 080e9b2c 1cb6e409
-DAT_080e9b30:
-    .word  0x09e4b7cc                     @ 080e9b30 ccb7e409
+set_img_proxy_vram_location_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9b2c 1cb6e409  nnsys/g2d/g2d_Image.c
+set_img_proxy_vram_location_assert_pimg:
+    .word  assert_pimg                    @ 080e9b30 ccb7e409  pImg
 DAT_080e9b34:
     .word  0x00000189                     @ 080e9b34 89010000
-DAT_080e9b38:
-    .word  0x09e4b644                     @ 080e9b38 44b6e409
-DAT_080e9b3c:
-    .word  0x09e4b634                     @ 080e9b3c 34b6e409
+set_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9b38 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+set_img_proxy_vram_location_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9b3c 34b6e409  pVramLocation
 
 @ Read the base address of the specified VRAM type slot from NNS_G2dImageProxy. Called from NNS G2D Image proxy read path (g2d_Image.c line 0xce*2=0x19c=412). Assert pProxy non-NULL, type [0..2]. Computes pProxy[type*4+0] and returns it. Differs from get_renderer_img_proxy_vram_location (0x080e9ce8): that function reads from slots starting at offset +0x8. Equivalent to NNS_G2dGetImageProxyData.
 @ Constants: NNS_G2D_VRAM_TYPE_MAX=3.
@@ -1462,33 +1462,33 @@ get_img_proxy_vram_location:
     adds r4,r1,#0x0    @ 080e9b44 0c1c
     cmp r5,#0x0                              @ 080e9b46 002d
     bne LAB_080e9b58                         @ 080e9b48 06d1
-    ldr r0, DAT_080e9b94                     @ 080e9b4a 1248
+    ldr r0, get_img_proxy_vram_location_g2d_image_c_filename @ 080e9b4a 1248
     movs r1,#0xce    @ 080e9b4c ce21
     lsls r1,r1,#0x1    @ 080e9b4e 4900
-    ldr r2, DAT_080e9b98                     @ 080e9b50 114a
+    ldr r2, get_img_proxy_vram_location_assert_pimg @ 080e9b50 114a
     movs r3,#0x1    @ 080e9b52 0123
     bl suppress_assert_report                @ 080e9b54 10f0c2fc
 LAB_080e9b58:
     cmp r4,#0x2                              @ 080e9b58 022c
     bls LAB_080e9b68                         @ 080e9b5a 05d9
-    ldr r0, DAT_080e9b94                     @ 080e9b5c 0d48
+    ldr r0, get_img_proxy_vram_location_g2d_image_c_filename @ 080e9b5c 0d48
     ldr r1, DAT_080e9b9c                     @ 080e9b5e 0f49
-    ldr r2, DAT_080e9ba0                     @ 080e9b60 0f4a
+    ldr r2, get_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9b60 0f4a
     movs r3,#0x1    @ 080e9b62 0123
     bl suppress_assert_report                @ 080e9b64 10f0bafc
 LAB_080e9b68:
     cmp r5,#0x0                              @ 080e9b68 002d
     bne LAB_080e9b78                         @ 080e9b6a 05d1
-    ldr r0, DAT_080e9b94                     @ 080e9b6c 0948
-    ldr r2, DAT_080e9ba4                     @ 080e9b6e 0d4a
+    ldr r0, get_img_proxy_vram_location_g2d_image_c_filename @ 080e9b6c 0948
+    ldr r2, get_img_proxy_vram_location_assert_pvramlocation @ 080e9b6e 0d4a
     movs r1,#0x2c    @ 080e9b70 2c21
     movs r3,#0x1    @ 080e9b72 0123
     bl suppress_assert_report                @ 080e9b74 10f0b2fc
 LAB_080e9b78:
     cmp r4,#0x2                              @ 080e9b78 022c
     bls LAB_080e9b88                         @ 080e9b7a 05d9
-    ldr r0, DAT_080e9b94                     @ 080e9b7c 0548
-    ldr r2, DAT_080e9ba0                     @ 080e9b7e 084a
+    ldr r0, get_img_proxy_vram_location_g2d_image_c_filename @ 080e9b7c 0548
+    ldr r2, get_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9b7e 084a
     movs r1,#0x2d    @ 080e9b80 2d21
     movs r3,#0x1    @ 080e9b82 0123
     bl suppress_assert_report                @ 080e9b84 10f0aafc
@@ -1499,16 +1499,16 @@ LAB_080e9b88:
     pop {r4,r5}                              @ 080e9b8e 30bc
     pop {r1}                                 @ 080e9b90 02bc
     bx r1                                    @ 080e9b92 0847
-DAT_080e9b94:
-    .word  0x09e4b61c                     @ 080e9b94 1cb6e409
-DAT_080e9b98:
-    .word  0x09e4b7cc                     @ 080e9b98 ccb7e409
+get_img_proxy_vram_location_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9b94 1cb6e409  nnsys/g2d/g2d_Image.c
+get_img_proxy_vram_location_assert_pimg:
+    .word  assert_pimg                    @ 080e9b98 ccb7e409  pImg
 DAT_080e9b9c:
     .word  0x0000019d                     @ 080e9b9c 9d010000
-DAT_080e9ba0:
-    .word  0x09e4b644                     @ 080e9ba0 44b6e409
-DAT_080e9ba4:
-    .word  0x09e4b634                     @ 080e9ba4 34b6e409
+get_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9ba0 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+get_img_proxy_vram_location_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9ba4 34b6e409  pVramLocation
 
 @ Check whether the specified VRAM type slot of NNS_G2dImageProxy has been validly initialized (i.e. value != 0xFFFFFFFF/-1). Called from NNS G2D Image proxy validity check path (g2d_Image.c line 0x1af=431). Assert pProxy non-NULL, type [0..2]. Reads pProxy[type*4+0]; returns 1 if value != -1 (valid), 0 if -1 (uninitialized). Symmetric with check_renderer_img_proxy_vram_location_valid (0x080e9d54), differing only in read start offset.
 @ Constants: INVALID_VRAM_LOCATION=0xFFFFFFFF.
@@ -1518,49 +1518,49 @@ check_img_proxy_vram_location_valid:
     adds r4,r1,#0x0    @ 080e9bac 0c1c
     cmp r5,#0x0                              @ 080e9bae 002d
     bne LAB_080e9bbe                         @ 080e9bb0 05d1
-    ldr r0, DAT_080e9c24                     @ 080e9bb2 1c48
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9bb2 1c48
     ldr r1, DAT_080e9c28                     @ 080e9bb4 1c49
-    ldr r2, DAT_080e9c2c                     @ 080e9bb6 1d4a
+    ldr r2, check_img_proxy_vram_location_valid_assert_pimg @ 080e9bb6 1d4a
     movs r3,#0x1    @ 080e9bb8 0123
     bl suppress_assert_report                @ 080e9bba 10f08ffc
 LAB_080e9bbe:
     cmp r4,#0x2                              @ 080e9bbe 022c
     bls LAB_080e9bd0                         @ 080e9bc0 06d9
-    ldr r0, DAT_080e9c24                     @ 080e9bc2 1848
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9bc2 1848
     movs r1,#0xd8    @ 080e9bc4 d821
     lsls r1,r1,#0x1    @ 080e9bc6 4900
-    ldr r2, DAT_080e9c30                     @ 080e9bc8 194a
+    ldr r2, check_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9bc8 194a
     movs r3,#0x1    @ 080e9bca 0123
     bl suppress_assert_report                @ 080e9bcc 10f086fc
 LAB_080e9bd0:
     cmp r5,#0x0                              @ 080e9bd0 002d
     bne LAB_080e9be0                         @ 080e9bd2 05d1
-    ldr r0, DAT_080e9c24                     @ 080e9bd4 1348
-    ldr r2, DAT_080e9c34                     @ 080e9bd6 174a
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9bd4 1348
+    ldr r2, check_img_proxy_vram_location_valid_assert_pvramlocation @ 080e9bd6 174a
     movs r1,#0x35    @ 080e9bd8 3521
     movs r3,#0x1    @ 080e9bda 0123
     bl suppress_assert_report                @ 080e9bdc 10f07efc
 LAB_080e9be0:
     cmp r4,#0x2                              @ 080e9be0 022c
     bls LAB_080e9bf0                         @ 080e9be2 05d9
-    ldr r0, DAT_080e9c24                     @ 080e9be4 0f48
-    ldr r2, DAT_080e9c30                     @ 080e9be6 124a
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9be4 0f48
+    ldr r2, check_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9be6 124a
     movs r1,#0x36    @ 080e9be8 3621
     movs r3,#0x1    @ 080e9bea 0123
     bl suppress_assert_report                @ 080e9bec 10f076fc
 LAB_080e9bf0:
     cmp r5,#0x0                              @ 080e9bf0 002d
     bne LAB_080e9c00                         @ 080e9bf2 05d1
-    ldr r0, DAT_080e9c24                     @ 080e9bf4 0b48
-    ldr r2, DAT_080e9c34                     @ 080e9bf6 0f4a
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9bf4 0b48
+    ldr r2, check_img_proxy_vram_location_valid_assert_pvramlocation @ 080e9bf6 0f4a
     movs r1,#0x2c    @ 080e9bf8 2c21
     movs r3,#0x1    @ 080e9bfa 0123
     bl suppress_assert_report                @ 080e9bfc 10f06efc
 LAB_080e9c00:
     cmp r4,#0x2                              @ 080e9c00 022c
     bls LAB_080e9c10                         @ 080e9c02 05d9
-    ldr r0, DAT_080e9c24                     @ 080e9c04 0748
-    ldr r2, DAT_080e9c30                     @ 080e9c06 0a4a
+    ldr r0, check_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9c04 0748
+    ldr r2, check_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9c06 0a4a
     movs r1,#0x2d    @ 080e9c08 2d21
     movs r3,#0x1    @ 080e9c0a 0123
     bl suppress_assert_report                @ 080e9c0c 10f066fc
@@ -1575,16 +1575,16 @@ LAB_080e9c10:
     pop {r4,r5}                              @ 080e9c1e 30bc
     pop {r1}                                 @ 080e9c20 02bc
     bx r1                                    @ 080e9c22 0847
-DAT_080e9c24:
-    .word  0x09e4b61c                     @ 080e9c24 1cb6e409
+check_img_proxy_vram_location_valid_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9c24 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080e9c28:
     .word  0x000001af                     @ 080e9c28 af010000
-DAT_080e9c2c:
-    .word  0x09e4b7cc                     @ 080e9c2c ccb7e409
-DAT_080e9c30:
-    .word  0x09e4b644                     @ 080e9c30 44b6e409
-DAT_080e9c34:
-    .word  0x09e4b634                     @ 080e9c34 34b6e409
+check_img_proxy_vram_location_valid_assert_pimg:
+    .word  assert_pimg                    @ 080e9c2c ccb7e409  pImg
+check_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9c30 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+check_img_proxy_vram_location_valid_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9c34 34b6e409  pVramLocation
 
 @ GL/IG2D_Main.c g2d_Image.c line 449. r0=NNS_G2dRendererImageProxy* pProxy (non-NULL). Asserts pProxy != NULL, then writes 0xFFFFFFFF (-1) to fields [pProxy+0x8], [pProxy+0xc], [pProxy+0x10] (3 VRAM location slots). Symmetric sibling to init_img_proxy_fields (0x080e9a94) which covers +0..+8. Side-effect: RendererImageProxy VRAM slots +8/+c/+10 marked invalid.
 init_renderer_img_proxy_fields:
@@ -1592,9 +1592,9 @@ init_renderer_img_proxy_fields:
     adds r4,r0,#0x0    @ 080e9c3a 041c
     cmp r4,#0x0                              @ 080e9c3c 002c
     bne LAB_080e9c4c                         @ 080e9c3e 05d1
-    ldr r0, DAT_080e9c68                     @ 080e9c40 0948
+    ldr r0, init_renderer_img_proxy_fields_g2d_image_c_filename @ 080e9c40 0948
     ldr r1, DAT_080e9c6c                     @ 080e9c42 0a49
-    ldr r2, DAT_080e9c70                     @ 080e9c44 0a4a
+    ldr r2, init_renderer_img_proxy_fields_assert_pimg @ 080e9c44 0a4a
     movs r3,#0x1    @ 080e9c46 0123
     bl suppress_assert_report                @ 080e9c48 10f048fc
 LAB_080e9c4c:
@@ -1613,12 +1613,12 @@ LAB_080e9c56:
     pop {r0}                                 @ 080e9c62 01bc
     bx r0                                    @ 080e9c64 0047
     .zero  0x2
-DAT_080e9c68:
-    .word  0x09e4b61c                     @ 080e9c68 1cb6e409
+init_renderer_img_proxy_fields_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9c68 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080e9c6c:
     .word  0x000001c1                     @ 080e9c6c c1010000
-DAT_080e9c70:
-    .word  0x09e4b7cc                     @ 080e9c70 ccb7e409
+init_renderer_img_proxy_fields_assert_pimg:
+    .word  assert_pimg                    @ 080e9c70 ccb7e409  pImg
 
 @ GL/IG2D_Main.c g2d_Image.c line 468-469. r0=NNS_G2dImageProxy* pProxy (non-NULL), r1=void* pImg (image data ptr, non-NULL), r2=NNS_G2dVRamType type [0..2] (0=3D_MAIN, 1=2D_MAIN, 2=2D_SUB). Asserts all args, calls check_vram_location_slot, then writes pImg to pProxy[type] (str pImg,[pProxy+type*4]). Side-effect: NNS_G2dImageProxy VRAM slot[type] set to pImg.
 set_img_proxy_vram_slot:
@@ -1628,34 +1628,34 @@ set_img_proxy_vram_slot:
     adds r6,r2,#0x0    @ 080e9c7a 161c
     cmp r4,#0x0                              @ 080e9c7c 002c
     bne LAB_080e9c8e                         @ 080e9c7e 06d1
-    ldr r0, DAT_080e9cd4                     @ 080e9c80 1448
+    ldr r0, set_img_proxy_vram_slot_g2d_image_c_filename @ 080e9c80 1448
     movs r1,#0xea    @ 080e9c82 ea21
     lsls r1,r1,#0x1    @ 080e9c84 4900
-    ldr r2, DAT_080e9cd8                     @ 080e9c86 144a
+    ldr r2, set_img_proxy_vram_slot_assert_pimg @ 080e9c86 144a
     movs r3,#0x1    @ 080e9c88 0123
     bl suppress_assert_report                @ 080e9c8a 10f027fc
 LAB_080e9c8e:
     cmp r5,#0x2                              @ 080e9c8e 022d
     bls LAB_080e9c9e                         @ 080e9c90 05d9
-    ldr r0, DAT_080e9cd4                     @ 080e9c92 1048
+    ldr r0, set_img_proxy_vram_slot_g2d_image_c_filename @ 080e9c92 1048
     ldr r1, DAT_080e9cdc                     @ 080e9c94 1149
-    ldr r2, DAT_080e9ce0                     @ 080e9c96 124a
+    ldr r2, set_img_proxy_vram_slot_assert_type_nns_g2d_vram_type_3dmain @ 080e9c96 124a
     movs r3,#0x1    @ 080e9c98 0123
     bl suppress_assert_report                @ 080e9c9a 10f01ffc
 LAB_080e9c9e:
     adds r4,#0x8    @ 080e9c9e 0834
     cmp r4,#0x0                              @ 080e9ca0 002c
     bne LAB_080e9cb0                         @ 080e9ca2 05d1
-    ldr r0, DAT_080e9cd4                     @ 080e9ca4 0b48
-    ldr r2, DAT_080e9ce4                     @ 080e9ca6 0f4a
+    ldr r0, set_img_proxy_vram_slot_g2d_image_c_filename @ 080e9ca4 0b48
+    ldr r2, set_img_proxy_vram_slot_assert_pvramlocation @ 080e9ca6 0f4a
     movs r1,#0x1f    @ 080e9ca8 1f21
     movs r3,#0x1    @ 080e9caa 0123
     bl suppress_assert_report                @ 080e9cac 10f016fc
 LAB_080e9cb0:
     cmp r5,#0x2                              @ 080e9cb0 022d
     bls LAB_080e9cc0                         @ 080e9cb2 05d9
-    ldr r0, DAT_080e9cd4                     @ 080e9cb4 0748
-    ldr r2, DAT_080e9ce0                     @ 080e9cb6 0a4a
+    ldr r0, set_img_proxy_vram_slot_g2d_image_c_filename @ 080e9cb4 0748
+    ldr r2, set_img_proxy_vram_slot_assert_type_nns_g2d_vram_type_3dmain @ 080e9cb6 0a4a
     movs r1,#0x20    @ 080e9cb8 2021
     movs r3,#0x1    @ 080e9cba 0123
     bl suppress_assert_report                @ 080e9cbc 10f00efc
@@ -1669,16 +1669,16 @@ LAB_080e9cc0:
     pop {r4,r5,r6}                           @ 080e9cce 70bc
     pop {r0}                                 @ 080e9cd0 01bc
     bx r0                                    @ 080e9cd2 0047
-DAT_080e9cd4:
-    .word  0x09e4b61c                     @ 080e9cd4 1cb6e409
-DAT_080e9cd8:
-    .word  0x09e4b7cc                     @ 080e9cd8 ccb7e409
+set_img_proxy_vram_slot_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9cd4 1cb6e409  nnsys/g2d/g2d_Image.c
+set_img_proxy_vram_slot_assert_pimg:
+    .word  assert_pimg                    @ 080e9cd8 ccb7e409  pImg
 DAT_080e9cdc:
     .word  0x000001d5                     @ 080e9cdc d5010000
-DAT_080e9ce0:
-    .word  0x09e4b644                     @ 080e9ce0 44b6e409
-DAT_080e9ce4:
-    .word  0x09e4b634                     @ 080e9ce4 34b6e409
+set_img_proxy_vram_slot_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9ce0 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+set_img_proxy_vram_slot_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9ce4 34b6e409  pVramLocation
 
 @ Read the base address of the specified VRAM type slot from NNS_G2dRendererImageProxy. Called from NNS G2D Image renderer proxy read path (g2d_Image.c line 0xf4*2=0x1e8=488). Assert pRendererProxy non-NULL, type [0..2]. Adds 8 to r5 (=pRendererProxy) to skip first two fields, then computes (pRendererProxy+8)[type*4] and returns it. Symmetric with get_img_proxy_vram_location (0x080e9b40), differing in read start offset +8.
 @ Constants: NNS_G2D_VRAM_TYPE_MAX=3.
@@ -1688,34 +1688,34 @@ get_renderer_img_proxy_vram_location:
     adds r4,r1,#0x0    @ 080e9cec 0c1c
     cmp r5,#0x0                              @ 080e9cee 002d
     bne LAB_080e9d00                         @ 080e9cf0 06d1
-    ldr r0, DAT_080e9d40                     @ 080e9cf2 1348
+    ldr r0, get_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080e9cf2 1348
     movs r1,#0xf4    @ 080e9cf4 f421
     lsls r1,r1,#0x1    @ 080e9cf6 4900
-    ldr r2, DAT_080e9d44                     @ 080e9cf8 124a
+    ldr r2, get_renderer_img_proxy_vram_location_assert_pimg @ 080e9cf8 124a
     movs r3,#0x1    @ 080e9cfa 0123
     bl suppress_assert_report                @ 080e9cfc 10f0eefb
 LAB_080e9d00:
     cmp r4,#0x2                              @ 080e9d00 022c
     bls LAB_080e9d10                         @ 080e9d02 05d9
-    ldr r0, DAT_080e9d40                     @ 080e9d04 0e48
+    ldr r0, get_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080e9d04 0e48
     ldr r1, DAT_080e9d48                     @ 080e9d06 1049
-    ldr r2, DAT_080e9d4c                     @ 080e9d08 104a
+    ldr r2, get_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9d08 104a
     movs r3,#0x1    @ 080e9d0a 0123
     bl suppress_assert_report                @ 080e9d0c 10f0e6fb
 LAB_080e9d10:
     adds r5,#0x8    @ 080e9d10 0835
     cmp r5,#0x0                              @ 080e9d12 002d
     bne LAB_080e9d22                         @ 080e9d14 05d1
-    ldr r0, DAT_080e9d40                     @ 080e9d16 0a48
-    ldr r2, DAT_080e9d50                     @ 080e9d18 0d4a
+    ldr r0, get_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080e9d16 0a48
+    ldr r2, get_renderer_img_proxy_vram_location_assert_pvramlocation @ 080e9d18 0d4a
     movs r1,#0x2c    @ 080e9d1a 2c21
     movs r3,#0x1    @ 080e9d1c 0123
     bl suppress_assert_report                @ 080e9d1e 10f0ddfb
 LAB_080e9d22:
     cmp r4,#0x2                              @ 080e9d22 022c
     bls LAB_080e9d32                         @ 080e9d24 05d9
-    ldr r0, DAT_080e9d40                     @ 080e9d26 0648
-    ldr r2, DAT_080e9d4c                     @ 080e9d28 084a
+    ldr r0, get_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080e9d26 0648
+    ldr r2, get_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080e9d28 084a
     movs r1,#0x2d    @ 080e9d2a 2d21
     movs r3,#0x1    @ 080e9d2c 0123
     bl suppress_assert_report                @ 080e9d2e 10f0d5fb
@@ -1727,16 +1727,16 @@ LAB_080e9d32:
     pop {r1}                                 @ 080e9d3a 02bc
     bx r1                                    @ 080e9d3c 0847
     .zero  0x2
-DAT_080e9d40:
-    .word  0x09e4b61c                     @ 080e9d40 1cb6e409
-DAT_080e9d44:
-    .word  0x09e4b7cc                     @ 080e9d44 ccb7e409
+get_renderer_img_proxy_vram_location_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9d40 1cb6e409  nnsys/g2d/g2d_Image.c
+get_renderer_img_proxy_vram_location_assert_pimg:
+    .word  assert_pimg                    @ 080e9d44 ccb7e409  pImg
 DAT_080e9d48:
     .word  0x000001e9                     @ 080e9d48 e9010000
-DAT_080e9d4c:
-    .word  0x09e4b644                     @ 080e9d4c 44b6e409
-DAT_080e9d50:
-    .word  0x09e4b634                     @ 080e9d50 34b6e409
+get_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9d4c 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+get_renderer_img_proxy_vram_location_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9d50 34b6e409  pVramLocation
 
 @ Check whether the specified VRAM type slot of NNS_G2dRendererImageProxy has been validly initialized (i.e. value != 0xFFFFFFFF/-1). Called from NNS G2D renderer image proxy validity check path (g2d_Image.c line 0x1fb=507). Assert pRendererProxy non-NULL, type [0..2]. Adds 8 to r4, reads (pRendererProxy+8)[type*4], then uses mvns+rsbs+orrs+lsrs #0x1f standard nonzero test; returns 1 if not -1 (valid), 0 if -1 (uninitialized). Symmetric with check_img_proxy_vram_location_valid (0x080e9ba8), differing in read offset +8.
 @ Constants: INVALID_VRAM_LOCATION=0xFFFFFFFF.
@@ -1746,50 +1746,50 @@ check_renderer_img_proxy_vram_location_valid:
     adds r5,r1,#0x0    @ 080e9d58 0d1c
     cmp r4,#0x0                              @ 080e9d5a 002c
     bne LAB_080e9d6a                         @ 080e9d5c 05d1
-    ldr r0, DAT_080e9dd4                     @ 080e9d5e 1d48
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9d5e 1d48
     ldr r1, DAT_080e9dd8                     @ 080e9d60 1d49
-    ldr r2, DAT_080e9ddc                     @ 080e9d62 1e4a
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_pimg @ 080e9d62 1e4a
     movs r3,#0x1    @ 080e9d64 0123
     bl suppress_assert_report                @ 080e9d66 10f0b9fb
 LAB_080e9d6a:
     cmp r5,#0x2                              @ 080e9d6a 022d
     bls LAB_080e9d7c                         @ 080e9d6c 06d9
-    ldr r0, DAT_080e9dd4                     @ 080e9d6e 1948
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9d6e 1948
     movs r1,#0xfe    @ 080e9d70 fe21
     lsls r1,r1,#0x1    @ 080e9d72 4900
-    ldr r2, DAT_080e9de0                     @ 080e9d74 1a4a
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9d74 1a4a
     movs r3,#0x1    @ 080e9d76 0123
     bl suppress_assert_report                @ 080e9d78 10f0b0fb
 LAB_080e9d7c:
     adds r4,#0x8    @ 080e9d7c 0834
     cmp r4,#0x0                              @ 080e9d7e 002c
     bne LAB_080e9d8e                         @ 080e9d80 05d1
-    ldr r0, DAT_080e9dd4                     @ 080e9d82 1448
-    ldr r2, DAT_080e9de4                     @ 080e9d84 174a
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9d82 1448
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_pvramlocation @ 080e9d84 174a
     movs r1,#0x35    @ 080e9d86 3521
     movs r3,#0x1    @ 080e9d88 0123
     bl suppress_assert_report                @ 080e9d8a 10f0a7fb
 LAB_080e9d8e:
     cmp r5,#0x2                              @ 080e9d8e 022d
     bls LAB_080e9d9e                         @ 080e9d90 05d9
-    ldr r0, DAT_080e9dd4                     @ 080e9d92 1048
-    ldr r2, DAT_080e9de0                     @ 080e9d94 124a
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9d92 1048
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9d94 124a
     movs r1,#0x36    @ 080e9d96 3621
     movs r3,#0x1    @ 080e9d98 0123
     bl suppress_assert_report                @ 080e9d9a 10f09ffb
 LAB_080e9d9e:
     cmp r4,#0x0                              @ 080e9d9e 002c
     bne LAB_080e9dae                         @ 080e9da0 05d1
-    ldr r0, DAT_080e9dd4                     @ 080e9da2 0c48
-    ldr r2, DAT_080e9de4                     @ 080e9da4 0f4a
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9da2 0c48
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_pvramlocation @ 080e9da4 0f4a
     movs r1,#0x2c    @ 080e9da6 2c21
     movs r3,#0x1    @ 080e9da8 0123
     bl suppress_assert_report                @ 080e9daa 10f097fb
 LAB_080e9dae:
     cmp r5,#0x2                              @ 080e9dae 022d
     bls LAB_080e9dbe                         @ 080e9db0 05d9
-    ldr r0, DAT_080e9dd4                     @ 080e9db2 0848
-    ldr r2, DAT_080e9de0                     @ 080e9db4 0a4a
+    ldr r0, check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename @ 080e9db2 0848
+    ldr r2, check_renderer_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain @ 080e9db4 0a4a
     movs r1,#0x2d    @ 080e9db6 2d21
     movs r3,#0x1    @ 080e9db8 0123
     bl suppress_assert_report                @ 080e9dba 10f08ffb
@@ -1805,16 +1805,16 @@ LAB_080e9dbe:
     pop {r1}                                 @ 080e9dce 02bc
     bx r1                                    @ 080e9dd0 0847
     .zero  0x2
-DAT_080e9dd4:
-    .word  0x09e4b61c                     @ 080e9dd4 1cb6e409
+check_renderer_img_proxy_vram_location_valid_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9dd4 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080e9dd8:
     .word  0x000001fb                     @ 080e9dd8 fb010000
-DAT_080e9ddc:
-    .word  0x09e4b7cc                     @ 080e9ddc ccb7e409
-DAT_080e9de0:
-    .word  0x09e4b644                     @ 080e9de0 44b6e409
-DAT_080e9de4:
-    .word  0x09e4b634                     @ 080e9de4 34b6e409
+check_renderer_img_proxy_vram_location_valid_assert_pimg:
+    .word  assert_pimg                    @ 080e9ddc ccb7e409  pImg
+check_renderer_img_proxy_vram_location_valid_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080e9de0 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+check_renderer_img_proxy_vram_location_valid_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080e9de4 34b6e409  pVramLocation
 
 @ nnsys/g2d/g2d_Image.c -- load character image to OBJ tile VRAM and update image proxy. Called by game layer 0x08015d30 (fs tag). Asserts pImgProxy != NULL (line 0x221), pSrcData != NULL (line 0x222). Validates via check_vram_size_for_type + check_img_mapping_type; dispatches 32-way switch on [pSrcData+0x2] (mapType) to internal enum 0-5; calls copy_to_obj_tile_vram to write pixel data, then set_img_proxy_vram_location to update proxy. r0=NNS_G2dImageProxy* pImgProxy, r1=u32 dst_word_offset [0..0x1FFF] (saved to r8), r2=NNS_G2dCharacterData* pSrcData, r3=u32 type [0..2]. Constants: CHAR_FMT_CHAR=NNS_G2D_CHARACTER_FMT_CHAR / MAP_TYPE_COUNT=32.
 load_img_proxy_to_vram:
@@ -1827,17 +1827,17 @@ load_img_proxy_to_vram:
     adds r6,r3,#0x0    @ 080e9df4 1e1c
     cmp r4,#0x0                              @ 080e9df6 002c
     bne LAB_080e9e06                         @ 080e9df8 05d1
-    ldr r0, DAT_080e9e84                     @ 080e9dfa 2248
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9dfa 2248
     ldr r1, DAT_080e9e88                     @ 080e9dfc 2249
-    ldr r2, DAT_080e9e8c                     @ 080e9dfe 234a
+    ldr r2, load_img_proxy_to_vram_assert_psrcdata_790 @ 080e9dfe 234a
     movs r3,#0x1    @ 080e9e00 0123
     bl suppress_assert_report                @ 080e9e02 10f06bfb
 LAB_080e9e06:
     cmp r6,#0x0                              @ 080e9e06 002e
     bne LAB_080e9e16                         @ 080e9e08 05d1
-    ldr r0, DAT_080e9e84                     @ 080e9e0a 1e48
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9e0a 1e48
     ldr r1, DAT_080e9e90                     @ 080e9e0c 2049
-    ldr r2, DAT_080e9e94                     @ 080e9e0e 214a
+    ldr r2, load_img_proxy_to_vram_assert_pimgproxy @ 080e9e0e 214a
     movs r3,#0x1    @ 080e9e10 0123
     bl suppress_assert_report                @ 080e9e12 10f063fb
 LAB_080e9e16:
@@ -1846,10 +1846,10 @@ LAB_080e9e16:
     bl check_vram_size_for_type              @ 080e9e1a fff7e9fd
     cmp r0,#0x0                              @ 080e9e1e 0028
     bne LAB_080e9e30                         @ 080e9e20 06d1
-    ldr r0, DAT_080e9e84                     @ 080e9e22 1848
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9e22 1848
     movs r1,#0x89    @ 080e9e24 8921
     lsls r1,r1,#0x2    @ 080e9e26 8900
-    ldr r2, DAT_080e9e98                     @ 080e9e28 1b4a
+    ldr r2, load_img_proxy_to_vram_assert_isvalid1dmappingtype_type_psrc @ 080e9e28 1b4a
     movs r3,#0x1    @ 080e9e2a 0123
     bl suppress_assert_report                @ 080e9e2c 10f056fb
 LAB_080e9e30:
@@ -1858,9 +1858,9 @@ LAB_080e9e30:
     bl check_img_mapping_type                @ 080e9e34 fff7f0fd
     cmp r0,#0x0                              @ 080e9e38 0028
     bne LAB_080e9e48                         @ 080e9e3a 05d1
-    ldr r0, DAT_080e9e84                     @ 080e9e3c 1148
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9e3c 1148
     ldr r1, DAT_080e9e9c                     @ 080e9e3e 1749
-    ldr r2, DAT_080e9ea0                     @ 080e9e40 174a
+    ldr r2, load_img_proxy_to_vram_assert_isvaliddatasize_psrcdata_type @ 080e9e40 174a
     movs r3,#0x1    @ 080e9e42 0123
     bl suppress_assert_report                @ 080e9e44 10f04afb
 LAB_080e9e48:
@@ -1871,8 +1871,8 @@ LAB_080e9e48:
     ands r0,r1    @ 080e9e50 0840
     cmp r0,#0x0                              @ 080e9e52 0028
     beq LAB_080e9e62                         @ 080e9e54 05d0
-    ldr r0, DAT_080e9e84                     @ 080e9e56 0b48
-    ldr r2, DAT_080e9ea4                     @ 080e9e58 124a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9e56 0b48
+    ldr r2, load_img_proxy_to_vram_assert_nnsi_g2discharactervramtransfe @ 080e9e58 124a
     movs r1,#0x88    @ 080e9e5a 8821
     movs r3,#0x1    @ 080e9e5c 0123
     bl suppress_assert_report                @ 080e9e5e 10f03dfb
@@ -1881,8 +1881,8 @@ LAB_080e9e62:
     bne LAB_080e9eac                         @ 080e9e64 22d1
     cmp r5,#0x0                              @ 080e9e66 002d
     beq LAB_080e9e76                         @ 080e9e68 05d0
-    ldr r0, DAT_080e9e84                     @ 080e9e6a 0648
-    ldr r2, DAT_080e9ea8                     @ 080e9e6c 0e4a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename @ 080e9e6a 0648
+    ldr r2, load_img_proxy_to_vram_assert_charfmt_nns_g2d_character_fmt @ 080e9e6c 0e4a
     movs r1,#0x9a    @ 080e9e6e 9a21
     movs r3,#0x1    @ 080e9e70 0123
     bl suppress_assert_report                @ 080e9e72 10f033fb
@@ -1893,29 +1893,29 @@ LAB_080e9e76:
     bl copy_to_obj_tile_vram                 @ 080e9e7c 2af7caff
     b LAB_080e9eb8                           @ 080e9e80 1ae0
     .zero  0x2
-DAT_080e9e84:
-    .word  0x09e4b61c                     @ 080e9e84 1cb6e409
+load_img_proxy_to_vram_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080e9e84 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080e9e88:
     .word  0x00000221                     @ 080e9e88 21020000
-DAT_080e9e8c:
-    .word  0x09e4b790                     @ 080e9e8c 90b7e409
+load_img_proxy_to_vram_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080e9e8c 90b7e409  pSrcData
 DAT_080e9e90:
     .word  0x00000222                     @ 080e9e90 22020000
-DAT_080e9e94:
-    .word  0x09e4b610                     @ 080e9e94 10b6e409
-DAT_080e9e98:
-    .word  0x09e4b7d4                     @ 080e9e98 d4b7e409
+load_img_proxy_to_vram_assert_pimgproxy:
+    .word  assert_pimgproxy               @ 080e9e94 10b6e409  pImgProxy
+load_img_proxy_to_vram_assert_isvalid1dmappingtype_type_psrc:
+    .word  assert_isvalid1dmappingtype_type_psrc @ 080e9e98 d4b7e409  IsValid1DMappingType_( type  pSrcData->mapingType )
 DAT_080e9e9c:
     .word  0x00000226                     @ 080e9e9c 26020000
-DAT_080e9ea0:
-    .word  0x09e4b808                     @ 080e9ea0 08b8e409
-DAT_080e9ea4:
-    .word  0x09e4b720                     @ 080e9ea4 20b7e409
-DAT_080e9ea8:
-    .word  0x09e4b760                     @ 080e9ea8 60b7e409
+load_img_proxy_to_vram_assert_isvaliddatasize_psrcdata_type:
+    .word  assert_isvaliddatasize_psrcdata_type @ 080e9ea0 08b8e409  IsValidDataSize_( pSrcData  type )
+load_img_proxy_to_vram_assert_nnsi_g2discharactervramtransfe:
+    .word  assert_nnsi_g2discharactervramtransfe @ 080e9ea4 20b7e409  !NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )
+load_img_proxy_to_vram_assert_charfmt_nns_g2d_character_fmt:
+    .word  assert_charfmt_nns_g2d_character_fmt @ 080e9ea8 60b7e409  charFmt == NNS_G2D_CHARACTER_FMT_CHAR
 LAB_080e9eac:
-    ldr r0, DAT_080e9ef8                     @ 080e9eac 1248
-    ldr r2, DAT_080e9efc                     @ 080e9eae 134a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename_ef8 @ 080e9eac 1248
+    ldr r2, load_img_proxy_to_vram_assert_false_788 @ 080e9eae 134a
     movs r1,#0xa5    @ 080e9eb0 a521
     movs r3,#0x1    @ 080e9eb2 0123
     bl suppress_assert_report                @ 080e9eb4 10f012fb
@@ -1924,16 +1924,16 @@ LAB_080e9eb8:
     adds r5,#0xc    @ 080e9eba 0c35
     cmp r4,#0x0                              @ 080e9ebc 002c
     bne LAB_080e9ecc                         @ 080e9ebe 05d1
-    ldr r0, DAT_080e9ef8                     @ 080e9ec0 0d48
-    ldr r2, DAT_080e9f00                     @ 080e9ec2 0f4a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename_ef8 @ 080e9ec0 0d48
+    ldr r2, load_img_proxy_to_vram_assert_psrc_6b8 @ 080e9ec2 0f4a
     movs r1,#0x5d    @ 080e9ec4 5d21
     movs r3,#0x1    @ 080e9ec6 0123
     bl suppress_assert_report                @ 080e9ec8 10f008fb
 LAB_080e9ecc:
     cmp r5,#0x0                              @ 080e9ecc 002d
     bne LAB_080e9edc                         @ 080e9ece 05d1
-    ldr r0, DAT_080e9ef8                     @ 080e9ed0 0948
-    ldr r2, DAT_080e9f04                     @ 080e9ed2 0c4a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename_ef8 @ 080e9ed0 0948
+    ldr r2, load_img_proxy_to_vram_assert_pdst_6c0 @ 080e9ed2 0c4a
     movs r1,#0x5e    @ 080e9ed4 5e21
     movs r3,#0x1    @ 080e9ed6 0123
     bl suppress_assert_report                @ 080e9ed8 10f000fb
@@ -1954,14 +1954,14 @@ LAB_080e9ee4:
 switchD_080e9ef4__switchD:
     .hword 0x4687    @ 080e9ef4 8746
     .zero  0x2
-DAT_080e9ef8:
-    .word  0x09e4b61c                     @ 080e9ef8 1cb6e409
-DAT_080e9efc:
-    .word  0x09e4b788                     @ 080e9efc 88b7e409
-DAT_080e9f00:
-    .word  0x09e4b6b8                     @ 080e9f00 b8b6e409
-DAT_080e9f04:
-    .word  0x09e4b6c0                     @ 080e9f04 c0b6e409
+load_img_proxy_to_vram_g2d_image_c_filename_ef8:
+    .word  g2d_image_c_filename           @ 080e9ef8 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_assert_false_788:
+    .word  assert_false_788               @ 080e9efc 88b7e409  FALSE
+load_img_proxy_to_vram_assert_psrc_6b8:
+    .word  assert_psrc_6b8                @ 080e9f00 b8b6e409  pSrc
+load_img_proxy_to_vram_assert_pdst_6c0:
+    .word  assert_pdst_6c0                @ 080e9f04 c0b6e409  pDst
 DAT_080e9f08:
     .word  0x080e9f0c                     @ 080e9f08 0c9f0e08
 switchD_080e9ef4__switchdataD_080e9f0c:
@@ -2088,8 +2088,8 @@ LAB_080ea056:
     rsbs r0,r0,#0    @ 080ea05a 4042
     cmp r1,r0                                @ 080ea05c 8142
     beq LAB_080ea06c                         @ 080ea05e 05d0
-    ldr r0, DAT_080ea098                     @ 080ea060 0d48
-    ldr r2, DAT_080ea09c                     @ 080ea062 0e4a
+    ldr r0, load_img_proxy_to_vram_g2d_image_c_filename_098 @ 080ea060 0d48
+    ldr r2, load_img_proxy_to_vram_assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea062 0e4a
     movs r1,#0x6d    @ 080ea064 6d21
     movs r3,#0x1    @ 080ea066 0123
     bl suppress_assert_report                @ 080ea068 10f038fa
@@ -2116,10 +2116,10 @@ LAB_080ea076:
     pop {r4,r5,r6,r7}                        @ 080ea092 f0bc
     pop {r0}                                 @ 080ea094 01bc
     bx r0                                    @ 080ea096 0047
-DAT_080ea098:
-    .word  0x09e4b61c                     @ 080ea098 1cb6e409
-DAT_080ea09c:
-    .word  0x09e4b6c8                     @ 080ea09c c8b6e409
+load_img_proxy_to_vram_g2d_image_c_filename_098:
+    .word  g2d_image_c_filename           @ 080ea098 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_assert_psrc_w_nns_g2d_1d_mapping_char:
+    .word  assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea09c c8b6e409  (pSrc->W == NNS_G2D_1D_MAPPING_CHAR_SIZE) && (pSrc->H == NNS
 
 @ Load character data from NNS_G2dImageProxy into VRAM using 1D OBJ mapping mode. Called from NNS G2D Image load path (g2d_Image.c line 0x24d=589). Assert pImgProxy non-NULL, pSrc non-NULL, [pImgProxy+0x8] (3D texture ptr) == 0 (line 0x24f=591, prohibits existing 3D texture), mapping type bit8 == 0 (line 0x88=136, prohibits VRAM-transfer mode). Symmetric with load_img_proxy_to_vram (0x080e9de8); differs in skipping check_vram_size_for_type and calling copy_to_obj_tile_vram directly for OBJ char VRAM write, then writing base address to pOutProxy.
 @ Constants: MAPPING_VRAM_TRANSFER_BIT=bit8-of-[pImgProxy+0xc].
@@ -2133,26 +2133,26 @@ load_img_proxy_to_vram_1d:
     adds r6,r3,#0x0    @ 080ea0ac 1e1c
     cmp r4,#0x0                              @ 080ea0ae 002c
     bne LAB_080ea0be                         @ 080ea0b0 05d1
-    ldr r0, DAT_080ea134                     @ 080ea0b2 2048
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea0b2 2048
     ldr r1, DAT_080ea138                     @ 080ea0b4 2049
-    ldr r2, DAT_080ea13c                     @ 080ea0b6 214a
+    ldr r2, load_img_proxy_to_vram_1d_assert_psrcdata_790 @ 080ea0b6 214a
     movs r3,#0x1    @ 080ea0b8 0123
     bl suppress_assert_report                @ 080ea0ba 10f00ffa
 LAB_080ea0be:
     cmp r6,#0x0                              @ 080ea0be 002e
     bne LAB_080ea0ce                         @ 080ea0c0 05d1
-    ldr r0, DAT_080ea134                     @ 080ea0c2 1c48
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea0c2 1c48
     ldr r1, DAT_080ea140                     @ 080ea0c4 1e49
-    ldr r2, DAT_080ea144                     @ 080ea0c6 1f4a
+    ldr r2, load_img_proxy_to_vram_1d_assert_pimgproxy @ 080ea0c6 1f4a
     movs r3,#0x1    @ 080ea0c8 0123
     bl suppress_assert_report                @ 080ea0ca 10f007fa
 LAB_080ea0ce:
     ldr r0,[r4,#0x8]                         @ 080ea0ce a068
     cmp r0,#0x0                              @ 080ea0d0 0028
     beq LAB_080ea0e0                         @ 080ea0d2 05d0
-    ldr r0, DAT_080ea134                     @ 080ea0d4 1748
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea0d4 1748
     ldr r1, DAT_080ea148                     @ 080ea0d6 1c49
-    ldr r2, DAT_080ea14c                     @ 080ea0d8 1c4a
+    ldr r2, load_img_proxy_to_vram_1d_assert_psrcdata_mapingtype_gx_objvram @ 080ea0d8 1c4a
     movs r3,#0x1    @ 080ea0da 0123
     bl suppress_assert_report                @ 080ea0dc 10f0fef9
 LAB_080ea0e0:
@@ -2161,9 +2161,9 @@ LAB_080ea0e0:
     bl check_img_mapping_type                @ 080ea0e4 fff798fc
     cmp r0,#0x0                              @ 080ea0e8 0028
     bne LAB_080ea0f8                         @ 080ea0ea 05d1
-    ldr r0, DAT_080ea134                     @ 080ea0ec 1148
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea0ec 1148
     ldr r1, DAT_080ea150                     @ 080ea0ee 1849
-    ldr r2, DAT_080ea154                     @ 080ea0f0 184a
+    ldr r2, load_img_proxy_to_vram_1d_assert_isvaliddatasize_psrcdata_type @ 080ea0f0 184a
     movs r3,#0x1    @ 080ea0f2 0123
     bl suppress_assert_report                @ 080ea0f4 10f0f2f9
 LAB_080ea0f8:
@@ -2174,8 +2174,8 @@ LAB_080ea0f8:
     ands r0,r1    @ 080ea100 0840
     cmp r0,#0x0                              @ 080ea102 0028
     beq LAB_080ea112                         @ 080ea104 05d0
-    ldr r0, DAT_080ea134                     @ 080ea106 0b48
-    ldr r2, DAT_080ea158                     @ 080ea108 134a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea106 0b48
+    ldr r2, load_img_proxy_to_vram_1d_assert_nnsi_g2discharactervramtransfe @ 080ea108 134a
     movs r1,#0x88    @ 080ea10a 8821
     movs r3,#0x1    @ 080ea10c 0123
     bl suppress_assert_report                @ 080ea10e 10f0e5f9
@@ -2184,8 +2184,8 @@ LAB_080ea112:
     bne LAB_080ea160                         @ 080ea114 24d1
     cmp r5,#0x0                              @ 080ea116 002d
     beq LAB_080ea126                         @ 080ea118 05d0
-    ldr r0, DAT_080ea134                     @ 080ea11a 0648
-    ldr r2, DAT_080ea15c                     @ 080ea11c 0f4a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename @ 080ea11a 0648
+    ldr r2, load_img_proxy_to_vram_1d_assert_charfmt_nns_g2d_character_fmt @ 080ea11c 0f4a
     movs r1,#0x9a    @ 080ea11e 9a21
     movs r3,#0x1    @ 080ea120 0123
     bl suppress_assert_report                @ 080ea122 10f0dbf9
@@ -2196,31 +2196,31 @@ LAB_080ea126:
     bl copy_to_obj_tile_vram                 @ 080ea12c 2af772fe
     b LAB_080ea16c                           @ 080ea130 1ce0
     .zero  0x2
-DAT_080ea134:
-    .word  0x09e4b61c                     @ 080ea134 1cb6e409
+load_img_proxy_to_vram_1d_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea134 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea138:
     .word  0x0000024d                     @ 080ea138 4d020000
-DAT_080ea13c:
-    .word  0x09e4b790                     @ 080ea13c 90b7e409
+load_img_proxy_to_vram_1d_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080ea13c 90b7e409  pSrcData
 DAT_080ea140:
     .word  0x0000024e                     @ 080ea140 4e020000
-DAT_080ea144:
-    .word  0x09e4b610                     @ 080ea144 10b6e409
+load_img_proxy_to_vram_1d_assert_pimgproxy:
+    .word  assert_pimgproxy               @ 080ea144 10b6e409  pImgProxy
 DAT_080ea148:
     .word  0x0000024f                     @ 080ea148 4f020000
-DAT_080ea14c:
-    .word  0x09e4b82c                     @ 080ea14c 2cb8e409
+load_img_proxy_to_vram_1d_assert_psrcdata_mapingtype_gx_objvram:
+    .word  assert_psrcdata_mapingtype_gx_objvram @ 080ea14c 2cb8e409  pSrcData->mapingType == GX_OBJVRAMMODE_CHAR_2D
 DAT_080ea150:
     .word  0x00000251                     @ 080ea150 51020000
-DAT_080ea154:
-    .word  0x09e4b808                     @ 080ea154 08b8e409
-DAT_080ea158:
-    .word  0x09e4b720                     @ 080ea158 20b7e409
-DAT_080ea15c:
-    .word  0x09e4b760                     @ 080ea15c 60b7e409
+load_img_proxy_to_vram_1d_assert_isvaliddatasize_psrcdata_type:
+    .word  assert_isvaliddatasize_psrcdata_type @ 080ea154 08b8e409  IsValidDataSize_( pSrcData  type )
+load_img_proxy_to_vram_1d_assert_nnsi_g2discharactervramtransfe:
+    .word  assert_nnsi_g2discharactervramtransfe @ 080ea158 20b7e409  !NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )
+load_img_proxy_to_vram_1d_assert_charfmt_nns_g2d_character_fmt:
+    .word  assert_charfmt_nns_g2d_character_fmt @ 080ea15c 60b7e409  charFmt == NNS_G2D_CHARACTER_FMT_CHAR
 LAB_080ea160:
-    ldr r0, DAT_080ea1ac                     @ 080ea160 1248
-    ldr r2, DAT_080ea1b0                     @ 080ea162 134a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename_1ac @ 080ea160 1248
+    ldr r2, load_img_proxy_to_vram_1d_assert_false_788 @ 080ea162 134a
     movs r1,#0xa5    @ 080ea164 a521
     movs r3,#0x1    @ 080ea166 0123
     bl suppress_assert_report                @ 080ea168 10f0b8f9
@@ -2229,16 +2229,16 @@ LAB_080ea16c:
     adds r5,#0xc    @ 080ea16e 0c35
     cmp r4,#0x0                              @ 080ea170 002c
     bne LAB_080ea180                         @ 080ea172 05d1
-    ldr r0, DAT_080ea1ac                     @ 080ea174 0d48
-    ldr r2, DAT_080ea1b4                     @ 080ea176 0f4a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename_1ac @ 080ea174 0d48
+    ldr r2, load_img_proxy_to_vram_1d_assert_psrc_6b8 @ 080ea176 0f4a
     movs r1,#0x5d    @ 080ea178 5d21
     movs r3,#0x1    @ 080ea17a 0123
     bl suppress_assert_report                @ 080ea17c 10f0aef9
 LAB_080ea180:
     cmp r5,#0x0                              @ 080ea180 002d
     bne LAB_080ea190                         @ 080ea182 05d1
-    ldr r0, DAT_080ea1ac                     @ 080ea184 0948
-    ldr r2, DAT_080ea1b8                     @ 080ea186 0c4a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename_1ac @ 080ea184 0948
+    ldr r2, load_img_proxy_to_vram_1d_assert_pdst_6c0 @ 080ea186 0c4a
     movs r1,#0x5e    @ 080ea188 5e21
     movs r3,#0x1    @ 080ea18a 0123
     bl suppress_assert_report                @ 080ea18c 10f0a6f9
@@ -2259,14 +2259,14 @@ LAB_080ea198:
 switchD_080ea1a8__switchD:
     .hword 0x4687    @ 080ea1a8 8746
     .zero  0x2
-DAT_080ea1ac:
-    .word  0x09e4b61c                     @ 080ea1ac 1cb6e409
-DAT_080ea1b0:
-    .word  0x09e4b788                     @ 080ea1b0 88b7e409
-DAT_080ea1b4:
-    .word  0x09e4b6b8                     @ 080ea1b4 b8b6e409
-DAT_080ea1b8:
-    .word  0x09e4b6c0                     @ 080ea1b8 c0b6e409
+load_img_proxy_to_vram_1d_g2d_image_c_filename_1ac:
+    .word  g2d_image_c_filename           @ 080ea1ac 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_1d_assert_false_788:
+    .word  assert_false_788               @ 080ea1b0 88b7e409  FALSE
+load_img_proxy_to_vram_1d_assert_psrc_6b8:
+    .word  assert_psrc_6b8                @ 080ea1b4 b8b6e409  pSrc
+load_img_proxy_to_vram_1d_assert_pdst_6c0:
+    .word  assert_pdst_6c0                @ 080ea1b8 c0b6e409  pDst
 DAT_080ea1bc:
     .word  0x080ea1c0                     @ 080ea1bc c0a10e08
 switchD_080ea1a8__switchdataD_080ea1c0:
@@ -2393,8 +2393,8 @@ LAB_080ea30a:
     rsbs r0,r0,#0    @ 080ea30e 4042
     cmp r1,r0                                @ 080ea310 8142
     beq LAB_080ea320                         @ 080ea312 05d0
-    ldr r0, DAT_080ea34c                     @ 080ea314 0d48
-    ldr r2, DAT_080ea350                     @ 080ea316 0e4a
+    ldr r0, load_img_proxy_to_vram_1d_g2d_image_c_filename_34c @ 080ea314 0d48
+    ldr r2, load_img_proxy_to_vram_1d_assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea316 0e4a
     movs r1,#0x6d    @ 080ea318 6d21
     movs r3,#0x1    @ 080ea31a 0123
     bl suppress_assert_report                @ 080ea31c 10f0def8
@@ -2421,10 +2421,10 @@ LAB_080ea32a:
     pop {r4,r5,r6,r7}                        @ 080ea346 f0bc
     pop {r0}                                 @ 080ea348 01bc
     bx r0                                    @ 080ea34a 0047
-DAT_080ea34c:
-    .word  0x09e4b61c                     @ 080ea34c 1cb6e409
-DAT_080ea350:
-    .word  0x09e4b6c8                     @ 080ea350 c8b6e409
+load_img_proxy_to_vram_1d_g2d_image_c_filename_34c:
+    .word  g2d_image_c_filename           @ 080ea34c 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_1d_assert_psrc_w_nns_g2d_1d_mapping_char:
+    .word  assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea350 c8b6e409  (pSrc->W == NNS_G2D_1D_MAPPING_CHAR_SIZE) && (pSrc->H == NNS
 
 @ Load character data from NNS_G2dImageProxy into VRAM using VRAM-transfer mode. Called from NNS G2D Image VRAM transfer load path (g2d_Image.c line 0x9f*4=0x27c=636). Assert [pImgProxy+0xc] bit8 == 1 (line 0x9f*4=636, requires VRAM-transfer mode flag set). Assert pImgProxy non-NULL (line 0x5d=93), pOutProxy non-NULL (line 0x5e=94). Symmetric with load_img_proxy_to_vram_1d (0x080ea0a0); differs in requiring bit8==1 (vs 0) and not calling copy_to_obj_tile_vram directly (dispatches through switch for OBJ tile path then VRAM-transfer post-processing). Calls set_img_proxy_vram_location to write base address.
 @ Constants: MAPPING_VRAM_TRANSFER_BIT=bit8-of-[pImgProxy+0xc].
@@ -2442,10 +2442,10 @@ load_img_proxy_to_vram_vt:
     ands r0,r1    @ 080ea368 0840
     cmp r0,#0x0                              @ 080ea36a 0028
     bne LAB_080ea37c                         @ 080ea36c 06d1
-    ldr r0, DAT_080ea3bc                     @ 080ea36e 1348
+    ldr r0, load_img_proxy_to_vram_vt_g2d_image_c_filename @ 080ea36e 1348
     movs r1,#0x9f    @ 080ea370 9f21
     lsls r1,r1,#0x2    @ 080ea372 8900
-    ldr r2, DAT_080ea3c0                     @ 080ea374 124a
+    ldr r2, load_img_proxy_to_vram_vt_assert_nnsi_g2discharactervramtransfe_85c @ 080ea374 124a
     movs r3,#0x1    @ 080ea376 0123
     bl suppress_assert_report                @ 080ea378 10f0b0f8
 LAB_080ea37c:
@@ -2453,16 +2453,16 @@ LAB_080ea37c:
     adds r5,#0xc    @ 080ea37e 0c35
     cmp r4,#0x0                              @ 080ea380 002c
     bne LAB_080ea390                         @ 080ea382 05d1
-    ldr r0, DAT_080ea3bc                     @ 080ea384 0d48
-    ldr r2, DAT_080ea3c4                     @ 080ea386 0f4a
+    ldr r0, load_img_proxy_to_vram_vt_g2d_image_c_filename @ 080ea384 0d48
+    ldr r2, load_img_proxy_to_vram_vt_assert_psrc_6b8 @ 080ea386 0f4a
     movs r1,#0x5d    @ 080ea388 5d21
     movs r3,#0x1    @ 080ea38a 0123
     bl suppress_assert_report                @ 080ea38c 10f0a6f8
 LAB_080ea390:
     cmp r5,#0x0                              @ 080ea390 002d
     bne LAB_080ea3a0                         @ 080ea392 05d1
-    ldr r0, DAT_080ea3bc                     @ 080ea394 0948
-    ldr r2, DAT_080ea3c8                     @ 080ea396 0c4a
+    ldr r0, load_img_proxy_to_vram_vt_g2d_image_c_filename @ 080ea394 0948
+    ldr r2, load_img_proxy_to_vram_vt_assert_pdst_6c0 @ 080ea396 0c4a
     movs r1,#0x5e    @ 080ea398 5e21
     movs r3,#0x1    @ 080ea39a 0123
     bl suppress_assert_report                @ 080ea39c 10f09ef8
@@ -2483,14 +2483,14 @@ LAB_080ea3a8:
 switchD_080ea3b8__switchD:
     .hword 0x4687    @ 080ea3b8 8746
     .zero  0x2
-DAT_080ea3bc:
-    .word  0x09e4b61c                     @ 080ea3bc 1cb6e409
-DAT_080ea3c0:
-    .word  0x09e4b85c                     @ 080ea3c0 5cb8e409
-DAT_080ea3c4:
-    .word  0x09e4b6b8                     @ 080ea3c4 b8b6e409
-DAT_080ea3c8:
-    .word  0x09e4b6c0                     @ 080ea3c8 c0b6e409
+load_img_proxy_to_vram_vt_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea3bc 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_vt_assert_nnsi_g2discharactervramtransfe_85c:
+    .word  assert_nnsi_g2discharactervramtransfe_85c @ 080ea3c0 5cb8e409  NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )
+load_img_proxy_to_vram_vt_assert_psrc_6b8:
+    .word  assert_psrc_6b8                @ 080ea3c4 b8b6e409  pSrc
+load_img_proxy_to_vram_vt_assert_pdst_6c0:
+    .word  assert_pdst_6c0                @ 080ea3c8 c0b6e409  pDst
 DAT_080ea3cc:
     .word  0x080ea3d0                     @ 080ea3cc d0a30e08
 switchD_080ea3b8__switchdataD_080ea3d0:
@@ -2617,8 +2617,8 @@ LAB_080ea51a:
     rsbs r0,r0,#0    @ 080ea51e 4042
     cmp r1,r0                                @ 080ea520 8142
     beq LAB_080ea530                         @ 080ea522 05d0
-    ldr r0, DAT_080ea55c                     @ 080ea524 0d48
-    ldr r2, DAT_080ea560                     @ 080ea526 0e4a
+    ldr r0, load_img_proxy_to_vram_vt_g2d_image_c_filename_55c @ 080ea524 0d48
+    ldr r2, load_img_proxy_to_vram_vt_assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea526 0e4a
     movs r1,#0x6d    @ 080ea528 6d21
     movs r3,#0x1    @ 080ea52a 0123
     bl suppress_assert_report                @ 080ea52c 0ff0d6ff
@@ -2645,10 +2645,10 @@ LAB_080ea53a:
     pop {r4,r5,r6,r7}                        @ 080ea556 f0bc
     pop {r0}                                 @ 080ea558 01bc
     bx r0                                    @ 080ea55a 0047
-DAT_080ea55c:
-    .word  0x09e4b61c                     @ 080ea55c 1cb6e409
-DAT_080ea560:
-    .word  0x09e4b6c8                     @ 080ea560 c8b6e409
+load_img_proxy_to_vram_vt_g2d_image_c_filename_55c:
+    .word  g2d_image_c_filename           @ 080ea55c 1cb6e409  nnsys/g2d/g2d_Image.c
+load_img_proxy_to_vram_vt_assert_psrc_w_nns_g2d_1d_mapping_char:
+    .word  assert_psrc_w_nns_g2d_1d_mapping_char @ 080ea560 c8b6e409  (pSrc->W == NNS_G2D_1D_MAPPING_CHAR_SIZE) && (pSrc->H == NNS
 
 @ Write palette data from NNS_G2dImageProxy to OBJ palette VRAM and update the output proxy slot. Called from NNS G2D palette load path (g2d_Image.c line 0x29f=671, NNS_G2dLoadPaletteData). Assert pImgProxy non-NULL, type [0..2], pSrcData non-NULL. When type==1 (2D_MAIN OBJ), calls bios_cpu_fast_set to copy palette data to 0x05000200 (OBJ palette VRAM) + dst_word_offset; other types cause assert failure. Calls set_img_proxy_vram_slot to write output proxy.
 @ Constants: OBJ_PALETTE_VRAM=0x05000200.
@@ -2662,34 +2662,34 @@ load_palette_proxy_to_vram:
     adds r5,r3,#0x0    @ 080ea570 1d1c
     cmp r4,#0x0                              @ 080ea572 002c
     bne LAB_080ea582                         @ 080ea574 05d1
-    ldr r0, DAT_080ea5cc                     @ 080ea576 1548
+    ldr r0, load_palette_proxy_to_vram_g2d_image_c_filename @ 080ea576 1548
     ldr r1, DAT_080ea5d0                     @ 080ea578 1549
-    ldr r2, DAT_080ea5d4                     @ 080ea57a 164a
+    ldr r2, load_palette_proxy_to_vram_assert_psrcdata_790 @ 080ea57a 164a
     movs r3,#0x1    @ 080ea57c 0123
     bl suppress_assert_report                @ 080ea57e 0ff0adff
 LAB_080ea582:
     cmp r7,#0x2                              @ 080ea582 022f
     bls LAB_080ea594                         @ 080ea584 06d9
-    ldr r0, DAT_080ea5cc                     @ 080ea586 1148
+    ldr r0, load_palette_proxy_to_vram_g2d_image_c_filename @ 080ea586 1148
     movs r1,#0xa8    @ 080ea588 a821
     lsls r1,r1,#0x2    @ 080ea58a 8900
-    ldr r2, DAT_080ea5d8                     @ 080ea58c 124a
+    ldr r2, load_palette_proxy_to_vram_assert_type_nns_g2d_vram_type_3dmain @ 080ea58c 124a
     movs r3,#0x1    @ 080ea58e 0123
     bl suppress_assert_report                @ 080ea590 0ff0a4ff
 LAB_080ea594:
     cmp r5,#0x0                              @ 080ea594 002d
     bne LAB_080ea5a4                         @ 080ea596 05d1
-    ldr r0, DAT_080ea5cc                     @ 080ea598 0c48
+    ldr r0, load_palette_proxy_to_vram_g2d_image_c_filename @ 080ea598 0c48
     ldr r1, DAT_080ea5dc                     @ 080ea59a 1049
-    ldr r2, DAT_080ea5e0                     @ 080ea59c 104a
+    ldr r2, load_palette_proxy_to_vram_assert_ppltproxy @ 080ea59c 104a
     movs r3,#0x1    @ 080ea59e 0123
     bl suppress_assert_report                @ 080ea5a0 0ff09cff
 LAB_080ea5a4:
     ldr r6,[r4,#0x8]                         @ 080ea5a4 a668
     cmp r4,#0x0                              @ 080ea5a6 002c
     bne LAB_080ea5b8                         @ 080ea5a8 06d1
-    ldr r0, DAT_080ea5cc                     @ 080ea5aa 0848
-    ldr r2, DAT_080ea5d4                     @ 080ea5ac 094a
+    ldr r0, load_palette_proxy_to_vram_g2d_image_c_filename @ 080ea5aa 0848
+    ldr r2, load_palette_proxy_to_vram_assert_psrcdata_790 @ 080ea5ac 094a
     movs r1,#0x8e    @ 080ea5ae 8e21
     lsls r1,r1,#0x1    @ 080ea5b0 4900
     movs r3,#0x1    @ 080ea5b2 0123
@@ -2704,23 +2704,23 @@ LAB_080ea5b8:
     lsrs r2,r2,#0xb    @ 080ea5c4 d20a
     bl bios_cpu_fast_set                     @ 080ea5c6 23f015ff
     b LAB_080ea5f6                           @ 080ea5ca 14e0
-DAT_080ea5cc:
-    .word  0x09e4b61c                     @ 080ea5cc 1cb6e409
+load_palette_proxy_to_vram_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea5cc 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea5d0:
     .word  0x0000029f                     @ 080ea5d0 9f020000
-DAT_080ea5d4:
-    .word  0x09e4b790                     @ 080ea5d4 90b7e409
-DAT_080ea5d8:
-    .word  0x09e4b644                     @ 080ea5d8 44b6e409
+load_palette_proxy_to_vram_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080ea5d4 90b7e409  pSrcData
+load_palette_proxy_to_vram_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea5d8 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 DAT_080ea5dc:
     .word  0x000002a1                     @ 080ea5dc a1020000
-DAT_080ea5e0:
-    .word  0x09e4b898                     @ 080ea5e0 98b8e409
+load_palette_proxy_to_vram_assert_ppltproxy:
+    .word  assert_ppltproxy               @ 080ea5e0 98b8e409  pPltProxy
 DAT_080ea5e4:
     .word  0x05000200                     @ 080ea5e4 00020005
 LAB_080ea5e8:
-    ldr r0, DAT_080ea614                     @ 080ea5e8 0a48
-    ldr r2, DAT_080ea618                     @ 080ea5ea 0b4a
+    ldr r0, load_palette_proxy_to_vram_g2d_image_c_filename_614 @ 080ea5e8 0a48
+    ldr r2, load_palette_proxy_to_vram_assert_false_788 @ 080ea5ea 0b4a
     movs r1,#0x94    @ 080ea5ec 9421
     lsls r1,r1,#0x1    @ 080ea5ee 4900
     movs r3,#0x1    @ 080ea5f0 0123
@@ -2740,10 +2740,10 @@ LAB_080ea5f6:
     pop {r0}                                 @ 080ea60e 01bc
     bx r0                                    @ 080ea610 0047
     .zero  0x2
-DAT_080ea614:
-    .word  0x09e4b61c                     @ 080ea614 1cb6e409
-DAT_080ea618:
-    .word  0x09e4b788                     @ 080ea618 88b7e409
+load_palette_proxy_to_vram_g2d_image_c_filename_614:
+    .word  g2d_image_c_filename           @ 080ea614 1cb6e409  nnsys/g2d/g2d_Image.c
+load_palette_proxy_to_vram_assert_false_788:
+    .word  assert_false_788               @ 080ea618 88b7e409  FALSE
 
 @ Batch-write palette data from NNS_G2dPlttBankData grouped palette structure to OBJ palette VRAM, updating output proxy. Called from NNS G2D palette bank load path (g2d_Image.c line 0x2c7=711, NNS_G2dLoadPaletteBankData). Assert pPlttBankData/pAnimBank/pSrcData non-NULL, type [0..2]. Checks [pPlttBankData+0] for palette type: ==3 (16-color, 32 bytes/entry) or ==4 (256-color, 512 bytes/entry). Loops over all entries in pAnimBank ([pAnimBank+0] count), fetches each entry data from pSrcData, calls bios_cpu_fast_set to write 0x05000200+dst+offset. Copies pPlttBankData first two fields to pOutProxy and calls set_img_proxy_vram_slot.
 @ Constants: NNS_G2D_PLTT_BANK_16=3 (32-bytes/entry) / NNS_G2D_PLTT_BANK_256=4 (512-bytes/entry) / OBJ_PALETTE_VRAM=0x05000200 / PALETTE_VRAM_MASK=0x001fffff.
@@ -2760,51 +2760,51 @@ load_pltt_bank_proxy_to_vram:
     .hword 0x4699    @ 080ea62e 9946
     cmp r6,#0x0                              @ 080ea630 002e
     bne LAB_080ea640                         @ 080ea632 05d1
-    ldr r0, DAT_080ea6c8                     @ 080ea634 2448
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea634 2448
     ldr r1, DAT_080ea6cc                     @ 080ea636 2549
-    ldr r2, DAT_080ea6d0                     @ 080ea638 254a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_psrcdata_790 @ 080ea638 254a
     movs r3,#0x1    @ 080ea63a 0123
     bl suppress_assert_report                @ 080ea63c 0ff04eff
 LAB_080ea640:
     cmp r7,#0x0                              @ 080ea640 002f
     bne LAB_080ea652                         @ 080ea642 06d1
-    ldr r0, DAT_080ea6c8                     @ 080ea644 2048
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea644 2048
     movs r1,#0xb2    @ 080ea646 b221
     lsls r1,r1,#0x2    @ 080ea648 8900
-    ldr r2, DAT_080ea6d4                     @ 080ea64a 224a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_pcmpinfo @ 080ea64a 224a
     movs r3,#0x1    @ 080ea64c 0123
     bl suppress_assert_report                @ 080ea64e 0ff045ff
 LAB_080ea652:
     .hword 0x4648    @ 080ea652 4846
     cmp r0,#0x2                              @ 080ea654 0228
     bls LAB_080ea664                         @ 080ea656 05d9
-    ldr r0, DAT_080ea6c8                     @ 080ea658 1b48
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea658 1b48
     ldr r1, DAT_080ea6d8                     @ 080ea65a 1f49
-    ldr r2, DAT_080ea6dc                     @ 080ea65c 1f4a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_type_nns_g2d_vram_type_3dmain @ 080ea65c 1f4a
     movs r3,#0x1    @ 080ea65e 0123
     bl suppress_assert_report                @ 080ea660 0ff03cff
 LAB_080ea664:
     ldr r1,[sp,#0x24]                        @ 080ea664 0999
     cmp r1,#0x0                              @ 080ea666 0029
     bne LAB_080ea676                         @ 080ea668 05d1
-    ldr r0, DAT_080ea6c8                     @ 080ea66a 1748
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea66a 1748
     ldr r1, DAT_080ea6e0                     @ 080ea66c 1c49
-    ldr r2, DAT_080ea6e4                     @ 080ea66e 1d4a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_ppltproxy @ 080ea66e 1d4a
     movs r3,#0x1    @ 080ea670 0123
     bl suppress_assert_report                @ 080ea672 0ff033ff
 LAB_080ea676:
     cmp r6,#0x0                              @ 080ea676 002e
     bne LAB_080ea686                         @ 080ea678 05d1
-    ldr r0, DAT_080ea6c8                     @ 080ea67a 1348
-    ldr r2, DAT_080ea6d0                     @ 080ea67c 144a
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea67a 1348
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_psrcdata_790 @ 080ea67c 144a
     ldr r1, DAT_080ea6e8                     @ 080ea67e 1a49
     movs r3,#0x1    @ 080ea680 0123
     bl suppress_assert_report                @ 080ea682 0ff02bff
 LAB_080ea686:
     cmp r7,#0x0                              @ 080ea686 002f
     bne LAB_080ea698                         @ 080ea688 06d1
-    ldr r0, DAT_080ea6c8                     @ 080ea68a 0f48
-    ldr r2, DAT_080ea6d4                     @ 080ea68c 114a
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea68a 0f48
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_pcmpinfo @ 080ea68c 114a
     movs r1,#0xa8    @ 080ea68e a821
     lsls r1,r1,#0x1    @ 080ea690 4900
     movs r3,#0x1    @ 080ea692 0123
@@ -2813,16 +2813,16 @@ LAB_080ea698:
     .hword 0x464a    @ 080ea698 4a46
     cmp r2,#0x2                              @ 080ea69a 022a
     bls LAB_080ea6aa                         @ 080ea69c 05d9
-    ldr r0, DAT_080ea6c8                     @ 080ea69e 0a48
-    ldr r2, DAT_080ea6dc                     @ 080ea6a0 0e4a
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea69e 0a48
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_type_nns_g2d_vram_type_3dmain @ 080ea6a0 0e4a
     ldr r1, DAT_080ea6ec                     @ 080ea6a2 1249
     movs r3,#0x1    @ 080ea6a4 0123
     bl suppress_assert_report                @ 080ea6a6 0ff019ff
 LAB_080ea6aa:
     cmp r6,#0x0                              @ 080ea6aa 002e
     bne LAB_080ea6ba                         @ 080ea6ac 05d1
-    ldr r0, DAT_080ea6c8                     @ 080ea6ae 0648
-    ldr r2, DAT_080ea6d0                     @ 080ea6b0 074a
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename @ 080ea6ae 0648
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_psrcdata_790 @ 080ea6b0 074a
     ldr r1, DAT_080ea6f0                     @ 080ea6b2 0f49
     movs r3,#0x1    @ 080ea6b4 0123
     bl suppress_assert_report                @ 080ea6b6 0ff011ff
@@ -2834,22 +2834,22 @@ LAB_080ea6ba:
     .hword 0x4698    @ 080ea6c2 9846
     b LAB_080ea70c                           @ 080ea6c4 22e0
     .zero  0x2
-DAT_080ea6c8:
-    .word  0x09e4b61c                     @ 080ea6c8 1cb6e409
+load_pltt_bank_proxy_to_vram_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea6c8 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea6cc:
     .word  0x000002c7                     @ 080ea6cc c7020000
-DAT_080ea6d0:
-    .word  0x09e4b790                     @ 080ea6d0 90b7e409
-DAT_080ea6d4:
-    .word  0x09e4b7c0                     @ 080ea6d4 c0b7e409
+load_pltt_bank_proxy_to_vram_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080ea6d0 90b7e409  pSrcData
+load_pltt_bank_proxy_to_vram_assert_pcmpinfo:
+    .word  assert_pcmpinfo                @ 080ea6d4 c0b7e409  pCmpInfo
 DAT_080ea6d8:
     .word  0x000002c9                     @ 080ea6d8 c9020000
-DAT_080ea6dc:
-    .word  0x09e4b644                     @ 080ea6dc 44b6e409
+load_pltt_bank_proxy_to_vram_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea6dc 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 DAT_080ea6e0:
     .word  0x000002ca                     @ 080ea6e0 ca020000
-DAT_080ea6e4:
-    .word  0x09e4b898                     @ 080ea6e4 98b8e409
+load_pltt_bank_proxy_to_vram_assert_ppltproxy:
+    .word  assert_ppltproxy               @ 080ea6e4 98b8e409  pPltProxy
 DAT_080ea6e8:
     .word  0x0000014f                     @ 080ea6e8 4f010000
 DAT_080ea6ec:
@@ -2859,8 +2859,8 @@ DAT_080ea6f0:
 LAB_080ea6f4:
     cmp r0,#0x4                              @ 080ea6f4 0428
     beq LAB_080ea706                         @ 080ea6f6 06d0
-    ldr r0, DAT_080ea75c                     @ 080ea6f8 1848
-    ldr r2, DAT_080ea760                     @ 080ea6fa 194a
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename_75c @ 080ea6f8 1848
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_psrcdata_fmt_gx_texfmt_pltt256 @ 080ea6fa 194a
     movs r1,#0x9c    @ 080ea6fc 9c21
     lsls r1,r1,#0x1    @ 080ea6fe 4900
     movs r3,#0x1    @ 080ea700 0123
@@ -2880,10 +2880,10 @@ LAB_080ea70c:
 LAB_080ea71a:
     cmp r7,#0x0                              @ 080ea71a 002f
     bne LAB_080ea72c                         @ 080ea71c 06d1
-    ldr r0, DAT_080ea75c                     @ 080ea71e 0f48
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename_75c @ 080ea71e 0f48
     movs r1,#0xa0    @ 080ea720 a021
     lsls r1,r1,#0x1    @ 080ea722 4900
-    ldr r2, DAT_080ea764                     @ 080ea724 0f4a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_pcmpinfo_764 @ 080ea724 0f4a
     movs r3,#0x1    @ 080ea726 0123
     bl suppress_assert_report                @ 080ea728 0ff0d8fe
 LAB_080ea72c:
@@ -2910,21 +2910,21 @@ LAB_080ea72c:
     ands r2,r3    @ 080ea754 1a40
     bl bios_cpu_fast_set                     @ 080ea756 23f04dfe
     b LAB_080ea77e                           @ 080ea75a 10e0
-DAT_080ea75c:
-    .word  0x09e4b61c                     @ 080ea75c 1cb6e409
-DAT_080ea760:
-    .word  0x09e4b79c                     @ 080ea760 9cb7e409
-DAT_080ea764:
-    .word  0x09e4b7c0                     @ 080ea764 c0b7e409
+load_pltt_bank_proxy_to_vram_g2d_image_c_filename_75c:
+    .word  g2d_image_c_filename           @ 080ea75c 1cb6e409  nnsys/g2d/g2d_Image.c
+load_pltt_bank_proxy_to_vram_assert_psrcdata_fmt_gx_texfmt_pltt256:
+    .word  assert_psrcdata_fmt_gx_texfmt_pltt256 @ 080ea760 9cb7e409  pSrcData->fmt == GX_TEXFMT_PLTT256
+load_pltt_bank_proxy_to_vram_assert_pcmpinfo_764:
+    .word  assert_pcmpinfo                @ 080ea764 c0b7e409  pCmpInfo
 DAT_080ea768:
     .word  0x05000200                     @ 080ea768 00020005
 DAT_080ea76c:
     .word  0x001fffff                     @ 080ea76c ffff1f00
 LAB_080ea770:
-    ldr r0, DAT_080ea7ac                     @ 080ea770 0e48
+    ldr r0, load_pltt_bank_proxy_to_vram_g2d_image_c_filename_7ac @ 080ea770 0e48
     movs r1,#0x94    @ 080ea772 9421
     lsls r1,r1,#0x1    @ 080ea774 4900
-    ldr r2, DAT_080ea7b0                     @ 080ea776 0e4a
+    ldr r2, load_pltt_bank_proxy_to_vram_assert_false_788 @ 080ea776 0e4a
     movs r3,#0x1    @ 080ea778 0123
     bl suppress_assert_report                @ 080ea77a 0ff0affe
 LAB_080ea77e:
@@ -2951,10 +2951,10 @@ LAB_080ea788:
     pop {r4,r5,r6,r7}                        @ 080ea7a6 f0bc
     pop {r0}                                 @ 080ea7a8 01bc
     bx r0                                    @ 080ea7aa 0047
-DAT_080ea7ac:
-    .word  0x09e4b61c                     @ 080ea7ac 1cb6e409
-DAT_080ea7b0:
-    .word  0x09e4b788                     @ 080ea7b0 88b7e409
+load_pltt_bank_proxy_to_vram_g2d_image_c_filename_7ac:
+    .word  g2d_image_c_filename           @ 080ea7ac 1cb6e409  nnsys/g2d/g2d_Image.c
+load_pltt_bank_proxy_to_vram_assert_false_788:
+    .word  assert_false_788               @ 080ea7b0 88b7e409  FALSE
     ROM_INCBIN 0xea7b4, 0x14
 
 @ Write a base address to the specified VRAM type slot of NNS_G2dRendererImageProxy. Called from NNS G2D renderer image proxy set path (g2d_Image.c line 0x2e9=745). Assert pRendererProxy non-NULL, type [0..2] (twice). Calls check_vram_location_slot to validate baseAddr, then writes baseAddr to pRendererProxy[type*4]. Symmetric with set_img_proxy_vram_location (0x080e9acc); that function writes from offset [+0], this function writes to [+0] (pRendererProxy itself is the +0 start of the struct, no additional offset).
@@ -2966,32 +2966,32 @@ set_renderer_img_proxy_vram_location:
     adds r6,r2,#0x0    @ 080ea7ce 161c
     cmp r5,#0x0                              @ 080ea7d0 002d
     bne LAB_080ea7e0                         @ 080ea7d2 05d1
-    ldr r0, DAT_080ea824                     @ 080ea7d4 1348
+    ldr r0, set_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080ea7d4 1348
     ldr r1, DAT_080ea828                     @ 080ea7d6 1449
-    ldr r2, DAT_080ea82c                     @ 080ea7d8 144a
+    ldr r2, set_renderer_img_proxy_vram_location_assert_pvramlocation @ 080ea7d8 144a
     movs r3,#0x1    @ 080ea7da 0123
     bl suppress_assert_report                @ 080ea7dc 0ff07efe
 LAB_080ea7e0:
     cmp r4,#0x2                              @ 080ea7e0 022c
     bls LAB_080ea7f0                         @ 080ea7e2 05d9
-    ldr r0, DAT_080ea824                     @ 080ea7e4 0f48
+    ldr r0, set_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080ea7e4 0f48
     ldr r1, DAT_080ea830                     @ 080ea7e6 1249
-    ldr r2, DAT_080ea834                     @ 080ea7e8 124a
+    ldr r2, set_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080ea7e8 124a
     movs r3,#0x1    @ 080ea7ea 0123
     bl suppress_assert_report                @ 080ea7ec 0ff076fe
 LAB_080ea7f0:
     cmp r5,#0x0                              @ 080ea7f0 002d
     bne LAB_080ea800                         @ 080ea7f2 05d1
-    ldr r0, DAT_080ea824                     @ 080ea7f4 0b48
-    ldr r2, DAT_080ea82c                     @ 080ea7f6 0d4a
+    ldr r0, set_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080ea7f4 0b48
+    ldr r2, set_renderer_img_proxy_vram_location_assert_pvramlocation @ 080ea7f6 0d4a
     movs r1,#0x1f    @ 080ea7f8 1f21
     movs r3,#0x1    @ 080ea7fa 0123
     bl suppress_assert_report                @ 080ea7fc 0ff06efe
 LAB_080ea800:
     cmp r4,#0x2                              @ 080ea800 022c
     bls LAB_080ea810                         @ 080ea802 05d9
-    ldr r0, DAT_080ea824                     @ 080ea804 0748
-    ldr r2, DAT_080ea834                     @ 080ea806 0b4a
+    ldr r0, set_renderer_img_proxy_vram_location_g2d_image_c_filename @ 080ea804 0748
+    ldr r2, set_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain @ 080ea806 0b4a
     movs r1,#0x20    @ 080ea808 2021
     movs r3,#0x1    @ 080ea80a 0123
     bl suppress_assert_report                @ 080ea80c 0ff066fe
@@ -3005,16 +3005,16 @@ LAB_080ea810:
     pop {r4,r5,r6}                           @ 080ea81e 70bc
     pop {r0}                                 @ 080ea820 01bc
     bx r0                                    @ 080ea822 0047
-DAT_080ea824:
-    .word  0x09e4b61c                     @ 080ea824 1cb6e409
+set_renderer_img_proxy_vram_location_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea824 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea828:
     .word  0x000002e9                     @ 080ea828 e9020000
-DAT_080ea82c:
-    .word  0x09e4b634                     @ 080ea82c 34b6e409
+set_renderer_img_proxy_vram_location_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080ea82c 34b6e409  pVramLocation
 DAT_080ea830:
     .word  0x000002ea                     @ 080ea830 ea020000
-DAT_080ea834:
-    .word  0x09e4b644                     @ 080ea834 44b6e409
+set_renderer_img_proxy_vram_location_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea834 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 
 @ nnsys/g2d/g2d_Image.c line 753/754. Read slot value from NNS_G2dImageProxy VRAM location table by type index. Computes pVramLocation->slot[type] = [pVramLocation + type*4] and returns the raw u32 slot value. Unlike check_vram_location_slot (0x080eae5c), this function returns the raw value rather than a 0/1 boolean.
 @ 
@@ -3029,32 +3029,32 @@ get_vram_location_slot_value:
     adds r4,r1,#0x0    @ 080ea83c 0c1c
     cmp r5,#0x0                              @ 080ea83e 002d
     bne LAB_080ea84e                         @ 080ea840 05d1
-    ldr r0, DAT_080ea88c                     @ 080ea842 1248
+    ldr r0, get_vram_location_slot_value_g2d_image_c_filename @ 080ea842 1248
     ldr r1, DAT_080ea890                     @ 080ea844 1249
-    ldr r2, DAT_080ea894                     @ 080ea846 134a
+    ldr r2, get_vram_location_slot_value_assert_pvramlocation @ 080ea846 134a
     movs r3,#0x1    @ 080ea848 0123
     bl suppress_assert_report                @ 080ea84a 0ff047fe
 LAB_080ea84e:
     cmp r4,#0x2                              @ 080ea84e 022c
     bls LAB_080ea85e                         @ 080ea850 05d9
-    ldr r0, DAT_080ea88c                     @ 080ea852 0e48
+    ldr r0, get_vram_location_slot_value_g2d_image_c_filename @ 080ea852 0e48
     ldr r1, DAT_080ea898                     @ 080ea854 1049
-    ldr r2, DAT_080ea89c                     @ 080ea856 114a
+    ldr r2, get_vram_location_slot_value_assert_type_nns_g2d_vram_type_3dmain @ 080ea856 114a
     movs r3,#0x1    @ 080ea858 0123
     bl suppress_assert_report                @ 080ea85a 0ff03ffe
 LAB_080ea85e:
     cmp r5,#0x0                              @ 080ea85e 002d
     bne LAB_080ea86e                         @ 080ea860 05d1
-    ldr r0, DAT_080ea88c                     @ 080ea862 0a48
-    ldr r2, DAT_080ea894                     @ 080ea864 0b4a
+    ldr r0, get_vram_location_slot_value_g2d_image_c_filename @ 080ea862 0a48
+    ldr r2, get_vram_location_slot_value_assert_pvramlocation @ 080ea864 0b4a
     movs r1,#0x2c    @ 080ea866 2c21
     movs r3,#0x1    @ 080ea868 0123
     bl suppress_assert_report                @ 080ea86a 0ff037fe
 LAB_080ea86e:
     cmp r4,#0x2                              @ 080ea86e 022c
     bls LAB_080ea87e                         @ 080ea870 05d9
-    ldr r0, DAT_080ea88c                     @ 080ea872 0648
-    ldr r2, DAT_080ea89c                     @ 080ea874 094a
+    ldr r0, get_vram_location_slot_value_g2d_image_c_filename @ 080ea872 0648
+    ldr r2, get_vram_location_slot_value_assert_type_nns_g2d_vram_type_3dmain @ 080ea874 094a
     movs r1,#0x2d    @ 080ea876 2d21
     movs r3,#0x1    @ 080ea878 0123
     bl suppress_assert_report                @ 080ea87a 0ff02ffe
@@ -3066,16 +3066,16 @@ LAB_080ea87e:
     pop {r1}                                 @ 080ea886 02bc
     bx r1                                    @ 080ea888 0847
     .zero  0x2
-DAT_080ea88c:
-    .word  0x09e4b61c                     @ 080ea88c 1cb6e409
+get_vram_location_slot_value_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea88c 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea890:
     .word  0x000002f1                     @ 080ea890 f1020000
-DAT_080ea894:
-    .word  0x09e4b634                     @ 080ea894 34b6e409
+get_vram_location_slot_value_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080ea894 34b6e409  pVramLocation
 DAT_080ea898:
     .word  0x000002f2                     @ 080ea898 f2020000
-DAT_080ea89c:
-    .word  0x09e4b644                     @ 080ea89c 44b6e409
+get_vram_location_slot_value_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea89c 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 
 @ nnsys/g2d/g2d_Image.c line 762/763. Check if NNS_G2dImageProxy VRAM slot[type] is nonzero (allocated). Reads pVramLocation->slot[type] = [pVramLocation + type*4], maps nonzero -> 1 and zero -> 0 using mvns+rsbs+orrs+lsrs#0x1f idiom. Same source as get_vram_location_slot_value (0x080ea838), differs in return type (boolean vs raw).
 @ 
@@ -3090,48 +3090,48 @@ check_vram_location_slot_set:
     adds r4,r1,#0x0    @ 080ea8a4 0c1c
     cmp r5,#0x0                              @ 080ea8a6 002d
     bne LAB_080ea8b6                         @ 080ea8a8 05d1
-    ldr r0, DAT_080ea91c                     @ 080ea8aa 1c48
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8aa 1c48
     ldr r1, DAT_080ea920                     @ 080ea8ac 1c49
-    ldr r2, DAT_080ea924                     @ 080ea8ae 1d4a
+    ldr r2, check_vram_location_slot_set_assert_pvramlocation @ 080ea8ae 1d4a
     movs r3,#0x1    @ 080ea8b0 0123
     bl suppress_assert_report                @ 080ea8b2 0ff013fe
 LAB_080ea8b6:
     cmp r4,#0x2                              @ 080ea8b6 022c
     bls LAB_080ea8c6                         @ 080ea8b8 05d9
-    ldr r0, DAT_080ea91c                     @ 080ea8ba 1848
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8ba 1848
     ldr r1, DAT_080ea928                     @ 080ea8bc 1a49
-    ldr r2, DAT_080ea92c                     @ 080ea8be 1b4a
+    ldr r2, check_vram_location_slot_set_assert_type_nns_g2d_vram_type_3dmain @ 080ea8be 1b4a
     movs r3,#0x1    @ 080ea8c0 0123
     bl suppress_assert_report                @ 080ea8c2 0ff00bfe
 LAB_080ea8c6:
     cmp r5,#0x0                              @ 080ea8c6 002d
     bne LAB_080ea8d6                         @ 080ea8c8 05d1
-    ldr r0, DAT_080ea91c                     @ 080ea8ca 1448
-    ldr r2, DAT_080ea924                     @ 080ea8cc 154a
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8ca 1448
+    ldr r2, check_vram_location_slot_set_assert_pvramlocation @ 080ea8cc 154a
     movs r1,#0x35    @ 080ea8ce 3521
     movs r3,#0x1    @ 080ea8d0 0123
     bl suppress_assert_report                @ 080ea8d2 0ff003fe
 LAB_080ea8d6:
     cmp r4,#0x2                              @ 080ea8d6 022c
     bls LAB_080ea8e6                         @ 080ea8d8 05d9
-    ldr r0, DAT_080ea91c                     @ 080ea8da 1048
-    ldr r2, DAT_080ea92c                     @ 080ea8dc 134a
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8da 1048
+    ldr r2, check_vram_location_slot_set_assert_type_nns_g2d_vram_type_3dmain @ 080ea8dc 134a
     movs r1,#0x36    @ 080ea8de 3621
     movs r3,#0x1    @ 080ea8e0 0123
     bl suppress_assert_report                @ 080ea8e2 0ff0fbfd
 LAB_080ea8e6:
     cmp r5,#0x0                              @ 080ea8e6 002d
     bne LAB_080ea8f6                         @ 080ea8e8 05d1
-    ldr r0, DAT_080ea91c                     @ 080ea8ea 0c48
-    ldr r2, DAT_080ea924                     @ 080ea8ec 0d4a
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8ea 0c48
+    ldr r2, check_vram_location_slot_set_assert_pvramlocation @ 080ea8ec 0d4a
     movs r1,#0x2c    @ 080ea8ee 2c21
     movs r3,#0x1    @ 080ea8f0 0123
     bl suppress_assert_report                @ 080ea8f2 0ff0f3fd
 LAB_080ea8f6:
     cmp r4,#0x2                              @ 080ea8f6 022c
     bls LAB_080ea906                         @ 080ea8f8 05d9
-    ldr r0, DAT_080ea91c                     @ 080ea8fa 0848
-    ldr r2, DAT_080ea92c                     @ 080ea8fc 0b4a
+    ldr r0, check_vram_location_slot_set_g2d_image_c_filename @ 080ea8fa 0848
+    ldr r2, check_vram_location_slot_set_assert_type_nns_g2d_vram_type_3dmain @ 080ea8fc 0b4a
     movs r1,#0x2d    @ 080ea8fe 2d21
     movs r3,#0x1    @ 080ea900 0123
     bl suppress_assert_report                @ 080ea902 0ff0ebfd
@@ -3147,16 +3147,16 @@ LAB_080ea906:
     pop {r1}                                 @ 080ea916 02bc
     bx r1                                    @ 080ea918 0847
     .zero  0x2
-DAT_080ea91c:
-    .word  0x09e4b61c                     @ 080ea91c 1cb6e409
+check_vram_location_slot_set_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea91c 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea920:
     .word  0x000002fa                     @ 080ea920 fa020000
-DAT_080ea924:
-    .word  0x09e4b634                     @ 080ea924 34b6e409
+check_vram_location_slot_set_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080ea924 34b6e409  pVramLocation
 DAT_080ea928:
     .word  0x000002fb                     @ 080ea928 fb020000
-DAT_080ea92c:
-    .word  0x09e4b644                     @ 080ea92c 44b6e409
+check_vram_location_slot_set_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea92c 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 
 @ nnsys/g2d/g2d_Image.c line 777/778. Copy NNS_G2dCharacterData pixel data to OBJ tile VRAM. type must be 1 (2DMAIN); asserts otherwise. Reads charFmt from pCharData[+0xc]: bit8 must be 0 (linear format). Passes pCharData[+0x14] (source ptr) and pCharData[+0x10] (byte count) to copy_to_obj_tile_vram.
 @ 
@@ -3171,17 +3171,17 @@ copy_char_data_to_obj_vram_by_type:
     adds r6,r2,#0x0    @ 080ea936 161c
     cmp r4,#0x0                              @ 080ea938 002c
     bne LAB_080ea948                         @ 080ea93a 05d1
-    ldr r0, DAT_080ea994                     @ 080ea93c 1548
+    ldr r0, copy_char_data_to_obj_vram_by_type_g2d_image_c_filename @ 080ea93c 1548
     ldr r1, DAT_080ea998                     @ 080ea93e 1649
-    ldr r2, DAT_080ea99c                     @ 080ea940 164a
+    ldr r2, copy_char_data_to_obj_vram_by_type_assert_psrcdata_790 @ 080ea940 164a
     movs r3,#0x1    @ 080ea942 0123
     bl suppress_assert_report                @ 080ea944 0ff0cafd
 LAB_080ea948:
     cmp r6,#0x2                              @ 080ea948 022e
     bls LAB_080ea958                         @ 080ea94a 05d9
-    ldr r0, DAT_080ea994                     @ 080ea94c 1148
+    ldr r0, copy_char_data_to_obj_vram_by_type_g2d_image_c_filename @ 080ea94c 1148
     ldr r1, DAT_080ea9a0                     @ 080ea94e 1449
-    ldr r2, DAT_080ea9a4                     @ 080ea950 144a
+    ldr r2, copy_char_data_to_obj_vram_by_type_assert_type_nns_g2d_vram_type_3dmain @ 080ea950 144a
     movs r3,#0x1    @ 080ea952 0123
     bl suppress_assert_report                @ 080ea954 0ff0c2fd
 LAB_080ea958:
@@ -3192,8 +3192,8 @@ LAB_080ea958:
     ands r0,r1    @ 080ea960 0840
     cmp r0,#0x0                              @ 080ea962 0028
     beq LAB_080ea972                         @ 080ea964 05d0
-    ldr r0, DAT_080ea994                     @ 080ea966 0b48
-    ldr r2, DAT_080ea9a8                     @ 080ea968 0f4a
+    ldr r0, copy_char_data_to_obj_vram_by_type_g2d_image_c_filename @ 080ea966 0b48
+    ldr r2, copy_char_data_to_obj_vram_by_type_assert_nnsi_g2discharactervramtransfe @ 080ea968 0f4a
     movs r1,#0x88    @ 080ea96a 8821
     movs r3,#0x1    @ 080ea96c 0123
     bl suppress_assert_report                @ 080ea96e 0ff0b5fd
@@ -3202,8 +3202,8 @@ LAB_080ea972:
     bne LAB_080ea9b0                         @ 080ea974 1cd1
     cmp r5,#0x0                              @ 080ea976 002d
     beq LAB_080ea986                         @ 080ea978 05d0
-    ldr r0, DAT_080ea994                     @ 080ea97a 0648
-    ldr r2, DAT_080ea9ac                     @ 080ea97c 0b4a
+    ldr r0, copy_char_data_to_obj_vram_by_type_g2d_image_c_filename @ 080ea97a 0648
+    ldr r2, copy_char_data_to_obj_vram_by_type_assert_charfmt_nns_g2d_character_fmt @ 080ea97c 0b4a
     movs r1,#0x9a    @ 080ea97e 9a21
     movs r3,#0x1    @ 080ea980 0123
     bl suppress_assert_report                @ 080ea982 0ff0abfd
@@ -3214,23 +3214,23 @@ LAB_080ea986:
     bl copy_to_obj_tile_vram                 @ 080ea98c 2af742fa
     b LAB_080ea9bc                           @ 080ea990 14e0
     .zero  0x2
-DAT_080ea994:
-    .word  0x09e4b61c                     @ 080ea994 1cb6e409
+copy_char_data_to_obj_vram_by_type_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ea994 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080ea998:
     .word  0x00000309                     @ 080ea998 09030000
-DAT_080ea99c:
-    .word  0x09e4b790                     @ 080ea99c 90b7e409
+copy_char_data_to_obj_vram_by_type_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080ea99c 90b7e409  pSrcData
 DAT_080ea9a0:
     .word  0x0000030a                     @ 080ea9a0 0a030000
-DAT_080ea9a4:
-    .word  0x09e4b644                     @ 080ea9a4 44b6e409
-DAT_080ea9a8:
-    .word  0x09e4b720                     @ 080ea9a8 20b7e409
-DAT_080ea9ac:
-    .word  0x09e4b760                     @ 080ea9ac 60b7e409
+copy_char_data_to_obj_vram_by_type_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ea9a4 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+copy_char_data_to_obj_vram_by_type_assert_nnsi_g2discharactervramtransfe:
+    .word  assert_nnsi_g2discharactervramtransfe @ 080ea9a8 20b7e409  !NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )
+copy_char_data_to_obj_vram_by_type_assert_charfmt_nns_g2d_character_fmt:
+    .word  assert_charfmt_nns_g2d_character_fmt @ 080ea9ac 60b7e409  charFmt == NNS_G2D_CHARACTER_FMT_CHAR
 LAB_080ea9b0:
-    ldr r0, DAT_080ea9c4                     @ 080ea9b0 0448
-    ldr r2, DAT_080ea9c8                     @ 080ea9b2 054a
+    ldr r0, copy_char_data_to_obj_vram_by_type_g2d_image_c_filename_9c4 @ 080ea9b0 0448
+    ldr r2, copy_char_data_to_obj_vram_by_type_assert_false_788 @ 080ea9b2 054a
     movs r1,#0xa5    @ 080ea9b4 a521
     movs r3,#0x1    @ 080ea9b6 0123
     bl suppress_assert_report                @ 080ea9b8 0ff090fd
@@ -3239,10 +3239,10 @@ LAB_080ea9bc:
     pop {r0}                                 @ 080ea9be 01bc
     bx r0                                    @ 080ea9c0 0047
     .zero  0x2
-DAT_080ea9c4:
-    .word  0x09e4b61c                     @ 080ea9c4 1cb6e409
-DAT_080ea9c8:
-    .word  0x09e4b788                     @ 080ea9c8 88b7e409
+copy_char_data_to_obj_vram_by_type_g2d_image_c_filename_9c4:
+    .word  g2d_image_c_filename           @ 080ea9c4 1cb6e409  nnsys/g2d/g2d_Image.c
+copy_char_data_to_obj_vram_by_type_assert_false_788:
+    .word  assert_false_788               @ 080ea9c8 88b7e409  FALSE
 
 @ nnsys/g2d/g2d_Image.c line 794/795. Dispatch char data write to VRAM location by NNS file format type field. Spills r1 to r8 (.hword 0x4688), r2 to r7, r3 to r6. Reads pSrcData[+2] low 16 bits minus 1 as 32-entry switch index, maps format codes (2->1, 4->2, 8->3, 0x10->4, 0x20->5, else->0) and writes to pVramLocation[+0xc]. Applies same mapping for pSrcData[+0] to pVramLocation[+4]. If pSrcData[+8] != 0 reads slot directly. Calls set_img_proxy_vram_location to finalize.
 @ 
@@ -3260,26 +3260,26 @@ dispatch_char_data_to_vram_by_type:
     adds r6,r3,#0x0    @ 080ea9d8 1e1c
     cmp r5,#0x0                              @ 080ea9da 002d
     bne LAB_080ea9ea                         @ 080ea9dc 05d1
-    ldr r0, DAT_080eaa4c                     @ 080ea9de 1b48
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename @ 080ea9de 1b48
     ldr r1, DAT_080eaa50                     @ 080ea9e0 1b49
-    ldr r2, DAT_080eaa54                     @ 080ea9e2 1c4a
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_psrcdata_790 @ 080ea9e2 1c4a
     movs r3,#0x1    @ 080ea9e4 0123
     bl suppress_assert_report                @ 080ea9e6 0ff079fd
 LAB_080ea9ea:
     cmp r7,#0x2                              @ 080ea9ea 022f
     bls LAB_080ea9fa                         @ 080ea9ec 05d9
-    ldr r0, DAT_080eaa4c                     @ 080ea9ee 1748
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename @ 080ea9ee 1748
     ldr r1, DAT_080eaa58                     @ 080ea9f0 1949
-    ldr r2, DAT_080eaa5c                     @ 080ea9f2 1a4a
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_type_nns_g2d_vram_type_3dmain @ 080ea9f2 1a4a
     movs r3,#0x1    @ 080ea9f4 0123
     bl suppress_assert_report                @ 080ea9f6 0ff071fd
 LAB_080ea9fa:
     cmp r6,#0x0                              @ 080ea9fa 002e
     bne LAB_080eaa0c                         @ 080ea9fc 06d1
-    ldr r0, DAT_080eaa4c                     @ 080ea9fe 1348
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename @ 080ea9fe 1348
     movs r1,#0xc7    @ 080eaa00 c721
     lsls r1,r1,#0x2    @ 080eaa02 8900
-    ldr r2, DAT_080eaa60                     @ 080eaa04 164a
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_pimgproxy @ 080eaa04 164a
     movs r3,#0x1    @ 080eaa06 0123
     bl suppress_assert_report                @ 080eaa08 0ff068fd
 LAB_080eaa0c:
@@ -3287,16 +3287,16 @@ LAB_080eaa0c:
     adds r4,#0xc    @ 080eaa0e 0c34
     cmp r5,#0x0                              @ 080eaa10 002d
     bne LAB_080eaa20                         @ 080eaa12 05d1
-    ldr r0, DAT_080eaa4c                     @ 080eaa14 0d48
-    ldr r2, DAT_080eaa64                     @ 080eaa16 134a
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename @ 080eaa14 0d48
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_psrc_6b8 @ 080eaa16 134a
     movs r1,#0x5d    @ 080eaa18 5d21
     movs r3,#0x1    @ 080eaa1a 0123
     bl suppress_assert_report                @ 080eaa1c 0ff05efd
 LAB_080eaa20:
     cmp r4,#0x0                              @ 080eaa20 002c
     bne LAB_080eaa30                         @ 080eaa22 05d1
-    ldr r0, DAT_080eaa4c                     @ 080eaa24 0948
-    ldr r2, DAT_080eaa68                     @ 080eaa26 104a
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename @ 080eaa24 0948
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_pdst_6c0 @ 080eaa26 104a
     movs r1,#0x5e    @ 080eaa28 5e21
     movs r3,#0x1    @ 080eaa2a 0123
     bl suppress_assert_report                @ 080eaa2c 0ff056fd
@@ -3317,22 +3317,22 @@ LAB_080eaa38:
 switchD_080eaa48__switchD:
     .hword 0x4687    @ 080eaa48 8746
     .zero  0x2
-DAT_080eaa4c:
-    .word  0x09e4b61c                     @ 080eaa4c 1cb6e409
+dispatch_char_data_to_vram_by_type_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080eaa4c 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080eaa50:
     .word  0x0000031a                     @ 080eaa50 1a030000
-DAT_080eaa54:
-    .word  0x09e4b790                     @ 080eaa54 90b7e409
+dispatch_char_data_to_vram_by_type_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080eaa54 90b7e409  pSrcData
 DAT_080eaa58:
     .word  0x0000031b                     @ 080eaa58 1b030000
-DAT_080eaa5c:
-    .word  0x09e4b644                     @ 080eaa5c 44b6e409
-DAT_080eaa60:
-    .word  0x09e4b610                     @ 080eaa60 10b6e409
-DAT_080eaa64:
-    .word  0x09e4b6b8                     @ 080eaa64 b8b6e409
-DAT_080eaa68:
-    .word  0x09e4b6c0                     @ 080eaa68 c0b6e409
+dispatch_char_data_to_vram_by_type_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080eaa5c 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+dispatch_char_data_to_vram_by_type_assert_pimgproxy:
+    .word  assert_pimgproxy               @ 080eaa60 10b6e409  pImgProxy
+dispatch_char_data_to_vram_by_type_assert_psrc_6b8:
+    .word  assert_psrc_6b8                @ 080eaa64 b8b6e409  pSrc
+dispatch_char_data_to_vram_by_type_assert_pdst_6c0:
+    .word  assert_pdst_6c0                @ 080eaa68 c0b6e409  pDst
 DAT_080eaa6c:
     .word  0x080eaa70                     @ 080eaa6c 70aa0e08
 switchD_080eaa48__switchdataD_080eaa70:
@@ -3459,8 +3459,8 @@ LAB_080eabba:
     rsbs r0,r0,#0    @ 080eabbe 4042
     cmp r1,r0                                @ 080eabc0 8142
     beq LAB_080eabd0                         @ 080eabc2 05d0
-    ldr r0, DAT_080eabfc                     @ 080eabc4 0d48
-    ldr r2, DAT_080eac00                     @ 080eabc6 0e4a
+    ldr r0, dispatch_char_data_to_vram_by_type_g2d_image_c_filename_bfc @ 080eabc4 0d48
+    ldr r2, dispatch_char_data_to_vram_by_type_assert_psrc_w_nns_g2d_1d_mapping_char @ 080eabc6 0e4a
     movs r1,#0x6d    @ 080eabc8 6d21
     movs r3,#0x1    @ 080eabca 0123
     bl suppress_assert_report                @ 080eabcc 0ff086fc
@@ -3487,10 +3487,10 @@ LAB_080eabda:
     pop {r4,r5,r6,r7}                        @ 080eabf6 f0bc
     pop {r0}                                 @ 080eabf8 01bc
     bx r0                                    @ 080eabfa 0047
-DAT_080eabfc:
-    .word  0x09e4b61c                     @ 080eabfc 1cb6e409
-DAT_080eac00:
-    .word  0x09e4b6c8                     @ 080eac00 c8b6e409
+dispatch_char_data_to_vram_by_type_g2d_image_c_filename_bfc:
+    .word  g2d_image_c_filename           @ 080eabfc 1cb6e409  nnsys/g2d/g2d_Image.c
+dispatch_char_data_to_vram_by_type_assert_psrc_w_nns_g2d_1d_mapping_char:
+    .word  assert_psrc_w_nns_g2d_1d_mapping_char @ 080eac00 c8b6e409  (pSrc->W == NNS_G2D_1D_MAPPING_CHAR_SIZE) && (pSrc->H == NNS
 
 @ nnsys/g2d/g2d_Image.c line 810/811. Upload NNS_G2dPaletteData palette data to 2DMAIN palette VRAM region (0x05000200). type must be 1 (2DMAIN), asserts otherwise. Reads palette count from pPltData[+0xc], source data ptr from pPltData[+8]. Computes write byte count via lsls#9, lsrs#0xb. Calls bios_cpu_fast_set to DMA data to 0x05000200 + type_offset.
 @ 
@@ -3505,25 +3505,25 @@ upload_pltt_data_to_2dmain_palette:
     adds r6,r2,#0x0    @ 080eac0a 161c
     cmp r4,#0x0                              @ 080eac0c 002c
     bne LAB_080eac1c                         @ 080eac0e 05d1
-    ldr r0, DAT_080eac54                     @ 080eac10 1048
+    ldr r0, upload_pltt_data_to_2dmain_palette_g2d_image_c_filename @ 080eac10 1048
     ldr r1, DAT_080eac58                     @ 080eac12 1149
-    ldr r2, DAT_080eac5c                     @ 080eac14 114a
+    ldr r2, upload_pltt_data_to_2dmain_palette_assert_psrcdata_790 @ 080eac14 114a
     movs r3,#0x1    @ 080eac16 0123
     bl suppress_assert_report                @ 080eac18 0ff060fc
 LAB_080eac1c:
     cmp r6,#0x2                              @ 080eac1c 022e
     bls LAB_080eac2c                         @ 080eac1e 05d9
-    ldr r0, DAT_080eac54                     @ 080eac20 0c48
+    ldr r0, upload_pltt_data_to_2dmain_palette_g2d_image_c_filename @ 080eac20 0c48
     ldr r1, DAT_080eac60                     @ 080eac22 0f49
-    ldr r2, DAT_080eac64                     @ 080eac24 0f4a
+    ldr r2, upload_pltt_data_to_2dmain_palette_assert_type_nns_g2d_vram_type_3dmain @ 080eac24 0f4a
     movs r3,#0x1    @ 080eac26 0123
     bl suppress_assert_report                @ 080eac28 0ff058fc
 LAB_080eac2c:
     ldr r5,[r4,#0x8]                         @ 080eac2c a568
     cmp r4,#0x0                              @ 080eac2e 002c
     bne LAB_080eac40                         @ 080eac30 06d1
-    ldr r0, DAT_080eac54                     @ 080eac32 0848
-    ldr r2, DAT_080eac5c                     @ 080eac34 094a
+    ldr r0, upload_pltt_data_to_2dmain_palette_g2d_image_c_filename @ 080eac32 0848
+    ldr r2, upload_pltt_data_to_2dmain_palette_assert_psrcdata_790 @ 080eac34 094a
     movs r1,#0x8e    @ 080eac36 8e21
     lsls r1,r1,#0x1    @ 080eac38 4900
     movs r3,#0x1    @ 080eac3a 0123
@@ -3538,21 +3538,21 @@ LAB_080eac40:
     lsrs r2,r2,#0xb    @ 080eac4c d20a
     bl bios_cpu_fast_set                     @ 080eac4e 23f0d1fb
     b LAB_080eac7a                           @ 080eac52 12e0
-DAT_080eac54:
-    .word  0x09e4b61c                     @ 080eac54 1cb6e409
+upload_pltt_data_to_2dmain_palette_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080eac54 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080eac58:
     .word  0x0000032a                     @ 080eac58 2a030000
-DAT_080eac5c:
-    .word  0x09e4b790                     @ 080eac5c 90b7e409
+upload_pltt_data_to_2dmain_palette_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080eac5c 90b7e409  pSrcData
 DAT_080eac60:
     .word  0x0000032b                     @ 080eac60 2b030000
-DAT_080eac64:
-    .word  0x09e4b644                     @ 080eac64 44b6e409
+upload_pltt_data_to_2dmain_palette_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080eac64 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 DAT_080eac68:
     .word  0x05000200                     @ 080eac68 00020005
 LAB_080eac6c:
-    ldr r0, DAT_080eac80                     @ 080eac6c 0448
-    ldr r2, DAT_080eac84                     @ 080eac6e 054a
+    ldr r0, upload_pltt_data_to_2dmain_palette_g2d_image_c_filename_c80 @ 080eac6c 0448
+    ldr r2, upload_pltt_data_to_2dmain_palette_assert_false_788 @ 080eac6e 054a
     movs r1,#0x94    @ 080eac70 9421
     lsls r1,r1,#0x1    @ 080eac72 4900
     movs r3,#0x1    @ 080eac74 0123
@@ -3561,10 +3561,10 @@ LAB_080eac7a:
     pop {r4,r5,r6,r7}                        @ 080eac7a f0bc
     pop {r0}                                 @ 080eac7c 01bc
     bx r0                                    @ 080eac7e 0047
-DAT_080eac80:
-    .word  0x09e4b61c                     @ 080eac80 1cb6e409
-DAT_080eac84:
-    .word  0x09e4b788                     @ 080eac84 88b7e409
+upload_pltt_data_to_2dmain_palette_g2d_image_c_filename_c80:
+    .word  g2d_image_c_filename           @ 080eac80 1cb6e409  nnsys/g2d/g2d_Image.c
+upload_pltt_data_to_2dmain_palette_assert_false_788:
+    .word  assert_false_788               @ 080eac84 88b7e409  FALSE
 
 @ nnsys/g2d/g2d_Image.c line 829/830. Upload palette entries in batches to 2DMAIN palette VRAM. Spills r10->r7->r9->r6->r8->r5 to callee-save, r0 to r8, r1 to r6, r2 to stack, r3 to r10. Loops over pCmpInfo entry list by r5: reads entry color count (ldrh at [r6+i*2]), multiplies by stride (r7 = 0x20 or 0x200), computes dest = [pSrc+0xc] + dest_index*stride + 0x05000200, calls bios_cpu_fast_set to write r2 bytes.
 @ 
@@ -3586,43 +3586,43 @@ upload_pltt_entries_to_palette_vram:
     .hword 0x469a    @ 080eac9a 9a46
     cmp r0,#0x0                              @ 080eac9c 0028
     bne LAB_080eacae                         @ 080eac9e 06d1
-    ldr r0, DAT_080ead24                     @ 080eaca0 2048
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eaca0 2048
     movs r1,#0xcf    @ 080eaca2 cf21
     lsls r1,r1,#0x2    @ 080eaca4 8900
-    ldr r2, DAT_080ead28                     @ 080eaca6 204a
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_psrcdata_790 @ 080eaca6 204a
     movs r3,#0x1    @ 080eaca8 0123
     bl suppress_assert_report                @ 080eacaa 0ff017fc
 LAB_080eacae:
     cmp r6,#0x0                              @ 080eacae 002e
     bne LAB_080eacbe                         @ 080eacb0 05d1
-    ldr r0, DAT_080ead24                     @ 080eacb2 1c48
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eacb2 1c48
     ldr r1, DAT_080ead2c                     @ 080eacb4 1d49
-    ldr r2, DAT_080ead30                     @ 080eacb6 1e4a
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_pcmpinfo @ 080eacb6 1e4a
     movs r3,#0x1    @ 080eacb8 0123
     bl suppress_assert_report                @ 080eacba 0ff00ffc
 LAB_080eacbe:
     .hword 0x4650    @ 080eacbe 5046
     cmp r0,#0x2                              @ 080eacc0 0228
     bls LAB_080eacd0                         @ 080eacc2 05d9
-    ldr r0, DAT_080ead24                     @ 080eacc4 1748
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eacc4 1748
     ldr r1, DAT_080ead34                     @ 080eacc6 1b49
-    ldr r2, DAT_080ead38                     @ 080eacc8 1b4a
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_type_nns_g2d_vram_type_3dmain @ 080eacc8 1b4a
     movs r3,#0x1    @ 080eacca 0123
     bl suppress_assert_report                @ 080eaccc 0ff006fc
 LAB_080eacd0:
     .hword 0x4641    @ 080eacd0 4146
     cmp r1,#0x0                              @ 080eacd2 0029
     bne LAB_080eace2                         @ 080eacd4 05d1
-    ldr r0, DAT_080ead24                     @ 080eacd6 1348
-    ldr r2, DAT_080ead28                     @ 080eacd8 134a
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eacd6 1348
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_psrcdata_790 @ 080eacd8 134a
     ldr r1, DAT_080ead3c                     @ 080eacda 1849
     movs r3,#0x1    @ 080eacdc 0123
     bl suppress_assert_report                @ 080eacde 0ff0fdfb
 LAB_080eace2:
     cmp r6,#0x0                              @ 080eace2 002e
     bne LAB_080eacf4                         @ 080eace4 06d1
-    ldr r0, DAT_080ead24                     @ 080eace6 0f48
-    ldr r2, DAT_080ead30                     @ 080eace8 114a
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eace6 0f48
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_pcmpinfo @ 080eace8 114a
     movs r1,#0xa8    @ 080eacea a821
     lsls r1,r1,#0x1    @ 080eacec 4900
     movs r3,#0x1    @ 080eacee 0123
@@ -3631,8 +3631,8 @@ LAB_080eacf4:
     .hword 0x4653    @ 080eacf4 5346
     cmp r3,#0x2                              @ 080eacf6 022b
     bls LAB_080ead06                         @ 080eacf8 05d9
-    ldr r0, DAT_080ead24                     @ 080eacfa 0a48
-    ldr r2, DAT_080ead38                     @ 080eacfc 0e4a
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080eacfa 0a48
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_type_nns_g2d_vram_type_3dmain @ 080eacfc 0e4a
     ldr r1, DAT_080ead40                     @ 080eacfe 1049
     movs r3,#0x1    @ 080ead00 0123
     bl suppress_assert_report                @ 080ead02 0ff0ebfb
@@ -3640,8 +3640,8 @@ LAB_080ead06:
     .hword 0x4640    @ 080ead06 4046
     cmp r0,#0x0                              @ 080ead08 0028
     bne LAB_080ead18                         @ 080ead0a 05d1
-    ldr r0, DAT_080ead24                     @ 080ead0c 0548
-    ldr r2, DAT_080ead28                     @ 080ead0e 064a
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename @ 080ead0c 0548
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_psrcdata_790 @ 080ead0e 064a
     ldr r1, DAT_080ead44                     @ 080ead10 0c49
     movs r3,#0x1    @ 080ead12 0123
     bl suppress_assert_report                @ 080ead14 0ff0e2fb
@@ -3652,18 +3652,18 @@ LAB_080ead18:
     bne LAB_080ead48                         @ 080ead1e 13d1
     movs r7,#0x20    @ 080ead20 2027
     b LAB_080ead5e                           @ 080ead22 1ce0
-DAT_080ead24:
-    .word  0x09e4b61c                     @ 080ead24 1cb6e409
-DAT_080ead28:
-    .word  0x09e4b790                     @ 080ead28 90b7e409
+upload_pltt_entries_to_palette_vram_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080ead24 1cb6e409  nnsys/g2d/g2d_Image.c
+upload_pltt_entries_to_palette_vram_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080ead28 90b7e409  pSrcData
 DAT_080ead2c:
     .word  0x0000033d                     @ 080ead2c 3d030000
-DAT_080ead30:
-    .word  0x09e4b7c0                     @ 080ead30 c0b7e409
+upload_pltt_entries_to_palette_vram_assert_pcmpinfo:
+    .word  assert_pcmpinfo                @ 080ead30 c0b7e409  pCmpInfo
 DAT_080ead34:
     .word  0x0000033e                     @ 080ead34 3e030000
-DAT_080ead38:
-    .word  0x09e4b644                     @ 080ead38 44b6e409
+upload_pltt_entries_to_palette_vram_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080ead38 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 DAT_080ead3c:
     .word  0x0000014f                     @ 080ead3c 4f010000
 DAT_080ead40:
@@ -3673,8 +3673,8 @@ DAT_080ead44:
 LAB_080ead48:
     cmp r0,#0x4                              @ 080ead48 0428
     beq LAB_080ead5a                         @ 080ead4a 06d0
-    ldr r0, DAT_080eadac                     @ 080ead4c 1748
-    ldr r2, DAT_080eadb0                     @ 080ead4e 184a
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename_dac @ 080ead4c 1748
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_psrcdata_fmt_gx_texfmt_pltt256 @ 080ead4e 184a
     movs r1,#0x9c    @ 080ead50 9c21
     lsls r1,r1,#0x1    @ 080ead52 4900
     movs r3,#0x1    @ 080ead54 0123
@@ -3692,10 +3692,10 @@ LAB_080ead5e:
 LAB_080ead6a:
     cmp r6,#0x0                              @ 080ead6a 002e
     bne LAB_080ead7c                         @ 080ead6c 06d1
-    ldr r0, DAT_080eadac                     @ 080ead6e 0f48
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename_dac @ 080ead6e 0f48
     movs r1,#0xa0    @ 080ead70 a021
     lsls r1,r1,#0x1    @ 080ead72 4900
-    ldr r2, DAT_080eadb4                     @ 080ead74 0f4a
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_pcmpinfo_db4 @ 080ead74 0f4a
     movs r3,#0x1    @ 080ead76 0123
     bl suppress_assert_report                @ 080ead78 0ff0b0fb
 LAB_080ead7c:
@@ -3722,21 +3722,21 @@ LAB_080ead7c:
     bl bios_cpu_fast_set                     @ 080eada4 23f026fb
     b LAB_080eadce                           @ 080eada8 11e0
     .zero  0x2
-DAT_080eadac:
-    .word  0x09e4b61c                     @ 080eadac 1cb6e409
-DAT_080eadb0:
-    .word  0x09e4b79c                     @ 080eadb0 9cb7e409
-DAT_080eadb4:
-    .word  0x09e4b7c0                     @ 080eadb4 c0b7e409
+upload_pltt_entries_to_palette_vram_g2d_image_c_filename_dac:
+    .word  g2d_image_c_filename           @ 080eadac 1cb6e409  nnsys/g2d/g2d_Image.c
+upload_pltt_entries_to_palette_vram_assert_psrcdata_fmt_gx_texfmt_pltt256:
+    .word  assert_psrcdata_fmt_gx_texfmt_pltt256 @ 080eadb0 9cb7e409  pSrcData->fmt == GX_TEXFMT_PLTT256
+upload_pltt_entries_to_palette_vram_assert_pcmpinfo_db4:
+    .word  assert_pcmpinfo                @ 080eadb4 c0b7e409  pCmpInfo
 DAT_080eadb8:
     .word  0x05000200                     @ 080eadb8 00020005
 DAT_080eadbc:
     .word  0x001fffff                     @ 080eadbc ffff1f00
 LAB_080eadc0:
-    ldr r0, DAT_080eade8                     @ 080eadc0 0948
+    ldr r0, upload_pltt_entries_to_palette_vram_g2d_image_c_filename_de8 @ 080eadc0 0948
     movs r1,#0x94    @ 080eadc2 9421
     lsls r1,r1,#0x1    @ 080eadc4 4900
-    ldr r2, DAT_080eadec                     @ 080eadc6 094a
+    ldr r2, upload_pltt_entries_to_palette_vram_assert_false_788 @ 080eadc6 094a
     movs r3,#0x1    @ 080eadc8 0123
     bl suppress_assert_report                @ 080eadca 0ff087fb
 LAB_080eadce:
@@ -3754,10 +3754,10 @@ LAB_080eadd8:
     pop {r4,r5,r6,r7}                        @ 080eade2 f0bc
     pop {r0}                                 @ 080eade4 01bc
     bx r0                                    @ 080eade6 0047
-DAT_080eade8:
-    .word  0x09e4b61c                     @ 080eade8 1cb6e409
-DAT_080eadec:
-    .word  0x09e4b788                     @ 080eadec 88b7e409
+upload_pltt_entries_to_palette_vram_g2d_image_c_filename_de8:
+    .word  g2d_image_c_filename           @ 080eade8 1cb6e409  nnsys/g2d/g2d_Image.c
+upload_pltt_entries_to_palette_vram_assert_false_788:
+    .word  assert_false_788               @ 080eadec 88b7e409  FALSE
 
 @ nnsys/g2d/g2d_Image.c line 846/847. Copy first two words from source palette proxy struct to dest, then call set_img_proxy_vram_slot to register the VRAM slot. Copies [pPltProxySrc+0] and [pPltProxySrc+4] to [pPltProxyDst+0] and [pPltProxyDst+4]. Then calls set_img_proxy_vram_slot (0x080e9c74) with pPltProxyDst, type, pImgProxy.
 @ 
@@ -3772,26 +3772,26 @@ init_plt_proxy_vram_slot_from_src:
     adds r4,r3,#0x0    @ 080eadf8 1c1c
     cmp r5,#0x0                              @ 080eadfa 002d
     bne LAB_080eae0a                         @ 080eadfc 05d1
-    ldr r0, DAT_080eae44                     @ 080eadfe 1148
+    ldr r0, init_plt_proxy_vram_slot_from_src_g2d_image_c_filename @ 080eadfe 1148
     ldr r1, DAT_080eae48                     @ 080eae00 1149
-    ldr r2, DAT_080eae4c                     @ 080eae02 124a
+    ldr r2, init_plt_proxy_vram_slot_from_src_assert_psrcdata_790 @ 080eae02 124a
     movs r3,#0x1    @ 080eae04 0123
     bl suppress_assert_report                @ 080eae06 0ff069fb
 LAB_080eae0a:
     cmp r6,#0x2                              @ 080eae0a 022e
     bls LAB_080eae1a                         @ 080eae0c 05d9
-    ldr r0, DAT_080eae44                     @ 080eae0e 0d48
+    ldr r0, init_plt_proxy_vram_slot_from_src_g2d_image_c_filename @ 080eae0e 0d48
     ldr r1, DAT_080eae50                     @ 080eae10 0f49
-    ldr r2, DAT_080eae54                     @ 080eae12 104a
+    ldr r2, init_plt_proxy_vram_slot_from_src_assert_type_nns_g2d_vram_type_3dmain @ 080eae12 104a
     movs r3,#0x1    @ 080eae14 0123
     bl suppress_assert_report                @ 080eae16 0ff061fb
 LAB_080eae1a:
     cmp r4,#0x0                              @ 080eae1a 002c
     bne LAB_080eae2c                         @ 080eae1c 06d1
-    ldr r0, DAT_080eae44                     @ 080eae1e 0948
+    ldr r0, init_plt_proxy_vram_slot_from_src_g2d_image_c_filename @ 080eae1e 0948
     movs r1,#0xd4    @ 080eae20 d421
     lsls r1,r1,#0x2    @ 080eae22 8900
-    ldr r2, DAT_080eae58                     @ 080eae24 0c4a
+    ldr r2, init_plt_proxy_vram_slot_from_src_assert_ppltproxy @ 080eae24 0c4a
     movs r3,#0x1    @ 080eae26 0123
     bl suppress_assert_report                @ 080eae28 0ff058fb
 LAB_080eae2c:
@@ -3806,18 +3806,18 @@ LAB_080eae2c:
     pop {r4,r5,r6,r7}                        @ 080eae3e f0bc
     pop {r0}                                 @ 080eae40 01bc
     bx r0                                    @ 080eae42 0047
-DAT_080eae44:
-    .word  0x09e4b61c                     @ 080eae44 1cb6e409
+init_plt_proxy_vram_slot_from_src_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080eae44 1cb6e409  nnsys/g2d/g2d_Image.c
 DAT_080eae48:
     .word  0x0000034e                     @ 080eae48 4e030000
-DAT_080eae4c:
-    .word  0x09e4b790                     @ 080eae4c 90b7e409
+init_plt_proxy_vram_slot_from_src_assert_psrcdata_790:
+    .word  assert_psrcdata_790            @ 080eae4c 90b7e409  pSrcData
 DAT_080eae50:
     .word  0x0000034f                     @ 080eae50 4f030000
-DAT_080eae54:
-    .word  0x09e4b644                     @ 080eae54 44b6e409
-DAT_080eae58:
-    .word  0x09e4b898                     @ 080eae58 98b8e409
+init_plt_proxy_vram_slot_from_src_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080eae54 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
+init_plt_proxy_vram_slot_from_src_assert_ppltproxy:
+    .word  assert_ppltproxy               @ 080eae58 98b8e409  pPltProxy
 
 @ nnsys/g2d/g2d_Image.c -- check if VRAM location slot[type] is set. Called by set_img_proxy_vram_location (0x080e9acc) and 2 other image-proxy paths. Asserts pVramLocation != NULL (line 0x35=53), type <= 2 (line 0x36=54). Reads pVramLocation->slot[type] = [pVramLocation + type*4]; returns 1 if non-zero (slot set), 0 if zero (not set). Uses mvns+rsbs+orrs+lsrs 0x1F idiom for non-zero boolean. r0=NNS_G2dImageProxy* pVramLocation [non-NULL], r1=u32 type [0..2]. Constants: NNS_G2D_VRAM_TYPE_3DMAIN=0 / NNS_G2D_VRAM_TYPE_2DMAIN=1 / NNS_G2D_VRAM_TYPE_2DSUB=2.
 check_vram_location_slot:
@@ -3826,32 +3826,32 @@ check_vram_location_slot:
     adds r4,r1,#0x0    @ 080eae60 0c1c
     cmp r5,#0x0                              @ 080eae62 002d
     bne LAB_080eae72                         @ 080eae64 05d1
-    ldr r0, DAT_080eaeb8                     @ 080eae66 1448
-    ldr r2, DAT_080eaebc                     @ 080eae68 144a
+    ldr r0, check_vram_location_slot_g2d_image_c_filename @ 080eae66 1448
+    ldr r2, check_vram_location_slot_assert_pvramlocation @ 080eae68 144a
     movs r1,#0x35    @ 080eae6a 3521
     movs r3,#0x1    @ 080eae6c 0123
     bl suppress_assert_report                @ 080eae6e 0ff035fb
 LAB_080eae72:
     cmp r4,#0x2                              @ 080eae72 022c
     bls LAB_080eae82                         @ 080eae74 05d9
-    ldr r0, DAT_080eaeb8                     @ 080eae76 1048
-    ldr r2, DAT_080eaec0                     @ 080eae78 114a
+    ldr r0, check_vram_location_slot_g2d_image_c_filename @ 080eae76 1048
+    ldr r2, check_vram_location_slot_assert_type_nns_g2d_vram_type_3dmain @ 080eae78 114a
     movs r1,#0x36    @ 080eae7a 3621
     movs r3,#0x1    @ 080eae7c 0123
     bl suppress_assert_report                @ 080eae7e 0ff02dfb
 LAB_080eae82:
     cmp r5,#0x0                              @ 080eae82 002d
     bne LAB_080eae92                         @ 080eae84 05d1
-    ldr r0, DAT_080eaeb8                     @ 080eae86 0c48
-    ldr r2, DAT_080eaebc                     @ 080eae88 0c4a
+    ldr r0, check_vram_location_slot_g2d_image_c_filename @ 080eae86 0c48
+    ldr r2, check_vram_location_slot_assert_pvramlocation @ 080eae88 0c4a
     movs r1,#0x2c    @ 080eae8a 2c21
     movs r3,#0x1    @ 080eae8c 0123
     bl suppress_assert_report                @ 080eae8e 0ff025fb
 LAB_080eae92:
     cmp r4,#0x2                              @ 080eae92 022c
     bls LAB_080eaea2                         @ 080eae94 05d9
-    ldr r0, DAT_080eaeb8                     @ 080eae96 0848
-    ldr r2, DAT_080eaec0                     @ 080eae98 094a
+    ldr r0, check_vram_location_slot_g2d_image_c_filename @ 080eae96 0848
+    ldr r2, check_vram_location_slot_assert_type_nns_g2d_vram_type_3dmain @ 080eae98 094a
     movs r1,#0x2d    @ 080eae9a 2d21
     movs r3,#0x1    @ 080eae9c 0123
     bl suppress_assert_report                @ 080eae9e 0ff01dfb
@@ -3867,12 +3867,12 @@ LAB_080eaea2:
     pop {r1}                                 @ 080eaeb2 02bc
     bx r1                                    @ 080eaeb4 0847
     .zero  0x2
-DAT_080eaeb8:
-    .word  0x09e4b61c                     @ 080eaeb8 1cb6e409
-DAT_080eaebc:
-    .word  0x09e4b634                     @ 080eaebc 34b6e409
-DAT_080eaec0:
-    .word  0x09e4b644                     @ 080eaec0 44b6e409
+check_vram_location_slot_g2d_image_c_filename:
+    .word  g2d_image_c_filename           @ 080eaeb8 1cb6e409  nnsys/g2d/g2d_Image.c
+check_vram_location_slot_assert_pvramlocation:
+    .word  assert_pvramlocation           @ 080eaebc 34b6e409  pVramLocation
+check_vram_location_slot_assert_type_nns_g2d_vram_type_3dmain:
+    .word  assert_type_nns_g2d_vram_type_3dmain @ 080eaec0 44b6e409  ( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_
 
 @ nnsys/g2d/g2d_Load.c line 10 (pBinFileHeader). Search NNS G2D binary file header for a block by type tag. r0=NNS_G2dBinaryBlockHeader* pBinFileHeader (non-NULL assert), r1=u32 type_tag (4-byte magic e.g. 'NANR'/'PLTT'). Walks block list at [pBinFileHeader+0xc]; compares [block+0x0]==type_tag; returns block ptr if found, NULL if not found. indeg=7 (used by g2d_NAN_load / g2d_NCL_load / g2d_NOB_load loaders).
 find_bin_block_by_type:
@@ -3881,8 +3881,8 @@ find_bin_block_by_type:
     adds r7,r1,#0x0    @ 080eaec8 0f1c
     cmp r6,#0x0                              @ 080eaeca 002e
     bne LAB_080eaeda                         @ 080eaecc 05d1
-    ldr r0, DAT_080eaee4                     @ 080eaece 0548
-    ldr r2, DAT_080eaee8                     @ 080eaed0 054a
+    ldr r0, find_bin_block_by_type_g2d_load_c_filename @ 080eaece 0548
+    ldr r2, find_bin_block_by_type_assert_pbinfileheader @ 080eaed0 054a
     movs r1,#0xa    @ 080eaed2 0a21
     movs r3,#0x1    @ 080eaed4 0123
     bl suppress_assert_report                @ 080eaed6 0ff001fb
@@ -3892,16 +3892,16 @@ LAB_080eaeda:
     movs r5,#0x0    @ 080eaede 0025
     b LAB_080eaf1a                           @ 080eaee0 1be0
     .zero  0x2
-DAT_080eaee4:
-    .word  0x09e4bfdc                     @ 080eaee4 dcbfe409
-DAT_080eaee8:
-    .word  0x09e4bff4                     @ 080eaee8 f4bfe409
+find_bin_block_by_type_g2d_load_c_filename:
+    .word  g2d_load_c_filename            @ 080eaee4 dcbfe409  nnsys/g2d/g2d_Load.c
+find_bin_block_by_type_assert_pbinfileheader:
+    .word  assert_pbinfileheader          @ 080eaee8 f4bfe409  pBinFileHeader
 LAB_080eaeec:
     cmp r4,#0x0                              @ 080eaeec 002c
     bne LAB_080eaefc                         @ 080eaeee 05d1
-    ldr r0, DAT_080eaf08                     @ 080eaef0 0548
+    ldr r0, find_bin_block_by_type_g2d_load_c_filename_f08 @ 080eaef0 0548
     movs r1,#0x13    @ 080eaef2 1321
-    ldr r2, DAT_080eaf0c                     @ 080eaef4 054a
+    ldr r2, find_bin_block_by_type_assert_pcursor @ 080eaef4 054a
     movs r3,#0x1    @ 080eaef6 0123
     bl suppress_assert_report                @ 080eaef8 0ff0f0fa
 LAB_080eaefc:
@@ -3911,10 +3911,10 @@ LAB_080eaefc:
     adds r0,r4,#0x0    @ 080eaf02 201c
     b LAB_080eaf22                           @ 080eaf04 0de0
     .zero  0x2
-DAT_080eaf08:
-    .word  0x09e4bfdc                     @ 080eaf08 dcbfe409
-DAT_080eaf0c:
-    .word  0x09e4c004                     @ 080eaf0c 04c0e409
+find_bin_block_by_type_g2d_load_c_filename_f08:
+    .word  g2d_load_c_filename            @ 080eaf08 dcbfe409  nnsys/g2d/g2d_Load.c
+find_bin_block_by_type_assert_pcursor:
+    .word  assert_pcursor                 @ 080eaf0c 04c0e409  pCursor
 LAB_080eaf10:
     ldr r0,[r4,#0x4]                         @ 080eaf10 6068
     adds r4,r4,r0    @ 080eaf12 2418
@@ -3967,16 +3967,16 @@ link_nanr_anim_bank:
     adds r5,r1,#0x0    @ 080eaf5c 0d1c
     cmp r4,#0x0                              @ 080eaf5e 002c
     bne LAB_080eaf6e                         @ 080eaf60 05d1
-    ldr r0, DAT_080eaf90                     @ 080eaf62 0b48
-    ldr r2, DAT_080eaf94                     @ 080eaf64 0b4a
+    ldr r0, link_nanr_anim_bank_g2d_nan_load_c_filename @ 080eaf62 0b48
+    ldr r2, link_nanr_anim_bank_assert_pnanrfile @ 080eaf64 0b4a
     movs r1,#0x26    @ 080eaf66 2621
     movs r3,#0x1    @ 080eaf68 0123
     bl suppress_assert_report                @ 080eaf6a 0ff0b7fa
 LAB_080eaf6e:
     cmp r5,#0x0                              @ 080eaf6e 002d
     bne LAB_080eaf7e                         @ 080eaf70 05d1
-    ldr r0, DAT_080eaf90                     @ 080eaf72 0748
-    ldr r2, DAT_080eaf98                     @ 080eaf74 084a
+    ldr r0, link_nanr_anim_bank_g2d_nan_load_c_filename @ 080eaf72 0748
+    ldr r2, link_nanr_anim_bank_assert_ppanimbank @ 080eaf74 084a
     movs r1,#0x27    @ 080eaf76 2721
     movs r3,#0x1    @ 080eaf78 0123
     bl suppress_assert_report                @ 080eaf7a 0ff0affa
@@ -3989,12 +3989,12 @@ LAB_080eaf7e:
     str r0,[r5,#0x0]                         @ 080eaf8a 2860
     movs r0,#0x0    @ 080eaf8c 0020
     b LAB_080eafae                           @ 080eaf8e 0ee0
-DAT_080eaf90:
-    .word  0x09e4c744                     @ 080eaf90 44c7e409
-DAT_080eaf94:
-    .word  0x09e4c760                     @ 080eaf94 60c7e409
-DAT_080eaf98:
-    .word  0x09e4c76c                     @ 080eaf98 6cc7e409
+link_nanr_anim_bank_g2d_nan_load_c_filename:
+    .word  g2d_nan_load_c_filename        @ 080eaf90 44c7e409  nnsys/g2d/g2d_NAN_load.c
+link_nanr_anim_bank_assert_pnanrfile:
+    .word  assert_pnanrfile               @ 080eaf94 60c7e409  pNanrFile
+link_nanr_anim_bank_assert_ppanimbank:
+    .word  assert_ppanimbank              @ 080eaf98 6cc7e409  ppAnimBank
 DAT_080eaf9c:
     .word  0x41424e4b                     @ 080eaf9c 4b4e4241
 LAB_080eafa0:
@@ -4038,16 +4038,16 @@ load_nanr_anim_bank:
     adds r5,r1,#0x0    @ 080eafd8 0d1c
     cmp r4,#0x0                              @ 080eafda 002c
     bne LAB_080eafea                         @ 080eafdc 05d1
-    ldr r0, DAT_080eb04c                     @ 080eafde 1b48
-    ldr r2, DAT_080eb050                     @ 080eafe0 1b4a
+    ldr r0, load_nanr_anim_bank_g2d_nan_load_c_filename @ 080eafde 1b48
+    ldr r2, load_nanr_anim_bank_assert_pnanrfile @ 080eafe0 1b4a
     movs r1,#0x5c    @ 080eafe2 5c21
     movs r3,#0x1    @ 080eafe4 0123
     bl suppress_assert_report                @ 080eafe6 0ff079fa
 LAB_080eafea:
     cmp r5,#0x0                              @ 080eafea 002d
     bne LAB_080eaffa                         @ 080eafec 05d1
-    ldr r0, DAT_080eb04c                     @ 080eafee 1748
-    ldr r2, DAT_080eb054                     @ 080eaff0 184a
+    ldr r0, load_nanr_anim_bank_g2d_nan_load_c_filename @ 080eafee 1748
+    ldr r2, load_nanr_anim_bank_assert_ppanimbank @ 080eaff0 184a
     movs r1,#0x5d    @ 080eaff2 5d21
     movs r3,#0x1    @ 080eaff4 0123
     bl suppress_assert_report                @ 080eaff6 0ff071fa
@@ -4063,8 +4063,8 @@ LAB_080eaffa:
 LAB_080eb00a:
     cmp r2,#0x0                              @ 080eb00a 002a
     bne LAB_080eb01a                         @ 080eb00c 05d1
-    ldr r0, DAT_080eb04c                     @ 080eb00e 0f48
-    ldr r2, DAT_080eb05c                     @ 080eb010 124a
+    ldr r0, load_nanr_anim_bank_g2d_nan_load_c_filename @ 080eb00e 0f48
+    ldr r2, load_nanr_anim_bank_assert_nnsi_g2disbinfilesignaturevali @ 080eb010 124a
     movs r1,#0x63    @ 080eb012 6321
     movs r3,#0x1    @ 080eb014 0123
     bl suppress_assert_report                @ 080eb016 0ff061fa
@@ -4081,8 +4081,8 @@ LAB_080eb01a:
 LAB_080eb02c:
     cmp r1,#0x0                              @ 080eb02c 0029
     bne LAB_080eb03c                         @ 080eb02e 05d1
-    ldr r0, DAT_080eb04c                     @ 080eb030 0648
-    ldr r2, DAT_080eb060                     @ 080eb032 0b4a
+    ldr r0, load_nanr_anim_bank_g2d_nan_load_c_filename @ 080eb030 0648
+    ldr r2, load_nanr_anim_bank_assert_nnsi_g2disbinfileversionvalid @ 080eb032 0b4a
     movs r1,#0x67    @ 080eb034 6721
     movs r3,#0x1    @ 080eb036 0123
     bl suppress_assert_report                @ 080eb038 0ff050fa
@@ -4094,18 +4094,18 @@ LAB_080eb03c:
     pop {r1}                                 @ 080eb046 02bc
     bx r1                                    @ 080eb048 0847
     .zero  0x2
-DAT_080eb04c:
-    .word  0x09e4c744                     @ 080eb04c 44c7e409
-DAT_080eb050:
-    .word  0x09e4c760                     @ 080eb050 60c7e409
-DAT_080eb054:
-    .word  0x09e4c76c                     @ 080eb054 6cc7e409
+load_nanr_anim_bank_g2d_nan_load_c_filename:
+    .word  g2d_nan_load_c_filename        @ 080eb04c 44c7e409  nnsys/g2d/g2d_NAN_load.c
+load_nanr_anim_bank_assert_pnanrfile:
+    .word  assert_pnanrfile               @ 080eb050 60c7e409  pNanrFile
+load_nanr_anim_bank_assert_ppanimbank:
+    .word  assert_ppanimbank              @ 080eb054 6cc7e409  ppAnimBank
 DAT_080eb058:
     .word  0x4e414e52                     @ 080eb058 524e414e
-DAT_080eb05c:
-    .word  0x09e4c778                     @ 080eb05c 78c7e409
-DAT_080eb060:
-    .word  0x09e4c7b4                     @ 080eb060 b4c7e409
+load_nanr_anim_bank_assert_nnsi_g2disbinfilesignaturevali:
+    .word  assert_nnsi_g2disbinfilesignaturevali @ 080eb05c 78c7e409  NNSi_G2dIsBinFileSignatureValid( pNanrFile  (u32)'NANR' )
+load_nanr_anim_bank_assert_nnsi_g2disbinfileversionvalid:
+    .word  assert_nnsi_g2disbinfileversionvalid @ 080eb060 b4c7e409  NNSi_G2dIsBinFileVersionValid( pNanrFile  NNS_G2dMakeVersion
 
 @ nnsys/g2d/g2d_NAN_load.c line 111/112. Load animation bank from NMAR (Multi-cell Animation Resource) file. Validates file header magic = 0x4e4d4152 ('NMAR'), checks [pNmarFile+6] halfword version >= 0x100. Calls link_nanr_anim_bank (0x080eaf58) for actual bank linking. Symmetric with load_nanr_anim_bank (same file, line 0x74=116/0x78=120 asserts), differs only in magic constant.
 @ 
@@ -4119,16 +4119,16 @@ load_nmar_anim_bank:
     adds r5,r1,#0x0    @ 080eb068 0d1c
     cmp r4,#0x0                              @ 080eb06a 002c
     bne LAB_080eb07a                         @ 080eb06c 05d1
-    ldr r0, DAT_080eb0dc                     @ 080eb06e 1b48
-    ldr r2, DAT_080eb0e0                     @ 080eb070 1b4a
+    ldr r0, load_nmar_anim_bank_g2d_nan_load_c_filename @ 080eb06e 1b48
+    ldr r2, load_nmar_anim_bank_assert_pnanrfile @ 080eb070 1b4a
     movs r1,#0x6f    @ 080eb072 6f21
     movs r3,#0x1    @ 080eb074 0123
     bl suppress_assert_report                @ 080eb076 0ff031fa
 LAB_080eb07a:
     cmp r5,#0x0                              @ 080eb07a 002d
     bne LAB_080eb08a                         @ 080eb07c 05d1
-    ldr r0, DAT_080eb0dc                     @ 080eb07e 1748
-    ldr r2, DAT_080eb0e4                     @ 080eb080 184a
+    ldr r0, load_nmar_anim_bank_g2d_nan_load_c_filename @ 080eb07e 1748
+    ldr r2, load_nmar_anim_bank_assert_ppanimbank @ 080eb080 184a
     movs r1,#0x70    @ 080eb082 7021
     movs r3,#0x1    @ 080eb084 0123
     bl suppress_assert_report                @ 080eb086 0ff029fa
@@ -4144,8 +4144,8 @@ LAB_080eb08a:
 LAB_080eb09a:
     cmp r2,#0x0                              @ 080eb09a 002a
     bne LAB_080eb0aa                         @ 080eb09c 05d1
-    ldr r0, DAT_080eb0dc                     @ 080eb09e 0f48
-    ldr r2, DAT_080eb0ec                     @ 080eb0a0 124a
+    ldr r0, load_nmar_anim_bank_g2d_nan_load_c_filename @ 080eb09e 0f48
+    ldr r2, load_nmar_anim_bank_assert_nnsi_g2disbinfilesignaturevali_800 @ 080eb0a0 124a
     movs r1,#0x74    @ 080eb0a2 7421
     movs r3,#0x1    @ 080eb0a4 0123
     bl suppress_assert_report                @ 080eb0a6 0ff019fa
@@ -4162,8 +4162,8 @@ LAB_080eb0aa:
 LAB_080eb0bc:
     cmp r1,#0x0                              @ 080eb0bc 0029
     bne LAB_080eb0cc                         @ 080eb0be 05d1
-    ldr r0, DAT_080eb0dc                     @ 080eb0c0 0648
-    ldr r2, DAT_080eb0f0                     @ 080eb0c2 0b4a
+    ldr r0, load_nmar_anim_bank_g2d_nan_load_c_filename @ 080eb0c0 0648
+    ldr r2, load_nmar_anim_bank_assert_nnsi_g2disbinfileversionvalid @ 080eb0c2 0b4a
     movs r1,#0x78    @ 080eb0c4 7821
     movs r3,#0x1    @ 080eb0c6 0123
     bl suppress_assert_report                @ 080eb0c8 0ff008fa
@@ -4175,18 +4175,18 @@ LAB_080eb0cc:
     pop {r1}                                 @ 080eb0d6 02bc
     bx r1                                    @ 080eb0d8 0847
     .zero  0x2
-DAT_080eb0dc:
-    .word  0x09e4c744                     @ 080eb0dc 44c7e409
-DAT_080eb0e0:
-    .word  0x09e4c760                     @ 080eb0e0 60c7e409
-DAT_080eb0e4:
-    .word  0x09e4c76c                     @ 080eb0e4 6cc7e409
+load_nmar_anim_bank_g2d_nan_load_c_filename:
+    .word  g2d_nan_load_c_filename        @ 080eb0dc 44c7e409  nnsys/g2d/g2d_NAN_load.c
+load_nmar_anim_bank_assert_pnanrfile:
+    .word  assert_pnanrfile               @ 080eb0e0 60c7e409  pNanrFile
+load_nmar_anim_bank_assert_ppanimbank:
+    .word  assert_ppanimbank              @ 080eb0e4 6cc7e409  ppAnimBank
 DAT_080eb0e8:
     .word  0x4e4d4152                     @ 080eb0e8 52414d4e
-DAT_080eb0ec:
-    .word  0x09e4c800                     @ 080eb0ec 00c8e409
-DAT_080eb0f0:
-    .word  0x09e4c7b4                     @ 080eb0f0 b4c7e409
+load_nmar_anim_bank_assert_nnsi_g2disbinfilesignaturevali_800:
+    .word  assert_nnsi_g2disbinfilesignaturevali_800 @ 080eb0ec 00c8e409  NNSi_G2dIsBinFileSignatureValid( pNanrFile  (u32)'NMAR' )
+load_nmar_anim_bank_assert_nnsi_g2disbinfileversionvalid:
+    .word  assert_nnsi_g2disbinfileversionvalid @ 080eb0f0 b4c7e409  NNSi_G2dIsBinFileVersionValid( pNanrFile  NNS_G2dMakeVersion
 
 @ nnsys/g2d/g2d_NAN_load.c line 130. Patch all relative offsets in a NANR block to absolute pointers. r0=NNS_G2dAnimBankData* pBlock (block data body, after 8-byte block header). Patches [pBlock+4],[+8],[+0xc] relative->absolute; iterates each anim sequence: patches [seq+0xc] and each frame [frame+0x0]; handles optional ext block at [pBlock+0x14]; calls check_anim_block_has_data to validate. Entry uses .hword 0x4657/0x464e/0x4645 (THUMB high-register save encoding).
 relocate_nanr_block_ptrs:
@@ -4198,8 +4198,8 @@ relocate_nanr_block_ptrs:
     adds r5,r0,#0x0    @ 080eb0fe 051c
     cmp r5,#0x0                              @ 080eb100 002d
     bne LAB_080eb110                         @ 080eb102 05d1
-    ldr r0, DAT_080eb12c                     @ 080eb104 0948
-    ldr r2, DAT_080eb130                     @ 080eb106 0a4a
+    ldr r0, relocate_nanr_block_ptrs_g2d_nan_load_c_filename @ 080eb104 0948
+    ldr r2, relocate_nanr_block_ptrs_assert_pdata @ 080eb106 0a4a
     movs r1,#0x82    @ 080eb108 8221
     movs r3,#0x1    @ 080eb10a 0123
     bl suppress_assert_report                @ 080eb10c 0ff0e6f9
@@ -4218,10 +4218,10 @@ LAB_080eb110:
     .hword 0x4681    @ 080eb126 8146
     movs r2,#0x0    @ 080eb128 0022
     b LAB_080eb182                           @ 080eb12a 2ae0
-DAT_080eb12c:
-    .word  0x09e4c744                     @ 080eb12c 44c7e409
-DAT_080eb130:
-    .word  0x09e4c83c                     @ 080eb130 3cc8e409
+relocate_nanr_block_ptrs_g2d_nan_load_c_filename:
+    .word  g2d_nan_load_c_filename        @ 080eb12c 44c7e409  nnsys/g2d/g2d_NAN_load.c
+relocate_nanr_block_ptrs_assert_pdata:
+    .word  assert_pdata                   @ 080eb130 3cc8e409  pData
 LAB_080eb134:
     lsls r3,r2,#0x4    @ 080eb134 1301
     adds r1,r3,r6    @ 080eb136 9919
@@ -4254,9 +4254,9 @@ LAB_080eb166:
     bl check_anim_block_has_data             @ 080eb168 fff724ff
     cmp r0,#0x0                              @ 080eb16c 0028
     bne LAB_080eb17c                         @ 080eb16e 05d1
-    ldr r0, DAT_080eb1ec                     @ 080eb170 1e48
+    ldr r0, relocate_nanr_block_ptrs_g2d_nan_load_c_filename_1ec @ 080eb170 1e48
     movs r1,#0x9a    @ 080eb172 9a21
-    ldr r2, DAT_080eb1f0                     @ 080eb174 1e4a
+    ldr r2, relocate_nanr_block_ptrs_assert_checkanimsequencevalidity_pseq @ 080eb174 1e4a
     movs r3,#0x1    @ 080eb176 0123
     bl suppress_assert_report                @ 080eb178 0ff0b0f9
 LAB_080eb17c:
@@ -4321,10 +4321,10 @@ LAB_080eb1de:
     pop {r4,r5,r6,r7}                        @ 080eb1e6 f0bc
     pop {r0}                                 @ 080eb1e8 01bc
     bx r0                                    @ 080eb1ea 0047
-DAT_080eb1ec:
-    .word  0x09e4c744                     @ 080eb1ec 44c7e409
-DAT_080eb1f0:
-    .word  0x09e4c844                     @ 080eb1f0 44c8e409
+relocate_nanr_block_ptrs_g2d_nan_load_c_filename_1ec:
+    .word  g2d_nan_load_c_filename        @ 080eb1ec 44c7e409  nnsys/g2d/g2d_NAN_load.c
+relocate_nanr_block_ptrs_assert_checkanimsequencevalidity_pseq:
+    .word  assert_checkanimsequencevalidity_pseq @ 080eb1f0 44c8e409  CheckAnimSequenceValidity_( &pSeq[i] )
 
 @ GL/IG2D_Main.c g2d_NAN_load.c line 203 / g2d_NAN_load.h line 21. r0=NNS_G2dAnimBankData* pAnimBank (non-NULL), r1=u16 seqIndex [0..numSequences-1] (high 16 bits truncated). Asserts pAnimBank != NULL and seqIndex < numSequences, then returns &pAnimBank->pSequenceArrayHead[seqIndex] (each entry 16 bytes). Returns NULL on out-of-bounds. No side-effects (pure address computation).
 get_anim_sequence_ptr_by_index:
@@ -4334,13 +4334,13 @@ get_anim_sequence_ptr_by_index:
     lsrs r6,r1,#0x10    @ 080eb1fa 0e0c
     cmp r5,#0x0                              @ 080eb1fc 002d
     bne LAB_080eb21a                         @ 080eb1fe 0cd1
-    ldr r0, DAT_080eb224                     @ 080eb200 0848
+    ldr r0, get_anim_sequence_ptr_by_index_g2d_nan_load_c_filename @ 080eb200 0848
     ldr r4, DAT_080eb228                     @ 080eb202 094c
     movs r1,#0xcb    @ 080eb204 cb21
     adds r2,r4,#0x0    @ 080eb206 221c
     movs r3,#0x1    @ 080eb208 0123
     bl suppress_assert_report                @ 080eb20a 0ff067f9
-    ldr r0, DAT_080eb22c                     @ 080eb20e 0748
+    ldr r0, get_anim_sequence_ptr_by_index_g2d_nan_load_h_filename @ 080eb20e 0748
     movs r1,#0x15    @ 080eb210 1521
     adds r2,r4,#0x0    @ 080eb212 221c
     movs r3,#0x1    @ 080eb214 0123
@@ -4351,12 +4351,12 @@ LAB_080eb21a:
     bhi LAB_080eb230                         @ 080eb21e 07d8
     movs r0,#0x0    @ 080eb220 0020
     b LAB_080eb236                           @ 080eb222 08e0
-DAT_080eb224:
-    .word  0x09e4c744                     @ 080eb224 44c7e409
+get_anim_sequence_ptr_by_index_g2d_nan_load_c_filename:
+    .word  g2d_nan_load_c_filename        @ 080eb224 44c7e409  nnsys/g2d/g2d_NAN_load.c
 DAT_080eb228:
     .word  0x09e4c738                     @ 080eb228 38c7e409
-DAT_080eb22c:
-    .word  0x09e4c714                     @ 080eb22c 14c7e409
+get_anim_sequence_ptr_by_index_g2d_nan_load_h_filename:
+    .word  g2d_nan_load_h_filename        @ 080eb22c 14c7e409  inc/nnsys/g2d/load/g2d_NAN_load.h
 LAB_080eb230:
     lsls r1,r6,#0x4    @ 080eb230 3101
     ldr r0,[r5,#0x4]                         @ 080eb232 6868
@@ -4373,16 +4373,16 @@ parse_ncgr_char_data:
     adds r5,r1,#0x0    @ 080eb240 0d1c
     cmp r4,#0x0                              @ 080eb242 002c
     bne LAB_080eb252                         @ 080eb244 05d1
-    ldr r0, DAT_080eb2b8                     @ 080eb246 1c48
-    ldr r2, DAT_080eb2bc                     @ 080eb248 1c4a
+    ldr r0, parse_ncgr_char_data_g2d_ncg_load_c_filename @ 080eb246 1c48
+    ldr r2, parse_ncgr_char_data_assert_pncgrfile @ 080eb248 1c4a
     movs r1,#0x34    @ 080eb24a 3421
     movs r3,#0x1    @ 080eb24c 0123
     bl suppress_assert_report                @ 080eb24e 0ff045f9
 LAB_080eb252:
     cmp r5,#0x0                              @ 080eb252 002d
     bne LAB_080eb262                         @ 080eb254 05d1
-    ldr r0, DAT_080eb2b8                     @ 080eb256 1848
-    ldr r2, DAT_080eb2c0                     @ 080eb258 194a
+    ldr r0, parse_ncgr_char_data_g2d_ncg_load_c_filename @ 080eb256 1848
+    ldr r2, parse_ncgr_char_data_assert_ppchardata @ 080eb258 194a
     movs r1,#0x35    @ 080eb25a 3521
     movs r3,#0x1    @ 080eb25c 0123
     bl suppress_assert_report                @ 080eb25e 0ff03df9
@@ -4398,8 +4398,8 @@ LAB_080eb262:
 LAB_080eb272:
     cmp r2,#0x0                              @ 080eb272 002a
     bne LAB_080eb282                         @ 080eb274 05d1
-    ldr r0, DAT_080eb2b8                     @ 080eb276 1048
-    ldr r2, DAT_080eb2c8                     @ 080eb278 134a
+    ldr r0, parse_ncgr_char_data_g2d_ncg_load_c_filename @ 080eb276 1048
+    ldr r2, parse_ncgr_char_data_assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb278 134a
     movs r1,#0x39    @ 080eb27a 3921
     movs r3,#0x1    @ 080eb27c 0123
     bl suppress_assert_report                @ 080eb27e 0ff02df9
@@ -4416,8 +4416,8 @@ LAB_080eb282:
 LAB_080eb294:
     cmp r1,#0x0                              @ 080eb294 0029
     bne LAB_080eb2a4                         @ 080eb296 05d1
-    ldr r0, DAT_080eb2b8                     @ 080eb298 0748
-    ldr r2, DAT_080eb2cc                     @ 080eb29a 0c4a
+    ldr r0, parse_ncgr_char_data_g2d_ncg_load_c_filename @ 080eb298 0748
+    ldr r2, parse_ncgr_char_data_assert_nnsi_g2disbinfileversionvalid_014 @ 080eb29a 0c4a
     movs r1,#0x3d    @ 080eb29c 3d21
     movs r3,#0x1    @ 080eb29e 0123
     bl suppress_assert_report                @ 080eb2a0 0ff01cf9
@@ -4431,18 +4431,18 @@ LAB_080eb2a4:
     movs r0,#0x0    @ 080eb2b2 0020
     b LAB_080eb2e2                           @ 080eb2b4 15e0
     .zero  0x2
-DAT_080eb2b8:
-    .word  0x09e4cfa4                     @ 080eb2b8 a4cfe409
-DAT_080eb2bc:
-    .word  0x09e4cfc0                     @ 080eb2bc c0cfe409
-DAT_080eb2c0:
-    .word  0x09e4cfcc                     @ 080eb2c0 cccfe409
+parse_ncgr_char_data_g2d_ncg_load_c_filename:
+    .word  g2d_ncg_load_c_filename        @ 080eb2b8 a4cfe409  nnsys/g2d/g2d_NCG_load.c
+parse_ncgr_char_data_assert_pncgrfile:
+    .word  assert_pncgrfile               @ 080eb2bc c0cfe409  pNcgrFile
+parse_ncgr_char_data_assert_ppchardata:
+    .word  assert_ppchardata              @ 080eb2c0 cccfe409  ppCharData
 DAT_080eb2c4:
     .word  0x4e434752                     @ 080eb2c4 5247434e
-DAT_080eb2c8:
-    .word  0x09e4cfd8                     @ 080eb2c8 d8cfe409
-DAT_080eb2cc:
-    .word  0x09e4d014                     @ 080eb2cc 14d0e409
+parse_ncgr_char_data_assert_nnsi_g2disbinfilesignaturevali_fd8:
+    .word  assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb2c8 d8cfe409  NNSi_G2dIsBinFileSignatureValid( pNcgrFile  (u32)'NCGR' )
+parse_ncgr_char_data_assert_nnsi_g2disbinfileversionvalid_014:
+    .word  assert_nnsi_g2disbinfileversionvalid_014 @ 080eb2cc 14d0e409  NNSi_G2dIsBinFileVersionValid( pNcgrFile  NNS_G2dMakeVersion
 DAT_080eb2d0:
     .word  0x43484152                     @ 080eb2d0 52414843
 LAB_080eb2d4:
@@ -4463,8 +4463,8 @@ fixup_char_block_data_ptr:
     adds r4,r0,#0x0    @ 080eb2ea 041c
     cmp r4,#0x0                              @ 080eb2ec 002c
     bne LAB_080eb2fc                         @ 080eb2ee 05d1
-    ldr r0, DAT_080eb338                     @ 080eb2f0 1148
-    ldr r2, DAT_080eb33c                     @ 080eb2f2 124a
+    ldr r0, fixup_char_block_data_ptr_g2d_ncg_load_c_filename @ 080eb2f0 1148
+    ldr r2, fixup_char_block_data_ptr_assert_pchardata @ 080eb2f2 124a
     movs r1,#0x5c    @ 080eb2f4 5c21
     movs r3,#0x1    @ 080eb2f6 0123
     bl suppress_assert_report                @ 080eb2f8 0ff0f0f8
@@ -4491,8 +4491,8 @@ LAB_080eb31a:
     cmp r4,#0x10                             @ 080eb320 102c
     beq LAB_080eb330                         @ 080eb322 05d0
 LAB_080eb324:
-    ldr r0, DAT_080eb338                     @ 080eb324 0448
-    ldr r2, DAT_080eb340                     @ 080eb326 064a
+    ldr r0, fixup_char_block_data_ptr_g2d_ncg_load_c_filename @ 080eb324 0448
+    ldr r2, fixup_char_block_data_ptr_assert_pchardata_pixelfmt_gx_texfmt_p @ 080eb326 064a
     movs r1,#0x77    @ 080eb328 7721
     movs r3,#0x1    @ 080eb32a 0123
     bl suppress_assert_report                @ 080eb32c 0ff0d6f8
@@ -4501,12 +4501,12 @@ LAB_080eb330:
     pop {r0}                                 @ 080eb332 01bc
     bx r0                                    @ 080eb334 0047
     .zero  0x2
-DAT_080eb338:
-    .word  0x09e4cfa4                     @ 080eb338 a4cfe409
-DAT_080eb33c:
-    .word  0x09e4d068                     @ 080eb33c 68d0e409
-DAT_080eb340:
-    .word  0x09e4d074                     @ 080eb340 74d0e409
+fixup_char_block_data_ptr_g2d_ncg_load_c_filename:
+    .word  g2d_ncg_load_c_filename        @ 080eb338 a4cfe409  nnsys/g2d/g2d_NCG_load.c
+fixup_char_block_data_ptr_assert_pchardata:
+    .word  assert_pchardata               @ 080eb33c 68d0e409  pCharData
+fixup_char_block_data_ptr_assert_pchardata_pixelfmt_gx_texfmt_p:
+    .word  assert_pchardata_pixelfmt_gx_texfmt_p @ 080eb340 74d0e409  ( pCharData->pixelFmt == GX_TEXFMT_PLTT16 && pCharData->W ==
 
 @ nnsys/g2d/g2d_NCG_load.c NCGR character data block loader entry.
 @ r0=NNS_G2dBinaryFileHeader* pNcgrFile, r1=NNS_G2dCharacterData** ppCharData.
@@ -4531,16 +4531,16 @@ load_ncgr_char_data_block:
     adds r5,r1,#0x0    @ 080eb348 0d1c
     cmp r4,#0x0                              @ 080eb34a 002c
     bne LAB_080eb35a                         @ 080eb34c 05d1
-    ldr r0, DAT_080eb3c0                     @ 080eb34e 1c48
-    ldr r2, DAT_080eb3c4                     @ 080eb350 1c4a
+    ldr r0, load_ncgr_char_data_block_g2d_ncg_load_c_filename @ 080eb34e 1c48
+    ldr r2, load_ncgr_char_data_block_assert_pncgrfile @ 080eb350 1c4a
     movs r1,#0x84    @ 080eb352 8421
     movs r3,#0x1    @ 080eb354 0123
     bl suppress_assert_report                @ 080eb356 0ff0c1f8
 LAB_080eb35a:
     cmp r5,#0x0                              @ 080eb35a 002d
     bne LAB_080eb36a                         @ 080eb35c 05d1
-    ldr r0, DAT_080eb3c0                     @ 080eb35e 1848
-    ldr r2, DAT_080eb3c8                     @ 080eb360 194a
+    ldr r0, load_ncgr_char_data_block_g2d_ncg_load_c_filename @ 080eb35e 1848
+    ldr r2, load_ncgr_char_data_block_assert_ppchardata @ 080eb360 194a
     movs r1,#0x85    @ 080eb362 8521
     movs r3,#0x1    @ 080eb364 0123
     bl suppress_assert_report                @ 080eb366 0ff0b9f8
@@ -4556,8 +4556,8 @@ LAB_080eb36a:
 LAB_080eb37a:
     cmp r2,#0x0                              @ 080eb37a 002a
     bne LAB_080eb38a                         @ 080eb37c 05d1
-    ldr r0, DAT_080eb3c0                     @ 080eb37e 1048
-    ldr r2, DAT_080eb3d0                     @ 080eb380 134a
+    ldr r0, load_ncgr_char_data_block_g2d_ncg_load_c_filename @ 080eb37e 1048
+    ldr r2, load_ncgr_char_data_block_assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb380 134a
     movs r1,#0x89    @ 080eb382 8921
     movs r3,#0x1    @ 080eb384 0123
     bl suppress_assert_report                @ 080eb386 0ff0a9f8
@@ -4574,8 +4574,8 @@ LAB_080eb38a:
 LAB_080eb39c:
     cmp r1,#0x0                              @ 080eb39c 0029
     bne LAB_080eb3ac                         @ 080eb39e 05d1
-    ldr r0, DAT_080eb3c0                     @ 080eb3a0 0748
-    ldr r2, DAT_080eb3d4                     @ 080eb3a2 0c4a
+    ldr r0, load_ncgr_char_data_block_g2d_ncg_load_c_filename @ 080eb3a0 0748
+    ldr r2, load_ncgr_char_data_block_assert_nnsi_g2disbinfileversionvalid_014 @ 080eb3a2 0c4a
     movs r1,#0x8d    @ 080eb3a4 8d21
     movs r3,#0x1    @ 080eb3a6 0123
     bl suppress_assert_report                @ 080eb3a8 0ff098f8
@@ -4589,18 +4589,18 @@ LAB_080eb3ac:
     movs r0,#0x0    @ 080eb3ba 0020
     b LAB_080eb3ea                           @ 080eb3bc 15e0
     .zero  0x2
-DAT_080eb3c0:
-    .word  0x09e4cfa4                     @ 080eb3c0 a4cfe409
-DAT_080eb3c4:
-    .word  0x09e4cfc0                     @ 080eb3c4 c0cfe409
-DAT_080eb3c8:
-    .word  0x09e4cfcc                     @ 080eb3c8 cccfe409
+load_ncgr_char_data_block_g2d_ncg_load_c_filename:
+    .word  g2d_ncg_load_c_filename        @ 080eb3c0 a4cfe409  nnsys/g2d/g2d_NCG_load.c
+load_ncgr_char_data_block_assert_pncgrfile:
+    .word  assert_pncgrfile               @ 080eb3c4 c0cfe409  pNcgrFile
+load_ncgr_char_data_block_assert_ppchardata:
+    .word  assert_ppchardata              @ 080eb3c8 cccfe409  ppCharData
 DAT_080eb3cc:
     .word  0x4e434752                     @ 080eb3cc 5247434e
-DAT_080eb3d0:
-    .word  0x09e4cfd8                     @ 080eb3d0 d8cfe409
-DAT_080eb3d4:
-    .word  0x09e4d014                     @ 080eb3d4 14d0e409
+load_ncgr_char_data_block_assert_nnsi_g2disbinfilesignaturevali_fd8:
+    .word  assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb3d0 d8cfe409  NNSi_G2dIsBinFileSignatureValid( pNcgrFile  (u32)'NCGR' )
+load_ncgr_char_data_block_assert_nnsi_g2disbinfileversionvalid_014:
+    .word  assert_nnsi_g2disbinfileversionvalid_014 @ 080eb3d4 14d0e409  NNSi_G2dIsBinFileVersionValid( pNcgrFile  NNS_G2dMakeVersion
 DAT_080eb3d8:
     .word  0x43484152                     @ 080eb3d8 52414843
 LAB_080eb3dc:
@@ -4628,16 +4628,16 @@ find_ncgr_char_pos_block:
     adds r5,r1,#0x0    @ 080eb3f4 0d1c
     cmp r4,#0x0                              @ 080eb3f6 002c
     bne LAB_080eb406                         @ 080eb3f8 05d1
-    ldr r0, DAT_080eb468                     @ 080eb3fa 1b48
-    ldr r2, DAT_080eb46c                     @ 080eb3fc 1b4a
+    ldr r0, find_ncgr_char_pos_block_g2d_ncg_load_c_filename @ 080eb3fa 1b48
+    ldr r2, find_ncgr_char_pos_block_assert_pncgrfile @ 080eb3fc 1b4a
     movs r1,#0xc3    @ 080eb3fe c321
     movs r3,#0x1    @ 080eb400 0123
     bl suppress_assert_report                @ 080eb402 0ff06bf8
 LAB_080eb406:
     cmp r5,#0x0                              @ 080eb406 002d
     bne LAB_080eb416                         @ 080eb408 05d1
-    ldr r0, DAT_080eb468                     @ 080eb40a 1748
-    ldr r2, DAT_080eb470                     @ 080eb40c 184a
+    ldr r0, find_ncgr_char_pos_block_g2d_ncg_load_c_filename @ 080eb40a 1748
+    ldr r2, find_ncgr_char_pos_block_assert_ppcharposinfo @ 080eb40c 184a
     movs r1,#0xc4    @ 080eb40e c421
     movs r3,#0x1    @ 080eb410 0123
     bl suppress_assert_report                @ 080eb412 0ff063f8
@@ -4653,8 +4653,8 @@ LAB_080eb416:
 LAB_080eb426:
     cmp r2,#0x0                              @ 080eb426 002a
     bne LAB_080eb436                         @ 080eb428 05d1
-    ldr r0, DAT_080eb468                     @ 080eb42a 0f48
-    ldr r2, DAT_080eb478                     @ 080eb42c 124a
+    ldr r0, find_ncgr_char_pos_block_g2d_ncg_load_c_filename @ 080eb42a 0f48
+    ldr r2, find_ncgr_char_pos_block_assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb42c 124a
     movs r1,#0xc8    @ 080eb42e c821
     movs r3,#0x1    @ 080eb430 0123
     bl suppress_assert_report                @ 080eb432 0ff053f8
@@ -4670,8 +4670,8 @@ LAB_080eb436:
 LAB_080eb446:
     cmp r1,#0x0                              @ 080eb446 0029
     bne LAB_080eb456                         @ 080eb448 05d1
-    ldr r0, DAT_080eb468                     @ 080eb44a 0748
-    ldr r2, DAT_080eb480                     @ 080eb44c 0c4a
+    ldr r0, find_ncgr_char_pos_block_g2d_ncg_load_c_filename @ 080eb44a 0748
+    ldr r2, find_ncgr_char_pos_block_assert_nnsi_g2disbinfileversionvalid_10c @ 080eb44c 0c4a
     movs r1,#0xcc    @ 080eb44e cc21
     movs r3,#0x1    @ 080eb450 0123
     bl suppress_assert_report                @ 080eb452 0ff043f8
@@ -4684,20 +4684,20 @@ LAB_080eb456:
     str r0,[r5,#0x0]                         @ 080eb462 2860
     movs r0,#0x0    @ 080eb464 0020
     b LAB_080eb48e                           @ 080eb466 12e0
-DAT_080eb468:
-    .word  0x09e4cfa4                     @ 080eb468 a4cfe409
-DAT_080eb46c:
-    .word  0x09e4cfc0                     @ 080eb46c c0cfe409
-DAT_080eb470:
-    .word  0x09e4d0fc                     @ 080eb470 fcd0e409
+find_ncgr_char_pos_block_g2d_ncg_load_c_filename:
+    .word  g2d_ncg_load_c_filename        @ 080eb468 a4cfe409  nnsys/g2d/g2d_NCG_load.c
+find_ncgr_char_pos_block_assert_pncgrfile:
+    .word  assert_pncgrfile               @ 080eb46c c0cfe409  pNcgrFile
+find_ncgr_char_pos_block_assert_ppcharposinfo:
+    .word  assert_ppcharposinfo           @ 080eb470 fcd0e409  ppCharPosInfo
 DAT_080eb474:
     .word  0x4e434752                     @ 080eb474 5247434e
-DAT_080eb478:
-    .word  0x09e4cfd8                     @ 080eb478 d8cfe409
+find_ncgr_char_pos_block_assert_nnsi_g2disbinfilesignaturevali_fd8:
+    .word  assert_nnsi_g2disbinfilesignaturevali_fd8 @ 080eb478 d8cfe409  NNSi_G2dIsBinFileSignatureValid( pNcgrFile  (u32)'NCGR' )
 DAT_080eb47c:
     .word  0x00000101                     @ 080eb47c 01010000
-DAT_080eb480:
-    .word  0x09e4d10c                     @ 080eb480 0cd1e409
+find_ncgr_char_pos_block_assert_nnsi_g2disbinfileversionvalid_10c:
+    .word  assert_nnsi_g2disbinfileversionvalid_10c @ 080eb480 0cd1e409  NNSi_G2dIsBinFileVersionValid( pNcgrFile  NNS_G2dMakeVersion
 DAT_080eb484:
     .word  0x43504f53                     @ 080eb484 534f5043
 LAB_080eb488:
@@ -4719,8 +4719,8 @@ fixup_ncgr_char_data_ptr:
     adds r4,r0,#0x0    @ 080eb496 041c
     cmp r4,#0x0                              @ 080eb498 002c
     bne LAB_080eb4a8                         @ 080eb49a 05d1
-    ldr r0, DAT_080eb4c8                     @ 080eb49c 0a48
-    ldr r2, DAT_080eb4cc                     @ 080eb49e 0b4a
+    ldr r0, fixup_ncgr_char_data_ptr_g2d_ncg_load_c_filename @ 080eb49c 0a48
+    ldr r2, fixup_ncgr_char_data_ptr_assert_pchardata @ 080eb49e 0b4a
     movs r1,#0xe6    @ 080eb4a0 e621
     movs r3,#0x1    @ 080eb4a2 0123
     bl suppress_assert_report                @ 080eb4a4 0ff01af8
@@ -4731,8 +4731,8 @@ LAB_080eb4a8:
     ldrb r0,[r4,#0xc]                        @ 080eb4ae 207b
     cmp r0,#0x0                              @ 080eb4b0 0028
     beq LAB_080eb4c0                         @ 080eb4b2 05d0
-    ldr r0, DAT_080eb4c8                     @ 080eb4b4 0448
-    ldr r2, DAT_080eb4d0                     @ 080eb4b6 064a
+    ldr r0, fixup_ncgr_char_data_ptr_g2d_ncg_load_c_filename @ 080eb4b4 0448
+    ldr r2, fixup_ncgr_char_data_ptr_assert_nnsi_g2dgetcharacterfmttype_pc @ 080eb4b6 064a
     movs r1,#0xf6    @ 080eb4b8 f621
     movs r3,#0x1    @ 080eb4ba 0123
     bl suppress_assert_report                @ 080eb4bc 0ff00ef8
@@ -4741,12 +4741,12 @@ LAB_080eb4c0:
     pop {r0}                                 @ 080eb4c2 01bc
     bx r0                                    @ 080eb4c4 0047
     .zero  0x2
-DAT_080eb4c8:
-    .word  0x09e4cfa4                     @ 080eb4c8 a4cfe409
-DAT_080eb4cc:
-    .word  0x09e4d068                     @ 080eb4cc 68d0e409
-DAT_080eb4d0:
-    .word  0x09e4d160                     @ 080eb4d0 60d1e409
+fixup_ncgr_char_data_ptr_g2d_ncg_load_c_filename:
+    .word  g2d_ncg_load_c_filename        @ 080eb4c8 a4cfe409  nnsys/g2d/g2d_NCG_load.c
+fixup_ncgr_char_data_ptr_assert_pchardata:
+    .word  assert_pchardata               @ 080eb4cc 68d0e409  pCharData
+fixup_ncgr_char_data_ptr_assert_nnsi_g2dgetcharacterfmttype_pc:
+    .word  assert_nnsi_g2dgetcharacterfmttype_pc @ 080eb4d0 60d1e409  NNSi_G2dGetCharacterFmtType( pCharData->characterFmt ) == NN
 
 @ nnsys/g2d/g2d_NCL_load.c line 25/26. Debug palette entry dump function (suppressed in release build via suppress_display_output). Prints palette header "\n --- palette ---\n", loops i=0..0xff (256 iterations) outputting each palette entry: newline "\n" every 16 entries, each entry as " %04X ". Prints footer "\n" after loop. All suppress_display_output calls are no-ops in release build.
 @ 
@@ -4761,8 +4761,8 @@ dump_nclr_palette_entries:
     adds r4,r0,#0x0    @ 080eb4d6 041c
     cmp r4,#0x0                              @ 080eb4d8 002c
     bne LAB_080eb4e8                         @ 080eb4da 05d1
-    ldr r0, DAT_080eb534                     @ 080eb4dc 1548
-    ldr r2, DAT_080eb538                     @ 080eb4de 164a
+    ldr r0, dump_nclr_palette_entries_g2d_ncl_load_c_filename @ 080eb4dc 1548
+    ldr r2, dump_nclr_palette_entries_assert_pplttdata @ 080eb4de 164a
     movs r1,#0x19    @ 080eb4e0 1921
     movs r3,#0x1    @ 080eb4e2 0123
     bl suppress_assert_report                @ 080eb4e4 0ef0faff
@@ -4770,8 +4770,8 @@ LAB_080eb4e8:
     ldr r0,[r4,#0xc]                         @ 080eb4e8 e068
     cmp r0,#0x0                              @ 080eb4ea 0028
     bne LAB_080eb4fa                         @ 080eb4ec 05d1
-    ldr r0, DAT_080eb534                     @ 080eb4ee 1148
-    ldr r2, DAT_080eb53c                     @ 080eb4f0 124a
+    ldr r0, dump_nclr_palette_entries_g2d_ncl_load_c_filename @ 080eb4ee 1148
+    ldr r2, dump_nclr_palette_entries_assert_pplttdata_prawdata @ 080eb4f0 124a
     movs r1,#0x1a    @ 080eb4f2 1a21
     movs r3,#0x1    @ 080eb4f4 0123
     bl suppress_assert_report                @ 080eb4f6 0ef0f1ff
@@ -4803,12 +4803,12 @@ LAB_080eb512:
     pop {r4,r5}                              @ 080eb52e 30bc
     pop {r0}                                 @ 080eb530 01bc
     bx r0                                    @ 080eb532 0047
-DAT_080eb534:
-    .word  0x09e4d8f0                     @ 080eb534 f0d8e409
-DAT_080eb538:
-    .word  0x09e4d90c                     @ 080eb538 0cd9e409
-DAT_080eb53c:
-    .word  0x09e4d918                     @ 080eb53c 18d9e409
+dump_nclr_palette_entries_g2d_ncl_load_c_filename:
+    .word  g2d_ncl_load_c_filename        @ 080eb534 f0d8e409  nnsys/g2d/g2d_NCL_load.c
+dump_nclr_palette_entries_assert_pplttdata:
+    .word  assert_pplttdata               @ 080eb538 0cd9e409  pPlttData
+dump_nclr_palette_entries_assert_pplttdata_prawdata:
+    .word  assert_pplttdata_prawdata      @ 080eb53c 18d9e409  pPlttData->pRawData
 DAT_080eb540:
     .word  0x09e4d92c                     @ 080eb540 2cd9e409
 DAT_080eb544:
@@ -4823,16 +4823,16 @@ load_nclr_pltt_data:
     adds r5,r1,#0x0    @ 080eb550 0d1c
     cmp r4,#0x0                              @ 080eb552 002c
     bne LAB_080eb562                         @ 080eb554 05d1
-    ldr r0, DAT_080eb5b8                     @ 080eb556 1848
-    ldr r2, DAT_080eb5bc                     @ 080eb558 184a
+    ldr r0, load_nclr_pltt_data_g2d_ncl_load_c_filename @ 080eb556 1848
+    ldr r2, load_nclr_pltt_data_assert_pnclrfile @ 080eb558 184a
     movs r1,#0x31    @ 080eb55a 3121
     movs r3,#0x1    @ 080eb55c 0123
     bl suppress_assert_report                @ 080eb55e 0ef0bdff
 LAB_080eb562:
     cmp r5,#0x0                              @ 080eb562 002d
     bne LAB_080eb572                         @ 080eb564 05d1
-    ldr r0, DAT_080eb5b8                     @ 080eb566 1448
-    ldr r2, DAT_080eb5c0                     @ 080eb568 154a
+    ldr r0, load_nclr_pltt_data_g2d_ncl_load_c_filename @ 080eb566 1448
+    ldr r2, load_nclr_pltt_data_assert_pppltdata @ 080eb568 154a
     movs r1,#0x32    @ 080eb56a 3221
     movs r3,#0x1    @ 080eb56c 0123
     bl suppress_assert_report                @ 080eb56e 0ef0b5ff
@@ -4844,8 +4844,8 @@ LAB_080eb572:
     ldr r0, DAT_080eb5c8                     @ 080eb57a 1348
     cmp r1,r0                                @ 080eb57c 8142
     beq LAB_080eb58c                         @ 080eb57e 05d0
-    ldr r0, DAT_080eb5b8                     @ 080eb580 0d48
-    ldr r2, DAT_080eb5cc                     @ 080eb582 124a
+    ldr r0, load_nclr_pltt_data_g2d_ncl_load_c_filename @ 080eb580 0d48
+    ldr r2, load_nclr_pltt_data_assert_pbinfile_signature_u32_nclr_pb @ 080eb582 124a
     movs r1,#0x3a    @ 080eb584 3a21
     movs r3,#0x1    @ 080eb586 0123
     bl suppress_assert_report                @ 080eb588 0ef0a8ff
@@ -4858,8 +4858,8 @@ LAB_080eb58c:
 LAB_080eb596:
     cmp r0,#0x0                              @ 080eb596 0028
     bne LAB_080eb5a6                         @ 080eb598 05d1
-    ldr r0, DAT_080eb5b8                     @ 080eb59a 0748
-    ldr r2, DAT_080eb5d0                     @ 080eb59c 0c4a
+    ldr r0, load_nclr_pltt_data_g2d_ncl_load_c_filename @ 080eb59a 0748
+    ldr r2, load_nclr_pltt_data_assert_nnsi_g2disbinfileversionvalid_9cc @ 080eb59c 0c4a
     movs r1,#0x3f    @ 080eb59e 3f21
     movs r3,#0x1    @ 080eb5a0 0123
     bl suppress_assert_report                @ 080eb5a2 0ef09bff
@@ -4872,20 +4872,20 @@ LAB_080eb5a6:
     str r0,[r5,#0x0]                         @ 080eb5b2 2860
     movs r0,#0x0    @ 080eb5b4 0020
     b LAB_080eb5e6                           @ 080eb5b6 16e0
-DAT_080eb5b8:
-    .word  0x09e4d8f0                     @ 080eb5b8 f0d8e409
-DAT_080eb5bc:
-    .word  0x09e4d968                     @ 080eb5bc 68d9e409
-DAT_080eb5c0:
-    .word  0x09e4d974                     @ 080eb5c0 74d9e409
+load_nclr_pltt_data_g2d_ncl_load_c_filename:
+    .word  g2d_ncl_load_c_filename        @ 080eb5b8 f0d8e409  nnsys/g2d/g2d_NCL_load.c
+load_nclr_pltt_data_assert_pnclrfile:
+    .word  assert_pnclrfile               @ 080eb5bc 68d9e409  pNclrFile
+load_nclr_pltt_data_assert_pppltdata:
+    .word  assert_pppltdata               @ 080eb5c0 74d9e409  ppPltData
 DAT_080eb5c4:
     .word  0x4e434c52                     @ 080eb5c4 524c434e
 DAT_080eb5c8:
     .word  0x4e435052                     @ 080eb5c8 5250434e
-DAT_080eb5cc:
-    .word  0x09e4d980                     @ 080eb5cc 80d9e409
-DAT_080eb5d0:
-    .word  0x09e4d9cc                     @ 080eb5d0 ccd9e409
+load_nclr_pltt_data_assert_pbinfile_signature_u32_nclr_pb:
+    .word  assert_pbinfile_signature_u32_nclr_pb @ 080eb5cc 80d9e409  pBinFile->signature == (u32)'NCLR' || pBinFile->signature ==
+load_nclr_pltt_data_assert_nnsi_g2disbinfileversionvalid_9cc:
+    .word  assert_nnsi_g2disbinfileversionvalid_9cc @ 080eb5d0 ccd9e409  NNSi_G2dIsBinFileVersionValid( pNclrFile  NNS_G2dMakeVersion
 DAT_080eb5d4:
     .word  0x504c5454                     @ 080eb5d4 54544c50
 LAB_080eb5d8:
@@ -4923,16 +4923,16 @@ load_nclr_pcmp_block:
     adds r5,r1,#0x0    @ 080eb5f0 0d1c
     cmp r4,#0x0                              @ 080eb5f2 002c
     bne LAB_080eb602                         @ 080eb5f4 05d1
-    ldr r0, DAT_080eb658                     @ 080eb5f6 1848
-    ldr r2, DAT_080eb65c                     @ 080eb5f8 184a
+    ldr r0, load_nclr_pcmp_block_g2d_ncl_load_c_filename @ 080eb5f6 1848
+    ldr r2, load_nclr_pcmp_block_assert_pnclrfile @ 080eb5f8 184a
     movs r1,#0x5f    @ 080eb5fa 5f21
     movs r3,#0x1    @ 080eb5fc 0123
     bl suppress_assert_report                @ 080eb5fe 0ef06dff
 LAB_080eb602:
     cmp r5,#0x0                              @ 080eb602 002d
     bne LAB_080eb612                         @ 080eb604 05d1
-    ldr r0, DAT_080eb658                     @ 080eb606 1448
-    ldr r2, DAT_080eb660                     @ 080eb608 154a
+    ldr r0, load_nclr_pcmp_block_g2d_ncl_load_c_filename @ 080eb606 1448
+    ldr r2, load_nclr_pcmp_block_assert_pppltcmpinfo @ 080eb608 154a
     movs r1,#0x60    @ 080eb60a 6021
     movs r3,#0x1    @ 080eb60c 0123
     bl suppress_assert_report                @ 080eb60e 0ef065ff
@@ -4944,8 +4944,8 @@ LAB_080eb612:
     ldr r0, DAT_080eb668                     @ 080eb61a 1348
     cmp r1,r0                                @ 080eb61c 8142
     beq LAB_080eb62c                         @ 080eb61e 05d0
-    ldr r0, DAT_080eb658                     @ 080eb620 0d48
-    ldr r2, DAT_080eb66c                     @ 080eb622 124a
+    ldr r0, load_nclr_pcmp_block_g2d_ncl_load_c_filename @ 080eb620 0d48
+    ldr r2, load_nclr_pcmp_block_assert_pbinfile_signature_u32_nclr_pb @ 080eb622 124a
     movs r1,#0x68    @ 080eb624 6821
     movs r3,#0x1    @ 080eb626 0123
     bl suppress_assert_report                @ 080eb628 0ef058ff
@@ -4958,8 +4958,8 @@ LAB_080eb62c:
 LAB_080eb636:
     cmp r0,#0x0                              @ 080eb636 0028
     bne LAB_080eb646                         @ 080eb638 05d1
-    ldr r0, DAT_080eb658                     @ 080eb63a 0748
-    ldr r2, DAT_080eb670                     @ 080eb63c 0c4a
+    ldr r0, load_nclr_pcmp_block_g2d_ncl_load_c_filename @ 080eb63a 0748
+    ldr r2, load_nclr_pcmp_block_assert_nnsi_g2disbinfileversionvalid_9cc @ 080eb63c 0c4a
     movs r1,#0x6d    @ 080eb63e 6d21
     movs r3,#0x1    @ 080eb640 0123
     bl suppress_assert_report                @ 080eb642 0ef04bff
@@ -4972,20 +4972,20 @@ LAB_080eb646:
     str r0,[r5,#0x0]                         @ 080eb652 2860
     movs r0,#0x0    @ 080eb654 0020
     b LAB_080eb686                           @ 080eb656 16e0
-DAT_080eb658:
-    .word  0x09e4d8f0                     @ 080eb658 f0d8e409
-DAT_080eb65c:
-    .word  0x09e4d968                     @ 080eb65c 68d9e409
-DAT_080eb660:
-    .word  0x09e4da20                     @ 080eb660 20dae409
+load_nclr_pcmp_block_g2d_ncl_load_c_filename:
+    .word  g2d_ncl_load_c_filename        @ 080eb658 f0d8e409  nnsys/g2d/g2d_NCL_load.c
+load_nclr_pcmp_block_assert_pnclrfile:
+    .word  assert_pnclrfile               @ 080eb65c 68d9e409  pNclrFile
+load_nclr_pcmp_block_assert_pppltcmpinfo:
+    .word  assert_pppltcmpinfo            @ 080eb660 20dae409  ppPltCmpInfo
 DAT_080eb664:
     .word  0x4e434c52                     @ 080eb664 524c434e
 DAT_080eb668:
     .word  0x4e435052                     @ 080eb668 5250434e
-DAT_080eb66c:
-    .word  0x09e4d980                     @ 080eb66c 80d9e409
-DAT_080eb670:
-    .word  0x09e4d9cc                     @ 080eb670 ccd9e409
+load_nclr_pcmp_block_assert_pbinfile_signature_u32_nclr_pb:
+    .word  assert_pbinfile_signature_u32_nclr_pb @ 080eb66c 80d9e409  pBinFile->signature == (u32)'NCLR' || pBinFile->signature ==
+load_nclr_pcmp_block_assert_nnsi_g2disbinfileversionvalid_9cc:
+    .word  assert_nnsi_g2disbinfileversionvalid_9cc @ 080eb670 ccd9e409  NNSi_G2dIsBinFileVersionValid( pNclrFile  NNS_G2dMakeVersion
 DAT_080eb674:
     .word  0x50434d50                     @ 080eb674 504d4350
 LAB_080eb678:
@@ -5010,8 +5010,8 @@ fixup_pcmp_cmpinfo_data_ptr:
     adds r4,r0,#0x0    @ 080eb68e 041c
     cmp r4,#0x0                              @ 080eb690 002c
     bne LAB_080eb6a0                         @ 080eb692 05d1
-    ldr r0, DAT_080eb6ac                     @ 080eb694 0548
-    ldr r2, DAT_080eb6b0                     @ 080eb696 064a
+    ldr r0, fixup_pcmp_cmpinfo_data_ptr_g2d_ncl_load_c_filename @ 080eb694 0548
+    ldr r2, fixup_pcmp_cmpinfo_data_ptr_assert_pplttcmpinfo @ 080eb696 064a
     movs r1,#0x8c    @ 080eb698 8c21
     movs r3,#0x1    @ 080eb69a 0123
     bl suppress_assert_report                @ 080eb69c 0ef01eff
@@ -5022,10 +5022,10 @@ LAB_080eb6a0:
     pop {r4}                                 @ 080eb6a6 10bc
     pop {r0}                                 @ 080eb6a8 01bc
     bx r0                                    @ 080eb6aa 0047
-DAT_080eb6ac:
-    .word  0x09e4d8f0                     @ 080eb6ac f0d8e409
-DAT_080eb6b0:
-    .word  0x09e4da30                     @ 080eb6b0 30dae409
+fixup_pcmp_cmpinfo_data_ptr_g2d_ncl_load_c_filename:
+    .word  g2d_ncl_load_c_filename        @ 080eb6ac f0d8e409  nnsys/g2d/g2d_NCL_load.c
+fixup_pcmp_cmpinfo_data_ptr_assert_pplttcmpinfo:
+    .word  assert_pplttcmpinfo            @ 080eb6b0 30dae409  pPlttCmpInfo
 
 @ nnsys/g2d/g2d_NCL_load.c line 151 (pPlttData). Patch palette data block raw-data relative pointer to absolute address. r0=NNS_G2dPaletteData* pPlttData. Asserts pPlttData != NULL; then: [pPlttData+0xc] += pPlttData (converts pRawData field from relative offset to absolute ptr). Called by load_nclr_pltt_data after finding PLTT block.
 relocate_ncl_pltt_data_ptr:
@@ -5033,8 +5033,8 @@ relocate_ncl_pltt_data_ptr:
     adds r4,r0,#0x0    @ 080eb6b6 041c
     cmp r4,#0x0                              @ 080eb6b8 002c
     bne LAB_080eb6c8                         @ 080eb6ba 05d1
-    ldr r0, DAT_080eb6d4                     @ 080eb6bc 0548
-    ldr r2, DAT_080eb6d8                     @ 080eb6be 064a
+    ldr r0, relocate_ncl_pltt_data_ptr_g2d_ncl_load_c_filename @ 080eb6bc 0548
+    ldr r2, relocate_ncl_pltt_data_ptr_assert_pplttdata @ 080eb6be 064a
     movs r1,#0x97    @ 080eb6c0 9721
     movs r3,#0x1    @ 080eb6c2 0123
     bl suppress_assert_report                @ 080eb6c4 0ef00aff
@@ -5045,10 +5045,10 @@ LAB_080eb6c8:
     pop {r4}                                 @ 080eb6ce 10bc
     pop {r0}                                 @ 080eb6d0 01bc
     bx r0                                    @ 080eb6d2 0047
-DAT_080eb6d4:
-    .word  0x09e4d8f0                     @ 080eb6d4 f0d8e409
-DAT_080eb6d8:
-    .word  0x09e4d90c                     @ 080eb6d8 0cd9e409
+relocate_ncl_pltt_data_ptr_g2d_ncl_load_c_filename:
+    .word  g2d_ncl_load_c_filename        @ 080eb6d4 f0d8e409  nnsys/g2d/g2d_NCL_load.c
+relocate_ncl_pltt_data_ptr_assert_pplttdata:
+    .word  assert_pplttdata               @ 080eb6d8 0cd9e409  pPlttData
 
 @ nnsys/g2d/g2d_NOB_load.c line 11 (pCellBank). Compute byte offset of a cell entry in a NOB cell bank by format flag. r0=NNS_G2dCellBank* pCellBank, r1=u16 cell_idx [0..count-1]. [pCellBank+0x2] bit0: 0=stride 8 bytes (lsls #3), 1=stride 16 bytes (lsls #4). Returns [pCellBank+0x4] + cell_idx*stride (absolute address of cell entry). Equivalent to NNSi_G2dGetCellDataAddress.
 get_nob_cell_data_offset:
@@ -5056,8 +5056,8 @@ get_nob_cell_data_offset:
     adds r4,r0,#0x0    @ 080eb6de 041c
     cmp r4,#0x0                              @ 080eb6e0 002c
     bne LAB_080eb6f0                         @ 080eb6e2 05d1
-    ldr r0, DAT_080eb700                     @ 080eb6e4 0648
-    ldr r2, DAT_080eb704                     @ 080eb6e6 074a
+    ldr r0, get_nob_cell_data_offset_g2d_nob_load_c_filename @ 080eb6e4 0648
+    ldr r2, get_nob_cell_data_offset_assert_pcellbank @ 080eb6e6 074a
     movs r1,#0xb    @ 080eb6e8 0b21
     movs r3,#0x1    @ 080eb6ea 0123
     bl suppress_assert_report                @ 080eb6ec 0ef0f6fe
@@ -5070,10 +5070,10 @@ LAB_080eb6f0:
     ldrh r0,[r4,#0x0]                        @ 080eb6fa 2088
     lsls r1,r0,#0x3    @ 080eb6fc c100
     b LAB_080eb70c                           @ 080eb6fe 05e0
-DAT_080eb700:
-    .word  0x09e4e178                     @ 080eb700 78e1e409
-DAT_080eb704:
-    .word  0x09e4e0fc                     @ 080eb704 fce0e409
+get_nob_cell_data_offset_g2d_nob_load_c_filename:
+    .word  g2d_nob_load_c_filename        @ 080eb700 78e1e409  nnsys/g2d/g2d_NOB_load.c
+get_nob_cell_data_offset_assert_pcellbank:
+    .word  assert_pcellbank               @ 080eb704 fce0e409  pCellBank
 LAB_080eb708:
     ldrh r0,[r4,#0x0]                        @ 080eb708 2088
     lsls r1,r0,#0x4    @ 080eb70a 0101
@@ -5091,8 +5091,8 @@ relocate_nob_exdata_block_ptrs:
     adds r4,r0,#0x0    @ 080eb71a 041c
     cmp r4,#0x0                              @ 080eb71c 002c
     bne LAB_080eb72c                         @ 080eb71e 05d1
-    ldr r0, DAT_080eb73c                     @ 080eb720 0648
-    ldr r2, DAT_080eb740                     @ 080eb722 074a
+    ldr r0, relocate_nob_exdata_block_ptrs_g2d_nob_load_c_filename @ 080eb720 0648
+    ldr r2, relocate_nob_exdata_block_ptrs_assert_pexdata @ 080eb722 074a
     movs r1,#0x1c    @ 080eb724 1c21
     movs r3,#0x1    @ 080eb726 0123
     bl suppress_assert_report                @ 080eb728 0ef0d8fe
@@ -5104,10 +5104,10 @@ LAB_080eb72c:
     pop {r0}                                 @ 080eb736 01bc
     bx r0                                    @ 080eb738 0047
     .zero  0x2
-DAT_080eb73c:
-    .word  0x09e4e178                     @ 080eb73c 78e1e409
-DAT_080eb740:
-    .word  0x09e4e194                     @ 080eb740 94e1e409
+relocate_nob_exdata_block_ptrs_g2d_nob_load_c_filename:
+    .word  g2d_nob_load_c_filename        @ 080eb73c 78e1e409  nnsys/g2d/g2d_NOB_load.c
+relocate_nob_exdata_block_ptrs_assert_pexdata:
+    .word  assert_pexdata                 @ 080eb740 94e1e409  pExData
 
 @ nnsys/g2d/g2d_NOB_load.c line 41 (pNcerFile). NCER cell bank loader: verify magic, find 'CBEK' block, relocate, write *ppCellBank. r0=NNS_G2dBinaryFileHeader* pNcerFile, r1=NNS_G2dCellBank** ppCellBank. Asserts both non-NULL; verifies magic==0x4e434552 ('NCER'); version>=0x100; calls find_bin_block_by_type(pNcerFile,0x4345424b 'CBEK'); calls relocate_nob_cell_bank_ptrs; *ppCellBank=block+8; returns 1/0. Constants: NCER_SIGNATURE=0x4e434552, CBEK_BLOCK_TYPE=0x4345424b.
 load_ncer_cell_bank:
@@ -5116,16 +5116,16 @@ load_ncer_cell_bank:
     adds r5,r1,#0x0    @ 080eb748 0d1c
     cmp r4,#0x0                              @ 080eb74a 002c
     bne LAB_080eb75a                         @ 080eb74c 05d1
-    ldr r0, DAT_080eb7c0                     @ 080eb74e 1c48
-    ldr r2, DAT_080eb7c4                     @ 080eb750 1c4a
+    ldr r0, load_ncer_cell_bank_g2d_nob_load_c_filename @ 080eb74e 1c48
+    ldr r2, load_ncer_cell_bank_assert_pncerfile @ 080eb750 1c4a
     movs r1,#0x29    @ 080eb752 2921
     movs r3,#0x1    @ 080eb754 0123
     bl suppress_assert_report                @ 080eb756 0ef0c1fe
 LAB_080eb75a:
     cmp r5,#0x0                              @ 080eb75a 002d
     bne LAB_080eb76a                         @ 080eb75c 05d1
-    ldr r0, DAT_080eb7c0                     @ 080eb75e 1848
-    ldr r2, DAT_080eb7c8                     @ 080eb760 194a
+    ldr r0, load_ncer_cell_bank_g2d_nob_load_c_filename @ 080eb75e 1848
+    ldr r2, load_ncer_cell_bank_assert_ppcellbank @ 080eb760 194a
     movs r1,#0x2a    @ 080eb762 2a21
     movs r3,#0x1    @ 080eb764 0123
     bl suppress_assert_report                @ 080eb766 0ef0b9fe
@@ -5141,8 +5141,8 @@ LAB_080eb76a:
 LAB_080eb77a:
     cmp r2,#0x0                              @ 080eb77a 002a
     bne LAB_080eb78a                         @ 080eb77c 05d1
-    ldr r0, DAT_080eb7c0                     @ 080eb77e 1048
-    ldr r2, DAT_080eb7d0                     @ 080eb780 134a
+    ldr r0, load_ncer_cell_bank_g2d_nob_load_c_filename @ 080eb77e 1048
+    ldr r2, load_ncer_cell_bank_assert_nnsi_g2disbinfilesignaturevali_1b4 @ 080eb780 134a
     movs r1,#0x2e    @ 080eb782 2e21
     movs r3,#0x1    @ 080eb784 0123
     bl suppress_assert_report                @ 080eb786 0ef0a9fe
@@ -5159,8 +5159,8 @@ LAB_080eb78a:
 LAB_080eb79c:
     cmp r1,#0x0                              @ 080eb79c 0029
     bne LAB_080eb7ac                         @ 080eb79e 05d1
-    ldr r0, DAT_080eb7c0                     @ 080eb7a0 0748
-    ldr r2, DAT_080eb7d4                     @ 080eb7a2 0c4a
+    ldr r0, load_ncer_cell_bank_g2d_nob_load_c_filename @ 080eb7a0 0748
+    ldr r2, load_ncer_cell_bank_assert_nnsi_g2disbinfileversionvalid_1f0 @ 080eb7a2 0c4a
     movs r1,#0x32    @ 080eb7a4 3221
     movs r3,#0x1    @ 080eb7a6 0123
     bl suppress_assert_report                @ 080eb7a8 0ef098fe
@@ -5174,18 +5174,18 @@ LAB_080eb7ac:
     movs r0,#0x0    @ 080eb7ba 0020
     b LAB_080eb7ea                           @ 080eb7bc 15e0
     .zero  0x2
-DAT_080eb7c0:
-    .word  0x09e4e178                     @ 080eb7c0 78e1e409
-DAT_080eb7c4:
-    .word  0x09e4e19c                     @ 080eb7c4 9ce1e409
-DAT_080eb7c8:
-    .word  0x09e4e1a8                     @ 080eb7c8 a8e1e409
+load_ncer_cell_bank_g2d_nob_load_c_filename:
+    .word  g2d_nob_load_c_filename        @ 080eb7c0 78e1e409  nnsys/g2d/g2d_NOB_load.c
+load_ncer_cell_bank_assert_pncerfile:
+    .word  assert_pncerfile               @ 080eb7c4 9ce1e409  pNcerFile
+load_ncer_cell_bank_assert_ppcellbank:
+    .word  assert_ppcellbank              @ 080eb7c8 a8e1e409  ppCellBank
 DAT_080eb7cc:
     .word  0x4e434552                     @ 080eb7cc 5245434e
-DAT_080eb7d0:
-    .word  0x09e4e1b4                     @ 080eb7d0 b4e1e409
-DAT_080eb7d4:
-    .word  0x09e4e1f0                     @ 080eb7d4 f0e1e409
+load_ncer_cell_bank_assert_nnsi_g2disbinfilesignaturevali_1b4:
+    .word  assert_nnsi_g2disbinfilesignaturevali_1b4 @ 080eb7d0 b4e1e409  NNSi_G2dIsBinFileSignatureValid( pNcerFile  (u32)'NCER' )
+load_ncer_cell_bank_assert_nnsi_g2disbinfileversionvalid_1f0:
+    .word  assert_nnsi_g2disbinfileversionvalid_1f0 @ 080eb7d4 f0e1e409  NNSi_G2dIsBinFileVersionValid( pNcerFile  NNS_G2dMakeVersion
 DAT_080eb7d8:
     .word  0x4345424b                     @ 080eb7d8 4b424543
 LAB_080eb7dc:
@@ -5209,8 +5209,8 @@ get_nob_cell_data_ptr:
     adds r6,r5,#0x0    @ 080eb7f8 2e1c
     cmp r4,#0x0                              @ 080eb7fa 002c
     bne LAB_080eb80a                         @ 080eb7fc 05d1
-    ldr r0, DAT_080eb814                     @ 080eb7fe 0548
-    ldr r2, DAT_080eb818                     @ 080eb800 054a
+    ldr r0, get_nob_cell_data_ptr_g2d_nob_load_c_filename @ 080eb7fe 0548
+    ldr r2, get_nob_cell_data_ptr_assert_pcelldata @ 080eb800 054a
     movs r1,#0x51    @ 080eb802 5121
     movs r3,#0x1    @ 080eb804 0123
     bl suppress_assert_report                @ 080eb806 0ef069fe
@@ -5220,10 +5220,10 @@ LAB_080eb80a:
     bcc LAB_080eb81c                         @ 080eb80e 05d3
     movs r0,#0x0    @ 080eb810 0020
     b LAB_080eb830                           @ 080eb812 0de0
-DAT_080eb814:
-    .word  0x09e4e178                     @ 080eb814 78e1e409
-DAT_080eb818:
-    .word  0x09e4e23c                     @ 080eb818 3ce2e409
+get_nob_cell_data_ptr_g2d_nob_load_c_filename:
+    .word  g2d_nob_load_c_filename        @ 080eb814 78e1e409  nnsys/g2d/g2d_NOB_load.c
+get_nob_cell_data_ptr_assert_pcelldata:
+    .word  assert_pcelldata               @ 080eb818 3ce2e409  pCellData
 LAB_080eb81c:
     movs r0,#0x1    @ 080eb81c 0120
     ldrh r1,[r4,#0x2]                        @ 080eb81e 6188
@@ -5249,8 +5249,8 @@ relocate_nob_cell_bank_ptrs:
     adds r4,r0,#0x0    @ 080eb83a 041c
     cmp r4,#0x0                              @ 080eb83c 002c
     bne LAB_080eb84c                         @ 080eb83e 05d1
-    ldr r0, DAT_080eb860                     @ 080eb840 0748
-    ldr r2, DAT_080eb864                     @ 080eb842 084a
+    ldr r0, relocate_nob_cell_bank_ptrs_g2d_nob_load_c_filename @ 080eb840 0748
+    ldr r2, relocate_nob_cell_bank_ptrs_assert_pcelldata @ 080eb842 084a
     movs r1,#0x6e    @ 080eb844 6e21
     movs r3,#0x1    @ 080eb846 0123
     bl suppress_assert_report                @ 080eb848 0ef048fe
@@ -5264,10 +5264,10 @@ LAB_080eb84c:
     movs r5,#0x0    @ 080eb85a 0025
     b LAB_080eb87c                           @ 080eb85c 0ee0
     .zero  0x2
-DAT_080eb860:
-    .word  0x09e4e178                     @ 080eb860 78e1e409
-DAT_080eb864:
-    .word  0x09e4e23c                     @ 080eb864 3ce2e409
+relocate_nob_cell_bank_ptrs_g2d_nob_load_c_filename:
+    .word  g2d_nob_load_c_filename        @ 080eb860 78e1e409  nnsys/g2d/g2d_NOB_load.c
+relocate_nob_cell_bank_ptrs_assert_pcelldata:
+    .word  assert_pcelldata               @ 080eb864 3ce2e409  pCellData
 LAB_080eb868:
     adds r0,r4,#0x0    @ 080eb868 201c
     adds r1,r5,#0x0    @ 080eb86a 291c
@@ -5322,7 +5322,7 @@ set_nob_cell_position:
     strh r2,[r3,#0xe]                        @ 080eb8c4 da81
     b LAB_080eb8d4                           @ 080eb8c6 05e0
 LAB_080eb8c8:
-    ldr r0, DAT_080eb8dc                     @ 080eb8c8 0448
+    ldr r0, set_nob_cell_position_g2d_srtcontrol_c_filename @ 080eb8c8 0448
     ldr r2, DAT_080eb8e0                     @ 080eb8ca 054a
     movs r1,#0x27    @ 080eb8cc 2721
     movs r3,#0x1    @ 080eb8ce 0123
@@ -5332,8 +5332,8 @@ LAB_080eb8d4:
     pop {r0}                                 @ 080eb8d6 01bc
     bx r0                                    @ 080eb8d8 0047
     .zero  0x2
-DAT_080eb8dc:
-    .word  0x09e4e91c                     @ 080eb8dc 1ce9e409
+set_nob_cell_position_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eb8dc 1ce9e409  nnsys/g2d/g2d_SRTControl.c
 DAT_080eb8e0:
     .word  0x09e4e938                     @ 080eb8e0 38e9e409
 
@@ -5353,7 +5353,7 @@ set_nob_cell_frame_idx:
     strh r1,[r2,#0x10]                       @ 080eb8fa 1182
     b LAB_080eb90a                           @ 080eb8fc 05e0
 LAB_080eb8fe:
-    ldr r0, DAT_080eb910                     @ 080eb8fe 0448
+    ldr r0, set_nob_cell_frame_idx_g2d_srtcontrol_c_filename @ 080eb8fe 0448
     ldr r2, DAT_080eb914                     @ 080eb900 044a
     movs r1,#0x45    @ 080eb902 4521
     movs r3,#0x1    @ 080eb904 0123
@@ -5362,8 +5362,8 @@ LAB_080eb90a:
     pop {r0}                                 @ 080eb90a 01bc
     bx r0                                    @ 080eb90c 0047
     .zero  0x2
-DAT_080eb910:
-    .word  0x09e4e91c                     @ 080eb910 1ce9e409
+set_nob_cell_frame_idx_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eb910 1ce9e409  nnsys/g2d/g2d_SRTControl.c
 DAT_080eb914:
     .word  0x09e4e938                     @ 080eb914 38e9e409
 
@@ -5382,7 +5382,7 @@ set_srt_ctrl_translate:
     str r2,[r3,#0x8]                         @ 080eb92c 9a60
     b LAB_080eb93c                           @ 080eb92e 05e0
 LAB_080eb930:
-    ldr r0, DAT_080eb944                     @ 080eb930 0448
+    ldr r0, set_srt_ctrl_translate_g2d_srtcontrol_c_filename @ 080eb930 0448
     ldr r2, DAT_080eb948                     @ 080eb932 054a
     movs r1,#0x62    @ 080eb934 6221
     movs r3,#0x1    @ 080eb936 0123
@@ -5392,8 +5392,8 @@ LAB_080eb93c:
     pop {r0}                                 @ 080eb93e 01bc
     bx r0                                    @ 080eb940 0047
     .zero  0x2
-DAT_080eb944:
-    .word  0x09e4e91c                     @ 080eb944 1ce9e409
+set_srt_ctrl_translate_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eb944 1ce9e409  nnsys/g2d/g2d_SRTControl.c
 DAT_080eb948:
     .word  0x09e4e938                     @ 080eb948 38e9e409
 
@@ -5404,8 +5404,8 @@ bind_srt_ctrl_data:
     adds r5,r1,#0x0    @ 080eb950 0d1c
     cmp r4,#0x0                              @ 080eb952 002c
     bne LAB_080eb962                         @ 080eb954 05d1
-    ldr r0, DAT_080eb970                     @ 080eb956 0648
-    ldr r2, DAT_080eb974                     @ 080eb958 064a
+    ldr r0, bind_srt_ctrl_data_g2d_srtcontrol_c_filename @ 080eb956 0648
+    ldr r2, bind_srt_ctrl_data_assert_pctrl  @ 080eb958 064a
     movs r1,#0x77    @ 080eb95a 7721
     movs r3,#0x1    @ 080eb95c 0123
     bl suppress_assert_report                @ 080eb95e 0ef0bdfd
@@ -5416,10 +5416,10 @@ LAB_080eb962:
     pop {r4,r5}                              @ 080eb96a 30bc
     pop {r0}                                 @ 080eb96c 01bc
     bx r0                                    @ 080eb96e 0047
-DAT_080eb970:
-    .word  0x09e4e91c                     @ 080eb970 1ce9e409
-DAT_080eb974:
-    .word  0x09e4e93c                     @ 080eb974 3ce9e409
+bind_srt_ctrl_data_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eb970 1ce9e409  nnsys/g2d/g2d_SRTControl.c
+bind_srt_ctrl_data_assert_pctrl:
+    .word  assert_pctrl                   @ 080eb974 3ce9e409  pCtrl
 
 @ NitroSDK nnsys/g2d/g2d_SRTControl.c -- initialise SRT controller scale/rotate/translate fields. Called by bind_srt_ctrl_data (0x080eb94c). Asserts pCtrl != NULL (suppress line 0x8f) and type==NNS_G2D_SRTCONTROLTYPE_SRT==1 (line 0x90). Clears [pCtrl+0] halfword, calls bios_cpu_set fill-0 (control word 0x0100000c) to zero [pCtrl+4..0xf] (12 bytes), then writes [pCtrl+4]=0x1000 and [pCtrl+8]=0x1000 (scale=1.0 in 4.12). r0=ptr pCtrl (NNS_G2dSRTControl). Constants: SRT_SCALE_INIT=0x1000 / SRT_CLEAR_LEN=0xc / NNS_G2D_SRTCONTROLTYPE_SRT=1.
 init_srt_ctrl_state:
@@ -5428,8 +5428,8 @@ init_srt_ctrl_state:
     adds r4,r0,#0x0    @ 080eb97c 041c
     cmp r4,#0x0                              @ 080eb97e 002c
     bne LAB_080eb98e                         @ 080eb980 05d1
-    ldr r0, DAT_080eb9c0                     @ 080eb982 0f48
-    ldr r2, DAT_080eb9c4                     @ 080eb984 0f4a
+    ldr r0, init_srt_ctrl_state_g2d_srtcontrol_c_filename @ 080eb982 0f48
+    ldr r2, init_srt_ctrl_state_assert_pctrl @ 080eb984 0f4a
     movs r1,#0x8f    @ 080eb986 8f21
     movs r3,#0x1    @ 080eb988 0123
     bl suppress_assert_report                @ 080eb98a 0ef0a7fd
@@ -5437,8 +5437,8 @@ LAB_080eb98e:
     ldr r0,[r4,#0x0]                         @ 080eb98e 2068
     cmp r0,#0x1                              @ 080eb990 0128
     beq LAB_080eb9a0                         @ 080eb992 05d0
-    ldr r0, DAT_080eb9c0                     @ 080eb994 0a48
-    ldr r2, DAT_080eb9c8                     @ 080eb996 0c4a
+    ldr r0, init_srt_ctrl_state_g2d_srtcontrol_c_filename @ 080eb994 0a48
+    ldr r2, init_srt_ctrl_state_assert_pctrl_type_nns_g2d_srtcontrolt @ 080eb996 0c4a
     movs r1,#0x90    @ 080eb998 9021
     movs r3,#0x1    @ 080eb99a 0123
     bl suppress_assert_report                @ 080eb99c 0ef09efd
@@ -5458,12 +5458,12 @@ LAB_080eb9a0:
     pop {r4}                                 @ 080eb9ba 10bc
     pop {r0}                                 @ 080eb9bc 01bc
     bx r0                                    @ 080eb9be 0047
-DAT_080eb9c0:
-    .word  0x09e4e91c                     @ 080eb9c0 1ce9e409
-DAT_080eb9c4:
-    .word  0x09e4e93c                     @ 080eb9c4 3ce9e409
-DAT_080eb9c8:
-    .word  0x09e4e944                     @ 080eb9c8 44e9e409
+init_srt_ctrl_state_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eb9c0 1ce9e409  nnsys/g2d/g2d_SRTControl.c
+init_srt_ctrl_state_assert_pctrl:
+    .word  assert_pctrl                   @ 080eb9c4 3ce9e409  pCtrl
+init_srt_ctrl_state_assert_pctrl_type_nns_g2d_srtcontrolt:
+    .word  assert_pctrl_type_nns_g2d_srtcontrolt @ 080eb9c8 44e9e409  ( pCtrl->type ) == NNS_G2D_SRTCONTROLTYPE_SRT
 DAT_080eb9cc:
     .word  0x0100000c                     @ 080eb9cc 0c000001
 
@@ -5489,16 +5489,16 @@ init_blend_param_from_srt_src:
     adds r4,r1,#0x0    @ 080eb9d4 0c1c
     cmp r5,#0x0                              @ 080eb9d6 002d
     bne LAB_080eb9e6                         @ 080eb9d8 05d1
-    ldr r0, DAT_080eba60                     @ 080eb9da 2148
-    ldr r2, DAT_080eba64                     @ 080eb9dc 214a
+    ldr r0, init_blend_param_from_srt_src_g2d_srtcontrol_c_filename @ 080eb9da 2148
+    ldr r2, init_blend_param_from_srt_src_assert_pctrl @ 080eb9dc 214a
     movs r1,#0xab    @ 080eb9de ab21
     movs r3,#0x1    @ 080eb9e0 0123
     bl suppress_assert_report                @ 080eb9e2 0ef07bfd
 LAB_080eb9e6:
     cmp r4,#0x0                              @ 080eb9e6 002c
     bne LAB_080eb9f6                         @ 080eb9e8 05d1
-    ldr r0, DAT_080eba60                     @ 080eb9ea 1d48
-    ldr r2, DAT_080eba68                     @ 080eb9ec 1e4a
+    ldr r0, init_blend_param_from_srt_src_g2d_srtcontrol_c_filename @ 080eb9ea 1d48
+    ldr r2, init_blend_param_from_srt_src_assert_pdst_974 @ 080eb9ec 1e4a
     movs r1,#0xac    @ 080eb9ee ac21
     movs r3,#0x1    @ 080eb9f0 0123
     bl suppress_assert_report                @ 080eb9f2 0ef073fd
@@ -5506,16 +5506,16 @@ LAB_080eb9f6:
     ldr r0,[r5,#0x0]                         @ 080eb9f6 2868
     cmp r0,#0x1                              @ 080eb9f8 0128
     beq LAB_080eba08                         @ 080eb9fa 05d0
-    ldr r0, DAT_080eba60                     @ 080eb9fc 1848
-    ldr r2, DAT_080eba6c                     @ 080eb9fe 1b4a
+    ldr r0, init_blend_param_from_srt_src_g2d_srtcontrol_c_filename @ 080eb9fc 1848
+    ldr r2, init_blend_param_from_srt_src_assert_pctrl_type_nns_g2d_srtcontrolt @ 080eb9fe 1b4a
     movs r1,#0xad    @ 080eba00 ad21
     movs r3,#0x1    @ 080eba02 0123
     bl suppress_assert_report                @ 080eba04 0ef06afd
 LAB_080eba08:
     cmp r4,#0x0                              @ 080eba08 002c
     bne LAB_080eba18                         @ 080eba0a 05d1
-    ldr r0, DAT_080eba70                     @ 080eba0c 1848
-    ldr r2, DAT_080eba74                     @ 080eba0e 194a
+    ldr r0, init_blend_param_from_srt_src_fx_mtx22_h_filename @ 080eba0c 1848
+    ldr r2, init_blend_param_from_srt_src_assert_pdst_null_8fc @ 080eba0e 194a
     movs r1,#0x30    @ 080eba10 3021
     movs r3,#0x1    @ 080eba12 0123
     bl suppress_assert_report                @ 080eba14 0ef062fd
@@ -5535,8 +5535,8 @@ LAB_080eba18:
     ldrsh r6,[r1,r0]                         @ 080eba32 0e5e
     cmp r4,#0x0                              @ 080eba34 002c
     bne LAB_080eba44                         @ 080eba36 05d1
-    ldr r0, DAT_080eba70                     @ 080eba38 0d48
-    ldr r2, DAT_080eba74                     @ 080eba3a 0e4a
+    ldr r0, init_blend_param_from_srt_src_fx_mtx22_h_filename @ 080eba38 0d48
+    ldr r2, init_blend_param_from_srt_src_assert_pdst_null_8fc @ 080eba3a 0e4a
     movs r1,#0x77    @ 080eba3c 7721
     movs r3,#0x1    @ 080eba3e 0123
     bl suppress_assert_report                @ 080eba40 0ef04cfd
@@ -5553,18 +5553,18 @@ LAB_080eba44:
     pop {r4,r5,r6,r7}                        @ 080eba5a f0bc
     pop {r0}                                 @ 080eba5c 01bc
     bx r0                                    @ 080eba5e 0047
-DAT_080eba60:
-    .word  0x09e4e91c                     @ 080eba60 1ce9e409
-DAT_080eba64:
-    .word  0x09e4e93c                     @ 080eba64 3ce9e409
-DAT_080eba68:
-    .word  0x09e4e974                     @ 080eba68 74e9e409
-DAT_080eba6c:
-    .word  0x09e4e944                     @ 080eba6c 44e9e409
-DAT_080eba70:
-    .word  0x09e4e8e4                     @ 080eba70 e4e8e409
-DAT_080eba74:
-    .word  0x09e4e8fc                     @ 080eba74 fce8e409
+init_blend_param_from_srt_src_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080eba60 1ce9e409  nnsys/g2d/g2d_SRTControl.c
+init_blend_param_from_srt_src_assert_pctrl:
+    .word  assert_pctrl                   @ 080eba64 3ce9e409  pCtrl
+init_blend_param_from_srt_src_assert_pdst_974:
+    .word  assert_pdst_974                @ 080eba68 74e9e409  pDst
+init_blend_param_from_srt_src_assert_pctrl_type_nns_g2d_srtcontrolt:
+    .word  assert_pctrl_type_nns_g2d_srtcontrolt @ 080eba6c 44e9e409  ( pCtrl->type ) == NNS_G2D_SRTCONTROLTYPE_SRT
+init_blend_param_from_srt_src_fx_mtx22_h_filename:
+    .word  fx_mtx22_h_filename            @ 080eba70 e4e8e409  inc/nitro/fx_mtx22.h
+init_blend_param_from_srt_src_assert_pdst_null_8fc:
+    .word  assert_pdst_null_8fc           @ 080eba74 fce8e409  (pDst) != NULL
 DAT_080eba78:
     .word  0x09e399d0                     @ 080eba78 d099e309
 
@@ -5590,16 +5590,16 @@ init_blend_param_from_srt_dst:
     adds r5,r1,#0x0    @ 080eba80 0d1c
     cmp r4,#0x0                              @ 080eba82 002c
     bne LAB_080eba92                         @ 080eba84 05d1
-    ldr r0, DAT_080ebaf8                     @ 080eba86 1c48
-    ldr r2, DAT_080ebafc                     @ 080eba88 1c4a
+    ldr r0, init_blend_param_from_srt_dst_g2d_srtcontrol_c_filename @ 080eba86 1c48
+    ldr r2, init_blend_param_from_srt_dst_assert_pctrl @ 080eba88 1c4a
     movs r1,#0xca    @ 080eba8a ca21
     movs r3,#0x1    @ 080eba8c 0123
     bl suppress_assert_report                @ 080eba8e 0ef025fd
 LAB_080eba92:
     cmp r5,#0x0                              @ 080eba92 002d
     bne LAB_080ebaa2                         @ 080eba94 05d1
-    ldr r0, DAT_080ebaf8                     @ 080eba96 1848
-    ldr r2, DAT_080ebb00                     @ 080eba98 194a
+    ldr r0, init_blend_param_from_srt_dst_g2d_srtcontrol_c_filename @ 080eba96 1848
+    ldr r2, init_blend_param_from_srt_dst_assert_pdst_974 @ 080eba98 194a
     movs r1,#0xcb    @ 080eba9a cb21
     movs r3,#0x1    @ 080eba9c 0123
     bl suppress_assert_report                @ 080eba9e 0ef01dfd
@@ -5607,8 +5607,8 @@ LAB_080ebaa2:
     ldr r0,[r4,#0x0]                         @ 080ebaa2 2068
     cmp r0,#0x1                              @ 080ebaa4 0128
     beq LAB_080ebab4                         @ 080ebaa6 05d0
-    ldr r0, DAT_080ebaf8                     @ 080ebaa8 1348
-    ldr r2, DAT_080ebb04                     @ 080ebaaa 164a
+    ldr r0, init_blend_param_from_srt_dst_g2d_srtcontrol_c_filename @ 080ebaa8 1348
+    ldr r2, init_blend_param_from_srt_dst_assert_pctrl_type_nns_g2d_srtcontrolt @ 080ebaaa 164a
     movs r1,#0xcc    @ 080ebaac cc21
     movs r3,#0x1    @ 080ebaae 0123
     bl suppress_assert_report                @ 080ebab0 0ef014fd
@@ -5626,8 +5626,8 @@ LAB_080ebab4:
     ldrsh r6,[r1,r0]                         @ 080ebac8 0e5e
     cmp r5,#0x0                              @ 080ebaca 002d
     bne LAB_080ebada                         @ 080ebacc 05d1
-    ldr r0, DAT_080ebb0c                     @ 080ebace 0f48
-    ldr r2, DAT_080ebb10                     @ 080ebad0 0f4a
+    ldr r0, init_blend_param_from_srt_dst_fx_mtx22_h_filename @ 080ebace 0f48
+    ldr r2, init_blend_param_from_srt_dst_assert_pdst_null_8fc @ 080ebad0 0f4a
     movs r1,#0x77    @ 080ebad2 7721
     movs r3,#0x1    @ 080ebad4 0123
     bl suppress_assert_report                @ 080ebad6 0ef001fd
@@ -5645,20 +5645,20 @@ LAB_080ebada:
     pop {r0}                                 @ 080ebaf2 01bc
     bx r0                                    @ 080ebaf4 0047
     .zero  0x2
-DAT_080ebaf8:
-    .word  0x09e4e91c                     @ 080ebaf8 1ce9e409
-DAT_080ebafc:
-    .word  0x09e4e93c                     @ 080ebafc 3ce9e409
-DAT_080ebb00:
-    .word  0x09e4e974                     @ 080ebb00 74e9e409
-DAT_080ebb04:
-    .word  0x09e4e944                     @ 080ebb04 44e9e409
+init_blend_param_from_srt_dst_g2d_srtcontrol_c_filename:
+    .word  g2d_srtcontrol_c_filename      @ 080ebaf8 1ce9e409  nnsys/g2d/g2d_SRTControl.c
+init_blend_param_from_srt_dst_assert_pctrl:
+    .word  assert_pctrl                   @ 080ebafc 3ce9e409  pCtrl
+init_blend_param_from_srt_dst_assert_pdst_974:
+    .word  assert_pdst_974                @ 080ebb00 74e9e409  pDst
+init_blend_param_from_srt_dst_assert_pctrl_type_nns_g2d_srtcontrolt:
+    .word  assert_pctrl_type_nns_g2d_srtcontrolt @ 080ebb04 44e9e409  ( pCtrl->type ) == NNS_G2D_SRTCONTROLTYPE_SRT
 DAT_080ebb08:
     .word  0x09e399d0                     @ 080ebb08 d099e309
-DAT_080ebb0c:
-    .word  0x09e4e8e4                     @ 080ebb0c e4e8e409
-DAT_080ebb10:
-    .word  0x09e4e8fc                     @ 080ebb10 fce8e409
+init_blend_param_from_srt_dst_fx_mtx22_h_filename:
+    .word  fx_mtx22_h_filename            @ 080ebb0c e4e8e409  inc/nitro/fx_mtx22.h
+init_blend_param_from_srt_dst_assert_pdst_null_8fc:
+    .word  assert_pdst_null_8fc           @ 080ebb10 fce8e409  (pDst) != NULL
     ldr r2, PTR_BG3VOFS_080ebb28             @ 080ebb14 044a
     ldr r0, PTR_gPrng_080ebb2c               @ 080ebb16 0548
     ldr r1, DAT_080ebb30                     @ 080ebb18 0549

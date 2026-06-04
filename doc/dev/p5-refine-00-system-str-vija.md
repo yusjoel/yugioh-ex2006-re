@@ -155,6 +155,35 @@ tick_demo_scene_state_machine。全部操作 gDemoState (0x02029ec0)。byte-iden
 
 **LAB_ 内部分支 (111)**: 按 boot 区裁定**跳过**。
 
+### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
+
+`suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
+0x09e398dc..0x09e5073c (line733 raw blob 的 after-demo 段内, 与图形/二进制/指针表混合)。
+**最终形态 (用户定): 把 156 个被引用的断言串本体 carve 进 rom.s 成带 label 的 `.asciz`, 其余
+(未引用串/二进制/指针表) 仍 `.incbin` 原样保留; 代码 .word 经 resolve_word_symbol 指向 carve label。**
+
+落地 (byte-identical):
+- 扫描器 `tools/rom-export/export_assert_strings.py` (一次性, 非 export_all): 扫 asm 调用点
+  (closest r0/r2 + is_asciz 校验 + demo 块排除) → `assert_labels.csv` (slot,string,label) +
+  `assert_carve_block.txt` (137 `.incbin` + 156 `<label>: .asciz "<content>"`, 替换 rom.s
+  after-demo incbin) + `assert_slots.csv` (459 槽 `<func>_<assertlabel>` 改名 + EOL=断言原文)。
+- `AddAssertStringLabels.py`: 串地址建 USER_DEFINED label + 443 槽加 DATA ref (驱动 resolve_word_symbol)。
+- `SetAssertSlotLabels.py`: 459 槽 `DAT_xxx → <func>_<assertlabel>` (setName 重命名) + EOL_COMMENT=断言原文。
+- `RenameAssertPreexisting.py` + `FixAssertPlateRef.py`: 把 2 个旧名 (gl_bright_assert/nns_g2d_assert_anmID)
+  统一为 my-scheme (与 carve 一致), 并订正 1 处 plate 散文旧名。
+- `_verify_carve.py`: 核对 carve 块覆盖字节 == 原 incbin (0x1F430) 且重建序列 == ROM。
+- `assert_carve_block.txt` 内容粘入 `asm/rom.s` (替换 `0x1E398DC,0x1F430` 那行)。
+
+工具改动:
+- `ExportRangeToGas.py`: (a) `resolve_word_equate` (字面量池数值常量 data-equate, demo 掩码用);
+  (b) `emit_defined_data` 取 EOL_COMMENT 追加到 `.word ... @ addr bytes` 之后 (断言原文渲染)。
+
+效果: 898 处 `.word assert_*`/`*_filename` + EOL 原文; 串本体在 rom.s carve 块 (含 content), **不在
+rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); demo 块 2 串
+(EXO_main.c/anmID) 由 demo-exodia-resources.s 处理, 排除。
+- ⚠ 弯路 (3 版): data-equate(constants/assert_strings.inc) → rom_data.inc 自动 label → asm/assert_str_const.s
+  的 .equ → **最终 carve `.asciz` 进 rom.s** (用户定: 槽用函数名前缀避重 + .word 加 EOL 原文 + 串本体写 rom.s)。
+
 ### 4.1 boot-ui 上色 (1 项, 需 mGBA, 用户裁定放最后)
 跑游戏到语言选择之后画面 → dump VRAM/PALRAM → 与 0xDE30..0x13510 字节匹配 → 定位加载
 函数 + 调色板 → 替换灰度为真彩 + 语义命名段 (改 `export_boot_ui_gfx.py` 模块名/调色板)。

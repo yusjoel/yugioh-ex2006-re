@@ -2540,8 +2540,8 @@ gl_set_brightness:
     adds r0,#0x10    @ 08014706 1030
     cmp r0,#0x20                             @ 08014708 2028
     bls LAB_08014718                         @ 0801470a 05d9
-    ldr r0, PTR_gl_common_c_filename_08014744 @ 0801470c 0d48
-    ldr r2, PTR_gl_bright_assert_08014748    @ 0801470e 0e4a
+    ldr r0, gl_set_brightness_gl_common_c_filename @ 0801470c 0d48
+    ldr r2, gl_set_brightness_assert_bright_16_bright_16 @ 0801470e 0e4a
     movs r1,#0xea    @ 08014710 ea21
     movs r3,#0x0    @ 08014712 0023
     bl suppress_assert_report                @ 08014714 e5f0e2fe
@@ -2567,10 +2567,10 @@ LAB_08014718:
     bx r0                                    @ 0801473e 0047
 DAT_08014740:
     .word  0x02023480                     @ 08014740 80340202
-PTR_gl_common_c_filename_08014744:
-    .word  gl_common_c_filename           @ 08014744 dc98e309
-PTR_gl_bright_assert_08014748:
-    .word  gl_bright_assert               @ 08014748 ec98e309
+gl_set_brightness_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014744 dc98e309  GL/GL_Common.c
+gl_set_brightness_assert_bright_16_bright_16:
+    .word  assert_bright_16_bright_16     @ 08014748 ec98e309  bright >= -16 && bright <= 16
 DAT_0801474c:
     .word  0xfffffc03                     @ 0801474c 03fcffff
 DAT_08014750:
@@ -2588,16 +2588,16 @@ init_blend_transition_params:
     ldr r4, DAT_080147c0                     @ 08014762 174c
     cmp r5,#0x10                             @ 08014764 102d
     bls LAB_08014774                         @ 08014766 05d9
-    ldr r0, PTR_gl_common_c_filename_080147c4 @ 08014768 1648
-    ldr r2, DAT_080147c8                     @ 0801476a 174a
+    ldr r0, init_blend_transition_params_gl_common_c_filename @ 08014768 1648
+    ldr r2, init_blend_transition_params_assert_blend1_0_blend1_16 @ 0801476a 174a
     movs r1,#0xf8    @ 0801476c f821
     movs r3,#0x0    @ 0801476e 0023
     bl suppress_assert_report                @ 08014770 e5f0b4fe
 LAB_08014774:
     cmp r6,#0x10                             @ 08014774 102e
     bls LAB_08014784                         @ 08014776 05d9
-    ldr r0, PTR_gl_common_c_filename_080147c4 @ 08014778 1248
-    ldr r2, DAT_080147cc                     @ 0801477a 144a
+    ldr r0, init_blend_transition_params_gl_common_c_filename @ 08014778 1248
+    ldr r2, init_blend_transition_params_assert_blend2_0_blend2_16 @ 0801477a 144a
     movs r1,#0xf9    @ 0801477c f921
     movs r3,#0x0    @ 0801477e 0023
     bl suppress_assert_report                @ 08014780 e5f0acfe
@@ -2634,12 +2634,12 @@ LAB_08014784:
     bx r0                                    @ 080147be 0047
 DAT_080147c0:
     .word  0x02023480                     @ 080147c0 80340202
-PTR_gl_common_c_filename_080147c4:
-    .word  gl_common_c_filename           @ 080147c4 dc98e309
-DAT_080147c8:
-    .word  0x09e3990c                     @ 080147c8 0c99e309
-DAT_080147cc:
-    .word  0x09e39928                     @ 080147cc 2899e309
+init_blend_transition_params_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 080147c4 dc98e309  GL/GL_Common.c
+init_blend_transition_params_assert_blend1_0_blend1_16:
+    .word  assert_blend1_0_blend1_16      @ 080147c8 0c99e309  blend1 >= 0 && blend1 <= 16
+init_blend_transition_params_assert_blend2_0_blend2_16:
+    .word  assert_blend2_0_blend2_16      @ 080147cc 2899e309  blend2 >= 0 && blend2 <= 16
 DAT_080147d0:
     .word  0xfffffc03                     @ 080147d0 03fcffff
 DAT_080147d4:
@@ -2656,10 +2656,10 @@ gl_set_blend2_level:
     adds r0,#0x10    @ 080147e4 1030
     cmp r0,#0x20                             @ 080147e6 2028
     bls LAB_080147f8                         @ 080147e8 06d9
-    ldr r0, PTR_gl_common_c_filename_08014828 @ 080147ea 0f48
+    ldr r0, gl_set_blend2_level_gl_common_c_filename @ 080147ea 0f48
     movs r1,#0x85    @ 080147ec 8521
     lsls r1,r1,#0x1    @ 080147ee 4900
-    ldr r2, PTR_gl_bright_assert_0801482c    @ 080147f0 0e4a
+    ldr r2, gl_set_blend2_level_assert_bright_16_bright_16 @ 080147f0 0e4a
     movs r3,#0x0    @ 080147f2 0023
     bl suppress_assert_report                @ 080147f4 e5f072fe
 LAB_080147f8:
@@ -2686,10 +2686,10 @@ LAB_080147f8:
     bx r0                                    @ 08014822 0047
 DAT_08014824:
     .word  0x02023480                     @ 08014824 80340202
-PTR_gl_common_c_filename_08014828:
-    .word  gl_common_c_filename           @ 08014828 dc98e309
-PTR_gl_bright_assert_0801482c:
-    .word  gl_bright_assert               @ 0801482c ec98e309
+gl_set_blend2_level_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014828 dc98e309  GL/GL_Common.c
+gl_set_blend2_level_assert_bright_16_bright_16:
+    .word  assert_bright_16_bright_16     @ 0801482c ec98e309  bright >= -16 && bright <= 16
 DAT_08014830:
     .word  0xfffffc03                     @ 08014830 03fcffff
 DAT_08014834:
@@ -2709,18 +2709,18 @@ init_blend_transition_params_ex:
     ldr r4, DAT_080148b4                     @ 0801484a 1a4c
     cmp r6,#0x10                             @ 0801484c 102e
     bls LAB_0801485c                         @ 0801484e 05d9
-    ldr r0, PTR_gl_common_c_filename_080148b8 @ 08014850 1948
+    ldr r0, init_blend_transition_params_ex_gl_common_c_filename @ 08014850 1948
     ldr r1, DAT_080148bc                     @ 08014852 1a49
-    ldr r2, DAT_080148c0                     @ 08014854 1a4a
+    ldr r2, init_blend_transition_params_ex_assert_blend1_0_blend1_16 @ 08014854 1a4a
     movs r3,#0x0    @ 08014856 0023
     bl suppress_assert_report                @ 08014858 e5f040fe
 LAB_0801485c:
     cmp r7,#0x10                             @ 0801485c 102f
     bls LAB_0801486e                         @ 0801485e 06d9
-    ldr r0, PTR_gl_common_c_filename_080148b8 @ 08014860 1548
+    ldr r0, init_blend_transition_params_ex_gl_common_c_filename @ 08014860 1548
     movs r1,#0x8d    @ 08014862 8d21
     lsls r1,r1,#0x1    @ 08014864 4900
-    ldr r2, DAT_080148c4                     @ 08014866 174a
+    ldr r2, init_blend_transition_params_ex_assert_blend2_0_blend2_16 @ 08014866 174a
     movs r3,#0x0    @ 08014868 0023
     bl suppress_assert_report                @ 0801486a e5f037fe
 LAB_0801486e:
@@ -2761,14 +2761,14 @@ LAB_0801486e:
     bx r0                                    @ 080148b2 0047
 DAT_080148b4:
     .word  0x02023480                     @ 080148b4 80340202
-PTR_gl_common_c_filename_080148b8:
-    .word  gl_common_c_filename           @ 080148b8 dc98e309
+init_blend_transition_params_ex_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 080148b8 dc98e309  GL/GL_Common.c
 DAT_080148bc:
     .word  0x00000119                     @ 080148bc 19010000
-DAT_080148c0:
-    .word  0x09e3990c                     @ 080148c0 0c99e309
-DAT_080148c4:
-    .word  0x09e39928                     @ 080148c4 2899e309
+init_blend_transition_params_ex_assert_blend1_0_blend1_16:
+    .word  assert_blend1_0_blend1_16      @ 080148c0 0c99e309  blend1 >= 0 && blend1 <= 16
+init_blend_transition_params_ex_assert_blend2_0_blend2_16:
+    .word  assert_blend2_0_blend2_16      @ 080148c4 2899e309  blend2 >= 0 && blend2 <= 16
 DAT_080148c8:
     .word  0xfffffc03                     @ 080148c8 03fcffff
 DAT_080148cc:
@@ -3273,10 +3273,10 @@ copy_to_bg0_char_tiles:
     ands r0,r4    @ 08014c1e 2040
     cmp r0,#0x0                              @ 08014c20 0028
     beq LAB_08014c32                         @ 08014c22 06d0
-    ldr r0, PTR_gl_common_c_filename_08014c4c @ 08014c24 0948
+    ldr r0, copy_to_bg0_char_tiles_gl_common_c_filename @ 08014c24 0948
     movs r1,#0xf1    @ 08014c26 f121
     lsls r1,r1,#0x1    @ 08014c28 4900
-    ldr r2, DAT_08014c50                     @ 08014c2a 094a
+    ldr r2, copy_to_bg0_char_tiles_assert_u32_psrc_0x3_0 @ 08014c2a 094a
     movs r3,#0x1    @ 08014c2c 0123
     bl suppress_assert_report                @ 08014c2e e5f055fc
 LAB_08014c32:
@@ -3291,10 +3291,10 @@ LAB_08014c32:
     pop {r0}                                 @ 08014c46 01bc
     bx r0                                    @ 08014c48 0047
     .zero  0x2
-PTR_gl_common_c_filename_08014c4c:
-    .word  gl_common_c_filename           @ 08014c4c dc98e309
-DAT_08014c50:
-    .word  0x09e39944                     @ 08014c50 4499e309
+copy_to_bg0_char_tiles_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014c4c dc98e309  GL/GL_Common.c
+copy_to_bg0_char_tiles_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014c50 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ Copies src tile data via bios_cpu_fast_set to BG1 char VRAM. Asserts src 4-byte aligned (gl_common.c:487) before calling get_bg1_char_vram_addr. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. Constants: 0x3 = 4-byte alignment mask.
 copy_to_bg1_char_tiles:
@@ -3306,9 +3306,9 @@ copy_to_bg1_char_tiles:
     ands r0,r4    @ 08014c5e 2040
     cmp r0,#0x0                              @ 08014c60 0028
     beq LAB_08014c70                         @ 08014c62 05d0
-    ldr r0, PTR_gl_common_c_filename_08014c88 @ 08014c64 0848
+    ldr r0, copy_to_bg1_char_tiles_gl_common_c_filename @ 08014c64 0848
     ldr r1, DAT_08014c8c                     @ 08014c66 0949
-    ldr r2, DAT_08014c90                     @ 08014c68 094a
+    ldr r2, copy_to_bg1_char_tiles_assert_u32_psrc_0x3_0 @ 08014c68 094a
     movs r3,#0x1    @ 08014c6a 0123
     bl suppress_assert_report                @ 08014c6c e5f036fc
 LAB_08014c70:
@@ -3322,12 +3322,12 @@ LAB_08014c70:
     pop {r4,r5,r6}                           @ 08014c82 70bc
     pop {r0}                                 @ 08014c84 01bc
     bx r0                                    @ 08014c86 0047
-PTR_gl_common_c_filename_08014c88:
-    .word  gl_common_c_filename           @ 08014c88 dc98e309
+copy_to_bg1_char_tiles_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014c88 dc98e309  GL/GL_Common.c
 DAT_08014c8c:
     .word  0x000001e7                     @ 08014c8c e7010000
-DAT_08014c90:
-    .word  0x09e39944                     @ 08014c90 4499e309
+copy_to_bg1_char_tiles_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014c90 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ Copies src tile data via bios_cpu_fast_set to BG2 char VRAM. Asserts src 4-byte aligned (gl_common.c:492) before calling get_bg2_char_vram_addr. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. Constants: 0x3 = 4-byte alignment mask; BG char area max 16KB = 0x1000 words.
 copy_to_bg2_char_tiles:
@@ -3339,10 +3339,10 @@ copy_to_bg2_char_tiles:
     ands r0,r4    @ 08014c9e 2040
     cmp r0,#0x0                              @ 08014ca0 0028
     beq LAB_08014cb2                         @ 08014ca2 06d0
-    ldr r0, PTR_gl_common_c_filename_08014ccc @ 08014ca4 0948
+    ldr r0, copy_to_bg2_char_tiles_gl_common_c_filename @ 08014ca4 0948
     movs r1,#0xf6    @ 08014ca6 f621
     lsls r1,r1,#0x1    @ 08014ca8 4900
-    ldr r2, DAT_08014cd0                     @ 08014caa 094a
+    ldr r2, copy_to_bg2_char_tiles_assert_u32_psrc_0x3_0 @ 08014caa 094a
     movs r3,#0x1    @ 08014cac 0123
     bl suppress_assert_report                @ 08014cae e5f015fc
 LAB_08014cb2:
@@ -3357,10 +3357,10 @@ LAB_08014cb2:
     pop {r0}                                 @ 08014cc6 01bc
     bx r0                                    @ 08014cc8 0047
     .zero  0x2
-PTR_gl_common_c_filename_08014ccc:
-    .word  gl_common_c_filename           @ 08014ccc dc98e309
-DAT_08014cd0:
-    .word  0x09e39944                     @ 08014cd0 4499e309
+copy_to_bg2_char_tiles_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014ccc dc98e309  GL/GL_Common.c
+copy_to_bg2_char_tiles_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014cd0 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ Copies src tile data via bios_cpu_fast_set to BG3 char VRAM. Asserts src 4-byte aligned (gl_common.c:497) before calling get_bg3_char_vram_addr. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. Constants: 0x3 = 4-byte alignment mask.
 copy_to_bg3_char_tiles:
@@ -3372,9 +3372,9 @@ copy_to_bg3_char_tiles:
     ands r0,r4    @ 08014cde 2040
     cmp r0,#0x0                              @ 08014ce0 0028
     beq LAB_08014cf0                         @ 08014ce2 05d0
-    ldr r0, PTR_gl_common_c_filename_08014d08 @ 08014ce4 0848
+    ldr r0, copy_to_bg3_char_tiles_gl_common_c_filename @ 08014ce4 0848
     ldr r1, DAT_08014d0c                     @ 08014ce6 0949
-    ldr r2, DAT_08014d10                     @ 08014ce8 094a
+    ldr r2, copy_to_bg3_char_tiles_assert_u32_psrc_0x3_0 @ 08014ce8 094a
     movs r3,#0x1    @ 08014cea 0123
     bl suppress_assert_report                @ 08014cec e5f0f6fb
 LAB_08014cf0:
@@ -3388,12 +3388,12 @@ LAB_08014cf0:
     pop {r4,r5,r6}                           @ 08014d02 70bc
     pop {r0}                                 @ 08014d04 01bc
     bx r0                                    @ 08014d06 0047
-PTR_gl_common_c_filename_08014d08:
-    .word  gl_common_c_filename           @ 08014d08 dc98e309
+copy_to_bg3_char_tiles_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014d08 dc98e309  GL/GL_Common.c
 DAT_08014d0c:
     .word  0x000001f1                     @ 08014d0c f1010000
-DAT_08014d10:
-    .word  0x09e39944                     @ 08014d10 4499e309
+copy_to_bg3_char_tiles_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014d10 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ 由 dispatch_bg_screen_map_write 在 bg_index=0 时调用, 将 src 数据经 bios_cpu_set 拷贝到 BG0 的 screen map VRAM 地址. 调用前先以 assert 检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:503 处的 suppress_assert_report. 对齐通过后: 调 get_bg0_screen_vram_addr 查询 BG0CNT 获得 screen 基址, 加上 dst_offset, 以 bios_cpu_set copy 模式写入.
 copy_to_bg0_screen_map:
@@ -3405,9 +3405,9 @@ copy_to_bg0_screen_map:
     ands r0,r4    @ 08014d1e 2040
     cmp r0,#0x0                              @ 08014d20 0028
     beq LAB_08014d30                         @ 08014d22 05d0
-    ldr r0, PTR_gl_common_c_filename_08014d48 @ 08014d24 0848
+    ldr r0, copy_to_bg0_screen_map_gl_common_c_filename @ 08014d24 0848
     ldr r1, DAT_08014d4c                     @ 08014d26 0949
-    ldr r2, DAT_08014d50                     @ 08014d28 094a
+    ldr r2, copy_to_bg0_screen_map_assert_u32_psrc_0x3_0 @ 08014d28 094a
     movs r3,#0x1    @ 08014d2a 0123
     bl suppress_assert_report                @ 08014d2c e5f0d6fb
 LAB_08014d30:
@@ -3421,12 +3421,12 @@ LAB_08014d30:
     pop {r4,r5,r6}                           @ 08014d42 70bc
     pop {r0}                                 @ 08014d44 01bc
     bx r0                                    @ 08014d46 0047
-PTR_gl_common_c_filename_08014d48:
-    .word  gl_common_c_filename           @ 08014d48 dc98e309
+copy_to_bg0_screen_map_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014d48 dc98e309  GL/GL_Common.c
 DAT_08014d4c:
     .word  0x000001f7                     @ 08014d4c f7010000
-DAT_08014d50:
-    .word  0x09e39944                     @ 08014d50 4499e309
+copy_to_bg0_screen_map_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014d50 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ 由 dispatch_bg_screen_map_write 在 bg_index=1 时调用, 将 src 数据经 bios_cpu_set 拷贝到 BG1 的 screen map VRAM 地址. 调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:508 处的 suppress_assert_report. 对齐通过后: 调 get_bg1_screen_vram_addr 查询 BG1CNT 获得 screen 基址, 加上 dst_offset, 以 bios_cpu_set copy 写入.
 copy_to_bg1_screen_map:
@@ -3438,10 +3438,10 @@ copy_to_bg1_screen_map:
     ands r0,r4    @ 08014d5e 2040
     cmp r0,#0x0                              @ 08014d60 0028
     beq LAB_08014d72                         @ 08014d62 06d0
-    ldr r0, PTR_gl_common_c_filename_08014d8c @ 08014d64 0948
+    ldr r0, copy_to_bg1_screen_map_gl_common_c_filename @ 08014d64 0948
     movs r1,#0xfe    @ 08014d66 fe21
     lsls r1,r1,#0x1    @ 08014d68 4900
-    ldr r2, DAT_08014d90                     @ 08014d6a 094a
+    ldr r2, copy_to_bg1_screen_map_assert_u32_psrc_0x3_0 @ 08014d6a 094a
     movs r3,#0x1    @ 08014d6c 0123
     bl suppress_assert_report                @ 08014d6e e5f0b5fb
 LAB_08014d72:
@@ -3456,10 +3456,10 @@ LAB_08014d72:
     pop {r0}                                 @ 08014d86 01bc
     bx r0                                    @ 08014d88 0047
     .zero  0x2
-PTR_gl_common_c_filename_08014d8c:
-    .word  gl_common_c_filename           @ 08014d8c dc98e309
-DAT_08014d90:
-    .word  0x09e39944                     @ 08014d90 4499e309
+copy_to_bg1_screen_map_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014d8c dc98e309  GL/GL_Common.c
+copy_to_bg1_screen_map_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014d90 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ 由 dispatch_bg_screen_map_write 在 bg_index=2 时调用, 将 src 数据经 bios_cpu_set 拷贝到 BG2 的 screen map VRAM 地址. 调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:513 处的 suppress_assert_report. 对齐通过后: 调 get_bg2_screen_vram_addr 查询 BG2CNT 获得 screen 基址, 加上 dst_offset, 以 bios_cpu_set copy 写入.
 copy_to_bg2_screen_map:
@@ -3471,9 +3471,9 @@ copy_to_bg2_screen_map:
     ands r0,r4    @ 08014d9e 2040
     cmp r0,#0x0                              @ 08014da0 0028
     beq LAB_08014db0                         @ 08014da2 05d0
-    ldr r0, PTR_gl_common_c_filename_08014dc8 @ 08014da4 0848
+    ldr r0, copy_to_bg2_screen_map_gl_common_c_filename @ 08014da4 0848
     ldr r1, DAT_08014dcc                     @ 08014da6 0949
-    ldr r2, DAT_08014dd0                     @ 08014da8 094a
+    ldr r2, copy_to_bg2_screen_map_assert_u32_psrc_0x3_0 @ 08014da8 094a
     movs r3,#0x1    @ 08014daa 0123
     bl suppress_assert_report                @ 08014dac e5f096fb
 LAB_08014db0:
@@ -3487,12 +3487,12 @@ LAB_08014db0:
     pop {r4,r5,r6}                           @ 08014dc2 70bc
     pop {r0}                                 @ 08014dc4 01bc
     bx r0                                    @ 08014dc6 0047
-PTR_gl_common_c_filename_08014dc8:
-    .word  gl_common_c_filename           @ 08014dc8 dc98e309
+copy_to_bg2_screen_map_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014dc8 dc98e309  GL/GL_Common.c
 DAT_08014dcc:
     .word  0x00000201                     @ 08014dcc 01020000
-DAT_08014dd0:
-    .word  0x09e39944                     @ 08014dd0 4499e309
+copy_to_bg2_screen_map_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014dd0 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ 由 dispatch_bg_screen_map_write 在 bg_index=3 时调用, 将 src 数据经 bios_cpu_set 拷贝到 BG3 的 screen map VRAM 地址. 调用前先检查 src 指针 4 字节对齐, 违规则触发 gl_common.c:518 处的 suppress_assert_report. 对齐通过后: 调 get_bg3_screen_vram_addr 查询 BG3CNT 获得 screen 基址, 加上 dst_offset, 以 bios_cpu_set copy 写入.
 copy_to_bg3_screen_map:
@@ -3504,9 +3504,9 @@ copy_to_bg3_screen_map:
     ands r0,r4    @ 08014dde 2040
     cmp r0,#0x0                              @ 08014de0 0028
     beq LAB_08014df0                         @ 08014de2 05d0
-    ldr r0, PTR_gl_common_c_filename_08014e08 @ 08014de4 0848
+    ldr r0, copy_to_bg3_screen_map_gl_common_c_filename @ 08014de4 0848
     ldr r1, DAT_08014e0c                     @ 08014de6 0949
-    ldr r2, DAT_08014e10                     @ 08014de8 094a
+    ldr r2, copy_to_bg3_screen_map_assert_u32_psrc_0x3_0 @ 08014de8 094a
     movs r3,#0x1    @ 08014dea 0123
     bl suppress_assert_report                @ 08014dec e5f076fb
 LAB_08014df0:
@@ -3520,12 +3520,12 @@ LAB_08014df0:
     pop {r4,r5,r6}                           @ 08014e02 70bc
     pop {r0}                                 @ 08014e04 01bc
     bx r0                                    @ 08014e06 0047
-PTR_gl_common_c_filename_08014e08:
-    .word  gl_common_c_filename           @ 08014e08 dc98e309
+copy_to_bg3_screen_map_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014e08 dc98e309  GL/GL_Common.c
 DAT_08014e0c:
     .word  0x00000206                     @ 08014e0c 06020000
-DAT_08014e10:
-    .word  0x09e39944                     @ 08014e10 4499e309
+copy_to_bg3_screen_map_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014e10 4499e309  ((u32)pSrc & 0x3) == 0
 
 @ Copies src data via bios_cpu_set to OBJ tile VRAM (0x06010000). Asserts src 4-byte aligned (gl_common.c:524) before calling get_obj_tile_vram_base. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0x1FFF], r2=word_count [1..0x2000]. indeg=4, called by apply_objd_entry_to_sprite and 3 other scene renderers. Constants: gl_common.c:524 = 0x83<<2 = 0x20C; 0x06010000 = OBJ tile VRAM base.
 copy_to_obj_tile_vram:
@@ -3537,10 +3537,10 @@ copy_to_obj_tile_vram:
     ands r0,r4    @ 08014e1e 2040
     cmp r0,#0x0                              @ 08014e20 0028
     beq LAB_08014e32                         @ 08014e22 06d0
-    ldr r0, PTR_gl_common_c_filename_08014e4c @ 08014e24 0948
+    ldr r0, copy_to_obj_tile_vram_gl_common_c_filename @ 08014e24 0948
     movs r1,#0x83    @ 08014e26 8321
     lsls r1,r1,#0x2    @ 08014e28 8900
-    ldr r2, DAT_08014e50                     @ 08014e2a 094a
+    ldr r2, copy_to_obj_tile_vram_assert_u32_psrc_0x3_0 @ 08014e2a 094a
     movs r3,#0x1    @ 08014e2c 0123
     bl suppress_assert_report                @ 08014e2e e5f055fb
 LAB_08014e32:
@@ -3555,10 +3555,10 @@ LAB_08014e32:
     pop {r0}                                 @ 08014e46 01bc
     bx r0                                    @ 08014e48 0047
     .zero  0x2
-PTR_gl_common_c_filename_08014e4c:
-    .word  gl_common_c_filename           @ 08014e4c dc98e309
-DAT_08014e50:
-    .word  0x09e39944                     @ 08014e50 4499e309
+copy_to_obj_tile_vram_gl_common_c_filename:
+    .word  gl_common_c_filename           @ 08014e4c dc98e309  GL/GL_Common.c
+copy_to_obj_tile_vram_assert_u32_psrc_0x3_0:
+    .word  assert_u32_psrc_0x3_0          @ 08014e50 4499e309  ((u32)pSrc & 0x3) == 0
     ROM_INCBIN 0x14e54, 0x4c
 
 @ 由 FUN_08014eb4 (GL/GL_File.c 字符串搜索) 在子串搜索前调用, 分别测量 pSrc 和 pKey 的字节长度以确定搜索范围上界. 逐字节遍历直到空字节, 返回不含终止符 的字节数 (等同 strlen 语义). 与 count_str_charlen (0x0801455c) 不同, 本函数只做原始字节计数, 不感知游戏自定义编码宽度. 调用方将两次返回值之差加一作为搜索循环次数上限.
@@ -3586,16 +3586,16 @@ find_substr_offset:
     adds r6,r1,#0x0    @ 08014ebe 0e1c
     cmp r0,#0x0                              @ 08014ec0 0028
     bne LAB_08014ed0                         @ 08014ec2 05d1
-    ldr r0, DAT_08014f30                     @ 08014ec4 1a48
-    ldr r2, DAT_08014f34                     @ 08014ec6 1b4a
+    ldr r0, find_substr_offset_gl_file_c_filename @ 08014ec4 1a48
+    ldr r2, find_substr_offset_assert_psrc   @ 08014ec6 1b4a
     movs r1,#0x26    @ 08014ec8 2621
     movs r3,#0x1    @ 08014eca 0123
     bl suppress_assert_report                @ 08014ecc e5f006fb
 LAB_08014ed0:
     cmp r6,#0x0                              @ 08014ed0 002e
     bne LAB_08014ee0                         @ 08014ed2 05d1
-    ldr r0, DAT_08014f30                     @ 08014ed4 1648
-    ldr r2, DAT_08014f38                     @ 08014ed6 184a
+    ldr r0, find_substr_offset_gl_file_c_filename @ 08014ed4 1648
+    ldr r2, find_substr_offset_assert_pkey   @ 08014ed6 184a
     movs r1,#0x27    @ 08014ed8 2721
     movs r3,#0x1    @ 08014eda 0123
     bl suppress_assert_report                @ 08014edc e5f0fefa
@@ -3641,12 +3641,12 @@ LAB_08014f26:
     adds r0,r4,#0x0    @ 08014f2a 201c
     b LAB_08014f46                           @ 08014f2c 0be0
     .zero  0x2
-DAT_08014f30:
-    .word  0x09e3995c                     @ 08014f30 5c99e309
-DAT_08014f34:
-    .word  0x09e3996c                     @ 08014f34 6c99e309
-DAT_08014f38:
-    .word  0x09e39974                     @ 08014f38 7499e309
+find_substr_offset_gl_file_c_filename:
+    .word  gl_file_c_filename             @ 08014f30 5c99e309  GL/GL_File.c
+find_substr_offset_assert_psrc:
+    .word  assert_psrc                    @ 08014f34 6c99e309  pSrc
+find_substr_offset_assert_pkey:
+    .word  assert_pkey                    @ 08014f38 7499e309  pKey
 LAB_08014f3c:
     adds r4,#0x1    @ 08014f3c 0134
     cmp r4,r12                               @ 08014f3e 6445
@@ -3835,8 +3835,8 @@ LAB_080150a4:
     lsrs r0,r0,#0x1c    @ 080150a8 000f
     cmp r0,#0x1                              @ 080150aa 0128
     beq LAB_080150ba                         @ 080150ac 05d0
-    ldr r0, DAT_080150d8                     @ 080150ae 0a48
-    ldr r2, DAT_080150dc                     @ 080150b0 0a4a
+    ldr r0, fs_load_gl_file_c_filename       @ 080150ae 0a48
+    ldr r2, fs_load_assert_phead_comptype_1  @ 080150b0 0a4a
     movs r1,#0x91    @ 080150b2 9121
     movs r3,#0x1    @ 080150b4 0123
     bl suppress_assert_report                @ 080150b6 e5f011fa
@@ -3854,10 +3854,10 @@ LAB_080150ba:
     lsrs r2,r2,#0x8    @ 080150d0 120a
     bl cpu_copy_auto                         @ 080150d2 fff795fa
     b LAB_080150f2                           @ 080150d6 0ce0
-DAT_080150d8:
-    .word  0x09e3995c                     @ 080150d8 5c99e309
-DAT_080150dc:
-    .word  0x09e399b8                     @ 080150dc b899e309
+fs_load_gl_file_c_filename:
+    .word  gl_file_c_filename             @ 080150d8 5c99e309  GL/GL_File.c
+fs_load_assert_phead_comptype_1:
+    .word  assert_phead_comptype_1        @ 080150dc b899e309  pHead->compType == 1
 LAB_080150e0:
     .hword 0x4682    @ 080150e0 8246
     b LAB_080150f8                           @ 080150e2 09e0
@@ -3897,8 +3897,8 @@ get_gl_oam_entry_ptr:
     ldr r5, DAT_0801512c                     @ 08015110 064d
     cmp r4,#0x1f                             @ 08015112 1f2c
     ble LAB_08015122                         @ 08015114 05dd
-    ldr r0, DAT_08015130                     @ 08015116 0648
-    ldr r2, DAT_08015134                     @ 08015118 064a
+    ldr r0, get_gl_oam_entry_ptr_gl_oam_c_filename @ 08015116 0648
+    ldr r2, get_gl_oam_entry_ptr_assert_num_32 @ 08015118 064a
     movs r1,#0x1f    @ 0801511a 1f21
     movs r3,#0x1    @ 0801511c 0123
     bl suppress_assert_report                @ 0801511e e5f0ddf9
@@ -3910,10 +3910,10 @@ LAB_08015122:
     bx r1                                    @ 0801512a 0847
 DAT_0801512c:
     .word  0x02023490                     @ 0801512c 90340202
-DAT_08015130:
-    .word  0x09e39c50                     @ 08015130 509ce309
-DAT_08015134:
-    .word  0x09e39c5c                     @ 08015134 5c9ce309
+get_gl_oam_entry_ptr_gl_oam_c_filename:
+    .word  gl_oam_c_filename              @ 08015130 509ce309  GL/GL_Oam.c
+get_gl_oam_entry_ptr_assert_num_32:
+    .word  assert_num_32                  @ 08015134 5c9ce309  num < 32
 
 @ GL: 初始化 state struct @ EWRAM 0x02023490 (0x22B B)
 gl_state_init:
@@ -4333,8 +4333,8 @@ get_scrollbar_range_param:
     adds r4,r0,#0x0    @ 08015426 041c
     cmp r4,#0x0                              @ 08015428 002c
     bne LAB_08015438                         @ 0801542a 05d1
-    ldr r0, DAT_08015444                     @ 0801542c 0548
-    ldr r2, DAT_08015448                     @ 0801542e 064a
+    ldr r0, get_scrollbar_range_param_gl_scrollbar_c_filename @ 0801542c 0548
+    ldr r2, get_scrollbar_range_param_assert_pthis @ 0801542e 064a
     movs r1,#0x38    @ 08015430 3821
     movs r3,#0x1    @ 08015432 0123
     bl suppress_assert_report                @ 08015434 e5f052f8
@@ -4345,10 +4345,10 @@ LAB_08015438:
     pop {r4}                                 @ 0801543e 10bc
     pop {r1}                                 @ 08015440 02bc
     bx r1                                    @ 08015442 0847
-DAT_08015444:
-    .word  0x09e39c68                     @ 08015444 689ce309
-DAT_08015448:
-    .word  0x09e39c7c                     @ 08015448 7c9ce309
+get_scrollbar_range_param_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 08015444 689ce309  GL/GL_Scrollbar.c
+get_scrollbar_range_param_assert_pthis:
+    .word  assert_pthis                   @ 08015448 7c9ce309  pThis
 
 @ Computes GL_Scrollbar thumb visual position. Formula: pos = field_c[23:15] + field_9 + (field_4 * (field_8 - 2*field_9 - field_a)) / (field_6 - field_b). Field meanings: field_c[23:15]=OAM Y base; field_4=cur_val (halfword); field_6=max_val (halfword); field_8=track_len (byte); field_9=margin_top (byte); field_a=extra_offset (byte); field_b=margin_bot (byte). Caller FUN_080155f4 reads result for OAM Y update. Pure computation, no writes.
 @ 
@@ -4394,8 +4394,8 @@ get_scrollbar_cur_value:
     adds r4,r0,#0x0    @ 080154a6 041c
     cmp r4,#0x0                              @ 080154a8 002c
     bne LAB_080154b8                         @ 080154aa 05d1
-    ldr r0, DAT_080154c0                     @ 080154ac 0448
-    ldr r2, DAT_080154c4                     @ 080154ae 054a
+    ldr r0, get_scrollbar_cur_value_gl_scrollbar_c_filename @ 080154ac 0448
+    ldr r2, get_scrollbar_cur_value_assert_pthis @ 080154ae 054a
     movs r1,#0x5a    @ 080154b0 5a21
     movs r3,#0x1    @ 080154b2 0123
     bl suppress_assert_report                @ 080154b4 e5f012f8
@@ -4404,10 +4404,10 @@ LAB_080154b8:
     pop {r4}                                 @ 080154ba 10bc
     pop {r1}                                 @ 080154bc 02bc
     bx r1                                    @ 080154be 0847
-DAT_080154c0:
-    .word  0x09e39c68                     @ 080154c0 689ce309
-DAT_080154c4:
-    .word  0x09e39c7c                     @ 080154c4 7c9ce309
+get_scrollbar_cur_value_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 080154c0 689ce309  GL/GL_Scrollbar.c
+get_scrollbar_cur_value_assert_pthis:
+    .word  assert_pthis                   @ 080154c4 7c9ce309  pThis
 
 @ GL/GL_Scrollbar.c line 96: writes new_pos directly to [pThis+0x4] (u16 current_pos field). Asserts pThis non-null via suppress_assert_report. No bounds check; caller must ensure valid range.
 @ 
@@ -4421,8 +4421,8 @@ set_scrollbar_cur_pos:
     adds r5,r1,#0x0    @ 080154cc 0d1c
     cmp r4,#0x0                              @ 080154ce 002c
     bne LAB_080154de                         @ 080154d0 05d1
-    ldr r0, DAT_080154e8                     @ 080154d2 0548
-    ldr r2, DAT_080154ec                     @ 080154d4 054a
+    ldr r0, set_scrollbar_cur_pos_gl_scrollbar_c_filename @ 080154d2 0548
+    ldr r2, set_scrollbar_cur_pos_assert_pthis @ 080154d4 054a
     movs r1,#0x60    @ 080154d6 6021
     movs r3,#0x1    @ 080154d8 0123
     bl suppress_assert_report                @ 080154da e4f0ffff
@@ -4432,10 +4432,10 @@ LAB_080154de:
     pop {r0}                                 @ 080154e2 01bc
     bx r0                                    @ 080154e4 0047
     .zero  0x2
-DAT_080154e8:
-    .word  0x09e39c68                     @ 080154e8 689ce309
-DAT_080154ec:
-    .word  0x09e39c7c                     @ 080154ec 7c9ce309
+set_scrollbar_cur_pos_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 080154e8 689ce309  GL/GL_Scrollbar.c
+set_scrollbar_cur_pos_assert_pthis:
+    .word  assert_pthis                   @ 080154ec 7c9ce309  pThis
 
 @ Function: checks whether GL_Scrollbar can still advance forward (has more entries to display).
 @ Reads pThis[+0x6]=total_count (u16) and pThis[+0xb]=visible_count (u8), computes
@@ -4477,8 +4477,8 @@ advance_scrollbar_pos_one:
     adds r4,r0,#0x0    @ 0801551a 041c
     cmp r4,#0x0                              @ 0801551c 002c
     bne LAB_0801552c                         @ 0801551e 05d1
-    ldr r0, DAT_0801553c                     @ 08015520 0648
-    ldr r2, DAT_08015540                     @ 08015522 074a
+    ldr r0, advance_scrollbar_pos_one_gl_scrollbar_c_filename @ 08015520 0648
+    ldr r2, advance_scrollbar_pos_one_assert_pthis @ 08015522 074a
     movs r1,#0x75    @ 08015524 7521
     movs r3,#0x1    @ 08015526 0123
     bl suppress_assert_report                @ 08015528 e4f0d8ff
@@ -4491,10 +4491,10 @@ LAB_0801552c:
     blt LAB_08015544                         @ 08015536 05db
     movs r0,#0x0    @ 08015538 0020
     b LAB_0801554a                           @ 0801553a 06e0
-DAT_0801553c:
-    .word  0x09e39c68                     @ 0801553c 689ce309
-DAT_08015540:
-    .word  0x09e39c7c                     @ 08015540 7c9ce309
+advance_scrollbar_pos_one_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 0801553c 689ce309  GL/GL_Scrollbar.c
+advance_scrollbar_pos_one_assert_pthis:
+    .word  assert_pthis                   @ 08015540 7c9ce309  pThis
 LAB_08015544:
     adds r0,r1,#0x1    @ 08015544 481c
     strh r0,[r4,#0x4]                        @ 08015546 a080
@@ -4515,8 +4515,8 @@ retreat_scrollbar_pos_one:
     adds r4,r0,#0x0    @ 08015552 041c
     cmp r4,#0x0                              @ 08015554 002c
     bne LAB_08015564                         @ 08015556 05d1
-    ldr r0, DAT_08015570                     @ 08015558 0548
-    ldr r2, DAT_08015574                     @ 0801555a 064a
+    ldr r0, retreat_scrollbar_pos_one_gl_scrollbar_c_filename @ 08015558 0548
+    ldr r2, retreat_scrollbar_pos_one_assert_pthis @ 0801555a 064a
     movs r1,#0x7f    @ 0801555c 7f21
     movs r3,#0x1    @ 0801555e 0123
     bl suppress_assert_report                @ 08015560 e4f0bcff
@@ -4527,10 +4527,10 @@ LAB_08015564:
     movs r0,#0x0    @ 0801556a 0020
     b LAB_0801557e                           @ 0801556c 07e0
     .zero  0x2
-DAT_08015570:
-    .word  0x09e39c68                     @ 08015570 689ce309
-DAT_08015574:
-    .word  0x09e39c7c                     @ 08015574 7c9ce309
+retreat_scrollbar_pos_one_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 08015570 689ce309  GL/GL_Scrollbar.c
+retreat_scrollbar_pos_one_assert_pthis:
+    .word  assert_pthis                   @ 08015574 7c9ce309  pThis
 LAB_08015578:
     subs r0,#0x1    @ 08015578 0138
     strh r0,[r4,#0x4]                        @ 0801557a a080
@@ -4551,8 +4551,8 @@ advance_scrollbar_pos_page:
     adds r4,r0,#0x0    @ 08015586 041c
     cmp r4,#0x0                              @ 08015588 002c
     bne LAB_08015598                         @ 0801558a 05d1
-    ldr r0, DAT_080155b8                     @ 0801558c 0a48
-    ldr r2, DAT_080155bc                     @ 0801558e 0b4a
+    ldr r0, advance_scrollbar_pos_page_gl_scrollbar_c_filename @ 0801558c 0a48
+    ldr r2, advance_scrollbar_pos_page_assert_pthis @ 0801558e 0b4a
     movs r1,#0x89    @ 08015590 8921
     movs r3,#0x1    @ 08015592 0123
     bl suppress_assert_report                @ 08015594 e4f0a2ff
@@ -4575,10 +4575,10 @@ LAB_080155b2:
     pop {r4}                                 @ 080155b2 10bc
     pop {r0}                                 @ 080155b4 01bc
     bx r0                                    @ 080155b6 0047
-DAT_080155b8:
-    .word  0x09e39c68                     @ 080155b8 689ce309
-DAT_080155bc:
-    .word  0x09e39c7c                     @ 080155bc 7c9ce309
+advance_scrollbar_pos_page_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 080155b8 689ce309  GL/GL_Scrollbar.c
+advance_scrollbar_pos_page_assert_pthis:
+    .word  assert_pthis                   @ 080155bc 7c9ce309  pThis
 
 @ GL/GL_Scrollbar.c line 144: page-up backward scroll. Symmetric sibling of advance_scrollbar_pos_page (0x08015584). Asserts pThis non-null, reads [pThis+0xb]=visible_count and [pThis+0x4]=current_pos. If current_pos<=visible_count, clamp to 0; else current_pos-=visible_count. Writes back. Implements Page Up -- retreats one full visible window. Returns void.
 @ 
@@ -4591,8 +4591,8 @@ retreat_scrollbar_pos_page:
     adds r4,r0,#0x0    @ 080155c2 041c
     cmp r4,#0x0                              @ 080155c4 002c
     bne LAB_080155d4                         @ 080155c6 05d1
-    ldr r0, DAT_080155e0                     @ 080155c8 0548
-    ldr r2, DAT_080155e4                     @ 080155ca 064a
+    ldr r0, retreat_scrollbar_pos_page_gl_scrollbar_c_filename @ 080155c8 0548
+    ldr r2, retreat_scrollbar_pos_page_assert_pthis @ 080155ca 064a
     movs r1,#0x90    @ 080155cc 9021
     movs r3,#0x1    @ 080155ce 0123
     bl suppress_assert_report                @ 080155d0 e4f084ff
@@ -4603,10 +4603,10 @@ LAB_080155d4:
     bls LAB_080155e8                         @ 080155da 05d9
     subs r0,r0,r1    @ 080155dc 401a
     b LAB_080155ea                           @ 080155de 04e0
-DAT_080155e0:
-    .word  0x09e39c68                     @ 080155e0 689ce309
-DAT_080155e4:
-    .word  0x09e39c7c                     @ 080155e4 7c9ce309
+retreat_scrollbar_pos_page_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 080155e0 689ce309  GL/GL_Scrollbar.c
+retreat_scrollbar_pos_page_assert_pthis:
+    .word  assert_pthis                   @ 080155e4 7c9ce309  pThis
 LAB_080155e8:
     movs r0,#0x0    @ 080155e8 0020
 LAB_080155ea:
@@ -4638,8 +4638,8 @@ update_scrollbar_thumb_display:
     adds r4,r0,#0x0    @ 080155f6 041c
     cmp r4,#0x0                              @ 080155f8 002c
     bne LAB_08015608                         @ 080155fa 05d1
-    ldr r0, DAT_0801562c                     @ 080155fc 0b48
-    ldr r2, DAT_08015630                     @ 080155fe 0c4a
+    ldr r0, update_scrollbar_thumb_display_gl_scrollbar_c_filename @ 080155fc 0b48
+    ldr r2, update_scrollbar_thumb_display_assert_pthis @ 080155fe 0c4a
     movs r1,#0x9a    @ 08015600 9a21
     movs r3,#0x1    @ 08015602 0123
     bl suppress_assert_report                @ 08015604 e4f06aff
@@ -4662,10 +4662,10 @@ LAB_08015626:
     pop {r4}                                 @ 08015626 10bc
     pop {r0}                                 @ 08015628 01bc
     bx r0                                    @ 0801562a 0047
-DAT_0801562c:
-    .word  0x09e39c68                     @ 0801562c 689ce309
-DAT_08015630:
-    .word  0x09e39c7c                     @ 08015630 7c9ce309
+update_scrollbar_thumb_display_gl_scrollbar_c_filename:
+    .word  gl_scrollbar_c_filename        @ 0801562c 689ce309  GL/GL_Scrollbar.c
+update_scrollbar_thumb_display_assert_pthis:
+    .word  assert_pthis                   @ 08015630 7c9ce309  pThis
 DAT_08015634:
     .word  0x000001ff                     @ 08015634 ff010000
 DAT_08015638:
@@ -4678,8 +4678,8 @@ alloc_nce_buff_slot:
     ldr r0,[r4,#0x0]                         @ 08015640 2068
     cmp r0,#0x1                              @ 08015642 0128
     ble LAB_08015652                         @ 08015644 05dd
-    ldr r0, DAT_08015668                     @ 08015646 0848
-    ldr r2, DAT_0801566c                     @ 08015648 084a
+    ldr r0, alloc_nce_buff_slot_ig2d_main_c_filename @ 08015646 0848
+    ldr r2, alloc_nce_buff_slot_assert_usedncebuff_ig2d_load_anm_max @ 08015648 084a
     movs r1,#0x2f    @ 0801564a 2f21
     movs r3,#0x1    @ 0801564c 0123
     bl suppress_assert_report                @ 0801564e e4f045ff
@@ -4695,10 +4695,10 @@ LAB_08015652:
     bx r1                                    @ 08015662 0847
 DAT_08015664:
     .word  0x03000bfc                     @ 08015664 fc0b0003
-DAT_08015668:
-    .word  0x09e3a488                     @ 08015668 88a4e309
-DAT_0801566c:
-    .word  0x09e3a498                     @ 0801566c 98a4e309
+alloc_nce_buff_slot_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015668 88a4e309  GL/IG2D_Main.c
+alloc_nce_buff_slot_assert_usedncebuff_ig2d_load_anm_max:
+    .word  assert_usedncebuff_ig2d_load_anm_max @ 0801566c 98a4e309  UsedNceBuff < IG2D_LOAD_ANM_MAX
 DAT_08015670:
     .word  0x03000c08                     @ 08015670 080c0003
 
@@ -4709,8 +4709,8 @@ alloc_char_data_slot:
     ldr r0,[r4,#0x0]                         @ 08015678 2068
     cmp r0,#0x1                              @ 0801567a 0128
     ble LAB_0801568a                         @ 0801567c 05dd
-    ldr r0, DAT_080156a0                     @ 0801567e 0848
-    ldr r2, DAT_080156a4                     @ 08015680 084a
+    ldr r0, alloc_char_data_slot_ig2d_main_c_filename @ 0801567e 0848
+    ldr r2, alloc_char_data_slot_assert_usednanbuff_ig2d_load_anm_max @ 08015680 084a
     movs r1,#0x34    @ 08015682 3421
     movs r3,#0x1    @ 08015684 0123
     bl suppress_assert_report                @ 08015686 e4f029ff
@@ -4726,10 +4726,10 @@ LAB_0801568a:
     bx r1                                    @ 0801569a 0847
 DAT_0801569c:
     .word  0x03000c00                     @ 0801569c 000c0003
-DAT_080156a0:
-    .word  0x09e3a488                     @ 080156a0 88a4e309
-DAT_080156a4:
-    .word  0x09e3a4b8                     @ 080156a4 b8a4e309
+alloc_char_data_slot_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 080156a0 88a4e309  GL/IG2D_Main.c
+alloc_char_data_slot_assert_usednanbuff_ig2d_load_anm_max:
+    .word  assert_usednanbuff_ig2d_load_anm_max @ 080156a4 b8a4e309  UsedNanBuff < IG2D_LOAD_ANM_MAX
 DAT_080156a8:
     .word  0x03002c08                     @ 080156a8 082c0003
 
@@ -4805,8 +4805,8 @@ get_anim_ctrl_seq_id:
     ldr r4,[r0,#0x18]                        @ 080156f6 8469
     cmp r4,#0x0                              @ 080156f8 002c
     bne LAB_08015708                         @ 080156fa 05d1
-    ldr r0, DWORD_08015710                   @ 080156fc 0448
-    ldr r2, DWORD_08015714                   @ 080156fe 054a
+    ldr r0, get_anim_ctrl_seq_id_ig2d_main_c_filename @ 080156fc 0448
+    ldr r2, get_anim_ctrl_seq_id_assert_psequence @ 080156fe 054a
     movs r1,#0x65    @ 08015700 6521
     movs r3,#0x1    @ 08015702 0123
     bl suppress_assert_report                @ 08015704 e4f0eafe
@@ -4815,10 +4815,10 @@ LAB_08015708:
     pop {r4}                                 @ 0801570a 10bc
     pop {r1}                                 @ 0801570c 02bc
     bx r1                                    @ 0801570e 0847
-DWORD_08015710:
-    .word  0x09e3a488                     @ 08015710 88a4e309
-DWORD_08015714:
-    .word  0x09e3a4d8                     @ 08015714 d8a4e309
+get_anim_ctrl_seq_id_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015710 88a4e309  GL/IG2D_Main.c
+get_anim_ctrl_seq_id_assert_psequence:
+    .word  assert_psequence               @ 08015714 d8a4e309  pSequence
 
 @ Minimal D_shared_mid hub (indeg=6, 2 instructions, 4 bytes). Body: ldrh r0,[r0,#0x0]; bx lr -- reads first u16 field of object and returns. Called by FUN_08013a68 (scene_demo) before comparing slot_idx; receives pointer loaded from gDemoState table by slot offset. Provides type-safe accessor for object's first u16 field (ID / count / type_code). r0=void* obj_ptr. Returns u16 first field value.
 read_obj_id_field:
@@ -5023,8 +5023,8 @@ apply_bg_affine_by_angle_scale:
     lsls r7,r6,#0x3    @ 0801587a f700
     cmp r6,#0x1                              @ 0801587c 012e
     bls LAB_0801588c                         @ 0801587e 05d9
-    ldr r0, DAT_08015914                     @ 08015880 2448
-    ldr r2, DAT_08015918                     @ 08015882 254a
+    ldr r0, apply_bg_affine_by_angle_scale_ig2d_main_c_filename @ 08015880 2448
+    ldr r2, apply_bg_affine_by_angle_scale_assert_bg_2_bg_3 @ 08015882 254a
     movs r1,#0xab    @ 08015884 ab21
     movs r3,#0x1    @ 08015886 0123
     bl suppress_assert_report                @ 08015888 e4f028fe
@@ -5096,10 +5096,10 @@ LAB_0801588c:
     pop {r4,r5,r6,r7}                        @ 0801590e f0bc
     pop {r0}                                 @ 08015910 01bc
     bx r0                                    @ 08015912 0047
-DAT_08015914:
-    .word  0x09e3a488                     @ 08015914 88a4e309
-DAT_08015918:
-    .word  0x09e3a4e4                     @ 08015918 e4a4e309
+apply_bg_affine_by_angle_scale_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015914 88a4e309  GL/IG2D_Main.c
+apply_bg_affine_by_angle_scale_assert_bg_2_bg_3:
+    .word  assert_bg_2_bg_3               @ 08015918 e4a4e309  bg == 2 || bg == 3
 PTR_BG2X_0801591c:
     .word  BG2X                           @ 0801591c 28000004
 PTR_BG2PA_08015920:
@@ -5112,7 +5112,7 @@ resolve_bg_affine_param_offset:
     beq LAB_08015948                         @ 08015928 0ed0
     cmp r0,#0x2                              @ 0801592a 0228
     beq LAB_0801594c                         @ 0801592c 0ed0
-    ldr r0, DAT_08015940                     @ 0801592e 0448
+    ldr r0, resolve_bg_affine_param_offset_ig2d_main_c_filename @ 0801592e 0448
     ldr r2, DAT_08015944                     @ 08015930 044a
     movs r1,#0xc0    @ 08015932 c021
     movs r3,#0x1    @ 08015934 0123
@@ -5120,8 +5120,8 @@ resolve_bg_affine_param_offset:
     movs r0,#0x0    @ 0801593a 0020
     b LAB_0801594e                           @ 0801593c 07e0
     .zero  0x2
-DAT_08015940:
-    .word  0x09e3a488                     @ 08015940 88a4e309
+resolve_bg_affine_param_offset_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015940 88a4e309  GL/IG2D_Main.c
 DAT_08015944:
     .word  0x09e3a4f8                     @ 08015944 f8a4e309
 LAB_08015948:
@@ -5170,8 +5170,8 @@ LAB_08015994:
     ldr r2,[sp,#0xc]                         @ 08015994 039a
     cmp r2,#0x0                              @ 08015996 002a
     bne LAB_080159a6                         @ 08015998 05d1
-    ldr r0, DAT_08015a78                     @ 0801599a 3748
-    ldr r2, DAT_08015a7c                     @ 0801599c 374a
+    ldr r0, setup_isd_cell_anim_oam_entry_ig2d_main_c_filename @ 0801599a 3748
+    ldr r2, setup_isd_cell_anim_oam_entry_assert_pcell_null @ 0801599c 374a
     movs r1,#0xe3    @ 0801599e e321
     movs r3,#0x1    @ 080159a0 0123
     bl suppress_assert_report                @ 080159a2 e4f09bfd
@@ -5281,10 +5281,10 @@ LAB_08015a60:
     .zero  0x2
 DAT_08015a74:
     .word  0x000001ff                     @ 08015a74 ff010000
-DAT_08015a78:
-    .word  0x09e3a488                     @ 08015a78 88a4e309
-DAT_08015a7c:
-    .word  0x09e3a4fc                     @ 08015a7c fca4e309
+setup_isd_cell_anim_oam_entry_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015a78 88a4e309  GL/IG2D_Main.c
+setup_isd_cell_anim_oam_entry_assert_pcell_null:
+    .word  assert_pcell_null              @ 08015a7c fca4e309  ( pCell ) != NULL
 DAT_08015a80:
     .word  0x030007f8                     @ 08015a80 f8070003
 DAT_08015a84:
@@ -5329,9 +5329,9 @@ alloc_cell_anim_slot:
     ldr r0,[r4,#0x0]                         @ 08015ac8 2068
     cmp r0,#0x3f                             @ 08015aca 3f28
     bls LAB_08015ada                         @ 08015acc 05d9
-    ldr r0, DAT_08015af4                     @ 08015ace 0948
+    ldr r0, alloc_cell_anim_slot_ig2d_main_c_filename @ 08015ace 0948
     ldr r1, DAT_08015af8                     @ 08015ad0 0949
-    ldr r2, DAT_08015afc                     @ 08015ad2 0a4a
+    ldr r2, alloc_cell_anim_slot_assert_usedcellanm_nelems_cellanmbank @ 08015ad2 0a4a
     movs r3,#0x1    @ 08015ad4 0123
     bl suppress_assert_report                @ 08015ad6 e4f001fd
 LAB_08015ada:
@@ -5348,12 +5348,12 @@ LAB_08015ada:
     .zero  0x2
 DAT_08015af0:
     .word  0x03000bf8                     @ 08015af0 f80b0003
-DAT_08015af4:
-    .word  0x09e3a488                     @ 08015af4 88a4e309
+alloc_cell_anim_slot_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015af4 88a4e309  GL/IG2D_Main.c
 DAT_08015af8:
     .word  0x00000127                     @ 08015af8 27010000
-DAT_08015afc:
-    .word  0x09e3a510                     @ 08015afc 10a5e309
+alloc_cell_anim_slot_assert_usedcellanm_nelems_cellanmbank:
+    .word  assert_usedcellanm_nelems_cellanmbank @ 08015afc 10a5e309  UsedCellAnm < NELEMS(CellAnmBank)
 DAT_08015b00:
     .word  0x02027d40                     @ 08015b00 407d0202
 
@@ -5372,18 +5372,18 @@ load_nce_cell_bank_from_file:
     adds r4,r1,#0x0    @ 08015b14 0c1c
     cmp r5,#0x0                              @ 08015b16 002d
     bne LAB_08015b28                         @ 08015b18 06d1
-    ldr r0, DAT_08015b58                     @ 08015b1a 0f48
+    ldr r0, load_nce_cell_bank_from_file_ig2d_main_c_filename @ 08015b1a 0f48
     movs r1,#0xcc    @ 08015b1c cc21
     lsls r1,r1,#0x1    @ 08015b1e 4900
-    ldr r2, DAT_08015b5c                     @ 08015b20 0e4a
+    ldr r2, load_nce_cell_bank_from_file_assert_ppcellbank_null @ 08015b20 0e4a
     movs r3,#0x1    @ 08015b22 0123
     bl suppress_assert_report                @ 08015b24 e4f0dafc
 LAB_08015b28:
     cmp r4,#0x0                              @ 08015b28 002c
     bne LAB_08015b38                         @ 08015b2a 05d1
-    ldr r0, DAT_08015b58                     @ 08015b2c 0a48
+    ldr r0, load_nce_cell_bank_from_file_ig2d_main_c_filename @ 08015b2c 0a48
     ldr r1, DAT_08015b60                     @ 08015b2e 0c49
-    ldr r2, DAT_08015b64                     @ 08015b30 0c4a
+    ldr r2, load_nce_cell_bank_from_file_assert_pfname_null @ 08015b30 0c4a
     movs r3,#0x1    @ 08015b32 0123
     bl suppress_assert_report                @ 08015b34 e4f0d2fc
 LAB_08015b38:
@@ -5400,14 +5400,14 @@ LAB_08015b38:
     beq LAB_08015b68                         @ 08015b52 09d0
     adds r0,r4,#0x0    @ 08015b54 201c
     b LAB_08015b6a                           @ 08015b56 08e0
-DAT_08015b58:
-    .word  0x09e3a488                     @ 08015b58 88a4e309
-DAT_08015b5c:
-    .word  0x09e3a534                     @ 08015b5c 34a5e309
+load_nce_cell_bank_from_file_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015b58 88a4e309  GL/IG2D_Main.c
+load_nce_cell_bank_from_file_assert_ppcellbank_null:
+    .word  assert_ppcellbank_null         @ 08015b5c 34a5e309  ( ppCellBank ) != NULL
 DAT_08015b60:
     .word  0x00000199                     @ 08015b60 99010000
-DAT_08015b64:
-    .word  0x09e3a54c                     @ 08015b64 4ca5e309
+load_nce_cell_bank_from_file_assert_pfname_null:
+    .word  assert_pfname_null             @ 08015b64 4ca5e309  ( pFname ) != NULL
 LAB_08015b68:
     movs r0,#0x0    @ 08015b68 0020
 LAB_08015b6a:
@@ -5422,18 +5422,18 @@ load_nanr_anim_bank_from_file:
     adds r4,r1,#0x0    @ 08015b74 0c1c
     cmp r5,#0x0                              @ 08015b76 002d
     bne LAB_08015b86                         @ 08015b78 05d1
-    ldr r0, DAT_08015bb8                     @ 08015b7a 0f48
+    ldr r0, load_nanr_anim_bank_from_file_ig2d_main_c_filename @ 08015b7a 0f48
     ldr r1, DAT_08015bbc                     @ 08015b7c 0f49
-    ldr r2, DAT_08015bc0                     @ 08015b7e 104a
+    ldr r2, load_nanr_anim_bank_from_file_assert_ppanimbank_null @ 08015b7e 104a
     movs r3,#0x1    @ 08015b80 0123
     bl suppress_assert_report                @ 08015b82 e4f0abfc
 LAB_08015b86:
     cmp r4,#0x0                              @ 08015b86 002c
     bne LAB_08015b98                         @ 08015b88 06d1
-    ldr r0, DAT_08015bb8                     @ 08015b8a 0b48
+    ldr r0, load_nanr_anim_bank_from_file_ig2d_main_c_filename @ 08015b8a 0b48
     movs r1,#0xe1    @ 08015b8c e121
     lsls r1,r1,#0x1    @ 08015b8e 4900
-    ldr r2, DAT_08015bc4                     @ 08015b90 0c4a
+    ldr r2, load_nanr_anim_bank_from_file_assert_pfname_null @ 08015b90 0c4a
     movs r3,#0x1    @ 08015b92 0123
     bl suppress_assert_report                @ 08015b94 e4f0a2fc
 LAB_08015b98:
@@ -5450,14 +5450,14 @@ LAB_08015b98:
     beq LAB_08015bc8                         @ 08015bb2 09d0
     adds r0,r4,#0x0    @ 08015bb4 201c
     b LAB_08015bca                           @ 08015bb6 08e0
-DAT_08015bb8:
-    .word  0x09e3a488                     @ 08015bb8 88a4e309
+load_nanr_anim_bank_from_file_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015bb8 88a4e309  GL/IG2D_Main.c
 DAT_08015bbc:
     .word  0x000001c1                     @ 08015bbc c1010000
-DAT_08015bc0:
-    .word  0x09e3a560                     @ 08015bc0 60a5e309
-DAT_08015bc4:
-    .word  0x09e3a54c                     @ 08015bc4 4ca5e309
+load_nanr_anim_bank_from_file_assert_ppanimbank_null:
+    .word  assert_ppanimbank_null         @ 08015bc0 60a5e309  ( ppAnimBank ) != NULL
+load_nanr_anim_bank_from_file_assert_pfname_null:
+    .word  assert_pfname_null             @ 08015bc4 4ca5e309  ( pFname ) != NULL
 LAB_08015bc8:
     movs r0,#0x0    @ 08015bc8 0020
 LAB_08015bca:
@@ -5472,17 +5472,17 @@ load_ncgr_char_data_from_file:
     adds r4,r1,#0x0    @ 08015bd4 0c1c
     cmp r5,#0x0                              @ 08015bd6 002d
     bne LAB_08015be6                         @ 08015bd8 05d1
-    ldr r0, DAT_08015c14                     @ 08015bda 0e48
+    ldr r0, load_ncgr_char_data_from_file_ig2d_main_c_filename @ 08015bda 0e48
     ldr r1, DAT_08015c18                     @ 08015bdc 0e49
-    ldr r2, DAT_08015c1c                     @ 08015bde 0f4a
+    ldr r2, load_ncgr_char_data_from_file_assert_ppchardata_null @ 08015bde 0f4a
     movs r3,#0x1    @ 08015be0 0123
     bl suppress_assert_report                @ 08015be2 e4f07bfc
 LAB_08015be6:
     cmp r4,#0x0                              @ 08015be6 002c
     bne LAB_08015bf6                         @ 08015be8 05d1
-    ldr r0, DAT_08015c14                     @ 08015bea 0a48
+    ldr r0, load_ncgr_char_data_from_file_ig2d_main_c_filename @ 08015bea 0a48
     ldr r1, DAT_08015c20                     @ 08015bec 0c49
-    ldr r2, DAT_08015c24                     @ 08015bee 0d4a
+    ldr r2, load_ncgr_char_data_from_file_assert_pfname_null @ 08015bee 0d4a
     movs r3,#0x1    @ 08015bf0 0123
     bl suppress_assert_report                @ 08015bf2 e4f073fc
 LAB_08015bf6:
@@ -5499,16 +5499,16 @@ LAB_08015bf6:
     adds r0,r4,#0x0    @ 08015c0e 201c
     b LAB_08015c2a                           @ 08015c10 0be0
     .zero  0x2
-DAT_08015c14:
-    .word  0x09e3a488                     @ 08015c14 88a4e309
+load_ncgr_char_data_from_file_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015c14 88a4e309  GL/IG2D_Main.c
 DAT_08015c18:
     .word  0x0000023e                     @ 08015c18 3e020000
-DAT_08015c1c:
-    .word  0x09e3a578                     @ 08015c1c 78a5e309
+load_ncgr_char_data_from_file_assert_ppchardata_null:
+    .word  assert_ppchardata_null         @ 08015c1c 78a5e309  ( ppCharData ) != NULL
 DAT_08015c20:
     .word  0x0000023f                     @ 08015c20 3f020000
-DAT_08015c24:
-    .word  0x09e3a54c                     @ 08015c24 4ca5e309
+load_ncgr_char_data_from_file_assert_pfname_null:
+    .word  assert_pfname_null             @ 08015c24 4ca5e309  ( pFname ) != NULL
 LAB_08015c28:
     movs r0,#0x0    @ 08015c28 0020
 LAB_08015c2a:
@@ -5523,17 +5523,17 @@ load_nclr_pltt_data_from_file:
     adds r4,r1,#0x0    @ 08015c34 0c1c
     cmp r5,#0x0                              @ 08015c36 002d
     bne LAB_08015c46                         @ 08015c38 05d1
-    ldr r0, DAT_08015c74                     @ 08015c3a 0e48
+    ldr r0, load_nclr_pltt_data_from_file_ig2d_main_c_filename @ 08015c3a 0e48
     ldr r1, DAT_08015c78                     @ 08015c3c 0e49
-    ldr r2, DAT_08015c7c                     @ 08015c3e 0f4a
+    ldr r2, load_nclr_pltt_data_from_file_assert_pppltdata_null @ 08015c3e 0f4a
     movs r3,#0x1    @ 08015c40 0123
     bl suppress_assert_report                @ 08015c42 e4f04bfc
 LAB_08015c46:
     cmp r4,#0x0                              @ 08015c46 002c
     bne LAB_08015c56                         @ 08015c48 05d1
-    ldr r0, DAT_08015c74                     @ 08015c4a 0a48
+    ldr r0, load_nclr_pltt_data_from_file_ig2d_main_c_filename @ 08015c4a 0a48
     ldr r1, DAT_08015c80                     @ 08015c4c 0c49
-    ldr r2, DAT_08015c84                     @ 08015c4e 0d4a
+    ldr r2, load_nclr_pltt_data_from_file_assert_pfname_null @ 08015c4e 0d4a
     movs r3,#0x1    @ 08015c50 0123
     bl suppress_assert_report                @ 08015c52 e4f043fc
 LAB_08015c56:
@@ -5550,16 +5550,16 @@ LAB_08015c56:
     adds r0,r4,#0x0    @ 08015c6e 201c
     b LAB_08015c8a                           @ 08015c70 0be0
     .zero  0x2
-DAT_08015c74:
-    .word  0x09e3a488                     @ 08015c74 88a4e309
+load_nclr_pltt_data_from_file_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015c74 88a4e309  GL/IG2D_Main.c
 DAT_08015c78:
     .word  0x00000266                     @ 08015c78 66020000
-DAT_08015c7c:
-    .word  0x09e3a590                     @ 08015c7c 90a5e309
+load_nclr_pltt_data_from_file_assert_pppltdata_null:
+    .word  assert_pppltdata_null          @ 08015c7c 90a5e309  ( ppPltData ) != NULL
 DAT_08015c80:
     .word  0x00000267                     @ 08015c80 67020000
-DAT_08015c84:
-    .word  0x09e3a54c                     @ 08015c84 4ca5e309
+load_nclr_pltt_data_from_file_assert_pfname_null:
+    .word  assert_pfname_null             @ 08015c84 4ca5e309  ( pFname ) != NULL
 LAB_08015c88:
     movs r0,#0x0    @ 08015c88 0020
 LAB_08015c8a:
@@ -5576,17 +5576,17 @@ copy_pltt_data_to_vram_proxy:
     adds r4,r3,#0x0    @ 08015c98 1c1c
     cmp r5,#0x0                              @ 08015c9a 002d
     bne LAB_08015caa                         @ 08015c9c 05d1
-    ldr r0, DAT_08015cd0                     @ 08015c9e 0c48
+    ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename @ 08015c9e 0c48
     ldr r1, DAT_08015cd4                     @ 08015ca0 0c49
-    ldr r2, DAT_08015cd8                     @ 08015ca2 0d4a
+    ldr r2, copy_pltt_data_to_vram_proxy_assert_psrcdata @ 08015ca2 0d4a
     movs r3,#0x1    @ 08015ca4 0123
     bl suppress_assert_report                @ 08015ca6 e4f019fc
 LAB_08015caa:
     cmp r4,#0x0                              @ 08015caa 002c
     bne LAB_08015cba                         @ 08015cac 05d1
-    ldr r0, DAT_08015cd0                     @ 08015cae 0848
+    ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename @ 08015cae 0848
     ldr r1, DAT_08015cdc                     @ 08015cb0 0a49
-    ldr r2, DAT_08015ce0                     @ 08015cb2 0b4a
+    ldr r2, copy_pltt_data_to_vram_proxy_assert_ppltproxt @ 08015cb2 0b4a
     movs r3,#0x1    @ 08015cb4 0123
     bl suppress_assert_report                @ 08015cb6 e4f011fc
 LAB_08015cba:
@@ -5600,22 +5600,22 @@ LAB_08015cba:
     lsrs r2,r2,#0xb    @ 08015cc8 d20a
     bl bios_cpu_fast_set                     @ 08015cca f8f093fb
     b LAB_08015cf4                           @ 08015cce 11e0
-DAT_08015cd0:
-    .word  0x09e3a488                     @ 08015cd0 88a4e309
+copy_pltt_data_to_vram_proxy_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015cd0 88a4e309  GL/IG2D_Main.c
 DAT_08015cd4:
     .word  0x000002d9                     @ 08015cd4 d9020000
-DAT_08015cd8:
-    .word  0x09e3a5a8                     @ 08015cd8 a8a5e309
+copy_pltt_data_to_vram_proxy_assert_psrcdata:
+    .word  assert_psrcdata                @ 08015cd8 a8a5e309  pSrcData
 DAT_08015cdc:
     .word  0x000002da                     @ 08015cdc da020000
-DAT_08015ce0:
-    .word  0x09e3a5b4                     @ 08015ce0 b4a5e309
+copy_pltt_data_to_vram_proxy_assert_ppltproxt:
+    .word  assert_ppltproxt               @ 08015ce0 b4a5e309  pPltProxt
 DAT_08015ce4:
     .word  0x05000200                     @ 08015ce4 00020005
 LAB_08015ce8:
-    ldr r0, DAT_08015d0c                     @ 08015ce8 0848
+    ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename_d0c @ 08015ce8 0848
     ldr r1, DAT_08015d10                     @ 08015cea 0949
-    ldr r2, DAT_08015d14                     @ 08015cec 094a
+    ldr r2, copy_pltt_data_to_vram_proxy_assert_false @ 08015cec 094a
     movs r3,#0x1    @ 08015cee 0123
     bl suppress_assert_report                @ 08015cf0 e4f0f4fb
 LAB_08015cf4:
@@ -5630,12 +5630,12 @@ LAB_08015cf4:
     pop {r4,r5,r6,r7}                        @ 08015d06 f0bc
     pop {r0}                                 @ 08015d08 01bc
     bx r0                                    @ 08015d0a 0047
-DAT_08015d0c:
-    .word  0x09e3a488                     @ 08015d0c 88a4e309
+copy_pltt_data_to_vram_proxy_ig2d_main_c_filename_d0c:
+    .word  ig2d_main_c_filename           @ 08015d0c 88a4e309  GL/IG2D_Main.c
 DAT_08015d10:
     .word  0x000002e3                     @ 08015d10 e3020000
-DAT_08015d14:
-    .word  0x09e3a5c0                     @ 08015d14 c0a5e309
+copy_pltt_data_to_vram_proxy_assert_false:
+    .word  assert_false                   @ 08015d14 c0a5e309  FALSE
     ROM_INCBIN 0x15d18, 0x18
 
 @ GL/IG2D_Main.c core G2D OBJ resource loader, line 813-874, indeg=6. r0=void* pOutState, r1=NNS_G2dCellAnimation** ppAnimCtrl (r8 via 0x4689), r2=G2dObjPathConfig* pPaths {ncer*,nanr*,ncgr*,nclr*}, r3=u32 vramFlags. Stack args: flag0/flag1/pFilePathTable/flag3/bufSize. Sequence: init_img_proxy_fields + init_renderer_img_proxy_fields, load_nce_cell_bank_from_file + load_nanr_anim_bank_from_file, alloc_cell_anim_slot + get_anim_sequence_ptr_by_index + bind_cell_anim_to_bank per seq, optional load_ncgr_char_data_from_file + load_img_proxy_to_vram (NCGR path), optional load_nclr_pltt_data_from_file + copy_pltt_data_to_vram_proxy (NCLR path). Side-effects: VRAM OBJ tile+palette written; ppAnimCtrl slots bound; ImageProxy set.
@@ -5668,9 +5668,9 @@ load_g2d_obj_resource_set:
     bl load_nce_cell_bank_from_file          @ 08015d66 fff7d3fe
     cmp r0,#0x0                              @ 08015d6a 0028
     bne LAB_08015d7a                         @ 08015d6c 05d1
-    ldr r0, DAT_08015e74                     @ 08015d6e 4148
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d6e 4148
     ldr r1, DAT_08015e78                     @ 08015d70 4149
-    ldr r2, DAT_08015e7c                     @ 08015d72 424a
+    ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015d72 424a
     movs r3,#0x1    @ 08015d74 0123
     bl suppress_assert_report                @ 08015d76 e4f0b1fb
 LAB_08015d7a:
@@ -5680,9 +5680,9 @@ LAB_08015d7a:
     bl load_nanr_anim_bank_from_file         @ 08015d80 fff7f6fe
     cmp r0,#0x0                              @ 08015d84 0028
     bne LAB_08015d94                         @ 08015d86 05d1
-    ldr r0, DAT_08015e74                     @ 08015d88 3a48
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d88 3a48
     ldr r1, DAT_08015e80                     @ 08015d8a 3d49
-    ldr r2, DAT_08015e7c                     @ 08015d8c 3b4a
+    ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015d8c 3b4a
     movs r3,#0x1    @ 08015d8e 0123
     bl suppress_assert_report                @ 08015d90 e4f0a4fb
 LAB_08015d94:
@@ -5690,9 +5690,9 @@ LAB_08015d94:
     ldrh r0,[r0,#0x0]                        @ 08015d96 0088
     cmp r0,#0x0                              @ 08015d98 0028
     bne LAB_08015da8                         @ 08015d9a 05d1
-    ldr r0, DAT_08015e74                     @ 08015d9c 3548
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d9c 3548
     ldr r1, DAT_08015e84                     @ 08015d9e 3949
-    ldr r2, DAT_08015e88                     @ 08015da0 394a
+    ldr r2, load_g2d_obj_resource_set_assert_ppanimbank_numsequences_0 @ 08015da0 394a
     movs r3,#0x1    @ 08015da2 0123
     bl suppress_assert_report                @ 08015da4 e4f09afb
 LAB_08015da8:
@@ -5710,9 +5710,9 @@ LAB_08015db4:
     ldr r0,[r1,#0x0]                         @ 08015dbe 0868
     cmp r0,#0x0                              @ 08015dc0 0028
     bne LAB_08015dd0                         @ 08015dc2 05d1
-    ldr r0, DAT_08015e74                     @ 08015dc4 2b48
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015dc4 2b48
     ldr r1, DAT_08015e8c                     @ 08015dc6 3149
-    ldr r2, DAT_08015e90                     @ 08015dc8 314a
+    ldr r2, load_g2d_obj_resource_set_assert_ppcellanim_null @ 08015dc8 314a
     movs r3,#0x1    @ 08015dca 0123
     bl suppress_assert_report                @ 08015dcc e4f086fb
 LAB_08015dd0:
@@ -5721,9 +5721,9 @@ LAB_08015dd0:
     ldr r0,[r0,#0x4]                         @ 08015dd4 4068
     cmn r0,r1                                @ 08015dd6 c842
     bne LAB_08015de6                         @ 08015dd8 05d1
-    ldr r0, DAT_08015e74                     @ 08015dda 2648
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015dda 2648
     ldr r1, DAT_08015e94                     @ 08015ddc 2d49
-    ldr r2, DAT_08015e98                     @ 08015dde 2e4a
+    ldr r2, load_g2d_obj_resource_set_assert_ppanimbank_psequencearrayhead @ 08015dde 2e4a
     movs r3,#0x1    @ 08015de0 0123
     bl suppress_assert_report                @ 08015de2 e4f07bfb
 LAB_08015de6:
@@ -5751,9 +5751,9 @@ LAB_08015e08:
     bl load_ncgr_char_data_from_file         @ 08015e12 fff7ddfe
     cmp r0,#0x0                              @ 08015e16 0028
     bne LAB_08015e26                         @ 08015e18 05d1
-    ldr r0, DAT_08015e74                     @ 08015e1a 1648
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015e1a 1648
     ldr r1, DAT_08015e9c                     @ 08015e1c 1f49
-    ldr r2, DAT_08015e7c                     @ 08015e1e 174a
+    ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015e1e 174a
     movs r3,#0x1    @ 08015e20 0123
     bl suppress_assert_report                @ 08015e22 e4f05bfb
 LAB_08015e26:
@@ -5771,9 +5771,9 @@ LAB_08015e32:
     bl load_nclr_pltt_data_from_file         @ 08015e3c fff7f8fe
     cmp r0,#0x0                              @ 08015e40 0028
     bne LAB_08015e50                         @ 08015e42 05d1
-    ldr r0, DAT_08015e74                     @ 08015e44 0b48
+    ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015e44 0b48
     ldr r1, DAT_08015ea0                     @ 08015e46 1649
-    ldr r2, DAT_08015e7c                     @ 08015e48 0c4a
+    ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015e48 0c4a
     movs r3,#0x1    @ 08015e4a 0123
     bl suppress_assert_report                @ 08015e4c e4f046fb
 LAB_08015e50:
@@ -5795,26 +5795,26 @@ LAB_08015e64:
     pop {r4,r5,r6,r7}                        @ 08015e6e f0bc
     pop {r0}                                 @ 08015e70 01bc
     bx r0                                    @ 08015e72 0047
-DAT_08015e74:
-    .word  0x09e3a488                     @ 08015e74 88a4e309
+load_g2d_obj_resource_set_ig2d_main_c_filename:
+    .word  ig2d_main_c_filename           @ 08015e74 88a4e309  GL/IG2D_Main.c
 DAT_08015e78:
     .word  0x0000032d                     @ 08015e78 2d030000
-DAT_08015e7c:
-    .word  0x09e3a5c8                     @ 08015e7c c8a5e309
+load_g2d_obj_resource_set_assert_pbuf_null:
+    .word  assert_pbuf_null               @ 08015e7c c8a5e309  ( pBuf ) != NULL
 DAT_08015e80:
     .word  0x00000331                     @ 08015e80 31030000
 DAT_08015e84:
     .word  0x0000033a                     @ 08015e84 3a030000
-DAT_08015e88:
-    .word  0x09e3a5dc                     @ 08015e88 dca5e309
+load_g2d_obj_resource_set_assert_ppanimbank_numsequences_0:
+    .word  assert_ppanimbank_numsequences_0 @ 08015e88 dca5e309  (*ppAnimBank)->numSequences != 0
 DAT_08015e8c:
     .word  0x0000033f                     @ 08015e8c 3f030000
-DAT_08015e90:
-    .word  0x09e3a600                     @ 08015e90 00a6e309
+load_g2d_obj_resource_set_assert_ppcellanim_null:
+    .word  assert_ppcellanim_null         @ 08015e90 00a6e309  ( *ppCellAnim ) != NULL
 DAT_08015e94:
     .word  0x00000341                     @ 08015e94 41030000
-DAT_08015e98:
-    .word  0x09e3a618                     @ 08015e98 18a6e309
+load_g2d_obj_resource_set_assert_ppanimbank_psequencearrayhead:
+    .word  assert_ppanimbank_psequencearrayhead @ 08015e98 18a6e309  ( &((*ppAnimBank)->pSequenceArrayHead[i]) ) != NULL
 DAT_08015e9c:
     .word  0x00000355                     @ 08015e9c 55030000
 DAT_08015ea0:
@@ -6065,14 +6065,14 @@ set_isd_affine_matrix_ptr_by_type:
     beq LAB_080160b8                         @ 0801609c 0cd0
     cmp r0,#0x9                              @ 0801609e 0928
     beq LAB_080160c0                         @ 080160a0 0ed0
-    ldr r0, DWORD_080160b0                   @ 080160a2 0348
+    ldr r0, set_isd_affine_matrix_ptr_by_type_isd_draw_c_filename @ 080160a2 0348
     ldr r2, DWORD_080160b4                   @ 080160a4 034a
     movs r1,#0x76    @ 080160a6 7621
     movs r3,#0x1    @ 080160a8 0123
     bl suppress_assert_report                @ 080160aa e4f017fa
     b LAB_080160c4                           @ 080160ae 09e0
-DWORD_080160b0:
-    .word  0x09e3a64c                     @ 080160b0 4ca6e309
+set_isd_affine_matrix_ptr_by_type_isd_draw_c_filename:
+    .word  isd_draw_c_filename            @ 080160b0 4ca6e309  GL/ISD_Draw.c
 DWORD_080160b4:
     .word  0x09e3a65c                     @ 080160b4 5ca6e309
 LAB_080160b8:
@@ -6115,15 +6115,15 @@ get_isd_affine_matrix_ptr_from_obj:
     beq LAB_080160f4                         @ 080160d6 0dd0
     cmp r0,#0x9                              @ 080160d8 0928
     beq LAB_080160fc                         @ 080160da 0fd0
-    ldr r0, DWORD_080160ec                   @ 080160dc 0348
+    ldr r0, get_isd_affine_matrix_ptr_from_obj_isd_draw_c_filename @ 080160dc 0348
     ldr r2, DWORD_080160f0                   @ 080160de 044a
     movs r1,#0x82    @ 080160e0 8221
     movs r3,#0x1    @ 080160e2 0123
     bl suppress_assert_report                @ 080160e4 e4f0faf9
     movs r0,#0x0    @ 080160e8 0020
     b LAB_08016100                           @ 080160ea 09e0
-DWORD_080160ec:
-    .word  0x09e3a64c                     @ 080160ec 4ca6e309
+get_isd_affine_matrix_ptr_from_obj_isd_draw_c_filename:
+    .word  isd_draw_c_filename            @ 080160ec 4ca6e309  GL/ISD_Draw.c
 DWORD_080160f0:
     .word  0x09e3a65c                     @ 080160f0 5ca6e309
 LAB_080160f4:
@@ -6148,7 +6148,7 @@ resolve_isd_affine_matrix_ptr:
     beq LAB_0801612c                         @ 0801610c 0ed0
     cmp r0,#0x9                              @ 0801610e 0928
     beq LAB_08016134                         @ 08016110 10d0
-    ldr r0, DAT_08016124                     @ 08016112 0448
+    ldr r0, resolve_isd_affine_matrix_ptr_isd_draw_c_filename @ 08016112 0448
     ldr r2, DAT_08016128                     @ 08016114 044a
     movs r1,#0x8c    @ 08016116 8c21
     movs r3,#0x1    @ 08016118 0123
@@ -6156,8 +6156,8 @@ resolve_isd_affine_matrix_ptr:
     movs r0,#0x0    @ 0801611e 0020
     b LAB_08016138                           @ 08016120 0ae0
     .zero  0x2
-DAT_08016124:
-    .word  0x09e3a64c                     @ 08016124 4ca6e309
+resolve_isd_affine_matrix_ptr_isd_draw_c_filename:
+    .word  isd_draw_c_filename            @ 08016124 4ca6e309  GL/ISD_Draw.c
 DAT_08016128:
     .word  0x09e3a65c                     @ 08016128 5ca6e309
 LAB_0801612c:
@@ -6802,13 +6802,13 @@ LAB_080164e0:
     beq LAB_0801651c                         @ 080164fe 0dd0
     cmp r0,#0x3                              @ 08016500 0328
     beq LAB_08016522                         @ 08016502 0ed0
-    ldr r0, DAT_08016510                     @ 08016504 0248
+    ldr r0, write_tile_region_to_bg_screen_isd_draw_c_filename @ 08016504 0248
     ldr r1, DAT_08016514                     @ 08016506 0349
     ldr r2, DAT_08016518                     @ 08016508 034a
     bl suppress_assert_report                @ 0801650a e3f0e7ff
     b LAB_08016528                           @ 0801650e 0be0
-DAT_08016510:
-    .word  0x09e3a64c                     @ 08016510 4ca6e309
+write_tile_region_to_bg_screen_isd_draw_c_filename:
+    .word  isd_draw_c_filename            @ 08016510 4ca6e309  GL/ISD_Draw.c
 DAT_08016514:
     .word  0x0000016b                     @ 08016514 6b010000
 DAT_08016518:
@@ -7550,8 +7550,8 @@ resolve_prhlist_entry_name_ptr:
     ldrb r0,[r4,#0x0]                        @ 08016b02 2078
     cmp r0,#0x0                              @ 08016b04 0028
     bne LAB_08016b14                         @ 08016b06 05d1
-    ldr r0, DAT_08016b4c                     @ 08016b08 1048
-    ldr r2, DAT_08016b50                     @ 08016b0a 114a
+    ldr r0, resolve_prhlist_entry_name_ptr_prh_main_c_filename @ 08016b08 1048
+    ldr r2, resolve_prhlist_entry_name_ptr_assert_pdst_nameid @ 08016b0a 114a
     movs r1,#0x26    @ 08016b0c 2621
     movs r3,#0x1    @ 08016b0e 0123
     bl suppress_assert_report                @ 08016b10 e3f0e4fc
@@ -7583,10 +7583,10 @@ LAB_08016b14:
     bx r1                                    @ 08016b46 0847
 DAT_08016b48:
     .word  0x00000201                     @ 08016b48 01020000
-DAT_08016b4c:
-    .word  0x09e3a770                     @ 08016b4c 70a7e309
-DAT_08016b50:
-    .word  0x09e3a780                     @ 08016b50 80a7e309
+resolve_prhlist_entry_name_ptr_prh_main_c_filename:
+    .word  prh_main_c_filename            @ 08016b4c 70a7e309  GL/PRH_Main.c
+resolve_prhlist_entry_name_ptr_assert_pdst_nameid:
+    .word  assert_pdst_nameid             @ 08016b50 80a7e309  pDst->nameID
 DAT_08016b54:
     .word  0x00001072                     @ 08016b54 72100000
 PTR_game_str_pointer_table_08016b58:
@@ -9222,9 +9222,9 @@ LAB_08017abe:
     ldr r0, DAT_08017b20                     @ 08017ace 1448
     cmp r1,r0                                @ 08017ad0 8142
     bls LAB_08017ae0                         @ 08017ad2 05d9
-    ldr r0, DAT_08017b24                     @ 08017ad4 1348
+    ldr r0, encode_str_table_entry_to_line_buf_name_main_c_filename @ 08017ad4 1348
     ldr r1, DAT_08017b28                     @ 08017ad6 1449
-    ldr r2, DAT_08017b2c                     @ 08017ad8 144a
+    ldr r2, encode_str_table_entry_to_line_buf_assert_cnt_name_mojitbl_width_1_name @ 08017ad8 144a
     movs r3,#0x1    @ 08017ada 0123
     bl suppress_assert_report                @ 08017adc e2f0fefc
 LAB_08017ae0:
@@ -9258,12 +9258,12 @@ DAT_08017b1c:
     .word  0x0000e3a9                     @ 08017b1c a9e30000
 DAT_08017b20:
     .word  0x00000117                     @ 08017b20 17010000
-DAT_08017b24:
-    .word  0x09e3b2b8                     @ 08017b24 b8b2e309
+encode_str_table_entry_to_line_buf_name_main_c_filename:
+    .word  name_main_c_filename           @ 08017b24 b8b2e309  NameInput/Name_main.c
 DAT_08017b28:
     .word  0x00000189                     @ 08017b28 89010000
-DAT_08017b2c:
-    .word  0x09e3b2d0                     @ 08017b2c d0b2e309
+encode_str_table_entry_to_line_buf_assert_cnt_name_mojitbl_width_1_name:
+    .word  assert_cnt_name_mojitbl_width_1_name @ 08017b2c d0b2e309  (cnt + NAME_MOJITBL_WIDTH - 1) / NAME_MOJITBL_WIDTH * NAME_M
 DAT_08017b30:
     .word  0x09e3b338                     @ 08017b30 38b3e309
 LAB_08017b34:
@@ -9917,10 +9917,10 @@ set_name_scroll_step:
     rsbs r0,r0,#0    @ 08017fb0 4042
     cmp r4,r0                                @ 08017fb2 8442
     beq LAB_08017fc4                         @ 08017fb4 06d0
-    ldr r0, DAT_08017fd8                     @ 08017fb6 0848
+    ldr r0, set_name_scroll_step_name_main_c_filename @ 08017fb6 0848
     movs r1,#0x92    @ 08017fb8 9221
     lsls r1,r1,#0x2    @ 08017fba 8900
-    ldr r2, DAT_08017fdc                     @ 08017fbc 074a
+    ldr r2, set_name_scroll_step_assert_dir_1_dir_1 @ 08017fbc 074a
     movs r3,#0x1    @ 08017fbe 0123
     bl suppress_assert_report                @ 08017fc0 e2f08cfa
 LAB_08017fc4:
@@ -9934,10 +9934,10 @@ LAB_08017fc4:
     .zero  0x2
 DAT_08017fd4:
     .word  0x02029250                     @ 08017fd4 50920202
-DAT_08017fd8:
-    .word  0x09e3b2b8                     @ 08017fd8 b8b2e309
-DAT_08017fdc:
-    .word  0x09e3b348                     @ 08017fdc 48b3e309
+set_name_scroll_step_name_main_c_filename:
+    .word  name_main_c_filename           @ 08017fd8 b8b2e309  NameInput/Name_main.c
+set_name_scroll_step_assert_dir_1_dir_1:
+    .word  assert_dir_1_dir_1             @ 08017fdc 48b3e309  dir == 1 || dir == -1
 DAT_08017fe0:
     .word  0x0000031a                     @ 08017fe0 1a030000
 
@@ -10294,7 +10294,7 @@ write_bg1_vofs_with_bias:
 PTR_BG1VOFS_0801825c:
     .word  BG1VOFS                        @ 0801825c 16000004
 
-@ Advances NNS G2D cell animation for OBJ slot (slot_idx) and writes OAM entry at screen coordinates. First validates obj_id via read_obj_id_field (fires assert via suppress_assert_report nns_g2d_assert_anmID line 736 if out of bounds); gets NNS_G2dCellAnimation* from game_state[8+slot_idx*4]. If seq_id==-1 calls dispatch_cell_anim_frame_advance; else truncates seq_id to u16 and calls dispatch_cell_anim_sequence_step. Then packs x/y (left-shifted 12 to 12.4 fixed-point) + OAM flags into struct, calls dispatch_isd_cell_anim_oam_setup to submit OAM entry.
+@ Advances NNS G2D cell animation for OBJ slot (slot_idx) and writes OAM entry at screen coordinates. First validates obj_id via read_obj_id_field (fires assert via suppress_assert_report assert_anmid_ig2d_getanmsequencescoun line 736 if out of bounds); gets NNS_G2dCellAnimation* from game_state[8+slot_idx*4]. If seq_id==-1 calls dispatch_cell_anim_frame_advance; else truncates seq_id to u16 and calls dispatch_cell_anim_sequence_step. Then packs x/y (left-shifted 12 to 12.4 fixed-point) + OAM flags into struct, calls dispatch_isd_cell_anim_oam_setup to submit OAM entry.
 @ 
 @ Params: r0=u8 obj_slot_idx [0..obj_count-1]; r1=s16 seq_id (-1=frame advance only, [0..N-1]=set+step sequence); r2=u8 x_pos [0..255]; r3=u8 y_pos [0..191]; sp[0]=u32 oam_attr0_flags; sp[4]=u32 oam_palette_flags
 @ Returns: void (pop {r0}; bx r0 tail-call exit)
@@ -10316,10 +10316,10 @@ render_obj_slot_cell_anim:
     bl read_obj_id_field                     @ 08018278 fdf74efa
     cmp r4,r0                                @ 0801827c 8442
     blt LAB_0801828e                         @ 0801827e 06db
-    ldr r0, DAT_080182b0                     @ 08018280 0b48
+    ldr r0, render_obj_slot_cell_anim_name_main_c_filename @ 08018280 0b48
     movs r1,#0xb8    @ 08018282 b821
     lsls r1,r1,#0x2    @ 08018284 8900
-    ldr r2, PTR_nns_g2d_assert_anmID_080182b4 @ 08018286 0b4a
+    ldr r2, render_obj_slot_cell_anim_assert_anmid_ig2d_getanmsequencescoun @ 08018286 0b4a
     movs r3,#0x1    @ 08018288 0123
     bl suppress_assert_report                @ 0801828a e2f027f9
 LAB_0801828e:
@@ -10339,10 +10339,10 @@ LAB_0801828e:
     .zero  0x2
 DAT_080182ac:
     .word  0x02029250                     @ 080182ac 50920202
-DAT_080182b0:
-    .word  0x09e3b2b8                     @ 080182b0 b8b2e309
-PTR_nns_g2d_assert_anmID_080182b4:
-    .word  nns_g2d_assert_anmID           @ 080182b4 34b4e309
+render_obj_slot_cell_anim_name_main_c_filename:
+    .word  name_main_c_filename           @ 080182b0 b8b2e309  NameInput/Name_main.c
+render_obj_slot_cell_anim_assert_anmid_ig2d_getanmsequencescoun:
+    .word  assert_anmid_ig2d_getanmsequencescoun @ 080182b4 34b4e309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 LAB_080182b8:
     lsls r1,r6,#0x10    @ 080182b8 3104
     lsrs r1,r1,#0x10    @ 080182ba 090c
@@ -14555,9 +14555,9 @@ set_banlist_scroll_step:
     rsbs r0,r0,#0    @ 0801a178 4042
     cmp r4,r0                                @ 0801a17a 8442
     beq LAB_0801a18a                         @ 0801a17c 05d0
-    ldr r0, DWORD_0801a19c                   @ 0801a17e 0748
+    ldr r0, set_banlist_scroll_step_pass_main_c_filename @ 0801a17e 0748
     ldr r1, DWORD_0801a1a0                   @ 0801a180 0749
-    ldr r2, DWORD_0801a1a4                   @ 0801a182 084a
+    ldr r2, set_banlist_scroll_step_assert_dir_1_dir_1_59c @ 0801a182 084a
     movs r3,#0x1    @ 0801a184 0123
     bl suppress_assert_report                @ 0801a186 e0f0a9f9
 LAB_0801a18a:
@@ -14570,12 +14570,12 @@ LAB_0801a18a:
     bx r0                                    @ 0801a196 0047
 PTR_gBanlistPasswordBuffer_0801a198:
     .word  gBanlistPasswordBuffer         @ 0801a198 10980202
-DWORD_0801a19c:
-    .word  0x09e3c584                     @ 0801a19c 84c5e309
+set_banlist_scroll_step_pass_main_c_filename:
+    .word  pass_main_c_filename           @ 0801a19c 84c5e309  PassInput/Pass_main.c
 DWORD_0801a1a0:
     .word  0x000002cd                     @ 0801a1a0 cd020000
-DWORD_0801a1a4:
-    .word  0x09e3c59c                     @ 0801a1a4 9cc5e309
+set_banlist_scroll_step_assert_dir_1_dir_1_59c:
+    .word  assert_dir_1_dir_1_59c         @ 0801a1a4 9cc5e309  dir == 1 || dir == -1
 DWORD_0801a1a8:
     .word  0x00000666                     @ 0801a1a8 66060000
 
@@ -14995,9 +14995,9 @@ tick_banlist_card_slot_anim_oam:
     bl read_obj_id_field                     @ 0801a4b8 fbf72ef9
     cmp r4,r0                                @ 0801a4bc 8442
     blt LAB_0801a4cc                         @ 0801a4be 05db
-    ldr r0, DAT_0801a4f0                     @ 0801a4c0 0b48
+    ldr r0, tick_banlist_card_slot_anim_oam_pass_main_c_filename @ 0801a4c0 0b48
     ldr r1, DAT_0801a4f4                     @ 0801a4c2 0c49
-    ldr r2, DAT_0801a4f8                     @ 0801a4c4 0c4a
+    ldr r2, tick_banlist_card_slot_anim_oam_assert_anmid_ig2d_getanmsequencescoun_670 @ 0801a4c4 0c4a
     movs r3,#0x1    @ 0801a4c6 0123
     bl suppress_assert_report                @ 0801a4c8 e0f008f8
 LAB_0801a4cc:
@@ -15018,12 +15018,12 @@ PTR_gBanlistPasswordBuffer_0801a4e8:
     .word  gBanlistPasswordBuffer         @ 0801a4e8 10980202
 DAT_0801a4ec:
     .word  0x000005a4                     @ 0801a4ec a4050000
-DAT_0801a4f0:
-    .word  0x09e3c584                     @ 0801a4f0 84c5e309
+tick_banlist_card_slot_anim_oam_pass_main_c_filename:
+    .word  pass_main_c_filename           @ 0801a4f0 84c5e309  PassInput/Pass_main.c
 DAT_0801a4f4:
     .word  0x0000036f                     @ 0801a4f4 6f030000
-DAT_0801a4f8:
-    .word  0x09e3c670                     @ 0801a4f8 70c6e309
+tick_banlist_card_slot_anim_oam_assert_anmid_ig2d_getanmsequencescoun_670:
+    .word  assert_anmid_ig2d_getanmsequencescoun @ 0801a4f8 70c6e309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 DAT_0801a4fc:
     .word  0x000005ac                     @ 0801a4fc ac050000
 LAB_0801a500:
@@ -17467,9 +17467,9 @@ DAT_0801b714:
 LAB_0801b718:
     cmp r4,#0xb                              @ 0801b718 0b2c
     bls LAB_0801b728                         @ 0801b71a 05d9
-    ldr r0, DAT_0801b754                     @ 0801b71c 0d48
+    ldr r0, dispatch_banlist_pass_input_frame_pass_main_c_filename @ 0801b71c 0d48
     ldr r1, DAT_0801b758                     @ 0801b71e 0e49
-    ldr r2, DAT_0801b75c                     @ 0801b720 0e4a
+    ldr r2, dispatch_banlist_pass_input_frame_assert_dstbuffid_0_dstbuffid_def_prhl @ 0801b720 0e4a
     movs r3,#0x1    @ 0801b722 0123
     bl suppress_assert_report                @ 0801b724 def0dafe
 LAB_0801b728:
@@ -17495,12 +17495,12 @@ LAB_0801b74c:
     bl return_void_handler                   @ 0801b74c def0c2fe
     movs r0,#0x0    @ 0801b750 0020
     b LAB_0801b772                           @ 0801b752 0ee0
-DAT_0801b754:
-    .word  0x09e3c584                     @ 0801b754 84c5e309
+dispatch_banlist_pass_input_frame_pass_main_c_filename:
+    .word  pass_main_c_filename           @ 0801b754 84c5e309  PassInput/Pass_main.c
 DAT_0801b758:
     .word  0x000006f5                     @ 0801b758 f5060000
-DAT_0801b75c:
-    .word  0x09e3c6b4                     @ 0801b75c b4c6e309
+dispatch_banlist_pass_input_frame_assert_dstbuffid_0_dstbuffid_def_prhl:
+    .word  assert_dstbuffid_0_dstbuffid_def_prhl @ 0801b75c b4c6e309  dstBuffID >= 0 && dstBuffID < DEF_PRHLIST_MAX
 DAT_0801b760:
     .word  0x00000663                     @ 0801b760 63060000
 DAT_0801b764:
@@ -18041,8 +18041,8 @@ advance_shuen_cell_anim_frame:
     bl read_obj_id_field                     @ 0801bb40 f9f7eafd
     cmp r5,r0                                @ 0801bb44 8542
     blt LAB_0801bb54                         @ 0801bb46 05db
-    ldr r0, DAT_0801bb98                     @ 0801bb48 1348
-    ldr r2, DAT_0801bb9c                     @ 0801bb4a 144a
+    ldr r0, advance_shuen_cell_anim_frame_shu_main_c_filename @ 0801bb48 1348
+    ldr r2, advance_shuen_cell_anim_frame_assert_anmid_ig2d_getanmsequencescoun_f84 @ 0801bb4a 144a
     movs r1,#0xef    @ 0801bb4c ef21
     movs r3,#0x1    @ 0801bb4e 0123
     bl suppress_assert_report                @ 0801bb50 def0c4fc
@@ -18078,10 +18078,10 @@ LAB_0801bb82:
     .zero  0x2
 DAT_0801bb94:
     .word  gDemoState                     @ 0801bb94 c09e0202
-DAT_0801bb98:
-    .word  0x09e3cf70                     @ 0801bb98 70cfe309
-DAT_0801bb9c:
-    .word  0x09e3cf84                     @ 0801bb9c 84cfe309
+advance_shuen_cell_anim_frame_shu_main_c_filename:
+    .word  shu_main_c_filename            @ 0801bb98 70cfe309  Shuen/SHU_main.c
+advance_shuen_cell_anim_frame_assert_anmid_ig2d_getanmsequencescoun_f84:
+    .word  assert_anmid_ig2d_getanmsequencescoun_f84 @ 0801bb9c 84cfe309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 LAB_0801bba0:
     lsls r1,r6,#0x10    @ 0801bba0 3104
     lsrs r1,r1,#0x10    @ 0801bba2 090c
@@ -19457,8 +19457,8 @@ drive_vija_obj_cell_anim:
     bl read_obj_id_field                     @ 0801c5f0 f9f792f8
     cmp r4,r0                                @ 0801c5f4 8442
     blt LAB_0801c604                         @ 0801c5f6 05db
-    ldr r0, DAT_0801c62c                     @ 0801c5f8 0c48
-    ldr r2, DAT_0801c630                     @ 0801c5fa 0d4a
+    ldr r0, drive_vija_obj_cell_anim_vij_main_c_filename @ 0801c5f8 0c48
+    ldr r2, drive_vija_obj_cell_anim_assert_anmid_ig2d_getanmsequencescoun_994 @ 0801c5fa 0d4a
     movs r1,#0xf2    @ 0801c5fc f221
     movs r3,#0x1    @ 0801c5fe 0123
     bl suppress_assert_report                @ 0801c600 ddf06cff
@@ -19482,10 +19482,10 @@ LAB_0801c604:
     .zero  0x2
 DAT_0801c628:
     .word  0x02029eb0                     @ 0801c628 b09e0202
-DAT_0801c62c:
-    .word  0x09e3d984                     @ 0801c62c 84d9e309
-DAT_0801c630:
-    .word  0x09e3d994                     @ 0801c630 94d9e309
+drive_vija_obj_cell_anim_vij_main_c_filename:
+    .word  vij_main_c_filename            @ 0801c62c 84d9e309  Vija/VIJ_main.c
+drive_vija_obj_cell_anim_assert_anmid_ig2d_getanmsequencescoun_994:
+    .word  assert_anmid_ig2d_getanmsequencescoun_994 @ 0801c630 94d9e309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 LAB_0801c634:
     lsls r1,r5,#0x10    @ 0801c634 2904
     lsrs r1,r1,#0x10    @ 0801c636 090c

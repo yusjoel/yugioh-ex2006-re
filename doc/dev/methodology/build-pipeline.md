@@ -144,6 +144,9 @@ tools/asm-regen/ghidra-run-script.bat ExportRomLabelsToInc.py
 
 `ExportRomLabelsToInc.py` 范围 = `[0x080000C0, 0x09FFFFFF]`，但已在 asm/*.s 中以 `name:` 形式 disasm 出的会自动跳过（`scan_existing_asm_labels`），不重复 .equ。
 
+⚠ **顺序陷阱（E1）**：给**代码区地址**（`[0x080000C0, 0x084C7637]` 内，会被反汇编出 `name:`）新建 Ghidra label 时，必须**先重导出 asm/all.s（让 `name:` 进 asm）再跑 `ExportRomLabelsToInc.py`**。若顺序反了，新 label 尚未在 asm 里、`scan_existing_asm_labels` 抓不到，会被误收进 `rom_data.inc` → 与重导出后的 asm `name:` 双定义。数据段（`0x084C7638+`，不反汇编）label 无此问题，可直接 regen。
+- 同理：carve 进 `rom.s`/`data/*.s` 的 `<label>: .asciz/.byte` 因带 `name:`，`scan_existing_asm_labels` 自动跳过，不进 rom_data.inc（**E2**）。
+
 #### ⑬ 重导出 asm/all.s + 校验
 
 ```bash
@@ -260,7 +263,9 @@ Windows 批处理包装，调用 Ghidra `support/analyzeHeadless.bat` 以无 GUI
 - **UNDEF 连续区**：`> 16 字节` 用 `ROM_INCBIN` 宏（`.incbin` 原 ROM）；否则 `.byte`
 - **label**：Ghidra 已有 symbol 直接输出；ADR 目标若范围内无 symbol 则合成 `DAT_<addr>`
 - **label 全局去重**：避免 `switchD` 等同名符号在不同地址重复定义
-- **equate 符号化**（`apply_equates`，2026-06-03 加）：若某指令操作数在 Ghidra EquateTable 设了 equate，把立即数 `#0x..` 替换为 equate 名（如 `#PSR_IRQ_MODE`）。仅对有 equate 的操作数生效，其余指令零影响 → 全 ROM byte-identical 不受扰。GAS 端靠 `constants/*.inc` 的 `.set`/`.equ` 解析回同值。设 equate 用 `tools/ghidra-labeling/SetBootEquates.py` 式脚本（`EquateTable.createEquate` + `addReference(addr, opIndex)`）。⚠ `ins.toString()` 本身不应用 equate，故必须由本步替换。
+- **指令 equate 符号化**（`apply_equates`，2026-06-03 加）：若某**指令**操作数在 Ghidra EquateTable 设了 equate，把立即数 `#0x..` 替换为 equate 名（如 `#PSR_IRQ_MODE`）。仅对有 equate 的操作数生效，其余指令零影响 → 全 ROM byte-identical 不受扰。GAS 端靠 `constants/*.inc` 的 `.set`/`.equ` 解析回同值。设 equate 用 `tools/ghidra-labeling/SetBootEquates.py` 式脚本（`EquateTable.createEquate` + `addReference(addr, opIndex)`）。⚠ `ins.toString()` 本身不应用 equate，故必须由本步替换。
+- **数据 equate 符号化**（`resolve_word_equate`，2026-06-04 加）：`.word` 是**纯数值常量**（位掩码 / IO 初值 / 范围外地址，**非指向已 label 的地址指针**）时，若该**数据地址**在 EquateTable 设了 equate，输出 equate 名代替数字。仅在 `resolve_word_symbol`（地址指针路径）返回 None 后兜底调用；对未设 equate 的数据零影响。详见 `symbolization.md §2.1`（三机制 + 优先级陷阱）。
+- **数据行 EOL 注释**（`emit_defined_data`，2026-06-04 加）：若数据地址设了 Ghidra `EOL_COMMENT`，追加到 `.word … @ <addr> <hex>` 之后（如断言串原文 `.word assert_blend1_0_blend1_16 @ … blend1 >= 0 && blend1 <= 16`）。对无 EOL 的数据零影响。⚠ **解析 asm `.word` 行的下游脚本须容忍行尾 EOL 文本**——行尾不再恒为 `<hex>$`，正则别用 `[0-9a-f]{8}\s*$` 锚。
 
 **GAS 语法修正**：
 

@@ -52,6 +52,28 @@ asm/all.s 残留裸 .word 0xXXXXXXXX
 - 排除 auto-gen 前缀：`DAT_/LAB_/FUN_/PTR_/SUB_/UNK_/SWITCH_`
 - PALRAM/VRAM/OAM（`0x05..0x07xxxxxx`）：不处理（loader 未定义 symbol）
 
+### 2.1 三种符号化机制（按数据类型选）
+
+上面的决策树是 **① 地址指针** 路径。完整有三种机制：
+
+| 数据类型 | 机制 | GAS 端定义处 | 导出器函数 |
+|---|---|---|---|
+| **① 地址指针**（`.word` 指向 RAM/IO/ROM 某符号） | Ghidra USER_DEFINED label + DATA ref | `rom_data.inc`/`ewram.inc` 等 `.equ`（自动/手维护） | `resolve_word_symbol` |
+| **② 纯数值常量**（位掩码 / IO 初值等，**无目标地址**） | Ghidra **data-equate**（`EquateTable.createEquate`+`addReference(数据地址,op0)`） | `constants/*.inc` 的 `.equ`/`.set`（手维护） | `resolve_word_equate` |
+| **③ 需结构化的数据本体**（字符串 / 描述符 / 表） | carve 成 `<label>: .asciz/.byte/.word`，gap 用 `.incbin` | 数据本身即定义（`data/*.s` 或 `rom.s` carve 块） | `resolve_word_symbol`（指向 carve label） |
+
+**B2 优先级陷阱**：导出器对 `.word` **先调 `resolve_word_symbol`、再兜底 `resolve_word_equate`**。
+- 同一地址**若已有 USER_DEFINED label，data-equate 会失效（成死代码）**——给已 label 的地址别再设 equate。
+- 反之**纯数值常量别建 Ghidra label**（GAS 端无该地址定义 → 链接失败），用 data-equate。
+
+**B3 混合区不可整片自动 carve**：区域若是字符串 + 二进制 + 图形混合（如 SDK 调试串池夹 tile/指针表），
+"可打印即字符串"的启发式分类会把图形数据（如 `0x21`=`!` 连串、SJIS 日文）误判成 `.asciz` → 产出脏假串。
+正确做法：**只 carve 被代码引用的特定项**，其余 gap 用 `.incbin "roms/2343.gba", off, len` 原样保留。
+（byte-identical 不在乎 `.asciz` vs `.byte` 分类，仅影响可读性——但脏分类反害可读性，故只 carve 确定项。）
+
+**B4 整片 carve 只适用于干净连续数据块**（如 demo/exodia 资源块 = 描述符 + 路径池 + 指针表连续 548B，
+可整体 carve 成 `data/*.s`）。
+
 ---
 
 ## 三、标准 pipeline（6 步）
@@ -177,6 +199,10 @@ REMOVALS = [
 - 数据池（实际 byte 数据）：`<scope>_table`（如 `card_names_table`、`card_stats_table`）
 - 索引/指针表：`<scope>_pointer_table` 或 `<scope>_pointers`（如 `card_name_pointer_table`、`duel_field_outer_tile_pointers`）
 - base + offset 访问的数组：base 用单一 label（如 `campaign_inner_image`，其他 mode 由 `base + idx * stride` 访问，不需各自 label）
+- **字面量池槽 label**（函数内 `<label>: .word <目标>` 的槽**自身**）：用 **`<函数名>_<目标>`** 前缀，
+  靠函数名避免"多函数引用同一目标"时 label 重复（如 `init_blend_transition_params_assert_blend1_0_blend1_16`、
+  `gl_set_brightness_gl_common_c_filename`；同函数引用同目标两次才追加地址尾 `_<低3位>`）。
+  ⚠ **不要用全局 `ptr_<目标>`** 给可被多处引用的目标——会跨函数碰撞；`ptr_<目标>` 仅适合全局唯一、单次引用的槽（如 crt0 的 `ptr_intr_vector`）。
 
 ---
 
@@ -216,7 +242,7 @@ REMOVALS = [
 | `tools/ghidra-labeling/LabelDataCrystalRomMap.py` | Ghidra label 主表 + RENAMES + REMOVALS |
 | `tools/ghidra-labeling/MarkRamIoPointers.py` | 扫代码区批量 pointer 化字面量 |
 | `tools/ghidra-labeling/ExportRomLabelsToInc.py` | Ghidra → constants/rom_data.inc 自动同步 |
-| `tools/asm-regen/ghidra/ExportRangeToGas.py` | 含 `resolve_word_symbol()`,符号化的核心 |
+| `tools/asm-regen/ghidra/ExportRangeToGas.py` | 符号化核心：`resolve_word_symbol()`（地址指针）+ `resolve_word_equate()`（纯数值常量 data-equate）；`emit_defined_data` 还支持数据行 EOL 注释 |
 | `tools/asm-regen/inject_modes.py` | 重导出后修 ARM/Thumb mode + s 后缀 |
 | `tools/gen_gba_io_inc.py` | 从 refs/gba-ghidra-loader 生成 96 条 MMIO `.equ` |
 | `constants/ewram.inc` | EWRAM 变量 `.equ`（手维护） |

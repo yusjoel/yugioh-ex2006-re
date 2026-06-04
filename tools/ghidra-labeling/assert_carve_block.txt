@@ -1,0 +1,453 @@
+@ ----------------------------------------------------------------------------
+@ NNS/GL SDK 断言串 (suppress_assert_report file/expr 参数) — carve 自 0x1E317B4 blob 的
+@ after-demo 段; 仅被代码引用的 156 串抽成带 label 的 .asciz, 其余 (未引用串/二进制/指针表)
+@ 仍以 .incbin 原样保留。代码 .word 经 resolve_word_symbol 指向这些 label。byte-identical。
+@ ----------------------------------------------------------------------------
+gl_common_c_filename:
+	.asciz "GL/GL_Common.c"
+	.incbin "roms/2343.gba", 0x1E398EB, 0x1
+assert_bright_16_bright_16:
+	.asciz "bright >= -16 && bright <= 16"
+	.incbin "roms/2343.gba", 0x1E3990A, 0x2
+assert_blend1_0_blend1_16:
+	.asciz "blend1 >= 0 && blend1 <= 16"
+assert_blend2_0_blend2_16:
+	.asciz "blend2 >= 0 && blend2 <= 16"
+assert_u32_psrc_0x3_0:
+	.asciz "((u32)pSrc & 0x3) == 0"
+	.incbin "roms/2343.gba", 0x1E3995B, 0x1
+gl_file_c_filename:
+	.asciz "GL/GL_File.c"
+	.incbin "roms/2343.gba", 0x1E39969, 0x3
+assert_psrc:
+	.asciz "pSrc"
+	.incbin "roms/2343.gba", 0x1E39971, 0x3
+assert_pkey:
+	.asciz "pKey"
+	.incbin "roms/2343.gba", 0x1E39979, 0x3F
+assert_phead_comptype_1:
+	.asciz "pHead->compType == 1"
+	.incbin "roms/2343.gba", 0x1E399CD, 0x283
+gl_oam_c_filename:
+	.asciz "GL/GL_Oam.c"
+assert_num_32:
+	.asciz "num < 32"
+	.incbin "roms/2343.gba", 0x1E39C65, 0x3
+gl_scrollbar_c_filename:
+	.asciz "GL/GL_Scrollbar.c"
+	.incbin "roms/2343.gba", 0x1E39C7A, 0x2
+assert_pthis:
+	.asciz "pThis"
+	.incbin "roms/2343.gba", 0x1E39C82, 0x806
+ig2d_main_c_filename:
+	.asciz "GL/IG2D_Main.c"
+	.incbin "roms/2343.gba", 0x1E3A497, 0x1
+assert_usedncebuff_ig2d_load_anm_max:
+	.asciz "UsedNceBuff < IG2D_LOAD_ANM_MAX"
+assert_usednanbuff_ig2d_load_anm_max:
+	.asciz "UsedNanBuff < IG2D_LOAD_ANM_MAX"
+assert_psequence:
+	.asciz "pSequence"
+	.incbin "roms/2343.gba", 0x1E3A4E2, 0x2
+assert_bg_2_bg_3:
+	.asciz "bg == 2 || bg == 3"
+	.incbin "roms/2343.gba", 0x1E3A4F7, 0x5
+assert_pcell_null:
+	.asciz "( pCell ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A50E, 0x2
+assert_usedcellanm_nelems_cellanmbank:
+	.asciz "UsedCellAnm < NELEMS(CellAnmBank)"
+	.incbin "roms/2343.gba", 0x1E3A532, 0x2
+assert_ppcellbank_null:
+	.asciz "( ppCellBank ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A54B, 0x1
+assert_pfname_null:
+	.asciz "( pFname ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A55F, 0x1
+assert_ppanimbank_null:
+	.asciz "( ppAnimBank ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A577, 0x1
+assert_ppchardata_null:
+	.asciz "( ppCharData ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A58F, 0x1
+assert_pppltdata_null:
+	.asciz "( ppPltData ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A5A6, 0x2
+assert_psrcdata:
+	.asciz "pSrcData"
+	.incbin "roms/2343.gba", 0x1E3A5B1, 0x3
+assert_ppltproxt:
+	.asciz "pPltProxt"
+	.incbin "roms/2343.gba", 0x1E3A5BE, 0x2
+assert_false:
+	.asciz "FALSE"
+	.incbin "roms/2343.gba", 0x1E3A5C6, 0x2
+assert_pbuf_null:
+	.asciz "( pBuf ) != NULL"
+	.incbin "roms/2343.gba", 0x1E3A5D9, 0x3
+assert_ppanimbank_numsequences_0:
+	.asciz "(*ppAnimBank)->numSequences != 0"
+	.incbin "roms/2343.gba", 0x1E3A5FD, 0x3
+assert_ppcellanim_null:
+	.asciz "( *ppCellAnim ) != NULL"
+assert_ppanimbank_psequencearrayhead:
+	.asciz "( &((*ppAnimBank)->pSequenceArrayHead[i]) ) != NULL"
+isd_draw_c_filename:
+	.asciz "GL/ISD_Draw.c"
+	.incbin "roms/2343.gba", 0x1E3A65A, 0x116
+prh_main_c_filename:
+	.asciz "GL/PRH_Main.c"
+	.incbin "roms/2343.gba", 0x1E3A77E, 0x2
+assert_pdst_nameid:
+	.asciz "pDst->nameID"
+	.incbin "roms/2343.gba", 0x1E3A78D, 0xB2B
+name_main_c_filename:
+	.asciz "NameInput/Name_main.c"
+	.incbin "roms/2343.gba", 0x1E3B2CE, 0x2
+assert_cnt_name_mojitbl_width_1_name:
+	.asciz "(cnt + NAME_MOJITBL_WIDTH - 1) / NAME_MOJITBL_WIDTH * NAME_MOJITBL_WIDTH < sizeof(pThis->mojiTbl) / 2"
+	.incbin "roms/2343.gba", 0x1E3B336, 0x12
+assert_dir_1_dir_1:
+	.asciz "dir == 1 || dir == -1"
+	.incbin "roms/2343.gba", 0x1E3B35E, 0xD6
+assert_anmid_ig2d_getanmsequencescoun:
+	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
+	.incbin "roms/2343.gba", 0x1E3B46F, 0x1115
+pass_main_c_filename:
+	.asciz "PassInput/Pass_main.c"
+	.incbin "roms/2343.gba", 0x1E3C59A, 0x2
+assert_dir_1_dir_1_59c:
+	.asciz "dir == 1 || dir == -1"
+	.incbin "roms/2343.gba", 0x1E3C5B2, 0xBE
+assert_anmid_ig2d_getanmsequencescoun_670:
+	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
+	.incbin "roms/2343.gba", 0x1E3C6AB, 0x9
+assert_dstbuffid_0_dstbuffid_def_prhl:
+	.asciz "dstBuffID >= 0 && dstBuffID < DEF_PRHLIST_MAX"
+	.incbin "roms/2343.gba", 0x1E3C6E2, 0x88E
+shu_main_c_filename:
+	.asciz "Shuen/SHU_main.c"
+	.incbin "roms/2343.gba", 0x1E3CF81, 0x3
+assert_anmid_ig2d_getanmsequencescoun_f84:
+	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
+	.incbin "roms/2343.gba", 0x1E3CFBF, 0x9C5
+vij_main_c_filename:
+	.asciz "Vija/VIJ_main.c"
+assert_anmid_ig2d_getanmsequencescoun_994:
+	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
+	.incbin "roms/2343.gba", 0x1E3D9CF, 0xC33D
+assert_pdst_null:
+	.asciz "(pDst) != NULL"
+	.incbin "roms/2343.gba", 0x1E49D1B, 0x1
+assert_psrc_null:
+	.asciz "(pSrc) != NULL"
+	.incbin "roms/2343.gba", 0x1E49D2B, 0x1
+fx_mtx22_c_filename:
+	.asciz "nnsys/g2d/fx_mtx22.c"
+	.incbin "roms/2343.gba", 0x1E49D41, 0x3
+assert_a_null:
+	.asciz "(a) != NULL"
+assert_b_null:
+	.asciz "(b) != NULL"
+assert_ab_null:
+	.asciz "(ab) != NULL"
+	.incbin "roms/2343.gba", 0x1E49D69, 0x70B
+g2d_animation_inline_h_filename:
+	.asciz "inc/nnsys/g2d/g2d_Animation_inline.h"
+	.incbin "roms/2343.gba", 0x1E4A499, 0x3
+assert_panimctrl:
+	.asciz "pAnimCtrl"
+	.incbin "roms/2343.gba", 0x1E4A4A6, 0x2
+g2d_animation_c_filename:
+	.asciz "nnsys/g2d/g2d_Animation.c"
+	.incbin "roms/2343.gba", 0x1E4A4C2, 0x2
+assert_psequence_4c4:
+	.asciz "pSequence"
+	.incbin "roms/2343.gba", 0x1E4A4CE, 0x2
+assert_panimctrl_panimsequence:
+	.asciz "pAnimCtrl->pAnimSequence"
+	.incbin "roms/2343.gba", 0x1E4A4E9, 0x3
+assert_panimctrl_pcurrent:
+	.asciz "pAnimCtrl->pCurrent"
+assert_pfunctor:
+	.asciz "pFunctor"
+	.incbin "roms/2343.gba", 0x1E4A509, 0x3
+assert_pframe:
+	.asciz "pFrame"
+	.incbin "roms/2343.gba", 0x1E4A513, 0x1
+assert_panimctrl_callbackfunctor_pfun:
+	.asciz "pAnimCtrl->callbackFunctor.pFunc"
+	.incbin "roms/2343.gba", 0x1E4A535, 0x3
+assert_void_panimctrl_pcurrent_pconte:
+	.asciz "(void*)pAnimCtrl->pCurrent->pContent"
+	.incbin "roms/2343.gba", 0x1E4A55D, 0x3
+assert_pnext_pcontent:
+	.asciz "pNext->pContent"
+assert_frames_0:
+	.asciz "frames >= 0"
+assert_pcallback:
+	.asciz "pCallBack"
+	.incbin "roms/2343.gba", 0x1E4A586, 0x2
+assert_panimsequence:
+	.asciz "pAnimSequence"
+	.incbin "roms/2343.gba", 0x1E4A596, 0x2
+assert_void_pfunc:
+	.asciz "(void*)pFunc"
+	.incbin "roms/2343.gba", 0x1E4A5A5, 0x3
+assert_type_nns_g2d_anmcallbacktype_s:
+	.asciz "type != NNS_G2D_ANMCALLBACKTYPE_SPEC_FRM"
+	.incbin "roms/2343.gba", 0x1E4A5D1, 0x3
+g2_oam_h_filename:
+	.asciz "inc/nitro/g2_oam.h"
+	.incbin "roms/2343.gba", 0x1E4A5E7, 0xC5
+assert_effect_gx_oam_effect_none_effe:
+	.asciz "(effect) == GX_OAM_EFFECT_NONE || (effect) == GX_OAM_EFFECT_FLIP_H || (effect) == GX_OAM_EFFECT_FLIP_V || (effect) == GX_OAM_EFFECT_FLIP_HV || (effect) == GX_OAM_EFFECT_AFFINE || (effect) == GX_OAM_EFFECT_NODISPLAY || (effect) == GX_OAM_EFFECT_AFFINE_DOUBLE"
+	.incbin "roms/2343.gba", 0x1E4A7AE, 0x2
+assert_rsparam_0_rsparam_31:
+	.asciz "(rsParam) >= ( 0) && (rsParam) <= ( 31)"
+	.incbin "roms/2343.gba", 0x1E4A7D8, 0x494
+g2d_cell_data_h_filename:
+	.asciz "inc/nnsys/g2d/fmt/g2d_Cell_data.h"
+	.incbin "roms/2343.gba", 0x1E4AC8E, 0x16
+assert_pdst:
+	.asciz "pDst"
+	.incbin "roms/2343.gba", 0x1E4ACA9, 0x33
+g2d_animation_inline_h_filename_cdc:
+	.asciz "inc/nnsys/g2d/g2d_Animation_inline.h"
+	.incbin "roms/2343.gba", 0x1E4AD01, 0x3
+assert_panimctrl_d04:
+	.asciz "pAnimCtrl"
+	.incbin "roms/2343.gba", 0x1E4AD0E, 0x56
+assert_pcellanim:
+	.asciz "pCellAnim"
+	.incbin "roms/2343.gba", 0x1E4AD6E, 0xF2
+g2d_cellanimation_c_filename:
+	.asciz "nnsys/g2d/g2d_CellAnimation.c"
+	.incbin "roms/2343.gba", 0x1E4AE7E, 0x2
+assert_pcellanim_pcelldatabank:
+	.asciz "pCellAnim->pCellDataBank"
+	.incbin "roms/2343.gba", 0x1E4AE99, 0x3
+assert_pcellanim_pcurrentcell:
+	.asciz "pCellAnim->pCurrentCell"
+assert_panimseq:
+	.asciz "pAnimSeq"
+	.incbin "roms/2343.gba", 0x1E4AEBD, 0x3
+assert_pcelldatabank:
+	.asciz "pCellDataBank"
+	.incbin "roms/2343.gba", 0x1E4AECE, 0x2
+assert_nns_g2dgetanimsequenceanimtype:
+	.asciz "NNS_G2dGetAnimSequenceAnimType( pAnimSeq ) == NNS_G2D_ANIMATIONTYPE_CELL"
+	.incbin "roms/2343.gba", 0x1E4AF19, 0x3
+assert_pcellanim_animctrl_panimsequen:
+	.asciz "pCellAnim->animCtrl.pAnimSequence"
+	.incbin "roms/2343.gba", 0x1E4AF3E, 0x2
+assert_nns_g2dgetanimsequenceanimtype_f40:
+	.asciz "NNS_G2dGetAnimSequenceAnimType( pCellAnim->animCtrl.pAnimSequence ) == NNS_G2D_ANIMATIONTYPE_CELL"
+	.incbin "roms/2343.gba", 0x1E4AFA2, 0x66E
+assert_pimgproxy:
+	.asciz "pImgProxy"
+	.incbin "roms/2343.gba", 0x1E4B61A, 0x2
+g2d_image_c_filename:
+	.asciz "nnsys/g2d/g2d_Image.c"
+	.incbin "roms/2343.gba", 0x1E4B632, 0x2
+assert_pvramlocation:
+	.asciz "pVramLocation"
+	.incbin "roms/2343.gba", 0x1E4B642, 0x2
+assert_type_nns_g2d_vram_type_3dmain:
+	.asciz "( type ) == NNS_G2D_VRAM_TYPE_3DMAIN || ( type ) == NNS_G2D_VRAM_TYPE_2DMAIN || ( type ) == NNS_G2D_VRAM_TYPE_2DSUB"
+assert_psrc_6b8:
+	.asciz "pSrc"
+	.incbin "roms/2343.gba", 0x1E4B6BD, 0x3
+assert_pdst_6c0:
+	.asciz "pDst"
+	.incbin "roms/2343.gba", 0x1E4B6C5, 0x3
+assert_psrc_w_nns_g2d_1d_mapping_char:
+	.asciz "(pSrc->W == NNS_G2D_1D_MAPPING_CHAR_SIZE) && (pSrc->H == NNS_G2D_1D_MAPPING_CHAR_SIZE)"
+	.incbin "roms/2343.gba", 0x1E4B71F, 0x1
+assert_nnsi_g2discharactervramtransfe:
+	.asciz "!NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )"
+	.incbin "roms/2343.gba", 0x1E4B75D, 0x3
+assert_charfmt_nns_g2d_character_fmt:
+	.asciz "charFmt == NNS_G2D_CHARACTER_FMT_CHAR"
+	.incbin "roms/2343.gba", 0x1E4B786, 0x2
+assert_false_788:
+	.asciz "FALSE"
+	.incbin "roms/2343.gba", 0x1E4B78E, 0x2
+assert_psrcdata_790:
+	.asciz "pSrcData"
+	.incbin "roms/2343.gba", 0x1E4B799, 0x3
+assert_psrcdata_fmt_gx_texfmt_pltt256:
+	.asciz "pSrcData->fmt == GX_TEXFMT_PLTT256"
+	.incbin "roms/2343.gba", 0x1E4B7BF, 0x1
+assert_pcmpinfo:
+	.asciz "pCmpInfo"
+	.incbin "roms/2343.gba", 0x1E4B7C9, 0x3
+assert_pimg:
+	.asciz "pImg"
+	.incbin "roms/2343.gba", 0x1E4B7D1, 0x3
+assert_isvalid1dmappingtype_type_psrc:
+	.asciz "IsValid1DMappingType_( type, pSrcData->mapingType )"
+assert_isvaliddatasize_psrcdata_type:
+	.asciz "IsValidDataSize_( pSrcData, type )"
+	.incbin "roms/2343.gba", 0x1E4B82B, 0x1
+assert_psrcdata_mapingtype_gx_objvram:
+	.asciz "pSrcData->mapingType == GX_OBJVRAMMODE_CHAR_2D"
+	.incbin "roms/2343.gba", 0x1E4B85B, 0x1
+assert_nnsi_g2discharactervramtransfe_85c:
+	.asciz "NNSi_G2dIsCharacterVramTransfered( pSrcData->characterFmt )"
+assert_ppltproxy:
+	.asciz "pPltProxy"
+	.incbin "roms/2343.gba", 0x1E4B8A2, 0x73A
+g2d_load_c_filename:
+	.asciz "nnsys/g2d/g2d_Load.c"
+	.incbin "roms/2343.gba", 0x1E4BFF1, 0x3
+assert_pbinfileheader:
+	.asciz "pBinFileHeader"
+	.incbin "roms/2343.gba", 0x1E4C003, 0x1
+assert_pcursor:
+	.asciz "pCursor"
+	.incbin "roms/2343.gba", 0x1E4C00C, 0x708
+g2d_nan_load_h_filename:
+	.asciz "inc/nnsys/g2d/load/g2d_NAN_load.h"
+	.incbin "roms/2343.gba", 0x1E4C736, 0xE
+g2d_nan_load_c_filename:
+	.asciz "nnsys/g2d/g2d_NAN_load.c"
+	.incbin "roms/2343.gba", 0x1E4C75D, 0x3
+assert_pnanrfile:
+	.asciz "pNanrFile"
+	.incbin "roms/2343.gba", 0x1E4C76A, 0x2
+assert_ppanimbank:
+	.asciz "ppAnimBank"
+	.incbin "roms/2343.gba", 0x1E4C777, 0x1
+assert_nnsi_g2disbinfilesignaturevali:
+	.asciz "NNSi_G2dIsBinFileSignatureValid( pNanrFile, (u32)'NANR' )"
+	.incbin "roms/2343.gba", 0x1E4C7B2, 0x2
+assert_nnsi_g2disbinfileversionvalid:
+	.asciz "NNSi_G2dIsBinFileVersionValid( pNanrFile, NNS_G2dMakeVersionData( 1, 0 ) )"
+	.incbin "roms/2343.gba", 0x1E4C7FF, 0x1
+assert_nnsi_g2disbinfilesignaturevali_800:
+	.asciz "NNSi_G2dIsBinFileSignatureValid( pNanrFile, (u32)'NMAR' )"
+	.incbin "roms/2343.gba", 0x1E4C83A, 0x2
+assert_pdata:
+	.asciz "pData"
+	.incbin "roms/2343.gba", 0x1E4C842, 0x2
+assert_checkanimsequencevalidity_pseq:
+	.asciz "CheckAnimSequenceValidity_( &pSeq[i] )"
+	.incbin "roms/2343.gba", 0x1E4C86B, 0x739
+g2d_ncg_load_c_filename:
+	.asciz "nnsys/g2d/g2d_NCG_load.c"
+	.incbin "roms/2343.gba", 0x1E4CFBD, 0x3
+assert_pncgrfile:
+	.asciz "pNcgrFile"
+	.incbin "roms/2343.gba", 0x1E4CFCA, 0x2
+assert_ppchardata:
+	.asciz "ppCharData"
+	.incbin "roms/2343.gba", 0x1E4CFD7, 0x1
+assert_nnsi_g2disbinfilesignaturevali_fd8:
+	.asciz "NNSi_G2dIsBinFileSignatureValid( pNcgrFile, (u32)'NCGR' )"
+	.incbin "roms/2343.gba", 0x1E4D012, 0x2
+assert_nnsi_g2disbinfileversionvalid_014:
+	.asciz "NNSi_G2dIsBinFileVersionValid( pNcgrFile, NNS_G2dMakeVersionData( (u8)1, (u8)0 ) )"
+	.incbin "roms/2343.gba", 0x1E4D067, 0x1
+assert_pchardata:
+	.asciz "pCharData"
+	.incbin "roms/2343.gba", 0x1E4D072, 0x2
+assert_pchardata_pixelfmt_gx_texfmt_p:
+	.asciz "( pCharData->pixelFmt == GX_TEXFMT_PLTT16 && pCharData->W == 32 ) || ( pCharData->pixelFmt == GX_TEXFMT_PLTT256 && pCharData->W == 16 )"
+assert_ppcharposinfo:
+	.asciz "ppCharPosInfo"
+	.incbin "roms/2343.gba", 0x1E4D10A, 0x2
+assert_nnsi_g2disbinfileversionvalid_10c:
+	.asciz "NNSi_G2dIsBinFileVersionValid( pNcgrFile, NNS_G2dMakeVersionData( (u8)1, (u8)1 ) )"
+	.incbin "roms/2343.gba", 0x1E4D15F, 0x1
+assert_nnsi_g2dgetcharacterfmttype_pc:
+	.asciz "NNSi_G2dGetCharacterFmtType( pCharData->characterFmt ) == NNS_G2D_CHARACTER_FMT_CHAR"
+	.incbin "roms/2343.gba", 0x1E4D1B5, 0x73B
+g2d_ncl_load_c_filename:
+	.asciz "nnsys/g2d/g2d_NCL_load.c"
+	.incbin "roms/2343.gba", 0x1E4D909, 0x3
+assert_pplttdata:
+	.asciz "pPlttData"
+	.incbin "roms/2343.gba", 0x1E4D916, 0x2
+assert_pplttdata_prawdata:
+	.asciz "pPlttData->pRawData"
+	.incbin "roms/2343.gba", 0x1E4D92C, 0x3C
+assert_pnclrfile:
+	.asciz "pNclrFile"
+	.incbin "roms/2343.gba", 0x1E4D972, 0x2
+assert_pppltdata:
+	.asciz "ppPltData"
+	.incbin "roms/2343.gba", 0x1E4D97E, 0x2
+assert_pbinfile_signature_u32_nclr_pb:
+	.asciz "pBinFile->signature == (u32)'NCLR' || pBinFile->signature == (u32)'NCPR'"
+	.incbin "roms/2343.gba", 0x1E4D9C9, 0x3
+assert_nnsi_g2disbinfileversionvalid_9cc:
+	.asciz "NNSi_G2dIsBinFileVersionValid( pNclrFile, NNS_G2dMakeVersionData( (u8)1, (u8)0 ) )"
+	.incbin "roms/2343.gba", 0x1E4DA1F, 0x1
+assert_pppltcmpinfo:
+	.asciz "ppPltCmpInfo"
+	.incbin "roms/2343.gba", 0x1E4DA2D, 0x3
+assert_pplttcmpinfo:
+	.asciz "pPlttCmpInfo"
+	.incbin "roms/2343.gba", 0x1E4DA3D, 0x6BF
+assert_pcellbank:
+	.asciz "pCellBank"
+	.incbin "roms/2343.gba", 0x1E4E106, 0x72
+g2d_nob_load_c_filename:
+	.asciz "nnsys/g2d/g2d_NOB_load.c"
+	.incbin "roms/2343.gba", 0x1E4E191, 0x3
+assert_pexdata:
+	.asciz "pExData"
+assert_pncerfile:
+	.asciz "pNcerFile"
+	.incbin "roms/2343.gba", 0x1E4E1A6, 0x2
+assert_ppcellbank:
+	.asciz "ppCellBank"
+	.incbin "roms/2343.gba", 0x1E4E1B3, 0x1
+assert_nnsi_g2disbinfilesignaturevali_1b4:
+	.asciz "NNSi_G2dIsBinFileSignatureValid( pNcerFile, (u32)'NCER' )"
+	.incbin "roms/2343.gba", 0x1E4E1EE, 0x2
+assert_nnsi_g2disbinfileversionvalid_1f0:
+	.asciz "NNSi_G2dIsBinFileVersionValid( pNcerFile, NNS_G2dMakeVersionData( 1, 0 ) )"
+	.incbin "roms/2343.gba", 0x1E4E23B, 0x1
+assert_pcelldata:
+	.asciz "pCellData"
+	.incbin "roms/2343.gba", 0x1E4E246, 0x69E
+fx_mtx22_h_filename:
+	.asciz "inc/nitro/fx_mtx22.h"
+	.incbin "roms/2343.gba", 0x1E4E8F9, 0x3
+assert_pdst_null_8fc:
+	.asciz "(pDst) != NULL"
+	.incbin "roms/2343.gba", 0x1E4E90B, 0x11
+g2d_srtcontrol_c_filename:
+	.asciz "nnsys/g2d/g2d_SRTControl.c"
+	.incbin "roms/2343.gba", 0x1E4E937, 0x5
+assert_pctrl:
+	.asciz "pCtrl"
+	.incbin "roms/2343.gba", 0x1E4E942, 0x2
+assert_pctrl_type_nns_g2d_srtcontrolt:
+	.asciz "( pCtrl->type ) == NNS_G2D_SRTCONTROLTYPE_SRT"
+	.incbin "roms/2343.gba", 0x1E4E972, 0x2
+assert_pdst_974:
+	.asciz "pDst"
+	.incbin "roms/2343.gba", 0x1E4E979, 0xB3F
+s_opdobj_c_filename:
+	.asciz "system/s_opdobj.c"
+	.incbin "roms/2343.gba", 0x1E4F4CA, 0x2
+assert_ptnno_aob_ptnsect_header_p_ptn:
+	.asciz "PtnNo < ((AOB_PTNSECT_HEADER*)p_ptnsect)->PtnNum"
+	.incbin "roms/2343.gba", 0x1E4F4FD, 0x3
+assert_anmno_aob_anmsect_header_p_anm:
+	.asciz "AnmNo < ((AOB_ANMSECT_HEADER*)p_anmsect)->AnmNum"
+	.incbin "roms/2343.gba", 0x1E4F531, 0x3
+assert_pwork_canmwait_0:
+	.asciz "pWork->cAnmWait > 0"
+assert_pwork_canmcrntfrm_frmnum:
+	.asciz "pWork->cAnmCrntFrm < frmnum"
+	.incbin "roms/2343.gba", 0x1E4F564, 0x11C0
+titleex_main_c_filename:
+	.asciz "titleEx/TitleEx_main.c"
+	.incbin "roms/2343.gba", 0x1E5073B, 0x1
+assert_anmid_ig2d_getanmsequencescoun_73c:
+	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
+	.incbin "roms/2343.gba", 0x1E50777, 0x8595

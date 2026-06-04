@@ -7,7 +7,6 @@
 @ Usage: .word <name> in asm; GAS substitutes via .equ
 @ =============================================================================
 
-.equ game_str_id_remap_table,      0x08000250
 .equ file_card_names_start,        0x095BB5AC
 .equ card_desc_table,              0x09800000
 .equ card_desc_ptr_table,          0x09816580
@@ -3752,14 +3751,10 @@
 .equ card_142F,                    0x098325C0
 .equ font_jp_sjis_lookup_table,    0x09BA1524
 .equ font_jp_sjis_lookup_count,    0x09BA2430
-.equ gl_common_c_filename,         0x09E398DC
-.equ gl_bright_assert,             0x09E398EC
 .equ name_input_path_strings,      0x09E3B360
-.equ nns_g2d_assert_anmID,         0x09E3B434
 .equ pass_input_path_strings,      0x09E3C5B4
 .equ rom_card_zoom_anim_curve,     0x09E493B4
 .equ name_input_state_table,       0x09E588B8
-.equ main_menu_page_table,         0x09E5ED24
 .equ file_banlists_start,          0x09E5EF30
 .equ font_jp_charset_table,        0x09E5F864
 .equ file_starter_deck_start,      0x09E5F884

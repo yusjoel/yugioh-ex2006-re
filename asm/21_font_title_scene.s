@@ -9043,8 +9043,8 @@ resolve_aob_pattern_entry_ptr:
     ldrh r0,[r4,#0x0]                        @ 080f7e1e 2088
     cmp r5,r0                                @ 080f7e20 8542
     bcc LAB_080f7e30                         @ 080f7e22 05d3
-    ldr r0, DAT_080f7e40                     @ 080f7e24 0648
-    ldr r2, DAT_080f7e44                     @ 080f7e26 074a
+    ldr r0, resolve_aob_pattern_entry_ptr_s_opdobj_c_filename @ 080f7e24 0648
+    ldr r2, resolve_aob_pattern_entry_ptr_assert_ptnno_aob_ptnsect_header_p_ptn @ 080f7e26 074a
     movs r1,#0xbc    @ 080f7e28 bc21
     movs r3,#0x1    @ 080f7e2a 0123
     bl suppress_assert_report                @ 080f7e2c 02f056fb
@@ -9057,10 +9057,10 @@ LAB_080f7e30:
     pop {r4,r5,r6,r7}                        @ 080f7e3a f0bc
     pop {r0}                                 @ 080f7e3c 01bc
     bx r0                                    @ 080f7e3e 0047
-DAT_080f7e40:
-    .word  0x09e4f4b8                     @ 080f7e40 b8f4e409
-DAT_080f7e44:
-    .word  0x09e4f4cc                     @ 080f7e44 ccf4e409
+resolve_aob_pattern_entry_ptr_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f7e40 b8f4e409  system/s_opdobj.c
+resolve_aob_pattern_entry_ptr_assert_ptnno_aob_ptnsect_header_p_ptn:
+    .word  assert_ptnno_aob_ptnsect_header_p_ptn @ 080f7e44 ccf4e409  PtnNo < ((AOB_PTNSECT_HEADER*)p_ptnsect)->PtnNum
 
 @ 来自 system/s_opdobj.c line 207. 给定 AOB ctx (r0), 动画编号 (r1, u16), 初始化标志 (r2, u8), 验证动画编号 < AOB_ANMSECT_HEADER->AnmNum, 写动画入口地址到 [ctx+0x8], 根据 [ctx+0x13] bit3/bit4 决定是否调用 resolve_aob_pattern_entry_ptr 初始化图案指针, 并设置帧步进量 [ctx+0xc/0xd/0xe]. 被 14 个调用方共享 (duel field LP / UI effect 3b/38 / palette vram 路径). Constants: AOB_FLAG_HAS_PATTERN=0x8, AOB_FLAG_HAS_FRAME_DIV=0x10, ASSERT_LINE=0xcf(207).
 init_aob_ctx_with_anm_entry:
@@ -9082,8 +9082,8 @@ init_aob_ctx_with_anm_entry:
     ldrh r1,[r5,#0x0]                        @ 080f7e66 2988
     cmp r6,r1                                @ 080f7e68 8e42
     bcc LAB_080f7e78                         @ 080f7e6a 05d3
-    ldr r0, DAT_080f7ea4                     @ 080f7e6c 0d48
-    ldr r2, DAT_080f7ea8                     @ 080f7e6e 0e4a
+    ldr r0, init_aob_ctx_with_anm_entry_s_opdobj_c_filename @ 080f7e6c 0d48
+    ldr r2, init_aob_ctx_with_anm_entry_assert_anmno_aob_anmsect_header_p_anm @ 080f7e6e 0e4a
     movs r1,#0xcf    @ 080f7e70 cf21
     movs r3,#0x1    @ 080f7e72 0123
     bl suppress_assert_report                @ 080f7e74 02f032fb
@@ -9111,10 +9111,10 @@ LAB_080f7e94:
     ldrb r0,[r2,#0x0]                        @ 080f7e9e 1078
     subs r0,#0x1    @ 080f7ea0 0138
     b LAB_080f7eae                           @ 080f7ea2 04e0
-DAT_080f7ea4:
-    .word  0x09e4f4b8                     @ 080f7ea4 b8f4e409
-DAT_080f7ea8:
-    .word  0x09e4f500                     @ 080f7ea8 00f5e409
+init_aob_ctx_with_anm_entry_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f7ea4 b8f4e409  system/s_opdobj.c
+init_aob_ctx_with_anm_entry_assert_anmno_aob_anmsect_header_p_anm:
+    .word  assert_anmno_aob_anmsect_header_p_anm @ 080f7ea8 00f5e409  AnmNo < ((AOB_ANMSECT_HEADER*)p_anmsect)->AnmNum
 LAB_080f7eac:
     movs r0,#0x0    @ 080f7eac 0020
 LAB_080f7eae:
@@ -9188,8 +9188,8 @@ LAB_080f7f28:
     ldrb r0,[r4,#0xc]                        @ 080f7f28 207b
     cmp r0,#0x0                              @ 080f7f2a 0028
     bne LAB_080f7f3a                         @ 080f7f2c 05d1
-    ldr r0, DAT_080f7f88                     @ 080f7f2e 1648
-    ldr r2, DAT_080f7f8c                     @ 080f7f30 164a
+    ldr r0, tick_aob_frame_counter_s_opdobj_c_filename @ 080f7f2e 1648
+    ldr r2, tick_aob_frame_counter_assert_pwork_canmwait_0 @ 080f7f30 164a
     movs r1,#0xf1    @ 080f7f32 f121
     movs r3,#0x1    @ 080f7f34 0123
     bl suppress_assert_report                @ 080f7f36 02f0d1fa
@@ -9204,8 +9204,8 @@ LAB_080f7f3a:
     ldrb r0,[r4,#0xd]                        @ 080f7f48 607b
     cmp r0,r5                                @ 080f7f4a a842
     bcc LAB_080f7f5a                         @ 080f7f4c 05d3
-    ldr r0, DAT_080f7f88                     @ 080f7f4e 0e48
-    ldr r2, DAT_080f7f90                     @ 080f7f50 0f4a
+    ldr r0, tick_aob_frame_counter_s_opdobj_c_filename @ 080f7f4e 0e48
+    ldr r2, tick_aob_frame_counter_assert_pwork_canmcrntfrm_frmnum @ 080f7f50 0f4a
     movs r1,#0xf5    @ 080f7f52 f521
     movs r3,#0x1    @ 080f7f54 0123
     bl suppress_assert_report                @ 080f7f56 02f0c1fa
@@ -9233,12 +9233,12 @@ LAB_080f7f5a:
     subs r0,r5,#0x1    @ 080f7f82 681e
     strb r0,[r4,#0xd]                        @ 080f7f84 6073
     b LAB_080f7fb6                           @ 080f7f86 16e0
-DAT_080f7f88:
-    .word  0x09e4f4b8                     @ 080f7f88 b8f4e409
-DAT_080f7f8c:
-    .word  0x09e4f534                     @ 080f7f8c 34f5e409
-DAT_080f7f90:
-    .word  0x09e4f548                     @ 080f7f90 48f5e409
+tick_aob_frame_counter_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f7f88 b8f4e409  system/s_opdobj.c
+tick_aob_frame_counter_assert_pwork_canmwait_0:
+    .word  assert_pwork_canmwait_0        @ 080f7f8c 34f5e409  pWork->cAnmWait > 0
+tick_aob_frame_counter_assert_pwork_canmcrntfrm_frmnum:
+    .word  assert_pwork_canmcrntfrm_frmnum @ 080f7f90 48f5e409  pWork->cAnmCrntFrm < frmnum
 LAB_080f7f94:
     ldrb r0,[r4,#0xd]                        @ 080f7f94 607b
     adds r0,#0x1    @ 080f7f96 0130
@@ -9488,7 +9488,7 @@ LAB_080f8138:
     movs r5,#0x8    @ 080f813c 0825
     b LAB_080f814e                           @ 080f813e 06e0
 LAB_080f8140:
-    ldr r0, DAT_080f81e0                     @ 080f8140 2748
+    ldr r0, render_aob_frame_to_oam_s_opdobj_c_filename @ 080f8140 2748
     movs r1,#0xa6    @ 080f8142 a621
     lsls r1,r1,#0x1    @ 080f8144 4900
     ldr r2, DAT_080f81e4                     @ 080f8146 274a
@@ -9569,8 +9569,8 @@ LAB_080f81a2:
     str r3,[sp,#0x3c]                        @ 080f81da 0f93
     b LAB_080f8234                           @ 080f81dc 2ae0
     .zero  0x2
-DAT_080f81e0:
-    .word  0x09e4f4b8                     @ 080f81e0 b8f4e409
+render_aob_frame_to_oam_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f81e0 b8f4e409  system/s_opdobj.c
 DAT_080f81e4:
     .word  0x09e4f564                     @ 080f81e4 64f5e409
 DAT_080f81e8:
@@ -10082,7 +10082,7 @@ LAB_080f8578:
     .hword 0x46a8    @ 080f857e a846
     b LAB_080f8590                           @ 080f8580 06e0
 LAB_080f8582:
-    ldr r0, DAT_080f862c                     @ 080f8582 2a48
+    ldr r0, render_aob_sprite_with_rot_scale_s_opdobj_c_filename @ 080f8582 2a48
     movs r1,#0xf7    @ 080f8584 f721
     lsls r1,r1,#0x1    @ 080f8586 4900
     ldr r2, DAT_080f8630                     @ 080f8588 294a
@@ -10168,8 +10168,8 @@ LAB_080f85e6:
     adds r0,#0x8    @ 080f8626 0830
     str r0,[sp,#0x60]                        @ 080f8628 1890
     b LAB_080f868c                           @ 080f862a 2fe0
-DAT_080f862c:
-    .word  0x09e4f4b8                     @ 080f862c b8f4e409
+render_aob_sprite_with_rot_scale_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f862c b8f4e409  system/s_opdobj.c
 DAT_080f8630:
     .word  0x09e4f564                     @ 080f8630 64f5e409
 DAT_080f8634:
@@ -10521,7 +10521,7 @@ LAB_080f88aa:
     str r3,[sp,#0x54]                        @ 080f88b0 1593
     b LAB_080f88c0                           @ 080f88b2 05e0
 LAB_080f88b4:
-    ldr r0, DAT_080f88f8                     @ 080f88b4 1048
+    ldr r0, render_aob_sprite_with_rot_scale_s_opdobj_c_filename_8f8 @ 080f88b4 1048
     ldr r1, DAT_080f88fc                     @ 080f88b6 1149
     ldr r2, DAT_080f8900                     @ 080f88b8 114a
     movs r3,#0x1    @ 080f88ba 0123
@@ -10553,8 +10553,8 @@ LAB_080f88c0:
     adds r4,r7,#0x0    @ 080f88f2 3c1c
     adds r3,r6,#0x0    @ 080f88f4 331c
     b LAB_080f8932                           @ 080f88f6 1ce0
-DAT_080f88f8:
-    .word  0x09e4f4b8                     @ 080f88f8 b8f4e409
+render_aob_sprite_with_rot_scale_s_opdobj_c_filename_8f8:
+    .word  s_opdobj_c_filename            @ 080f88f8 b8f4e409  system/s_opdobj.c
 DAT_080f88fc:
     .word  0x00000263                     @ 080f88fc 63020000
 DAT_080f8900:
@@ -10914,7 +10914,7 @@ LAB_080f8b6a:
     str r1,[sp,#0x38]                        @ 080f8b70 0e91
     b LAB_080f8b80                           @ 080f8b72 05e0
 LAB_080f8b74:
-    ldr r0, DAT_080f8c10                     @ 080f8b74 2648
+    ldr r0, render_aob_sprite_with_scale_diag_s_opdobj_c_filename @ 080f8b74 2648
     ldr r1, DAT_080f8c14                     @ 080f8b76 2749
     ldr r2, DAT_080f8c18                     @ 080f8b78 274a
     movs r3,#0x1    @ 080f8b7a 0123
@@ -10993,8 +10993,8 @@ LAB_080f8bd6:
     subs r2,#0x8    @ 080f8c0a 083a
     str r2,[sp,#0x4c]                        @ 080f8c0c 1392
     b LAB_080f8c6c                           @ 080f8c0e 2de0
-DAT_080f8c10:
-    .word  0x09e4f4b8                     @ 080f8c10 b8f4e409
+render_aob_sprite_with_scale_diag_s_opdobj_c_filename:
+    .word  s_opdobj_c_filename            @ 080f8c10 b8f4e409  system/s_opdobj.c
 DAT_080f8c14:
     .word  0x000002d3                     @ 080f8c14 d3020000
 DAT_080f8c18:
@@ -11263,7 +11263,7 @@ LAB_080f8df2:
     movs r4,#0x8    @ 080f8df4 0824
     b LAB_080f8e06                           @ 080f8df6 06e0
 LAB_080f8df8:
-    ldr r0, DAT_080f8ee8                     @ 080f8df8 3b48
+    ldr r0, render_aob_sprite_with_scale_diag_s_opdobj_c_filename_ee8 @ 080f8df8 3b48
     movs r1,#0xcc    @ 080f8dfa cc21
     lsls r1,r1,#0x2    @ 080f8dfc 8900
     ldr r2, DAT_080f8eec                     @ 080f8dfe 3b4a
@@ -11388,8 +11388,8 @@ LAB_080f8ed8:
     pop {r4,r5,r6,r7}                        @ 080f8ee2 f0bc
     pop {r1}                                 @ 080f8ee4 02bc
     bx r1                                    @ 080f8ee6 0847
-DAT_080f8ee8:
-    .word  0x09e4f4b8                     @ 080f8ee8 b8f4e409
+render_aob_sprite_with_scale_diag_s_opdobj_c_filename_ee8:
+    .word  s_opdobj_c_filename            @ 080f8ee8 b8f4e409  system/s_opdobj.c
 DAT_080f8eec:
     .word  0x09e4f564                     @ 080f8eec 64f5e409
 DAT_080f8ef0:
@@ -19284,10 +19284,10 @@ tick_title_ex_cell_anim_slot:
     bl read_obj_id_field                     @ 080fd690 18f742f8
     cmp r5,r0                                @ 080fd694 8542
     blt LAB_080fd6a6                         @ 080fd696 06db
-    ldr r0, DAT_080fd6e8                     @ 080fd698 1348
+    ldr r0, tick_title_ex_cell_anim_slot_titleex_main_c_filename @ 080fd698 1348
     movs r1,#0x84    @ 080fd69a 8421
     lsls r1,r1,#0x1    @ 080fd69c 4900
-    ldr r2, DAT_080fd6ec                     @ 080fd69e 134a
+    ldr r2, tick_title_ex_cell_anim_slot_assert_anmid_ig2d_getanmsequencescoun_73c @ 080fd69e 134a
     movs r3,#0x1    @ 080fd6a0 0123
     bl suppress_assert_report                @ 080fd6a2 fcf71bff
 LAB_080fd6a6:
@@ -19321,10 +19321,10 @@ LAB_080fd6d4:
     b LAB_080fd6fa                           @ 080fd6e2 0ae0
 DAT_080fd6e4:
     .word  0x02029eb0                     @ 080fd6e4 b09e0202
-DAT_080fd6e8:
-    .word  0x09e50724                     @ 080fd6e8 2407e509
-DAT_080fd6ec:
-    .word  0x09e5073c                     @ 080fd6ec 3c07e509
+tick_title_ex_cell_anim_slot_titleex_main_c_filename:
+    .word  titleex_main_c_filename        @ 080fd6e8 2407e509  titleEx/TitleEx_main.c
+tick_title_ex_cell_anim_slot_assert_anmid_ig2d_getanmsequencescoun_73c:
+    .word  assert_anmid_ig2d_getanmsequencescoun_73c @ 080fd6ec 3c07e509  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 LAB_080fd6f0:
     lsls r1,r6,#0x10    @ 080fd6f0 3104
     lsrs r1,r1,#0x10    @ 080fd6f2 090c

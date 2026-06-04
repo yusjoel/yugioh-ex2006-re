@@ -497,8 +497,11 @@ def fix_adr_immediate_to_label(program, text, start_addr, end_addr):
 # 已定义数据（非结构体）输出
 # --------------------------
 
-def emit_data_line_with_addr_bytes(bw, mnemonic, operand_text, addr, bs_list):
-    bw.write("    %-6s %-30s %s\n" % (mnemonic, operand_text, fmt_addr_bytes(addr, bytes_hex_from_list(bs_list))))
+def emit_data_line_with_addr_bytes(bw, mnemonic, operand_text, addr, bs_list, eol=None):
+    line = "    %-6s %-30s %s" % (mnemonic, operand_text, fmt_addr_bytes(addr, bytes_hex_from_list(bs_list)))
+    if eol:
+        line += "  " + eol
+    bw.write(line + "\n")
 
 def resolve_word_symbol(program, data_obj):
     """
@@ -595,12 +598,23 @@ def emit_defined_data(bw, program, data_obj, end_addr):
         bw.write("    .byte  0x00\n")
         return 1
 
+    # 数据 EOL 注释 (Ghidra EOL_COMMENT) -> 追加到 @ addr bytes 之后 (如断言串原文)
+    eol = None
+    try:
+        cu = program.getListing().getCodeUnitAt(addr)
+        if cu is not None:
+            c = cu.getComment(CodeUnit.EOL_COMMENT)
+            if c:
+                eol = c.replace("\n", " ").strip()
+    except Exception:
+        eol = None
+
     if max_len == 4:
         sym = resolve_word_symbol(program, data_obj)
         if sym is None:
             sym = resolve_word_equate(program, data_obj)
         val_str = sym if sym is not None else ("0x%08x" % uval_le(bs))
-        emit_data_line_with_addr_bytes(bw, ".word", val_str, addr, bs)
+        emit_data_line_with_addr_bytes(bw, ".word", val_str, addr, bs, eol)
         return 4
     if max_len == 2:
         emit_data_line_with_addr_bytes(bw, ".hword", "0x%04x" % uval_le(bs), addr, bs)
