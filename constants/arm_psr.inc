@@ -17,3 +17,7 @@
 .set PSR_T_BIT,     0x00000020  @ Thumb 状态位
 .set PSR_F_BIT,     0x00000040  @ FIQ 禁用
 .set PSR_I_BIT,     0x00000080  @ IRQ 禁用
+
+@ -- IntrMain / IntrMain_RetAddr 模式切换复合掩码 --
+.set PSR_MODE_FIQ_IRQ_MASK, 0x000000df  @ BIC 掩码: 清模式位(0x1f)+F(0x40)+I(0x80), 保留 T(0x20)
+.set PSR_IRQ_MODE_IRQ_OFF,  0x00000092  @ IRQ 模式(0x12)|I_BIT(0x80): 进 IRQ 模式并禁用 IRQ

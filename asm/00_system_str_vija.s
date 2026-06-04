@@ -34,7 +34,7 @@ sp_irq_init:
 
 @ ARM 模式中断主处理器 (AGB IntrMain). 被 crt0 注册进 BIOS IRQ 向量 [0x03007ffc], 每次硬件 IRQ 由 BIOS 跳入. 流程: 读 REG_IE/IF(0x4000200)/REG_IME(0x4000208)+SPSR 入栈; 按优先级扫描挂起中断求 gIntrTable(@0x03000000) 槽偏移; 写 REG_IF 应答; 设 REG_IE=允许嵌套子集(0x26c0); 切 System 模式开嵌套; 取 gIntrTable[槽] 的 Thumb ISR 指针; 尾段 (dispatch_thumb_isr_from_arm @0x1f0) 调用之并恢复现场返回. GamePak(卡带拔出)中断 → 关声音(SOUNDCNT_X)后死循环.
 IntrMain:
-    mov r3,#0x4000000                        @ 080000fc 0133a0e3
+    mov r3,#REG_BASE                         @ 080000fc 0133a0e3
     add r3,r3,#0x200                         @ 08000100 023c83e2
     ldr r2,[r3,#0x0]                         @ 08000104 002093e5  -- r2 = REG_IF<<16 | REG_IE
     ldrh r1,[r3,#0x8]                        @ 08000108 b810d3e1
@@ -44,65 +44,65 @@ IntrMain:
     strh r0,[r3,#0x8]                        @ 08000118 b800c3e1
     and r1,r2,r2, lsr #0x10                  @ 0800011c 221802e0  -- r1 = IE & IF (已使能且挂起的中断)
     mov r12,#0x0                             @ 08000120 00c0a0e3
-    ands r0,r1,#0xc0                         @ 08000124 c00011e2  -- 优先级扫描起点: 槽0 = Serial|Timer3 (0xc0)
+    ands r0,r1,#INTR_FLAG_SERIAL_TIMER3      @ 08000124 c00011e2  -- 优先级扫描起点: 槽0 = Serial|Timer3 (0xc0)
     bne LAB_080001c0                         @ 08000128 2400001a
     add r12,r12,#0x4                         @ 0800012c 04c08ce2
-    ands r0,r1,#0x2                          @ 08000130 020011e2
+    ands r0,r1,#INTR_FLAG_HBLANK             @ 08000130 020011e2
     bne LAB_080001c0                         @ 08000134 2100001a
     add r12,r12,#0x4                         @ 08000138 04c08ce2
-    ands r0,r1,#0x1                          @ 0800013c 010011e2
+    ands r0,r1,#INTR_FLAG_VBLANK             @ 0800013c 010011e2
     bne LAB_080001c0                         @ 08000140 1e00001a
     add r12,r12,#0x4                         @ 08000144 04c08ce2
-    ands r0,r1,#0x4                          @ 08000148 040011e2
+    ands r0,r1,#INTR_FLAG_VCOUNT             @ 08000148 040011e2
     bne LAB_080001c0                         @ 0800014c 1b00001a
     add r12,r12,#0x4                         @ 08000150 04c08ce2
-    ands r0,r1,#0x8                          @ 08000154 080011e2
+    ands r0,r1,#INTR_FLAG_TIMER0             @ 08000154 080011e2
     bne LAB_080001c0                         @ 08000158 1800001a
     add r12,r12,#0x4                         @ 0800015c 04c08ce2
-    ands r0,r1,#0x10                         @ 08000160 100011e2
+    ands r0,r1,#INTR_FLAG_TIMER1             @ 08000160 100011e2
     bne LAB_080001c0                         @ 08000164 1500001a
     add r12,r12,#0x4                         @ 08000168 04c08ce2
-    ands r0,r1,#0x20                         @ 0800016c 200011e2
+    ands r0,r1,#INTR_FLAG_TIMER2             @ 0800016c 200011e2
     bne LAB_080001c0                         @ 08000170 1200001a
     add r12,r12,#0x4                         @ 08000174 04c08ce2
-    ands r0,r1,#0x100                        @ 08000178 010c11e2
+    ands r0,r1,#INTR_FLAG_DMA0               @ 08000178 010c11e2
     bne LAB_080001c0                         @ 0800017c 0f00001a
     add r12,r12,#0x4                         @ 08000180 04c08ce2
-    ands r0,r1,#0x200                        @ 08000184 020c11e2
+    ands r0,r1,#INTR_FLAG_DMA1               @ 08000184 020c11e2
     bne LAB_080001c0                         @ 08000188 0c00001a
     add r12,r12,#0x4                         @ 0800018c 04c08ce2
-    ands r0,r1,#0x400                        @ 08000190 010b11e2
+    ands r0,r1,#INTR_FLAG_DMA2               @ 08000190 010b11e2
     bne LAB_080001c0                         @ 08000194 0900001a
     add r12,r12,#0x4                         @ 08000198 04c08ce2
-    ands r0,r1,#0x800                        @ 0800019c 020b11e2
+    ands r0,r1,#INTR_FLAG_DMA3               @ 0800019c 020b11e2
     bne LAB_080001c0                         @ 080001a0 0600001a
     add r12,r12,#0x4                         @ 080001a4 04c08ce2
-    ands r0,r1,#0x1000                       @ 080001a8 010a11e2
+    ands r0,r1,#INTR_FLAG_KEYPAD             @ 080001a8 010a11e2
     bne LAB_080001c0                         @ 080001ac 0300001a
     add r12,r12,#0x4                         @ 080001b0 04c08ce2
-    ands r0,r1,#0x2000                       @ 080001b4 020a11e2
+    ands r0,r1,#INTR_FLAG_GAMEPAK            @ 080001b4 020a11e2
     strbne r0,[r3,#-0x17c]                   @ 080001b8 7c014315  -- GamePak(卡带拔出) → 关 SOUNDCNT_X (0x4000084)
 LAB_080001bc:
     bne LAB_080001bc                         @ 080001bc feffff1a
 LAB_080001c0:
     strh r0,[r3,#0x2]                        @ 080001c0 b200c3e1  -- REG_IF = r0 (写 1 应答已处理中断)
-    mov r1,#0x26c0                           @ 080001c4 9b1da0e3
+    mov r1,#INTR_NESTED_ENABLE_MASK          @ 080001c4 9b1da0e3
     bic r2,r2,r0                             @ 080001c8 0020c2e1
     and r1,r1,r2                             @ 080001cc 021001e0
     strh r1,[r3,#0x0]                        @ 080001d0 b010c3e1  -- REG_IE = 允许嵌套的中断子集 (0x26c0)
     mrs r3,cpsr                              @ 080001d4 00300fe1
-    bic r3,r3,#0xdf                          @ 080001d8 df30c3e3
+    bic r3,r3,#PSR_MODE_FIQ_IRQ_MASK         @ 080001d8 df30c3e3
     orr r3,r3,#PSR_SYS_MODE                  @ 080001dc 1f3083e3
     msr cpsr_cf,r3                           @ 080001e0 03f029e1
     ldr r1, ptr_gIntrTable                   @ 080001e4 48109fe5
     add r1,r1,r12                            @ 080001e8 0c1081e0
     ldr r0,[r1,#0x0]                         @ 080001ec 000091e5  -- r0 = gIntrTable[槽] = 该中断的 Thumb ISR 指针
 
-@ ARM-mode bridge called by CRT0 ARM ISR (0x080000fc) on every IRQ. Sets LR=0x080001fc return stub, calls Thumb ISR via bx r0, then restores IRQ mode via cpsr manipulation and writes IO registers. No game-layer callers (indeg=0); activated by hardware IRQ mechanism only.
+@ ARM-mode bridge invoked by IntrMain (0x080000fc) on every IRQ. Pushes lr, sets lr=IntrMain_RetAddr (0x080001fc), then bx r0 to the Thumb ISR. When the ISR returns it lands in the IntrMain_RetAddr stub (NOT in this bridge), which restores IRQ mode via cpsr manipulation and rewrites the IE/IF/IME IO registers. No game-layer callers (indeg=0); activated by the hardware IRQ mechanism only.
 @ 
-@ Params: r0=Thumb ISR func_ptr (loaded by ARM handler before call)
-@ Returns: void (bx lr, returns to ARM IRQ handler)
-@ Side effects: [r3+0]=r2 (halfword IO reg write); [r3+8]=r1 (halfword IO reg write); cpsr switched to IRQ mode; spsr_cf:=r0
+@ Params: r0=Thumb ISR func_ptr (loaded by IntrMain before the call)
+@ Returns: void (Thumb ISR returns through lr=IntrMain_RetAddr)
+@ Side effects (this bridge only): pushes lr onto the IRQ stack; sets lr=IntrMain_RetAddr. The IE/IF/IME restore and cpsr mode-switch happen in IntrMain_RetAddr (0x080001fc), not in these three instructions.
 @ Constants: 0x92=IRQ mode (bits[4:0]=0b10010) | IRQ-disable (bit7); 0xdf=BIC mask clearing bits[7:6:4:3:2:1:0] (preserves Thumb bit5)
 dispatch_thumb_isr_from_arm:
     stmdb sp!,{lr}                           @ 080001f0 00402de9
@@ -113,8 +113,8 @@ dispatch_thumb_isr_from_arm:
 IntrMain_RetAddr:
     ldmia sp!,{lr}                           @ 080001fc 0040bde8
     mrs r3,cpsr                              @ 08000200 00300fe1
-    bic r3,r3,#0xdf                          @ 08000204 df30c3e3
-    orr r3,r3,#0x92                          @ 08000208 923083e3
+    bic r3,r3,#PSR_MODE_FIQ_IRQ_MASK         @ 08000204 df30c3e3
+    orr r3,r3,#PSR_IRQ_MODE_IRQ_OFF          @ 08000208 923083e3
     msr cpsr_cf,r3                           @ 0800020c 03f029e1
     ldmia sp!,{r0,r1,r2,r3,lr}               @ 08000210 0f40bde8
     strh r2,[r3,#0x0]                        @ 08000214 b020c3e1
@@ -146,15 +146,15 @@ game_str_id_remap_count:
 .include "data/boot-ui-gfx.s"
 
 
-@ 由 play_ui_effect_3a 及 FUN_08014398 在需要完全重置显示层时调用. 执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); (2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); (3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; (4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; (5) gl_state_init 重置 GL 状态结构体; (6) gl_clear_frame_callbacks 清空帧回调队列. Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B.
+@ 由 play_ui_effect_3a (0x080bcbd4) 在需要完全重置显示层时调用 (直接调用者仅此一个; 其地址另登记于函数指针表, 可被间接分派). 执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); (2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); (3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; (4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; (5) gl_state_init 重置 GL 状态结构体; (6) gl_clear_frame_callbacks 清空帧回调队列. Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B.
 reset_display_and_gl_state:
 .thumb
     push {lr}                                @ 08013510 00b5
     sub sp,#0x4                              @ 08013512 81b0
-    ldr r1, DAT_08013564                     @ 08013514 1349
+    ldr r1, reset_display_and_gl_state_ptr_gdemostate @ 08013514 1349
     movs r0,#0x0    @ 08013516 0020
     str r0,[sp,#0x0]                         @ 08013518 0090
-    ldr r2, DAT_08013568                     @ 0801351a 134a
+    ldr r2, reset_display_and_gl_state_demo_cpuset_fill_ctrl @ 0801351a 134a
     .hword 0x4668    @ 0801351c 6846
     bl bios_cpu_set                          @ 0801351e faf06bff
     bl gl_clear_vram_palram_scroll           @ 08013522 01f089f8
@@ -167,13 +167,13 @@ reset_display_and_gl_state:
     lsls r0,r0,#0x5    @ 08013532 4001
     strh r0,[r1,#0x0]                        @ 08013534 0880
     adds r1,#0x2    @ 08013536 0231
-    ldr r0, DAT_0801356c                     @ 08013538 0c48
+    ldr r0, reset_display_and_gl_state_demo_bg1cnt_init @ 08013538 0c48
     strh r0,[r1,#0x0]                        @ 0801353a 0880
     adds r1,#0x2    @ 0801353c 0231
-    ldr r0, DAT_08013570                     @ 0801353e 0c48
+    ldr r0, reset_display_and_gl_state_demo_bg2cnt_init @ 0801353e 0c48
     strh r0,[r1,#0x0]                        @ 08013540 0880
     adds r1,#0x2    @ 08013542 0231
-    ldr r0, DAT_08013574                     @ 08013544 0b48
+    ldr r0, reset_display_and_gl_state_demo_bg3cnt_init @ 08013544 0b48
     strh r0,[r1,#0x0]                        @ 08013546 0880
     movs r1,#0x10    @ 08013548 1021
     rsbs r1,r1,#0    @ 0801354a 4942
@@ -186,16 +186,16 @@ reset_display_and_gl_state:
     pop {r1}                                 @ 0801355e 02bc
     bx r1                                    @ 08013560 0847
     .zero  0x2
-DAT_08013564:
+reset_display_and_gl_state_ptr_gdemostate:
     .word  gDemoState                     @ 08013564 c09e0202
-DAT_08013568:
-    .word  0x05000025                     @ 08013568 25000005
-DAT_0801356c:
-    .word  0x00001e01                     @ 0801356c 011e0000
-DAT_08013570:
-    .word  0x00001f02                     @ 08013570 021f0000
-DAT_08013574:
-    .word  0x00009b0b                     @ 08013574 0b9b0000
+reset_display_and_gl_state_demo_cpuset_fill_ctrl:
+    .word  DEMO_CPUSET_FILL_CTRL          @ 08013568 25000005
+reset_display_and_gl_state_demo_bg1cnt_init:
+    .word  DEMO_BG1CNT_INIT               @ 0801356c 011e0000
+reset_display_and_gl_state_demo_bg2cnt_init:
+    .word  DEMO_BG2CNT_INIT               @ 08013570 021f0000
+reset_display_and_gl_state_demo_bg3cnt_init:
+    .word  DEMO_BG3CNT_INIT               @ 08013574 0b9b0000
 
 @ Called by dispatch_demo_sprite_setup_by_mode (mode=0). Initialises OAM attr0/attr1/attr2 fields for one demo sprite slot, then calls apply_gfx_resource_list to commit. Detects JP BIOS version byte [0x080000ae]>>8 == 0x4a and adjusts tile offset +0x38. r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. Constants: OAM_BIOS_JP_MASK=0x4a / ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf.
 setup_demo_sprite_entry:
@@ -209,11 +209,11 @@ setup_demo_sprite_entry:
     .hword 0x4689    @ 08013586 8946
     adds r5,r2,#0x0    @ 08013588 151c
     .hword 0x4698    @ 0801358a 9846
-    ldr r0, DAT_08013668                     @ 0801358c 3648
+    ldr r0, setup_demo_sprite_entry_ptr_gdemostate @ 0801358c 3648
     .hword 0x4682    @ 0801358e 8246
     add r2,sp,#0x24                          @ 08013590 09aa
     adds r1,r2,#0x0    @ 08013592 111c
-    ldr r0, DAT_0801366c                     @ 08013594 3548
+    ldr r0, setup_demo_sprite_entry_demo_sprite_resource_desc @ 08013594 3548
     ldmia r0!,{r3,r4,r6}                     @ 08013596 58c8
     stmia r1!,{r3,r4,r6}                     @ 08013598 58c1
     ldr r0,[r0,#0x0]                         @ 0801359a 0068
@@ -247,7 +247,7 @@ setup_demo_sprite_entry:
     ldr r3,[sp,#0x58]                        @ 080135d4 169b
     ands r3,r0    @ 080135d6 0340
     lsls r6,r3,#0x7    @ 080135d8 de01
-    ldr r0, DAT_08013670                     @ 080135da 2548
+    ldr r0, setup_demo_sprite_entry_demo_clear_bits_13_7 @ 080135da 2548
     ldrh r4,[r1,#0x18]                       @ 080135dc 0c8b
     ands r0,r4    @ 080135de 2040
     orrs r0,r6    @ 080135e0 3043
@@ -321,12 +321,12 @@ LAB_08013646:
     pop {r0}                                 @ 08013662 01bc
     bx r0                                    @ 08013664 0047
     .zero  0x2
-DAT_08013668:
+setup_demo_sprite_entry_ptr_gdemostate:
     .word  gDemoState                     @ 08013668 c09e0202
-DAT_0801366c:
-    .word  0x09e396b8                     @ 0801366c b896e309
-DAT_08013670:
-    .word  0xffffc07f                     @ 08013670 7fc0ffff
+setup_demo_sprite_entry_demo_sprite_resource_desc:
+    .word  demo_sprite_resource_desc      @ 0801366c b896e309
+setup_demo_sprite_entry_demo_clear_bits_13_7:
+    .word  DEMO_CLEAR_BITS_13_7           @ 08013670 7fc0ffff
 DAT_08013674:
     .word  0x080000ae                     @ 08013674 ae000008
 DAT_08013678:
@@ -349,13 +349,13 @@ setup_demo_sprite_entry_alt:
     ldr r6,[sp,#0x54]                        @ 08013694 159e
     add r2,sp,#0x24                          @ 08013696 09aa
     adds r1,r2,#0x0    @ 08013698 111c
-    ldr r0, DAT_08013734                     @ 0801369a 2648
+    ldr r0, setup_demo_sprite_entry_alt_demo_sprite_alt_resource_desc @ 0801369a 2648
     ldmia r0!,{r3,r4,r7}                     @ 0801369c 98c8
     stmia r1!,{r3,r4,r7}                     @ 0801369e 98c1
     .hword 0x4668    @ 080136a0 6846
     str r2,[sp,#0x30]                        @ 080136a2 0c92
     bl zero_struct_36bytes                   @ 080136a4 02f090fc
-    ldr r4, DAT_08013738                     @ 080136a8 234c
+    ldr r4, setup_demo_sprite_entry_alt_ptr_gdemostate @ 080136a8 234c
     adds r4,#0x88    @ 080136aa 8834
     ldr r0,[r4,#0x0]                         @ 080136ac 2068
     str r0,[sp,#0x0]                         @ 080136ae 0090
@@ -380,7 +380,7 @@ setup_demo_sprite_entry_alt:
     movs r0,#0x7f    @ 080136d4 7f20
     ands r6,r0    @ 080136d6 0640
     lsls r6,r6,#0x7    @ 080136d8 f601
-    ldr r0, DAT_0801373c                     @ 080136da 1848
+    ldr r0, setup_demo_sprite_entry_alt_demo_clear_bits_13_7 @ 080136da 1848
     ldrh r3,[r1,#0x18]                       @ 080136dc 0b8b
     ands r0,r3    @ 080136de 1840
     orrs r0,r6    @ 080136e0 3043
@@ -425,14 +425,14 @@ LAB_08013708:
     pop {r0}                                 @ 0801372e 01bc
     bx r0                                    @ 08013730 0047
     .zero  0x2
-DAT_08013734:
-    .word  0x09e396c8                     @ 08013734 c896e309
-DAT_08013738:
+setup_demo_sprite_entry_alt_demo_sprite_alt_resource_desc:
+    .word  demo_sprite_alt_resource_desc  @ 08013734 c896e309
+setup_demo_sprite_entry_alt_ptr_gdemostate:
     .word  gDemoState                     @ 08013738 c09e0202
-DAT_0801373c:
-    .word  0xffffc07f                     @ 0801373c 7fc0ffff
+setup_demo_sprite_entry_alt_demo_clear_bits_13_7:
+    .word  DEMO_CLEAR_BITS_13_7           @ 0801373c 7fc0ffff
 
-@ Dispatcher called by scene_demo state machine (FUN_08013bd4) for sprite init. mode=0 -> setup_demo_sprite_entry (0x08013578); mode=1 or mode=2 -> setup_demo_sprite_entry_alt (0x08013680); other mode: epilogue only. Epilogue unconditionally writes 0 to DISPCNT (0x04000000) via 0xa0<<0x13. r0=mode[0..2], r1=x_pos, r2=palette_idx, r3=ptr. Constants: DISPCNT=0x04000000.
+@ Dispatcher called by scene_demo state machine (tick_demo_scene_state_machine) for sprite init. mode=0 -> setup_demo_sprite_entry (0x08013578); mode=1 or mode=2 -> setup_demo_sprite_entry_alt (0x08013680); other mode: epilogue only. Epilogue unconditionally writes 0 to DISPCNT (0x04000000) via 0xa0<<0x13. r0=mode[0..2], r1=x_pos, r2=palette_idx, r3=ptr. Constants: DISPCNT=0x04000000.
 dispatch_demo_sprite_setup_by_mode:
     push {r4,r5,lr}                          @ 08013740 30b5
     sub sp,#0x4                              @ 08013742 81b0
@@ -483,7 +483,7 @@ LAB_0801378a:
     bx r0                                    @ 08013798 0047
     .zero  0x2
 
-@ Called by scene_demo state machine (FUN_08013bd4, case=0). Loads first BG graphics group: fs_load(r0='demo/exodia/exodia00_1.LZ5bg'), then two rounds of zero_struct_36bytes + apply_gfx_resource_list for BG0 and BG1. First apply: priority=3; second apply: tile offset 0xa00 + attr1 bit7 set. Epilogue strh to DISPCNT (0xa0<<0x13 = 0x04000000). Constants: BG0_PRIORITY=0x3 / OBJ_VRAM_OFFSET=0xa00 / DISPCNT=0x04000000.
+@ Called by scene_demo state machine (tick_demo_scene_state_machine, case=0). Loads first BG graphics group: fs_load(r0='demo/exodia/exodia00_1.LZ5bg'), then two rounds of zero_struct_36bytes + apply_gfx_resource_list for BG0 and BG1. First apply: priority=3; second apply: tile offset 0xa00 + attr1 bit7 set. Epilogue strh to DISPCNT (0xa0<<0x13 = 0x04000000). Constants: BG0_PRIORITY=0x3 / OBJ_VRAM_OFFSET=0xa00 / DISPCNT=0x04000000.
 load_demo_bg_gfx_set0:
     push {r4,r5,r6,r7,lr}                    @ 0801379c f0b5
     .hword 0x4657    @ 0801379e 5746
@@ -514,7 +514,7 @@ load_demo_bg_gfx_set0:
     ldrb r2,[r1,#0x18]                       @ 080137d4 0a7e
     ands r0,r2    @ 080137d6 1040
     strb r0,[r1,#0x18]                       @ 080137d8 0876
-    ldr r4, DAT_08013860                     @ 080137da 214c
+    ldr r4, load_demo_bg_gfx_set0_demo_clear_bits_13_7 @ 080137da 214c
     adds r0,r4,#0x0    @ 080137dc 201c
     ldrh r2,[r1,#0x18]                       @ 080137de 0a8b
     ands r0,r2    @ 080137e0 1040
@@ -578,10 +578,10 @@ load_demo_bg_gfx_set0:
     pop {r4,r5,r6,r7}                        @ 0801385a f0bc
     pop {r0}                                 @ 0801385c 01bc
     bx r0                                    @ 0801385e 0047
-DAT_08013860:
-    .word  0xffffc07f                     @ 08013860 7fc0ffff
+load_demo_bg_gfx_set0_demo_clear_bits_13_7:
+    .word  DEMO_CLEAR_BITS_13_7           @ 08013860 7fc0ffff
 
-@ Called by scene_demo state machine (FUN_08013bd4, case=5). Symmetric to load_demo_bg_gfx_set0 (0x0801379c); loads second BG group: fs_load(r0='demo/exodia/exodia01_BG.LZ5bg'), two zero_struct_36bytes + two apply_gfx_resource_list, plus a third apply for extended resource descriptor DAT_0801393c=0x141e0000. Difference: second apply uses tile base 0x22 instead of 0xa0<<4. Epilogue strh to DISPCNT. Constants: BG_TILE_BASE2=0x22 / DISPCNT=0x04000000 / EXTRA_RESOURCE=0x141e0000.
+@ Called by scene_demo state machine (tick_demo_scene_state_machine, case=5). Symmetric to load_demo_bg_gfx_set0 (0x0801379c); loads second BG group: fs_load(r0='demo/exodia/exodia01_BG.LZ5bg'), two zero_struct_36bytes + two apply_gfx_resource_list, plus a third apply for extended resource descriptor DEMO_EXTRA_RESOURCE_DESC=0x141e0000. Difference: second apply uses tile base 0x22 instead of 0xa0<<4. Epilogue strh to DISPCNT. Constants: BG_TILE_BASE2=0x22 / DISPCNT=0x04000000 / EXTRA_RESOURCE=0x141e0000.
 load_demo_bg_gfx_set1:
     push {r4,r5,r6,r7,lr}                    @ 08013864 f0b5
     .hword 0x4657    @ 08013866 5746
@@ -612,7 +612,7 @@ load_demo_bg_gfx_set1:
     ldrb r2,[r1,#0x18]                       @ 0801389c 0a7e
     ands r0,r2    @ 0801389e 1040
     strb r0,[r1,#0x18]                       @ 080138a0 0876
-    ldr r6, DAT_08013938                     @ 080138a2 254e
+    ldr r6, load_demo_bg_gfx_set1_demo_clear_bits_13_7 @ 080138a2 254e
     adds r0,r6,#0x0    @ 080138a4 301c
     ldrh r2,[r1,#0x18]                       @ 080138a6 0a8b
     ands r0,r2    @ 080138a8 1040
@@ -668,7 +668,7 @@ load_demo_bg_gfx_set1:
     ldrb r2,[r1,#0x17]                       @ 08013910 ca7d
     orrs r0,r2    @ 08013912 1043
     strb r0,[r1,#0x17]                       @ 08013914 c875
-    ldr r0, DAT_0801393c                     @ 08013916 0948
+    ldr r0, load_demo_bg_gfx_set1_demo_extra_resource_desc @ 08013916 0948
     str r0,[sp,#0x20]                        @ 08013918 0890
     .hword 0x4668    @ 0801391a 6846
     bl apply_gfx_resource_list               @ 0801391c 03f0aef8
@@ -684,18 +684,18 @@ load_demo_bg_gfx_set1:
     pop {r4,r5,r6,r7}                        @ 08013932 f0bc
     pop {r0}                                 @ 08013934 01bc
     bx r0                                    @ 08013936 0047
-DAT_08013938:
-    .word  0xffffc07f                     @ 08013938 7fc0ffff
-DAT_0801393c:
-    .word  0x141e0000                     @ 0801393c 00001e14
+load_demo_bg_gfx_set1_demo_clear_bits_13_7:
+    .word  DEMO_CLEAR_BITS_13_7           @ 08013938 7fc0ffff
+load_demo_bg_gfx_set1_demo_extra_resource_desc:
+    .word  DEMO_EXTRA_RESOURCE_DESC       @ 0801393c 00001e14
 
 @ demo scene OBJ resource loader with slot selection. r0=u32 slot_index [0..1] (0=exodia01_obj, 1=exodia02_obj). Reads file path table from ROM constant at 0x09e397d4 (8 paths: 2 slots x 4 files), indexes by slot_index*16 on stack, then calls load_g2d_obj_resource_set. Side-effects: gDemoState anim ctrl + ImageProxy initialised; OBJ Tile VRAM + OBJ Palette VRAM written with exodia file data.
 load_demo_obj_resource_by_slot:
     push {r4,r5,r6,lr}                       @ 08013940 70b5
     sub sp,#0x34                             @ 08013942 8db0
-    ldr r4, DAT_08013984                     @ 08013944 0f4c
+    ldr r4, load_demo_obj_resource_by_slot_ptr_gdemostate @ 08013944 0f4c
     add r2,sp,#0x14                          @ 08013946 05aa
-    ldr r1, DAT_08013988                     @ 08013948 0f49
+    ldr r1, load_demo_obj_resource_by_slot_demo_obj_resource_ptr_table @ 08013948 0f49
     ldmia r1!,{r3,r5,r6}                     @ 0801394a 68c9
     stmia r2!,{r3,r5,r6}                     @ 0801394c 68c2
     ldmia r1!,{r3,r5,r6}                     @ 0801394e 68c9
@@ -724,10 +724,10 @@ load_demo_obj_resource_by_slot:
     pop {r4,r5,r6}                           @ 0801397e 70bc
     pop {r0}                                 @ 08013980 01bc
     bx r0                                    @ 08013982 0047
-DAT_08013984:
+load_demo_obj_resource_by_slot_ptr_gdemostate:
     .word  gDemoState                     @ 08013984 c09e0202
-DAT_08013988:
-    .word  0x09e397d4                     @ 08013988 d497e309
+load_demo_obj_resource_by_slot_demo_obj_resource_ptr_table:
+    .word  demo_obj_resource_ptr_table    @ 08013988 d497e309
 
 @ demo scene slot-0 OBJ loader stub. void args. Fixes r0=0 then calls load_demo_obj_resource_by_slot(0) to load exodia01_obj {NCER/NANR/NCGR/NCLR} into demo state slot 0. Returns r0=1 (fixed success flag). Side-effects: same as load_demo_obj_resource_by_slot(0).
 load_demo_obj_resource_slot0:
@@ -741,25 +741,25 @@ load_demo_obj_resource_slot0:
 
 @ demo scene BG3 scroll register write helper. r0=u16 hofs [0..511], r1=u16 vofs [0..511]. Masks both with 0x1FF, then strh hofs -> BG3HOFS (0x04000018), strh vofs -> BG3VOFS (0x0400001E). Called by tick_demo_bg3_hscroll and tick_demo_bg3_vscroll after computing new offsets. Side-effects: GBA IO regs BG3HOFS and BG3VOFS updated.
 write_bg3_scroll_regs:
-    ldr r3, DAT_080139ac                     @ 0801399c 034b
+    ldr r3, write_bg3_scroll_regs_demo_keep_bits_8_0 @ 0801399c 034b
     ands r0,r3    @ 0801399e 1840
-    ldr r2, PTR_BG3HOFS_080139b0             @ 080139a0 034a
+    ldr r2, write_bg3_scroll_regs_ptr_bg3hofs @ 080139a0 034a
     strh r0,[r2,#0x0]                        @ 080139a2 1080
     ands r1,r3    @ 080139a4 1940
-    ldr r0, PTR_BG3VOFS_080139b4             @ 080139a6 0348
+    ldr r0, write_bg3_scroll_regs_ptr_bg3vofs @ 080139a6 0348
     strh r1,[r0,#0x0]                        @ 080139a8 0180
     bx lr                                    @ 080139aa 7047
-DAT_080139ac:
-    .word  0x000001ff                     @ 080139ac ff010000
-PTR_BG3HOFS_080139b0:
+write_bg3_scroll_regs_demo_keep_bits_8_0:
+    .word  DEMO_KEEP_BITS_8_0             @ 080139ac ff010000
+write_bg3_scroll_regs_ptr_bg3hofs:
     .word  BG3HOFS                        @ 080139b0 1c000004
-PTR_BG3VOFS_080139b4:
+write_bg3_scroll_regs_ptr_bg3vofs:
     .word  BG3VOFS                        @ 080139b4 1e000004
 
 @ demo scene per-frame BG3 horizontal scroll updater. void args. Reads gDemoState+0x8c bits[23:16] as 8-bit scroll counter, computes HOFS = counter % 160 (0xa0, GBA screen width), steps counter bits[8:1] += 2 mod 256 with wrap at 0xa0, writes back to gDemoState+0x8c, calls write_bg3_scroll_regs(0, hofs). Side-effects: gDemoState+0x8c updated; BG3HOFS written.
 tick_demo_bg3_hscroll:
     push {r4,r5,lr}                          @ 080139b8 30b5
-    ldr r0, DAT_08013a08                     @ 080139ba 1348
+    ldr r0, tick_demo_bg3_hscroll_ptr_gdemostate @ 080139ba 1348
     adds r4,r0,#0x0    @ 080139bc 041c
     adds r4,#0x8c    @ 080139be 8c34
     ldrh r1,[r4,#0x0]                        @ 080139c0 2188
@@ -777,7 +777,7 @@ tick_demo_bg3_hscroll:
     movs r5,#0xff    @ 080139dc ff25
     ands r0,r5    @ 080139de 2840
     lsls r0,r0,#0x1    @ 080139e0 4000
-    ldr r3, DAT_08013a0c                     @ 080139e2 0a4b
+    ldr r3, tick_demo_bg3_hscroll_demo_clear_bits_8_1 @ 080139e2 0a4b
     adds r2,r3,#0x0    @ 080139e4 1a1c
     ands r2,r1    @ 080139e6 0a40
     orrs r2,r0    @ 080139e8 0243
@@ -797,15 +797,15 @@ LAB_08013a00:
     pop {r0}                                 @ 08013a02 01bc
     bx r0                                    @ 08013a04 0047
     .zero  0x2
-DAT_08013a08:
+tick_demo_bg3_hscroll_ptr_gdemostate:
     .word  gDemoState                     @ 08013a08 c09e0202
-DAT_08013a0c:
-    .word  0xfffffe01                     @ 08013a0c 01feffff
+tick_demo_bg3_hscroll_demo_clear_bits_8_1:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013a0c 01feffff
 
 @ demo scene per-frame BG3 vertical scroll updater. void args. Reads gDemoState+0x8c bits[23:16], computes VOFS = -(counter % 240) (0xf0, GBA screen height; rsbs for upward scroll direction), steps counter bits[8:1] += 2 mod 256 with wrap at 0xf0, writes back, calls write_bg3_scroll_regs(vofs, 0). Side-effects: gDemoState+0x8c updated; BG3VOFS written.
 tick_demo_bg3_vscroll:
     push {r4,r5,lr}                          @ 08013a10 30b5
-    ldr r0, DAT_08013a60                     @ 08013a12 1348
+    ldr r0, tick_demo_bg3_vscroll_ptr_gdemostate @ 08013a12 1348
     adds r4,r0,#0x0    @ 08013a14 041c
     adds r4,#0x8c    @ 08013a16 8c34
     ldrh r1,[r4,#0x0]                        @ 08013a18 2188
@@ -823,7 +823,7 @@ tick_demo_bg3_vscroll:
     movs r5,#0xff    @ 08013a34 ff25
     ands r0,r5    @ 08013a36 2840
     lsls r0,r0,#0x1    @ 08013a38 4000
-    ldr r3, DAT_08013a64                     @ 08013a3a 0a4b
+    ldr r3, tick_demo_bg3_vscroll_demo_clear_bits_8_1 @ 08013a3a 0a4b
     adds r2,r3,#0x0    @ 08013a3c 1a1c
     ands r2,r1    @ 08013a3e 0a40
     orrs r2,r0    @ 08013a40 0243
@@ -843,18 +843,18 @@ LAB_08013a58:
     pop {r0}                                 @ 08013a5a 01bc
     bx r0                                    @ 08013a5c 0047
     .zero  0x2
-DAT_08013a60:
+tick_demo_bg3_vscroll_ptr_gdemostate:
     .word  gDemoState                     @ 08013a60 c09e0202
-DAT_08013a64:
-    .word  0xfffffe01                     @ 08013a64 01feffff
+tick_demo_bg3_vscroll_demo_clear_bits_8_1:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013a64 01feffff
 
-@ scene_demo cell animation slot initializer. Called by FUN_08013bd4 (tags: display,bg,demo,fs,settings) only. Steps: (1) table-lookup gDemoState[slot_idx*4] for cell anim ptr; (2) read_obj_id_field to assert slot_idx < obj_field (IG2D_Main.c:0x14b=331); (3) get gDemoState+slot*4+8 anim struct addr; (4) if frame_or_seq_param==-1: dispatch_cell_anim_frame_advance; else: dispatch_cell_anim_sequence_step; (5) assemble stack args and call dispatch_isd_cell_anim_oam_setup for OAM init. r0=u8 slot_idx [0..slot_count-1], r1=NNS_G2dCellAnimation* pCellAnim, r2=s16 frame_or_seq_param (-1=frame advance, else=seq_idx lsls*0xc), r3=s16 second_param. Constants: gDemoState=0x02029ec0.
+@ scene_demo cell animation slot initializer. Called by tick_demo_scene_state_machine (tags: display,bg,demo,fs,settings) only. Steps: (1) table-lookup gDemoState[slot_idx*4] for cell anim ptr; (2) read_obj_id_field to assert slot_idx < obj_field (Exodia/EXO_main.c:331; assert: anmID < IG2D_GetAnmSequencesCount); (3) get gDemoState+slot*4+8 anim struct addr; (4) if frame_or_seq_param==-1: dispatch_cell_anim_frame_advance; else: dispatch_cell_anim_sequence_step; (5) assemble stack args and call dispatch_isd_cell_anim_oam_setup for OAM init. r0=u8 slot_idx [0..slot_count-1], r1=NNS_G2dCellAnimation* pCellAnim, r2=s16 frame_or_seq_param (-1=frame advance, else=seq_idx lsls*0xc), r3=s16 second_param. Constants: gDemoState=0x02029ec0.
 setup_demo_cell_anim_slot:
     push {r4,r5,r6,r7,lr}                    @ 08013a68 f0b5
     sub sp,#0x28                             @ 08013a6a 8ab0
     adds r4,r0,#0x0    @ 08013a6c 041c
     adds r6,r1,#0x0    @ 08013a6e 0e1c
-    ldr r7, DAT_08013ab0                     @ 08013a70 0f4f
+    ldr r7, setup_demo_cell_anim_slot_ptr_gdemostate @ 08013a70 0f4f
     lsls r2,r2,#0xc    @ 08013a72 1203
     str r2,[sp,#0x20]                        @ 08013a74 0892
     lsls r3,r3,#0xc    @ 08013a76 1b03
@@ -865,9 +865,9 @@ setup_demo_cell_anim_slot:
     bl read_obj_id_field                     @ 08013a80 01f04afe
     cmp r4,r0                                @ 08013a84 8442
     blt LAB_08013a94                         @ 08013a86 05db
-    ldr r0, DAT_08013ab4                     @ 08013a88 0a48
+    ldr r0, setup_demo_cell_anim_slot_demo_cell_anim_assert_file @ 08013a88 0a48
     ldr r1, DAT_08013ab8                     @ 08013a8a 0b49
-    ldr r2, DAT_08013abc                     @ 08013a8c 0b4a
+    ldr r2, setup_demo_cell_anim_slot_demo_cell_anim_assert_expr @ 08013a8c 0b4a
     movs r3,#0x1    @ 08013a8e 0123
     bl suppress_assert_report                @ 08013a90 e6f024fd
 LAB_08013a94:
@@ -884,14 +884,14 @@ LAB_08013a94:
     adds r0,r4,#0x0    @ 08013aa8 201c
     bl dispatch_cell_anim_frame_advance      @ 08013aaa 01f037fe
     b LAB_08013aca                           @ 08013aae 0ce0
-DAT_08013ab0:
+setup_demo_cell_anim_slot_ptr_gdemostate:
     .word  gDemoState                     @ 08013ab0 c09e0202
-DAT_08013ab4:
-    .word  0x09e397f4                     @ 08013ab4 f497e309
+setup_demo_cell_anim_slot_demo_cell_anim_assert_file:
+    .word  demo_cell_anim_assert_file     @ 08013ab4 f497e309
 DAT_08013ab8:
     .word  0x0000014b                     @ 08013ab8 4b010000
-DAT_08013abc:
-    .word  0x09e39808                     @ 08013abc 0898e309
+setup_demo_cell_anim_slot_demo_cell_anim_assert_expr:
+    .word  demo_cell_anim_assert_expr     @ 08013abc 0898e309
 LAB_08013ac0:
     lsls r1,r6,#0x10    @ 08013ac0 3104
     lsrs r1,r1,#0x10    @ 08013ac2 090c
@@ -931,7 +931,7 @@ apply_demo_window_fade_in_step:
     adds r6,r0,#0x0    @ 08013b04 061c
     cmp r5,r4                                @ 08013b06 a542
     bne LAB_08013b56                         @ 08013b08 25d1
-    ldr r3, PTR_WININ_08013b74               @ 08013b0a 1a4b
+    ldr r3, apply_demo_window_fade_in_step_ptr_winin @ 08013b0a 1a4b
     movs r2,#0x20    @ 08013b0c 2022
     rsbs r2,r2,#0    @ 08013b0e 5242
     ldrh r1,[r3,#0x0]                        @ 08013b10 1988
@@ -940,7 +940,7 @@ apply_demo_window_fade_in_step:
     movs r1,#0x3b    @ 08013b16 3b21
     orrs r0,r1    @ 08013b18 0843
     strh r0,[r3,#0x0]                        @ 08013b1a 1880
-    ldr r1, PTR_WINOUT_08013b78              @ 08013b1c 1649
+    ldr r1, apply_demo_window_fade_in_step_ptr_winout @ 08013b1c 1649
     ldrh r0,[r1,#0x0]                        @ 08013b1e 0888
     ands r2,r0    @ 08013b20 0240
     strh r2,[r1,#0x0]                        @ 08013b22 0a80
@@ -954,7 +954,7 @@ apply_demo_window_fade_in_step:
     lsls r2,r2,#0x13    @ 08013b32 d204
     movs r3,#0x80    @ 08013b34 8023
     lsls r3,r3,#0x6    @ 08013b36 9b01
-    ldr r0, DAT_08013b7c                     @ 08013b38 1048
+    ldr r0, apply_demo_window_fade_in_step_demo_clear_bits_14_13 @ 08013b38 1048
     ldrh r1,[r2,#0x0]                        @ 08013b3a 1188
     ands r0,r1    @ 08013b3c 0840
     orrs r0,r3    @ 08013b3e 1843
@@ -977,19 +977,19 @@ LAB_08013b56:
     lsrs r0,r0,#0x8    @ 08013b62 000a
     orrs r0,r1    @ 08013b64 0843
     lsrs r0,r0,#0x10    @ 08013b66 000c
-    ldr r1, PTR_WIN0V_08013b80               @ 08013b68 0549
+    ldr r1, apply_demo_window_fade_in_step_ptr_win0v @ 08013b68 0549
     strh r0,[r1,#0x0]                        @ 08013b6a 0880
     pop {r4,r5,r6}                           @ 08013b6c 70bc
     pop {r0}                                 @ 08013b6e 01bc
     bx r0                                    @ 08013b70 0047
     .zero  0x2
-PTR_WININ_08013b74:
+apply_demo_window_fade_in_step_ptr_winin:
     .word  WININ                          @ 08013b74 48000004
-PTR_WINOUT_08013b78:
+apply_demo_window_fade_in_step_ptr_winout:
     .word  WINOUT                         @ 08013b78 4a000004
-DAT_08013b7c:
-    .word  0xffff9fff                     @ 08013b7c ff9fffff
-PTR_WIN0V_08013b80:
+apply_demo_window_fade_in_step_demo_clear_bits_14_13:
+    .word  DEMO_CLEAR_BITS_14_13          @ 08013b7c ff9fffff
+apply_demo_window_fade_in_step_ptr_win0v:
     .word  WIN0V                          @ 08013b80 44000004
 
 @ Called by tick_demo_scene_state_machine (0x08013bd4) caseD_6 to execute one fade-out step. Computes window vertical range as (max-cur)*0x50/max and writes to WIN0V; on completion calls gl_set_brightness(0x3f,-16) + tick_blend_transition_step (0x08014914) + gl_set_blend2_level. r0=u8 current_frame [0..max_frames-1], r1=u8 max_frames [1..15]. Symmetric sibling of apply_demo_window_fade_in_step (0x08013af4), direction reversed. Side-effects: WIN0V(0x04000044), gl_set_brightness(-16), tick_blend_transition_step.
@@ -1012,7 +1012,7 @@ apply_demo_window_fade_out_step:
     lsrs r1,r1,#0x8    @ 08013ba4 090a
     orrs r1,r2    @ 08013ba6 1143
     lsrs r1,r1,#0x10    @ 08013ba8 090c
-    ldr r0, PTR_WIN0V_08013bd0               @ 08013baa 0948
+    ldr r0, apply_demo_window_fade_out_step_ptr_win0v @ 08013baa 0948
     strh r1,[r0,#0x0]                        @ 08013bac 0180
     cmp r5,r4                                @ 08013bae a542
     bne LAB_08013bca                         @ 08013bb0 0bd1
@@ -1029,10 +1029,10 @@ LAB_08013bca:
     pop {r4,r5}                              @ 08013bca 30bc
     pop {r0}                                 @ 08013bcc 01bc
     bx r0                                    @ 08013bce 0047
-PTR_WIN0V_08013bd0:
+apply_demo_window_fade_out_step_ptr_win0v:
     .word  WIN0V                          @ 08013bd0 44000004
 
-@ Called by FUN_08014398 and play_ui_effect_3a (0x080bcbd4); drives the demo scene (Exodia animation) per-frame state machine. Reads gDemoState+0x8c bits[22:15] as state_idx (0-9), dispatches via 10-entry jump table: case0 load BG gfx set0+FS+sprites; case1/2 check blend progress and advance fade-in; case3/4 step sprite animation frames; case5 load BG gfx set1; case6/7 fade-out window animation; case8/9 end states. Each case increments state counter and falls through to default (no change). No parameters (void); all inputs from gDemoState EWRAM struct. Side-effects: gDemoState+0x8c state field, DISPCNT/BG3CNT/BLDCNT IO registers.
+@ Called by play_ui_effect_3a (0x080bcbd4) directly (its address also appears in a function-pointer table for indirect dispatch); drives the demo scene (Exodia animation) per-frame state machine. Reads gDemoState+0x8c bits[22:15] as state_idx (0-9), dispatches via 10-entry jump table: case0 load BG gfx set0+FS+sprites; case1/2 check blend progress and advance fade-in; case3/4 step sprite animation frames; case5 load BG gfx set1; case6/7 fade-out window animation; case8/9 end states. Each case increments state counter and falls through to default (no change). No parameters (void); all inputs from gDemoState EWRAM struct. Side-effects: gDemoState+0x8c state field, DISPCNT/BG3CNT/BLDCNT IO registers.
 tick_demo_scene_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 08013bd4 f0b5
     .hword 0x4657    @ 08013bd6 5746
@@ -1040,7 +1040,7 @@ tick_demo_scene_state_machine:
     .hword 0x4645    @ 08013bda 4546
     push {r5,r6,r7}                          @ 08013bdc e0b4
     sub sp,#0x8                              @ 08013bde 82b0
-    ldr r0, DAT_08013bfc                     @ 08013be0 0648
+    ldr r0, tick_demo_scene_state_machine_ptr_gdemostate @ 08013be0 0648
     .hword 0x4682    @ 08013be2 8246
     adds r0,#0x8c    @ 08013be4 8c30
     ldr r0,[r0,#0x0]                         @ 08013be6 0068
@@ -1056,7 +1056,7 @@ LAB_08013bf2:
     ldr r0,[r0,#0x0]                         @ 08013bf8 0068
 switchD_08013bfa__switchD:
     .hword 0x4687    @ 08013bfa 8746
-DAT_08013bfc:
+tick_demo_scene_state_machine_ptr_gdemostate:
     .word  gDemoState                     @ 08013bfc c09e0202
 DAT_08013c00:
     .word  0x08013c04                     @ 08013c00 043c0108
@@ -1072,9 +1072,9 @@ switchD_08013bfa__switchdataD_08013c04:
     .word  0x080141f8                     @ 08013c24 f8410108
     .word  0x08014258                     @ 08013c28 58420108
 switchD_08013bfa__caseD_0:
-    ldr r0, DAT_08013c98                     @ 08013c2c 1a48
+    ldr r0, tick_demo_scene_state_machine_path_demo_exodia00_1_bg @ 08013c2c 1a48
     bl load_demo_bg_gfx_set0                 @ 08013c2e fff7b5fd
-    ldr r0, DAT_08013c9c                     @ 08013c32 1a48
+    ldr r0, tick_demo_scene_state_machine_path_demo_exodia00_2_bg @ 08013c32 1a48
     movs r1,#0x0    @ 08013c34 0021
     bl fs_load                               @ 08013c36 01f0b7f9
     .hword 0x4651    @ 08013c3a 5146
@@ -1113,18 +1113,18 @@ switchD_08013bfa__caseD_0:
     lsls r2,r2,#0x13    @ 08013c86 d204
     movs r3,#0x80    @ 08013c88 8023
     lsls r3,r3,#0x1    @ 08013c8a 5b00
-    ldr r0, DAT_08013ca0                     @ 08013c8c 0448
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_ca0 @ 08013c8c 0448
     ldrh r1,[r2,#0x0]                        @ 08013c8e 1188
     ands r0,r1    @ 08013c90 0840
     orrs r0,r3    @ 08013c92 1843
     strh r0,[r2,#0x0]                        @ 08013c94 1080
     b LAB_08013cd6                           @ 08013c96 1ee0
-DAT_08013c98:
-    .word  0x09e39844                     @ 08013c98 4498e309
-DAT_08013c9c:
-    .word  0x09e39864                     @ 08013c9c 6498e309
-DAT_08013ca0:
-    .word  0xffffe0ff                     @ 08013ca0 ffe0ffff
+tick_demo_scene_state_machine_path_demo_exodia00_1_bg:
+    .word  demo_path_exodia00_1_bg        @ 08013c98 4498e309
+tick_demo_scene_state_machine_path_demo_exodia00_2_bg:
+    .word  demo_path_exodia00_2_bg        @ 08013c9c 6498e309
+tick_demo_scene_state_machine_demo_clear_bits_12_8_ca0:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013ca0 ffe0ffff
 switchD_08013bfa__caseD_1:
     bl check_blend_transition_done           @ 08013ca4 00f026fe
     cmp r0,#0x0                              @ 08013ca8 0028
@@ -1158,14 +1158,14 @@ LAB_08013cd6:
     movs r0,#0xff    @ 08013ce2 ff20
     ands r1,r0    @ 08013ce4 0140
     lsls r1,r1,#0x9    @ 08013ce6 4902
-    ldr r0, DAT_08013cf4                     @ 08013ce8 0248
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_cf4 @ 08013ce8 0248
     ands r0,r2    @ 08013cea 1040
     orrs r0,r1    @ 08013cec 0843
     str r0,[r3,#0x0]                         @ 08013cee 1860
     b switchD_08013bfa__default              @ 08013cf0 36e3
     .zero  0x2
-DAT_08013cf4:
-    .word  0xfffe01ff                     @ 08013cf4 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_cf4:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08013cf4 ff01feff
 switchD_08013bfa__caseD_2:
     bl check_blend_transition_done           @ 08013cf8 00f0fcfd
     cmp r0,#0x0                              @ 08013cfc 0028
@@ -1181,13 +1181,13 @@ LAB_08013d02:
     movs r0,#0xff    @ 08013d0e ff20
     ands r1,r0    @ 08013d10 0140
     lsls r1,r1,#0x9    @ 08013d12 4902
-    ldr r0, DAT_08013d4c                     @ 08013d14 0d48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_d4c @ 08013d14 0d48
     ands r0,r2    @ 08013d16 1040
     orrs r0,r1    @ 08013d18 0843
     str r0,[r3,#0x0]                         @ 08013d1a 1860
     .hword 0x4652    @ 08013d1c 5246
     adds r2,#0x8e    @ 08013d1e 8e32
-    ldr r0, DAT_08013d50                     @ 08013d20 0b48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_d50 @ 08013d20 0b48
     ldrh r1,[r2,#0x0]                        @ 08013d22 1188
     ands r0,r1    @ 08013d24 0840
     movs r1,#0xe    @ 08013d26 0e21
@@ -1207,10 +1207,10 @@ LAB_08013d02:
     orrs r0,r1    @ 08013d46 0843
     strh r0,[r2,#0x0]                        @ 08013d48 1080
     b LAB_08013fc2                           @ 08013d4a 3ae1
-DAT_08013d4c:
-    .word  0xfffe01ff                     @ 08013d4c ff01feff
-DAT_08013d50:
-    .word  0xfffffe01                     @ 08013d50 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_d4c:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08013d4c ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_d50:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013d50 01feffff
 switchD_08013bfa__caseD_3:
     bl check_blend_transition_done           @ 08013d54 00f0cefd
     cmp r0,#0x0                              @ 08013d58 0028
@@ -1226,7 +1226,7 @@ LAB_08013d5e:
     movs r1,#0xff    @ 08013d6a ff21
     ands r0,r1    @ 08013d6c 0840
     lsls r0,r0,#0x1    @ 08013d6e 4000
-    ldr r2, DAT_08013ddc                     @ 08013d70 1a4a
+    ldr r2, tick_demo_scene_state_machine_demo_clear_bits_8_1_ddc @ 08013d70 1a4a
     ands r2,r4    @ 08013d72 2240
     orrs r2,r0    @ 08013d74 0243
     strh r2,[r5,#0x0]                        @ 08013d76 2a80
@@ -1258,7 +1258,7 @@ LAB_08013d5e:
     lsls r2,r2,#0x13    @ 08013db0 d204
     movs r3,#0xf0    @ 08013db2 f023
     lsls r3,r3,#0x4    @ 08013db4 1b01
-    ldr r0, DAT_08013de0                     @ 08013db6 0a48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_de0 @ 08013db6 0a48
     ldrh r1,[r2,#0x0]                        @ 08013db8 1188
     ands r0,r1    @ 08013dba 0840
     orrs r0,r3    @ 08013dbc 1843
@@ -1277,10 +1277,10 @@ LAB_08013d5e:
     strb r0,[r1,#0x0]                        @ 08013dd6 0870
     b LAB_08013fa8                           @ 08013dd8 e6e0
     .zero  0x2
-DAT_08013ddc:
-    .word  0xfffffe01                     @ 08013ddc 01feffff
-DAT_08013de0:
-    .word  0xffffe0ff                     @ 08013de0 ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_ddc:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013ddc 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_de0:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013de0 ffe0ffff
 LAB_08013de4:
     movs r0,#0x1e    @ 08013de4 1e20
     str r0,[sp,#0x0]                         @ 08013de6 0090
@@ -1319,7 +1319,7 @@ LAB_08013e22:
     lsls r2,r2,#0x13    @ 08013e28 d204
     movs r3,#0xb0    @ 08013e2a b023
     lsls r3,r3,#0x4    @ 08013e2c 1b01
-    ldr r0, DAT_08013e90                     @ 08013e2e 1848
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_e90 @ 08013e2e 1848
     ldrh r1,[r2,#0x0]                        @ 08013e30 1188
     ands r0,r1    @ 08013e32 0840
     orrs r0,r3    @ 08013e34 1843
@@ -1334,7 +1334,7 @@ LAB_08013e22:
     bl dispatch_demo_sprite_setup_by_mode    @ 08013e46 fff77bfc
     .hword 0x4652    @ 08013e4a 5246
     adds r2,#0x8e    @ 08013e4c 8e32
-    ldr r0, DAT_08013e94                     @ 08013e4e 1148
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_e94 @ 08013e4e 1148
     ldrh r3,[r2,#0x0]                        @ 08013e50 1388
     ands r0,r3    @ 08013e52 1840
     movs r3,#0x96    @ 08013e54 9623
@@ -1367,10 +1367,10 @@ LAB_08013e22:
     strb r0,[r4,#0x0]                        @ 08013e8a 2070
     b LAB_08013fc2                           @ 08013e8c 99e0
     .zero  0x2
-DAT_08013e90:
-    .word  0xffffe0ff                     @ 08013e90 ffe0ffff
-DAT_08013e94:
-    .word  0xfffffe01                     @ 08013e94 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_e90:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013e90 ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_e94:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013e94 01feffff
 LAB_08013e98:
     .hword 0x4651    @ 08013e98 5146
     adds r1,#0x8e    @ 08013e9a 8e31
@@ -1382,7 +1382,7 @@ LAB_08013e98:
     bne LAB_08013ed8                         @ 08013ea6 17d1
     movs r2,#0x80    @ 08013ea8 8022
     lsls r2,r2,#0x13    @ 08013eaa d204
-    ldr r0, DAT_08013ed0                     @ 08013eac 0848
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_ed0 @ 08013eac 0848
     ldrh r1,[r2,#0x0]                        @ 08013eae 1188
     ands r0,r1    @ 08013eb0 0840
     strh r0,[r2,#0x0]                        @ 08013eb2 1080
@@ -1395,15 +1395,15 @@ LAB_08013e98:
     movs r0,#0xff    @ 08013ec0 ff20
     ands r1,r0    @ 08013ec2 0140
     lsls r1,r1,#0x9    @ 08013ec4 4902
-    ldr r0, DAT_08013ed4                     @ 08013ec6 0348
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_ed4 @ 08013ec6 0348
     ands r0,r2    @ 08013ec8 1040
     orrs r0,r1    @ 08013eca 0843
     str r0,[r3,#0x0]                         @ 08013ecc 1860
     b LAB_08013f0c                           @ 08013ece 1de0
-DAT_08013ed0:
-    .word  0xffffe0ff                     @ 08013ed0 ffe0ffff
-DAT_08013ed4:
-    .word  0xfffe01ff                     @ 08013ed4 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_ed0:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013ed0 ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_ed4:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08013ed4 ff01feff
 LAB_08013ed8:
     movs r0,#0x4    @ 08013ed8 0420
     ands r0,r2    @ 08013eda 1040
@@ -1418,7 +1418,7 @@ LAB_08013ee8:
     movs r0,#0xff    @ 08013eea ff20
     ands r1,r0    @ 08013eec 0140
     lsls r1,r1,#0x1    @ 08013eee 4900
-    ldr r0, DAT_08013f20                     @ 08013ef0 0b48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_f20 @ 08013ef0 0b48
     ands r0,r4    @ 08013ef2 2040
     orrs r0,r1    @ 08013ef4 0843
     strh r0,[r5,#0x0]                        @ 08013ef6 2880
@@ -1427,7 +1427,7 @@ LAB_08013ee8:
     orrs r3,r0    @ 08013efc 0343
     movs r2,#0x80    @ 08013efe 8022
     lsls r2,r2,#0x13    @ 08013f00 d204
-    ldr r0, DAT_08013f24                     @ 08013f02 0848
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_f24 @ 08013f02 0848
     ldrh r1,[r2,#0x0]                        @ 08013f04 1188
     ands r0,r1    @ 08013f06 0840
     orrs r0,r3    @ 08013f08 1843
@@ -1442,30 +1442,30 @@ LAB_08013f0c:
     bl apply_demo_window_fade_in_step        @ 08013f18 fff7ecfd
     b LAB_08013fc2                           @ 08013f1c 51e0
     .zero  0x2
-DAT_08013f20:
-    .word  0xfffffe01                     @ 08013f20 01feffff
-DAT_08013f24:
-    .word  0xffffe0ff                     @ 08013f24 ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_f20:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013f20 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_f24:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013f24 ffe0ffff
 switchD_08013bfa__caseD_5:
     movs r6,#0x80    @ 08013f28 8026
     lsls r6,r6,#0x13    @ 08013f2a f604
     movs r5,#0x0    @ 08013f2c 0025
-    ldr r4, DAT_08013fc8                     @ 08013f2e 264c
+    ldr r4, tick_demo_scene_state_machine_demo_clear_bits_12_8_fc8 @ 08013f2e 264c
     ldrh r1,[r6,#0x0]                        @ 08013f30 3188
     adds r0,r4,#0x0    @ 08013f32 201c
     ands r0,r1    @ 08013f34 0840
     strh r0,[r6,#0x0]                        @ 08013f36 3080
-    ldr r2, PTR_BG3CNT_08013fcc              @ 08013f38 244a
+    ldr r2, tick_demo_scene_state_machine_ptr_bg3cnt @ 08013f38 244a
     movs r3,#0x80    @ 08013f3a 8023
     lsls r3,r3,#0x7    @ 08013f3c db01
-    ldr r0, DAT_08013fd0                     @ 08013f3e 2448
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_15_14 @ 08013f3e 2448
     ldrh r1,[r2,#0x0]                        @ 08013f40 1188
     ands r0,r1    @ 08013f42 0840
     orrs r0,r3    @ 08013f44 1843
     strh r0,[r2,#0x0]                        @ 08013f46 1080
-    ldr r0, DAT_08013fd4                     @ 08013f48 2248
+    ldr r0, tick_demo_scene_state_machine_path_demo_exodia01_bg @ 08013f48 2248
     bl load_demo_bg_gfx_set1                 @ 08013f4a fff78bfc
-    ldr r0, DAT_08013fd8                     @ 08013f4e 2248
+    ldr r0, tick_demo_scene_state_machine_path_demo_exodia01 @ 08013f4e 2248
     movs r1,#0x0    @ 08013f50 0021
     bl fs_load                               @ 08013f52 01f029f8
     .hword 0x4651    @ 08013f56 5146
@@ -1500,7 +1500,7 @@ switchD_08013bfa__caseD_5:
     strh r4,[r6,#0x0]                        @ 08013f96 3480
     .hword 0x4652    @ 08013f98 5246
     adds r2,#0x8e    @ 08013f9a 8e32
-    ldr r0, DAT_08013fdc                     @ 08013f9c 0f48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_fdc @ 08013f9c 0f48
     ldrh r1,[r2,#0x0]                        @ 08013f9e 1188
     ands r0,r1    @ 08013fa0 0840
     movs r1,#0x1e    @ 08013fa2 1e21
@@ -1516,27 +1516,27 @@ LAB_08013fa8:
     movs r0,#0xff    @ 08013fb4 ff20
     ands r1,r0    @ 08013fb6 0140
     lsls r1,r1,#0x9    @ 08013fb8 4902
-    ldr r0, DAT_08013fe0                     @ 08013fba 0948
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_fe0 @ 08013fba 0948
     ands r0,r2    @ 08013fbc 1040
     orrs r0,r1    @ 08013fbe 0843
     str r0,[r3,#0x0]                         @ 08013fc0 1860
 LAB_08013fc2:
     bl tick_demo_bg3_hscroll                 @ 08013fc2 fff7f9fc
     b switchD_08013bfa__default              @ 08013fc6 cbe1
-DAT_08013fc8:
-    .word  0xffffe0ff                     @ 08013fc8 ffe0ffff
-PTR_BG3CNT_08013fcc:
+tick_demo_scene_state_machine_demo_clear_bits_12_8_fc8:
+    .word  DEMO_CLEAR_BITS_12_8           @ 08013fc8 ffe0ffff
+tick_demo_scene_state_machine_ptr_bg3cnt:
     .word  BG3CNT                         @ 08013fcc 0e000004
-DAT_08013fd0:
-    .word  0xffff3fff                     @ 08013fd0 ff3fffff
-DAT_08013fd4:
-    .word  0x09e39884                     @ 08013fd4 8498e309
-DAT_08013fd8:
-    .word  0x09e398a4                     @ 08013fd8 a498e309
-DAT_08013fdc:
-    .word  0xfffffe01                     @ 08013fdc 01feffff
-DAT_08013fe0:
-    .word  0xfffe01ff                     @ 08013fe0 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_15_14:
+    .word  DEMO_CLEAR_BITS_15_14          @ 08013fd0 ff3fffff
+tick_demo_scene_state_machine_path_demo_exodia01_bg:
+    .word  demo_path_exodia01_bg          @ 08013fd4 8498e309
+tick_demo_scene_state_machine_path_demo_exodia01:
+    .word  demo_path_exodia01             @ 08013fd8 a498e309
+tick_demo_scene_state_machine_demo_clear_bits_8_1_fdc:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08013fdc 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_fe0:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08013fe0 ff01feff
 switchD_08013bfa__caseD_6:
     .hword 0x4654    @ 08013fe4 5446
     adds r4,#0x8e    @ 08013fe6 8e34
@@ -1547,11 +1547,11 @@ switchD_08013bfa__caseD_6:
     bne LAB_08014024                         @ 08013ff0 18d1
     movs r2,#0x80    @ 08013ff2 8022
     lsls r2,r2,#0x13    @ 08013ff4 d204
-    ldr r0, DAT_0801405c                     @ 08013ff6 1948
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_14_13_05c @ 08013ff6 1948
     ldrh r1,[r2,#0x0]                        @ 08013ff8 1188
     ands r0,r1    @ 08013ffa 0840
     strh r0,[r2,#0x0]                        @ 08013ffc 1080
-    ldr r0, DAT_08014060                     @ 08013ffe 1848
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_060 @ 08013ffe 1848
     ldrh r3,[r4,#0x0]                        @ 08014000 2388
     ands r0,r3    @ 08014002 1840
     movs r1,#0xf0    @ 08014004 f021
@@ -1566,7 +1566,7 @@ switchD_08013bfa__caseD_6:
     movs r0,#0xff    @ 08014016 ff20
     ands r1,r0    @ 08014018 0140
     lsls r1,r1,#0x9    @ 0801401a 4902
-    ldr r0, DAT_08014064                     @ 0801401c 1148
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_064 @ 0801401c 1148
     ands r0,r2    @ 0801401e 1040
     orrs r0,r1    @ 08014020 0843
     str r0,[r3,#0x0]                         @ 08014022 1860
@@ -1578,7 +1578,7 @@ LAB_08014024:
     movs r1,#0xff    @ 0801402c ff21
     ands r2,r1    @ 0801402e 0a40
     lsls r2,r2,#0x1    @ 08014030 5200
-    ldr r1, DAT_08014060                     @ 08014032 0b49
+    ldr r1, tick_demo_scene_state_machine_demo_clear_bits_8_1_060 @ 08014032 0b49
     ands r1,r3    @ 08014034 1940
     orrs r1,r2    @ 08014036 1143
     strh r1,[r4,#0x0]                        @ 08014038 2180
@@ -1597,12 +1597,12 @@ LAB_08014054:
     bl tick_demo_bg3_vscroll                 @ 08014054 fff7dcfc
     b switchD_08013bfa__default              @ 08014058 82e1
     .zero  0x2
-DAT_0801405c:
-    .word  0xffff9fff                     @ 0801405c ff9fffff
-DAT_08014060:
-    .word  0xfffffe01                     @ 08014060 01feffff
-DAT_08014064:
-    .word  0xfffe01ff                     @ 08014064 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_14_13_05c:
+    .word  DEMO_CLEAR_BITS_14_13          @ 0801405c ff9fffff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_060:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08014060 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_064:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08014064 ff01feff
 switchD_08013bfa__caseD_7:
     .hword 0x4655    @ 08014068 5546
     adds r5,#0x8e    @ 0801406a 8e35
@@ -1613,7 +1613,7 @@ switchD_08013bfa__caseD_7:
     movs r0,#0xff    @ 08014074 ff20
     ands r1,r0    @ 08014076 0140
     lsls r1,r1,#0x1    @ 08014078 4900
-    ldr r6, DAT_0801412c                     @ 0801407a 2c4e
+    ldr r6, tick_demo_scene_state_machine_demo_clear_bits_8_1_12c @ 0801407a 2c4e
     adds r0,r6,#0x0    @ 0801407c 301c
     ands r0,r2    @ 0801407e 1040
     orrs r0,r1    @ 08014080 0843
@@ -1636,7 +1636,7 @@ LAB_080140a2:
     lsrs r4,r0,#0x18    @ 080140a6 040e
     cmp r4,#0x0                              @ 080140a8 002c
     bne LAB_08014138                         @ 080140aa 45d1
-    ldr r0, DAT_08014130                     @ 080140ac 2048
+    ldr r0, tick_demo_scene_state_machine_path_demo_exodia02 @ 080140ac 2048
     movs r1,#0x0    @ 080140ae 0021
     bl fs_load                               @ 080140b0 00f07aff
     .hword 0x4651    @ 080140b4 5146
@@ -1687,18 +1687,18 @@ LAB_080140a2:
     movs r0,#0xff    @ 0801411a ff20
     ands r1,r0    @ 0801411c 0140
     lsls r1,r1,#0x9    @ 0801411e 4902
-    ldr r0, DAT_08014134                     @ 08014120 0448
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_134 @ 08014120 0448
     ands r0,r2    @ 08014122 1040
     orrs r0,r1    @ 08014124 0843
     str r0,[r3,#0x0]                         @ 08014126 1860
     b LAB_08014054                           @ 08014128 94e7
     .zero  0x2
-DAT_0801412c:
-    .word  0xfffffe01                     @ 0801412c 01feffff
-DAT_08014130:
-    .word  0x09e398c0                     @ 08014130 c098e309
-DAT_08014134:
-    .word  0xfffe01ff                     @ 08014134 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_12c:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801412c 01feffff
+tick_demo_scene_state_machine_path_demo_exodia02:
+    .word  demo_path_exodia02             @ 08014130 c098e309
+tick_demo_scene_state_machine_demo_clear_bits_16_9_134:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08014134 ff01feff
 LAB_08014138:
     movs r0,#0x8    @ 08014138 0820
     ands r4,r0    @ 0801413a 0440
@@ -1778,7 +1778,7 @@ LAB_080141b4:
     orrs r3,r0    @ 080141ce 0343
     movs r4,#0x80    @ 080141d0 8024
     lsls r4,r4,#0x13    @ 080141d2 e404
-    ldr r0, DAT_080141f4                     @ 080141d4 0748
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_12_8_1f4 @ 080141d4 0748
     ldrh r2,[r4,#0x0]                        @ 080141d6 2288
     ands r0,r2    @ 080141d8 1040
     orrs r0,r3    @ 080141da 1843
@@ -1793,8 +1793,8 @@ LAB_080141b4:
     bl setup_demo_cell_anim_slot             @ 080141ec fff73cfc
     b LAB_08014054                           @ 080141f0 30e7
     .zero  0x2
-DAT_080141f4:
-    .word  0xffffe0ff                     @ 080141f4 ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_1f4:
+    .word  DEMO_CLEAR_BITS_12_8           @ 080141f4 ffe0ffff
 switchD_08013bfa__caseD_8:
     bl check_blend_transition_done           @ 080141f8 00f07cfb
     cmp r0,#0x0                              @ 080141fc 0028
@@ -1803,13 +1803,13 @@ switchD_08013bfa__caseD_8:
 LAB_08014202:
     movs r2,#0x80    @ 08014202 8022
     lsls r2,r2,#0x13    @ 08014204 d204
-    ldr r0, DAT_0801424c                     @ 08014206 1148
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_14_13_24c @ 08014206 1148
     ldrh r1,[r2,#0x0]                        @ 08014208 1188
     ands r0,r1    @ 0801420a 0840
     strh r0,[r2,#0x0]                        @ 0801420c 1080
     .hword 0x4651    @ 0801420e 5146
     adds r1,#0x8e    @ 08014210 8e31
-    ldr r0, DAT_08014250                     @ 08014212 0f48
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_250 @ 08014212 0f48
     ldrh r2,[r1,#0x0]                        @ 08014214 0a88
     ands r0,r2    @ 08014216 1040
     strh r0,[r1,#0x0]                        @ 08014218 0880
@@ -1833,17 +1833,17 @@ LAB_08014202:
     movs r0,#0xff    @ 0801423c ff20
     ands r1,r0    @ 0801423e 0140
     lsls r1,r1,#0x9    @ 08014240 4902
-    ldr r0, DAT_08014254                     @ 08014242 0448
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_254 @ 08014242 0448
     ands r0,r2    @ 08014244 1040
     orrs r0,r1    @ 08014246 0843
     str r0,[r3,#0x0]                         @ 08014248 1860
     b LAB_08014054                           @ 0801424a 03e7
-DAT_0801424c:
-    .word  0xffff9fff                     @ 0801424c ff9fffff
-DAT_08014250:
-    .word  0xfffffe01                     @ 08014250 01feffff
-DAT_08014254:
-    .word  0xfffe01ff                     @ 08014254 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_14_13_24c:
+    .word  DEMO_CLEAR_BITS_14_13          @ 0801424c ff9fffff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_250:
+    .word  DEMO_CLEAR_BITS_8_1            @ 08014250 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_254:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08014254 ff01feff
 switchD_08013bfa__caseD_9:
     .hword 0x4653    @ 08014258 5346
     adds r3,#0x8e    @ 0801425a 8e33
@@ -1854,7 +1854,7 @@ switchD_08013bfa__caseD_9:
     movs r0,#0xff    @ 08014264 ff20
     ands r1,r0    @ 08014266 0140
     lsls r1,r1,#0x1    @ 08014268 4900
-    ldr r0, DAT_080142f8                     @ 0801426a 2348
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_8_1_2f8 @ 0801426a 2348
     ands r0,r2    @ 0801426c 1040
     orrs r0,r1    @ 0801426e 0843
     strh r0,[r3,#0x0]                        @ 08014270 1880
@@ -1876,7 +1876,7 @@ LAB_08014286:
     orrs r1,r0    @ 08014290 0143
     movs r6,#0x80    @ 08014292 8026
     lsls r6,r6,#0x13    @ 08014294 f604
-    ldr r7, DAT_080142fc                     @ 08014296 194f
+    ldr r7, tick_demo_scene_state_machine_demo_clear_bits_12_8_2fc @ 08014296 194f
     ldrh r2,[r6,#0x0]                        @ 08014298 3288
     adds r0,r7,#0x0    @ 0801429a 381c
     ands r0,r2    @ 0801429c 1040
@@ -1918,18 +1918,18 @@ LAB_080142c6:
     movs r0,#0xff    @ 080142e6 ff20
     ands r1,r0    @ 080142e8 0140
     lsls r1,r1,#0x9    @ 080142ea 4902
-    ldr r0, DAT_08014300                     @ 080142ec 0448
+    ldr r0, tick_demo_scene_state_machine_demo_clear_bits_16_9_300 @ 080142ec 0448
     ands r0,r3    @ 080142ee 1840
     orrs r0,r1    @ 080142f0 0843
     str r0,[r2,#0x0]                         @ 080142f2 1060
     b LAB_0801435c                           @ 080142f4 32e0
     .zero  0x2
-DAT_080142f8:
-    .word  0xfffffe01                     @ 080142f8 01feffff
-DAT_080142fc:
-    .word  0xffffe0ff                     @ 080142fc ffe0ffff
-DAT_08014300:
-    .word  0xfffe01ff                     @ 08014300 ff01feff
+tick_demo_scene_state_machine_demo_clear_bits_8_1_2f8:
+    .word  DEMO_CLEAR_BITS_8_1            @ 080142f8 01feffff
+tick_demo_scene_state_machine_demo_clear_bits_12_8_2fc:
+    .word  DEMO_CLEAR_BITS_12_8           @ 080142fc ffe0ffff
+tick_demo_scene_state_machine_demo_clear_bits_16_9_300:
+    .word  DEMO_CLEAR_BITS_16_9           @ 08014300 ff01feff
 LAB_08014304:
     cmp r4,#0x69                             @ 08014304 692c
     ble LAB_08014322                         @ 08014306 0cdd

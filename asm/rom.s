@@ -12,6 +12,12 @@
 @ GBA MMIO 寄存器（依据 refs/gba-ghidra-loader mapIO()）
 	.include "constants/gba_io.inc"
 
+@ GBA 中断 IRQ flag/掩码常量（IntrMain 优先级扫描/嵌套掩码用）
+	.include "constants/gba_intr.inc"
+
+@ demo scene (gDemoState) 字段掩码/初值常量（0x13510..0x14398 demo 场景簇用）
+	.include "constants/demo_state.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 
@@ -724,7 +730,10 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 	.incbin "graphics/bin/ui-misc/FUN081058c8_anim_pal_01E31754.bin"
 	.incbin "roms/2343.gba", 0x1E31774, 0x20
 	.incbin "graphics/bin/ui-misc/FUN081066fc_obj_pal_01E31794.bin"
-	.incbin "roms/2343.gba", 0x1E317B4, 0x27558
+	.incbin "roms/2343.gba", 0x1E317B4, 0x7F04      @ 0x1E317B4..0x1E396B8 demo 资源块前 (SDK 调试串等, 未结构化)
+@ demo/exodia 资源块 (0x1E396B8..0x1E398DC, 548B)，生成: tools/rom-export/export_demo_exodia_resources.py
+	.include "data/demo-exodia-resources.s"
+	.incbin "roms/2343.gba", 0x1E398DC, 0x1F430     @ 0x1E398DC..0x1E58D0C demo 资源块后 (GL/NNS 断言串等, 未结构化)
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)

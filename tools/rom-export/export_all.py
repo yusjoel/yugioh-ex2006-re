@@ -36,6 +36,7 @@ EXPORT_PIPELINE = [
     (None, 'export_card_descriptions.py'),      # data/card-descriptions.s (merged: ET + special + offset table + anchors)
     (None, 'export_game_strings.py'),           # data/game-strings-{en,de,fr,it,es}.s
     (None, 'export_file_paths.py'),             # data/file-paths.s
+    (None, 'export_demo_exodia_resources.py'),  # data/demo-exodia-resources.s (demo/exodia 资源块, 从 0x1E317B4 blob 切出)
     (None, 'export_fs_tables.py'),              # data/fs-tables.s
     (None, 'export_fs_files.py'),               # fs/<orig path> + data/fs-payload.s（338 个 FS 文件）
     (None, 'export_nns_unpacked.py'),           # fs-decompressed/**/*.{nanr,ncer,ncgr,nclr}（63 个解压 NNS）

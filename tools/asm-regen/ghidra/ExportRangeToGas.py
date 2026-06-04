@@ -559,6 +559,28 @@ def resolve_word_symbol(program, data_obj):
     return sanitize_label(name)
 
 
+def resolve_word_equate(program, data_obj):
+    """
+    若 data_obj 的标量在 Ghidra EquateTable 设了 equate, 返回该 equate 名; 否则 None。
+    用于把字面量池里的 *纯数值常量* (位掩码 / IO 初值等, 非地址指针) 导出成符号名。
+    - 仅在 resolve_word_symbol (地址指针路径) 返回 None 后兜底调用。
+    - 对未设 equate 的数据是纯 no-op (getEquates 为空 -> 返回 None) -> 不影响全 ROM byte-identical。
+    - GAS 端靠 constants/*.inc 的 .equ 解析 equate 名 = 同值 -> 同字节。
+    """
+    addr = data_obj.getAddress()
+    et = program.getEquateTable()
+    try:
+        eqs = iter_any(et.getEquates(addr))
+    except:
+        return None
+    for eq in eqs:
+        try:
+            return sanitize_label(eq.getName())
+        except:
+            continue
+    return None
+
+
 def emit_defined_data(bw, program, data_obj, end_addr):
     memory = program.getMemory()
     addr = data_obj.getAddress()
@@ -575,6 +597,8 @@ def emit_defined_data(bw, program, data_obj, end_addr):
 
     if max_len == 4:
         sym = resolve_word_symbol(program, data_obj)
+        if sym is None:
+            sym = resolve_word_equate(program, data_obj)
         val_str = sym if sym is not None else ("0x%08x" % uval_le(bs))
         emit_data_line_with_addr_bytes(bw, ".word", val_str, addr, bs)
         return 4
