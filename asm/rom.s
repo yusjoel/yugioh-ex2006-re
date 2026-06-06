@@ -30,6 +30,9 @@
 @ GL_Scrollbar 字段位掩码/控制字（0x15384..0x155f4 scrollbar 簇用）
 	.include "constants/gl_scrollbar.inc"
 
+@ NNS G2D 资源块 FourCC tag（0x16140 find_gfx_entry_by_tag 簇用）
+	.include "constants/g2d_tags.inc"
+
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"

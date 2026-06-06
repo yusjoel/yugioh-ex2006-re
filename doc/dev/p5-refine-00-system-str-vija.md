@@ -116,7 +116,8 @@ gitignore 生成产物):
 | **batch-5: GL_Scrollbar 簇 (11 fn)** | 0x15384..0x155f4 | ✅ R1/R2/R5 完成 (见 §四.4.0e): 5 字段位掩码 equate(新 gl_scrollbar.inc) + 7 槽改名 + 4 plate 过时 FUN_ caller 改现名; byte-identical。GL_Scrollbar* 传参(非全局) |
 | **batch-6: NNS IG2D 资源加载管理器 (allocators + globals)** | 0x1563c..0x15b00 (散) | ✅ R3/R5/rename 完成 (见 §四.4.0f): 6 个 IG2D 全局符号化(gIg2dUsed{CellAnm,NceBuff,NanBuff}/NceBuffBase/CharPoolBase/CellAnmBank) + 函数改名 gl_clear_frame_callbacks→reset_ig2d_load_counters(误名) + 10 plate(含 5 外部 caller); byte-identical |
 | **batch-7: BG affine matrix 簇 (4 fn)** | 0x15728..0x15924 | ✅ R3/R7/R2/R5 完成 (见 §四.4.0g): trig_table(512B)+assert_expr_zero **carve 进 rom.s** + GAS label 引用 + 3 槽改名 + 3 plate FUN_ 改现名; byte-identical |
-| 代码函数 (其余 ~207 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-8: NNS G2D GFX entry accessor 簇 (10 fn)** | 0x16140..0x16268 | ✅ R1/R2/R5 完成 (见 §四.4.0h): 3 FourCC tag equate(BGDT/OBJD/PALT, 新 g2d_tags.inc) + 9 槽改名 + 10 plate 去过时槽引用; byte-identical |
+| 代码函数 (其余 ~197 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -310,6 +311,21 @@ byte-identical SHA1 9689337d。
 (equate→carve-label 切换)。**当场 carve, 不留待办** (用户标准: 细化即 carve 出数据表体)。
 PTR_BG2X/BG2PA 槽按策略跳过 (已显寄存器名)。内联 FIXED_ONE(0x80<<0x11=0x01000000) 无 pool 槽不符号化。
 
+### 4.0h batch-8 完成记录: NNS G2D GFX entry accessor 簇 (0x16140..0x16268, 10 fn) ✅
+
+find_gfx_entry_by_tag (核心线性查找) + 9 个 tag-based accessor (get_bgdt/objd/palt_entry_* /
+get_bgdt/objd_inline_data_ptr / get_bgdt/objd_second_blob_ptr / get_bgdt_entry_pixel_dimensions)。
+源 GL/IG2D_Main.c。资源链表按 4 字节 FourCC tag 查找。byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1/R2 FourCC tag | data-equate `BGDT_TAG`(0x54444742='BGDT', 5 槽) / `OBJD_TAG`(0x444a424f='OBJD', 3 槽) / `PALT_TAG`(0x544c4150='PALT', 1 槽); 新增 `constants/g2d_tags.inc`; 9 槽改名 `<func>_<tag>` | 9 槽/3 常量 |
+| R5 注释 | 9 accessor plate 去掉过时 `, DAT_/DWORD_xxx)` 槽引用 + find_gfx plate `tag_*`→`*_TAG` | 10 plate |
+
+新增: `constants/g2d_tags.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineG2dTagsBatch8.py`。
+注: write_palt_block_to_vram (0x1626c, 调色板写 VRAM) / dispatch_bg_screen_map_write (0x162dc) 非
+纯 tag accessor (无 tag 槽, 按 caller tag 调用), 留后续批。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -382,16 +398,18 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 5. ✅ **batch-5 (0x15384..0x155f4, GL_Scrollbar 簇 11 fn)** 完成 (见 §四.4.0e)。
 6. ✅ **batch-6 (NNS IG2D 资源加载管理器 globals + allocators)** 完成 (见 §四.4.0f)。
 7. ✅ **batch-7 (0x15728..0x15924, BG affine matrix 簇 4 fn)** 完成 (见 §四.4.0g);
-   TRIG_TABLE 符号化。
-8. 下一批 (batch-8) 候选:
+   TRIG_TABLE + assert_expr_zero **当场 carve**。
+8. ✅ **batch-8 (0x16140..0x16268, NNS G2D GFX entry accessor 簇 10 fn)** 完成 (见 §四.4.0h);
+   BGDT/OBJD/PALT FourCC tag 符号化。
+9. 下一批 (batch-9) 候选:
+   - **ISD affine matrix 指针簇** (set/get/resolve_isd_affine_matrix_ptr 0x16098..0x1613c):
+     2 个 ISD affine 矩阵指针槽 (0x09e587e4/e8) + assert expr 串 (0x09e3a65c 等) **当场 carve**。
    - **ISD cell-anim OAM 簇** (setup_isd_cell_anim_oam_entry 0x15954 /
-     dispatch_isd_cell_anim_oam_setup 0x15a8c / set/get/resolve_isd_affine_matrix_ptr 0x16098..0x16108):
-     操作 0x030007f8 OAM build buffer + ISD affine 矩阵指针表。
+     dispatch_isd_cell_anim_oam_setup 0x15a8c): 操作 0x030007f8 OAM build buffer。
    - **IG2D 加载族深度** (load_nce/nanr/ncgr/nclr_*_from_file 0x15b10..0x15ea0): assert-line + PALRAM/VRAM。
-   - G2D entry accessor 簇 (find_gfx_entry_by_tag / get_bgdt/objd/palt_entry_* 0x16140..0x16200+)。
    - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction。
    - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0) / cell-anim accessor (0x156d0)。
-   - 注: ROM 数据表细化即**当场 carve** (不留待办)——trig_table/assert_expr_zero 已 batch-7 carve; 后续遇 ROM 表同此。
+   - 注: ROM 数据表/串细化即**当场 carve** (不留待办)。
 9. 每批后视情况更新本文「进度」表。
 
 ---

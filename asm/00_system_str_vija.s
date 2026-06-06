@@ -6180,7 +6180,7 @@ DAT_0801613c:
 @ Params: r0=void* list_header; r1=u32 tag_key (e.g. 0x54444742='BGDT')
 @ Returns: r0=void* entry_ptr (matching entry, or NULL; pop {r1}=lr, r0 preserved)
 @ Side effects: none (pure search, no writes)
-@ Constants: tag_BGDT=0x54444742 / tag_OBJD=0x444a424f / tag_PALT=0x544c4150 / header[+0xc]=first_entry_offset / header[+0xe]=entry_count / entry[+0x0]=tag / entry[+0x4]=next_relative_offset
+@ Constants: BGDT_TAG=0x54444742 / OBJD_TAG=0x444a424f / PALT_TAG=0x544c4150 / header[+0xc]=first_entry_offset / header[+0xe]=entry_count / entry[+0x0]=tag / entry[+0x4]=next_relative_offset
 find_gfx_entry_by_tag:
     push {r4,lr}                             @ 08016140 10b5
     adds r4,r1,#0x0    @ 08016142 0c1c
@@ -6217,11 +6217,11 @@ LAB_08016166:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - BGDT_TAG = 0x54444742 ("BGDT", DAT_08016184)
+@ - BGDT_TAG = 0x54444742 ("BGDT")
 @ - GFX_ENTRY_FIELD = [+0xc] (entry first data field)
 get_bgdt_entry_char_base:
     push {lr}                                @ 0801616c 00b5
-    ldr r1, DAT_08016184                     @ 0801616e 0549
+    ldr r1, get_bgdt_entry_char_base_bgdt_tag @ 0801616e 0549
     bl find_gfx_entry_by_tag                 @ 08016170 fff7e6ff
     movs r1,#0x0    @ 08016174 0021
     cmp r0,#0x0                              @ 08016176 0028
@@ -6232,8 +6232,8 @@ LAB_0801617c:
     pop {r1}                                 @ 0801617e 02bc
     bx r1                                    @ 08016180 0847
     .zero  0x2
-DAT_08016184:
-    .word  0x54444742                     @ 08016184 42474454
+get_bgdt_entry_char_base_bgdt_tag:
+    .word  BGDT_TAG                       @ 08016184 42474454
 
 @ Function: searches GFX resource list by "BGDT" tag (0x54444742), returns entry [+0x18] field
 @ value (or 0 if not found). [+0x18] is a second data field in a BGDT entry, distinct from [+0xc].
@@ -6242,11 +6242,11 @@ DAT_08016184:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - BGDT_TAG = 0x54444742 ("BGDT", DAT_080161a0)
+@ - BGDT_TAG = 0x54444742 ("BGDT")
 @ - GFX_ENTRY_FIELD = [+0x18] (entry field)
 get_bgdt_entry_field0x18:
     push {lr}                                @ 08016188 00b5
-    ldr r1, DAT_080161a0                     @ 0801618a 0549
+    ldr r1, get_bgdt_entry_field0x18_bgdt_tag @ 0801618a 0549
     bl find_gfx_entry_by_tag                 @ 0801618c fff7d8ff
     movs r1,#0x0    @ 08016190 0021
     cmp r0,#0x0                              @ 08016192 0028
@@ -6257,8 +6257,8 @@ LAB_08016198:
     pop {r1}                                 @ 0801619a 02bc
     bx r1                                    @ 0801619c 0847
     .zero  0x2
-DAT_080161a0:
-    .word  0x54444742                     @ 080161a0 42474454
+get_bgdt_entry_field0x18_bgdt_tag:
+    .word  BGDT_TAG                       @ 080161a0 42474454
 
 @ Function: searches GFX resource list by "OBJD" tag (0x444a424f), returns entry [+0x1c] field
 @ value (or 0 if not found). [+0x1c] is a data field in an OBJD entry (OBJ sprite data related).
@@ -6267,11 +6267,11 @@ DAT_080161a0:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - OBJD_TAG = 0x444a424f ("OBJD", DAT_080161bc)
+@ - OBJD_TAG = 0x444a424f ("OBJD")
 @ - GFX_ENTRY_FIELD = [+0x1c]
 get_objd_entry_field0x1c:
     push {lr}                                @ 080161a4 00b5
-    ldr r1, DAT_080161bc                     @ 080161a6 0549
+    ldr r1, get_objd_entry_field0x1c_objd_tag @ 080161a6 0549
     bl find_gfx_entry_by_tag                 @ 080161a8 fff7caff
     movs r1,#0x0    @ 080161ac 0021
     cmp r0,#0x0                              @ 080161ae 0028
@@ -6282,8 +6282,8 @@ LAB_080161b4:
     pop {r1}                                 @ 080161b6 02bc
     bx r1                                    @ 080161b8 0847
     .zero  0x2
-DAT_080161bc:
-    .word  0x444a424f                     @ 080161bc 4f424a44
+get_objd_entry_field0x1c_objd_tag:
+    .word  OBJD_TAG                       @ 080161bc 4f424a44
 
 @ Function: searches GFX resource list by "PALT" tag (0x544c4150), reads [+0x8] field (entry count /
 @ size count) and left-shifts by 1 (*2) to get byte size, returns it. Returns 0 if entry not found.
@@ -6293,12 +6293,12 @@ DAT_080161bc:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - PALT_TAG = 0x544c4150 ("PALT", DAT_080161d4)
+@ - PALT_TAG = 0x544c4150 ("PALT")
 @ - PALT_COUNT_FIELD = [+0x8] (entry/color count)
 @ - BYTE_SIZE = count * 2 (2 bytes per GBA color)
 get_palt_entry_byte_size:
     push {lr}                                @ 080161c0 00b5
-    ldr r1, DAT_080161d4                     @ 080161c2 0449
+    ldr r1, get_palt_entry_byte_size_palt_tag @ 080161c2 0449
     bl find_gfx_entry_by_tag                 @ 080161c4 fff7bcff
     cmp r0,#0x0                              @ 080161c8 0028
     beq LAB_080161d8                         @ 080161ca 05d0
@@ -6306,8 +6306,8 @@ get_palt_entry_byte_size:
     lsls r0,r0,#0x1    @ 080161ce 4000
     b LAB_080161da                           @ 080161d0 03e0
     .zero  0x2
-DAT_080161d4:
-    .word  0x544c4150                     @ 080161d4 50414c54
+get_palt_entry_byte_size_palt_tag:
+    .word  PALT_TAG                       @ 080161d4 50414c54
 LAB_080161d8:
     movs r0,#0x0    @ 080161d8 0020
 LAB_080161da:
@@ -6326,7 +6326,7 @@ LAB_080161da:
 @ - [r2] := bgdt_entry[+0x12] << 3 (height_pixels, u32)
 @ 
 @ Constants:
-@ - BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016200)
+@ - BGDT_TAG = 0x54444742 ("BGDT")
 @ - TILE_TO_PIXEL_SHIFT = 3 (lsls #3 = *8)
 @ - WIDTH_TILES_FIELD = [+0x10] (u16)
 @ - HEIGHT_TILES_FIELD = [+0x12] (u16)
@@ -6334,7 +6334,7 @@ get_bgdt_entry_pixel_dimensions:
     push {r4,r5,lr}                          @ 080161e0 30b5
     adds r4,r1,#0x0    @ 080161e2 0c1c
     adds r5,r2,#0x0    @ 080161e4 151c
-    ldr r1, DWORD_08016200                   @ 080161e6 0649
+    ldr r1, get_bgdt_entry_pixel_dimensions_bgdt_tag @ 080161e6 0649
     bl find_gfx_entry_by_tag                 @ 080161e8 fff7aaff
     ldrh r2,[r0,#0x10]                       @ 080161ec 028a
     lsls r1,r2,#0x3    @ 080161ee d100
@@ -6346,8 +6346,8 @@ get_bgdt_entry_pixel_dimensions:
     pop {r0}                                 @ 080161fa 01bc
     bx r0                                    @ 080161fc 0047
     .zero  0x2
-DWORD_08016200:
-    .word  0x54444742                     @ 08016200 42474454
+get_bgdt_entry_pixel_dimensions_bgdt_tag:
+    .word  BGDT_TAG                       @ 08016200 42474454
 
 @ Function: searches GFX resource list by "BGDT" tag (0x54444742), returns entry start address
 @ + 0x1c (the address of the first inline data blob immediately following the BGDT entry header).
@@ -6356,18 +6356,18 @@ DWORD_08016200:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016214)
+@ - BGDT_TAG = 0x54444742 ("BGDT")
 @ - BGDT_DATA_OFFSET = 0x1c (entry header size, inline data start offset)
 get_bgdt_inline_data_ptr:
     push {lr}                                @ 08016204 00b5
-    ldr r1, DWORD_08016214                   @ 08016206 0349
+    ldr r1, get_bgdt_inline_data_ptr_bgdt_tag @ 08016206 0349
     bl find_gfx_entry_by_tag                 @ 08016208 fff79aff
     adds r0,#0x1c    @ 0801620c 1c30
     pop {r1}                                 @ 0801620e 02bc
     bx r1                                    @ 08016210 0847
     .zero  0x2
-DWORD_08016214:
-    .word  0x54444742                     @ 08016214 42474454
+get_bgdt_inline_data_ptr_bgdt_tag:
+    .word  BGDT_TAG                       @ 08016214 42474454
 
 @ Function: searches GFX resource list by "BGDT" tag (0x54444742), computes start address of
 @ second inline data blob: entry_ptr + 0x1c + align_up([entry+0xc], 4). [entry+0xc] is the
@@ -6377,13 +6377,13 @@ DWORD_08016214:
 @ Side effects: none (pure address computation).
 @ 
 @ Constants:
-@ - BGDT_TAG = 0x54444742 ("BGDT", DWORD_08016234)
+@ - BGDT_TAG = 0x54444742 ("BGDT")
 @ - BGDT_DATA_OFFSET = 0x1c (first blob start offset)
 @ - BGDT_SIZE_FIELD = [entry+0xc] (first blob byte size)
 @ - WORD_ALIGN = 4 (adds r0,#3; asrs/lsls #2 = ceil(x/4)*4)
 get_bgdt_second_blob_ptr:
     push {lr}                                @ 08016218 00b5
-    ldr r1, DWORD_08016234                   @ 0801621a 0649
+    ldr r1, get_bgdt_second_blob_ptr_bgdt_tag @ 0801621a 0649
     bl find_gfx_entry_by_tag                 @ 0801621c fff790ff
     adds r1,r0,#0x0    @ 08016220 011c
     adds r1,#0x1c    @ 08016222 1c31
@@ -6395,8 +6395,8 @@ get_bgdt_second_blob_ptr:
     adds r0,r1,#0x0    @ 0801622e 081c
     pop {r1}                                 @ 08016230 02bc
     bx r1                                    @ 08016232 0847
-DWORD_08016234:
-    .word  0x54444742                     @ 08016234 42474454
+get_bgdt_second_blob_ptr_bgdt_tag:
+    .word  BGDT_TAG                       @ 08016234 42474454
 
 @ Function: searches GFX resource list by "OBJD" tag (0x444a424f), computes start address of
 @ second inline data blob: entry_ptr + 0x20 + align([entry+0xc], 4). [entry+0xc] is the
@@ -6407,13 +6407,13 @@ DWORD_08016234:
 @ Side effects: none (pure address computation).
 @ 
 @ Constants:
-@ - OBJD_TAG = 0x444a424f ("OBJD", DWORD_08016254)
+@ - OBJD_TAG = 0x444a424f ("OBJD")
 @ - OBJD_DATA_OFFSET = 0x20 (first blob start offset, OBJD header 4 bytes larger than BGDT)
 @ - SIZE_FIELD = [entry+0xc] (first blob byte size)
 @ - WORD_ALIGN = 4 (lsrs r0,r0,#2; lsls r0,r0,#2 = floor(x/4)*4 downward align)
 get_objd_second_blob_ptr:
     push {lr}                                @ 08016238 00b5
-    ldr r1, DWORD_08016254                   @ 0801623a 0649
+    ldr r1, get_objd_second_blob_ptr_objd_tag @ 0801623a 0649
     bl find_gfx_entry_by_tag                 @ 0801623c fff780ff
     adds r1,r0,#0x0    @ 08016240 011c
     adds r1,#0x20    @ 08016242 2031
@@ -6425,8 +6425,8 @@ get_objd_second_blob_ptr:
     adds r0,r1,#0x0    @ 0801624e 081c
     pop {r1}                                 @ 08016250 02bc
     bx r1                                    @ 08016252 0847
-DWORD_08016254:
-    .word  0x444a424f                     @ 08016254 4f424a44
+get_objd_second_blob_ptr_objd_tag:
+    .word  OBJD_TAG                       @ 08016254 4f424a44
 
 @ Function: searches GFX resource list by "OBJD" tag (0x444a424f), returns entry start address
 @ + 0x20 (the address of the first inline data blob in an OBJD entry). Symmetric with
@@ -6436,18 +6436,18 @@ DWORD_08016254:
 @ Side effects: none (pure query).
 @ 
 @ Constants:
-@ - OBJD_TAG = 0x444a424f ("OBJD", DWORD_08016268)
+@ - OBJD_TAG = 0x444a424f ("OBJD")
 @ - OBJD_DATA_OFFSET = 0x20 (entry header size, inline OBJ tile data start offset)
 get_objd_inline_data_ptr:
     push {lr}                                @ 08016258 00b5
-    ldr r1, DWORD_08016268                   @ 0801625a 0349
+    ldr r1, get_objd_inline_data_ptr_objd_tag @ 0801625a 0349
     bl find_gfx_entry_by_tag                 @ 0801625c fff770ff
     adds r0,#0x20    @ 08016260 2030
     pop {r1}                                 @ 08016262 02bc
     bx r1                                    @ 08016264 0847
     .zero  0x2
-DWORD_08016268:
-    .word  0x444a424f                     @ 08016268 4f424a44
+get_objd_inline_data_ptr_objd_tag:
+    .word  OBJD_TAG                       @ 08016268 4f424a44
 
 @ Writes PALT (palette) data block to GBA palette VRAM. r0=void* src_entry (PALT resource entry with type/x/visible/data fields), r1=void* dst_info. Checks src_entry[+0x10] signed x>=0 and src_entry[+0x18] bit31 visibility. src_entry[+0x14] bits[3:0] type: 0-3 -> BG palette 0x05000000; type 4 -> OBJ palette 0x05000200. Uses bios_cpu_fast_set to write. Returns fixed 0. Called by apply_gfx_resource_list on 'PALT' (0x544C4150) tag match. Constants: 0x05000000 = BG palette VRAM base; 0x05000200 = OBJ palette VRAM base.
 write_palt_block_to_vram:
