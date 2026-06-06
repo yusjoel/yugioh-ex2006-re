@@ -4948,7 +4948,7 @@ compute_bg_affine_matrix_scaled:
     pop {r0}                                 @ 08015810 01bc
     bx r0                                    @ 08015812 0047
 compute_bg_affine_matrix_scaled_trig_table:
-    .word  TRIG_TABLE                     @ 08015814 d099e309
+    .word  trig_table                     @ 08015814 d099e309
 compute_bg_affine_matrix_scaled_fix12_round_lo:
     .word  0x00000800                     @ 08015818 00080000
 compute_bg_affine_matrix_scaled_fix12_round_hi:
@@ -5123,7 +5123,7 @@ resolve_bg_affine_param_offset:
 resolve_bg_affine_param_offset_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015940 88a4e309  GL/IG2D_Main.c
 resolve_bg_affine_param_offset_assert_expr_zero:
-    .word  0x09e3a4f8                     @ 08015944 f8a4e309
+    .word  assert_expr_zero               @ 08015944 f8a4e309
 LAB_08015948:
     movs r0,#0x4    @ 08015948 0420
     b LAB_0801594e                           @ 0801594a 00e0

@@ -115,7 +115,7 @@ gitignore 生成产物):
 | **batch-4: GL palette/OAM manager 簇 (7 fn)** | 0x1510c..0x1522c | ✅ R1/R2/R3/R5 完成 (见 §四.4.0d): gGlState=0x02023490 符号化(7 槽) + 3 cpu_set equate(新 gl_state.inc) + 7 plate 订正(含 2 处 0x02024330→0x02023d30 错址 + 0x22B B / 0x200→0x400 字节单位); byte-identical |
 | **batch-5: GL_Scrollbar 簇 (11 fn)** | 0x15384..0x155f4 | ✅ R1/R2/R5 完成 (见 §四.4.0e): 5 字段位掩码 equate(新 gl_scrollbar.inc) + 7 槽改名 + 4 plate 过时 FUN_ caller 改现名; byte-identical。GL_Scrollbar* 传参(非全局) |
 | **batch-6: NNS IG2D 资源加载管理器 (allocators + globals)** | 0x1563c..0x15b00 (散) | ✅ R3/R5/rename 完成 (见 §四.4.0f): 6 个 IG2D 全局符号化(gIg2dUsed{CellAnm,NceBuff,NanBuff}/NceBuffBase/CharPoolBase/CellAnmBank) + 函数改名 gl_clear_frame_callbacks→reset_ig2d_load_counters(误名) + 10 plate(含 5 外部 caller); byte-identical |
-| **batch-7: BG affine matrix 簇 (4 fn)** | 0x15728..0x15924 | ✅ R3/R2/R5 完成 (见 §四.4.0g): TRIG_TABLE(0x09e399d0) data-equate(新 ig2d_data.inc) + 3 槽改名 + 3 plate FUN_ 改现名; byte-identical。trig_table 表体 carve 留专项 |
+| **batch-7: BG affine matrix 簇 (4 fn)** | 0x15728..0x15924 | ✅ R3/R7/R2/R5 完成 (见 §四.4.0g): trig_table(512B)+assert_expr_zero **carve 进 rom.s** + GAS label 引用 + 3 槽改名 + 3 plate FUN_ 改现名; byte-identical |
 | 代码函数 (其余 ~207 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
@@ -300,14 +300,14 @@ byte-identical SHA1 9689337d。
 
 | 项 | 做法 | 数量 |
 |---|---|---|
-| R3 ROM 数据表 | data-equate `TRIG_TABLE`(0x09e399d0, 256 项 s16 cos/sin); 新增 `constants/ig2d_data.inc` | 1 槽 |
-| R2 改名 | muldi3 定点舍入对 (0x800 lo/0x0 hi) + resolve assert-expr "0" 槽 | 3 槽 |
+| **R7 carve trig_table** | 表体 512B (0x1E399D0) 从 `.incbin 0x1E399CD+0x283` 切出 → rom.s `trig_table:` + 256 `.hword` (signed, 16/行, round-trip 验证) + 前 3B 对齐填充/后 0x80B 仍 incbin; 256 项 s16 cos/sin 查表, 幅值 256=Q8.8 的 1.0, 全圆 256 步 (sin(a)=trig[a], cos(a)=trig[a+0x40]) | 512 B |
+| **R7 carve assert_expr_zero** | "0" 串 (0x1E3A4F8) 从 `.incbin 0x1E3A4F7+0x5` 切出 → rom.s `assert_expr_zero:` + `.asciz "0"` (前 1B/后 2B 仍 incbin); resolve_bg_affine_param_offset 的 assert(0) 表达式 | 1 串 |
+| R3 GAS label 引用 | 2 槽从 data-equate/裸值切换为 carve label DATA ref (单一命名源): `.word trig_table` / `.word assert_expr_zero` | 2 槽 |
+| R2 改名 | muldi3 定点舍入对 (0x800 lo/0x0 hi) | 2 槽 |
 | R5 注释 | 3 plate FUN_ caller 改现名 (FUN_08015820→setup_oam_affine_matrix_from_scale; FUN_080ee654→alloc_affine_oam_entry_with_defaults; FUN_0801c668→apply_bg2_affine_fixed_angle) | 3 plate |
 
-新增: `constants/ig2d_data.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineAffineBatch7.py`。
-
-**defer (R7 carve)**: trig_table 表体 (0x1E399D0, 256×2=512 B) 在 .incbin 0x1E399CD+0x283 内,
-本批仅 data-equate 符号化引用地址; 表体 carve 成 `.hword` 结构留专项 (需切 incbin + byte-identical 验)。
+脚本: `tools/ghidra-labeling/RefineAffineBatch7.py` (符号化/改名/plate) + `CarveTrigTableAssertZero.py`
+(equate→carve-label 切换)。**当场 carve, 不留待办** (用户标准: 细化即 carve 出数据表体)。
 PTR_BG2X/BG2PA 槽按策略跳过 (已显寄存器名)。内联 FIXED_ONE(0x80<<0x11=0x01000000) 无 pool 槽不符号化。
 
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
@@ -390,8 +390,8 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
    - **IG2D 加载族深度** (load_nce/nanr/ncgr/nclr_*_from_file 0x15b10..0x15ea0): assert-line + PALRAM/VRAM。
    - G2D entry accessor 簇 (find_gfx_entry_by_tag / get_bgdt/objd/palt_entry_* 0x16140..0x16200+)。
    - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction。
-   - **专项 R7 carve**: trig_table 表体 (0x1E399D0, 512 B) 切出 .incbin 成 .hword。
    - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0) / cell-anim accessor (0x156d0)。
+   - 注: ROM 数据表细化即**当场 carve** (不留待办)——trig_table/assert_expr_zero 已 batch-7 carve; 后续遇 ROM 表同此。
 9. 每批后视情况更新本文「进度」表。
 
 ---

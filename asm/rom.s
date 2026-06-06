@@ -30,8 +30,6 @@
 @ GL_Scrollbar 字段位掩码/控制字（0x15384..0x155f4 scrollbar 簇用）
 	.include "constants/gl_scrollbar.inc"
 
-@ NNS IG2D ROM 数据表地址（trig_table 等；0x15728 affine 簇用）
-	.include "constants/ig2d_data.inc"
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
@@ -779,7 +777,28 @@ assert_pkey:
 	.incbin "roms/2343.gba", 0x1E39979, 0x3F
 assert_phead_comptype_1:
 	.asciz "pHead->compType == 1"
-	.incbin "roms/2343.gba", 0x1E399CD, 0x283
+	.incbin "roms/2343.gba", 0x1E399CD, 0x3   @ 0x1E399CD..0x1E399D0 对齐填充 (00 00 00)
+@ trig_table: 256 项 s16 cos/sin 查表 (幅值 256 = Q8.8 的 1.0; 全圆 256 步, 1 步≈1.406°)
+@   sin(a) = trig_table[a]; cos(a) = trig_table[a+0x40]; compute_bg_affine_matrix_scaled 用
+@   trig[0]=0 trig[0x40]=256(sin90) trig[0x80]=0 trig[0xc0]=-256(sin270)
+trig_table:
+	.hword 0, 6, 12, 18, 25, 31, 37, 43, 49, 56, 62, 68, 74, 80, 86, 92
+	.hword 97, 103, 109, 115, 120, 126, 131, 136, 142, 147, 152, 157, 162, 167, 171, 176
+	.hword 181, 185, 189, 193, 197, 201, 205, 209, 212, 216, 219, 222, 225, 228, 231, 234
+	.hword 236, 238, 241, 243, 244, 246, 248, 249, 251, 252, 253, 254, 254, 255, 255, 255
+	.hword 256, 255, 255, 255, 254, 254, 253, 252, 251, 249, 248, 246, 244, 243, 241, 238
+	.hword 236, 234, 231, 228, 225, 222, 219, 216, 212, 209, 205, 201, 197, 193, 189, 185
+	.hword 181, 176, 171, 167, 162, 157, 152, 147, 142, 136, 131, 126, 120, 115, 109, 103
+	.hword 97, 92, 86, 80, 74, 68, 62, 56, 49, 43, 37, 31, 25, 18, 12, 6
+	.hword 0, -6, -12, -18, -25, -31, -37, -43, -49, -56, -62, -68, -74, -80, -86, -92
+	.hword -97, -103, -109, -115, -120, -126, -131, -136, -142, -147, -152, -157, -162, -167, -171, -176
+	.hword -181, -185, -189, -193, -197, -201, -205, -209, -212, -216, -219, -222, -225, -228, -231, -234
+	.hword -236, -238, -241, -243, -244, -246, -248, -249, -251, -252, -253, -254, -254, -255, -255, -255
+	.hword -256, -255, -255, -255, -254, -254, -253, -252, -251, -249, -248, -246, -244, -243, -241, -238
+	.hword -236, -234, -231, -228, -225, -222, -219, -216, -212, -209, -205, -201, -197, -193, -189, -185
+	.hword -181, -176, -171, -167, -162, -157, -152, -147, -142, -136, -131, -126, -120, -115, -109, -103
+	.hword -97, -92, -86, -80, -74, -68, -62, -56, -49, -43, -37, -31, -25, -18, -12, -6
+	.incbin "roms/2343.gba", 0x1E39BD0, 0x80   @ trig_table 之后剩余 blob
 gl_oam_c_filename:
 	.asciz "GL/GL_Oam.c"
 assert_num_32:
@@ -803,7 +822,10 @@ assert_psequence:
 	.incbin "roms/2343.gba", 0x1E3A4E2, 0x2
 assert_bg_2_bg_3:
 	.asciz "bg == 2 || bg == 3"
-	.incbin "roms/2343.gba", 0x1E3A4F7, 0x5
+	.incbin "roms/2343.gba", 0x1E3A4F7, 0x1   @ 前缀 1B (00)
+assert_expr_zero:
+	.asciz "0"                                @ resolve_bg_affine_param_offset 的 assert(0) 表达式串
+	.incbin "roms/2343.gba", 0x1E3A4FA, 0x2   @ 后缀 2B
 assert_pcell_null:
 	.asciz "( pCell ) != NULL"
 	.incbin "roms/2343.gba", 0x1E3A50E, 0x2
