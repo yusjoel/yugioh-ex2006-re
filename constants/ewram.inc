@@ -166,6 +166,19 @@
                              @   name_input_page_init, apply_sprite_gfx_by_type,
                              @   load_game_str_pair_1004_to_state, load_game_str_1006_to_state, ...
 
+.equ gCardInfoPageState,         0x0201afb0  @ card info page per-frame state struct (EWRAM)
+                                             @ +0x0  = u32 packed: bit0=page_active, bits[17:2]=card_id
+                                             @ +0x4  = u16 page_step (0=init, 1/2/3=tick phases)
+                                             @ +0x6  = u8  countdown_timer (tick update, non-zero decrements)
+                                             @ +0x14 = u32 scroll_frame_counter (>0xe8 triggers scroll)
+                                             @ +0x18 = u32 scroll_pixel_y_offset
+                                             @ +0x1c = u32 scroll_sub_counter
+                                             @ +0x20 = s16 scroll_offset_field (adjusted by display flags)
+                                             @ 20 ROM refs; consumers: card_info_page_enter_with_card_id,
+                                             @   card_info_page_init_bg0, render_card_name_to_line_buf,
+                                             @   tick_scroll_frame_and_update_pos, update_card_info_page_state,
+                                             @   render_card_stats_oam_for_current_card, tick_card_info_page_by_state
+
 .equ gFontJpCtx, 0x02006ed0 @ JP font render context struct (~0x68B based on stride)
                               @ +0x4  = fn_ptr (indexed from font_jp_base_table by mode bits)
                               @ +0x8  = mode_flags (bit1=double-byte, bit2=? used by setup_font_jp_ctx_*)

@@ -46,7 +46,7 @@
 | Seg | 范围 | 状态 | commit |
 |-----|------|------|--------|
 | **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
-| 2 | 0x1d448..0x1d998 (8fn) | ⬜ | |
+| **2** | 0x1d448..0x1d998 (8fn) | ✅ | (pending) |
 | 3 | 0x1d998..0x1e36c (8fn) | ⬜ | |
 | 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
 | 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
@@ -80,6 +80,23 @@
 - 新增 constants: BG_CHAR_VRAM_CB2=0x06004000 (gba_mem.inc)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 50a40fc
+
+### 4.02 Seg-2 完成记录 (2026-06-07)
+
+- 范围: 0x0801d448..0x0801d998, 8 fn
+- 函数: card_info_page_enter_with_card_id / card_info_page_init_bg0 / render_card_name_to_line_buf / draw_card_name_label_to_vram / render_atk_def_digits_to_buf / draw_atk_def_label_to_vram / render_card_level_text_to_buf / draw_card_level_label_to_vram
+- Ghidra 脚本: RefineF01Seg2Slots.py
+- EQ=15 (BG_CHAR_VRAM_CB2 x1 reuse / OBJ_PALRAM_BASE x1 reuse / gFontJpCtx x1 reuse / EWRAM_BASE x1 reuse / GSETTINGS_OFFSET x1 reuse / CARD_INFO_BG1CNT_INIT x1 新 / CARD_INFO_BG2CNT_INIT x1 新 / CARD_INFO_BG3CNT_INIT x1 新 / CARD_INFO_OBJ_PAL_SLOT x1 新 / CARD_INFO_NAME_BG_TILE_VRAM x1 新 [Fix#1 OAM->BG] / CARD_INFO_NAME_SPRITE_VRAM x1 新 / CARD_INFO_STAT_BG_TILE_VRAM x2 新+复用 [Fix#2 OBJ->BG] / CARD_INFO_STAT_SPRITE_VRAM x2 新+复用)
+- REF=12 (gCardInfoPageState x3 / name_o_palette_data x1 / sjis_char_fold_table x1 / card_label_glyph_buf x2 / card_digit_glyph_data x3 / level_signature_table_field_a x1 / level_signature_table_field_b x1)
+- FUNC_RENAME=0
+- PLATE=8 (全 8 函数 CJK->ASCII)
+- carve=3 (Carve A: sjis_char_fold_table @ rom.s line 1599, 0x1E589A4 0x368 分裂; Carve B: 124KB blob 三表 @ rom.s line 124, 0x1832602 0x1E51A 分裂: card_digit_glyph_data@0x0984f54c/0x50 + card_label_glyph_buf@0x0984f59c/0x30 + card_glyph_table_3@0x0984f5cc/0x1550)
+- 新增 constants: card_info.inc (8 常量: BG1/2/3CNT_INIT / OBJ_PAL_SLOT / NAME_BG_TILE_VRAM / NAME_SPRITE_VRAM / STAT_BG_TILE_VRAM / STAT_SPRITE_VRAM)
+- 新增全局: gCardInfoPageState=0x0201afb0 (ewram.inc); level_signature_table_field_a/_b offset labels (data/post-banlists-tables.s)
+- §5.1=0 (段内无数据块)
+- disasm=0
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: (pending)
 
 ---
 

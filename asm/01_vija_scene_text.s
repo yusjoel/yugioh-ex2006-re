@@ -1194,19 +1194,19 @@ decode_card_image_6bpp_tile_xy_6bit_mask:
 decode_card_image_6bpp_attr_packed_mask:
     .word  0x00000c7f                     @ 0801d444 7f0c0000  0xc7f: packed tile attribute field mask
 
-@ p1: FUN_0801e640 的首个 bl
+@ p1: called by open_card_info_by_icid; zero-fills gCardInfoPageState (0x30 halfwords=0x60B).
 card_info_page_enter_with_card_id:
     push {lr}                                @ 0801d448 00b5
-    ldr r0, DAT_0801d458                     @ 0801d44a 0348
+    ldr r0, card_info_page_enter_with_card_id_state_ptr @ 0801d44a 0348
     movs r1,#0x30    @ 0801d44c 3021
     bl zero_fill_by_halfword                 @ 0801d44e d7f011fd
     pop {r0}                                 @ 0801d452 01bc
     bx r0                                    @ 0801d454 0047
     .zero  0x2
-DAT_0801d458:
-    .word  0x0201afb0                     @ 0801d458 b0af0102
+card_info_page_enter_with_card_id_state_ptr:
+    .word  gCardInfoPageState             @ 0801d458 b0af0102  gCardInfoPageState: card info page per-frame state struct base (EWRAM, 20 refs)
 
-@ p1: 写 BG0CNT=0x0086, 清 BG0 VRAM
+@ Initializes BG0-3 control regs, clears VRAM regions, loads card mini-frame tiles and palette to BG/OBJ.
 card_info_page_init_bg0:
     push {r4,lr}                             @ 0801d45c 10b5
     ldr r0, PTR_gPrng_0801d4e4               @ 0801d45e 2148
@@ -1219,7 +1219,7 @@ card_info_page_init_bg0:
     lsls r1,r1,#0x13    @ 0801d46c c904
     movs r0,#0x40    @ 0801d46e 4020
     strh r0,[r1,#0x0]                        @ 0801d470 0880
-    ldr r0, DAT_0801d4e8                     @ 0801d472 1d48
+    ldr r0, card_info_page_init_bg0_vram_char_base @ 0801d472 1d48
     movs r1,#0x80    @ 0801d474 8021
     lsls r1,r1,#0x8    @ 0801d476 0902
     bl zero_fill_by_halfword                 @ 0801d478 d7f0fcfc
@@ -1228,7 +1228,7 @@ card_info_page_init_bg0:
     movs r1,#0xa0    @ 0801d480 a021
     lsls r1,r1,#0x6    @ 0801d482 8901
     bl zero_fill_by_halfword                 @ 0801d484 d7f0f6fc
-    ldr r4, DAT_0801d4ec                     @ 0801d488 184c
+    ldr r4, card_info_page_init_bg0_state_ptr @ 0801d488 184c
     ldr r0,[r4,#0x28]                        @ 0801d48a a06a
     bl reset_display_and_obj_vram            @ 0801d48c daf0f2f8
     ldr r0,[r4,#0x2c]                        @ 0801d490 e06a
@@ -1237,29 +1237,29 @@ card_info_page_init_bg0:
     movs r0,#0x86    @ 0801d498 8620
     strh r0,[r1,#0x0]                        @ 0801d49a 0880
     adds r1,#0x2    @ 0801d49c 0231
-    ldr r2, DAT_0801d4f4                     @ 0801d49e 154a
+    ldr r2, card_info_page_init_bg0_bg1cnt   @ 0801d49e 154a
     adds r0,r2,#0x0    @ 0801d4a0 101c
     strh r0,[r1,#0x0]                        @ 0801d4a2 0880
     adds r1,#0x2    @ 0801d4a4 0231
-    ldr r2, DAT_0801d4f8                     @ 0801d4a6 144a
+    ldr r2, card_info_page_init_bg0_bg2cnt   @ 0801d4a6 144a
     adds r0,r2,#0x0    @ 0801d4a8 101c
     strh r0,[r1,#0x0]                        @ 0801d4aa 0880
     adds r1,#0x2    @ 0801d4ac 0231
-    ldr r2, DAT_0801d4fc                     @ 0801d4ae 134a
+    ldr r2, card_info_page_init_bg0_bg3cnt   @ 0801d4ae 134a
     adds r0,r2,#0x0    @ 0801d4b0 101c
     strh r0,[r1,#0x0]                        @ 0801d4b2 0880
     bl reset_all_bg_scroll_regs_and_shadows  @ 0801d4b4 d8f0e8fa
     movs r0,#0xa0    @ 0801d4b8 a020
     lsls r0,r0,#0x13    @ 0801d4ba c004
-    ldr r4, DAT_0801d500                     @ 0801d4bc 104c
+    ldr r4, card_info_page_init_bg0_frame_pal @ 0801d4bc 104c
     adds r1,r4,#0x0    @ 0801d4be 211c
     movs r2,#0x20    @ 0801d4c0 2022
     bl copy_bytes_by_halfword                @ 0801d4c2 d7f0effc
-    ldr r0, DAT_0801d504                     @ 0801d4c6 0f48
+    ldr r0, card_info_page_init_bg0_obj_pal_slot @ 0801d4c6 0f48
     adds r1,r4,#0x0    @ 0801d4c8 211c
     movs r2,#0x20    @ 0801d4ca 2022
     bl copy_bytes_by_halfword                @ 0801d4cc d7f0eafc
-    ldr r0, DAT_0801d508                     @ 0801d4d0 0d48
+    ldr r0, card_info_page_init_bg0_obj_palram_base @ 0801d4d0 0d48
     ldr r1, PTR_card_mini_frame_pal_main_0801d50c @ 0801d4d2 0e49
     movs r2,#0x80    @ 0801d4d4 8022
     lsls r2,r2,#0x1    @ 0801d4d6 5200
@@ -1270,28 +1270,28 @@ card_info_page_init_bg0:
     .zero  0x2
 PTR_gPrng_0801d4e4:
     .word  gPrng                          @ 0801d4e4 40000003
-DAT_0801d4e8:
-    .word  0x06004000                     @ 0801d4e8 00400006
-DAT_0801d4ec:
-    .word  0x0201afb0                     @ 0801d4ec b0af0102
+card_info_page_init_bg0_vram_char_base:
+    .word  BG_CHAR_VRAM_CB2               @ 0801d4e8 00400006  BG charblock 2 base: 0x06004000 (GBA_VRAM_BASE + 0x4000)
+card_info_page_init_bg0_state_ptr:
+    .word  gCardInfoPageState             @ 0801d4ec b0af0102
 PTR_BG0CNT_0801d4f0:
     .word  BG0CNT                         @ 0801d4f0 08000004
-DAT_0801d4f4:
-    .word  0x00004104                     @ 0801d4f4 04410000
-DAT_0801d4f8:
-    .word  0x00000407                     @ 0801d4f8 07040000
-DAT_0801d4fc:
-    .word  0x00000305                     @ 0801d4fc 05030000
-DAT_0801d500:
-    .word  0x09ccd290                     @ 0801d500 90d2cc09
-DAT_0801d504:
-    .word  0x050003e0                     @ 0801d504 e0030005
-DAT_0801d508:
-    .word  0x05000200                     @ 0801d508 00020005
+card_info_page_init_bg0_bg1cnt:
+    .word  CARD_INFO_BG1CNT_INIT          @ 0801d4f4 04410000  BG1CNT init: pri=0 charbase=1 16col scrbase=0x10 32x32
+card_info_page_init_bg0_bg2cnt:
+    .word  CARD_INFO_BG2CNT_INIT          @ 0801d4f8 07040000  BG2CNT init: pri=3 charbase=1 16col scrbase=0 32x32
+card_info_page_init_bg0_bg3cnt:
+    .word  CARD_INFO_BG3CNT_INIT          @ 0801d4fc 05030000  BG3CNT init: pri=1 charbase=0 16col scrbase=0 32x32
+card_info_page_init_bg0_frame_pal:
+    .word  name_o_palette_data            @ 0801d500 90d2cc09  ptr to name_o_palette_data (16 RGB15 colors; carve H in rom.s)
+card_info_page_init_bg0_obj_pal_slot:
+    .word  CARD_INFO_OBJ_PAL_SLOT         @ 0801d504 e0030005  OBJ palette slot for card info frame (OBJ_PALRAM_BASE + 0x1e0)
+card_info_page_init_bg0_obj_palram_base:
+    .word  OBJ_PALRAM_BASE                @ 0801d508 00020005  OBJ palette RAM base: 0x05000200
 PTR_card_mini_frame_pal_main_0801d50c:
     .word  card_mini_frame_pal_main       @ 0801d50c 1416e309
 
-@ 接收卡片索引 (r0), 从 card_stats_table 读取卡种字段判断是否为特殊宽度 (0x16/0x17), 再从 IWRAM 状态字 [0x02006c2c] 读取语言/charset 标志调用 select_charset_then_load_name 加载卡名字符串, 然后按双字节 JP 编码逐字素调用 render_glyph_jp_dual_layer 将卡名渲染进行缓冲区. 限宽逻辑 (cmp #0x5c) 防止卡名溢出单行. 被 FUN_0801d6b4 (card_image_decode_wrapper 下一级) 调用, 构成绘制卡片详情页卡名行的核心路径.
+@ r0=card_id. Reads card_stats_table type field to detect wide-card (0x16/0x17). Loads gFontJpCtx from gCardInfoPageState[+8], selects charset (gSettings bits[2:0]) via select_charset_then_load_name, then iterates SJIS bytes, using sjis_char_fold_table[byte] != byte to detect 2-byte sequences. Width guard: cumulative width cmp #0x5c stops render. Returns void.
 render_card_name_to_line_buf:
     push {r4,r5,r6,r7,lr}                    @ 0801d510 f0b5
     .hword 0x4657    @ 0801d512 5746
@@ -1321,9 +1321,9 @@ render_card_name_to_line_buf:
     movs r0,#0x7    @ 0801d542 0720
     str r0,[sp,#0x0]                         @ 0801d544 0090
 LAB_0801d546:
-    ldr r5, DAT_0801d5a8                     @ 0801d546 184d
-    ldr r0, DAT_0801d5ac                     @ 0801d548 1848
-    ldr r1, DAT_0801d5b0                     @ 0801d54a 1949
+    ldr r5, render_card_name_to_line_buf_font_jp_ctx @ 0801d546 184d
+    ldr r0, render_card_name_to_line_buf_ewram_base @ 0801d548 1848
+    ldr r1, render_card_name_to_line_buf_gsettings_off @ 0801d54a 1949
     adds r0,r0,r1    @ 0801d54c 4018
     ldrb r3,[r0,#0x0]                        @ 0801d54e 0378
     movs r2,#0x7    @ 0801d550 0722
@@ -1353,7 +1353,7 @@ LAB_0801d546:
     adds r1,r3,#0x0    @ 0801d580 191c
     cmp r2,#0x0                              @ 0801d582 002a
     bne LAB_0801d60c                         @ 0801d584 42d1
-    ldr r0, DAT_0801d5b8                     @ 0801d586 0c48
+    ldr r0, render_card_name_to_line_buf_state_ptr @ 0801d586 0c48
     ldrb r2,[r0,#0x0]                        @ 0801d588 0278
     movs r0,#0x4    @ 0801d58a 0420
     ands r0,r2    @ 0801d58c 1040
@@ -1369,16 +1369,16 @@ LAB_0801d546:
     .zero  0x2
 PTR_card_stats_table_0801d5a4:
     .word  card_stats_table               @ 0801d5a4 b8698109
-DAT_0801d5a8:
-    .word  0x02006ed0                     @ 0801d5a8 d06e0002
-DAT_0801d5ac:
-    .word  0x02000000                     @ 0801d5ac 00000002
-DAT_0801d5b0:
-    .word  0x00006c2c                     @ 0801d5b0 2c6c0000
+render_card_name_to_line_buf_font_jp_ctx:
+    .word  gFontJpCtx                     @ 0801d5a8 d06e0002  JP font render context struct base
+render_card_name_to_line_buf_ewram_base:
+    .word  EWRAM_BASE                     @ 0801d5ac 00000002  EWRAM base: used with GSETTINGS_OFFSET to reach gSettings
+render_card_name_to_line_buf_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0801d5b0 2c6c0000  gSettings byte offset from EWRAM_BASE (0x6c2c)
 PTR_font_jp_base_table_0801d5b4:
     .word  font_jp_base_table             @ 0801d5b4 54f8e509
-DAT_0801d5b8:
-    .word  0x0201afb0                     @ 0801d5b8 b0af0102
+render_card_name_to_line_buf_state_ptr:
+    .word  gCardInfoPageState             @ 0801d5b8 b0af0102
 LAB_0801d5bc:
     lsls r1,r1,#0x1d    @ 0801d5bc 4907
     lsrs r1,r1,#0x1d    @ 0801d5be 490f
@@ -1435,7 +1435,7 @@ LAB_0801d60c:
     adds r7,r5,#0x0    @ 0801d622 2f1c
 LAB_0801d624:
     ldrb r5,[r6,#0x0]                        @ 0801d624 3578
-    ldr r0, DAT_0801d650                     @ 0801d626 0a48
+    ldr r0, render_card_name_to_line_buf_char_fold @ 0801d626 0a48
     adds r0,r5,r0    @ 0801d628 2818
     ldrb r1,[r0,#0x0]                        @ 0801d62a 0178
     cmp r1,r5                                @ 0801d62c a942
@@ -1456,8 +1456,8 @@ LAB_0801d624:
     movs r4,#0x2    @ 0801d64a 0224
     b LAB_0801d672                           @ 0801d64c 11e0
     .zero  0x2
-DAT_0801d650:
-    .word  0x09e589c4                     @ 0801d650 c489e509
+render_card_name_to_line_buf_char_fold:
+    .word  sjis_char_fold_table           @ 0801d650 c489e509  ptr to sjis_char_fold_table: 256B SJIS/ASCII char normalization table
 LAB_0801d654:
     movs r0,#0x2    @ 0801d654 0220
     ldrb r1,[r7,#0x8]                        @ 0801d656 397a
@@ -1510,13 +1510,13 @@ LAB_0801d6a4:
     pop {r0}                                 @ 0801d6b0 01bc
     bx r0                                    @ 0801d6b2 0047
 
-@ 作为 card_image_decode_wrapper 的直接子调用, 负责将卡名文本行渲染并提交到 OBJ VRAM. 步骤固定三段: (1) 调用 setup_line_buf_pos_and_font (FUN_080f0bb4) 以 x=0xe/y=2 初始化 行缓冲区位置和字体指针, 目标 tile 基址 0x06001c00<<2=0x06007000; (2) 调用 render_card_name_to_line_buf (FUN_0801d510) 以卡片索引渲染卡名到行缓冲区; (3) 调用 commit_line_buffer_to_sprite_vram 将行缓冲区内容刷新到 VRAM 地址 0x06008500. indeg=1 (唯一来自 card_image_decode_wrapper), 确认是卡名行的专属绘制函数.
+@ r0=card_id. Calls setup_line_buf_pos_and_font(x=0xe,y=2,base=0x06001c00), render_card_name_to_line_buf(card_id), commit_line_buffer_to_sprite_vram(0x06008200,0). Post-commit loop: writes sequential tile-attr halfwords from 0x06001840 across 2 rows x 14 columns (tile_idx from 0x210, increments). indeg=1; caller card_image_decode_wrapper.
 draw_card_name_label_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 0801d6b4 f0b5
     adds r4,r0,#0x0    @ 0801d6b6 041c
     lsls r4,r4,#0x10    @ 0801d6b8 2404
     lsrs r4,r4,#0x10    @ 0801d6ba 240c
-    ldr r6, DAT_0801d704                     @ 0801d6bc 114e
+    ldr r6, draw_card_name_label_to_vram_bg_tile_vram @ 0801d6bc 114e
     movs r7,#0x84    @ 0801d6be 8427
     lsls r7,r7,#0x2    @ 0801d6c0 bf00
     movs r0,#0xe    @ 0801d6c2 0e20
@@ -1524,7 +1524,7 @@ draw_card_name_label_to_vram:
     bl setup_line_buf_pos_and_font           @ 0801d6c6 d3f075fa
     adds r0,r4,#0x0    @ 0801d6ca 201c
     bl render_card_name_to_line_buf          @ 0801d6cc fff720ff
-    ldr r0, DAT_0801d708                     @ 0801d6d0 0d48
+    ldr r0, draw_card_name_label_to_vram_sprite_vram @ 0801d6d0 0d48
     movs r1,#0x0    @ 0801d6d2 0021
     bl commit_line_buffer_to_sprite_vram     @ 0801d6d4 d5f0bafb
     movs r0,#0x0    @ 0801d6d8 0020
@@ -1551,19 +1551,19 @@ LAB_0801d6e4:
     pop {r4,r5,r6,r7}                        @ 0801d6fe f0bc
     pop {r0}                                 @ 0801d700 01bc
     bx r0                                    @ 0801d702 0047
-DAT_0801d704:
-    .word  0x06001840                     @ 0801d704 40180006
-DAT_0801d708:
-    .word  0x06008200                     @ 0801d708 00820006
+draw_card_name_label_to_vram_bg_tile_vram:
+    .word  CARD_INFO_NAME_BG_TILE_VRAM    @ 0801d704 40180006  BG screen-map tile-attr write base for card name line (CB0, SB3+0x040)
+draw_card_name_label_to_vram_sprite_vram:
+    .word  CARD_INFO_NAME_SPRITE_VRAM     @ 0801d708 00820006  commit_line_buffer_to_sprite_vram target for card name (BG VRAM CB2+0x200)
 
-@ 接收卡片 ATK (r0) 和 DEF (r1) 值, 通过 __umodsi3/__udivsi3 逐位分解十进制数字, 对 ATK 的个/十/百/千位分别以固定列偏移 (0x36, 0x32, ...) 调用 FUN_080f1b0c 将数字字素渲染到行缓冲区中对应列; DEF 同理以另一组列偏移渲染. 行缓冲区基址从 DAT_0801d7c8 (0x0984f59c) 读取, 数字字素基址从 DAT_0801d7cc (0x0984f54c). 被 FUN_0801d7d0 (draw_atk_def_label_to_vram) 调用, 是 ATK/DEF 数值渲染的计算核心.
+@ r0=atk_val, r1=def_val. Calls blit_glyph_columns_to_buf 4x for ATK label glyphs (col offsets 0x1a/0x22/0x40/0x48), then loops 4 digits each for ATK/DEF via __umodsi3/__udivsi3 at col offsets 0x36..0x2e (ATK) and 0x5c..0x54 (DEF). Glyph buf base=card_label_glyph_buf(0x0984f59c), digit glyph src=card_digit_glyph_data(0x0984f54c, 8B/glyph). indeg=1; caller draw_atk_def_label_to_vram.
 render_atk_def_digits_to_buf:
     push {r4,r5,r6,lr}                       @ 0801d70c 70b5
     lsls r0,r0,#0x10    @ 0801d70e 0004
     lsrs r5,r0,#0x10    @ 0801d710 050c
     lsls r1,r1,#0x10    @ 0801d712 0904
     lsrs r6,r1,#0x10    @ 0801d714 0e0c
-    ldr r4, DAT_0801d7c8                     @ 0801d716 2c4c
+    ldr r4, render_atk_def_digits_to_buf_glyph_buf @ 0801d716 2c4c
     adds r0,r4,#0x0    @ 0801d718 201c
     movs r1,#0x1a    @ 0801d71a 1a21
     movs r2,#0x1    @ 0801d71c 0122
@@ -1599,7 +1599,7 @@ LAB_0801d758:
     bl __umodsi3                             @ 0801d75c f1f07af8
     lsls r0,r0,#0x10    @ 0801d760 0004
     lsrs r0,r0,#0xd    @ 0801d762 400b
-    ldr r1, DAT_0801d7cc                     @ 0801d764 1949
+    ldr r1, render_atk_def_digits_to_buf_digit_glyph @ 0801d764 1949
     adds r0,r0,r1    @ 0801d766 4018
     lsls r2,r4,#0x2    @ 0801d768 a200
     movs r1,#0x36    @ 0801d76a 3621
@@ -1628,7 +1628,7 @@ LAB_0801d792:
     bl __umodsi3                             @ 0801d796 f1f05df8
     lsls r0,r0,#0x10    @ 0801d79a 0004
     lsrs r0,r0,#0xd    @ 0801d79c 400b
-    ldr r1, DAT_0801d7cc                     @ 0801d79e 0b49
+    ldr r1, render_atk_def_digits_to_buf_digit_glyph @ 0801d79e 0b49
     adds r0,r0,r1    @ 0801d7a0 4018
     lsls r2,r4,#0x2    @ 0801d7a2 a200
     movs r1,#0x5c    @ 0801d7a4 5c21
@@ -1648,12 +1648,12 @@ LAB_0801d7b0:
     pop {r4,r5,r6}                           @ 0801d7c2 70bc
     pop {r0}                                 @ 0801d7c4 01bc
     bx r0                                    @ 0801d7c6 0047
-DAT_0801d7c8:
-    .word  0x0984f59c                     @ 0801d7c8 9cf58409
-DAT_0801d7cc:
-    .word  0x0984f54c                     @ 0801d7cc 4cf58409
+render_atk_def_digits_to_buf_glyph_buf:
+    .word  card_label_glyph_buf           @ 0801d7c8 9cf58409  ptr to card_label_glyph_buf: label glyph buffer (LEVEL/ATK/DEF JP bitmaps)
+render_atk_def_digits_to_buf_digit_glyph:
+    .word  card_digit_glyph_data          @ 0801d7cc 4cf58409  ptr to card_digit_glyph_data: 10 decimal digit bitmaps (8B/glyph, 7px wide)
 
-@ card_image_decode_wrapper 的第二个直接子调用, 负责将卡片 ATK/DEF 数值渲染并提交到 OBJ VRAM. 步骤三段: (1) 调用 setup_line_buf_pos_and_font 以 x=0xe/y=2 + tile 基址 0x06001c00 初始化行缓冲区; (2) 调用 render_atk_def_digits_to_buf (FUN_0801d70c) 将 ATK (r0) 和 DEF (r1) 数字字素渲染到缓冲区; (3) 调用 commit_line_buffer_to_sprite_vram 以目标地址 0x06008580 刷新到 VRAM. 与 draw_card_name_label_to_vram (FUN_0801d6b4) 结构完全对称, 两者均被 card_image_decode_wrapper 以 indeg=1 调用.
+@ r0=atk_val, r1=def_val. Calls setup_line_buf_pos_and_font(x=0xe,y=2,base=0x06001c00), render_atk_def_digits_to_buf(atk,def), commit_line_buffer_to_sprite_vram(0x06008580,0). Post-commit loop mirrors draw_card_name_label_to_vram pattern. Symmetric sibling of draw_card_name_label_to_vram. indeg=1; caller card_image_decode_wrapper.
 draw_atk_def_label_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 0801d7d0 f0b5
     adds r4,r0,#0x0    @ 0801d7d2 041c
@@ -1662,7 +1662,7 @@ draw_atk_def_label_to_vram:
     lsrs r4,r4,#0x10    @ 0801d7d8 240c
     lsls r5,r5,#0x10    @ 0801d7da 2d04
     lsrs r5,r5,#0x10    @ 0801d7dc 2d0c
-    ldr r6, DAT_0801d828                     @ 0801d7de 124e
+    ldr r6, draw_atk_def_label_to_vram_bg_tile_vram @ 0801d7de 124e
     movs r7,#0x8b    @ 0801d7e0 8b27
     lsls r7,r7,#0x2    @ 0801d7e2 bf00
     movs r0,#0xe    @ 0801d7e4 0e20
@@ -1671,7 +1671,7 @@ draw_atk_def_label_to_vram:
     adds r0,r4,#0x0    @ 0801d7ec 201c
     adds r1,r5,#0x0    @ 0801d7ee 291c
     bl render_atk_def_digits_to_buf          @ 0801d7f0 fff78cff
-    ldr r0, DAT_0801d82c                     @ 0801d7f4 0d48
+    ldr r0, draw_atk_def_label_to_vram_sprite_vram @ 0801d7f4 0d48
     movs r1,#0x0    @ 0801d7f6 0021
     bl commit_line_buffer_to_sprite_vram     @ 0801d7f8 d5f028fb
     movs r0,#0x0    @ 0801d7fc 0020
@@ -1698,16 +1698,16 @@ LAB_0801d808:
     pop {r4,r5,r6,r7}                        @ 0801d822 f0bc
     pop {r0}                                 @ 0801d824 01bc
     bx r0                                    @ 0801d826 0047
-DAT_0801d828:
-    .word  0x06001c00                     @ 0801d828 001c0006
-DAT_0801d82c:
-    .word  0x06008580                     @ 0801d82c 80850006
+draw_atk_def_label_to_vram_bg_tile_vram:
+    .word  CARD_INFO_STAT_BG_TILE_VRAM    @ 0801d828 001c0006  BG screen-map tile-attr write base for ATK/DEF/Level lines (CB0, SB3+0x400)
+draw_atk_def_label_to_vram_sprite_vram:
+    .word  CARD_INFO_STAT_SPRITE_VRAM     @ 0801d82c 80850006  commit_line_buffer_to_sprite_vram target for ATK/DEF/Level (BG VRAM CB2+0x580)
 
-@ 接收 level 字符串表索引 (r0, 来自 lookup_level_glyph_index 返回值), 从 ROM 字符串表 (0x09e5f726 = level/type 文字表) 定位对应文本, 先以固定 4 次调用 blit_glyph_columns_to_buf (FUN_080f1b0c, r1=0x1a/0x22/0x40/0x48) 将 "LEVEL"/"RANK" 等标签字素写入缓冲区, 再调用 count_bytes_until_null 取文本长度, 然后逐字节解码数字 (0x30-0x39 -> %10 取余, 特殊码 0x3f/'?'->0xe, 0x58/'X'->0xf) 并以 FUN_080f1b0c 渲染各数字字素到对应列. 被 FUN_0801d92c (draw_card_level_label_to_vram) 调用, 是 Level/Rank 数值行的渲染核心.
+@ r0=level_idx (from lookup_level_glyph_index). Blits 4-glyph LEVEL/RANK label (blit_glyph_columns_to_buf x4). Then reads level_signature_table[r0].field_a and .field_b (stride=20B) for label and rank strings. Decodes ASCII: 0x3f->glyph_14, 0x58->glyph_15, 0x30..0x39->digit. Renders each decoded glyph via blit_glyph_columns_to_buf at col offsets 0x36..0x2e and 0x5c..0x54. Returns void.
 render_card_level_text_to_buf:
     push {r4,r5,r6,r7,lr}                    @ 0801d830 f0b5
     adds r7,r0,#0x0    @ 0801d832 071c
-    ldr r4, DAT_0801d89c                     @ 0801d834 194c
+    ldr r4, render_card_level_text_to_buf_glyph_buf @ 0801d834 194c
     adds r0,r4,#0x0    @ 0801d836 201c
     movs r1,#0x1a    @ 0801d838 1a21
     movs r2,#0x1    @ 0801d83a 0122
@@ -1734,7 +1734,7 @@ render_card_level_text_to_buf:
     lsls r4,r7,#0x2    @ 0801d86c bc00
     adds r4,r4,r7    @ 0801d86e e419
     lsls r4,r4,#0x2    @ 0801d870 a400
-    ldr r0, DAT_0801d8a0                     @ 0801d872 0b48
+    ldr r0, render_card_level_text_to_buf_lvl_field_a @ 0801d872 0b48
     adds r4,r4,r0    @ 0801d874 2418
     adds r0,r4,#0x0    @ 0801d876 201c
     bl count_bytes_until_null                @ 0801d878 d7f032fe
@@ -1754,10 +1754,10 @@ LAB_0801d888:
     movs r1,#0xa    @ 0801d894 0a21
     bl __modsi3                              @ 0801d896 f0f001ff
     b LAB_0801d8aa                           @ 0801d89a 06e0
-DAT_0801d89c:
-    .word  0x0984f59c                     @ 0801d89c 9cf58409
-DAT_0801d8a0:
-    .word  0x09e5f71e                     @ 0801d8a0 1ef7e509
+render_card_level_text_to_buf_glyph_buf:
+    .word  card_label_glyph_buf           @ 0801d89c 9cf58409
+render_card_level_text_to_buf_lvl_field_a:
+    .word  level_signature_table_field_a  @ 0801d8a0 1ef7e509  level_signature_table+2: rec[0].field_a base (stride=20B per record)
 LAB_0801d8a4:
     movs r0,#0xe    @ 0801d8a4 0e20
     b LAB_0801d8aa                           @ 0801d8a6 00e0
@@ -1765,7 +1765,7 @@ LAB_0801d8a8:
     movs r0,#0xf    @ 0801d8a8 0f20
 LAB_0801d8aa:
     lsls r0,r0,#0x3    @ 0801d8aa c000
-    ldr r1, DAT_0801d8f8                     @ 0801d8ac 1249
+    ldr r1, render_card_level_text_to_buf_digit_glyph_a @ 0801d8ac 1249
     adds r0,r0,r1    @ 0801d8ae 4018
     lsls r2,r5,#0x2    @ 0801d8b0 aa00
     movs r1,#0x36    @ 0801d8b2 3621
@@ -1781,7 +1781,7 @@ LAB_0801d8c6:
     lsls r4,r7,#0x2    @ 0801d8c6 bc00
     adds r4,r4,r7    @ 0801d8c8 e419
     lsls r4,r4,#0x2    @ 0801d8ca a400
-    ldr r0, DAT_0801d8fc                     @ 0801d8cc 0b48
+    ldr r0, render_card_level_text_to_buf_lvl_field_b @ 0801d8cc 0b48
     adds r4,r4,r0    @ 0801d8ce 2418
     adds r0,r4,#0x0    @ 0801d8d0 201c
     bl count_bytes_until_null                @ 0801d8d2 d7f005fe
@@ -1802,10 +1802,10 @@ LAB_0801d8e4:
     movs r1,#0xa    @ 0801d8f0 0a21
     bl __modsi3                              @ 0801d8f2 f0f0d3fe
     b LAB_0801d906                           @ 0801d8f6 06e0
-DAT_0801d8f8:
-    .word  0x0984f54c                     @ 0801d8f8 4cf58409
-DAT_0801d8fc:
-    .word  0x09e5f726                     @ 0801d8fc 26f7e509
+render_card_level_text_to_buf_digit_glyph_a:
+    .word  card_digit_glyph_data          @ 0801d8f8 4cf58409
+render_card_level_text_to_buf_lvl_field_b:
+    .word  level_signature_table_field_b  @ 0801d8fc 26f7e509  level_signature_table+0xa: rec[0].field_b base (stride=20B per record)
 LAB_0801d900:
     movs r0,#0xe    @ 0801d900 0e20
     b LAB_0801d906                           @ 0801d902 00e0
@@ -1813,7 +1813,7 @@ LAB_0801d904:
     movs r0,#0xf    @ 0801d904 0f20
 LAB_0801d906:
     lsls r0,r0,#0x3    @ 0801d906 c000
-    ldr r1, DAT_0801d928                     @ 0801d908 0749
+    ldr r1, render_card_level_text_to_buf_digit_glyph_b @ 0801d908 0749
     adds r0,r0,r1    @ 0801d90a 4018
     lsls r2,r5,#0x2    @ 0801d90c aa00
     movs r1,#0x5c    @ 0801d90e 5c21
@@ -1829,15 +1829,15 @@ LAB_0801d922:
     pop {r4,r5,r6,r7}                        @ 0801d922 f0bc
     pop {r0}                                 @ 0801d924 01bc
     bx r0                                    @ 0801d926 0047
-DAT_0801d928:
-    .word  0x0984f54c                     @ 0801d928 4cf58409
+render_card_level_text_to_buf_digit_glyph_b:
+    .word  card_digit_glyph_data          @ 0801d928 4cf58409
 
-@ card_image_decode_wrapper 的第三个直接子调用, 负责将卡片等级 (Level/Rank) 星图渲染并提交到 OBJ VRAM. 先调用 lookup_level_glyph_index (FUN_080ef454) 以卡片索引查 level_signature_table 取等级索引; 若返回 -1 (无等级数据, 如魔法/陷阱) 则直接返回 0. 否则调用 setup_line_buf_pos_and_font (FUN_080f0bb4) 以 x=0xe/y=2 初始化行缓冲区, 再调用 render_card_level_text_to_buf (FUN_0801d830) 渲染等级文字/星图到缓冲区, 最后 commit_line_buffer_to_sprite_vram 写入 VRAM (目标地址 DAT_0801d994). indeg=1, 唯一 caller card_image_decode_wrapper.
+@ r0=card_id. Calls lookup_level_glyph_index(card_id); returns 0 if -1 (no level: magic/trap). Otherwise: setup_line_buf_pos_and_font(x=0xe,y=2), render_card_level_text_to_buf(level_idx), commit_line_buffer_to_sprite_vram(0x06008580,0). Returns 1 on success, 0 if no level. indeg=1; caller card_image_decode_wrapper.
 draw_card_level_label_to_vram:
     push {r4,r5,r6,r7,lr}                    @ 0801d92c f0b5
     lsls r0,r0,#0x10    @ 0801d92e 0004
     lsrs r0,r0,#0x10    @ 0801d930 000c
-    ldr r6, DAT_0801d94c                     @ 0801d932 064e
+    ldr r6, draw_card_level_label_to_vram_bg_tile_vram @ 0801d932 064e
     movs r7,#0x8b    @ 0801d934 8b27
     lsls r7,r7,#0x2    @ 0801d936 bf00
     bl lookup_level_glyph_index              @ 0801d938 d1f08cfd
@@ -1849,15 +1849,15 @@ draw_card_level_label_to_vram:
     movs r0,#0x0    @ 0801d946 0020
     b LAB_0801d98e                           @ 0801d948 21e0
     .zero  0x2
-DAT_0801d94c:
-    .word  0x06001c00                     @ 0801d94c 001c0006
+draw_card_level_label_to_vram_bg_tile_vram:
+    .word  CARD_INFO_STAT_BG_TILE_VRAM    @ 0801d94c 001c0006  BG screen-map tile-attr write base for Level line (CB0, SB3+0x400)
 LAB_0801d950:
     movs r0,#0xe    @ 0801d950 0e20
     movs r1,#0x2    @ 0801d952 0221
     bl setup_line_buf_pos_and_font           @ 0801d954 d3f02ef9
     adds r0,r4,#0x0    @ 0801d958 201c
     bl render_card_level_text_to_buf         @ 0801d95a fff769ff
-    ldr r0, DAT_0801d994                     @ 0801d95e 0d48
+    ldr r0, draw_card_level_label_to_vram_sprite_vram @ 0801d95e 0d48
     movs r1,#0x0    @ 0801d960 0021
     bl commit_line_buffer_to_sprite_vram     @ 0801d962 d5f073fa
     movs r0,#0x0    @ 0801d966 0020
@@ -1886,8 +1886,8 @@ LAB_0801d98e:
     pop {r4,r5,r6,r7}                        @ 0801d98e f0bc
     pop {r1}                                 @ 0801d990 02bc
     bx r1                                    @ 0801d992 0847
-DAT_0801d994:
-    .word  0x06008580                     @ 0801d994 80850006
+draw_card_level_label_to_vram_sprite_vram:
+    .word  CARD_INFO_STAT_SPRITE_VRAM     @ 0801d994 80850006  commit_line_buffer_to_sprite_vram target for Level (BG VRAM CB2+0x580)
 
 @ p1: 读卡片属性, 调 decode_card_image_6bpp (r1=0x10 palette offset)
 card_image_decode_wrapper:

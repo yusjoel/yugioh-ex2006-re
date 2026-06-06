@@ -45,6 +45,9 @@
 @ 名字输入 / banlist 页面常量（BG CNT init / cpuset 控制字 / gSettings offset; 0x171ec 簇用）
 	.include "constants/name_input.inc"
 
+@ Card Info Page BG CNT init / OBJ pal slot / BG-VRAM 写入基址（0x1d448 card_info 簇用）
+	.include "constants/card_info.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 
@@ -118,7 +121,13 @@ pack_banner_obj_palette:
 
 @ 后 16MB 第一段前半 seg-C：ROM偏移 0x1832602 - 0x1850B1B（属性表后，HUD 前）
 @ 内嵌 HUD 元素 + 外场 tile image 指针表已拆出
-	.incbin "roms/2343.gba", 0x1832602, 0x1E51A     @ seg-C 前段 0x1832602..0x1850B1C
+	.incbin "roms/2343.gba", 0x1832602, 0x1CF4A     @ seg-C pre-segment (to card_digit_glyph_data @ 0x0984f54c)
+card_digit_glyph_data:                               @ 0x0984f54c (0x50 B, 6 ROM refs; 10 decimal digit bitmaps, 8B/glyph, 7px wide)
+	.incbin "roms/2343.gba", 0x184F54C, 0x50         @ 10 digits x 8B/glyph
+card_label_glyph_buf:                                @ 0x0984f59c (0x30 B, 3 ROM refs; label glyph buffer for LEVEL/ATK/DEF JP bitmaps)
+	.incbin "roms/2343.gba", 0x184F59C, 0x30         @ label glyph data
+card_glyph_table_3:                                  @ 0x0984f5cc (0x1550 B, 2 ROM refs; glyph table 3, consumed by file-C modules)
+	.incbin "roms/2343.gba", 0x184F5CC, 0x1550       @ glyph table 3 body (to blob end 0x1850B1C; 0x1cf4a+0x50+0x30+0x1550=0x1e51a)
 hud_life_points_font:
 	.incbin "graphics/bin/duel-field/tiles/hud_life_points_font.bin"          @ 0x1850B1C, 0xAC0
 hud_phase_highlights_palette:
@@ -1593,7 +1602,10 @@ banlist_handler_table:                         @ 0x09e58994 (3 THUMB fn-ptrs +1 
 	.word 0x0801a329                           @ [1] (handler+1, THUMB)
 	.word 0x0801b5d9                           @ [2] tick_banlist_scene_frame+1 (THUMB)
 	.word 0x00000000                           @ [3] NULL sentinel
-	.incbin "roms/2343.gba", 0x1E589A4, 0x368 @ remainder (0x420 - 0xA8 - 0x10 = 0x368)
+	.incbin "roms/2343.gba", 0x1E589A4, 0x20     @ gap before sjis_char_fold_table (0x20 B)
+sjis_char_fold_table:                            @ 0x09e589c4 (256B, 4 ROM refs; SJIS/ASCII char normalization: lowercase->uppercase fold + SJIS lead-byte remap)
+	.incbin "roms/2343.gba", 0x1E589C4, 0x100   @ sjis_char_fold_table body (256 B)
+	.incbin "roms/2343.gba", 0x1E58AC4, 0x248   @ remainder after table (0x368 - 0x20 - 0x100 = 0x248)
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)
