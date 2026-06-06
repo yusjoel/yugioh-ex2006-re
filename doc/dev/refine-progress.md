@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `01_vija_scene_text.s` (下一文件, 00 文件全 10 段已完成)。
-> **下一任务**: **file 00 完成; 启动 file 01**: 先建活动 doc + 按地址拆 ~10 段 (driver 待办)。
+> **当前文件**: `01_vija_scene_text.s` (进行中, 1/10 段; 活动 doc + 10 段路线图已建)。
+> **下一任务**: **Seg-2** (01 文件, 0x1d448..0x1d998, 8fn)。
 
 ---
 
@@ -18,7 +18,7 @@
 | # | 文件 | 地址区间 | 段(~10/文件) | 状态 | 活动 doc |
 |---|------|----------|------|------|---------|
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
-| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | 未拆 | ⬜ | (待建) |
+| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | 🟡 进行中 (1/10) | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | 未拆 | ⬜ | |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
@@ -115,4 +115,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-07 (00 文件 Seg-10 完成: vija/shuen 32fn + gVijaState(ewram.inc) + 6 新 EQ(demo_state.inc) + 33 EQ+21 REF+25 RENAME+5 DWORD+17 PLATE_FIX+1 CJK_PLATE+23 EOL_FIX + BG3HOFS 地址订正; byte-identical 9689337d; **file 00 全 10 段完成 ✅**)。下一任务: file 01 (01_vija_scene_text.s)。
+**上次更新**: 2026-06-07 (01 文件 Seg-1 完成: vija scene 8fn + 15 EQ + 3 REF + 5 RENAME + 3 PLATE + carve vija_bg/obj paths(rom.s) + §5.1 orphan dispatcher 簇 + BG_CHAR_VRAM_CB2(gba_mem.inc); byte-identical 9689337d)。下一任务: file 01 Seg-2 (0x1d448..0x1d998)。

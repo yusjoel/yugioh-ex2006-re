@@ -1139,7 +1139,19 @@ vij_main_c_filename:
 	.asciz "Vija/VIJ_main.c"
 assert_anmid_ig2d_getanmsequencescoun_994:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
-	.incbin "roms/2343.gba", 0x1E3D9CF, 0xC33D
+	.incbin "roms/2343.gba", 0x1E3D9CF, 0x5        @ 5B pre-pad (bytes 00 01 02 01 00)
+vija_bg_jp_path:                                   @ GBA 0x09e3d9d4
+	.asciz "demo/vija/BG1_all.LZ5bg"              @ 24B (23 chars + NUL, 4-byte aligned)
+vija_bg_us_path:                                   @ GBA 0x09e3d9ec
+	.asciz "demo/vija/BG1_all_US.LZ5bg"           @ 27B (26 chars + NUL)
+	.byte  0x0                                     @ 1B alignment pad -> total 28B
+vija_bg_fs_path_pair:                              @ GBA 0x09e3da08 (ref: DAT_0801cbf4)
+	.word  vija_bg_jp_path                         @ [0] JP FS path ptr
+	.word  vija_bg_us_path                         @ [4] US FS path ptr
+vija_obj_slot_seq:                                 @ GBA 0x09e3da10 (ref: DAT_0801ce00)
+	.byte  0x01, 0x03, 0x00, 0x02, 0x04           @ OBJ slot index sequence [phase 0..4]
+	.byte  0x0, 0x0, 0x0                           @ 3B pad
+	.incbin "roms/2343.gba", 0x1E3DA18, 0xC2F4    @ remainder
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

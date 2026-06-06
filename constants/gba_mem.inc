@@ -12,4 +12,5 @@
 .equ GBA_VRAM_BASE,       0x06000000  @ VRAM 基址 (BG char/screen map; 0xc0<<0x13 内联值)
 .equ OBJ_TILE_VRAM_BASE,  0x06010000  @ OBJ/sprite tile 数据基址 (mode 0-2, VRAM+0x10000)
 .equ GBA_OAM_BASE,        0x07000000  @ OAM (sprite 属性, 0x400 字节)
+.equ BG_CHAR_VRAM_CB2,    0x06004000  @ BG charblock 2 base (GBA_VRAM_BASE + 0x4000); 43 ROM refs; BG char data start for card image tile writes
 .equ BG_VRAM_TEXT_BASE,   0x06000020  @ BG text VRAM base+0x20 (tile slot 1); used by font/text render init

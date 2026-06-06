@@ -5,7 +5,7 @@
 run_vija_scene_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 0801cb00 f0b5
     sub sp,#0x18                             @ 0801cb02 86b0
-    ldr r5, DAT_0801cb1c                     @ 0801cb04 054d
+    ldr r5, run_vija_scene_state_machine_gvija_state @ 0801cb04 054d
     adds r0,r5,#0x0    @ 0801cb06 281c
     adds r0,#0x8d    @ 0801cb08 8d30
     ldrb r0,[r0,#0x0]                        @ 0801cb0a 0078
@@ -14,15 +14,15 @@ run_vija_scene_state_machine:
     b switchD_0801cb1a__default              @ 0801cb10 18e2
 LAB_0801cb12:
     lsls r0,r0,#0x2    @ 0801cb12 8000
-    ldr r1, DAT_0801cb20                     @ 0801cb14 0249
+    ldr r1, run_vija_scene_state_machine_switch_table_base @ 0801cb14 0249
     adds r0,r0,r1    @ 0801cb16 4018
     ldr r0,[r0,#0x0]                         @ 0801cb18 0068
 switchD_0801cb1a__switchD:
     .hword 0x4687    @ 0801cb1a 8746
-DAT_0801cb1c:
-    .word  0x02029eb0                     @ 0801cb1c b09e0202
-DAT_0801cb20:
-    .word  0x0801cb24                     @ 0801cb20 24cb0108
+run_vija_scene_state_machine_gvija_state:
+    .word  gVijaState                     @ 0801cb1c b09e0202  gVijaState: vija per-frame state struct base (0xc0 bytes @ EWRAM)
+run_vija_scene_state_machine_switch_table_base:
+    .word  0x0801cb24                     @ 0801cb20 24cb0108  ptr to 10-case switch jump table at switchdataD_0801cb24
 switchD_0801cb1a__switchdataD_0801cb24:
     .word  0x0801cb4c                     @ 0801cb24 4ccb0108
     .word  0x0801cc08                     @ 0801cb28 08cc0108
@@ -43,19 +43,19 @@ switchD_0801cb1a__caseD_0:
     movs r2,#0x1    @ 0801cb56 0122
     movs r3,#0x2    @ 0801cb58 0223
     bl load_vija_bg_gfx_by_mode              @ 0801cb5a fff793fc
-    ldr r0, DAT_0801cbf4                     @ 0801cb5e 2548
+    ldr r0, run_vija_scene_state_machine_vija_bg_path_pair @ 0801cb5e 2548
     ldr r1,[r0,#0x4]                         @ 0801cb60 4168
     ldr r0,[r0,#0x0]                         @ 0801cb62 0068
     str r0,[sp,#0x10]                        @ 0801cb64 0490
     str r1,[sp,#0x14]                        @ 0801cb66 0591
     movs r2,#0x0    @ 0801cb68 0022
-    ldr r0, DAT_0801cbf8                     @ 0801cb6a 2348
+    ldr r0, run_vija_scene_state_machine_rom_region_code_addr @ 0801cb6a 2348
     ldrh r0,[r0,#0x0]                        @ 0801cb6c 0088
     lsrs r0,r0,#0x8    @ 0801cb6e 000a
     cmp r0,#0x4a                             @ 0801cb70 4a28
     bne LAB_0801cb84                         @ 0801cb72 07d1
-    ldr r1, DAT_0801cbfc                     @ 0801cb74 2149
-    ldr r0, DAT_0801cc00                     @ 0801cb76 2248
+    ldr r1, run_vija_scene_state_machine_ewram_base @ 0801cb74 2149
+    ldr r0, run_vija_scene_state_machine_gsettings_offset @ 0801cb76 2248
     adds r1,r1,r0    @ 0801cb78 0918
     movs r0,#0x7    @ 0801cb7a 0720
     ldrb r1,[r1,#0x0]                        @ 0801cb7c 0978
@@ -101,7 +101,7 @@ LAB_0801cb86:
     lsls r2,r2,#0x13    @ 0801cbd2 d204
     movs r3,#0x80    @ 0801cbd4 8023
     lsls r3,r3,#0x2    @ 0801cbd6 9b00
-    ldr r0, DAT_0801cc04                     @ 0801cbd8 0a48
+    ldr r0, run_vija_scene_state_machine_dispcnt_obj_en_mask_a @ 0801cbd8 0a48
     ldrh r1,[r2,#0x0]                        @ 0801cbda 1188
     ands r0,r1    @ 0801cbdc 0840
     orrs r0,r3    @ 0801cbde 1843
@@ -114,16 +114,16 @@ LAB_0801cb86:
     adds r0,#0x1    @ 0801cbee 0130
     b LAB_0801cf42                           @ 0801cbf0 a7e1
     .zero  0x2
-DAT_0801cbf4:
-    .word  0x09e3da08                     @ 0801cbf4 08dae309
-DAT_0801cbf8:
-    .word  0x080000ae                     @ 0801cbf8 ae000008
-DAT_0801cbfc:
-    .word  0x02000000                     @ 0801cbfc 00000002
-DAT_0801cc00:
-    .word  0x00006c2c                     @ 0801cc00 2c6c0000
-DAT_0801cc04:
-    .word  0xffffe0ff                     @ 0801cc04 ffe0ffff
+run_vija_scene_state_machine_vija_bg_path_pair:
+    .word  vija_bg_fs_path_pair           @ 0801cbf4 08dae309  ptr to {JP path, US path} pair for vija BG1 LZ5 file load
+run_vija_scene_state_machine_rom_region_code_addr:
+    .word  ROM_REGION_CODE_ADDR           @ 0801cbf8 ae000008  ROM header game-code high u16 (ldrh+>>8 gives region char)
+run_vija_scene_state_machine_ewram_base:
+    .word  EWRAM_BASE                     @ 0801cbfc 00000002  EWRAM base: used with GSETTINGS_OFFSET to reach gSettings
+run_vija_scene_state_machine_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 0801cc00 2c6c0000  gSettings byte offset from EWRAM_BASE (0x6c2c)
+run_vija_scene_state_machine_dispcnt_obj_en_mask_a:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801cc04 ffe0ffff  DISPCNT clear bits[12:8] (BG/OBJ enable field)
 switchD_0801cb1a__caseD_1:
     bl check_blend_transition_done           @ 0801cc08 f7f774fe
     adds r4,r0,#0x0    @ 0801cc0c 041c
@@ -313,7 +313,7 @@ LAB_0801cd60:
     lsls r2,r2,#0x13    @ 0801cd7e d204
     movs r3,#0xb0    @ 0801cd80 b023
     lsls r3,r3,#0x5    @ 0801cd82 5b01
-    ldr r0, DAT_0801cd9c                     @ 0801cd84 0548
+    ldr r0, run_vija_scene_state_machine_dispcnt_obj_en_mask_b @ 0801cd84 0548
     ldrh r1,[r2,#0x0]                        @ 0801cd86 1188
     ands r0,r1    @ 0801cd88 0840
     orrs r0,r3    @ 0801cd8a 1843
@@ -325,8 +325,8 @@ LAB_0801cd60:
     ldrb r0,[r1,#0x0]                        @ 0801cd96 0878
     adds r0,#0x1    @ 0801cd98 0130
     b LAB_0801cf42                           @ 0801cd9a d2e0
-DAT_0801cd9c:
-    .word  0xffffe0ff                     @ 0801cd9c ffe0ffff
+run_vija_scene_state_machine_dispcnt_obj_en_mask_b:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801cd9c ffe0ffff
 switchD_0801cb1a__caseD_5:
     bl tick_bg2_affine_anim_frame            @ 0801cda0 fff778fc
     bl check_blend_transition_done           @ 0801cda4 f7f7a6fd
@@ -334,7 +334,7 @@ switchD_0801cb1a__caseD_5:
     beq LAB_0801cdae                         @ 0801cdaa 00d0
     b LAB_0801ceb6                           @ 0801cdac 83e0
 LAB_0801cdae:
-    ldr r1, DAT_0801ce00                     @ 0801cdae 1449
+    ldr r1, run_vija_scene_state_machine_vija_obj_slot_seq @ 0801cdae 1449
     add r0,sp,#0x8                           @ 0801cdb0 02a8
     movs r2,#0x5    @ 0801cdb2 0522
     bl memcpy                                @ 0801cdb4 f1f0d2fd
@@ -374,8 +374,8 @@ LAB_0801cdf8:
     adds r0,#0x1    @ 0801cdfa 0130
     strb r0,[r6,#0x0]                        @ 0801cdfc 3070
     b LAB_0801ceb6                           @ 0801cdfe 5ae0
-DAT_0801ce00:
-    .word  0x09e3da10                     @ 0801ce00 10dae309
+run_vija_scene_state_machine_vija_obj_slot_seq:
+    .word  vija_obj_slot_seq              @ 0801ce00 10dae309  ptr to 5-byte OBJ slot index sequence {01 03 00 02 04}
 switchD_0801cb1a__caseD_6:
     bl tick_bg2_affine_anim_frame            @ 0801ce04 fff746fc
     adds r0,r5,#0x0    @ 0801ce08 281c
@@ -393,7 +393,7 @@ switchD_0801cb1a__caseD_6:
     lsls r2,r2,#0x13    @ 0801ce20 d204
     movs r3,#0xa0    @ 0801ce22 a023
     lsls r3,r3,#0x5    @ 0801ce24 5b01
-    ldr r0, DAT_0801ce3c                     @ 0801ce26 0548
+    ldr r0, run_vija_scene_state_machine_dispcnt_obj_en_mask_c @ 0801ce26 0548
     ldrh r1,[r2,#0x0]                        @ 0801ce28 1188
     ands r0,r1    @ 0801ce2a 0840
     orrs r0,r3    @ 0801ce2c 1843
@@ -404,8 +404,8 @@ switchD_0801cb1a__caseD_6:
     adds r0,#0x1    @ 0801ce36 0130
     b LAB_0801cf2c                           @ 0801ce38 78e0
     .zero  0x2
-DAT_0801ce3c:
-    .word  0xffffe0ff                     @ 0801ce3c ffe0ffff
+run_vija_scene_state_machine_dispcnt_obj_en_mask_c:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801ce3c ffe0ffff
 LAB_0801ce40:
     adds r1,r5,#0x0    @ 0801ce40 291c
     adds r1,#0x8e    @ 0801ce42 8e31
@@ -498,7 +498,7 @@ LAB_0801cee2:
     bl gl_set_blend2_level                   @ 0801cef0 f7f772fc
     movs r2,#0x80    @ 0801cef4 8022
     lsls r2,r2,#0x13    @ 0801cef6 d204
-    ldr r0, DAT_0801cf08                     @ 0801cef8 0348
+    ldr r0, run_vija_scene_state_machine_dispcnt_obj_en_mask_d @ 0801cef8 0348
     ldrh r1,[r2,#0x0]                        @ 0801cefa 1188
     ands r0,r1    @ 0801cefc 0840
     strh r0,[r2,#0x0]                        @ 0801cefe 1080
@@ -506,8 +506,8 @@ LAB_0801cee2:
     lsls r0,r0,#0x13    @ 0801cf02 c004
     strh r4,[r0,#0x0]                        @ 0801cf04 0480
     b LAB_0801cdf8                           @ 0801cf06 77e7
-DAT_0801cf08:
-    .word  0xffffe0ff                     @ 0801cf08 ffe0ffff
+run_vija_scene_state_machine_dispcnt_obj_en_mask_d:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801cf08 ffe0ffff
 LAB_0801cf0c:
     movs r0,#0x3f    @ 0801cf0c 3f20
     movs r1,#0x0    @ 0801cf0e 0021
@@ -571,7 +571,7 @@ LAB_0801cf6a:
 @ STEP_ADVANCE_MASK = 0xffc03fff
 tick_scene_step_by_step_table_b:
     push {r4,lr}                             @ 0801cf74 10b5
-    ldr r1, DWORD_0801cfb8                   @ 0801cf76 1049
+    ldr r1, tick_scene_step_by_step_table_b_step_table @ 0801cf76 1049
     ldr r0, DWORD_0801cfbc                   @ 0801cf78 1048
     movs r2,#0x81    @ 0801cf7a 8122
     lsls r2,r2,#0x2    @ 0801cf7c 9200
@@ -594,7 +594,7 @@ tick_scene_step_by_step_table_b:
     movs r0,#0xff    @ 0801cfa0 ff20
     ands r1,r0    @ 0801cfa2 0140
     lsls r1,r1,#0xe    @ 0801cfa4 8903
-    ldr r0, DWORD_0801cfc0                   @ 0801cfa6 0648
+    ldr r0, tick_scene_step_by_step_table_b_step_advance_mask @ 0801cfa6 0648
     ands r0,r2    @ 0801cfa8 1040
     orrs r0,r1    @ 0801cfaa 0843
     str r0,[r4,#0x0]                         @ 0801cfac 2060
@@ -603,12 +603,12 @@ LAB_0801cfae:
     movs r0,#0x0    @ 0801cfb2 0020
     b LAB_0801cfc6                           @ 0801cfb4 07e0
     .zero  0x2
-DWORD_0801cfb8:
-    .word  0x09e589b4                     @ 0801cfb8 b489e509
+tick_scene_step_by_step_table_b_step_table:
+    .word  0x09e589b4                     @ 0801cfb8 b489e509  ROM step table B base 0x09e589b4: 3 THUMB fn-ptrs +1 NULL
 DWORD_0801cfbc:
     .word  gPrng                          @ 0801cfbc 40000003
-DWORD_0801cfc0:
-    .word  0xffc03fff                     @ 0801cfc0 ff3fc0ff
+tick_scene_step_by_step_table_b_step_advance_mask:
+    .word  NAME_INPUT_PAGE_STATE_CLEAR    @ 0801cfc0 ff3fc0ff  bits[21:14] clear mask for step index field in gPrng+0x204
 LAB_0801cfc4:
     movs r0,#0x1    @ 0801cfc4 0120
 LAB_0801cfc6:
@@ -625,7 +625,7 @@ LAB_0801cfc6:
 @ STEP_ADVANCE_MASK = 0xffc03fff
 tick_scene_step_by_step_table_c:
     push {r4,lr}                             @ 0801cfcc 10b5
-    ldr r1, DWORD_0801d010                   @ 0801cfce 1049
+    ldr r1, tick_scene_step_by_step_table_c_step_table @ 0801cfce 1049
     ldr r0, DWORD_0801d014                   @ 0801cfd0 1048
     movs r2,#0x81    @ 0801cfd2 8122
     lsls r2,r2,#0x2    @ 0801cfd4 9200
@@ -648,7 +648,7 @@ tick_scene_step_by_step_table_c:
     movs r0,#0xff    @ 0801cff8 ff20
     ands r1,r0    @ 0801cffa 0140
     lsls r1,r1,#0xe    @ 0801cffc 8903
-    ldr r0, DWORD_0801d018                   @ 0801cffe 0648
+    ldr r0, tick_scene_step_by_step_table_c_step_advance_mask @ 0801cffe 0648
     ands r0,r2    @ 0801d000 1040
     orrs r0,r1    @ 0801d002 0843
     str r0,[r4,#0x0]                         @ 0801d004 2060
@@ -657,12 +657,12 @@ LAB_0801d006:
     movs r0,#0x0    @ 0801d00a 0020
     b LAB_0801d01e                           @ 0801d00c 07e0
     .zero  0x2
-DWORD_0801d010:
-    .word  0x09e589b4                     @ 0801d010 b489e509
+tick_scene_step_by_step_table_c_step_table:
+    .word  0x09e589b4                     @ 0801d010 b489e509  ROM step table B base 0x09e589b4 (shared with table_b)
 DWORD_0801d014:
     .word  gPrng                          @ 0801d014 40000003
-DWORD_0801d018:
-    .word  0xffc03fff                     @ 0801d018 ff3fc0ff
+tick_scene_step_by_step_table_c_step_advance_mask:
+    .word  NAME_INPUT_PAGE_STATE_CLEAR    @ 0801d018 ff3fc0ff
 LAB_0801d01c:
     movs r0,#0x1    @ 0801d01c 0120
 LAB_0801d01e:
@@ -705,7 +705,7 @@ PTR_DAT_0801d044:
 DAT_0801d0bc:
     .byte  0x30, 0x20, 0x00, 0xe0, 0x50, 0x20, 0x20, 0x60, 0x10, 0xbc, 0x01, 0xbc, 0x00, 0x47, 0x00, 0x00
 
-@ Called by FUN_0801d174 in inner loop for each of 4 sub-elements (r4 in [0..3]) of a map entry. Accepts r0/r1 packed coordinate fields and r2 attribute byte, r3 packed params; computes BG char data VRAM address (base 0x06004000) via multi-step bit shifts, loads 4-byte tile entry, writes r2 attribute byte into the specified position then writes back to VRAM. Heavy use of hi-reg to sp move instructions (.hword 0x466x = mov rN,sp) to stage intermediate bytes on stack. Low-level tile attribute write utility. Exit: pop {r0}; bx r0 (lr saved on stack, Sub-case E - r0 is not a return value).
+@ Called by write_tile_attr_strip_4wide in inner loop for each of 4 sub-elements (r4 in [0..3]) of a map entry. Accepts r0/r1 packed coordinate fields and r2 attribute byte, r3 packed params; computes BG char data VRAM address (base 0x06004000) via multi-step bit shifts, loads 4-byte tile entry, writes r2 attribute byte into the specified position then writes back to VRAM. Heavy use of hi-reg to sp move instructions (.hword 0x466x = mov rN,sp) to stage intermediate bytes on stack. Low-level tile attribute write utility. Exit: pop {r0}; bx r0 (lr saved on stack, Sub-case E - r0 is not a return value).
 @ 
 @ Constants:
 @ VRAM_CHAR_BASE = 0x06004000 (BG char data VRAM base)
@@ -736,7 +736,7 @@ write_tile_attr_byte_to_vram:
     lsls r3,r3,#0x1    @ 0801d0f8 5b00
     adds r5,r5,r3    @ 0801d0fa ed18
     lsls r5,r5,#0x5    @ 0801d0fc 6d01
-    ldr r3, DWORD_0801d158                   @ 0801d0fe 164b
+    ldr r3, write_tile_attr_byte_to_vram_vram_char_base @ 0801d0fe 164b
     adds r5,r5,r3    @ 0801d100 ed18
     lsrs r3,r0,#0x12    @ 0801d102 830c
     lsls r3,r3,#0x2    @ 0801d104 9b00
@@ -781,10 +781,10 @@ write_tile_attr_byte_to_vram:
     pop {r4,r5,r6,r7}                        @ 0801d152 f0bc
     pop {r0}                                 @ 0801d154 01bc
     bx r0                                    @ 0801d156 0047
-DWORD_0801d158:
-    .word  0x06004000                     @ 0801d158 00400006
+write_tile_attr_byte_to_vram_vram_char_base:
+    .word  BG_CHAR_VRAM_CB2               @ 0801d158 00400006  BG charblock 2 base: 0x06004000 = GBA_VRAM_BASE + 0x4000
 
-@ Called by FUN_0801d208 (tile map update function). Accepts r0 = packed param, extracts bits[11:4] (8-bit palette slot index bank_idx [0..255]), computes target address = 0x05000000 + bank_idx*32 (PALRAM, 32 bytes per slot = 16 RGB15 colors), uses r1 as source address and calls copy_memory_dma3_with_cpu_fallback to copy 0x20 bytes (1 sixteen-color palette bank). Exit: pop {r0}; bx r0 (Sub-case E, r0=lr).
+@ Called by apply_palette_and_tile_attr_strips (tile map update function). Accepts r0 = packed param, extracts bits[11:4] (8-bit palette slot index bank_idx [0..255]), computes target address = 0x05000000 + bank_idx*32 (PALRAM, 32 bytes per slot = 16 RGB15 colors), uses r1 as source address and calls copy_memory_dma3_with_cpu_fallback to copy 0x20 bytes (1 sixteen-color palette bank). Exit: pop {r0}; bx r0 (Sub-case E, r0=lr).
 @ 
 @ Constants:
 @ PALRAM_BASE = 0x05000000 (0xa0 << 0x13 = 0xa0 * 524288; python: hex(0xa0<<0x13) -> 0x5000000)
@@ -960,7 +960,11 @@ apply_palette_and_tile_attr_strips:
     bx r0                                    @ 0801d28c 0047
     .zero  0x2
 
-@ p1: 6bpp -> BG0 VRAM, 每6 ROM bytes -> 8 像素
+@ @ 6bpp source -> BG char VRAM tile layout. 6 input bytes -> 8 output pixels
+@ @ (3 src halfwords -> 4 dst halfwords). Writes to BG charblock 2 (0x06004000).
+@ @ r0/r1: tile coord params; r2: packed tile attribute; operates on card image data.
+@ @ Parameters: r5=src_ptr (6bpp card image), r6=VRAM dst tile base.
+@ @ Returns void (pop {r0}; bx r0, Sub-case E).
 decode_card_image_6bpp:
     push {r4,r5,r6,r7,lr}                    @ 0801d290 f0b5
     .hword 0x4657    @ 0801d292 5746
@@ -1019,13 +1023,13 @@ LAB_0801d2ca:
     .hword 0x464d    @ 0801d2f8 4d46
     .hword 0x4642    @ 0801d2fa 4246
     movs r3,#0x0    @ 0801d2fc 0023
-    ldr r0, DAT_0801d424                     @ 0801d2fe 4948
+    ldr r0, decode_card_image_6bpp_rom_region_code_addr @ 0801d2fe 4948
     ldrh r0,[r0,#0x0]                        @ 0801d300 0088
     lsrs r0,r0,#0x8    @ 0801d302 000a
     cmp r0,#0x4a                             @ 0801d304 4a28
     bne LAB_0801d318                         @ 0801d306 07d1
-    ldr r1, DAT_0801d428                     @ 0801d308 4749
-    ldr r0, DAT_0801d42c                     @ 0801d30a 4848
+    ldr r1, decode_card_image_6bpp_ewram_base @ 0801d308 4749
+    ldr r0, decode_card_image_6bpp_gsettings_offset @ 0801d30a 4848
     adds r1,r1,r0    @ 0801d30c 0918
     movs r0,#0x7    @ 0801d30e 0720
     ldrb r1,[r1,#0x0]                        @ 0801d310 0978
@@ -1048,13 +1052,13 @@ LAB_0801d31a:
     ldr r4, PTR_card_image_index_0801d420    @ 0801d330 3b4c
     .hword 0x4642    @ 0801d332 4246
     movs r3,#0x0    @ 0801d334 0023
-    ldr r0, DAT_0801d424                     @ 0801d336 3b48
+    ldr r0, decode_card_image_6bpp_rom_region_code_addr @ 0801d336 3b48
     ldrh r0,[r0,#0x0]                        @ 0801d338 0088
     lsrs r0,r0,#0x8    @ 0801d33a 000a
     cmp r0,#0x4a                             @ 0801d33c 4a28
     bne LAB_0801d350                         @ 0801d33e 07d1
-    ldr r1, DAT_0801d428                     @ 0801d340 3949
-    ldr r5, DAT_0801d42c                     @ 0801d342 3a4d
+    ldr r1, decode_card_image_6bpp_ewram_base @ 0801d340 3949
+    ldr r5, decode_card_image_6bpp_gsettings_offset @ 0801d342 3a4d
     adds r1,r1,r5    @ 0801d344 4919
     movs r0,#0x7    @ 0801d346 0720
     ldrb r1,[r1,#0x0]                        @ 0801d348 0978
@@ -1075,7 +1079,7 @@ LAB_0801d352:
     lsls r0,r0,#0x6    @ 0801d362 8001
     ldr r1, PTR_card_image_tiles_0801d434    @ 0801d364 3349
     adds r6,r0,r1    @ 0801d366 4618
-    ldr r5, DAT_0801d438                     @ 0801d368 334d
+    ldr r5, decode_card_image_6bpp_vram_char_base @ 0801d368 334d
     add r5,r10                               @ 0801d36a 5544
     movs r7,#0x0    @ 0801d36c 0027
     movs r4,#0x3f    @ 0801d36e 3f24
@@ -1083,7 +1087,7 @@ LAB_0801d352:
     movs r0,#0xfc    @ 0801d372 fc20
     lsls r0,r0,#0x4    @ 0801d374 0001
     .hword 0x4680    @ 0801d376 8046
-    ldr r1, DAT_0801d43c                     @ 0801d378 3049
+    ldr r1, decode_card_image_6bpp_tile_x_low_mask @ 0801d378 3049
     .hword 0x4689    @ 0801d37a 8946
 LAB_0801d37c:
     ldrh r2,[r6,#0x0]                        @ 0801d37c 3288
@@ -1140,15 +1144,15 @@ LAB_0801d37c:
     lsrs r7,r0,#0x10    @ 0801d3e2 070c
     cmp r7,r9                                @ 0801d3e4 4f45
     bls LAB_0801d37c                         @ 0801d3e6 c9d9
-    ldr r4, DAT_0801d438                     @ 0801d3e8 134c
+    ldr r4, decode_card_image_6bpp_vram_char_base @ 0801d3e8 134c
     add r4,r10                               @ 0801d3ea 5444
     movs r7,#0x0    @ 0801d3ec 0027
-    ldr r3, DAT_0801d440                     @ 0801d3ee 144b
+    ldr r3, decode_card_image_6bpp_tile_xy_6bit_mask @ 0801d3ee 144b
     ldr r2,[sp,#0x0]                         @ 0801d3f0 009a
     lsrs r0,r2,#0x18    @ 0801d3f2 100e
     lsls r1,r0,#0x8    @ 0801d3f4 0102
     orrs r1,r0    @ 0801d3f6 0143
-    ldr r2, DAT_0801d444                     @ 0801d3f8 124a
+    ldr r2, decode_card_image_6bpp_attr_packed_mask @ 0801d3f8 124a
 LAB_0801d3fa:
     adds r0,r3,#0x0    @ 0801d3fa 181c
     ldrh r5,[r4,#0x0]                        @ 0801d3fc 2588
@@ -1171,24 +1175,24 @@ LAB_0801d3fa:
     bx r0                                    @ 0801d41e 0047
 PTR_card_image_index_0801d420:
     .word  card_image_index               @ 0801d420 005c5b09
-DAT_0801d424:
-    .word  0x080000ae                     @ 0801d424 ae000008
-DAT_0801d428:
-    .word  0x02000000                     @ 0801d428 00000002
-DAT_0801d42c:
-    .word  0x00006c2c                     @ 0801d42c 2c6c0000
+decode_card_image_6bpp_rom_region_code_addr:
+    .word  ROM_REGION_CODE_ADDR           @ 0801d424 ae000008
+decode_card_image_6bpp_ewram_base:
+    .word  EWRAM_BASE                     @ 0801d428 00000002
+decode_card_image_6bpp_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 0801d42c 2c6c0000
 PTR_card_image_palettes_0801d430:
     .word  card_image_palettes            @ 0801d430 c0764c08
 PTR_card_image_tiles_0801d434:
     .word  card_image_tiles               @ 0801d434 40065108
-DAT_0801d438:
-    .word  0x06004000                     @ 0801d438 00400006
-DAT_0801d43c:
-    .word  0x0000031f                     @ 0801d43c 1f030000
-DAT_0801d440:
-    .word  0x00003f3f                     @ 0801d440 3f3f0000
-DAT_0801d444:
-    .word  0x00000c7f                     @ 0801d444 7f0c0000
+decode_card_image_6bpp_vram_char_base:
+    .word  BG_CHAR_VRAM_CB2               @ 0801d438 00400006
+decode_card_image_6bpp_tile_x_low_mask:
+    .word  0x0000031f                     @ 0801d43c 1f030000  0x31f: low-9-bit tile index mask for BG char addr compute
+decode_card_image_6bpp_tile_xy_6bit_mask:
+    .word  0x00003f3f                     @ 0801d440 3f3f0000  0x3f3f: dual-6-bit mask for tile grid x/y coordinate fields
+decode_card_image_6bpp_attr_packed_mask:
+    .word  0x00000c7f                     @ 0801d444 7f0c0000  0xc7f: packed tile attribute field mask
 
 @ p1: FUN_0801e640 的首个 bl
 card_info_page_enter_with_card_id:
