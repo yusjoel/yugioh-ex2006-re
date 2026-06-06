@@ -45,7 +45,7 @@
 
 | Seg | 范围 | 状态 | commit |
 |-----|------|------|--------|
-| **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | (pending commit) |
+| **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
 | 2 | 0x1d448..0x1d998 (8fn) | ⬜ | |
 | 3 | 0x1d998..0x1e36c (8fn) | ⬜ | |
 | 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
@@ -79,7 +79,7 @@
 - §5.1=1 cluster (0x0801d024 orphan THUMB dispatcher + jump table 0x1d044 + handlers 0x1d0bc)
 - 新增 constants: BG_CHAR_VRAM_CB2=0x06004000 (gba_mem.inc)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: (pending)
+- commit: 50a40fc
 
 ---
 
