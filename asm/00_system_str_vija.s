@@ -5134,7 +5134,7 @@ LAB_0801594e:
     bx r1                                    @ 08015950 0847
     .zero  0x2
 
-@ GL/IG2D_Main.c line 0xe3=227. Called by dispatch_isd_cell_anim_oam_setup (0x08015a8c, D_shared_mid hub indeg=6) and FUN_0801a49c. Core cell animation OAM initializer: (1) resolve_bg_affine_param_offset -> affine offset; (2) resolve_isd_affine_matrix_ptr(offset) -> matrix ptr; (3) asserts pCell != NULL; (4) loops alloc_palette_entry_slot to allocate palette slots; (5) build_oam_attrs_from_cell_with_affine(0x030007f8, max=128, pCell, pAnimCtrl). Returns u16 OAM entry count. Side-effects: EWRAM palette slot [gGlState+0x8a0 (0x02023d30)]+1; OAM buffer [0x030007f8+...] written.
+@ GL/IG2D_Main.c line 0xe3=227. Called by dispatch_isd_cell_anim_oam_setup (0x08015a8c, D_shared_mid hub indeg=6) and FUN_0801a49c. Core cell animation OAM initializer: (1) resolve_bg_affine_param_offset -> affine offset; (2) resolve_isd_affine_matrix_ptr(offset) -> matrix ptr; (3) asserts pCell != NULL; (4) loops alloc_palette_entry_slot to allocate palette slots; (5) build_oam_attrs_from_cell_with_affine(gOamAttrBuildBuf, max=128, pCell, pAnimCtrl). Returns u16 OAM entry count. Side-effects: EWRAM palette slot [gGlState+0x8a0 (0x02023d30)]+1; OAM buffer [gOamAttrBuildBuf (0x030007f8)+...] written.
 setup_isd_cell_anim_oam_entry:
     push {r4,r5,r6,r7,lr}                    @ 08015954 f0b5
     .hword 0x4657    @ 08015956 5746
@@ -5159,7 +5159,7 @@ setup_isd_cell_anim_oam_entry:
     .hword 0x4642    @ 08015980 4246
     asrs r2,r0    @ 08015982 0241
     .hword 0x4690    @ 08015984 9046
-    ldr r0, DAT_08015a74                     @ 08015986 3b48
+    ldr r0, setup_isd_cell_anim_oam_entry_scale_shift_threshold @ 08015986 3b48
     asrs r1,r5,#0x5    @ 08015988 6911
     .hword 0x4689    @ 0801598a 8946
     cmp r5,r0                                @ 0801598c 8542
@@ -5182,7 +5182,7 @@ LAB_080159a6:
     str r1,[sp,#0x4]                         @ 080159ac 0191
     ldr r0,[sp,#0x44]                        @ 080159ae 1198
     str r0,[sp,#0x8]                         @ 080159b0 0290
-    ldr r0, DAT_08015a80                     @ 080159b2 3348
+    ldr r0, setup_isd_cell_anim_oam_entry_ptr_oam_attr_build_buf @ 080159b2 3348
     movs r1,#0x80    @ 080159b4 8021
     ldr r2,[sp,#0xc]                         @ 080159b6 039a
     ldr r3,[sp,#0x48]                        @ 080159b8 129b
@@ -5203,7 +5203,7 @@ LAB_080159a6:
     ands r1,r0    @ 080159d8 0140
     str r1,[sp,#0x18]                        @ 080159da 0691
     lsls r1,r2,#0x3    @ 080159dc d100
-    ldr r0, DAT_08015a80                     @ 080159de 2848
+    ldr r0, setup_isd_cell_anim_oam_entry_ptr_oam_attr_build_buf @ 080159de 2848
     subs r0,#0x8    @ 080159e0 0838
     adds r6,r1,r0    @ 080159e2 0e18
     movs r0,#0x1    @ 080159e4 0120
@@ -5224,10 +5224,10 @@ LAB_080159ee:
     lsls r0,r2,#0x16    @ 08015a02 9005
     lsrs r0,r0,#0x16    @ 08015a04 800d
     add r0,r8                                @ 08015a06 4044
-    ldr r7, DAT_08015a84                     @ 08015a08 1e4f
+    ldr r7, setup_isd_cell_anim_oam_entry_oam_attr2_charname_mask @ 08015a08 1e4f
     adds r1,r7,#0x0    @ 08015a0a 391c
     ands r0,r1    @ 08015a0c 0840
-    ldr r7, DAT_08015a88                     @ 08015a0e 1e4f
+    ldr r7, setup_isd_cell_anim_oam_entry_oam_attr2_charname_clear @ 08015a0e 1e4f
     adds r1,r7,#0x0    @ 08015a10 391c
     ands r2,r1    @ 08015a12 0a40
     orrs r2,r0    @ 08015a14 0243
@@ -5279,18 +5279,18 @@ LAB_08015a60:
     pop {r1}                                 @ 08015a6e 02bc
     bx r1                                    @ 08015a70 0847
     .zero  0x2
-DAT_08015a74:
+setup_isd_cell_anim_oam_entry_scale_shift_threshold:
     .word  0x000001ff                     @ 08015a74 ff010000
 setup_isd_cell_anim_oam_entry_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015a78 88a4e309  GL/IG2D_Main.c
 setup_isd_cell_anim_oam_entry_assert_pcell_null:
     .word  assert_pcell_null              @ 08015a7c fca4e309  ( pCell ) != NULL
-DAT_08015a80:
-    .word  0x030007f8                     @ 08015a80 f8070003
-DAT_08015a84:
-    .word  0x000003ff                     @ 08015a84 ff030000
-DAT_08015a88:
-    .word  0xfffffc00                     @ 08015a88 00fcffff
+setup_isd_cell_anim_oam_entry_ptr_oam_attr_build_buf:
+    .word  gOamAttrBuildBuf               @ 08015a80 f8070003
+setup_isd_cell_anim_oam_entry_oam_attr2_charname_mask:
+    .word  OAM_ATTR2_CHARNAME_MASK        @ 08015a84 ff030000
+setup_isd_cell_anim_oam_entry_oam_attr2_charname_clear:
+    .word  OAM_ATTR2_CHARNAME_CLEAR       @ 08015a88 00fcffff
 
 @ D_shared_mid hub (indeg=6) shared across 5 scenes (scene_demo + unnamed scene + 0x08015ea4). Body 29 instructions: loads stack args (r4-r7 from [sp+0x38..0x54]) into new stack frame, sets [sp+0x20]=0 (counter init), calls setup_isd_cell_anim_oam_entry, unwinds and returns. Multi-arg wrapper: repacks caller-supplied stack args and forwards to core init function. r0=NNS_G2dCellAnimation* pCellAnim, r1=void* pCell, r2=NNS_G2dCellDataBank* pCellBank, r3=u16 bg_index [1..2]. Returns u16 OAM count transparent from setup_isd_cell_anim_oam_entry.
 dispatch_isd_cell_anim_oam_setup:
@@ -5330,7 +5330,7 @@ alloc_cell_anim_slot:
     cmp r0,#0x3f                             @ 08015aca 3f28
     bls LAB_08015ada                         @ 08015acc 05d9
     ldr r0, alloc_cell_anim_slot_ig2d_main_c_filename @ 08015ace 0948
-    ldr r1, DAT_08015af8                     @ 08015ad0 0949
+    ldr r1, alloc_cell_anim_slot_assert_line @ 08015ad0 0949
     ldr r2, alloc_cell_anim_slot_assert_usedcellanm_nelems_cellanmbank @ 08015ad2 0a4a
     movs r3,#0x1    @ 08015ad4 0123
     bl suppress_assert_report                @ 08015ad6 e4f001fd
@@ -5350,7 +5350,7 @@ alloc_cell_anim_slot_ptr_used_cell_anm:
     .word  gIg2dUsedCellAnm               @ 08015af0 f80b0003
 alloc_cell_anim_slot_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015af4 88a4e309  GL/IG2D_Main.c
-DAT_08015af8:
+alloc_cell_anim_slot_assert_line:
     .word  0x00000127                     @ 08015af8 27010000
 alloc_cell_anim_slot_assert_usedcellanm_nelems_cellanmbank:
     .word  assert_usedcellanm_nelems_cellanmbank @ 08015afc 10a5e309  UsedCellAnm < NELEMS(CellAnmBank)
@@ -5382,7 +5382,7 @@ LAB_08015b28:
     cmp r4,#0x0                              @ 08015b28 002c
     bne LAB_08015b38                         @ 08015b2a 05d1
     ldr r0, load_nce_cell_bank_from_file_ig2d_main_c_filename @ 08015b2c 0a48
-    ldr r1, DAT_08015b60                     @ 08015b2e 0c49
+    ldr r1, load_nce_cell_bank_from_file_assert_line_199 @ 08015b2e 0c49
     ldr r2, load_nce_cell_bank_from_file_assert_pfname_null @ 08015b30 0c4a
     movs r3,#0x1    @ 08015b32 0123
     bl suppress_assert_report                @ 08015b34 e4f0d2fc
@@ -5404,7 +5404,7 @@ load_nce_cell_bank_from_file_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015b58 88a4e309  GL/IG2D_Main.c
 load_nce_cell_bank_from_file_assert_ppcellbank_null:
     .word  assert_ppcellbank_null         @ 08015b5c 34a5e309  ( ppCellBank ) != NULL
-DAT_08015b60:
+load_nce_cell_bank_from_file_assert_line_199:
     .word  0x00000199                     @ 08015b60 99010000
 load_nce_cell_bank_from_file_assert_pfname_null:
     .word  assert_pfname_null             @ 08015b64 4ca5e309  ( pFname ) != NULL
@@ -5423,7 +5423,7 @@ load_nanr_anim_bank_from_file:
     cmp r5,#0x0                              @ 08015b76 002d
     bne LAB_08015b86                         @ 08015b78 05d1
     ldr r0, load_nanr_anim_bank_from_file_ig2d_main_c_filename @ 08015b7a 0f48
-    ldr r1, DAT_08015bbc                     @ 08015b7c 0f49
+    ldr r1, load_nanr_anim_bank_from_file_assert_line_1c1 @ 08015b7c 0f49
     ldr r2, load_nanr_anim_bank_from_file_assert_ppanimbank_null @ 08015b7e 104a
     movs r3,#0x1    @ 08015b80 0123
     bl suppress_assert_report                @ 08015b82 e4f0abfc
@@ -5452,7 +5452,7 @@ LAB_08015b98:
     b LAB_08015bca                           @ 08015bb6 08e0
 load_nanr_anim_bank_from_file_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015bb8 88a4e309  GL/IG2D_Main.c
-DAT_08015bbc:
+load_nanr_anim_bank_from_file_assert_line_1c1:
     .word  0x000001c1                     @ 08015bbc c1010000
 load_nanr_anim_bank_from_file_assert_ppanimbank_null:
     .word  assert_ppanimbank_null         @ 08015bc0 60a5e309  ( ppAnimBank ) != NULL
@@ -5473,7 +5473,7 @@ load_ncgr_char_data_from_file:
     cmp r5,#0x0                              @ 08015bd6 002d
     bne LAB_08015be6                         @ 08015bd8 05d1
     ldr r0, load_ncgr_char_data_from_file_ig2d_main_c_filename @ 08015bda 0e48
-    ldr r1, DAT_08015c18                     @ 08015bdc 0e49
+    ldr r1, load_ncgr_char_data_from_file_assert_line_23e @ 08015bdc 0e49
     ldr r2, load_ncgr_char_data_from_file_assert_ppchardata_null @ 08015bde 0f4a
     movs r3,#0x1    @ 08015be0 0123
     bl suppress_assert_report                @ 08015be2 e4f07bfc
@@ -5481,7 +5481,7 @@ LAB_08015be6:
     cmp r4,#0x0                              @ 08015be6 002c
     bne LAB_08015bf6                         @ 08015be8 05d1
     ldr r0, load_ncgr_char_data_from_file_ig2d_main_c_filename @ 08015bea 0a48
-    ldr r1, DAT_08015c20                     @ 08015bec 0c49
+    ldr r1, load_ncgr_char_data_from_file_assert_line_23f @ 08015bec 0c49
     ldr r2, load_ncgr_char_data_from_file_assert_pfname_null @ 08015bee 0d4a
     movs r3,#0x1    @ 08015bf0 0123
     bl suppress_assert_report                @ 08015bf2 e4f073fc
@@ -5501,11 +5501,11 @@ LAB_08015bf6:
     .zero  0x2
 load_ncgr_char_data_from_file_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015c14 88a4e309  GL/IG2D_Main.c
-DAT_08015c18:
+load_ncgr_char_data_from_file_assert_line_23e:
     .word  0x0000023e                     @ 08015c18 3e020000
 load_ncgr_char_data_from_file_assert_ppchardata_null:
     .word  assert_ppchardata_null         @ 08015c1c 78a5e309  ( ppCharData ) != NULL
-DAT_08015c20:
+load_ncgr_char_data_from_file_assert_line_23f:
     .word  0x0000023f                     @ 08015c20 3f020000
 load_ncgr_char_data_from_file_assert_pfname_null:
     .word  assert_pfname_null             @ 08015c24 4ca5e309  ( pFname ) != NULL
@@ -5524,7 +5524,7 @@ load_nclr_pltt_data_from_file:
     cmp r5,#0x0                              @ 08015c36 002d
     bne LAB_08015c46                         @ 08015c38 05d1
     ldr r0, load_nclr_pltt_data_from_file_ig2d_main_c_filename @ 08015c3a 0e48
-    ldr r1, DAT_08015c78                     @ 08015c3c 0e49
+    ldr r1, load_nclr_pltt_data_from_file_assert_line_266 @ 08015c3c 0e49
     ldr r2, load_nclr_pltt_data_from_file_assert_pppltdata_null @ 08015c3e 0f4a
     movs r3,#0x1    @ 08015c40 0123
     bl suppress_assert_report                @ 08015c42 e4f04bfc
@@ -5532,7 +5532,7 @@ LAB_08015c46:
     cmp r4,#0x0                              @ 08015c46 002c
     bne LAB_08015c56                         @ 08015c48 05d1
     ldr r0, load_nclr_pltt_data_from_file_ig2d_main_c_filename @ 08015c4a 0a48
-    ldr r1, DAT_08015c80                     @ 08015c4c 0c49
+    ldr r1, load_nclr_pltt_data_from_file_assert_line_267 @ 08015c4c 0c49
     ldr r2, load_nclr_pltt_data_from_file_assert_pfname_null @ 08015c4e 0d4a
     movs r3,#0x1    @ 08015c50 0123
     bl suppress_assert_report                @ 08015c52 e4f043fc
@@ -5552,11 +5552,11 @@ LAB_08015c56:
     .zero  0x2
 load_nclr_pltt_data_from_file_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015c74 88a4e309  GL/IG2D_Main.c
-DAT_08015c78:
+load_nclr_pltt_data_from_file_assert_line_266:
     .word  0x00000266                     @ 08015c78 66020000
 load_nclr_pltt_data_from_file_assert_pppltdata_null:
     .word  assert_pppltdata_null          @ 08015c7c 90a5e309  ( ppPltData ) != NULL
-DAT_08015c80:
+load_nclr_pltt_data_from_file_assert_line_267:
     .word  0x00000267                     @ 08015c80 67020000
 load_nclr_pltt_data_from_file_assert_pfname_null:
     .word  assert_pfname_null             @ 08015c84 4ca5e309  ( pFname ) != NULL
@@ -5567,7 +5567,7 @@ LAB_08015c8a:
     pop {r1}                                 @ 08015c8c 02bc
     bx r1                                    @ 08015c8e 0847
 
-@ GL/IG2D_Main.c line 729-730. r0=NNS_G2dPaletteData* pSrcData (non-NULL), r1=u32 vram_offset (added to OBJ palette base 0x05000200), r2=NNS_G2dVRamType vram_type [0..2], r3=NNS_G2dImageProxy* pPltProxt (non-NULL). If r6==1: bios_cpu_fast_set DMA copies palette to OBJ VRAM at 0x05000200+offset; else assert_false (line 739). Calls set_img_proxy_vram_slot to update proxy slot. Side-effects: OBJ palette VRAM written; ImageProxy slot updated.
+@ GL/IG2D_Main.c line 729-730. r0=NNS_G2dPaletteData* pSrcData (non-NULL), r1=u32 vram_offset (added to OBJ palette base OBJ_PALRAM_BASE (0x05000200)), r2=NNS_G2dVRamType vram_type [0..2], r3=NNS_G2dImageProxy* pPltProxt (non-NULL). If r6==1: bios_cpu_fast_set DMA copies palette to OBJ VRAM at OBJ_PALRAM_BASE (0x05000200)+offset; else assert_false (line 739). Calls set_img_proxy_vram_slot to update proxy slot. Side-effects: OBJ palette VRAM written; ImageProxy slot updated.
 copy_pltt_data_to_vram_proxy:
     push {r4,r5,r6,r7,lr}                    @ 08015c90 f0b5
     adds r5,r0,#0x0    @ 08015c92 051c
@@ -5577,7 +5577,7 @@ copy_pltt_data_to_vram_proxy:
     cmp r5,#0x0                              @ 08015c9a 002d
     bne LAB_08015caa                         @ 08015c9c 05d1
     ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename @ 08015c9e 0c48
-    ldr r1, DAT_08015cd4                     @ 08015ca0 0c49
+    ldr r1, copy_pltt_data_to_vram_proxy_assert_line_2d9 @ 08015ca0 0c49
     ldr r2, copy_pltt_data_to_vram_proxy_assert_psrcdata @ 08015ca2 0d4a
     movs r3,#0x1    @ 08015ca4 0123
     bl suppress_assert_report                @ 08015ca6 e4f019fc
@@ -5585,7 +5585,7 @@ LAB_08015caa:
     cmp r4,#0x0                              @ 08015caa 002c
     bne LAB_08015cba                         @ 08015cac 05d1
     ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename @ 08015cae 0848
-    ldr r1, DAT_08015cdc                     @ 08015cb0 0a49
+    ldr r1, copy_pltt_data_to_vram_proxy_assert_line_2da @ 08015cb0 0a49
     ldr r2, copy_pltt_data_to_vram_proxy_assert_ppltproxt @ 08015cb2 0b4a
     movs r3,#0x1    @ 08015cb4 0123
     bl suppress_assert_report                @ 08015cb6 e4f011fc
@@ -5593,7 +5593,7 @@ LAB_08015cba:
     cmp r6,#0x1                              @ 08015cba 012e
     bne LAB_08015ce8                         @ 08015cbc 14d1
     ldr r0,[r5,#0xc]                         @ 08015cbe e868
-    ldr r2, DAT_08015ce4                     @ 08015cc0 084a
+    ldr r2, copy_pltt_data_to_vram_proxy_obj_palram_base @ 08015cc0 084a
     adds r1,r7,r2    @ 08015cc2 b918
     ldr r2,[sp,#0x14]                        @ 08015cc4 059a
     lsls r2,r2,#0x9    @ 08015cc6 5202
@@ -5602,19 +5602,19 @@ LAB_08015cba:
     b LAB_08015cf4                           @ 08015cce 11e0
 copy_pltt_data_to_vram_proxy_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015cd0 88a4e309  GL/IG2D_Main.c
-DAT_08015cd4:
+copy_pltt_data_to_vram_proxy_assert_line_2d9:
     .word  0x000002d9                     @ 08015cd4 d9020000
 copy_pltt_data_to_vram_proxy_assert_psrcdata:
     .word  assert_psrcdata                @ 08015cd8 a8a5e309  pSrcData
-DAT_08015cdc:
+copy_pltt_data_to_vram_proxy_assert_line_2da:
     .word  0x000002da                     @ 08015cdc da020000
 copy_pltt_data_to_vram_proxy_assert_ppltproxt:
     .word  assert_ppltproxt               @ 08015ce0 b4a5e309  pPltProxt
-DAT_08015ce4:
-    .word  0x05000200                     @ 08015ce4 00020005
+copy_pltt_data_to_vram_proxy_obj_palram_base:
+    .word  OBJ_PALRAM_BASE                @ 08015ce4 00020005
 LAB_08015ce8:
     ldr r0, copy_pltt_data_to_vram_proxy_ig2d_main_c_filename_d0c @ 08015ce8 0848
-    ldr r1, DAT_08015d10                     @ 08015cea 0949
+    ldr r1, copy_pltt_data_to_vram_proxy_assert_line_2e3 @ 08015cea 0949
     ldr r2, copy_pltt_data_to_vram_proxy_assert_false @ 08015cec 094a
     movs r3,#0x1    @ 08015cee 0123
     bl suppress_assert_report                @ 08015cf0 e4f0f4fb
@@ -5632,7 +5632,7 @@ LAB_08015cf4:
     bx r0                                    @ 08015d0a 0047
 copy_pltt_data_to_vram_proxy_ig2d_main_c_filename_d0c:
     .word  ig2d_main_c_filename           @ 08015d0c 88a4e309  GL/IG2D_Main.c
-DAT_08015d10:
+copy_pltt_data_to_vram_proxy_assert_line_2e3:
     .word  0x000002e3                     @ 08015d10 e3020000
 copy_pltt_data_to_vram_proxy_assert_false:
     .word  assert_false                   @ 08015d14 c0a5e309  FALSE
@@ -5669,7 +5669,7 @@ load_g2d_obj_resource_set:
     cmp r0,#0x0                              @ 08015d6a 0028
     bne LAB_08015d7a                         @ 08015d6c 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d6e 4148
-    ldr r1, DAT_08015e78                     @ 08015d70 4149
+    ldr r1, load_g2d_obj_resource_set_assert_line_32d @ 08015d70 4149
     ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015d72 424a
     movs r3,#0x1    @ 08015d74 0123
     bl suppress_assert_report                @ 08015d76 e4f0b1fb
@@ -5681,7 +5681,7 @@ LAB_08015d7a:
     cmp r0,#0x0                              @ 08015d84 0028
     bne LAB_08015d94                         @ 08015d86 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d88 3a48
-    ldr r1, DAT_08015e80                     @ 08015d8a 3d49
+    ldr r1, load_g2d_obj_resource_set_assert_line_331 @ 08015d8a 3d49
     ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015d8c 3b4a
     movs r3,#0x1    @ 08015d8e 0123
     bl suppress_assert_report                @ 08015d90 e4f0a4fb
@@ -5691,7 +5691,7 @@ LAB_08015d94:
     cmp r0,#0x0                              @ 08015d98 0028
     bne LAB_08015da8                         @ 08015d9a 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015d9c 3548
-    ldr r1, DAT_08015e84                     @ 08015d9e 3949
+    ldr r1, load_g2d_obj_resource_set_assert_line_33a @ 08015d9e 3949
     ldr r2, load_g2d_obj_resource_set_assert_ppanimbank_numsequences_0 @ 08015da0 394a
     movs r3,#0x1    @ 08015da2 0123
     bl suppress_assert_report                @ 08015da4 e4f09afb
@@ -5711,7 +5711,7 @@ LAB_08015db4:
     cmp r0,#0x0                              @ 08015dc0 0028
     bne LAB_08015dd0                         @ 08015dc2 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015dc4 2b48
-    ldr r1, DAT_08015e8c                     @ 08015dc6 3149
+    ldr r1, load_g2d_obj_resource_set_assert_line_33f @ 08015dc6 3149
     ldr r2, load_g2d_obj_resource_set_assert_ppcellanim_null @ 08015dc8 314a
     movs r3,#0x1    @ 08015dca 0123
     bl suppress_assert_report                @ 08015dcc e4f086fb
@@ -5722,7 +5722,7 @@ LAB_08015dd0:
     cmn r0,r1                                @ 08015dd6 c842
     bne LAB_08015de6                         @ 08015dd8 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015dda 2648
-    ldr r1, DAT_08015e94                     @ 08015ddc 2d49
+    ldr r1, load_g2d_obj_resource_set_assert_line_341 @ 08015ddc 2d49
     ldr r2, load_g2d_obj_resource_set_assert_ppanimbank_psequencearrayhead @ 08015dde 2e4a
     movs r3,#0x1    @ 08015de0 0123
     bl suppress_assert_report                @ 08015de2 e4f07bfb
@@ -5752,7 +5752,7 @@ LAB_08015e08:
     cmp r0,#0x0                              @ 08015e16 0028
     bne LAB_08015e26                         @ 08015e18 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015e1a 1648
-    ldr r1, DAT_08015e9c                     @ 08015e1c 1f49
+    ldr r1, load_g2d_obj_resource_set_assert_line_355 @ 08015e1c 1f49
     ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015e1e 174a
     movs r3,#0x1    @ 08015e20 0123
     bl suppress_assert_report                @ 08015e22 e4f05bfb
@@ -5772,7 +5772,7 @@ LAB_08015e32:
     cmp r0,#0x0                              @ 08015e40 0028
     bne LAB_08015e50                         @ 08015e42 05d1
     ldr r0, load_g2d_obj_resource_set_ig2d_main_c_filename @ 08015e44 0b48
-    ldr r1, DAT_08015ea0                     @ 08015e46 1649
+    ldr r1, load_g2d_obj_resource_set_assert_line_36a @ 08015e46 1649
     ldr r2, load_g2d_obj_resource_set_assert_pbuf_null @ 08015e48 0c4a
     movs r3,#0x1    @ 08015e4a 0123
     bl suppress_assert_report                @ 08015e4c e4f046fb
@@ -5797,35 +5797,35 @@ LAB_08015e64:
     bx r0                                    @ 08015e72 0047
 load_g2d_obj_resource_set_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015e74 88a4e309  GL/IG2D_Main.c
-DAT_08015e78:
+load_g2d_obj_resource_set_assert_line_32d:
     .word  0x0000032d                     @ 08015e78 2d030000
 load_g2d_obj_resource_set_assert_pbuf_null:
     .word  assert_pbuf_null               @ 08015e7c c8a5e309  ( pBuf ) != NULL
-DAT_08015e80:
+load_g2d_obj_resource_set_assert_line_331:
     .word  0x00000331                     @ 08015e80 31030000
-DAT_08015e84:
+load_g2d_obj_resource_set_assert_line_33a:
     .word  0x0000033a                     @ 08015e84 3a030000
 load_g2d_obj_resource_set_assert_ppanimbank_numsequences_0:
     .word  assert_ppanimbank_numsequences_0 @ 08015e88 dca5e309  (*ppAnimBank)->numSequences != 0
-DAT_08015e8c:
+load_g2d_obj_resource_set_assert_line_33f:
     .word  0x0000033f                     @ 08015e8c 3f030000
 load_g2d_obj_resource_set_assert_ppcellanim_null:
     .word  assert_ppcellanim_null         @ 08015e90 00a6e309  ( *ppCellAnim ) != NULL
-DAT_08015e94:
+load_g2d_obj_resource_set_assert_line_341:
     .word  0x00000341                     @ 08015e94 41030000
 load_g2d_obj_resource_set_assert_ppanimbank_psequencearrayhead:
     .word  assert_ppanimbank_psequencearrayhead @ 08015e98 18a6e309  ( &((*ppAnimBank)->pSequenceArrayHead[i]) ) != NULL
-DAT_08015e9c:
+load_g2d_obj_resource_set_assert_line_355:
     .word  0x00000355                     @ 08015e9c 55030000
-DAT_08015ea0:
+load_g2d_obj_resource_set_assert_line_36a:
     .word  0x0000036a                     @ 08015ea0 6a030000
 
 @ Splits a decimal integer into digits and for each calls step_cell_anim_sequence_guarded to set animation frame then dispatch_isd_cell_anim_oam_setup to build OAM entry. Two execution paths: path A (r3!=0): loop divmod(10) to extract decimal digits, one cell anim tick and OAM build per digit; path B (r3==0): same OAM build logic for fixed sequence slots. Each iteration locates pCellAnim via r8 (array base + stride offset). indeg=0; caller not found in callgraph.
 @ 
 @ Params: r0=void* pCellAnim_base; r1=u16 base_seq_idx; r2=NNS_G2dCellDataBank* pCellBank; r3=s32 value_to_display; sp[0x50]=void* oam_base; sp[0x54]=void* pCell; sp[0x58]=u16 digit_stride; sp[0x5c]=u16 digit_count; sp[0x60]=u32 extra_flag
 @ Returns: void (pop {r0}=lr overwrites r0)
-@ Side effects: [0x030007f8+offset]: OAM attrs written via dispatch_isd_cell_anim_oam_setup; cell anim state updated via step_cell_anim_sequence_guarded
-@ Constants: __divsi3/__modsi3 divisor=10 (decimal digit extraction); OAM_BUF=0x030007f8
+@ Side effects: [gOamAttrBuildBuf (0x030007f8)+offset]: OAM attrs written via dispatch_isd_cell_anim_oam_setup; cell anim state updated via step_cell_anim_sequence_guarded
+@ Constants: __divsi3/__modsi3 divisor=10 (decimal digit extraction); OAM_BUF=gOamAttrBuildBuf (0x030007f8)
 setup_decimal_digit_oam_batch:
     push {r4,r5,r6,r7,lr}                    @ 08015ea4 f0b5
     .hword 0x4657    @ 08015ea6 5746

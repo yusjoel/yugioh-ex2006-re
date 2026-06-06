@@ -8,6 +8,8 @@
 .equ gFrameCounter,   0x03000240  @ 4 B  帧计数器
 .equ INTR_VECTOR,     0x03007ffc  @ BIOS IRQ handler 向量槽 (crt0 写入 IntrMain 地址)
 .equ pack_ui_state,   0x03005850  @ pack scene state struct; offset 0x10 = u16 state field
+.equ gOamAttrBuildBuf,0x030007f8  @ OAM 属性构建暂存缓冲 (128 项 × 8 B = 0x400 B, 紧邻 gIg2dUsedCellAnm)
+                                  @ setup_isd_cell_anim_oam_entry/setup_decimal_digit_oam_batch 构建
 
 @ -----------------------------------------------------------------------------
 @ NNS G2D (IG2D) 资源加载管理器 (源 GL/IG2D_Main.c)

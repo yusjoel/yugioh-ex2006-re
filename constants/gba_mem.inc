@@ -6,6 +6,7 @@
 @ =============================================================================
 
 .equ GBA_PALRAM_BASE,     0x05000000  @ 调色板 RAM (BG+OBJ, 各 0x200 字节)
+.equ OBJ_PALRAM_BASE,     0x05000200  @ OBJ/sprite 调色板 RAM (PALRAM+0x200, 16 调色板 ×16 色)
 .equ GBA_VRAM_BASE,       0x06000000  @ VRAM 基址 (BG char/screen map; 0xc0<<0x13 内联值)
 .equ OBJ_TILE_VRAM_BASE,  0x06010000  @ OBJ/sprite tile 数据基址 (mode 0-2, VRAM+0x10000)
 .equ GBA_OAM_BASE,        0x07000000  @ OAM (sprite 属性, 0x400 字节)

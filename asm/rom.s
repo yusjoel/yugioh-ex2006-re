@@ -33,6 +33,9 @@
 @ NNS G2D 资源块 FourCC tag（0x16140 find_gfx_entry_by_tag 簇用）
 	.include "constants/g2d_tags.inc"
 
+@ 硬件 OAM 项字段位掩码（0x15954 cell-anim OAM 构建簇用）
+	.include "constants/oam_attr.inc"
+
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"

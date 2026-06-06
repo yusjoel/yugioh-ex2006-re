@@ -118,6 +118,8 @@ gitignore 生成产物):
 | **batch-7: BG affine matrix 簇 (4 fn)** | 0x15728..0x15924 | ✅ R3/R7/R2/R5 完成 (见 §四.4.0g): trig_table(512B)+assert_expr_zero **carve 进 rom.s** + GAS label 引用 + 3 槽改名 + 3 plate FUN_ 改现名; byte-identical |
 | **batch-8: NNS G2D GFX entry accessor 簇 (10 fn)** | 0x16140..0x16268 | ✅ R1/R2/R5 完成 (见 §四.4.0h): 3 FourCC tag equate(BGDT/OBJD/PALT, 新 g2d_tags.inc) + 9 槽改名 + 10 plate 去过时槽引用; byte-identical |
 | **batch-9: ISD affine matrix 指针簇 (3 fn)** | 0x16098..0x1613c | ✅ R3/R7/R2/R5 完成 (见 §四.4.0i): 3 个 ROM 数据 **carve 进 rom.s**(isd_affine_matrix_ptr_type4/type9 NULL 槽 + assert_expr_zero_65c) + 9 槽 GAS label 引用/改名 + 3 plate; byte-identical |
+| **batch-10: ISD cell-anim OAM 簇 (2 fn)** | 0x15954..0x15ac4 | ✅ R3/R1/R2/R5 完成 (见 §四.4.0j): gOamAttrBuildBuf=0x030007f8(iwram.inc, OAM 属性构建暂存缓冲 128×8B=0x400B) + 2 attr2 char-name 字段掩码 equate(新 oam_attr.inc) + 2 槽改名(scale-shift 阈值/assert 行号) + 3 plate 散文符号化(含消费者 build_oam_attrs_from_cell_with_affine); byte-identical |
+| **batch-11: NNS IG2D 资源加载族 (7 fn)** | 0x15b04..0x15e72 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0k): OBJ_PALRAM_BASE=0x05000200(gba_mem.inc) + 16 个 assert-line DAT 槽改名(`<func>_assert_line_<hexlineno>` 避碰撞) + copy_pltt plate 散文符号化; byte-identical。load_nce/nanr/ncgr/nclr_*_from_file sibling + copy_pltt_data_to_vram_proxy + load_g2d_obj_resource_set hub; plate 已高质量, 细化以 R2 灭自动名为主 |
 | 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
@@ -351,6 +353,48 @@ assert "0" 与 batch-7 assert_expr_zero (0x09e3a4f8) 同内容不同 ROM 拷贝,
 R5: set/get/resolve plate 的 DWORD_/DAT_ 槽引用改 carve label。
 脚本: `tools/ghidra-labeling/RefineIsdAffineBatch9.py`。
 
+### 4.0j batch-10 完成记录: ISD cell-anim OAM 簇 (0x15954..0x15ac4, 2 fn) ✅
+
+setup_isd_cell_anim_oam_entry (0x15954) / dispatch_isd_cell_anim_oam_setup (0x15a8c)。
+源 GL/IG2D_Main.c。核心 cell→OAM 构建: resolve affine offset/matrix → 断言 pCell → 循环
+alloc_palette_entry_slot → build_oam_attrs_from_cell_with_affine 写暂存缓冲, 再逐项把 OAM
+attr2 的 char-name (tile index) 与 palette nibble 做 base 重映射。byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R3 暂存缓冲全局 | `gOamAttrBuildBuf=0x030007f8` → `constants/iwram.inc` .equ + Ghidra USER label + 槽 0x15a80 DATA ref + 改名 `setup_isd_cell_anim_oam_entry_ptr_oam_attr_build_buf`。**128 项 × 8 B = 0x400 B**, 终址 0x03000bf8 = gIg2dUsedCellAnm (边界吻合佐证) | 1 槽 |
+| R1 OAM 字段掩码 | data-equate `OAM_ATTR2_CHARNAME_MASK`(0x3ff, 保留 attr2 bits[9:0]=char name) / `OAM_ATTR2_CHARNAME_CLEAR`(0xfffffc00, 清同字段); 新增 `constants/oam_attr.inc` | 2 槽/2 常量 |
+| R2 槽改名 | 0x15a74(0x1ff: `cmp r5` 阈值, 选 scale-shift `asrs #5`/`asrs #9`) → `_scale_shift_threshold`; 0x15af8(0x127=295, alloc_cell_anim_slot assert 行号, batch-6 遗留) → `alloc_cell_anim_slot_assert_line` | 2 槽 |
+| R5 注释 | 3 plate 的 `0x030007f8` 散文引用 → `gOamAttrBuildBuf`: setup (build_oam 调用 + side-effect) / setup_decimal_digit_oam_batch (0x15ea4, side-effect + OAM_BUF=) / **消费者** build_oam_attrs_from_cell_with_affine (0x080e969c, `[...at callsite]`) | 3 plate |
+
+新增: `constants/oam_attr.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineCellAnimOamBatch10.py`。
+**消费者佐证 (R6)**: 读 build_oam_attrs_from_cell_with_affine (module 20) 确认 r0=pDst 即
+gOamAttrBuildBuf, 每项写 attr0/attr1 对; attr2 char-name 字段 (bits[9:0]) 经 setup 循环加 tile-base
+重映射 — 故 0x3ff/0xfffffc00 命名为 attr2 char-name 掩码 (非臆测, ldrh [r4+0x4]+lsls#0x16/lsrs#0x16 取低 10 位佐证)。
+注: 内联 0xf palette nibble 掩码 / rsbs 取负 (-0x11/-0x4) 无 pool 槽, 不符号化 (沿用 batch-2 策略)。
+
+### 4.0k batch-11 完成记录: NNS IG2D 资源加载族 (0x15b04..0x15e72, 7 fn) ✅
+
+invoke_fs_load (0x15b04, thin wrapper, 已干净) / load_nce_cell_bank_from_file (0x15b10) /
+load_nanr_anim_bank_from_file (0x15b70) / load_ncgr_char_data_from_file (0x15bd0) /
+load_nclr_pltt_data_from_file (0x15c30) / copy_pltt_data_to_vram_proxy (0x15c90) /
+load_g2d_obj_resource_set (0x15d30, hub indeg=6)。源 GL/IG2D_Main.c。NCE/NANR/NCGR/NCLR
+四类 G2D 资源 FS 加载 + 解析 + VRAM 写入。byte-identical SHA1 9689337d。
+
+**特点**: 本族 plate 已高质量 (sibling load 函数, assert 行号/调用链/参数齐全), 细化以 **R2 灭
+自动名** 为主 + 1 个 R1/R3 区基址。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1/R3 OBJ 调色板基址 | data-equate `OBJ_PALRAM_BASE`(0x05000200) @0x15ce4 (copy_pltt DMA 目标); 加入 `constants/gba_mem.inc` (= PALRAM+0x200, OBJ/sprite 16 调色板) | 1 槽 |
+| R2 assert-line 槽 | 16 个 `DAT_` line-number 槽 → `<func>_assert_line_<hexlineno>` (load_g2d hub 含 4 个 pBuf 断言行号不同 0x32d/331/355/36a, 故用 hex 行号后缀避碰撞; 另 nce 199/nanr 1c1/ncgr 23e+23f/nclr 266+267/copy_pltt 2d9+2da+2e3) | 16 槽 |
+| R5 注释 | copy_pltt_data_to_vram_proxy plate 2 处 `0x05000200` → `OBJ_PALRAM_BASE` | 1 plate |
+
+新增脚本: `tools/ghidra-labeling/RefineIg2dLoadBatch11.py`。`constants/gba_mem.inc` 追加 OBJ_PALRAM_BASE。
+注: 各 load 函数另有 1 条 assert 行号是**内联**计算 (`movs r1,#N; lsls r1,#1`, 如 nce 0x198=`0xcc<<1`),
+无 pool 槽不符号化。assert 串本体槽 (`_assert_<expr>_null` 等) 已由 4.0b 全 ROM 断言串 carve 处理。
+其余 0x05000200 字面量槽 (write_palt_block_to_vram 0x162bc / 模块 01/15) 留各自批次符号化。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -427,17 +471,20 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 8. ✅ **batch-8 (0x16140..0x16268, NNS G2D GFX entry accessor 簇 10 fn)** 完成 (见 §四.4.0h)。
 9. ✅ **batch-9 (0x16098..0x1613c, ISD affine matrix 指针簇 3 fn)** 完成 (见 §四.4.0i);
    isd_affine_matrix_ptr_type4/9 + assert_expr_zero_65c **当场 carve**。
-10. 下一批 (batch-10) 候选:
-   - **ISD cell-anim OAM 簇** (setup_isd_cell_anim_oam_entry 0x15954 /
-     dispatch_isd_cell_anim_oam_setup 0x15a8c): 操作 0x030007f8 OAM build buffer。
-   - **IG2D 加载族深度** (load_nce/nanr/ncgr/nclr_*_from_file 0x15b10..0x15ea0): assert-line + PALRAM/VRAM。
+10. ✅ **batch-10 (0x15954..0x15ac4, ISD cell-anim OAM 簇 2 fn)** 完成 (见 §四.4.0j);
+   gOamAttrBuildBuf=0x030007f8 + OAM attr2 char-name 掩码符号化。
+11. ✅ **batch-11 (0x15b04..0x15e72, NNS IG2D 资源加载族 7 fn)** 完成 (见 §四.4.0k);
+   OBJ_PALRAM_BASE=0x05000200 + 16 assert-line 槽灭自动名。
+12. 下一批 (batch-12) 候选:
+   - **setup_decimal_digit_oam_batch 深度** (0x15ea4): divmod(10) 数字拆解 + cell anim tick;
+     其 plate 已较完整, 主要 R2 槽 (DAT_08015ea0 已 batch-11 改名) + 内部常量。
    - **G2D 写族** (write_palt_block_to_vram 0x1626c / dispatch_bg_screen_map_write 0x162dc /
-     write_tile_region_to_bg_screen): PALRAM/VRAM 基址 + screen map 写。
+     write_tile_region_to_bg_screen): PALRAM/VRAM 基址 (0x05000000/0x05000200) + screen map 写。
    - **cell-anim accessor 簇** (get_anim_ctrl_* / dispatch_cell_anim_* 0x156d0..0x1571c)。
    - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction。
    - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0)。
    - 注: ROM 数据表/串细化即**当场 carve** (不留待办)。
-9. 每批后视情况更新本文「进度」表。
+13. 每批后视情况更新本文「进度」表。
 
 ---
 
