@@ -125,6 +125,7 @@ gitignore 生成产物):
 | **Seg-6b: render/cursor/load_assets + carve F/G/H** | 0x17e48..0x18774 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0x): carve F(name_o paths+desc) + G(cursor_anim_data_a/b) + H(name_o_palette_data bit15修正); 10 EQ+31 REF+23 RENAME+4 PLATE; §5.1 登记 0x186ce/0x22; byte-identical 9689337d |
 | **Seg-7: name_input/banlist 场景 + carve J/K** | 0x18774..0x19a58 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0y): carve J(name_input_state_table+banlist_pass_char_group_ptr_table) + K(render_param+default_name); 20 EQ+38 REF+59 RENAME+3 PLATE; §5.1 登记 0x19640/0x20; byte-identical 9689337d |
 | **Seg-8: banlist password 渲染簇** | 0x19a58..0x1a794 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0z): carve host1(char_candidate/pass_char/alt_char/rom_password_table) + host2(4 obj path+resource_desc+2 bg path); 15 EQ+10 REF+37 RENAME+11 PLATE; §5.1 本段为空; byte-identical 9689337d |
+| **Seg-9: banlist/shuen 场景 (28 fn)** | 0x1a794..0x1b850 | ✅ R1/R2/R3/R4/R5/R7 完成 (见 §四.4.0aa): 6 EQ+56 REF+69 RENAME+5 PLATE_FIX+4 CJK_PLATE; carve 1/2/3 + disasm block B (5 stubs); §5.1 block A; byte-identical 9689337d |
 | 代码函数 (其余 ~166 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x19a58..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
@@ -744,6 +745,53 @@ FUNC_RENAME=0 (28 函数名与函数体一致, 无误名). 不需 ExportFunction
 - banlist_pass_ext_char_group carve (@0x09e3be3c, 唯一代码引用 DWORD_0801abb0 Seg-9)
 - 4 EQ + 18 RENAME + 10 REF 越界槽 (advance/retreat_banlist_password_cursor_slot 族等)
 
+### 4.0aa Seg-9 完成记录: banlist/shuen 场景 (0x0801a794..0x0801b850, 28 fn) ✅
+
+tick_banlist_scrollbar_and_slot_anim / advance_banlist_password_cursor_slot /
+retreat_banlist_password_cursor_slot / load_banlist_char_by_cursor_slot /
+get_banlist_scroll_pixel_offset / get_banlist_password_entry_ptr /
+render_banlist_text_col_cleared / render_banlist_password_chars_to_buf /
+advance_banlist_password_char_and_render / retreat_banlist_password_char_and_render /
+tick_banlist_password_backspace_input / advance_banlist_scroll_pos_step /
+dispatch_banlist_cursor_action / advance_banlist_scroll_column_and_page /
+retreat_banlist_scroll_column_and_page / tick_banlist_password_frame /
+tick_banlist_oam_palette_fade / tick_banlist_card_slot_anim_primary /
+tick_banlist_card_slot_anim_secondary / trigger_banlist_fade_out_exit /
+tick_banlist_oam_and_card_slots / tick_banlist_scroll_view_by_state /
+tick_banlist_scene_frame / dispatch_banlist_scene_handler_frame /
+dispatch_banlist_pass_input_frame / scale_char_width_by_encoding /
+read_encoded_char_pair_from_state / init_demo_shuen_display_state。
+banlist 密码输入驱动族 + shuen 场景初始化。byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1 EQ_SLOTS 复用 | NAME_INPUT_MODE_CLEAR×5 (name_input.inc) + NAME_INPUT_PAGE_STATE_CLEAR×1 (name_input.inc) | 6 槽 |
+| R3 REF_SLOTS (gBanlistPasswordBuffer) | 0x02029810 (ewram.inc), 已有 USER label; 仅加 DATA ref + 槽改名 | 24 槽 |
+| R3 REF_SLOTS (gPrng) | 0x03000040 (iwram.inc) | 5 槽 |
+| R3 REF_SLOTS (gTextEncodingOverride) | 0x0202348c (ewram.inc) | 2 槽 |
+| R3 REF_SLOTS (gDemoState) | 0x02029ec0 (ewram.inc) | 1 槽 |
+| R3 REF_SLOTS (carve label) | banlist_char_candidate_str(1) + banlist_pass_alt_char(1) + banlist_pass_ext_char_group(1 new) + banlist_handler_table(2 new) + banlist_scroll_view_anim_params(1 new) | 7 槽 |
+| R3 REF_SLOTS (EWRAM_BASE + GSETTINGS_OFFSET) | gba_mem.inc + name_input.inc | 8+8=16 槽 |
+| R3 REF_SLOTS (game_str_pointer_table + game_str_ja) | existing carve labels | 2 槽 |
+| R2 RENAME_SLOTS | offset/mask/state 槽 (buffer offset / scene state / scroll field / misc) | 69 槽 |
+| R5 PLATE_FIX (C8 5 处 FUN_->现名) | load_banlist_char_by_cursor_slot: FUN_0801aa54->advance_banlist_password_char_and_render; dispatch_banlist_cursor_action: FUN_0801af70->tick_banlist_password_frame; tick_banlist_oam_palette_fade: FUN_0801b1a0->tick_banlist_card_slot_anim_primary; dispatch_banlist_pass_input_frame: FUN_081089d8->transition_banlist_pass_to_card_list; scale_char_width_by_encoding: FUN_0801a230->render_banlist_title_text_to_bg | 5 plate |
+| R5 CJK plate 重写 ASCII | advance_banlist_password_char_and_render / retreat_banlist_password_char_and_render / tick_banlist_password_backspace_input / tick_banlist_oam_and_card_slots | 4 plate |
+| **R7 carve 1: banlist_pass_ext_char_group** | host `.incbin 0x1E3BD67, 0x276` 拆: 0xD5 prefix + label + `0x1E3BE3C, 0x1A1`; 覆盖 0xD5+0x1A1=0x276 PASS | 1 carve |
+| **R7 carve 2: banlist_pass_char_group_ptr_table 扩展 + banlist_handler_table** | host `.incbin 0x1E588EC, 0x420` 拆: 42 .word [8..49] + 4 .word handler_table + `.incbin 0x1E589A4, 0x368`; 覆盖 0xA8+0x10+0x368=0x420 PASS | 2 labels |
+| **R7 carve 3: banlist_scroll_view_anim_params** | assert-block 间隙 `.incbin 0x1E3C6AB, 0x9` 拆: 6 .byte params + `.incbin 0x1E3C6B1, 0x3`; 覆盖 6+3=9 PASS | 1 carve |
+| **R4 disasm block B** | ROM_INCBIN `0x1ad18, 0xec` (236B) -> 5 THUMB stub handlers via clearListing+setTMode+per-stub DisassembleCommand; 81 instructions. 5 stubs 体积 8+44+72+76+36=236B. Literal pool labels added to asm (DAT_0801ad40/80/c0/fc/ae00) | 5 stubs |
+| §5.1 | block A `0x1a89c/0x20` (32B, 0 ROM 引用, THUMB 孤儿小函数; 0x0801a8a0 raw=1 在 FS asset 区 0x08af5768 偶合非代码引用) | 1 块 |
+
+新增 constants 文件: 无 (全部复用 name_input.inc/ewram.inc/iwram.inc/gba_mem.inc)。
+新增 carve label: banlist_pass_ext_char_group / banlist_handler_table / banlist_scroll_view_anim_params。
+FUNC_RENAME=0 (28 函数名与函数体一致, 无误名)。不需 ExportFunctionInventory/sync/CSV 手改。
+脚本: `tools/ghidra-labeling/RefineSeg9Slots.py` (A=6 B=56 C=69 D=5+4, 0 FAIL) + `DisassembleSeg9BlockB.py`。
+
+**踩坑**: disasm 后 Ghidra 未导出 stub 内部 literal pool labels (DAT_0801ad40/80/c0/fc/ae00) 作为独立行,
+但 `ldr rN, DAT_0801adXX` 仍引用这些名字。GAS 报 "invalid offset, value too big"。修复: 在
+`asm/00_system_str_vija.s` 中手动拆分 `.byte` 块, 在正确偏移处插入 `DAT_0801adXX:` label。
+byte-identical 验证确认字节不变。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -815,7 +863,7 @@ R9 byte-identical。
 | **Seg-6** | 0x1794c..0x18774 | ~28 | **0x186ce/0x22** | — | ✅ **Seg-6a/b 全部完成** (Seg-6a JP 假名表 carve / Seg-6b render/cursor/load_assets + carve F/G/H; 0x186ce/0x22 §5.1 登记) |
 | **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | ✅ **完成**: 28fn 符号化 + carve J (name_input_state_table+banlist_pass_char_group_ptr_table) + carve K (name_input_render_param_4b+name_input_default_name) + §5.1 0x19640/0x20; byte-identical 9689337d |
 | **Seg-8** | 0x19a58..0x1a794 | 28 | — | — | ✅ **完成**: 27fn 槽符号化 + carve host1 (banlist_char_candidate_str/pass_char_str/pass_alt_char/rom_password_table) + carve host2 (4 obj path + resource_desc + 2 bg path); executor 越界项 36 个已裁; byte-identical 9689337d |
-| **Seg-9** | 0x1a794..0x1b850 | ~28 | **0x1a89c/0x20, 0x1ad18/0xec** | — | **全新**: banlist/shuen + **carve 2 incbin (含 236B 大块 @0x1ad18)** |
+| **Seg-9** | 0x1a794..0x1b850 | 28 | **0x1a89c/0x20 §5.1, 0x1ad18/0xec disasm** | — | ✅ **完成**: 28fn 符号化 + carve 1 (banlist_pass_ext_char_group) + carve 2 (ptr_table[8..49]+handler_table) + carve 3 (banlist_scroll_view_anim_params) + disasm block B (5 stubs) + §5.1 block A; 6 EQ+56 REF+69 RENAME+5 PLATE_FIX+4 CJK_PLATE; byte-identical 9689337d |
 | **Seg-10** | 0x1b850..0x1cb00 | ~32 | — | — | **全新**: vija/shuen 场景 tick (tick_*_obj_anim ...) |
 
 执行约定:
@@ -845,6 +893,7 @@ R9 byte-identical。
 | 0x08017424 | 64 B (`ROM_INCBIN 0x17424, 0x40`) | Seg-5d | **2 个 THUMB 孤儿小函数 (dead code, 0 ROM 引用)**: ①0x17424..0x17444 (32B) bitfield-index helper (`adds r2,r1,#0; asrs r1,r2,#2; ...` 等效 `r2 mod 4` 类 bit-index, `bx lr`); ②0x17448..0x17462 (26B) halfword-pair extractor (从 r0 addr 读 2×u16, 按 bit0 控制 shift 合并返回 u16)。**全 ROM 0 引用** (ref-scan 16 个 4B 对齐子地址 raw=0/thumb=0 全零, 已独立复核)。**留待**: 引用到时 R4 disasm + createFunction |
 | 0x080186ce | 34 B (`ROM_INCBIN 0x186ce, 0x22`) | Seg-6b | **THUMB leaf dead-code**: `get_language_stride()` (返回 1=JP/2=EN, 读 gSettings bits[2:0]) — 该逻辑在多个同 Seg 函数内联, 无外部调用。含 2B 对齐 pad + 10 THUMB 指令 + 2B pad + 2×.word 字面量池 (EWRAM_BASE + GSETTINGS_OFFSET)。**全 ROM 0 引用** (ref-scan 9 个 4B 对齐子地址 raw=0/thumb=0; reviewer 独立复核 PASS)。**留待**: 引用到时 R4 disasm + createFunction |
 | 0x08019640 | 32 B (`ROM_INCBIN 0x19640, 0x20`) | Seg-7 | **THUMB 孤儿叶函数 (get_settings_language_id 变体)**: push/ldrb/ands/rsbs/bx_lr + 字面量池 (EWRAM_BASE=0x02000000 + GSETTINGS_OFFSET=0x6c2c)。**全 ROM 0 引用** (entry 0x08019641 THUMB count=0; raw 0x08019640 count=0; 内部 0x08019650 raw=1 at file offset 0x671310 为图形 blob 偶合非代码引用; reviewer C3 独立复核 PASS)。**留待**: 引用到时 R4 disasm + createFunction |
+| 0x0801a89c | 32 B (`ROM_INCBIN 0x1a89c, 0x20`) | Seg-9 | **THUMB 孤儿小函数 (dead code, 0 ROM 引用)**: THUMB opcode 形态; 0x0801a89c raw=0/thumb=0; 0x0801a8a0 raw=1 at ROM off 0x00af5768 (vaddr 0x08af5768, FS compressed asset 区) 偶合非代码引用。Seg-8/Seg-9 reviewer 两次独立复核 PASS (§5.1 认定正确)。**留待**: 引用到时 R4 disasm + createFunction |
 
 ---
 

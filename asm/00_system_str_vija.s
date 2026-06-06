@@ -15636,8 +15636,8 @@ retreat_banlist_scrollbar_pos_page_scrollbar_off:
 tick_banlist_scrollbar_and_slot_anim:
     push {r4,lr}                             @ 0801a794 10b5
     sub sp,#0x8                              @ 0801a796 82b0
-    ldr r4, PTR_gBanlistPasswordBuffer_0801a7c8 @ 0801a798 0b4c
-    ldr r0, DAT_0801a7cc                     @ 0801a79a 0c48
+    ldr r4, tick_banlist_scrollbar_and_slot_anim_ptr_gbanlistpasswordbuffer @ 0801a798 0b4c
+    ldr r0, tick_banlist_scrollbar_and_slot_anim_scrollbar_offset @ 0801a79a 0c48
     adds r4,r4,r0    @ 0801a79c 2418
     adds r0,r4,#0x0    @ 0801a79e 201c
     bl update_scrollbar_thumb_display        @ 0801a7a0 faf728ff
@@ -15657,10 +15657,10 @@ tick_banlist_scrollbar_and_slot_anim:
     pop {r4}                                 @ 0801a7c2 10bc
     pop {r0}                                 @ 0801a7c4 01bc
     bx r0                                    @ 0801a7c6 0047
-PTR_gBanlistPasswordBuffer_0801a7c8:
+tick_banlist_scrollbar_and_slot_anim_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a7c8 10980202
-DAT_0801a7cc:
-    .word  0x0000064c                     @ 0801a7cc 4c060000
+tick_banlist_scrollbar_and_slot_anim_scrollbar_offset:
+    .word  0x0000064c                     @ 0801a7cc 4c060000  scrollbar struct offset in gBanlistPasswordBuffer
 
 @ Banlist password input interface cursor slot forward advance function.
 @ Reads bits[5:3] of gBanlistPasswordBuffer+0x660 (current slot 0..2), increments by 1, writes back;
@@ -15671,7 +15671,7 @@ DAT_0801a7cc:
 @ Constants: CURSOR_FIELD_OFFSET=0x660; DIR_FIELD_OFFSET=0x667; DIR_FORWARD=0x08; ENCODE_FLAG_ADDR=0x02006c2c.
 advance_banlist_password_cursor_slot:
     push {r4,lr}                             @ 0801a7d0 10b5
-    ldr r4, PTR_gBanlistPasswordBuffer_0801a7fc @ 0801a7d2 0a4c
+    ldr r4, advance_banlist_password_cursor_slot_ptr_gbanlistpasswordbuffer @ 0801a7d2 0a4c
     movs r1,#0xcc    @ 0801a7d4 cc21
     lsls r1,r1,#0x3    @ 0801a7d6 c900
     adds r0,r4,r1    @ 0801a7d8 6018
@@ -15679,8 +15679,8 @@ advance_banlist_password_cursor_slot:
     lsls r0,r0,#0x1a    @ 0801a7dc 8006
     lsrs r0,r0,#0x1d    @ 0801a7de 400f
     adds r3,r0,#0x1    @ 0801a7e0 431c
-    ldr r1, DAT_0801a800                     @ 0801a7e2 0749
-    ldr r0, DAT_0801a804                     @ 0801a7e4 0748
+    ldr r1, advance_banlist_password_cursor_slot_ewram_base @ 0801a7e2 0749
+    ldr r0, advance_banlist_password_cursor_slot_gsettings_offset @ 0801a7e4 0748
     adds r1,r1,r0    @ 0801a7e6 0918
     movs r0,#0x7    @ 0801a7e8 0720
     ldrb r1,[r1,#0x0]                        @ 0801a7ea 0978
@@ -15692,11 +15692,11 @@ advance_banlist_password_cursor_slot:
     movs r3,#0x0    @ 0801a7f6 0023
     b LAB_0801a812                           @ 0801a7f8 0be0
     .zero  0x2
-PTR_gBanlistPasswordBuffer_0801a7fc:
+advance_banlist_password_cursor_slot_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a7fc 10980202
-DAT_0801a800:
-    .word  0x02000000                     @ 0801a800 00000002
-DAT_0801a804:
+advance_banlist_password_cursor_slot_ewram_base:
+    .word  EWRAM_BASE                     @ 0801a800 00000002
+advance_banlist_password_cursor_slot_gsettings_offset:
     .word  0x00006c2c                     @ 0801a804 2c6c0000
 LAB_0801a808:
     adds r0,r3,#0x0    @ 0801a808 181c
@@ -15716,15 +15716,15 @@ LAB_0801a812:
     ands r0,r3    @ 0801a824 1840
     orrs r0,r1    @ 0801a826 0843
     strb r0,[r2,#0x0]                        @ 0801a828 1070
-    ldr r0, DAT_0801a838                     @ 0801a82a 0348
+    ldr r0, advance_banlist_password_cursor_slot_dir_field_offset @ 0801a82a 0348
     adds r1,r4,r0    @ 0801a82c 2118
     movs r0,#0x8    @ 0801a82e 0820
     strb r0,[r1,#0x0]                        @ 0801a830 0870
     pop {r4}                                 @ 0801a832 10bc
     pop {r0}                                 @ 0801a834 01bc
     bx r0                                    @ 0801a836 0047
-DAT_0801a838:
-    .word  0x00000667                     @ 0801a838 67060000
+advance_banlist_password_cursor_slot_dir_field_offset:
+    .word  0x00000667                     @ 0801a838 67060000  direction field byte offset
 
 @ Banlist password input interface cursor slot backward retreat function.
 @ Reads bits[5:3] of gBanlistPasswordBuffer+0x660 (current slot 0..2), decrements by 1, writes back.
@@ -15734,7 +15734,7 @@ DAT_0801a838:
 @ Constants: CURSOR_FIELD_OFFSET=0x660; DIR_FIELD_OFFSET=0x667; DIR_BACKWARD=0xF8; ENCODE_FLAG_ADDR=0x02006c2c.
 retreat_banlist_password_cursor_slot:
     push {r4,lr}                             @ 0801a83c 10b5
-    ldr r4, PTR_gBanlistPasswordBuffer_0801a88c @ 0801a83e 134c
+    ldr r4, retreat_banlist_password_cursor_slot_ptr_gbanlistpasswordbuffer @ 0801a83e 134c
     movs r1,#0xcc    @ 0801a840 cc21
     lsls r1,r1,#0x3    @ 0801a842 c900
     adds r0,r4,r1    @ 0801a844 6018
@@ -15744,8 +15744,8 @@ retreat_banlist_password_cursor_slot:
     subs r3,r0,#0x1    @ 0801a84c 431e
     cmp r0,#0x0                              @ 0801a84e 0028
     bne LAB_0801a866                         @ 0801a850 09d1
-    ldr r0, DAT_0801a890                     @ 0801a852 0f48
-    ldr r3, DAT_0801a894                     @ 0801a854 0f4b
+    ldr r0, retreat_banlist_password_cursor_slot_ewram_base @ 0801a852 0f48
+    ldr r3, retreat_banlist_password_cursor_slot_gsettings_offset @ 0801a854 0f4b
     adds r0,r0,r3    @ 0801a856 c018
     movs r1,#0x7    @ 0801a858 0721
     ldrb r0,[r0,#0x0]                        @ 0801a85a 0078
@@ -15767,24 +15767,24 @@ LAB_0801a866:
     ands r0,r3    @ 0801a878 1840
     orrs r0,r1    @ 0801a87a 0843
     strb r0,[r2,#0x0]                        @ 0801a87c 1070
-    ldr r0, DAT_0801a898                     @ 0801a87e 0648
+    ldr r0, retreat_banlist_password_cursor_slot_dir_field_offset @ 0801a87e 0648
     adds r1,r4,r0    @ 0801a880 2118
     movs r0,#0xf8    @ 0801a882 f820
     strb r0,[r1,#0x0]                        @ 0801a884 0870
     pop {r4}                                 @ 0801a886 10bc
     pop {r0}                                 @ 0801a888 01bc
     bx r0                                    @ 0801a88a 0047
-PTR_gBanlistPasswordBuffer_0801a88c:
+retreat_banlist_password_cursor_slot_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a88c 10980202
-DAT_0801a890:
-    .word  0x02000000                     @ 0801a890 00000002
-DAT_0801a894:
+retreat_banlist_password_cursor_slot_ewram_base:
+    .word  EWRAM_BASE                     @ 0801a890 00000002
+retreat_banlist_password_cursor_slot_gsettings_offset:
     .word  0x00006c2c                     @ 0801a894 2c6c0000
-DAT_0801a898:
-    .word  0x00000667                     @ 0801a898 67060000
+retreat_banlist_password_cursor_slot_dir_field_offset:
+    .word  0x00000667                     @ 0801a898 67060000  direction field byte offset
     ROM_INCBIN 0x1a89c, 0x20
 
-@ Function: Locates a character from the password candidate character table using cursor slot info and writes it to the destination buffer via banlist_password_enter_char. Extracts bits[5:2] (4-bit slot index) from gBanlistPasswordBuffer+0x661, multiplies by 15 to compute primary offset, then reads column offset from gBanlistPasswordBuffer+0x660 halfword bits[9:6] and adds it; uses advance_text_ptr_by_charlen to locate target character in candidate string. If candidate is space and global mode flag (gPrng+0x6c2c bits[2:0]) is 0, uses alternate character string address. Called by FUN_0801aa54 when user selects a character.
+@ Function: Locates a character from the password candidate character table using cursor slot info and writes it to the destination buffer via banlist_password_enter_char. Extracts bits[5:2] (4-bit slot index) from gBanlistPasswordBuffer+0x661, multiplies by 15 to compute primary offset, then reads column offset from gBanlistPasswordBuffer+0x660 halfword bits[9:6] and adds it; uses advance_text_ptr_by_charlen to locate target character in candidate string. If candidate is space and global mode flag (gPrng+0x6c2c bits[2:0]) is 0, uses alternate character string address. Called by advance_banlist_password_char_and_render when user selects a character.
 @ Side effects: [r0] (dest_char_buf) written via banlist_password_enter_char with selected character.
 @ Constants:
 @   CURSOR_SLOT_OFFSET = 0x661 // gBanlistPasswordBuffer cursor slot byte
@@ -15797,9 +15797,9 @@ DAT_0801a898:
 load_banlist_char_by_cursor_slot:
     push {r4,lr}                             @ 0801a8bc 10b5
     adds r4,r0,#0x0    @ 0801a8be 041c
-    ldr r3, DWORD_0801a904                   @ 0801a8c0 104b
-    ldr r0, DWORD_0801a908                   @ 0801a8c2 1148
-    ldr r2, DWORD_0801a90c                   @ 0801a8c4 114a
+    ldr r3, load_banlist_char_by_cursor_slot_ptr_gbanlistpasswordbuffer @ 0801a8c0 104b
+    ldr r0, load_banlist_char_by_cursor_slot_ptr_banlist_char_candidate_str @ 0801a8c2 1148
+    ldr r2, load_banlist_char_by_cursor_slot_cursor_slot_offset @ 0801a8c4 114a
     adds r1,r3,r2    @ 0801a8c6 9918
     ldrb r1,[r1,#0x0]                        @ 0801a8c8 0978
     lsls r2,r1,#0x1a    @ 0801a8ca 8a06
@@ -15817,8 +15817,8 @@ load_banlist_char_by_cursor_slot:
     adds r2,r0,#0x0    @ 0801a8e4 021c
     cmp r2,#0x0                              @ 0801a8e6 002a
     beq LAB_0801a928                         @ 0801a8e8 1ed0
-    ldr r1, DWORD_0801a910                   @ 0801a8ea 0949
-    ldr r0, DWORD_0801a914                   @ 0801a8ec 0948
+    ldr r1, load_banlist_char_by_cursor_slot_ewram_base @ 0801a8ea 0949
+    ldr r0, load_banlist_char_by_cursor_slot_gsettings_offset @ 0801a8ec 0948
     adds r1,r1,r0    @ 0801a8ee 0918
     movs r0,#0x7    @ 0801a8f0 0720
     ldrb r1,[r1,#0x0]                        @ 0801a8f2 0978
@@ -15828,20 +15828,20 @@ load_banlist_char_by_cursor_slot:
     ldrb r0,[r2,#0x0]                        @ 0801a8fa 1078
     cmp r0,#0x20                             @ 0801a8fc 2028
     bne LAB_0801a91c                         @ 0801a8fe 0dd1
-    ldr r0, DWORD_0801a918                   @ 0801a900 0548
+    ldr r0, load_banlist_char_by_cursor_slot_ptr_banlist_pass_alt_char @ 0801a900 0548
     b LAB_0801a91e                           @ 0801a902 0ce0
-DWORD_0801a904:
+load_banlist_char_by_cursor_slot_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a904 10980202
-DWORD_0801a908:
-    .word  0x09e3bcb1                     @ 0801a908 b1bce309
-DWORD_0801a90c:
-    .word  0x00000661                     @ 0801a90c 61060000
-DWORD_0801a910:
-    .word  0x02000000                     @ 0801a910 00000002
-DWORD_0801a914:
+load_banlist_char_by_cursor_slot_ptr_banlist_char_candidate_str:
+    .word  banlist_char_candidate_str     @ 0801a908 b1bce309
+load_banlist_char_by_cursor_slot_cursor_slot_offset:
+    .word  0x00000661                     @ 0801a90c 61060000  bits[5:2]=4-bit slot index
+load_banlist_char_by_cursor_slot_ewram_base:
+    .word  EWRAM_BASE                     @ 0801a910 00000002
+load_banlist_char_by_cursor_slot_gsettings_offset:
     .word  0x00006c2c                     @ 0801a914 2c6c0000
-DWORD_0801a918:
-    .word  0x09e3c040                     @ 0801a918 40c0e309
+load_banlist_char_by_cursor_slot_ptr_banlist_pass_alt_char:
+    .word  banlist_pass_alt_char          @ 0801a918 40c0e309
 LAB_0801a91c:
     adds r0,r2,#0x0    @ 0801a91c 101c
 LAB_0801a91e:
@@ -15863,8 +15863,8 @@ LAB_0801a92a:
 @   PIXELS_PER_UNIT = 0xf = 15 // pixels per scroll unit (v<<4 - v)
 get_banlist_scroll_pixel_offset:
     push {lr}                                @ 0801a930 00b5
-    ldr r0, DWORD_0801a948                   @ 0801a932 0548
-    ldr r1, DWORD_0801a94c                   @ 0801a934 0549
+    ldr r0, get_banlist_scroll_pixel_offset_ptr_gbanlistpasswordbuffer @ 0801a932 0548
+    ldr r1, get_banlist_scroll_pixel_offset_scrollbar_offset @ 0801a934 0549
     adds r0,r0,r1    @ 0801a936 4018
     bl get_scrollbar_cur_value               @ 0801a938 faf7b4fd
     adds r1,r0,#0x0    @ 0801a93c 011c
@@ -15873,10 +15873,10 @@ get_banlist_scroll_pixel_offset:
     pop {r1}                                 @ 0801a942 02bc
     bx r1                                    @ 0801a944 0847
     .zero  0x2
-DWORD_0801a948:
+get_banlist_scroll_pixel_offset_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a948 10980202
-DWORD_0801a94c:
-    .word  0x0000064c                     @ 0801a94c 4c060000
+get_banlist_scroll_pixel_offset_scrollbar_offset:
+    .word  0x0000064c                     @ 0801a94c 4c060000  scrollbar struct offset
 
 @ get_banlist_password_entry_ptr: Banlist pass-input scene -- computes and returns current password entry pointer from scroll offset and cursor row/col fields. Calls get_banlist_scroll_pixel_offset for base; reads gBanlistPasswordBuffer+0x66a halfword to extract row (bits[8:0] via lsls #0x17; lsrs #0x19) and col (bits[3:1] via lsrs #0x1); computes row*15 + col offset; final ptr = gBanlistPasswordBuffer + (scroll_offset + row*15 + col)*2. Return via Sub-case E (pop {r1}; bx r1).
 @ 
@@ -15886,9 +15886,9 @@ DWORD_0801a94c:
 @ - ENTRY_SIZE = 2
 get_banlist_password_entry_ptr:
     push {r4,lr}                             @ 0801a950 10b5
-    ldr r4, DWORD_0801a97c                   @ 0801a952 0a4c
+    ldr r4, get_banlist_password_entry_ptr_ptr_gbanlistpasswordbuffer @ 0801a952 0a4c
     bl get_banlist_scroll_pixel_offset       @ 0801a954 fff7ecff
-    ldr r2, DWORD_0801a980                   @ 0801a958 094a
+    ldr r2, get_banlist_password_entry_ptr_cursor_hw_offset @ 0801a958 094a
     adds r1,r4,r2    @ 0801a95a a118
     ldrh r1,[r1,#0x0]                        @ 0801a95c 0988
     lsls r1,r1,#0x17    @ 0801a95e c905
@@ -15906,10 +15906,10 @@ get_banlist_password_entry_ptr:
     pop {r4}                                 @ 0801a976 10bc
     pop {r1}                                 @ 0801a978 02bc
     bx r1                                    @ 0801a97a 0847
-DWORD_0801a97c:
+get_banlist_password_entry_ptr_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a97c 10980202
-DWORD_0801a980:
-    .word  0x0000066a                     @ 0801a980 6a060000
+get_banlist_password_entry_ptr_cursor_hw_offset:
+    .word  0x0000066a                     @ 0801a980 6a060000  cursor halfword offset
 
 @ Function: Clears the tile buffer column range before rendering, then renders banlist text to the specified column position. Column index is adjusted via __divsi3(col_idx,5)+col_idx then multiplied by 12 to obtain tile column start; reads font height multiplier from gBanlistPasswordBuffer+0x663; calls init_font_jp_ctx_bg2_char_vram to init BG2 char VRAM context; calls clear_tile_buf_col_range to clear target column; if text is non-null calls dispatch_text_render_by_mode_banlist(mode=7) to render. Called by 3 callers during banlist password input text update.
 @ Side effects:
@@ -15930,7 +15930,7 @@ render_banlist_text_col_cleared:
     adds r7,r0,#0x0    @ 0801a98e 071c
     adds r4,r1,#0x0    @ 0801a990 0c1c
     .hword 0x4691    @ 0801a992 9146
-    ldr r5, DWORD_0801a9ec                   @ 0801a994 154d
+    ldr r5, render_banlist_text_col_cleared_ptr_gbanlistpasswordbuffer @ 0801a994 154d
     movs r6,#0xc    @ 0801a996 0c26
     movs r0,#0xe    @ 0801a998 0e20
     .hword 0x4680    @ 0801a99a 8046
@@ -15939,7 +15939,7 @@ render_banlist_text_col_cleared:
     bl __divsi3                              @ 0801a9a0 f3f030fe
     adds r4,r4,r0    @ 0801a9a4 2418
     muls r4,r6    @ 0801a9a6 7443
-    ldr r0, DWORD_0801a9f0                   @ 0801a9a8 1148
+    ldr r0, render_banlist_text_col_cleared_font_scale_offset @ 0801a9a8 1148
     adds r5,r5,r0    @ 0801a9aa 2d18
     ldrb r5,[r5,#0x0]                        @ 0801a9ac 2d78
     lsls r0,r5,#0x1c    @ 0801a9ae 2807
@@ -15971,10 +15971,10 @@ LAB_0801a9de:
     pop {r4,r5,r6,r7}                        @ 0801a9e6 f0bc
     pop {r0}                                 @ 0801a9e8 01bc
     bx r0                                    @ 0801a9ea 0047
-DWORD_0801a9ec:
+render_banlist_text_col_cleared_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801a9ec 10980202
-DWORD_0801a9f0:
-    .word  0x00000663                     @ 0801a9f0 63060000
+render_banlist_text_col_cleared_font_scale_offset:
+    .word  0x00000663                     @ 0801a9f0 63060000  font height scale byte offset
 
 @ Banlist password chars render to font-row buffer. Calls get_banlist_password_entry_ptr to get current entry ptr r6; reads col offset r5 from [gBanlistPasswordBuffer+0x66a] bits[8:2] (7-bit field); reads row r4 from [+0x66b] >>1. Main loop: reads [r6] byte, if nonzero and r4<=3: (1) banlist_password_enter_char(r6,r5,1); (2) render_banlist_text_col_cleared(buf,r5,r4); r5++ wraps at 0xf; r4++; r6+=2 advance. Returns void (Pattern B: pop {r0}; bx r0).
 @ 
@@ -15987,25 +15987,25 @@ DWORD_0801a9f0:
 render_banlist_password_chars_to_buf:
     push {r4,r5,r6,lr}                       @ 0801a9f4 70b5
     sub sp,#0x4                              @ 0801a9f6 81b0
-    ldr r4, DWORD_0801aa14                   @ 0801a9f8 064c
+    ldr r4, render_banlist_password_chars_to_buf_ptr_gbanlistpasswordbuffer @ 0801a9f8 064c
     bl get_banlist_password_entry_ptr        @ 0801a9fa fff7a9ff
     adds r6,r0,#0x0    @ 0801a9fe 061c
-    ldr r1, DWORD_0801aa18                   @ 0801aa00 0549
+    ldr r1, render_banlist_password_chars_to_buf_cursor_hw_offset @ 0801aa00 0549
     adds r0,r4,r1    @ 0801aa02 6018
     ldrh r0,[r0,#0x0]                        @ 0801aa04 0088
     lsls r0,r0,#0x17    @ 0801aa06 c005
     lsrs r5,r0,#0x19    @ 0801aa08 450e
-    ldr r0, DWORD_0801aa1c                   @ 0801aa0a 0448
+    ldr r0, render_banlist_password_chars_to_buf_row_byte_offset @ 0801aa0a 0448
     adds r4,r4,r0    @ 0801aa0c 2418
     ldrb r4,[r4,#0x0]                        @ 0801aa0e 2478
     lsrs r4,r4,#0x1    @ 0801aa10 6408
     b LAB_0801aa40                           @ 0801aa12 15e0
-DWORD_0801aa14:
+render_banlist_password_chars_to_buf_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801aa14 10980202
-DWORD_0801aa18:
-    .word  0x0000066a                     @ 0801aa18 6a060000
-DWORD_0801aa1c:
-    .word  0x0000066b                     @ 0801aa1c 6b060000
+render_banlist_password_chars_to_buf_cursor_hw_offset:
+    .word  0x0000066a                     @ 0801aa18 6a060000  cursor halfword
+render_banlist_password_chars_to_buf_row_byte_offset:
+    .word  0x0000066b                     @ 0801aa1c 6b060000  row height byte offset
 LAB_0801aa20:
     adds r0,r6,#0x0    @ 0801aa20 301c
     .hword 0x4669    @ 0801aa22 6946
@@ -16035,16 +16035,24 @@ LAB_0801aa4a:
     bx r0                                    @ 0801aa50 0047
     .zero  0x2
 
-@ banlist 密码输入界面的"选定字符并前进"操作入口. 由 banlist 主帧循环 (0x0801af70) 在用户按确定键时调用. 流程: (1) 检查当前密码列表位置 (gBanlistPasswordBuffer+0x66c) 是否已超限, 超限直接返回 0 (无操作); (2) 调用 load_banlist_char_by_cursor_slot 读取光标指向的候选字符; (3) 若候选字符为 NUL 则跳过; (4) 密码列表长度 +1 (strh), 调用 copy_str_unbounded 拷贝字符到缓冲区, 再调用 append_text_to_buf_charlen 追加; (5) copy_str_unbounded 将新字符串写回密码条目; (6) 调用 render_banlist_text_col_cleared 以列号/行号刷新文字显示; (7) 调用 advance_banlist_scroll_column_and_page 推进列游标; (8) 若游标返回 1 (普通步进), 调用 render_banlist_password_chars_to_buf 全量重绘密码字符区. 返回 advance_banlist_scroll_column_and_page 的返回值 (0=上限, 1=普通步进, 2=翻页, 3=页满, 4=当前位置等于上限).
+@ @ advance_banlist_password_char_and_render: Banlist password input forward commit path.
+@ @ Checks current entry count at gBanlistPasswordBuffer+0x66c vs limit at +0x66e;
+@ @ returns 0 immediately if at limit. Calls load_banlist_char_by_cursor_slot to fetch
+@ @ selected char; if NUL skips. If entry count == limit returns 4 (position=limit).
+@ @ Otherwise: increments count (+0x66c), copies char via copy_str_unbounded +
+@ @ append_text_to_buf_charlen, writes to entry ptr, calls render_banlist_text_col_cleared
+@ @ then advance_banlist_scroll_column_and_page. Returns page-scroll status (0/1/2/3/4).
+@ @ Caller: tick_banlist_password_frame (0x0801af70) via dispatch_banlist_cursor_action.
+@ @ Stack frame: 0x5a8 bytes (large local char buffer).
 advance_banlist_password_char_and_render:
     push {r4,r5,r6,r7,lr}                    @ 0801aa54 f0b5
-    ldr r4, DWORD_0801aa74                   @ 0801aa56 074c
+    ldr r4, advance_banlist_password_char_and_render_stack_frame_neg @ 0801aa56 074c
     add sp,r4                                @ 0801aa58 a544
-    ldr r6, DWORD_0801aa78                   @ 0801aa5a 074e
+    ldr r6, advance_banlist_password_char_and_render_ptr_gbanlistpasswordbuffer @ 0801aa5a 074e
     movs r4,#0x0    @ 0801aa5c 0024
-    ldr r0, DWORD_0801aa7c                   @ 0801aa5e 0748
+    ldr r0, advance_banlist_password_char_and_render_limit1_offset @ 0801aa5e 0748
     adds r5,r6,r0    @ 0801aa60 3518
-    ldr r1, DWORD_0801aa80                   @ 0801aa62 0749
+    ldr r1, advance_banlist_password_char_and_render_limit2_offset @ 0801aa62 0749
     adds r7,r6,r1    @ 0801aa64 7718
     ldrh r2,[r5,#0x0]                        @ 0801aa66 2a88
     ldrh r0,[r7,#0x0]                        @ 0801aa68 3888
@@ -16053,14 +16061,14 @@ advance_banlist_password_char_and_render:
     movs r0,#0x0    @ 0801aa6e 0020
     b LAB_0801aaea                           @ 0801aa70 3be0
     .zero  0x2
-DWORD_0801aa74:
-    .word  0xfffffa58                     @ 0801aa74 58faffff
-DWORD_0801aa78:
+advance_banlist_password_char_and_render_stack_frame_neg:
+    .word  0xfffffa58                     @ 0801aa74 58faffff  large stack frame -0x5a8 bytes
+advance_banlist_password_char_and_render_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801aa78 10980202
-DWORD_0801aa7c:
-    .word  0x0000066c                     @ 0801aa7c 6c060000
-DWORD_0801aa80:
-    .word  0x0000066e                     @ 0801aa80 6e060000
+advance_banlist_password_char_and_render_limit1_offset:
+    .word  0x0000066c                     @ 0801aa7c 6c060000  current entry count halfword
+advance_banlist_password_char_and_render_limit2_offset:
+    .word  0x0000066e                     @ 0801aa80 6e060000  max entry count halfword
 LAB_0801aa84:
     .hword 0x4668    @ 0801aa84 6846
     bl load_banlist_char_by_cursor_slot      @ 0801aa86 fff719ff
@@ -16088,12 +16096,12 @@ LAB_0801aa9e:
     adds r1,r0,#0x0    @ 0801aaba 011c
     adds r0,r4,#0x0    @ 0801aabc 201c
     bl copy_str_unbounded                    @ 0801aabe f9f7d7fc
-    ldr r1, DWORD_0801aaf8                   @ 0801aac2 0d49
+    ldr r1, advance_banlist_password_char_and_render_cursor_hw_offset @ 0801aac2 0d49
     adds r0,r6,r1    @ 0801aac4 7018
     ldrh r0,[r0,#0x0]                        @ 0801aac6 0088
     lsls r1,r0,#0x17    @ 0801aac8 c105
     lsrs r1,r1,#0x19    @ 0801aaca 490e
-    ldr r2, DWORD_0801aafc                   @ 0801aacc 0b4a
+    ldr r2, advance_banlist_password_char_and_render_row_byte_offset @ 0801aacc 0b4a
     adds r0,r6,r2    @ 0801aace b018
     ldrb r0,[r0,#0x0]                        @ 0801aad0 0078
     lsrs r2,r0,#0x1    @ 0801aad2 4208
@@ -16114,19 +16122,27 @@ LAB_0801aaea:
     pop {r1}                                 @ 0801aaf2 02bc
     bx r1                                    @ 0801aaf4 0847
     .zero  0x2
-DWORD_0801aaf8:
-    .word  0x0000066a                     @ 0801aaf8 6a060000
-DWORD_0801aafc:
-    .word  0x0000066b                     @ 0801aafc 6b060000
+advance_banlist_password_char_and_render_cursor_hw_offset:
+    .word  0x0000066a                     @ 0801aaf8 6a060000  cursor halfword
+advance_banlist_password_char_and_render_row_byte_offset:
+    .word  0x0000066b                     @ 0801aafc 6b060000  row height byte
 
-@ banlist 密码输入界面的"后退删除字符"操作入口. 由 banlist 字符后退帧 (0x0801abec) 在用户按退格键时调用. 与 advance_banlist_password_char_and_render (0x0801aa54) 对称, 执行反向操作: (1) 读 gBanlistPasswordBuffer+0x66a bits[9:2] (列游标) 和 +0x66b bit[1] (行高偏移), 计算当前绝对位置 r4; (2) 加载当前密码条目列表长度及上限, 若位置<=0 且 scroll_pixel_offset<=0 则返回 0; (3) 计算 r5=位置 mod 15 (列内偏移) 和 r4=位置 div 15 (行号), 调用 get_banlist_password_entry_ptr 取条目指针; (4) 若 r5<=14 且 r4<=3, 调用 render_banlist_text_col_cleared 刷新当前列; (5) 若内部标记为 0 (普通退格): 拷贝条目后 2 字节至 r0+r2 形成前移, 将目标字节清零 (NUL), 调用 retreat_banlist_scroll_column_and_page 后退游标, 密码条目长度 -1; (6) 若标记为 1 (翻页退格): advance_text_ptr_by_charlen 找末字节清零, retreat_banlist_scroll_column_and_page 后退页, 长度 -1. 最终调用 render_banlist_password_chars_to_buf 重绘. 返回 0=无法后退, 非 0=成功.
+@ @ retreat_banlist_password_char_and_render: Banlist password input backspace path.
+@ @ Reads cursor col and row from gBanlistPasswordBuffer+0x66a/66b; if position<=0 and
+@ @ scroll_pixel_offset<=0 returns 0. Computes col=pos mod 15, row=pos div 15; calls
+@ @ get_banlist_password_entry_ptr; if col<=14 and row<=3 calls render_banlist_text_col_cleared.
+@ @ Normal backspace: copies entry +2 forward (shift left), clears trailing byte,
+@ @ calls retreat_banlist_scroll_column_and_page, decrements count -1.
+@ @ Page backspace: advance_text_ptr_by_charlen clears last byte, retreat_banlist_scroll...,
+@ @ decrements count. Calls render_banlist_password_chars_to_buf for full redraw.
+@ @ Returns 0=cannot retreat, non-zero=success.
 retreat_banlist_password_char_and_render:
     push {r4,r5,r6,r7,lr}                    @ 0801ab00 f0b5
     .hword 0x464f    @ 0801ab02 4f46
     .hword 0x4646    @ 0801ab04 4646
     push {r6,r7}                             @ 0801ab06 c0b4
-    ldr r7, DWORD_0801aba4                   @ 0801ab08 264f
-    ldr r1, DWORD_0801aba8                   @ 0801ab0a 2749
+    ldr r7, retreat_banlist_password_char_and_render_ptr_gbanlistpasswordbuffer @ 0801ab08 264f
+    ldr r1, retreat_banlist_password_char_and_render_cursor_hw_offset @ 0801ab0a 2749
     adds r0,r7,r1    @ 0801ab0c 7818
     ldrh r0,[r0,#0x0]                        @ 0801ab0e 0088
     lsls r2,r0,#0x17    @ 0801ab10 c205
@@ -16140,7 +16156,7 @@ retreat_banlist_password_char_and_render:
     adds r4,r2,r0    @ 0801ab20 1418
     movs r0,#0x0    @ 0801ab22 0020
     .hword 0x4681    @ 0801ab24 8146
-    ldr r1, DWORD_0801abac                   @ 0801ab26 2149
+    ldr r1, retreat_banlist_password_char_and_render_limit_offset @ 0801ab26 2149
     adds r5,r7,r1    @ 0801ab28 7d18
     ldrh r0,[r5,#0x0]                        @ 0801ab2a 2888
     cmp r0,#0x0                              @ 0801ab2c 0028
@@ -16178,7 +16194,7 @@ LAB_0801ab4c:
     bgt LAB_0801ab84                         @ 0801ab74 06dc
     cmp r4,#0x3                              @ 0801ab76 032c
     bgt LAB_0801ab84                         @ 0801ab78 04dc
-    ldr r0, DWORD_0801abb0                   @ 0801ab7a 0d48
+    ldr r0, retreat_banlist_password_char_and_render_ptr_ext_char_group @ 0801ab7a 0d48
     adds r1,r5,#0x0    @ 0801ab7c 291c
     adds r2,r4,#0x0    @ 0801ab7e 221c
     bl render_banlist_text_col_cleared       @ 0801ab80 fff700ff
@@ -16189,7 +16205,7 @@ LAB_0801ab84:
     adds r0,r6,#0x2    @ 0801ab8a b01c
     adds r1,r6,#0x0    @ 0801ab8c 311c
     bl copy_str_unbounded                    @ 0801ab8e f9f76ffc
-    ldr r0, DWORD_0801abac                   @ 0801ab92 0648
+    ldr r0, retreat_banlist_password_char_and_render_limit_offset @ 0801ab92 0648
     adds r1,r7,r0    @ 0801ab94 3918
     ldrh r0,[r1,#0x0]                        @ 0801ab96 0888
     subs r0,#0x1    @ 0801ab98 0138
@@ -16197,16 +16213,16 @@ LAB_0801ab84:
     bl render_banlist_password_chars_to_buf  @ 0801ab9c fff72aff
     b LAB_0801abd2                           @ 0801aba0 17e0
     .zero  0x2
-DWORD_0801aba4:
+retreat_banlist_password_char_and_render_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801aba4 10980202
-DWORD_0801aba8:
-    .word  0x0000066a                     @ 0801aba8 6a060000
-DWORD_0801abac:
-    .word  0x0000066c                     @ 0801abac 6c060000
-DWORD_0801abb0:
-    .word  0x09e3be3c                     @ 0801abb0 3cbee309
+retreat_banlist_password_char_and_render_cursor_hw_offset:
+    .word  0x0000066a                     @ 0801aba8 6a060000  cursor halfword
+retreat_banlist_password_char_and_render_limit_offset:
+    .word  0x0000066c                     @ 0801abac 6c060000  entry count halfword
+retreat_banlist_password_char_and_render_ptr_ext_char_group:
+    .word  banlist_pass_ext_char_group    @ 0801abb0 3cbee309
 LAB_0801abb4:
-    ldr r1, DWORD_0801abd8                   @ 0801abb4 0849
+    ldr r1, retreat_banlist_password_char_and_render_limit_offset_b @ 0801abb4 0849
     adds r4,r7,r1    @ 0801abb6 7c18
     ldrh r1,[r4,#0x0]                        @ 0801abb8 2188
     subs r1,#0x1    @ 0801abba 0139
@@ -16223,8 +16239,8 @@ LAB_0801abd2:
     .hword 0x4648    @ 0801abd2 4846
     b LAB_0801abde                           @ 0801abd4 03e0
     .zero  0x2
-DWORD_0801abd8:
-    .word  0x0000066c                     @ 0801abd8 6c060000
+retreat_banlist_password_char_and_render_limit_offset_b:
+    .word  0x0000066c                     @ 0801abd8 6c060000  entry count halfword (second ref)
 LAB_0801abdc:
     movs r0,#0x0    @ 0801abdc 0020
 LAB_0801abde:
@@ -16236,11 +16252,15 @@ LAB_0801abde:
     bx r1                                    @ 0801abe8 0847
     .zero  0x2
 
-@ banlist 密码输入页退格键每帧处理函数. 由 FUN_0801af70 (banlist 密码输入主帧驱动, tags: [banlist,pass_input]) 调用. 读 gBanlistPasswordBuffer+0x66c halfword (滚动上限); 若为 0 则跳至同步状态 2 (无字符可删); 否则调用 retreat_banlist_password_char_and_render 执行退格渲染并获取返回状态; 状态==3 时需要翻页, 调用 tick_banlist_scroll_input_handler 处理滚动输入; 其他非零状态调用 sync_state_and_init_sprite(1) 更新精灵. 出口 pop {r0};bx r0 = Pattern B (void 返回).
+@ @ tick_banlist_password_backspace_input: Per-frame handler for banlist backspace key.
+@ @ Reads gBanlistPasswordBuffer+0x66c (entry count); if 0 calls sync_state_and_init_sprite(2)
+@ @ and returns. Otherwise calls retreat_banlist_password_char_and_render; if status==3
+@ @ (page-boundary) calls tick_banlist_scroll_input_handler(1) for scroll. Other non-zero
+@ @ status: sync_state_and_init_sprite(1). Called by tick_banlist_password_frame.
 tick_banlist_password_backspace_input:
     push {lr}                                @ 0801abec 00b5
-    ldr r0, DWORD_0801ac0c                   @ 0801abee 0748
-    ldr r1, DWORD_0801ac10                   @ 0801abf0 0749
+    ldr r0, tick_banlist_password_backspace_input_ptr_gbanlistpasswordbuffer @ 0801abee 0748
+    ldr r1, tick_banlist_password_backspace_input_limit_offset @ 0801abf0 0749
     adds r0,r0,r1    @ 0801abf2 4018
     ldrh r0,[r0,#0x0]                        @ 0801abf4 0088
     cmp r0,#0x0                              @ 0801abf6 0028
@@ -16252,10 +16272,10 @@ tick_banlist_password_backspace_input:
     bl tick_banlist_scroll_input_handler     @ 0801ac04 fff7eef9
     b LAB_0801ac22                           @ 0801ac08 0be0
     .zero  0x2
-DWORD_0801ac0c:
+tick_banlist_password_backspace_input_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801ac0c 10980202
-DWORD_0801ac10:
-    .word  0x0000066c                     @ 0801ac10 6c060000
+tick_banlist_password_backspace_input_limit_offset:
+    .word  0x0000066c                     @ 0801ac10 6c060000  entry count halfword
 LAB_0801ac14:
     movs r0,#0x1    @ 0801ac14 0120
     bl sync_state_and_init_sprite            @ 0801ac16 def04dff
@@ -16276,36 +16296,36 @@ LAB_0801ac22:
 @ Constants: BUF_BASE=gBanlistPasswordBuffer=0x02029810; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; LIMIT_HALFWORD_OFF=0x66c; SCROLL_SUBSTEP_DIV=0xf; SCROLL_COL_MASK=0x7f
 advance_banlist_scroll_pos_step:
     push {r4,r5,r6,r7,lr}                    @ 0801ac28 f0b5
-    ldr r4, DWORD_0801ac58                   @ 0801ac2a 0b4c
+    ldr r4, advance_banlist_scroll_pos_step_ptr_gbanlistpasswordbuffer @ 0801ac2a 0b4c
     bl get_banlist_scroll_pixel_offset       @ 0801ac2c fff780fe
-    ldr r1, DWORD_0801ac5c                   @ 0801ac30 0a49
+    ldr r1, advance_banlist_scroll_pos_step_scroll_halfword_off @ 0801ac30 0a49
     adds r6,r4,r1    @ 0801ac32 6618
     ldrh r2,[r6,#0x0]                        @ 0801ac34 3288
     lsls r1,r2,#0x17    @ 0801ac36 d105
     lsrs r1,r1,#0x19    @ 0801ac38 490e
     adds r0,r0,r1    @ 0801ac3a 4018
-    ldr r1, DWORD_0801ac60                   @ 0801ac3c 0849
+    ldr r1, advance_banlist_scroll_pos_step_row_byte_off @ 0801ac3c 0849
     adds r7,r4,r1    @ 0801ac3e 6718
     ldrb r1,[r7,#0x0]                        @ 0801ac40 3978
     lsrs r2,r1,#0x1    @ 0801ac42 4a08
     lsls r1,r2,#0x4    @ 0801ac44 1101
     subs r1,r1,r2    @ 0801ac46 891a
     adds r0,r0,r1    @ 0801ac48 4018
-    ldr r2, DWORD_0801ac64                   @ 0801ac4a 064a
+    ldr r2, advance_banlist_scroll_pos_step_limit_halfword_off @ 0801ac4a 064a
     adds r5,r4,r2    @ 0801ac4c a518
     ldrh r1,[r5,#0x0]                        @ 0801ac4e 2988
     cmp r0,r1                                @ 0801ac50 8842
     bgt LAB_0801ac68                         @ 0801ac52 09dc
     movs r0,#0x0    @ 0801ac54 0020
     b LAB_0801aca0                           @ 0801ac56 23e0
-DWORD_0801ac58:
+advance_banlist_scroll_pos_step_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801ac58 10980202
-DWORD_0801ac5c:
-    .word  0x0000066a                     @ 0801ac5c 6a060000
-DWORD_0801ac60:
-    .word  0x0000066b                     @ 0801ac60 6b060000
-DWORD_0801ac64:
-    .word  0x0000066c                     @ 0801ac64 6c060000
+advance_banlist_scroll_pos_step_scroll_halfword_off:
+    .word  0x0000066a                     @ 0801ac5c 6a060000  cursor halfword
+advance_banlist_scroll_pos_step_row_byte_off:
+    .word  0x0000066b                     @ 0801ac60 6b060000  row height byte
+advance_banlist_scroll_pos_step_limit_halfword_off:
+    .word  0x0000066c                     @ 0801ac64 6c060000  entry count halfword
 LAB_0801ac68:
     bl get_banlist_scroll_pixel_offset       @ 0801ac68 fff762fe
     adds r4,r0,#0x0    @ 0801ac6c 041c
@@ -16317,7 +16337,7 @@ LAB_0801ac68:
     movs r1,#0x7f    @ 0801ac7a 7f21
     ands r0,r1    @ 0801ac7c 0840
     lsls r0,r0,#0x2    @ 0801ac7e 8000
-    ldr r1, DWORD_0801aca8                   @ 0801ac80 0949
+    ldr r1, advance_banlist_scroll_pos_step_mask_clear_col @ 0801ac80 0949
     ldrh r2,[r6,#0x0]                        @ 0801ac82 3288
     ands r1,r2    @ 0801ac84 1140
     orrs r1,r0    @ 0801ac86 0143
@@ -16337,10 +16357,10 @@ LAB_0801aca0:
     pop {r1}                                 @ 0801aca2 02bc
     bx r1                                    @ 0801aca4 0847
     .zero  0x2
-DWORD_0801aca8:
-    .word  0xfffffe03                     @ 0801aca8 03feffff
+advance_banlist_scroll_pos_step_mask_clear_col:
+    .word  0xfffffe03                     @ 0801aca8 03feffff  mask ~(0x7f<<2): clear scroll column bits
 
-@ Function: Checks banlist state-machine mode equals 0xe(14), gPrng+0x148 bit0 trigger flag is set, and cursor slot (gBanlistPasswordBuffer+0x661 bits[5:2]) is in [0..5]; then dispatches to the corresponding cursor action handler via jump table (6 entries). Jump table at 0x0801ad00 contains 6 handlers for different password input modes (letter/digit/symbol selection etc.). Called by FUN_0801af70 each frame to detect and trigger cursor action.
+@ Function: Checks banlist state-machine mode equals 0xe(14), gPrng+0x148 bit0 trigger flag is set, and cursor slot (gBanlistPasswordBuffer+0x661 bits[5:2]) is in [0..5]; then dispatches to the corresponding cursor action handler via jump table (6 entries). Jump table at 0x0801ad00 contains 6 handlers for different password input modes (letter/digit/symbol selection etc.). Called by tick_banlist_password_frame each frame to detect and trigger cursor action.
 @ Side effects: jumps to table[cursor_slot] handler (each handler has its own side effects); if condition unmet jumps to LAB_0801ae04 (nop path).
 @ Constants:
 @   REQUIRED_MODE = 0xe = 14 // target state-machine mode to trigger dispatch
@@ -16350,7 +16370,7 @@ DWORD_0801aca8:
 @   JUMP_TABLE = 0x0801ad00 // 6-case jump table base address
 dispatch_banlist_cursor_action:
     push {r4,r5,lr}                          @ 0801acac 30b5
-    ldr r5, DWORD_0801acf0                   @ 0801acae 104d
+    ldr r5, dispatch_banlist_cursor_action_ptr_gbanlistpasswordbuffer @ 0801acae 104d
     movs r1,#0xcc    @ 0801acb0 cc21
     lsls r1,r1,#0x3    @ 0801acb2 c900
     adds r0,r5,r1    @ 0801acb4 6818
@@ -16361,7 +16381,7 @@ dispatch_banlist_cursor_action:
     beq LAB_0801acc2                         @ 0801acbe 00d0
     b LAB_0801ae04                           @ 0801acc0 a0e0
 LAB_0801acc2:
-    ldr r1, DWORD_0801acf4                   @ 0801acc2 0c49
+    ldr r1, dispatch_banlist_cursor_action_ptr_gprng @ 0801acc2 0c49
     movs r2,#0xa4    @ 0801acc4 a422
     lsls r2,r2,#0x1    @ 0801acc6 5200
     adds r1,r1,r2    @ 0801acc8 8918
@@ -16372,7 +16392,7 @@ LAB_0801acc2:
     bne LAB_0801acd6                         @ 0801acd2 00d1
     b LAB_0801ae04                           @ 0801acd4 96e0
 LAB_0801acd6:
-    ldr r1, DWORD_0801acf8                   @ 0801acd6 0849
+    ldr r1, dispatch_banlist_cursor_action_cursor_slot_offset @ 0801acd6 0849
     adds r0,r5,r1    @ 0801acd8 6818
     ldrb r0,[r0,#0x0]                        @ 0801acda 0078
     lsls r0,r0,#0x1a    @ 0801acdc 8006
@@ -16382,29 +16402,136 @@ LAB_0801acd6:
     b LAB_0801ae04                           @ 0801ace4 8ee0
 LAB_0801ace6:
     lsls r0,r0,#0x2    @ 0801ace6 8000
-    ldr r1, PTR_PTR_0801acfc                 @ 0801ace8 0449
+    ldr r1, dispatch_banlist_cursor_action_jump_table_ptr @ 0801ace8 0449
     adds r0,r0,r1    @ 0801acea 4018
     ldr r0,[r0,#0x0]                         @ 0801acec 0068
     .hword 0x4687    @ 0801acee 8746
-DWORD_0801acf0:
+dispatch_banlist_cursor_action_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801acf0 10980202
-DWORD_0801acf4:
+dispatch_banlist_cursor_action_ptr_gprng:
     .word  gPrng                          @ 0801acf4 40000003
-DWORD_0801acf8:
-    .word  0x00000661                     @ 0801acf8 61060000
-PTR_PTR_0801acfc:
-    .word  0x0801ad00                     @ 0801acfc 00ad0108
-PTR_DAT_0801ad00:
-    .word  0x0801ad18                     @ 0801ad00 18ad0108
+dispatch_banlist_cursor_action_cursor_slot_offset:
+    .word  0x00000661                     @ 0801acf8 61060000  cursor slot byte (bits[5:2]=slot)
+dispatch_banlist_cursor_action_jump_table_ptr:
+    .word  dispatch_banlist_cursor_action_jump_table @ 0801acfc 00ad0108  ptr to 6-entry jump table at 0x0801ad00
+dispatch_banlist_cursor_action_jump_table:
+    .word  0x0801ad18                     @ 0801ad00 18ad0108  6-entry handler table (dispatch via mov pc,r0)
     .word  0x0801ae04                     @ 0801ad04 04ae0108
     .word  0x0801ad20                     @ 0801ad08 20ad0108
     .word  0x0801ad4c                     @ 0801ad0c 4cad0108
     .word  0x0801ad94                     @ 0801ad10 94ad0108
     .word  0x0801ade0                     @ 0801ad14 e0ad0108
-DAT_0801ad18:
-    ROM_INCBIN 0x1ad18, 0xec
+LAB_0801ad18:
+    bl tick_banlist_password_backspace_input @ 0801ad18 fff768ff
+LAB_0801ad1c:
+    movs r0,#0x1    @ 0801ad1c 0120
+    b LAB_0801ae06                           @ 0801ad1e 72e0
+LAB_0801ad20:
+    ldr r2, DAT_0801ad40                     @ 0801ad20 074a
+    adds r0,r5,r2    @ 0801ad22 a818
+    bl retreat_banlist_scrollbar_pos_page    @ 0801ad24 fff724fd
+    cmp r0,#0x0                              @ 0801ad28 0028
+    beq LAB_0801ad44                         @ 0801ad2a 0bd0
+    movs r0,#0x1    @ 0801ad2c 0120
+    bl tick_banlist_scroll_input_handler     @ 0801ad2e fff759f9
+    bl advance_banlist_scroll_pos_step       @ 0801ad32 fff779ff
+    movs r0,#0x24    @ 0801ad36 2420
+    bl sync_state_and_init_sprite            @ 0801ad38 def0bcfe
+    b LAB_0801ad1c                           @ 0801ad3c eee7
+    .byte  0x00, 0x00
+DAT_0801ad40:
+    .byte  0x4c, 0x06, 0x00, 0x00
+LAB_0801ad44:
+    movs r0,#0x2    @ 0801ad44 0220
+    bl sync_state_and_init_sprite            @ 0801ad46 def0b5fe
+    b LAB_0801ad1c                           @ 0801ad4a e7e7
+LAB_0801ad4c:
+    ldr r1, DAT_0801ad7c                     @ 0801ad4c 0b49
+    adds r0,r5,r1    @ 0801ad4e 6818
+    ldrh r4,[r0,#0x0]                        @ 0801ad50 0488
+    bl get_banlist_scroll_pixel_offset       @ 0801ad52 fff7edfd
+    adds r0,#0x3c    @ 0801ad56 3c30
+    cmp r4,r0                                @ 0801ad58 8442
+    ble LAB_0801ad8c                         @ 0801ad5a 17dd
+    ldr r2, DAT_0801ad80                     @ 0801ad5c 084a
+    adds r0,r5,r2    @ 0801ad5e a818
+    bl advance_banlist_scrollbar_pos_page    @ 0801ad60 fff7f4fc
+    cmp r0,#0x0                              @ 0801ad64 0028
+    beq LAB_0801ad84                         @ 0801ad66 0dd0
+    movs r0,#0x1    @ 0801ad68 0120
+    rsbs r0,r0,#0    @ 0801ad6a 4042
+    bl tick_banlist_scroll_input_handler     @ 0801ad6c fff73af9
+    bl advance_banlist_scroll_pos_step       @ 0801ad70 fff75aff
+    movs r0,#0x24    @ 0801ad74 2420
+    bl sync_state_and_init_sprite            @ 0801ad76 def09dfe
+    b LAB_0801ad1c                           @ 0801ad7a cfe7
+DAT_0801ad7c:
+    .byte  0x6c, 0x06, 0x00, 0x00
+DAT_0801ad80:
+    .byte  0x4c, 0x06, 0x00, 0x00
+LAB_0801ad84:
+    movs r0,#0x2    @ 0801ad84 0220
+    bl sync_state_and_init_sprite            @ 0801ad86 def095fe
+    b LAB_0801ad1c                           @ 0801ad8a c7e7
+LAB_0801ad8c:
+    movs r0,#0x2    @ 0801ad8c 0220
+    bl sync_state_and_init_sprite            @ 0801ad8e def091fe
+    b LAB_0801ad1c                           @ 0801ad92 c3e7
+LAB_0801ad94:
+    adds r0,r5,#0x0    @ 0801ad94 281c
+    bl count_str_charlen                     @ 0801ad96 f9f7e1fb
+    adds r1,r0,#0x0    @ 0801ad9a 011c
+    ldr r2, DAT_0801adc0                     @ 0801ad9c 084a
+    adds r0,r5,r2    @ 0801ad9e a818
+    ldr r2,[r0,#0x0]                         @ 0801ada0 0268
+    adds r0,r5,#0x0    @ 0801ada2 281c
+    movs r3,#0x1    @ 0801ada4 0123
+    bl decode_char_frame_to_vram             @ 0801ada6 fcf741fa
+    movs r1,#0x1    @ 0801adaa 0121
+    rsbs r1,r1,#0    @ 0801adac 4942
+    cmp r0,r1                                @ 0801adae 8842
+    beq LAB_0801adc4                         @ 0801adb0 08d0
+    movs r0,#0x24    @ 0801adb2 2420
+    bl sync_state_and_init_sprite            @ 0801adb4 def07efe
+    bl trigger_banlist_fade_out_exit         @ 0801adb8 00f054fa
+    b LAB_0801ad1c                           @ 0801adbc aee7
+    .byte  0x00, 0x00
+DAT_0801adc0:
+    .byte  0x5c, 0x06, 0x00, 0x00
+LAB_0801adc4:
+    ldr r1, DAT_0801addc                     @ 0801adc4 0549
+    adds r0,r5,r1    @ 0801adc6 6818
+    movs r1,#0x3f    @ 0801adc8 3f21
+    ldrb r2,[r0,#0x0]                        @ 0801adca 0278
+    ands r1,r2    @ 0801adcc 1140
+    movs r2,#0x40    @ 0801adce 4022
+    orrs r1,r2    @ 0801add0 1143
+    strb r1,[r0,#0x0]                        @ 0801add2 0170
+    movs r0,#0x2    @ 0801add4 0220
+    bl sync_state_and_init_sprite            @ 0801add6 def06dfe
+    b LAB_0801ad1c                           @ 0801adda 9fe7
+DAT_0801addc:
+    .byte  0x62, 0x06, 0x00, 0x00
+LAB_0801ade0:
+    bl trigger_banlist_fade_out_exit         @ 0801ade0 00f040fa
+    ldr r1, DAT_0801adfc                     @ 0801ade4 0549
+    ldr r0, DAT_0801ae00                     @ 0801ade6 0648
+    adds r1,r1,r0    @ 0801ade8 0918
+    movs r0,#0x1    @ 0801adea 0120
+    ldrb r2,[r1,#0x0]                        @ 0801adec 0a78
+    orrs r0,r2    @ 0801adee 1043
+    strb r0,[r1,#0x0]                        @ 0801adf0 0870
+    movs r0,#0x24    @ 0801adf2 2420
+    bl sync_state_and_init_sprite            @ 0801adf4 def05efe
+    b LAB_0801ad1c                           @ 0801adf8 90e7
+    .byte  0x00, 0x00
+DAT_0801adfc:
+    .byte  0x40, 0x00, 0x00, 0x03
+DAT_0801ae00:
+    .byte  0x3a, 0x02, 0x00, 0x00
 LAB_0801ae04:
     movs r0,#0x0    @ 0801ae04 0020
+LAB_0801ae06:
     pop {r4,r5}                              @ 0801ae06 30bc
     pop {r1}                                 @ 0801ae08 02bc
     bx r1                                    @ 0801ae0a 0847
@@ -16417,13 +16544,13 @@ LAB_0801ae04:
 @ Constants: BUF_BASE=gBanlistPasswordBuffer; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; LIMIT_HALFWORD_OFF=0x66c; COL_WRAP_MASK=0x7f; ROW_MAX=4; COL_IDX_FULL=0xf; FIXED_FULL_IDX=0x38; MASK_CLEAR_COL=0xfffffe03
 advance_banlist_scroll_column_and_page:
     push {r4,r5,r6,r7,lr}                    @ 0801ae0c f0b5
-    ldr r5, DWORD_0801ae74                   @ 0801ae0e 194d
-    ldr r0, DWORD_0801ae78                   @ 0801ae10 1948
+    ldr r5, advance_banlist_scroll_column_and_page_ptr_gbanlistpasswordbuffer @ 0801ae0e 194d
+    ldr r0, advance_banlist_scroll_column_and_page_scroll_halfword_off @ 0801ae10 1948
     adds r6,r5,r0    @ 0801ae12 2e18
     ldrh r1,[r6,#0x0]                        @ 0801ae14 3188
     lsls r4,r1,#0x17    @ 0801ae16 cc05
     lsrs r4,r4,#0x19    @ 0801ae18 640e
-    ldr r2, DWORD_0801ae7c                   @ 0801ae1a 184a
+    ldr r2, advance_banlist_scroll_column_and_page_row_byte_off @ 0801ae1a 184a
     adds r7,r5,r2    @ 0801ae1c af18
     ldrb r0,[r7,#0x0]                        @ 0801ae1e 3878
     lsrs r1,r0,#0x1    @ 0801ae20 4108
@@ -16431,7 +16558,7 @@ advance_banlist_scroll_column_and_page:
     subs r0,r0,r1    @ 0801ae24 401a
     adds r4,r4,r0    @ 0801ae26 2418
     bl get_banlist_scroll_pixel_offset       @ 0801ae28 fff782fd
-    ldr r1, DWORD_0801ae80                   @ 0801ae2c 1449
+    ldr r1, advance_banlist_scroll_column_and_page_limit1_off @ 0801ae2c 1449
     adds r1,r1,r5    @ 0801ae2e 4919
     .hword 0x468c    @ 0801ae30 8c46
     ldrh r2,[r1,#0x0]                        @ 0801ae32 0a88
@@ -16445,7 +16572,7 @@ advance_banlist_scroll_column_and_page:
     movs r1,#0x7f    @ 0801ae42 7f21
     ands r0,r1    @ 0801ae44 0840
     lsls r0,r0,#0x2    @ 0801ae46 8000
-    ldr r3, DWORD_0801ae84                   @ 0801ae48 0e4b
+    ldr r3, advance_banlist_scroll_column_and_page_mask_clear_col @ 0801ae48 0e4b
     adds r1,r3,#0x0    @ 0801ae4a 191c
     ands r1,r2    @ 0801ae4c 1140
     orrs r1,r0    @ 0801ae4e 0143
@@ -16454,7 +16581,7 @@ advance_banlist_scroll_column_and_page:
     lsrs r0,r0,#0x19    @ 0801ae54 400e
     cmp r0,#0xf                              @ 0801ae56 0f28
     bne LAB_0801aeba                         @ 0801ae58 2fd1
-    ldr r4, DWORD_0801ae88                   @ 0801ae5a 0b4c
+    ldr r4, advance_banlist_scroll_column_and_page_limit2_off @ 0801ae5a 0b4c
     adds r0,r5,r4    @ 0801ae5c 2819
     .hword 0x4662    @ 0801ae5e 6246
     ldrh r2,[r2,#0x0]                        @ 0801ae60 1288
@@ -16467,18 +16594,18 @@ advance_banlist_scroll_column_and_page:
     strh r1,[r6,#0x0]                        @ 0801ae6e 3180
     movs r0,#0x3    @ 0801ae70 0320
     b LAB_0801aec0                           @ 0801ae72 25e0
-DWORD_0801ae74:
+advance_banlist_scroll_column_and_page_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801ae74 10980202
-DWORD_0801ae78:
-    .word  0x0000066a                     @ 0801ae78 6a060000
-DWORD_0801ae7c:
-    .word  0x0000066b                     @ 0801ae7c 6b060000
-DWORD_0801ae80:
-    .word  0x0000066c                     @ 0801ae80 6c060000
-DWORD_0801ae84:
-    .word  0xfffffe03                     @ 0801ae84 03feffff
-DWORD_0801ae88:
-    .word  0x0000066e                     @ 0801ae88 6e060000
+advance_banlist_scroll_column_and_page_scroll_halfword_off:
+    .word  0x0000066a                     @ 0801ae78 6a060000  cursor halfword
+advance_banlist_scroll_column_and_page_row_byte_off:
+    .word  0x0000066b                     @ 0801ae7c 6b060000  row height byte
+advance_banlist_scroll_column_and_page_limit1_off:
+    .word  0x0000066c                     @ 0801ae80 6c060000  entry count
+advance_banlist_scroll_column_and_page_mask_clear_col:
+    .word  0xfffffe03                     @ 0801ae84 03feffff  mask ~(0x7f<<2): clear scroll column bits
+advance_banlist_scroll_column_and_page_limit2_off:
+    .word  0x0000066e                     @ 0801ae88 6e060000  max count halfword
 LAB_0801ae8c:
     ands r1,r3    @ 0801ae8c 1940
     strh r1,[r6,#0x0]                        @ 0801ae8e 3180
@@ -16521,13 +16648,13 @@ LAB_0801aec0:
 @ Constants: BUF_BASE=gBanlistPasswordBuffer; SCROLL_HALFWORD_OFF=0x66a; ROW_BYTE_OFF=0x66b; COL_WRAP_MASK=0x7f; FIXED_RETREAT_IDX=0x38; MASK_CLEAR_COL=0xfffffe03
 retreat_banlist_scroll_column_and_page:
     push {r4,r5,lr}                          @ 0801aec8 30b5
-    ldr r1, DWORD_0801af04                   @ 0801aeca 0e49
-    ldr r0, DWORD_0801af08                   @ 0801aecc 0e48
+    ldr r1, retreat_banlist_scroll_column_and_page_ptr_gbanlistpasswordbuffer_a @ 0801aeca 0e49
+    ldr r0, retreat_banlist_scroll_column_and_page_scroll_halfword_off @ 0801aecc 0e48
     adds r4,r1,r0    @ 0801aece 0c18
     ldrh r3,[r4,#0x0]                        @ 0801aed0 2388
     lsls r0,r3,#0x17    @ 0801aed2 d805
     lsrs r2,r0,#0x19    @ 0801aed4 420e
-    ldr r0, DWORD_0801af0c                   @ 0801aed6 0d48
+    ldr r0, retreat_banlist_scroll_column_and_page_row_byte_off @ 0801aed6 0d48
     adds r5,r1,r0    @ 0801aed8 0d18
     ldrb r0,[r5,#0x0]                        @ 0801aeda 2878
     lsrs r1,r0,#0x1    @ 0801aedc 4108
@@ -16538,7 +16665,7 @@ retreat_banlist_scroll_column_and_page:
     ble LAB_0801af3c                         @ 0801aee6 29dd
     cmp r2,#0x0                              @ 0801aee8 002a
     bne LAB_0801af24                         @ 0801aeea 1bd1
-    ldr r0, DWORD_0801af10                   @ 0801aeec 0848
+    ldr r0, retreat_banlist_scroll_column_and_page_mask_clear_col_a @ 0801aeec 0848
     ands r0,r3    @ 0801aeee 1840
     movs r1,#0x38    @ 0801aef0 3821
     orrs r0,r1    @ 0801aef2 0843
@@ -16549,14 +16676,14 @@ retreat_banlist_scroll_column_and_page:
     bne LAB_0801af14                         @ 0801aefc 0ad1
     bl retreat_banlist_scrollbar_pos_page    @ 0801aefe fff737fc
     b LAB_0801af20                           @ 0801af02 0de0
-DWORD_0801af04:
+retreat_banlist_scroll_column_and_page_ptr_gbanlistpasswordbuffer_a:
     .word  gBanlistPasswordBuffer         @ 0801af04 10980202
-DWORD_0801af08:
-    .word  0x0000066a                     @ 0801af08 6a060000
-DWORD_0801af0c:
-    .word  0x0000066b                     @ 0801af0c 6b060000
-DWORD_0801af10:
-    .word  0xfffffe03                     @ 0801af10 03feffff
+retreat_banlist_scroll_column_and_page_scroll_halfword_off:
+    .word  0x0000066a                     @ 0801af08 6a060000  cursor halfword
+retreat_banlist_scroll_column_and_page_row_byte_off:
+    .word  0x0000066b                     @ 0801af0c 6b060000  row height byte
+retreat_banlist_scroll_column_and_page_mask_clear_col_a:
+    .word  0xfffffe03                     @ 0801af10 03feffff  mask ~(0x7f<<2): clear scroll column bits
 LAB_0801af14:
     subs r1,#0x1    @ 0801af14 0139
     lsls r1,r1,#0x1    @ 0801af16 4900
@@ -16572,14 +16699,14 @@ LAB_0801af24:
     movs r1,#0x7f    @ 0801af26 7f21
     ands r0,r1    @ 0801af28 0840
     lsls r0,r0,#0x2    @ 0801af2a 8000
-    ldr r1, DWORD_0801af38                   @ 0801af2c 0249
+    ldr r1, retreat_banlist_scroll_column_and_page_mask_clear_col_b @ 0801af2c 0249
     ands r1,r3    @ 0801af2e 1940
     orrs r1,r0    @ 0801af30 0143
     strh r1,[r4,#0x0]                        @ 0801af32 2180
     movs r0,#0x1    @ 0801af34 0120
     b LAB_0801af66                           @ 0801af36 16e0
-DWORD_0801af38:
-    .word  0xfffffe03                     @ 0801af38 03feffff
+retreat_banlist_scroll_column_and_page_mask_clear_col_b:
+    .word  0xfffffe03                     @ 0801af38 03feffff  mask ~(0x7f<<2): clear scroll column bits
 LAB_0801af3c:
     bl get_banlist_scroll_pixel_offset       @ 0801af3c fff7f8fc
     cmp r0,#0x0                              @ 0801af40 0028
@@ -16588,7 +16715,7 @@ LAB_0801af3c:
     b LAB_0801af66                           @ 0801af46 0ee0
 LAB_0801af48:
     bl retreat_banlist_scrollbar_pos_page    @ 0801af48 fff712fc
-    ldr r0, DWORD_0801af6c                   @ 0801af4c 0748
+    ldr r0, retreat_banlist_scroll_column_and_page_mask_clear_col_c @ 0801af4c 0748
     ldrh r1,[r4,#0x0]                        @ 0801af4e 2188
     ands r0,r1    @ 0801af50 0840
     movs r1,#0x38    @ 0801af52 3821
@@ -16605,19 +16732,19 @@ LAB_0801af66:
     pop {r4,r5}                              @ 0801af66 30bc
     pop {r1}                                 @ 0801af68 02bc
     bx r1                                    @ 0801af6a 0847
-DWORD_0801af6c:
-    .word  0xfffffe03                     @ 0801af6c 03feffff
+retreat_banlist_scroll_column_and_page_mask_clear_col_c:
+    .word  0xfffffe03                     @ 0801af6c 03feffff  mask ~(0x7f<<2): clear scroll column bits
 
 @ 禁卡表密码输入场景每帧驱动. 由 0x0801b284 banlist 帧初始化调用. 先读 get_banlist_scroll_direction; 非零跳过. 读 D-pad 位: 上/下键调整 gBanlistPasswordBuffer+0x661 光标位; 左键 advance_banlist_scroll_column_and_page (返回2触发scroll); 右键 retreat 对称. dispatch_banlist_cursor_action 确认; advance_banlist_password_char_and_render 渲染密码; 上限时更新 +0x660 strh 并 sync_state_and_init_sprite; 退格走 tick_banlist_password_backspace_input.
 tick_banlist_password_frame:
     push {r4,r5,lr}                          @ 0801af70 30b5
-    ldr r4, DWORD_0801afac                   @ 0801af72 0e4c
+    ldr r4, tick_banlist_password_frame_ptr_gbanlistpasswordbuffer @ 0801af72 0e4c
     bl get_banlist_scroll_direction          @ 0801af74 fff7eef8
     cmp r0,#0x0                              @ 0801af78 0028
     beq LAB_0801af7e                         @ 0801af7a 00d0
     b LAB_0801b168                           @ 0801af7c f4e0
 LAB_0801af7e:
-    ldr r0, DWORD_0801afb0                   @ 0801af7e 0c48
+    ldr r0, tick_banlist_password_frame_ptr_gprng @ 0801af7e 0c48
     movs r1,#0xa4    @ 0801af80 a421
     lsls r1,r1,#0x1    @ 0801af82 4900
     adds r5,r0,r1    @ 0801af84 4518
@@ -16626,7 +16753,7 @@ LAB_0801af7e:
     ands r0,r1    @ 0801af8a 0840
     cmp r0,#0x0                              @ 0801af8c 0028
     beq LAB_0801afcc                         @ 0801af8e 1dd0
-    ldr r3, DWORD_0801afb4                   @ 0801af90 084b
+    ldr r3, tick_banlist_password_frame_cursor_slot_offset @ 0801af90 084b
     adds r2,r4,r3    @ 0801af92 e218
     ldrb r3,[r2,#0x0]                        @ 0801af94 1378
     lsls r0,r3,#0x1a    @ 0801af96 9806
@@ -16640,12 +16767,12 @@ LAB_0801af7e:
     orrs r0,r1    @ 0801afa6 0843
     strb r0,[r2,#0x0]                        @ 0801afa8 1070
     b LAB_0801b09c                           @ 0801afaa 77e0
-DWORD_0801afac:
+tick_banlist_password_frame_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801afac 10980202
-DWORD_0801afb0:
+tick_banlist_password_frame_ptr_gprng:
     .word  gPrng                          @ 0801afb0 40000003
-DWORD_0801afb4:
-    .word  0x00000661                     @ 0801afb4 61060000
+tick_banlist_password_frame_cursor_slot_offset:
+    .word  0x00000661                     @ 0801afb4 61060000  cursor slot byte
 LAB_0801afb8:
     subs r0,#0x1    @ 0801afb8 0138
 LAB_0801afba:
@@ -16663,7 +16790,7 @@ LAB_0801afcc:
     ands r0,r1    @ 0801afce 0840
     cmp r0,#0x0                              @ 0801afd0 0028
     beq LAB_0801aff6                         @ 0801afd2 10d0
-    ldr r0, DWORD_0801afe8                   @ 0801afd4 0448
+    ldr r0, tick_banlist_password_frame_cursor_slot_offset_b @ 0801afd4 0448
     adds r2,r4,r0    @ 0801afd6 2218
     ldrb r3,[r2,#0x0]                        @ 0801afd8 1378
     lsls r0,r3,#0x1a    @ 0801afda 9806
@@ -16673,8 +16800,8 @@ LAB_0801afcc:
     adds r0,#0x1    @ 0801afe2 0130
     b LAB_0801afba                           @ 0801afe4 e9e7
     .zero  0x2
-DWORD_0801afe8:
-    .word  0x00000661                     @ 0801afe8 61060000
+tick_banlist_password_frame_cursor_slot_offset_b:
+    .word  0x00000661                     @ 0801afe8 61060000  cursor slot byte (second ref)
 LAB_0801afec:
     movs r0,#0x3d    @ 0801afec 3d20
     rsbs r0,r0,#0    @ 0801afee 4042
@@ -16697,13 +16824,13 @@ LAB_0801aff6:
     adds r0,#0x1    @ 0801b00e 0130
     b LAB_0801b04e                           @ 0801b010 1de0
 LAB_0801b012:
-    ldr r0, DWORD_0801b01c                   @ 0801b012 0248
+    ldr r0, tick_banlist_password_frame_mode_clear_a @ 0801b012 0248
     ands r0,r3    @ 0801b014 1840
     strh r0,[r2,#0x0]                        @ 0801b016 1080
     b LAB_0801b09c                           @ 0801b018 40e0
     .zero  0x2
-DWORD_0801b01c:
-    .word  0xfffffc3f                     @ 0801b01c 3ffcffff
+tick_banlist_password_frame_mode_clear_a:
+    .word  NAME_INPUT_MODE_CLEAR          @ 0801b01c 3ffcffff  bits[9:6] clear mask for mode field in gBanlistPasswordBuffer+0x660
 LAB_0801b020:
     movs r0,#0x20    @ 0801b020 2020
     ands r0,r1    @ 0801b022 0840
@@ -16717,7 +16844,7 @@ LAB_0801b020:
     lsrs r0,r0,#0x1c    @ 0801b032 000f
     cmp r0,#0x0                              @ 0801b034 0028
     bne LAB_0801b04c                         @ 0801b036 09d1
-    ldr r0, DWORD_0801b048                   @ 0801b038 0348
+    ldr r0, tick_banlist_password_frame_mode_clear_b @ 0801b038 0348
     ands r0,r3    @ 0801b03a 1840
     movs r3,#0xe0    @ 0801b03c e023
     lsls r3,r3,#0x2    @ 0801b03e 9b00
@@ -16725,22 +16852,22 @@ LAB_0801b020:
     orrs r0,r1    @ 0801b042 0843
     strh r0,[r2,#0x0]                        @ 0801b044 1080
     b LAB_0801b09c                           @ 0801b046 29e0
-DWORD_0801b048:
-    .word  0xfffffc3f                     @ 0801b048 3ffcffff
+tick_banlist_password_frame_mode_clear_b:
+    .word  NAME_INPUT_MODE_CLEAR          @ 0801b048 3ffcffff
 LAB_0801b04c:
     subs r0,#0x1    @ 0801b04c 0138
 LAB_0801b04e:
     movs r1,#0xf    @ 0801b04e 0f21
     ands r0,r1    @ 0801b050 0840
     lsls r0,r0,#0x6    @ 0801b052 8001
-    ldr r1, DWORD_0801b060                   @ 0801b054 0249
+    ldr r1, tick_banlist_password_frame_mode_clear_c @ 0801b054 0249
     ands r1,r3    @ 0801b056 1940
     orrs r1,r0    @ 0801b058 0143
     strh r1,[r2,#0x0]                        @ 0801b05a 1180
     b LAB_0801b09c                           @ 0801b05c 1ee0
     .zero  0x2
-DWORD_0801b060:
-    .word  0xfffffc3f                     @ 0801b060 3ffcffff
+tick_banlist_password_frame_mode_clear_c:
+    .word  NAME_INPUT_MODE_CLEAR          @ 0801b060 3ffcffff
 LAB_0801b064:
     movs r0,#0x80    @ 0801b064 8020
     lsls r0,r0,#0x1    @ 0801b066 4000
@@ -16795,9 +16922,9 @@ LAB_0801b0ca:
     rsbs r0,r0,#0    @ 0801b0cc 4042
     bl tick_banlist_scroll_input_handler     @ 0801b0ce fef789ff
 LAB_0801b0d2:
-    ldr r0, DWORD_0801b114                   @ 0801b0d2 1048
+    ldr r0, tick_banlist_password_frame_limit1_offset @ 0801b0d2 1048
     adds r1,r4,r0    @ 0801b0d4 2118
-    ldr r2, DWORD_0801b118                   @ 0801b0d6 104a
+    ldr r2, tick_banlist_password_frame_limit2_offset @ 0801b0d6 104a
     adds r0,r4,r2    @ 0801b0d8 a018
     ldrh r1,[r1,#0x0]                        @ 0801b0da 0988
     ldrh r0,[r0,#0x0]                        @ 0801b0dc 0088
@@ -16806,7 +16933,7 @@ LAB_0801b0d2:
     movs r3,#0xcc    @ 0801b0e2 cc23
     lsls r3,r3,#0x3    @ 0801b0e4 db00
     adds r2,r4,r3    @ 0801b0e6 e218
-    ldr r0, DWORD_0801b11c                   @ 0801b0e8 0c48
+    ldr r0, tick_banlist_password_frame_mode_clear_d @ 0801b0e8 0c48
     ldrh r1,[r2,#0x0]                        @ 0801b0ea 1188
     ands r0,r1    @ 0801b0ec 0840
     movs r3,#0xe0    @ 0801b0ee e023
@@ -16814,7 +16941,7 @@ LAB_0801b0d2:
     adds r1,r3,#0x0    @ 0801b0f2 191c
     orrs r0,r1    @ 0801b0f4 0843
     strh r0,[r2,#0x0]                        @ 0801b0f6 1080
-    ldr r0, DWORD_0801b120                   @ 0801b0f8 0948
+    ldr r0, tick_banlist_password_frame_cursor_slot_offset_c @ 0801b0f8 0948
     adds r2,r4,r0    @ 0801b0fa 2218
     movs r0,#0x3d    @ 0801b0fc 3d20
     rsbs r0,r0,#0    @ 0801b0fe 4042
@@ -16828,14 +16955,14 @@ LAB_0801b10a:
     bl sync_state_and_init_sprite            @ 0801b10c def0d2fc
     b LAB_0801b168                           @ 0801b110 2ae0
     .zero  0x2
-DWORD_0801b114:
-    .word  0x0000066c                     @ 0801b114 6c060000
-DWORD_0801b118:
-    .word  0x0000066e                     @ 0801b118 6e060000
-DWORD_0801b11c:
-    .word  0xfffffc3f                     @ 0801b11c 3ffcffff
-DWORD_0801b120:
-    .word  0x00000661                     @ 0801b120 61060000
+tick_banlist_password_frame_limit1_offset:
+    .word  0x0000066c                     @ 0801b114 6c060000  entry count halfword
+tick_banlist_password_frame_limit2_offset:
+    .word  0x0000066e                     @ 0801b118 6e060000  max count halfword
+tick_banlist_password_frame_mode_clear_d:
+    .word  NAME_INPUT_MODE_CLEAR          @ 0801b11c 3ffcffff
+tick_banlist_password_frame_cursor_slot_offset_c:
+    .word  0x00000661                     @ 0801b120 61060000  cursor slot byte (third ref)
 LAB_0801b124:
     movs r0,#0x2    @ 0801b124 0220
     ands r0,r1    @ 0801b126 0840
@@ -16851,7 +16978,7 @@ LAB_0801b132:
     movs r3,#0xcc    @ 0801b13a cc23
     lsls r3,r3,#0x3    @ 0801b13c db00
     adds r2,r4,r3    @ 0801b13e e218
-    ldr r0, DWORD_0801b170                   @ 0801b140 0b48
+    ldr r0, tick_banlist_password_frame_mode_clear_e @ 0801b140 0b48
     ldrh r1,[r2,#0x0]                        @ 0801b142 1188
     ands r0,r1    @ 0801b144 0840
     movs r3,#0xe0    @ 0801b146 e023
@@ -16859,7 +16986,7 @@ LAB_0801b132:
     adds r1,r3,#0x0    @ 0801b14a 191c
     orrs r0,r1    @ 0801b14c 0843
     strh r0,[r2,#0x0]                        @ 0801b14e 1080
-    ldr r0, DWORD_0801b174                   @ 0801b150 0848
+    ldr r0, tick_banlist_password_frame_cursor_slot_offset_d @ 0801b150 0848
     adds r2,r4,r0    @ 0801b152 2218
     movs r0,#0x3d    @ 0801b154 3d20
     rsbs r0,r0,#0    @ 0801b156 4042
@@ -16875,12 +17002,12 @@ LAB_0801b168:
     pop {r0}                                 @ 0801b16a 01bc
     bx r0                                    @ 0801b16c 0047
     .zero  0x2
-DWORD_0801b170:
-    .word  0xfffffc3f                     @ 0801b170 3ffcffff
-DWORD_0801b174:
-    .word  0x00000661                     @ 0801b174 61060000
+tick_banlist_password_frame_mode_clear_e:
+    .word  NAME_INPUT_MODE_CLEAR          @ 0801b170 3ffcffff
+tick_banlist_password_frame_cursor_slot_offset_d:
+    .word  0x00000661                     @ 0801b174 61060000  cursor slot byte (fourth ref)
 
-@ Function: Calls tick_palette_fade_to_oam_palram with fixed banlist palette parameters. Fade target is OAM palette RAM (0x05000202); source data from gBanlistPasswordBuffer+0x630 (palette snapshot); reference data from gBanlistPasswordBuffer+0x676; step count 2. Called each frame by FUN_0801b1a0 during banlist scene frame update.
+@ Function: Calls tick_palette_fade_to_oam_palram with fixed banlist palette parameters. Fade target is OAM palette RAM (0x05000202); source data from gBanlistPasswordBuffer+0x630 (palette snapshot); reference data from gBanlistPasswordBuffer+0x676; step count 2. Called each frame by tick_banlist_card_slot_anim_primary during banlist scene frame update.
 @ Side effects: OAM palette RAM [0x05000202..]: tick_palette_fade_to_oam_palram writes faded palette data.
 @ Constants:
 @   PAL_SNAPSHOT_OFFSET = 0xc6<<3 = 0x630 // gBanlistPasswordBuffer palette snapshot offset
@@ -16889,24 +17016,24 @@ DWORD_0801b174:
 @   FADE_STEPS = 0x2 // fade steps per frame
 tick_banlist_oam_palette_fade:
     push {lr}                                @ 0801b178 00b5
-    ldr r3, DWORD_0801b194                   @ 0801b17a 064b
+    ldr r3, tick_banlist_oam_palette_fade_ptr_gbanlistpasswordbuffer @ 0801b17a 064b
     movs r1,#0xc6    @ 0801b17c c621
     lsls r1,r1,#0x3    @ 0801b17e c900
     adds r0,r3,r1    @ 0801b180 5818
-    ldr r1, DWORD_0801b198                   @ 0801b182 0549
-    ldr r2, DWORD_0801b19c                   @ 0801b184 054a
+    ldr r1, tick_banlist_oam_palette_fade_oam_palram_plus2 @ 0801b182 0549
+    ldr r2, tick_banlist_oam_palette_fade_ref_palette_offset @ 0801b184 054a
     adds r3,r3,r2    @ 0801b186 9b18
     movs r2,#0x2    @ 0801b188 0222
     bl tick_palette_fade_to_oam_palram       @ 0801b18a faf791f8
     pop {r0}                                 @ 0801b18e 01bc
     bx r0                                    @ 0801b190 0047
     .zero  0x2
-DWORD_0801b194:
+tick_banlist_oam_palette_fade_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b194 10980202
-DWORD_0801b198:
-    .word  0x05000202                     @ 0801b198 02020005
-DWORD_0801b19c:
-    .word  0x00000676                     @ 0801b19c 76060000
+tick_banlist_oam_palette_fade_oam_palram_plus2:
+    .word  0x05000202                     @ 0801b198 02020005  OBJ PALRAM+2 (sprite palette 1 entry 1) = 0x05000202
+tick_banlist_oam_palette_fade_ref_palette_offset:
+    .word  0x00000676                     @ 0801b19c 76060000  reference palette offset in gBanlistPasswordBuffer
 
 @ Banlist primary card slot animation tick. Reads gBanlistPasswordBuffer+0x660 halfword bits[13:10] as state_mode (4-bit [0..0xe]) and bits[5:2] from +0x661 as cursor_slot (4-bit [0..5]); computes OAM y offset (mode*14*2+0x48) and x (cursor_slot*14*2). Special case: state_mode==0xe and cursor_slot==5 uses fixed y=0x90, x=0xc8, count=9. Calls call_tick_banlist_card_slot_anim(r0=0, r1=count, r2=x, r3=y, sp[0]=0, sp[4]=0xe) to drive primary slot animation; then calls tick_banlist_oam_palette_fade. Returns void (Pattern B: pop {r0}; bx r0). Called each frame by 0x0801b284.
 @ 
@@ -16917,7 +17044,7 @@ DWORD_0801b19c:
 tick_banlist_card_slot_anim_primary:
     push {r4,r5,lr}                          @ 0801b1a0 30b5
     sub sp,#0x8                              @ 0801b1a2 82b0
-    ldr r1, DWORD_0801b1e0                   @ 0801b1a4 0e49
+    ldr r1, tick_banlist_card_slot_anim_primary_ptr_gbanlistpasswordbuffer @ 0801b1a4 0e49
     movs r5,#0x8    @ 0801b1a6 0825
     movs r2,#0xcc    @ 0801b1a8 cc22
     lsls r2,r2,#0x3    @ 0801b1aa d200
@@ -16928,7 +17055,7 @@ tick_banlist_card_slot_anim_primary:
     lsls r0,r2,#0x3    @ 0801b1b4 d000
     subs r0,r0,r2    @ 0801b1b6 801a
     lsls r3,r0,#0x1    @ 0801b1b8 4300
-    ldr r0, DWORD_0801b1e4                   @ 0801b1ba 0a48
+    ldr r0, tick_banlist_card_slot_anim_primary_cursor_slot_offset @ 0801b1ba 0a48
     adds r1,r1,r0    @ 0801b1bc 0918
     ldrb r1,[r1,#0x0]                        @ 0801b1be 0978
     lsls r0,r1,#0x1a    @ 0801b1c0 8806
@@ -16947,10 +17074,10 @@ tick_banlist_card_slot_anim_primary:
     movs r4,#0x90    @ 0801b1da 9024
     b LAB_0801b1ec                           @ 0801b1dc 06e0
     .zero  0x2
-DWORD_0801b1e0:
+tick_banlist_card_slot_anim_primary_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b1e0 10980202
-DWORD_0801b1e4:
-    .word  0x00000661                     @ 0801b1e4 61060000
+tick_banlist_card_slot_anim_primary_cursor_slot_offset:
+    .word  0x00000661                     @ 0801b1e4 61060000  cursor slot byte
 LAB_0801b1e8:
     movs r5,#0xa    @ 0801b1e8 0a25
     adds r3,#0x4    @ 0801b1ea 0433
@@ -16979,8 +17106,8 @@ LAB_0801b1ec:
 tick_banlist_card_slot_anim_secondary:
     push {r4,r5,r6,lr}                       @ 0801b20c 70b5
     sub sp,#0x8                              @ 0801b20e 82b0
-    ldr r1, DWORD_0801b25c                   @ 0801b210 1249
-    ldr r2, DWORD_0801b260                   @ 0801b212 134a
+    ldr r1, tick_banlist_card_slot_anim_secondary_ptr_gbanlistpasswordbuffer @ 0801b210 1249
+    ldr r2, tick_banlist_card_slot_anim_secondary_scroll_halfword_off @ 0801b212 134a
     adds r0,r1,r2    @ 0801b214 8818
     ldrh r0,[r0,#0x0]                        @ 0801b216 0088
     lsls r0,r0,#0x17    @ 0801b218 c005
@@ -17015,10 +17142,10 @@ tick_banlist_card_slot_anim_secondary:
     pop {r0}                                 @ 0801b256 01bc
     bx r0                                    @ 0801b258 0047
     .zero  0x2
-DWORD_0801b25c:
+tick_banlist_card_slot_anim_secondary_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b25c 10980202
-DWORD_0801b260:
-    .word  0x0000066a                     @ 0801b260 6a060000
+tick_banlist_card_slot_anim_secondary_scroll_halfword_off:
+    .word  0x0000066a                     @ 0801b260 6a060000  cursor halfword
 
 @ Function: Calls gl_fade_out to start global fade-out effect, then sets bit2 (value 0x4) at gBanlistPasswordBuffer+0x660, marking banlist scene exit state. This bit2 flag is checked by the upper scene frame loop to decide scene-switch timing. callgraph has no direct callers (indeg=0 from direct bl; called indirectly via function pointer table).
 @ Side effects:
@@ -17029,7 +17156,7 @@ DWORD_0801b260:
 @   EXIT_FLAG_BIT = 0x4 = bit2 // scene exit flag bit
 trigger_banlist_fade_out_exit:
     push {r4,lr}                             @ 0801b264 10b5
-    ldr r4, DWORD_0801b280                   @ 0801b266 064c
+    ldr r4, trigger_banlist_fade_out_exit_ptr_gbanlistpasswordbuffer @ 0801b266 064c
     bl gl_fade_out                           @ 0801b268 f9f73afb
     movs r0,#0xcc    @ 0801b26c cc20
     lsls r0,r0,#0x3    @ 0801b26e c000
@@ -17041,16 +17168,21 @@ trigger_banlist_fade_out_exit:
     pop {r4}                                 @ 0801b27a 10bc
     pop {r0}                                 @ 0801b27c 01bc
     bx r0                                    @ 0801b27e 0047
-DWORD_0801b280:
+trigger_banlist_fade_out_exit_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b280 10980202
 
-@ 禁卡密码输入场景每帧 OAM+卡槽动画驱动. 由 FUN_0801b5d8 banlist 帧 tick state==0 分支调用. tick_banlist_password_frame 处理按键; call_tick_banlist_card_slot_anim 5 次刷新 slot OAM; 读 gState+0x6c2c bits[0..2] 修正 y 偏移; call_setup_banlist_sprite_oam_row x2 建立 sprite 行; tick_banlist_card_slot_anim_primary/secondary+scrollbar_and_slot_anim 完成帧刷新. void.
+@ @ tick_banlist_oam_and_card_slots: Banlist scene per-frame OAM and card slot driver.
+@ @ Called by tick_banlist_scene_frame when bits[7:6] of gBanlistPasswordBuffer+0x662 == 0.
+@ @ Calls tick_banlist_password_frame; then 5x call_tick_banlist_card_slot_anim for fixed
+@ @ OAM slots; reads gSettings encoding flag to compute y-offset bias; 2x
+@ @ call_setup_banlist_sprite_oam_row; calls tick_banlist_card_slot_anim_primary/secondary +
+@ @ tick_banlist_scrollbar_and_slot_anim. Returns void (Pattern B).
 tick_banlist_oam_and_card_slots:
     push {r4,r5,r6,r7,lr}                    @ 0801b284 f0b5
     .hword 0x4647    @ 0801b286 4746
     push {r7}                                @ 0801b288 80b4
     sub sp,#0xc                              @ 0801b28a 83b0
-    ldr r0, DWORD_0801b354                   @ 0801b28c 3148
+    ldr r0, tick_banlist_oam_and_card_slots_ptr_gbanlistpasswordbuffer @ 0801b28c 3148
     .hword 0x4680    @ 0801b28e 8046
     bl tick_banlist_password_frame           @ 0801b290 fff76efe
     movs r6,#0x0    @ 0801b294 0026
@@ -17091,8 +17223,8 @@ tick_banlist_oam_and_card_slots:
     movs r3,#0x90    @ 0801b2e2 9023
     bl call_tick_banlist_card_slot_anim      @ 0801b2e4 fff72cf9
     movs r7,#0x0    @ 0801b2e8 0027
-    ldr r1, DWORD_0801b358                   @ 0801b2ea 1b49
-    ldr r0, DWORD_0801b35c                   @ 0801b2ec 1b48
+    ldr r1, tick_banlist_oam_and_card_slots_ewram_base @ 0801b2ea 1b49
+    ldr r0, tick_banlist_oam_and_card_slots_gsettings_offset @ 0801b2ec 1b48
     adds r1,r1,r0    @ 0801b2ee 0918
     movs r0,#0x7    @ 0801b2f0 0720
     ldrb r1,[r1,#0x0]                        @ 0801b2f2 0978
@@ -17103,7 +17235,7 @@ tick_banlist_oam_and_card_slots:
 LAB_0801b2fc:
     movs r0,#0x9c    @ 0801b2fc 9c20
     lsls r0,r0,#0x1    @ 0801b2fe 4000
-    ldr r1, DWORD_0801b360                   @ 0801b300 1749
+    ldr r1, tick_banlist_oam_and_card_slots_sprite_y_offset_a @ 0801b300 1749
     add r1,r8                                @ 0801b302 4144
     ldrb r1,[r1,#0x0]                        @ 0801b304 0978
     lsrs r1,r1,#0x1    @ 0801b306 4908
@@ -17118,7 +17250,7 @@ LAB_0801b2fc:
     bl call_setup_banlist_sprite_oam_row     @ 0801b318 fff7baf9
     movs r0,#0x96    @ 0801b31c 9620
     lsls r0,r0,#0x1    @ 0801b31e 4000
-    ldr r1, DWORD_0801b364                   @ 0801b320 1049
+    ldr r1, tick_banlist_oam_and_card_slots_sprite_y_offset_b @ 0801b320 1049
     add r1,r8                                @ 0801b322 4144
     ldrb r1,[r1,#0x0]                        @ 0801b324 0978
     lsrs r1,r1,#0x1    @ 0801b326 4908
@@ -17140,16 +17272,16 @@ LAB_0801b2fc:
     pop {r0}                                 @ 0801b34e 01bc
     bx r0                                    @ 0801b350 0047
     .zero  0x2
-DWORD_0801b354:
+tick_banlist_oam_and_card_slots_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b354 10980202
-DWORD_0801b358:
-    .word  0x02000000                     @ 0801b358 00000002
-DWORD_0801b35c:
+tick_banlist_oam_and_card_slots_ewram_base:
+    .word  EWRAM_BASE                     @ 0801b358 00000002
+tick_banlist_oam_and_card_slots_gsettings_offset:
     .word  0x00006c2c                     @ 0801b35c 2c6c0000
-DWORD_0801b360:
-    .word  0x00000674                     @ 0801b360 74060000
-DWORD_0801b364:
-    .word  0x00000675                     @ 0801b364 75060000
+tick_banlist_oam_and_card_slots_sprite_y_offset_a:
+    .word  0x00000674                     @ 0801b360 74060000  sprite row Y param byte A
+tick_banlist_oam_and_card_slots_sprite_y_offset_b:
+    .word  0x00000675                     @ 0801b364 75060000  sprite row Y param byte B
 
 @ Banlist password input scroll view frame tick. Reads gBanlistPasswordBuffer+0x665 byte bits[7:4] as view_state [0..2] and dispatches three ways: state==0: calls zero_obj_tile_vram_range+render_banlist_char_obj_row to render character row, writes gBanlistPasswordBuffer+0x672/0x673 and calls gl_set_blend2_level; state==1: calls tick_banlist_card_slot_anim_oam+setup_banlist_sprite_oam_row_batch to drive OAM animation row; state==2: checks gPrng state random bit, if satisfied calls gl_set_blend2_level+sync_state_and_init_sprite(0x24), then tick_banlist_card_slot_anim_oam+setup_banlist_sprite_oam_row_batch. Returns void (Pattern B). Called by 0x0801b5d8 (banlist scene main frame tick) on state==1 branch.
 @ 
@@ -17164,11 +17296,11 @@ tick_banlist_scroll_view_by_state:
     .hword 0x4645    @ 0801b36e 4546
     push {r5,r6,r7}                          @ 0801b370 e0b4
     sub sp,#0x20                             @ 0801b372 88b0
-    ldr r6, DWORD_0801b3b8                   @ 0801b374 104e
+    ldr r6, tick_banlist_scroll_view_by_state_ptr_gbanlistpasswordbuffer @ 0801b374 104e
     movs r0,#0x14    @ 0801b376 1420
     .hword 0x4682    @ 0801b378 8246
-    ldr r0, DWORD_0801b3bc                   @ 0801b37a 1048
-    ldr r1, DWORD_0801b3c0                   @ 0801b37c 1049
+    ldr r0, tick_banlist_scroll_view_by_state_ewram_base @ 0801b37a 1048
+    ldr r1, tick_banlist_scroll_view_by_state_gsettings_offset @ 0801b37c 1049
     adds r1,r1,r0    @ 0801b37e 0918
     .hword 0x4688    @ 0801b380 8846
     movs r7,#0x7    @ 0801b382 0727
@@ -17183,11 +17315,11 @@ tick_banlist_scroll_view_by_state:
     movs r0,#0x2    @ 0801b394 0220
     .hword 0x4681    @ 0801b396 8146
 LAB_0801b398:
-    ldr r1, DWORD_0801b3c4                   @ 0801b398 0a49
+    ldr r1, tick_banlist_scroll_view_by_state_ptr_anim_params @ 0801b398 0a49
     add r0,sp,#0x18                          @ 0801b39a 06a8
     movs r2,#0x6    @ 0801b39c 0622
     bl memcpy                                @ 0801b39e f3f0ddfa
-    ldr r1, DWORD_0801b3c8                   @ 0801b3a2 0949
+    ldr r1, tick_banlist_scroll_view_by_state_view_state_offset @ 0801b3a2 0949
     adds r3,r6,r1    @ 0801b3a4 7318
     ldrb r2,[r3,#0x0]                        @ 0801b3a6 1a78
     lsrs r4,r2,#0x4    @ 0801b3a8 1409
@@ -17198,16 +17330,16 @@ LAB_0801b398:
     cmp r4,#0x0                              @ 0801b3b2 002c
     beq LAB_0801b3d4                         @ 0801b3b4 0ed0
     b LAB_0801b5b6                           @ 0801b3b6 fee0
-DWORD_0801b3b8:
+tick_banlist_scroll_view_by_state_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b3b8 10980202
-DWORD_0801b3bc:
-    .word  0x02000000                     @ 0801b3bc 00000002
-DWORD_0801b3c0:
+tick_banlist_scroll_view_by_state_ewram_base:
+    .word  EWRAM_BASE                     @ 0801b3bc 00000002
+tick_banlist_scroll_view_by_state_gsettings_offset:
     .word  0x00006c2c                     @ 0801b3c0 2c6c0000
-DWORD_0801b3c4:
-    .word  0x09e3c6ab                     @ 0801b3c4 abc6e309
-DWORD_0801b3c8:
-    .word  0x00000665                     @ 0801b3c8 65060000
+tick_banlist_scroll_view_by_state_ptr_anim_params:
+    .word  banlist_scroll_view_anim_params @ 0801b3c4 abc6e309
+tick_banlist_scroll_view_by_state_view_state_offset:
+    .word  0x00000665                     @ 0801b3c8 65060000  view_state byte offset bits[7:4]
 LAB_0801b3cc:
     cmp r4,#0x2                              @ 0801b3cc 022c
     bne LAB_0801b3d2                         @ 0801b3ce 00d1
@@ -17219,9 +17351,9 @@ LAB_0801b3d4:
     lsls r0,r0,#0x1    @ 0801b3d6 4000
     movs r1,#0x90    @ 0801b3d8 9021
     bl zero_obj_tile_vram_range              @ 0801b3da fff783f9
-    ldr r0, DWORD_0801b428                   @ 0801b3de 1248
+    ldr r0, tick_banlist_scroll_view_by_state_game_str_id @ 0801b3de 1248
     bl game_str_id_to_row                    @ 0801b3e0 d9f01afd
-    ldr r3, DWORD_0801b42c                   @ 0801b3e4 114b
+    ldr r3, tick_banlist_scroll_view_by_state_ptr_game_str_pointer_table @ 0801b3e4 114b
     lsls r0,r0,#0x10    @ 0801b3e6 0004
     lsrs r0,r0,#0x10    @ 0801b3e8 000c
     lsls r1,r0,#0x1    @ 0801b3ea 4100
@@ -17235,7 +17367,7 @@ LAB_0801b3d4:
     lsls r1,r1,#0x2    @ 0801b3fa 8900
     adds r1,r1,r3    @ 0801b3fc c918
     ldr r1,[r1,#0x0]                         @ 0801b3fe 0968
-    ldr r0, DWORD_0801b430                   @ 0801b400 0b48
+    ldr r0, tick_banlist_scroll_view_by_state_ptr_game_str_ja @ 0801b400 0b48
     adds r5,r1,r0    @ 0801b402 0d18
     adds r0,r7,#0x0    @ 0801b404 381c
     ands r0,r2    @ 0801b406 1040
@@ -17254,11 +17386,11 @@ LAB_0801b3d4:
     adds r0,r0,r1    @ 0801b422 4018
     b LAB_0801b43a                           @ 0801b424 09e0
     .zero  0x2
-DWORD_0801b428:
-    .word  0x0000103a                     @ 0801b428 3a100000
-DWORD_0801b42c:
+tick_banlist_scroll_view_by_state_game_str_id:
+    .word  0x0000103a                     @ 0801b428 3a100000  game string ID 0x103a
+tick_banlist_scroll_view_by_state_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0801b42c 400f0008
-DWORD_0801b430:
+tick_banlist_scroll_view_by_state_ptr_game_str_ja:
     .word  game_str_ja                    @ 0801b430 109cdb09
 LAB_0801b434:
     lsls r0,r1,#0x1    @ 0801b434 4800
@@ -17267,15 +17399,15 @@ LAB_0801b434:
 LAB_0801b43a:
     movs r1,#0x5c    @ 0801b43a 5c21
     subs r1,r1,r0    @ 0801b43c 091a
-    ldr r3, DWORD_0801b448                   @ 0801b43e 024b
+    ldr r3, tick_banlist_scroll_view_by_state_state_mode_incr_off_a @ 0801b43e 024b
     adds r0,r6,r3    @ 0801b440 f018
     strb r1,[r0,#0x0]                        @ 0801b442 0170
     b LAB_0801b452                           @ 0801b444 05e0
     .zero  0x2
-DWORD_0801b448:
-    .word  0x00000673                     @ 0801b448 73060000
+tick_banlist_scroll_view_by_state_state_mode_incr_off_a:
+    .word  0x00000673                     @ 0801b448 73060000  view sub-state offset byte
 LAB_0801b44c:
-    ldr r1, DWORD_0801b490                   @ 0801b44c 1049
+    ldr r1, tick_banlist_scroll_view_by_state_state_mode_incr_off_b @ 0801b44c 1049
     adds r0,r6,r1    @ 0801b44e 7018
     strb r4,[r0,#0x0]                        @ 0801b450 0470
 LAB_0801b452:
@@ -17287,7 +17419,7 @@ LAB_0801b452:
     movs r2,#0x18    @ 0801b45c 1822
     movs r3,#0x6    @ 0801b45e 0623
     bl render_banlist_char_obj_row           @ 0801b460 fff728f9
-    ldr r2, DWORD_0801b494                   @ 0801b464 0b4a
+    ldr r2, tick_banlist_scroll_view_by_state_blend_ctr_offset_a @ 0801b464 0b4a
     adds r1,r6,r2    @ 0801b466 b118
     movs r0,#0x8    @ 0801b468 0820
     strb r0,[r1,#0x0]                        @ 0801b46a 0870
@@ -17296,7 +17428,7 @@ LAB_0801b452:
     movs r0,#0x2f    @ 0801b470 2f20
     movs r2,#0x8    @ 0801b472 0822
     bl gl_set_blend2_level                   @ 0801b474 f9f7b0f9
-    ldr r0, DWORD_0801b498                   @ 0801b478 0748
+    ldr r0, tick_banlist_scroll_view_by_state_view_state_offset_b @ 0801b478 0748
     adds r3,r6,r0    @ 0801b47a 3318
     ldrb r2,[r3,#0x0]                        @ 0801b47c 1a78
     lsrs r1,r2,#0x4    @ 0801b47e 1109
@@ -17308,15 +17440,15 @@ LAB_0801b452:
     strb r0,[r3,#0x0]                        @ 0801b48a 1870
     b LAB_0801b5b6                           @ 0801b48c 93e0
     .zero  0x2
-DWORD_0801b490:
-    .word  0x00000673                     @ 0801b490 73060000
-DWORD_0801b494:
-    .word  0x00000672                     @ 0801b494 72060000
-DWORD_0801b498:
-    .word  0x00000665                     @ 0801b498 65060000
+tick_banlist_scroll_view_by_state_state_mode_incr_off_b:
+    .word  0x00000673                     @ 0801b490 73060000  view sub-state offset byte
+tick_banlist_scroll_view_by_state_blend_ctr_offset_a:
+    .word  0x00000672                     @ 0801b494 72060000  blend counter byte offset
+tick_banlist_scroll_view_by_state_view_state_offset_b:
+    .word  0x00000665                     @ 0801b498 65060000  view_state byte offset
 LAB_0801b49c:
     movs r5,#0x0    @ 0801b49c 0025
-    ldr r0, DWORD_0801b4c4                   @ 0801b49e 0948
+    ldr r0, tick_banlist_scroll_view_by_state_blend_ctr_offset_b @ 0801b49e 0948
     adds r1,r6,r0    @ 0801b4a0 3118
     ldrb r0,[r1,#0x0]                        @ 0801b4a2 0878
     cmp r0,#0x0                              @ 0801b4a4 0028
@@ -17336,8 +17468,8 @@ LAB_0801b4be:
     asrs r5,r0,#0x3    @ 0801b4be c510
     b LAB_0801b4d2                           @ 0801b4c0 07e0
     .zero  0x2
-DWORD_0801b4c4:
-    .word  0x00000672                     @ 0801b4c4 72060000
+tick_banlist_scroll_view_by_state_blend_ctr_offset_b:
+    .word  0x00000672                     @ 0801b4c4 72060000  blend counter byte offset
 LAB_0801b4c8:
     movs r0,#0xf    @ 0801b4c8 0f20
     ands r0,r2    @ 0801b4ca 1040
@@ -17345,8 +17477,8 @@ LAB_0801b4c8:
     orrs r0,r1    @ 0801b4ce 0843
     strb r0,[r3,#0x0]                        @ 0801b4d0 1870
 LAB_0801b4d2:
-    ldr r0, DWORD_0801b52c                   @ 0801b4d2 1648
-    ldr r1, DWORD_0801b530                   @ 0801b4d4 1649
+    ldr r0, tick_banlist_scroll_view_by_state_ewram_base_b @ 0801b4d2 1648
+    ldr r1, tick_banlist_scroll_view_by_state_gsettings_offset_b @ 0801b4d4 1649
     adds r0,r0,r1    @ 0801b4d6 4018
     ldrb r0,[r0,#0x0]                        @ 0801b4d8 0078
     lsls r0,r0,#0x1d    @ 0801b4da 4007
@@ -17367,7 +17499,7 @@ LAB_0801b4d2:
     bl tick_banlist_card_slot_anim_oam       @ 0801b4f8 fef7d0ff
     movs r0,#0xa2    @ 0801b4fc a220
     lsls r0,r0,#0x1    @ 0801b4fe 4000
-    ldr r3, DWORD_0801b534                   @ 0801b500 0c4b
+    ldr r3, tick_banlist_scroll_view_by_state_state_mode_incr_off_c @ 0801b500 0c4b
     adds r1,r6,r3    @ 0801b502 f118
     ldrb r1,[r1,#0x0]                        @ 0801b504 0978
     adds r1,#0x8    @ 0801b506 0831
@@ -17388,18 +17520,18 @@ LAB_0801b4d2:
     movs r3,#0x18    @ 0801b524 1823
     bl setup_banlist_sprite_oam_row_batch    @ 0801b526 fff71bf8
     b LAB_0801b5b6                           @ 0801b52a 44e0
-DWORD_0801b52c:
-    .word  0x02000000                     @ 0801b52c 00000002
-DWORD_0801b530:
+tick_banlist_scroll_view_by_state_ewram_base_b:
+    .word  EWRAM_BASE                     @ 0801b52c 00000002
+tick_banlist_scroll_view_by_state_gsettings_offset_b:
     .word  0x00006c2c                     @ 0801b530 2c6c0000
-DWORD_0801b534:
-    .word  0x00000673                     @ 0801b534 73060000
+tick_banlist_scroll_view_by_state_state_mode_incr_off_c:
+    .word  0x00000673                     @ 0801b534 73060000  view sub-state offset byte
 LAB_0801b538:
-    ldr r1, DWORD_0801b5c8                   @ 0801b538 2349
+    ldr r1, tick_banlist_scroll_view_by_state_ptr_gprng @ 0801b538 2349
     movs r0,#0xa4    @ 0801b53a a420
     lsls r0,r0,#0x1    @ 0801b53c 4000
     adds r1,r1,r0    @ 0801b53e 0918
-    ldr r0, DWORD_0801b5cc                   @ 0801b540 2248
+    ldr r0, tick_banlist_scroll_view_by_state_prng_rng_mask @ 0801b540 2248
     ldrh r1,[r1,#0x0]                        @ 0801b542 0988
     ands r0,r1    @ 0801b544 0840
     cmp r0,#0x0                              @ 0801b546 0028
@@ -17407,7 +17539,7 @@ LAB_0801b538:
     movs r0,#0xf    @ 0801b54a 0f20
     ands r0,r2    @ 0801b54c 1040
     strb r0,[r3,#0x0]                        @ 0801b54e 1870
-    ldr r2, DWORD_0801b5d0                   @ 0801b550 1f4a
+    ldr r2, tick_banlist_scroll_view_by_state_scene_state_offset_a @ 0801b550 1f4a
     adds r1,r6,r2    @ 0801b552 b118
     movs r0,#0x3f    @ 0801b554 3f20
     ldrb r3,[r1,#0x0]                        @ 0801b556 0b78
@@ -17439,7 +17571,7 @@ LAB_0801b56c:
     bl tick_banlist_card_slot_anim_oam       @ 0801b58c fef786ff
     movs r0,#0xa2    @ 0801b590 a220
     lsls r0,r0,#0x1    @ 0801b592 4000
-    ldr r2, DWORD_0801b5d4                   @ 0801b594 0f4a
+    ldr r2, tick_banlist_scroll_view_by_state_state_mode_incr_off_d @ 0801b594 0f4a
     adds r1,r6,r2    @ 0801b596 b118
     ldrb r1,[r1,#0x0]                        @ 0801b598 0978
     adds r1,#0x1a    @ 0801b59a 1a31
@@ -17465,14 +17597,14 @@ LAB_0801b5b6:
     pop {r0}                                 @ 0801b5c2 01bc
     bx r0                                    @ 0801b5c4 0047
     .zero  0x2
-DWORD_0801b5c8:
+tick_banlist_scroll_view_by_state_ptr_gprng:
     .word  gPrng                          @ 0801b5c8 40000003
-DWORD_0801b5cc:
-    .word  0x0000030f                     @ 0801b5cc 0f030000
-DWORD_0801b5d0:
-    .word  0x00000662                     @ 0801b5d0 62060000
-DWORD_0801b5d4:
-    .word  0x00000673                     @ 0801b5d4 73060000
+tick_banlist_scroll_view_by_state_prng_rng_mask:
+    .word  0x0000030f                     @ 0801b5cc 0f030000  gPrng random state mask bits[9:0]+bits[3:0]
+tick_banlist_scroll_view_by_state_scene_state_offset_a:
+    .word  0x00000662                     @ 0801b5d0 62060000  scene state byte offset
+tick_banlist_scroll_view_by_state_state_mode_incr_off_d:
+    .word  0x00000673                     @ 0801b5d4 73060000  view sub-state offset byte
 
 @ Top-level per-frame driver for the banlist scene.
 @ Called via fn-ptr table by dispatch_banlist_scene_handler_frame (and dispatch_banlist_pass_input_frame).
@@ -17487,8 +17619,8 @@ DWORD_0801b5d4:
 @   EXIT_FLAG  = gBanlistPasswordBuffer+0x660 // bit2 = scene-exit request flag
 tick_banlist_scene_frame:
     push {r4,lr}                             @ 0801b5d8 10b5
-    ldr r4, DWORD_0801b5f0                   @ 0801b5da 054c
-    ldr r1, DWORD_0801b5f4                   @ 0801b5dc 0549
+    ldr r4, tick_banlist_scene_frame_ptr_gbanlistpasswordbuffer @ 0801b5da 054c
+    ldr r1, tick_banlist_scene_frame_scene_state_offset @ 0801b5dc 0549
     adds r0,r4,r1    @ 0801b5de 6018
     ldrb r0,[r0,#0x0]                        @ 0801b5e0 0078
     lsrs r0,r0,#0x6    @ 0801b5e2 8009
@@ -17498,10 +17630,10 @@ tick_banlist_scene_frame:
     beq LAB_0801b5fe                         @ 0801b5ea 08d0
     b LAB_0801b602                           @ 0801b5ec 09e0
     .zero  0x2
-DWORD_0801b5f0:
+tick_banlist_scene_frame_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b5f0 10980202
-DWORD_0801b5f4:
-    .word  0x00000662                     @ 0801b5f4 62060000
+tick_banlist_scene_frame_scene_state_offset:
+    .word  0x00000662                     @ 0801b5f4 62060000  scene state byte bits[7:6]=sub-mode
 LAB_0801b5f8:
     bl tick_banlist_oam_and_card_slots       @ 0801b5f8 fff744fe
     b LAB_0801b602                           @ 0801b5fc 01e0
@@ -17541,8 +17673,8 @@ LAB_0801b62e:
 @   HANDLER_IDX_MASK = 0xffffc03f // mask to clear bits[13:6]
 dispatch_banlist_scene_handler_frame:
     push {r4,lr}                             @ 0801b634 10b5
-    ldr r1, DWORD_0801b678                   @ 0801b636 1049
-    ldr r2, DWORD_0801b67c                   @ 0801b638 104a
+    ldr r1, dispatch_banlist_scene_handler_frame_ptr_handler_table @ 0801b636 1049
+    ldr r2, dispatch_banlist_scene_handler_frame_ptr_gprng @ 0801b638 104a
     movs r0,#0x81    @ 0801b63a 8120
     lsls r0,r0,#0x2    @ 0801b63c 8000
     adds r4,r2,r0    @ 0801b63e 1418
@@ -17564,7 +17696,7 @@ dispatch_banlist_scene_handler_frame:
     movs r0,#0xff    @ 0801b660 ff20
     ands r1,r0    @ 0801b662 0140
     lsls r1,r1,#0x6    @ 0801b664 8901
-    ldr r0, DWORD_0801b680                   @ 0801b666 0648
+    ldr r0, dispatch_banlist_scene_handler_frame_handler_idx_mask @ 0801b666 0648
     ands r0,r2    @ 0801b668 1040
     orrs r0,r1    @ 0801b66a 0843
     strh r0,[r4,#0x0]                        @ 0801b66c 2080
@@ -17573,14 +17705,14 @@ LAB_0801b66e:
     movs r0,#0x0    @ 0801b672 0020
     b LAB_0801b694                           @ 0801b674 0ee0
     .zero  0x2
-DWORD_0801b678:
-    .word  0x09e58994                     @ 0801b678 9489e509
-DWORD_0801b67c:
+dispatch_banlist_scene_handler_frame_ptr_handler_table:
+    .word  banlist_handler_table          @ 0801b678 9489e509
+dispatch_banlist_scene_handler_frame_ptr_gprng:
     .word  gPrng                          @ 0801b67c 40000003
-DWORD_0801b680:
-    .word  0xffffc03f                     @ 0801b680 3fc0ffff
+dispatch_banlist_scene_handler_frame_handler_idx_mask:
+    .word  0xffffc03f                     @ 0801b680 3fc0ffff  clear bits[13:6] handler index: ~(0xff<<6)
 LAB_0801b684:
-    ldr r0, DWORD_0801b69c                   @ 0801b684 0548
+    ldr r0, dispatch_banlist_scene_handler_frame_ptr_text_encoding_override @ 0801b684 0548
     strb r1,[r0,#0x0]                        @ 0801b686 0170
     movs r0,#0xa8    @ 0801b688 a820
     lsls r0,r0,#0x1    @ 0801b68a 4000
@@ -17593,10 +17725,10 @@ LAB_0801b694:
     pop {r1}                                 @ 0801b696 02bc
     bx r1                                    @ 0801b698 0847
     .zero  0x2
-DWORD_0801b69c:
-    .word  0x0202348c                     @ 0801b69c 8c340202
+dispatch_banlist_scene_handler_frame_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 0801b69c 8c340202
 
-@ Function: banlist password-input scene frame-level pass_input dispatcher, sharing HANDLER_TABLE with dispatch_banlist_scene_handler_frame but additionally handling cursor position write-back. Reads gPrng+PRNG_DISPATCH_OFFSET (32-bit) bits[21:14] as handler index; calls invoke_r1(handler); if nonzero increments index; when new index==2 and r0(pass_input_context) high byte nonzero, asserts r0<=MAX_PASS_INPUT_CTX and writes r0 to gBanlistPasswordBuffer+CURSOR_SLOT_OFFSET (low 4 bits=slot) and gBanlistPasswordBuffer+CURSOR_PX_OFFSET (cursor pixel position). When handler chain exhausted (fn_ptr==null), writes 0 to SCENE_DONE_FLAG_ADDR and returns 1; normal dispatch returns 0. Called by FUN_081089d8 (scene_pass_input;pass_input;prng) each frame.
+@ Function: banlist password-input scene frame-level pass_input dispatcher, sharing HANDLER_TABLE with dispatch_banlist_scene_handler_frame but additionally handling cursor position write-back. Reads gPrng+PRNG_DISPATCH_OFFSET (32-bit) bits[21:14] as handler index; calls invoke_r1(handler); if nonzero increments index; when new index==2 and r0(pass_input_context) high byte nonzero, asserts r0<=MAX_PASS_INPUT_CTX and writes r0 to gBanlistPasswordBuffer+CURSOR_SLOT_OFFSET (low 4 bits=slot) and gBanlistPasswordBuffer+CURSOR_PX_OFFSET (cursor pixel position). When handler chain exhausted (fn_ptr==null), writes 0 to SCENE_DONE_FLAG_ADDR and returns 1; normal dispatch returns 0. Called by transition_banlist_pass_to_card_list (scene_pass_input;pass_input;prng) each frame.
 @ Side effects:
 @ - [gPrng+PRNG_DISPATCH_OFFSET] bits[21:14]: handler index advanced
 @ - [gBanlistPasswordBuffer+CURSOR_SLOT_OFFSET] bits[3:0]: := r0 & 0xf (cursor slot, idx==2 path)
@@ -17614,8 +17746,8 @@ DWORD_0801b69c:
 dispatch_banlist_pass_input_frame:
     push {r4,r5,r6,lr}                       @ 0801b6a0 70b5
     adds r4,r0,#0x0    @ 0801b6a2 041c
-    ldr r1, DAT_0801b704                     @ 0801b6a4 1749
-    ldr r0, PTR_gPrng_0801b708               @ 0801b6a6 1848
+    ldr r1, dispatch_banlist_pass_input_frame_ptr_handler_table @ 0801b6a4 1749
+    ldr r0, dispatch_banlist_pass_input_frame_ptr_gprng @ 0801b6a6 1848
     movs r2,#0x81    @ 0801b6a8 8122
     lsls r2,r2,#0x2    @ 0801b6aa 9200
     adds r5,r0,r2    @ 0801b6ac 8518
@@ -17630,7 +17762,7 @@ dispatch_banlist_pass_input_frame:
     bl invoke_r1                             @ 0801b6be f2f085ff
     cmp r0,#0x0                              @ 0801b6c2 0028
     beq LAB_0801b74c                         @ 0801b6c4 42d0
-    ldr r6, PTR_gBanlistPasswordBuffer_0801b70c @ 0801b6c6 114e
+    ldr r6, dispatch_banlist_pass_input_frame_ptr_gbanlistpasswordbuffer @ 0801b6c6 114e
     ldr r2,[r5,#0x0]                         @ 0801b6c8 2a68
     lsls r1,r2,#0xa    @ 0801b6ca 9102
     lsrs r1,r1,#0x18    @ 0801b6cc 090e
@@ -17638,7 +17770,7 @@ dispatch_banlist_pass_input_frame:
     movs r0,#0xff    @ 0801b6d0 ff20
     ands r1,r0    @ 0801b6d2 0140
     lsls r1,r1,#0xe    @ 0801b6d4 8903
-    ldr r0, DAT_0801b710                     @ 0801b6d6 0e48
+    ldr r0, dispatch_banlist_pass_input_frame_page_state_clear @ 0801b6d6 0e48
     ands r0,r2    @ 0801b6d8 1040
     orrs r0,r1    @ 0801b6da 0843
     str r0,[r5,#0x0]                         @ 0801b6dc 2860
@@ -17651,7 +17783,7 @@ dispatch_banlist_pass_input_frame:
     ands r0,r4    @ 0801b6ea 2040
     cmp r0,#0x0                              @ 0801b6ec 0028
     beq LAB_0801b718                         @ 0801b6ee 13d0
-    ldr r3, DAT_0801b714                     @ 0801b6f0 084b
+    ldr r3, dispatch_banlist_pass_input_frame_cursor_slot_offset @ 0801b6f0 084b
     adds r0,r6,r3    @ 0801b6f2 f018
     movs r1,#0xf    @ 0801b6f4 0f21
     ldrb r2,[r0,#0x0]                        @ 0801b6f6 0278
@@ -17661,26 +17793,26 @@ dispatch_banlist_pass_input_frame:
     adds r0,r6,r3    @ 0801b6fe f018
     str r4,[r0,#0x0]                         @ 0801b700 0460
     b LAB_0801b74c                           @ 0801b702 23e0
-DAT_0801b704:
-    .word  0x09e58994                     @ 0801b704 9489e509
-PTR_gPrng_0801b708:
+dispatch_banlist_pass_input_frame_ptr_handler_table:
+    .word  banlist_handler_table          @ 0801b704 9489e509
+dispatch_banlist_pass_input_frame_ptr_gprng:
     .word  gPrng                          @ 0801b708 40000003
-PTR_gBanlistPasswordBuffer_0801b70c:
+dispatch_banlist_pass_input_frame_ptr_gbanlistpasswordbuffer:
     .word  gBanlistPasswordBuffer         @ 0801b70c 10980202
-DAT_0801b710:
-    .word  0xffc03fff                     @ 0801b710 ff3fc0ff
-DAT_0801b714:
-    .word  0x00000663                     @ 0801b714 63060000
+dispatch_banlist_pass_input_frame_page_state_clear:
+    .word  NAME_INPUT_PAGE_STATE_CLEAR    @ 0801b710 ff3fc0ff  bits[21:14] clear mask for page_state field in gBanlistPasswordBuffer+0x660
+dispatch_banlist_pass_input_frame_cursor_slot_offset:
+    .word  0x00000663                     @ 0801b714 63060000  cursor slot byte
 LAB_0801b718:
     cmp r4,#0xb                              @ 0801b718 0b2c
     bls LAB_0801b728                         @ 0801b71a 05d9
     ldr r0, dispatch_banlist_pass_input_frame_pass_main_c_filename @ 0801b71c 0d48
-    ldr r1, DAT_0801b758                     @ 0801b71e 0e49
+    ldr r1, dispatch_banlist_pass_input_frame_assert_line_6f5 @ 0801b71e 0e49
     ldr r2, dispatch_banlist_pass_input_frame_assert_dstbuffid_0_dstbuffid_def_prhl @ 0801b720 0e4a
     movs r3,#0x1    @ 0801b722 0123
     bl suppress_assert_report                @ 0801b724 def0dafe
 LAB_0801b728:
-    ldr r0, DAT_0801b760                     @ 0801b728 0d48
+    ldr r0, dispatch_banlist_pass_input_frame_cursor_slot_offset_b @ 0801b728 0d48
     adds r2,r6,r0    @ 0801b72a 3218
     lsls r0,r4,#0x4    @ 0801b72c 2001
     movs r1,#0xf    @ 0801b72e 0f21
@@ -17688,14 +17820,14 @@ LAB_0801b728:
     ands r1,r3    @ 0801b732 1940
     orrs r1,r0    @ 0801b734 0143
     strb r1,[r2,#0x0]                        @ 0801b736 1170
-    ldr r0, DAT_0801b764                     @ 0801b738 0a48
+    ldr r0, dispatch_banlist_pass_input_frame_cursor_px_offset @ 0801b738 0a48
     adds r2,r6,r0    @ 0801b73a 3218
     lsls r1,r1,#0x18    @ 0801b73c 0906
     lsrs r1,r1,#0x1c    @ 0801b73e 090f
     lsls r0,r1,#0x7    @ 0801b740 c801
     adds r0,r0,r1    @ 0801b742 4018
     lsls r0,r0,#0x2    @ 0801b744 8000
-    ldr r1, DAT_0801b768                     @ 0801b746 0849
+    ldr r1, dispatch_banlist_pass_input_frame_cursor_pos_base @ 0801b746 0849
     adds r0,r0,r1    @ 0801b748 4018
     str r0,[r2,#0x0]                         @ 0801b74a 1060
 LAB_0801b74c:
@@ -17704,37 +17836,37 @@ LAB_0801b74c:
     b LAB_0801b772                           @ 0801b752 0ee0
 dispatch_banlist_pass_input_frame_pass_main_c_filename:
     .word  pass_main_c_filename           @ 0801b754 84c5e309  PassInput/Pass_main.c
-DAT_0801b758:
-    .word  0x000006f5                     @ 0801b758 f5060000
+dispatch_banlist_pass_input_frame_assert_line_6f5:
+    .word  0x000006f5                     @ 0801b758 f5060000  assert line 0x6f5=1781
 dispatch_banlist_pass_input_frame_assert_dstbuffid_0_dstbuffid_def_prhl:
     .word  assert_dstbuffid_0_dstbuffid_def_prhl @ 0801b75c b4c6e309  dstBuffID >= 0 && dstBuffID < DEF_PRHLIST_MAX
-DAT_0801b760:
-    .word  0x00000663                     @ 0801b760 63060000
-DAT_0801b764:
-    .word  0x0000065c                     @ 0801b764 5c060000
-DAT_0801b768:
-    .word  0x020053f8                     @ 0801b768 f8530002
+dispatch_banlist_pass_input_frame_cursor_slot_offset_b:
+    .word  0x00000663                     @ 0801b760 63060000  cursor slot byte (second ref)
+dispatch_banlist_pass_input_frame_cursor_px_offset:
+    .word  0x0000065c                     @ 0801b764 5c060000  cursor pixel position field offset
+dispatch_banlist_pass_input_frame_cursor_pos_base:
+    .word  0x020053f8                     @ 0801b768 f8530002  cursor pixel pos EWRAM base 0x020053f8
 LAB_0801b76c:
-    ldr r0, DAT_0801b778                     @ 0801b76c 0248
+    ldr r0, dispatch_banlist_pass_input_frame_ptr_text_encoding_override @ 0801b76c 0248
     strb r1,[r0,#0x0]                        @ 0801b76e 0170
     movs r0,#0x1    @ 0801b770 0120
 LAB_0801b772:
     pop {r4,r5,r6}                           @ 0801b772 70bc
     pop {r1}                                 @ 0801b774 02bc
     bx r1                                    @ 0801b776 0847
-DAT_0801b778:
-    .word  0x0202348c                     @ 0801b778 8c340202
+dispatch_banlist_pass_input_frame_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 0801b778 8c340202
 
 @ Scale character width by current encoding mode.
 @ Reads [0x02006c2c] bits[2:0] (encoding_flag).
 @ flag==0 (JP mode): return r0 unchanged (full-width character, no reduction).
 @ flag!=0 (non-JP/ASCII mode): return r0/2 (half-width character = arithmetic right shift by 1).
-@ Caller FUN_0801a230 (font_jp;game_str;settings) uses return value * count_str_charlen to compute total render width.
+@ Caller render_banlist_title_text_to_bg (font_jp;game_str;settings) uses return value * count_str_charlen to compute total render width.
 @ Constants: ENCODE_FLAG_ADDR=0x02006c2c.
 scale_char_width_by_encoding:
     adds r2,r0,#0x0    @ 0801b77c 021c
-    ldr r1, DWORD_0801b798                   @ 0801b77e 0649
-    ldr r0, DWORD_0801b79c                   @ 0801b780 0648
+    ldr r1, scale_char_width_by_encoding_ewram_base @ 0801b77e 0649
+    ldr r0, scale_char_width_by_encoding_gsettings_offset @ 0801b780 0648
     adds r1,r1,r0    @ 0801b782 0918
     movs r0,#0x7    @ 0801b784 0720
     ldrb r1,[r1,#0x0]                        @ 0801b786 0978
@@ -17747,9 +17879,9 @@ scale_char_width_by_encoding:
 LAB_0801b794:
     adds r0,r2,#0x0    @ 0801b794 101c
     bx lr                                    @ 0801b796 7047
-DWORD_0801b798:
-    .word  0x02000000                     @ 0801b798 00000002
-DWORD_0801b79c:
+scale_char_width_by_encoding_ewram_base:
+    .word  EWRAM_BASE                     @ 0801b798 00000002
+scale_char_width_by_encoding_gsettings_offset:
     .word  0x00006c2c                     @ 0801b79c 2c6c0000
 
 @ By caller: src byte ptr r0, dst buf ptr r1. Reads EWRAM global state byte [0x02006c2c] bits[2:0]; if nonzero (TCG mode) skips double-byte extraction. If zero (OCG/JP mode) checks src[0] bit7 (0x80 mask); if set writes src[0]->dst[0], src[1]->dst[1], 0->dst[2] and returns r0=2 (double-byte step). If state nonzero or bit7 clear, writes src[0]->dst[0] and returns r0=1 (single-byte step). Used in string decode iteration to decide single vs double byte advance. Leaf function.
@@ -17762,8 +17894,8 @@ DWORD_0801b79c:
 read_encoded_char_pair_from_state:
     push {r4,lr}                             @ 0801b7a0 10b5
     adds r3,r0,#0x0    @ 0801b7a2 031c
-    ldr r0, DWORD_0801b7cc                   @ 0801b7a4 0948
-    ldr r2, DWORD_0801b7d0                   @ 0801b7a6 0a4a
+    ldr r0, read_encoded_char_pair_from_state_ewram_base @ 0801b7a4 0948
+    ldr r2, read_encoded_char_pair_from_state_gsettings_offset @ 0801b7a6 0a4a
     adds r0,r0,r2    @ 0801b7a8 8018
     movs r4,#0x7    @ 0801b7aa 0724
     ldrb r0,[r0,#0x0]                        @ 0801b7ac 0078
@@ -17782,9 +17914,9 @@ read_encoded_char_pair_from_state:
     movs r0,#0x2    @ 0801b7c6 0220
     b LAB_0801b7de                           @ 0801b7c8 09e0
     .zero  0x2
-DWORD_0801b7cc:
-    .word  0x02000000                     @ 0801b7cc 00000002
-DWORD_0801b7d0:
+read_encoded_char_pair_from_state_ewram_base:
+    .word  EWRAM_BASE                     @ 0801b7cc 00000002
+read_encoded_char_pair_from_state_gsettings_offset:
     .word  0x00006c2c                     @ 0801b7d0 2c6c0000
 LAB_0801b7d4:
     ldrb r0,[r3,#0x0]                        @ 0801b7d4 1878
@@ -17802,10 +17934,10 @@ LAB_0801b7de:
 init_demo_shuen_display_state:
     push {lr}                                @ 0801b7e8 00b5
     sub sp,#0x4                              @ 0801b7ea 81b0
-    ldr r1, DAT_0801b83c                     @ 0801b7ec 1349
+    ldr r1, init_demo_shuen_display_state_ptr_gdemostate @ 0801b7ec 1349
     movs r0,#0x0    @ 0801b7ee 0020
     str r0,[sp,#0x0]                         @ 0801b7f0 0090
-    ldr r2, DAT_0801b840                     @ 0801b7f2 134a
+    ldr r2, init_demo_shuen_display_state_gdemostate_fill_ctrl @ 0801b7f2 134a
     .hword 0x4668    @ 0801b7f4 6846
     bl bios_cpu_set                          @ 0801b7f6 f2f0fffd
     bl gl_clear_vram_palram_scroll           @ 0801b7fa f8f71dff
@@ -17818,13 +17950,13 @@ init_demo_shuen_display_state:
     lsls r0,r0,#0x5    @ 0801b80a 4001
     strh r0,[r1,#0x0]                        @ 0801b80c 0880
     adds r1,#0x2    @ 0801b80e 0231
-    ldr r0, DAT_0801b844                     @ 0801b810 0c48
+    ldr r0, init_demo_shuen_display_state_bg1cnt_init @ 0801b810 0c48
     strh r0,[r1,#0x0]                        @ 0801b812 0880
     adds r1,#0x2    @ 0801b814 0231
-    ldr r0, DAT_0801b848                     @ 0801b816 0c48
+    ldr r0, init_demo_shuen_display_state_bg2cnt_init @ 0801b816 0c48
     strh r0,[r1,#0x0]                        @ 0801b818 0880
     adds r1,#0x2    @ 0801b81a 0231
-    ldr r0, DAT_0801b84c                     @ 0801b81c 0b48
+    ldr r0, init_demo_shuen_display_state_bg3cnt_init @ 0801b81c 0b48
     strh r0,[r1,#0x0]                        @ 0801b81e 0880
     movs r1,#0x10    @ 0801b820 1021
     rsbs r1,r1,#0    @ 0801b822 4942
@@ -17837,16 +17969,16 @@ init_demo_shuen_display_state:
     pop {r1}                                 @ 0801b836 02bc
     bx r1                                    @ 0801b838 0847
     .zero  0x2
-DAT_0801b83c:
+init_demo_shuen_display_state_ptr_gdemostate:
     .word  gDemoState                     @ 0801b83c c09e0202
-DAT_0801b840:
-    .word  0x05000026                     @ 0801b840 26000005
-DAT_0801b844:
-    .word  0x00001e01                     @ 0801b844 011e0000
-DAT_0801b848:
-    .word  0x00001f02                     @ 0801b848 021f0000
-DAT_0801b84c:
-    .word  0x00009b0b                     @ 0801b84c 0b9b0000
+init_demo_shuen_display_state_gdemostate_fill_ctrl:
+    .word  0x05000026                     @ 0801b840 26000005  bios_cpu_set: fill 38 words zero for gDemoState
+init_demo_shuen_display_state_bg1cnt_init:
+    .word  0x00001e01                     @ 0801b844 011e0000  BG1CNT init value
+init_demo_shuen_display_state_bg2cnt_init:
+    .word  0x00001f02                     @ 0801b848 021f0000  BG2CNT init value
+init_demo_shuen_display_state_bg3cnt_init:
+    .word  0x00009b0b                     @ 0801b84c 0b9b0000  BG3CNT init value
 
 @ Called by FUN_0801b91c (scene_demo, indeg=1). Loads a single sprite GFX resource for the demo shuen scene. Non-APCS input: r8=ptr oam_entry (caller-set, transparent through FUN_0801b91c which has no r8 write). APCS: r0=u8 sprite_slot [0..1], r1=u8 tile_param_low [0..1], r2=u8 tile_param_high [1..2], r3=u8 sprite_config [0..0]; stack [sp+0x48]=u8 palette_slot [0..0]. Reads gDemoState+0x88 for GFX resource handle; calls zero_struct_36bytes(r8) to clear OAM buffer; configures OAM attr bytes [+0x14/0x17/0x18] for tile shape/priority/palette; loads ROM GFX resource descriptor (0x09e3cee8) and calls apply_gfx_resource_list. Constants: GFX_RESOURCE_LIST=0x09e3cee8, OAM_PALETTE_MASK=0xffffc07f, OAM_ENTRY_SIZE=36.
 load_demo_shuen_sprite_gfx:

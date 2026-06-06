@@ -1088,7 +1088,9 @@ name_input_default_name:                       @ 0x09e3b4a8 (SJIS "tesuto" defau
 	.incbin "roms/2343.gba", 0x1E3B4A8, 0x809   @ 0x09e3b4a8..0x09e3bcb1
 banlist_char_candidate_str:                    @ 0x09e3bcb1 (90 SJIS pairs + null pair; init_banlist_pass_input_bg0_page)
 	.incbin "roms/2343.gba", 0x1E3BCB1, 0xB6    @ 182B
-	.incbin "roms/2343.gba", 0x1E3BD67, 0x276   @ gap1 single span (banlist_pass_ext_char_group defer Seg-9)
+	.incbin "roms/2343.gba", 0x1E3BD67, 0xD5    @ 0xd5 bytes prefix before ext_char_group
+banlist_pass_ext_char_group:                   @ 0x09e3be3c (417B SJIS null-padded char groups; retreat_banlist_password_char_and_render)
+	.incbin "roms/2343.gba", 0x1E3BE3C, 0x1A1  @ 417B ext char group data
 banlist_pass_char_str:                         @ 0x09e3bfdd (99B SJIS char str; encode_pass_table_entry_to_line_buf)
 	.incbin "roms/2343.gba", 0x1E3BFDD, 0x63    @ 99B
 banlist_pass_alt_char:                         @ 0x09e3c040 (4B SJIS full-width space + null; encode_pass_table_entry_to_line_buf)
@@ -1121,7 +1123,9 @@ banlist_pass_bg2_fs_path:                      @ 0x09e3c650
 	.incbin "roms/2343.gba", 0x1E3C650, 0x20    @ "pass_input/moziire_b_01.LZ5bg\0\0\0" (32B)
 assert_anmid_ig2d_getanmsequencescoun_670:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
-	.incbin "roms/2343.gba", 0x1E3C6AB, 0x9
+banlist_scroll_view_anim_params:               @ 0x09e3c6ab (6B: view-state anim params indexed by gSettings encoding bits; tick_banlist_scroll_view_by_state)
+	.byte 0x06, 0x06, 0x07, 0x07, 0x07, 0x07
+	.incbin "roms/2343.gba", 0x1E3C6B1, 0x3    @ 3 NUL bytes pad
 assert_dstbuffid_0_dstbuffid_def_prhl:
 	.asciz "dstBuffID >= 0 && dstBuffID < DEF_PRHLIST_MAX"
 	.incbin "roms/2343.gba", 0x1E3C6E2, 0x88E
@@ -1529,7 +1533,55 @@ banlist_pass_char_group_ptr_table:             @ 0x09e588cc (8 ROM data ptrs; en
 	.word 0x09e3bf98                           @ [5] char_group_5
 	.word 0x09e3bf8c                           @ [6] char_group_6
 	.word 0x09e3bf80                           @ [7] char_group_7
-	.incbin "roms/2343.gba", 0x1E588EC, 0x420  @ remaining to host end 0x1E58D0C
+	@ banlist_pass_char_group_ptr_table entries [8..49] (42 more .word ptrs, 168B = 0xA8)
+	.word 0x09e3bf74                           @ [8]
+	.word 0x09e3bf68                           @ [9]
+	.word 0x09e3bf5c                           @ [10]
+	.word 0x09e3bf50                           @ [11]
+	.word 0x09e3bf44                           @ [12]
+	.word 0x09e3bf38                           @ [13]
+	.word 0x09e3bf2c                           @ [14]
+	.word 0x09e3bf20                           @ [15]
+	.word 0x09e3bf14                           @ [16]
+	.word 0x09e3bf04                           @ [17]
+	.word 0x09e3bef8                           @ [18]
+	.word 0x09e3beec                           @ [19]
+	.word 0x09e3bee4                           @ [20]
+	.word 0x09e3bedc                           @ [21]
+	.word 0x09e3bed4                           @ [22]
+	.word 0x09e3becc                           @ [23]
+	.word 0x09e3bec4                           @ [24]
+	.word 0x09e3beb4                           @ [25]
+	.word 0x09e3bea4                           @ [26]
+	.word 0x09e3be94                           @ [27]
+	.word 0x09e3be84                           @ [28]
+	.word 0x09e3be74                           @ [29]
+	.word 0x09e3be6c                           @ [30]
+	.word 0x09e3be64                           @ [31]
+	.word 0x09e3be5c                           @ [32]
+	.word 0x09e3be54                           @ [33]
+	.word 0x09e3be4c                           @ [34]
+	.word 0x09e3be40                           @ [35]
+	.word 0x09e3be3c                           @ [36]
+	.word 0x09e3be30                           @ [37]
+	.word 0x09e3be3c                           @ [38]
+	.word 0x09e3be24                           @ [39]
+	.word 0x09e3be1c                           @ [40]
+	.word 0x09e3be14                           @ [41]
+	.word 0x09e3be0c                           @ [42]
+	.word 0x09e3be04                           @ [43]
+	.word 0x09e3bdfc                           @ [44]
+	.word 0x09e3bdf4                           @ [45]
+	.word 0x09e3bdec                           @ [46]
+	.word 0x09e3bde4                           @ [47]
+	.word 0x09e3be3c                           @ [48]
+	.word 0x09e3be3c                           @ [49]
+banlist_handler_table:                         @ 0x09e58994 (3 THUMB fn-ptrs +1 + NULL sentinel; dispatch_banlist_scene_handler_frame)
+	.word 0x08019661                           @ [0] dispatch_banlist_scene_handler+1 (THUMB)
+	.word 0x0801a329                           @ [1] (handler+1, THUMB)
+	.word 0x0801b5d9                           @ [2] tick_banlist_scene_frame+1 (THUMB)
+	.word 0x00000000                           @ [3] NULL sentinel
+	.incbin "roms/2343.gba", 0x1E589A4, 0x368 @ remainder (0x420 - 0xA8 - 0x10 = 0x368)
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)
