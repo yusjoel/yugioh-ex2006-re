@@ -197,7 +197,7 @@ reset_display_and_gl_state_demo_bg2cnt_init:
 reset_display_and_gl_state_demo_bg3cnt_init:
     .word  DEMO_BG3CNT_INIT               @ 08013574 0b9b0000
 
-@ Called by dispatch_demo_sprite_setup_by_mode (mode=0). Initialises OAM attr0/attr1/attr2 fields for one demo sprite slot, then calls apply_gfx_resource_list to commit. Detects JP BIOS version byte [0x080000ae]>>8 == 0x4a and adjusts tile offset +0x38. r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. Constants: OAM_BIOS_JP_MASK=0x4a / ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf.
+@ Called by dispatch_demo_sprite_setup_by_mode (mode=0). Initialises OAM attr0/attr1/attr2 fields for one demo sprite slot, then calls apply_gfx_resource_list to commit. Region/language gate: game-code byte [ROM_REGION_CODE_ADDR (0x080000ae)]>>8 == 0x4a ('J') = JP build; if JP and gSettings (0x02006c2c) language_id (bits[2:0]) == 0, skip; otherwise for slot in {0,1,3} adjust 2 OAM char codes by +0x38. r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. Constants: ROM_REGION_CODE_ADDR=0x080000ae / REGION_CODE_JP=0x4a / gSettings=0x02006c2c (bits[2:0]=language_id) / CHAR_CODE_ADJUST=0x38 / ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf.
 setup_demo_sprite_entry:
     push {r4,r5,r6,r7,lr}                    @ 08013578 f0b5
     .hword 0x4657    @ 0801357a 5746
@@ -274,13 +274,13 @@ LAB_08013604:
     lsls r1,r1,#0x9    @ 08013608 4902
     orrs r0,r1    @ 0801360a 0843
     str r0,[sp,#0x18]                        @ 0801360c 0690
-    ldr r0, DAT_08013674                     @ 0801360e 1948
+    ldr r0, setup_demo_sprite_entry_rom_region_code_addr @ 0801360e 1948
     ldrh r0,[r0,#0x0]                        @ 08013610 0088
     lsrs r0,r0,#0x8    @ 08013612 000a
     cmp r0,#0x4a                             @ 08013614 4a28
     bne LAB_08013628                         @ 08013616 07d1
-    ldr r1, DAT_08013678                     @ 08013618 1749
-    ldr r3, DAT_0801367c                     @ 0801361a 184b
+    ldr r1, setup_demo_sprite_entry_ewram_base @ 08013618 1749
+    ldr r3, setup_demo_sprite_entry_gsettings_offset @ 0801361a 184b
     adds r1,r1,r3    @ 0801361c c918
     movs r0,#0x7    @ 0801361e 0720
     ldrb r1,[r1,#0x0]                        @ 08013620 0978
@@ -327,12 +327,12 @@ setup_demo_sprite_entry_demo_sprite_resource_desc:
     .word  demo_sprite_resource_desc      @ 0801366c b896e309
 setup_demo_sprite_entry_demo_clear_bits_13_7:
     .word  DEMO_CLEAR_BITS_13_7           @ 08013670 7fc0ffff
-DAT_08013674:
-    .word  0x080000ae                     @ 08013674 ae000008
-DAT_08013678:
+setup_demo_sprite_entry_rom_region_code_addr:
+    .word  ROM_REGION_CODE_ADDR           @ 08013674 ae000008
+setup_demo_sprite_entry_ewram_base:
     .word  0x02000000                     @ 08013678 00000002
-DAT_0801367c:
-    .word  0x00006c2c                     @ 0801367c 2c6c0000
+setup_demo_sprite_entry_gsettings_offset:
+    .word  0x00006c2c                     @ 0801367c 2c6c0000  = gSettings(0x02006c2c) - EWRAM base; bits[2:0]=language_id
 
 @ Called by dispatch_demo_sprite_setup_by_mode (mode=1 or mode=2). Structure mirrors setup_demo_sprite_entry (0x08013578) but omits JP BIOS detection branch. Initialises OAM attr0/attr1/attr2 and calls apply_gfx_resource_list. Resource list template: 0x09e396c8 (demo/exodia/exodia01_obj.LZncer). r0=sprite_slot[0..3], r1=x_pos[0..127], r2=palette_idx[0..15], r3=ptr gDemoState field. Constants: ATTR1_X_MASK=0x7f / ATTR0_PAL_MASK=0xf / ATTR2_MASK=0xffffc07f.
 setup_demo_sprite_entry_alt:
@@ -866,7 +866,7 @@ setup_demo_cell_anim_slot:
     cmp r4,r0                                @ 08013a84 8442
     blt LAB_08013a94                         @ 08013a86 05db
     ldr r0, setup_demo_cell_anim_slot_demo_cell_anim_assert_file @ 08013a88 0a48
-    ldr r1, DAT_08013ab8                     @ 08013a8a 0b49
+    ldr r1, setup_demo_cell_anim_slot_assert_line_14b @ 08013a8a 0b49
     ldr r2, setup_demo_cell_anim_slot_demo_cell_anim_assert_expr @ 08013a8c 0b4a
     movs r3,#0x1    @ 08013a8e 0123
     bl suppress_assert_report                @ 08013a90 e6f024fd
@@ -888,7 +888,7 @@ setup_demo_cell_anim_slot_ptr_gdemostate:
     .word  gDemoState                     @ 08013ab0 c09e0202
 setup_demo_cell_anim_slot_demo_cell_anim_assert_file:
     .word  demo_cell_anim_assert_file     @ 08013ab4 f497e309
-DAT_08013ab8:
+setup_demo_cell_anim_slot_assert_line_14b:
     .word  0x0000014b                     @ 08013ab8 4b010000
 setup_demo_cell_anim_slot_demo_cell_anim_assert_expr:
     .word  demo_cell_anim_assert_expr     @ 08013abc 0898e309
@@ -1051,15 +1051,15 @@ tick_demo_scene_state_machine:
     b switchD_08013bfa__default              @ 08013bf0 b6e3
 LAB_08013bf2:
     lsls r0,r0,#0x2    @ 08013bf2 8000
-    ldr r1, DAT_08013c00                     @ 08013bf4 0249
+    ldr r1, tick_demo_scene_state_machine_state_jump_table_ptr @ 08013bf4 0249
     adds r0,r0,r1    @ 08013bf6 4018
     ldr r0,[r0,#0x0]                         @ 08013bf8 0068
 switchD_08013bfa__switchD:
     .hword 0x4687    @ 08013bfa 8746
 tick_demo_scene_state_machine_ptr_gdemostate:
     .word  gDemoState                     @ 08013bfc c09e0202
-DAT_08013c00:
-    .word  0x08013c04                     @ 08013c00 043c0108
+tick_demo_scene_state_machine_state_jump_table_ptr:
+    .word  0x08013c04                     @ 08013c00 043c0108  -> 10-case state dispatch table @0x08013c04
 switchD_08013bfa__switchdataD_08013c04:
     .word  0x08013c2c                     @ 08013c04 2c3c0108
     .word  0x08013ca4                     @ 08013c08 a43c0108

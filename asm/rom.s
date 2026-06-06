@@ -36,6 +36,9 @@
 @ 硬件 OAM 项字段位掩码（0x15954 cell-anim OAM 构建簇用）
 	.include "constants/oam_attr.inc"
 
+@ ROM 区域/语言检测（0x080000ae game-code + gSettings language_id）
+	.include "constants/rom_region.inc"
+
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"

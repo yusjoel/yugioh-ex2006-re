@@ -413,6 +413,20 @@ PALT 调色板块写 PALRAM (按 type 选 BG/OBJ 调色板) + BG screen-map 写�
 槽不符号化 (plate 已注)。**defer**: write_tile_region_to_bg_screen (0x16344) 体大且 plate 自标
 med-conf (r6 struct +0x14/+0x15/+0x16 字段布局待 runtime verify) + 含 0x02023d40 全局, 留专项批。
 
+### 4.0m Seg-1a 完成记录: b1 残留 3 defer 槽 (demo scene) ✅
+
+地址序 Seg-1 第一部分: 回填 batch-1 当年 R8 诚实 defer 的 3 处 demo-scene 槽。byte-identical 9689337d。
+
+| 残留 | 函数 | 做法 |
+|---|---|---|
+| 0x13674/78/7c | setup_demo_sprite_entry (0x13578) | **区域/语言检测**: 0x080000ae→`ROM_REGION_CODE_ADDR` equate(新 `constants/rom_region.inc`) + 0x02000000/0x6c2c 槽改名(`_ewram_base`/`_gsettings_offset` + EOL); plate R5 订正 (旧误称 "JP BIOS version byte" → ROM game-code 区域字符 + gSettings(0x02006c2c) language_id bits[2:0], 既有 ewram.inc gSettings 名) |
+| 0x13ab8 | setup_demo_cell_anim_slot (0x13a6c) | assert 行号槽 0x14b=331 → `_assert_line_14b` |
+| 0x13c00 | tick_demo_scene_state_machine (0x13bd4) | 10-case 状态机跳转表基址槽 → `_state_jump_table_ptr` + DATA ref→表 0x13c04 + EOL (switchD 表标签保留) |
+
+新增: `constants/rom_region.inc` (ROM_REGION_CODE_ADDR/REGION_CODE_JP/REGION_LANG_ID_MASK; 接入 rom.s)。
+脚本: `tools/ghidra-labeling/RefineSeg1aDemoResiduals.py`。**§5.1 登记: 无** (3 槽均有引用, 当场符号化)。
+关键发现: 0x02006c2c 早已在 ewram.inc 定义为 `gSettings` (language_id), 故复用既有名, 未新建常量。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -446,68 +460,63 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 跑游戏到语言选择之后画面 → dump VRAM/PALRAM → 与 0xDE30..0x13510 字节匹配 → 定位加载
 函数 + 调色板 → 替换灰度为真彩 + 语义命名段 (改 `export_boot_ui_gfx.py` 模块名/调色板)。
 
-### 4.2 291 个代码函数内部细化 (主体工作量)
-范围 `0x13510..0x1CB00`。按地址序分批 (建议 ~10-15 fn/批), 每批走「代码侧 pipeline」。
-子系统聚类 (按函数名):
-- 显示/GL/VRAM/BG: reset_display_and_gl_state, write_bg3_scroll_regs, copy_to_bg3_screen_map,
-  init_gl_palette_slot_flags, get_obj_tile_vram_base ... (0x13510..0x150xx)
-- 滚动条/anim_ctrl: compute_scrollbar_thumb_position, update_scrollbar_thumb_display,
-  get_anim_ctrl_seq_id, dispatch_isd_cell_anim_oam_setup ... (0x154xx..0x158xx)
-- G2D/资源加载: load_g2d_obj_resource_set, get_bgdt_entry_char_base, get_objd_inline_data_ptr,
-  resolve_prhlist_entry_name_ptr ... (0x15d30..0x170xx) — NNS g2d 系, 可对照 refs/NITRO SDK
-- 字符串/文本渲染: pad_str_to_char_multiple, render_jp_string_row, append_col_padded_text_to_buf,
-  scale_char_width_by_encoding ... (0x178xx..0x19xxx)
-- banlist 密码输入场景: banlist_password_enter_char, init_banlist_pass_input_scene,
-  render_banlist_password_chars_row, advance/retreat_banlist_password_cursor ... (0x143xx, 0x186xx..0x1abxx)
-- vija/shuen 场景 tick: tick_banlist_card_slot_anim_primary, write_shuen_bg3_scroll_regs,
-  tick_scene_step_by_step_table_a, tick_vija_bg3_scroll_forward ... (0x1b1xx..0x1cb00)
+### 4.2 代码函数内部细化 (主体工作量, 284 fn)
+范围 `0x13510..0x1CB00`。**执行计划见 §五 地址序路线图 (Seg-1..Seg-10)**——已于 2026-06-06
+按用户 3 条硬规则重排为严格地址序 (取代原"子系统聚类")。每段走「代码侧 pipeline」, 段内逐函数
++ 函数间 ROM_INCBIN 一并细化。
 
-每个函数细化清单: R1 常量 + R2 标签 + R3 引用接通 + R4 误标数据 + R5 注释 + R9 byte-identical。
+每个函数细化清单: R1 常量 + R2 标签 + R3 引用接通 + R4 误标数据 + R5 注释 + R7 数据 carve +
+R9 byte-identical。
 
 参考: 系统/SDK 风格函数 (g2d/中断/newlib) 除 refs/pokeruby 外, 也查 **refs/NITRO SDK v2.0RC3**
 (NitroSDK 早期亦覆盖 GBA, 见 memory reference-nitrosdk-gba)。
 
 ---
 
-## 五、批次建议
+## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
-0. ✅ **boot/IRQ 区 (0x0C0..0x224) R1 收尾** (本会话): IntrMain/RetAddr 立即数符号化 +
-   dispatch plate 归属订正, byte-identical 通过 (SHA1 9689337d)。
-1. ~~先清 boot-ui mGBA 上色~~ → **用户裁定: 暂跳过, 放最后处理** (当前导出图未确认、未找到加载方; 0xAA10..0x13510 暂留 🟡)。
-2. ✅ **batch-2 (0x14600..0x14a10, GL blend/brightness 簇 12 fn)** 完成 (见 §四.4.0a):
-   gGlBlendState 符号化 + equate + 函数改名 + plate 订正; byte-identical。附带修复 1 个 pre-existing
-   断言串 carve 回归。
-   - 注: §五.0/batch-1 提到的 `reset_display_and_gl_state` plate 旧名 `FUN_08014398` 已在 batch-1
-     订正 (现引 play_ui_effect_3a + indirect_table 说明), 全文件 plate 散文无 FUN_08014398 残留。
-3. ✅ **batch-3 (0x14a10..0x14e14, BG VRAM 地址簇 24 fn)** 完成 (见 §四.4.0c)。
-4. ✅ **batch-4 (0x1510c..0x1522c, GL palette/OAM manager 簇 7 fn)** 完成 (见 §四.4.0d);
-   gGlState=0x02023490 命名, 与 batch-2 gGlBlendState 配对。
-5. ✅ **batch-5 (0x15384..0x155f4, GL_Scrollbar 簇 11 fn)** 完成 (见 §四.4.0e)。
-6. ✅ **batch-6 (NNS IG2D 资源加载管理器 globals + allocators)** 完成 (见 §四.4.0f)。
-7. ✅ **batch-7 (0x15728..0x15924, BG affine matrix 簇 4 fn)** 完成 (见 §四.4.0g);
-   TRIG_TABLE + assert_expr_zero **当场 carve**。
-8. ✅ **batch-8 (0x16140..0x16268, NNS G2D GFX entry accessor 簇 10 fn)** 完成 (见 §四.4.0h)。
-9. ✅ **batch-9 (0x16098..0x1613c, ISD affine matrix 指针簇 3 fn)** 完成 (见 §四.4.0i);
-   isd_affine_matrix_ptr_type4/9 + assert_expr_zero_65c **当场 carve**。
-10. ✅ **batch-10 (0x15954..0x15ac4, ISD cell-anim OAM 簇 2 fn)** 完成 (见 §四.4.0j);
-   gOamAttrBuildBuf=0x030007f8 + OAM attr2 char-name 掩码符号化。
-11. ✅ **batch-11 (0x15b04..0x15e72, NNS IG2D 资源加载族 7 fn)** 完成 (见 §四.4.0k);
-   OBJ_PALRAM_BASE=0x05000200 + 16 assert-line 槽灭自动名。
-12. ✅ **batch-12 (0x1626c..0x16342, NNS G2D 写族 前 2 fn)** 完成 (见 §四.4.0l);
-   write_palt(OBJ/GBA_PALRAM_BASE) + dispatch_bg_screen_map_write(raw-addr 掩码)。
-   - 注: setup_decimal_digit_oam_batch (0x15ea4) 已确认**无 pool 数据槽** (常量全内联) + plate 完整
-     (含 batch-10 已符号化 gOamAttrBuildBuf), 无需细化; zero_struct_36bytes (0x15fc8) 剩 1 个
-     cpu_set 控制字槽 (0x01000012) + get_bg_screen_vram_addr_by_index (0x16014) 已干净。
-13. 下一批 (batch-13) 候选:
-   - **write_tile_region_to_bg_screen 专项** (0x16344): med-conf, r6 struct 字段布局 +
-     0x02023d40 全局, 需 runtime verify (mGBA)。
-   - **cell-anim accessor 簇** (get_anim_ctrl_* / dispatch_cell_anim_* 0x156d0..0x1571c)。
-   - **专项 R4 (2 处)**: 0x1550a 14B `.byte` 小函数 + 0x1604c jump-table 分派器 (含 0x16060
-     跳转表 + 0x16074..8c 5 个 6B handler, 均 Ghidra 误标数据) disasm + createFunction。
-   - zero_struct_36bytes (0x15fc8) 的 cpu_set 控制字槽 (顺手并入相邻批)。
-   - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0)。
-   - 注: ROM 数据表/串细化即**当场 carve** (不留待办)。
-14. 每批后视情况更新本文「进度」表。
+> **2026-06-06 重排 (用户定 3 条硬规则, 取代旧"子系统聚类"方式)**:
+> 1. **严格地址序**, 不按子系统/难度。整个代码区 `0x13510..0x1CB00` (284 fn) 按地址均分 **10 段
+>    (Seg-1..Seg-10)**, 每段 ~28 fn, **段边界 = 某函数结束处** (不切断函数)。按 Seg 序号执行,
+>    段内从低地址往高地址逐函数细化, 不回头不跳号。
+> 2. **函数间数据也要细化**: 段内出现的 `ROM_INCBIN <off>, <size>` (Ghidra 未分化的函数间数据)
+>    **不允许保留**——当场 carve 进 rom.s (label + 结构化 `.byte`/`.word`/`.asciz`) 或反汇编成
+>    指令/函数 (R4/R7), round-trip 验 byte-identical。
+> 3. **唯一例外**: 若该数据**全 ROM 无任何引用** (grep `.word <addr>` / DATA ref 皆空), 允许暂不
+>    carve, 在下方「§5.1 未引用数据登记表」标记, 留以后处理 (引用到时再切)。
+>
+> 旧 batch-1..12 (子系统聚类, 已完成, byte-identical) 记录见 **§四 4.0/4.0a..4.0l + §三 进度表**,
+> 作为历史保留; 其覆盖映射到下表 "旧覆盖" 列。新执行单位是 **Seg-N**。
+
+| Seg | 地址范围 | ~fn | 内含 ROM_INCBIN (必 carve/或登记) | 旧覆盖 | 剩余工作 (本轮要做) |
+|---|---|---|---|---|---|
+| **Seg-1** | 0x13510..0x14838 | ~30 | — | b1, b2(头) | b1 残留 3 defer 槽 (0x13674 ROM头JP探测/0x02006c2c 全局 + 0x13ab8 assert行号 + 0x13c00 hub跳转表基址) + **0x14398..0x14600 gap 7 fn** (tick_prng_step_sequence / banlist_password_enter_char / copy_str_unbounded / append_text_to_buf_charlen / advance_text_ptr_by_charlen / count_str_charlen / measure_text_pixel_width) |
+| **Seg-2** | 0x14838..0x14fa8 | ~28 | **0x14e54/0x4c** | b2(尾), b3 | 0x14e14..0x14fa8 gap fn + **carve 0x14e54 (76B)** |
+| **Seg-3** | 0x14fa8..0x1571c | ~28 | **0x1547e/0x26** | b4, b5, b6(部分), b7(头) | 0x14fa8..0x1510c / 0x1522c..0x15384 (tick_palette_fade) / 0x155f4..0x1563c / 0x15674..0x1571c gap fn + **carve 0x1547e (38B)** + **R4: 0x1550a 14B `.byte` 误标小函数** disasm+createFunction |
+| **Seg-4** | 0x1571c..0x16218 | ~28 | **0x15d18/0x18, 0x15fe8/0x2c, 0x16074/0x24** | b7, b10, b11, b9, b8(部分) | 0x15924..0x15954 / 0x15e72..0x16098 gap fn + **carve 3 incbin** + zero_struct_36bytes cpu_set 控制字槽 (0x01000012) + **R4: 0x1604c jump-table 分派器** (含 0x16060 跳转表 + 0x16074..8c 5×6B handler, 均误标数据) disasm+createFunction |
+| **Seg-5** | 0x16218..0x1794c | ~28 | **0x169d6/0x16, 0x16a20/0x5c, 0x170d4/0xfc, 0x17424/0x40** | b8(尾), b12 | **0x16344 起几乎全新** (write_tile_region_to_bg_screen 含 0x02023d40 全局 med-conf + G2D 系) + **carve 4 incbin (含 252B 大块 @0x170d4)** |
+| **Seg-6** | 0x1794c..0x18774 | ~28 | **0x186ce/0x22** | — | **全新**: 字符串/文本渲染簇 (render_jp_string_row ...) + carve 0x186ce (34B) |
+| **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | **全新**: name_input/banlist 场景 + carve 0x19640 (32B) |
+| **Seg-8** | 0x19a58..0x1a794 | ~28 | — | — | **全新**: banlist password 渲染簇 |
+| **Seg-9** | 0x1a794..0x1b850 | ~28 | **0x1a89c/0x20, 0x1ad18/0xec** | — | **全新**: banlist/shuen + **carve 2 incbin (含 236B 大块 @0x1ad18)** |
+| **Seg-10** | 0x1b850..0x1cb00 | ~32 | — | — | **全新**: vija/shuen 场景 tick (tick_*_obj_anim ...) |
+
+执行约定:
+- 每个 Seg 走 §二「代码侧 pipeline」(备份 .rep → Ghidra 脚本 → 重导出 → split → build → byte-identical
+  SHA1 9689337d → 函数改名才 CSV sync)。Seg 内可分多次提交, 但**地址序不回头**。
+- 每个函数细化清单: R1 常量 + R2 标签 + R3 引用接通 + R4 误标数据反汇编 + R5 注释 + R7 数据 carve
+  + R9 byte-identical。
+- 已被旧 batch 细化干净的函数 (旧覆盖列) 跳过, 只补 gap 函数 + carve incbin + 清残留 DAT。
+- 每完成一段, 更新 §三 进度表 + 下方登记表。
+
+### 5.1 未引用数据登记表 (规则 3: 全 ROM 无引用, 暂不 carve, 留后)
+
+> 执行 Seg 时遇 ROM_INCBIN 先 grep 引用; 有引用→当场 carve; **无引用→登记此表**, 注地址/大小/
+> 所在 Seg/初判内容, 引用到时再切。(初始为空, 逐 Seg 填。)
+
+| 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
+|---|---|---|---|---|
+| (待 Seg 执行时填) | | | | |
 
 ---
 
