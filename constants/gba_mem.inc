@@ -5,6 +5,8 @@
 @ 仅被引用 (data-equate) 的常量才会出现在导出 .word; 其余为参考文档。
 @ =============================================================================
 
+.equ EWRAM_BASE,          0x02000000  @ External Work RAM base (256KB, 0x02000000..0x0203FFFF)
+                                      @ 4295 ROM refs; used in base+offset form for gSettings etc.
 .equ GBA_PALRAM_BASE,     0x05000000  @ 调色板 RAM (BG+OBJ, 各 0x200 字节)
 .equ OBJ_PALRAM_BASE,     0x05000200  @ OBJ/sprite 调色板 RAM (PALRAM+0x200, 16 调色板 ×16 色)
 .equ GBA_VRAM_BASE,       0x06000000  @ VRAM 基址 (BG char/screen map; 0xc0<<0x13 内联值)

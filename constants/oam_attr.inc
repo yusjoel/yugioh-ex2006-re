@@ -9,3 +9,6 @@
 
 .equ OAM_ATTR2_CHARNAME_MASK,  0x000003ff  @ 保留 attr2 bits[9:0] (char name = tile index)
 .equ OAM_ATTR2_CHARNAME_CLEAR, 0xfffffc00  @ 清 attr2 bits[9:0] (插入 tile-base 重映射前)
+
+.equ OAM_ATTR0_HIDDEN,         0x0000ffff  @ attr0 all-bits-set: OBJ disabled/hidden mode
+                                             @ used by apply_sprite_gfx_by_type for initial hide

@@ -5705,7 +5705,7 @@ init_lang_select_vram_and_regs:
     ldr r0, PTR_DAT_080ebbc8                 @ 080ebb54 1c48
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 080ebb56 08f0a3fb
     ldr r2, PTR_DAT_080ebbcc                 @ 080ebb5a 1c4a
-    ldr r0, PTR_DAT_080ebbd0                 @ 080ebb5c 1c48
+    ldr r0, PTR_EWRAM_BASE_080ebbd0          @ 080ebb5c 1c48
     ldr r3, DAT_080ebbd4                     @ 080ebb5e 1d4b
     adds r0,r0,r3    @ 080ebb60 c018
     ldrb r0,[r0,#0x0]                        @ 080ebb62 0078
@@ -5758,8 +5758,8 @@ PTR_DAT_080ebbc8:
     .word  0x0202a2c0                     @ 080ebbc8 c0a20202
 PTR_DAT_080ebbcc:
     .word  0x020297e0                     @ 080ebbcc e0970202
-PTR_DAT_080ebbd0:
-    .word  0x02000000                     @ 080ebbd0 00000002
+PTR_EWRAM_BASE_080ebbd0:
+    .word  EWRAM_BASE                     @ 080ebbd0 00000002
 DAT_080ebbd4:
     .word  0x00006c2c                     @ 080ebbd4 2c6c0000
 DAT_080ebbd8:

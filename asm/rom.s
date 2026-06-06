@@ -42,6 +42,8 @@
 @ GFX 资源 BGDT/OBJD → state struct attr 字段位掩码（0x165bc apply_bgdt 簇用）
 	.include "constants/gfx_resource.inc"
 
+@ 名字输入 / banlist 页面常量（BG CNT init / cpuset 控制字 / gSettings offset; 0x171ec 簇用）
+	.include "constants/name_input.inc"
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
@@ -911,13 +913,25 @@ isd_draw_c_filename:
 	.incbin "roms/2343.gba", 0x1E3A65A, 0x2     @ 前缀 2B
 assert_expr_zero_65c:
 	.asciz "0"                                  @ 0x09e3a65c ISD_Draw 类型 assert(0) 条件串
-	.incbin "roms/2343.gba", 0x1E3A65E, 0x112   @ 后缀
+	.incbin "roms/2343.gba", 0x1E3A65E, 0x2     @ 2B align pad after assert_expr_zero_65c
+char_frame_decode_lut:                            @ 0x09e3a660
+	.incbin "roms/2343.gba", 0x1E3A660, 0x110   @ 272B: 68 entries x 4B halfword-pair decode LUT
+	                                              @ LUT[2*char_idx + encode_mode] -> VRAM halfword
+	                                              @ Consumed by: decode_char_frame_to_vram DWORD_08017410
 prh_main_c_filename:
 	.asciz "GL/PRH_Main.c"
 	.incbin "roms/2343.gba", 0x1E3A77E, 0x2
 assert_pdst_nameid:
 	.asciz "pDst->nameID"
-	.incbin "roms/2343.gba", 0x1E3A78D, 0xB2B
+	.incbin "roms/2343.gba", 0x1E3A78D, 0x83B   @ 2107B: up to sprite_gfx_type_meta
+sprite_gfx_type_meta:                             @ 0x09e3afc8
+	.word 0x031e0000                              @ type0: [tile_start=0x00, tile_count=0x1e, screen_page=0x03, ...]
+	.word 0x061e0300                              @ type1
+	.word 0x081e0600                              @ type2
+	.word 0x0a1e0800                              @ type3 (4 entries x 4B = 16B)
+sprite_palette_type_table:                        @ 0x09e3afd8
+	.byte 1, 1, 16, 16                            @ palette indices for sprite types 0..3 (4B)
+	.incbin "roms/2343.gba", 0x1E3AFDC, 0x2DC   @ 732B: remainder of blob to 0x1E3B2B8
 name_main_c_filename:
 	.asciz "NameInput/Name_main.c"
 	.incbin "roms/2343.gba", 0x1E3B2CE, 0x2

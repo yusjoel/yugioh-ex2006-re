@@ -8172,7 +8172,7 @@ LAB_080171dc:
 LAB_080171ea:
     bx lr                                    @ 080171ea 7047
 
-@ Validates complement checksum of a byte buffer. Buffer format: byte 0=stored_cs, bytes 1..=payload. Logic: (1) read stored_cs=[r0+0]; (2) get count from [r1+0]; (3) sum bytes [1..count-1] truncated to u8; (4) write count-1 back to [r1+0]; (5) if ~sum&0xFF==stored_cs return data_start (buf+1), else return NULL. Called by FUN_0801722c after XOR decode (FUN_080171d4) as frame integrity check; caller skips frame on fail.
+@ Validates complement checksum of a byte buffer. Buffer format: byte 0=stored_cs, bytes 1..=payload. Logic: (1) read stored_cs=[r0+0]; (2) get count from [r1+0]; (3) sum bytes [1..count-1] truncated to u8; (4) write count-1 back to [r1+0]; (5) if ~sum&0xFF==stored_cs return data_start (buf+1), else return NULL. Called by decode_char_frame_to_vram after XOR decode (FUN_080171d4) as frame integrity check; caller skips frame on fail.
 @ 
 @ Params: r0=u8* buf_ptr ([r0+0]=checksum byte, [r0+1..]=payload); r1=void* state_ptr ([r1+0]=u32 remaining_count)
 @ Returns: r0=u8* data_ptr (buf+1 on pass, NULL on fail; pop {r1}=lr)
@@ -8231,14 +8231,14 @@ decode_char_frame_to_vram:
     .hword 0x464e    @ 08017230 4e46
     .hword 0x4645    @ 08017232 4546
     push {r5,r6,r7}                          @ 08017234 e0b4
-    ldr r4, DWORD_08017264                   @ 08017236 0b4c
+    ldr r4, decode_char_frame_to_vram_neg_frame_size @ 08017236 0b4c
     add sp,r4                                @ 08017238 a544
     .hword 0x4692    @ 0801723a 9246
     adds r7,r3,#0x0    @ 0801723c 1f1c
     movs r2,#0x0    @ 0801723e 0022
     .hword 0x4691    @ 08017240 9146
     .hword 0x4690    @ 08017242 9046
-    ldr r3, DWORD_08017268                   @ 08017244 084b
+    ldr r3, decode_char_frame_to_vram_sp_state_ptr_off @ 08017244 084b
     add r3,sp                                @ 08017246 6b44
     movs r6,#0xb5    @ 08017248 b526
     lsls r6,r6,#0x3    @ 0801724a f600
@@ -8255,10 +8255,10 @@ LAB_0801725a:
     cmp r7,#0x1                              @ 0801725e 012f
     beq LAB_08017270                         @ 08017260 06d0
     b LAB_08017280                           @ 08017262 0de0
-DWORD_08017264:
-    .word  0xfffffa50                     @ 08017264 50faffff
-DWORD_08017268:
-    .word  0x000005a4                     @ 08017268 a4050000
+decode_char_frame_to_vram_neg_frame_size:
+    .word  0xfffffa50                     @ 08017264 50faffff  neg stack frame alloc: sp -= 0x5b0
+decode_char_frame_to_vram_sp_state_ptr_off:
+    .word  0x000005a4                     @ 08017268 a4050000  sp+0x5a4: ptr to r1(state)
 LAB_0801726c:
     ldrh r0,[r5,#0x0]                        @ 0801726c 2888
     b LAB_0801727a                           @ 0801726e 04e0
@@ -8286,7 +8286,7 @@ LAB_0801728e:
     movs r1,#0x0    @ 08017294 0021
     strh r1,[r0,#0x0]                        @ 08017296 0180
     add r4,sp,#0x2d0                         @ 08017298 b4ac
-    ldr r2, DWORD_080172d4                   @ 0801729a 0e4a
+    ldr r2, decode_char_frame_to_vram_cpuset_ctrl @ 0801729a 0e4a
     adds r1,r4,#0x0    @ 0801729c 211c
     bl bios_cpu_set                          @ 0801729e f7f0abf8
     .hword 0x4668    @ 080172a2 6846
@@ -8295,7 +8295,7 @@ LAB_0801728e:
     movs r3,#0x40    @ 080172a8 4023
     bl pack_bytes_to_vram_bits               @ 080172aa 00f01df9
     adds r1,r0,#0x0    @ 080172ae 011c
-    ldr r5, DWORD_080172d8                   @ 080172b0 094d
+    ldr r5, decode_char_frame_to_vram_sp_state_ptr_off_b @ 080172b0 094d
     add r5,sp                                @ 080172b2 6d44
     str r1,[r5,#0x0]                         @ 080172b4 2960
     adds r0,r4,#0x0    @ 080172b6 201c
@@ -8309,33 +8309,33 @@ LAB_0801728e:
     adds r2,r0,#0x0    @ 080172ca 021c
     cmp r2,#0x0                              @ 080172cc 002a
     bne LAB_080172e0                         @ 080172ce 07d1
-    ldr r0, DWORD_080172dc                   @ 080172d0 0248
+    ldr r0, decode_char_frame_to_vram_assert_prohibit_cs_ptr @ 080172d0 0248
     b LAB_080172ec                           @ 080172d2 0be0
-DWORD_080172d4:
-    .word  0x01000168                     @ 080172d4 68010001
-DWORD_080172d8:
-    .word  0x000005a4                     @ 080172d8 a4050000
-DWORD_080172dc:
-    .word  0x09e3a790                     @ 080172dc 90a7e309
+decode_char_frame_to_vram_cpuset_ctrl:
+    .word  CHAR_FRAME_DECODE_CPUSET_CTRL  @ 080172d4 68010001
+decode_char_frame_to_vram_sp_state_ptr_off_b:
+    .word  0x000005a4                     @ 080172d8 a4050000  sp+0x5a4 2nd ref (same value)
+decode_char_frame_to_vram_assert_prohibit_cs_ptr:
+    .word  0x09e3a790                     @ 080172dc 90a7e309  ptr to "Prohibit CheckSum Error\n" in ROM blob
 LAB_080172e0:
     ldr r3,[r5,#0x0]                         @ 080172e0 2b68
     ldrb r6,[r5,#0x0]                        @ 080172e2 2e78
     ldrb r7,[r2,#0x0]                        @ 080172e4 1778
     cmp r6,r7                                @ 080172e6 be42
     beq LAB_080172fc                         @ 080172e8 08d0
-    ldr r0, DWORD_080172f8                   @ 080172ea 0348
+    ldr r0, decode_char_frame_to_vram_assert_password_sz_ptr @ 080172ea 0348
 LAB_080172ec:
     bl suppress_display_output               @ 080172ec e3f0eef8
     movs r0,#0x1    @ 080172f0 0120
     rsbs r0,r0,#0    @ 080172f2 4042
     b LAB_080173f6                           @ 080172f4 7fe0
     .zero  0x2
-DWORD_080172f8:
-    .word  0x09e3a7ac                     @ 080172f8 aca7e309
+decode_char_frame_to_vram_assert_password_sz_ptr:
+    .word  0x09e3a7ac                     @ 080172f8 aca7e309  ptr to "PassWord Size Error\n" in ROM blob
 LAB_080172fc:
     adds r2,#0x1    @ 080172fc 0132
     ldrb r1,[r2,#0x0]                        @ 080172fe 1178
-    ldr r0, DWORD_0801740c                   @ 08017300 4248
+    ldr r0, decode_char_frame_to_vram_store_base_201 @ 08017300 4248
     add r0,r10                               @ 08017302 5044
     strb r1,[r0,#0x0]                        @ 08017304 0170
     subs r0,r3,#0x1    @ 08017306 581e
@@ -8346,7 +8346,7 @@ LAB_080172fc:
     movs r0,#0x4    @ 08017310 0420
     rsbs r0,r0,#0    @ 08017312 4042
     .hword 0x4681    @ 08017314 8146
-    ldr r6, DWORD_08017410                   @ 08017316 3e4e
+    ldr r6, decode_char_frame_to_vram_lut_ptr @ 08017316 3e4e
     .hword 0x4641    @ 08017318 4146
     lsls r0,r1,#0x1    @ 0801731a 4800
     .hword 0x4652    @ 0801731c 5246
@@ -8394,17 +8394,17 @@ LAB_08017366:
     cmp r4,#0x86                             @ 0801736a 862c
     bls LAB_08017320                         @ 0801736c d8d9
     movs r4,#0x22    @ 0801736e 2224
-    ldr r1, DWORD_08017414                   @ 08017370 2849
+    ldr r1, decode_char_frame_to_vram_sp_state_ptr_off_c @ 08017370 2849
     add r1,sp                                @ 08017372 6944
     ldr r0,[r1,#0x0]                         @ 08017374 0868
     cmp r4,r0                                @ 08017376 8442
     bge LAB_080173ea                         @ 08017378 37da
-    ldr r5, DWORD_08017418                   @ 0801737a 274d
+    ldr r5, decode_char_frame_to_vram_sp_packed_cnt_off @ 0801737a 274d
     add r5,sp                                @ 0801737c 6d44
     movs r3,#0x4    @ 0801737e 0423
     rsbs r3,r3,#0    @ 08017380 5b42
     .hword 0x4699    @ 08017382 9946
-    ldr r6, DWORD_0801741c                   @ 08017384 254e
+    ldr r6, decode_char_frame_to_vram_sp_state_holder_off @ 08017384 254e
     add r6,sp                                @ 08017386 6e44
     str r1,[r6,#0x0]                         @ 08017388 3160
     .hword 0x4647    @ 0801738a 4746
@@ -8440,7 +8440,7 @@ LAB_08017392:
     ands r0,r7    @ 080173c4 3840
     orrs r0,r1    @ 080173c6 0843
     strb r0,[r3,#0x0]                        @ 080173c8 1870
-    ldr r0, DWORD_08017420                   @ 080173ca 1548
+    ldr r0, decode_char_frame_to_vram_vram_step @ 080173ca 1548
     adds r2,r2,r0    @ 080173cc 1218
     movs r0,#0x3    @ 080173ce 0320
     ldrh r1,[r3,#0x0]                        @ 080173d0 1988
@@ -8450,7 +8450,7 @@ LAB_08017392:
     adds r3,#0x2    @ 080173d8 0233
     movs r2,#0x1    @ 080173da 0122
     add r8,r2                                @ 080173dc 9044
-    ldr r6, DWORD_0801741c                   @ 080173de 0f4e
+    ldr r6, decode_char_frame_to_vram_sp_state_holder_off @ 080173de 0f4e
     add r6,sp                                @ 080173e0 6e44
     ldr r6,[r6,#0x0]                         @ 080173e2 3668
     ldr r0,[r6,#0x0]                         @ 080173e4 3068
@@ -8475,21 +8475,21 @@ LAB_080173f6:
     pop {r1}                                 @ 08017406 02bc
     bx r1                                    @ 08017408 0847
     .zero  0x2
-DWORD_0801740c:
-    .word  0x00000201                     @ 0801740c 01020000
-DWORD_08017410:
-    .word  0x09e3a660                     @ 08017410 60a6e309
-DWORD_08017414:
-    .word  0x000005a4                     @ 08017414 a4050000
-DWORD_08017418:
-    .word  0x000005a2                     @ 08017418 a2050000
-DWORD_0801741c:
-    .word  0x000005ac                     @ 0801741c ac050000
-DWORD_08017420:
-    .word  0x00003e9c                     @ 08017420 9c3e0000
+decode_char_frame_to_vram_store_base_201:
+    .word  0x00000201                     @ 0801740c 01020000  byte store base: dst=0x201+r10 (r10=param r2 from prologue mov r10,r2 @0x0801723a); sibling base 0x200 at 0x080173ee
+decode_char_frame_to_vram_lut_ptr:
+    .word  char_frame_decode_lut          @ 08017410 60a6e309
+decode_char_frame_to_vram_sp_state_ptr_off_c:
+    .word  0x000005a4                     @ 08017414 a4050000  sp+0x5a4 3rd ref (same value)
+decode_char_frame_to_vram_sp_packed_cnt_off:
+    .word  0x000005a2                     @ 08017418 a2050000  sp+0x5a2: packed char count
+decode_char_frame_to_vram_sp_state_holder_off:
+    .word  0x000005ac                     @ 0801741c ac050000  sp+0x5ac: state ptr holder
+decode_char_frame_to_vram_vram_step:
+    .word  0x00003e9c                     @ 08017420 9c3e0000  0x3e9c: VRAM bit-field step; med-conf
     ROM_INCBIN 0x17424, 0x40
 
-@ Computes floor(log2(n)) for 32-bit integer r0. Implementation: r1=0, arithmetic right-shift r0 by 1 and increment r1 until r0==0; return r1-1. If r0==0 returns -1 (r1=0, subs r0,r1,#1 -> -1). Callers FUN_08017478 and FUN_080174e8 use result as bit-width for image quantization step computation. Pure leaf, bx lr exit, no side effects.
+@ Computes floor(log2(n)) for 32-bit integer r0. Implementation: r1=0, arithmetic right-shift r0 by 1 and increment r1 until r0==0; return r1-1. If r0==0 returns -1 (r1=0, subs r0,r1,#1 -> -1). Callers unpack_bits_to_byte_buf and pack_bytes_to_vram_bits use result as bit-width for image quantization step computation. Pure leaf, bx lr exit, no side effects.
 @ 
 @ Params: r0=s32 n (input integer; n=0 returns -1; n>0 counts via signed right-shift)
 @ Returns: r0=s32 floor(log2(n)) if n>0; -1 if n<=0
@@ -8509,7 +8509,7 @@ LAB_08017472:
     .zero  0x2
 
 @ Function: Extracts pixel/byte values from a compact bitfield table and writes them to an output buffer. Inputs: source table base (r9:=r0, assigned in prologue), output byte buffer (r7:=r1), entry count (r4:=r2), and bit stride (r3 -> compute_floor_log2 -> log2 step). Iterates bitfield table at step r3, extracts one byte value per offset position and writes to [r7++]. After the loop performs a final __divsi3 and returns the quotient. r8 is an internal work register (prologue mov r8,r1 assigned from r3-1, not an APCS input).
-@ Trigger: Called by FUN_0801722c (char frame decode pipeline) in the frame decompression stage to restore font/char data from compact bitfield format to per-byte format.
+@ Trigger: Called by decode_char_frame_to_vram (char frame decode pipeline) in the frame decompression stage to restore font/char data from compact bitfield format to per-byte format.
 @ Side effects: Writes [r7..r7+count-1], count bytes (output buffer).
 @ 
 @ Constants:
@@ -8572,11 +8572,11 @@ LAB_080174d2:
     .zero  0x2
 
 @ Function: Reads pixel/glyph data from byte array (r5=r0), packs it into a VRAM halfword table (r8=r1) using bit steps of r7=compute_floor_log2(r3) per iteration. Each loop: loads one byte, computes target halfword address [r8 + (r4>>4)*2], shifts byte left by r4&0xf bits then ORs into target halfword (and carry into adjacent +2 halfword). r4 advances by step r7; loops r6=r2 times. Returns r0 = r4>>3 (total bits written / 8).
-@ Trigger: Called by FUN_0801722c (char frame decode pipeline) when writing byte data to target buffer; r2=r9 (VRAM target), r3=0x40 (stride 64 -> log2=6).
+@ Trigger: Called by decode_char_frame_to_vram (char frame decode pipeline) when writing byte data to target buffer; r2=r9 (VRAM target), r3=0x40 (stride 64 -> log2=6).
 @ Side effects: Writes [r8+stride*i..+2] halfword OR operations (VRAM region), r6 times.
 @ 
 @ Constants:
-@ - BIT_STRIDE=0x40=64 (passed by caller FUN_0801722c), log2(64)=6
+@ - BIT_STRIDE=0x40=64 (passed by caller decode_char_frame_to_vram), log2(64)=6
 @ - NIBBLE_MASK=0xf (low 4-bit mask)
 pack_bytes_to_vram_bits:
     push {r4,r5,r6,r7,lr}                    @ 080174e8 f0b5
@@ -8643,7 +8643,7 @@ init_scrollbar_oam_slot_settings:
     push {lr}                                @ 08017540 00b5
     sub sp,#0x14                             @ 08017542 85b0
     adds r2,r0,#0x0    @ 08017544 021c
-    ldr r0, DAT_08017570                     @ 08017546 0a48
+    ldr r0, init_scrollbar_oam_slot_settings_gstate @ 08017546 0a48
     movs r1,#0xc1    @ 08017548 c121
     lsls r1,r1,#0x2    @ 0801754a 8900
     adds r0,r0,r1    @ 0801754c 4018
@@ -8663,17 +8663,17 @@ init_scrollbar_oam_slot_settings:
     pop {r0}                                 @ 0801756a 01bc
     bx r0                                    @ 0801756c 0047
     .zero  0x2
-DAT_08017570:
-    .word  0x02029250                     @ 08017570 50920202
+init_scrollbar_oam_slot_settings_gstate:
+    .word  gState                         @ 08017570 50920202
 
 @ name_input 页 IO 初始化 (DISPCNT=0x1F40, BG0-3CNT=0x1C02/0x1D8C/0x1E8D/0x1F8F); state[0]
 name_input_page_init:
     push {r4,lr}                             @ 08017574 10b5
     sub sp,#0x4                              @ 08017576 81b0
-    ldr r1, DAT_080175d8                     @ 08017578 1749
+    ldr r1, name_input_page_init_gstate      @ 08017578 1749
     movs r4,#0x0    @ 0801757a 0024
     str r4,[sp,#0x0]                         @ 0801757c 0094
-    ldr r2, DAT_080175dc                     @ 0801757e 174a
+    ldr r2, name_input_page_init_cpuset_ctrl @ 0801757e 174a
     .hword 0x4668    @ 08017580 6846
     bl bios_cpu_set                          @ 08017582 f6f039ff
     bl gl_clear_vram_palram_scroll           @ 08017586 fdf757f8
@@ -8683,16 +8683,16 @@ name_input_page_init:
     lsls r0,r0,#0x5    @ 08017590 4001
     strh r0,[r1,#0x0]                        @ 08017592 0880
     adds r1,#0x8    @ 08017594 0831
-    ldr r0, DAT_080175e0                     @ 08017596 1248
+    ldr r0, name_input_page_init_bg0cnt      @ 08017596 1248
     strh r0,[r1,#0x0]                        @ 08017598 0880
     adds r1,#0x2    @ 0801759a 0231
-    ldr r0, DAT_080175e4                     @ 0801759c 1148
+    ldr r0, name_input_page_init_bg1cnt      @ 0801759c 1148
     strh r0,[r1,#0x0]                        @ 0801759e 0880
     adds r1,#0x2    @ 080175a0 0231
-    ldr r0, DAT_080175e8                     @ 080175a2 1148
+    ldr r0, name_input_page_init_bg2cnt      @ 080175a2 1148
     strh r0,[r1,#0x0]                        @ 080175a4 0880
     adds r1,#0x2    @ 080175a6 0231
-    ldr r0, DAT_080175ec                     @ 080175a8 1048
+    ldr r0, name_input_page_init_bg3cnt      @ 080175a8 1048
     strh r0,[r1,#0x0]                        @ 080175aa 0880
     movs r1,#0x10    @ 080175ac 1021
     rsbs r1,r1,#0    @ 080175ae 4942
@@ -8703,7 +8703,7 @@ name_input_page_init:
     bl reset_ig2d_load_counters              @ 080175be fef775f8
     movs r0,#0x0    @ 080175c2 0020
     bl write_name_input_mode_flag            @ 080175c4 01f0c6ff
-    ldr r0, DAT_080175f0                     @ 080175c8 0948
+    ldr r0, name_input_page_init_text_enc_override @ 080175c8 0948
     strb r4,[r0,#0x0]                        @ 080175ca 0470
     movs r0,#0x1    @ 080175cc 0120
     add sp,#0x4                              @ 080175ce 01b0
@@ -8711,20 +8711,20 @@ name_input_page_init:
     pop {r1}                                 @ 080175d2 02bc
     bx r1                                    @ 080175d4 0847
     .zero  0x2
-DAT_080175d8:
-    .word  0x02029250                     @ 080175d8 50920202
-DAT_080175dc:
-    .word  0x050000c9                     @ 080175dc c9000005
-DAT_080175e0:
-    .word  0x00001c02                     @ 080175e0 021c0000
-DAT_080175e4:
-    .word  0x00001d8c                     @ 080175e4 8c1d0000
-DAT_080175e8:
-    .word  0x00001e8d                     @ 080175e8 8d1e0000
-DAT_080175ec:
-    .word  0x00001f8f                     @ 080175ec 8f1f0000
-DAT_080175f0:
-    .word  0x0202348c                     @ 080175f0 8c340202
+name_input_page_init_gstate:
+    .word  gState                         @ 080175d8 50920202
+name_input_page_init_cpuset_ctrl:
+    .word  NAME_INPUT_STATE_CPUSET_CTRL   @ 080175dc c9000005
+name_input_page_init_bg0cnt:
+    .word  NAME_INPUT_BG0CNT_INIT         @ 080175e0 021c0000
+name_input_page_init_bg1cnt:
+    .word  NAME_INPUT_BG1CNT_INIT         @ 080175e4 8c1d0000
+name_input_page_init_bg2cnt:
+    .word  NAME_INPUT_BG2CNT_INIT         @ 080175e8 8d1e0000
+name_input_page_init_bg3cnt:
+    .word  NAME_INPUT_BG3CNT_INIT         @ 080175ec 8f1f0000
+name_input_page_init_text_enc_override:
+    .word  gTextEncodingOverride          @ 080175f0 8c340202
 
 @ 由 name_input 页面族（FUN_08017cd0、FUN_080183d0 等 font_jp 簇）调用，根据第 5 个参数 render_mode 在三种渲染路径之间分发：mode=0x20 将单字符偏移 (+1,+1) 后交给 text_render_wrapper 渲染；mode=0x80 向 (x,y) 的 8 邻域各调用一次 text_render_wrapper（描边/阴影 pass，使用 shadow_color），再在 (x,y) 正中追加一次前景 pass（使用 fg_color），实现 8 方向描边效果；其余 mode 值则直接在 (x,y) 渲染一次（无描边）。调用方传入 render_mode=0x80 时产生「文字描边」视觉效果，是 name_input 页面标题文字渲染的核心路径。
 dispatch_text_render_by_mode:
@@ -8840,17 +8840,17 @@ apply_sprite_gfx_by_type:
     .hword 0x4681    @ 080176cc 8146
     .hword 0x468a    @ 080176ce 8a46
     adds r4,r2,#0x0    @ 080176d0 141c
-    ldr r5, DAT_08017778                     @ 080176d2 294d
+    ldr r5, apply_sprite_gfx_by_type_gstate  @ 080176d2 294d
     add r0,sp,#0x24                          @ 080176d4 09a8
     .hword 0x4680    @ 080176d6 8046
     .hword 0x4641    @ 080176d8 4146
-    ldr r0, DAT_0801777c                     @ 080176da 2848
+    ldr r0, apply_sprite_gfx_by_type_meta_ptr @ 080176da 2848
     ldmia r0!,{r2,r3,r6}                     @ 080176dc 4cc8
     stmia r1!,{r2,r3,r6}                     @ 080176de 4cc1
     ldr r0,[r0,#0x0]                         @ 080176e0 0068
     str r0,[r1,#0x0]                         @ 080176e2 0860
     add r6,sp,#0x34                          @ 080176e4 0dae
-    ldr r1, DAT_08017780                     @ 080176e6 2649
+    ldr r1, apply_sprite_gfx_by_type_pal_table_ptr @ 080176e6 2649
     adds r0,r6,#0x0    @ 080176e8 301c
     movs r2,#0x4    @ 080176ea 0422
     bl memcpy                                @ 080176ec f7f036f9
@@ -8879,7 +8879,7 @@ apply_sprite_gfx_by_type:
     movs r0,#0x7f    @ 0801771e 7f20
     ands r4,r0    @ 08017720 0440
     lsls r4,r4,#0x7    @ 08017722 e401
-    ldr r0, DAT_08017784                     @ 08017724 1748
+    ldr r0, apply_sprite_gfx_by_type_oam_pal_mask @ 08017724 1748
     ldrh r3,[r1,#0x18]                       @ 08017726 0b8b
     ands r0,r3    @ 08017728 1840
     orrs r0,r4    @ 0801772a 2043
@@ -8908,7 +8908,7 @@ apply_sprite_gfx_by_type:
     ands r0,r3    @ 08017758 1840
     orrs r0,r2    @ 0801775a 1043
     strb r0,[r1,#0x17]                       @ 0801775c c875
-    ldr r0, DAT_08017788                     @ 0801775e 0a48
+    ldr r0, apply_sprite_gfx_by_type_attr0_init @ 0801775e 0a48
     strh r0,[r1,#0x10]                       @ 08017760 0882
     .hword 0x4668    @ 08017762 6846
     bl apply_gfx_resource_list               @ 08017764 fff78af9
@@ -8920,16 +8920,16 @@ apply_sprite_gfx_by_type:
     pop {r4,r5,r6}                           @ 08017772 70bc
     pop {r0}                                 @ 08017774 01bc
     bx r0                                    @ 08017776 0047
-DAT_08017778:
-    .word  0x02029250                     @ 08017778 50920202
-DAT_0801777c:
-    .word  0x09e3afc8                     @ 0801777c c8afe309
-DAT_08017780:
-    .word  0x09e3afd8                     @ 08017780 d8afe309
-DAT_08017784:
-    .word  0xffffc07f                     @ 08017784 7fc0ffff
-DAT_08017788:
-    .word  0x0000ffff                     @ 08017788 ffff0000
+apply_sprite_gfx_by_type_gstate:
+    .word  gState                         @ 08017778 50920202
+apply_sprite_gfx_by_type_meta_ptr:
+    .word  sprite_gfx_type_meta           @ 0801777c c8afe309
+apply_sprite_gfx_by_type_pal_table_ptr:
+    .word  sprite_palette_type_table      @ 08017780 d8afe309
+apply_sprite_gfx_by_type_oam_pal_mask:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 08017784 7fc0ffff
+apply_sprite_gfx_by_type_attr0_init:
+    .word  OAM_ATTR0_HIDDEN               @ 08017788 ffff0000
 
 @ Function: Calls apply_sprite_gfx_by_type with fixed r2=0, forwarding r0 (sprite index) and r1 (target address) unchanged, binding only the type parameter to 0. A single-parameter-bound wrapper of apply_sprite_gfx_by_type for initializing fixed-type sprite graphics during name_input scene load. Called by name_input_page_load_assets in the asset load phase.
 @ Trigger: During name_input page load; name_input_page_load_assets calls before initializing sprite graphics; r0 and r1 set by caller per specific sprite.
@@ -8949,11 +8949,11 @@ apply_sprite_gfx_type_zero:
 @ Constants: BG_VRAM_BASE=0x06000020; CTX_BASE=0x02006ed0; CTX_FLAG_ACTIVE=0x20; CTX_FLAG_MODE=0x2
 setup_font_jp_ctx_bg_vram_fixed:
     push {lr}                                @ 08017798 00b5
-    ldr r0, DAT_080177d0                     @ 0801779a 0d48
+    ldr r0, setup_font_jp_ctx_bg_vram_fixed_vram_base @ 0801779a 0d48
     movs r1,#0x16    @ 0801779c 1621
     movs r2,#0xc    @ 0801779e 0c22
     bl init_font_jp_render_context           @ 080177a0 dcf088fd
-    ldr r2, DAT_080177d4                     @ 080177a4 0b4a
+    ldr r2, setup_font_jp_ctx_bg_vram_fixed_font_jp_ctx @ 080177a4 0b4a
     movs r0,#0x20    @ 080177a6 2020
     ldrb r1,[r2,#0x15]                       @ 080177a8 517d
     orrs r0,r1    @ 080177aa 0843
@@ -8975,10 +8975,10 @@ setup_font_jp_ctx_bg_vram_fixed:
     str r0,[r2,#0x4]                         @ 080177ca 5060
     pop {r0}                                 @ 080177cc 01bc
     bx r0                                    @ 080177ce 0047
-DAT_080177d0:
-    .word  0x06000020                     @ 080177d0 20000006
-DAT_080177d4:
-    .word  0x02006ed0                     @ 080177d4 d06e0002
+setup_font_jp_ctx_bg_vram_fixed_vram_base:
+    .word  0x06000020                     @ 080177d0 20000006  0x06000020 = BG VRAM base + 0x20 (tile 1 start)
+setup_font_jp_ctx_bg_vram_fixed_font_jp_ctx:
+    .word  gFontJpCtx                     @ 080177d4 d06e0002
 PTR_font_jp_base_table_080177d8:
     .word  font_jp_base_table             @ 080177d8 54f8e509
 
@@ -8987,10 +8987,10 @@ setup_font_jp_ctx_obj_vram_row:
     push {r4,lr}                             @ 080177dc 10b5
     adds r4,r3,#0x0    @ 080177de 1c1c
     lsls r0,r0,#0x5    @ 080177e0 4001
-    ldr r3, DAT_08017824                     @ 080177e2 104b
+    ldr r3, setup_font_jp_ctx_obj_vram_row_vram_base @ 080177e2 104b
     adds r0,r0,r3    @ 080177e4 c018
     bl init_font_jp_render_context           @ 080177e6 dcf065fd
-    ldr r2, DAT_08017828                     @ 080177ea 0f4a
+    ldr r2, setup_font_jp_ctx_obj_vram_row_font_jp_ctx @ 080177ea 0f4a
     movs r0,#0x20    @ 080177ec 2020
     ldrb r1,[r2,#0x15]                       @ 080177ee 517d
     orrs r0,r1    @ 080177f0 0843
@@ -9019,10 +9019,10 @@ setup_font_jp_ctx_obj_vram_row:
     pop {r0}                                 @ 0801781e 01bc
     bx r0                                    @ 08017820 0047
     .zero  0x2
-DAT_08017824:
+setup_font_jp_ctx_obj_vram_row_vram_base:
     .word  0x06010000                     @ 08017824 00000106
-DAT_08017828:
-    .word  0x02006ed0                     @ 08017828 d06e0002
+setup_font_jp_ctx_obj_vram_row_font_jp_ctx:
+    .word  gFontJpCtx                     @ 08017828 d06e0002
 PTR_font_jp_base_table_0801782c:
     .word  font_jp_base_table             @ 0801782c 54f8e509
 
@@ -9120,8 +9120,8 @@ load_game_str_pair_1004_to_state:
     push {r4,r5,r6,lr}                       @ 080178b4 70b5
     .hword 0x4646    @ 080178b6 4646
     push {r6}                                @ 080178b8 40b4
-    ldr r5, DAT_08017930                     @ 080178ba 1d4d
-    ldr r0, DAT_08017934                     @ 080178bc 1d48
+    ldr r5, load_game_str_pair_1004_to_state_gstate @ 080178ba 1d4d
+    ldr r0, load_game_str_pair_1004_to_state_str_id_a @ 080178bc 1d48
     bl game_str_id_to_row                    @ 080178be ddf0abfa
     ldr r1, PTR_game_str_pointer_table_08017938 @ 080178c2 1d49
     .hword 0x4688    @ 080178c4 8846
@@ -9130,8 +9130,8 @@ load_game_str_pair_1004_to_state:
     lsls r1,r0,#0x1    @ 080178ca 4100
     adds r1,r1,r0    @ 080178cc 0918
     lsls r1,r1,#0x1    @ 080178ce 4900
-    ldr r4, DAT_0801793c                     @ 080178d0 1a4c
-    ldr r2, DAT_08017940                     @ 080178d2 1b4a
+    ldr r4, load_game_str_pair_1004_to_state_ewram_base @ 080178d0 1a4c
+    ldr r2, load_game_str_pair_1004_to_state_gsettings_offset @ 080178d2 1b4a
     adds r4,r4,r2    @ 080178d4 a418
     ldrb r2,[r4,#0x0]                        @ 080178d6 2278
     lsls r0,r2,#0x1d    @ 080178d8 5007
@@ -9148,7 +9148,7 @@ load_game_str_pair_1004_to_state:
     adds r0,r5,#0x0    @ 080178f0 281c
     movs r1,#0xc    @ 080178f2 0c21
     bl pad_str_to_char_multiple              @ 080178f4 fff7b2ff
-    ldr r0, DAT_08017948                     @ 080178f8 1348
+    ldr r0, load_game_str_pair_1004_to_state_str_id_b @ 080178f8 1348
     bl game_str_id_to_row                    @ 080178fa ddf08dfa
     lsls r0,r0,#0x10    @ 080178fe 0004
     lsrs r0,r0,#0x10    @ 08017900 000c
@@ -9173,20 +9173,20 @@ load_game_str_pair_1004_to_state:
     pop {r4,r5,r6}                           @ 0801792a 70bc
     pop {r0}                                 @ 0801792c 01bc
     bx r0                                    @ 0801792e 0047
-DAT_08017930:
-    .word  0x02029250                     @ 08017930 50920202
-DAT_08017934:
-    .word  0x00001004                     @ 08017934 04100000
+load_game_str_pair_1004_to_state_gstate:
+    .word  gState                         @ 08017930 50920202
+load_game_str_pair_1004_to_state_str_id_a:
+    .word  0x00001004                     @ 08017934 04100000  str ID 0x1004 name-input str A
 PTR_game_str_pointer_table_08017938:
     .word  game_str_pointer_table         @ 08017938 400f0008
-DAT_0801793c:
-    .word  0x02000000                     @ 0801793c 00000002
-DAT_08017940:
-    .word  0x00006c2c                     @ 08017940 2c6c0000
+load_game_str_pair_1004_to_state_ewram_base:
+    .word  EWRAM_BASE                     @ 0801793c 00000002
+load_game_str_pair_1004_to_state_gsettings_offset:
+    .word  0x00006c2c                     @ 08017940 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE; bits[2:0]=language_id
 PTR_game_str_ja_08017944:
     .word  game_str_ja                    @ 08017944 109cdb09
-DAT_08017948:
-    .word  0x00001005                     @ 08017948 05100000
+load_game_str_pair_1004_to_state_str_id_b:
+    .word  0x00001005                     @ 08017948 05100000  str ID 0x1005 name-input str B
 
 @ load_game_str_1006_to_state: Name-input scene init -- loads single game string ID 0x1006 into gState+0x8d buffer, calls pad_str_to_char_multiple to align to 12-char multiple. Sibling of load_game_str_pair_1004_to_state (0x080178b4); that function loads IDs 0x1004+0x1005, this one loads only 0x1006. Both load gState base and string table internally.
 @ 
@@ -9196,8 +9196,8 @@ DAT_08017948:
 @ - STATE_BUF_OFF = 0x8d
 load_game_str_1006_to_state:
     push {r4,lr}                             @ 0801794c 10b5
-    ldr r4, DAT_08017990                     @ 0801794e 104c
-    ldr r0, DAT_08017994                     @ 08017950 1048
+    ldr r4, load_game_str_1006_to_state_gstate @ 0801794e 104c
+    ldr r0, load_game_str_1006_to_state_str_id @ 08017950 1048
     bl game_str_id_to_row                    @ 08017952 ddf061fa
     ldr r2, PTR_game_str_pointer_table_08017998 @ 08017956 104a
     lsls r0,r0,#0x10    @ 08017958 0004
@@ -9205,8 +9205,8 @@ load_game_str_1006_to_state:
     lsls r1,r0,#0x1    @ 0801795c 4100
     adds r1,r1,r0    @ 0801795e 0918
     lsls r1,r1,#0x1    @ 08017960 4900
-    ldr r0, DAT_0801799c                     @ 08017962 0e48
-    ldr r3, DAT_080179a0                     @ 08017964 0e4b
+    ldr r0, load_game_str_1006_to_state_ewram_base @ 08017962 0e48
+    ldr r3, load_game_str_1006_to_state_gsettings_offset @ 08017964 0e4b
     adds r0,r0,r3    @ 08017966 c018
     ldrb r0,[r0,#0x0]                        @ 08017968 0078
     lsls r0,r0,#0x1d    @ 0801796a 4007
@@ -9226,16 +9226,16 @@ load_game_str_1006_to_state:
     pop {r4}                                 @ 0801798a 10bc
     pop {r0}                                 @ 0801798c 01bc
     bx r0                                    @ 0801798e 0047
-DAT_08017990:
-    .word  0x02029250                     @ 08017990 50920202
-DAT_08017994:
-    .word  0x00001006                     @ 08017994 06100000
+load_game_str_1006_to_state_gstate:
+    .word  gState                         @ 08017990 50920202
+load_game_str_1006_to_state_str_id:
+    .word  0x00001006                     @ 08017994 06100000  str ID 0x1006 name-input str C
 PTR_game_str_pointer_table_08017998:
     .word  game_str_pointer_table         @ 08017998 400f0008
-DAT_0801799c:
-    .word  0x02000000                     @ 0801799c 00000002
-DAT_080179a0:
-    .word  0x00006c2c                     @ 080179a0 2c6c0000
+load_game_str_1006_to_state_ewram_base:
+    .word  EWRAM_BASE                     @ 0801799c 00000002
+load_game_str_1006_to_state_gsettings_offset:
+    .word  0x00006c2c                     @ 080179a0 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE; bits[2:0]=language_id
 PTR_game_str_ja_080179a4:
     .word  game_str_ja                    @ 080179a4 109cdb09
 

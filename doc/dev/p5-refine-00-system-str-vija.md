@@ -571,6 +571,32 @@ jp_char_handler_jump_table (339-entry 0x16b88, SJIS code → handler 分派表)�
 又: 若 range 内已有指令 (重跑), setTMode 会 ContextChangeException → 须**先 clearListing 整 range** 再
 setTMode 再 disasm。脚本: `RefineSeg5cSlots.py` + `DisassembleSeg5cJpHandlers.py`。
 
+### 4.0v Seg-5d 完成记录: 15 fn 槽符号化 + 2 carve (0x080171ec..0x0801794c) ✅
+
+validate_complement_checksum / decode_char_frame_to_vram / compute_floor_log2 /
+unpack_bits_to_byte_buf / pack_bytes_to_vram_bits / init_scrollbar_oam_slot_settings /
+name_input_page_init / dispatch_text_render_by_mode / apply_sprite_gfx_by_type /
+apply_sprite_gfx_type_zero / setup_font_jp_ctx_bg_vram_fixed / setup_font_jp_ctx_obj_vram_row /
+fill_bg0_tilemap_name_input / pad_str_to_char_multiple / load_game_str_pair_1004_to_state
+(+boundary: load_game_str_1006_to_state)。名字输入 / banlist 页面渲染 + JP 字符解码。
+byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| **R7 carve 1: char_frame_decode_lut** | @0x09e3a660 (272B = 68×4B halfword-pair LUT); 从 `.incbin 0x1E3A65E, 0x112` 切出: 2B pad + label + `0x110` | 1 carve |
+| **R7 carve 2: sprite_gfx_type_meta + sprite_palette_type_table** | @0x09e3afc8 (16B + 4B = 20B); 从 `.incbin 0x1E3A78D, 0xB2B` 切出: 0x83B 前缀 + 4×.word + 4×.byte + 0x2DC 后缀 | 1 carve |
+| R1 equate 新建 | `CHAR_FRAME_DECODE_CPUSET_CTRL`(0x01000168) / `NAME_INPUT_STATE_CPUSET_CTRL`(0x050000c9) / `NAME_INPUT_BG0-3CNT_INIT`(4 常量) → 新建 `constants/name_input.inc`; `GSETTINGS_OFFSET`(0x6c2c) 追加同文件 | 7 槽 |
+| R1 equate 复用 | `GFX_ATTR_CLEAR_BITS_13_7`(0xffffc07f, gfx_resource.inc Seg-5b 建) / `OAM_ATTR0_HIDDEN`(0x0000ffff, 追加 oam_attr.inc) | 2 槽 |
+| R3 REF_SLOTS (全局) | `gState`=0x02029250(5 槽, 追加 ewram.inc) / `gFontJpCtx`=0x02006ed0(2 槽, 追加 ewram.inc) / `gTextEncodingOverride`(复用) / `OBJ_TILE_VRAM_BASE`(复用) / `EWRAM_BASE`=0x02000000(2 槽, 追加 gba_mem.inc) | 12 槽 |
+| R3 REF_SLOTS (carve label) | `char_frame_decode_lut`(1) / `sprite_gfx_type_meta`(1) / `sprite_palette_type_table`(1) | 3 槽 |
+| R2 RENAME_SLOTS | decode_char_frame_to_vram sp-offset 5×(+vram_step+store_base_201 = 7) + 2 assert-str ptr + 1 BG VRAM base + 3 str-ID + 2 GSETTINGS_OFFSET 槽 = 16 槽 | 16 槽 |
+| R5 PLATE (FUN_ 替换) | 4 函数 plate: FUN_0801722c→decode_char_frame_to_vram (×3) + FUN_08017478→unpack_bits_to_byte_buf + FUN_080174e8→pack_bytes_to_vram_bits | 5 次替换 |
+| §5.1 登记 | ROM_INCBIN 0x17424/0x40 (64B dead code, 0 ROM ref; 见 §5.1 表) | 1 块 |
+
+新增: `constants/name_input.inc` (接入 rom.s); 追加 ewram.inc(gState/gFontJpCtx) / oam_attr.inc(OAM_ATTR0_HIDDEN) / gba_mem.inc(EWRAM_BASE)。
+脚本: `tools/ghidra-labeling/RefineSeg5dSlots.py` (A=8 B=14 C=16 D=5, 0 FAIL)。
+FUNC_RENAME=0 (15 函数名均与函数体一致, 无误名); **不需** ExportFunctionInventory/sync/CSV 手改。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -638,7 +664,7 @@ R9 byte-identical。
 | **Seg-2** | 0x14838..0x14fa8 | ~28 | **0x14e54/0x4c** | b2(尾), b3 | 0x14e14..0x14fa8 gap fn + **carve 0x14e54 (76B)** |
 | **Seg-3** | 0x14fa8..0x1571c | ~28 | **0x1547e/0x26** | b4, b5, b6(部分), b7(头) | 0x14fa8..0x1510c / 0x1522c..0x15384 (tick_palette_fade) / 0x155f4..0x1563c / 0x15674..0x1571c gap fn + **carve 0x1547e (38B)** + **R4: 0x1550a 14B `.byte` 误标小函数** disasm+createFunction |
 | **Seg-4** | 0x1571c..0x16218 | ~28 | **0x15d18/0x18, 0x15fe8/0x2c, 0x16074/0x24** | b7, b10, b11, b9, b8(部分) | 0x15924..0x15954 / 0x15e72..0x16098 gap fn + **carve 3 incbin** + zero_struct_36bytes cpu_set 控制字槽 (0x01000012) + **R4: 0x1604c jump-table 分派器** (含 0x16060 跳转表 + 0x16074..8c 5×6B handler, 均误标数据) disasm+createFunction |
-| **Seg-5** | 0x16218..0x1794c | ~28 | **0x169d6/0x16, 0x16a20/0x5c, 0x170d4/0xfc, 0x17424/0x40** | b8(尾), b12 | **0x16344 起几乎全新** (write_tile_region_to_bg_screen 含 0x02023d40 全局 med-conf + G2D 系) + **carve 4 incbin (含 252B 大块 @0x170d4)** |
+| **Seg-5** | 0x16218..0x1794c | ~28 | **0x169d6/0x16, 0x16a20/0x5c, 0x170d4/0xfc, 0x17424/0x40** | b8(尾), b12 | ✅ **Seg-5a/b/c/d 全部完成** (Seg-5a write_tile_region_to_bg_screen / Seg-5b apply_bgdt_objd / Seg-5c-i+ii jp_char dispatch+disasm / Seg-5d 15fn+2carve); 0x17424/0x40 §5.1 登记 |
 | **Seg-6** | 0x1794c..0x18774 | ~28 | **0x186ce/0x22** | — | **全新**: 字符串/文本渲染簇 (render_jp_string_row ...) + carve 0x186ce (34B) |
 | **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | **全新**: name_input/banlist 场景 + carve 0x19640 (32B) |
 | **Seg-8** | 0x19a58..0x1a794 | ~28 | — | — | **全新**: banlist password 渲染簇 |
@@ -669,6 +695,7 @@ R9 byte-identical。
 | 0x08015fe8 | 44 B (`ROM_INCBIN 0x15fe8, 0x2c`) | Seg-4 | **1 个 THUMB 孤儿模算法 helper**: 输入 r0, 分支据 r0 cmp 4/0, 调用 asrs/lsls/subs 序列等效于 `r0 mod 4` 类操作, `ands #1`+`bx lr` 返回 bit0。**ROM 内 0 引用**。**留待**: R4 disasm |
 | 0x080169d6 | 22 B (`ROM_INCBIN 0x169d6, 0x16`) + 0x16a20 92 B (`ROM_INCBIN 0x16a20, 0x5c`) | Seg-5 | **孤儿 OBJD-type dispatcher 簇**: 0x169d6 (22B dispatcher: `adds r3,r1;ldrb;lsrs;cmp 0xb;bhi;...mov pc,r0`) + jump table `orphan_objd_type_dispatch_jump_table` @0x169f0 (12×4B → 0x16a20..70) + 0x16a20 (92B = 12 个 6B handler)。0x12-type 分派表。**0 外部引用** (与 named accessor 簇功能重叠的 dead-code 编译变体)。**留待**: R4 disasm + createFunction ×13 |
 | 0x08016074 | 36 B (`ROM_INCBIN 0x16074, 0x24`) | Seg-4 | **5 个 THUMB 孤儿 dispatcher handler** (各 6B = `BL get_bgN_screen_vram_addr; b <common_tail>`): 0x16074→BG0/0x1607a→BG1/0x16080→BG2/0x16086→BG3/0x1608c→第5路。配合 `.byte` 块 0x1604c (16B 跳转表 dispatcher) + jump table `orphan_bg_screen_vram_jump_table` @0x16060 (5 entries)。**与 named `get_bg_screen_vram_addr_by_index` (0x16014, cmp/beq 实现) 功能重复**, 显然是 compiler 另一翻译变体的 dead code。**0 外部引用** (跳转表→handlers 是 orphan 块内部引用)。**留待**: R4 disasm + createFunction × 6 |
+| 0x08017424 | 64 B (`ROM_INCBIN 0x17424, 0x40`) | Seg-5d | **2 个 THUMB 孤儿小函数 (dead code, 0 ROM 引用)**: ①0x17424..0x17444 (32B) bitfield-index helper (`adds r2,r1,#0; asrs r1,r2,#2; ...` 等效 `r2 mod 4` 类 bit-index, `bx lr`); ②0x17448..0x17462 (26B) halfword-pair extractor (从 r0 addr 读 2×u16, 按 bit0 控制 shift 合并返回 u16)。**全 ROM 0 引用** (ref-scan 16 个 4B 对齐子地址 raw=0/thumb=0 全零, 已独立复核)。**留待**: 引用到时 R4 disasm + createFunction |
 
 ---
 

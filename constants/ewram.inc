@@ -158,6 +158,22 @@
                                              @         Get Cards / Forb-Ltd Card Lists / Options
 
 @ -----------------------------------------------------------------------------
+@ 名字输入 / Banlist 场景状态结构
+@ -----------------------------------------------------------------------------
+.equ gState,    0x02029250  @ name-input / banlist page state struct (804B cleared by NAME_INPUT_STATE_CPUSET_CTRL)
+                             @ +0x8d = name display buffer (14B); +0x304 = scrollbar OAM slot;
+                             @ 37 ROM refs; consumers: init_scrollbar_oam_slot_settings,
+                             @   name_input_page_init, apply_sprite_gfx_by_type,
+                             @   load_game_str_pair_1004_to_state, load_game_str_1006_to_state, ...
+
+.equ gFontJpCtx, 0x02006ed0 @ JP font render context struct (~0x68B based on stride)
+                              @ +0x4  = fn_ptr (indexed from font_jp_base_table by mode bits)
+                              @ +0x8  = mode_flags (bit1=double-byte, bit2=? used by setup_font_jp_ctx_*)
+                              @ +0x15 = active_flag (bit5=0x20 = glyph active)
+                              @ 202 ROM refs; consumers: setup_font_jp_ctx_bg_vram_fixed,
+                              @   setup_font_jp_ctx_obj_vram_row
+
+@ -----------------------------------------------------------------------------
 @ Demo 过场动画 (cinematic; demo/shuen, demo/exodia, demo/vija ...)
 @ -----------------------------------------------------------------------------
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
