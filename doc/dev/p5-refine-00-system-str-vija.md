@@ -113,7 +113,8 @@ gitignore 生成产物):
 | **batch-2: GL blend/brightness 簇 (12 fn)** | 0x14600..0x14a10 | ✅ R1/R2/R3/R5 完成 (见 §四.4.0a): gGlBlendState 符号化 + 4 equate + 1 函数改名 + 7 plate 订正; byte-identical。**附带修复 1 个 pre-existing 断言串 carve 回归 (assert_..._670 标签)** |
 | **batch-3: BG VRAM 地址簇 (24 fn)** | 0x14a10..0x14e14 | ✅ R1/R2/R5 完成 (见 §四.4.0c): OBJ_TILE_VRAM_BASE equate(新 gba_mem.inc) + 8 auto-name 槽改名 + 2 plate 订正; byte-identical。簇本身 plate 已高质量 (sibling getter/copy), 细化以 R2 为主 |
 | **batch-4: GL palette/OAM manager 簇 (7 fn)** | 0x1510c..0x1522c | ✅ R1/R2/R3/R5 完成 (见 §四.4.0d): gGlState=0x02023490 符号化(7 槽) + 3 cpu_set equate(新 gl_state.inc) + 7 plate 订正(含 2 处 0x02024330→0x02023d30 错址 + 0x22B B / 0x200→0x400 字节单位); byte-identical |
-| 代码函数 (其余 ~233 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-5: GL_Scrollbar 簇 (11 fn)** | 0x15384..0x155f4 | ✅ R1/R2/R5 完成 (见 §四.4.0e): 5 字段位掩码 equate(新 gl_scrollbar.inc) + 7 槽改名 + 4 plate 过时 FUN_ caller 改现名; byte-identical。GL_Scrollbar* 传参(非全局) |
+| 代码函数 (其余 ~222 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x1563c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -236,6 +237,29 @@ assign_palette_slot_entry / alloc_palette_entry_slot / copy_sprite_attr_table_to
 注: tick_palette_fade_to_oam_palram (0x152b0) / init_scrollbar_oam_entry (0x15384) 不引用 gGlState
 (用传入指针/OBJ PALRAM), 留后续批。内联 OAM VRAM 基址 (0xe0<<0x13=0x07000000) 无 pool 槽不符号化。
 
+### 4.0e batch-5 完成记录: GL_Scrollbar 簇 (0x15384..0x155f4, 11 fn) ✅
+
+init_scrollbar_oam_entry / get_scrollbar_range_param / compute_scrollbar_thumb_position /
+get_scrollbar_cur_value / set_scrollbar_cur_pos / check_scrollbar_can_advance /
+advance/retreat_scrollbar_pos_one / advance/retreat_scrollbar_pos_page /
+update_scrollbar_thumb_display。源 GL/GL_Scrollbar.c。byte-identical SHA1 9689337d。
+
+**特点**: GL_Scrollbar* 由 r0 传参 (非全局, 无 ewram label)。plate 已高质量 (字段布局/行号/
+现名齐全), 细化以 R1 字段掩码 + R5 过时 caller 名为主。结构字段: +0w(attr,bit0 visible) /
++4 u16 cur_pos / +6 u16 total_count / +8 track_len / +9 margin_top / +a offset / +b visible_count /
++c w(bits[14:6] range_param, bits[23:15] Y base, bits[17:9] thumb pos)。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1/R2 字段掩码 | data-equate `SCROLLBAR_INIT_FILL_CTRL`(0x05000004) / `SCROLLBAR_KEEP_BITS_8_0`(0x1ff) / `SCROLLBAR_CLEAR_BITS_14_6`(0xffff803f) / `_23_15`(0xff007fff) / `_17_9`(0xfffc01ff); 新增 `constants/gl_scrollbar.inc` | 7 槽/5 常量 |
+| R5 注释 | 4 plate 过时 FUN_ caller 改现名 (FUN_080155f4→update_scrollbar_thumb_display; FUN_08018d3c→tick_oam_palette_fade_settings; banlist_080186f0→read_banlist_char_at_scroll_pos; FUN_08018434→tick_name_input_scrollbar_and_anims; FUN_0801a794→tick_banlist_scrollbar_and_slot_anim) + thumb mask 名对齐 equate | 4 plate |
+
+新增: `constants/gl_scrollbar.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineScrollbarBatch5.py`。
+
+**defer (R4)**: 0x1550a 处 14 字节 `.byte` 块 (check_scrollbar_can_advance 与 advance_scrollbar_pos_one
+之间) 反汇编为一个小函数 (adds/ldrh/orrs/lsrs#0x1f/bx lr, 取某字段最高位返回), Ghidra 误标为数据;
+未在函数清单。独立 R4 案 (需 disasm+createFunction), 本批跳过, 留专项处理 (字节保持 .byte → byte-identical)。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -305,15 +329,17 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 3. ✅ **batch-3 (0x14a10..0x14e14, BG VRAM 地址簇 24 fn)** 完成 (见 §四.4.0c)。
 4. ✅ **batch-4 (0x1510c..0x1522c, GL palette/OAM manager 簇 7 fn)** 完成 (见 §四.4.0d);
    gGlState=0x02023490 命名, 与 batch-2 gGlBlendState 配对。
-5. 下一批 (batch-5) 候选:
-   - **OAM/affine + ISD cell-anim 簇** (tick_palette_fade_to_oam_palram 0x152b0 /
-     init_scrollbar_oam_entry 0x15384 / compute_bg_affine_matrix_scaled 0x15820 /
-     setup_isd_cell_anim_oam_entry 0x15954 / dispatch_isd_cell_anim_oam_setup 0x15a8c ...,
-     0x152b0..0x16xxx) —— 延续 GL/IG2D 子系统。
-   - FS 簇 (fs_resolve_path_to_fid / fs_load / cpu_copy_auto, 0x14f54..0x15108)。
-   - 文本测量簇 (copy_str_unbounded / measure_text_pixel_width 等, 0x14470..0x145bc) + 散点
-     (tick_prng_step_sequence 0x14398 / banlist_password_enter_char 0x143f0)。
-6. 每批后视情况更新本文「进度」表。
+5. ✅ **batch-5 (0x15384..0x155f4, GL_Scrollbar 簇 11 fn)** 完成 (见 §四.4.0e)。
+6. 下一批 (batch-6) 候选:
+   - **NNS G2D 资源加载簇** (alloc_nce_buff_slot 0x1563c / load_nce_cell_bank_from_file 0x15b10 /
+     load_nanr/ncgr/nclr_*_from_file / load_g2d_obj_resource_set 0x15d30 ...) —— FS+IG2D 资源加载,
+     操作 [0x03000bfc]/[0x03000c08] 等 IWRAM 计数器/基址 (可符号化为 g 全局)。
+   - **OAM/affine + ISD cell-anim 簇** (compute_bg_affine_matrix_scaled 0x15728 /
+     setup_isd_cell_anim_oam_entry 0x15954 / dispatch_isd_cell_anim_oam_setup 0x15a8c / trig_table)。
+   - G2D entry accessor 簇 (find_gfx_entry_by_tag / get_bgdt/objd/palt_entry_* 0x16140..0x16200+)。
+   - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction (见 §四.4.0e defer)。
+   - FS 散点 (fs_resolve_path_to_fid / fs_load 0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade 0x152b0。
+7. 每批后视情况更新本文「进度」表。
 
 ---
 

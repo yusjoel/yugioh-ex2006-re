@@ -4253,25 +4253,25 @@ init_scrollbar_oam_entry:
     ldr r7,[sp,#0x20]                        @ 08015394 089f
     movs r0,#0x0    @ 08015396 0020
     str r0,[sp,#0x0]                         @ 08015398 0090
-    ldr r2, DAT_08015410                     @ 0801539a 1d4a
+    ldr r2, init_scrollbar_oam_entry_scrollbar_init_fill_ctrl @ 0801539a 1d4a
     .hword 0x4668    @ 0801539c 6846
     adds r1,r4,#0x0    @ 0801539e 211c
     bl bios_cpu_set                          @ 080153a0 f9f02af8
-    ldr r1, DAT_08015414                     @ 080153a4 1b49
+    ldr r1, init_scrollbar_oam_entry_scrollbar_keep_bits_8_0 @ 080153a4 1b49
     adds r0,r1,#0x0    @ 080153a6 081c
     ands r6,r0    @ 080153a8 0640
     lsls r6,r6,#0x6    @ 080153aa b601
-    ldr r0, DAT_08015418                     @ 080153ac 1a48
+    ldr r0, init_scrollbar_oam_entry_scrollbar_clear_bits_14_6 @ 080153ac 1a48
     ldrh r1,[r4,#0x0]                        @ 080153ae 2188
     ands r0,r1    @ 080153b0 0840
     orrs r0,r6    @ 080153b2 3043
     strh r0,[r4,#0x0]                        @ 080153b4 2080
-    ldr r3, DAT_08015414                     @ 080153b6 174b
+    ldr r3, init_scrollbar_oam_entry_scrollbar_keep_bits_8_0 @ 080153b6 174b
     adds r1,r5,#0x0    @ 080153b8 291c
     ands r1,r3    @ 080153ba 1940
     lsls r1,r1,#0xf    @ 080153bc c903
     ldr r0,[r4,#0x0]                         @ 080153be 2068
-    ldr r2, DAT_0801541c                     @ 080153c0 164a
+    ldr r2, init_scrollbar_oam_entry_scrollbar_clear_bits_23_15 @ 080153c0 164a
     ands r0,r2    @ 080153c2 1040
     orrs r0,r1    @ 080153c4 0843
     str r0,[r4,#0x0]                         @ 080153c6 2060
@@ -4294,7 +4294,7 @@ init_scrollbar_oam_entry:
     ands r5,r3    @ 080153e8 1d40
     lsls r5,r5,#0x9    @ 080153ea 6d02
     ldr r0,[r4,#0xc]                         @ 080153ec e068
-    ldr r1, DAT_08015420                     @ 080153ee 0c49
+    ldr r1, init_scrollbar_oam_entry_scrollbar_clear_bits_17_9 @ 080153ee 0c49
     ands r0,r1    @ 080153f0 0840
     orrs r0,r5    @ 080153f2 2843
     str r0,[r4,#0xc]                         @ 080153f4 e060
@@ -4311,18 +4311,18 @@ init_scrollbar_oam_entry:
     pop {r0}                                 @ 0801540a 01bc
     bx r0                                    @ 0801540c 0047
     .zero  0x2
-DAT_08015410:
-    .word  0x05000004                     @ 08015410 04000005
-DAT_08015414:
-    .word  0x000001ff                     @ 08015414 ff010000
-DAT_08015418:
-    .word  0xffff803f                     @ 08015418 3f80ffff
-DAT_0801541c:
-    .word  0xff007fff                     @ 0801541c ff7f00ff
-DAT_08015420:
-    .word  0xfffc01ff                     @ 08015420 ff01fcff
+init_scrollbar_oam_entry_scrollbar_init_fill_ctrl:
+    .word  SCROLLBAR_INIT_FILL_CTRL       @ 08015410 04000005
+init_scrollbar_oam_entry_scrollbar_keep_bits_8_0:
+    .word  SCROLLBAR_KEEP_BITS_8_0        @ 08015414 ff010000
+init_scrollbar_oam_entry_scrollbar_clear_bits_14_6:
+    .word  SCROLLBAR_CLEAR_BITS_14_6      @ 08015418 3f80ffff
+init_scrollbar_oam_entry_scrollbar_clear_bits_23_15:
+    .word  SCROLLBAR_CLEAR_BITS_23_15     @ 0801541c ff7f00ff
+init_scrollbar_oam_entry_scrollbar_clear_bits_17_9:
+    .word  SCROLLBAR_CLEAR_BITS_17_9      @ 08015420 ff01fcff
 
-@ Extracts [pThis+0xc] word bits[22:14] (9-bit field) from GL_Scrollbar entry (r0=pThis) and returns as unsigned int. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x38=56 "pThis"). Callers FUN_08018d3c/banlist_080186f0 read this param before rendering scrollbar for position calculation.
+@ Extracts [pThis+0xc] word bits[22:14] (9-bit field) from GL_Scrollbar entry (r0=pThis) and returns as unsigned int. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x38=56 "pThis"). Callers tick_oam_palette_fade_settings/read_banlist_char_at_scroll_pos read this param before rendering scrollbar for position calculation.
 @ 
 @ Params: r0=ptr pThis GL_Scrollbar entry (non-NULL assert)
 @ Returns: r0=u32 param_field ([pThis+0xc] bits[22:14], 9-bit unsigned [0..511])
@@ -4350,7 +4350,7 @@ get_scrollbar_range_param_gl_scrollbar_c_filename:
 get_scrollbar_range_param_assert_pthis:
     .word  assert_pthis                   @ 08015448 7c9ce309  pThis
 
-@ Computes GL_Scrollbar thumb visual position. Formula: pos = field_c[23:15] + field_9 + (field_4 * (field_8 - 2*field_9 - field_a)) / (field_6 - field_b). Field meanings: field_c[23:15]=OAM Y base; field_4=cur_val (halfword); field_6=max_val (halfword); field_8=track_len (byte); field_9=margin_top (byte); field_a=extra_offset (byte); field_b=margin_bot (byte). Caller FUN_080155f4 reads result for OAM Y update. Pure computation, no writes.
+@ Computes GL_Scrollbar thumb visual position. Formula: pos = field_c[23:15] + field_9 + (field_4 * (field_8 - 2*field_9 - field_a)) / (field_6 - field_b). Field meanings: field_c[23:15]=OAM Y base; field_4=cur_val (halfword); field_6=max_val (halfword); field_8=track_len (byte); field_9=margin_top (byte); field_a=extra_offset (byte); field_b=margin_bot (byte). Caller update_scrollbar_thumb_display reads result for OAM Y update. Pure computation, no writes.
 @ 
 @ Params: r0=ptr pScrollbar GL_Scrollbar OAM entry struct
 @ Returns: r0=s32 thumb_y_pos (visual thumb Y pixel position)
@@ -4383,7 +4383,7 @@ compute_scrollbar_thumb_position:
     bx r1                                    @ 0801547c 0847
     ROM_INCBIN 0x1547e, 0x26
 
-@ Reads current-value field [pThis+0x4] (halfword) from GL_Scrollbar entry (r0=pThis) and returns u16. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x5a=90 "pThis"). Caller banlist_080186f0 reads current scroll position before direction-key input handling.
+@ Reads current-value field [pThis+0x4] (halfword) from GL_Scrollbar entry (r0=pThis) and returns u16. Fires assert via suppress_assert_report if pThis==NULL (GL/GL_Scrollbar.c line 0x5a=90 "pThis"). Caller read_banlist_char_at_scroll_pos reads current scroll position before direction-key input handling.
 @ 
 @ Params: r0=ptr pThis GL_Scrollbar entry (non-NULL assert)
 @ Returns: r0=u16 cur_value ([pThis+0x4] halfword, current scroll value)
@@ -4621,7 +4621,7 @@ LAB_080155ea:
 @ GL/GL_Scrollbar.c:154; then checks pThis[+0x0] bit0 (visibility); if visible: calls
 @ compute_scrollbar_thumb_position for position value, masks low 9 bits, shifts left 9 into
 @ pThis[+0xc] bits[17:9], preserving other bits (mask 0xfffc01ff clears old value then ORs new).
-@ Called by FUN_08018434 (tags: [scrollbar,name_input]) and FUN_0801a794 (tags: [scrollbar,banlist])
+@ Called by tick_name_input_scrollbar_and_anims and tick_banlist_scrollbar_and_slot_anim
 @ in scrollbar state update scenarios.
 @ 
 @ Side effects:
@@ -4629,9 +4629,9 @@ LAB_080155ea:
 @ 
 @ Constants:
 @ - GL_Scrollbar.c line 154 = assert non-null (0x9a=154)
-@ - THUMB_FIELD_MASK = 0xfffc01ff (clears pThis[+0xc] bits[17:9])
+@ - SCROLLBAR_CLEAR_BITS_17_9 = 0xfffc01ff (clears pThis[+0xc] bits[17:9])
 @ - THUMB_SHIFT = 9 (lsls r1,r1,#0x9)
-@ - THUMB_VAL_MASK = 0x000001ff (9-bit truncation)
+@ - SCROLLBAR_KEEP_BITS_8_0 = 0x000001ff (9-bit truncation)
 @ - VISIBLE_BIT = pThis[+0x0] bit0
 update_scrollbar_thumb_display:
     push {r4,lr}                             @ 080155f4 10b5
@@ -4650,11 +4650,11 @@ LAB_08015608:
     beq LAB_08015626                         @ 0801560e 0ad0
     adds r0,r4,#0x0    @ 08015610 201c
     bl compute_scrollbar_thumb_position      @ 08015612 fff71bff
-    ldr r1, DAT_08015634                     @ 08015616 0749
+    ldr r1, update_scrollbar_thumb_display_scrollbar_keep_bits_8_0 @ 08015616 0749
     ands r1,r0    @ 08015618 0140
     lsls r1,r1,#0x9    @ 0801561a 4902
     ldr r0,[r4,#0xc]                         @ 0801561c e068
-    ldr r2, DAT_08015638                     @ 0801561e 064a
+    ldr r2, update_scrollbar_thumb_display_scrollbar_clear_bits_17_9 @ 0801561e 064a
     ands r0,r2    @ 08015620 1040
     orrs r0,r1    @ 08015622 0843
     str r0,[r4,#0xc]                         @ 08015624 e060
@@ -4666,10 +4666,10 @@ update_scrollbar_thumb_display_gl_scrollbar_c_filename:
     .word  gl_scrollbar_c_filename        @ 0801562c 689ce309  GL/GL_Scrollbar.c
 update_scrollbar_thumb_display_assert_pthis:
     .word  assert_pthis                   @ 08015630 7c9ce309  pThis
-DAT_08015634:
-    .word  0x000001ff                     @ 08015634 ff010000
-DAT_08015638:
-    .word  0xfffc01ff                     @ 08015638 ff01fcff
+update_scrollbar_thumb_display_scrollbar_keep_bits_8_0:
+    .word  SCROLLBAR_KEEP_BITS_8_0        @ 08015634 ff010000
+update_scrollbar_thumb_display_scrollbar_clear_bits_17_9:
+    .word  SCROLLBAR_CLEAR_BITS_17_9      @ 08015638 ff01fcff
 
 @ GL/IG2D_Main.c -- allocate next free NceBuff (NCE = NNS Cell Entry) slot. Called by 0x08015b10 (fs tag). Asserts [0x03000BFC] <= 1 (UsedNceBuff < IG2D_LOAD_ANM_MAX=2, line 0x2F=47). Computes slot addr = [0x03000C08] + count*(1<<12), increments counter, returns ptr. r0: no input (entry ldr r4,DAT overwrites r0). Returns void* (4KB-aligned NceBuff slot). Side effect: [0x03000BFC] += 1. Constants: IG2D_LOAD_ANM_MAX=2 / NCE_BUFF_SLOT_SIZE=0x1000 / UsedNceBuff=[0x03000BFC] / NceBuffBase=[0x03000C08].
 alloc_nce_buff_slot:
