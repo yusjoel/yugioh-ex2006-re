@@ -5972,15 +5972,15 @@ zero_struct_36bytes:
     .hword 0x466a    @ 08015fce 6a46
     movs r0,#0x0    @ 08015fd0 0020
     strh r0,[r2,#0x0]                        @ 08015fd2 1080
-    ldr r2, DAT_08015fe4                     @ 08015fd4 034a
+    ldr r2, zero_struct_36bytes_fill_ctrl    @ 08015fd4 034a
     .hword 0x4668    @ 08015fd6 6846
     bl bios_cpu_set                          @ 08015fd8 f8f00efa
     movs r0,#0x0    @ 08015fdc 0020
     add sp,#0x4                              @ 08015fde 01b0
     pop {r1}                                 @ 08015fe0 02bc
     bx r1                                    @ 08015fe2 0847
-DAT_08015fe4:
-    .word  0x01000012                     @ 08015fe4 12000001
+zero_struct_36bytes_fill_ctrl:
+    .word  0x01000012                     @ 08015fe4 12000001  = 0x01000012; bit24=0 cpu_set / bit26=1 fill / halfword / len=0x12=18 hw=36B
     ROM_INCBIN 0x15fe8, 0x2c
 
 @ Function: dispatches on r0=bg_index {0,1,2,3} to call the corresponding get_bgN_screen_vram_addr
@@ -6026,9 +6026,9 @@ LAB_08016048:
     pop {r1}                                 @ 08016048 02bc
     bx r1                                    @ 0801604a 0847
     .byte  0x00, 0xb5, 0x04, 0x28, 0x1f, 0xd8, 0x80, 0x00, 0x01, 0x49, 0x40, 0x18, 0x00, 0x68, 0x87, 0x46
-    .word  0x08016060                     @ 0801605c 60600108
-PTR_DAT_08016060:
-    .word  0x08016074                     @ 08016060 74600108
+    .word  orphan_bg_screen_vram_jump_table @ 0801605c 60600108
+orphan_bg_screen_vram_jump_table:
+    .word  0x08016074                     @ 08016060 74600108  5-entry; targets 0x16074/7a/80/86/8c (orphan handlers @0x16074 ROM_INCBIN, dead code, 0 ext refs)
     .word  0x0801607a                     @ 08016064 7a600108
     .word  0x08016080                     @ 08016068 80600108
     .word  0x08016086                     @ 0801606c 86600108

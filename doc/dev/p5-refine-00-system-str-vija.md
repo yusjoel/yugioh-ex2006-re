@@ -502,6 +502,30 @@ CJK, 必要解释走 doc/dev/。**§5.1 登记: 无** (10 个 carve label 均有
 
 byte-identical 9689337d 保持。脚本: `RefineSeg3bGetAnimCtrl.py` (单 plate R5)。**Seg-3 完成**。
 
+### 4.0r Seg-4 完成记录: 0x1571c..0x16218 (b7/b10/b11/b9/b8 复用 + R2 + 3 §5.1) ✅
+
+Seg-4 大部分被 b7/b10/b11/b9/b8 覆盖, 剩余仅 2 R2 + 3 §5.1 ROM_INCBIN:
+
+| 区段/函数 | 处理 |
+|---|---|
+| 0x1571c..0x15728 | ✅ b6 dispatch_cell_anim_frame_advance (Seg-3 末) |
+| 0x15728..0x15924 | ✅ b7 BG affine matrix 4fn 已细化 |
+| 0x15924..0x15954 gap | ✅ alloc_palette_entry_slot/alloc_cell_anim_slot 已细化 (b6 部分; Seg-3 已确认) |
+| 0x15954..0x15ac4 | ✅ b10 ISD cell-anim OAM 2fn 已细化 |
+| 0x15ac4..0x15b04 | ✅ alloc_cell_anim_slot + invoke_fs_load (b6/b11 末) |
+| 0x15b04..0x15e72 | ✅ b11 IG2D 资源加载族 7fn 已细化 (含 Seg-3a/3b 续) |
+| **ROM_INCBIN 0x15d18/0x18** | **§5.1 登记** (1 affine-type→idx 孤儿映射) |
+| 0x15e72..0x15fc8 | ✅ load_g2d_obj_resource_set 末 + setup_decimal_digit_oam_batch (无 pool 槽) |
+| zero_struct_36bytes (0x15fc8) | ✅ DAT_08015fe4 (0x01000012 cpu_set ctrl) → `zero_struct_36bytes_fill_ctrl` + EOL (位字段说明) |
+| **ROM_INCBIN 0x15fe8/0x2c** | **§5.1 登记** (1 模算法 helper 孤儿) |
+| get_bg_screen_vram_addr_by_index (0x16014) | ✅ b3 名族, plate 完整 |
+| **0x1604c .byte 16B + 0x1605c .word + 0x16060 jump table (5×4B) + ROM_INCBIN 0x16074/0x24** | dispatcher + jump table + handlers 组成的**孤儿 dead-code 簇** (是 get_bg_screen_vram_addr_by_index 的 jump-table 翻译变体), 内部互引用但 0 外部引用; PTR_DAT_08016060 → `orphan_bg_screen_vram_jump_table` + EOL; **§5.1 登记 handlers 区** |
+| 0x16098..0x1613c | ✅ b9 ISD affine matrix 指针簇 3fn 已细化 |
+| 0x1613c..0x16140 | 4B 对齐填充 |
+| 0x16140..0x16218 (b8 前 6 fn) | ✅ b8 G2D entry accessor 簇已细化 |
+
+byte-identical 9689337d 保持。脚本: `RefineSeg4LightRenames.py` (2 槽 R2)。**Seg-4 完成**。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -596,6 +620,9 @@ R9 byte-identical。
 | 0x0801547e | 38 B (`ROM_INCBIN 0x1547e, 0x26`) | Seg-3 | **3 个 THUMB 孤儿 GL_Scrollbar 字段小函数**: ①0x15480 (8B) `bits[5:2] getter` (`ldrb [r0];lsls#0x1a;lsrs#0x1c;bx lr`); ②0x15488 (8B) `bit[0] getter` (`ldrb [r0];lsls#0x1f;lsrs#0x1f;bx lr`); ③0x15490 (18B) `bit[0] setter from r1&1` (read-modify-write [r0])。**ROM 内 0 引用** (全 ROM 扫 raw+THUMB+1 均零)。**留待**: 引用到时 R4 disasm |
 | 0x0801550a | 14 B (`.byte` 块, 非 ROM_INCBIN) | Seg-3 | **1 个 THUMB 孤儿谓词函数**: 0x1550c `adds r1,r0,#0;ldrh r2,[r1+4];rsbs r0,r2,#0;orrs r0,r2;lsrs r0,#0x1f;bx lr` = "返回 [r0+4] 的 u16 字段是否非零 (0/1)" 谓词。**ROM 内 0 引用**。**留待**: R4 disasm |
 | 0x080156ec | 6 B (`.byte` 块, 非 ROM_INCBIN) | Seg-3 | **1 个 THUMB 孤儿 setter**: 0x156ee `str r1,[r0,#0xc];bx lr` = `void f(void* p, u32 val) { p[+0xc]=val; }`。**ROM 内 0 引用**。**留待**: R4 disasm |
+| 0x08015d18 | 24 B (`ROM_INCBIN 0x15d18, 0x18`) | Seg-4 | **1 个 THUMB 孤儿 affine-type → 索引映射**: `cmp r0,#4;beq…;cmp r0,#9;beq…` 三分支返回 {4→1, 9→2, default→3}。**ROM 内 0 引用** (与 batch-9 ISD affine 同模式但 dead code)。**留待**: R4 disasm |
+| 0x08015fe8 | 44 B (`ROM_INCBIN 0x15fe8, 0x2c`) | Seg-4 | **1 个 THUMB 孤儿模算法 helper**: 输入 r0, 分支据 r0 cmp 4/0, 调用 asrs/lsls/subs 序列等效于 `r0 mod 4` 类操作, `ands #1`+`bx lr` 返回 bit0。**ROM 内 0 引用**。**留待**: R4 disasm |
+| 0x08016074 | 36 B (`ROM_INCBIN 0x16074, 0x24`) | Seg-4 | **5 个 THUMB 孤儿 dispatcher handler** (各 6B = `BL get_bgN_screen_vram_addr; b <common_tail>`): 0x16074→BG0/0x1607a→BG1/0x16080→BG2/0x16086→BG3/0x1608c→第5路。配合 `.byte` 块 0x1604c (16B 跳转表 dispatcher) + jump table `orphan_bg_screen_vram_jump_table` @0x16060 (5 entries)。**与 named `get_bg_screen_vram_addr_by_index` (0x16014, cmp/beq 实现) 功能重复**, 显然是 compiler 另一翻译变体的 dead code。**0 外部引用** (跳转表→handlers 是 orphan 块内部引用)。**留待**: R4 disasm + createFunction × 6 |
 
 ---
 
