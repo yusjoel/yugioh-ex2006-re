@@ -61,7 +61,7 @@
 | 5b | apply_bgdt/objd | ✅ | (committed) |
 | 5c | apply_gfx_resource_list + R4 disasm 63 SJIS stubs | ✅ | (committed) |
 | 5d | 0x171ec..0x1794c (15 fn + 2 carve + §5.1 0x17424/0x40) | ✅ | 8c4ec5a |
-| 6a | 0x1794c..0x17e48 (5 fn, kana carve A+B+pool+I) | ✅ | (pending commit) |
+| 6a | 0x1794c..0x17e48 (5 fn, kana carve A+B+pool+I) | ✅ | baabb9a |
 | **6b** | **0x17e48..0x18774 (23 fn, carve F/G/H, incbin 0x186ce/0x22)** | **⬜ 下一步** | |
 | 7 | 0x18774..0x19a58 (incbin 0x19640/0x20) | ⬜ | |
 | 8 | 0x19a58..0x1a794 | ⬜ | |
