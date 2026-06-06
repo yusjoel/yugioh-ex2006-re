@@ -2003,23 +2003,15 @@ LAB_08014386:
     bx r1                                    @ 08014394 0847
     .zero  0x2
 
-@ Function: reads gPrng+0x204 bits[21:14] to get current step index, looks up step callback
-@ at STEP_TABLE[index*4] and calls it via invoke_r0; if step returns nonzero (step done),
-@ increments index (mod 256) and writes back to bits[21:14]; if step returns 0, calls
-@ return_void_handler and returns 0; if step pointer is NULL returns 1 (sequence end sentinel).
+@ Demo scene phase sequencer (was mis-named tick_prng_step_sequence; uses gPrng addr only as a base). Reads gDemoSceneInitPhase (gPrng+0x204 = 0x03000244) bits[21:14] = current phase index, looks up demo_scene_phase_table[index] and calls it via invoke_r0. Phase table: [0]=reset_display_and_gl_state, [1]=load_demo_obj_resource_slot0, [2]=tick_demo_scene_state_machine, [3]=NULL (sequence-end sentinel). If phase fn returns nonzero (phase done), increments index (mod 256) writing back bits[21:14]; if returns 0, calls return_void_handler and returns 0; if table entry is NULL returns 1 (sequence complete). indeg=0 (driven indirectly).
 @ 
-@ Side effects: updates [gPrng+0x204] bits[21:14] (step counter +1 mod 256) when step completes.
-@ 
-@ Constants:
-@ - gPrng = 0x03000040 (IWRAM global state)
-@ - STEP_FIELD_OFFSET = 0x204 (word offset within gPrng)
-@ - STEP_TABLE = 0x09e587d4 (ROM step function pointer array)
-@ - STEP_SHIFT = 14 (bits[21:14] extraction: lsls #0xa / lsrs #0x18)
-@ - STEP_MASK = 0xffc03fff (write-back clear mask)
-tick_prng_step_sequence:
+@ Params: none. Returns: r0=1 when sequence complete (NULL entry), else 0.
+@ Side effects: updates [gDemoSceneInitPhase] bits[21:14] (+1 mod 256) when a phase completes.
+@ Constants: gDemoSceneInitPhase=0x03000244 (gPrng+0x204) / demo_scene_phase_table=0x09e587d4 / PHASE_SHIFT=14 (bits[21:14]) / PHASE_FIELD_CLEAR=0xffc03fff.
+step_demo_scene_phase:
     push {r4,lr}                             @ 08014398 10b5
-    ldr r1, DWORD_080143dc                   @ 0801439a 1049
-    ldr r0, DWORD_080143e0                   @ 0801439c 1048
+    ldr r1, step_demo_scene_phase_phase_table @ 0801439a 1049
+    ldr r0, step_demo_scene_phase_ptr_gprng_base @ 0801439c 1048
     movs r2,#0x81    @ 0801439e 8122
     lsls r2,r2,#0x2    @ 080143a0 9200
     adds r4,r0,r2    @ 080143a2 8418
@@ -2041,7 +2033,7 @@ tick_prng_step_sequence:
     movs r0,#0xff    @ 080143c4 ff20
     ands r1,r0    @ 080143c6 0140
     lsls r1,r1,#0xe    @ 080143c8 8903
-    ldr r0, DWORD_080143e4                   @ 080143ca 0648
+    ldr r0, step_demo_scene_phase_phase_field_clear_mask @ 080143ca 0648
     ands r0,r2    @ 080143cc 1040
     orrs r0,r1    @ 080143ce 0843
     str r0,[r4,#0x0]                         @ 080143d0 2060
@@ -2050,12 +2042,12 @@ LAB_080143d2:
     movs r0,#0x0    @ 080143d6 0020
     b LAB_080143ea                           @ 080143d8 07e0
     .zero  0x2
-DWORD_080143dc:
-    .word  0x09e587d4                     @ 080143dc d487e509
-DWORD_080143e0:
-    .word  gPrng                          @ 080143e0 40000003
-DWORD_080143e4:
-    .word  0xffc03fff                     @ 080143e4 ff3fc0ff
+step_demo_scene_phase_phase_table:
+    .word  demo_scene_phase_table         @ 080143dc d487e509
+step_demo_scene_phase_ptr_gprng_base:
+    .word  gPrng                          @ 080143e0 40000003  +0x204 = gDemoSceneInitPhase (0x03000244)
+step_demo_scene_phase_phase_field_clear_mask:
+    .word  0xffc03fff                     @ 080143e4 ff3fc0ff  clear bits[21:14] (phase idx)
 LAB_080143e8:
     movs r0,#0x1    @ 080143e8 0120
 LAB_080143ea:
@@ -2069,15 +2061,15 @@ banlist_password_enter_char:
     adds r4,r0,#0x0    @ 080143f2 041c
     adds r3,r1,#0x0    @ 080143f4 0b1c
     adds r6,r2,#0x0    @ 080143f6 161c
-    ldr r1, DAT_08014430                     @ 080143f8 0d49
-    ldr r0, DAT_08014434                     @ 080143fa 0e48
+    ldr r1, banlist_password_enter_char_ewram_base @ 080143f8 0d49
+    ldr r0, banlist_password_enter_char_gsettings_offset @ 080143fa 0e48
     adds r1,r1,r0    @ 080143fc 0918
     movs r0,#0x7    @ 080143fe 0720
     ldrb r1,[r1,#0x0]                        @ 08014400 0978
     ands r0,r1    @ 08014402 0840
     cmp r0,#0x0                              @ 08014404 0028
     beq LAB_08014410                         @ 08014406 03d0
-    ldr r0, DAT_08014438                     @ 08014408 0b48
+    ldr r0, banlist_password_enter_char_ptr_text_encoding_override @ 08014408 0b48
     ldrb r0,[r0,#0x0]                        @ 0801440a 0078
     cmp r0,#0x0                              @ 0801440c 0028
     beq LAB_08014458                         @ 0801440e 23d0
@@ -2099,12 +2091,12 @@ LAB_0801441c:
     ldrb r0,[r4,#0x0]                        @ 0801442a 2078
     strb r0,[r3,#0x0]                        @ 0801442c 1870
     b LAB_0801443e                           @ 0801442e 06e0
-DAT_08014430:
+banlist_password_enter_char_ewram_base:
     .word  0x02000000                     @ 08014430 00000002
-DAT_08014434:
-    .word  0x00006c2c                     @ 08014434 2c6c0000
-DAT_08014438:
-    .word  0x0202348c                     @ 08014438 8c340202
+banlist_password_enter_char_gsettings_offset:
+    .word  0x00006c2c                     @ 08014434 2c6c0000  = gSettings(0x02006c2c) - EWRAM base
+banlist_password_enter_char_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 08014438 8c340202
 LAB_0801443c:
     strb r1,[r3,#0x0]                        @ 0801443c 1970
 LAB_0801443e:
@@ -2140,33 +2132,33 @@ LAB_08014462:
 @ 无界字符串复制 wrapper. 调用方传入 r0=src, r1=dst; 本函数向 banlist_password_enter_char 传入 r2=0x05F5E0FF (99,999,999 无上限哨兵) 实现不限长度的 src→dst 复制 (1/2 字节编码, 0x00 终止符). 返回 r0=chars_written. 13 个 caller 覆盖 banlist/name_input/pass_input/game_str. 已命名 caller: name_input_page_exit (0x080194ec).
 copy_str_unbounded:
     push {lr}                                @ 08014470 00b5
-    ldr r2, DAT_0801447c                     @ 08014472 024a
+    ldr r2, copy_str_unbounded_len_sentinel  @ 08014472 024a
     bl banlist_password_enter_char           @ 08014474 fff7bcff
     pop {r1}                                 @ 08014478 02bc
     bx r1                                    @ 0801447a 0847
-DAT_0801447c:
-    .word  0x05f5e0ff                     @ 0801447c ffe0f505
+copy_str_unbounded_len_sentinel:
+    .word  0x05f5e0ff                     @ 0801447c ffe0f505  = 99,999,999 (0x5f5e0ff) æ ä¸éå¨åµ
 
 @ Appends src string (r0) to the end of dst buffer (r1) and returns total char-unit count. Flow: (1) scan dst in encoding-aware mode to count existing char units r4 (OCG: bit7=1 double-byte +2, else +1; TCG: byte count); (2) call copy_str_unbounded(src, dst_end) to append; (3) return r4+copy_result. Encoding mode from [EWRAM+0x6c2c]&0x7 (0=OCG double-byte, else TCG). Extra flag [0x0202348c] can override OCG to byte-count mode.
 @ 
 @ Params: r0=u8* src_str; r1=u8* dst_buf (append target)
 @ Returns: r0=u32 total_charlen (existing + appended char units)
 @ Side effects: [r1_end..] := src_str content via copy_str_unbounded
-@ Constants: 0x02006c2c=EWRAM encoding flag byte (bits[2:0]=0=>OCG); 0x0202348c=TCG/OCG override flag; 0x80=double-byte lead byte detection mask
+@ Constants: 0x02006c2c=EWRAM encoding flag byte (bits[2:0]=0=>OCG); gTextEncodingOverride(0x0202348c)=TCG/OCG override flag; 0x80=double-byte lead byte detection mask
 append_text_to_buf_charlen:
     push {r4,r5,lr}                          @ 08014480 30b5
     adds r5,r0,#0x0    @ 08014482 051c
     adds r2,r1,#0x0    @ 08014484 0a1c
     movs r4,#0x0    @ 08014486 0024
-    ldr r1, DAT_080144b4                     @ 08014488 0a49
-    ldr r0, DAT_080144b8                     @ 0801448a 0b48
+    ldr r1, append_text_to_buf_charlen_ewram_base @ 08014488 0a49
+    ldr r0, append_text_to_buf_charlen_gsettings_offset @ 0801448a 0b48
     adds r1,r1,r0    @ 0801448c 0918
     movs r0,#0x7    @ 0801448e 0720
     ldrb r1,[r1,#0x0]                        @ 08014490 0978
     ands r0,r1    @ 08014492 0840
     cmp r0,#0x0                              @ 08014494 0028
     beq LAB_080144a0                         @ 08014496 03d0
-    ldr r0, DAT_080144bc                     @ 08014498 0848
+    ldr r0, append_text_to_buf_charlen_ptr_text_encoding_override @ 08014498 0848
     ldrb r0,[r0,#0x0]                        @ 0801449a 0078
     cmp r0,#0x0                              @ 0801449c 0028
     beq LAB_080144d0                         @ 0801449e 17d0
@@ -2182,12 +2174,12 @@ LAB_080144a8:
     beq LAB_080144c0                         @ 080144ae 07d0
     adds r2,#0x2    @ 080144b0 0232
     b LAB_080144c2                           @ 080144b2 06e0
-DAT_080144b4:
+append_text_to_buf_charlen_ewram_base:
     .word  0x02000000                     @ 080144b4 00000002
-DAT_080144b8:
-    .word  0x00006c2c                     @ 080144b8 2c6c0000
-DAT_080144bc:
-    .word  0x0202348c                     @ 080144bc 8c340202
+append_text_to_buf_charlen_gsettings_offset:
+    .word  0x00006c2c                     @ 080144b8 2c6c0000  = gSettings(0x02006c2c) - EWRAM base
+append_text_to_buf_charlen_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 080144bc 8c340202
 LAB_080144c0:
     adds r2,#0x1    @ 080144c0 0132
 LAB_080144c2:
@@ -2218,21 +2210,21 @@ LAB_080144d6:
 @ Params: r0=u8* str (mixed 1/2-byte encoding, NUL-terminated); r1=u32 char_offset [0..str_charlen]
 @ Returns: r0=u8* ptr at char #char_offset, or NULL if str_charlen < char_offset
 @ Side effects: none (pure read-only pointer arithmetic)
-@ Constants: 0x02006c2c=EWRAM encoding flag byte; 0x0202348c=TCG/OCG override flag; 0x80=double-byte lead mask
+@ Constants: 0x02006c2c=EWRAM encoding flag byte; gTextEncodingOverride(0x0202348c)=TCG/OCG override flag; 0x80=double-byte lead mask
 advance_text_ptr_by_charlen:
     push {r4,r5,lr}                          @ 080144e8 30b5
     adds r2,r0,#0x0    @ 080144ea 021c
     adds r4,r1,#0x0    @ 080144ec 0c1c
     movs r3,#0x0    @ 080144ee 0023
-    ldr r1, DAT_08014520                     @ 080144f0 0b49
-    ldr r0, DAT_08014524                     @ 080144f2 0c48
+    ldr r1, advance_text_ptr_by_charlen_ewram_base @ 080144f0 0b49
+    ldr r0, advance_text_ptr_by_charlen_gsettings_offset @ 080144f2 0c48
     adds r1,r1,r0    @ 080144f4 0918
     movs r0,#0x7    @ 080144f6 0720
     ldrb r1,[r1,#0x0]                        @ 080144f8 0978
     ands r0,r1    @ 080144fa 0840
     cmp r0,#0x0                              @ 080144fc 0028
     beq LAB_08014508                         @ 080144fe 03d0
-    ldr r0, DAT_08014528                     @ 08014500 0948
+    ldr r0, advance_text_ptr_by_charlen_ptr_text_encoding_override @ 08014500 0948
     ldrb r0,[r0,#0x0]                        @ 08014502 0078
     cmp r0,#0x0                              @ 08014504 0028
     beq LAB_08014540                         @ 08014506 1bd0
@@ -2250,12 +2242,12 @@ LAB_08014514:
     beq LAB_0801452c                         @ 0801451a 07d0
     adds r2,#0x2    @ 0801451c 0232
     b LAB_0801452e                           @ 0801451e 06e0
-DAT_08014520:
+advance_text_ptr_by_charlen_ewram_base:
     .word  0x02000000                     @ 08014520 00000002
-DAT_08014524:
-    .word  0x00006c2c                     @ 08014524 2c6c0000
-DAT_08014528:
-    .word  0x0202348c                     @ 08014528 8c340202
+advance_text_ptr_by_charlen_gsettings_offset:
+    .word  0x00006c2c                     @ 08014524 2c6c0000  = gSettings(0x02006c2c) - EWRAM base
+advance_text_ptr_by_charlen_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 08014528 8c340202
 LAB_0801452c:
     adds r2,#0x1    @ 0801452c 0132
 LAB_0801452e:
@@ -2288,20 +2280,20 @@ LAB_08014554:
     bx r1                                    @ 08014558 0847
     .zero  0x2
 
-@ 由 settings_080145bc/banlist_0801990c 等跨 banlist/font_jp/game_str/settings 共 10 个调用方在文字渲染前调用, 用于测量字符串的字符单元数量. 输入字符串遵循 1/2 字节混合编码: 若字节 bit7=1 则为双字节字符(前导+后继, ptr+2), 否则单字节(ptr+1). 双字节检测由 [EWRAM+0x6c2c] & 0x7 决定(0=OCG/J 双字节, 非0=TCG 单字节). 附加标志 [0x0202348c] 在 OCG 模式下可切换为字节计数路径. 返回 r0=charlen (字符单元总数, 不含 0x00 终止符). 纯只读操作, 无任何内存写入.
+@ 由 settings_080145bc/banlist_0801990c 等跨 banlist/font_jp/game_str/settings 共 10 个调用方在文字渲染前调用, 用于测量字符串的字符单元数量. 输入字符串遵循 1/2 字节混合编码: 若字节 bit7=1 则为双字节字符(前导+后继, ptr+2), 否则单字节(ptr+1). 双字节检测由 [EWRAM+0x6c2c] & 0x7 决定(0=OCG/J 双字节, 非0=TCG 单字节). 附加标志 [gTextEncodingOverride (0x0202348c)] 在 OCG 模式下可切换为字节计数路径. 返回 r0=charlen (字符单元总数, 不含 0x00 终止符). 纯只读操作, 无任何内存写入.
 count_str_charlen:
     push {r4,lr}                             @ 0801455c 10b5
     adds r2,r0,#0x0    @ 0801455e 021c
     movs r3,#0x0    @ 08014560 0023
-    ldr r1, DAT_08014590                     @ 08014562 0b49
-    ldr r0, DAT_08014594                     @ 08014564 0b48
+    ldr r1, count_str_charlen_ewram_base     @ 08014562 0b49
+    ldr r0, count_str_charlen_gsettings_offset @ 08014564 0b48
     adds r1,r1,r0    @ 08014566 0918
     movs r0,#0x7    @ 08014568 0720
     ldrb r1,[r1,#0x0]                        @ 0801456a 0978
     ands r0,r1    @ 0801456c 0840
     cmp r0,#0x0                              @ 0801456e 0028
     beq LAB_0801457a                         @ 08014570 03d0
-    ldr r0, DAT_08014598                     @ 08014572 0948
+    ldr r0, count_str_charlen_ptr_text_encoding_override @ 08014572 0948
     ldrb r0,[r0,#0x0]                        @ 08014574 0078
     cmp r0,#0x0                              @ 08014576 0028
     beq LAB_080145ac                         @ 08014578 18d0
@@ -2318,12 +2310,12 @@ LAB_08014582:
     adds r2,#0x2    @ 0801458a 0232
     b LAB_0801459e                           @ 0801458c 07e0
     .zero  0x2
-DAT_08014590:
+count_str_charlen_ewram_base:
     .word  0x02000000                     @ 08014590 00000002
-DAT_08014594:
-    .word  0x00006c2c                     @ 08014594 2c6c0000
-DAT_08014598:
-    .word  0x0202348c                     @ 08014598 8c340202
+count_str_charlen_gsettings_offset:
+    .word  0x00006c2c                     @ 08014594 2c6c0000  = gSettings(0x02006c2c) - EWRAM base
+count_str_charlen_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 08014598 8c340202
 LAB_0801459c:
     adds r2,#0x1    @ 0801459c 0132
 LAB_0801459e:
@@ -2351,22 +2343,22 @@ LAB_080145b2:
 @ Params: r0=u8* str (mixed encoding, NUL-terminated); r1=u32 full_char_width_px (e.g. 10)
 @ Returns: r0=u32 pixel_width (total string pixel width)
 @ Side effects: none (pure read-only computation)
-@ Constants: 0x02006c2c=EWRAM encoding flag byte; 0x0202348c=TCG/OCG override; asrs r3,r4,#1=r1/2 (half-width)
+@ Constants: 0x02006c2c=EWRAM encoding flag byte; gTextEncodingOverride(0x0202348c)=TCG/OCG override; asrs r3,r4,#1=r1/2 (half-width)
 measure_text_pixel_width:
     push {r4,lr}                             @ 080145bc 10b5
     adds r4,r1,#0x0    @ 080145be 0c1c
     bl count_str_charlen                     @ 080145c0 fff7ccff
     adds r2,r0,#0x0    @ 080145c4 021c
     asrs r3,r4,#0x1    @ 080145c6 6310
-    ldr r1, DAT_080145e8                     @ 080145c8 0749
-    ldr r0, DAT_080145ec                     @ 080145ca 0848
+    ldr r1, measure_text_pixel_width_ewram_base @ 080145c8 0749
+    ldr r0, measure_text_pixel_width_gsettings_offset @ 080145ca 0848
     adds r1,r1,r0    @ 080145cc 0918
     movs r0,#0x7    @ 080145ce 0720
     ldrb r1,[r1,#0x0]                        @ 080145d0 0978
     ands r0,r1    @ 080145d2 0840
     cmp r0,#0x0                              @ 080145d4 0028
     beq LAB_080145e0                         @ 080145d6 03d0
-    ldr r0, DAT_080145f0                     @ 080145d8 0548
+    ldr r0, measure_text_pixel_width_ptr_text_encoding_override @ 080145d8 0548
     ldrb r0,[r0,#0x0]                        @ 080145da 0078
     cmp r0,#0x0                              @ 080145dc 0028
     beq LAB_080145f4                         @ 080145de 09d0
@@ -2375,12 +2367,12 @@ LAB_080145e0:
     muls r0,r4    @ 080145e2 6043
     b LAB_080145f8                           @ 080145e4 08e0
     .zero  0x2
-DAT_080145e8:
+measure_text_pixel_width_ewram_base:
     .word  0x02000000                     @ 080145e8 00000002
-DAT_080145ec:
-    .word  0x00006c2c                     @ 080145ec 2c6c0000
-DAT_080145f0:
-    .word  0x0202348c                     @ 080145f0 8c340202
+measure_text_pixel_width_gsettings_offset:
+    .word  0x00006c2c                     @ 080145ec 2c6c0000  = gSettings(0x02006c2c) - EWRAM base
+measure_text_pixel_width_ptr_text_encoding_override:
+    .word  gTextEncodingOverride          @ 080145f0 8c340202
 LAB_080145f4:
     adds r0,r2,#0x0    @ 080145f4 101c
     muls r0,r3    @ 080145f6 5843

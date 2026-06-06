@@ -427,6 +427,24 @@ med-conf (r6 struct +0x14/+0x15/+0x16 字段布局待 runtime verify) + 含 0x02
 脚本: `tools/ghidra-labeling/RefineSeg1aDemoResiduals.py`。**§5.1 登记: 无** (3 槽均有引用, 当场符号化)。
 关键发现: 0x02006c2c 早已在 ewram.inc 定义为 `gSettings` (language_id), 故复用既有名, 未新建常量。
 
+### 4.0n Seg-1b 完成记录: 0x14398..0x14600 gap (7 fn) ✅
+
+地址序 Seg-1 第二部分: b1→b2 之间 7 个未细化函数 (PRNG/demo-phase + banlist 密码 + 文字测量簇)。
+byte-identical 9689337d。
+
+| 函数 | 做法 |
+|---|---|
+| tick_prng_step_sequence (0x14398) | **误名订正 → RENAME `step_demo_scene_phase`**: 实为 demo 场景阶段分派器 (仅用 gPrng 地址当 base, 经 +0x204 读 gDemoSceneInitPhase=0x03000244 bits[21:14] 阶段索引)。**R7 carve `demo_scene_phase_table`** (0x09e587d4, 3 THUMB fn ptr `+1` + NULL: reset_display_and_gl_state/load_demo_obj_resource_slot0/tick_demo_scene_state_machine, 从 incbin 末 0x10B 切出) + 表/gPrng base/phase-clear-mask 槽改名 + plate 全重写 + CSV sync |
+| banlist_password_enter_char (0x143f0) | gSettings(0x02006c2c via base+offset) 槽改名 + **gTextEncodingOverride=0x0202348c** 符号化 |
+| copy_str_unbounded (0x14470) | 0x05f5e0ff 无上限哨兵槽改名 |
+| append/advance/count/measure (0x14480/144e8/1455c/145bc) | gSettings base+offset 槽改名(各 2) + gTextEncodingOverride 符号化(各 1) + plate 0x0202348c→符号 |
+
+**新全局**: `gTextEncodingOverride=0x0202348c` (ewram.inc, TCG/OCG 编码覆盖; **物理在 gGlBlendState
+footprint 内但逻辑独立** —— 10+ refs 全文字函数, 0 blend; blend 结构仅用 +0/+4/+8, 已验证);
+`gDemoSceneInitPhase=0x03000244` (iwram.inc, 参考; 经 gPrng+0x204 访问无直接槽)。
+脚本: `tools/ghidra-labeling/RefineSeg1bTextPrng.py`。**§5.1 登记: 无** (STEP_TABLE 有引用 → 当场 carve)。
+**Seg-1 完成** (Seg-1a 残留 + Seg-1b gap)。下一段 Seg-2 (0x14838..0x14fa8, 含 carve 0x14e54/76B)。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在

@@ -1236,7 +1236,12 @@ titleex_main_c_filename:
 	.incbin "roms/2343.gba", 0x1E5073B, 0x1
 assert_anmid_ig2d_getanmsequencescoun_73c:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
-	.incbin "roms/2343.gba", 0x1E50777, 0x806D   @ 0x1E50777..0x1E587E4
+	.incbin "roms/2343.gba", 0x1E50777, 0x805D   @ 0x1E50777..0x1E587D4
+demo_scene_phase_table:                           @ 0x09e587d4 demo 场景阶段分派表 (THUMB fn ptr, addr|1)
+	.word reset_display_and_gl_state + 1          @ phase 0: 复位显示/GL 状态
+	.word load_demo_obj_resource_slot0 + 1        @ phase 1: 加载 demo OBJ 资源 slot0
+	.word tick_demo_scene_state_machine + 1       @ phase 2: tick demo 场景状态机
+	.word 0x0                                     @ NULL 终止 (序列结束哨兵)
 isd_affine_matrix_ptr_type4:
 	.word 0x0                                     @ 0x09e587e4 ISD affine 矩阵指针槽 (type 4=BG2; ROM 内 NULL)
 isd_affine_matrix_ptr_type9:
