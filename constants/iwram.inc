@@ -8,3 +8,13 @@
 .equ gFrameCounter,   0x03000240  @ 4 B  帧计数器
 .equ INTR_VECTOR,     0x03007ffc  @ BIOS IRQ handler 向量槽 (crt0 写入 IntrMain 地址)
 .equ pack_ui_state,   0x03005850  @ pack scene state struct; offset 0x10 = u16 state field
+
+@ -----------------------------------------------------------------------------
+@ NNS G2D (IG2D) 资源加载管理器 (源 GL/IG2D_Main.c)
+@ used-count 计数器 + 缓冲池基址; reset_ig2d_load_counters 清 3 个计数器
+@ -----------------------------------------------------------------------------
+.equ gIg2dUsedCellAnm, 0x03000bf8  @ s32 已用 CellAnm 槽数 (max NELEMS(CellAnmBank)=0x40)
+.equ gIg2dUsedNceBuff, 0x03000bfc  @ s32 已用 NceBuff 槽数 (max IG2D_LOAD_ANM_MAX=2)
+.equ gIg2dUsedNanBuff, 0x03000c00  @ s32 已用 NanBuff/char-data 槽数 (max IG2D_LOAD_ANM_MAX=2)
+.equ gIg2dNceBuffBase, 0x03000c08  @ NceBuff 缓冲池基址 (slot = base + count*0x1000)
+.equ gIg2dCharPoolBase,0x03002c08  @ char-data 缓冲池基址 (slot = base + count*0x1000)

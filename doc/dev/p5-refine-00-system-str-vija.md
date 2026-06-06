@@ -114,7 +114,8 @@ gitignore 生成产物):
 | **batch-3: BG VRAM 地址簇 (24 fn)** | 0x14a10..0x14e14 | ✅ R1/R2/R5 完成 (见 §四.4.0c): OBJ_TILE_VRAM_BASE equate(新 gba_mem.inc) + 8 auto-name 槽改名 + 2 plate 订正; byte-identical。簇本身 plate 已高质量 (sibling getter/copy), 细化以 R2 为主 |
 | **batch-4: GL palette/OAM manager 簇 (7 fn)** | 0x1510c..0x1522c | ✅ R1/R2/R3/R5 完成 (见 §四.4.0d): gGlState=0x02023490 符号化(7 槽) + 3 cpu_set equate(新 gl_state.inc) + 7 plate 订正(含 2 处 0x02024330→0x02023d30 错址 + 0x22B B / 0x200→0x400 字节单位); byte-identical |
 | **batch-5: GL_Scrollbar 簇 (11 fn)** | 0x15384..0x155f4 | ✅ R1/R2/R5 完成 (见 §四.4.0e): 5 字段位掩码 equate(新 gl_scrollbar.inc) + 7 槽改名 + 4 plate 过时 FUN_ caller 改现名; byte-identical。GL_Scrollbar* 传参(非全局) |
-| 代码函数 (其余 ~222 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x1563c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-6: NNS IG2D 资源加载管理器 (allocators + globals)** | 0x1563c..0x15b00 (散) | ✅ R3/R5/rename 完成 (见 §四.4.0f): 6 个 IG2D 全局符号化(gIg2dUsed{CellAnm,NceBuff,NanBuff}/NceBuffBase/CharPoolBase/CellAnmBank) + 函数改名 gl_clear_frame_callbacks→reset_ig2d_load_counters(误名) + 10 plate(含 5 外部 caller); byte-identical |
+| 代码函数 (其余 ~211 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -260,6 +261,35 @@ update_scrollbar_thumb_display。源 GL/GL_Scrollbar.c。byte-identical SHA1 968
 之间) 反汇编为一个小函数 (adds/ldrh/orrs/lsrs#0x1f/bx lr, 取某字段最高位返回), Ghidra 误标为数据;
 未在函数清单。独立 R4 案 (需 disasm+createFunction), 本批跳过, 留专项处理 (字节保持 .byte → byte-identical)。
 
+### 4.0f batch-6 完成记录: NNS IG2D 资源加载管理器 (allocators + globals) ✅
+
+alloc_nce_buff_slot (0x1563c) / alloc_char_data_slot (0x15674) / reset_ig2d_load_counters
+(0x156ac, 原 gl_clear_frame_callbacks) / alloc_cell_anim_slot (0x15ac4) +
+load_nce_cell_bank_from_file 等加载族引用。源 GL/IG2D_Main.c。byte-identical SHA1 9689337d。
+
+**R3 6 个 IG2D 资源管理器全局** (NNS SDK assert 串直接给名, 高置信):
+
+| 全局 | 地址 | 语义 |
+|---|---|---|
+| gIg2dUsedCellAnm | 0x03000bf8 | 已用 CellAnm 槽数 (max 0x40) |
+| gIg2dUsedNceBuff | 0x03000bfc | 已用 NceBuff 槽数 (max 2) |
+| gIg2dUsedNanBuff | 0x03000c00 | 已用 NanBuff/char 槽数 (max 2) |
+| gIg2dNceBuffBase | 0x03000c08 | NceBuff 池基址 |
+| gIg2dCharPoolBase | 0x03002c08 | char-data 池基址 |
+| gIg2dCellAnmBank | 0x02027d40 | CellAnmBank (0x40×0x54 B) |
+
+iwram.inc(前 5)+ewram.inc(CellAnmBank); 9 槽 ref+改名。
+
+**函数改名**: `gl_clear_frame_callbacks` → `reset_ig2d_load_counters` (误名: 实清 bf8/bfc/c00
+三个 used-count 计数器 = 释放所有 IG2D 加载槽, 与"帧回调"无关; indeg=6)。`bl` 6 处自动更新;
+**5 个外部 caller plate** (reset_display_and_gl_state / init_banlist_pass_input_scene /
+init_demo_shuen_display_state / reset_gl_display_state / 模块 21 GL scene init @0x80fd2f0) 的散文
+名 + "清空帧回调队列"/"callbacks reset" 描述一并订正。CSV sync 完成。
+
+新增脚本: `tools/ghidra-labeling/RefineIg2dLoadBatch6.py`。
+注: load_*_from_file 加载族 (0x15b10..0x15d30) 的 assert-line DAT 槽 + 深度细化留后续批
+(本批只接通其全局引用)。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -330,16 +360,18 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 4. ✅ **batch-4 (0x1510c..0x1522c, GL palette/OAM manager 簇 7 fn)** 完成 (见 §四.4.0d);
    gGlState=0x02023490 命名, 与 batch-2 gGlBlendState 配对。
 5. ✅ **batch-5 (0x15384..0x155f4, GL_Scrollbar 簇 11 fn)** 完成 (见 §四.4.0e)。
-6. 下一批 (batch-6) 候选:
-   - **NNS G2D 资源加载簇** (alloc_nce_buff_slot 0x1563c / load_nce_cell_bank_from_file 0x15b10 /
-     load_nanr/ncgr/nclr_*_from_file / load_g2d_obj_resource_set 0x15d30 ...) —— FS+IG2D 资源加载,
-     操作 [0x03000bfc]/[0x03000c08] 等 IWRAM 计数器/基址 (可符号化为 g 全局)。
+6. ✅ **batch-6 (NNS IG2D 资源加载管理器 globals + allocators)** 完成 (见 §四.4.0f);
+   6 个 IG2D 全局命名 + reset_ig2d_load_counters 改名。
+7. 下一批 (batch-7) 候选:
+   - **IG2D 加载族深度细化** (load_nce_cell_bank/load_nanr/ncgr/nclr_*_from_file /
+     copy_pltt_data_to_vram_proxy / load_g2d_obj_resource_set, 0x15b10..0x15ea0): assert-line DAT 槽
+     + PALRAM/VRAM 常量 + R5 (本批已接通全局引用, 剩内部常量)。
    - **OAM/affine + ISD cell-anim 簇** (compute_bg_affine_matrix_scaled 0x15728 /
-     setup_isd_cell_anim_oam_entry 0x15954 / dispatch_isd_cell_anim_oam_setup 0x15a8c / trig_table)。
+     setup_isd_cell_anim_oam_entry 0x15954 / dispatch_isd_cell_anim_oam_setup 0x15a8c / trig_table 0x09e399d0)。
    - G2D entry accessor 簇 (find_gfx_entry_by_tag / get_bgdt/objd/palt_entry_* 0x16140..0x16200+)。
    - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction (见 §四.4.0e defer)。
    - FS 散点 (fs_resolve_path_to_fid / fs_load 0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade 0x152b0。
-7. 每批后视情况更新本文「进度」表。
+8. 每批后视情况更新本文「进度」表。
 
 ---
 

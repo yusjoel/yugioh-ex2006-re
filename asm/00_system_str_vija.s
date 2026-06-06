@@ -146,7 +146,7 @@ game_str_id_remap_count:
 .include "data/boot-ui-gfx.s"
 
 
-@ 由 play_ui_effect_3a (0x080bcbd4) 在需要完全重置显示层时调用 (直接调用者仅此一个; 其地址另登记于函数指针表, 可被间接分派). 执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); (2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); (3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; (4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; (5) gl_state_init 重置 GL 状态结构体; (6) gl_clear_frame_callbacks 清空帧回调队列. Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B.
+@ 由 play_ui_effect_3a (0x080bcbd4) 在需要完全重置显示层时调用 (直接调用者仅此一个; 其地址另登记于函数指针表, 可被间接分派). 执行顺序: (1) bios_cpu_set 以 0 fill gDemoState (0x02029ec0, 0x94 字节); (2) 向 DISPCNT 写 0x40 (OBJ 1D 映射, 屏幕显示关闭); (3) 依次设置 BG0CNT/BG1CNT/BG2CNT/BG3CNT 为固定初始值; (4) gl_set_brightness (mode=0x3f, bright=-16) 将亮度推向最暗; (5) gl_state_init 重置 GL 状态结构体; (6) reset_ig2d_load_counters 复位 IG2D 资源加载计数器. Constants: DISPCNT=0x0040 / BG0CNT=0x1D00 / BG1CNT=0x1E01 / BG2CNT=0x1F02 / BG3CNT=0x9B0B.
 reset_display_and_gl_state:
 .thumb
     push {lr}                                @ 08013510 00b5
@@ -180,7 +180,7 @@ reset_display_and_gl_state:
     movs r0,#0x3f    @ 0801354c 3f20
     bl gl_set_brightness                     @ 0801354e 01f0d5f8
     bl gl_state_init                         @ 08013552 01f0f1fd
-    bl gl_clear_frame_callbacks              @ 08013556 02f0a9f8
+    bl reset_ig2d_load_counters              @ 08013556 02f0a9f8
     movs r0,#0x1    @ 0801355a 0120
     add sp,#0x4                              @ 0801355c 01b0
     pop {r1}                                 @ 0801355e 02bc
@@ -4671,10 +4671,10 @@ update_scrollbar_thumb_display_scrollbar_keep_bits_8_0:
 update_scrollbar_thumb_display_scrollbar_clear_bits_17_9:
     .word  SCROLLBAR_CLEAR_BITS_17_9      @ 08015638 ff01fcff
 
-@ GL/IG2D_Main.c -- allocate next free NceBuff (NCE = NNS Cell Entry) slot. Called by 0x08015b10 (fs tag). Asserts [0x03000BFC] <= 1 (UsedNceBuff < IG2D_LOAD_ANM_MAX=2, line 0x2F=47). Computes slot addr = [0x03000C08] + count*(1<<12), increments counter, returns ptr. r0: no input (entry ldr r4,DAT overwrites r0). Returns void* (4KB-aligned NceBuff slot). Side effect: [0x03000BFC] += 1. Constants: IG2D_LOAD_ANM_MAX=2 / NCE_BUFF_SLOT_SIZE=0x1000 / UsedNceBuff=[0x03000BFC] / NceBuffBase=[0x03000C08].
+@ GL/IG2D_Main.c -- allocate next free NceBuff (NCE = NNS Cell Entry) slot. Called by 0x08015b10 (fs tag). Asserts gIg2dUsedNceBuff <= 1 (UsedNceBuff < IG2D_LOAD_ANM_MAX=2, line 0x2F=47). Computes slot addr = gIg2dNceBuffBase + count*(1<<12), increments counter, returns ptr. r0: no input (entry ldr r4,DAT overwrites r0). Returns void* (4KB-aligned NceBuff slot). Side effect: gIg2dUsedNceBuff += 1. Constants: IG2D_LOAD_ANM_MAX=2 / NCE_BUFF_SLOT_SIZE=0x1000 / UsedNceBuff=gIg2dUsedNceBuff / NceBuffBase=gIg2dNceBuffBase.
 alloc_nce_buff_slot:
     push {r4,lr}                             @ 0801563c 10b5
-    ldr r4, DAT_08015664                     @ 0801563e 094c
+    ldr r4, alloc_nce_buff_slot_ptr_used_nce_buff @ 0801563e 094c
     ldr r0,[r4,#0x0]                         @ 08015640 2068
     cmp r0,#0x1                              @ 08015642 0128
     ble LAB_08015652                         @ 08015644 05dd
@@ -4686,26 +4686,26 @@ alloc_nce_buff_slot:
 LAB_08015652:
     ldr r1,[r4,#0x0]                         @ 08015652 2168
     lsls r0,r1,#0xc    @ 08015654 0803
-    ldr r2, DAT_08015670                     @ 08015656 064a
+    ldr r2, alloc_nce_buff_slot_ptr_nce_buff_base @ 08015656 064a
     adds r0,r0,r2    @ 08015658 8018
     adds r1,#0x1    @ 0801565a 0131
     str r1,[r4,#0x0]                         @ 0801565c 2160
     pop {r4}                                 @ 0801565e 10bc
     pop {r1}                                 @ 08015660 02bc
     bx r1                                    @ 08015662 0847
-DAT_08015664:
-    .word  0x03000bfc                     @ 08015664 fc0b0003
+alloc_nce_buff_slot_ptr_used_nce_buff:
+    .word  gIg2dUsedNceBuff               @ 08015664 fc0b0003
 alloc_nce_buff_slot_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015668 88a4e309  GL/IG2D_Main.c
 alloc_nce_buff_slot_assert_usedncebuff_ig2d_load_anm_max:
     .word  assert_usedncebuff_ig2d_load_anm_max @ 0801566c 98a4e309  UsedNceBuff < IG2D_LOAD_ANM_MAX
-DAT_08015670:
-    .word  0x03000c08                     @ 08015670 080c0003
+alloc_nce_buff_slot_ptr_nce_buff_base:
+    .word  gIg2dNceBuffBase               @ 08015670 080c0003
 
-@ GL/IG2D_Main.c line 52. Allocate a 4096-byte char-data buffer slot from IWRAM pool; return its ptr. No parameters (all state from IWRAM). IWRAM [0x03000c00] holds current slot count; asserts count<=1 (max 2 slots [0..1]); returns [0x03002c08] + count*4096 (lsls count,#0xc); increments [0x03000c00]. Side-effect: [0x03000c00] := old_count+1. Constants: SLOT_COUNT_PTR=[0x03000c00], CHAR_POOL_BASE=[0x03002c08], SLOT_SIZE=4096.
+@ GL/IG2D_Main.c line 52. Allocate a 4096-byte char-data buffer slot from IWRAM pool; return its ptr. No parameters (all state from IWRAM). IWRAM gIg2dUsedNanBuff holds current slot count; asserts count<=1 (max 2 slots [0..1]); returns gIg2dCharPoolBase + count*4096 (lsls count,#0xc); increments gIg2dUsedNanBuff. Side-effect: gIg2dUsedNanBuff := old_count+1. Constants: SLOT_COUNT_PTR=gIg2dUsedNanBuff, CHAR_POOL_BASE=gIg2dCharPoolBase, SLOT_SIZE=4096.
 alloc_char_data_slot:
     push {r4,lr}                             @ 08015674 10b5
-    ldr r4, DAT_0801569c                     @ 08015676 094c
+    ldr r4, alloc_char_data_slot_ptr_used_nan_buff @ 08015676 094c
     ldr r0,[r4,#0x0]                         @ 08015678 2068
     cmp r0,#0x1                              @ 0801567a 0128
     ble LAB_0801568a                         @ 0801567c 05dd
@@ -4717,38 +4717,38 @@ alloc_char_data_slot:
 LAB_0801568a:
     ldr r1,[r4,#0x0]                         @ 0801568a 2168
     lsls r0,r1,#0xc    @ 0801568c 0803
-    ldr r2, DAT_080156a8                     @ 0801568e 064a
+    ldr r2, alloc_char_data_slot_ptr_char_pool_base @ 0801568e 064a
     adds r0,r0,r2    @ 08015690 8018
     adds r1,#0x1    @ 08015692 0131
     str r1,[r4,#0x0]                         @ 08015694 2160
     pop {r4}                                 @ 08015696 10bc
     pop {r1}                                 @ 08015698 02bc
     bx r1                                    @ 0801569a 0847
-DAT_0801569c:
-    .word  0x03000c00                     @ 0801569c 000c0003
+alloc_char_data_slot_ptr_used_nan_buff:
+    .word  gIg2dUsedNanBuff               @ 0801569c 000c0003
 alloc_char_data_slot_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 080156a0 88a4e309  GL/IG2D_Main.c
 alloc_char_data_slot_assert_usednanbuff_ig2d_load_anm_max:
     .word  assert_usednanbuff_ig2d_load_anm_max @ 080156a4 b8a4e309  UsedNanBuff < IG2D_LOAD_ANM_MAX
-DAT_080156a8:
-    .word  0x03002c08                     @ 080156a8 082c0003
+alloc_char_data_slot_ptr_char_pool_base:
+    .word  gIg2dCharPoolBase              @ 080156a8 082c0003
 
-@ GL: 清 IWRAM 回调指针槽 [0x03000BF8/BFC/C00] = 0
-gl_clear_frame_callbacks:
-    ldr r0, DAT_080156bc                     @ 080156ac 0348
+@ GL/IG2D: 复位 IG2D 资源加载计数器——把 gIg2dUsedCellAnm/gIg2dUsedNceBuff/gIg2dUsedNanBuff (0x03000bf8/bfc/c00) 三个 used-count 写 0, 释放所有已加载 G2D 资源槽 (NCE/NAN/CellAnm 缓冲)。无参 (void); 叶子。被 reset_display_and_gl_state 等 6 个场景重置入口调用 (indeg=6)。注: 旧名 gl_clear_frame_callbacks 系误名 (清的是计数器, 非帧回调)。
+reset_ig2d_load_counters:
+    ldr r0, reset_ig2d_load_counters_ptr_used_cell_anm @ 080156ac 0348
     movs r1,#0x0    @ 080156ae 0021
     str r1,[r0,#0x0]                         @ 080156b0 0160
-    ldr r0, DAT_080156c0                     @ 080156b2 0348
+    ldr r0, reset_ig2d_load_counters_ptr_used_nce_buff @ 080156b2 0348
     str r1,[r0,#0x0]                         @ 080156b4 0160
-    ldr r0, DAT_080156c4                     @ 080156b6 0348
+    ldr r0, reset_ig2d_load_counters_ptr_used_nan_buff @ 080156b6 0348
     str r1,[r0,#0x0]                         @ 080156b8 0160
     bx lr                                    @ 080156ba 7047
-DAT_080156bc:
-    .word  0x03000bf8                     @ 080156bc f80b0003
-DAT_080156c0:
-    .word  0x03000bfc                     @ 080156c0 fc0b0003
-DAT_080156c4:
-    .word  0x03000c00                     @ 080156c4 000c0003
+reset_ig2d_load_counters_ptr_used_cell_anm:
+    .word  gIg2dUsedCellAnm               @ 080156bc f80b0003
+reset_ig2d_load_counters_ptr_used_nce_buff:
+    .word  gIg2dUsedNceBuff               @ 080156c0 fc0b0003
+reset_ig2d_load_counters_ptr_used_nan_buff:
+    .word  gIg2dUsedNanBuff               @ 080156c4 000c0003
 
 @ Called by FUN_0801bb28 (scene_demo) and two scene_title_ex callers (indeg=3). Body: ldr r0,[r0,#0x8]; bx lr -- simple field getter. r0=ptr obj (title_ex scene object); returns r0=u32 field8 ([obj+0x8]). Getter/setter pair with set_title_ex_obj_field8 (0x080156cc) at adjacent address. Pure read, no side-effects.
 get_title_ex_obj_field8:
@@ -5322,10 +5322,10 @@ dispatch_isd_cell_anim_oam_setup:
     pop {r1}                                 @ 08015ac0 02bc
     bx r1                                    @ 08015ac2 0847
 
-@ GL/IG2D_Main.c -- allocate next free CellAnmBank slot. Called by 0x08015d30 (fs tag). Asserts [0x03000BF8] <= 0x3F (UsedCellAnm < NELEMS(CellAnmBank), line 0x127=295). Computes slot addr = CellAnmBank + counter*0x54, increments counter, returns ptr. r0: no input (entry ldr r4,DAT overwrites r0). Returns NNS_G2dCellAnimation* (allocated slot). Side effect: [0x03000BF8] += 1. Constants: IG2D_CELL_ANM_MAX=0x40 / CELL_ANM_ENTRY_SIZE=0x54 / UsedCellAnm=[0x03000BF8] / CellAnmBank=0x02027D40.
+@ GL/IG2D_Main.c -- allocate next free CellAnmBank slot. Called by 0x08015d30 (fs tag). Asserts gIg2dUsedCellAnm <= 0x3F (UsedCellAnm < NELEMS(CellAnmBank), line 0x127=295). Computes slot addr = gIg2dCellAnmBank + counter*0x54, increments counter, returns ptr. r0: no input (entry ldr r4,DAT overwrites r0). Returns NNS_G2dCellAnimation* (allocated slot). Side effect: gIg2dUsedCellAnm += 1. Constants: IG2D_CELL_ANM_MAX=0x40 / CELL_ANM_ENTRY_SIZE=0x54 / UsedCellAnm=gIg2dUsedCellAnm / CellAnmBank=gIg2dCellAnmBank.
 alloc_cell_anim_slot:
     push {r4,lr}                             @ 08015ac4 10b5
-    ldr r4, DAT_08015af0                     @ 08015ac6 0a4c
+    ldr r4, alloc_cell_anim_slot_ptr_used_cell_anm @ 08015ac6 0a4c
     ldr r0,[r4,#0x0]                         @ 08015ac8 2068
     cmp r0,#0x3f                             @ 08015aca 3f28
     bls LAB_08015ada                         @ 08015acc 05d9
@@ -5338,7 +5338,7 @@ LAB_08015ada:
     ldr r2,[r4,#0x0]                         @ 08015ada 2268
     movs r0,#0x54    @ 08015adc 5420
     muls r0,r2    @ 08015ade 5043
-    ldr r1, DAT_08015b00                     @ 08015ae0 0749
+    ldr r1, alloc_cell_anim_slot_ptr_cell_anm_bank @ 08015ae0 0749
     adds r0,r0,r1    @ 08015ae2 4018
     adds r2,#0x1    @ 08015ae4 0132
     str r2,[r4,#0x0]                         @ 08015ae6 2260
@@ -5346,16 +5346,16 @@ LAB_08015ada:
     pop {r1}                                 @ 08015aea 02bc
     bx r1                                    @ 08015aec 0847
     .zero  0x2
-DAT_08015af0:
-    .word  0x03000bf8                     @ 08015af0 f80b0003
+alloc_cell_anim_slot_ptr_used_cell_anm:
+    .word  gIg2dUsedCellAnm               @ 08015af0 f80b0003
 alloc_cell_anim_slot_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015af4 88a4e309  GL/IG2D_Main.c
 DAT_08015af8:
     .word  0x00000127                     @ 08015af8 27010000
 alloc_cell_anim_slot_assert_usedcellanm_nelems_cellanmbank:
     .word  assert_usedcellanm_nelems_cellanmbank @ 08015afc 10a5e309  UsedCellAnm < NELEMS(CellAnmBank)
-DAT_08015b00:
-    .word  0x02027d40                     @ 08015b00 407d0202
+alloc_cell_anim_slot_ptr_cell_anm_bank:
+    .word  gIg2dCellAnmBank               @ 08015b00 407d0202
 
 @ GL/IG2D_Main.c area -- thin fs_load wrapper. Called by 4 G2D resource load paths (FUN_08015b10/b70/bd0/c30, all fs-tagged). Body: push lr / bl fs_load / pop r1 / bx r1 -- passes all args through, returns fs_load return value. r0..r3: forwarded to fs_load unchanged. Returns: fs_load return value.
 invoke_fs_load:
@@ -5415,7 +5415,7 @@ LAB_08015b6a:
     pop {r1}                                 @ 08015b6c 02bc
     bx r1                                    @ 08015b6e 0847
 
-@ GL/IG2D_Main.c. Full pipeline: allocate char-data slot, load NANR file from FS, parse anim bank. r0=NNS_G2dAnimBankData** ppAnimBank (non-NULL assert line 0x1c1), r1=void** ppCharData (non-NULL assert line 0x1c2). Calls alloc_char_data_slot -> invoke_fs_load(ppCharData, slot_ptr) -> load_nanr_anim_bank(slot_ptr, ppAnimBank). Returns loaded data ptr on success, NULL on failure. Side-effects: char-data slot allocated ([0x03000c00] +1), file DMA'd, *ppAnimBank set.
+@ GL/IG2D_Main.c. Full pipeline: allocate char-data slot, load NANR file from FS, parse anim bank. r0=NNS_G2dAnimBankData** ppAnimBank (non-NULL assert line 0x1c1), r1=void** ppCharData (non-NULL assert line 0x1c2). Calls alloc_char_data_slot -> invoke_fs_load(ppCharData, slot_ptr) -> load_nanr_anim_bank(slot_ptr, ppAnimBank). Returns loaded data ptr on success, NULL on failure. Side-effects: char-data slot allocated (gIg2dUsedNanBuff +1), file DMA'd, *ppAnimBank set.
 load_nanr_anim_bank_from_file:
     push {r4,r5,lr}                          @ 08015b70 30b5
     adds r5,r0,#0x0    @ 08015b72 051c
@@ -8520,7 +8520,7 @@ name_input_page_init:
     bl gl_set_brightness                     @ 080175b2 fdf7a3f8
     bl gl_fade_in                            @ 080175b6 fdf78bf9
     bl gl_state_init                         @ 080175ba fdf7bdfd
-    bl gl_clear_frame_callbacks              @ 080175be fef775f8
+    bl reset_ig2d_load_counters              @ 080175be fef775f8
     movs r0,#0x0    @ 080175c2 0020
     bl write_name_input_mode_flag            @ 080175c4 01f0c6ff
     ldr r0, DAT_080175f0                     @ 080175c8 0948
@@ -12978,7 +12978,7 @@ LAB_0801963a:
     bx r1                                    @ 0801963e 0847
     ROM_INCBIN 0x19640, 0x20
 
-@ Function: Initialization entry for the banlist password input scene (pass_input). Performs: (1) bios_cpu_set FILL mode zeros gBanlistPasswordBuffer (0x02029810, 1656 bytes/414 words); (2) gl_clear_vram_palram_scroll clears VRAM/PALRAM/scroll registers; (3) configures DISPCNT=0x1f40, BG0CNT=0x1c00(0xe0<<5), BG1CNT=0x1d0d, BG2CNT=0x1e06 (=0x1d0d+0xf9), BG3CNT=0x1f0f; (4) gl_set_brightness(-16, 63)/gl_fade_in/gl_state_init/gl_clear_frame_callbacks init GL state; (5) zeros gPrng[0x23a] and writes gState[0x66e]=0x2d0 and gPrng[0x38a]=0x3f0. Called via function pointer from dispatch tables at 0x0801b634 and 0x0801b6a0.
+@ Function: Initialization entry for the banlist password input scene (pass_input). Performs: (1) bios_cpu_set FILL mode zeros gBanlistPasswordBuffer (0x02029810, 1656 bytes/414 words); (2) gl_clear_vram_palram_scroll clears VRAM/PALRAM/scroll registers; (3) configures DISPCNT=0x1f40, BG0CNT=0x1c00(0xe0<<5), BG1CNT=0x1d0d, BG2CNT=0x1e06 (=0x1d0d+0xf9), BG3CNT=0x1f0f; (4) gl_set_brightness(-16, 63)/gl_fade_in/gl_state_init/reset_ig2d_load_counters init GL state; (5) zeros gPrng[0x23a] and writes gState[0x66e]=0x2d0 and gPrng[0x38a]=0x3f0. Called via function pointer from dispatch tables at 0x0801b634 and 0x0801b6a0.
 @ Trigger: Game enters banlist password input scene; called by scene_dispatcher via fn-ptr table.
 @ Side effects: gBanlistPasswordBuffer zeroed; VRAM/PALRAM cleared; DISPCNT/BGxCNT IO registers written; gPrng and gState fields zeroed/initialized; BG brightness/fade configured.
 @ 
@@ -13028,7 +13028,7 @@ init_banlist_pass_input_scene:
     bl gl_set_brightness                     @ 080196a2 fbf72bf8
     bl gl_fade_in                            @ 080196a6 fbf713f9
     bl gl_state_init                         @ 080196aa fbf745fd
-    bl gl_clear_frame_callbacks              @ 080196ae fbf7fdff
+    bl reset_ig2d_load_counters              @ 080196ae fbf7fdff
     ldr r1, DWORD_080196f4                   @ 080196b2 1049
     ldr r0, DWORD_080196f8                   @ 080196b4 1048
     adds r2,r1,r0    @ 080196b6 0a18
@@ -17591,7 +17591,7 @@ LAB_0801b7de:
     bx r1                                    @ 0801b7e2 0847
     .byte  0x00, 0x20, 0x70, 0x47
 
-@ Called by play_demo_shuen (0x080bc880) and FUN_0801c254 (indeg=2). Full display-state reset for the demo shuen (final) scene: bios_cpu_set fill-zeros gDemoState (EWRAM 0x02029ec0) header; gl_clear_vram_palram_scroll; writes DISPCNT(0x04000000):=0x40 (BG mode 2); writes BG0CNT(0x04000008):=0x1d00, BG1CNT(0x0400000a):=0x1e01, BG2CNT(0x0400000c):=0x1f02, BG3CNT(0x0400000e):=0x9b0b; gl_set_brightness(0x3f,-16) (full dark for fade-in); gl_state_init; gl_clear_frame_callbacks. No parameters (void). Returns r0=1 (success). Constants: DISPCNT=0x04000000, BG0CNT_VAL=0x1d00, BG1CNT_VAL=0x1e01, BG2CNT_VAL=0x1f02, BG3CNT_VAL=0x9b0b.
+@ Called by play_demo_shuen (0x080bc880) and FUN_0801c254 (indeg=2). Full display-state reset for the demo shuen (final) scene: bios_cpu_set fill-zeros gDemoState (EWRAM 0x02029ec0) header; gl_clear_vram_palram_scroll; writes DISPCNT(0x04000000):=0x40 (BG mode 2); writes BG0CNT(0x04000008):=0x1d00, BG1CNT(0x0400000a):=0x1e01, BG2CNT(0x0400000c):=0x1f02, BG3CNT(0x0400000e):=0x9b0b; gl_set_brightness(0x3f,-16) (full dark for fade-in); gl_state_init; reset_ig2d_load_counters. No parameters (void). Returns r0=1 (success). Constants: DISPCNT=0x04000000, BG0CNT_VAL=0x1d00, BG1CNT_VAL=0x1e01, BG2CNT_VAL=0x1f02, BG3CNT_VAL=0x9b0b.
 init_demo_shuen_display_state:
     push {lr}                                @ 0801b7e8 00b5
     sub sp,#0x4                              @ 0801b7ea 81b0
@@ -17624,7 +17624,7 @@ init_demo_shuen_display_state:
     movs r0,#0x3f    @ 0801b824 3f20
     bl gl_set_brightness                     @ 0801b826 f8f769ff
     bl gl_state_init                         @ 0801b82a f9f785fc
-    bl gl_clear_frame_callbacks              @ 0801b82e f9f73dff
+    bl reset_ig2d_load_counters              @ 0801b82e f9f73dff
     movs r0,#0x1    @ 0801b832 0120
     add sp,#0x4                              @ 0801b834 01b0
     pop {r1}                                 @ 0801b836 02bc
@@ -19004,7 +19004,7 @@ LAB_0801c2a6:
     pop {r1}                                 @ 0801c2a8 02bc
     bx r1                                    @ 0801c2aa 0847
 
-@ Full GL display state reset called at scene transitions. Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). No input params (r0 clobbered at entry). Returns r0=1 (success). Sequence: (1) bios_cpu_set fill-zero EWRAM 0x02029eb0 192 bytes; (2) gl_clear_vram_palram_scroll; (3) DISPCNT(0x04000000)=0x1741, BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; (4) gl_set_brightness(0x3F,-16); (5) gl_state_init; (6) gl_clear_frame_callbacks. Side-effects: EWRAM cleared; IO regs written; GL state/callbacks reset. Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, ZERO_FILL_CTRL=0x05000030.
+@ Full GL display state reset called at scene transitions. Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). No input params (r0 clobbered at entry). Returns r0=1 (success). Sequence: (1) bios_cpu_set fill-zero EWRAM 0x02029eb0 192 bytes; (2) gl_clear_vram_palram_scroll; (3) DISPCNT(0x04000000)=0x1741, BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; (4) gl_set_brightness(0x3F,-16); (5) gl_state_init; (6) reset_ig2d_load_counters. Side-effects: EWRAM cleared; IO regs written; GL state reset + IG2D load counters reset. Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, ZERO_FILL_CTRL=0x05000030.
 reset_gl_display_state:
     push {lr}                                @ 0801c2ac 00b5
     sub sp,#0x4                              @ 0801c2ae 81b0
@@ -19033,7 +19033,7 @@ reset_gl_display_state:
     movs r0,#0x3f    @ 0801c2e0 3f20
     bl gl_set_brightness                     @ 0801c2e2 f8f70bfa
     bl gl_state_init                         @ 0801c2e6 f8f727ff
-    bl gl_clear_frame_callbacks              @ 0801c2ea f9f7dff9
+    bl reset_ig2d_load_counters              @ 0801c2ea f9f7dff9
     movs r0,#0x1    @ 0801c2ee 0120
     add sp,#0x4                              @ 0801c2f0 01b0
     pop {r1}                                 @ 0801c2f2 02bc

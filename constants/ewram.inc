@@ -129,6 +129,9 @@
                                              @         copy_sprite_attr_table_to_oam
                                              @ 注: 各 consumer 对 +0x880 等偏移语义解读略有出入, 待运行时核实
 
+@ NNS G2D cell animation bank (源 GL/IG2D_Main.c; alloc_cell_anim_slot 分配)
+.equ gIg2dCellAnmBank,           0x02027D40  @ CellAnmBank: 0x40 条 × 0x54 B (slot=base+count*0x54)
+
 @ -----------------------------------------------------------------------------
 @ 输入 / Banlist
 @ -----------------------------------------------------------------------------

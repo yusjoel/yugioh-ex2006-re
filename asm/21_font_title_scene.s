@@ -18724,7 +18724,7 @@ exit_pack_init_with_failure:
     bx r1                                    @ 080fd2ea 0847
     .byte  0x0d, 0x7e, 0x0e, 0x08
 
-@ GL scene hardware initialization function. Calls bios_cpu_set to zero 0x02029eb0 (EWRAM GL context, control word 0x050000e7), calls gl_clear_vram_palram_scroll to clear VRAM/palette/scroll, writes DISPCNT=0x40 (force blank), BG0CNT=0x1e01, BG1CNT=0x1f02, BG3CNT=0x9b0b (configures each BG layer), calls gl_set_brightness(-0x10, 0x3f) to set initial brightness, gl_state_init to initialize GL state, gl_clear_frame_callbacks to clear frame callback list, verify_puzzle_ewram_integrity to verify EWRAM integrity, invalidate_active_channel_id to invalidate audio channel ID. Returns 1. indeg=0.
+@ GL scene hardware initialization function. Calls bios_cpu_set to zero 0x02029eb0 (EWRAM GL context, control word 0x050000e7), calls gl_clear_vram_palram_scroll to clear VRAM/palette/scroll, writes DISPCNT=0x40 (force blank), BG0CNT=0x1e01, BG1CNT=0x1f02, BG3CNT=0x9b0b (configures each BG layer), calls gl_set_brightness(-0x10, 0x3f) to set initial brightness, gl_state_init to initialize GL state, reset_ig2d_load_counters to reset IG2D load counters, verify_puzzle_ewram_integrity to verify EWRAM integrity, invalidate_active_channel_id to invalidate audio channel ID. Returns 1. indeg=0.
 @ 
 @ Constants:
 @ GL_CTX_EWRAM=0x02029eb0 (GL scene EWRAM context base address)
@@ -18768,7 +18768,7 @@ init_gl_scene_hardware:
     movs r0,#0x3f    @ 080fd32e 3f20
     bl gl_set_brightness                     @ 080fd330 17f7e4f9
     bl gl_state_init                         @ 080fd334 17f700ff
-    bl gl_clear_frame_callbacks              @ 080fd338 18f7b8f9
+    bl reset_ig2d_load_counters              @ 080fd338 18f7b8f9
     bl verify_puzzle_ewram_integrity         @ 080fd33c fcf72cfc
     movs r1,#0xe4    @ 080fd340 e421
     lsls r1,r1,#0x2    @ 080fd342 8900

@@ -85,7 +85,7 @@ address,name,proposed_name,score,tags
 0x080155f4,update_scrollbar_thumb_display,,,
 0x0801563c,alloc_nce_buff_slot,,,
 0x08015674,alloc_char_data_slot,,,
-0x080156ac,gl_clear_frame_callbacks,,,
+0x080156ac,reset_ig2d_load_counters,,,ig2d_load
 0x080156c8,get_title_ex_obj_field8,,,scene_title_ex
 0x080156cc,set_title_ex_obj_field8,,,scene_title_ex
 0x080156d0,get_anim_ctrl_frame_offset_u16,,,
