@@ -117,7 +117,8 @@ gitignore 生成产物):
 | **batch-6: NNS IG2D 资源加载管理器 (allocators + globals)** | 0x1563c..0x15b00 (散) | ✅ R3/R5/rename 完成 (见 §四.4.0f): 6 个 IG2D 全局符号化(gIg2dUsed{CellAnm,NceBuff,NanBuff}/NceBuffBase/CharPoolBase/CellAnmBank) + 函数改名 gl_clear_frame_callbacks→reset_ig2d_load_counters(误名) + 10 plate(含 5 外部 caller); byte-identical |
 | **batch-7: BG affine matrix 簇 (4 fn)** | 0x15728..0x15924 | ✅ R3/R7/R2/R5 完成 (见 §四.4.0g): trig_table(512B)+assert_expr_zero **carve 进 rom.s** + GAS label 引用 + 3 槽改名 + 3 plate FUN_ 改现名; byte-identical |
 | **batch-8: NNS G2D GFX entry accessor 簇 (10 fn)** | 0x16140..0x16268 | ✅ R1/R2/R5 完成 (见 §四.4.0h): 3 FourCC tag equate(BGDT/OBJD/PALT, 新 g2d_tags.inc) + 9 槽改名 + 10 plate 去过时槽引用; byte-identical |
-| 代码函数 (其余 ~197 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-9: ISD affine matrix 指针簇 (3 fn)** | 0x16098..0x1613c | ✅ R3/R7/R2/R5 完成 (见 §四.4.0i): 3 个 ROM 数据 **carve 进 rom.s**(isd_affine_matrix_ptr_type4/type9 NULL 槽 + assert_expr_zero_65c) + 9 槽 GAS label 引用/改名 + 3 plate; byte-identical |
+| 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -326,6 +327,30 @@ get_bgdt/objd_inline_data_ptr / get_bgdt/objd_second_blob_ptr / get_bgdt_entry_p
 注: write_palt_block_to_vram (0x1626c, 调色板写 VRAM) / dispatch_bg_screen_map_write (0x162dc) 非
 纯 tag accessor (无 tag 槽, 按 caller tag 调用), 留后续批。
 
+### 4.0i batch-9 完成记录: ISD affine matrix 指针簇 (0x16098..0x1613c, 3 fn) ✅
+
+set_isd_affine_matrix_ptr_by_type / get_isd_affine_matrix_ptr_from_obj /
+resolve_isd_affine_matrix_ptr。源 GL/ISD_Draw.c。按 affine_type {4=BG2, 9=BG3} 读写
+ISD 仿射矩阵指针槽。byte-identical SHA1 9689337d。
+
+**当场 carve 3 个 ROM 数据** (用户标准):
+
+| carve label | 地址 | 内容 | 引用槽 |
+|---|---|---|---|
+| isd_affine_matrix_ptr_type4 | 0x09e587e4 | `.word 0x0` (type-4 矩阵指针, ROM 内 NULL) | 6 槽 (set/get/resolve ×2) |
+| isd_affine_matrix_ptr_type9 | 0x09e587e8 | `.word 0x0` (type-9, NULL) | (同上) |
+| assert_expr_zero_65c | 0x09e3a65c | `.asciz "0"` (类型 assert(0) 条件串) | 3 槽 |
+
+从 `.incbin 0x1E50777+0x8595` (matrix 槽, off 0x806D) + `.incbin 0x1E3A65A+0x116` (assert, off 2)
+切出。9 槽加 GAS label DATA ref + 改名 (`<func>_ptr_type4/9` / `_assert_expr_zero`)。
+
+**语义注**: 矩阵指针槽在 ROM 内恒为 NULL; set_isd 的 `str r1,[槽]` 写 ROM 是 no-op (硬件只读),
+故 get/resolve 恒返回 NULL —— 该 ISD 仿射路径在本 build 实际未启用 (carve 如实记录 NULL)。
+assert "0" 与 batch-7 assert_expr_zero (0x09e3a4f8) 同内容不同 ROM 拷贝, 加 _65c 后缀避碰撞。
+
+R5: set/get/resolve plate 的 DWORD_/DAT_ 槽引用改 carve label。
+脚本: `tools/ghidra-labeling/RefineIsdAffineBatch9.py`。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -399,16 +424,18 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 6. ✅ **batch-6 (NNS IG2D 资源加载管理器 globals + allocators)** 完成 (见 §四.4.0f)。
 7. ✅ **batch-7 (0x15728..0x15924, BG affine matrix 簇 4 fn)** 完成 (见 §四.4.0g);
    TRIG_TABLE + assert_expr_zero **当场 carve**。
-8. ✅ **batch-8 (0x16140..0x16268, NNS G2D GFX entry accessor 簇 10 fn)** 完成 (见 §四.4.0h);
-   BGDT/OBJD/PALT FourCC tag 符号化。
-9. 下一批 (batch-9) 候选:
-   - **ISD affine matrix 指针簇** (set/get/resolve_isd_affine_matrix_ptr 0x16098..0x1613c):
-     2 个 ISD affine 矩阵指针槽 (0x09e587e4/e8) + assert expr 串 (0x09e3a65c 等) **当场 carve**。
+8. ✅ **batch-8 (0x16140..0x16268, NNS G2D GFX entry accessor 簇 10 fn)** 完成 (见 §四.4.0h)。
+9. ✅ **batch-9 (0x16098..0x1613c, ISD affine matrix 指针簇 3 fn)** 完成 (见 §四.4.0i);
+   isd_affine_matrix_ptr_type4/9 + assert_expr_zero_65c **当场 carve**。
+10. 下一批 (batch-10) 候选:
    - **ISD cell-anim OAM 簇** (setup_isd_cell_anim_oam_entry 0x15954 /
      dispatch_isd_cell_anim_oam_setup 0x15a8c): 操作 0x030007f8 OAM build buffer。
    - **IG2D 加载族深度** (load_nce/nanr/ncgr/nclr_*_from_file 0x15b10..0x15ea0): assert-line + PALRAM/VRAM。
+   - **G2D 写族** (write_palt_block_to_vram 0x1626c / dispatch_bg_screen_map_write 0x162dc /
+     write_tile_region_to_bg_screen): PALRAM/VRAM 基址 + screen map 写。
+   - **cell-anim accessor 簇** (get_anim_ctrl_* / dispatch_cell_anim_* 0x156d0..0x1571c)。
    - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction。
-   - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0) / cell-anim accessor (0x156d0)。
+   - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0)。
    - 注: ROM 数据表/串细化即**当场 carve** (不留待办)。
 9. 每批后视情况更新本文「进度」表。
 

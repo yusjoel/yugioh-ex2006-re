@@ -871,7 +871,10 @@ assert_ppanimbank_psequencearrayhead:
 	.asciz "( &((*ppAnimBank)->pSequenceArrayHead[i]) ) != NULL"
 isd_draw_c_filename:
 	.asciz "GL/ISD_Draw.c"
-	.incbin "roms/2343.gba", 0x1E3A65A, 0x116
+	.incbin "roms/2343.gba", 0x1E3A65A, 0x2     @ 前缀 2B
+assert_expr_zero_65c:
+	.asciz "0"                                  @ 0x09e3a65c ISD_Draw 类型 assert(0) 条件串
+	.incbin "roms/2343.gba", 0x1E3A65E, 0x112   @ 后缀
 prh_main_c_filename:
 	.asciz "GL/PRH_Main.c"
 	.incbin "roms/2343.gba", 0x1E3A77E, 0x2
@@ -1227,7 +1230,12 @@ titleex_main_c_filename:
 	.incbin "roms/2343.gba", 0x1E5073B, 0x1
 assert_anmid_ig2d_getanmsequencescoun_73c:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
-	.incbin "roms/2343.gba", 0x1E50777, 0x8595
+	.incbin "roms/2343.gba", 0x1E50777, 0x806D   @ 0x1E50777..0x1E587E4
+isd_affine_matrix_ptr_type4:
+	.word 0x0                                     @ 0x09e587e4 ISD affine 矩阵指针槽 (type 4=BG2; ROM 内 NULL)
+isd_affine_matrix_ptr_type9:
+	.word 0x0                                     @ 0x09e587e8 ISD affine 矩阵指针槽 (type 9=BG3; ROM 内 NULL)
+	.incbin "roms/2343.gba", 0x1E587EC, 0x520     @ 0x1E587EC..0x1E58D0C 剩余 blob
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)

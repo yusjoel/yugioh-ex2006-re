@@ -6056,8 +6056,8 @@ DAT_08016074:
 @ 
 @ Constants:
 @ - GL/ISD_Draw.c assert line 0x76 = 118
-@ - DWORD_080160bc = 0x09e587e4 (type-4 matrix pointer global slot)
-@ - DWORD_080160c8 = 0x09e587e8 (type-9 matrix pointer global slot)
+@ - isd_affine_matrix_ptr_type4 = 0x09e587e4 (type-4 矩阵指针槽; ROM 内 NULL)
+@ - isd_affine_matrix_ptr_type9 = 0x09e587e8 (type-9 矩阵指针槽; ROM 内 NULL)
 @ - AFFINE_TYPE_4 = 4, AFFINE_TYPE_9 = 9
 set_isd_affine_matrix_ptr_by_type:
     push {lr}                                @ 08016098 00b5
@@ -6066,29 +6066,29 @@ set_isd_affine_matrix_ptr_by_type:
     cmp r0,#0x9                              @ 0801609e 0928
     beq LAB_080160c0                         @ 080160a0 0ed0
     ldr r0, set_isd_affine_matrix_ptr_by_type_isd_draw_c_filename @ 080160a2 0348
-    ldr r2, DWORD_080160b4                   @ 080160a4 034a
+    ldr r2, set_isd_affine_matrix_ptr_by_type_assert_expr_zero @ 080160a4 034a
     movs r1,#0x76    @ 080160a6 7621
     movs r3,#0x1    @ 080160a8 0123
     bl suppress_assert_report                @ 080160aa e4f017fa
     b LAB_080160c4                           @ 080160ae 09e0
 set_isd_affine_matrix_ptr_by_type_isd_draw_c_filename:
     .word  isd_draw_c_filename            @ 080160b0 4ca6e309  GL/ISD_Draw.c
-DWORD_080160b4:
-    .word  0x09e3a65c                     @ 080160b4 5ca6e309
+set_isd_affine_matrix_ptr_by_type_assert_expr_zero:
+    .word  assert_expr_zero_65c           @ 080160b4 5ca6e309
 LAB_080160b8:
-    ldr r0, DWORD_080160bc                   @ 080160b8 0048
+    ldr r0, set_isd_affine_matrix_ptr_by_type_ptr_type4 @ 080160b8 0048
     b LAB_080160c2                           @ 080160ba 02e0
-DWORD_080160bc:
-    .word  0x09e587e4                     @ 080160bc e487e509
+set_isd_affine_matrix_ptr_by_type_ptr_type4:
+    .word  isd_affine_matrix_ptr_type4    @ 080160bc e487e509
 LAB_080160c0:
-    ldr r0, DWORD_080160c8                   @ 080160c0 0148
+    ldr r0, set_isd_affine_matrix_ptr_by_type_ptr_type9 @ 080160c0 0148
 LAB_080160c2:
     str r1,[r0,#0x0]                         @ 080160c2 0160
 LAB_080160c4:
     pop {r0}                                 @ 080160c4 01bc
     bx r0                                    @ 080160c6 0047
-DWORD_080160c8:
-    .word  0x09e587e8                     @ 080160c8 e887e509
+set_isd_affine_matrix_ptr_by_type_ptr_type9:
+    .word  isd_affine_matrix_ptr_type9    @ 080160c8 e887e509
 
 @ Function: reads [r0+0x14] byte low 4-bit nibble as affine_type {4,9}, then dereferences the
 @ corresponding global ISD affine matrix pointer slot and returns the matrix data pointer.
@@ -6101,10 +6101,10 @@ DWORD_080160c8:
 @ 
 @ Constants:
 @ - GL/ISD_Draw.c assert line 0x82 = 130
-@ - DWORD_080160ec = 0x09e3a64c (source file string)
-@ - DWORD_080160f0 = 0x09e3a65c (condition string)
-@ - DWORD_080160f8 = 0x09e587e4 (type-4 matrix pointer slot)
-@ - DWORD_08016104 = 0x09e587e8 (type-9 matrix pointer slot)
+@ - isd_draw_c_filename = 0x09e3a64c (源文件串)
+@ - assert_expr_zero_65c = 0x09e3a65c (条件串 "0")
+@ - isd_affine_matrix_ptr_type4 = 0x09e587e4 (type-4 矩阵指针槽)
+@ - isd_affine_matrix_ptr_type9 = 0x09e587e8 (type-9 矩阵指针槽)
 @ - TYPE_FIELD = [r0+0x14] bits[3:0] (4-bit type code field)
 get_isd_affine_matrix_ptr_from_obj:
     push {lr}                                @ 080160cc 00b5
@@ -6116,7 +6116,7 @@ get_isd_affine_matrix_ptr_from_obj:
     cmp r0,#0x9                              @ 080160d8 0928
     beq LAB_080160fc                         @ 080160da 0fd0
     ldr r0, get_isd_affine_matrix_ptr_from_obj_isd_draw_c_filename @ 080160dc 0348
-    ldr r2, DWORD_080160f0                   @ 080160de 044a
+    ldr r2, get_isd_affine_matrix_ptr_from_obj_assert_expr_zero @ 080160de 044a
     movs r1,#0x82    @ 080160e0 8221
     movs r3,#0x1    @ 080160e2 0123
     bl suppress_assert_report                @ 080160e4 e4f0faf9
@@ -6124,24 +6124,24 @@ get_isd_affine_matrix_ptr_from_obj:
     b LAB_08016100                           @ 080160ea 09e0
 get_isd_affine_matrix_ptr_from_obj_isd_draw_c_filename:
     .word  isd_draw_c_filename            @ 080160ec 4ca6e309  GL/ISD_Draw.c
-DWORD_080160f0:
-    .word  0x09e3a65c                     @ 080160f0 5ca6e309
+get_isd_affine_matrix_ptr_from_obj_assert_expr_zero:
+    .word  assert_expr_zero_65c           @ 080160f0 5ca6e309
 LAB_080160f4:
-    ldr r0, DWORD_080160f8                   @ 080160f4 0048
+    ldr r0, get_isd_affine_matrix_ptr_from_obj_ptr_type4 @ 080160f4 0048
     b LAB_080160fe                           @ 080160f6 02e0
-DWORD_080160f8:
-    .word  0x09e587e4                     @ 080160f8 e487e509
+get_isd_affine_matrix_ptr_from_obj_ptr_type4:
+    .word  isd_affine_matrix_ptr_type4    @ 080160f8 e487e509
 LAB_080160fc:
-    ldr r0, DWORD_08016104                   @ 080160fc 0148
+    ldr r0, get_isd_affine_matrix_ptr_from_obj_ptr_type9 @ 080160fc 0148
 LAB_080160fe:
     ldr r0,[r0,#0x0]                         @ 080160fe 0068
 LAB_08016100:
     pop {r1}                                 @ 08016100 02bc
     bx r1                                    @ 08016102 0847
-DWORD_08016104:
-    .word  0x09e587e8                     @ 08016104 e887e509
+get_isd_affine_matrix_ptr_from_obj_ptr_type9:
+    .word  isd_affine_matrix_ptr_type9    @ 08016104 e887e509
 
-@ GL/ISD_Draw.c line 0x8c=140. Called by setup_isd_cell_anim_oam_entry (0x08015954). Returns ISD matrix data pointer by affine type code (4 or 9). r0==4 -> ldr DAT_08016130 (=0x09e587e4) content; r0==9 -> ldr DAT_0801613c (=0x09e587e8) content; other -> assert(0) (ISD_Draw.c:140), returns 0. Paired with resolve_bg_affine_param_offset: receives its return value as input. r0=u8 affine_type {4, 9}. Returns void* affine matrix data ptr.
+@ GL/ISD_Draw.c line 0x8c=140. Called by setup_isd_cell_anim_oam_entry (0x08015954). Returns ISD matrix data pointer by affine type code (4 or 9). r0==4 -> ldr isd_affine_matrix_ptr_type4 (=0x09e587e4) content; r0==9 -> ldr isd_affine_matrix_ptr_type9 (=0x09e587e8) content; other -> assert(0) (ISD_Draw.c:140), returns 0. Paired with resolve_bg_affine_param_offset: receives its return value as input. r0=u8 affine_type {4, 9}. Returns void* affine matrix data ptr.
 resolve_isd_affine_matrix_ptr:
     push {lr}                                @ 08016108 00b5
     cmp r0,#0x4                              @ 0801610a 0428
@@ -6149,7 +6149,7 @@ resolve_isd_affine_matrix_ptr:
     cmp r0,#0x9                              @ 0801610e 0928
     beq LAB_08016134                         @ 08016110 10d0
     ldr r0, resolve_isd_affine_matrix_ptr_isd_draw_c_filename @ 08016112 0448
-    ldr r2, DAT_08016128                     @ 08016114 044a
+    ldr r2, resolve_isd_affine_matrix_ptr_assert_expr_zero @ 08016114 044a
     movs r1,#0x8c    @ 08016116 8c21
     movs r3,#0x1    @ 08016118 0123
     bl suppress_assert_report                @ 0801611a e4f0dff9
@@ -6158,22 +6158,22 @@ resolve_isd_affine_matrix_ptr:
     .zero  0x2
 resolve_isd_affine_matrix_ptr_isd_draw_c_filename:
     .word  isd_draw_c_filename            @ 08016124 4ca6e309  GL/ISD_Draw.c
-DAT_08016128:
-    .word  0x09e3a65c                     @ 08016128 5ca6e309
+resolve_isd_affine_matrix_ptr_assert_expr_zero:
+    .word  assert_expr_zero_65c           @ 08016128 5ca6e309
 LAB_0801612c:
-    ldr r0, DAT_08016130                     @ 0801612c 0048
+    ldr r0, resolve_isd_affine_matrix_ptr_ptr_type4 @ 0801612c 0048
     b LAB_08016136                           @ 0801612e 02e0
-DAT_08016130:
-    .word  0x09e587e4                     @ 08016130 e487e509
+resolve_isd_affine_matrix_ptr_ptr_type4:
+    .word  isd_affine_matrix_ptr_type4    @ 08016130 e487e509
 LAB_08016134:
-    ldr r0, DAT_0801613c                     @ 08016134 0148
+    ldr r0, resolve_isd_affine_matrix_ptr_ptr_type9 @ 08016134 0148
 LAB_08016136:
     ldr r0,[r0,#0x0]                         @ 08016136 0068
 LAB_08016138:
     pop {r1}                                 @ 08016138 02bc
     bx r1                                    @ 0801613a 0847
-DAT_0801613c:
-    .word  0x09e587e8                     @ 0801613c e887e509
+resolve_isd_affine_matrix_ptr_ptr_type9:
+    .word  isd_affine_matrix_ptr_type9    @ 0801613c e887e509
 
 @ Linearly searches GFX resource linked list by 4-byte type tag, returning pointer to first matching entry. Input: r0=list_header, r1=tag. list_header[+0xc]=first entry offset (stride), list_header[+0xe]=entry count. Entry format: [+0x0]=4-byte tag, [+0x4]=relative offset to next entry. Returns entry ptr on match, NULL on miss. Called by 9 sibling wrappers accessing BGDT/OBJD/PALT tag types.
 @ 
