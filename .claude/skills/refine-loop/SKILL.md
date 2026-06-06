@@ -26,21 +26,27 @@ description: Drive the address-ordered per-segment refinement loop for an alread
 2. **函数间数据必处理**：段内 `ROM_INCBIN`/`.byte` 块**不留**——被引用代码 → R4 disasm；被引用数据 → R7 carve 进 rom.s。
 3. **唯一例外**：全 ROM 0 引用 (ref-scan raw + THUMB+1) → §5.1 登记留待。
 
-## 每段工作流 (Seg-N)
+## 3-agent 体系 (executor → reviewer → fixer)
+
+每段经 3 个 sub-agent (位于 `.claude/agents/refine-*.md`), 角色分离防自评污染:
 
 ```
-0. 备份 .rep → .rep.bak-<ts>-pre-seg<N>
-1. 测绘段: 扫 [start,end) 内 残留自动名 label + ROM_INCBIN/.byte 块 + 函数入口
-2. 数据块分类 (ref-scan → disasm / carve / §5.1, 见方法论决策树)
-3. 读消费者理解槽语义 (R6); 留意误名信号 (函数体全局 vs 函数名矛盾)
-4. 写 RefineSeg<N>*.py: equate / carve-label-ref / 槽改名 / plate (+ rom.s carve, + disasm 脚本)
-5. DRY-run (0 FAIL) → 实跑
-6. ghidra-export-range 080000c0 084c7637 → inject_modes → split_all_s → build → SHA1 校验
-7. (改函数名才) ExportFunctionInventory + sync + 手改 naming-proposals.csv
-8. 更新 refine 文档: §四 记录 + §三 进度 + §5.1 (如有) + §五 标 ✅
-9. commit (用户指令后)
-10. 更新 MEMORY 续接指针
+1. refine-executor → doc/dev/refine/<Seg-N>.proposal.md
+     测绘段 + ref-scan 分类数据块 + 读消费者 + 符号化/carve/disasm/§5.1 计划。不动 Ghidra。
+2. refine-reviewer → doc/dev/refine/<Seg-N>.review.md (C1-C13 自主复核, 重跑 ref-scan)
+3. 状态判定:
+     PASS      → fixer 模式 B 落地 → commit (auto-commit 已授权)
+     NEEDS_FIX → fixer 模式 A 改 proposal → 回 step 2 (max-iter=3)
+     BLOCKED   → §5.1 登记 / 求助用户
+     P0_FAILED → 退回 executor
+4. refine-fixer 模式 B 落地 phase:
+     备份 .rep → 物化 RefineSeg<N>*.py (equate/ref/rename/plate) + rom.s carve + disasm
+     → ghidra-export-range 080000c0 084c7637 → inject_modes → split_all_s → build
+     → byte-identical SHA1 → §5.1/文档更新 → (改名才) CSV sync → commit → MEMORY 续接
 ```
+
+byte-identical = 红线; 失败立即 abort + 回滚 .rep。段大可拆 Seg-Na/Nb (地址序不回头)。
+轻量段 (无数据块/纯 §5.1 登记) 可由主线程直接处理, 不必起全 3-agent。
 
 ## R1-R9 细化清单 (逐项过, 详见方法论)
 
@@ -67,6 +73,8 @@ R8 图形目视核对 · R9 byte-identical + 备份。
 
 | 文件 | 用途 |
 |------|------|
+| `.claude/agents/refine-{executor,reviewer,fixer}.md` | 3 sub-agent prompt |
+| `doc/dev/refine/<Seg-N>.{proposal,review}.md` | 每段 proposal + review 留痕 |
 | `doc/dev/methodology/refine-loop.md` | 完整方法论 (按需读) |
 | `doc/dev/p5-refine-<file>.md` | 活动文件进度 + §五 Seg 路线图 + §5.1 登记 |
 | `.claude/skills/symbolization` 或 `doc/dev/methodology/symbolization.md` | 字面量池符号化细节 |

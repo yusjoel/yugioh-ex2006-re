@@ -109,9 +109,12 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 **用途**: 在**已命名**基础上对一个模块文件做**内部细化**——立即数符号化 / 消灭 `DAT_` 自动名 / 误标数据反汇编 / 函数间 `ROM_INCBIN` carve / 注释订正, 全程 byte-identical。与命名互补。完整方法论 `doc/dev/methodology/refine-loop.md`, 活动进度 `doc/dev/p5-refine-<file>.md`。
 
-**组件**: 1 skill `refine-loop` (驱动器) + `doc/dev/methodology/refine-loop.md` (R1-R9 细化清单 + 三条硬规则 + carve/disasm/符号化技法)。
+**组件**:
+- 3 sub-agent: `refine-{executor,reviewer,fixer}` (位于 `.claude/agents/`; executor 测绘+ref-scan分类+计划 → reviewer C1-C13 自主复核 → fixer 模式A改proposal/模式B落地)
+- 1 skill `refine-loop` (驱动器) + `doc/dev/methodology/refine-loop.md` (R1-R9 细化清单 + 三条硬规则 + carve/disasm/符号化技法)
+- 每段留痕: `doc/dev/refine/<Seg-N>.{proposal,review}.md`
 
-**入口**: `Skill: refine-loop [Seg-N | <addr>]`（不传则从活动 refine 文档 §五 选下一未完成段）。
+**入口**: `Skill: refine-loop [Seg-N | <addr>]`（不传则从活动 refine 文档 §五 选下一未完成段）。轻量段 (纯 §5.1 登记) 主线程可直接处理, 不必起全 3-agent。
 
 **三条硬规则**: ①严格地址序 (文件均分 ~10 段 Seg-1..10, 边界=函数结束处, 不回头不跳号) ②函数间数据必处理 (被引用→carve/disasm, 不留 `ROM_INCBIN`) ③全 ROM 0 引用→§5.1 登记留待。
 
