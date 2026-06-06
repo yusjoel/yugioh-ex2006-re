@@ -110,7 +110,8 @@ gitignore 生成产物):
 | lang-select 图形 | 0xAA10..0xDE30 | ✅ 国旗/边框/palette/extra tiles, 符号化, 目视确认 |
 | boot-ui 图形 | 0xDE30..0x13510 | 🟡 灰度导出 + 结构化; **用户裁定放最后** (导出图未确认/未找到加载方) |
 | **batch-1: demo scene 簇 (15 fn)** | 0x13510..0x14398 | ✅ R1 常量 + R3 指针 + R5 注释完成 (见 §四.batch-1); byte-identical |
-| 代码函数 (其余 276 个) | 0x14398..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-2: GL blend/brightness 簇 (12 fn)** | 0x14600..0x14a10 | ✅ R1/R2/R3/R5 完成 (见 §四.batch-2): gGlBlendState 符号化 + 4 equate + 1 函数改名 + 7 plate 订正; byte-identical。**附带修复 1 个 pre-existing 断言串 carve 回归 (assert_..._670 标签)** |
+| 代码函数 (其余 ~264 个) | 0x14398..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -154,6 +155,41 @@ tick_demo_scene_state_machine。全部操作 gDemoState (0x02029ec0)。byte-iden
 自明) / `0x08013c04` (hub 10-case 跳转表基址; 表项指向 LAB_ case handler, 按 LAB_ 跳过策略留)。
 
 **LAB_ 内部分支 (111)**: 按 boot 区裁定**跳过**。
+
+### 4.0a batch-2 完成记录: GL blend/brightness 簇 (0x14600..0x14a10, 12 fn) ✅
+
+cpu_copy_auto / gl_clear_vram_palram_scroll / reset_gl_blend_transition_state /
+update_brightness_fade_flag / gl_set_brightness / init_blend_transition_params(_ex) /
+gl_set_blend2_level / gl_fade_in / gl_fade_out / check_blend_transition_done /
+tick_blend_transition_step。全部操作 gGlBlendState (0x02023480)。byte-identical SHA1 9689337d。
+
+**关键发现**: 本簇核心结构 `0x02023480` 在 batch-1 多个 plate 被**误称 `gDemoState`** (实际
+gDemoState=0x02029EC0)。它是 GL 屏幕亮度/alpha-blend 淡入淡出控制块 (源 GL/GL_Common.c),
+与紧邻的 GL 调色板管理区 0x02023490 (gl_state_init 用) 不同。本批订正。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R2/R3 状态结构 | `gGlBlendState=0x02023480` → `constants/ewram.inc` .equ + Ghidra USER label + 8 槽 DATA ref + 槽改名 `<func>_ptr_gl_blend_state` | 8 槽 |
+| R1 位掩码 | data-equate `GL_CLEAR_BITS_9_2`(0xfffffc03, 清 blend1 step bits[9:2]) / `GL_CLEAR_BITS_17_10`(0xfffc03ff, 清 blend2 step bits[17:10]) | 11 槽/2 常量 |
+| R1 fill 控制字 | data-equate `GL_CLEAR_VRAM_FILL_CTRL`(0x01006000) / `GL_CLEAR_PALRAM_FILL_CTRL`(0x01000100) | 2 槽 |
+| R2 改名 | assert-line 槽 0x148bc(行 281) → `init_blend_transition_params_ex_assert_line_blend1` | 1 槽 |
+| 函数改名 | 0x0801469c `clear_demo_sprite_enable_bits` → `reset_gl_blend_transition_state` (batch-1 误名: 实复位 gGlBlendState +0x8 控制字, 与 demo sprite 无关; 唯一调用者 tick_demo_scene_state_machine) | 1 fn |
+| R5 注释 | 1 plate 全改 (0x1469c 函数改名) + 6 plate targeted (gDemoState→gGlBlendState ×4 + gl_set_blend2_level 的 bits[11:2]→bits[17:10] 修正 + 常量名对齐) | 7 plate |
+
+新增: `constants/gl_blend.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineGlBlendBatch2.py`。
+
+**⚠ 附带修复: pre-existing 断言串 carve byte-identical 回归 (与 batch-2 无关)**
+
+batch-2 重导出后 build 出现 **2 字节** mismatch @ `0x0801a4f8`。二分确认 **HEAD 自身亦非 byte-identical**
+(同 2 字节, 同 hash 668AAD0C) —— 即上一 commit (7e770e1 断言串 carve) 引入的潜伏回归, 非 batch-2 所致。
+- 根因: `0x09e3c670` 的 Ghidra 符号被遗留为**裸 base 名** `assert_anmid_ig2d_getanmsequencescoun`
+  (无 `_670` 后缀), 而 `assert_labels.csv` / rom.s carve block 均意图 `_670`。该截断名与 base 串
+  (0x09e3b434) 的 carve label **同名碰撞** → `.word @0x1a4f8` 经 resolve_word_symbol 导出裸名 →
+  GAS 解析到 0x09e3b434 (错), 应为 0x09e3c670。
+- 修复: `tools/ghidra-labeling/FixAssert670Label.py` 把该符号补回 `_670` 后缀 (1 符号改名)。
+- 教训: assert-carve 的同前缀串靠**地址尾号后缀**去碰撞, AddAssertStringLabels.py 须确保 Ghidra
+  目标符号名 = carve label 名 (带后缀); `_verify_carve.py` 只验 carve 块字节, **不覆盖 .word 符号
+  解析**, 故未拦截 → 该类回归唯一防线是 build byte-identical, **断言串改动后必须 build 复验**。
 
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
@@ -216,13 +252,17 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
 0. ✅ **boot/IRQ 区 (0x0C0..0x224) R1 收尾** (本会话): IntrMain/RetAddr 立即数符号化 +
    dispatch plate 归属订正, byte-identical 通过 (SHA1 9689337d)。
 1. ~~先清 boot-ui mGBA 上色~~ → **用户裁定: 暂跳过, 放最后处理** (当前导出图未确认、未找到加载方; 0xAA10..0x13510 暂留 🟡)。
-2. 按地址序从 `reset_display_and_gl_state` (0x13510) 起, ~10-15 fn/批, 逐批走 pipeline +
-   byte-identical + commit。优先同子系统连续批 (复用上下文)。
-   - ⚠ batch-2 首函数 `reset_display_and_gl_state` 的 plate 仍引 `FUN_08014398` (= tick_prng_step_sequence);
-     但权威 2-col callgraph 显示其**直接调用者仅 play_ui_effect_3a**, 0x08014398 是 `indirect_table`
-     (函数指针表成员, 非 direct bl) → 该 caller 归属需 R6/R7 复核, 留 batch-2 处理 (同样 line 1035
-     `tick_demo_scene_*` plate 的 FUN_08014398 旧名)。
-3. 每批后视情况更新本文「进度」表。
+2. ✅ **batch-2 (0x14600..0x14a10, GL blend/brightness 簇 12 fn)** 完成 (见 §四.4.0a):
+   gGlBlendState 符号化 + equate + 函数改名 + plate 订正; byte-identical。附带修复 1 个 pre-existing
+   断言串 carve 回归。
+   - 注: §五.0/batch-1 提到的 `reset_display_and_gl_state` plate 旧名 `FUN_08014398` 已在 batch-1
+     订正 (现引 play_ui_effect_3a + indirect_table 说明), 全文件 plate 散文无 FUN_08014398 残留。
+3. 下一批 (batch-3) 候选: 按地址序 `0x14398` 起的剩余簇 ——
+   tick_prng_step_sequence / banlist_password_enter_char / 文本测量簇 (copy_str_unbounded,
+   measure_text_pixel_width...) / BG VRAM 地址簇 (get_bgN_char_vram_addr, copy_to_bgN_*, 0x14a10..0x14e14) /
+   GL 调色板管理簇 (gl_state_init, init_gl_palette_slot_flags @ 0x02023490, 0x1510c..)。
+   建议优先 **BG VRAM 地址簇** (0x14a10..0x14e14, ~24 个小 getter/copy, 高度同构, R1 IO 寄存器密集)。
+4. 每批后视情况更新本文「进度」表。
 
 ---
 

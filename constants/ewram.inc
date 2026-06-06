@@ -95,6 +95,25 @@
                                              @ 注: gPageState @ +0x20 (0x02023130) 是相邻另一结构
 
 @ -----------------------------------------------------------------------------
+@ GL 亮度/混合 (fade/blend) 状态结构 (源 GL/GL_Common.c)
+@ -----------------------------------------------------------------------------
+.equ gGlBlendState,              0x02023480  @ GL 屏幕亮度/alpha-blend 淡入淡出控制块
+                                             @ +0x0  = s8  blend1 当前系数 (history)
+                                             @ +0x1  = s8  blend1 目标系数 [-16..16]
+                                             @ +0x2  = u8  blend 模式位 (BLDCNT 目标, 常 0x3f)
+                                             @ +0x4  = s8  blend2 当前系数 (history)
+                                             @ +0x5  = s8  blend2 目标系数 [0..16]
+                                             @ +0x6  = u8  blend2 模式位
+                                             @ +0x8  = u32 打包控制字:
+                                             @         bits[1:0]   = 标志 (bit0 active / bit1 fade)
+                                             @         bits[9:2]   = blend1 step (当前帧步)
+                                             @         bits[17:10] = blend2 step (目标帧步)
+                                             @ 共用者: gl_set_brightness / gl_set_blend2_level /
+                                             @         init_blend_transition_params(_ex) /
+                                             @         check/tick_blend_transition_step
+                                             @ 注: 紧邻 GL 调色板管理区 (0x02023490, gl_state_init 用)
+
+@ -----------------------------------------------------------------------------
 @ 输入 / Banlist
 @ -----------------------------------------------------------------------------
 .equ gPlayerNameEntry,           0x02029512  @ 14 B  名字输入缓冲

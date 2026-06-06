@@ -18,6 +18,9 @@
 @ demo scene (gDemoState) 字段掩码/初值常量（0x13510..0x14398 demo 场景簇用）
 	.include "constants/demo_state.inc"
 
+@ GL blend/brightness (gGlBlendState) 位掩码/控制字常量（0x14600..0x14a10 GL 簇用）
+	.include "constants/gl_blend.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 

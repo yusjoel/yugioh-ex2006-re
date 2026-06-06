@@ -1314,7 +1314,7 @@ LAB_08013e18:
     beq LAB_08013e22                         @ 08013e1e 00d0
     b LAB_08013fc2                           @ 08013e20 cfe0
 LAB_08013e22:
-    bl clear_demo_sprite_enable_bits         @ 08013e22 00f03bfc
+    bl reset_gl_blend_transition_state       @ 08013e22 00f03bfc
     movs r2,#0x80    @ 08013e26 8022
     lsls r2,r2,#0x13    @ 08013e28 d204
     movs r3,#0xb0    @ 08013e2a b023
@@ -2436,14 +2436,14 @@ gl_clear_vram_palram_scroll:
     str r4,[sp,#0x0]                         @ 08014648 0094
     movs r1,#0xc0    @ 0801464a c021
     lsls r1,r1,#0x13    @ 0801464c c904
-    ldr r2, DAT_08014690                     @ 0801464e 104a
+    ldr r2, gl_clear_vram_palram_scroll_gl_clear_vram_fill_ctrl @ 0801464e 104a
     .hword 0x4668    @ 08014650 6846
     bl bios_cpu_fast_set                     @ 08014652 f9f0cffe
     str r4,[sp,#0x4]                         @ 08014656 0194
     add r0,sp,#0x4                           @ 08014658 01a8
     movs r1,#0xa0    @ 0801465a a021
     lsls r1,r1,#0x13    @ 0801465c c904
-    ldr r2, DAT_08014694                     @ 0801465e 0d4a
+    ldr r2, gl_clear_vram_palram_scroll_gl_clear_palram_fill_ctrl @ 0801465e 0d4a
     bl bios_cpu_fast_set                     @ 08014660 f9f0c8fe
     ldr r0, PTR_BG0HOFS_08014698             @ 08014664 0c48
     strh r4,[r0,#0x0]                        @ 08014666 0480
@@ -2467,43 +2467,43 @@ gl_clear_vram_palram_scroll:
     bx r0                                    @ 0801468a 0047
 PTR_gPrng_0801468c:
     .word  gPrng                          @ 0801468c 40000003
-DAT_08014690:
-    .word  0x01006000                     @ 08014690 00600001
-DAT_08014694:
-    .word  0x01000100                     @ 08014694 00010001
+gl_clear_vram_palram_scroll_gl_clear_vram_fill_ctrl:
+    .word  GL_CLEAR_VRAM_FILL_CTRL        @ 08014690 00600001
+gl_clear_vram_palram_scroll_gl_clear_palram_fill_ctrl:
+    .word  GL_CLEAR_PALRAM_FILL_CTRL      @ 08014694 00010001
 PTR_BG0HOFS_08014698:
     .word  BG0HOFS                        @ 08014698 10000004
 
-@ Called by tick_demo_scene_state_machine (0x08013bd4) caseD_4 after blend-done check to reset sprite-enable bits in gDemoState+0x8. Three-step operation on same field: (1) ldrb/strb clear bit2 (mask ~0x04); (2) ldrh/strh clear bits[9:2] (mask 0xfffffc03); (3) ldr/str clear bits[17:10] and set bit10 (0x400) as sprite-inactive initial state. No parameters (void); leaf function. Side-effects: [gDemoState(0x02023480)+0x8] byte/halfword/word.
-clear_demo_sprite_enable_bits:
-    ldr r2, DAT_080146c0                     @ 0801469c 084a
+@ 由 tick_demo_scene_state_machine (0x08013bd4) caseD_4 在 blend 完成检测后调用, 复位 gGlBlendState (0x02023480) 的 +0x8 打包控制字: (1) ldrb/strb 清 bits[1:0] (active/fade 标志, AND 0xfc); (2) ldrh/strh 清 bits[9:2] (blend1 step, GL_CLEAR_BITS_9_2); (3) ldr/str 清 bits[17:10] (blend2 step, GL_CLEAR_BITS_17_10) 后置 bit10 (0x400). 无参 (void); 叶子函数. 副作用: [gGlBlendState+0x8] 字节/半字/字写入.
+reset_gl_blend_transition_state:
+    ldr r2, reset_gl_blend_transition_state_ptr_gl_blend_state @ 0801469c 084a
     movs r0,#0x4    @ 0801469e 0420
     rsbs r0,r0,#0    @ 080146a0 4042
     ldrb r1,[r2,#0x8]                        @ 080146a2 117a
     ands r0,r1    @ 080146a4 0840
     strb r0,[r2,#0x8]                        @ 080146a6 1072
-    ldr r0, DAT_080146c4                     @ 080146a8 0648
+    ldr r0, reset_gl_blend_transition_state_gl_clear_bits_9_2 @ 080146a8 0648
     ldrh r1,[r2,#0x8]                        @ 080146aa 1189
     ands r0,r1    @ 080146ac 0840
     strh r0,[r2,#0x8]                        @ 080146ae 1081
     ldr r0,[r2,#0x8]                         @ 080146b0 9068
-    ldr r1, DAT_080146c8                     @ 080146b2 0549
+    ldr r1, reset_gl_blend_transition_state_gl_clear_bits_17_10 @ 080146b2 0549
     ands r0,r1    @ 080146b4 0840
     movs r1,#0x80    @ 080146b6 8021
     lsls r1,r1,#0x3    @ 080146b8 c900
     orrs r0,r1    @ 080146ba 0843
     str r0,[r2,#0x8]                         @ 080146bc 9060
     bx lr                                    @ 080146be 7047
-DAT_080146c0:
-    .word  0x02023480                     @ 080146c0 80340202
-DAT_080146c4:
-    .word  0xfffffc03                     @ 080146c4 03fcffff
-DAT_080146c8:
-    .word  0xfffc03ff                     @ 080146c8 ff03fcff
+reset_gl_blend_transition_state_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 080146c0 80340202
+reset_gl_blend_transition_state_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 080146c4 03fcffff
+reset_gl_blend_transition_state_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 080146c8 ff03fcff
 
-@ 由 gl_set_brightness 在设置亮度目标值后调用, 根据亮度状态结构体 (EWRAM 0x02023480) 中的当前值 (offset +0) 和目标值 (offset +1) 符号确定 fade 状态标记并写回 offset +8. 若两个值均 >= 0 则将 +8 的低 2 位清零并置 bit1 (fade 激活); 若任一值 < 0 则置 +8 为 3 (idle/disabled). 副作用: [0x02023480+8] 写入新 flag 字节.
+@ 由 gl_set_brightness 在设置亮度目标值后调用, 根据gGlBlendState 亮度状态结构体 (0x02023480) 中的当前值 (offset +0) 和目标值 (offset +1) 符号确定 fade 状态标记并写回 offset +8. 若两个值均 >= 0 则将 +8 的低 2 位清零并置 bit1 (fade 激活); 若任一值 < 0 则置 +8 为 3 (idle/disabled). 副作用: [gGlBlendState+8] 写入新 flag 字节.
 update_brightness_fade_flag:
-    ldr r2, DAT_080146ec                     @ 080146cc 074a
+    ldr r2, update_brightness_fade_flag_ptr_gl_blend_state @ 080146cc 074a
     movs r0,#0x1    @ 080146ce 0120
     ldrsb r0,[r2,r0]                         @ 080146d0 1056
     cmp r0,#0x0                              @ 080146d2 0028
@@ -2519,8 +2519,8 @@ update_brightness_fade_flag:
     movs r1,#0x2    @ 080146e6 0221
     b LAB_080146f4                           @ 080146e8 04e0
     .zero  0x2
-DAT_080146ec:
-    .word  0x02023480                     @ 080146ec 80340202
+update_brightness_fade_flag_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 080146ec 80340202
 LAB_080146f0:
     movs r0,#0x3    @ 080146f0 0320
     ldrb r1,[r2,#0x8]                        @ 080146f2 117a
@@ -2535,7 +2535,7 @@ gl_set_brightness:
     push {r4,r5,r6,lr}                       @ 080146fc 70b5
     adds r6,r0,#0x0    @ 080146fe 061c
     adds r5,r1,#0x0    @ 08014700 0d1c
-    ldr r4, DAT_08014740                     @ 08014702 0f4c
+    ldr r4, gl_set_brightness_ptr_gl_blend_state @ 08014702 0f4c
     adds r0,r5,#0x0    @ 08014704 281c
     adds r0,#0x10    @ 08014706 1030
     cmp r0,#0x20                             @ 08014708 2028
@@ -2549,12 +2549,12 @@ LAB_08014718:
     strb r5,[r4,#0x1]                        @ 08014718 6570
     strb r5,[r4,#0x0]                        @ 0801471a 2570
     strb r6,[r4,#0x2]                        @ 0801471c a670
-    ldr r0, DAT_0801474c                     @ 0801471e 0b48
+    ldr r0, gl_set_brightness_gl_clear_bits_9_2 @ 0801471e 0b48
     ldrh r1,[r4,#0x8]                        @ 08014720 2189
     ands r0,r1    @ 08014722 0840
     strh r0,[r4,#0x8]                        @ 08014724 2081
     ldr r0,[r4,#0x8]                         @ 08014726 a068
-    ldr r1, DAT_08014750                     @ 08014728 0949
+    ldr r1, gl_set_brightness_gl_clear_bits_17_10 @ 08014728 0949
     ands r0,r1    @ 0801472a 0840
     movs r1,#0x80    @ 0801472c 8021
     lsls r1,r1,#0x3    @ 0801472e c900
@@ -2565,18 +2565,18 @@ LAB_08014718:
     pop {r4,r5,r6}                           @ 0801473a 70bc
     pop {r0}                                 @ 0801473c 01bc
     bx r0                                    @ 0801473e 0047
-DAT_08014740:
-    .word  0x02023480                     @ 08014740 80340202
+gl_set_brightness_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 08014740 80340202
 gl_set_brightness_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014744 dc98e309  GL/GL_Common.c
 gl_set_brightness_assert_bright_16_bright_16:
     .word  assert_bright_16_bright_16     @ 08014748 ec98e309  bright >= -16 && bright <= 16
-DAT_0801474c:
-    .word  0xfffffc03                     @ 0801474c 03fcffff
-DAT_08014750:
-    .word  0xfffc03ff                     @ 08014750 ff03fcff
+gl_set_brightness_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 0801474c 03fcffff
+gl_set_brightness_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 08014750 ff03fcff
 
-@ Called by tick_demo_scene_state_machine caseD_2/3 and 3 other scene ticks (indeg=5). Initializes gDemoState blend-transition param struct (0x02023480): writes r1/r0/r2/r3 (blend start/current/end/step) to byte fields +0/+1/+2/+4/+5/+6; clears bits[9:2] of +0x8 and ORs 0x400; sets +0x8 bit0=1 (active). Out-of-range params trigger suppress_assert_report (GL/GL_Common.c lines 248/249). High-register convention: r8=r1 via caller mov r8,r1. r0=u8 blend_target [0..255], r1=s8 blend1_start [0..16], r2=u8 blend2_end [0..16], r3=u8 blend_step [0..16]. No return (void).
+@ Called by tick_demo_scene_state_machine caseD_2/3 and 3 other scene ticks (indeg=5). Initializes gGlBlendState blend-transition param struct (0x02023480): writes r1/r0/r2/r3 (blend start/current/end/step) to byte fields +0/+1/+2/+4/+5/+6; clears bits[9:2] of +0x8 and ORs 0x400; sets +0x8 bit0=1 (active). Out-of-range params trigger suppress_assert_report (GL/GL_Common.c lines 248/249). High-register convention: r8=r1 via caller mov r8,r1. r0=u8 blend_target [0..255], r1=s8 blend1_start [0..16], r2=u8 blend2_end [0..16], r3=u8 blend_step [0..16]. No return (void).
 init_blend_transition_params:
     push {r4,r5,r6,r7,lr}                    @ 08014754 f0b5
     .hword 0x4647    @ 08014756 4746
@@ -2585,7 +2585,7 @@ init_blend_transition_params:
     .hword 0x4688    @ 0801475c 8846
     adds r5,r2,#0x0    @ 0801475e 151c
     adds r6,r3,#0x0    @ 08014760 1e1c
-    ldr r4, DAT_080147c0                     @ 08014762 174c
+    ldr r4, init_blend_transition_params_ptr_gl_blend_state @ 08014762 174c
     cmp r5,#0x10                             @ 08014764 102d
     bls LAB_08014774                         @ 08014766 05d9
     ldr r0, init_blend_transition_params_gl_common_c_filename @ 08014768 1648
@@ -2609,12 +2609,12 @@ LAB_08014784:
     strb r6,[r4,#0x4]                        @ 0801478c 2671
     .hword 0x4640    @ 0801478e 4046
     strb r0,[r4,#0x6]                        @ 08014790 a071
-    ldr r0, DAT_080147d0                     @ 08014792 0f48
+    ldr r0, init_blend_transition_params_gl_clear_bits_9_2 @ 08014792 0f48
     ldrh r1,[r4,#0x8]                        @ 08014794 2189
     ands r0,r1    @ 08014796 0840
     strh r0,[r4,#0x8]                        @ 08014798 2081
     ldr r0,[r4,#0x8]                         @ 0801479a a068
-    ldr r1, DAT_080147d4                     @ 0801479c 0d49
+    ldr r1, init_blend_transition_params_gl_clear_bits_17_10 @ 0801479c 0d49
     ands r0,r1    @ 0801479e 0840
     movs r1,#0x80    @ 080147a0 8021
     lsls r1,r1,#0x3    @ 080147a2 c900
@@ -2632,26 +2632,26 @@ LAB_08014784:
     pop {r4,r5,r6,r7}                        @ 080147ba f0bc
     pop {r0}                                 @ 080147bc 01bc
     bx r0                                    @ 080147be 0047
-DAT_080147c0:
-    .word  0x02023480                     @ 080147c0 80340202
+init_blend_transition_params_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 080147c0 80340202
 init_blend_transition_params_gl_common_c_filename:
     .word  gl_common_c_filename           @ 080147c4 dc98e309  GL/GL_Common.c
 init_blend_transition_params_assert_blend1_0_blend1_16:
     .word  assert_blend1_0_blend1_16      @ 080147c8 0c99e309  blend1 >= 0 && blend1 <= 16
 init_blend_transition_params_assert_blend2_0_blend2_16:
     .word  assert_blend2_0_blend2_16      @ 080147cc 2899e309  blend2 >= 0 && blend2 <= 16
-DAT_080147d0:
-    .word  0xfffffc03                     @ 080147d0 03fcffff
-DAT_080147d4:
-    .word  0xfffc03ff                     @ 080147d4 ff03fcff
+init_blend_transition_params_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 080147d0 03fcffff
+init_blend_transition_params_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 080147d4 ff03fcff
 
-@ GL/GL_Common.c -- blend2 coefficient setter, symmetric sibling of gl_set_brightness. Called by gl_fade_in (0x080148d0), gl_fade_out (0x080148e0), and 11 other window/display/scene callers (indeg=13). Asserts blend1_level+0x10<=0x20 and blend2_level<=0x10 (GL_Common.c line 0x10a=266, 0x10b=267). Writes blend2_level to [gl_state+0x8] bits[11:2] (mask 0xFFFFFC03, shift 10); saves blend1_level to [gl_state+0x1]; old [gl_state+0x1] -> [gl_state+0x0]; writes blend_target to [gl_state+0x2]; calls update_brightness_fade_flag(blend1_level). r0=u8 blend_target [0..255], r1=s8 blend1_level [-16..16], r2=u8 blend2_level [0..16]. Constants: GL_STATE_BASE=0x02023480 / BLEND2_MASK=0xFFFFFC03 / BLEND2_SHIFT=10.
+@ GL/GL_Common.c -- blend2 coefficient setter, symmetric sibling of gl_set_brightness. Called by gl_fade_in (0x080148d0), gl_fade_out (0x080148e0), and 11 other window/display/scene callers (indeg=13). Asserts blend1_level+0x10<=0x20 and blend2_level<=0x10 (GL_Common.c line 0x10a=266, 0x10b=267). Clears blend1 step bits[9:2] of [gGlBlendState+0x8] (GL_CLEAR_BITS_9_2); inserts blend2_level into bits[17:10] (GL_CLEAR_BITS_17_10, shift 10); saves blend1_level to [gGlBlendState+0x1]; old [gGlBlendState+0x1] -> [gGlBlendState+0x0]; writes blend_target to [gGlBlendState+0x2]; calls update_brightness_fade_flag(blend1_level). r0=u8 blend_target [0..255], r1=s8 blend1_level [-16..16], r2=u8 blend2_level [0..16]. Constants: gGlBlendState=0x02023480 / GL_CLEAR_BITS_9_2=0xFFFFFC03 / GL_CLEAR_BITS_17_10=0xFFFC03FF / BLEND2_SHIFT=10.
 gl_set_blend2_level:
     push {r4,r5,r6,r7,lr}                    @ 080147d8 f0b5
     adds r7,r0,#0x0    @ 080147da 071c
     adds r5,r1,#0x0    @ 080147dc 0d1c
     adds r6,r2,#0x0    @ 080147de 161c
-    ldr r4, DAT_08014824                     @ 080147e0 104c
+    ldr r4, gl_set_blend2_level_ptr_gl_blend_state @ 080147e0 104c
     adds r0,r5,#0x0    @ 080147e2 281c
     adds r0,#0x10    @ 080147e4 1030
     cmp r0,#0x20                             @ 080147e6 2028
@@ -2663,7 +2663,7 @@ gl_set_blend2_level:
     movs r3,#0x0    @ 080147f2 0023
     bl suppress_assert_report                @ 080147f4 e5f072fe
 LAB_080147f8:
-    ldr r0, DAT_08014830                     @ 080147f8 0d48
+    ldr r0, gl_set_blend2_level_gl_clear_bits_9_2 @ 080147f8 0d48
     ldrh r1,[r4,#0x8]                        @ 080147fa 2189
     ands r0,r1    @ 080147fc 0840
     strh r0,[r4,#0x8]                        @ 080147fe 2081
@@ -2671,7 +2671,7 @@ LAB_080147f8:
     ands r1,r6    @ 08014802 3140
     lsls r1,r1,#0xa    @ 08014804 8902
     ldr r0,[r4,#0x8]                         @ 08014806 a068
-    ldr r2, DAT_08014834                     @ 08014808 0a4a
+    ldr r2, gl_set_blend2_level_gl_clear_bits_17_10 @ 08014808 0a4a
     ands r0,r2    @ 0801480a 1040
     orrs r0,r1    @ 0801480c 0843
     str r0,[r4,#0x8]                         @ 0801480e a060
@@ -2684,18 +2684,18 @@ LAB_080147f8:
     pop {r4,r5,r6,r7}                        @ 0801481e f0bc
     pop {r0}                                 @ 08014820 01bc
     bx r0                                    @ 08014822 0047
-DAT_08014824:
-    .word  0x02023480                     @ 08014824 80340202
+gl_set_blend2_level_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 08014824 80340202
 gl_set_blend2_level_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014828 dc98e309  GL/GL_Common.c
 gl_set_blend2_level_assert_bright_16_bright_16:
     .word  assert_bright_16_bright_16     @ 0801482c ec98e309  bright >= -16 && bright <= 16
-DAT_08014830:
-    .word  0xfffffc03                     @ 08014830 03fcffff
-DAT_08014834:
-    .word  0xfffc03ff                     @ 08014834 ff03fcff
+gl_set_blend2_level_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 08014830 03fcffff
+gl_set_blend2_level_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 08014834 ff03fcff
 
-@ Extended version of init_blend_transition_params (0x08014754); called by tick_demo_scene_state_machine caseD_3 and 3 other scene ticks (indeg=4). Accepts extra stack param r5=[sp+0x1c] as additional blend channel. Same purpose: writes r0/r1/r2/r3/r5 to gDemoState+0x0..+0x6 byte fields with history-roll (+1->+0, +5->+4); clears +0x8 step count and sets active bit. Out-of-range params trigger suppress_assert_report (GL/GL_Common.c lines 282/283). High-register convention: r8=r0, r9=r1 via caller mov instructions. r0=u8 blend_target_ch1 [0..255], r1=s8 blend1_start_ch1 [0..16], r2=u8 blend2_end_ch1 [0..16], r3=u8 blend_step_ch1 [0..16], [sp+0x1c]=u8 blend_extra. No return (void).
+@ Extended version of init_blend_transition_params (0x08014754); called by tick_demo_scene_state_machine caseD_3 and 3 other scene ticks (indeg=4). Accepts extra stack param r5=[sp+0x1c] as additional blend channel. Same purpose: writes r0/r1/r2/r3/r5 to gGlBlendState+0x0..+0x6 byte fields with history-roll (+1->+0, +5->+4); clears +0x8 step count and sets active bit. Out-of-range params trigger suppress_assert_report (GL/GL_Common.c lines 282/283). High-register convention: r8=r0, r9=r1 via caller mov instructions. r0=u8 blend_target_ch1 [0..255], r1=s8 blend1_start_ch1 [0..16], r2=u8 blend2_end_ch1 [0..16], r3=u8 blend_step_ch1 [0..16], [sp+0x1c]=u8 blend_extra. No return (void).
 init_blend_transition_params_ex:
     push {r4,r5,r6,r7,lr}                    @ 08014838 f0b5
     .hword 0x464f    @ 0801483a 4f46
@@ -2706,11 +2706,11 @@ init_blend_transition_params_ex:
     adds r6,r2,#0x0    @ 08014844 161c
     adds r7,r3,#0x0    @ 08014846 1f1c
     ldr r5,[sp,#0x1c]                        @ 08014848 079d
-    ldr r4, DAT_080148b4                     @ 0801484a 1a4c
+    ldr r4, init_blend_transition_params_ex_ptr_gl_blend_state @ 0801484a 1a4c
     cmp r6,#0x10                             @ 0801484c 102e
     bls LAB_0801485c                         @ 0801484e 05d9
     ldr r0, init_blend_transition_params_ex_gl_common_c_filename @ 08014850 1948
-    ldr r1, DAT_080148bc                     @ 08014852 1a49
+    ldr r1, init_blend_transition_params_ex_assert_line_blend1 @ 08014852 1a49
     ldr r2, init_blend_transition_params_ex_assert_blend1_0_blend1_16 @ 08014854 1a4a
     movs r3,#0x0    @ 08014856 0023
     bl suppress_assert_report                @ 08014858 e5f040fe
@@ -2741,7 +2741,7 @@ LAB_0801486e:
     movs r1,#0x1    @ 0801488a 0121
     orrs r0,r1    @ 0801488c 0843
     strb r0,[r4,#0x8]                        @ 0801488e 2072
-    ldr r0, DAT_080148c8                     @ 08014890 0d48
+    ldr r0, init_blend_transition_params_ex_gl_clear_bits_9_2 @ 08014890 0d48
     ldrh r1,[r4,#0x8]                        @ 08014892 2189
     ands r0,r1    @ 08014894 0840
     strh r0,[r4,#0x8]                        @ 08014896 2081
@@ -2749,7 +2749,7 @@ LAB_0801486e:
     ands r5,r0    @ 0801489a 0540
     lsls r2,r5,#0xa    @ 0801489c aa02
     ldr r0,[r4,#0x8]                         @ 0801489e a068
-    ldr r1, DAT_080148cc                     @ 080148a0 0a49
+    ldr r1, init_blend_transition_params_ex_gl_clear_bits_17_10 @ 080148a0 0a49
     ands r0,r1    @ 080148a2 0840
     orrs r0,r2    @ 080148a4 1043
     str r0,[r4,#0x8]                         @ 080148a6 a060
@@ -2759,20 +2759,20 @@ LAB_0801486e:
     pop {r4,r5,r6,r7}                        @ 080148ae f0bc
     pop {r0}                                 @ 080148b0 01bc
     bx r0                                    @ 080148b2 0047
-DAT_080148b4:
-    .word  0x02023480                     @ 080148b4 80340202
+init_blend_transition_params_ex_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 080148b4 80340202
 init_blend_transition_params_ex_gl_common_c_filename:
     .word  gl_common_c_filename           @ 080148b8 dc98e309  GL/GL_Common.c
-DAT_080148bc:
+init_blend_transition_params_ex_assert_line_blend1:
     .word  0x00000119                     @ 080148bc 19010000
 init_blend_transition_params_ex_assert_blend1_0_blend1_16:
     .word  assert_blend1_0_blend1_16      @ 080148c0 0c99e309  blend1 >= 0 && blend1 <= 16
 init_blend_transition_params_ex_assert_blend2_0_blend2_16:
     .word  assert_blend2_0_blend2_16      @ 080148c4 2899e309  blend2 >= 0 && blend2 <= 16
-DAT_080148c8:
-    .word  0xfffffc03                     @ 080148c8 03fcffff
-DAT_080148cc:
-    .word  0xfffc03ff                     @ 080148cc ff03fcff
+init_blend_transition_params_ex_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 080148c8 03fcffff
+init_blend_transition_params_ex_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 080148cc ff03fcff
 
 @ GL: 启动 8 帧淡入 (bright -16 -> 0)
 gl_fade_in:
@@ -2796,9 +2796,9 @@ gl_fade_out:
     bx r0                                    @ 080148f0 0047
     .zero  0x2
 
-@ Called by many scene ticks (indeg=7) including tick_demo_scene_state_machine caseD_1/2/3 and name_input_page_tick. Reads gDemoState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); returns 0 if equal (transition complete), 1 if still in progress. Pure read, no side-effects. Prerequisite check before tick_blend_transition_step (0x08014914): caller waits for 0 before advancing state. No parameters (void). Returns r0=u8 done_flag {0=done, 1=in-progress}.
+@ Called by many scene ticks (indeg=7) including tick_demo_scene_state_machine caseD_1/2/3 and name_input_page_tick. Reads gGlBlendState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); returns 0 if equal (transition complete), 1 if still in progress. Pure read, no side-effects. Prerequisite check before tick_blend_transition_step (0x08014914): caller waits for 0 before advancing state. No parameters (void). Returns r0=u8 done_flag {0=done, 1=in-progress}.
 check_blend_transition_done:
-    ldr r0, DAT_0801490c                     @ 080148f4 0548
+    ldr r0, check_blend_transition_done_ptr_gl_blend_state @ 080148f4 0548
     ldrh r2,[r0,#0x8]                        @ 080148f6 0289
     lsls r1,r2,#0x16    @ 080148f8 9105
     lsrs r1,r1,#0x18    @ 080148fa 090e
@@ -2810,18 +2810,18 @@ check_blend_transition_done:
     movs r0,#0x0    @ 08014906 0020
     b LAB_08014912                           @ 08014908 03e0
     .zero  0x2
-DAT_0801490c:
-    .word  0x02023480                     @ 0801490c 80340202
+check_blend_transition_done_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 0801490c 80340202
 LAB_08014910:
     movs r0,#0x1    @ 08014910 0120
 LAB_08014912:
     bx lr                                    @ 08014912 7047
 
-@ Called by many scene ticks (indeg=10) including demo scene state machine and name_input_page_tick. Advances the GL blend-transition state machine one step per frame: reads gDemoState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); if equal returns idle; otherwise increments step and dispatches by step-range (0x00/0x40/0x80/0xC0). 0x40/0x00 branches interpolate BLDCNT/BLDY; 0x80/0xC0 branches set BLDY direction coefficient. No parameters (void). Side-effects: gDemoState+0x8 step field, BLDCNT(0x04000050), BLDY(0x04000054).
+@ Called by many scene ticks (indeg=10) including demo scene state machine and name_input_page_tick. Advances the GL blend-transition state machine one step per frame: reads gGlBlendState+0x8 bits[9:2] (cur step) and bits[17:10] (target step); if equal returns idle; otherwise increments step and dispatches by step-range (0x00/0x40/0x80/0xC0). 0x40/0x00 branches interpolate BLDCNT/BLDY; 0x80/0xC0 branches set BLDY direction coefficient. No parameters (void). Side-effects: gGlBlendState+0x8 step field, BLDCNT(0x04000050), BLDY(0x04000054).
 tick_blend_transition_step:
     push {r4,r5,r6,r7,lr}                    @ 08014914 f0b5
     sub sp,#0x4                              @ 08014916 81b0
-    ldr r3, DAT_08014954                     @ 08014918 0e4b
+    ldr r3, tick_blend_transition_step_ptr_gl_blend_state @ 08014918 0e4b
     adds r7,r3,#0x0    @ 0801491a 1f1c
     movs r5,#0x1    @ 0801491c 0125
     ldrh r2,[r3,#0x8]                        @ 0801491e 1a89
@@ -2836,7 +2836,7 @@ tick_blend_transition_step:
     movs r0,#0xff    @ 08014930 ff20
     ands r1,r0    @ 08014932 0140
     lsls r1,r1,#0x2    @ 08014934 8900
-    ldr r0, DAT_08014958                     @ 08014936 0848
+    ldr r0, tick_blend_transition_step_gl_clear_bits_9_2 @ 08014936 0848
     ands r0,r2    @ 08014938 1040
     orrs r0,r1    @ 0801493a 0843
     strh r0,[r3,#0x8]                        @ 0801493c 1881
@@ -2851,10 +2851,10 @@ tick_blend_transition_step:
     beq LAB_08014966                         @ 0801494e 0ad0
     b LAB_080149fe                           @ 08014950 55e0
     .zero  0x2
-DAT_08014954:
-    .word  0x02023480                     @ 08014954 80340202
-DAT_08014958:
-    .word  0xfffffc03                     @ 08014958 03fcffff
+tick_blend_transition_step_ptr_gl_blend_state:
+    .word  gGlBlendState                  @ 08014954 80340202
+tick_blend_transition_step_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 08014958 03fcffff
 LAB_0801495c:
     cmp r0,#0x80                             @ 0801495c 8028
     beq LAB_080149c4                         @ 0801495e 31d0
@@ -15023,7 +15023,7 @@ tick_banlist_card_slot_anim_oam_pass_main_c_filename:
 DAT_0801a4f4:
     .word  0x0000036f                     @ 0801a4f4 6f030000
 tick_banlist_card_slot_anim_oam_assert_anmid_ig2d_getanmsequencescoun_670:
-    .word  assert_anmid_ig2d_getanmsequencescoun @ 0801a4f8 70c6e309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
+    .word  assert_anmid_ig2d_getanmsequencescoun_670 @ 0801a4f8 70c6e309  anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])
 DAT_0801a4fc:
     .word  0x000005ac                     @ 0801a4fc ac050000
 LAB_0801a500:
