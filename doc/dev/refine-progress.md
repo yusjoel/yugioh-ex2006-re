@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `00_system_str_vija.s` (进行中, ~5.7/10 段)。
-> **下一任务**: **Seg-6** (00 文件, 0x1794c..0x18774, ~28 fn, ROM_INCBIN 0x186ce/0x22)。
+> **当前文件**: `00_system_str_vija.s` (进行中, ~6/10 段)。
+> **下一任务**: **Seg-6b** (00 文件, 0x17e48..0x18774, 23 fn, ROM_INCBIN 0x186ce/0x22; carve F/G/H pending)。
 
 ---
 
@@ -61,7 +61,8 @@
 | 5b | apply_bgdt/objd | ✅ | (committed) |
 | 5c | apply_gfx_resource_list + R4 disasm 63 SJIS stubs | ✅ | (committed) |
 | 5d | 0x171ec..0x1794c (15 fn + 2 carve + §5.1 0x17424/0x40) | ✅ | 8c4ec5a |
-| **6** | **0x1794c..0x18774 (incbin 0x186ce/0x22)** | **⬜ 下一步** | |
+| 6a | 0x1794c..0x17e48 (5 fn, kana carve A+B+pool+I) | ✅ | (pending commit) |
+| **6b** | **0x17e48..0x18774 (23 fn, carve F/G/H, incbin 0x186ce/0x22)** | **⬜ 下一步** | |
 | 7 | 0x18774..0x19a58 (incbin 0x19640/0x20) | ⬜ | |
 | 8 | 0x19a58..0x1a794 | ⬜ | |
 | 9 | 0x1a794..0x1b850 (incbin 0x1a89c, 0x1ad18/0xec) | ⬜ | |

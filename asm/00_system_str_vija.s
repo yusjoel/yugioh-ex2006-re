@@ -9239,13 +9239,13 @@ load_game_str_1006_to_state_gsettings_offset:
 PTR_game_str_ja_080179a4:
     .word  game_str_ja                    @ 080179a4 109cdb09
 
-@ Function: Receives a single Shift-JIS char code (r0 low 16 bits), queries glyph index via char_code_to_glyph_index; if no glyph, updates counters and returns. If glyph exists: builds a 2-byte char representation in stack buffer (high byte + low byte), calls append_text_to_buf_charlen to append to output line buffer r1(=r9), increments r5 (line char count) and r7 (global char count). When r5 reaches 11 (0xb), additionally appends a 3-byte delimiter sequence read from ROM constant 0x09e3b2b4 and resets r5=0. On exit writes r5 and r7 back to *r2 and *r3 respectively.
+@ Function: Receives a single Shift-JIS char code (r0 low 16 bits), queries glyph index via char_code_to_glyph_index; if no glyph, updates counters and returns. If glyph exists: builds a 2-byte char representation in stack buffer (high byte + low byte), calls append_text_to_buf_charlen to append to output line buffer r1(=r9), increments r5 (line char count) and r7 (global char count). When r5 reaches 11 (0xb), additionally appends a 3-byte delimiter sequence read from ROM constant line_break_seq and resets r5=0. On exit writes r5 and r7 back to *r2 and *r3 respectively.
 @ Trigger: Called by FUN_08017a24 (banlist/settings font renderer) when processing JP strings char by char.
 @ Side effects: append_text_to_buf_charlen appends to output buffer (r9); *r2 := r5 (line char count update); *r3 := r7 (global count update).
 @ 
 @ Constants:
 @ - LINE_BREAK_INTERVAL=0xb=11 (insert line break delimiter every 11 chars)
-@ - LINE_BREAK_BYTES=0x09e3b2b4 (ROM address: 3-byte line break delimiter sequence)
+@ - LINE_BREAK_BYTES=line_break_seq (ROM address: 3-byte line break delimiter sequence)
 encode_char_to_line_buf:
     push {r4,r5,r6,r7,lr}                    @ 080179a8 f0b5
     .hword 0x4657    @ 080179aa 5746
@@ -9281,7 +9281,7 @@ encode_char_to_line_buf:
     cmp r5,#0xb                              @ 080179ec 0b2d
     bne LAB_08017a06                         @ 080179ee 0ad1
     add r4,sp,#0x4                           @ 080179f0 01ac
-    ldr r1, DAT_08017a20                     @ 080179f2 0b49
+    ldr r1, encode_char_to_line_buf_line_break_seq @ 080179f2 0b49
     adds r0,r4,#0x0    @ 080179f4 201c
     movs r2,#0x3    @ 080179f6 0322
     bl memcpy                                @ 080179f8 f6f0b0ff
@@ -9303,8 +9303,8 @@ LAB_08017a06:
     pop {r0}                                 @ 08017a1a 01bc
     bx r0                                    @ 08017a1c 0047
     .zero  0x2
-DAT_08017a20:
-    .word  0x09e3b2b4                     @ 08017a20 b4b2e309
+encode_char_to_line_buf_line_break_seq:
+    .word  line_break_seq                 @ 08017a20 b4b2e309
 
 @ encode_str_table_entry_to_line_buf: Name-input scene -- takes string table entry pointed to by caller-frame r6, encodes each char via encode_char_to_line_buf into line buffer, then calls pad_str_to_char_multiple to align to 60 or 12 cols. No push prologue; r4/r5/r6/r7 are caller-frame registers (inline exit fragment pattern).
 @ 
@@ -9315,7 +9315,7 @@ DAT_08017a20:
 encode_str_table_entry_to_line_buf:
     push {r4,r5,r6,r7,lr}                    @ 08017a24 f0b5
     sub sp,#0x8                              @ 08017a26 82b0
-    ldr r1, DAT_08017a54                     @ 08017a28 0a49
+    ldr r1, encode_str_table_entry_to_line_buf_gstate @ 08017a28 0a49
     adds r7,r1,#0x0    @ 08017a2a 0f1c
     adds r7,#0x8d    @ 08017a2c 8d37
     movs r0,#0x0    @ 08017a2e 0020
@@ -9326,7 +9326,7 @@ encode_str_table_entry_to_line_buf:
     ldrh r0,[r0,#0x0]                        @ 08017a38 0088
     lsls r0,r0,#0x16    @ 08017a3a 8005
     lsrs r2,r0,#0x1c    @ 08017a3c 020f
-    ldr r0, DAT_08017a58                     @ 08017a3e 0648
+    ldr r0, encode_str_table_entry_to_line_buf_scroll_col_offset @ 08017a3e 0648
     adds r1,r1,r0    @ 08017a40 0918
     ldrb r1,[r1,#0x0]                        @ 08017a42 0978
     lsls r0,r1,#0x1a    @ 08017a44 8806
@@ -9337,16 +9337,16 @@ encode_str_table_entry_to_line_buf:
     lsls r0,r1,#0x2    @ 08017a4e 8800
     adds r0,r0,r1    @ 08017a50 4018
     b LAB_08017a60                           @ 08017a52 05e0
-DAT_08017a54:
-    .word  0x02029250                     @ 08017a54 50920202
-DAT_08017a58:
-    .word  0x00000315                     @ 08017a58 15030000
+encode_str_table_entry_to_line_buf_gstate:
+    .word  gState                         @ 08017a54 50920202
+encode_str_table_entry_to_line_buf_scroll_col_offset:
+    .word  0x00000315                     @ 08017a58 15030000  gState+0x315 = scroll column index field; bits[5:2] select column group
 LAB_08017a5c:
     lsls r0,r2,#0x2    @ 08017a5c 9000
     adds r0,r0,r2    @ 08017a5e 8018
 LAB_08017a60:
     adds r6,r0,r3    @ 08017a60 c618
-    ldr r1, DAT_08017b14                     @ 08017a62 2c49
+    ldr r1, encode_str_table_entry_to_line_buf_group_ptr_table @ 08017a62 2c49
     lsls r0,r6,#0x2    @ 08017a64 b000
     adds r0,r0,r1    @ 08017a66 4018
     ldr r0,[r0,#0x0]                         @ 08017a68 0068
@@ -9354,7 +9354,7 @@ LAB_08017a60:
     bl copy_str_unbounded                    @ 08017a6c fcf700fd
     str r0,[sp,#0x0]                         @ 08017a70 0090
     lsls r0,r6,#0x1    @ 08017a72 7000
-    ldr r3, DAT_08017b18                     @ 08017a74 284b
+    ldr r3, encode_str_table_entry_to_line_buf_range_table @ 08017a74 284b
     adds r1,r0,#0x1    @ 08017a76 411c
     adds r1,r1,r3    @ 08017a78 c918
     adds r2,r0,r3    @ 08017a7a c218
@@ -9386,7 +9386,7 @@ LAB_08017a9c:
 LAB_08017aae:
     cmp r6,#0x2d                             @ 08017aae 2d2e
     bne LAB_08017abe                         @ 08017ab0 05d1
-    ldr r0, DAT_08017b1c                     @ 08017ab2 1a48
+    ldr r0, encode_str_table_entry_to_line_buf_char_sentinel @ 08017ab2 1a48
     add r3,sp,#0x4                           @ 08017ab4 01ab
     adds r1,r7,#0x0    @ 08017ab6 391c
     .hword 0x466a    @ 08017ab8 6a46
@@ -9399,16 +9399,16 @@ LAB_08017abe:
     lsls r1,r0,#0x1    @ 08017ac8 4100
     adds r1,r1,r0    @ 08017aca 0918
     lsls r1,r1,#0x2    @ 08017acc 8900
-    ldr r0, DAT_08017b20                     @ 08017ace 1448
+    ldr r0, encode_str_table_entry_to_line_buf_assert_line_117 @ 08017ace 1448
     cmp r1,r0                                @ 08017ad0 8142
     bls LAB_08017ae0                         @ 08017ad2 05d9
     ldr r0, encode_str_table_entry_to_line_buf_name_main_c_filename @ 08017ad4 1348
-    ldr r1, DAT_08017b28                     @ 08017ad6 1449
+    ldr r1, encode_str_table_entry_to_line_buf_assert_line_189 @ 08017ad6 1449
     ldr r2, encode_str_table_entry_to_line_buf_assert_cnt_name_mojitbl_width_1_name @ 08017ad8 144a
     movs r3,#0x1    @ 08017ada 0123
     bl suppress_assert_report                @ 08017adc e2f0fefc
 LAB_08017ae0:
-    ldr r4, DAT_08017b30                     @ 08017ae0 134c
+    ldr r4, encode_str_table_entry_to_line_buf_assert_fmt @ 08017ae0 134c
     ldr r0,[sp,#0x4]                         @ 08017ae2 0198
     adds r0,#0xb    @ 08017ae4 0b30
     movs r1,#0xc    @ 08017ae6 0c21
@@ -9430,22 +9430,22 @@ LAB_08017ae0:
     bl pad_str_to_char_multiple              @ 08017b0c fff7a6fe
     b LAB_08017b3c                           @ 08017b10 14e0
     .zero  0x2
-DAT_08017b14:
-    .word  0x09e587f0                     @ 08017b14 f087e509
-DAT_08017b18:
-    .word  0x09e3b251                     @ 08017b18 51b2e309
-DAT_08017b1c:
-    .word  0x0000e3a9                     @ 08017b1c a9e30000
-DAT_08017b20:
-    .word  0x00000117                     @ 08017b20 17010000
+encode_str_table_entry_to_line_buf_group_ptr_table:
+    .word  name_char_group_ptr_table      @ 08017b14 f087e509
+encode_str_table_entry_to_line_buf_range_table:
+    .word  name_char_range_table          @ 08017b18 51b2e309
+encode_str_table_entry_to_line_buf_char_sentinel:
+    .word  0x0000e3a9                     @ 08017b1c a9e30000  upper-bound literal 0xe3a9 in char-group scan cmp; not an address
+encode_str_table_entry_to_line_buf_assert_line_117:
+    .word  0x00000117                     @ 08017b20 17010000  assert line 0x117=279 (char width range check)
 encode_str_table_entry_to_line_buf_name_main_c_filename:
     .word  name_main_c_filename           @ 08017b24 b8b2e309  NameInput/Name_main.c
-DAT_08017b28:
-    .word  0x00000189                     @ 08017b28 89010000
+encode_str_table_entry_to_line_buf_assert_line_189:
+    .word  0x00000189                     @ 08017b28 89010000  assert line 0x189=393 (column group boundary check)
 encode_str_table_entry_to_line_buf_assert_cnt_name_mojitbl_width_1_name:
     .word  assert_cnt_name_mojitbl_width_1_name @ 08017b2c d0b2e309  (cnt + NAME_MOJITBL_WIDTH - 1) / NAME_MOJITBL_WIDTH * NAME_M
-DAT_08017b30:
-    .word  0x09e3b338                     @ 08017b30 38b3e309
+encode_str_table_entry_to_line_buf_assert_fmt:
+    .word  assert_table_last_fmt          @ 08017b30 38b3e309
 LAB_08017b34:
     adds r0,r7,#0x0    @ 08017b34 381c
     movs r1,#0xc    @ 08017b36 0c21
@@ -9456,7 +9456,7 @@ LAB_08017b3c:
     pop {r0}                                 @ 08017b40 01bc
     bx r0                                    @ 08017b42 0047
 
-@ Function: Renders 3 JP game strings (game_str ids: 0x1008, 0x1007, 0x100c) to fixed OBJ VRAM tile slots. For each string: (1) looks up string pointer from game_str_pointer_table (index synthesized from game_str_id_to_row + gState[0x6c2c] low 3 bits), (2) calls measure_text_pixel_width and stores at gState offsets (0x321/0x320/0x322), (3) calls zero_obj_vram_tiles to clear target tile region, (4) calls render_jp_text_to_vram_obj at 6 cols 2 rows to OBJ VRAM. Three string tile starts: 0xbe<<1=0x17c, 0x17c-0xc=0x170, 0x170+0x18=0x188. Called by name_input_page_load_assets during page asset load. r8 and r9 are loaded internally from literal pool (gState=0x02029250 and game_str_ja base respectively), not APCS inputs.
+@ Function: Renders 3 JP game strings (game_str ids: 0x1008, 0x1007, 0x100c) to fixed OBJ VRAM tile slots. For each string: (1) looks up string pointer from game_str_pointer_table (index synthesized from game_str_id_to_row + gState[0x6c2c] low 3 bits), (2) calls measure_text_pixel_width and stores at gState offsets (0x321/0x320/0x322), (3) calls zero_obj_vram_tiles to clear target tile region, (4) calls render_jp_text_to_vram_obj at 6 cols 2 rows to OBJ VRAM. Three string tile starts: 0xbe<<1=0x17c, 0x17c-0xc=0x170, 0x170+0x18=0x188. Called by name_input_page_load_assets during page asset load. r8 and r9 are loaded internally from literal pool (gState=gState and game_str_ja base respectively), not APCS inputs.
 @ Trigger: name_input page init; called after BG tilemap clear and scrollbar init.
 @ Side effects: OBJ VRAM three tile regions written with JP text; gState[0x321], [0x320], [0x322] store pixel widths.
 @ 
@@ -9469,7 +9469,7 @@ LAB_08017b3c:
 @ - TILE_C=0x170+0x18=0x188 (3rd OBJ tile start)
 @ - TILE_COUNT_EACH=0xc (12 tiles per segment)
 @ - WIDTH_COLS=6, HEIGHT_ROWS=2 (render_jp_text_to_vram_obj dimensions)
-@ - GSTATE_BASE=0x02029250 (loaded from literal pool, not APCS param)
+@ - GSTATE_BASE=gState (loaded from literal pool, not APCS param)
 @ - STR_MODE_OFFSET=0x6c2c (gState+0x6c2c low 3 bits = language mode)
 @ - WIDTH_STORE_A=0x321, WIDTH_STORE_B=0xc8<<2=0x320, WIDTH_STORE_C=0x322
 render_name_input_jp_labels_to_obj:
@@ -9479,9 +9479,9 @@ render_name_input_jp_labels_to_obj:
     .hword 0x4645    @ 08017b4a 4546
     push {r5,r6,r7}                          @ 08017b4c e0b4
     sub sp,#0x4                              @ 08017b4e 81b0
-    ldr r0, DAT_08017c54                     @ 08017b50 4048
+    ldr r0, render_name_input_jp_labels_to_obj_gstate @ 08017b50 4048
     .hword 0x4680    @ 08017b52 8046
-    ldr r0, DAT_08017c58                     @ 08017b54 4048
+    ldr r0, render_name_input_jp_labels_to_obj_str_id_a @ 08017b54 4048
     bl game_str_id_to_row                    @ 08017b56 ddf05ff9
     ldr r7, PTR_game_str_pointer_table_08017c5c @ 08017b5a 404f
     lsls r0,r0,#0x10    @ 08017b5c 0004
@@ -9489,8 +9489,8 @@ render_name_input_jp_labels_to_obj:
     lsls r1,r0,#0x1    @ 08017b60 4100
     adds r1,r1,r0    @ 08017b62 0918
     lsls r1,r1,#0x1    @ 08017b64 4900
-    ldr r6, DAT_08017c60                     @ 08017b66 3e4e
-    ldr r2, DAT_08017c64                     @ 08017b68 3e4a
+    ldr r6, render_name_input_jp_labels_to_obj_ewram_base @ 08017b66 3e4e
+    ldr r2, render_name_input_jp_labels_to_obj_gsettings_offset @ 08017b68 3e4a
     adds r6,r6,r2    @ 08017b6a b618
     ldrb r2,[r6,#0x0]                        @ 08017b6c 3278
     lsls r0,r2,#0x1d    @ 08017b6e 5007
@@ -9505,7 +9505,7 @@ render_name_input_jp_labels_to_obj:
     adds r0,r4,#0x0    @ 08017b80 201c
     movs r1,#0xa    @ 08017b82 0a21
     bl measure_text_pixel_width              @ 08017b84 fcf71afd
-    ldr r1, DAT_08017c6c                     @ 08017b88 3849
+    ldr r1, render_name_input_jp_labels_to_obj_width_store_a @ 08017b88 3849
     add r1,r8                                @ 08017b8a 4144
     movs r2,#0x0    @ 08017b8c 0022
     .hword 0x4692    @ 08017b8e 9246
@@ -9522,7 +9522,7 @@ render_name_input_jp_labels_to_obj:
     movs r2,#0x6    @ 08017ba6 0622
     movs r3,#0x2    @ 08017ba8 0223
     bl render_jp_text_to_vram_obj            @ 08017baa 00f011fc
-    ldr r0, DAT_08017c70                     @ 08017bae 3048
+    ldr r0, render_name_input_jp_labels_to_obj_str_id_b @ 08017bae 3048
     bl game_str_id_to_row                    @ 08017bb0 ddf032f9
     lsls r0,r0,#0x10    @ 08017bb4 0004
     lsrs r0,r0,#0x10    @ 08017bb6 000c
@@ -9555,7 +9555,7 @@ render_name_input_jp_labels_to_obj:
     movs r2,#0x6    @ 08017bf0 0622
     movs r3,#0x2    @ 08017bf2 0223
     bl render_jp_text_to_vram_obj            @ 08017bf4 00f0ecfb
-    ldr r0, DAT_08017c74                     @ 08017bf8 1e48
+    ldr r0, render_name_input_jp_labels_to_obj_str_id_c @ 08017bf8 1e48
     bl game_str_id_to_row                    @ 08017bfa ddf00df9
     lsls r0,r0,#0x10    @ 08017bfe 0004
     lsrs r0,r0,#0x10    @ 08017c00 000c
@@ -9573,7 +9573,7 @@ render_name_input_jp_labels_to_obj:
     adds r0,r4,#0x0    @ 08017c18 201c
     movs r1,#0xa    @ 08017c1a 0a21
     bl measure_text_pixel_width              @ 08017c1c fcf7cefc
-    ldr r1, DAT_08017c78                     @ 08017c20 1549
+    ldr r1, render_name_input_jp_labels_to_obj_width_store_c @ 08017c20 1549
     add r8,r1                                @ 08017c22 8844
     .hword 0x4642    @ 08017c24 4246
     strb r0,[r2,#0x0]                        @ 08017c26 1070
@@ -9597,26 +9597,26 @@ render_name_input_jp_labels_to_obj:
     pop {r0}                                 @ 08017c4e 01bc
     bx r0                                    @ 08017c50 0047
     .zero  0x2
-DAT_08017c54:
-    .word  0x02029250                     @ 08017c54 50920202
-DAT_08017c58:
-    .word  0x00001008                     @ 08017c58 08100000
+render_name_input_jp_labels_to_obj_gstate:
+    .word  gState                         @ 08017c54 50920202
+render_name_input_jp_labels_to_obj_str_id_a:
+    .word  0x00001008                     @ 08017c58 08100000  STR_ID_A=0x1008: first game_str label id rendered to OBJ VRAM
 PTR_game_str_pointer_table_08017c5c:
     .word  game_str_pointer_table         @ 08017c5c 400f0008
-DAT_08017c60:
-    .word  0x02000000                     @ 08017c60 00000002
-DAT_08017c64:
-    .word  0x00006c2c                     @ 08017c64 2c6c0000
+render_name_input_jp_labels_to_obj_ewram_base:
+    .word  EWRAM_BASE                     @ 08017c60 00000002
+render_name_input_jp_labels_to_obj_gsettings_offset:
+    .word  0x00006c2c                     @ 08017c64 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE; bits[2:0]=language_id
 PTR_game_str_ja_08017c68:
     .word  game_str_ja                    @ 08017c68 109cdb09
-DAT_08017c6c:
-    .word  0x00000321                     @ 08017c6c 21030000
-DAT_08017c70:
-    .word  0x00001007                     @ 08017c70 07100000
-DAT_08017c74:
-    .word  0x0000100c                     @ 08017c74 0c100000
-DAT_08017c78:
-    .word  0x00000322                     @ 08017c78 22030000
+render_name_input_jp_labels_to_obj_width_store_a:
+    .word  0x00000321                     @ 08017c6c 21030000  gState+0x321 = pixel width store for str A result
+render_name_input_jp_labels_to_obj_str_id_b:
+    .word  0x00001007                     @ 08017c70 07100000  STR_ID_B=0x1007: second game_str label id
+render_name_input_jp_labels_to_obj_str_id_c:
+    .word  0x0000100c                     @ 08017c74 0c100000  STR_ID_C=0x100c: third game_str label id
+render_name_input_jp_labels_to_obj_width_store_c:
+    .word  0x00000322                     @ 08017c78 22030000  gState+0x322 = pixel width store for str C result
 
 @ Banlist password input scene string load dispatcher. r0=key [0..3] selects load operation: key=0 -> load_game_str_pair_1004_to_state; key=1 -> load_game_str_1006_to_state; key=2 -> copy_str_unbounded (src=DAT_08017ca8, dst=r1+0x8d); key=3 -> encode_str_table_entry_to_line_buf. All paths converge at movs r0,#0x1 @ 08017cbc; returns 1 fixed. Sub-case E epilogue: pop {r1}; bx r1.
 @ 
@@ -9626,7 +9626,7 @@ DAT_08017c78:
 @ - KEY_RANGE = [0..3]
 dispatch_banlist_text_by_key:
     push {lr}                                @ 08017c7c 00b5
-    ldr r1, DAT_08017c90                     @ 08017c7e 0449
+    ldr r1, dispatch_banlist_text_by_key_gstate @ 08017c7e 0449
     cmp r0,#0x1                              @ 08017c80 0128
     beq LAB_08017cb8                         @ 08017c82 19d0
     cmp r0,#0x1                              @ 08017c84 0128
@@ -9635,8 +9635,8 @@ dispatch_banlist_text_by_key:
     beq LAB_08017cb2                         @ 08017c8a 12d0
     b LAB_08017cbc                           @ 08017c8c 16e0
     .zero  0x2
-DAT_08017c90:
-    .word  0x02029250                     @ 08017c90 50920202
+dispatch_banlist_text_by_key_gstate:
+    .word  gState                         @ 08017c90 50920202
 LAB_08017c94:
     cmp r0,#0x2                              @ 08017c94 0228
     beq LAB_08017c9e                         @ 08017c96 02d0
@@ -9644,12 +9644,12 @@ LAB_08017c94:
     beq LAB_08017cac                         @ 08017c9a 07d0
     b LAB_08017cbc                           @ 08017c9c 0ee0
 LAB_08017c9e:
-    ldr r0, DAT_08017ca8                     @ 08017c9e 0248
+    ldr r0, dispatch_banlist_text_by_key_jp_str_src @ 08017c9e 0248
     adds r1,#0x8d    @ 08017ca0 8d31
     bl copy_str_unbounded                    @ 08017ca2 fcf7e5fb
     b LAB_08017cbc                           @ 08017ca6 09e0
-DAT_08017ca8:
-    .word  0x09e3afdc                     @ 08017ca8 dcafe309
+dispatch_banlist_text_by_key_jp_str_src:
+    .word  banlist_jp_str_src             @ 08017ca8 dcafe309
 LAB_08017cac:
     bl encode_str_table_entry_to_line_buf    @ 08017cac fff7bafe
     b LAB_08017cbc                           @ 08017cb0 04e0

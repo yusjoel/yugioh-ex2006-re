@@ -931,13 +931,115 @@ sprite_gfx_type_meta:                             @ 0x09e3afc8
 	.word 0x0a1e0800                              @ type3 (4 entries x 4B = 16B)
 sprite_palette_type_table:                        @ 0x09e3afd8
 	.byte 1, 1, 16, 16                            @ palette indices for sprite types 0..3 (4B)
-	.incbin "roms/2343.gba", 0x1E3AFDC, 0x2DC   @ 732B: remainder of blob to 0x1E3B2B8
+banlist_jp_str_src:
+	.incbin "roms/2343.gba", 0x1E3AFDC, 0x7C
+name_char_group_47:
+	.incbin "roms/2343.gba", 0x1E3B058, 0x8
+name_char_group_46:
+	.incbin "roms/2343.gba", 0x1E3B060, 0x8
+name_char_group_45:
+	.incbin "roms/2343.gba", 0x1E3B068, 0x8
+name_char_group_44:
+	.incbin "roms/2343.gba", 0x1E3B070, 0x8
+name_char_group_43:
+	.incbin "roms/2343.gba", 0x1E3B078, 0x8
+name_char_group_42:
+	.incbin "roms/2343.gba", 0x1E3B080, 0x8
+name_char_group_41:
+	.incbin "roms/2343.gba", 0x1E3B088, 0x8
+name_char_group_40:
+	.incbin "roms/2343.gba", 0x1E3B090, 0x8
+name_char_group_39:
+	.incbin "roms/2343.gba", 0x1E3B098, 0xC
+name_char_group_37:
+	.incbin "roms/2343.gba", 0x1E3B0A4, 0xC
+name_char_group_36:
+	.incbin "roms/2343.gba", 0x1E3B0B0, 0x4
+name_char_group_35:
+	.incbin "roms/2343.gba", 0x1E3B0B4, 0xC
+name_char_group_34:
+	.incbin "roms/2343.gba", 0x1E3B0C0, 0x8
+name_char_group_33:
+	.incbin "roms/2343.gba", 0x1E3B0C8, 0x8
+name_char_group_32:
+	.incbin "roms/2343.gba", 0x1E3B0D0, 0x8
+name_char_group_31:
+	.incbin "roms/2343.gba", 0x1E3B0D8, 0x8
+name_char_group_30:
+	.incbin "roms/2343.gba", 0x1E3B0E0, 0x8
+name_char_group_29:
+	.incbin "roms/2343.gba", 0x1E3B0E8, 0x10
+name_char_group_28:
+	.incbin "roms/2343.gba", 0x1E3B0F8, 0x10
+name_char_group_27:
+	.incbin "roms/2343.gba", 0x1E3B108, 0x10
+name_char_group_26:
+	.incbin "roms/2343.gba", 0x1E3B118, 0x10
+name_char_group_25:
+	.incbin "roms/2343.gba", 0x1E3B128, 0x10
+name_char_group_24:
+	.incbin "roms/2343.gba", 0x1E3B138, 0x8
+name_char_group_23:
+	.incbin "roms/2343.gba", 0x1E3B140, 0x8
+name_char_group_22:
+	.incbin "roms/2343.gba", 0x1E3B148, 0x8
+name_char_group_21:
+	.incbin "roms/2343.gba", 0x1E3B150, 0x8
+name_char_group_20:
+	.incbin "roms/2343.gba", 0x1E3B158, 0x8
+name_char_group_19:
+	.incbin "roms/2343.gba", 0x1E3B160, 0xC
+name_char_group_18:
+	.incbin "roms/2343.gba", 0x1E3B16C, 0xC
+name_char_group_17:
+	.incbin "roms/2343.gba", 0x1E3B178, 0x10
+name_char_group_16:
+	.incbin "roms/2343.gba", 0x1E3B188, 0xC
+name_char_group_15:
+	.incbin "roms/2343.gba", 0x1E3B194, 0xC
+name_char_group_14:
+	.incbin "roms/2343.gba", 0x1E3B1A0, 0xC
+name_char_group_13:
+	.incbin "roms/2343.gba", 0x1E3B1AC, 0xC
+name_char_group_12:
+	.incbin "roms/2343.gba", 0x1E3B1B8, 0xC
+name_char_group_11:
+	.incbin "roms/2343.gba", 0x1E3B1C4, 0xC
+name_char_group_10:
+	.incbin "roms/2343.gba", 0x1E3B1D0, 0xC
+name_char_group_09:
+	.incbin "roms/2343.gba", 0x1E3B1DC, 0xC
+name_char_group_08:
+	.incbin "roms/2343.gba", 0x1E3B1E8, 0xC
+name_char_group_07:
+	.incbin "roms/2343.gba", 0x1E3B1F4, 0xC
+name_char_group_06:
+	.incbin "roms/2343.gba", 0x1E3B200, 0xC
+name_char_group_05:
+	.incbin "roms/2343.gba", 0x1E3B20C, 0xC
+name_char_group_04:
+	.incbin "roms/2343.gba", 0x1E3B218, 0xC
+name_char_group_03:
+	.incbin "roms/2343.gba", 0x1E3B224, 0xC
+name_char_group_02:
+	.incbin "roms/2343.gba", 0x1E3B230, 0xC
+name_char_group_01:
+	.incbin "roms/2343.gba", 0x1E3B23C, 0xC
+name_char_group_00:
+	.incbin "roms/2343.gba", 0x1E3B248, 0x9
+name_char_range_table:
+	.incbin "roms/2343.gba", 0x1E3B251, 0x63
+line_break_seq:
+	.incbin "roms/2343.gba", 0x1E3B2B4, 0x4
 name_main_c_filename:
 	.asciz "NameInput/Name_main.c"
 	.incbin "roms/2343.gba", 0x1E3B2CE, 0x2
 assert_cnt_name_mojitbl_width_1_name:
 	.asciz "(cnt + NAME_MOJITBL_WIDTH - 1) / NAME_MOJITBL_WIDTH * NAME_MOJITBL_WIDTH < sizeof(pThis->mojiTbl) / 2"
-	.incbin "roms/2343.gba", 0x1E3B336, 0x12
+	.incbin "roms/2343.gba", 0x1E3B336, 0x2
+assert_table_last_fmt:
+	.asciz "TableLast(%d)\n"
+	.incbin "roms/2343.gba", 0x1E3B347, 0x1
 assert_dir_1_dir_1:
 	.asciz "dir == 1 || dir == -1"
 	.incbin "roms/2343.gba", 0x1E3B35E, 0xD6
@@ -1291,7 +1393,61 @@ isd_affine_matrix_ptr_type4:
 	.word 0x0                                     @ 0x09e587e4 ISD affine 矩阵指针槽 (type 4=BG2; ROM 内 NULL)
 isd_affine_matrix_ptr_type9:
 	.word 0x0                                     @ 0x09e587e8 ISD affine 矩阵指针槽 (type 9=BG3; ROM 内 NULL)
-	.incbin "roms/2343.gba", 0x1E587EC, 0x520     @ 0x1E587EC..0x1E58D0C 剩余 blob
+name_char_tile_slot_table:                        @ 0x09e587ec carve A: ping-pong OBJ tile indices
+	.hword 0x012c                                 @ ping-pong buf0 tile 300
+	.hword 0x014e                                 @ ping-pong buf1 tile 334
+name_char_group_ptr_table:                        @ 0x09e587f0 carve B: 50-entry kana group ptr table
+	.word name_char_group_00             @ [ 0] 0x09e3b248
+	.word name_char_group_01             @ [ 1] 0x09e3b23c
+	.word name_char_group_02             @ [ 2] 0x09e3b230
+	.word name_char_group_03             @ [ 3] 0x09e3b224
+	.word name_char_group_04             @ [ 4] 0x09e3b218
+	.word name_char_group_05             @ [ 5] 0x09e3b20c
+	.word name_char_group_06             @ [ 6] 0x09e3b200
+	.word name_char_group_07             @ [ 7] 0x09e3b1f4
+	.word name_char_group_08             @ [ 8] 0x09e3b1e8
+	.word name_char_group_09             @ [ 9] 0x09e3b1dc
+	.word name_char_group_10             @ [10] 0x09e3b1d0
+	.word name_char_group_11             @ [11] 0x09e3b1c4
+	.word name_char_group_12             @ [12] 0x09e3b1b8
+	.word name_char_group_13             @ [13] 0x09e3b1ac
+	.word name_char_group_14             @ [14] 0x09e3b1a0
+	.word name_char_group_15             @ [15] 0x09e3b194
+	.word name_char_group_16             @ [16] 0x09e3b188
+	.word name_char_group_17             @ [17] 0x09e3b178
+	.word name_char_group_18             @ [18] 0x09e3b16c
+	.word name_char_group_19             @ [19] 0x09e3b160
+	.word name_char_group_20             @ [20] 0x09e3b158
+	.word name_char_group_21             @ [21] 0x09e3b150
+	.word name_char_group_22             @ [22] 0x09e3b148
+	.word name_char_group_23             @ [23] 0x09e3b140
+	.word name_char_group_24             @ [24] 0x09e3b138
+	.word name_char_group_25             @ [25] 0x09e3b128
+	.word name_char_group_26             @ [26] 0x09e3b118
+	.word name_char_group_27             @ [27] 0x09e3b108
+	.word name_char_group_28             @ [28] 0x09e3b0f8
+	.word name_char_group_29             @ [29] 0x09e3b0e8
+	.word name_char_group_30             @ [30] 0x09e3b0e0
+	.word name_char_group_31             @ [31] 0x09e3b0d8
+	.word name_char_group_32             @ [32] 0x09e3b0d0
+	.word name_char_group_33             @ [33] 0x09e3b0c8
+	.word name_char_group_34             @ [34] 0x09e3b0c0
+	.word name_char_group_35             @ [35] 0x09e3b0b4
+	.word name_char_group_36             @ [36] 0x09e3b0b0
+	.word name_char_group_37             @ [37] 0x09e3b0a4
+	.word name_char_group_36             @ [38] 0x09e3b0b0 (shared target)
+	.word name_char_group_39             @ [39] 0x09e3b098
+	.word name_char_group_40             @ [40] 0x09e3b090
+	.word name_char_group_41             @ [41] 0x09e3b088
+	.word name_char_group_42             @ [42] 0x09e3b080
+	.word name_char_group_43             @ [43] 0x09e3b078
+	.word name_char_group_44             @ [44] 0x09e3b070
+	.word name_char_group_45             @ [45] 0x09e3b068
+	.word name_char_group_46             @ [46] 0x09e3b060
+	.word name_char_group_47             @ [47] 0x09e3b058
+	.word name_char_group_36             @ [48] 0x09e3b0b0 (shared target)
+	.word name_char_group_36             @ [49] 0x09e3b0b0 (shared target)
+	.incbin "roms/2343.gba", 0x1E588B8, 0x454   @ remaining to host end 0x1E58D0C
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)

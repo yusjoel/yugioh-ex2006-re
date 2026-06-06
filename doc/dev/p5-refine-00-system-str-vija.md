@@ -121,7 +121,8 @@ gitignore 生成产物):
 | **batch-10: ISD cell-anim OAM 簇 (2 fn)** | 0x15954..0x15ac4 | ✅ R3/R1/R2/R5 完成 (见 §四.4.0j): gOamAttrBuildBuf=0x030007f8(iwram.inc, OAM 属性构建暂存缓冲 128×8B=0x400B) + 2 attr2 char-name 字段掩码 equate(新 oam_attr.inc) + 2 槽改名(scale-shift 阈值/assert 行号) + 3 plate 散文符号化(含消费者 build_oam_attrs_from_cell_with_affine); byte-identical |
 | **batch-11: NNS IG2D 资源加载族 (7 fn)** | 0x15b04..0x15e72 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0k): OBJ_PALRAM_BASE=0x05000200(gba_mem.inc) + 16 个 assert-line DAT 槽改名(`<func>_assert_line_<hexlineno>` 避碰撞) + copy_pltt plate 散文符号化; byte-identical。load_nce/nanr/ncgr/nclr_*_from_file sibling + copy_pltt_data_to_vram_proxy + load_g2d_obj_resource_set hub; plate 已高质量, 细化以 R2 灭自动名为主 |
 | **batch-12: NNS G2D 写族 前 2 fn** | 0x1626c..0x16342 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0l): write_palt_block_to_vram(OBJ_PALRAM_BASE 复用 batch-11 + plate 0x05000000/0x05000200→GBA/OBJ_PALRAM_BASE) + dispatch_bg_screen_map_write(0xfff00000 raw-addr 判别掩码槽改名); byte-identical。write_tile_region_to_bg_screen(0x16344, med-conf struct 字段待 runtime) defer |
-| 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **Seg-6a: JP 假名表 carve + 5 fn** | 0x1794c..0x17e48 | ✅ R3/R2/R5/R7 carve A+B+kana池+I 完成 (见 §四.4.0w): 50-label kana pool + name_char_group_ptr_table + name_char_tile_slot_table + assert_table_last_fmt carve; 9 REF+10 RENAME 槽; byte-identical 9689337d |
+| 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x17e48..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -596,6 +597,30 @@ byte-identical SHA1 9689337d。
 新增: `constants/name_input.inc` (接入 rom.s); 追加 ewram.inc(gState/gFontJpCtx) / oam_attr.inc(OAM_ATTR0_HIDDEN) / gba_mem.inc(EWRAM_BASE)。
 脚本: `tools/ghidra-labeling/RefineSeg5dSlots.py` (A=8 B=14 C=16 D=5, 0 FAIL)。
 FUNC_RENAME=0 (15 函数名均与函数体一致, 无误名); **不需** ExportFunctionInventory/sync/CSV 手改。
+
+### 4.0w Seg-6a 完成记录: JP 假名表 carve + 5 fn 符号化 (0x0801794c..0x08017e48) ✅
+
+load_game_str_1006_to_state (boundary, Seg-5d 已处理) / encode_char_to_line_buf /
+encode_str_table_entry_to_line_buf / render_name_input_jp_labels_to_obj /
+dispatch_banlist_text_by_key。JP 名字输入字符组 + banlist SJIS 文字 + 3 game_str 标签渲染。
+byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| **R7 carve A: name_char_tile_slot_table** | @0x09e587ec (4B: 2 hword ping-pong OBJ tile 索引 300/334); 从 `.incbin 0x1E587EC,0x520` 头切 4B | 1 label |
+| **R7 carve B: name_char_group_ptr_table** | @0x09e587f0 (200B = 50 .word, 指向 kana pool 各组串); 50 entries 符号化为 kana pool label 名; 余 incbin `0x1E588B8,0x454` | 1 label + 50 .word |
+| **R7 carve kana pool**: incbin `0x1E3AFDC,0x2DC` → 50 label+incbin-span | 51 distinct ref 地址扫描, 实产 50 labels (0x09e3b250 thumb 预地址不另建 label): `banlist_jp_str_src`(+0x0) + `name_char_group_00..47`(47 个 kana 串, 降序 ptr 表序号) + `name_char_range_table`(+0x275) + `line_break_seq`(+0x2d8); incbin span 总和 = 0x2DC OK | 50 labels |
+| **R7 carve I: assert_table_last_fmt** | @0x09e3b338 "TableLast(%d)\n" (14B .asciz); 从 `.incbin 0x1E3B336,0x12` 切: 2B NUL pad + label + asciz + 1B trailing `0x1E3B347,0x1` | 1 label |
+| R3 REF_SLOTS | encode_char: line_break_seq(1); encode_str_table: gState/name_char_group_ptr_table/name_char_range_table/assert_table_last_fmt(4); render_jp_labels: gState/EWRAM_BASE(2); dispatch_banlist: gState/banlist_jp_str_src(2) | 9 槽 |
+| R2 RENAME_SLOTS | encode_str_table: scroll_col_offset/char_sentinel/assert_line_117/assert_line_189(4); render_jp_labels: str_id_a/gsettings_offset/width_store_a/str_id_b/str_id_c/width_store_c(6) | 10 槽 |
+| R5 PLATE | encode_char: 0x09e3b2b4→line_break_seq; render_jp_labels: 0x02029250→gState | 2 替换 |
+| §5.1 登记 | 无 (Seg-6a 段内 ROM_INCBIN 均已 carve 或无) | 0 |
+
+新建 constants: 无 (EQ_SLOTS 全在 Seg-6b; 本段仅 REF+RENAME)。
+脚本: `tools/ghidra-labeling/RefineSeg6aSlots.py` (B=9 C=10 D=2, 0 FAIL)。
+FUNC_RENAME=0; 不需 ExportFunctionInventory/sync/CSV 手改。
+reviewer #4(carve B 10→50 entries) / #2(carve I 余 incbin 修正) / kana pool 三处 NEEDS_FIX 均已修正。
+carve F/G/H (Seg-6b) 的 NEEDS_FIX #1/#3/#5 留 Seg-6b 处理。
 
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
