@@ -3885,16 +3885,16 @@ LAB_080150f8:
     bx r1                                    @ 08015108 0847
     .zero  0x2
 
-@ Returns GL OAM entry pointer at slot_idx: base 0x02023490 + r0*0x20. If r0>0x1f, fires assert via suppress_assert_report (GL/GL_Oam.c "num < 32") then continues. Called by FUN_08015820 before writing PA/PB/PC/PD affine matrix coefficients.
+@ Returns GL OAM entry pointer at slot_idx: base gGlState + r0*0x20. If r0>0x1f, fires assert via suppress_assert_report (GL/GL_Oam.c "num < 32") then continues. Called by FUN_08015820 before writing PA/PB/PC/PD affine matrix coefficients.
 @ 
 @ Params: r0=u8 slot_idx [0..31]
-@ Returns: r0=u8* ptr (0x02023490 + slot_idx*0x20)
+@ Returns: r0=u8* ptr (gGlState + slot_idx*0x20)
 @ Side effects: none (assert path calls suppress_assert_report but does not abort)
-@ Constants: 0x02023490=GL state EWRAM base; 0x20=OAM entry size (32 bytes); 0x1f=max legal index; lsls r0,r4,#5=r4*32
+@ Constants: gGlState=0x02023490 GL state EWRAM base; 0x20=OAM entry size (32 bytes); 0x1f=max legal index; lsls r0,r4,#5=r4*32
 get_gl_oam_entry_ptr:
     push {r4,r5,lr}                          @ 0801510c 30b5
     adds r4,r0,#0x0    @ 0801510e 041c
-    ldr r5, DAT_0801512c                     @ 08015110 064d
+    ldr r5, get_gl_oam_entry_ptr_ptr_gl_state @ 08015110 064d
     cmp r4,#0x1f                             @ 08015112 1f2c
     ble LAB_08015122                         @ 08015114 05dd
     ldr r0, get_gl_oam_entry_ptr_gl_oam_c_filename @ 08015116 0648
@@ -3908,37 +3908,37 @@ LAB_08015122:
     pop {r4,r5}                              @ 08015126 30bc
     pop {r1}                                 @ 08015128 02bc
     bx r1                                    @ 0801512a 0847
-DAT_0801512c:
-    .word  0x02023490                     @ 0801512c 90340202
+get_gl_oam_entry_ptr_ptr_gl_state:
+    .word  gGlState                       @ 0801512c 90340202
 get_gl_oam_entry_ptr_gl_oam_c_filename:
     .word  gl_oam_c_filename              @ 08015130 509ce309  GL/GL_Oam.c
 get_gl_oam_entry_ptr_assert_num_32:
     .word  assert_num_32                  @ 08015134 5c9ce309  num < 32
 
-@ GL: 初始化 state struct @ EWRAM 0x02023490 (0x22B B)
+@ GL: 初始化 gGlState 结构 @ EWRAM 0x02023490 (0x8ac B = 0x22b 字)
 gl_state_init:
     push {lr}                                @ 08015138 00b5
     sub sp,#0x4                              @ 0801513a 81b0
-    ldr r1, DAT_08015154                     @ 0801513c 0549
+    ldr r1, gl_state_init_ptr_gl_state       @ 0801513c 0549
     movs r0,#0x0    @ 0801513e 0020
     str r0,[sp,#0x0]                         @ 08015140 0090
-    ldr r2, DAT_08015158                     @ 08015142 054a
+    ldr r2, gl_state_init_gl_state_init_fill_ctrl @ 08015142 054a
     .hword 0x4668    @ 08015144 6846
     bl bios_cpu_set                          @ 08015146 f9f057f9
     bl init_gl_palette_slot_flags            @ 0801514a 00f009f8
     add sp,#0x4                              @ 0801514e 01b0
     pop {r0}                                 @ 08015150 01bc
     bx r0                                    @ 08015152 0047
-DAT_08015154:
-    .word  0x02023490                     @ 08015154 90340202
-DAT_08015158:
-    .word  0x0500022b                     @ 08015158 2b020005
+gl_state_init_ptr_gl_state:
+    .word  gGlState                       @ 08015154 90340202
+gl_state_init_gl_state_init_fill_ctrl:
+    .word  GL_STATE_INIT_FILL_CTRL        @ 08015158 2b020005
     .byte  0x70, 0x47, 0x00, 0x00
 
-@ 被 gl_state_init/name_input_page_tick/demo_shuen_state_machine 等 7 个场景共同调用, 负责将 GL 调色板槽位标记区域 (EWRAM 0x02023490+0x880, 共 32 字节) 全部置为 0xFF, 并将相邻控制字节 (offset 0x8A0) 清零, 最后调用 fill_gl_palram_buf_0xf0 填充调色板 RAM 子区. 触发时机: 每次 GL 层重新初始化或场景切换需要复位调色板槽位状态时调用.
+@ 被 gl_state_init/name_input_page_tick/demo_shuen_state_machine 等 7 个场景共同调用, 负责将 gGlState+0x880 调色板槽位标记区 (palette_map, 共 32 字节) 全部置为 0xFF, 并将相邻控制字节 (offset 0x8A0) 清零, 最后调用 fill_gl_palram_buf_0xf0 填充调色板 RAM 子区. 触发时机: 每次 GL 层重新初始化或场景切换需要复位调色板槽位状态时调用.
 init_gl_palette_slot_flags:
     push {r4,r5,lr}                          @ 08015160 30b5
-    ldr r5, DAT_08015190                     @ 08015162 0b4d
+    ldr r5, init_gl_palette_slot_flags_ptr_gl_state @ 08015162 0b4d
     movs r2,#0x0    @ 08015164 0022
     movs r0,#0x88    @ 08015166 8820
     lsls r0,r0,#0x4    @ 08015168 0001
@@ -3961,31 +3961,31 @@ LAB_0801516e:
     pop {r4,r5}                              @ 0801518a 30bc
     pop {r0}                                 @ 0801518c 01bc
     bx r0                                    @ 0801518e 0047
-DAT_08015190:
-    .word  0x02023490                     @ 08015190 90340202
+init_gl_palette_slot_flags_ptr_gl_state:
+    .word  gGlState                       @ 08015190 90340202
 
-@ 由 init_gl_palette_slot_flags (FUN_08015160) 在 GL 状态初始化链末尾调用, 负责将调色板 RAM 子区域全部填充为 0xf0 (halfword fill 模式). 实现: sp 作为 src 地址存放填充值 0xf0; bios_cpu_set fill 写入 EWRAM 0x02023490 起始 0x100 halfword (0x200 字节), 确保调色板条目处于已知默认值状态(非零). Constants: 0x05000100 = bios_cpu_set 控制字 (bit24=1 fill, len=0x100 halfwords=0x200 bytes).
+@ 由 init_gl_palette_slot_flags (FUN_08015160) 在 GL 状态初始化链末尾调用, 负责将调色板 RAM 子区域全部填充为 0xf0 (halfword fill 模式). 实现: sp 作为 src 地址存放填充值 0xf0; bios_cpu_set fill 写入 gGlState 起始 0x100 字 (0x400 字节), 确保调色板条目处于已知默认值状态(非零). Constants: GL_PALRAM_FILL_CTRL=0x05000100 (bit24=fill, bit26=32-bit, len=0x100 字=0x400 字节).
 fill_gl_palram_buf_0xf0:
     push {lr}                                @ 08015194 00b5
     sub sp,#0x4                              @ 08015196 81b0
-    ldr r1, DAT_080151ac                     @ 08015198 0449
+    ldr r1, fill_gl_palram_buf_0xf0_ptr_gl_state @ 08015198 0449
     movs r0,#0xf0    @ 0801519a f020
     str r0,[sp,#0x0]                         @ 0801519c 0090
-    ldr r2, DAT_080151b0                     @ 0801519e 044a
+    ldr r2, fill_gl_palram_buf_0xf0_gl_palram_fill_ctrl @ 0801519e 044a
     .hword 0x4668    @ 080151a0 6846
     bl bios_cpu_set                          @ 080151a2 f9f029f9
     add sp,#0x4                              @ 080151a6 01b0
     pop {r0}                                 @ 080151a8 01bc
     bx r0                                    @ 080151aa 0047
-DAT_080151ac:
-    .word  0x02023490                     @ 080151ac 90340202
-DAT_080151b0:
-    .word  0x05000100                     @ 080151b0 00010005
+fill_gl_palram_buf_0xf0_ptr_gl_state:
+    .word  gGlState                       @ 080151ac 90340202
+fill_gl_palram_buf_0xf0_gl_palram_fill_ctrl:
+    .word  GL_PALRAM_FILL_CTRL            @ 080151b0 00010005
 
-@ Called by alloc_palette_entry_slot (0x080151d8, palette tag) only. Establishes bidirectional mapping slot_idx <-> palette_entry in EWRAM palette manager table. Base 0x02023490: slot_record array at +0x800 (1 byte/entry), palette_map array at +0x880. Saves old palette_map[palette_entry] into slot_record[slot_idx]; writes slot_idx into palette_map[palette_entry] (atomic slot occupation record). r0=u8 slot_idx [0..127], r1=u8 palette_entry [0..31]. Returns void. Side-effects: [0x02023C90+slot_idx] and [0x02023D10+palette_entry] updated.
+@ Called by alloc_palette_entry_slot (0x080151d8, palette tag) only. Establishes bidirectional mapping slot_idx <-> palette_entry in EWRAM palette manager table. Base gGlState (0x02023490): slot_record array at +0x800 (1 byte/entry), palette_map array at +0x880. Saves old palette_map[palette_entry] into slot_record[slot_idx]; writes slot_idx into palette_map[palette_entry] (atomic slot occupation record). r0=u8 slot_idx [0..127], r1=u8 palette_entry [0..31]. Returns void. Side-effects: [0x02023C90+slot_idx] and [0x02023D10+palette_entry] updated.
 assign_palette_slot_entry:
     push {r4,lr}                             @ 080151b4 10b5
-    ldr r2, DAT_080151d4                     @ 080151b6 074a
+    ldr r2, assign_palette_slot_entry_ptr_gl_state @ 080151b6 074a
     movs r4,#0x80    @ 080151b8 8024
     lsls r4,r4,#0x4    @ 080151ba 2401
     adds r3,r2,r4    @ 080151bc 1319
@@ -4000,15 +4000,15 @@ assign_palette_slot_entry:
     pop {r0}                                 @ 080151ce 01bc
     bx r0                                    @ 080151d0 0047
     .zero  0x2
-DAT_080151d4:
-    .word  0x02023490                     @ 080151d4 90340202
+assign_palette_slot_entry_ptr_gl_state:
+    .word  gGlState                       @ 080151d4 90340202
 
-@ GL/IG2D_Main.c palette slot allocator. Called by setup_isd_cell_anim_oam_entry (0x08015954) and 3 other scene init paths. Checks [0x02024330] signed byte (slot counter) >= 0; if negative (no slots): returns NULL. Otherwise: calls assign_palette_slot_entry to record mapping, increments counter, computes EWRAM palette entry addr (base + slot*8 + 0x400), bios_cpu_set zero-fills 8 bytes (CPUSET_CTRL=0x05000002), returns entry ptr. r0=u8 palette_id [0..31]. Returns u8* palette entry ptr or NULL. Side-effects: [0x02024330] += 1; palette entry zeroed.
+@ GL/IG2D_Main.c palette slot allocator. Called by setup_isd_cell_anim_oam_entry (0x08015954) and 3 other scene init paths. Checks [gGlState+0x8a0] (=0x02023d30) signed byte (slot counter) >= 0; if negative (no slots): returns NULL. Otherwise: calls assign_palette_slot_entry to record mapping, increments counter, computes EWRAM palette entry addr (base + slot*8 + 0x400), bios_cpu_set zero-fills 8 bytes (GL_PALENTRY_ZERO_CTRL=0x05000002), returns entry ptr. r0=u8 palette_id [0..31]. Returns u8* palette entry ptr or NULL. Side-effects: [gGlState+0x8a0] += 1; palette entry zeroed.
 alloc_palette_entry_slot:
     push {r4,r5,r6,lr}                       @ 080151d8 70b5
     sub sp,#0x4                              @ 080151da 81b0
     adds r1,r0,#0x0    @ 080151dc 011c
-    ldr r6, DAT_080151f4                     @ 080151de 054e
+    ldr r6, alloc_palette_entry_slot_ptr_gl_state @ 080151de 054e
     movs r0,#0x8a    @ 080151e0 8a20
     lsls r0,r0,#0x4    @ 080151e2 0001
     adds r5,r6,r0    @ 080151e4 3518
@@ -4019,8 +4019,8 @@ alloc_palette_entry_slot:
     movs r0,#0x0    @ 080151ee 0020
     b LAB_08015220                           @ 080151f0 16e0
     .zero  0x2
-DAT_080151f4:
-    .word  0x02023490                     @ 080151f4 90340202
+alloc_palette_entry_slot_ptr_gl_state:
+    .word  gGlState                       @ 080151f4 90340202
 LAB_080151f8:
     ldrb r0,[r5,#0x0]                        @ 080151f8 2878
     bl assign_palette_slot_entry             @ 080151fa fff7dbff
@@ -4035,7 +4035,7 @@ LAB_080151f8:
     adds r4,r4,r6    @ 0801520e a419
     movs r0,#0x0    @ 08015210 0020
     str r0,[sp,#0x0]                         @ 08015212 0090
-    ldr r2, DAT_08015228                     @ 08015214 044a
+    ldr r2, alloc_palette_entry_slot_gl_palentry_zero_ctrl @ 08015214 044a
     .hword 0x4668    @ 08015216 6846
     adds r1,r4,#0x0    @ 08015218 211c
     bl bios_cpu_set                          @ 0801521a f9f0edf8
@@ -4045,17 +4045,17 @@ LAB_08015220:
     pop {r4,r5,r6}                           @ 08015222 70bc
     pop {r1}                                 @ 08015224 02bc
     bx r1                                    @ 08015226 0847
-DAT_08015228:
-    .word  0x05000002                     @ 08015228 02000005
+alloc_palette_entry_slot_gl_palentry_zero_ctrl:
+    .word  GL_PALENTRY_ZERO_CTRL          @ 08015228 02000005
 
-@ Called by many scene ticks (indeg=6) including tick_demo_scene_state_machine, name_input_page_tick, demo_shuen_state_machine. Copies up to 32 sprite attribute entries (8 bytes each) from EWRAM sprite-attr array (0x02023490+0x880) to EWRAM OAM buffer (0x02023490+slot*8); sentinel=-1 terminates list. Finally calls bios_cpu_fast_set to zero unused OAM VRAM slots (0x07000000). No external parameters (void); all addresses computed internally from DAT_080152ac=0x02023490. Side-effects: EWRAM OAM buffer (0x02023490+) write; bios_cpu_fast_set zero OAM VRAM (0x07000000).
+@ Called by many scene ticks (indeg=6) including tick_demo_scene_state_machine, name_input_page_tick, demo_shuen_state_machine. Copies up to 32 sprite attribute entries (8 bytes each) from gGlState+0x880 (palette_map sentinel list) to EWRAM OAM buffer (gGlState+slot*8); sentinel=-1 terminates list. Finally calls bios_cpu_fast_set to zero unused OAM VRAM slots (0x07000000). No external parameters (void); all addresses computed internally from gGlState (0x02023490). Side-effects: EWRAM OAM buffer (0x02023490+) write; bios_cpu_fast_set zero OAM VRAM (0x07000000).
 copy_sprite_attr_table_to_oam:
     push {r4,r5,r6,r7,lr}                    @ 0801522c f0b5
     .hword 0x4657    @ 0801522e 5746
     .hword 0x464e    @ 08015230 4e46
     .hword 0x4645    @ 08015232 4546
     push {r5,r6,r7}                          @ 08015234 e0b4
-    ldr r0, DAT_080152ac                     @ 08015236 1d48
+    ldr r0, copy_sprite_attr_table_to_oam_ptr_gl_state @ 08015236 1d48
     .hword 0x4684    @ 08015238 8446
     movs r2,#0x80    @ 0801523a 8022
     lsls r2,r2,#0x3    @ 0801523c d200
@@ -4083,7 +4083,7 @@ LAB_08015254:
     add r4,r12                               @ 08015266 6444
     movs r7,#0x1    @ 08015268 0127
     rsbs r7,r7,#0    @ 0801526a 7f42
-    ldr r0, DAT_080152ac                     @ 0801526c 0f48
+    ldr r0, copy_sprite_attr_table_to_oam_ptr_gl_state @ 0801526c 0f48
     adds r3,r5,r0    @ 0801526e 2b18
 LAB_08015270:
     lsls r1,r2,#0x3    @ 08015270 d100
@@ -4116,8 +4116,8 @@ LAB_0801528a:
     pop {r4,r5,r6,r7}                        @ 080152a6 f0bc
     pop {r0}                                 @ 080152a8 01bc
     bx r0                                    @ 080152aa 0047
-DAT_080152ac:
-    .word  0x02023490                     @ 080152ac 90340202
+copy_sprite_attr_table_to_oam_ptr_gl_state:
+    .word  gGlState                       @ 080152ac 90340202
 
 @ Executes one step of RGB555 palette fade for r2 color entries, writing results to OBJ PALRAM at r1 (0x05000202). Per-frame call: (1) read fade step from [r3+0] ([0..0x1e]); (2) compute divisor=step if step<=0xf else 0x1e-step (symmetric triangle wave); (3) interpolate each R/G/B channel: new_ch=(ch*divisor+((ch+93)>>2)*(15-divisor))/15; (4) write RGB555 to dst PALRAM; (5) step++, wrap at >0x1d. Returns 1. Callers FUN_08018d3c and FUN_0801b178 both pass dst=0x05000202 (OBJ palette 0 colors 1-2) for scrollbar sprite palette fade.
 @ 
@@ -5134,7 +5134,7 @@ LAB_0801594e:
     bx r1                                    @ 08015950 0847
     .zero  0x2
 
-@ GL/IG2D_Main.c line 0xe3=227. Called by dispatch_isd_cell_anim_oam_setup (0x08015a8c, D_shared_mid hub indeg=6) and FUN_0801a49c. Core cell animation OAM initializer: (1) resolve_bg_affine_param_offset -> affine offset; (2) resolve_isd_affine_matrix_ptr(offset) -> matrix ptr; (3) asserts pCell != NULL; (4) loops alloc_palette_entry_slot to allocate palette slots; (5) build_oam_attrs_from_cell_with_affine(0x030007f8, max=128, pCell, pAnimCtrl). Returns u16 OAM entry count. Side-effects: EWRAM palette slot [0x02024330]+1; OAM buffer [0x030007f8+...] written.
+@ GL/IG2D_Main.c line 0xe3=227. Called by dispatch_isd_cell_anim_oam_setup (0x08015a8c, D_shared_mid hub indeg=6) and FUN_0801a49c. Core cell animation OAM initializer: (1) resolve_bg_affine_param_offset -> affine offset; (2) resolve_isd_affine_matrix_ptr(offset) -> matrix ptr; (3) asserts pCell != NULL; (4) loops alloc_palette_entry_slot to allocate palette slots; (5) build_oam_attrs_from_cell_with_affine(0x030007f8, max=128, pCell, pAnimCtrl). Returns u16 OAM entry count. Side-effects: EWRAM palette slot [gGlState+0x8a0 (0x02023d30)]+1; OAM buffer [0x030007f8+...] written.
 setup_isd_cell_anim_oam_entry:
     push {r4,r5,r6,r7,lr}                    @ 08015954 f0b5
     .hword 0x4657    @ 08015956 5746

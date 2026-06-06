@@ -114,6 +114,22 @@
                                              @ 注: 紧邻 GL 调色板管理区 (0x02023490, gl_state_init 用)
 
 @ -----------------------------------------------------------------------------
+@ GL 主状态结构 (palette/OAM manager; 源 GL/GL_Oam.c, GL/IG2D_Main.c)
+@ -----------------------------------------------------------------------------
+.equ gGlState,                   0x02023490  @ GL 子系统主状态结构 (0x8ac B; gl_state_init 清 0)
+                                             @ +0x000 = OAM/affine 条目区 (0x20 B/条, get_gl_oam_entry_ptr)
+                                             @          兼 fill_gl_palram_buf_0xf0 填充区 (+0..+0x400)
+                                             @ +0x400 = palette entry 区 (8 B/条, alloc_palette_entry_slot)
+                                             @ +0x800 = slot_record[ ] (1 B/条; slot_idx->prev)
+                                             @ +0x880 = palette_map[ ] (1 B/条; palette_entry->slot, 初值 0xff)
+                                             @ +0x8a0 = s8 slot 分配计数器
+                                             @ 共用者: get_gl_oam_entry_ptr / gl_state_init /
+                                             @         init_gl_palette_slot_flags / fill_gl_palram_buf_0xf0 /
+                                             @         assign_palette_slot_entry / alloc_palette_entry_slot /
+                                             @         copy_sprite_attr_table_to_oam
+                                             @ 注: 各 consumer 对 +0x880 等偏移语义解读略有出入, 待运行时核实
+
+@ -----------------------------------------------------------------------------
 @ 输入 / Banlist
 @ -----------------------------------------------------------------------------
 .equ gPlayerNameEntry,           0x02029512  @ 14 B  名字输入缓冲

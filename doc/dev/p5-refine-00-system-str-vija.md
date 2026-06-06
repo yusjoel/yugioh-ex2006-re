@@ -112,7 +112,8 @@ gitignore 生成产物):
 | **batch-1: demo scene 簇 (15 fn)** | 0x13510..0x14398 | ✅ R1 常量 + R3 指针 + R5 注释完成 (见 §四.batch-1); byte-identical |
 | **batch-2: GL blend/brightness 簇 (12 fn)** | 0x14600..0x14a10 | ✅ R1/R2/R3/R5 完成 (见 §四.4.0a): gGlBlendState 符号化 + 4 equate + 1 函数改名 + 7 plate 订正; byte-identical。**附带修复 1 个 pre-existing 断言串 carve 回归 (assert_..._670 标签)** |
 | **batch-3: BG VRAM 地址簇 (24 fn)** | 0x14a10..0x14e14 | ✅ R1/R2/R5 完成 (见 §四.4.0c): OBJ_TILE_VRAM_BASE equate(新 gba_mem.inc) + 8 auto-name 槽改名 + 2 plate 订正; byte-identical。簇本身 plate 已高质量 (sibling getter/copy), 细化以 R2 为主 |
-| 代码函数 (其余 ~240 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x14e54..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-4: GL palette/OAM manager 簇 (7 fn)** | 0x1510c..0x1522c | ✅ R1/R2/R3/R5 完成 (见 §四.4.0d): gGlState=0x02023490 符号化(7 槽) + 3 cpu_set equate(新 gl_state.inc) + 7 plate 订正(含 2 处 0x02024330→0x02023d30 错址 + 0x22B B / 0x200→0x400 字节单位); byte-identical |
+| 代码函数 (其余 ~233 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -216,6 +217,25 @@ auto-name** 为主, R1 仅 1 个 pool 常量。
 `.word BG0CNT` 等已可读)。内联 VRAM 基址 (`0xc0<<0x13`=0x06000000) 为 movs+lsls 复合值, 无 pool
 槽, 不符号化 (plate 已注)。
 
+### 4.0d batch-4 完成记录: GL palette/OAM manager 簇 (0x1510c..0x1522c, 7 fn) ✅
+
+get_gl_oam_entry_ptr / gl_state_init / init_gl_palette_slot_flags / fill_gl_palram_buf_0xf0 /
+assign_palette_slot_entry / alloc_palette_entry_slot / copy_sprite_attr_table_to_oam。
+全部操作 GL 主状态结构 gGlState (0x02023490, 0x8ac B)。byte-identical SHA1 9689337d。
+
+**与 batch-2 配对**: 补全 0x02023480 (gGlBlendState) / 0x02023490 (gGlState) 这对相邻 GL 结构的命名。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R2/R3 状态结构 | `gGlState=0x02023490` → ewram.inc .equ + Ghidra label + 7 槽 ref + 槽改名 `<func>_ptr_gl_state` (含字段布局: +0 OAM/affine, +0x400 palette entry, +0x800 slot_record, +0x880 palette_map, +0x8a0 计数器) | 7 槽 |
+| R1 cpu_set 控制字 | data-equate `GL_STATE_INIT_FILL_CTRL`(0x0500022b) / `GL_PALRAM_FILL_CTRL`(0x05000100) / `GL_PALENTRY_ZERO_CTRL`(0x05000002); 新增 `constants/gl_state.inc` | 3 槽 |
+| R5 注释订正 | 7 plate: 0x02023490→gGlState; **alloc 计数器错址 0x02024330→0x02023d30(=gGlState+0x8a0)**; gl_state_init `(0x22B B)`→`(0x8ac B=0x22b 字)`; fill_gl_palram `0x100 halfword(0x200 字节)`→`0x100 字(0x400 字节)` (bit26=32-bit, 对照 demo_state.inc CpuSet 解码) | 7 plate |
+| R5 附带 | setup_isd_cell_anim_oam_entry (0x15954, 簇外) plate 里 propagated 的同一 0x02024330 错址订正 | 1 plate |
+
+新增: `constants/gl_state.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineGlStateBatch4.py` + `FixIsdCounterAddr.py`。
+注: tick_palette_fade_to_oam_palram (0x152b0) / init_scrollbar_oam_entry (0x15384) 不引用 gGlState
+(用传入指针/OBJ PALRAM), 留后续批。内联 OAM VRAM 基址 (0xe0<<0x13=0x07000000) 无 pool 槽不符号化。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -283,15 +303,17 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
    - 注: §五.0/batch-1 提到的 `reset_display_and_gl_state` plate 旧名 `FUN_08014398` 已在 batch-1
      订正 (现引 play_ui_effect_3a + indirect_table 说明), 全文件 plate 散文无 FUN_08014398 残留。
 3. ✅ **batch-3 (0x14a10..0x14e14, BG VRAM 地址簇 24 fn)** 完成 (见 §四.4.0c)。
-4. 下一批 (batch-4) 候选:
-   - **GL 调色板管理簇** (gl_state_init / init_gl_palette_slot_flags / fill_gl_palram_buf_0xf0 /
-     assign_palette_slot_entry / alloc_palette_entry_slot, 0x1510c..0x151d8+) —— 操作 **0x02023490**
-     (紧邻 gGlBlendState, 应定义 `gGlPaletteMgr` label; palram buf+slot_record+palette_map)。**推荐**:
-     与 batch-2/3 同子系统 (GL), 可复用上下文, 且补全 0x02023480/0x02023490 这对相邻结构的命名。
+4. ✅ **batch-4 (0x1510c..0x1522c, GL palette/OAM manager 簇 7 fn)** 完成 (见 §四.4.0d);
+   gGlState=0x02023490 命名, 与 batch-2 gGlBlendState 配对。
+5. 下一批 (batch-5) 候选:
+   - **OAM/affine + ISD cell-anim 簇** (tick_palette_fade_to_oam_palram 0x152b0 /
+     init_scrollbar_oam_entry 0x15384 / compute_bg_affine_matrix_scaled 0x15820 /
+     setup_isd_cell_anim_oam_entry 0x15954 / dispatch_isd_cell_anim_oam_setup 0x15a8c ...,
+     0x152b0..0x16xxx) —— 延续 GL/IG2D 子系统。
    - FS 簇 (fs_resolve_path_to_fid / fs_load / cpu_copy_auto, 0x14f54..0x15108)。
    - 文本测量簇 (copy_str_unbounded / measure_text_pixel_width 等, 0x14470..0x145bc) + 散点
      (tick_prng_step_sequence 0x14398 / banlist_password_enter_char 0x143f0)。
-5. 每批后视情况更新本文「进度」表。
+6. 每批后视情况更新本文「进度」表。
 
 ---
 

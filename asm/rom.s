@@ -24,6 +24,9 @@
 @ GL blend/brightness (gGlBlendState) 位掩码/控制字常量（0x14600..0x14a10 GL 簇用）
 	.include "constants/gl_blend.inc"
 
+@ GL 主状态 (gGlState) palette/OAM 簇 cpu_set 控制字（0x1510c..0x1522c GL 簇用）
+	.include "constants/gl_state.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 
