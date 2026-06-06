@@ -123,7 +123,8 @@ gitignore 生成产物):
 | **batch-12: NNS G2D 写族 前 2 fn** | 0x1626c..0x16342 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0l): write_palt_block_to_vram(OBJ_PALRAM_BASE 复用 batch-11 + plate 0x05000000/0x05000200→GBA/OBJ_PALRAM_BASE) + dispatch_bg_screen_map_write(0xfff00000 raw-addr 判别掩码槽改名); byte-identical。write_tile_region_to_bg_screen(0x16344, med-conf struct 字段待 runtime) defer |
 | **Seg-6a: JP 假名表 carve + 5 fn** | 0x1794c..0x17e48 | ✅ R3/R2/R5/R7 carve A+B+kana池+I 完成 (见 §四.4.0w): 50-label kana pool + name_char_group_ptr_table + name_char_tile_slot_table + assert_table_last_fmt carve; 9 REF+10 RENAME 槽; byte-identical 9689337d |
 | **Seg-6b: render/cursor/load_assets + carve F/G/H** | 0x17e48..0x18774 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0x): carve F(name_o paths+desc) + G(cursor_anim_data_a/b) + H(name_o_palette_data bit15修正); 10 EQ+31 REF+23 RENAME+4 PLATE; §5.1 登记 0x186ce/0x22; byte-identical 9689337d |
-| 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x18774..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **Seg-7: name_input/banlist 场景 + carve J/K** | 0x18774..0x19a58 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0y): carve J(name_input_state_table+banlist_pass_char_group_ptr_table) + K(render_param+default_name); 20 EQ+38 REF+59 RENAME+3 PLATE; §5.1 登记 0x19640/0x20; byte-identical 9689337d |
+| 代码函数 (其余 ~166 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x19a58..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -654,6 +655,43 @@ byte-identical SHA1 9689337d.
 - carve G 余 incbin 修正为 `0x10EC` (原 proposal 0x1087 错误)
 - carve H entries[4..7] 修正 bit15 set: 0x83e0/0xffe0/0x83ff/0xffff (原 proposal 0x03e0/0x7fe0/0x03ff/0x7fff)
 
+### 4.0y Seg-7 完成记录: name_input/banlist 场景 + carve J/K (0x08018774..0x08019a58, 28 fn) ✅
+
+append_banlist_input_char / delete_banlist_name_last_char / dispatch_name_input_key_by_state /
+tick_name_input_frame / tick_oam_palette_fade_settings / tick_name_input_oam_fade /
+tick_name_input_cursor_sprite / signal_name_input_exit / tick_name_input_oam_and_scrollbar /
+tick_name_input_render_by_state / name_input_page_tick / name_input_page_exit /
+commit_input_name_to_buf / dispatch_name_input_confirm_state / write_name_input_mode_flag /
+page_state_dispatcher / extract_char_entry_by_lang / init_banlist_pass_input_scene /
+dispatch_text_render_by_mode_banlist / return_noop_text_variant / invoke_noop_text_variant_zero /
+init_font_jp_ctx_bg2_char_vram / init_font_jp_ctx_bg_vram_text /
+setup_font_jp_ctx_obj_vram_row_banlist / fill_bg0_tilemap_pass_input /
+append_col_padded_text_to_buf / load_game_str_pair_1036_to_pass_buf /
+load_game_str_1038_to_pass_buf。name_input 每帧 tick/render + banlist 密码输入场景初始化 + 字体 JP 上下文设置。
+byte-identical SHA1 9689337d.
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| **R7 carve J: name_input_state_table + banlist_pass_char_group_ptr_table** | host incbin `0x1E588B8,0x454` 头切 0x34 (52B): 5 .word fn-ptr 表 (4 THUMB+1 + NULL sentinel) + 8 .word ROM data ptrs; 余 `0x1E588EC,0x420`。覆盖等式 OK | 2 labels |
+| **R7 carve K: name_input_render_param_4b + name_input_default_name** | host incbin `0x1E3B498,0x10EC` 切: 0xC 前缀 + label + 4B + label + 余 `0x1E3B4A8,0x10DC`。覆盖等式 OK。两 label 均为 code-ref 已核 raw=1 | 2 labels |
+| R1 EQ_SLOTS 新建 (name_input.inc) | `NAME_INPUT_MODE_CLEAR`(0xfffffc3f, 6槽) / `NAME_INPUT_STATE_FIELD_CLEAR`(0xfffc3fff, 1槽) / `NAME_INPUT_PAGE_STATE_CLEAR`(0xffc03fff, 2槽) / `BANLIST_PASS_BUF_CLEAR_CTRL`(0x0500019e) / `BANLIST_PASS_BG1CNT_VAL`(0x1d0d) / `BANLIST_PASS_BG3CNT_VAL`(0x1f0f) / `BANLIST_NAME_BG1_SCREEN_CLEAR_CTRL`(0x01000020) / `BANLIST_PASS_BG0_SCREEN_CLEAR_CTRL`(0x01000840, 2槽) / `BANLIST_PASS_BG1_SCREEN_PARTIAL_CTRL`(0x01000040) | 17 槽/9 常量 |
+| R1 EQ_SLOTS 复用 (name_input.inc) | `NAME_INPUT_BG0_SCREEN_CLEAR_CTRL`(0x01000200, 1槽) | 1 槽 |
+| R1 EQ_SLOTS 新建 (gba_mem.inc) | `BG_VRAM_TEXT_BASE`(0x06000020, 3槽; reviewer C13 补) | 3 槽/1 常量 |
+| R3 REF_SLOTS (gState 14槽) | gState=0x02029250 (ewram.inc) | 14 槽 |
+| R3 REF_SLOTS (EWRAM_BASE/GSETTINGS 12槽) | EWRAM_BASE(6) + GSETTINGS_OFFSET(6) | 12 槽 |
+| R3 REF_SLOTS (gFontJpCtx 3槽 + OBJ_TILE_VRAM_BASE 1槽) | gFontJpCtx=0x02006ed0 / OBJ_TILE_VRAM_BASE=0x06010000 | 4 槽 |
+| R3 REF_SLOTS (carve/ROM label 9槽) | name_char_tile_slot_table(2) / trig_table(2) / gTextEncodingOverride(1) / name_input_render_param_4b(1) / name_input_default_name(1) / name_char_group_36(1) | 8 槽 |
+| R2 RENAME_SLOTS (gPrng 10槽) | PTR_gPrng_* → `<func>_ptr_gprng` | 10 槽 |
+| R2 RENAME_SLOTS (gState offset 29槽) | char_count/limit/buf/mode_flag/cursor_field/scroll_step/... offset 槽 (含 reviewer C13 补 4 个) | 29 槽 |
+| R2 RENAME_SLOTS (misc 20槽) | SJIS range lo/hi / WIN0V / DISPCNT mask / str-ID / IWRAM buf / palette target / BG cnt val 槽 | 20 槽 |
+| R5 PLATE_REWRITES (CJK 清除) | tick_name_input_oam_and_scrollbar / tick_name_input_frame / tick_name_input_render_by_state — 3 函数 plate CJK 全重写为纯 ASCII | 3 函数 |
+| §5.1 登记 | ROM_INCBIN 0x19640/0x20 (32B THUMB 孤儿叶函数, 全 ROM 0 引用, 见 §5.1 表) | 1 块 |
+
+EQ_SLOTS 合计: A=20 / REF_SLOTS B=38 / RENAME_SLOTS C=59 / PLATE D=3. 0 FAIL.
+FUNC_RENAME=0 (无函数误名). 不需 ExportFunctionInventory/sync/CSV 手改.
+新增 name_input.inc 9 常量 + gba_mem.inc 1 常量 (BG_VRAM_TEXT_BASE).
+脚本: `tools/ghidra-labeling/RefineSeg7Slots.py`.
+
 **踩坑: EQ_SLOT label 与 `.equ` 同名冲突**:
 GAS `ldr r, SYMBOL` + `.equ SYMBOL, val` + label `SYMBOL:` 三者共存时, GAS 用 `.equ` 值
 做 PC-relative 计算, 导致 "invalid offset, value too big" 错误。修复: EQ_SLOT 的
@@ -734,7 +772,7 @@ R9 byte-identical。
 | **Seg-4** | 0x1571c..0x16218 | ~28 | **0x15d18/0x18, 0x15fe8/0x2c, 0x16074/0x24** | b7, b10, b11, b9, b8(部分) | 0x15924..0x15954 / 0x15e72..0x16098 gap fn + **carve 3 incbin** + zero_struct_36bytes cpu_set 控制字槽 (0x01000012) + **R4: 0x1604c jump-table 分派器** (含 0x16060 跳转表 + 0x16074..8c 5×6B handler, 均误标数据) disasm+createFunction |
 | **Seg-5** | 0x16218..0x1794c | ~28 | **0x169d6/0x16, 0x16a20/0x5c, 0x170d4/0xfc, 0x17424/0x40** | b8(尾), b12 | ✅ **Seg-5a/b/c/d 全部完成** (Seg-5a write_tile_region_to_bg_screen / Seg-5b apply_bgdt_objd / Seg-5c-i+ii jp_char dispatch+disasm / Seg-5d 15fn+2carve); 0x17424/0x40 §5.1 登记 |
 | **Seg-6** | 0x1794c..0x18774 | ~28 | **0x186ce/0x22** | — | ✅ **Seg-6a/b 全部完成** (Seg-6a JP 假名表 carve / Seg-6b render/cursor/load_assets + carve F/G/H; 0x186ce/0x22 §5.1 登记) |
-| **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | **全新**: name_input/banlist 场景 + carve 0x19640 (32B) |
+| **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | ✅ **完成**: 28fn 符号化 + carve J (name_input_state_table+banlist_pass_char_group_ptr_table) + carve K (name_input_render_param_4b+name_input_default_name) + §5.1 0x19640/0x20; byte-identical 9689337d |
 | **Seg-8** | 0x19a58..0x1a794 | ~28 | — | — | **全新**: banlist password 渲染簇 |
 | **Seg-9** | 0x1a794..0x1b850 | ~28 | **0x1a89c/0x20, 0x1ad18/0xec** | — | **全新**: banlist/shuen + **carve 2 incbin (含 236B 大块 @0x1ad18)** |
 | **Seg-10** | 0x1b850..0x1cb00 | ~32 | — | — | **全新**: vija/shuen 场景 tick (tick_*_obj_anim ...) |
@@ -765,6 +803,7 @@ R9 byte-identical。
 | 0x08016074 | 36 B (`ROM_INCBIN 0x16074, 0x24`) | Seg-4 | **5 个 THUMB 孤儿 dispatcher handler** (各 6B = `BL get_bgN_screen_vram_addr; b <common_tail>`): 0x16074→BG0/0x1607a→BG1/0x16080→BG2/0x16086→BG3/0x1608c→第5路。配合 `.byte` 块 0x1604c (16B 跳转表 dispatcher) + jump table `orphan_bg_screen_vram_jump_table` @0x16060 (5 entries)。**与 named `get_bg_screen_vram_addr_by_index` (0x16014, cmp/beq 实现) 功能重复**, 显然是 compiler 另一翻译变体的 dead code。**0 外部引用** (跳转表→handlers 是 orphan 块内部引用)。**留待**: R4 disasm + createFunction × 6 |
 | 0x08017424 | 64 B (`ROM_INCBIN 0x17424, 0x40`) | Seg-5d | **2 个 THUMB 孤儿小函数 (dead code, 0 ROM 引用)**: ①0x17424..0x17444 (32B) bitfield-index helper (`adds r2,r1,#0; asrs r1,r2,#2; ...` 等效 `r2 mod 4` 类 bit-index, `bx lr`); ②0x17448..0x17462 (26B) halfword-pair extractor (从 r0 addr 读 2×u16, 按 bit0 控制 shift 合并返回 u16)。**全 ROM 0 引用** (ref-scan 16 个 4B 对齐子地址 raw=0/thumb=0 全零, 已独立复核)。**留待**: 引用到时 R4 disasm + createFunction |
 | 0x080186ce | 34 B (`ROM_INCBIN 0x186ce, 0x22`) | Seg-6b | **THUMB leaf dead-code**: `get_language_stride()` (返回 1=JP/2=EN, 读 gSettings bits[2:0]) — 该逻辑在多个同 Seg 函数内联, 无外部调用。含 2B 对齐 pad + 10 THUMB 指令 + 2B pad + 2×.word 字面量池 (EWRAM_BASE + GSETTINGS_OFFSET)。**全 ROM 0 引用** (ref-scan 9 个 4B 对齐子地址 raw=0/thumb=0; reviewer 独立复核 PASS)。**留待**: 引用到时 R4 disasm + createFunction |
+| 0x08019640 | 32 B (`ROM_INCBIN 0x19640, 0x20`) | Seg-7 | **THUMB 孤儿叶函数 (get_settings_language_id 变体)**: push/ldrb/ands/rsbs/bx_lr + 字面量池 (EWRAM_BASE=0x02000000 + GSETTINGS_OFFSET=0x6c2c)。**全 ROM 0 引用** (entry 0x08019641 THUMB count=0; raw 0x08019640 count=0; 内部 0x08019650 raw=1 at file offset 0x671310 为图形 blob 偶合非代码引用; reviewer C3 独立复核 PASS)。**留待**: 引用到时 R4 disasm + createFunction |
 
 ---
 

@@ -1081,7 +1081,11 @@ cursor_anim_data_b:                    @ 0x09e3b47c carve G: cursor anim coord t
 	.word 0x00000071    @ cell 4
 	.word 0x00000085    @ cell 5
 	.word 0x000000c9    @ cell 6
-	.incbin "roms/2343.gba", 0x1E3B498, 0x10EC  @ remainder to host end 0x1E3C584
+	.incbin "roms/2343.gba", 0x1E3B498, 0xC     @ 0x09e3b498..0x09e3b4a4 (3 words: anim coords continued)
+name_input_render_param_4b:                    @ 0x09e3b4a4 (4B render param block: 38 84 88 84; memcpy src in tick_name_input_render_by_state)
+	.incbin "roms/2343.gba", 0x1E3B4A4, 0x4
+name_input_default_name:                       @ 0x09e3b4a8 (SJIS "tesuto" default commit name; dispatch_name_input_confirm_state src)
+	.incbin "roms/2343.gba", 0x1E3B4A8, 0x10DC  @ remainder to host end 0x1E3C584
 pass_main_c_filename:
 	.asciz "PassInput/Pass_main.c"
 	.incbin "roms/2343.gba", 0x1E3C59A, 0x2
@@ -1483,7 +1487,22 @@ name_char_group_ptr_table:                        @ 0x09e587f0 carve B: 50-entry
 	.word name_char_group_47             @ [47] 0x09e3b058
 	.word name_char_group_36             @ [48] 0x09e3b0b0 (shared target)
 	.word name_char_group_36             @ [49] 0x09e3b0b0 (shared target)
-	.incbin "roms/2343.gba", 0x1E588B8, 0x454   @ remaining to host end 0x1E58D0C
+name_input_state_table:                        @ 0x09e588b8 (page state fn-ptr table; page_state_dispatcher index)
+	.word name_input_page_init+1               @ [0] 0x08017575 THUMB
+	.word name_input_page_load_assets+1        @ [1] 0x080180ad THUMB
+	.word name_input_page_tick+1               @ [2] 0x08019495 THUMB
+	.word name_input_page_exit+1               @ [3] 0x080194ed THUMB
+	.word 0                                    @ [4] NULL sentinel
+banlist_pass_char_group_ptr_table:             @ 0x09e588cc (8 ROM data ptrs; encode_pass_table_entry_to_line_buf index)
+	.word 0x09e3bfd4                           @ [0] char_group_0
+	.word 0x09e3bfc8                           @ [1] char_group_1
+	.word 0x09e3bfbc                           @ [2] char_group_2
+	.word 0x09e3bfb0                           @ [3] char_group_3
+	.word 0x09e3bfa4                           @ [4] char_group_4
+	.word 0x09e3bf98                           @ [5] char_group_5
+	.word 0x09e3bf8c                           @ [6] char_group_6
+	.word 0x09e3bf80                           @ [7] char_group_7
+	.incbin "roms/2343.gba", 0x1E588EC, 0x420  @ remaining to host end 0x1E58D0C
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)
