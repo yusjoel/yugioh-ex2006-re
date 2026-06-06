@@ -5700,7 +5700,7 @@ init_lang_select_vram_and_regs:
     movs r0,#0x80    @ 080ebb48 8020
     lsls r0,r0,#0x13    @ 080ebb4a c004
     strh r2,[r0,#0x0]                        @ 080ebb4c 0280
-    ldr r0, PTR_DAT_080ebbc4                 @ 080ebb4e 1d48
+    ldr r0, PTR_gVijaState_080ebbc4          @ 080ebb4e 1d48
     bl reset_display_and_obj_vram            @ 080ebb50 0bf090fd
     ldr r0, PTR_DAT_080ebbc8                 @ 080ebb54 1c48
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 080ebb56 08f0a3fb
@@ -5752,8 +5752,8 @@ init_lang_select_vram_and_regs:
     .zero  0x2
 PTR_gPrng_080ebbc0:
     .word  gPrng                          @ 080ebbc0 40000003
-PTR_DAT_080ebbc4:
-    .word  0x02029eb0                     @ 080ebbc4 b09e0202
+PTR_gVijaState_080ebbc4:
+    .word  gVijaState                     @ 080ebbc4 b09e0202
 PTR_DAT_080ebbc8:
     .word  0x0202a2c0                     @ 080ebbc8 c0a20202
 PTR_DAT_080ebbcc:

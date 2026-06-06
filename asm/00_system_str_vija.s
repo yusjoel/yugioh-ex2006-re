@@ -16427,7 +16427,7 @@ LAB_0801ad1c:
     movs r0,#0x1    @ 0801ad1c 0120
     b LAB_0801ae06                           @ 0801ad1e 72e0
 LAB_0801ad20:
-    ldr r2, DAT_0801ad40                     @ 0801ad20 074a
+    ldr r2, dispatch_banlist_cursor_action_scroll_cursor_hw_off_a @ 0801ad20 074a
     adds r0,r5,r2    @ 0801ad22 a818
     bl retreat_banlist_scrollbar_pos_page    @ 0801ad24 fff724fd
     cmp r0,#0x0                              @ 0801ad28 0028
@@ -16438,9 +16438,9 @@ LAB_0801ad20:
     movs r0,#0x24    @ 0801ad36 2420
     bl sync_state_and_init_sprite            @ 0801ad38 def0bcfe
     b LAB_0801ad1c                           @ 0801ad3c eee7
-    .byte  0x00, 0x00
-DAT_0801ad40:
-    .byte  0x4c, 0x06, 0x00, 0x00
+    .zero  0x2
+dispatch_banlist_cursor_action_scroll_cursor_hw_off_a:
+    .word  0x0000064c                     @ 0801ad40 4c060000  cursor halfword offset in gBanlistPasswordBuffer (0x64c)
 LAB_0801ad44:
     movs r0,#0x2    @ 0801ad44 0220
     bl sync_state_and_init_sprite            @ 0801ad46 def0b5fe
@@ -16453,7 +16453,7 @@ LAB_0801ad4c:
     adds r0,#0x3c    @ 0801ad56 3c30
     cmp r4,r0                                @ 0801ad58 8442
     ble LAB_0801ad8c                         @ 0801ad5a 17dd
-    ldr r2, DAT_0801ad80                     @ 0801ad5c 084a
+    ldr r2, dispatch_banlist_cursor_action_scroll_cursor_hw_off_b @ 0801ad5c 084a
     adds r0,r5,r2    @ 0801ad5e a818
     bl advance_banlist_scrollbar_pos_page    @ 0801ad60 fff7f4fc
     cmp r0,#0x0                              @ 0801ad64 0028
@@ -16467,8 +16467,8 @@ LAB_0801ad4c:
     b LAB_0801ad1c                           @ 0801ad7a cfe7
 DAT_0801ad7c:
     .byte  0x6c, 0x06, 0x00, 0x00
-DAT_0801ad80:
-    .byte  0x4c, 0x06, 0x00, 0x00
+dispatch_banlist_cursor_action_scroll_cursor_hw_off_b:
+    .word  0x0000064c                     @ 0801ad80 4c060000  cursor halfword offset in gBanlistPasswordBuffer (0x64c)
 LAB_0801ad84:
     movs r0,#0x2    @ 0801ad84 0220
     bl sync_state_and_init_sprite            @ 0801ad86 def095fe
@@ -16481,7 +16481,7 @@ LAB_0801ad94:
     adds r0,r5,#0x0    @ 0801ad94 281c
     bl count_str_charlen                     @ 0801ad96 f9f7e1fb
     adds r1,r0,#0x0    @ 0801ad9a 011c
-    ldr r2, DAT_0801adc0                     @ 0801ad9c 084a
+    ldr r2, dispatch_banlist_cursor_action_scroll_row_byte_off @ 0801ad9c 084a
     adds r0,r5,r2    @ 0801ad9e a818
     ldr r2,[r0,#0x0]                         @ 0801ada0 0268
     adds r0,r5,#0x0    @ 0801ada2 281c
@@ -16495,9 +16495,9 @@ LAB_0801ad94:
     bl sync_state_and_init_sprite            @ 0801adb4 def07efe
     bl trigger_banlist_fade_out_exit         @ 0801adb8 00f054fa
     b LAB_0801ad1c                           @ 0801adbc aee7
-    .byte  0x00, 0x00
-DAT_0801adc0:
-    .byte  0x5c, 0x06, 0x00, 0x00
+    .zero  0x2
+dispatch_banlist_cursor_action_scroll_row_byte_off:
+    .word  0x0000065c                     @ 0801adc0 5c060000  row height byte offset (0x65c)
 LAB_0801adc4:
     ldr r1, DAT_0801addc                     @ 0801adc4 0549
     adds r0,r5,r1    @ 0801adc6 6818
@@ -16514,8 +16514,8 @@ DAT_0801addc:
     .byte  0x62, 0x06, 0x00, 0x00
 LAB_0801ade0:
     bl trigger_banlist_fade_out_exit         @ 0801ade0 00f040fa
-    ldr r1, DAT_0801adfc                     @ 0801ade4 0549
-    ldr r0, DAT_0801ae00                     @ 0801ade6 0648
+    ldr r1, dispatch_banlist_cursor_action_ptr_gprng_b @ 0801ade4 0549
+    ldr r0, dispatch_banlist_cursor_action_cursor_px_base @ 0801ade6 0648
     adds r1,r1,r0    @ 0801ade8 0918
     movs r0,#0x1    @ 0801adea 0120
     ldrb r2,[r1,#0x0]                        @ 0801adec 0a78
@@ -16524,11 +16524,11 @@ LAB_0801ade0:
     movs r0,#0x24    @ 0801adf2 2420
     bl sync_state_and_init_sprite            @ 0801adf4 def05efe
     b LAB_0801ad1c                           @ 0801adf8 90e7
-    .byte  0x00, 0x00
-DAT_0801adfc:
-    .byte  0x40, 0x00, 0x00, 0x03
-DAT_0801ae00:
-    .byte  0x3a, 0x02, 0x00, 0x00
+    .zero  0x2
+dispatch_banlist_cursor_action_ptr_gprng_b:
+    .word  0x03000040                     @ 0801adfc 40000003  gPrng second ref in cursor action handler (0x03000040)
+dispatch_banlist_cursor_action_cursor_px_base:
+    .word  0x0000023a                     @ 0801ae00 3a020000  cursor pixel pos base offset (0x023a=570 into EWRAM)
 LAB_0801ae04:
     movs r0,#0x0    @ 0801ae04 0020
 LAB_0801ae06:
@@ -17980,7 +17980,7 @@ init_demo_shuen_display_state_bg2cnt_init:
 init_demo_shuen_display_state_bg3cnt_init:
     .word  0x00009b0b                     @ 0801b84c 0b9b0000  BG3CNT init value
 
-@ Called by FUN_0801b91c (scene_demo, indeg=1). Loads a single sprite GFX resource for the demo shuen scene. Non-APCS input: r8=ptr oam_entry (caller-set, transparent through FUN_0801b91c which has no r8 write). APCS: r0=u8 sprite_slot [0..1], r1=u8 tile_param_low [0..1], r2=u8 tile_param_high [1..2], r3=u8 sprite_config [0..0]; stack [sp+0x48]=u8 palette_slot [0..0]. Reads gDemoState+0x88 for GFX resource handle; calls zero_struct_36bytes(r8) to clear OAM buffer; configures OAM attr bytes [+0x14/0x17/0x18] for tile shape/priority/palette; loads ROM GFX resource descriptor (0x09e3cee8) and calls apply_gfx_resource_list. Constants: GFX_RESOURCE_LIST=0x09e3cee8, OAM_PALETTE_MASK=0xffffc07f, OAM_ENTRY_SIZE=36.
+@ Called by load_shuen_sprite_gfx_guarded (scene_demo, indeg=1). Loads a single sprite GFX resource for the demo shuen scene. Non-APCS input: r8=ptr oam_entry (caller-set, transparent through load_shuen_sprite_gfx_guarded which has no r8 write). APCS: r0=u8 sprite_slot [0..1], r1=u8 tile_param_low [0..1], r2=u8 tile_param_high [1..2], r3=u8 sprite_config [0..0]; stack [sp+0x48]=u8 palette_slot [0..0]. Reads gDemoState+0x88 for GFX resource handle; calls zero_struct_36bytes(r8) to clear OAM buffer; configures OAM attr bytes [+0x14/0x17/0x18] for tile shape/priority/palette; loads ROM GFX resource descriptor (0x09e3cee8) and calls apply_gfx_resource_list. Constants: GFX_RESOURCE_LIST=0x09e3cee8, OAM_PALETTE_MASK=0xffffc07f, OAM_ENTRY_SIZE=36.
 load_demo_shuen_sprite_gfx:
     push {r4,r5,r6,lr}                       @ 0801b850 70b5
     .hword 0x4656    @ 0801b852 5646
@@ -17993,8 +17993,8 @@ load_demo_shuen_sprite_gfx:
     adds r5,r2,#0x0    @ 0801b860 151c
     .hword 0x4698    @ 0801b862 9846
     ldr r6,[sp,#0x48]                        @ 0801b864 129e
-    ldr r4, DAT_0801b910                     @ 0801b866 2a4c
-    ldr r0, DAT_0801b914                     @ 0801b868 2a48
+    ldr r4, load_demo_shuen_sprite_gfx_ptr_gdemostate @ 0801b866 2a4c
+    ldr r0, load_demo_shuen_sprite_gfx_gfx_resource_desc @ 0801b868 2a48
     ldr r1,[r0,#0x4]                         @ 0801b86a 4168
     ldr r0,[r0,#0x0]                         @ 0801b86c 0068
     str r0,[sp,#0x24]                        @ 0801b86e 0990
@@ -18027,7 +18027,7 @@ load_demo_shuen_sprite_gfx:
     movs r0,#0x7f    @ 0801b8a6 7f20
     ands r6,r0    @ 0801b8a8 0640
     lsls r6,r6,#0x7    @ 0801b8aa f601
-    ldr r0, DAT_0801b918                     @ 0801b8ac 1a48
+    ldr r0, load_demo_shuen_sprite_gfx_oam_palette_mask @ 0801b8ac 1a48
     ldrh r2,[r1,#0x18]                       @ 0801b8ae 0a8b
     ands r0,r2    @ 0801b8b0 1040
     orrs r0,r6    @ 0801b8b2 3043
@@ -18076,12 +18076,12 @@ load_demo_shuen_sprite_gfx:
     pop {r0}                                 @ 0801b90a 01bc
     bx r0                                    @ 0801b90c 0047
     .zero  0x2
-DAT_0801b910:
+load_demo_shuen_sprite_gfx_ptr_gdemostate:
     .word  gDemoState                     @ 0801b910 c09e0202
-DAT_0801b914:
-    .word  0x09e3cee8                     @ 0801b914 e8cee309
-DAT_0801b918:
-    .word  0xffffc07f                     @ 0801b918 7fc0ffff
+load_demo_shuen_sprite_gfx_gfx_resource_desc:
+    .word  0x09e3cee8                     @ 0801b914 e8cee309  shuen sprite GFX resource descriptor ptr (0x09e3cee8)
+load_demo_shuen_sprite_gfx_oam_palette_mask:
+    .word  DEMO_CLEAR_BITS_13_7           @ 0801b918 7fc0ffff  OAM palette field clear mask bits[13:7]
 
 @ demo_shuen scene sprite GFX load dispatcher (guarded). Called twice by demo_shuen_state_machine (0x0801bd08) in caseD_0 (INIT step). r0=u8 skip_flag: if r0==0, shifts params (r1->r0, r2->r1, r3->r2, [sp+0xc]->r3, [sp+0x8]->stack) then calls load_demo_shuen_sprite_gfx; if r0!=0, skips. Both actual callsites pass r0=0 so the load path always executes. Params: r0=skip_flag {0=load, non-0=skip}, r1=tile_param_low [0..1], r2=tile_param_high [0..2], r3=sprite_config [1..2], [sp+0x8]=5th param, [sp+0xc]=6th param. Returns void (tail-call via pop {r0}; bx r0). Side-effects: OAM attr bytes [r8+0..35] zeroed then attr0/1/2 written; apply_gfx_resource_list triggered. Constants: none (all magic handled by callee).
 load_shuen_sprite_gfx_guarded:
@@ -18133,7 +18133,7 @@ load_shuen_bg1_gfx_set:
     ldrb r2,[r1,#0x18]                       @ 0801b974 0a7e
     ands r0,r2    @ 0801b976 1040
     strb r0,[r1,#0x18]                       @ 0801b978 0876
-    ldr r4, DAT_0801ba00                     @ 0801b97a 214c
+    ldr r4, load_shuen_bg1_gfx_set_oam_palette_mask @ 0801b97a 214c
     adds r0,r4,#0x0    @ 0801b97c 201c
     ldrh r2,[r1,#0x18]                       @ 0801b97e 0a8b
     ands r0,r2    @ 0801b980 1040
@@ -18197,16 +18197,16 @@ load_shuen_bg1_gfx_set:
     pop {r4,r5,r6,r7}                        @ 0801b9fa f0bc
     pop {r0}                                 @ 0801b9fc 01bc
     bx r0                                    @ 0801b9fe 0047
-DAT_0801ba00:
-    .word  0xffffc07f                     @ 0801ba00 7fc0ffff
+load_shuen_bg1_gfx_set_oam_palette_mask:
+    .word  DEMO_CLEAR_BITS_13_7           @ 0801ba00 7fc0ffff
 
 @ demo_shuen scene OBJ GFX resource loader by slot index. Called by load_shuen_obj_resource_slot0 (0x0801ba4c) with r0=0. Symmetric with load_demo_obj_resource_by_slot (0x08013940): (1) copies 4 words from ROM resource table 0x09e3cf60 (ldmia+str) to stack struct; (2) builds load_g2d_obj_resource_set param struct; (3) lsls r0,r0,#4 multiplies slot_index by 16; (4) calls load_g2d_obj_resource_set. Param: r0=u32 slot_index [0..0]. Returns void. Side-effects: gDemoState anim ctrl + ImageProxy initialized; OBJ Tile VRAM + OBJ Palette VRAM written. Constants: GDEMOSTATE=0x02029ec0, SHUEN_OBJ_RESOURCE_TABLE=0x09e3cf60, OBJ_RESOURCE_STRIDE=0x10, VRAM_FLAGS=0x200.
 load_shuen_obj_resource_by_slot:
     push {r4,r5,r6,lr}                       @ 0801ba04 70b5
     sub sp,#0x24                             @ 0801ba06 89b0
-    ldr r4, DAT_0801ba44                     @ 0801ba08 0e4c
+    ldr r4, load_shuen_obj_resource_by_slot_ptr_gdemostate @ 0801ba08 0e4c
     add r2,sp,#0x14                          @ 0801ba0a 05aa
-    ldr r1, DAT_0801ba48                     @ 0801ba0c 0e49
+    ldr r1, load_shuen_obj_resource_by_slot_obj_resource_table @ 0801ba0c 0e49
     ldmia r1!,{r3,r5,r6}                     @ 0801ba0e 68c9
     stmia r2!,{r3,r5,r6}                     @ 0801ba10 68c2
     ldr r1,[r1,#0x0]                         @ 0801ba12 0968
@@ -18233,12 +18233,12 @@ load_shuen_obj_resource_by_slot:
     pop {r4,r5,r6}                           @ 0801ba3e 70bc
     pop {r0}                                 @ 0801ba40 01bc
     bx r0                                    @ 0801ba42 0047
-DAT_0801ba44:
+load_shuen_obj_resource_by_slot_ptr_gdemostate:
     .word  gDemoState                     @ 0801ba44 c09e0202
-DAT_0801ba48:
-    .word  0x09e3cf60                     @ 0801ba48 60cfe309
+load_shuen_obj_resource_by_slot_obj_resource_table:
+    .word  0x09e3cf60                     @ 0801ba48 60cfe309  shuen OBJ resource table base (0x09e3cf60)
 
-@ demo_shuen scene OBJ GFX resource slot0 fixed-param stub. Symmetric with load_demo_obj_resource_slot0 (0x0801398c): passes r0=0 to load_shuen_obj_resource_by_slot, then returns fixed r0=1. Called by play_demo_shuen (0x080bc880) and FUN_0801c254 (0x0801c254). Entry scan (5 instrs): push {lr} / movs r0,#0 / bl FUN_0801ba04 / movs r0,#1 / pop {r1}. r0 at entry clobbered -> no input parameter. Returns r0=u32 1 (load success/busy). Side-effects via load_shuen_obj_resource_by_slot(0): OBJ Tile VRAM + OBJ Palette VRAM written; gDemoState anim ctrl + ImageProxy initialized.
+@ demo_shuen scene OBJ GFX resource slot0 fixed-param stub. Symmetric with load_demo_obj_resource_slot0 (0x0801398c): passes r0=0 to load_shuen_obj_resource_by_slot, then returns fixed r0=1. Called by play_demo_shuen (0x080bc880) and tick_scene_step_by_step_table_a (0x0801c254). Entry scan (5 instrs): push {lr} / movs r0,#0 / bl load_shuen_obj_resource_by_slot / movs r0,#1 / pop {r1}. r0 at entry clobbered -> no input parameter. Returns r0=u32 1 (load success/busy). Side-effects via load_shuen_obj_resource_by_slot(0): OBJ Tile VRAM + OBJ Palette VRAM written; gDemoState anim ctrl + ImageProxy initialized.
 load_shuen_obj_resource_slot0:
     push {lr}                                @ 0801ba4c 00b5
     movs r0,#0x0    @ 0801ba4e 0020
@@ -18248,27 +18248,27 @@ load_shuen_obj_resource_slot0:
     bx r1                                    @ 0801ba58 0847
     .zero  0x2
 
-@ demo_shuen scene BG3 scroll register writer. Identical structure to write_bg3_scroll_regs (0x0801399c): r0=u16 hofs [0..511], r1=u16 vofs [0..511]; each ANDed with 0x1FF (9-bit mask), then strh written to BG3HOFS (0x04000018) and BG3VOFS (0x0400001e). Callers: tick_demo_shuen_bg3_hscroll (0x0801ba78) passes r0=0, r1=hofs; FUN_0801bad0 passes r0=vofs, r1=0. Leaf function (bx lr). Side-effects: [BG3HOFS 0x04000018] := r0 & 0x1FF; [BG3VOFS 0x0400001e] := r1 & 0x1FF. Constants: BG3_SCROLL_MASK=0x1FF, BG3HOFS=0x04000018, BG3VOFS=0x0400001e.
+@ demo_shuen scene BG3 scroll register writer. Identical structure to write_bg3_scroll_regs (0x0801399c): r0=u16 hofs [0..511], r1=u16 vofs [0..511]; each ANDed with 0x1FF (9-bit mask), then strh written to BG3HOFS (0x0400001c) and BG3VOFS (0x0400001e). Callers: tick_demo_shuen_bg3_hscroll (0x0801ba78) passes r0=0, r1=hofs; tick_shuen_bg3_vscroll_phase passes r0=vofs, r1=0. Leaf function (bx lr). Side-effects: [BG3HOFS 0x04000018] := r0 & 0x1FF; [BG3VOFS 0x0400001e] := r1 & 0x1FF. Constants: BG3_SCROLL_MASK=0x1FF, BG3HOFS=0x04000018, BG3VOFS=0x0400001e.
 write_shuen_bg3_scroll_regs:
-    ldr r3, DAT_0801ba6c                     @ 0801ba5c 034b
+    ldr r3, write_shuen_bg3_scroll_regs_scroll_mask @ 0801ba5c 034b
     ands r0,r3    @ 0801ba5e 1840
-    ldr r2, PTR_BG3HOFS_0801ba70             @ 0801ba60 034a
+    ldr r2, write_shuen_bg3_scroll_regs_bg3hofs @ 0801ba60 034a
     strh r0,[r2,#0x0]                        @ 0801ba62 1080
     ands r1,r3    @ 0801ba64 1940
-    ldr r0, PTR_BG3VOFS_0801ba74             @ 0801ba66 0348
+    ldr r0, write_shuen_bg3_scroll_regs_bg3vofs @ 0801ba66 0348
     strh r1,[r0,#0x0]                        @ 0801ba68 0180
     bx lr                                    @ 0801ba6a 7047
-DAT_0801ba6c:
-    .word  0x000001ff                     @ 0801ba6c ff010000
-PTR_BG3HOFS_0801ba70:
-    .word  BG3HOFS                        @ 0801ba70 1c000004
-PTR_BG3VOFS_0801ba74:
-    .word  BG3VOFS                        @ 0801ba74 1e000004
+write_shuen_bg3_scroll_regs_scroll_mask:
+    .word  DEMO_KEEP_BITS_8_0             @ 0801ba6c ff010000  9-bit scroll mask bits[8:0]
+write_shuen_bg3_scroll_regs_bg3hofs:
+    .word  BG3HOFS                        @ 0801ba70 1c000004  BG3HOFS (0x0400001c) horizontal scroll register
+write_shuen_bg3_scroll_regs_bg3vofs:
+    .word  BG3VOFS                        @ 0801ba74 1e000004  BG3VOFS (0x0400001e) vertical scroll register
 
 @ Per-frame BG3 horizontal scroll updater for demo_shuen scene. Called by demo_shuen_state_machine (0x0801bd08) each frame. Reads gDemoState+0x8C bits[23:16] (8-bit scroll counter), computes hofs = counter % 0xA0, updates counter bits[8:1] (+= 2, wraps at 256), re-wraps if > 0xA0, writes back, then calls write_shuen_bg3_scroll_regs(0, new_hofs). Symmetric with tick_demo_bg3_hscroll (0x080139b8). No input params (r0 clobbered by ldr at entry). Returns void. Side-effects: [gDemoState+0x8C] bits[8:1] updated; [BG3HOFS 0x04000018] written. Constants: SCREEN_WIDTH=0xA0, COUNTER_MASK=0xFF, STEP=2.
 tick_demo_shuen_bg3_hscroll:
     push {r4,r5,lr}                          @ 0801ba78 30b5
-    ldr r0, DAT_0801bac8                     @ 0801ba7a 1348
+    ldr r0, tick_demo_shuen_bg3_hscroll_ptr_gdemostate @ 0801ba7a 1348
     adds r4,r0,#0x0    @ 0801ba7c 041c
     adds r4,#0x8c    @ 0801ba7e 8c34
     ldrh r1,[r4,#0x0]                        @ 0801ba80 2188
@@ -18286,7 +18286,7 @@ tick_demo_shuen_bg3_hscroll:
     movs r5,#0xff    @ 0801ba9c ff25
     ands r0,r5    @ 0801ba9e 2840
     lsls r0,r0,#0x1    @ 0801baa0 4000
-    ldr r3, DAT_0801bacc                     @ 0801baa2 0a4b
+    ldr r3, tick_demo_shuen_bg3_hscroll_counter_clear_mask @ 0801baa2 0a4b
     adds r2,r3,#0x0    @ 0801baa4 1a1c
     ands r2,r1    @ 0801baa6 0a40
     orrs r2,r0    @ 0801baa8 0243
@@ -18306,10 +18306,10 @@ LAB_0801bac0:
     pop {r0}                                 @ 0801bac2 01bc
     bx r0                                    @ 0801bac4 0047
     .zero  0x2
-DAT_0801bac8:
+tick_demo_shuen_bg3_hscroll_ptr_gdemostate:
     .word  gDemoState                     @ 0801bac8 c09e0202
-DAT_0801bacc:
-    .word  0xfffffe01                     @ 0801bacc 01feffff
+tick_demo_shuen_bg3_hscroll_counter_clear_mask:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801bacc 01feffff  clear bits[8:1] of hscroll counter
 
 @ Advance demo_shuen scene BG3 vertical scroll phase by one frame.
 @ Reads gDemoState+0x8C halfword bits[8:15] (8-bit vertical scroll counter); takes mod 0xF0=240 (GBA screen height),
@@ -18320,7 +18320,7 @@ DAT_0801bacc:
 @ Constants: VSCROLL_WRAP=0xF0=240; COUNTER_STEP=2; COUNTER_MASK=0xFF.
 tick_shuen_bg3_vscroll_phase:
     push {r4,r5,lr}                          @ 0801bad0 30b5
-    ldr r0, DAT_0801bb20                     @ 0801bad2 1348
+    ldr r0, tick_shuen_bg3_vscroll_phase_ptr_gdemostate @ 0801bad2 1348
     adds r4,r0,#0x0    @ 0801bad4 041c
     adds r4,#0x8c    @ 0801bad6 8c34
     ldrh r1,[r4,#0x0]                        @ 0801bad8 2188
@@ -18338,7 +18338,7 @@ tick_shuen_bg3_vscroll_phase:
     movs r5,#0xff    @ 0801baf4 ff25
     ands r0,r5    @ 0801baf6 2840
     lsls r0,r0,#0x1    @ 0801baf8 4000
-    ldr r3, DAT_0801bb24                     @ 0801bafa 0a4b
+    ldr r3, tick_shuen_bg3_vscroll_phase_counter_clear_mask @ 0801bafa 0a4b
     adds r2,r3,#0x0    @ 0801bafc 1a1c
     ands r2,r1    @ 0801bafe 0a40
     orrs r2,r0    @ 0801bb00 0243
@@ -18358,10 +18358,10 @@ LAB_0801bb18:
     pop {r0}                                 @ 0801bb1a 01bc
     bx r0                                    @ 0801bb1c 0047
     .zero  0x2
-DAT_0801bb20:
+tick_shuen_bg3_vscroll_phase_ptr_gdemostate:
     .word  gDemoState                     @ 0801bb20 c09e0202
-DAT_0801bb24:
-    .word  0xfffffe01                     @ 0801bb24 01feffff
+tick_shuen_bg3_vscroll_phase_counter_clear_mask:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801bb24 01feffff
 
 @ Per-sprite demo cell animation frame advance for shuen scene (Shuen/SHU_main.c). Called by tick_shuen_anim_slots_batch (0x0801bbd4). r0=u8 anm_id [0..10], r1=s32 playback_step (-1=auto advance, >=0=explicit seq step), r2=s32 screen_x_fp12, r3=s32 screen_y_fp12. Validates anm_id via read_obj_id_field; out-of-range triggers suppress_assert_report (assert: anmID < IG2D_GetAnmSequencesCount, file=Shuen/SHU_main.c, line=0xEF). playback_step==-1: dispatch_cell_anim_frame_advance then dispatch_cell_anim_sequence_step; playback_step>=0: dispatch_cell_anim_sequence_step with r6 low 16 bits. Finally dispatch_isd_cell_anim_oam_setup commits OAM. Returns void. Side-effects: [gDemoState+0x8+anm_id*4] advanced; OAM attr0/1/2 + XY written. Constants: STEP_AUTO=-1, DEFAULT_STEP=1, FAST_STEP=2, SEQ_RANGE_MAX=0xA.
 advance_shuen_cell_anim_frame:
@@ -18369,7 +18369,7 @@ advance_shuen_cell_anim_frame:
     sub sp,#0x28                             @ 0801bb2a 8ab0
     adds r5,r0,#0x0    @ 0801bb2c 051c
     adds r6,r1,#0x0    @ 0801bb2e 0e1c
-    ldr r7, DAT_0801bb94                     @ 0801bb30 184f
+    ldr r7, advance_shuen_cell_anim_frame_ptr_gdemostate @ 0801bb30 184f
     lsls r2,r2,#0xc    @ 0801bb32 1203
     str r2,[sp,#0x20]                        @ 0801bb34 0892
     lsls r3,r3,#0xc    @ 0801bb36 1b03
@@ -18415,7 +18415,7 @@ LAB_0801bb82:
     bl set_title_ex_obj_field8               @ 0801bb8c f9f79efd
     b LAB_0801bbaa                           @ 0801bb90 0be0
     .zero  0x2
-DAT_0801bb94:
+advance_shuen_cell_anim_frame_ptr_gdemostate:
     .word  gDemoState                     @ 0801bb94 c09e0202
 advance_shuen_cell_anim_frame_shu_main_c_filename:
     .word  shu_main_c_filename            @ 0801bb98 70cfe309  Shuen/SHU_main.c
@@ -18453,7 +18453,7 @@ tick_shuen_anim_slots_batch:
     push {r4,r5,r6,r7,lr}                    @ 0801bbd4 f0b5
     sub sp,#0x30                             @ 0801bbd6 8cb0
     adds r4,r0,#0x0    @ 0801bbd8 041c
-    ldr r1, DAT_0801bc24                     @ 0801bbda 1249
+    ldr r1, tick_shuen_anim_slots_batch_coord_table @ 0801bbda 1249
     add r0,sp,#0x8                           @ 0801bbdc 02a8
     movs r2,#0x28    @ 0801bbde 2822
     bl memcpy                                @ 0801bbe0 f2f0bcfe
@@ -18489,8 +18489,8 @@ LAB_0801bc12:
     pop {r0}                                 @ 0801bc1e 01bc
     bx r0                                    @ 0801bc20 0047
     .zero  0x2
-DAT_0801bc24:
-    .word  0x09e3cfbf                     @ 0801bc24 bfcfe309
+tick_shuen_anim_slots_batch_coord_table:
+    .word  0x09e3cfbf                     @ 0801bc24 bfcfe309  shuen 20-pair s8 screen coord table (0x09e3cfbf)
 
 @ Advance demo_shuen scene WIN0 vertical window fade-in animation by one frame.
 @ Interpolates progress r6=(r0*80)/r1; sets WIN0V: Y1=(80-r6), Y2=(r6+80) -- window expands from center outward.
@@ -18510,7 +18510,7 @@ apply_win0v_fadein_step:
     adds r6,r0,#0x0    @ 0801bc38 061c
     cmp r5,r4                                @ 0801bc3a a542
     bne LAB_0801bc8a                         @ 0801bc3c 25d1
-    ldr r3, PTR_WININ_0801bca8               @ 0801bc3e 1a4b
+    ldr r3, apply_win0v_fadein_step_winin    @ 0801bc3e 1a4b
     movs r2,#0x20    @ 0801bc40 2022
     rsbs r2,r2,#0    @ 0801bc42 5242
     ldrh r1,[r3,#0x0]                        @ 0801bc44 1988
@@ -18519,7 +18519,7 @@ apply_win0v_fadein_step:
     movs r1,#0x3b    @ 0801bc4a 3b21
     orrs r0,r1    @ 0801bc4c 0843
     strh r0,[r3,#0x0]                        @ 0801bc4e 1880
-    ldr r1, PTR_WINOUT_0801bcac              @ 0801bc50 1649
+    ldr r1, apply_win0v_fadein_step_winout   @ 0801bc50 1649
     ldrh r0,[r1,#0x0]                        @ 0801bc52 0888
     ands r2,r0    @ 0801bc54 0240
     strh r2,[r1,#0x0]                        @ 0801bc56 0a80
@@ -18533,7 +18533,7 @@ apply_win0v_fadein_step:
     lsls r2,r2,#0x13    @ 0801bc66 d204
     movs r3,#0x80    @ 0801bc68 8023
     lsls r3,r3,#0x6    @ 0801bc6a 9b01
-    ldr r0, DAT_0801bcb0                     @ 0801bc6c 1048
+    ldr r0, apply_win0v_fadein_step_dispcnt_clear_mask @ 0801bc6c 1048
     ldrh r1,[r2,#0x0]                        @ 0801bc6e 1188
     ands r0,r1    @ 0801bc70 0840
     orrs r0,r3    @ 0801bc72 1843
@@ -18556,20 +18556,20 @@ LAB_0801bc8a:
     lsrs r0,r0,#0x8    @ 0801bc96 000a
     orrs r0,r1    @ 0801bc98 0843
     lsrs r0,r0,#0x10    @ 0801bc9a 000c
-    ldr r1, PTR_WIN0V_0801bcb4               @ 0801bc9c 0549
+    ldr r1, apply_win0v_fadein_step_win0v    @ 0801bc9c 0549
     strh r0,[r1,#0x0]                        @ 0801bc9e 0880
     pop {r4,r5,r6}                           @ 0801bca0 70bc
     pop {r0}                                 @ 0801bca2 01bc
     bx r0                                    @ 0801bca4 0047
     .zero  0x2
-PTR_WININ_0801bca8:
-    .word  WININ                          @ 0801bca8 48000004
-PTR_WINOUT_0801bcac:
-    .word  WINOUT                         @ 0801bcac 4a000004
-DAT_0801bcb0:
-    .word  0xffff9fff                     @ 0801bcb0 ff9fffff
-PTR_WIN0V_0801bcb4:
-    .word  WIN0V                          @ 0801bcb4 44000004
+apply_win0v_fadein_step_winin:
+    .word  WININ                          @ 0801bca8 48000004  WININ window inside control
+apply_win0v_fadein_step_winout:
+    .word  WINOUT                         @ 0801bcac 4a000004  WINOUT window outside control
+apply_win0v_fadein_step_dispcnt_clear_mask:
+    .word  DEMO_CLEAR_BITS_14_13          @ 0801bcb0 ff9fffff  DISPCNT clear bits[14:13] (WIN0/WIN1 display enable)
+apply_win0v_fadein_step_win0v:
+    .word  WIN0V                          @ 0801bcb4 44000004  WIN0V window 0 vertical bounds
 
 @ Advance demo_shuen scene WIN0 vertical window fade-out animation by one frame.
 @ Computes remaining=(r1-r0); interpolates result=(remaining*80)/r1; sets WIN0V: Y1=(80-result), Y2=(result+80) -- window shrinks from full-screen to center.
@@ -18595,7 +18595,7 @@ apply_win0v_fadeout_step:
     lsrs r1,r1,#0x8    @ 0801bcd8 090a
     orrs r1,r2    @ 0801bcda 1143
     lsrs r1,r1,#0x10    @ 0801bcdc 090c
-    ldr r0, PTR_WIN0V_0801bd04               @ 0801bcde 0948
+    ldr r0, apply_win0v_fadeout_step_win0v   @ 0801bcde 0948
     strh r1,[r0,#0x0]                        @ 0801bce0 0180
     cmp r5,r4                                @ 0801bce2 a542
     bne LAB_0801bcfe                         @ 0801bce4 0bd1
@@ -18612,10 +18612,27 @@ LAB_0801bcfe:
     pop {r4,r5}                              @ 0801bcfe 30bc
     pop {r0}                                 @ 0801bd00 01bc
     bx r0                                    @ 0801bd02 0047
-PTR_WIN0V_0801bd04:
-    .word  WIN0V                          @ 0801bd04 44000004
+apply_win0v_fadeout_step_win0v:
+    .word  WIN0V                          @ 0801bd04 44000004  WIN0V window 0 vertical bounds
 
-@ demo 'shuen' (終焉) 过场动画状态机 (7-state on [gDemoState+0x8c] bits 9..16). step 0 INIT: 加载 BG1 (FUN_0801b93c 'demo/shuen/shuen_bg1.LZ5bg') + BG2 (fs_load 'demo/shuen/shuen_bg2.LZ5bg' 缓存到 [gDemoState+0x88]) + OAM/window + 启 fade-in. step 1=wait init (poll FUN_080148f4). step 2=phase A (keyframe 0x09e3d01f, sub-state 按 0x3c/0x96/0x4b/0xa5/0xe6 分支). step 3=wait A. step 4=phase B (双 keyframe 0x09e3d022/0x09e3d028, 6帧循环, sub-state==0x78 推进). step 5=fadeout (3 种 brightness/blend 模式). step 6=wait fadeout. default 路径 cleanup (FUN_0801522c sprite + FUN_08015160 + FUN_080148f4 final poll). 返回 1=busy / 0=done. 唯一 caller: FUN_080bc880 case 3 (scene loader).
+@ @ demo 'shuen' (shuen/Syu-en) cinematic 7-state machine on [gDemoState+0x8c] bits[16:9].
+@ @ State 0 INIT: load_shuen_bg1_gfx_set('demo/shuen/shuen_bg1.LZ5bg') +
+@ @   fs_load('demo/shuen/shuen_bg2.LZ5bg') cached to [gDemoState+0x88] +
+@ @   load_shuen_sprite_gfx_guarded x2 (OAM/window setup) +
+@ @   tick_demo_shuen_bg3_hscroll + gl_set_blend2_level(0x28,0,0x3c) fade-in +
+@ @   DISPCNT|=0x1800 (BG3+OBJ enabled).
+@ @ State 1 WAIT_INIT: check_blend_transition_done; on done: clear [gDemoState+0x8e] field bits.
+@ @ State 2 PHASE_A: memcpy 3-byte keyframe table from 0x09e3d01f;
+@ @   dispatch sub-state by sub_state bits (0x3c/0x96/0x4b/0xa5/0xe6 branches).
+@ @ State 3 WAIT_A: check_blend_transition_done.
+@ @ State 4 PHASE_B: dual keyframe 0x09e3d022/0x09e3d028; 6-frame sub-loop;
+@ @   tick_shuen_anim_slots_batch + tick_demo_shuen_bg3_hscroll.
+@ @ State 5 FADEOUT: 3-variant brightness/blend sequence.
+@ @ State 6 WAIT_FADEOUT: check_blend_transition_done.
+@ @ Default (state>6): copy_sprite_attr_table_to_oam + init_gl_palette_slot_flags +
+@ @   check_blend_transition_done final.
+@ @ Returns r0: 1=busy / 0=done.
+@ @ Caller: play_demo_shuen (0x080bc880) case 3.
 demo_shuen_state_machine:
     push {r4,r5,r6,r7,lr}                    @ 0801bd08 f0b5
     .hword 0x4657    @ 0801bd0a 5746
@@ -18623,26 +18640,26 @@ demo_shuen_state_machine:
     .hword 0x4645    @ 0801bd0e 4546
     push {r5,r6,r7}                          @ 0801bd10 e0b4
     sub sp,#0x20                             @ 0801bd12 88b0
-    ldr r6, DAT_0801bd30                     @ 0801bd14 064e  -- r6 = &gDemoState (0x02029EC0)
+    ldr r6, demo_shuen_state_machine_ptr_gdemostate @ 0801bd14 064e  -- r6 = &gDemoState (0x02029EC0)
     adds r0,r6,#0x0    @ 0801bd16 301c
     adds r0,#0x8c    @ 0801bd18 8c30
     ldr r0,[r0,#0x0]                         @ 0801bd1a 0068  -- r0 = packed bitfield gDemoState[+0x8c]
     lsls r0,r0,#0xf    @ 0801bd1c c003  -- main state = (r0 << 0xf) >> 0x18 (= bits 9..16 of [+0x8c])
     lsrs r0,r0,#0x18    @ 0801bd1e 000e
-    cmp r0,#0x6                              @ 0801bd20 0628  -- state > 6 -> default (cleanup, 检查 done flag)
+    cmp r0,#0x6                              @ 0801bd20 0628  -- state > 6 -> default cleanup path
     bls LAB_0801bd26                         @ 0801bd22 00d9
     b switchD_0801bd2e__default              @ 0801bd24 7ae2
 LAB_0801bd26:
     lsls r0,r0,#0x2    @ 0801bd26 8000
-    ldr r1, DAT_0801bd34                     @ 0801bd28 0249
+    ldr r1, demo_shuen_state_machine_switch_table_ptr @ 0801bd28 0249
     adds r0,r0,r1    @ 0801bd2a 4018
-    ldr r0,[r0,#0x0]                         @ 0801bd2c 0068  -- switch dispatch: jump_table @ 0x0801bd38 (7 entries)
+    ldr r0,[r0,#0x0]                         @ 0801bd2c 0068  -- switch dispatch: load jump_table entry, mov pc
 switchD_0801bd2e__switchD:
     .hword 0x4687    @ 0801bd2e 8746
-DAT_0801bd30:
+demo_shuen_state_machine_ptr_gdemostate:
     .word  gDemoState                     @ 0801bd30 c09e0202
-DAT_0801bd34:
-    .word  0x0801bd38                     @ 0801bd34 38bd0108
+demo_shuen_state_machine_switch_table_ptr:
+    .word  0x0801bd38                     @ 0801bd34 38bd0108  ptr to 7-entry switch jump table at 0x0801bd38
 switchD_0801bd2e__switchdataD_0801bd38:
     .word  0x0801bd54                     @ 0801bd38 54bd0108
     .word  0x0801bddc                     @ 0801bd3c dcbd0108
@@ -18652,14 +18669,14 @@ switchD_0801bd2e__switchdataD_0801bd38:
     .word  0x0801c0c8                     @ 0801bd4c c8c00108
     .word  0x0801c208                     @ 0801bd50 08c20108
 switchD_0801bd2e__caseD_0:
-    ldr r0, DAT_0801bdcc                     @ 0801bd54 1d48  -- case 0 INIT: 加载资源 + 启 fade-in
+    ldr r0, demo_shuen_state_machine_bg1_resource_path @ 0801bd54 1d48  -- case 0 INIT: load resources + start fade-in
     bl load_shuen_bg1_gfx_set                @ 0801bd56 fff7f1fd  -- FUN_0801b93c('demo/shuen/shuen_bg1.LZ5bg')
-    ldr r0, DAT_0801bdd0                     @ 0801bd5a 1d48
+    ldr r0, demo_shuen_state_machine_bg2_path @ 0801bd5a 1d48
     movs r1,#0x0    @ 0801bd5c 0021
     bl fs_load                               @ 0801bd5e f9f723f9  -- fs_load('demo/shuen/shuen_bg2.LZ5bg', 0)
     adds r1,r6,#0x0    @ 0801bd62 311c
     adds r1,#0x88    @ 0801bd64 8831
-    str r0,[r1,#0x0]                         @ 0801bd66 0860  -- gDemoState[+0x88] = fs_load 返回 (解压数据指针)
+    str r0,[r1,#0x0]                         @ 0801bd66 0860  -- gDemoState[+0x88] = fs_load return (decompressed data ptr)
     movs r4,#0x0    @ 0801bd68 0024
     str r4,[sp,#0x0]                         @ 0801bd6a 0094
     str r4,[sp,#0x4]                         @ 0801bd6c 0194
@@ -18667,30 +18684,30 @@ switchD_0801bd2e__caseD_0:
     movs r1,#0x0    @ 0801bd70 0021
     movs r2,#0x1    @ 0801bd72 0122
     movs r3,#0x1    @ 0801bd74 0123
-    bl load_shuen_sprite_gfx_guarded         @ 0801bd76 fff7d1fd  -- FUN_0801b91c(0,0,1,1) (OAM/window setup #1)
+    bl load_shuen_sprite_gfx_guarded         @ 0801bd76 fff7d1fd  -- load_shuen_sprite_gfx_guarded(0,0,1,1) -- OAM/window setup #1
     str r4,[sp,#0x0]                         @ 0801bd7a 0094
     str r4,[sp,#0x4]                         @ 0801bd7c 0194
     movs r0,#0x0    @ 0801bd7e 0020
     movs r1,#0x1    @ 0801bd80 0121
     movs r2,#0x0    @ 0801bd82 0022
     movs r3,#0x2    @ 0801bd84 0223
-    bl load_shuen_sprite_gfx_guarded         @ 0801bd86 fff7c9fd  -- FUN_0801b91c(0,1,0,2) (OAM/window setup #2)
+    bl load_shuen_sprite_gfx_guarded         @ 0801bd86 fff7c9fd  -- load_shuen_sprite_gfx_guarded(0,1,0,2) -- OAM/window setup #2
     bl tick_demo_shuen_bg3_hscroll           @ 0801bd8a fff775fe
     movs r0,#0x28    @ 0801bd8e 2820
     movs r1,#0x0    @ 0801bd90 0021
     movs r2,#0x3c    @ 0801bd92 3c22
-    bl gl_set_blend2_level                   @ 0801bd94 f8f720fd  -- FUN_080147d8(0x28, 0, 0x3c) (启 fade-in)
+    bl gl_set_blend2_level                   @ 0801bd94 f8f720fd  -- gl_set_blend2_level(0x28, 0, 0x3c) -- start fade-in
     movs r2,#0x80    @ 0801bd98 8022
     lsls r2,r2,#0x13    @ 0801bd9a d204
     movs r3,#0xc0    @ 0801bd9c c023
     lsls r3,r3,#0x5    @ 0801bd9e 5b01
-    ldr r0, DAT_0801bdd4                     @ 0801bda0 0c48
+    ldr r0, demo_shuen_state_machine_dispcnt_clear_mask @ 0801bda0 0c48
     ldrh r1,[r2,#0x0]                        @ 0801bda2 1188
     ands r0,r1    @ 0801bda4 0840
     orrs r0,r3    @ 0801bda6 1843
-    strh r0,[r2,#0x0]                        @ 0801bda8 1080  -- DISPCNT |= 0x1800 (启 BG3 + OBJ)
+    strh r0,[r2,#0x0]                        @ 0801bda8 1080  -- DISPCNT |= 0x1800: enable BG3 + OBJ display
     movs r0,#0x3    @ 0801bdaa 0320
-    bl set_channel_if_changed                @ 0801bdac ddf096fe  -- FUN_080f9adc(3) (TODO: 推测 sound/sfx)
+    bl set_channel_if_changed                @ 0801bdac ddf096fe  -- set_channel_if_changed(3) -- sound channel trigger
     adds r3,r6,#0x0    @ 0801bdb0 331c
     adds r3,#0x8c    @ 0801bdb2 8c33
     ldr r2,[r3,#0x0]                         @ 0801bdb4 1a68
@@ -18700,26 +18717,26 @@ switchD_0801bd2e__caseD_0:
     movs r0,#0xff    @ 0801bdbc ff20
     ands r1,r0    @ 0801bdbe 0140
     lsls r1,r1,#0x9    @ 0801bdc0 4902
-    ldr r0, DAT_0801bdd8                     @ 0801bdc2 0548
+    ldr r0, demo_shuen_state_machine_state_clear_mask_a @ 0801bdc2 0548
     ands r0,r2    @ 0801bdc4 1040
     orrs r0,r1    @ 0801bdc6 0843
-    str r0,[r3,#0x0]                         @ 0801bdc8 1860  -- gDemoState[+0x8c]: state++ (bits 9..16)
+    str r0,[r3,#0x0]                         @ 0801bdc8 1860  -- gDemoState[+0x8c]: state++ packed into bits[16:9]
     b switchD_0801bd2e__default              @ 0801bdca 27e2
-DAT_0801bdcc:
-    .word  0x09e3cfe8                     @ 0801bdcc e8cfe309
-DAT_0801bdd0:
-    .word  0x09e3d004                     @ 0801bdd0 04d0e309
-DAT_0801bdd4:
-    .word  0xffffe0ff                     @ 0801bdd4 ffe0ffff
-DAT_0801bdd8:
-    .word  0xfffe01ff                     @ 0801bdd8 ff01feff
+demo_shuen_state_machine_bg1_resource_path:
+    .word  0x09e3cfe8                     @ 0801bdcc e8cfe309  shuen BG1 file path ptr (demo/shuen/shuen_bg1.LZ5bg)
+demo_shuen_state_machine_bg2_path:
+    .word  0x09e3d004                     @ 0801bdd0 04d0e309  shuen BG2 file path ptr (demo/shuen/shuen_bg2.LZ5bg)
+demo_shuen_state_machine_dispcnt_clear_mask:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801bdd4 ffe0ffff  DISPCNT clear bits[12:8] (BG/OBJ enable field)
+demo_shuen_state_machine_state_clear_mask_a:
+    .word  DEMO_CLEAR_BITS_16_9           @ 0801bdd8 ff01feff  clear state bits[16:9] in gDemoState+0x8c
 switchD_0801bd2e__caseD_1:
-    bl check_blend_transition_done           @ 0801bddc f8f78afd  -- case 1 WAIT_INIT: 等 gl ready (FUN_080148f4)
+    bl check_blend_transition_done           @ 0801bddc f8f78afd  -- case 1 WAIT_INIT: check_blend_transition_done
     cmp r0,#0x0                              @ 0801bde0 0028
-    bne LAB_0801be20                         @ 0801bde2 1dd1  -- r0 != 0 (still busy) -> 不推进, 跳到 helper
+    bne LAB_0801be20                         @ 0801bde2 1dd1  -- r0 != 0 (still busy) -> skip state advance
     adds r1,r6,#0x0    @ 0801bde4 311c
     adds r1,#0x8e    @ 0801bde6 8e31
-    ldr r0, DAT_0801be28                     @ 0801bde8 0f48
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_a @ 0801bde8 0f48
     ldrh r2,[r1,#0x0]                        @ 0801bdea 0a88
     ands r0,r2    @ 0801bdec 1040
     strh r0,[r1,#0x0]                        @ 0801bdee 0880
@@ -18743,7 +18760,7 @@ switchD_0801bd2e__caseD_1:
     movs r0,#0xff    @ 0801be12 ff20
     ands r1,r0    @ 0801be14 0140
     lsls r1,r1,#0x9    @ 0801be16 4902
-    ldr r0, DAT_0801be2c                     @ 0801be18 0448
+    ldr r0, demo_shuen_state_machine_state_clear_mask_b @ 0801be18 0448
     ands r0,r2    @ 0801be1a 1040
     orrs r0,r1    @ 0801be1c 0843
     str r0,[r3,#0x0]                         @ 0801be1e 1860
@@ -18751,15 +18768,15 @@ LAB_0801be20:
     bl tick_demo_shuen_bg3_hscroll           @ 0801be20 fff72afe
     b switchD_0801bd2e__default              @ 0801be24 fae1
     .zero  0x2
-DAT_0801be28:
-    .word  0xfffffe01                     @ 0801be28 01feffff
-DAT_0801be2c:
-    .word  0xfffe01ff                     @ 0801be2c ff01feff
+demo_shuen_state_machine_substate_clear_mask_a:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801be28 01feffff
+demo_shuen_state_machine_state_clear_mask_b:
+    .word  DEMO_CLEAR_BITS_16_9           @ 0801be2c ff01feff
 switchD_0801bd2e__caseD_2:
-    ldr r1, DAT_0801be98                     @ 0801be30 1949  -- case 2 PHASE_A: keyframe 时间线
+    ldr r1, demo_shuen_state_machine_keyframe_phase_a @ 0801be30 1949  -- case 2 PHASE_A: copy keyframe table from 0x09e3d01f
     add r0,sp,#0x8                           @ 0801be32 02a8
     movs r2,#0x3    @ 0801be34 0322
-    bl memcpy                                @ 0801be36 f2f091fd  -- memcpy(stack+0x8, 0x09e3d01f, 3) (载 3-byte keyframe table)
+    bl memcpy                                @ 0801be36 f2f091fd  -- memcpy(stack+0x8, 0x09e3d01f, 3) -- copy 3-byte keyframe table
     adds r1,r6,#0x0    @ 0801be3a 311c
     adds r1,#0x8e    @ 0801be3c 8e31
     ldrh r2,[r1,#0x0]                        @ 0801be3e 0a88
@@ -18806,8 +18823,8 @@ LAB_0801be4e:
     bl init_blend_transition_params_ex       @ 0801be90 f8f7d2fc
     b LAB_0801bf70                           @ 0801be94 6ce0
     .zero  0x2
-DAT_0801be98:
-    .word  0x09e3d01f                     @ 0801be98 1fd0e309
+demo_shuen_state_machine_keyframe_phase_a:
+    .word  0x09e3d01f                     @ 0801be98 1fd0e309  shuen phase A 3-byte keyframe table ptr (0x09e3d01f)
 LAB_0801be9c:
     cmp r0,#0x4b                             @ 0801be9c 4b28
     beq LAB_0801bea4                         @ 0801be9e 01d0
@@ -18892,7 +18909,7 @@ LAB_0801bf0e:
     ldrb r2,[r1,#0x0]                        @ 0801bf40 0a78
     ands r0,r2    @ 0801bf42 1040
     strb r0,[r1,#0x0]                        @ 0801bf44 0870
-    ldr r0, DAT_0801bf94                     @ 0801bf46 1348
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_b @ 0801bf46 1348
     .hword 0x4641    @ 0801bf48 4146
     ldrh r1,[r1,#0x0]                        @ 0801bf4a 0988
     ands r0,r1    @ 0801bf4c 0840
@@ -18909,7 +18926,7 @@ LAB_0801bf0e:
     movs r0,#0xff    @ 0801bf62 ff20
     ands r1,r0    @ 0801bf64 0140
     lsls r1,r1,#0x9    @ 0801bf66 4902
-    ldr r0, DAT_0801bf98                     @ 0801bf68 0b48
+    ldr r0, demo_shuen_state_machine_state_clear_mask_c @ 0801bf68 0b48
     ands r0,r2    @ 0801bf6a 1040
     orrs r0,r1    @ 0801bf6c 0843
     str r0,[r3,#0x0]                         @ 0801bf6e 1860
@@ -18922,7 +18939,7 @@ LAB_0801bf70:
     movs r0,#0xff    @ 0801bf7a ff20
     ands r1,r0    @ 0801bf7c 0140
     lsls r1,r1,#0x1    @ 0801bf7e 4900
-    ldr r0, DAT_0801bf94                     @ 0801bf80 0448
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_b @ 0801bf80 0448
     ands r0,r2    @ 0801bf82 1040
     orrs r0,r1    @ 0801bf84 0843
     .hword 0x4641    @ 0801bf86 4146
@@ -18931,19 +18948,19 @@ LAB_0801bf70:
     adds r2,r6,#0x0    @ 0801bf8e 321c
     adds r2,#0x94    @ 0801bf90 9432
     b LAB_0801c0a4                           @ 0801bf92 87e0
-DAT_0801bf94:
-    .word  0xfffffe01                     @ 0801bf94 01feffff
-DAT_0801bf98:
-    .word  0xfffe01ff                     @ 0801bf98 ff01feff
+demo_shuen_state_machine_substate_clear_mask_b:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801bf94 01feffff
+demo_shuen_state_machine_state_clear_mask_c:
+    .word  DEMO_CLEAR_BITS_16_9           @ 0801bf98 ff01feff
 switchD_0801bd2e__caseD_3:
-    bl check_blend_transition_done           @ 0801bf9c f8f7aafc  -- case 3 WAIT_A: 等 phase A 完成 (FUN_080148f4)
+    bl check_blend_transition_done           @ 0801bf9c f8f7aafc  -- case 3 WAIT_A: check_blend_transition_done for phase A
     cmp r0,#0x0                              @ 0801bfa0 0028
     beq LAB_0801bfa6                         @ 0801bfa2 00d0
     b LAB_0801c1ec                           @ 0801bfa4 22e1
 LAB_0801bfa6:
     adds r1,r6,#0x0    @ 0801bfa6 311c
     adds r1,#0x8e    @ 0801bfa8 8e31
-    ldr r0, DAT_0801bfd0                     @ 0801bfaa 0948
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_c @ 0801bfaa 0948
     ldrh r2,[r1,#0x0]                        @ 0801bfac 0a88
     ands r0,r2    @ 0801bfae 1040
     strh r0,[r1,#0x0]                        @ 0801bfb0 0880
@@ -18957,24 +18974,24 @@ LAB_0801bfb2:
     movs r0,#0xff    @ 0801bfbe ff20
     ands r1,r0    @ 0801bfc0 0140
     lsls r1,r1,#0x9    @ 0801bfc2 4902
-    ldr r0, DAT_0801bfd4                     @ 0801bfc4 0348
+    ldr r0, demo_shuen_state_machine_state_clear_mask_d @ 0801bfc4 0348
     ands r0,r2    @ 0801bfc6 1040
     orrs r0,r1    @ 0801bfc8 0843
     str r0,[r3,#0x0]                         @ 0801bfca 1860
     b LAB_0801c1ec                           @ 0801bfcc 0ee1
     .zero  0x2
-DAT_0801bfd0:
-    .word  0xfffffe01                     @ 0801bfd0 01feffff
-DAT_0801bfd4:
-    .word  0xfffe01ff                     @ 0801bfd4 ff01feff
+demo_shuen_state_machine_substate_clear_mask_c:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801bfd0 01feffff
+demo_shuen_state_machine_state_clear_mask_d:
+    .word  DEMO_CLEAR_BITS_16_9           @ 0801bfd4 ff01feff
 switchD_0801bd2e__caseD_4:
-    add r5,sp,#0xc                           @ 0801bfd8 03ad  -- case 4 PHASE_B: 双 keyframe 6 帧循环
-    ldr r1, DAT_0801c0b4                     @ 0801bfda 3649
+    add r5,sp,#0xc                           @ 0801bfd8 03ad  -- case 4 PHASE_B: dual keyframe 6-frame sub-loop
+    ldr r1, demo_shuen_state_machine_keyframe_phase_b_a @ 0801bfda 3649
     adds r0,r5,#0x0    @ 0801bfdc 281c
     movs r2,#0x6    @ 0801bfde 0622
     bl memcpy                                @ 0801bfe0 f2f0bcfc  -- memcpy(stack+0xc, 0x09e3d022, 6) (keyframe A)
     add r4,sp,#0x14                          @ 0801bfe4 05ac
-    ldr r1, DAT_0801c0b8                     @ 0801bfe6 3449
+    ldr r1, demo_shuen_state_machine_keyframe_phase_b_b @ 0801bfe6 3449
     adds r0,r4,#0x0    @ 0801bfe8 201c
     movs r2,#0x6    @ 0801bfea 0622
     bl memcpy                                @ 0801bfec f2f0b6fc  -- memcpy(stack+0x14, 0x09e3d028, 6) (keyframe B)
@@ -18989,7 +19006,7 @@ switchD_0801bd2e__caseD_4:
     .hword 0x46a1    @ 0801c000 a146
     movs r7,#0x80    @ 0801c002 8027
     lsls r7,r7,#0x13    @ 0801c004 ff04
-    ldr r5, DAT_0801c0bc                     @ 0801c006 2d4d
+    ldr r5, demo_shuen_state_machine_dispcnt_clear_mask_b @ 0801c006 2d4d
     .hword 0x4644    @ 0801c008 4446
 LAB_0801c00a:
     ldrh r2,[r4,#0x0]                        @ 0801c00a 2288
@@ -19025,7 +19042,7 @@ LAB_0801c036:
     lsrs r0,r0,#0x18    @ 0801c042 000e
     cmp r0,#0x78                             @ 0801c044 7828  -- if sub_state == 0x78: BLDY=0x3c, state++
     bne LAB_0801c084                         @ 0801c046 1dd1
-    ldr r0, DAT_0801c0c0                     @ 0801c048 1d48
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_d @ 0801c048 1d48
     ands r0,r1    @ 0801c04a 0840
     movs r1,#0x3c    @ 0801c04c 3c21
     orrs r0,r1    @ 0801c04e 0843
@@ -19051,7 +19068,7 @@ LAB_0801c036:
     movs r0,#0xff    @ 0801c076 ff20
     ands r1,r0    @ 0801c078 0140
     lsls r1,r1,#0x9    @ 0801c07a 4902
-    ldr r0, DAT_0801c0c4                     @ 0801c07c 1148
+    ldr r0, demo_shuen_state_machine_state_clear_mask_e @ 0801c07c 1148
     ands r0,r2    @ 0801c07e 1040
     orrs r0,r1    @ 0801c080 0843
     str r0,[r3,#0x0]                         @ 0801c082 1860
@@ -19064,7 +19081,7 @@ LAB_0801c084:
     movs r0,#0xff    @ 0801c08e ff20
     ands r1,r0    @ 0801c090 0140
     lsls r1,r1,#0x1    @ 0801c092 4900
-    ldr r0, DAT_0801c0c0                     @ 0801c094 0a48
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_d @ 0801c094 0a48
     ands r0,r2    @ 0801c096 1040
     orrs r0,r1    @ 0801c098 0843
     .hword 0x4641    @ 0801c09a 4146
@@ -19079,18 +19096,18 @@ LAB_0801c0a4:
     bl tick_shuen_anim_slots_batch           @ 0801c0ac fff792fd
     b switchD_0801bd2e__default              @ 0801c0b0 b4e0
     .zero  0x2
-DAT_0801c0b4:
-    .word  0x09e3d022                     @ 0801c0b4 22d0e309
-DAT_0801c0b8:
-    .word  0x09e3d028                     @ 0801c0b8 28d0e309
-DAT_0801c0bc:
-    .word  0xffffe0ff                     @ 0801c0bc ffe0ffff
-DAT_0801c0c0:
-    .word  0xfffffe01                     @ 0801c0c0 01feffff
-DAT_0801c0c4:
-    .word  0xfffe01ff                     @ 0801c0c4 ff01feff
+demo_shuen_state_machine_keyframe_phase_b_a:
+    .word  0x09e3d022                     @ 0801c0b4 22d0e309  shuen phase B keyframe A - loop start (0x09e3d022)
+demo_shuen_state_machine_keyframe_phase_b_b:
+    .word  0x09e3d028                     @ 0801c0b8 28d0e309  shuen phase B keyframe B - loop end (0x09e3d028)
+demo_shuen_state_machine_dispcnt_clear_mask_b:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801c0bc ffe0ffff
+demo_shuen_state_machine_substate_clear_mask_d:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801c0c0 01feffff
+demo_shuen_state_machine_state_clear_mask_e:
+    .word  DEMO_CLEAR_BITS_16_9           @ 0801c0c4 ff01feff
 switchD_0801bd2e__caseD_5:
-    movs r0,#0x8e    @ 0801c0c8 8e20  -- case 5 FADEOUT: 3 种 brightness/blend 模式
+    movs r0,#0x8e    @ 0801c0c8 8e20  -- case 5 FADEOUT: 3-variant brightness/blend sequence
     adds r0,r0,r6    @ 0801c0ca 8019
     .hword 0x4680    @ 0801c0cc 8046
     ldrh r2,[r0,#0x0]                        @ 0801c0ce 0288
@@ -19137,7 +19154,7 @@ LAB_0801c112:
     movs r1,#0x10    @ 0801c11c 1021
     movs r2,#0x1e    @ 0801c11e 1e22
     bl gl_set_blend2_level                   @ 0801c120 f8f75afb
-    ldr r0, DAT_0801c160                     @ 0801c124 0e48
+    ldr r0, demo_shuen_state_machine_substate_clear_mask_e @ 0801c124 0e48
     .hword 0x4641    @ 0801c126 4146
     ldrh r1,[r1,#0x0]                        @ 0801c128 0988
     ands r0,r1    @ 0801c12a 0840
@@ -19167,8 +19184,8 @@ LAB_0801c112:
     ands r1,r0    @ 0801c15a 0140
     b LAB_0801c1b2                           @ 0801c15c 29e0
     .zero  0x2
-DAT_0801c160:
-    .word  0xfffffe01                     @ 0801c160 01feffff
+demo_shuen_state_machine_substate_clear_mask_e:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801c160 01feffff
 LAB_0801c164:
     movs r0,#0x3f    @ 0801c164 3f20
     movs r1,#0x10    @ 0801c166 1021
@@ -19179,7 +19196,7 @@ LAB_0801c164:
     bl gl_set_blend2_level                   @ 0801c172 f8f731fb
     movs r2,#0x80    @ 0801c176 8022
     lsls r2,r2,#0x13    @ 0801c178 d204
-    ldr r0, DAT_0801c1c0                     @ 0801c17a 1148
+    ldr r0, demo_shuen_state_machine_dispcnt_clear_mask_c @ 0801c17a 1148
     ldrh r1,[r2,#0x0]                        @ 0801c17c 1188
     ands r0,r1    @ 0801c17e 0840
     strh r0,[r2,#0x0]                        @ 0801c180 1080
@@ -19215,8 +19232,8 @@ LAB_0801c1b2:
     orrs r0,r1    @ 0801c1ba 0843
     strb r0,[r7,#0x0]                        @ 0801c1bc 3870
     b LAB_0801c1ec                           @ 0801c1be 15e0
-DAT_0801c1c0:
-    .word  0xffffe0ff                     @ 0801c1c0 ffe0ffff
+demo_shuen_state_machine_dispcnt_clear_mask_c:
+    .word  DEMO_CLEAR_BITS_12_8           @ 0801c1c0 ffe0ffff
 LAB_0801c1c4:
     movs r0,#0x3f    @ 0801c1c4 3f20
     movs r1,#0x0    @ 0801c1c6 0021
@@ -19232,7 +19249,7 @@ LAB_0801c1da:
     movs r1,#0xff    @ 0801c1dc ff21
     ands r0,r1    @ 0801c1de 0840
     lsls r0,r0,#0x1    @ 0801c1e0 4000
-    ldr r1, DAT_0801c204                     @ 0801c1e2 0849
+    ldr r1, demo_shuen_state_machine_substate_clear_mask_f @ 0801c1e2 0849
     ands r1,r2    @ 0801c1e4 1140
     orrs r1,r0    @ 0801c1e6 0143
     .hword 0x4640    @ 0801c1e8 4046
@@ -19248,10 +19265,10 @@ LAB_0801c1ec:
     bl tick_shuen_anim_slots_batch           @ 0801c1fc fff7eafc
     b switchD_0801bd2e__default              @ 0801c200 0ce0
     .zero  0x2
-DAT_0801c204:
-    .word  0xfffffe01                     @ 0801c204 01feffff
+demo_shuen_state_machine_substate_clear_mask_f:
+    .word  DEMO_CLEAR_BITS_8_1            @ 0801c204 01feffff
 switchD_0801bd2e__caseD_6:
-    bl check_blend_transition_done           @ 0801c208 f8f774fb  -- case 6 WAIT_FADEOUT: 等最终 fade-out
+    bl check_blend_transition_done           @ 0801c208 f8f774fb  -- case 6 WAIT_FADEOUT: check_blend_transition_done
     cmp r0,#0x0                              @ 0801c20c 0028
     bne switchD_0801bd2e__default            @ 0801c20e 05d1
     adds r1,r6,#0x0    @ 0801c210 311c
@@ -19265,20 +19282,20 @@ switchD_0801bd2e__default:
     bl init_gl_palette_slot_flags            @ 0801c220 f8f79eff
     bl check_blend_transition_done           @ 0801c224 f8f766fb  -- FUN_080148f4 final ready check
     cmp r0,#0x0                              @ 0801c228 0028
-    bne LAB_0801c23c                         @ 0801c22a 07d1  -- r0 != 0 (gl busy) -> 走 cleanup return 0 路径
+    bne LAB_0801c23c                         @ 0801c22a 07d1  -- r0 != 0 (gl busy) -> skip cleanup return 0 path
     adds r0,r6,#0x0    @ 0801c22c 301c
     adds r0,#0x8c    @ 0801c22e 8c30
-    ldrb r0,[r0,#0x0]                        @ 0801c230 0078  -- 检查 gDemoState[+0x8c] bit0 (done flag)
+    ldrb r0,[r0,#0x0]                        @ 0801c230 0078  -- read gDemoState[+0x8c] bit0 (done flag)
     lsls r0,r0,#0x1f    @ 0801c232 c007
     cmp r0,#0x0                              @ 0801c234 0028
     beq LAB_0801c23c                         @ 0801c236 01d0
-    movs r0,#0x1    @ 0801c238 0120  -- bit0 set + gl ready -> r0 = 1 (busy, 等下一帧)
+    movs r0,#0x1    @ 0801c238 0120  -- bit0 set + gl ready -> r0=1 (busy, one more frame)
     b LAB_0801c242                           @ 0801c23a 02e0
 LAB_0801c23c:
     bl tick_blend_transition_step            @ 0801c23c f8f76afb  -- FUN_08014914 final cleanup; r0 = 0 (done)
     movs r0,#0x0    @ 0801c240 0020
 LAB_0801c242:
-    add sp,#0x20                             @ 0801c242 08b0  -- epilogue: 返回 r0 (1=busy / 0=done)
+    add sp,#0x20                             @ 0801c242 08b0  -- epilogue: return r0 (1=busy / 0=done)
     pop {r3,r4,r5}                           @ 0801c244 38bc
     .hword 0x4698    @ 0801c246 9846
     .hword 0x46a1    @ 0801c248 a146
@@ -19298,8 +19315,8 @@ LAB_0801c242:
 @ STEP_ADVANCE_MASK = 0xffc03fff (step field clear mask)
 tick_scene_step_by_step_table_a:
     push {r4,lr}                             @ 0801c254 10b5
-    ldr r1, DWORD_0801c298                   @ 0801c256 1049
-    ldr r0, DWORD_0801c29c                   @ 0801c258 1048
+    ldr r1, tick_scene_step_by_step_table_a_step_table @ 0801c256 1049
+    ldr r0, tick_scene_step_by_step_table_a_ptr_gprng @ 0801c258 1048
     movs r2,#0x81    @ 0801c25a 8122
     lsls r2,r2,#0x2    @ 0801c25c 9200
     adds r4,r0,r2    @ 0801c25e 8418
@@ -19321,7 +19338,7 @@ tick_scene_step_by_step_table_a:
     movs r0,#0xff    @ 0801c280 ff20
     ands r1,r0    @ 0801c282 0140
     lsls r1,r1,#0xe    @ 0801c284 8903
-    ldr r0, DWORD_0801c2a0                   @ 0801c286 0648
+    ldr r0, tick_scene_step_by_step_table_a_step_idx_clear_mask @ 0801c286 0648
     ands r0,r2    @ 0801c288 1040
     orrs r0,r1    @ 0801c28a 0843
     str r0,[r4,#0x0]                         @ 0801c28c 2060
@@ -19330,12 +19347,12 @@ LAB_0801c28e:
     movs r0,#0x0    @ 0801c292 0020
     b LAB_0801c2a6                           @ 0801c294 07e0
     .zero  0x2
-DWORD_0801c298:
-    .word  0x09e589a4                     @ 0801c298 a489e509
-DWORD_0801c29c:
+tick_scene_step_by_step_table_a_step_table:
+    .word  0x09e589a4                     @ 0801c298 a489e509  ROM step table A base - scene step fn ptrs (0x09e589a4)
+tick_scene_step_by_step_table_a_ptr_gprng:
     .word  gPrng                          @ 0801c29c 40000003
-DWORD_0801c2a0:
-    .word  0xffc03fff                     @ 0801c2a0 ff3fc0ff
+tick_scene_step_by_step_table_a_step_idx_clear_mask:
+    .word  NAME_INPUT_PAGE_STATE_CLEAR    @ 0801c2a0 ff3fc0ff  bits[21:14] clear mask for step index field in gPrng+0x204
 LAB_0801c2a4:
     movs r0,#0x1    @ 0801c2a4 0120
 LAB_0801c2a6:
@@ -19343,29 +19360,29 @@ LAB_0801c2a6:
     pop {r1}                                 @ 0801c2a8 02bc
     bx r1                                    @ 0801c2aa 0847
 
-@ Full GL display state reset called at scene transitions. Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). No input params (r0 clobbered at entry). Returns r0=1 (success). Sequence: (1) bios_cpu_set fill-zero EWRAM 0x02029eb0 192 bytes; (2) gl_clear_vram_palram_scroll; (3) DISPCNT(0x04000000)=0x1741, BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; (4) gl_set_brightness(0x3F,-16); (5) gl_state_init; (6) reset_ig2d_load_counters. Side-effects: EWRAM cleared; IO regs written; GL state reset + IG2D load counters reset. Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, ZERO_FILL_CTRL=0x05000030.
+@ Full GL display state reset called at scene transitions. Called by tick_scene_step_by_step_table_b, tick_scene_step_by_step_table_c, and play_ui_effect_3b (0x080bc918). No input params (r0 clobbered at entry). Returns r0=1 (success). Sequence: (1) bios_cpu_set fill-zero EWRAM 0x02029eb0 192 bytes; (2) gl_clear_vram_palram_scroll; (3) DISPCNT(0x04000000)=0x1741, BG0CNT(0x04000008)=0x1D81, BG1CNT(0x0400000A)=0x1E82, BG2CNT(0x0400000C)=0x1F8B; (4) gl_set_brightness(0x3F,-16); (5) gl_state_init; (6) reset_ig2d_load_counters. Side-effects: EWRAM cleared; IO regs written; GL state reset + IG2D load counters reset. Constants: DISPCNT_VAL=0x1741, BG0CNT_VAL=0x1D81, BG1CNT_VAL=0x1E82, BG2CNT_VAL=0x1F8B, ZERO_FILL_CTRL=0x05000030.
 reset_gl_display_state:
     push {lr}                                @ 0801c2ac 00b5
     sub sp,#0x4                              @ 0801c2ae 81b0
-    ldr r1, DAT_0801c2f8                     @ 0801c2b0 1149
+    ldr r1, reset_gl_display_state_gvija_state @ 0801c2b0 1149
     movs r0,#0x0    @ 0801c2b2 0020
     str r0,[sp,#0x0]                         @ 0801c2b4 0090
-    ldr r2, DAT_0801c2fc                     @ 0801c2b6 114a
+    ldr r2, reset_gl_display_state_cpuset_ctrl @ 0801c2b6 114a
     .hword 0x4668    @ 0801c2b8 6846
     bl bios_cpu_set                          @ 0801c2ba f2f09df8
     bl gl_clear_vram_palram_scroll           @ 0801c2be f8f7bbf9
     movs r1,#0x80    @ 0801c2c2 8021
     lsls r1,r1,#0x13    @ 0801c2c4 c904
-    ldr r0, DAT_0801c300                     @ 0801c2c6 0e48
+    ldr r0, reset_gl_display_state_dispcnt_init @ 0801c2c6 0e48
     strh r0,[r1,#0x0]                        @ 0801c2c8 0880
     adds r1,#0x8    @ 0801c2ca 0831
-    ldr r0, DAT_0801c304                     @ 0801c2cc 0d48
+    ldr r0, reset_gl_display_state_bg0cnt_init @ 0801c2cc 0d48
     strh r0,[r1,#0x0]                        @ 0801c2ce 0880
     adds r1,#0x2    @ 0801c2d0 0231
-    ldr r0, DAT_0801c308                     @ 0801c2d2 0d48
+    ldr r0, reset_gl_display_state_bg1cnt_init @ 0801c2d2 0d48
     strh r0,[r1,#0x0]                        @ 0801c2d4 0880
     adds r1,#0x2    @ 0801c2d6 0231
-    ldr r0, DAT_0801c30c                     @ 0801c2d8 0c48
+    ldr r0, reset_gl_display_state_bg2cnt_init @ 0801c2d8 0c48
     strh r0,[r1,#0x0]                        @ 0801c2da 0880
     movs r1,#0x10    @ 0801c2dc 1021
     rsbs r1,r1,#0    @ 0801c2de 4942
@@ -19378,18 +19395,18 @@ reset_gl_display_state:
     pop {r1}                                 @ 0801c2f2 02bc
     bx r1                                    @ 0801c2f4 0847
     .zero  0x2
-DAT_0801c2f8:
-    .word  0x02029eb0                     @ 0801c2f8 b09e0202
-DAT_0801c2fc:
-    .word  0x05000030                     @ 0801c2fc 30000005
-DAT_0801c300:
-    .word  0x00001741                     @ 0801c300 41170000
-DAT_0801c304:
-    .word  0x00001d81                     @ 0801c304 811d0000
-DAT_0801c308:
-    .word  0x00001e82                     @ 0801c308 821e0000
-DAT_0801c30c:
-    .word  0x00001f8b                     @ 0801c30c 8b1f0000
+reset_gl_display_state_gvija_state:
+    .word  gVijaState                     @ 0801c2f8 b09e0202  bios_cpu_set fill-zero: clear 0xc0 bytes from gVijaState
+reset_gl_display_state_cpuset_ctrl:
+    .word  VIJA_CPUSET_FILL_CTRL          @ 0801c2fc 30000005  bios_cpu_set fill+32bit: count=0x30 words (0xc0 bytes) to zero gVijaState
+reset_gl_display_state_dispcnt_init:
+    .word  VIJA_DISPCNT_INIT              @ 0801c300 41170000  DISPCNT init: mode1 + OBJ+BG0-1 + OBJ 1-D
+reset_gl_display_state_bg0cnt_init:
+    .word  VIJA_BG0CNT_INIT               @ 0801c304 811d0000
+reset_gl_display_state_bg1cnt_init:
+    .word  VIJA_BG1CNT_INIT               @ 0801c308 821e0000
+reset_gl_display_state_bg2cnt_init:
+    .word  VIJA_BG2CNT_INIT               @ 0801c30c 8b1f0000
 
 @ vija scene BG GFX loader - embedded ROM data variant. Called by load_vija_bg_gfx_by_mode (0x0801c484) when r0==0. Copies 16-byte BG resource header from 0x09e3d834 to stack (ldmia+str x4); memcpy 8-byte BG params from 0x09e3d844. Configures OAM: [r1+0x14] bits[3:0]=tile_shape, [r1+0x17] bit6=priority(0x40), [r1+0x18] bits[6:0]=tile_base_idx, bits[14:7]=palette_bank<<7. Calls apply_gfx_resource_list -> BG tile+palette VRAM write. Params: r0=u8 tile_group_index [0..12], r1=ptr oam_entry, r2=u8 tile_shape [0..15], r3=u8 tile_base_idx [0..127], [sp+0]=palette_bank [0..127]. Returns void. Constants: VIJA_STATE=0x02029eb0, VIJA_BG_RES_HEADER=0x09e3d834, VIJA_BG_PARAMS=0x09e3d844, OAM_PRIORITY_BIT=0x40, OAM_TILE_MASK=0xffffc07f.
 load_vija_bg_gfx_embedded:
@@ -19404,17 +19421,17 @@ load_vija_bg_gfx_embedded:
     .hword 0x4691    @ 0801c320 9146
     .hword 0x4698    @ 0801c322 9846
     ldr r4,[sp,#0x60]                        @ 0801c324 189c
-    ldr r5, DAT_0801c3e4                     @ 0801c326 2f4d
+    ldr r5, load_vija_bg_gfx_embedded_gvija_state @ 0801c326 2f4d
     add r0,sp,#0x24                          @ 0801c328 09a8
     .hword 0x4682    @ 0801c32a 8246
     .hword 0x4651    @ 0801c32c 5146
-    ldr r0, DAT_0801c3e8                     @ 0801c32e 2e48
+    ldr r0, load_vija_bg_gfx_embedded_bg_res_header @ 0801c32e 2e48
     ldmia r0!,{r2,r3,r6}                     @ 0801c330 4cc8
     stmia r1!,{r2,r3,r6}                     @ 0801c332 4cc1
     ldr r0,[r0,#0x0]                         @ 0801c334 0068
     str r0,[r1,#0x0]                         @ 0801c336 0860
     add r6,sp,#0x34                          @ 0801c338 0dae
-    ldr r1, DAT_0801c3ec                     @ 0801c33a 2c49
+    ldr r1, load_vija_bg_gfx_embedded_bg_params @ 0801c33a 2c49
     adds r0,r6,#0x0    @ 0801c33c 301c
     movs r2,#0x8    @ 0801c33e 0822
     bl memcpy                                @ 0801c340 f2f00cfb
@@ -19454,7 +19471,7 @@ load_vija_bg_gfx_embedded:
     movs r0,#0x7f    @ 0801c388 7f20
     ands r4,r0    @ 0801c38a 0440
     lsls r4,r4,#0x7    @ 0801c38c e401
-    ldr r0, DAT_0801c3f0                     @ 0801c38e 1848
+    ldr r0, load_vija_bg_gfx_embedded_oam_palette_mask @ 0801c38e 1848
     ldrh r6,[r1,#0x18]                       @ 0801c390 0e8b
     ands r0,r6    @ 0801c392 3040
     orrs r0,r4    @ 0801c394 2043
@@ -19496,14 +19513,14 @@ load_vija_bg_gfx_embedded:
     pop {r4,r5,r6,r7}                        @ 0801c3de f0bc
     pop {r0}                                 @ 0801c3e0 01bc
     bx r0                                    @ 0801c3e2 0047
-DAT_0801c3e4:
-    .word  0x02029eb0                     @ 0801c3e4 b09e0202
-DAT_0801c3e8:
-    .word  0x09e3d834                     @ 0801c3e8 34d8e309
-DAT_0801c3ec:
-    .word  0x09e3d844                     @ 0801c3ec 44d8e309
-DAT_0801c3f0:
-    .word  0xffffc07f                     @ 0801c3f0 7fc0ffff
+load_vija_bg_gfx_embedded_gvija_state:
+    .word  gVijaState                     @ 0801c3e4 b09e0202
+load_vija_bg_gfx_embedded_bg_res_header:
+    .word  0x09e3d834                     @ 0801c3e8 34d8e309  vija BG embedded resource header 16B (0x09e3d834)
+load_vija_bg_gfx_embedded_bg_params:
+    .word  0x09e3d844                     @ 0801c3ec 44d8e309  vija BG embedded params 8B coord table (0x09e3d844)
+load_vija_bg_gfx_embedded_oam_palette_mask:
+    .word  DEMO_CLEAR_BITS_13_7           @ 0801c3f0 7fc0ffff
 
 @ vija scene BG GFX loader - file system variant. Called by load_vija_bg_gfx_by_mode (0x0801c484) when r0==1. Non-APCS input: r8=ptr oam_entry (entry .hword 0x4668 = mov r0,r8). zero_struct_36bytes(r8) clears OAM buffer; fs_load(0x09e3d84c, 0) loads vija BG/OBJ files. OAM attr: [r1+0x14] bits[3:0]=tile_shape, [r1+0x17] bits[5:0]=0 (clear priority+flip), [r1+0x18] tile_base_idx + palette_bank<<7, [r1+0x1b] bit2=1 (OBJ enable). apply_gfx_resource_list writes VRAM. Params: r8=ptr oam_entry (non-APCS), r2=tile_shape [0..15], r3=tile_base_idx [0..127], [sp+0x34]=palette_bank [0..127]. Returns void. Constants: VIJA_FS_PATH_LIST=0x09e3d84c, OAM_TILE_MASK=0xffffc07f, OBJ_ENABLE=0x4.
 load_vija_bg_gfx_from_fs:
@@ -19514,7 +19531,7 @@ load_vija_bg_gfx_from_fs:
     ldr r5,[sp,#0x34]                        @ 0801c3fc 0d9d
     .hword 0x4668    @ 0801c3fe 6846
     bl zero_struct_36bytes                   @ 0801c400 f9f7e2fd
-    ldr r0, DAT_0801c478                     @ 0801c404 1c48
+    ldr r0, load_vija_bg_gfx_from_fs_bg_fs_params @ 0801c404 1c48
     movs r1,#0x0    @ 0801c406 0021
     bl fs_load                               @ 0801c408 f8f7cefd
     str r0,[sp,#0x0]                         @ 0801c40c 0090
@@ -19538,7 +19555,7 @@ load_vija_bg_gfx_from_fs:
     movs r0,#0x7f    @ 0801c430 7f20
     ands r5,r0    @ 0801c432 0540
     lsls r5,r5,#0x7    @ 0801c434 ed01
-    ldr r0, DAT_0801c47c                     @ 0801c436 1148
+    ldr r0, load_vija_bg_gfx_from_fs_oam_palette_mask @ 0801c436 1148
     ldrh r2,[r1,#0x18]                       @ 0801c438 0a8b
     ands r0,r2    @ 0801c43a 1040
     orrs r0,r5    @ 0801c43c 2843
@@ -19549,7 +19566,7 @@ load_vija_bg_gfx_from_fs:
     ands r0,r2    @ 0801c446 1040
     strb r0,[r1,#0x17]                       @ 0801c448 c875
     ldr r0,[sp,#0x18]                        @ 0801c44a 0698
-    ldr r1, DAT_0801c480                     @ 0801c44c 0c49
+    ldr r1, load_vija_bg_gfx_from_fs_tile_shape_clear_mask @ 0801c44c 0c49
     ands r0,r1    @ 0801c44e 0840
     str r0,[sp,#0x18]                        @ 0801c450 0690
     movs r0,#0x41    @ 0801c452 4120
@@ -19570,14 +19587,14 @@ load_vija_bg_gfx_from_fs:
     pop {r0}                                 @ 0801c472 01bc
     bx r0                                    @ 0801c474 0047
     .zero  0x2
-DAT_0801c478:
-    .word  0x09e3d84c                     @ 0801c478 4cd8e309
-DAT_0801c47c:
-    .word  0xffffc07f                     @ 0801c47c 7fc0ffff
-DAT_0801c480:
-    .word  0xfffe3fff                     @ 0801c480 ff3ffeff
+load_vija_bg_gfx_from_fs_bg_fs_params:
+    .word  0x09e3d84c                     @ 0801c478 4cd8e309  vija BG fs path ptr (wija_bg.LZ5bg variant, 0x09e3d84c)
+load_vija_bg_gfx_from_fs_oam_palette_mask:
+    .word  DEMO_CLEAR_BITS_13_7           @ 0801c47c 7fc0ffff
+load_vija_bg_gfx_from_fs_tile_shape_clear_mask:
+    .word  DEMO_CLEAR_BITS_16_14          @ 0801c480 ff3ffeff  clear bits[16:14]: OAM resource struct tile shape upper field
 
-@ vija scene BG GFX load dispatcher by mode. Called by tick_bg_scroll_anim_frame (0x0801c6b0) and FUN_0801cb00. r0=u8 load_mode: 0=load_vija_bg_gfx_embedded, 1=load_vija_bg_gfx_from_fs, other=no-op. Forwards r1..r3 and two stack params unchanged. No direct VRAM side-effects. Params: r0=load_mode, r1=tile_group_index [0..3], r2=ptr oam_entry, r3=tile_base_idx [0..127], [sp+0x10]=palette_bank, [sp+0x14]=extra_param. Returns void.
+@ vija scene BG GFX load dispatcher by mode. Called by tick_bg_scroll_anim_frame (0x0801c6b0) and run_vija_scene_state_machine. r0=u8 load_mode: 0=load_vija_bg_gfx_embedded, 1=load_vija_bg_gfx_from_fs, other=no-op. Forwards r1..r3 and two stack params unchanged. No direct VRAM side-effects. Params: r0=load_mode, r1=tile_group_index [0..3], r2=ptr oam_entry, r3=tile_base_idx [0..127], [sp+0x10]=palette_bank, [sp+0x14]=extra_param. Returns void.
 load_vija_bg_gfx_by_mode:
     push {r4,r5,lr}                          @ 0801c484 30b5
     sub sp,#0x4                              @ 0801c486 81b0
@@ -19615,9 +19632,9 @@ LAB_0801c4b6:
 load_vija_obj_resource_by_region:
     push {r4,r5,r6,lr}                       @ 0801c4c0 70b5
     sub sp,#0x34                             @ 0801c4c2 8db0
-    ldr r4, DAT_0801c504                     @ 0801c4c4 0f4c
+    ldr r4, load_vija_obj_resource_by_region_gvija_state @ 0801c4c4 0f4c
     add r2,sp,#0x14                          @ 0801c4c6 05aa
-    ldr r1, DAT_0801c508                     @ 0801c4c8 0f49
+    ldr r1, load_vija_obj_resource_by_region_obj_res_table @ 0801c4c8 0f49
     ldmia r1!,{r3,r5,r6}                     @ 0801c4ca 68c9
     stmia r2!,{r3,r5,r6}                     @ 0801c4cc 68c2
     ldmia r1!,{r3,r5,r6}                     @ 0801c4ce 68c9
@@ -19646,22 +19663,22 @@ load_vija_obj_resource_by_region:
     pop {r4,r5,r6}                           @ 0801c4fe 70bc
     pop {r0}                                 @ 0801c500 01bc
     bx r0                                    @ 0801c502 0047
-DAT_0801c504:
-    .word  0x02029eb0                     @ 0801c504 b09e0202
-DAT_0801c508:
-    .word  0x09e3d964                     @ 0801c508 64d9e309
+load_vija_obj_resource_by_region_gvija_state:
+    .word  gVijaState                     @ 0801c504 b09e0202
+load_vija_obj_resource_by_region_obj_res_table:
+    .word  0x09e3d964                     @ 0801c508 64d9e309  vija OBJ resource table JP/US 8-ptr array (0x09e3d964)
 
-@ vija scene OBJ resource load entry with JP/US region gate. Called by FUN_0801cf74, FUN_0801cfcc, and play_ui_effect_3b (0x080bc918). No input params. Returns r0=1 (always). ROM header 0x080000ae u16 high byte: != 0x4a ('J') -> use_us_variant=1. If JP: [0x02006c2c] bits[2:0] != 0 -> use_us_variant=1. Calls load_vija_obj_resource_by_region(use_us_variant). Constants: ROM_REGION_CODE_ADDR=0x080000ae, REGION_CODE_JP=0x4a, REGION_FLAGS_OFFSET=0x6c2c, REGION_FLAGS_MASK=0x7.
+@ vija scene OBJ resource load entry with JP/US region gate. Called by tick_scene_step_by_step_table_b, tick_scene_step_by_step_table_c, and play_ui_effect_3b (0x080bc918). No input params. Returns r0=1 (always). ROM header 0x080000ae u16 high byte: != 0x4a ('J') -> use_us_variant=1. If JP: [0x02006c2c] bits[2:0] != 0 -> use_us_variant=1. Calls load_vija_obj_resource_by_region(use_us_variant). Constants: ROM_REGION_CODE_ADDR=0x080000ae, REGION_CODE_JP=0x4a, REGION_FLAGS_OFFSET=0x6c2c, REGION_FLAGS_MASK=0x7.
 load_vija_obj_resource_gated:
     push {lr}                                @ 0801c50c 00b5
     movs r2,#0x0    @ 0801c50e 0022
-    ldr r0, DAT_0801c538                     @ 0801c510 0948
+    ldr r0, load_vija_obj_resource_by_region_rom_region_addr @ 0801c510 0948
     ldrh r0,[r0,#0x0]                        @ 0801c512 0088
     lsrs r0,r0,#0x8    @ 0801c514 000a
     cmp r0,#0x4a                             @ 0801c516 4a28
     bne LAB_0801c52a                         @ 0801c518 07d1
-    ldr r1, DAT_0801c53c                     @ 0801c51a 0849
-    ldr r0, DAT_0801c540                     @ 0801c51c 0848
+    ldr r1, load_vija_obj_resource_by_region_ewram_base @ 0801c51a 0849
+    ldr r0, load_vija_obj_resource_by_region_gsettings_off @ 0801c51c 0848
     adds r1,r1,r0    @ 0801c51e 0918
     movs r0,#0x7    @ 0801c520 0720
     ldrb r1,[r1,#0x0]                        @ 0801c522 0978
@@ -19676,12 +19693,12 @@ LAB_0801c52c:
     movs r0,#0x1    @ 0801c532 0120
     pop {r1}                                 @ 0801c534 02bc
     bx r1                                    @ 0801c536 0847
-DAT_0801c538:
-    .word  0x080000ae                     @ 0801c538 ae000008
-DAT_0801c53c:
-    .word  0x02000000                     @ 0801c53c 00000002
-DAT_0801c540:
-    .word  0x00006c2c                     @ 0801c540 2c6c0000
+load_vija_obj_resource_by_region_rom_region_addr:
+    .word  ROM_REGION_CODE_ADDR           @ 0801c538 ae000008  ROM header game-code region address (JP detect)
+load_vija_obj_resource_by_region_ewram_base:
+    .word  EWRAM_BASE                     @ 0801c53c 00000002
+load_vija_obj_resource_by_region_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0801c540 2c6c0000  gSettings offset from EWRAM_BASE
 
 @ Called by FUN_0801c560 and FUN_0801c59c during background scroll frame updates. r0 = horizontal offset (BG3HOFS), r1 = vertical offset (BG3VOFS); both are ANDed with mask 0x1ff (9-bit width) then written to the corresponding IO registers. Side effects: BG3HOFS (0x04000016) := r0 & 0x1ff, BG3VOFS (0x04000018) := r1 & 0x1ff. Leaf tool function for 9-bit precision write to background layer 3 scroll registers.
 @ 
@@ -19690,19 +19707,19 @@ DAT_0801c540:
 @ BG3HOFS = 0x04000016 (background layer 3 horizontal scroll offset register)
 @ BG3VOFS = 0x04000018 (background layer 3 vertical scroll offset register)
 apply_bg3_scroll_masked:
-    ldr r3, DWORD_0801c554                   @ 0801c544 034b
+    ldr r3, apply_bg3_scroll_masked_scroll_mask @ 0801c544 034b
     ands r0,r3    @ 0801c546 1840
-    ldr r2, DWORD_0801c558                   @ 0801c548 034a
+    ldr r2, apply_bg3_scroll_masked_ptr_bg3hofs @ 0801c548 034a
     strh r0,[r2,#0x0]                        @ 0801c54a 1080
     ands r1,r3    @ 0801c54c 1940
-    ldr r0, DWORD_0801c55c                   @ 0801c54e 0348
+    ldr r0, apply_bg3_scroll_masked_ptr_bg3vofs @ 0801c54e 0348
     strh r1,[r0,#0x0]                        @ 0801c550 0180
     bx lr                                    @ 0801c552 7047
-DWORD_0801c554:
-    .word  0x000001ff                     @ 0801c554 ff010000
-DWORD_0801c558:
+apply_bg3_scroll_masked_scroll_mask:
+    .word  DEMO_KEEP_BITS_8_0             @ 0801c554 ff010000
+apply_bg3_scroll_masked_ptr_bg3hofs:
     .word  BG3HOFS                        @ 0801c558 1c000004
-DWORD_0801c55c:
+apply_bg3_scroll_masked_ptr_bg3vofs:
     .word  BG3VOFS                        @ 0801c55c 1e000004
 
 @ Vija scene BG3 forward scroll tick. Each frame reads 0x02029eb0+0x8c (vija_state.scroll_phase, u8), takes mod 0xa0 to get scroll_offset [0..0x9f], passes to apply_bg3_scroll_masked(0, scroll_offset) to update BG3 horizontal scroll; then increments scroll_phase by 2, wraps back if new value exceeds 0xa0 (subtracts 0x9e). Symmetric sibling tick_vija_bg3_scroll_backward (0x0801c59c) scrolls in reverse with period 0xf0. Returns void (Pattern B). indeg=0, Sub-type A (no fn-ptr table reference found).
@@ -19713,7 +19730,7 @@ DWORD_0801c55c:
 @ Constants: VIJA_STATE=0x02029eb0; SCROLL_PHASE_OFF=0x8c; SCROLL_PERIOD=0xa0; SCROLL_STEP=2
 tick_vija_bg3_scroll_forward:
     push {r4,lr}                             @ 0801c560 10b5
-    ldr r0, DWORD_0801c598                   @ 0801c562 0d48
+    ldr r0, tick_vija_bg3_scroll_forward_gvija_state @ 0801c562 0d48
     adds r4,r0,#0x0    @ 0801c564 041c
     adds r4,#0x8c    @ 0801c566 8c34
     ldrb r0,[r4,#0x0]                        @ 0801c568 2078
@@ -19739,8 +19756,8 @@ LAB_0801c590:
     pop {r0}                                 @ 0801c592 01bc
     bx r0                                    @ 0801c594 0047
     .zero  0x2
-DWORD_0801c598:
-    .word  0x02029eb0                     @ 0801c598 b09e0202
+tick_vija_bg3_scroll_forward_gvija_state:
+    .word  gVijaState                     @ 0801c598 b09e0202
 
 @ Vija scene BG3 backward scroll tick. Each frame reads 0x02029eb0+0x8c (vija_state.scroll_phase, u8), takes mod 0xf0, negates the result, passes apply_bg3_scroll_masked(0, -offset) to update BG3 horizontal scroll in reverse; then increments scroll_phase by 2, wraps if new value exceeds 0xf0 (adds 0x12). Symmetric sibling tick_vija_bg3_scroll_forward (0x0801c560) scrolls forward with period 0xa0. Returns void (Pattern B). indeg=0, Sub-type A.
 @ 
@@ -19750,7 +19767,7 @@ DWORD_0801c598:
 @ Constants: VIJA_STATE=0x02029eb0; SCROLL_PHASE_OFF=0x8c; SCROLL_PERIOD=0xf0; SCROLL_STEP=2
 tick_vija_bg3_scroll_backward:
     push {r4,lr}                             @ 0801c59c 10b5
-    ldr r0, DWORD_0801c5d4                   @ 0801c59e 0d48
+    ldr r0, tick_vija_bg3_scroll_backward_gvija_state @ 0801c59e 0d48
     adds r4,r0,#0x0    @ 0801c5a0 041c
     adds r4,#0x8c    @ 0801c5a2 8c34
     ldrb r0,[r4,#0x0]                        @ 0801c5a4 2078
@@ -19776,16 +19793,16 @@ LAB_0801c5cc:
     pop {r0}                                 @ 0801c5ce 01bc
     bx r0                                    @ 0801c5d0 0047
     .zero  0x2
-DWORD_0801c5d4:
-    .word  0x02029eb0                     @ 0801c5d4 b09e0202
+tick_vija_bg3_scroll_backward_gvija_state:
+    .word  gVijaState                     @ 0801c5d4 b09e0202
 
-@ vija scene NNS G2D CellAnimation driver (Vija/VIJ_main.c). Called by update_dual_cell_anim_oam_pos (0x0801c74c) and FUN_0801c794. r0=u8 obj_slot_idx [0..N-1]: read_obj_id_field validates; out-of-range -> suppress_assert_report (Vija/VIJ_main.c line=0xf2). r1=s16 anim_cmd: -2=OAM pos refresh only, -1=frame advance (rate 0x1000), >=0=seq step. r2=s16 x_pos, r3=s16 y_pos (lsls #0xc -> fp12). All paths end: dispatch_isd_cell_anim_oam_setup. Returns void. Side-effects: OAM updated; CellAnim state advanced. Constants: VIJA_STATE=0x02029eb0, ANIM_CMD_NO_UPDATE=-2, ANIM_CMD_FRAME_ADVANCE=-1, FRAME_ADVANCE_RATE=0x1000.
+@ vija scene NNS G2D CellAnimation driver (Vija/VIJ_main.c). Called by update_dual_cell_anim_oam_pos (0x0801c74c) and tick_vija_obj_anim_slot. r0=u8 obj_slot_idx [0..N-1]: read_obj_id_field validates; out-of-range -> suppress_assert_report (Vija/VIJ_main.c line=0xf2). r1=s16 anim_cmd: -2=OAM pos refresh only, -1=frame advance (rate 0x1000), >=0=seq step. r2=s16 x_pos, r3=s16 y_pos (lsls #0xc -> fp12). All paths end: dispatch_isd_cell_anim_oam_setup. Returns void. Side-effects: OAM updated; CellAnim state advanced. Constants: VIJA_STATE=0x02029eb0, ANIM_CMD_NO_UPDATE=-2, ANIM_CMD_FRAME_ADVANCE=-1, FRAME_ADVANCE_RATE=0x1000.
 drive_vija_obj_cell_anim:
     push {r4,r5,r6,r7,lr}                    @ 0801c5d8 f0b5
     sub sp,#0x28                             @ 0801c5da 8ab0
     adds r4,r0,#0x0    @ 0801c5dc 041c
     adds r5,r1,#0x0    @ 0801c5de 0d1c
-    ldr r7, DAT_0801c628                     @ 0801c5e0 114f
+    ldr r7, drive_vija_obj_cell_anim_gvija_state @ 0801c5e0 114f
     lsls r2,r2,#0xc    @ 0801c5e2 1203
     str r2,[sp,#0x20]                        @ 0801c5e4 0892
     lsls r3,r3,#0xc    @ 0801c5e6 1b03
@@ -19819,8 +19836,8 @@ LAB_0801c604:
     bl dispatch_cell_anim_frame_advance      @ 0801c620 f9f77cf8
     b LAB_0801c63e                           @ 0801c624 0be0
     .zero  0x2
-DAT_0801c628:
-    .word  0x02029eb0                     @ 0801c628 b09e0202
+drive_vija_obj_cell_anim_gvija_state:
+    .word  gVijaState                     @ 0801c628 b09e0202
 drive_vija_obj_cell_anim_vij_main_c_filename:
     .word  vij_main_c_filename            @ 0801c62c 84d9e309  Vija/VIJ_main.c
 drive_vija_obj_cell_anim_assert_anmid_ig2d_getanmsequencescoun_994:
@@ -19876,10 +19893,10 @@ apply_bg2_affine_fixed_angle:
     bx r0                                    @ 0801c690 0047
     .zero  0x2
 
-@ Per-frame BG2 affine rotation tick for play_ui_effect_3b scene. Called by FUN_0801cb00 each frame. No input params. Reads IWRAM 0x02029eb0+0x90 frame counter byte, increments (u8 wrap), zero-extends old value -> angle, calls apply_bg2_affine_fixed_angle(angle). Returns void. Side-effects: [0x02029eb0+0x90] incremented; BG2 affine regs written via callee.
+@ Per-frame BG2 affine rotation tick for play_ui_effect_3b scene. Called by run_vija_scene_state_machine each frame. No input params. Reads IWRAM 0x02029eb0+0x90 frame counter byte, increments (u8 wrap), zero-extends old value -> angle, calls apply_bg2_affine_fixed_angle(angle). Returns void. Side-effects: [0x02029eb0+0x90] incremented; BG2 affine regs written via callee.
 tick_bg2_affine_anim_frame:
     push {lr}                                @ 0801c694 00b5
-    ldr r1, DAT_0801c6ac                     @ 0801c696 0549
+    ldr r1, tick_bg2_affine_anim_frame_gvija_state @ 0801c696 0549
     adds r1,#0x90    @ 0801c698 9031
     ldrb r0,[r1,#0x0]                        @ 0801c69a 0878
     adds r2,r0,#0x1    @ 0801c69c 421c
@@ -19889,20 +19906,20 @@ tick_bg2_affine_anim_frame:
     bl apply_bg2_affine_fixed_angle          @ 0801c6a4 fff7e0ff
     pop {r0}                                 @ 0801c6a8 01bc
     bx r0                                    @ 0801c6aa 0047
-DAT_0801c6ac:
-    .word  0x02029eb0                     @ 0801c6ac b09e0202
+tick_bg2_affine_anim_frame_gvija_state:
+    .word  gVijaState                     @ 0801c6ac b09e0202
 
-@ Per-frame BG scroll and tile animation tick for play_ui_effect_3b scene. Called by FUN_0801cb00 each frame. r0=u32 tick_count. Updates only when tick_count mod 13 == 0. On trigger: memcpy 4-byte ROM params from 0x09e3d9cf; increments [0x02029eb0+0x91] AND 0x3 (4-frame cycle); calls load_vija_bg_gfx_by_mode(mode=0); writes BG0VOFS(0x04000012)=4. Returns void. Constants: MOD_PERIOD=13, SUB_FRAME_MASK=0x3, BG0VOFS=0x04000012.
+@ Per-frame BG scroll and tile animation tick for play_ui_effect_3b scene. Called by run_vija_scene_state_machine each frame. r0=u32 tick_count. Updates only when tick_count mod 13 == 0. On trigger: memcpy 4-byte ROM params from 0x09e3d9cf; increments [0x02029eb0+0x91] AND 0x3 (4-frame cycle); calls load_vija_bg_gfx_by_mode(mode=0); writes BG0VOFS(0x04000012)=4. Returns void. Constants: MOD_PERIOD=13, SUB_FRAME_MASK=0x3, BG0VOFS=0x04000012.
 tick_bg_scroll_anim_frame:
     push {r4,r5,lr}                          @ 0801c6b0 30b5
     sub sp,#0xc                              @ 0801c6b2 83b0
-    ldr r5, DAT_0801c704                     @ 0801c6b4 134d
+    ldr r5, tick_bg_scroll_anim_frame_gvija_state @ 0801c6b4 134d
     movs r1,#0xd    @ 0801c6b6 0d21
     bl __modsi3                              @ 0801c6b8 f1f0f0ff
     adds r4,r0,#0x0    @ 0801c6bc 041c
     cmp r4,#0x0                              @ 0801c6be 002c
     bne LAB_0801c6fa                         @ 0801c6c0 1bd1
-    ldr r1, DAT_0801c708                     @ 0801c6c2 1149
+    ldr r1, tick_bg_scroll_anim_frame_bg_frame_params @ 0801c6c2 1149
     add r0,sp,#0x8                           @ 0801c6c4 02a8
     movs r2,#0x4    @ 0801c6c6 0422
     bl memcpy                                @ 0801c6c8 f2f048f9
@@ -19925,7 +19942,7 @@ tick_bg_scroll_anim_frame:
     movs r2,#0x0    @ 0801c6ec 0022
     movs r3,#0x0    @ 0801c6ee 0023
     bl load_vija_bg_gfx_by_mode              @ 0801c6f0 fff7c8fe
-    ldr r1, PTR_BG0VOFS_0801c70c             @ 0801c6f4 0549
+    ldr r1, tick_bg_scroll_anim_frame_bg0vofs @ 0801c6f4 0549
     movs r0,#0x4    @ 0801c6f6 0420
     strh r0,[r1,#0x0]                        @ 0801c6f8 0880
 LAB_0801c6fa:
@@ -19934,12 +19951,12 @@ LAB_0801c6fa:
     pop {r0}                                 @ 0801c6fe 01bc
     bx r0                                    @ 0801c700 0047
     .zero  0x2
-DAT_0801c704:
-    .word  0x02029eb0                     @ 0801c704 b09e0202
-DAT_0801c708:
-    .word  0x09e3d9cf                     @ 0801c708 cfd9e309
-PTR_BG0VOFS_0801c70c:
-    .word  BG0VOFS                        @ 0801c70c 12000004
+tick_bg_scroll_anim_frame_gvija_state:
+    .word  gVijaState                     @ 0801c704 b09e0202
+tick_bg_scroll_anim_frame_bg_frame_params:
+    .word  0x09e3d9cf                     @ 0801c708 cfd9e309  vija BG frame cycle param table 4B (0x09e3d9cf)
+tick_bg_scroll_anim_frame_bg0vofs:
+    .word  BG0VOFS                        @ 0801c70c 12000004  BG0VOFS vertical scroll register
 
 @ Read field8 of a vija scene OBJ slot by index.
 @ r0 = slot_index; loads OBJ pointer from vija_state (0x02029EB0) + 0x8 + slot_index*4,
@@ -19948,7 +19965,7 @@ PTR_BG0VOFS_0801c70c:
 @ Constants: VIJA_STATE_BASE=0x02029EB0; OBJ_PTR_ARRAY_OFFSET=0x8.
 get_vija_obj_slot_field8:
     push {lr}                                @ 0801c710 00b5
-    ldr r1, DAT_0801c724                     @ 0801c712 0449
+    ldr r1, get_vija_obj_slot_field8_gvija_state @ 0801c712 0449
     lsls r0,r0,#0x2    @ 0801c714 8000
     adds r1,#0x8    @ 0801c716 0831
     adds r0,r0,r1    @ 0801c718 4018
@@ -19956,10 +19973,10 @@ get_vija_obj_slot_field8:
     bl get_title_ex_obj_field8               @ 0801c71c f8f7d4ff
     pop {r1}                                 @ 0801c720 02bc
     bx r1                                    @ 0801c722 0847
-DAT_0801c724:
-    .word  0x02029eb0                     @ 0801c724 b09e0202
+get_vija_obj_slot_field8_gvija_state:
+    .word  gVijaState                     @ 0801c724 b09e0202
 
-@ Scene internal 2-level phase counter advance. Called by FUN_0801c794; return value used for dispatch. r0=void* pSceneState: byte[2]=phase tick [0..7], byte[3]=phase index [0..3]. If byte[2]==7: byte[3]=(byte[3]+1)&0x3, byte[2]=0. Else: byte[2]++. Returns r0=u8 phase_index [0..3]. Leaf function. Side-effects: [r0+2] and [r0+3] updated.
+@ Scene internal 2-level phase counter advance. Called by tick_vija_obj_anim_slot; return value used for dispatch. r0=void* pSceneState: byte[2]=phase tick [0..7], byte[3]=phase index [0..3]. If byte[2]==7: byte[3]=(byte[3]+1)&0x3, byte[2]=0. Else: byte[2]++. Returns r0=u8 phase_index [0..3]. Leaf function. Side-effects: [r0+2] and [r0+3] updated.
 advance_scene_phase_counter:
     adds r2,r0,#0x0    @ 0801c728 021c
     ldrb r0,[r2,#0x2]                        @ 0801c72a 9078
@@ -19982,7 +19999,7 @@ LAB_0801c748:
     ldrb r0,[r2,#0x3]                        @ 0801c748 d078
     bx lr                                    @ 0801c74a 7047
 
-@ Update two ISD cell animation OAM entries simultaneously. Called by FUN_0801c794 (play_ui_effect_3b state machine). r0=u8 base_obj_index [0..7], r1=s16 sequence_idx [0..4], r2=s16 x_pos_px, r3=s16 y_pos_px. x -= 0x10, y -= 0x10 (center anchor). Calls drive_vija_obj_cell_anim(obj_index=2, seq_idx, x, y), then drive_vija_obj_cell_anim(obj_index=r0+3, seq_idx, x, y). [sp+0]=0, [sp+4]=0 for both. Returns void. Side-effects: OAM slots [2] and [r0+3] updated via dispatch_isd_cell_anim_oam_setup.
+@ Update two ISD cell animation OAM entries simultaneously. Called by tick_vija_obj_anim_slot (play_ui_effect_3b state machine). r0=u8 base_obj_index [0..7], r1=s16 sequence_idx [0..4], r2=s16 x_pos_px, r3=s16 y_pos_px. x -= 0x10, y -= 0x10 (center anchor). Calls drive_vija_obj_cell_anim(obj_index=2, seq_idx, x, y), then drive_vija_obj_cell_anim(obj_index=r0+3, seq_idx, x, y). [sp+0]=0, [sp+4]=0 for both. Returns void. Side-effects: OAM slots [2] and [r0+3] updated via dispatch_isd_cell_anim_oam_setup.
 update_dual_cell_anim_oam_pos:
     push {r4,r5,r6,lr}                       @ 0801c74c 70b5
     .hword 0x464e    @ 0801c74e 4e46
@@ -20019,7 +20036,7 @@ update_dual_cell_anim_oam_pos:
     pop {r0}                                 @ 0801c790 01bc
     bx r0                                    @ 0801c792 0047
 
-@ vija scene OBJ slot per-frame animation state machine tick. Called by tick_all_vija_obj_anim_slots (FUN_0801cadc) with stride=8 for each of 5 slot ctrl blocks at IWRAM 0x02029eb0+0x98+i*8 (i=[0..4]). r0=u8* slot_ctrl_ptr: byte[0]=phase [0..0x1e], byte[1]=sub-counter/seq-idx. Outer switch routes by phase; inner switch maps to x-coord variant (0x30/0x50 px). Active phases (1/0xa/3/0x1e/4/5): interpolate x/y from sub-counter, call drive_vija_obj_cell_anim. Phase 2: call advance_scene_phase_counter then update_dual_cell_anim_oam_pos. Phase 5: call drive_vija_obj_cell_anim twice with fixed x=-1, y=0x78, z=0x50, then exit. Phase 0 and invalid phases: return immediately. Side-effects: slot_ctrl_ptr byte[0]/byte[1] updated; OAM entry for active slot written. Constants: PHASE_MAX=0x1e, X_VARIANT_A=0x30, X_VARIANT_B=0x50, SIN_TABLE=0x09e399d0.
+@ vija scene OBJ slot per-frame animation state machine tick. Called by tick_all_vija_obj_anim_slots (tick_all_vija_obj_anim_slots) with stride=8 for each of 5 slot ctrl blocks at IWRAM 0x02029eb0+0x98+i*8 (i=[0..4]). r0=u8* slot_ctrl_ptr: byte[0]=phase [0..0x1e], byte[1]=sub-counter/seq-idx. Outer switch routes by phase; inner switch maps to x-coord variant (0x30/0x50 px). Active phases (1/0xa/3/0x1e/4/5): interpolate x/y from sub-counter, call drive_vija_obj_cell_anim. Phase 2: call advance_scene_phase_counter then update_dual_cell_anim_oam_pos. Phase 5: call drive_vija_obj_cell_anim twice with fixed x=-1, y=0x78, z=0x50, then exit. Phase 0 and invalid phases: return immediately. Side-effects: slot_ctrl_ptr byte[0]/byte[1] updated; OAM entry for active slot written. Constants: PHASE_MAX=0x1e, X_VARIANT_A=0x30, X_VARIANT_B=0x50, SIN_TABLE=0x09e399d0.
 tick_vija_obj_anim_slot:
     push {r4,r5,r6,r7,lr}                    @ 0801c794 f0b5
     .hword 0x4657    @ 0801c796 5746
@@ -20038,13 +20055,13 @@ tick_vija_obj_anim_slot:
     b switchD_0801c7ba__caseD_0              @ 0801c7b0 8ce1
 LAB_0801c7b2:
     lsls r0,r0,#0x2    @ 0801c7b2 8000
-    ldr r1, DAT_0801c7bc                     @ 0801c7b4 0149
+    ldr r1, tick_vija_obj_anim_slot_switch_table_ptr @ 0801c7b4 0149
     adds r0,r0,r1    @ 0801c7b6 4018
     ldr r0,[r0,#0x0]                         @ 0801c7b8 0068
 switchD_0801c7ba__switchD:
     .hword 0x4687    @ 0801c7ba 8746
-DAT_0801c7bc:
-    .word  0x0801c7c0                     @ 0801c7bc c0c70108
+tick_vija_obj_anim_slot_switch_table_ptr:
+    .word  0x0801c7c0                     @ 0801c7bc c0c70108  ptr to switch jump table at 0x0801c7c0
 switchD_0801c7ba__switchdataD_0801c7c0:
     .word  0x0801cacc                     @ 0801c7c0 ccca0108
     .word  0x0801c83c                     @ 0801c7c4 3cc80108
@@ -20108,14 +20125,14 @@ LAB_0801c85c:
     cmp r0,#0x1d                             @ 0801c870 1d28
     bhi switchD_0801c87c__caseD_4            @ 0801c872 47d8
     lsls r0,r0,#0x2    @ 0801c874 8000
-    ldr r1, DAT_0801c880                     @ 0801c876 0249
+    ldr r1, tick_vija_obj_anim_slot_inner_switch_table_ptr_b @ 0801c876 0249
     adds r0,r0,r1    @ 0801c878 4018
     ldr r0,[r0,#0x0]                         @ 0801c87a 0068
 switchD_0801c87c__switchD:
     .hword 0x4687    @ 0801c87c 8746
     .zero  0x2
-DAT_0801c880:
-    .word  0x0801c884                     @ 0801c880 84c80108
+tick_vija_obj_anim_slot_inner_switch_table_ptr_b:
+    .word  0x0801c884                     @ 0801c880 84c80108  ptr to inner switch jump table at 0x0801c884
 switchD_0801c87c__switchdataD_0801c884:
     .word  0x0801c8fc                     @ 0801c884 fcc80108
     .word  0x0801c8fc                     @ 0801c888 fcc80108
@@ -20157,7 +20174,7 @@ LAB_0801c902:
 switchD_0801c87c__caseD_4:
     .hword 0x4650    @ 0801c904 5046
     subs r5,r2,r0    @ 0801c906 151a
-    ldr r4, DAT_0801c95c                     @ 0801c908 144c
+    ldr r4, tick_vija_obj_anim_slot_trig_table_b @ 0801c908 144c
     lsls r0,r6,#0x6    @ 0801c90a b001
     movs r1,#0x1e    @ 0801c90c 1e21
     bl __divsi3                              @ 0801c90e f1f079fe
@@ -20197,8 +20214,8 @@ LAB_0801c954:
     strb r0,[r7,#0x0]                        @ 0801c956 3870
     b switchD_0801c7ba__caseD_0              @ 0801c958 b8e0
     .zero  0x2
-DAT_0801c95c:
-    .word  0x09e399d0                     @ 0801c95c d099e309
+tick_vija_obj_anim_slot_trig_table_b:
+    .word  trig_table                     @ 0801c95c d099e309  sin/cos lookup table (512B, 256 s16 entries, amplitude 256=Q8.8)
 switchD_0801c7ba__caseD_2:
     adds r0,r7,#0x0    @ 0801c960 381c
     bl advance_scene_phase_counter           @ 0801c962 fff7e1fe
@@ -20214,14 +20231,14 @@ switchD_0801c7ba__caseD_2:
     cmp r0,#0x1d                             @ 0801c978 1d28
     bhi switchD_0801c984__caseD_4            @ 0801c97a 47d8
     lsls r0,r0,#0x2    @ 0801c97c 8000
-    ldr r1, DAT_0801c988                     @ 0801c97e 0249
+    ldr r1, tick_vija_obj_anim_slot_inner_switch_table_ptr_c @ 0801c97e 0249
     adds r0,r0,r1    @ 0801c980 4018
     ldr r0,[r0,#0x0]                         @ 0801c982 0068
 switchD_0801c984__switchD:
     .hword 0x4687    @ 0801c984 8746
     .zero  0x2
-DAT_0801c988:
-    .word  0x0801c98c                     @ 0801c988 8cc90108
+tick_vija_obj_anim_slot_inner_switch_table_ptr_c:
+    .word  0x0801c98c                     @ 0801c988 8cc90108  ptr to inner switch jump table at 0x0801c98c
 switchD_0801c984__switchdataD_0801c98c:
     .word  0x0801ca04                     @ 0801c98c 04ca0108
     .word  0x0801ca04                     @ 0801c990 04ca0108
@@ -20319,7 +20336,7 @@ switchD_0801c7ba__caseD_4:
     adds r2,#0x20    @ 0801ca7c 2032
     movs r0,#0x50    @ 0801ca7e 5020
     str r0,[sp,#0x18]                        @ 0801ca80 0690
-    ldr r0, DAT_0801caa0                     @ 0801ca82 0748
+    ldr r0, tick_vija_obj_anim_slot_trig_table_c @ 0801ca82 0748
     lsls r4,r4,#0x1    @ 0801ca84 6400
     adds r4,r4,r0    @ 0801ca86 2418
     movs r0,#0x0    @ 0801ca88 0020
@@ -20333,8 +20350,8 @@ switchD_0801c7ba__caseD_4:
     strb r0,[r7,#0x1]                        @ 0801ca9a 7870
     b switchD_0801c7ba__caseD_0              @ 0801ca9c 16e0
     .zero  0x2
-DAT_0801caa0:
-    .word  0x09e399d0                     @ 0801caa0 d099e309
+tick_vija_obj_anim_slot_trig_table_c:
+    .word  trig_table                     @ 0801caa0 d099e309
 switchD_0801c7ba__caseD_5:
     movs r4,#0x1    @ 0801caa4 0124
     rsbs r4,r4,#0    @ 0801caa6 6442
@@ -20364,10 +20381,10 @@ switchD_0801c7ba__caseD_0:
     pop {r0}                                 @ 0801cad8 01bc
     bx r0                                    @ 0801cada 0047
 
-@ vija scene batch per-frame tick for all 5 OBJ animation slots. Loops i=[0..4] over IWRAM 0x02029eb0+0x98 with stride=8, calling tick_vija_obj_anim_slot(ptr) per slot. No parameters; returns void. Called by run_vija_scene_state_machine (FUN_0801cb00) in phase 4 (active anim) and phase 7 (transition). Constants: SLOT_BASE_OFFSET=0x98, SLOT_STRIDE=8, SLOT_COUNT=5.
+@ vija scene batch per-frame tick for all 5 OBJ animation slots. Loops i=[0..4] over IWRAM 0x02029eb0+0x98 with stride=8, calling tick_vija_obj_anim_slot(ptr) per slot. No parameters; returns void. Called by run_vija_scene_state_machine (run_vija_scene_state_machine) in phase 4 (active anim) and phase 7 (transition). Constants: SLOT_BASE_OFFSET=0x98, SLOT_STRIDE=8, SLOT_COUNT=5.
 tick_all_vija_obj_anim_slots:
     push {r4,r5,lr}                          @ 0801cadc 30b5
-    ldr r0, DAT_0801cafc                     @ 0801cade 0748
+    ldr r0, tick_all_vija_obj_anim_slots_gvija_state @ 0801cade 0748
     movs r5,#0x0    @ 0801cae0 0025
     adds r4,r0,#0x0    @ 0801cae2 041c
     adds r4,#0x98    @ 0801cae4 9834
@@ -20382,6 +20399,6 @@ LAB_0801cae6:
     pop {r0}                                 @ 0801caf6 01bc
     bx r0                                    @ 0801caf8 0047
     .zero  0x2
-DAT_0801cafc:
-    .word  0x02029eb0                     @ 0801cafc b09e0202
+tick_all_vija_obj_anim_slots_gvija_state:
+    .word  gVijaState                     @ 0801cafc b09e0202
 

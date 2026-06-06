@@ -176,6 +176,19 @@
 @ -----------------------------------------------------------------------------
 @ Demo 过场动画 (cinematic; demo/shuen, demo/exodia, demo/vija ...)
 @ -----------------------------------------------------------------------------
+.equ gVijaState,                 0x02029EB0  @ vija scene (play_ui_effect_3b) per-frame state struct (0xc0 bytes)
+                                             @ +0x8c = u8  scroll_phase (vija BG3 horizontal scroll counter)
+                                             @ +0x8d = u8  scene_main_state (10-phase state, run_vija_scene_state_machine)
+                                             @ +0x90 = u8  bg2_affine_angle_counter (tick_bg2_affine_anim_frame)
+                                             @ +0x91 = u8  bg_frame_cycle (mod 4, tick_bg_scroll_anim_frame)
+                                             @ +0x98 = u8[5*8] slot_ctrl (5 OBJ anim slots * 8B each, tick_vija_obj_anim_slot)
+                                             @ Consumers: reset_gl_display_state, load_vija_bg_gfx_embedded,
+                                             @   load_vija_obj_resource_by_region, tick_vija_bg3_scroll_forward,
+                                             @   tick_vija_bg3_scroll_backward, drive_vija_obj_cell_anim,
+                                             @   tick_bg2_affine_anim_frame, tick_bg_scroll_anim_frame,
+                                             @   get_vija_obj_slot_field8, tick_all_vija_obj_anim_slots,
+                                             @   run_vija_scene_state_machine (file 01)
+
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
                                              @ +0x88 = u32 fs_load 返回的解压数据指针
                                              @ +0x8c = u32 packed bitfield

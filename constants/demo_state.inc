@@ -33,6 +33,20 @@
 @ load_demo_bg_gfx_set1 第三个 apply 的扩展资源描述符 (内联打包值)
 .equ DEMO_EXTRA_RESOURCE_DESC, 0x141e0000
 
+@ -----------------------------------------------------------------------------
+@ Vija scene display reset constants (reset_gl_display_state)
+@ -----------------------------------------------------------------------------
+.equ VIJA_CPUSET_FILL_CTRL, 0x05000030  @ bios_cpu_set fill ctrl: count=0x30 words (=0xc0 bytes), fill+32bit
+                                         @ used by reset_gl_display_state to zero-fill gVijaState (0x02029eb0)
+.equ VIJA_DISPCNT_INIT,     0x00001741  @ DISPCNT init val: BG mode 1, OBJ+BG0-1, OBJ 1-D mapping
+.equ VIJA_BG0CNT_INIT,      0x00001d81  @ BG0CNT init val (scrbase=29, charbase=2, 256col, 32x32)
+.equ VIJA_BG1CNT_INIT,      0x00001e82  @ BG1CNT init val
+.equ VIJA_BG2CNT_INIT,      0x00001f8b  @ BG2CNT init val
+
+@ Additional bitfield mask
+.equ DEMO_CLEAR_BITS_16_14, 0xfffe3fff  @ clears bits[16:14] (~0x0001c000); OAM resource struct tile shape field
+                                         @ used by load_vija_bg_gfx_from_fs
+
 @ 注: FS 资源区指针 (0x09e396b8 等资源描述符/路径/断言串) 已结构化为 data/demo-exodia-resources.s,
 @ 代码侧 .word 直接引用其 GAS label (demo_sprite_resource_desc / demo_path_exodia* 等),
 @ 经 resolve_word_symbol 导出; 不再用 data-equate 常量 (单一命名源)。

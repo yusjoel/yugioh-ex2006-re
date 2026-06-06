@@ -126,7 +126,9 @@ gitignore 生成产物):
 | **Seg-7: name_input/banlist 场景 + carve J/K** | 0x18774..0x19a58 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0y): carve J(name_input_state_table+banlist_pass_char_group_ptr_table) + K(render_param+default_name); 20 EQ+38 REF+59 RENAME+3 PLATE; §5.1 登记 0x19640/0x20; byte-identical 9689337d |
 | **Seg-8: banlist password 渲染簇** | 0x19a58..0x1a794 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0z): carve host1(char_candidate/pass_char/alt_char/rom_password_table) + host2(4 obj path+resource_desc+2 bg path); 15 EQ+10 REF+37 RENAME+11 PLATE; §5.1 本段为空; byte-identical 9689337d |
 | **Seg-9: banlist/shuen 场景 (28 fn)** | 0x1a794..0x1b850 | ✅ R1/R2/R3/R4/R5/R7 完成 (见 §四.4.0aa): 6 EQ+56 REF+69 RENAME+5 PLATE_FIX+4 CJK_PLATE; carve 1/2/3 + disasm block B (5 stubs); §5.1 block A; byte-identical 9689337d |
+| **Seg-10: vija/shuen 场景 tick (32 fn)** | 0x1b850..0x1cb00 | ✅ R1/R2/R3/R5 完成 (见 §四.4.0ab): 33 EQ+21 REF+25 RENAME+5 DWORD+17 PLATE_FIX+1 CJK_PLATE+23 EOL_FIX; gVijaState(ewram.inc) + 6 新 EQ(demo_state.inc); byte-identical 9689337d |
 | 代码函数 (其余 ~166 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x19a58..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **file 00 全 10 段 ✅** | 0x080000c0..0x0801cb00 | **✅ 完成** — 全 10 段 byte-identical 9689337d |
 
 ---
 
@@ -788,9 +790,58 @@ FUNC_RENAME=0 (28 函数名与函数体一致, 无误名)。不需 ExportFunctio
 脚本: `tools/ghidra-labeling/RefineSeg9Slots.py` (A=6 B=56 C=69 D=5+4, 0 FAIL) + `DisassembleSeg9BlockB.py`。
 
 **踩坑**: disasm 后 Ghidra 未导出 stub 内部 literal pool labels (DAT_0801ad40/80/c0/fc/ae00) 作为独立行,
-但 `ldr rN, DAT_0801adXX` 仍引用这些名字。GAS 报 "invalid offset, value too big"。修复: 在
+但 `ldr rN, DAT_0801adXX` 仍引用这些名字。GAS 报 "invalid offset, value too big"。初次修复: 在
 `asm/00_system_str_vija.s` 中手动拆分 `.byte` 块, 在正确偏移处插入 `DAT_0801adXX:` label。
-byte-identical 验证确认字节不变。
+Seg-10 再次触发该问题 (headless re-analysis 每次重跑会清除这些临时 label); 永久修复方案:
+在 Ghidra 脚本里用 `createDWord(addr)` 明确定义 `.word` 数据类型 + 命名 label (DWORD_SLOTS),
+导出器据此输出带 label 的 `.word` 行, 不再依赖 `.byte` 合并/拆分。
+
+### 4.0ab Seg-10 完成记录: vija/shuen 场景 tick (0x0801b850..0x0801cb00, 32 fn) ✅
+
+load_demo_shuen_sprite_gfx / load_shuen_sprite_gfx_guarded / load_shuen_bg1_gfx_set /
+load_shuen_obj_resource_by_slot / load_shuen_obj_resource_slot0 /
+write_shuen_bg3_scroll_regs / tick_demo_shuen_bg3_hscroll / tick_shuen_bg3_vscroll_phase /
+advance_shuen_cell_anim_frame / tick_shuen_anim_slots_batch /
+apply_win0v_fadein_step / apply_win0v_fadeout_step / demo_shuen_state_machine /
+tick_scene_step_by_step_table_a / reset_gl_display_state /
+load_vija_bg_gfx_embedded / load_vija_bg_gfx_from_fs / load_vija_bg_gfx_by_mode /
+load_vija_obj_resource_by_region / load_vija_obj_resource_gated /
+apply_bg3_scroll_masked / tick_vija_bg3_scroll_forward / tick_vija_bg3_scroll_backward /
+drive_vija_obj_cell_anim / apply_bg2_affine_fixed_angle / tick_bg2_affine_anim_frame /
+tick_bg_scroll_anim_frame / get_vija_obj_slot_field8 / advance_scene_phase_counter /
+update_dual_cell_anim_oam_pos / tick_vija_obj_anim_slot / tick_all_vija_obj_anim_slots.
+vija 场景 tick 主体 + shuen 7-state 过场动画状态机。byte-identical SHA1 9689337d。
+
+**新增全局**: `gVijaState=0x02029eb0` (ewram.inc; vija per-frame 状态结构体 0xc0B;
+61 ROM refs; 独立于 gDemoState=0x02029ec0, 相距 0x10B, 两场景分时复用同一 EWRAM 块)。
+
+**Review 修正 (2 项)**: C5=复用 NAME_INPUT_PAGE_STATE_CLEAR(name_input.inc:28, 同值 0xffc03fff)
+代替新建 SCENE_STEP_IDX_CLEAR_MASK; C13=补 9 个遗漏自动名槽 (6 gDemoState REF + gPrng + BG3HOFS + BG3VOFS)。
+
+**踩坑 (DWORD_SLOTS)**: headless re-analysis 清除 dispatch_banlist_cursor_action 5 个 literal pool
+labels (0x0801ad40/80/c0/fc/ae00); 永久修复 = DWORD_SLOTS 在脚本里 createDWord + 命名。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1 EQ_SLOTS (复用) | DEMO_CLEAR_BITS_13_7×4 / DEMO_KEEP_BITS_8_0×2 / DEMO_CLEAR_BITS_8_1×7 / DEMO_CLEAR_BITS_16_9×5 / DEMO_CLEAR_BITS_14_13×1 / DEMO_CLEAR_BITS_12_8×3 / ROM_REGION_CODE_ADDR×1 / EWRAM_BASE×1 / GSETTINGS_OFFSET×1 / NAME_INPUT_PAGE_STATE_CLEAR×1 | 26 槽 |
+| R1 EQ_SLOTS (新建) | VIJA_CPUSET_FILL_CTRL / VIJA_DISPCNT_INIT / VIJA_BG0CNT_INIT / VIJA_BG1CNT_INIT / VIJA_BG2CNT_INIT (demo_state.inc) / DEMO_CLEAR_BITS_16_14 (demo_state.inc) | 6 槽/6 常量 |
+| R3 REF_SLOTS (gVijaState) | 0x02029eb0 新全局 (ewram.inc); 10 Seg-10 槽 | 10 槽 |
+| R3 REF_SLOTS (trig_table) | rom.s carve label 0x09e399d0; 2 Seg-10 槽 | 2 槽 |
+| R3 REF_SLOTS (gDemoState C13) | 6 遗漏自动名槽 → REF to 0x02029ec0 | 6 槽 |
+| R3 REF_SLOTS (gPrng/BG3HOFS/BG3VOFS C13) | 各 1 遗漏槽 → REF | 3 槽 |
+| R2 RENAME_SLOTS (ROM addr) | 14 ROM 地址槽 (资源描述符/路径/参数表等) | 14 槽 |
+| R2 RENAME_SLOTS (switch table ptr) | 4 内部跳转表指针槽 | 4 槽 |
+| R2 RENAME_SLOTS (PTR_ fix) | 7 PTR_ 槽改语义名 (BG3HOFS/VOFS/WININ/WINOUT/WIN0V×2/BG0VOFS) | 7 槽 |
+| DWORD_SLOTS (restore) | 5 个 literal pool 地址恢复 `.word` 数据类型 + 语义命名 | 5 槽 |
+| R5 PLATE_FIX | 17 处: 16 个 FUN_→现名 + 1 个 BG3HOFS 地址订正 (0x04000018→0x0400001c) | 17 处 |
+| R5 CJK plate 重写 | demo_shuen_state_machine 7-state 状态机 plate 全 ASCII 重写 | 1 plate |
+| R5 CJK EOL 替换 | demo_shuen_state_machine 体内 23 行 CJK inline 注释→ASCII | 23 行 |
+| 新增 constants | ewram.inc: gVijaState; demo_state.inc: VIJA_CPUSET_FILL_CTRL / VIJA_DISPCNT_INIT / VIJA_BG0/1/2CNT_INIT / DEMO_CLEAR_BITS_16_14 (6 新 EQ) | 2 文件 |
+
+FUNC_RENAME=0 (32 函数名与函数体一致)。carve=0 disasm=0 §5.1=0。
+脚本: `tools/ghidra-labeling/RefineSeg10Slots.py` (EQ=33 REF=21 RENAME=25+5 DWORD=5 PLATE_FIX=17 CJK_PLATE=1 EOL_FIX=23, 0 FAIL/SKIP)。
+
+**file 00 (00_system_str_vija.s) 全 10 段 (Seg-1..10) 细化完成 ✅** — byte-identical 9689337d 全程保持。
 
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
