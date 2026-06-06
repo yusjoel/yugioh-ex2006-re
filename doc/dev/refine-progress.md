@@ -60,7 +60,7 @@
 | 5a | write_tile_region | ✅ | b177f9a |
 | 5b | apply_bgdt/objd | ✅ | (committed) |
 | 5c | apply_gfx_resource_list + R4 disasm 63 SJIS stubs | ✅ | (committed) |
-| 5d | 0x171ec..0x1794c (15 fn + 2 carve + §5.1 0x17424/0x40) | ✅ | (pending commit) |
+| 5d | 0x171ec..0x1794c (15 fn + 2 carve + §5.1 0x17424/0x40) | ✅ | 8c4ec5a |
 | **6** | **0x1794c..0x18774 (incbin 0x186ce/0x22)** | **⬜ 下一步** | |
 | 7 | 0x18774..0x19a58 (incbin 0x19640/0x20) | ⬜ | |
 | 8 | 0x19a58..0x1a794 | ⬜ | |
