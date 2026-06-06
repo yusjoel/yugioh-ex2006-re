@@ -4833,7 +4833,7 @@ dispatch_cell_anim_frame_advance:
     bx r0                                    @ 08015724 0047
     .zero  0x2
 
-@ Called by FUN_08015820 and apply_bg_affine_by_angle_scale (0x08015868) (indeg=2). Computes BG affine transform matrix PA/PB/PC/PD from angle and x/y scale: 1) bios_div(0x01000000, scale_x/y) for fixed-point reciprocals (8.24); 2) lookup cos(angle)=trig_table[angle+0x40] and sin(angle)=trig_table[angle] (ROM 0x09e399d0, 256 s16 entries); 3) __muldi3(trig_val<<4, inv_scale) -> 8.8 fixed-point affine coefficient; PD=-cos*inv_scale_y. Results written to output buffer r3: [r3+0]=PA, [r3+4]=PB, [r3+8]=PC, [r3+0xc]=PD. r0=s32 scale_x, r1=s32 scale_y, r2=s32 angle [0..255], r3=ptr out_matrix. Returns r0=ptr out_matrix. Constants: TRIG_TABLE=0x09e399d0, FIXED_ONE=0x01000000.
+@ Called by setup_oam_affine_matrix_from_scale and apply_bg_affine_by_angle_scale (0x08015868) (indeg=2). Computes BG affine transform matrix PA/PB/PC/PD from angle and x/y scale: 1) bios_div(0x01000000, scale_x/y) for fixed-point reciprocals (8.24); 2) lookup cos(angle)=trig_table[angle+0x40] and sin(angle)=trig_table[angle] (ROM 0x09e399d0, 256 s16 entries); 3) __muldi3(trig_val<<4, inv_scale) -> 8.8 fixed-point affine coefficient; PD=-cos*inv_scale_y. Results written to output buffer r3: [r3+0]=PA, [r3+4]=PB, [r3+8]=PC, [r3+0xc]=PD. r0=s32 scale_x, r1=s32 scale_y, r2=s32 angle [0..255], r3=ptr out_matrix. Returns r0=ptr out_matrix. Constants: TRIG_TABLE=0x09e399d0, FIXED_ONE=0x01000000.
 compute_bg_affine_matrix_scaled:
     push {r4,r5,r6,r7,lr}                    @ 08015728 f0b5
     .hword 0x4657    @ 0801572a 5746
@@ -4855,7 +4855,7 @@ compute_bg_affine_matrix_scaled:
     .hword 0x4641    @ 0801574c 4146
     bl bios_div                              @ 0801574e f8f055fe
     .hword 0x4680    @ 08015752 8046
-    ldr r5, DAT_08015814                     @ 08015754 2f4d
+    ldr r5, compute_bg_affine_matrix_scaled_trig_table @ 08015754 2f4d
     movs r0,#0xff    @ 08015756 ff20
     ands r4,r0    @ 08015758 0440
     adds r0,r4,#0x0    @ 0801575a 201c
@@ -4875,8 +4875,8 @@ compute_bg_affine_matrix_scaled:
     adds r3,r7,#0x0    @ 08015776 3b1c
     adds r2,r6,#0x0    @ 08015778 321c
     bl __muldi3                              @ 0801577a f8f0f7ff
-    ldr r2, DAT_08015818                     @ 0801577e 264a
-    ldr r3, DAT_0801581c                     @ 08015780 264b
+    ldr r2, compute_bg_affine_matrix_scaled_fix12_round_lo @ 0801577e 264a
+    ldr r3, compute_bg_affine_matrix_scaled_fix12_round_hi @ 08015780 264b
     adds r0,r0,r2    @ 08015782 8018
     adcs r1,r3    @ 08015784 5941
     lsls r3,r1,#0x14    @ 08015786 0b05
@@ -4896,8 +4896,8 @@ compute_bg_affine_matrix_scaled:
     adds r3,r7,#0x0    @ 080157a2 3b1c
     adds r2,r6,#0x0    @ 080157a4 321c
     bl __muldi3                              @ 080157a6 f8f0e1ff
-    ldr r2, DAT_08015818                     @ 080157aa 1b4a
-    ldr r3, DAT_0801581c                     @ 080157ac 1b4b
+    ldr r2, compute_bg_affine_matrix_scaled_fix12_round_lo @ 080157aa 1b4a
+    ldr r3, compute_bg_affine_matrix_scaled_fix12_round_hi @ 080157ac 1b4b
     adds r0,r0,r2    @ 080157ae 8018
     adcs r1,r3    @ 080157b0 5941
     lsls r3,r1,#0x14    @ 080157b2 0b05
@@ -4913,8 +4913,8 @@ compute_bg_affine_matrix_scaled:
     adds r3,r7,#0x0    @ 080157c6 3b1c
     adds r2,r6,#0x0    @ 080157c8 321c
     bl __muldi3                              @ 080157ca f8f0cfff
-    ldr r2, DAT_08015818                     @ 080157ce 124a
-    ldr r3, DAT_0801581c                     @ 080157d0 124b
+    ldr r2, compute_bg_affine_matrix_scaled_fix12_round_lo @ 080157ce 124a
+    ldr r3, compute_bg_affine_matrix_scaled_fix12_round_hi @ 080157d0 124b
     adds r0,r0,r2    @ 080157d2 8018
     adcs r1,r3    @ 080157d4 5941
     lsls r3,r1,#0x14    @ 080157d6 0b05
@@ -4929,8 +4929,8 @@ compute_bg_affine_matrix_scaled:
     adds r3,r7,#0x0    @ 080157e8 3b1c
     adds r2,r6,#0x0    @ 080157ea 321c
     bl __muldi3                              @ 080157ec f8f0beff
-    ldr r2, DAT_08015818                     @ 080157f0 094a
-    ldr r3, DAT_0801581c                     @ 080157f2 0a4b
+    ldr r2, compute_bg_affine_matrix_scaled_fix12_round_lo @ 080157f0 094a
+    ldr r3, compute_bg_affine_matrix_scaled_fix12_round_hi @ 080157f2 0a4b
     adds r0,r0,r2    @ 080157f4 8018
     adcs r1,r3    @ 080157f6 5941
     lsls r3,r1,#0x14    @ 080157f8 0b05
@@ -4947,16 +4947,16 @@ compute_bg_affine_matrix_scaled:
     pop {r4,r5,r6,r7}                        @ 0801580e f0bc
     pop {r0}                                 @ 08015810 01bc
     bx r0                                    @ 08015812 0047
-DAT_08015814:
-    .word  0x09e399d0                     @ 08015814 d099e309
-DAT_08015818:
+compute_bg_affine_matrix_scaled_trig_table:
+    .word  TRIG_TABLE                     @ 08015814 d099e309
+compute_bg_affine_matrix_scaled_fix12_round_lo:
     .word  0x00000800                     @ 08015818 00080000
-DAT_0801581c:
+compute_bg_affine_matrix_scaled_fix12_round_hi:
     .word  0x00000000                     @ 0801581c 00000000
 
 @ Function: gets OAM affine entry pointer, calls compute_bg_affine_matrix_scaled to compute
 @ PA/PB/PC/PD affine matrix parameters, then right-shifts each by 4 bits (fixed-point conversion)
-@ and writes into OAM entry affine fields (+0x6/+0xe/+0x16/+0x1e). Called by FUN_080ee654
+@ and writes into OAM entry affine fields (+0x6/+0xe/+0x16/+0x1e). Called by alloc_affine_oam_entry_with_defaults
 @ (tags: [oam,palette], allocates palette slot then initializes OAM affine matrix) with
 @ r0=0 (slot_idx), r1=0x1800, r2=0x1200, r3=oam_count, [sp+0]=stack_buf.
 @ Exit via pop {r1}; bx r1 = Sub-case E, r0 has no return value.
@@ -5009,7 +5009,7 @@ setup_oam_affine_matrix_from_scale:
     pop {r1}                                 @ 08015864 02bc
     bx r1                                    @ 08015866 0847
 
-@ Called by FUN_0801c668 (BG affine animation driver, indeg=1). Full BG affine transform write-back entry: asserts bg_index in [2..3] (GBA only BG2/BG3 support affine); calls compute_bg_affine_matrix_scaled to get PA/PB/PC/PD; shifts each >>4 and writes to BG2PA/PB/PC/PD hardware registers (0x04000020+bg_index*0x10); computes and writes BG2X/BG2Y reference point. r0=u8 bg_index [2..3], r1=u8 angle [0..255], r2=s32 scale_x, r3=s32 scale_y, [sp+0x2c]=ptr out_matrix. Side-effects: BG2PA(0x04000020)/BG2PB/BG2PC/BG2PD and BG2X(0x04000028)/BG2Y written per bg_index offset.
+@ Called by apply_bg2_affine_fixed_angle (BG affine animation driver, indeg=1). Full BG affine transform write-back entry: asserts bg_index in [2..3] (GBA only BG2/BG3 support affine); calls compute_bg_affine_matrix_scaled to get PA/PB/PC/PD; shifts each >>4 and writes to BG2PA/PB/PC/PD hardware registers (0x04000020+bg_index*0x10); computes and writes BG2X/BG2Y reference point. r0=u8 bg_index [2..3], r1=u8 angle [0..255], r2=s32 scale_x, r3=s32 scale_y, [sp+0x2c]=ptr out_matrix. Side-effects: BG2PA(0x04000020)/BG2PB/BG2PC/BG2PD and BG2X(0x04000028)/BG2Y written per bg_index offset.
 apply_bg_affine_by_angle_scale:
     push {r4,r5,r6,r7,lr}                    @ 08015868 f0b5
     .hword 0x464f    @ 0801586a 4f46
@@ -5113,7 +5113,7 @@ resolve_bg_affine_param_offset:
     cmp r0,#0x2                              @ 0801592a 0228
     beq LAB_0801594c                         @ 0801592c 0ed0
     ldr r0, resolve_bg_affine_param_offset_ig2d_main_c_filename @ 0801592e 0448
-    ldr r2, DAT_08015944                     @ 08015930 044a
+    ldr r2, resolve_bg_affine_param_offset_assert_expr_zero @ 08015930 044a
     movs r1,#0xc0    @ 08015932 c021
     movs r3,#0x1    @ 08015934 0123
     bl suppress_assert_report                @ 08015936 e4f0d1fd
@@ -5122,7 +5122,7 @@ resolve_bg_affine_param_offset:
     .zero  0x2
 resolve_bg_affine_param_offset_ig2d_main_c_filename:
     .word  ig2d_main_c_filename           @ 08015940 88a4e309  GL/IG2D_Main.c
-DAT_08015944:
+resolve_bg_affine_param_offset_assert_expr_zero:
     .word  0x09e3a4f8                     @ 08015944 f8a4e309
 LAB_08015948:
     movs r0,#0x4    @ 08015948 0420
