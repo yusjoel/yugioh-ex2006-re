@@ -7477,7 +7477,7 @@ apply_gfx_resource_list:
     adds r4,r2,r0    @ 08016a8a 1418
     cmp r1,#0x0                              @ 08016a8c 0029
     beq LAB_08016aec                         @ 08016a8e 2dd0
-    ldr r7, DAT_08016aac                     @ 08016a90 064f
+    ldr r7, apply_gfx_resource_list_bgdt_tag @ 08016a90 064f
     movs r0,#0x1    @ 08016a92 0120
     rsbs r0,r0,#0    @ 08016a94 4042
     .hword 0x4680    @ 08016a96 8046
@@ -7488,16 +7488,16 @@ LAB_08016a9a:
     beq LAB_08016ad0                         @ 08016a9e 17d0
     cmp r1,r7                                @ 08016aa0 b942
     bhi LAB_08016ab4                         @ 08016aa2 07d8
-    ldr r0, DAT_08016ab0                     @ 08016aa4 0248
+    ldr r0, apply_gfx_resource_list_objd_tag @ 08016aa4 0248
     cmp r1,r0                                @ 08016aa6 8142
     beq LAB_08016ada                         @ 08016aa8 17d0
     b LAB_08016ae2                           @ 08016aaa 1ae0
-DAT_08016aac:
-    .word  0x54444742                     @ 08016aac 42474454
-DAT_08016ab0:
-    .word  0x444a424f                     @ 08016ab0 4f424a44
+apply_gfx_resource_list_bgdt_tag:
+    .word  BGDT_TAG                       @ 08016aac 42474454
+apply_gfx_resource_list_objd_tag:
+    .word  OBJD_TAG                       @ 08016ab0 4f424a44
 LAB_08016ab4:
-    ldr r0, DAT_08016acc                     @ 08016ab4 0548
+    ldr r0, apply_gfx_resource_list_palt_tag @ 08016ab4 0548
     cmp r1,r0                                @ 08016ab6 8142
     bne LAB_08016ae2                         @ 08016ab8 13d1
     movs r1,#0x10    @ 08016aba 1021
@@ -7508,8 +7508,8 @@ LAB_08016ab4:
     adds r1,r4,#0x0    @ 08016ac4 211c
     bl write_palt_block_to_vram              @ 08016ac6 fff7d1fb
     b LAB_08016ae2                           @ 08016aca 0ae0
-DAT_08016acc:
-    .word  0x544c4150                     @ 08016acc 50414c54
+apply_gfx_resource_list_palt_tag:
+    .word  PALT_TAG                       @ 08016acc 50414c54
 LAB_08016ad0:
     adds r0,r5,#0x0    @ 08016ad0 281c
     adds r1,r4,#0x0    @ 08016ad2 211c
@@ -7537,7 +7537,7 @@ LAB_08016aec:
 @ 由 card_list_screen_init/FUN_081061d0/FUN_08107198 在 banlist 界面调用. 给定禁止条目结构体指针(pDst), 读 +0x201 处 u8 nameID, assert nameID!=0 (GL/PRH_Main.c:38 'pDst->nameID'), 调 game_str_id_to_row(nameID+0x1072) 得 master_row, 再读 WRAM[0x02006c2c] 低3位选语言槽, 返回 game_str_ja 基址+偏移 的本地化卡名字符串指针. 纯查询叶子, 无外部副作用.
 resolve_prhlist_entry_name_ptr:
     push {r4,lr}                             @ 08016afc 10b5
-    ldr r1, DAT_08016b48                     @ 08016afe 1249
+    ldr r1, resolve_prhlist_entry_name_ptr_nameid_offset @ 08016afe 1249
     adds r4,r0,r1    @ 08016b00 4418
     ldrb r0,[r4,#0x0]                        @ 08016b02 2078
     cmp r0,#0x0                              @ 08016b04 0028
@@ -7549,7 +7549,7 @@ resolve_prhlist_entry_name_ptr:
     bl suppress_assert_report                @ 08016b10 e3f0e4fc
 LAB_08016b14:
     ldrb r4,[r4,#0x0]                        @ 08016b14 2478
-    ldr r3, DAT_08016b54                     @ 08016b16 0f4b
+    ldr r3, resolve_prhlist_entry_name_ptr_game_str_id_base @ 08016b16 0f4b
     adds r0,r4,r3    @ 08016b18 e018
     bl game_str_id_to_row                    @ 08016b1a def07df9
     ldr r2, PTR_game_str_pointer_table_08016b58 @ 08016b1e 0e4a
@@ -7558,8 +7558,8 @@ LAB_08016b14:
     lsls r1,r0,#0x1    @ 08016b24 4100
     adds r1,r1,r0    @ 08016b26 0918
     lsls r1,r1,#0x1    @ 08016b28 4900
-    ldr r0, DAT_08016b5c                     @ 08016b2a 0c48
-    ldr r3, DAT_08016b60                     @ 08016b2c 0c4b
+    ldr r0, resolve_prhlist_entry_name_ptr_ewram_base @ 08016b2a 0c48
+    ldr r3, resolve_prhlist_entry_name_ptr_gsettings_offset @ 08016b2c 0c4b
     adds r0,r0,r3    @ 08016b2e c018
     ldrb r0,[r0,#0x0]                        @ 08016b30 0078
     lsls r0,r0,#0x1d    @ 08016b32 4007
@@ -7573,20 +7573,20 @@ LAB_08016b14:
     pop {r4}                                 @ 08016b42 10bc
     pop {r1}                                 @ 08016b44 02bc
     bx r1                                    @ 08016b46 0847
-DAT_08016b48:
-    .word  0x00000201                     @ 08016b48 01020000
+resolve_prhlist_entry_name_ptr_nameid_offset:
+    .word  0x00000201                     @ 08016b48 01020000  = 0x201; pDst[+0x201] u8 nameID
 resolve_prhlist_entry_name_ptr_prh_main_c_filename:
     .word  prh_main_c_filename            @ 08016b4c 70a7e309  GL/PRH_Main.c
 resolve_prhlist_entry_name_ptr_assert_pdst_nameid:
     .word  assert_pdst_nameid             @ 08016b50 80a7e309  pDst->nameID
-DAT_08016b54:
-    .word  0x00001072                     @ 08016b54 72100000
+resolve_prhlist_entry_name_ptr_game_str_id_base:
+    .word  0x00001072                     @ 08016b54 72100000  = 0x1072; nameID + 0x1072 -> game_str id for game_str_id_to_row
 PTR_game_str_pointer_table_08016b58:
     .word  game_str_pointer_table         @ 08016b58 400f0008
-DAT_08016b5c:
+resolve_prhlist_entry_name_ptr_ewram_base:
     .word  0x02000000                     @ 08016b5c 00000002
-DAT_08016b60:
-    .word  0x00006c2c                     @ 08016b60 2c6c0000
+resolve_prhlist_entry_name_ptr_gsettings_offset:
+    .word  0x00006c2c                     @ 08016b60 2c6c0000  = gSettings(0x02006c2c) - EWRAM base; bits[2:0]=language_id selects str slot
 PTR_game_str_ja_08016b64:
     .word  game_str_ja                    @ 08016b64 109cdb09
 
@@ -7599,7 +7599,7 @@ PTR_game_str_ja_08016b64:
 @ - CHAR_RANGE=0x152 (max allowed offset, 338 chars)
 @ - TABLE_BASE=0x08016b88 (fn-ptr jump table base, 4 bytes per entry)
 dispatch_jp_char_handler:
-    ldr r2, DWORD_08016b80                   @ 08016b68 054a
+    ldr r2, dispatch_jp_char_handler_neg_char_base @ 08016b68 054a
     adds r1,r0,r2    @ 08016b6a 8118
     movs r0,#0xa9    @ 08016b6c a920
     lsls r0,r0,#0x1    @ 08016b6e 4000
@@ -7608,16 +7608,16 @@ dispatch_jp_char_handler:
     b LAB_080171d0                           @ 08016b74 2ce3
 LAB_08016b76:
     lsls r0,r1,#0x2    @ 08016b76 8800
-    ldr r1, PTR_PTR_08016b84                 @ 08016b78 0249
+    ldr r1, dispatch_jp_char_handler_ptr_jump_table @ 08016b78 0249
     adds r0,r0,r1    @ 08016b7a 4018
     ldr r0,[r0,#0x0]                         @ 08016b7c 0068
     .hword 0x4687    @ 08016b7e 8746
-DWORD_08016b80:
-    .word  0xffff7eb8                     @ 08016b80 b87effff
-PTR_PTR_08016b84:
-    .word  0x08016b88                     @ 08016b84 886b0108
-PTR_DAT_08016b88:
-    .word  0x080171a4                     @ 08016b88 a4710108
+dispatch_jp_char_handler_neg_char_base:
+    .word  0xffff7eb8                     @ 08016b80 b87effff  = -0x8148 (two-complement); r1 = sjis_code - 0x8148 (zone-2 base)
+dispatch_jp_char_handler_ptr_jump_table:
+    .word  jp_char_handler_jump_table     @ 08016b84 886b0108
+jp_char_handler_jump_table:
+    .word  0x080171a4                     @ 08016b88 a4710108  339-entry (0x153) SJIS code->handler dispatch table; targets 0x170d4..0x171d0 stubs (each movs r0,#idx; b ret)
     .word  0x080171a0                     @ 08016b8c a0710108
     .word  0x080171d0                     @ 08016b90 d0710108
     .word  0x080171d0                     @ 08016b94 d0710108
