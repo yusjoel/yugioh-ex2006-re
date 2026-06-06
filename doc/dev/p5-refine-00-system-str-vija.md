@@ -526,6 +526,22 @@ Seg-4 大部分被 b7/b10/b11/b9/b8 覆盖, 剩余仅 2 R2 + 3 §5.1 ROM_INCBIN:
 
 byte-identical 9689337d 保持。脚本: `RefineSeg4LightRenames.py` (2 槽 R2)。**Seg-4 完成**。
 
+### 4.0s Seg-5a 完成记录: write_tile_region_to_bg_screen (0x16344..0x165b8) ✅
+
+Seg-5 第一支 (Seg-5a). med-conf 函数 (r6 struct +0x14/+0x15/+0x16 layout 待 mGBA runtime
+verify) — 仅做槽符号化, **不重写 plate** (保留 med-conf 标注待 runtime)。byte-identical 9689337d。
+
+| 槽 | 处理 |
+|---|---|
+| 0x080163e0 (0x02023d40) | `_ptr_screen_map_staging_buf` + EOL (全 ROM 仅 1 ref; gGlState 末+0x4 紧邻; med-conf 推测 BG screen map 暂存) |
+| 0x08016440 (0x3ff) | `_tile_name_mask` + EOL (BG screen-map entry 低 10 位 tile_name 字段) |
+| 0x080164dc (0x407f) | `_field_16_bitmask` + EOL (测 [r6+0x16] bits[14]+bits[6:0] 是否 == 0x20) |
+| 0x08016514 (0x16b=363) | `_assert_line_16b` |
+| 0x08016518 | carve label DATA ref → `assert_expr_zero_65c` (batch-9 已 carve) |
+
+**未新建任何 EWRAM 全局** (0x02023d40 仅 1 处使用, 保守不入 ewram.inc 等 runtime 锚定)。
+脚本: `RefineSeg5aWriteTileRegion.py`。**§5.1 登记: 无**。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在

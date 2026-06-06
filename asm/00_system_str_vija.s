@@ -6572,7 +6572,7 @@ write_tile_region_to_bg_screen:
     adds r0,r1,#0x0    @ 08016354 081c
     adds r0,#0x1c    @ 08016356 1c30
     .hword 0x4681    @ 08016358 8146
-    ldr r1, DAT_080163e0                     @ 0801635a 2149
+    ldr r1, write_tile_region_to_bg_screen_ptr_screen_map_staging_buf @ 0801635a 2149
     .hword 0x468a    @ 0801635c 8a46
     ldr r2,[sp,#0x0]                         @ 0801635e 009a
     ldr r0,[r2,#0xc]                         @ 08016360 d068
@@ -6641,8 +6641,8 @@ LAB_080163ae:
     cmp r3,r0                                @ 080163da 8342
     blt LAB_080163ae                         @ 080163dc e7db
     b LAB_08016490                           @ 080163de 57e0
-DAT_080163e0:
-    .word  0x02023d40                     @ 080163e0 403d0202
+write_tile_region_to_bg_screen_ptr_screen_map_staging_buf:
+    .word  0x02023d40                     @ 080163e0 403d0202  = 0x02023d40; only 1 ROM ref (here); med-conf: likely BG screen map staging buffer; gGlState+0x8b0 (just past gGlState end 0x8ac); awaits runtime verify
 LAB_080163e4:
     ldr r0,[sp,#0x0]                         @ 080163e4 0098
     ldrb r0,[r0,#0xa]                        @ 080163e6 807a
@@ -6666,7 +6666,7 @@ LAB_08016402:
     subs r7,#0x4    @ 08016408 043f
     ldmia r7!,{r2}                           @ 0801640a 04cf
     adds r1,r2,r5    @ 0801640c 5119
-    ldr r7, DAT_08016440                     @ 0801640e 0c4f
+    ldr r7, write_tile_region_to_bg_screen_tile_name_mask @ 0801640e 0c4f
     adds r0,r7,#0x0    @ 08016410 381c
     ands r1,r0    @ 08016412 0140
     lsrs r2,r2,#0x10    @ 08016414 120c
@@ -6691,8 +6691,8 @@ LAB_08016402:
     blt LAB_08016402                         @ 0801643a e2db
     b LAB_08016490                           @ 0801643c 28e0
     .zero  0x2
-DAT_08016440:
-    .word  0x000003ff                     @ 08016440 ff030000
+write_tile_region_to_bg_screen_tile_name_mask:
+    .word  0x000003ff                     @ 08016440 ff030000  = 0x3ff; 10-bit BG screen-map entry tile_name field (low 10 bits)
 LAB_08016444:
     movs r3,#0x10    @ 08016444 1023
     ldrsh r0,[r6,r3]                         @ 08016446 f05e
@@ -6754,7 +6754,7 @@ LAB_08016492:
     strb r0,[r1,#0x0]                        @ 080164b0 0870
 LAB_080164b2:
     ldrh r4,[r6,#0x16]                       @ 080164b2 f48a
-    ldr r0, DAT_080164dc                     @ 080164b4 0948
+    ldr r0, write_tile_region_to_bg_screen_field_16_bitmask @ 080164b4 0948
     ands r0,r4    @ 080164b6 2040
     cmp r0,#0x20                             @ 080164b8 2028
     bne LAB_080164e0                         @ 080164ba 11d1
@@ -6773,8 +6773,8 @@ LAB_080164b2:
     bl dispatch_bg_screen_map_write          @ 080164d4 fff702ff
     b LAB_080165ac                           @ 080164d8 68e0
     .zero  0x2
-DAT_080164dc:
-    .word  0x0000407f                     @ 080164dc 7f400000
+write_tile_region_to_bg_screen_field_16_bitmask:
+    .word  0x0000407f                     @ 080164dc 7f400000  = 0x407f; tests [r6+0x16] bits[14]+bits[6:0]; cmp r0,#0x20 path branches
 LAB_080164e0:
     movs r0,#0x2    @ 080164e0 0220
     .hword 0x4682    @ 080164e2 8246
@@ -6795,16 +6795,16 @@ LAB_080164e0:
     cmp r0,#0x3                              @ 08016500 0328
     beq LAB_08016522                         @ 08016502 0ed0
     ldr r0, write_tile_region_to_bg_screen_isd_draw_c_filename @ 08016504 0248
-    ldr r1, DAT_08016514                     @ 08016506 0349
-    ldr r2, DAT_08016518                     @ 08016508 034a
+    ldr r1, write_tile_region_to_bg_screen_assert_line_16b @ 08016506 0349
+    ldr r2, write_tile_region_to_bg_screen_assert_expr_zero @ 08016508 034a
     bl suppress_assert_report                @ 0801650a e3f0e7ff
     b LAB_08016528                           @ 0801650e 0be0
 write_tile_region_to_bg_screen_isd_draw_c_filename:
     .word  isd_draw_c_filename            @ 08016510 4ca6e309  GL/ISD_Draw.c
-DAT_08016514:
-    .word  0x0000016b                     @ 08016514 6b010000
-DAT_08016518:
-    .word  0x09e3a65c                     @ 08016518 5ca6e309
+write_tile_region_to_bg_screen_assert_line_16b:
+    .word  0x0000016b                     @ 08016514 6b010000  0x16b = 363 (GL/ISD_Draw.c line)
+write_tile_region_to_bg_screen_assert_expr_zero:
+    .word  assert_expr_zero_65c           @ 08016518 5ca6e309
 LAB_0801651c:
     bl bg2_cnt_get_screen_size               @ 0801651c fef7d0fa
     b LAB_08016526                           @ 08016520 01e0
