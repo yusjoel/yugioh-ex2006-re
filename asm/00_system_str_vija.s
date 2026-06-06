@@ -6921,7 +6921,7 @@ apply_bgdt_entry_to_bg:
     ldrb r3,[r6,#0x9]                        @ 080165f0 737a
     ands r1,r3    @ 080165f2 1940
     lsls r1,r1,#0x7    @ 080165f4 c901
-    ldr r0, DAT_08016634                     @ 080165f6 0f48
+    ldr r0, apply_bgdt_entry_to_bg_attr_clear_bits_8_7 @ 080165f6 0f48
     ldrh r4,[r5,#0x14]                       @ 080165f8 ac8a
     ands r0,r4    @ 080165fa 2040
     orrs r0,r1    @ 080165fc 0843
@@ -6939,7 +6939,7 @@ apply_bgdt_entry_to_bg:
     ldrb r3,[r6,#0x12]                       @ 08016614 b37c
     ands r1,r3    @ 08016616 1940
     lsls r1,r1,#0x7    @ 08016618 c901
-    ldr r0, DAT_08016638                     @ 0801661a 0748
+    ldr r0, apply_bgdt_entry_to_bg_attr_clear_bits_13_7 @ 0801661a 0748
     ldrh r4,[r5,#0x16]                       @ 0801661c ec8a
     ands r0,r4    @ 0801661e 2040
     orrs r0,r1    @ 08016620 0843
@@ -6952,10 +6952,10 @@ apply_bgdt_entry_to_bg:
     orrs r0,r7    @ 0801662e 3843
     b LAB_08016644                           @ 08016630 08e0
     .zero  0x2
-DAT_08016634:
-    .word  0xfffffe7f                     @ 08016634 7ffeffff
-DAT_08016638:
-    .word  0xffffc07f                     @ 08016638 7fc0ffff
+apply_bgdt_entry_to_bg_attr_clear_bits_8_7:
+    .word  GFX_ATTR_CLEAR_BITS_8_7        @ 08016634 7ffeffff
+apply_bgdt_entry_to_bg_attr_clear_bits_13_7:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 08016638 7fc0ffff
 LAB_0801663c:
     movs r0,#0x3    @ 0801663c 0320
     rsbs r0,r0,#0    @ 0801663e 4042
@@ -7194,7 +7194,7 @@ LAB_080167c0:
     ldrb r2,[r1,#0x18]                       @ 08016804 0a7e
     ands r0,r2    @ 08016806 1040
     strb r0,[r1,#0x18]                       @ 08016808 0876
-    ldr r0, DAT_0801682c                     @ 0801680a 0848
+    ldr r0, apply_bgdt_entry_to_bg_attr_clear_bits_13_7_b @ 0801680a 0848
     ldrh r3,[r1,#0x18]                       @ 0801680c 0b8b
     ands r0,r3    @ 0801680e 1840
     strh r0,[r1,#0x18]                       @ 08016810 0883
@@ -7209,8 +7209,8 @@ LAB_080167c0:
     adds r1,r6,#0x0    @ 08016824 311c
     bl write_tile_region_to_bg_screen        @ 08016826 fff78dfd
     b LAB_08016898                           @ 0801682a 35e0
-DAT_0801682c:
-    .word  0xffffc07f                     @ 0801682c 7fc0ffff
+apply_bgdt_entry_to_bg_attr_clear_bits_13_7_b:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 0801682c 7fc0ffff
 LAB_08016830:
     add r4,sp,#0x24                          @ 08016830 09ac
     adds r1,r4,#0x0    @ 08016832 211c
@@ -7256,7 +7256,7 @@ LAB_08016876:
     movs r1,#0x7f    @ 08016882 7f21
     ands r0,r1    @ 08016884 0840
     lsls r0,r0,#0x7    @ 08016886 c001
-    ldr r1, DAT_080168c8                     @ 08016888 0f49
+    ldr r1, apply_bgdt_entry_to_bg_attr_clear_bits_13_7_c @ 08016888 0f49
     ands r1,r2    @ 0801688a 1140
     orrs r1,r0    @ 0801688c 0143
     strh r1,[r4,#0x18]                       @ 0801688e 2183
@@ -7289,8 +7289,8 @@ LAB_08016898:
     beq LAB_080168d6                         @ 080168c2 08d0
     b LAB_080168f4                           @ 080168c4 16e0
     .zero  0x2
-DAT_080168c8:
-    .word  0xffffc07f                     @ 080168c8 7fc0ffff
+apply_bgdt_entry_to_bg_attr_clear_bits_13_7_c:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 080168c8 7fc0ffff
 LAB_080168cc:
     cmp r0,#0x2                              @ 080168cc 0228
     beq LAB_080168e6                         @ 080168ce 0ad0
@@ -7353,7 +7353,7 @@ fill_vram_screen_rect_zero:
     cmp r4,#0x0                              @ 0801691c 002c
     ble LAB_0801694a                         @ 0801691e 14dd
     .hword 0x466f    @ 08016920 6f46
-    ldr r6, DWORD_08016958                   @ 08016922 0d4e
+    ldr r6, fill_vram_screen_rect_zero_cpuset_wordcount_mask @ 08016922 0d4e
     ands r6,r3    @ 08016924 1e40
     adds r5,r0,#0x0    @ 08016926 051c
     movs r0,#0x0    @ 08016928 0020
@@ -7381,8 +7381,8 @@ LAB_0801694a:
     pop {r4,r5,r6,r7}                        @ 08016952 f0bc
     pop {r0}                                 @ 08016954 01bc
     bx r0                                    @ 08016956 0047
-DWORD_08016958:
-    .word  0x001fffff                     @ 08016958 ffff1f00
+fill_vram_screen_rect_zero_cpuset_wordcount_mask:
+    .word  0x001fffff                     @ 08016958 ffff1f00  = 0x001fffff; bios_cpu_set length field (bits[20:0]) mask
 
 @ Applies one OBJD (Object Data) resource entry to target sprite/OAM state struct. r0=void* sprite_dst, r1=void* objd_entry. Reads data_len([+0xc]) / __udivsi3 / tile_stride([+0xa]) -> row_count -> strh sprite_dst[+0x12]. Writes tile_attr bits[7:4] (palette) and bits[3:0] (mode) to sprite_dst[+0x14]. If mode==4 (4bpp indexed) and VRAM target offset valid, calls copy_to_obj_tile_vram. Returns fixed 0. Called by apply_gfx_resource_list on 'OBJD' (0x444A424F) tag match. Constants: 'OBJD' = 0x444A424F; mode 4 = 4bpp indexed tile mode.
 apply_objd_entry_to_sprite:
@@ -7448,9 +7448,9 @@ LAB_080169ce:
     pop {r1}                                 @ 080169d2 02bc
     bx r1                                    @ 080169d4 0847
     ROM_INCBIN 0x169d6, 0x16
-    .word  0x080169f0                     @ 080169ec f0690108
-PTR_DAT_080169f0:
-    .word  0x08016a20                     @ 080169f0 206a0108
+    .word  orphan_objd_type_dispatch_jump_table @ 080169ec f0690108
+orphan_objd_type_dispatch_jump_table:
+    .word  0x08016a20                     @ 080169f0 206a0108  12-entry; targets 0x16a20..70 (orphan handlers @0x16a20 ROM_INCBIN, dead code, 0 ext refs)
     .word  0x08016a26                     @ 080169f4 266a0108
     .word  0x08016a2c                     @ 080169f8 2c6a0108
     .word  0x08016a32                     @ 080169fc 326a0108

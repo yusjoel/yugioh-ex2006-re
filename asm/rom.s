@@ -39,6 +39,9 @@
 @ ROM 区域/语言检测（0x080000ae game-code + gSettings language_id）
 	.include "constants/rom_region.inc"
 
+@ GFX 资源 BGDT/OBJD → state struct attr 字段位掩码（0x165bc apply_bgdt 簇用）
+	.include "constants/gfx_resource.inc"
+
 
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"

@@ -542,6 +542,18 @@ verify) — 仅做槽符号化, **不重写 plate** (保留 med-conf 标注待 r
 **未新建任何 EWRAM 全局** (0x02023d40 仅 1 处使用, 保守不入 ewram.inc 等 runtime 锚定)。
 脚本: `RefineSeg5aWriteTileRegion.py`。**§5.1 登记: 无**。
 
+### 4.0t Seg-5b 完成记录: apply_bgdt/objd + fill_vram (0x165bc..0x16a7c) ✅
+
+| 函数 | 处理 |
+|---|---|
+| apply_bgdt_entry_to_bg (0x165bc) | 4 attr 掩码 equate (新 `constants/gfx_resource.inc`): `GFX_ATTR_CLEAR_BITS_8_7`(0xfffffe7f, palette 2-bit) / `GFX_ATTR_CLEAR_BITS_13_7`(0xffffc07f, tile 字段, ×3 出现) |
+| fill_vram_screen_rect_zero (0x16908) | DWORD_08016958 (0x001fffff cpu_set wordcount mask) → `_cpuset_wordcount_mask` + EOL; plate 已完整 |
+| apply_objd_entry_to_sprite (0x1695c) | plate 完整, attr 字段操作用内联掩码 (movs #0xf/#0x3 等, 无 pool 槽) |
+| **0x169d6/0x16 + 0x16a20/0x5c orphan dispatcher 簇** | jump table PTR_DAT_080169f0 → `orphan_objd_type_dispatch_jump_table`; handlers + dispatcher **§5.1 登记** (0 ext ref dead code) |
+
+新增: `constants/gfx_resource.inc` (接入 rom.s)。byte-identical 9689337d。
+脚本: `RefineSeg5bApplyBgdtObjd.py`。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -638,6 +650,7 @@ R9 byte-identical。
 | 0x080156ec | 6 B (`.byte` 块, 非 ROM_INCBIN) | Seg-3 | **1 个 THUMB 孤儿 setter**: 0x156ee `str r1,[r0,#0xc];bx lr` = `void f(void* p, u32 val) { p[+0xc]=val; }`。**ROM 内 0 引用**。**留待**: R4 disasm |
 | 0x08015d18 | 24 B (`ROM_INCBIN 0x15d18, 0x18`) | Seg-4 | **1 个 THUMB 孤儿 affine-type → 索引映射**: `cmp r0,#4;beq…;cmp r0,#9;beq…` 三分支返回 {4→1, 9→2, default→3}。**ROM 内 0 引用** (与 batch-9 ISD affine 同模式但 dead code)。**留待**: R4 disasm |
 | 0x08015fe8 | 44 B (`ROM_INCBIN 0x15fe8, 0x2c`) | Seg-4 | **1 个 THUMB 孤儿模算法 helper**: 输入 r0, 分支据 r0 cmp 4/0, 调用 asrs/lsls/subs 序列等效于 `r0 mod 4` 类操作, `ands #1`+`bx lr` 返回 bit0。**ROM 内 0 引用**。**留待**: R4 disasm |
+| 0x080169d6 | 22 B (`ROM_INCBIN 0x169d6, 0x16`) + 0x16a20 92 B (`ROM_INCBIN 0x16a20, 0x5c`) | Seg-5 | **孤儿 OBJD-type dispatcher 簇**: 0x169d6 (22B dispatcher: `adds r3,r1;ldrb;lsrs;cmp 0xb;bhi;...mov pc,r0`) + jump table `orphan_objd_type_dispatch_jump_table` @0x169f0 (12×4B → 0x16a20..70) + 0x16a20 (92B = 12 个 6B handler)。0x12-type 分派表。**0 外部引用** (与 named accessor 簇功能重叠的 dead-code 编译变体)。**留待**: R4 disasm + createFunction ×13 |
 | 0x08016074 | 36 B (`ROM_INCBIN 0x16074, 0x24`) | Seg-4 | **5 个 THUMB 孤儿 dispatcher handler** (各 6B = `BL get_bgN_screen_vram_addr; b <common_tail>`): 0x16074→BG0/0x1607a→BG1/0x16080→BG2/0x16086→BG3/0x1608c→第5路。配合 `.byte` 块 0x1604c (16B 跳转表 dispatcher) + jump table `orphan_bg_screen_vram_jump_table` @0x16060 (5 entries)。**与 named `get_bg_screen_vram_addr_by_index` (0x16014, cmp/beq 实现) 功能重复**, 显然是 compiler 另一翻译变体的 dead code。**0 外部引用** (跳转表→handlers 是 orphan 块内部引用)。**留待**: R4 disasm + createFunction × 6 |
 
 ---
