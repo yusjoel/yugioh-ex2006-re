@@ -46,7 +46,7 @@
 | Seg | 范围 | 状态 | commit |
 |-----|------|------|--------|
 | **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
-| **2** | 0x1d448..0x1d998 (8fn) | ✅ | (pending) |
+| **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
 | 3 | 0x1d998..0x1e36c (8fn) | ⬜ | |
 | 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
 | 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
@@ -96,7 +96,7 @@
 - §5.1=0 (段内无数据块)
 - disasm=0
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: (pending)
+- commit: db3325d
 
 ---
 
