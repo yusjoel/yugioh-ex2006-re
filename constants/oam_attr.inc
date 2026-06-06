@@ -12,3 +12,8 @@
 
 .equ OAM_ATTR0_HIDDEN,         0x0000ffff  @ attr0 all-bits-set: OBJ disabled/hidden mode
                                              @ used by apply_sprite_gfx_by_type for initial hide
+
+.equ OAM_HFLIP_VFLIP_PACKED_PATTERN, 0x40004000  @ bit14 set in both attr0 and attr1 halfwords (packed as 32-bit word)
+                                                   @ ORed into 32-bit OAM entry to toggle hflip+vflip
+.equ OAM_ATTR1_X_MASK,  0x000001ff  @ attr1 bits[8:0] = x coordinate (9-bit x-pos field)
+.equ OAM_ATTR1_X_CLEAR, 0xfffffe00  @ clear attr1 bits[8:0] before inserting x-pos

@@ -9763,7 +9763,13 @@ LAB_08017d4e:
     bx r0                                    @ 08017d60 0047
     .zero  0x2
 
-@ banlist/name-input 页面完整版式初始化函数. 由 name_input_page_load_assets (0x080180ac), 两个 banlist/settings 帧驱动函数 (0x08018884, 0x08018938, 0x08018f7c) 在页面切换或刷新时调用. 执行如下操作: (1) 从 gState+0x6c2c bits[2:0] 读取语言模式并推断 JP/EN 偏移, 调用 dispatch_banlist_text_by_key 填充文字内容; (2) setup_font_jp_ctx_bg_vram_fixed 初始化 BG VRAM 字体上下文; (3) get_bg0_screen_vram_addr + bios_cpu_fast_set 清零 BG0 screen VRAM 区域 (控制字 0x01000200 = 512 halfwords copy); (4) 再次清零 char VRAM 区域 (0x01001800 = 6144 halfwords); (5) 循环最多 5 行渲染 JP 字符串 (render_jp_string_row); (6) 调用 count_str_charlen + __divsi3 推算行数后写入 scrollbar 条目数 (gState+0x318 = 0xc6<<2 偏移); (7) init_scrollbar_oam_slot_settings 初始化滚动条 OAM 槽; (8) write_bg0_vofs_with_bias 清零 BG0 垂直偏移; (9) fill_tilemap_rect_with_palette 以 22x12 矩形填充 BG0 tilemap 首行.
+@ init_banlist_name_input_page_layout(u32 page_layout_type) @ 0x08017d64
+@ Args: r0 = page_layout_type (0=banlist, 1=name_input)
+@ Clears BG0 screen VRAM (NAME_INPUT_BG0_SCREEN_CLEAR_CTRL=0x01000200, 512 words) via bios_cpu_fast_set.
+@ Clears char VRAM (NAME_INPUT_CHAR_VRAM_CLEAR_CTRL=0x01001800, 6144 words) via bios_cpu_fast_set.
+@ Reads gSettings(EWRAM_BASE+GSETTINGS_OFFSET) to select language mode.
+@ Dispatches to banlist or name-input BG layout init based on page_layout_type.
+@ Callers: dispatch_banlist_text_by_key (key=0/1), name_input_page_load_assets.
 init_banlist_name_input_page_layout:
     push {r4,r5,r6,r7,lr}                    @ 08017d64 f0b5
     .hword 0x464f    @ 08017d66 4f46
@@ -9794,14 +9800,14 @@ init_banlist_name_input_page_layout:
     str r5,[sp,#0x14]                        @ 08017d9c 0595
     bl get_bg0_screen_vram_addr              @ 08017d9e fcf7f5fe
     adds r1,r0,#0x0    @ 08017da2 011c
-    ldr r2, DAT_08017e40                     @ 08017da4 264a
+    ldr r2, init_banlist_name_input_page_layout_bg0_clear_ctrl @ 08017da4 264a
     add r0,sp,#0x14                          @ 08017da6 05a8
     bl bios_cpu_fast_set                     @ 08017da8 f6f024fb
     str r5,[sp,#0x18]                        @ 08017dac 0695
     add r4,sp,#0x18                          @ 08017dae 06ac
     bl get_bg0_char_vram_addr                @ 08017db0 fcf72efe
     adds r1,r0,#0x0    @ 08017db4 011c
-    ldr r2, DAT_08017e44                     @ 08017db6 234a
+    ldr r2, init_banlist_name_input_page_layout_char_vram_clear_ctrl @ 08017db6 234a
     adds r0,r4,#0x0    @ 08017db8 201c
     bl bios_cpu_fast_set                     @ 08017dba f6f01bfb
     movs r4,#0x2    @ 08017dbe 0224
@@ -9864,10 +9870,10 @@ DAT_08017e38:
     .word  0x02000000                     @ 08017e38 00000002
 DAT_08017e3c:
     .word  0x00006c2c                     @ 08017e3c 2c6c0000
-DAT_08017e40:
-    .word  0x01000200                     @ 08017e40 00020001
-DAT_08017e44:
-    .word  0x01001800                     @ 08017e44 00180001
+init_banlist_name_input_page_layout_bg0_clear_ctrl:
+    .word  NAME_INPUT_BG0_SCREEN_CLEAR_CTRL @ 08017e40 00020001  bios_cpu_fast_set: fill 0x200 halfwords -> BG0 screen VRAM (32x32 tiles)
+init_banlist_name_input_page_layout_char_vram_clear_ctrl:
+    .word  NAME_INPUT_CHAR_VRAM_CLEAR_CTRL @ 08017e44 00180001  bios_cpu_fast_set: fill 0x1800 halfwords -> char VRAM clear (24576B)
 
 @ Finds pointer to char_idx-th character in name-input buffer (game_state+0x8d). Mode from gSettings bit[2:0]: JP mode (non-zero) steps 1 byte per char; EN mode (zero) steps 2 bytes per char. Sets target byte position = index*12, iterates by step until target reached; returns current ptr on match. Returns NULL if NUL byte encountered before target.
 @ 
@@ -9878,11 +9884,11 @@ DAT_08017e44:
 find_name_char_at_idx:
     push {r4,lr}                             @ 08017e48 10b5
     adds r3,r0,#0x0    @ 08017e4a 031c
-    ldr r0, DAT_08017e7c                     @ 08017e4c 0b48
+    ldr r0, find_name_char_at_idx_gstate     @ 08017e4c 0b48
     adds r2,r0,#0x0    @ 08017e4e 021c
     adds r2,#0x8d    @ 08017e50 8d32
-    ldr r0, DAT_08017e80                     @ 08017e52 0b48
-    ldr r1, DAT_08017e84                     @ 08017e54 0b49
+    ldr r0, find_name_char_at_idx_ewram_base @ 08017e52 0b48
+    ldr r1, find_name_char_at_idx_gsettings_offset @ 08017e54 0b49
     adds r0,r0,r1    @ 08017e56 4018
     movs r1,#0x7    @ 08017e58 0721
     ldrb r0,[r0,#0x0]                        @ 08017e5a 0078
@@ -9904,12 +9910,12 @@ LAB_08017e74:
     bne LAB_08017e88                         @ 08017e76 07d1
     adds r0,r2,#0x0    @ 08017e78 101c
     b LAB_08017e94                           @ 08017e7a 0be0
-DAT_08017e7c:
-    .word  0x02029250                     @ 08017e7c 50920202
-DAT_08017e80:
-    .word  0x02000000                     @ 08017e80 00000002
-DAT_08017e84:
-    .word  0x00006c2c                     @ 08017e84 2c6c0000
+find_name_char_at_idx_gstate:
+    .word  gState                         @ 08017e7c 50920202
+find_name_char_at_idx_ewram_base:
+    .word  EWRAM_BASE                     @ 08017e80 00000002
+find_name_char_at_idx_gsettings_offset:
+    .word  0x00006c2c                     @ 08017e84 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE; bits[2:0]=language_id
 LAB_08017e88:
     adds r2,r2,r4    @ 08017e88 1219
     adds r1,#0x1    @ 08017e8a 0131
@@ -9953,12 +9959,12 @@ render_jp_string_to_bg_row:
     movs r0,#0xc0    @ 08017eb4 c020
     lsls r0,r0,#0x13    @ 08017eb6 c004
     adds r1,r1,r0    @ 08017eb8 0918
-    ldr r2, DAT_08017ef8                     @ 08017eba 0f4a
+    ldr r2, render_jp_string_to_bg_row_bg_row_clear_ctrl @ 08017eba 0f4a
     add r0,sp,#0x4                           @ 08017ebc 01a8
     bl bios_cpu_set                          @ 08017ebe f6f09bfa
     bl setup_font_jp_ctx_bg_vram_fixed       @ 08017ec2 fff769fc
-    ldr r1, DAT_08017efc                     @ 08017ec6 0d49
-    ldr r0, DAT_08017f00                     @ 08017ec8 0d48
+    ldr r1, render_jp_string_to_bg_row_ewram_base @ 08017ec6 0d49
+    ldr r0, render_jp_string_to_bg_row_gsettings_offset @ 08017ec8 0d48
     adds r1,r1,r0    @ 08017eca 0918
     movs r0,#0x7    @ 08017ecc 0720
     ldrb r1,[r1,#0x0]                        @ 08017ece 0978
@@ -9981,12 +9987,12 @@ render_jp_string_to_bg_row:
     pop {r0}                                 @ 08017ef2 01bc
     bx r0                                    @ 08017ef4 0047
     .zero  0x2
-DAT_08017ef8:
-    .word  0x05000160                     @ 08017ef8 60010005
-DAT_08017efc:
-    .word  0x02000000                     @ 08017efc 00000002
-DAT_08017f00:
-    .word  0x00006c2c                     @ 08017f00 2c6c0000
+render_jp_string_to_bg_row_bg_row_clear_ctrl:
+    .word  NAME_INPUT_BG_ROW_CLEAR_CTRL   @ 08017ef8 60010005  bios_cpu_set: copy 0x160=352 words=1408B -> clear one BG row (44 tiles)
+render_jp_string_to_bg_row_ewram_base:
+    .word  EWRAM_BASE                     @ 08017efc 00000002
+render_jp_string_to_bg_row_gsettings_offset:
+    .word  0x00006c2c                     @ 08017f00 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
 
 @ render_name_input_scroll_row: Name-input scene scroll-row render. Takes scroll direction r0; reads current scrollbar state; if direction==1 calls find_name_char_at_idx to locate target char; then calls render_jp_string_to_bg_row to render JP string to BG row; finally calls fill_tilemap_rect_with_palette. Triggered on user up/down scroll to refresh one BG tile row.
 @ 
@@ -9999,7 +10005,7 @@ render_name_input_scroll_row:
     push {r7}                                @ 08017f08 80b4
     sub sp,#0x14                             @ 08017f0a 85b0
     adds r6,r0,#0x0    @ 08017f0c 061c
-    ldr r0, DAT_08017f88                     @ 08017f0e 1e48
+    ldr r0, render_name_input_scroll_row_gstate @ 08017f0e 1e48
     movs r1,#0xc1    @ 08017f10 c121
     lsls r1,r1,#0x2    @ 08017f12 8900
     adds r0,r0,r1    @ 08017f14 4018
@@ -10058,8 +10064,8 @@ LAB_08017f7a:
     pop {r0}                                 @ 08017f82 01bc
     bx r0                                    @ 08017f84 0047
     .zero  0x2
-DAT_08017f88:
-    .word  0x02029250                     @ 08017f88 50920202
+render_name_input_scroll_row_gstate:
+    .word  gState                         @ 08017f88 50920202
 
 @ Reads name list scroll step field at game_state+0x31a (0x0202956a) and returns sign-extended s8. Written by set_name_scroll_step (0x08017fa4) as direction*4 (-4 or +4); 0 means no active scroll. Caller FUN_08018938 reads at start of each frame tick: non-zero means skip character input this frame (scroll-lock logic).
 @ 
@@ -10068,18 +10074,18 @@ DAT_08017f88:
 @ Side effects: none (read-only leaf)
 @ Constants: SCROLL_FIELD=0x02029250+0x31a=0x0202956a
 get_name_scroll_step:
-    ldr r0, DAT_08017f9c                     @ 08017f8c 0348
-    ldr r1, DAT_08017fa0                     @ 08017f8e 0449
+    ldr r0, get_name_scroll_step_gstate      @ 08017f8c 0348
+    ldr r1, get_name_scroll_step_scroll_field_offset @ 08017f8e 0449
     adds r0,r0,r1    @ 08017f90 4018
     ldrb r0,[r0,#0x0]                        @ 08017f92 0078
     lsls r0,r0,#0x18    @ 08017f94 0006
     asrs r0,r0,#0x18    @ 08017f96 0016
     bx lr                                    @ 08017f98 7047
     .zero  0x2
-DAT_08017f9c:
-    .word  0x02029250                     @ 08017f9c 50920202
-DAT_08017fa0:
-    .word  0x0000031a                     @ 08017fa0 1a030000
+get_name_scroll_step_gstate:
+    .word  gState                         @ 08017f9c 50920202
+get_name_scroll_step_scroll_field_offset:
+    .word  0x0000031a                     @ 08017fa0 1a030000  gState+0x31a = scroll_step field (u8)
 
 @ Sets name list scroll step field (game_state+0x31a). Accepts direction value r0 (-1=left/up, +1=right/down); values outside {-1,+1} trigger suppress_assert_report defense assert. Writes direction<<2 (direction*4) as actual step into byte field. Caller FUN_08018938 passes r0=-1 after cursor reaches end to trigger left-scroll animation. get_name_scroll_step (0x08017f8c) reads the same field.
 @ 
@@ -10090,7 +10096,7 @@ DAT_08017fa0:
 set_name_scroll_step:
     push {r4,r5,lr}                          @ 08017fa4 30b5
     adds r4,r0,#0x0    @ 08017fa6 041c
-    ldr r5, DAT_08017fd4                     @ 08017fa8 0a4d
+    ldr r5, set_name_scroll_step_gstate      @ 08017fa8 0a4d
     cmp r4,#0x1                              @ 08017faa 012c
     beq LAB_08017fc4                         @ 08017fac 0ad0
     movs r0,#0x1    @ 08017fae 0120
@@ -10105,21 +10111,21 @@ set_name_scroll_step:
     bl suppress_assert_report                @ 08017fc0 e2f08cfa
 LAB_08017fc4:
     lsls r1,r4,#0x2    @ 08017fc4 a100
-    ldr r2, DAT_08017fe0                     @ 08017fc6 064a
+    ldr r2, set_name_scroll_step_scroll_field_offset @ 08017fc6 064a
     adds r0,r5,r2    @ 08017fc8 a818
     strb r1,[r0,#0x0]                        @ 08017fca 0170
     pop {r4,r5}                              @ 08017fcc 30bc
     pop {r0}                                 @ 08017fce 01bc
     bx r0                                    @ 08017fd0 0047
     .zero  0x2
-DAT_08017fd4:
-    .word  0x02029250                     @ 08017fd4 50920202
+set_name_scroll_step_gstate:
+    .word  gState                         @ 08017fd4 50920202
 set_name_scroll_step_name_main_c_filename:
     .word  name_main_c_filename           @ 08017fd8 b8b2e309  NameInput/Name_main.c
 set_name_scroll_step_assert_dir_1_dir_1:
     .word  assert_dir_1_dir_1             @ 08017fdc 48b3e309  dir == 1 || dir == -1
-DAT_08017fe0:
-    .word  0x0000031a                     @ 08017fe0 1a030000
+set_name_scroll_step_scroll_field_offset:
+    .word  0x0000031a                     @ 08017fe0 1a030000  gState+0x31a = scroll_step field (u8)
 
 @ Function: Reads current scrollbar value (gState+0x304 scrollbar slot via get_scrollbar_cur_value), uses value*16 as base offset r3; reads gState[0x031a] speed correction byte (signed): positive means scroll down (r0--/r3-=0x10), negative means scroll up (r0++/r3+=0x10), zero jumps to LAB_0801803e with no correction. Then uses abs(gState[0x031a]) as speed factor to adjust r3. Finally takes r3%0xff and calls write_bg0_vofs_with_bias and write_bg3_vofs_with_bias to synchronously write BG0 and BG3 vertical offset registers. Called each frame by FUN_08018e50 (banlist/font_jp/settings scroll renderer).
 @ Trigger: banlist/settings page each-frame refresh, after scrollbar value changes, to sync BG vertical offset.
@@ -10132,13 +10138,13 @@ DAT_08017fe0:
 @ - VOFS_MODULO=0xff=255 (BG vertical offset modulo range)
 sync_scrollbar_to_bg_vofs:
     push {r4,lr}                             @ 08017fe4 10b5
-    ldr r4, DAT_08018014                     @ 08017fe6 0b4c
+    ldr r4, sync_scrollbar_to_bg_vofs_gstate @ 08017fe6 0b4c
     movs r1,#0xc1    @ 08017fe8 c121
     lsls r1,r1,#0x2    @ 08017fea 8900
     adds r0,r4,r1    @ 08017fec 6018
     bl get_scrollbar_cur_value               @ 08017fee fdf759fa
     lsls r3,r0,#0x4    @ 08017ff2 0301
-    ldr r0, DAT_08018018                     @ 08017ff4 0848
+    ldr r0, sync_scrollbar_to_bg_vofs_scroll_field_offset @ 08017ff4 0848
     adds r2,r4,r0    @ 08017ff6 2218
     ldrb r0,[r2,#0x0]                        @ 08017ff8 1078
     movs r1,#0x0    @ 08017ffa 0021
@@ -10154,10 +10160,10 @@ sync_scrollbar_to_bg_vofs:
     movs r1,#0x1    @ 0801800e 0121
     subs r3,#0x10    @ 08018010 103b
     b LAB_08018026                           @ 08018012 08e0
-DAT_08018014:
-    .word  0x02029250                     @ 08018014 50920202
-DAT_08018018:
-    .word  0x0000031a                     @ 08018018 1a030000
+sync_scrollbar_to_bg_vofs_gstate:
+    .word  gState                         @ 08018014 50920202
+sync_scrollbar_to_bg_vofs_scroll_field_offset:
+    .word  0x0000031a                     @ 08018018 1a030000  gState+0x31a (1st ref: read scroll_step)
 LAB_0801801c:
     adds r0,#0x1    @ 0801801c 0130
     strb r0,[r2,#0x0]                        @ 0801801e 1070
@@ -10165,7 +10171,7 @@ LAB_0801801c:
     rsbs r1,r1,#0    @ 08018022 4942
     adds r3,#0x10    @ 08018024 1033
 LAB_08018026:
-    ldr r2, DAT_08018058                     @ 08018026 0c4a
+    ldr r2, sync_scrollbar_to_bg_vofs_scroll_field_offset_b @ 08018026 0c4a
     adds r0,r4,r2    @ 08018028 a018
     movs r2,#0x0    @ 0801802a 0022
     ldrsb r2,[r0,r2]                         @ 0801802c 8256
@@ -10189,8 +10195,8 @@ LAB_0801803e:
     pop {r4}                                 @ 08018052 10bc
     pop {r0}                                 @ 08018054 01bc
     bx r0                                    @ 08018056 0047
-DAT_08018058:
-    .word  0x0000031a                     @ 08018058 1a030000
+sync_scrollbar_to_bg_vofs_scroll_field_offset_b:
+    .word  0x0000031a                     @ 08018058 1a030000  gState+0x31a (2nd ref: update VOFS from scroll_step)
 
 @ Checks whether name-input buffer has reached max char count. Reads game_state+0x31f (current char count), selects threshold from gSettings bit[2:0]: JP mode (non-zero) threshold=14, EN mode (zero) threshold=7. Returns 1 if full (count>threshold), 0 if room remains. Caller FUN_08018098 uses result to pick cursor tile index (0x34=has room, 0x48=full).
 @ 
@@ -10199,12 +10205,12 @@ DAT_08018058:
 @ Side effects: none (read-only leaf)
 @ Constants: CHAR_COUNT_FIELD=0x02029250+0x31f=0x0202956f; LANG_MASK=0x7; MAX_EN=7; MAX_JP=14=0xe
 check_name_char_limit_reached:
-    ldr r0, DAT_0801807c                     @ 0801805c 0748
-    ldr r1, DAT_08018080                     @ 0801805e 0849
+    ldr r0, check_name_char_limit_reached_gstate @ 0801805c 0748
+    ldr r1, check_name_char_limit_reached_char_count_offset @ 0801805e 0849
     adds r0,r0,r1    @ 08018060 4018
     ldrb r2,[r0,#0x0]                        @ 08018062 0278
-    ldr r1, DAT_08018084                     @ 08018064 0749
-    ldr r0, DAT_08018088                     @ 08018066 0848
+    ldr r1, check_name_char_limit_reached_ewram_base @ 08018064 0749
+    ldr r0, check_name_char_limit_reached_gsettings_offset @ 08018066 0848
     adds r1,r1,r0    @ 08018068 0918
     movs r0,#0x7    @ 0801806a 0720
     ldrb r1,[r1,#0x0]                        @ 0801806c 0978
@@ -10215,14 +10221,14 @@ check_name_char_limit_reached:
     cmp r2,#0x7                              @ 08018076 072a
     ble LAB_08018094                         @ 08018078 0cdd
     b LAB_08018092                           @ 0801807a 0ae0
-DAT_0801807c:
-    .word  0x02029250                     @ 0801807c 50920202
-DAT_08018080:
-    .word  0x0000031f                     @ 08018080 1f030000
-DAT_08018084:
-    .word  0x02000000                     @ 08018084 00000002
-DAT_08018088:
-    .word  0x00006c2c                     @ 08018088 2c6c0000
+check_name_char_limit_reached_gstate:
+    .word  gState                         @ 0801807c 50920202
+check_name_char_limit_reached_char_count_offset:
+    .word  0x0000031f                     @ 08018080 1f030000  gState+0x31f = current char count byte field
+check_name_char_limit_reached_ewram_base:
+    .word  EWRAM_BASE                     @ 08018084 00000002
+check_name_char_limit_reached_gsettings_offset:
+    .word  0x00006c2c                     @ 08018088 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
 LAB_0801808c:
     movs r0,#0x0    @ 0801808c 0020
     cmp r2,#0xe                              @ 0801808e 0e2a
@@ -10259,9 +10265,9 @@ name_input_page_load_assets:
     .hword 0x4646    @ 080180b0 4646
     push {r6,r7}                             @ 080180b2 c0b4
     sub sp,#0x6c                             @ 080180b4 9bb0
-    ldr r7, DAT_08018190                     @ 080180b6 364f
+    ldr r7, name_input_page_load_assets_gstate @ 080180b6 364f
     add r1,sp,#0x14                          @ 080180b8 05a9
-    ldr r0, DAT_08018194                     @ 080180ba 3648
+    ldr r0, name_input_page_load_assets_name_o_resource_desc @ 080180ba 3648
     ldmia r0!,{r2,r3,r4}                     @ 080180bc 1cc8
     stmia r1!,{r2,r3,r4}                     @ 080180be 1cc1
     ldr r0,[r0,#0x0]                         @ 080180c0 0068
@@ -10287,7 +10293,7 @@ name_input_page_load_assets:
     add r4,sp,#0x24                          @ 080180ea 09ac
     adds r0,r4,#0x0    @ 080180ec 201c
     bl zero_struct_36bytes                   @ 080180ee fdf76bff
-    ldr r0, DAT_08018198                     @ 080180f2 2948
+    ldr r0, name_input_page_load_assets_name_b_01_path @ 080180f2 2948
     movs r1,#0x0    @ 080180f4 0021
     bl fs_load                               @ 080180f6 fcf757ff
     str r0,[sp,#0x24]                        @ 080180fa 0990
@@ -10306,7 +10312,7 @@ name_input_page_load_assets:
     ldrb r3,[r4,#0x18]                       @ 08018114 237e
     ands r0,r3    @ 08018116 1840
     strb r0,[r4,#0x18]                       @ 08018118 2076
-    ldr r6, DAT_0801819c                     @ 0801811a 204e
+    ldr r6, name_input_page_load_assets_attr_clear_bits_13_7 @ 0801811a 204e
     adds r0,r6,#0x0    @ 0801811c 301c
     ldrh r1,[r4,#0x18]                       @ 0801811e 218b
     ands r0,r1    @ 08018120 0840
@@ -10322,7 +10328,7 @@ name_input_page_load_assets:
     add r4,sp,#0x48                          @ 08018136 12ac
     adds r0,r4,#0x0    @ 08018138 201c
     bl zero_struct_36bytes                   @ 0801813a fdf745ff
-    ldr r0, DAT_080181a0                     @ 0801813e 1848
+    ldr r0, name_input_page_load_assets_name_b_02_path @ 0801813e 1848
     movs r1,#0x0    @ 08018140 0021
     bl fs_load                               @ 08018142 fcf731ff
     str r0,[sp,#0x48]                        @ 08018146 1290
@@ -10345,7 +10351,7 @@ name_input_page_load_assets:
     strh r3,[r4,#0x10]                       @ 08018168 2382
     adds r0,r4,#0x0    @ 0801816a 201c
     bl apply_gfx_resource_list               @ 0801816c fef786fc
-    ldr r0, DAT_080181a4                     @ 08018170 0c48
+    ldr r0, name_input_page_load_assets_name_b_04_path @ 08018170 0c48
     movs r1,#0x0    @ 08018172 0021
     bl fs_load                               @ 08018174 fcf718ff
     adds r1,r7,#0x0    @ 08018178 391c
@@ -10358,18 +10364,18 @@ name_input_page_load_assets:
     movs r1,#0x0    @ 08018188 0021
     bl apply_sprite_gfx_type_zero            @ 0801818a fff7fffa
     b LAB_080181b0                           @ 0801818e 0fe0
-DAT_08018190:
-    .word  0x02029250                     @ 08018190 50920202
-DAT_08018194:
-    .word  0x09e3b3d0                     @ 08018194 d0b3e309
-DAT_08018198:
-    .word  0x09e3b3e0                     @ 08018198 e0b3e309
-DAT_0801819c:
-    .word  0xffffc07f                     @ 0801819c 7fc0ffff
-DAT_080181a0:
-    .word  0x09e3b3fc                     @ 080181a0 fcb3e309
-DAT_080181a4:
-    .word  0x09e3b418                     @ 080181a4 18b4e309
+name_input_page_load_assets_gstate:
+    .word  gState                         @ 08018190 50920202
+name_input_page_load_assets_name_o_resource_desc:
+    .word  name_o_resource_desc           @ 08018194 d0b3e309
+name_input_page_load_assets_name_b_01_path:
+    .word  name_b_01_path                 @ 08018198 e0b3e309
+name_input_page_load_assets_attr_clear_bits_13_7:
+    .word  GFX_ATTR_CLEAR_BITS_13_7       @ 0801819c 7fc0ffff
+name_input_page_load_assets_name_b_02_path:
+    .word  name_b_02_path                 @ 080181a0 fcb3e309
+name_input_page_load_assets_name_b_04_path:
+    .word  name_b_04_path                 @ 080181a4 18b4e309
 LAB_080181a8:
     movs r0,#0x0    @ 080181a8 0020
     movs r1,#0x0    @ 080181aa 0021
@@ -10378,19 +10384,19 @@ LAB_080181b0:
     movs r0,#0x2    @ 080181b0 0220
     movs r1,#0x1    @ 080181b2 0121
     bl apply_sprite_gfx_type_zero            @ 080181b4 fff7eafa
-    ldr r4, DAT_08018228                     @ 080181b8 1b4c
-    ldr r1, DAT_0801822c                     @ 080181ba 1c49
+    ldr r4, name_input_page_load_assets_name_o_palette_data @ 080181b8 1b4c
+    ldr r1, name_input_page_load_assets_bg_palette_dst @ 080181ba 1c49
     ldr r5, PTR_BG0CNT_08018230              @ 080181bc 1c4d
     adds r0,r4,#0x0    @ 080181be 201c
     adds r2,r5,#0x0    @ 080181c0 2a1c
     bl bios_cpu_set                          @ 080181c2 f6f019f9
-    ldr r1, DAT_08018234                     @ 080181c6 1b49
+    ldr r1, name_input_page_load_assets_obj_palette_dst @ 080181c6 1b49
     adds r0,r4,#0x0    @ 080181c8 201c
     adds r2,r5,#0x0    @ 080181ca 2a1c
     bl bios_cpu_set                          @ 080181cc f6f014f9
     bl fill_bg0_tilemap_name_input           @ 080181d0 fff72efb
-    ldr r1, DAT_08018238                     @ 080181d4 1849
-    ldr r4, DAT_0801823c                     @ 080181d6 194c
+    ldr r1, name_input_page_load_assets_ewram_base @ 080181d4 1849
+    ldr r4, name_input_page_load_assets_gsettings_offset @ 080181d6 194c
     adds r1,r1,r4    @ 080181d8 0919
     movs r0,#0x7    @ 080181da 0720
     ldrb r1,[r1,#0x0]                        @ 080181dc 0978
@@ -10415,8 +10421,8 @@ LAB_080181f8:
     lsls r0,r0,#0x1a    @ 08018200 8006
     lsrs r0,r0,#0x1d    @ 08018202 400f
     bl init_banlist_name_input_page_layout   @ 08018204 fff7aefd
-    ldr r0, DAT_08018240                     @ 08018208 0d48
-    ldr r4, DAT_08018244                     @ 0801820a 0e4c
+    ldr r0, name_input_page_load_assets_gstate_copy_ctrl @ 08018208 0d48
+    ldr r4, name_input_page_load_assets_gstate_ptr_offset @ 0801820a 0e4c
     adds r1,r7,r4    @ 0801820c 3919
     movs r2,#0x2    @ 0801820e 0222
     bl bios_cpu_set                          @ 08018210 f6f0f2f8
@@ -10429,22 +10435,22 @@ LAB_080181f8:
     pop {r4,r5,r6,r7}                        @ 08018222 f0bc
     pop {r1}                                 @ 08018224 02bc
     bx r1                                    @ 08018226 0847
-DAT_08018228:
-    .word  0x09ccd290                     @ 08018228 90d2cc09
-DAT_0801822c:
-    .word  0x05000020                     @ 0801822c 20000005
+name_input_page_load_assets_name_o_palette_data:
+    .word  name_o_palette_data            @ 08018228 90d2cc09
+name_input_page_load_assets_bg_palette_dst:
+    .word  0x05000020                     @ 0801822c 20000005  BG PALRAM+0x20 = BG palette entry 16 (first non-zero palette slot)
 PTR_BG0CNT_08018230:
     .word  BG0CNT                         @ 08018230 08000004
-DAT_08018234:
-    .word  0x05000220                     @ 08018234 20020005
-DAT_08018238:
-    .word  0x02000000                     @ 08018238 00000002
-DAT_0801823c:
-    .word  0x00006c2c                     @ 0801823c 2c6c0000
-DAT_08018240:
-    .word  0x05000202                     @ 08018240 02020005
-DAT_08018244:
-    .word  0x000002be                     @ 08018244 be020000
+name_input_page_load_assets_obj_palette_dst:
+    .word  0x05000220                     @ 08018234 20020005  OBJ PALRAM+0x20 = OBJ palette entry 16
+name_input_page_load_assets_ewram_base:
+    .word  EWRAM_BASE                     @ 08018238 00000002
+name_input_page_load_assets_gsettings_offset:
+    .word  0x00006c2c                     @ 0801823c 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
+name_input_page_load_assets_gstate_copy_ctrl:
+    .word  0x05000202                     @ 08018240 02020005  bios_cpu_set ctrl: copy 514 words (2056B) from name_o ptr table -> gState+0x2be
+name_input_page_load_assets_gstate_ptr_offset:
+    .word  0x000002be                     @ 08018244 be020000  gState+0x2be = name_o animation ptr table base (receives 514-word block copy)
 
 @ BG3 vertical scroll register write helper. Receives shared scroll base value, subtracts fixed parallax bias 8, writes to BG3VOFS (0x0400001e). Part of three-layer BG parallax family with write_bg0_vofs_with_bias (0x08017cc4, bias=40) and write_bg1_vofs_with_bias (0x08018254, bias=4). FUN_08017fe4 calls all three in sequence for name-input page multi-layer BG parallax scrolling.
 @ 
@@ -10485,7 +10491,7 @@ render_obj_slot_cell_anim:
     sub sp,#0x28                             @ 08018262 8ab0
     adds r4,r0,#0x0    @ 08018264 041c
     adds r6,r1,#0x0    @ 08018266 0e1c
-    ldr r7, DAT_080182ac                     @ 08018268 104f
+    ldr r7, render_obj_slot_cell_anim_gstate @ 08018268 104f
     lsls r2,r2,#0xc    @ 0801826a 1203
     str r2,[sp,#0x20]                        @ 0801826c 0892
     lsls r3,r3,#0xc    @ 0801826e 1b03
@@ -10517,8 +10523,8 @@ LAB_0801828e:
     bl dispatch_cell_anim_frame_advance      @ 080182a4 fdf73afa
     b LAB_080182c2                           @ 080182a8 0be0
     .zero  0x2
-DAT_080182ac:
-    .word  0x02029250                     @ 080182ac 50920202
+render_obj_slot_cell_anim_gstate:
+    .word  gState                         @ 080182ac 50920202
 render_obj_slot_cell_anim_name_main_c_filename:
     .word  name_main_c_filename           @ 080182b0 b8b2e309  NameInput/Name_main.c
 render_obj_slot_cell_anim_assert_anmid_ig2d_getanmsequencescoun:
@@ -10585,10 +10591,10 @@ LAB_08018314:
     ldr r0,[sp,#0x0]                         @ 0801831c 0098
     ldr r2,[sp,#0x8]                         @ 0801831e 029a
     adds r1,r0,r2    @ 08018320 8118
-    ldr r7, DAT_08018360                     @ 08018322 0f4f
+    ldr r7, build_sprite_oam_row_attr2_charname_mask @ 08018322 0f4f
     adds r0,r7,#0x0    @ 08018324 381c
     ands r1,r0    @ 08018326 0140
-    ldr r2, DAT_08018364                     @ 08018328 0e4a
+    ldr r2, build_sprite_oam_row_attr2_charname_clear @ 08018328 0e4a
     adds r0,r2,#0x0    @ 0801832a 101c
     ldrh r7,[r3,#0x4]                        @ 0801832c 9f88
     ands r0,r7    @ 0801832e 3840
@@ -10613,15 +10619,15 @@ LAB_08018314:
     ble LAB_0801836c                         @ 08018354 0add
     subs r4,#0x4    @ 08018356 043c
     movs r2,#0x4    @ 08018358 0422
-    ldr r1, DAT_08018368                     @ 0801835a 0349
+    ldr r1, build_sprite_oam_row_hflip_vflip_pattern @ 0801835a 0349
     b LAB_08018380                           @ 0801835c 10e0
     .zero  0x2
-DAT_08018360:
-    .word  0x000003ff                     @ 08018360 ff030000
-DAT_08018364:
-    .word  0xfffffc00                     @ 08018364 00fcffff
-DAT_08018368:
-    .word  0x40004000                     @ 08018368 00400040
+build_sprite_oam_row_attr2_charname_mask:
+    .word  OAM_ATTR2_CHARNAME_MASK        @ 08018360 ff030000
+build_sprite_oam_row_attr2_charname_clear:
+    .word  OAM_ATTR2_CHARNAME_CLEAR       @ 08018364 00fcffff
+build_sprite_oam_row_hflip_vflip_pattern:
+    .word  OAM_HFLIP_VFLIP_PACKED_PATTERN @ 08018368 00400040  bit14 in attr0+attr1 word: hflip+vflip toggle
 LAB_0801836c:
     cmp r4,#0x1                              @ 0801836c 012c
     ble LAB_0801837a                         @ 0801836e 04dd
@@ -10640,10 +10646,10 @@ LAB_08018380:
     str r0,[r3,#0x0]                         @ 08018384 1860
     .hword 0x4650    @ 08018386 5046
     adds r1,r0,r5    @ 08018388 4119
-    ldr r7, DAT_080183c8                     @ 0801838a 0f4f
+    ldr r7, build_sprite_oam_row_attr1_x_mask @ 0801838a 0f4f
     adds r0,r7,#0x0    @ 0801838c 381c
     ands r1,r0    @ 0801838e 0140
-    ldr r7, DAT_080183cc                     @ 08018390 0e4f
+    ldr r7, build_sprite_oam_row_attr1_x_clear @ 08018390 0e4f
     adds r0,r7,#0x0    @ 08018392 381c
     ldrh r7,[r3,#0x2]                        @ 08018394 5f88
     ands r0,r7    @ 08018396 3840
@@ -10673,10 +10679,10 @@ LAB_080183b2:
     pop {r4,r5,r6,r7}                        @ 080183c2 f0bc
     pop {r0}                                 @ 080183c4 01bc
     bx r0                                    @ 080183c6 0047
-DAT_080183c8:
-    .word  0x000001ff                     @ 080183c8 ff010000
-DAT_080183cc:
-    .word  0xfffffe00                     @ 080183cc 00feffff
+build_sprite_oam_row_attr1_x_mask:
+    .word  OAM_ATTR1_X_MASK               @ 080183c8 ff010000  attr1 bits[8:0] = 9-bit x coordinate
+build_sprite_oam_row_attr1_x_clear:
+    .word  OAM_ATTR1_X_CLEAR              @ 080183cc 00feffff  clear attr1 bits[8:0] before inserting x-pos
 
 @ name_input 页面文字渲染的薄包装函数。由 name_input 页面渲染子树的两个上层函数调用：addr 0x08017b44（tags: game_str;name_input，场景文字行列渲染，调用 3 次）和 addr 0x08018774（tags: font_jp;name_input，当前被选中字符高亮显示，调用 1 次）；两者均尚未命名，通过 name_input EWRAM 缓冲区 0x02029250 + FUN_08018400 计算 vram_row 后压栈传入本函数；本函数先调 setup_font_jp_ctx_obj_vram_row 配置 JP 字体渲染上下文（目标 VRAM OBJ 行 + 图层模式），再以硬编码的模式参数（r1=1, r2=1, r3=7, arg5=8, arg6=0x80）调 dispatch_text_render_by_mode，将字符串渲染到 VRAM OBJ 瓦片（精灵层）。0x80 模式对应 dispatch 内的 JP 8 行字形 OBJ 渲染路径。
 render_jp_text_to_vram_obj:
@@ -10712,10 +10718,10 @@ zero_obj_vram_tiles:
     movs r0,#0x0    @ 08018408 0020
     str r0,[sp,#0x0]                         @ 0801840a 0090
     lsls r3,r3,#0x5    @ 0801840c 5b01
-    ldr r0, DAT_0801842c                     @ 0801840e 0748
+    ldr r0, zero_obj_vram_tiles_obj_tile_vram_base @ 0801840e 0748
     adds r3,r3,r0    @ 08018410 1b18
     lsls r2,r2,#0x3    @ 08018412 d200
-    ldr r0, DAT_08018430                     @ 08018414 0648
+    ldr r0, zero_obj_vram_tiles_cpuset_wordcount_mask @ 08018414 0648
     ands r2,r0    @ 08018416 0240
     movs r0,#0xa0    @ 08018418 a020
     lsls r0,r0,#0x13    @ 0801841a c004
@@ -10726,10 +10732,10 @@ zero_obj_vram_tiles:
     add sp,#0x4                              @ 08018426 01b0
     pop {r0}                                 @ 08018428 01bc
     bx r0                                    @ 0801842a 0047
-DAT_0801842c:
-    .word  0x06010000                     @ 0801842c 00000106
-DAT_08018430:
-    .word  0x001fffff                     @ 08018430 ffff1f00
+zero_obj_vram_tiles_obj_tile_vram_base:
+    .word  OBJ_TILE_VRAM_BASE             @ 0801842c 00000106
+zero_obj_vram_tiles_cpuset_wordcount_mask:
+    .word  0x001fffff                     @ 08018430 ffff1f00  cpuset word count mask (bits[20:0]) for bios_cpu_set fill; 0x1fffff = 2097151 max words
 
 @ tick_name_input_scrollbar_and_anims: Name-input scene per-frame tick. Three OAM updates: (1) calls update_scrollbar_thumb_display to refresh scrollbar thumb; (2) calls render_obj_slot_cell_anim for OBJ slot A cell animation; (3) calls render_obj_slot_cell_anim for OBJ slot B cell animation. The two render_obj_slot_cell_anim calls pass different slot params, typically cursor and selection-box animations.
 @ 
@@ -10742,7 +10748,7 @@ DAT_08018430:
 tick_name_input_scrollbar_and_anims:
     push {r4,r5,r6,r7,lr}                    @ 08018434 f0b5
     sub sp,#0x8                              @ 08018436 82b0
-    ldr r4, DAT_08018488                     @ 08018438 134c
+    ldr r4, tick_name_input_scrollbar_and_anims_gstate @ 08018438 134c
     movs r0,#0xc1    @ 0801843a c120
     lsls r0,r0,#0x2    @ 0801843c 8000
     adds r5,r4,r0    @ 0801843e 2518
@@ -10779,8 +10785,8 @@ LAB_0801847e:
     pop {r0}                                 @ 08018482 01bc
     bx r0                                    @ 08018484 0047
     .zero  0x2
-DAT_08018488:
-    .word  0x02029250                     @ 08018488 50920202
+tick_name_input_scrollbar_and_anims_gstate:
+    .word  gState                         @ 08018488 50920202
 
 @ Called by FUN_08018938 on right/down direction input. Advances 3-bit cursor slot index (bits[4:2]) at name_input EWRAM (0x02029250+0x314) by one slot. If gPrng+0x23a bits[2:0] non-zero (language/mode restriction active) and candidate==2, skips slot 2 and wraps to 0; else takes result modulo 3 (0->1->2->0 cycle). Writes forward direction marker 0x08 to [0x02029250+0x31b].
 @ 
@@ -10790,7 +10796,7 @@ DAT_08018488:
 @ Constants: NAME_INPUT_BUF=0x02029250; CURSOR_SLOT_OFFSET=0xC5*4=0x314; CURSOR_SLOT_MASK_WRITE=0xC7; CURSOR_SLOT_SHIFT=3; SCROLL_DIR_OFFSET=0x31b; SCROLL_FWD=0x08; SLOT_MODULO=3
 advance_name_input_cursor_slot:
     push {r4,lr}                             @ 0801848c 10b5
-    ldr r4, DAT_080184b8                     @ 0801848e 0a4c
+    ldr r4, advance_name_input_cursor_slot_gstate @ 0801848e 0a4c
     movs r1,#0xc5    @ 08018490 c521
     lsls r1,r1,#0x2    @ 08018492 8900
     adds r0,r4,r1    @ 08018494 6018
@@ -10798,8 +10804,8 @@ advance_name_input_cursor_slot:
     lsls r0,r0,#0x1a    @ 08018498 8006
     lsrs r0,r0,#0x1d    @ 0801849a 400f
     adds r3,r0,#0x1    @ 0801849c 431c
-    ldr r1, DAT_080184bc                     @ 0801849e 0749
-    ldr r0, DAT_080184c0                     @ 080184a0 0748
+    ldr r1, advance_name_input_cursor_slot_ewram_base @ 0801849e 0749
+    ldr r0, advance_name_input_cursor_slot_gsettings_offset @ 080184a0 0748
     adds r1,r1,r0    @ 080184a2 0918
     movs r0,#0x7    @ 080184a4 0720
     ldrb r1,[r1,#0x0]                        @ 080184a6 0978
@@ -10811,12 +10817,12 @@ advance_name_input_cursor_slot:
     movs r3,#0x0    @ 080184b2 0023
     b LAB_080184ce                           @ 080184b4 0be0
     .zero  0x2
-DAT_080184b8:
-    .word  0x02029250                     @ 080184b8 50920202
-DAT_080184bc:
-    .word  0x02000000                     @ 080184bc 00000002
-DAT_080184c0:
-    .word  0x00006c2c                     @ 080184c0 2c6c0000
+advance_name_input_cursor_slot_gstate:
+    .word  gState                         @ 080184b8 50920202
+advance_name_input_cursor_slot_ewram_base:
+    .word  EWRAM_BASE                     @ 080184bc 00000002
+advance_name_input_cursor_slot_gsettings_offset:
+    .word  0x00006c2c                     @ 080184c0 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
 LAB_080184c4:
     adds r0,r3,#0x0    @ 080184c4 181c
     movs r1,#0x3    @ 080184c6 0321
@@ -10835,15 +10841,15 @@ LAB_080184ce:
     ands r0,r3    @ 080184e0 1840
     orrs r0,r1    @ 080184e2 0843
     strb r0,[r2,#0x0]                        @ 080184e4 1070
-    ldr r0, DAT_080184f4                     @ 080184e6 0348
+    ldr r0, advance_name_input_cursor_slot_scroll_dir_offset @ 080184e6 0348
     adds r1,r4,r0    @ 080184e8 2118
     movs r0,#0x8    @ 080184ea 0820
     strb r0,[r1,#0x0]                        @ 080184ec 0870
     pop {r4}                                 @ 080184ee 10bc
     pop {r0}                                 @ 080184f0 01bc
     bx r0                                    @ 080184f2 0047
-DAT_080184f4:
-    .word  0x0000031b                     @ 080184f4 1b030000
+advance_name_input_cursor_slot_scroll_dir_offset:
+    .word  0x0000031b                     @ 080184f4 1b030000  gState+0x31b = scroll direction marker field (advance writes dir=1)
 
 @ Symmetric sibling of advance_name_input_cursor_slot (0x0801848c). Called by FUN_08018938 on left/up direction input. Retreats 3-bit cursor slot index (bits[4:2]) at name_input EWRAM (0x02029250+0x314) by one slot. When current slot is 0 and language mode non-zero, wraps to slot 1 (skips slot 2); else wraps to slot 2. Non-zero current slot decrements directly. Writes backward direction marker 0xF8 (-8) to [0x02029250+0x31b].
 @ 
@@ -10853,7 +10859,7 @@ DAT_080184f4:
 @ Constants: NAME_INPUT_BUF=0x02029250; CURSOR_SLOT_OFFSET=0xC5*4=0x314; SCROLL_DIR_OFFSET=0x31b; SCROLL_BWD=0xF8=-8; SLOT_MODULO=3
 retreat_name_input_cursor_slot:
     push {r4,lr}                             @ 080184f8 10b5
-    ldr r4, DAT_08018548                     @ 080184fa 134c
+    ldr r4, retreat_name_input_cursor_slot_gstate @ 080184fa 134c
     movs r1,#0xc5    @ 080184fc c521
     lsls r1,r1,#0x2    @ 080184fe 8900
     adds r0,r4,r1    @ 08018500 6018
@@ -10863,8 +10869,8 @@ retreat_name_input_cursor_slot:
     subs r3,r0,#0x1    @ 08018508 431e
     cmp r0,#0x0                              @ 0801850a 0028
     bne LAB_08018522                         @ 0801850c 09d1
-    ldr r0, DAT_0801854c                     @ 0801850e 0f48
-    ldr r3, DAT_08018550                     @ 08018510 0f4b
+    ldr r0, retreat_name_input_cursor_slot_ewram_base @ 0801850e 0f48
+    ldr r3, retreat_name_input_cursor_slot_gsettings_offset @ 08018510 0f4b
     adds r0,r0,r3    @ 08018512 c018
     movs r1,#0x7    @ 08018514 0721
     ldrb r0,[r0,#0x0]                        @ 08018516 0078
@@ -10886,21 +10892,21 @@ LAB_08018522:
     ands r0,r3    @ 08018534 1840
     orrs r0,r1    @ 08018536 0843
     strb r0,[r2,#0x0]                        @ 08018538 1070
-    ldr r0, DAT_08018554                     @ 0801853a 0648
+    ldr r0, retreat_name_input_cursor_slot_scroll_dir_offset @ 0801853a 0648
     adds r1,r4,r0    @ 0801853c 2118
     movs r0,#0xf8    @ 0801853e f820
     strb r0,[r1,#0x0]                        @ 08018540 0870
     pop {r4}                                 @ 08018542 10bc
     pop {r0}                                 @ 08018544 01bc
     bx r0                                    @ 08018546 0047
-DAT_08018548:
-    .word  0x02029250                     @ 08018548 50920202
-DAT_0801854c:
-    .word  0x02000000                     @ 0801854c 00000002
-DAT_08018550:
-    .word  0x00006c2c                     @ 08018550 2c6c0000
-DAT_08018554:
-    .word  0x0000031b                     @ 08018554 1b030000
+retreat_name_input_cursor_slot_gstate:
+    .word  gState                         @ 08018548 50920202
+retreat_name_input_cursor_slot_ewram_base:
+    .word  EWRAM_BASE                     @ 0801854c 00000002
+retreat_name_input_cursor_slot_gsettings_offset:
+    .word  0x00006c2c                     @ 08018550 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
+retreat_name_input_cursor_slot_scroll_dir_offset:
+    .word  0x0000031b                     @ 08018554 1b030000  gState+0x31b = scroll direction marker field (retreat writes dir=-1)
 
 @ Function: Renders the OBJ slot cell animation sequence (up to 5 cells) for the settings page selection cursor. Reads language flag (gState[0x6c2c]&7) and speed correction (gState[0x031b] signed abs); copies two animation data tables from ROM (0x09e3b46f 12 bytes / 0x09e3b47c 28 bytes) to stack; if speed nonzero sets [sp+0x3c]=8-speed as step factor; for r4 in [0..4]: computes OBJ slot offset based on current index and language flag, calls render_obj_slot_cell_anim for each cursor animation cell. Called each frame by FUN_08018e50 (banlist/settings frame renderer).
 @ Trigger: banlist/settings scene each-frame render, cursor OBJ animation update.
@@ -10921,10 +10927,10 @@ render_settings_cursor_cell_anims:
     .hword 0x4645    @ 0801855e 4546
     push {r5,r6,r7}                          @ 08018560 e0b4
     sub sp,#0x40                             @ 08018562 90b0
-    ldr r0, DAT_08018658                     @ 08018564 3c48
+    ldr r0, render_settings_cursor_cell_anims_gstate @ 08018564 3c48
     .hword 0x4680    @ 08018566 8046
-    ldr r0, DAT_0801865c                     @ 08018568 3c48
-    ldr r1, DAT_08018660                     @ 0801856a 3d49
+    ldr r0, render_settings_cursor_cell_anims_ewram_base @ 08018568 3c48
+    ldr r1, render_settings_cursor_cell_anims_gsettings_offset @ 0801856a 3d49
     adds r0,r0,r1    @ 0801856c 4018
     movs r1,#0x7    @ 0801856e 0721
     ldrb r0,[r0,#0x0]                        @ 08018570 0078
@@ -10934,7 +10940,7 @@ render_settings_cursor_cell_anims:
     lsrs r0,r0,#0x1f    @ 08018578 c00f
     .hword 0x4681    @ 0801857a 8146
     .hword 0x464d    @ 0801857c 4d46
-    ldr r0, DAT_08018664                     @ 0801857e 3948
+    ldr r0, render_settings_cursor_cell_anims_speed_field_offset @ 0801857e 3948
     add r0,r8                                @ 08018580 4044
     movs r7,#0x0    @ 08018582 0027
     ldrsb r7,[r0,r7]                         @ 08018584 c757
@@ -10942,13 +10948,13 @@ render_settings_cursor_cell_anims:
     bge LAB_0801858c                         @ 08018588 00da
     rsbs r7,r7,#0    @ 0801858a 7f42
 LAB_0801858c:
-    ldr r1, DAT_08018668                     @ 0801858c 3649
+    ldr r1, render_settings_cursor_cell_anims_anim_data_a @ 0801858c 3649
     add r0,sp,#0x8                           @ 0801858e 02a8
     movs r2,#0xc    @ 08018590 0c22
     bl memcpy                                @ 08018592 f6f0e3f9
     add r2,sp,#0x14                          @ 08018596 05aa
     adds r1,r2,#0x0    @ 08018598 111c
-    ldr r0, DAT_0801866c                     @ 0801859a 3448
+    ldr r0, render_settings_cursor_cell_anims_anim_data_b @ 0801859a 3448
     ldmia r0!,{r3,r4,r6}                     @ 0801859c 58c8
     stmia r1!,{r3,r4,r6}                     @ 0801859e 58c1
     ldmia r0!,{r3,r4,r6}                     @ 080185a0 58c8
@@ -10972,7 +10978,7 @@ LAB_080185be:
     rsbs r0,r1,#0    @ 080185c2 4842
     orrs r0,r1    @ 080185c4 0843
     lsrs r6,r0,#0x1f    @ 080185c6 c60f
-    ldr r0, DAT_08018664                     @ 080185c8 2648
+    ldr r0, render_settings_cursor_cell_anims_speed_field_offset @ 080185c8 2648
     add r0,r8                                @ 080185ca 4044
     ldrb r0,[r0,#0x0]                        @ 080185cc 0078
     lsls r0,r0,#0x18    @ 080185ce 0006
@@ -11037,7 +11043,7 @@ LAB_0801863c:
     cmp r4,#0x4                              @ 0801863e 042c
     ble LAB_080185be                         @ 08018640 bddd
     adds r2,r7,#0x0    @ 08018642 3a1c
-    ldr r1, DAT_08018664                     @ 08018644 0749
+    ldr r1, render_settings_cursor_cell_anims_speed_field_offset @ 08018644 0749
     add r1,r8                                @ 08018646 4144
     movs r0,#0x0    @ 08018648 0020
     ldrsb r0,[r1,r0]                         @ 0801864a 0856
@@ -11048,18 +11054,18 @@ LAB_08018652:
     strb r2,[r1,#0x0]                        @ 08018652 0a70
     b LAB_080186be                           @ 08018654 33e0
     .zero  0x2
-DAT_08018658:
-    .word  0x02029250                     @ 08018658 50920202
-DAT_0801865c:
-    .word  0x02000000                     @ 0801865c 00000002
-DAT_08018660:
-    .word  0x00006c2c                     @ 08018660 2c6c0000
-DAT_08018664:
-    .word  0x0000031b                     @ 08018664 1b030000
-DAT_08018668:
-    .word  0x09e3b46f                     @ 08018668 6fb4e309
-DAT_0801866c:
-    .word  0x09e3b47c                     @ 0801866c 7cb4e309
+render_settings_cursor_cell_anims_gstate:
+    .word  gState                         @ 08018658 50920202
+render_settings_cursor_cell_anims_ewram_base:
+    .word  EWRAM_BASE                     @ 0801865c 00000002
+render_settings_cursor_cell_anims_gsettings_offset:
+    .word  0x00006c2c                     @ 08018660 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
+render_settings_cursor_cell_anims_speed_field_offset:
+    .word  0x0000031b                     @ 08018664 1b030000  gState+0x31b = speed/position correction byte for cursor animation
+render_settings_cursor_cell_anims_anim_data_a:
+    .word  cursor_anim_data_a             @ 08018668 6fb4e309
+render_settings_cursor_cell_anims_anim_data_b:
+    .word  cursor_anim_data_b             @ 0801866c 7cb4e309
 LAB_08018670:
     movs r4,#0x0    @ 08018670 0024
     lsls r0,r5,#0x1    @ 08018672 6800
@@ -11113,29 +11119,22 @@ LAB_080186be:
     bx r0                                    @ 080186cc 0047
     ROM_INCBIN 0x186ce, 0x22
 
-@ Function: Computes current row/column index from scrollbar value (get_scrollbar_cur_value) and auxiliary offset field (gState[0x315] bits[5:2]), calls advance_text_ptr_by_charlen to locate corresponding char pointer r2 in banlist text table (gState+0x8d); if r2 is null writes 0 to r5; otherwise checks for space char (0x20) in EN mode and substitutes ROM constant bytes (0x09e3b2b4), then calls banlist_password_enter_char to write the char to output buffer r5. Called by FUN_080187e0 and FUN_08018938 (banlist/settings char input) on each char selection.
-@ Trigger: banlist password input interface when a character is selected (scrollbar position determines char); r0=output buf ptr.
-@ Side effects: [r5..] written with one char (via banlist_password_enter_char); if invalid [r5]=0.
-@ 
-@ Constants:
-@ - SCROLLBAR_OAM_OFFSET=0xc1<<2=0x304 (gState+0x304 scrollbar slot)
-@ - BANLIST_TEXT_OFFSET=0x8d (gState+0x8d banlist text table start)
-@ - SCROLL_COL_FIELD=gState+0x315 (scroll column index field bits[5:2])
-@ - LANG_CHECK_OFFSET=gState+0x6c2c (language flag bits[2:0])
-@ - COL_STRIDE=0xc=12 (bytes per column: r2*3<<2=r2*12)
-@ - SPACE_PLACEHOLDER=0x09e3b2b4 (ROM addr: EN mode space substitute bytes)
-@ - ENTER_FLAG=1 (banlist_password_enter_char 3rd param)
+@ read_banlist_char_at_scroll_pos(void) @ 0x080186f0
+@ Reads gState+0x315 scroll column index.
+@ Returns SJIS char byte from banlist_jp_str_src at scroll position.
+@ In EN mode: substitutes line_break_seq (0x09e3b2b4, SJIS full-width space+NUL).
+@ Returns char value in r0.
 read_banlist_char_at_scroll_pos:
     push {r4,r5,lr}                          @ 080186f0 30b5
     adds r5,r0,#0x0    @ 080186f2 051c
-    ldr r4, DAT_0801874c                     @ 080186f4 154c
+    ldr r4, read_banlist_char_at_scroll_pos_gstate @ 080186f4 154c
     movs r1,#0xc1    @ 080186f6 c121
     lsls r1,r1,#0x2    @ 080186f8 8900
     adds r0,r4,r1    @ 080186fa 6018
     bl get_scrollbar_cur_value               @ 080186fc fcf7d2fe
     adds r3,r4,#0x0    @ 08018700 231c
     adds r3,#0x8d    @ 08018702 8d33
-    ldr r2, DAT_08018750                     @ 08018704 124a
+    ldr r2, read_banlist_char_at_scroll_pos_scroll_col_offset @ 08018704 124a
     adds r1,r4,r2    @ 08018706 a118
     ldrb r1,[r1,#0x0]                        @ 08018708 0978
     lsls r2,r1,#0x1a    @ 0801870a 8a06
@@ -11156,8 +11155,8 @@ read_banlist_char_at_scroll_pos:
     adds r2,r0,#0x0    @ 0801872a 021c
     cmp r2,#0x0                              @ 0801872c 002a
     beq LAB_0801876c                         @ 0801872e 1dd0
-    ldr r1, DAT_08018754                     @ 08018730 0849
-    ldr r0, DAT_08018758                     @ 08018732 0948
+    ldr r1, read_banlist_char_at_scroll_pos_ewram_base @ 08018730 0849
+    ldr r0, read_banlist_char_at_scroll_pos_gsettings_offset @ 08018732 0948
     adds r1,r1,r0    @ 08018734 0918
     movs r0,#0x7    @ 08018736 0720
     ldrb r1,[r1,#0x0]                        @ 08018738 0978
@@ -11167,19 +11166,19 @@ read_banlist_char_at_scroll_pos:
     ldrb r1,[r2,#0x0]                        @ 08018740 1178
     cmp r1,#0x20                             @ 08018742 2029
     bne LAB_08018760                         @ 08018744 0cd1
-    ldr r0, DAT_0801875c                     @ 08018746 0548
+    ldr r0, read_banlist_char_at_scroll_pos_line_break_seq @ 08018746 0548
     b LAB_08018762                           @ 08018748 0be0
     .zero  0x2
-DAT_0801874c:
-    .word  0x02029250                     @ 0801874c 50920202
-DAT_08018750:
-    .word  0x00000315                     @ 08018750 15030000
-DAT_08018754:
-    .word  0x02000000                     @ 08018754 00000002
-DAT_08018758:
-    .word  0x00006c2c                     @ 08018758 2c6c0000
-DAT_0801875c:
-    .word  0x09e3b2b4                     @ 0801875c b4b2e309
+read_banlist_char_at_scroll_pos_gstate:
+    .word  gState                         @ 0801874c 50920202
+read_banlist_char_at_scroll_pos_scroll_col_offset:
+    .word  0x00000315                     @ 08018750 15030000  gState+0x315 = scroll column index field (same as encode_str_table scroll_col)
+read_banlist_char_at_scroll_pos_ewram_base:
+    .word  EWRAM_BASE                     @ 08018754 00000002
+read_banlist_char_at_scroll_pos_gsettings_offset:
+    .word  0x00006c2c                     @ 08018758 2c6c0000  = 0x6c2c; gSettings(0x02006c2c) - EWRAM_BASE
+read_banlist_char_at_scroll_pos_line_break_seq:
+    .word  line_break_seq                 @ 0801875c b4b2e309
 LAB_08018760:
     adds r0,r2,#0x0    @ 08018760 101c
 LAB_08018762:
@@ -11194,14 +11193,18 @@ LAB_0801876e:
     pop {r0}                                 @ 08018770 01bc
     bx r0                                    @ 08018772 0047
 
-@ banlist/font_jp/settings callers (0x080187e0/0x08018838/0x0801950c) name_input 界面每次切换/确认字符时触发. 读 IWRAM 0x02029564 (游戏状态基址 0x02029250 + 0xc5*4) 处的 2-bit ping-pong 槽位选择子, 切换到对端槽位 (bit0 XOR 1), 调 zero_obj_vram_tiles 清空该槽位的 34 块 OBJ VRAM 瓦片, 再调 render_jp_text_to_vram_obj 把当前选中假名写入那 34 块瓦片, 最后将翻转后的槽位值写回原地址, 完成双缓冲换页, 防止字符更新时 OBJ VRAM 可见撕裂.
+@ refresh_selected_char_obj_tile(void) @ 0x08018774
+@ Reads gState+0x31c (ping-pong buf index 0 or 1) to select OBJ tile slot.
+@ Loads tile index from name_char_tile_slot_table[buf_idx] (0x09e587ec).
+@ Writes OBJ tile index to gState+0x2c2 name input buffer entry.
+@ Ping-pong: buf0=tile 300 (0x012c), buf1=tile 334 (0x014e).
 refresh_selected_char_obj_tile:
     push {r4,r5,r6,lr}                       @ 08018774 70b5
     .hword 0x4646    @ 08018776 4646
     push {r6}                                @ 08018778 40b4
     sub sp,#0x4                              @ 0801877a 81b0
-    ldr r4, DAT_080187d4                     @ 0801877c 154c
-    ldr r1, DAT_080187d8                     @ 0801877e 1649
+    ldr r4, refresh_selected_char_obj_tile_gstate @ 0801877c 154c
+    ldr r1, refresh_selected_char_obj_tile_char_tile_slot_table @ 0801877e 1649
     movs r0,#0xc5    @ 08018780 c520
     lsls r0,r0,#0x2    @ 08018782 8000
     adds r0,r0,r4    @ 08018784 0019
@@ -11214,7 +11217,7 @@ refresh_selected_char_obj_tile:
     lsls r0,r0,#0x1    @ 08018792 4000
     adds r0,r0,r1    @ 08018794 4018
     ldrh r6,[r0,#0x0]                        @ 08018796 0688
-    ldr r3, DAT_080187dc                     @ 08018798 104b
+    ldr r3, refresh_selected_char_obj_tile_name_buf_offset @ 08018798 104b
     adds r4,r4,r3    @ 0801879a e418
     adds r0,r6,#0x0    @ 0801879c 301c
     movs r1,#0x22    @ 0801879e 2221
@@ -11242,12 +11245,12 @@ refresh_selected_char_obj_tile:
     pop {r4,r5,r6}                           @ 080187ce 70bc
     pop {r0}                                 @ 080187d0 01bc
     bx r0                                    @ 080187d2 0047
-DAT_080187d4:
-    .word  0x02029250                     @ 080187d4 50920202
-DAT_080187d8:
-    .word  0x09e587ec                     @ 080187d8 ec87e509
-DAT_080187dc:
-    .word  0x000002c2                     @ 080187dc c2020000
+refresh_selected_char_obj_tile_gstate:
+    .word  gState                         @ 080187d4 50920202
+refresh_selected_char_obj_tile_char_tile_slot_table:
+    .word  name_char_tile_slot_table      @ 080187d8 ec87e509
+refresh_selected_char_obj_tile_name_buf_offset:
+    .word  0x000002c2                     @ 080187dc c2020000  gState+0x2c2 = name input byte buffer base (current char index reads from here)
 
 @ append_banlist_input_char: Appends one character to the input buffer in the banlist name-input scene. Checks if current char count (gState+0x31e) has reached the limit (gState+0x31f); if full, returns 0 (fail). Otherwise calls read_banlist_char_at_scroll_pos to get the char at scroll position, appends it to the buffer end, calls refresh_selected_char_obj_tile to refresh the OBJ tile, and returns 1 (success). Return value preserved via pop {r1}; bx r1 exit (Sub-case E).
 @ 

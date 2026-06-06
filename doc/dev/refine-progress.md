@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `00_system_str_vija.s` (进行中, ~6/10 段)。
-> **下一任务**: **Seg-6b** (00 文件, 0x17e48..0x18774, 23 fn, ROM_INCBIN 0x186ce/0x22; carve F/G/H pending)。
+> **当前文件**: `00_system_str_vija.s` (进行中, ~7/10 段)。
+> **下一任务**: **Seg-7** (00 文件, 0x18774..0x19a58, ~28 fn, ROM_INCBIN 0x19640/0x20)。
 
 ---
 
@@ -17,7 +17,7 @@
 
 | # | 文件 | 地址区间 | 段(~10/文件) | 状态 | 活动 doc |
 |---|------|----------|------|------|---------|
-| 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | 🟡 进行中 (1..5d ✅, 6→) | `doc/dev/p5-refine-00-system-str-vija.md` |
+| 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | 🟡 进行中 (1..6b ✅, 7→) | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | 未拆 | ⬜ | (待建) |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | 未拆 | ⬜ | |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
@@ -62,15 +62,15 @@
 | 5c | apply_gfx_resource_list + R4 disasm 63 SJIS stubs | ✅ | (committed) |
 | 5d | 0x171ec..0x1794c (15 fn + 2 carve + §5.1 0x17424/0x40) | ✅ | 8c4ec5a |
 | 6a | 0x1794c..0x17e48 (5 fn, kana carve A+B+pool+I) | ✅ | baabb9a |
-| **6b** | **0x17e48..0x18774 (23 fn, carve F/G/H, incbin 0x186ce/0x22)** | **⬜ 下一步** | |
-| 7 | 0x18774..0x19a58 (incbin 0x19640/0x20) | ⬜ | |
+| 6b | 0x17e48..0x18774 (23 fn, carve F/G/H, §5.1 0x186ce/0x22) | ✅ | (pending commit) |
+| **7** | **0x18774..0x19a58 (~28 fn, incbin 0x19640/0x20)** | **⬜ 下一步** | |
 | 8 | 0x19a58..0x1a794 | ⬜ | |
 | 9 | 0x1a794..0x1b850 (incbin 0x1a89c, 0x1ad18/0xec) | ⬜ | |
 | 10 | 0x1b850..0x1cb00 | ⬜ | |
 
 00 文件完整路线图 (段范围 / ROM_INCBIN / 旧覆盖) 见其活动 doc §五。
 00 文件 §5.1 未引用登记: 0x14e54 / 0x14f9c / 0x1547e / 0x1550a / 0x156ec / 0x15d18 / 0x15fe8 /
-0x16074 / 0x169d6+0x16a20 / 0x17424 (孤儿 dead-code, 引用到时再 R4 disasm)。
+0x16074 / 0x169d6+0x16a20 / 0x17424 / 0x186ce (孤儿 dead-code, 引用到时再 R4 disasm)。
 
 ---
 
@@ -105,4 +105,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-07 (00 文件 Seg-5d 完成: 15 fn 槽符号化 + 2 carve + §5.1 0x17424/0x40; byte-identical 9689337d)。
+**上次更新**: 2026-06-07 (00 文件 Seg-6b 完成: 23 fn render/cursor/load_assets + carve F/G/H + 10 EQ + 31 REF + 23 RENAME + §5.1 0x186ce/0x22; byte-identical 9689337d)。

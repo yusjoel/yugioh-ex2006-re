@@ -670,7 +670,10 @@ font_jp_outline_large:                             @ 0x1C6F2BC..0x1CCB490 (37730
 @ 加载函数 FUN_080f1b60 @ 0x080f1b60；详见 doc/dev/p2-font-location-findings.md
 	.include "data/font.s"
 
-	.incbin "roms/2343.gba", 0x1CCD290, 0x16D0      @ 0x1CCD290..0x1CCE960 字库后段前部
+name_o_palette_data:                               @ 0x09ccd290 carve H: name_o OAM/BG palette (16 RGB15 colors, 32B)
+	.hword 0x0000, 0x7c00, 0x001f, 0x7c1f, 0x83e0, 0xffe0, 0x83ff, 0xffff  @ entries [0..7]
+	.hword 0x2108, 0x6000, 0x0018, 0x6018, 0x0300, 0x6300, 0x0318, 0x5294  @ entries [8..15]
+	.incbin "roms/2343.gba", 0x1CCD2B0, 0x16B0      @ remaining to 0x1CCE960
 
 @ 卡包封面条幅图 (ROM 0x1CCE960..0x1CE822C, 0x198CC bytes)
 @ 指针表 (.word label) + 51 × 0x800 bytes 8bpp OBJ tile data
@@ -1042,10 +1045,43 @@ assert_table_last_fmt:
 	.incbin "roms/2343.gba", 0x1E3B347, 0x1
 assert_dir_1_dir_1:
 	.asciz "dir == 1 || dir == -1"
-	.incbin "roms/2343.gba", 0x1E3B35E, 0xD6
+	.incbin "roms/2343.gba", 0x1E3B35E, 0x2   @ 2B pad before name_o paths
+name_o_ncer_path:                              @ 0x09e3b360
+	.asciz "name_input/name_o_01.LZncer"      @ 27+NUL=28B (4B-aligned, no extra pad)
+name_o_nanr_path:                              @ 0x09e3b37c
+	.asciz "name_input/name_o_01.LZnanr"      @ 27+NUL=28B
+name_o_ncgr_path:                              @ 0x09e3b398
+	.asciz "name_input/name_o_01.LZncgr"      @ 27+NUL=28B
+name_o_nclr_path:                              @ 0x09e3b3b4
+	.asciz "name_input/name_o_01.LZnclr"      @ 27+NUL=28B
+name_o_resource_desc:                          @ 0x09e3b3d0 carve F: name_o_01 G2D resource desc (4 path ptrs)
+	.word name_o_ncer_path
+	.word name_o_nanr_path
+	.word name_o_ncgr_path
+	.word name_o_nclr_path
+name_b_01_path:                                @ 0x09e3b3e0
+	.asciz "name_input/name_b_01.LZ5bg"       @ 26+NUL=27B + 1B pad = 28B
+	.byte 0x00                                 @ 1B align pad
+name_b_02_path:                                @ 0x09e3b3fc
+	.asciz "name_input/name_b_02.LZ5bg"       @ 26+NUL=27B + 1B pad = 28B
+	.byte 0x00                                 @ 1B align pad
+name_b_04_path:                                @ 0x09e3b418
+	.asciz "name_input/name_b_04.LZ5bg"       @ 26+NUL=27B + 1B pad = 28B
+	.byte 0x00                                 @ 1B align pad -> host end 0x1E3B434
 assert_anmid_ig2d_getanmsequencescoun:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
-	.incbin "roms/2343.gba", 0x1E3B46F, 0x1115
+cursor_anim_data_a:                    @ 0x09e3b46f carve G: cursor anim frame bytes (12B x/y offsets for 5 cursor cells)
+	.byte 6, 8, 10, 6, 8, 10, 10, 8, 10, 8, 10, 8
+	.incbin "roms/2343.gba", 0x1E3B47B, 0x1   @ 1B gap
+cursor_anim_data_b:                    @ 0x09e3b47c carve G: cursor anim coord table (7 s32 values)
+	.word 0xffffffc1    @ cell 0: x_start (signed -63)
+	.word 0x00000085    @ cell 1
+	.word 0x00000019    @ cell 2
+	.word 0x00000085    @ cell 3
+	.word 0x00000071    @ cell 4
+	.word 0x00000085    @ cell 5
+	.word 0x000000c9    @ cell 6
+	.incbin "roms/2343.gba", 0x1E3B498, 0x10EC  @ remainder to host end 0x1E3C584
 pass_main_c_filename:
 	.asciz "PassInput/Pass_main.c"
 	.incbin "roms/2343.gba", 0x1E3C59A, 0x2
