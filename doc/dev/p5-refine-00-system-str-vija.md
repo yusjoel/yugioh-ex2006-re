@@ -485,6 +485,23 @@ byte-identical 9689337d。
 再确认)。脚本 `FixSeg1bSeg3aEOLAscii.py` 重写为纯 ASCII; **规则**: Ghidra 设的 EOL/plate 一律避免
 CJK, 必要解释走 doc/dev/。**§5.1 登记: 无** (10 个 carve label 均有引用)。
 
+### 4.0q Seg-3b/3 完成记录: 0x1510a..0x1571c (b4/b5/b6 复用 + R5 + §5.1) ✅
+
+| 区段/函数 | 处理 |
+|---|---|
+| 0x1510c..0x1522c | ✅ b4 GL palette/OAM 7fn 已细化 (零自动名残留) |
+| **0x1522c..0x15384 gap** | ✅ tick_palette_fade_to_oam_palram (0x152b0) 已细化 (plate 完整, 无 pool 槽残留) |
+| 0x15384..0x155f4 | ✅ b5 GL_Scrollbar 11fn 已细化 |
+| **ROM_INCBIN 0x1547e/0x26** | **§5.1 登记** (3 个 GL_Scrollbar 字段孤儿小函数, 0 ROM 引用) |
+| **0x1550a .byte 14B** | **§5.1 登记** (1 个谓词函数 "字段非零?", 0 引用) |
+| 0x155f4..0x1563c update_scrollbar_thumb_display | ✅ b5 末细化 |
+| 0x1563c..0x15724 IG2D allocators (b6) | ✅ batch-6 IG2D 资源加载管理器已细化 |
+| 0x156d0..0x1571c cell-anim accessor | ✅ 已细化 (4 fn; `get_anim_ctrl_seq_id` R5 plate 旧 DWORD_08015710/14 → 现槽名, byte-identical) |
+| **0x156ec .byte 6B** | **§5.1 登记** (1 个 setter `str r1,[r0,#0xc]`, 0 引用) |
+| 0x1571c..0x15728 dispatch_cell_anim_frame_advance | ✅ b6 边缘已细化 (plate 完整, 无 pool 槽) |
+
+byte-identical 9689337d 保持。脚本: `RefineSeg3bGetAnimCtrl.py` (单 plate R5)。**Seg-3 完成**。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -576,6 +593,9 @@ R9 byte-identical。
 |---|---|---|---|---|
 | 0x08014e54 | 76 B | Seg-2 | **3 个 THUMB 孤儿小函数 (Ghidra 未识别为代码)**: ①0x14e54 (24B) `sub sp,#4;ldrh;mov;strh;ldr [sp]` 从 u16 ptr 取 bits[3:2]×0x4000 + VRAM_BASE (char_base addr); ②0x14e70 (20B) 同壳取 bits[15:14] 返回 screen_size 值 (0..3); ③0x14e84 (28B) 同壳取 bits[12:8]×0x800 + VRAM_BASE (screen_base addr)。**与 batch-3 BG VRAM 族同模式但操作 ptr-to-BGnCNT-copy 而非 register**。**ROM 内 0 引用** (扫描 ROM_BASE+1 / 原值均零真匹配)。**留待**: 引用到时按 R4 disasm + createFunction (Ghidra 反汇编 + 4-byte 对齐 alignment pad) |
 | 0x08014f9c | 14 B | Seg-2 | **1 个 THUMB 孤儿 thunk (`.byte` 块, 非 ROM_INCBIN)**: 0x14f9e `push lr;movs r1,#0;bl fs_load;pop r0;bx r0` = `fs_load_no_flag(path)` wrapper (强制 flag=0)。**ROM 内 0 引用**。**留待**: 引用到时 R4 disasm。注: 已是 `.byte` 形式, 未违反 Rule 2 |
+| 0x0801547e | 38 B (`ROM_INCBIN 0x1547e, 0x26`) | Seg-3 | **3 个 THUMB 孤儿 GL_Scrollbar 字段小函数**: ①0x15480 (8B) `bits[5:2] getter` (`ldrb [r0];lsls#0x1a;lsrs#0x1c;bx lr`); ②0x15488 (8B) `bit[0] getter` (`ldrb [r0];lsls#0x1f;lsrs#0x1f;bx lr`); ③0x15490 (18B) `bit[0] setter from r1&1` (read-modify-write [r0])。**ROM 内 0 引用** (全 ROM 扫 raw+THUMB+1 均零)。**留待**: 引用到时 R4 disasm |
+| 0x0801550a | 14 B (`.byte` 块, 非 ROM_INCBIN) | Seg-3 | **1 个 THUMB 孤儿谓词函数**: 0x1550c `adds r1,r0,#0;ldrh r2,[r1+4];rsbs r0,r2,#0;orrs r0,r2;lsrs r0,#0x1f;bx lr` = "返回 [r0+4] 的 u16 字段是否非零 (0/1)" 谓词。**ROM 内 0 引用**。**留待**: R4 disasm |
+| 0x080156ec | 6 B (`.byte` 块, 非 ROM_INCBIN) | Seg-3 | **1 个 THUMB 孤儿 setter**: 0x156ee `str r1,[r0,#0xc];bx lr` = `void f(void* p, u32 val) { p[+0xc]=val; }`。**ROM 内 0 引用**。**留待**: R4 disasm |
 
 ---
 

@@ -4788,8 +4788,8 @@ dispatch_cell_anim_sequence_step:
 @ 
 @ Constants:
 @ - GL/ISD_Draw.c assert line 0x65 = 101
-@ - DWORD_08015710 = 0x09e3a488 (source file string)
-@ - DWORD_08015714 = 0x09e3a4d8 (condition string)
+@ - get_anim_ctrl_seq_id_ig2d_main_c_filename = ig2d_main_c_filename (GL/IG2D_Main.c)
+@ - get_anim_ctrl_seq_id_assert_psequence = assert_psequence (pSequence)
 @ - ANIM_CTRL_FIELD = [r0+0x18] (non-null check target)
 @ - SEQ_ID_FIELD = [r4+0x0] (u16 sequence ID)
 get_anim_ctrl_seq_id:
