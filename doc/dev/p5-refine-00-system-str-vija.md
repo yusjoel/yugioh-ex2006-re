@@ -445,6 +445,24 @@ footprint 内但逻辑独立** —— 10+ refs 全文字函数, 0 blend; blend �
 脚本: `tools/ghidra-labeling/RefineSeg1bTextPrng.py`。**§5.1 登记: 无** (STEP_TABLE 有引用 → 当场 carve)。
 **Seg-1 完成** (Seg-1a 残留 + Seg-1b gap)。下一段 Seg-2 (0x14838..0x14fa8, 含 carve 0x14e54/76B)。
 
+### 4.0o Seg-2 完成记录: 0x14838..0x14fa8 (b2-tail + b3 + gap, register-only) ✅
+
+Seg-2 大部分已被旧 batch-2/batch-3 细化; 新增工作仅为**§5.1 登记** (无 Ghidra 改动 / 无 build):
+
+| 函数/区段 | 状态 |
+|---|---|
+| 0x14838..0x14a10 | ✅ batch-2 GL blend/brightness 已细化 |
+| 0x14a10..0x14e14 | ✅ batch-3 BG VRAM 簇 24fn 已细化 |
+| copy_to_obj_tile_vram (0x14e14, b3 末) | ✅ 已细化 (槽 0x14e4c/50 已符号化为 _gl_common_c_filename / _assert_u32_psrc_0x3_0) |
+| **ROM_INCBIN 0x14e54/0x4c** | **§5.1 登记** (3 个 THUMB 孤儿小函数, 0 ROM 引用; 与 batch-3 BG VRAM 同模式但操作 ptr-to-BGnCNT-copy; Ghidra 未识别) |
+| measure_str_bytelen (0x14ea0) | ✅ 已干净 (plate 完整, 无 pool 槽) |
+| find_substr_offset (0x14eb4) | ✅ 已干净 (3 pool 槽已经全局 assert carve 符号化) |
+| fs_resolve_path_to_fid (0x14f54) | ✅ 已干净 (plate 完整, 无 pool 槽) |
+| **0x14f9c .byte 14B 孤儿 thunk** | **§5.1 登记** (`fs_load_no_flag` wrapper, 0 ROM 引用; `.byte` 形式未违反 Rule 2) |
+| fs_load (0x14fa8) | → **Seg-3 起点**, 留 Seg-3 处理 |
+
+byte-identical 保持 9689337d (无任何 Ghidra/asm 改动)。Seg-2 完成, 进入 Seg-3。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -534,7 +552,8 @@ R9 byte-identical。
 
 | 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
 |---|---|---|---|---|
-| (待 Seg 执行时填) | | | | |
+| 0x08014e54 | 76 B | Seg-2 | **3 个 THUMB 孤儿小函数 (Ghidra 未识别为代码)**: ①0x14e54 (24B) `sub sp,#4;ldrh;mov;strh;ldr [sp]` 从 u16 ptr 取 bits[3:2]×0x4000 + VRAM_BASE (char_base addr); ②0x14e70 (20B) 同壳取 bits[15:14] 返回 screen_size 值 (0..3); ③0x14e84 (28B) 同壳取 bits[12:8]×0x800 + VRAM_BASE (screen_base addr)。**与 batch-3 BG VRAM 族同模式但操作 ptr-to-BGnCNT-copy 而非 register**。**ROM 内 0 引用** (扫描 ROM_BASE+1 / 原值均零真匹配)。**留待**: 引用到时按 R4 disasm + createFunction (Ghidra 反汇编 + 4-byte 对齐 alignment pad) |
+| 0x08014f9c | 14 B | Seg-2 | **1 个 THUMB 孤儿 thunk (`.byte` 块, 非 ROM_INCBIN)**: 0x14f9e `push lr;movs r1,#0;bl fs_load;pop r0;bx r0` = `fs_load_no_flag(path)` wrapper (强制 flag=0)。**ROM 内 0 引用**。**留待**: 引用到时 R4 disasm。注: 已是 `.byte` 形式, 未违反 Rule 2 |
 
 ---
 
