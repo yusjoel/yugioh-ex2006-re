@@ -2137,7 +2137,7 @@ copy_str_unbounded:
     pop {r1}                                 @ 08014478 02bc
     bx r1                                    @ 0801447a 0847
 copy_str_unbounded_len_sentinel:
-    .word  0x05f5e0ff                     @ 0801447c ffe0f505  = 99,999,999 (0x5f5e0ff) æ ä¸éå¨åµ
+    .word  0x05f5e0ff                     @ 0801447c ffe0f505  = 99,999,999 (0x5f5e0ff) sentinel meaning no upper-bound length
 
 @ Appends src string (r0) to the end of dst buffer (r1) and returns total char-unit count. Flow: (1) scan dst in encoding-aware mode to count existing char units r4 (OCG: bit7=1 double-byte +2, else +1; TCG: byte count); (2) call copy_str_unbounded(src, dst_end) to append; (3) return r4+copy_result. Encoding mode from [EWRAM+0x6c2c]&0x7 (0=OCG double-byte, else TCG). Extra flag [0x0202348c] can override OCG to byte-count mode.
 @ 
@@ -3707,9 +3707,9 @@ fs_load:
     push {r5,r6,r7}                          @ 08014fb0 e0b4
     sub sp,#0x68                             @ 08014fb2 9ab0
     .hword 0x4688    @ 08014fb4 8846
-    ldr r1, DAT_0801507c                     @ 08014fb6 3149
+    ldr r1, fs_load_ptr_key_hash             @ 08014fb6 3149
     .hword 0x466b    @ 08014fb8 6b46
-    ldr r2, DAT_08015080                     @ 08014fba 314a
+    ldr r2, fs_load_ptr_language_char_table  @ 08014fba 314a
     ldmia r2!,{r4,r5,r6}                     @ 08014fbc 70ca
     stmia r3!,{r4,r5,r6}                     @ 08014fbe 70c3
     ldmia r2!,{r4,r5,r6}                     @ 08014fc0 70ca
@@ -3743,8 +3743,8 @@ fs_load:
     adds r1,r6,#0x0    @ 08014ffa 311c
     bl strcpy                                @ 08014ffc faf048f8
     adds r1,r4,r5    @ 08015000 6119
-    ldr r0, DAT_08015088                     @ 08015002 2148
-    ldr r2, DAT_0801508c                     @ 08015004 214a
+    ldr r0, fs_load_ewram_base               @ 08015002 2148
+    ldr r2, fs_load_gsettings_offset         @ 08015004 214a
     adds r0,r0,r2    @ 08015006 8018
     ldrb r0,[r0,#0x0]                        @ 08015008 0078
     lsls r0,r0,#0x1d    @ 0801500a 4007
@@ -3756,7 +3756,7 @@ fs_load:
     adds r6,r4,#0x0    @ 08015016 261c
 LAB_08015018:
     adds r0,r6,#0x0    @ 08015018 301c
-    ldr r1, DAT_08015090                     @ 0801501a 1d49
+    ldr r1, fs_load_ptr_key_excl             @ 0801501a 1d49
     bl find_substr_offset                    @ 0801501c fff74aff
     adds r5,r0,#0x0    @ 08015020 051c
     cmp r5,r9                                @ 08015022 4d45
@@ -3766,7 +3766,7 @@ LAB_08015018:
     adds r1,r6,#0x0    @ 0801502a 311c
     bl strcpy                                @ 0801502c faf030f8
     adds r1,r4,r5    @ 08015030 6119
-    ldr r0, DAT_08015094                     @ 08015032 1848
+    ldr r0, fs_load_rom_region_code_addr     @ 08015032 1848
     ldrh r0,[r0,#0x0]                        @ 08015034 0088
     lsrs r0,r0,#0x8    @ 08015036 000a
     strb r0,[r1,#0x0]                        @ 08015038 0870
@@ -3780,7 +3780,7 @@ LAB_0801503c:
     cmp r4,r9                                @ 08015048 4c45
     beq LAB_080150f8                         @ 0801504a 55d0
     adds r0,r6,#0x0    @ 0801504c 301c
-    ldr r1, DAT_08015098                     @ 0801504e 1249
+    ldr r1, fs_load_ptr_key_lz_suffix        @ 0801504e 1249
     bl find_substr_offset                    @ 08015050 fff730ff
     lsls r1,r4,#0x2    @ 08015054 a100
     ldr r3,[sp,#0x5c]                        @ 08015056 179b
@@ -3793,34 +3793,34 @@ LAB_0801503c:
     ldr r2,[r1,#0x0]                         @ 08015064 0a68
     cmp r0,r9                                @ 08015066 4845
     beq LAB_080150e4                         @ 08015068 3cd0
-    ldr r5, DAT_0801509c                     @ 0801506a 0c4d
-    ldr r0, DAT_080150a0                     @ 0801506c 0c48
+    ldr r5, fs_load_ptr_decomp_buf           @ 0801506a 0c4d
+    ldr r0, fs_load_vram_boundary_threshold  @ 0801506c 0c48
     cmp r8,r0                                @ 0801506e 8045
     bls LAB_080150a4                         @ 08015070 18d9
     adds r0,r4,#0x0    @ 08015072 201c
     .hword 0x4641    @ 08015074 4146
     bl bios_huff_uncomp                      @ 08015076 f9f0cff9
     b LAB_080150f8                           @ 0801507a 3de0
-DAT_0801507c:
-    .word  0x09e39980                     @ 0801507c 8099e309
-DAT_08015080:
-    .word  0x09e399a0                     @ 08015080 a099e309
+fs_load_ptr_key_hash:
+    .word  fs_key_hash                    @ 0801507c 8099e309
+fs_load_ptr_language_char_table:
+    .word  fs_language_char_ptr_table     @ 08015080 a099e309
 PTR_fs_master_struct_08015084:
     .word  fs_master_struct               @ 08015084 7811e609
-DAT_08015088:
+fs_load_ewram_base:
     .word  0x02000000                     @ 08015088 00000002
-DAT_0801508c:
-    .word  0x00006c2c                     @ 0801508c 2c6c0000
-DAT_08015090:
-    .word  0x09e39984                     @ 08015090 8499e309
-DAT_08015094:
-    .word  0x080000ae                     @ 08015094 ae000008
-DAT_08015098:
-    .word  0x09e3997c                     @ 08015098 7c99e309
-DAT_0801509c:
-    .word  0x0200af20                     @ 0801509c 20af0002
-DAT_080150a0:
-    .word  0x05ffffff                     @ 080150a0 ffffff05
+fs_load_gsettings_offset:
+    .word  0x00006c2c                     @ 0801508c 2c6c0000  = gSettings(0x02006c2c) - EWRAM base; bits[2:0]=language_id
+fs_load_ptr_key_excl:
+    .word  fs_key_excl                    @ 08015090 8499e309
+fs_load_rom_region_code_addr:
+    .word  ROM_REGION_CODE_ADDR           @ 08015094 ae000008
+fs_load_ptr_key_lz_suffix:
+    .word  fs_key_lz_suffix               @ 08015098 7c99e309
+fs_load_ptr_decomp_buf:
+    .word  gFsDecompBuf                   @ 0801509c 20af0002
+fs_load_vram_boundary_threshold:
+    .word  0x05ffffff                     @ 080150a0 ffffff05  = 0x06000000-1 (VRAM boundary - 1); dest <= this -> LZ77 decompress to gFsDecompBuf, otherwise direct huff/lz to dest
 LAB_080150a4:
     ldr r0,[r4,#0x0]                         @ 080150a4 2068
     lsls r0,r0,#0x18    @ 080150a6 0006

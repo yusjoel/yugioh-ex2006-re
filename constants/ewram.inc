@@ -12,6 +12,9 @@
 @ -----------------------------------------------------------------------------
 .equ gSettings,                  0x02006C2C  @ 1 B  各种设置；低 3 位为语言 ID
                                              @ language_id: 0=JP 1=EN 2=DE 3=FR 4=IT 5=ES
+.equ gFsDecompBuf,               0x0200AF20  @ FS 解压暂存缓冲 (LZ77 bios_lz77_uncomp 目标)
+                                             @ fs_load 用; dest in VRAM 时直接 huff/lz 写 VRAM, 否则
+                                             @ 先解压到此 buf 再 cpu_copy_auto 到最终 dest
 .equ gTextEncodingOverride,      0x0202348C  @ 1 B  文字编码覆盖标志 (TCG/OCG override)
                                              @ OCG(JP)模式下非0 → 强制单字节(TCG)计数路径
                                              @ 物理位于 gGlBlendState(0x02023480) 之后, 逻辑独立

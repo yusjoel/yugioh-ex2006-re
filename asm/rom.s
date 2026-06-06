@@ -783,7 +783,35 @@ assert_psrc:
 	.incbin "roms/2343.gba", 0x1E39971, 0x3
 assert_pkey:
 	.asciz "pKey"
-	.incbin "roms/2343.gba", 0x1E39979, 0x3F
+	.incbin "roms/2343.gba", 0x1E39979, 0x3   @ 3B 对齐填充
+@ fs_load 用 3 个路径前缀魔数 (each NUL-terminated, 4B 对齐):
+@   ".LZ" = 解压后缀；"#" = 语言占位符 (替换为 j/e/g/f/i/s)；"!" = 区域占位符 (替换为 'J'/'E')
+fs_key_lz_suffix:
+	.asciz ".LZ"                              @ 0x09e3997c (4B incl NUL)
+fs_key_hash:
+	.ascii "#\0\0\0"                          @ 0x09e39980 (1 char + 3B pad)
+fs_key_excl:
+	.ascii "!\0\0\0"                          @ 0x09e39984
+fs_lang_char_j:
+	.ascii "j\0\0\0"                          @ 0x09e39988 = JP language char
+fs_lang_char_e:
+	.ascii "e\0\0\0"                          @ 0x09e3998c = EN
+fs_lang_char_g:
+	.ascii "g\0\0\0"                          @ 0x09e39990 = DE (g for German)
+fs_lang_char_f:
+	.ascii "f\0\0\0"                          @ 0x09e39994 = FR
+fs_lang_char_i:
+	.ascii "i\0\0\0"                          @ 0x09e39998 = IT
+fs_lang_char_s:
+	.ascii "s\0\0\0"                          @ 0x09e3999c = ES
+@ 6 ptr 表, gSettings 低 3 位 (language_id) ×4 索引, fs_load 入口 ldmia ×2 复制 24 B 进栈
+fs_language_char_ptr_table:                   @ 0x09e399a0
+	.word fs_lang_char_j                      @ language_id 0
+	.word fs_lang_char_e                      @ language_id 1
+	.word fs_lang_char_g                      @ language_id 2
+	.word fs_lang_char_f                      @ language_id 3
+	.word fs_lang_char_i                      @ language_id 4
+	.word fs_lang_char_s                      @ language_id 5
 assert_phead_comptype_1:
 	.asciz "pHead->compType == 1"
 	.incbin "roms/2343.gba", 0x1E399CD, 0x3   @ 0x1E399CD..0x1E399D0 对齐填充 (00 00 00)

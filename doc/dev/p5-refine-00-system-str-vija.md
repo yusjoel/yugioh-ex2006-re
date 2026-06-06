@@ -463,6 +463,28 @@ Seg-2 大部分已被旧 batch-2/batch-3 细化; 新增工作仅为**§5.1 登�
 
 byte-identical 保持 9689337d (无任何 Ghidra/asm 改动)。Seg-2 完成, 进入 Seg-3。
 
+### 4.0p Seg-3a 完成记录: fs_load (0x14fa8..0x1510a) ✅
+
+Seg-3 起点。fs_load 是 FS 路径解析+解压 hub: ① 用 #/!/.LZ 3 个魔数 prefix 探测路径 →
+② 据 gSettings language_id (bits[2:0]) 把 # 替换为 j/e/g/f/i/s; ROM region byte 把 ! 替换
+为 'J' / 'E' → ③ fs_resolve_path_to_fid 查 FID → ④ LZ77/Huff 解压。9 个 pool 槽全符号化。
+byte-identical 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| **R7 rom.s carve** | 把 `.incbin 0x1E39979, 0x3F` (63B) 切为: 3B 对齐填充 + `fs_key_lz_suffix`(".LZ") + `fs_key_hash`("#") + `fs_key_excl`("!") + 6 个 `fs_lang_char_<j/e/g/f/i/s>` (每个 4B 对齐) + `fs_language_char_ptr_table` (6 .word ptr 表) | 1 incbin → 10 labels |
+| R3 carve label ref | 4 个 fs key/table 槽 (0x1507c/15080/15090/15098) → carve label DATA ref + 改名 `fs_load_ptr_key_<hash/excl/lz_suffix>` / `_ptr_language_char_table` | 4 槽 |
+| R3 新全局 | `gFsDecompBuf`=0x0200af20 (ewram.inc, FS LZ77 解压暂存缓冲) + 槽 0x1509c ref + 改名 | 1 槽/1 全局 |
+| R1 区域字节 | ROM_REGION_CODE_ADDR=0x080000ae equate (Seg-1a 复用) @0x15094 + 改名 | 1 槽 |
+| R2 EWRAM base+offset | 0x15088/0x1508c → `fs_load_ewram_base` / `fs_load_gsettings_offset` (gSettings 0x02006c2c pattern, 同 Seg-1a/1b) | 2 槽 |
+| R2 VRAM 边界 | 0x150a0 (0x05ffffff = 0x06000000-1) → `fs_load_vram_boundary_threshold` + EOL (LZ77→gFsDecompBuf vs 直接 huff 到 dest 判别) | 1 槽 |
+
+新增: `gFsDecompBuf` (ewram.inc); 脚本: `RefineSeg3aFsLoad.py`。
+**踩坑修复**: Seg-1b `copy_str_unbounded_len_sentinel` + Seg-3a `fs_load_vram_boundary_threshold`
+2 个 EOL 含 CJK → Ghidra Jython 双重 UTF-8 编码 mojibake (feedback_jython_unicode_plate_comment.md
+再确认)。脚本 `FixSeg1bSeg3aEOLAscii.py` 重写为纯 ASCII; **规则**: Ghidra 设的 EOL/plate 一律避免
+CJK, 必要解释走 doc/dev/。**§5.1 登记: 无** (10 个 carve label 均有引用)。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
