@@ -120,6 +120,7 @@ gitignore 生成产物):
 | **batch-9: ISD affine matrix 指针簇 (3 fn)** | 0x16098..0x1613c | ✅ R3/R7/R2/R5 完成 (见 §四.4.0i): 3 个 ROM 数据 **carve 进 rom.s**(isd_affine_matrix_ptr_type4/type9 NULL 槽 + assert_expr_zero_65c) + 9 槽 GAS label 引用/改名 + 3 plate; byte-identical |
 | **batch-10: ISD cell-anim OAM 簇 (2 fn)** | 0x15954..0x15ac4 | ✅ R3/R1/R2/R5 完成 (见 §四.4.0j): gOamAttrBuildBuf=0x030007f8(iwram.inc, OAM 属性构建暂存缓冲 128×8B=0x400B) + 2 attr2 char-name 字段掩码 equate(新 oam_attr.inc) + 2 槽改名(scale-shift 阈值/assert 行号) + 3 plate 散文符号化(含消费者 build_oam_attrs_from_cell_with_affine); byte-identical |
 | **batch-11: NNS IG2D 资源加载族 (7 fn)** | 0x15b04..0x15e72 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0k): OBJ_PALRAM_BASE=0x05000200(gba_mem.inc) + 16 个 assert-line DAT 槽改名(`<func>_assert_line_<hexlineno>` 避碰撞) + copy_pltt plate 散文符号化; byte-identical。load_nce/nanr/ncgr/nclr_*_from_file sibling + copy_pltt_data_to_vram_proxy + load_g2d_obj_resource_set hub; plate 已高质量, 细化以 R2 灭自动名为主 |
+| **batch-12: NNS G2D 写族 前 2 fn** | 0x1626c..0x16342 | ✅ R1/R3/R2/R5 完成 (见 §四.4.0l): write_palt_block_to_vram(OBJ_PALRAM_BASE 复用 batch-11 + plate 0x05000000/0x05000200→GBA/OBJ_PALRAM_BASE) + dispatch_bg_screen_map_write(0xfff00000 raw-addr 判别掩码槽改名); byte-identical。write_tile_region_to_bg_screen(0x16344, med-conf struct 字段待 runtime) defer |
 | 代码函数 (其余 ~194 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
@@ -395,6 +396,23 @@ load_g2d_obj_resource_set (0x15d30, hub indeg=6)。源 GL/IG2D_Main.c。NCE/NANR
 无 pool 槽不符号化。assert 串本体槽 (`_assert_<expr>_null` 等) 已由 4.0b 全 ROM 断言串 carve 处理。
 其余 0x05000200 字面量槽 (write_palt_block_to_vram 0x162bc / 模块 01/15) 留各自批次符号化。
 
+### 4.0l batch-12 完成记录: NNS G2D 写族 前 2 fn (0x1626c..0x16342) ✅
+
+write_palt_block_to_vram (0x1626c) / dispatch_bg_screen_map_write (0x162dc)。源 GL/IG2D_Main.c。
+PALT 调色板块写 PALRAM (按 type 选 BG/OBJ 调色板) + BG screen-map 写入分派 (raw-addr 直写
+或 bg_index+offset 分派到 copy_to_bgN_screen_map)。byte-identical SHA1 9689337d。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1/R3 OBJ 调色板基址 | data-equate `OBJ_PALRAM_BASE`(0x05000200, **复用 batch-11 gba_mem.inc 常量**) @0x162bc + 槽改名 `write_palt_block_to_vram_obj_palram_base` | 1 槽 |
+| R2 判别掩码 | 0x162fc(0xfff00000, 测 dst 高 20 位判 raw-addr/offset 两路径) → `dispatch_bg_screen_map_write_raw_addr_mask` | 1 槽 |
+| R5 注释 | write_palt plate 2 处: `0x05000000`→`GBA_PALRAM_BASE` (BG 调色板) + `0x05000200`→`OBJ_PALRAM_BASE` (OBJ 调色板) | 1 plate |
+
+脚本: `tools/ghidra-labeling/RefineG2dWriteBatch12.py` (无新增 constants, 复用 gba_mem.inc)。
+注: BG 调色板基址 0x05000000 由 `movs r0,#0xa0; lsls r0,#0x13` (=0xa0<<0x13) 内联合成, 无 pool
+槽不符号化 (plate 已注)。**defer**: write_tile_region_to_bg_screen (0x16344) 体大且 plate 自标
+med-conf (r6 struct +0x14/+0x15/+0x16 字段布局待 runtime verify) + 含 0x02023d40 全局, 留专项批。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -475,16 +493,21 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
    gOamAttrBuildBuf=0x030007f8 + OAM attr2 char-name 掩码符号化。
 11. ✅ **batch-11 (0x15b04..0x15e72, NNS IG2D 资源加载族 7 fn)** 完成 (见 §四.4.0k);
    OBJ_PALRAM_BASE=0x05000200 + 16 assert-line 槽灭自动名。
-12. 下一批 (batch-12) 候选:
-   - **setup_decimal_digit_oam_batch 深度** (0x15ea4): divmod(10) 数字拆解 + cell anim tick;
-     其 plate 已较完整, 主要 R2 槽 (DAT_08015ea0 已 batch-11 改名) + 内部常量。
-   - **G2D 写族** (write_palt_block_to_vram 0x1626c / dispatch_bg_screen_map_write 0x162dc /
-     write_tile_region_to_bg_screen): PALRAM/VRAM 基址 (0x05000000/0x05000200) + screen map 写。
+12. ✅ **batch-12 (0x1626c..0x16342, NNS G2D 写族 前 2 fn)** 完成 (见 §四.4.0l);
+   write_palt(OBJ/GBA_PALRAM_BASE) + dispatch_bg_screen_map_write(raw-addr 掩码)。
+   - 注: setup_decimal_digit_oam_batch (0x15ea4) 已确认**无 pool 数据槽** (常量全内联) + plate 完整
+     (含 batch-10 已符号化 gOamAttrBuildBuf), 无需细化; zero_struct_36bytes (0x15fc8) 剩 1 个
+     cpu_set 控制字槽 (0x01000012) + get_bg_screen_vram_addr_by_index (0x16014) 已干净。
+13. 下一批 (batch-13) 候选:
+   - **write_tile_region_to_bg_screen 专项** (0x16344): med-conf, r6 struct 字段布局 +
+     0x02023d40 全局, 需 runtime verify (mGBA)。
    - **cell-anim accessor 簇** (get_anim_ctrl_* / dispatch_cell_anim_* 0x156d0..0x1571c)。
-   - **专项 R4**: 0x1550a 处 14 字节 `.byte` 误标小函数 disasm + createFunction。
+   - **专项 R4 (2 处)**: 0x1550a 14B `.byte` 小函数 + 0x1604c jump-table 分派器 (含 0x16060
+     跳转表 + 0x16074..8c 5 个 6B handler, 均 Ghidra 误标数据) disasm + createFunction。
+   - zero_struct_36bytes (0x15fc8) 的 cpu_set 控制字槽 (顺手并入相邻批)。
    - FS 散点 (0x14f54) / 文本测量簇 (0x14470) / tick_palette_fade (0x152b0)。
    - 注: ROM 数据表/串细化即**当场 carve** (不留待办)。
-13. 每批后视情况更新本文「进度」表。
+14. 每批后视情况更新本文「进度」表。
 
 ---
 

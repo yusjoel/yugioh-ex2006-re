@@ -6449,7 +6449,7 @@ get_objd_inline_data_ptr:
 get_objd_inline_data_ptr_objd_tag:
     .word  OBJD_TAG                       @ 08016268 4f424a44
 
-@ Writes PALT (palette) data block to GBA palette VRAM. r0=void* src_entry (PALT resource entry with type/x/visible/data fields), r1=void* dst_info. Checks src_entry[+0x10] signed x>=0 and src_entry[+0x18] bit31 visibility. src_entry[+0x14] bits[3:0] type: 0-3 -> BG palette 0x05000000; type 4 -> OBJ palette 0x05000200. Uses bios_cpu_fast_set to write. Returns fixed 0. Called by apply_gfx_resource_list on 'PALT' (0x544C4150) tag match. Constants: 0x05000000 = BG palette VRAM base; 0x05000200 = OBJ palette VRAM base.
+@ Writes PALT (palette) data block to GBA palette VRAM. r0=void* src_entry (PALT resource entry with type/x/visible/data fields), r1=void* dst_info. Checks src_entry[+0x10] signed x>=0 and src_entry[+0x18] bit31 visibility. src_entry[+0x14] bits[3:0] type: 0-3 -> BG palette GBA_PALRAM_BASE (0x05000000); type 4 -> OBJ palette OBJ_PALRAM_BASE (0x05000200). Uses bios_cpu_fast_set to write. Returns fixed 0. Called by apply_gfx_resource_list on 'PALT' (0x544C4150) tag match. Constants: GBA_PALRAM_BASE (0x05000000) = BG palette VRAM base; OBJ_PALRAM_BASE (0x05000200) = OBJ palette VRAM base.
 write_palt_block_to_vram:
     push {r4,lr}                             @ 0801626c 10b5
     adds r3,r0,#0x0    @ 0801626e 031c
@@ -6485,15 +6485,15 @@ LAB_08016282:
     bne LAB_080162d4                         @ 080162a6 15d1
     movs r0,#0x10    @ 080162a8 1020
     ldrsh r1,[r3,r0]                         @ 080162aa 195e
-    ldr r0, DAT_080162bc                     @ 080162ac 0348
+    ldr r0, write_palt_block_to_vram_obj_palram_base @ 080162ac 0348
     adds r1,r1,r0    @ 080162ae 0918
     lsls r2,r2,#0x9    @ 080162b0 5202
     lsrs r2,r2,#0xb    @ 080162b2 d20a
     adds r0,r4,#0x0    @ 080162b4 201c
     bl bios_cpu_fast_set                     @ 080162b6 f8f09df8
     b LAB_080162d4                           @ 080162ba 0be0
-DAT_080162bc:
-    .word  0x05000200                     @ 080162bc 00020005
+write_palt_block_to_vram_obj_palram_base:
+    .word  OBJ_PALRAM_BASE                @ 080162bc 00020005
 LAB_080162c0:
     movs r0,#0x10    @ 080162c0 1020
     ldrsh r1,[r3,r0]                         @ 080162c2 195e
@@ -6516,7 +6516,7 @@ dispatch_bg_screen_map_write:
     adds r5,r0,#0x0    @ 080162de 051c
     adds r4,r2,#0x0    @ 080162e0 141c
     adds r2,r3,#0x0    @ 080162e2 1a1c
-    ldr r0, DAT_080162fc                     @ 080162e4 0548
+    ldr r0, dispatch_bg_screen_map_write_raw_addr_mask @ 080162e4 0548
     ands r0,r4    @ 080162e6 2040
     cmp r0,#0x0                              @ 080162e8 0028
     beq LAB_08016300                         @ 080162ea 09d0
@@ -6527,7 +6527,7 @@ dispatch_bg_screen_map_write:
     bl bios_cpu_set                          @ 080162f4 f8f080f8
     b LAB_0801633e                           @ 080162f8 21e0
     .zero  0x2
-DAT_080162fc:
+dispatch_bg_screen_map_write_raw_addr_mask:
     .word  0xfff00000                     @ 080162fc 0000f0ff
 LAB_08016300:
     cmp r1,#0x1                              @ 08016300 0129
