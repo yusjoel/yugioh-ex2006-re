@@ -110,8 +110,9 @@ gitignore 生成产物):
 | lang-select 图形 | 0xAA10..0xDE30 | ✅ 国旗/边框/palette/extra tiles, 符号化, 目视确认 |
 | boot-ui 图形 | 0xDE30..0x13510 | 🟡 灰度导出 + 结构化; **用户裁定放最后** (导出图未确认/未找到加载方) |
 | **batch-1: demo scene 簇 (15 fn)** | 0x13510..0x14398 | ✅ R1 常量 + R3 指针 + R5 注释完成 (见 §四.batch-1); byte-identical |
-| **batch-2: GL blend/brightness 簇 (12 fn)** | 0x14600..0x14a10 | ✅ R1/R2/R3/R5 完成 (见 §四.batch-2): gGlBlendState 符号化 + 4 equate + 1 函数改名 + 7 plate 订正; byte-identical。**附带修复 1 个 pre-existing 断言串 carve 回归 (assert_..._670 标签)** |
-| 代码函数 (其余 ~264 个) | 0x14398..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
+| **batch-2: GL blend/brightness 簇 (12 fn)** | 0x14600..0x14a10 | ✅ R1/R2/R3/R5 完成 (见 §四.4.0a): gGlBlendState 符号化 + 4 equate + 1 函数改名 + 7 plate 订正; byte-identical。**附带修复 1 个 pre-existing 断言串 carve 回归 (assert_..._670 标签)** |
+| **batch-3: BG VRAM 地址簇 (24 fn)** | 0x14a10..0x14e14 | ✅ R1/R2/R5 完成 (见 §四.4.0c): OBJ_TILE_VRAM_BASE equate(新 gba_mem.inc) + 8 auto-name 槽改名 + 2 plate 订正; byte-identical。簇本身 plate 已高质量 (sibling getter/copy), 细化以 R2 为主 |
+| 代码函数 (其余 ~240 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x14e54..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
 
@@ -191,6 +192,30 @@ batch-2 重导出后 build 出现 **2 字节** mismatch @ `0x0801a4f8`。二分�
   目标符号名 = carve label 名 (带后缀); `_verify_carve.py` 只验 carve 块字节, **不覆盖 .word 符号
   解析**, 故未拦截 → 该类回归唯一防线是 build byte-identical, **断言串改动后必须 build 复验**。
 
+### 4.0c batch-3 完成记录: BG VRAM 地址簇 (0x14a10..0x14e14, 24 fn) ✅
+
+get_bgN_char_vram_addr ×4 / bgN_cnt_get_screen_size ×4 / calc_bg_screenmap_block_offset /
+write_bg_scroll_pair / get_bgN_screen_vram_addr ×4 / get_obj_tile_vram_base /
+copy_to_bgN_char_tiles ×4 / copy_to_bgN_screen_map ×4 / copy_to_obj_tile_vram。
+读 BGnCNT 提取 char_base/screen_base/screen_size 字段算 VRAM 地址, 或 bios_cpu(_fast)_set
+拷贝 tile/screen-map。byte-identical SHA1 9689337d。
+
+**特点**: 本簇 plate 已高质量 (sibling getter/copy, 现名/公式/调用者齐全), 细化以 **R2 消灭
+auto-name** 为主, R1 仅 1 个 pool 常量。
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1 区基址 | data-equate `OBJ_TILE_VRAM_BASE`(0x06010000) @0x14c10; 新增 `constants/gba_mem.inc` (VRAM/OBJ/PALRAM/OAM 区基址参考表) | 1 槽 |
+| R2 scroll 槽 | `DWORD_08014b84/b88`(BG0HOFS/BG0VOFS) → `write_bg_scroll_pair_ptr_bg0hofs/vofs` | 2 槽 |
+| R2 assert-line | `DAT_*`(行 487/497/503/513/518) → `<func>_assert_line` | 5 槽 |
+| R2 OBJ-base 槽 | `DAT_08014c10` → `get_obj_tile_vram_base_obj_tile_vram_base` (= equate 槽) | 1 槽 |
+| R5 注释 | get_obj_tile_vram_base + copy_to_obj_tile_vram 的 `DAT_08014c10`/`0x06010000` → `OBJ_TILE_VRAM_BASE` | 2 plate |
+
+新增: `constants/gba_mem.inc` (接入 rom.s); 脚本 `tools/ghidra-labeling/RefineBgVramBatch3.py`。
+注: `PTR_BGxCNT_xxxx` 槽 (~16 个) 按 batch-2 策略**跳过** (PTR 不在 R2 列表, 已显寄存器名;
+`.word BG0CNT` 等已可读)。内联 VRAM 基址 (`0xc0<<0x13`=0x06000000) 为 movs+lsls 复合值, 无 pool
+槽, 不符号化 (plate 已注)。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -257,12 +282,16 @@ rom_data.inc** (carved `name:` 被 scan_existing_asm_labels 跳过, 0 残留); d
    断言串 carve 回归。
    - 注: §五.0/batch-1 提到的 `reset_display_and_gl_state` plate 旧名 `FUN_08014398` 已在 batch-1
      订正 (现引 play_ui_effect_3a + indirect_table 说明), 全文件 plate 散文无 FUN_08014398 残留。
-3. 下一批 (batch-3) 候选: 按地址序 `0x14398` 起的剩余簇 ——
-   tick_prng_step_sequence / banlist_password_enter_char / 文本测量簇 (copy_str_unbounded,
-   measure_text_pixel_width...) / BG VRAM 地址簇 (get_bgN_char_vram_addr, copy_to_bgN_*, 0x14a10..0x14e14) /
-   GL 调色板管理簇 (gl_state_init, init_gl_palette_slot_flags @ 0x02023490, 0x1510c..)。
-   建议优先 **BG VRAM 地址簇** (0x14a10..0x14e14, ~24 个小 getter/copy, 高度同构, R1 IO 寄存器密集)。
-4. 每批后视情况更新本文「进度」表。
+3. ✅ **batch-3 (0x14a10..0x14e14, BG VRAM 地址簇 24 fn)** 完成 (见 §四.4.0c)。
+4. 下一批 (batch-4) 候选:
+   - **GL 调色板管理簇** (gl_state_init / init_gl_palette_slot_flags / fill_gl_palram_buf_0xf0 /
+     assign_palette_slot_entry / alloc_palette_entry_slot, 0x1510c..0x151d8+) —— 操作 **0x02023490**
+     (紧邻 gGlBlendState, 应定义 `gGlPaletteMgr` label; palram buf+slot_record+palette_map)。**推荐**:
+     与 batch-2/3 同子系统 (GL), 可复用上下文, 且补全 0x02023480/0x02023490 这对相邻结构的命名。
+   - FS 簇 (fs_resolve_path_to_fid / fs_load / cpu_copy_auto, 0x14f54..0x15108)。
+   - 文本测量簇 (copy_str_unbounded / measure_text_pixel_width 等, 0x14470..0x145bc) + 散点
+     (tick_prng_step_sequence 0x14398 / banlist_password_enter_char 0x143f0)。
+5. 每批后视情况更新本文「进度」表。
 
 ---
 

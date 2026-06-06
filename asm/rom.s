@@ -12,6 +12,9 @@
 @ GBA MMIO 寄存器（依据 refs/gba-ghidra-loader mapIO()）
 	.include "constants/gba_io.inc"
 
+@ GBA 内存区基址常量（VRAM/OBJ tile/PALRAM/OAM；BG VRAM 簇 OBJ_TILE_VRAM_BASE 用）
+	.include "constants/gba_mem.inc"
+
 @ GBA 中断 IRQ flag/掩码常量（IntrMain 优先级扫描/嵌套掩码用）
 	.include "constants/gba_intr.inc"
 

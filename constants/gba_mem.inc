@@ -1,0 +1,11 @@
+@ =============================================================================
+@ GBA 内存区基址常量 (硬件固定地址, 非 MMIO 寄存器)
+@ 字面量池里的区基址常量经 ExportRangeToGas.resolve_word_equate 导出为符号;
+@ GAS 用本表 .equ 解析回同值 -> byte-identical。
+@ 仅被引用 (data-equate) 的常量才会出现在导出 .word; 其余为参考文档。
+@ =============================================================================
+
+.equ GBA_PALRAM_BASE,     0x05000000  @ 调色板 RAM (BG+OBJ, 各 0x200 字节)
+.equ GBA_VRAM_BASE,       0x06000000  @ VRAM 基址 (BG char/screen map; 0xc0<<0x13 内联值)
+.equ OBJ_TILE_VRAM_BASE,  0x06010000  @ OBJ/sprite tile 数据基址 (mode 0-2, VRAM+0x10000)
+.equ GBA_OAM_BASE,        0x07000000  @ OAM (sprite 属性, 0x400 字节)

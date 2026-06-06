@@ -3165,19 +3165,19 @@ LAB_08014b62:
 write_bg_scroll_pair:
     push {r4,lr}                             @ 08014b6c 10b5
     lsls r0,r0,#0x1    @ 08014b6e 4000
-    ldr r4, DWORD_08014b84                   @ 08014b70 044c
+    ldr r4, write_bg_scroll_pair_ptr_bg0hofs @ 08014b70 044c
     adds r3,r0,r4    @ 08014b72 0319
     strh r1,[r3,#0x0]                        @ 08014b74 1980
-    ldr r1, DWORD_08014b88                   @ 08014b76 0449
+    ldr r1, write_bg_scroll_pair_ptr_bg0vofs @ 08014b76 0449
     adds r0,r0,r1    @ 08014b78 4018
     strh r2,[r0,#0x0]                        @ 08014b7a 0280
     pop {r4}                                 @ 08014b7c 10bc
     pop {r0}                                 @ 08014b7e 01bc
     bx r0                                    @ 08014b80 0047
     .zero  0x2
-DWORD_08014b84:
+write_bg_scroll_pair_ptr_bg0hofs:
     .word  BG0HOFS                        @ 08014b84 10000004
-DWORD_08014b88:
+write_bg_scroll_pair_ptr_bg0vofs:
     .word  BG0VOFS                        @ 08014b88 12000004
 
 @ 由 assert-wrapper copy_to_bg0_screen_map 在执行 BG0 screen map 拷贝前调用, 读取 BG0CNT 寄存器 (0x04000008) 的 screen_base_block 字段 (bits [12:8]), 计算并返回 BG0 screen map 在 VRAM 中的实际起始地址. 公式: addr = 0x06000000 + screen_base_block * 0x800. 无副作用, 纯计算返回. 与 get_bg1/bg2/bg3_screen_vram_addr 构成四函数 sibling 簇.
@@ -3256,12 +3256,12 @@ get_bg3_screen_vram_addr:
 PTR_BG3CNT_08014c08:
     .word  BG3CNT                         @ 08014c08 0e000004
 
-@ Returns constant 0x06010000 (OBJ/sprite tile VRAM base address). Body: ldr r0, DAT_08014c10; bx lr. Pure constant leaf. GBA OBJ tile data starts at 0x06010000 (32KB in mode 0-2). Called only by copy_to_obj_tile_vram to get the write target base.
+@ Returns constant 0x06010000 (OBJ/sprite tile VRAM base address). Body: ldr r0, OBJ_TILE_VRAM_BASE; bx lr. Pure constant leaf. GBA OBJ tile data starts at 0x06010000 (32KB in mode 0-2). Called only by copy_to_obj_tile_vram to get the write target base.
 get_obj_tile_vram_base:
-    ldr r0, DAT_08014c10                     @ 08014c0c 0048
+    ldr r0, get_obj_tile_vram_base_obj_tile_vram_base @ 08014c0c 0048
     bx lr                                    @ 08014c0e 7047
-DAT_08014c10:
-    .word  0x06010000                     @ 08014c10 00000106
+get_obj_tile_vram_base_obj_tile_vram_base:
+    .word  OBJ_TILE_VRAM_BASE             @ 08014c10 00000106
 
 @ Copies src tile data via bios_cpu_fast_set to BG0 char VRAM. Asserts src 4-byte aligned (gl_common.c:482) before calling get_bg0_char_vram_addr. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0xFFF], r2=word_count [1..0x1000]. Part of four-function sibling: copy_to_bg0/bg1/bg2/bg3_char_tiles. Constants: 0x3 = 4-byte alignment mask; caller apply_bgdt_entry_to_bg uses this.
 copy_to_bg0_char_tiles:
@@ -3307,7 +3307,7 @@ copy_to_bg1_char_tiles:
     cmp r0,#0x0                              @ 08014c60 0028
     beq LAB_08014c70                         @ 08014c62 05d0
     ldr r0, copy_to_bg1_char_tiles_gl_common_c_filename @ 08014c64 0848
-    ldr r1, DAT_08014c8c                     @ 08014c66 0949
+    ldr r1, copy_to_bg1_char_tiles_assert_line @ 08014c66 0949
     ldr r2, copy_to_bg1_char_tiles_assert_u32_psrc_0x3_0 @ 08014c68 094a
     movs r3,#0x1    @ 08014c6a 0123
     bl suppress_assert_report                @ 08014c6c e5f036fc
@@ -3324,7 +3324,7 @@ LAB_08014c70:
     bx r0                                    @ 08014c86 0047
 copy_to_bg1_char_tiles_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014c88 dc98e309  GL/GL_Common.c
-DAT_08014c8c:
+copy_to_bg1_char_tiles_assert_line:
     .word  0x000001e7                     @ 08014c8c e7010000
 copy_to_bg1_char_tiles_assert_u32_psrc_0x3_0:
     .word  assert_u32_psrc_0x3_0          @ 08014c90 4499e309  ((u32)pSrc & 0x3) == 0
@@ -3373,7 +3373,7 @@ copy_to_bg3_char_tiles:
     cmp r0,#0x0                              @ 08014ce0 0028
     beq LAB_08014cf0                         @ 08014ce2 05d0
     ldr r0, copy_to_bg3_char_tiles_gl_common_c_filename @ 08014ce4 0848
-    ldr r1, DAT_08014d0c                     @ 08014ce6 0949
+    ldr r1, copy_to_bg3_char_tiles_assert_line @ 08014ce6 0949
     ldr r2, copy_to_bg3_char_tiles_assert_u32_psrc_0x3_0 @ 08014ce8 094a
     movs r3,#0x1    @ 08014cea 0123
     bl suppress_assert_report                @ 08014cec e5f0f6fb
@@ -3390,7 +3390,7 @@ LAB_08014cf0:
     bx r0                                    @ 08014d06 0047
 copy_to_bg3_char_tiles_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014d08 dc98e309  GL/GL_Common.c
-DAT_08014d0c:
+copy_to_bg3_char_tiles_assert_line:
     .word  0x000001f1                     @ 08014d0c f1010000
 copy_to_bg3_char_tiles_assert_u32_psrc_0x3_0:
     .word  assert_u32_psrc_0x3_0          @ 08014d10 4499e309  ((u32)pSrc & 0x3) == 0
@@ -3406,7 +3406,7 @@ copy_to_bg0_screen_map:
     cmp r0,#0x0                              @ 08014d20 0028
     beq LAB_08014d30                         @ 08014d22 05d0
     ldr r0, copy_to_bg0_screen_map_gl_common_c_filename @ 08014d24 0848
-    ldr r1, DAT_08014d4c                     @ 08014d26 0949
+    ldr r1, copy_to_bg0_screen_map_assert_line @ 08014d26 0949
     ldr r2, copy_to_bg0_screen_map_assert_u32_psrc_0x3_0 @ 08014d28 094a
     movs r3,#0x1    @ 08014d2a 0123
     bl suppress_assert_report                @ 08014d2c e5f0d6fb
@@ -3423,7 +3423,7 @@ LAB_08014d30:
     bx r0                                    @ 08014d46 0047
 copy_to_bg0_screen_map_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014d48 dc98e309  GL/GL_Common.c
-DAT_08014d4c:
+copy_to_bg0_screen_map_assert_line:
     .word  0x000001f7                     @ 08014d4c f7010000
 copy_to_bg0_screen_map_assert_u32_psrc_0x3_0:
     .word  assert_u32_psrc_0x3_0          @ 08014d50 4499e309  ((u32)pSrc & 0x3) == 0
@@ -3472,7 +3472,7 @@ copy_to_bg2_screen_map:
     cmp r0,#0x0                              @ 08014da0 0028
     beq LAB_08014db0                         @ 08014da2 05d0
     ldr r0, copy_to_bg2_screen_map_gl_common_c_filename @ 08014da4 0848
-    ldr r1, DAT_08014dcc                     @ 08014da6 0949
+    ldr r1, copy_to_bg2_screen_map_assert_line @ 08014da6 0949
     ldr r2, copy_to_bg2_screen_map_assert_u32_psrc_0x3_0 @ 08014da8 094a
     movs r3,#0x1    @ 08014daa 0123
     bl suppress_assert_report                @ 08014dac e5f096fb
@@ -3489,7 +3489,7 @@ LAB_08014db0:
     bx r0                                    @ 08014dc6 0047
 copy_to_bg2_screen_map_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014dc8 dc98e309  GL/GL_Common.c
-DAT_08014dcc:
+copy_to_bg2_screen_map_assert_line:
     .word  0x00000201                     @ 08014dcc 01020000
 copy_to_bg2_screen_map_assert_u32_psrc_0x3_0:
     .word  assert_u32_psrc_0x3_0          @ 08014dd0 4499e309  ((u32)pSrc & 0x3) == 0
@@ -3505,7 +3505,7 @@ copy_to_bg3_screen_map:
     cmp r0,#0x0                              @ 08014de0 0028
     beq LAB_08014df0                         @ 08014de2 05d0
     ldr r0, copy_to_bg3_screen_map_gl_common_c_filename @ 08014de4 0848
-    ldr r1, DAT_08014e0c                     @ 08014de6 0949
+    ldr r1, copy_to_bg3_screen_map_assert_line @ 08014de6 0949
     ldr r2, copy_to_bg3_screen_map_assert_u32_psrc_0x3_0 @ 08014de8 094a
     movs r3,#0x1    @ 08014dea 0123
     bl suppress_assert_report                @ 08014dec e5f076fb
@@ -3522,12 +3522,12 @@ LAB_08014df0:
     bx r0                                    @ 08014e06 0047
 copy_to_bg3_screen_map_gl_common_c_filename:
     .word  gl_common_c_filename           @ 08014e08 dc98e309  GL/GL_Common.c
-DAT_08014e0c:
+copy_to_bg3_screen_map_assert_line:
     .word  0x00000206                     @ 08014e0c 06020000
 copy_to_bg3_screen_map_assert_u32_psrc_0x3_0:
     .word  assert_u32_psrc_0x3_0          @ 08014e10 4499e309  ((u32)pSrc & 0x3) == 0
 
-@ Copies src data via bios_cpu_set to OBJ tile VRAM (0x06010000). Asserts src 4-byte aligned (gl_common.c:524) before calling get_obj_tile_vram_base. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0x1FFF], r2=word_count [1..0x2000]. indeg=4, called by apply_objd_entry_to_sprite and 3 other scene renderers. Constants: gl_common.c:524 = 0x83<<2 = 0x20C; 0x06010000 = OBJ tile VRAM base.
+@ Copies src data via bios_cpu_set to OBJ tile VRAM (0x06010000). Asserts src 4-byte aligned (gl_common.c:524) before calling get_obj_tile_vram_base. r0=u32* src (4-byte aligned), r1=dst_word_offset [0..0x1FFF], r2=word_count [1..0x2000]. indeg=4, called by apply_objd_entry_to_sprite and 3 other scene renderers. Constants: gl_common.c:524 = 0x83<<2 = 0x20C; OBJ_TILE_VRAM_BASE (0x06010000) = OBJ tile VRAM base.
 copy_to_obj_tile_vram:
     push {r4,r5,r6,lr}                       @ 08014e14 70b5
     adds r4,r0,#0x0    @ 08014e16 041c
