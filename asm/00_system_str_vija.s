@@ -7956,10 +7956,198 @@ jp_char_handler_jump_table:
     .word  0x08017178                     @ 080170c8 78710108
     .word  0x0801717c                     @ 080170cc 7c710108
     .word  0x08017180                     @ 080170d0 80710108
-DAT_080170d4:
-    ROM_INCBIN 0x170d4, 0xfc
+LAB_080170d4:
+    movs r0,#0x1    @ 080170d4 0120
+    b LAB_080171d2                           @ 080170d6 7ce0
+LAB_080170d8:
+    movs r0,#0x2    @ 080170d8 0220
+    b LAB_080171d2                           @ 080170da 7ae0
+LAB_080170dc:
+    movs r0,#0x3    @ 080170dc 0320
+    b LAB_080171d2                           @ 080170de 78e0
+LAB_080170e0:
+    movs r0,#0x4    @ 080170e0 0420
+    b LAB_080171d2                           @ 080170e2 76e0
+LAB_080170e4:
+    movs r0,#0x5    @ 080170e4 0520
+    b LAB_080171d2                           @ 080170e6 74e0
+LAB_080170e8:
+    movs r0,#0x6    @ 080170e8 0620
+    b LAB_080171d2                           @ 080170ea 72e0
+LAB_080170ec:
+    movs r0,#0x7    @ 080170ec 0720
+    b LAB_080171d2                           @ 080170ee 70e0
+LAB_080170f0:
+    movs r0,#0x8    @ 080170f0 0820
+    b LAB_080171d2                           @ 080170f2 6ee0
+LAB_080170f4:
+    movs r0,#0x9    @ 080170f4 0920
+    b LAB_080171d2                           @ 080170f6 6ce0
+LAB_080170f8:
+    movs r0,#0xa    @ 080170f8 0a20
+    b LAB_080171d2                           @ 080170fa 6ae0
+LAB_080170fc:
+    movs r0,#0xb    @ 080170fc 0b20
+    b LAB_080171d2                           @ 080170fe 68e0
+LAB_08017100:
+    movs r0,#0xc    @ 08017100 0c20
+    b LAB_080171d2                           @ 08017102 66e0
+LAB_08017104:
+    movs r0,#0xd    @ 08017104 0d20
+    b LAB_080171d2                           @ 08017106 64e0
+LAB_08017108:
+    movs r0,#0xe    @ 08017108 0e20
+    b LAB_080171d2                           @ 0801710a 62e0
+LAB_0801710c:
+    movs r0,#0xf    @ 0801710c 0f20
+    b LAB_080171d2                           @ 0801710e 60e0
+LAB_08017110:
+    movs r0,#0x10    @ 08017110 1020
+    b LAB_080171d2                           @ 08017112 5ee0
+LAB_08017114:
+    movs r0,#0x11    @ 08017114 1120
+    b LAB_080171d2                           @ 08017116 5ce0
+LAB_08017118:
+    movs r0,#0x12    @ 08017118 1220
+    b LAB_080171d2                           @ 0801711a 5ae0
+LAB_0801711c:
+    movs r0,#0x13    @ 0801711c 1320
+    b LAB_080171d2                           @ 0801711e 58e0
+LAB_08017120:
+    movs r0,#0x14    @ 08017120 1420
+    b LAB_080171d2                           @ 08017122 56e0
+LAB_08017124:
+    movs r0,#0x15    @ 08017124 1520
+    b LAB_080171d2                           @ 08017126 54e0
+LAB_08017128:
+    movs r0,#0x16    @ 08017128 1620
+    b LAB_080171d2                           @ 0801712a 52e0
+LAB_0801712c:
+    movs r0,#0x17    @ 0801712c 1720
+    b LAB_080171d2                           @ 0801712e 50e0
+LAB_08017130:
+    movs r0,#0x18    @ 08017130 1820
+    b LAB_080171d2                           @ 08017132 4ee0
+LAB_08017134:
+    movs r0,#0x19    @ 08017134 1920
+    b LAB_080171d2                           @ 08017136 4ce0
+LAB_08017138:
+    movs r0,#0x1a    @ 08017138 1a20
+    b LAB_080171d2                           @ 0801713a 4ae0
+LAB_0801713c:
+    movs r0,#0x1b    @ 0801713c 1b20
+    b LAB_080171d2                           @ 0801713e 48e0
+LAB_08017140:
+    movs r0,#0x1c    @ 08017140 1c20
+    b LAB_080171d2                           @ 08017142 46e0
+LAB_08017144:
+    movs r0,#0x1d    @ 08017144 1d20
+    b LAB_080171d2                           @ 08017146 44e0
+LAB_08017148:
+    movs r0,#0x1e    @ 08017148 1e20
+    b LAB_080171d2                           @ 0801714a 42e0
+LAB_0801714c:
+    movs r0,#0x1f    @ 0801714c 1f20
+    b LAB_080171d2                           @ 0801714e 40e0
+LAB_08017150:
+    movs r0,#0x20    @ 08017150 2020
+    b LAB_080171d2                           @ 08017152 3ee0
+LAB_08017154:
+    movs r0,#0x21    @ 08017154 2120
+    b LAB_080171d2                           @ 08017156 3ce0
+LAB_08017158:
+    movs r0,#0x22    @ 08017158 2220
+    b LAB_080171d2                           @ 0801715a 3ae0
+LAB_0801715c:
+    movs r0,#0x23    @ 0801715c 2320
+    b LAB_080171d2                           @ 0801715e 38e0
+LAB_08017160:
+    movs r0,#0x24    @ 08017160 2420
+    b LAB_080171d2                           @ 08017162 36e0
+LAB_08017164:
+    movs r0,#0x25    @ 08017164 2520
+    b LAB_080171d2                           @ 08017166 34e0
+LAB_08017168:
+    movs r0,#0x26    @ 08017168 2620
+    b LAB_080171d2                           @ 0801716a 32e0
+LAB_0801716c:
+    movs r0,#0x27    @ 0801716c 2720
+    b LAB_080171d2                           @ 0801716e 30e0
+LAB_08017170:
+    movs r0,#0x28    @ 08017170 2820
+    b LAB_080171d2                           @ 08017172 2ee0
+LAB_08017174:
+    movs r0,#0x29    @ 08017174 2920
+    b LAB_080171d2                           @ 08017176 2ce0
+LAB_08017178:
+    movs r0,#0x2a    @ 08017178 2a20
+    b LAB_080171d2                           @ 0801717a 2ae0
+LAB_0801717c:
+    movs r0,#0x2b    @ 0801717c 2b20
+    b LAB_080171d2                           @ 0801717e 28e0
+LAB_08017180:
+    movs r0,#0x2c    @ 08017180 2c20
+    b LAB_080171d2                           @ 08017182 26e0
+LAB_08017184:
+    movs r0,#0x2d    @ 08017184 2d20
+    b LAB_080171d2                           @ 08017186 24e0
+LAB_08017188:
+    movs r0,#0x2e    @ 08017188 2e20
+    b LAB_080171d2                           @ 0801718a 22e0
+LAB_0801718c:
+    movs r0,#0x2f    @ 0801718c 2f20
+    b LAB_080171d2                           @ 0801718e 20e0
+LAB_08017190:
+    movs r0,#0x30    @ 08017190 3020
+    b LAB_080171d2                           @ 08017192 1ee0
+LAB_08017194:
+    movs r0,#0x31    @ 08017194 3120
+    b LAB_080171d2                           @ 08017196 1ce0
+LAB_08017198:
+    movs r0,#0x32    @ 08017198 3220
+    b LAB_080171d2                           @ 0801719a 1ae0
+LAB_0801719c:
+    movs r0,#0x33    @ 0801719c 3320
+    b LAB_080171d2                           @ 0801719e 18e0
+LAB_080171a0:
+    movs r0,#0x34    @ 080171a0 3420
+    b LAB_080171d2                           @ 080171a2 16e0
+LAB_080171a4:
+    movs r0,#0x35    @ 080171a4 3520
+    b LAB_080171d2                           @ 080171a6 14e0
+LAB_080171a8:
+    movs r0,#0x36    @ 080171a8 3620
+    b LAB_080171d2                           @ 080171aa 12e0
+LAB_080171ac:
+    movs r0,#0x37    @ 080171ac 3720
+    b LAB_080171d2                           @ 080171ae 10e0
+LAB_080171b0:
+    movs r0,#0x38    @ 080171b0 3820
+    b LAB_080171d2                           @ 080171b2 0ee0
+LAB_080171b4:
+    movs r0,#0x39    @ 080171b4 3920
+    b LAB_080171d2                           @ 080171b6 0ce0
+LAB_080171b8:
+    movs r0,#0x3a    @ 080171b8 3a20
+    b LAB_080171d2                           @ 080171ba 0ae0
+LAB_080171bc:
+    movs r0,#0x3b    @ 080171bc 3b20
+    b LAB_080171d2                           @ 080171be 08e0
+LAB_080171c0:
+    movs r0,#0x3c    @ 080171c0 3c20
+    b LAB_080171d2                           @ 080171c2 06e0
+LAB_080171c4:
+    movs r0,#0x3d    @ 080171c4 3d20
+    b LAB_080171d2                           @ 080171c6 04e0
+LAB_080171c8:
+    movs r0,#0x3e    @ 080171c8 3e20
+    b LAB_080171d2                           @ 080171ca 02e0
+LAB_080171cc:
+    movs r0,#0x3f    @ 080171cc 3f20
+    b LAB_080171d2                           @ 080171ce 00e0
 LAB_080171d0:
     movs r0,#0x0    @ 080171d0 0020
+LAB_080171d2:
     bx lr                                    @ 080171d2 7047
 
 @ Function: XOR-decrypts consecutive r1 bytes in a byte buffer in-place (^= 0x39). Returns immediately if r1<=0. Called by FUN_0801722c in the char frame processing pipeline to decrypt ROM/EWRAM char frame data with a fixed symmetric XOR key, restoring the plaintext byte stream.

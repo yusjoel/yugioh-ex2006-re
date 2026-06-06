@@ -554,6 +554,23 @@ verify) — 仅做槽符号化, **不重写 plate** (保留 med-conf 标注待 r
 新增: `constants/gfx_resource.inc` (接入 rom.s)。byte-identical 9689337d。
 脚本: `RefineSeg5bApplyBgdtObjd.py`。
 
+### 4.0u Seg-5c 完成记录: apply_gfx_resource_list 簇 + jp_char dispatch + R4 disasm (0x16a7c..0x171ec) ✅
+
+**Seg-5c-i (槽符号化)**: apply_gfx_resource_list (0x16a7c) 3 FourCC tag 复用 g2d_tags.inc;
+resolve_prhlist_entry_name_ptr (0x16afc) nameID offset 0x201 / game_str id base 0x1072 /
+gSettings base+offset; dispatch_jp_char_handler (0x16b68) neg_char_base (-0x8148 SJIS zone-2) +
+jp_char_handler_jump_table (339-entry 0x16b88, SJIS code → handler 分派表)。
+
+**Seg-5c-ii (R4 disasm)**: `ROM_INCBIN 0x170d4, 0xfc` (252B) = **63 个 SJIS code→idx handler stub**
+(各 4B `movs r0,#N; b LAB_080171d2`, N=1..0x3f), 被 jp_char_handler_jump_table live 引用 (非 orphan)。
+逐 stub disasm (跳转表目标非 fall-through, 须 per-4B DisassembleCommand) → **126 指令, 消除 incbin**
+(Rule 2)。byte-identical 9689337d。
+
+**R4 disasm 要点 (新 sub-note)**: 跳转表目标块的 disasm 不能用单次 DisassembleCommand(整 range)
+—— flow 在首个 `b` 处离开 range, 只 disasm 首 stub; 须**逐目标 per-stub DisassembleCommand**。
+又: 若 range 内已有指令 (重跑), setTMode 会 ContextChangeException → 须**先 clearListing 整 range** 再
+setTMode 再 disasm。脚本: `RefineSeg5cSlots.py` + `DisassembleSeg5cJpHandlers.py`。
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
