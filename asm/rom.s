@@ -1085,13 +1085,40 @@ cursor_anim_data_b:                    @ 0x09e3b47c carve G: cursor anim coord t
 name_input_render_param_4b:                    @ 0x09e3b4a4 (4B render param block: 38 84 88 84; memcpy src in tick_name_input_render_by_state)
 	.incbin "roms/2343.gba", 0x1E3B4A4, 0x4
 name_input_default_name:                       @ 0x09e3b4a8 (SJIS "tesuto" default commit name; dispatch_name_input_confirm_state src)
-	.incbin "roms/2343.gba", 0x1E3B4A8, 0x10DC  @ remainder to host end 0x1E3C584
+	.incbin "roms/2343.gba", 0x1E3B4A8, 0x809   @ 0x09e3b4a8..0x09e3bcb1
+banlist_char_candidate_str:                    @ 0x09e3bcb1 (90 SJIS pairs + null pair; init_banlist_pass_input_bg0_page)
+	.incbin "roms/2343.gba", 0x1E3BCB1, 0xB6    @ 182B
+	.incbin "roms/2343.gba", 0x1E3BD67, 0x276   @ gap1 single span (banlist_pass_ext_char_group defer Seg-9)
+banlist_pass_char_str:                         @ 0x09e3bfdd (99B SJIS char str; encode_pass_table_entry_to_line_buf)
+	.incbin "roms/2343.gba", 0x1E3BFDD, 0x63    @ 99B
+banlist_pass_alt_char:                         @ 0x09e3c040 (4B SJIS full-width space + null; encode_pass_table_entry_to_line_buf)
+	.incbin "roms/2343.gba", 0x1E3C040, 0x4     @ 4B
+rom_password_table:                            @ 0x09e3c044 (671x2B LE halfwords; load_banlist_password_table_from_rom)
+	.incbin "roms/2343.gba", 0x1E3C044, 0x53E   @ 671*2=1342B
+	.incbin "roms/2343.gba", 0x1E3C582, 0x2     @ trailing pad to host end
 pass_main_c_filename:
 	.asciz "PassInput/Pass_main.c"
 	.incbin "roms/2343.gba", 0x1E3C59A, 0x2
 assert_dir_1_dir_1_59c:
 	.asciz "dir == 1 || dir == -1"
-	.incbin "roms/2343.gba", 0x1E3C5B2, 0xBE
+	.incbin "roms/2343.gba", 0x1E3C5B2, 0x2      @ 2B pre-pad
+banlist_pass_obj_ncer_path:                    @ 0x09e3c5b4
+	.incbin "roms/2343.gba", 0x1E3C5B4, 0x1C    @ "pass_input/pass_o_01.LZncer\0" (28B)
+banlist_pass_obj_nanr_path:                    @ 0x09e3c5d0
+	.incbin "roms/2343.gba", 0x1E3C5D0, 0x1C    @ "pass_input/pass_o_01.LZnanr\0" (28B)
+banlist_pass_obj_ncgr_path:                    @ 0x09e3c5ec
+	.incbin "roms/2343.gba", 0x1E3C5EC, 0x1C    @ "pass_input/pass_o_01.LZncgr\0" (28B)
+banlist_pass_obj_nclr_path:                    @ 0x09e3c608
+	.incbin "roms/2343.gba", 0x1E3C608, 0x1C    @ "pass_input/pass_o_01.LZnclr\0" (28B)
+banlist_pass_obj_resource_desc:                @ 0x09e3c624 (4-word ptr struct; load_banlist_pass_input_scene_resources)
+	.word banlist_pass_obj_ncer_path
+	.word banlist_pass_obj_nanr_path
+	.word banlist_pass_obj_ncgr_path
+	.word banlist_pass_obj_nclr_path
+banlist_pass_bg1_fs_path:                      @ 0x09e3c634
+	.incbin "roms/2343.gba", 0x1E3C634, 0x1C    @ "pass_input/pass_b_01.LZ5bg\0" (28B)
+banlist_pass_bg2_fs_path:                      @ 0x09e3c650
+	.incbin "roms/2343.gba", 0x1E3C650, 0x20    @ "pass_input/moziire_b_01.LZ5bg\0\0\0" (32B)
 assert_anmid_ig2d_getanmsequencescoun_670:
 	.asciz "anmID < IG2D_GetAnmSequencesCount(pThis->pAnimBank[anmID])"
 	.incbin "roms/2343.gba", 0x1E3C6AB, 0x9

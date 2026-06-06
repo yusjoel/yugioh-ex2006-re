@@ -124,6 +124,7 @@ gitignore 生成产物):
 | **Seg-6a: JP 假名表 carve + 5 fn** | 0x1794c..0x17e48 | ✅ R3/R2/R5/R7 carve A+B+kana池+I 完成 (见 §四.4.0w): 50-label kana pool + name_char_group_ptr_table + name_char_tile_slot_table + assert_table_last_fmt carve; 9 REF+10 RENAME 槽; byte-identical 9689337d |
 | **Seg-6b: render/cursor/load_assets + carve F/G/H** | 0x17e48..0x18774 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0x): carve F(name_o paths+desc) + G(cursor_anim_data_a/b) + H(name_o_palette_data bit15修正); 10 EQ+31 REF+23 RENAME+4 PLATE; §5.1 登记 0x186ce/0x22; byte-identical 9689337d |
 | **Seg-7: name_input/banlist 场景 + carve J/K** | 0x18774..0x19a58 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0y): carve J(name_input_state_table+banlist_pass_char_group_ptr_table) + K(render_param+default_name); 20 EQ+38 REF+59 RENAME+3 PLATE; §5.1 登记 0x19640/0x20; byte-identical 9689337d |
+| **Seg-8: banlist password 渲染簇** | 0x19a58..0x1a794 | ✅ R1/R2/R3/R5/R7 完成 (见 §四.4.0z): carve host1(char_candidate/pass_char/alt_char/rom_password_table) + host2(4 obj path+resource_desc+2 bg path); 15 EQ+10 REF+37 RENAME+11 PLATE; §5.1 本段为空; byte-identical 9689337d |
 | 代码函数 (其余 ~166 个) | 0x14398..0x143f0, 0x14470..0x14600, 0x152b0..0x15384, 0x15674..0x15728, 0x15954..0x16098, 0x16140..0x16140, 0x1626c..0x1CB00, 0x19a58..0x1CB00 | ⬜ 函数已命名; 体内常量/指针/注释待细化 (LAB_ 内部分支按裁定跳过) |
 
 ---
@@ -703,6 +704,46 @@ name_input.inc 追加 NAME_INPUT_BG0_SCREEN_CLEAR_CTRL/NAME_INPUT_CHAR_VRAM_CLEA
 脚本: `tools/ghidra-labeling/RefineSeg6bSlots.py` (A=10 B=31 C=23 D=4, 0 FAIL)。
 FUNC_RENAME=0; 不需 ExportFunctionInventory/sync/CSV 手改。**Seg-6 完成**。
 
+### 4.0z Seg-8 完成记录: banlist password 渲染簇 (0x08019a58..0x0801a794, 28 fn) ✅
+
+encode_pass_table_entry_to_line_buf / render_banlist_pass_char_obj_rows_pair /
+reject_banlist_input_event / load_banlist_password_table_from_rom /
+write_banlist_bg2_scroll_regs_biased / render_banlist_password_chars_row /
+init_banlist_pass_input_bg0_page / render_banlist_password_chars_grid /
+init_banlist_pass_input_bg2_page / get_banlist_password_page_ptr /
+init_banlist_pass_chars_grid_row / refresh_banlist_pass_chars_font_rows /
+tick_banlist_scroll_input_handler / get_banlist_scroll_direction / set_banlist_scroll_step /
+tick_banlist_bg_scroll_step / render_banlist_title_text_to_bg /
+load_banlist_pass_input_scene_resources / tick_banlist_card_slot_anim_oam /
+call_tick_banlist_card_slot_anim / setup_banlist_sprite_oam_row_batch /
+call_setup_banlist_sprite_oam_row / render_banlist_char_obj_row /
+zero_obj_tile_vram_range / init_banlist_scrollbar_oam_entry /
+advance_banlist_scrollbar_pos_page / retreat_banlist_scrollbar_pos_page /
+write_banlist_bg3_vofs_with_bias。banlist 密码输入渲染簇。byte-identical SHA1 9689337d.
+
+**注意: executor proposal 越界 — 含 36 个 >=0x1a794 (Seg-9) 项, reviewer NEEDS_FIX 指出。Fixer
+严格裁剪, 仅落地 <0x1a794 槽。36 个越界项 defer Seg-9 可复用 (含 4 EQ + 18 RENAME + 7 REF gBanlistPasswordBuffer + 3 REF carve + 2 ROM_INCBIN block + 1 disasm)。**
+
+| 项 | 做法 | 数量 |
+|---|---|---|
+| R1 EQ_SLOTS 复用 | gTextEncodingOverride(ewram) / EWRAM_BASE(gba_mem) / GSETTINGS_OFFSET(name_input) / gFontJpCtx(ewram) / OAM_ATTR2_CHARNAME_MASK/CLEAR(oam_attr) / OAM_ATTR1_X_MASK/CLEAR(oam_attr) / OBJ_TILE_VRAM_BASE(gba_mem) / NAME_INPUT_BG0_SCREEN_CLEAR_CTRL×2(name_input, **复用 #4b reviewer 修正**) | 15 槽/0 新常量 |
+| **R7 carve host1** | `name_input_default_name` host incbin `0x1E3B4A8, 0x10DC` 切分: banlist_char_candidate_str(0x09e3bcb1, 182B) + gap1(0x276, 单 span, banlist_pass_ext_char_group **defer Seg-9**) + banlist_pass_char_str(0x09e3bfdd, 99B) + banlist_pass_alt_char(0x09e3c040, 4B) + rom_password_table(0x09e3c044, 1342B) + 2B pad; 覆盖 0x10DC OK | 4 labels |
+| **R7 carve host2** | `0x1E3C5B2, 0xBE` host 全结构化: 2B pad + 4x obj path (ncer/nanr/ncgr/nclr, 各 28B) + banlist_pass_obj_resource_desc (4×.word data ptr, **无 +1**, 纯数据指针) + banlist_pass_bg1_fs_path(28B) + banlist_pass_bg2_fs_path(32B, **reviewer #4a 修正: 0x20 非 0x1E**); 覆盖 0xBE OK | 7 labels |
+| R3 REF_SLOTS | banlist_pass_char_group_ptr_table(Seg-7 已 carve, 1槽) + name_o_palette_data(Seg-6b 已 carve, 1槽) + gBanlistPasswordBuffer(已标, 1槽) + 4 新 carve label 槽(char_candidate_str/pass_char_str/pass_alt_char/rom_password_table) + 3 host2 carve label 槽(obj_resource_desc/bg1_path/bg2_path) | 10 槽 |
+| R2 RENAME_SLOTS | 37 槽: gBanlistPasswordBuffer 私有 offset 槽 (`<func>_pass_buf_off_<hex>`) / cpuset 控制字 / assert-line / scene 私有常量 (clr_mask/palette-slot/anim-off/vram-addr 等) | 37 槽 |
+| R5 PLATE_REWRITES | 11 个函数 plate 中 FUN_<hex> 改现名 (14 次替换); FUN_0x0801aec8/af70/b284/b368 (Seg-9+ 未命名) 保留 | 11 函数/14 次 |
+| §5.1 | 本段为空 (block A 0x1a89c/0x20 + block B 0x1ad18/0xec 均 >=0x1a794 属 Seg-9) | 0 块 |
+
+脚本: `tools/ghidra-labeling/RefineSeg8Slots.py` (A=15 B=10 C=37 D=11, 0 FAIL).
+FUNC_RENAME=0 (28 函数名与函数体一致, 无误名). 不需 ExportFunctionInventory/sync/CSV 手改.
+新增: 无新 constants 文件 (全部复用已有 inc). 新增 carve 标签 (host1: 4, host2: 7).
+
+**Seg-9 可复用越界预析** (executor proposal 已含, review 已复核):
+- Block A (0x1a89c/0x20): §5.1 候选 (raw=1 偶合, thumb=0); Seg-9 登记
+- Block B (0x1ad18/0xec): R4 disasm 5 stubs (0x1ad18/ad20/ad4c/ad94/ade0, MOV PC,R0 dispatch)
+- banlist_pass_ext_char_group carve (@0x09e3be3c, 唯一代码引用 DWORD_0801abb0 Seg-9)
+- 4 EQ + 18 RENAME + 10 REF 越界槽 (advance/retreat_banlist_password_cursor_slot 族等)
+
 ### 4.0b NNS/GL SDK 断言串符号化 (全 ROM, 156 串)
 
 `suppress_assert_report(file, line, expr)` 全 ROM 728 调用点; file/expr 字符串集中在
@@ -773,7 +814,7 @@ R9 byte-identical。
 | **Seg-5** | 0x16218..0x1794c | ~28 | **0x169d6/0x16, 0x16a20/0x5c, 0x170d4/0xfc, 0x17424/0x40** | b8(尾), b12 | ✅ **Seg-5a/b/c/d 全部完成** (Seg-5a write_tile_region_to_bg_screen / Seg-5b apply_bgdt_objd / Seg-5c-i+ii jp_char dispatch+disasm / Seg-5d 15fn+2carve); 0x17424/0x40 §5.1 登记 |
 | **Seg-6** | 0x1794c..0x18774 | ~28 | **0x186ce/0x22** | — | ✅ **Seg-6a/b 全部完成** (Seg-6a JP 假名表 carve / Seg-6b render/cursor/load_assets + carve F/G/H; 0x186ce/0x22 §5.1 登记) |
 | **Seg-7** | 0x18774..0x19a58 | ~28 | **0x19640/0x20** | — | ✅ **完成**: 28fn 符号化 + carve J (name_input_state_table+banlist_pass_char_group_ptr_table) + carve K (name_input_render_param_4b+name_input_default_name) + §5.1 0x19640/0x20; byte-identical 9689337d |
-| **Seg-8** | 0x19a58..0x1a794 | ~28 | — | — | **全新**: banlist password 渲染簇 |
+| **Seg-8** | 0x19a58..0x1a794 | 28 | — | — | ✅ **完成**: 27fn 槽符号化 + carve host1 (banlist_char_candidate_str/pass_char_str/pass_alt_char/rom_password_table) + carve host2 (4 obj path + resource_desc + 2 bg path); executor 越界项 36 个已裁; byte-identical 9689337d |
 | **Seg-9** | 0x1a794..0x1b850 | ~28 | **0x1a89c/0x20, 0x1ad18/0xec** | — | **全新**: banlist/shuen + **carve 2 incbin (含 236B 大块 @0x1ad18)** |
 | **Seg-10** | 0x1b850..0x1cb00 | ~32 | — | — | **全新**: vija/shuen 场景 tick (tick_*_obj_anim ...) |
 

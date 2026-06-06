@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `00_system_str_vija.s` (进行中, ~8/10 段)。
-> **下一任务**: **Seg-8** (00 文件, 0x19a58..0x1a794, ~28 fn, banlist password 渲染簇)。
+> **当前文件**: `00_system_str_vija.s` (进行中, ~9/10 段)。
+> **下一任务**: **Seg-9** (00 文件, 0x1a794..0x1b850, ~28 fn, banlist/shuen 场景 + ROM_INCBIN 0x1a89c/0x20 §5.1 + 0x1ad18/0xec disasm + banlist_pass_ext_char_group carve; 可复用 Seg-8 executor 越界预析的 4 EQ+18 RENAME+10 REF)。
 
 ---
 
@@ -17,7 +17,7 @@
 
 | # | 文件 | 地址区间 | 段(~10/文件) | 状态 | 活动 doc |
 |---|------|----------|------|------|---------|
-| 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | 🟡 进行中 (1..6b ✅, 7→) | `doc/dev/p5-refine-00-system-str-vija.md` |
+| 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | 🟡 进行中 (1..8 ✅, 9→) | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | 未拆 | ⬜ | (待建) |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | 未拆 | ⬜ | |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
@@ -64,14 +64,21 @@
 | 6a | 0x1794c..0x17e48 (5 fn, kana carve A+B+pool+I) | ✅ | baabb9a |
 | 6b | 0x17e48..0x18774 (23 fn, carve F/G/H, §5.1 0x186ce/0x22) | ✅ | 67862bf |
 | 7 | 0x18774..0x19a58 (28 fn, carve J/K + §5.1 0x19640/0x20) | ✅ | (this session) |
-| **8** | **0x19a58..0x1a794 (~28 fn, banlist password 渲染簇)** | **⬜ 下一步** | |
-| 8 | 0x19a58..0x1a794 | ⬜ | |
-| 9 | 0x1a794..0x1b850 (incbin 0x1a89c, 0x1ad18/0xec) | ⬜ | |
+| **8** | **0x19a58..0x1a794 (28 fn, banlist password 渲染簇)** | **✅** | (this session) |
+| **9** | **0x1a794..0x1b850 (ROM_INCBIN 0x1a89c/0x20 §5.1 + 0x1ad18/0xec disasm)** | **⬜ 下一步** | |
 | 10 | 0x1b850..0x1cb00 | ⬜ | |
 
 00 文件完整路线图 (段范围 / ROM_INCBIN / 旧覆盖) 见其活动 doc §五。
 00 文件 §5.1 未引用登记: 0x14e54 / 0x14f9c / 0x1547e / 0x1550a / 0x156ec / 0x15d18 / 0x15fe8 /
-0x16074 / 0x169d6+0x16a20 / 0x17424 / 0x186ce (孤儿 dead-code, 引用到时再 R4 disasm)。
+0x16074 / 0x169d6+0x16a20 / 0x17424 / 0x186ce / 0x19640 (孤儿 dead-code, 引用到时再 R4 disasm)。
+
+**Seg-9 说明**: Seg-8 executor proposal 越界含 Seg-9 预析数据, 可直接复用:
+- Block A (0x1a89c/0x20): §5.1 候选 (thumb=0; raw=1 偶合 0x08af5768 压缩 FS 资产)
+- Block B (0x1ad18/0xec): R4 disasm 5 stubs (dispatch_banlist_cursor_action MOV PC,R0 跳转表目标)
+- banlist_pass_ext_char_group carve (@0x09e3be3c, 代码引用 DWORD_0801abb0 in Seg-9)
+- 越界 EQ 4槽: advance/retreat_banlist_password_cursor_slot_ewram_base/gsettings_offset
+- 越界 RENAME 18槽: advance/retreat_banlist_password_cursor_slot_dir_field_off + load_banlist_char_by_cursor_slot_*/get_banlist_scroll_pixel_offset_*/get_banlist_password_entry_ptr_*/render_banlist_*/advance/retreat_banlist_pw_char_and_render_* 族
+- 越界 REF 10槽: 7x gBanlistPasswordBuffer (Seg-9 fn) + 3x carve (char_candidate_str/alt_char/ext_char_group)
 
 ---
 
