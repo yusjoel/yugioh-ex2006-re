@@ -47,7 +47,7 @@
 |-----|------|------|--------|
 | **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
 | **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
-| **3** | 0x1d998..0x1e36c (8fn) | ✅ | pending |
+| **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
 | 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
 | 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
 | 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
@@ -114,7 +114,7 @@
 - 新增 constants: card_info.inc +30 (CARD_TILE_PACK_*/CARD_FRAME_*/CARD_DESC_*/CARD_LEVEL_*/CARD_SPELL_*/CARD_ICON_*/CARD_OVERLAY_TILE_SRC) / gba_mem.inc +3 (BG_SCREEN_TILE_OFF_1/BG_SCREEN_ROW1_OFF/BG_SCREEN_ROW1_TILE1) / gba_io.inc +1 (DISPCNT_BG_OBJ_CLEAR_MASK)
 - CSV sync: ExportFunctionInventory (4642 named) + naming-proposals.csv 0x0801dbdc 行更新
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: (pending)
+- commit: 1b683a0
 
 ---
 
