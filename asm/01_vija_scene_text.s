@@ -1889,7 +1889,18 @@ LAB_0801d98e:
 draw_card_level_label_to_vram_sprite_vram:
     .word  CARD_INFO_STAT_SPRITE_VRAM     @ 0801d994 80850006  commit_line_buffer_to_sprite_vram target for Level (BG VRAM CB2+0x580)
 
-@ p1: 读卡片属性, 调 decode_card_image_6bpp (r1=0x10 palette offset)
+@ @ Loads card image tiles and frame graphics for the card info page.
+@ @ r0=card_id (u16), r1=pal_offset (stored sp+4), r2=atk_stat (stored sp+8).
+@ @ Reads card_stats_table (stride=11 hwords): field[7]=card_subtype(r4), field[6]=unk,
+@ @   field[9]=level(r7).
+@ @ Calls load_pack_tile_and_map_to_vram x2 (bg_vram=0xc000/0x6000000, param=0x020e).
+@ @ Calls decode_card_image_6bpp(vram=0x06000000<<0x13, pal=0x10, card_id, mode=2).
+@ @ Branches on r4 (card_subtype): r4<=20 -> monster frame; r4==22 -> spell frame;
+@ @   r4==23 -> spell-alt frame; else skip frame.
+@ @ Each frame path: resolve_card_type_icon_ptr(card_id), copy palette+tiles to PALRAM/VRAM,
+@ @   draw_card_name_label_to_vram, copy ATK/DEF stat glyphs.
+@ @ Calls draw_atk_def_label_to_vram(pal_offset, atk_stat).
+@ @ Returns void (Pattern B).
 card_image_decode_wrapper:
     push {r4,r5,r6,r7,lr}                    @ 0801d998 f0b5
     .hword 0x4657    @ 0801d99a 5746
@@ -1928,14 +1939,14 @@ card_image_decode_wrapper:
     lsls r6,r6,#0x5    @ 0801d9dc 7601
     movs r2,#0x82    @ 0801d9de 8222
     lsls r2,r2,#0x2    @ 0801d9e0 9200
-    ldr r3, DAT_0801da90                     @ 0801d9e2 2b4b
+    ldr r3, card_image_decode_wrapper_tile_a @ 0801d9e2 2b4b
     adds r0,r6,#0x0    @ 0801d9e4 301c
     movs r1,#0x80    @ 0801d9e6 8021
     bl load_pack_tile_and_map_to_vram        @ 0801d9e8 d0f012fb
     movs r0,#0xc0    @ 0801d9ec c020
     lsls r0,r0,#0x4    @ 0801d9ee 0001
-    ldr r2, DAT_0801da94                     @ 0801d9f0 284a
-    ldr r3, DAT_0801da98                     @ 0801d9f2 294b
+    ldr r2, card_image_decode_wrapper_map_param @ 0801d9f0 284a
+    ldr r3, card_image_decode_wrapper_tile_b @ 0801d9f2 294b
     movs r1,#0x80    @ 0801d9f4 8021
     bl load_pack_tile_and_map_to_vram        @ 0801d9f6 d0f00bfb
     movs r0,#0xc0    @ 0801d9fa c020
@@ -1960,12 +1971,12 @@ LAB_0801da1c:
     bge LAB_0801da22                         @ 0801da1e 00da
     b LAB_0801dbca                           @ 0801da20 d3e0
 LAB_0801da22:
-    ldr r3, DAT_0801da9c                     @ 0801da22 1e4b
+    ldr r3, card_image_decode_wrapper_tile_c @ 0801da22 1e4b
     adds r0,r6,#0x0    @ 0801da24 301c
     movs r1,#0x50    @ 0801da26 5021
     movs r2,#0xca    @ 0801da28 ca22
     bl load_pack_tile_and_map_to_vram        @ 0801da2a d0f0f1fa
-    ldr r4, DAT_0801daa0                     @ 0801da2e 1c4c
+    ldr r4, card_image_decode_wrapper_bg_pal @ 0801da2e 1c4c
     adds r0,r5,#0x0    @ 0801da30 281c
     bl resolve_card_type_icon_ptr            @ 0801da32 d1f04bfc
     adds r1,r0,#0x0    @ 0801da36 011c
@@ -1974,23 +1985,23 @@ LAB_0801da22:
     bl copy_bytes_by_halfword                @ 0801da3c d7f032fa
     adds r0,r5,#0x0    @ 0801da40 281c
     bl draw_card_name_label_to_vram          @ 0801da42 fff737fe
-    ldr r0, DAT_0801daa4                     @ 0801da46 1748
+    ldr r0, card_image_decode_wrapper_obj_pal_a @ 0801da46 1748
     .hword 0x4654    @ 0801da48 5446
     subs r4,#0x1    @ 0801da4a 013c
     lsls r1,r4,#0x5    @ 0801da4c 6101
-    ldr r2, DAT_0801daa8                     @ 0801da4e 164a
+    ldr r2, card_image_decode_wrapper_pal_a  @ 0801da4e 164a
     adds r1,r1,r2    @ 0801da50 8918
     movs r2,#0x20    @ 0801da52 2022
     bl copy_bytes_by_halfword                @ 0801da54 d7f026fa
-    ldr r0, DAT_0801daac                     @ 0801da58 1448
+    ldr r0, card_image_decode_wrapper_obj_tile @ 0801da58 1448
     lsls r4,r4,#0x7    @ 0801da5a e401
-    ldr r1, DAT_0801dab0                     @ 0801da5c 1449
+    ldr r1, card_image_decode_wrapper_tile_d @ 0801da5c 1449
     adds r4,r4,r1    @ 0801da5e 6418
     adds r1,r4,#0x0    @ 0801da60 211c
     movs r2,#0x80    @ 0801da62 8022
     bl copy_bytes_by_halfword                @ 0801da64 d7f01efa
-    ldr r0, DAT_0801dab4                     @ 0801da68 1248
-    ldr r1, DAT_0801dab8                     @ 0801da6a 1349
+    ldr r0, card_image_decode_wrapper_tile_s1 @ 0801da68 1248
+    ldr r1, card_image_decode_wrapper_overlay @ 0801da6a 1349
     movs r2,#0x20    @ 0801da6c 2022
     bl copy_bytes_by_halfword                @ 0801da6e d7f019fa
     adds r0,r5,#0x0    @ 0801da72 281c
@@ -2008,40 +2019,40 @@ LAB_0801da8a:
     b LAB_0801dbb8                           @ 0801da8a 95e0
 PTR_card_stats_table_0801da8c:
     .word  card_stats_table               @ 0801da8c b8698109
-DAT_0801da90:
-    .word  0x0985004c                     @ 0801da90 4c008509
-DAT_0801da94:
-    .word  0x0000020e                     @ 0801da94 0e020000
-DAT_0801da98:
-    .word  0x09850934                     @ 0801da98 34098509
-DAT_0801da9c:
-    .word  0x0984a3fc                     @ 0801da9c fca38409
-DAT_0801daa0:
-    .word  0x050000a0                     @ 0801daa0 a0000005
-DAT_0801daa4:
-    .word  0x050003a0                     @ 0801daa4 a0030005
-DAT_0801daa8:
-    .word  0x0984dd6c                     @ 0801daa8 6cdd8409
-DAT_0801daac:
-    .word  0x06017440                     @ 0801daac 40740106
-DAT_0801dab0:
-    .word  0x0984d8ec                     @ 0801dab0 ecd88409
-DAT_0801dab4:
-    .word  0x06010020                     @ 0801dab4 20000106
-DAT_0801dab8:
-    .word  0x09ccd2d0                     @ 0801dab8 d0d2cc09
+card_image_decode_wrapper_tile_a:
+    .word  CARD_TILE_PACK_GLYPH_OFF_A     @ 0801da90 4c008509  card_glyph_table_3+0xa80: tile src A for card info BG map
+card_image_decode_wrapper_map_param:
+    .word  CARD_TILE_PACK_MAP_PARAM       @ 0801da94 0e020000  load_pack_tile_and_map_to_vram map param (0x020e)
+card_image_decode_wrapper_tile_b:
+    .word  CARD_TILE_PACK_GLYPH_OFF_B     @ 0801da98 34098509  card_glyph_table_3+0x1368: tile src B for card info BG map
+card_image_decode_wrapper_tile_c:
+    .word  CARD_FRAME_TILE_SRC_MONSTER    @ 0801da9c fca38409  seg-C blob: monster card frame tile pack source
+card_image_decode_wrapper_bg_pal:
+    .word  CARD_FRAME_BG_PAL_BASE         @ 0801daa0 a0000005  BG PALRAM row 5 (card frame BG palette base)
+card_image_decode_wrapper_obj_pal_a:
+    .word  CARD_FRAME_OBJ_PAL_MONSTER     @ 0801daa4 a0030005  OBJ PALRAM slot 13: monster frame palette
+card_image_decode_wrapper_pal_a:
+    .word  CARD_FRAME_PAL_SRC_MONSTER_A   @ 0801daa8 6cdd8409  seg-C blob: monster frame OBJ palette A (32B)
+card_image_decode_wrapper_obj_tile:
+    .word  CARD_FRAME_OBJ_TILE_BASE       @ 0801daac 40740106  OBJ VRAM card frame tile base (OBJ+0x7440)
+card_image_decode_wrapper_tile_d:
+    .word  CARD_FRAME_TILE_SRC_MONSTER_A  @ 0801dab0 ecd88409  seg-C blob: monster frame OBJ tile data A (256B)
+card_image_decode_wrapper_tile_s1:
+    .word  CARD_FRAME_OBJ_TILE_SLOT1      @ 0801dab4 20000106  OBJ_TILE_VRAM_BASE+0x20: tile slot 1 for card art overlay
+card_image_decode_wrapper_overlay:
+    .word  CARD_OVERLAY_TILE_SRC          @ 0801dab8 d0d2cc09  name_o region+0x40: card overlay nibble-sequence tile (5 refs)
 LAB_0801dabc:
     .hword 0x4640    @ 0801dabc 4046
     cmp r0,#0x17                             @ 0801dabe 1728
     beq LAB_0801dac4                         @ 0801dac0 00d0
     b LAB_0801dbca                           @ 0801dac2 82e0
 LAB_0801dac4:
-    ldr r3, DAT_0801db10                     @ 0801dac4 124b
+    ldr r3, card_image_decode_wrapper_tile_e @ 0801dac4 124b
     adds r0,r6,#0x0    @ 0801dac6 301c
     movs r1,#0x50    @ 0801dac8 5021
     movs r2,#0xca    @ 0801daca ca22
     bl load_pack_tile_and_map_to_vram        @ 0801dacc d0f0a0fa
-    ldr r4, DAT_0801db14                     @ 0801dad0 104c
+    ldr r4, card_image_decode_wrapper_bg_pal_b @ 0801dad0 104c
     adds r0,r5,#0x0    @ 0801dad2 281c
     bl resolve_card_type_icon_ptr            @ 0801dad4 d1f0fafb
     adds r1,r0,#0x0    @ 0801dad8 011c
@@ -2050,48 +2061,48 @@ LAB_0801dac4:
     bl copy_bytes_by_halfword                @ 0801dade d7f0e1f9
     adds r0,r5,#0x0    @ 0801dae2 281c
     bl draw_card_name_label_to_vram          @ 0801dae4 fff7e6fd
-    ldr r0, DAT_0801db18                     @ 0801dae8 0b48
-    ldr r1, DAT_0801db1c                     @ 0801daea 0c49
+    ldr r0, card_image_decode_wrapper_obj_pal_b @ 0801dae8 0b48
+    ldr r1, card_image_decode_wrapper_pal_b  @ 0801daea 0c49
     movs r2,#0x20    @ 0801daec 2022
     bl copy_bytes_by_halfword                @ 0801daee d7f0d9f9
-    ldr r0, DAT_0801db20                     @ 0801daf2 0b48
-    ldr r1, DAT_0801db24                     @ 0801daf4 0b49
+    ldr r0, card_image_decode_wrapper_obj_tile_b @ 0801daf2 0b48
+    ldr r1, card_image_decode_wrapper_tile_f @ 0801daf4 0b49
     movs r2,#0x80    @ 0801daf6 8022
     bl copy_bytes_by_halfword                @ 0801daf8 d7f0d4f9
     cmp r7,#0x0                              @ 0801dafc 002f
     beq LAB_0801dbca                         @ 0801dafe 64d0
-    ldr r0, DAT_0801db28                     @ 0801db00 0948
-    ldr r1, DAT_0801db2c                     @ 0801db02 0a49
+    ldr r0, card_image_decode_wrapper_obj_pal_c @ 0801db00 0948
+    ldr r1, card_image_decode_wrapper_pal_c  @ 0801db02 0a49
     movs r2,#0x20    @ 0801db04 2022
     bl copy_bytes_by_halfword                @ 0801db06 d7f0cdf9
-    ldr r0, DAT_0801db30                     @ 0801db0a 0948
+    ldr r0, card_image_decode_wrapper_star_tile @ 0801db0a 0948
     subs r1,r7,#0x1    @ 0801db0c 791e
     b LAB_0801db82                           @ 0801db0e 38e0
-DAT_0801db10:
-    .word  0x0984b994                     @ 0801db10 94b98409
-DAT_0801db14:
-    .word  0x050000a0                     @ 0801db14 a0000005
-DAT_0801db18:
-    .word  0x050003a0                     @ 0801db18 a0030005
-DAT_0801db1c:
-    .word  0x0984de6c                     @ 0801db1c 6cde8409
-DAT_0801db20:
-    .word  0x06017440                     @ 0801db20 40740106
-DAT_0801db24:
-    .word  0x0984dcec                     @ 0801db24 ecdc8409
-DAT_0801db28:
-    .word  0x050003c0                     @ 0801db28 c0030005
-DAT_0801db2c:
-    .word  0x0984f52c                     @ 0801db2c 2cf58409
-DAT_0801db30:
-    .word  0x060174c0                     @ 0801db30 c0740106
+card_image_decode_wrapper_tile_e:
+    .word  CARD_FRAME_TILE_SRC_SPELL      @ 0801db10 94b98409  seg-C blob: spell card frame tile pack source (type23)
+card_image_decode_wrapper_bg_pal_b:
+    .word  CARD_FRAME_BG_PAL_BASE         @ 0801db14 a0000005
+card_image_decode_wrapper_obj_pal_b:
+    .word  CARD_FRAME_OBJ_PAL_MONSTER     @ 0801db18 a0030005
+card_image_decode_wrapper_pal_b:
+    .word  CARD_FRAME_PAL_SRC_SPELL_A     @ 0801db1c 6cde8409  seg-C blob: spell frame OBJ palette A
+card_image_decode_wrapper_obj_tile_b:
+    .word  CARD_FRAME_OBJ_TILE_BASE       @ 0801db20 40740106
+card_image_decode_wrapper_tile_f:
+    .word  CARD_FRAME_TILE_SRC_SPELL_A    @ 0801db24 ecdc8409  seg-C blob: spell frame OBJ tile data A
+card_image_decode_wrapper_obj_pal_c:
+    .word  CARD_FRAME_OBJ_PAL_SPELL       @ 0801db28 c0030005  OBJ PALRAM slot 14: spell/star frame palette
+card_image_decode_wrapper_pal_c:
+    .word  CARD_FRAME_PAL_SRC_STAR_A      @ 0801db2c 2cf58409  seg-C blob: star/level frame OBJ palette A
+card_image_decode_wrapper_star_tile:
+    .word  CARD_LEVEL_OBJ_TILE_BASE       @ 0801db30 c0740106  OBJ VRAM card level star tile base (OBJ+0x74c0)
 LAB_0801db34:
-    ldr r3, DAT_0801db90                     @ 0801db34 164b
+    ldr r3, card_image_decode_wrapper_tile_e2 @ 0801db34 164b
     adds r0,r6,#0x0    @ 0801db36 301c
     movs r1,#0x50    @ 0801db38 5021
     movs r2,#0xca    @ 0801db3a ca22
     bl load_pack_tile_and_map_to_vram        @ 0801db3c d0f068fa
-    ldr r4, DAT_0801db94                     @ 0801db40 144c
+    ldr r4, card_image_decode_wrapper_bg_pal_c @ 0801db40 144c
     adds r0,r5,#0x0    @ 0801db42 281c
     bl resolve_card_type_icon_ptr            @ 0801db44 d1f0c2fb
     adds r1,r0,#0x0    @ 0801db48 011c
@@ -2100,51 +2111,51 @@ LAB_0801db34:
     bl copy_bytes_by_halfword                @ 0801db4e d7f0a9f9
     adds r0,r5,#0x0    @ 0801db52 281c
     bl draw_card_name_label_to_vram          @ 0801db54 fff7aefd
-    ldr r0, DAT_0801db98                     @ 0801db58 0f48
-    ldr r1, DAT_0801db9c                     @ 0801db5a 1049
+    ldr r0, card_image_decode_wrapper_obj_pal_d @ 0801db58 0f48
+    ldr r1, card_image_decode_wrapper_pal_d  @ 0801db5a 1049
     movs r2,#0x20    @ 0801db5c 2022
     bl copy_bytes_by_halfword                @ 0801db5e d7f0a1f9
-    ldr r0, DAT_0801dba0                     @ 0801db62 0f48
-    ldr r1, DAT_0801dba4                     @ 0801db64 0f49
+    ldr r0, card_image_decode_wrapper_obj_tile_c @ 0801db62 0f48
+    ldr r1, card_image_decode_wrapper_tile_g @ 0801db64 0f49
     movs r2,#0x80    @ 0801db66 8022
     bl copy_bytes_by_halfword                @ 0801db68 d7f09cf9
     .hword 0x4648    @ 0801db6c 4846
     cmp r0,#0x0                              @ 0801db6e 0028
     beq LAB_0801dbca                         @ 0801db70 2bd0
-    ldr r0, DAT_0801dba8                     @ 0801db72 0d48
-    ldr r1, DAT_0801dbac                     @ 0801db74 0d49
+    ldr r0, card_image_decode_wrapper_obj_pal_e @ 0801db72 0d48
+    ldr r1, card_image_decode_wrapper_pal_e  @ 0801db74 0d49
     movs r2,#0x20    @ 0801db76 2022
     bl copy_bytes_by_halfword                @ 0801db78 d7f094f9
-    ldr r0, DAT_0801dbb0                     @ 0801db7c 0c48
+    ldr r0, card_image_decode_wrapper_star_tile_b @ 0801db7c 0c48
     .hword 0x4649    @ 0801db7e 4946
     subs r1,#0x1    @ 0801db80 0139
 LAB_0801db82:
     lsls r1,r1,#0x5    @ 0801db82 4901
-    ldr r2, DAT_0801dbb4                     @ 0801db84 0b4a
+    ldr r2, card_image_decode_wrapper_tile_h @ 0801db84 0b4a
     adds r1,r1,r2    @ 0801db86 8918
     movs r2,#0x20    @ 0801db88 2022
     bl copy_bytes_by_halfword                @ 0801db8a d7f08bf9
     b LAB_0801dbca                           @ 0801db8e 1ce0
-DAT_0801db90:
-    .word  0x0984b994                     @ 0801db90 94b98409
-DAT_0801db94:
-    .word  0x050000a0                     @ 0801db94 a0000005
-DAT_0801db98:
-    .word  0x050003a0                     @ 0801db98 a0030005
-DAT_0801db9c:
-    .word  0x0984de4c                     @ 0801db9c 4cde8409
-DAT_0801dba0:
-    .word  0x06017440                     @ 0801dba0 40740106
-DAT_0801dba4:
-    .word  0x0984dc6c                     @ 0801dba4 6cdc8409
-DAT_0801dba8:
-    .word  0x050003c0                     @ 0801dba8 c0030005
-DAT_0801dbac:
-    .word  0x0984f52c                     @ 0801dbac 2cf58409
-DAT_0801dbb0:
-    .word  0x060174c0                     @ 0801dbb0 c0740106
-DAT_0801dbb4:
-    .word  0x0984f46c                     @ 0801dbb4 6cf48409
+card_image_decode_wrapper_tile_e2:
+    .word  CARD_FRAME_TILE_SRC_SPELL      @ 0801db90 94b98409
+card_image_decode_wrapper_bg_pal_c:
+    .word  CARD_FRAME_BG_PAL_BASE         @ 0801db94 a0000005
+card_image_decode_wrapper_obj_pal_d:
+    .word  CARD_FRAME_OBJ_PAL_MONSTER     @ 0801db98 a0030005
+card_image_decode_wrapper_pal_d:
+    .word  CARD_FRAME_PAL_SRC_MONSTER_B   @ 0801db9c 4cde8409  seg-C blob: monster frame OBJ palette B
+card_image_decode_wrapper_obj_tile_c:
+    .word  CARD_FRAME_OBJ_TILE_BASE       @ 0801dba0 40740106
+card_image_decode_wrapper_tile_g:
+    .word  CARD_FRAME_TILE_SRC_STAR       @ 0801dba4 6cdc8409  seg-C blob: star/level OBJ tile data
+card_image_decode_wrapper_obj_pal_e:
+    .word  CARD_FRAME_OBJ_PAL_SPELL       @ 0801dba8 c0030005
+card_image_decode_wrapper_pal_e:
+    .word  CARD_FRAME_PAL_SRC_STAR_A      @ 0801dbac 2cf58409
+card_image_decode_wrapper_star_tile_b:
+    .word  CARD_LEVEL_OBJ_TILE_BASE       @ 0801dbb0 c0740106
+card_image_decode_wrapper_tile_h:
+    .word  CARD_FRAME_TILE_SRC_STAR_B     @ 0801dbb4 6cf48409  seg-C blob: star/level OBJ tile data B
 LAB_0801dbb8:
     ldr r0,[sp,#0x4]                         @ 0801dbb8 0198
     ldr r1,[sp,#0x8]                         @ 0801dbba 0299
@@ -2165,8 +2176,20 @@ LAB_0801dbca:
     bx r0                                    @ 0801dbd8 0047
     .zero  0x2
 
-@ p1/p2: 页面动画/过渡 (非 tile 写入), 待细化
-card_info_page_step_03_unknown:
+@ @ Renders card name text to the description page glyph line buffer.
+@ @ Reads gCardInfoPageState+0x0 bit0 to select charset:
+@ @   bit0==1 -> resolve_card_gfx_pointer_by_type (card_id bits[17:15] field[0xf]);
+@ @   bit0==0 -> select_charset_then_load_name (card_id, lang bits[2:0] of gSettings).
+@ @ Calculates total pixel width via char_width_wide_10_or_12 or char_width_narrow_5.
+@ @ Sets gFontJpCtx[+0x8] mode_flags and gFontJpCtx[+0x4] fn_ptr from font_jp_base_table.
+@ @ Renders each glyph via render_glyph_jp_dual_layer (wide) or render_glyph_jp_single_layer.
+@ @ Flushes line buffer: zero_fill_by_halfword(0x06007100, 0x80 hwords),
+@ @   commit_line_buffer_to_sprite_vram(0x06007100, 0).
+@ @ If sp[0]!=0 (scrolled page): writes tile-index sequences to BG VRAM 0x06000800
+@ @   and 0x06000c80 using gPrng+0x1e2 as stride, clears gCardInfoPageState[+0x18/+0x1c].
+@ @ indeg=2: card_info_page_entry (0x0801e456) + update_card_info_page_state (0x0801e42e).
+@ @ Returns void (Pattern B).
+render_card_name_to_desc_page_vram:
     push {r4,r5,r6,r7,lr}                    @ 0801dbdc f0b5
     .hword 0x4657    @ 0801dbde 5746
     .hword 0x464e    @ 0801dbe0 4e46
@@ -2179,9 +2202,9 @@ card_info_page_step_03_unknown:
     .hword 0x468a    @ 0801dbee 8a46
     movs r2,#0x0    @ 0801dbf0 0022
     str r2,[sp,#0x0]                         @ 0801dbf2 0092
-    ldr r2, DAT_0801dc28                     @ 0801dbf4 0c4a
-    ldr r0, DAT_0801dc2c                     @ 0801dbf6 0d48
-    ldr r3, DAT_0801dc30                     @ 0801dbf8 0d4b
+    ldr r2, render_card_name_to_desc_page_vram_ptr_gfontjpctx_a @ 0801dbf4 0c4a
+    ldr r0, render_card_name_to_desc_page_vram_ewram_base_a @ 0801dbf6 0d48
+    ldr r3, render_card_name_to_desc_page_vram_gsettings_off_a @ 0801dbf8 0d4b
     adds r0,r0,r3    @ 0801dbfa c018
     ldrb r3,[r0,#0x0]                        @ 0801dbfc 0378
     movs r0,#0x7    @ 0801dbfe 0720
@@ -2193,7 +2216,7 @@ card_info_page_step_03_unknown:
     ands r1,r4    @ 0801dc0a 2140
     orrs r1,r0    @ 0801dc0c 0143
     strb r1,[r2,#0x8]                        @ 0801dc0e 1172
-    ldr r1, DAT_0801dc34                     @ 0801dc10 0849
+    ldr r1, render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_a @ 0801dc10 0849
     movs r0,#0x1    @ 0801dc12 0120
     ldrb r2,[r1,#0x0]                        @ 0801dc14 0a78
     ands r0,r2    @ 0801dc16 1040
@@ -2204,14 +2227,14 @@ card_info_page_step_03_unknown:
     lsrs r0,r0,#0x12    @ 0801dc20 800c
     bl resolve_card_gfx_pointer_by_type      @ 0801dc22 d0f0b1fe
     b LAB_0801dc46                           @ 0801dc26 0ee0
-DAT_0801dc28:
-    .word  0x02006ed0                     @ 0801dc28 d06e0002
-DAT_0801dc2c:
-    .word  0x02000000                     @ 0801dc2c 00000002
-DAT_0801dc30:
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_a:
+    .word  gFontJpCtx                     @ 0801dc28 d06e0002
+render_card_name_to_desc_page_vram_ewram_base_a:
+    .word  EWRAM_BASE                     @ 0801dc2c 00000002
+render_card_name_to_desc_page_vram_gsettings_off_a:
     .word  0x00006c2c                     @ 0801dc30 2c6c0000
-DAT_0801dc34:
-    .word  0x0201afb0                     @ 0801dc34 b0af0102
+render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_a:
+    .word  gCardInfoPageState             @ 0801dc34 b0af0102
 LAB_0801dc38:
     ldr r0,[r1,#0x0]                         @ 0801dc38 0868
     lsls r0,r0,#0xf    @ 0801dc3a c003
@@ -2221,8 +2244,8 @@ LAB_0801dc38:
     bl select_charset_then_load_name         @ 0801dc42 d0f0b3fd
 LAB_0801dc46:
     adds r6,r0,#0x0    @ 0801dc46 061c
-    ldr r0, DAT_0801dc9c                     @ 0801dc48 1448
-    ldr r3, DAT_0801dca0                     @ 0801dc4a 154b
+    ldr r0, render_card_name_to_desc_page_vram_ewram_base_b @ 0801dc48 1448
+    ldr r3, render_card_name_to_desc_page_vram_gsettings_off_b @ 0801dc4a 154b
     adds r0,r0,r3    @ 0801dc4c c018
     movs r1,#0x7    @ 0801dc4e 0721
     ldrb r0,[r0,#0x0]                        @ 0801dc50 0078
@@ -2230,7 +2253,7 @@ LAB_0801dc46:
     cmp r1,#0x0                              @ 0801dc54 0029
     bne LAB_0801dcac                         @ 0801dc56 29d1
     adds r4,r6,#0x0    @ 0801dc58 341c
-    ldr r2, DAT_0801dca4                     @ 0801dc5a 124a
+    ldr r2, render_card_name_to_desc_page_vram_ptr_gfontjpctx_b @ 0801dc5a 124a
     movs r0,#0x2    @ 0801dc5c 0220
     rsbs r0,r0,#0    @ 0801dc5e 4042
     ldrb r1,[r2,#0x8]                        @ 0801dc60 117a
@@ -2263,17 +2286,17 @@ LAB_0801dc82:
     bne LAB_0801dc82                         @ 0801dc96 f4d1
     b LAB_0801dd40                           @ 0801dc98 52e0
     .zero  0x2
-DAT_0801dc9c:
-    .word  0x02000000                     @ 0801dc9c 00000002
-DAT_0801dca0:
+render_card_name_to_desc_page_vram_ewram_base_b:
+    .word  EWRAM_BASE                     @ 0801dc9c 00000002
+render_card_name_to_desc_page_vram_gsettings_off_b:
     .word  0x00006c2c                     @ 0801dca0 2c6c0000
-DAT_0801dca4:
-    .word  0x02006ed0                     @ 0801dca4 d06e0002
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_b:
+    .word  gFontJpCtx                     @ 0801dca4 d06e0002
 PTR_font_jp_base_table_0801dca8:
     .word  font_jp_base_table             @ 0801dca8 54f8e509
 LAB_0801dcac:
     adds r5,r6,#0x0    @ 0801dcac 351c
-    ldr r2, DAT_0801dd04                     @ 0801dcae 154a
+    ldr r2, render_card_name_to_desc_page_vram_ptr_gfontjpctx_c @ 0801dcae 154a
     rsbs r1,r1,#0    @ 0801dcb0 4942
     lsrs r1,r1,#0x1f    @ 0801dcb2 c90f
     movs r0,#0x2    @ 0801dcb4 0220
@@ -2300,7 +2323,7 @@ LAB_0801dcac:
     adds r7,r3,#0x0    @ 0801dcde 1f1c
 LAB_0801dce0:
     ldrb r1,[r5,#0x0]                        @ 0801dce0 2978
-    ldr r0, DAT_0801dd0c                     @ 0801dce2 0a48
+    ldr r0, render_card_name_to_desc_page_vram_ptr_sjis_fold_a @ 0801dce2 0a48
     adds r0,r1,r0    @ 0801dce4 0818
     ldrb r0,[r0,#0x0]                        @ 0801dce6 0078
     cmp r0,r1                                @ 0801dce8 8842
@@ -2317,12 +2340,12 @@ LAB_0801dce0:
     adds r0,r0,r7    @ 0801dcfe c019
     ldr r0,[r0,#0x0]                         @ 0801dd00 0068
     b LAB_0801dd2a                           @ 0801dd02 12e0
-DAT_0801dd04:
-    .word  0x02006ed0                     @ 0801dd04 d06e0002
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_c:
+    .word  gFontJpCtx                     @ 0801dd04 d06e0002
 PTR_font_jp_base_table_0801dd08:
     .word  font_jp_base_table             @ 0801dd08 54f8e509
-DAT_0801dd0c:
-    .word  0x09e589c4                     @ 0801dd0c c489e509
+render_card_name_to_desc_page_vram_ptr_sjis_fold_a:
+    .word  sjis_char_fold_table           @ 0801dd0c c489e509
 LAB_0801dd10:
     movs r0,#0x2    @ 0801dd10 0220
     ldrb r3,[r4,#0x8]                        @ 0801dd12 237a
@@ -2349,11 +2372,11 @@ LAB_0801dd2a:
     cmp r0,#0x0                              @ 0801dd3c 0028
     bne LAB_0801dce0                         @ 0801dd3e cfd1
 LAB_0801dd40:
-    ldr r0, DAT_0801dd90                     @ 0801dd40 1348
+    ldr r0, render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_b @ 0801dd40 1348
     .hword 0x464c    @ 0801dd42 4c46
     str r4,[r0,#0x14]                        @ 0801dd44 4461
-    ldr r1, DAT_0801dd94                     @ 0801dd46 1349
-    ldr r0, DAT_0801dd98                     @ 0801dd48 1348
+    ldr r1, render_card_name_to_desc_page_vram_ewram_base_c @ 0801dd46 1349
+    ldr r0, render_card_name_to_desc_page_vram_gsettings_off_c @ 0801dd48 1348
     adds r1,r1,r0    @ 0801dd4a 0918
     movs r0,#0x7    @ 0801dd4c 0720
     ldrb r1,[r1,#0x0]                        @ 0801dd4e 0978
@@ -2361,7 +2384,7 @@ LAB_0801dd40:
     cmp r0,#0x0                              @ 0801dd52 0028
     bne LAB_0801ddf4                         @ 0801dd54 4ed1
     adds r7,r6,#0x0    @ 0801dd56 371c
-    ldr r2, DAT_0801dd9c                     @ 0801dd58 104a
+    ldr r2, render_card_name_to_desc_page_vram_ptr_gfontjpctx_d @ 0801dd58 104a
     movs r0,#0x2    @ 0801dd5a 0220
     rsbs r0,r0,#0    @ 0801dd5c 4042
     ldrb r1,[r2,#0x8]                        @ 0801dd5e 117a
@@ -2388,14 +2411,14 @@ LAB_0801dd40:
     bl setup_line_buf_pos_and_font           @ 0801dd88 d2f014ff
     b LAB_0801ddb2                           @ 0801dd8c 11e0
     .zero  0x2
-DAT_0801dd90:
-    .word  0x0201afb0                     @ 0801dd90 b0af0102
-DAT_0801dd94:
-    .word  0x02000000                     @ 0801dd94 00000002
-DAT_0801dd98:
+render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_b:
+    .word  gCardInfoPageState             @ 0801dd90 b0af0102
+render_card_name_to_desc_page_vram_ewram_base_c:
+    .word  EWRAM_BASE                     @ 0801dd94 00000002
+render_card_name_to_desc_page_vram_gsettings_off_c:
     .word  0x00006c2c                     @ 0801dd98 2c6c0000
-DAT_0801dd9c:
-    .word  0x02006ed0                     @ 0801dd9c d06e0002
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_d:
+    .word  gFontJpCtx                     @ 0801dd9c d06e0002
 PTR_font_jp_base_table_0801dda0:
     .word  font_jp_base_table             @ 0801dda0 54f8e509
 LAB_0801dda4:
@@ -2421,7 +2444,7 @@ LAB_0801ddba:
     adds r0,r4,#0x0    @ 0801ddca 201c
     adds r1,r6,#0x0    @ 0801ddcc 311c
     .hword 0x4652    @ 0801ddce 5246
-    ldr r3, DAT_0801ddf0                     @ 0801ddd0 074b
+    ldr r3, render_card_name_to_desc_page_vram_render_param @ 0801ddd0 074b
     bl render_glyph_jp_dual_layer            @ 0801ddd2 d3f057fd
     adds r0,r4,#0x0    @ 0801ddd6 201c
     adds r1,r6,#0x0    @ 0801ddd8 311c
@@ -2435,11 +2458,11 @@ LAB_0801ddba:
     bne LAB_0801ddba                         @ 0801ddea e6d1
     b LAB_0801dede                           @ 0801ddec 77e0
     .zero  0x2
-DAT_0801ddf0:
-    .word  0x00008008                     @ 0801ddf0 08800000
+render_card_name_to_desc_page_vram_render_param:
+    .word  CARD_DESC_RENDER_PARAM         @ 0801ddf0 08800000  render_glyph_jp layer param for card description text
 LAB_0801ddf4:
     .hword 0x46b0    @ 0801ddf4 b046
-    ldr r2, DAT_0801de30                     @ 0801ddf6 0e4a
+    ldr r2, render_card_name_to_desc_page_vram_ptr_gfontjpctx_e @ 0801ddf6 0e4a
     movs r1,#0x2    @ 0801ddf8 0221
     ldrb r3,[r2,#0x8]                        @ 0801ddfa 137a
     orrs r1,r3    @ 0801ddfc 1943
@@ -2467,8 +2490,8 @@ LAB_0801ddf4:
     movs r1,#0x2    @ 0801de28 0221
     bl setup_line_buf_pos_and_font           @ 0801de2a d2f0c3fe
     b LAB_0801de46                           @ 0801de2e 0ae0
-DAT_0801de30:
-    .word  0x02006ed0                     @ 0801de30 d06e0002
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_e:
+    .word  gFontJpCtx                     @ 0801de30 d06e0002
 PTR_font_jp_base_table_0801de34:
     .word  font_jp_base_table             @ 0801de34 54f8e509
 LAB_0801de38:
@@ -2483,13 +2506,13 @@ LAB_0801de46:
     ldrb r0,[r1,#0x0]                        @ 0801de48 0878
     cmp r0,#0x0                              @ 0801de4a 0028
     beq LAB_0801dede                         @ 0801de4c 47d0
-    ldr r7, DAT_0801de84                     @ 0801de4e 0d4f
+    ldr r7, render_card_name_to_desc_page_vram_ptr_gfontjpctx_f @ 0801de4e 0d4f
     ldr r2, PTR_font_jp_base_table_0801de88  @ 0801de50 0d4a
     .hword 0x4691    @ 0801de52 9146
 LAB_0801de54:
     .hword 0x4643    @ 0801de54 4346
     ldrb r5,[r3,#0x0]                        @ 0801de56 1d78
-    ldr r0, DAT_0801de8c                     @ 0801de58 0c48
+    ldr r0, render_card_name_to_desc_page_vram_ptr_sjis_fold_b @ 0801de58 0c48
     adds r0,r5,r0    @ 0801de5a 2818
     ldrb r4,[r0,#0x0]                        @ 0801de5c 0478
     cmp r4,r5                                @ 0801de5e ac42
@@ -2511,12 +2534,12 @@ LAB_0801de54:
     .hword 0x469a    @ 0801de7e 9a46
     b LAB_0801deb0                           @ 0801de80 16e0
     .zero  0x2
-DAT_0801de84:
-    .word  0x02006ed0                     @ 0801de84 d06e0002
+render_card_name_to_desc_page_vram_ptr_gfontjpctx_f:
+    .word  gFontJpCtx                     @ 0801de84 d06e0002
 PTR_font_jp_base_table_0801de88:
     .word  font_jp_base_table             @ 0801de88 54f8e509
-DAT_0801de8c:
-    .word  0x09e589c4                     @ 0801de8c c489e509
+render_card_name_to_desc_page_vram_ptr_sjis_fold_b:
+    .word  sjis_char_fold_table           @ 0801de8c c489e509
 LAB_0801de90:
     movs r0,#0x2    @ 0801de90 0220
     ldrb r4,[r7,#0x8]                        @ 0801de92 3c7a
@@ -2541,7 +2564,7 @@ LAB_0801deb0:
     adds r0,r5,#0x0    @ 0801deb8 281c
     adds r1,r6,#0x0    @ 0801deba 311c
     .hword 0x4652    @ 0801debc 5246
-    ldr r3, DAT_0801df48                     @ 0801debe 224b
+    ldr r3, render_card_name_to_desc_page_vram_render_param_b @ 0801debe 224b
     bl render_glyph_jp_single_layer          @ 0801dec0 d3f070fd
     adds r0,r5,#0x0    @ 0801dec4 281c
     adds r1,r6,#0x0    @ 0801dec6 311c
@@ -2556,7 +2579,7 @@ LAB_0801deb0:
     cmp r0,#0x0                              @ 0801deda 0028
     bne LAB_0801de54                         @ 0801dedc bad1
 LAB_0801dede:
-    ldr r4, DAT_0801df4c                     @ 0801dede 1b4c
+    ldr r4, render_card_name_to_desc_page_vram_line_buf @ 0801dede 1b4c
     movs r1,#0x80    @ 0801dee0 8021
     lsls r1,r1,#0x5    @ 0801dee2 4901
     adds r0,r4,#0x0    @ 0801dee4 201c
@@ -2570,14 +2593,14 @@ LAB_0801dede:
     movs r4,#0xc4    @ 0801def8 c424
     lsls r4,r4,#0x1    @ 0801defa 6400
     movs r1,#0x0    @ 0801defc 0021
-    ldr r6, DAT_0801df50                     @ 0801defe 144e
-    ldr r7, PTR_gPrng_0801df54               @ 0801df00 144f
+    ldr r6, render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_c @ 0801defe 144e
+    ldr r7, render_card_name_to_desc_page_vram_ptr_gprng_a @ 0801df00 144f
 LAB_0801df02:
     adds r0,r1,#0x0    @ 0801df02 081c
     adds r0,#0x12    @ 0801df04 1230
     lsls r0,r0,#0x10    @ 0801df06 0004
     lsrs r0,r0,#0xa    @ 0801df08 800a
-    ldr r3, DAT_0801df58                     @ 0801df0a 134b
+    ldr r3, render_card_name_to_desc_page_vram_bg_a @ 0801df0a 134b
     adds r2,r0,r3    @ 0801df0c c218
     adds r5,r1,#0x1    @ 0801df0e 4d1c
     movs r3,#0x1f    @ 0801df10 1f23
@@ -2610,21 +2633,21 @@ LAB_0801df2c:
     ble LAB_0801df02                         @ 0801df42 dedd
     b LAB_0801df76                           @ 0801df44 17e0
     .zero  0x2
-DAT_0801df48:
-    .word  0x00008008                     @ 0801df48 08800000
-DAT_0801df4c:
-    .word  0x06007100                     @ 0801df4c 00710006
-DAT_0801df50:
-    .word  0x0201afb0                     @ 0801df50 b0af0102
-PTR_gPrng_0801df54:
+render_card_name_to_desc_page_vram_render_param_b:
+    .word  CARD_DESC_RENDER_PARAM         @ 0801df48 08800000
+render_card_name_to_desc_page_vram_line_buf:
+    .word  CARD_DESC_LINE_BUF_VRAM        @ 0801df4c 00710006  BG VRAM card description text line buffer
+render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_c:
+    .word  gCardInfoPageState             @ 0801df50 b0af0102
+render_card_name_to_desc_page_vram_ptr_gprng_a:
     .word  gPrng                          @ 0801df54 40000003
-DAT_0801df58:
-    .word  0x06000800                     @ 0801df58 00080006
+render_card_name_to_desc_page_vram_bg_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0801df58 00080006  BG VRAM desc page tile region A
 LAB_0801df5c:
-    ldr r1, DAT_0801df94                     @ 0801df5c 0d49
+    ldr r1, render_card_name_to_desc_page_vram_bg_b @ 0801df5c 0d49
     movs r3,#0x0    @ 0801df5e 0023
-    ldr r6, DAT_0801df98                     @ 0801df60 0d4e
-    ldr r7, PTR_gPrng_0801df9c               @ 0801df62 0e4f
+    ldr r6, render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_d @ 0801df60 0d4e
+    ldr r7, render_card_name_to_desc_page_vram_ptr_gprng_b @ 0801df62 0e4f
     movs r4,#0xc4    @ 0801df64 c424
     lsls r4,r4,#0x1    @ 0801df66 6400
     adds r2,r4,#0x0    @ 0801df68 221c
@@ -2651,17 +2674,25 @@ LAB_0801df76:
     pop {r4,r5,r6,r7}                        @ 0801df8e f0bc
     pop {r0}                                 @ 0801df90 01bc
     bx r0                                    @ 0801df92 0047
-DAT_0801df94:
-    .word  0x06000c80                     @ 0801df94 800c0006
-DAT_0801df98:
-    .word  0x0201afb0                     @ 0801df98 b0af0102
-PTR_gPrng_0801df9c:
+render_card_name_to_desc_page_vram_bg_b:
+    .word  CARD_DESC_BG_VRAM_B            @ 0801df94 800c0006  BG VRAM desc page tile region B
+render_card_name_to_desc_page_vram_ptr_gcardinfopagestate_d:
+    .word  gCardInfoPageState             @ 0801df98 b0af0102
+render_card_name_to_desc_page_vram_ptr_gprng_b:
     .word  gPrng                          @ 0801df9c 40000003
 
-@ 被 FUN_0801e714 (card_info 场景主循环) 唯一调用, 是卡片信息场景的逐帧滚动位置更新函数. 从 EWRAM 结构体 0x0201afb0 读取字段 [+0x14] (帧计数器), 若超过 0xe8=232 则将帧计数器继续递增并以帧数计算滚动偏移量, 写入 [+0x18] (像素 Y 偏移) 和 [+0x1c] (子计数器); 若帧计数器未超阈值则清零并停止滚动. 最终写 VRAM 0x03000240 (gFrameCounter 偏移处) 的对应字段以同步 HW 位置.
+@ @ Updates card description page scroll position each frame (called by card info scene).
+@ @ Reads gCardInfoPageState[+0x14] (frame_counter, r1). If r1 > 0xe8:
+@ @   Increments gCardInfoPageState[+0x1c] (sub_counter) modulo (r1-0xe8)*2+0xd2.
+@ @   If sub_counter in [0x5a..(r1-0xe8)*2+0x5a]: computes scroll_y = (sub_counter-0x5a)/2.
+@ @   Writes scroll_y to gCardInfoPageState[+0x18] (scroll_pixel_y_offset).
+@ @   Writes scroll_y to gPrng+0x1e2 (IWRAM BG3VOFS shadow, hw scroll register).
+@ @ If r1 <= 0xe8: clears [+0x18] and [+0x1c] (stop scroll).
+@ @ indeg=1; caller: tick_card_info_page_by_state (0x0801e714).
+@ @ Returns void (Pattern B, pop {r4}; pop {r0}; bx r0).
 tick_scroll_frame_and_update_pos:
     push {r4,lr}                             @ 0801dfa0 10b5
-    ldr r0, DAT_0801dfd0                     @ 0801dfa2 0b48
+    ldr r0, tick_scroll_frame_and_update_pos_ptr_gcardinfopagestate @ 0801dfa2 0b48
     ldr r1,[r0,#0x14]                        @ 0801dfa4 4169
     adds r3,r0,#0x0    @ 0801dfa6 031c
     cmp r1,#0xe8                             @ 0801dfa8 e829
@@ -2685,8 +2716,8 @@ LAB_0801dfc4:
     movs r0,#0x0    @ 0801dfca 0020
     b LAB_0801dfe6                           @ 0801dfcc 0be0
     .zero  0x2
-DAT_0801dfd0:
-    .word  0x0201afb0                     @ 0801dfd0 b0af0102
+tick_scroll_frame_and_update_pos_ptr_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801dfd0 b0af0102
 LAB_0801dfd4:
     adds r0,r4,#0x0    @ 0801dfd4 201c
     adds r0,#0x5a    @ 0801dfd6 5a30
@@ -2700,7 +2731,7 @@ LAB_0801dfd4:
 LAB_0801dfe6:
     str r0,[r3,#0x18]                        @ 0801dfe6 9861
 LAB_0801dfe8:
-    ldr r0, PTR_gPrng_0801dffc               @ 0801dfe8 0448
+    ldr r0, tick_scroll_frame_and_update_pos_ptr_gprng @ 0801dfe8 0448
     ldr r1,[r3,#0x18]                        @ 0801dfea 9969
     movs r2,#0xf1    @ 0801dfec f122
     lsls r2,r2,#0x1    @ 0801dfee 5200
@@ -2711,19 +2742,28 @@ LAB_0801dff4:
     pop {r0}                                 @ 0801dff6 01bc
     bx r0                                    @ 0801dff8 0047
     .zero  0x2
-PTR_gPrng_0801dffc:
+tick_scroll_frame_and_update_pos_ptr_gprng:
     .word  gPrng                          @ 0801dffc 40000003
 
-@ p2: 字段/描述绘制入口, 字面量池含 .word 0x06010040
+@ @ Renders card description text to OBJ VRAM (card info page, description sub-page).
+@ @ Reads gSettings (EWRAM_BASE+GSETTINGS_OFFSET) bits[2:0] (lang) to select charset.
+@ @ Sets gFontJpCtx[+0x8] mode_flags and fn_ptr from font_jp_base_table.
+@ @ Calls setup_line_buf_with_font_and_align(x=0x10, y=0x3a, align=1, font=1).
+@ @ Sets gFontJpCtx[+0x15] active flag bit5 (0x40).
+@ @ Calls text_render_wrapper(mode, 2, 7, r3) up to 2 times (normal + overflow path).
+@ @ Writes scroll fields: gCardInfoPageState[+0x24] = line_count+2,
+@ @   gCardInfoPageState[+0x20] = 0 (reset scroll).
+@ @ Calls commit_line_buffer_to_sprite_vram(0x06010040, 0).
+@ @ Returns void.
 render_card_description_text:
     push {r4,r5,r6,r7,lr}                    @ 0801e000 f0b5
     .hword 0x464f    @ 0801e002 4f46
     .hword 0x4646    @ 0801e004 4646
     push {r6,r7}                             @ 0801e006 c0b4
     .hword 0x4680    @ 0801e008 8046
-    ldr r4, DAT_0801e0e8                     @ 0801e00a 374c
-    ldr r0, DAT_0801e0ec                     @ 0801e00c 3748
-    ldr r1, DAT_0801e0f0                     @ 0801e00e 3849
+    ldr r4, render_card_description_text_ptr_gfontjpctx @ 0801e00a 374c
+    ldr r0, render_card_description_text_ewram_base @ 0801e00c 3748
+    ldr r1, render_card_description_text_gsettings_off @ 0801e00e 3849
     adds r5,r0,r1    @ 0801e010 4518
     movs r6,#0x7    @ 0801e012 0726
     adds r1,r6,#0x0    @ 0801e014 311c
@@ -2812,8 +2852,8 @@ LAB_0801e0b6:
     .hword 0x4643    @ 0801e0bc 4346
     bl text_render_wrapper                   @ 0801e0be d4f0ddfc
 LAB_0801e0c2:
-    ldr r1, DAT_0801e0f8                     @ 0801e0c2 0d49
-    ldr r0, DAT_0801e0e8                     @ 0801e0c4 0848
+    ldr r1, render_card_description_text_ptr_gcardinfopagestate @ 0801e0c2 0d49
+    ldr r0, render_card_description_text_ptr_gfontjpctx @ 0801e0c4 0848
     ldrh r0,[r0,#0xe]                        @ 0801e0c6 c089
     lsls r0,r0,#0x16    @ 0801e0c8 8005
     lsrs r0,r0,#0x16    @ 0801e0ca 800d
@@ -2821,7 +2861,7 @@ LAB_0801e0c2:
     str r0,[r1,#0x24]                        @ 0801e0ce 4862
     movs r0,#0x0    @ 0801e0d0 0020
     str r0,[r1,#0x20]                        @ 0801e0d2 0862
-    ldr r0, DAT_0801e0fc                     @ 0801e0d4 0948
+    ldr r0, render_card_description_text_obj_tile @ 0801e0d4 0948
     movs r1,#0x0    @ 0801e0d6 0021
     bl commit_line_buffer_to_sprite_vram     @ 0801e0d8 d4f0b8fe
     pop {r3,r4}                              @ 0801e0dc 18bc
@@ -2830,20 +2870,33 @@ LAB_0801e0c2:
     pop {r4,r5,r6,r7}                        @ 0801e0e2 f0bc
     pop {r0}                                 @ 0801e0e4 01bc
     bx r0                                    @ 0801e0e6 0047
-DAT_0801e0e8:
-    .word  0x02006ed0                     @ 0801e0e8 d06e0002
-DAT_0801e0ec:
-    .word  0x02000000                     @ 0801e0ec 00000002
-DAT_0801e0f0:
+render_card_description_text_ptr_gfontjpctx:
+    .word  gFontJpCtx                     @ 0801e0e8 d06e0002
+render_card_description_text_ewram_base:
+    .word  EWRAM_BASE                     @ 0801e0ec 00000002
+render_card_description_text_gsettings_off:
     .word  0x00006c2c                     @ 0801e0f0 2c6c0000
 PTR_font_jp_base_table_0801e0f4:
     .word  font_jp_base_table             @ 0801e0f4 54f8e509
-DAT_0801e0f8:
-    .word  0x0201afb0                     @ 0801e0f8 b0af0102
-DAT_0801e0fc:
-    .word  0x06010040                     @ 0801e0fc 40000106
+render_card_description_text_ptr_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e0f8 b0af0102
+render_card_description_text_obj_tile:
+    .word  CARD_DESC_OBJ_TILE_BASE        @ 0801e0fc 40000106  OBJ_TILE_VRAM_BASE+0x40: tile slot 2 for card desc text
 
-@ p2: 顶层最后一个 bl, UI 收尾
+@ @ Loads card frame graphics and card flag icons for the card info page finalize step.
+@ @ r0=card_id (u16). Reads card_stats_table row (stride=11 hwords):
+@ @   field[7]=subtype(r4), field[6]=subtype_b(r5), field[9]=level(r6),
+@ @   field[8]=card_type_index(r0 at entry).
+@ @ Reads gCardInfoPageState[+0x0] to mask bits[7:2] (clears type/flag fields).
+@ @ If subtype in [22..23] (Spell/Spell-alt): loads icon palette/tiles to
+@ @   CARD_FRAME_OBJ_PAL_LEVEL(0x05000380) and CARD_SPELL_OBJ_TILE_BASE(0x06017500).
+@ @ Otherwise: loads alternate icon palette/tiles.
+@ @ Loop r5=0..0x1f: reads card_attr_order_table[r5] (card type flag ID),
+@ @   calls test_card_flag_bit(card_id, flag_id). On match:
+@ @   loads 0x100 bytes from card_status_sprite_sheet[r5*0x100] to
+@ @   card_type_alt_display_table offset and CARD_ICON_OBJ_TILE_BASE(0x06017580).
+@ @   Updates gCardInfoPageState flag nibble bits[5:2].
+@ @ Returns void (Pattern B).
 card_info_page_finalize:
     push {r4,r5,r6,r7,lr}                    @ 0801e100 f0b5
     .hword 0x4657    @ 0801e102 5746
@@ -2873,7 +2926,7 @@ card_info_page_finalize:
     adds r0,r0,r3    @ 0801e132 c018
     ldrh r0,[r0,#0x0]                        @ 0801e134 0088
     .hword 0x4681    @ 0801e136 8146
-    ldr r0, DAT_0801e190                     @ 0801e138 1548
+    ldr r0, card_info_page_finalize_ptr_gcardinfopagestate_a @ 0801e138 1548
     .hword 0x4680    @ 0801e13a 8046
     movs r0,#0x3d    @ 0801e13c 3d20
     rsbs r0,r0,#0    @ 0801e13e 4042
@@ -2897,13 +2950,13 @@ LAB_0801e156:
     cmp r6,#0x0                              @ 0801e160 002e
     ble LAB_0801e1d0                         @ 0801e162 35dd
     subs r6,#0x1    @ 0801e164 013e
-    ldr r0, DAT_0801e194                     @ 0801e166 0b48
-    ldr r1, DAT_0801e198                     @ 0801e168 0b49
+    ldr r0, card_info_page_finalize_obj_pal_level @ 0801e166 0b48
+    ldr r1, card_info_page_finalize_pal_src_icon_b @ 0801e168 0b49
     movs r2,#0x20    @ 0801e16a 2022
     bl copy_bytes_by_halfword                @ 0801e16c d6f09afe
-    ldr r0, DAT_0801e19c                     @ 0801e170 0a48
+    ldr r0, card_info_page_finalize_spell_tile_base @ 0801e170 0a48
     lsls r1,r6,#0x7    @ 0801e172 f101
-    ldr r2, DAT_0801e1a0                     @ 0801e174 0a4a
+    ldr r2, card_info_page_finalize_tile_src_icon @ 0801e174 0a4a
     adds r1,r1,r2    @ 0801e176 8918
     movs r2,#0x80    @ 0801e178 8022
     bl copy_bytes_by_halfword                @ 0801e17a d6f093fe
@@ -2916,33 +2969,33 @@ LAB_0801e156:
     b LAB_0801e1d0                           @ 0801e18a 21e0
 PTR_card_stats_table_0801e18c:
     .word  card_stats_table               @ 0801e18c b8698109
-DAT_0801e190:
-    .word  0x0201afb0                     @ 0801e190 b0af0102
-DAT_0801e194:
-    .word  0x05000380                     @ 0801e194 80030005
-DAT_0801e198:
-    .word  0x0984f3ac                     @ 0801e198 acf38409
-DAT_0801e19c:
-    .word  0x06017500                     @ 0801e19c 00750106
-DAT_0801e1a0:
-    .word  0x0984f0ac                     @ 0801e1a0 acf08409
+card_info_page_finalize_ptr_gcardinfopagestate_a:
+    .word  gCardInfoPageState             @ 0801e190 b0af0102
+card_info_page_finalize_obj_pal_level:
+    .word  CARD_FRAME_OBJ_PAL_LEVEL       @ 0801e194 80030005  OBJ PALRAM slot 12: level/icon frame palette (PAL+0x180)
+card_info_page_finalize_pal_src_icon_b:
+    .word  CARD_FRAME_PAL_SRC_ICON_B      @ 0801e198 acf38409  seg-C blob: icon frame OBJ palette B (type 0x16)
+card_info_page_finalize_spell_tile_base:
+    .word  CARD_SPELL_OBJ_TILE_BASE       @ 0801e19c 00750106  OBJ VRAM spell card icon tile base (OBJ+0x7500)
+card_info_page_finalize_tile_src_icon:
+    .word  CARD_FRAME_TILE_SRC_ICON       @ 0801e1a0 acf08409  seg-C blob: icon frame OBJ tile data (type 0x16)
 LAB_0801e1a4:
     cmp r5,#0x0                              @ 0801e1a4 002d
     ble LAB_0801e1d0                         @ 0801e1a6 13dd
     subs r5,#0x1    @ 0801e1a8 013d
-    ldr r0, DAT_0801e270                     @ 0801e1aa 3148
+    ldr r0, card_info_page_finalize_obj_pal_level_b @ 0801e1aa 3148
     lsls r1,r5,#0x5    @ 0801e1ac 6901
-    ldr r2, DAT_0801e274                     @ 0801e1ae 314a
+    ldr r2, card_info_page_finalize_pal_src_icon_a @ 0801e1ae 314a
     adds r1,r1,r2    @ 0801e1b0 8918
     movs r2,#0x20    @ 0801e1b2 2022
     bl copy_bytes_by_halfword                @ 0801e1b4 d6f076fe
-    ldr r0, DAT_0801e278                     @ 0801e1b8 2f48
+    ldr r0, card_info_page_finalize_spell_tile_base_b @ 0801e1b8 2f48
     lsls r1,r5,#0x7    @ 0801e1ba e901
-    ldr r2, DAT_0801e27c                     @ 0801e1bc 2f4a
+    ldr r2, card_info_page_finalize_tile_src_spell_b @ 0801e1bc 2f4a
     adds r1,r1,r2    @ 0801e1be 8918
     movs r2,#0x80    @ 0801e1c0 8022
     bl copy_bytes_by_halfword                @ 0801e1c2 d6f06ffe
-    ldr r1, DAT_0801e280                     @ 0801e1c6 2e49
+    ldr r1, card_info_page_finalize_ptr_gcardinfopagestate_b @ 0801e1c6 2e49
     movs r0,#0x2    @ 0801e1c8 0220
     ldrb r2,[r1,#0x2]                        @ 0801e1ca 8a78
     orrs r0,r2    @ 0801e1cc 1043
@@ -2952,9 +3005,9 @@ LAB_0801e1d0:
     .hword 0x464b    @ 0801e1d2 4b46
     lsls r3,r3,#0x10    @ 0801e1d4 1b04
     .hword 0x469a    @ 0801e1d6 9a46
-    ldr r6, DAT_0801e284                     @ 0801e1d8 2a4e
+    ldr r6, card_info_page_finalize_ptr_card_attr_order_table @ 0801e1d8 2a4e
     .hword 0x46b1    @ 0801e1da b146
-    ldr r0, DAT_0801e280                     @ 0801e1dc 2848
+    ldr r0, card_info_page_finalize_ptr_gcardinfopagestate_b @ 0801e1dc 2848
     .hword 0x4680    @ 0801e1de 8046
 LAB_0801e1e0:
     lsls r4,r5,#0x2    @ 0801e1e0 ac00
@@ -2971,7 +3024,7 @@ LAB_0801e1e0:
     movs r3,#0x1    @ 0801e1f8 0123
     rsbs r3,r3,#0    @ 0801e1fa 5b42
     movs r2,#0x0    @ 0801e1fc 0022
-    ldr r0, DAT_0801e288                     @ 0801e1fe 2248
+    ldr r0, card_info_page_finalize_ptr_card_type_alt_display_table @ 0801e1fe 2248
     ldrh r1,[r0,#0x0]                        @ 0801e200 0188
     adds r5,r0,#0x0    @ 0801e202 051c
     cmp r1,r6                                @ 0801e204 b142
@@ -2997,10 +3050,10 @@ LAB_0801e220:
     lsls r0,r1,#0x1a    @ 0801e228 8806
     lsrs r0,r0,#0x1c    @ 0801e22a 000f
     lsls r0,r0,#0x8    @ 0801e22c 0002
-    ldr r2, DAT_0801e28c                     @ 0801e22e 174a
+    ldr r2, card_info_page_finalize_icon_tile_base @ 0801e22e 174a
     adds r0,r0,r2    @ 0801e230 8018
     lsls r1,r3,#0x8    @ 0801e232 1902
-    ldr r2, DAT_0801e290                     @ 0801e234 164a
+    ldr r2, card_info_page_finalize_ptr_card_status_sprite_sheet @ 0801e234 164a
     adds r1,r1,r2    @ 0801e236 8918
     movs r2,#0x80    @ 0801e238 8022
     lsls r2,r2,#0x1    @ 0801e23a 5200
@@ -3031,24 +3084,24 @@ LAB_0801e262:
     pop {r4,r5,r6,r7}                        @ 0801e26a f0bc
     pop {r0}                                 @ 0801e26c 01bc
     bx r0                                    @ 0801e26e 0047
-DAT_0801e270:
-    .word  0x05000380                     @ 0801e270 80030005
-DAT_0801e274:
-    .word  0x0984ee2c                     @ 0801e274 2cee8409
-DAT_0801e278:
-    .word  0x06017500                     @ 0801e278 00750106
-DAT_0801e27c:
-    .word  0x0984e42c                     @ 0801e27c 2ce48409
-DAT_0801e280:
-    .word  0x0201afb0                     @ 0801e280 b0af0102
-DAT_0801e284:
-    .word  0x09e4f204                     @ 0801e284 04f2e409
-DAT_0801e288:
-    .word  0x09e58ac4                     @ 0801e288 c48ae509
-DAT_0801e28c:
-    .word  0x06017580                     @ 0801e28c 80750106
-DAT_0801e290:
-    .word  0x09e2ddb4                     @ 0801e290 b4dde209
+card_info_page_finalize_obj_pal_level_b:
+    .word  CARD_FRAME_OBJ_PAL_LEVEL       @ 0801e270 80030005
+card_info_page_finalize_pal_src_icon_a:
+    .word  CARD_FRAME_PAL_SRC_ICON_A      @ 0801e274 2cee8409  seg-C blob: icon frame OBJ palette A (type 0x17)
+card_info_page_finalize_spell_tile_base_b:
+    .word  CARD_SPELL_OBJ_TILE_BASE       @ 0801e278 00750106
+card_info_page_finalize_tile_src_spell_b:
+    .word  CARD_FRAME_TILE_SRC_SPELL_B    @ 0801e27c 2ce48409  seg-C blob: spell frame OBJ tile data B (type 0x17)
+card_info_page_finalize_ptr_gcardinfopagestate_b:
+    .word  gCardInfoPageState             @ 0801e280 b0af0102
+card_info_page_finalize_ptr_card_attr_order_table:
+    .word  card_attr_order_table          @ 0801e284 04f2e409  32 u32 card attr flag IDs indexed by display slot
+card_info_page_finalize_ptr_card_type_alt_display_table:
+    .word  card_type_alt_display_table    @ 0801e288 c48ae509  card type/display index mapping table (u16 pairs, 1 ref)
+card_info_page_finalize_icon_tile_base:
+    .word  CARD_ICON_OBJ_TILE_BASE        @ 0801e28c 80750106  OBJ VRAM card icon/status tile base (OBJ+0x7580)
+card_info_page_finalize_ptr_card_status_sprite_sheet:
+    .word  card_status_sprite_sheet       @ 0801e290 b4dde209  32+1 card status OBJ sprite items, 0x100B each
 
 @ Write a 2x2 tile glyph block into BG VRAM with palette and tile data copy.
 @ Steps: (1) copy 32 bytes from PALRAM[palette_slot*32] to palette_dst;
@@ -3085,7 +3138,7 @@ blit_glyph_2x2_to_bg_vram:
     movs r2,#0x20    @ 0801e2c4 2022
     bl copy_bytes_by_halfword                @ 0801e2c6 d6f0edfd
     lsls r0,r4,#0x5    @ 0801e2ca 6001
-    ldr r3, DAT_0801e318                     @ 0801e2cc 124b
+    ldr r3, blit_glyph_2x2_to_bg_vram_bg_char_vram_cb2 @ 0801e2cc 124b
     adds r0,r0,r3    @ 0801e2ce c018
     .hword 0x4649    @ 0801e2d0 4946
     movs r2,#0x80    @ 0801e2d2 8022
@@ -3097,7 +3150,7 @@ blit_glyph_2x2_to_bg_vram:
     adds r4,r6,r4    @ 0801e2e0 3419
     .hword 0x4640    @ 0801e2e2 4046
     strh r4,[r0,#0x0]                        @ 0801e2e4 0480
-    ldr r3, DAT_0801e31c                     @ 0801e2e6 0d4b
+    ldr r3, blit_glyph_2x2_to_bg_vram_screen_tile_off1 @ 0801e2e6 0d4b
     adds r2,r5,r3    @ 0801e2e8 ea18
     lsrs r0,r1,#0x10    @ 0801e2ea 080c
     movs r3,#0x80    @ 0801e2ec 8023
@@ -3105,14 +3158,14 @@ blit_glyph_2x2_to_bg_vram:
     adds r1,r1,r3    @ 0801e2f0 c918
     adds r0,r6,r0    @ 0801e2f2 3018
     strh r0,[r2,#0x0]                        @ 0801e2f4 1080
-    ldr r0, DAT_0801e320                     @ 0801e2f6 0a48
+    ldr r0, blit_glyph_2x2_to_bg_vram_screen_row1_off @ 0801e2f6 0a48
     adds r2,r5,r0    @ 0801e2f8 2a18
     lsrs r0,r1,#0x10    @ 0801e2fa 080c
     adds r1,r1,r3    @ 0801e2fc c918
     lsrs r1,r1,#0x10    @ 0801e2fe 090c
     adds r0,r6,r0    @ 0801e300 3018
     strh r0,[r2,#0x0]                        @ 0801e302 1080
-    ldr r2, DAT_0801e324                     @ 0801e304 074a
+    ldr r2, blit_glyph_2x2_to_bg_vram_screen_row1_tile1 @ 0801e304 074a
     adds r5,r5,r2    @ 0801e306 ad18
     adds r6,r6,r1    @ 0801e308 7618
     strh r6,[r5,#0x0]                        @ 0801e30a 2e80
@@ -3122,16 +3175,19 @@ blit_glyph_2x2_to_bg_vram:
     pop {r4,r5,r6}                           @ 0801e312 70bc
     pop {r0}                                 @ 0801e314 01bc
     bx r0                                    @ 0801e316 0047
-DAT_0801e318:
-    .word  0x06004000                     @ 0801e318 00400006
-DAT_0801e31c:
-    .word  0x06000002                     @ 0801e31c 02000006
-DAT_0801e320:
-    .word  0x06000040                     @ 0801e320 40000006
-DAT_0801e324:
-    .word  0x06000042                     @ 0801e324 42000006
+blit_glyph_2x2_to_bg_vram_bg_char_vram_cb2:
+    .word  0x06004000                     @ 0801e318 00400006  BG charblock 2 base (GBA_VRAM_BASE+0x4000) = BG_CHAR_VRAM_CB2
+blit_glyph_2x2_to_bg_vram_screen_tile_off1:
+    .word  BG_SCREEN_TILE_OFF_1           @ 0801e31c 02000006  BG screen map entry 1 (tile row 0 col 1 = map base+2)
+blit_glyph_2x2_to_bg_vram_screen_row1_off:
+    .word  BG_SCREEN_ROW1_OFF             @ 0801e320 40000006  BG screen map row 1 base (32 tiles * 2B = 0x40 per row)
+blit_glyph_2x2_to_bg_vram_screen_row1_tile1:
+    .word  BG_SCREEN_ROW1_TILE1           @ 0801e324 42000006  BG screen map row 1 col 1 (0x06000040+2)
 
-@ 被 FUN_0801e714 (card_info 场景主循环) 唯一调用. 先向 DISPCNT (0x04000000) 写入 0x1f00|当前值 (置位 bits[12:8] = BG0-BG3+OBJ 显示使能位), 然后以 delta=4 调用 tick_blend_step_by_delta 递减 blend_step. 实质是卡片信息场景每帧的混合淡出+显示模式锁定组合. 返回 tick_blend_step_by_delta 的返回值 (1=淡出完成, 0=进行中).
+@ @ Sets DISPCNT bits[12:8] (BG0-BG3+OBJ enable) via OR with 0x1f00, then calls
+@ @ tick_blend_step_by_delta(delta=4) to advance the blend fade-out by 4 steps.
+@ @ Returns tick_blend_step_by_delta result: 1=fade complete, 0=in progress.
+@ @ indeg=1; caller: tick_card_info_page_by_state (0x0801e714).
 tick_blend_fadeout_and_set_dispcnt:
     push {lr}                                @ 0801e328 00b5
     movs r2,#0x80    @ 0801e32a 8022
@@ -3147,7 +3203,11 @@ tick_blend_fadeout_and_set_dispcnt:
     pop {r1}                                 @ 0801e340 02bc
     bx r1                                    @ 0801e342 0847
 
-@ 被 FUN_0801e714 (card_info 场景) 和 FUN_080fa3a8 调用. 以 target_step=4 调用 start_blend_fadein_with_target 递增 blend_step; 若返回 0 (仍在过渡) 则将返回值继续传递为 0; 若返回 1 (混合完成) 则读 DISPCNT (0x04000000), 与 DISPCNT_PRESERVE_MASK=0xe0ff 做 AND (保留 bits[7:0]+bits[15:13], 清除 bits[12:8] = BG0-BG3+OBJ 使能位), 写回 DISPCNT 关闭高位显示标志, 并返回 1. 实质是 blend fade-in 的每帧驱动函数, 完成时自动清理 DISPCNT.
+@ @ Calls start_blend_fadein_with_target(target=4) each frame to step the blend fade-in.
+@ @ If fade-in complete (returns 1): ANDs DISPCNT with DISPCNT_BG_OBJ_CLEAR_MASK (0xe0ff)
+@ @   to clear bits[12:8] (BG0-BG3+OBJ enable), then returns 1.
+@ @ If not complete: returns 0.
+@ @ indeg=2; callers: tick_card_info_page_by_state (0x0801e714), advance_pack_fadein_to_card_info (0x080fa3a8).
 tick_blend_fadein_and_poll_done:
     push {lr}                                @ 0801e344 00b5
     movs r0,#0x4    @ 0801e346 0420
@@ -3160,7 +3220,7 @@ LAB_0801e354:
     movs r2,#0x80    @ 0801e354 8022
     lsls r2,r2,#0x13    @ 0801e356 d204
     ldrh r1,[r2,#0x0]                        @ 0801e358 1188
-    ldr r0, DAT_0801e368                     @ 0801e35a 0348
+    ldr r0, tick_blend_fadein_and_poll_done_dispcnt_mask @ 0801e35a 0348
     ands r0,r1    @ 0801e35c 0840
     strh r0,[r2,#0x0]                        @ 0801e35e 1080
     movs r0,#0x1    @ 0801e360 0120
@@ -3168,10 +3228,17 @@ LAB_0801e362:
     pop {r1}                                 @ 0801e362 02bc
     bx r1                                    @ 0801e364 0847
     .zero  0x2
-DAT_0801e368:
-    .word  0x0000e0ff                     @ 0801e368 ffe00000
+tick_blend_fadein_and_poll_done_dispcnt_mask:
+    .word  DISPCNT_BG_OBJ_CLEAR_MASK      @ 0801e368 ffe00000  DISPCNT AND mask: clear bits[12:8] (BG0-BG3+OBJ enable)
 
-@ card_info 场景的每帧状态更新函数, 被 FUN_0801e714 (card_info 场景主循环) 唯一调用. 共执行四步逻辑: (1) 读 IWRAM gPrng+0x148 (0x03000188) bits[1:0], 若非零则调用 sync_state_and_init_sprite(1) 触发 sprite 初始化; (2) 读 [0x0201afb0+0x6] 倒计时字段, 若非零则递减并在归零时返回 1; (3) 根据 gPrng+0x146 的显示标志 bit7/bit6 调整 [struct+0x20] 的滚动偏移值; (4) 若 gPrng+0x148 bit2 设置且 [0x02006c2c] bits[2:0]==0, 则翻转 [struct+0x0] bit0 并调用 card_info_page_step_03_unknown. 最终返回 0 (继续更新) 或 1 (触发场景切换).
+@ @ Per-frame state update for the card info page scene.
+@ @ Reads gPrng+0x148 (0x03000188) bits[1:0]; if nonzero: calls sync_state_and_init_sprite(1).
+@ @ Reads gCardInfoPageState+0x6 countdown; if nonzero: decrements and returns 1 when zero.
+@ @ Reads gPrng+0x146 display flags bit7/bit6 to adjust gCardInfoPageState+0x20 scroll offset.
+@ @ If gPrng+0x148 bit2 set and gSettings bits[2:0]==0:
+@ @   toggles gCardInfoPageState+0x0 bit0, then calls render_card_name_to_desc_page_vram.
+@ @ Returns 0 (continue) or 1 (trigger scene transition).
+@ @ indeg=1; caller: tick_card_info_page_by_state (0x0801e714).
 update_card_info_page_state:
     push {lr}                                @ 0801e36c 00b5
     ldr r2, PTR_gPrng_0801e38c               @ 0801e36e 074a
@@ -3277,7 +3344,7 @@ LAB_0801e3fa:
     ands r0,r2    @ 0801e428 1040
     orrs r0,r1    @ 0801e42a 0843
     strb r0,[r3,#0x0]                        @ 0801e42c 1870
-    bl card_info_page_step_03_unknown        @ 0801e42e fff7d5fb
+    bl render_card_name_to_desc_page_vram    @ 0801e42e fff7d5fb
 LAB_0801e432:
     movs r0,#0x0    @ 0801e432 0020
 LAB_0801e434:
@@ -3299,7 +3366,7 @@ card_info_page_entry:
     ldrh r1,[r4,#0xc]                        @ 0801e44e a189
     ldrh r2,[r4,#0x10]                       @ 0801e450 228a
     bl card_image_decode_wrapper             @ 0801e452 fff7a1fa
-    bl card_info_page_step_03_unknown        @ 0801e456 fff7c1fb
+    bl render_card_name_to_desc_page_vram    @ 0801e456 fff7c1fb
     ldr r0,[r4,#0x0]                         @ 0801e45a 2068
     lsls r0,r0,#0xf    @ 0801e45c c003
     lsrs r0,r0,#0x12    @ 0801e45e 800c

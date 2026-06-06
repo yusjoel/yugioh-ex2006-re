@@ -310,7 +310,7 @@ address,name,proposed_name,score,tags
 0x0801d830,render_card_level_text_to_buf,,,font_jp
 0x0801d92c,draw_card_level_label_to_vram,,,vram;font_jp
 0x0801d998,card_image_decode_wrapper,,,palette;vram;card_image;card_stats;font_jp
-0x0801dbdc,card_info_page_step_03_unknown,,,vram;card_info;card_stats;font_jp
+0x0801dbdc,render_card_name_to_desc_page_vram,,,vram;card_info;card_stats;font_jp
 0x0801dfa0,tick_scroll_frame_and_update_pos,,,
 0x0801e000,render_card_description_text,,,vram;card_desc;font_jp
 0x0801e100,card_info_page_finalize,,,palette;vram;card_info

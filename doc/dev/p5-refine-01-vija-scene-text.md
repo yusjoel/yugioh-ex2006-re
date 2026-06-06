@@ -47,7 +47,7 @@
 |-----|------|------|--------|
 | **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
 | **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
-| 3 | 0x1d998..0x1e36c (8fn) | ⬜ | |
+| **3** | 0x1d998..0x1e36c (8fn) | ✅ | pending |
 | 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
 | 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
 | 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
@@ -98,6 +98,24 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: db3325d
 
+### 4.03 Seg-3 完成记录 (2026-06-07)
+
+- 范围: 0x0801d998..0x0801e36c, 8 fn
+- 函数: card_image_decode_wrapper / render_card_name_to_desc_page_vram (误名 card_info_page_step_03_unknown 订正) / tick_scroll_frame_and_update_pos / render_card_description_text / card_info_page_finalize / blit_glyph_2x2_to_bg_vram / tick_blend_fadeout_and_set_dispcnt / tick_blend_fadein_and_poll_done
+- Ghidra 脚本: RefineF01Seg3Slots.py (主) + RefineF01Seg3PlateFix.py (邻函数 plate 修正)
+- EQ=49 (新建 34 槽: card_info.inc +30, gba_mem.inc +3, gba_io.inc +1; dup 复用 15 槽)
+- REF=31 (gFontJpCtx x7 / EWRAM_BASE x4 / GSETTINGS_OFFSET x4 / gCardInfoPageState x8 / gPrng x3 / sjis_char_fold_table x2 / card_attr_order_table x1 / card_type_alt_display_table x1 / card_status_sprite_sheet x1)
+- RENAME=1 (blit_glyph_2x2_to_bg_vram_bg_char_vram_cb2 BG_CHAR_VRAM_CB2 复用)
+- FUNC_RENAME=1: card_info_page_step_03_unknown -> render_card_name_to_desc_page_vram (误名订正, indeg=2, 函数体=渲染卡名文字到描述页字形行缓冲)
+- PLATE=8 (7 个段内函数 CJK->ASCII + 1 个邻函数 update_card_info_page_state 旧名引用订正)
+- carve=3: Carve A card_type_alt_display_table@0x09e58ac4 (incbin 前插 label); Carve B card_status_sprite_sheet@0x09e2ddb4 (case_9.bin 前插 label); Carve C card_attr_order_table@0x09e4f204 (分裂 incbin 0x1E4E979/0xB3F -> 0x88B + label + 0x2B4)
+- disasm=0 (段内无误标代码)
+- §5.1=0 (段内无 ROM_INCBIN 块, ROM 远端数据全 carve)
+- 新增 constants: card_info.inc +30 (CARD_TILE_PACK_*/CARD_FRAME_*/CARD_DESC_*/CARD_LEVEL_*/CARD_SPELL_*/CARD_ICON_*/CARD_OVERLAY_TILE_SRC) / gba_mem.inc +3 (BG_SCREEN_TILE_OFF_1/BG_SCREEN_ROW1_OFF/BG_SCREEN_ROW1_TILE1) / gba_io.inc +1 (DISPCNT_BG_OBJ_CLEAR_MASK)
+- CSV sync: ExportFunctionInventory (4642 named) + naming-proposals.csv 0x0801dbdc 行更新
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: (pending)
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -110,7 +128,7 @@
 |---|---|---|---|---|
 | Seg-1 | 0x1cb00..0x1d448 | 8 | 0x1d024/0x1c | 含 file 00 边界后首函数 run_vija_scene_state_machine |
 | Seg-2 | 0x1d448..0x1d998 | 8 | — | |
-| Seg-3 | 0x1d998..0x1e36c | 8 | — | |
+| Seg-3 | 0x1d998..0x1e36c | 8 | — | ✅ |
 | Seg-4 | 0x1e36c..0x1e714 | 8 | — | |
 | Seg-5 | 0x1e714..0x1f25c | 8 | — | |
 | Seg-6 | 0x1f25c..0x20fa8 | 8 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | 4 数据块 (文本/puzzle 资源?) |

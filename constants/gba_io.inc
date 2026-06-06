@@ -126,3 +126,6 @@
 .equ POSTFLG,     0x04000300  @ Undocumented - Post Boot Flag
 .equ HALTCNT,     0x04000301  @ Undocumented - Power Down Control
 
+@ DISPCNT AND mask for BG/OBJ enable bits
+.equ DISPCNT_BG_OBJ_CLEAR_MASK, 0x0000e0ff  @ DISPCNT AND mask: clear bits[12:8] (BG0-BG3+OBJ enable)
+

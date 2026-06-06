@@ -746,6 +746,7 @@ name_o_palette_data:                               @ 0x09ccd290 carve H: name_o 
 	.incbin "graphics/bin/ui-misc/switch_sheets/case_b_0x01E2B7B4.bin"
 	.incbin "graphics/bin/ui-misc/switch_sheets/case_8_0x01E2CDB4.bin"
 	.incbin "graphics/bin/ui-misc/switch_sheets/case_c_0x01E2D5B4.bin"
+card_status_sprite_sheet:  @ 0x09e2ddb4 (32+1 card status OBJ sprite items, 0x100B each, index 0..31 active)
 	.incbin "graphics/bin/ui-misc/switch_sheets/case_9_0x01E2DDB4.bin"
 
 	.incbin "roms/2343.gba", 0x1E2FEB4, 0x1200
@@ -1455,7 +1456,9 @@ assert_pctrl_type_nns_g2d_srtcontrolt:
 	.incbin "roms/2343.gba", 0x1E4E972, 0x2
 assert_pdst_974:
 	.asciz "pDst"
-	.incbin "roms/2343.gba", 0x1E4E979, 0xB3F
+	.incbin "roms/2343.gba", 0x1E4E979, 0x88B
+card_attr_order_table:  @ 0x09e4f204 (32 u32 card attr flag IDs, indexed by display slot)
+	.incbin "roms/2343.gba", 0x1E4F204, 0x2B4
 s_opdobj_c_filename:
 	.asciz "system/s_opdobj.c"
 	.incbin "roms/2343.gba", 0x1E4F4CA, 0x2
@@ -1605,6 +1608,7 @@ banlist_handler_table:                         @ 0x09e58994 (3 THUMB fn-ptrs +1 
 	.incbin "roms/2343.gba", 0x1E589A4, 0x20     @ gap before sjis_char_fold_table (0x20 B)
 sjis_char_fold_table:                            @ 0x09e589c4 (256B, 4 ROM refs; SJIS/ASCII char normalization: lowercase->uppercase fold + SJIS lead-byte remap)
 	.incbin "roms/2343.gba", 0x1E589C4, 0x100   @ sjis_char_fold_table body (256 B)
+card_type_alt_display_table:  @ 0x09e58ac4 (card type/display index mapping table, u16 pairs)
 	.incbin "roms/2343.gba", 0x1E58AC4, 0x248   @ remainder after table (0x368 - 0x20 - 0x100 = 0x248)
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
