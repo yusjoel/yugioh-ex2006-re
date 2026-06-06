@@ -107,7 +107,7 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 ## 反汇编细化体系 (refine-loop)
 
-**用途**: 在**已命名**基础上对一个模块文件做**内部细化**——立即数符号化 / 消灭 `DAT_` 自动名 / 误标数据反汇编 / 函数间 `ROM_INCBIN` carve / 注释订正, 全程 byte-identical。与命名互补。完整方法论 `doc/dev/methodology/refine-loop.md`, 活动进度 `doc/dev/p5-refine-<file>.md`。
+**用途**: 在**已命名**基础上对一个模块文件做**内部细化**——立即数符号化 / 消灭 `DAT_` 自动名 / 误标数据反汇编 / 函数间 `ROM_INCBIN` carve / 注释订正, 全程 byte-identical。与命名互补。**总目标**: `asm/` 下 25 个模块全部细化。完整方法论 `doc/dev/methodology/refine-loop.md`, **跨文件总进度 `doc/dev/refine-progress.md`** (当前文件 00, 自动推进到下一文件: 先按地址拆 ~10 段, 再逐批)。
 
 **组件**:
 - 3 sub-agent: `refine-{executor,reviewer,fixer}` (位于 `.claude/agents/`; executor 测绘+ref-scan分类+计划 → reviewer C1-C13 自主复核 → fixer 模式A改proposal/模式B落地)

@@ -12,13 +12,24 @@ description: Drive the address-ordered per-segment refinement loop for an alread
 ## 入口
 
 ```
-/refine-loop                 # 自动选下一段 (活动 refine 文档 §五 第一个未 ✅ 的 Seg)
-/refine-loop Seg-6           # 显式段号
+/refine-loop                 # 从 doc/dev/refine-progress.md "下一任务" 字段读 (当前文件下一未 ✅ 段)
+/refine-loop Seg-6           # 显式段号 (当前文件)
 /refine-loop 0x16344         # 显式起始地址 (落在某 Seg 内)
 ```
 
-无活动 refine 文档时：先按方法论「段划分」把目标文件均分 ~10 段 (Seg-1..Seg-10, 边界=函数结束处)，
-写入新 `doc/dev/p5-refine-<file>.md` 的 §五 路线图。
+**总进度镜像 `doc/dev/refine-progress.md`** (25 文件总表 + 当前文件/下一任务 + 自动推进协议) 是入口的
+单一真源。Step 0 先读它确定当前文件 + 下一段。
+
+### 自动跨文件推进 (refine-progress.md §三)
+```
+当前段完成 → 同文件下一段 (地址序不跳号)
+当前文件全段 ✅ → refine-progress 标 ✅ → 跳下一文件 (NN+1):
+   1) 建活动 doc doc/dev/refine/<NN_name>.md (模板抄 00 文件)
+   2) 先按地址拆分: push-prologue 抽函数入口, 均分 ~10 段 (边界=函数结束处), 写 §五 路线图
+   3) 再逐批处理: Seg-1 起 executor→reviewer→fixer
+全 25 文件 ✅ → 总目标达成
+```
+文件地址边界见 `tools/asm-regen/split_manifest.tsv`。
 
 ## 三条硬规则 (违反即停)
 
@@ -73,6 +84,7 @@ R8 图形目视核对 · R9 byte-identical + 备份。
 
 | 文件 | 用途 |
 |------|------|
+| `doc/dev/refine-progress.md` | **跨文件总进度** (25 文件总表 + 当前文件/下一任务 + 自动推进) — 入口真源 |
 | `.claude/agents/refine-{executor,reviewer,fixer}.md` | 3 sub-agent prompt |
 | `doc/dev/refine/<Seg-N>.{proposal,review}.md` | 每段 proposal + review 留痕 |
 | `doc/dev/methodology/refine-loop.md` | 完整方法论 (按需读) |
