@@ -105,6 +105,18 @@ GDB MCP 无法处理断点命中后的状态，改用 batch 脚本：
 
 **评分 vs 落地分离**: R1-R9 (45 分) 只评 proposal 命名质量。Ghidra rename / asm 重导 / build / byte-identical 验证 / CSV 同步 是 review PASSED 后 fixer 在「落地 phase」执行的红线动作 (byte-identical 失败 = abort + 回滚 .rep), 不计入评分。
 
+## 反汇编细化体系 (refine-loop)
+
+**用途**: 在**已命名**基础上对一个模块文件做**内部细化**——立即数符号化 / 消灭 `DAT_` 自动名 / 误标数据反汇编 / 函数间 `ROM_INCBIN` carve / 注释订正, 全程 byte-identical。与命名互补。完整方法论 `doc/dev/methodology/refine-loop.md`, 活动进度 `doc/dev/p5-refine-<file>.md`。
+
+**组件**: 1 skill `refine-loop` (驱动器) + `doc/dev/methodology/refine-loop.md` (R1-R9 细化清单 + 三条硬规则 + carve/disasm/符号化技法)。
+
+**入口**: `Skill: refine-loop [Seg-N | <addr>]`（不传则从活动 refine 文档 §五 选下一未完成段）。
+
+**三条硬规则**: ①严格地址序 (文件均分 ~10 段 Seg-1..10, 边界=函数结束处, 不回头不跳号) ②函数间数据必处理 (被引用→carve/disasm, 不留 `ROM_INCBIN`) ③全 ROM 0 引用→§5.1 登记留待。
+
+**Ghidra 注释红线**: 设的 EOL/plate 一律 **ASCII** (含 CJK 会 Jython 双重 UTF-8 mojibake), 中文解释走 doc/。
+
 ### 反汇编命名零容忍词
 
 eval 文档 / proposal / commit message / agent 输出中出现以下任一 → analysis-eval skill 自动扣 R9 到 0:

@@ -673,6 +673,7 @@ R9 byte-identical。
 ---
 
 ## 六、相关文档
+- **`doc/dev/methodology/refine-loop.md`** (本文沉淀的通用方法论: 三条硬规则 + R1-R9 + 段划分 + carve/disasm/符号化技法; skill `refine-loop` 驱动)
 - `doc/dev/methodology/build-pipeline.md` (§二 导出器/equate, §七 拆分)
 - `doc/dev/methodology/symbolization.md` (字面量池符号化)
 - `doc/dev/methodology/asset-location.md` (§二 mGBA 动态路径 — boot-ui 上色用)
