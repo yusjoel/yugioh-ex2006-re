@@ -50,7 +50,7 @@
 | **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
-| 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
+| **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | *pending* |
 | 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
@@ -131,6 +131,30 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 3edab63
 
+### 4.06 Seg-6 完成记录 (2026-06-07)
+
+- 范围: 0x0801f25c..0x08020fa8, 16 fn + 4 ROM_INCBIN disasm
+- 函数: append_game_text_if_raw / format_int_to_decimal_text / format_game_text_with_text_arg / format_game_text_with_int_arg / check_siocnt_link_ready / read_prng_entry_flag_clear / return_void_noop_stub / return_zero_leaf / return_noop_leaf / return_one_leaf / find_deck_record_index_by_key / find_card_index_in_rom_table / tick_duel_puzzle_scene_step / poll_fadein_exit_to_duel_state / run_duel_puzzle_scene_state_machine / render_lp_record_text_set_a
+- Ghidra 脚本: DisassembleF01Seg6Blocks.py + FixF01Seg6LiteralPools.py + FixF01Seg6RestoreCode.py + RefineF01Seg6Slots.py + FixF01Seg6BadRefLabels.py
+- disasm R4: 4 blocks
+  - Block1 (0x1f4d0/0x690): 596 instructions, 8 case entries (tick_duel_puzzle_scene_step cases 0..7)
+  - Block2 (0x1fb90/0x302): 283 instructions, 13 entry points (cases 8..13,20 + sub-dispatch cluster)
+  - Block3 (0x202fe/0x36): 20 instructions, fn tick_lp_record_scene_step @ 0x08020300 (med-conf, reviewer decision)
+  - Block4 (0x20370/0xa44): 901 instructions, 14 case entries (tick_lp_record_scene_step cases 0..13)
+  - Total: 1800 instructions disassembled
+- literal pool fix: FixF01Seg6LiteralPools.py (334 createDWord entries) + FixF01Seg6RestoreCode.py (restore 0x0801fbc0 = code+data dual-purpose)
+- EQ=21 (GAME_STR_RAW_ID_MASK x3, SIOCNT x1, GPRNG_BANNER_FLAG_OFF x1, gDuelFieldState x1, GL_CLEAR_BITS_17_10 x1, GL_CLEAR_BITS_9_2 x1, EWRAM_BASE x3, GSETTINGS_OFFSET x3, gDuelCardCtxBase x6, gDuelSceneBase x1)
+- REF=0 (demoted to RENAME; far ROM targets at 0x098973f6/0x098972f0 lack carve labels)
+- RENAME=58 (2 count/data slot renames + 3 tick_duel_puzzle_scene_step + 1 poll_fadein + 50 run_duel_puzzle_scene/render_lp_record_text_set_a including 18 card ID pivots)
+- FUNC_RENAME=0 (no existing function renamed)
+- PLATE=1 (run_duel_puzzle_scene_state_machine CJK->ASCII, 0x0801fec0)
+- carve=0 / §5.1=0 (all 4 blocks have 86-110 refs each, fully disassembled)
+- 新建函数: tick_lp_record_scene_step @ 0x08020300 (函数总数 4641->4643)
+- 踩坑: flow-based disasm decoded literal pool entries as THUMB instructions; fixed via FixF01Seg6LiteralPools.py (334 DWORDs); 0x0801fbc0 = dual code+data (branch target AND ldr literal), restored as code
+- REF label collision: gas_label==slot_label caused .word self-reference; fixed by demoting to RENAME_SLOTS + FixF01Seg6BadRefLabels.py cleanup
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b OK
+- commit: pending
+
 ### 4.05 Seg-5 完成记录 (2026-06-07)
 
 - 范围: 0x0801e714..0x0801f25c, 10 fn
@@ -163,7 +187,7 @@
 | Seg-3 | 0x1d998..0x1e36c | 8 | — | ✅ |
 | Seg-4 | 0x1e36c..0x1e714 | 8 | — | ✅ |
 | Seg-5 | 0x1e714..0x1f25c | 10 | — | ✅ |
-| Seg-6 | 0x1f25c..0x20fa8 | 8 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | 4 数据块 (文本/puzzle 资源?) |
+| Seg-6 | 0x1f25c..0x20fa8 | 16 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | ✅ 4 ROM_INCBIN disasm R4; tick_lp_record_scene_step 新建 |
 | Seg-7 | 0x20fa8..0x24868 | 8 | 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6 | 大数据区 (~6880B 块, ref-scan 分类) |
 | Seg-8 | 0x24868..0x27e44 | 8 | 0x2497c/0x78, 0x258f0/0x230 | |
 | Seg-9 | 0x27e44..0x28bdc | 8 | 0x27e50/0x6c | |
