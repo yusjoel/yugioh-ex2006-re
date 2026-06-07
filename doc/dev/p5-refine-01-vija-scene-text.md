@@ -49,7 +49,7 @@
 | **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
 | **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
-| **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **TBD** |
+| **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
 | 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
 | 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
@@ -146,7 +146,7 @@
 - 新增 constants: ewram.inc +11 全局 + 11 偏移/掩码常量
 - 命名裁定: gDuelFieldState=0x02023130 (不改 gDuelFieldCtx; driver 裁定; reviewer 指出 asm/07 plate 非正式用同名于 0x0201bb90/0x0201b290, 但该地址无 .equ 定义; 0x02023130 用 gDuelFieldState 与现有 ewram.inc 无碰撞)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: TBD
+- commit: a13983b
 
 ---
 
