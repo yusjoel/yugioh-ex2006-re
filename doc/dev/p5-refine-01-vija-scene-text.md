@@ -50,7 +50,7 @@
 | **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
-| **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | *pending* |
+| **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
 | 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
@@ -153,7 +153,7 @@
 - 踩坑: flow-based disasm decoded literal pool entries as THUMB instructions; fixed via FixF01Seg6LiteralPools.py (334 DWORDs); 0x0801fbc0 = dual code+data (branch target AND ldr literal), restored as code
 - REF label collision: gas_label==slot_label caused .word self-reference; fixed by demoting to RENAME_SLOTS + FixF01Seg6BadRefLabels.py cleanup
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b OK
-- commit: pending
+- commit: 316bbe7
 
 ### 4.05 Seg-5 完成记录 (2026-06-07)
 
