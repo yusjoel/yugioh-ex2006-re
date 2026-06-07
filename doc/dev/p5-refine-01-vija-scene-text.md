@@ -48,7 +48,7 @@
 | **1** | 0x1cb00..0x1d448 (8fn, incbin 0x1d024/0x1c) | ✅ | 50a40fc |
 | **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
 | **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
-| 4 | 0x1e36c..0x1e714 (8fn) | ⬜ | |
+| **4** | 0x1e36c..0x1e714 (8fn) | ✅ | (pending commit) |
 | 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
 | 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
 | 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
@@ -116,6 +116,20 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 1b683a0
 
+### 4.04 Seg-4 完成记录 (2026-06-07)
+
+- 范围: 0x0801e36c..0x0801e714, 8 fn
+- 函数: update_card_info_page_state / card_info_page_entry / draw_card_stat_digits_to_oam / draw_stat_row_sprites_to_oam / render_card_stats_oam_for_current_card / card_list_on_select_to_info_page / open_card_info_by_icid / open_card_info_page_from_list
+- Ghidra 脚本: RefineF01Seg4Slots.py
+- EQ=24 (gCardInfoPageState x7 复用 / EWRAM_BASE x2 复用 / GSETTINGS_OFFSET x2 复用 / 13 新建: CARD_STAT_ATK_DEF_OAM_XY/ATTR2 / CARD_STAT_QPLAY_OAM_XY/ATTR2 / CARD_STAT_DIGIT_OAM_ATTR2 x2 / CARD_STAT_FUSION_OAM_ATTR2 / CARD_STAT_ROW_ATTR2_BASE_A..D / CARD_INFO_STATE_CARD_ID_MASK / CARD_INFO_STATE_CARD_ID_CLEAR)
+- REF=0 (无新 carve/全局槽; PTR_ 已符号化)
+- RENAME=2 (draw_stat_row_sprites_to_oam_tile_r1 / card_list_on_select_to_info_page_no_stat_sentinel)
+- FUNC_RENAME=0 (全 8 函数名准确)
+- PLATE=5 (2 CJK->ASCII: card_info_page_entry/card_list_on_select_to_info_page; 3 stale FUN_ 删除: draw_card_stat_digits_to_oam/draw_stat_row_sprites_to_oam/render_card_stats_oam_for_current_card)
+- carve=0 / disasm=0 / §5.1=0
+- 新增 constants: card_info.inc +13 (CARD_STAT_*/CARD_INFO_STATE_*)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -129,7 +143,7 @@
 | Seg-1 | 0x1cb00..0x1d448 | 8 | 0x1d024/0x1c | 含 file 00 边界后首函数 run_vija_scene_state_machine |
 | Seg-2 | 0x1d448..0x1d998 | 8 | — | |
 | Seg-3 | 0x1d998..0x1e36c | 8 | — | ✅ |
-| Seg-4 | 0x1e36c..0x1e714 | 8 | — | |
+| Seg-4 | 0x1e36c..0x1e714 | 8 | — | ✅ |
 | Seg-5 | 0x1e714..0x1f25c | 8 | — | |
 | Seg-6 | 0x1f25c..0x20fa8 | 8 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | 4 数据块 (文本/puzzle 资源?) |
 | Seg-7 | 0x20fa8..0x24868 | 8 | 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6 | 大数据区 (~6880B 块, ref-scan 分类) |

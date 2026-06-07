@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `01_vija_scene_text.s` (进行中, 3/10 段; 活动 doc + 10 段路线图已建)。
-> **下一任务**: **Seg-4** (01 文件, 0x1e36c..0x1e714, 8fn)。
+> **当前文件**: `01_vija_scene_text.s` (进行中, 4/10 段; 活动 doc + 10 段路线图已建)。
+> **下一任务**: **Seg-5** (01 文件, 0x1e714..0x1f25c, 8fn)。
 
 ---
 
@@ -115,4 +115,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-07 (01 文件 Seg-1 完成: vija scene 8fn + 15 EQ + 3 REF + 5 RENAME + 3 PLATE + carve vija_bg/obj paths(rom.s) + §5.1 orphan dispatcher 簇 + BG_CHAR_VRAM_CB2(gba_mem.inc); byte-identical 9689337d)。下一任务: file 01 Seg-2 (0x1d448..0x1d998)。
+**上次更新**: 2026-06-07 (01 文件 Seg-4 完成: card_info 状态机 8fn + 24 EQ + 2 RENAME + 5 PLATE + card_info.inc +13 (CARD_STAT_*/CARD_INFO_STATE_*); byte-identical 9689337d)。下一任务: file 01 Seg-5 (0x1e714..0x1f25c)。

@@ -3258,7 +3258,7 @@ update_card_info_page_state:
 PTR_gPrng_0801e38c:
     .word  gPrng                          @ 0801e38c 40000003
 LAB_0801e390:
-    ldr r0, DAT_0801e3a8                     @ 0801e390 0548
+    ldr r0, update_card_info_page_state_gcardinfopagestate @ 0801e390 0548
     ldrh r1,[r0,#0x6]                        @ 0801e392 c188
     adds r3,r0,#0x0    @ 0801e394 031c
     cmp r1,#0x0                              @ 0801e396 0029
@@ -3270,8 +3270,8 @@ LAB_0801e390:
     bne LAB_0801e3ac                         @ 0801e3a2 03d1
     movs r0,#0x1    @ 0801e3a4 0120
     b LAB_0801e434                           @ 0801e3a6 45e0
-DAT_0801e3a8:
-    .word  0x0201afb0                     @ 0801e3a8 b0af0102
+update_card_info_page_state_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e3a8 b0af0102
 LAB_0801e3ac:
     movs r1,#0xa3    @ 0801e3ac a321
     lsls r1,r1,#0x1    @ 0801e3ae 4900
@@ -3326,8 +3326,8 @@ LAB_0801e3fa:
     ands r0,r1    @ 0801e404 0840
     cmp r0,#0x0                              @ 0801e406 0028
     beq LAB_0801e432                         @ 0801e408 13d0
-    ldr r1, DAT_0801e438                     @ 0801e40a 0b49
-    ldr r0, DAT_0801e43c                     @ 0801e40c 0b48
+    ldr r1, update_card_info_page_state_ewram_base @ 0801e40a 0b49
+    ldr r0, update_card_info_page_state_gsettings_off @ 0801e40c 0b48
     adds r1,r1,r0    @ 0801e40e 0918
     movs r0,#0x7    @ 0801e410 0720
     ldrb r1,[r1,#0x0]                        @ 0801e412 0978
@@ -3350,16 +3350,22 @@ LAB_0801e432:
 LAB_0801e434:
     pop {r1}                                 @ 0801e434 02bc
     bx r1                                    @ 0801e436 0847
-DAT_0801e438:
-    .word  0x02000000                     @ 0801e438 00000002
-DAT_0801e43c:
-    .word  0x00006c2c                     @ 0801e43c 2c6c0000
+update_card_info_page_state_ewram_base:
+    .word  EWRAM_BASE                     @ 0801e438 00000002
+update_card_info_page_state_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0801e43c 2c6c0000
 
-@ p1/p2: 卡牌信息页顶层, card_id=(word0<<15)>>18
+@ @ Top-level card info page init: decodes card image, renders name+description+stats.
+@ @ card_id = (state.word0 << 15) >> 18.
+@ @ Calls: card_info_page_init_bg0, card_image_decode_wrapper, render_card_name_to_desc_page_vram,
+@ @   card_data_query, render_card_description_text, card_info_page_finalize.
+@ @ r4 = gCardInfoPageState ptr; card_id from [r4+0x0] bits[17:2].
+@ @ r1=[r4+0xc] pal_offset, r2=[r4+0x10] atk_stat passed to card_image_decode_wrapper.
+@ @ Returns void (Pattern B: pop {r4}; pop {r0}; bx r0).
 card_info_page_entry:
     push {r4,lr}                             @ 0801e440 10b5
     bl card_info_page_init_bg0               @ 0801e442 fff70bf8
-    ldr r4, DAT_0801e484                     @ 0801e446 0f4c
+    ldr r4, card_info_page_entry_gcardinfopagestate @ 0801e446 0f4c
     ldr r0,[r4,#0x0]                         @ 0801e448 2068
     lsls r0,r0,#0xf    @ 0801e44a c003
     lsrs r0,r0,#0x12    @ 0801e44c 800c
@@ -3370,8 +3376,8 @@ card_info_page_entry:
     ldr r0,[r4,#0x0]                         @ 0801e45a 2068
     lsls r0,r0,#0xf    @ 0801e45c c003
     lsrs r0,r0,#0x12    @ 0801e45e 800c
-    ldr r1, DAT_0801e488                     @ 0801e460 0949
-    ldr r2, DAT_0801e48c                     @ 0801e462 0a4a
+    ldr r1, card_info_page_entry_ewram_base  @ 0801e460 0949
+    ldr r2, card_info_page_entry_gsettings_off @ 0801e462 0a4a
     adds r1,r1,r2    @ 0801e464 8918
     ldrb r1,[r1,#0x0]                        @ 0801e466 0978
     lsls r1,r1,#0x1d    @ 0801e468 4907
@@ -3385,14 +3391,18 @@ card_info_page_entry:
     pop {r4}                                 @ 0801e47e 10bc
     pop {r0}                                 @ 0801e480 01bc
     bx r0                                    @ 0801e482 0047
-DAT_0801e484:
-    .word  0x0201afb0                     @ 0801e484 b0af0102
-DAT_0801e488:
-    .word  0x02000000                     @ 0801e488 00000002
-DAT_0801e48c:
-    .word  0x00006c2c                     @ 0801e48c 2c6c0000
+card_info_page_entry_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e484 b0af0102
+card_info_page_entry_ewram_base:
+    .word  EWRAM_BASE                     @ 0801e488 00000002
+card_info_page_entry_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0801e48c 2c6c0000
 
-@ Called by render_card_stats_oam_for_current_card (FUN_0801e620). Reads card_id (r0 low16), looks up card_stats_table row (stride=11 halfwords), reads ATK (offset+6)/DEF (offset+5)/type (offset+9), then calls write_oam_entry_from_packed_args to write digit sprites to OAM buffer. Skips render if ATK not in 1..20 range (Spell/Trap have no ATK). For type 22 (Quick-Play Trap) with field[9]!=0, renders a second digit group.
+@ @ Called by render_card_stats_oam_for_current_card. Reads card_id (r0 low16), looks up card_stats_table row
+@ @ (stride=11 halfwords), reads ATK (offset+6)/DEF (offset+5)/type (offset+9),
+@ @ then calls write_oam_entry_from_packed_args to write digit sprites to OAM buffer.
+@ @ Skips render if ATK not in 1..20 range (Spell/Trap have no ATK).
+@ @ For type 22 (Quick-Play Trap) with field[9]!=0, renders a second digit group.
 draw_card_stat_digits_to_oam:
     push {r4,r5,r6,r7,lr}                    @ 0801e490 f0b5
     lsls r0,r0,#0x10    @ 0801e492 0004
@@ -3412,8 +3422,8 @@ draw_card_stat_digits_to_oam:
     lsls r1,r1,#0x1    @ 0801e4ae 4900
     adds r1,r1,r2    @ 0801e4b0 8918
     ldrh r6,[r1,#0x0]                        @ 0801e4b2 0e88
-    ldr r0, DAT_0801e4e4                     @ 0801e4b4 0b48
-    ldr r2, DAT_0801e4e8                     @ 0801e4b6 0c4a
+    ldr r0, draw_card_stat_digits_to_oam_atk_def_oam_xy @ 0801e4b4 0b48
+    ldr r2, draw_card_stat_digits_to_oam_atk_def_attr2 @ 0801e4b6 0c4a
     movs r1,#0x40    @ 0801e4b8 4021
     bl write_oam_entry_from_packed_args      @ 0801e4ba d7f057fe
     cmp r4,#0x1                              @ 0801e4be 012c
@@ -3426,22 +3436,22 @@ draw_card_stat_digits_to_oam:
     blt LAB_0801e538                         @ 0801e4cc 34db
     cmp r6,#0x0                              @ 0801e4ce 002e
     beq LAB_0801e538                         @ 0801e4d0 32d0
-    ldr r0, DAT_0801e4ec                     @ 0801e4d2 0648
-    ldr r2, DAT_0801e4f0                     @ 0801e4d4 064a
+    ldr r0, draw_card_stat_digits_to_oam_qplay_oam_xy @ 0801e4d2 0648
+    ldr r2, draw_card_stat_digits_to_oam_qplay_attr2 @ 0801e4d4 064a
     movs r1,#0x0    @ 0801e4d6 0021
     bl write_oam_entry_from_packed_args      @ 0801e4d8 d7f048fe
     b LAB_0801e538                           @ 0801e4dc 2ce0
     .zero  0x2
 PTR_card_stats_table_0801e4e0:
     .word  card_stats_table               @ 0801e4e0 b8698109
-DAT_0801e4e4:
-    .word  0x00060056                     @ 0801e4e4 56000600
-DAT_0801e4e8:
-    .word  0x0000d3a2                     @ 0801e4e8 a2d30000
-DAT_0801e4ec:
-    .word  0x00150058                     @ 0801e4ec 58001500
-DAT_0801e4f0:
-    .word  0x0000e3a6                     @ 0801e4f0 a6e30000
+draw_card_stat_digits_to_oam_atk_def_oam_xy:
+    .word  CARD_STAT_ATK_DEF_OAM_XY       @ 0801e4e4 56000600  ATK/DEF frame OBJ packed_xy: x=86 y=6; 4 ROM refs
+draw_card_stat_digits_to_oam_atk_def_attr2:
+    .word  CARD_STAT_ATK_DEF_OAM_ATTR2    @ 0801e4e8 a2d30000  ATK/DEF frame attr2: pal13 tile0x3a2; 2 ROM refs
+draw_card_stat_digits_to_oam_qplay_oam_xy:
+    .word  CARD_STAT_QPLAY_OAM_XY         @ 0801e4ec 58001500  Quick-Play Spell marker packed_xy: x=88 y=21; 2 ROM refs
+draw_card_stat_digits_to_oam_qplay_attr2:
+    .word  CARD_STAT_QPLAY_OAM_ATTR2      @ 0801e4f0 a6e30000  Quick-Play marker attr2: pal14 tile0x3a6; 2 ROM refs
 LAB_0801e4f4:
     movs r4,#0x0    @ 0801e4f4 0024
     cmp r4,r5                                @ 0801e4f6 ac42
@@ -3457,12 +3467,12 @@ LAB_0801e500:
     subs r0,r0,r1    @ 0801e508 401a
     orrs r0,r7    @ 0801e50a 3843
     movs r1,#0x0    @ 0801e50c 0021
-    ldr r2, DAT_0801e518                     @ 0801e50e 024a
+    ldr r2, draw_card_stat_digits_to_oam_digit_attr2_a @ 0801e50e 024a
     bl write_oam_entry_from_packed_args      @ 0801e510 d7f02cfe
     b LAB_0801e530                           @ 0801e514 0ce0
     .zero  0x2
-DAT_0801e518:
-    .word  0x0000f001                     @ 0801e518 01f00000
+draw_card_stat_digits_to_oam_digit_attr2_a:
+    .word  CARD_STAT_DIGIT_OAM_ATTR2      @ 0801e518 01f00000  ATK/DEF digit sprite attr2: pal15 tile1; loop path A
 LAB_0801e51c:
     adds r0,r6,#0x0    @ 0801e51c 301c
     adds r1,r5,#0x0    @ 0801e51e 291c
@@ -3470,7 +3480,7 @@ LAB_0801e51c:
     adds r0,#0x14    @ 0801e524 1430
     orrs r0,r7    @ 0801e526 3843
     movs r1,#0x0    @ 0801e528 0021
-    ldr r2, DAT_0801e55c                     @ 0801e52a 0c4a
+    ldr r2, draw_card_stat_digits_to_oam_digit_attr2_b @ 0801e52a 0c4a
     bl write_oam_entry_from_packed_args      @ 0801e52c d7f01efe
 LAB_0801e530:
     adds r6,#0x50    @ 0801e530 5036
@@ -3479,13 +3489,13 @@ LAB_0801e530:
     blt LAB_0801e500                         @ 0801e536 e3db
 LAB_0801e538:
     movs r5,#0x70    @ 0801e538 7025
-    ldr r6, DAT_0801e560                     @ 0801e53a 094e
+    ldr r6, draw_card_stat_digits_to_oam_gcardinfopagestate_a @ 0801e53a 094e
     movs r0,#0x2    @ 0801e53c 0220
     ldrb r1,[r6,#0x2]                        @ 0801e53e b178
     ands r0,r1    @ 0801e540 0840
     cmp r0,#0x0                              @ 0801e542 0028
     beq LAB_0801e552                         @ 0801e544 05d0
-    ldr r2, DAT_0801e564                     @ 0801e546 074a
+    ldr r2, draw_card_stat_digits_to_oam_fusion_attr2 @ 0801e546 074a
     movs r0,#0x70    @ 0801e548 7020
     movs r1,#0x40    @ 0801e54a 4021
     bl write_oam_entry_from_packed_args      @ 0801e54c d7f00efe
@@ -3496,12 +3506,12 @@ LAB_0801e552:
     lsls r0,r6,#0x1a    @ 0801e556 b006
     b LAB_0801e584                           @ 0801e558 14e0
     .zero  0x2
-DAT_0801e55c:
-    .word  0x0000f001                     @ 0801e55c 01f00000
-DAT_0801e560:
-    .word  0x0201afb0                     @ 0801e560 b0af0102
-DAT_0801e564:
-    .word  0x0000c3a8                     @ 0801e564 a8c30000
+draw_card_stat_digits_to_oam_digit_attr2_b:
+    .word  CARD_STAT_DIGIT_OAM_ATTR2      @ 0801e55c 01f00000  ATK/DEF digit sprite attr2: pal15 tile1; loop path B
+draw_card_stat_digits_to_oam_gcardinfopagestate_a:
+    .word  gCardInfoPageState             @ 0801e560 b0af0102
+draw_card_stat_digits_to_oam_fusion_attr2:
+    .word  CARD_STAT_FUSION_OAM_ATTR2     @ 0801e564 a8c30000  Fusion/extra-type marker attr2: pal12 tile0x3a8; 1 ROM ref
 LAB_0801e568:
     lsls r2,r4,#0x12    @ 0801e568 a204
     movs r0,#0xeb    @ 0801e56a eb20
@@ -3513,7 +3523,7 @@ LAB_0801e568:
     bl write_oam_entry_with_tile_inc         @ 0801e576 d7f06bff
     adds r5,#0x10    @ 0801e57a 1035
     adds r4,#0x1    @ 0801e57c 0134
-    ldr r0, DAT_0801e590                     @ 0801e57e 0448
+    ldr r0, draw_card_stat_digits_to_oam_gcardinfopagestate_b @ 0801e57e 0448
     ldrb r0,[r0,#0x2]                        @ 0801e580 8078
     lsls r0,r0,#0x1a    @ 0801e582 8006
 LAB_0801e584:
@@ -3523,10 +3533,13 @@ LAB_0801e584:
     pop {r4,r5,r6,r7}                        @ 0801e58a f0bc
     pop {r0}                                 @ 0801e58c 01bc
     bx r0                                    @ 0801e58e 0047
-DAT_0801e590:
-    .word  0x0201afb0                     @ 0801e590 b0af0102
+draw_card_stat_digits_to_oam_gcardinfopagestate_b:
+    .word  gCardInfoPageState             @ 0801e590 b0af0102
 
-@ Called by render_card_stats_oam_for_current_card (FUN_0801e620). r0=row_count (signed; negative values rounded up by +7 before >>3). Folds row_count by 8 to get column/row indices, then loops writing 4 sprite entries per row at Y positions 0x70/0x90/0xb0/0xd0 (32px steps) via write_oam_entry_from_packed_args. Loop terminates when r6 > 0x8f (GBA screen height-1=143).
+@ @ Called by render_card_stats_oam_for_current_card. r0=row_count (signed; negative values
+@ @ rounded up by +7 before >>3). Folds row_count by 8 to get column/row indices,
+@ @ then loops writing 4 sprite entries per row at Y positions 0x70/0x90/0xb0/0xd0 (32px steps)
+@ @ via write_oam_entry_from_packed_args. Loop terminates when r6 > 0x8f (GBA screen height-1=143).
 draw_stat_row_sprites_to_oam:
     push {r4,r5,r6,r7,lr}                    @ 0801e594 f0b5
     adds r3,r0,#0x0    @ 0801e596 031c
@@ -3543,12 +3556,12 @@ LAB_0801e59e:
     adds r5,#0x2    @ 0801e5aa 0235
     cmp r6,#0x8f                             @ 0801e5ac 8f2e
     bgt LAB_0801e606                         @ 0801e5ae 2adc
-    ldr r7, DAT_0801e60c                     @ 0801e5b0 164f
+    ldr r7, draw_stat_row_sprites_to_oam_tile_r1 @ 0801e5b0 164f
 LAB_0801e5b2:
     lsls r4,r6,#0x10    @ 0801e5b2 3404
     movs r0,#0x70    @ 0801e5b4 7020
     orrs r0,r4    @ 0801e5b6 2043
-    ldr r1, DAT_0801e610                     @ 0801e5b8 1549
+    ldr r1, draw_stat_row_sprites_to_oam_attr2_base_a @ 0801e5b8 1549
     adds r2,r5,r1    @ 0801e5ba 6a18
     lsls r2,r2,#0x10    @ 0801e5bc 1204
     lsrs r2,r2,#0x10    @ 0801e5be 120c
@@ -3556,7 +3569,7 @@ LAB_0801e5b2:
     bl write_oam_entry_from_packed_args      @ 0801e5c2 d7f0d3fd
     movs r0,#0x90    @ 0801e5c6 9020
     orrs r0,r4    @ 0801e5c8 2043
-    ldr r1, DAT_0801e614                     @ 0801e5ca 1249
+    ldr r1, draw_stat_row_sprites_to_oam_attr2_base_b @ 0801e5ca 1249
     adds r2,r5,r1    @ 0801e5cc 6a18
     lsls r2,r2,#0x10    @ 0801e5ce 1204
     lsrs r2,r2,#0x10    @ 0801e5d0 120c
@@ -3564,7 +3577,7 @@ LAB_0801e5b2:
     bl write_oam_entry_from_packed_args      @ 0801e5d4 d7f0cafd
     movs r0,#0xb0    @ 0801e5d8 b020
     orrs r0,r4    @ 0801e5da 2043
-    ldr r1, DAT_0801e618                     @ 0801e5dc 0e49
+    ldr r1, draw_stat_row_sprites_to_oam_attr2_base_c @ 0801e5dc 0e49
     adds r2,r5,r1    @ 0801e5de 6a18
     lsls r2,r2,#0x10    @ 0801e5e0 1204
     lsrs r2,r2,#0x10    @ 0801e5e2 120c
@@ -3572,7 +3585,7 @@ LAB_0801e5b2:
     bl write_oam_entry_from_packed_args      @ 0801e5e6 d7f0c1fd
     movs r0,#0xd0    @ 0801e5ea d020
     orrs r4,r0    @ 0801e5ec 0443
-    ldr r0, DAT_0801e61c                     @ 0801e5ee 0b48
+    ldr r0, draw_stat_row_sprites_to_oam_attr2_base_d @ 0801e5ee 0b48
     adds r2,r5,r0    @ 0801e5f0 2a18
     lsls r2,r2,#0x10    @ 0801e5f2 1204
     lsrs r2,r2,#0x10    @ 0801e5f4 120c
@@ -3587,21 +3600,24 @@ LAB_0801e606:
     pop {r4,r5,r6,r7}                        @ 0801e606 f0bc
     pop {r0}                                 @ 0801e608 01bc
     bx r0                                    @ 0801e60a 0047
-DAT_0801e60c:
-    .word  0x00004040                     @ 0801e60c 40400000
-DAT_0801e610:
-    .word  0xfffff800                     @ 0801e610 00f8ffff
-DAT_0801e614:
-    .word  0xfffff804                     @ 0801e614 04f8ffff
-DAT_0801e618:
-    .word  0xfffff808                     @ 0801e618 08f8ffff
-DAT_0801e61c:
-    .word  0xfffff80c                     @ 0801e61c 0cf8ffff
+draw_stat_row_sprites_to_oam_tile_r1:
+    .word  0x00004040                     @ 0801e60c 40400000  tile index 0x40 (=64) for stat row OBJ sprites; 71 ROM refs, not equated
+draw_stat_row_sprites_to_oam_attr2_base_a:
+    .word  CARD_STAT_ROW_ATTR2_BASE_A     @ 0801e610 00f8ffff  stat row sprite group A attr2 base (row 0)
+draw_stat_row_sprites_to_oam_attr2_base_b:
+    .word  CARD_STAT_ROW_ATTR2_BASE_B     @ 0801e614 04f8ffff  stat row sprite group B attr2 base (row 1)
+draw_stat_row_sprites_to_oam_attr2_base_c:
+    .word  CARD_STAT_ROW_ATTR2_BASE_C     @ 0801e618 08f8ffff  stat row sprite group C attr2 base (row 2)
+draw_stat_row_sprites_to_oam_attr2_base_d:
+    .word  CARD_STAT_ROW_ATTR2_BASE_D     @ 0801e61c 0cf8ffff  stat row sprite group D attr2 base (row 3)
 
-@ Called every frame by tick_card_info_page_by_state (FUN_0801e714). Reads current card_id from global state struct 0x0201afb0 (+0x0 bits[17:2]) and row_count (+0x20), then calls draw_card_stat_digits_to_oam and draw_stat_row_sprites_to_oam to write all card stat sprites to OAM buffer.
+@ @ Called every frame by tick_card_info_page_by_state. Reads current card_id from
+@ @ global state struct 0x0201afb0 (+0x0 bits[17:2]) and row_count (+0x20),
+@ @ then calls draw_card_stat_digits_to_oam and draw_stat_row_sprites_to_oam
+@ @ to write all card stat sprites to OAM buffer.
 render_card_stats_oam_for_current_card:
     push {r4,lr}                             @ 0801e620 10b5
-    ldr r4, DAT_0801e63c                     @ 0801e622 064c
+    ldr r4, render_card_stats_oam_for_current_card_gcardinfopagestate @ 0801e622 064c
     ldr r0,[r4,#0x0]                         @ 0801e624 2068
     lsls r0,r0,#0xf    @ 0801e626 c003
     lsrs r0,r0,#0x12    @ 0801e628 800c
@@ -3612,10 +3628,18 @@ render_card_stats_oam_for_current_card:
     pop {r0}                                 @ 0801e636 01bc
     bx r0                                    @ 0801e638 0047
     .zero  0x2
-DAT_0801e63c:
-    .word  0x0201afb0                     @ 0801e63c b0af0102
+render_card_stats_oam_for_current_card_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e63c b0af0102
 
-@ TG.4-next: 卡列表按 A 进详情页的派发, 首 bl 即 card_info_page_enter_with_card_id
+@ @ Card-list dispatch to card info page on select.
+@ @ First bl: card_info_page_enter_with_card_id.
+@ @ Encodes card_id into gCardInfoPageState word0 bits[16:3]:
+@ @   (card_id & CARD_INFO_STATE_CARD_ID_MASK) << 3, merged via CARD_INFO_STATE_CARD_ID_CLEAR AND.
+@ @ Loads ATK (field[3]) and DEF (field[4]) from card_stats_table into gCardInfoPageState[+0xc/+0x10].
+@ @ Sentinel: 0xffff in table field means Spell/Trap (no ATK/DEF); stores 0 in that case.
+@ @ Also stores origin_page to [+0x6], card_type fields to [+0x28/+0x2c].
+@ @ Clears gCardInfoPageState[+0x0] bits[1:0] (flags field).
+@ @ r0=card_id (u16), r1=origin_page (u16), r2=ptr, r3=ptr. Returns void.
 card_list_on_select_to_info_page:
     push {r4,r5,r6,r7,lr}                    @ 0801e640 f0b5
     .hword 0x464f    @ 0801e642 4f46
@@ -3629,12 +3653,12 @@ card_list_on_select_to_info_page:
     lsls r1,r1,#0x10    @ 0801e652 0904
     lsrs r6,r1,#0x10    @ 0801e654 0e0c
     bl card_info_page_enter_with_card_id     @ 0801e656 fef7f7fe
-    ldr r3, DAT_0801e6b8                     @ 0801e65a 174b
-    ldr r1, DAT_0801e6bc                     @ 0801e65c 1749
+    ldr r3, card_list_on_select_to_info_page_gcardinfopagestate @ 0801e65a 174b
+    ldr r1, card_list_on_select_to_info_page_card_id_mask @ 0801e65c 1749
     ands r1,r4    @ 0801e65e 2140
     lsls r1,r1,#0x3    @ 0801e660 c900
     ldr r0,[r3,#0x0]                         @ 0801e662 1868
-    ldr r2, DAT_0801e6c0                     @ 0801e664 164a
+    ldr r2, card_list_on_select_to_info_page_card_id_clear @ 0801e664 164a
     ands r0,r2    @ 0801e666 1040
     orrs r0,r1    @ 0801e668 0843
     str r0,[r3,#0x0]                         @ 0801e66a 1860
@@ -3644,7 +3668,7 @@ card_list_on_select_to_info_page:
     adds r0,r4,#0x3    @ 0801e672 e01c
     lsls r0,r0,#0x1    @ 0801e674 4000
     adds r0,r0,r5    @ 0801e676 4019
-    ldr r2, DAT_0801e6c8                     @ 0801e678 134a
+    ldr r2, card_list_on_select_to_info_page_no_stat_sentinel @ 0801e678 134a
     movs r1,#0x0    @ 0801e67a 0021
     ldrh r7,[r0,#0x0]                        @ 0801e67c 0788
     cmp r7,r2                                @ 0801e67e 9742
@@ -3678,16 +3702,16 @@ LAB_0801e696:
     pop {r4,r5,r6,r7}                        @ 0801e6b2 f0bc
     pop {r0}                                 @ 0801e6b4 01bc
     bx r0                                    @ 0801e6b6 0047
-DAT_0801e6b8:
-    .word  0x0201afb0                     @ 0801e6b8 b0af0102
-DAT_0801e6bc:
-    .word  0x00003fff                     @ 0801e6bc ff3f0000
-DAT_0801e6c0:
-    .word  0xfffe0007                     @ 0801e6c0 0700feff
+card_list_on_select_to_info_page_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e6b8 b0af0102
+card_list_on_select_to_info_page_card_id_mask:
+    .word  CARD_INFO_STATE_CARD_ID_MASK   @ 0801e6bc ff3f0000  14-bit card_id mask; (card_id & mask) << 3 into word0[16:3]
+card_list_on_select_to_info_page_card_id_clear:
+    .word  CARD_INFO_STATE_CARD_ID_CLEAR  @ 0801e6c0 0700feff  AND mask: clears word0 bits[16:3] (card_id field); keeps [17]+[2:0]
 PTR_card_stats_table_0801e6c4:
     .word  card_stats_table               @ 0801e6c4 b8698109
-DAT_0801e6c8:
-    .word  0x0000ffff                     @ 0801e6c8 ffff0000
+card_list_on_select_to_info_page_no_stat_sentinel:
+    .word  0x0000ffff                     @ 0801e6c8 ffff0000  0xffff sentinel: ATK/DEF field not applicable (Spell/Trap); 7616 ROM refs, not equated
 
 @ Adapter: convert internal card ID (icid) to card ID (cid) then open card info page.
 @ Called from function pointer table at ROM 0x082E9EE8 when player selects a card.
@@ -3723,15 +3747,15 @@ open_card_info_page_from_list:
     lsls r1,r1,#0x10    @ 0801e6fa 0904
     lsrs r1,r1,#0x10    @ 0801e6fc 090c
     bl card_list_on_select_to_info_page      @ 0801e6fe fff79fff
-    ldr r1, DAT_0801e710                     @ 0801e702 0349
+    ldr r1, open_card_info_page_from_list_gcardinfopagestate @ 0801e702 0349
     movs r0,#0x4    @ 0801e704 0420
     ldrb r2,[r1,#0x0]                        @ 0801e706 0a78
     orrs r0,r2    @ 0801e708 1043
     strb r0,[r1,#0x0]                        @ 0801e70a 0870
     pop {r0}                                 @ 0801e70c 01bc
     bx r0                                    @ 0801e70e 0047
-DAT_0801e710:
-    .word  0x0201afb0                     @ 0801e710 b0af0102
+open_card_info_page_from_list_gcardinfopagestate:
+    .word  gCardInfoPageState             @ 0801e710 b0af0102
 
 @ card_info page per-frame main loop. Reads state halfword from 0x0201afb0+0x4, dispatches 4 paths: 0=init (read VCOUNT, call card_info_page_entry), 1/2/3=each calls render_card_stats_oam_for_current_card + tick_scroll_frame_and_update_pos, then tick_blend_fadeout_and_set_dispcnt / update_card_info_page_state / tick_blend_fadein_and_poll_done respectively. Increments state each frame; returns 1 (page exit) when state overflows, restoring VCOUNT.
 tick_card_info_page_by_state:
