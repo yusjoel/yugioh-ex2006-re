@@ -3761,15 +3761,15 @@ open_card_info_page_from_list_gcardinfopagestate:
 tick_card_info_page_by_state:
     push {r4,r5,lr}                          @ 0801e714 30b5
     movs r5,#0x0    @ 0801e716 0025
-    ldr r1, DAT_0801e744                     @ 0801e718 0a49
+    ldr r1, tick_card_info_page_by_state_card_info_page_state @ 0801e718 0a49
     movs r0,#0x4    @ 0801e71a 0420
     ldrb r2,[r1,#0x0]                        @ 0801e71c 0a78
     ands r0,r2    @ 0801e71e 1040
     adds r4,r1,#0x0    @ 0801e720 0c1c
     cmp r0,#0x0                              @ 0801e722 0028
     beq LAB_0801e732                         @ 0801e724 05d0
-    ldr r0, DAT_0801e748                     @ 0801e726 0848
-    ldr r1, DAT_0801e74c                     @ 0801e728 0849
+    ldr r0, tick_card_info_page_by_state_duel_field_state @ 0801e726 0848
+    ldr r1, tick_card_info_page_by_state_duel_field_prng_anim_flag_off @ 0801e728 0849
     adds r0,r0,r1    @ 0801e72a 4018
     ldrb r0,[r0,#0x0]                        @ 0801e72c 0078
     lsls r0,r0,#0x1c    @ 0801e72e 0007
@@ -3784,12 +3784,12 @@ LAB_0801e732:
     beq LAB_0801e75a                         @ 0801e73e 0cd0
     b LAB_0801e7a6                           @ 0801e740 31e0
     .zero  0x2
-DAT_0801e744:
+tick_card_info_page_by_state_card_info_page_state:
     .word  0x0201afb0                     @ 0801e744 b0af0102
-DAT_0801e748:
-    .word  0x02023130                     @ 0801e748 30310202
-DAT_0801e74c:
-    .word  0x00000222                     @ 0801e74c 22020000
+tick_card_info_page_by_state_duel_field_state:
+    .word  gDuelFieldState                @ 0801e748 30310202  gDuelFieldState base; [+0x222] bit2=prng-anim active; 170 raw refs
+tick_card_info_page_by_state_duel_field_prng_anim_flag_off:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 0801e74c 22020000  offset into gDuelFieldState: [gDuelFieldState+0x222] bit2=prng-driven anim active
 LAB_0801e750:
     cmp r0,#0x2                              @ 0801e750 0228
     beq LAB_0801e776                         @ 0801e752 10d0
@@ -3850,14 +3850,14 @@ get_card_data_format_id:
 
 @ Word-indexed table lookup: computes r0*4 + DAT_0801e7c8 (0x09e58b08) and returns the 32-bit value at that address. Standard ROM table fetch primitive used by card_ids/fs callers.
 lookup_card_entry_by_index:
-    ldr r1, DAT_0801e7c8                     @ 0801e7bc 0249
+    ldr r1, lookup_card_entry_by_index_card_deck_fs_path_table @ 0801e7bc 0249
     lsls r0,r0,#0x2    @ 0801e7be 8000
     adds r0,r0,r1    @ 0801e7c0 4018
     ldr r0,[r0,#0x0]                         @ 0801e7c2 0068
     bx lr                                    @ 0801e7c4 7047
     .zero  0x2
-DAT_0801e7c8:
-    .word  0x09e58b08                     @ 0801e7c8 088be509
+lookup_card_entry_by_index_card_deck_fs_path_table:
+    .word  card_deck_fs_path_table        @ 0801e7c8 088be509
 
 @ Called by FUN_08103524 (card_ids/fs). r0=slot_index, r1=fs_file_id. Computes IWRAM struct offset: 0x0201e2b4 + slot*0x108 (slot*33*8). Calls fs_load(r1,0), then parses FS data header: reads +0x8 halfword as count1 -> [r4+0x0], copies count1 halfwords from +0xA -> [r4+0xC], reads next halfword as count2 -> [r4+0x8], copies count2 halfwords -> [r4+0xCA]. Fills deck card FS data block into IWRAM struct.
 load_card_fs_entry_to_struct:
@@ -3865,7 +3865,7 @@ load_card_fs_entry_to_struct:
     lsls r2,r0,#0x5    @ 0801e7ce 4201
     adds r2,r2,r0    @ 0801e7d0 1218
     lsls r2,r2,#0x3    @ 0801e7d2 d200
-    ldr r0, DAT_0801e84c                     @ 0801e7d4 1d48
+    ldr r0, load_card_fs_entry_to_struct_card_fs_data_block @ 0801e7d4 1d48
     adds r4,r2,r0    @ 0801e7d6 1418
     adds r0,r1,#0x0    @ 0801e7d8 081c
     movs r1,#0x0    @ 0801e7da 0021
@@ -3930,8 +3930,8 @@ LAB_0801e844:
     pop {r0}                                 @ 0801e846 01bc
     bx r0                                    @ 0801e848 0047
     .zero  0x2
-DAT_0801e84c:
-    .word  0x0201e2b4                     @ 0801e84c b4e20102
+load_card_fs_entry_to_struct_card_fs_data_block:
+    .word  gCardFsDataBlock               @ 0801e84c b4e20102  gCardFsDataBlock base; card FS slot data block (stride=0x108); 4 raw refs
 
 @ Reads card FS data block (base 0x0201e2b4, stride=0x108, indexed by r0=slot_index) and fills up to three sub-arrays of display entries (halfword) into the target buffer at r1. Sub-array counts stored at [r1+0x18], [r1+0x19], [r1+0x1a]; entries sourced from card_stats_table and mapping table at 0x0201ff60. Callers: fill_card_fs_display_entries_for_card_list (fixed r1=0x02001138), FUN_0802752c, FUN_0802803c. Clears three word fields at r1 before filling (init write cursors). No return value (void). r0=u8 slot_index [0..1], r1=ptr display_buffer. Constants: 0x108=card FS data block stride (slot*0x108=slot*33*8).
 fill_card_fs_display_entries:
@@ -3949,7 +3949,7 @@ fill_card_fs_display_entries:
     lsls r0,r1,#0x5    @ 0801e866 4801
     adds r0,r0,r1    @ 0801e868 4018
     lsls r0,r0,#0x3    @ 0801e86a c000
-    ldr r1, DAT_0801e968                     @ 0801e86c 3e49
+    ldr r1, fill_card_fs_display_entries_card_fs_data_block @ 0801e86c 3e49
     adds r0,r0,r1    @ 0801e86e 4018
     .hword 0x4684    @ 0801e870 8446
     movs r0,#0x0    @ 0801e872 0020
@@ -3963,7 +3963,7 @@ fill_card_fs_display_entries:
     bge LAB_0801e8ca                         @ 0801e882 22da
     ldr r5, PTR_card_stats_table_0801e96c    @ 0801e884 394d
     .hword 0x46a8    @ 0801e886 a846
-    ldr r1, DAT_0801e970                     @ 0801e888 3949
+    ldr r1, fill_card_fs_display_entries_card_id_cache @ 0801e888 3949
     ldr r7,[sp,#0x0]                         @ 0801e88a 009f
     lsls r0,r7,#0x1    @ 0801e88c 7800
     adds r0,r0,r1    @ 0801e88e 4018
@@ -4038,7 +4038,7 @@ LAB_0801e90a:
     bge LAB_0801e958                         @ 0801e910 22da
     ldr r3, PTR_card_stats_table_0801e96c    @ 0801e912 164b
     .hword 0x4698    @ 0801e914 9846
-    ldr r0, DAT_0801e970                     @ 0801e916 1648
+    ldr r0, fill_card_fs_display_entries_card_id_cache @ 0801e916 1648
     .hword 0x464d    @ 0801e918 4d46
     lsls r2,r5,#0x2    @ 0801e91a aa00
     ldr r7,[sp,#0x0]                         @ 0801e91c 009f
@@ -4081,22 +4081,22 @@ LAB_0801e958:
     pop {r4,r5,r6,r7}                        @ 0801e962 f0bc
     pop {r0}                                 @ 0801e964 01bc
     bx r0                                    @ 0801e966 0047
-DAT_0801e968:
-    .word  0x0201e2b4                     @ 0801e968 b4e20102
+fill_card_fs_display_entries_card_fs_data_block:
+    .word  gCardFsDataBlock               @ 0801e968 b4e20102
 PTR_card_stats_table_0801e96c:
     .word  card_stats_table               @ 0801e96c b8698109
-DAT_0801e970:
-    .word  0x0201ff60                     @ 0801e970 60ff0102
+fill_card_fs_display_entries_card_id_cache:
+    .word  gCardIdCache                   @ 0801e970 60ff0102  gCardIdCache base; EWRAM card id lookup/mapping cache; 5 raw refs
 
 @ Specialized wrapper for fill_card_fs_display_entries (FUN_0801e850) that fixes the second argument to 0x02001138 (card_list slot display buffer EWRAM address) and forwards r0 (slot_index) unchanged. Called by FUN_0802752c to write card FS data into the card_list slot display buffer. No computation logic; single ldr overwrites r1 then jumps to core function. r0=u8 slot_index [0..1]. Returns void.
 fill_card_fs_display_entries_for_card_list:
     push {lr}                                @ 0801e974 00b5
-    ldr r1, DAT_0801e980                     @ 0801e976 0249
+    ldr r1, fill_card_fs_display_entries_for_card_list_display_buf @ 0801e976 0249
     bl fill_card_fs_display_entries          @ 0801e978 fff76aff
     pop {r0}                                 @ 0801e97c 01bc
     bx r0                                    @ 0801e97e 0047
-DAT_0801e980:
-    .word  0x02001138                     @ 0801e980 38110002
+fill_card_fs_display_entries_for_card_list_display_buf:
+    .word  gCardListDisplayBuf            @ 0801e980 38110002  gCardListDisplayBuf; card list slot display buffer; 12 raw refs
 
 @ Called by FUN_0801fec0 (large duel scene switch dispatcher) and FUN_08027714 (duel field prng). Main frame driver for the duel field, dispatches on global state flags via multiple paths: (1) checks [0x02023130+0x88*4] bit-mask 0xff<<10 - if 0 enters prng anim path: checks [BASE+0x21e] bit0 and [BASE+0x226] bit0, if met calls request_sound_engine_code10 + tick_duel_field_fadein_step; (2) checks multiple flags then calls advance_duel_turn_by_prng_anim; (3) conditionally calls enqueue_duel_phase_sprite_by_side; (4) conditionally calls init_duel_phase_display_flag_with_sprite; (5) unconditionally calls render_duel_field_oam_all; (6) multi-branch calls tick_card_list_scene_frame / tick_zone_display_frame / advance_duel_turn_by_prng_anim; (7) clears prng+0x213/0x217 bit7. Exit: LAB_0801ec84=movs r0,#1; LAB_0801eb70=movs r0,#0; via pop {r3}; restore r8-r10; pop {r4-r7}; pop {r1}; bx r1.
 @ 
@@ -4112,7 +4112,7 @@ tick_duel_field_main_frame:
     push {r4,r5,r6,r7,lr}                    @ 0801e984 f0b5
     .hword 0x4647    @ 0801e986 4746
     push {r7}                                @ 0801e988 80b4
-    ldr r2, DAT_0801e9ec                     @ 0801e98a 184a
+    ldr r2, tick_duel_field_main_frame_duel_field_state_a @ 0801e98a 184a
     movs r1,#0x88    @ 0801e98c 8821
     lsls r1,r1,#0x2    @ 0801e98e 8900
     adds r0,r2,r1    @ 0801e990 5018
@@ -4123,7 +4123,7 @@ tick_duel_field_main_frame:
     adds r4,r2,#0x0    @ 0801e99a 141c
     cmp r0,#0x0                              @ 0801e99c 0028
     bne LAB_0801ea4c                         @ 0801e99e 55d1
-    ldr r2, DAT_0801e9f0                     @ 0801e9a0 134a
+    ldr r2, tick_duel_field_main_frame_fadein_flag_off @ 0801e9a0 134a
     adds r1,r4,r2    @ 0801e9a2 a118
     movs r2,#0x1    @ 0801e9a4 0122
     adds r0,r2,#0x0    @ 0801e9a6 101c
@@ -4131,14 +4131,14 @@ tick_duel_field_main_frame:
     ands r0,r1    @ 0801e9aa 0840
     cmp r0,#0x0                              @ 0801e9ac 0028
     bne LAB_0801ea4c                         @ 0801e9ae 4dd1
-    ldr r0, DAT_0801e9f4                     @ 0801e9b0 1048
+    ldr r0, tick_duel_field_main_frame_state_226_off @ 0801e9b0 1048
     adds r5,r4,r0    @ 0801e9b2 2518
     ldrb r3,[r5,#0x0]                        @ 0801e9b4 2b78
     adds r0,r2,#0x0    @ 0801e9b6 101c
     ands r0,r3    @ 0801e9b8 1840
     cmp r0,#0x0                              @ 0801e9ba 0028
     bne LAB_0801e9fc                         @ 0801e9bc 1ed1
-    ldr r2, PTR_gPrng_0801e9f8               @ 0801e9be 0e4a
+    ldr r2, tick_duel_field_main_frame_gprng @ 0801e9be 0e4a
     movs r0,#0xa4    @ 0801e9c0 a420
     lsls r0,r0,#0x1    @ 0801e9c2 4000
     adds r1,r2,r0    @ 0801e9c4 1118
@@ -4161,13 +4161,13 @@ tick_duel_field_main_frame:
     orrs r0,r3    @ 0801e9e6 1843
     strb r0,[r5,#0x0]                        @ 0801e9e8 2870
     b LAB_0801eb6c                           @ 0801e9ea bfe0
-DAT_0801e9ec:
-    .word  0x02023130                     @ 0801e9ec 30310202
-DAT_0801e9f0:
-    .word  0x0000021e                     @ 0801e9f0 1e020000
-DAT_0801e9f4:
-    .word  0x00000226                     @ 0801e9f4 26020000
-PTR_gPrng_0801e9f8:
+tick_duel_field_main_frame_duel_field_state_a:
+    .word  gDuelFieldState                @ 0801e9ec 30310202
+tick_duel_field_main_frame_fadein_flag_off:
+    .word  DUEL_FIELD_FADEIN_FLAG_OFF     @ 0801e9f0 1e020000  offset: [gDuelFieldState+0x21e] bit0=fadein active; 31 raw refs
+tick_duel_field_main_frame_state_226_off:
+    .word  DUEL_FIELD_STATE_226_OFF       @ 0801e9f4 26020000  offset: [gDuelFieldState+0x226] bit0=scene entry done; 19 raw refs
+tick_duel_field_main_frame_gprng:
     .word  gPrng                          @ 0801e9f8 40000003
 LAB_0801e9fc:
     movs r1,#0x87    @ 0801e9fc 8721
@@ -4184,7 +4184,7 @@ LAB_0801e9fc:
 LAB_0801ea16:
     b LAB_0801ec84                           @ 0801ea16 35e1
 LAB_0801ea18:
-    ldr r1, DAT_0801ea40                     @ 0801ea18 0949
+    ldr r1, tick_duel_field_main_frame_font_state_a @ 0801ea18 0949
     adds r0,r2,#0x0    @ 0801ea1a 101c
     ldrb r1,[r1,#0x0]                        @ 0801ea1c 0978
     ands r0,r1    @ 0801ea1e 0840
@@ -4192,8 +4192,8 @@ LAB_0801ea18:
     beq LAB_0801ea26                         @ 0801ea22 00d0
     b LAB_0801ec2c                           @ 0801ea24 02e1
 LAB_0801ea26:
-    ldr r1, DAT_0801ea44                     @ 0801ea26 0749
-    ldr r4, DAT_0801ea48                     @ 0801ea28 074c
+    ldr r1, tick_duel_field_main_frame_duel_ctx_a @ 0801ea26 0749
+    ldr r4, tick_duel_field_main_frame_zone_state_off_a @ 0801ea28 074c
     adds r1,r1,r4    @ 0801ea2a 0919
     adds r0,r2,#0x0    @ 0801ea2c 101c
     ldrb r1,[r1,#0x0]                        @ 0801ea2e 0978
@@ -4205,12 +4205,12 @@ LAB_0801ea38:
     bl advance_duel_turn_by_prng_anim        @ 0801ea38 76f0b8f9
     b LAB_0801eb70                           @ 0801ea3c 98e0
     .zero  0x2
-DAT_0801ea40:
-    .word  0x0201f440                     @ 0801ea40 40f40102
-DAT_0801ea44:
-    .word  0x02020160                     @ 0801ea44 60010202
-DAT_0801ea48:
-    .word  0x00002f51                     @ 0801ea48 512f0000
+tick_duel_field_main_frame_font_state_a:
+    .word  gFontState                     @ 0801ea40 40f40102  gFontState; font rendering global state; 91 raw refs
+tick_duel_field_main_frame_duel_ctx_a:
+    .word  gDuelCtx                       @ 0801ea44 60010202  gDuelCtx base; duel context; 95 raw refs
+tick_duel_field_main_frame_zone_state_off_a:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801ea48 512f0000  offset: [gDuelCtx+0x2f51] bit0=zone display active; 25 raw refs
 LAB_0801ea4c:
     movs r0,#0x89    @ 0801ea4c 8920
     lsls r0,r0,#0x2    @ 0801ea4e 8000
@@ -4220,15 +4220,15 @@ LAB_0801ea4c:
     beq LAB_0801ea5c                         @ 0801ea56 01d0
     bl enqueue_duel_phase_sprite_by_side     @ 0801ea58 75f04efe
 LAB_0801ea5c:
-    ldr r7, PTR_gP1LifePoints_0801eb1c       @ 0801ea5c 2f4f
-    ldr r1, DAT_0801eb20                     @ 0801ea5e 3049
+    ldr r7, tick_duel_field_main_frame_p1lp  @ 0801ea5c 2f4f
+    ldr r1, tick_duel_field_main_frame_p1lp_block2_off @ 0801ea5e 3049
     adds r0,r7,r1    @ 0801ea60 7818
     ldr r0,[r0,#0x0]                         @ 0801ea62 0068
     cmp r0,#0x0                              @ 0801ea64 0028
     bne LAB_0801ea6a                         @ 0801ea66 00d1
     b LAB_0801ec1a                           @ 0801ea68 d7e0
 LAB_0801ea6a:
-    ldr r2, DAT_0801eb24                     @ 0801ea6a 2e4a
+    ldr r2, tick_duel_field_main_frame_duel_scene_base_a @ 0801ea6a 2e4a
     adds r0,r2,#0x0    @ 0801ea6c 101c
     adds r0,#0x37    @ 0801ea6e 3730
     ldrb r0,[r0,#0x0]                        @ 0801ea70 0078
@@ -4244,15 +4244,15 @@ LAB_0801ea6a:
     bne LAB_0801ea88                         @ 0801ea84 00d1
     b LAB_0801ec1a                           @ 0801ea86 c8e0
 LAB_0801ea88:
-    ldr r2, DAT_0801eb28                     @ 0801ea88 274a
+    ldr r2, tick_duel_field_main_frame_prng_anim_flag_off_b @ 0801ea88 274a
     adds r0,r4,r2    @ 0801ea8a a018
     ldrb r4,[r0,#0x0]                        @ 0801ea8c 0478
     movs r0,#0x10    @ 0801ea8e 1020
     ands r0,r4    @ 0801ea90 2040
     cmp r0,#0x0                              @ 0801ea92 0028
     bne LAB_0801eb80                         @ 0801ea94 74d1
-    ldr r1, DAT_0801eb2c                     @ 0801ea96 2549
-    ldr r0, DAT_0801eb30                     @ 0801ea98 2548
+    ldr r1, tick_duel_field_main_frame_duel_ctx_b @ 0801ea96 2549
+    ldr r0, tick_duel_field_main_frame_zone_state_off_b @ 0801ea98 2548
     adds r1,r1,r0    @ 0801ea9a 0918
     movs r2,#0x1    @ 0801ea9c 0122
     adds r0,r2,#0x0    @ 0801ea9e 101c
@@ -4260,19 +4260,19 @@ LAB_0801ea88:
     ands r0,r1    @ 0801eaa2 0840
     cmp r0,#0x0                              @ 0801eaa4 0028
     bne LAB_0801eb80                         @ 0801eaa6 6bd1
-    ldr r1, DAT_0801eb34                     @ 0801eaa8 2249
+    ldr r1, tick_duel_field_main_frame_card_ctx_slot_data @ 0801eaa8 2249
     adds r0,r2,#0x0    @ 0801eaaa 101c
     ldrb r1,[r1,#0x0]                        @ 0801eaac 0978
     ands r0,r1    @ 0801eaae 0840
     cmp r0,#0x0                              @ 0801eab0 0028
     bne LAB_0801eb80                         @ 0801eab2 65d1
-    ldr r1, DAT_0801eb38                     @ 0801eab4 2049
+    ldr r1, tick_duel_field_main_frame_font_state_b @ 0801eab4 2049
     adds r0,r2,#0x0    @ 0801eab6 101c
     ldrb r1,[r1,#0x0]                        @ 0801eab8 0978
     ands r0,r1    @ 0801eaba 0840
     cmp r0,#0x0                              @ 0801eabc 0028
     bne LAB_0801eb80                         @ 0801eabe 5fd1
-    ldr r1, DAT_0801eb3c                     @ 0801eac0 1e49
+    ldr r1, tick_duel_field_main_frame_banner_state_b @ 0801eac0 1e49
     adds r0,r2,#0x0    @ 0801eac2 101c
     ldrb r1,[r1,#0x0]                        @ 0801eac4 0978
     ands r0,r1    @ 0801eac6 0840
@@ -4285,7 +4285,7 @@ LAB_0801ea88:
     ands r0,r1    @ 0801ead4 0840
     cmp r0,#0x0                              @ 0801ead6 0028
     bne LAB_0801eb48                         @ 0801ead8 36d1
-    ldr r0, PTR_gPrng_0801eb40               @ 0801eada 1948
+    ldr r0, tick_duel_field_main_frame_gprng_b @ 0801eada 1948
     movs r1,#0x84    @ 0801eadc 8421
     lsls r1,r1,#0x2    @ 0801eade 8900
     adds r0,r0,r1    @ 0801eae0 4018
@@ -4309,38 +4309,38 @@ LAB_0801ea88:
     ands r0,r4    @ 0801eb06 2040
     cmp r0,#0x8                              @ 0801eb08 0828
     beq LAB_0801eb48                         @ 0801eb0a 1dd0
-    ldr r2, DAT_0801eb44                     @ 0801eb0c 0d4a
+    ldr r2, tick_duel_field_main_frame_p1lp_timer_off @ 0801eb0c 0d4a
     adds r0,r7,r2    @ 0801eb0e b818
     ldrh r0,[r0,#0x0]                        @ 0801eb10 0088
     adds r0,#0x1    @ 0801eb12 0130
     strh r0,[r6,#0x0]                        @ 0801eb14 3080
     bl enqueue_duel_phase_sprite_by_side     @ 0801eb16 75f0effd
     b LAB_0801eb6c                           @ 0801eb1a 27e0
-PTR_gP1LifePoints_0801eb1c:
+tick_duel_field_main_frame_p1lp:
     .word  gP1LifePoints                  @ 0801eb1c e0c40102
-DAT_0801eb20:
-    .word  0x00001d08                     @ 0801eb20 081d0000
-DAT_0801eb24:
-    .word  0x02023360                     @ 0801eb24 60330202
-DAT_0801eb28:
-    .word  0x00000222                     @ 0801eb28 22020000
-DAT_0801eb2c:
-    .word  0x02020160                     @ 0801eb2c 60010202
-DAT_0801eb30:
-    .word  0x00002f51                     @ 0801eb30 512f0000
-DAT_0801eb34:
-    .word  0x0201ff30                     @ 0801eb34 30ff0102
-DAT_0801eb38:
-    .word  0x0201f440                     @ 0801eb38 40f40102
-DAT_0801eb3c:
+tick_duel_field_main_frame_p1lp_block2_off:
+    .word  P1LP_BLOCK2_OFF                @ 0801eb20 081d0000  offset: [gP1LifePoints+0x1d08] duel field LP display field; 35 raw refs
+tick_duel_field_main_frame_duel_scene_base_a:
+    .word  gDuelSceneBase                 @ 0801eb24 60330202  gDuelSceneBase; duel scene/campaign base; 192 raw refs
+tick_duel_field_main_frame_prng_anim_flag_off_b:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 0801eb28 22020000
+tick_duel_field_main_frame_duel_ctx_b:
+    .word  gDuelCtx                       @ 0801eb2c 60010202
+tick_duel_field_main_frame_zone_state_off_b:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801eb30 512f0000
+tick_duel_field_main_frame_card_ctx_slot_data:
+    .word  gCardCtxSlotData               @ 0801eb34 30ff0102  gCardCtxSlotData; card context slot data base; 29 raw refs
+tick_duel_field_main_frame_font_state_b:
+    .word  gFontState                     @ 0801eb38 40f40102
+tick_duel_field_main_frame_banner_state_b:
     .word  gBannerState                   @ 0801eb3c c0fe0102
-PTR_gPrng_0801eb40:
+tick_duel_field_main_frame_gprng_b:
     .word  gPrng                          @ 0801eb40 40000003
-DAT_0801eb44:
-    .word  0x00001cec                     @ 0801eb44 ec1c0000
+tick_duel_field_main_frame_p1lp_timer_off:
+    .word  P1LP_TIMER_OFF                 @ 0801eb44 ec1c0000  offset: [gP1LifePoints+0x1cec] duel field timer field; 29 raw refs
 LAB_0801eb48:
-    ldr r0, DAT_0801eb74                     @ 0801eb48 0a48
-    ldr r4, DAT_0801eb78                     @ 0801eb4a 0b4c
+    ldr r0, tick_duel_field_main_frame_duel_field_state_b @ 0801eb48 0a48
+    ldr r4, tick_duel_field_main_frame_prng_anim_flag_off_c @ 0801eb4a 0b4c
     adds r2,r0,r4    @ 0801eb4c 0219
     ldrb r1,[r2,#0x0]                        @ 0801eb4e 1178
     movs r0,#0xc    @ 0801eb50 0c20
@@ -4353,7 +4353,7 @@ LAB_0801eb48:
     movs r1,#0x8    @ 0801eb5e 0821
     orrs r0,r1    @ 0801eb60 0843
     strb r0,[r2,#0x0]                        @ 0801eb62 1070
-    ldr r0, DAT_0801eb7c                     @ 0801eb64 0548
+    ldr r0, tick_duel_field_main_frame_duel_card_ctx_a @ 0801eb64 0548
     ldr r0,[r0,#0x4]                         @ 0801eb66 4068
     bl init_duel_phase_display_flag_with_sprite @ 0801eb68 75f0f2fd
 LAB_0801eb6c:
@@ -4361,14 +4361,14 @@ LAB_0801eb6c:
 LAB_0801eb70:
     movs r0,#0x0    @ 0801eb70 0020
     b LAB_0801ec86                           @ 0801eb72 88e0
-DAT_0801eb74:
-    .word  0x02023130                     @ 0801eb74 30310202
-DAT_0801eb78:
-    .word  0x00000222                     @ 0801eb78 22020000
-DAT_0801eb7c:
-    .word  0x0201e2a0                     @ 0801eb7c a0e20102
+tick_duel_field_main_frame_duel_field_state_b:
+    .word  gDuelFieldState                @ 0801eb74 30310202
+tick_duel_field_main_frame_prng_anim_flag_off_c:
+    .word  DUEL_FIELD_PRNG_ANIM_FLAG_OFF  @ 0801eb78 22020000
+tick_duel_field_main_frame_duel_card_ctx_a:
+    .word  gDuelCardCtxBase               @ 0801eb7c a0e20102  gDuelCardCtxBase; duel card activation context; 442 raw refs
 LAB_0801eb80:
-    ldr r4, PTR_gPrng_0801ebb8               @ 0801eb80 0d4c
+    ldr r4, tick_duel_field_main_frame_gprng_c @ 0801eb80 0d4c
     movs r1,#0x84    @ 0801eb82 8421
     lsls r1,r1,#0x2    @ 0801eb84 8900
     adds r0,r4,r1    @ 0801eb86 6018
@@ -4389,30 +4389,30 @@ LAB_0801eb80:
     lsls r1,r1,#0x2    @ 0801eba6 8900
     cmp r0,r1                                @ 0801eba8 8842
     bgt LAB_0801ebc0                         @ 0801ebaa 09dc
-    ldr r2, DAT_0801ebbc                     @ 0801ebac 034a
+    ldr r2, tick_duel_field_main_frame_prng_state_213_a @ 0801ebac 034a
     adds r1,r4,r2    @ 0801ebae a118
     movs r0,#0x80    @ 0801ebb0 8020
     ldrb r4,[r1,#0x0]                        @ 0801ebb2 0c78
     orrs r0,r4    @ 0801ebb4 2043
     b LAB_0801ebca                           @ 0801ebb6 08e0
-PTR_gPrng_0801ebb8:
+tick_duel_field_main_frame_gprng_c:
     .word  gPrng                          @ 0801ebb8 40000003
-DAT_0801ebbc:
-    .word  0x00000213                     @ 0801ebbc 13020000
+tick_duel_field_main_frame_prng_state_213_a:
+    .word  GPRNG_PRNG_STATE_OFF213        @ 0801ebbc 13020000  offset: [gPrng+0x213] bit7=prng-anim state flag; 37 raw refs
 LAB_0801ebc0:
-    ldr r0, DAT_0801ebfc                     @ 0801ebc0 0e48
+    ldr r0, tick_duel_field_main_frame_prng_state_213_b @ 0801ebc0 0e48
     adds r1,r4,r0    @ 0801ebc2 2118
     movs r0,#0x7f    @ 0801ebc4 7f20
     ldrb r2,[r1,#0x0]                        @ 0801ebc6 0a78
     ands r0,r2    @ 0801ebc8 1040
 LAB_0801ebca:
     strb r0,[r1,#0x0]                        @ 0801ebca 0870
-    ldr r0, DAT_0801ec00                     @ 0801ebcc 0c48
+    ldr r0, tick_duel_field_main_frame_duel_card_ctx_b @ 0801ebcc 0c48
     ldr r0,[r0,#0x4]                         @ 0801ebce 4068
     bl check_card_play_condition_eligible    @ 0801ebd0 1df042f8
     cmp r0,#0x0                              @ 0801ebd4 0028
     beq LAB_0801ec0c                         @ 0801ebd6 19d0
-    ldr r4, PTR_gPrng_0801ec04               @ 0801ebd8 0a4c
+    ldr r4, tick_duel_field_main_frame_gprng_d @ 0801ebd8 0a4c
     movs r1,#0x85    @ 0801ebda 8521
     lsls r1,r1,#0x2    @ 0801ebdc 8900
     adds r0,r4,r1    @ 0801ebde 6018
@@ -4423,23 +4423,23 @@ LAB_0801ebca:
     bl __divsi3                              @ 0801ebe8 eff00cfd
     cmp r0,#0xb4                             @ 0801ebec b428
     bgt LAB_0801ec0c                         @ 0801ebee 0ddc
-    ldr r2, DAT_0801ec08                     @ 0801ebf0 054a
+    ldr r2, tick_duel_field_main_frame_prng_state_217_a @ 0801ebf0 054a
     adds r1,r4,r2    @ 0801ebf2 a118
     movs r0,#0x80    @ 0801ebf4 8020
     ldrb r4,[r1,#0x0]                        @ 0801ebf6 0c78
     orrs r0,r4    @ 0801ebf8 2043
     b LAB_0801ec18                           @ 0801ebfa 0de0
-DAT_0801ebfc:
-    .word  0x00000213                     @ 0801ebfc 13020000
-DAT_0801ec00:
-    .word  0x0201e2a0                     @ 0801ec00 a0e20102
-PTR_gPrng_0801ec04:
+tick_duel_field_main_frame_prng_state_213_b:
+    .word  GPRNG_PRNG_STATE_OFF213        @ 0801ebfc 13020000
+tick_duel_field_main_frame_duel_card_ctx_b:
+    .word  gDuelCardCtxBase               @ 0801ec00 a0e20102
+tick_duel_field_main_frame_gprng_d:
     .word  gPrng                          @ 0801ec04 40000003
-DAT_0801ec08:
-    .word  0x00000217                     @ 0801ec08 17020000
+tick_duel_field_main_frame_prng_state_217_a:
+    .word  GPRNG_PRNG_STATE_OFF217        @ 0801ec08 17020000  offset: [gPrng+0x217] bit7=prng-anim LP flag; 12 raw refs
 LAB_0801ec0c:
-    ldr r1, PTR_gPrng_0801ec34               @ 0801ec0c 0949
-    ldr r0, DAT_0801ec38                     @ 0801ec0e 0a48
+    ldr r1, tick_duel_field_main_frame_gprng_e @ 0801ec0c 0949
+    ldr r0, tick_duel_field_main_frame_prng_state_217_b @ 0801ec0e 0a48
     adds r1,r1,r0    @ 0801ec10 0918
     movs r0,#0x7f    @ 0801ec12 7f20
     ldrb r2,[r1,#0x0]                        @ 0801ec14 0a78
@@ -4448,7 +4448,7 @@ LAB_0801ec18:
     strb r0,[r1,#0x0]                        @ 0801ec18 0870
 LAB_0801ec1a:
     bl render_duel_field_oam_all             @ 0801ec1a aef0ebf8
-    ldr r1, DAT_0801ec3c                     @ 0801ec1e 0749
+    ldr r1, tick_duel_field_main_frame_font_state_c @ 0801ec1e 0749
     movs r2,#0x1    @ 0801ec20 0122
     adds r0,r2,#0x0    @ 0801ec22 101c
     ldrb r1,[r1,#0x0]                        @ 0801ec24 0978
@@ -4459,15 +4459,15 @@ LAB_0801ec2c:
     bl tick_card_list_scene_frame            @ 0801ec2c a9f02cfd
     b LAB_0801eb70                           @ 0801ec30 9ee7
     .zero  0x2
-PTR_gPrng_0801ec34:
+tick_duel_field_main_frame_gprng_e:
     .word  gPrng                          @ 0801ec34 40000003
-DAT_0801ec38:
-    .word  0x00000217                     @ 0801ec38 17020000
-DAT_0801ec3c:
-    .word  0x0201f440                     @ 0801ec3c 40f40102
+tick_duel_field_main_frame_prng_state_217_b:
+    .word  GPRNG_PRNG_STATE_OFF217        @ 0801ec38 17020000
+tick_duel_field_main_frame_font_state_c:
+    .word  gFontState                     @ 0801ec3c 40f40102
 LAB_0801ec40:
-    ldr r1, DAT_0801ec58                     @ 0801ec40 0549
-    ldr r4, DAT_0801ec5c                     @ 0801ec42 064c
+    ldr r1, tick_duel_field_main_frame_duel_ctx_c @ 0801ec40 0549
+    ldr r4, tick_duel_field_main_frame_zone_state_off_c @ 0801ec42 064c
     adds r1,r1,r4    @ 0801ec44 0919
     adds r0,r2,#0x0    @ 0801ec46 101c
     ldrb r1,[r1,#0x0]                        @ 0801ec48 0978
@@ -4478,25 +4478,25 @@ LAB_0801ec50:
     bl tick_zone_display_frame               @ 0801ec50 adf06afc
     b LAB_0801eb70                           @ 0801ec54 8ce7
     .zero  0x2
-DAT_0801ec58:
-    .word  0x02020160                     @ 0801ec58 60010202
-DAT_0801ec5c:
-    .word  0x00002f51                     @ 0801ec5c 512f0000
+tick_duel_field_main_frame_duel_ctx_c:
+    .word  gDuelCtx                       @ 0801ec58 60010202
+tick_duel_field_main_frame_zone_state_off_c:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801ec5c 512f0000
 LAB_0801ec60:
     bl advance_duel_turn_by_prng_anim        @ 0801ec60 76f0a4f8
     cmp r0,#0x0                              @ 0801ec64 0028
     bne LAB_0801ec6a                         @ 0801ec66 00d1
     b LAB_0801eb70                           @ 0801ec68 82e7
 LAB_0801ec6a:
-    ldr r2, PTR_gPrng_0801ec90               @ 0801ec6a 094a
-    ldr r0, DAT_0801ec94                     @ 0801ec6c 0948
+    ldr r2, tick_duel_field_main_frame_gprng_f @ 0801ec6a 094a
+    ldr r0, tick_duel_field_main_frame_prng_state_213_c @ 0801ec6c 0948
     adds r3,r2,r0    @ 0801ec6e 1318
     movs r1,#0x7f    @ 0801ec70 7f21
     adds r0,r1,#0x0    @ 0801ec72 081c
     ldrb r4,[r3,#0x0]                        @ 0801ec74 1c78
     ands r0,r4    @ 0801ec76 2040
     strb r0,[r3,#0x0]                        @ 0801ec78 1870
-    ldr r0, DAT_0801ec98                     @ 0801ec7a 0748
+    ldr r0, tick_duel_field_main_frame_prng_state_217_c @ 0801ec7a 0748
     adds r2,r2,r0    @ 0801ec7c 1218
     ldrb r4,[r2,#0x0]                        @ 0801ec7e 1478
     ands r1,r4    @ 0801ec80 2140
@@ -4509,12 +4509,12 @@ LAB_0801ec86:
     pop {r4,r5,r6,r7}                        @ 0801ec8a f0bc
     pop {r1}                                 @ 0801ec8c 02bc
     bx r1                                    @ 0801ec8e 0847
-PTR_gPrng_0801ec90:
+tick_duel_field_main_frame_gprng_f:
     .word  gPrng                          @ 0801ec90 40000003
-DAT_0801ec94:
-    .word  0x00000213                     @ 0801ec94 13020000
-DAT_0801ec98:
-    .word  0x00000217                     @ 0801ec98 17020000
+tick_duel_field_main_frame_prng_state_213_c:
+    .word  GPRNG_PRNG_STATE_OFF213        @ 0801ec94 13020000
+tick_duel_field_main_frame_prng_state_217_c:
+    .word  GPRNG_PRNG_STATE_OFF217        @ 0801ec98 17020000
 
 @ Core card display operation dispatcher (indeg=114). r0=op_code [1..0x3d] (subs#1; cmp#0x3c); dispatches via 61-entry jump table 0x0801ecc4. Case handlers (sample): 0x01/0x21=init_field_slot_aob_ctx_a, 0x03=write_zone_slot_oam_descriptor+update_zone_activation_display_state, 0x06=init_card_effect_aob_ctx, 0x09=build_slot_activation_mask_for_player+write_field_slot_activation_mask, 0x0b=init_field_slot_aob_ctx_b, 0x0c=write_zone_oam_entry_with_flip, 0x0d=write_lp_digit_tiles_to_vram, 0x14=get_player_lp_by_field_type+render_field_zone_card_tile_by_type, 0x18=init_field_slot_aob_ctx_d, 0x19=init_field_slot_aob_ctx_c, 0x1a=init_field_slot_ctx_zoom, 0x1b=render_field_slot_card_tile_by_id, 0x1c=init_field_slot_aob_ctx_a (case alias), 0x24=refresh_duel_field+refresh_zone_effect_buff_cache+refresh_all_zone_slot_tile_display, 0x31=copy_game_text_to_card_name_vram, 0x32=build_field_zone_display_state. r1/r2/r3=op args (transparent to callee). Returns 1=done or 0=default/invalid. Constants: jump_table=0x0801ecc4, op_range=[1..0x3d].
 dispatch_card_display_op:
@@ -4532,14 +4532,14 @@ dispatch_card_display_op:
     b switchD_0801ecbc__caseD_8              @ 0801ecb2 67e1
 LAB_0801ecb4:
     lsls r0,r0,#0x2    @ 0801ecb4 8000
-    ldr r1, DAT_0801ecc0                     @ 0801ecb6 0249
+    ldr r1, dispatch_card_display_op_jt_ptr  @ 0801ecb6 0249
     adds r0,r0,r1    @ 0801ecb8 4018
     ldr r0,[r0,#0x0]                         @ 0801ecba 0068
 switchD_0801ecbc__switchD:
     .hword 0x4687    @ 0801ecbc 8746
     .zero  0x2
-DAT_0801ecc0:
-    .word  0x0801ecc4                     @ 0801ecc0 c4ec0108
+dispatch_card_display_op_jt_ptr:
+    .word  switchD_0801ecbc__switchdataD_0801ecc4 @ 0801ecc0 c4ec0108
 switchD_0801ecbc__switchdataD_0801ecc4:
     .word  0x0801ef60                     @ 0801ecc4 60ef0108
     .word  0x0801ef60                     @ 0801ecc8 60ef0108
@@ -4677,14 +4677,14 @@ switchD_0801ecbc__caseD_3:
     bl get_lp_display_anim_counter           @ 0801ee48 77f094fd
     cmp r0,#0x1                              @ 0801ee4c 0128
     bne LAB_0801ee60                         @ 0801ee4e 07d1
-    ldr r0, DAT_0801ee5c                     @ 0801ee50 0248
+    ldr r0, dispatch_card_display_op_duel_card_ctx @ 0801ee50 0248
     ldr r0,[r0,#0x4]                         @ 0801ee52 4068
     movs r1,#0xd    @ 0801ee54 0d21
     movs r2,#0x0    @ 0801ee56 0022
     b LAB_0801ef48                           @ 0801ee58 76e0
     .zero  0x2
-DAT_0801ee5c:
-    .word  0x0201e2a0                     @ 0801ee5c a0e20102
+dispatch_card_display_op_duel_card_ctx:
+    .word  gDuelCardCtxBase               @ 0801ee5c a0e20102
 LAB_0801ee60:
     movs r7,#0x0    @ 0801ee60 0027
     movs r0,#0x80    @ 0801ee62 8020
@@ -4692,10 +4692,10 @@ LAB_0801ee60:
     .hword 0x4680    @ 0801ee66 8046
     movs r1,#0x1    @ 0801ee68 0121
     .hword 0x468a    @ 0801ee6a 8a46
-    ldr r2, DAT_0801eed4                     @ 0801ee6c 194a
+    ldr r2, dispatch_card_display_op_zone_activ_table @ 0801ee6c 194a
     .hword 0x4691    @ 0801ee6e 9146
 LAB_0801ee70:
-    ldr r0, DAT_0801eed8                     @ 0801ee70 1948
+    ldr r0, dispatch_card_display_op_duel_card_ctx_b @ 0801ee70 1948
     ldr r5,[r0,#0x4]                         @ 0801ee72 4568
     eors r5,r7    @ 0801ee74 7d40
     movs r4,#0x0    @ 0801ee76 0024
@@ -4715,9 +4715,9 @@ LAB_0801ee78:
     adds r0,r5,#0x0    @ 0801ee92 281c
     .hword 0x4652    @ 0801ee94 5246
     ands r0,r2    @ 0801ee96 1040
-    ldr r1, DAT_0801eedc                     @ 0801ee98 1049
+    ldr r1, dispatch_card_display_op_player_block_stride @ 0801ee98 1049
     muls r1,r0    @ 0801ee9a 4143
-    ldr r2, DAT_0801eee0                     @ 0801ee9c 104a
+    ldr r2, dispatch_card_display_op_p1_zone_hand_count @ 0801ee9c 104a
     adds r0,r1,r2    @ 0801ee9e 8818
     ldr r0,[r0,#0x0]                         @ 0801eea0 0068
     cmp r4,r0                                @ 0801eea2 8442
@@ -4746,20 +4746,20 @@ LAB_0801eec4:
     cmp r7,#0x1                              @ 0801eece 012f
     ble LAB_0801ee70                         @ 0801eed0 cedd
     b switchD_0801ecbc__caseD_a              @ 0801eed2 76e7
-DAT_0801eed4:
-    .word  0x020230f0                     @ 0801eed4 f0300202
-DAT_0801eed8:
-    .word  0x0201e2a0                     @ 0801eed8 a0e20102
-DAT_0801eedc:
-    .word  0x00000868                     @ 0801eedc 68080000
-DAT_0801eee0:
-    .word  0x0201c4ec                     @ 0801eee0 ecc40102
+dispatch_card_display_op_zone_activ_table:
+    .word  gZoneActivTable                @ 0801eed4 f0300202  gZoneActivTable; zone activation player table (2-word array [p0,p1]); 1 raw ref (med-conf)
+dispatch_card_display_op_duel_card_ctx_b:
+    .word  gDuelCardCtxBase               @ 0801eed8 a0e20102
+dispatch_card_display_op_player_block_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0801eedc 68080000  player data block stride 0x868=2152 bytes; 2146 raw refs
+dispatch_card_display_op_p1_zone_hand_count:
+    .word  gP1ZoneHandCount               @ 0801eee0 ecc40102  gP1ZoneHandCount = gP1LifePoints+0xc; player zone/hand count table base; 23 raw refs
 switchD_0801ecbc__caseD_6:
     adds r0,r6,#0x0    @ 0801eee4 301c
     bl init_card_effect_aob_ctx              @ 0801eee6 aaf02ff8
     b switchD_0801ecbc__caseD_a              @ 0801eeea 6ae7
 switchD_0801ecbc__caseD_11:
-    ldr r2, DAT_0801ef1c                     @ 0801eeec 0b4a
+    ldr r2, dispatch_card_display_op_duel_field_state_a @ 0801eeec 0b4a
     lsls r1,r7,#0x1    @ 0801eeee 7900
     lsls r0,r6,#0x2    @ 0801eef0 b000
     adds r0,r0,r6    @ 0801eef2 8019
@@ -4780,10 +4780,10 @@ switchD_0801ecbc__caseD_11:
     bl refresh_duel_field_zone_info          @ 0801ef14 acf0faff
     b switchD_0801ecbc__caseD_1              @ 0801ef18 22e0
     .zero  0x2
-DAT_0801ef1c:
-    .word  0x02023130                     @ 0801ef1c 30310202
+dispatch_card_display_op_duel_field_state_a:
+    .word  gDuelFieldState                @ 0801ef1c 30310202
 switchD_0801ecbc__caseD_12:
-    ldr r0, DAT_0801ef34                     @ 0801ef20 0448
+    ldr r0, dispatch_card_display_op_duel_field_state_b @ 0801ef20 0448
     lsls r1,r6,#0x1    @ 0801ef22 7100
     adds r0,#0x4c    @ 0801ef24 4c30
     adds r1,r1,r0    @ 0801ef26 0918
@@ -4792,8 +4792,8 @@ switchD_0801ecbc__caseD_12:
     bl refresh_player_field_slot_tiles       @ 0801ef2c a5f078f9
     b switchD_0801ecbc__caseD_a              @ 0801ef30 47e7
     .zero  0x2
-DAT_0801ef34:
-    .word  0x02023130                     @ 0801ef34 30310202
+dispatch_card_display_op_duel_field_state_b:
+    .word  gDuelFieldState                @ 0801ef34 30310202
 switchD_0801ecbc__caseD_21:
     adds r0,r6,#0x0    @ 0801ef38 301c
     adds r1,r7,#0x0    @ 0801ef3a 391c
@@ -4842,7 +4842,15 @@ LAB_0801ef86:
     pop {r1}                                 @ 0801ef90 02bc
     bx r1                                    @ 0801ef92 0847
 
-@ UI 特效派发器 (per-frame tick). r0 = effect_id (0..0x3d), 按 ID 分派到 ~28 个独立的 effect handler 子状态机, busy/done 返回. dispatch table 中 重复 fallthrough 到 default 的 case = 未实现/无效 ID. 已识别 effect: 0x01 = banner_anim_state_machine (pack 横幅出/入场), 0x1a = play_card_zoom_in (小图→大图缩放过渡), 0x3c = play_demo_shuen (终焉过场). 其他 case 子函数批量占位为 play_ui_effect_<id_hex>, 待详细分析. cmp 上限 0x3d, 大于则 default. case 0/0x18/0x19 共享 caseD_0 (state-bit 检查后选 FUN_080c4edc 或 FUN_080c4350); case 1 状态化 (banner_anim 或 FUN_080be600); case 2 三向状态分派. case 0x31/0x32 内联无 bl (特殊 readback).
+@ UI effect dispatcher (per-frame tick). r0=effect_id [0..0x3d]; dispatches ~28 independent
+@ effect handler sub-state-machines; returns busy(0)/done(1). Unrecognized IDs fall through
+@ to caseD_7 (returns 0). Known effects: 0x01=banner_anim_state_machine (pack banner enter/exit),
+@ 0x1a=play_card_zoom_in (small->large zoom transition), 0x3c=play_demo_shuen (ending cinematic).
+@ Other cases delegated to play_ui_effect_<id_hex> stubs. cmp upper bound 0x3d; >0x3d -> default.
+@ case 0/0x18/0x19 share caseD_0 (state-bit check -> run_ui_effect_card_pair_state_machine or
+@ dispatch_ui_effect_by_card_type); case 1: [gPrng+0x23f] bit0 -> banner_anim_state_machine
+@ else tick_banner_pack_state_machine; case 2: gBannerState[+4] state [1..3] dispatch.
+@ case 0x31/0x32 inline reads (no bl, special readback).
 play_ui_effect:
     push {lr}                                @ 0801ef94 00b5
     cmp r0,#0x3d                             @ 0801ef96 3d28
@@ -4850,14 +4858,14 @@ play_ui_effect:
     b switchD_0801efa4__caseD_7              @ 0801ef9a 4ae1
 LAB_0801ef9c:
     lsls r0,r0,#0x2    @ 0801ef9c 8000
-    ldr r1, DAT_0801efa8                     @ 0801ef9e 0249
+    ldr r1, play_ui_effect_jt_ptr            @ 0801ef9e 0249
     adds r0,r0,r1    @ 0801efa0 4018
     ldr r0,[r0,#0x0]                         @ 0801efa2 0068
 switchD_0801efa4__switchD:
     .hword 0x4687    @ 0801efa4 8746
     .zero  0x2
-DAT_0801efa8:
-    .word  0x0801efac                     @ 0801efa8 acef0108
+play_ui_effect_jt_ptr:
+    .word  switchD_0801efa4__switchdataD_0801efac @ 0801efa8 acef0108
 switchD_0801efa4__switchdataD_0801efac:
     .word  0x0801f0a4                     @ 0801efac a4f00108
     .word  0x0801f13e                     @ 0801efb0 3ef10108
@@ -4922,7 +4930,7 @@ switchD_0801efa4__switchdataD_0801efac:
     .word  0x0801f214                     @ 0801f09c 14f20108
     .word  0x0801f22c                     @ 0801f0a0 2cf20108
 switchD_0801efa4__caseD_0:
-    ldr r0, DAT_0801f0b8                     @ 0801f0a4 0448
+    ldr r0, play_ui_effect_ui_effect_state   @ 0801f0a4 0448
     ldrb r1,[r0,#0x19]                       @ 0801f0a6 417e
     movs r0,#0x2    @ 0801f0a8 0220
     ands r0,r1    @ 0801f0aa 0840
@@ -4931,7 +4939,7 @@ switchD_0801efa4__caseD_0:
     bl run_ui_effect_card_pair_state_machine @ 0801f0b0 a5f014ff
     b LAB_0801f234                           @ 0801f0b4 bee0
     .zero  0x2
-DAT_0801f0b8:
+play_ui_effect_ui_effect_state:
     .word  gUIEffectState                 @ 0801f0b8 10310202
 LAB_0801f0bc:
     movs r0,#0x1    @ 0801f0bc 0120
@@ -4955,11 +4963,11 @@ switchD_0801efa4__caseD_11:
     bl play_ui_effect_11                     @ 0801f0de a0f0a3f8
     b LAB_0801f234                           @ 0801f0e2 a7e0
 switchD_0801efa4__caseD_31:
-    ldr r0, DAT_0801f0fc                     @ 0801f0e4 0548
+    ldr r0, play_ui_effect_font_state_a      @ 0801f0e4 0548
     ldrb r0,[r0,#0x0]                        @ 0801f0e6 0078
     lsls r1,r0,#0x1f    @ 0801f0e8 c107
-    ldr r0, DAT_0801f100                     @ 0801f0ea 0548
-    ldr r2, DAT_0801f104                     @ 0801f0ec 054a
+    ldr r0, play_ui_effect_duel_ctx_a        @ 0801f0ea 0548
+    ldr r2, play_ui_effect_zone_state_off_a  @ 0801f0ec 054a
     adds r0,r0,r2    @ 0801f0ee 8018
     ldrb r0,[r0,#0x0]                        @ 0801f0f0 0078
     lsls r0,r0,#0x1f    @ 0801f0f2 c007
@@ -4967,12 +4975,12 @@ switchD_0801efa4__caseD_31:
     lsrs r0,r0,#0x1f    @ 0801f0f6 c00f
     b LAB_0801f234                           @ 0801f0f8 9ce0
     .zero  0x2
-DAT_0801f0fc:
-    .word  0x0201f440                     @ 0801f0fc 40f40102
-DAT_0801f100:
-    .word  0x02020160                     @ 0801f100 60010202
-DAT_0801f104:
-    .word  0x00002f51                     @ 0801f104 512f0000
+play_ui_effect_font_state_a:
+    .word  gFontState                     @ 0801f0fc 40f40102
+play_ui_effect_duel_ctx_a:
+    .word  gDuelCtx                       @ 0801f100 60010202
+play_ui_effect_zone_state_off_a:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801f104 512f0000
 switchD_0801efa4__caseD_1a:
     bl play_card_zoom_in                     @ 0801f108 a4f00afe
     b LAB_0801f234                           @ 0801f10c 92e0
@@ -4980,18 +4988,18 @@ switchD_0801efa4__caseD_e:
     bl play_ui_effect_0e                     @ 0801f10e a0f041f9
     b LAB_0801f234                           @ 0801f112 8fe0
 switchD_0801efa4__caseD_32:
-    ldr r0, DAT_0801f124                     @ 0801f114 0348
-    ldr r1, DAT_0801f128                     @ 0801f116 0449
+    ldr r0, play_ui_effect_duel_ctx_b        @ 0801f114 0348
+    ldr r1, play_ui_effect_zone_state_off_b  @ 0801f116 0449
     adds r0,r0,r1    @ 0801f118 4018
     ldrb r0,[r0,#0x0]                        @ 0801f11a 0078
     lsls r0,r0,#0x1f    @ 0801f11c c007
     lsrs r0,r0,#0x1f    @ 0801f11e c00f
     b LAB_0801f234                           @ 0801f120 88e0
     .zero  0x2
-DAT_0801f124:
-    .word  0x02020160                     @ 0801f124 60010202
-DAT_0801f128:
-    .word  0x00002f51                     @ 0801f128 512f0000
+play_ui_effect_duel_ctx_b:
+    .word  gDuelCtx                       @ 0801f124 60010202
+play_ui_effect_zone_state_off_b:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801f128 512f0000
 switchD_0801efa4__caseD_6:
     bl play_ui_effect_06                     @ 0801f12c aaf058f8
     b LAB_0801f234                           @ 0801f130 80e0
@@ -5002,8 +5010,8 @@ switchD_0801efa4__caseD_4:
     bl play_ui_effect_04                     @ 0801f138 9ef0e0fd
     b LAB_0801f234                           @ 0801f13c 7ae0
 switchD_0801efa4__caseD_1:
-    ldr r1, PTR_gPrng_0801f154               @ 0801f13e 0549
-    ldr r2, DAT_0801f158                     @ 0801f140 054a
+    ldr r1, play_ui_effect_gprng             @ 0801f13e 0549
+    ldr r2, play_ui_effect_gprng_banner_flag_off @ 0801f140 054a
     adds r1,r1,r2    @ 0801f142 8918
     movs r0,#0x1    @ 0801f144 0120
     ldrb r1,[r1,#0x0]                        @ 0801f146 0978
@@ -5012,23 +5020,23 @@ switchD_0801efa4__caseD_1:
     beq LAB_0801f15c                         @ 0801f14c 06d0
     bl banner_anim_state_machine             @ 0801f14e 9ef02dff
     b LAB_0801f234                           @ 0801f152 6fe0
-PTR_gPrng_0801f154:
+play_ui_effect_gprng:
     .word  gPrng                          @ 0801f154 40000003
-DAT_0801f158:
-    .word  0x0000023f                     @ 0801f158 3f020000
+play_ui_effect_gprng_banner_flag_off:
+    .word  GPRNG_BANNER_FLAG_OFF          @ 0801f158 3f020000  offset: [gPrng+0x23f] bit0=banner-anim active; 279 raw refs
 LAB_0801f15c:
     bl tick_banner_pack_state_machine        @ 0801f15c 9ff050fa
     b LAB_0801f234                           @ 0801f160 68e0
 switchD_0801efa4__caseD_2:
-    ldr r1, DAT_0801f184                     @ 0801f162 0849
+    ldr r1, play_ui_effect_font_state_b      @ 0801f162 0849
     movs r2,#0x1    @ 0801f164 0122
     adds r0,r2,#0x0    @ 0801f166 101c
     ldrb r1,[r1,#0x0]                        @ 0801f168 0978
     ands r0,r1    @ 0801f16a 0840
     cmp r0,#0x0                              @ 0801f16c 0028
     bne LAB_0801f180                         @ 0801f16e 07d1
-    ldr r1, DAT_0801f188                     @ 0801f170 0549
-    ldr r0, DAT_0801f18c                     @ 0801f172 0648
+    ldr r1, play_ui_effect_duel_ctx_c        @ 0801f170 0549
+    ldr r0, play_ui_effect_zone_state_off_c  @ 0801f172 0648
     adds r1,r1,r0    @ 0801f174 0918
     adds r0,r2,#0x0    @ 0801f176 101c
     ldrb r1,[r1,#0x0]                        @ 0801f178 0978
@@ -5038,14 +5046,14 @@ switchD_0801efa4__caseD_2:
 LAB_0801f180:
     movs r0,#0x1    @ 0801f180 0120
     b LAB_0801f234                           @ 0801f182 57e0
-DAT_0801f184:
-    .word  0x0201f440                     @ 0801f184 40f40102
-DAT_0801f188:
-    .word  0x02020160                     @ 0801f188 60010202
-DAT_0801f18c:
-    .word  0x00002f51                     @ 0801f18c 512f0000
+play_ui_effect_font_state_b:
+    .word  gFontState                     @ 0801f184 40f40102
+play_ui_effect_duel_ctx_c:
+    .word  gDuelCtx                       @ 0801f188 60010202
+play_ui_effect_zone_state_off_c:
+    .word  DUEL_CTX_ZONE_STATE_OFF        @ 0801f18c 512f0000
 LAB_0801f190:
-    ldr r0, DAT_0801f1a4                     @ 0801f190 0448
+    ldr r0, play_ui_effect_banner_state      @ 0801f190 0448
     ldr r0,[r0,#0x4]                         @ 0801f192 4068
     cmp r0,#0x2                              @ 0801f194 0228
     beq LAB_0801f1b4                         @ 0801f196 0dd0
@@ -5055,7 +5063,7 @@ LAB_0801f190:
     beq LAB_0801f1ae                         @ 0801f19e 06d0
     b switchD_0801efa4__caseD_7              @ 0801f1a0 47e0
     .zero  0x2
-DAT_0801f1a4:
+play_ui_effect_banner_state:
     .word  gBannerState                   @ 0801f1a4 c0fe0102
 LAB_0801f1a8:
     cmp r0,#0x3                              @ 0801f1a8 0328
@@ -5137,7 +5145,7 @@ LAB_0801f234:
 copy_game_text_if_raw:
     push {r4,lr}                             @ 0801f238 10b5
     adds r4,r0,#0x0    @ 0801f23a 041c
-    ldr r0, DAT_0801f258                     @ 0801f23c 0648
+    ldr r0, copy_game_text_if_raw_raw_id_mask @ 0801f23c 0648
     ands r0,r1    @ 0801f23e 0840
     cmp r0,#0x0                              @ 0801f240 0028
     bne LAB_0801f24c                         @ 0801f242 03d1
@@ -5150,8 +5158,8 @@ LAB_0801f24c:
     pop {r4}                                 @ 0801f252 10bc
     pop {r0}                                 @ 0801f254 01bc
     bx r0                                    @ 0801f256 0047
-DAT_0801f258:
-    .word  0xfffe0000                     @ 0801f258 0000feff
+copy_game_text_if_raw_raw_id_mask:
+    .word  GAME_STR_RAW_ID_MASK           @ 0801f258 0000feff  raw game string ID mask bits[31:17]==0; 485 raw refs
 
 @ Appends a game string to end of dest buf r0 (strcat variant of copy_game_text_if_raw). If r1 high 15 bits == 0 calls resolve_game_str_ptr(r1) then strcat; otherwise uses r1 directly as pointer for strcat. r0=u8* dest (existing content); r1=u32 str_handle. Returns void. Side effects: appends NUL-terminated string to [r0 end..]. Constants: RAW_ID_MASK=0xFFFE0000.
 append_game_text_if_raw:

@@ -202,6 +202,47 @@
                                              @   get_vija_obj_slot_field8, tick_all_vija_obj_anim_slots,
                                              @   run_vija_scene_state_machine (file 01)
 
+@ -----------------------------------------------------------------------------
+@ 决斗场 / 卡牌显示 (Duel Field / Card Display) -- f01 Seg-5
+@ -----------------------------------------------------------------------------
+.equ gDuelFieldState,            0x02023130  @ duel field main state struct (large, ~0x400B; 170 raw refs)
+                                             @ +0x21e = u8  fadein active flag (bit0)
+                                             @ +0x222 = u8  prng anim flag (bit2 = prng-driven anim active)
+                                             @ +0x226 = u8  scene entry complete flag (bit0)
+                                             @ +0x220 = u32 OAM cache slot [0x88*4 into struct]
+.equ gFontState,                 0x0201f440  @ font rendering global state (91 raw refs)
+                                             @ confirmed from eval/080c7638.proposal.md: FONT_STATE_BASE=0x0201f440
+.equ gDuelCtx,                   0x02020160  @ duel context base (95 raw refs)
+                                             @ +0x2f51 = u8  zone display state flag (bit0)
+                                             @ confirmed from eval/080d0c7c.md
+.equ gDuelCardCtxBase,           0x0201e2a0  @ duel card activation context base (442 raw refs)
+                                             @ +0x4  = u32 current_player (eors with 0/1 in dispatch_card_display_op)
+                                             @ confirmed from eval/080566f4.proposal.md: ACTIVATION_STATE_BASE
+.equ gCardFsDataBlock,           0x0201e2b4  @ card FS slot data block base (4 raw refs; stride=0x108 per slot)
+.equ gCardIdCache,               0x0201ff60  @ EWRAM card id lookup/mapping cache (5 raw refs)
+.equ gCardListDisplayBuf,        0x02001138  @ card list slot display buffer (12 raw refs)
+.equ gZoneActivTable,            0x020230f0  @ zone activation player table (1 ref; 2-word array [player0,player1])
+                                             @ med-conf (single ref; semantics from indexing by player 0/1 context)
+.equ gDuelSceneBase,             0x02023360  @ duel scene / campaign card-select scene base (192 raw refs)
+                                             @ confirmed from eval/08028874.proposal.md: SCENE_BASE=0x02023360
+.equ gCardCtxSlotData,           0x0201ff30  @ card context slot data base (29 raw refs)
+                                             @ confirmed from eval/080c6240.proposal.md
+.equ gP1ZoneHandCount,           0x0201c4ec  @ = gP1LifePoints+0xc; player zone/hand count table base (23 raw refs)
+                                             @ confirmed from eval/08077678.md: LIST_A_BASE=0x0201c4ec
+
+@ duel field state offsets
+.equ DUEL_FIELD_FADEIN_FLAG_OFF,    0x21e   @ [gDuelFieldState+0x21e] bit0 = fadein active (31 raw refs)
+.equ DUEL_FIELD_PRNG_ANIM_FLAG_OFF, 0x222   @ [gDuelFieldState+0x222] bit2 = prng-driven anim (111 raw refs)
+.equ DUEL_FIELD_STATE_226_OFF,      0x226   @ [gDuelFieldState+0x226] bit0 = scene entry done (19 raw refs)
+.equ DUEL_CTX_ZONE_STATE_OFF,       0x2f51  @ [gDuelCtx+0x2f51] bit0 = zone display active (25 raw refs)
+.equ GPRNG_PRNG_STATE_OFF213,       0x213   @ [gPrng+0x213] bit7 = prng-anim state flag (37 raw refs)
+.equ GPRNG_PRNG_STATE_OFF217,       0x217   @ [gPrng+0x217] bit7 = prng-anim LP flag (12 raw refs)
+.equ GPRNG_BANNER_FLAG_OFF,         0x23f   @ [gPrng+0x23f] bit0 = banner-anim active (279 raw refs)
+.equ P1LP_BLOCK2_OFF,               0x1d08  @ [gP1LifePoints+0x1d08] duel field LP display field (35 raw refs)
+.equ P1LP_TIMER_OFF,                0x1cec  @ [gP1LifePoints+0x1cec] duel field timer field (29 raw refs)
+.equ PLAYER_BLOCK_STRIDE,           0x868   @ player data block stride (0x868=2152 bytes; 2146 raw refs)
+.equ GAME_STR_RAW_ID_MASK,     0xfffe0000   @ raw game string ID mask: bits[31:17]==0 (485 raw refs)
+
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
                                              @ +0x88 = u32 fs_load 返回的解压数据指针
                                              @ +0x8c = u32 packed bitfield

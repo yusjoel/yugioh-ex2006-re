@@ -1609,7 +1609,9 @@ banlist_handler_table:                         @ 0x09e58994 (3 THUMB fn-ptrs +1 
 sjis_char_fold_table:                            @ 0x09e589c4 (256B, 4 ROM refs; SJIS/ASCII char normalization: lowercase->uppercase fold + SJIS lead-byte remap)
 	.incbin "roms/2343.gba", 0x1E589C4, 0x100   @ sjis_char_fold_table body (256 B)
 card_type_alt_display_table:  @ 0x09e58ac4 (card type/display index mapping table, u16 pairs)
-	.incbin "roms/2343.gba", 0x1E58AC4, 0x248   @ remainder after table (0x368 - 0x20 - 0x100 = 0x248)
+	.incbin "roms/2343.gba", 0x1E58AC4, 0x44    @ card_type_alt_display_table u16 pairs (0x44 B)
+card_deck_fs_path_table:      @ 0x09e58b08 (deck FS path string pointer array; 100+ entries; 1 raw ref)
+	.incbin "roms/2343.gba", 0x1E58B08, 0x204   @ card_deck_fs_path_table body (0x248-0x44=0x204 B)
 
 @ Deck Record Table（原名 opponent_card_values，ROM偏移 0x1E58D0C - 0x1E59C2B）
 @ 121 条 × 32 B = 0xF20 B = 3872 B (Opponent 27 + Theme 52 + Limited 42)

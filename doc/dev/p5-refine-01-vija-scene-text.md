@@ -49,7 +49,7 @@
 | **2** | 0x1d448..0x1d998 (8fn) | ✅ | db3325d |
 | **3** | 0x1d998..0x1e36c (8fn) | ✅ | 1b683a0 |
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
-| 5 | 0x1e714..0x1f25c (8fn) | ⬜ | |
+| **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **TBD** |
 | 6 | 0x1f25c..0x20fa8 (8fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44) | ⬜ | |
 | 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
@@ -131,6 +131,23 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 3edab63
 
+### 4.05 Seg-5 完成记录 (2026-06-07)
+
+- 范围: 0x0801e714..0x0801f25c, 10 fn
+- 函数: tick_card_info_page_by_state / get_card_data_format_id / lookup_card_entry_by_index / load_card_fs_entry_to_struct / fill_card_fs_display_entries / fill_card_fs_display_entries_for_card_list / tick_duel_field_main_frame / dispatch_card_display_op / play_ui_effect / copy_game_text_if_raw
+- Ghidra 脚本: RefineF01Seg5Slots.py
+- EQ=50 (11 新全局: gDuelFieldState/gFontState/gDuelCtx/gDuelCardCtxBase/gCardFsDataBlock/gCardIdCache/gCardListDisplayBuf/gZoneActivTable[med]/gDuelSceneBase/gCardCtxSlotData/gP1ZoneHandCount; 11 偏移常量: DUEL_FIELD_FADEIN_FLAG_OFF/DUEL_FIELD_PRNG_ANIM_FLAG_OFF/DUEL_FIELD_STATE_226_OFF/DUEL_CTX_ZONE_STATE_OFF/GPRNG_PRNG_STATE_OFF213/GPRNG_PRNG_STATE_OFF217/GPRNG_BANNER_FLAG_OFF/P1LP_BLOCK2_OFF/P1LP_TIMER_OFF/PLAYER_BLOCK_STRIDE/GAME_STR_RAW_ID_MASK; 28 reuse)
+- RENAME=12 (6 PTR_gPrng + PTR_gP1LifePoints + DAT_0801f0b8/f1a4/f154 + 2 C13: DAT_0801e744/DAT_0801eb3c)
+- REF=3 (card_deck_fs_path_table + 2 jump table base ptrs)
+- FUNC_RENAME=0
+- PLATE=1 (play_ui_effect CJK->ASCII, 789 chars)
+- carve=1: card_deck_fs_path_table@0x09e58b08 (rom.s card_type_alt_display_table incbin 拆 0x44+label+0x204=0x248; byte-identical)
+- disasm=0 / §5.1=0 (段内无 ROM_INCBIN 块)
+- 新增 constants: ewram.inc +11 全局 + 11 偏移/掩码常量
+- 命名裁定: gDuelFieldState=0x02023130 (不改 gDuelFieldCtx; driver 裁定; reviewer 指出 asm/07 plate 非正式用同名于 0x0201bb90/0x0201b290, 但该地址无 .equ 定义; 0x02023130 用 gDuelFieldState 与现有 ewram.inc 无碰撞)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: TBD
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -145,7 +162,7 @@
 | Seg-2 | 0x1d448..0x1d998 | 8 | — | |
 | Seg-3 | 0x1d998..0x1e36c | 8 | — | ✅ |
 | Seg-4 | 0x1e36c..0x1e714 | 8 | — | ✅ |
-| Seg-5 | 0x1e714..0x1f25c | 8 | — | |
+| Seg-5 | 0x1e714..0x1f25c | 10 | — | ✅ |
 | Seg-6 | 0x1f25c..0x20fa8 | 8 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | 4 数据块 (文本/puzzle 资源?) |
 | Seg-7 | 0x20fa8..0x24868 | 8 | 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6 | 大数据区 (~6880B 块, ref-scan 分类) |
 | Seg-8 | 0x24868..0x27e44 | 8 | 0x2497c/0x78, 0x258f0/0x230 | |
