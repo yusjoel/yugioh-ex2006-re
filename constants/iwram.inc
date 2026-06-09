@@ -25,3 +25,5 @@
 
 @ Seg-8 addition: IWRAM OBJ attribute scratch buffer
 .equ IWRAM_OBJ_SCRATCH_BUF,       0x03000288  @ IWRAM OBJ attribute scratch buffer (0x118 bytes); 4 ROM refs
+@ Seg-9 addition: campaign OAM attribute buffer mid-point (gPrng+0x20c absolute)
+.equ tick_campaign_card_selector_oam_attr_buf, 0x0300024c  @ gPrng+0x20c; OAM attr buf accessed as table base; 1 ROM ref

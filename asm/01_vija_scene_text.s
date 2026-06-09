@@ -23391,8 +23391,65 @@ invoke_build_campaign_sprite_row_type6:
     bl build_campaign_sprite_row_by_type     @ 08027e48 fff726ff
     pop {r0}                                 @ 08027e4c 01bc
     bx r0                                    @ 08027e4e 0047
-    ROM_INCBIN 0x27e50, 0x6c
-    .word  0x08027ec0                     @ 08027ebc c07e0208
+tick_campaign_card_select_display_state__08027e50:
+    push {r4,r5,r6,r7,lr}                    @ 08027e50 f0b5
+    .hword 0x4657    @ 08027e52 5746
+    .hword 0x464e    @ 08027e54 4e46
+    .hword 0x4645    @ 08027e56 4546
+    push {r5,r6,r7}                          @ 08027e58 e0b4
+    ldr r4, tick_campaign_card_select_display_state_sp_adj @ 08027e5a 144c
+    add sp,r4                                @ 08027e5c a544
+    ldr r2, tick_campaign_card_select_display_state_gprng @ 08027e5e 144a
+    movs r1,#0xe0    @ 08027e60 e021
+    lsls r1,r1,#0x1    @ 08027e62 4900
+    adds r0,r2,r1    @ 08027e64 5018
+    ldr r1,[r0,#0x0]                         @ 08027e66 0168
+    ldr r3, tick_campaign_card_select_display_state_flag_off @ 08027e68 124b
+    adds r1,r1,r3    @ 08027e6a c918
+    movs r0,#0x1    @ 08027e6c 0120
+    ldrb r1,[r1,#0x0]                        @ 08027e6e 0978
+    ands r0,r1    @ 08027e70 0840
+    cmp r0,#0x0                              @ 08027e72 0028
+    bne LAB_08027f0a                         @ 08027e74 49d1
+    ldr r4, tick_campaign_card_select_display_state_step_off @ 08027e76 104c
+    adds r0,r2,r4    @ 08027e78 1019
+    ldrh r0,[r0,#0x0]                        @ 08027e7a 0088
+    lsls r0,r0,#0x12    @ 08027e7c 8004
+    lsrs r0,r0,#0x18    @ 08027e7e 000e
+    subs r0,#0x1e    @ 08027e80 1e38
+    lsls r0,r0,#0x10    @ 08027e82 0004
+    lsrs r0,r0,#0x10    @ 08027e84 000c
+    cmp r0,#0x13                             @ 08027e86 1328
+    bhi LAB_08027e8c                         @ 08027e88 00d8
+    b finalize_campaign_card_select_frame    @ 08027e8a bae2
+LAB_08027e8c:
+    .hword 0x4668    @ 08027e8c 6846
+    bl dequeue_prng_anim_entry               @ 08027e8e c5f035fc
+    cmp r0,#0x0                              @ 08027e92 0028
+    bne LAB_08027e98                         @ 08027e94 00d1
+    b finalize_campaign_card_select_frame    @ 08027e96 b4e2
+LAB_08027e98:
+    .hword 0x4668    @ 08027e98 6846
+    ldrh r0,[r0,#0x0]                        @ 08027e9a 0088
+    cmp r0,#0xf                              @ 08027e9c 0f28
+    bls LAB_08027ea2                         @ 08027e9e 00d9
+    b finalize_campaign_card_select_frame    @ 08027ea0 afe2
+LAB_08027ea2:
+    lsls r0,r0,#0x2    @ 08027ea2 8000
+    ldr r1, campaign_card_handler_table_ptr  @ 08027ea4 0549
+    adds r0,r0,r1    @ 08027ea6 4018
+    ldr r0,[r0,#0x0]                         @ 08027ea8 0068
+    .hword 0x4687    @ 08027eaa 8746
+tick_campaign_card_select_display_state_sp_adj:
+    .word  0xfffffdc4                     @ 08027eac c4fdffff  0xfffffdc4: negative sp adjustment for frame setup
+tick_campaign_card_select_display_state_gprng:
+    .word  gPrng                          @ 08027eb0 40000003
+tick_campaign_card_select_display_state_flag_off:
+    .word  GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF @ 08027eb4 84050000
+tick_campaign_card_select_display_state_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027eb8 02020000
+campaign_card_handler_table_ptr:
+    .word  0x08027ec0                     @ 08027ebc c07e0208  ptr to PTR_run_campaign_card_select_handler_0 jump dispatch table (0x10 entries)
 PTR_run_campaign_card_select_handler_0_08027ec0:
     .word  0x08027f00                     @ 08027ec0 007f0208
     .word  0x08027f48                     @ 08027ec4 487f0208
@@ -23411,7 +23468,7 @@ PTR_run_campaign_card_select_handler_0_08027ec0:
     .word  0x080282f0                     @ 08027ef8 f0820208
     .word  0x080283e8                     @ 08027efc e8830208
 
-@ Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 0 handler. No independent push prologue (inline exit fragment, inherits parent frame registers). Entry .hword 0x4668=mov r0,sp reads parent frame stack pointer; ldrh r1,[r0+2] reads SIO message sub_cmd; compares to 0x2c06 -- if not equal jumps LAB_08028404 (notifies parent frame no action taken). If equal: calls check_siocnt_link_ready to verify SIO ready; if not ready skips build_campaign_sprite_row_by_type(0); continues to read gPrng+OAM field to update OAM tile frame, then branches to LAB_080280b2 shared frame-end path. Called via PTR_FUN_08027ec0 entry index 0.
+@ Campaign card-select scene dispatch table (PTR_run_campaign_card_select_handler_0_08027ec0) case 0 handler. No independent push prologue (inline exit fragment, inherits parent frame registers). Entry .hword 0x4668=mov r0,sp reads parent frame stack pointer; ldrh r1,[r0+2] reads SIO message sub_cmd; compares to 0x2c06 -- if not equal jumps LAB_08028404 (notifies parent frame no action taken). If equal: calls check_siocnt_link_ready to verify SIO ready; if not ready skips build_campaign_sprite_row_by_type(0); continues to read gPrng+OAM field to update OAM tile frame, then branches to LAB_080280b2 shared frame-end path. Called via PTR_run_campaign_card_select_handler_0_08027ec0 entry index 0.
 @ 
 @ Params: r0=(none -- inline fragment, parent frame stack via mov r0,sp; no independent APCS input)
 @ Returns: void (b LAB_08028404 shared epilogue)
@@ -23420,14 +23477,15 @@ PTR_run_campaign_card_select_handler_0_08027ec0:
 run_campaign_card_select_handler_0:
     .hword 0x4668    @ 08027f00 6846
     ldrh r1,[r0,#0x2]                        @ 08027f02 4188
-    ldr r0, DWORD_08027f10                   @ 08027f04 0248
+    ldr r0, run_campaign_card_select_handler_0_sio_cmd @ 08027f04 0248
     cmp r1,r0                                @ 08027f06 8142
     beq LAB_08027f14                         @ 08027f08 04d0
+LAB_08027f0a:
     movs r0,#0x0    @ 08027f0a 0020
     b LAB_08028404                           @ 08027f0c 7ae2
     .zero  0x2
-DWORD_08027f10:
-    .word  0x00002c06                     @ 08027f10 062c0000
+run_campaign_card_select_handler_0_sio_cmd:
+    .word  CAMPAIGN_SIO_CMD_MATCH         @ 08027f10 062c0000
 LAB_08027f14:
     bl check_siocnt_link_ready               @ 08027f14 f7f740fa
     cmp r0,#0x0                              @ 08027f18 0028
@@ -23435,8 +23493,8 @@ LAB_08027f14:
     movs r0,#0x0    @ 08027f1c 0020
     bl build_campaign_sprite_row_by_type     @ 08027f1e fff7bbfe
 LAB_08027f22:
-    ldr r2, DWORD_08027f3c                   @ 08027f22 064a
-    ldr r5, DWORD_08027f40                   @ 08027f24 064d
+    ldr r2, run_campaign_card_select_handler_0_gprng @ 08027f22 064a
+    ldr r5, run_campaign_card_select_handler_0_step_off @ 08027f24 064d
     adds r2,r2,r5    @ 08027f26 5219
     ldrh r3,[r2,#0x0]                        @ 08027f28 1388
     lsls r1,r3,#0x12    @ 08027f2a 9904
@@ -23445,17 +23503,17 @@ LAB_08027f22:
     movs r0,#0xff    @ 08027f30 ff20
     ands r1,r0    @ 08027f32 0140
     lsls r1,r1,#0x6    @ 08027f34 8901
-    ldr r0, DWORD_08027f44                   @ 08027f36 0348
+    ldr r0, run_campaign_card_select_handler_0_step_mask @ 08027f36 0348
     ands r0,r3    @ 08027f38 1840
     b LAB_080280b2                           @ 08027f3a bae0
-DWORD_08027f3c:
+run_campaign_card_select_handler_0_gprng:
     .word  gPrng                          @ 08027f3c 40000003
-DWORD_08027f40:
-    .word  0x00000202                     @ 08027f40 02020000
-DWORD_08027f44:
-    .word  0xffffc03f                     @ 08027f44 3fc0ffff
+run_campaign_card_select_handler_0_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027f40 02020000
+run_campaign_card_select_handler_0_step_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027f44 3fc0ffff
 
-@ At index 1 of PTR_FUN_08027ec0 jump table (addr 0x08027ec4). Inline exit fragment, no push prologue; accesses parent frame data via r4 (= .hword 0x466c -> mov r4,sp; adds r4,#2 => sp+2 card data ptr). Copies r4+0..0xe (14 bytes) to destination struct (0x02023360+0xe), modifies 0x02023360+0x1d bit fields, handles r4[0xf] bit 0 (set/clear 0x02023360+0x1d bit 0x8), copies r4[0x10] bits to 0x02023360+0x1d, then increments gPrng+0x202 step counter field (+1 step) and branches to FUN_08028402 (parent frame epilogue). Syncs selected card data fields to display state struct 0x02023360 and advances card select step.
+@ At index 1 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (addr 0x08027ec4). Inline exit fragment, no push prologue; accesses parent frame data via r4 (= .hword 0x466c -> mov r4,sp; adds r4,#2 => sp+2 card data ptr). Copies r4+0..0xe (14 bytes) to destination struct (0x02023360+0xe), modifies 0x02023360+0x1d bit fields, handles r4[0xf] bit 0 (set/clear 0x02023360+0x1d bit 0x8), copies r4[0x10] bits to 0x02023360+0x1d, then increments gPrng+0x202 step counter field (+1 step) and branches to finalize_campaign_card_select_frame (parent frame epilogue). Syncs selected card data fields to display state struct 0x02023360 and advances card select step.
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360 (campaign card select display state base)
@@ -23466,8 +23524,8 @@ run_campaign_card_select_handler_1:
     .hword 0x466c    @ 08027f48 6c46
     adds r4,#0x2    @ 08027f4a 0234
     movs r2,#0x0    @ 08027f4c 0022
-    ldr r6, DWORD_08027fb8                   @ 08027f4e 1a4e
-    ldr r5, DWORD_08027fbc                   @ 08027f50 1a4d
+    ldr r6, run_campaign_card_select_handler_1_gprng @ 08027f4e 1a4e
+    ldr r5, run_campaign_card_select_handler_1_scene_base @ 08027f50 1a4d
     adds r3,r5,#0x0    @ 08027f52 2b1c
     adds r3,#0xe    @ 08027f54 0e33
 LAB_08027f56:
@@ -23502,11 +23560,11 @@ LAB_08027f56:
     ands r0,r1    @ 08027f8e 0840
     lsls r0,r0,#0xf    @ 08027f90 c003
     ldr r1,[r5,#0x1c]                        @ 08027f92 e969
-    ldr r2, DWORD_08027fc0                   @ 08027f94 0a4a
+    ldr r2, run_campaign_card_select_handler_1_copy_mask @ 08027f94 0a4a
     ands r1,r2    @ 08027f96 1140
     orrs r1,r0    @ 08027f98 0143
     str r1,[r5,#0x1c]                        @ 08027f9a e961
-    ldr r4, DWORD_08027fc4                   @ 08027f9c 094c
+    ldr r4, run_campaign_card_select_handler_1_step_off @ 08027f9c 094c
     adds r3,r6,r4    @ 08027f9e 3319
     ldrh r2,[r3,#0x0]                        @ 08027fa0 1a88
     lsls r1,r2,#0x12    @ 08027fa2 9104
@@ -23515,23 +23573,23 @@ LAB_08027f56:
     movs r0,#0xff    @ 08027fa8 ff20
     ands r1,r0    @ 08027faa 0140
     lsls r1,r1,#0x6    @ 08027fac 8901
-    ldr r0, DWORD_08027fc8                   @ 08027fae 0648
+    ldr r0, run_campaign_card_select_handler_1_step_mask @ 08027fae 0648
     ands r0,r2    @ 08027fb0 1040
     orrs r0,r1    @ 08027fb2 0843
     strh r0,[r3,#0x0]                        @ 08027fb4 1880
     b finalize_campaign_card_select_frame    @ 08027fb6 24e2
-DWORD_08027fb8:
+run_campaign_card_select_handler_1_gprng:
     .word  gPrng                          @ 08027fb8 40000003
-DWORD_08027fbc:
-    .word  0x02023360                     @ 08027fbc 60330202
-DWORD_08027fc0:
-    .word  0xffe07fff                     @ 08027fc0 ff7fe0ff
-DWORD_08027fc4:
-    .word  0x00000202                     @ 08027fc4 02020000
-DWORD_08027fc8:
-    .word  0xffffc03f                     @ 08027fc8 3fc0ffff
+run_campaign_card_select_handler_1_scene_base:
+    .word  gDuelSceneBase                 @ 08027fbc 60330202
+run_campaign_card_select_handler_1_copy_mask:
+    .word  CAMPAIGN_CARD_STEP_COPY_MASK   @ 08027fc0 ff7fe0ff
+run_campaign_card_select_handler_1_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027fc4 02020000
+run_campaign_card_select_handler_1_step_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027fc8 3fc0ffff
 
-@ At index 2 of PTR_FUN_08027ec0 jump table (0x08027ec8). Inline exit fragment, no push prologue. Reads parent frame r0 (sp, .hword 0x4668=mov r0,sp) [r0+2] halfword: extracts bits[1:0] writes to 0x02023360+0x36 bits[8:7] (lsls #7), clears and ORs in; extracts bit[2] writes to 0x02023360+0x37 bits[1:0]; extracts bits[7:3] writes to same byte bits[6:2]. Then checks 0x02023360+0x36 bits[10:9] (lsls #5; lsrs #0x1e): if <= 2 branches to FUN_08028402; otherwise reads gPrng+0x202 step field, loads 0x02023360+step*2 halfword, ANDs with mask then merges high bits (0xf0<<3=0x780), writes back to gPrng+0x202 step word.
+@ At index 2 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ec8). Inline exit fragment, no push prologue. Reads parent frame r0 (sp, .hword 0x4668=mov r0,sp) [r0+2] halfword: extracts bits[1:0] writes to 0x02023360+0x36 bits[8:7] (lsls #7), clears and ORs in; extracts bit[2] writes to 0x02023360+0x37 bits[1:0]; extracts bits[7:3] writes to same byte bits[6:2]. Then checks 0x02023360+0x36 bits[10:9] (lsls #5; lsrs #0x1e): if <= 2 branches to finalize_campaign_card_select_frame; otherwise reads gPrng+0x202 step field, loads 0x02023360+step*2 halfword, ANDs with mask then merges high bits (0xf0<<3=0x780), writes back to gPrng+0x202 step word.
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360
@@ -23539,13 +23597,13 @@ DWORD_08027fc8:
 @ MASK_CLEAR_HOFS = 0xfffffe7f (0x02023360+0x36 clear bits[8:7])
 @ STEP_HIGH_BITS = 0x780 (0xf0 << 3, step high bits mask)
 run_campaign_card_select_handler_2:
-    ldr r3, DWORD_08028028                   @ 08027fcc 164b
+    ldr r3, run_campaign_card_select_handler_2_scene_base @ 08027fcc 164b
     .hword 0x4668    @ 08027fce 6846
     ldrh r2,[r0,#0x2]                        @ 08027fd0 4288
     movs r1,#0x3    @ 08027fd2 0321
     ands r1,r2    @ 08027fd4 1140
     lsls r1,r1,#0x7    @ 08027fd6 c901
-    ldr r0, DWORD_0802802c                   @ 08027fd8 1448
+    ldr r0, run_campaign_card_select_handler_2_hb7_mask @ 08027fd8 1448
     ldrh r5,[r3,#0x36]                       @ 08027fda dd8e
     ands r0,r5    @ 08027fdc 2840
     orrs r0,r1    @ 08027fde 0843
@@ -23577,27 +23635,27 @@ run_campaign_card_select_handler_2:
     bhi LAB_08028016                         @ 08028012 00d8
     b finalize_campaign_card_select_frame    @ 08028014 f5e1
 LAB_08028016:
-    ldr r0, DWORD_08028030                   @ 08028016 0648
-    ldr r1, DWORD_08028034                   @ 08028018 0649
+    ldr r0, run_campaign_card_select_handler_2_gprng @ 08028016 0648
+    ldr r1, run_campaign_card_select_handler_2_step_off @ 08028018 0649
     adds r0,r0,r1    @ 0802801a 4018
-    ldr r1, DWORD_08028038                   @ 0802801c 0649
+    ldr r1, run_campaign_card_select_handler_2_step_mask @ 0802801c 0649
     ldrh r2,[r0,#0x0]                        @ 0802801e 0288
     ands r1,r2    @ 08028020 1140
     movs r3,#0xa0    @ 08028022 a023
     lsls r3,r3,#0x3    @ 08028024 db00
     b LAB_080281c0                           @ 08028026 cbe0
-DWORD_08028028:
-    .word  0x02023360                     @ 08028028 60330202
-DWORD_0802802c:
-    .word  0xfffffe7f                     @ 0802802c 7ffeffff
-DWORD_08028030:
+run_campaign_card_select_handler_2_scene_base:
+    .word  gDuelSceneBase                 @ 08028028 60330202
+run_campaign_card_select_handler_2_hb7_mask:
+    .word  GFX_ATTR_CLEAR_BITS_8_7        @ 0802802c 7ffeffff
+run_campaign_card_select_handler_2_gprng:
     .word  gPrng                          @ 08028030 40000003
-DWORD_08028034:
-    .word  0x00000202                     @ 08028034 02020000
-DWORD_08028038:
-    .word  0xffffc03f                     @ 08028038 3fc0ffff
+run_campaign_card_select_handler_2_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08028034 02020000
+run_campaign_card_select_handler_2_step_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08028038 3fc0ffff
 
-@ At index 4 of PTR_FUN_08027ec0 jump table (0x08027ed0). Inline exit fragment, no push prologue. Reads parent frame r3 (.hword 0x466b=mov r3,sp; adds r3,#2 => sp+2 = current card entry ptr). Loads card field from 0x02023360+0x17, extracts 5-bit value and writes to 0x0201e2a0+0x1e bits[7:3] (lsls #5); writes r5-sourced data to 0x0201e2a0+0x1f..0x34 (22-byte loop copy); reads [r5+4] flag, eors 1 (flips low bit), calls fill_card_fs_display_entries; reads gPrng+0x202 step word, checks bits[7:2] == 0x8 or 0x3c to decide branch path (write gPrng step +1 or direct epilogue). Fills card FS display data into EWRAM display buffer and updates step state.
+@ At index 4 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ed0). Inline exit fragment, no push prologue. Reads parent frame r3 (.hword 0x466b=mov r3,sp; adds r3,#2 => sp+2 = current card entry ptr). Loads card field from 0x02023360+0x17, extracts 5-bit value and writes to 0x0201e2a0+0x1e bits[7:3] (lsls #5); writes r5-sourced data to 0x0201e2a0+0x1f..0x34 (22-byte loop copy); reads [r5+4] flag, eors 1 (flips low bit), calls fill_card_fs_display_entries; reads gPrng+0x202 step word, checks bits[7:2] == 0x8 or 0x3c to decide branch path (write gPrng step +1 or direct epilogue). Fills card FS display data into EWRAM display buffer and updates step state.
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360
@@ -23608,7 +23666,7 @@ DWORD_08028038:
 run_campaign_card_select_handler_4:
     .hword 0x466b    @ 0802803c 6b46
     adds r3,#0x2    @ 0802803e 0233
-    ldr r0, DWORD_08028088                   @ 08028040 1148
+    ldr r0, run_campaign_card_select_handler_4_scene_base @ 08028040 1148
     ldrb r4,[r3,#0x17]                       @ 08028042 dc7d
     lsls r2,r4,#0x5    @ 08028044 6201
     movs r1,#0x1f    @ 08028046 1f21
@@ -23617,7 +23675,7 @@ run_campaign_card_select_handler_4:
     orrs r1,r2    @ 0802804c 1143
     strb r1,[r0,#0x1e]                       @ 0802804e 8177
     movs r2,#0x0    @ 08028050 0022
-    ldr r5, DWORD_0802808c                   @ 08028052 0e4d
+    ldr r5, run_campaign_card_select_handler_4_card_ctx_base @ 08028052 0e4d
     adds r4,r0,#0x0    @ 08028054 041c
     adds r4,#0x1f    @ 08028056 1f34
 LAB_08028058:
@@ -23633,8 +23691,8 @@ LAB_08028058:
     eors r0,r1    @ 0802806a 4840
     adds r1,r3,#0x0    @ 0802806c 191c
     bl fill_card_fs_display_entries          @ 0802806e f6f7effb
-    ldr r0, DWORD_08028090                   @ 08028072 0748
-    ldr r1, DWORD_08028094                   @ 08028074 0749
+    ldr r0, run_campaign_card_select_handler_4_gprng @ 08028072 0748
+    ldr r1, run_campaign_card_select_handler_4_step_off @ 08028074 0749
     adds r2,r0,r1    @ 08028076 4218
     ldrh r1,[r2,#0x0]                        @ 08028078 1188
     lsls r0,r1,#0x12    @ 0802807a 8804
@@ -23644,25 +23702,25 @@ LAB_08028058:
     cmp r0,#0x3c                             @ 08028082 3c28
     beq LAB_080280a8                         @ 08028084 10d0
     b finalize_campaign_card_select_frame    @ 08028086 bce1
-DWORD_08028088:
-    .word  0x02023360                     @ 08028088 60330202
-DWORD_0802808c:
-    .word  0x0201e2a0                     @ 0802808c a0e20102
-DWORD_08028090:
+run_campaign_card_select_handler_4_scene_base:
+    .word  gDuelSceneBase                 @ 08028088 60330202
+run_campaign_card_select_handler_4_card_ctx_base:
+    .word  gDuelCardCtxBase               @ 0802808c a0e20102
+run_campaign_card_select_handler_4_gprng:
     .word  gPrng                          @ 08028090 40000003
-DWORD_08028094:
-    .word  0x00000202                     @ 08028094 02020000
+run_campaign_card_select_handler_4_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08028094 02020000
 LAB_08028098:
-    ldr r0, DWORD_080280a4                   @ 08028098 0248
+    ldr r0, run_campaign_card_select_handler_4_step_mask_a @ 08028098 0248
     ands r0,r1    @ 0802809a 0840
     movs r3,#0xa0    @ 0802809c a023
     lsls r3,r3,#0x2    @ 0802809e 9b00
     adds r1,r3,#0x0    @ 080280a0 191c
     b LAB_080280b2                           @ 080280a2 06e0
-DWORD_080280a4:
-    .word  0xffffc03f                     @ 080280a4 3fc0ffff
+run_campaign_card_select_handler_4_step_mask_a:
+    .word  GPRNG_STEP_CTR_MASK            @ 080280a4 3fc0ffff
 LAB_080280a8:
-    ldr r0, DWORD_080280b8                   @ 080280a8 0348
+    ldr r0, run_campaign_card_select_handler_4_step_mask_b @ 080280a8 0348
     ands r0,r1    @ 080280aa 0840
     movs r4,#0x8c    @ 080280ac 8c24
     lsls r4,r4,#0x5    @ 080280ae 6401
@@ -23671,17 +23729,17 @@ LAB_080280b2:
     orrs r0,r1    @ 080280b2 0843
     strh r0,[r2,#0x0]                        @ 080280b4 1080
     b finalize_campaign_card_select_frame    @ 080280b6 a4e1
-DWORD_080280b8:
-    .word  0xffffc03f                     @ 080280b8 3fc0ffff
+run_campaign_card_select_handler_4_step_mask_b:
+    .word  GPRNG_STEP_CTR_MASK            @ 080280b8 3fc0ffff
 
-@ At index 3 of PTR_FUN_08027ec0 jump table (0x08027ecc). Shortest inline exit fragment (8 instructions), no push prologue. Reads byte at 0x02023360+0x36, sets bit 5 (OR 0x20), writes back; then branches to FUN_08028402 (parent frame epilogue). Sets bit5 of display state word at offset 0x36 in campaign card select display context, then immediately returns to parent frame. No parent frame data read.
+@ At index 3 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ecc). Shortest inline exit fragment (8 instructions), no push prologue. Reads byte at 0x02023360+0x36, sets bit 5 (OR 0x20), writes back; then branches to finalize_campaign_card_select_frame (parent frame epilogue). Sets bit5 of display state word at offset 0x36 in campaign card select display context, then immediately returns to parent frame. No parent frame data read.
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360
 @ STATUS_OFFSET = 0x36 (status byte offset)
 @ READY_BIT = 0x20 (bit5, set to indicate a ready/loaded state)
 run_campaign_card_select_handler_3:
-    ldr r1, DWORD_080280cc                   @ 080280bc 0349
+    ldr r1, run_campaign_card_select_handler_3_scene_base @ 080280bc 0349
     adds r1,#0x36    @ 080280be 3631
     movs r0,#0x20    @ 080280c0 2020
     ldrb r5,[r1,#0x0]                        @ 080280c2 0d78
@@ -23689,10 +23747,10 @@ run_campaign_card_select_handler_3:
     strb r0,[r1,#0x0]                        @ 080280c6 0870
     b finalize_campaign_card_select_frame    @ 080280c8 9be1
     .zero  0x2
-DWORD_080280cc:
-    .word  0x02023360                     @ 080280cc 60330202
+run_campaign_card_select_handler_3_scene_base:
+    .word  gDuelSceneBase                 @ 080280cc 60330202
 
-@ At index 5 of PTR_FUN_08027ec0 jump table (0x08027ed4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads current sprite state byte from 0x02023360+0x39, updates bit3 from [r0+2] halfword bit0 (lsls r1,#3) and bit2 from [sp+4] bit0, then ORs 0x10 (bit4 fixed set), writes back to 0x02023360+0x39; calls sync_state_and_init_sprite(r0=0x24) to init sprite; reads 0x02023360+0x3b then falls through to LAB_0802814a (shared convergence path with run_campaign_card_select_handler_6 for animation step processing).
+@ At index 5 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ed4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads current sprite state byte from 0x02023360+0x39, updates bit3 from [r0+2] halfword bit0 (lsls r1,#3) and bit2 from [sp+4] bit0, then ORs 0x10 (bit4 fixed set), writes back to 0x02023360+0x39; calls sync_state_and_init_sprite(r0=0x24) to init sprite; reads 0x02023360+0x3b then falls through to LAB_0802814a (shared convergence path with run_campaign_card_select_handler_6 for animation step processing).
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360
@@ -23700,7 +23758,7 @@ DWORD_080280cc:
 @ SPRITE_OAM_FLAG = 0x10 (bit4, fixed set)
 @ SPRITE_ID = 0x24 (sprite slot passed to sync_state_and_init_sprite)
 run_campaign_card_select_handler_5:
-    ldr r7, DWORD_08028114                   @ 080280d0 104f
+    ldr r7, run_campaign_card_select_handler_5_scene_base @ 080280d0 104f
     .hword 0x4668    @ 080280d2 6846
     ldrh r0,[r0,#0x2]                        @ 080280d4 4088
     adds r3,r7,#0x0    @ 080280d6 3b1c
@@ -23733,10 +23791,10 @@ run_campaign_card_select_handler_5:
     ldrb r5,[r3,#0x0]                        @ 0802810e 1d78
     b LAB_0802814a                           @ 08028110 1be0
     .zero  0x2
-DWORD_08028114:
-    .word  0x02023360                     @ 08028114 60330202
+run_campaign_card_select_handler_5_scene_base:
+    .word  gDuelSceneBase                 @ 08028114 60330202
 
-@ At index 6 of PTR_FUN_08027ec0 jump table (0x08027ed8). Inline exit fragment, no push prologue. Symmetric with handler index 5 (0x080280d0): reads parent frame r0 (.hword 0x4668=mov r0,sp), takes bit0 from [r0+2] halfword and eors 1 (flips it, unlike op5 which uses ands directly), updates 0x02023360+0x39 bit3 with flipped value (no bit2 update step); ORs 0x10 (bit4 fixed set), writes back; calls sync_state_and_init_sprite(r0=0x24); converges at LAB_0802814a (shared with op5 for animation step counter processing at 0x02023360+0x3a and 0x3c).
+@ At index 6 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ed8). Inline exit fragment, no push prologue. Symmetric with handler index 5 (0x080280d0): reads parent frame r0 (.hword 0x4668=mov r0,sp), takes bit0 from [r0+2] halfword and eors 1 (flips it, unlike op5 which uses ands directly), updates 0x02023360+0x39 bit3 with flipped value (no bit2 update step); ORs 0x10 (bit4 fixed set), writes back; calls sync_state_and_init_sprite(r0=0x24); converges at LAB_0802814a (shared with op5 for animation step counter processing at 0x02023360+0x3a and 0x3c).
 @ 
 @ Constants:
 @ DISPLAY_CTX_BASE = 0x02023360
@@ -23745,7 +23803,7 @@ DWORD_08028114:
 @ SPRITE_ID = 0x24 (sync_state_and_init_sprite param)
 @ BIT_FLIP_MASK = 0x1 (eors 1 => flips [r0+2] bit0, differs from op5 ands)
 run_campaign_card_select_handler_6:
-    ldr r7, DWORD_0802818c                   @ 08028118 1c4f
+    ldr r7, run_campaign_card_select_handler_6_scene_base @ 08028118 1c4f
     .hword 0x4668    @ 0802811a 6846
     ldrh r1,[r0,#0x2]                        @ 0802811c 4188
     movs r0,#0x1    @ 0802811e 0120
@@ -23797,18 +23855,18 @@ LAB_0802814a:
     ands r1,r2    @ 0802817a 1140
     orrs r1,r0    @ 0802817c 0143
     strb r1,[r4,#0x0]                        @ 0802817e 2170
-    ldr r0, DWORD_08028190                   @ 08028180 0348
+    ldr r0, run_campaign_card_select_handler_6_anim_mask @ 08028180 0348
     ldrh r3,[r7,#0x3a]                       @ 08028182 7b8f
     ands r0,r3    @ 08028184 1840
     strh r0,[r7,#0x3a]                       @ 08028186 7887
     b finalize_campaign_card_select_frame    @ 08028188 3be1
     .zero  0x2
-DWORD_0802818c:
-    .word  0x02023360                     @ 0802818c 60330202
-DWORD_08028190:
-    .word  0xfffffe03                     @ 08028190 03feffff
+run_campaign_card_select_handler_6_scene_base:
+    .word  gDuelSceneBase                 @ 0802818c 60330202
+run_campaign_card_select_handler_6_anim_mask:
+    .word  CAMPAIGN_CARD_ANIM_STEP_MASK   @ 08028190 03feffff
 
-@ Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 7 handler. No independent push prologue (inline exit fragment). Calls check_siocnt_link_ready; if SIO ready: reads parent frame sp+2 halfword (SIO received data), writes to 0x0201e2a0+0x10 (card_cmd field) and +0x0 (card_id field); calls build_campaign_sprite_row_by_type(7). Regardless of SIO state: reads gPrng+OAM field to update OAM attr (clears/sets bit1 by 3-bit truncation), sets r3=0xf0<<3=0x780, branches LAB_080281c0 to execute strh + b finalize_campaign_card_select_frame. Called via PTR_FUN_08027ec0 entry index 7 at table addr 0x08027edc.
+@ Campaign card-select scene dispatch table (PTR_run_campaign_card_select_handler_0_08027ec0) case 7 handler. No independent push prologue (inline exit fragment). Calls check_siocnt_link_ready; if SIO ready: reads parent frame sp+2 halfword (SIO received data), writes to 0x0201e2a0+0x10 (card_cmd field) and +0x0 (card_id field); calls build_campaign_sprite_row_by_type(7). Regardless of SIO state: reads gPrng+OAM field to update OAM attr (clears/sets bit1 by 3-bit truncation), sets r3=0xf0<<3=0x780, branches LAB_080281c0 to execute strh + b finalize_campaign_card_select_frame. Called via PTR_run_campaign_card_select_handler_0_08027ec0 entry index 7 at table addr 0x08027edc.
 @ 
 @ Params: r0=(none -- inline fragment, no APCS input)
 @ Returns: void (b finalize_campaign_card_select_frame)
@@ -23818,7 +23876,7 @@ run_campaign_card_select_handler_7:
     bl check_siocnt_link_ready               @ 08028194 f7f700f9
     cmp r0,#0x0                              @ 08028198 0028
     bne LAB_080281b0                         @ 0802819a 09d1
-    ldr r1, DWORD_080281c8                   @ 0802819c 0a49
+    ldr r1, run_campaign_card_select_handler_7_card_ctx_base @ 0802819c 0a49
     .hword 0x4668    @ 0802819e 6846
     ldrh r0,[r0,#0x2]                        @ 080281a0 4088
     str r0,[r1,#0x10]                        @ 080281a2 0861
@@ -23828,10 +23886,10 @@ run_campaign_card_select_handler_7:
     movs r0,#0x7    @ 080281aa 0720
     bl build_campaign_sprite_row_by_type     @ 080281ac fff774fd
 LAB_080281b0:
-    ldr r0, DWORD_080281cc                   @ 080281b0 0648
-    ldr r4, DWORD_080281d0                   @ 080281b2 074c
+    ldr r0, run_campaign_card_select_handler_7_gprng @ 080281b0 0648
+    ldr r4, run_campaign_card_select_handler_7_step_off @ 080281b2 074c
     adds r0,r0,r4    @ 080281b4 0019
-    ldr r1, DWORD_080281d4                   @ 080281b6 0749
+    ldr r1, run_campaign_card_select_handler_7_step_mask @ 080281b6 0749
     ldrh r5,[r0,#0x0]                        @ 080281b8 0588
     ands r1,r5    @ 080281ba 2940
     movs r3,#0xf0    @ 080281bc f023
@@ -23841,16 +23899,16 @@ LAB_080281c0:
     orrs r1,r2    @ 080281c2 1143
     strh r1,[r0,#0x0]                        @ 080281c4 0180
     b finalize_campaign_card_select_frame    @ 080281c6 1ce1
-DWORD_080281c8:
-    .word  0x0201e2a0                     @ 080281c8 a0e20102
-DWORD_080281cc:
+run_campaign_card_select_handler_7_card_ctx_base:
+    .word  gDuelCardCtxBase               @ 080281c8 a0e20102
+run_campaign_card_select_handler_7_gprng:
     .word  gPrng                          @ 080281cc 40000003
-DWORD_080281d0:
-    .word  0x00000202                     @ 080281d0 02020000
-DWORD_080281d4:
-    .word  0xffffc03f                     @ 080281d4 3fc0ffff
+run_campaign_card_select_handler_7_step_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 080281d0 02020000
+run_campaign_card_select_handler_7_step_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 080281d4 3fc0ffff
 
-@ At index 9 of PTR_FUN_08027ec0 jump table (0x08027ee4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads [r0+2] halfword as current step value: if > 0x3b (59) branches to FUN_08028402 (out of range, exit); if < 0 branches to FUN_08028402 (below minimum, exit); if in [0..59] falls to LAB_080281e8 (reads sp+0x11c frame slot, writes 4 into [sp+0x11c], continues processing). Validates parent frame step value in valid range [0..0x3b]; exits early if out of range.
+@ At index 9 of PTR_run_campaign_card_select_handler_0_08027ec0 jump table (0x08027ee4). Inline exit fragment, no push prologue. Reads parent frame r0 (.hword 0x4668=mov r0,sp), loads [r0+2] halfword as current step value: if > 0x3b (59) branches to finalize_campaign_card_select_frame (out of range, exit); if < 0 branches to finalize_campaign_card_select_frame (below minimum, exit); if in [0..59] falls to LAB_080281e8 (reads sp+0x11c frame slot, writes 4 into [sp+0x11c], continues processing). Validates parent frame step value in valid range [0..0x3b]; exits early if out of range.
 @ 
 @ Constants:
 @ STEP_MAX = 0x3b = 59 (valid step upper bound)
@@ -23874,12 +23932,12 @@ LAB_080281e8:
     .hword 0x4668    @ 080281ee 6846
     ldrh r0,[r0,#0x2]                        @ 080281f0 4088
     strh r0,[r6,#0x2]                        @ 080281f2 7080
-    ldr r7, DWORD_08028258                   @ 080281f4 184f
+    ldr r7, run_campaign_card_select_handler_9_ewram_base @ 080281f4 184f
     .hword 0x4668    @ 080281f6 6846
     ldrh r2,[r0,#0x2]                        @ 080281f8 4288
     lsrs r1,r2,#0x5    @ 080281fa 5109
     lsls r1,r1,#0x2    @ 080281fc 8900
-    ldr r5, DWORD_0802825c                   @ 080281fe 174d
+    ldr r5, run_campaign_card_select_handler_9_chall_bits_off @ 080281fe 174d
     adds r4,r7,r5    @ 08028200 7c19
     adds r1,r1,r4    @ 08028202 0919
     movs r5,#0x1f    @ 08028204 1f25
@@ -23910,7 +23968,7 @@ LAB_080281e8:
     lsls r1,r1,#0x2    @ 08028236 8900
     subs r1,r1,r2    @ 08028238 891a
     lsls r1,r1,#0x3    @ 0802823a c900
-    ldr r3, DWORD_08028260                   @ 0802823c 084b
+    ldr r3, run_campaign_card_select_handler_9_sprite_ctx_off @ 0802823c 084b
     adds r2,r7,r3    @ 0802823e fa18
     adds r1,r1,r2    @ 08028240 8918
     movs r2,#0x8c    @ 08028242 8c22
@@ -23922,19 +23980,19 @@ LAB_080281e8:
     bl write_sprite_row_to_vram_buffer       @ 08028250 c5f002fb
     b finalize_campaign_card_select_frame    @ 08028254 d5e0
     .zero  0x2
-DWORD_08028258:
-    .word  0x02000000                     @ 08028258 00000002
-DWORD_0802825c:
-    .word  0x000053f0                     @ 0802825c f0530000
-DWORD_08028260:
-    .word  0x00001250                     @ 08028260 50120000
+run_campaign_card_select_handler_9_ewram_base:
+    .word  EWRAM_BASE                     @ 08028258 00000002
+run_campaign_card_select_handler_9_chall_bits_off:
+    .word  GSETTINGS_FONT_TABLE_OFF       @ 0802825c f0530000
+run_campaign_card_select_handler_9_sprite_ctx_off:
+    .word  GSETTINGS_TEXT_FIELD_A_OFF     @ 08028260 50120000
 LAB_08028264:
     adds r0,r6,#0x0    @ 08028264 301c
     movs r1,#0x6    @ 08028266 0621
     bl write_sprite_row_to_vram_buffer       @ 08028268 c5f0f6fa
     b finalize_campaign_card_select_frame    @ 0802826c c9e0
 
-@ Function: PTR_FUN_08027ec0 jump table index 10 handler for campaign card select. Reads parent frame sp+0x11c for sprite_row descriptor address, writes attr0=4 (8x8 obj), attr1 (y=0x1ff), attr2=1 (tile_idx=1), then calls copy_bytes_by_halfword to copy 0x8c*2=0x118 bytes of prototype row data from 0x02001138 into sp+0x11c, then calls write_sprite_row_to_vram_buffer with tile_base_y=0x11e (0x8f<<1) to commit OBJ VRAM row write. No own push prologue; this is a parent-frame inline exit fragment that jumps to parent frame shared epilogue via b FUN_08028402.
+@ Function: PTR_run_campaign_card_select_handler_0_08027ec0 jump table index 10 handler for campaign card select. Reads parent frame sp+0x11c for sprite_row descriptor address, writes attr0=4 (8x8 obj), attr1 (y=0x1ff), attr2=1 (tile_idx=1), then calls copy_bytes_by_halfword to copy 0x8c*2=0x118 bytes of prototype row data from 0x02001138 into sp+0x11c, then calls write_sprite_row_to_vram_buffer with tile_base_y=0x11e (0x8f<<1) to commit OBJ VRAM row write. No own push prologue; this is a parent-frame inline exit fragment that jumps to parent frame shared epilogue via b finalize_campaign_card_select_frame.
 @ 
 @ Side effects: OBJ VRAM written via write_sprite_row_to_vram_buffer.
 @ 
@@ -23949,14 +24007,14 @@ run_campaign_card_select_handler_10:
     add r4,sp,#0x11c                         @ 0802826e 47ac
     movs r0,#0x4    @ 08028270 0420
     strh r0,[r4,#0x0]                        @ 08028272 2080
-    ldr r0, DWORD_08028298                   @ 08028274 0848
+    ldr r0, run_campaign_card_select_handler_10_oam_hidden @ 08028274 0848
     strh r0,[r4,#0x2]                        @ 08028276 6080
     movs r0,#0x1    @ 08028278 0120
     strh r0,[r4,#0x4]                        @ 0802827a a080
     movs r0,#0x91    @ 0802827c 9120
     lsls r0,r0,#0x1    @ 0802827e 4000
     add r0,sp                                @ 08028280 6844
-    ldr r1, DWORD_0802829c                   @ 08028282 0649
+    ldr r1, run_campaign_card_select_handler_10_proto_row_slot @ 08028282 0649
     movs r2,#0x8c    @ 08028284 8c22
     lsls r2,r2,#0x1    @ 08028286 5200
     bl copy_bytes_by_halfword                @ 08028288 ccf00cfe
@@ -23965,12 +24023,12 @@ run_campaign_card_select_handler_10:
     adds r0,r4,#0x0    @ 08028290 201c
     bl write_sprite_row_to_vram_buffer       @ 08028292 c5f0e1fa
     b finalize_campaign_card_select_frame    @ 08028296 b4e0
-DWORD_08028298:
-    .word  0x0000ffff                     @ 08028298 ffff0000
-DWORD_0802829c:
-    .word  0x02001138                     @ 0802829c 38110002
+run_campaign_card_select_handler_10_oam_hidden:
+    .word  OAM_ATTR0_HIDDEN               @ 08028298 ffff0000
+run_campaign_card_select_handler_10_proto_row_slot:
+    .word  run_campaign_card_select_handler_10_proto_row @ 0802829c 38110002
 
-@ Function: PTR_FUN_08027ec0 jump table index 11 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp to get parent frame stack pointer; ldrh r0,[r0,#2] reads sp+2 halfword as hand_oam_slot_id; movs r1,#1; bl apply_delta_to_hand_oam_entry applies delta=+1 to hand OAM entry (scroll forward). Then b LAB_080282b6 to init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(0x8) shared tail before entering parent frame epilogue.
+@ Function: PTR_run_campaign_card_select_handler_0_08027ec0 jump table index 11 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp to get parent frame stack pointer; ldrh r0,[r0,#2] reads sp+2 halfword as hand_oam_slot_id; movs r1,#1; bl apply_delta_to_hand_oam_entry applies delta=+1 to hand OAM entry (scroll forward). Then b LAB_080282b6 to init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(0x8) shared tail before entering parent frame epilogue.
 @ 
 @ Side effects: OAM hand entry y-offset modified via apply_delta_to_hand_oam_entry.
 @ 
@@ -23983,7 +24041,7 @@ run_campaign_card_select_handler_11:
     bl apply_delta_to_hand_oam_entry         @ 080282a6 d0f0d5fe
     b LAB_080282b6                           @ 080282aa 04e0
 
-@ Campaign card-select scene dispatch table (PTR_FUN_08027ec0) case 12 handler. No independent push prologue (inline exit fragment). .hword 0x4668=mov r0,sp reads parent frame stack; ldrh r0,[r0+2] reads SIO received halfword; movs r1,#1; bl apply_delta_to_hand_oam_entry__080f90a8 applies delta=+1 to hand OAM entry (scroll up). Then jumps to LAB_080282b6 shared tail: init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(8) + b finalize_campaign_card_select_frame. Only difference from run_campaign_card_select_handler_11 (0x080282a0): calls apply_delta_to_hand_oam_entry__080f90a8 instead of apply_delta_to_hand_oam_entry. Called via PTR_FUN_08027ec0 entry index 12 at table addr 0x08027ef0.
+@ Campaign card-select scene dispatch table (PTR_run_campaign_card_select_handler_0_08027ec0) case 12 handler. No independent push prologue (inline exit fragment). .hword 0x4668=mov r0,sp reads parent frame stack; ldrh r0,[r0+2] reads SIO received halfword; movs r1,#1; bl apply_delta_to_hand_oam_entry__080f90a8 applies delta=+1 to hand OAM entry (scroll up). Then jumps to LAB_080282b6 shared tail: init_puzzle_wram_then_copy + build_campaign_sprite_row_by_type(8) + b finalize_campaign_card_select_frame. Only difference from run_campaign_card_select_handler_11 (0x080282a0): calls apply_delta_to_hand_oam_entry__080f90a8 instead of apply_delta_to_hand_oam_entry. Called via PTR_run_campaign_card_select_handler_0_08027ec0 entry index 12 at table addr 0x08027ef0.
 @ 
 @ Params: r0=(none -- inline fragment, no APCS input)
 @ Returns: void (b finalize_campaign_card_select_frame)
@@ -24000,7 +24058,7 @@ LAB_080282b6:
     bl build_campaign_sprite_row_by_type     @ 080282bc fff7ecfc
     b finalize_campaign_card_select_frame    @ 080282c0 9fe0
 
-@ Function: PTR_FUN_08027ec0 jump table index 13 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh player profile sprite row; then iterates hand OAM entry array (reads hand_count halfword from 0x095b7cca, calls apply_delta_to_hand_oam_entry(idx, delta=1) for each index in [0..hand_count), scrolling all hand OAM entry y-offsets); skips loop if hand_count==0. Finally b FUN_08028402 to parent frame shared epilogue.
+@ Function: PTR_run_campaign_card_select_handler_0_08027ec0 jump table index 13 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh player profile sprite row; then iterates hand OAM entry array (reads hand_count halfword from 0x095b7cca, calls apply_delta_to_hand_oam_entry(idx, delta=1) for each index in [0..hand_count), scrolling all hand OAM entry y-offsets); skips loop if hand_count==0. Finally b finalize_campaign_card_select_frame to parent frame shared epilogue.
 @ 
 @ Side effects: all hand OAM entry y-offsets +1; build_campaign_sprite_row_by_type writes VRAM.
 @ 
@@ -24012,7 +24070,7 @@ run_campaign_card_select_handler_13:
     movs r0,#0x8    @ 080282c2 0820
     bl build_campaign_sprite_row_by_type     @ 080282c4 fff7e8fc
     movs r4,#0x0    @ 080282c8 0024
-    ldr r0, DWORD_080282ec                   @ 080282ca 0848
+    ldr r0, run_campaign_card_select_handler_13_hand_array @ 080282ca 0848
     ldrh r5,[r0,#0x0]                        @ 080282cc 0588
     cmp r4,r5                                @ 080282ce ac42
     blt LAB_080282d4                         @ 080282d0 00db
@@ -24030,10 +24088,10 @@ LAB_080282d6:
     blt LAB_080282d6                         @ 080282e6 f6db
     b finalize_campaign_card_select_frame    @ 080282e8 8be0
     .zero  0x2
-DWORD_080282ec:
-    .word  0x095b7cca                     @ 080282ec ca7c5b09
+run_campaign_card_select_handler_13_hand_array:
+    .word  0x095b7cca                     @ 080282ec ca7c5b09  0x095b7cca: campaign hand OAM array; target in card-image-index.s
 
-@ Function: PTR_FUN_08027ec0 jump table index 14 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh sprite row; then iterates 0x7d (125) challenge records (r5 in [0..0x7c]) in three segments: expert [0..0x22], standard [0x23..0x4b], duel_puzzle [0x4c..0x7c]. For each challenge record reads completion status halfword[+8]; if 0x7 (completed), modifies ROM flag byte [r4+0] bits[1:0] via bit operations (also computes y-sprite scale offset written back to [r4+0]); if 0x4 (special state, only duel_puzzle segment), clears that field. Each iteration advances r10/r9/r8/r4 by 0xc bytes. After loop calls init_puzzle_wram_then_copy, then b FUN_08028402.
+@ Function: PTR_run_campaign_card_select_handler_0_08027ec0 jump table index 14 handler for campaign card select. Calls build_campaign_sprite_row_by_type(0x8) to refresh sprite row; then iterates 0x7d (125) challenge records (r5 in [0..0x7c]) in three segments: expert [0..0x22], standard [0x23..0x4b], duel_puzzle [0x4c..0x7c]. For each challenge record reads completion status halfword[+8]; if 0x7 (completed), modifies ROM flag byte [r4+0] bits[1:0] via bit operations (also computes y-sprite scale offset written back to [r4+0]); if 0x4 (special state, only duel_puzzle segment), clears that field. Each iteration advances r10/r9/r8/r4 by 0xc bytes. After loop calls init_puzzle_wram_then_copy, then b finalize_campaign_card_select_frame.
 @ 
 @ Side effects: ROM flag table [r4+0] challenge completion status bits modified; init_puzzle_wram_then_copy side effects.
 @ 
@@ -24053,15 +24111,15 @@ run_campaign_card_select_handler_14:
     movs r0,#0x8    @ 080282f0 0820
     bl build_campaign_sprite_row_by_type     @ 080282f2 fff7d1fc
     movs r5,#0x0    @ 080282f6 0025
-    ldr r0, DWORD_080283ac                   @ 080282f8 2c48
+    ldr r0, run_campaign_card_select_handler_14_ewram @ 080282f8 2c48
     movs r6,#0x3    @ 080282fa 0326
-    ldr r1, DWORD_080283b0                   @ 080282fc 2c49
+    ldr r1, run_campaign_card_select_handler_14_ewram_neg_off_a @ 080282fc 2c49
     .hword 0x468a    @ 080282fe 8a46
-    ldr r2, DWORD_080283b4                   @ 08028300 2c4a
+    ldr r2, run_campaign_card_select_handler_14_ewram_neg_off_b @ 08028300 2c4a
     .hword 0x4691    @ 08028302 9146
-    ldr r3, DWORD_080283b8                   @ 08028304 2c4b
+    ldr r3, run_campaign_card_select_handler_14_challenge_entry_off @ 08028304 2c4b
     adds r4,r0,r3    @ 08028306 c418
-    ldr r7, DWORD_080283bc                   @ 08028308 2c4f
+    ldr r7, run_campaign_card_select_handler_14_challenge_flag_mask @ 08028308 2c4f
     .hword 0x46a8    @ 0802830a a846
 LAB_0802830c:
     ldrb r1,[r4,#0x0]                        @ 0802830c 2178
@@ -24081,7 +24139,7 @@ LAB_08028320:
     bl get_expert_challenge_count            @ 08028324 b9f030fa
     cmp r5,r0                                @ 08028328 8542
     bge LAB_0802834c                         @ 0802832a 0fda
-    ldr r0, DWORD_080283c0                   @ 0802832c 2448
+    ldr r0, run_campaign_card_select_handler_14_expert_base @ 0802832c 2448
     add r0,r8                                @ 0802832e 4044
     ldrh r0,[r0,#0x8]                        @ 08028330 0089
     cmp r0,#0x7                              @ 08028332 0728
@@ -24104,7 +24162,7 @@ LAB_0802834c:
     adds r0,#0x23    @ 08028354 2330
     cmp r5,r0                                @ 08028356 8542
     bge LAB_0802837a                         @ 08028358 0fda
-    ldr r0, DWORD_080283c4                   @ 0802835a 1a48
+    ldr r0, run_campaign_card_select_handler_14_standard_base @ 0802835a 1a48
     add r0,r9                                @ 0802835c 4844
     ldrh r0,[r0,#0x8]                        @ 0802835e 0089
     cmp r0,#0x7                              @ 08028360 0728
@@ -24127,7 +24185,7 @@ LAB_0802837a:
     adds r0,#0x4c    @ 08028382 4c30
     cmp r5,r0                                @ 08028384 8542
     bge LAB_080283d2                         @ 08028386 24da
-    ldr r0, DWORD_080283c8                   @ 08028388 0f48
+    ldr r0, run_campaign_card_select_handler_14_puzzle_base @ 08028388 0f48
     add r0,r10                               @ 0802838a 5044
     ldrh r0,[r0,#0x8]                        @ 0802838c 0089
     cmp r0,#0x4                              @ 0802838e 0428
@@ -24145,22 +24203,22 @@ LAB_0802837a:
     ands r0,r2    @ 080283a6 1040
     orrs r0,r1    @ 080283a8 0843
     b LAB_080283d0                           @ 080283aa 11e0
-DWORD_080283ac:
-    .word  0x02000000                     @ 080283ac 00000002
-DWORD_080283b0:
-    .word  0xfffffc70                     @ 080283b0 70fcffff
-DWORD_080283b4:
-    .word  0xfffffe5c                     @ 080283b4 5cfeffff
-DWORD_080283b8:
-    .word  0x00006c3c                     @ 080283b8 3c6c0000
-DWORD_080283bc:
-    .word  0x0000e0fc                     @ 080283bc fce00000
-DWORD_080283c0:
-    .word  0x09e5e80c                     @ 080283c0 0ce8e509
-DWORD_080283c4:
-    .word  0x09e5e620                     @ 080283c4 20e6e509
-DWORD_080283c8:
-    .word  0x09e5e9cc                     @ 080283c8 cce9e509
+run_campaign_card_select_handler_14_ewram:
+    .word  EWRAM_BASE                     @ 080283ac 00000002
+run_campaign_card_select_handler_14_ewram_neg_off_a:
+    .word  0xfffffc70                     @ 080283b0 70fcffff  0xfffffc70: negative offset into EWRAM for campaign struct ptr
+run_campaign_card_select_handler_14_ewram_neg_off_b:
+    .word  0xfffffe5c                     @ 080283b4 5cfeffff  0xfffffe5c: similar negative EWRAM offset
+run_campaign_card_select_handler_14_challenge_entry_off:
+    .word  GPRNG_CHALLENGE_ENTRY_OFF      @ 080283b8 3c6c0000
+run_campaign_card_select_handler_14_challenge_flag_mask:
+    .word  0x0000e0fc                     @ 080283bc fce00000  0x0000e0fc: challenge completion/sprite flag bitmask
+run_campaign_card_select_handler_14_expert_base:
+    .word  expert_challenge_record_array  @ 080283c0 0ce8e509
+run_campaign_card_select_handler_14_standard_base:
+    .word  standard_challenge_record_array @ 080283c4 20e6e509
+run_campaign_card_select_handler_14_puzzle_base:
+    .word  puzzle_challenge_record_array  @ 080283c8 cce9e509
 LAB_080283cc:
     ldr r0,[r4,#0x0]                         @ 080283cc 2068
     ands r0,r6    @ 080283ce 3040
@@ -24178,7 +24236,7 @@ LAB_080283d2:
     bl init_puzzle_wram_then_copy            @ 080283e2 d1f051fc
     b finalize_campaign_card_select_frame    @ 080283e6 0ce0
 
-@ Function: PTR_FUN_08027ec0 jump table index 15 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp gets parent frame sp; ldrh r0,[r0,#2] reads sp+2 halfword as money_delta low 16 bits; .hword 0x4669=mov r1,sp; ldrh r1,[r1,#4] reads sp+4 halfword as money_delta high 16 bits; orrs r0,r1<<16 combines to 32-bit money value; bl accrue_money_with_cap accumulates money (with cap). Then bl init_puzzle_wram_then_copy, movs r0,#8, bl build_campaign_sprite_row_by_type(8) refreshes sprite row, then enters parent frame epilogue.
+@ Function: PTR_run_campaign_card_select_handler_0_08027ec0 jump table index 15 handler for campaign card select. No own push prologue (inline exit fragment). .hword 0x4668 = mov r0,sp gets parent frame sp; ldrh r0,[r0,#2] reads sp+2 halfword as money_delta low 16 bits; .hword 0x4669=mov r1,sp; ldrh r1,[r1,#4] reads sp+4 halfword as money_delta high 16 bits; orrs r0,r1<<16 combines to 32-bit money value; bl accrue_money_with_cap accumulates money (with cap). Then bl init_puzzle_wram_then_copy, movs r0,#8, bl build_campaign_sprite_row_by_type(8) refreshes sprite row, then enters parent frame epilogue.
 @ 
 @ Side effects: player money state updated via accrue_money_with_cap; init_puzzle_wram_then_copy side effects; VRAM OBJ via build_campaign_sprite_row_by_type.
 @ 
@@ -24196,7 +24254,7 @@ run_campaign_card_select_handler_15:
     movs r0,#0x8    @ 080283fc 0820
     bl build_campaign_sprite_row_by_type     @ 080283fe fff74bfc
 
-@ Function: shared epilogue fragment for campaign card select parent frame. PTR_FUN_08027ec0[8] points directly here; all handler_10..15 also jump here via "b FUN_08028402". Entry sets r0=1 (frame processing done / tick done), then restores r8/r9/r10/r4/r5/r6/r7 callee-save values via pop/mov sequence, then pop {r1}; bx r1 returns (Sub-case E: return value in r0 unaffected by pop). Essentially the unified exit path for the parent frame (large switch-driven frame function).
+@ Function: shared epilogue fragment for campaign card select parent frame. PTR_run_campaign_card_select_handler_0_08027ec0[8] points directly here; all handler_10..15 also jump here via "b FUN_08028402". Entry sets r0=1 (frame processing done / tick done), then restores r8/r9/r10/r4/r5/r6/r7 callee-save values via pop/mov sequence, then pop {r1}; bx r1 returns (Sub-case E: return value in r0 unaffected by pop). Essentially the unified exit path for the parent frame (large switch-driven frame function).
 @ 
 @ Side effects: none; restores calling-convention registers.
 @ 
@@ -24261,9 +24319,9 @@ render_campaign_text_line_centered:
     adds r0,r6,#0x0    @ 0802844c 301c
     adds r1,r7,#0x0    @ 0802844e 391c
     bl setup_line_buf_pos_and_font           @ 08028450 c8f0b0fb
-    ldr r2, DWORD_08028554                   @ 08028454 3f4a
-    ldr r0, DWORD_08028558                   @ 08028456 4048
-    ldr r1, DWORD_0802855c                   @ 08028458 4049
+    ldr r2, render_campaign_text_line_centered_font_ctx @ 08028454 3f4a
+    ldr r0, render_campaign_text_line_centered_ewram @ 08028456 4048
+    ldr r1, render_campaign_text_line_centered_gsettings_off @ 08028458 4049
     adds r0,r0,r1    @ 0802845a 4018
     movs r1,#0x7    @ 0802845c 0721
     ldrb r0,[r0,#0x0]                        @ 0802845e 0078
@@ -24278,7 +24336,7 @@ render_campaign_text_line_centered:
     movs r1,#0x2    @ 08028470 0221
     orrs r0,r1    @ 08028472 0843
     strb r0,[r2,#0x8]                        @ 08028474 1072
-    ldr r3, DWORD_08028560                   @ 08028476 3a4b
+    ldr r3, render_campaign_text_line_centered_font_table @ 08028476 3a4b
     lsls r1,r0,#0x1e    @ 08028478 8107
     lsrs r1,r1,#0x1f    @ 0802847a c90f
     lsls r1,r1,#0x2    @ 0802847c 8900
@@ -24309,7 +24367,7 @@ LAB_080284a4:
     ldr r3,[sp,#0x20]                        @ 080284ae 089b
     bl text_render_wrapper                   @ 080284b0 caf0e4fa
     lsls r4,r5,#0x5    @ 080284b4 6c01
-    ldr r0, DWORD_08028564                   @ 080284b6 2b48
+    ldr r0, render_campaign_text_line_centered_bg_vram @ 080284b6 2b48
     adds r4,r4,r0    @ 080284b8 2418
     lsls r0,r7,#0x5    @ 080284ba 7801
     adds r1,r6,#0x0    @ 080284bc 311c
@@ -24395,16 +24453,16 @@ LAB_08028544:
     pop {r0}                                 @ 0802854e 01bc
     bx r0                                    @ 08028550 0047
     .zero  0x2
-DWORD_08028554:
-    .word  0x02006ed0                     @ 08028554 d06e0002
-DWORD_08028558:
-    .word  0x02000000                     @ 08028558 00000002
-DWORD_0802855c:
-    .word  0x00006c2c                     @ 0802855c 2c6c0000
-DWORD_08028560:
+render_campaign_text_line_centered_font_ctx:
+    .word  gFontJpCtx                     @ 08028554 d06e0002
+render_campaign_text_line_centered_ewram:
+    .word  EWRAM_BASE                     @ 08028558 00000002
+render_campaign_text_line_centered_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802855c 2c6c0000
+render_campaign_text_line_centered_font_table:
     .word  font_jp_base_table             @ 08028560 54f8e509
-DWORD_08028564:
-    .word  0x06004000                     @ 08028564 00400006
+render_campaign_text_line_centered_bg_vram:
+    .word  BG_CHAR_VRAM_CB2               @ 08028564 00400006
 
 @ Function: campaign card select screen text line renderer (aligned variant). Structure highly symmetric with render_campaign_text_line_centered (0x08028418); differences: uses setup_line_buf_with_font_and_align instead of setup_line_buf_pos_and_font (extra align=2, color=1 params); reads sp[0x2c] as bool_center (6th param, frame=0x28, sp[0x2c]=2nd stack arg), performs center offset calculation (calls count_bytes_until_null) only when bool_center!=0; when bool_center==0 skips centering and calls setup directly with r0=r8 (col_x). Reads sp[0x28] as text_str passed to text_render_wrapper. Remaining flow (style bits write / text_render_wrapper / zero_fill / commit_line_buffer_to_sprite_vram / tile write loop) identical to centered variant. Exit pop {r1}; bx r1 (Sub-case E).
 @ 
@@ -24463,9 +24521,9 @@ LAB_080285b2:
     movs r2,#0x1    @ 080285b6 0122
     movs r3,#0x2    @ 080285b8 0223
     bl setup_line_buf_with_font_and_align    @ 080285ba c8f081fb
-    ldr r2, DWORD_08028680                   @ 080285be 304a
-    ldr r0, DWORD_08028684                   @ 080285c0 3048
-    ldr r3, DWORD_08028688                   @ 080285c2 314b
+    ldr r2, render_campaign_text_line_with_align_font_ctx @ 080285be 304a
+    ldr r0, render_campaign_text_line_with_align_ewram @ 080285c0 3048
+    ldr r3, render_campaign_text_line_with_align_gsettings_off @ 080285c2 314b
     adds r0,r0,r3    @ 080285c4 c018
     movs r1,#0x7    @ 080285c6 0721
     ldrb r0,[r0,#0x0]                        @ 080285c8 0078
@@ -24480,7 +24538,7 @@ LAB_080285b2:
     movs r1,#0x2    @ 080285da 0221
     orrs r0,r1    @ 080285dc 0843
     strb r0,[r2,#0x8]                        @ 080285de 1072
-    ldr r3, DWORD_0802868c                   @ 080285e0 2a4b
+    ldr r3, render_campaign_text_line_with_align_font_table @ 080285e0 2a4b
     lsls r1,r0,#0x1e    @ 080285e2 8107
     lsrs r1,r1,#0x1f    @ 080285e4 c90f
     lsls r1,r1,#0x2    @ 080285e6 8900
@@ -24512,7 +24570,7 @@ LAB_08028610:
     ldr r3,[sp,#0x28]                        @ 0802861a 0a9b
     bl text_render_wrapper                   @ 0802861c caf02efa
     lsls r4,r5,#0x5    @ 08028620 6c01
-    ldr r0, DWORD_08028690                   @ 08028622 1b48
+    ldr r0, render_campaign_text_line_with_align_bg_vram @ 08028622 1b48
     adds r4,r4,r0    @ 08028624 2418
     lsls r0,r7,#0x5    @ 08028626 7801
     adds r1,r6,#0x0    @ 08028628 311c
@@ -24561,16 +24619,16 @@ LAB_0802866e:
     pop {r0}                                 @ 0802867a 01bc
     bx r0                                    @ 0802867c 0047
     .zero  0x2
-DWORD_08028680:
-    .word  0x02006ed0                     @ 08028680 d06e0002
-DWORD_08028684:
-    .word  0x02000000                     @ 08028684 00000002
-DWORD_08028688:
-    .word  0x00006c2c                     @ 08028688 2c6c0000
-DWORD_0802868c:
+render_campaign_text_line_with_align_font_ctx:
+    .word  gFontJpCtx                     @ 08028680 d06e0002
+render_campaign_text_line_with_align_ewram:
+    .word  EWRAM_BASE                     @ 08028684 00000002
+render_campaign_text_line_with_align_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 08028688 2c6c0000
+render_campaign_text_line_with_align_font_table:
     .word  font_jp_base_table             @ 0802868c 54f8e509
-DWORD_08028690:
-    .word  0x06004000                     @ 08028690 00400006
+render_campaign_text_line_with_align_bg_vram:
+    .word  BG_CHAR_VRAM_CB2               @ 08028690 00400006
 
 @ Function: initialize pack scene VRAM and display state. No APCS input params (r0 overwritten by ldr gPrng at entry). Execution order: (1) write 0x601 to gPrng+0xba*2=gPrng+0x174 (display control value); (2) write 0 to DISPCNT=0x04000000 (disable display); (3) call reset_display_and_obj_vram (clear OBJ VRAM and display registers); (4) call store_ewram_ctx_ptr_and_clear_mode_flags (write EWRAM context pointer, clear mode flags); (5) write 4 halfwords consecutively to BG0CNT-BG3CNT (bg_ctrl[0..3]={0x4,0x105,0x206,0x307}); (6) call reset_all_bg_scroll_regs_and_shadows + upload_pack_vram_and_palette; (7) three zero_fill_by_halfword calls to clear 0x06004000/0x06010000 and another region (r4=0x8000 halfwords = 0x10000 bytes each call). Exit pop {r0}; bx r0 (Sub-case E, r0 overwritten by pop -> void).
 @ 
@@ -24599,38 +24657,38 @@ DWORD_08028690:
 @ - ZERO_FILL_SIZE = 0x80<<8 = 0x8000 halfwords (= 0x10000 bytes per call)
 init_pack_scene_vram_regs:
     push {r4,lr}                             @ 08028694 10b5
-    ldr r0, DWORD_08028704                   @ 08028696 1b48
+    ldr r0, init_pack_scene_vram_regs_gprng  @ 08028696 1b48
     movs r1,#0xba    @ 08028698 ba21
     lsls r1,r1,#0x1    @ 0802869a 4900
     adds r0,r0,r1    @ 0802869c 4018
     movs r2,#0x0    @ 0802869e 0022
-    ldr r1, DWORD_08028708                   @ 080286a0 1949
+    ldr r1, init_pack_scene_vram_regs_ctrl_val @ 080286a0 1949
     strh r1,[r0,#0x0]                        @ 080286a2 0180
     movs r0,#0x80    @ 080286a4 8020
     lsls r0,r0,#0x13    @ 080286a6 c004
     strh r2,[r0,#0x0]                        @ 080286a8 0280
-    ldr r0, DWORD_0802870c                   @ 080286aa 1848
+    ldr r0, init_pack_scene_vram_regs_disp_ctx @ 080286aa 1848
     bl reset_display_and_obj_vram            @ 080286ac cef0e2ff
-    ldr r0, DWORD_08028710                   @ 080286b0 1748
+    ldr r0, init_pack_scene_vram_regs_vija_state @ 080286b0 1748
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 080286b2 cbf0f5fd
-    ldr r1, DWORD_08028714                   @ 080286b6 1749
+    ldr r1, init_pack_scene_vram_regs_bg0cnt @ 080286b6 1749
     movs r0,#0x4    @ 080286b8 0420
     strh r0,[r1,#0x0]                        @ 080286ba 0880
     adds r1,#0x2    @ 080286bc 0231
-    ldr r2, DWORD_08028718                   @ 080286be 164a
+    ldr r2, init_pack_scene_vram_regs_bgcnt1 @ 080286be 164a
     adds r0,r2,#0x0    @ 080286c0 101c
     strh r0,[r1,#0x0]                        @ 080286c2 0880
     adds r1,#0x2    @ 080286c4 0231
-    ldr r2, DWORD_0802871c                   @ 080286c6 154a
+    ldr r2, init_pack_scene_vram_regs_bgcnt2 @ 080286c6 154a
     adds r0,r2,#0x0    @ 080286c8 101c
     strh r0,[r1,#0x0]                        @ 080286ca 0880
     adds r1,#0x2    @ 080286cc 0231
-    ldr r2, DWORD_08028720                   @ 080286ce 144a
+    ldr r2, init_pack_scene_vram_regs_bgcnt3 @ 080286ce 144a
     adds r0,r2,#0x0    @ 080286d0 101c
     strh r0,[r1,#0x0]                        @ 080286d2 0880
     bl reset_all_bg_scroll_regs_and_shadows  @ 080286d4 cdf0d8f9
     bl upload_pack_vram_and_palette          @ 080286d8 cdf0def9
-    ldr r0, DWORD_08028724                   @ 080286dc 1148
+    ldr r0, init_pack_scene_vram_regs_vram_obj @ 080286dc 1148
     movs r4,#0x80    @ 080286de 8024
     lsls r4,r4,#0x8    @ 080286e0 2402
     adds r1,r4,#0x0    @ 080286e2 211c
@@ -24640,33 +24698,33 @@ init_pack_scene_vram_regs:
     movs r1,#0x80    @ 080286ec 8021
     lsls r1,r1,#0x6    @ 080286ee 8901
     bl zero_fill_by_halfword                 @ 080286f0 ccf0c0fb
-    ldr r0, DWORD_08028728                   @ 080286f4 0c48
+    ldr r0, init_pack_scene_vram_regs_vram_bg @ 080286f4 0c48
     adds r1,r4,#0x0    @ 080286f6 211c
     bl zero_fill_by_halfword                 @ 080286f8 ccf0bcfb
     pop {r4}                                 @ 080286fc 10bc
     pop {r0}                                 @ 080286fe 01bc
     bx r0                                    @ 08028700 0047
     .zero  0x2
-DWORD_08028704:
+init_pack_scene_vram_regs_gprng:
     .word  gPrng                          @ 08028704 40000003
-DWORD_08028708:
-    .word  0x00000601                     @ 08028708 01060000
-DWORD_0802870c:
-    .word  0x0203eeb0                     @ 0802870c b0ee0302
-DWORD_08028710:
-    .word  0x02029eb0                     @ 08028710 b09e0202
-DWORD_08028714:
+init_pack_scene_vram_regs_ctrl_val:
+    .word  DUEL_FIELD_CTRL_VAL            @ 08028708 01060000
+init_pack_scene_vram_regs_disp_ctx:
+    .word  gDuelDispCtx                   @ 0802870c b0ee0302
+init_pack_scene_vram_regs_vija_state:
+    .word  gVijaState                     @ 08028710 b09e0202
+init_pack_scene_vram_regs_bg0cnt:
     .word  BG0CNT                         @ 08028714 08000004
-DWORD_08028718:
-    .word  0x00000105                     @ 08028718 05010000
-DWORD_0802871c:
-    .word  0x00000206                     @ 0802871c 06020000
-DWORD_08028720:
-    .word  0x00000307                     @ 08028720 07030000
-DWORD_08028724:
-    .word  0x06004000                     @ 08028724 00400006
-DWORD_08028728:
-    .word  0x06010000                     @ 08028728 00000106
+init_pack_scene_vram_regs_bgcnt1:
+    .word  DUEL_FIELD_BGCNT1_INIT         @ 08028718 05010000
+init_pack_scene_vram_regs_bgcnt2:
+    .word  DUEL_FIELD_BGCNT2_INIT         @ 0802871c 06020000
+init_pack_scene_vram_regs_bgcnt3:
+    .word  DUEL_FIELD_BGCNT3_INIT         @ 08028720 07030000
+init_pack_scene_vram_regs_vram_obj:
+    .word  BG_CHAR_VRAM_CB2               @ 08028724 00400006
+init_pack_scene_vram_regs_vram_bg:
+    .word  OBJ_TILE_VRAM_BASE             @ 08028728 00000106
 
 @ Function: select one of two pack tile loading paths based on r0 flag, then initialize palette flags. When r0==0: loads pack tile set B (0x09ba050c, 0x30 tiles, 2bpp mode 0x4e) to VRAM 0xc00 and pack tile set C (0x09b9fa20, 0x20 tiles, mode 0x2) to VRAM 0x800. When r0!=0: loads only pack tile set A (0x09b9e6e8, 0x10 tiles, mode 0x2) to VRAM 0xc00. Both paths converge: copy_bytes_by_halfword copies 0x20 halfwords from ROM 0x09b9e6c8 to PAL_RAM 0x05000220; tile_2d_row_copy copies 0x20x8 rows from ROM 0x09b9c6c8 to VRAM 0x06010000; sets bit0 of byte [0x02023360+0x36] (palette init flag). Exit pop {r0}; bx r0 (Sub-case E, void).
 @ 
@@ -24692,38 +24750,38 @@ load_pack_tiles_with_palette_init:
     beq LAB_08028748                         @ 08028730 0ad0
     movs r0,#0xc0    @ 08028732 c020
     lsls r0,r0,#0x4    @ 08028734 0001
-    ldr r3, DWORD_08028744                   @ 08028736 034b
+    ldr r3, load_pack_tiles_with_palette_init_tiles_a @ 08028736 034b
     movs r1,#0x10    @ 08028738 1021
     movs r2,#0x2    @ 0802873a 0222
     bl load_pack_tile_and_map_to_vram        @ 0802873c c5f068fc
     b LAB_08028764                           @ 08028740 10e0
     .zero  0x2
-DWORD_08028744:
-    .word  0x09b9e6e8                     @ 08028744 e8e6b909
+load_pack_tiles_with_palette_init_tiles_a:
+    .word  0x09b9e6e8                     @ 08028744 e8e6b909  0x09b9e6e8: pack tiles A GFX blob
 LAB_08028748:
     movs r0,#0xc0    @ 08028748 c020
     lsls r0,r0,#0x4    @ 0802874a 0001
-    ldr r3, DWORD_0802878c                   @ 0802874c 0f4b
+    ldr r3, load_pack_tiles_with_palette_init_tiles_b @ 0802874c 0f4b
     movs r1,#0x30    @ 0802874e 3021
     movs r2,#0x4e    @ 08028750 4e22
     bl load_pack_tile_and_map_to_vram        @ 08028752 c5f05dfc
     movs r0,#0x80    @ 08028756 8020
     lsls r0,r0,#0x4    @ 08028758 0001
-    ldr r3, DWORD_08028790                   @ 0802875a 0d4b
+    ldr r3, load_pack_tiles_with_palette_init_tiles_c @ 0802875a 0d4b
     movs r1,#0x20    @ 0802875c 2021
     movs r2,#0x2    @ 0802875e 0222
     bl load_pack_tile_and_map_to_vram        @ 08028760 c5f056fc
 LAB_08028764:
-    ldr r0, DWORD_08028794                   @ 08028764 0b48
-    ldr r1, DWORD_08028798                   @ 08028766 0c49
+    ldr r0, load_pack_tiles_with_palette_init_pal_dest @ 08028764 0b48
+    ldr r1, load_pack_tiles_with_palette_init_pal_src @ 08028766 0c49
     movs r2,#0x20    @ 08028768 2022
     bl copy_bytes_by_halfword                @ 0802876a ccf09bfb
-    ldr r0, DWORD_0802879c                   @ 0802876e 0b48
-    ldr r1, DWORD_080287a0                   @ 08028770 0b49
+    ldr r0, load_pack_tiles_with_palette_init_vram_bg @ 0802876e 0b48
+    ldr r1, load_pack_tiles_with_palette_init_bg_tiles @ 08028770 0b49
     movs r2,#0x20    @ 08028772 2022
     movs r3,#0x8    @ 08028774 0823
     bl tile_2d_row_copy                      @ 08028776 cef0adfe
-    ldr r1, DWORD_080287a4                   @ 0802877a 0a49
+    ldr r1, load_pack_tiles_with_palette_init_scene_base @ 0802877a 0a49
     adds r1,#0x36    @ 0802877c 3631
     movs r0,#0x1    @ 0802877e 0120
     ldrb r2,[r1,#0x0]                        @ 08028780 0a78
@@ -24732,20 +24790,20 @@ LAB_08028764:
     pop {r0}                                 @ 08028786 01bc
     bx r0                                    @ 08028788 0047
     .zero  0x2
-DWORD_0802878c:
-    .word  0x09ba050c                     @ 0802878c 0c05ba09
-DWORD_08028790:
-    .word  0x09b9fa20                     @ 08028790 20fab909
-DWORD_08028794:
-    .word  0x05000220                     @ 08028794 20020005
-DWORD_08028798:
-    .word  0x09b9e6c8                     @ 08028798 c8e6b909
-DWORD_0802879c:
-    .word  0x06010000                     @ 0802879c 00000106
-DWORD_080287a0:
-    .word  0x09b9c6c8                     @ 080287a0 c8c6b909
-DWORD_080287a4:
-    .word  0x02023360                     @ 080287a4 60330202
+load_pack_tiles_with_palette_init_tiles_b:
+    .word  0x09ba050c                     @ 0802878c 0c05ba09  0x09ba050c: pack tiles B GFX blob
+load_pack_tiles_with_palette_init_tiles_c:
+    .word  0x09b9fa20                     @ 08028790 20fab909  0x09b9fa20: pack tiles C GFX blob
+load_pack_tiles_with_palette_init_pal_dest:
+    .word  OBJ_PAL_SLOT_1                 @ 08028794 20020005
+load_pack_tiles_with_palette_init_pal_src:
+    .word  0x09b9e6c8                     @ 08028798 c8e6b909  0x09b9e6c8: pack palette GFX blob
+load_pack_tiles_with_palette_init_vram_bg:
+    .word  OBJ_TILE_VRAM_BASE             @ 0802879c 00000106
+load_pack_tiles_with_palette_init_bg_tiles:
+    .word  0x09b9c6c8                     @ 080287a0 c8c6b909  0x09b9c6c8: pack BG tile GFX blob
+load_pack_tiles_with_palette_init_scene_base:
+    .word  gDuelSceneBase                 @ 080287a4 60330202
 
 @ Function: write 3 OAM entries for pack scene sprite strip. Reads gPrng+0x20c halfword bits[4:2] as 3-bit index (0..7), fetches corresponding tile_id halfword from ROM table 0x09e59d78 (r4); using r0=x_pos [0x1b..0x4c], r1=y_row [0x40..0x8a] as position params, loops 3 times (r6=2..0): calls write_oam_entry_from_packed_args(packed_xy, attr1=0x4080 (0x81<<7), tile_id+delta), each iteration tile_id advances +4, x advances +0x20. Exit pop {r0}; bx r0 (Sub-case E, void).
 @ 
@@ -24763,8 +24821,8 @@ write_pack_strip_oam_entries:
     push {r4,r5,r6,r7,lr}                    @ 080287a8 f0b5
     adds r5,r0,#0x0    @ 080287aa 051c
     adds r7,r1,#0x0    @ 080287ac 0f1c
-    ldr r2, DWORD_080287f4                   @ 080287ae 114a
-    ldr r0, DWORD_080287f8                   @ 080287b0 1148
+    ldr r2, write_pack_strip_oam_entries_tile_table @ 080287ae 114a
+    ldr r0, write_pack_strip_oam_entries_gprng @ 080287b0 1148
     movs r1,#0x83    @ 080287b2 8321
     lsls r1,r1,#0x2    @ 080287b4 8900
     adds r0,r0,r1    @ 080287b6 4018
@@ -24798,9 +24856,9 @@ LAB_080287c8:
     pop {r0}                                 @ 080287ee 01bc
     bx r0                                    @ 080287f0 0047
     .zero  0x2
-DWORD_080287f4:
-    .word  0x09e59d78                     @ 080287f4 789de509
-DWORD_080287f8:
+write_pack_strip_oam_entries_tile_table:
+    .word  pack_strip_tile_id_table       @ 080287f4 789de509
+write_pack_strip_oam_entries_gprng:
     .word  gPrng                          @ 080287f8 40000003
 
 @ Function: write up to 2 OAM entries for pack card grid (10-column layout). r0 is row base pointer (+6), r1 is column index (pack position packed), r2 is tile_base (u32, saved to r8), r3 is y offset (saved to r5, scaled <<6). Computes tile_base % 10 (column position) + y_scaled -> r2 (column coordinate); generates initial r2 from r9=0x188; calls write_oam_entry_from_packed_args to write 1st OAM sprite (r0=packed_pos, r1=r10=0x8000, r2=column_pos). Then computes tile_base / 10: if tile_base/10 == 0 jumps to end; otherwise ORs 0x3f with row_base+6 bit field (orrs r6,r7) then computes %10 for 2nd sprite column position, calls write_oam_entry_from_packed_args to write 2nd OAM sprite. Exit pop {r0}; bx r0 (Sub-case E, void).
@@ -24883,7 +24941,7 @@ tick_campaign_card_selector_oam:
     .hword 0x464f    @ 08028876 4f46
     .hword 0x4646    @ 08028878 4646
     push {r6,r7}                             @ 0802887a c0b4
-    ldr r7, DWORD_08028898                   @ 0802887c 064f
+    ldr r7, tick_campaign_card_selector_oam_scene_base_a @ 0802887c 064f
     adds r0,r7,#0x0    @ 0802887e 381c
     adds r0,#0x36    @ 08028880 3630
     ldrb r0,[r0,#0x0]                        @ 08028882 0078
@@ -24897,8 +24955,8 @@ tick_campaign_card_selector_oam:
     beq LAB_080288a6                         @ 08028892 08d0
     b LAB_08028bba                           @ 08028894 91e1
     .zero  0x2
-DWORD_08028898:
-    .word  0x02023360                     @ 08028898 60330202
+tick_campaign_card_selector_oam_scene_base_a:
+    .word  gDuelSceneBase                 @ 08028898 60330202
 LAB_0802889c:
     cmp r0,#0x2                              @ 0802889c 0228
     beq LAB_080288a6                         @ 0802889e 02d0
@@ -24907,9 +24965,9 @@ LAB_0802889c:
     b LAB_08028bba                           @ 080288a4 89e1
 LAB_080288a6:
     movs r5,#0x0    @ 080288a6 0025
-    ldr r0, DWORD_08028918                   @ 080288a8 1b48
+    ldr r0, tick_campaign_card_selector_oam_attr_table @ 080288a8 1b48
     .hword 0x4680    @ 080288aa 8046
-    ldr r1, DWORD_0802891c                   @ 080288ac 1b49
+    ldr r1, tick_campaign_card_selector_oam_attr_buf_slot @ 080288ac 1b49
     .hword 0x4689    @ 080288ae 8946
     movs r6,#0x0    @ 080288b0 0026
     movs r7,#0x1f    @ 080288b2 1f27
@@ -24964,12 +25022,12 @@ LAB_0802890e:
     cmp r5,#0x1d                             @ 08028912 1d2d
     ble LAB_080288b4                         @ 08028914 cedd
     b LAB_08028bba                           @ 08028916 50e1
-DWORD_08028918:
-    .word  0x09e59d38                     @ 08028918 389de509
-DWORD_0802891c:
-    .word  0x0300024c                     @ 0802891c 4c020003
+tick_campaign_card_selector_oam_attr_table:
+    .word  campaign_oam_slot_count_table  @ 08028918 389de509
+tick_campaign_card_selector_oam_attr_buf_slot:
+    .word  tick_campaign_card_selector_oam_attr_buf @ 0802891c 4c020003
 LAB_08028920:
-    ldr r1, DWORD_08028944                   @ 08028920 0849
+    ldr r1, tick_campaign_card_selector_oam_gprng_1 @ 08028920 0849
     movs r2,#0x83    @ 08028922 8322
     lsls r2,r2,#0x2    @ 08028924 9200
     adds r1,r1,r2    @ 08028926 8918
@@ -24980,17 +25038,17 @@ LAB_08028920:
     bne LAB_08028934                         @ 08028930 00d1
     b LAB_08028bba                           @ 08028932 42e1
 LAB_08028934:
-    ldr r0, DWORD_08028948                   @ 08028934 0448
+    ldr r0, tick_campaign_card_selector_oam_mode1_xy_coord @ 08028934 0448
     movs r2,#0x82    @ 08028936 8222
     lsls r2,r2,#0x5    @ 08028938 5201
     movs r1,#0x80    @ 0802893a 8021
     bl write_oam_entry_from_packed_args      @ 0802893c cdf016fc
     b LAB_08028bba                           @ 08028940 3be1
     .zero  0x2
-DWORD_08028944:
+tick_campaign_card_selector_oam_gprng_1:
     .word  gPrng                          @ 08028944 40000003
-DWORD_08028948:
-    .word  0x0060006e                     @ 08028948 6e006000
+tick_campaign_card_selector_oam_mode1_xy_coord:
+    .word  0x0060006e                     @ 08028948 6e006000  0x0060006e: packed OAM xy (x=110 y=96) for mode1 sprite
 LAB_0802894c:
     movs r3,#0xc0    @ 0802894c c023
     lsls r3,r3,#0x1    @ 0802894e 5b00
@@ -25013,7 +25071,7 @@ LAB_0802894c:
     movs r1,#0x40    @ 08028970 4021
     bl write_pack_strip_oam_entries          @ 08028972 fff719ff
 LAB_08028976:
-    ldr r0, DWORD_08028a34                   @ 08028976 2f48
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_0 @ 08028976 2f48
     movs r5,#0x81    @ 08028978 8125
     lsls r5,r5,#0x7    @ 0802897a ed01
     .hword 0x464e    @ 0802897c 4e46
@@ -25027,7 +25085,7 @@ LAB_08028976:
     orrs r2,r1    @ 0802898c 0a43
     adds r1,r5,#0x0    @ 0802898e 291c
     bl write_oam_entry_from_packed_args      @ 08028990 cdf0ecfb
-    ldr r0, DWORD_08028a38                   @ 08028994 2848
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_1 @ 08028994 2848
     ldrb r1,[r6,#0x0]                        @ 08028996 3178
     lsls r2,r1,#0x1e    @ 08028998 8a07
     lsrs r2,r2,#0x1f    @ 0802899a d20f
@@ -25038,7 +25096,7 @@ LAB_08028976:
     orrs r2,r1    @ 080289a4 0a43
     adds r1,r5,#0x0    @ 080289a6 291c
     bl write_oam_entry_from_packed_args      @ 080289a8 cdf0e0fb
-    ldr r0, DWORD_08028a3c                   @ 080289ac 2348
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_2 @ 080289ac 2348
     ldrb r1,[r6,#0x0]                        @ 080289ae 3178
     lsls r2,r1,#0x1e    @ 080289b0 8a07
     lsrs r2,r2,#0x1f    @ 080289b2 d20f
@@ -25049,7 +25107,7 @@ LAB_08028976:
     orrs r2,r1    @ 080289bc 0a43
     adds r1,r5,#0x0    @ 080289be 291c
     bl write_oam_entry_from_packed_args      @ 080289c0 cdf0d4fb
-    ldr r0, DWORD_08028a40                   @ 080289c4 1e48
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_3 @ 080289c4 1e48
     movs r2,#0x2    @ 080289c6 0222
     ldrb r1,[r6,#0x0]                        @ 080289c8 3178
     ands r2,r1    @ 080289ca 0a40
@@ -25062,7 +25120,7 @@ LAB_08028976:
     lsrs r2,r2,#0x10    @ 080289d8 120c
     adds r1,r5,#0x0    @ 080289da 291c
     bl write_oam_entry_from_packed_args      @ 080289dc cdf0c6fb
-    ldr r0, DWORD_08028a44                   @ 080289e0 1848
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_4 @ 080289e0 1848
     movs r2,#0x2    @ 080289e2 0222
     ldrb r1,[r6,#0x0]                        @ 080289e4 3178
     ands r2,r1    @ 080289e6 0a40
@@ -25074,7 +25132,7 @@ LAB_08028976:
     lsrs r2,r2,#0x10    @ 080289f2 120c
     adds r1,r5,#0x0    @ 080289f4 291c
     bl write_oam_entry_from_packed_args      @ 080289f6 cdf0b9fb
-    ldr r0, DWORD_08028a48                   @ 080289fa 1348
+    ldr r0, tick_campaign_card_selector_oam_sprite_pos_5 @ 080289fa 1348
     movs r1,#0x2    @ 080289fc 0221
     ldrb r2,[r6,#0x0]                        @ 080289fe 3278
     ands r1,r2    @ 08028a00 1140
@@ -25101,21 +25159,21 @@ LAB_08028976:
     movs r1,#0x70    @ 08028a2c 7021
     bl write_pack_strip_oam_entries          @ 08028a2e fff7bbfe
     b LAB_08028ac0                           @ 08028a32 45e0
-DWORD_08028a34:
-    .word  0x003e0014                     @ 08028a34 14003e00
-DWORD_08028a38:
-    .word  0x003e0034                     @ 08028a38 34003e00
-DWORD_08028a3c:
-    .word  0x003e0054                     @ 08028a3c 54003e00
-DWORD_08028a40:
-    .word  0x003e0084                     @ 08028a40 84003e00
-DWORD_08028a44:
-    .word  0x003e00a4                     @ 08028a44 a4003e00
-DWORD_08028a48:
-    .word  0x003e00c4                     @ 08028a48 c4003e00
+tick_campaign_card_selector_oam_sprite_pos_0:
+    .word  CAMPAIGN_CARD_SPRITE_POS_0     @ 08028a34 14003e00
+tick_campaign_card_selector_oam_sprite_pos_1:
+    .word  CAMPAIGN_CARD_SPRITE_POS_1     @ 08028a38 34003e00
+tick_campaign_card_selector_oam_sprite_pos_2:
+    .word  CAMPAIGN_CARD_SPRITE_POS_2     @ 08028a3c 54003e00
+tick_campaign_card_selector_oam_sprite_pos_3:
+    .word  CAMPAIGN_CARD_SPRITE_POS_3     @ 08028a40 84003e00
+tick_campaign_card_selector_oam_sprite_pos_4:
+    .word  CAMPAIGN_CARD_SPRITE_POS_4     @ 08028a44 a4003e00
+tick_campaign_card_selector_oam_sprite_pos_5:
+    .word  CAMPAIGN_CARD_SPRITE_POS_5     @ 08028a48 c4003e00
 LAB_08028a4c:
-    ldr r2, DWORD_08028b24                   @ 08028a4c 354a
-    ldr r0, DWORD_08028b28                   @ 08028a4e 3648
+    ldr r2, write_pack_grid_oam_by_card_slot_tile_table @ 08028a4c 354a
+    ldr r0, tick_campaign_card_selector_oam_gprng_2 @ 08028a4e 3648
     movs r1,#0x83    @ 08028a50 8321
     lsls r1,r1,#0x2    @ 08028a52 8900
     adds r0,r0,r1    @ 08028a54 4018
@@ -25143,7 +25201,7 @@ LAB_08028a4c:
     movs r3,#0x80    @ 08028a80 8023
     lsls r3,r3,#0x8    @ 08028a82 1b02
     .hword 0x4698    @ 08028a84 9846
-    ldr r1, DWORD_08028b2c                   @ 08028a86 2949
+    ldr r1, write_pack_grid_oam_by_card_slot_tile_delta_a @ 08028a86 2949
     adds r2,r4,r1    @ 08028a88 6218
     lsls r2,r2,#0x10    @ 08028a8a 1204
     lsrs r2,r2,#0x10    @ 08028a8c 120c
@@ -25164,14 +25222,14 @@ LAB_08028a4c:
     movs r0,#0xd8    @ 08028aac d820
     subs r0,r0,r1    @ 08028aae 401a
     orrs r0,r5    @ 08028ab0 2843
-    ldr r3, DWORD_08028b30                   @ 08028ab2 1f4b
+    ldr r3, write_pack_grid_oam_by_card_slot_tile_delta_b @ 08028ab2 1f4b
     adds r2,r4,r3    @ 08028ab4 e218
     lsls r2,r2,#0x10    @ 08028ab6 1204
     lsrs r2,r2,#0x10    @ 08028ab8 120c
     .hword 0x4641    @ 08028aba 4146
     bl write_oam_entry_from_packed_args      @ 08028abc cdf056fb
 LAB_08028ac0:
-    ldr r6, DWORD_08028b34                   @ 08028ac0 1c4e
+    ldr r6, tick_campaign_card_selector_oam_scene_base_b @ 08028ac0 1c4e
     adds r5,r6,#0x0    @ 08028ac2 351c
     adds r5,#0x37    @ 08028ac4 3735
     movs r0,#0x7c    @ 08028ac6 7c20
@@ -25179,24 +25237,24 @@ LAB_08028ac0:
     ands r0,r1    @ 08028aca 0840
     cmp r0,#0x0                              @ 08028acc 0028
     bne LAB_08028b48                         @ 08028ace 3bd1
-    ldr r0, DWORD_08028b38                   @ 08028ad0 1948
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_a @ 08028ad0 1948
     movs r4,#0x81    @ 08028ad2 8124
     lsls r4,r4,#0x7    @ 08028ad4 e401
     movs r2,#0x8c    @ 08028ad6 8c22
     lsls r2,r2,#0x1    @ 08028ad8 5200
     adds r1,r4,#0x0    @ 08028ada 211c
     bl write_oam_entry_from_packed_args      @ 08028adc cdf046fb
-    ldr r0, DWORD_08028b3c                   @ 08028ae0 1648
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_b @ 08028ae0 1648
     movs r2,#0x8e    @ 08028ae2 8e22
     lsls r2,r2,#0x1    @ 08028ae4 5200
     adds r1,r4,#0x0    @ 08028ae6 211c
     bl write_oam_entry_from_packed_args      @ 08028ae8 cdf040fb
-    ldr r0, DWORD_08028b40                   @ 08028aec 1448
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_c @ 08028aec 1448
     movs r2,#0xe0    @ 08028aee e022
     lsls r2,r2,#0x1    @ 08028af0 5200
     adds r1,r4,#0x0    @ 08028af2 211c
     bl write_oam_entry_from_packed_args      @ 08028af4 cdf03afb
-    ldr r0, DWORD_08028b44                   @ 08028af8 1248
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_d @ 08028af8 1248
     movs r2,#0xe2    @ 08028afa e222
     lsls r2,r2,#0x1    @ 08028afc 5200
     adds r1,r4,#0x0    @ 08028afe 211c
@@ -25216,43 +25274,43 @@ LAB_08028ac0:
     movs r3,#0x1    @ 08028b1c 0123
     bl write_pack_grid_oam_by_card_slot      @ 08028b1e fff76dfe
     b LAB_08028ba0                           @ 08028b22 3de0
-DWORD_08028b24:
-    .word  0x09e59d88                     @ 08028b24 889de509
-DWORD_08028b28:
+write_pack_grid_oam_by_card_slot_tile_table:
+    .word  pack_card_grid_tile_table      @ 08028b24 889de509
+tick_campaign_card_selector_oam_gprng_2:
     .word  gPrng                          @ 08028b28 40000003
-DWORD_08028b2c:
-    .word  0x00001006                     @ 08028b2c 06100000
-DWORD_08028b30:
-    .word  0x00001007                     @ 08028b30 07100000
-DWORD_08028b34:
-    .word  0x02023360                     @ 08028b34 60330202
-DWORD_08028b38:
-    .word  0x006e0024                     @ 08028b38 24006e00
-DWORD_08028b3c:
-    .word  0x006e0044                     @ 08028b3c 44006e00
-DWORD_08028b40:
-    .word  0x006e0094                     @ 08028b40 94006e00
-DWORD_08028b44:
-    .word  0x006e00b4                     @ 08028b44 b4006e00
+write_pack_grid_oam_by_card_slot_tile_delta_a:
+    .word  0x00001006                     @ 08028b2c 06100000  0x1006: tile attr delta row A
+write_pack_grid_oam_by_card_slot_tile_delta_b:
+    .word  0x00001007                     @ 08028b30 07100000  0x1007: tile attr delta row B
+tick_campaign_card_selector_oam_scene_base_b:
+    .word  gDuelSceneBase                 @ 08028b34 60330202
+tick_campaign_card_selector_oam_hand_sprite_pos_a:
+    .word  CAMPAIGN_HAND_SPRITE_POS_A     @ 08028b38 24006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_b:
+    .word  CAMPAIGN_HAND_SPRITE_POS_B     @ 08028b3c 44006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_c:
+    .word  CAMPAIGN_HAND_SPRITE_POS_C     @ 08028b40 94006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_d:
+    .word  CAMPAIGN_HAND_SPRITE_POS_D     @ 08028b44 b4006e00
 LAB_08028b48:
-    ldr r0, DWORD_08028bc8                   @ 08028b48 1f48
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_a2 @ 08028b48 1f48
     movs r4,#0x81    @ 08028b4a 8124
     lsls r4,r4,#0x7    @ 08028b4c e401
     movs r2,#0xac    @ 08028b4e ac22
     lsls r2,r2,#0x1    @ 08028b50 5200
     adds r1,r4,#0x0    @ 08028b52 211c
     bl write_oam_entry_from_packed_args      @ 08028b54 cdf00afb
-    ldr r0, DWORD_08028bcc                   @ 08028b58 1c48
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_b2 @ 08028b58 1c48
     movs r2,#0xae    @ 08028b5a ae22
     lsls r2,r2,#0x1    @ 08028b5c 5200
     adds r1,r4,#0x0    @ 08028b5e 211c
     bl write_oam_entry_from_packed_args      @ 08028b60 cdf004fb
-    ldr r0, DWORD_08028bd0                   @ 08028b64 1a48
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_c2 @ 08028b64 1a48
     movs r2,#0xc0    @ 08028b66 c022
     lsls r2,r2,#0x1    @ 08028b68 5200
     adds r1,r4,#0x0    @ 08028b6a 211c
     bl write_oam_entry_from_packed_args      @ 08028b6c cdf0fefa
-    ldr r0, DWORD_08028bd4                   @ 08028b70 1848
+    ldr r0, tick_campaign_card_selector_oam_hand_sprite_pos_d2 @ 08028b70 1848
     movs r2,#0xc2    @ 08028b72 c222
     lsls r2,r2,#0x1    @ 08028b74 5200
     adds r1,r4,#0x0    @ 08028b76 211c
@@ -25275,7 +25333,7 @@ LAB_08028b48:
     movs r3,#0x0    @ 08028b9a 0023
     bl write_pack_grid_oam_by_card_slot      @ 08028b9c fff72efe
 LAB_08028ba0:
-    ldr r0, DWORD_08028bd8                   @ 08028ba0 0d48
+    ldr r0, tick_campaign_card_selector_oam_scene_base_c @ 08028ba0 0d48
     movs r1,#0xc0    @ 08028ba2 c021
     lsls r1,r1,#0x1    @ 08028ba4 4900
     ldrh r0,[r0,#0x36]                       @ 08028ba6 c08e
@@ -25295,16 +25353,16 @@ LAB_08028bba:
     pop {r0}                                 @ 08028bc2 01bc
     bx r0                                    @ 08028bc4 0047
     .zero  0x2
-DWORD_08028bc8:
-    .word  0x006e0024                     @ 08028bc8 24006e00
-DWORD_08028bcc:
-    .word  0x006e0044                     @ 08028bcc 44006e00
-DWORD_08028bd0:
-    .word  0x006e0094                     @ 08028bd0 94006e00
-DWORD_08028bd4:
-    .word  0x006e00b4                     @ 08028bd4 b4006e00
-DWORD_08028bd8:
-    .word  0x02023360                     @ 08028bd8 60330202
+tick_campaign_card_selector_oam_hand_sprite_pos_a2:
+    .word  CAMPAIGN_HAND_SPRITE_POS_A     @ 08028bc8 24006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_b2:
+    .word  CAMPAIGN_HAND_SPRITE_POS_B     @ 08028bcc 44006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_c2:
+    .word  CAMPAIGN_HAND_SPRITE_POS_C     @ 08028bd0 94006e00
+tick_campaign_card_selector_oam_hand_sprite_pos_d2:
+    .word  CAMPAIGN_HAND_SPRITE_POS_D     @ 08028bd4 b4006e00
+tick_campaign_card_selector_oam_scene_base_c:
+    .word  gDuelSceneBase                 @ 08028bd8 60330202
 
 @ Function: evaluate campaign current duel victory state, returning enum value 0-3. No APCS input (r0 overwritten by internal load at entry). First reads state_word at 0x0201e2a0+0x8a*4=0x0201e4a8; if equal to 8 checks sub_state at 0x0201e2a0+0x89*4=0x0201e4a4: 1->return 1 (player wins), 2->return 2 (opponent wins). Otherwise reads bit6 of byte at 0x02023360+0x36 (0x40 mask); if bit6 set loads 0x0201e2a0+0x89*4 and returns its value. If bit6 clear: reads gPrng+0x23f byte bits[7:1] as win_count, reads gPrng+0x240 byte bit0 as lock_bit; computes score = win_count * (lock_bit<<7 | win_count>>1) and checks sign to decide winner; further reads multiple challenge sub-states for combined judgment. Returns {0=draw/continue, 1=player_wins, 2=opp_wins, 3=undecided}.
 @ 

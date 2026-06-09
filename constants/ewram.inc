@@ -221,6 +221,8 @@
 .equ gCardFsDataBlock,           0x0201e2b4  @ card FS slot data block base (4 raw refs; stride=0x108 per slot)
 .equ gCardIdCache,               0x0201ff60  @ EWRAM card id lookup/mapping cache (5 raw refs)
 .equ gCardListDisplayBuf,        0x02001138  @ card list slot display buffer (12 raw refs)
+@ Seg-9 alias: same address used as campaign handler_10 sprite row prototype source
+.equ run_campaign_card_select_handler_10_proto_row, 0x02001138  @ alias for gCardListDisplayBuf (Seg-9 REF slot gas_label)
 .equ gZoneActivTable,            0x020230f0  @ zone activation player table (1 ref; 2-word array [player0,player1])
                                              @ med-conf (single ref; semantics from indexing by player 0/1 context)
 .equ gDuelSceneBase,             0x02023360  @ duel scene / campaign card-select scene base (192 raw refs)

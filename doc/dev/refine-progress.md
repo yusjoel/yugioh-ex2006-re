@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `01_vija_scene_text.s` (进行中, 8/10 段; 活动 doc + 10 段路线图已建)。
-> **下一任务**: **Seg-9** (01 文件, 0x27e44..0x28bdc, 含 incbin 0x27e50/0x6c)。
+> **当前文件**: `01_vija_scene_text.s` (进行中, 9/10 段; 活动 doc + 10 段路线图已建)。
+> **下一任务**: **Seg-10** (01 文件, 0x28bdc..0x2c238, 12fn, 大块 incbin 0x29170/0x22f0=8944B; 先 ref-scan 分类)。
 
 ---
 

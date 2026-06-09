@@ -53,7 +53,7 @@
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
 | **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | **5266f72** |
-| 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
+| **9** | **0x27e44..0x28bdc (8fn+1 disasm, incbin 0x27e50/0x6c->disasm)** | **✅** | **pending** |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -210,6 +210,26 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 5266f72
 
+### 4.09 Seg-9 完成记录 (2026-06-10)
+
+- 范围: 0x08027e44..0x08028bdc, 8 named fn + 1 disasm (tick_campaign_card_select_display_state)
+- 函数: invoke_build_campaign_sprite_row_type6 / tick_campaign_card_select_display_state (disasm new) / run_campaign_card_select_handler_0..15 (16 inline fragments) / finalize_campaign_card_select_frame / render_campaign_text_line_centered / render_campaign_text_line_with_align / init_pack_scene_vram_regs / load_pack_tiles_with_palette_init / write_pack_strip_oam_entries / write_pack_grid_oam_by_card_slot / tick_campaign_card_selector_oam
+- Ghidra 脚本: DisassembleF01Seg9Block.py (R4 disasm) + RefineF01Seg9Slots.py (EQ/REF/RENAME/PLATE)
+- EQ=76+3 disasm = 79 (58 reuse: gPrng x8 / GPRNG_STEP_IDX_OFF x6 / GPRNG_STEP_CTR_MASK x8 / gDuelSceneBase x14 / gDuelCardCtxBase x3 / EWRAM_BASE x6 / GSETTINGS_OFFSET x4 / GSETTINGS_FONT_TABLE_OFF x1 / GSETTINGS_TEXT_FIELD_A_OFF x1 / GPRNG_CHALLENGE_ENTRY_OFF x1 / OAM_ATTR0_HIDDEN x1 / BG_CHAR_VRAM_CB2 x3 / OBJ_TILE_VRAM_BASE x2 / OBJ_PAL_SLOT_1 x1 / DUEL_FIELD_BGCNT1/2/3_INIT x3 / DUEL_FIELD_CTRL_VAL x1 / gFontJpCtx x2 / gVijaState x1 / gDuelDispCtx x1 / BG0CNT x1 / GFX_ATTR_CLEAR_BITS_8_7 x1; 18 new: CAMPAIGN_SIO_CMD_MATCH / CAMPAIGN_CARD_STEP_COPY_MASK / CAMPAIGN_CARD_ANIM_STEP_MASK / GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF / CAMPAIGN_CARD_SPRITE_POS_0..5 / CAMPAIGN_HAND_SPRITE_POS_A..D x2; 3 disasm pool: gPrng/GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF/GPRNG_STEP_IDX_OFF)
+- REF=12 (font_jp_base_table x2 / pack_strip_tile_id_table / campaign_oam_slot_count_table / pack_card_grid_tile_table / IWRAM attr buf 0x0300024c / OAM xy coord 0x0060006e / proto_row 0x02001138 / expert/standard/puzzle_challenge_record_array / handler_table_ptr 0x08027ec0)
+- RENAME=13 (campaign_card_handler_table_ptr + neg_off_a/b + flag_mask + tile_delta_a/b + mode1_xy_coord + 5x pack_tiles RENAME [Carve G blocked] + campaign_hand_oam RENAME [Carve H blocked] + sp_adj)
+- FUNC_RENAME=0
+- PLATE=16 (stale name fixes: 16 handler functions updated; PTR_FUN_08027ec0 -> PTR_run_campaign_card_select_handler_0_08027ec0 x19 occurrences / FUN_08028402 -> finalize_campaign_card_select_frame x9 occurrences across 16 handlers)
+- carve=6: A: campaign_oam_slot_count_table@0x09e59d38 (0x40B); B: pack_strip_tile_id_table@0x09e59d78 (0x10B); C: pack_card_grid_tile_table@0x09e59d88 (0x20B) [host 0x1E59C2C/0xFD0 -> 5-split]; D: standard_challenge_record_array@0x09e5e620 (0x1ECB); E: expert_challenge_record_array@0x09e5e80c (0x1A4B); F: puzzle_challenge_record_array@0x09e5e9cc (0x24CB) [host 0x1E5E618/0x6BC -> 6-split]
+- Carve G/H降级 RENAME: G (pack GFX 5 blobs, asset sizes unknown, host rom.s line 660); H (campaign_hand_oam_array 0x095b7cca, auto-gen file card-image-index.s)
+- disasm=1: block 0x08027e50/0x6c -> tick_campaign_card_select_display_state (18 BL callers); literal pool guard 4 DWORDs @0x08027eac..0x08027eb8
+- §5.1=0
+- 新增 constants: duel_field.inc +14 (CAMPAIGN_SIO_CMD_MATCH/CAMPAIGN_CARD_STEP_COPY_MASK/CAMPAIGN_CARD_ANIM_STEP_MASK/GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF/CAMPAIGN_CARD_SPRITE_POS_0..5/CAMPAIGN_HAND_SPRITE_POS_A..D)
+- 新增全局别名: ewram.inc +alias run_campaign_card_select_handler_10_proto_row (=gCardListDisplayBuf=0x02001138); iwram.inc +tick_campaign_card_selector_oam_attr_buf=0x0300024c
+- CSV sync: yes (new fn tick_campaign_card_select_display_state @ 0x08027e50 added to naming-proposals.csv)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: pending
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -228,7 +248,7 @@
 | Seg-6 | 0x1f25c..0x20fa8 | 16 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | ✅ 4 ROM_INCBIN disasm R4; tick_lp_record_scene_step 新建 |
 | Seg-7 | 0x20fa8..0x24868 | 8 | 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6 | 大数据区 (~6880B 块, ref-scan 分类) |
 | Seg-8 | 0x24868..0x27e44 | 11 | 0x2497c/0x78->disasm R4 (15 entries), 0x258f0/0x230->disasm R4 (6 entries) | ✅ |
-| Seg-9 | 0x27e44..0x28bdc | 8 | 0x27e50/0x6c | |
+| Seg-9 | 0x27e44..0x28bdc | 8+1 disasm | 0x27e50/0x6c->disasm R4 | ✅ carve A-F (6 data arrays) |
 | Seg-10 | 0x28bdc..0x2c238 | 12 | **0x29170/0x22f0** | 大数据区 (~8944B 块, ref-scan 分类) |
 
 执行约定同 file 00: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;

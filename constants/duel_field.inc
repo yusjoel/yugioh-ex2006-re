@@ -85,3 +85,27 @@
 .equ DUEL_SCENE_FLAGS_MASK_0F00,  0xffff0f00  @ mask bits[11:8] of duel scene flags word; 10 refs
 .equ DUEL_SCENE_FIELD_OFF_6E48,   0x00006e48  @ EWRAM+0x6e48 = duel scene record field A; 10 refs
 .equ DUEL_SCENE_FIELD_OFF_6E57,   0x00006e57  @ EWRAM+0x6e57 = duel scene record field B; 19 refs
+
+@ =============================================================================
+@ Seg-9 additions: campaign card-select handlers + pack scene init
+@ =============================================================================
+
+@ Campaign card-select SIO / display constants
+.equ CAMPAIGN_SIO_CMD_MATCH,          0x00002c06  @ SIO link cmd code for card select sync; 4 ROM refs
+.equ CAMPAIGN_CARD_STEP_COPY_MASK,    0xffe07fff  @ clears bits[28:15] from display ctx +0x1c word; 1 ROM ref
+.equ CAMPAIGN_CARD_ANIM_STEP_MASK,    0xfffffe03  @ clears bits[9:2] of scene_ctx+0x3a halfword; 39 ROM refs
+.equ GPRNG_SCENE_CTX_DISPLAY_FLAG_OFF, 0x00000584 @ gPrng+0x1c0 dereference + 0x584: display_ready flag byte; 20 ROM refs
+
+@ Campaign OAM sprite positions (packed 32-bit: y[23:16] | x[7:0] written to write_oam_entry_from_packed_args)
+.equ CAMPAIGN_CARD_SPRITE_POS_0,      0x003e0014  @ card sprite 0 xy (x=0x14, y=0x3e)
+.equ CAMPAIGN_CARD_SPRITE_POS_1,      0x003e0034  @ card sprite 1 xy
+.equ CAMPAIGN_CARD_SPRITE_POS_2,      0x003e0054  @ card sprite 2 xy
+.equ CAMPAIGN_CARD_SPRITE_POS_3,      0x003e0084  @ card sprite 3 xy
+.equ CAMPAIGN_CARD_SPRITE_POS_4,      0x003e00a4  @ card sprite 4 xy
+.equ CAMPAIGN_CARD_SPRITE_POS_5,      0x003e00c4  @ card sprite 5 xy
+
+@ Campaign hand sprite positions
+.equ CAMPAIGN_HAND_SPRITE_POS_A,      0x006e0024  @ hand sprite A xy (x=0x24, y=0x6e)
+.equ CAMPAIGN_HAND_SPRITE_POS_B,      0x006e0044  @ hand sprite B xy
+.equ CAMPAIGN_HAND_SPRITE_POS_C,      0x006e0094  @ hand sprite C xy
+.equ CAMPAIGN_HAND_SPRITE_POS_D,      0x006e00b4  @ hand sprite D xy

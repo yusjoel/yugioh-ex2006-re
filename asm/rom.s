@@ -1622,14 +1622,31 @@ card_deck_fs_path_table:      @ 0x09e58b08 (deck FS path string pointer array; 1
 	.include "data/opponent-card-values.s"
 
 @ 后 16MB 中间段：ROM偏移 0x1E59C2C - 0x1E5ABFB（deck record table 后，卡包卡牌列表前）
-	.incbin "roms/2343.gba", 0x1E59C2C, 0xFD0
+@ Carve A-C (Seg-9): campaign_oam_slot_count_table / pack_strip_tile_id_table / pack_card_grid_tile_table
+	.incbin "roms/2343.gba", 0x1E59C2C, 0x10C      @ pre-table gap (0x1E59C2C..0x1E59D37)
+campaign_oam_slot_count_table:                      @ 0x09e59d38: 29 halfword OAM slot counts (indexed mod-32)
+	.incbin "roms/2343.gba", 0x1E59D38, 0x40       @ 29 slot counts + 6B pad
+pack_strip_tile_id_table:                           @ 0x09e59d78: 8 halfword tile IDs for pack strip sprites
+	.incbin "roms/2343.gba", 0x1E59D78, 0x10       @ 8 strip tile IDs
+pack_card_grid_tile_table:                          @ 0x09e59d88: 16 halfword tile offsets for pack card grid
+	.incbin "roms/2343.gba", 0x1E59D88, 0x20       @ 16 grid tile offsets
+	.incbin "roms/2343.gba", 0x1E59DA8, 0xE54      @ remainder to end (0x1E59C2C+0xFD0=0x1E5ABFC)
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节
 	.include "data/pack-card-lists.s"
 
 @ 后 16MB 中间段前部：ROM偏移 0x1E5E618 - 0x1E5ECD3（卡包信息表后，主菜单数据前）
-	.incbin "roms/2343.gba", 0x1E5E618, 0x6BC
+@ Carve D-F (Seg-9): standard/expert/puzzle_challenge_record_array
+	.incbin "roms/2343.gba", 0x1E5E618, 0x8         @ FS ptr pre-data (2 words: 0x09e495c0, 0x09e495cc)
+standard_challenge_record_array:                    @ 0x09e5e620: 41 challenge records (stride 0xc)
+	.incbin "roms/2343.gba", 0x1E5E620, 0x1EC       @ 41 x 12B = 0x1EC
+expert_challenge_record_array:                      @ 0x09e5e80c: 35 challenge records
+	.incbin "roms/2343.gba", 0x1E5E80C, 0x1A4       @ 35 x 12B = 0x1A4
+	.incbin "roms/2343.gba", 0x1E5E9B0, 0x1C        @ gap between expert end and puzzle start
+puzzle_challenge_record_array:                      @ 0x09e5e9cc: 49 challenge records
+	.incbin "roms/2343.gba", 0x1E5E9CC, 0x24C       @ 49 x 12B = 0x24C
+	.incbin "roms/2343.gba", 0x1E5EC18, 0xBC        @ remainder (0x1E5E618+0x6BC=0x1E5ECD4)
 
 @ 主菜单 page table + sub-row 数组（ROM偏移 0x1E5ECD4 - 0x1E5EE13, 0x140 字节）
 @ 6 子页 + sub-rows 结构化数据
