@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `01_vija_scene_text.s` (进行中, 7/10 段; 活动 doc + 10 段路线图已建)。
-> **下一任务**: **Seg-8** (01 文件, 0x24868..0x27e44, 含 2 incbin: 0x2497c/0x78, 0x258f0/0x230)。
+> **当前文件**: `01_vija_scene_text.s` (进行中, 8/10 段; 活动 doc + 10 段路线图已建)。
+> **下一任务**: **Seg-9** (01 文件, 0x27e44..0x28bdc, 含 incbin 0x27e50/0x6c)。
 
 ---
 
@@ -18,7 +18,7 @@
 | # | 文件 | 地址区间 | 段(~10/文件) | 状态 | 活动 doc |
 |---|------|----------|------|------|---------|
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
-| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-01-vija-scene-text.md` |
+| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | 🟡 进行中 (8/10) | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | 未拆 | ⬜ | |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
@@ -115,4 +115,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-07 (01 文件 Seg-6 完成: puzzle/lp_record 16fn + 4 ROM_INCBIN R4 disasm 1800 instr + tick_lp_record_scene_step 新建 + EQ21/RENAME58/PLATE1 + 334 literal pool DWORDs; byte-identical 9689337d)。下一任务: file 01 Seg-7 (0x20fa8..0x24868, 4 incbin 含大块 0x2134c/0x1ae0)。
+**上次更新**: 2026-06-10 (01 文件 Seg-8 完成: campaign scene + card stat text rendering 11fn; EQ289/REF36/RENAME353+12; R4 disasm block1 0x2497c/0x78 (15 entries) + block2 0x258f0/0x230 (6 entries + 6 literal pool regions guard); 新增 constants 45个 (duel_field+21/gba_mem+6/ewram+9/card_info+8/iwram+1); byte-identical 9689337d)。下一任务: file 01 Seg-9 (0x27e44..0x28bdc, incbin 0x27e50/0x6c)。

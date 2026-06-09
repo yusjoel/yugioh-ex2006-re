@@ -15999,9 +15999,9 @@ check_scene_slot_all_entries_meet_threshold:
     lsls r1,r0,#0x2    @ 0802486e 8100
     adds r1,r1,r0    @ 08024870 0918
     movs r2,#0x0    @ 08024872 0022
-    ldr r0, DAT_0802488c                     @ 08024874 0548
+    ldr r0, cssamet_ewram_base               @ 08024874 0548
     lsls r1,r1,#0x2    @ 08024876 8900
-    ldr r4, DAT_08024890                     @ 08024878 054c
+    ldr r4, cssamet_gwins_base_offset        @ 08024878 054c
     adds r0,r0,r4    @ 0802487a 0019
     adds r1,r1,r0    @ 0802487c 0918
 LAB_0802487e:
@@ -16012,10 +16012,10 @@ LAB_0802487e:
     bge LAB_08024894                         @ 08024886 05da
     movs r0,#0x0    @ 08024888 0020
     b LAB_0802489e                           @ 0802488a 08e0
-DAT_0802488c:
-    .word  0x02000000                     @ 0802488c 00000002
-DAT_08024890:
-    .word  0x00006e60                     @ 08024890 606e0000
+cssamet_ewram_base:
+    .word  EWRAM_BASE                     @ 0802488c 00000002
+cssamet_gwins_base_offset:
+    .word  GWINS_BASE_OFFSET              @ 08024890 606e0000
 LAB_08024894:
     adds r1,#0x4    @ 08024894 0431
     adds r2,#0x1    @ 08024896 0132
@@ -16046,8 +16046,8 @@ get_total_challenge_cleared_count:
     adds r1,r4,r0    @ 080248ba 2118
     cmp r6,r1                                @ 080248bc 8e42
     bge LAB_080248dc                         @ 080248be 0dda
-    ldr r0, DAT_080248ec                     @ 080248c0 0a48
-    ldr r2, DAT_080248f0                     @ 080248c2 0b4a
+    ldr r0, gtccc_ewram_base                 @ 080248c0 0a48
+    ldr r2, gtccc_gprng_challenge_entry_off  @ 080248c2 0b4a
     adds r3,r0,r2    @ 080248c4 8318
     adds r2,r1,#0x0    @ 080248c6 0a1c
 LAB_080248c8:
@@ -16070,10 +16070,10 @@ LAB_080248dc:
     pop {r1}                                 @ 080248e6 02bc
     bx r1                                    @ 080248e8 0847
     .zero  0x2
-DAT_080248ec:
-    .word  0x02000000                     @ 080248ec 00000002
-DAT_080248f0:
-    .word  0x00006c3c                     @ 080248f0 3c6c0000
+gtccc_ewram_base:
+    .word  EWRAM_BASE                     @ 080248ec 00000002
+gtccc_gprng_challenge_entry_off:
+    .word  GPRNG_CHALLENGE_ENTRY_OFF      @ 080248f0 3c6c0000
 
 @ Iterates all 27 field slots (r4 from 0 to 0x1a=26), checks each slot state via jump
 @ table (PTR_PTR_0802490c, 27 entries): if the handler returns nonzero (r1 != 0), sets
@@ -16133,8 +16133,77 @@ PTR_LAB_08024910:
     .word  0x080249d0                     @ 08024970 d0490208
     .word  0x080249dc                     @ 08024974 dc490208
     .word  0x080249e8                     @ 08024978 e8490208
-DAT_0802497c:
-    ROM_INCBIN 0x2497c, 0x78
+FUN_0802497c:
+    movs r0,#0x1    @ 0802497c 0120
+    movs r1,#0x1    @ 0802497e 0121
+    b LAB_080249b0                           @ 08024980 16e0
+FUN_08024982:
+    movs r0,#0x1    @ 08024982 0120
+    movs r1,#0x3    @ 08024984 0321
+    b LAB_080249b0                           @ 08024986 13e0
+FUN_08024988:
+    movs r0,#0x1    @ 08024988 0120
+    b LAB_080249ae                           @ 0802498a 10e0
+FUN_0802498c:
+    movs r0,#0x2    @ 0802498c 0220
+    movs r1,#0x1    @ 0802498e 0121
+    b LAB_080249b0                           @ 08024990 0ee0
+FUN_08024992:
+    movs r0,#0x2    @ 08024992 0220
+    movs r1,#0x3    @ 08024994 0321
+    b LAB_080249b0                           @ 08024996 0be0
+FUN_08024998:
+    movs r0,#0x2    @ 08024998 0220
+    b LAB_080249ae                           @ 0802499a 08e0
+FUN_0802499c:
+    movs r0,#0x3    @ 0802499c 0320
+    movs r1,#0x1    @ 0802499e 0121
+    b LAB_080249b0                           @ 080249a0 06e0
+FUN_080249a2:
+    movs r0,#0x3    @ 080249a2 0320
+    movs r1,#0x3    @ 080249a4 0321
+    b LAB_080249b0                           @ 080249a6 03e0
+FUN_080249a8:
+    movs r0,#0x3    @ 080249a8 0320
+    b LAB_080249ae                           @ 080249aa 00e0
+FUN_080249ac:
+    movs r0,#0x4    @ 080249ac 0420
+LAB_080249ae:
+    movs r1,#0x5    @ 080249ae 0521
+LAB_080249b0:
+    bl check_scene_slot_all_entries_meet_threshold @ 080249b0 fff75aff
+    adds r1,r0,#0x0    @ 080249b4 011c
+    b LAB_080249f4                           @ 080249b6 1de0
+FUN_080249b8:
+    bl get_total_challenge_cleared_count     @ 080249b8 fff774ff
+    movs r1,#0x0    @ 080249bc 0021
+    cmp r0,#0x3b                             @ 080249be 3b28
+    ble LAB_080249f4                         @ 080249c0 18dd
+    b LAB_080249f8                           @ 080249c2 19e0
+FUN_080249c4:
+    bl get_total_challenge_cleared_count     @ 080249c4 fff76eff
+    movs r1,#0x0    @ 080249c8 0021
+    cmp r0,#0x45                             @ 080249ca 4528
+    ble LAB_080249f4                         @ 080249cc 12dd
+    b LAB_080249f8                           @ 080249ce 13e0
+FUN_080249d0:
+    bl get_total_challenge_cleared_count     @ 080249d0 fff768ff
+    movs r1,#0x0    @ 080249d4 0021
+    cmp r0,#0x4f                             @ 080249d6 4f28
+    ble LAB_080249f4                         @ 080249d8 0cdd
+    b LAB_080249f8                           @ 080249da 0de0
+FUN_080249dc:
+    bl get_total_challenge_cleared_count     @ 080249dc fff762ff
+    movs r1,#0x0    @ 080249e0 0021
+    cmp r0,#0x59                             @ 080249e2 5928
+    ble LAB_080249f4                         @ 080249e4 06dd
+    b LAB_080249f8                           @ 080249e6 07e0
+FUN_080249e8:
+    bl get_total_challenge_cleared_count     @ 080249e8 fff75cff
+    movs r1,#0x0    @ 080249ec 0021
+    cmp r0,#0x5e                             @ 080249ee 5e28
+    ble LAB_080249f4                         @ 080249f0 00dd
+    movs r1,#0x1    @ 080249f2 0121
 LAB_080249f4:
     cmp r1,#0x0                              @ 080249f4 0029
     beq LAB_080249fe                         @ 080249f6 02d0
@@ -16148,13 +16217,13 @@ LAB_080249fe:
     bgt LAB_08024a06                         @ 08024a02 00dc
     b LAB_080248fa                           @ 08024a04 79e7
 LAB_08024a06:
-    ldr r0, DWORD_08024a5c                   @ 08024a06 1548
-    ldr r1, DWORD_08024a60                   @ 08024a08 1549
+    ldr r0, bfsb_ewram_base                  @ 08024a06 1548
+    ldr r1, bfsb_gunlocked_duelists_offset   @ 08024a08 1549
     adds r0,r0,r1    @ 08024a0a 4018
     ldr r1,[r0,#0x0]                         @ 08024a0c 0168
     orrs r1,r5    @ 08024a0e 2943
     str r1,[r0,#0x0]                         @ 08024a10 0160
-    ldr r2, DWORD_08024a64                   @ 08024a12 144a
+    ldr r2, bfsb_ptr_gduelscenebase          @ 08024a12 144a
     movs r0,#0x1    @ 08024a14 0120
     strh r0,[r2,#0x0]                        @ 08024a16 1080
     movs r4,#0x0    @ 08024a18 0024
@@ -16191,12 +16260,12 @@ LAB_08024a2e:
     pop {r0}                                 @ 08024a56 01bc
     bx r0                                    @ 08024a58 0047
     .zero  0x2
-DWORD_08024a5c:
-    .word  0x02000000                     @ 08024a5c 00000002
-DWORD_08024a60:
-    .word  0x00006e5c                     @ 08024a60 5c6e0000
-DWORD_08024a64:
-    .word  0x02023360                     @ 08024a64 60330202
+bfsb_ewram_base:
+    .word  EWRAM_BASE                     @ 08024a5c 00000002
+bfsb_gunlocked_duelists_offset:
+    .word  GUNLOCKED_DUELISTS_OFFSET      @ 08024a60 5c6e0000
+bfsb_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08024a64 60330202
 
 @ Selects a ROM font data pointer based on gPrng+0x6c2c bits[2:0] (font_type, [1..5]),
 @ stores it in high registers r8/r9/r10/r11, then calls setup_line_buf_pos_and_font
@@ -16239,8 +16308,8 @@ render_text_with_font_type_select:
     ldr r3,[sp,#0x4]                         @ 08024a92 019b
     ands r3,r0    @ 08024a94 0340
     str r3,[sp,#0x4]                         @ 08024a96 0193
-    ldr r0, DWORD_08024ac0                   @ 08024a98 0948
-    ldr r4, DWORD_08024ac4                   @ 08024a9a 0a4c
+    ldr r0, rtfts_ewram_base                 @ 08024a98 0948
+    ldr r4, rtfts_gsettings_offset           @ 08024a9a 0a4c
     adds r0,r0,r4    @ 08024a9c 0019
     ldrb r0,[r0,#0x0]                        @ 08024a9e 0078
     ands r2,r0    @ 08024aa0 0240
@@ -16252,53 +16321,53 @@ render_text_with_font_type_select:
     beq LAB_08024adc                         @ 08024aac 16d0
     cmp r2,#0x4                              @ 08024aae 042a
     beq LAB_08024ad0                         @ 08024ab0 0ed0
-    ldr r0, DWORD_08024ac8                   @ 08024ab2 0548
+    ldr r0, render_text_font_select_font5_base @ 08024ab2 0548
     .hword 0x4681    @ 08024ab4 8146
     cmp r2,#0x5                              @ 08024ab6 052a
     bne LAB_08024af8                         @ 08024ab8 1ed1
-    ldr r1, DWORD_08024acc                   @ 08024aba 0449
+    ldr r1, render_text_font_select_font5_off @ 08024aba 0449
     add r9,r1                                @ 08024abc 8944
     b LAB_08024af8                           @ 08024abe 1be0
-DWORD_08024ac0:
-    .word  0x02000000                     @ 08024ac0 00000002
-DWORD_08024ac4:
-    .word  0x00006c2c                     @ 08024ac4 2c6c0000
-DWORD_08024ac8:
-    .word  0x09dbf4d6                     @ 08024ac8 d6f4db09
-DWORD_08024acc:
-    .word  0x0003aa54                     @ 08024acc 54aa0300
+rtfts_ewram_base:
+    .word  EWRAM_BASE                     @ 08024ac0 00000002
+rtfts_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08024ac4 2c6c0000
+render_text_font_select_font5_base:
+    .word  0x09dbf4d6                     @ 08024ac8 d6f4db09  0x09dbf4d6: font type5 ROM base JP
+render_text_font_select_font5_off:
+    .word  0x0003aa54                     @ 08024acc 54aa0300  0x0003aa54: font type5 offset
 LAB_08024ad0:
-    ldr r2, DWORD_08024ad8                   @ 08024ad0 014a
+    ldr r2, render_text_font_select_font4_ptr @ 08024ad0 014a
     .hword 0x4691    @ 08024ad2 9146
     b LAB_08024af8                           @ 08024ad4 10e0
     .zero  0x2
-DWORD_08024ad8:
-    .word  0x09dee362                     @ 08024ad8 62e3de09
+render_text_font_select_font4_ptr:
+    .word  0x09dee362                     @ 08024ad8 62e3de09  0x09dee362: font type4 ROM ptr
 LAB_08024adc:
-    ldr r3, DWORD_08024ae4                   @ 08024adc 014b
+    ldr r3, render_text_font_select_font3_ptr @ 08024adc 014b
     .hword 0x4699    @ 08024ade 9946
     b LAB_08024af8                           @ 08024ae0 0ae0
     .zero  0x2
-DWORD_08024ae4:
-    .word  0x09de1e76                     @ 08024ae4 761ede09
+render_text_font_select_font3_ptr:
+    .word  0x09de1e76                     @ 08024ae4 761ede09  0x09de1e76: font type3 ROM ptr
 LAB_08024ae8:
-    ldr r4, DWORD_08024af0                   @ 08024ae8 014c
+    ldr r4, render_text_font_select_font2_ptr @ 08024ae8 014c
     .hword 0x46a1    @ 08024aea a146
     b LAB_08024af8                           @ 08024aec 04e0
     .zero  0x2
-DWORD_08024af0:
-    .word  0x09dd5b3a                     @ 08024af0 3a5bdd09
+render_text_font_select_font2_ptr:
+    .word  0x09dd5b3a                     @ 08024af0 3a5bdd09  0x09dd5b3a: font type2 ROM ptr
 LAB_08024af4:
-    ldr r0, DWORD_08024c60                   @ 08024af4 5a48
+    ldr r0, render_text_font_select_font1_ptr @ 08024af4 5a48
     .hword 0x4681    @ 08024af6 8146
 LAB_08024af8:
     movs r0,#0x16    @ 08024af8 1620
     movs r1,#0x2    @ 08024afa 0221
     bl setup_line_buf_pos_and_font           @ 08024afc ccf05af8
-    ldr r1, DWORD_08024c64                   @ 08024b00 5849
+    ldr r1, rtfts_gfontjpctx                 @ 08024b00 5849
     .hword 0x468a    @ 08024b02 8a46
-    ldr r2, DWORD_08024c68                   @ 08024b04 584a
-    ldr r3, DWORD_08024c6c                   @ 08024b06 594b
+    ldr r2, rtfts_ewram_base_1               @ 08024b04 584a
+    ldr r3, rtfts_gsettings_offset_1         @ 08024b06 594b
     adds r0,r2,r3    @ 08024b08 d018
     movs r1,#0x7    @ 08024b0a 0721
     ldrb r0,[r0,#0x0]                        @ 08024b0c 0078
@@ -16325,7 +16394,7 @@ LAB_08024af8:
     lsrs r0,r0,#0x1f    @ 08024b36 c00f
     lsls r0,r0,#0x3    @ 08024b38 c000
     adds r1,r1,r0    @ 08024b3a 0918
-    ldr r4, DWORD_08024c70                   @ 08024b3c 4c4c
+    ldr r4, render_text_font_select_jp_base_tbl @ 08024b3c 4c4c
     adds r1,r1,r4    @ 08024b3e 0919
     ldr r0,[r1,#0x0]                         @ 08024b40 0868
     str r0,[r3,#0x4]                         @ 08024b42 5860
@@ -16362,8 +16431,8 @@ LAB_08024af8:
 LAB_08024b88:
     asrs r0,r0,#0x5    @ 08024b88 4011
     lsls r2,r0,#0x2    @ 08024b8a 8200
-    ldr r3, DWORD_08024c68                   @ 08024b8c 364b
-    ldr r4, DWORD_08024c74                   @ 08024b8e 394c
+    ldr r3, rtfts_ewram_base_1               @ 08024b8c 364b
+    ldr r4, rtfts_gsettings_font_table_off   @ 08024b8e 394c
     adds r1,r3,r4    @ 08024b90 1919
     adds r2,r2,r1    @ 08024b92 5218
     lsls r0,r0,#0x5    @ 08024b94 4001
@@ -16379,12 +16448,12 @@ LAB_08024b88:
     lsls r0,r0,#0x2    @ 08024ba8 8000
     subs r0,r0,r7    @ 08024baa c01b
     lsls r0,r0,#0x3    @ 08024bac c000
-    ldr r2, DWORD_08024c78                   @ 08024bae 324a
+    ldr r2, rtfts_gsettings_text_field_a_off @ 08024bae 324a
     adds r1,r3,r2    @ 08024bb0 9918
     adds r1,r1,r0    @ 08024bb2 0918
     .hword 0x4689    @ 08024bb4 8946
     adds r0,r0,r3    @ 08024bb6 c018
-    ldr r3, DWORD_08024c7c                   @ 08024bb8 304b
+    ldr r3, rtfts_gsettings_text_field_b_off @ 08024bb8 304b
     adds r0,r0,r3    @ 08024bba c018
     ldrb r0,[r0,#0x0]                        @ 08024bbc 0078
     rsbs r1,r0,#0    @ 08024bbe 4142
@@ -16407,7 +16476,7 @@ LAB_08024b88:
     lsrs r0,r0,#0x1f    @ 08024be0 c00f
     lsls r0,r0,#0x3    @ 08024be2 c000
     adds r1,r1,r0    @ 08024be4 0918
-    ldr r4, DWORD_08024c70                   @ 08024be6 224c
+    ldr r4, render_text_font_select_jp_base_tbl @ 08024be6 224c
     adds r1,r1,r4    @ 08024be8 0919
     ldr r0,[r1,#0x0]                         @ 08024bea 0868
     str r0,[r3,#0x4]                         @ 08024bec 5860
@@ -16424,7 +16493,7 @@ LAB_08024bee:
     bl text_render_wrapper                   @ 08024c02 cdf03bff
     .hword 0x4640    @ 08024c06 4046
     lsls r4,r0,#0x5    @ 08024c08 4401
-    ldr r1, DWORD_08024c80                   @ 08024c0a 1d49
+    ldr r1, rtfts_bg_char_vram_cb2           @ 08024c0a 1d49
     adds r4,r4,r1    @ 08024c0c 6418
     movs r1,#0xb0    @ 08024c0e b021
     lsls r1,r1,#0x3    @ 08024c10 c900
@@ -16434,7 +16503,7 @@ LAB_08024bee:
     movs r1,#0x0    @ 08024c1a 0021
     bl commit_line_buffer_to_sprite_vram     @ 08024c1c cef016f9
     movs r1,#0x0    @ 08024c20 0021
-    ldr r5, DWORD_08024c84                   @ 08024c22 184d
+    ldr r5, rtfts_card_desc_bg_vram_a        @ 08024c22 184d
 LAB_08024c24:
     ldr r2,[sp,#0x4]                         @ 08024c24 019a
     adds r0,r2,r1    @ 08024c26 5018
@@ -16467,26 +16536,26 @@ LAB_08024c36:
     pop {r4,r5,r6,r7}                        @ 08024c5a f0bc
     pop {r0}                                 @ 08024c5c 01bc
     bx r0                                    @ 08024c5e 0047
-DWORD_08024c60:
-    .word  0x09dca398                     @ 08024c60 98a3dc09
-DWORD_08024c64:
-    .word  0x02006ed0                     @ 08024c64 d06e0002
-DWORD_08024c68:
-    .word  0x02000000                     @ 08024c68 00000002
-DWORD_08024c6c:
-    .word  0x00006c2c                     @ 08024c6c 2c6c0000
-DWORD_08024c70:
-    .word  font_jp_base_table             @ 08024c70 54f8e509
-DWORD_08024c74:
-    .word  0x000053f0                     @ 08024c74 f0530000
-DWORD_08024c78:
-    .word  0x00001250                     @ 08024c78 50120000
-DWORD_08024c7c:
-    .word  0x00001267                     @ 08024c7c 67120000
-DWORD_08024c80:
-    .word  0x06004000                     @ 08024c80 00400006
-DWORD_08024c84:
-    .word  0x06000800                     @ 08024c84 00080006
+render_text_font_select_font1_ptr:
+    .word  0x09dca398                     @ 08024c60 98a3dc09  0x09dca398: font type1 ROM ptr
+rtfts_gfontjpctx:
+    .word  gFontJpCtx                     @ 08024c64 d06e0002
+rtfts_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08024c68 00000002
+rtfts_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08024c6c 2c6c0000
+render_text_font_select_jp_base_tbl:
+    .word  font_jp_base_table             @ 08024c70 54f8e509  0x09e5f854: JP font base table ptr
+rtfts_gsettings_font_table_off:
+    .word  GSETTINGS_FONT_TABLE_OFF       @ 08024c74 f0530000
+rtfts_gsettings_text_field_a_off:
+    .word  GSETTINGS_TEXT_FIELD_A_OFF     @ 08024c78 50120000
+rtfts_gsettings_text_field_b_off:
+    .word  GSETTINGS_TEXT_FIELD_B_OFF     @ 08024c7c 67120000
+rtfts_bg_char_vram_cb2:
+    .word  BG_CHAR_VRAM_CB2               @ 08024c80 00400006
+rtfts_card_desc_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 08024c84 00080006
 
 @ Card attribute render hub: first calls get_card_data_bit_by_index(4) to read card bit 4
 @ (e.g. ATK type flag); skips if zero. Otherwise selects font pointer from font_type
@@ -16508,8 +16577,8 @@ render_card_stats_to_line_buf:
     bgt LAB_08024c96                         @ 08024c92 00dc
     b LAB_08024d74                           @ 08024c94 6ee0
 LAB_08024c96:
-    ldr r0, DWORD_08024cc0                   @ 08024c96 0a48
-    ldr r1, DWORD_08024cc4                   @ 08024c98 0a49
+    ldr r0, rcs_ewram_base                   @ 08024c96 0a48
+    ldr r1, rcs_gsettings_offset             @ 08024c98 0a49
     adds r0,r0,r1    @ 08024c9a 4018
     movs r1,#0x7    @ 08024c9c 0721
     ldrb r0,[r0,#0x0]                        @ 08024c9e 0078
@@ -16522,45 +16591,45 @@ LAB_08024c96:
     beq LAB_08024cd8                         @ 08024cac 14d0
     cmp r1,#0x4                              @ 08024cae 0429
     beq LAB_08024cd0                         @ 08024cb0 0ed0
-    ldr r4, DWORD_08024cc8                   @ 08024cb2 054c
+    ldr r4, rcs_fa_font5_base                @ 08024cb2 054c
     cmp r1,#0x5                              @ 08024cb4 0529
     bne LAB_08024cea                         @ 08024cb6 18d1
-    ldr r2, DWORD_08024ccc                   @ 08024cb8 044a
+    ldr r2, rcs_fa_font5_off                 @ 08024cb8 044a
     adds r4,r4,r2    @ 08024cba a418
     b LAB_08024cea                           @ 08024cbc 15e0
     .zero  0x2
-DWORD_08024cc0:
-    .word  0x02000000                     @ 08024cc0 00000002
-DWORD_08024cc4:
-    .word  0x00006c2c                     @ 08024cc4 2c6c0000
-DWORD_08024cc8:
-    .word  0x09dbe4c2                     @ 08024cc8 c2e4db09
-DWORD_08024ccc:
-    .word  0x0003aaee                     @ 08024ccc eeaa0300
+rcs_ewram_base:
+    .word  EWRAM_BASE                     @ 08024cc0 00000002
+rcs_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08024cc4 2c6c0000
+rcs_fa_font5_base:
+    .word  0x09dbe4c2                     @ 08024cc8 c2e4db09  0x09dbe4c2: card_stat pass A font5 base
+rcs_fa_font5_off:
+    .word  0x0003aaee                     @ 08024ccc eeaa0300  0x0003aaee: pass A font5 off
 LAB_08024cd0:
-    ldr r4, DWORD_08024cd4                   @ 08024cd0 004c
+    ldr r4, rcs_fa_font4_ptr                 @ 08024cd0 004c
     b LAB_08024cea                           @ 08024cd2 0ae0
-DWORD_08024cd4:
-    .word  0x09ded2d8                     @ 08024cd4 d8d2de09
+rcs_fa_font4_ptr:
+    .word  0x09ded2d8                     @ 08024cd4 d8d2de09  0x09ded2d8: pass A font4 ptr
 LAB_08024cd8:
-    ldr r4, DWORD_08024cdc                   @ 08024cd8 004c
+    ldr r4, rcs_fa_font3_ptr                 @ 08024cd8 004c
     b LAB_08024cea                           @ 08024cda 06e0
-DWORD_08024cdc:
-    .word  0x09de0e7e                     @ 08024cdc 7e0ede09
+rcs_fa_font3_ptr:
+    .word  0x09de0e7e                     @ 08024cdc 7e0ede09  0x09de0e7e: pass A font3 ptr
 LAB_08024ce0:
-    ldr r4, DWORD_08024ce4                   @ 08024ce0 004c
+    ldr r4, rcs_fa_font2_ptr                 @ 08024ce0 004c
     b LAB_08024cea                           @ 08024ce2 02e0
-DWORD_08024ce4:
-    .word  0x09dd4bde                     @ 08024ce4 de4bdd09
+rcs_fa_font2_ptr:
+    .word  0x09dd4bde                     @ 08024ce4 de4bdd09  0x09dd4bde: pass A font2 ptr
 LAB_08024ce8:
-    ldr r4, DWORD_08024d34                   @ 08024ce8 124c
+    ldr r4, rcs_fa_font1_ptr                 @ 08024ce8 124c
 LAB_08024cea:
     movs r0,#0x4    @ 08024cea 0420
     bl get_card_data_bit_by_index            @ 08024cec 70f0c2f8
     adds r1,r0,#0x0    @ 08024cf0 011c
     adds r0,r4,#0x0    @ 08024cf2 201c
     bl render_card_stat_with_number_alt      @ 08024cf4 06f0c8ff
-    ldr r0, DWORD_08024d38                   @ 08024cf8 0f48
+    ldr r0, rcs_game_str_separator_ptr       @ 08024cf8 0f48
     movs r1,#0x3    @ 08024cfa 0321
     movs r2,#0x64    @ 08024cfc 6422
     bl render_game_string_with_number        @ 08024cfe 06f01ffe
@@ -16568,8 +16637,8 @@ LAB_08024cea:
     bl get_card_data_bit_by_index            @ 08024d04 70f0b6f8
     cmp r0,#0x0                              @ 08024d08 0028
     bne LAB_08024dce                         @ 08024d0a 60d1
-    ldr r0, DWORD_08024d3c                   @ 08024d0c 0b48
-    ldr r3, DWORD_08024d40                   @ 08024d0e 0c4b
+    ldr r0, rcs_ewram_base_1                 @ 08024d0c 0b48
+    ldr r3, rcs_gsettings_offset_1           @ 08024d0e 0c4b
     adds r0,r0,r3    @ 08024d10 c018
     movs r1,#0x7    @ 08024d12 0721
     ldrb r0,[r0,#0x0]                        @ 08024d14 0078
@@ -16582,51 +16651,51 @@ LAB_08024cea:
     beq LAB_08024d54                         @ 08024d22 17d0
     cmp r1,#0x4                              @ 08024d24 0429
     beq LAB_08024d4c                         @ 08024d26 11d0
-    ldr r0, DWORD_08024d44                   @ 08024d28 0648
+    ldr r0, rcs_fb_font5_base                @ 08024d28 0648
     cmp r1,#0x5                              @ 08024d2a 0529
     bne LAB_08024d66                         @ 08024d2c 1bd1
-    ldr r1, DWORD_08024d48                   @ 08024d2e 0649
+    ldr r1, rcs_fb_font5_off                 @ 08024d2e 0649
     adds r0,r0,r1    @ 08024d30 4018
     b LAB_08024d66                           @ 08024d32 18e0
-DWORD_08024d34:
-    .word  0x09dc957a                     @ 08024d34 7a95dc09
-DWORD_08024d38:
-    .word  0x09e3e740                     @ 08024d38 40e7e309
-DWORD_08024d3c:
-    .word  0x02000000                     @ 08024d3c 00000002
-DWORD_08024d40:
-    .word  0x00006c2c                     @ 08024d40 2c6c0000
-DWORD_08024d44:
-    .word  0x09dbea7e                     @ 08024d44 7eeadb09
-DWORD_08024d48:
-    .word  0x0003ab4c                     @ 08024d48 4cab0300
+rcs_fa_font1_ptr:
+    .word  0x09dc957a                     @ 08024d34 7a95dc09  0x09dc957a: pass A font1 ptr
+rcs_game_str_separator_ptr:
+    .word  0x09e3e740                     @ 08024d38 40e7e309  0x09e3e740: game str separator data ptr
+rcs_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08024d3c 00000002
+rcs_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08024d40 2c6c0000
+rcs_fb_font5_base:
+    .word  0x09dbea7e                     @ 08024d44 7eeadb09  0x09dbea7e
+rcs_fb_font5_off:
+    .word  0x0003ab4c                     @ 08024d48 4cab0300  0x0003ab4c
 LAB_08024d4c:
-    ldr r0, DWORD_08024d50                   @ 08024d4c 0048
+    ldr r0, rcs_fb_font4_ptr                 @ 08024d4c 0048
     b LAB_08024d66                           @ 08024d4e 0ae0
-DWORD_08024d50:
-    .word  0x09ded9d6                     @ 08024d50 d6d9de09
+rcs_fb_font4_ptr:
+    .word  0x09ded9d6                     @ 08024d50 d6d9de09  0x09ded9d6
 LAB_08024d54:
-    ldr r0, DWORD_08024d58                   @ 08024d54 0048
+    ldr r0, rcs_fb_font3_ptr                 @ 08024d54 0048
     b LAB_08024d66                           @ 08024d56 06e0
-DWORD_08024d58:
-    .word  0x09de14ec                     @ 08024d58 ec14de09
+rcs_fb_font3_ptr:
+    .word  0x09de14ec                     @ 08024d58 ec14de09  0x09de14ec
 LAB_08024d5c:
-    ldr r0, DWORD_08024d60                   @ 08024d5c 0048
+    ldr r0, rcs_fb_font2_ptr                 @ 08024d5c 0048
     b LAB_08024d66                           @ 08024d5e 02e0
-DWORD_08024d60:
-    .word  0x09dd5204                     @ 08024d60 0452dd09
+rcs_fb_font2_ptr:
+    .word  0x09dd5204                     @ 08024d60 0452dd09  0x09dd5204
 LAB_08024d64:
-    ldr r0, DWORD_08024d70                   @ 08024d64 0248
+    ldr r0, rcs_fb_font1_ptr                 @ 08024d64 0248
 LAB_08024d66:
     movs r1,#0x2    @ 08024d66 0221
     movs r2,#0x2    @ 08024d68 0222
     bl render_game_string_with_number        @ 08024d6a 06f0e9fd
     b LAB_08024dce                           @ 08024d6e 2ee0
-DWORD_08024d70:
-    .word  0x09dc9b3c                     @ 08024d70 3c9bdc09
+rcs_fb_font1_ptr:
+    .word  0x09dc9b3c                     @ 08024d70 3c9bdc09  0x09dc9b3c
 LAB_08024d74:
-    ldr r0, DWORD_08024d9c                   @ 08024d74 0948
-    ldr r2, DWORD_08024da0                   @ 08024d76 0a4a
+    ldr r0, rcs_ewram_base_2                 @ 08024d74 0948
+    ldr r2, rcs_gsettings_offset_2           @ 08024d76 0a4a
     adds r0,r0,r2    @ 08024d78 8018
     movs r1,#0x7    @ 08024d7a 0721
     ldrb r0,[r0,#0x0]                        @ 08024d7c 0078
@@ -16639,37 +16708,37 @@ LAB_08024d74:
     beq LAB_08024db4                         @ 08024d8a 13d0
     cmp r1,#0x4                              @ 08024d8c 0429
     beq LAB_08024dac                         @ 08024d8e 0dd0
-    ldr r0, DWORD_08024da4                   @ 08024d90 0448
+    ldr r0, rcs_fc_font5_base                @ 08024d90 0448
     cmp r1,#0x5                              @ 08024d92 0529
     bne LAB_08024dc6                         @ 08024d94 17d1
-    ldr r3, DWORD_08024da8                   @ 08024d96 044b
+    ldr r3, rcs_fc_font5_off                 @ 08024d96 044b
     adds r0,r0,r3    @ 08024d98 c018
     b LAB_08024dc6                           @ 08024d9a 14e0
-DWORD_08024d9c:
-    .word  0x02000000                     @ 08024d9c 00000002
-DWORD_08024da0:
-    .word  0x00006c2c                     @ 08024da0 2c6c0000
-DWORD_08024da4:
-    .word  0x09dbea98                     @ 08024da4 98eadb09
-DWORD_08024da8:
-    .word  0x0003ab4e                     @ 08024da8 4eab0300
+rcs_ewram_base_2:
+    .word  EWRAM_BASE                     @ 08024d9c 00000002
+rcs_gsettings_offset_2:
+    .word  GSETTINGS_OFFSET               @ 08024da0 2c6c0000
+rcs_fc_font5_base:
+    .word  0x09dbea98                     @ 08024da4 98eadb09  0x09dbea98
+rcs_fc_font5_off:
+    .word  0x0003ab4e                     @ 08024da8 4eab0300  0x0003ab4e
 LAB_08024dac:
-    ldr r0, DWORD_08024db0                   @ 08024dac 0048
+    ldr r0, rcs_fc_font4_ptr                 @ 08024dac 0048
     b LAB_08024dc6                           @ 08024dae 0ae0
-DWORD_08024db0:
-    .word  0x09ded9f4                     @ 08024db0 f4d9de09
+rcs_fc_font4_ptr:
+    .word  0x09ded9f4                     @ 08024db0 f4d9de09  0x09ded9f4
 LAB_08024db4:
-    ldr r0, DWORD_08024db8                   @ 08024db4 0048
+    ldr r0, rcs_fc_font3_ptr                 @ 08024db4 0048
     b LAB_08024dc6                           @ 08024db6 06e0
-DWORD_08024db8:
-    .word  0x09de1504                     @ 08024db8 0415de09
+rcs_fc_font3_ptr:
+    .word  0x09de1504                     @ 08024db8 0415de09  0x09de1504
 LAB_08024dbc:
-    ldr r0, DWORD_08024dc0                   @ 08024dbc 0048
+    ldr r0, rcs_fc_font2_ptr                 @ 08024dbc 0048
     b LAB_08024dc6                           @ 08024dbe 02e0
-DWORD_08024dc0:
-    .word  0x09dd5220                     @ 08024dc0 2052dd09
+rcs_fc_font2_ptr:
+    .word  0x09dd5220                     @ 08024dc0 2052dd09  0x09dd5220
 LAB_08024dc4:
-    ldr r0, DWORD_08024e04                   @ 08024dc4 0f48
+    ldr r0, rcs_fc_font1_ptr                 @ 08024dc4 0f48
 LAB_08024dc6:
     movs r1,#0x96    @ 08024dc6 9621
     lsls r1,r1,#0x1    @ 08024dc8 4900
@@ -16677,11 +16746,11 @@ LAB_08024dc6:
 LAB_08024dce:
     movs r0,#0x0    @ 08024dce 0020
     bl get_card_data_bit_by_index            @ 08024dd0 70f050f8
-    ldr r1, DWORD_08024e08                   @ 08024dd4 0c49
+    ldr r1, rcs_card_stat_lp_threshold       @ 08024dd4 0c49
     cmp r0,r1                                @ 08024dd6 8842
     ble LAB_08024e4a                         @ 08024dd8 37dd
-    ldr r0, DWORD_08024e0c                   @ 08024dda 0c48
-    ldr r1, DWORD_08024e10                   @ 08024ddc 0c49
+    ldr r0, rcs_ewram_base_3                 @ 08024dda 0c48
+    ldr r1, rcs_gsettings_offset_3           @ 08024ddc 0c49
     adds r0,r0,r1    @ 08024dde 4018
     movs r1,#0x7    @ 08024de0 0721
     ldrb r0,[r0,#0x0]                        @ 08024de2 0078
@@ -16694,42 +16763,42 @@ LAB_08024dce:
     beq LAB_08024e24                         @ 08024df0 18d0
     cmp r1,#0x4                              @ 08024df2 0429
     beq LAB_08024e1c                         @ 08024df4 12d0
-    ldr r4, DWORD_08024e14                   @ 08024df6 074c
+    ldr r4, rcs_fd_font5_base                @ 08024df6 074c
     cmp r1,#0x5                              @ 08024df8 0529
     bne LAB_08024e36                         @ 08024dfa 1cd1
-    ldr r2, DWORD_08024e18                   @ 08024dfc 064a
+    ldr r2, rcs_fd_font5_off                 @ 08024dfc 064a
     adds r4,r4,r2    @ 08024dfe a418
     b LAB_08024e36                           @ 08024e00 19e0
     .zero  0x2
-DWORD_08024e04:
-    .word  0x09dc9b56                     @ 08024e04 569bdc09
-DWORD_08024e08:
-    .word  0x00000bb8                     @ 08024e08 b80b0000
-DWORD_08024e0c:
-    .word  0x02000000                     @ 08024e0c 00000002
-DWORD_08024e10:
-    .word  0x00006c2c                     @ 08024e10 2c6c0000
-DWORD_08024e14:
-    .word  0x09dbea14                     @ 08024e14 14eadb09
-DWORD_08024e18:
-    .word  0x0003ab50                     @ 08024e18 50ab0300
+rcs_fc_font1_ptr:
+    .word  0x09dc9b56                     @ 08024e04 569bdc09  0x09dc9b56
+rcs_card_stat_lp_threshold:
+    .word  CARD_STAT_LP_THRESHOLD         @ 08024e08 b80b0000
+rcs_ewram_base_3:
+    .word  EWRAM_BASE                     @ 08024e0c 00000002
+rcs_gsettings_offset_3:
+    .word  GSETTINGS_OFFSET               @ 08024e10 2c6c0000
+rcs_fd_font5_base:
+    .word  0x09dbea14                     @ 08024e14 14eadb09  0x09dbea14
+rcs_fd_font5_off:
+    .word  0x0003ab50                     @ 08024e18 50ab0300  0x0003ab50
 LAB_08024e1c:
-    ldr r4, DWORD_08024e20                   @ 08024e1c 004c
+    ldr r4, rcs_fd_font4_ptr                 @ 08024e1c 004c
     b LAB_08024e36                           @ 08024e1e 0ae0
-DWORD_08024e20:
-    .word  0x09ded95e                     @ 08024e20 5ed9de09
+rcs_fd_font4_ptr:
+    .word  0x09ded95e                     @ 08024e20 5ed9de09  0x09ded95e
 LAB_08024e24:
-    ldr r4, DWORD_08024e28                   @ 08024e24 004c
+    ldr r4, rcs_fd_font3_ptr                 @ 08024e24 004c
     b LAB_08024e36                           @ 08024e26 06e0
-DWORD_08024e28:
-    .word  0x09de1474                     @ 08024e28 7414de09
+rcs_fd_font3_ptr:
+    .word  0x09de1474                     @ 08024e28 7414de09  0x09de1474
 LAB_08024e2c:
-    ldr r4, DWORD_08024e30                   @ 08024e2c 004c
+    ldr r4, rcs_fd_font2_ptr                 @ 08024e2c 004c
     b LAB_08024e36                           @ 08024e2e 02e0
-DWORD_08024e30:
-    .word  0x09dd518e                     @ 08024e30 8e51dd09
+rcs_fd_font2_ptr:
+    .word  0x09dd518e                     @ 08024e30 8e51dd09  0x09dd518e
 LAB_08024e34:
-    ldr r4, DWORD_08024ea4                   @ 08024e34 1b4c
+    ldr r4, rcs_fd_font1_ptr                 @ 08024e34 1b4c
 LAB_08024e36:
     movs r0,#0x0    @ 08024e36 0020
     bl get_card_data_bit_by_index            @ 08024e38 70f01cf8
@@ -16761,8 +16830,8 @@ LAB_08024e62:
     bl get_card_data_bit_by_index            @ 08024e76 6ff0fdff
     adds r5,r0,#0x0    @ 08024e7a 051c
 LAB_08024e7c:
-    ldr r0, DWORD_08024ea8                   @ 08024e7c 0a48
-    ldr r3, DWORD_08024eac                   @ 08024e7e 0b4b
+    ldr r0, rcs_ewram_base_4                 @ 08024e7c 0a48
+    ldr r3, rcs_gsettings_offset_4           @ 08024e7e 0b4b
     adds r0,r0,r3    @ 08024e80 c018
     movs r1,#0x7    @ 08024e82 0721
     ldrb r0,[r0,#0x0]                        @ 08024e84 0078
@@ -16775,39 +16844,39 @@ LAB_08024e7c:
     beq LAB_08024ec0                         @ 08024e92 15d0
     cmp r1,#0x4                              @ 08024e94 0429
     beq LAB_08024eb8                         @ 08024e96 0fd0
-    ldr r4, DWORD_08024eb0                   @ 08024e98 054c
+    ldr r4, rcs_fe_font5_base                @ 08024e98 054c
     cmp r1,#0x5                              @ 08024e9a 0529
     bne LAB_08024ed2                         @ 08024e9c 19d1
-    ldr r0, DWORD_08024eb4                   @ 08024e9e 0548
+    ldr r0, rcs_fe_font5_off                 @ 08024e9e 0548
     adds r4,r4,r0    @ 08024ea0 2418
     b LAB_08024ed2                           @ 08024ea2 16e0
-DWORD_08024ea4:
-    .word  0x09dc9ad6                     @ 08024ea4 d69adc09
-DWORD_08024ea8:
-    .word  0x02000000                     @ 08024ea8 00000002
-DWORD_08024eac:
-    .word  0x00006c2c                     @ 08024eac 2c6c0000
-DWORD_08024eb0:
-    .word  0x09dbea28                     @ 08024eb0 28eadb09
-DWORD_08024eb4:
-    .word  0x0003ab4a                     @ 08024eb4 4aab0300
+rcs_fd_font1_ptr:
+    .word  0x09dc9ad6                     @ 08024ea4 d69adc09  0x09dc9ad6
+rcs_ewram_base_4:
+    .word  EWRAM_BASE                     @ 08024ea8 00000002
+rcs_gsettings_offset_4:
+    .word  GSETTINGS_OFFSET               @ 08024eac 2c6c0000
+rcs_fe_font5_base:
+    .word  0x09dbea28                     @ 08024eb0 28eadb09  0x09dbea28
+rcs_fe_font5_off:
+    .word  0x0003ab4a                     @ 08024eb4 4aab0300  0x0003ab4a
 LAB_08024eb8:
-    ldr r4, DWORD_08024ebc                   @ 08024eb8 004c
+    ldr r4, rcs_fe_font4_ptr                 @ 08024eb8 004c
     b LAB_08024ed2                           @ 08024eba 0ae0
-DWORD_08024ebc:
-    .word  0x09ded974                     @ 08024ebc 74d9de09
+rcs_fe_font4_ptr:
+    .word  0x09ded974                     @ 08024ebc 74d9de09  0x09ded974
 LAB_08024ec0:
-    ldr r4, DWORD_08024ec4                   @ 08024ec0 004c
+    ldr r4, rcs_fe_font3_ptr                 @ 08024ec0 004c
     b LAB_08024ed2                           @ 08024ec2 06e0
-DWORD_08024ec4:
-    .word  0x09de1488                     @ 08024ec4 8814de09
+rcs_fe_font3_ptr:
+    .word  0x09de1488                     @ 08024ec4 8814de09  0x09de1488
 LAB_08024ec8:
-    ldr r4, DWORD_08024ecc                   @ 08024ec8 004c
+    ldr r4, rcs_fe_font2_ptr                 @ 08024ec8 004c
     b LAB_08024ed2                           @ 08024eca 02e0
-DWORD_08024ecc:
-    .word  0x09dd51a2                     @ 08024ecc a251dd09
+rcs_fe_font2_ptr:
+    .word  0x09dd51a2                     @ 08024ecc a251dd09  0x09dd51a2
 LAB_08024ed0:
-    ldr r4, DWORD_08024f14                   @ 08024ed0 104c
+    ldr r4, rcs_fe_font1_ptr                 @ 08024ed0 104c
 LAB_08024ed2:
     adds r0,r5,#0x0    @ 08024ed2 281c
     movs r1,#0x64    @ 08024ed4 6421
@@ -16820,8 +16889,8 @@ LAB_08024ee2:
     bl get_card_data_bit_by_index            @ 08024ee4 6ff0c6ff
     cmp r0,#0x0                              @ 08024ee8 0028
     ble LAB_08024f54                         @ 08024eea 33dd
-    ldr r0, DWORD_08024f18                   @ 08024eec 0a48
-    ldr r1, DWORD_08024f1c                   @ 08024eee 0b49
+    ldr r0, rcs_ewram_base_5                 @ 08024eec 0a48
+    ldr r1, rcs_gsettings_offset_5           @ 08024eee 0b49
     adds r0,r0,r1    @ 08024ef0 4018
     movs r1,#0x7    @ 08024ef2 0721
     ldrb r0,[r0,#0x0]                        @ 08024ef4 0078
@@ -16834,39 +16903,39 @@ LAB_08024ee2:
     beq LAB_08024f30                         @ 08024f02 15d0
     cmp r1,#0x4                              @ 08024f04 0429
     beq LAB_08024f28                         @ 08024f06 0fd0
-    ldr r4, DWORD_08024f20                   @ 08024f08 054c
+    ldr r4, rcs_ff_font5_base                @ 08024f08 054c
     cmp r1,#0x5                              @ 08024f0a 0529
     bne LAB_08024f42                         @ 08024f0c 19d1
-    ldr r2, DWORD_08024f24                   @ 08024f0e 054a
+    ldr r2, rcs_ff_font5_off                 @ 08024f0e 054a
     adds r4,r4,r2    @ 08024f10 a418
     b LAB_08024f42                           @ 08024f12 16e0
-DWORD_08024f14:
-    .word  0x09dc9ae4                     @ 08024f14 e49adc09
-DWORD_08024f18:
-    .word  0x02000000                     @ 08024f18 00000002
-DWORD_08024f1c:
-    .word  0x00006c2c                     @ 08024f1c 2c6c0000
-DWORD_08024f20:
-    .word  0x09dbeab2                     @ 08024f20 b2eadb09
-DWORD_08024f24:
-    .word  0x0003ab4e                     @ 08024f24 4eab0300
+rcs_fe_font1_ptr:
+    .word  0x09dc9ae4                     @ 08024f14 e49adc09  0x09dc9ae4
+rcs_ewram_base_5:
+    .word  EWRAM_BASE                     @ 08024f18 00000002
+rcs_gsettings_offset_5:
+    .word  GSETTINGS_OFFSET               @ 08024f1c 2c6c0000
+rcs_ff_font5_base:
+    .word  0x09dbeab2                     @ 08024f20 b2eadb09  0x09dbeab2
+rcs_ff_font5_off:
+    .word  0x0003ab4e                     @ 08024f24 4eab0300  0x0003ab4e
 LAB_08024f28:
-    ldr r4, DWORD_08024f2c                   @ 08024f28 004c
+    ldr r4, rcs_ff_font4_ptr                 @ 08024f28 004c
     b LAB_08024f42                           @ 08024f2a 0ae0
-DWORD_08024f2c:
-    .word  0x09deda10                     @ 08024f2c 10dade09
+rcs_ff_font4_ptr:
+    .word  0x09deda10                     @ 08024f2c 10dade09  0x09deda10
 LAB_08024f30:
-    ldr r4, DWORD_08024f34                   @ 08024f30 004c
+    ldr r4, rcs_ff_font3_ptr                 @ 08024f30 004c
     b LAB_08024f42                           @ 08024f32 06e0
-DWORD_08024f34:
-    .word  0x09de151e                     @ 08024f34 1e15de09
+rcs_ff_font3_ptr:
+    .word  0x09de151e                     @ 08024f34 1e15de09  0x09de151e
 LAB_08024f38:
-    ldr r4, DWORD_08024f3c                   @ 08024f38 004c
+    ldr r4, rcs_ff_font2_ptr                 @ 08024f38 004c
     b LAB_08024f42                           @ 08024f3a 02e0
-DWORD_08024f3c:
-    .word  0x09dd523c                     @ 08024f3c 3c52dd09
+rcs_ff_font2_ptr:
+    .word  0x09dd523c                     @ 08024f3c 3c52dd09  0x09dd523c
 LAB_08024f40:
-    ldr r4, DWORD_08024f88                   @ 08024f40 114c
+    ldr r4, rcs_ff_font1_ptr                 @ 08024f40 114c
 LAB_08024f42:
     movs r0,#0xf    @ 08024f42 0f20
     bl get_card_data_bit_by_index            @ 08024f44 6ff096ff
@@ -16880,8 +16949,8 @@ LAB_08024f54:
     bl get_card_data_bit_by_index            @ 08024f56 6ff08dff
     cmp r0,#0x0                              @ 08024f5a 0028
     ble LAB_08024fc8                         @ 08024f5c 34dd
-    ldr r0, DWORD_08024f8c                   @ 08024f5e 0b48
-    ldr r3, DWORD_08024f90                   @ 08024f60 0b4b
+    ldr r0, rcs_ewram_base_6                 @ 08024f5e 0b48
+    ldr r3, rcs_gsettings_offset_6           @ 08024f60 0b4b
     adds r0,r0,r3    @ 08024f62 c018
     movs r1,#0x7    @ 08024f64 0721
     ldrb r0,[r0,#0x0]                        @ 08024f66 0078
@@ -16894,40 +16963,40 @@ LAB_08024f54:
     beq LAB_08024fa4                         @ 08024f74 16d0
     cmp r1,#0x4                              @ 08024f76 0429
     beq LAB_08024f9c                         @ 08024f78 10d0
-    ldr r4, DWORD_08024f94                   @ 08024f7a 064c
+    ldr r4, rcs_fg_font5_base                @ 08024f7a 064c
     cmp r1,#0x5                              @ 08024f7c 0529
     bne LAB_08024fb6                         @ 08024f7e 1ad1
-    ldr r0, DWORD_08024f98                   @ 08024f80 0548
+    ldr r0, rcs_fg_font5_off                 @ 08024f80 0548
     adds r4,r4,r0    @ 08024f82 2418
     b LAB_08024fb6                           @ 08024f84 17e0
     .zero  0x2
-DWORD_08024f88:
-    .word  0x09dc9b70                     @ 08024f88 709bdc09
-DWORD_08024f8c:
-    .word  0x02000000                     @ 08024f8c 00000002
-DWORD_08024f90:
-    .word  0x00006c2c                     @ 08024f90 2c6c0000
-DWORD_08024f94:
-    .word  0x09dbe9d8                     @ 08024f94 d8e9db09
-DWORD_08024f98:
-    .word  0x0003ab48                     @ 08024f98 48ab0300
+rcs_ff_font1_ptr:
+    .word  0x09dc9b70                     @ 08024f88 709bdc09  0x09dc9b70
+rcs_ewram_base_6:
+    .word  EWRAM_BASE                     @ 08024f8c 00000002
+rcs_gsettings_offset_6:
+    .word  GSETTINGS_OFFSET               @ 08024f90 2c6c0000
+rcs_fg_font5_base:
+    .word  0x09dbe9d8                     @ 08024f94 d8e9db09  0x09dbe9d8
+rcs_fg_font5_off:
+    .word  0x0003ab48                     @ 08024f98 48ab0300  0x0003ab48
 LAB_08024f9c:
-    ldr r4, DWORD_08024fa0                   @ 08024f9c 004c
+    ldr r4, rcs_fg_font4_ptr                 @ 08024f9c 004c
     b LAB_08024fb6                           @ 08024f9e 0ae0
-DWORD_08024fa0:
-    .word  0x09ded914                     @ 08024fa0 14d9de09
+rcs_fg_font4_ptr:
+    .word  0x09ded914                     @ 08024fa0 14d9de09  0x09ded914
 LAB_08024fa4:
-    ldr r4, DWORD_08024fa8                   @ 08024fa4 004c
+    ldr r4, rcs_fg_font3_ptr                 @ 08024fa4 004c
     b LAB_08024fb6                           @ 08024fa6 06e0
-DWORD_08024fa8:
-    .word  0x09de142a                     @ 08024fa8 2a14de09
+rcs_fg_font3_ptr:
+    .word  0x09de142a                     @ 08024fa8 2a14de09  0x09de142a
 LAB_08024fac:
-    ldr r4, DWORD_08024fb0                   @ 08024fac 004c
+    ldr r4, rcs_fg_font2_ptr                 @ 08024fac 004c
     b LAB_08024fb6                           @ 08024fae 02e0
-DWORD_08024fb0:
-    .word  0x09dd514e                     @ 08024fb0 4e51dd09
+rcs_fg_font2_ptr:
+    .word  0x09dd514e                     @ 08024fb0 4e51dd09  0x09dd514e
 LAB_08024fb4:
-    ldr r4, DWORD_08024ffc                   @ 08024fb4 114c
+    ldr r4, rcs_fg_font1_ptr                 @ 08024fb4 114c
 LAB_08024fb6:
     movs r0,#0x18    @ 08024fb6 1820
     bl get_card_data_bit_by_index            @ 08024fb8 6ff05cff
@@ -16941,8 +17010,8 @@ LAB_08024fc8:
     bl get_card_data_bit_by_index            @ 08024fca 6ff053ff
     cmp r0,#0x0                              @ 08024fce 0028
     ble LAB_0802503a                         @ 08024fd0 33dd
-    ldr r0, DWORD_08025000                   @ 08024fd2 0b48
-    ldr r1, DWORD_08025004                   @ 08024fd4 0b49
+    ldr r0, rcs_ewram_base_7                 @ 08024fd2 0b48
+    ldr r1, rcs_gsettings_offset_7           @ 08024fd4 0b49
     adds r0,r0,r1    @ 08024fd6 4018
     movs r1,#0x7    @ 08024fd8 0721
     ldrb r0,[r0,#0x0]                        @ 08024fda 0078
@@ -16955,40 +17024,40 @@ LAB_08024fc8:
     beq LAB_08025018                         @ 08024fe8 16d0
     cmp r1,#0x4                              @ 08024fea 0429
     beq LAB_08025010                         @ 08024fec 10d0
-    ldr r4, DWORD_08025008                   @ 08024fee 064c
+    ldr r4, rcs_fh_font5_base                @ 08024fee 064c
     cmp r1,#0x5                              @ 08024ff0 0529
     bne LAB_0802502a                         @ 08024ff2 1ad1
-    ldr r2, DWORD_0802500c                   @ 08024ff4 054a
+    ldr r2, rcs_fh_font5_off                 @ 08024ff4 054a
     adds r4,r4,r2    @ 08024ff6 a418
     b LAB_0802502a                           @ 08024ff8 17e0
     .zero  0x2
-DWORD_08024ffc:
-    .word  0x09dc9a9c                     @ 08024ffc 9c9adc09
-DWORD_08025000:
-    .word  0x02000000                     @ 08025000 00000002
-DWORD_08025004:
-    .word  0x00006c2c                     @ 08025004 2c6c0000
-DWORD_08025008:
-    .word  0x09dbe9b4                     @ 08025008 b4e9db09
-DWORD_0802500c:
-    .word  0x0003ab34                     @ 0802500c 34ab0300
+rcs_fg_font1_ptr:
+    .word  0x09dc9a9c                     @ 08024ffc 9c9adc09  0x09dc9a9c
+rcs_ewram_base_7:
+    .word  EWRAM_BASE                     @ 08025000 00000002
+rcs_gsettings_offset_7:
+    .word  GSETTINGS_OFFSET               @ 08025004 2c6c0000
+rcs_fh_font5_base:
+    .word  0x09dbe9b4                     @ 08025008 b4e9db09  0x09dbe9b4
+rcs_fh_font5_off:
+    .word  0x0003ab34                     @ 0802500c 34ab0300  0x0003ab34
 LAB_08025010:
-    ldr r4, DWORD_08025014                   @ 08025010 004c
+    ldr r4, rcs_fh_font4_ptr                 @ 08025010 004c
     b LAB_0802502a                           @ 08025012 0ae0
-DWORD_08025014:
-    .word  0x09ded8e0                     @ 08025014 e0d8de09
+rcs_fh_font4_ptr:
+    .word  0x09ded8e0                     @ 08025014 e0d8de09  0x09ded8e0
 LAB_08025018:
-    ldr r4, DWORD_0802501c                   @ 08025018 004c
+    ldr r4, rcs_fh_font3_ptr                 @ 08025018 004c
     b LAB_0802502a                           @ 0802501a 06e0
-DWORD_0802501c:
-    .word  0x09de13f4                     @ 0802501c f413de09
+rcs_fh_font3_ptr:
+    .word  0x09de13f4                     @ 0802501c f413de09  0x09de13f4
 LAB_08025020:
-    ldr r4, DWORD_08025024                   @ 08025020 004c
+    ldr r4, rcs_fh_font2_ptr                 @ 08025020 004c
     b LAB_0802502a                           @ 08025022 02e0
-DWORD_08025024:
-    .word  0x09dd511c                     @ 08025024 1c51dd09
+rcs_fh_font2_ptr:
+    .word  0x09dd511c                     @ 08025024 1c51dd09  0x09dd511c
 LAB_08025028:
-    ldr r4, DWORD_0802506c                   @ 08025028 104c
+    ldr r4, rcs_fh_font1_ptr                 @ 08025028 104c
 LAB_0802502a:
     movs r0,#0x23    @ 0802502a 2320
     bl get_card_data_bit_by_index            @ 0802502c 6ff022ff
@@ -17001,8 +17070,8 @@ LAB_0802503a:
     bl get_card_data_bit_by_index            @ 0802503c 6ff01aff
     cmp r0,#0x0                              @ 08025040 0028
     ble LAB_080250b0                         @ 08025042 35dd
-    ldr r0, DWORD_08025070                   @ 08025044 0a48
-    ldr r3, DWORD_08025074                   @ 08025046 0b4b
+    ldr r0, rcs_ewram_base_8                 @ 08025044 0a48
+    ldr r3, rcs_gsettings_offset_8           @ 08025046 0b4b
     adds r0,r0,r3    @ 08025048 c018
     movs r1,#0x7    @ 0802504a 0721
     ldrb r0,[r0,#0x0]                        @ 0802504c 0078
@@ -17015,39 +17084,39 @@ LAB_0802503a:
     beq LAB_08025088                         @ 0802505a 15d0
     cmp r1,#0x4                              @ 0802505c 0429
     beq LAB_08025080                         @ 0802505e 0fd0
-    ldr r4, DWORD_08025078                   @ 08025060 054c
+    ldr r4, rcs_fi_font5_base                @ 08025060 054c
     cmp r1,#0x5                              @ 08025062 0529
     bne LAB_0802509a                         @ 08025064 19d1
-    ldr r0, DWORD_0802507c                   @ 08025066 0548
+    ldr r0, rcs_fi_font5_off                 @ 08025066 0548
     adds r4,r4,r0    @ 08025068 2418
     b LAB_0802509a                           @ 0802506a 16e0
-DWORD_0802506c:
-    .word  0x09dc9a74                     @ 0802506c 749adc09
-DWORD_08025070:
-    .word  0x02000000                     @ 08025070 00000002
-DWORD_08025074:
-    .word  0x00006c2c                     @ 08025074 2c6c0000
-DWORD_08025078:
-    .word  0x09dbe9c6                     @ 08025078 c6e9db09
-DWORD_0802507c:
-    .word  0x0003ab3e                     @ 0802507c 3eab0300
+rcs_fh_font1_ptr:
+    .word  0x09dc9a74                     @ 0802506c 749adc09  0x09dc9a74
+rcs_ewram_base_8:
+    .word  EWRAM_BASE                     @ 08025070 00000002
+rcs_gsettings_offset_8:
+    .word  GSETTINGS_OFFSET               @ 08025074 2c6c0000
+rcs_fi_font5_base:
+    .word  0x09dbe9c6                     @ 08025078 c6e9db09  0x09dbe9c6
+rcs_fi_font5_off:
+    .word  0x0003ab3e                     @ 0802507c 3eab0300  0x0003ab3e
 LAB_08025080:
-    ldr r4, DWORD_08025084                   @ 08025080 004c
+    ldr r4, rcs_fi_font4_ptr                 @ 08025080 004c
     b LAB_0802509a                           @ 08025082 0ae0
-DWORD_08025084:
-    .word  0x09ded8fa                     @ 08025084 fad8de09
+rcs_fi_font4_ptr:
+    .word  0x09ded8fa                     @ 08025084 fad8de09  0x09ded8fa
 LAB_08025088:
-    ldr r4, DWORD_0802508c                   @ 08025088 004c
+    ldr r4, rcs_fi_font3_ptr                 @ 08025088 004c
     b LAB_0802509a                           @ 0802508a 06e0
-DWORD_0802508c:
-    .word  0x09de140e                     @ 0802508c 0e14de09
+rcs_fi_font3_ptr:
+    .word  0x09de140e                     @ 0802508c 0e14de09  0x09de140e
 LAB_08025090:
-    ldr r4, DWORD_08025094                   @ 08025090 004c
+    ldr r4, rcs_fi_font2_ptr                 @ 08025090 004c
     b LAB_0802509a                           @ 08025092 02e0
-DWORD_08025094:
-    .word  0x09dd5136                     @ 08025094 3651dd09
+rcs_fi_font2_ptr:
+    .word  0x09dd5136                     @ 08025094 3651dd09  0x09dd5136
 LAB_08025098:
-    ldr r4, DWORD_080250e4                   @ 08025098 124c
+    ldr r4, rcs_fi_font1_ptr                 @ 08025098 124c
 LAB_0802509a:
     movs r0,#0x24    @ 0802509a 2420
     bl get_card_data_bit_by_index            @ 0802509c 6ff0eafe
@@ -17063,8 +17132,8 @@ LAB_080250b0:
     bl get_card_data_bit_by_index            @ 080250b2 6ff0dffe
     cmp r0,#0x0                              @ 080250b6 0028
     bne LAB_08025118                         @ 080250b8 2ed1
-    ldr r0, DWORD_080250e8                   @ 080250ba 0b48
-    ldr r1, DWORD_080250ec                   @ 080250bc 0b49
+    ldr r0, rcs_ewram_base_9                 @ 080250ba 0b48
+    ldr r1, rcs_gsettings_offset_9           @ 080250bc 0b49
     adds r0,r0,r1    @ 080250be 4018
     movs r1,#0x7    @ 080250c0 0721
     ldrb r0,[r0,#0x0]                        @ 080250c2 0078
@@ -17077,40 +17146,40 @@ LAB_080250b0:
     beq LAB_08025100                         @ 080250d0 16d0
     cmp r1,#0x4                              @ 080250d2 0429
     beq LAB_080250f8                         @ 080250d4 10d0
-    ldr r0, DWORD_080250f0                   @ 080250d6 0648
+    ldr r0, rcs_fj_font5_base                @ 080250d6 0648
     cmp r1,#0x5                              @ 080250d8 0529
     bne LAB_08025112                         @ 080250da 1ad1
-    ldr r2, DWORD_080250f4                   @ 080250dc 054a
+    ldr r2, rcs_fj_font5_off                 @ 080250dc 054a
     adds r0,r0,r2    @ 080250de 8018
     b LAB_08025112                           @ 080250e0 17e0
     .zero  0x2
-DWORD_080250e4:
-    .word  0x09dc9a88                     @ 080250e4 889adc09
-DWORD_080250e8:
-    .word  0x02000000                     @ 080250e8 00000002
-DWORD_080250ec:
-    .word  0x00006c2c                     @ 080250ec 2c6c0000
-DWORD_080250f0:
-    .word  0x09dbe9ea                     @ 080250f0 eae9db09
-DWORD_080250f4:
-    .word  0x0003ab52                     @ 080250f4 52ab0300
+rcs_fi_font1_ptr:
+    .word  0x09dc9a88                     @ 080250e4 889adc09  0x09dc9a88
+rcs_ewram_base_9:
+    .word  EWRAM_BASE                     @ 080250e8 00000002
+rcs_gsettings_offset_9:
+    .word  GSETTINGS_OFFSET               @ 080250ec 2c6c0000
+rcs_fj_font5_base:
+    .word  0x09dbe9ea                     @ 080250f0 eae9db09  0x09dbe9ea
+rcs_fj_font5_off:
+    .word  0x0003ab52                     @ 080250f4 52ab0300  0x0003ab52
 LAB_080250f8:
-    ldr r0, DWORD_080250fc                   @ 080250f8 0048
+    ldr r0, rcs_fj_font4_ptr                 @ 080250f8 0048
     b LAB_08025112                           @ 080250fa 0ae0
-DWORD_080250fc:
-    .word  0x09ded92e                     @ 080250fc 2ed9de09
+rcs_fj_font4_ptr:
+    .word  0x09ded92e                     @ 080250fc 2ed9de09  0x09ded92e
 LAB_08025100:
-    ldr r0, DWORD_08025104                   @ 08025100 0048
+    ldr r0, rcs_fj_font3_ptr                 @ 08025100 0048
     b LAB_08025112                           @ 08025102 06e0
-DWORD_08025104:
-    .word  0x09de1448                     @ 08025104 4814de09
+rcs_fj_font3_ptr:
+    .word  0x09de1448                     @ 08025104 4814de09  0x09de1448
 LAB_08025108:
-    ldr r0, DWORD_0802510c                   @ 08025108 0048
+    ldr r0, rcs_fj_font2_ptr                 @ 08025108 0048
     b LAB_08025112                           @ 0802510a 02e0
-DWORD_0802510c:
-    .word  0x09dd5166                     @ 0802510c 6651dd09
+rcs_fj_font2_ptr:
+    .word  0x09dd5166                     @ 0802510c 6651dd09  0x09dd5166
 LAB_08025110:
-    ldr r0, DWORD_0802514c                   @ 08025110 0e48
+    ldr r0, rcs_fj_font1_ptr                 @ 08025110 0e48
 LAB_08025112:
     movs r1,#0xc8    @ 08025112 c821
     bl render_card_stat_with_number_alt      @ 08025114 06f0b8fd
@@ -17119,8 +17188,8 @@ LAB_08025118:
     bl get_card_data_bit_by_index            @ 0802511a 6ff0abfe
     cmp r0,#0x0                              @ 0802511e 0028
     ble LAB_08025194                         @ 08025120 38dd
-    ldr r0, DWORD_08025150                   @ 08025122 0b48
-    ldr r3, DWORD_08025154                   @ 08025124 0b4b
+    ldr r0, rcs_ewram_base_10                @ 08025122 0b48
+    ldr r3, rcs_gsettings_offset_10          @ 08025124 0b4b
     adds r0,r0,r3    @ 08025126 c018
     movs r1,#0x7    @ 08025128 0721
     ldrb r0,[r0,#0x0]                        @ 0802512a 0078
@@ -17133,40 +17202,40 @@ LAB_08025118:
     beq LAB_08025168                         @ 08025138 16d0
     cmp r1,#0x4                              @ 0802513a 0429
     beq LAB_08025160                         @ 0802513c 10d0
-    ldr r4, DWORD_08025158                   @ 0802513e 064c
+    ldr r4, rcs_fk_font5_base                @ 0802513e 064c
     cmp r1,#0x5                              @ 08025140 0529
     bne LAB_0802517a                         @ 08025142 1ad1
-    ldr r0, DWORD_0802515c                   @ 08025144 0548
+    ldr r0, rcs_fk_font5_off                 @ 08025144 0548
     adds r4,r4,r0    @ 08025146 2418
     b LAB_0802517a                           @ 08025148 17e0
     .zero  0x2
-DWORD_0802514c:
-    .word  0x09dc9ab2                     @ 0802514c b29adc09
-DWORD_08025150:
-    .word  0x02000000                     @ 08025150 00000002
-DWORD_08025154:
-    .word  0x00006c2c                     @ 08025154 2c6c0000
-DWORD_08025158:
-    .word  0x09dbe954                     @ 08025158 54e9db09
-DWORD_0802515c:
-    .word  0x0003ab34                     @ 0802515c 34ab0300
+rcs_fj_font1_ptr:
+    .word  0x09dc9ab2                     @ 0802514c b29adc09  0x09dc9ab2
+rcs_ewram_base_10:
+    .word  EWRAM_BASE                     @ 08025150 00000002
+rcs_gsettings_offset_10:
+    .word  GSETTINGS_OFFSET               @ 08025154 2c6c0000
+rcs_fk_font5_base:
+    .word  0x09dbe954                     @ 08025158 54e9db09  0x09dbe954
+rcs_fk_font5_off:
+    .word  0x0003ab34                     @ 0802515c 34ab0300  0x0003ab34
 LAB_08025160:
-    ldr r4, DWORD_08025164                   @ 08025160 004c
+    ldr r4, rcs_fk_font4_ptr                 @ 08025160 004c
     b LAB_0802517a                           @ 08025162 0ae0
-DWORD_08025164:
-    .word  0x09ded87a                     @ 08025164 7ad8de09
+rcs_fk_font4_ptr:
+    .word  0x09ded87a                     @ 08025164 7ad8de09  0x09ded87a
 LAB_08025168:
-    ldr r4, DWORD_0802516c                   @ 08025168 004c
+    ldr r4, rcs_fk_font3_ptr                 @ 08025168 004c
     b LAB_0802517a                           @ 0802516a 06e0
-DWORD_0802516c:
-    .word  0x09de1394                     @ 0802516c 9413de09
+rcs_fk_font3_ptr:
+    .word  0x09de1394                     @ 0802516c 9413de09  0x09de1394
 LAB_08025170:
-    ldr r4, DWORD_08025174                   @ 08025170 004c
+    ldr r4, rcs_fk_font2_ptr                 @ 08025170 004c
     b LAB_0802517a                           @ 08025172 02e0
-DWORD_08025174:
-    .word  0x09dd50c4                     @ 08025174 c450dd09
+rcs_fk_font2_ptr:
+    .word  0x09dd50c4                     @ 08025174 c450dd09  0x09dd50c4
 LAB_08025178:
-    ldr r4, DWORD_08025190                   @ 08025178 054c
+    ldr r4, rcs_fk_font1_ptr                 @ 08025178 054c
 LAB_0802517a:
     movs r0,#0x1f    @ 0802517a 1f20
     bl get_card_data_bit_by_index            @ 0802517c 6ff07afe
@@ -17177,11 +17246,11 @@ LAB_0802517a:
     bl render_card_stat_with_number_alt      @ 08025188 06f07efd
     b LAB_080251ec                           @ 0802518c 2ee0
     .zero  0x2
-DWORD_08025190:
-    .word  0x09dc9a28                     @ 08025190 289adc09
+rcs_fk_font1_ptr:
+    .word  0x09dc9a28                     @ 08025190 289adc09  0x09dc9a28
 LAB_08025194:
-    ldr r0, DWORD_080251bc                   @ 08025194 0948
-    ldr r1, DWORD_080251c0                   @ 08025196 0a49
+    ldr r0, rcs_ewram_base_11                @ 08025194 0948
+    ldr r1, rcs_gsettings_offset_11          @ 08025196 0a49
     adds r0,r0,r1    @ 08025198 4018
     movs r1,#0x7    @ 0802519a 0721
     ldrb r0,[r0,#0x0]                        @ 0802519c 0078
@@ -17194,37 +17263,37 @@ LAB_08025194:
     beq LAB_080251d4                         @ 080251aa 13d0
     cmp r1,#0x4                              @ 080251ac 0429
     beq LAB_080251cc                         @ 080251ae 0dd0
-    ldr r0, DWORD_080251c4                   @ 080251b0 0448
+    ldr r0, rcs_fl_font5_base                @ 080251b0 0448
     cmp r1,#0x5                              @ 080251b2 0529
     bne LAB_080251e6                         @ 080251b4 17d1
-    ldr r2, DWORD_080251c8                   @ 080251b6 044a
+    ldr r2, rcs_fl_font5_off                 @ 080251b6 044a
     adds r0,r0,r2    @ 080251b8 8018
     b LAB_080251e6                           @ 080251ba 14e0
-DWORD_080251bc:
-    .word  0x02000000                     @ 080251bc 00000002
-DWORD_080251c0:
-    .word  0x00006c2c                     @ 080251c0 2c6c0000
-DWORD_080251c4:
-    .word  0x09dbe982                     @ 080251c4 82e9db09
-DWORD_080251c8:
-    .word  0x0003ab30                     @ 080251c8 30ab0300
+rcs_ewram_base_11:
+    .word  EWRAM_BASE                     @ 080251bc 00000002
+rcs_gsettings_offset_11:
+    .word  GSETTINGS_OFFSET               @ 080251c0 2c6c0000
+rcs_fl_font5_base:
+    .word  0x09dbe982                     @ 080251c4 82e9db09  0x09dbe982
+rcs_fl_font5_off:
+    .word  0x0003ab30                     @ 080251c8 30ab0300  0x0003ab30
 LAB_080251cc:
-    ldr r0, DWORD_080251d0                   @ 080251cc 0048
+    ldr r0, rcs_fl_font4_ptr                 @ 080251cc 0048
     b LAB_080251e6                           @ 080251ce 0ae0
-DWORD_080251d0:
-    .word  0x09ded8aa                     @ 080251d0 aad8de09
+rcs_fl_font4_ptr:
+    .word  0x09ded8aa                     @ 080251d0 aad8de09  0x09ded8aa
 LAB_080251d4:
-    ldr r0, DWORD_080251d8                   @ 080251d4 0048
+    ldr r0, rcs_fl_font3_ptr                 @ 080251d4 0048
     b LAB_080251e6                           @ 080251d6 06e0
-DWORD_080251d8:
-    .word  0x09de13bc                     @ 080251d8 bc13de09
+rcs_fl_font3_ptr:
+    .word  0x09de13bc                     @ 080251d8 bc13de09  0x09de13bc
 LAB_080251dc:
-    ldr r0, DWORD_080251e0                   @ 080251dc 0048
+    ldr r0, rcs_fl_font2_ptr                 @ 080251dc 0048
     b LAB_080251e6                           @ 080251de 02e0
-DWORD_080251e0:
-    .word  0x09dd50e8                     @ 080251e0 e850dd09
+rcs_fl_font2_ptr:
+    .word  0x09dd50e8                     @ 080251e0 e850dd09  0x09dd50e8
 LAB_080251e4:
-    ldr r0, DWORD_08025220                   @ 080251e4 0e48
+    ldr r0, rcs_fl_font1_ptr                 @ 080251e4 0e48
 LAB_080251e6:
     movs r1,#0xc8    @ 080251e6 c821
     bl render_card_stat_with_number_alt      @ 080251e8 06f04efd
@@ -17233,8 +17302,8 @@ LAB_080251ec:
     bl get_card_data_bit_by_index            @ 080251ee 6ff041fe
     cmp r0,#0x0                              @ 080251f2 0028
     ble LAB_08025268                         @ 080251f4 38dd
-    ldr r0, DWORD_08025224                   @ 080251f6 0b48
-    ldr r3, DWORD_08025228                   @ 080251f8 0b4b
+    ldr r0, rcs_ewram_base_12                @ 080251f6 0b48
+    ldr r3, rcs_gsettings_offset_12          @ 080251f8 0b4b
     adds r0,r0,r3    @ 080251fa c018
     movs r1,#0x7    @ 080251fc 0721
     ldrb r0,[r0,#0x0]                        @ 080251fe 0078
@@ -17247,40 +17316,40 @@ LAB_080251ec:
     beq LAB_0802523c                         @ 0802520c 16d0
     cmp r1,#0x4                              @ 0802520e 0429
     beq LAB_08025234                         @ 08025210 10d0
-    ldr r4, DWORD_0802522c                   @ 08025212 064c
+    ldr r4, rcs_fm_font5_base                @ 08025212 064c
     cmp r1,#0x5                              @ 08025214 0529
     bne LAB_0802524e                         @ 08025216 1ad1
-    ldr r0, DWORD_08025230                   @ 08025218 0548
+    ldr r0, rcs_fm_font5_off                 @ 08025218 0548
     adds r4,r4,r0    @ 0802521a 2418
     b LAB_0802524e                           @ 0802521c 17e0
     .zero  0x2
-DWORD_08025220:
-    .word  0x09dc9a4a                     @ 08025220 4a9adc09
-DWORD_08025224:
-    .word  0x02000000                     @ 08025224 00000002
-DWORD_08025228:
-    .word  0x00006c2c                     @ 08025228 2c6c0000
-DWORD_0802522c:
-    .word  0x09dbe96c                     @ 0802522c 6ce9db09
-DWORD_08025230:
-    .word  0x0003ab30                     @ 08025230 30ab0300
+rcs_fl_font1_ptr:
+    .word  0x09dc9a4a                     @ 08025220 4a9adc09  0x09dc9a4a
+rcs_ewram_base_12:
+    .word  EWRAM_BASE                     @ 08025224 00000002
+rcs_gsettings_offset_12:
+    .word  GSETTINGS_OFFSET               @ 08025228 2c6c0000
+rcs_fm_font5_base:
+    .word  0x09dbe96c                     @ 0802522c 6ce9db09  0x09dbe96c
+rcs_fm_font5_off:
+    .word  0x0003ab30                     @ 08025230 30ab0300  0x0003ab30
 LAB_08025234:
-    ldr r4, DWORD_08025238                   @ 08025234 004c
+    ldr r4, rcs_fm_font4_ptr                 @ 08025234 004c
     b LAB_0802524e                           @ 08025236 0ae0
-DWORD_08025238:
-    .word  0x09ded890                     @ 08025238 90d8de09
+rcs_fm_font4_ptr:
+    .word  0x09ded890                     @ 08025238 90d8de09  0x09ded890
 LAB_0802523c:
-    ldr r4, DWORD_08025240                   @ 0802523c 004c
+    ldr r4, rcs_fm_font3_ptr                 @ 0802523c 004c
     b LAB_0802524e                           @ 0802523e 06e0
-DWORD_08025240:
-    .word  0x09de13a8                     @ 08025240 a813de09
+rcs_fm_font3_ptr:
+    .word  0x09de13a8                     @ 08025240 a813de09  0x09de13a8
 LAB_08025244:
-    ldr r4, DWORD_08025248                   @ 08025244 004c
+    ldr r4, rcs_fm_font2_ptr                 @ 08025244 004c
     b LAB_0802524e                           @ 08025246 02e0
-DWORD_08025248:
-    .word  0x09dd50d6                     @ 08025248 d650dd09
+rcs_fm_font2_ptr:
+    .word  0x09dd50d6                     @ 08025248 d650dd09  0x09dd50d6
 LAB_0802524c:
-    ldr r4, DWORD_08025264                   @ 0802524c 054c
+    ldr r4, rcs_fm_font1_ptr                 @ 0802524c 054c
 LAB_0802524e:
     movs r0,#0x21    @ 0802524e 2120
     bl get_card_data_bit_by_index            @ 08025250 6ff010fe
@@ -17291,11 +17360,11 @@ LAB_0802524e:
     bl render_card_stat_with_number_alt      @ 0802525c 06f014fd
     b LAB_080252c0                           @ 08025260 2ee0
     .zero  0x2
-DWORD_08025264:
-    .word  0x09dc9a3a                     @ 08025264 3a9adc09
+rcs_fm_font1_ptr:
+    .word  0x09dc9a3a                     @ 08025264 3a9adc09  0x09dc9a3a
 LAB_08025268:
-    ldr r0, DWORD_08025290                   @ 08025268 0948
-    ldr r1, DWORD_08025294                   @ 0802526a 0a49
+    ldr r0, rcs_ewram_base_13                @ 08025268 0948
+    ldr r1, rcs_gsettings_offset_13          @ 0802526a 0a49
     adds r0,r0,r1    @ 0802526c 4018
     movs r1,#0x7    @ 0802526e 0721
     ldrb r0,[r0,#0x0]                        @ 08025270 0078
@@ -17308,58 +17377,58 @@ LAB_08025268:
     beq LAB_080252a8                         @ 0802527e 13d0
     cmp r1,#0x4                              @ 08025280 0429
     beq LAB_080252a0                         @ 08025282 0dd0
-    ldr r0, DWORD_08025298                   @ 08025284 0448
+    ldr r0, rcs_fn_font5_base                @ 08025284 0448
     cmp r1,#0x5                              @ 08025286 0529
     bne LAB_080252ba                         @ 08025288 17d1
-    ldr r2, DWORD_0802529c                   @ 0802528a 044a
+    ldr r2, rcs_fn_font5_off                 @ 0802528a 044a
     adds r0,r0,r2    @ 0802528c 8018
     b LAB_080252ba                           @ 0802528e 14e0
-DWORD_08025290:
-    .word  0x02000000                     @ 08025290 00000002
-DWORD_08025294:
-    .word  0x00006c2c                     @ 08025294 2c6c0000
-DWORD_08025298:
-    .word  0x09dbe99c                     @ 08025298 9ce9db09
-DWORD_0802529c:
-    .word  0x0003ab30                     @ 0802529c 30ab0300
+rcs_ewram_base_13:
+    .word  EWRAM_BASE                     @ 08025290 00000002
+rcs_gsettings_offset_13:
+    .word  GSETTINGS_OFFSET               @ 08025294 2c6c0000
+rcs_fn_font5_base:
+    .word  0x09dbe99c                     @ 08025298 9ce9db09  0x09dbe99c
+rcs_fn_font5_off:
+    .word  0x0003ab30                     @ 0802529c 30ab0300  0x0003ab30
 LAB_080252a0:
-    ldr r0, DWORD_080252a4                   @ 080252a0 0048
+    ldr r0, rcs_fn_font4_ptr                 @ 080252a0 0048
     b LAB_080252ba                           @ 080252a2 0ae0
-DWORD_080252a4:
-    .word  0x09ded8c4                     @ 080252a4 c4d8de09
+rcs_fn_font4_ptr:
+    .word  0x09ded8c4                     @ 080252a4 c4d8de09  0x09ded8c4
 LAB_080252a8:
-    ldr r0, DWORD_080252ac                   @ 080252a8 0048
+    ldr r0, rcs_fn_font3_ptr                 @ 080252a8 0048
     b LAB_080252ba                           @ 080252aa 06e0
-DWORD_080252ac:
-    .word  0x09de13d8                     @ 080252ac d813de09
+rcs_fn_font3_ptr:
+    .word  0x09de13d8                     @ 080252ac d813de09  0x09de13d8
 LAB_080252b0:
-    ldr r0, DWORD_080252b4                   @ 080252b0 0048
+    ldr r0, rcs_fn_font2_ptr                 @ 080252b0 0048
     b LAB_080252ba                           @ 080252b2 02e0
-DWORD_080252b4:
-    .word  0x09dd5102                     @ 080252b4 0251dd09
+rcs_fn_font2_ptr:
+    .word  0x09dd5102                     @ 080252b4 0251dd09  0x09dd5102
 LAB_080252b8:
-    ldr r0, DWORD_08025308                   @ 080252b8 1348
+    ldr r0, rcs_fn_font1_ptr                 @ 080252b8 1348
 LAB_080252ba:
     movs r1,#0x64    @ 080252ba 6421
     bl render_card_stat_with_number_alt      @ 080252bc 06f0e4fc
 LAB_080252c0:
-    ldr r1, DWORD_0802530c                   @ 080252c0 1249
+    ldr r1, rcs_ptr_gduelcardctxbase         @ 080252c0 1249
     movs r3,#0x89    @ 080252c2 8923
     lsls r3,r3,#0x2    @ 080252c4 9b00
     adds r0,r1,r3    @ 080252c6 c818
     ldr r2,[r0,#0x0]                         @ 080252c8 0268
     cmp r2,#0x1                              @ 080252ca 012a
     bne LAB_08025348                         @ 080252cc 3cd1
-    ldr r0, DWORD_08025310                   @ 080252ce 1048
-    ldr r3, DWORD_08025314                   @ 080252d0 104b
+    ldr r0, rcs_ptr_gp1lifepoints            @ 080252ce 1048
+    ldr r3, rcs_p1lp_block2_off_1ce8         @ 080252d0 104b
     adds r0,r0,r3    @ 080252d2 c018
     ldr r1,[r1,#0x4]                         @ 080252d4 4968
     eors r1,r2    @ 080252d6 5140
     ldr r0,[r0,#0x0]                         @ 080252d8 0068
     cmp r0,r1                                @ 080252da 8842
     bne LAB_08025348                         @ 080252dc 34d1
-    ldr r0, DWORD_08025318                   @ 080252de 0e48
-    ldr r1, DWORD_0802531c                   @ 080252e0 0e49
+    ldr r0, rcs_ewram_base_14                @ 080252de 0e48
+    ldr r1, rcs_gsettings_offset_14          @ 080252e0 0e49
     adds r0,r0,r1    @ 080252e2 4018
     movs r1,#0x7    @ 080252e4 0721
     ldrb r0,[r0,#0x0]                        @ 080252e6 0078
@@ -17372,51 +17441,51 @@ LAB_080252c0:
     beq LAB_08025330                         @ 080252f4 1cd0
     cmp r1,#0x4                              @ 080252f6 0429
     beq LAB_08025328                         @ 080252f8 16d0
-    ldr r0, DWORD_08025320                   @ 080252fa 0948
+    ldr r0, rcs_fo_font5_base                @ 080252fa 0948
     cmp r1,#0x5                              @ 080252fc 0529
     bne LAB_08025342                         @ 080252fe 20d1
-    ldr r2, DWORD_08025324                   @ 08025300 084a
+    ldr r2, rcs_fo_font5_off                 @ 08025300 084a
     adds r0,r0,r2    @ 08025302 8018
     b LAB_08025342                           @ 08025304 1de0
     .zero  0x2
-DWORD_08025308:
-    .word  0x09dc9a60                     @ 08025308 609adc09
-DWORD_0802530c:
-    .word  0x0201e2a0                     @ 0802530c a0e20102
-DWORD_08025310:
+rcs_fn_font1_ptr:
+    .word  0x09dc9a60                     @ 08025308 609adc09  0x09dc9a60
+rcs_ptr_gduelcardctxbase:
+    .word  gDuelCardCtxBase               @ 0802530c a0e20102
+rcs_ptr_gp1lifepoints:
     .word  gP1LifePoints                  @ 08025310 e0c40102
-DWORD_08025314:
-    .word  0x00001ce8                     @ 08025314 e81c0000
-DWORD_08025318:
-    .word  0x02000000                     @ 08025318 00000002
-DWORD_0802531c:
-    .word  0x00006c2c                     @ 0802531c 2c6c0000
-DWORD_08025320:
-    .word  0x09dbe89c                     @ 08025320 9ce8db09
-DWORD_08025324:
-    .word  0x0003ab4e                     @ 08025324 4eab0300
+rcs_p1lp_block2_off_1ce8:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08025314 e81c0000
+rcs_ewram_base_14:
+    .word  EWRAM_BASE                     @ 08025318 00000002
+rcs_gsettings_offset_14:
+    .word  GSETTINGS_OFFSET               @ 0802531c 2c6c0000
+rcs_fo_font5_base:
+    .word  0x09dbe89c                     @ 08025320 9ce8db09  0x09dbe89c
+rcs_fo_font5_off:
+    .word  0x0003ab4e                     @ 08025324 4eab0300  0x0003ab4e
 LAB_08025328:
-    ldr r0, DWORD_0802532c                   @ 08025328 0048
+    ldr r0, rcs_fo_font4_ptr                 @ 08025328 0048
     b LAB_08025342                           @ 0802532a 0ae0
-DWORD_0802532c:
-    .word  0x09ded7b2                     @ 0802532c b2d7de09
+rcs_fo_font4_ptr:
+    .word  0x09ded7b2                     @ 0802532c b2d7de09  0x09ded7b2
 LAB_08025330:
-    ldr r0, DWORD_08025334                   @ 08025330 0048
+    ldr r0, rcs_fo_font3_ptr                 @ 08025330 0048
     b LAB_08025342                           @ 08025332 06e0
-DWORD_08025334:
-    .word  0x09de12da                     @ 08025334 da12de09
+rcs_fo_font3_ptr:
+    .word  0x09de12da                     @ 08025334 da12de09  0x09de12da
 LAB_08025338:
-    ldr r0, DWORD_0802533c                   @ 08025338 0048
+    ldr r0, rcs_fo_font2_ptr                 @ 08025338 0048
     b LAB_08025342                           @ 0802533a 02e0
-DWORD_0802533c:
-    .word  0x09dd500c                     @ 0802533c 0c50dd09
+rcs_fo_font2_ptr:
+    .word  0x09dd500c                     @ 0802533c 0c50dd09  0x09dd500c
 LAB_08025340:
-    ldr r0, DWORD_08025368                   @ 08025340 0948
+    ldr r0, rcs_fo_font1_ptr                 @ 08025340 0948
 LAB_08025342:
     movs r1,#0xc8    @ 08025342 c821
     bl render_card_stat_with_number_alt      @ 08025344 06f0a0fc
 LAB_08025348:
-    ldr r0, DWORD_0802536c                   @ 08025348 0848
+    ldr r0, rcs_ptr_gduelcardctxbase_1       @ 08025348 0848
     movs r3,#0x89    @ 0802534a 8923
     lsls r3,r3,#0x2    @ 0802534c 9b00
     adds r0,r0,r3    @ 0802534e c018
@@ -17431,10 +17500,10 @@ LAB_0802535a:
     beq LAB_0802537c                         @ 08025360 0cd0
     bl SUB_08025c8a                          @ 08025362 00f092fc
     movs r0,r0    @ 08025366 0000
-DWORD_08025368:
-    .word  0x09dc9988                     @ 08025368 8899dc09
-DWORD_0802536c:
-    .word  0x0201e2a0                     @ 0802536c a0e20102
+rcs_fo_font1_ptr:
+    .word  0x09dc9988                     @ 08025368 8899dc09  0x09dc9988
+rcs_ptr_gduelcardctxbase_1:
+    .word  gDuelCardCtxBase               @ 0802536c a0e20102
 LAB_08025370:
     cmp r0,#0x3                              @ 08025370 0328
     bne LAB_08025378                         @ 08025372 01d1
@@ -17442,7 +17511,7 @@ LAB_08025370:
 LAB_08025378:
     bl SUB_08025c8a                          @ 08025378 00f087fc
 LAB_0802537c:
-    ldr r0, DWORD_080253c0                   @ 0802537c 1048
+    ldr r0, rcs_ptr_gduelscenebase           @ 0802537c 1048
     ldrb r0,[r0,#0x2]                        @ 0802537e 8078
     lsls r0,r0,#0x1b    @ 08025380 c006
     lsrs r0,r0,#0x1b    @ 08025382 c00e
@@ -17455,8 +17524,8 @@ LAB_0802537c:
     ble LAB_08025396                         @ 08025392 00dd
     movs r1,#0x2    @ 08025394 0221
 LAB_08025396:
-    ldr r0, DWORD_080253c4                   @ 08025396 0b48
-    ldr r2, DWORD_080253c8                   @ 08025398 0b4a
+    ldr r0, rcs_ewram_base_15                @ 08025396 0b48
+    ldr r2, rcs_gsettings_offset_15          @ 08025398 0b4a
     adds r0,r0,r2    @ 0802539a 8018
     movs r2,#0x7    @ 0802539c 0722
     ldrb r0,[r0,#0x0]                        @ 0802539e 0078
@@ -17469,40 +17538,40 @@ LAB_08025396:
     beq LAB_080253dc                         @ 080253ac 16d0
     cmp r2,#0x4                              @ 080253ae 042a
     beq LAB_080253d4                         @ 080253b0 10d0
-    ldr r3, DWORD_080253cc                   @ 080253b2 064b
+    ldr r3, rcs_fp_font5_base                @ 080253b2 064b
     cmp r2,#0x5                              @ 080253b4 052a
     bne LAB_080253ee                         @ 080253b6 1ad1
-    ldr r0, DWORD_080253d0                   @ 080253b8 0548
+    ldr r0, rcs_fp_font5_off                 @ 080253b8 0548
     adds r3,r3,r0    @ 080253ba 1b18
     b LAB_080253ee                           @ 080253bc 17e0
     .zero  0x2
-DWORD_080253c0:
-    .word  0x02023360                     @ 080253c0 60330202
-DWORD_080253c4:
-    .word  0x02000000                     @ 080253c4 00000002
-DWORD_080253c8:
-    .word  0x00006c2c                     @ 080253c8 2c6c0000
-DWORD_080253cc:
-    .word  0x09dbe7e6                     @ 080253cc e6e7db09
-DWORD_080253d0:
-    .word  0x0003ab0e                     @ 080253d0 0eab0300
+rcs_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 080253c0 60330202
+rcs_ewram_base_15:
+    .word  EWRAM_BASE                     @ 080253c4 00000002
+rcs_gsettings_offset_15:
+    .word  GSETTINGS_OFFSET               @ 080253c8 2c6c0000
+rcs_fp_font5_base:
+    .word  0x09dbe7e6                     @ 080253cc e6e7db09  0x09dbe7e6
+rcs_fp_font5_off:
+    .word  0x0003ab0e                     @ 080253d0 0eab0300  0x0003ab0e
 LAB_080253d4:
-    ldr r3, DWORD_080253d8                   @ 080253d4 004b
+    ldr r3, rcs_fp_font4_ptr                 @ 080253d4 004b
     b LAB_080253ee                           @ 080253d6 0ae0
-DWORD_080253d8:
-    .word  0x09ded68a                     @ 080253d8 8ad6de09
+rcs_fp_font4_ptr:
+    .word  0x09ded68a                     @ 080253d8 8ad6de09  0x09ded68a
 LAB_080253dc:
-    ldr r3, DWORD_080253e0                   @ 080253dc 004b
+    ldr r3, rcs_fp_font3_ptr                 @ 080253dc 004b
     b LAB_080253ee                           @ 080253de 06e0
-DWORD_080253e0:
-    .word  0x09de11dc                     @ 080253e0 dc11de09
+rcs_fp_font3_ptr:
+    .word  0x09de11dc                     @ 080253e0 dc11de09  0x09de11dc
 LAB_080253e4:
-    ldr r3, DWORD_080253e8                   @ 080253e4 004b
+    ldr r3, rcs_fp_font2_ptr                 @ 080253e4 004b
     b LAB_080253ee                           @ 080253e6 02e0
-DWORD_080253e8:
-    .word  0x09dd4f2c                     @ 080253e8 2c4fdd09
+rcs_fp_font2_ptr:
+    .word  0x09dd4f2c                     @ 080253e8 2c4fdd09  0x09dd4f2c
 LAB_080253ec:
-    ldr r3, DWORD_0802542c                   @ 080253ec 0f4b
+    ldr r3, rcs_fp_font1_ptr                 @ 080253ec 0f4b
 LAB_080253ee:
     movs r0,#0x32    @ 080253ee 3220
     muls r1,r0    @ 080253f0 4143
@@ -17512,8 +17581,8 @@ LAB_080253ee:
     bl get_card_data_bit_by_index            @ 080253fa 6ff03bfd
     cmp r0,#0x0                              @ 080253fe 0028
     bne LAB_08025460                         @ 08025400 2ed1
-    ldr r0, DWORD_08025430                   @ 08025402 0b48
-    ldr r1, DWORD_08025434                   @ 08025404 0b49
+    ldr r0, rcs_ewram_base_16                @ 08025402 0b48
+    ldr r1, rcs_gsettings_offset_16          @ 08025404 0b49
     adds r0,r0,r1    @ 08025406 4018
     movs r1,#0x7    @ 08025408 0721
     ldrb r0,[r0,#0x0]                        @ 0802540a 0078
@@ -17526,40 +17595,40 @@ LAB_080253ee:
     beq LAB_08025448                         @ 08025418 16d0
     cmp r1,#0x4                              @ 0802541a 0429
     beq LAB_08025440                         @ 0802541c 10d0
-    ldr r0, DWORD_08025438                   @ 0802541e 0648
+    ldr r0, rcs_fq_font5_base                @ 0802541e 0648
     cmp r1,#0x5                              @ 08025420 0529
     bne LAB_0802545a                         @ 08025422 1ad1
-    ldr r2, DWORD_0802543c                   @ 08025424 054a
+    ldr r2, rcs_fq_font5_off                 @ 08025424 054a
     adds r0,r0,r2    @ 08025426 8018
     b LAB_0802545a                           @ 08025428 17e0
     .zero  0x2
-DWORD_0802542c:
-    .word  0x09dc9886                     @ 0802542c 8698dc09
-DWORD_08025430:
-    .word  0x02000000                     @ 08025430 00000002
-DWORD_08025434:
-    .word  0x00006c2c                     @ 08025434 2c6c0000
-DWORD_08025438:
-    .word  0x09dbe8e2                     @ 08025438 e2e8db09
-DWORD_0802543c:
-    .word  0x0003ab4a                     @ 0802543c 4aab0300
+rcs_fp_font1_ptr:
+    .word  0x09dc9886                     @ 0802542c 8698dc09  0x09dc9886
+rcs_ewram_base_16:
+    .word  EWRAM_BASE                     @ 08025430 00000002
+rcs_gsettings_offset_16:
+    .word  GSETTINGS_OFFSET               @ 08025434 2c6c0000
+rcs_fq_font5_base:
+    .word  0x09dbe8e2                     @ 08025438 e2e8db09  0x09dbe8e2
+rcs_fq_font5_off:
+    .word  0x0003ab4a                     @ 0802543c 4aab0300  0x0003ab4a
 LAB_08025440:
-    ldr r0, DWORD_08025444                   @ 08025440 0048
+    ldr r0, rcs_fq_font4_ptr                 @ 08025440 0048
     b LAB_0802545a                           @ 08025442 0ae0
-DWORD_08025444:
-    .word  0x09ded7fc                     @ 08025444 fcd7de09
+rcs_fq_font4_ptr:
+    .word  0x09ded7fc                     @ 08025444 fcd7de09  0x09ded7fc
 LAB_08025448:
-    ldr r0, DWORD_0802544c                   @ 08025448 0048
+    ldr r0, rcs_fq_font3_ptr                 @ 08025448 0048
     b LAB_0802545a                           @ 0802544a 06e0
-DWORD_0802544c:
-    .word  0x09de1322                     @ 0802544c 2213de09
+rcs_fq_font3_ptr:
+    .word  0x09de1322                     @ 0802544c 2213de09  0x09de1322
 LAB_08025450:
-    ldr r0, DWORD_08025454                   @ 08025450 0048
+    ldr r0, rcs_fq_font2_ptr                 @ 08025450 0048
     b LAB_0802545a                           @ 08025452 02e0
-DWORD_08025454:
-    .word  0x09dd5058                     @ 08025454 5850dd09
+rcs_fq_font2_ptr:
+    .word  0x09dd5058                     @ 08025454 5850dd09  0x09dd5058
 LAB_08025458:
-    ldr r0, DWORD_08025494                   @ 08025458 0e48
+    ldr r0, rcs_fq_font1_ptr                 @ 08025458 0e48
 LAB_0802545a:
     movs r1,#0x64    @ 0802545a 6421
     bl render_card_stat_with_number_alt      @ 0802545c 06f014fc
@@ -17568,8 +17637,8 @@ LAB_08025460:
     bl get_card_data_bit_by_index            @ 08025462 6ff007fd
     cmp r0,#0x0                              @ 08025466 0028
     beq LAB_080254c8                         @ 08025468 2ed0
-    ldr r0, DWORD_08025498                   @ 0802546a 0b48
-    ldr r3, DWORD_0802549c                   @ 0802546c 0b4b
+    ldr r0, rcs_ewram_base_17                @ 0802546a 0b48
+    ldr r3, rcs_gsettings_offset_17          @ 0802546c 0b4b
     adds r0,r0,r3    @ 0802546e c018
     movs r1,#0x7    @ 08025470 0721
     ldrb r0,[r0,#0x0]                        @ 08025472 0078
@@ -17582,40 +17651,40 @@ LAB_08025460:
     beq LAB_080254b0                         @ 08025480 16d0
     cmp r1,#0x4                              @ 08025482 0429
     beq LAB_080254a8                         @ 08025484 10d0
-    ldr r0, DWORD_080254a0                   @ 08025486 0648
+    ldr r0, rcs_fr_font5_base                @ 08025486 0648
     cmp r1,#0x5                              @ 08025488 0529
     bne LAB_080254c2                         @ 0802548a 1ad1
-    ldr r1, DWORD_080254a4                   @ 0802548c 0549
+    ldr r1, rcs_fr_font5_off                 @ 0802548c 0549
     adds r0,r0,r1    @ 0802548e 4018
     b LAB_080254c2                           @ 08025490 17e0
     .zero  0x2
-DWORD_08025494:
-    .word  0x09dc99cc                     @ 08025494 cc99dc09
-DWORD_08025498:
-    .word  0x02000000                     @ 08025498 00000002
-DWORD_0802549c:
-    .word  0x00006c2c                     @ 0802549c 2c6c0000
-DWORD_080254a0:
-    .word  0x09dbea68                     @ 080254a0 68eadb09
-DWORD_080254a4:
-    .word  0x0003ab4a                     @ 080254a4 4aab0300
+rcs_fq_font1_ptr:
+    .word  0x09dc99cc                     @ 08025494 cc99dc09  0x09dc99cc
+rcs_ewram_base_17:
+    .word  EWRAM_BASE                     @ 08025498 00000002
+rcs_gsettings_offset_17:
+    .word  GSETTINGS_OFFSET               @ 0802549c 2c6c0000
+rcs_fr_font5_base:
+    .word  0x09dbea68                     @ 080254a0 68eadb09  0x09dbea68
+rcs_fr_font5_off:
+    .word  0x0003ab4a                     @ 080254a4 4aab0300  0x0003ab4a
 LAB_080254a8:
-    ldr r0, DWORD_080254ac                   @ 080254a8 0048
+    ldr r0, rcs_fr_font4_ptr                 @ 080254a8 0048
     b LAB_080254c2                           @ 080254aa 0ae0
-DWORD_080254ac:
-    .word  0x09ded9c0                     @ 080254ac c0d9de09
+rcs_fr_font4_ptr:
+    .word  0x09ded9c0                     @ 080254ac c0d9de09  0x09ded9c0
 LAB_080254b0:
-    ldr r0, DWORD_080254b4                   @ 080254b0 0048
+    ldr r0, rcs_fr_font3_ptr                 @ 080254b0 0048
     b LAB_080254c2                           @ 080254b2 06e0
-DWORD_080254b4:
-    .word  0x09de14d4                     @ 080254b4 d414de09
+rcs_fr_font3_ptr:
+    .word  0x09de14d4                     @ 080254b4 d414de09  0x09de14d4
 LAB_080254b8:
-    ldr r0, DWORD_080254bc                   @ 080254b8 0048
+    ldr r0, rcs_fr_font2_ptr                 @ 080254b8 0048
     b LAB_080254c2                           @ 080254ba 02e0
-DWORD_080254bc:
-    .word  0x09dd51ee                     @ 080254bc ee51dd09
+rcs_fr_font2_ptr:
+    .word  0x09dd51ee                     @ 080254bc ee51dd09  0x09dd51ee
 LAB_080254c0:
-    ldr r0, DWORD_080254fc                   @ 080254c0 0e48
+    ldr r0, rcs_fr_font1_ptr                 @ 080254c0 0e48
 LAB_080254c2:
     movs r1,#0x64    @ 080254c2 6421
     bl render_card_stat_with_number_alt      @ 080254c4 06f0e0fb
@@ -17624,8 +17693,8 @@ LAB_080254c8:
     bl get_card_data_bit_by_index            @ 080254ca 6ff0d3fc
     cmp r0,#0x0                              @ 080254ce 0028
     beq LAB_08025530                         @ 080254d0 2ed0
-    ldr r0, DWORD_08025500                   @ 080254d2 0b48
-    ldr r2, DWORD_08025504                   @ 080254d4 0b4a
+    ldr r0, rcs_ewram_base_18                @ 080254d2 0b48
+    ldr r2, rcs_gsettings_offset_18          @ 080254d4 0b4a
     adds r0,r0,r2    @ 080254d6 8018
     movs r1,#0x7    @ 080254d8 0721
     ldrb r0,[r0,#0x0]                        @ 080254da 0078
@@ -17638,40 +17707,40 @@ LAB_080254c8:
     beq LAB_08025518                         @ 080254e8 16d0
     cmp r1,#0x4                              @ 080254ea 0429
     beq LAB_08025510                         @ 080254ec 10d0
-    ldr r0, DWORD_08025508                   @ 080254ee 0648
+    ldr r0, rcs_fs_font5_base                @ 080254ee 0648
     cmp r1,#0x5                              @ 080254f0 0529
     bne LAB_0802552a                         @ 080254f2 1ad1
-    ldr r3, DWORD_0802550c                   @ 080254f4 054b
+    ldr r3, rcs_fs_font5_off                 @ 080254f4 054b
     adds r0,r0,r3    @ 080254f6 c018
     b LAB_0802552a                           @ 080254f8 17e0
     .zero  0x2
-DWORD_080254fc:
-    .word  0x09dc9b28                     @ 080254fc 289bdc09
-DWORD_08025500:
-    .word  0x02000000                     @ 08025500 00000002
-DWORD_08025504:
-    .word  0x00006c2c                     @ 08025504 2c6c0000
-DWORD_08025508:
-    .word  0x09dbe86c                     @ 08025508 6ce8db09
-DWORD_0802550c:
-    .word  0x0003ab32                     @ 0802550c 32ab0300
+rcs_fr_font1_ptr:
+    .word  0x09dc9b28                     @ 080254fc 289bdc09  0x09dc9b28
+rcs_ewram_base_18:
+    .word  EWRAM_BASE                     @ 08025500 00000002
+rcs_gsettings_offset_18:
+    .word  GSETTINGS_OFFSET               @ 08025504 2c6c0000
+rcs_fs_font5_base:
+    .word  0x09dbe86c                     @ 08025508 6ce8db09  0x09dbe86c
+rcs_fs_font5_off:
+    .word  0x0003ab32                     @ 0802550c 32ab0300  0x0003ab32
 LAB_08025510:
-    ldr r0, DWORD_08025514                   @ 08025510 0048
+    ldr r0, rcs_fs_font4_ptr                 @ 08025510 0048
     b LAB_0802552a                           @ 08025512 0ae0
-DWORD_08025514:
-    .word  0x09ded760                     @ 08025514 60d7de09
+rcs_fs_font4_ptr:
+    .word  0x09ded760                     @ 08025514 60d7de09  0x09ded760
 LAB_08025518:
-    ldr r0, DWORD_0802551c                   @ 08025518 0048
+    ldr r0, rcs_fs_font3_ptr                 @ 08025518 0048
     b LAB_0802552a                           @ 0802551a 06e0
-DWORD_0802551c:
-    .word  0x09de128c                     @ 0802551c 8c12de09
+rcs_fs_font3_ptr:
+    .word  0x09de128c                     @ 0802551c 8c12de09  0x09de128c
 LAB_08025520:
-    ldr r0, DWORD_08025524                   @ 08025520 0048
+    ldr r0, rcs_fs_font2_ptr                 @ 08025520 0048
     b LAB_0802552a                           @ 08025522 02e0
-DWORD_08025524:
-    .word  0x09dd4fca                     @ 08025524 ca4fdd09
+rcs_fs_font2_ptr:
+    .word  0x09dd4fca                     @ 08025524 ca4fdd09  0x09dd4fca
 LAB_08025528:
-    ldr r0, DWORD_08025564                   @ 08025528 0e48
+    ldr r0, rcs_fs_font1_ptr                 @ 08025528 0e48
 LAB_0802552a:
     movs r1,#0xa    @ 0802552a 0a21
     bl render_card_stat_with_number_alt      @ 0802552c 06f0acfb
@@ -17680,8 +17749,8 @@ LAB_08025530:
     bl get_card_data_bit_by_index            @ 08025532 6ff09ffc
     cmp r0,#0x0                              @ 08025536 0028
     beq LAB_08025598                         @ 08025538 2ed0
-    ldr r0, DWORD_08025568                   @ 0802553a 0b48
-    ldr r1, DWORD_0802556c                   @ 0802553c 0b49
+    ldr r0, rcs_ewram_base_19                @ 0802553a 0b48
+    ldr r1, rcs_gsettings_offset_19          @ 0802553c 0b49
     adds r0,r0,r1    @ 0802553e 4018
     movs r1,#0x7    @ 08025540 0721
     ldrb r0,[r0,#0x0]                        @ 08025542 0078
@@ -17694,47 +17763,47 @@ LAB_08025530:
     beq LAB_08025580                         @ 08025550 16d0
     cmp r1,#0x4                              @ 08025552 0429
     beq LAB_08025578                         @ 08025554 10d0
-    ldr r0, DWORD_08025570                   @ 08025556 0648
+    ldr r0, rcs_ft_font5_base                @ 08025556 0648
     cmp r1,#0x5                              @ 08025558 0529
     bne LAB_08025592                         @ 0802555a 1ad1
-    ldr r2, DWORD_08025574                   @ 0802555c 054a
+    ldr r2, rcs_ft_font5_off                 @ 0802555c 054a
     adds r0,r0,r2    @ 0802555e 8018
     b LAB_08025592                           @ 08025560 17e0
     .zero  0x2
-DWORD_08025564:
-    .word  0x09dc9942                     @ 08025564 4299dc09
-DWORD_08025568:
-    .word  0x02000000                     @ 08025568 00000002
-DWORD_0802556c:
-    .word  0x00006c2c                     @ 0802556c 2c6c0000
-DWORD_08025570:
-    .word  0x09dbe88a                     @ 08025570 8ae8db09
-DWORD_08025574:
-    .word  0x0003ab46                     @ 08025574 46ab0300
+rcs_fs_font1_ptr:
+    .word  0x09dc9942                     @ 08025564 4299dc09  0x09dc9942
+rcs_ewram_base_19:
+    .word  EWRAM_BASE                     @ 08025568 00000002
+rcs_gsettings_offset_19:
+    .word  GSETTINGS_OFFSET               @ 0802556c 2c6c0000
+rcs_ft_font5_base:
+    .word  0x09dbe88a                     @ 08025570 8ae8db09  0x09dbe88a
+rcs_ft_font5_off:
+    .word  0x0003ab46                     @ 08025574 46ab0300  0x0003ab46
 LAB_08025578:
-    ldr r0, DWORD_0802557c                   @ 08025578 0048
+    ldr r0, rcs_ft_font4_ptr                 @ 08025578 0048
     b LAB_08025592                           @ 0802557a 0ae0
-DWORD_0802557c:
-    .word  0x09ded796                     @ 0802557c 96d7de09
+rcs_ft_font4_ptr:
+    .word  0x09ded796                     @ 0802557c 96d7de09  0x09ded796
 LAB_08025580:
-    ldr r0, DWORD_08025584                   @ 08025580 0048
+    ldr r0, rcs_ft_font3_ptr                 @ 08025580 0048
     b LAB_08025592                           @ 08025582 06e0
-DWORD_08025584:
-    .word  0x09de12bc                     @ 08025584 bc12de09
+rcs_ft_font3_ptr:
+    .word  0x09de12bc                     @ 08025584 bc12de09  0x09de12bc
 LAB_08025588:
-    ldr r0, DWORD_0802558c                   @ 08025588 0048
+    ldr r0, rcs_ft_font2_ptr                 @ 08025588 0048
     b LAB_08025592                           @ 0802558a 02e0
-DWORD_0802558c:
-    .word  0x09dd4ff6                     @ 0802558c f64fdd09
+rcs_ft_font2_ptr:
+    .word  0x09dd4ff6                     @ 0802558c f64fdd09  0x09dd4ff6
 LAB_08025590:
-    ldr r0, DWORD_080255b4                   @ 08025590 0848
+    ldr r0, rcs_ft_font1_ptr                 @ 08025590 0848
 LAB_08025592:
     movs r1,#0x1e    @ 08025592 1e21
     bl render_card_stat_with_number_alt      @ 08025594 06f078fb
 LAB_08025598:
-    ldr r0, DWORD_080255b8                   @ 08025598 0748
+    ldr r0, rcs_ptr_gp1lifepoints_1          @ 08025598 0748
     ldr r1,[r0,#0x0]                         @ 0802559a 0168
-    ldr r0, DWORD_080255bc                   @ 0802559c 0748
+    ldr r0, rcs_gprng_pack_scroll_off_23d    @ 0802559c 0748
     cmp r1,r0                                @ 0802559e 8142
     bne LAB_080255a4                         @ 080255a0 00d1
     b LAB_080256b8                           @ 080255a2 89e0
@@ -17748,46 +17817,46 @@ LAB_080255ae:
     cmp r1,#0x63                             @ 080255ae 6329
     ble LAB_08025658                         @ 080255b0 52dd
     b LAB_080255f4                           @ 080255b2 1fe0
-DWORD_080255b4:
-    .word  0x09dc9972                     @ 080255b4 7299dc09
-DWORD_080255b8:
+rcs_ft_font1_ptr:
+    .word  0x09dc9972                     @ 080255b4 7299dc09  0x09dc9972
+rcs_ptr_gp1lifepoints_1:
     .word  gP1LifePoints                  @ 080255b8 e0c40102
-DWORD_080255bc:
-    .word  0x0000023d                     @ 080255bc 3d020000
+rcs_gprng_pack_scroll_off_23d:
+    .word  GPRNG_PACK_SCROLL_OFF_23D      @ 080255bc 3d020000
 LAB_080255c0:
-    ldr r0, DWORD_080255e0                   @ 080255c0 0748
+    ldr r0, rcs_card_stat_lp_threshold_5730  @ 080255c0 0748
     cmp r1,r0                                @ 080255c2 8142
     bne LAB_080255c8                         @ 080255c4 00d1
     b LAB_08025710                           @ 080255c6 a3e0
 LAB_080255c8:
     cmp r1,r0                                @ 080255c8 8142
     ble LAB_080255ec                         @ 080255ca 0fdd
-    ldr r0, DWORD_080255e4                   @ 080255cc 0548
+    ldr r0, rcs_card_stat_lp_threshold_57300 @ 080255cc 0548
     cmp r1,r0                                @ 080255ce 8142
     bne LAB_080255d4                         @ 080255d0 00d1
     b LAB_08025710                           @ 080255d2 9de0
 LAB_080255d4:
-    ldr r0, DWORD_080255e8                   @ 080255d4 0448
+    ldr r0, rcs_card_stat_lp_threshold_572488 @ 080255d4 0448
     cmp r1,r0                                @ 080255d6 8142
     bne LAB_080255dc                         @ 080255d8 00d1
     b LAB_08025710                           @ 080255da 99e0
 LAB_080255dc:
     b LAB_0802576c                           @ 080255dc c6e0
     .zero  0x2
-DWORD_080255e0:
-    .word  0x00001662                     @ 080255e0 62160000
-DWORD_080255e4:
-    .word  0x0000dfd4                     @ 080255e4 d4df0000
-DWORD_080255e8:
-    .word  0x0008be48                     @ 080255e8 48be0800
+rcs_card_stat_lp_threshold_5730:
+    .word  CARD_STAT_LP_THRESHOLD_5730    @ 080255e0 62160000
+rcs_card_stat_lp_threshold_57300:
+    .word  CARD_STAT_LP_THRESHOLD_57300   @ 080255e4 d4df0000
+rcs_card_stat_lp_threshold_572488:
+    .word  CARD_STAT_LP_THRESHOLD_572488  @ 080255e8 48be0800
 LAB_080255ec:
-    ldr r0, DWORD_0802561c                   @ 080255ec 0b48
+    ldr r0, rcs_card_stat_lp_threshold_999   @ 080255ec 0b48
     cmp r1,r0                                @ 080255ee 8142
     ble LAB_080255f4                         @ 080255f0 00dd
     b LAB_0802576c                           @ 080255f2 bbe0
 LAB_080255f4:
-    ldr r0, DWORD_08025620                   @ 080255f4 0a48
-    ldr r3, DWORD_08025624                   @ 080255f6 0b4b
+    ldr r0, rcs_ewram_base_20                @ 080255f4 0a48
+    ldr r3, rcs_gsettings_offset_20          @ 080255f6 0b4b
     adds r0,r0,r3    @ 080255f8 c018
     movs r1,#0x7    @ 080255fa 0721
     ldrb r0,[r0,#0x0]                        @ 080255fc 0078
@@ -17800,49 +17869,49 @@ LAB_080255f4:
     beq LAB_08025638                         @ 0802560a 15d0
     cmp r1,#0x4                              @ 0802560c 0429
     beq LAB_08025630                         @ 0802560e 0fd0
-    ldr r0, DWORD_08025628                   @ 08025610 0548
+    ldr r0, rcs_fe_font5_base_b              @ 08025610 0548
     cmp r1,#0x5                              @ 08025612 0529
     bne LAB_0802564a                         @ 08025614 19d1
-    ldr r1, DWORD_0802562c                   @ 08025616 0549
+    ldr r1, rcs_fe_font5_off_b               @ 08025616 0549
     adds r0,r0,r1    @ 08025618 4018
     b LAB_0802564a                           @ 0802561a 16e0
-DWORD_0802561c:
-    .word  0x000003e7                     @ 0802561c e7030000
-DWORD_08025620:
-    .word  0x02000000                     @ 08025620 00000002
-DWORD_08025624:
-    .word  0x00006c2c                     @ 08025624 2c6c0000
-DWORD_08025628:
-    .word  0x09dbe8b4                     @ 08025628 b4e8db09
-DWORD_0802562c:
-    .word  0x0003ab52                     @ 0802562c 52ab0300
+rcs_card_stat_lp_threshold_999:
+    .word  CARD_STAT_LP_THRESHOLD_999     @ 0802561c e7030000
+rcs_ewram_base_20:
+    .word  EWRAM_BASE                     @ 08025620 00000002
+rcs_gsettings_offset_20:
+    .word  GSETTINGS_OFFSET               @ 08025624 2c6c0000
+rcs_fe_font5_base_b:
+    .word  0x09dbe8b4                     @ 08025628 b4e8db09  0x09dbe8b4: pass E 2nd font5 base slot
+rcs_fe_font5_off_b:
+    .word  0x0003ab52                     @ 0802562c 52ab0300  0x0003ab52
 LAB_08025630:
-    ldr r0, DWORD_08025634                   @ 08025630 0048
+    ldr r0, rcs_fe_font4_ptr_b               @ 08025630 0048
     b LAB_0802564a                           @ 08025632 0ae0
-DWORD_08025634:
-    .word  0x09ded7d0                     @ 08025634 d0d7de09
+rcs_fe_font4_ptr_b:
+    .word  0x09ded7d0                     @ 08025634 d0d7de09  0x09ded7d0
 LAB_08025638:
-    ldr r0, DWORD_0802563c                   @ 08025638 0048
+    ldr r0, rcs_fe_font3_ptr_b               @ 08025638 0048
     b LAB_0802564a                           @ 0802563a 06e0
-DWORD_0802563c:
-    .word  0x09de12f6                     @ 0802563c f612de09
+rcs_fe_font3_ptr_b:
+    .word  0x09de12f6                     @ 0802563c f612de09  0x09de12f6
 LAB_08025640:
-    ldr r0, DWORD_08025644                   @ 08025640 0048
+    ldr r0, rcs_fe_font2_ptr_b               @ 08025640 0048
     b LAB_0802564a                           @ 08025642 02e0
-DWORD_08025644:
-    .word  0x09dd5026                     @ 08025644 2650dd09
+rcs_fe_font2_ptr_b:
+    .word  0x09dd5026                     @ 08025644 2650dd09  0x09dd5026
 LAB_08025648:
-    ldr r0, DWORD_08025654                   @ 08025648 0248
+    ldr r0, rcs_fe_font1_ptr_b               @ 08025648 0248
 LAB_0802564a:
     movs r1,#0xc8    @ 0802564a c821
     bl render_card_stat_with_number_alt      @ 0802564c 06f01cfb
     b LAB_0802576c                           @ 08025650 8ce0
     .zero  0x2
-DWORD_08025654:
-    .word  0x09dc99a6                     @ 08025654 a699dc09
+rcs_fe_font1_ptr_b:
+    .word  0x09dc99a6                     @ 08025654 a699dc09  0x09dc99a6
 LAB_08025658:
-    ldr r0, DWORD_08025680                   @ 08025658 0948
-    ldr r2, DWORD_08025684                   @ 0802565a 0a4a
+    ldr r0, rcs_ewram_base_21                @ 08025658 0948
+    ldr r2, rcs_gsettings_offset_21          @ 0802565a 0a4a
     adds r0,r0,r2    @ 0802565c 8018
     movs r1,#0x7    @ 0802565e 0721
     ldrb r0,[r0,#0x0]                        @ 08025660 0078
@@ -17855,47 +17924,47 @@ LAB_08025658:
     beq LAB_08025698                         @ 0802566e 13d0
     cmp r1,#0x4                              @ 08025670 0429
     beq LAB_08025690                         @ 08025672 0dd0
-    ldr r0, DWORD_08025688                   @ 08025674 0448
+    ldr r0, rcs_ff_font5_base_b              @ 08025674 0448
     cmp r1,#0x5                              @ 08025676 0529
     bne LAB_080256aa                         @ 08025678 17d1
-    ldr r3, DWORD_0802568c                   @ 0802567a 044b
+    ldr r3, rcs_ff_font5_off_b               @ 0802567a 044b
     adds r0,r0,r3    @ 0802567c c018
     b LAB_080256aa                           @ 0802567e 14e0
-DWORD_08025680:
-    .word  0x02000000                     @ 08025680 00000002
-DWORD_08025684:
-    .word  0x00006c2c                     @ 08025684 2c6c0000
-DWORD_08025688:
-    .word  0x09dbe8ca                     @ 08025688 cae8db09
-DWORD_0802568c:
-    .word  0x0003ab4a                     @ 0802568c 4aab0300
+rcs_ewram_base_21:
+    .word  EWRAM_BASE                     @ 08025680 00000002
+rcs_gsettings_offset_21:
+    .word  GSETTINGS_OFFSET               @ 08025684 2c6c0000
+rcs_ff_font5_base_b:
+    .word  0x09dbe8ca                     @ 08025688 cae8db09  0x09dbe8ca: pass F 2nd font5 base
+rcs_ff_font5_off_b:
+    .word  0x0003ab4a                     @ 0802568c 4aab0300  0x0003ab4a
 LAB_08025690:
-    ldr r0, DWORD_08025694                   @ 08025690 0048
+    ldr r0, rcs_ff_font4_ptr_b               @ 08025690 0048
     b LAB_080256aa                           @ 08025692 0ae0
-DWORD_08025694:
-    .word  0x09ded7e4                     @ 08025694 e4d7de09
+rcs_ff_font4_ptr_b:
+    .word  0x09ded7e4                     @ 08025694 e4d7de09  0x09ded7e4
 LAB_08025698:
-    ldr r0, DWORD_0802569c                   @ 08025698 0048
+    ldr r0, rcs_ff_font3_ptr_b               @ 08025698 0048
     b LAB_080256aa                           @ 0802569a 06e0
-DWORD_0802569c:
-    .word  0x09de130a                     @ 0802569c 0a13de09
+rcs_ff_font3_ptr_b:
+    .word  0x09de130a                     @ 0802569c 0a13de09  0x09de130a
 LAB_080256a0:
-    ldr r0, DWORD_080256a4                   @ 080256a0 0048
+    ldr r0, rcs_ff_font2_ptr_b               @ 080256a0 0048
     b LAB_080256aa                           @ 080256a2 02e0
-DWORD_080256a4:
-    .word  0x09dd503c                     @ 080256a4 3c50dd09
+rcs_ff_font2_ptr_b:
+    .word  0x09dd503c                     @ 080256a4 3c50dd09  0x09dd503c
 LAB_080256a8:
-    ldr r0, DWORD_080256b4                   @ 080256a8 0248
+    ldr r0, rcs_ff_font1_ptr_b               @ 080256a8 0248
 LAB_080256aa:
     movs r1,#0xfa    @ 080256aa fa21
     lsls r1,r1,#0x3    @ 080256ac c900
     bl render_card_stat_with_number_alt      @ 080256ae 06f0ebfa
     b LAB_0802576c                           @ 080256b2 5be0
-DWORD_080256b4:
-    .word  0x09dc99b4                     @ 080256b4 b499dc09
+rcs_ff_font1_ptr_b:
+    .word  0x09dc99b4                     @ 080256b4 b499dc09  0x09dc99b4
 LAB_080256b8:
-    ldr r0, DWORD_080256e0                   @ 080256b8 0948
-    ldr r1, DWORD_080256e4                   @ 080256ba 0a49
+    ldr r0, rcs_ewram_base_22                @ 080256b8 0948
+    ldr r1, rcs_gsettings_offset_22          @ 080256ba 0a49
     adds r0,r0,r1    @ 080256bc 4018
     movs r1,#0x7    @ 080256be 0721
     ldrb r0,[r0,#0x0]                        @ 080256c0 0078
@@ -17908,43 +17977,43 @@ LAB_080256b8:
     beq LAB_080256f8                         @ 080256ce 13d0
     cmp r1,#0x4                              @ 080256d0 0429
     beq LAB_080256f0                         @ 080256d2 0dd0
-    ldr r0, DWORD_080256e8                   @ 080256d4 0448
+    ldr r0, rcs_fg_font5_base_b              @ 080256d4 0448
     cmp r1,#0x5                              @ 080256d6 0529
     bne LAB_0802570a                         @ 080256d8 17d1
-    ldr r2, DWORD_080256ec                   @ 080256da 044a
+    ldr r2, rcs_fg_font5_off_b               @ 080256da 044a
     adds r0,r0,r2    @ 080256dc 8018
     b LAB_0802570a                           @ 080256de 14e0
-DWORD_080256e0:
-    .word  0x02000000                     @ 080256e0 00000002
-DWORD_080256e4:
-    .word  0x00006c2c                     @ 080256e4 2c6c0000
-DWORD_080256e8:
-    .word  0x09dbe8b4                     @ 080256e8 b4e8db09
-DWORD_080256ec:
-    .word  0x0003ab52                     @ 080256ec 52ab0300
+rcs_ewram_base_22:
+    .word  EWRAM_BASE                     @ 080256e0 00000002
+rcs_gsettings_offset_22:
+    .word  GSETTINGS_OFFSET               @ 080256e4 2c6c0000
+rcs_fg_font5_base_b:
+    .word  0x09dbe8b4                     @ 080256e8 b4e8db09  0x09dbe8b4
+rcs_fg_font5_off_b:
+    .word  0x0003ab52                     @ 080256ec 52ab0300  0x0003ab52
 LAB_080256f0:
-    ldr r0, DWORD_080256f4                   @ 080256f0 0048
+    ldr r0, rcs_fg_font4_ptr_b               @ 080256f0 0048
     b LAB_0802570a                           @ 080256f2 0ae0
-DWORD_080256f4:
-    .word  0x09ded7d0                     @ 080256f4 d0d7de09
+rcs_fg_font4_ptr_b:
+    .word  0x09ded7d0                     @ 080256f4 d0d7de09  0x09ded7d0
 LAB_080256f8:
-    ldr r0, DWORD_080256fc                   @ 080256f8 0048
+    ldr r0, rcs_fg_font3_ptr_b               @ 080256f8 0048
     b LAB_0802570a                           @ 080256fa 06e0
-DWORD_080256fc:
-    .word  0x09de12f6                     @ 080256fc f612de09
+rcs_fg_font3_ptr_b:
+    .word  0x09de12f6                     @ 080256fc f612de09  0x09de12f6
 LAB_08025700:
-    ldr r0, DWORD_08025704                   @ 08025700 0048
+    ldr r0, rcs_fg_font2_ptr_b               @ 08025700 0048
     b LAB_0802570a                           @ 08025702 02e0
-DWORD_08025704:
-    .word  0x09dd5026                     @ 08025704 2650dd09
+rcs_fg_font2_ptr_b:
+    .word  0x09dd5026                     @ 08025704 2650dd09  0x09dd5026
 LAB_08025708:
-    ldr r0, DWORD_08025738                   @ 08025708 0b48
+    ldr r0, rcs_fg_font1_ptr_b               @ 08025708 0b48
 LAB_0802570a:
     movs r1,#0xc8    @ 0802570a c821
     bl render_card_stat_with_number_alt      @ 0802570c 06f0bcfa
 LAB_08025710:
-    ldr r0, DWORD_0802573c                   @ 08025710 0a48
-    ldr r3, DWORD_08025740                   @ 08025712 0b4b
+    ldr r0, rcs_ewram_base_23                @ 08025710 0a48
+    ldr r3, rcs_gsettings_offset_23          @ 08025712 0b4b
     adds r0,r0,r3    @ 08025714 c018
     movs r1,#0x7    @ 08025716 0721
     ldrb r0,[r0,#0x0]                        @ 08025718 0078
@@ -17957,50 +18026,50 @@ LAB_08025710:
     beq LAB_08025754                         @ 08025726 15d0
     cmp r1,#0x4                              @ 08025728 0429
     beq LAB_0802574c                         @ 0802572a 0fd0
-    ldr r0, DWORD_08025744                   @ 0802572c 0548
+    ldr r0, rcs_fh_font5_base_b              @ 0802572c 0548
     cmp r1,#0x5                              @ 0802572e 0529
     bne LAB_08025766                         @ 08025730 19d1
-    ldr r1, DWORD_08025748                   @ 08025732 0549
+    ldr r1, rcs_fh_font5_off_b               @ 08025732 0549
     adds r0,r0,r1    @ 08025734 4018
     b LAB_08025766                           @ 08025736 16e0
-DWORD_08025738:
-    .word  0x09dc99a6                     @ 08025738 a699dc09
-DWORD_0802573c:
-    .word  0x02000000                     @ 0802573c 00000002
-DWORD_08025740:
-    .word  0x00006c2c                     @ 08025740 2c6c0000
-DWORD_08025744:
-    .word  0x09dbe910                     @ 08025744 10e9db09
-DWORD_08025748:
-    .word  0x0003ab40                     @ 08025748 40ab0300
+rcs_fg_font1_ptr_b:
+    .word  0x09dc99a6                     @ 08025738 a699dc09  0x09dc99a6
+rcs_ewram_base_23:
+    .word  EWRAM_BASE                     @ 0802573c 00000002
+rcs_gsettings_offset_23:
+    .word  GSETTINGS_OFFSET               @ 08025740 2c6c0000
+rcs_fh_font5_base_b:
+    .word  0x09dbe910                     @ 08025744 10e9db09  0x09dbe910
+rcs_fh_font5_off_b:
+    .word  0x0003ab40                     @ 08025748 40ab0300  0x0003ab40
 LAB_0802574c:
-    ldr r0, DWORD_08025750                   @ 0802574c 0048
+    ldr r0, rcs_fh_font4_ptr_b               @ 0802574c 0048
     b LAB_08025766                           @ 0802574e 0ae0
-DWORD_08025750:
-    .word  0x09ded836                     @ 08025750 36d8de09
+rcs_fh_font4_ptr_b:
+    .word  0x09ded836                     @ 08025750 36d8de09  0x09ded836
 LAB_08025754:
-    ldr r0, DWORD_08025758                   @ 08025754 0048
+    ldr r0, rcs_fh_font3_ptr_b               @ 08025754 0048
     b LAB_08025766                           @ 08025756 06e0
-DWORD_08025758:
-    .word  0x09de1356                     @ 08025758 5613de09
+rcs_fh_font3_ptr_b:
+    .word  0x09de1356                     @ 08025758 5613de09  0x09de1356
 LAB_0802575c:
-    ldr r0, DWORD_08025760                   @ 0802575c 0048
+    ldr r0, rcs_fh_font2_ptr_b               @ 0802575c 0048
     b LAB_08025766                           @ 0802575e 02e0
-DWORD_08025760:
-    .word  0x09dd5080                     @ 08025760 8050dd09
+rcs_fh_font2_ptr_b:
+    .word  0x09dd5080                     @ 08025760 8050dd09  0x09dd5080
 LAB_08025764:
-    ldr r0, DWORD_080257a0                   @ 08025764 0e48
+    ldr r0, rcs_fh_font1_ptr_b               @ 08025764 0e48
 LAB_08025766:
-    ldr r1, DWORD_080257a4                   @ 08025766 0f49
+    ldr r1, rcs_gprng_pack_scroll_off_23d_1  @ 08025766 0f49
     bl render_card_stat_with_number_alt      @ 08025768 06f08efa
 LAB_0802576c:
-    ldr r0, DWORD_080257a8                   @ 0802576c 0e48
+    ldr r0, rcs_ptr_gp1lifepoints_2          @ 0802576c 0e48
     ldr r1,[r0,#0x0]                         @ 0802576e 0168
-    ldr r0, DWORD_080257ac                   @ 08025770 0e48
+    ldr r0, rcs_card_stat_lp_threshold_20000 @ 08025770 0e48
     cmp r1,r0                                @ 08025772 8142
     ble LAB_080257e0                         @ 08025774 34dd
-    ldr r0, DWORD_080257b0                   @ 08025776 0e48
-    ldr r2, DWORD_080257b4                   @ 08025778 0e4a
+    ldr r0, rcs_ewram_base_24                @ 08025776 0e48
+    ldr r2, rcs_gsettings_offset_24          @ 08025778 0e4a
     adds r0,r0,r2    @ 0802577a 8018
     movs r1,#0x7    @ 0802577c 0721
     ldrb r0,[r0,#0x0]                        @ 0802577e 0078
@@ -18013,58 +18082,58 @@ LAB_0802576c:
     beq LAB_080257c8                         @ 0802578c 1cd0
     cmp r1,#0x4                              @ 0802578e 0429
     beq LAB_080257c0                         @ 08025790 16d0
-    ldr r0, DWORD_080257b8                   @ 08025792 0948
+    ldr r0, rcs_fi_font5_base_b              @ 08025792 0948
     cmp r1,#0x5                              @ 08025794 0529
     bne LAB_080257da                         @ 08025796 20d1
-    ldr r3, DWORD_080257bc                   @ 08025798 084b
+    ldr r3, rcs_fi_font5_off_b               @ 08025798 084b
     adds r0,r0,r3    @ 0802579a c018
     b LAB_080257da                           @ 0802579c 1de0
     .zero  0x2
-DWORD_080257a0:
-    .word  0x09dc99f0                     @ 080257a0 f099dc09
-DWORD_080257a4:
-    .word  0x0000023d                     @ 080257a4 3d020000
-DWORD_080257a8:
+rcs_fh_font1_ptr_b:
+    .word  0x09dc99f0                     @ 080257a0 f099dc09  0x09dc99f0
+rcs_gprng_pack_scroll_off_23d_1:
+    .word  GPRNG_PACK_SCROLL_OFF_23D      @ 080257a4 3d020000
+rcs_ptr_gp1lifepoints_2:
     .word  gP1LifePoints                  @ 080257a8 e0c40102
-DWORD_080257ac:
-    .word  0x00004e20                     @ 080257ac 204e0000
-DWORD_080257b0:
-    .word  0x02000000                     @ 080257b0 00000002
-DWORD_080257b4:
-    .word  0x00006c2c                     @ 080257b4 2c6c0000
-DWORD_080257b8:
-    .word  0x09dbe8f8                     @ 080257b8 f8e8db09
-DWORD_080257bc:
-    .word  0x0003ab42                     @ 080257bc 42ab0300
+rcs_card_stat_lp_threshold_20000:
+    .word  CARD_STAT_LP_THRESHOLD_20000   @ 080257ac 204e0000
+rcs_ewram_base_24:
+    .word  EWRAM_BASE                     @ 080257b0 00000002
+rcs_gsettings_offset_24:
+    .word  GSETTINGS_OFFSET               @ 080257b4 2c6c0000
+rcs_fi_font5_base_b:
+    .word  0x09dbe8f8                     @ 080257b8 f8e8db09  0x09dbe8f8
+rcs_fi_font5_off_b:
+    .word  0x0003ab42                     @ 080257bc 42ab0300  0x0003ab42
 LAB_080257c0:
-    ldr r0, DWORD_080257c4                   @ 080257c0 0048
+    ldr r0, rcs_fi_font4_ptr_b               @ 080257c0 0048
     b LAB_080257da                           @ 080257c2 0ae0
-DWORD_080257c4:
-    .word  0x09ded81c                     @ 080257c4 1cd8de09
+rcs_fi_font4_ptr_b:
+    .word  0x09ded81c                     @ 080257c4 1cd8de09  0x09ded81c
 LAB_080257c8:
-    ldr r0, DWORD_080257cc                   @ 080257c8 0048
+    ldr r0, rcs_fi_font3_ptr_b               @ 080257c8 0048
     b LAB_080257da                           @ 080257ca 06e0
-DWORD_080257cc:
-    .word  0x09de133c                     @ 080257cc 3c13de09
+rcs_fi_font3_ptr_b:
+    .word  0x09de133c                     @ 080257cc 3c13de09  0x09de133c
 LAB_080257d0:
-    ldr r0, DWORD_080257d4                   @ 080257d0 0048
+    ldr r0, rcs_fi_font2_ptr_b               @ 080257d0 0048
     b LAB_080257da                           @ 080257d2 02e0
-DWORD_080257d4:
-    .word  0x09dd506c                     @ 080257d4 6c50dd09
+rcs_fi_font2_ptr_b:
+    .word  0x09dd506c                     @ 080257d4 6c50dd09  0x09dd506c
 LAB_080257d8:
-    ldr r0, DWORD_08025814                   @ 080257d8 0e48
+    ldr r0, rcs_fi_font1_ptr_b               @ 080257d8 0e48
 LAB_080257da:
     movs r1,#0xc8    @ 080257da c821
     bl render_card_stat_with_number_alt      @ 080257dc 06f054fa
 LAB_080257e0:
-    ldr r0, DWORD_08025818                   @ 080257e0 0d48
+    ldr r0, rcs_ptr_gp1lifepoints_3          @ 080257e0 0d48
     ldr r0,[r0,#0x10]                        @ 080257e2 0069
     cmp r0,#0x0                              @ 080257e4 0028
     beq LAB_08025854                         @ 080257e6 35d0
     cmp r0,#0x5                              @ 080257e8 0528
     bhi LAB_080258ac                         @ 080257ea 5fd8
-    ldr r0, DWORD_0802581c                   @ 080257ec 0b48
-    ldr r1, DWORD_08025820                   @ 080257ee 0c49
+    ldr r0, rcs_ewram_base_25                @ 080257ec 0b48
+    ldr r1, rcs_gsettings_offset_25          @ 080257ee 0c49
     adds r0,r0,r1    @ 080257f0 4018
     movs r1,#0x7    @ 080257f2 0721
     ldrb r0,[r0,#0x0]                        @ 080257f4 0078
@@ -18077,51 +18146,51 @@ LAB_080257e0:
     beq LAB_08025834                         @ 08025802 17d0
     cmp r1,#0x4                              @ 08025804 0429
     beq LAB_0802582c                         @ 08025806 11d0
-    ldr r0, DWORD_08025824                   @ 08025808 0648
+    ldr r0, rcs_fj_font5_base_b              @ 08025808 0648
     cmp r1,#0x5                              @ 0802580a 0529
     bne LAB_08025846                         @ 0802580c 1bd1
-    ldr r2, DWORD_08025828                   @ 0802580e 064a
+    ldr r2, rcs_fj_font5_off_b               @ 0802580e 064a
     adds r0,r0,r2    @ 08025810 8018
     b LAB_08025846                           @ 08025812 18e0
-DWORD_08025814:
-    .word  0x09dc99dc                     @ 08025814 dc99dc09
-DWORD_08025818:
+rcs_fi_font1_ptr_b:
+    .word  0x09dc99dc                     @ 08025814 dc99dc09  0x09dc99dc
+rcs_ptr_gp1lifepoints_3:
     .word  gP1LifePoints                  @ 08025818 e0c40102
-DWORD_0802581c:
-    .word  0x02000000                     @ 0802581c 00000002
-DWORD_08025820:
-    .word  0x00006c2c                     @ 08025820 2c6c0000
-DWORD_08025824:
-    .word  0x09dbe922                     @ 08025824 22e9db09
-DWORD_08025828:
-    .word  0x0003ab3c                     @ 08025828 3cab0300
+rcs_ewram_base_25:
+    .word  EWRAM_BASE                     @ 0802581c 00000002
+rcs_gsettings_offset_25:
+    .word  GSETTINGS_OFFSET               @ 08025820 2c6c0000
+rcs_fj_font5_base_b:
+    .word  0x09dbe922                     @ 08025824 22e9db09  0x09dbe922
+rcs_fj_font5_off_b:
+    .word  0x0003ab3c                     @ 08025828 3cab0300  0x0003ab3c
 LAB_0802582c:
-    ldr r0, DWORD_08025830                   @ 0802582c 0048
+    ldr r0, rcs_fj_font4_ptr_b               @ 0802582c 0048
     b LAB_08025846                           @ 0802582e 0ae0
-DWORD_08025830:
-    .word  0x09ded844                     @ 08025830 44d8de09
+rcs_fj_font4_ptr_b:
+    .word  0x09ded844                     @ 08025830 44d8de09  0x09ded844
 LAB_08025834:
-    ldr r0, DWORD_08025838                   @ 08025834 0048
+    ldr r0, rcs_fj_font3_ptr_b               @ 08025834 0048
     b LAB_08025846                           @ 08025836 06e0
-DWORD_08025838:
-    .word  0x09de1366                     @ 08025838 6613de09
+rcs_fj_font3_ptr_b:
+    .word  0x09de1366                     @ 08025838 6613de09  0x09de1366
 LAB_0802583c:
-    ldr r0, DWORD_08025840                   @ 0802583c 0048
+    ldr r0, rcs_fj_font2_ptr_b               @ 0802583c 0048
     b LAB_08025846                           @ 0802583e 02e0
-DWORD_08025840:
-    .word  0x09dd508e                     @ 08025840 8e50dd09
+rcs_fj_font2_ptr_b:
+    .word  0x09dd508e                     @ 08025840 8e50dd09  0x09dd508e
 LAB_08025844:
-    ldr r0, DWORD_08025850                   @ 08025844 0248
+    ldr r0, rcs_fj_font1_ptr_b               @ 08025844 0248
 LAB_08025846:
     movs r1,#0x96    @ 08025846 9621
     bl render_card_stat_with_number_alt      @ 08025848 06f01efa
     b LAB_080258ac                           @ 0802584c 2ee0
     .zero  0x2
-DWORD_08025850:
-    .word  0x09dc99fe                     @ 08025850 fe99dc09
+rcs_fj_font1_ptr_b:
+    .word  0x09dc99fe                     @ 08025850 fe99dc09  0x09dc99fe
 LAB_08025854:
-    ldr r0, DWORD_0802587c                   @ 08025854 0948
-    ldr r3, DWORD_08025880                   @ 08025856 0a4b
+    ldr r0, rcs_ewram_base_26                @ 08025854 0948
+    ldr r3, rcs_gsettings_offset_26          @ 08025856 0a4b
     adds r0,r0,r3    @ 08025858 c018
     movs r1,#0x7    @ 0802585a 0721
     ldrb r0,[r0,#0x0]                        @ 0802585c 0078
@@ -18134,42 +18203,42 @@ LAB_08025854:
     beq LAB_08025894                         @ 0802586a 13d0
     cmp r1,#0x4                              @ 0802586c 0429
     beq LAB_0802588c                         @ 0802586e 0dd0
-    ldr r0, DWORD_08025884                   @ 08025870 0448
+    ldr r0, rcs_fk_font5_base_b              @ 08025870 0448
     cmp r1,#0x5                              @ 08025872 0529
     bne LAB_080258a6                         @ 08025874 17d1
-    ldr r1, DWORD_08025888                   @ 08025876 0449
+    ldr r1, rcs_fk_font5_off_b               @ 08025876 0449
     adds r0,r0,r1    @ 08025878 4018
     b LAB_080258a6                           @ 0802587a 14e0
-DWORD_0802587c:
-    .word  0x02000000                     @ 0802587c 00000002
-DWORD_08025880:
-    .word  0x00006c2c                     @ 08025880 2c6c0000
-DWORD_08025884:
-    .word  0x09dbe93a                     @ 08025884 3ae9db09
-DWORD_08025888:
-    .word  0x0003ab34                     @ 08025888 34ab0300
+rcs_ewram_base_26:
+    .word  EWRAM_BASE                     @ 0802587c 00000002
+rcs_gsettings_offset_26:
+    .word  GSETTINGS_OFFSET               @ 08025880 2c6c0000
+rcs_fk_font5_base_b:
+    .word  0x09dbe93a                     @ 08025884 3ae9db09  0x09dbe93a
+rcs_fk_font5_off_b:
+    .word  0x0003ab34                     @ 08025888 34ab0300  0x0003ab34
 LAB_0802588c:
-    ldr r0, DWORD_08025890                   @ 0802588c 0048
+    ldr r0, rcs_fk_font4_ptr_b               @ 0802588c 0048
     b LAB_080258a6                           @ 0802588e 0ae0
-DWORD_08025890:
-    .word  0x09ded85e                     @ 08025890 5ed8de09
+rcs_fk_font4_ptr_b:
+    .word  0x09ded85e                     @ 08025890 5ed8de09  0x09ded85e
 LAB_08025894:
-    ldr r0, DWORD_08025898                   @ 08025894 0048
+    ldr r0, rcs_fk_font3_ptr_b               @ 08025894 0048
     b LAB_080258a6                           @ 08025896 06e0
-DWORD_08025898:
-    .word  0x09de137a                     @ 08025898 7a13de09
+rcs_fk_font3_ptr_b:
+    .word  0x09de137a                     @ 08025898 7a13de09  0x09de137a
 LAB_0802589c:
-    ldr r0, DWORD_080258a0                   @ 0802589c 0048
+    ldr r0, rcs_fk_font2_ptr_b               @ 0802589c 0048
     b LAB_080258a6                           @ 0802589e 02e0
-DWORD_080258a0:
-    .word  0x09dd50a8                     @ 080258a0 a850dd09
+rcs_fk_font2_ptr_b:
+    .word  0x09dd50a8                     @ 080258a0 a850dd09  0x09dd50a8
 LAB_080258a4:
-    ldr r0, DWORD_080258c8                   @ 080258a4 0848
+    ldr r0, rcs_fk_font1_ptr_b               @ 080258a4 0848
 LAB_080258a6:
-    ldr r1, DWORD_080258cc                   @ 080258a6 0949
+    ldr r1, rcs_card_stat_lp_threshold_1500  @ 080258a6 0949
     bl render_card_stat_with_number_alt      @ 080258a8 06f0eef9
 LAB_080258ac:
-    ldr r0, DWORD_080258d0                   @ 080258ac 0848
+    ldr r0, rcs_ptr_gduelcardctxbase_2       @ 080258ac 0848
     movs r2,#0x8a    @ 080258ae 8a22
     lsls r2,r2,#0x2    @ 080258b0 9200
     adds r0,r0,r2    @ 080258b2 8018
@@ -18180,30 +18249,340 @@ LAB_080258ac:
     b LAB_08025b20                           @ 080258bc 30e1
 LAB_080258be:
     lsls r0,r0,#0x2    @ 080258be 8000
-    ldr r1, DWORD_080258d4                   @ 080258c0 0449
+    ldr r1, rcs_block2_dispatch_table_ptr    @ 080258c0 0449
     adds r0,r0,r1    @ 080258c2 4018
     ldr r0,[r0,#0x0]                         @ 080258c4 0068
     .hword 0x4687    @ 080258c6 8746
-DWORD_080258c8:
-    .word  0x09dc9a0e                     @ 080258c8 0e9adc09
-DWORD_080258cc:
-    .word  0x000005dc                     @ 080258cc dc050000
-DWORD_080258d0:
-    .word  0x0201e2a0                     @ 080258d0 a0e20102
-DWORD_080258d4:
-    .word  0x080258d8                     @ 080258d4 d8580208
+rcs_fk_font1_ptr_b:
+    .word  0x09dc9a0e                     @ 080258c8 0e9adc09  0x09dc9a0e: fk pass font1 jp path
+rcs_card_stat_lp_threshold_1500:
+    .word  CARD_STAT_LP_THRESHOLD_1500    @ 080258cc dc050000
+rcs_ptr_gduelcardctxbase_2:
+    .word  gDuelCardCtxBase               @ 080258d0 a0e20102
+rcs_block2_dispatch_table_ptr:
+    .word  0x080258d8                     @ 080258d4 d8580208  0x080258d8: block2 dispatch table base
     .word  0x080259a8                     @ 080258d8 a8590208
     .word  0x080258f0                     @ 080258dc f0580208
     .word  0x0802594c                     @ 080258e0 4c590208
     .word  0x08025ac8                     @ 080258e4 c85a0208
     .word  0x08025a68                     @ 080258e8 685a0208
     .word  0x08025a08                     @ 080258ec 085a0208
-DAT_080258f0:
-    ROM_INCBIN 0x258f0, 0x230
+FUN_080258f0:
+    ldr r0, fun_080258f0_b0_ewram_base       @ 080258f0 0a48
+    ldr r3, fun_080258f0_b0_gsettings_off    @ 080258f2 0b4b
+    adds r0,r0,r3    @ 080258f4 c018
+    movs r1,#0x7    @ 080258f6 0721
+    ldrb r0,[r0,#0x0]                        @ 080258f8 0078
+    ands r1,r0    @ 080258fa 0140
+    cmp r1,#0x1                              @ 080258fc 0129
+    beq LAB_08025944                         @ 080258fe 21d0
+    cmp r1,#0x2                              @ 08025900 0229
+    beq LAB_0802593c                         @ 08025902 1bd0
+    cmp r1,#0x3                              @ 08025904 0329
+    beq LAB_08025934                         @ 08025906 15d0
+    cmp r1,#0x4                              @ 08025908 0429
+    beq LAB_0802592c                         @ 0802590a 0fd0
+    ldr r0, rcs_blk2_b0_font5_base           @ 0802590c 0548
+    cmp r1,#0x5                              @ 0802590e 0529
+    beq LAB_08025914                         @ 08025910 00d0
+    b LAB_08025aba                           @ 08025912 d2e0
+LAB_08025914:
+    ldr r1, rcs_blk2_b0_font5_off            @ 08025914 0449
+    adds r0,r0,r1    @ 08025916 4018
+    b LAB_08025aba                           @ 08025918 cfe0
+    .zero  0x2
+fun_080258f0_b0_ewram_base:
+    .word  EWRAM_BASE                     @ 0802591c 00000002
+fun_080258f0_b0_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 08025920 2c6c0000
+rcs_blk2_b0_font5_base:
+    .word  0x09dbe804                     @ 08025924 04e8db09  0x09dbe804: block2 stub 0 font5 base
+rcs_blk2_b0_font5_off:
+    .word  0x0003ab14                     @ 08025928 14ab0300  0x0003ab14: block2 stub 0 font5 off
+LAB_0802592c:
+    ldr r0, DAT_08025930                     @ 0802592c 0048
+    b LAB_08025aba                           @ 0802592e c4e0
+DAT_08025930:
+    .byte  0xbc, 0xd6, 0xde, 0x09
+LAB_08025934:
+    ldr r0, DAT_08025938                     @ 08025934 0048
+    b LAB_08025aba                           @ 08025936 c0e0
+DAT_08025938:
+    .byte  0x04, 0x12, 0xde, 0x09
+LAB_0802593c:
+    ldr r0, DAT_08025940                     @ 0802593c 0048
+    b LAB_08025aba                           @ 0802593e bce0
+DAT_08025940:
+    .byte  0x54, 0x4f, 0xdd, 0x09
+LAB_08025944:
+    ldr r0, DAT_08025948                     @ 08025944 0048
+    b LAB_08025aba                           @ 08025946 b8e0
+DAT_08025948:
+    .byte  0xae, 0x98, 0xdc, 0x09
+FUN_0802594c:
+    ldr r0, fun_0802594c_b1_ewram_base       @ 0802594c 0a48
+    ldr r2, fun_0802594c_b1_gsettings_off    @ 0802594e 0b4a
+    adds r0,r0,r2    @ 08025950 8018
+    movs r1,#0x7    @ 08025952 0721
+    ldrb r0,[r0,#0x0]                        @ 08025954 0078
+    ands r1,r0    @ 08025956 0140
+    cmp r1,#0x1                              @ 08025958 0129
+    beq LAB_080259a0                         @ 0802595a 21d0
+    cmp r1,#0x2                              @ 0802595c 0229
+    beq LAB_08025998                         @ 0802595e 1bd0
+    cmp r1,#0x3                              @ 08025960 0329
+    beq LAB_08025990                         @ 08025962 15d0
+    cmp r1,#0x4                              @ 08025964 0429
+    beq LAB_08025988                         @ 08025966 0fd0
+    ldr r0, rcs_blk2_b1_font5_base           @ 08025968 0548
+    cmp r1,#0x5                              @ 0802596a 0529
+    beq LAB_08025970                         @ 0802596c 00d0
+    b LAB_08025a5a                           @ 0802596e 74e0
+LAB_08025970:
+    ldr r3, rcs_blk2_b1_font5_off            @ 08025970 044b
+    adds r0,r0,r3    @ 08025972 c018
+    b LAB_08025a5a                           @ 08025974 71e0
+    .zero  0x2
+fun_0802594c_b1_ewram_base:
+    .word  EWRAM_BASE                     @ 08025978 00000002
+fun_0802594c_b1_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802597c 2c6c0000
+rcs_blk2_b1_font5_base:
+    .word  0x09dbe816                     @ 08025980 16e8db09  0x09dbe816
+rcs_blk2_b1_font5_off:
+    .word  0x0003ab1c                     @ 08025984 1cab0300  0x0003ab1c
+LAB_08025988:
+    ldr r0, DAT_0802598c                     @ 08025988 0048
+    b LAB_08025a5a                           @ 0802598a 66e0
+DAT_0802598c:
+    .byte  0xda, 0xd6, 0xde, 0x09
+LAB_08025990:
+    ldr r0, DAT_08025994                     @ 08025990 0048
+    b LAB_08025a5a                           @ 08025992 62e0
+DAT_08025994:
+    .byte  0x14, 0x12, 0xde, 0x09
+LAB_08025998:
+    ldr r0, DAT_0802599c                     @ 08025998 0048
+    b LAB_08025a5a                           @ 0802599a 5ee0
+DAT_0802599c:
+    .byte  0x62, 0x4f, 0xdd, 0x09
+LAB_080259a0:
+    ldr r0, DAT_080259a4                     @ 080259a0 0048
+    b LAB_08025a5a                           @ 080259a2 5ae0
+DAT_080259a4:
+    .byte  0xc2, 0x98, 0xdc, 0x09
+FUN_080259a8:
+    ldr r0, fun_080259a8_b2_ewram_base       @ 080259a8 0948
+    ldr r1, fun_080259a8_b2_gsettings_off    @ 080259aa 0a49
+    adds r0,r0,r1    @ 080259ac 4018
+    movs r1,#0x7    @ 080259ae 0721
+    ldrb r0,[r0,#0x0]                        @ 080259b0 0078
+    ands r1,r0    @ 080259b2 0140
+    cmp r1,#0x1                              @ 080259b4 0129
+    beq LAB_080259f8                         @ 080259b6 1fd0
+    cmp r1,#0x2                              @ 080259b8 0229
+    beq LAB_080259f0                         @ 080259ba 19d0
+    cmp r1,#0x3                              @ 080259bc 0329
+    beq LAB_080259e8                         @ 080259be 13d0
+    cmp r1,#0x4                              @ 080259c0 0429
+    beq LAB_080259e0                         @ 080259c2 0dd0
+    ldr r0, rcs_blk2_b2_font5_base           @ 080259c4 0448
+    cmp r1,#0x5                              @ 080259c6 0529
+    bne LAB_080259fa                         @ 080259c8 17d1
+    ldr r2, rcs_blk2_b2_font5_off            @ 080259ca 044a
+    adds r0,r0,r2    @ 080259cc 8018
+    b LAB_080259fa                           @ 080259ce 14e0
+fun_080259a8_b2_ewram_base:
+    .word  EWRAM_BASE                     @ 080259d0 00000002
+fun_080259a8_b2_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 080259d4 2c6c0000
+rcs_blk2_b2_font5_base:
+    .word  0x09dbe826                     @ 080259d8 26e8db09  0x09dbe826
+rcs_blk2_b2_font5_off:
+    .word  0x0003ab24                     @ 080259dc 24ab0300  0x0003ab24
+LAB_080259e0:
+    ldr r0, DAT_080259e4                     @ 080259e0 0048
+    b LAB_080259fa                           @ 080259e2 0ae0
+DAT_080259e4:
+    .byte  0xf4, 0xd6, 0xde, 0x09
+LAB_080259e8:
+    ldr r0, DAT_080259ec                     @ 080259e8 0048
+    b LAB_080259fa                           @ 080259ea 06e0
+DAT_080259ec:
+    .byte  0x2e, 0x12, 0xde, 0x09
+LAB_080259f0:
+    ldr r0, DAT_080259f4                     @ 080259f0 0048
+    b LAB_080259fa                           @ 080259f2 02e0
+DAT_080259f4:
+    .byte  0x78, 0x4f, 0xdd, 0x09
+LAB_080259f8:
+    ldr r0, DAT_08025a04                     @ 080259f8 0248
+LAB_080259fa:
+    movs r1,#0xfa    @ 080259fa fa21
+    lsls r1,r1,#0x1    @ 080259fc 4900
+    bl render_card_stat_with_number_alt      @ 080259fe 06f043f9
+    b LAB_08025b20                           @ 08025a02 8de0
+DAT_08025a04:
+    .byte  0xde, 0x98, 0xdc, 0x09
+FUN_08025a08:
+    ldr r0, fun_08025a08_b3_ewram_base       @ 08025a08 0948
+    ldr r3, fun_08025a08_b3_gsettings_off    @ 08025a0a 0a4b
+    adds r0,r0,r3    @ 08025a0c c018
+    movs r1,#0x7    @ 08025a0e 0721
+    ldrb r0,[r0,#0x0]                        @ 08025a10 0078
+    ands r1,r0    @ 08025a12 0140
+    cmp r1,#0x1                              @ 08025a14 0129
+    beq LAB_08025a58                         @ 08025a16 1fd0
+    cmp r1,#0x2                              @ 08025a18 0229
+    beq LAB_08025a50                         @ 08025a1a 19d0
+    cmp r1,#0x3                              @ 08025a1c 0329
+    beq LAB_08025a48                         @ 08025a1e 13d0
+    cmp r1,#0x4                              @ 08025a20 0429
+    beq LAB_08025a40                         @ 08025a22 0dd0
+    ldr r0, rcs_blk2_b3_font5_base           @ 08025a24 0448
+    cmp r1,#0x5                              @ 08025a26 0529
+    bne LAB_08025a5a                         @ 08025a28 17d1
+    ldr r1, rcs_blk2_b3_font5_off            @ 08025a2a 0449
+    adds r0,r0,r1    @ 08025a2c 4018
+    b LAB_08025a5a                           @ 08025a2e 14e0
+fun_08025a08_b3_ewram_base:
+    .word  EWRAM_BASE                     @ 08025a30 00000002
+fun_08025a08_b3_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 08025a34 2c6c0000
+rcs_blk2_b3_font5_base:
+    .word  0x09dbe836                     @ 08025a38 36e8db09  0x09dbe836
+rcs_blk2_b3_font5_off:
+    .word  0x0003ab28                     @ 08025a3c 28ab0300  0x0003ab28
+LAB_08025a40:
+    ldr r0, DAT_08025a44                     @ 08025a40 0048
+    b LAB_08025a5a                           @ 08025a42 0ae0
+DAT_08025a44:
+    .byte  0x0c, 0xd7, 0xde, 0x09
+LAB_08025a48:
+    ldr r0, DAT_08025a4c                     @ 08025a48 0048
+    b LAB_08025a5a                           @ 08025a4a 06e0
+DAT_08025a4c:
+    .byte  0x48, 0x12, 0xde, 0x09
+LAB_08025a50:
+    ldr r0, DAT_08025a54                     @ 08025a50 0048
+    b LAB_08025a5a                           @ 08025a52 02e0
+DAT_08025a54:
+    .byte  0x90, 0x4f, 0xdd, 0x09
+LAB_08025a58:
+    ldr r0, DAT_08025a64                     @ 08025a58 0248
+LAB_08025a5a:
+    movs r1,#0xfa    @ 08025a5a fa21
+    lsls r1,r1,#0x3    @ 08025a5c c900
+    bl render_card_stat_with_number_alt      @ 08025a5e 06f013f9
+    b LAB_08025b20                           @ 08025a62 5de0
+DAT_08025a64:
+    .byte  0xf2, 0x98, 0xdc, 0x09
+FUN_08025a68:
+    ldr r0, fun_08025a68_b4_ewram_base       @ 08025a68 0948
+    ldr r2, fun_08025a68_b4_gsettings_off    @ 08025a6a 0a4a
+    adds r0,r0,r2    @ 08025a6c 8018
+    movs r1,#0x7    @ 08025a6e 0721
+    ldrb r0,[r0,#0x0]                        @ 08025a70 0078
+    ands r1,r0    @ 08025a72 0140
+    cmp r1,#0x1                              @ 08025a74 0129
+    beq LAB_08025ab8                         @ 08025a76 1fd0
+    cmp r1,#0x2                              @ 08025a78 0229
+    beq LAB_08025ab0                         @ 08025a7a 19d0
+    cmp r1,#0x3                              @ 08025a7c 0329
+    beq LAB_08025aa8                         @ 08025a7e 13d0
+    cmp r1,#0x4                              @ 08025a80 0429
+    beq LAB_08025aa0                         @ 08025a82 0dd0
+    ldr r0, rcs_blk2_b4_font5_base           @ 08025a84 0448
+    cmp r1,#0x5                              @ 08025a86 0529
+    bne LAB_08025aba                         @ 08025a88 17d1
+    ldr r3, rcs_blk2_b4_font5_off            @ 08025a8a 044b
+    adds r0,r0,r3    @ 08025a8c c018
+    b LAB_08025aba                           @ 08025a8e 14e0
+fun_08025a68_b4_ewram_base:
+    .word  EWRAM_BASE                     @ 08025a90 00000002
+fun_08025a68_b4_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 08025a94 2c6c0000
+rcs_blk2_b4_font5_base:
+    .word  0x09dbe84a                     @ 08025a98 4ae8db09  0x09dbe84a
+rcs_blk2_b4_font5_off:
+    .word  0x0003ab2e                     @ 08025a9c 2eab0300  0x0003ab2e
+LAB_08025aa0:
+    ldr r0, DAT_08025aa4                     @ 08025aa0 0048
+    b LAB_08025aba                           @ 08025aa2 0ae0
+DAT_08025aa4:
+    .byte  0x28, 0xd7, 0xde, 0x09
+LAB_08025aa8:
+    ldr r0, DAT_08025aac                     @ 08025aa8 0048
+    b LAB_08025aba                           @ 08025aaa 06e0
+DAT_08025aac:
+    .byte  0x62, 0x12, 0xde, 0x09
+LAB_08025ab0:
+    ldr r0, DAT_08025ab4                     @ 08025ab0 0048
+    b LAB_08025aba                           @ 08025ab2 02e0
+DAT_08025ab4:
+    .byte  0xa6, 0x4f, 0xdd, 0x09
+LAB_08025ab8:
+    ldr r0, DAT_08025ac4                     @ 08025ab8 0248
+LAB_08025aba:
+    movs r1,#0xfa    @ 08025aba fa21
+    lsls r1,r1,#0x2    @ 08025abc 8900
+    bl render_card_stat_with_number_alt      @ 08025abe 06f0e3f8
+    b LAB_08025b20                           @ 08025ac2 2de0
+DAT_08025ac4:
+    .byte  0x10, 0x99, 0xdc, 0x09
+FUN_08025ac8:
+    ldr r0, fun_08025ac8_b5_ewram_base       @ 08025ac8 0948
+    ldr r1, fun_08025ac8_b5_gsettings_off    @ 08025aca 0a49
+    adds r0,r0,r1    @ 08025acc 4018
+    movs r1,#0x7    @ 08025ace 0721
+    ldrb r0,[r0,#0x0]                        @ 08025ad0 0078
+    ands r1,r0    @ 08025ad2 0140
+    cmp r1,#0x1                              @ 08025ad4 0129
+    beq LAB_08025b18                         @ 08025ad6 1fd0
+    cmp r1,#0x2                              @ 08025ad8 0229
+    beq LAB_08025b10                         @ 08025ada 19d0
+    cmp r1,#0x3                              @ 08025adc 0329
+    beq LAB_08025b08                         @ 08025ade 13d0
+    cmp r1,#0x4                              @ 08025ae0 0429
+    beq LAB_08025b00                         @ 08025ae2 0dd0
+    ldr r0, rcs_blk2_b5_font5_base           @ 08025ae4 0448
+    cmp r1,#0x5                              @ 08025ae6 0529
+    bne LAB_08025b1a                         @ 08025ae8 17d1
+    ldr r2, rcs_blk2_b5_font5_off            @ 08025aea 044a
+    adds r0,r0,r2    @ 08025aec 8018
+    b LAB_08025b1a                           @ 08025aee 14e0
+fun_08025ac8_b5_ewram_base:
+    .word  EWRAM_BASE                     @ 08025af0 00000002
+fun_08025ac8_b5_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 08025af4 2c6c0000
+rcs_blk2_b5_font5_base:
+    .word  0x09dbe85c                     @ 08025af8 5ce8db09  0x09dbe85c
+rcs_blk2_b5_font5_off:
+    .word  0x0003ab30                     @ 08025afc 30ab0300  0x0003ab30
+LAB_08025b00:
+    ldr r0, DAT_08025b04                     @ 08025b00 0048
+    b LAB_08025b1a                           @ 08025b02 0ae0
+DAT_08025b04:
+    .byte  0x44, 0xd7, 0xde, 0x09
+LAB_08025b08:
+    ldr r0, DAT_08025b0c                     @ 08025b08 0048
+    b LAB_08025b1a                           @ 08025b0a 06e0
+DAT_08025b0c:
+    .byte  0x78, 0x12, 0xde, 0x09
+LAB_08025b10:
+    ldr r0, DAT_08025b14                     @ 08025b10 0048
+    b LAB_08025b1a                           @ 08025b12 02e0
+DAT_08025b14:
+    .byte  0xb8, 0x4f, 0xdd, 0x09
+LAB_08025b18:
+    ldr r0, DAT_08025b38                     @ 08025b18 0748
+LAB_08025b1a:
+    movs r1,#0xa    @ 08025b1a 0a21
+    bl render_card_stat_with_number_alt      @ 08025b1c 06f0b4f8
 LAB_08025b20:
     movs r1,#0x0    @ 08025b20 0021
-    ldr r0, DWORD_08025b3c                   @ 08025b22 0648
-    ldr r3, DWORD_08025b40                   @ 08025b24 064b
+    ldr r0, rcs_ptr_gp1lifepoints_4          @ 08025b22 0648
+    ldr r3, rcs_jp_lp_timer_off              @ 08025b24 064b
     adds r0,r0,r3    @ 08025b26 c018
     ldr r0,[r0,#0x0]                         @ 08025b28 0068
     cmp r0,#0x5                              @ 08025b2a 0528
@@ -18213,29 +18592,30 @@ LAB_08025b20:
     adds r0,r0,r1    @ 08025b32 4018
     ldr r0,[r0,#0x0]                         @ 08025b34 0068
     .hword 0x4687    @ 08025b36 8746
+DAT_08025b38:
     .byte  0x28, 0x99, 0xdc, 0x09
-DWORD_08025b3c:
+rcs_ptr_gp1lifepoints_4:
     .word  gP1LifePoints                  @ 08025b3c e0c40102
-DWORD_08025b40:
-    .word  0x00001cec                     @ 08025b40 ec1c0000
+rcs_jp_lp_timer_off:
+    .word  0x00001cec                     @ 08025b40 ec1c0000  0x1cec: P1LP_TIMER_OFF in jp path
 PTR_PTR_08025b44:
     .word  0x08025b48                     @ 08025b44 485b0208
-PTR_DAT_08025b48:
-    .word  0x08025b60                     @ 08025b48 605b0208
-    .word  0x08025b60                     @ 08025b4c 605b0208
+PTR_render_card_stats_lp_tier_a_stub_08025b48:
+    .word  render_card_stats_lp_tier_a_stub @ 08025b48 605b0208
+    .word  render_card_stats_lp_tier_a_stub @ 08025b4c 605b0208
     .word  0x08025b66                     @ 08025b50 665b0208
     .word  0x08025b66                     @ 08025b54 665b0208
     .word  0x08025b6c                     @ 08025b58 6c5b0208
     .word  0x08025b6c                     @ 08025b5c 6c5b0208
-DAT_08025b60:
+render_card_stats_lp_tier_a_stub:
     .byte  0xfa, 0x21, 0x49, 0x00, 0x06, 0xe0, 0x96, 0x21, 0x49, 0x00, 0x03, 0xe0, 0x64, 0x21
 LAB_08025b6e:
     cmp r1,#0x0                              @ 08025b6e 0029
     bne LAB_08025b74                         @ 08025b70 00d1
     b SUB_08025c8a                           @ 08025b72 8ae0
 LAB_08025b74:
-    ldr r0, DWORD_08025b9c                   @ 08025b74 0948
-    ldr r2, DWORD_08025ba0                   @ 08025b76 0a4a
+    ldr r0, rcs_ewram_base_27                @ 08025b74 0948
+    ldr r2, rcs_gsettings_offset_27          @ 08025b76 0a4a
     adds r0,r0,r2    @ 08025b78 8018
     movs r2,#0x7    @ 08025b7a 0722
     ldrb r0,[r0,#0x0]                        @ 08025b7c 0078
@@ -18248,42 +18628,42 @@ LAB_08025b74:
     beq LAB_08025bb4                         @ 08025b8a 13d0
     cmp r2,#0x4                              @ 08025b8c 042a
     beq LAB_08025bac                         @ 08025b8e 0dd0
-    ldr r0, DWORD_08025ba4                   @ 08025b90 0448
+    ldr r0, rcs_fu_font5_base                @ 08025b90 0448
     cmp r2,#0x5                              @ 08025b92 052a
     bne LAB_08025bc6                         @ 08025b94 17d1
-    ldr r3, DWORD_08025ba8                   @ 08025b96 044b
+    ldr r3, rcs_fu_font5_off                 @ 08025b96 044b
     adds r0,r0,r3    @ 08025b98 c018
     b LAB_08025bc6                           @ 08025b9a 14e0
-DWORD_08025b9c:
-    .word  0x02000000                     @ 08025b9c 00000002
-DWORD_08025ba0:
-    .word  0x00006c2c                     @ 08025ba0 2c6c0000
-DWORD_08025ba4:
-    .word  0x09dbe878                     @ 08025ba4 78e8db09
-DWORD_08025ba8:
-    .word  0x0003ab3e                     @ 08025ba8 3eab0300
+rcs_ewram_base_27:
+    .word  EWRAM_BASE                     @ 08025b9c 00000002
+rcs_gsettings_offset_27:
+    .word  GSETTINGS_OFFSET               @ 08025ba0 2c6c0000
+rcs_fu_font5_base:
+    .word  0x09dbe878                     @ 08025ba4 78e8db09  0x09dbe878
+rcs_fu_font5_off:
+    .word  0x0003ab3e                     @ 08025ba8 3eab0300  0x0003ab3e
 LAB_08025bac:
-    ldr r0, DWORD_08025bb0                   @ 08025bac 0048
+    ldr r0, rcs_fu_font4_ptr                 @ 08025bac 0048
     b LAB_08025bc6                           @ 08025bae 0ae0
-DWORD_08025bb0:
-    .word  0x09ded77c                     @ 08025bb0 7cd7de09
+rcs_fu_font4_ptr:
+    .word  0x09ded77c                     @ 08025bb0 7cd7de09  0x09ded77c
 LAB_08025bb4:
-    ldr r0, DWORD_08025bb8                   @ 08025bb4 0048
+    ldr r0, rcs_fu_font3_ptr                 @ 08025bb4 0048
     b LAB_08025bc6                           @ 08025bb6 06e0
-DWORD_08025bb8:
-    .word  0x09de12a4                     @ 08025bb8 a412de09
+rcs_fu_font3_ptr:
+    .word  0x09de12a4                     @ 08025bb8 a412de09  0x09de12a4
 LAB_08025bbc:
-    ldr r0, DWORD_08025bc0                   @ 08025bbc 0048
+    ldr r0, rcs_fu_font2_ptr                 @ 08025bbc 0048
     b LAB_08025bc6                           @ 08025bbe 02e0
-DWORD_08025bc0:
-    .word  0x09dd4fe0                     @ 08025bc0 e04fdd09
+rcs_fu_font2_ptr:
+    .word  0x09dd4fe0                     @ 08025bc0 e04fdd09  0x09dd4fe0
 LAB_08025bc4:
-    ldr r0, DWORD_08025bcc                   @ 08025bc4 0148
+    ldr r0, rcs_fu_font1_ptr                 @ 08025bc4 0148
 LAB_08025bc6:
     bl render_card_stat_with_number_alt      @ 08025bc6 06f05ff8
     b SUB_08025c8a                           @ 08025bca 5ee0
-DWORD_08025bcc:
-    .word  0x09dc995e                     @ 08025bcc 5e99dc09
+rcs_fu_font1_ptr:
+    .word  0x09dc995e                     @ 08025bcc 5e99dc09  0x09dc995e
 
 @ Selects a ROM font data pointer r0 based on gPrng+0x6c2c bits[2:0] (font_type, [1..5]),
 @ then calls render_game_string_with_number (FUN_0802b940) with fixed args (r1=3, r2=10)
@@ -18297,8 +18677,8 @@ DWORD_08025bcc:
 @ - 0x3ab84 = font_type 5 additional offset
 @ - r2=10 (0xa) = digit_value parameter for render_game_string_with_number
 render_game_text_with_font_type_a:
-    ldr r0, DWORD_08025bf8                   @ 08025bd0 0948
-    ldr r1, DWORD_08025bfc                   @ 08025bd2 0a49
+    ldr r0, rgta_ewram_base                  @ 08025bd0 0948
+    ldr r1, rgta_gsettings_offset            @ 08025bd2 0a49
     adds r0,r0,r1    @ 08025bd4 4018
     movs r1,#0x7    @ 08025bd6 0721
     ldrb r0,[r0,#0x0]                        @ 08025bd8 0078
@@ -18311,44 +18691,44 @@ render_game_text_with_font_type_a:
     beq LAB_08025c10                         @ 08025be6 13d0
     cmp r1,#0x4                              @ 08025be8 0429
     beq LAB_08025c08                         @ 08025bea 0dd0
-    ldr r0, DWORD_08025c00                   @ 08025bec 0448
+    ldr r0, rgta_font5_base                  @ 08025bec 0448
     cmp r1,#0x5                              @ 08025bee 0529
     bne LAB_08025c22                         @ 08025bf0 17d1
-    ldr r2, DWORD_08025c04                   @ 08025bf2 044a
+    ldr r2, rgta_font5_off                   @ 08025bf2 044a
     adds r0,r0,r2    @ 08025bf4 8018
     b LAB_08025c22                           @ 08025bf6 14e0
-DWORD_08025bf8:
-    .word  0x02000000                     @ 08025bf8 00000002
-DWORD_08025bfc:
-    .word  0x00006c2c                     @ 08025bfc 2c6c0000
-DWORD_08025c00:
-    .word  0x09dc01ac                     @ 08025c00 ac01dc09
-DWORD_08025c04:
-    .word  0x0003ab84                     @ 08025c04 84ab0300
+rgta_ewram_base:
+    .word  EWRAM_BASE                     @ 08025bf8 00000002
+rgta_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08025bfc 2c6c0000
+rgta_font5_base:
+    .word  0x09dc01ac                     @ 08025c00 ac01dc09  0x09dc01ac: game text A font5 base
+rgta_font5_off:
+    .word  0x0003ab84                     @ 08025c04 84ab0300  0x0003ab84
 LAB_08025c08:
-    ldr r0, DWORD_08025c0c                   @ 08025c08 0048
+    ldr r0, rgta_font4_ptr                   @ 08025c08 0048
     b LAB_08025c22                           @ 08025c0a 0ae0
-DWORD_08025c0c:
-    .word  0x09def168                     @ 08025c0c 68f1de09
+rgta_font4_ptr:
+    .word  0x09def168                     @ 08025c0c 68f1de09  0x09def168
 LAB_08025c10:
-    ldr r0, DWORD_08025c14                   @ 08025c10 0048
+    ldr r0, rgta_font3_ptr                   @ 08025c10 0048
     b LAB_08025c22                           @ 08025c12 06e0
-DWORD_08025c14:
-    .word  0x09de2cd8                     @ 08025c14 d82cde09
+rgta_font3_ptr:
+    .word  0x09de2cd8                     @ 08025c14 d82cde09  0x09de2cd8
 LAB_08025c18:
-    ldr r0, DWORD_08025c1c                   @ 08025c18 0048
+    ldr r0, rgta_font2_ptr                   @ 08025c18 0048
     b LAB_08025c22                           @ 08025c1a 02e0
-DWORD_08025c1c:
-    .word  0x09dd694c                     @ 08025c1c 4c69dd09
+rgta_font2_ptr:
+    .word  0x09dd694c                     @ 08025c1c 4c69dd09  0x09dd694c
 LAB_08025c20:
-    ldr r0, DWORD_08025c2c                   @ 08025c20 0248
+    ldr r0, rgta_font1_ptr                   @ 08025c20 0248
 LAB_08025c22:
     movs r1,#0x3    @ 08025c22 0321
     movs r2,#0xa    @ 08025c24 0a22
     bl render_game_string_with_number        @ 08025c26 05f08bfe
     b SUB_08025c8a                           @ 08025c2a 2ee0
-DWORD_08025c2c:
-    .word  0x09dcaf86                     @ 08025c2c 86afdc09
+rgta_font1_ptr:
+    .word  0x09dcaf86                     @ 08025c2c 86afdc09  0x09dcaf86
 
 @ Symmetric sibling of render_game_text_with_font_type_a (FUN_08025bd0): only differences are
 @ (1) different font pointer constants (0x09dc01b2 vs 0x09dc01ac); (2) r2=2 (vs r2=10)
@@ -18362,8 +18742,8 @@ DWORD_08025c2c:
 @ - 0x3ab86 = font_type 5 additional offset (+2 from A's 0x3ab84)
 @ - r2=2 = mode parameter for render_game_string_with_number
 render_game_text_with_font_type_b:
-    ldr r0, DWORD_08025c58                   @ 08025c30 0948
-    ldr r3, DWORD_08025c5c                   @ 08025c32 0a4b
+    ldr r0, rgtb_ewram_base                  @ 08025c30 0948
+    ldr r3, rgtb_gsettings_offset            @ 08025c32 0a4b
     adds r0,r0,r3    @ 08025c34 c018
     movs r1,#0x7    @ 08025c36 0721
     ldrb r0,[r0,#0x0]                        @ 08025c38 0078
@@ -18376,37 +18756,37 @@ render_game_text_with_font_type_b:
     beq LAB_08025c70                         @ 08025c46 13d0
     cmp r1,#0x4                              @ 08025c48 0429
     beq LAB_08025c68                         @ 08025c4a 0dd0
-    ldr r0, DWORD_08025c60                   @ 08025c4c 0448
+    ldr r0, rgtb_font5_base                  @ 08025c4c 0448
     cmp r1,#0x5                              @ 08025c4e 0529
     bne LAB_08025c82                         @ 08025c50 17d1
-    ldr r1, DWORD_08025c64                   @ 08025c52 0449
+    ldr r1, rgtb_font5_off                   @ 08025c52 0449
     adds r0,r0,r1    @ 08025c54 4018
     b LAB_08025c82                           @ 08025c56 14e0
-DWORD_08025c58:
-    .word  0x02000000                     @ 08025c58 00000002
-DWORD_08025c5c:
-    .word  0x00006c2c                     @ 08025c5c 2c6c0000
-DWORD_08025c60:
-    .word  0x09dc01b2                     @ 08025c60 b201dc09
-DWORD_08025c64:
-    .word  0x0003ab86                     @ 08025c64 86ab0300
+rgtb_ewram_base:
+    .word  EWRAM_BASE                     @ 08025c58 00000002
+rgtb_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08025c5c 2c6c0000
+rgtb_font5_base:
+    .word  0x09dc01b2                     @ 08025c60 b201dc09  0x09dc01b2
+rgtb_font5_off:
+    .word  0x0003ab86                     @ 08025c64 86ab0300  0x0003ab86
 LAB_08025c68:
-    ldr r0, DWORD_08025c6c                   @ 08025c68 0048
+    ldr r0, rgtb_font4_ptr                   @ 08025c68 0048
     b LAB_08025c82                           @ 08025c6a 0ae0
-DWORD_08025c6c:
-    .word  0x09def172                     @ 08025c6c 72f1de09
+rgtb_font4_ptr:
+    .word  0x09def172                     @ 08025c6c 72f1de09  0x09def172
 LAB_08025c70:
-    ldr r0, DWORD_08025c74                   @ 08025c70 0048
+    ldr r0, rgtb_font3_ptr                   @ 08025c70 0048
     b LAB_08025c82                           @ 08025c72 06e0
-DWORD_08025c74:
-    .word  0x09de2ce0                     @ 08025c74 e02cde09
+rgtb_font3_ptr:
+    .word  0x09de2ce0                     @ 08025c74 e02cde09  0x09de2ce0
 LAB_08025c78:
-    ldr r0, DWORD_08025c7c                   @ 08025c78 0048
+    ldr r0, rgtb_font2_ptr                   @ 08025c78 0048
     b LAB_08025c82                           @ 08025c7a 02e0
-DWORD_08025c7c:
-    .word  0x09dd6956                     @ 08025c7c 5669dd09
+rgtb_font2_ptr:
+    .word  0x09dd6956                     @ 08025c7c 5669dd09  0x09dd6956
 LAB_08025c80:
-    ldr r0, DWORD_08025c90                   @ 08025c80 0348
+    ldr r0, sub_5c8a_font1_ptr               @ 08025c80 0348
 LAB_08025c82:
     movs r1,#0x3    @ 08025c82 0321
     movs r2,#0x2    @ 08025c84 0222
@@ -18415,8 +18795,8 @@ SUB_08025c8a:
     pop {r4,r5}                              @ 08025c8a 30bc
     pop {r0}                                 @ 08025c8c 01bc
     bx r0                                    @ 08025c8e 0047
-DWORD_08025c90:
-    .word  0x09dcaf8c                     @ 08025c90 8cafdc09
+sub_5c8a_font1_ptr:
+    .word  0x09dcaf8c                     @ 08025c90 8cafdc09  0x09dcaf8c
 
 @ Root dispatch function for the campaign scene. Called indirectly via gMenuState+0x234 function pointer (written by enter_campaign_page). Each frame: reads gPrng+0x202 bits[13:6] as step_index [0..34]. If step_index > 0x22 -> bl exit_campaign_scene_with_next_handler. Otherwise multiplies by 4 and jumps into 35-entry function pointer table at 0x08025ccc. Table entries 8/9/13..19 all point to exit_campaign_scene_with_next_handler (placeholder steps).
 @ 
@@ -18433,7 +18813,7 @@ campaign_scene_handler:
     push {r5,r6,r7}                          @ 08025c9c e0b4
     sub sp,#0x14                             @ 08025c9e 85b0
     ldr r0, PTR_gPrng_08025cc0               @ 08025ca0 0748
-    ldr r2, DAT_08025cc4                     @ 08025ca2 084a
+    ldr r2, csh_gprng_step_idx_off           @ 08025ca2 084a
     adds r1,r0,r2    @ 08025ca4 8118
     ldrh r1,[r1,#0x0]                        @ 08025ca6 0988
     lsls r1,r1,#0x12    @ 08025ca8 8904
@@ -18444,16 +18824,16 @@ campaign_scene_handler:
     bl exit_campaign_scene_with_next_handler @ 08025cb2 01f0e1ff
 LAB_08025cb6:
     lsls r0,r1,#0x2    @ 08025cb6 8800
-    ldr r1, DAT_08025cc8                     @ 08025cb8 0349
+    ldr r1, csh_step_table_ptr               @ 08025cb8 0349
     adds r0,r0,r1    @ 08025cba 4018
     ldr r0,[r0,#0x0]                         @ 08025cbc 0068
     .hword 0x4687    @ 08025cbe 8746
 PTR_gPrng_08025cc0:
     .word  gPrng                          @ 08025cc0 40000003
-DAT_08025cc4:
-    .word  0x00000202                     @ 08025cc4 02020000
-DAT_08025cc8:
-    .word  0x08025ccc                     @ 08025cc8 cc5c0208
+csh_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08025cc4 02020000
+csh_step_table_ptr:
+    .word  0x08025ccc                     @ 08025cc8 cc5c0208  0x08025ccc: campaign step dispatch table ptr
 PTR_run_campaign_step0_field_vram_init_08025ccc:
     .word  0x08025d58                     @ 08025ccc 585d0208
     .word  0x08025ec0                     @ 08025cd0 c05e0208
@@ -18502,7 +18882,7 @@ PTR_run_campaign_step0_field_vram_init_08025ccc:
 @ - gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f
 run_campaign_step0_field_vram_init:
     bl build_field_slot_bitmask              @ 08025d58 fef7ccfd
-    ldr r2, DWORD_08025dd0                   @ 08025d5c 1c4a
+    ldr r2, step0_ptr_gduelscenebase         @ 08025d5c 1c4a
     movs r1,#0x20    @ 08025d5e 2021
     rsbs r1,r1,#0    @ 08025d60 4942
     adds r0,r1,#0x0    @ 08025d62 081c
@@ -18518,7 +18898,7 @@ run_campaign_step0_field_vram_init:
     ands r1,r5    @ 08025d76 2940
     movs r0,#0x5    @ 08025d78 0520
     orrs r1,r0    @ 08025d7a 0143
-    ldr r0, DWORD_08025dd4                   @ 08025d7c 1548
+    ldr r0, step0_scene_ctx_anim_mask        @ 08025d7c 1548
     ldrh r6,[r2,#0x8]                        @ 08025d7e 1689
     ands r0,r6    @ 08025d80 3040
     strh r0,[r2,#0x8]                        @ 08025d82 1081
@@ -18538,8 +18918,8 @@ run_campaign_step0_field_vram_init:
     ands r0,r1    @ 08025d9e 0840
     strb r0,[r2,#0x8]                        @ 08025da0 1072
     bl init_duel_field_icon_and_bg_vram      @ 08025da2 fdf7e3fe
-    ldr r0, DWORD_08025dd8                   @ 08025da6 0c48
-    ldr r4, DWORD_08025ddc                   @ 08025da8 0c4c
+    ldr r0, step0_ewram_base                 @ 08025da6 0c48
+    ldr r4, step0_gsettings_offset           @ 08025da8 0c4c
     adds r0,r0,r4    @ 08025daa 0019
     movs r1,#0x7    @ 08025dac 0721
     ldrb r0,[r0,#0x0]                        @ 08025dae 0078
@@ -18552,45 +18932,45 @@ run_campaign_step0_field_vram_init:
     beq LAB_08025df0                         @ 08025dbc 18d0
     cmp r1,#0x4                              @ 08025dbe 0429
     beq LAB_08025de8                         @ 08025dc0 12d0
-    ldr r3, DWORD_08025de0                   @ 08025dc2 074b
+    ldr r3, step0_font5_base_a               @ 08025dc2 074b
     cmp r1,#0x5                              @ 08025dc4 0529
     bne LAB_08025e02                         @ 08025dc6 1cd1
-    ldr r5, DWORD_08025de4                   @ 08025dc8 064d
+    ldr r5, step0_font5_off_a                @ 08025dc8 064d
     adds r3,r3,r5    @ 08025dca 5b19
     b LAB_08025e02                           @ 08025dcc 19e0
     .zero  0x2
-DWORD_08025dd0:
-    .word  0x02023360                     @ 08025dd0 60330202
-DWORD_08025dd4:
-    .word  0xffff807f                     @ 08025dd4 7f80ffff
-DWORD_08025dd8:
-    .word  0x02000000                     @ 08025dd8 00000002
-DWORD_08025ddc:
-    .word  0x00006c2c                     @ 08025ddc 2c6c0000
-DWORD_08025de0:
-    .word  0x09dbff0e                     @ 08025de0 0effdb09
-DWORD_08025de4:
-    .word  0x0003ab1e                     @ 08025de4 1eab0300
+step0_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08025dd0 60330202
+step0_scene_ctx_anim_mask:
+    .word  SCENE_CTX_ANIM_MASK            @ 08025dd4 7f80ffff
+step0_ewram_base:
+    .word  EWRAM_BASE                     @ 08025dd8 00000002
+step0_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08025ddc 2c6c0000
+step0_font5_base_a:
+    .word  0x09dbff0e                     @ 08025de0 0effdb09  0x09dbff0e
+step0_font5_off_a:
+    .word  0x0003ab1e                     @ 08025de4 1eab0300  0x0003ab1e
 LAB_08025de8:
-    ldr r3, DWORD_08025dec                   @ 08025de8 004b
+    ldr r3, step0_font4_ptr_a                @ 08025de8 004b
     b LAB_08025e02                           @ 08025dea 0ae0
-DWORD_08025dec:
-    .word  0x09deee62                     @ 08025dec 62eede09
+step0_font4_ptr_a:
+    .word  0x09deee62                     @ 08025dec 62eede09  0x09deee62
 LAB_08025df0:
-    ldr r3, DWORD_08025df4                   @ 08025df0 004b
+    ldr r3, step0_font3_ptr_a                @ 08025df0 004b
     b LAB_08025e02                           @ 08025df2 06e0
-DWORD_08025df4:
-    .word  0x09de29ae                     @ 08025df4 ae29de09
+step0_font3_ptr_a:
+    .word  0x09de29ae                     @ 08025df4 ae29de09  0x09de29ae
 LAB_08025df8:
-    ldr r3, DWORD_08025dfc                   @ 08025df8 004b
+    ldr r3, step0_font2_ptr_a                @ 08025df8 004b
     b LAB_08025e02                           @ 08025dfa 02e0
-DWORD_08025dfc:
-    .word  0x09dd6636                     @ 08025dfc 3666dd09
+step0_font2_ptr_a:
+    .word  0x09dd6636                     @ 08025dfc 3666dd09  0x09dd6636
 LAB_08025e00:
-    ldr r3, DWORD_08025e40                   @ 08025e00 0f4b
+    ldr r3, step0_font1_ptr_a                @ 08025e00 0f4b
 LAB_08025e02:
-    ldr r4, DWORD_08025e44                   @ 08025e02 104c
-    ldr r6, DWORD_08025e48                   @ 08025e04 104e
+    ldr r4, step0_ewram_base_1               @ 08025e02 104c
+    ldr r6, step0_gsettings_offset_1         @ 08025e04 104e
     adds r4,r4,r6    @ 08025e06 a419
     ldrb r1,[r4,#0x0]                        @ 08025e08 2178
     lsls r0,r1,#0x1d    @ 08025e0a 4807
@@ -18599,7 +18979,7 @@ LAB_08025e02:
     movs r0,#0x40    @ 08025e10 4020
     movs r1,#0x84    @ 08025e12 8421
     lsls r1,r1,#0x2    @ 08025e14 8900
-    ldr r2, DWORD_08025e4c                   @ 08025e16 0d4a
+    ldr r2, step0_draw_decimal_win_label_arg @ 08025e16 0d4a
     bl draw_decimal_with_offset              @ 08025e18 fdf730fd
     movs r0,#0x7    @ 08025e1c 0720
     ldrb r4,[r4,#0x0]                        @ 08025e1e 2478
@@ -18612,45 +18992,45 @@ LAB_08025e02:
     beq LAB_08025e60                         @ 08025e2c 18d0
     cmp r0,#0x4                              @ 08025e2e 0428
     beq LAB_08025e58                         @ 08025e30 12d0
-    ldr r3, DWORD_08025e50                   @ 08025e32 074b
+    ldr r3, step0_font5_base_b               @ 08025e32 074b
     cmp r0,#0x5                              @ 08025e34 0528
     bne LAB_08025e72                         @ 08025e36 1cd1
-    ldr r2, DWORD_08025e54                   @ 08025e38 064a
+    ldr r2, step0_font5_off_b                @ 08025e38 064a
     adds r3,r3,r2    @ 08025e3a 9b18
     b LAB_08025e72                           @ 08025e3c 19e0
     .zero  0x2
-DWORD_08025e40:
-    .word  0x09dcad08                     @ 08025e40 08addc09
-DWORD_08025e44:
-    .word  0x02000000                     @ 08025e44 00000002
-DWORD_08025e48:
-    .word  0x00006c2c                     @ 08025e48 2c6c0000
-DWORD_08025e4c:
-    .word  0x0000010f                     @ 08025e4c 0f010000
-DWORD_08025e50:
-    .word  0x09dc00b8                     @ 08025e50 b800dc09
-DWORD_08025e54:
-    .word  0x0003ab50                     @ 08025e54 50ab0300
+step0_font1_ptr_a:
+    .word  0x09dcad08                     @ 08025e40 08addc09  0x09dcad08
+step0_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08025e44 00000002
+step0_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08025e48 2c6c0000
+step0_draw_decimal_win_label_arg:
+    .word  DRAW_DECIMAL_WIN_LABEL_ARG     @ 08025e4c 0f010000
+step0_font5_base_b:
+    .word  0x09dc00b8                     @ 08025e50 b800dc09  0x09dc00b8
+step0_font5_off_b:
+    .word  0x0003ab50                     @ 08025e54 50ab0300  0x0003ab50
 LAB_08025e58:
-    ldr r3, DWORD_08025e5c                   @ 08025e58 004b
+    ldr r3, step0_font4_ptr_b                @ 08025e58 004b
     b LAB_08025e72                           @ 08025e5a 0ae0
-DWORD_08025e5c:
-    .word  0x09def042                     @ 08025e5c 42f0de09
+step0_font4_ptr_b:
+    .word  0x09def042                     @ 08025e5c 42f0de09  0x09def042
 LAB_08025e60:
-    ldr r3, DWORD_08025e64                   @ 08025e60 004b
+    ldr r3, step0_font3_ptr_b                @ 08025e60 004b
     b LAB_08025e72                           @ 08025e62 06e0
-DWORD_08025e64:
-    .word  0x09de2b9e                     @ 08025e64 9e2bde09
+step0_font3_ptr_b:
+    .word  0x09de2b9e                     @ 08025e64 9e2bde09  0x09de2b9e
 LAB_08025e68:
-    ldr r3, DWORD_08025e6c                   @ 08025e68 004b
+    ldr r3, step0_font2_ptr_b                @ 08025e68 004b
     b LAB_08025e72                           @ 08025e6a 02e0
-DWORD_08025e6c:
-    .word  0x09dd6832                     @ 08025e6c 3268dd09
+step0_font2_ptr_b:
+    .word  0x09dd6832                     @ 08025e6c 3268dd09  0x09dd6832
 LAB_08025e70:
-    ldr r3, DWORD_08025ea8                   @ 08025e70 0d4b
+    ldr r3, step0_font1_ptr_b                @ 08025e70 0d4b
 LAB_08025e72:
-    ldr r0, DWORD_08025eac                   @ 08025e72 0e48
-    ldr r4, DWORD_08025eb0                   @ 08025e74 0e4c
+    ldr r0, step0_ewram_base_2               @ 08025e72 0e48
+    ldr r4, step0_gsettings_offset_2         @ 08025e74 0e4c
     adds r0,r0,r4    @ 08025e76 0019
     ldrb r0,[r0,#0x0]                        @ 08025e78 0078
     lsls r0,r0,#0x1d    @ 08025e7a 4007
@@ -18661,8 +19041,8 @@ LAB_08025e72:
     lsls r1,r1,#0x2    @ 08025e84 8900
     movs r2,#0x1    @ 08025e86 0122
     bl draw_decimal_with_offset              @ 08025e88 fdf7f8fc
-    ldr r2, DWORD_08025eb4                   @ 08025e8c 094a
-    ldr r5, DWORD_08025eb8                   @ 08025e8e 0a4d
+    ldr r2, step0_ptr_gprng                  @ 08025e8c 094a
+    ldr r5, step0_gprng_step_idx_off         @ 08025e8e 0a4d
     adds r2,r2,r5    @ 08025e90 5219
     ldrh r3,[r2,#0x0]                        @ 08025e92 1388
     lsls r1,r3,#0x12    @ 08025e94 9904
@@ -18671,21 +19051,21 @@ LAB_08025e72:
     movs r0,#0xff    @ 08025e9a ff20
     ands r1,r0    @ 08025e9c 0140
     lsls r1,r1,#0x6    @ 08025e9e 8901
-    ldr r0, DWORD_08025ebc                   @ 08025ea0 0648
+    ldr r0, step0_gprng_step_ctr_mask        @ 08025ea0 0648
     ands r0,r3    @ 08025ea2 1840
     bl SUB_08027c22                          @ 08025ea4 01f0bdfe
-DWORD_08025ea8:
-    .word  0x09dcaea0                     @ 08025ea8 a0aedc09
-DWORD_08025eac:
-    .word  0x02000000                     @ 08025eac 00000002
-DWORD_08025eb0:
-    .word  0x00006c2c                     @ 08025eb0 2c6c0000
-DWORD_08025eb4:
+step0_font1_ptr_b:
+    .word  0x09dcaea0                     @ 08025ea8 a0aedc09  0x09dcaea0
+step0_ewram_base_2:
+    .word  EWRAM_BASE                     @ 08025eac 00000002
+step0_gsettings_offset_2:
+    .word  GSETTINGS_OFFSET               @ 08025eb0 2c6c0000
+step0_ptr_gprng:
     .word  gPrng                          @ 08025eb4 40000003
-DWORD_08025eb8:
-    .word  0x00000202                     @ 08025eb8 02020000
-DWORD_08025ebc:
-    .word  0xffffc03f                     @ 08025ebc 3fc0ffff
+step0_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08025eb8 02020000
+step0_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08025ebc 3fc0ffff
 
 @ Per-frame tick handler for campaign_scene_handler dispatch table index 1. Trigger: gPrng+0x202 bits[13:6] == 0x01. Sequence: (1) call set_channel_if_changed(4) to switch BGM channel; (2) call render_opp_wins_display_oam to refresh opponent wins sprites; (3) OR DISPCNT shadow with 0xf8*32=0x1f00 to enable sprite display mode; (4) call tick_blend_step_by_delta(4) to advance blend fade; (5) if returns 0 (fade not done) call SUB_08026714 to wait; (6) if done write incremented frame counter to gPrng+0x202 bits[13:6] and update scaler field; (7) tail-call SUB_08026714 to advance.
 @ 
@@ -18713,8 +19093,8 @@ run_campaign_step1_channel_and_blend_tick:
     bne LAB_08025ee8                         @ 08025ee2 01d1
     bl SUB_08026714                          @ 08025ee4 00f016fc
 LAB_08025ee8:
-    ldr r2, DWORD_08025f08                   @ 08025ee8 074a
-    ldr r0, DWORD_08025f0c                   @ 08025eea 0848
+    ldr r2, step1_ptr_gprng                  @ 08025ee8 074a
+    ldr r0, step1_gprng_step_idx_off         @ 08025eea 0848
     adds r2,r2,r0    @ 08025eec 1218
     ldrh r3,[r2,#0x0]                        @ 08025eee 1388
     lsls r1,r3,#0x12    @ 08025ef0 9904
@@ -18723,17 +19103,17 @@ LAB_08025ee8:
     movs r0,#0xff    @ 08025ef6 ff20
     ands r1,r0    @ 08025ef8 0140
     lsls r1,r1,#0x6    @ 08025efa 8901
-    ldr r0, DWORD_08025f10                   @ 08025efc 0448
+    ldr r0, step1_gprng_step_ctr_mask        @ 08025efc 0448
     ands r0,r3    @ 08025efe 1840
     orrs r0,r1    @ 08025f00 0843
     strh r0,[r2,#0x0]                        @ 08025f02 1080
     bl SUB_08026714                          @ 08025f04 00f006fc
-DWORD_08025f08:
+step1_ptr_gprng:
     .word  gPrng                          @ 08025f08 40000003
-DWORD_08025f0c:
-    .word  0x00000202                     @ 08025f0c 02020000
-DWORD_08025f10:
-    .word  0xffffc03f                     @ 08025f10 3fc0ffff
+step1_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08025f0c 02020000
+step1_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08025f10 3fc0ffff
 
 @ campaign_scene_handler dispatch table entry index 2, handles scroll state update for pack selection screen. Clears [scene_ctx+0x8] bit1 (0x02 mask). Reads [scene_ctx+0x3] bits[4:3] as scroll_dir [0..3]: if ==1 jump to LAB_08025fca (scroll right path), if ==2 enter scroll left logic. Left path: check gPrng+0x148 bit6, if set and slot_type > 4 call sync_state_and_init_sprite(0) to init new sprite, update slot_type = (slot_type-5) & 0x1f, set [scene_ctx+0x8] bit0. Right path: check gPrng+0x148 bit7, if set call sync_state_and_init_sprite(0), update slot_type = (slot_type+5) & 0x1f (cyclic clamp to slot_count-1), set bit0.
 @ 
@@ -18746,7 +19126,7 @@ DWORD_08025f10:
 @ - slot stride = 5 (scroll 5 slots per step)
 @ - slot_type mask = 0x1f [0..31]
 run_campaign_step2_pack_scroll_state:
-    ldr r6, DWORD_08026004                   @ 08025f14 3b4e
+    ldr r6, step2_ptr_gduelscenebase         @ 08025f14 3b4e
     movs r4,#0x2    @ 08025f16 0224
     rsbs r4,r4,#0    @ 08025f18 6442
     ldrb r1,[r6,#0x8]                        @ 08025f1a 317a
@@ -18761,7 +19141,7 @@ run_campaign_step2_pack_scroll_state:
     beq LAB_08025f30                         @ 08025f2c 00d0
     b LAB_08026088                           @ 08025f2e abe0
 LAB_08025f30:
-    ldr r1, DWORD_08026008                   @ 08025f30 3549
+    ldr r1, step2_ptr_gprng                  @ 08025f30 3549
     movs r2,#0xa4    @ 08025f32 a422
     lsls r2,r2,#0x1    @ 08025f34 5200
     adds r1,r1,r2    @ 08025f36 8918
@@ -18793,7 +19173,7 @@ LAB_08025f30:
     orrs r0,r4    @ 08025f6c 2043
     strb r0,[r6,#0x8]                        @ 08025f6e 3072
 LAB_08025f70:
-    ldr r2, DWORD_08026008                   @ 08025f70 254a
+    ldr r2, step2_ptr_gprng                  @ 08025f70 254a
     movs r5,#0xa4    @ 08025f72 a425
     lsls r5,r5,#0x1    @ 08025f74 6d00
     adds r1,r2,r5    @ 08025f76 5119
@@ -18803,7 +19183,7 @@ LAB_08025f70:
     .hword 0x4691    @ 08025f7e 9146
     cmp r0,#0x0                              @ 08025f80 0028
     beq LAB_08025fca                         @ 08025f82 22d0
-    ldr r4, DWORD_08026004                   @ 08025f84 1f4c
+    ldr r4, step2_ptr_gduelscenebase         @ 08025f84 1f4c
     ldrb r6,[r4,#0x2]                        @ 08025f86 a678
     lsls r0,r6,#0x1b    @ 08025f88 f006
     lsrs r0,r0,#0x1b    @ 08025f8a c00e
@@ -18849,7 +19229,7 @@ LAB_08025fca:
     beq LAB_0802602a                         @ 08025fd8 27d0
     movs r0,#0x0    @ 08025fda 0020
     bl sync_state_and_init_sprite            @ 08025fdc d3f06afd
-    ldr r3, DWORD_08026004                   @ 08025fe0 084b
+    ldr r3, step2_ptr_gduelscenebase         @ 08025fe0 084b
     ldrb r2,[r3,#0x2]                        @ 08025fe2 9a78
     movs r4,#0x1f    @ 08025fe4 1f24
     movs r0,#0x1f    @ 08025fe6 1f20
@@ -18867,9 +19247,9 @@ LAB_08025fca:
     strb r1,[r3,#0x2]                        @ 08025ffe 9970
     b LAB_0802601c                           @ 08026000 0ce0
     .zero  0x2
-DWORD_08026004:
-    .word  0x02023360                     @ 08026004 60330202
-DWORD_08026008:
+step2_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026004 60330202
+step2_ptr_gprng:
     .word  gPrng                          @ 08026008 40000003
 LAB_0802600c:
     ldrh r1,[r3,#0x0]                        @ 0802600c 1988
@@ -18881,12 +19261,12 @@ LAB_0802600c:
     orrs r0,r1    @ 08026018 0843
     strb r0,[r3,#0x2]                        @ 0802601a 9870
 LAB_0802601c:
-    ldr r1, DWORD_08026068                   @ 0802601c 1249
+    ldr r1, step2_ptr_gduelscenebase_1       @ 0802601c 1249
     movs r0,#0x1    @ 0802601e 0120
     ldrb r2,[r1,#0x8]                        @ 08026020 0a7a
     orrs r0,r2    @ 08026022 1043
     strb r0,[r1,#0x8]                        @ 08026024 0872
-    ldr r3, DWORD_0802606c                   @ 08026026 114b
+    ldr r3, step2_ptr_gprng_1                @ 08026026 114b
     .hword 0x4699    @ 08026028 9946
 LAB_0802602a:
     movs r1,#0xa4    @ 0802602a a421
@@ -18901,7 +19281,7 @@ LAB_0802602a:
 LAB_0802603c:
     movs r0,#0x0    @ 0802603c 0020
     bl sync_state_and_init_sprite            @ 0802603e d3f039fd
-    ldr r4, DWORD_08026068                   @ 08026042 094c
+    ldr r4, step2_ptr_gduelscenebase_1       @ 08026042 094c
     ldrb r2,[r4,#0x2]                        @ 08026044 a278
     lsls r3,r2,#0x1b    @ 08026046 d306
     lsrs r1,r3,#0x1b    @ 08026048 d90e
@@ -18920,9 +19300,9 @@ LAB_0802603c:
     strb r1,[r4,#0x2]                        @ 08026062 a170
     b LAB_08026078                           @ 08026064 08e0
     .zero  0x2
-DWORD_08026068:
-    .word  0x02023360                     @ 08026068 60330202
-DWORD_0802606c:
+step2_ptr_gduelscenebase_1:
+    .word  gDuelSceneBase                 @ 08026068 60330202
+step2_ptr_gprng_1:
     .word  gPrng                          @ 0802606c 40000003
 LAB_08026070:
     movs r0,#0x20    @ 08026070 2020
@@ -18930,14 +19310,14 @@ LAB_08026070:
     ands r0,r2    @ 08026074 1040
     strb r0,[r4,#0x2]                        @ 08026076 a070
 LAB_08026078:
-    ldr r1, DWORD_08026084                   @ 08026078 0249
+    ldr r1, step2_ptr_gduelscenebase_2       @ 08026078 0249
     movs r0,#0x1    @ 0802607a 0120
     ldrb r4,[r1,#0x8]                        @ 0802607c 0c7a
     orrs r0,r4    @ 0802607e 2043
     strb r0,[r1,#0x8]                        @ 08026080 0872
     b LAB_080265c2                           @ 08026082 9ee2
-DWORD_08026084:
-    .word  0x02023360                     @ 08026084 60330202
+step2_ptr_gduelscenebase_2:
+    .word  gDuelSceneBase                 @ 08026084 60330202
 LAB_08026088:
     ldrb r2,[r6,#0x5]                        @ 08026088 7279
     movs r5,#0xf    @ 0802608a 0f25
@@ -18966,7 +19346,7 @@ LAB_08026088:
     orrs r1,r0    @ 080260b8 0143
     movs r0,#0x6    @ 080260ba 0620
     ldrsh r5,[r6,r0]                         @ 080260bc 355e
-    ldr r2, DWORD_08026110                   @ 080260be 144a
+    ldr r2, step2_pack_sprite_tbl_ptr        @ 080260be 144a
     lsls r0,r3,#0x1c    @ 080260c0 1807
     lsrs r0,r0,#0x1a    @ 080260c2 800e
     adds r0,r0,r2    @ 080260c4 8018
@@ -19008,8 +19388,8 @@ LAB_080260fc:
     orrs r0,r1    @ 0802610a 0843
     strb r0,[r6,#0x2]                        @ 0802610c b070
     b LAB_080265c2                           @ 0802610e 58e2
-DWORD_08026110:
-    .word  0x09e59cf8                     @ 08026110 f89ce509
+step2_pack_sprite_tbl_ptr:
+    .word  0x09e59cf8                     @ 08026110 f89ce509  0x09e59cf8: pack sprite table ptr
 LAB_08026114:
     movs r5,#0x0    @ 08026114 0025
     str r5,[sp,#0x8]                         @ 08026116 0295
@@ -19049,7 +19429,7 @@ LAB_08026154:
     movs r2,#0x1f    @ 08026158 1f22
     .hword 0x4690    @ 0802615a 9046
     lsrs r0,r0,#0x16    @ 0802615c 800d
-    ldr r7, DWORD_080261b8                   @ 0802615e 164f
+    ldr r7, step2_gprng_field_anim_mask      @ 0802615e 164f
     adds r5,r7,#0x0    @ 08026160 3d1c
     ldrh r3,[r6,#0x2]                        @ 08026162 7388
     ands r5,r3    @ 08026164 1d40
@@ -19095,8 +19475,8 @@ LAB_080261b2:
     movs r5,#0x1    @ 080261b2 0125
     str r5,[sp,#0x8]                         @ 080261b4 0295
     b LAB_080262e4                           @ 080261b6 95e0
-DWORD_080261b8:
-    .word  0xfffffc1f                     @ 080261b8 1ffcffff
+step2_gprng_field_anim_mask:
+    .word  GPRNG_FIELD_ANIM_MASK          @ 080261b8 1ffcffff
 LAB_080261bc:
     movs r0,#0x80    @ 080261bc 8020
     ands r0,r1    @ 080261be 0840
@@ -19241,7 +19621,7 @@ LAB_080262ba:
     orrs r5,r4    @ 080262ce 2543
     strh r5,[r6,#0x2]                        @ 080262d0 7580
 LAB_080262d2:
-    ldr r0, DWORD_0802644c                   @ 080262d2 5e48
+    ldr r0, step2_ptr_gduelscenebase_3       @ 080262d2 5e48
     ldrh r0,[r0,#0x2]                        @ 080262d4 4088
     lsls r0,r0,#0x16    @ 080262d6 8005
     lsrs r0,r0,#0x1b    @ 080262d8 c00e
@@ -19255,7 +19635,7 @@ LAB_080262e4:
     bne LAB_080262ec                         @ 080262e8 00d1
     b LAB_08026416                           @ 080262ea 94e0
 LAB_080262ec:
-    ldr r2, DWORD_0802644c                   @ 080262ec 574a
+    ldr r2, step2_ptr_gduelscenebase_3       @ 080262ec 574a
     movs r0,#0x1    @ 080262ee 0120
     strh r0,[r2,#0x6]                        @ 080262f0 d080
     subs r0,#0x11    @ 080262f2 1138
@@ -19278,16 +19658,16 @@ LAB_0802630a:
     bhi LAB_08026316                         @ 08026312 00d8
     b LAB_08026416                           @ 08026314 7fe0
 LAB_08026316:
-    ldr r0, DWORD_08026450                   @ 08026316 4e48
+    ldr r0, step2_campaign_bg_tile_param_a   @ 08026316 4e48
     bl game_str_id_to_row                    @ 08026318 cef07efd
-    ldr r2, DWORD_08026454                   @ 0802631c 4d4a
+    ldr r2, step2_game_str_tbl_ptr_b         @ 0802631c 4d4a
     lsls r0,r0,#0x10    @ 0802631e 0004
     lsrs r0,r0,#0x10    @ 08026320 000c
     lsls r1,r0,#0x1    @ 08026322 4100
     adds r1,r1,r0    @ 08026324 0918
     lsls r1,r1,#0x1    @ 08026326 4900
-    ldr r0, DWORD_08026458                   @ 08026328 4b48
-    ldr r5, DWORD_0802645c                   @ 0802632a 4c4d
+    ldr r0, step2_ewram_base                 @ 08026328 4b48
+    ldr r5, step2_gsettings_offset           @ 0802632a 4c4d
     adds r0,r0,r5    @ 0802632c 4019
     ldrb r0,[r0,#0x0]                        @ 0802632e 0078
     lsls r0,r0,#0x1d    @ 08026330 4007
@@ -19296,19 +19676,19 @@ LAB_08026316:
     lsls r1,r1,#0x2    @ 08026336 8900
     adds r1,r1,r2    @ 08026338 8918
     ldr r1,[r1,#0x0]                         @ 0802633a 0968
-    ldr r0, DWORD_08026460                   @ 0802633c 4848
+    ldr r0, step2_game_str_ja_ptr_a          @ 0802633c 4848
     adds r1,r1,r0    @ 0802633e 0918
-    ldr r0, DWORD_08026464                   @ 08026340 4848
+    ldr r0, step2_campaign_bg_tile_param_b   @ 08026340 4848
     movs r2,#0x84    @ 08026342 8422
     lsls r2,r2,#0x2    @ 08026344 9200
-    ldr r3, DWORD_08026468                   @ 08026346 484b
+    ldr r3, step2_duel_field_text_bg_width   @ 08026346 484b
     str r1,[sp,#0x0]                         @ 08026348 0091
     movs r1,#0xd6    @ 0802634a d621
     bl render_centered_text_to_bg_vram       @ 0802634c fdf722fb
-    ldr r5, DWORD_0802646c                   @ 08026350 464d
+    ldr r5, step2_campaign_bg_tile_param_c   @ 08026350 464d
     movs r6,#0x93    @ 08026352 9326
     lsls r6,r6,#0x1    @ 08026354 7600
-    ldr r4, DWORD_08026470                   @ 08026356 464c
+    ldr r4, step2_gfx_src_e_ptr              @ 08026356 464c
     adds r0,r5,#0x0    @ 08026358 281c
     movs r1,#0x40    @ 0802635a 4021
     adds r2,r6,#0x0    @ 0802635c 321c
@@ -19334,9 +19714,9 @@ LAB_08026316:
     movs r1,#0xc0    @ 08026386 c021
     lsls r1,r1,#0x4    @ 08026388 0901
     .hword 0x468c    @ 0802638a 8c46
-    ldr r2, DWORD_08026474                   @ 0802638c 394a
+    ldr r2, step2_campaign_bg_tile_param_d   @ 0802638c 394a
     .hword 0x4692    @ 0802638e 9246
-    ldr r3, DWORD_08026478                   @ 08026390 394b
+    ldr r3, step2_oam_attr2_charname_mask    @ 08026390 394b
     .hword 0x4699    @ 08026392 9946
 LAB_08026394:
     ldrh r0,[r5,#0x0]                        @ 08026394 2888
@@ -19359,7 +19739,7 @@ LAB_08026394:
     ands r2,r6    @ 080263b6 3240
     cmp r3,#0x1f                             @ 080263b8 1f2b
     bls LAB_080263ca                         @ 080263ba 06d9
-    ldr r0, DWORD_0802647c                   @ 080263bc 2f48
+    ldr r0, step2_card_desc_bg_vram_a        @ 080263bc 2f48
     str r0,[sp,#0x10]                        @ 080263be 0490
     adds r0,r3,#0x0    @ 080263c0 181c
     subs r0,#0x20    @ 080263c2 2038
@@ -19367,13 +19747,13 @@ LAB_08026394:
     lsls r0,r1,#0x10    @ 080263c6 0804
     lsrs r0,r0,#0x10    @ 080263c8 000c
 LAB_080263ca:
-    ldr r1, DWORD_0802646c                   @ 080263ca 2849
+    ldr r1, step2_campaign_bg_tile_param_c   @ 080263ca 2849
     adds r0,r0,r1    @ 080263cc 4018
     lsls r0,r0,#0x10    @ 080263ce 0004
     lsrs r0,r0,#0x10    @ 080263d0 000c
     cmp r0,r10                               @ 080263d2 5045
     bls LAB_080263de                         @ 080263d4 03d9
-    ldr r3, DWORD_08026480                   @ 080263d6 2a4b
+    ldr r3, step2_oam_attr2_charname_clear   @ 080263d6 2a4b
     adds r0,r0,r3    @ 080263d8 c018
     lsls r0,r0,#0x10    @ 080263da 0004
     lsrs r0,r0,#0x10    @ 080263dc 000c
@@ -19399,10 +19779,10 @@ LAB_080263de:
     cmp r7,r6                                @ 08026402 b742
     bcc LAB_08026394                         @ 08026404 c6d3
 LAB_08026406:
-    ldr r0, DWORD_08026484                   @ 08026406 1f48
+    ldr r0, step2_campaign_vram_bg_tile_base @ 08026406 1f48
     movs r1,#0x80    @ 08026408 8021
     bl zero_fill_by_halfword                 @ 0802640a cef033fd
-    ldr r0, DWORD_0802647c                   @ 0802640e 1b48
+    ldr r0, step2_card_desc_bg_vram_a        @ 0802640e 1b48
     movs r1,#0x80    @ 08026410 8021
     bl zero_fill_by_halfword                 @ 08026412 cef02ffd
 LAB_08026416:
@@ -19412,7 +19792,7 @@ LAB_08026416:
     ldr r1,[sp,#0xc]                         @ 0802641c 0399
     cmp r1,#0x0                              @ 0802641e 0029
     bne LAB_080264fe                         @ 08026420 6dd1
-    ldr r3, DWORD_0802644c                   @ 08026422 0a4b
+    ldr r3, step2_ptr_gduelscenebase_3       @ 08026422 0a4b
     ldrb r4,[r3,#0x2]                        @ 08026424 9c78
     lsls r0,r4,#0x1b    @ 08026426 e006
     ldrh r5,[r3,#0x2]                        @ 08026428 5d88
@@ -19433,39 +19813,39 @@ LAB_08026416:
     strb r0,[r3,#0x8]                        @ 08026446 1872
     b LAB_080265c2                           @ 08026448 bbe0
     .zero  0x2
-DWORD_0802644c:
-    .word  0x02023360                     @ 0802644c 60330202
-DWORD_08026450:
-    .word  0x00000be5                     @ 08026450 e50b0000
-DWORD_08026454:
-    .word  game_str_pointer_table         @ 08026454 400f0008
-DWORD_08026458:
-    .word  0x02000000                     @ 08026458 00000002
-DWORD_0802645c:
-    .word  0x00006c2c                     @ 0802645c 2c6c0000
-DWORD_08026460:
-    .word  game_str_ja                    @ 08026460 109cdb09
-DWORD_08026464:
-    .word  0x000007c7                     @ 08026464 c7070000
-DWORD_08026468:
-    .word  0x00000f09                     @ 08026468 090f0000
-DWORD_0802646c:
-    .word  0x00000bc1                     @ 0802646c c10b0000
-DWORD_08026470:
-    .word  0x09b96514                     @ 08026470 1465b909
-DWORD_08026474:
-    .word  0x00000bff                     @ 08026474 ff0b0000
-DWORD_08026478:
-    .word  0x000003ff                     @ 08026478 ff030000
-DWORD_0802647c:
-    .word  0x06000800                     @ 0802647c 00080006
-DWORD_08026480:
-    .word  0xfffffc00                     @ 08026480 00fcffff
-DWORD_08026484:
-    .word  0x06001100                     @ 08026484 00110006
+step2_ptr_gduelscenebase_3:
+    .word  gDuelSceneBase                 @ 0802644c 60330202
+step2_campaign_bg_tile_param_a:
+    .word  CAMPAIGN_BG_TILE_PARAM_A       @ 08026450 e50b0000
+step2_game_str_tbl_ptr_b:
+    .word  game_str_pointer_table         @ 08026454 400f0008  0x08000f40: game_str_pointer_table ptr 2nd ref
+step2_ewram_base:
+    .word  EWRAM_BASE                     @ 08026458 00000002
+step2_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 0802645c 2c6c0000
+step2_game_str_ja_ptr_a:
+    .word  game_str_ja                    @ 08026460 109cdb09  0x09db9c10: game_str_ja ptr
+step2_campaign_bg_tile_param_b:
+    .word  CAMPAIGN_BG_TILE_PARAM_B       @ 08026464 c7070000
+step2_duel_field_text_bg_width:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 08026468 090f0000
+step2_campaign_bg_tile_param_c:
+    .word  CAMPAIGN_BG_TILE_PARAM_C       @ 0802646c c10b0000
+step2_gfx_src_e_ptr:
+    .word  0x09b96514                     @ 08026470 1465b909  0x09b96514: gfx_src_e ROM ptr
+step2_campaign_bg_tile_param_d:
+    .word  CAMPAIGN_BG_TILE_PARAM_D       @ 08026474 ff0b0000
+step2_oam_attr2_charname_mask:
+    .word  OAM_ATTR2_CHARNAME_MASK        @ 08026478 ff030000
+step2_card_desc_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802647c 00080006
+step2_oam_attr2_charname_clear:
+    .word  OAM_ATTR2_CHARNAME_CLEAR       @ 08026480 00fcffff
+step2_campaign_vram_bg_tile_base:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE     @ 08026484 00110006
 LAB_08026488:
-    ldr r2, DWORD_0802655c                   @ 08026488 344a
-    ldr r0, DWORD_08026560                   @ 0802648a 3548
+    ldr r2, step2_ptr_gduelscenebase_4       @ 08026488 344a
+    ldr r0, step2_oam_attr0_hidden           @ 0802648a 3548
     strh r0,[r2,#0x6]                        @ 0802648c d080
     movs r0,#0x10    @ 0802648e 1020
     rsbs r0,r0,#0    @ 08026490 4042
@@ -19482,14 +19862,14 @@ LAB_08026488:
     movs r0,#0xbe    @ 080264a6 be20
     lsls r0,r0,#0x4    @ 080264a8 0001
     bl game_str_id_to_row                    @ 080264aa cef0b5fc
-    ldr r2, DWORD_08026564                   @ 080264ae 2d4a
+    ldr r2, step2_game_str_tbl_ptr           @ 080264ae 2d4a
     lsls r0,r0,#0x10    @ 080264b0 0004
     lsrs r0,r0,#0x10    @ 080264b2 000c
     lsls r1,r0,#0x1    @ 080264b4 4100
     adds r1,r1,r0    @ 080264b6 0918
     lsls r1,r1,#0x1    @ 080264b8 4900
-    ldr r0, DWORD_08026568                   @ 080264ba 2b48
-    ldr r3, DWORD_0802656c                   @ 080264bc 2b4b
+    ldr r0, step2_ewram_base_1               @ 080264ba 2b48
+    ldr r3, step2_gsettings_offset_1         @ 080264bc 2b4b
     adds r0,r0,r3    @ 080264be c018
     ldrb r0,[r0,#0x0]                        @ 080264c0 0078
     lsls r0,r0,#0x1d    @ 080264c2 4007
@@ -19498,28 +19878,28 @@ LAB_08026488:
     lsls r1,r1,#0x2    @ 080264c8 8900
     adds r1,r1,r2    @ 080264ca 8918
     ldr r1,[r1,#0x0]                         @ 080264cc 0968
-    ldr r0, DWORD_08026570                   @ 080264ce 2848
+    ldr r0, step2_game_str_ja_ptr            @ 080264ce 2848
     adds r1,r1,r0    @ 080264d0 0918
-    ldr r0, DWORD_08026574                   @ 080264d2 2848
+    ldr r0, step2_card_info_bg2cnt_init      @ 080264d2 2848
     movs r2,#0x84    @ 080264d4 8422
     lsls r2,r2,#0x2    @ 080264d6 9200
-    ldr r3, DWORD_08026578                   @ 080264d8 274b
+    ldr r3, step2_duel_field_text_bg_width_1 @ 080264d8 274b
     str r1,[sp,#0x0]                         @ 080264da 0091
     movs r1,#0x36    @ 080264dc 3621
     bl render_centered_text_to_bg_vram       @ 080264de fdf759fa
-    ldr r0, DWORD_0802657c                   @ 080264e2 2648
-    ldr r3, DWORD_08026580                   @ 080264e4 264b
+    ldr r0, step2_campaign_bg_tile_param_e   @ 080264e2 2648
+    ldr r3, step2_gfx_src_d_ptr              @ 080264e4 264b
     movs r1,#0x20    @ 080264e6 2021
     movs r2,#0xf6    @ 080264e8 f622
     bl write_tile_row_to_vram                @ 080264ea c7f02ffd
-    ldr r0, DWORD_08026584                   @ 080264ee 2548
+    ldr r0, step2_campaign_vram_bg_tile_base_b @ 080264ee 2548
     movs r1,#0x80    @ 080264f0 8021
     bl zero_fill_by_halfword                 @ 080264f2 cef0bffc
-    ldr r0, DWORD_08026588                   @ 080264f6 2448
+    ldr r0, step2_campaign_vram_bg_tile_base_c @ 080264f6 2448
     movs r1,#0x80    @ 080264f8 8021
     bl zero_fill_by_halfword                 @ 080264fa cef0bbfc
 LAB_080264fe:
-    ldr r4, DWORD_0802655c                   @ 080264fe 174c
+    ldr r4, step2_ptr_gduelscenebase_4       @ 080264fe 174c
     ldrh r5,[r4,#0x2]                        @ 08026500 6588
     lsls r0,r5,#0x16    @ 08026502 a805
     lsrs r5,r0,#0x1b    @ 08026504 c50e
@@ -19533,12 +19913,12 @@ LAB_080264fe:
     ldrh r4,[r4,#0x0]                        @ 08026516 2488
     cmp r0,r4                                @ 08026518 a042
     bge LAB_080265c2                         @ 0802651a 52da
-    ldr r6, DWORD_0802658c                   @ 0802651c 1b4e
+    ldr r6, step2_gplayericon                @ 0802651c 1b4e
     .hword 0x46b1    @ 0802651e b146
     adds r5,r0,#0x0    @ 08026520 051c
     adds r1,r5,#0x0    @ 08026522 291c
     adds r1,#0xa    @ 08026524 0a31
-    ldr r0, DWORD_08026590                   @ 08026526 1a48
+    ldr r0, step2_pack_text_ptr_a            @ 08026526 1a48
     .hword 0x4680    @ 08026528 8046
     lsls r0,r1,#0x3    @ 0802652a c800
     adds r0,r0,r1    @ 0802652c 4018
@@ -19559,47 +19939,47 @@ LAB_08026536:
     lsls r2,r0,#0x3    @ 08026548 c200
     adds r2,r2,r0    @ 0802654a 1218
     lsls r2,r2,#0x5    @ 0802654c 5201
-    ldr r0, DWORD_08026594                   @ 0802654e 1148
+    ldr r0, step2_pack_text_ptr_b            @ 0802654e 1148
     adds r2,r2,r0    @ 08026550 1218
     movs r0,#0xa    @ 08026552 0a20
     bl copy_icon_tile_to_vram_row            @ 08026554 fdf7e6fa
     b LAB_080265aa                           @ 08026558 27e0
     .zero  0x2
-DWORD_0802655c:
-    .word  0x02023360                     @ 0802655c 60330202
-DWORD_08026560:
-    .word  0x0000ffff                     @ 08026560 ffff0000
-DWORD_08026564:
-    .word  game_str_pointer_table         @ 08026564 400f0008
-DWORD_08026568:
-    .word  0x02000000                     @ 08026568 00000002
-DWORD_0802656c:
-    .word  0x00006c2c                     @ 0802656c 2c6c0000
-DWORD_08026570:
-    .word  game_str_ja                    @ 08026570 109cdb09
-DWORD_08026574:
-    .word  0x00000407                     @ 08026574 07040000
-DWORD_08026578:
-    .word  0x00000f09                     @ 08026578 090f0000
-DWORD_0802657c:
-    .word  0x00000801                     @ 0802657c 01080000
-DWORD_08026580:
-    .word  0x09b953b4                     @ 08026580 b453b909
-DWORD_08026584:
-    .word  0x06001780                     @ 08026584 80170006
-DWORD_08026588:
-    .word  0x06000f80                     @ 08026588 800f0006
-DWORD_0802658c:
+step2_ptr_gduelscenebase_4:
+    .word  gDuelSceneBase                 @ 0802655c 60330202
+step2_oam_attr0_hidden:
+    .word  OAM_ATTR0_HIDDEN               @ 08026560 ffff0000
+step2_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 08026564 400f0008  0x08000f40: game_str_pointer_table ptr
+step2_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08026568 00000002
+step2_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 0802656c 2c6c0000
+step2_game_str_ja_ptr:
+    .word  game_str_ja                    @ 08026570 109cdb09  0x09db9c10: game_str_ja ptr
+step2_card_info_bg2cnt_init:
+    .word  CARD_INFO_BG2CNT_INIT          @ 08026574 07040000
+step2_duel_field_text_bg_width_1:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 08026578 090f0000
+step2_campaign_bg_tile_param_e:
+    .word  CAMPAIGN_BG_TILE_PARAM_E       @ 0802657c 01080000
+step2_gfx_src_d_ptr:
+    .word  0x09b953b4                     @ 08026580 b453b909  0x09b953b4: gfx_src_d ROM ptr
+step2_campaign_vram_bg_tile_base_b:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE_B   @ 08026584 80170006
+step2_campaign_vram_bg_tile_base_c:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE_C   @ 08026588 800f0006
+step2_gplayericon:
     .word  gPlayerIcon                    @ 0802658c 576e0002
-DWORD_08026590:
-    .word  icon_palettes_base             @ 08026590 90628909
-DWORD_08026594:
-    .word  icon_tiles_base                @ 08026594 30cf8809
+step2_pack_text_ptr_a:
+    .word  icon_palettes_base             @ 08026590 90628909  0x09896290: ROM pack text data ptr A
+step2_pack_text_ptr_b:
+    .word  icon_tiles_base                @ 08026594 30cf8809  0x0988cf30: ROM pack text data ptr B
 LAB_08026598:
     adds r0,r5,#0x0    @ 08026598 281c
     movs r1,#0xf    @ 0802659a 0f21
     bl __modsi3                              @ 0802659c e8f07ef8
-    ldr r2, DWORD_08026624                   @ 080265a0 204a
+    ldr r2, step2_pack_text_ptr_c            @ 080265a0 204a
     adds r2,r6,r2    @ 080265a2 b218
     adds r1,r4,#0x0    @ 080265a4 211c
     bl copy_icon_tile_to_vram_row            @ 080265a6 fdf7bdfa
@@ -19612,12 +19992,12 @@ LAB_080265aa:
     adds r7,#0x1    @ 080265b4 0137
     cmp r7,#0x4                              @ 080265b6 042f
     bgt LAB_080265c2                         @ 080265b8 03dc
-    ldr r0, DWORD_08026628                   @ 080265ba 1b48
+    ldr r0, step2_ptr_gduelscenebase_5       @ 080265ba 1b48
     ldrh r0,[r0,#0x0]                        @ 080265bc 0088
     cmp r5,r0                                @ 080265be 8542
     blt LAB_08026536                         @ 080265c0 b9db
 LAB_080265c2:
-    ldr r4, DWORD_08026628                   @ 080265c2 194c
+    ldr r4, step2_ptr_gduelscenebase_5       @ 080265c2 194c
     ldrh r1,[r4,#0x0]                        @ 080265c4 2188
     cmp r1,#0x1                              @ 080265c6 0129
     bne LAB_080265d4                         @ 080265c8 04d1
@@ -19649,7 +20029,7 @@ LAB_080265ee:
     beq LAB_080265fe                         @ 080265fa 00d0
     b SUB_08026714                           @ 080265fc 8ae0
 LAB_080265fe:
-    ldr r5, DWORD_0802662c                   @ 080265fe 0b4d
+    ldr r5, step2_ptr_gprng_2                @ 080265fe 0b4d
     movs r1,#0xa4    @ 08026600 a421
     lsls r1,r1,#0x1    @ 08026602 4900
     adds r0,r5,r1    @ 08026604 6818
@@ -19660,30 +20040,30 @@ LAB_080265fe:
     beq LAB_08026638                         @ 0802660e 13d0
     movs r0,#0x1    @ 08026610 0120
     bl sync_state_and_init_sprite            @ 08026612 d3f04ffa
-    ldr r2, DWORD_08026630                   @ 08026616 064a
+    ldr r2, step2_gprng_step_idx_off         @ 08026616 064a
     adds r0,r5,r2    @ 08026618 a818
-    ldr r1, DWORD_08026634                   @ 0802661a 0649
+    ldr r1, step2_gprng_step_ctr_mask        @ 0802661a 0649
     ldrh r3,[r0,#0x0]                        @ 0802661c 0388
     ands r1,r3    @ 0802661e 1940
     movs r2,#0xc0    @ 08026620 c022
     b LAB_08026c56                           @ 08026622 18e3
-DWORD_08026624:
-    .word  icon_tiles_base                @ 08026624 30cf8809
-DWORD_08026628:
-    .word  0x02023360                     @ 08026628 60330202
-DWORD_0802662c:
+step2_pack_text_ptr_c:
+    .word  icon_tiles_base                @ 08026624 30cf8809  0x0988cf30: ROM pack text data ptr C (2nd ref)
+step2_ptr_gduelscenebase_5:
+    .word  gDuelSceneBase                 @ 08026628 60330202
+step2_ptr_gprng_2:
     .word  gPrng                          @ 0802662c 40000003
-DWORD_08026630:
-    .word  0x00000202                     @ 08026630 02020000
-DWORD_08026634:
-    .word  0xffffc03f                     @ 08026634 3fc0ffff
+step2_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026630 02020000
+step2_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026634 3fc0ffff
 LAB_08026638:
     adds r0,r6,#0x0    @ 08026638 301c
     ands r0,r1    @ 0802663a 0840
     cmp r0,#0x0                              @ 0802663c 0028
     beq SUB_08026714                         @ 0802663e 69d0
-    ldr r2, DWORD_080266a8                   @ 08026640 194a
-    ldr r0, DWORD_080266ac                   @ 08026642 1a48
+    ldr r2, step2_ewram_base_2               @ 08026640 194a
+    ldr r0, step2_gunlocked_duelists_offset  @ 08026642 1a48
     adds r2,r2,r0    @ 08026644 1218
     ldrb r1,[r4,#0x2]                        @ 08026646 a178
     lsls r0,r1,#0x1b    @ 08026648 c806
@@ -19696,7 +20076,7 @@ LAB_08026638:
     beq SUB_08026714                         @ 08026656 5dd0
     movs r0,#0x24    @ 08026658 2420
     bl sync_state_and_init_sprite            @ 0802665a d3f02bfa
-    ldr r2, DWORD_080266b0                   @ 0802665e 144a
+    ldr r2, step2_gprng_frame_ctrl_off_203   @ 0802665e 144a
     adds r1,r5,r2    @ 08026660 a918
     movs r0,#0x3f    @ 08026662 3f20
     ldrb r3,[r1,#0x0]                        @ 08026664 0b78
@@ -19710,9 +20090,9 @@ LAB_08026638:
     ldrb r2,[r1,#0x0]                        @ 08026674 0a78
     ands r0,r2    @ 08026676 1040
     strb r0,[r1,#0x0]                        @ 08026678 0870
-    ldr r3, DWORD_080266b4                   @ 0802667a 0e4b
+    ldr r3, step2_gprng_step_idx_off_1       @ 0802667a 0e4b
     adds r1,r5,r3    @ 0802667c e918
-    ldr r3, DWORD_080266b8                   @ 0802667e 0e4b
+    ldr r3, step2_gprng_step_ctr_mask_1      @ 0802667e 0e4b
     adds r2,r3,#0x0    @ 08026680 1a1c
     ldrh r5,[r1,#0x0]                        @ 08026682 0d88
     ands r2,r5    @ 08026684 2a40
@@ -19733,16 +20113,16 @@ LAB_08026638:
     orrs r2,r0    @ 080266a2 0243
     strh r2,[r1,#0x0]                        @ 080266a4 0a80
     b SUB_08026714                           @ 080266a6 35e0
-DWORD_080266a8:
-    .word  0x02000000                     @ 080266a8 00000002
-DWORD_080266ac:
-    .word  0x00006e5c                     @ 080266ac 5c6e0000
-DWORD_080266b0:
-    .word  0x00000203                     @ 080266b0 03020000
-DWORD_080266b4:
-    .word  0x00000202                     @ 080266b4 02020000
-DWORD_080266b8:
-    .word  0xffffc03f                     @ 080266b8 3fc0ffff
+step2_ewram_base_2:
+    .word  EWRAM_BASE                     @ 080266a8 00000002
+step2_gunlocked_duelists_offset:
+    .word  GUNLOCKED_DUELISTS_OFFSET      @ 080266ac 5c6e0000
+step2_gprng_frame_ctrl_off_203:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 080266b0 03020000
+step2_gprng_step_idx_off_1:
+    .word  GPRNG_STEP_IDX_OFF             @ 080266b4 02020000
+step2_gprng_step_ctr_mask_1:
+    .word  GPRNG_STEP_CTR_MASK            @ 080266b8 3fc0ffff
 
 @ Per-frame tick handler for campaign_scene_handler dispatch table index 3. Trigger: gPrng+0x202 bits[13:6] == 0x03. Calls render_opp_wins_display_oam to refresh opponent wins sprites, then calls start_blend_fadein_with_target(4) to advance fadein. If fadein returns 0 (not done) tail-calls b SUB_08026714 to wait; if done (nonzero) calls SUB_08027768 (trigger scene-enter complete event) then tail-calls SUB_08026714 to advance.
 @ 
@@ -19768,8 +20148,8 @@ LAB_080266ce:
 @ - gPrng_frame_mask = 0xffffc03f
 run_campaign_step4_wins_and_blend_tick:
     bl render_opp_wins_display_oam           @ 080266d0 fdf720fd
-    ldr r4, DWORD_0802671c                   @ 080266d4 114c
-    ldr r5, DWORD_08026720                   @ 080266d6 124d
+    ldr r4, sub_6714_ptr_gprng               @ 080266d4 114c
+    ldr r5, sub_6714_gprng_frame_ctrl_off_203 @ 080266d6 124d
     adds r7,r4,r5    @ 080266d8 6719
     ldrb r6,[r7,#0x0]                        @ 080266da 3e78
     lsrs r1,r6,#0x6    @ 080266dc b109
@@ -19804,28 +20184,28 @@ SUB_08026714:
     movs r0,#0x80    @ 08026714 8020
     lsls r0,r0,#0x1    @ 08026716 4000
     bl SUB_08027c82                          @ 08026718 01f0b3fa
-DWORD_0802671c:
+sub_6714_ptr_gprng:
     .word  gPrng                          @ 0802671c 40000003
-DWORD_08026720:
-    .word  0x00000203                     @ 08026720 03020000
+sub_6714_gprng_frame_ctrl_off_203:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 08026720 03020000
 LAB_08026724:
     movs r0,#0x4    @ 08026724 0420
     bl start_blend_fadein_with_target        @ 08026726 cff08bf8
     cmp r0,#0x0                              @ 0802672a 0028
     beq SUB_08026714                         @ 0802672c f2d0
-    ldr r5, DWORD_08026740                   @ 0802672e 044d
+    ldr r5, sub_6714_gprng_step_idx_off      @ 0802672e 044d
     adds r0,r4,r5    @ 08026730 6019
-    ldr r1, DWORD_08026744                   @ 08026732 0449
+    ldr r1, sub_6714_gprng_step_ctr_mask     @ 08026732 0449
     ldrh r6,[r0,#0x0]                        @ 08026734 0688
     ands r1,r6    @ 08026736 3140
     movs r3,#0xa0    @ 08026738 a023
     lsls r3,r3,#0x3    @ 0802673a db00
     adds r2,r3,#0x0    @ 0802673c 1a1c
     b LAB_08026c56                           @ 0802673e 8ae2
-DWORD_08026740:
-    .word  0x00000202                     @ 08026740 02020000
-DWORD_08026744:
-    .word  0xffffc03f                     @ 08026744 3fc0ffff
+sub_6714_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026740 02020000
+sub_6714_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026744 3fc0ffff
 
 @ Init handler for campaign_scene_handler dispatch table index 5. Trigger: gPrng+0x202 bits[13:6] == 0x05. Initializes pack-select VRAM and text: (1) zero_fill_by_halfword(0x06001180, 0x80*8=0x400 halfwords) clears BG tile region 1; (2) load_pack_tile_and_map_to_vram(0x840, 0x50, 0x148, 0x09b96c2c) loads pack tile and tilemap; (3) zero_fill_by_halfword(0x06000800, 0xc0*8=0x600 halfwords) clears BG tile region 2; (4) loop r4=0..6 calls render_text_with_font_type_select(r4) 7 times; (5) clears scene_ctx(0x02023360)+8 halfword and word high bits; (6) increments gPrng+0x202 frame counter bits[13:6] and tail-calls SUB_08026714.
 @ 
@@ -19840,7 +20220,7 @@ DWORD_08026744:
 @ - scene_ctx=0x02023360
 @ - frame_ctr_mask=0xffffc03f
 run_campaign_step5_pack_vram_and_text_init:
-    ldr r0, DWORD_08026808                   @ 08026748 2f48
+    ldr r0, step6_campaign_vram_bg_tile_base_f @ 08026748 2f48
     movs r1,#0x80    @ 0802674a 8021
     lsls r1,r1,#0x3    @ 0802674c c900
     bl zero_fill_by_halfword                 @ 0802674e cef091fb
@@ -19848,10 +20228,10 @@ run_campaign_step5_pack_vram_and_text_init:
     lsls r0,r0,#0x4    @ 08026754 0001
     movs r2,#0xa4    @ 08026756 a422
     lsls r2,r2,#0x1    @ 08026758 5200
-    ldr r3, DWORD_0802680c                   @ 0802675a 2c4b
+    ldr r3, step6_pack_icon_tbl_ptr          @ 0802675a 2c4b
     movs r1,#0x50    @ 0802675c 5021
     bl load_pack_tile_and_map_to_vram        @ 0802675e c7f057fc
-    ldr r0, DWORD_08026810                   @ 08026762 2b48
+    ldr r0, step6_card_desc_bg_vram_a        @ 08026762 2b48
     movs r1,#0xc0    @ 08026764 c021
     lsls r1,r1,#0x3    @ 08026766 c900
     bl zero_fill_by_halfword                 @ 08026768 cef084fb
@@ -19862,14 +20242,14 @@ LAB_0802676e:
     adds r4,#0x1    @ 08026774 0134
     cmp r4,#0x6                              @ 08026776 062c
     ble LAB_0802676e                         @ 08026778 f9dd
-    ldr r2, DWORD_08026814                   @ 0802677a 264a
-    ldr r3, DWORD_08026818                   @ 0802677c 264b
+    ldr r2, step6_ptr_gduelscenebase         @ 0802677a 264a
+    ldr r3, step6_scene_ctx_anim_mask        @ 0802677c 264b
     adds r0,r3,#0x0    @ 0802677e 181c
     ldrh r4,[r2,#0x8]                        @ 08026780 1489
     ands r0,r4    @ 08026782 2040
     strh r0,[r2,#0x8]                        @ 08026784 1081
     ldr r0,[r2,#0x8]                         @ 08026786 9068
-    ldr r1, DWORD_0802681c                   @ 08026788 2449
+    ldr r1, step6_scene_ctx_timer_clear      @ 08026788 2449
     ands r0,r1    @ 0802678a 0840
     str r0,[r2,#0x8]                         @ 0802678c 9060
     adds r0,r3,#0x0    @ 0802678e 181c
@@ -19888,8 +20268,8 @@ LAB_0802676e:
     ldrb r3,[r2,#0xc]                        @ 080267a8 137b
     ands r0,r3    @ 080267aa 1840
     strb r0,[r2,#0xc]                        @ 080267ac 1073
-    ldr r2, DWORD_08026820                   @ 080267ae 1c4a
-    ldr r4, DWORD_08026824                   @ 080267b0 1c4c
+    ldr r2, step6_ptr_gprng                  @ 080267ae 1c4a
+    ldr r4, step6_gprng_step_idx_off         @ 080267b0 1c4c
     adds r2,r2,r4    @ 080267b2 1219
     ldrh r3,[r2,#0x0]                        @ 080267b4 1388
     lsls r1,r3,#0x12    @ 080267b6 9904
@@ -19898,7 +20278,7 @@ LAB_0802676e:
     movs r0,#0xff    @ 080267bc ff20
     ands r1,r0    @ 080267be 0140
     lsls r1,r1,#0x6    @ 080267c0 8901
-    ldr r0, DWORD_08026828                   @ 080267c2 1948
+    ldr r0, step6_gprng_step_ctr_mask        @ 080267c2 1948
     ands r0,r3    @ 080267c4 1840
     orrs r0,r1    @ 080267c6 0843
     strh r0,[r2,#0x0]                        @ 080267c8 1080
@@ -19914,19 +20294,19 @@ LAB_0802676e:
 @ - anim_mask_clear=0xffff807f (clears bits[14:7])
 run_campaign_step6_opp_scroll_sprite_tick:
     bl render_opp_wins_display_oam           @ 080267ca fdf7a3fc
-    ldr r6, DWORD_08026814                   @ 080267ce 114e
+    ldr r6, step6_ptr_gduelscenebase         @ 080267ce 114e
     ldr r5,[r6,#0x8]                         @ 080267d0 b568
     lsls r4,r5,#0x9    @ 080267d2 6c02
     lsrs r0,r4,#0x18    @ 080267d4 200e
     cmp r0,#0x7                              @ 080267d6 0728
     bhi LAB_08026830                         @ 080267d8 2ad8
-    ldr r3, DWORD_0802682c                   @ 080267da 144b
+    ldr r3, step6_anim_frame_tbl_ptr         @ 080267da 144b
     adds r1,r0,#0x0    @ 080267dc 011c
     adds r1,#0x1    @ 080267de 0131
     movs r2,#0xff    @ 080267e0 ff22
     ands r1,r2    @ 080267e2 1140
     lsls r1,r1,#0xf    @ 080267e4 c903
-    ldr r0, DWORD_0802681c                   @ 080267e6 0d48
+    ldr r0, step6_scene_ctx_timer_clear      @ 080267e6 0d48
     ands r0,r5    @ 080267e8 2840
     orrs r0,r1    @ 080267ea 0843
     str r0,[r6,#0x8]                         @ 080267ec b060
@@ -19936,36 +20316,36 @@ run_campaign_step6_opp_scroll_sprite_tick:
     ldr r1,[r0,#0x0]                         @ 080267f4 0168
     ands r1,r2    @ 080267f6 1140
     lsls r1,r1,#0x7    @ 080267f8 c901
-    ldr r0, DWORD_08026818                   @ 080267fa 0748
+    ldr r0, step6_scene_ctx_anim_mask        @ 080267fa 0748
     ldrh r5,[r6,#0x8]                        @ 080267fc 3589
     ands r0,r5    @ 080267fe 2840
     orrs r0,r1    @ 08026800 0843
     strh r0,[r6,#0x8]                        @ 08026802 3081
     b SUB_08026714                           @ 08026804 86e7
     .zero  0x2
-DWORD_08026808:
-    .word  0x06001180                     @ 08026808 80110006
-DWORD_0802680c:
-    .word  0x09b96c2c                     @ 0802680c 2c6cb909
-DWORD_08026810:
-    .word  0x06000800                     @ 08026810 00080006
-DWORD_08026814:
-    .word  0x02023360                     @ 08026814 60330202
-DWORD_08026818:
-    .word  0xffff807f                     @ 08026818 7f80ffff
-DWORD_0802681c:
-    .word  0xff807fff                     @ 0802681c ff7f80ff
-DWORD_08026820:
+step6_campaign_vram_bg_tile_base_f:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE_F   @ 08026808 80110006
+step6_pack_icon_tbl_ptr:
+    .word  0x09b96c2c                     @ 0802680c 2c6cb909  0x09b96c2c: pack icon table ptr
+step6_card_desc_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 08026810 00080006
+step6_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026814 60330202
+step6_scene_ctx_anim_mask:
+    .word  SCENE_CTX_ANIM_MASK            @ 08026818 7f80ffff
+step6_scene_ctx_timer_clear:
+    .word  SCENE_CTX_TIMER_CLEAR          @ 0802681c ff7f80ff
+step6_ptr_gprng:
     .word  gPrng                          @ 08026820 40000003
-DWORD_08026824:
-    .word  0x00000202                     @ 08026824 02020000
-DWORD_08026828:
-    .word  0xffffc03f                     @ 08026828 3fc0ffff
-DWORD_0802682c:
-    .word  0x09e59d18                     @ 0802682c 189de509
+step6_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026824 02020000
+step6_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026828 3fc0ffff
+step6_anim_frame_tbl_ptr:
+    .word  0x09e59d18                     @ 0802682c 189de509  0x09e59d18: anim frame table ptr
 LAB_08026830:
-    ldr r2, DWORD_0802684c                   @ 08026830 064a
-    ldr r6, DWORD_08026850                   @ 08026832 074e
+    ldr r2, step6_ptr_gprng_1                @ 08026830 064a
+    ldr r6, step6_gprng_step_idx_off_1       @ 08026832 074e
     adds r2,r2,r6    @ 08026834 9219
     ldrh r3,[r2,#0x0]                        @ 08026836 1388
     lsls r1,r3,#0x12    @ 08026838 9904
@@ -19974,15 +20354,15 @@ LAB_08026830:
     movs r0,#0xff    @ 0802683e ff20
     ands r1,r0    @ 08026840 0140
     lsls r1,r1,#0x6    @ 08026842 8901
-    ldr r0, DWORD_08026854                   @ 08026844 0348
+    ldr r0, step6_gprng_step_ctr_mask_1      @ 08026844 0348
     ands r0,r3    @ 08026846 1840
     bl SUB_08027c22                          @ 08026848 01f0ebf9
-DWORD_0802684c:
+step6_ptr_gprng_1:
     .word  gPrng                          @ 0802684c 40000003
-DWORD_08026850:
-    .word  0x00000202                     @ 08026850 02020000
-DWORD_08026854:
-    .word  0xffffc03f                     @ 08026854 3fc0ffff
+step6_gprng_step_idx_off_1:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026850 02020000
+step6_gprng_step_ctr_mask_1:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026854 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 7. Trigger: gPrng+0x202 bits[13:6] == 0x07. Sequence: (1) bl render_opp_wins_display_oam; (2) checks gPrng+0x148 bit6 (0x40): if set, reads scene_ctx+0xc halfword, extracts row offset index, if at limit decrements by 1 and bl render_text_with_font_type_select; (3) bl sync_state_and_init_sprite(0); (4) checks bit7 (0x80) path for opposite scroll direction, if row index <= 0x3a then adds 6 and renders; (5) checks bit1 (0x2): if set clears scene_ctx+0xb/+0xc scroll fields; (6) if gPrng+0x148 bit0 == 0 waits via SUB_08026714, else bl sync_state_and_init_sprite(0x24) and advances step.
 @ 
@@ -19994,7 +20374,7 @@ DWORD_08026854:
 @ - row_max_threshold = 0x3a (58), row_advance_step = 6
 run_campaign_step7_scroll_text_tick:
     bl render_opp_wins_display_oam           @ 08026858 fdf75cfc
-    ldr r1, DWORD_08026a10                   @ 0802685c 6c49
+    ldr r1, step7_ptr_gprng                  @ 0802685c 6c49
     movs r0,#0xa4    @ 0802685e a420
     lsls r0,r0,#0x1    @ 08026860 4000
     adds r1,r1,r0    @ 08026862 0918
@@ -20003,7 +20383,7 @@ run_campaign_step7_scroll_text_tick:
     ands r0,r1    @ 08026868 0840
     cmp r0,#0x0                              @ 0802686a 0028
     beq LAB_080268e4                         @ 0802686c 3ad0
-    ldr r4, DWORD_08026a14                   @ 0802686e 694c
+    ldr r4, step7_ptr_gduelscenebase         @ 0802686e 694c
     ldrh r1,[r4,#0xc]                        @ 08026870 a189
     movs r0,#0xff    @ 08026872 ff20
     lsls r0,r0,#0x7    @ 08026874 c001
@@ -20057,12 +20437,12 @@ LAB_080268c8:
     movs r0,#0xff    @ 080268d6 ff20
     ands r1,r0    @ 080268d8 0140
     lsls r1,r1,#0x7    @ 080268da c901
-    ldr r0, DWORD_08026a18                   @ 080268dc 4e48
+    ldr r0, step7_scene_ctx_anim_mask        @ 080268dc 4e48
     ands r0,r2    @ 080268de 1040
     orrs r0,r1    @ 080268e0 0843
     strh r0,[r4,#0xc]                        @ 080268e2 a081
 LAB_080268e4:
-    ldr r1, DWORD_08026a10                   @ 080268e4 4a49
+    ldr r1, step7_ptr_gprng                  @ 080268e4 4a49
     movs r0,#0xa4    @ 080268e6 a420
     lsls r0,r0,#0x1    @ 080268e8 4000
     adds r1,r1,r0    @ 080268ea 0918
@@ -20071,7 +20451,7 @@ LAB_080268e4:
     ands r0,r1    @ 080268f0 0840
     cmp r0,#0x0                              @ 080268f2 0028
     beq LAB_0802696c                         @ 080268f4 3ad0
-    ldr r4, DWORD_08026a14                   @ 080268f6 474c
+    ldr r4, step7_ptr_gduelscenebase         @ 080268f6 474c
     ldrh r1,[r4,#0xc]                        @ 080268f8 a189
     lsls r2,r1,#0x11    @ 080268fa 4a04
     lsrs r0,r2,#0x18    @ 080268fc 100e
@@ -20125,12 +20505,12 @@ LAB_08026950:
     movs r0,#0xff    @ 0802695e ff20
     ands r1,r0    @ 08026960 0140
     lsls r1,r1,#0x7    @ 08026962 c901
-    ldr r0, DWORD_08026a18                   @ 08026964 2c48
+    ldr r0, step7_scene_ctx_anim_mask        @ 08026964 2c48
     ands r0,r2    @ 08026966 1040
     orrs r0,r1    @ 08026968 0843
     strh r0,[r4,#0xc]                        @ 0802696a a081
 LAB_0802696c:
-    ldr r4, DWORD_08026a10                   @ 0802696c 284c
+    ldr r4, step7_ptr_gprng                  @ 0802696c 284c
     movs r3,#0xa4    @ 0802696e a423
     lsls r3,r3,#0x1    @ 08026970 5b00
     adds r6,r4,r3    @ 08026972 e618
@@ -20139,7 +20519,7 @@ LAB_0802696c:
     ands r0,r5    @ 08026978 2840
     cmp r0,#0x0                              @ 0802697a 0028
     beq LAB_080269c4                         @ 0802697c 22d0
-    ldr r2, DWORD_08026a14                   @ 0802697e 254a
+    ldr r2, step7_ptr_gduelscenebase         @ 0802697e 254a
     movs r0,#0x7f    @ 08026980 7f20
     ldrb r1,[r2,#0xb]                        @ 08026982 d17a
     ands r0,r1    @ 08026984 0840
@@ -20165,9 +20545,9 @@ LAB_0802696c:
     lsls r2,r2,#0x1    @ 080269ac 5200
     adds r0,r4,r2    @ 080269ae a018
     strh r1,[r0,#0x0]                        @ 080269b0 0180
-    ldr r3, DWORD_08026a1c                   @ 080269b2 1a4b
+    ldr r3, step7_gprng_step_idx_off         @ 080269b2 1a4b
     adds r2,r4,r3    @ 080269b4 e218
-    ldr r0, DWORD_08026a20                   @ 080269b6 1a48
+    ldr r0, step7_gprng_step_ctr_mask        @ 080269b6 1a48
     ldrh r5,[r2,#0x0]                        @ 080269b8 1588
     ands r0,r5    @ 080269ba 2840
     adds r3,#0x7e    @ 080269bc 7e33
@@ -20183,13 +20563,13 @@ LAB_080269c4:
     bne LAB_080269d2                         @ 080269ce 00d1
     b SUB_08026714                           @ 080269d0 a0e6
 LAB_080269d2:
-    ldr r1, DWORD_08026a24                   @ 080269d2 1449
-    ldr r0, DWORD_08026a14                   @ 080269d4 0f48
+    ldr r1, step7_ewram_base                 @ 080269d2 1449
+    ldr r0, step7_ptr_gduelscenebase         @ 080269d4 0f48
     ldrh r0,[r0,#0xc]                        @ 080269d6 8089
     lsls r2,r0,#0x11    @ 080269d8 4204
     lsrs r3,r2,#0x1d    @ 080269da 530f
     lsls r3,r3,#0x2    @ 080269dc 9b00
-    ldr r6, DWORD_08026a28                   @ 080269de 124e
+    ldr r6, step7_gsettings_font_table_off   @ 080269de 124e
     adds r1,r1,r6    @ 080269e0 8919
     adds r3,r3,r1    @ 080269e2 5b18
     lsrs r2,r2,#0x18    @ 080269e4 120e
@@ -20205,29 +20585,29 @@ LAB_080269d2:
 LAB_080269f8:
     movs r0,#0x24    @ 080269f8 2420
     bl sync_state_and_init_sprite            @ 080269fa d3f05bf8
-    ldr r1, DWORD_08026a1c                   @ 080269fe 0749
+    ldr r1, step7_gprng_step_idx_off         @ 080269fe 0749
     adds r0,r4,r1    @ 08026a00 6018
-    ldr r1, DWORD_08026a20                   @ 08026a02 0749
+    ldr r1, step7_gprng_step_ctr_mask        @ 08026a02 0749
     ldrh r2,[r0,#0x0]                        @ 08026a04 0288
     ands r1,r2    @ 08026a06 1140
     movs r3,#0x80    @ 08026a08 8023
     lsls r3,r3,#0x1    @ 08026a0a 5b00
     adds r2,r3,#0x0    @ 08026a0c 1a1c
     b LAB_08026c56                           @ 08026a0e 22e1
-DWORD_08026a10:
+step7_ptr_gprng:
     .word  gPrng                          @ 08026a10 40000003
-DWORD_08026a14:
-    .word  0x02023360                     @ 08026a14 60330202
-DWORD_08026a18:
-    .word  0xffff807f                     @ 08026a18 7f80ffff
-DWORD_08026a1c:
-    .word  0x00000202                     @ 08026a1c 02020000
-DWORD_08026a20:
-    .word  0xffffc03f                     @ 08026a20 3fc0ffff
-DWORD_08026a24:
-    .word  0x02000000                     @ 08026a24 00000002
-DWORD_08026a28:
-    .word  0x000053f0                     @ 08026a28 f0530000
+step7_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026a14 60330202
+step7_scene_ctx_anim_mask:
+    .word  SCENE_CTX_ANIM_MASK            @ 08026a18 7f80ffff
+step7_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026a1c 02020000
+step7_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026a20 3fc0ffff
+step7_ewram_base:
+    .word  EWRAM_BASE                     @ 08026a24 00000002
+step7_gsettings_font_table_off:
+    .word  GSETTINGS_FONT_TABLE_OFF       @ 08026a28 f0530000
 
 @ Per-frame handler for campaign_scene_handler dispatch table index 10. Trigger: gPrng+0x202 bits[13:6] == 0x0a. Sequence: (1) call sync_state_and_init_sprite(1) to reset sprite state; (2) call game_str_id_to_row(0x0be4) and render_centered_text_to_bg_vram to render opponent card name row 1; (3) call write_tile_row_to_vram for separator tile row; (4) call game_str_id_to_row(0x0be5) and render_centered_text_to_bg_vram for row 2; (5) call write_tile_row_to_vram for second separator; (6) zero_fill_by_halfword(0x06000d80, 0x80) and zero_fill_by_halfword(0x06000900, 0x80); (7) clear scene_ctx+8 high bits with 0xff807fff mask; (8) increment gPrng+0x202 frame counter bits[13:6].
 @ 
@@ -20243,17 +20623,17 @@ DWORD_08026a28:
 run_campaign_step10_render_opponent_card_names:
     movs r0,#0x1    @ 08026a2c 0120
     bl sync_state_and_init_sprite            @ 08026a2e d3f041f8
-    ldr r0, DWORD_08026b34                   @ 08026a32 4048
+    ldr r0, step11_campaign_bg_tile_param_f  @ 08026a32 4048
     bl game_str_id_to_row                    @ 08026a34 cef0f0f9
-    ldr r4, DWORD_08026b38                   @ 08026a38 3f4c
+    ldr r4, step11_game_str_tbl_ptr          @ 08026a38 3f4c
     .hword 0x46a1    @ 08026a3a a146
     lsls r0,r0,#0x10    @ 08026a3c 0004
     lsrs r0,r0,#0x10    @ 08026a3e 000c
     lsls r1,r0,#0x1    @ 08026a40 4100
     adds r1,r1,r0    @ 08026a42 0918
     lsls r1,r1,#0x1    @ 08026a44 4900
-    ldr r4, DWORD_08026b3c                   @ 08026a46 3d4c
-    ldr r5, DWORD_08026b40                   @ 08026a48 3d4d
+    ldr r4, step11_ewram_base                @ 08026a46 3d4c
+    ldr r5, step11_gsettings_offset          @ 08026a48 3d4d
     adds r4,r4,r5    @ 08026a4a 6419
     ldrb r6,[r4,#0x0]                        @ 08026a4c 2678
     lsls r0,r6,#0x1d    @ 08026a4e 7007
@@ -20262,24 +20642,24 @@ run_campaign_step10_render_opponent_card_names:
     lsls r1,r1,#0x2    @ 08026a54 8900
     add r1,r9                                @ 08026a56 4944
     ldr r1,[r1,#0x0]                         @ 08026a58 0968
-    ldr r5, DWORD_08026b44                   @ 08026a5a 3a4d
+    ldr r5, step11_game_str_ja_ptr           @ 08026a5a 3a4d
     adds r1,r1,r5    @ 08026a5c 4919
-    ldr r0, DWORD_08026b48                   @ 08026a5e 3a48
+    ldr r0, step11_campaign_bg_tile_param_g  @ 08026a5e 3a48
     movs r6,#0x84    @ 08026a60 8426
     lsls r6,r6,#0x2    @ 08026a62 b600
-    ldr r2, DWORD_08026b4c                   @ 08026a64 394a
+    ldr r2, step11_duel_field_text_bg_width  @ 08026a64 394a
     .hword 0x4690    @ 08026a66 9046
     str r1,[sp,#0x0]                         @ 08026a68 0091
     movs r1,#0xb6    @ 08026a6a b621
     adds r2,r6,#0x0    @ 08026a6c 321c
     .hword 0x4643    @ 08026a6e 4346
     bl render_centered_text_to_bg_vram       @ 08026a70 fcf790ff
-    ldr r0, DWORD_08026b50                   @ 08026a74 3648
-    ldr r3, DWORD_08026b54                   @ 08026a76 374b
+    ldr r0, step11_campaign_bg_tile_param_h  @ 08026a74 3648
+    ldr r3, step11_gfx_src_d_ptr             @ 08026a76 374b
     movs r1,#0x20    @ 08026a78 2021
     movs r2,#0xf6    @ 08026a7a f622
     bl write_tile_row_to_vram                @ 08026a7c c7f066fa
-    ldr r0, DWORD_08026b58                   @ 08026a80 3548
+    ldr r0, step11_campaign_bg_tile_param_a  @ 08026a80 3548
     bl game_str_id_to_row                    @ 08026a82 cef0c9f9
     lsls r0,r0,#0x10    @ 08026a86 0004
     lsrs r0,r0,#0x10    @ 08026a88 000c
@@ -20294,31 +20674,31 @@ run_campaign_step10_render_opponent_card_names:
     add r1,r9                                @ 08026a9a 4944
     ldr r1,[r1,#0x0]                         @ 08026a9c 0968
     adds r1,r1,r5    @ 08026a9e 4919
-    ldr r0, DWORD_08026b5c                   @ 08026aa0 2e48
+    ldr r0, step11_campaign_bg_tile_param_b  @ 08026aa0 2e48
     str r1,[sp,#0x0]                         @ 08026aa2 0091
     movs r1,#0xd6    @ 08026aa4 d621
     adds r2,r6,#0x0    @ 08026aa6 321c
     .hword 0x4643    @ 08026aa8 4346
     bl render_centered_text_to_bg_vram       @ 08026aaa fcf773ff
-    ldr r0, DWORD_08026b60                   @ 08026aae 2c48
+    ldr r0, step11_campaign_bg_tile_param_c  @ 08026aae 2c48
     movs r2,#0x93    @ 08026ab0 9322
     lsls r2,r2,#0x1    @ 08026ab2 5200
-    ldr r3, DWORD_08026b64                   @ 08026ab4 2b4b
+    ldr r3, step11_gfx_src_e_ptr             @ 08026ab4 2b4b
     movs r1,#0x40    @ 08026ab6 4021
     bl write_tile_row_to_vram                @ 08026ab8 c7f048fa
-    ldr r0, DWORD_08026b68                   @ 08026abc 2a48
+    ldr r0, step11_campaign_vram_bg_tile_base_d @ 08026abc 2a48
     movs r1,#0x80    @ 08026abe 8021
     bl zero_fill_by_halfword                 @ 08026ac0 cef0d8f9
-    ldr r0, DWORD_08026b6c                   @ 08026ac4 2948
+    ldr r0, step11_campaign_vram_bg_tile_base_e @ 08026ac4 2948
     movs r1,#0x80    @ 08026ac6 8021
     bl zero_fill_by_halfword                 @ 08026ac8 cef0d4f9
-    ldr r2, DWORD_08026b70                   @ 08026acc 284a
+    ldr r2, step11_ptr_gduelscenebase        @ 08026acc 284a
     ldr r0,[r2,#0x8]                         @ 08026ace 9068
-    ldr r1, DWORD_08026b74                   @ 08026ad0 2849
+    ldr r1, step11_scene_ctx_timer_clear     @ 08026ad0 2849
     ands r0,r1    @ 08026ad2 0840
     str r0,[r2,#0x8]                         @ 08026ad4 9060
-    ldr r2, DWORD_08026b78                   @ 08026ad6 284a
-    ldr r3, DWORD_08026b7c                   @ 08026ad8 284b
+    ldr r2, step11_ptr_gprng                 @ 08026ad6 284a
+    ldr r3, step11_gprng_step_idx_off        @ 08026ad8 284b
     adds r2,r2,r3    @ 08026ada d218
     ldrh r3,[r2,#0x0]                        @ 08026adc 1388
     lsls r1,r3,#0x12    @ 08026ade 9904
@@ -20327,7 +20707,7 @@ run_campaign_step10_render_opponent_card_names:
     movs r0,#0xff    @ 08026ae4 ff20
     ands r1,r0    @ 08026ae6 0140
     lsls r1,r1,#0x6    @ 08026ae8 8901
-    ldr r0, DWORD_08026b80                   @ 08026aea 2548
+    ldr r0, step11_gprng_step_ctr_mask       @ 08026aea 2548
     ands r0,r3    @ 08026aec 1840
     orrs r0,r1    @ 08026aee 0843
     strh r0,[r2,#0x0]                        @ 08026af0 1080
@@ -20343,7 +20723,7 @@ run_campaign_step10_render_opponent_card_names:
 @ - mask_clear_timer = 0xff807fff
 @ - gPrng_step_ctr = gPrng+0x202 bits[13:6], mask = 0xffffc03f
 run_campaign_step11_anim_timer_tick:
-    ldr r4, DWORD_08026b70                   @ 08026af2 1f4c
+    ldr r4, step11_ptr_gduelscenebase        @ 08026af2 1f4c
     ldr r3,[r4,#0x8]                         @ 08026af4 a368
     movs r0,#0xff    @ 08026af6 ff20
     lsls r0,r0,#0xf    @ 08026af8 c003
@@ -20358,11 +20738,11 @@ run_campaign_step11_anim_timer_tick:
     movs r2,#0xff    @ 08026b0a ff22
     ands r1,r2    @ 08026b0c 1140
     lsls r1,r1,#0xf    @ 08026b0e c903
-    ldr r0, DWORD_08026b74                   @ 08026b10 1848
+    ldr r0, step11_scene_ctx_timer_clear     @ 08026b10 1848
     ands r0,r3    @ 08026b12 1840
     orrs r0,r1    @ 08026b14 0843
     str r0,[r4,#0x8]                         @ 08026b16 a060
-    ldr r1, DWORD_08026b84                   @ 08026b18 1a49
+    ldr r1, step11_anim_frame_tbl_ptr        @ 08026b18 1a49
     lsls r0,r0,#0x9    @ 08026b1a 4002
     lsrs r0,r0,#0x18    @ 08026b1c 000e
     lsls r0,r0,#0x2    @ 08026b1e 8000
@@ -20370,63 +20750,63 @@ run_campaign_step11_anim_timer_tick:
     ldr r1,[r0,#0x0]                         @ 08026b22 0168
     ands r1,r2    @ 08026b24 1140
     lsls r1,r1,#0x7    @ 08026b26 c901
-    ldr r0, DWORD_08026b88                   @ 08026b28 1748
+    ldr r0, step11_scene_ctx_anim_mask       @ 08026b28 1748
     ldrh r5,[r4,#0x8]                        @ 08026b2a 2589
     ands r0,r5    @ 08026b2c 2840
     orrs r0,r1    @ 08026b2e 0843
     strh r0,[r4,#0x8]                        @ 08026b30 2081
     b LAB_08026bb0                           @ 08026b32 3de0
-DWORD_08026b34:
-    .word  0x00000be4                     @ 08026b34 e40b0000
-DWORD_08026b38:
-    .word  game_str_pointer_table         @ 08026b38 400f0008
-DWORD_08026b3c:
-    .word  0x02000000                     @ 08026b3c 00000002
-DWORD_08026b40:
-    .word  0x00006c2c                     @ 08026b40 2c6c0000
-DWORD_08026b44:
-    .word  game_str_ja                    @ 08026b44 109cdb09
-DWORD_08026b48:
-    .word  0x00000707                     @ 08026b48 07070000
-DWORD_08026b4c:
-    .word  0x00000f09                     @ 08026b4c 090f0000
-DWORD_08026b50:
-    .word  0x00000b01                     @ 08026b50 010b0000
-DWORD_08026b54:
-    .word  0x09b953b4                     @ 08026b54 b453b909
-DWORD_08026b58:
-    .word  0x00000be5                     @ 08026b58 e50b0000
-DWORD_08026b5c:
-    .word  0x000007c7                     @ 08026b5c c7070000
-DWORD_08026b60:
-    .word  0x00000bc1                     @ 08026b60 c10b0000
-DWORD_08026b64:
-    .word  0x09b96514                     @ 08026b64 1465b909
-DWORD_08026b68:
-    .word  0x06000d80                     @ 08026b68 800d0006
-DWORD_08026b6c:
-    .word  0x06000900                     @ 08026b6c 00090006
-DWORD_08026b70:
-    .word  0x02023360                     @ 08026b70 60330202
-DWORD_08026b74:
-    .word  0xff807fff                     @ 08026b74 ff7f80ff
-DWORD_08026b78:
+step11_campaign_bg_tile_param_f:
+    .word  CAMPAIGN_BG_TILE_PARAM_F       @ 08026b34 e40b0000
+step11_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 08026b38 400f0008  0x08000f40: game_str_pointer_table ptr
+step11_ewram_base:
+    .word  EWRAM_BASE                     @ 08026b3c 00000002
+step11_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08026b40 2c6c0000
+step11_game_str_ja_ptr:
+    .word  game_str_ja                    @ 08026b44 109cdb09  0x09db9c10: game_str_ja ptr
+step11_campaign_bg_tile_param_g:
+    .word  CAMPAIGN_BG_TILE_PARAM_G       @ 08026b48 07070000
+step11_duel_field_text_bg_width:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 08026b4c 090f0000
+step11_campaign_bg_tile_param_h:
+    .word  CAMPAIGN_BG_TILE_PARAM_H       @ 08026b50 010b0000
+step11_gfx_src_d_ptr:
+    .word  0x09b953b4                     @ 08026b54 b453b909  0x09b953b4: gfx_src_d ROM ptr
+step11_campaign_bg_tile_param_a:
+    .word  CAMPAIGN_BG_TILE_PARAM_A       @ 08026b58 e50b0000
+step11_campaign_bg_tile_param_b:
+    .word  CAMPAIGN_BG_TILE_PARAM_B       @ 08026b5c c7070000
+step11_campaign_bg_tile_param_c:
+    .word  CAMPAIGN_BG_TILE_PARAM_C       @ 08026b60 c10b0000
+step11_gfx_src_e_ptr:
+    .word  0x09b96514                     @ 08026b64 1465b909  0x09b96514: gfx_src_e ROM ptr
+step11_campaign_vram_bg_tile_base_d:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE_D   @ 08026b68 800d0006
+step11_campaign_vram_bg_tile_base_e:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE_E   @ 08026b6c 00090006
+step11_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026b70 60330202
+step11_scene_ctx_timer_clear:
+    .word  SCENE_CTX_TIMER_CLEAR          @ 08026b74 ff7f80ff
+step11_ptr_gprng:
     .word  gPrng                          @ 08026b78 40000003
-DWORD_08026b7c:
-    .word  0x00000202                     @ 08026b7c 02020000
-DWORD_08026b80:
-    .word  0xffffc03f                     @ 08026b80 3fc0ffff
-DWORD_08026b84:
-    .word  0x09e59d18                     @ 08026b84 189de509
-DWORD_08026b88:
-    .word  0xffff807f                     @ 08026b88 7f80ffff
+step11_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026b7c 02020000
+step11_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026b80 3fc0ffff
+step11_anim_frame_tbl_ptr:
+    .word  0x09e59d18                     @ 08026b84 189de509  0x09e59d18: anim frame lookup table ptr
+step11_scene_ctx_anim_mask:
+    .word  SCENE_CTX_ANIM_MASK            @ 08026b88 7f80ffff
 LAB_08026b8c:
-    ldr r0, DWORD_08026bb8                   @ 08026b8c 0a48
+    ldr r0, step11_scene_ctx_anim_mask_1     @ 08026b8c 0a48
     ldrh r6,[r4,#0x8]                        @ 08026b8e 2689
     ands r0,r6    @ 08026b90 3040
     strh r0,[r4,#0x8]                        @ 08026b92 2081
-    ldr r2, DWORD_08026bbc                   @ 08026b94 094a
-    ldr r0, DWORD_08026bc0                   @ 08026b96 0a48
+    ldr r2, step11_ptr_gprng_1               @ 08026b94 094a
+    ldr r0, step11_gprng_step_idx_off_1      @ 08026b96 0a48
     adds r2,r2,r0    @ 08026b98 1218
     ldrh r3,[r2,#0x0]                        @ 08026b9a 1388
     lsls r1,r3,#0x12    @ 08026b9c 9904
@@ -20435,7 +20815,7 @@ LAB_08026b8c:
     movs r0,#0xff    @ 08026ba2 ff20
     ands r1,r0    @ 08026ba4 0140
     lsls r1,r1,#0x6    @ 08026ba6 8901
-    ldr r0, DWORD_08026bc4                   @ 08026ba8 0648
+    ldr r0, step11_gprng_step_ctr_mask_1     @ 08026ba8 0648
     ands r0,r3    @ 08026baa 1840
     orrs r0,r1    @ 08026bac 0843
     strh r0,[r2,#0x0]                        @ 08026bae 1080
@@ -20443,14 +20823,14 @@ LAB_08026bb0:
     bl render_opp_wins_display_oam           @ 08026bb0 fdf7b0fa
     b SUB_08026714                           @ 08026bb4 aee5
     .zero  0x2
-DWORD_08026bb8:
-    .word  0xffff807f                     @ 08026bb8 7f80ffff
-DWORD_08026bbc:
+step11_scene_ctx_anim_mask_1:
+    .word  SCENE_CTX_ANIM_MASK            @ 08026bb8 7f80ffff
+step11_ptr_gprng_1:
     .word  gPrng                          @ 08026bbc 40000003
-DWORD_08026bc0:
-    .word  0x00000202                     @ 08026bc0 02020000
-DWORD_08026bc4:
-    .word  0xffffc03f                     @ 08026bc4 3fc0ffff
+step11_gprng_step_idx_off_1:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026bc0 02020000
+step11_gprng_step_ctr_mask_1:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026bc4 3fc0ffff
 
 @ Pack name text renderer for campaign_scene_handler dispatch table index 12. Trigger: gPrng+0x202 bits[13:6] == 0x0c. Reads scene_ctx(0x02023360)+3 bits[4:3] as pack_count [0..3]. If pack_count==0 jumps to completion path. Otherwise loops r4=1..min(pack_count,3): calls game_str_id_to_row(r4+0xbe0) to get pack name string row, calls render_centered_text_to_bg_vram to draw centered text, calls write_tile_row_to_vram for separator tile. After loop calls render_opp_wins_display_oam, then tail-calls LAB_08026c56 (writes gPrng+0x202 scaler and jumps to SUB_08026714).
 @ 
@@ -20463,17 +20843,17 @@ DWORD_08026bc4:
 @ - tile_row_data=0x09b953b4
 run_campaign_step12_render_pack_name_rows:
     movs r4,#0x1    @ 08026bc8 0124
-    ldr r0, DWORD_08026c5c                   @ 08026bca 2448
+    ldr r0, step12_ptr_gduelscenebase        @ 08026bca 2448
     ldrb r0,[r0,#0x3]                        @ 08026bcc c078
     lsls r0,r0,#0x1b    @ 08026bce c006
     lsrs r0,r0,#0x1d    @ 08026bd0 400f
     cmp r4,r0                                @ 08026bd2 8442
     bge LAB_08026c44                         @ 08026bd4 36da
-    ldr r1, DWORD_08026c60                   @ 08026bd6 2249
+    ldr r1, step12_game_str_tbl_ptr          @ 08026bd6 2249
     .hword 0x4688    @ 08026bd8 8846
-    ldr r6, DWORD_08026c64                   @ 08026bda 224e
-    ldr r5, DWORD_08026c68                   @ 08026bdc 224d
-    ldr r7, DWORD_08026c6c                   @ 08026bde 234f
+    ldr r6, step12_scroll_param_a            @ 08026bda 224e
+    ldr r5, step12_scroll_param_b            @ 08026bdc 224d
+    ldr r7, step12_gsettings                 @ 08026bde 234f
 LAB_08026be0:
     movs r2,#0xbe    @ 08026be0 be22
     lsls r2,r2,#0x4    @ 08026be2 1201
@@ -20491,7 +20871,7 @@ LAB_08026be0:
     lsls r1,r1,#0x2    @ 08026bfc 8900
     add r1,r8                                @ 08026bfe 4144
     ldr r2,[r1,#0x0]                         @ 08026c00 0a68
-    ldr r0, DWORD_08026c70                   @ 08026c02 1b48
+    ldr r0, step12_game_str_ja_ptr           @ 08026c02 1b48
     adds r2,r2,r0    @ 08026c04 1218
     lsrs r0,r5,#0x10    @ 08026c06 280c
     lsls r1,r4,#0x15    @ 08026c08 6105
@@ -20502,19 +20882,19 @@ LAB_08026be0:
     str r2,[sp,#0x0]                         @ 08026c12 0092
     movs r2,#0x84    @ 08026c14 8422
     lsls r2,r2,#0x2    @ 08026c16 9200
-    ldr r3, DWORD_08026c74                   @ 08026c18 164b
+    ldr r3, step12_duel_field_text_bg_width  @ 08026c18 164b
     bl render_centered_text_to_bg_vram       @ 08026c1a fcf7bbfe
     lsrs r0,r6,#0x10    @ 08026c1e 300c
     movs r1,#0x20    @ 08026c20 2021
     movs r2,#0xf6    @ 08026c22 f622
-    ldr r3, DWORD_08026c78                   @ 08026c24 144b
+    ldr r3, step12_gfx_src_d_ptr             @ 08026c24 144b
     bl write_tile_row_to_vram                @ 08026c26 c7f091f9
     movs r0,#0xc0    @ 08026c2a c020
     lsls r0,r0,#0x10    @ 08026c2c 0004
     adds r6,r6,r0    @ 08026c2e 3618
     adds r5,r5,r0    @ 08026c30 2d18
     adds r4,#0x1    @ 08026c32 0134
-    ldr r0, DWORD_08026c5c                   @ 08026c34 0948
+    ldr r0, step12_ptr_gduelscenebase        @ 08026c34 0948
     ldrb r0,[r0,#0x3]                        @ 08026c36 c078
     lsls r0,r0,#0x1b    @ 08026c38 c006
     lsrs r0,r0,#0x1d    @ 08026c3a 400f
@@ -20524,10 +20904,10 @@ LAB_08026be0:
     ble LAB_08026be0                         @ 08026c42 cddd
 LAB_08026c44:
     bl render_opp_wins_display_oam           @ 08026c44 fdf766fa
-    ldr r0, DWORD_08026c7c                   @ 08026c48 0c48
-    ldr r1, DWORD_08026c80                   @ 08026c4a 0d49
+    ldr r0, step12_ptr_gprng                 @ 08026c48 0c48
+    ldr r1, step12_gprng_step_idx_off        @ 08026c4a 0d49
     adds r0,r0,r1    @ 08026c4c 4018
-    ldr r1, DWORD_08026c84                   @ 08026c4e 0d49
+    ldr r1, step12_gprng_step_ctr_mask       @ 08026c4e 0d49
     ldrh r2,[r0,#0x0]                        @ 08026c50 0288
     ands r1,r2    @ 08026c52 1140
     movs r2,#0x80    @ 08026c54 8022
@@ -20535,28 +20915,28 @@ LAB_08026c56:
     orrs r1,r2    @ 08026c56 1143
     strh r1,[r0,#0x0]                        @ 08026c58 0180
     b SUB_08026714                           @ 08026c5a 5be5
-DWORD_08026c5c:
-    .word  0x02023360                     @ 08026c5c 60330202
-DWORD_08026c60:
-    .word  game_str_pointer_table         @ 08026c60 400f0008
-DWORD_08026c64:
-    .word  0x08c10000                     @ 08026c64 0000c108
-DWORD_08026c68:
-    .word  0x04c70000                     @ 08026c68 0000c704
-DWORD_08026c6c:
+step12_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026c5c 60330202
+step12_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 08026c60 400f0008  0x08000f40: game_str_pointer_table ptr
+step12_scroll_param_a:
+    .word  0x08c10000                     @ 08026c64 0000c108  0x08c10000: scroll param A (med-conf)
+step12_scroll_param_b:
+    .word  0x04c70000                     @ 08026c68 0000c704  0x04c70000: scroll param B (med-conf)
+step12_gsettings:
     .word  gSettings                      @ 08026c6c 2c6c0002
-DWORD_08026c70:
-    .word  game_str_ja                    @ 08026c70 109cdb09
-DWORD_08026c74:
-    .word  0x00000f09                     @ 08026c74 090f0000
-DWORD_08026c78:
-    .word  0x09b953b4                     @ 08026c78 b453b909
-DWORD_08026c7c:
+step12_game_str_ja_ptr:
+    .word  game_str_ja                    @ 08026c70 109cdb09  0x09db9c10: game_str_ja ptr
+step12_duel_field_text_bg_width:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 08026c74 090f0000
+step12_gfx_src_d_ptr:
+    .word  0x09b953b4                     @ 08026c78 b453b909  0x09b953b4: gfx_src_d ROM ptr
+step12_ptr_gprng:
     .word  gPrng                          @ 08026c7c 40000003
-DWORD_08026c80:
-    .word  0x00000202                     @ 08026c80 02020000
-DWORD_08026c84:
-    .word  0xffffc03f                     @ 08026c84 3fc0ffff
+step12_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026c80 02020000
+step12_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026c84 3fc0ffff
 
 @ campaign_scene_handler (FUN_08025c94) dispatch table entry index 20, responsible for full initialization sequence before entering opponent card display screen. Trigger: scene state word gPrng+0x202 bits[13:6] == 0x14. Flow: (1) clear scene state word flag bits; (2) call init_campaign_bg_and_obj_vram for BG/OBJ VRAM global init; (3) extract slot type code bits[4:0] and call init_opponent_card_bg_vram(slot_type); (4) call init_duel_scroll_params; (5) compute and write IWRAM scroll params (0x02023360+0x23c = 0xfa*32 | slot_type); (6) write secondary IWRAM byte; (7) read font mode byte and look up font_jp_base_table to update font pointer; (8) branch on slot_type (0x19/0x1a or other): if neither, call card_name_lookup_by_internal_id + game_str_id_to_row + render_opponent_card_icon_and_name to render card name; (9) jump to LAB_08026df2 to write scene counter.
 @ 
@@ -20566,9 +20946,9 @@ DWORD_08026c84:
 @ - scroll base value = 0xfa*32 = 0x1f40
 @ - slot_type special values: 0x19 (empty slot branch A), 0x1a (empty slot branch B)
 run_campaign_step20_card_display_init:
-    ldr r4, DWORD_08026d4c                   @ 08026c88 304c
+    ldr r4, step20_ptr_gduelscenebase        @ 08026c88 304c
     ldr r0,[r4,#0x8]                         @ 08026c8a a068
-    ldr r1, DWORD_08026d50                   @ 08026c8c 3049
+    ldr r1, step20_scene_ctx_timer_clear     @ 08026c8c 3049
     ands r0,r1    @ 08026c8e 0840
     str r0,[r4,#0x8]                         @ 08026c90 a060
     bl init_campaign_bg_and_obj_vram         @ 08026c92 06f0eff9
@@ -20577,7 +20957,7 @@ run_campaign_step20_card_display_init:
     lsrs r0,r0,#0x1b    @ 08026c9a c00e
     bl init_opponent_card_bg_vram            @ 08026c9c 06f080fa
     bl init_duel_scroll_params               @ 08026ca0 06f0f4fb
-    ldr r2, DWORD_08026d54                   @ 08026ca4 2b4a
+    ldr r2, step20_ptr_gprng                 @ 08026ca4 2b4a
     ldrb r5,[r4,#0x2]                        @ 08026ca6 a578
     lsls r1,r5,#0x1b    @ 08026ca8 e906
     lsrs r1,r1,#0x1b    @ 08026caa c90e
@@ -20590,11 +20970,11 @@ run_campaign_step20_card_display_init:
     adds r3,r3,r2    @ 08026cb8 9b18
     .hword 0x469a    @ 08026cba 9a46
     strh r0,[r3,#0x0]                        @ 08026cbc 1880
-    ldr r5, DWORD_08026d58                   @ 08026cbe 264d
+    ldr r5, step20_gprng_pack_frame_off_23e  @ 08026cbe 264d
     adds r7,r2,r5    @ 08026cc0 5719
     strb r1,[r7,#0x0]                        @ 08026cc2 3970
-    ldr r6, DWORD_08026d5c                   @ 08026cc4 254e
-    ldr r0, DWORD_08026d60                   @ 08026cc6 2648
+    ldr r6, step20_ewram_base                @ 08026cc4 254e
+    ldr r0, step20_duel_scene_field_off_6e57 @ 08026cc6 2648
     adds r0,r0,r6    @ 08026cc8 8019
     .hword 0x4681    @ 08026cca 8146
     ldrb r2,[r0,#0x0]                        @ 08026ccc 0278
@@ -20602,16 +20982,16 @@ run_campaign_step20_card_display_init:
     lsrs r1,r1,#0x1c    @ 08026cd0 090f
     lsls r2,r2,#0x1d    @ 08026cd2 5207
     lsrs r2,r2,#0x1d    @ 08026cd4 520f
-    ldr r3, DWORD_08026d64                   @ 08026cd6 234b
+    ldr r3, step20_campaign_duelist_name_row_a @ 08026cd6 234b
     adds r3,r3,r6    @ 08026cd8 9b19
     .hword 0x4698    @ 08026cda 9846
     ldrb r0,[r3,#0x0]                        @ 08026cdc 1878
     str r0,[sp,#0x0]                         @ 08026cde 0090
-    ldr r0, DWORD_08026d68                   @ 08026ce0 2148
+    ldr r0, step20_campaign_duelist_name_row_b @ 08026ce0 2148
     adds r5,r6,r0    @ 08026ce2 3518
     str r5,[sp,#0x4]                         @ 08026ce4 0195
     movs r0,#0x0    @ 08026ce6 0020
-    ldr r3, DWORD_08026d6c                   @ 08026ce8 204b
+    ldr r3, step20_gplayername               @ 08026ce8 204b
     bl render_opponent_card_icon_and_name    @ 08026cea 06f0a5fc
     ldrb r1,[r4,#0x2]                        @ 08026cee a178
     lsls r0,r1,#0x1b    @ 08026cf0 c806
@@ -20620,7 +21000,7 @@ run_campaign_step20_card_display_init:
     beq LAB_08026d80                         @ 08026cf6 43d0
     cmp r0,#0x1a                             @ 08026cf8 1a28
     beq LAB_08026da4                         @ 08026cfa 53d0
-    ldr r4, DWORD_08026d70                   @ 08026cfc 1c4c
+    ldr r4, step20_deck_rec_tbl_ptr          @ 08026cfc 1c4c
     ldrb r2,[r7,#0x0]                        @ 08026cfe 3a78
     lsls r0,r2,#0x5    @ 08026d00 5001
     adds r0,r0,r4    @ 08026d02 0019
@@ -20632,13 +21012,13 @@ run_campaign_step20_card_display_init:
     adds r0,r0,r4    @ 08026d10 0019
     ldrh r0,[r0,#0x4]                        @ 08026d12 8088
     bl game_str_id_to_row                    @ 08026d14 cef080f8
-    ldr r2, DWORD_08026d74                   @ 08026d18 164a
+    ldr r2, step20_game_str_tbl_ptr          @ 08026d18 164a
     lsls r0,r0,#0x10    @ 08026d1a 0004
     lsrs r0,r0,#0x10    @ 08026d1c 000c
     lsls r1,r0,#0x1    @ 08026d1e 4100
     adds r1,r1,r0    @ 08026d20 0918
     lsls r1,r1,#0x1    @ 08026d22 4900
-    ldr r3, DWORD_08026d78                   @ 08026d24 144b
+    ldr r3, step20_gsettings_offset          @ 08026d24 144b
     adds r0,r6,r3    @ 08026d26 f018
     ldrb r0,[r0,#0x0]                        @ 08026d28 0078
     lsls r4,r0,#0x1d    @ 08026d2a 4407
@@ -20647,7 +21027,7 @@ run_campaign_step20_card_display_init:
     lsls r1,r1,#0x2    @ 08026d30 8900
     adds r1,r1,r2    @ 08026d32 8918
     ldr r3,[r1,#0x0]                         @ 08026d34 0b68
-    ldr r0, DWORD_08026d7c                   @ 08026d36 1148
+    ldr r0, step20_game_str_ja_ptr           @ 08026d36 1148
     adds r3,r3,r0    @ 08026d38 1b18
     .hword 0x4656    @ 08026d3a 5646
     ldrh r1,[r6,#0x0]                        @ 08026d3c 3188
@@ -20658,32 +21038,32 @@ run_campaign_step20_card_display_init:
     movs r0,#0x1    @ 08026d46 0120
     adds r3,r5,#0x0    @ 08026d48 2b1c
     b LAB_08026df2                           @ 08026d4a 52e0
-DWORD_08026d4c:
-    .word  0x02023360                     @ 08026d4c 60330202
-DWORD_08026d50:
-    .word  0xff807fff                     @ 08026d50 ff7f80ff
-DWORD_08026d54:
+step20_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08026d4c 60330202
+step20_scene_ctx_timer_clear:
+    .word  SCENE_CTX_TIMER_CLEAR          @ 08026d50 ff7f80ff
+step20_ptr_gprng:
     .word  gPrng                          @ 08026d54 40000003
-DWORD_08026d58:
-    .word  0x0000023e                     @ 08026d58 3e020000
-DWORD_08026d5c:
-    .word  0x02000000                     @ 08026d5c 00000002
-DWORD_08026d60:
-    .word  0x00006e57                     @ 08026d60 576e0000
-DWORD_08026d64:
-    .word  0x0000114f                     @ 08026d64 4f110000
-DWORD_08026d68:
-    .word  0x00001138                     @ 08026d68 38110000
-DWORD_08026d6c:
+step20_gprng_pack_frame_off_23e:
+    .word  GPRNG_PACK_FRAME_OFF_23E       @ 08026d58 3e020000
+step20_ewram_base:
+    .word  EWRAM_BASE                     @ 08026d5c 00000002
+step20_duel_scene_field_off_6e57:
+    .word  DUEL_SCENE_FIELD_OFF_6E57      @ 08026d60 576e0000
+step20_campaign_duelist_name_row_a:
+    .word  CAMPAIGN_DUELIST_NAME_ROW_A    @ 08026d64 4f110000
+step20_campaign_duelist_name_row_b:
+    .word  CAMPAIGN_DUELIST_NAME_ROW_B    @ 08026d68 38110000
+step20_gplayername:
     .word  gPlayerName                    @ 08026d6c 486e0002
-DWORD_08026d70:
-    .word  deck_record_table              @ 08026d70 0c8de509
-DWORD_08026d74:
-    .word  game_str_pointer_table         @ 08026d74 400f0008
-DWORD_08026d78:
-    .word  0x00006c2c                     @ 08026d78 2c6c0000
-DWORD_08026d7c:
-    .word  game_str_ja                    @ 08026d7c 109cdb09
+step20_deck_rec_tbl_ptr:
+    .word  deck_record_table              @ 08026d70 0c8de509  0x09e58d0c: deck_record_table ptr
+step20_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 08026d74 400f0008  0x08000f40: game_str_pointer_table ptr
+step20_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08026d78 2c6c0000
+step20_game_str_ja_ptr:
+    .word  game_str_ja                    @ 08026d7c 109cdb09  0x09db9c10: game_str_ja ptr
 LAB_08026d80:
     .hword 0x4648    @ 08026d80 4846
     ldrb r2,[r0,#0x0]                        @ 08026d82 0278
@@ -20696,14 +21076,14 @@ LAB_08026d80:
     str r0,[sp,#0x0]                         @ 08026d90 0090
     str r5,[sp,#0x4]                         @ 08026d92 0195
     movs r0,#0x1    @ 08026d94 0120
-    ldr r3, DWORD_08026da0                   @ 08026d96 024b
+    ldr r3, step20_gplayername_1             @ 08026d96 024b
     bl render_opponent_card_icon_and_name    @ 08026d98 06f04efc
     b LAB_08026df6                           @ 08026d9c 2be0
     .zero  0x2
-DWORD_08026da0:
+step20_gplayername_1:
     .word  gPlayerName                    @ 08026da0 486e0002
 LAB_08026da4:
-    ldr r1, DWORD_08026e44                   @ 08026da4 2749
+    ldr r1, step20_deck_rec_tbl_ptr_b        @ 08026da4 2749
     ldrb r7,[r7,#0x0]                        @ 08026da6 3f78
     lsls r0,r7,#0x5    @ 08026da8 7801
     adds r0,r0,r1    @ 08026daa 4018
@@ -20712,7 +21092,7 @@ LAB_08026da4:
     adds r3,r0,#0x0    @ 08026db2 031c
     .hword 0x4655    @ 08026db4 5546
     ldrh r1,[r5,#0x0]                        @ 08026db6 2988
-    ldr r2, DWORD_08026e48                   @ 08026db8 234a
+    ldr r2, step20_gsettings_offset_1        @ 08026db8 234a
     adds r0,r6,r2    @ 08026dba b018
     ldrb r0,[r0,#0x0]                        @ 08026dbc 0078
     lsls r2,r0,#0x1d    @ 08026dbe 4207
@@ -20726,7 +21106,7 @@ LAB_08026da4:
     subs r0,r0,r4    @ 08026dce 001b
     lsls r0,r0,#0x3    @ 08026dd0 c000
     adds r0,r0,r6    @ 08026dd2 8019
-    ldr r4, DWORD_08026e4c                   @ 08026dd4 1d4c
+    ldr r4, step20_gsettings_text_field_b_off @ 08026dd4 1d4c
     adds r0,r0,r4    @ 08026dd6 0019
     ldrb r0,[r0,#0x0]                        @ 08026dd8 0078
     str r0,[sp,#0x0]                         @ 08026dda 0090
@@ -20736,7 +21116,7 @@ LAB_08026da4:
     lsls r0,r0,#0x2    @ 08026de2 8000
     subs r0,r0,r5    @ 08026de4 401b
     lsls r0,r0,#0x3    @ 08026de6 c000
-    ldr r5, DWORD_08026e50                   @ 08026de8 194d
+    ldr r5, step20_gsettings_text_field_a_off @ 08026de8 194d
     adds r4,r6,r5    @ 08026dea 7419
     adds r0,r0,r4    @ 08026dec 0019
     str r0,[sp,#0x4]                         @ 08026dee 0190
@@ -20744,7 +21124,7 @@ LAB_08026da4:
 LAB_08026df2:
     bl render_opponent_card_icon_and_name    @ 08026df2 06f021fc
 LAB_08026df6:
-    ldr r1, DWORD_08026e54                   @ 08026df6 1749
+    ldr r1, step20_ptr_gduelscenebase_1      @ 08026df6 1749
     adds r1,#0x39    @ 08026df8 3931
     movs r0,#0x21    @ 08026dfa 2120
     rsbs r0,r0,#0    @ 08026dfc 4042
@@ -20753,8 +21133,8 @@ LAB_08026df6:
     strb r0,[r1,#0x0]                        @ 08026e02 0870
     movs r0,#0x0    @ 08026e04 0020
     bl draw_card_name_label_to_sprite_vram   @ 08026e06 06f0c1fb
-    ldr r2, DWORD_08026e58                   @ 08026e0a 134a
-    ldr r0, DWORD_08026e5c                   @ 08026e0c 1348
+    ldr r2, step20_ptr_gprng_1               @ 08026e0a 134a
+    ldr r0, step20_gprng_frame_ctrl_off_203  @ 08026e0c 1348
     adds r1,r2,r0    @ 08026e0e 1118
     movs r0,#0x3f    @ 08026e10 3f20
     ldrb r3,[r1,#0x0]                        @ 08026e12 0b78
@@ -20768,7 +21148,7 @@ LAB_08026df6:
     ldrb r5,[r1,#0x0]                        @ 08026e22 0d78
     ands r0,r5    @ 08026e24 2840
     strb r0,[r1,#0x0]                        @ 08026e26 0870
-    ldr r6, DWORD_08026e60                   @ 08026e28 0d4e
+    ldr r6, step20_gprng_step_idx_off        @ 08026e28 0d4e
     adds r2,r2,r6    @ 08026e2a 9219
     ldrh r3,[r2,#0x0]                        @ 08026e2c 1388
     lsls r1,r3,#0x12    @ 08026e2e 9904
@@ -20777,28 +21157,28 @@ LAB_08026df6:
     movs r0,#0xff    @ 08026e34 ff20
     ands r1,r0    @ 08026e36 0140
     lsls r1,r1,#0x6    @ 08026e38 8901
-    ldr r0, DWORD_08026e64                   @ 08026e3a 0a48
+    ldr r0, step20_gprng_step_ctr_mask       @ 08026e3a 0a48
     ands r0,r3    @ 08026e3c 1840
     bl SUB_08027c22                          @ 08026e3e 00f0f0fe
     movs r0,r0    @ 08026e42 0000
-DWORD_08026e44:
-    .word  deck_record_table              @ 08026e44 0c8de509
-DWORD_08026e48:
-    .word  0x00006c2c                     @ 08026e48 2c6c0000
-DWORD_08026e4c:
-    .word  0x00001267                     @ 08026e4c 67120000
-DWORD_08026e50:
-    .word  0x00001250                     @ 08026e50 50120000
-DWORD_08026e54:
-    .word  0x02023360                     @ 08026e54 60330202
-DWORD_08026e58:
+step20_deck_rec_tbl_ptr_b:
+    .word  deck_record_table              @ 08026e44 0c8de509  0x09e58d0c: deck_record_table ptr 2nd ref
+step20_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08026e48 2c6c0000
+step20_gsettings_text_field_b_off:
+    .word  GSETTINGS_TEXT_FIELD_B_OFF     @ 08026e4c 67120000
+step20_gsettings_text_field_a_off:
+    .word  GSETTINGS_TEXT_FIELD_A_OFF     @ 08026e50 50120000
+step20_ptr_gduelscenebase_1:
+    .word  gDuelSceneBase                 @ 08026e54 60330202
+step20_ptr_gprng_1:
     .word  gPrng                          @ 08026e58 40000003
-DWORD_08026e5c:
-    .word  0x00000203                     @ 08026e5c 03020000
-DWORD_08026e60:
-    .word  0x00000202                     @ 08026e60 02020000
-DWORD_08026e64:
-    .word  0xffffc03f                     @ 08026e64 3fc0ffff
+step20_gprng_frame_ctrl_off_203:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 08026e5c 03020000
+step20_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026e60 02020000
+step20_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026e64 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 21. Trigger: gPrng+0x202 bits[13:6] == 0x15. Sequence: (1) bl tick_aob_display_with_sprite_enable_blend; (2) if r0 == 0 (blend not complete): b SUB_08026714 to wait; (3) if r0 != 0 (blend complete): reads gPrng+0x202, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 22. Note: tick_aob_display_with_sprite_enable_blend exits via pop{r1};bx r1, r0 comes from tick_blend_step_by_delta return (0=not done, 1=done).
 @ 
@@ -20810,8 +21190,8 @@ run_campaign_step21_aob_sprite_blend_tick:
     bne LAB_08026e72                         @ 08026e6e 00d1
     b SUB_08026714                           @ 08026e70 50e4
 LAB_08026e72:
-    ldr r2, DWORD_08026e90                   @ 08026e72 074a
-    ldr r0, DWORD_08026e94                   @ 08026e74 0748
+    ldr r2, step21_ptr_gprng                 @ 08026e72 074a
+    ldr r0, step21_gprng_step_idx_off        @ 08026e74 0748
     adds r2,r2,r0    @ 08026e76 1218
     ldrh r3,[r2,#0x0]                        @ 08026e78 1388
     lsls r1,r3,#0x12    @ 08026e7a 9904
@@ -20820,17 +21200,17 @@ LAB_08026e72:
     movs r0,#0xff    @ 08026e80 ff20
     ands r1,r0    @ 08026e82 0140
     lsls r1,r1,#0x6    @ 08026e84 8901
-    ldr r0, DWORD_08026e98                   @ 08026e86 0448
+    ldr r0, step21_gprng_step_ctr_mask       @ 08026e86 0448
     ands r0,r3    @ 08026e88 1840
     orrs r0,r1    @ 08026e8a 0843
     strh r0,[r2,#0x0]                        @ 08026e8c 1080
     b SUB_08026714                           @ 08026e8e 41e4
-DWORD_08026e90:
+step21_ptr_gprng:
     .word  gPrng                          @ 08026e90 40000003
-DWORD_08026e94:
-    .word  0x00000202                     @ 08026e94 02020000
-DWORD_08026e98:
-    .word  0xffffc03f                     @ 08026e98 3fc0ffff
+step21_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026e94 02020000
+step21_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026e98 3fc0ffff
 
 @ campaign_scene_handler dispatch table entry index 22, opponent card AOB animation display phase per-frame tick. Calls tick_opponent_aob_by_phase (FUN_0802d4bc) for frame update; if return is 0 (animation not finished) tail-jumps via b SUB_08026714 to advance scene state machine; if nonzero continues with subsequent dispatch logic (display type selection / label render / state advance).
 @ 
@@ -20842,8 +21222,8 @@ run_campaign_step22_aob_tick:
     bne LAB_08026ea6                         @ 08026ea2 00d1
     b SUB_08026714                           @ 08026ea4 36e4
 LAB_08026ea6:
-    ldr r0, DWORD_08026ed0                   @ 08026ea6 0a48
-    ldr r1, DWORD_08026ed4                   @ 08026ea8 0a49
+    ldr r0, step22_ewram_base                @ 08026ea6 0a48
+    ldr r1, step22_gsettings_offset          @ 08026ea8 0a49
     adds r0,r0,r1    @ 08026eaa 4018
     movs r1,#0x7    @ 08026eac 0721
     ldrb r0,[r0,#0x0]                        @ 08026eae 0078
@@ -20856,42 +21236,42 @@ LAB_08026ea6:
     beq LAB_08026ee8                         @ 08026ebc 14d0
     cmp r1,#0x4                              @ 08026ebe 0429
     beq LAB_08026ee0                         @ 08026ec0 0ed0
-    ldr r0, DWORD_08026ed8                   @ 08026ec2 0548
+    ldr r0, step22_aob_font5_base_a          @ 08026ec2 0548
     cmp r1,#0x5                              @ 08026ec4 0529
     bne LAB_08026efa                         @ 08026ec6 18d1
-    ldr r2, DWORD_08026edc                   @ 08026ec8 044a
+    ldr r2, step22_aob_font5_off_a           @ 08026ec8 044a
     adds r0,r0,r2    @ 08026eca 8018
     b LAB_08026efa                           @ 08026ecc 15e0
     .zero  0x2
-DWORD_08026ed0:
-    .word  0x02000000                     @ 08026ed0 00000002
-DWORD_08026ed4:
-    .word  0x00006c2c                     @ 08026ed4 2c6c0000
-DWORD_08026ed8:
-    .word  0x09dba750                     @ 08026ed8 50a7db09
-DWORD_08026edc:
-    .word  0x0003a30c                     @ 08026edc 0ca30300
+step22_ewram_base:
+    .word  EWRAM_BASE                     @ 08026ed0 00000002
+step22_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08026ed4 2c6c0000
+step22_aob_font5_base_a:
+    .word  0x09dba750                     @ 08026ed8 50a7db09  0x09dba750
+step22_aob_font5_off_a:
+    .word  0x0003a30c                     @ 08026edc 0ca30300  0x0003a30c
 LAB_08026ee0:
-    ldr r0, DWORD_08026ee4                   @ 08026ee0 0048
+    ldr r0, step22_aob_font4_ptr_a           @ 08026ee0 0048
     b LAB_08026efa                           @ 08026ee2 0ae0
-DWORD_08026ee4:
-    .word  0x09de8ab2                     @ 08026ee4 b28ade09
+step22_aob_font4_ptr_a:
+    .word  0x09de8ab2                     @ 08026ee4 b28ade09  0x09de8ab2
 LAB_08026ee8:
-    ldr r0, DWORD_08026eec                   @ 08026ee8 0048
+    ldr r0, step22_aob_font3_ptr_a           @ 08026ee8 0048
     b LAB_08026efa                           @ 08026eea 06e0
-DWORD_08026eec:
-    .word  0x09ddc6cc                     @ 08026eec ccc6dd09
+step22_aob_font3_ptr_a:
+    .word  0x09ddc6cc                     @ 08026eec ccc6dd09  0x09ddc6cc
 LAB_08026ef0:
-    ldr r0, DWORD_08026ef4                   @ 08026ef0 0048
+    ldr r0, step22_aob_font2_ptr_a           @ 08026ef0 0048
     b LAB_08026efa                           @ 08026ef2 02e0
-DWORD_08026ef4:
-    .word  0x09dd037a                     @ 08026ef4 7a03dd09
+step22_aob_font2_ptr_a:
+    .word  0x09dd037a                     @ 08026ef4 7a03dd09  0x09dd037a
 LAB_08026ef8:
-    ldr r0, DWORD_08026f28                   @ 08026ef8 0b48
+    ldr r0, step22_aob_font1_ptr_a           @ 08026ef8 0b48
 LAB_08026efa:
     bl draw_card_name_label_to_sprite_vram   @ 08026efa 06f047fb
-    ldr r0, DWORD_08026f2c                   @ 08026efe 0b48
-    ldr r3, DWORD_08026f30                   @ 08026f00 0b4b
+    ldr r0, step22_ewram_base_1              @ 08026efe 0b48
+    ldr r3, step22_gsettings_offset_1        @ 08026f00 0b4b
     adds r0,r0,r3    @ 08026f02 c018
     movs r2,#0x7    @ 08026f04 0722
     ldrb r0,[r0,#0x0]                        @ 08026f06 0078
@@ -20904,43 +21284,43 @@ LAB_08026efa:
     beq LAB_08026f44                         @ 08026f14 16d0
     cmp r2,#0x4                              @ 08026f16 042a
     beq LAB_08026f3c                         @ 08026f18 10d0
-    ldr r1, DWORD_08026f34                   @ 08026f1a 0649
+    ldr r1, step22_aob_font5_base_b          @ 08026f1a 0649
     cmp r2,#0x5                              @ 08026f1c 052a
     bne LAB_08026f56                         @ 08026f1e 1ad1
-    ldr r4, DWORD_08026f38                   @ 08026f20 054c
+    ldr r4, step22_aob_font5_off_b           @ 08026f20 054c
     adds r1,r1,r4    @ 08026f22 0919
     b LAB_08026f56                           @ 08026f24 17e0
     .zero  0x2
-DWORD_08026f28:
-    .word  0x09dc53d6                     @ 08026f28 d653dc09
-DWORD_08026f2c:
-    .word  0x02000000                     @ 08026f2c 00000002
-DWORD_08026f30:
-    .word  0x00006c2c                     @ 08026f30 2c6c0000
-DWORD_08026f34:
-    .word  0x09dbd7cc                     @ 08026f34 ccd7db09
-DWORD_08026f38:
-    .word  0x0003a910                     @ 08026f38 10a90300
+step22_aob_font1_ptr_a:
+    .word  0x09dc53d6                     @ 08026f28 d653dc09  0x09dc53d6
+step22_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08026f2c 00000002
+step22_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08026f30 2c6c0000
+step22_aob_font5_base_b:
+    .word  0x09dbd7cc                     @ 08026f34 ccd7db09  0x09dbd7cc
+step22_aob_font5_off_b:
+    .word  0x0003a910                     @ 08026f38 10a90300  0x0003a910
 LAB_08026f3c:
-    ldr r1, DWORD_08026f40                   @ 08026f3c 0049
+    ldr r1, step22_aob_font4_ptr_b           @ 08026f3c 0049
     b LAB_08026f56                           @ 08026f3e 0ae0
-DWORD_08026f40:
-    .word  0x09dec2c6                     @ 08026f40 c6c2de09
+step22_aob_font4_ptr_b:
+    .word  0x09dec2c6                     @ 08026f40 c6c2de09  0x09dec2c6
 LAB_08026f44:
-    ldr r1, DWORD_08026f48                   @ 08026f44 0049
+    ldr r1, step22_aob_font3_ptr_b           @ 08026f44 0049
     b LAB_08026f56                           @ 08026f46 06e0
-DWORD_08026f48:
-    .word  0x09ddffc8                     @ 08026f48 c8ffdd09
+step22_aob_font3_ptr_b:
+    .word  0x09ddffc8                     @ 08026f48 c8ffdd09  0x09ddffc8
 LAB_08026f4c:
-    ldr r1, DWORD_08026f50                   @ 08026f4c 0049
+    ldr r1, step22_aob_font2_ptr_b           @ 08026f4c 0049
     b LAB_08026f56                           @ 08026f4e 02e0
-DWORD_08026f50:
-    .word  0x09dd3cec                     @ 08026f50 ec3cdd09
+step22_aob_font2_ptr_b:
+    .word  0x09dd3cec                     @ 08026f50 ec3cdd09  0x09dd3cec
 LAB_08026f54:
-    ldr r1, DWORD_08026f80                   @ 08026f54 0a49
+    ldr r1, step22_aob_font1_ptr_b           @ 08026f54 0a49
 LAB_08026f56:
-    ldr r0, DWORD_08026f84                   @ 08026f56 0b48
-    ldr r5, DWORD_08026f88                   @ 08026f58 0b4d
+    ldr r0, step22_ewram_base_2              @ 08026f56 0b48
+    ldr r5, step22_gsettings_offset_2        @ 08026f58 0b4d
     adds r0,r0,r5    @ 08026f5a 4019
     movs r3,#0x7    @ 08026f5c 0723
     ldrb r0,[r0,#0x0]                        @ 08026f5e 0078
@@ -20953,45 +21333,45 @@ LAB_08026f56:
     beq LAB_08026f9c                         @ 08026f6c 16d0
     cmp r3,#0x4                              @ 08026f6e 042b
     beq LAB_08026f94                         @ 08026f70 10d0
-    ldr r2, DWORD_08026f8c                   @ 08026f72 064a
+    ldr r2, step22_aob_font5_base_c          @ 08026f72 064a
     cmp r3,#0x5                              @ 08026f74 052b
     bne LAB_08026fae                         @ 08026f76 1ad1
-    ldr r6, DWORD_08026f90                   @ 08026f78 054e
+    ldr r6, step22_aob_font5_off_c           @ 08026f78 054e
     adds r2,r2,r6    @ 08026f7a 9219
     b LAB_08026fae                           @ 08026f7c 17e0
     .zero  0x2
-DWORD_08026f80:
-    .word  0x09dc882a                     @ 08026f80 2a88dc09
-DWORD_08026f84:
-    .word  0x02000000                     @ 08026f84 00000002
-DWORD_08026f88:
-    .word  0x00006c2c                     @ 08026f88 2c6c0000
-DWORD_08026f8c:
-    .word  0x09dbd7d4                     @ 08026f8c d4d7db09
-DWORD_08026f90:
-    .word  0x0003a90e                     @ 08026f90 0ea90300
+step22_aob_font1_ptr_b:
+    .word  0x09dc882a                     @ 08026f80 2a88dc09  0x09dc882a
+step22_ewram_base_2:
+    .word  EWRAM_BASE                     @ 08026f84 00000002
+step22_gsettings_offset_2:
+    .word  GSETTINGS_OFFSET               @ 08026f88 2c6c0000
+step22_aob_font5_base_c:
+    .word  0x09dbd7d4                     @ 08026f8c d4d7db09  0x09dbd7d4
+step22_aob_font5_off_c:
+    .word  0x0003a90e                     @ 08026f90 0ea90300  0x0003a90e
 LAB_08026f94:
-    ldr r2, DWORD_08026f98                   @ 08026f94 004a
+    ldr r2, step22_aob_font4_ptr_c           @ 08026f94 004a
     b LAB_08026fae                           @ 08026f96 0ae0
-DWORD_08026f98:
-    .word  0x09dec2cc                     @ 08026f98 ccc2de09
+step22_aob_font4_ptr_c:
+    .word  0x09dec2cc                     @ 08026f98 ccc2de09  0x09dec2cc
 LAB_08026f9c:
-    ldr r2, DWORD_08026fa0                   @ 08026f9c 004a
+    ldr r2, step22_aob_font3_ptr_c           @ 08026f9c 004a
     b LAB_08026fae                           @ 08026f9e 06e0
-DWORD_08026fa0:
-    .word  0x09ddffce                     @ 08026fa0 ceffdd09
+step22_aob_font3_ptr_c:
+    .word  0x09ddffce                     @ 08026fa0 ceffdd09  0x09ddffce
 LAB_08026fa4:
-    ldr r2, DWORD_08026fa8                   @ 08026fa4 004a
+    ldr r2, step22_aob_font2_ptr_c           @ 08026fa4 004a
     b LAB_08026fae                           @ 08026fa6 02e0
-DWORD_08026fa8:
-    .word  0x09dd3cf2                     @ 08026fa8 f23cdd09
+step22_aob_font2_ptr_c:
+    .word  0x09dd3cf2                     @ 08026fa8 f23cdd09  0x09dd3cf2
 LAB_08026fac:
-    ldr r2, DWORD_08026fd4                   @ 08026fac 094a
+    ldr r2, step22_aob_font1_ptr_c           @ 08026fac 094a
 LAB_08026fae:
     movs r0,#0x3    @ 08026fae 0320
     bl setup_label_render_ctx                @ 08026fb0 06f08cfd
-    ldr r2, DWORD_08026fd8                   @ 08026fb4 084a
-    ldr r0, DWORD_08026fdc                   @ 08026fb6 0948
+    ldr r2, step22_ptr_gprng                 @ 08026fb4 084a
+    ldr r0, step22_gprng_step_idx_off        @ 08026fb6 0948
     adds r2,r2,r0    @ 08026fb8 1218
     ldrh r3,[r2,#0x0]                        @ 08026fba 1388
     lsls r1,r3,#0x12    @ 08026fbc 9904
@@ -21000,19 +21380,19 @@ LAB_08026fae:
     movs r0,#0xff    @ 08026fc2 ff20
     ands r1,r0    @ 08026fc4 0140
     lsls r1,r1,#0x6    @ 08026fc6 8901
-    ldr r0, DWORD_08026fe0                   @ 08026fc8 0548
+    ldr r0, step22_gprng_step_ctr_mask       @ 08026fc8 0548
     ands r0,r3    @ 08026fca 1840
     orrs r0,r1    @ 08026fcc 0843
     strh r0,[r2,#0x0]                        @ 08026fce 1080
     bl SUB_08026714                          @ 08026fd0 fff7a0fb
-DWORD_08026fd4:
-    .word  0x09dc8830                     @ 08026fd4 3088dc09
-DWORD_08026fd8:
+step22_aob_font1_ptr_c:
+    .word  0x09dc8830                     @ 08026fd4 3088dc09  0x09dc8830
+step22_ptr_gprng:
     .word  gPrng                          @ 08026fd8 40000003
-DWORD_08026fdc:
-    .word  0x00000202                     @ 08026fdc 02020000
-DWORD_08026fe0:
-    .word  0xffffc03f                     @ 08026fe0 3fc0ffff
+step22_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08026fdc 02020000
+step22_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08026fe0 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 23. Trigger: gPrng+0x202 bits[13:6] == 0x17. Sequence: (1) bl tick_campaign_card_select_display_state; (2) if returns 0 (not done): b SUB_08026714 to wait; (3) if returns nonzero (done): checks scene_ctx+0x39 bit4 (0x10) and bit3 (0x08) -- if both set, enters extended detail display path (LP panel/deck info rendering); exits via b LAB_08025d28 or b SUB_08026714.
 @ 
@@ -21027,7 +21407,7 @@ run_campaign_step23_card_select_tick:
     bne LAB_08026ff0                         @ 08026fea 01d1
     bl SUB_08026714                          @ 08026fec fff792fb
 LAB_08026ff0:
-    ldr r0, DWORD_08027034                   @ 08026ff0 1048
+    ldr r0, step23_ptr_gduelscenebase        @ 08026ff0 1048
     adds r0,#0x39    @ 08026ff2 3930
     ldrb r1,[r0,#0x0]                        @ 08026ff4 0178
     movs r0,#0x10    @ 08026ff6 1020
@@ -21042,8 +21422,8 @@ LAB_08027000:
     bne LAB_0802700a                         @ 08027006 00d1
     b LAB_08027124                           @ 08027008 8ce0
 LAB_0802700a:
-    ldr r0, DWORD_08027038                   @ 0802700a 0b48
-    ldr r1, DWORD_0802703c                   @ 0802700c 0b49
+    ldr r0, step23_ewram_base                @ 0802700a 0b48
+    ldr r1, step23_gsettings_offset          @ 0802700c 0b49
     adds r0,r0,r1    @ 0802700e 4018
     movs r1,#0x7    @ 08027010 0721
     ldrb r0,[r0,#0x0]                        @ 08027012 0078
@@ -21056,44 +21436,44 @@ LAB_0802700a:
     beq LAB_08027050                         @ 08027020 16d0
     cmp r1,#0x4                              @ 08027022 0429
     beq LAB_08027048                         @ 08027024 10d0
-    ldr r0, DWORD_08027040                   @ 08027026 0648
+    ldr r0, step23_font5_base_a              @ 08027026 0648
     cmp r1,#0x5                              @ 08027028 0529
     bne LAB_08027062                         @ 0802702a 1ad1
-    ldr r2, DWORD_08027044                   @ 0802702c 054a
+    ldr r2, step23_font5_off_a               @ 0802702c 054a
     adds r0,r0,r2    @ 0802702e 8018
     b LAB_08027062                           @ 08027030 17e0
     .zero  0x2
-DWORD_08027034:
-    .word  0x02023360                     @ 08027034 60330202
-DWORD_08027038:
-    .word  0x02000000                     @ 08027038 00000002
-DWORD_0802703c:
-    .word  0x00006c2c                     @ 0802703c 2c6c0000
-DWORD_08027040:
-    .word  0x09dbfd66                     @ 08027040 66fddb09
-DWORD_08027044:
-    .word  0x0003ab16                     @ 08027044 16ab0300
+step23_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027034 60330202
+step23_ewram_base:
+    .word  EWRAM_BASE                     @ 08027038 00000002
+step23_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 0802703c 2c6c0000
+step23_font5_base_a:
+    .word  0x09dbfd66                     @ 08027040 66fddb09  0x09dbfd66
+step23_font5_off_a:
+    .word  0x0003ab16                     @ 08027044 16ab0300  0x0003ab16
 LAB_08027048:
-    ldr r0, DWORD_0802704c                   @ 08027048 0048
+    ldr r0, step23_font4_ptr_a               @ 08027048 0048
     b LAB_08027062                           @ 0802704a 0ae0
-DWORD_0802704c:
-    .word  0x09deeca0                     @ 0802704c a0ecde09
+step23_font4_ptr_a:
+    .word  0x09deeca0                     @ 0802704c a0ecde09  0x09deeca0
 LAB_08027050:
-    ldr r0, DWORD_08027054                   @ 08027050 0048
+    ldr r0, step23_font3_ptr_a               @ 08027050 0048
     b LAB_08027062                           @ 08027052 06e0
-DWORD_08027054:
-    .word  0x09de27ec                     @ 08027054 ec27de09
+step23_font3_ptr_a:
+    .word  0x09de27ec                     @ 08027054 ec27de09  0x09de27ec
 LAB_08027058:
-    ldr r0, DWORD_0802705c                   @ 08027058 0048
+    ldr r0, step23_font2_ptr_a               @ 08027058 0048
     b LAB_08027062                           @ 0802705a 02e0
-DWORD_0802705c:
-    .word  0x09dd6478                     @ 0802705c 7864dd09
+step23_font2_ptr_a:
+    .word  0x09dd6478                     @ 0802705c 7864dd09  0x09dd6478
 LAB_08027060:
-    ldr r0, DWORD_08027090                   @ 08027060 0b48
+    ldr r0, step23_font1_ptr_a               @ 08027060 0b48
 LAB_08027062:
     bl draw_card_name_label_to_sprite_vram   @ 08027062 06f093fa
-    ldr r0, DWORD_08027094                   @ 08027066 0b48
-    ldr r3, DWORD_08027098                   @ 08027068 0b4b
+    ldr r0, step23_ewram_base_1              @ 08027066 0b48
+    ldr r3, step23_gsettings_offset_1        @ 08027068 0b4b
     adds r0,r0,r3    @ 0802706a c018
     movs r2,#0x7    @ 0802706c 0722
     ldrb r0,[r0,#0x0]                        @ 0802706e 0078
@@ -21106,43 +21486,43 @@ LAB_08027062:
     beq LAB_080270ac                         @ 0802707c 16d0
     cmp r2,#0x4                              @ 0802707e 042a
     beq LAB_080270a4                         @ 08027080 10d0
-    ldr r1, DWORD_0802709c                   @ 08027082 0649
+    ldr r1, step23_font5_base_b              @ 08027082 0649
     cmp r2,#0x5                              @ 08027084 052a
     bne LAB_080270be                         @ 08027086 1ad1
-    ldr r4, DWORD_080270a0                   @ 08027088 054c
+    ldr r4, step23_font5_off_b               @ 08027088 054c
     adds r1,r1,r4    @ 0802708a 0919
     b LAB_080270be                           @ 0802708c 17e0
     .zero  0x2
-DWORD_08027090:
-    .word  0x09dcab86                     @ 08027090 86abdc09
-DWORD_08027094:
-    .word  0x02000000                     @ 08027094 00000002
-DWORD_08027098:
-    .word  0x00006c2c                     @ 08027098 2c6c0000
-DWORD_0802709c:
-    .word  0x09dbfd82                     @ 0802709c 82fddb09
-DWORD_080270a0:
-    .word  0x0003ab0e                     @ 080270a0 0eab0300
+step23_font1_ptr_a:
+    .word  0x09dcab86                     @ 08027090 86abdc09  0x09dcab86
+step23_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08027094 00000002
+step23_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08027098 2c6c0000
+step23_font5_base_b:
+    .word  0x09dbfd82                     @ 0802709c 82fddb09  0x09dbfd82
+step23_font5_off_b:
+    .word  0x0003ab0e                     @ 080270a0 0eab0300  0x0003ab0e
 LAB_080270a4:
-    ldr r1, DWORD_080270a8                   @ 080270a4 0049
+    ldr r1, step23_font4_ptr_b               @ 080270a4 0049
     b LAB_080270be                           @ 080270a6 0ae0
-DWORD_080270a8:
-    .word  0x09deecb2                     @ 080270a8 b2ecde09
+step23_font4_ptr_b:
+    .word  0x09deecb2                     @ 080270a8 b2ecde09  0x09deecb2
 LAB_080270ac:
-    ldr r1, DWORD_080270b0                   @ 080270ac 0049
+    ldr r1, step23_font3_ptr_b               @ 080270ac 0049
     b LAB_080270be                           @ 080270ae 06e0
-DWORD_080270b0:
-    .word  0x09de2802                     @ 080270b0 0228de09
+step23_font3_ptr_b:
+    .word  0x09de2802                     @ 080270b0 0228de09  0x09de2802
 LAB_080270b4:
-    ldr r1, DWORD_080270b8                   @ 080270b4 0049
+    ldr r1, step23_font2_ptr_b               @ 080270b4 0049
     b LAB_080270be                           @ 080270b6 02e0
-DWORD_080270b8:
-    .word  0x09dd648e                     @ 080270b8 8e64dd09
+step23_font2_ptr_b:
+    .word  0x09dd648e                     @ 080270b8 8e64dd09  0x09dd648e
 LAB_080270bc:
-    ldr r1, DWORD_080270e8                   @ 080270bc 0a49
+    ldr r1, step23_font1_ptr_b               @ 080270bc 0a49
 LAB_080270be:
-    ldr r0, DWORD_080270ec                   @ 080270be 0b48
-    ldr r5, DWORD_080270f0                   @ 080270c0 0b4d
+    ldr r0, step23_ewram_base_2              @ 080270be 0b48
+    ldr r5, step23_gsettings_offset_2        @ 080270c0 0b4d
     adds r0,r0,r5    @ 080270c2 4019
     movs r3,#0x7    @ 080270c4 0723
     ldrb r0,[r0,#0x0]                        @ 080270c6 0078
@@ -21155,50 +21535,50 @@ LAB_080270be:
     beq LAB_08027104                         @ 080270d4 16d0
     cmp r3,#0x4                              @ 080270d6 042b
     beq LAB_080270fc                         @ 080270d8 10d0
-    ldr r2, DWORD_080270f4                   @ 080270da 064a
+    ldr r2, step23_font5_base_c              @ 080270da 064a
     cmp r3,#0x5                              @ 080270dc 052b
     bne LAB_08027116                         @ 080270de 1ad1
-    ldr r6, DWORD_080270f8                   @ 080270e0 054e
+    ldr r6, step23_font5_off_c               @ 080270e0 054e
     adds r2,r2,r6    @ 080270e2 9219
     b LAB_08027116                           @ 080270e4 17e0
     .zero  0x2
-DWORD_080270e8:
-    .word  0x09dcab98                     @ 080270e8 98abdc09
-DWORD_080270ec:
-    .word  0x02000000                     @ 080270ec 00000002
-DWORD_080270f0:
-    .word  0x00006c2c                     @ 080270f0 2c6c0000
-DWORD_080270f4:
-    .word  0x09dbfd88                     @ 080270f4 88fddb09
-DWORD_080270f8:
-    .word  0x0003ab10                     @ 080270f8 10ab0300
+step23_font1_ptr_b:
+    .word  0x09dcab98                     @ 080270e8 98abdc09  0x09dcab98
+step23_ewram_base_2:
+    .word  EWRAM_BASE                     @ 080270ec 00000002
+step23_gsettings_offset_2:
+    .word  GSETTINGS_OFFSET               @ 080270f0 2c6c0000
+step23_font5_base_c:
+    .word  0x09dbfd88                     @ 080270f4 88fddb09  0x09dbfd88
+step23_font5_off_c:
+    .word  0x0003ab10                     @ 080270f8 10ab0300  0x0003ab10
 LAB_080270fc:
-    ldr r2, DWORD_08027100                   @ 080270fc 004a
+    ldr r2, step23_font4_ptr_c               @ 080270fc 004a
     b LAB_08027116                           @ 080270fe 0ae0
-DWORD_08027100:
-    .word  0x09deecb8                     @ 08027100 b8ecde09
+step23_font4_ptr_c:
+    .word  0x09deecb8                     @ 08027100 b8ecde09  0x09deecb8
 LAB_08027104:
-    ldr r2, DWORD_08027108                   @ 08027104 004a
+    ldr r2, step23_font3_ptr_c               @ 08027104 004a
     b LAB_08027116                           @ 08027106 06e0
-DWORD_08027108:
-    .word  0x09de280a                     @ 08027108 0a28de09
+step23_font3_ptr_c:
+    .word  0x09de280a                     @ 08027108 0a28de09  0x09de280a
 LAB_0802710c:
-    ldr r2, DWORD_08027110                   @ 0802710c 004a
+    ldr r2, step23_font2_ptr_c               @ 0802710c 004a
     b LAB_08027116                           @ 0802710e 02e0
-DWORD_08027110:
-    .word  0x09dd6496                     @ 08027110 9664dd09
+step23_font2_ptr_c:
+    .word  0x09dd6496                     @ 08027110 9664dd09  0x09dd6496
 LAB_08027114:
-    ldr r2, DWORD_08027120                   @ 08027114 024a
+    ldr r2, step23_font1_ptr_c               @ 08027114 024a
 LAB_08027116:
     movs r0,#0x2    @ 08027116 0220
     bl setup_label_render_ctx                @ 08027118 06f0d8fc
     b LAB_08027230                           @ 0802711c 88e0
     .zero  0x2
-DWORD_08027120:
-    .word  0x09dcab9e                     @ 08027120 9eabdc09
+step23_font1_ptr_c:
+    .word  0x09dcab9e                     @ 08027120 9eabdc09  0x09dcab9e
 LAB_08027124:
-    ldr r0, DWORD_0802714c                   @ 08027124 0948
-    ldr r1, DWORD_08027150                   @ 08027126 0a49
+    ldr r0, step23_ewram_base_3              @ 08027124 0948
+    ldr r1, step23_gsettings_offset_3        @ 08027126 0a49
     adds r0,r0,r1    @ 08027128 4018
     movs r1,#0x7    @ 0802712a 0721
     ldrb r0,[r0,#0x0]                        @ 0802712c 0078
@@ -21211,41 +21591,41 @@ LAB_08027124:
     beq LAB_08027164                         @ 0802713a 13d0
     cmp r1,#0x4                              @ 0802713c 0429
     beq LAB_0802715c                         @ 0802713e 0dd0
-    ldr r0, DWORD_08027154                   @ 08027140 0448
+    ldr r0, step23_font5_base_d              @ 08027140 0448
     cmp r1,#0x5                              @ 08027142 0529
     bne LAB_08027176                         @ 08027144 17d1
-    ldr r2, DWORD_08027158                   @ 08027146 044a
+    ldr r2, step23_font5_off_d               @ 08027146 044a
     adds r0,r0,r2    @ 08027148 8018
     b LAB_08027176                           @ 0802714a 14e0
-DWORD_0802714c:
-    .word  0x02000000                     @ 0802714c 00000002
-DWORD_08027150:
-    .word  0x00006c2c                     @ 08027150 2c6c0000
-DWORD_08027154:
-    .word  0x09dbfda6                     @ 08027154 a6fddb09
-DWORD_08027158:
-    .word  0x0003ab14                     @ 08027158 14ab0300
+step23_ewram_base_3:
+    .word  EWRAM_BASE                     @ 0802714c 00000002
+step23_gsettings_offset_3:
+    .word  GSETTINGS_OFFSET               @ 08027150 2c6c0000
+step23_font5_base_d:
+    .word  0x09dbfda6                     @ 08027154 a6fddb09  0x09dbfda6
+step23_font5_off_d:
+    .word  0x0003ab14                     @ 08027158 14ab0300  0x0003ab14
 LAB_0802715c:
-    ldr r0, DWORD_08027160                   @ 0802715c 0048
+    ldr r0, step23_font4_ptr_d               @ 0802715c 0048
     b LAB_08027176                           @ 0802715e 0ae0
-DWORD_08027160:
-    .word  0x09deecd8                     @ 08027160 d8ecde09
+step23_font4_ptr_d:
+    .word  0x09deecd8                     @ 08027160 d8ecde09  0x09deecd8
 LAB_08027164:
-    ldr r0, DWORD_08027168                   @ 08027164 0048
+    ldr r0, step23_font3_ptr_d               @ 08027164 0048
     b LAB_08027176                           @ 08027166 06e0
-DWORD_08027168:
-    .word  0x09de282c                     @ 08027168 2c28de09
+step23_font3_ptr_d:
+    .word  0x09de282c                     @ 08027168 2c28de09  0x09de282c
 LAB_0802716c:
-    ldr r0, DWORD_08027170                   @ 0802716c 0048
+    ldr r0, step23_font2_ptr_d               @ 0802716c 0048
     b LAB_08027176                           @ 0802716e 02e0
-DWORD_08027170:
-    .word  0x09dd64b2                     @ 08027170 b264dd09
+step23_font2_ptr_d:
+    .word  0x09dd64b2                     @ 08027170 b264dd09  0x09dd64b2
 LAB_08027174:
-    ldr r0, DWORD_080271a4                   @ 08027174 0b48
+    ldr r0, step23_font1_ptr_d               @ 08027174 0b48
 LAB_08027176:
     bl draw_card_name_label_to_sprite_vram   @ 08027176 06f009fa
-    ldr r0, DWORD_080271a8                   @ 0802717a 0b48
-    ldr r3, DWORD_080271ac                   @ 0802717c 0b4b
+    ldr r0, step23_ewram_base_4              @ 0802717a 0b48
+    ldr r3, step23_gsettings_offset_4        @ 0802717c 0b4b
     adds r0,r0,r3    @ 0802717e c018
     movs r2,#0x7    @ 08027180 0722
     ldrb r0,[r0,#0x0]                        @ 08027182 0078
@@ -21258,43 +21638,43 @@ LAB_08027176:
     beq LAB_080271c0                         @ 08027190 16d0
     cmp r2,#0x4                              @ 08027192 042a
     beq LAB_080271b8                         @ 08027194 10d0
-    ldr r1, DWORD_080271b0                   @ 08027196 0649
+    ldr r1, step23_font5_base_e              @ 08027196 0649
     cmp r2,#0x5                              @ 08027198 052a
     bne LAB_080271d2                         @ 0802719a 1ad1
-    ldr r4, DWORD_080271b4                   @ 0802719c 054c
+    ldr r4, step23_font5_off_e               @ 0802719c 054c
     adds r1,r1,r4    @ 0802719e 0919
     b LAB_080271d2                           @ 080271a0 17e0
     .zero  0x2
-DWORD_080271a4:
-    .word  0x09dcabba                     @ 080271a4 baabdc09
-DWORD_080271a8:
-    .word  0x02000000                     @ 080271a8 00000002
-DWORD_080271ac:
-    .word  0x00006c2c                     @ 080271ac 2c6c0000
-DWORD_080271b0:
-    .word  0x09dbfd82                     @ 080271b0 82fddb09
-DWORD_080271b4:
-    .word  0x0003ab0e                     @ 080271b4 0eab0300
+step23_font1_ptr_d:
+    .word  0x09dcabba                     @ 080271a4 baabdc09  0x09dcabba
+step23_ewram_base_4:
+    .word  EWRAM_BASE                     @ 080271a8 00000002
+step23_gsettings_offset_4:
+    .word  GSETTINGS_OFFSET               @ 080271ac 2c6c0000
+step23_font5_base_e:
+    .word  0x09dbfd82                     @ 080271b0 82fddb09  0x09dbfd82
+step23_font5_off_e:
+    .word  0x0003ab0e                     @ 080271b4 0eab0300  0x0003ab0e
 LAB_080271b8:
-    ldr r1, DWORD_080271bc                   @ 080271b8 0049
+    ldr r1, step23_font4_ptr_e               @ 080271b8 0049
     b LAB_080271d2                           @ 080271ba 0ae0
-DWORD_080271bc:
-    .word  0x09deecb2                     @ 080271bc b2ecde09
+step23_font4_ptr_e:
+    .word  0x09deecb2                     @ 080271bc b2ecde09  0x09deecb2
 LAB_080271c0:
-    ldr r1, DWORD_080271c4                   @ 080271c0 0049
+    ldr r1, step23_font3_ptr_e               @ 080271c0 0049
     b LAB_080271d2                           @ 080271c2 06e0
-DWORD_080271c4:
-    .word  0x09de2802                     @ 080271c4 0228de09
+step23_font3_ptr_e:
+    .word  0x09de2802                     @ 080271c4 0228de09  0x09de2802
 LAB_080271c8:
-    ldr r1, DWORD_080271cc                   @ 080271c8 0049
+    ldr r1, step23_font2_ptr_e               @ 080271c8 0049
     b LAB_080271d2                           @ 080271ca 02e0
-DWORD_080271cc:
-    .word  0x09dd648e                     @ 080271cc 8e64dd09
+step23_font2_ptr_e:
+    .word  0x09dd648e                     @ 080271cc 8e64dd09  0x09dd648e
 LAB_080271d0:
-    ldr r1, DWORD_080271fc                   @ 080271d0 0a49
+    ldr r1, step23_font1_ptr_e               @ 080271d0 0a49
 LAB_080271d2:
-    ldr r0, DWORD_08027200                   @ 080271d2 0b48
-    ldr r5, DWORD_08027204                   @ 080271d4 0b4d
+    ldr r0, step23_ewram_base_5              @ 080271d2 0b48
+    ldr r5, step23_gsettings_offset_5        @ 080271d4 0b4d
     adds r0,r0,r5    @ 080271d6 4019
     movs r3,#0x7    @ 080271d8 0723
     ldrb r0,[r0,#0x0]                        @ 080271da 0078
@@ -21307,46 +21687,46 @@ LAB_080271d2:
     beq LAB_08027218                         @ 080271e8 16d0
     cmp r3,#0x4                              @ 080271ea 042b
     beq LAB_08027210                         @ 080271ec 10d0
-    ldr r2, DWORD_08027208                   @ 080271ee 064a
+    ldr r2, step23_font5_base_f              @ 080271ee 064a
     cmp r3,#0x5                              @ 080271f0 052b
     bne LAB_0802722a                         @ 080271f2 1ad1
-    ldr r6, DWORD_0802720c                   @ 080271f4 054e
+    ldr r6, step23_font5_off_f               @ 080271f4 054e
     adds r2,r2,r6    @ 080271f6 9219
     b LAB_0802722a                           @ 080271f8 17e0
     .zero  0x2
-DWORD_080271fc:
-    .word  0x09dcab98                     @ 080271fc 98abdc09
-DWORD_08027200:
-    .word  0x02000000                     @ 08027200 00000002
-DWORD_08027204:
-    .word  0x00006c2c                     @ 08027204 2c6c0000
-DWORD_08027208:
-    .word  0x09dbfd88                     @ 08027208 88fddb09
-DWORD_0802720c:
-    .word  0x0003ab10                     @ 0802720c 10ab0300
+step23_font1_ptr_e:
+    .word  0x09dcab98                     @ 080271fc 98abdc09  0x09dcab98
+step23_ewram_base_5:
+    .word  EWRAM_BASE                     @ 08027200 00000002
+step23_gsettings_offset_5:
+    .word  GSETTINGS_OFFSET               @ 08027204 2c6c0000
+step23_font5_base_f:
+    .word  0x09dbfd88                     @ 08027208 88fddb09  0x09dbfd88
+step23_font5_off_f:
+    .word  0x0003ab10                     @ 0802720c 10ab0300  0x0003ab10
 LAB_08027210:
-    ldr r2, DWORD_08027214                   @ 08027210 004a
+    ldr r2, step23_font4_ptr_f               @ 08027210 004a
     b LAB_0802722a                           @ 08027212 0ae0
-DWORD_08027214:
-    .word  0x09deecb8                     @ 08027214 b8ecde09
+step23_font4_ptr_f:
+    .word  0x09deecb8                     @ 08027214 b8ecde09  0x09deecb8
 LAB_08027218:
-    ldr r2, DWORD_0802721c                   @ 08027218 004a
+    ldr r2, step23_font3_ptr_f               @ 08027218 004a
     b LAB_0802722a                           @ 0802721a 06e0
-DWORD_0802721c:
-    .word  0x09de280a                     @ 0802721c 0a28de09
+step23_font3_ptr_f:
+    .word  0x09de280a                     @ 0802721c 0a28de09  0x09de280a
 LAB_08027220:
-    ldr r2, DWORD_08027224                   @ 08027220 004a
+    ldr r2, step23_font2_ptr_f               @ 08027220 004a
     b LAB_0802722a                           @ 08027222 02e0
-DWORD_08027224:
-    .word  0x09dd6496                     @ 08027224 9664dd09
+step23_font2_ptr_f:
+    .word  0x09dd6496                     @ 08027224 9664dd09  0x09dd6496
 LAB_08027228:
-    ldr r2, DWORD_0802726c                   @ 08027228 104a
+    ldr r2, step23_font1_ptr_f               @ 08027228 104a
 LAB_0802722a:
     movs r0,#0x6    @ 0802722a 0620
     bl setup_label_render_ctx                @ 0802722c 06f04efc
 LAB_08027230:
-    ldr r2, DWORD_08027270                   @ 08027230 0f4a
-    ldr r0, DWORD_08027274                   @ 08027232 1048
+    ldr r2, step23_ptr_gprng                 @ 08027230 0f4a
+    ldr r0, step23_gprng_step_idx_off        @ 08027232 1048
     adds r2,r2,r0    @ 08027234 1218
     ldrh r3,[r2,#0x0]                        @ 08027236 1388
     lsls r1,r3,#0x12    @ 08027238 9904
@@ -21355,13 +21735,13 @@ LAB_08027230:
     movs r0,#0xff    @ 0802723e ff20
     ands r1,r0    @ 08027240 0140
     lsls r1,r1,#0x6    @ 08027242 8901
-    ldr r0, DWORD_08027278                   @ 08027244 0c48
+    ldr r0, step23_gprng_step_ctr_mask       @ 08027244 0c48
     ands r0,r3    @ 08027246 1840
     orrs r0,r1    @ 08027248 0843
     strh r0,[r2,#0x0]                        @ 0802724a 1080
 LAB_0802724c:
-    ldr r2, DWORD_08027270                   @ 0802724c 084a
-    ldr r1, DWORD_08027274                   @ 0802724e 0949
+    ldr r2, step23_ptr_gprng                 @ 0802724c 084a
+    ldr r1, step23_gprng_step_idx_off        @ 0802724e 0949
     adds r2,r2,r1    @ 08027250 5218
     ldrh r3,[r2,#0x0]                        @ 08027252 1388
     lsls r1,r3,#0x12    @ 08027254 9904
@@ -21370,19 +21750,19 @@ LAB_0802724c:
     movs r0,#0xff    @ 0802725a ff20
     ands r1,r0    @ 0802725c 0140
     lsls r1,r1,#0x6    @ 0802725e 8901
-    ldr r0, DWORD_08027278                   @ 08027260 0548
+    ldr r0, step23_gprng_step_ctr_mask       @ 08027260 0548
     ands r0,r3    @ 08027262 1840
     orrs r0,r1    @ 08027264 0843
     strh r0,[r2,#0x0]                        @ 08027266 1080
     bl SUB_08026714                          @ 08027268 fff754fa
-DWORD_0802726c:
-    .word  0x09dcab9e                     @ 0802726c 9eabdc09
-DWORD_08027270:
+step23_font1_ptr_f:
+    .word  0x09dcab9e                     @ 0802726c 9eabdc09  0x09dcab9e
+step23_ptr_gprng:
     .word  gPrng                          @ 08027270 40000003
-DWORD_08027274:
-    .word  0x00000202                     @ 08027274 02020000
-DWORD_08027278:
-    .word  0xffffc03f                     @ 08027278 3fc0ffff
+step23_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027274 02020000
+step23_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027278 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 24. Trigger: gPrng+0x202 bits[13:6] == 0x18. Sequence: (1) bl tick_aob_display_with_fadein; if returns 0 (fade-in not complete): b SUB_08026714 to wait. If returns nonzero (complete): (2) bl build_field_slot_bitmask; (3) bl init_duel_field_icon_and_bg_vram; (4) branches on [0x02006c2c] bits[2:0] = deck_type [0..5] twice to select tile data and BG color data; (5) bl draw_decimal_with_offset(0x40, 0x210, src, 0x10f) and (0x80, 0x21c, 0x1, ..); (6) if scene_ctx+0x4 bits[7:5] > 2 and bits[4:3] > 5: bl game_str_id_to_row + bl render_centered_text_to_bg_vram + bl write_tile_row_to_vram; (7) OAM sprite batch-write loop for card condition sprites; exits via b SUB_08026714.
 @ 
@@ -21399,8 +21779,8 @@ run_campaign_step24_fadein_and_field_init:
 LAB_08027288:
     bl build_field_slot_bitmask              @ 08027288 fdf734fb
     bl init_duel_field_icon_and_bg_vram      @ 0802728c fcf76efc
-    ldr r0, DWORD_080272b8                   @ 08027290 0948
-    ldr r2, DWORD_080272bc                   @ 08027292 0a4a
+    ldr r0, step24_ewram_base                @ 08027290 0948
+    ldr r2, step24_gsettings_offset          @ 08027292 0a4a
     adds r0,r0,r2    @ 08027294 8018
     movs r1,#0x7    @ 08027296 0721
     ldrb r0,[r0,#0x0]                        @ 08027298 0078
@@ -21413,40 +21793,40 @@ LAB_08027288:
     beq LAB_080272d0                         @ 080272a6 13d0
     cmp r1,#0x4                              @ 080272a8 0429
     beq LAB_080272c8                         @ 080272aa 0dd0
-    ldr r3, DWORD_080272c0                   @ 080272ac 044b
+    ldr r3, step24_font5_base_a              @ 080272ac 044b
     cmp r1,#0x5                              @ 080272ae 0529
     bne LAB_080272e2                         @ 080272b0 17d1
-    ldr r4, DWORD_080272c4                   @ 080272b2 044c
+    ldr r4, step24_font5_off_a               @ 080272b2 044c
     adds r3,r3,r4    @ 080272b4 1b19
     b LAB_080272e2                           @ 080272b6 14e0
-DWORD_080272b8:
-    .word  0x02000000                     @ 080272b8 00000002
-DWORD_080272bc:
-    .word  0x00006c2c                     @ 080272bc 2c6c0000
-DWORD_080272c0:
-    .word  0x09dbff0e                     @ 080272c0 0effdb09
-DWORD_080272c4:
-    .word  0x0003ab1e                     @ 080272c4 1eab0300
+step24_ewram_base:
+    .word  EWRAM_BASE                     @ 080272b8 00000002
+step24_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 080272bc 2c6c0000
+step24_font5_base_a:
+    .word  0x09dbff0e                     @ 080272c0 0effdb09  0x09dbff0e
+step24_font5_off_a:
+    .word  0x0003ab1e                     @ 080272c4 1eab0300  0x0003ab1e
 LAB_080272c8:
-    ldr r3, DWORD_080272cc                   @ 080272c8 004b
+    ldr r3, step24_font4_ptr_a               @ 080272c8 004b
     b LAB_080272e2                           @ 080272ca 0ae0
-DWORD_080272cc:
-    .word  0x09deee62                     @ 080272cc 62eede09
+step24_font4_ptr_a:
+    .word  0x09deee62                     @ 080272cc 62eede09  0x09deee62
 LAB_080272d0:
-    ldr r3, DWORD_080272d4                   @ 080272d0 004b
+    ldr r3, step24_font3_ptr_a               @ 080272d0 004b
     b LAB_080272e2                           @ 080272d2 06e0
-DWORD_080272d4:
-    .word  0x09de29ae                     @ 080272d4 ae29de09
+step24_font3_ptr_a:
+    .word  0x09de29ae                     @ 080272d4 ae29de09  0x09de29ae
 LAB_080272d8:
-    ldr r3, DWORD_080272dc                   @ 080272d8 004b
+    ldr r3, step24_font2_ptr_a               @ 080272d8 004b
     b LAB_080272e2                           @ 080272da 02e0
-DWORD_080272dc:
-    .word  0x09dd6636                     @ 080272dc 3666dd09
+step24_font2_ptr_a:
+    .word  0x09dd6636                     @ 080272dc 3666dd09  0x09dd6636
 LAB_080272e0:
-    ldr r3, DWORD_08027320                   @ 080272e0 0f4b
+    ldr r3, step24_font1_ptr_a               @ 080272e0 0f4b
 LAB_080272e2:
-    ldr r4, DWORD_08027324                   @ 080272e2 104c
-    ldr r5, DWORD_08027328                   @ 080272e4 104d
+    ldr r4, step24_ewram_base_1              @ 080272e2 104c
+    ldr r5, step24_gsettings_offset_1        @ 080272e4 104d
     adds r4,r4,r5    @ 080272e6 6419
     ldrb r6,[r4,#0x0]                        @ 080272e8 2678
     lsls r0,r6,#0x1d    @ 080272ea 7007
@@ -21455,7 +21835,7 @@ LAB_080272e2:
     movs r0,#0x40    @ 080272f0 4020
     movs r1,#0x84    @ 080272f2 8421
     lsls r1,r1,#0x2    @ 080272f4 8900
-    ldr r2, DWORD_0802732c                   @ 080272f6 0d4a
+    ldr r2, step24_draw_decimal_win_label_arg @ 080272f6 0d4a
     bl draw_decimal_with_offset              @ 080272f8 fcf7c0fa
     movs r0,#0x7    @ 080272fc 0720
     ldrb r4,[r4,#0x0]                        @ 080272fe 2478
@@ -21468,45 +21848,45 @@ LAB_080272e2:
     beq LAB_08027340                         @ 0802730c 18d0
     cmp r0,#0x4                              @ 0802730e 0428
     beq LAB_08027338                         @ 08027310 12d0
-    ldr r3, DWORD_08027330                   @ 08027312 074b
+    ldr r3, step24_font5_base_b              @ 08027312 074b
     cmp r0,#0x5                              @ 08027314 0528
     bne LAB_08027352                         @ 08027316 1cd1
-    ldr r0, DWORD_08027334                   @ 08027318 0648
+    ldr r0, step24_font5_off_b               @ 08027318 0648
     adds r3,r3,r0    @ 0802731a 1b18
     b LAB_08027352                           @ 0802731c 19e0
     .zero  0x2
-DWORD_08027320:
-    .word  0x09dcad08                     @ 08027320 08addc09
-DWORD_08027324:
-    .word  0x02000000                     @ 08027324 00000002
-DWORD_08027328:
-    .word  0x00006c2c                     @ 08027328 2c6c0000
-DWORD_0802732c:
-    .word  0x0000010f                     @ 0802732c 0f010000
-DWORD_08027330:
-    .word  0x09dc00b8                     @ 08027330 b800dc09
-DWORD_08027334:
-    .word  0x0003ab50                     @ 08027334 50ab0300
+step24_font1_ptr_a:
+    .word  0x09dcad08                     @ 08027320 08addc09  0x09dcad08
+step24_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08027324 00000002
+step24_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08027328 2c6c0000
+step24_draw_decimal_win_label_arg:
+    .word  DRAW_DECIMAL_WIN_LABEL_ARG     @ 0802732c 0f010000
+step24_font5_base_b:
+    .word  0x09dc00b8                     @ 08027330 b800dc09  0x09dc00b8
+step24_font5_off_b:
+    .word  0x0003ab50                     @ 08027334 50ab0300  0x0003ab50
 LAB_08027338:
-    ldr r3, DWORD_0802733c                   @ 08027338 004b
+    ldr r3, step24_font4_ptr_b               @ 08027338 004b
     b LAB_08027352                           @ 0802733a 0ae0
-DWORD_0802733c:
-    .word  0x09def042                     @ 0802733c 42f0de09
+step24_font4_ptr_b:
+    .word  0x09def042                     @ 0802733c 42f0de09  0x09def042
 LAB_08027340:
-    ldr r3, DWORD_08027344                   @ 08027340 004b
+    ldr r3, step24_font3_ptr_b               @ 08027340 004b
     b LAB_08027352                           @ 08027342 06e0
-DWORD_08027344:
-    .word  0x09de2b9e                     @ 08027344 9e2bde09
+step24_font3_ptr_b:
+    .word  0x09de2b9e                     @ 08027344 9e2bde09  0x09de2b9e
 LAB_08027348:
-    ldr r3, DWORD_0802734c                   @ 08027348 004b
+    ldr r3, step24_font2_ptr_b               @ 08027348 004b
     b LAB_08027352                           @ 0802734a 02e0
-DWORD_0802734c:
-    .word  0x09dd6832                     @ 0802734c 3268dd09
+step24_font2_ptr_b:
+    .word  0x09dd6832                     @ 0802734c 3268dd09  0x09dd6832
 LAB_08027350:
-    ldr r3, DWORD_080274a8                   @ 08027350 554b
+    ldr r3, step24_font1_ptr_b               @ 08027350 554b
 LAB_08027352:
-    ldr r0, DWORD_080274ac                   @ 08027352 5648
-    ldr r1, DWORD_080274b0                   @ 08027354 5649
+    ldr r0, step24_ewram_base_2              @ 08027352 5648
+    ldr r1, step24_gsettings_offset_2        @ 08027354 5649
     adds r4,r0,r1    @ 08027356 4418
     ldrb r2,[r4,#0x0]                        @ 08027358 2278
     lsls r0,r2,#0x1d    @ 0802735a 5007
@@ -21517,7 +21897,7 @@ LAB_08027352:
     lsls r1,r1,#0x2    @ 08027364 8900
     movs r2,#0x1    @ 08027366 0122
     bl draw_decimal_with_offset              @ 08027368 fcf788fa
-    ldr r1, DWORD_080274b4                   @ 0802736c 5149
+    ldr r1, step24_ptr_gduelscenebase        @ 0802736c 5149
     ldrb r3,[r1,#0x4]                        @ 0802736e 0b79
     lsrs r0,r3,#0x5    @ 08027370 5809
     cmp r0,#0x2                              @ 08027372 0228
@@ -21529,9 +21909,9 @@ LAB_08027378:
     lsrs r0,r0,#0x1d    @ 0802737c 400f
     cmp r0,#0x5                              @ 0802737e 0528
     bls LAB_0802747e                         @ 08027380 7dd9
-    ldr r0, DWORD_080274b8                   @ 08027382 4d48
+    ldr r0, step24_campaign_bg_tile_param_a  @ 08027382 4d48
     bl game_str_id_to_row                    @ 08027384 cdf048fd
-    ldr r2, DWORD_080274bc                   @ 08027388 4c4a
+    ldr r2, step24_game_str_tbl_ptr          @ 08027388 4c4a
     lsls r0,r0,#0x10    @ 0802738a 0004
     lsrs r0,r0,#0x10    @ 0802738c 000c
     lsls r1,r0,#0x1    @ 0802738e 4100
@@ -21544,19 +21924,19 @@ LAB_08027378:
     lsls r1,r1,#0x2    @ 0802739c 8900
     adds r1,r1,r2    @ 0802739e 8918
     ldr r1,[r1,#0x0]                         @ 080273a0 0968
-    ldr r0, DWORD_080274c0                   @ 080273a2 4748
+    ldr r0, step24_game_str_ja_ptr           @ 080273a2 4748
     adds r1,r1,r0    @ 080273a4 0918
-    ldr r0, DWORD_080274c4                   @ 080273a6 4748
+    ldr r0, step24_campaign_bg_tile_param_b  @ 080273a6 4748
     movs r2,#0x84    @ 080273a8 8422
     lsls r2,r2,#0x2    @ 080273aa 9200
-    ldr r3, DWORD_080274c8                   @ 080273ac 464b
+    ldr r3, step24_duel_field_text_bg_width  @ 080273ac 464b
     str r1,[sp,#0x0]                         @ 080273ae 0091
     movs r1,#0xd6    @ 080273b0 d621
     bl render_centered_text_to_bg_vram       @ 080273b2 fcf7effa
-    ldr r5, DWORD_080274cc                   @ 080273b6 454d
+    ldr r5, step24_campaign_bg_tile_param_c  @ 080273b6 454d
     movs r6,#0x93    @ 080273b8 9326
     lsls r6,r6,#0x1    @ 080273ba 7600
-    ldr r4, DWORD_080274d0                   @ 080273bc 444c
+    ldr r4, step24_gfx_src_e_ptr             @ 080273bc 444c
     adds r0,r5,#0x0    @ 080273be 281c
     movs r1,#0x40    @ 080273c0 4021
     adds r2,r6,#0x0    @ 080273c2 321c
@@ -21583,9 +21963,9 @@ LAB_08027378:
     movs r0,#0xc0    @ 080273ee c020
     lsls r0,r0,#0x4    @ 080273f0 0001
     .hword 0x4684    @ 080273f2 8446
-    ldr r1, DWORD_080274d4                   @ 080273f4 3749
+    ldr r1, step24_campaign_bg_tile_param_d  @ 080273f4 3749
     .hword 0x468a    @ 080273f6 8a46
-    ldr r2, DWORD_080274d8                   @ 080273f8 374a
+    ldr r2, step24_oam_attr2_charname_mask   @ 080273f8 374a
     .hword 0x4691    @ 080273fa 9146
 LAB_080273fc:
     ldrh r0,[r5,#0x0]                        @ 080273fc 2888
@@ -21608,7 +21988,7 @@ LAB_080273fc:
     ands r2,r6    @ 0802741e 3240
     cmp r3,#0x1f                             @ 08027420 1f2b
     bls LAB_08027432                         @ 08027422 06d9
-    ldr r0, DWORD_080274dc                   @ 08027424 2d48
+    ldr r0, step24_card_desc_bg_vram_a       @ 08027424 2d48
     str r0,[sp,#0x10]                        @ 08027426 0490
     adds r0,r3,#0x0    @ 08027428 181c
     subs r0,#0x20    @ 0802742a 2038
@@ -21616,13 +21996,13 @@ LAB_080273fc:
     lsls r0,r1,#0x10    @ 0802742e 0804
     lsrs r0,r0,#0x10    @ 08027430 000c
 LAB_08027432:
-    ldr r1, DWORD_080274cc                   @ 08027432 2649
+    ldr r1, step24_campaign_bg_tile_param_c  @ 08027432 2649
     adds r0,r0,r1    @ 08027434 4018
     lsls r0,r0,#0x10    @ 08027436 0004
     lsrs r0,r0,#0x10    @ 08027438 000c
     cmp r0,r10                               @ 0802743a 5045
     bls LAB_08027446                         @ 0802743c 03d9
-    ldr r3, DWORD_080274e0                   @ 0802743e 284b
+    ldr r3, step24_oam_attr2_charname_clear  @ 0802743e 284b
     adds r0,r0,r3    @ 08027440 c018
     lsls r0,r0,#0x10    @ 08027442 0004
     lsrs r0,r0,#0x10    @ 08027444 000c
@@ -21648,14 +22028,14 @@ LAB_08027446:
     cmp r7,r6                                @ 0802746a b742
     bcc LAB_080273fc                         @ 0802746c c6d3
 LAB_0802746e:
-    ldr r0, DWORD_080274e4                   @ 0802746e 1d48
+    ldr r0, step24_campaign_vram_bg_tile_base @ 0802746e 1d48
     movs r1,#0x80    @ 08027470 8021
     bl zero_fill_by_halfword                 @ 08027472 cdf0fffc
-    ldr r0, DWORD_080274dc                   @ 08027476 1948
+    ldr r0, step24_card_desc_bg_vram_a       @ 08027476 1948
     movs r1,#0x80    @ 08027478 8021
     bl zero_fill_by_halfword                 @ 0802747a cdf0fbfc
 LAB_0802747e:
-    ldr r2, DWORD_080274b4                   @ 0802747e 0d4a
+    ldr r2, step24_ptr_gduelscenebase        @ 0802747e 0d4a
     movs r0,#0x3    @ 08027480 0320
     rsbs r0,r0,#0    @ 08027482 4042
     ldrb r1,[r2,#0x8]                        @ 08027484 117a
@@ -21664,10 +22044,10 @@ LAB_0802747e:
     rsbs r1,r1,#0    @ 0802748a 4942
     ands r0,r1    @ 0802748c 0840
     strb r0,[r2,#0x8]                        @ 0802748e 1072
-    ldr r2, DWORD_080274e8                   @ 08027490 154a
-    ldr r3, DWORD_080274ec                   @ 08027492 164b
+    ldr r2, step24_ptr_gprng                 @ 08027490 154a
+    ldr r3, step24_gprng_step_idx_off        @ 08027492 164b
     adds r2,r2,r3    @ 08027494 d218
-    ldr r0, DWORD_080274f0                   @ 08027496 1648
+    ldr r0, step24_gprng_step_ctr_mask       @ 08027496 1648
     ldrh r4,[r2,#0x0]                        @ 08027498 1488
     ands r0,r4    @ 0802749a 2040
     movs r1,#0x40    @ 0802749c 4021
@@ -21675,44 +22055,44 @@ LAB_0802747e:
     strh r0,[r2,#0x0]                        @ 080274a0 1080
     bl SUB_08026714                          @ 080274a2 fff737f9
     movs r0,r0    @ 080274a6 0000
-DWORD_080274a8:
-    .word  0x09dcaea0                     @ 080274a8 a0aedc09
-DWORD_080274ac:
-    .word  0x02000000                     @ 080274ac 00000002
-DWORD_080274b0:
-    .word  0x00006c2c                     @ 080274b0 2c6c0000
-DWORD_080274b4:
-    .word  0x02023360                     @ 080274b4 60330202
-DWORD_080274b8:
-    .word  0x00000be5                     @ 080274b8 e50b0000
-DWORD_080274bc:
-    .word  game_str_pointer_table         @ 080274bc 400f0008
-DWORD_080274c0:
-    .word  game_str_ja                    @ 080274c0 109cdb09
-DWORD_080274c4:
-    .word  0x000007c7                     @ 080274c4 c7070000
-DWORD_080274c8:
-    .word  0x00000f09                     @ 080274c8 090f0000
-DWORD_080274cc:
-    .word  0x00000bc1                     @ 080274cc c10b0000
-DWORD_080274d0:
-    .word  0x09b96514                     @ 080274d0 1465b909
-DWORD_080274d4:
-    .word  0x00000bff                     @ 080274d4 ff0b0000
-DWORD_080274d8:
-    .word  0x000003ff                     @ 080274d8 ff030000
-DWORD_080274dc:
-    .word  0x06000800                     @ 080274dc 00080006
-DWORD_080274e0:
-    .word  0xfffffc00                     @ 080274e0 00fcffff
-DWORD_080274e4:
-    .word  0x06001100                     @ 080274e4 00110006
-DWORD_080274e8:
+step24_font1_ptr_b:
+    .word  0x09dcaea0                     @ 080274a8 a0aedc09  0x09dcaea0
+step24_ewram_base_2:
+    .word  EWRAM_BASE                     @ 080274ac 00000002
+step24_gsettings_offset_2:
+    .word  GSETTINGS_OFFSET               @ 080274b0 2c6c0000
+step24_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 080274b4 60330202
+step24_campaign_bg_tile_param_a:
+    .word  CAMPAIGN_BG_TILE_PARAM_A       @ 080274b8 e50b0000
+step24_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 080274bc 400f0008  0x08000f40: game_str_pointer_table ptr
+step24_game_str_ja_ptr:
+    .word  game_str_ja                    @ 080274c0 109cdb09  0x09db9c10: game_str_ja ptr
+step24_campaign_bg_tile_param_b:
+    .word  CAMPAIGN_BG_TILE_PARAM_B       @ 080274c4 c7070000
+step24_duel_field_text_bg_width:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 080274c8 090f0000
+step24_campaign_bg_tile_param_c:
+    .word  CAMPAIGN_BG_TILE_PARAM_C       @ 080274cc c10b0000
+step24_gfx_src_e_ptr:
+    .word  0x09b96514                     @ 080274d0 1465b909  0x09b96514: gfx_src_e ROM ptr
+step24_campaign_bg_tile_param_d:
+    .word  CAMPAIGN_BG_TILE_PARAM_D       @ 080274d4 ff0b0000
+step24_oam_attr2_charname_mask:
+    .word  OAM_ATTR2_CHARNAME_MASK        @ 080274d8 ff030000
+step24_card_desc_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 080274dc 00080006
+step24_oam_attr2_charname_clear:
+    .word  OAM_ATTR2_CHARNAME_CLEAR       @ 080274e0 00fcffff
+step24_campaign_vram_bg_tile_base:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE     @ 080274e4 00110006
+step24_ptr_gprng:
     .word  gPrng                          @ 080274e8 40000003
-DWORD_080274ec:
-    .word  0x00000202                     @ 080274ec 02020000
-DWORD_080274f0:
-    .word  0xffffc03f                     @ 080274f0 3fc0ffff
+step24_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 080274ec 02020000
+step24_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 080274f0 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 25. Trigger: gPrng+0x202 bits[13:6] == 0x19. Symmetric to run_campaign_step23_card_select_tick (0x08026fe4): (1) bl tick_campaign_card_select_display_state; (2) if returns 0: b SUB_08026714 to wait; (3) if returns nonzero: reads gPrng+0x202, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 26. Steps 23 and 25 both use the same display state machine tick; they correspond to first and second entry into the card-select display phase.
 @ 
@@ -21724,8 +22104,8 @@ run_campaign_step25_card_select_tick:
     bne LAB_08027500                         @ 080274fa 01d1
     bl SUB_08026714                          @ 080274fc fff70af9
 LAB_08027500:
-    ldr r2, DWORD_08027520                   @ 08027500 074a
-    ldr r5, DWORD_08027524                   @ 08027502 084d
+    ldr r2, step25_ptr_gprng                 @ 08027500 074a
+    ldr r5, step25_gprng_step_idx_off        @ 08027502 084d
     adds r2,r2,r5    @ 08027504 5219
     ldrh r3,[r2,#0x0]                        @ 08027506 1388
     lsls r1,r3,#0x12    @ 08027508 9904
@@ -21734,17 +22114,17 @@ LAB_08027500:
     movs r0,#0xff    @ 0802750e ff20
     ands r1,r0    @ 08027510 0140
     lsls r1,r1,#0x6    @ 08027512 8901
-    ldr r0, DWORD_08027528                   @ 08027514 0448
+    ldr r0, step25_gprng_step_ctr_mask       @ 08027514 0448
     ands r0,r3    @ 08027516 1840
     orrs r0,r1    @ 08027518 0843
     strh r0,[r2,#0x0]                        @ 0802751a 1080
     bl SUB_08026714                          @ 0802751c fff7faf8
-DWORD_08027520:
+step25_ptr_gprng:
     .word  gPrng                          @ 08027520 40000003
-DWORD_08027524:
-    .word  0x00000202                     @ 08027524 02020000
-DWORD_08027528:
-    .word  0xffffc03f                     @ 08027528 3fc0ffff
+step25_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027524 02020000
+step25_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027528 3fc0ffff
 
 @ Per-frame handler for campaign_scene_handler dispatch table index 26. Trigger: gPrng+0x202 bits[13:6] == 0x1a. Full duel_puzzle initialization sequence: (1) tick_aob_display_with_fadein; if returns 0 calls SUB_08026714 to wait; (2) clear DISPCNT shadow word to 0; (3) clear_oam_active_flags_in_hand_range; (4) zero_fill_by_halfword(0x02029e90, 0x10 halfwords); (5) clear [gPrng+0x23f] bit1 (0x02 mask); (6) zero_duel_scene_display_buffers; (7) clear [0x02023130+0x88*4] OAM cache field with 0xfffc03ff mask; (8) call find_card_index_in_rom_table with current hand card; (9) step_prng_and_get_rand15 then write rand15 to scene_ctx2 as initial seed; (10) fill_card_fs_display_entries_for_card_list; (11) init_duel_puzzle_field_and_hand_display; (12) init_duel_field_vram_layout; (13) compute pack_index (slot_type/5+9) and write OAM attrs; (14) increment gPrng+0x202 frame counter.
 @ 
@@ -21764,12 +22144,12 @@ LAB_08027538:
     movs r0,#0x0    @ 0802753c 0020
     strh r0,[r1,#0x0]                        @ 0802753e 0880
     bl clear_oam_active_flags_in_hand_range  @ 08027540 d1f0e8fd
-    ldr r0, DWORD_080275fc                   @ 08027544 2d48
+    ldr r0, step26_gcampaigndisplaystate     @ 08027544 2d48
     movs r1,#0x10    @ 08027546 1021
     bl zero_fill_by_halfword                 @ 08027548 cdf094fc
-    ldr r6, DWORD_08027600                   @ 0802754c 2c4e
+    ldr r6, step26_ptr_gprng                 @ 0802754c 2c4e
     .hword 0x46b0    @ 0802754e b046
-    ldr r1, DWORD_08027604                   @ 08027550 2c49
+    ldr r1, step26_gprng_banner_flag_off     @ 08027550 2c49
     add r1,r8                                @ 08027552 4144
     movs r0,#0x2    @ 08027554 0220
     rsbs r0,r0,#0    @ 08027556 4042
@@ -21778,12 +22158,12 @@ LAB_08027538:
     ands r0,r2    @ 0802755c 1040
     strb r0,[r1,#0x0]                        @ 0802755e 0870
     bl zero_duel_scene_display_buffers       @ 08027560 a5f06cf9
-    ldr r4, DWORD_08027608                   @ 08027564 284c
+    ldr r4, step26_gduelfieldstate           @ 08027564 284c
     movs r3,#0x88    @ 08027566 8823
     lsls r3,r3,#0x2    @ 08027568 9b00
     adds r2,r4,r3    @ 0802756a e218
     ldr r0,[r2,#0x0]                         @ 0802756c 1068
-    ldr r1, DWORD_0802760c                   @ 0802756e 2749
+    ldr r1, step26_gl_clear_bits_17_10       @ 0802756e 2749
     ands r0,r1    @ 08027570 0840
     str r0,[r2,#0x0]                         @ 08027572 1060
     movs r0,#0x8f    @ 08027574 8f20
@@ -21795,7 +22175,7 @@ LAB_08027538:
     lsrs r2,r0,#0x10    @ 08027582 020c
     movs r5,#0x7f    @ 08027584 7f25
     ands r2,r5    @ 08027586 2a40
-    ldr r1, DWORD_08027610                   @ 08027588 2149
+    ldr r1, step26_gprng_prng_state_off213   @ 08027588 2149
     adds r6,r4,r1    @ 0802758a 6618
     lsls r2,r2,#0x1    @ 0802758c 5200
     movs r7,#0x1    @ 0802758e 0127
@@ -21817,7 +22197,7 @@ LAB_08027538:
     orrs r1,r0    @ 080275ae 0143
     strb r1,[r4,#0x0]                        @ 080275b0 2170
     bl tick_prng_lcg_rand15                  @ 080275b2 d1f09ffc
-    ldr r1, DWORD_08027614                   @ 080275b6 1749
+    ldr r1, step26_ptr_gduelcardctxbase      @ 080275b6 1749
     lsls r0,r0,#0x10    @ 080275b8 0004
     lsrs r0,r0,#0x10    @ 080275ba 000c
     str r0,[r1,#0x0]                         @ 080275bc 0860
@@ -21825,7 +22205,7 @@ LAB_08027538:
     str r0,[r1,#0x4]                         @ 080275c0 4860
     str r0,[r1,#0x8]                         @ 080275c2 8860
     str r7,[r1,#0xc]                         @ 080275c4 cf60
-    ldr r5, DWORD_08027618                   @ 080275c6 144d
+    ldr r5, step26_ptr_gduelscenebase        @ 080275c6 144d
     adds r0,r5,#0x0    @ 080275c8 281c
     adds r0,#0x39    @ 080275ca 3930
     ldrb r0,[r0,#0x0]                        @ 080275cc 0078
@@ -21841,40 +22221,40 @@ LAB_08027538:
     beq LAB_08027624                         @ 080275e2 1fd0
     cmp r0,#0x1a                             @ 080275e4 1a28
     beq LAB_08027658                         @ 080275e6 37d0
-    ldr r0, DWORD_0802761c                   @ 080275e8 0c48
+    ldr r0, step26_gprng_pack_frame_off_23e  @ 080275e8 0c48
     add r0,r8                                @ 080275ea 4044
     ldrb r0,[r0,#0x0]                        @ 080275ec 0078
     lsls r1,r0,#0x5    @ 080275ee 4101
-    ldr r0, DWORD_08027620                   @ 080275f0 0b48
+    ldr r0, step26_puzzle_data_ptr           @ 080275f0 0b48
     adds r1,r1,r0    @ 080275f2 0918
     movs r0,#0x1    @ 080275f4 0120
     bl load_card_fs_entry_to_struct          @ 080275f6 f7f7e9f8
     b LAB_08027672                           @ 080275fa 3ae0
-DWORD_080275fc:
-    .word  0x02029e90                     @ 080275fc 909e0202
-DWORD_08027600:
+step26_gcampaigndisplaystate:
+    .word  gCampaignDisplayState          @ 080275fc 909e0202
+step26_ptr_gprng:
     .word  gPrng                          @ 08027600 40000003
-DWORD_08027604:
-    .word  0x0000023f                     @ 08027604 3f020000
-DWORD_08027608:
-    .word  0x02023130                     @ 08027608 30310202
-DWORD_0802760c:
-    .word  0xfffc03ff                     @ 0802760c ff03fcff
-DWORD_08027610:
-    .word  0x00000213                     @ 08027610 13020000
-DWORD_08027614:
-    .word  0x0201e2a0                     @ 08027614 a0e20102
-DWORD_08027618:
-    .word  0x02023360                     @ 08027618 60330202
-DWORD_0802761c:
-    .word  0x0000023e                     @ 0802761c 3e020000
-DWORD_08027620:
-    .word  0x09e58d12                     @ 08027620 128de509
+step26_gprng_banner_flag_off:
+    .word  GPRNG_BANNER_FLAG_OFF          @ 08027604 3f020000
+step26_gduelfieldstate:
+    .word  gDuelFieldState                @ 08027608 30310202
+step26_gl_clear_bits_17_10:
+    .word  GL_CLEAR_BITS_17_10            @ 0802760c ff03fcff
+step26_gprng_prng_state_off213:
+    .word  GPRNG_PRNG_STATE_OFF213        @ 08027610 13020000
+step26_ptr_gduelcardctxbase:
+    .word  gDuelCardCtxBase               @ 08027614 a0e20102
+step26_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027618 60330202
+step26_gprng_pack_frame_off_23e:
+    .word  GPRNG_PACK_FRAME_OFF_23E       @ 0802761c 3e020000
+step26_puzzle_data_ptr:
+    .word  0x09e58d12                     @ 08027620 128de509  0x09e58d12: puzzle data ROM ptr
 LAB_08027624:
     movs r0,#0x1    @ 08027624 0120
     bl fill_card_fs_display_entries_for_card_list @ 08027626 f7f7a5f9
-    ldr r0, DWORD_08027650                   @ 0802762a 0948
-    ldr r5, DWORD_08027654                   @ 0802762c 094d
+    ldr r0, step26_ewram_base                @ 0802762a 0948
+    ldr r5, step26_duel_scene_field_off_6e57 @ 0802762c 094d
     adds r0,r0,r5    @ 0802762e 4019
     ldrb r0,[r0,#0x0]                        @ 08027630 0078
     lsls r0,r0,#0x19    @ 08027632 4006
@@ -21892,10 +22272,10 @@ LAB_08027624:
     ands r0,r3    @ 0802764a 1840
     strb r0,[r4,#0x0]                        @ 0802764c 2070
     b LAB_08027672                           @ 0802764e 10e0
-DWORD_08027650:
-    .word  0x02000000                     @ 08027650 00000002
-DWORD_08027654:
-    .word  0x00006e57                     @ 08027654 576e0000
+step26_ewram_base:
+    .word  EWRAM_BASE                     @ 08027650 00000002
+step26_duel_scene_field_off_6e57:
+    .word  DUEL_SCENE_FIELD_OFF_6E57      @ 08027654 576e0000
 LAB_08027658:
     ldrh r5,[r5,#0xc]                        @ 08027658 ad89
     lsls r0,r5,#0x11    @ 0802765a 6804
@@ -21905,15 +22285,15 @@ LAB_08027658:
     lsls r1,r1,#0x2    @ 08027662 8900
     subs r1,r1,r0    @ 08027664 091a
     lsls r1,r1,#0x3    @ 08027666 c900
-    ldr r0, DWORD_080276c0                   @ 08027668 1548
+    ldr r0, step26_gcampaignspritectxbase    @ 08027668 1548
     adds r1,r1,r0    @ 0802766a 0918
     movs r0,#0x1    @ 0802766c 0120
     bl fill_card_fs_display_entries          @ 0802766e f7f7eff8
 LAB_08027672:
     bl init_duel_puzzle_field_and_hand_display @ 08027672 6bf0f5ff
     bl init_duel_field_vram_layout           @ 08027676 a5f045f9
-    ldr r4, DWORD_080276c4                   @ 0802767a 124c
-    ldr r0, DWORD_080276c8                   @ 0802767c 1248
+    ldr r4, step26_gduelfieldstate_1         @ 0802767a 124c
+    ldr r0, step26_ptr_gduelscenebase_1      @ 0802767c 1248
     ldrb r0,[r0,#0x2]                        @ 0802767e 8078
     lsls r0,r0,#0x1b    @ 08027680 c006
     lsrs r0,r0,#0x1b    @ 08027682 c00e
@@ -21926,13 +22306,13 @@ LAB_08027672:
     movs r5,#0xff    @ 08027692 ff25
     ands r0,r5    @ 08027694 2840
     lsls r0,r0,#0x2    @ 08027696 8000
-    ldr r1, DWORD_080276cc                   @ 08027698 0c49
+    ldr r1, step26_gl_clear_bits_9_2         @ 08027698 0c49
     ldrh r6,[r4,#0x0]                        @ 0802769a 2688
     ands r1,r6    @ 0802769c 3140
     orrs r1,r0    @ 0802769e 0143
     strh r1,[r4,#0x0]                        @ 080276a0 2180
-    ldr r2, DWORD_080276d0                   @ 080276a2 0b4a
-    ldr r0, DWORD_080276d4                   @ 080276a4 0b48
+    ldr r2, step26_ptr_gprng_1               @ 080276a2 0b4a
+    ldr r0, step26_gprng_step_idx_off        @ 080276a4 0b48
     adds r2,r2,r0    @ 080276a6 1218
     ldrh r3,[r2,#0x0]                        @ 080276a8 1388
     lsls r0,r3,#0x12    @ 080276aa 9804
@@ -21940,25 +22320,25 @@ LAB_08027672:
     adds r0,#0x1    @ 080276ae 0130
     ands r0,r5    @ 080276b0 2840
     lsls r0,r0,#0x6    @ 080276b2 8001
-    ldr r1, DWORD_080276d8                   @ 080276b4 0849
+    ldr r1, step26_gprng_step_ctr_mask       @ 080276b4 0849
     ands r1,r3    @ 080276b6 1940
     orrs r1,r0    @ 080276b8 0143
     strh r1,[r2,#0x0]                        @ 080276ba 1180
     bl SUB_08026714                          @ 080276bc fff72af8
-DWORD_080276c0:
-    .word  0x02001250                     @ 080276c0 50120002
-DWORD_080276c4:
-    .word  0x02023130                     @ 080276c4 30310202
-DWORD_080276c8:
-    .word  0x02023360                     @ 080276c8 60330202
-DWORD_080276cc:
-    .word  0xfffffc03                     @ 080276cc 03fcffff
-DWORD_080276d0:
+step26_gcampaignspritectxbase:
+    .word  gCampaignSpriteCtxBase         @ 080276c0 50120002
+step26_gduelfieldstate_1:
+    .word  gDuelFieldState                @ 080276c4 30310202
+step26_ptr_gduelscenebase_1:
+    .word  gDuelSceneBase                 @ 080276c8 60330202
+step26_gl_clear_bits_9_2:
+    .word  GL_CLEAR_BITS_9_2              @ 080276cc 03fcffff
+step26_ptr_gprng_1:
     .word  gPrng                          @ 080276d0 40000003
-DWORD_080276d4:
-    .word  0x00000202                     @ 080276d4 02020000
-DWORD_080276d8:
-    .word  0xffffc03f                     @ 080276d8 3fc0ffff
+step26_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 080276d4 02020000
+step26_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 080276d8 3fc0ffff
 
 @ campaign_scene_handler dispatch table index 27. Trigger: gPrng+0x202 bits[13:6] == 0x1b. Sequence: (1) bl tick_duel_field_fadeout_step; (2) if returns 0 (fadeout not complete): b SUB_08026714 to wait; (3) if returns nonzero (fadeout complete): reads gPrng+0x202 halfword, increments bits[13:6] by 1, writes back, then b SUB_08026714 to advance to step 28. No direct r0 return value; both exit paths via b tail-call.
 @ 
@@ -21970,8 +22350,8 @@ run_campaign_step27_duel_field_fadeout_tick:
     bne LAB_080276e8                         @ 080276e2 01d1
     bl SUB_08026714                          @ 080276e4 fff716f8
 LAB_080276e8:
-    ldr r2, DWORD_08027708                   @ 080276e8 074a
-    ldr r1, DWORD_0802770c                   @ 080276ea 0849
+    ldr r2, step27_ptr_gprng                 @ 080276e8 074a
+    ldr r1, step27_gprng_step_idx_off        @ 080276ea 0849
     adds r2,r2,r1    @ 080276ec 5218
     ldrh r3,[r2,#0x0]                        @ 080276ee 1388
     lsls r1,r3,#0x12    @ 080276f0 9904
@@ -21980,17 +22360,17 @@ LAB_080276e8:
     movs r0,#0xff    @ 080276f6 ff20
     ands r1,r0    @ 080276f8 0140
     lsls r1,r1,#0x6    @ 080276fa 8901
-    ldr r0, DWORD_08027710                   @ 080276fc 0448
+    ldr r0, step27_gprng_step_ctr_mask       @ 080276fc 0448
     ands r0,r3    @ 080276fe 1840
     orrs r0,r1    @ 08027700 0843
     strh r0,[r2,#0x0]                        @ 08027702 1080
     bl SUB_08026714                          @ 08027704 fff706f8
-DWORD_08027708:
+step27_ptr_gprng:
     .word  gPrng                          @ 08027708 40000003
-DWORD_0802770c:
-    .word  0x00000202                     @ 0802770c 02020000
-DWORD_08027710:
-    .word  0xffffc03f                     @ 08027710 3fc0ffff
+step27_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 0802770c 02020000
+step27_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027710 3fc0ffff
 
 @ campaign_scene_handler dispatch table entry index 28, duel field main frame animation tick phase. Calls tick_duel_field_main_frame to execute field main frame logic; if return is 0 (frame not complete) calls SUB_08026714 to advance scene state. In all cases reads gPrng+0x202 frame counter bits[13:6], increments by 1 taking low 8 bits, writes back to bits[13:6], then calls SUB_08026714 again to advance scene state machine.
 @ 
@@ -22003,8 +22383,8 @@ run_campaign_step28_duel_field_tick:
     bne LAB_08027720                         @ 0802771a 01d1
     bl SUB_08026714                          @ 0802771c fef7faff
 LAB_08027720:
-    ldr r2, DWORD_08027740                   @ 08027720 074a
-    ldr r3, DWORD_08027744                   @ 08027722 084b
+    ldr r2, step28_ptr_gprng                 @ 08027720 074a
+    ldr r3, step28_gprng_step_idx_off        @ 08027722 084b
     adds r2,r2,r3    @ 08027724 d218
     ldrh r3,[r2,#0x0]                        @ 08027726 1388
     lsls r1,r3,#0x12    @ 08027728 9904
@@ -22013,17 +22393,17 @@ LAB_08027720:
     movs r0,#0xff    @ 0802772e ff20
     ands r1,r0    @ 08027730 0140
     lsls r1,r1,#0x6    @ 08027732 8901
-    ldr r0, DWORD_08027748                   @ 08027734 0448
+    ldr r0, step28_gprng_step_ctr_mask       @ 08027734 0448
     ands r0,r3    @ 08027736 1840
     orrs r0,r1    @ 08027738 0843
     strh r0,[r2,#0x0]                        @ 0802773a 1080
     bl SUB_08026714                          @ 0802773c fef7eaff
-DWORD_08027740:
+step28_ptr_gprng:
     .word  gPrng                          @ 08027740 40000003
-DWORD_08027744:
-    .word  0x00000202                     @ 08027744 02020000
-DWORD_08027748:
-    .word  0xffffc03f                     @ 08027748 3fc0ffff
+step28_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027744 02020000
+step28_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027748 3fc0ffff
 
 @ Duel field fadein tick handler for campaign_scene_handler dispatch table index 29. Trigger: gPrng+0x202 bits[13:6] == 0x1d. Calls tick_duel_field_fadein_step to advance duel field fadein; if returns 0 (not done) tail-calls SUB_08026714 to wait. If done reads [0x02023130+0x226] byte0 bit0: if bit0==1 calls SUB_08027768 (trigger scene-enter complete event); otherwise increments gPrng+0x202 frame counter bits[13:6] and tail-calls SUB_08026714 to advance to step 30.
 @ 
@@ -22037,8 +22417,8 @@ run_campaign_step29_duel_field_fadein_tick:
     bne LAB_08027758                         @ 08027752 01d1
     bl SUB_08026714                          @ 08027754 fef7deff
 LAB_08027758:
-    ldr r1, DWORD_08027770                   @ 08027758 0549
-    ldr r4, DWORD_08027774                   @ 0802775a 064c
+    ldr r1, sub_7768_gduelfieldstate         @ 08027758 0549
+    ldr r4, sub_7768_duel_field_state_226_off @ 0802775a 064c
     adds r1,r1,r4    @ 0802775c 0919
     movs r0,#0x1    @ 0802775e 0120
     ldrb r1,[r1,#0x0]                        @ 08027760 0978
@@ -22050,13 +22430,13 @@ SUB_08027768:
     lsls r0,r0,#0x7    @ 0802776a c001
     b SUB_08027c82                           @ 0802776c 89e2
     .zero  0x2
-DWORD_08027770:
-    .word  0x02023130                     @ 08027770 30310202
-DWORD_08027774:
-    .word  0x00000226                     @ 08027774 26020000
+sub_7768_gduelfieldstate:
+    .word  gDuelFieldState                @ 08027770 30310202
+sub_7768_duel_field_state_226_off:
+    .word  DUEL_FIELD_STATE_226_OFF       @ 08027774 26020000
 LAB_08027778:
-    ldr r2, DWORD_08027798                   @ 08027778 074a
-    ldr r5, DWORD_0802779c                   @ 0802777a 084d
+    ldr r2, sub_7768_ptr_gprng               @ 08027778 074a
+    ldr r5, sub_7768_gprng_step_idx_off      @ 0802777a 084d
     adds r2,r2,r5    @ 0802777c 5219
     ldrh r3,[r2,#0x0]                        @ 0802777e 1388
     lsls r1,r3,#0x12    @ 08027780 9904
@@ -22065,17 +22445,17 @@ LAB_08027778:
     movs r0,#0xff    @ 08027786 ff20
     ands r1,r0    @ 08027788 0140
     lsls r1,r1,#0x6    @ 0802778a 8901
-    ldr r0, DWORD_080277a0                   @ 0802778c 0448
+    ldr r0, sub_7768_gprng_step_ctr_mask     @ 0802778c 0448
     ands r0,r3    @ 0802778e 1840
     orrs r0,r1    @ 08027790 0843
     strh r0,[r2,#0x0]                        @ 08027792 1080
     bl SUB_08026714                          @ 08027794 fef7beff
-DWORD_08027798:
+sub_7768_ptr_gprng:
     .word  gPrng                          @ 08027798 40000003
-DWORD_0802779c:
-    .word  0x00000202                     @ 0802779c 02020000
-DWORD_080277a0:
-    .word  0xffffc03f                     @ 080277a0 3fc0ffff
+sub_7768_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 0802779c 02020000
+sub_7768_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 080277a0 3fc0ffff
 
 @ campaign_scene_handler dispatch table entry index 30, initializes pack card info display screen. Symmetric structure with run_campaign_step34_field_rule_display (0x08027a0c): first reads [0x02000000+0x6c2c] low 3 bits rule_type [1..5], selects different ROM tile data pointers per rule_type (5 sets). Then: (1) calls init_pack_card_info_screen_vram (FUN_0802b590, r1=1) for pack VRAM full init and card name render; (2) calls init_puzzle_card_name_line_buf (FUN_0802b8bc) to init line buffer; (3) calls render_card_stats_to_line_buf to render card stat numbers; (4) calls zero_sprite_vram_with_tile_seq (FUN_0802bd64) to clear sprite VRAM and write tilemap; (5) reads gPrng+0x202 frame counter and increments by 1; (6) tail-jumps b SUB_08027c22 to advance scene state machine.
 @ 
@@ -22084,8 +22464,8 @@ DWORD_080277a0:
 @ - init_pack_card_info_screen_vram r1=1 (pack_index=1, fixed)
 @ - gPrng+0x202 = frame count field bits[13:6]
 run_campaign_step30_pack_card_info_display:
-    ldr r0, DWORD_080277cc                   @ 080277a4 0948
-    ldr r6, DWORD_080277d0                   @ 080277a6 0a4e
+    ldr r0, step30_ewram_base                @ 080277a4 0948
+    ldr r6, step30_gsettings_offset          @ 080277a6 0a4e
     adds r0,r0,r6    @ 080277a8 8019
     movs r1,#0x7    @ 080277aa 0721
     ldrb r0,[r0,#0x0]                        @ 080277ac 0078
@@ -22098,45 +22478,45 @@ run_campaign_step30_pack_card_info_display:
     beq LAB_080277e4                         @ 080277ba 13d0
     cmp r1,#0x4                              @ 080277bc 0429
     beq LAB_080277dc                         @ 080277be 0dd0
-    ldr r0, DWORD_080277d4                   @ 080277c0 0448
+    ldr r0, step30_font5_base_a              @ 080277c0 0448
     cmp r1,#0x5                              @ 080277c2 0529
     bne LAB_080277f6                         @ 080277c4 17d1
-    ldr r1, DWORD_080277d8                   @ 080277c6 0449
+    ldr r1, step30_font5_off_a               @ 080277c6 0449
     adds r0,r0,r1    @ 080277c8 4018
     b LAB_080277f6                           @ 080277ca 14e0
-DWORD_080277cc:
-    .word  0x02000000                     @ 080277cc 00000002
-DWORD_080277d0:
-    .word  0x00006c2c                     @ 080277d0 2c6c0000
-DWORD_080277d4:
-    .word  0x09dbe49a                     @ 080277d4 9ae4db09
-DWORD_080277d8:
-    .word  0x0003aade                     @ 080277d8 deaa0300
+step30_ewram_base:
+    .word  EWRAM_BASE                     @ 080277cc 00000002
+step30_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 080277d0 2c6c0000
+step30_font5_base_a:
+    .word  0x09dbe49a                     @ 080277d4 9ae4db09  0x09dbe49a
+step30_font5_off_a:
+    .word  0x0003aade                     @ 080277d8 deaa0300  0x0003aade
 LAB_080277dc:
-    ldr r0, DWORD_080277e0                   @ 080277dc 0048
+    ldr r0, step30_font4_ptr_a               @ 080277dc 0048
     b LAB_080277f6                           @ 080277de 0ae0
-DWORD_080277e0:
-    .word  0x09ded29a                     @ 080277e0 9ad2de09
+step30_font4_ptr_a:
+    .word  0x09ded29a                     @ 080277e0 9ad2de09  0x09ded29a
 LAB_080277e4:
-    ldr r0, DWORD_080277e8                   @ 080277e4 0048
+    ldr r0, step30_font3_ptr_a               @ 080277e4 0048
     b LAB_080277f6                           @ 080277e6 06e0
-DWORD_080277e8:
-    .word  0x09de0e46                     @ 080277e8 460ede09
+step30_font3_ptr_a:
+    .word  0x09de0e46                     @ 080277e8 460ede09  0x09de0e46
 LAB_080277ec:
-    ldr r0, DWORD_080277f0                   @ 080277ec 0048
+    ldr r0, step30_font2_ptr_a               @ 080277ec 0048
     b LAB_080277f6                           @ 080277ee 02e0
-DWORD_080277f0:
-    .word  0x09dd4bb4                     @ 080277f0 b44bdd09
+step30_font2_ptr_a:
+    .word  0x09dd4bb4                     @ 080277f0 b44bdd09  0x09dd4bb4
 LAB_080277f4:
-    ldr r0, DWORD_08027824                   @ 080277f4 0b48
+    ldr r0, step30_font1_ptr_a               @ 080277f4 0b48
 LAB_080277f6:
     movs r1,#0x1    @ 080277f6 0121
     bl init_pack_card_info_screen_vram       @ 080277f8 03f0cafe
     bl init_puzzle_card_name_line_buf        @ 080277fc 04f05ef8
     bl render_card_stats_to_line_buf         @ 08027800 fdf742fa
     bl zero_sprite_vram_with_tile_seq        @ 08027804 04f0aefa
-    ldr r2, DWORD_08027828                   @ 08027808 074a
-    ldr r3, DWORD_0802782c                   @ 0802780a 084b
+    ldr r2, step30_ptr_gprng                 @ 08027808 074a
+    ldr r3, step30_gprng_step_idx_off        @ 0802780a 084b
     adds r2,r2,r3    @ 0802780c d218
     ldrh r3,[r2,#0x0]                        @ 0802780e 1388
     lsls r1,r3,#0x12    @ 08027810 9904
@@ -22145,18 +22525,18 @@ LAB_080277f6:
     movs r0,#0xff    @ 08027816 ff20
     ands r1,r0    @ 08027818 0140
     lsls r1,r1,#0x6    @ 0802781a 8901
-    ldr r0, DWORD_08027830                   @ 0802781c 0448
+    ldr r0, step30_gprng_step_ctr_mask       @ 0802781c 0448
     ands r0,r3    @ 0802781e 1840
     b SUB_08027c22                           @ 08027820 ffe1
     .zero  0x2
-DWORD_08027824:
-    .word  0x09dc9548                     @ 08027824 4895dc09
-DWORD_08027828:
+step30_font1_ptr_a:
+    .word  0x09dc9548                     @ 08027824 4895dc09  0x09dc9548
+step30_ptr_gprng:
     .word  gPrng                          @ 08027828 40000003
-DWORD_0802782c:
-    .word  0x00000202                     @ 0802782c 02020000
-DWORD_08027830:
-    .word  0xffffc03f                     @ 08027830 3fc0ffff
+step30_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 0802782c 02020000
+step30_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027830 3fc0ffff
 
 @ Per-frame tick handler for campaign_scene_handler dispatch table index 31. Trigger: gPrng+0x202 bits[13:6] == 0x1f. Calls tick_lp_display_and_blend_step to advance LP digit sprite rendering and blend fade; if returns 0 (not done) calls SUB_08026714 to wait next frame. Otherwise clears gPrng+0x203 low 6 bits (AND 0x3f, slot_type mask) and clears bit6 (AND ~0x40) at gPrng+0x224+0x204, increments gPrng+0x202 frame counter bits[13:6], then tail-calls SUB_08026714 to advance to next step.
 @ 
@@ -22172,8 +22552,8 @@ run_campaign_step31_duel_lp_fadein_tick:
     bne LAB_08027840                         @ 0802783a 01d1
     bl SUB_08026714                          @ 0802783c fef76aff
 LAB_08027840:
-    ldr r2, DWORD_0802787c                   @ 08027840 0e4a
-    ldr r4, DWORD_08027880                   @ 08027842 0f4c
+    ldr r2, step31_ptr_gprng                 @ 08027840 0e4a
+    ldr r4, step31_gprng_frame_ctrl_off_203  @ 08027842 0f4c
     adds r1,r2,r4    @ 08027844 1119
     movs r0,#0x3f    @ 08027846 3f20
     ldrb r5,[r1,#0x0]                        @ 08027848 0d78
@@ -22196,17 +22576,17 @@ LAB_08027840:
     movs r0,#0xff    @ 0802786a ff20
     ands r1,r0    @ 0802786c 0140
     lsls r1,r1,#0x6    @ 0802786e 8901
-    ldr r0, DWORD_08027884                   @ 08027870 0448
+    ldr r0, step31_gprng_step_ctr_mask       @ 08027870 0448
     ands r0,r3    @ 08027872 1840
     orrs r0,r1    @ 08027874 0843
     strh r0,[r2,#0x0]                        @ 08027876 1080
     bl SUB_08026714                          @ 08027878 fef74cff
-DWORD_0802787c:
+step31_ptr_gprng:
     .word  gPrng                          @ 0802787c 40000003
-DWORD_08027880:
-    .word  0x00000203                     @ 08027880 03020000
-DWORD_08027884:
-    .word  0xffffc03f                     @ 08027884 3fc0ffff
+step31_gprng_frame_ctrl_off_203:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 08027880 03020000
+step31_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027884 3fc0ffff
 
 @ campaign_scene_handler (FUN_08025c94) dispatch table entry index 32, duel_puzzle display phase per-frame tick. Calls dispatch_puzzle_display_mode (FUN_0802be08) for LP digit render and mode dispatch; if return is 0 (scene not ready) calls SUB_08026714 to advance state. In all cases reads gPrng+0x202 bits[13:6] (frame count field), increments by 1 taking low 8 bits, shifts left 6, writes back to same field position, then calls SUB_08026714 to advance scene state machine again.
 @ 
@@ -22219,8 +22599,8 @@ run_campaign_step32_puzzle_display_tick:
     bne LAB_08027894                         @ 0802788e 01d1
     bl SUB_08026714                          @ 08027890 fef740ff
 LAB_08027894:
-    ldr r2, DWORD_080278b4                   @ 08027894 074a
-    ldr r5, DWORD_080278b8                   @ 08027896 084d
+    ldr r2, step32_ptr_gprng                 @ 08027894 074a
+    ldr r5, step32_gprng_step_idx_off        @ 08027896 084d
     adds r2,r2,r5    @ 08027898 5219
     ldrh r3,[r2,#0x0]                        @ 0802789a 1388
     lsls r1,r3,#0x12    @ 0802789c 9904
@@ -22229,17 +22609,17 @@ LAB_08027894:
     movs r0,#0xff    @ 080278a2 ff20
     ands r1,r0    @ 080278a4 0140
     lsls r1,r1,#0x6    @ 080278a6 8901
-    ldr r0, DWORD_080278bc                   @ 080278a8 0448
+    ldr r0, step32_gprng_step_ctr_mask       @ 080278a8 0448
     ands r0,r3    @ 080278aa 1840
     orrs r0,r1    @ 080278ac 0843
     strh r0,[r2,#0x0]                        @ 080278ae 1080
     bl SUB_08026714                          @ 080278b0 fef730ff
-DWORD_080278b4:
+step32_ptr_gprng:
     .word  gPrng                          @ 080278b4 40000003
-DWORD_080278b8:
-    .word  0x00000202                     @ 080278b8 02020000
-DWORD_080278bc:
-    .word  0xffffc03f                     @ 080278bc 3fc0ffff
+step32_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 080278b8 02020000
+step32_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 080278bc 3fc0ffff
 
 @ Per-frame tick handler for campaign_scene_handler dispatch table index 33. Trigger: gPrng+0x202 bits[13:6] == 0x21. Sequence: (1) call tick_lp_display_and_fadein_check; if returns 0 tail-calls SUB_08026714 to wait; (2) read [scene_ctx+0x68] LP prize amount, call accrue_money_with_cap to award coins; (3) read [scene_ctx2+0x89*4] battle_result field (0=no_result, 1=player_win, 2=draw, 3=opp_win); dispatch on four paths each reading next scene ID from a different EWRAM slot and triggering scene transition.
 @ 
@@ -22257,10 +22637,10 @@ run_campaign_step33_duel_reward_and_fadein_tick:
     bne LAB_080278cc                         @ 080278c6 01d1
     bl SUB_08026714                          @ 080278c8 fef724ff
 LAB_080278cc:
-    ldr r4, DWORD_080278ec                   @ 080278cc 074c
+    ldr r4, step33_ptr_gduelscenebase        @ 080278cc 074c
     ldr r0,[r4,#0x68]                        @ 080278ce a06e
     bl accrue_money_with_cap                 @ 080278d0 d1f024fb
-    ldr r0, DWORD_080278f0                   @ 080278d4 0648
+    ldr r0, step33_ptr_gduelcardctxbase      @ 080278d4 0648
     movs r6,#0x89    @ 080278d6 8926
     lsls r6,r6,#0x2    @ 080278d8 b600
     adds r0,r0,r6    @ 080278da 8019
@@ -22272,68 +22652,68 @@ LAB_080278cc:
     cmp r0,#0x1                              @ 080278e6 0128
     beq LAB_080278fa                         @ 080278e8 07d0
     b LAB_080279d4                           @ 080278ea 73e0
-DWORD_080278ec:
-    .word  0x02023360                     @ 080278ec 60330202
-DWORD_080278f0:
-    .word  0x0201e2a0                     @ 080278f0 a0e20102
+step33_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 080278ec 60330202
+step33_ptr_gduelcardctxbase:
+    .word  gDuelCardCtxBase               @ 080278f0 a0e20102
 LAB_080278f4:
     cmp r0,#0x3                              @ 080278f4 0328
     beq LAB_0802799c                         @ 080278f6 51d0
     b LAB_080279d4                           @ 080278f8 6ce0
 LAB_080278fa:
-    ldr r5, DWORD_08027938                   @ 080278fa 0f4d
+    ldr r5, step33_ewram_base                @ 080278fa 0f4d
     ldrb r4,[r4,#0x2]                        @ 080278fc a478
     lsls r3,r4,#0x1b    @ 080278fe e306
     lsrs r0,r3,#0x19    @ 08027900 580e
     adds r0,r0,r5    @ 08027902 4019
-    ldr r1, DWORD_0802793c                   @ 08027904 0d49
+    ldr r1, step33_gwins_base_offset         @ 08027904 0d49
     adds r0,r0,r1    @ 08027906 4018
     ldrh r0,[r0,#0x0]                        @ 08027908 0088
     lsls r1,r0,#0x14    @ 0802790a 0105
-    ldr r0, DWORD_08027940                   @ 0802790c 0c48
+    ldr r0, step33_scene_slot_mask_hi_clear  @ 0802790c 0c48
     cmp r1,r0                                @ 0802790e 8142
     bhi LAB_080279d4                         @ 08027910 60d8
     lsrs r2,r3,#0x19    @ 08027912 5a0e
     adds r2,r2,r5    @ 08027914 5219
     lsrs r0,r3,#0x19    @ 08027916 580e
     adds r0,r0,r5    @ 08027918 4019
-    ldr r3, DWORD_0802793c                   @ 0802791a 084b
+    ldr r3, step33_gwins_base_offset         @ 0802791a 084b
     adds r0,r0,r3    @ 0802791c c018
     ldrh r0,[r0,#0x0]                        @ 0802791e 0088
     lsls r1,r0,#0x14    @ 08027920 0105
     lsrs r1,r1,#0x14    @ 08027922 090d
     adds r1,#0x1    @ 08027924 0131
     adds r2,r2,r3    @ 08027926 d218
-    ldr r4, DWORD_08027944                   @ 08027928 064c
+    ldr r4, step33_scene_slot_mask_lo        @ 08027928 064c
     adds r0,r4,#0x0    @ 0802792a 201c
     ands r1,r0    @ 0802792c 0140
-    ldr r0, DWORD_08027948                   @ 0802792e 0648
+    ldr r0, step33_scene_slot_field_clear    @ 0802792e 0648
     ldrh r5,[r2,#0x0]                        @ 08027930 1588
     ands r0,r5    @ 08027932 2840
     b LAB_080279d0                           @ 08027934 4ce0
     .zero  0x2
-DWORD_08027938:
-    .word  0x02000000                     @ 08027938 00000002
-DWORD_0802793c:
-    .word  0x00006e60                     @ 0802793c 606e0000
-DWORD_08027940:
-    .word  0xffe00000                     @ 08027940 0000e0ff
-DWORD_08027944:
-    .word  0x00000fff                     @ 08027944 ff0f0000
-DWORD_08027948:
-    .word  0xfffff000                     @ 08027948 00f0ffff
+step33_ewram_base:
+    .word  EWRAM_BASE                     @ 08027938 00000002
+step33_gwins_base_offset:
+    .word  GWINS_BASE_OFFSET              @ 0802793c 606e0000
+step33_scene_slot_mask_hi_clear:
+    .word  SCENE_SLOT_MASK_HI_CLEAR       @ 08027940 0000e0ff
+step33_scene_slot_mask_lo:
+    .word  SCENE_SLOT_MASK_LO             @ 08027944 ff0f0000
+step33_scene_slot_field_clear:
+    .word  SCENE_SLOT_FIELD_CLEAR         @ 08027948 00f0ffff
 LAB_0802794c:
-    ldr r5, DWORD_0802798c                   @ 0802794c 0f4d
+    ldr r5, step33_ewram_base_1              @ 0802794c 0f4d
     ldrb r4,[r4,#0x2]                        @ 0802794e a478
     lsls r2,r4,#0x1b    @ 08027950 e206
     lsrs r0,r2,#0x19    @ 08027952 500e
     adds r0,r0,r5    @ 08027954 4019
-    ldr r6, DWORD_08027990                   @ 08027956 0e4e
+    ldr r6, step33_gwins_base_offset_1       @ 08027956 0e4e
     adds r0,r0,r6    @ 08027958 8019
     ldr r0,[r0,#0x0]                         @ 0802795a 0068
     lsls r0,r0,#0xa    @ 0802795c 8002
     lsrs r0,r0,#0x16    @ 0802795e 800d
-    ldr r1, DWORD_08027994                   @ 08027960 0c49
+    ldr r1, step33_scene_slot_field_mask     @ 08027960 0c49
     cmp r0,r1                                @ 08027962 8842
     bhi LAB_080279d4                         @ 08027964 36d8
     lsrs r3,r2,#0x19    @ 08027966 530e
@@ -22350,37 +22730,37 @@ LAB_0802794c:
     ands r0,r1    @ 0802797c 0840
     lsls r0,r0,#0xc    @ 0802797e 0003
     ldr r1,[r3,#0x0]                         @ 08027980 1968
-    ldr r2, DWORD_08027998                   @ 08027982 054a
+    ldr r2, step33_scene_slot_ctr_clear      @ 08027982 054a
     ands r1,r2    @ 08027984 1140
     orrs r1,r0    @ 08027986 0143
     str r1,[r3,#0x0]                         @ 08027988 1960
     b LAB_080279d4                           @ 0802798a 23e0
-DWORD_0802798c:
-    .word  0x02000000                     @ 0802798c 00000002
-DWORD_08027990:
-    .word  0x00006e60                     @ 08027990 606e0000
-DWORD_08027994:
-    .word  0x000003fe                     @ 08027994 fe030000
-DWORD_08027998:
-    .word  0xffc00fff                     @ 08027998 ff0fc0ff
+step33_ewram_base_1:
+    .word  EWRAM_BASE                     @ 0802798c 00000002
+step33_gwins_base_offset_1:
+    .word  GWINS_BASE_OFFSET              @ 08027990 606e0000
+step33_scene_slot_field_mask:
+    .word  SCENE_SLOT_FIELD_MASK          @ 08027994 fe030000
+step33_scene_slot_ctr_clear:
+    .word  SCENE_SLOT_CTR_CLEAR           @ 08027998 ff0fc0ff
 LAB_0802799c:
-    ldr r5, DWORD_080279f4                   @ 0802799c 154d
+    ldr r5, step33_ewram_base_2              @ 0802799c 154d
     ldrb r4,[r4,#0x2]                        @ 0802799e a478
     lsls r3,r4,#0x1b    @ 080279a0 e306
     lsrs r0,r3,#0x19    @ 080279a2 580e
     adds r0,r0,r5    @ 080279a4 4019
-    ldr r1, DWORD_080279f8                   @ 080279a6 1449
+    ldr r1, step33_wins_off_6e62             @ 080279a6 1449
     adds r0,r0,r1    @ 080279a8 4018
     ldrh r0,[r0,#0x0]                        @ 080279aa 0088
     lsrs r1,r0,#0x6    @ 080279ac 8109
-    ldr r0, DWORD_080279fc                   @ 080279ae 1348
+    ldr r0, step33_scene_slot_field_mask_1   @ 080279ae 1348
     cmp r1,r0                                @ 080279b0 8142
     bhi LAB_080279d4                         @ 080279b2 0fd8
     lsrs r2,r3,#0x19    @ 080279b4 5a0e
     adds r2,r2,r5    @ 080279b6 5219
     lsrs r0,r3,#0x19    @ 080279b8 580e
     adds r0,r0,r5    @ 080279ba 4019
-    ldr r3, DWORD_080279f8                   @ 080279bc 0e4b
+    ldr r3, step33_wins_off_6e62             @ 080279bc 0e4b
     adds r0,r0,r3    @ 080279be c018
     ldrh r0,[r0,#0x0]                        @ 080279c0 0088
     lsrs r1,r0,#0x6    @ 080279c2 8109
@@ -22394,8 +22774,8 @@ LAB_080279d0:
     orrs r0,r1    @ 080279d0 0843
     strh r0,[r2,#0x0]                        @ 080279d2 1080
 LAB_080279d4:
-    ldr r2, DWORD_08027a00                   @ 080279d4 0a4a
-    ldr r5, DWORD_08027a04                   @ 080279d6 0b4d
+    ldr r2, step33_ptr_gprng                 @ 080279d4 0a4a
+    ldr r5, step33_gprng_step_idx_off        @ 080279d6 0b4d
     adds r2,r2,r5    @ 080279d8 5219
     ldrh r3,[r2,#0x0]                        @ 080279da 1388
     lsls r1,r3,#0x12    @ 080279dc 9904
@@ -22404,23 +22784,23 @@ LAB_080279d4:
     movs r0,#0xff    @ 080279e2 ff20
     ands r1,r0    @ 080279e4 0140
     lsls r1,r1,#0x6    @ 080279e6 8901
-    ldr r0, DWORD_08027a08                   @ 080279e8 0748
+    ldr r0, step33_gprng_step_ctr_mask       @ 080279e8 0748
     ands r0,r3    @ 080279ea 1840
     orrs r0,r1    @ 080279ec 0843
     strh r0,[r2,#0x0]                        @ 080279ee 1080
     bl SUB_08026714                          @ 080279f0 fef790fe
-DWORD_080279f4:
-    .word  0x02000000                     @ 080279f4 00000002
-DWORD_080279f8:
-    .word  0x00006e62                     @ 080279f8 626e0000
-DWORD_080279fc:
-    .word  0x000003fe                     @ 080279fc fe030000
-DWORD_08027a00:
+step33_ewram_base_2:
+    .word  EWRAM_BASE                     @ 080279f4 00000002
+step33_wins_off_6e62:
+    .word  0x00006e62                     @ 080279f8 626e0000  0x6e62: GWINS_BASE_OFF_2 field
+step33_scene_slot_field_mask_1:
+    .word  SCENE_SLOT_FIELD_MASK          @ 080279fc fe030000
+step33_ptr_gprng:
     .word  gPrng                          @ 08027a00 40000003
-DWORD_08027a04:
-    .word  0x00000202                     @ 08027a04 02020000
-DWORD_08027a08:
-    .word  0xffffc03f                     @ 08027a08 3fc0ffff
+step33_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027a04 02020000
+step33_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027a08 3fc0ffff
 
 @ campaign_scene_handler dispatch table entry index 34, displays rule information after duel field initialization. Calls build_field_slot_bitmask to build field slot mask, then init_duel_field_icon_and_bg_vram to init field icon and BG VRAM. Reads [0x02000000+0x6c2c] low 3 bits as rule_type [1..5], selects ROM data pointer for each rule type (5 different graphic resources). Then calls draw_decimal_with_offset to render decimal number at screen position (turn_count or LP limit display), reads rule_type again and selects second set of data pointers, calls draw_decimal_with_offset again. Overall completes duel field rule number display.
 @ 
@@ -22431,8 +22811,8 @@ DWORD_08027a08:
 run_campaign_step34_field_rule_display:
     bl build_field_slot_bitmask              @ 08027a0c fcf772ff
     bl init_duel_field_icon_and_bg_vram      @ 08027a10 fcf7acf8
-    ldr r0, DWORD_08027a3c                   @ 08027a14 0948
-    ldr r6, DWORD_08027a40                   @ 08027a16 0a4e
+    ldr r0, step34_ewram_base                @ 08027a14 0948
+    ldr r6, step34_gsettings_offset          @ 08027a16 0a4e
     adds r0,r0,r6    @ 08027a18 8019
     movs r1,#0x7    @ 08027a1a 0721
     ldrb r0,[r0,#0x0]                        @ 08027a1c 0078
@@ -22445,40 +22825,40 @@ run_campaign_step34_field_rule_display:
     beq LAB_08027a54                         @ 08027a2a 13d0
     cmp r1,#0x4                              @ 08027a2c 0429
     beq LAB_08027a4c                         @ 08027a2e 0dd0
-    ldr r3, DWORD_08027a44                   @ 08027a30 044b
+    ldr r3, step34_font5_base_a              @ 08027a30 044b
     cmp r1,#0x5                              @ 08027a32 0529
     bne LAB_08027a66                         @ 08027a34 17d1
-    ldr r0, DWORD_08027a48                   @ 08027a36 0448
+    ldr r0, step34_font5_off_a               @ 08027a36 0448
     adds r3,r3,r0    @ 08027a38 1b18
     b LAB_08027a66                           @ 08027a3a 14e0
-DWORD_08027a3c:
-    .word  0x02000000                     @ 08027a3c 00000002
-DWORD_08027a40:
-    .word  0x00006c2c                     @ 08027a40 2c6c0000
-DWORD_08027a44:
-    .word  0x09dbff0e                     @ 08027a44 0effdb09
-DWORD_08027a48:
-    .word  0x0003ab1e                     @ 08027a48 1eab0300
+step34_ewram_base:
+    .word  EWRAM_BASE                     @ 08027a3c 00000002
+step34_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08027a40 2c6c0000
+step34_font5_base_a:
+    .word  0x09dbff0e                     @ 08027a44 0effdb09  0x09dbff0e
+step34_font5_off_a:
+    .word  0x0003ab1e                     @ 08027a48 1eab0300  0x0003ab1e
 LAB_08027a4c:
-    ldr r3, DWORD_08027a50                   @ 08027a4c 004b
+    ldr r3, step34_font4_ptr_a               @ 08027a4c 004b
     b LAB_08027a66                           @ 08027a4e 0ae0
-DWORD_08027a50:
-    .word  0x09deee62                     @ 08027a50 62eede09
+step34_font4_ptr_a:
+    .word  0x09deee62                     @ 08027a50 62eede09  0x09deee62
 LAB_08027a54:
-    ldr r3, DWORD_08027a58                   @ 08027a54 004b
+    ldr r3, step34_font3_ptr_a               @ 08027a54 004b
     b LAB_08027a66                           @ 08027a56 06e0
-DWORD_08027a58:
-    .word  0x09de29ae                     @ 08027a58 ae29de09
+step34_font3_ptr_a:
+    .word  0x09de29ae                     @ 08027a58 ae29de09  0x09de29ae
 LAB_08027a5c:
-    ldr r3, DWORD_08027a60                   @ 08027a5c 004b
+    ldr r3, step34_font2_ptr_a               @ 08027a5c 004b
     b LAB_08027a66                           @ 08027a5e 02e0
-DWORD_08027a60:
-    .word  0x09dd6636                     @ 08027a60 3666dd09
+step34_font2_ptr_a:
+    .word  0x09dd6636                     @ 08027a60 3666dd09  0x09dd6636
 LAB_08027a64:
-    ldr r3, DWORD_08027aa4                   @ 08027a64 0f4b
+    ldr r3, step34_font1_ptr_a               @ 08027a64 0f4b
 LAB_08027a66:
-    ldr r4, DWORD_08027aa8                   @ 08027a66 104c
-    ldr r1, DWORD_08027aac                   @ 08027a68 1049
+    ldr r4, step34_ewram_base_1              @ 08027a66 104c
+    ldr r1, step34_gsettings_offset_1        @ 08027a68 1049
     adds r4,r4,r1    @ 08027a6a 6418
     ldrb r2,[r4,#0x0]                        @ 08027a6c 2278
     lsls r0,r2,#0x1d    @ 08027a6e 5007
@@ -22487,7 +22867,7 @@ LAB_08027a66:
     movs r0,#0x40    @ 08027a74 4020
     movs r1,#0x84    @ 08027a76 8421
     lsls r1,r1,#0x2    @ 08027a78 8900
-    ldr r2, DWORD_08027ab0                   @ 08027a7a 0d4a
+    ldr r2, step34_draw_decimal_win_label_arg @ 08027a7a 0d4a
     bl draw_decimal_with_offset              @ 08027a7c fbf7fefe
     movs r0,#0x7    @ 08027a80 0720
     ldrb r4,[r4,#0x0]                        @ 08027a82 2478
@@ -22500,45 +22880,45 @@ LAB_08027a66:
     beq LAB_08027ac4                         @ 08027a90 18d0
     cmp r0,#0x4                              @ 08027a92 0428
     beq LAB_08027abc                         @ 08027a94 12d0
-    ldr r3, DWORD_08027ab4                   @ 08027a96 074b
+    ldr r3, step34_font5_base_b              @ 08027a96 074b
     cmp r0,#0x5                              @ 08027a98 0528
     bne LAB_08027ad6                         @ 08027a9a 1cd1
-    ldr r4, DWORD_08027ab8                   @ 08027a9c 064c
+    ldr r4, step34_font5_off_b               @ 08027a9c 064c
     adds r3,r3,r4    @ 08027a9e 1b19
     b LAB_08027ad6                           @ 08027aa0 19e0
     .zero  0x2
-DWORD_08027aa4:
-    .word  0x09dcad08                     @ 08027aa4 08addc09
-DWORD_08027aa8:
-    .word  0x02000000                     @ 08027aa8 00000002
-DWORD_08027aac:
-    .word  0x00006c2c                     @ 08027aac 2c6c0000
-DWORD_08027ab0:
-    .word  0x0000010f                     @ 08027ab0 0f010000
-DWORD_08027ab4:
-    .word  0x09dc00b8                     @ 08027ab4 b800dc09
-DWORD_08027ab8:
-    .word  0x0003ab50                     @ 08027ab8 50ab0300
+step34_font1_ptr_a:
+    .word  0x09dcad08                     @ 08027aa4 08addc09  0x09dcad08
+step34_ewram_base_1:
+    .word  EWRAM_BASE                     @ 08027aa8 00000002
+step34_gsettings_offset_1:
+    .word  GSETTINGS_OFFSET               @ 08027aac 2c6c0000
+step34_draw_decimal_win_label_arg:
+    .word  DRAW_DECIMAL_WIN_LABEL_ARG     @ 08027ab0 0f010000
+step34_font5_base_b:
+    .word  0x09dc00b8                     @ 08027ab4 b800dc09  0x09dc00b8
+step34_font5_off_b:
+    .word  0x0003ab50                     @ 08027ab8 50ab0300  0x0003ab50
 LAB_08027abc:
-    ldr r3, DWORD_08027ac0                   @ 08027abc 004b
+    ldr r3, step34_font4_ptr_b               @ 08027abc 004b
     b LAB_08027ad6                           @ 08027abe 0ae0
-DWORD_08027ac0:
-    .word  0x09def042                     @ 08027ac0 42f0de09
+step34_font4_ptr_b:
+    .word  0x09def042                     @ 08027ac0 42f0de09  0x09def042
 LAB_08027ac4:
-    ldr r3, DWORD_08027ac8                   @ 08027ac4 004b
+    ldr r3, step34_font3_ptr_b               @ 08027ac4 004b
     b LAB_08027ad6                           @ 08027ac6 06e0
-DWORD_08027ac8:
-    .word  0x09de2b9e                     @ 08027ac8 9e2bde09
+step34_font3_ptr_b:
+    .word  0x09de2b9e                     @ 08027ac8 9e2bde09  0x09de2b9e
 LAB_08027acc:
-    ldr r3, DWORD_08027ad0                   @ 08027acc 004b
+    ldr r3, step34_font2_ptr_b               @ 08027acc 004b
     b LAB_08027ad6                           @ 08027ace 02e0
-DWORD_08027ad0:
-    .word  0x09dd6832                     @ 08027ad0 3268dd09
+step34_font2_ptr_b:
+    .word  0x09dd6832                     @ 08027ad0 3268dd09  0x09dd6832
 LAB_08027ad4:
-    ldr r3, DWORD_08027c2c                   @ 08027ad4 554b
+    ldr r3, sub7c22_font1_ptr                @ 08027ad4 554b
 LAB_08027ad6:
-    ldr r0, DWORD_08027c30                   @ 08027ad6 5648
-    ldr r5, DWORD_08027c34                   @ 08027ad8 564d
+    ldr r0, sub_7c22_ewram_base              @ 08027ad6 5648
+    ldr r5, sub_7c22_gsettings_offset        @ 08027ad8 564d
     adds r4,r0,r5    @ 08027ada 4419
     ldrb r6,[r4,#0x0]                        @ 08027adc 2678
     lsls r0,r6,#0x1d    @ 08027ade 7007
@@ -22549,7 +22929,7 @@ LAB_08027ad6:
     lsls r1,r1,#0x2    @ 08027ae8 8900
     movs r2,#0x1    @ 08027aea 0122
     bl draw_decimal_with_offset              @ 08027aec fbf7c6fe
-    ldr r1, DWORD_08027c38                   @ 08027af0 5149
+    ldr r1, sub_7c22_ptr_gduelscenebase      @ 08027af0 5149
     ldrb r2,[r1,#0x4]                        @ 08027af2 0a79
     lsrs r0,r2,#0x5    @ 08027af4 5009
     cmp r0,#0x2                              @ 08027af6 0228
@@ -22561,9 +22941,9 @@ LAB_08027afc:
     lsrs r0,r0,#0x1d    @ 08027b00 400f
     cmp r0,#0x5                              @ 08027b02 0528
     bls LAB_08027c02                         @ 08027b04 7dd9
-    ldr r0, DWORD_08027c3c                   @ 08027b06 4d48
+    ldr r0, sub_7c22_campaign_bg_tile_param_a @ 08027b06 4d48
     bl game_str_id_to_row                    @ 08027b08 cdf086f9
-    ldr r2, DWORD_08027c40                   @ 08027b0c 4c4a
+    ldr r2, bcsrbt_game_str_tbl_ptr          @ 08027b0c 4c4a
     lsls r0,r0,#0x10    @ 08027b0e 0004
     lsrs r0,r0,#0x10    @ 08027b10 000c
     lsls r1,r0,#0x1    @ 08027b12 4100
@@ -22576,19 +22956,19 @@ LAB_08027afc:
     lsls r1,r1,#0x2    @ 08027b20 8900
     adds r1,r1,r2    @ 08027b22 8918
     ldr r1,[r1,#0x0]                         @ 08027b24 0968
-    ldr r0, DWORD_08027c44                   @ 08027b26 4748
+    ldr r0, bcsrbt_game_str_ja_ptr           @ 08027b26 4748
     adds r1,r1,r0    @ 08027b28 0918
-    ldr r0, DWORD_08027c48                   @ 08027b2a 4748
+    ldr r0, sub_7c22_campaign_bg_tile_param_b @ 08027b2a 4748
     movs r2,#0x84    @ 08027b2c 8422
     lsls r2,r2,#0x2    @ 08027b2e 9200
-    ldr r3, DWORD_08027c4c                   @ 08027b30 464b
+    ldr r3, sub_7c22_duel_field_text_bg_width @ 08027b30 464b
     str r1,[sp,#0x0]                         @ 08027b32 0091
     movs r1,#0xd6    @ 08027b34 d621
     bl render_centered_text_to_bg_vram       @ 08027b36 fbf72dff
-    ldr r5, DWORD_08027c50                   @ 08027b3a 454d
+    ldr r5, sub_7c22_campaign_bg_tile_param_c @ 08027b3a 454d
     movs r6,#0x93    @ 08027b3c 9326
     lsls r6,r6,#0x1    @ 08027b3e 7600
-    ldr r4, DWORD_08027c54                   @ 08027b40 444c
+    ldr r4, bcsrbt_gfx_src_e_ptr             @ 08027b40 444c
     adds r0,r5,#0x0    @ 08027b42 281c
     movs r1,#0x40    @ 08027b44 4021
     adds r2,r6,#0x0    @ 08027b46 321c
@@ -22615,9 +22995,9 @@ LAB_08027afc:
     movs r6,#0xc0    @ 08027b72 c026
     lsls r6,r6,#0x4    @ 08027b74 3601
     .hword 0x46b4    @ 08027b76 b446
-    ldr r0, DWORD_08027c58                   @ 08027b78 3748
+    ldr r0, sub_7c22_campaign_bg_tile_param_d @ 08027b78 3748
     .hword 0x4682    @ 08027b7a 8246
-    ldr r1, DWORD_08027c5c                   @ 08027b7c 3749
+    ldr r1, sub_7c22_oam_attr2_charname_mask @ 08027b7c 3749
     .hword 0x4689    @ 08027b7e 8946
 LAB_08027b80:
     ldrh r0,[r5,#0x0]                        @ 08027b80 2888
@@ -22640,7 +23020,7 @@ LAB_08027b80:
     ands r2,r6    @ 08027ba2 3240
     cmp r3,#0x1f                             @ 08027ba4 1f2b
     bls LAB_08027bb6                         @ 08027ba6 06d9
-    ldr r0, DWORD_08027c60                   @ 08027ba8 2d48
+    ldr r0, sub_7c22_card_desc_bg_vram_a     @ 08027ba8 2d48
     str r0,[sp,#0x10]                        @ 08027baa 0490
     adds r0,r3,#0x0    @ 08027bac 181c
     subs r0,#0x20    @ 08027bae 2038
@@ -22648,13 +23028,13 @@ LAB_08027b80:
     lsls r0,r1,#0x10    @ 08027bb2 0804
     lsrs r0,r0,#0x10    @ 08027bb4 000c
 LAB_08027bb6:
-    ldr r1, DWORD_08027c50                   @ 08027bb6 2649
+    ldr r1, sub_7c22_campaign_bg_tile_param_c @ 08027bb6 2649
     adds r0,r0,r1    @ 08027bb8 4018
     lsls r0,r0,#0x10    @ 08027bba 0004
     lsrs r0,r0,#0x10    @ 08027bbc 000c
     cmp r0,r10                               @ 08027bbe 5045
     bls LAB_08027bca                         @ 08027bc0 03d9
-    ldr r3, DWORD_08027c64                   @ 08027bc2 284b
+    ldr r3, sub_7c22_oam_attr2_charname_clear @ 08027bc2 284b
     adds r0,r0,r3    @ 08027bc4 c018
     lsls r0,r0,#0x10    @ 08027bc6 0004
     lsrs r0,r0,#0x10    @ 08027bc8 000c
@@ -22680,14 +23060,14 @@ LAB_08027bca:
     cmp r7,r6                                @ 08027bee b742
     bcc LAB_08027b80                         @ 08027bf0 c6d3
 LAB_08027bf2:
-    ldr r0, DWORD_08027c68                   @ 08027bf2 1d48
+    ldr r0, sub_7c22_campaign_vram_bg_tile_base @ 08027bf2 1d48
     movs r1,#0x80    @ 08027bf4 8021
     bl zero_fill_by_halfword                 @ 08027bf6 cdf03df9
-    ldr r0, DWORD_08027c60                   @ 08027bfa 1948
+    ldr r0, sub_7c22_card_desc_bg_vram_a     @ 08027bfa 1948
     movs r1,#0x80    @ 08027bfc 8021
     bl zero_fill_by_halfword                 @ 08027bfe cdf039f9
 LAB_08027c02:
-    ldr r2, DWORD_08027c38                   @ 08027c02 0d4a
+    ldr r2, sub_7c22_ptr_gduelscenebase      @ 08027c02 0d4a
     movs r0,#0x3    @ 08027c04 0320
     rsbs r0,r0,#0    @ 08027c06 4042
     ldrb r1,[r2,#0x8]                        @ 08027c08 117a
@@ -22696,10 +23076,10 @@ LAB_08027c02:
     rsbs r1,r1,#0    @ 08027c0e 4942
     ands r0,r1    @ 08027c10 0840
     strb r0,[r2,#0x8]                        @ 08027c12 1072
-    ldr r2, DWORD_08027c6c                   @ 08027c14 154a
-    ldr r3, DWORD_08027c70                   @ 08027c16 164b
+    ldr r2, sub_7c22_ptr_gprng               @ 08027c14 154a
+    ldr r3, sub_7c22_gprng_step_idx_off      @ 08027c16 164b
     adds r2,r2,r3    @ 08027c18 d218
-    ldr r0, DWORD_08027c74                   @ 08027c1a 1648
+    ldr r0, sub_7c22_gprng_step_ctr_mask     @ 08027c1a 1648
     ldrh r4,[r2,#0x0]                        @ 08027c1c 1488
     ands r0,r4    @ 08027c1e 2040
     movs r1,#0x40    @ 08027c20 4021
@@ -22708,44 +23088,44 @@ SUB_08027c22:
     strh r0,[r2,#0x0]                        @ 08027c24 1080
     bl SUB_08026714                          @ 08027c26 fef775fd
     movs r0,r0    @ 08027c2a 0000
-DWORD_08027c2c:
-    .word  0x09dcaea0                     @ 08027c2c a0aedc09
-DWORD_08027c30:
-    .word  0x02000000                     @ 08027c30 00000002
-DWORD_08027c34:
-    .word  0x00006c2c                     @ 08027c34 2c6c0000
-DWORD_08027c38:
-    .word  0x02023360                     @ 08027c38 60330202
-DWORD_08027c3c:
-    .word  0x00000be5                     @ 08027c3c e50b0000
-DWORD_08027c40:
-    .word  game_str_pointer_table         @ 08027c40 400f0008
-DWORD_08027c44:
-    .word  game_str_ja                    @ 08027c44 109cdb09
-DWORD_08027c48:
-    .word  0x000007c7                     @ 08027c48 c7070000
-DWORD_08027c4c:
-    .word  0x00000f09                     @ 08027c4c 090f0000
-DWORD_08027c50:
-    .word  0x00000bc1                     @ 08027c50 c10b0000
-DWORD_08027c54:
-    .word  0x09b96514                     @ 08027c54 1465b909
-DWORD_08027c58:
-    .word  0x00000bff                     @ 08027c58 ff0b0000
-DWORD_08027c5c:
-    .word  0x000003ff                     @ 08027c5c ff030000
-DWORD_08027c60:
-    .word  0x06000800                     @ 08027c60 00080006
-DWORD_08027c64:
-    .word  0xfffffc00                     @ 08027c64 00fcffff
-DWORD_08027c68:
-    .word  0x06001100                     @ 08027c68 00110006
-DWORD_08027c6c:
+sub7c22_font1_ptr:
+    .word  0x09dcaea0                     @ 08027c2c a0aedc09  0x09dcaea0
+sub_7c22_ewram_base:
+    .word  EWRAM_BASE                     @ 08027c30 00000002
+sub_7c22_gsettings_offset:
+    .word  GSETTINGS_OFFSET               @ 08027c34 2c6c0000
+sub_7c22_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027c38 60330202
+sub_7c22_campaign_bg_tile_param_a:
+    .word  CAMPAIGN_BG_TILE_PARAM_A       @ 08027c3c e50b0000
+bcsrbt_game_str_tbl_ptr:
+    .word  game_str_pointer_table         @ 08027c40 400f0008  0x08000f40: game_str_pointer_table ptr
+bcsrbt_game_str_ja_ptr:
+    .word  game_str_ja                    @ 08027c44 109cdb09  0x09db9c10: game_str_ja ptr
+sub_7c22_campaign_bg_tile_param_b:
+    .word  CAMPAIGN_BG_TILE_PARAM_B       @ 08027c48 c7070000
+sub_7c22_duel_field_text_bg_width:
+    .word  DUEL_FIELD_TEXT_BG_WIDTH       @ 08027c4c 090f0000
+sub_7c22_campaign_bg_tile_param_c:
+    .word  CAMPAIGN_BG_TILE_PARAM_C       @ 08027c50 c10b0000
+bcsrbt_gfx_src_e_ptr:
+    .word  0x09b96514                     @ 08027c54 1465b909  0x09b96514: gfx_src_e ROM ptr
+sub_7c22_campaign_bg_tile_param_d:
+    .word  CAMPAIGN_BG_TILE_PARAM_D       @ 08027c58 ff0b0000
+sub_7c22_oam_attr2_charname_mask:
+    .word  OAM_ATTR2_CHARNAME_MASK        @ 08027c5c ff030000
+sub_7c22_card_desc_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 08027c60 00080006
+sub_7c22_oam_attr2_charname_clear:
+    .word  OAM_ATTR2_CHARNAME_CLEAR       @ 08027c64 00fcffff
+sub_7c22_campaign_vram_bg_tile_base:
+    .word  CAMPAIGN_VRAM_BG_TILE_BASE     @ 08027c68 00110006
+sub_7c22_ptr_gprng:
     .word  gPrng                          @ 08027c6c 40000003
-DWORD_08027c70:
-    .word  0x00000202                     @ 08027c70 02020000
-DWORD_08027c74:
-    .word  0xffffc03f                     @ 08027c74 3fc0ffff
+sub_7c22_gprng_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08027c70 02020000
+sub_7c22_gprng_step_ctr_mask:
+    .word  GPRNG_STEP_CTR_MASK            @ 08027c74 3fc0ffff
 
 @ Fast exit function for campaign_scene_handler; also serves as placeholder for steps 8/9/13..19 and the out-of-range (step > 0x22) path. Loads next scene handler pointer from player_state+0x224 = [0x0201e4c4] into r0, then falls into SUB_08027c82 (campaign_scene_handler full epilogue): restores sp (add sp,#0x14), pops r8/r9/r10 via r3/r4/r5 aliases, pops callee-save r4/r5/r6/r7, pops lr into r1, bx r1. r0 = [0x0201e4c4] returned to campaign_scene_handler caller as next dispatch target.
 @ 
@@ -22754,7 +23134,7 @@ DWORD_08027c74:
 @ - next_handler_offset = 0x89*4 = 0x224
 @ - next_handler_addr = 0x0201e4c4
 exit_campaign_scene_with_next_handler:
-    ldr r0, DAT_08027c94                     @ 08027c78 0648
+    ldr r0, sub_7c82_ptr_gduelcardctxbase    @ 08027c78 0648
     movs r5,#0x89    @ 08027c7a 8925
     lsls r5,r5,#0x2    @ 08027c7c ad00
     adds r0,r0,r5    @ 08027c7e 4019
@@ -22769,8 +23149,8 @@ SUB_08027c82:
     pop {r1}                                 @ 08027c8e 02bc
     bx r1                                    @ 08027c90 0847
     .zero  0x2
-DAT_08027c94:
-    .word  0x0201e2a0                     @ 08027c94 a0e20102
+sub_7c82_ptr_gduelcardctxbase:
+    .word  gDuelCardCtxBase               @ 08027c94 a0e20102
 
 @ Builds campaign sprite row data for a given row_type r0 [0..8] and writes to VRAM buffer. Called by wrapper functions that pass a fixed row_type constant. Switch with 9 cases: case 0 copies 4 bytes from ROM DAT 0x09e3ef46 + bl memcpy; case 1 builds 14-byte name data from [0x02000000+0x6e48] (player name/level fields) + bl write_sprite_row_to_vram_buffer(count=0x16); case 2 reads scene_ctx+0x36/0x37 halfword, extracts bits[10:8]/bit[7], writes 4-byte struct to sp+0x1c; case 3 writes type=3 to sp+0x13c + bl write_sprite_row_to_vram_buffer(count=2); case 4 bl copy_bytes_by_halfword(src=0x03000288, len=0x118) + bl write_sprite_row_to_vram_buffer(count=0x8d*2); case 5 reads scene_ctx+0x39 bit4/bit3 into sp+0x140; case 6 reads scene_ctx+0x39 bit4 into sp+0x148; case 7 reads player_profile(0x0201e2a0)+0x10/+0x0 into sp+0x14c; case 8 writes type=8 to sp+0x154. r0 > 8 -> default (no write). Returns via pop{r0};bx r0 (no r0 semantic).
 @ 
@@ -22789,13 +23169,13 @@ build_campaign_sprite_row_by_type:
     b switchD_08027caa__default              @ 08027ca0 c6e0
 LAB_08027ca2:
     lsls r0,r0,#0x2    @ 08027ca2 8000
-    ldr r1, DAT_08027cac                     @ 08027ca4 0149
+    ldr r1, build_campaign_sprite_row_switch_table @ 08027ca4 0149
     adds r0,r0,r1    @ 08027ca6 4018
     ldr r0,[r0,#0x0]                         @ 08027ca8 0068
 switchD_08027caa__switchD:
     .hword 0x4687    @ 08027caa 8746
-DAT_08027cac:
-    .word  0x08027cb0                     @ 08027cac b07c0208
+build_campaign_sprite_row_switch_table:
+    .word  0x08027cb0                     @ 08027cac b07c0208  0x08027cb0: switch table base addr
 switchD_08027caa__switchdataD_08027cb0:
     .word  0x08027cd4                     @ 08027cb0 d47c0208
     .word  0x08027ce8                     @ 08027cb4 e87c0208
@@ -22807,15 +23187,15 @@ switchD_08027caa__switchdataD_08027cb0:
     .word  0x08027e08                     @ 08027ccc 087e0208
     .word  0x08027e24                     @ 08027cd0 247e0208
 switchD_08027caa__caseD_0:
-    ldr r1, DAT_08027ce4                     @ 08027cd4 0349
+    ldr r1, build_campaign_sprite_row_name_template @ 08027cd4 0349
     .hword 0x4668    @ 08027cd6 6846
     movs r2,#0x4    @ 08027cd8 0422
     bl memcpy                                @ 08027cda e6f03ffe
     .hword 0x4668    @ 08027cde 6846
     b LAB_08027dfa                           @ 08027ce0 8be0
     .zero  0x2
-DAT_08027ce4:
-    .word  0x09e3ef46                     @ 08027ce4 46efe309
+build_campaign_sprite_row_name_template:
+    .word  0x09e3ef46                     @ 08027ce4 46efe309  0x09e3ef46: ROM name template 4B case0
 switchD_08027caa__caseD_1:
     add r1,sp,#0x4                           @ 08027ce8 01a9
     .hword 0x466c    @ 08027cea 6c46
@@ -22824,8 +23204,8 @@ switchD_08027caa__caseD_1:
     strh r0,[r1,#0x0]                        @ 08027cf0 0880
     movs r2,#0x0    @ 08027cf2 0022
     adds r6,r1,#0x0    @ 08027cf4 0e1c
-    ldr r5, DAT_08027d58                     @ 08027cf6 184d
-    ldr r0, DAT_08027d5c                     @ 08027cf8 1848
+    ldr r5, swD_case1_ewram_base             @ 08027cf6 184d
+    ldr r0, swD_case1_duel_scene_field_off_6e48 @ 08027cf8 1848
     adds r3,r5,r0    @ 08027cfa 2b18
 LAB_08027cfc:
     adds r0,r4,r2    @ 08027cfc a018
@@ -22835,7 +23215,7 @@ LAB_08027cfc:
     adds r2,#0x1    @ 08027d04 0132
     cmp r2,#0xe                              @ 08027d06 0e2a
     ble LAB_08027cfc                         @ 08027d08 f8dd
-    ldr r1, DAT_08027d60                     @ 08027d0a 1549
+    ldr r1, swD_case1_duel_scene_field_off_6e57 @ 08027d0a 1549
     adds r0,r5,r1    @ 08027d0c 6818
     ldrb r3,[r0,#0x0]                        @ 08027d0e 0378
     lsls r0,r3,#0x1d    @ 08027d10 5807
@@ -22852,7 +23232,7 @@ LAB_08027cfc:
     ands r1,r2    @ 08027d26 1140
     orrs r1,r0    @ 08027d28 0143
     lsrs r3,r3,#0x7    @ 08027d2a db09
-    ldr r2, DAT_08027d64                     @ 08027d2c 0d4a
+    ldr r2, swD_case1_duel_scene_field_off_6e58 @ 08027d2c 0d4a
     adds r0,r5,r2    @ 08027d2e a818
     ldrb r0,[r0,#0x0]                        @ 08027d30 0078
     lsls r0,r0,#0x1    @ 08027d32 4000
@@ -22873,19 +23253,19 @@ LAB_08027cfc:
     bl write_sprite_row_to_vram_buffer       @ 08027d50 c5f082fd
     b switchD_08027caa__default              @ 08027d54 6ce0
     .zero  0x2
-DAT_08027d58:
-    .word  0x02000000                     @ 08027d58 00000002
-DAT_08027d5c:
-    .word  0x00006e48                     @ 08027d5c 486e0000
-DAT_08027d60:
-    .word  0x00006e57                     @ 08027d60 576e0000
-DAT_08027d64:
-    .word  0x00006e58                     @ 08027d64 586e0000
+swD_case1_ewram_base:
+    .word  EWRAM_BASE                     @ 08027d58 00000002
+swD_case1_duel_scene_field_off_6e48:
+    .word  DUEL_SCENE_FIELD_OFF_6E48      @ 08027d5c 486e0000
+swD_case1_duel_scene_field_off_6e57:
+    .word  DUEL_SCENE_FIELD_OFF_6E57      @ 08027d60 576e0000
+swD_case1_duel_scene_field_off_6e58:
+    .word  DUEL_SCENE_FIELD_OFF_6E58      @ 08027d64 586e0000
 switchD_08027caa__caseD_2:
     add r0,sp,#0x1c                          @ 08027d68 07a8
     movs r1,#0x2    @ 08027d6a 0221
     strh r1,[r0,#0x0]                        @ 08027d6c 0180
-    ldr r1, DAT_08027d90                     @ 08027d6e 0849
+    ldr r1, swD_case2_ptr_gduelscenebase     @ 08027d6e 0849
     ldrh r2,[r1,#0x36]                       @ 08027d70 ca8e
     lsls r3,r2,#0x17    @ 08027d72 d305
     lsrs r3,r3,#0x1e    @ 08027d74 9b0f
@@ -22902,15 +23282,15 @@ switchD_08027caa__caseD_2:
     strh r3,[r0,#0x2]                        @ 08027d8a 4380
     b LAB_08027dfa                           @ 08027d8c 35e0
     .zero  0x2
-DAT_08027d90:
-    .word  0x02023360                     @ 08027d90 60330202
+swD_case2_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027d90 60330202
 switchD_08027caa__caseD_4:
     add r4,sp,#0x20                          @ 08027d94 08ac
     movs r0,#0x4    @ 08027d96 0420
     strh r0,[r4,#0x0]                        @ 08027d98 2080
     .hword 0x4668    @ 08027d9a 6846
     adds r0,#0x22    @ 08027d9c 2230
-    ldr r1, DAT_08027db4                     @ 08027d9e 0549
+    ldr r1, swD_case4_iwram_obj_scratch_buf  @ 08027d9e 0549
     movs r2,#0x8c    @ 08027da0 8c22
     lsls r2,r2,#0x1    @ 08027da2 5200
     bl copy_bytes_by_halfword                @ 08027da4 cdf07ef8
@@ -22919,8 +23299,8 @@ switchD_08027caa__caseD_4:
     adds r0,r4,#0x0    @ 08027dac 201c
     bl write_sprite_row_to_vram_buffer       @ 08027dae c5f053fd
     b switchD_08027caa__default              @ 08027db2 3de0
-DAT_08027db4:
-    .word  0x03000288                     @ 08027db4 88020003
+swD_case4_iwram_obj_scratch_buf:
+    .word  IWRAM_OBJ_SCRATCH_BUF          @ 08027db4 88020003
 switchD_08027caa__caseD_3:
     add r0,sp,#0x13c                         @ 08027db8 4fa8
     movs r1,#0x3    @ 08027dba 0321
@@ -22932,7 +23312,7 @@ switchD_08027caa__caseD_5:
     add r0,sp,#0x140                         @ 08027dc6 50a8
     movs r1,#0x5    @ 08027dc8 0521
     strh r1,[r0,#0x0]                        @ 08027dca 0180
-    ldr r1, DAT_08027de4                     @ 08027dcc 0549
+    ldr r1, swD_case5_ptr_gduelscenebase     @ 08027dcc 0549
     adds r1,#0x39    @ 08027dce 3931
     ldrb r3,[r1,#0x0]                        @ 08027dd0 0b78
     lsls r1,r3,#0x1c    @ 08027dd2 1907
@@ -22944,13 +23324,13 @@ switchD_08027caa__caseD_5:
     lsrs r3,r3,#0x1f    @ 08027dde db0f
     strh r3,[r0,#0x4]                        @ 08027de0 8380
     b LAB_08027e18                           @ 08027de2 19e0
-DAT_08027de4:
-    .word  0x02023360                     @ 08027de4 60330202
+swD_case5_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027de4 60330202
 switchD_08027caa__caseD_6:
     add r0,sp,#0x148                         @ 08027de8 52a8
     movs r1,#0x6    @ 08027dea 0621
     strh r1,[r0,#0x0]                        @ 08027dec 0180
-    ldr r1, DAT_08027e04                     @ 08027dee 0549
+    ldr r1, swD_case6_ptr_gduelscenebase     @ 08027dee 0549
     adds r1,#0x39    @ 08027df0 3931
     ldrb r1,[r1,#0x0]                        @ 08027df2 0978
     lsls r1,r1,#0x1c    @ 08027df4 0907
@@ -22961,13 +23341,13 @@ LAB_08027dfa:
     bl write_sprite_row_to_vram_buffer       @ 08027dfc c5f02cfd
     b switchD_08027caa__default              @ 08027e00 16e0
     .zero  0x2
-DAT_08027e04:
-    .word  0x02023360                     @ 08027e04 60330202
+swD_case6_ptr_gduelscenebase:
+    .word  gDuelSceneBase                 @ 08027e04 60330202
 switchD_08027caa__caseD_7:
     add r0,sp,#0x14c                         @ 08027e08 53a8
     movs r1,#0x7    @ 08027e0a 0721
     strh r1,[r0,#0x0]                        @ 08027e0c 0180
-    ldr r2, DAT_08027e20                     @ 08027e0e 044a
+    ldr r2, swD_case7_ptr_gduelcardctxbase   @ 08027e0e 044a
     ldr r1,[r2,#0x10]                        @ 08027e10 1169
     strh r1,[r0,#0x2]                        @ 08027e12 4180
     ldr r1,[r2,#0x0]                         @ 08027e14 1168
@@ -22976,8 +23356,8 @@ LAB_08027e18:
     movs r1,#0x6    @ 08027e18 0621
     bl write_sprite_row_to_vram_buffer       @ 08027e1a c5f01dfd
     b switchD_08027caa__default              @ 08027e1e 07e0
-DAT_08027e20:
-    .word  0x0201e2a0                     @ 08027e20 a0e20102
+swD_case7_ptr_gduelcardctxbase:
+    .word  gDuelCardCtxBase               @ 08027e20 a0e20102
 switchD_08027caa__caseD_8:
     add r0,sp,#0x154                         @ 08027e24 55a8
     movs r1,#0x8    @ 08027e26 0821

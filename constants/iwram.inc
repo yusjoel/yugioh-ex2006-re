@@ -22,3 +22,6 @@
 .equ gIg2dUsedNanBuff, 0x03000c00  @ s32 已用 NanBuff/char-data 槽数 (max IG2D_LOAD_ANM_MAX=2)
 .equ gIg2dNceBuffBase, 0x03000c08  @ NceBuff 缓冲池基址 (slot = base + count*0x1000)
 .equ gIg2dCharPoolBase,0x03002c08  @ char-data 缓冲池基址 (slot = base + count*0x1000)
+
+@ Seg-8 addition: IWRAM OBJ attribute scratch buffer
+.equ IWRAM_OBJ_SCRATCH_BUF,       0x03000288  @ IWRAM OBJ attribute scratch buffer (0x118 bytes); 4 ROM refs

@@ -18,3 +18,11 @@
 .equ BG_SCREEN_ROW1_OFF,  0x06000040  @ BG screen map row 1 base (32 tiles * 2B = 0x40 per row)
 .equ BG_SCREEN_ROW1_TILE1,0x06000042  @ BG screen map row 1 col 1 (0x06000040+2)
 .equ OBJ_TILE_VRAM_BASE_PAGE2,0x06010200  @ OBJ_TILE_VRAM_BASE+0x200; 16 ROM refs; icon tile base+0x200 (f01 Seg-7)
+
+@ Seg-8 additions: Campaign VRAM BG tile bases
+.equ CAMPAIGN_VRAM_BG_TILE_BASE,  0x06001100  @ campaign BG tile region base (pack display); 18 ROM refs
+.equ CAMPAIGN_VRAM_BG_TILE_BASE_B,0x06001780  @ VRAM BG tile base variant B (step2/22); 2 ROM refs
+.equ CAMPAIGN_VRAM_BG_TILE_BASE_C,0x06000f80  @ VRAM BG tile base variant C (step2/22); 2 ROM refs
+.equ CAMPAIGN_VRAM_BG_TILE_BASE_D,0x06000d80  @ VRAM BG tile base variant D (step11); 1 ROM ref
+.equ CAMPAIGN_VRAM_BG_TILE_BASE_E,0x06000900  @ VRAM BG tile base variant E (step11); 1 ROM ref
+.equ CAMPAIGN_VRAM_BG_TILE_BASE_F,0x06001180  @ VRAM BG tile region F (campaign display); 5 ROM refs

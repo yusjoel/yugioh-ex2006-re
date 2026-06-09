@@ -52,7 +52,7 @@
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
-| 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
+| **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
 
@@ -191,6 +191,25 @@
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: 005143e
 
+### 4.08 Seg-8 完成记录 (2026-06-10)
+
+- 范围: 0x08024868..0x08027e44, 11 named fn
+- 函数: check_scene_slot_all_entries_meet_threshold / get_total_challenge_cleared_count / build_field_slot_bitmask / render_text_with_font_type_select / render_card_stats_to_line_buf / render_game_text_with_font_type_a / render_game_text_with_font_type_b / campaign_scene_handler / exit_campaign_scene_with_next_handler / build_campaign_sprite_row_by_type / invoke_build_campaign_sprite_row_type5
+- Ghidra 脚本: RefineF01Seg8Slots.py + DisassembleF01Seg8Blocks.py + RefineF01Seg8Block2Pools.py
+- EQ=289 (reuse: EWRAM_BASE x65, GSETTINGS_OFFSET x56, GPRNG_STEP_IDX_OFF x26, gDuelSceneBase->REF, gDuelCardCtxBase->REF; new: duel_field.inc +21 GPRNG_STEP_CTR_MASK/SCENE_CTX_ANIM_MASK/CAMPAIGN_BG_TILE_PARAM_A..H/SCENE_CTX_TIMER_CLEAR/GPRNG_FIELD_ANIM_MASK/SCENE_SLOT_*/CAMPAIGN_DUELIST_NAME_ROW_A/B/DRAW_DECIMAL_WIN_LABEL_ARG/DUEL_SCENE_FIELD_OFF_6E58; gba_mem.inc +6 CAMPAIGN_VRAM_BG_TILE_BASE_*/; ewram.inc +9 GPRNG_CHALLENGE_ENTRY_OFF/GSETTINGS_FONT_TABLE_OFF/GSETTINGS_TEXT_FIELD_A/B_OFF/P1LP_BLOCK2_OFF_1CE8/GPRNG_PACK_SCROLL/FRAME_OFF_23D/E/gCampaignDisplayState/gCampaignSpriteCtxBase; card_info.inc +8 LP 阈值常量; iwram.inc +1 IWRAM_OBJ_SCRATCH_BUF)
+- REF=36 (gDuelSceneBase x18 + gDuelCardCtxBase x9 + gP1LifePoints x5 + switch table x3 + campaign_step_dispatch_table x1)
+- RENAME=353+12 (353 main: 7 render_text_font_select font ptrs + 22 render_game_text_a/b font ptrs + campaign step font ptrs + ~75 render_card_stats 26-pass font ptrs + 1 lp_tier_a_stub label + ~246 campaign step misc slots; 12 block2 pool: rcs_blk2_b0..b5 font5_base/off)
+- FUNC_RENAME=0 (全 11 函数名准确)
+- PLATE=0 (段内无 CJK plate 残留)
+- carve=0
+- disasm=2 ranges (block1 0x0802497c/0x78: 15 unique entry pts FUN_08024982..FUN_080249e8; block2 0x080258f0/0x230: 6 unique entry pts FUN_080258f0..FUN_08025ac8) + block2 literal pool guards (6 regions, 24 DWORDs)
+- §5.1=0 (两块均有引用: block1 raw=1 from jump table; block2 raw=1 from dispatch table)
+- 新增 constants: duel_field.inc +21 / gba_mem.inc +6 / ewram.inc +9 (含 2 globals) / card_info.inc +8 / iwram.inc +1 = 45 total
+- 踩坑: block2 (0x080258f0/0x230) 6 stubs 内各有 3-4 DWORD literal pool 嵌在 .byte inline block; 初次 disasm 后 Ghidra 未将其导出为 DWORD 标签 -> GAS "invalid offset, value too big (0xFFFFFFFC)"; 修复: DisassembleF01Seg8Blocks.py 加 _guard_literal_pool(6 regions, 24 DWORDs) 后重跑 disasm + 补 RefineF01Seg8Block2Pools.py 命名; byte-identical 保持不变
+- CSV sync: no (FUNC_RENAME=0)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: TBD
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -208,7 +227,7 @@
 | Seg-5 | 0x1e714..0x1f25c | 10 | — | ✅ |
 | Seg-6 | 0x1f25c..0x20fa8 | 16 | 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44 | ✅ 4 ROM_INCBIN disasm R4; tick_lp_record_scene_step 新建 |
 | Seg-7 | 0x20fa8..0x24868 | 8 | 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6 | 大数据区 (~6880B 块, ref-scan 分类) |
-| Seg-8 | 0x24868..0x27e44 | 8 | 0x2497c/0x78, 0x258f0/0x230 | |
+| Seg-8 | 0x24868..0x27e44 | 11 | 0x2497c/0x78->disasm R4 (15 entries), 0x258f0/0x230->disasm R4 (6 entries) | ✅ |
 | Seg-9 | 0x27e44..0x28bdc | 8 | 0x27e50/0x6c | |
 | Seg-10 | 0x28bdc..0x2c238 | 12 | **0x29170/0x22f0** | 大数据区 (~8944B 块, ref-scan 分类) |
 

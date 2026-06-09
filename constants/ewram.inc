@@ -248,6 +248,28 @@
                                              @ 8 ROM refs; callers: init_duel_field_icon_and_bg_vram + 7 others
                                              @ confidence: med (structural pattern; runtime fields unconfirmed)
 
+@ =============================================================================
+@ Seg-8 additions: campaign / card stats EWRAM globals and offsets
+@ =============================================================================
+
+@ gPrng offsets (pack display / challenge entry)
+.equ GPRNG_CHALLENGE_ENTRY_OFF,   0x00006c3c  @ EWRAM+0x6c3c = challenge entry array base (4B per entry); 23 ROM refs
+.equ GPRNG_PACK_SCROLL_OFF_23D,   0x0000023d  @ gPrng+0x23d pack scroll sync field; 27 ROM refs
+.equ GPRNG_PACK_FRAME_OFF_23E,    0x0000023e  @ gPrng+0x23e pack frame control field; 29 ROM refs
+@ NOTE: GPRNG_DISPLAY_OFF_226 = 0x226 -> same value as DUEL_FIELD_STATE_226_OFF (ewram.inc); reuse that constant
+
+@ gSettings sub-struct offsets (render_text_with_font_type_select)
+.equ GSETTINGS_FONT_TABLE_OFF,    0x000053f0  @ gSettings+0x53f0 = JP font pointer table; 10 ROM refs
+.equ GSETTINGS_TEXT_FIELD_A_OFF,  0x00001250  @ gSettings+0x1250 = text render field A; med-conf; 3 ROM refs
+.equ GSETTINGS_TEXT_FIELD_B_OFF,  0x00001267  @ gSettings+0x1267 = text render field B; med-conf; 3 ROM refs
+
+@ P1 LP display block field
+.equ P1LP_BLOCK2_OFF_1CE8,           0x1ce8  @ [gP1LifePoints+0x1ce8] LP display block2 field; 184 ROM refs
+
+@ Campaign scene globals
+.equ gCampaignDisplayState,       0x02029e90  @ campaign display state buffer (0x20 bytes); med-conf; 6 ROM refs
+.equ gCampaignSpriteCtxBase,      0x02001250  @ campaign sprite context base; med-conf; 7 ROM refs
+
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
                                              @ +0x88 = u32 fs_load 返回的解压数据指针
                                              @ +0x8c = u32 packed bitfield

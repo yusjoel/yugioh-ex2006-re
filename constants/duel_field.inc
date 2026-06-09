@@ -26,6 +26,43 @@
 @ Unlocked duelists offset
 .equ GUNLOCKED_DUELISTS_OFFSET,   0x00006e5c  @ gUnlockedDuelists - EWRAM_BASE
 
+@ =============================================================================
+@ Seg-8 additions: campaign scene / card stat render constants
+@ =============================================================================
+
+@ Campaign step counter / frame control masks
+.equ GPRNG_STEP_CTR_MASK,         0xffffc03f  @ mask clears bits[13:6] of gPrng+0x202 halfword (step counter); 223 ROM refs
+.equ SCENE_CTX_ANIM_MASK,         0xffff807f  @ mask clears bits[14:7] of scene_ctx+0x8 (anim frame field); 7 ROM refs
+.equ SCENE_CTX_TIMER_CLEAR,       0xff807fff  @ mask clears bits[22:15] of scene_ctx+0x8 word (timer field); 4 ROM refs
+.equ GPRNG_FIELD_ANIM_MASK,       0xfffffc1f  @ mask clears bits[7:5] of gPrng field anim state; 5 ROM refs
+
+@ Campaign BG tile/map parameters (load_pack_tile_and_map_to_vram args)
+.equ CAMPAIGN_BG_TILE_PARAM_A,    0x00000be5  @ tile param A; 4 ROM refs
+.equ CAMPAIGN_BG_TILE_PARAM_B,    0x000007c7  @ tile param B; 7 ROM refs
+.equ CAMPAIGN_BG_TILE_PARAM_C,    0x00000bc1  @ tile param C; 4 ROM refs
+.equ CAMPAIGN_BG_TILE_PARAM_D,    0x00000bff  @ tile param D; 6 ROM refs
+.equ CAMPAIGN_BG_TILE_PARAM_E,    0x00000801  @ tile param E (step2/12/22); 3 ROM refs
+.equ CAMPAIGN_BG_TILE_PARAM_F,    0x00000be4  @ tile param F (step11); 1 ROM ref
+.equ CAMPAIGN_BG_TILE_PARAM_G,    0x00000707  @ tile param G (step11); 1 ROM ref
+.equ CAMPAIGN_BG_TILE_PARAM_H,    0x00000b01  @ tile param H (step11); 1 ROM ref
+
+@ Campaign win/decimal display arg
+.equ DRAW_DECIMAL_WIN_LABEL_ARG,  0x0000010f  @ r2 arg to draw_decimal_with_offset for campaign win label; 33 ROM refs
+
+@ Duel scene field offsets
+.equ DUEL_SCENE_FIELD_OFF_6E58,   0x00006e58  @ EWRAM+0x6e58 = player name/level field C; 3 ROM refs
+
+@ Duel scene field slot masks
+.equ SCENE_SLOT_MASK_LO,          0x00000fff  @ keeps bits[11:0] of slot word; 3 Seg-8 refs (84 total)
+.equ SCENE_SLOT_MASK_HI_CLEAR,    0xffe00000  @ clears bits[28:21] of slot word; 3 ROM refs
+.equ SCENE_SLOT_FIELD_CLEAR,      0xfffff000  @ clears bits[11:0] of slot word; 3 ROM refs
+.equ SCENE_SLOT_FIELD_MASK,       0x000003fe  @ mask bits[8:1] of slot field; 148 ROM refs
+.equ SCENE_SLOT_CTR_CLEAR,        0xffc00fff  @ clears bits[21:12] of slot word; 3 ROM refs
+
+@ Campaign duelist name display row parameters (step21)
+.equ CAMPAIGN_DUELIST_NAME_ROW_A, 0x0000114f  @ duelist name display row param A (step21); 1 ROM ref
+.equ CAMPAIGN_DUELIST_NAME_ROW_B, 0x00001138  @ duelist name display row param B (step21); 1 ROM ref
+
 @ render_centered_text_to_bg_vram args
 .equ DUEL_FIELD_TEXT_TILE_POS_A,  0x00000507  @ render_centered_text_to_bg_vram r0 arg: col=7 row=5; 34 refs
 .equ DUEL_FIELD_TEXT_BG_WIDTH,    0x00000f09  @ render_centered_text_to_bg_vram r3 arg: BG width 0x0f; 14 refs
