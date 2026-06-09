@@ -52,7 +52,7 @@
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
-| **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | |
+| **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | **5266f72** |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
 
@@ -208,7 +208,7 @@
 - 踩坑: block2 (0x080258f0/0x230) 6 stubs 内各有 3-4 DWORD literal pool 嵌在 .byte inline block; 初次 disasm 后 Ghidra 未将其导出为 DWORD 标签 -> GAS "invalid offset, value too big (0xFFFFFFFC)"; 修复: DisassembleF01Seg8Blocks.py 加 _guard_literal_pool(6 regions, 24 DWORDs) 后重跑 disasm + 补 RefineF01Seg8Block2Pools.py 命名; byte-identical 保持不变
 - CSV sync: no (FUNC_RENAME=0)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: TBD
+- commit: 5266f72
 
 ---
 
