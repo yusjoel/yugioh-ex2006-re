@@ -44,3 +44,34 @@
 
 @ BG palette address
 .equ BG_PALRAM_SLOT15_BASE,          0x050001e0  @ BG PALRAM last 32 bytes (OBJ_PALRAM_BASE-0x20); 10 ROM refs
+
+@ =============================================================================
+@ file 02 Seg-1 additions: result screen / AOB display / opponent card / pack selection VRAM
+@ =============================================================================
+
+@ Result screen VRAM constants
+.equ RESULT_SCREEN_TILE_IDX_VRAM,   0x06001080  @ BG VRAM tile-idx write base for result screen glyph line; 2 ROM refs
+.equ RESULT_SCREEN_BG2CNT_INIT,     0x00008208  @ BG2CNT: pri=0 charbase=2 16col scrbase=2 size=0; 2 ROM refs
+.equ RESULT_SCREEN_TILEMAP_TARGET,  0x06000806  @ BG VRAM tilemap write addr for result screen tile row; 1 ROM ref
+.equ RESULT_SCREEN_FONT_CTX_OFF,    0x00000119  @ JP font direction flag offset in scene_ctx; 83 ROM refs
+.equ RESULT_SCREEN_SPRITE_VRAM,     0x06004C80  @ OBJ VRAM base for result screen sprites; 1 ROM ref
+
+@ AOB card display VRAM constants
+.equ AOB_CARD_TILE_VRAM,            0x06014000  @ AOB card OBJ tile VRAM base; 67 ROM refs
+.equ AOB_CARD_PAL_DST,              0x05000300  @ AOB card OBJ palette dst (PALRAM+0x100); 51 ROM refs
+.equ AOB_INIT_MODE,                 0x02000007  @ AOB init mode: EWRAM_BASE|7; 48 ROM refs
+.equ AOB_DISPLAY_TILE_VRAM_A,       0x06014200  @ AOB display OBJ tile VRAM A; 5 ROM refs
+.equ AOB_DISPLAY_TILE_VRAM_B,       0x06014600  @ AOB display OBJ tile VRAM B; 1 ROM ref
+
+@ Opponent card display VRAM constants
+.equ OBJ_ICON_TILE_VRAM_BASE,       0x06011100  @ OBJ tile VRAM icon base (OPP_CARD_LABEL_TILE_VRAM_A+0x100); 1 ROM ref
+.equ OPP_CARD_NAME_TILE_VRAM,       0x06012000  @ OBJ tile VRAM write base for opponent card name; 3 ROM refs
+.equ OBJ_PAL_ICON_BASE,             0x05000240  @ OBJ palette base for card icons (PALRAM+0x40); 3 ROM refs
+.equ OPP_CARD_LABEL_TILE_VRAM_A,    0x06011000  @ OBJ tile VRAM base A for opp card label; 11 ROM refs
+.equ OPP_CARD_LABEL_TILE_VRAM_B,    0x06011400  @ OBJ tile VRAM base B for opp card label; 3 ROM refs
+.equ OPP_CARD_LABEL_TILE_VRAM_C,    0x06011800  @ OBJ tile VRAM base C for opp card label; 5 ROM refs
+.equ OPP_CARD_LABEL_TILE_VRAM_D,    0x06011C00  @ OBJ tile VRAM base D for opp card label; 1 ROM ref
+
+@ Pack selection / campaign BG VRAM constants
+.equ OBJ_VRAM_BASE_1000,            0x06001000  @ VRAM base 0x06001000 (BG tile write target B); 85 ROM refs
+.equ CAMPAIGN_BG_TILEMAP_BASE,      0x06001800  @ campaign BG tilemap VRAM base; 4 ROM refs

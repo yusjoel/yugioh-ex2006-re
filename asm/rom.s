@@ -568,8 +568,42 @@ icon_palettes_base:
 	.incbin "graphics/bin/icons/palettes/icon_129.bin"
 	.incbin "graphics/bin/icons/palettes/icon_130.bin"
 
-@ ROM 0x18972F0 - 0x1B101AB
-	.incbin "roms/2343.gba", 0x18972F0, 0x278EBC
+@ ROM 0x18972F0 - 0x1B101AB (f02 Seg-1 carve Host A: 17 labels)
+	.incbin "roms/2343.gba", 0x18972F0, 0x508     @ pre-aob_card_tile_src gap
+aob_card_tile_src:                              @ 0x098977F8: AOB card tile data (0x2000B)
+	.incbin "roms/2343.gba", 0x18977F8, 0x2000
+aob_card_pal_src:                               @ 0x098997F8: AOB card palette (0x40B)
+	.incbin "roms/2343.gba", 0x18997F8, 0x40
+aob_ptnsect_src:                                @ 0x09899838: ptnsect data for init_aob_ctx
+	.incbin "roms/2343.gba", 0x1899838, 0xB3EC4
+campaign_bg_pal_src_a:                          @ 0x0994D6FC: campaign BG palette A (0x20B)
+	.incbin "roms/2343.gba", 0x194D6FC, 0x20
+campaign_bg_pal_src_b:                          @ 0x0994D71C: campaign BG palette B
+	.incbin "roms/2343.gba", 0x194D71C, 0x2120
+campaign_bg_tile_src:                           @ 0x0994F83C: campaign BG tile data
+	.incbin "roms/2343.gba", 0x194F83C, 0x4000
+campaign_bg_tilemap_src:                        @ 0x0995383C: campaign BG tilemap
+	.incbin "roms/2343.gba", 0x195383C, 0x4B0
+pack_deck_b_pal_src:                            @ 0x09953CEC: pack deck_b palette src
+	.incbin "roms/2343.gba", 0x1953CEC, 0x2F40
+pack_deck_b_tile1_src:                          @ 0x09956C2C: pack deck_b tile 1 src
+	.incbin "roms/2343.gba", 0x1956C2C, 0x54000
+pack_deck_b_tile3_src:                          @ 0x099AAC2C: pack deck_b tile 3 src
+	.incbin "roms/2343.gba", 0x19AAC2C, 0xF420
+pack_deck_b_tile2_src:                          @ 0x099BA04C: pack deck_b tile 2 src
+	.incbin "roms/2343.gba", 0x19BA04C, 0x54000
+pack_deck_b_tilemap_src:                        @ 0x09A0E04C: pack deck_b tilemap src
+	.incbin "roms/2343.gba", 0x1A0E04C, 0xC4E0
+campaign_bg_pal_src_c:                          @ 0x09A1A52C: campaign BG palette C
+	.incbin "roms/2343.gba", 0x1A1A52C, 0x3A80
+pack_deck_a_tile1_src:                          @ 0x09A1DFAC: pack deck_a tile 1 src
+	.incbin "roms/2343.gba", 0x1A1DFAC, 0x68000
+pack_deck_a_tile3_src:                          @ 0x09A85FAC: pack deck_a tile 3 src
+	.incbin "roms/2343.gba", 0x1A85FAC, 0x12E40
+pack_deck_a_tile2_src:                          @ 0x09A98DEC: pack deck_a tile 2 src
+	.incbin "roms/2343.gba", 0x1A98DEC, 0x68000
+pack_deck_a_tilemap_src:                        @ 0x09B00DEC: pack deck_a tilemap src
+	.incbin "roms/2343.gba", 0x1B00DEC, 0xF3C0  @ tail to host end 0x1B101AB
 
 @ 调色板块（Copy 1），ROM 0x1B101AC–0x1B1200B，7776 字节（27 个对手，每对手 288 字节）
 @ 注意：Copy 2（0x1B4FE9C–0x1B51CFB）与本块内容完全相同，引用同一文件
@@ -657,7 +691,24 @@ opponent_bottom_tilemap_base:
 
 @ 后 16MB 第一段剩余部分：ROM 0x1B8FB8C–0x1DBF019（内嵌英/日字库已拆出）
 @ 头段：含 font_jp_sjis_lookup_table @ 0x1BA1524 (3850 B) + count u16 + 其他未识别数据
-	.incbin "roms/2343.gba", 0x1B8FB8C, 0x1CE18    @ 0x1B8FB8C..0x1BAC9A4
+@ (f02 Seg-1 carve Host B: 8 labels)
+	.incbin "roms/2343.gba", 0x1B8FB8C, 0x2648    @ pre-result_screen_pal2_src gap
+result_screen_pal2_src:                         @ 0x09B921D4: result screen copy_bytes src (0x20B)
+	.incbin "roms/2343.gba", 0x1B921D4, 0x20
+result_screen_tile1_src:                        @ 0x09B921F4: result screen tile src 1
+	.incbin "roms/2343.gba", 0x1B921F4, 0x800
+result_screen_tile2_src:                        @ 0x09B929F4: result screen tile src 2
+	.incbin "roms/2343.gba", 0x1B929F4, 0xA90
+result_screen_tile3_src:                        @ 0x09B93484: result screen tile src 3
+	.incbin "roms/2343.gba", 0x1B93484, 0x3C0
+result_screen_tile4_src:                        @ 0x09B93844: result screen tile src 4
+	.incbin "roms/2343.gba", 0x1B93844, 0x42E4
+pack_default_pal_src:                           @ 0x09B97B28: init_pack_selection default pal src
+	.incbin "roms/2343.gba", 0x1B97B28, 0x240
+pack_default_tile_src:                          @ 0x09B97D68: init_pack_selection default tile src
+	.incbin "roms/2343.gba", 0x1B97D68, 0x4000
+pack_default_tilemap_src:                       @ 0x09B9BD68: init_pack_selection default tilemap src
+	.incbin "roms/2343.gba", 0x1B9BD68, 0x10C3C  @ tail to host end 0x1BAC9A4
 
 @ 日文字库（4 个 charset 变体，每个 1925 glyph，8bpp 预解码每像素 1 字节）
 @ 索引 = (hi & 0xF) << 7 | (lo & 0x7F)；详见 doc/dev/xx-encoding-analysis.md + tools/rom-export/export_font_jp.py
@@ -1630,7 +1681,9 @@ pack_strip_tile_id_table:                           @ 0x09e59d78: 8 halfword til
 	.incbin "roms/2343.gba", 0x1E59D78, 0x10       @ 8 strip tile IDs
 pack_card_grid_tile_table:                          @ 0x09e59d88: 16 halfword tile offsets for pack card grid
 	.incbin "roms/2343.gba", 0x1E59D88, 0x20       @ 16 grid tile offsets
-	.incbin "roms/2343.gba", 0x1E59DA8, 0xE54      @ remainder to end (0x1E59C2C+0xFD0=0x1E5ABFC)
+	.incbin "roms/2343.gba", 0x1E59DA8, 0xC        @ pre-aob_phase_table gap (f02 Seg-1 carve Host C)
+aob_phase_table:                                @ 0x09E59DB4: AOB phase dispatch table (halfword stride 2, phase [0..7])
+	.incbin "roms/2343.gba", 0x1E59DB4, 0xE48    @ tail to host end 0x1E5ABFC
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

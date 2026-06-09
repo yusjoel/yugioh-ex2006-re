@@ -282,3 +282,20 @@
                                              @ +0x94 = u32 frame counter
                                              @ 已知用户: demo_shuen_state_machine
                                              @ (其它 demo/exodia, demo/vija 等可能复用)
+
+@ =============================================================================
+@ file 02 Seg-1 additions: JP card name string table ptrs / campaign constants
+@ =============================================================================
+
+@ JP card name string table (init_card_name_result_screen uses lang-indexed branch)
+.equ JP_LANG5_STR_BASE,             0x09DC0240  @ JP card name string table base (lang5=ES); 4 ROM refs
+.equ JP_LANG5_STR_OFFSET_ES,        0x0003AB84  @ ES string offset from JP_LANG5_STR_BASE; 7 ROM refs
+.equ JP_LANG4_STR_PTR_DE,           0x09DEF212  @ DE card name string ptr (lang4); 4 ROM refs
+.equ JP_LANG3_STR_PTR_FR,           0x09DE2D5E  @ FR card name string ptr (lang3); 4 ROM refs
+.equ JP_LANG2_STR_PTR_IT,           0x09DD69EC  @ IT card name string ptr (lang2); 4 ROM refs
+.equ JP_LANG1_STR_PTR_EN,           0x09DCB012  @ EN card name string ptr (lang1); 4 ROM refs
+
+@ Campaign BG layout constants
+.equ CAMPAIGN_BG1CNT_INIT,          0x00000107  @ BG1CNT: pri=3 charbase=0 16col scrbase=0; 2 ROM refs
+.equ CAMPAIGN_BG2CNT_INIT,          0x00000207  @ BG2CNT: pri=3 charbase=0 16col scrbase=1; 2 ROM refs
+.equ CAMPAIGN_TILEMAP_SEQ_START,    0x0000F210  @ campaign BG tilemap seq start param; 2 ROM refs

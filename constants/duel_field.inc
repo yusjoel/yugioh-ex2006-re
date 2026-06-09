@@ -125,3 +125,12 @@
 .equ PUZZLE_LP_MAX,                   0x00002710  @ LP display max cap (+10000); 68 ROM refs
 .equ PUZZLE_LP_STEP_1000,             0xfffffc18  @ -1000 (s32): LP step-down per display tick; 16 ROM refs
 .equ PUZZLE_LP_NEG_10000,             0xffffd8f0  @ -10000 (s32): LP step-down 10000 single step; 1 ROM ref
+
+@ =============================================================================
+@ file 02 Seg-1 additions: label render ctx / dual label / text render flag
+@ =============================================================================
+
+.equ TEXT_RENDER_FLAG_LAYER2,         0x00008002  @ text render layer 2 flag; 21 ROM refs
+.equ DUAL_LABEL_RENDER_STATE_CLEAR,   0xFFFC7FFF  @ clears bits[17:15] of scene_ctx+0x38 render state; 31 ROM refs
+.equ LABEL_CTX_RENDER_STATE_CLEAR,    0xFFFFFC7F  @ clears 2 bits from slot render state (distinct from CAMPAIGN_CARD_ANIM_STEP_MASK); 1 ROM ref
+.equ LABEL_CTX_DISPLAY_PARAM,         0x00A00030  @ display param for label render ctx init; 1 ROM ref

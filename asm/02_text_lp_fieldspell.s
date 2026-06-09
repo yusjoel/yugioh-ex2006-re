@@ -12,17 +12,17 @@ render_game_text_decimal_to_line:
     adds r5,r2,#0x0    @ 0802c244 151c
     adds r4,r3,#0x0    @ 0802c246 1c1c
     ldr r0,[sp,#0x58]                        @ 0802c248 1698
-    ldr r1, DAT_0802c2f0                     @ 0802c24a 2949
+    ldr r1, render_game_text_decimal_to_line_str_base @ 0802c24a 2949
     adds r0,r0,r1    @ 0802c24c 4018
     bl game_str_id_to_row                    @ 0802c24e c8f0e3fd
-    ldr r2, PTR_game_str_pointer_table_0802c2f4 @ 0802c252 284a
+    ldr r2, render_game_text_ptr_game_str_pointer_table @ 0802c252 284a
     lsls r0,r0,#0x10    @ 0802c254 0004
     lsrs r0,r0,#0x10    @ 0802c256 000c
     lsls r1,r0,#0x1    @ 0802c258 4100
     adds r1,r1,r0    @ 0802c25a 0918
     lsls r1,r1,#0x1    @ 0802c25c 4900
-    ldr r0, DAT_0802c2f8                     @ 0802c25e 2648
-    ldr r3, DAT_0802c2fc                     @ 0802c260 264b
+    ldr r0, render_game_text_decimal_to_line_ewram_base @ 0802c25e 2648
+    ldr r3, render_game_text_decimal_to_line_gsettings_off @ 0802c260 264b
     adds r0,r0,r3    @ 0802c262 c018
     ldrb r0,[r0,#0x0]                        @ 0802c264 0078
     lsls r0,r0,#0x1d    @ 0802c266 4007
@@ -31,7 +31,7 @@ render_game_text_decimal_to_line:
     lsls r1,r1,#0x2    @ 0802c26c 8900
     adds r1,r1,r2    @ 0802c26e 8918
     ldr r1,[r1,#0x0]                         @ 0802c270 0968
-    ldr r0, PTR_game_str_ja_0802c300         @ 0802c272 2348
+    ldr r0, render_game_text_ptr_game_str_ja @ 0802c272 2348
     adds r1,r1,r0    @ 0802c274 0918
     .hword 0x4668    @ 0802c276 6846
     adds r2,r4,#0x0    @ 0802c278 221c
@@ -41,7 +41,7 @@ render_game_text_decimal_to_line:
     lsls r4,r0,#0x1    @ 0802c284 4400
     adds r4,r4,r0    @ 0802c286 2418
     lsls r4,r4,#0x1    @ 0802c288 6400
-    ldr r0, DAT_0802c304                     @ 0802c28a 1e48
+    ldr r0, render_game_text_decimal_to_line_render_flag @ 0802c28a 1e48
     .hword 0x4680    @ 0802c28c 8046
     adds r0,r6,#0x0    @ 0802c28e 301c
     adds r1,r7,#0x0    @ 0802c290 391c
@@ -55,7 +55,7 @@ render_game_text_decimal_to_line:
     bl text_render_wrapper                   @ 0802c2a2 c6f0ebfb
     movs r0,#0xcc    @ 0802c2a6 cc20
     subs r6,r0,r4    @ 0802c2a8 061b
-    ldr r5, DAT_0802c308                     @ 0802c2aa 174d
+    ldr r5, render_game_text_decimal_to_line_font_ctx @ 0802c2aa 174d
     ldrh r1,[r5,#0xc]                        @ 0802c2ac a989
     lsrs r0,r1,#0x6    @ 0802c2ae 8809
     adds r0,r0,r4    @ 0802c2b0 0019
@@ -89,22 +89,22 @@ LAB_0802c2c0:
     pop {r1}                                 @ 0802c2ea 02bc
     bx r1                                    @ 0802c2ec 0847
     .zero  0x2
-DAT_0802c2f0:
-    .word  0x00000c1c                     @ 0802c2f0 1c0c0000
-PTR_game_str_pointer_table_0802c2f4:
+render_game_text_decimal_to_line_str_base:
+    .word  GAME_STR_TEXT_BASE             @ 0802c2f0 1c0c0000  str_base_offset=0x0c1c; adds to game_str_id_offset
+render_game_text_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c2f4 400f0008
-DAT_0802c2f8:
-    .word  0x02000000                     @ 0802c2f8 00000002
-DAT_0802c2fc:
-    .word  0x00006c2c                     @ 0802c2fc 2c6c0000
-PTR_game_str_ja_0802c300:
+render_game_text_decimal_to_line_ewram_base:
+    .word  EWRAM_BASE                     @ 0802c2f8 00000002
+render_game_text_decimal_to_line_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802c2fc 2c6c0000
+render_game_text_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c300 109cdb09
-DAT_0802c304:
-    .word  0x00008008                     @ 0802c304 08800000
-DAT_0802c308:
-    .word  0x02006ed0                     @ 0802c308 d06e0002
+render_game_text_decimal_to_line_render_flag:
+    .word  CARD_DESC_RENDER_PARAM         @ 0802c304 08800000  render_glyph_jp layer param: shadow+8
+render_game_text_decimal_to_line_font_ctx:
+    .word  gFontJpCtx                     @ 0802c308 d06e0002
 
-@ Lookup card name and format-render to a display line. Calls card_name_lookup_by_internal_id(r3=card_internal_id) to get name ptr; calls expand_format_text_to_buf(name, r2=fmt_args, sp_buf, 0x100) to expand into 256-byte stack buf; calls text_render_wrapper(r5=dst_buf, r6=line_idx, text_buf, flags=0x8008) for first pass; calls text_render_wrapper again with extra_flags=7 for second pass (shadow/highlight). Returns low 10 bits of [gPrng+0x6ed0+0xe] halfword as render_width. r0=ptr dst_buf, r1=u16 line_idx [0..0x401], r2=ptr fmt_args, r3=u16 card_internal_id. Returns u16 render_width (bits[9:0] of gPrng+0x6ed0[0xe]). Caller: FUN_0802c358 (result_screen). Constants: stack_buf_size=0x100, render_flags=0x8008, extra_flags=7, width_field_offset=0xe, width_mask=0x3ff.
+@ Lookup card name and format-render to a display line. Calls card_name_lookup_by_internal_id(r3=card_internal_id) to get name ptr; calls expand_format_text_to_buf(name, r2=fmt_args, sp_buf, 0x100) to expand into 256-byte stack buf; calls text_render_wrapper(r5=dst_buf, r6=line_idx, text_buf, flags=0x8008) for first pass; calls text_render_wrapper again with extra_flags=7 for second pass (shadow/highlight). Returns low 10 bits of [gPrng+0x6ed0+0xe] halfword as render_width. r0=ptr dst_buf, r1=u16 line_idx [0..0x401], r2=ptr fmt_args, r3=u16 card_internal_id. Returns u16 render_width (bits[9:0] of gPrng+0x6ed0[0xe]). Caller: render_card_name_escape_to_line (result_screen). Constants: stack_buf_size=0x100, render_flags=0x8008, extra_flags=7, width_field_offset=0xe, width_mask=0x3ff.
 render_card_name_format_to_line:
     push {r4,r5,r6,lr}                       @ 0802c30c 70b5
     sub sp,#0x100                            @ 0802c30e c0b0
@@ -117,7 +117,7 @@ render_card_name_format_to_line:
     .hword 0x4668    @ 0802c31e 6846
     adds r1,r4,#0x0    @ 0802c320 211c
     bl expand_format_text_to_buf             @ 0802c322 c8f011ff
-    ldr r2, DAT_0802c350                     @ 0802c326 0a4a
+    ldr r2, render_card_name_format_to_line_render_flag @ 0802c326 0a4a
     adds r0,r5,#0x0    @ 0802c328 281c
     adds r1,r6,#0x0    @ 0802c32a 311c
     .hword 0x466b    @ 0802c32c 6b46
@@ -127,7 +127,7 @@ render_card_name_format_to_line:
     movs r2,#0x7    @ 0802c336 0722
     .hword 0x466b    @ 0802c338 6b46
     bl text_render_wrapper                   @ 0802c33a c6f09ffb
-    ldr r0, DAT_0802c354                     @ 0802c33e 0548
+    ldr r0, render_card_name_format_to_line_font_ctx @ 0802c33e 0548
     ldrh r0,[r0,#0xe]                        @ 0802c340 c089
     lsls r0,r0,#0x16    @ 0802c342 8005
     lsrs r0,r0,#0x16    @ 0802c344 800d
@@ -136,10 +136,10 @@ render_card_name_format_to_line:
     pop {r1}                                 @ 0802c34a 02bc
     bx r1                                    @ 0802c34c 0847
     .zero  0x2
-DAT_0802c350:
-    .word  0x00008008                     @ 0802c350 08800000
-DAT_0802c354:
-    .word  0x02006ed0                     @ 0802c354 d06e0002
+render_card_name_format_to_line_render_flag:
+    .word  CARD_DESC_RENDER_PARAM         @ 0802c350 08800000
+render_card_name_format_to_line_font_ctx:
+    .word  gFontJpCtx                     @ 0802c354 d06e0002
 
 @ Expand and render the card name (escape form) for a given card_id to a display line, then dispatch to sub-scene rendering via 16-entry switchD. r0=card_id [0x2711..0x2744] (saved to r9; r8/r10 init to 0). Steps: (1) r9+0x3e8 -> game_str_id_to_row; (2) font-variant from settings[0x6c2c]; (3) expand_card_name_escape_to_buf to sp+8; (4) two text_render_wrapper passes (flags 0x8008, 0x5); (5) read render_width from gPrng+0x6ed0[0xe]; (6) switchD keyed on r9-0x2711. Tail-jumps into sub-scene; no direct return. Constants: game_str_base=0x3e8, settings_addr=0x02000000+0x6c2c, render_flags_1=0x8008, render_flags_2=5, switch_adjust=-0x2711.
 render_card_name_escape_to_line:
@@ -159,14 +159,14 @@ render_card_name_escape_to_line:
     lsls r0,r0,#0x2    @ 0802c372 8000
     add r0,r9                                @ 0802c374 4844
     bl game_str_id_to_row                    @ 0802c376 c8f04ffd
-    ldr r2, PTR_game_str_pointer_table_0802c3dc @ 0802c37a 184a
+    ldr r2, render_card_name_escape_ptr_game_str_pointer_table @ 0802c37a 184a
     lsls r0,r0,#0x10    @ 0802c37c 0004
     lsrs r0,r0,#0x10    @ 0802c37e 000c
     lsls r1,r0,#0x1    @ 0802c380 4100
     adds r1,r1,r0    @ 0802c382 0918
     lsls r1,r1,#0x1    @ 0802c384 4900
-    ldr r0, DAT_0802c3e0                     @ 0802c386 1648
-    ldr r3, DAT_0802c3e4                     @ 0802c388 164b
+    ldr r0, render_card_name_escape_to_line_ewram_base @ 0802c386 1648
+    ldr r3, render_card_name_escape_to_line_gsettings_off @ 0802c388 164b
     adds r0,r0,r3    @ 0802c38a c018
     ldrb r0,[r0,#0x0]                        @ 0802c38c 0078
     lsls r0,r0,#0x1d    @ 0802c38e 4007
@@ -175,11 +175,11 @@ render_card_name_escape_to_line:
     lsls r1,r1,#0x2    @ 0802c394 8900
     adds r1,r1,r2    @ 0802c396 8918
     ldr r1,[r1,#0x0]                         @ 0802c398 0968
-    ldr r0, PTR_game_str_ja_0802c3e8         @ 0802c39a 1348
+    ldr r0, render_card_name_escape_ptr_game_str_ja @ 0802c39a 1348
     adds r1,r1,r0    @ 0802c39c 0918
     add r0,sp,#0x8                           @ 0802c39e 02a8
     bl expand_card_name_escape_to_buf        @ 0802c3a0 c8f004ff
-    ldr r2, DAT_0802c3ec                     @ 0802c3a4 114a
+    ldr r2, render_card_name_escape_to_line_render_flag @ 0802c3a4 114a
     movs r0,#0x0    @ 0802c3a6 0020
     movs r1,#0x4    @ 0802c3a8 0421
     add r3,sp,#0x8                           @ 0802c3aa 02ab
@@ -189,40 +189,40 @@ render_card_name_escape_to_line:
     movs r2,#0x5    @ 0802c3b4 0522
     add r3,sp,#0x8                           @ 0802c3b6 02ab
     bl text_render_wrapper                   @ 0802c3b8 c6f060fb
-    ldr r0, DAT_0802c3f0                     @ 0802c3bc 0c48
+    ldr r0, render_card_name_escape_to_line_font_ctx @ 0802c3bc 0c48
     ldrh r0,[r0,#0xe]                        @ 0802c3be c089
     lsls r0,r0,#0x16    @ 0802c3c0 8005
     lsrs r0,r0,#0x16    @ 0802c3c2 800d
     adds r6,r0,#0x2    @ 0802c3c4 861c
-    ldr r0, DAT_0802c3f4                     @ 0802c3c6 0b48
+    ldr r0, render_card_name_escape_to_line_card_id_adj @ 0802c3c6 0b48
     add r0,r9                                @ 0802c3c8 4844
     cmp r0,#0x33                             @ 0802c3ca 3328
     bls LAB_0802c3d0                         @ 0802c3cc 00d9
     b switchD_0802c3d8__caseD_2730           @ 0802c3ce 0ee3
 LAB_0802c3d0:
     lsls r0,r0,#0x2    @ 0802c3d0 8000
-    ldr r1, DAT_0802c3f8                     @ 0802c3d2 0949
+    ldr r1, render_card_name_escape_switch_tbl_ptr @ 0802c3d2 0949
     adds r0,r0,r1    @ 0802c3d4 4018
     ldr r0,[r0,#0x0]                         @ 0802c3d6 0068
 switchD_0802c3d8__switchD:
     .hword 0x4687    @ 0802c3d8 8746
     .zero  0x2
-PTR_game_str_pointer_table_0802c3dc:
+render_card_name_escape_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c3dc 400f0008
-DAT_0802c3e0:
-    .word  0x02000000                     @ 0802c3e0 00000002
-DAT_0802c3e4:
-    .word  0x00006c2c                     @ 0802c3e4 2c6c0000
-PTR_game_str_ja_0802c3e8:
+render_card_name_escape_to_line_ewram_base:
+    .word  EWRAM_BASE                     @ 0802c3e0 00000002
+render_card_name_escape_to_line_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802c3e4 2c6c0000
+render_card_name_escape_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c3e8 109cdb09
-DAT_0802c3ec:
-    .word  0x00008008                     @ 0802c3ec 08800000
-DAT_0802c3f0:
-    .word  0x02006ed0                     @ 0802c3f0 d06e0002
-DAT_0802c3f4:
-    .word  0xffffd8ef                     @ 0802c3f4 efd8ffff
-DAT_0802c3f8:
-    .word  0x0802c3fc                     @ 0802c3f8 fcc30208
+render_card_name_escape_to_line_render_flag:
+    .word  CARD_DESC_RENDER_PARAM         @ 0802c3ec 08800000
+render_card_name_escape_to_line_font_ctx:
+    .word  gFontJpCtx                     @ 0802c3f0 d06e0002
+render_card_name_escape_to_line_card_id_adj:
+    .word  CARD_ID_BASE_NEG_ADJ           @ 0802c3f4 efd8ffff  neg adj: -0x2711 so card_id 0x2711 maps to 0
+render_card_name_escape_switch_tbl_ptr:
+    .word  0x0802c3fc                     @ 0802c3f8 fcc30208  ptr to switchdataD_0802c3fc (81-case table)
 switchD_0802c3d8__switchdataD_0802c3fc:
     .word  0x0802c4cc                     @ 0802c3fc ccc40208
     .word  0x0802c4e4                     @ 0802c400 e4c40208
@@ -280,7 +280,7 @@ switchD_0802c3d8__caseD_2711:
     movs r0,#0x4    @ 0802c4cc 0420
     bl get_card_data_bit_by_index            @ 0802c4ce 68f0d1fc
     adds r5,r0,#0x0    @ 0802c4d2 051c
-    ldr r0, DAT_0802c4e0                     @ 0802c4d4 0248
+    ldr r0, switchD_2711_pool                @ 0802c4d4 0248
 LAB_0802c4d6:
     cmp r5,r0                                @ 0802c4d6 8542
     bhi LAB_0802c4dc                         @ 0802c4d8 00d8
@@ -288,30 +288,30 @@ LAB_0802c4d6:
 LAB_0802c4dc:
     movs r7,#0x1    @ 0802c4dc 0127
     b LAB_0802c9f4                           @ 0802c4de 89e2
-DAT_0802c4e0:
-    .word  0x0000270f                     @ 0802c4e0 0f270000
+switchD_2711_pool:
+    .word  0x0000270f                     @ 0802c4e0 0f270000  game_str offset for case 0x2711
 switchD_0802c3d8__caseD_2712:
     movs r0,#0x6    @ 0802c4e4 0620
     bl get_card_data_bit_by_index            @ 0802c4e6 68f0c5fc
     adds r5,r0,#0x0    @ 0802c4ea 051c
-    ldr r0, DAT_0802c4f0                     @ 0802c4ec 0048
+    ldr r0, switchD_2712_pool                @ 0802c4ec 0048
     b LAB_0802c4d6                           @ 0802c4ee f2e7
-DAT_0802c4f0:
-    .word  0x00000f9f                     @ 0802c4f0 9f0f0000
+switchD_2712_pool:
+    .word  0x00000f9f                     @ 0802c4f0 9f0f0000  game_str offset for case 0x2712
 switchD_0802c3d8__caseD_2713:
     movs r0,#0x7    @ 0802c4f4 0720
     bl get_card_data_bit_by_index            @ 0802c4f6 68f0bdfc
     adds r5,r0,#0x0    @ 0802c4fa 051c
-    ldr r0, DAT_0802c500                     @ 0802c4fc 0048
+    ldr r0, switchD_2713_pool                @ 0802c4fc 0048
     b LAB_0802c4d6                           @ 0802c4fe eae7
-DAT_0802c500:
-    .word  0x00004e1f                     @ 0802c500 1f4e0000
+switchD_2713_pool:
+    .word  0x00004e1f                     @ 0802c500 1f4e0000  game_str offset for case 0x2713
 switchD_0802c3d8__caseD_2714:
     movs r0,#0x2    @ 0802c504 0220
     bl get_card_data_bit_by_index            @ 0802c506 68f0b5fc
     adds r3,r0,#0x0    @ 0802c50a 031c
     adds r5,r5,r3    @ 0802c50c ed18
-    ldr r0, DAT_0802c538                     @ 0802c50e 0a48
+    ldr r0, switchD_2714_pool_a              @ 0802c50e 0a48
     ldr r1, DAT_0802c53c                     @ 0802c510 0a49
     adds r0,r0,r1    @ 0802c512 4018
     movs r1,#0x7    @ 0802c514 0721
@@ -320,11 +320,11 @@ switchD_0802c3d8__caseD_2714:
     cmp r1,#0x1                              @ 0802c51a 0129
     beq LAB_0802c560                         @ 0802c51c 20d0
     cmp r1,#0x2                              @ 0802c51e 0229
-    beq LAB_0802c558                         @ 0802c520 1ad0
+    beq switchD_2714_pool_c                  @ 0802c520 1ad0
     cmp r1,#0x3                              @ 0802c522 0329
     beq LAB_0802c550                         @ 0802c524 14d0
     cmp r1,#0x4                              @ 0802c526 0429
-    beq LAB_0802c548                         @ 0802c528 0ed0
+    beq switchD_2714_pool_b                  @ 0802c528 0ed0
     ldr r2, DAT_0802c540                     @ 0802c52a 054a
     cmp r1,#0x5                              @ 0802c52c 0529
     bne LAB_0802c562                         @ 0802c52e 18d1
@@ -332,16 +332,16 @@ switchD_0802c3d8__caseD_2714:
     adds r2,r2,r0    @ 0802c532 1218
     b LAB_0802c562                           @ 0802c534 15e0
     .zero  0x2
-DAT_0802c538:
-    .word  0x02000000                     @ 0802c538 00000002
+switchD_2714_pool_a:
+    .word  0x02000000                     @ 0802c538 00000002  game_str ID for case 0x2714 path A
 DAT_0802c53c:
     .word  0x00006c2c                     @ 0802c53c 2c6c0000
 DAT_0802c540:
     .word  0x09dc2daa                     @ 0802c540 aa2ddc09
 DAT_0802c544:
     .word  0x0003ae48                     @ 0802c544 48ae0300
-LAB_0802c548:
-    ldr r2, DAT_0802c54c                     @ 0802c548 004a
+switchD_2714_pool_b:
+    ldr r2, DAT_0802c54c                     @ 0802c548 004a  -- game_str ID for case 0x2714 path B
     b LAB_0802c562                           @ 0802c54a 0ae0
 DAT_0802c54c:
     .word  0x09df1f72                     @ 0802c54c 721fdf09
@@ -350,8 +350,8 @@ LAB_0802c550:
     b LAB_0802c562                           @ 0802c552 06e0
 DAT_0802c554:
     .word  0x09de5c7a                     @ 0802c554 7a5cde09
-LAB_0802c558:
-    ldr r2, DAT_0802c55c                     @ 0802c558 004a
+switchD_2714_pool_c:
+    ldr r2, DAT_0802c55c                     @ 0802c558 004a  -- game_str ID for case 0x2714 path C
     b LAB_0802c562                           @ 0802c55a 02e0
 DAT_0802c55c:
     .word  0x09dd98d6                     @ 0802c55c d698dd09
@@ -361,21 +361,24 @@ LAB_0802c562:
     movs r0,#0x6    @ 0802c562 0620
     str r0,[sp,#0x0]                         @ 0802c564 0090
     movs r4,#0x7    @ 0802c566 0724
-    str r4,[sp,#0x4]                         @ 0802c568 0194
+switchD_2714_pool_d:
+    str r4,[sp,#0x4]                         @ 0802c568 0194  -- game_str ID for case 0x2714 path D
     movs r0,#0x2    @ 0802c56a 0220
     adds r1,r6,#0x0    @ 0802c56c 311c
     bl render_game_text_decimal_to_line      @ 0802c56e fff763fe
     adds r6,r0,#0x0    @ 0802c572 061c
     adds r6,#0x2    @ 0802c574 0236
     movs r0,#0x4    @ 0802c576 0420
-    bl get_card_data_bit_by_index            @ 0802c578 68f07cfc
+switchD_2714_pool_e:
+    bl get_card_data_bit_by_index            @ 0802c578 68f07cfc  -- game_str ID for case 0x2714 path E
     adds r3,r0,#0x0    @ 0802c57c 031c
     adds r5,r5,r3    @ 0802c57e ed18
     ldr r0, DAT_0802c5ac                     @ 0802c580 0a48
     ldr r1, DAT_0802c5b0                     @ 0802c582 0b49
     adds r0,r0,r1    @ 0802c584 4018
     ldrb r0,[r0,#0x0]                        @ 0802c586 0078
-    ands r4,r0    @ 0802c588 0440
+switchD_2714_pool_f:
+    ands r4,r0    @ 0802c588 0440  -- game_str ID for case 0x2714 path F
     cmp r4,#0x1                              @ 0802c58a 012c
     beq LAB_0802c5d4                         @ 0802c58c 22d0
     cmp r4,#0x2                              @ 0802c58e 022c
@@ -383,11 +386,12 @@ LAB_0802c562:
     cmp r4,#0x3                              @ 0802c592 032c
     beq LAB_0802c5c4                         @ 0802c594 16d0
     cmp r4,#0x4                              @ 0802c596 042c
-    beq LAB_0802c5bc                         @ 0802c598 10d0
+switchD_2714_pool_g:
+    beq LAB_0802c5bc                         @ 0802c598 10d0  -- game_str ID for case 0x2714 path G
     ldr r2, DAT_0802c5b4                     @ 0802c59a 064a
     cmp r4,#0x5                              @ 0802c59c 052c
     bne LAB_0802c5d6                         @ 0802c59e 1ad1
-    ldr r0, DAT_0802c5b8                     @ 0802c5a0 0548
+    ldr r0, switchD_2714_pool_h              @ 0802c5a0 0548
     adds r2,r2,r0    @ 0802c5a2 1218
     b LAB_0802c5d6                           @ 0802c5a4 17e0
     .zero  0x2
@@ -399,8 +403,8 @@ DAT_0802c5b0:
     .word  0x00006c2c                     @ 0802c5b0 2c6c0000
 DAT_0802c5b4:
     .word  0x09dc2b08                     @ 0802c5b4 082bdc09
-DAT_0802c5b8:
-    .word  0x0003ac92                     @ 0802c5b8 92ac0300
+switchD_2714_pool_h:
+    .word  0x0003ac92                     @ 0802c5b8 92ac0300  game_str ID for case 0x2714 path H
 LAB_0802c5bc:
     ldr r2, DAT_0802c5c0                     @ 0802c5bc 004a
     b LAB_0802c5d6                           @ 0802c5be 0ae0
@@ -417,7 +421,7 @@ LAB_0802c5cc:
 DAT_0802c5d0:
     .word  0x09dd9448                     @ 0802c5d0 4894dd09
 LAB_0802c5d4:
-    ldr r2, DAT_0802c610                     @ 0802c5d4 0e4a
+    ldr r2, switchD_2715_pool_a              @ 0802c5d4 0e4a
 LAB_0802c5d6:
     movs r0,#0x6    @ 0802c5d6 0620
     str r0,[sp,#0x0]                         @ 0802c5d8 0090
@@ -444,29 +448,29 @@ LAB_0802c5d6:
     ldr r2, DAT_0802c61c                     @ 0802c604 054a
     cmp r4,#0x5                              @ 0802c606 052c
     bne LAB_0802c63e                         @ 0802c608 19d1
-    ldr r3, DAT_0802c620                     @ 0802c60a 054b
+    ldr r3, switchD_2715_pool_b              @ 0802c60a 054b
     adds r2,r2,r3    @ 0802c60c d218
     b LAB_0802c63e                           @ 0802c60e 16e0
-DAT_0802c610:
-    .word  0x09dcd5d2                     @ 0802c610 d2d5dc09
+switchD_2715_pool_a:
+    .word  0x09dcd5d2                     @ 0802c610 d2d5dc09  game_str ID for case 0x2715 path A
 DAT_0802c614:
     .word  0x02000000                     @ 0802c614 00000002
 DAT_0802c618:
     .word  0x00006c2c                     @ 0802c618 2c6c0000
 DAT_0802c61c:
     .word  0x09dc2b3e                     @ 0802c61c 3e2bdc09
-DAT_0802c620:
-    .word  0x0003ac9a                     @ 0802c620 9aac0300
+switchD_2715_pool_b:
+    .word  0x0003ac9a                     @ 0802c620 9aac0300  game_str ID for case 0x2715 path B
 LAB_0802c624:
     ldr r2, DAT_0802c628                     @ 0802c624 004a
     b LAB_0802c63e                           @ 0802c626 0ae0
 DAT_0802c628:
     .word  0x09df1b36                     @ 0802c628 361bdf09
 LAB_0802c62c:
-    ldr r2, DAT_0802c630                     @ 0802c62c 004a
+    ldr r2, switchD_2715_pool_c              @ 0802c62c 004a
     b LAB_0802c63e                           @ 0802c62e 06e0
-DAT_0802c630:
-    .word  0x09de58ae                     @ 0802c630 ae58de09
+switchD_2715_pool_c:
+    .word  0x09de58ae                     @ 0802c630 ae58de09  game_str ID for case 0x2715 path C
 LAB_0802c634:
     ldr r2, DAT_0802c638                     @ 0802c634 004a
     b LAB_0802c63e                           @ 0802c636 02e0
@@ -476,16 +480,17 @@ LAB_0802c63c:
     ldr r2, DAT_0802c64c                     @ 0802c63c 034a
 LAB_0802c63e:
     movs r1,#0x6    @ 0802c63e 0621
-    str r1,[sp,#0x0]                         @ 0802c640 0091
-    ldr r0, DAT_0802c650                     @ 0802c642 0348
+switchD_2715_pool_d:
+    str r1,[sp,#0x0]                         @ 0802c640 0091  -- game_str ID for case 0x2715 path D
+    ldr r0, switchD_2715_pool_e              @ 0802c642 0348
     cmp r5,r0                                @ 0802c644 8542
     bls LAB_0802c654                         @ 0802c646 05d9
     str r1,[sp,#0x4]                         @ 0802c648 0191
     b LAB_0802c658                           @ 0802c64a 05e0
 DAT_0802c64c:
     .word  0x09dcd612                     @ 0802c64c 12d6dc09
-DAT_0802c650:
-    .word  0x0000c34f                     @ 0802c650 4fc30000
+switchD_2715_pool_e:
+    .word  0x0000c34f                     @ 0802c650 4fc30000  game_str ID for case 0x2715 path E
 LAB_0802c654:
     movs r0,#0x7    @ 0802c654 0720
     str r0,[sp,#0x4]                         @ 0802c656 0190
@@ -495,23 +500,23 @@ LAB_0802c658:
     adds r3,r5,#0x0    @ 0802c65c 2b1c
     bl render_game_text_decimal_to_line      @ 0802c65e fff7ebfd
     adds r6,r0,#0x0    @ 0802c662 061c
-    ldr r0, DAT_0802c670                     @ 0802c664 0248
+    ldr r0, switchD_2715_pool_extra          @ 0802c664 0248
     cmp r5,r0                                @ 0802c666 8542
     bhi LAB_0802c66c                         @ 0802c668 00d8
     b switchD_0802c3d8__caseD_2730           @ 0802c66a c0e1
 LAB_0802c66c:
     movs r7,#0x1    @ 0802c66c 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c66e bee1
-DAT_0802c670:
-    .word  0x0000c34f                     @ 0802c670 4fc30000
+switchD_2715_pool_extra:
+    .word  0x0000c34f                     @ 0802c670 4fc30000  game_str ID continuation for 0x2715
 switchD_0802c3d8__caseD_2715:
     movs r0,#0x12    @ 0802c674 1220
     bl get_card_data_bit_by_index            @ 0802c676 68f0fdfb
     adds r5,r0,#0x0    @ 0802c67a 051c
-    ldr r0, DAT_0802c680                     @ 0802c67c 0048
+    ldr r0, switchD_2716_pool                @ 0802c67c 0048
     b LAB_0802c4d6                           @ 0802c67e 2ae7
-DAT_0802c680:
-    .word  0x00004e1f                     @ 0802c680 1f4e0000
+switchD_2716_pool:
+    .word  0x00004e1f                     @ 0802c680 1f4e0000  game_str ID for case 0x2716
 switchD_0802c3d8__caseD_2716:
     movs r0,#0xf    @ 0802c684 0f20
 LAB_0802c686:
@@ -589,10 +594,10 @@ switchD_0802c3d8__caseD_2724:
     movs r0,#0xb    @ 0802c6f4 0b20
     bl get_card_data_bit_by_index            @ 0802c6f6 68f0bdfb
     adds r5,r0,#0x0    @ 0802c6fa 051c
-    ldr r0, DAT_0802c700                     @ 0802c6fc 0048
+    ldr r0, switchD_case_pool_c700           @ 0802c6fc 0048
     b LAB_0802c4d6                           @ 0802c6fe eae6
-DAT_0802c700:
-    .word  0x00001f3f                     @ 0802c700 3f1f0000
+switchD_case_pool_c700:
+    .word  0x00001f3f                     @ 0802c700 3f1f0000  game_str offset switchD case
 switchD_0802c3d8__caseD_2725:
     movs r0,#0x1f    @ 0802c704 1f20
     b LAB_0802c686                           @ 0802c706 bee7
@@ -609,7 +614,7 @@ switchD_0802c3d8__caseD_2729:
     movs r0,#0x2d    @ 0802c714 2d20
     b LAB_0802c6aa                           @ 0802c716 c8e7
 switchD_0802c3d8__caseD_272a:
-    ldr r1, DAT_0802c730                     @ 0802c718 0549
+    ldr r1, switchD_case_pool_c730           @ 0802c718 0549
     movs r2,#0x89    @ 0802c71a 8922
     lsls r2,r2,#0x2    @ 0802c71c 9200
     adds r0,r1,r2    @ 0802c71e 8818
@@ -622,10 +627,10 @@ LAB_0802c728:
     lsls r3,r3,#0x2    @ 0802c72a 9b00
     adds r0,r1,r3    @ 0802c72c c818
     b LAB_0802c78c                           @ 0802c72e 2de0
-DAT_0802c730:
-    .word  0x0201e2a0                     @ 0802c730 a0e20102
+switchD_case_pool_c730:
+    .word  0x0201e2a0                     @ 0802c730 a0e20102  game_str offset switchD case
 switchD_0802c3d8__caseD_272b:
-    ldr r1, DAT_0802c758                     @ 0802c734 0849
+    ldr r1, switchD_case_pool_c758           @ 0802c734 0849
     movs r2,#0x89    @ 0802c736 8922
     lsls r2,r2,#0x2    @ 0802c738 9200
     adds r0,r1,r2    @ 0802c73a 8818
@@ -645,10 +650,10 @@ LAB_0802c752:
     movs r7,#0x1    @ 0802c752 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c754 4be1
     .zero  0x2
-DAT_0802c758:
-    .word  0x0201e2a0                     @ 0802c758 a0e20102
+switchD_case_pool_c758:
+    .word  0x0201e2a0                     @ 0802c758 a0e20102  game_str offset switchD case
 switchD_0802c3d8__caseD_272c:
-    ldr r1, DAT_0802c780                     @ 0802c75c 0849
+    ldr r1, switchD_case_pool_c780           @ 0802c75c 0849
     movs r2,#0x89    @ 0802c75e 8922
     lsls r2,r2,#0x2    @ 0802c760 9200
     adds r0,r1,r2    @ 0802c762 8818
@@ -668,10 +673,10 @@ LAB_0802c77a:
     movs r7,#0x1    @ 0802c77a 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c77c 37e1
     .zero  0x2
-DAT_0802c780:
-    .word  0x0201e2a0                     @ 0802c780 a0e20102
+switchD_case_pool_c780:
+    .word  0x0201e2a0                     @ 0802c780 a0e20102  game_str offset switchD case
 switchD_0802c3d8__caseD_272d:
-    ldr r0, DAT_0802c798                     @ 0802c784 0448
+    ldr r0, switchD_case_pool_c798           @ 0802c784 0448
     movs r1,#0x89    @ 0802c786 8921
     lsls r1,r1,#0x2    @ 0802c788 8900
     adds r0,r0,r1    @ 0802c78a 4018
@@ -683,16 +688,16 @@ LAB_0802c78c:
 LAB_0802c794:
     movs r7,#0x1    @ 0802c794 0127
     b switchD_0802c3d8__caseD_2730           @ 0802c796 2ae1
-DAT_0802c798:
-    .word  0x0201e2a0                     @ 0802c798 a0e20102
+switchD_case_pool_c798:
+    .word  0x0201e2a0                     @ 0802c798 a0e20102  game_str offset switchD case
 switchD_0802c3d8__caseD_272e:
     movs r0,#0x9    @ 0802c79c 0920
     bl get_card_data_bit_by_index            @ 0802c79e 68f069fb
     adds r5,r0,#0x0    @ 0802c7a2 051c
-    ldr r0, DAT_0802c7a8                     @ 0802c7a4 0048
+    ldr r0, switchD_case_pool_c7a8           @ 0802c7a4 0048
     b LAB_0802c4d6                           @ 0802c7a6 96e6
-DAT_0802c7a8:
-    .word  0x00001f3f                     @ 0802c7a8 3f1f0000
+switchD_case_pool_c7a8:
+    .word  0x00001f3f                     @ 0802c7a8 3f1f0000  game_str offset switchD case
 switchD_0802c3d8__caseD_272f:
     movs r0,#0x3    @ 0802c7ac 0320
     bl get_card_data_bit_by_index            @ 0802c7ae 68f061fb
@@ -705,19 +710,19 @@ switchD_0802c3d8__caseD_272f:
     bl get_card_data_bit_by_index            @ 0802c7c0 68f058fb
     adds r5,r0,#0x0    @ 0802c7c4 051c
 LAB_0802c7c6:
-    ldr r0, DAT_0802c7cc                     @ 0802c7c6 0148
+    ldr r0, switchD_case_pool_c7cc           @ 0802c7c6 0148
     b LAB_0802c4d6                           @ 0802c7c8 85e6
     .zero  0x2
-DAT_0802c7cc:
-    .word  0x00001f3f                     @ 0802c7cc 3f1f0000
+switchD_case_pool_c7cc:
+    .word  0x00001f3f                     @ 0802c7cc 3f1f0000  game_str offset switchD case
 switchD_0802c3d8__caseD_2733:
     movs r0,#0x28    @ 0802c7d0 2820
     b LAB_0802c686                           @ 0802c7d2 58e7
 switchD_0802c3d8__caseD_2735:
-    ldr r5, DAT_0802c7d8                     @ 0802c7d4 004d
+    ldr r5, switchD_case_pool_c7d8           @ 0802c7d4 004d
     b LAB_0802c9ca                           @ 0802c7d6 f8e0
-DAT_0802c7d8:
-    .word  0x00001954                     @ 0802c7d8 54190000
+switchD_case_pool_c7d8:
+    .word  0x00001954                     @ 0802c7d8 54190000  game_str offset switchD case
 switchD_0802c3d8__caseD_2736:
     movs r7,#0x1    @ 0802c7dc 0127
     ldr r4, DAT_0802c828                     @ 0802c7de 124c
@@ -730,7 +735,7 @@ switchD_0802c3d8__caseD_2736:
     lsls r0,r0,#0x3    @ 0802c7ee c000
     add r0,r9                                @ 0802c7f0 4844
     bl game_str_id_to_row                    @ 0802c7f2 c8f011fb
-    ldr r2, PTR_game_str_pointer_table_0802c82c @ 0802c7f6 0d4a
+    ldr r2, switchD_2712_ptr_game_str_pointer_table @ 0802c7f6 0d4a
     lsls r0,r0,#0x10    @ 0802c7f8 0004
     lsrs r0,r0,#0x10    @ 0802c7fa 000c
     lsls r1,r0,#0x1    @ 0802c7fc 4100
@@ -746,7 +751,7 @@ switchD_0802c3d8__caseD_2736:
     lsls r1,r1,#0x2    @ 0802c810 8900
     adds r1,r1,r2    @ 0802c812 8918
     ldr r2,[r1,#0x0]                         @ 0802c814 0a68
-    ldr r0, PTR_game_str_ja_0802c838         @ 0802c816 0848
+    ldr r0, switchD_2712_ptr_game_str_ja     @ 0802c816 0848
     adds r2,r2,r0    @ 0802c818 1218
     movs r0,#0x2    @ 0802c81a 0220
     adds r1,r6,#0x0    @ 0802c81c 311c
@@ -756,13 +761,13 @@ switchD_0802c3d8__caseD_2736:
     b LAB_0802c83e                           @ 0802c826 0ae0
 DAT_0802c828:
     .word  0x000015b1                     @ 0802c828 b1150000
-PTR_game_str_pointer_table_0802c82c:
+switchD_2712_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c82c 400f0008
 DAT_0802c830:
     .word  0x02000000                     @ 0802c830 00000002
 DAT_0802c834:
     .word  0x00006c2c                     @ 0802c834 2c6c0000
-PTR_game_str_ja_0802c838:
+switchD_2712_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c838 109cdb09
 LAB_0802c83c:
     movs r7,#0x0    @ 0802c83c 0027
@@ -777,7 +782,7 @@ LAB_0802c83e:
     lsls r0,r0,#0x3    @ 0802c84e c000
     add r0,r9                                @ 0802c850 4844
     bl game_str_id_to_row                    @ 0802c852 c8f0e1fa
-    ldr r2, PTR_game_str_pointer_table_0802c88c @ 0802c856 0d4a
+    ldr r2, switchD_2713_ptr_game_str_pointer_table @ 0802c856 0d4a
     lsls r0,r0,#0x10    @ 0802c858 0004
     lsrs r0,r0,#0x10    @ 0802c85a 000c
     lsls r1,r0,#0x1    @ 0802c85c 4100
@@ -793,7 +798,7 @@ LAB_0802c83e:
     lsls r1,r1,#0x2    @ 0802c870 8900
     adds r1,r1,r2    @ 0802c872 8918
     ldr r2,[r1,#0x0]                         @ 0802c874 0a68
-    ldr r0, PTR_game_str_ja_0802c898         @ 0802c876 0848
+    ldr r0, switchD_2713_ptr_game_str_ja     @ 0802c876 0848
     adds r2,r2,r0    @ 0802c878 1218
     movs r0,#0x2    @ 0802c87a 0220
     adds r1,r6,#0x0    @ 0802c87c 311c
@@ -803,13 +808,13 @@ LAB_0802c83e:
     b LAB_0802c89e                           @ 0802c886 0ae0
 DAT_0802c888:
     .word  0x000015f9                     @ 0802c888 f9150000
-PTR_game_str_pointer_table_0802c88c:
+switchD_2713_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c88c 400f0008
 DAT_0802c890:
     .word  0x02000000                     @ 0802c890 00000002
 DAT_0802c894:
     .word  0x00006c2c                     @ 0802c894 2c6c0000
-PTR_game_str_ja_0802c898:
+switchD_2713_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c898 109cdb09
 LAB_0802c89c:
     movs r7,#0x0    @ 0802c89c 0027
@@ -824,7 +829,7 @@ LAB_0802c89e:
     lsls r0,r0,#0x3    @ 0802c8ae c000
     add r0,r9                                @ 0802c8b0 4844
     bl game_str_id_to_row                    @ 0802c8b2 c8f0b1fa
-    ldr r2, PTR_game_str_pointer_table_0802c8ec @ 0802c8b6 0d4a
+    ldr r2, switchD_2714_ptr_game_str_pointer_table @ 0802c8b6 0d4a
     lsls r0,r0,#0x10    @ 0802c8b8 0004
     lsrs r0,r0,#0x10    @ 0802c8ba 000c
     lsls r1,r0,#0x1    @ 0802c8bc 4100
@@ -840,7 +845,7 @@ LAB_0802c89e:
     lsls r1,r1,#0x2    @ 0802c8d0 8900
     adds r1,r1,r2    @ 0802c8d2 8918
     ldr r2,[r1,#0x0]                         @ 0802c8d4 0a68
-    ldr r0, PTR_game_str_ja_0802c8f8         @ 0802c8d6 0848
+    ldr r0, switchD_2714_ptr_game_str_ja     @ 0802c8d6 0848
     adds r2,r2,r0    @ 0802c8d8 1218
     movs r0,#0x2    @ 0802c8da 0220
     adds r1,r6,#0x0    @ 0802c8dc 311c
@@ -850,13 +855,13 @@ LAB_0802c89e:
     b LAB_0802c8fe                           @ 0802c8e6 0ae0
 DAT_0802c8e8:
     .word  0x000015fa                     @ 0802c8e8 fa150000
-PTR_game_str_pointer_table_0802c8ec:
+switchD_2714_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c8ec 400f0008
 DAT_0802c8f0:
     .word  0x02000000                     @ 0802c8f0 00000002
 DAT_0802c8f4:
     .word  0x00006c2c                     @ 0802c8f4 2c6c0000
-PTR_game_str_ja_0802c8f8:
+switchD_2714_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c8f8 109cdb09
 LAB_0802c8fc:
     movs r7,#0x0    @ 0802c8fc 0027
@@ -871,7 +876,7 @@ LAB_0802c8fe:
     lsls r0,r0,#0x3    @ 0802c90e c000
     add r0,r9                                @ 0802c910 4844
     bl game_str_id_to_row                    @ 0802c912 c8f081fa
-    ldr r2, PTR_game_str_pointer_table_0802c94c @ 0802c916 0d4a
+    ldr r2, switchD_2715_ptr_game_str_pointer_table @ 0802c916 0d4a
     lsls r0,r0,#0x10    @ 0802c918 0004
     lsrs r0,r0,#0x10    @ 0802c91a 000c
     lsls r1,r0,#0x1    @ 0802c91c 4100
@@ -887,7 +892,7 @@ LAB_0802c8fe:
     lsls r1,r1,#0x2    @ 0802c930 8900
     adds r1,r1,r2    @ 0802c932 8918
     ldr r2,[r1,#0x0]                         @ 0802c934 0a68
-    ldr r0, PTR_game_str_ja_0802c958         @ 0802c936 0848
+    ldr r0, switchD_2715_ptr_game_str_ja     @ 0802c936 0848
     adds r2,r2,r0    @ 0802c938 1218
     movs r0,#0x2    @ 0802c93a 0220
     adds r1,r6,#0x0    @ 0802c93c 311c
@@ -897,13 +902,13 @@ LAB_0802c8fe:
     b switchD_0802c3d8__caseD_2730           @ 0802c946 52e0
 DAT_0802c948:
     .word  0x000015b4                     @ 0802c948 b4150000
-PTR_game_str_pointer_table_0802c94c:
+switchD_2715_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802c94c 400f0008
 DAT_0802c950:
     .word  0x02000000                     @ 0802c950 00000002
 DAT_0802c954:
     .word  0x00006c2c                     @ 0802c954 2c6c0000
-PTR_game_str_ja_0802c958:
+switchD_2715_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802c958 109cdb09
 LAB_0802c95c:
     movs r7,#0x0    @ 0802c95c 0027
@@ -934,8 +939,8 @@ switchD_0802c3d8__caseD_273b:
 DAT_0802c984:
     .word  0x000015ef                     @ 0802c984 ef150000
 switchD_0802c3d8__caseD_273c:
-    ldr r0, PTR_gP1LifePoints_0802c99c       @ 0802c988 0448
-    ldr r1, DAT_0802c9a0                     @ 0802c98a 0549
+    ldr r0, switchD_273c_lp_ptr              @ 0802c988 0448
+    ldr r1, switchD_273c_lp_timer_off        @ 0802c98a 0549
     adds r0,r0,r1    @ 0802c98c 4018
     ldr r0,[r0,#0x0]                         @ 0802c98e 0068
     adds r5,r0,#0x1    @ 0802c990 451c
@@ -944,10 +949,10 @@ switchD_0802c3d8__caseD_273c:
     movs r7,#0x1    @ 0802c996 0127
     b LAB_0802c9f4                           @ 0802c998 2ce0
     .zero  0x2
-PTR_gP1LifePoints_0802c99c:
+switchD_273c_lp_ptr:
     .word  gP1LifePoints                  @ 0802c99c e0c40102
-DAT_0802c9a0:
-    .word  0x00001cec                     @ 0802c9a0 ec1c0000
+switchD_273c_lp_timer_off:
+    .word  P1LP_TIMER_OFF                 @ 0802c9a0 ec1c0000  gP1LifePoints+0x1cec: duel field timer field
 switchD_0802c3d8__caseD_273e:
     movs r0,#0x25    @ 0802c9a4 2520
     b LAB_0802c6e4                           @ 0802c9a6 9de6
@@ -1001,7 +1006,7 @@ LAB_0802c9f4:
     lsls r0,r0,#0x3    @ 0802c9f6 c000
     add r0,r9                                @ 0802c9f8 4844
     bl game_str_id_to_row                    @ 0802c9fa c8f00dfa
-    ldr r2, PTR_game_str_pointer_table_0802ca40 @ 0802c9fe 104a
+    ldr r2, switchD_2730_ptr_game_str_pointer_table @ 0802c9fe 104a
     lsls r0,r0,#0x10    @ 0802ca00 0004
     lsrs r0,r0,#0x10    @ 0802ca02 000c
     lsls r1,r0,#0x1    @ 0802ca04 4100
@@ -1017,10 +1022,10 @@ LAB_0802c9f4:
     lsls r1,r1,#0x2    @ 0802ca18 8900
     adds r1,r1,r2    @ 0802ca1a 8918
     ldr r1,[r1,#0x0]                         @ 0802ca1c 0968
-    ldr r0, PTR_game_str_ja_0802ca4c         @ 0802ca1e 0b48
+    ldr r0, switchD_2730_ptr_game_str_ja     @ 0802ca1e 0b48
     adds r1,r1,r0    @ 0802ca20 0918
     .hword 0x4688    @ 0802ca22 8846
-    ldr r4, DAT_0802ca50                     @ 0802ca24 0a4c
+    ldr r4, switchD_2730_puzzle_slot_tbl     @ 0802ca24 0a4c
     .hword 0x4648    @ 0802ca26 4846
     bl find_puzzle_slot_by_id                @ 0802ca28 b6f018fc
     lsls r1,r0,#0x1    @ 0802ca2c 4100
@@ -1033,16 +1038,16 @@ LAB_0802c9f4:
     beq LAB_0802ca54                         @ 0802ca3a 0bd0
     movs r0,#0x6    @ 0802ca3c 0620
     b LAB_0802ca56                           @ 0802ca3e 0ae0
-PTR_game_str_pointer_table_0802ca40:
+switchD_2730_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802ca40 400f0008
 DAT_0802ca44:
     .word  0x02000000                     @ 0802ca44 00000002
 DAT_0802ca48:
     .word  0x00006c2c                     @ 0802ca48 2c6c0000
-PTR_game_str_ja_0802ca4c:
+switchD_2730_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802ca4c 109cdb09
-DAT_0802ca50:
-    .word  0x09e5e9cc                     @ 0802ca50 cce9e509
+switchD_2730_puzzle_slot_tbl:
+    .word  puzzle_challenge_record_array  @ 0802ca50 cce9e509  ptr to puzzle_challenge_record_array: 49x12B records
 LAB_0802ca54:
     movs r0,#0x7    @ 0802ca54 0720
 LAB_0802ca56:
@@ -1061,7 +1066,7 @@ LAB_0802ca66:
     lsls r0,r0,#0x3    @ 0802ca6e c000
     add r0,r9                                @ 0802ca70 4844
     bl game_str_id_to_row                    @ 0802ca72 c8f0d1f9
-    ldr r2, PTR_game_str_pointer_table_0802cb88 @ 0802ca76 444a
+    ldr r2, switchD_2744_ptr_game_str_pointer_table @ 0802ca76 444a
     lsls r0,r0,#0x10    @ 0802ca78 0004
     lsrs r0,r0,#0x10    @ 0802ca7a 000c
     lsls r1,r0,#0x1    @ 0802ca7c 4100
@@ -1077,7 +1082,7 @@ LAB_0802ca66:
     lsls r1,r1,#0x2    @ 0802ca90 8900
     adds r1,r1,r2    @ 0802ca92 8918
     ldr r2,[r1,#0x0]                         @ 0802ca94 0a68
-    ldr r0, PTR_game_str_ja_0802cb94         @ 0802ca96 3f48
+    ldr r0, switchD_2744_ptr_game_str_ja     @ 0802ca96 3f48
     adds r2,r2,r0    @ 0802ca98 1218
     movs r0,#0x2    @ 0802ca9a 0220
     adds r1,r6,#0x0    @ 0802ca9c 311c
@@ -1102,10 +1107,10 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cac4 400f
     adds r1,r1,r0    @ 0802cac6 0918
     lsls r1,r1,#0x2    @ 0802cac8 8900
-    ldr r0, PTR_game_str_pointer_table_0802cb88 @ 0802caca 2f48
+    ldr r0, switchD_2744_ptr_game_str_pointer_table @ 0802caca 2f48
     adds r1,r1,r0    @ 0802cacc 0918
     ldr r0,[r1,#0x0]                         @ 0802cace 0868
-    ldr r1, PTR_game_str_ja_0802cb94         @ 0802cad0 3049
+    ldr r1, switchD_2744_ptr_game_str_ja     @ 0802cad0 3049
     .hword 0x4689    @ 0802cad2 8946
     add r0,r9                                @ 0802cad4 4844
     bl count_bytes_until_null                @ 0802cad6 c8f003fd
@@ -1127,7 +1132,7 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cafa 400f
     adds r1,r1,r0    @ 0802cafc 0918
     lsls r1,r1,#0x2    @ 0802cafe 8900
-    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb00 214b
+    ldr r3, switchD_2744_ptr_game_str_pointer_table @ 0802cb00 214b
     adds r1,r1,r3    @ 0802cb02 c918
     ldr r3,[r1,#0x0]                         @ 0802cb04 0b68
     add r3,r9                                @ 0802cb06 4b44
@@ -1148,7 +1153,7 @@ LAB_0802caa4:
     lsrs r0,r0,#0x1d    @ 0802cb28 400f
     adds r1,r1,r0    @ 0802cb2a 0918
     lsls r1,r1,#0x2    @ 0802cb2c 8900
-    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb2e 164b
+    ldr r3, switchD_2744_ptr_game_str_pointer_table @ 0802cb2e 164b
     adds r1,r1,r3    @ 0802cb30 c918
     ldr r0,[r1,#0x0]                         @ 0802cb32 0868
     add r0,r9                                @ 0802cb34 4844
@@ -1174,7 +1179,7 @@ LAB_0802cb48:
     lsrs r0,r0,#0x1d    @ 0802cb5e 400f
     adds r1,r1,r0    @ 0802cb60 0918
     lsls r1,r1,#0x2    @ 0802cb62 8900
-    ldr r3, PTR_game_str_pointer_table_0802cb88 @ 0802cb64 084b
+    ldr r3, switchD_2744_ptr_game_str_pointer_table @ 0802cb64 084b
     adds r1,r1,r3    @ 0802cb66 c918
     ldr r3,[r1,#0x0]                         @ 0802cb68 0b68
     add r3,r9                                @ 0802cb6a 4b44
@@ -1191,13 +1196,13 @@ LAB_0802cb48:
     pop {r4,r5,r6,r7}                        @ 0802cb82 f0bc
     pop {r1}                                 @ 0802cb84 02bc
     bx r1                                    @ 0802cb86 0847
-PTR_game_str_pointer_table_0802cb88:
+switchD_2744_ptr_game_str_pointer_table:
     .word  game_str_pointer_table         @ 0802cb88 400f0008
 DAT_0802cb8c:
     .word  0x02000000                     @ 0802cb8c 00000002
 DAT_0802cb90:
     .word  0x00006c2c                     @ 0802cb90 2c6c0000
-PTR_game_str_ja_0802cb94:
+switchD_2744_ptr_game_str_ja:
     .word  game_str_ja                    @ 0802cb94 109cdb09
 DAT_0802cb98:
     .word  0x00000c02                     @ 0802cb98 020c0000
@@ -1212,9 +1217,9 @@ init_jp_font_linebuf_for_render:
     movs r2,#0x1    @ 0802cba6 0122
     movs r3,#0x0    @ 0802cba8 0023
     bl setup_line_buf_with_font_and_align    @ 0802cbaa c4f089f8
-    ldr r2, DAT_0802cbf4                     @ 0802cbae 114a
-    ldr r0, DAT_0802cbf8                     @ 0802cbb0 1148
-    ldr r1, DAT_0802cbfc                     @ 0802cbb2 1249
+    ldr r2, init_jp_font_linebuf_for_render_font_ctx @ 0802cbae 114a
+    ldr r0, init_jp_font_linebuf_for_render_ewram_base @ 0802cbb0 1148
+    ldr r1, init_jp_font_linebuf_for_render_gsettings_off @ 0802cbb2 1249
     adds r0,r0,r1    @ 0802cbb4 4018
     movs r1,#0x7    @ 0802cbb6 0721
     ldrb r0,[r0,#0x0]                        @ 0802cbb8 0078
@@ -1229,7 +1234,7 @@ init_jp_font_linebuf_for_render:
     movs r1,#0x2    @ 0802cbca 0221
     orrs r0,r1    @ 0802cbcc 0843
     strb r0,[r2,#0x8]                        @ 0802cbce 1072
-    ldr r3, PTR_font_jp_base_table_0802cc00  @ 0802cbd0 0b4b
+    ldr r3, init_jp_font_linebuf_ptr_font_jp_base_table @ 0802cbd0 0b4b
     lsls r1,r0,#0x1e    @ 0802cbd2 8107
     lsrs r1,r1,#0x1f    @ 0802cbd4 c90f
     lsls r1,r1,#0x2    @ 0802cbd6 8900
@@ -1240,29 +1245,29 @@ init_jp_font_linebuf_for_render:
     adds r1,r1,r3    @ 0802cbe0 c918
     ldr r0,[r1,#0x0]                         @ 0802cbe2 0868
     str r0,[r2,#0x4]                         @ 0802cbe4 5060
-    ldr r0, DAT_0802cc04                     @ 0802cbe6 0748
+    ldr r0, init_jp_font_linebuf_for_render_pal_base @ 0802cbe6 0748
     movs r1,#0x20    @ 0802cbe8 2021
     bl zero_fill_by_halfword                 @ 0802cbea c8f043f9
     pop {r0}                                 @ 0802cbee 01bc
     bx r0                                    @ 0802cbf0 0047
     .zero  0x2
-DAT_0802cbf4:
-    .word  0x02006ed0                     @ 0802cbf4 d06e0002
-DAT_0802cbf8:
-    .word  0x02000000                     @ 0802cbf8 00000002
-DAT_0802cbfc:
-    .word  0x00006c2c                     @ 0802cbfc 2c6c0000
-PTR_font_jp_base_table_0802cc00:
+init_jp_font_linebuf_for_render_font_ctx:
+    .word  gFontJpCtx                     @ 0802cbf4 d06e0002
+init_jp_font_linebuf_for_render_ewram_base:
+    .word  EWRAM_BASE                     @ 0802cbf8 00000002
+init_jp_font_linebuf_for_render_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802cbfc 2c6c0000
+init_jp_font_linebuf_ptr_font_jp_base_table:
     .word  font_jp_base_table             @ 0802cc00 54f8e509
-DAT_0802cc04:
-    .word  0x050001e0                     @ 0802cc04 e0010005
+init_jp_font_linebuf_for_render_pal_base:
+    .word  BG_PALRAM_SLOT15_BASE          @ 0802cc04 e0010005
 
 @ Clear OBJ VRAM 0x06008020 (0x8200 halfwords zero-fill), commit line buffer glyphs to sprite VRAM, then write tile index sequence (0,1..25,0,0,0) x40 loops into OAM index table. r0=void. Returns void. Caller: result_screen card name rendering pipeline. Side-effects: OBJ VRAM 0x06008020 zeroed; tile index table written. Constants: OBJ_VRAM_BASE=0x06008020, zero_fill_count=0x8200 halfwords, tile_seq_len=26 (0+1..25+0+0+0), loop_count=0x28.
 commit_glyph_linebuf_to_sprite_vram_with_index:
     push {r4,r5,r6,lr}                       @ 0802cc08 70b5
     movs r6,#0x1    @ 0802cc0a 0126
-    ldr r5, DAT_0802cc60                     @ 0802cc0c 144d
-    ldr r4, DAT_0802cc64                     @ 0802cc0e 154c
+    ldr r5, commit_glyph_linebuf_tile_idx_vram @ 0802cc0c 144d
+    ldr r4, commit_glyph_linebuf_sprite_vram @ 0802cc0e 154c
     movs r1,#0x82    @ 0802cc10 8221
     lsls r1,r1,#0x8    @ 0802cc12 0902
     adds r0,r4,#0x0    @ 0802cc14 201c
@@ -1305,37 +1310,37 @@ LAB_0802cc4a:
     pop {r4,r5,r6}                           @ 0802cc5a 70bc
     pop {r0}                                 @ 0802cc5c 01bc
     bx r0                                    @ 0802cc5e 0047
-DAT_0802cc60:
-    .word  0x06001080                     @ 0802cc60 80100006
-DAT_0802cc64:
-    .word  0x06008020                     @ 0802cc64 20800006
+commit_glyph_linebuf_tile_idx_vram:
+    .word  RESULT_SCREEN_TILE_IDX_VRAM    @ 0802cc60 80100006  BG VRAM tile idx write base for result screen glyph line
+commit_glyph_linebuf_sprite_vram:
+    .word  PUZZLE_NAME_SPRITE_VRAM        @ 0802cc64 20800006
 
 @ Fully initialize the card-name result screen: validate card_id range, configure VRAM/BG registers, upload tiles and palette, init font buffer, render card name. r0=card_id [0x2711..0x2744]; validated as r0-0x2711 in [0..0x33], else return 0. Steps: clear DISPCNT, reset_display_and_obj_vram, store_ewram_ctx_ptr_and_clear_mode_flags, set BG0-3CNT, reset_all_bg_scroll_regs_and_shadows, upload_pack_vram_and_palette, zero_fill_by_halfword (VRAM regions), copy_bytes_by_halfword (tiles/palette), load_pack_tile_and_map_to_vram, setup_line_buf_pos_and_font, init_jp_font_linebuf_for_render, render_card_name_escape_to_line, commit_glyph_linebuf_to_sprite_vram_with_index. Returns 1 on success, 0 if card_id out of range. Side effects: DISPCNT=0, BG0CNT=0x5, BG1CNT=0x104, BG2CNT=0x8208, BG3CNT=0x407, VRAM/PAL. Constants: DISPCNT=0x04000000, card_id_adjust=-0x2711, max_adjusted=0x33, gPrng_slot_offset=0x174, VRAM_BG=0x06004000, PAL_BASE=0x05000220.
 init_card_name_result_screen:
     push {r4,r5,r6,lr}                       @ 0802cc68 70b5
     adds r6,r0,#0x0    @ 0802cc6a 061c
-    ldr r1, DAT_0802cc78                     @ 0802cc6c 0249
+    ldr r1, init_card_name_result_screen_card_id_adj @ 0802cc6c 0249
     adds r0,r6,r1    @ 0802cc6e 7018
     cmp r0,#0x33                             @ 0802cc70 3328
     bls LAB_0802cc7c                         @ 0802cc72 03d9
     movs r0,#0x0    @ 0802cc74 0020
     b LAB_0802cf7e                           @ 0802cc76 82e1
-DAT_0802cc78:
-    .word  0xffffd8ef                     @ 0802cc78 efd8ffff
+init_card_name_result_screen_card_id_adj:
+    .word  CARD_ID_BASE_NEG_ADJ           @ 0802cc78 efd8ffff
 LAB_0802cc7c:
     ldr r0, PTR_gPrng_0802cd80               @ 0802cc7c 4048
     movs r2,#0xba    @ 0802cc7e ba22
     lsls r2,r2,#0x1    @ 0802cc80 5200
     adds r0,r0,r2    @ 0802cc82 8018
     movs r2,#0x0    @ 0802cc84 0022
-    ldr r1, DAT_0802cd84                     @ 0802cc86 3f49
+    ldr r1, init_card_name_result_screen_dispcnt @ 0802cc86 3f49
     strh r1,[r0,#0x0]                        @ 0802cc88 0180
     movs r0,#0x80    @ 0802cc8a 8020
     lsls r0,r0,#0x13    @ 0802cc8c c004
     strh r2,[r0,#0x0]                        @ 0802cc8e 0280
-    ldr r0, DAT_0802cd88                     @ 0802cc90 3d48
+    ldr r0, init_card_name_result_screen_disp_ctx @ 0802cc90 3d48
     bl reset_display_and_obj_vram            @ 0802cc92 caf0effc
-    ldr r0, DAT_0802cd8c                     @ 0802cc96 3d48
+    ldr r0, init_card_name_result_screen_ctx @ 0802cc96 3d48
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 0802cc98 c7f002fb
     ldr r1, PTR_BG0CNT_0802cd90              @ 0802cc9c 3c49
     movs r0,#0x5    @ 0802cc9e 0520
@@ -1346,16 +1351,16 @@ LAB_0802cc7c:
     adds r0,r3,#0x0    @ 0802cca8 181c
     strh r0,[r1,#0x0]                        @ 0802ccaa 0880
     adds r1,#0x2    @ 0802ccac 0231
-    ldr r4, DAT_0802cd94                     @ 0802ccae 394c
+    ldr r4, init_card_name_result_screen_bg2cnt @ 0802ccae 394c
     adds r0,r4,#0x0    @ 0802ccb0 201c
     strh r0,[r1,#0x0]                        @ 0802ccb2 0880
     adds r1,#0x2    @ 0802ccb4 0231
-    ldr r2, DAT_0802cd98                     @ 0802ccb6 384a
+    ldr r2, init_card_name_result_screen_bg3cnt @ 0802ccb6 384a
     adds r0,r2,#0x0    @ 0802ccb8 101c
     strh r0,[r1,#0x0]                        @ 0802ccba 0880
     bl reset_all_bg_scroll_regs_and_shadows  @ 0802ccbc c8f0e4fe
     bl upload_pack_vram_and_palette          @ 0802ccc0 c8f0eafe
-    ldr r0, DAT_0802cd9c                     @ 0802ccc4 3548
+    ldr r0, init_card_name_result_screen_vram_bg @ 0802ccc4 3548
     movs r1,#0xc0    @ 0802ccc6 c021
     lsls r1,r1,#0x8    @ 0802ccc8 0902
     bl zero_fill_by_halfword                 @ 0802ccca c8f0d3f8
@@ -1364,34 +1369,34 @@ LAB_0802cc7c:
     movs r1,#0xa0    @ 0802ccd2 a021
     lsls r1,r1,#0x6    @ 0802ccd4 8901
     bl zero_fill_by_halfword                 @ 0802ccd6 c8f0cdf8
-    ldr r4, DAT_0802cda0                     @ 0802ccda 314c
+    ldr r4, init_card_name_result_screen_obj_vram @ 0802ccda 314c
     movs r1,#0x80    @ 0802ccdc 8021
     lsls r1,r1,#0x8    @ 0802ccde 0902
     adds r0,r4,#0x0    @ 0802cce0 201c
     bl zero_fill_by_halfword                 @ 0802cce2 c8f0c7f8
-    ldr r0, DAT_0802cda4                     @ 0802cce6 2f48
-    ldr r1, DAT_0802cda8                     @ 0802cce8 2f49
+    ldr r0, init_card_name_result_screen_obj_pal @ 0802cce6 2f48
+    ldr r1, init_card_name_result_screen_pal2_src @ 0802cce8 2f49
     movs r2,#0x20    @ 0802ccea 2022
     bl copy_bytes_by_halfword                @ 0802ccec c8f0daf8
-    ldr r1, DAT_0802cdac                     @ 0802ccf0 2e49
+    ldr r1, init_card_name_result_screen_tile1_src @ 0802ccf0 2e49
     movs r2,#0x80    @ 0802ccf2 8022
     lsls r2,r2,#0x4    @ 0802ccf4 1201
     adds r0,r4,#0x0    @ 0802ccf6 201c
     bl copy_bytes_by_halfword                @ 0802ccf8 c8f0d4f8
-    ldr r3, DAT_0802cdb0                     @ 0802ccfc 2c4b
+    ldr r3, init_card_name_result_screen_tile2_src @ 0802ccfc 2c4b
     movs r0,#0x0    @ 0802ccfe 0020
     movs r1,#0x10    @ 0802cd00 1021
     movs r2,#0x2    @ 0802cd02 0222
     bl load_pack_tile_and_map_to_vram        @ 0802cd04 c1f084f9
     movs r0,#0x80    @ 0802cd08 8020
     lsls r0,r0,#0x3    @ 0802cd0a c000
-    ldr r3, DAT_0802cdb4                     @ 0802cd0c 294b
+    ldr r3, init_card_name_result_screen_tile3_src @ 0802cd0c 294b
     movs r1,#0x20    @ 0802cd0e 2021
     movs r2,#0x42    @ 0802cd10 4222
     bl load_pack_tile_and_map_to_vram        @ 0802cd12 c1f07df9
     movs r0,#0x80    @ 0802cd16 8020
     lsls r0,r0,#0x5    @ 0802cd18 4001
-    ldr r3, DAT_0802cdb8                     @ 0802cd1a 274b
+    ldr r3, init_card_name_result_screen_tile4_src @ 0802cd1a 274b
     movs r1,#0x10    @ 0802cd1c 1021
     movs r2,#0x5c    @ 0802cd1e 5c22
     bl load_pack_tile_and_map_to_vram        @ 0802cd20 c1f076f9
@@ -1399,8 +1404,8 @@ LAB_0802cc7c:
     movs r1,#0x2    @ 0802cd26 0221
     bl setup_line_buf_pos_and_font           @ 0802cd28 c3f044ff
     ldr r2, DAT_0802cdbc                     @ 0802cd2c 234a
-    ldr r0, DAT_0802cdc0                     @ 0802cd2e 2448
-    ldr r3, DAT_0802cdc4                     @ 0802cd30 244b
+    ldr r0, init_card_name_result_screen_ewram_base @ 0802cd2e 2448
+    ldr r3, init_card_name_result_screen_gsettings_off @ 0802cd30 244b
     adds r0,r0,r3    @ 0802cd32 c018
     movs r4,#0x7    @ 0802cd34 0724
     ldrb r0,[r0,#0x0]                        @ 0802cd36 0078
@@ -1415,7 +1420,7 @@ LAB_0802cc7c:
     movs r1,#0x2    @ 0802cd48 0221
     orrs r0,r1    @ 0802cd4a 0843
     strb r0,[r2,#0x8]                        @ 0802cd4c 1072
-    ldr r3, PTR_font_jp_base_table_0802cdc8  @ 0802cd4e 1e4b
+    ldr r3, init_card_name_result_screen_ptr_font_jp_base_table @ 0802cd4e 1e4b
     lsls r1,r0,#0x1e    @ 0802cd50 8107
     lsrs r1,r1,#0x1f    @ 0802cd52 c90f
     lsls r1,r1,#0x2    @ 0802cd54 8900
@@ -1434,79 +1439,79 @@ LAB_0802cc7c:
     beq LAB_0802cddc                         @ 0802cd6e 35d0
     cmp r4,#0x4                              @ 0802cd70 042c
     beq LAB_0802cdd4                         @ 0802cd72 2fd0
-    ldr r0, DAT_0802cdcc                     @ 0802cd74 1548
+    ldr r0, init_card_name_result_screen_jp_str_base @ 0802cd74 1548
     cmp r4,#0x5                              @ 0802cd76 052c
     bne LAB_0802cdee                         @ 0802cd78 39d1
-    ldr r4, DAT_0802cdd0                     @ 0802cd7a 154c
+    ldr r4, init_card_name_result_screen_jp_str_off_es @ 0802cd7a 154c
     adds r0,r0,r4    @ 0802cd7c 0019
     b LAB_0802cdee                           @ 0802cd7e 36e0
 PTR_gPrng_0802cd80:
     .word  gPrng                          @ 0802cd80 40000003
-DAT_0802cd84:
-    .word  0x00000401                     @ 0802cd84 01040000
-DAT_0802cd88:
-    .word  0x0203eeb0                     @ 0802cd88 b0ee0302
-DAT_0802cd8c:
-    .word  0x02029eb0                     @ 0802cd8c b09e0202
+init_card_name_result_screen_dispcnt:
+    .word  PACK_INFO_DISPCNT_SHADOW_INIT  @ 0802cd84 01040000
+init_card_name_result_screen_disp_ctx:
+    .word  gDuelDispCtx                   @ 0802cd88 b0ee0302
+init_card_name_result_screen_ctx:
+    .word  gVijaState                     @ 0802cd8c b09e0202
 PTR_BG0CNT_0802cd90:
     .word  BG0CNT                         @ 0802cd90 08000004
-DAT_0802cd94:
-    .word  0x00008208                     @ 0802cd94 08820000
-DAT_0802cd98:
-    .word  0x00000407                     @ 0802cd98 07040000
-DAT_0802cd9c:
-    .word  0x06004000                     @ 0802cd9c 00400006
-DAT_0802cda0:
-    .word  0x06010000                     @ 0802cda0 00000106
-DAT_0802cda4:
-    .word  0x05000220                     @ 0802cda4 20020005
-DAT_0802cda8:
-    .word  0x09b921d4                     @ 0802cda8 d421b909
-DAT_0802cdac:
-    .word  0x09b921f4                     @ 0802cdac f421b909
-DAT_0802cdb0:
-    .word  0x09b929f4                     @ 0802cdb0 f429b909
-DAT_0802cdb4:
-    .word  0x09b93484                     @ 0802cdb4 8434b909
-DAT_0802cdb8:
-    .word  0x09b93844                     @ 0802cdb8 4438b909
+init_card_name_result_screen_bg2cnt:
+    .word  RESULT_SCREEN_BG2CNT_INIT      @ 0802cd94 08820000  BG2CNT: pri=0 charbase=2 16col scrbase=2 size=0
+init_card_name_result_screen_bg3cnt:
+    .word  CARD_INFO_BG2CNT_INIT          @ 0802cd98 07040000
+init_card_name_result_screen_vram_bg:
+    .word  BG_CHAR_VRAM_CB2               @ 0802cd9c 00400006
+init_card_name_result_screen_obj_vram:
+    .word  OBJ_TILE_VRAM_BASE             @ 0802cda0 00000106
+init_card_name_result_screen_obj_pal:
+    .word  OBJ_PAL_SLOT_1                 @ 0802cda4 20020005
+init_card_name_result_screen_pal2_src:
+    .word  result_screen_pal2_src         @ 0802cda8 d421b909  result screen copy_bytes_by_halfword src (0x20B)
+init_card_name_result_screen_tile1_src:
+    .word  result_screen_tile1_src        @ 0802cdac f421b909
+init_card_name_result_screen_tile2_src:
+    .word  result_screen_tile2_src        @ 0802cdb0 f429b909
+init_card_name_result_screen_tile3_src:
+    .word  result_screen_tile3_src        @ 0802cdb4 8434b909
+init_card_name_result_screen_tile4_src:
+    .word  result_screen_tile4_src        @ 0802cdb8 4438b909
 DAT_0802cdbc:
     .word  0x02006ed0                     @ 0802cdbc d06e0002
-DAT_0802cdc0:
-    .word  0x02000000                     @ 0802cdc0 00000002
-DAT_0802cdc4:
-    .word  0x00006c2c                     @ 0802cdc4 2c6c0000
-PTR_font_jp_base_table_0802cdc8:
+init_card_name_result_screen_ewram_base:
+    .word  EWRAM_BASE                     @ 0802cdc0 00000002
+init_card_name_result_screen_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802cdc4 2c6c0000
+init_card_name_result_screen_ptr_font_jp_base_table:
     .word  font_jp_base_table             @ 0802cdc8 54f8e509
-DAT_0802cdcc:
-    .word  0x09dc0240                     @ 0802cdcc 4002dc09
-DAT_0802cdd0:
-    .word  0x0003ab84                     @ 0802cdd0 84ab0300
+init_card_name_result_screen_jp_str_base:
+    .word  JP_LANG5_STR_BASE              @ 0802cdcc 4002dc09  JP card name string table base (lang5=ES)
+init_card_name_result_screen_jp_str_off_es:
+    .word  JP_LANG5_STR_OFFSET_ES         @ 0802cdd0 84ab0300  ES string offset from JP_LANG5_STR_BASE
 LAB_0802cdd4:
-    ldr r0, DAT_0802cdd8                     @ 0802cdd4 0048
+    ldr r0, init_card_name_result_screen_jp_str_de @ 0802cdd4 0048
     b LAB_0802cdee                           @ 0802cdd6 0ae0
-DAT_0802cdd8:
-    .word  0x09def212                     @ 0802cdd8 12f2de09
+init_card_name_result_screen_jp_str_de:
+    .word  JP_LANG4_STR_PTR_DE            @ 0802cdd8 12f2de09  DE card name string ptr (lang4)
 LAB_0802cddc:
-    ldr r0, DAT_0802cde0                     @ 0802cddc 0048
+    ldr r0, init_card_name_result_screen_jp_str_fr @ 0802cddc 0048
     b LAB_0802cdee                           @ 0802cdde 06e0
-DAT_0802cde0:
-    .word  0x09de2d5e                     @ 0802cde0 5e2dde09
+init_card_name_result_screen_jp_str_fr:
+    .word  JP_LANG3_STR_PTR_FR            @ 0802cde0 5e2dde09  FR card name string ptr (lang3)
 LAB_0802cde4:
-    ldr r0, DAT_0802cde8                     @ 0802cde4 0048
+    ldr r0, init_card_name_result_screen_jp_str_it @ 0802cde4 0048
     b LAB_0802cdee                           @ 0802cde6 02e0
-DAT_0802cde8:
-    .word  0x09dd69ec                     @ 0802cde8 ec69dd09
+init_card_name_result_screen_jp_str_it:
+    .word  JP_LANG2_STR_PTR_IT            @ 0802cde8 ec69dd09  IT card name string ptr (lang2)
 LAB_0802cdec:
-    ldr r0, DAT_0802ce24                     @ 0802cdec 0d48
+    ldr r0, init_card_name_result_screen_jp_str_en @ 0802cdec 0d48
 LAB_0802cdee:
     bl count_bytes_until_null                @ 0802cdee c8f077fb
     lsls r1,r0,#0x1    @ 0802cdf2 4100
     adds r1,r1,r0    @ 0802cdf4 0918
     movs r0,#0x60    @ 0802cdf6 6020
     subs r2,r0,r1    @ 0802cdf8 421a
-    ldr r0, DAT_0802ce28                     @ 0802cdfa 0b48
-    ldr r1, DAT_0802ce2c                     @ 0802cdfc 0b49
+    ldr r0, init_card_name_result_screen_ewram_base_b @ 0802cdfa 0b48
+    ldr r1, init_card_name_result_screen_gsettings_off_b @ 0802cdfc 0b49
     adds r0,r0,r1    @ 0802cdfe 4018
     movs r1,#0x7    @ 0802ce00 0721
     ldrb r0,[r0,#0x0]                        @ 0802ce02 0078
@@ -1519,47 +1524,47 @@ LAB_0802cdee:
     beq LAB_0802ce40                         @ 0802ce10 16d0
     cmp r1,#0x4                              @ 0802ce12 0429
     beq LAB_0802ce38                         @ 0802ce14 10d0
-    ldr r3, DAT_0802ce30                     @ 0802ce16 064b
+    ldr r3, init_card_name_result_screen_jp_str_base_b @ 0802ce16 064b
     cmp r1,#0x5                              @ 0802ce18 0529
     bne LAB_0802ce52                         @ 0802ce1a 1ad1
-    ldr r4, DAT_0802ce34                     @ 0802ce1c 054c
+    ldr r4, init_card_name_result_screen_jp_str_off_es_b @ 0802ce1c 054c
     adds r3,r3,r4    @ 0802ce1e 1b19
     b LAB_0802ce52                           @ 0802ce20 17e0
     .zero  0x2
-DAT_0802ce24:
-    .word  0x09dcb012                     @ 0802ce24 12b0dc09
-DAT_0802ce28:
-    .word  0x02000000                     @ 0802ce28 00000002
-DAT_0802ce2c:
-    .word  0x00006c2c                     @ 0802ce2c 2c6c0000
-DAT_0802ce30:
-    .word  0x09dc0240                     @ 0802ce30 4002dc09
-DAT_0802ce34:
-    .word  0x0003ab84                     @ 0802ce34 84ab0300
+init_card_name_result_screen_jp_str_en:
+    .word  JP_LANG1_STR_PTR_EN            @ 0802ce24 12b0dc09  EN card name string ptr (lang1)
+init_card_name_result_screen_ewram_base_b:
+    .word  EWRAM_BASE                     @ 0802ce28 00000002
+init_card_name_result_screen_gsettings_off_b:
+    .word  GSETTINGS_OFFSET               @ 0802ce2c 2c6c0000
+init_card_name_result_screen_jp_str_base_b:
+    .word  JP_LANG5_STR_BASE              @ 0802ce30 4002dc09
+init_card_name_result_screen_jp_str_off_es_b:
+    .word  JP_LANG5_STR_OFFSET_ES         @ 0802ce34 84ab0300
 LAB_0802ce38:
-    ldr r3, DAT_0802ce3c                     @ 0802ce38 004b
+    ldr r3, init_card_name_result_screen_jp_str_de_b @ 0802ce38 004b
     b LAB_0802ce52                           @ 0802ce3a 0ae0
-DAT_0802ce3c:
-    .word  0x09def212                     @ 0802ce3c 12f2de09
+init_card_name_result_screen_jp_str_de_b:
+    .word  JP_LANG4_STR_PTR_DE            @ 0802ce3c 12f2de09
 LAB_0802ce40:
-    ldr r3, DAT_0802ce44                     @ 0802ce40 004b
+    ldr r3, init_card_name_result_screen_jp_str_fr_b @ 0802ce40 004b
     b LAB_0802ce52                           @ 0802ce42 06e0
-DAT_0802ce44:
-    .word  0x09de2d5e                     @ 0802ce44 5e2dde09
+init_card_name_result_screen_jp_str_fr_b:
+    .word  JP_LANG3_STR_PTR_FR            @ 0802ce44 5e2dde09
 LAB_0802ce48:
-    ldr r3, DAT_0802ce4c                     @ 0802ce48 004b
+    ldr r3, init_card_name_result_screen_jp_str_it_b @ 0802ce48 004b
     b LAB_0802ce52                           @ 0802ce4a 02e0
-DAT_0802ce4c:
-    .word  0x09dd69ec                     @ 0802ce4c ec69dd09
+init_card_name_result_screen_jp_str_it_b:
+    .word  JP_LANG2_STR_PTR_IT            @ 0802ce4c ec69dd09
 LAB_0802ce50:
-    ldr r3, DAT_0802ce84                     @ 0802ce50 0c4b
+    ldr r3, init_card_name_result_screen_jp_str_en_b @ 0802ce50 0c4b
 LAB_0802ce52:
     adds r0,r2,#0x0    @ 0802ce52 101c
     movs r1,#0x2    @ 0802ce54 0221
-    ldr r2, DAT_0802ce88                     @ 0802ce56 0c4a
+    ldr r2, init_card_name_result_screen_render_flag_b @ 0802ce56 0c4a
     bl text_render_wrapper                   @ 0802ce58 c5f010fe
-    ldr r0, DAT_0802ce8c                     @ 0802ce5c 0b48
-    ldr r1, DAT_0802ce90                     @ 0802ce5e 0c49
+    ldr r0, init_card_name_result_screen_ewram_base_c @ 0802ce5c 0b48
+    ldr r1, init_card_name_result_screen_gsettings_off_c @ 0802ce5e 0c49
     adds r0,r0,r1    @ 0802ce60 4018
     movs r1,#0x7    @ 0802ce62 0721
     ldrb r0,[r0,#0x0]                        @ 0802ce64 0078
@@ -1572,49 +1577,49 @@ LAB_0802ce52:
     beq LAB_0802cea4                         @ 0802ce72 17d0
     cmp r1,#0x4                              @ 0802ce74 0429
     beq LAB_0802ce9c                         @ 0802ce76 11d0
-    ldr r0, DAT_0802ce94                     @ 0802ce78 0648
+    ldr r0, init_card_name_result_screen_jp_str_base_c @ 0802ce78 0648
     cmp r1,#0x5                              @ 0802ce7a 0529
     bne LAB_0802ceb6                         @ 0802ce7c 1bd1
-    ldr r2, DAT_0802ce98                     @ 0802ce7e 064a
+    ldr r2, init_card_name_result_screen_jp_str_off_es_c @ 0802ce7e 064a
     adds r0,r0,r2    @ 0802ce80 8018
     b LAB_0802ceb6                           @ 0802ce82 18e0
-DAT_0802ce84:
-    .word  0x09dcb012                     @ 0802ce84 12b0dc09
-DAT_0802ce88:
-    .word  0x00008001                     @ 0802ce88 01800000
-DAT_0802ce8c:
-    .word  0x02000000                     @ 0802ce8c 00000002
-DAT_0802ce90:
-    .word  0x00006c2c                     @ 0802ce90 2c6c0000
-DAT_0802ce94:
-    .word  0x09dc0240                     @ 0802ce94 4002dc09
-DAT_0802ce98:
-    .word  0x0003ab84                     @ 0802ce98 84ab0300
+init_card_name_result_screen_jp_str_en_b:
+    .word  JP_LANG1_STR_PTR_EN            @ 0802ce84 12b0dc09
+init_card_name_result_screen_render_flag_b:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802ce88 01800000
+init_card_name_result_screen_ewram_base_c:
+    .word  EWRAM_BASE                     @ 0802ce8c 00000002
+init_card_name_result_screen_gsettings_off_c:
+    .word  GSETTINGS_OFFSET               @ 0802ce90 2c6c0000
+init_card_name_result_screen_jp_str_base_c:
+    .word  JP_LANG5_STR_BASE              @ 0802ce94 4002dc09
+init_card_name_result_screen_jp_str_off_es_c:
+    .word  JP_LANG5_STR_OFFSET_ES         @ 0802ce98 84ab0300
 LAB_0802ce9c:
-    ldr r0, DAT_0802cea0                     @ 0802ce9c 0048
+    ldr r0, init_card_name_result_screen_jp_str_de_c @ 0802ce9c 0048
     b LAB_0802ceb6                           @ 0802ce9e 0ae0
-DAT_0802cea0:
-    .word  0x09def212                     @ 0802cea0 12f2de09
+init_card_name_result_screen_jp_str_de_c:
+    .word  JP_LANG4_STR_PTR_DE            @ 0802cea0 12f2de09
 LAB_0802cea4:
-    ldr r0, DAT_0802cea8                     @ 0802cea4 0048
+    ldr r0, init_card_name_result_screen_jp_str_fr_c @ 0802cea4 0048
     b LAB_0802ceb6                           @ 0802cea6 06e0
-DAT_0802cea8:
-    .word  0x09de2d5e                     @ 0802cea8 5e2dde09
+init_card_name_result_screen_jp_str_fr_c:
+    .word  JP_LANG3_STR_PTR_FR            @ 0802cea8 5e2dde09
 LAB_0802ceac:
-    ldr r0, DAT_0802ceb0                     @ 0802ceac 0048
+    ldr r0, init_card_name_result_screen_jp_str_it_c @ 0802ceac 0048
     b LAB_0802ceb6                           @ 0802ceae 02e0
-DAT_0802ceb0:
-    .word  0x09dd69ec                     @ 0802ceb0 ec69dd09
+init_card_name_result_screen_jp_str_it_c:
+    .word  JP_LANG2_STR_PTR_IT            @ 0802ceb0 ec69dd09
 LAB_0802ceb4:
-    ldr r0, DAT_0802ceec                     @ 0802ceb4 0d48
+    ldr r0, init_card_name_result_screen_jp_str_en_c @ 0802ceb4 0d48
 LAB_0802ceb6:
     bl count_bytes_until_null                @ 0802ceb6 c8f013fb
     lsls r1,r0,#0x1    @ 0802ceba 4100
     adds r1,r1,r0    @ 0802cebc 0918
     movs r0,#0x60    @ 0802cebe 6020
     subs r2,r0,r1    @ 0802cec0 421a
-    ldr r0, DAT_0802cef0                     @ 0802cec2 0b48
-    ldr r3, DAT_0802cef4                     @ 0802cec4 0b4b
+    ldr r0, init_card_name_result_screen_ewram_base_d @ 0802cec2 0b48
+    ldr r3, init_card_name_result_screen_gsettings_off_d @ 0802cec4 0b4b
     adds r0,r0,r3    @ 0802cec6 c018
     movs r1,#0x7    @ 0802cec8 0721
     ldrb r0,[r0,#0x0]                        @ 0802ceca 0078
@@ -1627,51 +1632,51 @@ LAB_0802ceb6:
     beq LAB_0802cf08                         @ 0802ced8 16d0
     cmp r1,#0x4                              @ 0802ceda 0429
     beq LAB_0802cf00                         @ 0802cedc 10d0
-    ldr r3, DAT_0802cef8                     @ 0802cede 064b
+    ldr r3, init_card_name_result_screen_jp_str_base_d @ 0802cede 064b
     cmp r1,#0x5                              @ 0802cee0 0529
     bne LAB_0802cf1a                         @ 0802cee2 1ad1
-    ldr r4, DAT_0802cefc                     @ 0802cee4 054c
+    ldr r4, init_card_name_result_screen_jp_str_off_es_d @ 0802cee4 054c
     adds r3,r3,r4    @ 0802cee6 1b19
     b LAB_0802cf1a                           @ 0802cee8 17e0
     .zero  0x2
-DAT_0802ceec:
-    .word  0x09dcb012                     @ 0802ceec 12b0dc09
-DAT_0802cef0:
-    .word  0x02000000                     @ 0802cef0 00000002
-DAT_0802cef4:
-    .word  0x00006c2c                     @ 0802cef4 2c6c0000
-DAT_0802cef8:
-    .word  0x09dc0240                     @ 0802cef8 4002dc09
-DAT_0802cefc:
-    .word  0x0003ab84                     @ 0802cefc 84ab0300
+init_card_name_result_screen_jp_str_en_c:
+    .word  JP_LANG1_STR_PTR_EN            @ 0802ceec 12b0dc09
+init_card_name_result_screen_ewram_base_d:
+    .word  EWRAM_BASE                     @ 0802cef0 00000002
+init_card_name_result_screen_gsettings_off_d:
+    .word  GSETTINGS_OFFSET               @ 0802cef4 2c6c0000
+init_card_name_result_screen_jp_str_base_d:
+    .word  JP_LANG5_STR_BASE              @ 0802cef8 4002dc09
+init_card_name_result_screen_jp_str_off_es_d:
+    .word  JP_LANG5_STR_OFFSET_ES         @ 0802cefc 84ab0300
 LAB_0802cf00:
-    ldr r3, DAT_0802cf04                     @ 0802cf00 004b
+    ldr r3, init_card_name_result_screen_jp_str_de_d @ 0802cf00 004b
     b LAB_0802cf1a                           @ 0802cf02 0ae0
-DAT_0802cf04:
-    .word  0x09def212                     @ 0802cf04 12f2de09
+init_card_name_result_screen_jp_str_de_d:
+    .word  JP_LANG4_STR_PTR_DE            @ 0802cf04 12f2de09
 LAB_0802cf08:
-    ldr r3, DAT_0802cf0c                     @ 0802cf08 004b
+    ldr r3, init_card_name_result_screen_jp_str_fr_d @ 0802cf08 004b
     b LAB_0802cf1a                           @ 0802cf0a 06e0
-DAT_0802cf0c:
-    .word  0x09de2d5e                     @ 0802cf0c 5e2dde09
+init_card_name_result_screen_jp_str_fr_d:
+    .word  JP_LANG3_STR_PTR_FR            @ 0802cf0c 5e2dde09
 LAB_0802cf10:
-    ldr r3, DAT_0802cf14                     @ 0802cf10 004b
+    ldr r3, init_card_name_result_screen_jp_str_it_d @ 0802cf10 004b
     b LAB_0802cf1a                           @ 0802cf12 02e0
-DAT_0802cf14:
-    .word  0x09dd69ec                     @ 0802cf14 ec69dd09
+init_card_name_result_screen_jp_str_it_d:
+    .word  JP_LANG2_STR_PTR_IT            @ 0802cf14 ec69dd09
 LAB_0802cf18:
-    ldr r3, DAT_0802cf84                     @ 0802cf18 1a4b
+    ldr r3, init_card_name_result_screen_jp_str_en_d @ 0802cf18 1a4b
 LAB_0802cf1a:
     adds r0,r2,#0x0    @ 0802cf1a 101c
     movs r1,#0x2    @ 0802cf1c 0221
     movs r2,#0xe    @ 0802cf1e 0e22
     bl text_render_wrapper                   @ 0802cf20 c5f0acfd
-    ldr r0, DAT_0802cf88                     @ 0802cf24 1848
+    ldr r0, init_card_name_result_screen_sprite_vram @ 0802cf24 1848
     movs r1,#0x0    @ 0802cf26 0021
     bl commit_line_buffer_to_sprite_vram     @ 0802cf28 c5f090ff
     movs r3,#0x64    @ 0802cf2c 6423
     movs r2,#0x0    @ 0802cf2e 0022
-    ldr r0, DAT_0802cf8c                     @ 0802cf30 1648
+    ldr r0, init_card_name_result_screen_scene_ctx @ 0802cf30 1648
     .hword 0x4684    @ 0802cf32 8446
     movs r1,#0x80    @ 0802cf34 8021
     lsls r1,r1,#0x6    @ 0802cf36 8901
@@ -1679,7 +1684,7 @@ LAB_0802cf1a:
 LAB_0802cf3a:
     lsls r0,r2,#0x10    @ 0802cf3a 1004
     lsrs r0,r0,#0xa    @ 0802cf3c 800a
-    ldr r4, DAT_0802cf90                     @ 0802cf3e 144c
+    ldr r4, init_card_name_result_screen_tilemap_target @ 0802cf3e 144c
     adds r1,r0,r4    @ 0802cf40 0119
     adds r4,r2,#0x1    @ 0802cf42 541c
     movs r2,#0x17    @ 0802cf44 1722
@@ -1701,7 +1706,7 @@ LAB_0802cf46:
     add r0,r12                               @ 0802cf62 6044
     movs r1,#0x0    @ 0802cf64 0021
     strb r1,[r0,#0x0]                        @ 0802cf66 0170
-    ldr r0, DAT_0802cf94                     @ 0802cf68 0a48
+    ldr r0, init_card_name_result_screen_font_ctx_off @ 0802cf68 0a48
     add r0,r12                               @ 0802cf6a 6044
     strb r1,[r0,#0x0]                        @ 0802cf6c 0170
     bl init_jp_font_linebuf_for_render       @ 0802cf6e fff717fe
@@ -1713,18 +1718,18 @@ LAB_0802cf7e:
     pop {r4,r5,r6}                           @ 0802cf7e 70bc
     pop {r1}                                 @ 0802cf80 02bc
     bx r1                                    @ 0802cf82 0847
-DAT_0802cf84:
-    .word  0x09dcb012                     @ 0802cf84 12b0dc09
-DAT_0802cf88:
-    .word  0x06004c80                     @ 0802cf88 804c0006
-DAT_0802cf8c:
-    .word  0x02023360                     @ 0802cf8c 60330202
-DAT_0802cf90:
-    .word  0x06000806                     @ 0802cf90 06080006
-DAT_0802cf94:
-    .word  0x00000119                     @ 0802cf94 19010000
+init_card_name_result_screen_jp_str_en_d:
+    .word  JP_LANG1_STR_PTR_EN            @ 0802cf84 12b0dc09
+init_card_name_result_screen_sprite_vram:
+    .word  RESULT_SCREEN_SPRITE_VRAM      @ 0802cf88 804c0006  OBJ VRAM base for result screen sprites
+init_card_name_result_screen_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802cf8c 60330202
+init_card_name_result_screen_tilemap_target:
+    .word  RESULT_SCREEN_TILEMAP_TARGET   @ 0802cf90 06080006  BG VRAM tilemap write addr for result screen tile row
+init_card_name_result_screen_font_ctx_off:
+    .word  RESULT_SCREEN_FONT_CTX_OFF     @ 0802cf94 19010000  JP font direction flag offset in scene_ctx
 
-@ Execute one blend fadeout step. Reads BLDCNT (0x04000050), ORs BLD_SRC_ALL mask 0x1f00, writes back to enable full-screen blend source. Then calls tick_blend_step_by_delta(delta=4) to advance blend counter. r0=void. Returns void. Caller: FUN_0802cfd4 (tick_scene_blend_fade_sequence) phase 0 branch. Side-effects: [BLDCNT 0x04000050] |= 0x1f00; blend counter += 4 via callee. Constants: BLDCNT=0x04000050, BLD_SRC_ALL=0x1f00, blend_delta=4.
+@ Execute one blend fadeout step. Reads BLDCNT (0x04000050), ORs BLD_SRC_ALL mask 0x1f00, writes back to enable full-screen blend source. Then calls tick_blend_step_by_delta(delta=4) to advance blend counter. r0=void. Returns void. Caller: tick_scene_blend_fade_sequence (tick_scene_blend_fade_sequence) phase 0 branch. Side-effects: [BLDCNT 0x04000050] |= 0x1f00; blend counter += 4 via callee. Constants: BLDCNT=0x04000050, BLD_SRC_ALL=0x1f00, blend_delta=4.
 tick_scene_blend_fadeout_step:
     push {lr}                                @ 0802cf98 00b5
     movs r2,#0x80    @ 0802cf9a 8022
@@ -1740,7 +1745,7 @@ tick_scene_blend_fadeout_step:
     pop {r1}                                 @ 0802cfb0 02bc
     bx r1                                    @ 0802cfb2 0847
 
-@ Execute one blend fadein step and detect completion. Calls start_blend_fadein_with_target(target=4); if returns 0 (in progress) returns 0. On completion: writes 0 to BLDCNT (0x04000050) to disable blend, returns 1. r0=void. Returns u32 done_flag (0=in progress, 1=complete). Caller: FUN_0802cfd4 (tick_scene_blend_fade_sequence) phase 1 branch. Side-effects: [BLDCNT 0x04000050]:=0 on completion. Constants: BLDCNT=0x04000050, target=4.
+@ Execute one blend fadein step and detect completion. Calls start_blend_fadein_with_target(target=4); if returns 0 (in progress) returns 0. On completion: writes 0 to BLDCNT (0x04000050) to disable blend, returns 1. r0=void. Returns u32 done_flag (0=in progress, 1=complete). Caller: tick_scene_blend_fade_sequence (tick_scene_blend_fade_sequence) phase 1 branch. Side-effects: [BLDCNT 0x04000050]:=0 on completion. Constants: BLDCNT=0x04000050, target=4.
 tick_scene_blend_fadein_step:
     push {lr}                                @ 0802cfb4 00b5
     movs r0,#0x4    @ 0802cfb6 0420
@@ -1763,7 +1768,7 @@ LAB_0802cfce:
 @ Fadeout-fadein state machine for scene blend transition. Reads phase_state from 0x02023360+0x118; phase 0: calls tick_scene_blend_fadeout_step; phase 1: calls tick_scene_blend_fadein_step; advances phase on completion. Always returns 0. r0=void. Caller: frame_counter-driven state machine hub. Constants: phase_state_addr=0x02023360+0x118.
 tick_scene_blend_fade_sequence:
     push {r4,r5,lr}                          @ 0802cfd4 30b5
-    ldr r1, DAT_0802cff4                     @ 0802cfd6 0749
+    ldr r1, tick_scene_blend_fade_sequence_scene_ctx @ 0802cfd6 0749
     movs r0,#0x8c    @ 0802cfd8 8c20
     lsls r0,r0,#0x1    @ 0802cfda 4000
     adds r4,r1,r0    @ 0802cfdc 0c18
@@ -1777,8 +1782,8 @@ tick_scene_blend_fade_sequence:
     bl tick_scene_blend_fadein_step          @ 0802cfec fff7e2ff
     b LAB_0802d06c                           @ 0802cff0 3ce0
     .zero  0x2
-DAT_0802cff4:
-    .word  0x02023360                     @ 0802cff4 60330202
+tick_scene_blend_fade_sequence_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802cff4 60330202
 LAB_0802cff8:
     bl tick_scene_blend_fadeout_step         @ 0802cff8 fff7ceff
     cmp r0,#0x0                              @ 0802cffc 0028
@@ -1863,31 +1868,31 @@ init_campaign_bg_and_obj_vram:
     .hword 0x4646    @ 0802d076 4646
     push {r6}                                @ 0802d078 40b4
     sub sp,#0x4                              @ 0802d07a 81b0
-    ldr r0, DWORD_0802d154                   @ 0802d07c 3548
+    ldr r0, init_campaign_bg_and_obj_vram_prng @ 0802d07c 3548
     movs r1,#0xba    @ 0802d07e ba21
     lsls r1,r1,#0x1    @ 0802d080 4900
     adds r0,r0,r1    @ 0802d082 4018
     movs r2,#0x0    @ 0802d084 0022
     .hword 0x4690    @ 0802d086 9046
-    ldr r1, DWORD_0802d158                   @ 0802d088 3349
+    ldr r1, init_campaign_bg_and_obj_vram_dispcnt_shadow @ 0802d088 3349
     strh r1,[r0,#0x0]                        @ 0802d08a 0180
     movs r0,#0x80    @ 0802d08c 8020
     lsls r0,r0,#0x13    @ 0802d08e c004
     .hword 0x4641    @ 0802d090 4146
     strh r1,[r0,#0x0]                        @ 0802d092 0180
-    ldr r0, DWORD_0802d15c                   @ 0802d094 3148
+    ldr r0, init_campaign_bg_and_obj_vram_disp_ctx @ 0802d094 3148
     bl reset_display_and_obj_vram            @ 0802d096 caf0edfa
-    ldr r0, DWORD_0802d160                   @ 0802d09a 3148
+    ldr r0, init_campaign_bg_and_obj_vram_ctx @ 0802d09a 3148
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 0802d09c c7f000f9
     ldr r1, DWORD_0802d164                   @ 0802d0a0 3049
     movs r0,#0x5    @ 0802d0a2 0520
     strh r0,[r1,#0x0]                        @ 0802d0a4 0880
     adds r1,#0x2    @ 0802d0a6 0231
-    ldr r2, DWORD_0802d168                   @ 0802d0a8 2f4a
+    ldr r2, init_campaign_bg_and_obj_vram_bg1cnt @ 0802d0a8 2f4a
     adds r0,r2,#0x0    @ 0802d0aa 101c
     strh r0,[r1,#0x0]                        @ 0802d0ac 0880
     adds r1,#0x2    @ 0802d0ae 0231
-    ldr r2, DWORD_0802d16c                   @ 0802d0b0 2e4a
+    ldr r2, init_campaign_bg_and_obj_vram_bg2cnt @ 0802d0b0 2e4a
     adds r0,r2,#0x0    @ 0802d0b2 101c
     strh r0,[r1,#0x0]                        @ 0802d0b4 0880
     adds r1,#0x2    @ 0802d0b6 0231
@@ -1896,7 +1901,7 @@ init_campaign_bg_and_obj_vram:
     strh r0,[r1,#0x0]                        @ 0802d0bc 0880
     bl reset_all_bg_scroll_regs_and_shadows  @ 0802d0be c8f0e3fc
     bl upload_pack_vram_and_palette          @ 0802d0c2 c8f0e9fc
-    ldr r0, DWORD_0802d170                   @ 0802d0c6 2a48
+    ldr r0, init_campaign_bg_and_obj_vram_vram_bg @ 0802d0c6 2a48
     movs r4,#0x80    @ 0802d0c8 8024
     lsls r4,r4,#0x8    @ 0802d0ca 2402
     adds r1,r4,#0x0    @ 0802d0cc 211c
@@ -1907,41 +1912,41 @@ init_campaign_bg_and_obj_vram:
     lsls r6,r6,#0x6    @ 0802d0d8 b601
     adds r1,r6,#0x0    @ 0802d0da 311c
     bl zero_fill_by_halfword                 @ 0802d0dc c7f0cafe
-    ldr r5, DWORD_0802d174                   @ 0802d0e0 244d
+    ldr r5, init_campaign_bg_and_obj_vram_obj_vram @ 0802d0e0 244d
     adds r0,r5,#0x0    @ 0802d0e2 281c
     adds r1,r4,#0x0    @ 0802d0e4 211c
     bl zero_fill_by_halfword                 @ 0802d0e6 c7f0c5fe
-    ldr r0, DWORD_0802d178                   @ 0802d0ea 2348
-    ldr r1, PTR_DAT_0802d17c                 @ 0802d0ec 2349
+    ldr r0, init_campaign_bg_and_obj_vram_obj_pal @ 0802d0ea 2348
+    ldr r1, init_campaign_bg_and_obj_vram_pal_src_a @ 0802d0ec 2349
     movs r2,#0x20    @ 0802d0ee 2022
     bl copy_bytes_by_halfword                @ 0802d0f0 c7f0d8fe
-    ldr r1, PTR_DAT_0802d180                 @ 0802d0f4 2249
+    ldr r1, init_campaign_bg_and_obj_vram_pal_src_b @ 0802d0f4 2249
     adds r0,r5,#0x0    @ 0802d0f6 281c
     adds r2,r6,#0x0    @ 0802d0f8 321c
     bl copy_bytes_by_halfword                @ 0802d0fa c7f0d3fe
-    ldr r0, PTR_DAT_0802d184                 @ 0802d0fe 2148
+    ldr r0, init_campaign_bg_and_obj_vram_pal_src_c @ 0802d0fe 2148
     movs r1,#0x9    @ 0802d100 0921
     bl upload_palette_rows_to_bg_vram        @ 0802d102 c1f09bf9
     movs r0,#0xa0    @ 0802d106 a020
     lsls r0,r0,#0x13    @ 0802d108 c004
     .hword 0x4641    @ 0802d10a 4146
     strh r1,[r0,#0x0]                        @ 0802d10c 0180
-    ldr r0, PTR_DAT_0802d188                 @ 0802d10e 1e48
+    ldr r0, init_campaign_bg_and_obj_vram_tile_src @ 0802d10e 1e48
     movs r1,#0x2    @ 0802d110 0221
     bl upload_4bpp_nibble_tile_rows_to_obj_vram @ 0802d112 c1f09ff9
-    ldr r0, PTR_DAT_0802d18c                 @ 0802d116 1d48
+    ldr r0, init_campaign_bg_and_obj_vram_tilemap_src @ 0802d116 1d48
     movs r1,#0x14    @ 0802d118 1421
     str r1,[sp,#0x0]                         @ 0802d11a 0091
     movs r1,#0x0    @ 0802d11c 0021
     movs r2,#0x2    @ 0802d11e 0222
     movs r3,#0x1e    @ 0802d120 1e23
     bl upload_tilemap_rows_with_offset       @ 0802d122 c1f0dff9
-    ldr r0, DWORD_0802d190                   @ 0802d126 1a48
-    ldr r1, DWORD_0802d194                   @ 0802d128 1a49
+    ldr r0, init_campaign_bg_and_obj_vram_pal_dst @ 0802d126 1a48
+    ldr r1, init_campaign_bg_and_obj_vram_pal_src @ 0802d128 1a49
     movs r2,#0x20    @ 0802d12a 2022
     bl copy_bytes_by_halfword                @ 0802d12c c7f0bafe
-    ldr r0, DWORD_0802d198                   @ 0802d130 1948
-    ldr r3, DWORD_0802d19c                   @ 0802d132 1a4b
+    ldr r0, init_campaign_bg_and_obj_vram_tilemap_seq @ 0802d130 1948
+    ldr r3, init_campaign_bg_and_obj_vram_tilemap_base @ 0802d132 1a4b
     movs r2,#0x3f    @ 0802d134 3f22
 LAB_0802d136:
     adds r1,r0,#0x0    @ 0802d136 011c
@@ -1959,44 +1964,44 @@ LAB_0802d136:
     pop {r4,r5,r6}                           @ 0802d14e 70bc
     pop {r0}                                 @ 0802d150 01bc
     bx r0                                    @ 0802d152 0047
-DWORD_0802d154:
+init_campaign_bg_and_obj_vram_prng:
     .word  gPrng                          @ 0802d154 40000003
-DWORD_0802d158:
-    .word  0x00000601                     @ 0802d158 01060000
-DWORD_0802d15c:
-    .word  0x0203eeb0                     @ 0802d15c b0ee0302
-DWORD_0802d160:
-    .word  0x02029eb0                     @ 0802d160 b09e0202
+init_campaign_bg_and_obj_vram_dispcnt_shadow:
+    .word  DUEL_FIELD_CTRL_VAL            @ 0802d158 01060000
+init_campaign_bg_and_obj_vram_disp_ctx:
+    .word  gDuelDispCtx                   @ 0802d15c b0ee0302
+init_campaign_bg_and_obj_vram_ctx:
+    .word  gVijaState                     @ 0802d160 b09e0202
 DWORD_0802d164:
     .word  BG0CNT                         @ 0802d164 08000004
-DWORD_0802d168:
-    .word  0x00000107                     @ 0802d168 07010000
-DWORD_0802d16c:
-    .word  0x00000207                     @ 0802d16c 07020000
-DWORD_0802d170:
-    .word  0x06004000                     @ 0802d170 00400006
-DWORD_0802d174:
-    .word  0x06010000                     @ 0802d174 00000106
-DWORD_0802d178:
-    .word  0x05000220                     @ 0802d178 20020005
-PTR_DAT_0802d17c:
-    .word  0x0994d6fc                     @ 0802d17c fcd69409
-PTR_DAT_0802d180:
-    .word  0x0994d71c                     @ 0802d180 1cd79409
-PTR_DAT_0802d184:
-    .word  0x09a1a52c                     @ 0802d184 2ca5a109
-PTR_DAT_0802d188:
-    .word  0x0994f83c                     @ 0802d188 3cf89409
-PTR_DAT_0802d18c:
-    .word  0x0995383c                     @ 0802d18c 3c389509
-DWORD_0802d190:
-    .word  0x050001e0                     @ 0802d190 e0010005
-DWORD_0802d194:
-    .word  0x09ccd290                     @ 0802d194 90d2cc09
-DWORD_0802d198:
-    .word  0x0000f210                     @ 0802d198 10f20000
-DWORD_0802d19c:
-    .word  0x06001800                     @ 0802d19c 00180006
+init_campaign_bg_and_obj_vram_bg1cnt:
+    .word  CAMPAIGN_BG1CNT_INIT           @ 0802d168 07010000  BG1CNT: pri=3 charbase=0 16col scrbase=0
+init_campaign_bg_and_obj_vram_bg2cnt:
+    .word  CAMPAIGN_BG2CNT_INIT           @ 0802d16c 07020000  BG2CNT: pri=3 charbase=0 16col scrbase=1
+init_campaign_bg_and_obj_vram_vram_bg:
+    .word  BG_CHAR_VRAM_CB2               @ 0802d170 00400006
+init_campaign_bg_and_obj_vram_obj_vram:
+    .word  OBJ_TILE_VRAM_BASE             @ 0802d174 00000106
+init_campaign_bg_and_obj_vram_obj_pal:
+    .word  OBJ_PAL_SLOT_1                 @ 0802d178 20020005
+init_campaign_bg_and_obj_vram_pal_src_a:
+    .word  campaign_bg_pal_src_a          @ 0802d17c fcd69409
+init_campaign_bg_and_obj_vram_pal_src_b:
+    .word  campaign_bg_pal_src_b          @ 0802d180 1cd79409
+init_campaign_bg_and_obj_vram_pal_src_c:
+    .word  campaign_bg_pal_src_c          @ 0802d184 2ca5a109
+init_campaign_bg_and_obj_vram_tile_src:
+    .word  campaign_bg_tile_src           @ 0802d188 3cf89409
+init_campaign_bg_and_obj_vram_tilemap_src:
+    .word  campaign_bg_tilemap_src        @ 0802d18c 3c389509
+init_campaign_bg_and_obj_vram_pal_dst:
+    .word  BG_PALRAM_SLOT15_BASE          @ 0802d190 e0010005
+init_campaign_bg_and_obj_vram_pal_src:
+    .word  name_o_palette_data            @ 0802d194 90d2cc09  BG palette src: name_o_palette_data (32B RGB15)
+init_campaign_bg_and_obj_vram_tilemap_seq:
+    .word  CAMPAIGN_TILEMAP_SEQ_START     @ 0802d198 10f20000  campaign BG tilemap seq start param
+init_campaign_bg_and_obj_vram_tilemap_base:
+    .word  CAMPAIGN_BG_TILEMAP_BASE       @ 0802d19c 00180006  campaign BG tilemap VRAM base
 
 @ Initializes BG/OBJ VRAM data for a specified opponent card (r0=opponent_index):
 @ computes palette address (opponent_palettes_base + r0*288 bytes = r0*9*32), computes
@@ -2025,31 +2030,31 @@ init_opponent_card_bg_vram:
     lsls r4,r0,#0x3    @ 0802d1ac c400
     adds r4,r4,r0    @ 0802d1ae 2418
     lsls r4,r4,#0x5    @ 0802d1b0 6401
-    ldr r1, PTR_opponent_palettes_base_0802d240 @ 0802d1b2 2349
+    ldr r1, init_opponent_card_bg_vram_opp_pal_base @ 0802d1b2 2349
     adds r4,r4,r1    @ 0802d1b4 6418
     lsls r1,r0,#0xd    @ 0802d1b6 4103
     .hword 0x468a    @ 0802d1b8 8a46
-    ldr r1, PTR_opponent_top_tiles_base_0802d244 @ 0802d1ba 2249
+    ldr r1, init_opponent_card_bg_vram_opp_top_tiles @ 0802d1ba 2249
     .hword 0x4689    @ 0802d1bc 8946
     add r9,r10                               @ 0802d1be d144
-    ldr r1, PTR_opponent_bottom_tiles_base_0802d248 @ 0802d1c0 2149
+    ldr r1, init_opponent_card_bg_vram_opp_bot_tiles @ 0802d1c0 2149
     add r10,r1                               @ 0802d1c2 8a44
     lsls r1,r0,#0x2    @ 0802d1c4 8100
     adds r1,r1,r0    @ 0802d1c6 0918
     lsls r5,r1,#0x4    @ 0802d1c8 0d01
     subs r5,r5,r1    @ 0802d1ca 6d1a
     lsls r5,r5,#0x4    @ 0802d1cc 2d01
-    ldr r0, PTR_opponent_top_tilemap_base_0802d24c @ 0802d1ce 1f48
+    ldr r0, init_opponent_card_bg_vram_opp_top_tilemap @ 0802d1ce 1f48
     .hword 0x4680    @ 0802d1d0 8046
     add r8,r5                                @ 0802d1d2 a844
-    ldr r0, PTR_opponent_bottom_tilemap_base_0802d250 @ 0802d1d4 1e48
+    ldr r0, init_opponent_card_bg_vram_opp_bot_tilemap @ 0802d1d4 1e48
     adds r5,r5,r0    @ 0802d1d6 2d18
-    ldr r0, DWORD_0802d254                   @ 0802d1d8 1e48
+    ldr r0, init_opponent_card_bg_vram_tilemap_a @ 0802d1d8 1e48
     movs r6,#0x80    @ 0802d1da 8026
     lsls r6,r6,#0x4    @ 0802d1dc 3601
     adds r1,r6,#0x0    @ 0802d1de 311c
     bl zero_fill_by_halfword                 @ 0802d1e0 c7f048fe
-    ldr r0, DWORD_0802d258                   @ 0802d1e4 1c48
+    ldr r0, init_opponent_card_bg_vram_tilemap_b @ 0802d1e4 1c48
     adds r1,r6,#0x0    @ 0802d1e6 311c
     bl zero_fill_by_halfword                 @ 0802d1e8 c7f044fe
     adds r0,r4,#0x0    @ 0802d1ec 201c
@@ -2089,20 +2094,20 @@ init_opponent_card_bg_vram:
     pop {r0}                                 @ 0802d23a 01bc
     bx r0                                    @ 0802d23c 0047
     .zero  0x2
-PTR_opponent_palettes_base_0802d240:
+init_opponent_card_bg_vram_opp_pal_base:
     .word  opponent_palettes_base         @ 0802d240 ac01b109
-PTR_opponent_top_tiles_base_0802d244:
+init_opponent_card_bg_vram_opp_top_tiles:
     .word  opponent_top_tiles_base        @ 0802d244 0c20b109
-PTR_opponent_bottom_tiles_base_0802d248:
+init_opponent_card_bg_vram_opp_bot_tiles:
     .word  opponent_bottom_tiles_base     @ 0802d248 fc1cb509
-PTR_opponent_top_tilemap_base_0802d24c:
+init_opponent_card_bg_vram_opp_top_tilemap:
     .word  opponent_top_tilemap_base      @ 0802d24c 0c80b409
-PTR_opponent_bottom_tilemap_base_0802d250:
+init_opponent_card_bg_vram_opp_bot_tilemap:
     .word  opponent_bottom_tilemap_base   @ 0802d250 fc7cb809
-DWORD_0802d254:
-    .word  0x06000800                     @ 0802d254 00080006
-DWORD_0802d258:
-    .word  0x06001000                     @ 0802d258 00100006
+init_opponent_card_bg_vram_tilemap_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802d254 00080006
+init_opponent_card_bg_vram_tilemap_b:
+    .word  OBJ_VRAM_BASE_1000             @ 0802d258 00100006  VRAM base 0x06001000 (BG tile write target)
 
 @ Function: initialize pack selection screen default VRAM/palette (generic path with no specified deck). No APCS input. Loads three fixed ROM data sets: ROM_PALETTE=0x09b97b28 (palette), ROM_TILES=0x09b97d68 (tile data), ROM_TILEMAP=0x09b9bd68 (tilemap data). Executes in order: (1) zero_fill_by_halfword clears OBJ VRAM 0x06000800 and 0x06001000 (each 0x800 halfwords = 0x1000 bytes); (2) upload_palette_rows_to_bg_vram(ROM_PALETTE, 8) uploads 8 palette rows; (3) writes 0 to PAL_RAM 0x05000000 (clears background color); (4) upload_indexed_tile_rows_to_obj_vram(ROM_TILES+0x2000, 0x10) uploads 16 OBJ tile rows; (5) upload_tilemap_rows_with_offset(ROM_TILEMAP, 1, 0x10, 0x1e) uploads tilemap rows; (6) repeats upload_indexed_tile_rows_to_obj_vram(ROM_TILES+0x88*2=0x110, 0x14 rows); (7) upload_tilemap_rows_with_offset(tilemap_offset, 2, 0x88*2, 0x1e). Exit pop {r0}; bx r0 (Sub-case E, void).
 @ 
@@ -2132,24 +2137,24 @@ init_pack_selection_tile_vram_default:
     .hword 0x4644    @ 0802d262 4446
     push {r4,r5,r6}                          @ 0802d264 70b4
     sub sp,#0x4                              @ 0802d266 81b0
-    ldr r6, DWORD_0802d2e8                   @ 0802d268 1f4e
-    ldr r5, DWORD_0802d2ec                   @ 0802d26a 204d
+    ldr r6, init_pack_selection_default_pal  @ 0802d268 1f4e
+    ldr r5, init_pack_selection_default_tile_src @ 0802d26a 204d
     movs r0,#0x80    @ 0802d26c 8020
     lsls r0,r0,#0x6    @ 0802d26e 8001
     adds r0,r0,r5    @ 0802d270 4019
     .hword 0x4681    @ 0802d272 8146
-    ldr r0, DWORD_0802d2f0                   @ 0802d274 1e48
+    ldr r0, init_pack_selection_default_tilemap @ 0802d274 1e48
     .hword 0x4680    @ 0802d276 8046
     movs r0,#0x96    @ 0802d278 9620
     lsls r0,r0,#0x3    @ 0802d27a c000
     add r0,r8                                @ 0802d27c 4044
     .hword 0x4682    @ 0802d27e 8246
-    ldr r0, DWORD_0802d2f4                   @ 0802d280 1c48
+    ldr r0, init_pack_selection_default_vram_a @ 0802d280 1c48
     movs r4,#0x80    @ 0802d282 8024
     lsls r4,r4,#0x4    @ 0802d284 2401
     adds r1,r4,#0x0    @ 0802d286 211c
     bl zero_fill_by_halfword                 @ 0802d288 c7f0f4fd
-    ldr r0, DWORD_0802d2f8                   @ 0802d28c 1a48
+    ldr r0, init_pack_selection_default_vram_b @ 0802d28c 1a48
     adds r1,r4,#0x0    @ 0802d28e 211c
     bl zero_fill_by_halfword                 @ 0802d290 c7f0f0fd
     adds r0,r6,#0x0    @ 0802d294 301c
@@ -2189,16 +2194,16 @@ init_pack_selection_tile_vram_default:
     pop {r0}                                 @ 0802d2e2 01bc
     bx r0                                    @ 0802d2e4 0047
     .zero  0x2
-DWORD_0802d2e8:
-    .word  0x09b97b28                     @ 0802d2e8 287bb909
-DWORD_0802d2ec:
-    .word  0x09b97d68                     @ 0802d2ec 687db909
-DWORD_0802d2f0:
-    .word  0x09b9bd68                     @ 0802d2f0 68bdb909
-DWORD_0802d2f4:
-    .word  0x06000800                     @ 0802d2f4 00080006
-DWORD_0802d2f8:
-    .word  0x06001000                     @ 0802d2f8 00100006
+init_pack_selection_default_pal:
+    .word  pack_default_pal_src           @ 0802d2e8 287bb909
+init_pack_selection_default_tile_src:
+    .word  pack_default_tile_src          @ 0802d2ec 687db909
+init_pack_selection_default_tilemap:
+    .word  pack_default_tilemap_src       @ 0802d2f0 68bdb909
+init_pack_selection_default_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802d2f4 00080006
+init_pack_selection_default_vram_b:
+    .word  OBJ_VRAM_BASE_1000             @ 0802d2f8 00100006
 
 @ Function: pack selection screen VRAM/palette init (deck type A, internal key=0x2711). No APCS input. Entry immediately ldr r0, 0x2711 then calls find_deck_record_index_by_key, return value r0 is deck_record_index; subs r4,r4,r0 computes relative_deck_index (r4 at entry was already assigned 0 by adds r4,r0). Then based on relative_deck_index computes 5 ROM data pointers (r5=palette, r8/r9/r10=3 tile sets, r4=tilemap): step formula r5=idx*9*32 + ROM_PALETTE_A, others use similar multiplication. Executes: (1) zero_fill_by_halfword x2 clears OBJ VRAM 0x06000800/0x06001000; (2) upload_palette_rows_to_bg_vram(r5, 8); (3) clears PAL_RAM 0x05000000; (4) upload_indexed_tile_rows_to_obj_vram(r8, 0x10); (5) upload_tilemap_rows_with_offset(r8_offset, 1, 0x10, 0x1e); (6) upload_indexed_tile_rows_to_obj_vram(r9=ROM_TILES+0x88*2, 0x14); (7) upload_tilemap_rows_with_offset(r4=tilemap, 2, 0x110, 0x1e). Structure fully symmetric with init_pack_selection_tile_vram_default; difference is all ROM pointers computed dynamically from deck_record_index rather than fixed constants.
 @ 
@@ -2229,37 +2234,37 @@ init_pack_selection_tile_vram_by_deck_a:
     push {r4,r5,r6}                          @ 0802d304 70b4
     sub sp,#0x4                              @ 0802d306 81b0
     adds r4,r0,#0x0    @ 0802d308 041c
-    ldr r0, DWORD_0802d3a4                   @ 0802d30a 2648
+    ldr r0, init_pack_selection_deck_a_key   @ 0802d30a 2648
     bl find_deck_record_index_by_key         @ 0802d30c f2f76cf8
     subs r4,r4,r0    @ 0802d310 241a
     lsls r5,r4,#0x3    @ 0802d312 e500
     adds r5,r5,r4    @ 0802d314 2d19
     lsls r5,r5,#0x5    @ 0802d316 6d01
-    ldr r0, PTR_DAT_0802d3a8                 @ 0802d318 2348
+    ldr r0, init_pack_selection_deck_a_pal_src @ 0802d318 2348
     adds r5,r5,r0    @ 0802d31a 2d18
     lsls r0,r4,#0xd    @ 0802d31c 6003
     .hword 0x4682    @ 0802d31e 8246
-    ldr r0, PTR_DAT_0802d3ac                 @ 0802d320 2248
+    ldr r0, init_pack_selection_deck_a_tile1_src @ 0802d320 2248
     .hword 0x4681    @ 0802d322 8146
     add r9,r10                               @ 0802d324 d144
-    ldr r0, PTR_DAT_0802d3b0                 @ 0802d326 2248
+    ldr r0, init_pack_selection_deck_a_tile2_src @ 0802d326 2248
     add r10,r0                               @ 0802d328 8244
     lsls r0,r4,#0x2    @ 0802d32a a000
     adds r0,r0,r4    @ 0802d32c 0019
     lsls r4,r0,#0x4    @ 0802d32e 0401
     subs r4,r4,r0    @ 0802d330 241a
     lsls r4,r4,#0x4    @ 0802d332 2401
-    ldr r0, PTR_DAT_0802d3b4                 @ 0802d334 1f48
+    ldr r0, init_pack_selection_deck_a_tile3_src @ 0802d334 1f48
     .hword 0x4680    @ 0802d336 8046
     add r8,r4                                @ 0802d338 a044
-    ldr r0, PTR_DAT_0802d3b8                 @ 0802d33a 1f48
+    ldr r0, init_pack_selection_deck_a_tilemap_src @ 0802d33a 1f48
     adds r4,r4,r0    @ 0802d33c 2418
-    ldr r0, DWORD_0802d3bc                   @ 0802d33e 1f48
+    ldr r0, init_pack_selection_deck_a_vram_a @ 0802d33e 1f48
     movs r6,#0x80    @ 0802d340 8026
     lsls r6,r6,#0x4    @ 0802d342 3601
     adds r1,r6,#0x0    @ 0802d344 311c
     bl zero_fill_by_halfword                 @ 0802d346 c7f095fd
-    ldr r0, DWORD_0802d3c0                   @ 0802d34a 1d48
+    ldr r0, init_pack_selection_deck_a_vram_b @ 0802d34a 1d48
     adds r1,r6,#0x0    @ 0802d34c 311c
     bl zero_fill_by_halfword                 @ 0802d34e c7f091fd
     adds r0,r5,#0x0    @ 0802d352 281c
@@ -2298,22 +2303,22 @@ init_pack_selection_tile_vram_by_deck_a:
     pop {r4,r5,r6}                           @ 0802d39e 70bc
     pop {r0}                                 @ 0802d3a0 01bc
     bx r0                                    @ 0802d3a2 0047
-DWORD_0802d3a4:
-    .word  0x00002711                     @ 0802d3a4 11270000
-PTR_DAT_0802d3a8:
-    .word  0x09a1a52c                     @ 0802d3a8 2ca5a109
-PTR_DAT_0802d3ac:
-    .word  0x09a1dfac                     @ 0802d3ac acdfa109
-PTR_DAT_0802d3b0:
-    .word  0x09a98dec                     @ 0802d3b0 ec8da909
-PTR_DAT_0802d3b4:
-    .word  0x09a85fac                     @ 0802d3b4 ac5fa809
-PTR_DAT_0802d3b8:
-    .word  0x09b00dec                     @ 0802d3b8 ec0db009
-DWORD_0802d3bc:
-    .word  0x06000800                     @ 0802d3bc 00080006
-DWORD_0802d3c0:
-    .word  0x06001000                     @ 0802d3c0 00100006
+init_pack_selection_deck_a_key:
+    .word  PACK_DECK_A_KEY                @ 0802d3a4 11270000  deck A key 0x2711 = find_deck_record_index_by_key param
+init_pack_selection_deck_a_pal_src:
+    .word  campaign_bg_pal_src_c          @ 0802d3a8 2ca5a109
+init_pack_selection_deck_a_tile1_src:
+    .word  pack_deck_a_tile1_src          @ 0802d3ac acdfa109
+init_pack_selection_deck_a_tile2_src:
+    .word  pack_deck_a_tile2_src          @ 0802d3b0 ec8da909
+init_pack_selection_deck_a_tile3_src:
+    .word  pack_deck_a_tile3_src          @ 0802d3b4 ac5fa809
+init_pack_selection_deck_a_tilemap_src:
+    .word  pack_deck_a_tilemap_src        @ 0802d3b8 ec0db009
+init_pack_selection_deck_a_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802d3bc 00080006
+init_pack_selection_deck_a_vram_b:
+    .word  OBJ_VRAM_BASE_1000             @ 0802d3c0 00100006
 
 @ Function: pack selection screen VRAM/palette init (deck type B, internal key=0x4e20). No APCS input. Entry through prologue completes high-register save, then immediately ldr r0, 0x4e20 calls find_deck_record_index_by_key, return value r0 is deck_record_index; subs r4,r4,r0 computes relative_deck_index (r4 at entry adds r4,r0 already initialized to 0). Then based on relative_deck_index computes 5 ROM data pointers: r5=palette (PALETTE_TABLE_B=0x09953cec, step idx*9*32), r10=tilemap A (0x09956c2c), r9=tilemap B (0x099ba04c), r8=tilemap C (0x099aac2c), r4=tilemap D (0x09a0e04c). Executes: (1) zero_fill_by_halfword x2 clears OBJ VRAM 0x06000800/0x06001000 (each 0x800 halfwords); (2) upload_palette_rows_to_bg_vram(r5_deck_palette, 8); (3) writes 0 to PAL_RAM 0x05000000 (clears background color); (4) upload_indexed_tile_rows_to_obj_vram(r8, 0x10); (5) upload_tilemap_rows_with_offset(r8_offset, 1, 0x10, 0x1e); (6) upload_indexed_tile_rows_to_obj_vram(r9+0x88*2, 0x14); (7) upload_tilemap_rows_with_offset(r4=tilemap, 2, 0x88*2, 0x1e). Structure fully symmetric with init_pack_selection_tile_vram_by_deck_a (0x0802d2fc); only deck_key and ROM table bases differ: deck_key_B=0x4e20 vs deck_key_A=0x2711.
 @ 
@@ -2347,37 +2352,37 @@ init_pack_selection_tile_vram_by_deck_b:
     push {r4,r5,r6}                          @ 0802d3cc 70b4
     sub sp,#0x4                              @ 0802d3ce 81b0
     adds r4,r0,#0x0    @ 0802d3d0 041c
-    ldr r0, DWORD_0802d46c                   @ 0802d3d2 2648
+    ldr r0, init_pack_selection_deck_b_key   @ 0802d3d2 2648
     bl find_deck_record_index_by_key         @ 0802d3d4 f2f708f8
     subs r4,r4,r0    @ 0802d3d8 241a
     lsls r5,r4,#0x3    @ 0802d3da e500
     adds r5,r5,r4    @ 0802d3dc 2d19
     lsls r5,r5,#0x5    @ 0802d3de 6d01
-    ldr r0, PTR_DAT_0802d470                 @ 0802d3e0 2348
+    ldr r0, init_pack_selection_deck_b_pal_src @ 0802d3e0 2348
     adds r5,r5,r0    @ 0802d3e2 2d18
     lsls r0,r4,#0xd    @ 0802d3e4 6003
     .hword 0x4682    @ 0802d3e6 8246
-    ldr r0, PTR_DAT_0802d474                 @ 0802d3e8 2248
+    ldr r0, init_pack_selection_deck_b_tile1_src @ 0802d3e8 2248
     .hword 0x4681    @ 0802d3ea 8146
     add r9,r10                               @ 0802d3ec d144
-    ldr r0, PTR_DAT_0802d478                 @ 0802d3ee 2248
+    ldr r0, init_pack_selection_deck_b_tile2_src @ 0802d3ee 2248
     add r10,r0                               @ 0802d3f0 8244
     lsls r0,r4,#0x2    @ 0802d3f2 a000
     adds r0,r0,r4    @ 0802d3f4 0019
     lsls r4,r0,#0x4    @ 0802d3f6 0401
     subs r4,r4,r0    @ 0802d3f8 241a
     lsls r4,r4,#0x4    @ 0802d3fa 2401
-    ldr r0, PTR_DAT_0802d47c                 @ 0802d3fc 1f48
+    ldr r0, init_pack_selection_deck_b_tile3_src @ 0802d3fc 1f48
     .hword 0x4680    @ 0802d3fe 8046
     add r8,r4                                @ 0802d400 a044
-    ldr r0, PTR_DAT_0802d480                 @ 0802d402 1f48
+    ldr r0, init_pack_selection_deck_b_tilemap_src @ 0802d402 1f48
     adds r4,r4,r0    @ 0802d404 2418
-    ldr r0, DWORD_0802d484                   @ 0802d406 1f48
+    ldr r0, init_pack_selection_deck_b_vram_a @ 0802d406 1f48
     movs r6,#0x80    @ 0802d408 8026
     lsls r6,r6,#0x4    @ 0802d40a 3601
     adds r1,r6,#0x0    @ 0802d40c 311c
     bl zero_fill_by_halfword                 @ 0802d40e c7f031fd
-    ldr r0, DWORD_0802d488                   @ 0802d412 1d48
+    ldr r0, init_pack_selection_deck_b_vram_b @ 0802d412 1d48
     adds r1,r6,#0x0    @ 0802d414 311c
     bl zero_fill_by_halfword                 @ 0802d416 c7f02dfd
     adds r0,r5,#0x0    @ 0802d41a 281c
@@ -2416,22 +2421,22 @@ init_pack_selection_tile_vram_by_deck_b:
     pop {r4,r5,r6}                           @ 0802d466 70bc
     pop {r0}                                 @ 0802d468 01bc
     bx r0                                    @ 0802d46a 0047
-DWORD_0802d46c:
-    .word  0x00004e20                     @ 0802d46c 204e0000
-PTR_DAT_0802d470:
-    .word  0x09953cec                     @ 0802d470 ec3c9509
-PTR_DAT_0802d474:
-    .word  0x09956c2c                     @ 0802d474 2c6c9509
-PTR_DAT_0802d478:
-    .word  0x099ba04c                     @ 0802d478 4ca09b09
-PTR_DAT_0802d47c:
-    .word  0x099aac2c                     @ 0802d47c 2cac9a09
-PTR_DAT_0802d480:
-    .word  0x09a0e04c                     @ 0802d480 4ce0a009
-DWORD_0802d484:
-    .word  0x06000800                     @ 0802d484 00080006
-DWORD_0802d488:
-    .word  0x06001000                     @ 0802d488 00100006
+init_pack_selection_deck_b_key:
+    .word  CARD_STAT_LP_THRESHOLD_20000   @ 0802d46c 204e0000
+init_pack_selection_deck_b_pal_src:
+    .word  pack_deck_b_pal_src            @ 0802d470 ec3c9509
+init_pack_selection_deck_b_tile1_src:
+    .word  pack_deck_b_tile1_src          @ 0802d474 2c6c9509
+init_pack_selection_deck_b_tile2_src:
+    .word  pack_deck_b_tile2_src          @ 0802d478 4ca09b09
+init_pack_selection_deck_b_tile3_src:
+    .word  pack_deck_b_tile3_src          @ 0802d47c 2cac9a09
+init_pack_selection_deck_b_tilemap_src:
+    .word  pack_deck_b_tilemap_src        @ 0802d480 4ce0a009
+init_pack_selection_deck_b_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802d484 00080006
+init_pack_selection_deck_b_vram_b:
+    .word  OBJ_VRAM_BASE_1000             @ 0802d488 00100006
 
 @ Writes initial duel scene scroll parameters: gPrng+0x1ea (offset 0xf5*2) := 0x60
 @ (BG horizontal scroll initial value or display region offset A), gPrng+0x1ec
@@ -2448,7 +2453,7 @@ DWORD_0802d488:
 @ - 0x02023360+0x61 = 0x020233c1 (mode flag byte)
 @ - 0x7d = 0111 1101b; rsbs => -0x7d => byte mask = 0x83 = 1000 0011b; ands clears bits[6:2]
 init_duel_scroll_params:
-    ldr r1, DWORD_0802d4b4                   @ 0802d48c 0949
+    ldr r1, init_duel_scroll_params_prng     @ 0802d48c 0949
     movs r0,#0xf5    @ 0802d48e f520
     lsls r0,r0,#0x1    @ 0802d490 4000
     adds r2,r1,r0    @ 0802d492 0a18
@@ -2459,7 +2464,7 @@ init_duel_scroll_params:
     adds r1,r1,r2    @ 0802d49c 8918
     movs r0,#0xa0    @ 0802d49e a020
     strh r0,[r1,#0x0]                        @ 0802d4a0 0880
-    ldr r1, DWORD_0802d4b8                   @ 0802d4a2 0549
+    ldr r1, init_duel_scroll_params_scene_ctx @ 0802d4a2 0549
     adds r1,#0x61    @ 0802d4a4 6131
     movs r0,#0x7d    @ 0802d4a6 7d20
     rsbs r0,r0,#0    @ 0802d4a8 4042
@@ -2468,12 +2473,12 @@ init_duel_scroll_params:
     strb r0,[r1,#0x0]                        @ 0802d4ae 0870
     bx lr                                    @ 0802d4b0 7047
     .zero  0x2
-DWORD_0802d4b4:
+init_duel_scroll_params_prng:
     .word  gPrng                          @ 0802d4b4 40000003
-DWORD_0802d4b8:
-    .word  0x02023360                     @ 0802d4b8 60330202
+init_duel_scroll_params_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802d4b8 60330202
 
-@ Campaign opponent card AOB animation tick wrapper layer, called by run_campaign_step22_aob_tick (0x08026e9c). First calls tick_opponent_aob_display (FUN_0802dfb8) to execute frame animation tick. Then reads [scene_ctx+0x61] bits[4:2] as phase_state [0..7]: phase 0 -> error/wait path (LAB_0802d580); phase 7 -> LAB_0802d544 (phase complete); phase 8 -> LAB_0802d580 (out of range); others [1..6] -> LAB_0802d4f2 (normal frame advance), reads slot_type from [scene_ctx+0x61], computes VRAM write position and updates display state.
+@ Campaign opponent card AOB animation tick wrapper layer, called by run_campaign_step22_aob_tick (0x08026e9c). First calls tick_opponent_aob_display (tick_opponent_aob_display) to execute frame animation tick. Then reads [scene_ctx+0x61] bits[4:2] as phase_state [0..7]: phase 0 -> error/wait path (LAB_0802d580); phase 7 -> LAB_0802d544 (phase complete); phase 8 -> LAB_0802d580 (out of range); others [1..6] -> LAB_0802d4f2 (normal frame advance), reads slot_type from [scene_ctx+0x61], computes VRAM write position and updates display state.
 @ 
 @ Constants:
 @ - scene_ctx = 0x02023360
@@ -2486,7 +2491,7 @@ DWORD_0802d4b8:
 tick_opponent_aob_by_phase:
     push {r4,r5,r6,lr}                       @ 0802d4bc 70b5
     bl tick_opponent_aob_display             @ 0802d4be 00f07bfd
-    ldr r0, DWORD_0802d4dc                   @ 0802d4c2 0648
+    ldr r0, tick_opponent_aob_by_phase_scene_ctx @ 0802d4c2 0648
     adds r4,r0,#0x0    @ 0802d4c4 041c
     adds r4,#0x61    @ 0802d4c6 6134
     ldrb r1,[r4,#0x0]                        @ 0802d4c8 2178
@@ -2499,8 +2504,8 @@ tick_opponent_aob_by_phase:
     cmp r0,#0x0                              @ 0802d4d6 0028
     blt LAB_0802d580                         @ 0802d4d8 52db
     b LAB_0802d4f2                           @ 0802d4da 0ae0
-DWORD_0802d4dc:
-    .word  0x02023360                     @ 0802d4dc 60330202
+tick_opponent_aob_by_phase_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802d4dc 60330202
 LAB_0802d4e0:
     cmp r0,#0x8                              @ 0802d4e0 0828
     beq LAB_0802d544                         @ 0802d4e2 2fd0
@@ -2511,9 +2516,9 @@ LAB_0802d4e6:
     movs r0,#0x7    @ 0802d4ec 0720
     bl set_channel_if_changed                @ 0802d4ee ccf0f5fa
 LAB_0802d4f2:
-    ldr r5, DWORD_0802d538                   @ 0802d4f2 114d
-    ldr r1, DWORD_0802d53c                   @ 0802d4f4 1149
-    ldr r3, DWORD_0802d540                   @ 0802d4f6 124b
+    ldr r5, tick_opponent_aob_by_phase_prng  @ 0802d4f2 114d
+    ldr r1, tick_opponent_aob_by_phase_phase_tbl @ 0802d4f4 1149
+    ldr r3, tick_opponent_aob_by_phase_scene_ctx_b @ 0802d4f6 124b
     adds r3,#0x61    @ 0802d4f8 6133
     ldrb r4,[r3,#0x0]                        @ 0802d4fa 1c78
     lsls r2,r4,#0x19    @ 0802d4fc 6206
@@ -2547,14 +2552,14 @@ LAB_0802d4f2:
 LAB_0802d534:
     movs r0,#0x0    @ 0802d534 0020
     b LAB_0802d586                           @ 0802d536 26e0
-DWORD_0802d538:
+tick_opponent_aob_by_phase_prng:
     .word  gPrng                          @ 0802d538 40000003
-DWORD_0802d53c:
-    .word  0x09e59db4                     @ 0802d53c b49de509
-DWORD_0802d540:
-    .word  0x02023360                     @ 0802d540 60330202
+tick_opponent_aob_by_phase_phase_tbl:
+    .word  aob_phase_table                @ 0802d53c b49de509  AOB phase dispatch table: stride 2 halfword, phase [0..7]
+tick_opponent_aob_by_phase_scene_ctx_b:
+    .word  gDuelSceneBase                 @ 0802d540 60330202
 LAB_0802d544:
-    ldr r1, DWORD_0802d57c                   @ 0802d544 0d49
+    ldr r1, tick_opponent_aob_by_phase_prng_b @ 0802d544 0d49
     movs r0,#0xf5    @ 0802d546 f520
     lsls r0,r0,#0x1    @ 0802d548 4000
     adds r2,r1,r0    @ 0802d54a 0a18
@@ -2581,7 +2586,7 @@ LAB_0802d544:
     orrs r0,r1    @ 0802d576 0843
     strb r0,[r4,#0x0]                        @ 0802d578 2070
     b LAB_0802d534                           @ 0802d57a dbe7
-DWORD_0802d57c:
+tick_opponent_aob_by_phase_prng_b:
     .word  gPrng                          @ 0802d57c 40000003
 LAB_0802d580:
     movs r0,#0x4    @ 0802d580 0420
@@ -2610,7 +2615,7 @@ LAB_0802d586:
 draw_card_name_label_to_sprite_vram:
     push {r4,r5,r6,lr}                       @ 0802d58c 70b5
     adds r5,r0,#0x0    @ 0802d58e 051c
-    ldr r6, DWORD_0802d620                   @ 0802d590 234e
+    ldr r6, draw_card_name_label_sprite_vram @ 0802d590 234e
     movs r1,#0x80    @ 0802d592 8021
     lsls r1,r1,#0x4    @ 0802d594 0901
     adds r0,r6,#0x0    @ 0802d596 301c
@@ -2620,9 +2625,9 @@ draw_card_name_label_to_sprite_vram:
     movs r0,#0x20    @ 0802d5a0 2020
     movs r1,#0x2    @ 0802d5a2 0221
     bl setup_line_buf_pos_and_font           @ 0802d5a4 c3f006fb
-    ldr r2, DWORD_0802d624                   @ 0802d5a8 1e4a
-    ldr r0, DWORD_0802d628                   @ 0802d5aa 1f48
-    ldr r1, DWORD_0802d62c                   @ 0802d5ac 1f49
+    ldr r2, draw_card_name_label_font_ctx    @ 0802d5a8 1e4a
+    ldr r0, draw_card_name_label_ewram_base  @ 0802d5aa 1f48
+    ldr r1, draw_card_name_label_gsettings_off @ 0802d5ac 1f49
     adds r0,r0,r1    @ 0802d5ae 4018
     movs r1,#0x7    @ 0802d5b0 0721
     ldrb r0,[r0,#0x0]                        @ 0802d5b2 0078
@@ -2637,7 +2642,7 @@ draw_card_name_label_to_sprite_vram:
     movs r1,#0x2    @ 0802d5c4 0221
     orrs r0,r1    @ 0802d5c6 0843
     strb r0,[r2,#0x8]                        @ 0802d5c8 1072
-    ldr r3, DWORD_0802d630                   @ 0802d5ca 194b
+    ldr r3, draw_card_name_label_ptr_font_jp_base_table @ 0802d5ca 194b
     lsls r1,r0,#0x1e    @ 0802d5cc 8107
     lsrs r1,r1,#0x1f    @ 0802d5ce c90f
     lsls r1,r1,#0x2    @ 0802d5d0 8900
@@ -2655,7 +2660,7 @@ draw_card_name_label_to_sprite_vram:
     adds r0,r0,r1    @ 0802d5ea 4018
     movs r4,#0x78    @ 0802d5ec 7824
     subs r0,r4,r0    @ 0802d5ee 201a
-    ldr r2, DWORD_0802d634                   @ 0802d5f0 104a
+    ldr r2, draw_card_name_label_render_flag @ 0802d5f0 104a
     movs r1,#0x2    @ 0802d5f2 0221
     adds r3,r5,#0x0    @ 0802d5f4 2b1c
     bl text_render_wrapper                   @ 0802d5f6 c5f041fa
@@ -2676,18 +2681,18 @@ LAB_0802d61a:
     pop {r4,r5,r6}                           @ 0802d61a 70bc
     pop {r0}                                 @ 0802d61c 01bc
     bx r0                                    @ 0802d61e 0047
-DWORD_0802d620:
+draw_card_name_label_sprite_vram:
     .word  0x06008200                     @ 0802d620 00820006
-DWORD_0802d624:
-    .word  0x02006ed0                     @ 0802d624 d06e0002
-DWORD_0802d628:
-    .word  0x02000000                     @ 0802d628 00000002
-DWORD_0802d62c:
-    .word  0x00006c2c                     @ 0802d62c 2c6c0000
-DWORD_0802d630:
+draw_card_name_label_font_ctx:
+    .word  gFontJpCtx                     @ 0802d624 d06e0002
+draw_card_name_label_ewram_base:
+    .word  EWRAM_BASE                     @ 0802d628 00000002
+draw_card_name_label_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802d62c 2c6c0000
+draw_card_name_label_ptr_font_jp_base_table:
     .word  font_jp_base_table             @ 0802d630 54f8e509
-DWORD_0802d634:
-    .word  0x00008008                     @ 0802d634 08800000
+draw_card_name_label_render_flag:
+    .word  CARD_DESC_RENDER_PARAM         @ 0802d634 08800000
 
 @ Called by run_campaign_step20_card_display_init (0x08026c88) to render a single opponent card's icon and name. Inputs: r0=slot_index [0..N-1], r1=card_row_ptr (card data row pointer), r2=dest_vram_base, r3=font_glyph_ptr, sp+0x68=name_str_ptr. Flow: call find_card_index_in_rom_table to get ROM table index, copy icon palette (0x05000240 base, row stride 0x20) and icon tiles (0x06011100 base), write 2x3 tile block via tile_2d_row_copy, init font line-buf (col=0x20, font=4) via setup_line_buf_pos_and_font, set render mode bit in line-buf byte+0x8, truncate card name by byte length in three tiers (<=0x26 / <=0x2f / >0x2f) and call text_render_wrapper twice (normal + shadow color) to render name.
 @ 
@@ -2714,21 +2719,21 @@ render_opponent_card_icon_and_name:
     adds r4,r0,#0x0    @ 0802d654 041c
     ldr r2,[sp,#0x40]                        @ 0802d656 109a
     lsls r0,r2,#0x5    @ 0802d658 5001
-    ldr r3, DWORD_0802d6fc                   @ 0802d65a 284b
+    ldr r3, render_opponent_card_icon_pal_base @ 0802d65a 284b
     adds r0,r0,r3    @ 0802d65c c018
     lsls r1,r4,#0x5    @ 0802d65e 6101
-    ldr r2, DWORD_0802d700                   @ 0802d660 274a
+    ldr r2, render_opponent_card_icon_icon_pal_base @ 0802d660 274a
     adds r1,r1,r2    @ 0802d662 8918
     movs r2,#0x20    @ 0802d664 2022
     bl copy_bytes_by_halfword                @ 0802d666 c7f01dfc
     ldr r1,[sp,#0x40]                        @ 0802d66a 1099
     lsls r0,r1,#0x7    @ 0802d66c c801
-    ldr r2, DWORD_0802d704                   @ 0802d66e 254a
+    ldr r2, render_opponent_card_icon_tile_vram @ 0802d66e 254a
     adds r0,r0,r2    @ 0802d670 8018
     lsls r1,r4,#0x3    @ 0802d672 e100
     adds r1,r1,r4    @ 0802d674 0919
     lsls r1,r1,#0x5    @ 0802d676 4901
-    ldr r2, DWORD_0802d708                   @ 0802d678 234a
+    ldr r2, render_opponent_card_icon_icon_tile_base @ 0802d678 234a
     adds r1,r1,r2    @ 0802d67a 8918
     movs r2,#0x3    @ 0802d67c 0322
     movs r3,#0x3    @ 0802d67e 0323
@@ -2736,12 +2741,12 @@ render_opponent_card_icon_and_name:
     movs r0,#0x20    @ 0802d684 2020
     movs r1,#0x4    @ 0802d686 0421
     bl setup_line_buf_pos_and_font           @ 0802d688 c3f094fa
-    ldr r4, DWORD_0802d70c                   @ 0802d68c 1f4c
+    ldr r4, render_opponent_card_icon_font_ctx @ 0802d68c 1f4c
     movs r7,#0x2    @ 0802d68e 0227
     ldrb r2,[r4,#0x8]                        @ 0802d690 227a
     orrs r2,r7    @ 0802d692 3a43
     strb r2,[r4,#0x8]                        @ 0802d694 2272
-    ldr r3, DWORD_0802d710                   @ 0802d696 1e4b
+    ldr r3, render_opponent_card_icon_ptr_font_jp_base_table_a @ 0802d696 1e4b
     .hword 0x4699    @ 0802d698 9946
     lsls r1,r2,#0x1e    @ 0802d69a 9107
     lsrs r1,r1,#0x1f    @ 0802d69c c90f
@@ -2790,30 +2795,30 @@ LAB_0802d6b6:
     strb r2,[r0,#0x0]                        @ 0802d6f6 0270
     b LAB_0802d71c                           @ 0802d6f8 10e0
     .zero  0x2
-DWORD_0802d6fc:
-    .word  0x05000240                     @ 0802d6fc 40020005
-DWORD_0802d700:
+render_opponent_card_icon_pal_base:
+    .word  OBJ_PAL_ICON_BASE              @ 0802d6fc 40020005  OBJ palette base for card icons (PALRAM+0x40)
+render_opponent_card_icon_icon_pal_base:
     .word  icon_palettes_base             @ 0802d700 90628909
-DWORD_0802d704:
-    .word  0x06011100                     @ 0802d704 00110106
-DWORD_0802d708:
+render_opponent_card_icon_tile_vram:
+    .word  OBJ_ICON_TILE_VRAM_BASE        @ 0802d704 00110106  OBJ tile VRAM icon base (OPP_CARD_LABEL_TILE_VRAM_A+0x100)
+render_opponent_card_icon_icon_tile_base:
     .word  icon_tiles_base                @ 0802d708 30cf8809
-DWORD_0802d70c:
-    .word  0x02006ed0                     @ 0802d70c d06e0002
-DWORD_0802d710:
+render_opponent_card_icon_font_ctx:
+    .word  gFontJpCtx                     @ 0802d70c d06e0002
+render_opponent_card_icon_ptr_font_jp_base_table_a:
     .word  font_jp_base_table             @ 0802d710 54f8e509
 LAB_0802d714:
     .hword 0x4668    @ 0802d714 6846
     adds r1,r6,#0x0    @ 0802d716 311c
     bl copy_cstr_to_buf                      @ 0802d718 c7f09cfc
 LAB_0802d71c:
-    ldr r1, DWORD_0802d73c                   @ 0802d71c 0749
+    ldr r1, render_opponent_card_icon_font_ctx_d @ 0802d71c 0749
     movs r0,#0x3    @ 0802d71e 0320
     rsbs r0,r0,#0    @ 0802d720 4042
     ldrb r2,[r1,#0x8]                        @ 0802d722 0a7a
     ands r0,r2    @ 0802d724 1040
     strb r0,[r1,#0x8]                        @ 0802d726 0872
-    ldr r2, DWORD_0802d740                   @ 0802d728 054a
+    ldr r2, render_opponent_card_icon_ptr_font_jp_base_table_b @ 0802d728 054a
     lsls r0,r0,#0x1f    @ 0802d72a c007
     lsrs r0,r0,#0x1f    @ 0802d72c c00f
     lsls r0,r0,#0x3    @ 0802d72e c000
@@ -2823,9 +2828,9 @@ LAB_0802d71c:
     movs r5,#0x5    @ 0802d736 0525
     b LAB_0802d766                           @ 0802d738 15e0
     .zero  0x2
-DWORD_0802d73c:
-    .word  0x02006ed0                     @ 0802d73c d06e0002
-DWORD_0802d740:
+render_opponent_card_icon_font_ctx_d:
+    .word  gFontJpCtx                     @ 0802d73c d06e0002
+render_opponent_card_icon_ptr_font_jp_base_table_b:
     .word  font_jp_base_table             @ 0802d740 54f8e509
 LAB_0802d744:
     .hword 0x4668    @ 0802d744 6846
@@ -2850,7 +2855,7 @@ LAB_0802d766:
     muls r0,r5    @ 0802d76c 6843
     movs r4,#0xee    @ 0802d76e ee24
     subs r0,r4,r0    @ 0802d770 201a
-    ldr r2, DWORD_0802d7d0                   @ 0802d772 174a
+    ldr r2, render_opponent_card_icon_render_flag @ 0802d772 174a
     movs r1,#0x2    @ 0802d774 0221
     .hword 0x466b    @ 0802d776 6b46
     bl text_render_wrapper                   @ 0802d778 c5f080f9
@@ -2863,7 +2868,7 @@ LAB_0802d766:
     movs r2,#0x7    @ 0802d78a 0722
     .hword 0x466b    @ 0802d78c 6b46
     bl text_render_wrapper                   @ 0802d78e c5f075f9
-    ldr r4, DWORD_0802d7d4                   @ 0802d792 104c
+    ldr r4, render_opponent_card_icon_font_ctx_b @ 0802d792 104c
     ldr r3,[sp,#0x64]                        @ 0802d794 199b
     rsbs r1,r3,#0    @ 0802d796 5942
     orrs r1,r3    @ 0802d798 1943
@@ -2883,7 +2888,7 @@ LAB_0802d766:
     ldrb r3,[r4,#0x8]                        @ 0802d7b6 237a
     ands r0,r3    @ 0802d7b8 1840
     strb r0,[r4,#0x8]                        @ 0802d7ba 2072
-    ldr r1, DWORD_0802d7d8                   @ 0802d7bc 0649
+    ldr r1, render_opponent_card_icon_ptr_font_jp_base_table_c @ 0802d7bc 0649
     lsls r0,r0,#0x1f    @ 0802d7be c007
     lsrs r0,r0,#0x1f    @ 0802d7c0 c00f
     lsls r0,r0,#0x3    @ 0802d7c2 c000
@@ -2893,18 +2898,18 @@ LAB_0802d766:
     movs r5,#0x5    @ 0802d7ca 0525
     b LAB_0802d7fc                           @ 0802d7cc 16e0
     .zero  0x2
-DWORD_0802d7d0:
-    .word  0x00008002                     @ 0802d7d0 02800000
-DWORD_0802d7d4:
-    .word  0x02006ed0                     @ 0802d7d4 d06e0002
-DWORD_0802d7d8:
+render_opponent_card_icon_render_flag:
+    .word  TEXT_RENDER_FLAG_LAYER2        @ 0802d7d0 02800000  text render layer 2 flag
+render_opponent_card_icon_font_ctx_b:
+    .word  gFontJpCtx                     @ 0802d7d4 d06e0002
+render_opponent_card_icon_ptr_font_jp_base_table_c:
     .word  font_jp_base_table             @ 0802d7d8 54f8e509
 LAB_0802d7dc:
     movs r1,#0x2    @ 0802d7dc 0221
     ldrb r0,[r4,#0x8]                        @ 0802d7de 207a
     orrs r1,r0    @ 0802d7e0 0143
     strb r1,[r4,#0x8]                        @ 0802d7e2 2172
-    ldr r2, DWORD_0802d82c                   @ 0802d7e4 114a
+    ldr r2, render_opponent_card_icon_ptr_font_jp_base_table_d @ 0802d7e4 114a
     lsls r0,r1,#0x1e    @ 0802d7e6 8807
     lsrs r0,r0,#0x1f    @ 0802d7e8 c00f
     lsls r0,r0,#0x2    @ 0802d7ea 8000
@@ -2922,7 +2927,7 @@ LAB_0802d7fc:
     muls r0,r5    @ 0802d802 6843
     movs r4,#0xee    @ 0802d804 ee24
     subs r0,r4,r0    @ 0802d806 201a
-    ldr r2, DWORD_0802d830                   @ 0802d808 094a
+    ldr r2, render_opponent_card_icon_render_flag_b @ 0802d808 094a
     movs r1,#0x12    @ 0802d80a 1221
     .hword 0x4653    @ 0802d80c 5346
     bl text_render_wrapper                   @ 0802d80e c5f035f9
@@ -2937,10 +2942,10 @@ LAB_0802d7fc:
     bl text_render_wrapper                   @ 0802d824 c5f02af9
     b LAB_0802d91a                           @ 0802d828 77e0
     .zero  0x2
-DWORD_0802d82c:
+render_opponent_card_icon_ptr_font_jp_base_table_d:
     .word  font_jp_base_table             @ 0802d82c 54f8e509
-DWORD_0802d830:
-    .word  0x00008002                     @ 0802d830 02800000
+render_opponent_card_icon_render_flag_b:
+    .word  TEXT_RENDER_FLAG_LAYER2        @ 0802d830 02800000
 LAB_0802d834:
     ldr r1,[sp,#0x64]                        @ 0802d834 1999
     rsbs r0,r1,#0    @ 0802d836 4842
@@ -2981,7 +2986,7 @@ LAB_0802d866:
     ldr r0,[r1,#0x0]                         @ 0802d87c 0868
 LAB_0802d87e:
     str r0,[r4,#0x4]                         @ 0802d87e 6060
-    ldr r2, DWORD_0802d8c0                   @ 0802d880 0f4a
+    ldr r2, render_opponent_card_icon_render_flag_c @ 0802d880 0f4a
     movs r0,#0x2    @ 0802d882 0220
     movs r1,#0x2    @ 0802d884 0221
     .hword 0x4653    @ 0802d886 5346
@@ -2995,13 +3000,13 @@ LAB_0802d87e:
     bl count_bytes_until_null                @ 0802d89a c7f021fe
     cmp r0,#0x26                             @ 0802d89e 2628
     ble LAB_0802d8cc                         @ 0802d8a0 14dd
-    ldr r1, DWORD_0802d8c4                   @ 0802d8a2 0849
+    ldr r1, render_opponent_card_icon_font_ctx_c @ 0802d8a2 0849
     movs r0,#0x3    @ 0802d8a4 0320
     rsbs r0,r0,#0    @ 0802d8a6 4042
     ldrb r3,[r1,#0x8]                        @ 0802d8a8 0b7a
     ands r0,r3    @ 0802d8aa 1840
     strb r0,[r1,#0x8]                        @ 0802d8ac 0872
-    ldr r2, DWORD_0802d8c8                   @ 0802d8ae 064a
+    ldr r2, render_opponent_card_icon_ptr_font_jp_base_table_e @ 0802d8ae 064a
     lsls r0,r0,#0x1f    @ 0802d8b0 c007
     lsrs r0,r0,#0x1f    @ 0802d8b2 c00f
     lsls r0,r0,#0x3    @ 0802d8b4 c000
@@ -3010,19 +3015,19 @@ LAB_0802d87e:
     str r0,[r1,#0x4]                         @ 0802d8ba 4860
     b LAB_0802d8ec                           @ 0802d8bc 16e0
     .zero  0x2
-DWORD_0802d8c0:
-    .word  0x00008001                     @ 0802d8c0 01800000
-DWORD_0802d8c4:
-    .word  0x02006ed0                     @ 0802d8c4 d06e0002
-DWORD_0802d8c8:
+render_opponent_card_icon_render_flag_c:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802d8c0 01800000
+render_opponent_card_icon_font_ctx_c:
+    .word  gFontJpCtx                     @ 0802d8c4 d06e0002
+render_opponent_card_icon_ptr_font_jp_base_table_e:
     .word  font_jp_base_table             @ 0802d8c8 54f8e509
 LAB_0802d8cc:
-    ldr r2, DWORD_0802d958                   @ 0802d8cc 224a
+    ldr r2, render_opponent_card_icon_font_ctx_e @ 0802d8cc 224a
     movs r1,#0x2    @ 0802d8ce 0221
     ldrb r0,[r2,#0x8]                        @ 0802d8d0 107a
     orrs r1,r0    @ 0802d8d2 0143
     strb r1,[r2,#0x8]                        @ 0802d8d4 1172
-    ldr r3, DWORD_0802d95c                   @ 0802d8d6 214b
+    ldr r3, render_opponent_card_icon_ptr_font_jp_base_table_f @ 0802d8d6 214b
     lsls r0,r1,#0x1e    @ 0802d8d8 8807
     lsrs r0,r0,#0x1f    @ 0802d8da c00f
     lsls r0,r0,#0x2    @ 0802d8dc 8000
@@ -3034,7 +3039,7 @@ LAB_0802d8cc:
     ldr r0,[r0,#0x0]                         @ 0802d8e8 0068
     str r0,[r2,#0x4]                         @ 0802d8ea 5060
 LAB_0802d8ec:
-    ldr r2, DWORD_0802d958                   @ 0802d8ec 1a4a
+    ldr r2, render_opponent_card_icon_font_ctx_e @ 0802d8ec 1a4a
     .hword 0x4643    @ 0802d8ee 4346
     rsbs r1,r3,#0    @ 0802d8f0 5942
     orrs r1,r3    @ 0802d8f2 1943
@@ -3045,7 +3050,7 @@ LAB_0802d8ec:
     ands r0,r3    @ 0802d8fc 1840
     orrs r0,r1    @ 0802d8fe 0843
     strb r0,[r2,#0x8]                        @ 0802d900 1072
-    ldr r2, DWORD_0802d960                   @ 0802d902 174a
+    ldr r2, render_opponent_card_icon_render_flag_d @ 0802d902 174a
     movs r0,#0x2    @ 0802d904 0220
     movs r1,#0x12    @ 0802d906 1221
     adds r3,r6,#0x0    @ 0802d908 331c
@@ -3056,9 +3061,9 @@ LAB_0802d8ec:
     adds r3,r6,#0x0    @ 0802d914 331c
     bl text_render_wrapper                   @ 0802d916 c5f0b1f8
 LAB_0802d91a:
-    ldr r2, DWORD_0802d958                   @ 0802d91a 0f4a
-    ldr r1, DWORD_0802d964                   @ 0802d91c 1149
-    ldr r0, DWORD_0802d968                   @ 0802d91e 1248
+    ldr r2, render_opponent_card_icon_font_ctx_e @ 0802d91a 0f4a
+    ldr r1, render_opponent_card_icon_ewram_base @ 0802d91c 1149
+    ldr r0, render_opponent_card_icon_gsettings_off @ 0802d91e 1248
     adds r1,r1,r0    @ 0802d920 0918
     movs r0,#0x7    @ 0802d922 0720
     ldrb r1,[r1,#0x0]                        @ 0802d924 0978
@@ -3074,7 +3079,7 @@ LAB_0802d91a:
     ldr r1,[sp,#0x40]                        @ 0802d938 1099
     lsls r0,r1,#0x12    @ 0802d93a 8804
     lsrs r0,r0,#0x6    @ 0802d93c 8009
-    ldr r2, DWORD_0802d96c                   @ 0802d93e 0b4a
+    ldr r2, render_opponent_card_icon_name_vram @ 0802d93e 0b4a
     adds r0,r0,r2    @ 0802d940 8018
     movs r1,#0x0    @ 0802d942 0021
     bl write_line_buf_to_bg_tile_vram        @ 0802d944 c5f046ff
@@ -3086,18 +3091,18 @@ LAB_0802d91a:
     pop {r4,r5,r6,r7}                        @ 0802d952 f0bc
     pop {r0}                                 @ 0802d954 01bc
     bx r0                                    @ 0802d956 0047
-DWORD_0802d958:
-    .word  0x02006ed0                     @ 0802d958 d06e0002
-DWORD_0802d95c:
+render_opponent_card_icon_font_ctx_e:
+    .word  gFontJpCtx                     @ 0802d958 d06e0002
+render_opponent_card_icon_ptr_font_jp_base_table_f:
     .word  font_jp_base_table             @ 0802d95c 54f8e509
-DWORD_0802d960:
-    .word  0x00008001                     @ 0802d960 01800000
-DWORD_0802d964:
-    .word  0x02000000                     @ 0802d964 00000002
-DWORD_0802d968:
-    .word  0x00006c2c                     @ 0802d968 2c6c0000
-DWORD_0802d96c:
-    .word  0x06012000                     @ 0802d96c 00200106
+render_opponent_card_icon_render_flag_d:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802d960 01800000
+render_opponent_card_icon_ewram_base:
+    .word  EWRAM_BASE                     @ 0802d964 00000002
+render_opponent_card_icon_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802d968 2c6c0000
+render_opponent_card_icon_name_vram:
+    .word  OPP_CARD_NAME_TILE_VRAM        @ 0802d96c 00200106  OBJ tile VRAM write base for opponent card name
 
 @ General dual-label text render function, called by setup_label_render_ctx (0x0802dacc) during campaign card info display page. Accepts two optional C string pointers (r0=primary_label, r1=secondary_label), either may be NULL. Clears [0x02023360+0x38] render state bits (AND ~0x00038000), calls setup_line_buf_pos_and_font(col=8, font=4) to init line buffer. For primary_label: if non-NULL, count_bytes_until_null measures length, compute horizontal center offset (0x20-len*3)/2, two text_render_wrapper calls (layer=2, normal + shadow color rendering), update [0x02023360+0x38] bit[15]. For secondary_label: if non-NULL, same centering calculation (layer=0x12), update bit[16]. If both labels rendered, set [0x02023360+0x39] bit6, zero_fill four BG tile regions (0x06011000..0x06011c00 each 0x100 halfwords), call write_line_buf_to_bg_tile_vram to commit.
 @ 
@@ -3116,18 +3121,18 @@ render_dual_label_to_bg_vram:
     push {r6,r7}                             @ 0802d976 c0b4
     adds r5,r0,#0x0    @ 0802d978 051c
     adds r7,r1,#0x0    @ 0802d97a 0f1c
-    ldr r6, DWORD_0802daa0                   @ 0802d97c 484e
+    ldr r6, render_dual_label_scene_ctx      @ 0802d97c 484e
     ldr r0,[r6,#0x38]                        @ 0802d97e b06b
-    ldr r1, DWORD_0802daa4                   @ 0802d980 4849
+    ldr r1, render_dual_label_state_clear_mask @ 0802d980 4849
     .hword 0x4689    @ 0802d982 8946
     ands r0,r1    @ 0802d984 0840
     str r0,[r6,#0x38]                        @ 0802d986 b063
     movs r0,#0x8    @ 0802d988 0820
     movs r1,#0x4    @ 0802d98a 0421
     bl setup_line_buf_pos_and_font           @ 0802d98c c3f012f9
-    ldr r2, DWORD_0802daa8                   @ 0802d990 454a
-    ldr r0, DWORD_0802daac                   @ 0802d992 4648
-    ldr r3, DWORD_0802dab0                   @ 0802d994 464b
+    ldr r2, render_dual_label_font_ctx       @ 0802d990 454a
+    ldr r0, render_dual_label_ewram_base     @ 0802d992 4648
+    ldr r3, render_dual_label_gsettings_off  @ 0802d994 464b
     adds r0,r0,r3    @ 0802d996 c018
     movs r1,#0x7    @ 0802d998 0721
     .hword 0x4688    @ 0802d99a 8846
@@ -3143,7 +3148,7 @@ render_dual_label_to_bg_vram:
     movs r1,#0x2    @ 0802d9ae 0221
     orrs r0,r1    @ 0802d9b0 0843
     strb r0,[r2,#0x8]                        @ 0802d9b2 1072
-    ldr r3, DWORD_0802dab4                   @ 0802d9b4 3f4b
+    ldr r3, render_dual_label_ptr_font_jp_base_table @ 0802d9b4 3f4b
     lsls r1,r0,#0x1e    @ 0802d9b6 8107
     lsrs r1,r1,#0x1f    @ 0802d9b8 c90f
     lsls r1,r1,#0x2    @ 0802d9ba 8900
@@ -3162,7 +3167,7 @@ render_dual_label_to_bg_vram:
     adds r1,r1,r0    @ 0802d9d6 0918
     movs r4,#0x20    @ 0802d9d8 2024
     subs r4,r4,r1    @ 0802d9da 641a
-    ldr r2, DWORD_0802dab8                   @ 0802d9dc 364a
+    ldr r2, render_dual_label_render_flag    @ 0802d9dc 364a
     adds r0,r4,#0x0    @ 0802d9de 201c
     movs r1,#0x2    @ 0802d9e0 0221
     adds r3,r5,#0x0    @ 0802d9e2 2b1c
@@ -3193,7 +3198,7 @@ LAB_0802da0c:
     adds r1,r1,r0    @ 0802da18 0918
     movs r4,#0x20    @ 0802da1a 2024
     subs r4,r4,r1    @ 0802da1c 641a
-    ldr r2, DWORD_0802dab8                   @ 0802da1e 264a
+    ldr r2, render_dual_label_render_flag    @ 0802da1e 264a
     adds r0,r4,#0x0    @ 0802da20 201c
     movs r1,#0x12    @ 0802da22 1221
     adds r3,r7,#0x0    @ 0802da24 3b1c
@@ -3228,19 +3233,19 @@ LAB_0802da4e:
     ldrb r2,[r1,#0x0]                        @ 0802da60 0a78
     orrs r0,r2    @ 0802da62 1043
     strb r0,[r1,#0x0]                        @ 0802da64 0870
-    ldr r5, DWORD_0802dabc                   @ 0802da66 154d
+    ldr r5, render_dual_label_tile_vram_a    @ 0802da66 154d
     movs r4,#0x80    @ 0802da68 8024
     lsls r4,r4,#0x1    @ 0802da6a 6400
     adds r0,r5,#0x0    @ 0802da6c 281c
     adds r1,r4,#0x0    @ 0802da6e 211c
     bl zero_fill_by_halfword                 @ 0802da70 c7f000fa
-    ldr r0, DWORD_0802dac0                   @ 0802da74 1248
+    ldr r0, render_dual_label_tile_vram_b    @ 0802da74 1248
     adds r1,r4,#0x0    @ 0802da76 211c
     bl zero_fill_by_halfword                 @ 0802da78 c7f0fcf9
-    ldr r0, DWORD_0802dac4                   @ 0802da7c 1148
+    ldr r0, render_dual_label_tile_vram_c    @ 0802da7c 1148
     adds r1,r4,#0x0    @ 0802da7e 211c
     bl zero_fill_by_halfword                 @ 0802da80 c7f0f8f9
-    ldr r0, DWORD_0802dac8                   @ 0802da84 1048
+    ldr r0, render_dual_label_tile_vram_d    @ 0802da84 1048
     adds r1,r4,#0x0    @ 0802da86 211c
     bl zero_fill_by_halfword                 @ 0802da88 c7f0f4f9
     adds r0,r5,#0x0    @ 0802da8c 281c
@@ -3253,28 +3258,28 @@ LAB_0802da94:
     pop {r4,r5,r6,r7}                        @ 0802da9a f0bc
     pop {r0}                                 @ 0802da9c 01bc
     bx r0                                    @ 0802da9e 0047
-DWORD_0802daa0:
-    .word  0x02023360                     @ 0802daa0 60330202
-DWORD_0802daa4:
-    .word  0xfffc7fff                     @ 0802daa4 ff7ffcff
-DWORD_0802daa8:
-    .word  0x02006ed0                     @ 0802daa8 d06e0002
-DWORD_0802daac:
-    .word  0x02000000                     @ 0802daac 00000002
-DWORD_0802dab0:
-    .word  0x00006c2c                     @ 0802dab0 2c6c0000
-DWORD_0802dab4:
+render_dual_label_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802daa0 60330202
+render_dual_label_state_clear_mask:
+    .word  DUAL_LABEL_RENDER_STATE_CLEAR  @ 0802daa4 ff7ffcff  clears bits[17:15] of scene_ctx+0x38 render state
+render_dual_label_font_ctx:
+    .word  gFontJpCtx                     @ 0802daa8 d06e0002
+render_dual_label_ewram_base:
+    .word  EWRAM_BASE                     @ 0802daac 00000002
+render_dual_label_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802dab0 2c6c0000
+render_dual_label_ptr_font_jp_base_table:
     .word  font_jp_base_table             @ 0802dab4 54f8e509
-DWORD_0802dab8:
-    .word  0x00008001                     @ 0802dab8 01800000
-DWORD_0802dabc:
-    .word  0x06011000                     @ 0802dabc 00100106
-DWORD_0802dac0:
-    .word  0x06011400                     @ 0802dac0 00140106
-DWORD_0802dac4:
-    .word  0x06011800                     @ 0802dac4 00180106
-DWORD_0802dac8:
-    .word  0x06011c00                     @ 0802dac8 001c0106
+render_dual_label_render_flag:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802dab8 01800000
+render_dual_label_tile_vram_a:
+    .word  OPP_CARD_LABEL_TILE_VRAM_A     @ 0802dabc 00100106  OBJ tile VRAM base A for opp card label
+render_dual_label_tile_vram_b:
+    .word  OPP_CARD_LABEL_TILE_VRAM_B     @ 0802dac0 00140106
+render_dual_label_tile_vram_c:
+    .word  OPP_CARD_LABEL_TILE_VRAM_C     @ 0802dac4 00180106
+render_dual_label_tile_vram_d:
+    .word  OPP_CARD_LABEL_TILE_VRAM_D     @ 0802dac8 001c0106
 
 @ Campaign card info page label render pre-setup function, called by run_campaign_step22_aob_tick (0x08026e9c) and FUN_08026fe4 (campaign step-23 handler). Accepts r0=mode_idx [0..7], r1=primary_label_ptr, r2=secondary_label_ptr. Writes (mode_idx & 7) << 7 into [scene_ctx_base+0x38] bits[9:7] (display mode field), writes fixed value 0x00a00030 to [scene_ctx+0x40] (display params), clears [scene_ctx+0x3a] state bits (AND 0xfffffe03), retains only bit0 of [scene_ctx+0x3b], clears [scene_ctx+0x3c] bit1. Then clears four flag groups of [scene_ctx+0x39] (AND ~0x11, ~0x09, ~0x18, ~0x20). Finally forwards r1=primary_label, r2=secondary_label to render_dual_label_to_bg_vram.
 @ 
@@ -3288,18 +3293,18 @@ DWORD_0802dac8:
 @ - flag_clear for [+0x39]: ~0x11, ~0x09, ~0x18, ~0x20
 setup_label_render_ctx:
     push {r4,r5,lr}                          @ 0802dacc 30b5
-    ldr r4, DWORD_0802db2c                   @ 0802dace 174c
+    ldr r4, setup_label_render_ctx_scene_ctx @ 0802dace 174c
     movs r3,#0x7    @ 0802dad0 0723
     ands r0,r3    @ 0802dad2 1840
     lsls r0,r0,#0x7    @ 0802dad4 c001
-    ldr r3, DWORD_0802db30                   @ 0802dad6 164b
+    ldr r3, setup_label_render_ctx_mode_mask @ 0802dad6 164b
     ldrh r5,[r4,#0x38]                       @ 0802dad8 258f
     ands r3,r5    @ 0802dada 2b40
     orrs r3,r0    @ 0802dadc 0343
     strh r3,[r4,#0x38]                       @ 0802dade 2387
-    ldr r0, DWORD_0802db34                   @ 0802dae0 1448
+    ldr r0, setup_label_render_ctx_disp_param @ 0802dae0 1448
     str r0,[r4,#0x40]                        @ 0802dae2 2064
-    ldr r0, DWORD_0802db38                   @ 0802dae4 1448
+    ldr r0, setup_label_render_ctx_state_clear @ 0802dae4 1448
     ldrh r3,[r4,#0x3a]                       @ 0802dae6 638f
     ands r0,r3    @ 0802dae8 1840
     strh r0,[r4,#0x3a]                       @ 0802daea 6087
@@ -3334,14 +3339,14 @@ setup_label_render_ctx:
     pop {r4,r5}                              @ 0802db26 30bc
     pop {r0}                                 @ 0802db28 01bc
     bx r0                                    @ 0802db2a 0047
-DWORD_0802db2c:
-    .word  0x02023360                     @ 0802db2c 60330202
-DWORD_0802db30:
-    .word  0xfffffc7f                     @ 0802db30 7ffcffff
-DWORD_0802db34:
-    .word  0x00a00030                     @ 0802db34 3000a000
-DWORD_0802db38:
-    .word  0xfffffe03                     @ 0802db38 03feffff
+setup_label_render_ctx_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802db2c 60330202
+setup_label_render_ctx_mode_mask:
+    .word  LABEL_CTX_RENDER_STATE_CLEAR   @ 0802db30 7ffcffff  clears 2 bits from slot render state (distinct from CAMPAIGN_CARD_ANIM_STEP_MASK)
+setup_label_render_ctx_disp_param:
+    .word  LABEL_CTX_DISPLAY_PARAM        @ 0802db34 3000a000  display param for label render ctx init
+setup_label_render_ctx_state_clear:
+    .word  CAMPAIGN_CARD_ANIM_STEP_MASK   @ 0802db38 03feffff
 
 @ Opponent card display area OAM sprite dispatch function, called by tick_opponent_aob_display (0x0802dfb8) during animation frame update. Reads [0x02023360+0x38] bits[9:7] as current display phase (phase_idx = ((bits>>7)&7) - 1, [0..6]), out of range jumps to default. Dispatches via 7-way switch: cases 1/2/6/7 (idx=0/1/5/6) -> caseD_1 (normal slot phase: writes multiple OAM sprite entries including icon tiles and frame tiles); cases 3/4/5 (idx=2/3/4) -> caseD_3 (different phase OAM layout). r0=slot_oam_base_offset used as OAM base; each case calls write_oam_entry_from_packed_args to write sprite entries.
 @ 
@@ -3366,7 +3371,7 @@ dispatch_opponent_slot_oam_by_phase:
     push {r5,r6,r7}                          @ 0802db44 e0b4
     sub sp,#0xc                              @ 0802db46 83b0
     adds r6,r0,#0x0    @ 0802db48 061c
-    ldr r0, DAT_0802db64                     @ 0802db4a 0648
+    ldr r0, dispatch_oam_by_phase_scene_ctx  @ 0802db4a 0648
     ldrh r0,[r0,#0x38]                       @ 0802db4c 008f
     lsls r0,r0,#0x16    @ 0802db4e 8005
     lsrs r0,r0,#0x1d    @ 0802db50 400f
@@ -3381,8 +3386,8 @@ LAB_0802db5a:
     ldr r0,[r0,#0x0]                         @ 0802db60 0068
 switchD_0802db62__switchD:
     .hword 0x4687    @ 0802db62 8746
-DAT_0802db64:
-    .word  0x02023360                     @ 0802db64 60330202
+dispatch_oam_by_phase_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802db64 60330202
 DAT_0802db68:
     .word  0x0802db6c                     @ 0802db68 6cdb0208
 switchD_0802db62__switchdataD_0802db6c:
@@ -3402,7 +3407,7 @@ LAB_0802db8a:
     adds r0,r4,#0x0    @ 0802db90 201c
     adds r0,#0xc    @ 0802db92 0c30
     str r0,[sp,#0x0]                         @ 0802db94 0090
-    ldr r0, DAT_0802dc74                     @ 0802db96 3748
+    ldr r0, dispatch_oam_slot_pool_a         @ 0802db96 3748
     adds r0,#0x39    @ 0802db98 3930
     ldrb r1,[r0,#0x0]                        @ 0802db9a 0178
     movs r0,#0x40    @ 0802db9c 4020
@@ -3423,7 +3428,7 @@ LAB_0802db8a:
     orrs r0,r1    @ 0802dbba 0843
     adds r0,r6,r0    @ 0802dbbc 3018
     movs r1,#0x40    @ 0802dbbe 4021
-    ldr r2, DAT_0802dc78                     @ 0802dbc0 2d4a
+    ldr r2, dispatch_oam_slot_pool_b         @ 0802dbc0 2d4a
     bl write_oam_entry_from_packed_args      @ 0802dbc2 c8f0d3fa
     adds r0,r4,#0x0    @ 0802dbc6 201c
     adds r0,#0x14    @ 0802dbc8 1430
@@ -3432,7 +3437,7 @@ LAB_0802db8a:
     orrs r0,r3    @ 0802dbce 1843
     adds r0,r6,r0    @ 0802dbd0 3018
     movs r1,#0x40    @ 0802dbd2 4021
-    ldr r2, DAT_0802dc7c                     @ 0802dbd4 294a
+    ldr r2, dispatch_oam_slot_pool_c         @ 0802dbd4 294a
     bl write_oam_entry_from_packed_args      @ 0802dbd6 c8f0c9fa
     adds r0,r4,#0x4    @ 0802dbda 201d
     .hword 0x4682    @ 0802dbdc 8246
@@ -3450,14 +3455,14 @@ LAB_0802dbec:
     orrs r0,r4    @ 0802dbf2 2043
     adds r0,r6,r0    @ 0802dbf4 3018
     movs r1,#0x0    @ 0802dbf6 0021
-    ldr r2, DAT_0802dc80                     @ 0802dbf8 214a
+    ldr r2, dispatch_oam_slot_pool_d         @ 0802dbf8 214a
     bl write_oam_entry_from_packed_args      @ 0802dbfa c8f0b7fa
     .hword 0x4649    @ 0802dbfe 4946
     lsls r0,r1,#0x10    @ 0802dc00 0804
     orrs r0,r5    @ 0802dc02 2843
     adds r0,r6,r0    @ 0802dc04 3018
     movs r1,#0x0    @ 0802dc06 0021
-    ldr r2, DAT_0802dc84                     @ 0802dc08 1e4a
+    ldr r2, dispatch_oam_slot_pool_e         @ 0802dc08 1e4a
     bl write_oam_entry_from_packed_args      @ 0802dc0a c8f0affa
     adds r5,#0x8    @ 0802dc0e 0835
     subs r7,#0x1    @ 0802dc10 013f
@@ -3467,7 +3472,7 @@ LAB_0802dbec:
     orrs r4,r3    @ 0802dc18 1c43
     adds r0,r6,r4    @ 0802dc1a 3019
     movs r1,#0x40    @ 0802dc1c 4021
-    ldr r2, DAT_0802dc80                     @ 0802dc1e 184a
+    ldr r2, dispatch_oam_slot_pool_d         @ 0802dc1e 184a
     bl write_oam_entry_from_packed_args      @ 0802dc20 c8f0a4fa
     ldr r1,[sp,#0x8]                         @ 0802dc24 0299
     lsls r0,r1,#0x10    @ 0802dc26 0804
@@ -3475,7 +3480,7 @@ LAB_0802dbec:
     orrs r0,r3    @ 0802dc2a 1843
     adds r0,r6,r0    @ 0802dc2c 3018
     movs r1,#0x40    @ 0802dc2e 4021
-    ldr r2, DAT_0802dc88                     @ 0802dc30 154a
+    ldr r2, dispatch_oam_slot_pool_f         @ 0802dc30 154a
     bl write_oam_entry_from_packed_args      @ 0802dc32 c8f09bfa
 LAB_0802dc36:
     ldr r0,[sp,#0x0]                         @ 0802dc36 0098
@@ -3494,7 +3499,7 @@ LAB_0802dc36:
     movs r0,#0x48    @ 0802dc52 4820
     orrs r4,r0    @ 0802dc54 0443
     adds r4,r6,r4    @ 0802dc56 3419
-    ldr r2, DAT_0802dc8c                     @ 0802dc58 0c4a
+    ldr r2, dispatch_oam_slot_pool_g         @ 0802dc58 0c4a
     add r2,r8                                @ 0802dc5a 4244
     lsls r2,r2,#0x10    @ 0802dc5c 1204
     lsrs r2,r2,#0x10    @ 0802dc5e 120c
@@ -3507,27 +3512,27 @@ LAB_0802dc36:
     ble LAB_0802db8a                         @ 0802dc6e 8cdd
     b switchD_0802db62__default              @ 0802dc70 89e0
     .zero  0x2
-DAT_0802dc74:
-    .word  0x02023360                     @ 0802dc74 60330202
-DAT_0802dc78:
-    .word  0x00001001                     @ 0802dc78 01100000
-DAT_0802dc7c:
-    .word  0x00001021                     @ 0802dc7c 21100000
-DAT_0802dc80:
-    .word  0x00001002                     @ 0802dc80 02100000
-DAT_0802dc84:
-    .word  0x00001042                     @ 0802dc84 42100000
-DAT_0802dc88:
-    .word  0x00001022                     @ 0802dc88 22100000
-DAT_0802dc8c:
-    .word  0x00001084                     @ 0802dc8c 84100000
+dispatch_oam_slot_pool_a:
+    .word  0x02023360                     @ 0802dc74 60330202  OAM tile index for slot phase 1
+dispatch_oam_slot_pool_b:
+    .word  0x00001001                     @ 0802dc78 01100000  OAM tile index for slot phase 1
+dispatch_oam_slot_pool_c:
+    .word  0x00001021                     @ 0802dc7c 21100000  OAM tile index for slot phase 2
+dispatch_oam_slot_pool_d:
+    .word  0x00001002                     @ 0802dc80 02100000  OAM tile index for slot phase 2
+dispatch_oam_slot_pool_e:
+    .word  0x00001042                     @ 0802dc84 42100000  OAM tile index for slot phase 2
+dispatch_oam_slot_pool_f:
+    .word  0x00001022                     @ 0802dc88 22100000  OAM tile index for slot phase 2
+dispatch_oam_slot_pool_g:
+    .word  0x00001084                     @ 0802dc8c 84100000  OAM tile index for slot phase 2
 switchD_0802db62__caseD_3:
     movs r2,#0x0    @ 0802dc90 0022
     movs r1,#0x81    @ 0802dc92 8121
     lsls r1,r1,#0x7    @ 0802dc94 c901
     .hword 0x468a    @ 0802dc96 8a46
 LAB_0802dc98:
-    ldr r0, DAT_0802ddc8                     @ 0802dc98 4b48
+    ldr r0, dispatch_oam_caseD3_scene_ctx    @ 0802dc98 4b48
     adds r0,#0x39    @ 0802dc9a 3930
     ldrb r1,[r0,#0x0]                        @ 0802dc9c 0178
     movs r0,#0x40    @ 0802dc9e 4020
@@ -3601,11 +3606,11 @@ LAB_0802dce6:
     ldr r2, DAT_0802dddc                     @ 0802dd2e 2b4a
     bl write_oam_entry_from_packed_args      @ 0802dd30 c8f01cfa
 LAB_0802dd34:
-    ldr r0, DAT_0802dde0                     @ 0802dd34 2a48
+    ldr r0, dispatch_oam_caseD3_pool_a       @ 0802dd34 2a48
     .hword 0x4641    @ 0802dd36 4146
     orrs r0,r1    @ 0802dd38 0843
     adds r0,r6,r0    @ 0802dd3a 3018
-    ldr r2, DAT_0802dde4                     @ 0802dd3c 294a
+    ldr r2, dispatch_oam_caseD3_pool_b       @ 0802dd3c 294a
     add r2,r9                                @ 0802dd3e 4a44
     lsls r2,r2,#0x10    @ 0802dd40 1204
     lsrs r2,r2,#0x10    @ 0802dd42 120c
@@ -3630,7 +3635,7 @@ LAB_0802dd34:
     lsls r1,r1,#0xe    @ 0802dd6c 8903
     orrs r0,r1    @ 0802dd6e 0843
     adds r0,r6,r0    @ 0802dd70 3018
-    ldr r2, DAT_0802dde8                     @ 0802dd72 1d4a
+    ldr r2, dispatch_oam_caseD3_pool_c       @ 0802dd72 1d4a
     add r2,r8                                @ 0802dd74 4244
     lsls r2,r2,#0x10    @ 0802dd76 1204
     lsrs r2,r2,#0x10    @ 0802dd78 120c
@@ -3640,24 +3645,24 @@ LAB_0802dd34:
     cmp r2,#0x1                              @ 0802dd82 012a
     ble LAB_0802dc98                         @ 0802dd84 88dd
 switchD_0802db62__default:
-    ldr r2, DAT_0802ddec                     @ 0802dd86 194a
+    ldr r2, dispatch_oam_caseD3_pool_d       @ 0802dd86 194a
     adds r0,r6,#0x0    @ 0802dd88 301c
     movs r1,#0xc0    @ 0802dd8a c021
     bl write_oam_entry_from_packed_args      @ 0802dd8c c8f0eef9
     adds r0,r6,#0x0    @ 0802dd90 301c
     adds r0,#0x40    @ 0802dd92 4030
-    ldr r4, DAT_0802ddf0                     @ 0802dd94 164c
-    ldr r2, DAT_0802ddf4                     @ 0802dd96 174a
+    ldr r4, dispatch_oam_caseD3_pool_e       @ 0802dd94 164c
+    ldr r2, dispatch_oam_caseD3_pool_f       @ 0802dd96 174a
     adds r1,r4,#0x0    @ 0802dd98 211c
     bl write_oam_entry_from_packed_args      @ 0802dd9a c8f0e7f9
-    ldr r3, DAT_0802ddf8                     @ 0802dd9e 164b
+    ldr r3, dispatch_oam_caseD3_pool_g       @ 0802dd9e 164b
     adds r0,r6,r3    @ 0802dda0 f018
-    ldr r2, DAT_0802ddfc                     @ 0802dda2 164a
+    ldr r2, dispatch_oam_caseD3_pool_h       @ 0802dda2 164a
     adds r1,r4,#0x0    @ 0802dda4 211c
     bl write_oam_entry_from_packed_args      @ 0802dda6 c8f0e1f9
     adds r0,r6,#0x0    @ 0802ddaa 301c
     adds r0,#0x50    @ 0802ddac 5030
-    ldr r2, DAT_0802de00                     @ 0802ddae 144a
+    ldr r2, dispatch_oam_caseD3_pool_i       @ 0802ddae 144a
     movs r1,#0xc0    @ 0802ddb0 c021
     bl write_oam_entry_from_packed_args      @ 0802ddb2 c8f0dbf9
     add sp,#0xc                              @ 0802ddb6 03b0
@@ -3669,8 +3674,8 @@ switchD_0802db62__default:
     pop {r0}                                 @ 0802ddc2 01bc
     bx r0                                    @ 0802ddc4 0047
     .zero  0x2
-DAT_0802ddc8:
-    .word  0x02023360                     @ 0802ddc8 60330202
+dispatch_oam_caseD3_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802ddc8 60330202
 DAT_0802ddcc:
     .word  0x00001001                     @ 0802ddcc 01100000
 DAT_0802ddd0:
@@ -3681,24 +3686,24 @@ DAT_0802ddd8:
     .word  0x00001042                     @ 0802ddd8 42100000
 DAT_0802dddc:
     .word  0x00001022                     @ 0802dddc 22100000
-DAT_0802dde0:
-    .word  0x00050018                     @ 0802dde0 18000500
-DAT_0802dde4:
-    .word  0x00001008                     @ 0802dde4 08100000
-DAT_0802dde8:
-    .word  0x00001084                     @ 0802dde8 84100000
-DAT_0802ddec:
-    .word  0x00001816                     @ 0802ddec 16180000
-DAT_0802ddf0:
-    .word  0x00008080                     @ 0802ddf0 80800000
-DAT_0802ddf4:
-    .word  0x00001817                     @ 0802ddf4 17180000
-DAT_0802ddf8:
-    .word  0x00200040                     @ 0802ddf8 40002000
-DAT_0802ddfc:
-    .word  0x00001897                     @ 0802ddfc 97180000
-DAT_0802de00:
-    .word  0x00001818                     @ 0802de00 18180000
+dispatch_oam_caseD3_pool_a:
+    .word  0x00050018                     @ 0802dde0 18000500  OAM tile index slot phase 3
+dispatch_oam_caseD3_pool_b:
+    .word  0x00001008                     @ 0802dde4 08100000  OAM tile index slot phase 3
+dispatch_oam_caseD3_pool_c:
+    .word  0x00001084                     @ 0802dde8 84100000  OAM tile index slot phase 3
+dispatch_oam_caseD3_pool_d:
+    .word  0x00001816                     @ 0802ddec 16180000  OAM tile index slot phase 4
+dispatch_oam_caseD3_pool_e:
+    .word  0x00008080                     @ 0802ddf0 80800000  OAM tile index slot phase 4
+dispatch_oam_caseD3_pool_f:
+    .word  0x00001817                     @ 0802ddf4 17180000  OAM tile index slot phase 4
+dispatch_oam_caseD3_pool_g:
+    .word  0x00200040                     @ 0802ddf8 40002000  OAM tile index slot phase 4
+dispatch_oam_caseD3_pool_h:
+    .word  0x00001897                     @ 0802ddfc 97180000  OAM tile index slot phase 4
+dispatch_oam_caseD3_pool_i:
+    .word  0x00001818                     @ 0802de00 18180000  OAM tile index slot phase 5
 
 @ Initializes VRAM data for the opponent card display screen. Called by tick_campaign_card_select_display_state when entering card display sub-state. Sequence: (1) r0/r1 select AOB animation frame type (4 combos: r0=0+r1=0->frame=1, r0=0+r1!=0->frame=0, r0!=0+r1=0->frame=3, r0!=0+r1!=0->frame=2); (2) bl tile_2d_row_copy(0x06014000, ROM 0x098977f8, 0x10, 0x10) copies card tiles; (3) bl copy_bytes_by_halfword(0x05000300, ROM 0x098997f8, 0x40) copies palette; (4) bl init_aob_ctx_from_ptnsect(ctx=0x020233ac, ROM 0x09899838, mode=0x02000007, 1); (5) ctx+0x13 bit0 := 1 (AOB active); (6) bl init_aob_ctx_with_anm_entry(ctx, frame_type, 0); (7) ctx+0x13 bit5 := 1 (animation running); (8) clears ctx+0x14 bits[2:0]; (9) bl setup_line_buf_pos_and_font(0x10, 4); (10) reads [0x02006c2c] bits[2:0] = deck_type [0..5] to select card name string pointer; (11) bl count_bytes_until_null for length; (12) computes center offset r4 = 0x20 - len*3; (13) two bl text_render_wrapper calls; (14) bl zero_fill_by_halfword(0x06014200, 0x100) and zero_fill_by_halfword(0x06014600, 0x100); (15) bl write_line_buf_to_bg_tile_vram(ctx, 0).
 @ 
@@ -3716,33 +3721,41 @@ DAT_0802de00:
 @ - text_x_center = 0x20, text_mode = 2
 @ - deck_type_reg = [0x02006c2c] bits[2:0] [0..5]
 init_opponent_card_display_vram:
-    push {r4,r5,r6,r7,lr}                    @ 0802de04 f0b5
+    push {r4,r5,r6,r7,lr}                    @ 0802de04 f0b5  -- OAM tile index slot phase 5
     adds r7,r1,#0x0    @ 0802de06 0f1c
-    cmp r0,#0x0                              @ 0802de08 0028
+dispatch_oam_caseD3_pool_k:
+    cmp r0,#0x0                              @ 0802de08 0028  -- OAM tile index slot phase 5
     bne LAB_0802de16                         @ 0802de0a 04d1
-    movs r4,#0x1    @ 0802de0c 0124
+dispatch_oam_caseD3_pool_l:
+    movs r4,#0x1    @ 0802de0c 0124  -- OAM tile index slot phase 5
     cmp r7,#0x0                              @ 0802de0e 002f
-    beq LAB_0802de1e                         @ 0802de10 05d0
+dispatch_oam_caseD3_pool_m:
+    beq LAB_0802de1e                         @ 0802de10 05d0  -- OAM tile index slot phase 5
     movs r4,#0x0    @ 0802de12 0024
-    b LAB_0802de1e                           @ 0802de14 03e0
+dispatch_oam_default_pool_a:
+    b LAB_0802de1e                           @ 0802de14 03e0  -- OAM tile index default case
 LAB_0802de16:
     movs r4,#0x3    @ 0802de16 0324
-    cmp r7,#0x0                              @ 0802de18 002f
+dispatch_oam_default_pool_b:
+    cmp r7,#0x0                              @ 0802de18 002f  -- OAM tile index default case
     beq LAB_0802de1e                         @ 0802de1a 00d0
-    movs r4,#0x2    @ 0802de1c 0224
+dispatch_oam_default_pool_c:
+    movs r4,#0x2    @ 0802de1c 0224  -- OAM tile index default case
 LAB_0802de1e:
-    ldr r0, DAT_0802decc                     @ 0802de1e 2b48
-    ldr r1, DAT_0802ded0                     @ 0802de20 2b49
+    ldr r0, init_opp_card_display_vram_tile_vram @ 0802de1e 2b48
+dispatch_oam_default_pool_d:
+    ldr r1, init_opp_card_display_vram_tile_src @ 0802de20 2b49  -- OAM tile index default case
     movs r2,#0x10    @ 0802de22 1022
-    movs r3,#0x10    @ 0802de24 1023
+dispatch_oam_default_pool_e:
+    movs r3,#0x10    @ 0802de24 1023  -- OAM tile index default case
     bl tile_2d_row_copy                      @ 0802de26 c9f055fb
-    ldr r0, DAT_0802ded4                     @ 0802de2a 2a48
-    ldr r1, DAT_0802ded8                     @ 0802de2c 2a49
+    ldr r0, init_opp_card_display_vram_pal_dst @ 0802de2a 2a48
+    ldr r1, init_opp_card_display_vram_pal_src @ 0802de2c 2a49
     movs r2,#0x40    @ 0802de2e 4022
     bl copy_bytes_by_halfword                @ 0802de30 c7f038f8
-    ldr r5, DAT_0802dedc                     @ 0802de34 294d
-    ldr r1, DAT_0802dee0                     @ 0802de36 2a49
-    ldr r2, DAT_0802dee4                     @ 0802de38 2a4a
+    ldr r5, init_opp_card_display_vram_aob_ctx_sub @ 0802de34 294d
+    ldr r1, init_opp_card_display_vram_ptnsect_src @ 0802de36 2a49
+    ldr r2, init_opp_card_display_vram_init_mode @ 0802de38 2a4a
     adds r0,r5,#0x0    @ 0802de3a 281c
     movs r3,#0x1    @ 0802de3c 0123
     bl init_aob_ctx_from_ptnsect             @ 0802de3e c9f0b1ff
@@ -3770,9 +3783,9 @@ LAB_0802de1e:
     movs r0,#0x10    @ 0802de6e 1020
     movs r1,#0x4    @ 0802de70 0421
     bl setup_line_buf_pos_and_font           @ 0802de72 c2f09ffe
-    ldr r1, DAT_0802dee8                     @ 0802de76 1c49
-    ldr r0, DAT_0802deec                     @ 0802de78 1c48
-    ldr r2, DAT_0802def0                     @ 0802de7a 1d4a
+    ldr r1, init_opp_card_display_vram_font_ctx @ 0802de76 1c49
+    ldr r0, init_opp_card_display_vram_ewram_base @ 0802de78 1c48
+    ldr r2, init_opp_card_display_vram_gsettings_off @ 0802de7a 1d4a
     adds r0,r0,r2    @ 0802de7c 8018
     movs r3,#0x7    @ 0802de7e 0723
     ldrb r0,[r0,#0x0]                        @ 0802de80 0078
@@ -3786,7 +3799,7 @@ LAB_0802de1e:
     movs r0,#0x2    @ 0802de90 0220
     orrs r4,r0    @ 0802de92 0443
     strb r4,[r1,#0x8]                        @ 0802de94 0c72
-    ldr r2, PTR_font_jp_base_table_0802def4  @ 0802de96 174a
+    ldr r2, init_opp_card_display_vram_ptr_font_jp_base_table @ 0802de96 174a
     lsls r0,r4,#0x1e    @ 0802de98 a007
     lsrs r0,r0,#0x1f    @ 0802de9a c00f
     lsls r0,r0,#0x2    @ 0802de9c 8000
@@ -3807,58 +3820,58 @@ LAB_0802de1e:
     beq LAB_0802df08                         @ 0802deba 25d0
     cmp r3,#0x4                              @ 0802debc 042b
     beq LAB_0802df00                         @ 0802debe 1fd0
-    ldr r5, DAT_0802def8                     @ 0802dec0 0d4d
+    ldr r5, init_opp_card_display_str_ja_0326 @ 0802dec0 0d4d
     cmp r3,#0x5                              @ 0802dec2 052b
     bne LAB_0802df5e                         @ 0802dec4 4bd1
-    ldr r0, DAT_0802defc                     @ 0802dec6 0d48
+    ldr r0, init_opp_card_display_str_off_es @ 0802dec6 0d48
     adds r5,r5,r0    @ 0802dec8 2d18
     b LAB_0802df5e                           @ 0802deca 48e0
-DAT_0802decc:
-    .word  0x06014000                     @ 0802decc 00400106
-DAT_0802ded0:
-    .word  0x098977f8                     @ 0802ded0 f8778909
-DAT_0802ded4:
-    .word  0x05000300                     @ 0802ded4 00030005
-DAT_0802ded8:
-    .word  0x098997f8                     @ 0802ded8 f8978909
-DAT_0802dedc:
-    .word  0x020233ac                     @ 0802dedc ac330202
-DAT_0802dee0:
-    .word  0x09899838                     @ 0802dee0 38988909
-DAT_0802dee4:
-    .word  0x02000007                     @ 0802dee4 07000002
-DAT_0802dee8:
-    .word  0x02006ed0                     @ 0802dee8 d06e0002
-DAT_0802deec:
-    .word  0x02000000                     @ 0802deec 00000002
-DAT_0802def0:
-    .word  0x00006c2c                     @ 0802def0 2c6c0000
-PTR_font_jp_base_table_0802def4:
+init_opp_card_display_vram_tile_vram:
+    .word  AOB_CARD_TILE_VRAM             @ 0802decc 00400106  AOB card OBJ tile VRAM base
+init_opp_card_display_vram_tile_src:
+    .word  aob_card_tile_src              @ 0802ded0 f8778909  AOB card tile data src (0x2000B)
+init_opp_card_display_vram_pal_dst:
+    .word  AOB_CARD_PAL_DST               @ 0802ded4 00030005  AOB card OBJ palette dst (PALRAM+0x100)
+init_opp_card_display_vram_pal_src:
+    .word  aob_card_pal_src               @ 0802ded8 f8978909  AOB card palette src (0x40B)
+init_opp_card_display_vram_aob_ctx_sub:
+    .word  0x020233ac                     @ 0802dedc ac330202  aob ctx sub-struct: gDuelSceneBase+0x4c
+init_opp_card_display_vram_ptnsect_src:
+    .word  aob_ptnsect_src                @ 0802dee0 38988909  ptnsect data src for init_aob_ctx_from_ptnsect
+init_opp_card_display_vram_init_mode:
+    .word  AOB_INIT_MODE                  @ 0802dee4 07000002  AOB init mode: EWRAM_BASE|7 = 0x02000007
+init_opp_card_display_vram_font_ctx:
+    .word  gFontJpCtx                     @ 0802dee8 d06e0002
+init_opp_card_display_vram_ewram_base:
+    .word  EWRAM_BASE                     @ 0802deec 00000002
+init_opp_card_display_vram_gsettings_off:
+    .word  GSETTINGS_OFFSET               @ 0802def0 2c6c0000
+init_opp_card_display_vram_ptr_font_jp_base_table:
     .word  font_jp_base_table             @ 0802def4 54f8e509
-DAT_0802def8:
-    .word  0x09dbd7e8                     @ 0802def8 e8d7db09
-DAT_0802defc:
-    .word  0x0003a90c                     @ 0802defc 0ca90300
+init_opp_card_display_str_ja_0326:
+    .word  game_str_ja_0326               @ 0802def8 e8d7db09  game_str_ja_0326: JA quiz result str
+init_opp_card_display_str_off_es:
+    .word  OPP_CARD_NAME_STR_OFF_ES       @ 0802defc 0ca90300  ES offset from game_str_ja_0326 base
 LAB_0802df00:
-    ldr r5, DAT_0802df04                     @ 0802df00 004d
+    ldr r5, init_opp_card_display_str_de_0326 @ 0802df00 004d
     b LAB_0802df5e                           @ 0802df02 2ce0
-DAT_0802df04:
-    .word  0x09dec2de                     @ 0802df04 dec2de09
+init_opp_card_display_str_de_0326:
+    .word  game_str_it_0326               @ 0802df04 dec2de09
 LAB_0802df08:
-    ldr r5, DAT_0802df0c                     @ 0802df08 004d
+    ldr r5, init_opp_card_display_str_fr_0326 @ 0802df08 004d
     b LAB_0802df5e                           @ 0802df0a 28e0
-DAT_0802df0c:
-    .word  0x09ddffe0                     @ 0802df0c e0ffdd09
+init_opp_card_display_str_fr_0326:
+    .word  game_str_fr_0326               @ 0802df0c e0ffdd09
 LAB_0802df10:
-    ldr r5, DAT_0802df14                     @ 0802df10 004d
+    ldr r5, init_opp_card_display_str_it_0326 @ 0802df10 004d
     b LAB_0802df5e                           @ 0802df12 24e0
-DAT_0802df14:
-    .word  0x09dd3d04                     @ 0802df14 043ddd09
+init_opp_card_display_str_it_0326:
+    .word  game_str_de_0326               @ 0802df14 043ddd09
 LAB_0802df18:
-    ldr r5, DAT_0802df1c                     @ 0802df18 004d
+    ldr r5, init_opp_card_display_str_en_0326 @ 0802df18 004d
     b LAB_0802df5e                           @ 0802df1a 20e0
-DAT_0802df1c:
-    .word  0x09dc8842                     @ 0802df1c 4288dc09
+init_opp_card_display_str_en_0326:
+    .word  game_str_en_0326               @ 0802df1c 4288dc09
 LAB_0802df20:
     cmp r3,#0x1                              @ 0802df20 012b
     beq LAB_0802df5c                         @ 0802df22 1bd0
@@ -3868,33 +3881,33 @@ LAB_0802df20:
     beq LAB_0802df4c                         @ 0802df2a 0fd0
     cmp r3,#0x4                              @ 0802df2c 042b
     beq LAB_0802df44                         @ 0802df2e 09d0
-    ldr r5, DAT_0802df3c                     @ 0802df30 024d
+    ldr r5, init_opp_card_display_str_ja_0327 @ 0802df30 024d
     cmp r3,#0x5                              @ 0802df32 052b
     bne LAB_0802df5e                         @ 0802df34 13d1
-    ldr r1, DAT_0802df40                     @ 0802df36 0249
+    ldr r1, init_opp_card_display_str_off_es_null @ 0802df36 0249
     adds r5,r5,r1    @ 0802df38 6d18
     b LAB_0802df5e                           @ 0802df3a 10e0
-DAT_0802df3c:
-    .word  0x09dbd7f2                     @ 0802df3c f2d7db09
-DAT_0802df40:
-    .word  0x0003a90e                     @ 0802df40 0ea90300
+init_opp_card_display_str_ja_0327:
+    .word  game_str_ja_0327               @ 0802df3c f2d7db09
+init_opp_card_display_str_off_es_null:
+    .word  OPP_CARD_NAME_STR_OFF_ES_NULL  @ 0802df40 0ea90300  ES offset from game_str_ja_0327 base
 LAB_0802df44:
-    ldr r5, DAT_0802df48                     @ 0802df44 004d
+    ldr r5, init_opp_card_display_str_de_0327 @ 0802df44 004d
     b LAB_0802df5e                           @ 0802df46 0ae0
-DAT_0802df48:
-    .word  0x09dec2e6                     @ 0802df48 e6c2de09
+init_opp_card_display_str_de_0327:
+    .word  game_str_it_0327               @ 0802df48 e6c2de09
 LAB_0802df4c:
-    ldr r5, DAT_0802df50                     @ 0802df4c 004d
+    ldr r5, init_opp_card_display_str_fr_0327 @ 0802df4c 004d
     b LAB_0802df5e                           @ 0802df4e 06e0
-DAT_0802df50:
-    .word  0x09ddffea                     @ 0802df50 eaffdd09
+init_opp_card_display_str_fr_0327:
+    .word  game_str_fr_0327               @ 0802df50 eaffdd09
 LAB_0802df54:
-    ldr r5, DAT_0802df58                     @ 0802df54 004d
+    ldr r5, init_opp_card_display_str_it_0327 @ 0802df54 004d
     b LAB_0802df5e                           @ 0802df56 02e0
-DAT_0802df58:
-    .word  0x09dd3d0e                     @ 0802df58 0e3ddd09
+init_opp_card_display_str_it_0327:
+    .word  game_str_de_0327               @ 0802df58 0e3ddd09
 LAB_0802df5c:
-    ldr r5, DAT_0802dfa8                     @ 0802df5c 124d
+    ldr r5, init_opp_card_display_str_en_0327 @ 0802df5c 124d
 LAB_0802df5e:
     adds r0,r5,#0x0    @ 0802df5e 281c
     bl count_bytes_until_null                @ 0802df60 c7f0befa
@@ -3902,7 +3915,7 @@ LAB_0802df5e:
     adds r1,r1,r0    @ 0802df66 0918
     movs r4,#0x20    @ 0802df68 2024
     subs r4,r4,r1    @ 0802df6a 641a
-    ldr r2, DAT_0802dfac                     @ 0802df6c 0f4a
+    ldr r2, init_opp_card_display_vram_render_flag @ 0802df6c 0f4a
     adds r0,r4,#0x0    @ 0802df6e 201c
     movs r1,#0x2    @ 0802df70 0221
     adds r3,r5,#0x0    @ 0802df72 2b1c
@@ -3912,13 +3925,13 @@ LAB_0802df5e:
     movs r2,#0xf    @ 0802df7c 0f22
     adds r3,r5,#0x0    @ 0802df7e 2b1c
     bl text_render_wrapper                   @ 0802df80 c4f07cfd
-    ldr r5, DAT_0802dfb0                     @ 0802df84 0a4d
+    ldr r5, init_opp_card_display_vram_tile_a @ 0802df84 0a4d
     movs r4,#0x80    @ 0802df86 8024
     lsls r4,r4,#0x1    @ 0802df88 6400
     adds r0,r5,#0x0    @ 0802df8a 281c
     adds r1,r4,#0x0    @ 0802df8c 211c
     bl zero_fill_by_halfword                 @ 0802df8e c6f071ff
-    ldr r0, DAT_0802dfb4                     @ 0802df92 0848
+    ldr r0, init_opp_card_display_vram_tile_b @ 0802df92 0848
     adds r1,r4,#0x0    @ 0802df94 211c
     bl zero_fill_by_halfword                 @ 0802df96 c6f06dff
     adds r0,r5,#0x0    @ 0802df9a 281c
@@ -3927,14 +3940,14 @@ LAB_0802df5e:
     pop {r4,r5,r6,r7}                        @ 0802dfa2 f0bc
     pop {r0}                                 @ 0802dfa4 01bc
     bx r0                                    @ 0802dfa6 0047
-DAT_0802dfa8:
-    .word  0x09dc884c                     @ 0802dfa8 4c88dc09
-DAT_0802dfac:
-    .word  0x00008001                     @ 0802dfac 01800000
-DAT_0802dfb0:
-    .word  0x06014200                     @ 0802dfb0 00420106
-DAT_0802dfb4:
-    .word  0x06014600                     @ 0802dfb4 00460106
+init_opp_card_display_str_en_0327:
+    .word  game_str_en_0327               @ 0802dfa8 4c88dc09
+init_opp_card_display_vram_render_flag:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802dfac 01800000
+init_opp_card_display_vram_tile_a:
+    .word  AOB_DISPLAY_TILE_VRAM_A        @ 0802dfb0 00420106  AOB display OBJ tile VRAM A
+init_opp_card_display_vram_tile_b:
+    .word  AOB_DISPLAY_TILE_VRAM_B        @ 0802dfb4 00460106
 
 @ Opponent card AOB (animation object) display per-frame tick function, called by tick_opponent_aob_by_phase (0x0802d4bc), FUN_0802e108, FUN_0802e918, FUN_0802e938 (campaign different phases). Reads [scene_ctx+0x60] byte bit0 (AOB active flag): if not set, skips; if set, calls render_aob_frame_to_oam to write current frame to OAM. Then checks bit2 (frame counter running flag): if set calls tick_aob_frame_counter; if returns 0 (counter expired), clears bit0 and bit2 (stops AOB). Second segment checks bit1 (second AOB layer active flag): if set reads [scene_ctx+0x60] halfword, extracts bits[12:9] as second layer tile params, checks bit3=0x8 (special mode): if bit3 set takes alternate path; otherwise checks bits[12:9] >= 0x3c (60 frames), if not met skips; if met writes two OAM sprites (0x81<<7 size, using tile params from DAT_0802e0e8/0x0802e0f0).
 @ 
@@ -3953,7 +3966,7 @@ tick_opponent_aob_display:
     .hword 0x464f    @ 0802dfba 4f46
     .hword 0x4646    @ 0802dfbc 4646
     push {r6,r7}                             @ 0802dfbe c0b4
-    ldr r1, DAT_0802e0e4                     @ 0802dfc0 4849
+    ldr r1, tick_aob_display_scene_ctx       @ 0802dfc0 4849
     adds r4,r1,#0x0    @ 0802dfc2 0c1c
     adds r4,#0x60    @ 0802dfc4 6034
     movs r0,#0x1    @ 0802dfc6 0120
@@ -3983,7 +3996,7 @@ tick_opponent_aob_display:
     ands r0,r2    @ 0802dffa 1040
     strb r0,[r4,#0x0]                        @ 0802dffc 2070
 LAB_0802dffe:
-    ldr r0, DAT_0802e0e4                     @ 0802dffe 3948
+    ldr r0, tick_aob_display_scene_ctx       @ 0802dffe 3948
     adds r1,r0,#0x0    @ 0802e000 011c
     adds r1,#0x60    @ 0802e002 6031
     movs r0,#0x2    @ 0802e004 0220
@@ -4002,18 +4015,18 @@ LAB_0802dffe:
     cmp r0,#0x3c                             @ 0802e01e 3c28
     bls LAB_0802e03a                         @ 0802e020 0bd9
 LAB_0802e022:
-    ldr r0, DAT_0802e0e8                     @ 0802e022 3148
+    ldr r0, tick_aob_display_oam_xy_a        @ 0802e022 3148
     movs r4,#0x81    @ 0802e024 8124
     lsls r4,r4,#0x7    @ 0802e026 e401
-    ldr r2, DAT_0802e0ec                     @ 0802e028 304a
+    ldr r2, tick_aob_display_oam_tile_a      @ 0802e028 304a
     adds r1,r4,#0x0    @ 0802e02a 211c
     bl write_oam_entry_from_packed_args      @ 0802e02c c8f09ef8
-    ldr r0, DAT_0802e0f0                     @ 0802e030 2f48
-    ldr r2, DAT_0802e0f4                     @ 0802e032 304a
+    ldr r0, tick_aob_display_oam_xy_b        @ 0802e030 2f48
+    ldr r2, tick_aob_display_oam_tile_b      @ 0802e032 304a
     adds r1,r4,#0x0    @ 0802e034 211c
     bl write_oam_entry_from_packed_args      @ 0802e036 c8f099f8
 LAB_0802e03a:
-    ldr r4, DAT_0802e0e4                     @ 0802e03a 2a4c
+    ldr r4, tick_aob_display_scene_ctx       @ 0802e03a 2a4c
     adds r1,r4,#0x0    @ 0802e03c 211c
     adds r1,#0x39    @ 0802e03e 3931
     movs r0,#0x20    @ 0802e040 2020
@@ -4032,7 +4045,7 @@ LAB_0802e050:
     lsrs r0,r2,#0x1b    @ 0802e05a d00e
     cmp r0,#0x7                              @ 0802e05c 0728
     bhi LAB_0802e068                         @ 0802e05e 03d8
-    ldr r1, DAT_0802e0f8                     @ 0802e060 2549
+    ldr r1, tick_aob_display_phase_tbl       @ 0802e060 2549
     lsls r0,r0,#0x1    @ 0802e062 4000
     adds r0,r0,r1    @ 0802e064 4018
     ldrh r5,[r0,#0x0]                        @ 0802e066 0588
@@ -4042,7 +4055,7 @@ LAB_0802e068:
     lsls r0,r0,#0x10    @ 0802e06c 0004
     movs r1,#0xd0    @ 0802e06e d021
     orrs r0,r1    @ 0802e070 0843
-    ldr r2, DAT_0802e0fc                     @ 0802e072 224a
+    ldr r2, tick_aob_display_oam_attr1_large @ 0802e072 224a
     movs r1,#0x80    @ 0802e074 8021
     bl write_oam_entry_from_packed_args      @ 0802e076 c8f079f8
     adds r0,r5,#0x0    @ 0802e07a 281c
@@ -4050,7 +4063,7 @@ LAB_0802e068:
     lsls r0,r0,#0x10    @ 0802e07e 0004
     movs r1,#0x8    @ 0802e080 0821
     orrs r0,r1    @ 0802e082 0843
-    ldr r2, DAT_0802e100                     @ 0802e084 1e4a
+    ldr r2, tick_aob_display_oam_attr1_b     @ 0802e084 1e4a
     movs r1,#0x80    @ 0802e086 8021
     bl write_oam_entry_from_packed_args      @ 0802e088 c8f070f8
     movs r6,#0x0    @ 0802e08c 0026
@@ -4061,7 +4074,7 @@ LAB_0802e068:
     subs r0,r0,r5    @ 0802e096 401b
     lsls r0,r0,#0x10    @ 0802e098 0004
     .hword 0x4680    @ 0802e09a 8046
-    ldr r7, DAT_0802e104                     @ 0802e09c 194f
+    ldr r7, tick_aob_display_oam_attr2       @ 0802e09c 194f
 LAB_0802e09e:
     lsls r5,r6,#0x6    @ 0802e09e b501
     adds r0,r5,#0x0    @ 0802e0a0 281c
@@ -4096,24 +4109,24 @@ LAB_0802e09e:
     pop {r0}                                 @ 0802e0de 01bc
     bx r0                                    @ 0802e0e0 0047
     .zero  0x2
-DAT_0802e0e4:
-    .word  0x02023360                     @ 0802e0e4 60330202
-DAT_0802e0e8:
-    .word  0x00500058                     @ 0802e0e8 58005000
-DAT_0802e0ec:
-    .word  0x00001210                     @ 0802e0ec 10120000
-DAT_0802e0f0:
-    .word  0x00500078                     @ 0802e0f0 78005000
-DAT_0802e0f4:
-    .word  0x00001214                     @ 0802e0f4 14120000
-DAT_0802e0f8:
-    .word  0x09e59db4                     @ 0802e0f8 b49de509
-DAT_0802e0fc:
-    .word  0x0000388c                     @ 0802e0fc 8c380000
-DAT_0802e100:
-    .word  0x00002888                     @ 0802e100 88280000
-DAT_0802e104:
-    .word  0x000040c0                     @ 0802e104 c0400000
+tick_aob_display_scene_ctx:
+    .word  gDuelSceneBase                 @ 0802e0e4 60330202
+tick_aob_display_oam_xy_a:
+    .word  0x00500058                     @ 0802e0e8 58005000  OAM packed xy for 2nd-layer sprite A: y=0x50 x=0x58
+tick_aob_display_oam_tile_a:
+    .word  0x00001210                     @ 0802e0ec 10120000  OAM tile index A for 2nd-layer sprite: 0x1210
+tick_aob_display_oam_xy_b:
+    .word  0x00500078                     @ 0802e0f0 78005000  OAM packed xy for 2nd-layer sprite B: y=0x50 x=0x78
+tick_aob_display_oam_tile_b:
+    .word  0x00001214                     @ 0802e0f4 14120000  OAM tile index B: 0x1214
+tick_aob_display_phase_tbl:
+    .word  aob_phase_table                @ 0802e0f8 b49de509
+tick_aob_display_oam_attr1_large:
+    .word  0x0000388c                     @ 0802e0fc 8c380000  OAM attr1 0x388c: y=0x38 large-size
+tick_aob_display_oam_attr1_b:
+    .word  0x00002888                     @ 0802e100 88280000  OAM attr1 0x2888
+tick_aob_display_oam_attr2:
+    .word  0x000040c0                     @ 0802e104 c0400000  OAM attr2 0x40c0: tile=0xc0 pal=4
 
 @ Per-frame state machine for the campaign card-select/display screen. Called by run_campaign_step23 (0x08026fe4) and run_campaign_step25 (0x080274f4). Sequence: (1) bl tick_opponent_aob_display; (2) reads scene_ctx+0x3b bits[7:1] and scene_ctx+0x3c bit0 to form phase_state r0 [0..0x64]; (3) dispatches on phase_state: 0 -> initializes scene_ctx+0x39 bit5 and writes deck_type to scene_ctx+0x3a, returns 0; 1 -> second-level switch on scene_ctx+0x38 bits[10:8] [0..7] dispatching to invoke_build_campaign_sprite_row_type5/6 and other handlers; 2 -> LAB_0802e518 (heavy sprite update logic); 0x14/0x64 -> returns 1 (done); 0x15/0x16/0x17 -> various wait/transition paths; default -> returns 0. Return: 0 = still running, 1 = display phase complete.
 @ 
