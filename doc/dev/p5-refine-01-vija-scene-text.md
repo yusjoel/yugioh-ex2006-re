@@ -51,7 +51,7 @@
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
-| **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **pending** |
+| **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
@@ -189,7 +189,7 @@
 - 新增 constants: constants/duel_field.inc (28 equates: GPRNG_STEP_IDX_OFF/frame_ctrl/OBJ_PAL_SLOT_1/DUEL_FIELD_CTRL_VAL/BGCNT1/2/3_INIT/GWINS_BASE_OFFSET/OFF_2/OPP_WIN_*/GUNLOCKED_DUELISTS_OFFSET/DUEL_FIELD_TEXT_TILE_POS_A/B/C/TEXT_BG_WIDTH/TILE_ROW_ARG_A/B/C/OAM_COORDS_A/B/OAM_TILE_IDX_A/B/C/DUEL_SCENE_FLAGS_MASK/FIELD_OFF_6E48/6E57); gba_mem.inc +1 OBJ_TILE_VRAM_BASE_PAGE2; ewram.inc +1 gDuelDispCtx (med-conf)
 - 踩坑: FUN_08021090 was auto-disassembled by Ghidra flow from block4 (not true orphan); block3 (6880B) has 51 stubs with interleaved code+literal-pool requiring 3-pass DWORD fix (FixLiteralPools + FixLiteralPools2 + FixAllLiteralPools comprehensive scan)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: pending
+- commit: 005143e
 
 ---
 
