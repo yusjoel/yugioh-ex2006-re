@@ -51,7 +51,7 @@
 | **4** | 0x1e36c..0x1e714 (8fn) | ✅ | 3edab63 |
 | **5** | **0x1e714..0x1f25c (10fn)** | **✅** | **a13983b** |
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
-| 7 | 0x20fa8..0x24868 (8fn, incbin 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6) | ⬜ | |
+| **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **pending** |
 | 8 | 0x24868..0x27e44 (8fn, incbin 0x2497c/0x78, 0x258f0/0x230) | ⬜ | |
 | 9 | 0x27e44..0x28bdc (8fn, incbin 0x27e50/0x6c) | ⬜ | |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
@@ -171,6 +171,25 @@
 - 命名裁定: gDuelFieldState=0x02023130 (不改 gDuelFieldCtx; driver 裁定; reviewer 指出 asm/07 plate 非正式用同名于 0x0201bb90/0x0201b290, 但该地址无 .equ 定义; 0x02023130 用 gDuelFieldState 与现有 ewram.inc 无碰撞)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: a13983b
+
+### 4.07 Seg-7 完成记录 (2026-06-10)
+
+- 范围: 0x08020fa8..0x08024868, 9 named fn + 68 disasm stubs (FUN_08021090 + block2/3/4)
+- 函数 (named): render_lp_record_text_set_b / tick_scene_step_by_step_table_d / fetch_duel_next_state_overflow_exit / draw_decimal_with_offset / render_centered_text_to_bg_vram / copy_icon_tile_to_vram_row / init_duel_field_icon_and_bg_vram / render_win_count_digits_to_oam / render_opp_wins_display_oam
+- Ghidra 脚本: RefineF01Seg7Slots.py + DisassembleF01Seg7Blocks.py + FixF01Seg7OrphanBlock.py + FixF01Seg7LiteralPools.py + FixF01Seg7LiteralPools2.py + FixF01Seg7AllLiteralPools.py
+- EQ=67 (EWRAM_BASE x10 reuse / GSETTINGS_OFFSET x9 reuse / gFontJpCtx x3 reuse / gVijaState x1 reuse / OBJ_TILE_VRAM_BASE x3 reuse / BG_CHAR_VRAM_CB2 x2 reuse / OBJ_PALRAM_BASE x1 reuse + CARD_DESC_BG_VRAM_A x1 reuse; new: GPRNG_STEP_IDX_OFF/GPRNG_FRAME_CTRL_OFF_203/OBJ_PAL_SLOT_1/DUEL_FIELD_CTRL_VAL/DUEL_FIELD_BGCNT1/2/3_INIT/OBJ_TILE_VRAM_BASE_PAGE2/GWINS_BASE_OFFSET/GWINS_BASE_OFF_2/OPP_WIN_DIGIT_TILE_BASE/OPP_WIN_SPRITE_OFFSCREEN_XY/OPP_WIN_SEPARATOR_TILE_IDX/GUNLOCKED_DUELISTS_OFFSET/DUEL_FIELD_TEXT_TILE_POS_A/B/C/DUEL_FIELD_TEXT_BG_WIDTH/DUEL_FIELD_TILE_ROW_ARG_A/B/C/DUEL_FIELD_OAM_COORDS_A/B/DUEL_FIELD_OAM_TILE_IDX_A/B/C/DUEL_SCENE_FLAGS_MASK_0F00/DUEL_SCENE_FIELD_OFF_6E48/DUEL_SCENE_FIELD_OFF_6E57/gDuelDispCtx)
+- REF=14 (gDuelSceneBase x11 + gDuelCardCtxBase x1 + gDuelDispCtx x1 + PTR_DAT_08022e64 x1)
+- RENAME=47 (10 render_lp_record_set_b cid/str ptrs + 6 gfx_src + 6+1+6+6 LP str init_duel A/tile_d/B/C + 3 tile_src_d ptrs + 1 flags_mask + 6 LP str render_opp + 1 step_lut + 2 iwram_ptr)
+- FUNC_RENAME=0
+- PLATE=1 (draw_decimal_with_offset CJK->ASCII @0x0802387c)
+- carve=0 (no rom.s incbin cuts needed)
+- disasm=3 ranges: block2 (0x080211b4/0xc4, 2 entry pts) + block3 (0x0802134c/0x1ae0, 51 unique entry pts) + block4 (0x08022eb8/0x9a6, 15 unique entry pts); FUN_08021090 auto-disassembled (was "orphan" but has caller FUN_08023614)
+- §5.1=0 (all 4 incbin blocks resolved: orphan disassembled + block2/3/4 R4 disasm; NO zero-ref blocks remain)
+- literal pool fix: 997 DWORDs total (FixF01Seg7LiteralPools.py 167 + FixF01Seg7LiteralPools2.py 189 + FixF01Seg7AllLiteralPools.py 997 comprehensive scan; multiple passes required due to interleaved code/data in large block3)
+- 新增 constants: constants/duel_field.inc (28 equates: GPRNG_STEP_IDX_OFF/frame_ctrl/OBJ_PAL_SLOT_1/DUEL_FIELD_CTRL_VAL/BGCNT1/2/3_INIT/GWINS_BASE_OFFSET/OFF_2/OPP_WIN_*/GUNLOCKED_DUELISTS_OFFSET/DUEL_FIELD_TEXT_TILE_POS_A/B/C/TEXT_BG_WIDTH/TILE_ROW_ARG_A/B/C/OAM_COORDS_A/B/OAM_TILE_IDX_A/B/C/DUEL_SCENE_FLAGS_MASK/FIELD_OFF_6E48/6E57); gba_mem.inc +1 OBJ_TILE_VRAM_BASE_PAGE2; ewram.inc +1 gDuelDispCtx (med-conf)
+- 踩坑: FUN_08021090 was auto-disassembled by Ghidra flow from block4 (not true orphan); block3 (6880B) has 51 stubs with interleaved code+literal-pool requiring 3-pass DWORD fix (FixLiteralPools + FixLiteralPools2 + FixAllLiteralPools comprehensive scan)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: pending
 
 ---
 

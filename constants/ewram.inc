@@ -243,6 +243,11 @@
 .equ PLAYER_BLOCK_STRIDE,           0x868   @ player data block stride (0x868=2152 bytes; 2146 raw refs)
 .equ GAME_STR_RAW_ID_MASK,     0xfffe0000   @ raw game string ID mask: bits[31:17]==0 (485 raw refs)
 
+.equ gDuelDispCtx,               0x0203eeb0  @ display context struct for duel field / scene rendering
+                                             @ passed to reset_display_and_obj_vram as r0 arg; stored at gPrng+0x1bc
+                                             @ 8 ROM refs; callers: init_duel_field_icon_and_bg_vram + 7 others
+                                             @ confidence: med (structural pattern; runtime fields unconfirmed)
+
 .equ gDemoState,                 0x02029EC0  @ demo 过场动画状态结构
                                              @ +0x88 = u32 fs_load 返回的解压数据指针
                                              @ +0x8c = u32 packed bitfield

@@ -17,3 +17,4 @@
 .equ BG_SCREEN_TILE_OFF_1,0x06000002  @ BG screen map entry 1 (tile row 0 col 1 = map base+2)
 .equ BG_SCREEN_ROW1_OFF,  0x06000040  @ BG screen map row 1 base (32 tiles * 2B = 0x40 per row)
 .equ BG_SCREEN_ROW1_TILE1,0x06000042  @ BG screen map row 1 col 1 (0x06000040+2)
+.equ OBJ_TILE_VRAM_BASE_PAGE2,0x06010200  @ OBJ_TILE_VRAM_BASE+0x200; 16 ROM refs; icon tile base+0x200 (f01 Seg-7)

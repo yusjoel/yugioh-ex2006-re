@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `01_vija_scene_text.s` (进行中, 6/10 段; 活动 doc + 10 段路线图已建)。
-> **下一任务**: **Seg-7** (01 文件, 0x20fa8..0x24868, 含 4 incbin: 0x2108e/0xbe, 0x211b4/0xc4, **0x2134c/0x1ae0**, 0x22eb8/0x9a6)。
+> **当前文件**: `01_vija_scene_text.s` (进行中, 7/10 段; 活动 doc + 10 段路线图已建)。
+> **下一任务**: **Seg-8** (01 文件, 0x24868..0x27e44, 含 2 incbin: 0x2497c/0x78, 0x258f0/0x230)。
 
 ---
 
@@ -18,7 +18,7 @@
 | # | 文件 | 地址区间 | 段(~10/文件) | 状态 | 活动 doc |
 |---|------|----------|------|------|---------|
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
-| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | 🟡 进行中 (6/10) | `doc/dev/p5-refine-01-vija-scene-text.md` |
+| 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | 未拆 | ⬜ | |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |

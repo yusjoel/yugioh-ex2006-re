@@ -48,6 +48,9 @@
 @ Card Info Page BG CNT init / OBJ pal slot / BG-VRAM 写入基址（0x1d448 card_info 簇用）
 	.include "constants/card_info.inc"
 
+@ Duel Field display constants (init_duel_field_icon_and_bg_vram / render_win_count; f01 Seg-7 0x20fa8 cluster)
+	.include "constants/duel_field.inc"
+
 @ ARM CPSR/SPSR 处理器状态位（crt0/IntrMain 模式切换用）
 	.include "constants/arm_psr.inc"
 
