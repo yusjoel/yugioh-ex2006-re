@@ -53,7 +53,7 @@
 | **6** | **0x1f25c..0x20fa8 (16fn, incbin 0x1f4d0/0x690, 0x1fb90/0x302, 0x202fe/0x36, 0x20370/0xa44)** | **✅** | **316bbe7** |
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
 | **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | **5266f72** |
-| **9** | **0x27e44..0x28bdc (8fn+1 disasm, incbin 0x27e50/0x6c->disasm)** | **✅** | **pending** |
+| **9** | **0x27e44..0x28bdc (8fn+1 disasm, incbin 0x27e50/0x6c->disasm)** | **✅** | **af08e97** |
 | 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -228,7 +228,7 @@
 - 新增全局别名: ewram.inc +alias run_campaign_card_select_handler_10_proto_row (=gCardListDisplayBuf=0x02001138); iwram.inc +tick_campaign_card_selector_oam_attr_buf=0x0300024c
 - CSV sync: yes (new fn tick_campaign_card_select_display_state @ 0x08027e50 added to naming-proposals.csv)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: pending
+- commit: af08e97
 
 ---
 
