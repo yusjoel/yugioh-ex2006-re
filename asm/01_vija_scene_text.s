@@ -25387,7 +25387,7 @@ evaluate_campaign_victory_state:
     .hword 0x4647    @ 08028bde 4746
     push {r7}                                @ 08028be0 80b4
     movs r5,#0x0    @ 08028be2 0025
-    ldr r1, DWORD_08028c24                   @ 08028be4 0f49
+    ldr r1, evaluate_campaign_victory_state_ctx_base @ 08028be4 0f49
     movs r2,#0x8a    @ 08028be6 8a22
     lsls r2,r2,#0x2    @ 08028be8 9200
     adds r0,r1,r2    @ 08028bea 8818
@@ -25407,7 +25407,7 @@ LAB_08028c02:
     bne LAB_08028c08                         @ 08028c04 00d1
     b LAB_08028d2c                           @ 08028c06 91e0
 LAB_08028c08:
-    ldr r1, DWORD_08028c28                   @ 08028c08 0749
+    ldr r1, evaluate_campaign_victory_state_scene_base @ 08028c08 0749
     adds r2,r1,#0x0    @ 08028c0a 0a1c
     adds r2,#0x36    @ 08028c0c 3632
     movs r0,#0x40    @ 08028c0e 4020
@@ -25421,14 +25421,14 @@ LAB_08028c08:
     add r0,r12                               @ 08028c1e 6044
     ldr r0,[r0,#0x0]                         @ 08028c20 0068
     b LAB_08028d36                           @ 08028c22 88e0
-DWORD_08028c24:
-    .word  0x0201e2a0                     @ 08028c24 a0e20102
-DWORD_08028c28:
-    .word  0x02023360                     @ 08028c28 60330202
+evaluate_campaign_victory_state_ctx_base:
+    .word  gDuelCardCtxBase               @ 08028c24 a0e20102
+evaluate_campaign_victory_state_scene_base:
+    .word  gDuelSceneBase                 @ 08028c28 60330202
 LAB_08028c2c:
     movs r4,#0x0    @ 08028c2c 0024
-    ldr r2, DWORD_08028c64                   @ 08028c2e 0d4a
-    ldr r1, DWORD_08028c68                   @ 08028c30 0d49
+    ldr r2, evaluate_campaign_victory_state_gprng @ 08028c2e 0d4a
+    ldr r1, evaluate_campaign_victory_state_win_count_off @ 08028c30 0d49
     adds r0,r2,r1    @ 08028c32 5018
     ldrb r0,[r0,#0x0]                        @ 08028c34 0078
     lsrs r3,r0,#0x1    @ 08028c36 4308
@@ -25444,7 +25444,7 @@ LAB_08028c2c:
     adds r7,r2,#0x0    @ 08028c4a 171c
     cmp r4,r0                                @ 08028c4c 8442
     bge LAB_08028c7c                         @ 08028c4e 15da
-    ldr r1, DWORD_08028c6c                   @ 08028c50 0649
+    ldr r1, evaluate_campaign_victory_state_score_off @ 08028c50 0649
     adds r2,r7,r1    @ 08028c52 7a18
     adds r1,r0,#0x0    @ 08028c54 011c
 LAB_08028c56:
@@ -25455,12 +25455,12 @@ LAB_08028c56:
     cmp r0,#0x2                              @ 08028c5e 0228
     beq LAB_08028c74                         @ 08028c60 08d0
     b LAB_08028c76                           @ 08028c62 08e0
-DWORD_08028c64:
+evaluate_campaign_victory_state_gprng:
     .word  gPrng                          @ 08028c64 40000003
-DWORD_08028c68:
-    .word  0x0000023f                     @ 08028c68 3f020000
-DWORD_08028c6c:
-    .word  0x00000241                     @ 08028c6c 41020000
+evaluate_campaign_victory_state_win_count_off:
+    .word  GPRNG_BANNER_FLAG_OFF          @ 08028c68 3f020000
+evaluate_campaign_victory_state_score_off:
+    .word  GPRNG_CHALLENGE_SCORE_OFF      @ 08028c6c 41020000
 LAB_08028c70:
     adds r5,#0x1    @ 08028c70 0135
     b LAB_08028c76                           @ 08028c72 00e0
@@ -25472,7 +25472,7 @@ LAB_08028c76:
     blt LAB_08028c56                         @ 08028c7a ecdb
 LAB_08028c7c:
     adds r1,r7,#0x0    @ 08028c7c 391c
-    ldr r2, DWORD_08028d0c                   @ 08028c7e 234a
+    ldr r2, evaluate_campaign_victory_state_win_count_off_b @ 08028c7e 234a
     adds r0,r1,r2    @ 08028c80 8818
     ldrb r0,[r0,#0x0]                        @ 08028c82 0078
     lsrs r2,r0,#0x1    @ 08028c84 4208
@@ -25533,7 +25533,7 @@ LAB_08028cee:
     adds r0,r6,#0x1    @ 08028cf2 701c
     cmp r5,r0                                @ 08028cf4 8542
     bge LAB_08028d20                         @ 08028cf6 13da
-    ldr r2, DWORD_08028d10                   @ 08028cf8 054a
+    ldr r2, evaluate_campaign_victory_state_score_off_b @ 08028cf8 054a
     adds r1,r7,r2    @ 08028cfa b918
     adds r3,r0,#0x0    @ 08028cfc 031c
 LAB_08028cfe:
@@ -25544,10 +25544,10 @@ LAB_08028cfe:
     cmp r0,#0x2                              @ 08028d06 0228
     beq LAB_08028d18                         @ 08028d08 06d0
     b LAB_08028d1a                           @ 08028d0a 06e0
-DWORD_08028d0c:
-    .word  0x0000023f                     @ 08028d0c 3f020000
-DWORD_08028d10:
-    .word  0x00000241                     @ 08028d10 41020000
+evaluate_campaign_victory_state_win_count_off_b:
+    .word  GPRNG_BANNER_FLAG_OFF          @ 08028d0c 3f020000
+evaluate_campaign_victory_state_score_off_b:
+    .word  GPRNG_CHALLENGE_SCORE_OFF      @ 08028d10 41020000
 LAB_08028d14:
     adds r5,#0x1    @ 08028d14 0135
     b LAB_08028d1a                           @ 08028d16 00e0
@@ -25595,8 +25595,8 @@ dispatch_campaign_scene_by_prng_state:
     .hword 0x4645    @ 08028d46 4546
     push {r5,r6,r7}                          @ 08028d48 e0b4
     sub sp,#0x50                             @ 08028d4a 94b0
-    ldr r0, PTR_gPrng_08028d6c               @ 08028d4c 0748
-    ldr r2, DAT_08028d70                     @ 08028d4e 084a
+    ldr r0, dispatch_campaign_scene_by_prng_state_gprng @ 08028d4c 0748
+    ldr r2, dispatch_campaign_scene_by_prng_state_step_idx_off @ 08028d4e 084a
     adds r1,r0,r2    @ 08028d50 8118
     ldrh r1,[r1,#0x0]                        @ 08028d52 0988
     lsls r1,r1,#0x12    @ 08028d54 8904
@@ -25607,17 +25607,17 @@ dispatch_campaign_scene_by_prng_state:
     bl load_campaign_state_post_sio          @ 08028d5e 02f07ffb
 LAB_08028d62:
     lsls r0,r1,#0x2    @ 08028d62 8800
-    ldr r1, DAT_08028d74                     @ 08028d64 0349
+    ldr r1, dispatch_campaign_scene_by_prng_state_table_ptr @ 08028d64 0349
     adds r0,r0,r1    @ 08028d66 4018
     ldr r0,[r0,#0x0]                         @ 08028d68 0068
     .hword 0x4687    @ 08028d6a 8746
-PTR_gPrng_08028d6c:
+dispatch_campaign_scene_by_prng_state_gprng:
     .word  gPrng                          @ 08028d6c 40000003
-DAT_08028d70:
-    .word  0x00000202                     @ 08028d70 02020000
-DAT_08028d74:
-    .word  0x08028d78                     @ 08028d74 788d0208
-PTR_DAT_08028d78:
+dispatch_campaign_scene_by_prng_state_step_idx_off:
+    .word  GPRNG_STEP_IDX_OFF             @ 08028d70 02020000
+dispatch_campaign_scene_by_prng_state_table_ptr:
+    .word  campaign_scene_prng_dispatch_table @ 08028d74 788d0208
+campaign_scene_prng_dispatch_table:
     .word  0x08029170                     @ 08028d78 70910208
     .word  0x080292b4                     @ 08028d7c b4920208
     .word  0x08029304                     @ 08028d80 04930208
@@ -25872,8 +25872,4744 @@ PTR_DAT_08028d78:
     .word  0x080292b4                     @ 08029164 b4920208
     .word  0x0802b3a4                     @ 08029168 a4b30208
     .word  0x0802b434                     @ 0802916c 34b40208
-DAT_08029170:
-    ROM_INCBIN 0x29170, 0x22f0
+campaign_scene_handler_08029170:
+    bl init_pack_scene_vram_regs             @ 08029170 fff790fa
+    movs r0,#0x0    @ 08029174 0020
+    bl load_pack_tiles_with_palette_init     @ 08029176 fff7d9fa
+    ldr r0, DWORD_080291a4                   @ 0802917a 0a48
+    ldr r3, DWORD_080291a8                   @ 0802917c 0a4b
+    adds r0,r0,r3    @ 0802917e c018
+    movs r1,#0x7    @ 08029180 0721
+    ldrb r0,[r0,#0x0]                        @ 08029182 0078
+    ands r1,r0    @ 08029184 0140
+    cmp r1,#0x1                              @ 08029186 0129
+    beq LAB_080291cc                         @ 08029188 20d0
+    cmp r1,#0x2                              @ 0802918a 0229
+    beq LAB_080291c4                         @ 0802918c 1ad0
+    cmp r1,#0x3                              @ 0802918e 0329
+    beq LAB_080291bc                         @ 08029190 14d0
+    cmp r1,#0x4                              @ 08029192 0429
+    beq LAB_080291b4                         @ 08029194 0ed0
+    ldr r0, DWORD_080291ac                   @ 08029196 0548
+    cmp r1,#0x5                              @ 08029198 0529
+    bne LAB_080291ce                         @ 0802919a 18d1
+    ldr r4, DWORD_080291b0                   @ 0802919c 044c
+    adds r0,r0,r4    @ 0802919e 0019
+    b LAB_080291ce                           @ 080291a0 15e0
+    .zero  0x2
+DWORD_080291a4:
+    .word  0x02000000                     @ 080291a4 00000002
+DWORD_080291a8:
+    .word  0x00006c2c                     @ 080291a8 2c6c0000
+DWORD_080291ac:
+    .word  0x09dbff1a                     @ 080291ac 1affdb09
+DWORD_080291b0:
+    .word  0x0003ab1a                     @ 080291b0 1aab0300
+LAB_080291b4:
+    ldr r0, DWORD_080291b8                   @ 080291b4 0048
+    b LAB_080291ce                           @ 080291b6 0ae0
+DWORD_080291b8:
+    .word  0x09deee6c                     @ 080291b8 6ceede09
+LAB_080291bc:
+    ldr r0, DWORD_080291c0                   @ 080291bc 0048
+    b LAB_080291ce                           @ 080291be 06e0
+DWORD_080291c0:
+    .word  0x09de29b8                     @ 080291c0 b829de09
+LAB_080291c4:
+    ldr r0, DWORD_080291c8                   @ 080291c4 0048
+    b LAB_080291ce                           @ 080291c6 02e0
+DWORD_080291c8:
+    .word  0x09dd6640                     @ 080291c8 4066dd09
+LAB_080291cc:
+    ldr r0, DWORD_08029204                   @ 080291cc 0d48
+LAB_080291ce:
+    str r0,[sp,#0x0]                         @ 080291ce 0090
+    movs r0,#0x0    @ 080291d0 0020
+    movs r1,#0x82    @ 080291d2 8221
+    ldr r2, DWORD_08029208                   @ 080291d4 0c4a
+    ldr r3, DWORD_0802920c                   @ 080291d6 0d4b
+    bl render_campaign_text_line_centered    @ 080291d8 fff71ef9
+    ldr r0, DWORD_08029210                   @ 080291dc 0c48
+    ldr r5, DWORD_08029214                   @ 080291de 0d4d
+    adds r0,r0,r5    @ 080291e0 4019
+    movs r1,#0x7    @ 080291e2 0721
+    ldrb r0,[r0,#0x0]                        @ 080291e4 0078
+    ands r1,r0    @ 080291e6 0140
+    cmp r1,#0x1                              @ 080291e8 0129
+    beq LAB_08029238                         @ 080291ea 25d0
+    cmp r1,#0x2                              @ 080291ec 0229
+    beq LAB_08029230                         @ 080291ee 1fd0
+    cmp r1,#0x3                              @ 080291f0 0329
+    beq LAB_08029228                         @ 080291f2 19d0
+    cmp r1,#0x4                              @ 080291f4 0429
+    beq LAB_08029220                         @ 080291f6 13d0
+    ldr r0, DWORD_08029218                   @ 080291f8 0748
+    cmp r1,#0x5                              @ 080291fa 0529
+    bne LAB_0802923a                         @ 080291fc 1dd1
+    ldr r6, DWORD_0802921c                   @ 080291fe 074e
+    adds r0,r0,r6    @ 08029200 8019
+    b LAB_0802923a                           @ 08029202 1ae0
+DWORD_08029204:
+    .word  0x09dcad12                     @ 08029204 12addc09
+DWORD_08029208:
+    .word  0x0000021e                     @ 08029208 1e020000
+DWORD_0802920c:
+    .word  0x00000807                     @ 0802920c 07080000
+DWORD_08029210:
+    .word  0x02000000                     @ 08029210 00000002
+DWORD_08029214:
+    .word  0x00006c2c                     @ 08029214 2c6c0000
+DWORD_08029218:
+    .word  0x09dbfe30                     @ 08029218 30fedb09
+DWORD_0802921c:
+    .word  0x0003ab32                     @ 0802921c 32ab0300
+LAB_08029220:
+    ldr r0, DWORD_08029224                   @ 08029220 0048
+    b LAB_0802923a                           @ 08029222 0ae0
+DWORD_08029224:
+    .word  0x09deed82                     @ 08029224 82edde09
+LAB_08029228:
+    ldr r0, DWORD_0802922c                   @ 08029228 0048
+    b LAB_0802923a                           @ 0802922a 06e0
+DWORD_0802922c:
+    .word  0x09de28d6                     @ 0802922c d628de09
+LAB_08029230:
+    ldr r0, DWORD_08029234                   @ 08029230 0048
+    b LAB_0802923a                           @ 08029232 02e0
+DWORD_08029234:
+    .word  0x09dd6540                     @ 08029234 4065dd09
+LAB_08029238:
+    ldr r0, LAB_08029298                     @ 08029238 1748
+LAB_0802923a:
+    str r0,[sp,#0x0]                         @ 0802923a 0090
+    movs r0,#0x1    @ 0802923c 0120
+    str r0,[sp,#0x4]                         @ 0802923e 0190
+    movs r0,#0xa3    @ 08029240 a320
+    movs r1,#0xc2    @ 08029242 c221
+    movs r2,#0x83    @ 08029244 8322
+    lsls r2,r2,#0x3    @ 08029246 d200
+    ldr r3, LAB_0802929c                     @ 08029248 144b
+    bl render_campaign_text_line_with_align  @ 0802924a fff78df9
+    ldr r5, LAB_080292a0                     @ 0802924e 144d
+    adds r5,#0x36    @ 08029250 3635
+    movs r0,#0x1f    @ 08029252 1f20
+    rsbs r0,r0,#0    @ 08029254 4042
+    ldrb r7,[r5,#0x0]                        @ 08029256 2f78
+    ands r0,r7    @ 08029258 3840
+    strb r0,[r5,#0x0]                        @ 0802925a 2870
+    ldr r4, LAB_080292a4                     @ 0802925c 114c
+    ldr r1, LAB_080292a8                     @ 0802925e 1249
+    movs r2,#0x8c    @ 08029260 8c22
+    lsls r2,r2,#0x1    @ 08029262 5200
+    adds r0,r4,#0x0    @ 08029264 201c
+    bl copy_bytes_by_halfword                @ 08029266 cbf01dfe
+    ldr r0, LAB_080292ac                     @ 0802926a 1048
+    movs r1,#0x0    @ 0802926c 0021
+    bl setup_sio_link_session                @ 0802926e c4f08ffd
+    subs r4,#0x46    @ 08029272 463c
+    ldrh r2,[r4,#0x0]                        @ 08029274 2288
+    lsls r1,r2,#0x12    @ 08029276 9104
+    lsrs r1,r1,#0x18    @ 08029278 090e
+    adds r1,#0x1    @ 0802927a 0131
+    movs r0,#0xff    @ 0802927c ff20
+    ands r1,r0    @ 0802927e 0140
+    lsls r1,r1,#0x6    @ 08029280 8901
+    ldr r0, WORD_080292b0                    @ 08029282 0b48
+    ands r0,r2    @ 08029284 1040
+    orrs r0,r1    @ 08029286 0843
+    strh r0,[r4,#0x0]                        @ 08029288 2080
+    movs r0,#0x41    @ 0802928a 4120
+    rsbs r0,r0,#0    @ 0802928c 4042
+    ldrb r1,[r5,#0x0]                        @ 0802928e 2978
+    ands r0,r1    @ 08029290 0840
+    bl SUB_0802b3e6                          @ 08029292 02f0a8f8
+    movs r0,r0    @ 08029296 0000
+LAB_08029298:
+    add r4,sp,#0xe8                          @ 08029298 3aac
+    lsrs r4,r3,#0x7    @ 0802929a dc09
+LAB_0802929c:
+    lsrs r7,r0,#0x20    @ 0802929c 0708
+    movs r0,r0    @ 0802929e 0000
+LAB_080292a0:
+    adds r3,#0x60    @ 080292a0 6033
+    lsls r2,r0,#0x8    @ 080292a2 0202
+LAB_080292a4:
+    lsls r0,r1,#0xa    @ 080292a4 8802
+    lsls r0,r0,#0xc    @ 080292a6 0003
+LAB_080292a8:
+    asrs r0,r7,#0x4    @ 080292a8 3811
+    lsls r0,r0,#0x8    @ 080292aa 0002
+LAB_080292ac:
+    .hword 0xeb00    @ 080292ac 00eb
+    lsls r1,r0,#0x8    @ 080292ae 0102
+WORD_080292b0:
+    .hword 0xc03f                         @ 080292b0 3fc0
+    .hword 0xffff    @ 080292b2 ffff
+campaign_scene_handler_080292b4:
+    bl tick_campaign_card_selector_oam       @ 080292b4 fff7defa
+    movs r2,#0x80    @ 080292b8 8022
+    lsls r2,r2,#0x13    @ 080292ba d204
+    ldrh r0,[r2,#0x0]                        @ 080292bc 1088
+    movs r3,#0xe8    @ 080292be e823
+    lsls r3,r3,#0x5    @ 080292c0 5b01
+    adds r1,r3,#0x0    @ 080292c2 191c
+    orrs r0,r1    @ 080292c4 0843
+    strh r0,[r2,#0x0]                        @ 080292c6 1080
+    movs r0,#0x8    @ 080292c8 0820
+    bl tick_blend_step_by_delta              @ 080292ca ccf0f5fa
+    cmp r0,#0x0                              @ 080292ce 0028
+    bne LAB_080292d6                         @ 080292d0 01d1
+    bl SUB_08029bb2                          @ 080292d2 00f06efc
+LAB_080292d6:
+    ldr r2, LAB_080292f8                     @ 080292d6 084a
+    ldr r4, LAB_080292fc                     @ 080292d8 084c
+    adds r2,r2,r4    @ 080292da 1219
+    ldrh r3,[r2,#0x0]                        @ 080292dc 1388
+    lsls r1,r3,#0x12    @ 080292de 9904
+    lsrs r1,r1,#0x18    @ 080292e0 090e
+    adds r1,#0x1    @ 080292e2 0131
+    movs r0,#0xff    @ 080292e4 ff20
+    ands r1,r0    @ 080292e6 0140
+    lsls r1,r1,#0x6    @ 080292e8 8901
+    ldr r0, WORD_08029300                    @ 080292ea 0548
+    ands r0,r3    @ 080292ec 1840
+    orrs r0,r1    @ 080292ee 0843
+    strh r0,[r2,#0x0]                        @ 080292f0 1080
+    bl SUB_08029bb2                          @ 080292f2 00f05efc
+    movs r0,r0    @ 080292f6 0000
+LAB_080292f8:
+    lsls r0,r0,#0x1    @ 080292f8 4000
+    lsls r0,r0,#0xc    @ 080292fa 0003
+LAB_080292fc:
+    lsls r2,r0,#0x8    @ 080292fc 0202
+    movs r0,r0    @ 080292fe 0000
+WORD_08029300:
+    .hword 0xc03f                         @ 08029300 3fc0
+    .hword 0xffff    @ 08029302 ffff
+campaign_scene_handler_08029304:
+    bl tick_campaign_card_selector_oam       @ 08029304 fff7b6fa
+    ldr r3, LAB_08029338                     @ 08029308 0b4b
+    movs r5,#0xa4    @ 0802930a a425
+    lsls r5,r5,#0x1    @ 0802930c 6d00
+    adds r1,r3,r5    @ 0802930e 5919
+    movs r0,#0x2    @ 08029310 0220
+    ldrh r1,[r1,#0x0]                        @ 08029312 0988
+    ands r0,r1    @ 08029314 0840
+    lsls r0,r0,#0x10    @ 08029316 0004
+    lsrs r1,r0,#0x10    @ 08029318 010c
+    cmp r1,#0x0                              @ 0802931a 0029
+    beq LAB_08029344                         @ 0802931c 12d0
+    ldr r6, LAB_0802933c                     @ 0802931e 074e
+    adds r0,r3,r6    @ 08029320 9819
+    ldr r1, WORD_08029340                    @ 08029322 0749
+    ldrh r7,[r0,#0x0]                        @ 08029324 0788
+    ands r1,r7    @ 08029326 3940
+    movs r3,#0xc8    @ 08029328 c823
+    lsls r3,r3,#0x6    @ 0802932a 9b01
+    adds r2,r3,#0x0    @ 0802932c 1a1c
+    orrs r1,r2    @ 0802932e 1143
+    strh r1,[r0,#0x0]                        @ 08029330 0180
+    bl SUB_08029bb2                          @ 08029332 00f03efc
+    movs r0,r0    @ 08029336 0000
+LAB_08029338:
+    lsls r0,r0,#0x1    @ 08029338 4000
+    lsls r0,r0,#0xc    @ 0802933a 0003
+LAB_0802933c:
+    lsls r2,r0,#0x8    @ 0802933c 0202
+    movs r0,r0    @ 0802933e 0000
+WORD_08029340:
+    .hword 0xc03f                         @ 08029340 3fc0
+    .hword 0xffff    @ 08029342 ffff
+LAB_08029344:
+    ldr r0, LAB_08029380                     @ 08029344 0e48
+    ldr r4, LAB_08029384                     @ 08029346 0f4c
+    adds r0,r0,r4    @ 08029348 0019
+    strh r1,[r0,#0x0]                        @ 0802934a 0180
+    ldr r1, LAB_08029388                     @ 0802934c 0e49
+    ldr r5, LAB_0802938c                     @ 0802934e 0f4d
+    adds r1,r1,r5    @ 08029350 4919
+    movs r0,#0xf    @ 08029352 0f20
+    ldrh r1,[r1,#0x0]                        @ 08029354 0988
+    ands r0,r1    @ 08029356 0840
+    cmp r0,#0x3                              @ 08029358 0328
+    beq LAB_08029360                         @ 0802935a 01d0
+    bl SUB_08029bb2                          @ 0802935c 00f029fc
+LAB_08029360:
+    ldr r6, LAB_08029390                     @ 08029360 0b4e
+    adds r3,r3,r6    @ 08029362 9b19
+    ldrh r2,[r3,#0x0]                        @ 08029364 1a88
+    lsls r1,r2,#0x12    @ 08029366 9104
+    lsrs r1,r1,#0x18    @ 08029368 090e
+    adds r1,#0x1    @ 0802936a 0131
+    movs r0,#0xff    @ 0802936c ff20
+    ands r1,r0    @ 0802936e 0140
+    lsls r1,r1,#0x6    @ 08029370 8901
+    ldr r0, WORD_08029394                    @ 08029372 0848
+    ands r0,r2    @ 08029374 1040
+    orrs r0,r1    @ 08029376 0843
+    strh r0,[r3,#0x0]                        @ 08029378 1880
+    bl SUB_08029bb2                          @ 0802937a 00f01afc
+    movs r0,r0    @ 0802937e 0000
+LAB_08029380:
+    .hword 0xeb00    @ 08029380 00eb
+    lsls r1,r0,#0x8    @ 08029382 0102
+LAB_08029384:
+    lsls r2,r0,#0x16    @ 08029384 8205
+    movs r0,r0    @ 08029386 0000
+LAB_08029388:
+    lsls r0,r4,#0xe    @ 08029388 a003
+    lsls r0,r0,#0xc    @ 0802938a 0003
+LAB_0802938c:
+    lsls r4,r6,#0x10    @ 0802938c 3404
+    movs r0,r0    @ 0802938e 0000
+LAB_08029390:
+    lsls r2,r0,#0x8    @ 08029390 0202
+    movs r0,r0    @ 08029392 0000
+WORD_08029394:
+    .hword 0xc03f                         @ 08029394 3fc0
+    .hword 0xffff    @ 08029396 ffff
+campaign_scene_handler_08029398:
+    bl tick_campaign_card_selector_oam       @ 08029398 fff76cfa
+    ldr r0, LAB_080293c0                     @ 0802939c 0848
+    ldrh r1,[r0,#0x0]                        @ 0802939e 0188
+    movs r0,#0x30    @ 080293a0 3020
+    ands r0,r1    @ 080293a2 0840
+    cmp r0,#0x10                             @ 080293a4 1028
+    bls LAB_080293d0                         @ 080293a6 13d9
+    ldr r0, LAB_080293c4                     @ 080293a8 0648
+    ldr r7, LAB_080293c8                     @ 080293aa 074f
+    adds r0,r0,r7    @ 080293ac c019
+    ldr r1, WORD_080293cc                    @ 080293ae 0749
+    ldrh r2,[r0,#0x0]                        @ 080293b0 0288
+    ands r1,r2    @ 080293b2 1140
+    movs r3,#0xfa    @ 080293b4 fa23
+    lsls r3,r3,#0x6    @ 080293b6 9b01
+    adds r2,r3,#0x0    @ 080293b8 1a1c
+    bl SUB_0802ae26                          @ 080293ba 01f034fd
+    movs r0,r0    @ 080293be 0000
+LAB_080293c0:
+    lsls r0,r5,#0x4    @ 080293c0 2801
+    lsls r0,r0,#0x10    @ 080293c2 0004
+LAB_080293c4:
+    lsls r0,r0,#0x1    @ 080293c4 4000
+    lsls r0,r0,#0xc    @ 080293c6 0003
+LAB_080293c8:
+    lsls r2,r0,#0x8    @ 080293c8 0202
+    movs r0,r0    @ 080293ca 0000
+WORD_080293cc:
+    .hword 0xc03f                         @ 080293cc 3fc0
+    .hword 0xffff    @ 080293ce ffff
+LAB_080293d0:
+    ldr r0, LAB_08029494                     @ 080293d0 3048
+    movs r1,#0x10    @ 080293d2 1021
+    bl zero_fill_by_halfword                 @ 080293d4 cbf04efd
+    bl zero_duel_scene_display_buffers       @ 080293d8 a3f030fa
+    ldr r2, LAB_08029498                     @ 080293dc 2e4a
+    movs r4,#0x88    @ 080293de 8824
+    lsls r4,r4,#0x2    @ 080293e0 a400
+    adds r2,r2,r4    @ 080293e2 1219
+    ldr r0,[r2,#0x0]                         @ 080293e4 1068
+    ldr r1, LAB_0802949c                     @ 080293e6 2d49
+    ands r0,r1    @ 080293e8 0840
+    movs r1,#0x80    @ 080293ea 8021
+    lsls r1,r1,#0x3    @ 080293ec c900
+    orrs r0,r1    @ 080293ee 0843
+    str r0,[r2,#0x0]                         @ 080293f0 1060
+    ldr r5, LAB_080294a0                     @ 080293f2 2b4d
+    movs r6,#0x8f    @ 080293f4 8f26
+    lsls r6,r6,#0x2    @ 080293f6 b600
+    adds r1,r5,r6    @ 080293f8 a919
+    movs r2,#0x0    @ 080293fa 0022
+    movs r4,#0x0    @ 080293fc 0024
+    ldr r0, LAB_080294a4                     @ 080293fe 2948
+    strh r0,[r1,#0x0]                        @ 08029400 0880
+    ldr r7, LAB_080294a8                     @ 08029402 294f
+    adds r0,r5,r7    @ 08029404 e819
+    strb r2,[r0,#0x0]                        @ 08029406 0270
+    bl check_siocnt_link_ready               @ 08029408 f5f7c6ff
+    ldr r2, LAB_080294ac                     @ 0802940c 274a
+    str r0,[r2,#0x4]                         @ 0802940e 5060
+    lsls r0,r0,#0x2    @ 08029410 8000
+    adds r3,r2,#0x0    @ 08029412 131c
+    adds r3,#0x8    @ 08029414 0833
+    adds r0,r0,r3    @ 08029416 c018
+    str r4,[r0,#0x0]                         @ 08029418 0460
+    ldr r0,[r2,#0x4]                         @ 0802941a 5068
+    movs r1,#0x1    @ 0802941c 0121
+    eors r0,r1    @ 0802941e 4840
+    lsls r0,r0,#0x2    @ 08029420 8000
+    adds r0,r0,r3    @ 08029422 c018
+    movs r1,#0x2    @ 08029424 0221
+    str r1,[r0,#0x0]                         @ 08029426 0160
+    ldr r0,[r2,#0x4]                         @ 08029428 5068
+    movs r2,#0x92    @ 0802942a 9222
+    lsls r2,r2,#0x2    @ 0802942c 9200
+    adds r1,r5,r2    @ 0802942e a918
+    bl fill_card_fs_display_entries          @ 08029430 f5f70efa
+    bl check_siocnt_link_ready               @ 08029434 f5f7b0ff
+    cmp r0,#0x0                              @ 08029438 0028
+    beq LAB_0802945c                         @ 0802943a 0fd0
+    ldr r3, DWORD_080294b0                   @ 0802943c 1c4b
+    adds r1,r5,r3    @ 0802943e e918
+    movs r0,#0x3f    @ 08029440 3f20
+    ldrb r4,[r1,#0x0]                        @ 08029442 0c78
+    ands r0,r4    @ 08029444 2040
+    strb r0,[r1,#0x0]                        @ 08029446 0870
+    subs r6,#0x38    @ 08029448 383e
+    adds r1,r5,r6    @ 0802944a a919
+    movs r0,#0x40    @ 0802944c 4020
+    rsbs r0,r0,#0    @ 0802944e 4042
+    ldrb r7,[r1,#0x0]                        @ 08029450 0f78
+    ands r0,r7    @ 08029452 3840
+    strb r0,[r1,#0x0]                        @ 08029454 0870
+    movs r0,#0x0    @ 08029456 0020
+    bl build_campaign_sprite_row_by_type     @ 08029458 fef71efc
+LAB_0802945c:
+    ldr r0, DWORD_080294b4                   @ 0802945c 1548
+    adds r4,r5,r0    @ 0802945e 2c18
+    ldrh r2,[r4,#0x0]                        @ 08029460 2288
+    lsls r1,r2,#0x12    @ 08029462 9104
+    lsrs r1,r1,#0x18    @ 08029464 090e
+    adds r1,#0x1    @ 08029466 0131
+    movs r0,#0xff    @ 08029468 ff20
+    ands r1,r0    @ 0802946a 0140
+    lsls r1,r1,#0x6    @ 0802946c 8901
+    ldr r5, DWORD_080294b8                   @ 0802946e 124d
+    adds r0,r5,#0x0    @ 08029470 281c
+    ands r0,r2    @ 08029472 1040
+    orrs r0,r1    @ 08029474 0843
+    strh r0,[r4,#0x0]                        @ 08029476 2080
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029478 fef7eafc
+    cmp r0,#0x0                              @ 0802947c 0028
+    beq LAB_08029482                         @ 0802947e 00d0
+    b SUB_08029bb2                           @ 08029480 97e3
+LAB_08029482:
+    adds r0,r5,#0x0    @ 08029482 281c
+    ldrh r1,[r4,#0x0]                        @ 08029484 2188
+    ands r0,r1    @ 08029486 0840
+    movs r2,#0xfa    @ 08029488 fa22
+    lsls r2,r2,#0x6    @ 0802948a 9201
+    adds r1,r2,#0x0    @ 0802948c 111c
+    orrs r0,r1    @ 0802948e 0843
+    bl SUB_0802a724                          @ 08029490 01f048f9
+LAB_08029494:
+    ldr r6,[sp,#0x240]                       @ 08029494 909e
+    lsls r2,r0,#0x8    @ 08029496 0202
+LAB_08029498:
+    adds r1,#0x30    @ 08029498 3031
+    lsls r2,r0,#0x8    @ 0802949a 0202
+LAB_0802949c:
+    lsls r7,r7,#0xf    @ 0802949c ff03
+    .hword 0xfffc    @ 0802949e fcff
+LAB_080294a0:
+    lsls r0,r0,#0x1    @ 080294a0 4000
+    lsls r0,r0,#0xc    @ 080294a2 0003
+LAB_080294a4:
+    movs r3,#0x28    @ 080294a4 2823
+    movs r0,r0    @ 080294a6 0000
+LAB_080294a8:
+    lsls r6,r7,#0x8    @ 080294a8 3e02
+    movs r0,r0    @ 080294aa 0000
+LAB_080294ac:
+    b LAB_080299f0                           @ 080294ac a0e2
+    .byte  0x01, 0x02
+DWORD_080294b0:
+    .word  0x00000203                     @ 080294b0 03020000
+DWORD_080294b4:
+    .word  0x00000202                     @ 080294b4 02020000
+DWORD_080294b8:
+    .word  0xffffc03f                     @ 080294b8 3fc0ffff
+campaign_scene_handler_080294bc:
+    bl tick_campaign_card_selector_oam       @ 080294bc fff7daf9
+    bl tick_campaign_card_select_display_state__08027e50 @ 080294c0 fef7c6fc
+    cmp r0,#0x0                              @ 080294c4 0028
+    bne LAB_080294ec                         @ 080294c6 11d1
+    ldr r0, LAB_080294e0                     @ 080294c8 0548
+    ldr r3, LAB_080294e4                     @ 080294ca 064b
+    adds r0,r0,r3    @ 080294cc c018
+    ldr r1, WORD_080294e8                    @ 080294ce 0649
+    ldrh r4,[r0,#0x0]                        @ 080294d0 0488
+    ands r1,r4    @ 080294d2 2140
+    movs r5,#0xfa    @ 080294d4 fa25
+    lsls r5,r5,#0x6    @ 080294d6 ad01
+    adds r2,r5,#0x0    @ 080294d8 2a1c
+    bl SUB_0802ae26                          @ 080294da 01f0a4fc
+    movs r0,r0    @ 080294de 0000
+LAB_080294e0:
+    lsls r0,r0,#0x1    @ 080294e0 4000
+    lsls r0,r0,#0xc    @ 080294e2 0003
+LAB_080294e4:
+    lsls r2,r0,#0x8    @ 080294e4 0202
+    movs r0,r0    @ 080294e6 0000
+WORD_080294e8:
+    .hword 0xc03f                         @ 080294e8 3fc0
+    .hword 0xffff    @ 080294ea ffff
+LAB_080294ec:
+    ldr r1, DWORD_08029520                   @ 080294ec 0c49
+    ldr r6, DWORD_08029524                   @ 080294ee 0d4e
+    adds r3,r1,r6    @ 080294f0 8b19
+    ldrh r2,[r3,#0x0]                        @ 080294f2 1a88
+    lsls r0,r2,#0x12    @ 080294f4 9004
+    lsrs r0,r0,#0x18    @ 080294f6 000e
+    cmp r0,#0x31                             @ 080294f8 3128
+    bls LAB_080294fe                         @ 080294fa 00d9
+    b SUB_08029bb2                           @ 080294fc 59e3
+LAB_080294fe:
+    movs r7,#0xa4    @ 080294fe a427
+    lsls r7,r7,#0x1    @ 08029500 7f00
+    adds r1,r1,r7    @ 08029502 c919
+    movs r0,#0x2    @ 08029504 0220
+    ldrh r1,[r1,#0x0]                        @ 08029506 0988
+    ands r0,r1    @ 08029508 0840
+    cmp r0,#0x0                              @ 0802950a 0028
+    bne LAB_08029510                         @ 0802950c 00d1
+    b SUB_08029bb2                           @ 0802950e 50e3
+LAB_08029510:
+    ldr r0, DWORD_08029528                   @ 08029510 0548
+    ands r0,r2    @ 08029512 1040
+    movs r2,#0xc8    @ 08029514 c822
+    lsls r2,r2,#0x6    @ 08029516 9201
+    adds r1,r2,#0x0    @ 08029518 111c
+    orrs r0,r1    @ 0802951a 0843
+    strh r0,[r3,#0x0]                        @ 0802951c 1880
+    b SUB_08029bb2                           @ 0802951e 48e3
+DWORD_08029520:
+    .word  0x03000040                     @ 08029520 40000003
+DWORD_08029524:
+    .word  0x00000202                     @ 08029524 02020000
+DWORD_08029528:
+    .word  0xffffc03f                     @ 08029528 3fc0ffff
+campaign_scene_handler_0802952c:
+    bl tick_campaign_card_selector_oam       @ 0802952c fff7a2f9
+    movs r0,#0x1    @ 08029530 0120
+    bl build_campaign_sprite_row_by_type     @ 08029532 fef7b1fb
+    ldr r0, LAB_08029570                     @ 08029536 0e48
+    ldr r3, LAB_08029574                     @ 08029538 0e4b
+    adds r4,r0,r3    @ 0802953a c418
+    ldrh r2,[r4,#0x0]                        @ 0802953c 2288
+    lsls r1,r2,#0x12    @ 0802953e 9104
+    lsrs r1,r1,#0x18    @ 08029540 090e
+    adds r1,#0x1    @ 08029542 0131
+    movs r0,#0xff    @ 08029544 ff20
+    ands r1,r0    @ 08029546 0140
+    lsls r1,r1,#0x6    @ 08029548 8901
+    ldr r5, WORD_08029578                    @ 0802954a 0b4d
+    adds r0,r5,#0x0    @ 0802954c 281c
+    ands r0,r2    @ 0802954e 1040
+    orrs r0,r1    @ 08029550 0843
+    strh r0,[r4,#0x0]                        @ 08029552 2080
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029554 fef77cfc
+    cmp r0,#0x0                              @ 08029558 0028
+    beq LAB_0802955e                         @ 0802955a 00d0
+    b SUB_08029bb2                           @ 0802955c 29e3
+LAB_0802955e:
+    adds r0,r5,#0x0    @ 0802955e 281c
+    ldrh r5,[r4,#0x0]                        @ 08029560 2588
+    ands r0,r5    @ 08029562 2840
+    movs r6,#0xfa    @ 08029564 fa26
+    lsls r6,r6,#0x6    @ 08029566 b601
+    adds r1,r6,#0x0    @ 08029568 311c
+    orrs r0,r1    @ 0802956a 0843
+    bl SUB_0802a724                          @ 0802956c 01f0daf8
+LAB_08029570:
+    lsls r0,r0,#0x1    @ 08029570 4000
+    lsls r0,r0,#0xc    @ 08029572 0003
+LAB_08029574:
+    lsls r2,r0,#0x8    @ 08029574 0202
+    movs r0,r0    @ 08029576 0000
+WORD_08029578:
+    .hword 0xc03f                         @ 08029578 3fc0
+    .hword 0xffff    @ 0802957a ffff
+campaign_scene_handler_0802957c:
+    bl tick_campaign_card_selector_oam       @ 0802957c fff77af9
+    movs r0,#0x4    @ 08029580 0420
+    bl build_campaign_sprite_row_by_type     @ 08029582 fef789fb
+    ldr r0, LAB_080295c0                     @ 08029586 0e48
+    ldr r7, LAB_080295c4                     @ 08029588 0e4f
+    adds r4,r0,r7    @ 0802958a c419
+    ldrh r2,[r4,#0x0]                        @ 0802958c 2288
+    lsls r1,r2,#0x12    @ 0802958e 9104
+    lsrs r1,r1,#0x18    @ 08029590 090e
+    adds r1,#0x1    @ 08029592 0131
+    movs r0,#0xff    @ 08029594 ff20
+    ands r1,r0    @ 08029596 0140
+    lsls r1,r1,#0x6    @ 08029598 8901
+    ldr r5, WORD_080295c8                    @ 0802959a 0b4d
+    adds r0,r5,#0x0    @ 0802959c 281c
+    ands r0,r2    @ 0802959e 1040
+    orrs r0,r1    @ 080295a0 0843
+    strh r0,[r4,#0x0]                        @ 080295a2 2080
+    bl tick_campaign_card_select_display_state__08027e50 @ 080295a4 fef754fc
+    cmp r0,#0x0                              @ 080295a8 0028
+    beq LAB_080295ae                         @ 080295aa 00d0
+    b SUB_08029bb2                           @ 080295ac 01e3
+LAB_080295ae:
+    adds r0,r5,#0x0    @ 080295ae 281c
+    ldrh r1,[r4,#0x0]                        @ 080295b0 2188
+    ands r0,r1    @ 080295b2 0840
+    movs r2,#0xfa    @ 080295b4 fa22
+    lsls r2,r2,#0x6    @ 080295b6 9201
+    adds r1,r2,#0x0    @ 080295b8 111c
+    orrs r0,r1    @ 080295ba 0843
+    bl SUB_0802a724                          @ 080295bc 01f0b2f8
+LAB_080295c0:
+    lsls r0,r0,#0x1    @ 080295c0 4000
+    lsls r0,r0,#0xc    @ 080295c2 0003
+LAB_080295c4:
+    lsls r2,r0,#0x8    @ 080295c4 0202
+    movs r0,r0    @ 080295c6 0000
+WORD_080295c8:
+    .hword 0xc03f                         @ 080295c8 3fc0
+    .hword 0xffff    @ 080295ca ffff
+campaign_scene_handler_080295cc:
+    movs r0,#0x8    @ 080295cc 0820
+    bl start_blend_fadein_with_target        @ 080295ce ccf037f9
+    cmp r0,#0x0                              @ 080295d2 0028
+    bne LAB_080295f0                         @ 080295d4 0cd1
+    bl tick_campaign_card_selector_oam       @ 080295d6 fff74df9
+    ldr r1, LAB_080295ec                     @ 080295da 0449
+    adds r1,#0x36    @ 080295dc 3631
+    movs r0,#0x2    @ 080295de 0220
+    rsbs r0,r0,#0    @ 080295e0 4042
+    ldrb r3,[r1,#0x0]                        @ 080295e2 0b78
+    ands r0,r3    @ 080295e4 1840
+    bl SUB_0802aade                          @ 080295e6 01f07afa
+    movs r0,r0    @ 080295ea 0000
+LAB_080295ec:
+    adds r3,#0x60    @ 080295ec 6033
+    lsls r2,r0,#0x8    @ 080295ee 0202
+LAB_080295f0:
+    bl init_pack_scene_vram_regs             @ 080295f0 fff750f8
+    movs r0,#0x1    @ 080295f4 0120
+    bl load_pack_tiles_with_palette_init     @ 080295f6 fff799f8
+    ldr r0, DWORD_08029624                   @ 080295fa 0a48
+    ldr r4, DWORD_08029628                   @ 080295fc 0a4c
+    adds r0,r0,r4    @ 080295fe 0019
+    movs r1,#0x7    @ 08029600 0721
+    ldrb r0,[r0,#0x0]                        @ 08029602 0078
+    ands r1,r0    @ 08029604 0140
+    cmp r1,#0x1                              @ 08029606 0129
+    beq LAB_0802964c                         @ 08029608 20d0
+    cmp r1,#0x2                              @ 0802960a 0229
+    beq LAB_08029644                         @ 0802960c 1ad0
+    cmp r1,#0x3                              @ 0802960e 0329
+    beq LAB_0802963c                         @ 08029610 14d0
+    cmp r1,#0x4                              @ 08029612 0429
+    beq LAB_08029634                         @ 08029614 0ed0
+    ldr r0, DWORD_0802962c                   @ 08029616 0548
+    cmp r1,#0x5                              @ 08029618 0529
+    bne LAB_0802964e                         @ 0802961a 18d1
+    ldr r5, DWORD_08029630                   @ 0802961c 044d
+    adds r0,r0,r5    @ 0802961e 4019
+    b LAB_0802964e                           @ 08029620 15e0
+    .zero  0x2
+DWORD_08029624:
+    .word  0x02000000                     @ 08029624 00000002
+DWORD_08029628:
+    .word  0x00006c2c                     @ 08029628 2c6c0000
+DWORD_0802962c:
+    .word  0x09dbff1a                     @ 0802962c 1affdb09
+DWORD_08029630:
+    .word  0x0003ab1a                     @ 08029630 1aab0300
+LAB_08029634:
+    ldr r0, DWORD_08029638                   @ 08029634 0048
+    b LAB_0802964e                           @ 08029636 0ae0
+DWORD_08029638:
+    .word  0x09deee6c                     @ 08029638 6ceede09
+LAB_0802963c:
+    ldr r0, DWORD_08029640                   @ 0802963c 0048
+    b LAB_0802964e                           @ 0802963e 06e0
+DWORD_08029640:
+    .word  0x09de29b8                     @ 08029640 b829de09
+LAB_08029644:
+    ldr r0, DWORD_08029648                   @ 08029644 0048
+    b LAB_0802964e                           @ 08029646 02e0
+DWORD_08029648:
+    .word  0x09dd6640                     @ 08029648 4066dd09
+LAB_0802964c:
+    ldr r0, DWORD_0802968c                   @ 0802964c 0f48
+LAB_0802964e:
+    str r0,[sp,#0x0]                         @ 0802964e 0090
+    movs r0,#0x0    @ 08029650 0020
+    movs r1,#0x82    @ 08029652 8221
+    ldr r2, DWORD_08029690                   @ 08029654 0e4a
+    ldr r3, DWORD_08029694                   @ 08029656 0f4b
+    bl render_campaign_text_line_centered    @ 08029658 fef7defe
+    bl check_siocnt_link_ready               @ 0802965c f5f79cfe
+    cmp r0,#0x0                              @ 08029660 0028
+    beq LAB_080296c8                         @ 08029662 31d0
+    ldr r0, DWORD_08029698                   @ 08029664 0c48
+    ldr r6, DWORD_0802969c                   @ 08029666 0d4e
+    adds r0,r0,r6    @ 08029668 8019
+    movs r1,#0x7    @ 0802966a 0721
+    ldrb r0,[r0,#0x0]                        @ 0802966c 0078
+    ands r1,r0    @ 0802966e 0140
+    cmp r1,#0x1                              @ 08029670 0129
+    beq LAB_080296c0                         @ 08029672 25d0
+    cmp r1,#0x2                              @ 08029674 0229
+    beq LAB_080296b8                         @ 08029676 1fd0
+    cmp r1,#0x3                              @ 08029678 0329
+    beq LAB_080296b0                         @ 0802967a 19d0
+    cmp r1,#0x4                              @ 0802967c 0429
+    beq LAB_080296a8                         @ 0802967e 13d0
+    ldr r0, DWORD_080296a0                   @ 08029680 0748
+    cmp r1,#0x5                              @ 08029682 0529
+    bne LAB_0802971a                         @ 08029684 49d1
+    ldr r7, DWORD_080296a4                   @ 08029686 074f
+    adds r0,r0,r7    @ 08029688 c019
+    b LAB_0802971a                           @ 0802968a 46e0
+DWORD_0802968c:
+    .word  0x09dcad12                     @ 0802968c 12addc09
+DWORD_08029690:
+    .word  0x0000021e                     @ 08029690 1e020000
+DWORD_08029694:
+    .word  0x00000807                     @ 08029694 07080000
+DWORD_08029698:
+    .word  0x02000000                     @ 08029698 00000002
+DWORD_0802969c:
+    .word  0x00006c2c                     @ 0802969c 2c6c0000
+DWORD_080296a0:
+    .word  0x09dbfdea                     @ 080296a0 eafddb09
+DWORD_080296a4:
+    .word  0x0003ab22                     @ 080296a4 22ab0300
+LAB_080296a8:
+    ldr r0, DWORD_080296ac                   @ 080296a8 0048
+    b LAB_0802971a                           @ 080296aa 36e0
+DWORD_080296ac:
+    .word  0x09deed32                     @ 080296ac 32edde09
+LAB_080296b0:
+    ldr r0, DWORD_080296b4                   @ 080296b0 0048
+    b LAB_0802971a                           @ 080296b2 32e0
+DWORD_080296b4:
+    .word  0x09de2880                     @ 080296b4 8028de09
+LAB_080296b8:
+    ldr r0, DWORD_080296bc                   @ 080296b8 0048
+    b LAB_0802971a                           @ 080296ba 2ee0
+DWORD_080296bc:
+    .word  0x09dd64fe                     @ 080296bc fe64dd09
+LAB_080296c0:
+    ldr r0, DWORD_080296c4                   @ 080296c0 0048
+    b LAB_0802971a                           @ 080296c2 2ae0
+DWORD_080296c4:
+    .word  0x09dcac00                     @ 080296c4 00acdc09
+LAB_080296c8:
+    ldr r0, DWORD_080296f0                   @ 080296c8 0948
+    ldr r1, DWORD_080296f4                   @ 080296ca 0a49
+    adds r0,r0,r1    @ 080296cc 4018
+    movs r1,#0x7    @ 080296ce 0721
+    ldrb r0,[r0,#0x0]                        @ 080296d0 0078
+    ands r1,r0    @ 080296d2 0140
+    cmp r1,#0x1                              @ 080296d4 0129
+    beq LAB_08029718                         @ 080296d6 1fd0
+    cmp r1,#0x2                              @ 080296d8 0229
+    beq LAB_08029710                         @ 080296da 19d0
+    cmp r1,#0x3                              @ 080296dc 0329
+    beq LAB_08029708                         @ 080296de 13d0
+    cmp r1,#0x4                              @ 080296e0 0429
+    beq LAB_08029700                         @ 080296e2 0dd0
+    ldr r0, DWORD_080296f8                   @ 080296e4 0448
+    cmp r1,#0x5                              @ 080296e6 0529
+    bne LAB_0802971a                         @ 080296e8 17d1
+    ldr r2, DWORD_080296fc                   @ 080296ea 044a
+    adds r0,r0,r2    @ 080296ec 8018
+    b LAB_0802971a                           @ 080296ee 14e0
+DWORD_080296f0:
+    .word  0x02000000                     @ 080296f0 00000002
+DWORD_080296f4:
+    .word  0x00006c2c                     @ 080296f4 2c6c0000
+DWORD_080296f8:
+    .word  0x09dbfda6                     @ 080296f8 a6fddb09
+DWORD_080296fc:
+    .word  0x0003ab14                     @ 080296fc 14ab0300
+LAB_08029700:
+    ldr r0, DWORD_08029704                   @ 08029700 0048
+    b LAB_0802971a                           @ 08029702 0ae0
+DWORD_08029704:
+    .word  0x09deecd8                     @ 08029704 d8ecde09
+LAB_08029708:
+    ldr r0, DWORD_0802970c                   @ 08029708 0048
+    b LAB_0802971a                           @ 0802970a 06e0
+DWORD_0802970c:
+    .word  0x09de282c                     @ 0802970c 2c28de09
+LAB_08029710:
+    ldr r0, DWORD_08029714                   @ 08029710 0048
+    b LAB_0802971a                           @ 08029712 02e0
+DWORD_08029714:
+    .word  0x09dd64b2                     @ 08029714 b264dd09
+LAB_08029718:
+    ldr r0, DWORD_08029754                   @ 08029718 0e48
+LAB_0802971a:
+    ldr r2, DWORD_08029758                   @ 0802971a 0f4a
+    str r0,[sp,#0x0]                         @ 0802971c 0090
+    movs r0,#0x1    @ 0802971e 0120
+    str r0,[sp,#0x4]                         @ 08029720 0190
+    movs r0,#0x40    @ 08029722 4020
+    movs r1,#0xc2    @ 08029724 c221
+    movs r3,#0x8    @ 08029726 0823
+    bl render_campaign_text_line_with_align  @ 08029728 fef71eff
+    ldr r0, DWORD_0802975c                   @ 0802972c 0b48
+    ldr r3, DWORD_08029760                   @ 0802972e 0c4b
+    adds r0,r0,r3    @ 08029730 c018
+    movs r1,#0x7    @ 08029732 0721
+    ldrb r0,[r0,#0x0]                        @ 08029734 0078
+    ands r1,r0    @ 08029736 0140
+    cmp r1,#0x1                              @ 08029738 0129
+    beq LAB_08029784                         @ 0802973a 23d0
+    cmp r1,#0x2                              @ 0802973c 0229
+    beq LAB_0802977c                         @ 0802973e 1dd0
+    cmp r1,#0x3                              @ 08029740 0329
+    beq LAB_08029774                         @ 08029742 17d0
+    cmp r1,#0x4                              @ 08029744 0429
+    beq LAB_0802976c                         @ 08029746 11d0
+    ldr r0, DWORD_08029764                   @ 08029748 0648
+    cmp r1,#0x5                              @ 0802974a 0529
+    bne LAB_08029786                         @ 0802974c 1bd1
+    ldr r4, DWORD_08029768                   @ 0802974e 064c
+    adds r0,r0,r4    @ 08029750 0019
+    b LAB_08029786                           @ 08029752 18e0
+DWORD_08029754:
+    .word  0x09dcabba                     @ 08029754 baabdc09
+DWORD_08029758:
+    .word  0x0000021e                     @ 08029758 1e020000
+DWORD_0802975c:
+    .word  0x02000000                     @ 0802975c 00000002
+DWORD_08029760:
+    .word  0x00006c2c                     @ 08029760 2c6c0000
+DWORD_08029764:
+    .word  0x09dbfdb8                     @ 08029764 b8fddb09
+DWORD_08029768:
+    .word  0x0003ab0c                     @ 08029768 0cab0300
+LAB_0802976c:
+    ldr r0, DWORD_08029770                   @ 0802976c 0048
+    b LAB_08029786                           @ 0802976e 0ae0
+DWORD_08029770:
+    .word  0x09deecee                     @ 08029770 eeecde09
+LAB_08029774:
+    ldr r0, DWORD_08029778                   @ 08029774 0048
+    b LAB_08029786                           @ 08029776 06e0
+DWORD_08029778:
+    .word  0x09de2842                     @ 08029778 4228de09
+LAB_0802977c:
+    ldr r0, DWORD_08029780                   @ 0802977c 0048
+    b LAB_08029786                           @ 0802977e 02e0
+DWORD_08029780:
+    .word  0x09dd64c4                     @ 08029780 c464dd09
+LAB_08029784:
+    ldr r0, DWORD_080297c4                   @ 08029784 0f48
+LAB_08029786:
+    str r0,[sp,#0x0]                         @ 08029786 0090
+    movs r0,#0x1    @ 08029788 0120
+    str r0,[sp,#0x4]                         @ 0802978a 0190
+    movs r0,#0xa9    @ 0802978c a920
+    movs r1,#0xfe    @ 0802978e fe21
+    movs r2,#0x83    @ 08029790 8322
+    lsls r2,r2,#0x2    @ 08029792 9200
+    ldr r3, DWORD_080297c8                   @ 08029794 0c4b
+    bl render_campaign_text_line_with_align  @ 08029796 fef7e7fe
+    ldr r0, DWORD_080297cc                   @ 0802979a 0c48
+    ldr r5, DWORD_080297d0                   @ 0802979c 0c4d
+    adds r0,r0,r5    @ 0802979e 4019
+    movs r1,#0x7    @ 080297a0 0721
+    ldrb r0,[r0,#0x0]                        @ 080297a2 0078
+    ands r1,r0    @ 080297a4 0140
+    cmp r1,#0x1                              @ 080297a6 0129
+    beq LAB_080297f4                         @ 080297a8 24d0
+    cmp r1,#0x2                              @ 080297aa 0229
+    beq LAB_080297ec                         @ 080297ac 1ed0
+    cmp r1,#0x3                              @ 080297ae 0329
+    beq LAB_080297e4                         @ 080297b0 18d0
+    cmp r1,#0x4                              @ 080297b2 0429
+    beq LAB_080297dc                         @ 080297b4 12d0
+    ldr r0, DWORD_080297d4                   @ 080297b6 0748
+    cmp r1,#0x5                              @ 080297b8 0529
+    bne LAB_080297f6                         @ 080297ba 1cd1
+    ldr r6, DWORD_080297d8                   @ 080297bc 064e
+    adds r0,r0,r6    @ 080297be 8019
+    b LAB_080297f6                           @ 080297c0 19e0
+    .zero  0x2
+DWORD_080297c4:
+    .word  0x09dcabca                     @ 080297c4 caabdc09
+DWORD_080297c8:
+    .word  0x00000806                     @ 080297c8 06080000
+DWORD_080297cc:
+    .word  0x02000000                     @ 080297cc 00000002
+DWORD_080297d0:
+    .word  0x00006c2c                     @ 080297d0 2c6c0000
+DWORD_080297d4:
+    .word  0x09dbfdd4                     @ 080297d4 d4fddb09
+DWORD_080297d8:
+    .word  0x0003ab12                     @ 080297d8 12ab0300
+LAB_080297dc:
+    ldr r0, DWORD_080297e0                   @ 080297dc 0048
+    b LAB_080297f6                           @ 080297de 0ae0
+DWORD_080297e0:
+    .word  0x09deed10                     @ 080297e0 10edde09
+LAB_080297e4:
+    ldr r0, DWORD_080297e8                   @ 080297e4 0048
+    b LAB_080297f6                           @ 080297e6 06e0
+DWORD_080297e8:
+    .word  0x09de285e                     @ 080297e8 5e28de09
+LAB_080297ec:
+    ldr r0, DWORD_080297f0                   @ 080297ec 0048
+    b LAB_080297f6                           @ 080297ee 02e0
+DWORD_080297f0:
+    .word  0x09dd64dc                     @ 080297f0 dc64dd09
+LAB_080297f4:
+    ldr r0, DWORD_08029834                   @ 080297f4 0f48
+LAB_080297f6:
+    str r0,[sp,#0x0]                         @ 080297f6 0090
+    movs r0,#0x1    @ 080297f8 0120
+    str r0,[sp,#0x4]                         @ 080297fa 0190
+    ldr r0, DWORD_08029838                   @ 080297fc 0e48
+    movs r1,#0x8b    @ 080297fe 8b21
+    lsls r1,r1,#0x1    @ 08029800 4900
+    movs r2,#0x83    @ 08029802 8322
+    lsls r2,r2,#0x2    @ 08029804 9200
+    ldr r3, DWORD_0802983c                   @ 08029806 0d4b
+    bl render_campaign_text_line_with_align  @ 08029808 fef7aefe
+    ldr r0, DWORD_08029840                   @ 0802980c 0c48
+    ldr r7, DWORD_08029844                   @ 0802980e 0d4f
+    adds r0,r0,r7    @ 08029810 c019
+    movs r1,#0x7    @ 08029812 0721
+    ldrb r0,[r0,#0x0]                        @ 08029814 0078
+    ands r1,r0    @ 08029816 0140
+    cmp r1,#0x1                              @ 08029818 0129
+    beq LAB_08029868                         @ 0802981a 25d0
+    cmp r1,#0x2                              @ 0802981c 0229
+    beq LAB_08029860                         @ 0802981e 1fd0
+    cmp r1,#0x3                              @ 08029820 0329
+    beq LAB_08029858                         @ 08029822 19d0
+    cmp r1,#0x4                              @ 08029824 0429
+    beq LAB_08029850                         @ 08029826 13d0
+    ldr r0, DWORD_08029848                   @ 08029828 0748
+    cmp r1,#0x5                              @ 0802982a 0529
+    bne LAB_0802986a                         @ 0802982c 1dd1
+    ldr r1, DWORD_0802984c                   @ 0802982e 0749
+    adds r0,r0,r1    @ 08029830 4018
+    b LAB_0802986a                           @ 08029832 1ae0
+DWORD_08029834:
+    .word  0x09dcabe2                     @ 08029834 e2abdc09
+DWORD_08029838:
+    .word  0x00000169                     @ 08029838 69010000
+DWORD_0802983c:
+    .word  0x00000806                     @ 0802983c 06080000
+DWORD_08029840:
+    .word  0x02000000                     @ 08029840 00000002
+DWORD_08029844:
+    .word  0x00006c2c                     @ 08029844 2c6c0000
+DWORD_08029848:
+    .word  0x09dbfd32                     @ 08029848 32fddb09
+DWORD_0802984c:
+    .word  0x0003ab14                     @ 0802984c 14ab0300
+LAB_08029850:
+    ldr r0, DWORD_08029854                   @ 08029850 0048
+    b LAB_0802986a                           @ 08029852 0ae0
+DWORD_08029854:
+    .word  0x09deec6a                     @ 08029854 6aecde09
+LAB_08029858:
+    ldr r0, DWORD_0802985c                   @ 08029858 0048
+    b LAB_0802986a                           @ 0802985a 06e0
+DWORD_0802985c:
+    .word  0x09de27bc                     @ 0802985c bc27de09
+LAB_08029860:
+    ldr r0, DWORD_08029864                   @ 08029860 0048
+    b LAB_0802986a                           @ 08029862 02e0
+DWORD_08029864:
+    .word  0x09dd644a                     @ 08029864 4a64dd09
+LAB_08029868:
+    ldr r0, DWORD_080298dc                   @ 08029868 1c48
+LAB_0802986a:
+    str r0,[sp,#0x0]                         @ 0802986a 0090
+    movs r0,#0x1    @ 0802986c 0120
+    str r0,[sp,#0x4]                         @ 0802986e 0190
+    ldr r0, DWORD_080298e0                   @ 08029870 1b48
+    movs r1,#0x97    @ 08029872 9721
+    lsls r1,r1,#0x1    @ 08029874 4900
+    movs r2,#0x83    @ 08029876 8322
+    lsls r2,r2,#0x2    @ 08029878 9200
+    movs r3,#0x7    @ 0802987a 0723
+    bl render_campaign_text_line_with_align  @ 0802987c fef774fe
+    movs r6,#0x0    @ 08029880 0026
+    .hword 0x466a    @ 08029882 6a46
+    adds r2,#0x28    @ 08029884 2832
+    str r2,[sp,#0x48]                        @ 08029886 1292
+    .hword 0x466b    @ 08029888 6b46
+    adds r3,#0x2a    @ 0802988a 2a33
+    str r3,[sp,#0x4c]                        @ 0802988c 1393
+    ldr r4, DWORD_080298e4                   @ 0802988e 154c
+    .hword 0x46a0    @ 08029890 a046
+    ldr r5, DWORD_080298e8                   @ 08029892 154d
+    .hword 0x46aa    @ 08029894 aa46
+LAB_08029896:
+    movs r2,#0xf    @ 08029896 0f22
+    cmp r6,#0x0                              @ 08029898 002e
+    bne LAB_0802989e                         @ 0802989a 00d1
+    movs r2,#0x7    @ 0802989c 0722
+LAB_0802989e:
+    lsls r3,r6,#0x6    @ 0802989e b301
+    movs r7,#0x80    @ 080298a0 8027
+    lsls r7,r7,#0x1    @ 080298a2 7f00
+    adds r0,r3,r7    @ 080298a4 d819
+    lsls r0,r0,#0x10    @ 080298a6 0004
+    lsrs r0,r0,#0x10    @ 080298a8 000c
+    .hword 0x4684    @ 080298aa 8446
+    movs r1,#0x83    @ 080298ac 8321
+    lsls r1,r1,#0x2    @ 080298ae 8900
+    lsls r0,r2,#0x10    @ 080298b0 1004
+    lsrs r2,r0,#0x10    @ 080298b2 020c
+    movs r4,#0x7    @ 080298b4 0724
+    .hword 0x4645    @ 080298b6 4546
+    ldrb r5,[r5,#0x0]                        @ 080298b8 2d78
+    ands r4,r5    @ 080298ba 2c40
+    .hword 0x4699    @ 080298bc 9946
+    adds r7,r0,#0x0    @ 080298be 071c
+    cmp r4,#0x1                              @ 080298c0 012c
+    beq LAB_0802990c                         @ 080298c2 23d0
+    cmp r4,#0x2                              @ 080298c4 022c
+    beq LAB_08029904                         @ 080298c6 1dd0
+    cmp r4,#0x3                              @ 080298c8 032c
+    beq LAB_080298fc                         @ 080298ca 17d0
+    cmp r4,#0x4                              @ 080298cc 042c
+    beq LAB_080298f4                         @ 080298ce 11d0
+    ldr r3, DWORD_080298ec                   @ 080298d0 064b
+    cmp r4,#0x5                              @ 080298d2 052c
+    bne LAB_0802990e                         @ 080298d4 1bd1
+    ldr r0, DWORD_080298f0                   @ 080298d6 0648
+    adds r3,r3,r0    @ 080298d8 1b18
+    b LAB_0802990e                           @ 080298da 18e0
+DWORD_080298dc:
+    .word  0x09dcab5e                     @ 080298dc 5eabdc09
+DWORD_080298e0:
+    .word  0x00000229                     @ 080298e0 29020000
+DWORD_080298e4:
+    .word  0x02006c2c                     @ 080298e4 2c6c0002
+DWORD_080298e8:
+    .word  0x02023360                     @ 080298e8 60330202
+DWORD_080298ec:
+    .word  0x09dbfdc2                     @ 080298ec c2fddb09
+DWORD_080298f0:
+    .word  0x0003ab0e                     @ 080298f0 0eab0300
+LAB_080298f4:
+    ldr r3, DWORD_080298f8                   @ 080298f4 004b
+    b LAB_0802990e                           @ 080298f6 0ae0
+DWORD_080298f8:
+    .word  0x09deecfe                     @ 080298f8 feecde09
+LAB_080298fc:
+    ldr r3, DWORD_08029900                   @ 080298fc 004b
+    b LAB_0802990e                           @ 080298fe 06e0
+DWORD_08029900:
+    .word  0x09de2850                     @ 08029900 5028de09
+LAB_08029904:
+    ldr r3, DWORD_08029908                   @ 08029904 004b
+    b LAB_0802990e                           @ 08029906 02e0
+DWORD_08029908:
+    .word  0x09dd64ce                     @ 08029908 ce64dd09
+LAB_0802990c:
+    ldr r3, DWORD_08029954                   @ 0802990c 114b
+LAB_0802990e:
+    .hword 0x4644    @ 0802990e 4446
+    ldrb r4,[r4,#0x0]                        @ 08029910 2478
+    lsls r0,r4,#0x1d    @ 08029912 6007
+    lsrs r0,r0,#0x1d    @ 08029914 400f
+    str r0,[sp,#0x0]                         @ 08029916 0090
+    .hword 0x4660    @ 08029918 6046
+    bl draw_decimal_with_offset              @ 0802991a f9f7afff
+    movs r0,#0x86    @ 0802991e 8620
+    lsls r0,r0,#0x1    @ 08029920 4000
+    add r0,r9                                @ 08029922 4844
+    lsls r0,r0,#0x10    @ 08029924 0004
+    lsrs r0,r0,#0x10    @ 08029926 000c
+    .hword 0x4684    @ 08029928 8446
+    movs r1,#0x83    @ 0802992a 8321
+    lsls r1,r1,#0x2    @ 0802992c 8900
+    lsrs r2,r7,#0x10    @ 0802992e 3a0c
+    movs r0,#0x7    @ 08029930 0720
+    .hword 0x4645    @ 08029932 4546
+    ldrb r5,[r5,#0x0]                        @ 08029934 2d78
+    ands r0,r5    @ 08029936 2840
+    cmp r0,#0x1                              @ 08029938 0128
+    beq LAB_08029978                         @ 0802993a 1dd0
+    cmp r0,#0x2                              @ 0802993c 0228
+    beq LAB_08029970                         @ 0802993e 17d0
+    cmp r0,#0x3                              @ 08029940 0328
+    beq LAB_08029968                         @ 08029942 11d0
+    cmp r0,#0x4                              @ 08029944 0428
+    beq LAB_08029960                         @ 08029946 0bd0
+    ldr r3, DWORD_08029958                   @ 08029948 034b
+    cmp r0,#0x5                              @ 0802994a 0528
+    bne LAB_0802997a                         @ 0802994c 15d1
+    ldr r0, DWORD_0802995c                   @ 0802994e 0348
+    adds r3,r3,r0    @ 08029950 1b18
+    b LAB_0802997a                           @ 08029952 12e0
+DWORD_08029954:
+    .word  0x09dcabd4                     @ 08029954 d4abdc09
+DWORD_08029958:
+    .word  0x09dbfdcc                     @ 08029958 ccfddb09
+DWORD_0802995c:
+    .word  0x0003ab10                     @ 0802995c 10ab0300
+LAB_08029960:
+    ldr r3, DWORD_08029964                   @ 08029960 004b
+    b LAB_0802997a                           @ 08029962 0ae0
+DWORD_08029964:
+    .word  0x09deed06                     @ 08029964 06edde09
+LAB_08029968:
+    ldr r3, DWORD_0802996c                   @ 08029968 004b
+    b LAB_0802997a                           @ 0802996a 06e0
+DWORD_0802996c:
+    .word  0x09de2858                     @ 0802996c 5828de09
+LAB_08029970:
+    ldr r3, DWORD_08029974                   @ 08029970 004b
+    b LAB_0802997a                           @ 08029972 02e0
+DWORD_08029974:
+    .word  0x09dd64d6                     @ 08029974 d664dd09
+LAB_08029978:
+    ldr r3, DWORD_080299b0                   @ 08029978 0d4b
+LAB_0802997a:
+    .hword 0x4644    @ 0802997a 4446
+    ldrb r4,[r4,#0x0]                        @ 0802997c 2478
+    lsls r0,r4,#0x1d    @ 0802997e 6007
+    lsrs r0,r0,#0x1d    @ 08029980 400f
+    str r0,[sp,#0x0]                         @ 08029982 0090
+    .hword 0x4660    @ 08029984 6046
+    bl draw_decimal_with_offset              @ 08029986 f9f779ff
+    ldr r0,[sp,#0x48]                        @ 0802998a 1298
+    movs r2,#0x7    @ 0802998c 0722
+    .hword 0x4645    @ 0802998e 4546
+    ldrb r5,[r5,#0x0]                        @ 08029990 2d78
+    ands r2,r5    @ 08029992 2a40
+    cmp r2,#0x1                              @ 08029994 012a
+    beq LAB_080299d4                         @ 08029996 1dd0
+    cmp r2,#0x2                              @ 08029998 022a
+    beq LAB_080299cc                         @ 0802999a 17d0
+    cmp r2,#0x3                              @ 0802999c 032a
+    beq LAB_080299c4                         @ 0802999e 11d0
+    cmp r2,#0x4                              @ 080299a0 042a
+    beq LAB_080299bc                         @ 080299a2 0bd0
+    ldr r1, DWORD_080299b4                   @ 080299a4 0349
+    cmp r2,#0x5                              @ 080299a6 052a
+    bne LAB_080299d6                         @ 080299a8 15d1
+    ldr r2, DWORD_080299b8                   @ 080299aa 034a
+    adds r1,r1,r2    @ 080299ac 8918
+    b LAB_080299d6                           @ 080299ae 12e0
+DWORD_080299b0:
+    .word  0x09dcabdc                     @ 080299b0 dcabdc09
+DWORD_080299b4:
+    .word  0x09dbfde4                     @ 080299b4 e4fddb09
+DWORD_080299b8:
+    .word  0x0003ab1c                     @ 080299b8 1cab0300
+LAB_080299bc:
+    ldr r1, DWORD_080299c0                   @ 080299bc 0049
+    b LAB_080299d6                           @ 080299be 0ae0
+DWORD_080299c0:
+    .word  0x09deed28                     @ 080299c0 28edde09
+LAB_080299c4:
+    ldr r1, DWORD_080299c8                   @ 080299c4 0049
+    b LAB_080299d6                           @ 080299c6 06e0
+DWORD_080299c8:
+    .word  0x09de2874                     @ 080299c8 7428de09
+LAB_080299cc:
+    ldr r1, DWORD_080299d0                   @ 080299cc 0049
+    b LAB_080299d6                           @ 080299ce 02e0
+DWORD_080299d0:
+    .word  0x09dd64f2                     @ 080299d0 f264dd09
+LAB_080299d4:
+    ldr r1, DWORD_08029a18                   @ 080299d4 1049
+LAB_080299d6:
+    bl copy_cstr_to_buf                      @ 080299d6 cbf03dfb
+    add r0,sp,#0x8                           @ 080299da 02a8
+    ldr r1,[sp,#0x4c]                        @ 080299dc 1399
+    bl copy_cstr_to_buf                      @ 080299de cbf039fb
+    movs r0,#0x8c    @ 080299e2 8c20
+    lsls r0,r0,#0x1    @ 080299e4 4000
+    add r0,r9                                @ 080299e6 4844
+    lsls r0,r0,#0x10    @ 080299e8 0004
+    lsrs r0,r0,#0x10    @ 080299ea 000c
+    .hword 0x4684    @ 080299ec 8446
+    movs r1,#0x82    @ 080299ee 8221
+LAB_080299f0:
+    lsls r1,r1,#0x2    @ 080299f0 8900
+    lsrs r2,r7,#0x10    @ 080299f2 3a0c
+    movs r0,#0x7    @ 080299f4 0720
+    .hword 0x4643    @ 080299f6 4346
+    ldrb r3,[r3,#0x0]                        @ 080299f8 1b78
+    ands r0,r3    @ 080299fa 1840
+    cmp r0,#0x1                              @ 080299fc 0128
+    beq LAB_08029a3c                         @ 080299fe 1dd0
+    cmp r0,#0x2                              @ 08029a00 0228
+    beq LAB_08029a34                         @ 08029a02 17d0
+    cmp r0,#0x3                              @ 08029a04 0328
+    beq LAB_08029a2c                         @ 08029a06 11d0
+    cmp r0,#0x4                              @ 08029a08 0428
+    beq LAB_08029a24                         @ 08029a0a 0bd0
+    ldr r3, DWORD_08029a1c                   @ 08029a0c 034b
+    cmp r0,#0x5                              @ 08029a0e 0528
+    bne LAB_08029a3e                         @ 08029a10 15d1
+    ldr r4, DWORD_08029a20                   @ 08029a12 034c
+    adds r3,r3,r4    @ 08029a14 1b19
+    b LAB_08029a3e                           @ 08029a16 12e0
+DWORD_08029a18:
+    .word  0x09dcabf4                     @ 08029a18 f4abdc09
+DWORD_08029a1c:
+    .word  0x09dbfdde                     @ 08029a1c defddb09
+DWORD_08029a20:
+    .word  0x0003ab1a                     @ 08029a20 1aab0300
+LAB_08029a24:
+    ldr r3, DWORD_08029a28                   @ 08029a24 004b
+    b LAB_08029a3e                           @ 08029a26 0ae0
+DWORD_08029a28:
+    .word  0x09deed20                     @ 08029a28 20edde09
+LAB_08029a2c:
+    ldr r3, DWORD_08029a30                   @ 08029a2c 004b
+    b LAB_08029a3e                           @ 08029a2e 06e0
+DWORD_08029a30:
+    .word  0x09de286e                     @ 08029a30 6e28de09
+LAB_08029a34:
+    ldr r3, DWORD_08029a38                   @ 08029a34 004b
+    b LAB_08029a3e                           @ 08029a36 02e0
+DWORD_08029a38:
+    .word  0x09dd64ec                     @ 08029a38 ec64dd09
+LAB_08029a3c:
+    ldr r3, LAB_08029bbc                     @ 08029a3c 5f4b
+LAB_08029a3e:
+    .hword 0x4645    @ 08029a3e 4546
+    ldrb r5,[r5,#0x0]                        @ 08029a40 2d78
+    lsls r0,r5,#0x1d    @ 08029a42 6807
+    lsrs r0,r0,#0x1d    @ 08029a44 400f
+    str r0,[sp,#0x0]                         @ 08029a46 0090
+    .hword 0x4660    @ 08029a48 6046
+    bl draw_decimal_with_offset              @ 08029a4a f9f717ff
+    movs r0,#0xc0    @ 08029a4e c020
+    lsls r0,r0,#0x1    @ 08029a50 4000
+    add r0,r9                                @ 08029a52 4844
+    lsls r0,r0,#0x10    @ 08029a54 0004
+    lsrs r0,r0,#0x10    @ 08029a56 000c
+    lsrs r2,r7,#0x10    @ 08029a58 3a0c
+    .hword 0x4643    @ 08029a5a 4346
+    ldrb r3,[r3,#0x0]                        @ 08029a5c 1b78
+    lsls r1,r3,#0x1d    @ 08029a5e 5907
+    lsrs r1,r1,#0x1d    @ 08029a60 490f
+    str r1,[sp,#0x0]                         @ 08029a62 0091
+    movs r1,#0x82    @ 08029a64 8221
+    lsls r1,r1,#0x2    @ 08029a66 8900
+    add r3,sp,#0x8                           @ 08029a68 02ab
+    bl draw_decimal_with_offset              @ 08029a6a f9f707ff
+    add r0,sp,#0x8                           @ 08029a6e 02a8
+    bl count_bytes_until_null                @ 08029a70 cbf036fd
+    lsls r1,r0,#0x1    @ 08029a74 4100
+    adds r1,r1,r0    @ 08029a76 0918
+    movs r2,#0x20    @ 08029a78 2022
+    subs r2,r2,r1    @ 08029a7a 521a
+    lsls r2,r2,#0x10    @ 08029a7c 1204
+    lsrs r1,r2,#0x10    @ 08029a7e 110c
+    movs r0,#0x1    @ 08029a80 0120
+    ands r1,r0    @ 08029a82 0140
+    .hword 0x4654    @ 08029a84 5446
+    adds r4,#0x37    @ 08029a86 3734
+    lsls r1,r1,#0x7    @ 08029a88 c901
+    movs r3,#0x7f    @ 08029a8a 7f23
+    adds r0,r3,#0x0    @ 08029a8c 181c
+    ldrb r5,[r4,#0x0]                        @ 08029a8e 2578
+    ands r0,r5    @ 08029a90 2840
+    orrs r0,r1    @ 08029a92 0843
+    strb r0,[r4,#0x0]                        @ 08029a94 2070
+    lsrs r2,r2,#0x11    @ 08029a96 520c
+    ands r2,r3    @ 08029a98 1a40
+    movs r1,#0x80    @ 08029a9a 8021
+    rsbs r1,r1,#0    @ 08029a9c 4942
+    adds r0,r1,#0x0    @ 08029a9e 081c
+    ldr r3, LAB_08029bc0                     @ 08029aa0 474b
+    ldrb r3,[r3,#0x0]                        @ 08029aa2 1b78
+    ands r0,r3    @ 08029aa4 1840
+    orrs r0,r2    @ 08029aa6 1043
+    ldr r4, LAB_08029bc0                     @ 08029aa8 454c
+    strb r0,[r4,#0x0]                        @ 08029aaa 2070
+    movs r0,#0xa    @ 08029aac 0a20
+    movs r1,#0x2    @ 08029aae 0221
+    bl setup_line_buf_pos_and_font           @ 08029ab0 c7f080f8
+    movs r1,#0x1    @ 08029ab4 0121
+    ldr r5, LAB_08029bc4                     @ 08029ab6 434d
+    ldrb r5,[r5,#0x8]                        @ 08029ab8 2d7a
+    orrs r1,r5    @ 08029aba 2943
+    movs r0,#0x2    @ 08029abc 0220
+    orrs r1,r0    @ 08029abe 0143
+    ldr r0, LAB_08029bc4                     @ 08029ac0 4048
+    strb r1,[r0,#0x8]                        @ 08029ac2 0172
+    ldr r2, LAB_08029bc8                     @ 08029ac4 404a
+    lsls r0,r1,#0x1e    @ 08029ac6 8807
+    lsrs r0,r0,#0x1f    @ 08029ac8 c00f
+    lsls r0,r0,#0x2    @ 08029aca 8000
+    lsls r1,r1,#0x1f    @ 08029acc c907
+    lsrs r1,r1,#0x1f    @ 08029ace c90f
+    lsls r1,r1,#0x3    @ 08029ad0 c900
+    adds r0,r0,r1    @ 08029ad2 4018
+    adds r0,r0,r2    @ 08029ad4 8018
+    ldr r0,[r0,#0x0]                         @ 08029ad6 0068
+    ldr r1, LAB_08029bc4                     @ 08029ad8 3a49
+    str r0,[r1,#0x4]                         @ 08029ada 4860
+    add r1,sp,#0x8                           @ 08029adc 02a9
+    movs r0,#0x0    @ 08029ade 0020
+    strb r0,[r1,#0x1]                        @ 08029ae0 4870
+    movs r4,#0x0    @ 08029ae2 0024
+    adds r6,#0x1    @ 08029ae4 0136
+    adds r5,r1,#0x0    @ 08029ae6 0d1c
+LAB_08029ae8:
+    adds r0,r4,#0x0    @ 08029ae8 201c
+    adds r0,#0x30    @ 08029aea 3030
+    strb r0,[r5,#0x0]                        @ 08029aec 2870
+    lsls r0,r4,#0x3    @ 08029aee e000
+    movs r1,#0x3    @ 08029af0 0321
+    lsrs r2,r7,#0x10    @ 08029af2 3a0c
+    add r3,sp,#0x8                           @ 08029af4 02ab
+    bl text_render_wrapper                   @ 08029af6 c8f0c1ff
+    adds r4,#0x1    @ 08029afa 0134
+    cmp r4,#0x9                              @ 08029afc 092c
+    ble LAB_08029ae8                         @ 08029afe f3dd
+    .hword 0x464a    @ 08029b00 4a46
+    lsls r0,r2,#0x5    @ 08029b02 5001
+    ldr r3, LAB_08029bcc                     @ 08029b04 314b
+    adds r0,r0,r3    @ 08029b06 c018
+    movs r1,#0x0    @ 08029b08 0021
+    bl write_line_buf_to_bg_tile_vram        @ 08029b0a c9f063fe
+    cmp r6,#0x1                              @ 08029b0e 012e
+    bgt LAB_08029b14                         @ 08029b10 00dc
+    b LAB_08029896                           @ 08029b12 c0e6
+LAB_08029b14:
+    ldr r2, LAB_08029bd0                     @ 08029b14 2e4a
+    ldr r0, LAB_08029bd4                     @ 08029b16 2f48
+    ldrh r4,[r2,#0x36]                       @ 08029b18 d48e
+    ands r0,r4    @ 08029b1a 2040
+    strh r0,[r2,#0x36]                       @ 08029b1c d086
+    adds r3,r2,#0x0    @ 08029b1e 131c
+    adds r3,#0x37    @ 08029b20 3733
+    movs r0,#0x3    @ 08029b22 0320
+    rsbs r0,r0,#0    @ 08029b24 4042
+    ldrb r5,[r3,#0x0]                        @ 08029b26 1d78
+    ands r0,r5    @ 08029b28 2840
+    movs r1,#0x7d    @ 08029b2a 7d21
+    rsbs r1,r1,#0    @ 08029b2c 4942
+    ands r0,r1    @ 08029b2e 0840
+    strb r0,[r3,#0x0]                        @ 08029b30 1870
+    adds r2,#0x36    @ 08029b32 3632
+    movs r0,#0x1f    @ 08029b34 1f20
+    rsbs r0,r0,#0    @ 08029b36 4042
+    ldrb r6,[r2,#0x0]                        @ 08029b38 1678
+    ands r0,r6    @ 08029b3a 3040
+    movs r1,#0x6    @ 08029b3c 0621
+    orrs r0,r1    @ 08029b3e 0843
+    movs r1,#0x2    @ 08029b40 0221
+    rsbs r1,r1,#0    @ 08029b42 4942
+    ands r0,r1    @ 08029b44 0840
+    strb r0,[r2,#0x0]                        @ 08029b46 1070
+    ldr r2, LAB_08029bd8                     @ 08029b48 234a
+    ldr r7, LAB_08029bdc                     @ 08029b4a 244f
+    adds r4,r2,r7    @ 08029b4c d419
+    ldrh r3,[r4,#0x0]                        @ 08029b4e 2388
+    lsls r1,r3,#0x12    @ 08029b50 9904
+    lsrs r1,r1,#0x18    @ 08029b52 090e
+    adds r1,#0x1    @ 08029b54 0131
+    movs r0,#0xff    @ 08029b56 ff20
+    ands r1,r0    @ 08029b58 0140
+    lsls r1,r1,#0x6    @ 08029b5a 8901
+    ldr r0, WORD_08029be0                    @ 08029b5c 2048
+    ands r0,r3    @ 08029b5e 1840
+    orrs r0,r1    @ 08029b60 0843
+    strh r0,[r4,#0x0]                        @ 08029b62 2080
+    ldr r0, LAB_08029be4                     @ 08029b64 1f48
+    adds r1,r2,r0    @ 08029b66 1118
+    movs r0,#0x3f    @ 08029b68 3f20
+    ldrb r3,[r1,#0x0]                        @ 08029b6a 0b78
+    ands r0,r3    @ 08029b6c 1840
+    strb r0,[r1,#0x0]                        @ 08029b6e 0870
+    movs r4,#0x81    @ 08029b70 8124
+    lsls r4,r4,#0x2    @ 08029b72 a400
+    adds r1,r2,r4    @ 08029b74 1119
+    movs r0,#0x40    @ 08029b76 4020
+    rsbs r0,r0,#0    @ 08029b78 4042
+    ldrb r5,[r1,#0x0]                        @ 08029b7a 0d78
+    ands r0,r5    @ 08029b7c 2840
+    strb r0,[r1,#0x0]                        @ 08029b7e 0870
+    movs r6,#0x84    @ 08029b80 8426
+    lsls r6,r6,#0x2    @ 08029b82 b600
+    adds r1,r2,r6    @ 08029b84 9119
+    ldr r0,[r1,#0x0]                         @ 08029b86 0868
+    movs r3,#0x80    @ 08029b88 8023
+    lsls r3,r3,#0x18    @ 08029b8a 1b06
+    ands r0,r3    @ 08029b8c 1840
+    str r0,[r1,#0x0]                         @ 08029b8e 0860
+    adds r7,#0x12    @ 08029b90 1237
+    adds r1,r2,r7    @ 08029b92 d119
+    ldr r0,[r1,#0x0]                         @ 08029b94 0868
+    ands r0,r3    @ 08029b96 1840
+    str r0,[r1,#0x0]                         @ 08029b98 0860
+    ldr r0, LAB_08029be8                     @ 08029b9a 1348
+    adds r3,r2,r0    @ 08029b9c 1318
+    movs r1,#0x7f    @ 08029b9e 7f21
+    adds r0,r1,#0x0    @ 08029ba0 081c
+    ldrb r4,[r3,#0x0]                        @ 08029ba2 1c78
+    ands r0,r4    @ 08029ba4 2040
+    strb r0,[r3,#0x0]                        @ 08029ba6 1870
+    ldr r5, LAB_08029bec                     @ 08029ba8 104d
+    adds r2,r2,r5    @ 08029baa 5219
+    ldrb r6,[r2,#0x0]                        @ 08029bac 1678
+    ands r1,r6    @ 08029bae 3140
+    strb r1,[r2,#0x0]                        @ 08029bb0 1170
+SUB_08029bb2:
+    movs r0,#0x80    @ 08029bb2 8020
+    lsls r0,r0,#0x1    @ 08029bb4 4000
+    bl SUB_0802b46e                          @ 08029bb6 01f05afc
+    movs r0,r0    @ 08029bba 0000
+LAB_08029bbc:
+    add r3,sp,#0x3b8                         @ 08029bbc eeab
+    lsrs r4,r3,#0x7    @ 08029bbe dc09
+LAB_08029bc0:
+    adds r3,#0x98    @ 08029bc0 9833
+    lsls r2,r0,#0x8    @ 08029bc2 0202
+LAB_08029bc4:
+    ldr r0,[r2,#0x6c]                        @ 08029bc4 d06e
+    lsls r0,r0,#0x8    @ 08029bc6 0002
+LAB_08029bc8:
+    .hword 0xf854    @ 08029bc8 54f8
+    lsrs r5,r4,#0x7    @ 08029bca e509
+LAB_08029bcc:
+    adds r1,#0x0    @ 08029bcc 0031
+    lsls r1,r0,#0x18    @ 08029bce 0106
+LAB_08029bd0:
+    adds r3,#0x60    @ 08029bd0 6033
+    lsls r2,r0,#0x8    @ 08029bd2 0202
+LAB_08029bd4:
+    .hword 0xfe7f    @ 08029bd4 7ffe
+    .hword 0xffff    @ 08029bd6 ffff
+LAB_08029bd8:
+    lsls r0,r0,#0x1    @ 08029bd8 4000
+    lsls r0,r0,#0xc    @ 08029bda 0003
+LAB_08029bdc:
+    lsls r2,r0,#0x8    @ 08029bdc 0202
+    movs r0,r0    @ 08029bde 0000
+WORD_08029be0:
+    .hword 0xc03f                         @ 08029be0 3fc0
+    .hword 0xffff    @ 08029be2 ffff
+LAB_08029be4:
+    lsls r3,r0,#0x8    @ 08029be4 0302
+    movs r0,r0    @ 08029be6 0000
+LAB_08029be8:
+    lsls r3,r2,#0x8    @ 08029be8 1302
+    movs r0,r0    @ 08029bea 0000
+LAB_08029bec:
+    lsls r7,r2,#0x8    @ 08029bec 1702
+    movs r0,r0    @ 08029bee 0000
+campaign_scene_handler_08029bf0:
+    bl tick_campaign_card_selector_oam       @ 08029bf0 fef740fe
+    bl check_siocnt_link_ready               @ 08029bf4 f5f7d0fb
+    cmp r0,#0x0                              @ 08029bf8 0028
+    bne LAB_08029bfe                         @ 08029bfa 00d1
+    b LAB_08029e0a                           @ 08029bfc 05e1
+LAB_08029bfe:
+    ldr r4, DWORD_08029c14                   @ 08029bfe 054c
+    ldrh r2,[r4,#0x36]                       @ 08029c00 e28e
+    lsls r0,r2,#0x17    @ 08029c02 d005
+    lsrs r0,r0,#0x1e    @ 08029c04 800f
+    cmp r0,#0x1                              @ 08029c06 0128
+    beq LAB_08029c58                         @ 08029c08 26d0
+    cmp r0,#0x1                              @ 08029c0a 0128
+    bgt LAB_08029c18                         @ 08029c0c 04dc
+    cmp r0,#0x0                              @ 08029c0e 0028
+    beq LAB_08029c1e                         @ 08029c10 05d0
+    b LAB_08029d60                           @ 08029c12 a5e0
+DWORD_08029c14:
+    .word  0x02023360                     @ 08029c14 60330202
+LAB_08029c18:
+    cmp r0,#0x2                              @ 08029c18 0228
+    beq LAB_08029d00                         @ 08029c1a 71d0
+    b LAB_08029d60                           @ 08029c1c a0e0
+LAB_08029c1e:
+    ldr r1, DWORD_08029c54                   @ 08029c1e 0d49
+    movs r7,#0xa4    @ 08029c20 a427
+    lsls r7,r7,#0x1    @ 08029c22 7f00
+    adds r1,r1,r7    @ 08029c24 c919
+    movs r0,#0x30    @ 08029c26 3020
+    ldrh r1,[r1,#0x0]                        @ 08029c28 0988
+    ands r0,r1    @ 08029c2a 0840
+    cmp r0,#0x0                              @ 08029c2c 0028
+    bne LAB_08029c32                         @ 08029c2e 00d1
+    b LAB_08029d60                           @ 08029c30 96e0
+LAB_08029c32:
+    movs r0,#0x0    @ 08029c32 0020
+    bl sync_state_and_init_sprite            @ 08029c34 cff03eff
+    adds r3,r4,#0x0    @ 08029c38 231c
+    adds r3,#0x37    @ 08029c3a 3733
+    ldrb r2,[r3,#0x0]                        @ 08029c3c 1a78
+    lsls r0,r2,#0x1e    @ 08029c3e 9007
+    lsrs r0,r0,#0x1f    @ 08029c40 c00f
+    movs r1,#0x1    @ 08029c42 0121
+    eors r1,r0    @ 08029c44 4140
+    lsls r1,r1,#0x1    @ 08029c46 4900
+    movs r0,#0x3    @ 08029c48 0320
+    rsbs r0,r0,#0    @ 08029c4a 4042
+    ands r0,r2    @ 08029c4c 1040
+    orrs r0,r1    @ 08029c4e 0843
+    strb r0,[r3,#0x0]                        @ 08029c50 1870
+    b LAB_08029ce6                           @ 08029c52 48e0
+DWORD_08029c54:
+    .word  0x03000040                     @ 08029c54 40000003
+LAB_08029c58:
+    ldr r1, DWORD_08029c9c                   @ 08029c58 1049
+    movs r0,#0xa4    @ 08029c5a a420
+    lsls r0,r0,#0x1    @ 08029c5c 4000
+    adds r1,r1,r0    @ 08029c5e 0918
+    movs r0,#0x10    @ 08029c60 1020
+    ldrh r1,[r1,#0x0]                        @ 08029c62 0988
+    ands r0,r1    @ 08029c64 0840
+    cmp r0,#0x0                              @ 08029c66 0028
+    beq LAB_08029ca6                         @ 08029c68 1dd0
+    adds r4,#0x37    @ 08029c6a 3734
+    ldrb r1,[r4,#0x0]                        @ 08029c6c 2178
+    lsls r0,r1,#0x19    @ 08029c6e 4806
+    lsrs r0,r0,#0x1b    @ 08029c70 c00e
+    cmp r0,#0xb                              @ 08029c72 0b28
+    bhi LAB_08029ca0                         @ 08029c74 14d8
+    movs r0,#0x0    @ 08029c76 0020
+    bl sync_state_and_init_sprite            @ 08029c78 cff01cff
+    ldrb r2,[r4,#0x0]                        @ 08029c7c 2278
+    lsls r1,r2,#0x19    @ 08029c7e 5106
+    lsrs r1,r1,#0x1b    @ 08029c80 c90e
+    adds r1,#0x1    @ 08029c82 0131
+    movs r0,#0x1f    @ 08029c84 1f20
+    ands r1,r0    @ 08029c86 0140
+    lsls r1,r1,#0x2    @ 08029c88 8900
+    movs r0,#0x7d    @ 08029c8a 7d20
+    rsbs r0,r0,#0    @ 08029c8c 4042
+    ands r0,r2    @ 08029c8e 1040
+    orrs r0,r1    @ 08029c90 0843
+    strb r0,[r4,#0x0]                        @ 08029c92 2070
+    movs r0,#0x2    @ 08029c94 0220
+    bl build_campaign_sprite_row_by_type     @ 08029c96 fdf7ffff
+    b LAB_08029ca6                           @ 08029c9a 04e0
+DWORD_08029c9c:
+    .word  0x03000040                     @ 08029c9c 40000003
+LAB_08029ca0:
+    movs r0,#0x0    @ 08029ca0 0020
+    bl sync_state_and_init_sprite            @ 08029ca2 cff007ff
+LAB_08029ca6:
+    ldr r1, DWORD_08029cf0                   @ 08029ca6 1249
+    movs r2,#0xa4    @ 08029ca8 a422
+    lsls r2,r2,#0x1    @ 08029caa 5200
+    adds r1,r1,r2    @ 08029cac 8918
+    movs r0,#0x20    @ 08029cae 2020
+    ldrh r1,[r1,#0x0]                        @ 08029cb0 0988
+    ands r0,r1    @ 08029cb2 0840
+    cmp r0,#0x0                              @ 08029cb4 0028
+    beq LAB_08029d60                         @ 08029cb6 53d0
+    ldr r0, DWORD_08029cf4                   @ 08029cb8 0e48
+    adds r4,r0,#0x0    @ 08029cba 041c
+    adds r4,#0x37    @ 08029cbc 3734
+    movs r0,#0x7c    @ 08029cbe 7c20
+    ldrb r3,[r4,#0x0]                        @ 08029cc0 2378
+    ands r0,r3    @ 08029cc2 1840
+    cmp r0,#0x0                              @ 08029cc4 0028
+    beq LAB_08029cf8                         @ 08029cc6 17d0
+    movs r0,#0x0    @ 08029cc8 0020
+    bl sync_state_and_init_sprite            @ 08029cca cff0f3fe
+    ldrb r2,[r4,#0x0]                        @ 08029cce 2278
+    lsls r1,r2,#0x19    @ 08029cd0 5106
+    lsrs r1,r1,#0x1b    @ 08029cd2 c90e
+    subs r1,#0x1    @ 08029cd4 0139
+    movs r0,#0x1f    @ 08029cd6 1f20
+    ands r1,r0    @ 08029cd8 0140
+    lsls r1,r1,#0x2    @ 08029cda 8900
+    movs r0,#0x7d    @ 08029cdc 7d20
+    rsbs r0,r0,#0    @ 08029cde 4042
+    ands r0,r2    @ 08029ce0 1040
+    orrs r0,r1    @ 08029ce2 0843
+    strb r0,[r4,#0x0]                        @ 08029ce4 2070
+LAB_08029ce6:
+    movs r0,#0x2    @ 08029ce6 0220
+    bl build_campaign_sprite_row_by_type     @ 08029ce8 fdf7d6ff
+    b LAB_08029d60                           @ 08029cec 38e0
+    .zero  0x2
+DWORD_08029cf0:
+    .word  0x03000040                     @ 08029cf0 40000003
+DWORD_08029cf4:
+    .word  0x02023360                     @ 08029cf4 60330202
+LAB_08029cf8:
+    movs r0,#0x0    @ 08029cf8 0020
+    bl sync_state_and_init_sprite            @ 08029cfa cff0dbfe
+    b LAB_08029d60                           @ 08029cfe 2fe0
+LAB_08029d00:
+    ldr r5, LAB_08029d54                     @ 08029d00 144d
+    movs r6,#0xa4    @ 08029d02 a426
+    lsls r6,r6,#0x1    @ 08029d04 7600
+    adds r1,r5,r6    @ 08029d06 a919
+    movs r0,#0x1    @ 08029d08 0120
+    ldrh r1,[r1,#0x0]                        @ 08029d0a 0988
+    ands r0,r1    @ 08029d0c 0840
+    cmp r0,#0x0                              @ 08029d0e 0028
+    beq LAB_08029d60                         @ 08029d10 26d0
+    movs r7,#0xc0    @ 08029d12 c027
+    lsls r7,r7,#0x1    @ 08029d14 7f00
+    adds r0,r7,#0x0    @ 08029d16 381c
+    orrs r0,r2    @ 08029d18 1043
+    strh r0,[r4,#0x36]                       @ 08029d1a e086
+    movs r0,#0x2    @ 08029d1c 0220
+    bl build_campaign_sprite_row_by_type     @ 08029d1e fdf7bbff
+    ldr r0, LAB_08029d58                     @ 08029d22 0d48
+    adds r4,r5,r0    @ 08029d24 2c18
+    ldr r5, WORD_08029d5c                    @ 08029d26 0d4d
+    adds r0,r5,#0x0    @ 08029d28 281c
+    ldrh r1,[r4,#0x0]                        @ 08029d2a 2188
+    ands r0,r1    @ 08029d2c 0840
+    movs r2,#0xa0    @ 08029d2e a022
+    lsls r2,r2,#0x3    @ 08029d30 d200
+    adds r1,r2,#0x0    @ 08029d32 111c
+    orrs r0,r1    @ 08029d34 0843
+    strh r0,[r4,#0x0]                        @ 08029d36 2080
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029d38 fef78af8
+    cmp r0,#0x0                              @ 08029d3c 0028
+    beq LAB_08029d42                         @ 08029d3e 00d0
+    b SUB_08029bb2                           @ 08029d40 37e7
+LAB_08029d42:
+    adds r0,r5,#0x0    @ 08029d42 281c
+    ldrh r3,[r4,#0x0]                        @ 08029d44 2388
+    ands r0,r3    @ 08029d46 1840
+    movs r5,#0xfa    @ 08029d48 fa25
+    lsls r5,r5,#0x6    @ 08029d4a ad01
+    adds r1,r5,#0x0    @ 08029d4c 291c
+    orrs r0,r1    @ 08029d4e 0843
+    bl SUB_0802a724                          @ 08029d50 00f0e8fc
+LAB_08029d54:
+    lsls r0,r0,#0x1    @ 08029d54 4000
+    lsls r0,r0,#0xc    @ 08029d56 0003
+LAB_08029d58:
+    lsls r2,r0,#0x8    @ 08029d58 0202
+    movs r0,r0    @ 08029d5a 0000
+WORD_08029d5c:
+    .hword 0xc03f                         @ 08029d5c 3fc0
+    .hword 0xffff    @ 08029d5e ffff
+LAB_08029d60:
+    ldr r1, DWORD_08029da4                   @ 08029d60 1049
+    movs r6,#0xa4    @ 08029d62 a426
+    lsls r6,r6,#0x1    @ 08029d64 7600
+    adds r1,r1,r6    @ 08029d66 8919
+    movs r0,#0x40    @ 08029d68 4020
+    ldrh r1,[r1,#0x0]                        @ 08029d6a 0988
+    ands r0,r1    @ 08029d6c 0840
+    cmp r0,#0x0                              @ 08029d6e 0028
+    beq LAB_08029db6                         @ 08029d70 21d0
+    ldr r4, DWORD_08029da8                   @ 08029d72 0d4c
+    movs r0,#0xc0    @ 08029d74 c020
+    lsls r0,r0,#0x1    @ 08029d76 4000
+    ldrh r7,[r4,#0x36]                       @ 08029d78 e78e
+    ands r0,r7    @ 08029d7a 3840
+    cmp r0,#0x0                              @ 08029d7c 0028
+    beq LAB_08029db0                         @ 08029d7e 17d0
+    movs r0,#0x0    @ 08029d80 0020
+    bl sync_state_and_init_sprite            @ 08029d82 cff097fe
+    ldrh r2,[r4,#0x36]                       @ 08029d86 e28e
+    lsls r1,r2,#0x17    @ 08029d88 d105
+    lsrs r1,r1,#0x1e    @ 08029d8a 890f
+    subs r1,#0x1    @ 08029d8c 0139
+    movs r0,#0x3    @ 08029d8e 0320
+    ands r1,r0    @ 08029d90 0140
+    lsls r1,r1,#0x7    @ 08029d92 c901
+    ldr r0, DWORD_08029dac                   @ 08029d94 0548
+    ands r0,r2    @ 08029d96 1040
+    orrs r0,r1    @ 08029d98 0843
+    strh r0,[r4,#0x36]                       @ 08029d9a e086
+    movs r0,#0x2    @ 08029d9c 0220
+    bl build_campaign_sprite_row_by_type     @ 08029d9e fdf77bff
+    b LAB_08029db6                           @ 08029da2 08e0
+DWORD_08029da4:
+    .word  0x03000040                     @ 08029da4 40000003
+DWORD_08029da8:
+    .word  0x02023360                     @ 08029da8 60330202
+DWORD_08029dac:
+    .word  0xfffffe7f                     @ 08029dac 7ffeffff
+LAB_08029db0:
+    movs r0,#0x2    @ 08029db0 0220
+    bl sync_state_and_init_sprite            @ 08029db2 cff07ffe
+LAB_08029db6:
+    ldr r1, DWORD_08029df8                   @ 08029db6 1049
+    movs r0,#0xa4    @ 08029db8 a420
+    lsls r0,r0,#0x1    @ 08029dba 4000
+    adds r1,r1,r0    @ 08029dbc 0918
+    movs r0,#0x80    @ 08029dbe 8020
+    ldrh r1,[r1,#0x0]                        @ 08029dc0 0988
+    ands r0,r1    @ 08029dc2 0840
+    cmp r0,#0x0                              @ 08029dc4 0028
+    beq LAB_08029e0a                         @ 08029dc6 20d0
+    ldr r4, DWORD_08029dfc                   @ 08029dc8 0c4c
+    ldrh r1,[r4,#0x36]                       @ 08029dca e18e
+    lsls r0,r1,#0x17    @ 08029dcc c805
+    lsrs r0,r0,#0x1e    @ 08029dce 800f
+    cmp r0,#0x1                              @ 08029dd0 0128
+    bhi LAB_08029e04                         @ 08029dd2 17d8
+    movs r0,#0x0    @ 08029dd4 0020
+    bl sync_state_and_init_sprite            @ 08029dd6 cff06dfe
+    ldrh r2,[r4,#0x36]                       @ 08029dda e28e
+    lsls r1,r2,#0x17    @ 08029ddc d105
+    lsrs r1,r1,#0x1e    @ 08029dde 890f
+    adds r1,#0x1    @ 08029de0 0131
+    movs r0,#0x3    @ 08029de2 0320
+    ands r1,r0    @ 08029de4 0140
+    lsls r1,r1,#0x7    @ 08029de6 c901
+    ldr r0, DWORD_08029e00                   @ 08029de8 0548
+    ands r0,r2    @ 08029dea 1040
+    orrs r0,r1    @ 08029dec 0843
+    strh r0,[r4,#0x36]                       @ 08029dee e086
+    movs r0,#0x2    @ 08029df0 0220
+    bl build_campaign_sprite_row_by_type     @ 08029df2 fdf751ff
+    b LAB_08029e0a                           @ 08029df6 08e0
+DWORD_08029df8:
+    .word  0x03000040                     @ 08029df8 40000003
+DWORD_08029dfc:
+    .word  0x02023360                     @ 08029dfc 60330202
+DWORD_08029e00:
+    .word  0xfffffe7f                     @ 08029e00 7ffeffff
+LAB_08029e04:
+    movs r0,#0x2    @ 08029e04 0220
+    bl sync_state_and_init_sprite            @ 08029e06 cff055fe
+LAB_08029e0a:
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029e0a fef721f8
+    cmp r0,#0x0                              @ 08029e0e 0028
+    beq LAB_08029e14                         @ 08029e10 00d0
+    b SUB_08029bb2                           @ 08029e12 cee6
+LAB_08029e14:
+    ldr r0, LAB_08029e2c                     @ 08029e14 0548
+    ldr r2, LAB_08029e30                     @ 08029e16 064a
+    adds r0,r0,r2    @ 08029e18 8018
+    ldr r1, WORD_08029e34                    @ 08029e1a 0649
+    ldrh r3,[r0,#0x0]                        @ 08029e1c 0388
+    ands r1,r3    @ 08029e1e 1940
+    movs r4,#0xfa    @ 08029e20 fa24
+    lsls r4,r4,#0x6    @ 08029e22 a401
+    adds r2,r4,#0x0    @ 08029e24 221c
+    bl SUB_0802ae26                          @ 08029e26 00f0feff
+    movs r0,r0    @ 08029e2a 0000
+LAB_08029e2c:
+    lsls r0,r0,#0x1    @ 08029e2c 4000
+    lsls r0,r0,#0xc    @ 08029e2e 0003
+LAB_08029e30:
+    lsls r2,r0,#0x8    @ 08029e30 0202
+    movs r0,r0    @ 08029e32 0000
+WORD_08029e34:
+    .hword 0xc03f                         @ 08029e34 3fc0
+    .hword 0xffff    @ 08029e36 ffff
+campaign_scene_handler_08029e38:
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029e38 fef70af8
+    cmp r0,#0x0                              @ 08029e3c 0028
+    bne LAB_08029e64                         @ 08029e3e 11d1
+    ldr r0, LAB_08029e58                     @ 08029e40 0548
+    ldr r5, LAB_08029e5c                     @ 08029e42 064d
+    adds r0,r0,r5    @ 08029e44 4019
+    ldr r1, WORD_08029e60                    @ 08029e46 0649
+    ldrh r6,[r0,#0x0]                        @ 08029e48 0688
+    ands r1,r6    @ 08029e4a 3140
+    movs r7,#0xfa    @ 08029e4c fa27
+    lsls r7,r7,#0x6    @ 08029e4e bf01
+    adds r2,r7,#0x0    @ 08029e50 3a1c
+    bl SUB_0802ae26                          @ 08029e52 00f0e8ff
+    movs r0,r0    @ 08029e56 0000
+LAB_08029e58:
+    lsls r0,r0,#0x1    @ 08029e58 4000
+    lsls r0,r0,#0xc    @ 08029e5a 0003
+LAB_08029e5c:
+    lsls r2,r0,#0x8    @ 08029e5c 0202
+    movs r0,r0    @ 08029e5e 0000
+WORD_08029e60:
+    .hword 0xc03f                         @ 08029e60 3fc0
+    .hword 0xffff    @ 08029e62 ffff
+LAB_08029e64:
+    movs r0,#0x8    @ 08029e64 0820
+    bl start_blend_fadein_with_target        @ 08029e66 cbf0ebfc
+    cmp r0,#0x0                              @ 08029e6a 0028
+    bne LAB_08029e88                         @ 08029e6c 0cd1
+    ldr r1, DWORD_08029e84                   @ 08029e6e 0549
+    adds r1,#0x36    @ 08029e70 3631
+    movs r0,#0x2    @ 08029e72 0220
+    rsbs r0,r0,#0    @ 08029e74 4042
+    ldrb r2,[r1,#0x0]                        @ 08029e76 0a78
+    ands r0,r2    @ 08029e78 1040
+    strb r0,[r1,#0x0]                        @ 08029e7a 0870
+    bl tick_campaign_card_selector_oam       @ 08029e7c fef7fafc
+    b SUB_08029bb2                           @ 08029e80 97e6
+    .zero  0x2
+DWORD_08029e84:
+    .word  0x02023360                     @ 08029e84 60330202
+LAB_08029e88:
+    ldr r3, LAB_08029f84                     @ 08029e88 3e4b
+    ldr r0, LAB_08029f88                     @ 08029e8a 3f48
+    adds r0,#0x37    @ 08029e8c 3730
+    ldrb r0,[r0,#0x0]                        @ 08029e8e 0078
+    lsls r1,r0,#0x1e    @ 08029e90 8107
+    ldr r4, LAB_08029f8c                     @ 08029e92 3e4c
+    adds r2,r3,r4    @ 08029e94 1a19
+    lsrs r1,r1,#0x1f    @ 08029e96 c90f
+    movs r0,#0x2    @ 08029e98 0220
+    rsbs r0,r0,#0    @ 08029e9a 4042
+    ldrb r5,[r2,#0x0]                        @ 08029e9c 1578
+    ands r0,r5    @ 08029e9e 2840
+    orrs r0,r1    @ 08029ea0 0843
+    strb r0,[r2,#0x0]                        @ 08029ea2 1070
+    movs r1,#0x1    @ 08029ea4 0121
+    ands r0,r1    @ 08029ea6 0840
+    .hword 0x4698    @ 08029ea8 9846
+    cmp r0,#0x0                              @ 08029eaa 0028
+    beq LAB_08029ede                         @ 08029eac 17d0
+    movs r2,#0x0    @ 08029eae 0022
+    movs r1,#0x3    @ 08029eb0 0321
+    movs r0,#0x91    @ 08029eb2 9120
+    lsls r0,r0,#0x2    @ 08029eb4 8000
+    add r0,r8                                @ 08029eb6 4044
+LAB_08029eb8:
+    strb r2,[r0,#0x0]                        @ 08029eb8 0270
+    subs r0,#0x1    @ 08029eba 0138
+    subs r1,#0x1    @ 08029ebc 0139
+    cmp r1,#0x0                              @ 08029ebe 0029
+    bge LAB_08029eb8                         @ 08029ec0 fada
+    ldr r1, LAB_08029f8c                     @ 08029ec2 3249
+    add r1,r8                                @ 08029ec4 4144
+    movs r0,#0x1    @ 08029ec6 0120
+    ldrb r6,[r1,#0x0]                        @ 08029ec8 0e78
+    ands r0,r6    @ 08029eca 3040
+    strb r0,[r1,#0x0]                        @ 08029ecc 0870
+    movs r1,#0x90    @ 08029ece 9021
+    lsls r1,r1,#0x2    @ 08029ed0 8900
+    add r1,r8                                @ 08029ed2 4144
+    movs r0,#0x2    @ 08029ed4 0220
+    rsbs r0,r0,#0    @ 08029ed6 4042
+    ldrb r7,[r1,#0x0]                        @ 08029ed8 0f78
+    ands r0,r7    @ 08029eda 3840
+    strb r0,[r1,#0x0]                        @ 08029edc 0870
+LAB_08029ede:
+    bl init_campaign_bg_and_obj_vram         @ 08029ede 03f0c9f8
+    bl init_pack_selection_tile_vram_default @ 08029ee2 03f0bbf9
+    bl init_duel_scroll_params               @ 08029ee6 03f0d1fa
+    ldr r3, LAB_08029f90                     @ 08029eea 294b
+    ldr r1, LAB_08029f94                     @ 08029eec 2949
+    adds r0,r3,r1    @ 08029eee 5818
+    ldrb r2,[r0,#0x0]                        @ 08029ef0 0278
+    lsls r1,r2,#0x19    @ 08029ef2 5106
+    lsrs r1,r1,#0x1c    @ 08029ef4 090f
+    lsls r2,r2,#0x1d    @ 08029ef6 5207
+    lsrs r2,r2,#0x1d    @ 08029ef8 520f
+    ldr r4, LAB_08029f98                     @ 08029efa 274c
+    adds r3,r3,r4    @ 08029efc 1b19
+    ldr r4, LAB_08029f84                     @ 08029efe 214c
+    ldr r5, LAB_08029f9c                     @ 08029f00 264d
+    adds r0,r4,r5    @ 08029f02 6019
+    ldrb r0,[r0,#0x0]                        @ 08029f04 0078
+    str r0,[sp,#0x0]                         @ 08029f06 0090
+    movs r6,#0x92    @ 08029f08 9226
+    lsls r6,r6,#0x2    @ 08029f0a b600
+    adds r0,r4,r6    @ 08029f0c a019
+    str r0,[sp,#0x4]                         @ 08029f0e 0190
+    movs r0,#0x0    @ 08029f10 0020
+    bl render_opponent_card_icon_and_name    @ 08029f12 03f091fb
+    ldr r5, LAB_08029f88                     @ 08029f16 1c4d
+    ldrb r2,[r5,#0x1d]                       @ 08029f18 6a7f
+    lsls r1,r2,#0x19    @ 08029f1a 5106
+    lsrs r1,r1,#0x1c    @ 08029f1c 090f
+    lsls r2,r2,#0x1d    @ 08029f1e 5207
+    lsrs r2,r2,#0x1d    @ 08029f20 520f
+    adds r3,r5,#0x0    @ 08029f22 2b1c
+    adds r3,#0xe    @ 08029f24 0e33
+    ldrb r7,[r5,#0x1e]                       @ 08029f26 af7f
+    lsrs r0,r7,#0x5    @ 08029f28 7809
+    str r0,[sp,#0x0]                         @ 08029f2a 0090
+    adds r0,r5,#0x0    @ 08029f2c 281c
+    adds r0,#0x1f    @ 08029f2e 1f30
+    str r0,[sp,#0x4]                         @ 08029f30 0190
+    movs r0,#0x1    @ 08029f32 0120
+    bl render_opponent_card_icon_and_name    @ 08029f34 03f080fb
+    adds r1,r5,#0x0    @ 08029f38 291c
+    adds r1,#0x39    @ 08029f3a 3931
+    movs r0,#0x21    @ 08029f3c 2120
+    rsbs r0,r0,#0    @ 08029f3e 4042
+    ldrb r2,[r1,#0x0]                        @ 08029f40 0a78
+    ands r0,r2    @ 08029f42 1040
+    strb r0,[r1,#0x0]                        @ 08029f44 0870
+    movs r0,#0x0    @ 08029f46 0020
+    bl draw_card_name_label_to_sprite_vram   @ 08029f48 03f020fb
+    ldr r3, LAB_08029fa0                     @ 08029f4c 144b
+    adds r1,r4,r3    @ 08029f4e e118
+    movs r0,#0x3f    @ 08029f50 3f20
+    ldrb r5,[r1,#0x0]                        @ 08029f52 0d78
+    ands r0,r5    @ 08029f54 2840
+    strb r0,[r1,#0x0]                        @ 08029f56 0870
+    subs r6,#0x44    @ 08029f58 443e
+    adds r1,r4,r6    @ 08029f5a a119
+    movs r0,#0x40    @ 08029f5c 4020
+    rsbs r0,r0,#0    @ 08029f5e 4042
+    ldrb r7,[r1,#0x0]                        @ 08029f60 0f78
+    ands r0,r7    @ 08029f62 3840
+    strb r0,[r1,#0x0]                        @ 08029f64 0870
+    ldr r0, LAB_08029fa4                     @ 08029f66 0f48
+    adds r4,r4,r0    @ 08029f68 2418
+    ldrh r2,[r4,#0x0]                        @ 08029f6a 2288
+    lsls r1,r2,#0x12    @ 08029f6c 9104
+    lsrs r1,r1,#0x18    @ 08029f6e 090e
+    adds r1,#0x1    @ 08029f70 0131
+    movs r0,#0xff    @ 08029f72 ff20
+    ands r1,r0    @ 08029f74 0140
+    lsls r1,r1,#0x6    @ 08029f76 8901
+    ldr r0, WORD_08029fa8                    @ 08029f78 0b48
+    ands r0,r2    @ 08029f7a 1040
+    orrs r0,r1    @ 08029f7c 0843
+    bl SUB_0802a724                          @ 08029f7e 00f0d1fb
+    movs r0,r0    @ 08029f82 0000
+LAB_08029f84:
+    lsls r0,r0,#0x1    @ 08029f84 4000
+    lsls r0,r0,#0xc    @ 08029f86 0003
+LAB_08029f88:
+    adds r3,#0x60    @ 08029f88 6033
+    lsls r2,r0,#0x8    @ 08029f8a 0202
+LAB_08029f8c:
+    lsls r7,r7,#0x8    @ 08029f8c 3f02
+    movs r0,r0    @ 08029f8e 0000
+LAB_08029f90:
+    movs r0,r0    @ 08029f90 0000
+    lsls r0,r0,#0x8    @ 08029f92 0002
+LAB_08029f94:
+    ldr r7,[r2,#0x64]                        @ 08029f94 576e
+    movs r0,r0    @ 08029f96 0000
+LAB_08029f98:
+    ldr r0,[r1,#0x64]                        @ 08029f98 486e
+    movs r0,r0    @ 08029f9a 0000
+LAB_08029f9c:
+    lsls r7,r3,#0x9    @ 08029f9c 5f02
+    movs r0,r0    @ 08029f9e 0000
+LAB_08029fa0:
+    lsls r3,r0,#0x8    @ 08029fa0 0302
+    movs r0,r0    @ 08029fa2 0000
+LAB_08029fa4:
+    lsls r2,r0,#0x8    @ 08029fa4 0202
+    movs r0,r0    @ 08029fa6 0000
+WORD_08029fa8:
+    .hword 0xc03f                         @ 08029fa8 3fc0
+    .hword 0xffff    @ 08029faa ffff
+campaign_scene_handler_08029fac:
+    bl tick_campaign_card_select_display_state__08027e50 @ 08029fac fdf750ff
+    cmp r0,#0x0                              @ 08029fb0 0028
+    bne LAB_08029fd8                         @ 08029fb2 11d1
+    ldr r0, LAB_08029fcc                     @ 08029fb4 0548
+    ldr r1, LAB_08029fd0                     @ 08029fb6 0649
+    adds r0,r0,r1    @ 08029fb8 4018
+    ldr r1, WORD_08029fd4                    @ 08029fba 0649
+    ldrh r2,[r0,#0x0]                        @ 08029fbc 0288
+    ands r1,r2    @ 08029fbe 1140
+    movs r3,#0xfa    @ 08029fc0 fa23
+    lsls r3,r3,#0x6    @ 08029fc2 9b01
+    adds r2,r3,#0x0    @ 08029fc4 1a1c
+    bl SUB_0802ae26                          @ 08029fc6 00f02eff
+    movs r0,r0    @ 08029fca 0000
+LAB_08029fcc:
+    lsls r0,r0,#0x1    @ 08029fcc 4000
+    lsls r0,r0,#0xc    @ 08029fce 0003
+LAB_08029fd0:
+    lsls r2,r0,#0x8    @ 08029fd0 0202
+    movs r0,r0    @ 08029fd2 0000
+WORD_08029fd4:
+    .hword 0xc03f                         @ 08029fd4 3fc0
+    .hword 0xffff    @ 08029fd6 ffff
+LAB_08029fd8:
+    bl tick_aob_display_with_sprite_enable_blend @ 08029fd8 04f09efc
+    cmp r0,#0x0                              @ 08029fdc 0028
+    bne LAB_08029fe2                         @ 08029fde 00d1
+    b SUB_08029bb2                           @ 08029fe0 e7e5
+LAB_08029fe2:
+    ldr r2, DWORD_0802a000                   @ 08029fe2 074a
+    ldr r4, DWORD_0802a004                   @ 08029fe4 074c
+    adds r2,r2,r4    @ 08029fe6 1219
+    ldrh r3,[r2,#0x0]                        @ 08029fe8 1388
+    lsls r1,r3,#0x12    @ 08029fea 9904
+    lsrs r1,r1,#0x18    @ 08029fec 090e
+    adds r1,#0x1    @ 08029fee 0131
+    movs r0,#0xff    @ 08029ff0 ff20
+    ands r1,r0    @ 08029ff2 0140
+    lsls r1,r1,#0x6    @ 08029ff4 8901
+    ldr r0, DWORD_0802a008                   @ 08029ff6 0448
+    ands r0,r3    @ 08029ff8 1840
+    orrs r0,r1    @ 08029ffa 0843
+    strh r0,[r2,#0x0]                        @ 08029ffc 1080
+    b SUB_08029bb2                           @ 08029ffe d8e5
+DWORD_0802a000:
+    .word  0x03000040                     @ 0802a000 40000003
+DWORD_0802a004:
+    .word  0x00000202                     @ 0802a004 02020000
+DWORD_0802a008:
+    .word  0xffffc03f                     @ 0802a008 3fc0ffff
+campaign_scene_handler_0802a00c:
+    bl tick_opponent_aob_by_phase            @ 0802a00c 03f056fa
+    cmp r0,#0x0                              @ 0802a010 0028
+    bne LAB_0802a016                         @ 0802a012 00d1
+    b LAB_0802a19c                           @ 0802a014 c2e0
+LAB_0802a016:
+    bl check_siocnt_link_ready               @ 0802a016 f5f7bff9
+    cmp r0,#0x0                              @ 0802a01a 0028
+    beq LAB_0802a07c                         @ 0802a01c 2ed0
+    ldr r0, DWORD_0802a048                   @ 0802a01e 0a48
+    ldr r5, DWORD_0802a04c                   @ 0802a020 0a4d
+    adds r0,r0,r5    @ 0802a022 4019
+    movs r1,#0x7    @ 0802a024 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a026 0078
+    ands r1,r0    @ 0802a028 0140
+    cmp r1,#0x1                              @ 0802a02a 0129
+    beq LAB_0802a070                         @ 0802a02c 20d0
+    cmp r1,#0x2                              @ 0802a02e 0229
+    beq LAB_0802a068                         @ 0802a030 1ad0
+    cmp r1,#0x3                              @ 0802a032 0329
+    beq LAB_0802a060                         @ 0802a034 14d0
+    cmp r1,#0x4                              @ 0802a036 0429
+    beq LAB_0802a058                         @ 0802a038 0ed0
+    ldr r0, DWORD_0802a050                   @ 0802a03a 0548
+    cmp r1,#0x5                              @ 0802a03c 0529
+    bne LAB_0802a072                         @ 0802a03e 18d1
+    ldr r6, DWORD_0802a054                   @ 0802a040 044e
+    adds r0,r0,r6    @ 0802a042 8019
+    b LAB_0802a072                           @ 0802a044 15e0
+    .zero  0x2
+DWORD_0802a048:
+    .word  0x02000000                     @ 0802a048 00000002
+DWORD_0802a04c:
+    .word  0x00006c2c                     @ 0802a04c 2c6c0000
+DWORD_0802a050:
+    .word  0x09dbfda6                     @ 0802a050 a6fddb09
+DWORD_0802a054:
+    .word  0x0003ab14                     @ 0802a054 14ab0300
+LAB_0802a058:
+    ldr r0, DWORD_0802a05c                   @ 0802a058 0048
+    b LAB_0802a072                           @ 0802a05a 0ae0
+DWORD_0802a05c:
+    .word  0x09deecd8                     @ 0802a05c d8ecde09
+LAB_0802a060:
+    ldr r0, DWORD_0802a064                   @ 0802a060 0048
+    b LAB_0802a072                           @ 0802a062 06e0
+DWORD_0802a064:
+    .word  0x09de282c                     @ 0802a064 2c28de09
+LAB_0802a068:
+    ldr r0, DWORD_0802a06c                   @ 0802a068 0048
+    b LAB_0802a072                           @ 0802a06a 02e0
+DWORD_0802a06c:
+    .word  0x09dd64b2                     @ 0802a06c b264dd09
+LAB_0802a070:
+    ldr r0, DWORD_0802a078                   @ 0802a070 0148
+LAB_0802a072:
+    bl draw_card_name_label_to_sprite_vram   @ 0802a072 03f08bfa
+    b LAB_0802a0d2                           @ 0802a076 2ce0
+DWORD_0802a078:
+    .word  0x09dcabba                     @ 0802a078 baabdc09
+LAB_0802a07c:
+    ldr r0, DWORD_0802a0a4                   @ 0802a07c 0948
+    ldr r7, DWORD_0802a0a8                   @ 0802a07e 0a4f
+    adds r0,r0,r7    @ 0802a080 c019
+    movs r1,#0x7    @ 0802a082 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a084 0078
+    ands r1,r0    @ 0802a086 0140
+    cmp r1,#0x1                              @ 0802a088 0129
+    beq LAB_0802a0cc                         @ 0802a08a 1fd0
+    cmp r1,#0x2                              @ 0802a08c 0229
+    beq LAB_0802a0c4                         @ 0802a08e 19d0
+    cmp r1,#0x3                              @ 0802a090 0329
+    beq LAB_0802a0bc                         @ 0802a092 13d0
+    cmp r1,#0x4                              @ 0802a094 0429
+    beq LAB_0802a0b4                         @ 0802a096 0dd0
+    ldr r0, DWORD_0802a0ac                   @ 0802a098 0448
+    cmp r1,#0x5                              @ 0802a09a 0529
+    bne LAB_0802a0ce                         @ 0802a09c 17d1
+    ldr r1, DWORD_0802a0b0                   @ 0802a09e 0449
+    adds r0,r0,r1    @ 0802a0a0 4018
+    b LAB_0802a0ce                           @ 0802a0a2 14e0
+DWORD_0802a0a4:
+    .word  0x02000000                     @ 0802a0a4 00000002
+DWORD_0802a0a8:
+    .word  0x00006c2c                     @ 0802a0a8 2c6c0000
+DWORD_0802a0ac:
+    .word  0x09dba750                     @ 0802a0ac 50a7db09
+DWORD_0802a0b0:
+    .word  0x0003a30c                     @ 0802a0b0 0ca30300
+LAB_0802a0b4:
+    ldr r0, DWORD_0802a0b8                   @ 0802a0b4 0048
+    b LAB_0802a0ce                           @ 0802a0b6 0ae0
+DWORD_0802a0b8:
+    .word  0x09de8ab2                     @ 0802a0b8 b28ade09
+LAB_0802a0bc:
+    ldr r0, DWORD_0802a0c0                   @ 0802a0bc 0048
+    b LAB_0802a0ce                           @ 0802a0be 06e0
+DWORD_0802a0c0:
+    .word  0x09ddc6cc                     @ 0802a0c0 ccc6dd09
+LAB_0802a0c4:
+    ldr r0, DWORD_0802a0c8                   @ 0802a0c4 0048
+    b LAB_0802a0ce                           @ 0802a0c6 02e0
+DWORD_0802a0c8:
+    .word  0x09dd037a                     @ 0802a0c8 7a03dd09
+LAB_0802a0cc:
+    ldr r0, DWORD_0802a0fc                   @ 0802a0cc 0b48
+LAB_0802a0ce:
+    bl draw_card_name_label_to_sprite_vram   @ 0802a0ce 03f05dfa
+LAB_0802a0d2:
+    ldr r1, DWORD_0802a100                   @ 0802a0d2 0b49
+    ldr r2, DWORD_0802a104                   @ 0802a0d4 0b4a
+    adds r0,r1,r2    @ 0802a0d6 8818
+    movs r2,#0x7    @ 0802a0d8 0722
+    ldrb r0,[r0,#0x0]                        @ 0802a0da 0078
+    ands r2,r0    @ 0802a0dc 0240
+    adds r0,r1,#0x0    @ 0802a0de 081c
+    cmp r2,#0x1                              @ 0802a0e0 012a
+    beq LAB_0802a128                         @ 0802a0e2 21d0
+    cmp r2,#0x2                              @ 0802a0e4 022a
+    beq LAB_0802a120                         @ 0802a0e6 1bd0
+    cmp r2,#0x3                              @ 0802a0e8 032a
+    beq LAB_0802a118                         @ 0802a0ea 15d0
+    cmp r2,#0x4                              @ 0802a0ec 042a
+    beq LAB_0802a110                         @ 0802a0ee 0fd0
+    ldr r1, DWORD_0802a108                   @ 0802a0f0 0549
+    cmp r2,#0x5                              @ 0802a0f2 052a
+    bne LAB_0802a12a                         @ 0802a0f4 19d1
+    ldr r3, DWORD_0802a10c                   @ 0802a0f6 054b
+    adds r1,r1,r3    @ 0802a0f8 c918
+    b LAB_0802a12a                           @ 0802a0fa 16e0
+DWORD_0802a0fc:
+    .word  0x09dc53d6                     @ 0802a0fc d653dc09
+DWORD_0802a100:
+    .word  0x02000000                     @ 0802a100 00000002
+DWORD_0802a104:
+    .word  0x00006c2c                     @ 0802a104 2c6c0000
+DWORD_0802a108:
+    .word  0x09dbd7cc                     @ 0802a108 ccd7db09
+DWORD_0802a10c:
+    .word  0x0003a910                     @ 0802a10c 10a90300
+LAB_0802a110:
+    ldr r1, DWORD_0802a114                   @ 0802a110 0049
+    b LAB_0802a12a                           @ 0802a112 0ae0
+DWORD_0802a114:
+    .word  0x09dec2c6                     @ 0802a114 c6c2de09
+LAB_0802a118:
+    ldr r1, DWORD_0802a11c                   @ 0802a118 0049
+    b LAB_0802a12a                           @ 0802a11a 06e0
+DWORD_0802a11c:
+    .word  0x09ddffc8                     @ 0802a11c c8ffdd09
+LAB_0802a120:
+    ldr r1, DWORD_0802a124                   @ 0802a120 0049
+    b LAB_0802a12a                           @ 0802a122 02e0
+DWORD_0802a124:
+    .word  0x09dd3cec                     @ 0802a124 ec3cdd09
+LAB_0802a128:
+    ldr r1, DWORD_0802a150                   @ 0802a128 0949
+LAB_0802a12a:
+    ldr r4, DWORD_0802a154                   @ 0802a12a 0a4c
+    adds r0,r0,r4    @ 0802a12c 0019
+    movs r3,#0x7    @ 0802a12e 0723
+    ldrb r0,[r0,#0x0]                        @ 0802a130 0078
+    ands r3,r0    @ 0802a132 0340
+    cmp r3,#0x1                              @ 0802a134 012b
+    beq LAB_0802a178                         @ 0802a136 1fd0
+    cmp r3,#0x2                              @ 0802a138 022b
+    beq LAB_0802a170                         @ 0802a13a 19d0
+    cmp r3,#0x3                              @ 0802a13c 032b
+    beq LAB_0802a168                         @ 0802a13e 13d0
+    cmp r3,#0x4                              @ 0802a140 042b
+    beq LAB_0802a160                         @ 0802a142 0dd0
+    ldr r2, DWORD_0802a158                   @ 0802a144 044a
+    cmp r3,#0x5                              @ 0802a146 052b
+    bne LAB_0802a17a                         @ 0802a148 17d1
+    ldr r5, DWORD_0802a15c                   @ 0802a14a 044d
+    adds r2,r2,r5    @ 0802a14c 5219
+    b LAB_0802a17a                           @ 0802a14e 14e0
+DWORD_0802a150:
+    .word  0x09dc882a                     @ 0802a150 2a88dc09
+DWORD_0802a154:
+    .word  0x00006c2c                     @ 0802a154 2c6c0000
+DWORD_0802a158:
+    .word  0x09dbd7d4                     @ 0802a158 d4d7db09
+DWORD_0802a15c:
+    .word  0x0003a90e                     @ 0802a15c 0ea90300
+LAB_0802a160:
+    ldr r2, DWORD_0802a164                   @ 0802a160 004a
+    b LAB_0802a17a                           @ 0802a162 0ae0
+DWORD_0802a164:
+    .word  0x09dec2cc                     @ 0802a164 ccc2de09
+LAB_0802a168:
+    ldr r2, DWORD_0802a16c                   @ 0802a168 004a
+    b LAB_0802a17a                           @ 0802a16a 06e0
+DWORD_0802a16c:
+    .word  0x09ddffce                     @ 0802a16c ceffdd09
+LAB_0802a170:
+    ldr r2, DWORD_0802a174                   @ 0802a170 004a
+    b LAB_0802a17a                           @ 0802a172 02e0
+DWORD_0802a174:
+    .word  0x09dd3cf2                     @ 0802a174 f23cdd09
+LAB_0802a178:
+    ldr r2, LAB_0802a1bc                     @ 0802a178 104a
+LAB_0802a17a:
+    movs r0,#0x5    @ 0802a17a 0520
+    bl setup_label_render_ctx                @ 0802a17c 03f0a6fc
+    ldr r2, LAB_0802a1c0                     @ 0802a180 0f4a
+    ldr r6, LAB_0802a1c4                     @ 0802a182 104e
+    adds r2,r2,r6    @ 0802a184 9219
+    ldrh r3,[r2,#0x0]                        @ 0802a186 1388
+    lsls r1,r3,#0x12    @ 0802a188 9904
+    lsrs r1,r1,#0x18    @ 0802a18a 090e
+    adds r1,#0x1    @ 0802a18c 0131
+    movs r0,#0xff    @ 0802a18e ff20
+    ands r1,r0    @ 0802a190 0140
+    lsls r1,r1,#0x6    @ 0802a192 8901
+    ldr r0, WORD_0802a1c8                    @ 0802a194 0c48
+    ands r0,r3    @ 0802a196 1840
+    orrs r0,r1    @ 0802a198 0843
+    strh r0,[r2,#0x0]                        @ 0802a19a 1080
+LAB_0802a19c:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a19c fdf758fe
+    cmp r0,#0x0                              @ 0802a1a0 0028
+    beq LAB_0802a1a6                         @ 0802a1a2 00d0
+    b SUB_08029bb2                           @ 0802a1a4 05e5
+LAB_0802a1a6:
+    ldr r0, LAB_0802a1c0                     @ 0802a1a6 0648
+    ldr r7, LAB_0802a1c4                     @ 0802a1a8 064f
+    adds r0,r0,r7    @ 0802a1aa c019
+    ldr r1, WORD_0802a1c8                    @ 0802a1ac 0649
+    ldrh r2,[r0,#0x0]                        @ 0802a1ae 0288
+    ands r1,r2    @ 0802a1b0 1140
+    movs r3,#0xfa    @ 0802a1b2 fa23
+    lsls r3,r3,#0x6    @ 0802a1b4 9b01
+    adds r2,r3,#0x0    @ 0802a1b6 1a1c
+    bl SUB_0802ae26                          @ 0802a1b8 00f035fe
+LAB_0802a1bc:
+    ldrh r0,[r6,#0x0]                        @ 0802a1bc 3088
+    lsrs r4,r3,#0x7    @ 0802a1be dc09
+LAB_0802a1c0:
+    lsls r0,r0,#0x1    @ 0802a1c0 4000
+    lsls r0,r0,#0xc    @ 0802a1c2 0003
+LAB_0802a1c4:
+    lsls r2,r0,#0x8    @ 0802a1c4 0202
+    movs r0,r0    @ 0802a1c6 0000
+WORD_0802a1c8:
+    .hword 0xc03f                         @ 0802a1c8 3fc0
+    .hword 0xffff    @ 0802a1ca ffff
+campaign_scene_handler_0802a1cc:
+    bl tick_campaign_card_select_display_state @ 0802a1cc 03f09cff
+    cmp r0,#0x0                              @ 0802a1d0 0028
+    bne LAB_0802a1d6                         @ 0802a1d2 00d1
+    b LAB_0802a3b0                           @ 0802a1d4 ece0
+LAB_0802a1d6:
+    ldr r0, DWORD_0802a218                   @ 0802a1d6 1048
+    adds r0,#0x39    @ 0802a1d8 3930
+    ldrb r1,[r0,#0x0]                        @ 0802a1da 0178
+    movs r0,#0x10    @ 0802a1dc 1020
+    ands r0,r1    @ 0802a1de 0840
+    cmp r0,#0x0                              @ 0802a1e0 0028
+    bne LAB_0802a1e6                         @ 0802a1e2 00d1
+    b LAB_0802a394                           @ 0802a1e4 d6e0
+LAB_0802a1e6:
+    movs r0,#0x8    @ 0802a1e6 0820
+    ands r0,r1    @ 0802a1e8 0840
+    cmp r0,#0x0                              @ 0802a1ea 0028
+    beq LAB_0802a260                         @ 0802a1ec 38d0
+    ldr r0, DWORD_0802a21c                   @ 0802a1ee 0b48
+    ldr r4, DWORD_0802a220                   @ 0802a1f0 0b4c
+    adds r0,r0,r4    @ 0802a1f2 0019
+    movs r1,#0x7    @ 0802a1f4 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a1f6 0078
+    ands r1,r0    @ 0802a1f8 0140
+    cmp r1,#0x1                              @ 0802a1fa 0129
+    beq LAB_0802a244                         @ 0802a1fc 22d0
+    cmp r1,#0x2                              @ 0802a1fe 0229
+    beq LAB_0802a23c                         @ 0802a200 1cd0
+    cmp r1,#0x3                              @ 0802a202 0329
+    beq LAB_0802a234                         @ 0802a204 16d0
+    cmp r1,#0x4                              @ 0802a206 0429
+    beq LAB_0802a22c                         @ 0802a208 10d0
+    ldr r0, DWORD_0802a224                   @ 0802a20a 0648
+    cmp r1,#0x5                              @ 0802a20c 0529
+    bne LAB_0802a246                         @ 0802a20e 1ad1
+    ldr r5, DWORD_0802a228                   @ 0802a210 054d
+    adds r0,r0,r5    @ 0802a212 4019
+    b LAB_0802a246                           @ 0802a214 17e0
+    .zero  0x2
+DWORD_0802a218:
+    .word  0x02023360                     @ 0802a218 60330202
+DWORD_0802a21c:
+    .word  0x02000000                     @ 0802a21c 00000002
+DWORD_0802a220:
+    .word  0x00006c2c                     @ 0802a220 2c6c0000
+DWORD_0802a224:
+    .word  0x09dbfd66                     @ 0802a224 66fddb09
+DWORD_0802a228:
+    .word  0x0003ab16                     @ 0802a228 16ab0300
+LAB_0802a22c:
+    ldr r0, DWORD_0802a230                   @ 0802a22c 0048
+    b LAB_0802a246                           @ 0802a22e 0ae0
+DWORD_0802a230:
+    .word  0x09deeca0                     @ 0802a230 a0ecde09
+LAB_0802a234:
+    ldr r0, DWORD_0802a238                   @ 0802a234 0048
+    b LAB_0802a246                           @ 0802a236 06e0
+DWORD_0802a238:
+    .word  0x09de27ec                     @ 0802a238 ec27de09
+LAB_0802a23c:
+    ldr r0, DWORD_0802a240                   @ 0802a23c 0048
+    b LAB_0802a246                           @ 0802a23e 02e0
+DWORD_0802a240:
+    .word  0x09dd6478                     @ 0802a240 7864dd09
+LAB_0802a244:
+    ldr r0, DWORD_0802a258                   @ 0802a244 0448
+LAB_0802a246:
+    bl draw_card_name_label_to_sprite_vram   @ 0802a246 03f0a1f9
+    ldr r1, DWORD_0802a25c                   @ 0802a24a 0449
+    adds r1,#0x39    @ 0802a24c 3931
+    movs r0,#0x4    @ 0802a24e 0420
+    ldrb r6,[r1,#0x0]                        @ 0802a250 0e78
+    orrs r0,r6    @ 0802a252 3043
+    b LAB_0802a2c2                           @ 0802a254 35e0
+    .zero  0x2
+DWORD_0802a258:
+    .word  0x09dcab86                     @ 0802a258 86abdc09
+DWORD_0802a25c:
+    .word  0x02023360                     @ 0802a25c 60330202
+LAB_0802a260:
+    ldr r0, DWORD_0802a288                   @ 0802a260 0948
+    ldr r7, DWORD_0802a28c                   @ 0802a262 0a4f
+    adds r0,r0,r7    @ 0802a264 c019
+    movs r1,#0x7    @ 0802a266 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a268 0078
+    ands r1,r0    @ 0802a26a 0140
+    cmp r1,#0x1                              @ 0802a26c 0129
+    beq LAB_0802a2b0                         @ 0802a26e 1fd0
+    cmp r1,#0x2                              @ 0802a270 0229
+    beq LAB_0802a2a8                         @ 0802a272 19d0
+    cmp r1,#0x3                              @ 0802a274 0329
+    beq LAB_0802a2a0                         @ 0802a276 13d0
+    cmp r1,#0x4                              @ 0802a278 0429
+    beq LAB_0802a298                         @ 0802a27a 0dd0
+    ldr r0, DWORD_0802a290                   @ 0802a27c 0448
+    cmp r1,#0x5                              @ 0802a27e 0529
+    bne LAB_0802a2b2                         @ 0802a280 17d1
+    ldr r1, DWORD_0802a294                   @ 0802a282 0449
+    adds r0,r0,r1    @ 0802a284 4018
+    b LAB_0802a2b2                           @ 0802a286 14e0
+DWORD_0802a288:
+    .word  0x02000000                     @ 0802a288 00000002
+DWORD_0802a28c:
+    .word  0x00006c2c                     @ 0802a28c 2c6c0000
+DWORD_0802a290:
+    .word  0x09dbfda6                     @ 0802a290 a6fddb09
+DWORD_0802a294:
+    .word  0x0003ab14                     @ 0802a294 14ab0300
+LAB_0802a298:
+    ldr r0, DWORD_0802a29c                   @ 0802a298 0048
+    b LAB_0802a2b2                           @ 0802a29a 0ae0
+DWORD_0802a29c:
+    .word  0x09deecd8                     @ 0802a29c d8ecde09
+LAB_0802a2a0:
+    ldr r0, DWORD_0802a2a4                   @ 0802a2a0 0048
+    b LAB_0802a2b2                           @ 0802a2a2 06e0
+DWORD_0802a2a4:
+    .word  0x09de282c                     @ 0802a2a4 2c28de09
+LAB_0802a2a8:
+    ldr r0, DWORD_0802a2ac                   @ 0802a2a8 0048
+    b LAB_0802a2b2                           @ 0802a2aa 02e0
+DWORD_0802a2ac:
+    .word  0x09dd64b2                     @ 0802a2ac b264dd09
+LAB_0802a2b0:
+    ldr r0, DWORD_0802a2f0                   @ 0802a2b0 0f48
+LAB_0802a2b2:
+    bl draw_card_name_label_to_sprite_vram   @ 0802a2b2 03f06bf9
+    ldr r1, DWORD_0802a2f4                   @ 0802a2b6 0f49
+    adds r1,#0x39    @ 0802a2b8 3931
+    movs r0,#0x5    @ 0802a2ba 0520
+    rsbs r0,r0,#0    @ 0802a2bc 4042
+    ldrb r2,[r1,#0x0]                        @ 0802a2be 0a78
+    ands r0,r2    @ 0802a2c0 1040
+LAB_0802a2c2:
+    strb r0,[r1,#0x0]                        @ 0802a2c2 0870
+    ldr r1, DWORD_0802a2f8                   @ 0802a2c4 0c49
+    ldr r3, DWORD_0802a2fc                   @ 0802a2c6 0d4b
+    adds r0,r1,r3    @ 0802a2c8 c818
+    movs r2,#0x7    @ 0802a2ca 0722
+    ldrb r0,[r0,#0x0]                        @ 0802a2cc 0078
+    ands r2,r0    @ 0802a2ce 0240
+    adds r0,r1,#0x0    @ 0802a2d0 081c
+    cmp r2,#0x1                              @ 0802a2d2 012a
+    beq LAB_0802a320                         @ 0802a2d4 24d0
+    cmp r2,#0x2                              @ 0802a2d6 022a
+    beq LAB_0802a318                         @ 0802a2d8 1ed0
+    cmp r2,#0x3                              @ 0802a2da 032a
+    beq LAB_0802a310                         @ 0802a2dc 18d0
+    cmp r2,#0x4                              @ 0802a2de 042a
+    beq LAB_0802a308                         @ 0802a2e0 12d0
+    ldr r1, DWORD_0802a300                   @ 0802a2e2 0749
+    cmp r2,#0x5                              @ 0802a2e4 052a
+    bne LAB_0802a322                         @ 0802a2e6 1cd1
+    ldr r4, DWORD_0802a304                   @ 0802a2e8 064c
+    adds r1,r1,r4    @ 0802a2ea 0919
+    b LAB_0802a322                           @ 0802a2ec 19e0
+    .zero  0x2
+DWORD_0802a2f0:
+    .word  0x09dcabba                     @ 0802a2f0 baabdc09
+DWORD_0802a2f4:
+    .word  0x02023360                     @ 0802a2f4 60330202
+DWORD_0802a2f8:
+    .word  0x02000000                     @ 0802a2f8 00000002
+DWORD_0802a2fc:
+    .word  0x00006c2c                     @ 0802a2fc 2c6c0000
+DWORD_0802a300:
+    .word  0x09dbfd82                     @ 0802a300 82fddb09
+DWORD_0802a304:
+    .word  0x0003ab0e                     @ 0802a304 0eab0300
+LAB_0802a308:
+    ldr r1, DWORD_0802a30c                   @ 0802a308 0049
+    b LAB_0802a322                           @ 0802a30a 0ae0
+DWORD_0802a30c:
+    .word  0x09deecb2                     @ 0802a30c b2ecde09
+LAB_0802a310:
+    ldr r1, DWORD_0802a314                   @ 0802a310 0049
+    b LAB_0802a322                           @ 0802a312 06e0
+DWORD_0802a314:
+    .word  0x09de2802                     @ 0802a314 0228de09
+LAB_0802a318:
+    ldr r1, DWORD_0802a31c                   @ 0802a318 0049
+    b LAB_0802a322                           @ 0802a31a 02e0
+DWORD_0802a31c:
+    .word  0x09dd648e                     @ 0802a31c 8e64dd09
+LAB_0802a320:
+    ldr r1, DWORD_0802a348                   @ 0802a320 0949
+LAB_0802a322:
+    ldr r5, DWORD_0802a34c                   @ 0802a322 0a4d
+    adds r0,r0,r5    @ 0802a324 4019
+    movs r3,#0x7    @ 0802a326 0723
+    ldrb r0,[r0,#0x0]                        @ 0802a328 0078
+    ands r3,r0    @ 0802a32a 0340
+    cmp r3,#0x1                              @ 0802a32c 012b
+    beq LAB_0802a370                         @ 0802a32e 1fd0
+    cmp r3,#0x2                              @ 0802a330 022b
+    beq LAB_0802a368                         @ 0802a332 19d0
+    cmp r3,#0x3                              @ 0802a334 032b
+    beq LAB_0802a360                         @ 0802a336 13d0
+    cmp r3,#0x4                              @ 0802a338 042b
+    beq LAB_0802a358                         @ 0802a33a 0dd0
+    ldr r2, DWORD_0802a350                   @ 0802a33c 044a
+    cmp r3,#0x5                              @ 0802a33e 052b
+    bne LAB_0802a372                         @ 0802a340 17d1
+    ldr r6, DWORD_0802a354                   @ 0802a342 044e
+    adds r2,r2,r6    @ 0802a344 9219
+    b LAB_0802a372                           @ 0802a346 14e0
+DWORD_0802a348:
+    .word  0x09dcab98                     @ 0802a348 98abdc09
+DWORD_0802a34c:
+    .word  0x00006c2c                     @ 0802a34c 2c6c0000
+DWORD_0802a350:
+    .word  0x09dbfd88                     @ 0802a350 88fddb09
+DWORD_0802a354:
+    .word  0x0003ab10                     @ 0802a354 10ab0300
+LAB_0802a358:
+    ldr r2, DWORD_0802a35c                   @ 0802a358 004a
+    b LAB_0802a372                           @ 0802a35a 0ae0
+DWORD_0802a35c:
+    .word  0x09deecb8                     @ 0802a35c b8ecde09
+LAB_0802a360:
+    ldr r2, DWORD_0802a364                   @ 0802a360 004a
+    b LAB_0802a372                           @ 0802a362 06e0
+DWORD_0802a364:
+    .word  0x09de280a                     @ 0802a364 0a28de09
+LAB_0802a368:
+    ldr r2, DWORD_0802a36c                   @ 0802a368 004a
+    b LAB_0802a372                           @ 0802a36a 02e0
+DWORD_0802a36c:
+    .word  0x09dd6496                     @ 0802a36c 9664dd09
+LAB_0802a370:
+    ldr r2, LAB_0802a3d4                     @ 0802a370 184a
+LAB_0802a372:
+    movs r0,#0x7    @ 0802a372 0720
+    bl setup_label_render_ctx                @ 0802a374 03f0aafb
+    ldr r2, LAB_0802a3d8                     @ 0802a378 174a
+    ldr r7, LAB_0802a3dc                     @ 0802a37a 184f
+    adds r2,r2,r7    @ 0802a37c d219
+    ldrh r3,[r2,#0x0]                        @ 0802a37e 1388
+    lsls r1,r3,#0x12    @ 0802a380 9904
+    lsrs r1,r1,#0x18    @ 0802a382 090e
+    adds r1,#0x1    @ 0802a384 0131
+    movs r0,#0xff    @ 0802a386 ff20
+    ands r1,r0    @ 0802a388 0140
+    lsls r1,r1,#0x6    @ 0802a38a 8901
+    ldr r0, WORD_0802a3e0                    @ 0802a38c 1448
+    ands r0,r3    @ 0802a38e 1840
+    orrs r0,r1    @ 0802a390 0843
+    strh r0,[r2,#0x0]                        @ 0802a392 1080
+LAB_0802a394:
+    ldr r2, LAB_0802a3d8                     @ 0802a394 104a
+    ldr r0, LAB_0802a3dc                     @ 0802a396 1148
+    adds r2,r2,r0    @ 0802a398 1218
+    ldrh r3,[r2,#0x0]                        @ 0802a39a 1388
+    lsls r1,r3,#0x12    @ 0802a39c 9904
+    lsrs r1,r1,#0x18    @ 0802a39e 090e
+    adds r1,#0x1    @ 0802a3a0 0131
+    movs r0,#0xff    @ 0802a3a2 ff20
+    ands r1,r0    @ 0802a3a4 0140
+    lsls r1,r1,#0x6    @ 0802a3a6 8901
+    ldr r0, WORD_0802a3e0                    @ 0802a3a8 0d48
+    ands r0,r3    @ 0802a3aa 1840
+    orrs r0,r1    @ 0802a3ac 0843
+    strh r0,[r2,#0x0]                        @ 0802a3ae 1080
+LAB_0802a3b0:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a3b0 fdf74efd
+    cmp r0,#0x0                              @ 0802a3b4 0028
+    beq LAB_0802a3bc                         @ 0802a3b6 01d0
+    bl SUB_08029bb2                          @ 0802a3b8 fff7fbfb
+LAB_0802a3bc:
+    ldr r0, LAB_0802a3d8                     @ 0802a3bc 0648
+    ldr r1, LAB_0802a3dc                     @ 0802a3be 0749
+    adds r0,r0,r1    @ 0802a3c0 4018
+    ldr r1, WORD_0802a3e0                    @ 0802a3c2 0749
+    ldrh r2,[r0,#0x0]                        @ 0802a3c4 0288
+    ands r1,r2    @ 0802a3c6 1140
+    movs r3,#0xfa    @ 0802a3c8 fa23
+    lsls r3,r3,#0x6    @ 0802a3ca 9b01
+    adds r2,r3,#0x0    @ 0802a3cc 1a1c
+    bl SUB_0802ae26                          @ 0802a3ce 00f02afd
+    movs r0,r0    @ 0802a3d2 0000
+LAB_0802a3d4:
+    add r3,sp,#0x278                         @ 0802a3d4 9eab
+    lsrs r4,r3,#0x7    @ 0802a3d6 dc09
+LAB_0802a3d8:
+    lsls r0,r0,#0x1    @ 0802a3d8 4000
+    lsls r0,r0,#0xc    @ 0802a3da 0003
+LAB_0802a3dc:
+    lsls r2,r0,#0x8    @ 0802a3dc 0202
+    movs r0,r0    @ 0802a3de 0000
+WORD_0802a3e0:
+    .hword 0xc03f                         @ 0802a3e0 3fc0
+    .hword 0xffff    @ 0802a3e2 ffff
+campaign_scene_handler_0802a3e4:
+    bl tick_campaign_card_select_display_state @ 0802a3e4 03f090fe
+    cmp r0,#0x0                              @ 0802a3e8 0028
+    beq LAB_0802a40c                         @ 0802a3ea 0fd0
+    ldr r2, LAB_0802a430                     @ 0802a3ec 104a
+    ldr r4, LAB_0802a434                     @ 0802a3ee 114c
+    adds r2,r2,r4    @ 0802a3f0 1219
+    ldrh r3,[r2,#0x0]                        @ 0802a3f2 1388
+    lsls r1,r3,#0x12    @ 0802a3f4 9904
+    lsrs r1,r1,#0x18    @ 0802a3f6 090e
+    adds r1,#0x1    @ 0802a3f8 0131
+    movs r0,#0xff    @ 0802a3fa ff20
+    ands r1,r0    @ 0802a3fc 0140
+    lsls r1,r1,#0x6    @ 0802a3fe 8901
+    ldr r0, WORD_0802a438                    @ 0802a400 0d48
+    ands r0,r3    @ 0802a402 1840
+    orrs r0,r1    @ 0802a404 0843
+    strh r0,[r2,#0x0]                        @ 0802a406 1080
+    bl request_sound_engine_code10           @ 0802a408 cff09afb
+LAB_0802a40c:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a40c fdf720fd
+    cmp r0,#0x0                              @ 0802a410 0028
+    beq LAB_0802a418                         @ 0802a412 01d0
+    bl SUB_08029bb2                          @ 0802a414 fff7cdfb
+LAB_0802a418:
+    ldr r0, LAB_0802a430                     @ 0802a418 0548
+    ldr r5, LAB_0802a434                     @ 0802a41a 064d
+    adds r0,r0,r5    @ 0802a41c 4019
+    ldr r1, WORD_0802a438                    @ 0802a41e 0649
+    ldrh r6,[r0,#0x0]                        @ 0802a420 0688
+    ands r1,r6    @ 0802a422 3140
+    movs r7,#0xfa    @ 0802a424 fa27
+    lsls r7,r7,#0x6    @ 0802a426 bf01
+    adds r2,r7,#0x0    @ 0802a428 3a1c
+    bl SUB_0802ae26                          @ 0802a42a 00f0fcfc
+    movs r0,r0    @ 0802a42e 0000
+LAB_0802a430:
+    lsls r0,r0,#0x1    @ 0802a430 4000
+    lsls r0,r0,#0xc    @ 0802a432 0003
+LAB_0802a434:
+    lsls r2,r0,#0x8    @ 0802a434 0202
+    movs r0,r0    @ 0802a436 0000
+WORD_0802a438:
+    .hword 0xc03f                         @ 0802a438 3fc0
+    .hword 0xffff    @ 0802a43a ffff
+campaign_scene_handler_0802a43c:
+    bl tick_aob_display_with_fadein          @ 0802a43c 04f07cfa
+    cmp r0,#0x0                              @ 0802a440 0028
+    beq LAB_0802a492                         @ 0802a442 26d0
+    movs r0,#0x80    @ 0802a444 8020
+    lsls r0,r0,#0x13    @ 0802a446 c004
+    movs r1,#0x0    @ 0802a448 0021
+    strh r1,[r0,#0x0]                        @ 0802a44a 0180
+    bl check_siocnt_link_ready               @ 0802a44c f4f7a4ff
+    cmp r0,#0x0                              @ 0802a450 0028
+    beq LAB_0802a476                         @ 0802a452 10d0
+    ldr r4, LAB_0802a4b4                     @ 0802a454 174c
+    ldr r0, DWORD_0802a4b8                   @ 0802a456 1848
+    adds r0,#0x39    @ 0802a458 3930
+    ldrb r0,[r0,#0x0]                        @ 0802a45a 0078
+    lsls r1,r0,#0x1c    @ 0802a45c 0107
+    lsrs r1,r1,#0x1f    @ 0802a45e c90f
+    ldr r0,[r4,#0x4]                         @ 0802a460 6068
+    eors r0,r1    @ 0802a462 4840
+    str r0,[r4,#0x10]                        @ 0802a464 2061
+    bl tick_prng_lcg_rand15                  @ 0802a466 cef045fd
+    lsls r0,r0,#0x10    @ 0802a46a 0004
+    lsrs r0,r0,#0x10    @ 0802a46c 000c
+    str r0,[r4,#0x0]                         @ 0802a46e 2060
+    movs r0,#0x7    @ 0802a470 0720
+    bl build_campaign_sprite_row_by_type     @ 0802a472 fdf711fc
+LAB_0802a476:
+    ldr r2, DWORD_0802a4bc                   @ 0802a476 114a
+    ldr r0, DWORD_0802a4c0                   @ 0802a478 1148
+    adds r2,r2,r0    @ 0802a47a 1218
+    ldrh r3,[r2,#0x0]                        @ 0802a47c 1388
+    lsls r1,r3,#0x12    @ 0802a47e 9904
+    lsrs r1,r1,#0x18    @ 0802a480 090e
+    adds r1,#0x1    @ 0802a482 0131
+    movs r0,#0xff    @ 0802a484 ff20
+    ands r1,r0    @ 0802a486 0140
+    lsls r1,r1,#0x6    @ 0802a488 8901
+    ldr r0, DWORD_0802a4c4                   @ 0802a48a 0e48
+    ands r0,r3    @ 0802a48c 1840
+    orrs r0,r1    @ 0802a48e 0843
+    strh r0,[r2,#0x0]                        @ 0802a490 1080
+LAB_0802a492:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a492 fdf7ddfc
+    cmp r0,#0x0                              @ 0802a496 0028
+    beq LAB_0802a49e                         @ 0802a498 01d0
+    bl SUB_08029bb2                          @ 0802a49a fff78afb
+LAB_0802a49e:
+    ldr r0, DWORD_0802a4bc                   @ 0802a49e 0748
+    ldr r1, DWORD_0802a4c0                   @ 0802a4a0 0749
+    adds r0,r0,r1    @ 0802a4a2 4018
+    ldr r1, DWORD_0802a4c4                   @ 0802a4a4 0749
+    ldrh r2,[r0,#0x0]                        @ 0802a4a6 0288
+    ands r1,r2    @ 0802a4a8 1140
+    movs r3,#0xfa    @ 0802a4aa fa23
+    lsls r3,r3,#0x6    @ 0802a4ac 9b01
+    adds r2,r3,#0x0    @ 0802a4ae 1a1c
+    bl SUB_0802ae26                          @ 0802a4b0 00f0b9fc
+LAB_0802a4b4:
+    b campaign_scene_handler_0802a9f8        @ 0802a4b4 a0e2
+    .byte  0x01, 0x02
+DWORD_0802a4b8:
+    .word  0x02023360                     @ 0802a4b8 60330202
+DWORD_0802a4bc:
+    .word  0x03000040                     @ 0802a4bc 40000003
+DWORD_0802a4c0:
+    .word  0x00000202                     @ 0802a4c0 02020000
+DWORD_0802a4c4:
+    .word  0xffffc03f                     @ 0802a4c4 3fc0ffff
+campaign_scene_handler_0802a4c8:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a4c8 fdf7c2fc
+    cmp r0,#0x0                              @ 0802a4cc 0028
+    beq LAB_0802a4d4                         @ 0802a4ce 01d0
+    bl SUB_08029bb2                          @ 0802a4d0 fff76ffb
+LAB_0802a4d4:
+    ldr r0, LAB_0802a4e8                     @ 0802a4d4 0448
+    ldr r4, LAB_0802a4ec                     @ 0802a4d6 054c
+    adds r0,r0,r4    @ 0802a4d8 0019
+    ldr r1, WORD_0802a4f0                    @ 0802a4da 0549
+    ldrh r5,[r0,#0x0]                        @ 0802a4dc 0588
+    ands r1,r5    @ 0802a4de 2940
+    movs r6,#0xfa    @ 0802a4e0 fa26
+    lsls r6,r6,#0x6    @ 0802a4e2 b601
+    bl SUB_0802ae24                          @ 0802a4e4 00f09efc
+LAB_0802a4e8:
+    lsls r0,r0,#0x1    @ 0802a4e8 4000
+    lsls r0,r0,#0xc    @ 0802a4ea 0003
+LAB_0802a4ec:
+    lsls r2,r0,#0x8    @ 0802a4ec 0202
+    movs r0,r0    @ 0802a4ee 0000
+WORD_0802a4f0:
+    .hword 0xc03f                         @ 0802a4f0 3fc0
+    .hword 0xffff    @ 0802a4f2 ffff
+campaign_scene_handler_0802a4f4:
+    bl clear_oam_active_flags_in_hand_range  @ 0802a4f4 cef00efe
+    ldr r2, DWORD_0802a538                   @ 0802a4f8 0f4a
+    ldr r3, DWORD_0802a53c                   @ 0802a4fa 104b
+    ldrb r7,[r3,#0x1d]                       @ 0802a4fc 5f7f
+    lsls r1,r7,#0x19    @ 0802a4fe 7906
+    lsrs r1,r1,#0x1c    @ 0802a500 090f
+    lsls r1,r1,#0x10    @ 0802a502 0904
+    ldr r0, DWORD_0802a540                   @ 0802a504 0e48
+    adds r4,r2,r0    @ 0802a506 1418
+    lsrs r1,r1,#0xf    @ 0802a508 c90b
+    movs r0,#0x1    @ 0802a50a 0120
+    ldrb r5,[r4,#0x0]                        @ 0802a50c 2578
+    ands r0,r5    @ 0802a50e 2840
+    orrs r0,r1    @ 0802a510 0843
+    strb r0,[r4,#0x0]                        @ 0802a512 2070
+    movs r6,#0x85    @ 0802a514 8526
+    lsls r6,r6,#0x2    @ 0802a516 b600
+    adds r2,r2,r6    @ 0802a518 9219
+    movs r0,#0x2    @ 0802a51a 0220
+    rsbs r0,r0,#0    @ 0802a51c 4042
+    ldrb r7,[r2,#0x0]                        @ 0802a51e 1778
+    ands r0,r7    @ 0802a520 3840
+    strb r0,[r2,#0x0]                        @ 0802a522 1070
+    adds r3,#0x36    @ 0802a524 3633
+    movs r0,#0x40    @ 0802a526 4020
+    ldrb r3,[r3,#0x0]                        @ 0802a528 1b78
+    ands r0,r3    @ 0802a52a 1840
+    cmp r0,#0x0                              @ 0802a52c 0028
+    beq LAB_0802a544                         @ 0802a52e 09d0
+    bl init_duel_puzzle_field_display_and_flags @ 0802a530 69f026f9
+    b LAB_0802a548                           @ 0802a534 08e0
+    .zero  0x2
+DWORD_0802a538:
+    .word  0x02023130                     @ 0802a538 30310202
+DWORD_0802a53c:
+    .word  0x02023360                     @ 0802a53c 60330202
+DWORD_0802a540:
+    .word  0x00000213                     @ 0802a540 13020000
+LAB_0802a544:
+    bl init_duel_puzzle_field_and_hand_display @ 0802a544 69f08cf8
+LAB_0802a548:
+    bl init_duel_field_vram_layout           @ 0802a548 a2f0dcf9
+    ldr r2, LAB_0802a56c                     @ 0802a54c 074a
+    movs r0,#0x88    @ 0802a54e 8820
+    lsls r0,r0,#0x2    @ 0802a550 8000
+    adds r2,r2,r0    @ 0802a552 1218
+    ldr r0, LAB_0802a570                     @ 0802a554 0648
+    ldrh r1,[r2,#0x0]                        @ 0802a556 1188
+    ands r0,r1    @ 0802a558 0840
+    movs r1,#0x20    @ 0802a55a 2021
+    orrs r0,r1    @ 0802a55c 0843
+    strh r0,[r2,#0x0]                        @ 0802a55e 1080
+    ldr r2, LAB_0802a574                     @ 0802a560 044a
+    ldr r3, LAB_0802a578                     @ 0802a562 054b
+    adds r2,r2,r3    @ 0802a564 d218
+    bl SUB_0802b1f6                          @ 0802a566 00f046fe
+    movs r0,r0    @ 0802a56a 0000
+LAB_0802a56c:
+    adds r1,#0x30    @ 0802a56c 3031
+    lsls r2,r0,#0x8    @ 0802a56e 0202
+LAB_0802a570:
+    .hword 0xfc03    @ 0802a570 03fc
+    .hword 0xffff    @ 0802a572 ffff
+LAB_0802a574:
+    lsls r0,r0,#0x1    @ 0802a574 4000
+    lsls r0,r0,#0xc    @ 0802a576 0003
+LAB_0802a578:
+    lsls r2,r0,#0x8    @ 0802a578 0202
+    movs r0,r0    @ 0802a57a 0000
+campaign_scene_handler_0802a57c:
+    bl tick_duel_field_fadeout_step          @ 0802a57c a2f05cfa
+    cmp r0,#0x0                              @ 0802a580 0028
+    bne LAB_0802a588                         @ 0802a582 01d1
+    bl SUB_08029bb2                          @ 0802a584 fff715fb
+LAB_0802a588:
+    ldr r2, LAB_0802a5a8                     @ 0802a588 074a
+    ldr r4, LAB_0802a5ac                     @ 0802a58a 084c
+    adds r2,r2,r4    @ 0802a58c 1219
+    ldrh r3,[r2,#0x0]                        @ 0802a58e 1388
+    lsls r1,r3,#0x12    @ 0802a590 9904
+    lsrs r1,r1,#0x18    @ 0802a592 090e
+    adds r1,#0x1    @ 0802a594 0131
+    movs r0,#0xff    @ 0802a596 ff20
+    ands r1,r0    @ 0802a598 0140
+    lsls r1,r1,#0x6    @ 0802a59a 8901
+    ldr r0, WORD_0802a5b0                    @ 0802a59c 0448
+    ands r0,r3    @ 0802a59e 1840
+    orrs r0,r1    @ 0802a5a0 0843
+    strh r0,[r2,#0x0]                        @ 0802a5a2 1080
+    bl SUB_08029bb2                          @ 0802a5a4 fff705fb
+LAB_0802a5a8:
+    lsls r0,r0,#0x1    @ 0802a5a8 4000
+    lsls r0,r0,#0xc    @ 0802a5aa 0003
+LAB_0802a5ac:
+    lsls r2,r0,#0x8    @ 0802a5ac 0202
+    movs r0,r0    @ 0802a5ae 0000
+WORD_0802a5b0:
+    .hword 0xc03f                         @ 0802a5b0 3fc0
+    .hword 0xffff    @ 0802a5b2 ffff
+campaign_scene_handler_0802a5b4:
+    ldr r7, LAB_0802a634                     @ 0802a5b4 1f4f
+    add r7,r8                                @ 0802a5b6 4744
+    ldrb r2,[r7,#0x0]                        @ 0802a5b8 3a78
+    lsrs r0,r2,#0x6    @ 0802a5ba 9009
+    movs r5,#0x81    @ 0802a5bc 8125
+    lsls r5,r5,#0x2    @ 0802a5be ad00
+    add r5,r8                                @ 0802a5c0 4544
+    movs r4,#0x3f    @ 0802a5c2 3f24
+    adds r1,r4,#0x0    @ 0802a5c4 211c
+    ldrb r6,[r5,#0x0]                        @ 0802a5c6 2e78
+    ands r1,r6    @ 0802a5c8 3140
+    lsls r1,r1,#0x2    @ 0802a5ca 8900
+    orrs r1,r0    @ 0802a5cc 0143
+    adds r1,#0x1    @ 0802a5ce 0131
+    movs r0,#0x3    @ 0802a5d0 0320
+    ands r0,r1    @ 0802a5d2 0840
+    lsls r0,r0,#0x6    @ 0802a5d4 8001
+    adds r3,r4,#0x0    @ 0802a5d6 231c
+    ands r3,r2    @ 0802a5d8 1340
+    orrs r3,r0    @ 0802a5da 0343
+    strb r3,[r7,#0x0]                        @ 0802a5dc 3b70
+    lsrs r0,r1,#0x2    @ 0802a5de 8808
+    ands r0,r4    @ 0802a5e0 2040
+    movs r2,#0x40    @ 0802a5e2 4022
+    rsbs r2,r2,#0    @ 0802a5e4 5242
+    .hword 0x4692    @ 0802a5e6 9246
+    ldrb r6,[r5,#0x0]                        @ 0802a5e8 2e78
+    ands r2,r6    @ 0802a5ea 3240
+    orrs r2,r0    @ 0802a5ec 0243
+    strb r2,[r5,#0x0]                        @ 0802a5ee 2a70
+    movs r0,#0xff    @ 0802a5f0 ff20
+    .hword 0x4681    @ 0802a5f2 8146
+    .hword 0x464e    @ 0802a5f4 4e46
+    ands r1,r6    @ 0802a5f6 3140
+    cmp r1,#0x9                              @ 0802a5f8 0929
+    bls LAB_0802a60a                         @ 0802a5fa 06d9
+    ands r3,r4    @ 0802a5fc 2340
+    movs r0,#0x40    @ 0802a5fe 4020
+    orrs r3,r0    @ 0802a600 0343
+    strb r3,[r7,#0x0]                        @ 0802a602 3b70
+    .hword 0x4657    @ 0802a604 5746
+    ands r2,r7    @ 0802a606 3a40
+    strb r2,[r5,#0x0]                        @ 0802a608 2a70
+LAB_0802a60a:
+    bl tick_duel_field_main_frame            @ 0802a60a f4f7bbf9
+    cmp r0,#0x0                              @ 0802a60e 0028
+    bne LAB_0802a616                         @ 0802a610 01d1
+    bl SUB_08029bb2                          @ 0802a612 fff7cefa
+LAB_0802a616:
+    ldr r3, LAB_0802a638                     @ 0802a616 084b
+    add r3,r8                                @ 0802a618 4344
+    ldrh r2,[r3,#0x0]                        @ 0802a61a 1a88
+    lsls r0,r2,#0x12    @ 0802a61c 9004
+    lsrs r0,r0,#0x18    @ 0802a61e 000e
+    adds r0,#0x1    @ 0802a620 0130
+    .hword 0x4649    @ 0802a622 4946
+    ands r0,r1    @ 0802a624 0840
+    lsls r0,r0,#0x6    @ 0802a626 8001
+    ldr r1, WORD_0802a63c                    @ 0802a628 0449
+    ands r1,r2    @ 0802a62a 1140
+    orrs r1,r0    @ 0802a62c 0143
+    strh r1,[r3,#0x0]                        @ 0802a62e 1980
+    bl SUB_08029bb2                          @ 0802a630 fff7bffa
+LAB_0802a634:
+    lsls r3,r0,#0x8    @ 0802a634 0302
+    movs r0,r0    @ 0802a636 0000
+LAB_0802a638:
+    lsls r2,r0,#0x8    @ 0802a638 0202
+    movs r0,r0    @ 0802a63a 0000
+WORD_0802a63c:
+    .hword 0xc03f                         @ 0802a63c 3fc0
+    .hword 0xffff    @ 0802a63e ffff
+campaign_scene_handler_0802a640:
+    bl tick_duel_field_fadein_step           @ 0802a640 a2f00cfa
+    cmp r0,#0x0                              @ 0802a644 0028
+    bne LAB_0802a64c                         @ 0802a646 01d1
+    bl SUB_08029bb2                          @ 0802a648 fff7b3fa
+LAB_0802a64c:
+    ldr r3, DWORD_0802a690                   @ 0802a64c 104b
+    ldr r2, DWORD_0802a694                   @ 0802a64e 114a
+    adds r0,r3,r2    @ 0802a650 9818
+    ldrb r2,[r0,#0x0]                        @ 0802a652 0278
+    movs r1,#0x1    @ 0802a654 0121
+    adds r0,r1,#0x0    @ 0802a656 081c
+    ands r0,r2    @ 0802a658 1040
+    cmp r0,#0x0                              @ 0802a65a 0028
+    bne LAB_0802a6a0                         @ 0802a65c 20d1
+    ldr r5, DWORD_0802a698                   @ 0802a65e 0e4d
+    adds r4,r3,r5    @ 0802a660 5c19
+    ldr r5, DWORD_0802a69c                   @ 0802a662 0e4d
+    adds r0,r5,#0x0    @ 0802a664 281c
+    ldrh r6,[r4,#0x0]                        @ 0802a666 2688
+    ands r0,r6    @ 0802a668 3040
+    movs r7,#0xc8    @ 0802a66a c827
+    lsls r7,r7,#0x5    @ 0802a66c 7f01
+    adds r1,r7,#0x0    @ 0802a66e 391c
+    orrs r0,r1    @ 0802a670 0843
+    strh r0,[r4,#0x0]                        @ 0802a672 2080
+    bl get_lp_display_state_word             @ 0802a674 6bf062fa
+    cmp r0,#0x0                              @ 0802a678 0028
+    bne LAB_0802a680                         @ 0802a67a 01d1
+    bl SUB_08029bb2                          @ 0802a67c fff799fa
+LAB_0802a680:
+    adds r0,r5,#0x0    @ 0802a680 281c
+    ldrh r1,[r4,#0x0]                        @ 0802a682 2188
+    ands r0,r1    @ 0802a684 0840
+    movs r2,#0xfa    @ 0802a686 fa22
+    lsls r2,r2,#0x6    @ 0802a688 9201
+    adds r1,r2,#0x0    @ 0802a68a 111c
+    orrs r0,r1    @ 0802a68c 0843
+    b SUB_0802a724                           @ 0802a68e 49e0
+DWORD_0802a690:
+    .word  0x03000040                     @ 0802a690 40000003
+DWORD_0802a694:
+    .word  0x0000023f                     @ 0802a694 3f020000
+DWORD_0802a698:
+    .word  0x00000202                     @ 0802a698 02020000
+DWORD_0802a69c:
+    .word  0xffffc03f                     @ 0802a69c 3fc0ffff
+LAB_0802a6a0:
+    ldr r5, DWORD_0802a700                   @ 0802a6a0 174d
+    adds r4,r3,r5    @ 0802a6a2 5c19
+    ldr r6, DWORD_0802a704                   @ 0802a6a4 174e
+    adds r0,r6,#0x0    @ 0802a6a6 301c
+    ldrh r7,[r4,#0x0]                        @ 0802a6a8 2788
+    ands r0,r7    @ 0802a6aa 3840
+    movs r5,#0xc8    @ 0802a6ac c825
+    lsls r5,r5,#0x5    @ 0802a6ae 6d01
+    .hword 0x46a8    @ 0802a6b0 a846
+    .hword 0x4647    @ 0802a6b2 4746
+    orrs r0,r7    @ 0802a6b4 3843
+    strh r0,[r4,#0x0]                        @ 0802a6b6 2080
+    ldr r0, DWORD_0802a708                   @ 0802a6b8 1348
+    adds r5,r0,#0x0    @ 0802a6ba 051c
+    adds r5,#0x36    @ 0802a6bc 3635
+    movs r0,#0x40    @ 0802a6be 4020
+    ldrb r7,[r5,#0x0]                        @ 0802a6c0 2f78
+    ands r0,r7    @ 0802a6c2 3840
+    cmp r0,#0x0                              @ 0802a6c4 0028
+    bne LAB_0802a6ec                         @ 0802a6c6 11d1
+    lsls r0,r2,#0x18    @ 0802a6c8 1006
+    lsrs r0,r0,#0x19    @ 0802a6ca 400e
+    movs r7,#0x90    @ 0802a6cc 9027
+    lsls r7,r7,#0x2    @ 0802a6ce bf00
+    adds r2,r3,r7    @ 0802a6d0 da19
+    ldrb r2,[r2,#0x0]                        @ 0802a6d2 1278
+    ands r1,r2    @ 0802a6d4 1140
+    lsls r1,r1,#0x7    @ 0802a6d6 c901
+    orrs r1,r0    @ 0802a6d8 0143
+    ldr r2, DWORD_0802a70c                   @ 0802a6da 0c4a
+    adds r0,r3,r2    @ 0802a6dc 9818
+    adds r1,r1,r0    @ 0802a6de 0918
+    ldr r0, DWORD_0802a710                   @ 0802a6e0 0b48
+    movs r3,#0x89    @ 0802a6e2 8923
+    lsls r3,r3,#0x2    @ 0802a6e4 9b00
+    adds r0,r0,r3    @ 0802a6e6 c018
+    ldr r0,[r0,#0x0]                         @ 0802a6e8 0068
+    strb r0,[r1,#0x0]                        @ 0802a6ea 0870
+LAB_0802a6ec:
+    bl evaluate_campaign_victory_state       @ 0802a6ec fef776fa
+    cmp r0,#0x2                              @ 0802a6f0 0228
+    bgt LAB_0802a714                         @ 0802a6f2 0fdc
+    cmp r0,#0x1                              @ 0802a6f4 0128
+    bge LAB_0802a71a                         @ 0802a6f6 10da
+    cmp r0,#0x0                              @ 0802a6f8 0028
+    beq LAB_0802a72a                         @ 0802a6fa 16d0
+    b LAB_0802a750                           @ 0802a6fc 28e0
+    .zero  0x2
+DWORD_0802a700:
+    .word  0x00000202                     @ 0802a700 02020000
+DWORD_0802a704:
+    .word  0xffffc03f                     @ 0802a704 3fc0ffff
+DWORD_0802a708:
+    .word  0x02023360                     @ 0802a708 60330202
+DWORD_0802a70c:
+    .word  0x00000241                     @ 0802a70c 41020000
+DWORD_0802a710:
+    .word  0x0201e2a0                     @ 0802a710 a0e20102
+LAB_0802a714:
+    cmp r0,#0x3                              @ 0802a714 0328
+    beq LAB_0802a738                         @ 0802a716 0fd0
+    b LAB_0802a750                           @ 0802a718 1ae0
+LAB_0802a71a:
+    adds r0,r6,#0x0    @ 0802a71a 301c
+    ldrh r5,[r4,#0x0]                        @ 0802a71c 2588
+    ands r0,r5    @ 0802a71e 2840
+    .hword 0x4646    @ 0802a720 4646
+    orrs r0,r6    @ 0802a722 3043
+SUB_0802a724:
+    strh r0,[r4,#0x0]                        @ 0802a724 2080
+    bl SUB_08029bb2                          @ 0802a726 fff744fa
+LAB_0802a72a:
+    adds r0,r6,#0x0    @ 0802a72a 301c
+    ldrh r7,[r4,#0x0]                        @ 0802a72c 2788
+    ands r0,r7    @ 0802a72e 3840
+    movs r2,#0xc8    @ 0802a730 c822
+    lsls r2,r2,#0x4    @ 0802a732 1201
+    adds r1,r2,#0x0    @ 0802a734 111c
+    b LAB_0802a74c                           @ 0802a736 09e0
+LAB_0802a738:
+    movs r0,#0x40    @ 0802a738 4020
+    ldrb r3,[r5,#0x0]                        @ 0802a73a 2b78
+    orrs r0,r3    @ 0802a73c 1843
+    strb r0,[r5,#0x0]                        @ 0802a73e 2870
+    adds r0,r6,#0x0    @ 0802a740 301c
+    ldrh r5,[r4,#0x0]                        @ 0802a742 2588
+    ands r0,r5    @ 0802a744 2840
+    movs r6,#0xc8    @ 0802a746 c826
+    lsls r6,r6,#0x4    @ 0802a748 3601
+    adds r1,r6,#0x0    @ 0802a74a 311c
+LAB_0802a74c:
+    orrs r0,r1    @ 0802a74c 0843
+    strh r0,[r4,#0x0]                        @ 0802a74e 2080
+LAB_0802a750:
+    bl get_lp_display_state_word             @ 0802a750 6bf0f4f9
+    cmp r0,#0x0                              @ 0802a754 0028
+    bne LAB_0802a75c                         @ 0802a756 01d1
+    bl SUB_08029bb2                          @ 0802a758 fff72bfa
+LAB_0802a75c:
+    ldr r0, LAB_0802a778                     @ 0802a75c 0648
+    ldr r7, LAB_0802a77c                     @ 0802a75e 074f
+    adds r0,r0,r7    @ 0802a760 c019
+    ldr r1, WORD_0802a780                    @ 0802a762 0749
+    ldrh r2,[r0,#0x0]                        @ 0802a764 0288
+    ands r1,r2    @ 0802a766 1140
+    movs r3,#0xfa    @ 0802a768 fa23
+    lsls r3,r3,#0x6    @ 0802a76a 9b01
+    adds r2,r3,#0x0    @ 0802a76c 1a1c
+    orrs r1,r2    @ 0802a76e 1143
+    strh r1,[r0,#0x0]                        @ 0802a770 0180
+    bl SUB_08029bb2                          @ 0802a772 fff71efa
+    movs r0,r0    @ 0802a776 0000
+LAB_0802a778:
+    lsls r0,r0,#0x1    @ 0802a778 4000
+    lsls r0,r0,#0xc    @ 0802a77a 0003
+LAB_0802a77c:
+    lsls r2,r0,#0x8    @ 0802a77c 0202
+    movs r0,r0    @ 0802a77e 0000
+WORD_0802a780:
+    .hword 0xc03f                         @ 0802a780 3fc0
+    .hword 0xffff    @ 0802a782 ffff
+campaign_scene_handler_0802a784:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a784 fdf764fb
+    cmp r0,#0x0                              @ 0802a788 0028
+    bne LAB_0802a7ac                         @ 0802a78a 0fd1
+    ldr r0, DWORD_0802a7a0                   @ 0802a78c 0448
+    ldr r4, DWORD_0802a7a4                   @ 0802a78e 054c
+    adds r0,r0,r4    @ 0802a790 0019
+    ldr r1, DWORD_0802a7a8                   @ 0802a792 0549
+    ldrh r5,[r0,#0x0]                        @ 0802a794 0588
+    ands r1,r5    @ 0802a796 2940
+    movs r6,#0xfa    @ 0802a798 fa26
+    lsls r6,r6,#0x6    @ 0802a79a b601
+    b SUB_0802ae24                           @ 0802a79c 42e3
+    .zero  0x2
+DWORD_0802a7a0:
+    .word  0x03000040                     @ 0802a7a0 40000003
+DWORD_0802a7a4:
+    .word  0x00000202                     @ 0802a7a4 02020000
+DWORD_0802a7a8:
+    .word  0xffffc03f                     @ 0802a7a8 3fc0ffff
+LAB_0802a7ac:
+    bl init_card_list_main_scene             @ 0802a7ac e0f0f4fa
+    cmp r0,#0x0                              @ 0802a7b0 0028
+    bne LAB_0802a7b8                         @ 0802a7b2 01d1
+    bl SUB_08029bb2                          @ 0802a7b4 fff7fdf9
+LAB_0802a7b8:
+    ldr r1, LAB_0802a828                     @ 0802a7b8 1b49
+    adds r1,#0x36    @ 0802a7ba 3631
+    movs r0,#0x21    @ 0802a7bc 2120
+    rsbs r0,r0,#0    @ 0802a7be 4042
+    ldrb r7,[r1,#0x0]                        @ 0802a7c0 0f78
+    ands r0,r7    @ 0802a7c2 3840
+    strb r0,[r1,#0x0]                        @ 0802a7c4 0870
+    bl tick_prng_lcg_rand15                  @ 0802a7c6 cef095fb
+    ldr r5, LAB_0802a82c                     @ 0802a7ca 184d
+    lsls r0,r0,#0x10    @ 0802a7cc 0004
+    lsrs r0,r0,#0x10    @ 0802a7ce 000c
+    movs r1,#0x96    @ 0802a7d0 9621
+    lsls r1,r1,#0x3    @ 0802a7d2 c900
+    bl __umodsi3                             @ 0802a7d4 e4f03ef8
+    adds r0,#0xf0    @ 0802a7d8 f030
+    lsls r0,r0,#0x10    @ 0802a7da 0004
+    lsrs r2,r0,#0x10    @ 0802a7dc 020c
+    movs r1,#0x3    @ 0802a7de 0321
+    ands r2,r1    @ 0802a7e0 0a40
+    ldr r1, LAB_0802a830                     @ 0802a7e2 1349
+    adds r3,r5,r1    @ 0802a7e4 6b18
+    lsls r2,r2,#0x6    @ 0802a7e6 9201
+    movs r4,#0x3f    @ 0802a7e8 3f24
+    adds r1,r4,#0x0    @ 0802a7ea 211c
+    ldrb r6,[r3,#0x0]                        @ 0802a7ec 1e78
+    ands r1,r6    @ 0802a7ee 3140
+    orrs r1,r2    @ 0802a7f0 1143
+    strb r1,[r3,#0x0]                        @ 0802a7f2 1970
+    lsrs r0,r0,#0x12    @ 0802a7f4 800c
+    movs r7,#0x81    @ 0802a7f6 8127
+    lsls r7,r7,#0x2    @ 0802a7f8 bf00
+    adds r2,r5,r7    @ 0802a7fa ea19
+    ands r0,r4    @ 0802a7fc 2040
+    movs r1,#0x40    @ 0802a7fe 4021
+    rsbs r1,r1,#0    @ 0802a800 4942
+    ldrb r3,[r2,#0x0]                        @ 0802a802 1378
+    ands r1,r3    @ 0802a804 1940
+    orrs r1,r0    @ 0802a806 0143
+    strb r1,[r2,#0x0]                        @ 0802a808 1170
+    ldr r4, LAB_0802a834                     @ 0802a80a 0a4c
+    adds r5,r5,r4    @ 0802a80c 2d19
+    ldrh r2,[r5,#0x0]                        @ 0802a80e 2a88
+    lsls r1,r2,#0x12    @ 0802a810 9104
+    lsrs r1,r1,#0x18    @ 0802a812 090e
+    adds r1,#0x1    @ 0802a814 0131
+    movs r0,#0xff    @ 0802a816 ff20
+    ands r1,r0    @ 0802a818 0140
+    lsls r1,r1,#0x6    @ 0802a81a 8901
+    ldr r0, WORD_0802a838                    @ 0802a81c 0648
+    ands r0,r2    @ 0802a81e 1040
+    orrs r0,r1    @ 0802a820 0843
+    strh r0,[r5,#0x0]                        @ 0802a822 2880
+    bl SUB_08029bb2                          @ 0802a824 fff7c5f9
+LAB_0802a828:
+    adds r3,#0x60    @ 0802a828 6033
+    lsls r2,r0,#0x8    @ 0802a82a 0202
+LAB_0802a82c:
+    lsls r0,r0,#0x1    @ 0802a82c 4000
+    lsls r0,r0,#0xc    @ 0802a82e 0003
+LAB_0802a830:
+    lsls r3,r0,#0x8    @ 0802a830 0302
+    movs r0,r0    @ 0802a832 0000
+LAB_0802a834:
+    lsls r2,r0,#0x8    @ 0802a834 0202
+    movs r0,r0    @ 0802a836 0000
+WORD_0802a838:
+    .hword 0xc03f                         @ 0802a838 3fc0
+    .hword 0xffff    @ 0802a83a ffff
+campaign_scene_handler_0802a83c:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a83c fdf708fb
+    cmp r0,#0x0                              @ 0802a840 0028
+    bne LAB_0802a864                         @ 0802a842 0fd1
+    ldr r0, DWORD_0802a858                   @ 0802a844 0448
+    ldr r5, DWORD_0802a85c                   @ 0802a846 054d
+    adds r0,r0,r5    @ 0802a848 4019
+    ldr r1, DWORD_0802a860                   @ 0802a84a 0549
+    ldrh r6,[r0,#0x0]                        @ 0802a84c 0688
+    ands r1,r6    @ 0802a84e 3140
+    movs r7,#0xfa    @ 0802a850 fa27
+    lsls r7,r7,#0x6    @ 0802a852 bf01
+    adds r2,r7,#0x0    @ 0802a854 3a1c
+    b SUB_0802ae26                           @ 0802a856 e6e2
+DWORD_0802a858:
+    .word  0x03000040                     @ 0802a858 40000003
+DWORD_0802a85c:
+    .word  0x00000202                     @ 0802a85c 02020000
+DWORD_0802a860:
+    .word  0xffffc03f                     @ 0802a860 3fc0ffff
+LAB_0802a864:
+    bl tick_card_list_scene_frame_with_bg0cnt @ 0802a864 e0f04cfb
+    cmp r0,#0x0                              @ 0802a868 0028
+    bne LAB_0802a870                         @ 0802a86a 01d1
+    bl SUB_08029bb2                          @ 0802a86c fff7a1f9
+LAB_0802a870:
+    ldr r2, LAB_0802a890                     @ 0802a870 074a
+    ldr r0, LAB_0802a894                     @ 0802a872 0848
+    adds r2,r2,r0    @ 0802a874 1218
+    ldrh r3,[r2,#0x0]                        @ 0802a876 1388
+    lsls r1,r3,#0x12    @ 0802a878 9904
+    lsrs r1,r1,#0x18    @ 0802a87a 090e
+    adds r1,#0x1    @ 0802a87c 0131
+    movs r0,#0xff    @ 0802a87e ff20
+    ands r1,r0    @ 0802a880 0140
+    lsls r1,r1,#0x6    @ 0802a882 8901
+    ldr r0, WORD_0802a898                    @ 0802a884 0448
+    ands r0,r3    @ 0802a886 1840
+    orrs r0,r1    @ 0802a888 0843
+    strh r0,[r2,#0x0]                        @ 0802a88a 1080
+    bl SUB_08029bb2                          @ 0802a88c fff791f9
+LAB_0802a890:
+    lsls r0,r0,#0x1    @ 0802a890 4000
+    lsls r0,r0,#0xc    @ 0802a892 0003
+LAB_0802a894:
+    lsls r2,r0,#0x8    @ 0802a894 0202
+    movs r0,r0    @ 0802a896 0000
+WORD_0802a898:
+    .hword 0xc03f                         @ 0802a898 3fc0
+    .hword 0xffff    @ 0802a89a ffff
+campaign_scene_handler_0802a89c:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802a89c fdf7d8fa
+    cmp r0,#0x0                              @ 0802a8a0 0028
+    bne LAB_0802a8c4                         @ 0802a8a2 0fd1
+    ldr r0, DWORD_0802a8b8                   @ 0802a8a4 0448
+    ldr r1, DWORD_0802a8bc                   @ 0802a8a6 0549
+    adds r0,r0,r1    @ 0802a8a8 4018
+    ldr r1, DWORD_0802a8c0                   @ 0802a8aa 0549
+    ldrh r2,[r0,#0x0]                        @ 0802a8ac 0288
+    ands r1,r2    @ 0802a8ae 1140
+    movs r3,#0xfa    @ 0802a8b0 fa23
+    lsls r3,r3,#0x6    @ 0802a8b2 9b01
+    adds r2,r3,#0x0    @ 0802a8b4 1a1c
+    b SUB_0802ae26                           @ 0802a8b6 b6e2
+DWORD_0802a8b8:
+    .word  0x03000040                     @ 0802a8b8 40000003
+DWORD_0802a8bc:
+    .word  0x00000202                     @ 0802a8bc 02020000
+DWORD_0802a8c0:
+    .word  0xffffc03f                     @ 0802a8c0 3fc0ffff
+LAB_0802a8c4:
+    bl init_puzzle_card_list_display         @ 0802a8c4 e0f0f6fa
+    cmp r0,#0x0                              @ 0802a8c8 0028
+    bne LAB_0802a8d0                         @ 0802a8ca 01d1
+    bl SUB_08029bb2                          @ 0802a8cc fff771f9
+LAB_0802a8d0:
+    bl init_pack_scene_vram_regs             @ 0802a8d0 fdf7e0fe
+    movs r0,#0x0    @ 0802a8d4 0020
+    bl load_pack_tiles_with_palette_init     @ 0802a8d6 fdf729ff
+    ldr r0, DWORD_0802a904                   @ 0802a8da 0a48
+    ldr r4, DWORD_0802a908                   @ 0802a8dc 0a4c
+    adds r0,r0,r4    @ 0802a8de 0019
+    movs r1,#0x7    @ 0802a8e0 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a8e2 0078
+    ands r1,r0    @ 0802a8e4 0140
+    cmp r1,#0x1                              @ 0802a8e6 0129
+    beq LAB_0802a92c                         @ 0802a8e8 20d0
+    cmp r1,#0x2                              @ 0802a8ea 0229
+    beq LAB_0802a924                         @ 0802a8ec 1ad0
+    cmp r1,#0x3                              @ 0802a8ee 0329
+    beq LAB_0802a91c                         @ 0802a8f0 14d0
+    cmp r1,#0x4                              @ 0802a8f2 0429
+    beq LAB_0802a914                         @ 0802a8f4 0ed0
+    ldr r0, DWORD_0802a90c                   @ 0802a8f6 0548
+    cmp r1,#0x5                              @ 0802a8f8 0529
+    bne LAB_0802a92e                         @ 0802a8fa 18d1
+    ldr r5, DWORD_0802a910                   @ 0802a8fc 044d
+    adds r0,r0,r5    @ 0802a8fe 4019
+    b LAB_0802a92e                           @ 0802a900 15e0
+    .zero  0x2
+DWORD_0802a904:
+    .word  0x02000000                     @ 0802a904 00000002
+DWORD_0802a908:
+    .word  0x00006c2c                     @ 0802a908 2c6c0000
+DWORD_0802a90c:
+    .word  0x09dbff1a                     @ 0802a90c 1affdb09
+DWORD_0802a910:
+    .word  0x0003ab1a                     @ 0802a910 1aab0300
+LAB_0802a914:
+    ldr r0, DWORD_0802a918                   @ 0802a914 0048
+    b LAB_0802a92e                           @ 0802a916 0ae0
+DWORD_0802a918:
+    .word  0x09deee6c                     @ 0802a918 6ceede09
+LAB_0802a91c:
+    ldr r0, DWORD_0802a920                   @ 0802a91c 0048
+    b LAB_0802a92e                           @ 0802a91e 06e0
+DWORD_0802a920:
+    .word  0x09de29b8                     @ 0802a920 b829de09
+LAB_0802a924:
+    ldr r0, DWORD_0802a928                   @ 0802a924 0048
+    b LAB_0802a92e                           @ 0802a926 02e0
+DWORD_0802a928:
+    .word  0x09dd6640                     @ 0802a928 4066dd09
+LAB_0802a92c:
+    ldr r0, DWORD_0802a964                   @ 0802a92c 0d48
+LAB_0802a92e:
+    str r0,[sp,#0x0]                         @ 0802a92e 0090
+    movs r0,#0x0    @ 0802a930 0020
+    movs r1,#0x82    @ 0802a932 8221
+    ldr r2, DWORD_0802a968                   @ 0802a934 0c4a
+    ldr r3, DWORD_0802a96c                   @ 0802a936 0d4b
+    bl render_campaign_text_line_centered    @ 0802a938 fdf76efd
+    ldr r0, DWORD_0802a970                   @ 0802a93c 0c48
+    ldr r6, DWORD_0802a974                   @ 0802a93e 0d4e
+    adds r0,r0,r6    @ 0802a940 8019
+    movs r1,#0x7    @ 0802a942 0721
+    ldrb r0,[r0,#0x0]                        @ 0802a944 0078
+    ands r1,r0    @ 0802a946 0140
+    cmp r1,#0x1                              @ 0802a948 0129
+    beq LAB_0802a998                         @ 0802a94a 25d0
+    cmp r1,#0x2                              @ 0802a94c 0229
+    beq LAB_0802a990                         @ 0802a94e 1fd0
+    cmp r1,#0x3                              @ 0802a950 0329
+    beq LAB_0802a988                         @ 0802a952 19d0
+    cmp r1,#0x4                              @ 0802a954 0429
+    beq LAB_0802a980                         @ 0802a956 13d0
+    ldr r0, DWORD_0802a978                   @ 0802a958 0748
+    cmp r1,#0x5                              @ 0802a95a 0529
+    bne LAB_0802a99a                         @ 0802a95c 1dd1
+    ldr r7, DWORD_0802a97c                   @ 0802a95e 074f
+    adds r0,r0,r7    @ 0802a960 c019
+    b LAB_0802a99a                           @ 0802a962 1ae0
+DWORD_0802a964:
+    .word  0x09dcad12                     @ 0802a964 12addc09
+DWORD_0802a968:
+    .word  0x0000021e                     @ 0802a968 1e020000
+DWORD_0802a96c:
+    .word  0x00000807                     @ 0802a96c 07080000
+DWORD_0802a970:
+    .word  0x02000000                     @ 0802a970 00000002
+DWORD_0802a974:
+    .word  0x00006c2c                     @ 0802a974 2c6c0000
+DWORD_0802a978:
+    .word  0x09dbfe30                     @ 0802a978 30fedb09
+DWORD_0802a97c:
+    .word  0x0003ab32                     @ 0802a97c 32ab0300
+LAB_0802a980:
+    ldr r0, DWORD_0802a984                   @ 0802a980 0048
+    b LAB_0802a99a                           @ 0802a982 0ae0
+DWORD_0802a984:
+    .word  0x09deed82                     @ 0802a984 82edde09
+LAB_0802a988:
+    ldr r0, DWORD_0802a98c                   @ 0802a988 0048
+    b LAB_0802a99a                           @ 0802a98a 06e0
+DWORD_0802a98c:
+    .word  0x09de28d6                     @ 0802a98c d628de09
+LAB_0802a990:
+    ldr r0, DWORD_0802a994                   @ 0802a990 0048
+    b LAB_0802a99a                           @ 0802a992 02e0
+DWORD_0802a994:
+    .word  0x09dd6540                     @ 0802a994 4065dd09
+LAB_0802a998:
+    ldr r0, LAB_0802a9e0                     @ 0802a998 1148
+LAB_0802a99a:
+    str r0,[sp,#0x0]                         @ 0802a99a 0090
+    movs r0,#0x1    @ 0802a99c 0120
+    str r0,[sp,#0x4]                         @ 0802a99e 0190
+    movs r0,#0xa3    @ 0802a9a0 a320
+    movs r1,#0xc2    @ 0802a9a2 c221
+    movs r2,#0x83    @ 0802a9a4 8322
+    lsls r2,r2,#0x3    @ 0802a9a6 d200
+    ldr r3, LAB_0802a9e4                     @ 0802a9a8 0e4b
+    bl render_campaign_text_line_with_align  @ 0802a9aa fdf7ddfd
+    ldr r2, LAB_0802a9e8                     @ 0802a9ae 0e4a
+    adds r2,#0x36    @ 0802a9b0 3632
+    movs r0,#0x1f    @ 0802a9b2 1f20
+    rsbs r0,r0,#0    @ 0802a9b4 4042
+    ldrb r1,[r2,#0x0]                        @ 0802a9b6 1178
+    ands r0,r1    @ 0802a9b8 0840
+    movs r1,#0x4    @ 0802a9ba 0421
+    orrs r0,r1    @ 0802a9bc 0843
+    strb r0,[r2,#0x0]                        @ 0802a9be 1070
+    ldr r2, LAB_0802a9ec                     @ 0802a9c0 0a4a
+    ldr r3, LAB_0802a9f0                     @ 0802a9c2 0b4b
+    adds r2,r2,r3    @ 0802a9c4 d218
+    ldrh r3,[r2,#0x0]                        @ 0802a9c6 1388
+    lsls r1,r3,#0x12    @ 0802a9c8 9904
+    lsrs r1,r1,#0x18    @ 0802a9ca 090e
+    adds r1,#0x1    @ 0802a9cc 0131
+    movs r0,#0xff    @ 0802a9ce ff20
+    ands r1,r0    @ 0802a9d0 0140
+    lsls r1,r1,#0x6    @ 0802a9d2 8901
+    ldr r0, WORD_0802a9f4                    @ 0802a9d4 0748
+    ands r0,r3    @ 0802a9d6 1840
+    orrs r0,r1    @ 0802a9d8 0843
+    strh r0,[r2,#0x0]                        @ 0802a9da 1080
+    bl SUB_08029bb2                          @ 0802a9dc fff7e9f8
+LAB_0802a9e0:
+    add r4,sp,#0xe8                          @ 0802a9e0 3aac
+    lsrs r4,r3,#0x7    @ 0802a9e2 dc09
+LAB_0802a9e4:
+    lsrs r7,r0,#0x20    @ 0802a9e4 0708
+    movs r0,r0    @ 0802a9e6 0000
+LAB_0802a9e8:
+    adds r3,#0x60    @ 0802a9e8 6033
+    lsls r2,r0,#0x8    @ 0802a9ea 0202
+LAB_0802a9ec:
+    lsls r0,r0,#0x1    @ 0802a9ec 4000
+    lsls r0,r0,#0xc    @ 0802a9ee 0003
+LAB_0802a9f0:
+    lsls r2,r0,#0x8    @ 0802a9f0 0202
+    movs r0,r0    @ 0802a9f2 0000
+WORD_0802a9f4:
+    .hword 0xc03f                         @ 0802a9f4 3fc0
+    .hword 0xffff    @ 0802a9f6 ffff
+campaign_scene_handler_0802a9f8:
+    bl tick_campaign_card_selector_oam       @ 0802a9f8 fdf73cff
+    movs r2,#0x80    @ 0802a9fc 8022
+    lsls r2,r2,#0x13    @ 0802a9fe d204
+    ldrh r0,[r2,#0x0]                        @ 0802aa00 1088
+    movs r4,#0xe8    @ 0802aa02 e824
+    lsls r4,r4,#0x5    @ 0802aa04 6401
+    adds r1,r4,#0x0    @ 0802aa06 211c
+    orrs r0,r1    @ 0802aa08 0843
+    strh r0,[r2,#0x0]                        @ 0802aa0a 1080
+    movs r0,#0x8    @ 0802aa0c 0820
+    bl tick_blend_step_by_delta              @ 0802aa0e caf053ff
+    cmp r0,#0x0                              @ 0802aa12 0028
+    beq LAB_0802aa38                         @ 0802aa14 10d0
+    movs r0,#0x3    @ 0802aa16 0320
+    bl build_campaign_sprite_row_by_type     @ 0802aa18 fdf73ef9
+    ldr r2, DWORD_0802aa58                   @ 0802aa1c 0e4a
+    ldr r5, DWORD_0802aa5c                   @ 0802aa1e 0f4d
+    adds r2,r2,r5    @ 0802aa20 5219
+    ldrh r3,[r2,#0x0]                        @ 0802aa22 1388
+    lsls r1,r3,#0x12    @ 0802aa24 9904
+    lsrs r1,r1,#0x18    @ 0802aa26 090e
+    adds r1,#0x1    @ 0802aa28 0131
+    movs r0,#0xff    @ 0802aa2a ff20
+    ands r1,r0    @ 0802aa2c 0140
+    lsls r1,r1,#0x6    @ 0802aa2e 8901
+    ldr r0, DWORD_0802aa60                   @ 0802aa30 0b48
+    ands r0,r3    @ 0802aa32 1840
+    orrs r0,r1    @ 0802aa34 0843
+    strh r0,[r2,#0x0]                        @ 0802aa36 1080
+LAB_0802aa38:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802aa38 fdf70afa
+    cmp r0,#0x0                              @ 0802aa3c 0028
+    beq LAB_0802aa44                         @ 0802aa3e 01d0
+    bl SUB_08029bb2                          @ 0802aa40 fff7b7f8
+LAB_0802aa44:
+    ldr r0, DWORD_0802aa58                   @ 0802aa44 0448
+    ldr r6, DWORD_0802aa5c                   @ 0802aa46 054e
+    adds r0,r0,r6    @ 0802aa48 8019
+    ldr r1, DWORD_0802aa60                   @ 0802aa4a 0549
+    ldrh r7,[r0,#0x0]                        @ 0802aa4c 0788
+    ands r1,r7    @ 0802aa4e 3940
+    movs r3,#0xfa    @ 0802aa50 fa23
+    lsls r3,r3,#0x6    @ 0802aa52 9b01
+    adds r2,r3,#0x0    @ 0802aa54 1a1c
+    b SUB_0802ae26                           @ 0802aa56 e6e1
+DWORD_0802aa58:
+    .word  0x03000040                     @ 0802aa58 40000003
+DWORD_0802aa5c:
+    .word  0x00000202                     @ 0802aa5c 02020000
+DWORD_0802aa60:
+    .word  0xffffc03f                     @ 0802aa60 3fc0ffff
+campaign_scene_handler_0802aa64:
+    bl tick_campaign_card_selector_oam       @ 0802aa64 fdf706ff
+    ldr r1, DWORD_0802aab4                   @ 0802aa68 1249
+    adds r1,#0x36    @ 0802aa6a 3631
+    movs r0,#0x20    @ 0802aa6c 2020
+    ldrb r1,[r1,#0x0]                        @ 0802aa6e 0978
+    ands r0,r1    @ 0802aa70 0840
+    cmp r0,#0x0                              @ 0802aa72 0028
+    beq LAB_0802aa92                         @ 0802aa74 0dd0
+    ldr r2, DWORD_0802aab8                   @ 0802aa76 104a
+    ldr r4, DWORD_0802aabc                   @ 0802aa78 104c
+    adds r2,r2,r4    @ 0802aa7a 1219
+    ldrh r3,[r2,#0x0]                        @ 0802aa7c 1388
+    lsls r1,r3,#0x12    @ 0802aa7e 9904
+    lsrs r1,r1,#0x18    @ 0802aa80 090e
+    adds r1,#0x1    @ 0802aa82 0131
+    movs r0,#0xff    @ 0802aa84 ff20
+    ands r1,r0    @ 0802aa86 0140
+    lsls r1,r1,#0x6    @ 0802aa88 8901
+    ldr r0, DWORD_0802aac0                   @ 0802aa8a 0d48
+    ands r0,r3    @ 0802aa8c 1840
+    orrs r0,r1    @ 0802aa8e 0843
+    strh r0,[r2,#0x0]                        @ 0802aa90 1080
+LAB_0802aa92:
+    bl tick_campaign_card_select_display_state__08027e50 @ 0802aa92 fdf7ddf9
+    cmp r0,#0x0                              @ 0802aa96 0028
+    beq LAB_0802aa9e                         @ 0802aa98 01d0
+    bl SUB_08029bb2                          @ 0802aa9a fff78af8
+LAB_0802aa9e:
+    ldr r0, DWORD_0802aab8                   @ 0802aa9e 0648
+    ldr r5, DWORD_0802aabc                   @ 0802aaa0 064d
+    adds r0,r0,r5    @ 0802aaa2 4019
+    ldr r1, DWORD_0802aac0                   @ 0802aaa4 0649
+    ldrh r6,[r0,#0x0]                        @ 0802aaa6 0688
+    ands r1,r6    @ 0802aaa8 3140
+    movs r7,#0xfa    @ 0802aaaa fa27
+    lsls r7,r7,#0x6    @ 0802aaac bf01
+    adds r2,r7,#0x0    @ 0802aaae 3a1c
+    b SUB_0802ae26                           @ 0802aab0 b9e1
+    .zero  0x2
+DWORD_0802aab4:
+    .word  0x02023360                     @ 0802aab4 60330202
+DWORD_0802aab8:
+    .word  0x03000040                     @ 0802aab8 40000003
+DWORD_0802aabc:
+    .word  0x00000202                     @ 0802aabc 02020000
+DWORD_0802aac0:
+    .word  0xffffc03f                     @ 0802aac0 3fc0ffff
+campaign_scene_handler_0802aac4:
+    movs r0,#0x8    @ 0802aac4 0820
+    bl start_blend_fadein_with_target        @ 0802aac6 caf0bbfe
+    cmp r0,#0x0                              @ 0802aaca 0028
+    bne LAB_0802aae8                         @ 0802aacc 0cd1
+    bl tick_campaign_card_selector_oam       @ 0802aace fdf7d1fe
+    ldr r1, LAB_0802aae4                     @ 0802aad2 0449
+    adds r1,#0x36    @ 0802aad4 3631
+    movs r0,#0x2    @ 0802aad6 0220
+    rsbs r0,r0,#0    @ 0802aad8 4042
+    ldrb r2,[r1,#0x0]                        @ 0802aada 0a78
+    ands r0,r2    @ 0802aadc 1040
+SUB_0802aade:
+    strb r0,[r1,#0x0]                        @ 0802aade 0870
+    bl SUB_08029bb2                          @ 0802aae0 fff767f8
+LAB_0802aae4:
+    adds r3,#0x60    @ 0802aae4 6033
+    lsls r2,r0,#0x8    @ 0802aae6 0202
+LAB_0802aae8:
+    bl init_campaign_bg_and_obj_vram         @ 0802aae8 02f0c4fa
+    bl init_pack_selection_tile_vram_default @ 0802aaec 02f0b6fb
+    bl init_duel_scroll_params               @ 0802aaf0 02f0ccfc
+    ldr r3, LAB_0802abc4                     @ 0802aaf4 334b
+    ldr r4, LAB_0802abc8                     @ 0802aaf6 344c
+    adds r0,r3,r4    @ 0802aaf8 1819
+    ldrb r2,[r0,#0x0]                        @ 0802aafa 0278
+    lsls r1,r2,#0x19    @ 0802aafc 5106
+    lsrs r1,r1,#0x1c    @ 0802aafe 090f
+    lsls r2,r2,#0x1d    @ 0802ab00 5207
+    lsrs r2,r2,#0x1d    @ 0802ab02 520f
+    ldr r5, LAB_0802abcc                     @ 0802ab04 314d
+    adds r3,r3,r5    @ 0802ab06 5b19
+    ldr r7, LAB_0802abd0                     @ 0802ab08 314f
+    ldr r6, LAB_0802abd4                     @ 0802ab0a 324e
+    adds r0,r7,r6    @ 0802ab0c b819
+    ldrb r0,[r0,#0x0]                        @ 0802ab0e 0078
+    str r0,[sp,#0x0]                         @ 0802ab10 0090
+    movs r4,#0x92    @ 0802ab12 9224
+    lsls r4,r4,#0x2    @ 0802ab14 a400
+    adds r0,r7,r4    @ 0802ab16 3819
+    str r0,[sp,#0x4]                         @ 0802ab18 0190
+    movs r0,#0x0    @ 0802ab1a 0020
+    bl render_opponent_card_icon_and_name    @ 0802ab1c 02f08cfd
+    ldr r4, LAB_0802abd8                     @ 0802ab20 2d4c
+    ldrb r2,[r4,#0x1d]                       @ 0802ab22 627f
+    lsls r1,r2,#0x19    @ 0802ab24 5106
+    lsrs r1,r1,#0x1c    @ 0802ab26 090f
+    lsls r2,r2,#0x1d    @ 0802ab28 5207
+    lsrs r2,r2,#0x1d    @ 0802ab2a 520f
+    adds r3,r4,#0x0    @ 0802ab2c 231c
+    adds r3,#0xe    @ 0802ab2e 0e33
+    ldrb r5,[r4,#0x1e]                       @ 0802ab30 a57f
+    lsrs r0,r5,#0x5    @ 0802ab32 6809
+    str r0,[sp,#0x0]                         @ 0802ab34 0090
+    adds r0,r4,#0x0    @ 0802ab36 201c
+    adds r0,#0x1f    @ 0802ab38 1f30
+    str r0,[sp,#0x4]                         @ 0802ab3a 0190
+    movs r0,#0x1    @ 0802ab3c 0120
+    bl render_opponent_card_icon_and_name    @ 0802ab3e 02f07bfd
+    adds r1,r4,#0x0    @ 0802ab42 211c
+    adds r1,#0x39    @ 0802ab44 3931
+    movs r0,#0x21    @ 0802ab46 2120
+    rsbs r0,r0,#0    @ 0802ab48 4042
+    ldrb r6,[r1,#0x0]                        @ 0802ab4a 0e78
+    ands r0,r6    @ 0802ab4c 3040
+    strb r0,[r1,#0x0]                        @ 0802ab4e 0870
+    movs r0,#0x0    @ 0802ab50 0020
+    bl draw_card_name_label_to_sprite_vram   @ 0802ab52 02f01bfd
+    ldr r0, LAB_0802abdc                     @ 0802ab56 2148
+    adds r0,r0,r7    @ 0802ab58 c019
+    .hword 0x4680    @ 0802ab5a 8046
+    ldrb r5,[r0,#0x0]                        @ 0802ab5c 0578
+    lsrs r1,r5,#0x1    @ 0802ab5e 6908
+    movs r2,#0x90    @ 0802ab60 9022
+    lsls r2,r2,#0x2    @ 0802ab62 9200
+    adds r3,r7,r2    @ 0802ab64 bb18
+    movs r6,#0x1    @ 0802ab66 0126
+    adds r0,r6,#0x0    @ 0802ab68 301c
+    ldrb r2,[r3,#0x0]                        @ 0802ab6a 1a78
+    ands r0,r2    @ 0802ab6c 1040
+    lsls r0,r0,#0x7    @ 0802ab6e c001
+    orrs r0,r1    @ 0802ab70 0843
+    cmp r0,#0x2                              @ 0802ab72 0228
+    bhi LAB_0802ab9a                         @ 0802ab74 11d8
+    adds r2,r0,#0x1    @ 0802ab76 421c
+    lsls r2,r2,#0x18    @ 0802ab78 1206
+    lsrs r1,r2,#0x18    @ 0802ab7a 110e
+    movs r0,#0x7f    @ 0802ab7c 7f20
+    ands r1,r0    @ 0802ab7e 0140
+    lsls r1,r1,#0x1    @ 0802ab80 4900
+    adds r0,r6,#0x0    @ 0802ab82 301c
+    ands r0,r5    @ 0802ab84 2840
+    orrs r0,r1    @ 0802ab86 0843
+    .hword 0x4645    @ 0802ab88 4546
+    strb r0,[r5,#0x0]                        @ 0802ab8a 2870
+    lsrs r2,r2,#0x1f    @ 0802ab8c d20f
+    movs r0,#0x2    @ 0802ab8e 0220
+    rsbs r0,r0,#0    @ 0802ab90 4042
+    ldrb r6,[r3,#0x0]                        @ 0802ab92 1e78
+    ands r0,r6    @ 0802ab94 3040
+    orrs r0,r2    @ 0802ab96 1043
+    strb r0,[r3,#0x0]                        @ 0802ab98 1870
+LAB_0802ab9a:
+    adds r1,r4,#0x0    @ 0802ab9a 211c
+    adds r1,#0x36    @ 0802ab9c 3631
+    movs r0,#0x40    @ 0802ab9e 4020
+    ldrb r1,[r1,#0x0]                        @ 0802aba0 0978
+    ands r0,r1    @ 0802aba2 0840
+    cmp r0,#0x0                              @ 0802aba4 0028
+    bne LAB_0802ac34                         @ 0802aba6 45d1
+    ldr r0, LAB_0802abe0                     @ 0802aba8 0d48
+    movs r1,#0x89    @ 0802abaa 8921
+    lsls r1,r1,#0x2    @ 0802abac 8900
+    adds r0,r0,r1    @ 0802abae 4018
+    ldr r0,[r0,#0x0]                         @ 0802abb0 0068
+    cmp r0,#0x2                              @ 0802abb2 0228
+    bgt LAB_0802abe4                         @ 0802abb4 16dc
+    cmp r0,#0x1                              @ 0802abb6 0128
+    bge LAB_0802abec                         @ 0802abb8 18da
+    cmp r0,#0x0                              @ 0802abba 0028
+    beq LAB_0802ac14                         @ 0802abbc 2ad0
+    bl SUB_08029bb2                          @ 0802abbe fef7f8ff
+    movs r0,r0    @ 0802abc2 0000
+LAB_0802abc4:
+    movs r0,r0    @ 0802abc4 0000
+    lsls r0,r0,#0x8    @ 0802abc6 0002
+LAB_0802abc8:
+    ldr r7,[r2,#0x64]                        @ 0802abc8 576e
+    movs r0,r0    @ 0802abca 0000
+LAB_0802abcc:
+    ldr r0,[r1,#0x64]                        @ 0802abcc 486e
+    movs r0,r0    @ 0802abce 0000
+LAB_0802abd0:
+    lsls r0,r0,#0x1    @ 0802abd0 4000
+    lsls r0,r0,#0xc    @ 0802abd2 0003
+LAB_0802abd4:
+    lsls r7,r3,#0x9    @ 0802abd4 5f02
+    movs r0,r0    @ 0802abd6 0000
+LAB_0802abd8:
+    adds r3,#0x60    @ 0802abd8 6033
+    lsls r2,r0,#0x8    @ 0802abda 0202
+LAB_0802abdc:
+    lsls r7,r7,#0x8    @ 0802abdc 3f02
+    movs r0,r0    @ 0802abde 0000
+LAB_0802abe0:
+    b LAB_0802b124                           @ 0802abe0 a0e2
+    .byte  0x01, 0x02
+LAB_0802abe4:
+    cmp r0,#0x3                              @ 0802abe4 0328
+    beq LAB_0802ac14                         @ 0802abe6 15d0
+    bl SUB_08029bb2                          @ 0802abe8 fef7e3ff
+LAB_0802abec:
+    ldr r2, LAB_0802ac0c                     @ 0802abec 074a
+    adds r3,r7,r2    @ 0802abee bb18
+    ldrh r2,[r3,#0x0]                        @ 0802abf0 1a88
+    lsls r1,r2,#0x12    @ 0802abf2 9104
+    lsrs r1,r1,#0x18    @ 0802abf4 090e
+    adds r1,#0x1    @ 0802abf6 0131
+    movs r0,#0xff    @ 0802abf8 ff20
+    ands r1,r0    @ 0802abfa 0140
+    lsls r1,r1,#0x6    @ 0802abfc 8901
+    ldr r0, WORD_0802ac10                    @ 0802abfe 0448
+    ands r0,r2    @ 0802ac00 1040
+    orrs r0,r1    @ 0802ac02 0843
+    strh r0,[r3,#0x0]                        @ 0802ac04 1880
+    bl SUB_08029bb2                          @ 0802ac06 fef7d4ff
+    movs r0,r0    @ 0802ac0a 0000
+LAB_0802ac0c:
+    lsls r2,r0,#0x8    @ 0802ac0c 0202
+    movs r0,r0    @ 0802ac0e 0000
+WORD_0802ac10:
+    .hword 0xc03f                         @ 0802ac10 3fc0
+    .hword 0xffff    @ 0802ac12 ffff
+LAB_0802ac14:
+    ldr r0, DWORD_0802ac28                   @ 0802ac14 0448
+    ldr r3, DWORD_0802ac2c                   @ 0802ac16 054b
+    adds r0,r0,r3    @ 0802ac18 c018
+    ldr r1, DWORD_0802ac30                   @ 0802ac1a 0549
+    ldrh r4,[r0,#0x0]                        @ 0802ac1c 0488
+    ands r1,r4    @ 0802ac1e 2140
+    movs r5,#0xa8    @ 0802ac20 a825
+    lsls r5,r5,#0x3    @ 0802ac22 ed00
+    adds r2,r5,#0x0    @ 0802ac24 2a1c
+    b LAB_0802ac44                           @ 0802ac26 0de0
+DWORD_0802ac28:
+    .word  0x03000040                     @ 0802ac28 40000003
+DWORD_0802ac2c:
+    .word  0x00000202                     @ 0802ac2c 02020000
+DWORD_0802ac30:
+    .word  0xffffc03f                     @ 0802ac30 3fc0ffff
+LAB_0802ac34:
+    ldr r6, LAB_0802ac4c                     @ 0802ac34 054e
+    adds r0,r7,r6    @ 0802ac36 b819
+    ldr r1, WORD_0802ac50                    @ 0802ac38 0549
+    ldrh r7,[r0,#0x0]                        @ 0802ac3a 0788
+    ands r1,r7    @ 0802ac3c 3940
+    movs r3,#0xa8    @ 0802ac3e a823
+    lsls r3,r3,#0x3    @ 0802ac40 db00
+    adds r2,r3,#0x0    @ 0802ac42 1a1c
+LAB_0802ac44:
+    orrs r1,r2    @ 0802ac44 1143
+    strh r1,[r0,#0x0]                        @ 0802ac46 0180
+    bl SUB_08029bb2                          @ 0802ac48 fef7b3ff
+LAB_0802ac4c:
+    lsls r2,r0,#0x8    @ 0802ac4c 0202
+    movs r0,r0    @ 0802ac4e 0000
+WORD_0802ac50:
+    .hword 0xc03f                         @ 0802ac50 3fc0
+    .hword 0xffff    @ 0802ac52 ffff
+campaign_scene_handler_0802ac54:
+    bl tick_opponent_aob_by_phase            @ 0802ac54 02f032fc
+    cmp r0,#0x0                              @ 0802ac58 0028
+    bne LAB_0802ac60                         @ 0802ac5a 01d1
+    bl SUB_08029bb2                          @ 0802ac5c fef7a9ff
+LAB_0802ac60:
+    ldr r1, DWORD_0802ac8c                   @ 0802ac60 0a49
+    ldr r4, DWORD_0802ac90                   @ 0802ac62 0b4c
+    adds r0,r1,r4    @ 0802ac64 0819
+    ldrb r0,[r0,#0x0]                        @ 0802ac66 0078
+    lsrs r3,r0,#0x1    @ 0802ac68 4308
+    movs r5,#0x90    @ 0802ac6a 9025
+    lsls r5,r5,#0x2    @ 0802ac6c ad00
+    adds r2,r1,r5    @ 0802ac6e 4a19
+    movs r0,#0x1    @ 0802ac70 0120
+    ldrb r2,[r2,#0x0]                        @ 0802ac72 1278
+    ands r0,r2    @ 0802ac74 1040
+    lsls r0,r0,#0x7    @ 0802ac76 c001
+    orrs r0,r3    @ 0802ac78 1843
+    adds r1,r1,r0    @ 0802ac7a 0918
+    adds r1,r1,r5    @ 0802ac7c 4919
+    ldrb r0,[r1,#0x0]                        @ 0802ac7e 0878
+    cmp r0,#0x1                              @ 0802ac80 0128
+    beq LAB_0802ac94                         @ 0802ac82 07d0
+    cmp r0,#0x2                              @ 0802ac84 0228
+    beq LAB_0802ad00                         @ 0802ac86 3bd0
+    b LAB_0802ad62                           @ 0802ac88 6be0
+    .zero  0x2
+DWORD_0802ac8c:
+    .word  0x03000040                     @ 0802ac8c 40000003
+DWORD_0802ac90:
+    .word  0x0000023f                     @ 0802ac90 3f020000
+LAB_0802ac94:
+    ldr r0, DWORD_0802acbc                   @ 0802ac94 0948
+    ldr r6, DWORD_0802acc0                   @ 0802ac96 0a4e
+    adds r0,r0,r6    @ 0802ac98 8019
+    movs r1,#0x7    @ 0802ac9a 0721
+    ldrb r0,[r0,#0x0]                        @ 0802ac9c 0078
+    ands r1,r0    @ 0802ac9e 0140
+    cmp r1,#0x1                              @ 0802aca0 0129
+    beq LAB_0802ace4                         @ 0802aca2 1fd0
+    cmp r1,#0x2                              @ 0802aca4 0229
+    beq LAB_0802acdc                         @ 0802aca6 19d0
+    cmp r1,#0x3                              @ 0802aca8 0329
+    beq LAB_0802acd4                         @ 0802acaa 13d0
+    cmp r1,#0x4                              @ 0802acac 0429
+    beq LAB_0802accc                         @ 0802acae 0dd0
+    ldr r0, DWORD_0802acc4                   @ 0802acb0 0448
+    cmp r1,#0x5                              @ 0802acb2 0529
+    bne LAB_0802ace6                         @ 0802acb4 17d1
+    ldr r7, DWORD_0802acc8                   @ 0802acb6 044f
+    adds r0,r0,r7    @ 0802acb8 c019
+    b LAB_0802ace6                           @ 0802acba 14e0
+DWORD_0802acbc:
+    .word  0x02000000                     @ 0802acbc 00000002
+DWORD_0802acc0:
+    .word  0x00006c2c                     @ 0802acc0 2c6c0000
+DWORD_0802acc4:
+    .word  0x09dbfda6                     @ 0802acc4 a6fddb09
+DWORD_0802acc8:
+    .word  0x0003ab14                     @ 0802acc8 14ab0300
+LAB_0802accc:
+    ldr r0, DWORD_0802acd0                   @ 0802accc 0048
+    b LAB_0802ace6                           @ 0802acce 0ae0
+DWORD_0802acd0:
+    .word  0x09deecd8                     @ 0802acd0 d8ecde09
+LAB_0802acd4:
+    ldr r0, DWORD_0802acd8                   @ 0802acd4 0048
+    b LAB_0802ace6                           @ 0802acd6 06e0
+DWORD_0802acd8:
+    .word  0x09de282c                     @ 0802acd8 2c28de09
+LAB_0802acdc:
+    ldr r0, DWORD_0802ace0                   @ 0802acdc 0048
+    b LAB_0802ace6                           @ 0802acde 02e0
+DWORD_0802ace0:
+    .word  0x09dd64b2                     @ 0802ace0 b264dd09
+LAB_0802ace4:
+    ldr r0, DWORD_0802acf8                   @ 0802ace4 0448
+LAB_0802ace6:
+    bl draw_card_name_label_to_sprite_vram   @ 0802ace6 02f051fc
+    ldr r1, DWORD_0802acfc                   @ 0802acea 0449
+    adds r1,#0x39    @ 0802acec 3931
+    movs r0,#0x5    @ 0802acee 0520
+    rsbs r0,r0,#0    @ 0802acf0 4042
+    ldrb r2,[r1,#0x0]                        @ 0802acf2 0a78
+    ands r0,r2    @ 0802acf4 1040
+    b LAB_0802ad60                           @ 0802acf6 33e0
+DWORD_0802acf8:
+    .word  0x09dcabba                     @ 0802acf8 baabdc09
+DWORD_0802acfc:
+    .word  0x02023360                     @ 0802acfc 60330202
+LAB_0802ad00:
+    ldr r0, DWORD_0802ad28                   @ 0802ad00 0948
+    ldr r3, DWORD_0802ad2c                   @ 0802ad02 0a4b
+    adds r0,r0,r3    @ 0802ad04 c018
+    movs r1,#0x7    @ 0802ad06 0721
+    ldrb r0,[r0,#0x0]                        @ 0802ad08 0078
+    ands r1,r0    @ 0802ad0a 0140
+    cmp r1,#0x1                              @ 0802ad0c 0129
+    beq LAB_0802ad50                         @ 0802ad0e 1fd0
+    cmp r1,#0x2                              @ 0802ad10 0229
+    beq LAB_0802ad48                         @ 0802ad12 19d0
+    cmp r1,#0x3                              @ 0802ad14 0329
+    beq LAB_0802ad40                         @ 0802ad16 13d0
+    cmp r1,#0x4                              @ 0802ad18 0429
+    beq LAB_0802ad38                         @ 0802ad1a 0dd0
+    ldr r0, DWORD_0802ad30                   @ 0802ad1c 0448
+    cmp r1,#0x5                              @ 0802ad1e 0529
+    bne LAB_0802ad52                         @ 0802ad20 17d1
+    ldr r4, DWORD_0802ad34                   @ 0802ad22 044c
+    adds r0,r0,r4    @ 0802ad24 0019
+    b LAB_0802ad52                           @ 0802ad26 14e0
+DWORD_0802ad28:
+    .word  0x02000000                     @ 0802ad28 00000002
+DWORD_0802ad2c:
+    .word  0x00006c2c                     @ 0802ad2c 2c6c0000
+DWORD_0802ad30:
+    .word  0x09dbfd66                     @ 0802ad30 66fddb09
+DWORD_0802ad34:
+    .word  0x0003ab16                     @ 0802ad34 16ab0300
+LAB_0802ad38:
+    ldr r0, DWORD_0802ad3c                   @ 0802ad38 0048
+    b LAB_0802ad52                           @ 0802ad3a 0ae0
+DWORD_0802ad3c:
+    .word  0x09deeca0                     @ 0802ad3c a0ecde09
+LAB_0802ad40:
+    ldr r0, DWORD_0802ad44                   @ 0802ad40 0048
+    b LAB_0802ad52                           @ 0802ad42 06e0
+DWORD_0802ad44:
+    .word  0x09de27ec                     @ 0802ad44 ec27de09
+LAB_0802ad48:
+    ldr r0, DWORD_0802ad4c                   @ 0802ad48 0048
+    b LAB_0802ad52                           @ 0802ad4a 02e0
+DWORD_0802ad4c:
+    .word  0x09dd6478                     @ 0802ad4c 7864dd09
+LAB_0802ad50:
+    ldr r0, DWORD_0802ad8c                   @ 0802ad50 0e48
+LAB_0802ad52:
+    bl draw_card_name_label_to_sprite_vram   @ 0802ad52 02f01bfc
+    ldr r1, DWORD_0802ad90                   @ 0802ad56 0e49
+    adds r1,#0x39    @ 0802ad58 3931
+    movs r0,#0x4    @ 0802ad5a 0420
+    ldrb r5,[r1,#0x0]                        @ 0802ad5c 0d78
+    orrs r0,r5    @ 0802ad5e 2843
+LAB_0802ad60:
+    strb r0,[r1,#0x0]                        @ 0802ad60 0870
+LAB_0802ad62:
+    ldr r1, DWORD_0802ad94                   @ 0802ad62 0c49
+    ldr r6, DWORD_0802ad98                   @ 0802ad64 0c4e
+    adds r0,r1,r6    @ 0802ad66 8819
+    movs r2,#0x7    @ 0802ad68 0722
+    ldrb r0,[r0,#0x0]                        @ 0802ad6a 0078
+    ands r2,r0    @ 0802ad6c 0240
+    adds r0,r1,#0x0    @ 0802ad6e 081c
+    cmp r2,#0x1                              @ 0802ad70 012a
+    beq LAB_0802adbc                         @ 0802ad72 23d0
+    cmp r2,#0x2                              @ 0802ad74 022a
+    beq LAB_0802adb4                         @ 0802ad76 1dd0
+    cmp r2,#0x3                              @ 0802ad78 032a
+    beq LAB_0802adac                         @ 0802ad7a 17d0
+    cmp r2,#0x4                              @ 0802ad7c 042a
+    beq LAB_0802ada4                         @ 0802ad7e 11d0
+    ldr r1, DWORD_0802ad9c                   @ 0802ad80 0649
+    cmp r2,#0x5                              @ 0802ad82 052a
+    bne LAB_0802adbe                         @ 0802ad84 1bd1
+    ldr r7, DWORD_0802ada0                   @ 0802ad86 064f
+    adds r1,r1,r7    @ 0802ad88 c919
+    b LAB_0802adbe                           @ 0802ad8a 18e0
+DWORD_0802ad8c:
+    .word  0x09dcab86                     @ 0802ad8c 86abdc09
+DWORD_0802ad90:
+    .word  0x02023360                     @ 0802ad90 60330202
+DWORD_0802ad94:
+    .word  0x02000000                     @ 0802ad94 00000002
+DWORD_0802ad98:
+    .word  0x00006c2c                     @ 0802ad98 2c6c0000
+DWORD_0802ad9c:
+    .word  0x09dbfd82                     @ 0802ad9c 82fddb09
+DWORD_0802ada0:
+    .word  0x0003ab0e                     @ 0802ada0 0eab0300
+LAB_0802ada4:
+    ldr r1, DWORD_0802ada8                   @ 0802ada4 0049
+    b LAB_0802adbe                           @ 0802ada6 0ae0
+DWORD_0802ada8:
+    .word  0x09deecb2                     @ 0802ada8 b2ecde09
+LAB_0802adac:
+    ldr r1, DWORD_0802adb0                   @ 0802adac 0049
+    b LAB_0802adbe                           @ 0802adae 06e0
+DWORD_0802adb0:
+    .word  0x09de2802                     @ 0802adb0 0228de09
+LAB_0802adb4:
+    ldr r1, DWORD_0802adb8                   @ 0802adb4 0049
+    b LAB_0802adbe                           @ 0802adb6 02e0
+DWORD_0802adb8:
+    .word  0x09dd648e                     @ 0802adb8 8e64dd09
+LAB_0802adbc:
+    ldr r1, DWORD_0802ade4                   @ 0802adbc 0949
+LAB_0802adbe:
+    ldr r2, DWORD_0802ade8                   @ 0802adbe 0a4a
+    adds r0,r0,r2    @ 0802adc0 8018
+    movs r3,#0x7    @ 0802adc2 0723
+    ldrb r0,[r0,#0x0]                        @ 0802adc4 0078
+    ands r3,r0    @ 0802adc6 0340
+    cmp r3,#0x1                              @ 0802adc8 012b
+    beq LAB_0802ae0c                         @ 0802adca 1fd0
+    cmp r3,#0x2                              @ 0802adcc 022b
+    beq LAB_0802ae04                         @ 0802adce 19d0
+    cmp r3,#0x3                              @ 0802add0 032b
+    beq LAB_0802adfc                         @ 0802add2 13d0
+    cmp r3,#0x4                              @ 0802add4 042b
+    beq LAB_0802adf4                         @ 0802add6 0dd0
+    ldr r2, DWORD_0802adec                   @ 0802add8 044a
+    cmp r3,#0x5                              @ 0802adda 052b
+    bne LAB_0802ae0e                         @ 0802addc 17d1
+    ldr r3, DWORD_0802adf0                   @ 0802adde 044b
+    adds r2,r2,r3    @ 0802ade0 d218
+    b LAB_0802ae0e                           @ 0802ade2 14e0
+DWORD_0802ade4:
+    .word  0x09dcab98                     @ 0802ade4 98abdc09
+DWORD_0802ade8:
+    .word  0x00006c2c                     @ 0802ade8 2c6c0000
+DWORD_0802adec:
+    .word  0x09dbfd88                     @ 0802adec 88fddb09
+DWORD_0802adf0:
+    .word  0x0003ab10                     @ 0802adf0 10ab0300
+LAB_0802adf4:
+    ldr r2, DWORD_0802adf8                   @ 0802adf4 004a
+    b LAB_0802ae0e                           @ 0802adf6 0ae0
+DWORD_0802adf8:
+    .word  0x09deecb8                     @ 0802adf8 b8ecde09
+LAB_0802adfc:
+    ldr r2, DWORD_0802ae00                   @ 0802adfc 004a
+    b LAB_0802ae0e                           @ 0802adfe 06e0
+DWORD_0802ae00:
+    .word  0x09de280a                     @ 0802ae00 0a28de09
+LAB_0802ae04:
+    ldr r2, DWORD_0802ae08                   @ 0802ae04 004a
+    b LAB_0802ae0e                           @ 0802ae06 02e0
+DWORD_0802ae08:
+    .word  0x09dd6496                     @ 0802ae08 9664dd09
+LAB_0802ae0c:
+    ldr r2, LAB_0802ae30                     @ 0802ae0c 084a
+LAB_0802ae0e:
+    movs r0,#0x7    @ 0802ae0e 0720
+    bl setup_label_render_ctx                @ 0802ae10 02f05cfe
+    ldr r0, LAB_0802ae34                     @ 0802ae14 0748
+    ldr r4, LAB_0802ae38                     @ 0802ae16 084c
+    adds r0,r0,r4    @ 0802ae18 0019
+    ldr r1, WORD_0802ae3c                    @ 0802ae1a 0849
+    ldrh r5,[r0,#0x0]                        @ 0802ae1c 0588
+    ands r1,r5    @ 0802ae1e 2940
+    movs r6,#0xc8    @ 0802ae20 c826
+    lsls r6,r6,#0x3    @ 0802ae22 f600
+SUB_0802ae24:
+    adds r2,r6,#0x0    @ 0802ae24 321c
+SUB_0802ae26:
+    orrs r1,r2    @ 0802ae26 1143
+    strh r1,[r0,#0x0]                        @ 0802ae28 0180
+    bl SUB_08029bb2                          @ 0802ae2a fef7c2fe
+    movs r0,r0    @ 0802ae2e 0000
+LAB_0802ae30:
+    add r3,sp,#0x278                         @ 0802ae30 9eab
+    lsrs r4,r3,#0x7    @ 0802ae32 dc09
+LAB_0802ae34:
+    lsls r0,r0,#0x1    @ 0802ae34 4000
+    lsls r0,r0,#0xc    @ 0802ae36 0003
+LAB_0802ae38:
+    lsls r2,r0,#0x8    @ 0802ae38 0202
+    movs r0,r0    @ 0802ae3a 0000
+WORD_0802ae3c:
+    .hword 0xc03f                         @ 0802ae3c 3fc0
+    .hword 0xffff    @ 0802ae3e ffff
+campaign_scene_handler_0802ae40:
+    ldr r0, DWORD_0802ae68                   @ 0802ae40 0948
+    ldr r7, DWORD_0802ae6c                   @ 0802ae42 0a4f
+    adds r0,r0,r7    @ 0802ae44 c019
+    movs r1,#0x7    @ 0802ae46 0721
+    ldrb r0,[r0,#0x0]                        @ 0802ae48 0078
+    ands r1,r0    @ 0802ae4a 0140
+    cmp r1,#0x1                              @ 0802ae4c 0129
+    beq LAB_0802ae90                         @ 0802ae4e 1fd0
+    cmp r1,#0x2                              @ 0802ae50 0229
+    beq LAB_0802ae88                         @ 0802ae52 19d0
+    cmp r1,#0x3                              @ 0802ae54 0329
+    beq LAB_0802ae80                         @ 0802ae56 13d0
+    cmp r1,#0x4                              @ 0802ae58 0429
+    beq LAB_0802ae78                         @ 0802ae5a 0dd0
+    ldr r0, DWORD_0802ae70                   @ 0802ae5c 0448
+    cmp r1,#0x5                              @ 0802ae5e 0529
+    bne LAB_0802ae92                         @ 0802ae60 17d1
+    ldr r1, DWORD_0802ae74                   @ 0802ae62 0449
+    adds r0,r0,r1    @ 0802ae64 4018
+    b LAB_0802ae92                           @ 0802ae66 14e0
+DWORD_0802ae68:
+    .word  0x02000000                     @ 0802ae68 00000002
+DWORD_0802ae6c:
+    .word  0x00006c2c                     @ 0802ae6c 2c6c0000
+DWORD_0802ae70:
+    .word  0x09dbe49a                     @ 0802ae70 9ae4db09
+DWORD_0802ae74:
+    .word  0x0003aade                     @ 0802ae74 deaa0300
+LAB_0802ae78:
+    ldr r0, DWORD_0802ae7c                   @ 0802ae78 0048
+    b LAB_0802ae92                           @ 0802ae7a 0ae0
+DWORD_0802ae7c:
+    .word  0x09ded29a                     @ 0802ae7c 9ad2de09
+LAB_0802ae80:
+    ldr r0, DWORD_0802ae84                   @ 0802ae80 0048
+    b LAB_0802ae92                           @ 0802ae82 06e0
+DWORD_0802ae84:
+    .word  0x09de0e46                     @ 0802ae84 460ede09
+LAB_0802ae88:
+    ldr r0, DWORD_0802ae8c                   @ 0802ae88 0048
+    b LAB_0802ae92                           @ 0802ae8a 02e0
+DWORD_0802ae8c:
+    .word  0x09dd4bb4                     @ 0802ae8c b44bdd09
+LAB_0802ae90:
+    ldr r0, DWORD_0802aea0                   @ 0802ae90 0348
+LAB_0802ae92:
+    movs r1,#0x1    @ 0802ae92 0121
+    bl init_pack_card_info_screen_vram       @ 0802ae94 00f07cfb
+    ldr r2, DWORD_0802aea4                   @ 0802ae98 024a
+    ldr r3, DWORD_0802aea8                   @ 0802ae9a 034b
+    adds r2,r2,r3    @ 0802ae9c d218
+    b SUB_0802b1f6                           @ 0802ae9e aae1
+DWORD_0802aea0:
+    .word  0x09dc9548                     @ 0802aea0 4895dc09
+DWORD_0802aea4:
+    .word  0x03000040                     @ 0802aea4 40000003
+DWORD_0802aea8:
+    .word  0x00000202                     @ 0802aea8 02020000
+campaign_scene_handler_0802aeac:
+    bl init_puzzle_card_name_line_buf        @ 0802aeac 00f006fd
+    ldr r0, DWORD_0802aed8                   @ 0802aeb0 0948
+    ldr r4, DWORD_0802aedc                   @ 0802aeb2 0a4c
+    adds r0,r0,r4    @ 0802aeb4 0019
+    movs r1,#0x7    @ 0802aeb6 0721
+    ldrb r0,[r0,#0x0]                        @ 0802aeb8 0078
+    ands r1,r0    @ 0802aeba 0140
+    cmp r1,#0x1                              @ 0802aebc 0129
+    beq LAB_0802af00                         @ 0802aebe 1fd0
+    cmp r1,#0x2                              @ 0802aec0 0229
+    beq LAB_0802aef8                         @ 0802aec2 19d0
+    cmp r1,#0x3                              @ 0802aec4 0329
+    beq LAB_0802aef0                         @ 0802aec6 13d0
+    cmp r1,#0x4                              @ 0802aec8 0429
+    beq LAB_0802aee8                         @ 0802aeca 0dd0
+    ldr r0, DWORD_0802aee0                   @ 0802aecc 0448
+    cmp r1,#0x5                              @ 0802aece 0529
+    bne LAB_0802af02                         @ 0802aed0 17d1
+    ldr r5, DWORD_0802aee4                   @ 0802aed2 044d
+    adds r0,r0,r5    @ 0802aed4 4019
+    b LAB_0802af02                           @ 0802aed6 14e0
+DWORD_0802aed8:
+    .word  0x02000000                     @ 0802aed8 00000002
+DWORD_0802aedc:
+    .word  0x00006c2c                     @ 0802aedc 2c6c0000
+DWORD_0802aee0:
+    .word  0x09dbe7ba                     @ 0802aee0 bae7db09
+DWORD_0802aee4:
+    .word  0x0003ab12                     @ 0802aee4 12ab0300
+LAB_0802aee8:
+    ldr r0, DWORD_0802aeec                   @ 0802aee8 0048
+    b LAB_0802af02                           @ 0802aeea 0ae0
+DWORD_0802aeec:
+    .word  0x09ded652                     @ 0802aeec 52d6de09
+LAB_0802aef0:
+    ldr r0, DWORD_0802aef4                   @ 0802aef0 0048
+    b LAB_0802af02                           @ 0802aef2 06e0
+DWORD_0802aef4:
+    .word  0x09de11aa                     @ 0802aef4 aa11de09
+LAB_0802aef8:
+    ldr r0, DWORD_0802aefc                   @ 0802aef8 0048
+    b LAB_0802af02                           @ 0802aefa 02e0
+DWORD_0802aefc:
+    .word  0x09dd4f06                     @ 0802aefc 064fdd09
+LAB_0802af00:
+    ldr r0, DWORD_0802af30                   @ 0802af00 0b48
+LAB_0802af02:
+    movs r1,#0xfa    @ 0802af02 fa21
+    lsls r1,r1,#0x1    @ 0802af04 4900
+    bl render_card_stat_with_number_alt      @ 0802af06 00f0bffe
+    ldr r1, DWORD_0802af34                   @ 0802af0a 0a49
+    ldr r6, DWORD_0802af38                   @ 0802af0c 0a4e
+    adds r1,r1,r6    @ 0802af0e 8919
+    movs r0,#0x1    @ 0802af10 0120
+    ldrb r1,[r1,#0x0]                        @ 0802af12 0978
+    ands r0,r1    @ 0802af14 0840
+    cmp r0,#0x0                              @ 0802af16 0028
+    beq LAB_0802af1c                         @ 0802af18 00d0
+    b LAB_0802affc                           @ 0802af1a 6fe0
+LAB_0802af1c:
+    ldr r0, DWORD_0802af3c                   @ 0802af1c 0748
+    movs r7,#0x89    @ 0802af1e 8927
+    lsls r7,r7,#0x2    @ 0802af20 bf00
+    adds r0,r0,r7    @ 0802af22 c019
+    ldr r0,[r0,#0x0]                         @ 0802af24 0068
+    cmp r0,#0x2                              @ 0802af26 0228
+    beq LAB_0802af40                         @ 0802af28 0ad0
+    cmp r0,#0x3                              @ 0802af2a 0328
+    beq LAB_0802afa0                         @ 0802af2c 38d0
+    b LAB_0802b12e                           @ 0802af2e fee0
+DWORD_0802af30:
+    .word  0x09dc9862                     @ 0802af30 6298dc09
+DWORD_0802af34:
+    .word  0x03000040                     @ 0802af34 40000003
+DWORD_0802af38:
+    .word  0x0000023f                     @ 0802af38 3f020000
+DWORD_0802af3c:
+    .word  0x0201e2a0                     @ 0802af3c a0e20102
+LAB_0802af40:
+    ldr r0, DWORD_0802af68                   @ 0802af40 0948
+    ldr r1, DWORD_0802af6c                   @ 0802af42 0a49
+    adds r0,r0,r1    @ 0802af44 4018
+    movs r1,#0x7    @ 0802af46 0721
+    ldrb r0,[r0,#0x0]                        @ 0802af48 0078
+    ands r1,r0    @ 0802af4a 0140
+    cmp r1,#0x1                              @ 0802af4c 0129
+    beq LAB_0802af90                         @ 0802af4e 1fd0
+    cmp r1,#0x2                              @ 0802af50 0229
+    beq LAB_0802af88                         @ 0802af52 19d0
+    cmp r1,#0x3                              @ 0802af54 0329
+    beq LAB_0802af80                         @ 0802af56 13d0
+    cmp r1,#0x4                              @ 0802af58 0429
+    beq LAB_0802af78                         @ 0802af5a 0dd0
+    ldr r0, DWORD_0802af70                   @ 0802af5c 0448
+    cmp r1,#0x5                              @ 0802af5e 0529
+    bne LAB_0802af92                         @ 0802af60 17d1
+    ldr r2, DWORD_0802af74                   @ 0802af62 044a
+    adds r0,r0,r2    @ 0802af64 8018
+    b LAB_0802af92                           @ 0802af66 14e0
+DWORD_0802af68:
+    .word  0x02000000                     @ 0802af68 00000002
+DWORD_0802af6c:
+    .word  0x00006c2c                     @ 0802af6c 2c6c0000
+DWORD_0802af70:
+    .word  0x09dc01ac                     @ 0802af70 ac01dc09
+DWORD_0802af74:
+    .word  0x0003ab84                     @ 0802af74 84ab0300
+LAB_0802af78:
+    ldr r0, DWORD_0802af7c                   @ 0802af78 0048
+    b LAB_0802af92                           @ 0802af7a 0ae0
+DWORD_0802af7c:
+    .word  0x09def168                     @ 0802af7c 68f1de09
+LAB_0802af80:
+    ldr r0, DWORD_0802af84                   @ 0802af80 0048
+    b LAB_0802af92                           @ 0802af82 06e0
+DWORD_0802af84:
+    .word  0x09de2cd8                     @ 0802af84 d82cde09
+LAB_0802af88:
+    ldr r0, DWORD_0802af8c                   @ 0802af88 0048
+    b LAB_0802af92                           @ 0802af8a 02e0
+DWORD_0802af8c:
+    .word  0x09dd694c                     @ 0802af8c 4c69dd09
+LAB_0802af90:
+    ldr r0, DWORD_0802af9c                   @ 0802af90 0248
+LAB_0802af92:
+    movs r1,#0x3    @ 0802af92 0321
+    movs r2,#0xa    @ 0802af94 0a22
+    bl render_game_string_with_number        @ 0802af96 00f0d3fc
+    b LAB_0802b12e                           @ 0802af9a c8e0
+DWORD_0802af9c:
+    .word  0x09dcaf86                     @ 0802af9c 86afdc09
+LAB_0802afa0:
+    ldr r0, DWORD_0802afcc                   @ 0802afa0 0a48
+    ldr r3, DWORD_0802afd0                   @ 0802afa2 0b4b
+    adds r0,r0,r3    @ 0802afa4 c018
+    movs r1,#0x7    @ 0802afa6 0721
+    ldrb r0,[r0,#0x0]                        @ 0802afa8 0078
+    ands r1,r0    @ 0802afaa 0140
+    cmp r1,#0x1                              @ 0802afac 0129
+    beq LAB_0802aff4                         @ 0802afae 21d0
+    cmp r1,#0x2                              @ 0802afb0 0229
+    beq LAB_0802afec                         @ 0802afb2 1bd0
+    cmp r1,#0x3                              @ 0802afb4 0329
+    beq LAB_0802afe4                         @ 0802afb6 15d0
+    cmp r1,#0x4                              @ 0802afb8 0429
+    beq LAB_0802afdc                         @ 0802afba 0fd0
+    ldr r0, DWORD_0802afd4                   @ 0802afbc 0548
+    cmp r1,#0x5                              @ 0802afbe 0529
+    beq LAB_0802afc4                         @ 0802afc0 00d0
+    b LAB_0802b0c6                           @ 0802afc2 80e0
+LAB_0802afc4:
+    ldr r4, DWORD_0802afd8                   @ 0802afc4 044c
+    adds r0,r0,r4    @ 0802afc6 0019
+    b LAB_0802b0c6                           @ 0802afc8 7de0
+    .zero  0x2
+DWORD_0802afcc:
+    .word  0x02000000                     @ 0802afcc 00000002
+DWORD_0802afd0:
+    .word  0x00006c2c                     @ 0802afd0 2c6c0000
+DWORD_0802afd4:
+    .word  0x09dc01b2                     @ 0802afd4 b201dc09
+DWORD_0802afd8:
+    .word  0x0003ab86                     @ 0802afd8 86ab0300
+LAB_0802afdc:
+    ldr r0, DWORD_0802afe0                   @ 0802afdc 0048
+    b LAB_0802b0c6                           @ 0802afde 72e0
+DWORD_0802afe0:
+    .word  0x09def172                     @ 0802afe0 72f1de09
+LAB_0802afe4:
+    ldr r0, DWORD_0802afe8                   @ 0802afe4 0048
+    b LAB_0802b0c6                           @ 0802afe6 6ee0
+DWORD_0802afe8:
+    .word  0x09de2ce0                     @ 0802afe8 e02cde09
+LAB_0802afec:
+    ldr r0, DWORD_0802aff0                   @ 0802afec 0048
+    b LAB_0802b0c6                           @ 0802afee 6ae0
+DWORD_0802aff0:
+    .word  0x09dd6956                     @ 0802aff0 5669dd09
+LAB_0802aff4:
+    ldr r0, DWORD_0802aff8                   @ 0802aff4 0048
+    b LAB_0802b0c6                           @ 0802aff6 66e0
+DWORD_0802aff8:
+    .word  0x09dcaf8c                     @ 0802aff8 8cafdc09
+LAB_0802affc:
+    bl evaluate_campaign_victory_state       @ 0802affc fdf7eefd
+    cmp r0,#0x2                              @ 0802b000 0228
+    beq LAB_0802b074                         @ 0802b002 37d0
+    cmp r0,#0x2                              @ 0802b004 0228
+    bgt LAB_0802b00e                         @ 0802b006 02dc
+    cmp r0,#0x1                              @ 0802b008 0128
+    beq LAB_0802b014                         @ 0802b00a 03d0
+    b LAB_0802b12e                           @ 0802b00c 8fe0
+LAB_0802b00e:
+    cmp r0,#0x3                              @ 0802b00e 0328
+    beq LAB_0802b0d4                         @ 0802b010 60d0
+    b LAB_0802b12e                           @ 0802b012 8ce0
+LAB_0802b014:
+    ldr r0, DWORD_0802b03c                   @ 0802b014 0948
+    ldr r5, DWORD_0802b040                   @ 0802b016 0a4d
+    adds r0,r0,r5    @ 0802b018 4019
+    movs r1,#0x7    @ 0802b01a 0721
+    ldrb r0,[r0,#0x0]                        @ 0802b01c 0078
+    ands r1,r0    @ 0802b01e 0140
+    cmp r1,#0x1                              @ 0802b020 0129
+    beq LAB_0802b064                         @ 0802b022 1fd0
+    cmp r1,#0x2                              @ 0802b024 0229
+    beq LAB_0802b05c                         @ 0802b026 19d0
+    cmp r1,#0x3                              @ 0802b028 0329
+    beq LAB_0802b054                         @ 0802b02a 13d0
+    cmp r1,#0x4                              @ 0802b02c 0429
+    beq LAB_0802b04c                         @ 0802b02e 0dd0
+    ldr r0, DWORD_0802b044                   @ 0802b030 0448
+    cmp r1,#0x5                              @ 0802b032 0529
+    bne LAB_0802b066                         @ 0802b034 17d1
+    ldr r6, DWORD_0802b048                   @ 0802b036 044e
+    adds r0,r0,r6    @ 0802b038 8019
+    b LAB_0802b066                           @ 0802b03a 14e0
+DWORD_0802b03c:
+    .word  0x02000000                     @ 0802b03c 00000002
+DWORD_0802b040:
+    .word  0x00006c2c                     @ 0802b040 2c6c0000
+DWORD_0802b044:
+    .word  0x09dbe792                     @ 0802b044 92e7db09
+DWORD_0802b048:
+    .word  0x0003ab18                     @ 0802b048 18ab0300
+LAB_0802b04c:
+    ldr r0, DWORD_0802b050                   @ 0802b04c 0048
+    b LAB_0802b066                           @ 0802b04e 0ae0
+DWORD_0802b050:
+    .word  0x09ded628                     @ 0802b050 28d6de09
+LAB_0802b054:
+    ldr r0, DWORD_0802b058                   @ 0802b054 0048
+    b LAB_0802b066                           @ 0802b056 06e0
+DWORD_0802b058:
+    .word  0x09de117c                     @ 0802b058 7c11de09
+LAB_0802b05c:
+    ldr r0, DWORD_0802b060                   @ 0802b05c 0048
+    b LAB_0802b066                           @ 0802b05e 02e0
+DWORD_0802b060:
+    .word  0x09dd4ee0                     @ 0802b060 e04edd09
+LAB_0802b064:
+    ldr r0, DWORD_0802b070                   @ 0802b064 0248
+LAB_0802b066:
+    movs r1,#0x96    @ 0802b066 9621
+    lsls r1,r1,#0x1    @ 0802b068 4900
+    bl render_card_stat_with_number_alt      @ 0802b06a 00f00dfe
+    b LAB_0802b12e                           @ 0802b06e 5ee0
+DWORD_0802b070:
+    .word  0x09dc983e                     @ 0802b070 3e98dc09
+LAB_0802b074:
+    ldr r0, DWORD_0802b09c                   @ 0802b074 0948
+    ldr r7, DWORD_0802b0a0                   @ 0802b076 0a4f
+    adds r0,r0,r7    @ 0802b078 c019
+    movs r1,#0x7    @ 0802b07a 0721
+    ldrb r0,[r0,#0x0]                        @ 0802b07c 0078
+    ands r1,r0    @ 0802b07e 0140
+    cmp r1,#0x1                              @ 0802b080 0129
+    beq LAB_0802b0c4                         @ 0802b082 1fd0
+    cmp r1,#0x2                              @ 0802b084 0229
+    beq LAB_0802b0bc                         @ 0802b086 19d0
+    cmp r1,#0x3                              @ 0802b088 0329
+    beq LAB_0802b0b4                         @ 0802b08a 13d0
+    cmp r1,#0x4                              @ 0802b08c 0429
+    beq LAB_0802b0ac                         @ 0802b08e 0dd0
+    ldr r0, DWORD_0802b0a4                   @ 0802b090 0448
+    cmp r1,#0x5                              @ 0802b092 0529
+    bne LAB_0802b0c6                         @ 0802b094 17d1
+    ldr r1, DWORD_0802b0a8                   @ 0802b096 0449
+    adds r0,r0,r1    @ 0802b098 4018
+    b LAB_0802b0c6                           @ 0802b09a 14e0
+DWORD_0802b09c:
+    .word  0x02000000                     @ 0802b09c 00000002
+DWORD_0802b0a0:
+    .word  0x00006c2c                     @ 0802b0a0 2c6c0000
+DWORD_0802b0a4:
+    .word  0x09dc01ac                     @ 0802b0a4 ac01dc09
+DWORD_0802b0a8:
+    .word  0x0003ab84                     @ 0802b0a8 84ab0300
+LAB_0802b0ac:
+    ldr r0, DWORD_0802b0b0                   @ 0802b0ac 0048
+    b LAB_0802b0c6                           @ 0802b0ae 0ae0
+DWORD_0802b0b0:
+    .word  0x09def168                     @ 0802b0b0 68f1de09
+LAB_0802b0b4:
+    ldr r0, DWORD_0802b0b8                   @ 0802b0b4 0048
+    b LAB_0802b0c6                           @ 0802b0b6 06e0
+DWORD_0802b0b8:
+    .word  0x09de2cd8                     @ 0802b0b8 d82cde09
+LAB_0802b0bc:
+    ldr r0, DWORD_0802b0c0                   @ 0802b0bc 0048
+    b LAB_0802b0c6                           @ 0802b0be 02e0
+DWORD_0802b0c0:
+    .word  0x09dd694c                     @ 0802b0c0 4c69dd09
+LAB_0802b0c4:
+    ldr r0, DWORD_0802b0d0                   @ 0802b0c4 0248
+LAB_0802b0c6:
+    movs r1,#0x3    @ 0802b0c6 0321
+    movs r2,#0x5    @ 0802b0c8 0522
+    bl render_game_string_with_number        @ 0802b0ca 00f039fc
+    b LAB_0802b12e                           @ 0802b0ce 2ee0
+DWORD_0802b0d0:
+    .word  0x09dcaf86                     @ 0802b0d0 86afdc09
+LAB_0802b0d4:
+    ldr r0, DWORD_0802b0fc                   @ 0802b0d4 0948
+    ldr r2, DWORD_0802b100                   @ 0802b0d6 0a4a
+    adds r0,r0,r2    @ 0802b0d8 8018
+    movs r1,#0x7    @ 0802b0da 0721
+    ldrb r0,[r0,#0x0]                        @ 0802b0dc 0078
+    ands r1,r0    @ 0802b0de 0140
+    cmp r1,#0x1                              @ 0802b0e0 0129
+    beq LAB_0802b124                         @ 0802b0e2 1fd0
+    cmp r1,#0x2                              @ 0802b0e4 0229
+    beq LAB_0802b11c                         @ 0802b0e6 19d0
+    cmp r1,#0x3                              @ 0802b0e8 0329
+    beq LAB_0802b114                         @ 0802b0ea 13d0
+    cmp r1,#0x4                              @ 0802b0ec 0429
+    beq LAB_0802b10c                         @ 0802b0ee 0dd0
+    ldr r0, DWORD_0802b104                   @ 0802b0f0 0448
+    cmp r1,#0x5                              @ 0802b0f2 0529
+    bne LAB_0802b126                         @ 0802b0f4 17d1
+    ldr r3, DWORD_0802b108                   @ 0802b0f6 044b
+    adds r0,r0,r3    @ 0802b0f8 c018
+    b LAB_0802b126                           @ 0802b0fa 14e0
+DWORD_0802b0fc:
+    .word  0x02000000                     @ 0802b0fc 00000002
+DWORD_0802b100:
+    .word  0x00006c2c                     @ 0802b100 2c6c0000
+DWORD_0802b104:
+    .word  0x09dc01b2                     @ 0802b104 b201dc09
+DWORD_0802b108:
+    .word  0x0003ab86                     @ 0802b108 86ab0300
+LAB_0802b10c:
+    ldr r0, DWORD_0802b110                   @ 0802b10c 0048
+    b LAB_0802b126                           @ 0802b10e 0ae0
+DWORD_0802b110:
+    .word  0x09def172                     @ 0802b110 72f1de09
+LAB_0802b114:
+    ldr r0, DWORD_0802b118                   @ 0802b114 0048
+    b LAB_0802b126                           @ 0802b116 06e0
+DWORD_0802b118:
+    .word  0x09de2ce0                     @ 0802b118 e02cde09
+LAB_0802b11c:
+    ldr r0, DWORD_0802b120                   @ 0802b11c 0048
+    b LAB_0802b126                           @ 0802b11e 02e0
+DWORD_0802b120:
+    .word  0x09dd6956                     @ 0802b120 5669dd09
+LAB_0802b124:
+    ldr r0, DWORD_0802b13c                   @ 0802b124 0548
+LAB_0802b126:
+    movs r1,#0x3    @ 0802b126 0321
+    movs r2,#0x2    @ 0802b128 0222
+    bl render_game_string_with_number        @ 0802b12a 00f009fc
+LAB_0802b12e:
+    bl zero_sprite_vram_with_tile_seq        @ 0802b12e 00f019fe
+    ldr r2, DWORD_0802b140                   @ 0802b132 034a
+    ldr r4, DWORD_0802b144                   @ 0802b134 034c
+    adds r2,r2,r4    @ 0802b136 1219
+    b SUB_0802b1f6                           @ 0802b138 5de0
+    .zero  0x2
+DWORD_0802b13c:
+    .word  0x09dcaf8c                     @ 0802b13c 8cafdc09
+DWORD_0802b140:
+    .word  0x03000040                     @ 0802b140 40000003
+DWORD_0802b144:
+    .word  0x00000202                     @ 0802b144 02020000
+campaign_scene_handler_0802b148:
+    bl tick_lp_display_and_blend_step        @ 0802b148 00f03cfe
+    cmp r0,#0x0                              @ 0802b14c 0028
+    bne LAB_0802b154                         @ 0802b14e 01d1
+    bl SUB_08029bb2                          @ 0802b150 fef72ffd
+LAB_0802b154:
+    ldr r2, LAB_0802b190                     @ 0802b154 0e4a
+    ldr r5, LAB_0802b194                     @ 0802b156 0f4d
+    adds r1,r2,r5    @ 0802b158 5119
+    movs r0,#0x3f    @ 0802b15a 3f20
+    ldrb r6,[r1,#0x0]                        @ 0802b15c 0e78
+    ands r0,r6    @ 0802b15e 3040
+    strb r0,[r1,#0x0]                        @ 0802b160 0870
+    movs r7,#0x81    @ 0802b162 8127
+    lsls r7,r7,#0x2    @ 0802b164 bf00
+    adds r1,r2,r7    @ 0802b166 d119
+    movs r0,#0x40    @ 0802b168 4020
+    rsbs r0,r0,#0    @ 0802b16a 4042
+    ldrb r3,[r1,#0x0]                        @ 0802b16c 0b78
+    ands r0,r3    @ 0802b16e 1840
+    strb r0,[r1,#0x0]                        @ 0802b170 0870
+    ldr r4, LAB_0802b198                     @ 0802b172 094c
+    adds r2,r2,r4    @ 0802b174 1219
+    ldrh r3,[r2,#0x0]                        @ 0802b176 1388
+    lsls r1,r3,#0x12    @ 0802b178 9904
+    lsrs r1,r1,#0x18    @ 0802b17a 090e
+    adds r1,#0x1    @ 0802b17c 0131
+    movs r0,#0xff    @ 0802b17e ff20
+    ands r1,r0    @ 0802b180 0140
+    lsls r1,r1,#0x6    @ 0802b182 8901
+    ldr r0, WORD_0802b19c                    @ 0802b184 0548
+    ands r0,r3    @ 0802b186 1840
+    orrs r0,r1    @ 0802b188 0843
+    strh r0,[r2,#0x0]                        @ 0802b18a 1080
+    bl SUB_08029bb2                          @ 0802b18c fef711fd
+LAB_0802b190:
+    lsls r0,r0,#0x1    @ 0802b190 4000
+    lsls r0,r0,#0xc    @ 0802b192 0003
+LAB_0802b194:
+    lsls r3,r0,#0x8    @ 0802b194 0302
+    movs r0,r0    @ 0802b196 0000
+LAB_0802b198:
+    lsls r2,r0,#0x8    @ 0802b198 0202
+    movs r0,r0    @ 0802b19a 0000
+WORD_0802b19c:
+    .hword 0xc03f                         @ 0802b19c 3fc0
+    .hword 0xffff    @ 0802b19e ffff
+campaign_scene_handler_0802b1a0:
+    bl dispatch_puzzle_display_mode          @ 0802b1a0 00f032fe
+    cmp r0,#0x0                              @ 0802b1a4 0028
+    bne LAB_0802b1ac                         @ 0802b1a6 01d1
+    bl SUB_08029bb2                          @ 0802b1a8 fef703fd
+LAB_0802b1ac:
+    ldr r2, LAB_0802b1cc                     @ 0802b1ac 074a
+    ldr r5, LAB_0802b1d0                     @ 0802b1ae 084d
+    adds r2,r2,r5    @ 0802b1b0 5219
+    ldrh r3,[r2,#0x0]                        @ 0802b1b2 1388
+    lsls r1,r3,#0x12    @ 0802b1b4 9904
+    lsrs r1,r1,#0x18    @ 0802b1b6 090e
+    adds r1,#0x1    @ 0802b1b8 0131
+    movs r0,#0xff    @ 0802b1ba ff20
+    ands r1,r0    @ 0802b1bc 0140
+    lsls r1,r1,#0x6    @ 0802b1be 8901
+    ldr r0, WORD_0802b1d4                    @ 0802b1c0 0448
+    ands r0,r3    @ 0802b1c2 1840
+    orrs r0,r1    @ 0802b1c4 0843
+    strh r0,[r2,#0x0]                        @ 0802b1c6 1080
+    bl SUB_08029bb2                          @ 0802b1c8 fef7f3fc
+LAB_0802b1cc:
+    lsls r0,r0,#0x1    @ 0802b1cc 4000
+    lsls r0,r0,#0xc    @ 0802b1ce 0003
+LAB_0802b1d0:
+    lsls r2,r0,#0x8    @ 0802b1d0 0202
+    movs r0,r0    @ 0802b1d2 0000
+WORD_0802b1d4:
+    .hword 0xc03f                         @ 0802b1d4 3fc0
+    .hword 0xffff    @ 0802b1d6 ffff
+campaign_scene_handler_0802b1d8:
+    bl tick_lp_display_and_fadein_check      @ 0802b1d8 00f004fe
+    cmp r0,#0x0                              @ 0802b1dc 0028
+    bne LAB_0802b1e4                         @ 0802b1de 01d1
+    bl SUB_08029bb2                          @ 0802b1e0 fef7e7fc
+LAB_0802b1e4:
+    ldr r0, LAB_0802b210                     @ 0802b1e4 0a48
+    ldr r0,[r0,#0x68]                        @ 0802b1e6 806e
+    bl accrue_money_with_cap                 @ 0802b1e8 cdf098fe
+    bl init_puzzle_wram_then_copy            @ 0802b1ec cef04cfd
+    ldr r2, LAB_0802b214                     @ 0802b1f0 084a
+    ldr r6, LAB_0802b218                     @ 0802b1f2 094e
+    adds r2,r2,r6    @ 0802b1f4 9219
+SUB_0802b1f6:
+    ldrh r3,[r2,#0x0]                        @ 0802b1f6 1388
+    lsls r1,r3,#0x12    @ 0802b1f8 9904
+    lsrs r1,r1,#0x18    @ 0802b1fa 090e
+    adds r1,#0x1    @ 0802b1fc 0131
+    movs r0,#0xff    @ 0802b1fe ff20
+    ands r1,r0    @ 0802b200 0140
+    lsls r1,r1,#0x6    @ 0802b202 8901
+    ldr r0, WORD_0802b21c                    @ 0802b204 0548
+    ands r0,r3    @ 0802b206 1840
+    orrs r0,r1    @ 0802b208 0843
+    strh r0,[r2,#0x0]                        @ 0802b20a 1080
+    bl SUB_08029bb2                          @ 0802b20c fef7d1fc
+LAB_0802b210:
+    adds r3,#0x60    @ 0802b210 6033
+    lsls r2,r0,#0x8    @ 0802b212 0202
+LAB_0802b214:
+    lsls r0,r0,#0x1    @ 0802b214 4000
+    lsls r0,r0,#0xc    @ 0802b216 0003
+LAB_0802b218:
+    lsls r2,r0,#0x8    @ 0802b218 0202
+    movs r0,r0    @ 0802b21a 0000
+WORD_0802b21c:
+    .hword 0xc03f                         @ 0802b21c 3fc0
+    .hword 0xffff    @ 0802b21e ffff
+campaign_scene_handler_0802b220:
+    ldr r1, DWORD_0802b23c                   @ 0802b220 0649
+    adds r1,#0x36    @ 0802b222 3631
+    movs r0,#0x1    @ 0802b224 0120
+    ldrb r1,[r1,#0x0]                        @ 0802b226 0978
+    ands r0,r1    @ 0802b228 0840
+    cmp r0,#0x0                              @ 0802b22a 0028
+    bne LAB_0802b240                         @ 0802b22c 08d1
+    bl init_pack_scene_vram_regs             @ 0802b22e fdf731fa
+    movs r0,#0x0    @ 0802b232 0020
+    bl load_pack_tiles_with_palette_init     @ 0802b234 fdf77afa
+    b LAB_0802b25a                           @ 0802b238 0fe0
+    .zero  0x2
+DWORD_0802b23c:
+    .word  0x02023360                     @ 0802b23c 60330202
+LAB_0802b240:
+    ldr r3, DWORD_0802b284                   @ 0802b240 104b
+    add r3,r8                                @ 0802b242 4344
+    ldrh r2,[r3,#0x0]                        @ 0802b244 1a88
+    lsls r1,r2,#0x12    @ 0802b246 9104
+    lsrs r1,r1,#0x18    @ 0802b248 090e
+    adds r1,#0x1    @ 0802b24a 0131
+    movs r0,#0xff    @ 0802b24c ff20
+    ands r1,r0    @ 0802b24e 0140
+    lsls r1,r1,#0x6    @ 0802b250 8901
+    ldr r0, DWORD_0802b288                   @ 0802b252 0d48
+    ands r0,r2    @ 0802b254 1040
+    orrs r0,r1    @ 0802b256 0843
+    strh r0,[r3,#0x0]                        @ 0802b258 1880
+LAB_0802b25a:
+    ldr r0, DWORD_0802b28c                   @ 0802b25a 0c48
+    ldr r1, DWORD_0802b290                   @ 0802b25c 0c49
+    adds r0,r0,r1    @ 0802b25e 4018
+    movs r1,#0x7    @ 0802b260 0721
+    ldrb r0,[r0,#0x0]                        @ 0802b262 0078
+    ands r1,r0    @ 0802b264 0140
+    cmp r1,#0x1                              @ 0802b266 0129
+    beq LAB_0802b2b4                         @ 0802b268 24d0
+    cmp r1,#0x2                              @ 0802b26a 0229
+    beq LAB_0802b2ac                         @ 0802b26c 1ed0
+    cmp r1,#0x3                              @ 0802b26e 0329
+    beq LAB_0802b2a4                         @ 0802b270 18d0
+    cmp r1,#0x4                              @ 0802b272 0429
+    beq LAB_0802b29c                         @ 0802b274 12d0
+    ldr r0, DWORD_0802b294                   @ 0802b276 0748
+    cmp r1,#0x5                              @ 0802b278 0529
+    bne LAB_0802b2b6                         @ 0802b27a 1cd1
+    ldr r2, DWORD_0802b298                   @ 0802b27c 064a
+    adds r0,r0,r2    @ 0802b27e 8018
+    b LAB_0802b2b6                           @ 0802b280 19e0
+    .zero  0x2
+DWORD_0802b284:
+    .word  0x00000202                     @ 0802b284 02020000
+DWORD_0802b288:
+    .word  0xffffc03f                     @ 0802b288 3fc0ffff
+DWORD_0802b28c:
+    .word  0x02000000                     @ 0802b28c 00000002
+DWORD_0802b290:
+    .word  0x00006c2c                     @ 0802b290 2c6c0000
+DWORD_0802b294:
+    .word  0x09dbfe3e                     @ 0802b294 3efedb09
+DWORD_0802b298:
+    .word  0x0003ab32                     @ 0802b298 32ab0300
+LAB_0802b29c:
+    ldr r0, DWORD_0802b2a0                   @ 0802b29c 0048
+    b LAB_0802b2b6                           @ 0802b29e 0ae0
+DWORD_0802b2a0:
+    .word  0x09deed9a                     @ 0802b2a0 9aedde09
+LAB_0802b2a4:
+    ldr r0, DWORD_0802b2a8                   @ 0802b2a4 0048
+    b LAB_0802b2b6                           @ 0802b2a6 06e0
+DWORD_0802b2a8:
+    .word  0x09de28ec                     @ 0802b2a8 ec28de09
+LAB_0802b2ac:
+    ldr r0, DWORD_0802b2b0                   @ 0802b2ac 0048
+    b LAB_0802b2b6                           @ 0802b2ae 02e0
+DWORD_0802b2b0:
+    .word  0x09dd6560                     @ 0802b2b0 6065dd09
+LAB_0802b2b4:
+    ldr r0, DWORD_0802b2ec                   @ 0802b2b4 0d48
+LAB_0802b2b6:
+    str r0,[sp,#0x0]                         @ 0802b2b6 0090
+    movs r0,#0x0    @ 0802b2b8 0020
+    movs r1,#0x82    @ 0802b2ba 8221
+    ldr r2, DWORD_0802b2f0                   @ 0802b2bc 0c4a
+    ldr r3, DWORD_0802b2f4                   @ 0802b2be 0d4b
+    bl render_campaign_text_line_centered    @ 0802b2c0 fdf7aaf8
+    ldr r0, DWORD_0802b2f8                   @ 0802b2c4 0c48
+    ldr r3, DWORD_0802b2fc                   @ 0802b2c6 0d4b
+    adds r0,r0,r3    @ 0802b2c8 c018
+    movs r1,#0x7    @ 0802b2ca 0721
+    ldrb r0,[r0,#0x0]                        @ 0802b2cc 0078
+    ands r1,r0    @ 0802b2ce 0140
+    cmp r1,#0x1                              @ 0802b2d0 0129
+    beq LAB_0802b320                         @ 0802b2d2 25d0
+    cmp r1,#0x2                              @ 0802b2d4 0229
+    beq LAB_0802b318                         @ 0802b2d6 1fd0
+    cmp r1,#0x3                              @ 0802b2d8 0329
+    beq LAB_0802b310                         @ 0802b2da 19d0
+    cmp r1,#0x4                              @ 0802b2dc 0429
+    beq LAB_0802b308                         @ 0802b2de 13d0
+    ldr r0, DWORD_0802b300                   @ 0802b2e0 0748
+    cmp r1,#0x5                              @ 0802b2e2 0529
+    bne LAB_0802b322                         @ 0802b2e4 1dd1
+    ldr r4, DWORD_0802b304                   @ 0802b2e6 074c
+    adds r0,r0,r4    @ 0802b2e8 0019
+    b LAB_0802b322                           @ 0802b2ea 1ae0
+DWORD_0802b2ec:
+    .word  0x09dcac4c                     @ 0802b2ec 4cacdc09
+DWORD_0802b2f0:
+    .word  0x0000021e                     @ 0802b2f0 1e020000
+DWORD_0802b2f4:
+    .word  0x00000807                     @ 0802b2f4 07080000
+DWORD_0802b2f8:
+    .word  0x02000000                     @ 0802b2f8 00000002
+DWORD_0802b2fc:
+    .word  0x00006c2c                     @ 0802b2fc 2c6c0000
+DWORD_0802b300:
+    .word  0x09dbfe4a                     @ 0802b300 4afedb09
+DWORD_0802b304:
+    .word  0x0003ab3c                     @ 0802b304 3cab0300
+LAB_0802b308:
+    ldr r0, DWORD_0802b30c                   @ 0802b308 0048
+    b LAB_0802b322                           @ 0802b30a 0ae0
+DWORD_0802b30c:
+    .word  0x09deedb0                     @ 0802b30c b0edde09
+LAB_0802b310:
+    ldr r0, DWORD_0802b314                   @ 0802b310 0048
+    b LAB_0802b322                           @ 0802b312 06e0
+DWORD_0802b314:
+    .word  0x09de2900                     @ 0802b314 0029de09
+LAB_0802b318:
+    ldr r0, DWORD_0802b31c                   @ 0802b318 0048
+    b LAB_0802b322                           @ 0802b31a 02e0
+DWORD_0802b31c:
+    .word  0x09dd657a                     @ 0802b31c 7a65dd09
+LAB_0802b320:
+    ldr r0, LAB_0802b388                     @ 0802b320 1948
+LAB_0802b322:
+    str r0,[sp,#0x0]                         @ 0802b322 0090
+    movs r0,#0x0    @ 0802b324 0020
+    str r0,[sp,#0x4]                         @ 0802b326 0190
+    movs r0,#0xa3    @ 0802b328 a320
+    movs r1,#0xc2    @ 0802b32a c221
+    movs r2,#0x83    @ 0802b32c 8322
+    lsls r2,r2,#0x3    @ 0802b32e d200
+    ldr r3, LAB_0802b38c                     @ 0802b330 164b
+    bl render_campaign_text_line_with_align  @ 0802b332 fdf719f9
+    bl teardown_sio_link_session             @ 0802b336 c2f077fd
+    ldr r3, LAB_0802b390                     @ 0802b33a 154b
+    ldr r5, LAB_0802b394                     @ 0802b33c 154d
+    adds r4,r3,r5    @ 0802b33e 5c19
+    ldrh r2,[r4,#0x0]                        @ 0802b340 2288
+    lsls r1,r2,#0x12    @ 0802b342 9104
+    lsrs r1,r1,#0x18    @ 0802b344 090e
+    adds r1,#0x1    @ 0802b346 0131
+    movs r0,#0xff    @ 0802b348 ff20
+    ands r1,r0    @ 0802b34a 0140
+    lsls r1,r1,#0x6    @ 0802b34c 8901
+    ldr r0, WORD_0802b398                    @ 0802b34e 1248
+    ands r0,r2    @ 0802b350 1040
+    orrs r0,r1    @ 0802b352 0843
+    strh r0,[r4,#0x0]                        @ 0802b354 2080
+    ldr r2, LAB_0802b39c                     @ 0802b356 114a
+    adds r2,#0x36    @ 0802b358 3632
+    movs r0,#0x1f    @ 0802b35a 1f20
+    rsbs r0,r0,#0    @ 0802b35c 4042
+    ldrb r6,[r2,#0x0]                        @ 0802b35e 1678
+    ands r0,r6    @ 0802b360 3040
+    movs r1,#0x2    @ 0802b362 0221
+    orrs r0,r1    @ 0802b364 0843
+    strb r0,[r2,#0x0]                        @ 0802b366 1070
+    ldr r7, LAB_0802b3a0                     @ 0802b368 0d4f
+    adds r1,r3,r7    @ 0802b36a d919
+    movs r0,#0x3f    @ 0802b36c 3f20
+    ldrb r2,[r1,#0x0]                        @ 0802b36e 0a78
+    ands r0,r2    @ 0802b370 1040
+    strb r0,[r1,#0x0]                        @ 0802b372 0870
+    movs r4,#0x81    @ 0802b374 8124
+    lsls r4,r4,#0x2    @ 0802b376 a400
+    adds r3,r3,r4    @ 0802b378 1b19
+    movs r0,#0x40    @ 0802b37a 4020
+    rsbs r0,r0,#0    @ 0802b37c 4042
+    ldrb r5,[r3,#0x0]                        @ 0802b37e 1d78
+    ands r0,r5    @ 0802b380 2840
+    strb r0,[r3,#0x0]                        @ 0802b382 1870
+    bl SUB_08029bb2                          @ 0802b384 fef715fc
+LAB_0802b388:
+    add r4,sp,#0x178                         @ 0802b388 5eac
+    lsrs r4,r3,#0x7    @ 0802b38a dc09
+LAB_0802b38c:
+    lsrs r7,r0,#0x20    @ 0802b38c 0708
+    movs r0,r0    @ 0802b38e 0000
+LAB_0802b390:
+    lsls r0,r0,#0x1    @ 0802b390 4000
+    lsls r0,r0,#0xc    @ 0802b392 0003
+LAB_0802b394:
+    lsls r2,r0,#0x8    @ 0802b394 0202
+    movs r0,r0    @ 0802b396 0000
+WORD_0802b398:
+    .hword 0xc03f                         @ 0802b398 3fc0
+    .hword 0xffff    @ 0802b39a ffff
+LAB_0802b39c:
+    adds r3,#0x60    @ 0802b39c 6033
+    lsls r2,r0,#0x8    @ 0802b39e 0202
+LAB_0802b3a0:
+    lsls r3,r0,#0x8    @ 0802b3a0 0302
+    movs r0,r0    @ 0802b3a2 0000
+campaign_scene_handler_0802b3a4:
+    bl tick_campaign_card_selector_oam       @ 0802b3a4 fdf766fa
+    ldr r3, LAB_0802b3ec                     @ 0802b3a8 104b
+    ldr r6, LAB_0802b3f0                     @ 0802b3aa 114e
+    adds r7,r3,r6    @ 0802b3ac 9f19
+    ldrb r6,[r7,#0x0]                        @ 0802b3ae 3e78
+    lsrs r1,r6,#0x6    @ 0802b3b0 b109
+    movs r0,#0x81    @ 0802b3b2 8120
+    lsls r0,r0,#0x2    @ 0802b3b4 8000
+    adds r5,r3,r0    @ 0802b3b6 1d18
+    movs r4,#0x3f    @ 0802b3b8 3f24
+    adds r0,r4,#0x0    @ 0802b3ba 201c
+    ldrb r2,[r5,#0x0]                        @ 0802b3bc 2a78
+    ands r0,r2    @ 0802b3be 1040
+    lsls r0,r0,#0x2    @ 0802b3c0 8000
+    orrs r0,r1    @ 0802b3c2 0843
+    cmp r0,#0x3b                             @ 0802b3c4 3b28
+    bhi LAB_0802b3f4                         @ 0802b3c6 15d8
+    adds r2,r0,#0x1    @ 0802b3c8 421c
+    movs r1,#0x3    @ 0802b3ca 0321
+    ands r1,r2    @ 0802b3cc 1140
+    lsls r1,r1,#0x6    @ 0802b3ce 8901
+    adds r0,r4,#0x0    @ 0802b3d0 201c
+    ands r0,r6    @ 0802b3d2 3040
+    orrs r0,r1    @ 0802b3d4 0843
+    strb r0,[r7,#0x0]                        @ 0802b3d6 3870
+    lsrs r2,r2,#0x2    @ 0802b3d8 9208
+    ands r2,r4    @ 0802b3da 2240
+    movs r0,#0x40    @ 0802b3dc 4020
+    rsbs r0,r0,#0    @ 0802b3de 4042
+    ldrb r3,[r5,#0x0]                        @ 0802b3e0 2b78
+    ands r0,r3    @ 0802b3e2 1840
+    orrs r0,r2    @ 0802b3e4 1043
+SUB_0802b3e6:
+    strb r0,[r5,#0x0]                        @ 0802b3e6 2870
+    bl SUB_08029bb2                          @ 0802b3e8 fef7e3fb
+LAB_0802b3ec:
+    lsls r0,r0,#0x1    @ 0802b3ec 4000
+    lsls r0,r0,#0xc    @ 0802b3ee 0003
+LAB_0802b3f0:
+    lsls r3,r0,#0x8    @ 0802b3f0 0302
+    movs r0,r0    @ 0802b3f2 0000
+LAB_0802b3f4:
+    movs r4,#0xa4    @ 0802b3f4 a424
+    lsls r4,r4,#0x1    @ 0802b3f6 6400
+    adds r1,r3,r4    @ 0802b3f8 1919
+    movs r0,#0x3    @ 0802b3fa 0320
+    ldrh r1,[r1,#0x0]                        @ 0802b3fc 0988
+    ands r0,r1    @ 0802b3fe 0840
+    cmp r0,#0x0                              @ 0802b400 0028
+    bne LAB_0802b408                         @ 0802b402 01d1
+    bl SUB_08029bb2                          @ 0802b404 fef7d5fb
+LAB_0802b408:
+    ldr r5, LAB_0802b42c                     @ 0802b408 084d
+    adds r3,r3,r5    @ 0802b40a 5b19
+    ldrh r2,[r3,#0x0]                        @ 0802b40c 1a88
+    lsls r1,r2,#0x12    @ 0802b40e 9104
+    lsrs r1,r1,#0x18    @ 0802b410 090e
+    adds r1,#0x1    @ 0802b412 0131
+    movs r0,#0xff    @ 0802b414 ff20
+    ands r1,r0    @ 0802b416 0140
+    lsls r1,r1,#0x6    @ 0802b418 8901
+    ldr r0, WORD_0802b430                    @ 0802b41a 0548
+    ands r0,r2    @ 0802b41c 1040
+    orrs r0,r1    @ 0802b41e 0843
+    strh r0,[r3,#0x0]                        @ 0802b420 1880
+    bl request_sound_engine_code10           @ 0802b422 cef08dfb
+    bl SUB_08029bb2                          @ 0802b426 fef7c4fb
+    movs r0,r0    @ 0802b42a 0000
+LAB_0802b42c:
+    lsls r2,r0,#0x8    @ 0802b42c 0202
+    movs r0,r0    @ 0802b42e 0000
+WORD_0802b430:
+    .hword 0xc03f                         @ 0802b430 3fc0
+    .hword 0xffff    @ 0802b432 ffff
+campaign_scene_handler_0802b434:
+    movs r0,#0x8    @ 0802b434 0820
+    bl start_blend_fadein_with_target        @ 0802b436 caf003fa
+    cmp r0,#0x0                              @ 0802b43a 0028
+    bne LAB_0802b45c                         @ 0802b43c 0ed1
+    ldr r1, LAB_0802b458                     @ 0802b43e 0649
+    adds r1,#0x36    @ 0802b440 3631
+    movs r0,#0x2    @ 0802b442 0220
+    rsbs r0,r0,#0    @ 0802b444 4042
+    ldrb r6,[r1,#0x0]                        @ 0802b446 0e78
+    ands r0,r6    @ 0802b448 3040
+    strb r0,[r1,#0x0]                        @ 0802b44a 0870
+    bl tick_campaign_card_selector_oam       @ 0802b44c fdf712fa
+    bl invalidate_active_channel_id          @ 0802b450 cef068fb
+    bl SUB_08029bb2                          @ 0802b454 fef7adfb
+LAB_0802b458:
+    adds r3,#0x60    @ 0802b458 6033
+    lsls r2,r0,#0x8    @ 0802b45a 0202
+LAB_0802b45c:
+    movs r0,#0x0    @ 0802b45c 0020
+    b SUB_0802b46e                           @ 0802b45e 06e0
 
 @ SIO link session teardown epilogue fragment that reads campaign state word. Calls teardown_sio_link_session to disconnect SIO; then loads 0x0201e2a0+0x89*4=0x0201e4c4 (campaign state word address) into r0; exits via pop {r1}; bx r1 (Sub-case E) -- r0 holds the loaded state value returned to parent function. Large dispatch table at 0x08029098 (26+ entries all pointing here) indicates all "SIO terminate" state paths share this implementation.
 @ 
@@ -25883,11 +30619,12 @@ DAT_08029170:
 @ Constants: CAMPAIGN_STATE_BASE=0x0201e2a0; CAMPAIGN_STATE_OFF=0x89<<2=0x224; CAMPAIGN_STATE_ADDR=0x0201e4c4
 load_campaign_state_post_sio:
     bl teardown_sio_link_session             @ 0802b460 c2f0e2fc
-    ldr r0, DAT_0802b480                     @ 0802b464 0648
+    ldr r0, load_campaign_state_post_sio_ctx_base @ 0802b464 0648
     movs r7,#0x89    @ 0802b466 8927
     lsls r7,r7,#0x2    @ 0802b468 bf00
     adds r0,r0,r7    @ 0802b46a c019
     ldr r0,[r0,#0x0]                         @ 0802b46c 0068
+SUB_0802b46e:
     add sp,#0x50                             @ 0802b46e 14b0
     pop {r3,r4,r5}                           @ 0802b470 38bc
     .hword 0x4698    @ 0802b472 9846
@@ -25897,10 +30634,10 @@ load_campaign_state_post_sio:
     pop {r1}                                 @ 0802b47a 02bc
     bx r1                                    @ 0802b47c 0847
     .zero  0x2
-DAT_0802b480:
-    .word  0x0201e2a0                     @ 0802b480 a0e20102
+load_campaign_state_post_sio_ctx_base:
+    .word  gDuelCardCtxBase               @ 0802b480 a0e20102
 
-@ Core function to render card name centered to sprite VRAM, called by FUN_0801fec0 (duel_puzzle main loop) and init_pack_card_info_screen_vram (0x0802b590). Accepts r0=card_name_ptr (card name C string). Inits line buffer (col=0xc, font=2), reads [0x02000000+0x6c2c] font_style bits[2:0], updates [0x02006ed0+0x8] render mode byte (bit1 by font_style, bit1 forced=1), looks up font_jp_base_table for font pointer. Computes name byte length len; if len*3 > 0x30 selects narrow font (font_style bit0=0, clears bit0, relooks up table). Center offset = (0x30 - len*3) / 2, calls text_render_wrapper twice (normal + shadow, row=2 both). Computes length again, center offset = (0x30 - len*3) >> 1. Finally calls commit_line_buffer_to_sprite_vram(0x060053c0, 0) to write line buffer to OBJ VRAM. Then loops to write tilemap indices (2 rows x 12 cols = 24 tiles) to 0x06000812 region.
+@ Core function to render card name centered to sprite VRAM, called by run_duel_puzzle_scene_state_machine (duel_puzzle main loop) and init_pack_card_info_screen_vram (0x0802b590). Accepts r0=card_name_ptr (card name C string). Inits line buffer (col=0xc, font=2), reads [0x02000000+0x6c2c] font_style bits[2:0], updates [0x02006ed0+0x8] render mode byte (bit1 by font_style, bit1 forced=1), looks up font_jp_base_table for font pointer. Computes name byte length len; if len*3 > 0x30 selects narrow font (font_style bit0=0, clears bit0, relooks up table). Center offset = (0x30 - len*3) / 2, calls text_render_wrapper twice (normal + shadow, row=2 both). Computes length again, center offset = (0x30 - len*3) >> 1. Finally calls commit_line_buffer_to_sprite_vram(0x060053c0, 0) to write line buffer to OBJ VRAM. Then loops to write tilemap indices (2 rows x 12 cols = 24 tiles) to 0x06000812 region.
 @ 
 @ Constants:
 @ - line_buf_ctx = 0x02006ed0
@@ -25924,9 +30661,9 @@ render_card_name_centered_to_sprite_vram:
     movs r0,#0xc    @ 0802b492 0c20
     movs r1,#0x2    @ 0802b494 0221
     bl setup_line_buf_pos_and_font           @ 0802b496 c5f08dfb
-    ldr r5, DAT_0802b578                     @ 0802b49a 374d
-    ldr r0, DAT_0802b57c                     @ 0802b49c 3748
-    ldr r1, DAT_0802b580                     @ 0802b49e 3849
+    ldr r5, render_card_name_centered_to_sprite_vram_font_ctx @ 0802b49a 374d
+    ldr r0, render_card_name_centered_to_sprite_vram_ewram_base @ 0802b49c 3748
+    ldr r1, render_card_name_centered_to_sprite_vram_settings_off @ 0802b49e 3849
     adds r0,r0,r1    @ 0802b4a0 4018
     movs r1,#0x7    @ 0802b4a2 0721
     ldrb r0,[r0,#0x0]                        @ 0802b4a4 0078
@@ -25941,7 +30678,7 @@ render_card_name_centered_to_sprite_vram:
     movs r1,#0x2    @ 0802b4b6 0221
     orrs r0,r1    @ 0802b4b8 0843
     strb r0,[r5,#0x8]                        @ 0802b4ba 2872
-    ldr r7, PTR_font_jp_base_table_0802b584  @ 0802b4bc 314f
+    ldr r7, render_card_name_centered_to_sprite_vram_font_table @ 0802b4bc 314f
     lsls r1,r0,#0x1e    @ 0802b4be 8107
     lsrs r1,r1,#0x1f    @ 0802b4c0 c90f
     lsls r1,r1,#0x2    @ 0802b4c2 8900
@@ -26000,7 +30737,7 @@ LAB_0802b4fa:
     movs r1,#0x2    @ 0802b532 0221
     adds r3,r4,#0x0    @ 0802b534 231c
     bl text_render_wrapper                   @ 0802b536 c7f0a1fa
-    ldr r0, DAT_0802b588                     @ 0802b53a 1348
+    ldr r0, render_card_name_centered_to_sprite_vram_commit_tgt @ 0802b53a 1348
     movs r1,#0x0    @ 0802b53c 0021
     bl commit_line_buffer_to_sprite_vram     @ 0802b53e c7f085fc
     movs r3,#0x9e    @ 0802b542 9e23
@@ -26010,7 +30747,7 @@ LAB_0802b546:
     adds r0,#0x12    @ 0802b548 1230
     lsls r0,r0,#0x10    @ 0802b54a 0004
     lsrs r0,r0,#0xa    @ 0802b54c 800a
-    ldr r4, DAT_0802b58c                     @ 0802b54e 0f4c
+    ldr r4, render_card_name_centered_to_sprite_vram_tilemap @ 0802b54e 0f4c
     adds r1,r0,r4    @ 0802b550 0119
     adds r4,r2,#0x1    @ 0802b552 541c
     movs r2,#0xb    @ 0802b554 0b22
@@ -26032,20 +30769,20 @@ LAB_0802b556:
     pop {r4,r5,r6,r7}                        @ 0802b572 f0bc
     pop {r0}                                 @ 0802b574 01bc
     bx r0                                    @ 0802b576 0047
-DAT_0802b578:
-    .word  0x02006ed0                     @ 0802b578 d06e0002
-DAT_0802b57c:
-    .word  0x02000000                     @ 0802b57c 00000002
-DAT_0802b580:
-    .word  0x00006c2c                     @ 0802b580 2c6c0000
-PTR_font_jp_base_table_0802b584:
+render_card_name_centered_to_sprite_vram_font_ctx:
+    .word  gFontJpCtx                     @ 0802b578 d06e0002
+render_card_name_centered_to_sprite_vram_ewram_base:
+    .word  EWRAM_BASE                     @ 0802b57c 00000002
+render_card_name_centered_to_sprite_vram_settings_off:
+    .word  GSETTINGS_OFFSET               @ 0802b580 2c6c0000
+render_card_name_centered_to_sprite_vram_font_table:
     .word  font_jp_base_table             @ 0802b584 54f8e509
-DAT_0802b588:
-    .word  0x060053c0                     @ 0802b588 c0530006
-DAT_0802b58c:
-    .word  0x06000812                     @ 0802b58c 12080006
+render_card_name_centered_to_sprite_vram_commit_tgt:
+    .word  PACK_CARD_INFO_SPRITE_VRAM     @ 0802b588 c0530006
+render_card_name_centered_to_sprite_vram_tilemap:
+    .word  PACK_CARD_INFO_TILEMAP_ADDR    @ 0802b58c 12080006
 
-@ Pack buy/card info screen complete VRAM init + card name text render function, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4). Accepts r0=card_name_ptr, r1=pack_index [0..N]. Flow: writes DISPCNT shadow (gPrng+0x174 = 0x0401), writes DISPCNT register (0x04000000 = 0), calls reset_display_and_obj_vram, store_ewram_ctx_ptr_and_clear_mode_flags, writes BG0-BG3 control regs, reset_all_bg_scroll_regs_and_shadows, upload_pack_vram_and_palette; zero_fills three BG/OBJ tile regions; copies palette and pack tile data; calls load_pack_tile_and_map_to_vram three times (pack cover/title/background tile+map layers); inits line buffer (col=0x1e, font=2); computes name length to select font (long > 0xef bytes use narrow); two text_render_wrapper calls to render name; commit_line_buffer_to_sprite_vram; writes tilemap index row.
+@ Pack buy/card info screen complete VRAM init + card name text render function, called by run_duel_puzzle_scene_state_machine (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4). Accepts r0=card_name_ptr, r1=pack_index [0..N]. Flow: writes DISPCNT shadow (gPrng+0x174 = 0x0401), writes DISPCNT register (0x04000000 = 0), calls reset_display_and_obj_vram, store_ewram_ctx_ptr_and_clear_mode_flags, writes BG0-BG3 control regs, reset_all_bg_scroll_regs_and_shadows, upload_pack_vram_and_palette; zero_fills three BG/OBJ tile regions; copies palette and pack tile data; calls load_pack_tile_and_map_to_vram three times (pack cover/title/background tile+map layers); inits line buffer (col=0x1e, font=2); computes name length to select font (long > 0xef bytes use narrow); two text_render_wrapper calls to render name; commit_line_buffer_to_sprite_vram; writes tilemap index row.
 @ 
 @ Constants:
 @ - DISPCNT shadow = gPrng+0x174; value = 0x0401 (BG0+OBJ on)
@@ -26062,21 +30799,21 @@ init_pack_card_info_screen_vram:
     push {r4,r5,r6,r7,lr}                    @ 0802b590 f0b5
     adds r5,r0,#0x0    @ 0802b592 051c
     adds r7,r1,#0x0    @ 0802b594 0f1c
-    ldr r0, PTR_gPrng_0802b6c8               @ 0802b596 4c48
+    ldr r0, init_pack_card_info_screen_vram_gprng @ 0802b596 4c48
     movs r1,#0xba    @ 0802b598 ba21
     lsls r1,r1,#0x1    @ 0802b59a 4900
     adds r0,r0,r1    @ 0802b59c 4018
     movs r2,#0x0    @ 0802b59e 0022
-    ldr r1, DAT_0802b6cc                     @ 0802b5a0 4a49
+    ldr r1, init_pack_card_info_screen_vram_dispcnt_shadow @ 0802b5a0 4a49
     strh r1,[r0,#0x0]                        @ 0802b5a2 0180
     movs r0,#0x80    @ 0802b5a4 8020
     lsls r0,r0,#0x13    @ 0802b5a6 c004
     strh r2,[r0,#0x0]                        @ 0802b5a8 0280
-    ldr r0, DAT_0802b6d0                     @ 0802b5aa 4948
+    ldr r0, init_pack_card_info_screen_vram_disp_ctx @ 0802b5aa 4948
     bl reset_display_and_obj_vram            @ 0802b5ac ccf062f8
-    ldr r0, DAT_0802b6d4                     @ 0802b5b0 4848
+    ldr r0, init_pack_card_info_screen_vram_vija_state @ 0802b5b0 4848
     bl store_ewram_ctx_ptr_and_clear_mode_flags @ 0802b5b2 c8f075fe
-    ldr r1, PTR_BG0CNT_0802b6d8              @ 0802b5b6 4849
+    ldr r1, init_pack_card_info_screen_vram_bg0cnt @ 0802b5b6 4849
     movs r0,#0x5    @ 0802b5b8 0520
     strh r0,[r1,#0x0]                        @ 0802b5ba 0880
     adds r1,#0x2    @ 0802b5bc 0231
@@ -26085,16 +30822,16 @@ init_pack_card_info_screen_vram:
     adds r0,r2,#0x0    @ 0802b5c2 101c
     strh r0,[r1,#0x0]                        @ 0802b5c4 0880
     adds r1,#0x2    @ 0802b5c6 0231
-    ldr r3, DAT_0802b6dc                     @ 0802b5c8 444b
+    ldr r3, init_pack_card_info_screen_vram_bg2cnt_init @ 0802b5c8 444b
     adds r0,r3,#0x0    @ 0802b5ca 181c
     strh r0,[r1,#0x0]                        @ 0802b5cc 0880
     adds r1,#0x2    @ 0802b5ce 0231
-    ldr r2, DAT_0802b6e0                     @ 0802b5d0 434a
+    ldr r2, init_pack_card_info_screen_vram_bg3cnt_init @ 0802b5d0 434a
     adds r0,r2,#0x0    @ 0802b5d2 101c
     strh r0,[r1,#0x0]                        @ 0802b5d4 0880
     bl reset_all_bg_scroll_regs_and_shadows  @ 0802b5d6 caf057fa
     bl upload_pack_vram_and_palette          @ 0802b5da caf05dfa
-    ldr r0, DAT_0802b6e4                     @ 0802b5de 4148
+    ldr r0, init_pack_card_info_screen_vram_obj_vram_clr @ 0802b5de 4148
     movs r1,#0xc0    @ 0802b5e0 c021
     lsls r1,r1,#0x8    @ 0802b5e2 0902
     bl zero_fill_by_halfword                 @ 0802b5e4 c9f046fc
@@ -26103,34 +30840,34 @@ init_pack_card_info_screen_vram:
     movs r1,#0xa0    @ 0802b5ec a021
     lsls r1,r1,#0x6    @ 0802b5ee 8901
     bl zero_fill_by_halfword                 @ 0802b5f0 c9f040fc
-    ldr r4, DAT_0802b6e8                     @ 0802b5f4 3c4c
+    ldr r4, init_pack_card_info_screen_vram_bg_tile_clr @ 0802b5f4 3c4c
     movs r1,#0x80    @ 0802b5f6 8021
     lsls r1,r1,#0x8    @ 0802b5f8 0902
     adds r0,r4,#0x0    @ 0802b5fa 201c
     bl zero_fill_by_halfword                 @ 0802b5fc c9f03afc
-    ldr r0, DAT_0802b6ec                     @ 0802b600 3a48
-    ldr r1, DAT_0802b6f0                     @ 0802b602 3b49
+    ldr r0, init_pack_card_info_screen_vram_pal_src @ 0802b600 3a48
+    ldr r1, init_pack_card_info_screen_vram_pack_pal_src @ 0802b602 3b49
     movs r2,#0x20    @ 0802b604 2022
     bl copy_bytes_by_halfword                @ 0802b606 c9f04dfc
-    ldr r1, DAT_0802b6f4                     @ 0802b60a 3a49
+    ldr r1, init_pack_card_info_screen_vram_pack_tile_a @ 0802b60a 3a49
     movs r2,#0x80    @ 0802b60c 8022
     lsls r2,r2,#0x4    @ 0802b60e 1201
     adds r0,r4,#0x0    @ 0802b610 201c
     bl copy_bytes_by_halfword                @ 0802b612 c9f047fc
-    ldr r3, DAT_0802b6f8                     @ 0802b616 384b
+    ldr r3, init_pack_card_info_screen_vram_pack_tile_b @ 0802b616 384b
     movs r0,#0x0    @ 0802b618 0020
     movs r1,#0x10    @ 0802b61a 1021
     movs r2,#0x2    @ 0802b61c 0222
     bl load_pack_tile_and_map_to_vram        @ 0802b61e c2f0f7fc
     movs r0,#0x80    @ 0802b622 8020
     lsls r0,r0,#0x3    @ 0802b624 c000
-    ldr r3, DAT_0802b6fc                     @ 0802b626 354b
+    ldr r3, init_pack_card_info_screen_vram_pack_tile_c @ 0802b626 354b
     movs r1,#0x20    @ 0802b628 2021
     movs r2,#0x40    @ 0802b62a 4022
     bl load_pack_tile_and_map_to_vram        @ 0802b62c c2f0f0fc
     movs r0,#0x80    @ 0802b630 8020
     lsls r0,r0,#0x5    @ 0802b632 4001
-    ldr r3, DAT_0802b700                     @ 0802b634 324b
+    ldr r3, init_pack_card_info_screen_vram_pack_tile_d @ 0802b634 324b
     movs r1,#0x10    @ 0802b636 1021
     movs r2,#0x5a    @ 0802b638 5a22
     bl load_pack_tile_and_map_to_vram        @ 0802b63a c2f0e9fc
@@ -26144,9 +30881,9 @@ init_pack_card_info_screen_vram:
     lsls r1,r1,#0x1    @ 0802b650 4900
     cmp r1,#0xef                             @ 0802b652 ef29
     ble LAB_0802b718                         @ 0802b654 60dd
-    ldr r2, DAT_0802b704                     @ 0802b656 2b4a
-    ldr r0, DAT_0802b708                     @ 0802b658 2b48
-    ldr r3, DAT_0802b70c                     @ 0802b65a 2c4b
+    ldr r2, init_pack_card_info_screen_vram_font_ctx_a @ 0802b656 2b4a
+    ldr r0, init_pack_card_info_screen_vram_ewram_base @ 0802b658 2b48
+    ldr r3, init_pack_card_info_screen_vram_settings_off @ 0802b65a 2c4b
     adds r0,r0,r3    @ 0802b65c c018
     movs r1,#0x7    @ 0802b65e 0721
     ldrb r0,[r0,#0x0]                        @ 0802b660 0078
@@ -26162,7 +30899,7 @@ init_pack_card_info_screen_vram:
     rsbs r1,r1,#0    @ 0802b674 4942
     ands r0,r1    @ 0802b676 0840
     strb r0,[r2,#0x8]                        @ 0802b678 1072
-    ldr r1, PTR_font_jp_base_table_0802b710  @ 0802b67a 2549
+    ldr r1, init_pack_card_info_screen_vram_font_table_a @ 0802b67a 2549
     lsls r0,r0,#0x1f    @ 0802b67c c007
     lsrs r0,r0,#0x1f    @ 0802b67e c00f
     lsls r0,r0,#0x3    @ 0802b680 c000
@@ -26179,7 +30916,7 @@ init_pack_card_info_screen_vram:
     lsrs r1,r0,#0x1f    @ 0802b698 c10f
     adds r0,r0,r1    @ 0802b69a 4018
     asrs r0,r0,#0x1    @ 0802b69c 4010
-    ldr r2, DAT_0802b714                     @ 0802b69e 1d4a
+    ldr r2, init_pack_card_info_screen_vram_text_mode_a @ 0802b69e 1d4a
     movs r1,#0x3    @ 0802b6a0 0321
     adds r3,r5,#0x0    @ 0802b6a2 2b1c
     bl text_render_wrapper                   @ 0802b6a4 c7f0eaf9
@@ -26197,50 +30934,50 @@ init_pack_card_info_screen_vram:
     adds r3,r5,#0x0    @ 0802b6c0 2b1c
     bl text_render_wrapper                   @ 0802b6c2 c7f0dbf9
     b LAB_0802b782                           @ 0802b6c6 5ce0
-PTR_gPrng_0802b6c8:
+init_pack_card_info_screen_vram_gprng:
     .word  gPrng                          @ 0802b6c8 40000003
-DAT_0802b6cc:
-    .word  0x00000401                     @ 0802b6cc 01040000
-DAT_0802b6d0:
-    .word  0x0203eeb0                     @ 0802b6d0 b0ee0302
-DAT_0802b6d4:
-    .word  0x02029eb0                     @ 0802b6d4 b09e0202
-PTR_BG0CNT_0802b6d8:
+init_pack_card_info_screen_vram_dispcnt_shadow:
+    .word  PACK_INFO_DISPCNT_SHADOW_INIT  @ 0802b6cc 01040000
+init_pack_card_info_screen_vram_disp_ctx:
+    .word  gDuelDispCtx                   @ 0802b6d0 b0ee0302
+init_pack_card_info_screen_vram_vija_state:
+    .word  gVijaState                     @ 0802b6d4 b09e0202
+init_pack_card_info_screen_vram_bg0cnt:
     .word  BG0CNT                         @ 0802b6d8 08000004
-DAT_0802b6dc:
-    .word  0x0000820a                     @ 0802b6dc 0a820000
-DAT_0802b6e0:
-    .word  0x00000407                     @ 0802b6e0 07040000
-DAT_0802b6e4:
-    .word  0x06004000                     @ 0802b6e4 00400006
-DAT_0802b6e8:
-    .word  0x06010000                     @ 0802b6e8 00000106
-DAT_0802b6ec:
-    .word  0x05000220                     @ 0802b6ec 20020005
-DAT_0802b6f0:
+init_pack_card_info_screen_vram_bg2cnt_init:
+    .word  PACK_INFO_BG2CNT_INIT          @ 0802b6dc 0a820000
+init_pack_card_info_screen_vram_bg3cnt_init:
+    .word  CARD_INFO_BG2CNT_INIT          @ 0802b6e0 07040000
+init_pack_card_info_screen_vram_obj_vram_clr:
+    .word  BG_CHAR_VRAM_CB2               @ 0802b6e4 00400006
+init_pack_card_info_screen_vram_bg_tile_clr:
+    .word  OBJ_TILE_VRAM_BASE             @ 0802b6e8 00000106
+init_pack_card_info_screen_vram_pal_src:
+    .word  OBJ_PAL_SLOT_1                 @ 0802b6ec 20020005
+init_pack_card_info_screen_vram_pack_pal_src:
     .word  0x09b8fb8c                     @ 0802b6f0 8cfbb809
-DAT_0802b6f4:
+init_pack_card_info_screen_vram_pack_tile_a:
     .word  0x09b8fbac                     @ 0802b6f4 acfbb809
-DAT_0802b6f8:
+init_pack_card_info_screen_vram_pack_tile_b:
     .word  0x09b903ac                     @ 0802b6f8 ac03b909
-DAT_0802b6fc:
+init_pack_card_info_screen_vram_pack_tile_c:
     .word  0x09b90ddc                     @ 0802b6fc dc0db909
-DAT_0802b700:
+init_pack_card_info_screen_vram_pack_tile_d:
     .word  0x09b9119c                     @ 0802b700 9c11b909
-DAT_0802b704:
-    .word  0x02006ed0                     @ 0802b704 d06e0002
-DAT_0802b708:
-    .word  0x02000000                     @ 0802b708 00000002
-DAT_0802b70c:
-    .word  0x00006c2c                     @ 0802b70c 2c6c0000
-PTR_font_jp_base_table_0802b710:
+init_pack_card_info_screen_vram_font_ctx_a:
+    .word  gFontJpCtx                     @ 0802b704 d06e0002
+init_pack_card_info_screen_vram_ewram_base:
+    .word  EWRAM_BASE                     @ 0802b708 00000002
+init_pack_card_info_screen_vram_settings_off:
+    .word  GSETTINGS_OFFSET               @ 0802b70c 2c6c0000
+init_pack_card_info_screen_vram_font_table_a:
     .word  font_jp_base_table             @ 0802b710 54f8e509
-DAT_0802b714:
-    .word  0x00008001                     @ 0802b714 01800000
+init_pack_card_info_screen_vram_text_mode_a:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802b714 01800000
 LAB_0802b718:
-    ldr r2, DAT_0802b800                     @ 0802b718 394a
-    ldr r0, DAT_0802b804                     @ 0802b71a 3a48
-    ldr r1, DAT_0802b808                     @ 0802b71c 3a49
+    ldr r2, init_pack_card_info_screen_vram_font_ctx_b @ 0802b718 394a
+    ldr r0, init_pack_card_info_screen_vram_ewram_base_b @ 0802b71a 3a48
+    ldr r1, init_pack_card_info_screen_vram_settings_off_b @ 0802b71c 3a49
     adds r0,r0,r1    @ 0802b71e 4018
     movs r1,#0x7    @ 0802b720 0721
     ldrb r0,[r0,#0x0]                        @ 0802b722 0078
@@ -26255,7 +30992,7 @@ LAB_0802b718:
     movs r1,#0x2    @ 0802b734 0221
     orrs r0,r1    @ 0802b736 0843
     strb r0,[r2,#0x8]                        @ 0802b738 1072
-    ldr r3, PTR_font_jp_base_table_0802b80c  @ 0802b73a 344b
+    ldr r3, init_pack_card_info_screen_vram_font_table_b @ 0802b73a 344b
     lsls r1,r0,#0x1e    @ 0802b73c 8107
     lsrs r1,r1,#0x1f    @ 0802b73e c90f
     lsls r1,r1,#0x2    @ 0802b740 8900
@@ -26273,7 +31010,7 @@ LAB_0802b718:
     adds r0,r0,r1    @ 0802b75a 4018
     movs r4,#0x78    @ 0802b75c 7824
     subs r0,r4,r0    @ 0802b75e 201a
-    ldr r2, DAT_0802b810                     @ 0802b760 2b4a
+    ldr r2, init_pack_card_info_screen_vram_text_mode_b @ 0802b760 2b4a
     movs r1,#0x3    @ 0802b762 0321
     adds r3,r5,#0x0    @ 0802b764 2b1c
     bl text_render_wrapper                   @ 0802b766 c7f089f9
@@ -26288,19 +31025,19 @@ LAB_0802b718:
     adds r3,r5,#0x0    @ 0802b77c 2b1c
     bl text_render_wrapper                   @ 0802b77e c7f07df9
 LAB_0802b782:
-    ldr r0, DAT_0802b814                     @ 0802b782 2448
+    ldr r0, init_pack_card_info_screen_vram_sprite_vram_b @ 0802b782 2448
     movs r1,#0x0    @ 0802b784 0021
     bl commit_line_buffer_to_sprite_vram     @ 0802b786 c7f061fb
     movs r4,#0x62    @ 0802b78a 6224
     movs r3,#0x0    @ 0802b78c 0023
-    ldr r6, DAT_0802b818                     @ 0802b78e 224e
+    ldr r6, init_pack_card_info_screen_vram_scene_base @ 0802b78e 224e
     movs r0,#0x80    @ 0802b790 8020
     lsls r0,r0,#0x6    @ 0802b792 8001
     adds r5,r0,#0x0    @ 0802b794 051c
 LAB_0802b796:
     lsls r0,r3,#0x10    @ 0802b796 1804
     lsrs r0,r0,#0xa    @ 0802b798 800a
-    ldr r2, DAT_0802b81c                     @ 0802b79a 204a
+    ldr r2, init_pack_card_info_screen_vram_bg_vram_a @ 0802b79a 204a
     adds r1,r0,r2    @ 0802b79c 8118
     adds r2,r3,#0x1    @ 0802b79e 5a1c
     movs r3,#0x1d    @ 0802b7a0 1d23
@@ -26331,8 +31068,8 @@ LAB_0802b7a2:
     strb r0,[r2,#0x0]                        @ 0802b7d0 1070
     cmp r7,#0x0                              @ 0802b7d2 002f
     beq LAB_0802b84a                         @ 0802b7d4 39d0
-    ldr r0, DAT_0802b804                     @ 0802b7d6 0b48
-    ldr r1, DAT_0802b808                     @ 0802b7d8 0b49
+    ldr r0, init_pack_card_info_screen_vram_ewram_base_b @ 0802b7d6 0b48
+    ldr r1, init_pack_card_info_screen_vram_settings_off_b @ 0802b7d8 0b49
     adds r0,r0,r1    @ 0802b7da 4018
     movs r1,#0x7    @ 0802b7dc 0721
     ldrb r0,[r0,#0x0]                        @ 0802b7de 0078
@@ -26345,50 +31082,50 @@ LAB_0802b7a2:
     beq LAB_0802b830                         @ 0802b7ec 20d0
     cmp r1,#0x4                              @ 0802b7ee 0429
     beq LAB_0802b828                         @ 0802b7f0 1ad0
-    ldr r0, DAT_0802b820                     @ 0802b7f2 0b48
+    ldr r0, init_pack_card_info_screen_vram_font_gfx_base @ 0802b7f2 0b48
     cmp r1,#0x5                              @ 0802b7f4 0529
     bne LAB_0802b842                         @ 0802b7f6 24d1
-    ldr r2, DAT_0802b824                     @ 0802b7f8 0a4a
+    ldr r2, init_pack_card_info_screen_vram_font_gfx_off @ 0802b7f8 0a4a
     adds r0,r0,r2    @ 0802b7fa 8018
     b LAB_0802b842                           @ 0802b7fc 21e0
     .zero  0x2
-DAT_0802b800:
-    .word  0x02006ed0                     @ 0802b800 d06e0002
-DAT_0802b804:
-    .word  0x02000000                     @ 0802b804 00000002
-DAT_0802b808:
-    .word  0x00006c2c                     @ 0802b808 2c6c0000
-PTR_font_jp_base_table_0802b80c:
+init_pack_card_info_screen_vram_font_ctx_b:
+    .word  gFontJpCtx                     @ 0802b800 d06e0002
+init_pack_card_info_screen_vram_ewram_base_b:
+    .word  EWRAM_BASE                     @ 0802b804 00000002
+init_pack_card_info_screen_vram_settings_off_b:
+    .word  GSETTINGS_OFFSET               @ 0802b808 2c6c0000
+init_pack_card_info_screen_vram_font_table_b:
     .word  font_jp_base_table             @ 0802b80c 54f8e509
-DAT_0802b810:
-    .word  0x00008001                     @ 0802b810 01800000
-DAT_0802b814:
-    .word  0x06004c40                     @ 0802b814 404c0006
-DAT_0802b818:
-    .word  0x02023360                     @ 0802b818 60330202
-DAT_0802b81c:
-    .word  0x06000800                     @ 0802b81c 00080006
-DAT_0802b820:
+init_pack_card_info_screen_vram_text_mode_b:
+    .word  TEXT_RENDER_COLOR_MODE_1       @ 0802b810 01800000
+init_pack_card_info_screen_vram_sprite_vram_b:
+    .word  PACK_INFO_NAME_SPRITE_VRAM_B   @ 0802b814 404c0006
+init_pack_card_info_screen_vram_scene_base:
+    .word  gDuelSceneBase                 @ 0802b818 60330202
+init_pack_card_info_screen_vram_bg_vram_a:
+    .word  CARD_DESC_BG_VRAM_A            @ 0802b81c 00080006
+init_pack_card_info_screen_vram_font_gfx_base:
     .word  0x09dbe758                     @ 0802b820 58e7db09
-DAT_0802b824:
+init_pack_card_info_screen_vram_font_gfx_off:
     .word  0x0003ab1c                     @ 0802b824 1cab0300
 LAB_0802b828:
-    ldr r0, DAT_0802b82c                     @ 0802b828 0048
+    ldr r0, init_pack_card_info_screen_vram_str_lang4 @ 0802b828 0048
     b LAB_0802b842                           @ 0802b82a 0ae0
-DAT_0802b82c:
+init_pack_card_info_screen_vram_str_lang4:
     .word  0x09ded5d6                     @ 0802b82c d6d5de09
 LAB_0802b830:
-    ldr r0, DAT_0802b834                     @ 0802b830 0048
+    ldr r0, init_pack_card_info_screen_vram_str_lang3 @ 0802b830 0048
     b LAB_0802b842                           @ 0802b832 06e0
-DAT_0802b834:
+init_pack_card_info_screen_vram_str_lang3:
     .word  0x09de113c                     @ 0802b834 3c11de09
 LAB_0802b838:
-    ldr r0, DAT_0802b83c                     @ 0802b838 0048
+    ldr r0, init_pack_card_info_screen_vram_str_lang2 @ 0802b838 0048
     b LAB_0802b842                           @ 0802b83a 02e0
-DAT_0802b83c:
+init_pack_card_info_screen_vram_str_lang2:
     .word  0x09dd4ea8                     @ 0802b83c a84edd09
 LAB_0802b840:
-    ldr r0, DAT_0802b850                     @ 0802b840 0348
+    ldr r0, init_pack_card_info_screen_vram_str_lang1 @ 0802b840 0348
 LAB_0802b842:
     movs r1,#0x2    @ 0802b842 0221
     movs r2,#0x1    @ 0802b844 0122
@@ -26397,10 +31134,10 @@ LAB_0802b84a:
     pop {r4,r5,r6,r7}                        @ 0802b84a f0bc
     pop {r0}                                 @ 0802b84c 01bc
     bx r0                                    @ 0802b84e 0047
-DAT_0802b850:
+init_pack_card_info_screen_vram_str_lang1:
     .word  0x09dc9810                     @ 0802b850 1098dc09
 
-@ duel_puzzle scene LP digit OAM sprite render function, called by FUN_0801fec0 (duel_puzzle main loop) and FUN_0802bdc4 / FUN_0802bde4 / dispatch_puzzle_display_mode (0x0802be08) each frame. Reads [0x02023360+0x68] as current LP value, copies it to gPrng+0x1ec as display shadow value, checks [0x02023360+0x6d] bit6 as LP display enable flag. If enabled, iterates: LP %10 -> digit; OAM Y coord = 0x9000_0000 | (r5 -= 6 per digit) | digit_x_offset; OAM tile = 0x8000; call write_oam_entry_from_packed_args; LP /= 10; until LP==0. Each digit y-coord decreases by 6 pixels (higher-order digits appear higher), tile index = 0x1008 + digit_value.
+@ duel_puzzle scene LP digit OAM sprite render function, called by run_duel_puzzle_scene_state_machine (duel_puzzle main loop) and tick_lp_display_and_blend_step / tick_lp_display_and_fadein_check / dispatch_puzzle_display_mode (0x0802be08) each frame. Reads [0x02023360+0x68] as current LP value, copies it to gPrng+0x1ec as display shadow value, checks [0x02023360+0x6d] bit6 as LP display enable flag. If enabled, iterates: LP %10 -> digit; OAM Y coord = 0x9000_0000 | (r5 -= 6 per digit) | digit_x_offset; OAM tile = 0x8000; call write_oam_entry_from_packed_args; LP /= 10; until LP==0. Each digit y-coord decreases by 6 pixels (higher-order digits appear higher), tile index = 0x1008 + digit_value.
 @ 
 @ Constants:
 @ - scene_ctx base = 0x02023360
@@ -26414,9 +31151,9 @@ DAT_0802b850:
 render_puzzle_lp_digit_sprites:
     push {r4,r5,lr}                          @ 0802b854 30b5
     movs r5,#0xc6    @ 0802b856 c625
-    ldr r1, DAT_0802b8b0                     @ 0802b858 1549
+    ldr r1, render_puzzle_lp_digit_sprites_scene_base @ 0802b858 1549
     ldr r4,[r1,#0x68]                        @ 0802b85a 8c6e
-    ldr r0, PTR_gPrng_0802b8b4               @ 0802b85c 1548
+    ldr r0, render_puzzle_lp_digit_sprites_gprng @ 0802b85c 1548
     adds r2,r1,#0x0    @ 0802b85e 0a1c
     adds r2,#0x62    @ 0802b860 6232
     ldrh r2,[r2,#0x0]                        @ 0802b862 1288
@@ -26438,7 +31175,7 @@ LAB_0802b878:
     movs r0,#0x90    @ 0802b882 9020
     lsls r0,r0,#0x10    @ 0802b884 0004
     orrs r0,r5    @ 0802b886 2843
-    ldr r1, DAT_0802b8b8                     @ 0802b888 0b49
+    ldr r1, render_puzzle_lp_digit_sprites_tile_base @ 0802b888 0b49
     adds r2,r2,r1    @ 0802b88a 5218
     lsls r2,r2,#0x10    @ 0802b88c 1204
     lsrs r2,r2,#0x10    @ 0802b88e 120c
@@ -26457,12 +31194,12 @@ LAB_0802b8a8:
     pop {r0}                                 @ 0802b8aa 01bc
     bx r0                                    @ 0802b8ac 0047
     .zero  0x2
-DAT_0802b8b0:
-    .word  0x02023360                     @ 0802b8b0 60330202
-PTR_gPrng_0802b8b4:
+render_puzzle_lp_digit_sprites_scene_base:
+    .word  gDuelSceneBase                 @ 0802b8b0 60330202
+render_puzzle_lp_digit_sprites_gprng:
     .word  gPrng                          @ 0802b8b4 40000003
-DAT_0802b8b8:
-    .word  0x00001008                     @ 0802b8b8 08100000
+render_puzzle_lp_digit_sprites_tile_base:
+    .word  PUZZLE_LP_DIGIT_TILE_BASE      @ 0802b8b8 08100000
 
 @ duel_puzzle scene card name display line buffer init function, called by run_campaign_step30_pack_card_info_display (0x080277a4). No parameters. Fixed call to setup_line_buf_with_font_and_align(col=0x18, width=0x2a, align=1, flags=0) to init line buffer. Reads [0x02000000+0x6c2c] (scene state byte) bits[2:0] as font_style, clears [0x02006ed0+0x8] bit1 via ~0x02 mask, computes (font_style&7 nonzero) -> bit0 set; looks up font_jp_base_table[bit_combo] to update [0x02006ed0+0x4] font pointer. Then zero_fill [0x02006ed0+?] region 0x20 halfwords (clear line-buf content). Writes 0 to [scene_ctx+0x62], [+0x64], [+0x68], clears [scene_ctx+0x6c] bit5.
 @ 
@@ -26480,9 +31217,9 @@ init_puzzle_card_name_line_buf:
     movs r2,#0x1    @ 0802b8c2 0122
     movs r3,#0x0    @ 0802b8c4 0023
     bl setup_line_buf_with_font_and_align    @ 0802b8c6 c5f0fbf9
-    ldr r2, DAT_0802b928                     @ 0802b8ca 174a
-    ldr r0, DAT_0802b92c                     @ 0802b8cc 1748
-    ldr r1, DAT_0802b930                     @ 0802b8ce 1849
+    ldr r2, init_puzzle_card_name_line_buf_font_ctx @ 0802b8ca 174a
+    ldr r0, init_puzzle_card_name_line_buf_ewram_base @ 0802b8cc 1748
+    ldr r1, init_puzzle_card_name_line_buf_settings_off @ 0802b8ce 1849
     adds r0,r0,r1    @ 0802b8d0 4018
     movs r1,#0x7    @ 0802b8d2 0721
     ldrb r0,[r0,#0x0]                        @ 0802b8d4 0078
@@ -26497,7 +31234,7 @@ init_puzzle_card_name_line_buf:
     movs r1,#0x2    @ 0802b8e6 0221
     orrs r0,r1    @ 0802b8e8 0843
     strb r0,[r2,#0x8]                        @ 0802b8ea 1072
-    ldr r3, PTR_font_jp_base_table_0802b934  @ 0802b8ec 114b
+    ldr r3, init_puzzle_card_name_line_buf_font_table @ 0802b8ec 114b
     lsls r1,r0,#0x1e    @ 0802b8ee 8107
     lsrs r1,r1,#0x1f    @ 0802b8f0 c90f
     lsls r1,r1,#0x2    @ 0802b8f2 8900
@@ -26508,10 +31245,10 @@ init_puzzle_card_name_line_buf:
     adds r1,r1,r3    @ 0802b8fc c918
     ldr r0,[r1,#0x0]                         @ 0802b8fe 0868
     str r0,[r2,#0x4]                         @ 0802b900 5060
-    ldr r0, DAT_0802b938                     @ 0802b902 0d48
+    ldr r0, init_puzzle_card_name_line_buf_pal_clear_base @ 0802b902 0d48
     movs r1,#0x20    @ 0802b904 2021
     bl zero_fill_by_halfword                 @ 0802b906 c9f0b5fa
-    ldr r2, DAT_0802b93c                     @ 0802b90a 0c4a
+    ldr r2, init_puzzle_card_name_line_buf_scene_base @ 0802b90a 0c4a
     adds r1,r2,#0x0    @ 0802b90c 111c
     adds r1,#0x62    @ 0802b90e 6231
     movs r0,#0x0    @ 0802b910 0020
@@ -26526,18 +31263,18 @@ init_puzzle_card_name_line_buf:
     strb r0,[r1,#0x0]                        @ 0802b922 0870
     pop {r0}                                 @ 0802b924 01bc
     bx r0                                    @ 0802b926 0047
-DAT_0802b928:
-    .word  0x02006ed0                     @ 0802b928 d06e0002
-DAT_0802b92c:
-    .word  0x02000000                     @ 0802b92c 00000002
-DAT_0802b930:
-    .word  0x00006c2c                     @ 0802b930 2c6c0000
-PTR_font_jp_base_table_0802b934:
+init_puzzle_card_name_line_buf_font_ctx:
+    .word  gFontJpCtx                     @ 0802b928 d06e0002
+init_puzzle_card_name_line_buf_ewram_base:
+    .word  EWRAM_BASE                     @ 0802b92c 00000002
+init_puzzle_card_name_line_buf_settings_off:
+    .word  GSETTINGS_OFFSET               @ 0802b930 2c6c0000
+init_puzzle_card_name_line_buf_font_table:
     .word  font_jp_base_table             @ 0802b934 54f8e509
-DAT_0802b938:
-    .word  0x050001e0                     @ 0802b938 e0010005
-DAT_0802b93c:
-    .word  0x02023360                     @ 0802b93c 60330202
+init_puzzle_card_name_line_buf_pal_clear_base:
+    .word  BG_PALRAM_SLOT15_BASE          @ 0802b938 e0010005
+init_puzzle_card_name_line_buf_scene_base:
+    .word  gDuelSceneBase                 @ 0802b93c 60330202
 
 @ General game string + number combined render function. Writes r2 (text_ptr) to the
 @ gPrng scene struct line buffer slot (position determined by r0 bits[4:0] and bits[4:0]>>2),
@@ -26545,7 +31282,7 @@ DAT_0802b93c:
 @ 0x02006ed0+0xc, calls text_render_wrapper(2, line_buf_x, 7, text_ptr) to render the main
 @ string. Then based on r1: r1==7 -> updates line_buf_x += 0xc and branches; r1==8 ->
 @ branches to alternate render path; otherwise -> selects digit render branch based on
-@ whether r0 <= 9 (uses FUN_0802bb74 for <=9, FUN_0802bb68 for >9).
+@ whether r0 <= 9 (uses LAB_0802bb74 for <=9, LAB_0802bb68 for >9).
 @ Called by render_card_stats_to_line_buf / render_game_text_with_font_type_a /
 @ render_game_text_with_font_type_b and others.
 @ 
@@ -26564,7 +31301,7 @@ render_game_string_with_number:
     adds r6,r2,#0x0    @ 0802b94c 161c
     movs r0,#0xb6    @ 0802b94e b620
     .hword 0x4681    @ 0802b950 8146
-    ldr r5, DAT_0802b9b0                     @ 0802b952 174d
+    ldr r5, render_game_string_with_number_scene_base @ 0802b952 174d
     adds r2,r5,#0x0    @ 0802b954 2a1c
     adds r2,#0x6c    @ 0802b956 6c32
     ldrb r1,[r2,#0x0]                        @ 0802b958 1178
@@ -26580,7 +31317,7 @@ render_game_string_with_number:
     adds r1,#0x80    @ 0802b96c 8031
     adds r0,r0,r1    @ 0802b96e 4018
     strb r7,[r0,#0x0]                        @ 0802b970 0770
-    ldr r4, DAT_0802b9b4                     @ 0802b972 104c
+    ldr r4, render_game_string_with_number_font_ctx @ 0802b972 104c
     movs r0,#0x3f    @ 0802b974 3f20
     ldrh r2,[r4,#0xc]                        @ 0802b976 a289
     ands r0,r2    @ 0802b978 1040
@@ -26613,18 +31350,18 @@ LAB_0802b9a2:
 LAB_0802b9ac:
     b LAB_0802bb68                           @ 0802b9ac dce0
     .zero  0x2
-DAT_0802b9b0:
-    .word  0x02023360                     @ 0802b9b0 60330202
-DAT_0802b9b4:
-    .word  0x02006ed0                     @ 0802b9b4 d06e0002
+render_game_string_with_number_scene_base:
+    .word  gDuelSceneBase                 @ 0802b9b0 60330202
+render_game_string_with_number_font_ctx:
+    .word  gFontJpCtx                     @ 0802b9b4 d06e0002
 LAB_0802b9b8:
     ldrh r0,[r5,#0x0]                        @ 0802b9b8 2888
     adds r0,#0xc    @ 0802b9ba 0c30
     strh r0,[r5,#0x0]                        @ 0802b9bc 2880
     cmp r6,#0x0                              @ 0802b9be 002e
     beq LAB_0802ba94                         @ 0802b9c0 68d0
-    ldr r0, DAT_0802b9e8                     @ 0802b9c2 0948
-    ldr r2, DAT_0802b9ec                     @ 0802b9c4 094a
+    ldr r0, render_game_string_with_number_ewram_base @ 0802b9c2 0948
+    ldr r2, render_game_string_with_number_settings_off @ 0802b9c4 094a
     adds r0,r0,r2    @ 0802b9c6 8018
     ldrb r0,[r0,#0x0]                        @ 0802b9c8 0078
     ands r0,r7    @ 0802b9ca 3840
@@ -26636,37 +31373,37 @@ LAB_0802b9b8:
     beq LAB_0802ba00                         @ 0802b9d6 13d0
     cmp r0,#0x4                              @ 0802b9d8 0428
     beq LAB_0802b9f8                         @ 0802b9da 0dd0
-    ldr r1, DAT_0802b9f0                     @ 0802b9dc 0449
+    ldr r1, render_game_string_with_number_str_b_base @ 0802b9dc 0449
     cmp r0,#0x5                              @ 0802b9de 0528
     bne LAB_0802ba12                         @ 0802b9e0 17d1
-    ldr r0, DAT_0802b9f4                     @ 0802b9e2 0448
+    ldr r0, render_game_string_with_number_str_b_off @ 0802b9e2 0448
     adds r1,r1,r0    @ 0802b9e4 0918
     b LAB_0802ba12                           @ 0802b9e6 14e0
-DAT_0802b9e8:
-    .word  0x02000000                     @ 0802b9e8 00000002
-DAT_0802b9ec:
-    .word  0x00006c2c                     @ 0802b9ec 2c6c0000
-DAT_0802b9f0:
+render_game_string_with_number_ewram_base:
+    .word  EWRAM_BASE                     @ 0802b9e8 00000002
+render_game_string_with_number_settings_off:
+    .word  GSETTINGS_OFFSET               @ 0802b9ec 2c6c0000
+render_game_string_with_number_str_b_base:
     .word  0x09dc01d8                     @ 0802b9f0 d801dc09
-DAT_0802b9f4:
+render_game_string_with_number_str_b_off:
     .word  0x0003ab80                     @ 0802b9f4 80ab0300
 LAB_0802b9f8:
-    ldr r1, DAT_0802b9fc                     @ 0802b9f8 0049
+    ldr r1, render_game_string_with_number_str_lang4 @ 0802b9f8 0049
     b LAB_0802ba12                           @ 0802b9fa 0ae0
-DAT_0802b9fc:
+render_game_string_with_number_str_lang4:
     .word  0x09def19a                     @ 0802b9fc 9af1de09
 LAB_0802ba00:
-    ldr r1, DAT_0802ba04                     @ 0802ba00 0049
+    ldr r1, render_game_string_with_number_str_lang3 @ 0802ba00 0049
     b LAB_0802ba12                           @ 0802ba02 06e0
-DAT_0802ba04:
+render_game_string_with_number_str_lang3:
     .word  0x09de2d00                     @ 0802ba04 002dde09
 LAB_0802ba08:
-    ldr r1, DAT_0802ba0c                     @ 0802ba08 0049
+    ldr r1, render_game_string_with_number_str_lang2 @ 0802ba08 0049
     b LAB_0802ba12                           @ 0802ba0a 02e0
-DAT_0802ba0c:
+render_game_string_with_number_str_lang2:
     .word  0x09dd6982                     @ 0802ba0c 8269dd09
 LAB_0802ba10:
-    ldr r1, DAT_0802ba54                     @ 0802ba10 1049
+    ldr r1, render_game_string_with_number_str_lang1 @ 0802ba10 1049
 LAB_0802ba12:
     adds r0,r1,#0x0    @ 0802ba12 081c
     bl count_bytes_until_null                @ 0802ba14 c9f064fd
@@ -26676,11 +31413,11 @@ LAB_0802ba12:
     .hword 0x464a    @ 0802ba1e 4a46
     subs r2,r2,r1    @ 0802ba20 521a
     .hword 0x4691    @ 0802ba22 9146
-    ldr r0, DAT_0802ba58                     @ 0802ba24 0c48
+    ldr r0, render_game_string_with_number_scene_base_b @ 0802ba24 0c48
     adds r0,#0x64    @ 0802ba26 6430
     ldrh r1,[r0,#0x0]                        @ 0802ba28 0188
-    ldr r0, DAT_0802ba5c                     @ 0802ba2a 0c48
-    ldr r2, DAT_0802ba60                     @ 0802ba2c 0c4a
+    ldr r0, render_game_string_with_number_ewram_base_b @ 0802ba2a 0c48
+    ldr r2, render_game_string_with_number_settings_off_b @ 0802ba2c 0c4a
     adds r0,r0,r2    @ 0802ba2e 8018
     movs r2,#0x7    @ 0802ba30 0722
     ldrb r0,[r0,#0x0]                        @ 0802ba32 0078
@@ -26693,52 +31430,52 @@ LAB_0802ba12:
     beq LAB_0802ba74                         @ 0802ba40 18d0
     cmp r2,#0x4                              @ 0802ba42 042a
     beq LAB_0802ba6c                         @ 0802ba44 12d0
-    ldr r3, DAT_0802ba64                     @ 0802ba46 074b
+    ldr r3, render_game_string_with_number_str_b_base_b @ 0802ba46 074b
     cmp r2,#0x5                              @ 0802ba48 052a
     bne LAB_0802ba86                         @ 0802ba4a 1cd1
-    ldr r0, DAT_0802ba68                     @ 0802ba4c 0648
+    ldr r0, render_game_string_with_number_str_b_off_b @ 0802ba4c 0648
     adds r3,r3,r0    @ 0802ba4e 1b18
     b LAB_0802ba86                           @ 0802ba50 19e0
     .zero  0x2
-DAT_0802ba54:
+render_game_string_with_number_str_lang1:
     .word  0x09dcafac                     @ 0802ba54 acafdc09
-DAT_0802ba58:
-    .word  0x02023360                     @ 0802ba58 60330202
-DAT_0802ba5c:
-    .word  0x02000000                     @ 0802ba5c 00000002
-DAT_0802ba60:
-    .word  0x00006c2c                     @ 0802ba60 2c6c0000
-DAT_0802ba64:
+render_game_string_with_number_scene_base_b:
+    .word  gDuelSceneBase                 @ 0802ba58 60330202
+render_game_string_with_number_ewram_base_b:
+    .word  EWRAM_BASE                     @ 0802ba5c 00000002
+render_game_string_with_number_settings_off_b:
+    .word  GSETTINGS_OFFSET               @ 0802ba60 2c6c0000
+render_game_string_with_number_str_b_base_b:
     .word  0x09dc01d8                     @ 0802ba64 d801dc09
-DAT_0802ba68:
+render_game_string_with_number_str_b_off_b:
     .word  0x0003ab80                     @ 0802ba68 80ab0300
 LAB_0802ba6c:
-    ldr r3, DAT_0802ba70                     @ 0802ba6c 004b
+    ldr r3, render_game_string_with_number_str_lang4_b @ 0802ba6c 004b
     b LAB_0802ba86                           @ 0802ba6e 0ae0
-DAT_0802ba70:
+render_game_string_with_number_str_lang4_b:
     .word  0x09def19a                     @ 0802ba70 9af1de09
 LAB_0802ba74:
-    ldr r3, DAT_0802ba78                     @ 0802ba74 004b
+    ldr r3, render_game_string_with_number_str_lang3_b @ 0802ba74 004b
     b LAB_0802ba86                           @ 0802ba76 06e0
-DAT_0802ba78:
+render_game_string_with_number_str_lang3_b:
     .word  0x09de2d00                     @ 0802ba78 002dde09
 LAB_0802ba7c:
-    ldr r3, DAT_0802ba80                     @ 0802ba7c 004b
+    ldr r3, render_game_string_with_number_str_lang2_b @ 0802ba7c 004b
     b LAB_0802ba86                           @ 0802ba7e 02e0
-DAT_0802ba80:
+render_game_string_with_number_str_lang2_b:
     .word  0x09dd6982                     @ 0802ba80 8269dd09
 LAB_0802ba84:
-    ldr r3, DAT_0802ba90                     @ 0802ba84 024b
+    ldr r3, render_game_string_with_number_str_lang1_b @ 0802ba84 024b
 LAB_0802ba86:
     .hword 0x4648    @ 0802ba86 4846
     movs r2,#0x6    @ 0802ba88 0622
     bl text_render_wrapper                   @ 0802ba8a c6f0f7ff
     b LAB_0802bc30                           @ 0802ba8e cfe0
-DAT_0802ba90:
+render_game_string_with_number_str_lang1_b:
     .word  0x09dcafac                     @ 0802ba90 acafdc09
 LAB_0802ba94:
-    ldr r0, DAT_0802babc                     @ 0802ba94 0948
-    ldr r1, DAT_0802bac0                     @ 0802ba96 0a49
+    ldr r0, render_game_string_with_number_ewram_base_c @ 0802ba94 0948
+    ldr r1, render_game_string_with_number_settings_off_c @ 0802ba96 0a49
     adds r0,r0,r1    @ 0802ba98 4018
     ldrb r0,[r0,#0x0]                        @ 0802ba9a 0078
     ands r0,r7    @ 0802ba9c 3840
@@ -26750,38 +31487,38 @@ LAB_0802ba94:
     beq LAB_0802bad4                         @ 0802baa8 14d0
     cmp r0,#0x4                              @ 0802baaa 0428
     beq LAB_0802bacc                         @ 0802baac 0ed0
-    ldr r1, DAT_0802bac4                     @ 0802baae 0549
+    ldr r1, render_game_string_with_number_str_c_base @ 0802baae 0549
     cmp r0,#0x5                              @ 0802bab0 0528
     bne LAB_0802bae6                         @ 0802bab2 18d1
-    ldr r2, DAT_0802bac8                     @ 0802bab4 044a
+    ldr r2, render_game_string_with_number_str_c_off @ 0802bab4 044a
     adds r1,r1,r2    @ 0802bab6 8918
     b LAB_0802bae6                           @ 0802bab8 15e0
     .zero  0x2
-DAT_0802babc:
-    .word  0x02000000                     @ 0802babc 00000002
-DAT_0802bac0:
-    .word  0x00006c2c                     @ 0802bac0 2c6c0000
-DAT_0802bac4:
+render_game_string_with_number_ewram_base_c:
+    .word  EWRAM_BASE                     @ 0802babc 00000002
+render_game_string_with_number_settings_off_c:
+    .word  GSETTINGS_OFFSET               @ 0802bac0 2c6c0000
+render_game_string_with_number_str_c_base:
     .word  0x09dc01de                     @ 0802bac4 de01dc09
-DAT_0802bac8:
+render_game_string_with_number_str_c_off:
     .word  0x0003ab86                     @ 0802bac8 86ab0300
 LAB_0802bacc:
-    ldr r1, DAT_0802bad0                     @ 0802bacc 0049
+    ldr r1, render_game_string_with_number_str_c_lang4 @ 0802bacc 0049
     b LAB_0802bae6                           @ 0802bace 0ae0
-DAT_0802bad0:
+render_game_string_with_number_str_c_lang4:
     .word  0x09def1a6                     @ 0802bad0 a6f1de09
 LAB_0802bad4:
-    ldr r1, DAT_0802bad8                     @ 0802bad4 0049
+    ldr r1, render_game_string_with_number_str_c_lang3 @ 0802bad4 0049
     b LAB_0802bae6                           @ 0802bad6 06e0
-DAT_0802bad8:
+render_game_string_with_number_str_c_lang3:
     .word  0x09de2d08                     @ 0802bad8 082dde09
 LAB_0802badc:
-    ldr r1, DAT_0802bae0                     @ 0802badc 0049
+    ldr r1, render_game_string_with_number_str_c_lang2 @ 0802badc 0049
     b LAB_0802bae6                           @ 0802bade 02e0
-DAT_0802bae0:
+render_game_string_with_number_str_c_lang2:
     .word  0x09dd698c                     @ 0802bae0 8c69dd09
 LAB_0802bae4:
-    ldr r1, DAT_0802bb28                     @ 0802bae4 1049
+    ldr r1, render_game_string_with_number_str_c_lang1 @ 0802bae4 1049
 LAB_0802bae6:
     adds r0,r1,#0x0    @ 0802bae6 081c
     bl count_bytes_until_null                @ 0802bae8 c9f0fafc
@@ -26791,11 +31528,11 @@ LAB_0802bae6:
     .hword 0x4648    @ 0802baf2 4846
     subs r0,r0,r1    @ 0802baf4 401a
     .hword 0x4681    @ 0802baf6 8146
-    ldr r0, DAT_0802bb2c                     @ 0802baf8 0c48
+    ldr r0, render_game_string_with_number_scene_base_c @ 0802baf8 0c48
     adds r0,#0x64    @ 0802bafa 6430
     ldrh r1,[r0,#0x0]                        @ 0802bafc 0188
-    ldr r0, DAT_0802bb30                     @ 0802bafe 0c48
-    ldr r2, DAT_0802bb34                     @ 0802bb00 0c4a
+    ldr r0, render_game_string_with_number_ewram_base_d @ 0802bafe 0c48
+    ldr r2, render_game_string_with_number_settings_off_d @ 0802bb00 0c4a
     adds r0,r0,r2    @ 0802bb02 8018
     movs r2,#0x7    @ 0802bb04 0722
     ldrb r0,[r0,#0x0]                        @ 0802bb06 0078
@@ -26808,48 +31545,48 @@ LAB_0802bae6:
     beq LAB_0802bb48                         @ 0802bb14 18d0
     cmp r2,#0x4                              @ 0802bb16 042a
     beq LAB_0802bb40                         @ 0802bb18 12d0
-    ldr r3, DAT_0802bb38                     @ 0802bb1a 074b
+    ldr r3, render_game_string_with_number_str_d_base @ 0802bb1a 074b
     cmp r2,#0x5                              @ 0802bb1c 052a
     bne LAB_0802bb5a                         @ 0802bb1e 1cd1
-    ldr r0, DAT_0802bb3c                     @ 0802bb20 0648
+    ldr r0, render_game_string_with_number_str_d_off @ 0802bb20 0648
     adds r3,r3,r0    @ 0802bb22 1b18
     b LAB_0802bb5a                           @ 0802bb24 19e0
     .zero  0x2
-DAT_0802bb28:
+render_game_string_with_number_str_c_lang1:
     .word  0x09dcafb8                     @ 0802bb28 b8afdc09
-DAT_0802bb2c:
-    .word  0x02023360                     @ 0802bb2c 60330202
-DAT_0802bb30:
-    .word  0x02000000                     @ 0802bb30 00000002
-DAT_0802bb34:
-    .word  0x00006c2c                     @ 0802bb34 2c6c0000
-DAT_0802bb38:
+render_game_string_with_number_scene_base_c:
+    .word  gDuelSceneBase                 @ 0802bb2c 60330202
+render_game_string_with_number_ewram_base_d:
+    .word  EWRAM_BASE                     @ 0802bb30 00000002
+render_game_string_with_number_settings_off_d:
+    .word  GSETTINGS_OFFSET               @ 0802bb34 2c6c0000
+render_game_string_with_number_str_d_base:
     .word  0x09dc01de                     @ 0802bb38 de01dc09
-DAT_0802bb3c:
+render_game_string_with_number_str_d_off:
     .word  0x0003ab86                     @ 0802bb3c 86ab0300
 LAB_0802bb40:
-    ldr r3, DAT_0802bb44                     @ 0802bb40 004b
+    ldr r3, render_game_string_with_number_str_d_lang4 @ 0802bb40 004b
     b LAB_0802bb5a                           @ 0802bb42 0ae0
-DAT_0802bb44:
+render_game_string_with_number_str_d_lang4:
     .word  0x09def1a6                     @ 0802bb44 a6f1de09
 LAB_0802bb48:
-    ldr r3, DAT_0802bb4c                     @ 0802bb48 004b
+    ldr r3, render_game_string_with_number_str_d_lang3 @ 0802bb48 004b
     b LAB_0802bb5a                           @ 0802bb4a 06e0
-DAT_0802bb4c:
+render_game_string_with_number_str_d_lang3:
     .word  0x09de2d08                     @ 0802bb4c 082dde09
 LAB_0802bb50:
-    ldr r3, DAT_0802bb54                     @ 0802bb50 004b
+    ldr r3, render_game_string_with_number_str_d_lang2 @ 0802bb50 004b
     b LAB_0802bb5a                           @ 0802bb52 02e0
-DAT_0802bb54:
+render_game_string_with_number_str_d_lang2:
     .word  0x09dd698c                     @ 0802bb54 8c69dd09
 LAB_0802bb58:
-    ldr r3, DAT_0802bb64                     @ 0802bb58 024b
+    ldr r3, render_game_string_with_number_str_d_lang1 @ 0802bb58 024b
 LAB_0802bb5a:
     .hword 0x4648    @ 0802bb5a 4846
     movs r2,#0x3    @ 0802bb5c 0322
     bl text_render_wrapper                   @ 0802bb5e c6f08dff
     b LAB_0802bc30                           @ 0802bb62 65e0
-DAT_0802bb64:
+render_game_string_with_number_str_d_lang1:
     .word  0x09dcafb8                     @ 0802bb64 b8afdc09
 LAB_0802bb68:
     movs r1,#0xa    @ 0802bb68 0a21
@@ -26866,14 +31603,14 @@ LAB_0802bb7a:
     lsrs r0,r4,#0x6    @ 0802bb7c a009
     cmp r5,r0                                @ 0802bb7e 8542
     bge LAB_0802bb8c                         @ 0802bb80 04da
-    ldr r0, DAT_0802bc60                     @ 0802bb82 3748
+    ldr r0, render_game_string_with_number_scene_base_d @ 0802bb82 3748
     adds r0,#0x64    @ 0802bb84 6430
     ldrh r1,[r0,#0x0]                        @ 0802bb86 0188
     adds r1,#0xc    @ 0802bb88 0c31
     strh r1,[r0,#0x0]                        @ 0802bb8a 0180
 LAB_0802bb8c:
-    ldr r5, DAT_0802bc64                     @ 0802bb8c 354d
-    ldr r0, DAT_0802bc68                     @ 0802bb8e 3648
+    ldr r5, render_game_string_with_number_line_pos_ptr @ 0802bb8c 354d
+    ldr r0, render_game_string_with_number_glyph_spc_tbl @ 0802bb8e 3648
     adds r4,r7,r0    @ 0802bb90 3c18
 LAB_0802bb92:
     adds r0,r6,#0x0    @ 0802bb92 301c
@@ -26900,31 +31637,31 @@ LAB_0802bb92:
     add r9,r2                                @ 0802bbc2 9144
     cmp r7,#0x3                              @ 0802bbc4 032f
     bgt LAB_0802bc30                         @ 0802bbc6 33dc
-    ldr r5, DAT_0802bc6c                     @ 0802bbc8 284d
+    ldr r5, render_game_string_with_number_font_ctx_e @ 0802bbc8 284d
     movs r4,#0x2    @ 0802bbca 0224
     rsbs r4,r4,#0    @ 0802bbcc 6442
     adds r0,r4,#0x0    @ 0802bbce 201c
     ldrb r1,[r5,#0x8]                        @ 0802bbd0 297a
     ands r0,r1    @ 0802bbd2 0840
     strb r0,[r5,#0x8]                        @ 0802bbd4 2872
-    ldr r1, PTR_font_jp_base_table_0802bc70  @ 0802bbd6 2649
+    ldr r1, render_game_string_with_number_font_table @ 0802bbd6 2649
     lsls r0,r0,#0x1e    @ 0802bbd8 8007
     lsrs r0,r0,#0x1f    @ 0802bbda c00f
     lsls r0,r0,#0x2    @ 0802bbdc 8000
     adds r0,r0,r1    @ 0802bbde 4018
     ldr r0,[r0,#0x0]                         @ 0802bbe0 0068
     str r0,[r5,#0x4]                         @ 0802bbe2 6860
-    ldr r0, DAT_0802bc60                     @ 0802bbe4 1e48
+    ldr r0, render_game_string_with_number_scene_base_d @ 0802bbe4 1e48
     adds r0,#0x64    @ 0802bbe6 6430
     ldrh r0,[r0,#0x0]                        @ 0802bbe8 0088
     .hword 0x4680    @ 0802bbea 8046
-    ldr r0, DAT_0802bc68                     @ 0802bbec 1e48
+    ldr r0, render_game_string_with_number_glyph_spc_tbl @ 0802bbec 1e48
     adds r0,r7,r0    @ 0802bbee 3818
     ldrb r6,[r0,#0x0]                        @ 0802bbf0 0678
-    ldr r2, DAT_0802bc74                     @ 0802bbf2 204a
+    ldr r2, render_game_string_with_number_str_id_off @ 0802bbf2 204a
     adds r0,r7,r2    @ 0802bbf4 b818
     bl game_str_id_to_row                    @ 0802bbf6 c9f00ff9
-    ldr r2, PTR_game_str_pointer_table_0802bc78 @ 0802bbfa 1f4a
+    ldr r2, render_game_string_with_number_str_ptr_tbl @ 0802bbfa 1f4a
     lsls r0,r0,#0x10    @ 0802bbfc 0004
     lsrs r0,r0,#0x10    @ 0802bbfe 000c
     lsls r1,r0,#0x1    @ 0802bc00 4100
@@ -26932,14 +31669,14 @@ LAB_0802bb92:
     lsls r1,r1,#0x3    @ 0802bc04 c900
     adds r1,r1,r2    @ 0802bc06 8918
     ldr r3,[r1,#0x0]                         @ 0802bc08 0b68
-    ldr r0, PTR_game_str_ja_0802bc7c         @ 0802bc0a 1c48
+    ldr r0, render_game_string_with_number_str_ja_base @ 0802bc0a 1c48
     adds r3,r3,r0    @ 0802bc0c 1b18
     .hword 0x4648    @ 0802bc0e 4846
     .hword 0x4641    @ 0802bc10 4146
     adds r2,r6,#0x0    @ 0802bc12 321c
     bl text_render_wrapper                   @ 0802bc14 c6f032ff
-    ldr r1, DAT_0802bc80                     @ 0802bc18 1949
-    ldr r0, DAT_0802bc84                     @ 0802bc1a 1a48
+    ldr r1, render_game_string_with_number_ewram_base_e @ 0802bc18 1949
+    ldr r0, render_game_string_with_number_settings_off_e @ 0802bc1a 1a48
     adds r1,r1,r0    @ 0802bc1c 0918
     movs r0,#0x7    @ 0802bc1e 0720
     ldrb r1,[r1,#0x0]                        @ 0802bc20 0978
@@ -26951,7 +31688,7 @@ LAB_0802bb92:
     orrs r4,r0    @ 0802bc2c 0443
     strb r4,[r5,#0x8]                        @ 0802bc2e 2c72
 LAB_0802bc30:
-    ldr r2, DAT_0802bc60                     @ 0802bc30 0b4a
+    ldr r2, render_game_string_with_number_scene_base_d @ 0802bc30 0b4a
     adds r1,r2,#0x0    @ 0802bc32 111c
     adds r1,#0x64    @ 0802bc34 6431
     ldrh r0,[r1,#0x0]                        @ 0802bc36 0888
@@ -26976,34 +31713,34 @@ LAB_0802bc54:
     pop {r4,r5,r6,r7}                        @ 0802bc5a f0bc
     pop {r0}                                 @ 0802bc5c 01bc
     bx r0                                    @ 0802bc5e 0047
-DAT_0802bc60:
-    .word  0x02023360                     @ 0802bc60 60330202
-DAT_0802bc64:
+render_game_string_with_number_scene_base_d:
+    .word  gDuelSceneBase                 @ 0802bc60 60330202
+render_game_string_with_number_line_pos_ptr:
     .word  0x020233c4                     @ 0802bc64 c4330202
-DAT_0802bc68:
+render_game_string_with_number_glyph_spc_tbl:
     .word  0x09e59da8                     @ 0802bc68 a89de509
-DAT_0802bc6c:
-    .word  0x02006ed0                     @ 0802bc6c d06e0002
-PTR_font_jp_base_table_0802bc70:
+render_game_string_with_number_font_ctx_e:
+    .word  gFontJpCtx                     @ 0802bc6c d06e0002
+render_game_string_with_number_font_table:
     .word  font_jp_base_table             @ 0802bc70 54f8e509
-DAT_0802bc74:
+render_game_string_with_number_str_id_off:
     .word  0x00000bfa                     @ 0802bc74 fa0b0000
-PTR_game_str_pointer_table_0802bc78:
+render_game_string_with_number_str_ptr_tbl:
     .word  game_str_pointer_table         @ 0802bc78 400f0008
-PTR_game_str_ja_0802bc7c:
+render_game_string_with_number_str_ja_base:
     .word  game_str_ja                    @ 0802bc7c 109cdb09
-DAT_0802bc80:
-    .word  0x02000000                     @ 0802bc80 00000002
-DAT_0802bc84:
-    .word  0x00006c2c                     @ 0802bc84 2c6c0000
+render_game_string_with_number_ewram_base_e:
+    .word  EWRAM_BASE                     @ 0802bc80 00000002
+render_game_string_with_number_settings_off_e:
+    .word  GSETTINGS_OFFSET               @ 0802bc84 2c6c0000
 
-@ Variant of render_game_string_with_number (FUN_0802b940): main difference is that
+@ Variant of render_game_string_with_number (render_game_string_with_number): main difference is that
 @ text_render_wrapper is called with r2=6 (vs 7), representing a different render
 @ mode/width parameter. r0=text_ptr (card data string), r1=digit_value (card attribute
 @ value, from get_card_data_bit_by_index return). Writes to line buffer slot then renders
 @ text; if digit_value > 9, performs decimal decomposition loop (render_glyph_jp_single_layer);
 @ if <= 9, writes single character directly. Finally increments slot count bits[4:0]+1 and
-@ writes back. Called by FUN_0801fec0 (full scene hub) and render_card_stats_to_line_buf.
+@ writes back. Called by run_duel_puzzle_scene_state_machine (full scene hub) and render_card_stats_to_line_buf.
 @ 
 @ Constants:
 @ - gPrng+0xb6*2 = 0x16c (line buffer slot base)
@@ -27015,7 +31752,7 @@ render_card_stat_with_number_alt:
     adds r3,r0,#0x0    @ 0802bc8a 031c
     adds r4,r1,#0x0    @ 0802bc8c 0c1c
     movs r7,#0xb6    @ 0802bc8e b627
-    ldr r0, DAT_0802bd58                     @ 0802bc90 3148
+    ldr r0, render_card_stat_with_number_alt_scene_base @ 0802bc90 3148
     .hword 0x4684    @ 0802bc92 8446
     .hword 0x4662    @ 0802bc94 6246
     adds r2,#0x6c    @ 0802bc96 6c32
@@ -27033,7 +31770,7 @@ render_card_stat_with_number_alt:
     adds r0,r0,r1    @ 0802bcae 4018
     movs r1,#0x0    @ 0802bcb0 0021
     strb r1,[r0,#0x0]                        @ 0802bcb2 0170
-    ldr r6, DAT_0802bd5c                     @ 0802bcb4 294e
+    ldr r6, render_card_stat_with_number_alt_font_ctx @ 0802bcb4 294e
     movs r0,#0x3f    @ 0802bcb6 3f20
     ldrh r1,[r6,#0xc]                        @ 0802bcb8 b189
     ands r0,r1    @ 0802bcba 0840
@@ -27068,13 +31805,13 @@ LAB_0802bcf0:
     lsrs r0,r6,#0x6    @ 0802bcf2 b009
     cmp r5,r0                                @ 0802bcf4 8542
     bge LAB_0802bd02                         @ 0802bcf6 04da
-    ldr r0, DAT_0802bd58                     @ 0802bcf8 1748
+    ldr r0, render_card_stat_with_number_alt_scene_base @ 0802bcf8 1748
     adds r0,#0x64    @ 0802bcfa 6430
     ldrh r1,[r0,#0x0]                        @ 0802bcfc 0188
     adds r1,#0xc    @ 0802bcfe 0c31
     strh r1,[r0,#0x0]                        @ 0802bd00 0180
 LAB_0802bd02:
-    ldr r5, DAT_0802bd60                     @ 0802bd02 174d
+    ldr r5, render_card_stat_with_number_alt_line_pos_ptr @ 0802bd02 174d
 LAB_0802bd04:
     adds r0,r4,#0x0    @ 0802bd04 201c
     movs r1,#0xa    @ 0802bd06 0a21
@@ -27093,7 +31830,7 @@ LAB_0802bd04:
     subs r7,#0x6    @ 0802bd26 063f
     cmp r4,#0x0                              @ 0802bd28 002c
     bgt LAB_0802bd04                         @ 0802bd2a ebdc
-    ldr r2, DAT_0802bd58                     @ 0802bd2c 0a4a
+    ldr r2, render_card_stat_with_number_alt_scene_base @ 0802bd2c 0a4a
     adds r1,r2,#0x0    @ 0802bd2e 111c
     adds r1,#0x64    @ 0802bd30 6431
     ldrh r0,[r1,#0x0]                        @ 0802bd32 0888
@@ -27115,14 +31852,14 @@ LAB_0802bd04:
     pop {r0}                                 @ 0802bd52 01bc
     bx r0                                    @ 0802bd54 0047
     .zero  0x2
-DAT_0802bd58:
-    .word  0x02023360                     @ 0802bd58 60330202
-DAT_0802bd5c:
-    .word  0x02006ed0                     @ 0802bd5c d06e0002
-DAT_0802bd60:
+render_card_stat_with_number_alt_scene_base:
+    .word  gDuelSceneBase                 @ 0802bd58 60330202
+render_card_stat_with_number_alt_font_ctx:
+    .word  gFontJpCtx                     @ 0802bd5c d06e0002
+render_card_stat_with_number_alt_line_pos_ptr:
     .word  0x020233c4                     @ 0802bd60 c4330202
 
-@ Utility function to clear a sprite VRAM region and write sequential tile index sequence, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4) during card name display init. First zero_fill_by_halfword at 0x06008020 (0xfc<<7=0x7e00 halfwords = 0xff00 bytes), then commit_line_buffer_to_sprite_vram(0x06008020, 0) to commit empty line buffer. Then loops from row=0 to row=41 (0x29): for each row writes 2 halfwords = 0x0000 prefix, then 24 consecutive tile indices (starting at r6=1 incrementing), then 5 halfwords = 0x0000 suffix. Total 0x2a rows (42 rows).
+@ Utility function to clear a sprite VRAM region and write sequential tile index sequence, called by run_duel_puzzle_scene_state_machine (duel_puzzle main loop) and run_campaign_step30_pack_card_info_display (0x080277a4) during card name display init. First zero_fill_by_halfword at 0x06008020 (0xfc<<7=0x7e00 halfwords = 0xff00 bytes), then commit_line_buffer_to_sprite_vram(0x06008020, 0) to commit empty line buffer. Then loops from row=0 to row=41 (0x29): for each row writes 2 halfwords = 0x0000 prefix, then 24 consecutive tile indices (starting at r6=1 incrementing), then 5 halfwords = 0x0000 suffix. Total 0x2a rows (42 rows).
 @ 
 @ Constants:
 @ - sprite VRAM target = 0x06008020
@@ -27136,8 +31873,8 @@ DAT_0802bd60:
 zero_sprite_vram_with_tile_seq:
     push {r4,r5,r6,lr}                       @ 0802bd64 70b5
     movs r6,#0x1    @ 0802bd66 0126
-    ldr r5, DAT_0802bdbc                     @ 0802bd68 144d
-    ldr r4, DAT_0802bdc0                     @ 0802bd6a 154c
+    ldr r5, zero_sprite_vram_with_tile_seq_tilemap_scratch @ 0802bd68 144d
+    ldr r4, zero_sprite_vram_with_tile_seq_sprite_vram @ 0802bd6a 154c
     movs r1,#0xfc    @ 0802bd6c fc21
     lsls r1,r1,#0x7    @ 0802bd6e c901
     adds r0,r4,#0x0    @ 0802bd70 201c
@@ -27180,12 +31917,12 @@ LAB_0802bda6:
     pop {r4,r5,r6}                           @ 0802bdb6 70bc
     pop {r0}                                 @ 0802bdb8 01bc
     bx r0                                    @ 0802bdba 0047
-DAT_0802bdbc:
-    .word  0x06001440                     @ 0802bdbc 40140006
-DAT_0802bdc0:
-    .word  0x06008020                     @ 0802bdc0 20800006
+zero_sprite_vram_with_tile_seq_tilemap_scratch:
+    .word  PUZZLE_TILEMAP_SCRATCH         @ 0802bdbc 40140006
+zero_sprite_vram_with_tile_seq_sprite_vram:
+    .word  PUZZLE_NAME_SPRITE_VRAM        @ 0802bdc0 20800006
 
-@ Per-frame tick: advances LP digit sprite display and blend step. Called by run_campaign_step31_duel_lp_fadein_tick (0x08027834) and FUN_0801fec0 (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; ORs DISPCNT shadow with 0xf8*32=0x1f00 to set sprite display mode bits; calls tick_blend_step_by_delta(4) to advance blend fade. Returns tick_blend_step_by_delta result (0=fade in progress, nonzero=done) via pop {r1}; bx r1 (pattern B). Caller checks cmp r0,#0; bne to decide whether to keep waiting.
+@ Per-frame tick: advances LP digit sprite display and blend step. Called by run_campaign_step31_duel_lp_fadein_tick (0x08027834) and run_duel_puzzle_scene_state_machine (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; ORs DISPCNT shadow with 0xf8*32=0x1f00 to set sprite display mode bits; calls tick_blend_step_by_delta(4) to advance blend fade. Returns tick_blend_step_by_delta result (0=fade in progress, nonzero=done) via pop {r1}; bx r1 (pattern B). Caller checks cmp r0,#0; bne to decide whether to keep waiting.
 @ 
 @ Constants:
 @ - DISPCNT_shadow=0x80*32*0x13 (base area)
@@ -27207,7 +31944,7 @@ tick_lp_display_and_blend_step:
     pop {r1}                                 @ 0802bde0 02bc
     bx r1                                    @ 0802bde2 0847
 
-@ Per-frame tick: advances LP digit sprite display and checks fadein completion. Called by run_campaign_step33_duel_reward_and_fadein_tick (0x080278c0) and FUN_0801fec0 (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; calls start_blend_fadein_with_target(4) to advance fadein. If fadein returns 0 (not done) returns 0; if done clears DISPCNT shadow (strh 0 at 0x04000400) and returns 1. Differs from tick_lp_display_and_blend_step: uses start_blend_fadein_with_target (with target detection) instead of tick_blend_step_by_delta (no target check), so it actively clears DISPCNT shadow on completion.
+@ Per-frame tick: advances LP digit sprite display and checks fadein completion. Called by run_campaign_step33_duel_reward_and_fadein_tick (0x080278c0) and run_duel_puzzle_scene_state_machine (duel_puzzle main loop). Calls render_puzzle_lp_digit_sprites to refresh OAM; calls start_blend_fadein_with_target(4) to advance fadein. If fadein returns 0 (not done) returns 0; if done clears DISPCNT shadow (strh 0 at 0x04000400) and returns 1. Differs from tick_lp_display_and_blend_step: uses start_blend_fadein_with_target (with target detection) instead of tick_blend_step_by_delta (no target check), so it actively clears DISPCNT shadow on completion.
 @ 
 @ Constants:
 @ - fadein_target=4
@@ -27232,7 +31969,7 @@ LAB_0802be02:
     bx r1                                    @ 0802be04 0847
     .zero  0x2
 
-@ duel_puzzle scene display mode dispatch function, called by FUN_0801fec0 (duel_puzzle main loop) and run_campaign_step32_puzzle_display_tick (0x08027888). First calls render_puzzle_lp_digit_sprites to update LP digit OAM. Then reads one byte from gPrng+0x204, extracts bits[7:6] (2-bit high-priority mode r2) and bits[5:0]&0x3f (low 6-bit base mode field, shifted left 2), combines into mode_key = (byte&0x3f)<<2 | byte>>6, dispatches r0 to four paths: case 0 -> LAB_0802be58, case 1 -> LAB_0802be8e, case >1 -> LAB_0802be48, default -> LAB_0802c1a4.
+@ duel_puzzle scene display mode dispatch function, called by run_duel_puzzle_scene_state_machine (duel_puzzle main loop) and run_campaign_step32_puzzle_display_tick (0x08027888). First calls render_puzzle_lp_digit_sprites to update LP digit OAM. Then reads one byte from gPrng+0x204, extracts bits[7:6] (2-bit high-priority mode r2) and bits[5:0]&0x3f (low 6-bit base mode field, shifted left 2), combines into mode_key = (byte&0x3f)<<2 | byte>>6, dispatches r0 to four paths: case 0 -> LAB_0802be58, case 1 -> LAB_0802be8e, case >1 -> LAB_0802be48, default -> LAB_0802c1a4.
 @ 
 @ Constants:
 @ - mode byte = gPrng+0x204 (gPrng+0x81*4)
@@ -27248,8 +31985,8 @@ dispatch_puzzle_display_mode:
     .hword 0x4646    @ 0802be0c 4646
     push {r6,r7}                             @ 0802be0e c0b4
     bl render_puzzle_lp_digit_sprites        @ 0802be10 fff720fd
-    ldr r0, PTR_gPrng_0802be40               @ 0802be14 0a48
-    ldr r1, DAT_0802be44                     @ 0802be16 0b49
+    ldr r0, dispatch_puzzle_display_mode_gprng_a @ 0802be14 0a48
+    ldr r1, dispatch_puzzle_display_mode_frame_ctrl_off_a @ 0802be16 0b49
     adds r6,r0,r1    @ 0802be18 4618
     ldrb r5,[r6,#0x0]                        @ 0802be1a 3578
     lsrs r2,r5,#0x6    @ 0802be1c aa09
@@ -27270,24 +32007,24 @@ dispatch_puzzle_display_mode:
     beq LAB_0802be58                         @ 0802be3a 0dd0
     b LAB_0802c1a4                           @ 0802be3c b2e1
     .zero  0x2
-PTR_gPrng_0802be40:
+dispatch_puzzle_display_mode_gprng_a:
     .word  gPrng                          @ 0802be40 40000003
-DAT_0802be44:
-    .word  0x00000203                     @ 0802be44 03020000
+dispatch_puzzle_display_mode_frame_ctrl_off_a:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 0802be44 03020000
 LAB_0802be48:
-    ldr r1, DAT_0802be54                     @ 0802be48 0249
+    ldr r1, dispatch_puzzle_display_mode_scene_base_a @ 0802be48 0249
     .hword 0x4688    @ 0802be4a 8846
     cmp r0,#0x2                              @ 0802be4c 0228
     bne LAB_0802be52                         @ 0802be4e 00d1
     b LAB_0802bfa4                           @ 0802be50 a8e0
 LAB_0802be52:
     b LAB_0802c1a4                           @ 0802be52 a7e1
-DAT_0802be54:
-    .word  0x02023360                     @ 0802be54 60330202
+dispatch_puzzle_display_mode_scene_base_a:
+    .word  gDuelSceneBase                 @ 0802be54 60330202
 LAB_0802be58:
-    ldr r1, DAT_0802bf14                     @ 0802be58 2e49
+    ldr r1, dispatch_puzzle_display_mode_scene_base_b @ 0802be58 2e49
     adds r1,#0x6c    @ 0802be5a 6c31
-    ldr r0, DAT_0802bf18                     @ 0802be5c 2e48
+    ldr r0, dispatch_puzzle_display_mode_mode_clear_mask_a @ 0802be5c 2e48
     ldrh r7,[r1,#0x0]                        @ 0802be5e 0f88
     ands r0,r7    @ 0802be60 3840
     strh r0,[r1,#0x0]                        @ 0802be62 0880
@@ -27313,7 +32050,7 @@ LAB_0802be58:
     orrs r0,r1    @ 0802be8a 0843
     strb r0,[r4,#0x0]                        @ 0802be8c 2070
 LAB_0802be8e:
-    ldr r2, DAT_0802bf14                     @ 0802be8e 214a
+    ldr r2, dispatch_puzzle_display_mode_scene_base_b @ 0802be8e 214a
     adds r3,r2,#0x0    @ 0802be90 131c
     adds r3,#0x6c    @ 0802be92 6c33
     ldrh r4,[r3,#0x0]                        @ 0802be94 1c88
@@ -27325,8 +32062,8 @@ LAB_0802be8e:
     .hword 0x4690    @ 0802bea0 9046
     cmp r1,r0                                @ 0802bea2 8142
     blt LAB_0802bf24                         @ 0802bea4 3edb
-    ldr r4, PTR_gPrng_0802bf1c               @ 0802bea6 1d4c
-    ldr r0, DAT_0802bf20                     @ 0802bea8 1d48
+    ldr r4, dispatch_puzzle_display_mode_gprng_b @ 0802bea6 1d4c
+    ldr r0, dispatch_puzzle_display_mode_frame_ctrl_off_b @ 0802bea8 1d48
     adds r0,r0,r4    @ 0802beaa 0019
     .hword 0x4681    @ 0802beac 8146
     ldrb r2,[r0,#0x0]                        @ 0802beae 0278
@@ -27380,14 +32117,14 @@ LAB_0802be8e:
     strb r2,[r4,#0x0]                        @ 0802bf0e 2270
     b LAB_0802c228                           @ 0802bf10 8ae1
     .zero  0x2
-DAT_0802bf14:
-    .word  0x02023360                     @ 0802bf14 60330202
-DAT_0802bf18:
-    .word  0xfffffc1f                     @ 0802bf18 1ffcffff
-PTR_gPrng_0802bf1c:
+dispatch_puzzle_display_mode_scene_base_b:
+    .word  gDuelSceneBase                 @ 0802bf14 60330202
+dispatch_puzzle_display_mode_mode_clear_mask_a:
+    .word  GPRNG_FIELD_ANIM_MASK          @ 0802bf18 1ffcffff
+dispatch_puzzle_display_mode_gprng_b:
     .word  gPrng                          @ 0802bf1c 40000003
-DAT_0802bf20:
-    .word  0x00000203                     @ 0802bf20 03020000
+dispatch_puzzle_display_mode_frame_ctrl_off_b:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 0802bf20 03020000
 LAB_0802bf24:
     lsls r0,r1,#0x2    @ 0802bf24 8800
     .hword 0x4641    @ 0802bf26 4146
@@ -27419,12 +32156,12 @@ LAB_0802bf24:
     movs r0,#0x1f    @ 0802bf5a 1f20
     ands r1,r0    @ 0802bf5c 0140
     lsls r1,r1,#0x5    @ 0802bf5e 4901
-    ldr r0, DAT_0802bfe4                     @ 0802bf60 2048
+    ldr r0, dispatch_puzzle_display_mode_mode_clear_mask_b @ 0802bf60 2048
     ands r0,r2    @ 0802bf62 1040
     orrs r0,r1    @ 0802bf64 0843
     strh r0,[r3,#0x0]                        @ 0802bf66 1880
-    ldr r3, PTR_gPrng_0802bfe8               @ 0802bf68 1f4b
-    ldr r0, DAT_0802bfec                     @ 0802bf6a 2048
+    ldr r3, dispatch_puzzle_display_mode_gprng_c @ 0802bf68 1f4b
+    ldr r0, dispatch_puzzle_display_mode_frame_ctrl_off_c @ 0802bf6a 2048
     adds r6,r3,r0    @ 0802bf6c 1e18
     ldrb r5,[r6,#0x0]                        @ 0802bf6e 3578
     lsrs r0,r5,#0x6    @ 0802bf70 a809
@@ -27454,7 +32191,7 @@ LAB_0802bf24:
     orrs r0,r1    @ 0802bfa0 0843
     strb r0,[r3,#0x0]                        @ 0802bfa2 1870
 LAB_0802bfa4:
-    ldr r1, PTR_gPrng_0802bfe8               @ 0802bfa4 1049
+    ldr r1, dispatch_puzzle_display_mode_gprng_c @ 0802bfa4 1049
     movs r7,#0xa3    @ 0802bfa6 a327
     lsls r7,r7,#0x1    @ 0802bfa8 7f00
     adds r3,r1,r7    @ 0802bfaa cb19
@@ -27486,12 +32223,12 @@ LAB_0802bfa4:
     cmp r0,#0x0                              @ 0802bfde 0028
     beq LAB_0802bffa                         @ 0802bfe0 0bd0
     b LAB_0802c02a                           @ 0802bfe2 22e0
-DAT_0802bfe4:
-    .word  0xfffffc1f                     @ 0802bfe4 1ffcffff
-PTR_gPrng_0802bfe8:
+dispatch_puzzle_display_mode_mode_clear_mask_b:
+    .word  GPRNG_FIELD_ANIM_MASK          @ 0802bfe4 1ffcffff
+dispatch_puzzle_display_mode_gprng_c:
     .word  gPrng                          @ 0802bfe8 40000003
-DAT_0802bfec:
-    .word  0x00000203                     @ 0802bfec 03020000
+dispatch_puzzle_display_mode_frame_ctrl_off_c:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 0802bfec 03020000
 LAB_0802bff0:
     cmp r0,#0x2                              @ 0802bff0 0228
     beq LAB_0802c010                         @ 0802bff2 0dd0
@@ -27527,7 +32264,7 @@ LAB_0802c026:
     .hword 0x4642    @ 0802c026 4246
     str r0,[r2,#0x68]                        @ 0802c028 9066
 LAB_0802c02a:
-    ldr r3, DAT_0802c06c                     @ 0802c02a 104b
+    ldr r3, dispatch_puzzle_display_mode_frame_ctrl_off_d @ 0802c02a 104b
     adds r6,r4,r3    @ 0802c02c e618
     ldrb r5,[r6,#0x0]                        @ 0802c02e 3578
     lsrs r0,r5,#0x6    @ 0802c030 a809
@@ -27560,8 +32297,8 @@ LAB_0802c02a:
     strb r0,[r4,#0x0]                        @ 0802c066 2070
     b LAB_0802c228                           @ 0802c068 dee0
     .zero  0x2
-DAT_0802c06c:
-    .word  0x00000203                     @ 0802c06c 03020000
+dispatch_puzzle_display_mode_frame_ctrl_off_d:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 0802c06c 03020000
 LAB_0802c070:
     .hword 0x4643    @ 0802c070 4346
     adds r3,#0x62    @ 0802c072 6233
@@ -27603,28 +32340,28 @@ LAB_0802c0b2:
     bl sync_state_and_init_sprite            @ 0802c0b4 cdf0fefc
     .hword 0x4644    @ 0802c0b8 4446
     ldr r1,[r4,#0x74]                        @ 0802c0ba 616f
-    ldr r0, DAT_0802c0d4                     @ 0802c0bc 0548
+    ldr r0, dispatch_puzzle_display_mode_lp_max @ 0802c0bc 0548
     cmp r1,r0                                @ 0802c0be 8142
     ble LAB_0802c0dc                         @ 0802c0c0 0cdd
-    ldr r7, DAT_0802c0d8                     @ 0802c0c2 054f
+    ldr r7, dispatch_puzzle_display_mode_lp_neg_10000 @ 0802c0c2 054f
     adds r0,r1,r7    @ 0802c0c4 c819
     str r0,[r4,#0x74]                        @ 0802c0c6 6067
     ldr r0,[r4,#0x68]                        @ 0802c0c8 a06e
-    ldr r1, DAT_0802c0d4                     @ 0802c0ca 0249
+    ldr r1, dispatch_puzzle_display_mode_lp_max @ 0802c0ca 0249
     adds r0,r0,r1    @ 0802c0cc 4018
     str r0,[r4,#0x68]                        @ 0802c0ce a066
     b LAB_0802c228                           @ 0802c0d0 aae0
     .zero  0x2
-DAT_0802c0d4:
-    .word  0x00002710                     @ 0802c0d4 10270000
-DAT_0802c0d8:
-    .word  0xffffd8f0                     @ 0802c0d8 f0d8ffff
+dispatch_puzzle_display_mode_lp_max:
+    .word  PUZZLE_LP_MAX                  @ 0802c0d4 10270000
+dispatch_puzzle_display_mode_lp_neg_10000:
+    .word  PUZZLE_LP_NEG_10000            @ 0802c0d8 f0d8ffff
 LAB_0802c0dc:
     movs r0,#0xfa    @ 0802c0dc fa20
     lsls r0,r0,#0x2    @ 0802c0de 8000
     cmp r1,r0                                @ 0802c0e0 8142
     ble LAB_0802c0fc                         @ 0802c0e2 0bdd
-    ldr r2, DAT_0802c0f8                     @ 0802c0e4 044a
+    ldr r2, dispatch_puzzle_display_mode_lp_step_1000 @ 0802c0e4 044a
     adds r0,r1,r2    @ 0802c0e6 8818
     .hword 0x4643    @ 0802c0e8 4346
     str r0,[r3,#0x74]                        @ 0802c0ea 5867
@@ -27634,8 +32371,8 @@ LAB_0802c0dc:
     adds r0,r0,r4    @ 0802c0f2 0019
     str r0,[r3,#0x68]                        @ 0802c0f4 9866
     b LAB_0802c228                           @ 0802c0f6 97e0
-DAT_0802c0f8:
-    .word  0xfffffc18                     @ 0802c0f8 18fcffff
+dispatch_puzzle_display_mode_lp_step_1000:
+    .word  PUZZLE_LP_STEP_1000            @ 0802c0f8 18fcffff
 LAB_0802c0fc:
     cmp r1,#0x64                             @ 0802c0fc 6429
     ble LAB_0802c110                         @ 0802c0fe 07dd
@@ -27689,8 +32426,8 @@ LAB_0802c14e:
     bl __udivsi3                             @ 0802c154 e2f042fb
     str r0,[r7,#0x68]                        @ 0802c158 b866
 LAB_0802c15a:
-    ldr r3, PTR_gPrng_0802c19c               @ 0802c15a 104b
-    ldr r0, DAT_0802c1a0                     @ 0802c15c 1048
+    ldr r3, dispatch_puzzle_display_mode_gprng_d @ 0802c15a 104b
+    ldr r0, dispatch_puzzle_display_mode_frame_ctrl_off_e @ 0802c15c 1048
     adds r6,r3,r0    @ 0802c15e 1e18
     ldrb r5,[r6,#0x0]                        @ 0802c160 3578
     lsrs r0,r5,#0x6    @ 0802c162 a809
@@ -27722,12 +32459,12 @@ LAB_0802c15a:
     orrs r0,r1    @ 0802c196 0843
     strb r0,[r3,#0x0]                        @ 0802c198 1870
     b LAB_0802c228                           @ 0802c19a 45e0
-PTR_gPrng_0802c19c:
+dispatch_puzzle_display_mode_gprng_d:
     .word  gPrng                          @ 0802c19c 40000003
-DAT_0802c1a0:
-    .word  0x00000203                     @ 0802c1a0 03020000
+dispatch_puzzle_display_mode_frame_ctrl_off_e:
+    .word  GPRNG_FRAME_CTRL_OFF_203       @ 0802c1a0 03020000
 LAB_0802c1a4:
-    ldr r0, DAT_0802c1bc                     @ 0802c1a4 0548
+    ldr r0, dispatch_puzzle_display_mode_scene_base_c @ 0802c1a4 0548
     adds r5,r0,#0x0    @ 0802c1a6 051c
     adds r5,#0x62    @ 0802c1a8 6235
     ldrh r3,[r5,#0x0]                        @ 0802c1aa 2b88
@@ -27739,8 +32476,8 @@ LAB_0802c1a4:
     strh r0,[r5,#0x0]                        @ 0802c1b6 2880
     b LAB_0802c228                           @ 0802c1b8 36e0
     .zero  0x2
-DAT_0802c1bc:
-    .word  0x02023360                     @ 0802c1bc 60330202
+dispatch_puzzle_display_mode_scene_base_c:
+    .word  gDuelSceneBase                 @ 0802c1bc 60330202
 LAB_0802c1c0:
     .hword 0x4641    @ 0802c1c0 4146
     adds r1,#0x6d    @ 0802c1c2 6d31
@@ -27749,7 +32486,7 @@ LAB_0802c1c0:
     ands r0,r1    @ 0802c1c8 0840
     cmp r0,#0x0                              @ 0802c1ca 0028
     beq LAB_0802c1e2                         @ 0802c1cc 09d0
-    ldr r2, PTR_gPrng_0802c1e8               @ 0802c1ce 064a
+    ldr r2, dispatch_puzzle_display_mode_gprng_e @ 0802c1ce 064a
     movs r7,#0xa4    @ 0802c1d0 a427
     lsls r7,r7,#0x1    @ 0802c1d2 7f00
     adds r1,r2,r7    @ 0802c1d4 d119
@@ -27763,7 +32500,7 @@ LAB_0802c1e2:
     movs r0,#0x1    @ 0802c1e2 0120
     b LAB_0802c22a                           @ 0802c1e4 21e0
     .zero  0x2
-PTR_gPrng_0802c1e8:
+dispatch_puzzle_display_mode_gprng_e:
     .word  gPrng                          @ 0802c1e8 40000003
 LAB_0802c1ec:
     movs r0,#0xa3    @ 0802c1ec a320

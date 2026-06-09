@@ -54,7 +54,7 @@
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
 | **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | **5266f72** |
 | **9** | **0x27e44..0x28bdc (8fn+1 disasm, incbin 0x27e50/0x6c->disasm)** | **✅** | **af08e97** |
-| 10 | 0x28bdc..0x2c238 (12fn, incbin **0x29170/0x22f0**) | ⬜ | |
+| **10** | **0x28bdc..0x2c238 (13fn, incbin 0x29170/0x22f0->disasm R4 35 entries)** | **✅** | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 
@@ -229,6 +229,33 @@
 - CSV sync: yes (new fn tick_campaign_card_select_display_state @ 0x08027e50 added to naming-proposals.csv)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 - commit: af08e97
+
+### 4.10 Seg-10 完成记录 (2026-06-10)
+
+- 范围: 0x08028bdc..0x0802c238, 13 named fn
+- 函数: evaluate_campaign_victory_state / dispatch_campaign_scene_by_prng_state / load_campaign_state_post_sio / render_card_name_centered_to_sprite_vram / init_pack_card_info_screen_vram / render_puzzle_lp_digit_sprites / init_puzzle_card_name_line_buf / render_game_string_with_number / render_card_stat_with_number_alt / zero_sprite_vram_with_tile_seq / tick_lp_display_and_blend_step / tick_lp_display_and_fadein_check / dispatch_puzzle_display_mode
+- Ghidra 脚本: DisassembleF01Seg10Block.py (R4 disasm 35 entries) + FixF01Seg10StmiaPool.py (32 stmia hword fix) + RefineF01Seg10Slots.py (EQ/REF/RENAME/PLATE)
+- EQ=81 (66 reuse: gPrng x7 / GPRNG_BANNER_FLAG_OFF x2 / GPRNG_STEP_IDX_OFF x1 / gDuelCardCtxBase x2 / gDuelSceneBase x14 / gFontJpCtx x8 / EWRAM_BASE x10 / GSETTINGS_OFFSET x10 / BG_CHAR_VRAM_CB2 x2 / OBJ_TILE_VRAM_BASE x1 / OBJ_PAL_SLOT_1 x1 / CARD_INFO_BG2CNT_INIT x1 / CARD_DESC_BG_VRAM_A x1 / gDuelDispCtx x1 / gVijaState x1 / GPRNG_FIELD_ANIM_MASK x2 / GPRNG_FRAME_CTRL_OFF_203 x5; 15 new: GPRNG_CHALLENGE_SCORE_OFF x2 / PACK_INFO_DISPCNT_SHADOW_INIT x1 / PACK_INFO_BG2CNT_INIT x1 / PACK_CARD_INFO_SPRITE_VRAM x1 / PACK_CARD_INFO_TILEMAP_ADDR x1 / TEXT_RENDER_COLOR_MODE_1 x2 / PACK_INFO_NAME_SPRITE_VRAM_B x1 / PUZZLE_LP_DIGIT_TILE_BASE x1 / BG_PALRAM_SLOT15_BASE x1 / PUZZLE_TILEMAP_SCRATCH x1 / PUZZLE_NAME_SPRITE_VRAM x1 / PUZZLE_LP_MAX x1 / PUZZLE_LP_NEG_10000 x1 / PUZZLE_LP_STEP_1000 x1)
+- REF=1 (campaign_scene_prng_dispatch_table @ 0x08028d78)
+- RENAME=48 (dispatch table label / render_card_name font table + tilemap + sprite / init_pack_card_info bg0cnt + 5 pack GFX tiles + 2 font tables + gfx_base/off + str_lang1..4 + init_puzzle font table / render_game_string 24 lang str slots + line_pos_ptr + glyph_spc_tbl + font_table + str_id_off + str_ptr_tbl + str_ja_base / render_card_stat alt line_pos_ptr)
+- FUNC_RENAME=0
+- PLATE=9 (stale FUN_ -> current name: FUN_0801fec0 -> run_duel_puzzle_scene_state_machine x8 occurrences in 8fn; FUN_0802bdc4/bde4 -> tick_lp_display_and_blend_step/fadein_check x2; FUN_0802bb74/bb68 -> LAB_ x2; FUN_0802b940 -> render_game_string_with_number x1)
+- carve=0
+- disasm=1: block 0x08029170/0x22f0 (8944B) -> 35 unique entry points via dispatch_campaign_scene_by_prng_state (.hword 0x4687 = mov pc,r0, raw THUMB addresses); clearListing + setTMode + per-stub DisassembleCommand + createFunction + 350 literal pool DWORDs guarded; bonus fix: 32 stmia r0,{r0-r5} flow-disasm errors -> .hword 0xc03f via FixF01Seg10StmiaPool.py
+- §5.1=0 (ROM_INCBIN 有引用, disasm; 无 0-ref 块)
+- 新增 constants: duel_field.inc +6 (GPRNG_CHALLENGE_SCORE_OFF / TEXT_RENDER_COLOR_MODE_1 / PUZZLE_LP_DIGIT_TILE_BASE / PUZZLE_LP_MAX / PUZZLE_LP_STEP_1000 / PUZZLE_LP_NEG_10000); gba_mem.inc +8 (PACK_INFO_DISPCNT_SHADOW_INIT / PACK_INFO_BG2CNT_INIT / PACK_CARD_INFO_SPRITE_VRAM / PACK_CARD_INFO_TILEMAP_ADDR / PACK_INFO_NAME_SPRITE_VRAM_B / PUZZLE_NAME_SPRITE_VRAM / PUZZLE_TILEMAP_SCRATCH / BG_PALRAM_SLOT15_BASE)
+- CSV sync: no (FUNC_RENAME=0; 35 disasm stubs auto-named campaign_scene_handler_XXXXXXXX, not added to proposals.csv)
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+- commit: (pending)
+
+### file 01 全段完成 (2026-06-10)
+
+file 01 `01_vija_scene_text.s` (0x0801cb00..0x0802c238) 全 10 段细化完成:
+- 13 named fn + 35 disasm stubs (Seg-10) + 68 stubs (Seg-7) + 15+6+1 stubs (Seg-8/9) = 合计 ~125 函数/stub
+- 新增 constants 总计: card_info.inc 8 / duel_field.inc 14+14+6=34 / ewram.inc 9 / gba_mem.inc 6+8=14 / iwram.inc 1 = ~66 constants
+- 消灭 ROM_INCBIN: Seg-1(0x1d024/0x1c 含 §5.1) / Seg-6(4块 disasm) / Seg-7(4块) / Seg-8(2块 disasm) / Seg-9(1块 disasm + carve) / Seg-10(1块 disasm 8944B)
+- §5.1 登记: 0x0801d024 orphan dispatcher 簇 (Seg-1, 留待引用时 R4)
+- 跨文件推进: 下一任务 file 02 `02_text_lp_fieldspell.s` (0x0802c238..0x08035f54)
 
 ---
 

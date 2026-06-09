@@ -26,3 +26,21 @@
 .equ CAMPAIGN_VRAM_BG_TILE_BASE_D,0x06000d80  @ VRAM BG tile base variant D (step11); 1 ROM ref
 .equ CAMPAIGN_VRAM_BG_TILE_BASE_E,0x06000900  @ VRAM BG tile base variant E (step11); 1 ROM ref
 .equ CAMPAIGN_VRAM_BG_TILE_BASE_F,0x06001180  @ VRAM BG tile region F (campaign display); 5 ROM refs
+
+@ =============================================================================
+@ Seg-10 additions: pack info screen / puzzle display VRAM + palette addresses
+@ =============================================================================
+
+@ Pack info screen init values
+.equ PACK_INFO_DISPCNT_SHADOW_INIT,  0x00000401  @ DISPCNT shadow init: BG0+OBJ 1D-map; 188 ROM refs
+.equ PACK_INFO_BG2CNT_INIT,          0x0000820a  @ BG2CNT for pack info screen: charbase=2 scrbase=2; 5 ROM refs
+.equ PACK_CARD_INFO_SPRITE_VRAM,     0x060053c0  @ OBJ VRAM commit target for card-name sprite (centered); 1 ROM ref
+.equ PACK_CARD_INFO_TILEMAP_ADDR,    0x06000812  @ BG tilemap addr for card-name tile-index row; 1 ROM ref
+.equ PACK_INFO_NAME_SPRITE_VRAM_B,   0x06004c40  @ OBJ VRAM commit target (wide/narrow font path); 1 ROM ref
+
+@ Puzzle display VRAM addresses
+.equ PUZZLE_NAME_SPRITE_VRAM,        0x06008020  @ Puzzle card-name sprite VRAM base; 8 ROM refs
+.equ PUZZLE_TILEMAP_SCRATCH,         0x06001440  @ Puzzle tilemap scratch area; 1 ROM ref
+
+@ BG palette address
+.equ BG_PALRAM_SLOT15_BASE,          0x050001e0  @ BG PALRAM last 32 bytes (OBJ_PALRAM_BASE-0x20); 10 ROM refs

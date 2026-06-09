@@ -109,3 +109,19 @@
 .equ CAMPAIGN_HAND_SPRITE_POS_B,      0x006e0044  @ hand sprite B xy
 .equ CAMPAIGN_HAND_SPRITE_POS_C,      0x006e0094  @ hand sprite C xy
 .equ CAMPAIGN_HAND_SPRITE_POS_D,      0x006e00b4  @ hand sprite D xy
+
+@ =============================================================================
+@ Seg-10 additions: campaign victory / puzzle LP display constants
+@ =============================================================================
+
+@ Campaign challenge score / banner offsets
+.equ GPRNG_CHALLENGE_SCORE_OFF,       0x00000241  @ gPrng+0x241: per-challenge score/win array offset; 24 ROM refs
+
+@ Text render mode arg
+.equ TEXT_RENDER_COLOR_MODE_1,        0x00008001  @ text_render_wrapper r2 arg: shadow=1 color-mode-1; 30 ROM refs
+
+@ Puzzle LP display constants
+.equ PUZZLE_LP_DIGIT_TILE_BASE,       0x00001008  @ LP digit OAM tile base index; 71 ROM refs
+.equ PUZZLE_LP_MAX,                   0x00002710  @ LP display max cap (+10000); 68 ROM refs
+.equ PUZZLE_LP_STEP_1000,             0xfffffc18  @ -1000 (s32): LP step-down per display tick; 16 ROM refs
+.equ PUZZLE_LP_NEG_10000,             0xffffd8f0  @ -10000 (s32): LP step-down 10000 single step; 1 ROM ref
