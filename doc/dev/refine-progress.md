@@ -8,8 +8,8 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 1/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
-> **下一任务**: **file 02 Seg-2** (0x2e108..0x2f3a8, 23fn 94槽, campaign card-select + opponent card display, 2 incbin: 0x2e22c/0x19c + 0x2e554/0x144)。
+> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 2/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
+> **下一任务**: **file 02 Seg-3** (0x2f3a8..0x2fd00, 23fn 58槽, zone chain count / eligibility query, 无 ROM_INCBIN)。
 
 ---
 
@@ -115,4 +115,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-10 (02 文件 Seg-1 完成: 文本十进制渲染+卡名格式化+scene init 23fn; EQ140/REF77/RENAME60/PLATE4; carve 26 label 3 host (Host A 17 label/0x278EBC, Host B 8 label/0x1CE18, Host C 1 label/0xE54); 新建 constants gba_mem+17/duel_field+4/card_info+5/ewram+9; byte-identical 9689337d; 下一任务 file 02 Seg-2)。
+**上次更新**: 2026-06-10 (02 文件 Seg-2 完成: campaign card-select+equip chain 23fn; EQ36/REF32/RENAME22/PLATE6; carve Host C sub-split 2 label (deck_type_table/scene_scroll_table); R4 disasm Block1 181i+Block2 145i; 新建 constants duel_field+4/ewram+4; byte-identical 9689337d; 下一任务 file 02 Seg-3)。

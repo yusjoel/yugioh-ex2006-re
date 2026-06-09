@@ -1683,7 +1683,11 @@ pack_card_grid_tile_table:                          @ 0x09e59d88: 16 halfword ti
 	.incbin "roms/2343.gba", 0x1E59D88, 0x20       @ 16 grid tile offsets
 	.incbin "roms/2343.gba", 0x1E59DA8, 0xC        @ pre-aob_phase_table gap (f02 Seg-1 carve Host C)
 aob_phase_table:                                @ 0x09E59DB4: AOB phase dispatch table (halfword stride 2, phase [0..7])
-	.incbin "roms/2343.gba", 0x1E59DB4, 0xE48    @ tail to host end 0x1E5ABFC
+	.incbin "roms/2343.gba", 0x1E59DB4, 0x10   @ aob_phase_table body (8 halfwords, phase->offset)
+deck_type_table:                                @ 0x09E59DC4: 8-entry u16 deck_type->sprite_tile_offset lookup (f02 Seg-2 carve)
+	.incbin "roms/2343.gba", 0x1E59DC4, 0x10   @ deck_type_table (8 halfwords)
+scene_scroll_table:                             @ 0x09E59DD4: 0x20-entry u16 symmetric scroll position table (f02 Seg-2 carve)
+	.incbin "roms/2343.gba", 0x1E59DD4, 0xE28  @ scene_scroll_table + tail to host end 0x1E5ABFC
 
 @ 卡包卡牌列表 + 信息表（ROM偏移 0x1E5ABFC - 0x1E5E617）
 @ 45 个 pack 共 3515 条卡牌条目 + 51 条 pack 信息记录，共 0x3A1C 字节

@@ -299,3 +299,11 @@
 .equ CAMPAIGN_BG1CNT_INIT,          0x00000107  @ BG1CNT: pri=3 charbase=0 16col scrbase=0; 2 ROM refs
 .equ CAMPAIGN_BG2CNT_INIT,          0x00000207  @ BG2CNT: pri=3 charbase=0 16col scrbase=1; 2 ROM refs
 .equ CAMPAIGN_TILEMAP_SEQ_START,    0x0000F210  @ campaign BG tilemap seq start param; 2 ROM refs
+
+@ =============================================================================
+@ file 02 Seg-2 additions: duel field equip chain globals
+@ =============================================================================
+.equ gDuelFieldSlots,     0x0201c510  @ duel field zone slot array; player*0x868 + slot*0x14; 1007 raw refs
+.equ gEquipNodePool,      0x0201d9c0  @ equip chain node pool; node_idx*8 stride; 55 raw refs
+.equ gEquipChainSlotRefs, 0x0201bb90  @ equip chain slot reference array (replace_slot_chain_ref_by_id); 260 raw refs
+.equ gDuelFieldSlotState, 0x0201c520  @ parallel slot state flags at gDuelFieldSlots+0x10; 51 raw refs

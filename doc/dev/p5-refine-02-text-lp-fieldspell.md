@@ -57,7 +57,7 @@
 | Seg | 范围 | ~fn | ~slots | 状态 | commit |
 |-----|------|-----|--------|------|--------|
 | 1 | 0x2c238..0x2e108 | 23 | 318 | ✅ | 4199405 |
-| 2 | 0x2e108..0x2f3a8 | 23 | 94 | ⬜ | |
+| 2 | 0x2e108..0x2f3a8 | 23 | 94 | ✅ | (pending) |
 | 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ⬜ | |
 | 4 | 0x2fd00..0x309b8 | 23 | 136 | ⬜ | |
 | 5 | 0x309b8..0x313dc | 23 | 60 | ⬜ | |
@@ -138,6 +138,70 @@
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: 4199405
+
+---
+
+### 4.02 Seg-2 完成记录 (0x0802e108..0x0802f3a8, 23 fn)
+
+**函数列表**:
+| addr       | name                                          |
+|------------|-----------------------------------------------|
+| 0x0802e108 | tick_campaign_card_select_display_state       |
+| 0x0802e918 | tick_aob_display_with_sprite_enable_blend     |
+| 0x0802e938 | tick_aob_display_with_fadein                  |
+| 0x0802e95c | find_active_equip_chain_head                  |
+| 0x0802e988 | replace_slot_chain_ref_by_id                  |
+| 0x0802ea3c | replace_chain_refs_by_slot_id_for_player      |
+| 0x0802eac8 | link_equip_node_to_chain                      |
+| 0x0802eb3c | append_equip_chain_node_at_tail               |
+| 0x0802eb94 | replace_chain_refs_for_slot                   |
+| 0x0802ebbc | replace_chain_refs_by_id_filtered             |
+| 0x0802ebfc | replace_equip_chain_slot_refs_by_match        |
+| 0x0802ec3c | replace_chain_node_ref_by_zone_match          |
+| 0x0802ec80 | clear_chain_refs_for_low_zone_nodes           |
+| 0x0802ecbc | clear_equip_refs_for_leaving_slot             |
+| 0x0802edac | clear_equip_chain_refs_for_slot_zone          |
+| 0x0802edf0 | repair_slot_equip_chain_node_refs             |
+| 0x0802eeac | rebuild_equip_chain_refs                      |
+| 0x0802ef84 | purge_equip_chain_refs_for_zone_slot          |
+| 0x0802f0d8 | clear_zone_slot_card_ref_bits                 |
+| 0x0802f14c | update_equip_chain_zone_slot_refs             |
+| 0x0802f1f8 | count_slot_chain_copies_of_card               |
+| 0x0802f27c | count_zone_chain_eligible_cards               |
+| 0x0802f394 | count_equip_chain_default_flags               |
+
+**符号化统计**:
+- EQ_SLOTS: 36 (PLAYER_BLOCK_STRIDE x13 复用 ewram.inc, CAMPAIGN_CARD_ANIM_STEP_MASK x4 复用, gDuelSceneBase x8 复用, FIELD_SLOT_PHASE_MASK x3 新建, NODE_POOL_NEG_OFFSET x4 新建, EQUIP_CHAIN_LINK_OFFSET x1 新建, EQUIP_NODE_BASE_OFFSET x2 新建, gPrng x1 复用)
+- REF_SLOTS: 32 (gDuelFieldSlots x10, gEquipNodePool x15, gDuelFieldSlotState x2, gEquipChainSlotRefs x1, deck_type_table x2, scene_scroll_table x1, dispatch_table_seg2_blk1 x1)
+- RENAME_SLOTS: 22 (dispatch tbl ptrs x2, sprite attrs x2, equip chain offsets x6, sentinel/masks x5, type thresholds x4, card_id masks x2, sub_dispatch x1)
+- PLATE_REWRITES: 6 stale FUN_ replacements
+- §5.1: 0 (两 ROM_INCBIN 均有引用, 走 R4 disasm)
+- disasm: Block1 181 instr + Block2 145 instr = 326 total (2 blocks, MOV PC dispatch)
+- literal pool: 8 DWord fixes (7 Block1 + 1 Block2 missing pool)
+
+**新建 constants**:
+- `duel_field.inc`: FIELD_SLOT_PHASE_MASK, EQUIP_NODE_BASE_OFFSET, NODE_POOL_NEG_OFFSET, EQUIP_CHAIN_LINK_OFFSET
+- `ewram.inc`: gDuelFieldSlots, gEquipNodePool, gEquipChainSlotRefs, gDuelFieldSlotState
+
+**carve 2 sub-splits** (Host C tail 子分裂):
+- aob_phase_table body: `.incbin 0x1e59db4, 0x10` (unchanged content, new span)
+- deck_type_table @ 0x09e59dc4: `.incbin 0x1e59dc4, 0x10` (8 u16 deck_type->sprite_tile_offset)
+- scene_scroll_table @ 0x09e59dd4: `.incbin 0x1e59dd4, 0xe28` (0x20-entry scroll pos table)
+- sum: 0x10+0x10+0xe28=0xe48 == 原 tail 大小 ✅
+
+**落地踩坑记录**:
+1. PLAYER_BLOCK_STRIDE=0x868 在 ewram.inc line 245 已有 (proposal 拟新建 FIELD_PLAYER_STRIDE=0x868 在 duel_field.inc — 重复建立); 修正: 直接复用 ewram.inc 已有常量, 不新建。
+2. Ghidra 导出 Block1 literal pool 为 .byte 而非 .word (7 个池项未自动建 DWord); 追加 RefineF02Seg2LiteralPool.py 脚本修复 (8 个 createDWord: 7 Block1 + 1 Block2)。
+3. PLATE_REWRITES 全 6 处 WARN "not found in plate" — 相关 plate 已无 FUN_ stale 串 (可能原始 plate 不含 / 已被先前操作清除); 不影响落地。
+
+**脚本**:
+- `tools/ghidra-labeling/RefineF02Seg2Slots.py` (EQ36/REF32/RENAME22/PLATE6)
+- `tools/ghidra-labeling/DisassembleF02Seg2Blocks.py` (Block1 181i + Block2 145i)
+- `tools/ghidra-labeling/RefineF02Seg2LiteralPool.py` (8 DWord pool fix)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
 
 ---
 

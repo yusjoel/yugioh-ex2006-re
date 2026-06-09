@@ -134,3 +134,13 @@
 .equ DUAL_LABEL_RENDER_STATE_CLEAR,   0xFFFC7FFF  @ clears bits[17:15] of scene_ctx+0x38 render state; 31 ROM refs
 .equ LABEL_CTX_RENDER_STATE_CLEAR,    0xFFFFFC7F  @ clears 2 bits from slot render state (distinct from CAMPAIGN_CARD_ANIM_STEP_MASK); 1 ROM ref
 .equ LABEL_CTX_DISPLAY_PARAM,         0x00A00030  @ display param for label render ctx init; 1 ROM ref
+
+@ =============================================================================
+@ file 02 Seg-2 additions: equip chain / duel field slot constants
+@ =============================================================================
+
+@ Equip chain node pool geometry
+.equ EQUIP_NODE_BASE_OFFSET,  0x000014b0  @ positive offset from gDuelFieldSlots to gEquipNodePool (0x1d9c0-0x1c510=0x14b0); 4 refs
+.equ NODE_POOL_NEG_OFFSET,    0xffffeb50  @ neg offset (-0x14b0) from gEquipNodePool to gDuelFieldSlots base; 5 refs
+.equ EQUIP_CHAIN_LINK_OFFSET, 0xfffffc02  @ chain link sub-array base offset within node (-0x3fe); 1 ref (append_equip_chain_node_at_tail)
+.equ FIELD_SLOT_PHASE_MASK,   0xfffffc07  @ clears bits[9:3] of AOB state halfword (scene_ctx+0x60); 3 refs
