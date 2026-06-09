@@ -54,7 +54,7 @@
 | **7** | **0x20fa8..0x24868 (8fn+68 disasm stubs, incbin 0x2108e/0xbe->disasm, 0x211b4/0xc4, 0x2134c/0x1ae0, 0x22eb8/0x9a6)** | **✅** | **005143e** |
 | **8** | **0x24868..0x27e44 (11fn, incbin 0x2497c/0x78->disasm, 0x258f0/0x230->disasm)** | **✅** | **5266f72** |
 | **9** | **0x27e44..0x28bdc (8fn+1 disasm, incbin 0x27e50/0x6c->disasm)** | **✅** | **af08e97** |
-| **10** | **0x28bdc..0x2c238 (13fn, incbin 0x29170/0x22f0->disasm R4 35 entries)** | **✅** | |
+| **10** | **0x28bdc..0x2c238 (13fn, incbin 0x29170/0x22f0->disasm R4 35 entries)** | **✅** | **93d1c6d** |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 
@@ -246,7 +246,7 @@
 - 新增 constants: duel_field.inc +6 (GPRNG_CHALLENGE_SCORE_OFF / TEXT_RENDER_COLOR_MODE_1 / PUZZLE_LP_DIGIT_TILE_BASE / PUZZLE_LP_MAX / PUZZLE_LP_STEP_1000 / PUZZLE_LP_NEG_10000); gba_mem.inc +8 (PACK_INFO_DISPCNT_SHADOW_INIT / PACK_INFO_BG2CNT_INIT / PACK_CARD_INFO_SPRITE_VRAM / PACK_CARD_INFO_TILEMAP_ADDR / PACK_INFO_NAME_SPRITE_VRAM_B / PUZZLE_NAME_SPRITE_VRAM / PUZZLE_TILEMAP_SCRATCH / BG_PALRAM_SLOT15_BASE)
 - CSV sync: no (FUNC_RENAME=0; 35 disasm stubs auto-named campaign_scene_handler_XXXXXXXX, not added to proposals.csv)
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
-- commit: (pending)
+- commit: 93d1c6d
 
 ### file 01 全段完成 (2026-06-10)
 
