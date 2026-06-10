@@ -106,3 +106,8 @@
 @ file 02 Seg-5 additions: field spell type-B effect chain guard
 @ =============================================================================
 .equ FIELD_SPELL_B_EFFECT_ID, 0x00001407  @ effect chain guard value for field spell type-B placement check; 12 ROM refs
+
+@ =============================================================================
+@ file 02 Seg-6 additions: zone slot set_code / card_id mask
+@ =============================================================================
+.equ SLOT_CARD_SET_CODE_MASK, 0x00001fff  @ 13-bit mask for YGO set_code/card_id fields in zone slot arrays; 101 raw refs; 2 Seg-6 slots

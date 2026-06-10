@@ -153,3 +153,8 @@
 .equ SLOT_FACE_STATUS_ARRAY_OFF, 0x000010b1 @ gDuelFieldSlots+0x10b1: equip_face_bits status byte array base (16 ROM refs; 2 slots)
 .equ FIELD_SPELL_CARD_REF_OFF,  0x00001390  @ card_id 0x1390 field-spell equip trigger guard (10 ROM refs; 1 slot)
 .equ DUEL_ACTIVE_PLAYER_OFF,    0x00001cb8  @ gP1LifePoints+0x1cb8: active turn player idx (15 ROM refs; 1 slot)
+
+@ =============================================================================
+@ file 02 Seg-6 additions: equip slot active-state tag
+@ =============================================================================
+.equ EQUIP_SLOT_ACTIVE_TAG,     0xa5600000  @ packed slot word tag: slot[0]<<19==this -> equip slot active/live; 5 raw refs; 1 Seg-6 slot

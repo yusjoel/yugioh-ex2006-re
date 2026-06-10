@@ -17,3 +17,8 @@
                                                    @ ORed into 32-bit OAM entry to toggle hflip+vflip
 .equ OAM_ATTR1_X_MASK,  0x000001ff  @ attr1 bits[8:0] = x coordinate (9-bit x-pos field)
 .equ OAM_ATTR1_X_CLEAR, 0xfffffe00  @ clear attr1 bits[8:0] before inserting x-pos
+
+@ =============================================================================
+@ file 02 Seg-6 additions: OAM attr2 tile-field clear mask
+@ =============================================================================
+.equ OAM_ATTR2_TILE_CLEAR, 0xffffe000  @ AND mask clearing OAM attr2 bits[12:0] before inserting new tile/set_code; 31 raw refs; 3 Seg-6 slots

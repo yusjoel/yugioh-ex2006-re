@@ -61,7 +61,7 @@
 | 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ✅ | a78e8b1 |
 | 4 | 0x2fd00..0x309b8 | 23 | 136 | ✅ | f8cdb43 |
 | 5 | 0x309b8..0x313dc | 23 | 60 | ✅ | 1ad7df7 |
-| 6 | 0x313dc..0x3217c | 23 | 64 | ⬜ | |
+| 6 | 0x313dc..0x3217c | 23 | 64 | ✅ | |
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ⬜ | |
 | 8 | 0x32e80..0x33654 | 23 | 44 | ⬜ | |
 | 9 | 0x33654..0x3407c | 23 | 63 | ⬜ | |
@@ -366,6 +366,63 @@
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: 1ad7df7
+
+---
+
+### 4.06 Seg-6 完成记录 (0x080313dc..0x0803217c, 23 fn)
+
+**函数列表**:
+| addr       | name                                    |
+|------------|-----------------------------------------|
+| 0x080313dc | get_equip_card_set_code_for_slot        |
+| 0x08031474 | find_equip_chain_node_min_count_by_pred |
+| 0x0803149c | get_slot_effect_card_value              |
+| 0x080314d4 | resolve_slot_card_id_for_pair           |
+| 0x08031564 | check_slot_card_pair_allowed            |
+| 0x08031578 | insert_slot_ref_into_hand_array         |
+| 0x080315f8 | append_slot_ref_to_hand_array           |
+| 0x08031630 | append_slot_ref_to_equip_array          |
+| 0x08031668 | shuffle_player_hand_list                |
+| 0x080316b8 | find_card_pair_in_player_deck_list      |
+| 0x08031710 | find_chain_zone_slot_by_pair_card       |
+| 0x08031768 | remove_slot_from_equip_array_by_index   |
+| 0x080317e0 | erase_slot_from_hand_array_by_ptr       |
+| 0x0803189c | remove_zone_slot_entry_by_card_id       |
+| 0x08031954 | retire_equip_slot_with_relink           |
+| 0x08031978 | erase_slot_from_equip_array_b_by_ptr    |
+| 0x08031a34 | count_monster_slots_with_field5_nonzero |
+| 0x08031a84 | count_zone_card_pair_allowed_for_card   |
+| 0x08031ae4 | count_chain_zone_card_pair_allowed_for_card |
+| 0x08031b44 | sort_hand_cards_by_lp_score             |
+| 0x08031b90 | init_player_hand_display_slots          |
+| 0x08031d44 | build_hand_zone_display_slots_shuffled  |
+| 0x08031ebc | serialize_field_zone_setcodes_to_buf    |
+
+**符号化统计**:
+- EQ_SLOTS: 38 (32 EQ_REUSE + 6 EQ_NEW)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x20 + gDuelFieldSlots x3 + gP1SlotSetCodeArray x4 + gP1ChainZoneArray x2 + GPRNG_STEP_CTR_MASK x2 + OAM_ATTR0_HIDDEN x1
+  - EQ_NEW: EQUIP_SLOT_ACTIVE_TAG x1 (duel_field.inc) + SLOT_CARD_SET_CODE_MASK x2 (card_info.inc) + OAM_ATTR2_TILE_CLEAR x3 (oam_attr.inc)
+- REF_SLOTS: 0 (16 PTR_gP1LifePoints_* 已有 DATA refs)
+- RENAME_SLOTS: 26 (16 PTR_/DWORD_ label renames + 10 DAT_/DWORD_ domain labels)
+- PLATE_FULL: 11 (全段重写, C8 Ghidra readback 验证 11/11 无 FUN_ 残留)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants** (3 项):
+- `duel_field.inc`: EQUIP_SLOT_ACTIVE_TAG=0xa5600000 (packed slot state tag; slot[0]<<19==this -> active equip; 5 raw refs)
+- `card_info.inc`: SLOT_CARD_SET_CODE_MASK=0x00001fff (13-bit set_code/card_id mask for zone slot arrays; 101 raw refs)
+- `oam_attr.inc`: OAM_ATTR2_TILE_CLEAR=0xffffe000 (AND mask clearing OAM attr2 bits[12:0]; 31 raw refs)
+
+**C8 plate 验证**:
+- 11 个 plate 全用 setPlateComment 整段重写 (非 substring replace), 写入后读回 re 扫描确认无 FUN_ 残留
+- 导出后 grep asm/02_text_lp_fieldspell.s Seg-6 范围 (L11545..L13505) @ 行含 FUN_ = **0** (落地验收通过)
+
+**落地踩坑记录**: 无 (iteration-2 PASS, dry run 0 FAIL, 实跑 EQ=38/RENAME=26/PLATE 11 PLF OK, 0 SKIP)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg6Slots.py` (EQ38/REF0/RENAME26/PLATE_FULL11)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
 
 ---
 

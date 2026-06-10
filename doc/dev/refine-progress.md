@@ -8,10 +8,10 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 5/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
-> **下一任务**: **file 02 Seg-6** (0x313dc..0x3217c, 23fn 64槽, equip card set-code / slot ref array, 无 incbin)。
+> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 6/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
+> **下一任务**: **file 02 Seg-7** (0x3217c..0x32e80, 23fn 67槽, zone slot chain refs clear/dispatch, 无 incbin)。
 
-上次更新: 2026-06-10 file 02 Seg-5 完成 (EQ39/RENAME21/PLATE_FULL10/新建 duel_field+ewram+card_info 13项, C8 plate 全重写验证无残留 FUN_, byte-identical 9689337d)。
+上次更新: 2026-06-10 file 02 Seg-6 完成 (EQ38/RENAME26/PLATE_FULL11/新建 duel_field+card_info+oam_attr 3项, C8 plate 全重写 11/11 readback 无 FUN_, byte-identical 9689337d)。
 
 ---
 
