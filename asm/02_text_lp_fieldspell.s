@@ -16424,7 +16424,7 @@ LAB_0803365c:
     b LAB_08033680                           @ 0803366c 08e0
     .zero  0x2
 find_first_place_slot_order_tbl:
-    .word  monster_slot_order_table       @ 08033670 4cefe309  slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef4c
+    .word  MONSTER_SLOT_ORDER_TABLE       @ 08033670 4cefe309  slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef4c
 LAB_08033674:
     adds r5,#0x4    @ 08033674 0435
     adds r6,#0x1    @ 08033676 0136
@@ -17231,7 +17231,7 @@ LAB_08033c38:
     bx r1                                    @ 08033c3c 0847
     .zero  0x2
 find_first_avail_slot_order_tbl:
-    .word  available_slot_order_table     @ 08033c40 60efe309  available slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef60
+    .word  AVAIL_SLOT_ORDER_TABLE         @ 08033c40 60efe309  available slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef60
 
 @ Called by eval_field_spell_equip_activation_candidate (0x080bb9b8, duel_field) and 0x08061e20 (indeg=2) with r0=player_id. Computes the number of available field zones for the player: scans slots 5..9 (5 magic/trap zones), calls check_slot_available_for_card for each and accumulates count in r5. Then if special card 0x16df exists (count_field_copies_of_card > 0), subtracts count_occupied_all_field_zones(player) from the count, clamped to 0 as lower bound. Returns final available zone count. Pure read-only query with no external side effects. Inputs: r0=player_id [0..1]. Returns: r0=u32 count (available field zones [0..5]). Side effects: none. Constants: special_field_card=0x16df (dual field-type special card icid), slot_range=[5..9] (5 magic/trap zone slots), max_zones=5.
 count_available_field_zones_for_player:
@@ -17857,10 +17857,10 @@ eval_slot_target_eligibility_full:
     lsls r0,r2,#0x2    @ 0803409a 9000
     add r0,r9                                @ 0803409c 4844
     lsls r0,r0,#0x2    @ 0803409e 8000
-    ldr r2, DAT_080340bc                     @ 080340a0 064a
+    ldr r2, eval_slot_target_eligibility_full_stride @ 080340a0 064a
     muls r1,r2    @ 080340a2 5143
     adds r0,r0,r1    @ 080340a4 4018
-    ldr r1, DAT_080340c0                     @ 080340a6 0649
+    ldr r1, eval_slot_target_eligibility_full_slots @ 080340a6 0649
     adds r0,r0,r1    @ 080340a8 4018
     ldrh r0,[r0,#0x8]                        @ 080340aa 0089
     cmp r0,#0x0                              @ 080340ac 0028
@@ -17872,10 +17872,10 @@ LAB_080340b6:
     movs r0,#0x0    @ 080340b6 0020
     b LAB_08034114                           @ 080340b8 2ce0
     .zero  0x2
-DAT_080340bc:
-    .word  0x00000868                     @ 080340bc 68080000
-DAT_080340c0:
-    .word  0x0201c510                     @ 080340c0 10c50102
+eval_slot_target_eligibility_full_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080340bc 68080000  inter-player block stride 0x868
+eval_slot_target_eligibility_full_slots:
+    .word  gDuelFieldSlots                @ 080340c0 10c50102
 LAB_080340c4:
     movs r3,#0x0    @ 080340c4 0023
     movs r5,#0x0    @ 080340c6 0025
@@ -17887,7 +17887,7 @@ LAB_080340c8:
     movs r2,#0x1    @ 080340d0 0122
     ands r0,r2    @ 080340d2 1040
     movs r6,#0x0    @ 080340d4 0026
-    ldr r1, DAT_08034124                     @ 080340d6 1349
+    ldr r1, eval_slot_target_eligibility_full_stride_b @ 080340d6 1349
     adds r7,r0,#0x0    @ 080340d8 071c
     muls r7,r1    @ 080340da 4f43
 LAB_080340dc:
@@ -17897,7 +17897,7 @@ LAB_080340dc:
     beq LAB_08034104                         @ 080340e2 0fd0
 LAB_080340e4:
     adds r0,r6,r7    @ 080340e4 f019
-    ldr r1, DAT_08034128                     @ 080340e6 1049
+    ldr r1, eval_slot_target_eligibility_full_slots_b @ 080340e6 1049
     adds r0,r0,r1    @ 080340e8 4018
     ldrh r0,[r0,#0x8]                        @ 080340ea 0089
     cmp r0,#0x0                              @ 080340ec 0028
@@ -17929,40 +17929,40 @@ LAB_08034114:
     pop {r4,r5,r6,r7}                        @ 0803411e f0bc
     pop {r1}                                 @ 08034120 02bc
     bx r1                                    @ 08034122 0847
-DAT_08034124:
-    .word  0x00000868                     @ 08034124 68080000
-DAT_08034128:
-    .word  0x0201c510                     @ 08034128 10c50102
+eval_slot_target_eligibility_full_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034124 68080000
+eval_slot_target_eligibility_full_slots_b:
+    .word  gDuelFieldSlots                @ 08034128 10c50102
 
 @ Checks if card_id matches the effect category stored in the active effect slot at gP1LifePoints+0x10d8 (=0x0201D5B8). Special case: card_id==0x10f4 -> substitute reference card 0x150b for category lookup. General: call classify_card_effect_category(card_id), compare result against [0x0201D5B8]; return 1 if equal, 0 if not. r0=u16 card_id. Returns bool matches_active_effect. indeg=13; core predicate used by duel rule engine across 0x0803xx/0x0805xx/0x0809xx and hub FUN_0804074c. Constants: 0x10f4=special card needing proxy; 0x150b=proxy reference card; 0x0201D5B8=active effect slot category address (gP1LifePoints+0x10d8).
 check_card_matches_active_effect_slot:
     push {r4,r5,lr}                          @ 0803412c 30b5
     adds r5,r0,#0x0    @ 0803412e 051c
-    ldr r0, DAT_0803414c                     @ 08034130 0648
+    ldr r0, check_card_matches_active_effect_umi_cid @ 08034130 0648
     cmp r5,r0                                @ 08034132 8542
     bne LAB_08034158                         @ 08034134 10d1
-    ldr r4, PTR_gP1LifePoints_08034150       @ 08034136 064c
+    ldr r4, check_card_matches_active_effect_gp1lp_a @ 08034136 064c
     subs r0,#0x1c    @ 08034138 1c38
     adds r4,r4,r0    @ 0803413a 2418
-    ldr r0, DAT_08034154                     @ 0803413c 0548
+    ldr r0, check_card_matches_proxy_ocean_cid @ 0803413c 0548
     bl classify_card_effect_category         @ 0803413e fef70bf9
     ldr r1,[r4,#0x0]                         @ 08034142 2168
     cmp r1,r0                                @ 08034144 8142
     bne LAB_08034158                         @ 08034146 07d1
     movs r0,#0x1    @ 08034148 0120
     b LAB_08034170                           @ 0803414a 11e0
-DAT_0803414c:
-    .word  0x000010f4                     @ 0803414c f4100000
-PTR_gP1LifePoints_08034150:
-    .word  gP1LifePoints                  @ 08034150 e0c40102
-DAT_08034154:
-    .word  0x0000150b                     @ 08034154 0b150000
+check_card_matches_active_effect_umi_cid:
+    .word  UMI_CARD_ID                    @ 0803414c f4100000  Umi field spell CID (pw=22702055); special proxy activation
+check_card_matches_active_effect_gp1lp_a:
+    .word  gP1LifePoints                  @ 08034150 e0c40102  gP1LifePoints base for active effect category read
+check_card_matches_proxy_ocean_cid:
+    .word  A_LEGENDARY_OCEAN_CARD_ID      @ 08034154 0b150000  A Legendary Ocean CID (pw=295517); proxy reference for Umi activation
 LAB_08034158:
     adds r0,r5,#0x0    @ 08034158 281c
     bl classify_card_effect_category         @ 0803415a fef7fdf8
     movs r2,#0x0    @ 0803415e 0022
-    ldr r1, PTR_gP1LifePoints_08034178       @ 08034160 0549
-    ldr r3, DAT_0803417c                     @ 08034162 064b
+    ldr r1, check_card_matches_active_effect_gp1lp_b @ 08034160 0549
+    ldr r3, check_card_matches_category_off  @ 08034162 064b
     adds r1,r1,r3    @ 08034164 c918
     ldr r1,[r1,#0x0]                         @ 08034166 0968
     cmp r1,r0                                @ 08034168 8142
@@ -17975,10 +17975,10 @@ LAB_08034170:
     pop {r1}                                 @ 08034172 02bc
     bx r1                                    @ 08034174 0847
     .zero  0x2
-PTR_gP1LifePoints_08034178:
+check_card_matches_active_effect_gp1lp_b:
     .word  gP1LifePoints                  @ 08034178 e0c40102
-DAT_0803417c:
-    .word  0x000010d8                     @ 0803417c d8100000
+check_card_matches_category_off:
+    .word  ACTIVE_EFFECT_CATEGORY_OFF     @ 0803417c d8100000  gP1LifePoints+0x10d8=0x0201D5B8: active effect slot category word; 16 raw refs
 
 @ Medium-frequency utility (indeg=12) for paired effect zone lookup. Checks whether a zone entry paired with the input slot (r0=side, r1=slot_idx) exists. Steps: (1) verify input slot has a card (card_id != 0), else return 0. (2) Outer loop (2 iterations) over two effect zone base offsets. (3) Inner loop (r9=0..9) over 10 slots: checks card_id==0x1368 (target special card), calls query_slot_effect_eligibility_nonzero for active state, calls check_slot_card_pair_allowed to verify 0x1368 card pairs with entry slot card, calls find_effect_node_in_zone to confirm effect node exists. All conditions met -> returns 1. No match found -> returns 0. Read-only. r0=u32 side_flags (bit0=player_side, stored in r8), r1=u16 slot_index [0..0x44] (stored in r7). Returns u32 (1=paired zone entry found, 0=not found). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=0x14, 0x1368=target special card ID, inner loop r9=0..9, outer loop count=2.
 find_paired_zone_entry_for_card:
@@ -17995,10 +17995,10 @@ find_paired_zone_entry_for_card:
     lsls r0,r7,#0x2    @ 08034194 b800
     adds r0,r0,r7    @ 08034196 c019
     lsls r0,r0,#0x2    @ 08034198 8000
-    ldr r2, DAT_080341b0                     @ 0803419a 054a
+    ldr r2, find_paired_zone_entry_for_card_stride @ 0803419a 054a
     muls r1,r2    @ 0803419c 5143
     adds r0,r0,r1    @ 0803419e 4018
-    ldr r1, DAT_080341b4                     @ 080341a0 0449
+    ldr r1, find_paired_zone_entry_for_card_slots @ 080341a0 0449
     adds r0,r0,r1    @ 080341a2 4018
     ldr r0,[r0,#0x0]                         @ 080341a4 0068
     lsls r0,r0,#0x13    @ 080341a6 c004
@@ -18006,10 +18006,10 @@ find_paired_zone_entry_for_card:
     bne LAB_080341bc                         @ 080341aa 07d1
     b LAB_0803427a                           @ 080341ac 65e0
     .zero  0x2
-DAT_080341b0:
-    .word  0x00000868                     @ 080341b0 68080000
-DAT_080341b4:
-    .word  0x0201c510                     @ 080341b4 10c50102
+find_paired_zone_entry_for_card_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080341b0 68080000
+find_paired_zone_entry_for_card_slots:
+    .word  gDuelFieldSlots                @ 080341b4 10c50102
 LAB_080341b8:
     movs r0,#0x1    @ 080341b8 0120
     b LAB_0803427c                           @ 080341ba 5fe0
@@ -18036,12 +18036,12 @@ LAB_080341c0:
     ands r1,r3    @ 080341e2 1940
     .hword 0x4640    @ 080341e4 4046
     ands r0,r3    @ 080341e6 1840
-    ldr r3, DAT_0803428c                     @ 080341e8 284b
+    ldr r3, find_paired_zone_entry_for_card_stride_b @ 080341e8 284b
     adds r2,r0,#0x0    @ 080341ea 021c
     muls r2,r3    @ 080341ec 5a43
     str r2,[sp,#0x4]                         @ 080341ee 0192
     muls r1,r3    @ 080341f0 5943
-    ldr r2, DAT_08034290                     @ 080341f2 274a
+    ldr r2, find_paired_zone_entry_for_card_slots_b @ 080341f2 274a
     adds r0,r1,r2    @ 080341f4 8818
     adds r4,r0,#0x0    @ 080341f6 041c
     adds r4,#0x64    @ 080341f8 6434
@@ -18051,10 +18051,10 @@ LAB_080341fe:
     ldr r0,[r4,#0x0]                         @ 080341fe 2068
     lsls r0,r0,#0x13    @ 08034200 c004
     lsrs r5,r0,#0x13    @ 08034202 c50c
-    ldr r0, DAT_08034294                     @ 08034204 2348
+    ldr r0, find_paired_zone_target_cid      @ 08034204 2348
     cmp r5,r0                                @ 08034206 8542
     bne LAB_08034262                         @ 08034208 2bd1
-    ldr r0, DAT_08034290                     @ 0803420a 2148
+    ldr r0, find_paired_zone_entry_for_card_slots_b @ 0803420a 2148
     adds r0,#0x10    @ 0803420c 1030
     adds r0,r0,r6    @ 0803420e 8019
     ldr r1,[r0,#0x0]                         @ 08034210 0168
@@ -18081,7 +18081,7 @@ LAB_080341fe:
     lsls r0,r0,#0x2    @ 0803423c 8000
     ldr r3,[sp,#0x4]                         @ 0803423e 019b
     adds r0,r0,r3    @ 08034240 c018
-    ldr r1, DAT_08034290                     @ 08034242 1349
+    ldr r1, find_paired_zone_entry_for_card_slots_b @ 08034242 1349
     adds r0,r0,r1    @ 08034244 4018
     ldr r0,[r0,#0x0]                         @ 08034246 0068
     lsls r3,r0,#0x2    @ 08034248 8300
@@ -18121,12 +18121,12 @@ LAB_0803427c:
     pop {r4,r5,r6,r7}                        @ 08034286 f0bc
     pop {r1}                                 @ 08034288 02bc
     bx r1                                    @ 0803428a 0847
-DAT_0803428c:
-    .word  0x00000868                     @ 0803428c 68080000
-DAT_08034290:
-    .word  0x0201c510                     @ 08034290 10c50102
-DAT_08034294:
-    .word  0x00001368                     @ 08034294 68130000
+find_paired_zone_entry_for_card_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803428c 68080000
+find_paired_zone_entry_for_card_slots_b:
+    .word  gDuelFieldSlots                @ 08034290 10c50102
+find_paired_zone_target_cid:
+    .word  SPELL_ZONE_TARGET_CARD_ID      @ 08034294 68130000  cross-player spell-zone effect node type ID
 
 @ Checks whether card(r0=card_data_ptr_or_id) is under effect of spell/trap zone card 0x1368. Returns 0 immediately if r1(zone_type_code)==0. Scans both players' magic/trap slots 5..9 (slot_offset=0x64..0xb4): (1) card_id bits[12:0]==0x1368; (2) equip_flags bit valid and chain not blocked; (3) check_card_pair_allowed([sp+0x0], [r4+0xc]); (4) find_effect_node_in_zone(player, slot, 0x1368, zone_type). All 4 conditions met -> return 1. No match found -> return 0. Read-only. r0=u32 card_data_ptr_or_id (saved at [sp+0x0]), r1=u8 zone_type_code [0..5]. Returns u32 bool (1=targeted by 0x1368 effect, 0=not). Constants: 0x1368=target special card ID, gDuelFieldSlots=0x0201c510, player_stride=0x868, slot5_offset=0x64.
 check_card_targeted_by_spell_zone_effect:
@@ -18154,13 +18154,13 @@ LAB_080342ba:
     .hword 0x4648    @ 080342bc 4846
     .hword 0x4652    @ 080342be 5246
     ands r0,r2    @ 080342c0 1040
-    ldr r1, DAT_08034348                     @ 080342c2 2149
+    ldr r1, check_card_targeted_by_spell_zone_effect_stride @ 080342c2 2149
     muls r1,r0    @ 080342c4 4143
-    ldr r2, DAT_0803434c                     @ 080342c6 214a
+    ldr r2, check_card_targeted_spell_zone_slot_state @ 080342c6 214a
     adds r0,r1,r2    @ 080342c8 8818
     adds r6,r0,#0x0    @ 080342ca 061c
     adds r6,#0x64    @ 080342cc 6436
-    ldr r0, DAT_08034350                     @ 080342ce 2048
+    ldr r0, check_card_targeted_spell_zone_slots @ 080342ce 2048
     adds r1,r1,r0    @ 080342d0 0918
     adds r4,r1,#0x0    @ 080342d2 0c1c
     adds r4,#0x64    @ 080342d4 6434
@@ -18168,7 +18168,7 @@ LAB_080342d6:
     ldr r0,[r4,#0x0]                         @ 080342d6 2068
     lsls r0,r0,#0x13    @ 080342d8 c004
     lsrs r5,r0,#0x13    @ 080342da c50c
-    ldr r0, DAT_08034354                     @ 080342dc 1d48
+    ldr r0, check_card_targeted_spell_zone_cid @ 080342dc 1d48
     cmp r5,r0                                @ 080342de 8542
     bne LAB_08034320                         @ 080342e0 1ed1
     ldr r1,[r6,#0x0]                         @ 080342e2 3168
@@ -18223,14 +18223,14 @@ LAB_08034336:
     pop {r1}                                 @ 08034342 02bc
     bx r1                                    @ 08034344 0847
     .zero  0x2
-DAT_08034348:
-    .word  0x00000868                     @ 08034348 68080000
-DAT_0803434c:
-    .word  0x0201c520                     @ 0803434c 20c50102
-DAT_08034350:
-    .word  0x0201c510                     @ 08034350 10c50102
-DAT_08034354:
-    .word  0x00001368                     @ 08034354 68130000
+check_card_targeted_by_spell_zone_effect_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034348 68080000
+check_card_targeted_spell_zone_slot_state:
+    .word  gDuelFieldSlotState            @ 0803434c 20c50102
+check_card_targeted_spell_zone_slots:
+    .word  gDuelFieldSlots                @ 08034350 10c50102
+check_card_targeted_spell_zone_cid:
+    .word  SPELL_ZONE_TARGET_CARD_ID      @ 08034354 68130000
 
 @ Checks if gDuelFieldSlots[player_side][slot_idx] meets field action eligibility. Verifies slot is occupied (card_id bit9 != 0), else return 0. Checks slot[+0x10] bit21: bit21==1 -> if gDuelActivation[+4]==player_side write [gP1LifePoints+side*0x868+0x1d48]=0x3 return 0; bit21==0 -> run checks: check_slot_card_effect_eligibility / check_slot_card_fieldspell_eligibility / check_value_in_slot_chain(x3) / query_zone_chain_count_with_eligibility / count_equip_chain_default_flags / find_paired_zone_entry_for_card / count_available_effect_zones. All pass return 1, any fail return 0. indeg=6. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, activation_base=0x0201e2a0.
 check_slot_field_action_eligibility:
@@ -18246,10 +18246,10 @@ check_slot_field_action_eligibility:
     lsls r0,r6,#0x2    @ 0803436a b000
     adds r0,r0,r6    @ 0803436c 8019
     lsls r0,r0,#0x2    @ 0803436e 8000
-    ldr r1, DAT_080343a8                     @ 08034370 0d49
+    ldr r1, check_slot_field_action_eligibility_stride @ 08034370 0d49
     muls r1,r2    @ 08034372 5143
     adds r2,r0,r1    @ 08034374 4218
-    ldr r1, DAT_080343ac                     @ 08034376 0d49
+    ldr r1, check_slot_field_action_eligibility_slots @ 08034376 0d49
     adds r7,r2,r1    @ 08034378 5718
     ldr r0,[r7,#0x0]                         @ 0803437a 3868
     lsls r0,r0,#0x13    @ 0803437c c004
@@ -18265,25 +18265,25 @@ LAB_08034384:
     ands r0,r3    @ 0803438e 1840
     cmp r0,#0x0                              @ 08034390 0028
     beq LAB_080343b8                         @ 08034392 11d0
-    ldr r0, DAT_080343b0                     @ 08034394 0648
+    ldr r0, check_slot_field_action_eligibility_ctx @ 08034394 0648
     ldr r0,[r0,#0x4]                         @ 08034396 4068
     cmp r5,r0                                @ 08034398 8542
     beq LAB_0803439e                         @ 0803439a 00d0
     b LAB_080345c6                           @ 0803439c 13e1
 LAB_0803439e:
-    ldr r0, DAT_080343b4                     @ 0803439e 0548
+    ldr r0, check_slot_field_action_activation_off_a @ 0803439e 0548
     adds r1,r1,r0    @ 080343a0 0918
     movs r0,#0x3    @ 080343a2 0320
     str r0,[r1,#0x0]                         @ 080343a4 0860
     b LAB_080345c6                           @ 080343a6 0ee1
-DAT_080343a8:
-    .word  0x00000868                     @ 080343a8 68080000
-DAT_080343ac:
-    .word  0x0201c510                     @ 080343ac 10c50102
-DAT_080343b0:
-    .word  0x0201e2a0                     @ 080343b0 a0e20102
-DAT_080343b4:
-    .word  0x00001d48                     @ 080343b4 481d0000
+check_slot_field_action_eligibility_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080343a8 68080000
+check_slot_field_action_eligibility_slots:
+    .word  gDuelFieldSlots                @ 080343ac 10c50102
+check_slot_field_action_eligibility_ctx:
+    .word  gDuelCardCtxBase               @ 080343b0 a0e20102
+check_slot_field_action_activation_off_a:
+    .word  ACTIVATION_STATE_A_OFF         @ 080343b4 481d0000  gP1LifePoints+side*0x868+0x1d48: activation state field A; 27 raw refs
 LAB_080343b8:
     adds r0,r5,#0x0    @ 080343b8 281c
     adds r1,r6,#0x0    @ 080343ba 311c
@@ -18293,7 +18293,7 @@ LAB_080343b8:
     adds r1,r6,#0x0    @ 080343c4 311c
     bl check_slot_card_fieldspell_eligibility @ 080343c6 02f055f9
     .hword 0x4680    @ 080343ca 8046
-    ldr r2, DAT_0803446c                     @ 080343cc 274a
+    ldr r2, check_slot_field_action_chain_mesmeric_ctrl @ 080343cc 274a
     adds r0,r5,#0x0    @ 080343ce 281c
     movs r1,#0xb    @ 080343d0 0b21
     bl check_value_in_slot_chain             @ 080343d2 fbf75dfc
@@ -18301,7 +18301,7 @@ LAB_080343b8:
     beq LAB_080343dc                         @ 080343d8 00d0
     b LAB_080345b4                           @ 080343da ebe0
 LAB_080343dc:
-    ldr r2, DAT_08034470                     @ 080343dc 244a
+    ldr r2, check_slot_field_action_chain_node_131e @ 080343dc 244a
     adds r0,r5,#0x0    @ 080343de 281c
     movs r1,#0xb    @ 080343e0 0b21
     bl check_value_in_slot_chain             @ 080343e2 fbf755fc
@@ -18309,7 +18309,7 @@ LAB_080343dc:
     beq LAB_080343ec                         @ 080343e8 00d0
     b LAB_080345b4                           @ 080343ea e3e0
 LAB_080343ec:
-    ldr r2, DAT_08034474                     @ 080343ec 214a
+    ldr r2, check_slot_field_action_chain_curse_anubis @ 080343ec 214a
     adds r0,r5,#0x0    @ 080343ee 281c
     adds r1,r6,#0x0    @ 080343f0 311c
     bl check_value_in_slot_chain             @ 080343f2 fbf74dfc
@@ -18317,7 +18317,7 @@ LAB_080343ec:
     beq LAB_080343fc                         @ 080343f8 00d0
     b LAB_080345b4                           @ 080343fa dbe0
 LAB_080343fc:
-    ldr r2, DAT_08034478                     @ 080343fc 1e4a
+    ldr r2, check_slot_field_action_chain_spellbinding @ 080343fc 1e4a
     adds r0,r5,#0x0    @ 080343fe 281c
     adds r1,r6,#0x0    @ 08034400 311c
     bl query_zone_chain_count_with_eligibility @ 08034402 faf7d1ff
@@ -18325,7 +18325,7 @@ LAB_080343fc:
     beq LAB_0803440c                         @ 08034408 00d0
     b LAB_080345b4                           @ 0803440a d3e0
 LAB_0803440c:
-    ldr r2, DAT_0803447c                     @ 0803440c 1b4a
+    ldr r2, check_slot_field_action_chain_shadow_spell @ 0803440c 1b4a
     adds r0,r5,#0x0    @ 0803440e 281c
     adds r1,r6,#0x0    @ 08034410 311c
     bl query_zone_chain_count_with_eligibility @ 08034412 faf7c9ff
@@ -18333,7 +18333,7 @@ LAB_0803440c:
     beq LAB_0803441c                         @ 08034418 00d0
     b LAB_080345b4                           @ 0803441a cbe0
 LAB_0803441c:
-    ldr r2, DAT_08034480                     @ 0803441c 184a
+    ldr r2, check_slot_field_action_chain_nightmare_wheel @ 0803441c 184a
     adds r0,r5,#0x0    @ 0803441e 281c
     adds r1,r6,#0x0    @ 08034420 311c
     bl query_zone_chain_count_with_eligibility @ 08034422 faf7c1ff
@@ -18341,7 +18341,7 @@ LAB_0803441c:
     beq LAB_0803442c                         @ 08034428 00d0
     b LAB_080345b4                           @ 0803442a c3e0
 LAB_0803442c:
-    ldr r2, DAT_08034484                     @ 0803442c 154a
+    ldr r2, check_slot_field_action_chain_flint @ 0803442c 154a
     adds r0,r5,#0x0    @ 0803442e 281c
     adds r1,r6,#0x0    @ 08034430 311c
     bl query_zone_chain_count_with_eligibility @ 08034432 faf7b9ff
@@ -18349,7 +18349,7 @@ LAB_0803442c:
     beq LAB_0803443c                         @ 08034438 00d0
     b LAB_080345b4                           @ 0803443a bbe0
 LAB_0803443c:
-    ldr r2, DAT_08034488                     @ 0803443c 124a
+    ldr r2, check_slot_field_action_chain_unhappy_girl @ 0803443c 124a
     adds r0,r5,#0x0    @ 0803443e 281c
     adds r1,r6,#0x0    @ 08034440 311c
     bl count_equip_chain_default_flags       @ 08034442 faf7a7ff
@@ -18357,7 +18357,7 @@ LAB_0803443c:
     beq LAB_0803444c                         @ 08034448 00d0
     b LAB_080345b4                           @ 0803444a b3e0
 LAB_0803444c:
-    ldr r4, DAT_0803448c                     @ 0803444c 0f4c
+    ldr r4, check_slot_field_action_restrict_cid @ 0803444c 0f4c
     adds r0,r4,#0x0    @ 0803444e 201c
     bl count_field_copies_of_card            @ 08034450 fef7a4f9
     adds r1,r0,#0x0    @ 08034454 011c
@@ -18373,30 +18373,30 @@ LAB_0803444c:
 LAB_08034468:
     b LAB_08034496                           @ 08034468 15e0
     .zero  0x2
-DAT_0803446c:
-    .word  0x000012ce                     @ 0803446c ce120000
-DAT_08034470:
-    .word  0x0000131e                     @ 08034470 1e130000
-DAT_08034474:
-    .word  0x000017b3                     @ 08034474 b3170000
-DAT_08034478:
-    .word  0x00001103                     @ 08034478 03110000
-DAT_0803447c:
-    .word  0x00001243                     @ 0803447c 43120000
-DAT_08034480:
-    .word  0x000014b2                     @ 08034480 b2140000
-DAT_08034484:
-    .word  0x00001842                     @ 08034484 42180000
-DAT_08034488:
-    .word  0x00001743                     @ 08034488 43170000
-DAT_0803448c:
-    .word  0x00001284                     @ 0803448c 84120000
+check_slot_field_action_chain_mesmeric_ctrl:
+    .word  0x000012ce                     @ 0803446c ce120000  Mesmeric Control CID 0x12ce (card_0655)
+check_slot_field_action_chain_node_131e:
+    .word  0x0000131e                     @ 08034470 1e130000  chain effect node type 0x131e; no card-stats entry
+check_slot_field_action_chain_curse_anubis:
+    .word  0x000017b3                     @ 08034474 b3170000  Curse of Anubis CID 0x17b3 (card_1607)
+check_slot_field_action_chain_spellbinding:
+    .word  0x00001103                     @ 08034478 03110000  Spellbinding Circle CID 0x1103 (card_0309)
+check_slot_field_action_chain_shadow_spell:
+    .word  0x00001243                     @ 0803447c 43120000  Shadow Spell CID 0x1243 (card_0544)
+check_slot_field_action_chain_nightmare_wheel:
+    .word  0x000014b2                     @ 08034480 b2140000  Nightmare Wheel CID 0x14b2 (card_0999)
+check_slot_field_action_chain_flint:
+    .word  0x00001842                     @ 08034484 42180000  Flint CID 0x1842 (card_1734)
+check_slot_field_action_chain_unhappy_girl:
+    .word  0x00001743                     @ 08034488 43170000  The Unhappy Girl CID 0x1743 (card_1518)
+check_slot_field_action_restrict_cid:
+    .word  0x00001284                     @ 0803448c 84120000  Thousand-Eyes Restrict CID 0x1284 (card_0594)
 LAB_08034490:
     cmp r1,#0x0                              @ 08034490 0029
     ble LAB_08034496                         @ 08034492 00dd
     b LAB_080345b4                           @ 08034494 8ee0
 LAB_08034496:
-    ldr r0, DAT_08034514                     @ 08034496 1f48
+    ldr r0, check_slot_field_action_dcj_cid  @ 08034496 1f48
     adds r1,r5,#0x0    @ 08034498 291c
     .hword 0x4642    @ 0803449a 4246
     bl count_zones_by_card_and_mode          @ 0803449c fef732fa
@@ -18407,10 +18407,10 @@ LAB_08034496:
     lsls r0,r6,#0x2    @ 080344a8 b000
     adds r0,r0,r6    @ 080344aa 8019
     lsls r0,r0,#0x2    @ 080344ac 8000
-    ldr r1, DAT_08034518                     @ 080344ae 1a49
+    ldr r1, check_slot_field_action_eligibility_stride_b @ 080344ae 1a49
     muls r1,r2    @ 080344b0 5143
     adds r0,r0,r1    @ 080344b2 4018
-    ldr r1, DAT_0803451c                     @ 080344b4 1949
+    ldr r1, check_slot_field_action_eligibility_slots_b @ 080344b4 1949
     adds r0,r0,r1    @ 080344b6 4018
     ldrh r0,[r0,#0x8]                        @ 080344b8 0089
     cmp r0,#0x0                              @ 080344ba 0028
@@ -18423,7 +18423,7 @@ LAB_08034496:
     cmp r0,#0x1                              @ 080344ca 0128
     beq LAB_080345b4                         @ 080344cc 72d0
 LAB_080344ce:
-    ldr r0, DAT_08034520                     @ 080344ce 1448
+    ldr r0, check_slot_field_action_final_atk_ord @ 080344ce 1448
     adds r1,r5,#0x0    @ 080344d0 291c
     .hword 0x4642    @ 080344d2 4246
     bl count_zones_by_card_and_mode          @ 080344d4 fef716fa
@@ -18434,10 +18434,10 @@ LAB_080344ce:
     lsls r0,r6,#0x2    @ 080344e0 b000
     adds r0,r0,r6    @ 080344e2 8019
     lsls r0,r0,#0x2    @ 080344e4 8000
-    ldr r1, DAT_08034518                     @ 080344e6 0c49
+    ldr r1, check_slot_field_action_eligibility_stride_b @ 080344e6 0c49
     muls r1,r2    @ 080344e8 5143
     adds r0,r0,r1    @ 080344ea 4018
-    ldr r1, DAT_0803451c                     @ 080344ec 0b49
+    ldr r1, check_slot_field_action_eligibility_slots_b @ 080344ec 0b49
     adds r0,r0,r1    @ 080344ee 4018
     ldrh r0,[r0,#0x8]                        @ 080344f0 0089
     cmp r0,#0x0                              @ 080344f2 0028
@@ -18448,29 +18448,29 @@ LAB_080344f6:
     bl find_paired_zone_entry_for_card       @ 080344fa fff741fe
     cmp r0,#0x0                              @ 080344fe 0028
     beq LAB_08034530                         @ 08034500 16d0
-    ldr r0, DAT_08034524                     @ 08034502 0848
+    ldr r0, check_slot_field_action_eligibility_ctx_b @ 08034502 0848
     ldr r0,[r0,#0x4]                         @ 08034504 4068
     cmp r5,r0                                @ 08034506 8542
     bne LAB_080345c6                         @ 08034508 5dd1
-    ldr r0, PTR_gP1LifePoints_08034528       @ 0803450a 0748
-    ldr r1, DAT_0803452c                     @ 0803450c 0749
+    ldr r0, check_slot_field_action_gp1lp_a  @ 0803450a 0748
+    ldr r1, check_slot_field_action_activation_off_b @ 0803450c 0749
     adds r0,r0,r1    @ 0803450e 4018
     movs r1,#0x10    @ 08034510 1021
     b LAB_080345c4                           @ 08034512 57e0
-DAT_08034514:
-    .word  0x000010ef                     @ 08034514 ef100000
-DAT_08034518:
-    .word  0x00000868                     @ 08034518 68080000
-DAT_0803451c:
-    .word  0x0201c510                     @ 0803451c 10c50102
-DAT_08034520:
-    .word  0x000015fb                     @ 08034520 fb150000
-DAT_08034524:
-    .word  0x0201e2a0                     @ 08034524 a0e20102
-PTR_gP1LifePoints_08034528:
+check_slot_field_action_dcj_cid:
+    .word  0x000010ef                     @ 08034514 ef100000  Dragon Capture Jar CID 0x10ef (card_0291)
+check_slot_field_action_eligibility_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034518 68080000
+check_slot_field_action_eligibility_slots_b:
+    .word  gDuelFieldSlots                @ 0803451c 10c50102
+check_slot_field_action_final_atk_ord:
+    .word  0x000015fb                     @ 08034520 fb150000  Final Attack Orders CID 0x15fb (card_1255)
+check_slot_field_action_eligibility_ctx_b:
+    .word  gDuelCardCtxBase               @ 08034524 a0e20102
+check_slot_field_action_gp1lp_a:
     .word  gP1LifePoints                  @ 08034528 e0c40102
-DAT_0803452c:
-    .word  0x00001d78                     @ 0803452c 781d0000
+check_slot_field_action_activation_off_b:
+    .word  ACTIVATION_STATE_B_OFF         @ 0803452c 781d0000  gP1LifePoints+side*0x868+0x1d78: activation state field B; 41 raw refs
 LAB_08034530:
     movs r4,#0x1    @ 08034530 0124
     adds r2,r5,#0x0    @ 08034532 2a1c
@@ -18478,10 +18478,10 @@ LAB_08034530:
     lsls r1,r6,#0x2    @ 08034536 b100
     adds r1,r1,r6    @ 08034538 8919
     lsls r1,r1,#0x2    @ 0803453a 8900
-    ldr r0, DAT_080345a0                     @ 0803453c 1848
+    ldr r0, check_slot_field_action_eligibility_stride_c @ 0803453c 1848
     muls r0,r2    @ 0803453e 5043
     adds r1,r1,r0    @ 08034540 0918
-    ldr r0, DAT_080345a4                     @ 08034542 1848
+    ldr r0, check_slot_field_action_eligibility_slots_c @ 08034542 1848
     adds r2,r1,r0    @ 08034544 0a18
     adds r0,#0x10    @ 08034546 1030
     adds r1,r1,r0    @ 08034548 0918
@@ -18497,7 +18497,7 @@ LAB_08034530:
     ands r0,r1    @ 0803455c 0840
     cmp r0,#0x0                              @ 0803455e 0028
     beq LAB_08034570                         @ 08034560 06d0
-    ldr r2, DAT_080345a8                     @ 08034562 114a
+    ldr r2, check_slot_field_action_goblin_atk_force @ 08034562 114a
     adds r0,r5,#0x0    @ 08034564 281c
     adds r1,r6,#0x0    @ 08034566 311c
     bl check_value_in_slot_chain             @ 08034568 fbf792fb
@@ -18510,14 +18510,14 @@ LAB_08034570:
     cmp r0,#0x0                              @ 08034576 0028
     bgt LAB_0803459a                         @ 08034578 0fdc
     subs r4,r4,r5    @ 0803457a 641b
-    ldr r1, DAT_080345ac                     @ 0803457c 0b49
+    ldr r1, check_slot_field_action_gravity_axe @ 0803457c 0b49
     movs r2,#0x1    @ 0803457e 0122
     rsbs r2,r2,#0    @ 08034580 5242
     adds r0,r4,#0x0    @ 08034582 201c
     bl count_available_effect_zones          @ 08034584 fef766f8
     cmp r0,#0x0                              @ 08034588 0028
     bne LAB_080345b4                         @ 0803458a 13d1
-    ldr r1, DAT_080345b0                     @ 0803458c 0849
+    ldr r1, check_slot_field_action_swords_conceal @ 0803458c 0849
     adds r0,r4,#0x0    @ 0803458e 201c
     movs r2,#0x2    @ 08034590 0222
     bl count_equip_set_activatable_slots_for_player @ 08034592 fef7c3fb
@@ -18527,23 +18527,23 @@ LAB_0803459a:
     movs r0,#0x1    @ 0803459a 0120
     b LAB_080345c8                           @ 0803459c 14e0
     .zero  0x2
-DAT_080345a0:
-    .word  0x00000868                     @ 080345a0 68080000
-DAT_080345a4:
-    .word  0x0201c510                     @ 080345a4 10c50102
-DAT_080345a8:
-    .word  0x00001419                     @ 080345a8 19140000
-DAT_080345ac:
-    .word  0x0000165e                     @ 080345ac 5e160000
-DAT_080345b0:
-    .word  0x0000187c                     @ 080345b0 7c180000
+check_slot_field_action_eligibility_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080345a0 68080000
+check_slot_field_action_eligibility_slots_c:
+    .word  gDuelFieldSlots                @ 080345a4 10c50102
+check_slot_field_action_goblin_atk_force:
+    .word  0x00001419                     @ 080345a8 19140000  Goblin Attack Force CID 0x1419 (card_0900)
+check_slot_field_action_gravity_axe:
+    .word  0x0000165e                     @ 080345ac 5e160000  Gravity Axe - Grarl CID 0x165e (card_1334)
+check_slot_field_action_swords_conceal:
+    .word  0x0000187c                     @ 080345b0 7c180000  Swords of Concealing Light CID 0x187c (card_1789)
 LAB_080345b4:
-    ldr r0, DAT_080345d4                     @ 080345b4 0748
+    ldr r0, check_slot_field_action_eligibility_ctx_c @ 080345b4 0748
     ldr r0,[r0,#0x4]                         @ 080345b6 4068
     cmp r5,r0                                @ 080345b8 8542
     bne LAB_080345c6                         @ 080345ba 04d1
-    ldr r0, PTR_gP1LifePoints_080345d8       @ 080345bc 0648
-    ldr r1, DAT_080345dc                     @ 080345be 0749
+    ldr r0, check_slot_field_action_gp1lp_b  @ 080345bc 0648
+    ldr r1, check_slot_field_action_activation_off_b2 @ 080345be 0749
     adds r0,r0,r1    @ 080345c0 4018
     movs r1,#0x12    @ 080345c2 1221
 LAB_080345c4:
@@ -18557,12 +18557,12 @@ LAB_080345c8:
     pop {r4,r5,r6,r7}                        @ 080345ce f0bc
     pop {r1}                                 @ 080345d0 02bc
     bx r1                                    @ 080345d2 0847
-DAT_080345d4:
-    .word  0x0201e2a0                     @ 080345d4 a0e20102
-PTR_gP1LifePoints_080345d8:
+check_slot_field_action_eligibility_ctx_c:
+    .word  gDuelCardCtxBase               @ 080345d4 a0e20102
+check_slot_field_action_gp1lp_b:
     .word  gP1LifePoints                  @ 080345d8 e0c40102
-DAT_080345dc:
-    .word  0x00001d78                     @ 080345dc 781d0000
+check_slot_field_action_activation_off_b2:
+    .word  ACTIVATION_STATE_B_OFF         @ 080345dc 781d0000
 
 @ Checks if gDuelFieldSlots[player_side][slot_idx] allows placing a field spell. Reads slot+0x8 (equip chain head); nonzero -> return 0 (slot occupied by equip chain). Then three gate checks: (1) check_slot_field_action_eligibility(player, slot); (2) check_field_spell_last_warrior_placeable(player); (3) check_field_spell_neo_daedalus_group_placeable(player). Any 0 -> return 0. On pass checks card_id range (Archfiend range 0x164a..0x164f etc.) for extra pair constraints. Final pass return 1. indeg=3. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot+0x8=equip_chain_head.
 check_field_spell_slot_placeable:
@@ -18574,10 +18574,10 @@ check_field_spell_slot_placeable:
     lsls r0,r6,#0x2    @ 080345ea b000
     adds r0,r0,r6    @ 080345ec 8019
     lsls r0,r0,#0x2    @ 080345ee 8000
-    ldr r1, DAT_08034674                     @ 080345f0 2049
+    ldr r1, check_field_spell_slot_placeable_stride @ 080345f0 2049
     muls r1,r2    @ 080345f2 5143
     adds r0,r0,r1    @ 080345f4 4018
-    ldr r1, DAT_08034678                     @ 080345f6 2049
+    ldr r1, check_field_spell_slot_placeable_slots @ 080345f6 2049
     adds r4,r0,r1    @ 080345f8 4418
     ldrh r0,[r4,#0x8]                        @ 080345fa 2089
     cmp r0,#0x0                              @ 080345fc 0028
@@ -18617,15 +18617,15 @@ LAB_08034644:
     lsls r0,r6,#0x2    @ 08034648 b000
     adds r0,r0,r6    @ 0803464a 8019
     lsls r0,r0,#0x2    @ 0803464c 8000
-    ldr r1, DAT_08034674                     @ 0803464e 0949
+    ldr r1, check_field_spell_slot_placeable_stride @ 0803464e 0949
     muls r1,r2    @ 08034650 5143
     adds r0,r0,r1    @ 08034652 4018
-    ldr r1, DAT_08034678                     @ 08034654 0849
+    ldr r1, check_field_spell_slot_placeable_slots @ 08034654 0849
     adds r0,r0,r1    @ 08034656 4018
     ldr r0,[r0,#0x0]                         @ 08034658 0068
     lsls r0,r0,#0x13    @ 0803465a c004
     lsrs r1,r0,#0x13    @ 0803465c c10c
-    ldr r0, DAT_0803467c                     @ 0803465e 0748
+    ldr r0, check_field_spell_slot_placeable_cmax @ 0803465e 0748
     cmp r1,r0                                @ 08034660 8142
     bgt LAB_08034680                         @ 08034662 0ddc
     subs r0,#0x5    @ 08034664 0538
@@ -18636,19 +18636,19 @@ LAB_08034644:
     beq LAB_0803468c                         @ 0803466e 0dd0
     b LAB_080346b6                           @ 08034670 21e0
     .zero  0x2
-DAT_08034674:
-    .word  0x00000868                     @ 08034674 68080000
-DAT_08034678:
-    .word  0x0201c510                     @ 08034678 10c50102
-DAT_0803467c:
-    .word  0x0000164f                     @ 0803467c 4f160000
+check_field_spell_slot_placeable_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034674 68080000
+check_field_spell_slot_placeable_slots:
+    .word  gDuelFieldSlots                @ 08034678 10c50102
+check_field_spell_slot_placeable_cmax:
+    .word  EQUIP_CHAIN_PAIR_CARD_MAX      @ 0803467c 4f160000  max card_id for chain pairing path
 LAB_08034680:
-    ldr r0, DAT_08034688                     @ 08034680 0148
+    ldr r0, check_field_spell_slot_terrorking_cid @ 08034680 0148
     cmp r1,r0                                @ 08034682 8142
     beq LAB_080346aa                         @ 08034684 11d0
     b LAB_080346b6                           @ 08034686 16e0
-DAT_08034688:
-    .word  0x00001691                     @ 08034688 91160000
+check_field_spell_slot_terrorking_cid:
+    .word  0x00001691                     @ 08034688 91160000  Terrorking Archfiend CID 0x1691 (card_1373)
 LAB_0803468c:
     adds r0,r5,#0x0    @ 0803468c 281c
     bl count_paired_slots_with_field5_default @ 0803468e fef701fb
@@ -18665,7 +18665,7 @@ LAB_0803469a:
     bl count_paired_slots_with_field5_default @ 080346a4 fef7f6fa
     b LAB_080346b2                           @ 080346a8 03e0
 LAB_080346aa:
-    ldr r1, DAT_080346c0                     @ 080346aa 0549
+    ldr r1, check_field_spell_slot_placeable_fnptr @ 080346aa 0549
     adds r0,r5,#0x0    @ 080346ac 281c
     bl count_monster_slots_by_fnptr          @ 080346ae fef7b1fd
 LAB_080346b2:
@@ -18678,8 +18678,8 @@ LAB_080346b8:
     pop {r1}                                 @ 080346ba 02bc
     bx r1                                    @ 080346bc 0847
     .zero  0x2
-DAT_080346c0:
-    .word  0x0804aea1                     @ 080346c0 a1ae0408
+check_field_spell_slot_placeable_fnptr:
+    .word  0x0804aea1                     @ 080346c0 a1ae0408  THUMB fn ptr: monster slot predicate at 0x0804aea0; 4 ROM refs
 
 @ Multi-condition monster activation eligibility check for gDuelFieldSlots[player_side][slot_idx]. Reads slot[flags] bit22 (occupation flag); bit22==0 -> return 0. Checks bit23; bit23==1 -> proceed to activation path. bit23==0: reads slot[+0x30] flags extracting bit5/bit1 with slot+0x8 equip chain head for multi-condition filtering. On pass branches by card_id: 0x1723=Twinheaded Beast, 0x14d5=Tyrant Dragon etc. Final pass return 1, fail return 0. indeg=2. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]. Returns u32 0/1. Constants: gP1LifePoints ptr, player_stride=0x868, slot_offset=slot_idx*0x14+0x40, bit22=occupation, bit23=summoned_flag.
 check_slot_monster_activation_eligible:
@@ -18688,13 +18688,13 @@ check_slot_monster_activation_eligible:
     push {r7}                                @ 080346c8 80b4
     adds r6,r0,#0x0    @ 080346ca 061c
     adds r7,r1,#0x0    @ 080346cc 0f1c
-    ldr r5, PTR_gP1LifePoints_08034734       @ 080346ce 194d
+    ldr r5, check_slot_monster_activation_gp1lp @ 080346ce 194d
     lsls r2,r7,#0x2    @ 080346d0 ba00
     adds r2,r2,r7    @ 080346d2 d219
     lsls r2,r2,#0x2    @ 080346d4 9200
     movs r4,#0x1    @ 080346d6 0124
     ands r0,r4    @ 080346d8 2040
-    ldr r1, DAT_08034738                     @ 080346da 1749
+    ldr r1, check_slot_monster_activation_stride @ 080346da 1749
     muls r0,r1    @ 080346dc 4843
     adds r1,r2,r0    @ 080346de 1118
     adds r0,r5,#0x0    @ 080346e0 281c
@@ -18728,57 +18728,57 @@ LAB_080346fa:
     ldr r0,[r5,#0x0]                         @ 08034716 2868
     lsls r0,r0,#0x13    @ 08034718 c004
     lsrs r2,r0,#0x13    @ 0803471a c20c
-    ldr r0, DAT_0803473c                     @ 0803471c 0748
+    ldr r0, check_slot_monster_activation_thb_cid @ 0803471c 0748
     cmp r2,r0                                @ 0803471e 8242
     beq LAB_080347ac                         @ 08034720 44d0
     cmp r2,r0                                @ 08034722 8242
     bgt LAB_0803475c                         @ 08034724 1adc
-    ldr r0, DAT_08034740                     @ 08034726 0648
+    ldr r0, check_slot_monster_activation_td_cid @ 08034726 0648
     cmp r2,r0                                @ 08034728 8242
     beq LAB_080347a2                         @ 0803472a 3ad0
     cmp r2,r0                                @ 0803472c 8242
     bgt LAB_08034744                         @ 0803472e 09dc
     subs r0,#0xc4    @ 08034730 c438
     b LAB_0803474c                           @ 08034732 0be0
-PTR_gP1LifePoints_08034734:
+check_slot_monster_activation_gp1lp:
     .word  gP1LifePoints                  @ 08034734 e0c40102
-DAT_08034738:
-    .word  0x00000868                     @ 08034738 68080000
-DAT_0803473c:
-    .word  0x00001723                     @ 0803473c 23170000
-DAT_08034740:
-    .word  0x000014d5                     @ 08034740 d5140000
+check_slot_monster_activation_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034738 68080000
+check_slot_monster_activation_thb_cid:
+    .word  TWINHEADED_BEAST_CARD_ID       @ 0803473c 23170000  Twinheaded Beast CID (pw=82035781)
+check_slot_monster_activation_td_cid:
+    .word  TYRANT_DRAGON_CARD_ID          @ 08034740 d5140000  Tyrant Dragon CID (pw=94568601)
 LAB_08034744:
-    ldr r0, DAT_08034754                     @ 08034744 0348
+    ldr r0, check_slot_monster_activation_gw_cid @ 08034744 0348
     cmp r2,r0                                @ 08034746 8242
     beq LAB_08034798                         @ 08034748 26d0
-    ldr r0, DAT_08034758                     @ 0803474a 0348
+    ldr r0, check_slot_monster_activation_mataza_cid @ 0803474a 0348
 LAB_0803474c:
     cmp r2,r0                                @ 0803474c 8242
     beq LAB_080347ac                         @ 0803474e 2dd0
     b LAB_080347d0                           @ 08034750 3ee0
     .zero  0x2
-DAT_08034754:
-    .word  0x000014dc                     @ 08034754 dc140000
-DAT_08034758:
-    .word  0x0000170a                     @ 08034758 0a170000
+check_slot_monster_activation_gw_cid:
+    .word  0x000014dc                     @ 08034754 dc140000  Gray Wing CID 0x14dc (card_1036)
+check_slot_monster_activation_mataza_cid:
+    .word  0x0000170a                     @ 08034758 0a170000  Mataza the Zapper CID 0x170a (card_1474, pw=22609617)
 LAB_0803475c:
-    ldr r0, DAT_08034770                     @ 0803475c 0448
+    ldr r0, check_slot_monster_activation_master_monk_cid @ 0803475c 0448
     cmp r2,r0                                @ 0803475e 8242
     beq LAB_080347ac                         @ 08034760 24d0
     cmp r2,r0                                @ 08034762 8242
     bgt LAB_08034778                         @ 08034764 08dc
-    ldr r0, DAT_08034774                     @ 08034766 0348
+    ldr r0, check_slot_monster_activation_mermaid_knight_cid @ 08034766 0348
     cmp r2,r0                                @ 08034768 8242
     beq LAB_0803478c                         @ 0803476a 0fd0
     b LAB_080347d0                           @ 0803476c 30e0
     .zero  0x2
-DAT_08034770:
-    .word  0x000018b9                     @ 08034770 b9180000
-DAT_08034774:
-    .word  0x0000174f                     @ 08034774 4f170000
+check_slot_monster_activation_master_monk_cid:
+    .word  0x000018b9                     @ 08034770 b9180000  Master Monk CID 0x18b9 (card_1833)
+check_slot_monster_activation_mermaid_knight_cid:
+    .word  0x0000174f                     @ 08034774 4f170000  Mermaid Knight CID 0x174f (card_1530)
 LAB_08034778:
-    ldr r0, DAT_08034788                     @ 08034778 0348
+    ldr r0, check_slot_monster_activation_ctd_cid @ 08034778 0348
     cmp r2,r0                                @ 0803477a 8242
     beq LAB_080347ac                         @ 0803477c 16d0
     adds r0,#0xfc    @ 0803477e fc30
@@ -18786,14 +18786,14 @@ LAB_08034778:
     beq LAB_080347b0                         @ 08034782 15d0
     b LAB_080347d0                           @ 08034784 24e0
     .zero  0x2
-DAT_08034788:
-    .word  0x000018fc                     @ 08034788 fc180000
+check_slot_monster_activation_ctd_cid:
+    .word  0x000018fc                     @ 08034788 fc180000  Cyber Twin Dragon CID 0x18fc (card_1885)
 LAB_0803478c:
-    ldr r0, DAT_08034794                     @ 0803478c 0148
+    ldr r0, check_slot_monster_activation_umi_cid @ 0803478c 0148
     bl check_card_matches_active_effect_slot @ 0803478e fff7cdfc
     b LAB_080347a8                           @ 08034792 09e0
-DAT_08034794:
-    .word  0x000010f4                     @ 08034794 f4100000
+check_slot_monster_activation_umi_cid:
+    .word  UMI_CARD_ID                    @ 08034794 f4100000
 LAB_08034798:
     adds r0,r6,#0x0    @ 08034798 301c
     adds r1,r7,#0x0    @ 0803479a 391c
@@ -18813,7 +18813,7 @@ LAB_080347b0:
     bl count_occupied_monster_zones          @ 080347b2 fef7e9fc
     cmp r0,#0x0                              @ 080347b6 0028
     beq LAB_080347d0                         @ 080347b8 0ad0
-    ldr r2, DAT_08034868                     @ 080347ba 2b4a
+    ldr r2, check_slot_monster_activation_equip_refs @ 080347ba 2b4a
     ldr r1,[r5,#0x0]                         @ 080347bc 2968
     lsls r0,r1,#0x2    @ 080347be 8800
     lsrs r0,r0,#0x18    @ 080347c0 000e
@@ -18825,33 +18825,33 @@ LAB_080347b0:
     cmp r1,r0                                @ 080347cc 8142
     beq LAB_080347ac                         @ 080347ce edd0
 LAB_080347d0:
-    ldr r2, DAT_0803486c                     @ 080347d0 264a
+    ldr r2, check_slot_monster_activation_bls_cid @ 080347d0 264a
     adds r0,r6,#0x0    @ 080347d2 301c
     adds r1,r7,#0x0    @ 080347d4 391c
     movs r3,#0x4    @ 080347d6 0423
     bl check_node_in_slot_chain              @ 080347d8 fbf7f2fa
     cmp r0,#0x0                              @ 080347dc 0028
     bne LAB_080347ac                         @ 080347de e5d1
-    ldr r2, DAT_08034870                     @ 080347e0 234a
+    ldr r2, check_slot_monster_activation_twin_swords_cid @ 080347e0 234a
     adds r0,r6,#0x0    @ 080347e2 301c
     adds r1,r7,#0x0    @ 080347e4 391c
     bl query_zone_chain_count_with_eligibility @ 080347e6 faf7dffd
     cmp r0,#0x0                              @ 080347ea 0028
     bne LAB_080347ac                         @ 080347ec ded1
-    ldr r2, DAT_08034874                     @ 080347ee 214a
+    ldr r2, check_slot_monster_activation_double_atk_cid @ 080347ee 214a
     adds r0,r6,#0x0    @ 080347f0 301c
     adds r1,r7,#0x0    @ 080347f2 391c
     bl check_value_in_slot_chain             @ 080347f4 fbf74cfa
     cmp r0,#0x0                              @ 080347f8 0028
     bne LAB_080347ac                         @ 080347fa d7d1
-    ldr r2, DAT_08034878                     @ 080347fc 1e4a
+    ldr r2, check_slot_monster_activation_hero_heart_cid @ 080347fc 1e4a
     adds r0,r6,#0x0    @ 080347fe 301c
     adds r1,r7,#0x0    @ 08034800 391c
     bl check_value_in_slot_chain             @ 08034802 fbf745fa
     cmp r0,#0x0                              @ 08034806 0028
     bne LAB_080347ac                         @ 08034808 d0d1
 LAB_0803480a:
-    ldr r2, DAT_0803487c                     @ 0803480a 1c4a
+    ldr r2, check_slot_monster_activation_diffusion_cid @ 0803480a 1c4a
     adds r0,r6,#0x0    @ 0803480c 301c
     movs r1,#0xb    @ 0803480e 0b21
     bl check_value_in_slot_chain             @ 08034810 fbf73efa
@@ -18862,15 +18862,15 @@ LAB_0803480a:
     lsls r3,r7,#0x2    @ 0803481c bb00
     adds r0,r3,r7    @ 0803481e d819
     lsls r0,r0,#0x2    @ 08034820 8000
-    ldr r1, DAT_08034880                     @ 08034822 1749
+    ldr r1, check_slot_monster_activation_stride_b @ 08034822 1749
     muls r1,r2    @ 08034824 5143
     adds r0,r0,r1    @ 08034826 4018
-    ldr r1, DAT_08034884                     @ 08034828 1649
+    ldr r1, check_slot_monster_activation_slots_b @ 08034828 1649
     adds r0,r0,r1    @ 0803482a 4018
     ldr r0,[r0,#0x0]                         @ 0803482c 0068
     lsls r0,r0,#0x13    @ 0803482e c004
     lsrs r4,r0,#0x13    @ 08034830 c40c
-    ldr r0, DAT_08034888                     @ 08034832 1548
+    ldr r0, check_slot_monster_activation_eh_avian_cid @ 08034832 1548
     adds r5,r3,#0x0    @ 08034834 1d1c
     cmp r4,r0                                @ 08034836 8442
     bne LAB_0803488c                         @ 08034838 28d1
@@ -18894,34 +18894,34 @@ LAB_0803480a:
     movs r1,#0x0    @ 08034862 0021
     b LAB_08034946                           @ 08034864 6fe0
     .zero  0x2
-DAT_08034868:
-    .word  0x0201bb90                     @ 08034868 90bb0102
-DAT_0803486c:
-    .word  0x000016cb                     @ 0803486c cb160000
-DAT_08034870:
-    .word  0x00001661                     @ 08034870 61160000
-DAT_08034874:
-    .word  0x000018cb                     @ 08034874 cb180000
-DAT_08034878:
-    .word  0x000019ab                     @ 08034878 ab190000
-DAT_0803487c:
-    .word  0x000015ff                     @ 0803487c ff150000
-DAT_08034880:
-    .word  0x00000868                     @ 08034880 68080000
-DAT_08034884:
-    .word  0x0201c510                     @ 08034884 10c50102
-DAT_08034888:
-    .word  0x000018a6                     @ 08034888 a6180000
+check_slot_monster_activation_equip_refs:
+    .word  gEquipChainSlotRefs            @ 08034868 90bb0102
+check_slot_monster_activation_bls_cid:
+    .word  0x000016cb                     @ 0803486c cb160000  BLS - Envoy of the Beginning CID 0x16cb (card_1421)
+check_slot_monster_activation_twin_swords_cid:
+    .word  0x00001661                     @ 08034870 61160000  Twin Swords of Flashing Light - Tryce CID 0x1661 (card_1337)
+check_slot_monster_activation_double_atk_cid:
+    .word  0x000018cb                     @ 08034874 cb180000  Double Attack CID 0x18cb (card_1851)
+check_slot_monster_activation_hero_heart_cid:
+    .word  0x000019ab                     @ 08034878 ab190000  Hero Heart CID 0x19ab (card_2020)
+check_slot_monster_activation_diffusion_cid:
+    .word  0x000015ff                     @ 0803487c ff150000  Diffusion Wave-Motion CID 0x15ff (card_1260)
+check_slot_monster_activation_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034880 68080000
+check_slot_monster_activation_slots_b:
+    .word  gDuelFieldSlots                @ 08034884 10c50102
+check_slot_monster_activation_eh_avian_cid:
+    .word  0x000018a6                     @ 08034888 a6180000  Elemental Hero Avian CID 0x18a6 (card_1813)
 LAB_0803488c:
     movs r3,#0x1    @ 0803488c 0123
     adds r2,r6,#0x0    @ 0803488e 321c
     ands r2,r3    @ 08034890 1a40
     adds r1,r5,r7    @ 08034892 e919
     lsls r1,r1,#0x2    @ 08034894 8900
-    ldr r0, DAT_080348dc                     @ 08034896 1148
+    ldr r0, check_slot_monster_activation_stride_c @ 08034896 1148
     muls r0,r2    @ 08034898 5043
     adds r1,r1,r0    @ 0803489a 0918
-    ldr r0, DAT_080348e0                     @ 0803489c 1048
+    ldr r0, check_slot_monster_activation_slots_c @ 0803489c 1048
     adds r2,r1,r0    @ 0803489e 0a18
     adds r0,#0x10    @ 080348a0 1030
     adds r1,r1,r0    @ 080348a2 0918
@@ -18940,31 +18940,31 @@ LAB_0803488c:
     ldr r0,[r2,#0x0]                         @ 080348bc 1068
     lsls r0,r0,#0x13    @ 080348be c004
     lsrs r5,r0,#0x13    @ 080348c0 c50c
-    ldr r0, DAT_080348e4                     @ 080348c2 0848
+    ldr r0, check_slot_monster_activation_asbk_cid @ 080348c2 0848
     cmp r5,r0                                @ 080348c4 8542
     beq LAB_08034918                         @ 080348c6 27d0
     cmp r5,r0                                @ 080348c8 8542
     bgt LAB_080348f0                         @ 080348ca 11dc
-    ldr r0, DAT_080348e8                     @ 080348cc 0648
+    ldr r0, check_slot_monster_activation_asura_priest_cid_a @ 080348cc 0648
     cmp r5,r0                                @ 080348ce 8542
     beq LAB_08034904                         @ 080348d0 18d0
-    ldr r0, DAT_080348ec                     @ 080348d2 0648
+    ldr r0, check_slot_monster_activation_berserk_dragon_cid @ 080348d2 0648
     cmp r5,r0                                @ 080348d4 8542
     beq LAB_08034904                         @ 080348d6 15d0
     b LAB_08034950                           @ 080348d8 3ae0
     .zero  0x2
-DAT_080348dc:
-    .word  0x00000868                     @ 080348dc 68080000
-DAT_080348e0:
-    .word  0x0201c510                     @ 080348e0 10c50102
-DAT_080348e4:
-    .word  0x0000186c                     @ 080348e4 6c180000
-DAT_080348e8:
-    .word  0x00001505                     @ 080348e8 05150000
-DAT_080348ec:
-    .word  0x00001644                     @ 080348ec 44160000
+check_slot_monster_activation_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080348dc 68080000
+check_slot_monster_activation_slots_c:
+    .word  gDuelFieldSlots                @ 080348e0 10c50102
+check_slot_monster_activation_asbk_cid:
+    .word  ARMED_SAMURAI_BEN_KEI_CARD_ID  @ 080348e4 6c180000  Armed Samurai - Ben Kei CID (pw=84430950)
+check_slot_monster_activation_asura_priest_cid_a:
+    .word  0x00001505                     @ 080348e8 05150000  Asura Priest CID 0x1505 (card_1072)
+check_slot_monster_activation_berserk_dragon_cid:
+    .word  0x00001644                     @ 080348ec 44160000  Berserk Dragon CID 0x1644 (card_1309)
 LAB_080348f0:
-    ldr r0, DAT_08034900                     @ 080348f0 0348
+    ldr r0, check_slot_monster_activation_eh_wildedge_cid @ 080348f0 0348
     cmp r5,r0                                @ 080348f2 8542
     beq LAB_08034904                         @ 080348f4 06d0
     adds r0,#0x69    @ 080348f6 6930
@@ -18972,18 +18972,18 @@ LAB_080348f0:
     beq LAB_0803492e                         @ 080348fa 18d0
     b LAB_08034950                           @ 080348fc 28e0
     .zero  0x2
-DAT_08034900:
-    .word  0x00001958                     @ 08034900 58190000
+check_slot_monster_activation_eh_wildedge_cid:
+    .word  0x00001958                     @ 08034900 58190000  Elemental Hero Wildedge CID 0x1958 (card_1959)
 LAB_08034904:
-    ldr r2, DAT_08034914                     @ 08034904 034a
+    ldr r2, check_slot_monster_activation_asura_priest_cid_b @ 08034904 034a
     adds r0,r6,#0x0    @ 08034906 301c
     adds r1,r7,#0x0    @ 08034908 391c
     bl get_node_entity_id_in_slot            @ 0803490a fbf7a9fa
     cmp r0,#0x0                              @ 0803490e 0028
     beq LAB_08034950                         @ 08034910 1ed0
     b LAB_080347ac                           @ 08034912 4be7
-DAT_08034914:
-    .word  0x00001505                     @ 08034914 05150000
+check_slot_monster_activation_asura_priest_cid_b:
+    .word  0x00001505                     @ 08034914 05150000  Asura Priest CID 0x1505 second ref (card_1072)
 LAB_08034918:
     adds r0,r6,#0x0    @ 08034918 301c
     adds r1,r7,#0x0    @ 0803491a 391c
@@ -19082,10 +19082,10 @@ check_slot_card_activatable:
     lsls r0,r4,#0x2    @ 080349c2 a000
     adds r0,r0,r4    @ 080349c4 0019
     lsls r0,r0,#0x2    @ 080349c6 8000
-    ldr r1, DAT_080349f8                     @ 080349c8 0b49
+    ldr r1, check_slot_card_activatable_stride @ 080349c8 0b49
     muls r1,r2    @ 080349ca 5143
     adds r3,r0,r1    @ 080349cc 4318
-    ldr r6, DAT_080349fc                     @ 080349ce 0b4e
+    ldr r6, check_slot_card_activatable_slots @ 080349ce 0b4e
     adds r1,r3,r6    @ 080349d0 9919
     ldr r0,[r1,#0x0]                         @ 080349d2 0868
     lsls r0,r0,#0x13    @ 080349d4 c004
@@ -19098,22 +19098,22 @@ check_slot_card_activatable:
     ldrh r0,[r1,#0x6]                        @ 080349e2 c888
     cmp r0,#0x0                              @ 080349e4 0028
     beq LAB_08034a32                         @ 080349e6 24d0
-    ldr r0, DAT_08034a00                     @ 080349e8 0548
+    ldr r0, check_slot_card_activatable_tds_cid @ 080349e8 0548
     cmp r2,r0                                @ 080349ea 8242
     beq LAB_08034a08                         @ 080349ec 0cd0
-    ldr r0, DAT_08034a04                     @ 080349ee 0548
+    ldr r0, check_slot_card_activatable_erb_cid @ 080349ee 0548
     cmp r2,r0                                @ 080349f0 8242
     beq LAB_08034a1a                         @ 080349f2 12d0
     b LAB_08034a4a                           @ 080349f4 29e0
     .zero  0x2
-DAT_080349f8:
-    .word  0x00000868                     @ 080349f8 68080000
-DAT_080349fc:
-    .word  0x0201c510                     @ 080349fc 10c50102
-DAT_08034a00:
-    .word  0x000012b4                     @ 08034a00 b4120000
-DAT_08034a04:
-    .word  0x00001956                     @ 08034a04 56190000
+check_slot_card_activatable_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080349f8 68080000
+check_slot_card_activatable_slots:
+    .word  gDuelFieldSlots                @ 080349fc 10c50102
+check_slot_card_activatable_tds_cid:
+    .word  TOTAL_DEFENSE_SHOGUN_CARD_ID   @ 08034a00 b4120000  Total Defense Shogun CID (pw=75372290); slot[+0x10] bit5 activation
+check_slot_card_activatable_erb_cid:
+    .word  EHERO_RAMPART_BLASTER_CARD_ID  @ 08034a04 56190000  E-Hero Rampart Blaster CID (pw=47737087); inverted bit5 + zone count
 LAB_08034a08:
     adds r0,r6,#0x0    @ 08034a08 301c
     adds r0,#0x10    @ 08034a0a 1030
@@ -19176,10 +19176,10 @@ check_slot_full_activation_eligibility:
     lsls r1,r6,#0x2    @ 08034a72 b100
     adds r1,r1,r6    @ 08034a74 8919
     lsls r1,r1,#0x2    @ 08034a76 8900
-    ldr r0, DAT_08034acc                     @ 08034a78 1448
+    ldr r0, check_slot_full_activation_eligibility_stride @ 08034a78 1448
     muls r0,r2    @ 08034a7a 5043
     adds r1,r1,r0    @ 08034a7c 0918
-    ldr r4, DAT_08034ad0                     @ 08034a7e 144c
+    ldr r4, check_slot_full_activation_eligibility_slots @ 08034a7e 144c
     adds r2,r1,r4    @ 08034a80 0a19
     str r2,[sp,#0x28]                        @ 08034a82 0a92
     ldr r0,[r2,#0x0]                         @ 08034a84 1068
@@ -19206,26 +19206,26 @@ LAB_08034aaa:
     bl find_paired_zone_entry_for_card       @ 08034aae fff767fb
     cmp r0,#0x0                              @ 08034ab2 0028
     beq LAB_08034adc                         @ 08034ab4 12d0
-    ldr r0, DAT_08034ad4                     @ 08034ab6 0748
+    ldr r0, check_slot_full_activation_eligibility_ctx @ 08034ab6 0748
     ldr r0,[r0,#0x4]                         @ 08034ab8 4068
     cmp r5,r0                                @ 08034aba 8542
     beq LAB_08034ac0                         @ 08034abc 00d0
     b LAB_08035292                           @ 08034abe e8e3
 LAB_08034ac0:
-    ldr r3, DAT_08034ad8                     @ 08034ac0 054b
+    ldr r3, check_slot_full_activation_off_a @ 08034ac0 054b
     adds r1,r4,r3    @ 08034ac2 e118
     movs r0,#0x10    @ 08034ac4 1020
     str r0,[r1,#0x0]                         @ 08034ac6 0860
     b LAB_08035292                           @ 08034ac8 e3e3
     .zero  0x2
-DAT_08034acc:
-    .word  0x00000868                     @ 08034acc 68080000
-DAT_08034ad0:
-    .word  0x0201c510                     @ 08034ad0 10c50102
-DAT_08034ad4:
-    .word  0x0201e2a0                     @ 08034ad4 a0e20102
-DAT_08034ad8:
-    .word  0x00001d48                     @ 08034ad8 481d0000
+check_slot_full_activation_eligibility_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034acc 68080000
+check_slot_full_activation_eligibility_slots:
+    .word  gDuelFieldSlots                @ 08034ad0 10c50102
+check_slot_full_activation_eligibility_ctx:
+    .word  gDuelCardCtxBase               @ 08034ad4 a0e20102
+check_slot_full_activation_off_a:
+    .word  ACTIVATION_STATE_A_OFF         @ 08034ad8 481d0000
 LAB_08034adc:
     adds r0,r5,#0x0    @ 08034adc 281c
     adds r1,r6,#0x0    @ 08034ade 311c
@@ -19245,7 +19245,7 @@ LAB_08034adc:
     adds r1,r6,#0x0    @ 08034afe 311c
     bl check_slot_card_fieldspell_eligibility @ 08034b00 01f0b8fd
     str r0,[sp,#0x38]                        @ 08034b04 0e90
-    ldr r2, DAT_08034e04                     @ 08034b06 bf4a
+    ldr r2, check_slot_full_activation_ekibyo_cid @ 08034b06 bf4a
     adds r0,r5,#0x0    @ 08034b08 281c
     adds r1,r6,#0x0    @ 08034b0a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b0c faf74cfc
@@ -19253,7 +19253,7 @@ LAB_08034adc:
     beq LAB_08034b16                         @ 08034b12 00d0
     b exit_slot_activation_with_state_write  @ 08034b14 b4e3
 LAB_08034b16:
-    ldr r2, DAT_08034e08                     @ 08034b16 bc4a
+    ldr r2, check_slot_full_activation_mask_acc_cid @ 08034b16 bc4a
     adds r0,r5,#0x0    @ 08034b18 281c
     adds r1,r6,#0x0    @ 08034b1a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b1c faf744fc
@@ -19261,7 +19261,7 @@ LAB_08034b16:
     beq LAB_08034b26                         @ 08034b22 00d0
     b exit_slot_activation_with_state_write  @ 08034b24 ace3
 LAB_08034b26:
-    ldr r2, DAT_08034e0c                     @ 08034b26 b94a
+    ldr r2, check_slot_full_activation_flint_cid @ 08034b26 b94a
     adds r0,r5,#0x0    @ 08034b28 281c
     adds r1,r6,#0x0    @ 08034b2a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b2c faf73cfc
@@ -19269,7 +19269,7 @@ LAB_08034b26:
     beq LAB_08034b36                         @ 08034b32 00d0
     b exit_slot_activation_with_state_write  @ 08034b34 a4e3
 LAB_08034b36:
-    ldr r2, DAT_08034e10                     @ 08034b36 b64a
+    ldr r2, check_slot_full_activation_spellbinding_cid @ 08034b36 b64a
     adds r0,r5,#0x0    @ 08034b38 281c
     adds r1,r6,#0x0    @ 08034b3a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b3c faf734fc
@@ -19277,7 +19277,7 @@ LAB_08034b36:
     beq LAB_08034b46                         @ 08034b42 00d0
     b exit_slot_activation_with_state_write  @ 08034b44 9ce3
 LAB_08034b46:
-    ldr r2, DAT_08034e14                     @ 08034b46 b34a
+    ldr r2, check_slot_full_activation_shadow_spell_cid @ 08034b46 b34a
     adds r0,r5,#0x0    @ 08034b48 281c
     adds r1,r6,#0x0    @ 08034b4a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b4c faf72cfc
@@ -19285,7 +19285,7 @@ LAB_08034b46:
     beq LAB_08034b56                         @ 08034b52 00d0
     b exit_slot_activation_with_state_write  @ 08034b54 94e3
 LAB_08034b56:
-    ldr r2, DAT_08034e18                     @ 08034b56 b04a
+    ldr r2, check_slot_full_activation_nightmare_wheel_cid @ 08034b56 b04a
     adds r0,r5,#0x0    @ 08034b58 281c
     adds r1,r6,#0x0    @ 08034b5a 311c
     bl query_zone_chain_count_with_eligibility @ 08034b5c faf724fc
@@ -19300,7 +19300,7 @@ LAB_08034b66:
     bgt LAB_08034b82                         @ 08034b6e 08dc
     .hword 0x4642    @ 08034b70 4246
     subs r0,r2,r5    @ 08034b72 501b
-    ldr r1, DAT_08034e1c                     @ 08034b74 a949
+    ldr r1, check_slot_full_activation_wrl_atk_thresh @ 08034b74 a949
     ldr r2,[sp,#0x34]                        @ 08034b76 0d9a
     bl count_equip_slots_meeting_atk_threshold @ 08034b78 fef752f9
     cmp r0,#0x0                              @ 08034b7c 0028
@@ -19335,7 +19335,7 @@ LAB_08034b9e:
     beq LAB_08034bba                         @ 08034bb6 00d0
     b exit_slot_activation_with_state_write  @ 08034bb8 62e3
 LAB_08034bba:
-    ldr r0, DAT_08034e20                     @ 08034bba 9948
+    ldr r0, check_slot_full_activation_vbs_cid @ 08034bba 9948
     adds r1,r5,#0x0    @ 08034bbc 291c
     .hword 0x4652    @ 08034bbe 5246
     bl count_zones_by_card_and_mode          @ 08034bc0 fdf7a0fe
@@ -19367,7 +19367,7 @@ LAB_08034bf0:
     ldr r4,[sp,#0x30]                        @ 08034bf0 0c9c
     cmp r4,#0x3                              @ 08034bf2 032c
     ble LAB_08034c06                         @ 08034bf4 07dd
-    ldr r0, DAT_08034e24                     @ 08034bf6 8b48
+    ldr r0, check_slot_full_activation_gravity_bind_cid @ 08034bf6 8b48
     adds r1,r5,#0x0    @ 08034bf8 291c
     ldr r2,[sp,#0x38]                        @ 08034bfa 0e9a
     bl count_zones_by_card_and_mode          @ 08034bfc fdf782fe
@@ -19375,7 +19375,7 @@ LAB_08034bf0:
     beq LAB_08034c06                         @ 08034c02 00d0
     b exit_slot_activation_with_state_write  @ 08034c04 3ce3
 LAB_08034c06:
-    ldr r4, DAT_08034e28                     @ 08034c06 884c
+    ldr r4, check_slot_full_activation_dark_door_cid @ 08034c06 884c
     adds r0,r4,#0x0    @ 08034c08 201c
     bl count_field_copies_of_card            @ 08034c0a fdf7c7fd
     cmp r0,#0x0                              @ 08034c0e 0028
@@ -19408,7 +19408,7 @@ LAB_08034c38:
     beq LAB_08034c4a                         @ 08034c46 00d0
     b exit_slot_activation_with_state_write  @ 08034c48 1ae3
 LAB_08034c4a:
-    ldr r2, DAT_08034e2c                     @ 08034c4a 784a
+    ldr r2, check_slot_full_activation_chain_128a @ 08034c4a 784a
     adds r0,r5,#0x0    @ 08034c4c 281c
     adds r1,r6,#0x0    @ 08034c4e 311c
     bl count_equip_chain_default_flags       @ 08034c50 faf7a0fb
@@ -19416,7 +19416,7 @@ LAB_08034c4a:
     beq LAB_08034c5a                         @ 08034c56 00d0
     b exit_slot_activation_with_state_write  @ 08034c58 12e3
 LAB_08034c5a:
-    ldr r2, DAT_08034e30                     @ 08034c5a 754a
+    ldr r2, check_slot_full_activation_unhappy_girl_cid @ 08034c5a 754a
     adds r0,r5,#0x0    @ 08034c5c 281c
     adds r1,r6,#0x0    @ 08034c5e 311c
     bl count_equip_chain_default_flags       @ 08034c60 faf798fb
@@ -19424,7 +19424,7 @@ LAB_08034c5a:
     beq LAB_08034c6a                         @ 08034c66 00d0
     b exit_slot_activation_with_state_write  @ 08034c68 0ae3
 LAB_08034c6a:
-    ldr r4, DAT_08034e34                     @ 08034c6a 724c
+    ldr r4, check_slot_full_activation_restrict_cid @ 08034c6a 724c
     adds r0,r4,#0x0    @ 08034c6c 201c
     bl count_field_copies_of_card            @ 08034c6e fdf795fd
     cmp r7,r4                                @ 08034c72 a742
@@ -19438,20 +19438,20 @@ LAB_08034c7e:
     movs r1,#0x1    @ 08034c7e 0121
     .hword 0x4688    @ 08034c80 8846
     subs r0,r1,r5    @ 08034c82 481b
-    ldr r1, DAT_08034e38                     @ 08034c84 6c49
+    ldr r1, check_slot_full_activation_btm_cid @ 08034c84 6c49
     movs r2,#0x1    @ 08034c86 0122
     rsbs r2,r2,#0    @ 08034c88 5242
     bl count_available_effect_zones          @ 08034c8a fdf7e3fc
     cmp r0,#0x0                              @ 08034c8e 0028
     beq LAB_08034cce                         @ 08034c90 1dd0
-    ldr r3, PTR_gP1LifePoints_08034e3c       @ 08034c92 6a4b
+    ldr r3, check_slot_full_activation_gp1lp_a @ 08034c92 6a4b
     lsls r1,r6,#0x2    @ 08034c94 b100
     adds r1,r1,r6    @ 08034c96 8919
     lsls r1,r1,#0x2    @ 08034c98 8900
     adds r0,r5,#0x0    @ 08034c9a 281c
     .hword 0x4642    @ 08034c9c 4246
     ands r0,r2    @ 08034c9e 1040
-    ldr r2, DAT_08034e40                     @ 08034ca0 674a
+    ldr r2, check_slot_full_activation_stride_d @ 08034ca0 674a
     muls r0,r2    @ 08034ca2 5043
     adds r1,r1,r0    @ 08034ca4 0918
     adds r3,#0x40    @ 08034ca6 4033
@@ -19477,7 +19477,7 @@ LAB_08034cc4:
     beq LAB_08034cce                         @ 08034cca 00d0
     b exit_slot_activation_with_state_write  @ 08034ccc d8e2
 LAB_08034cce:
-    ldr r2, DAT_08034e44                     @ 08034cce 5d4a
+    ldr r2, check_slot_full_activation_level_mod_cid @ 08034cce 5d4a
     adds r0,r5,#0x0    @ 08034cd0 281c
     adds r1,r6,#0x0    @ 08034cd2 311c
     bl check_value_in_slot_chain             @ 08034cd4 faf7dcff
@@ -19485,7 +19485,7 @@ LAB_08034cce:
     beq LAB_08034cde                         @ 08034cda 00d0
     b exit_slot_activation_with_state_write  @ 08034cdc d0e2
 LAB_08034cde:
-    ldr r2, DAT_08034e48                     @ 08034cde 5a4a
+    ldr r2, check_slot_full_activation_chain_1208 @ 08034cde 5a4a
     adds r0,r5,#0x0    @ 08034ce0 281c
     adds r1,r6,#0x0    @ 08034ce2 311c
     bl check_value_in_slot_chain             @ 08034ce4 faf7d4ff
@@ -19493,7 +19493,7 @@ LAB_08034cde:
     beq LAB_08034cee                         @ 08034cea 00d0
     b exit_slot_activation_with_state_write  @ 08034cec c8e2
 LAB_08034cee:
-    ldr r2, DAT_08034e4c                     @ 08034cee 574a
+    ldr r2, check_slot_full_activation_tribute_doll_cid @ 08034cee 574a
     adds r0,r5,#0x0    @ 08034cf0 281c
     adds r1,r6,#0x0    @ 08034cf2 311c
     bl check_value_in_slot_chain             @ 08034cf4 faf7ccff
@@ -19501,7 +19501,7 @@ LAB_08034cee:
     beq LAB_08034cfe                         @ 08034cfa 00d0
     b exit_slot_activation_with_state_write  @ 08034cfc c0e2
 LAB_08034cfe:
-    ldr r2, DAT_08034e50                     @ 08034cfe 544a
+    ldr r2, check_slot_full_activation_puppet_master_cid @ 08034cfe 544a
     adds r0,r5,#0x0    @ 08034d00 281c
     adds r1,r6,#0x0    @ 08034d02 311c
     bl check_value_in_slot_chain             @ 08034d04 faf7c4ff
@@ -19518,7 +19518,7 @@ LAB_08034d0e:
     beq LAB_08034d20                         @ 08034d1c 00d0
     b exit_slot_activation_with_state_write  @ 08034d1e afe2
 LAB_08034d20:
-    ldr r2, DAT_08034e54                     @ 08034d20 4c4a
+    ldr r2, check_slot_full_activation_silent_fiend_cid @ 08034d20 4c4a
     adds r0,r5,#0x0    @ 08034d22 281c
     adds r1,r6,#0x0    @ 08034d24 311c
     bl check_value_in_slot_chain             @ 08034d26 faf7b3ff
@@ -19526,7 +19526,7 @@ LAB_08034d20:
     beq LAB_08034d30                         @ 08034d2c 00d0
     b exit_slot_activation_with_state_write  @ 08034d2e a7e2
 LAB_08034d30:
-    ldr r2, DAT_08034e58                     @ 08034d30 494a
+    ldr r2, check_slot_full_activation_magicians_unite_cid @ 08034d30 494a
     adds r0,r5,#0x0    @ 08034d32 281c
     adds r1,r6,#0x0    @ 08034d34 311c
     movs r3,#0x0    @ 08034d36 0023
@@ -19535,7 +19535,7 @@ LAB_08034d30:
     beq LAB_08034d42                         @ 08034d3e 00d0
     b exit_slot_activation_with_state_write  @ 08034d40 9ee2
 LAB_08034d42:
-    ldr r2, DAT_08034e5c                     @ 08034d42 464a
+    ldr r2, check_slot_full_activation_union_attack_cid @ 08034d42 464a
     adds r0,r5,#0x0    @ 08034d44 281c
     adds r1,r6,#0x0    @ 08034d46 311c
     movs r3,#0x1    @ 08034d48 0123
@@ -19544,7 +19544,7 @@ LAB_08034d42:
     beq LAB_08034d54                         @ 08034d50 00d0
     b exit_slot_activation_with_state_write  @ 08034d52 95e2
 LAB_08034d54:
-    ldr r4, DAT_08034e60                     @ 08034d54 424c
+    ldr r4, check_slot_full_activation_diffusion_cid @ 08034d54 424c
     adds r0,r5,#0x0    @ 08034d56 281c
     movs r1,#0xb    @ 08034d58 0b21
     adds r2,r4,#0x0    @ 08034d5a 221c
@@ -19559,7 +19559,7 @@ LAB_08034d54:
     bne LAB_08034d74                         @ 08034d70 00d1
     b exit_slot_activation_with_state_write  @ 08034d72 85e2
 LAB_08034d74:
-    ldr r4, DAT_08034e64                     @ 08034d74 3b4c
+    ldr r4, check_slot_full_activation_feather_shot_cid @ 08034d74 3b4c
     .hword 0x46a1    @ 08034d76 a146
     adds r0,r5,#0x0    @ 08034d78 281c
     movs r1,#0xb    @ 08034d7a 0b21
@@ -19573,10 +19573,10 @@ LAB_08034d74:
     lsls r0,r6,#0x2    @ 08034d8c b000
     adds r0,r0,r6    @ 08034d8e 8019
     lsls r0,r0,#0x2    @ 08034d90 8000
-    ldr r1, DAT_08034e40                     @ 08034d92 2b49
+    ldr r1, check_slot_full_activation_stride_d @ 08034d92 2b49
     muls r1,r2    @ 08034d94 5143
     adds r0,r0,r1    @ 08034d96 4018
-    ldr r1, DAT_08034e68                     @ 08034d98 3349
+    ldr r1, check_slot_full_activation_slots_d @ 08034d98 3349
     adds r0,r0,r1    @ 08034d9a 4018
     ldr r0,[r0,#0x0]                         @ 08034d9c 0068
     lsls r4,r0,#0x2    @ 08034d9e 8400
@@ -19593,14 +19593,14 @@ LAB_08034d74:
     beq LAB_08034dba                         @ 08034db6 00d0
     b exit_slot_activation_with_state_write  @ 08034db8 62e2
 LAB_08034dba:
-    ldr r0, DAT_08034e6c                     @ 08034dba 2c48
+    ldr r0, check_slot_full_activation_metal_reflect_cid @ 08034dba 2c48
     cmp r7,r0                                @ 08034dbc 8742
     bne LAB_08034dc2                         @ 08034dbe 00d1
     b exit_slot_activation_with_state_write  @ 08034dc0 5ee2
 LAB_08034dc2:
     cmp r7,r0                                @ 08034dc2 8742
     bgt LAB_08034e8c                         @ 08034dc4 62dc
-    ldr r0, DAT_08034e70                     @ 08034dc6 2a48
+    ldr r0, check_slot_full_activation_redeyes_cid @ 08034dc6 2a48
     cmp r7,r0                                @ 08034dc8 8742
     bne LAB_08034dce                         @ 08034dca 00d1
     b LAB_08034ed6                           @ 08034dcc 83e0
@@ -19617,7 +19617,7 @@ LAB_08034dda:
     bge LAB_08034de2                         @ 08034dde 00da
     b LAB_08034fa4                           @ 08034de0 e0e0
 LAB_08034de2:
-    ldr r4, DAT_08034e74                     @ 08034de2 244c
+    ldr r4, check_slot_full_activation_burst_stream_cid @ 08034de2 244c
     adds r0,r5,#0x0    @ 08034de4 281c
     adds r1,r6,#0x0    @ 08034de6 311c
     adds r2,r4,#0x0    @ 08034de8 221c
@@ -19633,66 +19633,66 @@ LAB_08034de2:
     b exit_slot_activation_with_state_write  @ 08034e00 3ee2
 LAB_08034e02:
     b LAB_08034ec8                           @ 08034e02 61e0
-DAT_08034e04:
-    .word  0x0000149d                     @ 08034e04 9d140000
-DAT_08034e08:
-    .word  0x000013f3                     @ 08034e08 f3130000
-DAT_08034e0c:
-    .word  0x00001842                     @ 08034e0c 42180000
-DAT_08034e10:
-    .word  0x00001103                     @ 08034e10 03110000
-DAT_08034e14:
-    .word  0x00001243                     @ 08034e14 43120000
-DAT_08034e18:
-    .word  0x000014b2                     @ 08034e18 b2140000
-DAT_08034e1c:
-    .word  0x00001766                     @ 08034e1c 66170000
-DAT_08034e20:
-    .word  0x000014a1                     @ 08034e20 a1140000
-DAT_08034e24:
-    .word  0x0000140e                     @ 08034e24 0e140000
-DAT_08034e28:
-    .word  0x00001469                     @ 08034e28 69140000
-DAT_08034e2c:
-    .word  0x0000128a                     @ 08034e2c 8a120000
-DAT_08034e30:
-    .word  0x00001743                     @ 08034e30 43170000
-DAT_08034e34:
-    .word  0x00001284                     @ 08034e34 84120000
-DAT_08034e38:
-    .word  0x00001865                     @ 08034e38 65180000
-PTR_gP1LifePoints_08034e3c:
+check_slot_full_activation_ekibyo_cid:
+    .word  0x0000149d                     @ 08034e04 9d140000  Ekibyo Drakmord CID 0x149d (card_0987)
+check_slot_full_activation_mask_acc_cid:
+    .word  0x000013f3                     @ 08034e08 f3130000  Mask of the Accursed CID 0x13f3 (card_0864)
+check_slot_full_activation_flint_cid:
+    .word  0x00001842                     @ 08034e0c 42180000  Flint CID 0x1842 (card_1734)
+check_slot_full_activation_spellbinding_cid:
+    .word  0x00001103                     @ 08034e10 03110000  Spellbinding Circle CID 0x1103 (card_0309)
+check_slot_full_activation_shadow_spell_cid:
+    .word  0x00001243                     @ 08034e14 43120000  Shadow Spell CID 0x1243 (card_0544)
+check_slot_full_activation_nightmare_wheel_cid:
+    .word  0x000014b2                     @ 08034e18 b2140000  Nightmare Wheel CID 0x14b2 (card_0999)
+check_slot_full_activation_wrl_atk_thresh:
+    .word  0x00001766                     @ 08034e1c 66170000  Wall of Revealing Light ATK threshold (card_1550, 0x1766)
+check_slot_full_activation_vbs_cid:
+    .word  0x000014a1                     @ 08034e20 a1140000  Vengeful Bog Spirit CID 0x14a1 (card_0989)
+check_slot_full_activation_gravity_bind_cid:
+    .word  0x0000140e                     @ 08034e24 0e140000  Gravity Bind CID 0x140e (card_0889)
+check_slot_full_activation_dark_door_cid:
+    .word  0x00001469                     @ 08034e28 69140000  The Dark Door CID 0x1469 (card_0940)
+check_slot_full_activation_chain_128a:
+    .word  0x0000128a                     @ 08034e2c 8a120000  chain node type ID 0x128a; no card-stats entry
+check_slot_full_activation_unhappy_girl_cid:
+    .word  0x00001743                     @ 08034e30 43170000  The Unhappy Girl CID 0x1743 (card_1518)
+check_slot_full_activation_restrict_cid:
+    .word  0x00001284                     @ 08034e34 84120000  Thousand-Eyes Restrict CID 0x1284 (card_0594)
+check_slot_full_activation_btm_cid:
+    .word  0x00001865                     @ 08034e38 65180000  Big-Tusked Mammoth CID 0x1865 (card_1766)
+check_slot_full_activation_gp1lp_a:
     .word  gP1LifePoints                  @ 08034e3c e0c40102
-DAT_08034e40:
-    .word  0x00000868                     @ 08034e40 68080000
-DAT_08034e44:
-    .word  0x00001944                     @ 08034e44 44190000
-DAT_08034e48:
-    .word  0x00001208                     @ 08034e48 08120000
-DAT_08034e4c:
-    .word  0x000015ed                     @ 08034e4c ed150000
-DAT_08034e50:
-    .word  0x0000156a                     @ 08034e50 6a150000
-DAT_08034e54:
-    .word  0x000014f7                     @ 08034e54 f7140000
-DAT_08034e58:
-    .word  0x00001819                     @ 08034e58 19180000
-DAT_08034e5c:
-    .word  0x00001890                     @ 08034e5c 90180000
-DAT_08034e60:
-    .word  0x000015ff                     @ 08034e60 ff150000
-DAT_08034e64:
-    .word  0x0000195b                     @ 08034e64 5b190000
-DAT_08034e68:
-    .word  0x0201c510                     @ 08034e68 10c50102
-DAT_08034e6c:
-    .word  0x00001636                     @ 08034e6c 36160000
-DAT_08034e70:
-    .word  0x00000ff8                     @ 08034e70 f80f0000
-DAT_08034e74:
-    .word  0x0000175b                     @ 08034e74 5b170000
+check_slot_full_activation_stride_d:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034e40 68080000
+check_slot_full_activation_level_mod_cid:
+    .word  0x00001944                     @ 08034e44 44190000  Level Modulation CID 0x1944 (card_1941)
+check_slot_full_activation_chain_1208:
+    .word  0x00001208                     @ 08034e48 08120000  chain node type ID 0x1208; no card-stats entry
+check_slot_full_activation_tribute_doll_cid:
+    .word  0x000015ed                     @ 08034e4c ed150000  Tribute Doll CID 0x15ed (card_1243)
+check_slot_full_activation_puppet_master_cid:
+    .word  0x0000156a                     @ 08034e50 6a150000  Puppet Master CID 0x156a (card_1144)
+check_slot_full_activation_silent_fiend_cid:
+    .word  0x000014f7                     @ 08034e54 f7140000  Silent Fiend CID 0x14f7 (card_1061)
+check_slot_full_activation_magicians_unite_cid:
+    .word  0x00001819                     @ 08034e58 19180000  Magician's Unite CID 0x1819 (card_1695)
+check_slot_full_activation_union_attack_cid:
+    .word  0x00001890                     @ 08034e5c 90180000  Union Attack CID 0x1890 (card_1807)
+check_slot_full_activation_diffusion_cid:
+    .word  0x000015ff                     @ 08034e60 ff150000  Diffusion Wave-Motion CID 0x15ff (card_1260)
+check_slot_full_activation_feather_shot_cid:
+    .word  0x0000195b                     @ 08034e64 5b190000  Feather Shot CID 0x195b (card_1961)
+check_slot_full_activation_slots_d:
+    .word  gDuelFieldSlots                @ 08034e68 10c50102
+check_slot_full_activation_metal_reflect_cid:
+    .word  0x00001636                     @ 08034e6c 36160000  Metal Reflect Slime CID 0x1636 (card_1302)
+check_slot_full_activation_redeyes_cid:
+    .word  0x00000ff8                     @ 08034e70 f80f0000  Red-Eyes B. Dragon CID 0x0ff8 (card_0088)
+check_slot_full_activation_burst_stream_cid:
+    .word  0x0000175b                     @ 08034e74 5b170000  Burst Stream of Destruction CID 0x175b (card_1542)
 LAB_08034e78:
-    ldr r0, DAT_08034e88                     @ 08034e78 0348
+    ldr r0, check_slot_full_activation_armor_exe_cid @ 08034e78 0348
     cmp r7,r0                                @ 08034e7a 8742
     beq LAB_08034f28                         @ 08034e7c 54d0
     adds r0,#0x7    @ 08034e7e 0730
@@ -19700,10 +19700,10 @@ LAB_08034e78:
     beq LAB_08034ee8                         @ 08034e82 31d0
     b LAB_08034fa4                           @ 08034e84 8ee0
     .zero  0x2
-DAT_08034e88:
-    .word  0x0000161b                     @ 08034e88 1b160000
+check_slot_full_activation_armor_exe_cid:
+    .word  0x0000161b                     @ 08034e88 1b160000  Armor Exe CID 0x161b (card_1279)
 LAB_08034e8c:
-    ldr r0, DAT_08034ea4                     @ 08034e8c 0548
+    ldr r0, check_slot_full_activation_bls_cid @ 08034e8c 0548
     cmp r7,r0                                @ 08034e8e 8742
     beq LAB_08034f18                         @ 08034e90 42d0
     cmp r7,r0                                @ 08034e92 8742
@@ -19716,10 +19716,10 @@ LAB_08034e9e:
     adds r0,#0x90    @ 08034e9e 9030
     b LAB_08034eb8                           @ 08034ea0 0ae0
     .zero  0x2
-DAT_08034ea4:
-    .word  0x000016cb                     @ 08034ea4 cb160000
+check_slot_full_activation_bls_cid:
+    .word  0x000016cb                     @ 08034ea4 cb160000  BLS - Envoy of Beginning CID 0x16cb (card_1421)
 LAB_08034ea8:
-    ldr r0, DAT_08034ec0                     @ 08034ea8 0548
+    ldr r0, check_slot_full_activation_andro_sphinx_cid @ 08034ea8 0548
     cmp r7,r0                                @ 08034eaa 8742
     bge LAB_08034eb0                         @ 08034eac 00da
     b LAB_08034fa4                           @ 08034eae 79e0
@@ -19727,16 +19727,16 @@ LAB_08034eb0:
     adds r0,#0x1    @ 08034eb0 0130
     cmp r7,r0                                @ 08034eb2 8742
     ble LAB_08034f6c                         @ 08034eb4 5add
-    ldr r0, DAT_08034ec4                     @ 08034eb6 0348
+    ldr r0, check_slot_full_activation_anteatereatingant_cid @ 08034eb6 0348
 LAB_08034eb8:
     cmp r7,r0                                @ 08034eb8 8742
     beq LAB_08034f18                         @ 08034eba 2dd0
     b LAB_08034fa4                           @ 08034ebc 72e0
     .zero  0x2
-DAT_08034ec0:
-    .word  0x000017c7                     @ 08034ec0 c7170000
-DAT_08034ec4:
-    .word  0x000019c8                     @ 08034ec4 c8190000
+check_slot_full_activation_andro_sphinx_cid:
+    .word  0x000017c7                     @ 08034ec0 c7170000  Andro Sphinx CID 0x17c7 (card_1622, pw=15013468)
+check_slot_full_activation_anteatereatingant_cid:
+    .word  0x000019c8                     @ 08034ec4 c8190000  Anteatereatingant CID 0x19c8 (card_2043)
 LAB_08034ec8:
     movs r2,#0xaf    @ 08034ec8 af22
     lsls r2,r2,#0x5    @ 08034eca 5201
@@ -19745,14 +19745,14 @@ LAB_08034ec8:
     bl check_value_in_slot_chain             @ 08034ed0 faf7defe
     b LAB_08034f9e                           @ 08034ed4 63e0
 LAB_08034ed6:
-    ldr r2, DAT_08034ee4                     @ 08034ed6 034a
+    ldr r2, check_slot_full_activation_inferno_fire_blast_cid @ 08034ed6 034a
     adds r0,r5,#0x0    @ 08034ed8 281c
     movs r1,#0xb    @ 08034eda 0b21
     bl check_value_in_slot_chain             @ 08034edc faf7d8fe
     b LAB_08034f9e                           @ 08034ee0 5de0
     .zero  0x2
-DAT_08034ee4:
-    .word  0x000017f6                     @ 08034ee4 f6170000
+check_slot_full_activation_inferno_fire_blast_cid:
+    .word  0x000017f6                     @ 08034ee4 f6170000  Inferno Fire Blast CID 0x17f6 (card_1667)
 LAB_08034ee8:
     ldr r1,[sp,#0x3c]                        @ 08034ee8 0f99
     cmp r1,#0x0                              @ 08034eea 0029
@@ -19763,41 +19763,41 @@ LAB_08034ee8:
     ble LAB_08034efa                         @ 08034ef6 00dd
     b exit_slot_activation_with_state_write  @ 08034ef8 c2e1
 LAB_08034efa:
-    ldr r2, PTR_gP1LifePoints_08034f10       @ 08034efa 054a
+    ldr r2, check_slot_full_activation_gp1lp_b @ 08034efa 054a
     adds r0,r5,#0x0    @ 08034efc 281c
     .hword 0x4643    @ 08034efe 4346
     ands r0,r3    @ 08034f00 1840
-    ldr r1, DAT_08034f14                     @ 08034f02 0449
+    ldr r1, check_slot_full_activation_stride_e @ 08034f02 0449
     muls r0,r1    @ 08034f04 4843
     adds r2,#0xc    @ 08034f06 0c32
     adds r0,r0,r2    @ 08034f08 8018
     ldr r0,[r0,#0x0]                         @ 08034f0a 0068
     b LAB_08034f9e                           @ 08034f0c 47e0
     .zero  0x2
-PTR_gP1LifePoints_08034f10:
+check_slot_full_activation_gp1lp_b:
     .word  gP1LifePoints                  @ 08034f10 e0c40102
-DAT_08034f14:
-    .word  0x00000868                     @ 08034f14 68080000
+check_slot_full_activation_stride_e:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034f14 68080000
 LAB_08034f18:
-    ldr r2, DAT_08034f24                     @ 08034f18 024a
+    ldr r2, check_slot_full_activation_time_wizard_cid @ 08034f18 024a
     adds r0,r5,#0x0    @ 08034f1a 281c
     adds r1,r6,#0x0    @ 08034f1c 311c
     bl check_value_in_slot_chain             @ 08034f1e faf7b7fe
     b LAB_08034f9e                           @ 08034f22 3ce0
-DAT_08034f24:
-    .word  0x00000fb6                     @ 08034f24 b60f0000
+check_slot_full_activation_time_wizard_cid:
+    .word  0x00000fb6                     @ 08034f24 b60f0000  Time Wizard CID 0x0fb6 (card_0016)
 LAB_08034f28:
     ldr r4,[sp,#0x3c]                        @ 08034f28 0f9c
     cmp r4,#0x0                              @ 08034f2a 002c
     beq LAB_08034fa4                         @ 08034f2c 3ad0
-    ldr r3, PTR_gP1LifePoints_08034f64       @ 08034f2e 0d4b
+    ldr r3, check_slot_full_activation_gp1lp_c @ 08034f2e 0d4b
     lsls r1,r6,#0x2    @ 08034f30 b100
     adds r1,r1,r6    @ 08034f32 8919
     lsls r1,r1,#0x2    @ 08034f34 8900
     adds r0,r5,#0x0    @ 08034f36 281c
     .hword 0x4642    @ 08034f38 4246
     ands r0,r2    @ 08034f3a 1040
-    ldr r2, DAT_08034f68                     @ 08034f3c 0a4a
+    ldr r2, check_slot_full_activation_stride_f @ 08034f3c 0a4a
     muls r0,r2    @ 08034f3e 5043
     adds r1,r1,r0    @ 08034f40 0918
     adds r3,#0x40    @ 08034f42 4033
@@ -19819,22 +19819,22 @@ LAB_08034f54:
 LAB_08034f60:
     lsrs r0,r2,#0x12    @ 08034f60 900c
     b LAB_08034f9c                           @ 08034f62 1be0
-PTR_gP1LifePoints_08034f64:
+check_slot_full_activation_gp1lp_c:
     .word  gP1LifePoints                  @ 08034f64 e0c40102
-DAT_08034f68:
-    .word  0x00000868                     @ 08034f68 68080000
+check_slot_full_activation_stride_f:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034f68 68080000
 LAB_08034f6c:
     ldr r4,[sp,#0x3c]                        @ 08034f6c 0f9c
     cmp r4,#0x0                              @ 08034f6e 002c
     beq LAB_08034fa4                         @ 08034f70 18d0
-    ldr r3, PTR_gP1LifePoints_08035138       @ 08034f72 714b
+    ldr r3, check_slot_full_activation_gp1lp_d @ 08034f72 714b
     lsls r1,r6,#0x2    @ 08034f74 b100
     adds r1,r1,r6    @ 08034f76 8919
     lsls r1,r1,#0x2    @ 08034f78 8900
     adds r0,r5,#0x0    @ 08034f7a 281c
     .hword 0x4642    @ 08034f7c 4246
     ands r0,r2    @ 08034f7e 1040
-    ldr r2, DAT_0803513c                     @ 08034f80 6e4a
+    ldr r2, check_slot_full_activation_stride_g @ 08034f80 6e4a
     muls r0,r2    @ 08034f82 5043
     adds r1,r1,r0    @ 08034f84 0918
     adds r3,#0x40    @ 08034f86 4033
@@ -19880,7 +19880,7 @@ LAB_08034fc8:
     .hword 0x4690    @ 08034fce 9046
     cmp r2,#0x0                              @ 08034fd0 002a
     bgt LAB_08034fe4                         @ 08034fd2 07dc
-    ldr r1, DAT_08035140                     @ 08034fd4 5a49
+    ldr r1, check_slot_full_activation_swords_reveal_cid @ 08034fd4 5a49
     adds r0,r4,#0x0    @ 08034fd6 201c
     movs r2,#0x3    @ 08034fd8 0322
     bl count_equip_set_activatable_slots_for_player @ 08034fda fdf79ffe
@@ -19891,7 +19891,7 @@ LAB_08034fe4:
     ldr r3,[sp,#0x2c]                        @ 08034fe4 0b9b
     cmp r3,#0x7                              @ 08034fe6 072b
     beq LAB_08034ffa                         @ 08034fe8 07d0
-    ldr r2, DAT_08035144                     @ 08034fea 564a
+    ldr r2, check_slot_full_activation_chain_130e @ 08034fea 564a
     adds r0,r5,#0x0    @ 08034fec 281c
     adds r1,r6,#0x0    @ 08034fee 311c
     bl query_zone_chain_count_with_eligibility @ 08034ff0 faf7daf9
@@ -19899,11 +19899,11 @@ LAB_08034fe4:
     beq LAB_08034ffa                         @ 08034ff6 00d0
     b exit_slot_activation_with_state_write  @ 08034ff8 42e1
 LAB_08034ffa:
-    ldr r0, DAT_08035148                     @ 08034ffa 5348
+    ldr r0, check_slot_full_activation_score_thresh_a @ 08034ffa 5348
     ldr r1,[sp,#0x34]                        @ 08034ffc 0d99
     cmp r1,r0                                @ 08034ffe 8142
     ble LAB_08035012                         @ 08035000 07dd
-    ldr r0, DAT_0803514c                     @ 08035002 5248
+    ldr r0, check_slot_full_activation_msngr_peace_cid @ 08035002 5248
     adds r1,r5,#0x0    @ 08035004 291c
     .hword 0x4652    @ 08035006 5246
     bl count_zones_by_card_and_mode          @ 08035008 fdf77cfc
@@ -19927,7 +19927,7 @@ LAB_08035012:
     beq LAB_08035032                         @ 0803502e 00d0
     b exit_slot_activation_with_state_write  @ 08035030 26e1
 LAB_08035032:
-    ldr r2, DAT_08035150                     @ 08035032 474a
+    ldr r2, check_slot_full_activation_equip_lock_b @ 08035032 474a
     adds r0,r5,#0x0    @ 08035034 281c
     adds r1,r6,#0x0    @ 08035036 311c
     bl check_value_in_slot_chain             @ 08035038 faf72afe
@@ -19935,20 +19935,20 @@ LAB_08035032:
     beq LAB_08035042                         @ 0803503e 00d0
     b exit_slot_activation_with_state_write  @ 08035040 1ee1
 LAB_08035042:
-    ldr r0, DAT_08035154                     @ 08035042 4448
+    ldr r0, check_slot_full_activation_array_reveal_cid @ 08035042 4448
     adds r1,r5,#0x0    @ 08035044 291c
     .hword 0x4652    @ 08035046 5246
     bl count_zones_by_card_and_mode          @ 08035048 fdf75cfc
     cmp r0,#0x0                              @ 0803504c 0028
     beq LAB_080350ac                         @ 0803504e 2dd0
-    ldr r3, PTR_gP1LifePoints_08035138       @ 08035050 394b
+    ldr r3, check_slot_full_activation_gp1lp_d @ 08035050 394b
     lsls r1,r6,#0x2    @ 08035052 b100
     adds r1,r1,r6    @ 08035054 8919
     lsls r1,r1,#0x2    @ 08035056 8900
     movs r4,#0x1    @ 08035058 0124
     adds r0,r5,#0x0    @ 0803505a 281c
     ands r0,r4    @ 0803505c 2040
-    ldr r2, DAT_0803513c                     @ 0803505e 374a
+    ldr r2, check_slot_full_activation_stride_g @ 0803505e 374a
     muls r0,r2    @ 08035060 5043
     adds r1,r1,r0    @ 08035062 0918
     adds r3,#0x40    @ 08035064 4033
@@ -19971,9 +19971,9 @@ LAB_08035084:
     movs r1,#0x1    @ 08035084 0121
     adds r0,r5,#0x0    @ 08035086 281c
     ands r0,r1    @ 08035088 0840
-    ldr r3, DAT_0803513c                     @ 0803508a 2c4b
+    ldr r3, check_slot_full_activation_stride_g @ 0803508a 2c4b
     muls r0,r3    @ 0803508c 5843
-    ldr r2, DAT_08035158                     @ 0803508e 324a
+    ldr r2, check_slot_full_activation_p2_base @ 0803508e 324a
     adds r0,r0,r2    @ 08035090 8018
     ldr r0,[r0,#0xc]                         @ 08035092 c068
     ldr r4,[sp,#0x2c]                        @ 08035094 0b9c
@@ -19995,7 +19995,7 @@ LAB_080350ac:
     ands r0,r4    @ 080350b0 2040
     cmp r0,#0x0                              @ 080350b2 0028
     bgt LAB_080350c6                         @ 080350b4 07dc
-    ldr r1, DAT_0803515c                     @ 080350b6 2949
+    ldr r1, check_slot_full_activation_regulation_tribe_cid @ 080350b6 2949
     adds r0,r5,#0x0    @ 080350b8 281c
     ldr r2,[sp,#0x2c]                        @ 080350ba 0b9a
     bl count_equip_zone_slots_matching_card  @ 080350bc fdf776fe
@@ -20009,24 +20009,24 @@ LAB_080350c6:
     cmp r0,#0x0                              @ 080350cc 0028
     bgt LAB_080350e0                         @ 080350ce 07dc
     subs r0,r4,r5    @ 080350d0 601b
-    ldr r1, DAT_0803515c                     @ 080350d2 2249
+    ldr r1, check_slot_full_activation_regulation_tribe_cid @ 080350d2 2249
     ldr r2,[sp,#0x2c]                        @ 080350d4 0b9a
     bl count_equip_zone_slots_matching_card  @ 080350d6 fdf769fe
     cmp r0,#0x0                              @ 080350da 0028
     beq LAB_080350e0                         @ 080350dc 00d0
     b exit_slot_activation_with_state_write  @ 080350de cfe0
 LAB_080350e0:
-    ldr r0, DAT_08035160                     @ 080350e0 1f48
+    ldr r0, check_slot_full_activation_score_thresh_b @ 080350e0 1f48
     ldr r2,[sp,#0x34]                        @ 080350e2 0d9a
     cmp r2,r0                                @ 080350e4 8242
     ble LAB_080350f4                         @ 080350e6 05dd
-    ldr r0, DAT_08035164                     @ 080350e8 1e48
+    ldr r0, check_slot_full_activation_gora_turtle_cid @ 080350e8 1e48
     bl count_field_copies_of_card            @ 080350ea fdf757fb
     cmp r0,#0x0                              @ 080350ee 0028
     beq LAB_080350f4                         @ 080350f0 00d0
     b exit_slot_activation_with_state_write  @ 080350f2 c5e0
 LAB_080350f4:
-    ldr r2, DAT_08035168                     @ 080350f4 1c4a
+    ldr r2, check_slot_full_activation_harpie_3_cid @ 080350f4 1c4a
     adds r0,r5,#0x0    @ 080350f6 281c
     adds r1,r6,#0x0    @ 080350f8 311c
     bl check_value_in_slot_chain             @ 080350fa faf7c9fd
@@ -20034,7 +20034,7 @@ LAB_080350f4:
     beq LAB_08035104                         @ 08035100 00d0
     b exit_slot_activation_with_state_write  @ 08035102 bde0
 LAB_08035104:
-    ldr r2, DAT_0803516c                     @ 08035104 194a
+    ldr r2, check_slot_full_activation_threatening_roar_cid @ 08035104 194a
     adds r0,r5,#0x0    @ 08035106 281c
     movs r1,#0xb    @ 08035108 0b21
     bl check_value_in_slot_chain             @ 0803510a faf7c1fd
@@ -20042,7 +20042,7 @@ LAB_08035104:
     beq LAB_08035114                         @ 08035110 00d0
     b exit_slot_activation_with_state_write  @ 08035112 b5e0
 LAB_08035114:
-    ldr r2, DAT_08035170                     @ 08035114 164a
+    ldr r2, check_slot_full_activation_teva_cid @ 08035114 164a
     adds r0,r5,#0x0    @ 08035116 281c
     movs r1,#0xb    @ 08035118 0b21
     bl check_slot_has_node_by_card_id        @ 0803511a faf76bfe
@@ -20050,68 +20050,68 @@ LAB_08035114:
     beq LAB_08035124                         @ 08035120 00d0
     b exit_slot_activation_with_state_write  @ 08035122 ade0
 LAB_08035124:
-    ldr r0, DAT_08035174                     @ 08035124 1348
+    ldr r0, check_slot_full_activation_cid_180d @ 08035124 1348
     cmp r7,r0                                @ 08035126 8742
     bne LAB_0803512c                         @ 08035128 00d1
     b exit_slot_activation_with_state_write  @ 0803512a a9e0
 LAB_0803512c:
     cmp r7,r0                                @ 0803512c 8742
     bgt LAB_0803517c                         @ 0803512e 25dc
-    ldr r0, DAT_08035178                     @ 08035130 1148
+    ldr r0, check_slot_full_activation_cave_dragon_cid @ 08035130 1148
     cmp r7,r0                                @ 08035132 8742
     beq LAB_08035198                         @ 08035134 30d0
     b LAB_080351ac                           @ 08035136 39e0
-PTR_gP1LifePoints_08035138:
+check_slot_full_activation_gp1lp_d:
     .word  gP1LifePoints                  @ 08035138 e0c40102
-DAT_0803513c:
-    .word  0x00000868                     @ 0803513c 68080000
-DAT_08035140:
-    .word  0x00001102                     @ 08035140 02110000
-DAT_08035144:
-    .word  0x0000130e                     @ 08035144 0e130000
-DAT_08035148:
-    .word  0x000005db                     @ 08035148 db050000
-DAT_0803514c:
-    .word  0x0000134a                     @ 0803514c 4a130000
-DAT_08035150:
-    .word  0x000012d1                     @ 08035150 d1120000
-DAT_08035154:
-    .word  0x000014d1                     @ 08035154 d1140000
-DAT_08035158:
-    .word  0x0201c5d8                     @ 08035158 d8c50102
-DAT_0803515c:
-    .word  0x00001358                     @ 0803515c 58130000
-DAT_08035160:
-    .word  0x0000076b                     @ 08035160 6b070000
-DAT_08035164:
-    .word  0x00001523                     @ 08035164 23150000
-DAT_08035168:
-    .word  0x0000182c                     @ 08035168 2c180000
-DAT_0803516c:
-    .word  0x00001886                     @ 0803516c 86180000
-DAT_08035170:
-    .word  0x0000172d                     @ 08035170 2d170000
-DAT_08035174:
-    .word  0x0000180d                     @ 08035174 0d180000
-DAT_08035178:
-    .word  0x000014db                     @ 08035178 db140000
+check_slot_full_activation_stride_g:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803513c 68080000
+check_slot_full_activation_swords_reveal_cid:
+    .word  0x00001102                     @ 08035140 02110000  Swords of Revealing Light CID 0x1102 (card_0308)
+check_slot_full_activation_chain_130e:
+    .word  0x0000130e                     @ 08035144 0e130000  chain node type ID 0x130e; no card-stats entry
+check_slot_full_activation_score_thresh_a:
+    .word  0x000005db                     @ 08035148 db050000  field_score threshold 1499 (0x5db)
+check_slot_full_activation_msngr_peace_cid:
+    .word  0x0000134a                     @ 0803514c 4a130000  Messenger of Peace CID 0x134a (card_0751, pw=44656491)
+check_slot_full_activation_equip_lock_b:
+    .word  EQUIP_LOCK_B_CID               @ 08035150 d1120000  equip lock chain effect B CID
+check_slot_full_activation_array_reveal_cid:
+    .word  0x000014d1                     @ 08035154 d1140000  Array of Revealing Light CID 0x14d1 (card_1025)
+check_slot_full_activation_p2_base:
+    .word  gDuelFieldSlots_p2_base        @ 08035158 d8c50102
+check_slot_full_activation_regulation_tribe_cid:
+    .word  0x00001358                     @ 0803515c 58130000  The Regulation of Tribe CID 0x1358 (card_0761)
+check_slot_full_activation_score_thresh_b:
+    .word  0x0000076b                     @ 08035160 6b070000  field_score threshold 1899 (0x76b)
+check_slot_full_activation_gora_turtle_cid:
+    .word  0x00001523                     @ 08035164 23150000  Gora Turtle CID 0x1523 (card_1097)
+check_slot_full_activation_harpie_3_cid:
+    .word  0x0000182c                     @ 08035168 2c180000  Harpie Lady 3 CID 0x182c (card_1712)
+check_slot_full_activation_threatening_roar_cid:
+    .word  0x00001886                     @ 0803516c 86180000  Threatening Roar CID 0x1886 (card_1797)
+check_slot_full_activation_teva_cid:
+    .word  0x0000172d                     @ 08035170 2d170000  Teva CID 0x172d (card_1504, pw=16469012)
+check_slot_full_activation_cid_180d:
+    .word  0x0000180d                     @ 08035174 0d180000  copy record CID 0x180d (card_2093, slot_id=0)
+check_slot_full_activation_cave_dragon_cid:
+    .word  0x000014db                     @ 08035178 db140000  Cave Dragon CID 0x14db (card_1035)
 LAB_0803517c:
-    ldr r0, DAT_08035190                     @ 0803517c 0448
+    ldr r0, check_slot_full_activation_cid_1813 @ 0803517c 0448
     cmp r7,r0                                @ 0803517e 8742
     bne LAB_08035184                         @ 08035180 00d1
     b exit_slot_activation_with_state_write  @ 08035182 7de0
 LAB_08035184:
-    ldr r0, DAT_08035194                     @ 08035184 0348
+    ldr r0, check_slot_full_activation_cid_195a @ 08035184 0348
     cmp r7,r0                                @ 08035186 8742
     bne LAB_0803518c                         @ 08035188 00d1
     b exit_slot_activation_with_state_write  @ 0803518a 79e0
 LAB_0803518c:
     b LAB_080351ac                           @ 0803518c 0ee0
     .zero  0x2
-DAT_08035190:
-    .word  0x00001813                     @ 08035190 13180000
-DAT_08035194:
-    .word  0x0000195a                     @ 08035194 5a190000
+check_slot_full_activation_cid_1813:
+    .word  0x00001813                     @ 08035190 13180000  copy record CID 0x1813 (card_2094, slot_id=0)
+check_slot_full_activation_cid_195a:
+    .word  0x0000195a                     @ 08035194 5a190000  special token/copy record CID 0x195a (card_2095)
 LAB_08035198:
     ldr r3,[sp,#0x3c]                        @ 08035198 0f9b
     cmp r3,#0x0                              @ 0803519a 002b
@@ -20131,7 +20131,7 @@ LAB_080351ac:
     ldr r1,[sp,#0x3c]                        @ 080351b6 0f99
     cmp r1,#0x0                              @ 080351b8 0029
     beq LAB_08035218                         @ 080351ba 2dd0
-    ldr r0, DAT_080351d0                     @ 080351bc 0448
+    ldr r0, check_slot_full_activation_toon_skull_cid @ 080351bc 0448
     cmp r7,r0                                @ 080351be 8742
     bgt LAB_080351d4                         @ 080351c0 08dc
     subs r0,#0x2    @ 080351c2 0238
@@ -20141,8 +20141,8 @@ LAB_080351ac:
     cmp r7,r0                                @ 080351ca 8742
     beq LAB_080351f4                         @ 080351cc 12d0
     b LAB_08035218                           @ 080351ce 23e0
-DAT_080351d0:
-    .word  0x0000127f                     @ 080351d0 7f120000
+check_slot_full_activation_toon_skull_cid:
+    .word  0x0000127f                     @ 080351d0 7f120000  Toon Summoned Skull CID 0x127f (card_0591)
 LAB_080351d4:
     movs r0,#0x95    @ 080351d4 9520
     lsls r0,r0,#0x5    @ 080351d6 4001
@@ -20155,12 +20155,12 @@ LAB_080351d4:
     beq LAB_08035204                         @ 080351e4 0ed0
     b LAB_08035218                           @ 080351e6 17e0
 LAB_080351e8:
-    ldr r0, DAT_080351f0                     @ 080351e8 0148
+    ldr r0, check_slot_full_activation_betd_cid @ 080351e8 0148
     cmp r7,r0                                @ 080351ea 8742
     beq LAB_080351fc                         @ 080351ec 06d0
     b LAB_08035218                           @ 080351ee 13e0
-DAT_080351f0:
-    .word  0x000012a5                     @ 080351f0 a5120000
+check_slot_full_activation_betd_cid:
+    .word  0x000012a5                     @ 080351f0 a5120000  Blue-Eyes Toon Dragon CID 0x12a5 (card_0629)
 LAB_080351f4:
     movs r2,#0xfa    @ 080351f4 fa22
     lsls r2,r2,#0x2    @ 080351f6 9200
@@ -20187,17 +20187,17 @@ LAB_08035218:
     ands r0,r4    @ 0803521c 2040
     cmp r0,#0x0                              @ 0803521e 0028
     bgt LAB_08035246                         @ 08035220 11dc
-    ldr r3, PTR_gP1LifePoints_08035274       @ 08035222 144b
+    ldr r3, check_slot_full_activation_gp1lp_e @ 08035222 144b
     movs r0,#0x1    @ 08035224 0120
     adds r1,r5,#0x0    @ 08035226 291c
     ands r1,r0    @ 08035228 0140
-    ldr r2, DAT_08035278                     @ 0803522a 134a
+    ldr r2, check_slot_full_activation_stride_h @ 0803522a 134a
     adds r4,r1,#0x0    @ 0803522c 0c1c
     muls r4,r2    @ 0803522e 5443
     adds r3,#0x10    @ 08035230 1033
     adds r4,r4,r3    @ 08035232 e418
     subs r0,r0,r5    @ 08035234 401b
-    ldr r1, DAT_0803527c                     @ 08035236 1149
+    ldr r1, check_slot_full_activation_gk_servant_cid @ 08035236 1149
     movs r2,#0x1    @ 08035238 0122
     rsbs r2,r2,#0    @ 0803523a 5242
     bl count_available_effect_zones          @ 0803523c fdf70afa
@@ -20216,10 +20216,10 @@ LAB_08035246:
     adds r1,r1,r0    @ 08035258 0918
     lsls r1,r1,#0x2    @ 0803525a 8900
     add r8,r1                                @ 0803525c 8844
-    ldr r2, PTR_gP1LifePoints_08035274       @ 0803525e 054a
+    ldr r2, check_slot_full_activation_gp1lp_e @ 0803525e 054a
     movs r0,#0x1    @ 08035260 0120
     ands r0,r5    @ 08035262 2840
-    ldr r1, DAT_08035278                     @ 08035264 0449
+    ldr r1, check_slot_full_activation_stride_h @ 08035264 0449
     muls r0,r1    @ 08035266 4843
     adds r0,r0,r2    @ 08035268 8018
     ldr r0,[r0,#0x0]                         @ 0803526a 0068
@@ -20228,12 +20228,12 @@ LAB_08035246:
 LAB_08035270:
     movs r0,#0x1    @ 08035270 0120
     b LAB_08035294                           @ 08035272 0fe0
-PTR_gP1LifePoints_08035274:
+check_slot_full_activation_gp1lp_e:
     .word  gP1LifePoints                  @ 08035274 e0c40102
-DAT_08035278:
-    .word  0x00000868                     @ 08035278 68080000
-DAT_0803527c:
-    .word  0x0000131d                     @ 0803527c 1d130000
+check_slot_full_activation_stride_h:
+    .word  PLAYER_BLOCK_STRIDE            @ 08035278 68080000
+check_slot_full_activation_gk_servant_cid:
+    .word  0x0000131d                     @ 0803527c 1d130000  Gravekeeper's Servant CID 0x131d (card_0710)
 
 @ Checks if gDuelActivation[+4] equals r5 (caller-saved player_side); if match writes 0x13 (activation_fail_code) to gP1LifePoints+0x1d78. Returns 0 regardless of write. Dedicated activation-fail exit for check_slot_full_activation_eligibility (FUN_08034a58): called via tail-branch b FUN_08035280 from multiple sites inside FUN_08034a58. indeg=1. No APCS params (uses caller r5). Returns u32 0. Constants: gDuelActivation=0x0201e2a0, activation_player_offset=+4, 0x1d78=activation_state_offset, activation_fail_code=0x13.
 exit_slot_activation_with_state_write:

@@ -65,7 +65,8 @@
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ✅ | f12c5fe |
 | 8 | 0x32e80..0x33654 | 23 | 44 | ✅ | 9892a81 |
 | 9 | 0x33654..0x3407c | 23 | 63 | ✅ | 77760ad |
-| 10 | 0x3407c..0x35f54 | 17 | 246 | ⬜ | |
+| 10a | 0x3407c..0x35280 | 10 | 148 | ✅ | (pending) |
+| 10b | 0x35280..0x35f54 | 7 | 98 | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 
@@ -607,6 +608,57 @@
 
 ---
 
+### 4.10a Seg-10a 完成记录 (0x0803407c..0x08035280, 10 fn)
+
+**函数列表**:
+| addr       | name                                         |
+|------------|----------------------------------------------|
+| 0x0803407c | eval_slot_target_eligibility_full            |
+| 0x0803412c | check_card_matches_active_effect_slot        |
+| 0x08034180 | find_paired_zone_entry_for_card              |
+| 0x08034298 | check_card_targeted_by_spell_zone_effect     |
+| 0x08034358 | check_slot_field_action_eligibility          |
+| 0x080345e0 | check_field_spell_slot_placeable             |
+| 0x080346c4 | check_slot_monster_activation_eligible       |
+| 0x0803495c | eval_slot_activation_guard_full              |
+| 0x080349b0 | check_slot_card_activatable                  |
+| 0x08034a58 | check_slot_full_activation_eligibility       |
+
+**符号化统计**:
+- EQ_SLOTS: 57 (40 EQ_REUSE + 17 EQ_NEW)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x19 + gDuelFieldSlots x14 + gDuelCardCtxBase x4 + gDuelFieldSlotState x1 + gEquipChainSlotRefs x1 + gDuelFieldSlots_p2_base x1 + EQUIP_CHAIN_PAIR_CARD_MAX x1 (card_info.inc) + EQUIP_LOCK_B_CID x1 (card_info.inc)
+  - EQ_NEW (card_info.inc): UMI_CARD_ID=0x10f4 x2 + A_LEGENDARY_OCEAN_CARD_ID=0x150b x1 + SPELL_ZONE_TARGET_CARD_ID=0x1368 x2 + TOTAL_DEFENSE_SHOGUN_CARD_ID=0x12b4 x1 + EHERO_RAMPART_BLASTER_CARD_ID=0x1956 x1 + TWINHEADED_BEAST_CARD_ID=0x1723 x1 + TYRANT_DRAGON_CARD_ID=0x14d5 x1 + ARMED_SAMURAI_BEN_KEI_CARD_ID=0x186c x1
+  - EQ_NEW (duel_field.inc): ACTIVATION_STATE_A_OFF=0x1d48 x2 + ACTIVATION_STATE_B_OFF=0x1d78 x3 + ACTIVE_EFFECT_CATEGORY_OFF=0x10d8 x1
+- REF_SLOTS: 11 (10 PTR_gP1LifePoints_* rename + 1 fn-ptr slot)
+- RENAME_SLOTS: 80 (verified card IDs / chain node type IDs)
+- FUNC_RENAME: 0
+- PLATE: 0 (no stale FUN_ in segment plates; PLATE=SKIP confirmed)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants** (11 项):
+- `duel_field.inc`: ACTIVATION_STATE_A_OFF=0x1d48 (gP1LifePoints+side*0x868+0x1d48; activation state field A; 27 raw refs)
+- `duel_field.inc`: ACTIVATION_STATE_B_OFF=0x1d78 (activation state field B; 41 raw refs)
+- `duel_field.inc`: ACTIVE_EFFECT_CATEGORY_OFF=0x10d8 (gP1LifePoints+0x10d8=0x0201D5B8; active effect slot category; 16 raw refs)
+- `card_info.inc`: UMI_CARD_ID=0x10f4, A_LEGENDARY_OCEAN_CARD_ID=0x150b, SPELL_ZONE_TARGET_CARD_ID=0x1368
+- `card_info.inc`: TOTAL_DEFENSE_SHOGUN_CARD_ID=0x12b4, EHERO_RAMPART_BLASTER_CARD_ID=0x1956
+- `card_info.inc`: TWINHEADED_BEAST_CARD_ID=0x1723, TYRANT_DRAGON_CARD_ID=0x14d5, ARMED_SAMURAI_BEN_KEI_CARD_ID=0x186c
+
+**C8 stale FUN_ 验收**: grep Seg-10a 范围 (L17843..L20238) 中主语 FUN_ = **0** (2 处括注 FUN_ 均为跨模块/跨段上下文说明, 非 stale 主语)。
+
+**Non-ASCII scan**: 1 处 (L19025 eval_slot_activation_guard_full 的存量 CJK plate, 命名阶段遗留, 本次 PLATE=0 未写入新 plate/EOL, 超出本段责任)。
+
+**落地踩坑记录**:
+1. fn-ptr REF slot 0x080346c0: 初始脚本误将 label `count_monster_slots_by_fnptr_pred_0804aea0` 建在目标奇地址 0x0804aea1, 导出器输出 `.word count_monster_slots_by_fnptr_pred_0804aea0` (无 +1, GAS undefined reference)。修复: FixF02Seg10aFnPtrSlot.py 删除奇地址 label + 重建 DATA ref 指向偶地址 0x0804aea0 (`check_card_is_archfiend_type`)。导出后 `.word 0x0804aea1` (原始奇地址值, slot label `check_field_spell_slot_placeable_fnptr` 正确输出)。
+2. Seg-9 残留: MONSTER_SLOT_ORDER_TABLE/AVAIL_SLOT_ORDER_TABLE 大写 equate 在 Seg-9 时已建立, 但 rom.s carve label 为小写, 每次重新 export 导致 GAS undefined reference。根治: rom.s 加 `.equ` 别名 `MONSTER_SLOT_ORDER_TABLE = monster_slot_order_table` / `AVAIL_SLOT_ORDER_TABLE = available_slot_order_table`。
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg10aSlots.py` (EQ57/REF11/RENAME80) + `tools/ghidra-labeling/FixF02Seg10aFnPtrSlot.py` (fn-ptr 修正)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 02 范围 `[0x0802c238, 0x08035f54)` (span 0x9D1C, 224 named fn [305 含 81 switchD 跳转表
@@ -624,7 +676,8 @@
 | Seg-7 | 0x3217c..0x32e80 | 23 | 67 | — | ✅ zone slot chain refs clear/dispatch + effect zone offset symbolization |
 | Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | ✅ monster slot count/state scan + field spell placement check |
 | Seg-9 | 0x33654..0x3407c | 23 | 63 | — | ✅ equip slot eligibility/lock + monster slot find + carve 2 slot-order tables |
-| Seg-10 | 0x3407c..0x35f54 | 17 | 246 | — | slot target eligibility full + fieldspell zone (重) |
+| Seg-10a | 0x3407c..0x35280 | 10 | 148 | — | ✅ slot activation eligibility full cluster |
+| Seg-10b | 0x35280..0x35f54 | 7 | 98 | — | exit_slot_activation_with_state_write + fieldspell zone (下一段) |
 
 执行约定同 file 00/01: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;
 每完成一段更新 §三 + §四 + refine-progress。

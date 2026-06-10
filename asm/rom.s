@@ -1220,12 +1220,14 @@ vija_obj_slot_seq:                                 @ GBA 0x09e3da10 (ref: DAT_08
 	.byte  0x0, 0x0, 0x0                           @ 3B pad
 	.incbin "roms/2343.gba", 0x1E3DA18, 0x1534    @ remainder prefix [0x1e3da18..0x1e3ef4b]
 monster_slot_order_table:                        @ GBA 0x09e3ef4c, ref: find_first_placeable_monster_slot
+MONSTER_SLOT_ORDER_TABLE = monster_slot_order_table
 	.word 2                                      @ preferred slot idx [0]
 	.word 3                                      @ preferred slot idx [1]
 	.word 1                                      @ preferred slot idx [2]
 	.word 4                                      @ preferred slot idx [3]
 	.word 0                                      @ preferred slot idx [4]
 available_slot_order_table:                      @ GBA 0x09e3ef60, ref: find_first_available_monster_slot_for_player
+AVAIL_SLOT_ORDER_TABLE = available_slot_order_table
 	.word 2                                      @ preferred slot idx [0]
 	.word 3                                      @ preferred slot idx [1]
 	.word 1                                      @ preferred slot idx [2]

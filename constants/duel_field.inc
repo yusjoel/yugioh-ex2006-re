@@ -165,3 +165,13 @@
 .equ EFFECT_ZONE_PARTITION_OFF, 0x000010a4  @ gDuelFieldSlots+0x10a4 = effect zone slot array base offset (0x0201d5b4); 18 raw refs
 .equ EFFECT_ZONE_BITMASK_OFF,   0x000010d0  @ gDuelFieldSlots+0x10a0 = effect zone occupation bitmask word offset; 45 raw refs
                                              @ (used as: r10=gDuelFieldSlots-0x30; r10+0x10d0=gDuelFieldSlots+0x10a0=0x0201d5b0)
+
+@ =============================================================================
+@ file 02 Seg-10a additions: slot activation state write offsets
+@ =============================================================================
+.equ ACTIVATION_STATE_A_OFF,   0x00001d48  @ gP1LifePoints+side*0x868+0x1d48: activation state field A;
+                                            @ written 0x3 on bit21-set guard fail; 27 raw refs; 2 Seg-10a slots
+.equ ACTIVATION_STATE_B_OFF,   0x00001d78  @ gP1LifePoints+side*0x868+0x1d78: activation state field B;
+                                            @ written 0x13 on exit_slot_activation_with_state_write; 41 raw refs; 3 Seg-10a slots
+.equ ACTIVE_EFFECT_CATEGORY_OFF, 0x000010d8 @ gP1LifePoints+0x10d8=0x0201D5B8: active effect slot category word;
+                                             @ read by check_card_matches_active_effect_slot; 16 raw refs; 1 Seg-10a slot
