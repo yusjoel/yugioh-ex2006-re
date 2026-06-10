@@ -8,8 +8,10 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 3/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
-> **下一任务**: **file 02 Seg-4** (0x2fd00..0x309b8, 23fn 136槽, equip chain node find/link/replace 簇, 无 ROM_INCBIN)。
+> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 4/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
+> **下一任务**: **file 02 Seg-5** (0x309b8..0x313dc, 23fn 60槽, effect slot zone equip valid 判定, 无 ROM_INCBIN)。
+
+上次更新: 2026-06-10 file 02 Seg-4 完成 (EQ46/RENAME90/PLATE3/新建 bitops.inc, byte-identical 9689337d)。
 
 ---
 
@@ -19,7 +21,7 @@
 |---|------|----------|------|------|---------|
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
-| 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 已拆 | 🟡 进行中 (3/10) | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
+| 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 已拆 | 🟡 进行中 (4/10) | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |

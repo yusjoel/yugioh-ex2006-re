@@ -59,7 +59,7 @@
 | 1 | 0x2c238..0x2e108 | 23 | 318 | ✅ | 4199405 |
 | 2 | 0x2e108..0x2f3a8 | 23 | 94 | ✅ | cd981d8 |
 | 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ✅ | a78e8b1 |
-| 4 | 0x2fd00..0x309b8 | 23 | 136 | ⬜ | |
+| 4 | 0x2fd00..0x309b8 | 23 | 136 | ✅ | |
 | 5 | 0x309b8..0x313dc | 23 | 60 | ⬜ | |
 | 6 | 0x313dc..0x3217c | 23 | 64 | ⬜ | |
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ⬜ | |
@@ -251,6 +251,57 @@
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: a78e8b1
+
+---
+
+### 4.04 Seg-4 完成记录 (0x0802fd00..0x080309b8, 23 fn)
+
+**函数列表**:
+| addr       | name                                          |
+|------------|-----------------------------------------------|
+| 0x0802fd00 | find_chain_node_by_dual_halfword              |
+| 0x0802fd60 | find_effect_node_in_zone                      |
+| 0x0802fdc0 | check_node_in_slot_chain                      |
+| 0x0802fdf4 | check_slot_has_node_by_card_id                |
+| 0x0802fe2c | check_value_in_slot_chain_zone_entity         |
+| 0x0802fe60 | get_node_entity_id_in_slot                    |
+| 0x0802fe98 | get_zone_node_entity_hword_by_card_and_type   |
+| 0x0802fed4 | get_zone_node_entity_hword_or_miss            |
+| 0x0802ff10 | check_zone_card_id_in_node_pool               |
+| 0x0802ff34 | check_node_in_zone_idx_chain                  |
+| 0x0802ff58 | get_entity_id_in_zone_idx_chain               |
+| 0x0802ff84 | get_entity_id_in_zone_idx_chain_by_type       |
+| 0x0802ffb0 | count_chain_by_card_id_in_zone_idx            |
+| 0x0802ffd0 | count_chain_by_card_id_and_type_in_zone_idx   |
+| 0x0802fff0 | scan_equip_node_pool_for_card_score           |
+| 0x08030048 | find_equip_chain_node_by_pred                 |
+| 0x0803009c | find_zone_node_by_card_id_match               |
+| 0x080300d4 | check_zone_card_special_state_by_field5       |
+| 0x08030208 | count_set_bits_in_word                        |
+| 0x0803026c | get_card_equip_target_zone_cost               |
+| 0x08030500 | map_card_id_to_anim_type                      |
+| 0x0803088c | check_effect_slot_summon_path_eligible        |
+| 0x08030988 | check_effect_slot_is_equip_activatable        |
+
+**符号化统计**:
+- EQ_SLOTS: 46 (PLAYER_BLOCK_STRIDE x14 ewram.inc, gDuelFieldSlots x12 ewram.inc, EQUIP_NODE_BASE_OFFSET x3 duel_field.inc, gEquipNodePool x2 ewram.inc, ZONE_CHAIN_CARD_ID_OFF x6 ewram.inc NEW, OAM_ATTR0_HIDDEN x1 oam_attr.inc, POPCOUNT_MASK_* x8 bitops.inc NEW)
+- REF_SLOTS: 0 (PTR_gP1LifePoints_* already resolved by prior ops)
+- RENAME_SLOTS: 90 (8 PTR_gP1LifePoints_* + 1 sw-table + 8 field5 cid + 32 equip_zone_cost cid + 33 map_anim_type cid + 8 summon_path cid)
+- PLATE_FULL: 3 (CJK -> ASCII rewrites: get_zone_node_entity_hword_by_card_and_type / get_zone_node_entity_hword_or_miss / scan_equip_node_pool_for_card_score)
+- PLATE_SUBS: 14 stale FUN_ entries (all WARN "not found" -- stale FUN_ strings already absent from plates, no-op as in Seg-3)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants** (2 项):
+- `ewram.inc`: ZONE_CHAIN_CARD_ID_OFF=0x000010e2 (gP1LifePoints+0x10e2 zone-chain card_id table; 21 raw refs; 6 Seg-4 slots)
+- `constants/bitops.inc` (新文件): 8 POPCOUNT_MASK_* (ODD/EVEN/HI2/LO2/HI4/LO4/HI8/LO8, standard Hamming weight parallel-reduction masks; count_set_bits_in_word @ 0x08030208 utility fn); include added to rom.s
+
+**落地踩坑记录**: 无 (first-shot PASS, dry run 0 FAIL, 实跑 0 SKIP; 14 PLATE_SUBS 均 WARN not found 同 Seg-3 一致, 无影响)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg4Slots.py` (EQ46/REF0/RENAME90/PLATE_FULL3/PLATE_SUBS14)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
 
 ---
 

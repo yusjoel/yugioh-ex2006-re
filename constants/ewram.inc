@@ -309,3 +309,9 @@
 .equ gDuelFieldSlotState,    0x0201c520  @ parallel slot state flags at gDuelFieldSlots+0x10; 51 raw refs
 .equ gDuelEffectChainSlots,  0x0201bc54  @ effect context chain slot array (2 entries, stride 20B); 17 raw refs
                                          @ gEquipChainSlotRefs(0x0201bb90)+0xc4; distinct semantic domain (effect context chain)
+
+@ =============================================================================
+@ file 02 Seg-4 additions: zone-chain card_id table offset
+@ =============================================================================
+.equ ZONE_CHAIN_CARD_ID_OFF, 0x000010e2  @ offset from gP1LifePoints to zone-chain card_id table base
+                                          @ (0x0201c4e0 + 0x10e2 = 0x0201d5c2); 21 raw ROM refs; 6 Seg-4 uses

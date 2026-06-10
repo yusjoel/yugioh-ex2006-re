@@ -8142,15 +8142,15 @@ find_chain_node_by_dual_halfword:
     lsls r0,r1,#0x2    @ 0802fd0a 8800
     adds r0,r0,r1    @ 0802fd0c 4018
     lsls r0,r0,#0x2    @ 0802fd0e 8000
-    ldr r1, DAT_0802fd44                     @ 0802fd10 0c49
+    ldr r1, find_chain_node_dual_player_stride @ 0802fd10 0c49
     muls r1,r2    @ 0802fd12 5143
     adds r0,r0,r1    @ 0802fd14 4018
-    ldr r1, DAT_0802fd48                     @ 0802fd16 0c49
+    ldr r1, find_chain_node_dual_field_slots @ 0802fd16 0c49
     adds r0,r0,r1    @ 0802fd18 4018
     ldrh r2,[r0,#0xa]                        @ 0802fd1a 4289
     cmp r2,#0x0                              @ 0802fd1c 002a
     beq LAB_0802fd56                         @ 0802fd1e 1ad0
-    ldr r0, DAT_0802fd4c                     @ 0802fd20 0a48
+    ldr r0, find_chain_node_dual_equip_off   @ 0802fd20 0a48
     adds r6,r1,r0    @ 0802fd22 0e18
 LAB_0802fd24:
     lsls r0,r2,#0x3    @ 0802fd24 d000
@@ -8169,12 +8169,12 @@ LAB_0802fd24:
     bne LAB_0802fd50                         @ 0802fd3e 07d1
     adds r0,r2,#0x0    @ 0802fd40 101c
     b LAB_0802fd58                           @ 0802fd42 09e0
-DAT_0802fd44:
-    .word  0x00000868                     @ 0802fd44 68080000
-DAT_0802fd48:
-    .word  0x0201c510                     @ 0802fd48 10c50102
-DAT_0802fd4c:
-    .word  0x000014b0                     @ 0802fd4c b0140000
+find_chain_node_dual_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fd44 68080000
+find_chain_node_dual_field_slots:
+    .word  gDuelFieldSlots                @ 0802fd48 10c50102
+find_chain_node_dual_equip_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802fd4c b0140000
 LAB_0802fd50:
     adds r2,r3,#0x0    @ 0802fd50 1a1c
     cmp r2,#0x0                              @ 0802fd52 002a
@@ -8187,7 +8187,7 @@ LAB_0802fd58:
     bx r1                                    @ 0802fd5c 0847
     .zero  0x2
 
-@ Searches the slot chain for a node matching effect_code ([node+0]==r2), entity_id ([node+4]==r3), and valid zone_type ([node+2]&0xF<=5). Player slot address: 0x0201c510 + (r0 bit0)*0x868 + r1*20; [slot+0xa]=chain head index. Node pool: EWRAM 0x0201d9c0, stride 8 bytes. Returns 1 if found, 0 if not. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 effect_code, r3=u16 entity_id. Callers: FUN_08033730 (duel_field effect activation check); get_zone_card_attribute_by_type case_d (slot 0xb effect presence check). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
+@ Searches the slot chain for a node matching effect_code ([node+0]==r2), entity_id ([node+4]==r3), and valid zone_type ([node+2]&0xF<=5). Player slot address: 0x0201c510 + (r0 bit0)*0x868 + r1*20; [slot+0xa]=chain head index. Node pool: EWRAM 0x0201d9c0, stride 8 bytes. Returns 1 if found, 0 if not. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 effect_code, r3=u16 entity_id. Callers: check_slot_card_can_be_equipped (duel_field effect activation check); get_zone_card_attribute_by_type case_d (slot 0xb effect presence check). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
 find_effect_node_in_zone:
     push {r4,r5,r6,lr}                       @ 0802fd60 70b5
     adds r4,r2,#0x0    @ 0802fd62 141c
@@ -8196,15 +8196,15 @@ find_effect_node_in_zone:
     lsls r0,r1,#0x2    @ 0802fd68 8800
     adds r0,r0,r1    @ 0802fd6a 4018
     lsls r0,r0,#0x2    @ 0802fd6c 8000
-    ldr r1, DAT_0802fda4                     @ 0802fd6e 0d49
+    ldr r1, find_effect_node_zone_player_stride @ 0802fd6e 0d49
     muls r1,r2    @ 0802fd70 5143
     adds r0,r0,r1    @ 0802fd72 4018
-    ldr r1, DAT_0802fda8                     @ 0802fd74 0c49
+    ldr r1, find_effect_node_zone_field_slots @ 0802fd74 0c49
     adds r0,r0,r1    @ 0802fd76 4018
     ldrh r0,[r0,#0xa]                        @ 0802fd78 4089
     cmp r0,#0x0                              @ 0802fd7a 0028
     beq LAB_0802fdb6                         @ 0802fd7c 1bd0
-    ldr r2, DAT_0802fdac                     @ 0802fd7e 0b4a
+    ldr r2, find_effect_node_zone_equip_off  @ 0802fd7e 0b4a
     adds r5,r1,r2    @ 0802fd80 8d18
 LAB_0802fd82:
     lsls r0,r0,#0x3    @ 0802fd82 c000
@@ -8224,12 +8224,12 @@ LAB_0802fd82:
     movs r0,#0x1    @ 0802fd9e 0120
     b LAB_0802fdb8                           @ 0802fda0 0ae0
     .zero  0x2
-DAT_0802fda4:
-    .word  0x00000868                     @ 0802fda4 68080000
-DAT_0802fda8:
-    .word  0x0201c510                     @ 0802fda8 10c50102
-DAT_0802fdac:
-    .word  0x000014b0                     @ 0802fdac b0140000
+find_effect_node_zone_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fda4 68080000
+find_effect_node_zone_field_slots:
+    .word  gDuelFieldSlots                @ 0802fda8 10c50102
+find_effect_node_zone_equip_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802fdac b0140000
 LAB_0802fdb0:
     adds r0,r2,#0x0    @ 0802fdb0 101c
     cmp r0,#0x0                              @ 0802fdb2 0028
@@ -8242,7 +8242,7 @@ LAB_0802fdb8:
     bx r1                                    @ 0802fdbc 0847
     .zero  0x2
 
-@ Computes slot entry address (0x0201c510 + (r0 bit0)*0x868 + r1*20), reads [slot+0xa] chain head index, then calls find_node_by_value_and_zone_type with r2=value and r3=zone_type to search EWRAM node pool (0x0201d9c0). Returns 1 if matching node found, 0 otherwise. Simplified variant of find_effect_node_in_zone (FUN_0802fd60) -- that function additionally checks [node+4]==entity_id; this one only does dual-field match. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 card_id, r3=u8 zone_type [0..5]. Returns u32 bool. Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
+@ Computes slot entry address (0x0201c510 + (r0 bit0)*0x868 + r1*20), reads [slot+0xa] chain head index, then calls find_node_by_value_and_zone_type with r2=value and r3=zone_type to search EWRAM node pool (0x0201d9c0). Returns 1 if matching node found, 0 otherwise. Simplified variant of find_effect_node_in_zone (find_effect_node_in_zone) -- that function additionally checks [node+4]==entity_id; this one only does dual-field match. r0=u32 packed_player_id, r1=u32 slot_index [0..0xb], r2=u16 card_id, r3=u8 zone_type [0..5]. Returns u32 bool. Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes.
 check_node_in_slot_chain:
     push {r4,lr}                             @ 0802fdc0 10b5
     movs r4,#0x1    @ 0802fdc2 0124
@@ -8250,10 +8250,10 @@ check_node_in_slot_chain:
     lsls r0,r1,#0x2    @ 0802fdc6 8800
     adds r0,r0,r1    @ 0802fdc8 4018
     lsls r0,r0,#0x2    @ 0802fdca 8000
-    ldr r1, DAT_0802fdec                     @ 0802fdcc 0749
+    ldr r1, check_node_slot_chain_player_stride @ 0802fdcc 0749
     muls r1,r4    @ 0802fdce 6143
     adds r0,r0,r1    @ 0802fdd0 4018
-    ldr r1, DAT_0802fdf0                     @ 0802fdd2 0749
+    ldr r1, check_node_slot_chain_field_slots @ 0802fdd2 0749
     adds r0,r0,r1    @ 0802fdd4 4018
     ldrh r0,[r0,#0xa]                        @ 0802fdd6 4089
     adds r1,r2,#0x0    @ 0802fdd8 111c
@@ -8266,10 +8266,10 @@ LAB_0802fde6:
     pop {r4}                                 @ 0802fde6 10bc
     pop {r1}                                 @ 0802fde8 02bc
     bx r1                                    @ 0802fdea 0847
-DAT_0802fdec:
-    .word  0x00000868                     @ 0802fdec 68080000
-DAT_0802fdf0:
-    .word  0x0201c510                     @ 0802fdf0 10c50102
+check_node_slot_chain_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fdec 68080000
+check_node_slot_chain_field_slots:
+    .word  gDuelFieldSlots                @ 0802fdf0 10c50102
 
 @ Reads chain head index from gDuelFieldSlots[player_side][slot_idx]+0xa; calls find_node_by_value_zone_entity(head, card_id, -1) (wildcard entity). Returns 1 if matching node found, 0 otherwise. r2=card_id is moved to r3 at entry; r1 is set to -1 for wildcard entity search. Called by check_field_spell_group_placeable and check_field_spell_card_placeable_strict to test whether a specific effect is already present in a slot chain. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..11]; r2=u16 card_id. Returns u32 bool. indeg=10, class D. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa.
 check_slot_has_node_by_card_id:
@@ -8280,10 +8280,10 @@ check_slot_has_node_by_card_id:
     lsls r0,r1,#0x2    @ 0802fdfc 8800
     adds r0,r0,r1    @ 0802fdfe 4018
     lsls r0,r0,#0x2    @ 0802fe00 8000
-    ldr r1, DAT_0802fe24                     @ 0802fe02 0849
+    ldr r1, check_slot_node_card_player_stride @ 0802fe02 0849
     muls r1,r2    @ 0802fe04 5143
     adds r0,r0,r1    @ 0802fe06 4018
-    ldr r1, DAT_0802fe28                     @ 0802fe08 0749
+    ldr r1, check_slot_node_card_field_slots @ 0802fe08 0749
     adds r0,r0,r1    @ 0802fe0a 4018
     ldrh r0,[r0,#0xa]                        @ 0802fe0c 4089
     movs r2,#0x1    @ 0802fe0e 0122
@@ -8297,10 +8297,10 @@ LAB_0802fe1e:
     pop {r1}                                 @ 0802fe1e 02bc
     bx r1                                    @ 0802fe20 0847
     .zero  0x2
-DAT_0802fe24:
-    .word  0x00000868                     @ 0802fe24 68080000
-DAT_0802fe28:
-    .word  0x0201c510                     @ 0802fe28 10c50102
+check_slot_node_card_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fe24 68080000
+check_slot_node_card_field_slots:
+    .word  gDuelFieldSlots                @ 0802fe28 10c50102
 
 @ Function: search equip chain at specified slot for a node matching value (with zone_entity constraint), return bool. r0=packed_player_id (bit0=side), r1=slot_index [0..11], r2=u16 value, r3=zone_entity constraint param. Reads chain_head_index halfword from gDuelFieldSlots+side*0x868+slot*20+0xa; calls find_node_by_value_zone_entity(head, value, zone_entity_param, r3); returns 1 if non-NULL found (hit), else returns 0 (miss). Sibling pair with get_node_entity_id_in_slot (0x0802fe60): the latter has indeg=33 and returns entity_id; this function returns bool. Exit pop{r1};bx r1 (Sub-case E, preserves r0).
 @ 
@@ -8318,10 +8318,10 @@ check_value_in_slot_chain_zone_entity:
     lsls r0,r1,#0x2    @ 0802fe32 8800
     adds r0,r0,r1    @ 0802fe34 4018
     lsls r0,r0,#0x2    @ 0802fe36 8000
-    ldr r1, DWORD_0802fe58                   @ 0802fe38 0749
+    ldr r1, check_value_slot_zone_player_stride @ 0802fe38 0749
     muls r1,r4    @ 0802fe3a 6143
     adds r0,r0,r1    @ 0802fe3c 4018
-    ldr r1, DWORD_0802fe5c                   @ 0802fe3e 0749
+    ldr r1, check_value_slot_zone_field_slots @ 0802fe3e 0749
     adds r0,r0,r1    @ 0802fe40 4018
     ldrh r0,[r0,#0xa]                        @ 0802fe42 4089
     adds r1,r2,#0x0    @ 0802fe44 111c
@@ -8334,10 +8334,10 @@ LAB_0802fe52:
     pop {r4}                                 @ 0802fe52 10bc
     pop {r1}                                 @ 0802fe54 02bc
     bx r1                                    @ 0802fe56 0847
-DWORD_0802fe58:
-    .word  0x00000868                     @ 0802fe58 68080000
-DWORD_0802fe5c:
-    .word  0x0201c510                     @ 0802fe5c 10c50102
+check_value_slot_zone_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fe58 68080000
+check_value_slot_zone_field_slots:
+    .word  gDuelFieldSlots                @ 0802fe5c 10c50102
 
 @ Locates a node in the equip chain for slot (r0 bit0=side, r1=slot_index) where [node+0]==r2(value) and zone_type<=5; if found returns [node+4](u16 entity_id), else returns -1 (0xFFFFFFFF). Reads chain_head_index from gDuelFieldSlots+side*0x868+slot_idx*20+0xa, calls find_node_by_value(head, value). Upgraded variant of check_value_in_slot_chain: returns entity_id instead of bool. indeg=33; used for effect source entity tracing. r0=u32 packed_player_id (bit0=side), r1=u32 slot_index [0..11], r2=u16 value. Returns u16 entity_id extended to u32, or -1 if not found. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20, chain_head_offset=0xa, entity_id_offset=4.
 get_node_entity_id_in_slot:
@@ -8347,10 +8347,10 @@ get_node_entity_id_in_slot:
     lsls r0,r1,#0x2    @ 0802fe66 8800
     adds r0,r0,r1    @ 0802fe68 4018
     lsls r0,r0,#0x2    @ 0802fe6a 8000
-    ldr r1, DAT_0802fe88                     @ 0802fe6c 0649
+    ldr r1, get_node_entity_slot_player_stride @ 0802fe6c 0649
     muls r1,r3    @ 0802fe6e 5943
     adds r0,r0,r1    @ 0802fe70 4018
-    ldr r1, DAT_0802fe8c                     @ 0802fe72 0649
+    ldr r1, get_node_entity_slot_field_slots @ 0802fe72 0649
     adds r0,r0,r1    @ 0802fe74 4018
     ldrh r0,[r0,#0xa]                        @ 0802fe76 4089
     adds r1,r2,#0x0    @ 0802fe78 111c
@@ -8360,10 +8360,10 @@ get_node_entity_id_in_slot:
     ldrh r0,[r0,#0x4]                        @ 0802fe82 8088
     b LAB_0802fe94                           @ 0802fe84 06e0
     .zero  0x2
-DAT_0802fe88:
-    .word  0x00000868                     @ 0802fe88 68080000
-DAT_0802fe8c:
-    .word  0x0201c510                     @ 0802fe8c 10c50102
+get_node_entity_slot_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fe88 68080000
+get_node_entity_slot_field_slots:
+    .word  gDuelFieldSlots                @ 0802fe8c 10c50102
 LAB_0802fe90:
     movs r0,#0x1    @ 0802fe90 0120
     rsbs r0,r0,#0    @ 0802fe92 4042
@@ -8371,7 +8371,13 @@ LAB_0802fe94:
     pop {r1}                                 @ 0802fe94 02bc
     bx r1                                    @ 0802fe96 0847
 
-@ 由 scan_equip_zone_for_super_rejuvenation_activation (0x0809d374) 调用, 用于在给定玩家/槽类型/区域 ID/类型标志下查找链节点并返回其 entity hword. 入口: bit0 of r0 -> r4 (player), r1=slot_type, r2=zone_id, r3=type_flag. 计算 slot_struct_addr = DAT_0x0201c510 + slot_type*20*4 + player*0x868; 读取 [slot_struct+0xa] hword; 调用 find_node_by_value_and_zone_type(hword, zone_id, type_flag); 若命中返回 [node+4] hword; 未命中路径见 LAB_0802fec8. Side effects: 无外部写入. Constants: chain_base=0x0201c510, player_stride=0x868, node_entity_offset=0x4.
+@ Called by scan_equip_zone_for_super_rejuvenation_activation (0x0809d374).
+@ Computes slot_struct_addr = gDuelFieldSlots + slot_type*20*4 + (r0&1)*0x868.
+@ Reads [slot+0xa] chain head halfword; calls find_node_by_value_and_zone_type(head, zone_id, type_flag).
+@ On hit: returns node[+4] hword (entity). On miss: returns -1.
+@ r0=packed_player_id, r1=slot_type, r2=zone_id, r3=type_flag.
+@ Returns u16 entity hword or -1. No external writes.
+@ Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, node_entity_offset=0x4.
 get_zone_node_entity_hword_by_card_and_type:
     push {r4,lr}                             @ 0802fe98 10b5
     movs r4,#0x1    @ 0802fe9a 0124
@@ -8379,10 +8385,10 @@ get_zone_node_entity_hword_by_card_and_type:
     lsls r0,r1,#0x2    @ 0802fe9e 8800
     adds r0,r0,r1    @ 0802fea0 4018
     lsls r0,r0,#0x2    @ 0802fea2 8000
-    ldr r1, DAT_0802fec0                     @ 0802fea4 0649
+    ldr r1, get_zone_entity_hword_type_player_stride @ 0802fea4 0649
     muls r1,r4    @ 0802fea6 6143
     adds r0,r0,r1    @ 0802fea8 4018
-    ldr r1, DAT_0802fec4                     @ 0802feaa 0649
+    ldr r1, get_zone_entity_hword_type_field_slots @ 0802feaa 0649
     adds r0,r0,r1    @ 0802feac 4018
     ldrh r0,[r0,#0xa]                        @ 0802feae 4089
     adds r1,r2,#0x0    @ 0802feb0 111c
@@ -8392,10 +8398,10 @@ get_zone_node_entity_hword_by_card_and_type:
     beq LAB_0802fec8                         @ 0802feba 05d0
     ldrh r0,[r0,#0x4]                        @ 0802febc 8088
     b LAB_0802fecc                           @ 0802febe 05e0
-DAT_0802fec0:
-    .word  0x00000868                     @ 0802fec0 68080000
-DAT_0802fec4:
-    .word  0x0201c510                     @ 0802fec4 10c50102
+get_zone_entity_hword_type_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fec0 68080000
+get_zone_entity_hword_type_field_slots:
+    .word  gDuelFieldSlots                @ 0802fec4 10c50102
 LAB_0802fec8:
     movs r0,#0x1    @ 0802fec8 0120
     rsbs r0,r0,#0    @ 0802feca 4042
@@ -8405,7 +8411,14 @@ LAB_0802fecc:
     bx r1                                    @ 0802fed0 0847
     .zero  0x2
 
-@ 由 scan_equip_zone_for_entity_sprite_and_activation (0x0809f538) 及 duel_field 函数 FUN_0809bfd4 调用, 用于在给定玩家/槽类型/区域 ID 下查找链节点并返回 entity hword, 未命中返回 -1. 入口: bit0 of r0 -> r3 (player), r1=slot_type, r2=zone_id. 计算 slot_struct_addr = 0x0201c510 + slot_type*20*4 + player*0x868; 读取 [struct+0xa] hword; 以 zone_entity_flag=-1 调用 find_node_by_value_zone_entity(hword, zone_id, -1); 命中返回 [node+4] hword, 未命中返回 r4=-1. Side effects: 无外部写入. Constants: chain_base=0x0201c510, player_stride=0x868, miss_sentinel=-1.
+@ Called by scan_equip_zone_for_entity_sprite_and_activation (0x0809f538) and
+@ dispatch_equip_action_sprite_by_phase_state (0x0809bfd4).
+@ Computes slot_struct_addr = gDuelFieldSlots + slot_type*20*4 + (r0&1)*0x868.
+@ Reads [struct+0xa] chain head halfword; calls find_node_by_value_zone_entity(head, zone_id, -1).
+@ On hit: returns node[+4] hword (entity). On miss: returns -1 (r4 sentinel).
+@ r0=packed_player_id, r1=slot_type, r2=zone_id.
+@ Returns u16 entity hword or -1. No external writes.
+@ Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, miss_sentinel=-1.
 get_zone_node_entity_hword_or_miss:
     push {r4,lr}                             @ 0802fed4 10b5
     movs r3,#0x1    @ 0802fed6 0123
@@ -8413,10 +8426,10 @@ get_zone_node_entity_hword_or_miss:
     lsls r0,r1,#0x2    @ 0802feda 8800
     adds r0,r0,r1    @ 0802fedc 4018
     lsls r0,r0,#0x2    @ 0802fede 8000
-    ldr r1, DAT_0802ff00                     @ 0802fee0 0749
+    ldr r1, get_zone_entity_hword_miss_player_stride @ 0802fee0 0749
     muls r1,r3    @ 0802fee2 5943
     adds r0,r0,r1    @ 0802fee4 4018
-    ldr r1, DAT_0802ff04                     @ 0802fee6 0749
+    ldr r1, get_zone_entity_hword_miss_field_slots @ 0802fee6 0749
     adds r0,r0,r1    @ 0802fee8 4018
     ldrh r0,[r0,#0xa]                        @ 0802feea 4089
     movs r4,#0x1    @ 0802feec 0124
@@ -8428,10 +8441,10 @@ get_zone_node_entity_hword_or_miss:
     beq LAB_0802ff08                         @ 0802fefa 05d0
     ldrh r0,[r0,#0x4]                        @ 0802fefc 8088
     b LAB_0802ff0a                           @ 0802fefe 04e0
-DAT_0802ff00:
-    .word  0x00000868                     @ 0802ff00 68080000
-DAT_0802ff04:
-    .word  0x0201c510                     @ 0802ff04 10c50102
+get_zone_entity_hword_miss_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802ff00 68080000
+get_zone_entity_hword_miss_field_slots:
+    .word  gDuelFieldSlots                @ 0802ff04 10c50102
 LAB_0802ff08:
     adds r0,r4,#0x0    @ 0802ff08 201c
 LAB_0802ff0a:
@@ -8439,13 +8452,13 @@ LAB_0802ff0a:
     pop {r1}                                 @ 0802ff0c 02bc
     bx r1                                    @ 0802ff0e 0847
 
-@ Zone slot card_id existence check wrapper: reads gP1LifePoints+0x10e2 (DAT_0802ff30=0x10e2) at slot_idx*4 to extract card_id halfword, then calls find_node_by_value (PROGRESS #183) to check node pool. Returns 1 on hit, 0 on miss. r0=u32 slot_idx [0..0xb]. Returns u32 bool. 7-instruction leaf wrapper. Callers: FUN_0804559c (duel_field, batch), FUN_0805e3a8 (effect trigger). No side effects (pure read of gP1LifePoints+0x10e2 zone state table + node pool). Constants: ZONE_STATE_OFFSET=0x10e2, slot_stride=4.
+@ Zone slot card_id existence check wrapper: reads gP1LifePoints+0x10e2 (DAT_0802ff30=0x10e2) at slot_idx*4 to extract card_id halfword, then calls find_node_by_value (PROGRESS #183) to check node pool. Returns 1 on hit, 0 on miss. r0=u32 slot_idx [0..0xb]. Returns u32 bool. 7-instruction leaf wrapper. Callers: dispatch_card_effect_sprite_render_by_card_id (duel_field, batch), check_equip_slot_eligible_with_pool_and_hand_slot (effect trigger). No side effects (pure read of gP1LifePoints+0x10e2 zone state table + node pool). Constants: ZONE_STATE_OFFSET=0x10e2, slot_stride=4.
 check_zone_card_id_in_node_pool:
     push {lr}                                @ 0802ff10 00b5
-    ldr r2, PTR_gP1LifePoints_0802ff2c       @ 0802ff12 064a
+    ldr r2, check_zone_card_id_in_node_pool_p1lp_base @ 0802ff12 064a
     lsls r0,r0,#0x2    @ 0802ff14 8000
     adds r0,r0,r2    @ 0802ff16 8018
-    ldr r2, DAT_0802ff30                     @ 0802ff18 054a
+    ldr r2, check_zone_card_pool_card_id_off @ 0802ff18 054a
     adds r0,r0,r2    @ 0802ff1a 8018
     ldrh r0,[r0,#0x0]                        @ 0802ff1c 0088
     bl find_node_by_value                    @ 0802ff1e fff7e9fd
@@ -8455,10 +8468,10 @@ check_zone_card_id_in_node_pool:
 LAB_0802ff28:
     pop {r1}                                 @ 0802ff28 02bc
     bx r1                                    @ 0802ff2a 0847
-PTR_gP1LifePoints_0802ff2c:
-    .word  gP1LifePoints                  @ 0802ff2c e0c40102
-DAT_0802ff30:
-    .word  0x000010e2                     @ 0802ff30 e2100000
+check_zone_card_id_in_node_pool_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ff2c e0c40102  gP1LifePoints base ptr
+check_zone_card_pool_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ff30 e2100000
 
 @ Zone_idx chain existence check: card_id + zone_type dual-match.
 @ Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
@@ -8468,10 +8481,10 @@ DAT_0802ff30:
 @ Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); ZONE_CHAIN_ENTRY_SIZE=4.
 check_node_in_zone_idx_chain:
     push {lr}                                @ 0802ff34 00b5
-    ldr r3, PTR_gP1LifePoints_0802ff50       @ 0802ff36 064b
+    ldr r3, check_node_in_zone_idx_chain_p1lp_base @ 0802ff36 064b
     lsls r0,r0,#0x2    @ 0802ff38 8000
     adds r0,r0,r3    @ 0802ff3a c018
-    ldr r3, DAT_0802ff54                     @ 0802ff3c 054b
+    ldr r3, check_node_zone_idx_card_id_off  @ 0802ff3c 054b
     adds r0,r0,r3    @ 0802ff3e c018
     ldrh r0,[r0,#0x0]                        @ 0802ff40 0088
     bl find_node_by_value_and_zone_type      @ 0802ff42 fff7f3fd
@@ -8481,10 +8494,10 @@ check_node_in_zone_idx_chain:
 LAB_0802ff4c:
     pop {r1}                                 @ 0802ff4c 02bc
     bx r1                                    @ 0802ff4e 0847
-PTR_gP1LifePoints_0802ff50:
-    .word  gP1LifePoints                  @ 0802ff50 e0c40102
-DAT_0802ff54:
-    .word  0x000010e2                     @ 0802ff54 e2100000
+check_node_in_zone_idx_chain_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ff50 e0c40102  gP1LifePoints base ptr
+check_node_zone_idx_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ff54 e2100000
 
 @ Get entity_id from zone_idx chain by card_id lookup.
 @ Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
@@ -8493,10 +8506,10 @@ DAT_0802ff54:
 @ Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); ENTITY_ID_OFFSET=4; NOT_FOUND=-1.
 get_entity_id_in_zone_idx_chain:
     push {lr}                                @ 0802ff58 00b5
-    ldr r2, PTR_gP1LifePoints_0802ff74       @ 0802ff5a 064a
+    ldr r2, get_entity_id_in_zone_idx_chain_p1lp_base @ 0802ff5a 064a
     lsls r0,r0,#0x2    @ 0802ff5c 8000
     adds r0,r0,r2    @ 0802ff5e 8018
-    ldr r2, DAT_0802ff78                     @ 0802ff60 054a
+    ldr r2, get_entity_zone_idx_card_id_off  @ 0802ff60 054a
     adds r0,r0,r2    @ 0802ff62 8018
     ldrh r0,[r0,#0x0]                        @ 0802ff64 0088
     bl find_node_by_value                    @ 0802ff66 fff7c5fd
@@ -8505,10 +8518,10 @@ get_entity_id_in_zone_idx_chain:
     ldrh r0,[r0,#0x4]                        @ 0802ff6e 8088
     b LAB_0802ff80                           @ 0802ff70 06e0
     .zero  0x2
-PTR_gP1LifePoints_0802ff74:
-    .word  gP1LifePoints                  @ 0802ff74 e0c40102
-DAT_0802ff78:
-    .word  0x000010e2                     @ 0802ff78 e2100000
+get_entity_id_in_zone_idx_chain_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ff74 e0c40102  gP1LifePoints base ptr
+get_entity_zone_idx_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ff78 e2100000
 LAB_0802ff7c:
     movs r0,#0x1    @ 0802ff7c 0120
     rsbs r0,r0,#0    @ 0802ff7e 4042
@@ -8523,10 +8536,10 @@ LAB_0802ff80:
 @ Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); ENTITY_ID_OFFSET=4; NOT_FOUND=-1.
 get_entity_id_in_zone_idx_chain_by_type:
     push {lr}                                @ 0802ff84 00b5
-    ldr r3, PTR_gP1LifePoints_0802ffa0       @ 0802ff86 064b
+    ldr r3, get_entity_id_in_zone_idx_chain_by_type_p1lp_base @ 0802ff86 064b
     lsls r0,r0,#0x2    @ 0802ff88 8000
     adds r0,r0,r3    @ 0802ff8a c018
-    ldr r3, DAT_0802ffa4                     @ 0802ff8c 054b
+    ldr r3, get_entity_zone_idx_type_card_id_off @ 0802ff8c 054b
     adds r0,r0,r3    @ 0802ff8e c018
     ldrh r0,[r0,#0x0]                        @ 0802ff90 0088
     bl find_node_by_value_and_zone_type      @ 0802ff92 fff7cbfd
@@ -8535,10 +8548,10 @@ get_entity_id_in_zone_idx_chain_by_type:
     ldrh r0,[r0,#0x4]                        @ 0802ff9a 8088
     b LAB_0802ffac                           @ 0802ff9c 06e0
     .zero  0x2
-PTR_gP1LifePoints_0802ffa0:
-    .word  gP1LifePoints                  @ 0802ffa0 e0c40102
-DAT_0802ffa4:
-    .word  0x000010e2                     @ 0802ffa4 e2100000
+get_entity_id_in_zone_idx_chain_by_type_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ffa0 e0c40102  gP1LifePoints base ptr
+get_entity_zone_idx_type_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ffa4 e2100000
 LAB_0802ffa8:
     movs r0,#0x1    @ 0802ffa8 0120
     rsbs r0,r0,#0    @ 0802ffaa 4042
@@ -8554,20 +8567,20 @@ LAB_0802ffac:
 @ Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); NODE_POOL=0x0201d9c0; NODE_STRIDE=8.
 count_chain_by_card_id_in_zone_idx:
     push {lr}                                @ 0802ffb0 00b5
-    ldr r2, PTR_gP1LifePoints_0802ffc8       @ 0802ffb2 054a
+    ldr r2, count_chain_by_card_id_in_zone_idx_p1lp_base @ 0802ffb2 054a
     lsls r0,r0,#0x2    @ 0802ffb4 8000
     adds r0,r0,r2    @ 0802ffb6 8018
-    ldr r2, DAT_0802ffcc                     @ 0802ffb8 044a
+    ldr r2, count_chain_card_id_zone_card_id_off @ 0802ffb8 044a
     adds r0,r0,r2    @ 0802ffba 8018
     ldrh r0,[r0,#0x0]                        @ 0802ffbc 0088
     bl count_chain_nodes_by_card_id          @ 0802ffbe fff7fdfd
     pop {r1}                                 @ 0802ffc2 02bc
     bx r1                                    @ 0802ffc4 0847
     .zero  0x2
-PTR_gP1LifePoints_0802ffc8:
-    .word  gP1LifePoints                  @ 0802ffc8 e0c40102
-DAT_0802ffcc:
-    .word  0x000010e2                     @ 0802ffcc e2100000
+count_chain_by_card_id_in_zone_idx_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ffc8 e0c40102  gP1LifePoints base ptr
+count_chain_card_id_zone_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ffcc e2100000
 
 @ Count nodes in zone_idx chain matching both card_id and zone_type.
 @ Indexes gP1LifePoints+0x10e2 (0x0201d5c2) by r0 (zone_idx) to get chain head halfword,
@@ -8577,22 +8590,30 @@ DAT_0802ffcc:
 @ Constants: ZONE_CHAIN_HEAD_BASE=0x0201d5c2 (gP1LifePoints+0x10e2); NODE_POOL=0x0201d9c0.
 count_chain_by_card_id_and_type_in_zone_idx:
     push {lr}                                @ 0802ffd0 00b5
-    ldr r3, PTR_gP1LifePoints_0802ffe8       @ 0802ffd2 054b
+    ldr r3, count_chain_by_card_id_and_type_in_zone_idx_p1lp_base @ 0802ffd2 054b
     lsls r0,r0,#0x2    @ 0802ffd4 8000
     adds r0,r0,r3    @ 0802ffd6 c018
-    ldr r3, DAT_0802ffec                     @ 0802ffd8 044b
+    ldr r3, count_chain_card_id_type_zone_card_id_off @ 0802ffd8 044b
     adds r0,r0,r3    @ 0802ffda c018
     ldrh r0,[r0,#0x0]                        @ 0802ffdc 0088
     bl count_chain_nodes_by_card_id_and_type @ 0802ffde fff709fe
     pop {r1}                                 @ 0802ffe2 02bc
     bx r1                                    @ 0802ffe4 0847
     .zero  0x2
-PTR_gP1LifePoints_0802ffe8:
-    .word  gP1LifePoints                  @ 0802ffe8 e0c40102
-DAT_0802ffec:
-    .word  0x000010e2                     @ 0802ffec e2100000
+count_chain_by_card_id_and_type_in_zone_idx_p1lp_base:
+    .word  gP1LifePoints                  @ 0802ffe8 e0c40102  gP1LifePoints base ptr
+count_chain_card_id_type_zone_card_id_off:
+    .word  ZONE_CHAIN_CARD_ID_OFF         @ 0802ffec e2100000
 
-@ 被 FUN_08090a78 (equip 激活主循环, 0x0809112e) 及同层上级调用 (共 2 处 callsite). 入口 r0=player_side [0..1], r1=slot_idx [0..4], r2=card_id_filter [0..0x1fff]. 计算 gDuelFieldSlots[player*0x868+slot*0x14] 目标格基址, 读 [+0xa] 链头 halfword. 若链头为 0 直接返回 0. 否则以 chain_head*8 为偏移在 gDuelNodePool (0x0201d9c0, stride=8) 遍历节点链: 检查 node[+2] 低 4 位 (lsls/lsrs #0x1c) <= 5; 匹配 node[+0] == card_id_filter 则累加 node[+4] 至 r3; 通过 node[+6] halfword 推进下一节点. 链尾 node[+6]==0 退出. 返回 r0=u32 累计分数. 纯读无外部写. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, gDuelNodePool=0x0201d9c0, node_stride=8, node_type_max=5, chain_head_offset=0xa.
+@ Called by build_equip_candidate_score_table (0x08090a78) (2 callsites).
+@ r0=player_side [0..1], r1=slot_idx [0..4], r2=card_id_filter [0..0x1fff].
+@ Computes gDuelFieldSlots[player*0x868+slot*0x14] base; reads [+0xa] chain head halfword.
+@ If head==0 returns 0. Else traverses gEquipNodePool (stride 8) while head!=0:
+@   checks node[+2] low 4 bits <= 5; if node[+0]==card_id_filter accumulates node[+4] to sum.
+@   Advances via node[+6] halfword.
+@ Returns r0=u32 accumulated score. Pure read, no external writes.
+@ Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, gEquipNodePool=0x0201d9c0,
+@ node_stride=8, node_type_max=5, chain_head_offset=0xa.
 scan_equip_node_pool_for_card_score:
     push {r4,r5,r6,lr}                       @ 0802fff0 70b5
     adds r4,r2,#0x0    @ 0802fff2 141c
@@ -8602,15 +8623,15 @@ scan_equip_node_pool_for_card_score:
     lsls r0,r1,#0x2    @ 0802fffa 8800
     adds r0,r0,r1    @ 0802fffc 4018
     lsls r0,r0,#0x2    @ 0802fffe 8000
-    ldr r1, DAT_0803003c                     @ 08030000 0e49
+    ldr r1, find_equip_node_pred_player_stride @ 08030000 0e49
     muls r1,r2    @ 08030002 5143
     adds r0,r0,r1    @ 08030004 4018
-    ldr r1, DAT_08030040                     @ 08030006 0e49
+    ldr r1, find_equip_node_pred_field_slots @ 08030006 0e49
     adds r0,r0,r1    @ 08030008 4018
     ldrh r0,[r0,#0xa]                        @ 0803000a 4089
     cmp r0,#0x0                              @ 0803000c 0028
     beq LAB_08030034                         @ 0803000e 11d0
-    ldr r2, DAT_08030044                     @ 08030010 0c4a
+    ldr r2, find_equip_node_pred_equip_off   @ 08030010 0c4a
     adds r5,r1,r2    @ 08030012 8d18
 LAB_08030014:
     lsls r0,r0,#0x3    @ 08030014 c000
@@ -8635,14 +8656,14 @@ LAB_08030034:
     pop {r4,r5,r6}                           @ 08030036 70bc
     pop {r1}                                 @ 08030038 02bc
     bx r1                                    @ 0803003a 0847
-DAT_0803003c:
-    .word  0x00000868                     @ 0803003c 68080000
-DAT_08030040:
-    .word  0x0201c510                     @ 08030040 10c50102
-DAT_08030044:
-    .word  0x000014b0                     @ 08030044 b0140000
+find_equip_node_pred_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803003c 68080000
+find_equip_node_pred_field_slots:
+    .word  gDuelFieldSlots                @ 08030040 10c50102
+find_equip_node_pred_equip_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 08030044 b0140000
 
-@ Read slot[+0xa] chain head from gDuelFieldSlots[player_side][slot_idx]; return 0 if empty. Traverse gDuelNodePool (0x0201d9c0) nodes (8 bytes each): for each node call FUN_0810e5e4 trampoline (bx r6) with (node_ptr, pred_param); if returns nonzero, return node_ptr. Next via node[+6] halfword. Exhausted: return 0. r0: player_side [0..1]; r1: slot_idx [0..4]; r3: pred_param (-> r1 in trampoline); r6 (non-APCS): fn_ptr/id for trampoline. Returns r0=node_ptr or 0. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, slot_chain_offset=0xa, node_stride=8, node_next_offset=6.
+@ Read slot[+0xa] chain head from gDuelFieldSlots[player_side][slot_idx]; return 0 if empty. Traverse gDuelNodePool (0x0201d9c0) nodes (8 bytes each): for each node call invoke_r7 trampoline (bx r6) with (node_ptr, pred_param); if returns nonzero, return node_ptr. Next via node[+6] halfword. Exhausted: return 0. r0: player_side [0..1]; r1: slot_idx [0..4]; r3: pred_param (-> r1 in trampoline); r6 (non-APCS): fn_ptr/id for trampoline. Returns r0=node_ptr or 0. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, slot_chain_offset=0xa, node_stride=8, node_next_offset=6.
 find_equip_chain_node_by_pred:
     push {r4,r5,r6,r7,lr}                    @ 08030048 f0b5
     adds r7,r2,#0x0    @ 0803004a 171c
@@ -8652,17 +8673,17 @@ find_equip_chain_node_by_pred:
     lsls r0,r1,#0x2    @ 08030052 8800
     adds r0,r0,r1    @ 08030054 4018
     lsls r0,r0,#0x2    @ 08030056 8000
-    ldr r1, DAT_08030080                     @ 08030058 0949
+    ldr r1, find_zone_node_card_player_stride @ 08030058 0949
     muls r1,r2    @ 0803005a 5143
     adds r0,r0,r1    @ 0803005c 4018
-    ldr r1, DAT_08030084                     @ 0803005e 0949
+    ldr r1, find_zone_node_card_field_slots  @ 0803005e 0949
     adds r0,r0,r1    @ 08030060 4018
     ldrh r0,[r0,#0xa]                        @ 08030062 4089
     cmp r0,#0x0                              @ 08030064 0028
     beq LAB_08030092                         @ 08030066 14d0
 LAB_08030068:
     lsls r0,r0,#0x3    @ 08030068 c000
-    ldr r1, DAT_08030088                     @ 0803006a 0749
+    ldr r1, find_equip_node_pred_pool        @ 0803006a 0749
     adds r4,r0,r1    @ 0803006c 4418
     ldrh r5,[r4,#0x6]                        @ 0803006e e588
     adds r0,r4,#0x0    @ 08030070 201c
@@ -8672,12 +8693,12 @@ LAB_08030068:
     beq LAB_0803008c                         @ 0803007a 07d0
     adds r0,r4,#0x0    @ 0803007c 201c
     b LAB_08030094                           @ 0803007e 09e0
-DAT_08030080:
-    .word  0x00000868                     @ 08030080 68080000
-DAT_08030084:
-    .word  0x0201c510                     @ 08030084 10c50102
-DAT_08030088:
-    .word  0x0201d9c0                     @ 08030088 c0d90102
+find_zone_node_card_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08030080 68080000
+find_zone_node_card_field_slots:
+    .word  gDuelFieldSlots                @ 08030084 10c50102
+find_equip_node_pred_pool:
+    .word  gEquipNodePool                 @ 08030088 c0d90102
 LAB_0803008c:
     adds r0,r5,#0x0    @ 0803008c 281c
     cmp r0,#0x0                              @ 0803008e 0028
@@ -8690,7 +8711,7 @@ LAB_08030094:
     bx r1                                    @ 08030098 0847
     .zero  0x2
 
-@ Zone-slot chain node finder: reads [r0+0xa] chain head, then scans node pool @0x0201d9c0 (stride 8) calling FUN_0810e5e4(node, r6=cmp_key) on each, returns first matching node pointer. Empty chain or no hit returns 0. r0=ptr<DuelFieldSlot> slot_ptr; r1=u32 r7_payload (callee-save alias unused in body); r2=u32 cmp_key -> r6 (forwarded to FUN_0810e5e4 r1). Returns ptr<Node> on hit, 0 on miss. Single caller FUN_0804559c (duel_field, batch). No side effects, pure read of node pool + chain head. Constants: NODE_POOL=0x0201d9c0, chain_head_offset=0xa, node_stride=8.
+@ Zone-slot chain node finder: reads [r0+0xa] chain head, then scans node pool @0x0201d9c0 (stride 8) calling invoke_r7(node, r6=cmp_key) on each, returns first matching node pointer. Empty chain or no hit returns 0. r0=ptr<DuelFieldSlot> slot_ptr; r1=u32 r7_payload (callee-save alias unused in body); r2=u32 cmp_key -> r6 (forwarded to invoke_r7 r1). Returns ptr<Node> on hit, 0 on miss. Single caller dispatch_card_effect_sprite_render_by_card_id (duel_field, batch). No side effects, pure read of node pool + chain head. Constants: NODE_POOL=0x0201d9c0, chain_head_offset=0xa, node_stride=8.
 find_zone_node_by_card_id_match:
     push {r4,r5,r6,r7,lr}                    @ 0803009c f0b5
     adds r7,r1,#0x0    @ 0803009e 0f1c
@@ -8700,7 +8721,7 @@ find_zone_node_by_card_id_match:
     beq LAB_080300ca                         @ 080300a6 10d0
 LAB_080300a8:
     lsls r0,r0,#0x3    @ 080300a8 c000
-    ldr r1, DAT_080300c0                     @ 080300aa 0549
+    ldr r1, scan_equip_pool_card_score_pool  @ 080300aa 0549
     adds r4,r0,r1    @ 080300ac 4418
     ldrh r5,[r4,#0x6]                        @ 080300ae e588
     adds r0,r4,#0x0    @ 080300b0 201c
@@ -8710,8 +8731,8 @@ LAB_080300a8:
     beq LAB_080300c4                         @ 080300ba 03d0
     adds r0,r4,#0x0    @ 080300bc 201c
     b LAB_080300cc                           @ 080300be 05e0
-DAT_080300c0:
-    .word  0x0201d9c0                     @ 080300c0 c0d90102
+scan_equip_pool_card_score_pool:
+    .word  gEquipNodePool                 @ 080300c0 c0d90102
 LAB_080300c4:
     adds r0,r5,#0x0    @ 080300c4 281c
     cmp r0,#0x0                              @ 080300c6 0028
@@ -8724,7 +8745,7 @@ LAB_080300cc:
     bx r1                                    @ 080300d0 0847
     .zero  0x2
 
-@ Zone slot special state checker by field5 dispatch: reads card_record [r0+2] low 4 bits (field5) and dispatches: field5 in [6..9] checks gDuelFieldSlots active_bit at slot[+0]&0x10000; field5 in [0xa..0xd] does card_id table-match on 0x14b2/0x1243/0x1103/0x137d/0x17b7/0x14fc/0x16a2/0x184b followed by gP1LifePoints+0x40 bit5 check. r0=ptr<CardEntry> (reads [+0]=card_id, [+2] low 4=field5); r1=u32 r6_payload (returned on hit at LAB_080301cc as fallback value). Returns u32 (0=miss, 1=hit with non-branch return, r6=branch hit return). Callers: FUN_0804659c, FUN_08046bd0 (duel_field, batch). No side effects, reads gDuelFieldSlots@0x0201c510 + gP1LifePoints+0x40 only. Constants: gDuelFieldSlots=0x0201c510, BIT5_MASK=0x20, FIELD5_RANGE_A=[6..9], FIELD5_RANGE_B=[0xa..0xd].
+@ Zone slot special state checker by field5 dispatch: reads card_record [r0+2] low 4 bits (field5) and dispatches: field5 in [6..9] checks gDuelFieldSlots active_bit at slot[+0]&0x10000; field5 in [0xa..0xd] does card_id table-match on 0x14b2/0x1243/0x1103/0x137d/0x17b7/0x14fc/0x16a2/0x184b followed by gP1LifePoints+0x40 bit5 check. r0=ptr<CardEntry> (reads [+0]=card_id, [+2] low 4=field5); r1=u32 r6_payload (returned on hit at LAB_080301cc as fallback value). Returns u32 (0=miss, 1=hit with non-branch return, r6=branch hit return). Callers: check_slot_equip_target_eligibility, dispatch_card_effect_zone_action_by_card_id (duel_field, batch). No side effects, reads gDuelFieldSlots@0x0201c510 + gP1LifePoints+0x40 only. Constants: gDuelFieldSlots=0x0201c510, BIT5_MASK=0x20, FIELD5_RANGE_A=[6..9], FIELD5_RANGE_B=[0xa..0xd].
 check_zone_card_special_state_by_field5:
     push {r4,r5,r6,lr}                       @ 080300d4 70b5
     adds r6,r1,#0x0    @ 080300d6 0e1c
@@ -8749,10 +8770,10 @@ LAB_080300f4:
     lsls r0,r5,#0x2    @ 080300f8 a800
     adds r0,r0,r5    @ 080300fa 4019
     lsls r0,r0,#0x2    @ 080300fc 8000
-    ldr r1, DAT_08030114                     @ 080300fe 0549
+    ldr r1, check_zone_card_field5_player_stride_a @ 080300fe 0549
     muls r1,r4    @ 08030100 6143
     adds r0,r0,r1    @ 08030102 4018
-    ldr r1, DAT_08030118                     @ 08030104 0449
+    ldr r1, check_zone_card_field5_field_slots_a @ 08030104 0449
     adds r0,r0,r1    @ 08030106 4018
     ldr r0,[r0,#0x0]                         @ 08030108 0068
     lsls r0,r0,#0x13    @ 0803010a c004
@@ -8761,77 +8782,77 @@ LAB_080300f4:
 LAB_08030110:
     movs r0,#0x1    @ 08030110 0120
     b LAB_080301f8                           @ 08030112 71e0
-DAT_08030114:
-    .word  0x00000868                     @ 08030114 68080000
-DAT_08030118:
-    .word  0x0201c510                     @ 08030118 10c50102
+check_zone_card_field5_player_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 08030114 68080000
+check_zone_card_field5_field_slots_a:
+    .word  gDuelFieldSlots                @ 08030118 10c50102
 LAB_0803011c:
     movs r2,#0x1    @ 0803011c 0122
     ands r2,r4    @ 0803011e 2240
     lsls r3,r5,#0x2    @ 08030120 ab00
     adds r0,r3,r5    @ 08030122 5819
     lsls r0,r0,#0x2    @ 08030124 8000
-    ldr r1, DAT_08030154                     @ 08030126 0b49
+    ldr r1, check_zone_card_field5_player_stride_b @ 08030126 0b49
     muls r1,r2    @ 08030128 5143
     adds r0,r0,r1    @ 0803012a 4018
-    ldr r1, DAT_08030158                     @ 0803012c 0a49
+    ldr r1, check_zone_card_field5_field_slots_b @ 0803012c 0a49
     adds r0,r0,r1    @ 0803012e 4018
     ldr r0,[r0,#0x0]                         @ 08030130 0068
     lsls r0,r0,#0x13    @ 08030132 c004
     lsrs r1,r0,#0x13    @ 08030134 c10c
-    ldr r0, DAT_0803015c                     @ 08030136 0948
+    ldr r0, check_zone_card_special_field5_cid_14b2 @ 08030136 0948
     cmp r1,r0                                @ 08030138 8142
     beq LAB_080301d8                         @ 0803013a 4dd0
     cmp r1,r0                                @ 0803013c 8142
     bgt LAB_08030178                         @ 0803013e 1bdc
-    ldr r0, DAT_08030160                     @ 08030140 0748
+    ldr r0, check_zone_card_special_field5_cid_1243 @ 08030140 0748
     cmp r1,r0                                @ 08030142 8142
     beq LAB_080301d8                         @ 08030144 48d0
     cmp r1,r0                                @ 08030146 8142
     bgt LAB_08030168                         @ 08030148 0edc
-    ldr r0, DAT_08030164                     @ 0803014a 0648
+    ldr r0, check_zone_card_special_field5_cid_1103 @ 0803014a 0648
     cmp r1,r0                                @ 0803014c 8142
     beq LAB_080301ac                         @ 0803014e 2dd0
     b LAB_080301f6                           @ 08030150 51e0
     .zero  0x2
-DAT_08030154:
-    .word  0x00000868                     @ 08030154 68080000
-DAT_08030158:
-    .word  0x0201c510                     @ 08030158 10c50102
-DAT_0803015c:
+check_zone_card_field5_player_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08030154 68080000
+check_zone_card_field5_field_slots_b:
+    .word  gDuelFieldSlots                @ 08030158 10c50102
+check_zone_card_special_field5_cid_14b2:
     .word  0x000014b2                     @ 0803015c b2140000
-DAT_08030160:
+check_zone_card_special_field5_cid_1243:
     .word  0x00001243                     @ 08030160 43120000
-DAT_08030164:
+check_zone_card_special_field5_cid_1103:
     .word  0x00001103                     @ 08030164 03110000
 LAB_08030168:
-    ldr r0, DAT_08030174                     @ 08030168 0248
+    ldr r0, check_zone_card_special_field5_cid_137d @ 08030168 0248
     cmp r1,r0                                @ 0803016a 8142
     beq LAB_080301ac                         @ 0803016c 1ed0
     adds r0,#0x73    @ 0803016e 7330
     b LAB_080301a0                           @ 08030170 16e0
     .zero  0x2
-DAT_08030174:
+check_zone_card_special_field5_cid_137d:
     .word  0x0000137d                     @ 08030174 7d130000
 LAB_08030178:
-    ldr r0, DAT_0803018c                     @ 08030178 0448
+    ldr r0, check_zone_card_special_field5_cid_17b7 @ 08030178 0448
     cmp r1,r0                                @ 0803017a 8142
     beq LAB_080301ac                         @ 0803017c 16d0
     cmp r1,r0                                @ 0803017e 8142
     bgt LAB_08030198                         @ 08030180 0adc
-    ldr r0, DAT_08030190                     @ 08030182 0348
+    ldr r0, check_zone_card_special_field5_cid_14fc @ 08030182 0348
     cmp r1,r0                                @ 08030184 8142
     beq LAB_080301d8                         @ 08030186 27d0
-    ldr r0, DAT_08030194                     @ 08030188 0248
+    ldr r0, check_zone_card_special_field5_cid_16a2 @ 08030188 0248
     b LAB_080301a0                           @ 0803018a 09e0
-DAT_0803018c:
+check_zone_card_special_field5_cid_17b7:
     .word  0x000017b7                     @ 0803018c b7170000
-DAT_08030190:
+check_zone_card_special_field5_cid_14fc:
     .word  0x000014fc                     @ 08030190 fc140000
-DAT_08030194:
+check_zone_card_special_field5_cid_16a2:
     .word  0x000016a2                     @ 08030194 a2160000
 LAB_08030198:
-    ldr r0, DAT_080301a8                     @ 08030198 0348
+    ldr r0, check_zone_card_special_field5_cid_184b @ 08030198 0348
     cmp r1,r0                                @ 0803019a 8142
     beq LAB_080301d8                         @ 0803019c 1cd0
     adds r0,#0x88    @ 0803019e 8830
@@ -8840,15 +8861,15 @@ LAB_080301a0:
     beq LAB_080301d8                         @ 080301a2 19d0
     b LAB_080301f6                           @ 080301a4 27e0
     .zero  0x2
-DAT_080301a8:
+check_zone_card_special_field5_cid_184b:
     .word  0x0000184b                     @ 080301a8 4b180000
 LAB_080301ac:
-    ldr r2, PTR_gP1LifePoints_080301d0       @ 080301ac 084a
+    ldr r2, check_zone_card_special_state_field5_range_b_p1lp @ 080301ac 084a
     adds r0,r3,r5    @ 080301ae 5819
     lsls r0,r0,#0x2    @ 080301b0 8000
     movs r3,#0x1    @ 080301b2 0123
     ands r4,r3    @ 080301b4 1c40
-    ldr r1, DAT_080301d4                     @ 080301b6 0749
+    ldr r1, check_zone_card_field5_player_stride_c @ 080301b6 0749
     muls r1,r4    @ 080301b8 6143
     adds r0,r0,r1    @ 080301ba 4018
     adds r2,#0x40    @ 080301bc 4032
@@ -8861,17 +8882,17 @@ LAB_080301ac:
     adds r0,r6,#0x0    @ 080301ca 301c
     b LAB_080301f8                           @ 080301cc 14e0
     .zero  0x2
-PTR_gP1LifePoints_080301d0:
-    .word  gP1LifePoints                  @ 080301d0 e0c40102
-DAT_080301d4:
-    .word  0x00000868                     @ 080301d4 68080000
+check_zone_card_special_state_field5_range_b_p1lp:
+    .word  gP1LifePoints                  @ 080301d0 e0c40102  gP1LifePoints for bit5 check
+check_zone_card_field5_player_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 080301d4 68080000
 LAB_080301d8:
-    ldr r2, PTR_gP1LifePoints_08030200       @ 080301d8 094a
+    ldr r2, check_zone_card_special_state_field5_range_a_p1lp @ 080301d8 094a
     adds r0,r3,r5    @ 080301da 5819
     lsls r0,r0,#0x2    @ 080301dc 8000
     movs r3,#0x1    @ 080301de 0123
     ands r4,r3    @ 080301e0 1c40
-    ldr r1, DAT_08030204                     @ 080301e2 0849
+    ldr r1, check_zone_card_field5_player_stride_d @ 080301e2 0849
     muls r1,r4    @ 080301e4 6143
     adds r0,r0,r1    @ 080301e6 4018
     adds r2,#0x40    @ 080301e8 4032
@@ -8888,10 +8909,10 @@ LAB_080301f8:
     pop {r1}                                 @ 080301fa 02bc
     bx r1                                    @ 080301fc 0847
     .zero  0x2
-PTR_gP1LifePoints_08030200:
-    .word  gP1LifePoints                  @ 08030200 e0c40102
-DAT_08030204:
-    .word  0x00000868                     @ 08030204 68080000
+check_zone_card_special_state_field5_range_a_p1lp:
+    .word  gP1LifePoints                  @ 08030200 e0c40102  gP1LifePoints for bit5 check
+check_zone_card_field5_player_stride_d:
+    .word  PLAYER_BLOCK_STRIDE            @ 08030204 68080000
 
 @ Count set bits (popcount / Hamming weight) in a 32-bit word.
 @ Classic 5-step parallel bit-counting algorithm:
@@ -8901,60 +8922,60 @@ DAT_08030204:
 @ (4) 16-bit groups: mask 0xFF00FF00/0x00FF00FF;
 @ (5) 32-bit merge: high16 + low16.
 @ No branches, O(1). indeg>=8, used across multiple subsystems.
-@ Caller FUN_08059a78 reads slot halfword then calls this; cmp r0,#3 checks equip slot usage.
+@ Caller tick_equip_zone_bitmap_slot_display_seq reads slot halfword then calls this; cmp r0,#3 checks equip slot usage.
 @ Constants: MASK_ODD=0xAAAAAAAA; MASK_EVEN=0x55555555; MASK_HI2=0xCCCCCCCC; MASK_LO2=0x33333333;
 @ MASK_HI4=0xF0F0F0F0; MASK_LO4=0x0F0F0F0F; MASK_HI8=0xFF00FF00; MASK_LO8=0x00FF00FF; MASK_LO16=0x0000FFFF.
 count_set_bits_in_word:
     adds r2,r0,#0x0    @ 08030208 021c
-    ldr r1, DAT_08030248                     @ 0803020a 0f49
+    ldr r1, count_set_bits_mask_odd          @ 0803020a 0f49
     ands r1,r2    @ 0803020c 1140
     lsrs r1,r1,#0x1    @ 0803020e 4908
-    ldr r0, DAT_0803024c                     @ 08030210 0e48
+    ldr r0, count_set_bits_mask_even         @ 08030210 0e48
     ands r0,r2    @ 08030212 1040
     adds r2,r1,r0    @ 08030214 0a18
-    ldr r1, DAT_08030250                     @ 08030216 0e49
+    ldr r1, count_set_bits_mask_hi2          @ 08030216 0e49
     ands r1,r2    @ 08030218 1140
     lsrs r1,r1,#0x2    @ 0803021a 8908
-    ldr r0, DAT_08030254                     @ 0803021c 0d48
+    ldr r0, count_set_bits_mask_lo2          @ 0803021c 0d48
     ands r0,r2    @ 0803021e 1040
     adds r2,r1,r0    @ 08030220 0a18
-    ldr r1, DAT_08030258                     @ 08030222 0d49
+    ldr r1, count_set_bits_mask_hi4          @ 08030222 0d49
     ands r1,r2    @ 08030224 1140
     lsrs r1,r1,#0x4    @ 08030226 0909
-    ldr r0, DAT_0803025c                     @ 08030228 0c48
+    ldr r0, count_set_bits_mask_lo4          @ 08030228 0c48
     ands r0,r2    @ 0803022a 1040
     adds r2,r1,r0    @ 0803022c 0a18
-    ldr r1, DAT_08030260                     @ 0803022e 0c49
+    ldr r1, count_set_bits_mask_hi8          @ 0803022e 0c49
     ands r1,r2    @ 08030230 1140
     lsrs r1,r1,#0x8    @ 08030232 090a
-    ldr r0, DAT_08030264                     @ 08030234 0b48
+    ldr r0, count_set_bits_mask_lo8          @ 08030234 0b48
     ands r0,r2    @ 08030236 1040
     adds r2,r1,r0    @ 08030238 0a18
     lsrs r1,r2,#0x10    @ 0803023a 110c
-    ldr r0, DAT_08030268                     @ 0803023c 0a48
+    ldr r0, count_set_bits_mask_lo16         @ 0803023c 0a48
     ands r0,r2    @ 0803023e 1040
     adds r2,r1,r0    @ 08030240 0a18
     adds r0,r2,#0x0    @ 08030242 101c
     bx lr                                    @ 08030244 7047
     .zero  0x2
-DAT_08030248:
-    .word  0xaaaaaaaa                     @ 08030248 aaaaaaaa
-DAT_0803024c:
-    .word  0x55555555                     @ 0803024c 55555555
-DAT_08030250:
-    .word  0xcccccccc                     @ 08030250 cccccccc
-DAT_08030254:
-    .word  0x33333333                     @ 08030254 33333333
-DAT_08030258:
-    .word  0xf0f0f0f0                     @ 08030258 f0f0f0f0
-DAT_0803025c:
-    .word  0x0f0f0f0f                     @ 0803025c 0f0f0f0f
-DAT_08030260:
-    .word  0xff00ff00                     @ 08030260 00ff00ff
-DAT_08030264:
-    .word  0x00ff00ff                     @ 08030264 ff00ff00
-DAT_08030268:
-    .word  0x0000ffff                     @ 08030268 ffff0000
+count_set_bits_mask_odd:
+    .word  POPCOUNT_MASK_ODD              @ 08030248 aaaaaaaa
+count_set_bits_mask_even:
+    .word  POPCOUNT_MASK_EVEN             @ 0803024c 55555555
+count_set_bits_mask_hi2:
+    .word  POPCOUNT_MASK_HI2              @ 08030250 cccccccc
+count_set_bits_mask_lo2:
+    .word  POPCOUNT_MASK_LO2              @ 08030254 33333333
+count_set_bits_mask_hi4:
+    .word  POPCOUNT_MASK_HI4              @ 08030258 f0f0f0f0
+count_set_bits_mask_lo4:
+    .word  POPCOUNT_MASK_LO4              @ 0803025c 0f0f0f0f
+count_set_bits_mask_hi8:
+    .word  POPCOUNT_MASK_HI8              @ 08030260 00ff00ff
+count_set_bits_mask_lo8:
+    .word  POPCOUNT_MASK_LO8              @ 08030264 ff00ff00
+count_set_bits_mask_lo16:
+    .word  OAM_ATTR0_HIDDEN               @ 08030268 ffff0000  MASK_LO16 (popcount step5: lo 16 bits)
 
 @ Return zone cost/eligibility value for equip target selection by card_id and zone_bits. Calls get_card_extended_stat_field9; if field9==1 returns 1 (special pass). Large BST over card_id: 0x1774/0x158a/0x15fc etc->1; unmatched->0 (ineligible). r0=u16 card_id [0..0x1fff], r1=u16 zone_bits. Returns u32 (1=eligible, 0=ineligible). Pure read. Constants: special_field9=1.
 get_card_equip_target_zone_cost:
@@ -8966,14 +8987,14 @@ get_card_equip_target_zone_cost:
     bne LAB_0803027c                         @ 08030278 00d1
     b LAB_080304f0                           @ 0803027a 39e1
 LAB_0803027c:
-    ldr r0, DAT_08030298                     @ 0803027c 0648
+    ldr r0, get_equip_zone_cost_cid_1774     @ 0803027c 0648
     cmp r4,r0                                @ 0803027e 8442
     bne LAB_08030284                         @ 08030280 00d1
     b LAB_080304f0                           @ 08030282 35e1
 LAB_08030284:
     cmp r4,r0                                @ 08030284 8442
     bgt LAB_080302b0                         @ 08030286 13dc
-    ldr r0, DAT_0803029c                     @ 08030288 0448
+    ldr r0, get_equip_zone_cost_cid_158a     @ 08030288 0448
     cmp r4,r0                                @ 0803028a 8442
     bne LAB_08030290                         @ 0803028c 00d1
     b LAB_080304f0                           @ 0803028e 2fe1
@@ -8982,22 +9003,22 @@ LAB_08030290:
     bgt LAB_080302a0                         @ 08030292 05dc
     subs r0,#0xfe    @ 08030294 fe38
     b LAB_080302d6                           @ 08030296 1ee0
-DAT_08030298:
+get_equip_zone_cost_cid_1774:
     .word  0x00001774                     @ 08030298 74170000
-DAT_0803029c:
+get_equip_zone_cost_cid_158a:
     .word  0x0000158a                     @ 0803029c 8a150000
 LAB_080302a0:
-    ldr r0, DAT_080302ac                     @ 080302a0 0248
+    ldr r0, get_equip_zone_cost_cid_15fc     @ 080302a0 0248
     cmp r4,r0                                @ 080302a2 8442
     bne LAB_080302a8                         @ 080302a4 00d1
     b LAB_080304f0                           @ 080302a6 23e1
 LAB_080302a8:
     adds r0,#0x93    @ 080302a8 9330
     b LAB_080302d6                           @ 080302aa 14e0
-DAT_080302ac:
+get_equip_zone_cost_cid_15fc:
     .word  0x000015fc                     @ 080302ac fc150000
 LAB_080302b0:
-    ldr r0, DAT_080302c8                     @ 080302b0 0548
+    ldr r0, get_equip_zone_cost_cid_17d4     @ 080302b0 0548
     cmp r4,r0                                @ 080302b2 8442
     bne LAB_080302b8                         @ 080302b4 00d1
     b LAB_080304f0                           @ 080302b6 1be1
@@ -9011,10 +9032,10 @@ LAB_080302b8:
 LAB_080302c4:
     adds r0,#0x4    @ 080302c4 0430
     b LAB_080302d6                           @ 080302c6 06e0
-DAT_080302c8:
+get_equip_zone_cost_cid_17d4:
     .word  0x000017d4                     @ 080302c8 d4170000
 LAB_080302cc:
-    ldr r0, DAT_080302f0                     @ 080302cc 0848
+    ldr r0, get_equip_zone_cost_cid_183a     @ 080302cc 0848
     cmp r4,r0                                @ 080302ce 8442
     bne LAB_080302d4                         @ 080302d0 00d1
     b LAB_080304f0                           @ 080302d2 0de1
@@ -9032,15 +9053,15 @@ LAB_080302dc:
     b switchD_080302ee__caseD_11             @ 080302e4 08e1
 LAB_080302e6:
     lsls r0,r0,#0x2    @ 080302e6 8000
-    ldr r1, DAT_080302f4                     @ 080302e8 0249
+    ldr r1, get_card_equip_target_zone_cost_sw_table @ 080302e8 0249
     adds r0,r0,r1    @ 080302ea 4018
     ldr r0,[r0,#0x0]                         @ 080302ec 0068
 switchD_080302ee__switchD:
     .hword 0x4687    @ 080302ee 8746
-DAT_080302f0:
+get_equip_zone_cost_cid_183a:
     .word  0x0000183a                     @ 080302f0 3a180000
-DAT_080302f4:
-    .word  0x080302f8                     @ 080302f4 f8020308
+get_card_equip_target_zone_cost_sw_table:
+    .word  0x080302f8                     @ 080302f4 f8020308  ptr to switchdataD_080302f8
 switchD_080302ee__switchdataD_080302f8:
     .word  0x0803046a                     @ 080302f8 6a040308
     .word  0x080304a8                     @ 080302fc a8040308
@@ -9053,14 +9074,14 @@ switchD_080302ee__switchdataD_080302f8:
     .word  0x080304f8                     @ 08030318 f8040308
     .word  0x08030434                     @ 0803031c 34040308
 switchD_080302ee__caseD_14:
-    ldr r0, DAT_08030354                     @ 08030320 0c48
+    ldr r0, get_equip_zone_cost_cid_1409     @ 08030320 0c48
     cmp r4,r0                                @ 08030322 8442
     bne LAB_08030328                         @ 08030324 00d1
     b LAB_080304f0                           @ 08030326 e3e0
 LAB_08030328:
     cmp r4,r0                                @ 08030328 8442
     bgt LAB_080303a4                         @ 0803032a 3bdc
-    ldr r0, DAT_08030358                     @ 0803032c 0a48
+    ldr r0, get_equip_zone_cost_cid_12f2     @ 0803032c 0a48
     cmp r4,r0                                @ 0803032e 8442
     bgt LAB_08030364                         @ 08030330 18dc
     subs r0,#0x1    @ 08030332 0138
@@ -9083,17 +9104,17 @@ LAB_0803034e:
     adds r0,#0x7    @ 0803034e 0730
     b LAB_08030420                           @ 08030350 66e0
     .zero  0x2
-DAT_08030354:
+get_equip_zone_cost_cid_1409:
     .word  0x00001409                     @ 08030354 09140000
-DAT_08030358:
+get_equip_zone_cost_cid_12f2:
     .word  0x000012f2                     @ 08030358 f2120000
 LAB_0803035c:
-    ldr r0, DAT_08030360                     @ 0803035c 0048
+    ldr r0, get_equip_zone_cost_cid_12d0     @ 0803035c 0048
     b LAB_08030372                           @ 0803035e 08e0
-DAT_08030360:
+get_equip_zone_cost_cid_12d0:
     .word  0x000012d0                     @ 08030360 d0120000
 LAB_08030364:
-    ldr r0, DAT_08030384                     @ 08030364 0748
+    ldr r0, get_equip_zone_cost_cid_1330     @ 08030364 0748
     cmp r4,r0                                @ 08030366 8442
     bne LAB_0803036c                         @ 08030368 00d1
     b LAB_080304f0                           @ 0803036a c1e0
@@ -9114,10 +9135,10 @@ LAB_0803037a:
 LAB_08030380:
     b LAB_080304f0                           @ 08030380 b6e0
     .zero  0x2
-DAT_08030384:
+get_equip_zone_cost_cid_1330:
     .word  0x00001330                     @ 08030384 30130000
 LAB_08030388:
-    ldr r0, DAT_08030398                     @ 08030388 0348
+    ldr r0, get_equip_zone_cost_cid_138e     @ 08030388 0348
     cmp r4,r0                                @ 0803038a 8442
     bne LAB_08030390                         @ 0803038c 00d1
     b LAB_080304f0                           @ 0803038e afe0
@@ -9126,22 +9147,22 @@ LAB_08030390:
     bgt LAB_0803039c                         @ 08030392 03dc
     subs r0,#0xd    @ 08030394 0d38
     b LAB_08030420                           @ 08030396 43e0
-DAT_08030398:
+get_equip_zone_cost_cid_138e:
     .word  0x0000138e                     @ 08030398 8e130000
 LAB_0803039c:
-    ldr r0, DAT_080303a0                     @ 0803039c 0048
+    ldr r0, get_equip_zone_cost_cid_13ee     @ 0803039c 0048
     b LAB_08030420                           @ 0803039e 3fe0
-DAT_080303a0:
+get_equip_zone_cost_cid_13ee:
     .word  0x000013ee                     @ 080303a0 ee130000
 LAB_080303a4:
-    ldr r0, DAT_080303c8                     @ 080303a4 0848
+    ldr r0, get_equip_zone_cost_cid_167b     @ 080303a4 0848
     cmp r4,r0                                @ 080303a6 8442
     bne LAB_080303ac                         @ 080303a8 00d1
     b LAB_080304f0                           @ 080303aa a1e0
 LAB_080303ac:
     cmp r4,r0                                @ 080303ac 8442
     bgt LAB_080303ec                         @ 080303ae 1ddc
-    ldr r0, DAT_080303cc                     @ 080303b0 0648
+    ldr r0, get_equip_zone_cost_cid_14eb     @ 080303b0 0648
     cmp r4,r0                                @ 080303b2 8442
     bne LAB_080303b8                         @ 080303b4 00d1
     b LAB_080304f0                           @ 080303b6 9be0
@@ -9155,12 +9176,12 @@ LAB_080303b8:
 LAB_080303c4:
     adds r0,#0x2c    @ 080303c4 2c30
     b LAB_08030420                           @ 080303c6 2be0
-DAT_080303c8:
+get_equip_zone_cost_cid_167b:
     .word  0x0000167b                     @ 080303c8 7b160000
-DAT_080303cc:
+get_equip_zone_cost_cid_14eb:
     .word  0x000014eb                     @ 080303cc eb140000
 LAB_080303d0:
-    ldr r0, DAT_080303e0                     @ 080303d0 0348
+    ldr r0, get_equip_zone_cost_cid_153d     @ 080303d0 0348
     cmp r4,r0                                @ 080303d2 8442
     bne LAB_080303d8                         @ 080303d4 00d1
     b LAB_080304f0                           @ 080303d6 8be0
@@ -9169,15 +9190,15 @@ LAB_080303d8:
     bgt LAB_080303e4                         @ 080303da 03dc
     subs r0,#0x29    @ 080303dc 2938
     b LAB_08030420                           @ 080303de 1fe0
-DAT_080303e0:
+get_equip_zone_cost_cid_153d:
     .word  0x0000153d                     @ 080303e0 3d150000
 LAB_080303e4:
-    ldr r0, DAT_080303e8                     @ 080303e4 0048
+    ldr r0, get_equip_zone_cost_cid_15a6     @ 080303e4 0048
     b LAB_08030420                           @ 080303e6 1be0
-DAT_080303e8:
+get_equip_zone_cost_cid_15a6:
     .word  0x000015a6                     @ 080303e8 a6150000
 LAB_080303ec:
-    ldr r0, DAT_08030408                     @ 080303ec 0648
+    ldr r0, get_equip_zone_cost_cid_1853_a   @ 080303ec 0648
     cmp r4,r0                                @ 080303ee 8442
     bne LAB_080303f4                         @ 080303f0 00d1
     b LAB_080304f0                           @ 080303f2 7de0
@@ -9193,15 +9214,15 @@ LAB_08030400:
     bgt LAB_0803040c                         @ 08030402 03dc
     subs r0,#0x80    @ 08030404 8038
     b LAB_08030420                           @ 08030406 0be0
-DAT_08030408:
+get_equip_zone_cost_cid_1853_a:
     .word  0x00001853                     @ 08030408 53180000
 LAB_0803040c:
-    ldr r0, DAT_08030410                     @ 0803040c 0048
+    ldr r0, get_equip_zone_cost_cid_184b_b   @ 0803040c 0048
     b LAB_08030420                           @ 0803040e 07e0
-DAT_08030410:
+get_equip_zone_cost_cid_184b_b:
     .word  0x0000184b                     @ 08030410 4b180000
 LAB_08030414:
-    ldr r0, DAT_08030428                     @ 08030414 0448
+    ldr r0, get_equip_zone_cost_cid_192d     @ 08030414 0448
     cmp r4,r0                                @ 08030416 8442
     beq LAB_080304f0                         @ 08030418 6ad0
     cmp r4,r0                                @ 0803041a 8442
@@ -9212,30 +9233,30 @@ LAB_08030420:
     beq LAB_080304f0                         @ 08030422 65d0
     b switchD_080302ee__caseD_11             @ 08030424 68e0
     .zero  0x2
-DAT_08030428:
+get_equip_zone_cost_cid_192d:
     .word  0x0000192d                     @ 08030428 2d190000
 LAB_0803042c:
-    ldr r0, DAT_08030430                     @ 0803042c 0048
+    ldr r0, get_equip_zone_cost_cid_19b4     @ 0803042c 0048
     b LAB_080304ec                           @ 0803042e 5de0
-DAT_08030430:
+get_equip_zone_cost_cid_19b4:
     .word  0x000019b4                     @ 08030430 b4190000
 switchD_080302ee__caseD_16:
-    ldr r0, DAT_08030448                     @ 08030434 0448
+    ldr r0, get_equip_zone_cost_cid_14a7     @ 08030434 0448
     cmp r4,r0                                @ 08030436 8442
     beq LAB_080304f0                         @ 08030438 5ad0
     cmp r4,r0                                @ 0803043a 8442
     bgt LAB_08030450                         @ 0803043c 08dc
-    ldr r0, DAT_0803044c                     @ 0803043e 0348
+    ldr r0, get_equip_zone_cost_cid_12ba     @ 0803043e 0348
     cmp r4,r0                                @ 08030440 8442
     beq LAB_080304f0                         @ 08030442 55d0
     adds r0,#0x91    @ 08030444 9130
     b LAB_08030420                           @ 08030446 ebe7
-DAT_08030448:
+get_equip_zone_cost_cid_14a7:
     .word  0x000014a7                     @ 08030448 a7140000
-DAT_0803044c:
+get_equip_zone_cost_cid_12ba:
     .word  0x000012ba                     @ 0803044c ba120000
 LAB_08030450:
-    ldr r0, DAT_08030460                     @ 08030450 0348
+    ldr r0, get_equip_zone_cost_cid_195e     @ 08030450 0348
     cmp r4,r0                                @ 08030452 8442
     beq LAB_080304f0                         @ 08030454 4cd0
     cmp r4,r0                                @ 08030456 8442
@@ -9243,57 +9264,57 @@ LAB_08030450:
     subs r0,#0x8a    @ 0803045a 8a38
     b LAB_08030420                           @ 0803045c e0e7
     .zero  0x2
-DAT_08030460:
+get_equip_zone_cost_cid_195e:
     .word  0x0000195e                     @ 08030460 5e190000
 LAB_08030464:
     movs r0,#0xcf    @ 08030464 cf20
     lsls r0,r0,#0x5    @ 08030466 4001
     b LAB_080304ec                           @ 08030468 40e0
 switchD_080302ee__caseD_d:
-    ldr r0, DAT_08030480                     @ 0803046a 0548
+    ldr r0, get_equip_zone_cost_cid_13a7     @ 0803046a 0548
     cmp r4,r0                                @ 0803046c 8442
     beq LAB_080304f0                         @ 0803046e 3fd0
     cmp r4,r0                                @ 08030470 8442
     bgt LAB_08030488                         @ 08030472 09dc
-    ldr r0, DAT_08030484                     @ 08030474 0348
+    ldr r0, get_equip_zone_cost_cid_111b     @ 08030474 0348
     cmp r4,r0                                @ 08030476 8442
     bgt switchD_080302ee__caseD_11           @ 08030478 3edc
     subs r0,#0x2    @ 0803047a 0238
     b LAB_0803037a                           @ 0803047c 7de7
     .zero  0x2
-DAT_08030480:
+get_equip_zone_cost_cid_13a7:
     .word  0x000013a7                     @ 08030480 a7130000
-DAT_08030484:
+get_equip_zone_cost_cid_111b:
     .word  0x0000111b                     @ 08030484 1b110000
 LAB_08030488:
-    ldr r0, DAT_08030498                     @ 08030488 0348
+    ldr r0, get_equip_zone_cost_cid_1853_c   @ 08030488 0348
     cmp r4,r0                                @ 0803048a 8442
     beq LAB_080304f0                         @ 0803048c 30d0
     cmp r4,r0                                @ 0803048e 8442
     bgt LAB_080304a0                         @ 08030490 06dc
-    ldr r0, DAT_0803049c                     @ 08030492 0248
+    ldr r0, get_equip_zone_cost_cid_1493     @ 08030492 0248
     b LAB_08030420                           @ 08030494 c4e7
     .zero  0x2
-DAT_08030498:
+get_equip_zone_cost_cid_1853_c:
     .word  0x00001853                     @ 08030498 53180000
-DAT_0803049c:
+get_equip_zone_cost_cid_1493:
     .word  0x00001493                     @ 0803049c 93140000
 LAB_080304a0:
-    ldr r0, DAT_080304a4                     @ 080304a0 0048
+    ldr r0, get_equip_zone_cost_cid_1883     @ 080304a0 0048
     b LAB_080304ec                           @ 080304a2 23e0
-DAT_080304a4:
+get_equip_zone_cost_cid_1883:
     .word  0x00001883                     @ 080304a4 83180000
 switchD_080302ee__caseD_e:
     movs r0,#0xfe    @ 080304a8 fe20
     lsls r0,r0,#0x4    @ 080304aa 0001
     cmp r4,r0                                @ 080304ac 8442
     beq LAB_080304f0                         @ 080304ae 1fd0
-    ldr r0, DAT_080304b4                     @ 080304b0 0048
+    ldr r0, get_equip_zone_cost_cid_151b     @ 080304b0 0048
     b LAB_080304ec                           @ 080304b2 1be0
-DAT_080304b4:
+get_equip_zone_cost_cid_151b:
     .word  0x0000151b                     @ 080304b4 1b150000
 switchD_080302ee__caseD_f:
-    ldr r0, DAT_080304cc                     @ 080304b8 0448
+    ldr r0, get_equip_zone_cost_cid_138f     @ 080304b8 0448
     cmp r4,r0                                @ 080304ba 8442
     beq LAB_080304f0                         @ 080304bc 18d0
     cmp r4,r0                                @ 080304be 8442
@@ -9303,21 +9324,21 @@ switchD_080302ee__caseD_f:
     beq LAB_080304f0                         @ 080304c6 13d0
     adds r0,#0x8    @ 080304c8 0830
     b LAB_08030420                           @ 080304ca a9e7
-DAT_080304cc:
+get_equip_zone_cost_cid_138f:
     .word  0x0000138f                     @ 080304cc 8f130000
 LAB_080304d0:
-    ldr r0, DAT_080304dc                     @ 080304d0 0248
+    ldr r0, get_equip_zone_cost_cid_17ca     @ 080304d0 0248
     cmp r4,r0                                @ 080304d2 8442
     beq LAB_080304f0                         @ 080304d4 0cd0
-    ldr r0, DAT_080304e0                     @ 080304d6 0248
+    ldr r0, get_equip_zone_cost_cid_19b6     @ 080304d6 0248
     b LAB_080304ec                           @ 080304d8 08e0
     .zero  0x2
-DAT_080304dc:
+get_equip_zone_cost_cid_17ca:
     .word  0x000017ca                     @ 080304dc ca170000
-DAT_080304e0:
+get_equip_zone_cost_cid_19b6:
     .word  0x000019b6                     @ 080304e0 b6190000
 switchD_080302ee__caseD_10:
-    ldr r0, DAT_080304f4                     @ 080304e4 0348
+    ldr r0, get_equip_zone_cost_cid_1352     @ 080304e4 0348
     cmp r4,r0                                @ 080304e6 8442
     beq LAB_080304f0                         @ 080304e8 02d0
     adds r0,#0x8    @ 080304ea 0830
@@ -9327,7 +9348,7 @@ LAB_080304ec:
 LAB_080304f0:
     movs r0,#0x1    @ 080304f0 0120
     b LAB_080304fa                           @ 080304f2 02e0
-DAT_080304f4:
+get_equip_zone_cost_cid_1352:
     .word  0x00001352                     @ 080304f4 52130000
 switchD_080302ee__caseD_11:
     movs r0,#0x0    @ 080304f8 0020
@@ -9336,12 +9357,12 @@ LAB_080304fa:
     pop {r1}                                 @ 080304fc 02bc
     bx r1                                    @ 080304fe 0847
 
-@ Maps a card ID (halfword from r2 struct +0) to an animation type enum [0..6] via a large binary-search dispatch tree (DAT compares + beq/bgt/blt branches). All known card IDs partitioned across 6 return labels: LAB_08030874 -> r0=1 (DEFAULT); LAB_0803084c -> r0=4 (SPELL extended); LAB_08030850 -> calls count_equip_slots_active_only, returns 6 if >0 else 0 (EQUIP); LAB_08030838 -> calls read_effect_slot_side_and_type, returns 2 if slot_type>4 else 0 (EXTRA); LAB_08030866 -> reads attr field, returns 1 or 0 if in range [0x1f..0x21]; LAB_08030884 -> r0=0 (NO_ANIM). r0=ptr slot_ptr (r2 saved; reads halfword [r0+0]=card_id). Returns u32 anim_type [0..6]. Callers: FUN_08036870 (batch-internal C_util_high indeg=37), FUN_0805d118, FUN_080b40d8. Constants: NO_ANIM=0, DEFAULT=1, EXTRA=2, SPELL=4, EQUIP=6.
+@ Maps a card ID (halfword from r2 struct +0) to an animation type enum [0..6] via a large binary-search dispatch tree (DAT compares + beq/bgt/blt branches). All known card IDs partitioned across 6 return labels: LAB_08030874 -> r0=1 (DEFAULT); LAB_0803084c -> r0=4 (SPELL extended); LAB_08030850 -> calls count_equip_slots_active_only, returns 6 if >0 else 0 (EQUIP); LAB_08030838 -> calls read_effect_slot_side_and_type, returns 2 if slot_type>4 else 0 (EXTRA); LAB_08030866 -> reads attr field, returns 1 or 0 if in range [0x1f..0x21]; LAB_08030884 -> r0=0 (NO_ANIM). r0=ptr slot_ptr (r2 saved; reads halfword [r0+0]=card_id). Returns u32 anim_type [0..6]. Callers: check_card_equip_eligible_for_slot (batch-internal C_util_high indeg=37), check_equip_zone_effect_eligible_by_card_id, check_slot_card_is_equippable. Constants: NO_ANIM=0, DEFAULT=1, EXTRA=2, SPELL=4, EQUIP=6.
 map_card_id_to_anim_type:
     push {lr}                                @ 08030500 00b5
     adds r2,r0,#0x0    @ 08030502 021c
     ldrh r1,[r2,#0x0]                        @ 08030504 1188
-    ldr r0, DAT_0803054c                     @ 08030506 1148
+    ldr r0, map_anim_type_cid_15f1           @ 08030506 1148
     cmp r1,r0                                @ 08030508 8142
     bne LAB_0803050e                         @ 0803050a 00d1
     b LAB_08030874                           @ 0803050c b2e1
@@ -9350,14 +9371,14 @@ LAB_0803050e:
     ble LAB_08030514                         @ 08030510 00dd
     b LAB_080306b0                           @ 08030512 cde0
 LAB_08030514:
-    ldr r0, DAT_08030550                     @ 08030514 0e48
+    ldr r0, map_anim_type_cid_1406           @ 08030514 0e48
     cmp r1,r0                                @ 08030516 8142
     bne LAB_0803051c                         @ 08030518 00d1
     b LAB_0803084c                           @ 0803051a 97e1
 LAB_0803051c:
     cmp r1,r0                                @ 0803051c 8142
     bgt LAB_080305ec                         @ 0803051e 65dc
-    ldr r0, DAT_08030554                     @ 08030520 0c48
+    ldr r0, map_anim_type_cid_12ff           @ 08030520 0c48
     cmp r1,r0                                @ 08030522 8142
     bgt LAB_08030598                         @ 08030524 38dc
     subs r0,#0x1    @ 08030526 0138
@@ -9372,7 +9393,7 @@ LAB_0803052e:
 LAB_08030536:
     cmp r1,r0                                @ 08030536 8142
     bgt LAB_0803056c                         @ 08030538 18dc
-    ldr r0, DAT_08030558                     @ 0803053a 0748
+    ldr r0, map_anim_type_cid_1086           @ 0803053a 0748
     cmp r1,r0                                @ 0803053c 8142
     bne LAB_08030542                         @ 0803053e 00d1
     b LAB_08030874                           @ 08030540 98e1
@@ -9382,26 +9403,26 @@ LAB_08030542:
     subs r0,#0x8c    @ 08030546 8c38
     b LAB_08030772                           @ 08030548 13e1
     .zero  0x2
-DAT_0803054c:
+map_anim_type_cid_15f1:
     .word  0x000015f1                     @ 0803054c f1150000
-DAT_08030550:
+map_anim_type_cid_1406:
     .word  0x00001406                     @ 08030550 06140000
-DAT_08030554:
+map_anim_type_cid_12ff:
     .word  0x000012ff                     @ 08030554 ff120000
-DAT_08030558:
+map_anim_type_cid_1086:
     .word  0x00001086                     @ 08030558 86100000
 LAB_0803055c:
-    ldr r0, DAT_08030568                     @ 0803055c 0248
+    ldr r0, map_anim_type_cid_117b           @ 0803055c 0248
     cmp r1,r0                                @ 0803055e 8142
     bne LAB_08030564                         @ 08030560 00d1
     b LAB_08030874                           @ 08030562 87e1
 LAB_08030564:
     adds r0,#0x75    @ 08030564 7530
     b LAB_08030772                           @ 08030566 04e1
-DAT_08030568:
+map_anim_type_cid_117b:
     .word  0x0000117b                     @ 08030568 7b110000
 LAB_0803056c:
-    ldr r0, DAT_0803057c                     @ 0803056c 0348
+    ldr r0, map_anim_type_cid_12e6           @ 0803056c 0348
     cmp r1,r0                                @ 0803056e 8142
     bne LAB_08030574                         @ 08030570 00d1
     b LAB_08030874                           @ 08030572 7fe1
@@ -9410,10 +9431,10 @@ LAB_08030574:
     bgt LAB_08030580                         @ 08030576 03dc
     subs r0,#0x58    @ 08030578 5838
     b LAB_08030772                           @ 0803057a fae0
-DAT_0803057c:
+map_anim_type_cid_12e6:
     .word  0x000012e6                     @ 0803057c e6120000
 LAB_08030580:
-    ldr r0, DAT_08030594                     @ 08030580 0448
+    ldr r0, map_anim_type_cid_12eb           @ 08030580 0448
     cmp r1,r0                                @ 08030582 8142
     bne LAB_08030588                         @ 08030584 00d1
     b LAB_08030874                           @ 08030586 75e1
@@ -9425,10 +9446,10 @@ LAB_08030588:
 LAB_08030590:
     b LAB_08030884                           @ 08030590 78e1
     .zero  0x2
-DAT_08030594:
+map_anim_type_cid_12eb:
     .word  0x000012eb                     @ 08030594 eb120000
 LAB_08030598:
-    ldr r0, DAT_080305c4                     @ 08030598 0a48
+    ldr r0, map_anim_type_cid_134d           @ 08030598 0a48
     cmp r1,r0                                @ 0803059a 8142
     bgt LAB_080305d0                         @ 0803059c 18dc
     subs r0,#0x1    @ 0803059e 0138
@@ -9454,15 +9475,15 @@ LAB_080305ba:
     b LAB_08030884                           @ 080305c0 60e1
 LAB_080305c2:
     b LAB_0803084c                           @ 080305c2 43e1
-DAT_080305c4:
+map_anim_type_cid_134d:
     .word  0x0000134d                     @ 080305c4 4d130000
 LAB_080305c8:
-    ldr r0, DAT_080305cc                     @ 080305c8 0048
+    ldr r0, map_anim_type_cid_132d           @ 080305c8 0048
     b LAB_08030772                           @ 080305ca d2e0
-DAT_080305cc:
+map_anim_type_cid_132d:
     .word  0x0000132d                     @ 080305cc 2d130000
 LAB_080305d0:
-    ldr r0, DAT_080305e0                     @ 080305d0 0348
+    ldr r0, map_anim_type_cid_137c           @ 080305d0 0348
     cmp r1,r0                                @ 080305d2 8142
     bne LAB_080305d8                         @ 080305d4 00d1
     b LAB_08030874                           @ 080305d6 4de1
@@ -9471,15 +9492,15 @@ LAB_080305d8:
     bgt LAB_080305e4                         @ 080305da 03dc
     subs r0,#0x18    @ 080305dc 1838
     b LAB_08030772                           @ 080305de c8e0
-DAT_080305e0:
+map_anim_type_cid_137c:
     .word  0x0000137c                     @ 080305e0 7c130000
 LAB_080305e4:
-    ldr r0, DAT_080305e8                     @ 080305e4 0048
+    ldr r0, map_anim_type_cid_13b5           @ 080305e4 0048
     b LAB_080307f6                           @ 080305e6 06e1
-DAT_080305e8:
+map_anim_type_cid_13b5:
     .word  0x000013b5                     @ 080305e8 b5130000
 LAB_080305ec:
-    ldr r0, DAT_08030614                     @ 080305ec 0948
+    ldr r0, map_anim_type_cid_1517           @ 080305ec 0948
     cmp r1,r0                                @ 080305ee 8142
     bne LAB_080305f4                         @ 080305f0 00d1
     b LAB_08030866                           @ 080305f2 38e1
@@ -9502,20 +9523,20 @@ LAB_0803060c:
     bgt LAB_08030618                         @ 0803060e 03dc
     subs r0,#0x63    @ 08030610 6338
     b LAB_08030772                           @ 08030612 aee0
-DAT_08030614:
+map_anim_type_cid_1517:
     .word  0x00001517                     @ 08030614 17150000
 LAB_08030618:
-    ldr r0, DAT_08030624                     @ 08030618 0248
+    ldr r0, map_anim_type_cid_148f           @ 08030618 0248
     cmp r1,r0                                @ 0803061a 8142
     bne LAB_08030620                         @ 0803061c 00d1
     b LAB_08030874                           @ 0803061e 29e1
 LAB_08030620:
     adds r0,#0x1b    @ 08030620 1b30
     b LAB_080307f6                           @ 08030622 e8e0
-DAT_08030624:
+map_anim_type_cid_148f:
     .word  0x0000148f                     @ 08030624 8f140000
 LAB_08030628:
-    ldr r0, DAT_08030640                     @ 08030628 0548
+    ldr r0, map_anim_type_cid_14df           @ 08030628 0548
     cmp r1,r0                                @ 0803062a 8142
     bne LAB_08030630                         @ 0803062c 00d1
     b LAB_0803084c                           @ 0803062e 0de1
@@ -9529,20 +9550,20 @@ LAB_08030630:
 LAB_0803063c:
     b LAB_08030884                           @ 0803063c 22e1
     .zero  0x2
-DAT_08030640:
+map_anim_type_cid_14df:
     .word  0x000014df                     @ 08030640 df140000
 LAB_08030644:
-    ldr r0, DAT_08030650                     @ 08030644 0248
+    ldr r0, map_anim_type_cid_14e1           @ 08030644 0248
     cmp r1,r0                                @ 08030646 8142
     bne LAB_0803064c                         @ 08030648 00d1
     b LAB_08030874                           @ 0803064a 13e1
 LAB_0803064c:
     adds r0,#0x33    @ 0803064c 3330
     b LAB_0803069c                           @ 0803064e 25e0
-DAT_08030650:
+map_anim_type_cid_14e1:
     .word  0x000014e1                     @ 08030650 e1140000
 LAB_08030654:
-    ldr r0, DAT_08030670                     @ 08030654 0648
+    ldr r0, map_anim_type_cid_15a8           @ 08030654 0648
     cmp r1,r0                                @ 08030656 8142
     bne LAB_0803065c                         @ 08030658 00d1
     b LAB_08030838                           @ 0803065a ede0
@@ -9558,20 +9579,20 @@ LAB_08030668:
     bgt LAB_08030674                         @ 0803066a 03dc
     subs r0,#0x13    @ 0803066c 1338
     b LAB_08030772                           @ 0803066e 80e0
-DAT_08030670:
+map_anim_type_cid_15a8:
     .word  0x000015a8                     @ 08030670 a8150000
 LAB_08030674:
-    ldr r0, DAT_08030680                     @ 08030674 0248
+    ldr r0, map_anim_type_cid_1541           @ 08030674 0248
     cmp r1,r0                                @ 08030676 8142
     bne LAB_0803067c                         @ 08030678 00d1
     b LAB_08030874                           @ 0803067a fbe0
 LAB_0803067c:
     adds r0,#0x34    @ 0803067c 3430
     b LAB_080307f6                           @ 0803067e bae0
-DAT_08030680:
+map_anim_type_cid_1541:
     .word  0x00001541                     @ 08030680 41150000
 LAB_08030684:
-    ldr r0, DAT_080306a4                     @ 08030684 0748
+    ldr r0, map_anim_type_cid_15d7           @ 08030684 0748
     cmp r1,r0                                @ 08030686 8142
     bgt LAB_080306a8                         @ 08030688 0edc
     subs r0,#0x1    @ 0803068a 0138
@@ -9591,15 +9612,15 @@ LAB_0803069c:
     b LAB_08030838                           @ 080306a0 cae0
 LAB_080306a2:
     b LAB_08030884                           @ 080306a2 efe0
-DAT_080306a4:
+map_anim_type_cid_15d7:
     .word  0x000015d7                     @ 080306a4 d7150000
 LAB_080306a8:
-    ldr r0, DAT_080306ac                     @ 080306a8 0048
+    ldr r0, map_anim_type_cid_15ef           @ 080306a8 0048
     b LAB_0803082c                           @ 080306aa bfe0
-DAT_080306ac:
+map_anim_type_cid_15ef:
     .word  0x000015ef                     @ 080306ac ef150000
 LAB_080306b0:
-    ldr r0, DAT_080306e4                     @ 080306b0 0c48
+    ldr r0, map_anim_type_cid_17a8           @ 080306b0 0c48
     cmp r1,r0                                @ 080306b2 8142
     bne LAB_080306b8                         @ 080306b4 00d1
     b LAB_08030850                           @ 080306b6 cbe0
@@ -9629,20 +9650,20 @@ LAB_080306dc:
     bgt LAB_080306e8                         @ 080306de 03dc
     subs r0,#0x1e    @ 080306e0 1e38
     b LAB_08030772                           @ 080306e2 46e0
-DAT_080306e4:
+map_anim_type_cid_17a8:
     .word  0x000017a8                     @ 080306e4 a8170000
 LAB_080306e8:
-    ldr r0, DAT_080306f4                     @ 080306e8 0248
+    ldr r0, map_anim_type_cid_161e           @ 080306e8 0248
     cmp r1,r0                                @ 080306ea 8142
     bne LAB_080306f0                         @ 080306ec 00d1
     b LAB_08030874                           @ 080306ee c1e0
 LAB_080306f0:
     adds r0,#0xf    @ 080306f0 0f30
     b LAB_0803082c                           @ 080306f2 9be0
-DAT_080306f4:
+map_anim_type_cid_161e:
     .word  0x0000161e                     @ 080306f4 1e160000
 LAB_080306f8:
-    ldr r0, DAT_08030708                     @ 080306f8 0348
+    ldr r0, map_anim_type_cid_167c           @ 080306f8 0348
     cmp r1,r0                                @ 080306fa 8142
     bne LAB_08030700                         @ 080306fc 00d1
     b LAB_08030838                           @ 080306fe 9be0
@@ -9651,20 +9672,20 @@ LAB_08030700:
     bgt LAB_0803070c                         @ 08030702 03dc
     subs r0,#0x48    @ 08030704 4838
     b LAB_08030772                           @ 08030706 34e0
-DAT_08030708:
+map_anim_type_cid_167c:
     .word  0x0000167c                     @ 08030708 7c160000
 LAB_0803070c:
-    ldr r0, DAT_08030718                     @ 0803070c 0248
+    ldr r0, map_anim_type_cid_16a6           @ 0803070c 0248
     cmp r1,r0                                @ 0803070e 8142
     bne LAB_08030714                         @ 08030710 00d1
     b LAB_08030874                           @ 08030712 afe0
 LAB_08030714:
     adds r0,#0xc    @ 08030714 0c30
     b LAB_08030772                           @ 08030716 2ce0
-DAT_08030718:
+map_anim_type_cid_16a6:
     .word  0x000016a6                     @ 08030718 a6160000
 LAB_0803071c:
-    ldr r0, DAT_08030738                     @ 0803071c 0648
+    ldr r0, map_anim_type_cid_1708           @ 0803071c 0648
     cmp r1,r0                                @ 0803071e 8142
     bne LAB_08030724                         @ 08030720 00d1
     b LAB_08030838                           @ 08030722 89e0
@@ -9680,20 +9701,20 @@ LAB_08030730:
     bgt LAB_0803073c                         @ 08030732 03dc
     subs r0,#0x8    @ 08030734 0838
     b LAB_080307f6                           @ 08030736 5ee0
-DAT_08030738:
+map_anim_type_cid_1708:
     .word  0x00001708                     @ 08030738 08170000
 LAB_0803073c:
-    ldr r0, DAT_08030748                     @ 0803073c 0248
+    ldr r0, map_anim_type_cid_16dd           @ 0803073c 0248
     cmp r1,r0                                @ 0803073e 8142
     bne LAB_08030744                         @ 08030740 00d1
     b LAB_08030874                           @ 08030742 97e0
 LAB_08030744:
     adds r0,#0x2a    @ 08030744 2a30
     b LAB_0803082c                           @ 08030746 71e0
-DAT_08030748:
+map_anim_type_cid_16dd:
     .word  0x000016dd                     @ 08030748 dd160000
 LAB_0803074c:
-    ldr r0, DAT_08030764                     @ 0803074c 0548
+    ldr r0, map_anim_type_cid_174c           @ 0803074c 0548
     cmp r1,r0                                @ 0803074e 8142
     beq LAB_08030838                         @ 08030750 72d0
     cmp r1,r0                                @ 08030752 8142
@@ -9706,10 +9727,10 @@ LAB_0803075e:
     adds r0,#0x12    @ 0803075e 1230
     b LAB_08030772                           @ 08030760 07e0
     .zero  0x2
-DAT_08030764:
+map_anim_type_cid_174c:
     .word  0x0000174c                     @ 08030764 4c170000
 LAB_08030768:
-    ldr r0, DAT_0803077c                     @ 08030768 0448
+    ldr r0, map_anim_type_cid_1753           @ 08030768 0448
     cmp r1,r0                                @ 0803076a 8142
     bne LAB_08030770                         @ 0803076c 00d1
     b LAB_08030874                           @ 0803076e 81e0
@@ -9722,7 +9743,7 @@ LAB_08030772:
 LAB_08030778:
     b LAB_08030884                           @ 08030778 84e0
     .zero  0x2
-DAT_0803077c:
+map_anim_type_cid_1753:
     .word  0x00001753                     @ 0803077c 53170000
 LAB_08030780:
     movs r0,#0xc7    @ 08030780 c720
@@ -9744,16 +9765,16 @@ LAB_08030780:
     subs r0,#0x13    @ 080307a0 1338
     b LAB_080307f6                           @ 080307a2 28e0
 LAB_080307a4:
-    ldr r0, DAT_080307b0                     @ 080307a4 0248
+    ldr r0, map_anim_type_cid_17e2           @ 080307a4 0248
     cmp r1,r0                                @ 080307a6 8142
     beq LAB_08030874                         @ 080307a8 64d0
     adds r0,#0x66    @ 080307aa 6630
     b LAB_080307f6                           @ 080307ac 23e0
     .zero  0x2
-DAT_080307b0:
+map_anim_type_cid_17e2:
     .word  0x000017e2                     @ 080307b0 e2170000
 LAB_080307b4:
-    ldr r0, DAT_080307c8                     @ 080307b4 0448
+    ldr r0, map_anim_type_cid_188d           @ 080307b4 0448
     cmp r1,r0                                @ 080307b6 8142
     beq LAB_08030850                         @ 080307b8 4ad0
     cmp r1,r0                                @ 080307ba 8142
@@ -9763,10 +9784,10 @@ LAB_080307b4:
     beq LAB_0803084c                         @ 080307c2 43d0
     adds r0,#0x3    @ 080307c4 0330
     b LAB_08030772                           @ 080307c6 d4e7
-DAT_080307c8:
+map_anim_type_cid_188d:
     .word  0x0000188d                     @ 080307c8 8d180000
 LAB_080307cc:
-    ldr r0, DAT_080307dc                     @ 080307cc 0348
+    ldr r0, map_anim_type_cid_18de           @ 080307cc 0348
     cmp r1,r0                                @ 080307ce 8142
     bgt LAB_08030884                         @ 080307d0 58dc
     subs r0,#0x1    @ 080307d2 0138
@@ -9774,10 +9795,10 @@ LAB_080307cc:
     blt LAB_08030884                         @ 080307d6 55db
     b LAB_08030874                           @ 080307d8 4ce0
     .zero  0x2
-DAT_080307dc:
+map_anim_type_cid_18de:
     .word  0x000018de                     @ 080307dc de180000
 LAB_080307e0:
-    ldr r0, DAT_080307fc                     @ 080307e0 0648
+    ldr r0, map_anim_type_cid_1969           @ 080307e0 0648
     cmp r1,r0                                @ 080307e2 8142
     beq LAB_08030838                         @ 080307e4 28d0
     cmp r1,r0                                @ 080307e6 8142
@@ -9792,7 +9813,7 @@ LAB_080307f6:
     cmp r1,r0                                @ 080307f6 8142
     beq LAB_0803084c                         @ 080307f8 28d0
     b LAB_08030884                           @ 080307fa 43e0
-DAT_080307fc:
+map_anim_type_cid_1969:
     .word  0x00001969                     @ 080307fc 69190000
 LAB_08030800:
     movs r0,#0xcb    @ 08030800 cb20
@@ -9802,7 +9823,7 @@ LAB_08030800:
     adds r0,#0x2    @ 08030808 0230
     b LAB_08030772                           @ 0803080a b2e7
 LAB_0803080c:
-    ldr r0, DAT_08030820                     @ 0803080c 0448
+    ldr r0, map_anim_type_cid_19b0           @ 0803080c 0448
     cmp r1,r0                                @ 0803080e 8142
     beq LAB_0803084c                         @ 08030810 1cd0
     cmp r1,r0                                @ 08030812 8142
@@ -9812,10 +9833,10 @@ LAB_0803080c:
     beq LAB_08030838                         @ 0803081a 0dd0
     adds r0,#0x33    @ 0803081c 3330
     b LAB_08030772                           @ 0803081e a8e7
-DAT_08030820:
+map_anim_type_cid_19b0:
     .word  0x000019b0                     @ 08030820 b0190000
 LAB_08030824:
-    ldr r0, DAT_08030834                     @ 08030824 0348
+    ldr r0, map_anim_type_cid_19c8           @ 08030824 0348
     cmp r1,r0                                @ 08030826 8142
     beq LAB_08030874                         @ 08030828 24d0
     adds r0,#0xd    @ 0803082a 0d30
@@ -9824,7 +9845,7 @@ LAB_0803082c:
     beq LAB_08030850                         @ 0803082e 0fd0
     b LAB_08030884                           @ 08030830 28e0
     .zero  0x2
-DAT_08030834:
+map_anim_type_cid_19c8:
     .word  0x000019c8                     @ 08030834 c8190000
 LAB_08030838:
     adds r0,r2,#0x0    @ 08030838 101c
@@ -9903,7 +9924,7 @@ LAB_080308a6:
     cmp r0,#0x2                              @ 080308ba 0228
     bne LAB_08030980                         @ 080308bc 60d1
     ldrh r1,[r5,#0x0]                        @ 080308be 2988
-    ldr r0, DAT_080308e0                     @ 080308c0 0748
+    ldr r0, check_summon_path_cid_1534       @ 080308c0 0748
     cmp r1,r0                                @ 080308c2 8142
     beq LAB_08030946                         @ 080308c4 3fd0
     cmp r1,r0                                @ 080308c6 8142
@@ -9913,20 +9934,20 @@ LAB_080308a6:
     beq LAB_08030938                         @ 080308ce 33d0
     cmp r1,r0                                @ 080308d0 8142
     bgt LAB_080308ec                         @ 080308d2 0bdc
-    ldr r0, DAT_080308e4                     @ 080308d4 0348
+    ldr r0, check_summon_path_cid_133b       @ 080308d4 0348
     cmp r1,r0                                @ 080308d6 8142
     beq LAB_08030938                         @ 080308d8 2ed0
-    ldr r0, DAT_080308e8                     @ 080308da 0348
+    ldr r0, check_summon_path_cid_1449       @ 080308da 0348
     b LAB_080308f4                           @ 080308dc 0ae0
     .zero  0x2
-DAT_080308e0:
+check_summon_path_cid_1534:
     .word  0x00001534                     @ 080308e0 34150000
-DAT_080308e4:
+check_summon_path_cid_133b:
     .word  0x0000133b                     @ 080308e4 3b130000
-DAT_080308e8:
+check_summon_path_cid_1449:
     .word  0x00001449                     @ 080308e8 49140000
 LAB_080308ec:
-    ldr r0, DAT_080308fc                     @ 080308ec 0348
+    ldr r0, check_summon_path_cid_1452       @ 080308ec 0348
     cmp r1,r0                                @ 080308ee 8142
     beq LAB_08030938                         @ 080308f0 22d0
     adds r0,#0x5    @ 080308f2 0530
@@ -9935,29 +9956,29 @@ LAB_080308f4:
     beq LAB_08030938                         @ 080308f6 1fd0
     b LAB_08030980                           @ 080308f8 42e0
     .zero  0x2
-DAT_080308fc:
+check_summon_path_cid_1452:
     .word  0x00001452                     @ 080308fc 52140000
 LAB_08030900:
-    ldr r0, DAT_08030918                     @ 08030900 0548
+    ldr r0, check_summon_path_cid_179a       @ 08030900 0548
     cmp r1,r0                                @ 08030902 8142
     beq LAB_08030938                         @ 08030904 18d0
     cmp r1,r0                                @ 08030906 8142
     bgt LAB_08030924                         @ 08030908 0cdc
-    ldr r0, DAT_0803091c                     @ 0803090a 0448
+    ldr r0, check_summon_path_cid_1549       @ 0803090a 0448
     cmp r1,r0                                @ 0803090c 8142
     beq LAB_08030938                         @ 0803090e 13d0
-    ldr r0, DAT_08030920                     @ 08030910 0348
+    ldr r0, check_summon_path_cid_1686       @ 08030910 0348
     cmp r1,r0                                @ 08030912 8142
     beq LAB_08030958                         @ 08030914 20d0
     b LAB_08030980                           @ 08030916 33e0
-DAT_08030918:
+check_summon_path_cid_179a:
     .word  0x0000179a                     @ 08030918 9a170000
-DAT_0803091c:
+check_summon_path_cid_1549:
     .word  0x00001549                     @ 0803091c 49150000
-DAT_08030920:
+check_summon_path_cid_1686:
     .word  0x00001686                     @ 08030920 86160000
 LAB_08030924:
-    ldr r0, DAT_08030934                     @ 08030924 0348
+    ldr r0, check_summon_path_cid_187f       @ 08030924 0348
     cmp r1,r0                                @ 08030926 8142
     beq LAB_08030946                         @ 08030928 0dd0
     movs r0,#0xce    @ 0803092a ce20
@@ -9965,7 +9986,7 @@ LAB_08030924:
     cmp r1,r0                                @ 0803092e 8142
     beq LAB_08030964                         @ 08030930 18d0
     b LAB_08030980                           @ 08030932 25e0
-DAT_08030934:
+check_summon_path_cid_187f:
     .word  0x0000187f                     @ 08030934 7f180000
 LAB_08030938:
     movs r1,#0x0    @ 08030938 0021
