@@ -76,7 +76,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | (pending) |
+| 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
 | 2 | 0x36a78..0x37128 | 13 | 29 | — | ⬜ | |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ⬜ | |
 | 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
@@ -123,7 +123,7 @@ check_slot_card_special_activation_eligible
 **Non-ASCII**: Seg-1 范围内无新增 CJK (文件头行 2 为预存标题注释)
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: c410d1d
 
 ---
 
