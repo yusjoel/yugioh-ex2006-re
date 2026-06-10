@@ -1,21 +1,19 @@
 @ ==== 03_equip_chain_hand.s ====
 @ 装备节点链接 + slot 链最优目标 + 手牌区交换显示
 .thumb
-@ Called by two callers (FUN_0803c814 / FUN_0803ca70[duel_field]). Accepts r0 (player_id), r1 (slot_idx), r6 (flag, non-APCS; bit0 for player direction; caller 0x0803c814 sets r6=0x0201c510 at 0x0803c830 before bl). Reads current slot [+0] field at gDuelFieldSlots[player*0x868+slot_idx*0x14], ORs in 0x200000 (bit21; movs r0,#0x80; lsls r0,r0,#0xe -> 0x80<<14=0x200000), writes back. Then checks bit22 (lsrs #0x16 & 1): if 0 (clear) enters link_equip_node_to_chain path; if 1 applies card_type conditional check before linking.
-@ 
-@ Constants: gDuelFieldSlots=0x0201c510 (DAT_08035fd0), player_stride=0x868 (DAT_08035f90), active_flag=0x200000 (bit21), card_type_A=0x18a6 (DAT_08035fd4), card_type_B=0x19c1 (DAT_0803600c).
+@ link_equip_node_by_card_type_check: Links an equip node into the equip chain after a card type check. Called by two callers in duel_field (0x0803c814=link_equip_node_to_chain / 0x0803ca70). Accepts r0=player_id, r1=slot_idx, r6=flag (non-APCS; bit0 for player direction). Reads current slot [+0] field at gDuelFieldSlots[player*0x868+slot_idx*0x14], ORs in 0x200000 (bit21; active_flag), writes back. Then checks bit22 (lsrs #0x16 & 1): if 0 (clear) enters link_equip_node_to_chain path; if 1 applies card_type conditional check before linking. card_type_A=EHERO_AVIAN_CID(0x18a6), card_type_B=CHAIN_THRASHER_CID(0x19c1). Constants: gDuelFieldSlots=0x0201c510, player_stride=PLAYER_BLOCK_STRIDE=0x868, active_flag=0x200000 (bit21).
 link_equip_node_by_card_type_check:
     push {r4,r5,r6,lr}                       @ 08035f54 70b5
     sub sp,#0x4                              @ 08035f56 81b0
     adds r6,r0,#0x0    @ 08035f58 061c
     adds r5,r1,#0x0    @ 08035f5a 0d1c
-    ldr r3, PTR_gP1LifePoints_08035f8c       @ 08035f5c 0b4b
+    ldr r3, link_equip_node_card_type_lp_ptr @ 08035f5c 0b4b
     lsls r1,r5,#0x2    @ 08035f5e a900
     adds r1,r1,r5    @ 08035f60 4919
     lsls r1,r1,#0x2    @ 08035f62 8900
     movs r4,#0x1    @ 08035f64 0124
     ands r0,r4    @ 08035f66 2040
-    ldr r2, DAT_08035f90                     @ 08035f68 094a
+    ldr r2, link_equip_node_card_type_stride @ 08035f68 094a
     muls r0,r2    @ 08035f6a 5043
     adds r1,r1,r0    @ 08035f6c 0918
     adds r3,#0x40    @ 08035f6e 4033
@@ -33,10 +31,10 @@ link_equip_node_by_card_type_check:
     lsls r0,r0,#0x10    @ 08035f86 0004
     b LAB_08035f98                           @ 08035f88 06e0
     .zero  0x2
-PTR_gP1LifePoints_08035f8c:
+link_equip_node_card_type_lp_ptr:
     .word  gP1LifePoints                  @ 08035f8c e0c40102
-DAT_08035f90:
-    .word  0x00000868                     @ 08035f90 68080000
+link_equip_node_card_type_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08035f90 68080000
 LAB_08035f94:
     movs r0,#0x80    @ 08035f94 8020
     lsls r0,r0,#0xf    @ 08035f96 c003
@@ -48,15 +46,15 @@ LAB_08035f98:
     lsls r3,r5,#0x2    @ 08035fa0 ab00
     adds r0,r3,r5    @ 08035fa2 5819
     lsls r0,r0,#0x2    @ 08035fa4 8000
-    ldr r1, DAT_08035fcc                     @ 08035fa6 0949
+    ldr r1, link_equip_node_card_type_stride_b @ 08035fa6 0949
     muls r1,r2    @ 08035fa8 5143
     adds r0,r0,r1    @ 08035faa 4018
-    ldr r1, DAT_08035fd0                     @ 08035fac 0849
+    ldr r1, link_equip_node_card_type_slots  @ 08035fac 0849
     adds r0,r0,r1    @ 08035fae 4018
     ldr r0,[r0,#0x0]                         @ 08035fb0 0068
     lsls r0,r0,#0x13    @ 08035fb2 c004
     lsrs r2,r0,#0x13    @ 08035fb4 c20c
-    ldr r0, DAT_08035fd4                     @ 08035fb6 0748
+    ldr r0, link_equip_node_card_type_cid_a  @ 08035fb6 0748
     adds r4,r1,#0x0    @ 08035fb8 0c1c
     cmp r2,r0                                @ 08035fba 8242
     beq LAB_08035fde                         @ 08035fbc 0fd0
@@ -67,14 +65,14 @@ LAB_08035f98:
     beq LAB_08035fde                         @ 08035fc6 0ad0
     b LAB_08036002                           @ 08035fc8 1be0
     .zero  0x2
-DAT_08035fcc:
-    .word  0x00000868                     @ 08035fcc 68080000
-DAT_08035fd0:
-    .word  0x0201c510                     @ 08035fd0 10c50102
-DAT_08035fd4:
-    .word  0x000018a6                     @ 08035fd4 a6180000
+link_equip_node_card_type_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08035fcc 68080000
+link_equip_node_card_type_slots:
+    .word  gDuelFieldSlots                @ 08035fd0 10c50102
+link_equip_node_card_type_cid_a:
+    .word  EHERO_AVIAN_CID                @ 08035fd4 a6180000
 LAB_08035fd8:
-    ldr r0, DAT_0803600c                     @ 08035fd8 0c48
+    ldr r0, link_equip_node_card_type_cid_b  @ 08035fd8 0c48
     cmp r2,r0                                @ 08035fda 8242
     bne LAB_08036002                         @ 08035fdc 11d1
 LAB_08035fde:
@@ -82,7 +80,7 @@ LAB_08035fde:
     ands r2,r6    @ 08035fe0 3240
     adds r0,r3,r5    @ 08035fe2 5819
     lsls r0,r0,#0x2    @ 08035fe4 8000
-    ldr r1, DAT_08036010                     @ 08035fe6 0a49
+    ldr r1, link_equip_node_card_type_stride_c @ 08035fe6 0a49
     muls r1,r2    @ 08035fe8 5143
     adds r0,r0,r1    @ 08035fea 4018
     adds r0,r0,r4    @ 08035fec 0019
@@ -101,12 +99,12 @@ LAB_08036002:
     pop {r0}                                 @ 08036006 01bc
     bx r0                                    @ 08036008 0047
     .zero  0x2
-DAT_0803600c:
-    .word  0x000019c1                     @ 0803600c c1190000
-DAT_08036010:
-    .word  0x00000868                     @ 08036010 68080000
+link_equip_node_card_type_cid_b:
+    .word  CHAIN_THRASHER_CID             @ 0803600c c1190000
+link_equip_node_card_type_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036010 68080000
 
-@ Comprehensive equip eligibility check for a field slot (r0=player_id, r1=slot_idx, r2=flag). Calls check_slot_card_effect_eligibility then count_zones_by_card_and_mode; dispatches to different eligibility paths based on card type field attr[0xc..0xf] (type=1/5/6/0xa etc). Returns 1 if slot can legally equip, 0 otherwise. Shared by 7 duel_field callers. Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4], r2=u8 flag [0..1]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.
+@ check_slot_equip_eligibility_by_type: Comprehensive equip eligibility check for a field slot. r0=player_id [0..1], r1=slot_idx [0..4], r2=flag [0..1]. Calls check_slot_card_effect_eligibility then count_zones_by_card_and_mode(0x1632 gap CID); dispatches to different eligibility paths based on card type field attr[0xc..0xf] (type=1/5/6/0xa/0xb etc). BST checks against 16 specific card IDs (ROYAL_COMMAND/FIEND_SKULL_DRAGON/POSSESSED_DARK_SOUL/SNATCH_STEAL/MAGIC_ARM_SHIELD/CHANGE_OF_HEART/0x13ea gap/MYSTIC_BOX/DARK_NECROFEAR/BRAIN_JACKER/ENEMY_CONTROLLER/FALLING_DOWN/OWNER_SEAL/RESHEF_THE_DARK_BEING/CHTHONIAN_POLYMER + DARK_NECROFEAR/SNATCH_STEAL/FALLING_DOWN/BRAIN_JACKER reprise). Returns 1 if slot can legally equip, 0 otherwise. Shared by 7 duel_field callers. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868.
 check_slot_equip_eligibility_by_type:
     push {r4,r5,r6,r7,lr}                    @ 08036014 f0b5
     .hword 0x4657    @ 08036016 5746
@@ -123,10 +121,10 @@ check_slot_equip_eligibility_by_type:
     lsls r0,r1,#0x2    @ 0803602c 8800
     adds r0,r0,r1    @ 0803602e 4018
     lsls r0,r0,#0x2    @ 08036030 8000
-    ldr r1, DAT_08036094                     @ 08036032 1849
+    ldr r1, check_slot_equip_elig_stride__08036094 @ 08036032 1849
     muls r1,r2    @ 08036034 5143
     adds r5,r0,r1    @ 08036036 4518
-    ldr r4, DAT_08036098                     @ 08036038 174c
+    ldr r4, check_slot_equip_elig_slots__08036098 @ 08036038 174c
     adds r7,r5,r4    @ 0803603a 2f19
     ldr r0,[r7,#0x0]                         @ 0803603c 3868
     lsls r0,r0,#0x12    @ 0803603e 8004
@@ -136,7 +134,7 @@ check_slot_equip_eligibility_by_type:
     ldr r1,[sp,#0x0]                         @ 08036046 0099
     bl check_slot_card_effect_eligibility    @ 08036048 00f032fa
     .hword 0x4681    @ 0803604c 8146
-    ldr r0, DAT_0803609c                     @ 0803604e 1348
+    ldr r0, check_slot_equip_elig_zone_cid_1632 @ 0803604e 1348
     .hword 0x4651    @ 08036050 5146
     .hword 0x464a    @ 08036052 4a46
     bl count_zones_by_card_and_mode          @ 08036054 fcf756fc
@@ -157,7 +155,7 @@ LAB_0803605e:
     b LAB_08036396                           @ 08036072 90e1
 LAB_08036074:
     lsls r0,r0,#0x3    @ 08036074 c000
-    ldr r3, DAT_080360a0                     @ 08036076 0a4b
+    ldr r3, check_slot_equip_elig_pool       @ 08036076 0a4b
     adds r5,r0,r3    @ 08036078 c518
     ldrh r4,[r5,#0x0]                        @ 0803607a 2c88
     ldrh r0,[r5,#0x6]                        @ 0803607c e888
@@ -172,14 +170,14 @@ LAB_08036074:
     cmp r0,#0x1                              @ 0803608e 0128
     beq LAB_080360b2                         @ 08036090 0fd0
     b LAB_0803638e                           @ 08036092 7ce1
-DAT_08036094:
-    .word  0x00000868                     @ 08036094 68080000
-DAT_08036098:
-    .word  0x0201c510                     @ 08036098 10c50102
-DAT_0803609c:
-    .word  0x00001632                     @ 0803609c 32160000
-DAT_080360a0:
-    .word  0x0201d9c0                     @ 080360a0 c0d90102
+check_slot_equip_elig_stride__08036094:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036094 68080000
+check_slot_equip_elig_slots__08036098:
+    .word  gDuelFieldSlots                @ 08036098 10c50102
+check_slot_equip_elig_zone_cid_1632:
+    .word  0x00001632                     @ 0803609c 32160000  card_id=0x1632 (gap slot; passed as r0 to count_zones_by_card_and_mode; not in card-stats.s; range [0x1631..0x1633] has Miracle Restoring/Disarmament); low-conf
+check_slot_equip_elig_pool:
+    .word  gEquipNodePool                 @ 080360a0 c0d90102
 LAB_080360a4:
     cmp r0,#0x6                              @ 080360a4 0628
     bne LAB_080360aa                         @ 080360a6 00d1
@@ -209,26 +207,26 @@ LAB_080360cc:
     bl get_card_field_summon_restriction     @ 080360ce 15f011fa
     cmp r0,#0x1                              @ 080360d2 0128
     bne LAB_080360ee                         @ 080360d4 0bd1
-    ldr r0, DAT_08036120                     @ 080360d6 1248
+    ldr r0, check_slot_equip_elig_cid_a      @ 080360d6 1248
     bl count_field_copies_of_card            @ 080360d8 fcf760fb
     cmp r0,#0x0                              @ 080360dc 0028
     beq LAB_080360e2                         @ 080360de 00d0
     b LAB_0803638e                           @ 080360e0 55e1
 LAB_080360e2:
-    ldr r0, DAT_08036124                     @ 080360e2 1048
+    ldr r0, check_slot_equip_elig_cid_b      @ 080360e2 1048
     bl count_field_copies_of_card            @ 080360e4 fcf75afb
     cmp r0,#0x0                              @ 080360e8 0028
     beq LAB_080360ee                         @ 080360ea 00d0
     b LAB_0803638e                           @ 080360ec 4fe1
 LAB_080360ee:
-    ldr r0, DAT_08036128                     @ 080360ee 0e48
+    ldr r0, check_slot_equip_elig_cid_c      @ 080360ee 0e48
     cmp r4,r0                                @ 080360f0 8442
     bne LAB_080360f6                         @ 080360f2 00d1
     b LAB_0803621a                           @ 080360f4 91e0
 LAB_080360f6:
     cmp r4,r0                                @ 080360f6 8442
     bgt LAB_08036180                         @ 080360f8 42dc
-    ldr r0, DAT_0803612c                     @ 080360fa 0c48
+    ldr r0, check_slot_equip_elig_cid_d      @ 080360fa 0c48
     cmp r4,r0                                @ 080360fc 8442
     bne LAB_08036102                         @ 080360fe 00d1
     b LAB_0803621a                           @ 08036100 8be0
@@ -250,16 +248,16 @@ LAB_0803611a:
     adds r0,#0x58    @ 0803611a 5830
     b LAB_080361b6                           @ 0803611c 4be0
     .zero  0x2
-DAT_08036120:
-    .word  0x0000148e                     @ 08036120 8e140000
-DAT_08036124:
-    .word  0x000014da                     @ 08036124 da140000
-DAT_08036128:
-    .word  0x000014b8                     @ 08036128 b8140000
-DAT_0803612c:
-    .word  0x00001322                     @ 0803612c 22130000
+check_slot_equip_elig_cid_a:
+    .word  ROYAL_COMMAND_CID              @ 08036120 8e140000
+check_slot_equip_elig_cid_b:
+    .word  FIEND_SKULL_DRAGON_CID         @ 08036124 da140000
+check_slot_equip_elig_cid_c:
+    .word  POSSESSED_DARK_SOUL_CID        @ 08036128 b8140000
+check_slot_equip_elig_cid_d:
+    .word  SNATCH_STEAL_CID               @ 0803612c 22130000
 LAB_08036130:
-    ldr r0, DAT_08036140                     @ 08036130 0348
+    ldr r0, check_slot_equip_elig_cid_e      @ 08036130 0348
     cmp r4,r0                                @ 08036132 8442
     bne LAB_08036138                         @ 08036134 00d1
     b LAB_0803621a                           @ 08036136 70e0
@@ -268,15 +266,15 @@ LAB_08036138:
     bgt LAB_08036144                         @ 0803613a 03dc
     subs r0,#0x11    @ 0803613c 1138
     b LAB_080361b6                           @ 0803613e 3ae0
-DAT_08036140:
-    .word  0x000012e2                     @ 08036140 e2120000
+check_slot_equip_elig_cid_e:
+    .word  MAGIC_ARM_SHIELD_CID           @ 08036140 e2120000
 LAB_08036144:
-    ldr r0, DAT_08036148                     @ 08036144 0048
+    ldr r0, check_slot_equip_elig_cid_f      @ 08036144 0048
     b LAB_080361b6                           @ 08036146 36e0
-DAT_08036148:
-    .word  0x000012fc                     @ 08036148 fc120000
+check_slot_equip_elig_cid_f:
+    .word  CHANGE_OF_HEART_CID            @ 08036148 fc120000
 LAB_0803614c:
-    ldr r0, DAT_08036160                     @ 0803614c 0448
+    ldr r0, check_slot_equip_elig_cid_13ea   @ 0803614c 0448
     cmp r4,r0                                @ 0803614e 8442
     beq LAB_0803621a                         @ 08036150 63d0
     cmp r4,r0                                @ 08036152 8442
@@ -286,10 +284,10 @@ LAB_0803614c:
     beq LAB_0803621a                         @ 0803615a 5ed0
     adds r0,#0x5    @ 0803615c 0530
     b LAB_080361b6                           @ 0803615e 2ae0
-DAT_08036160:
-    .word  0x000013ea                     @ 08036160 ea130000
+check_slot_equip_elig_cid_13ea:
+    .word  0x000013ea                     @ 08036160 ea130000  card_id=0x13ea (gap slot; not in card-stats.s; range [0x13E8..0x13EB] has Nuvia the Wicked/Soul Exchange); equip BST branch; low-conf
 LAB_08036164:
-    ldr r0, DAT_08036174                     @ 08036164 0348
+    ldr r0, check_slot_equip_elig_cid_g      @ 08036164 0348
     cmp r4,r0                                @ 08036166 8442
     beq LAB_0803621a                         @ 08036168 57d0
     cmp r4,r0                                @ 0803616a 8442
@@ -297,20 +295,20 @@ LAB_08036164:
     subs r0,#0x6    @ 0803616e 0638
     b LAB_080361b6                           @ 08036170 21e0
     .zero  0x2
-DAT_08036174:
-    .word  0x00001430                     @ 08036174 30140000
+check_slot_equip_elig_cid_g:
+    .word  MYSTIC_BOX_CID                 @ 08036174 30140000
 LAB_08036178:
-    ldr r0, DAT_0803617c                     @ 08036178 0048
+    ldr r0, check_slot_equip_elig_cid_h      @ 08036178 0048
     b LAB_080361b6                           @ 0803617a 1ce0
-DAT_0803617c:
-    .word  0x00001466                     @ 0803617c 66140000
+check_slot_equip_elig_cid_h:
+    .word  DARK_NECROFEAR_CID             @ 0803617c 66140000
 LAB_08036180:
-    ldr r0, DAT_080361a0                     @ 08036180 0748
+    ldr r0, check_slot_equip_elig_cid_i      @ 08036180 0748
     cmp r4,r0                                @ 08036182 8442
     beq LAB_0803621a                         @ 08036184 49d0
     cmp r4,r0                                @ 08036186 8442
     bgt LAB_080361cc                         @ 08036188 20dc
-    ldr r0, DAT_080361a4                     @ 0803618a 0648
+    ldr r0, check_slot_equip_elig_cid_j      @ 0803618a 0648
     cmp r4,r0                                @ 0803618c 8442
     beq LAB_0803621a                         @ 0803618e 44d0
     cmp r4,r0                                @ 08036190 8442
@@ -322,10 +320,10 @@ LAB_08036180:
 LAB_0803619c:
     subs r0,#0x1    @ 0803619c 0138
     b LAB_080361ec                           @ 0803619e 25e0
-DAT_080361a0:
-    .word  0x00001877                     @ 080361a0 77180000
-DAT_080361a4:
-    .word  0x00001581                     @ 080361a4 81150000
+check_slot_equip_elig_cid_i:
+    .word  BRAIN_JACKER_CID               @ 080361a0 77180000
+check_slot_equip_elig_cid_j:
+    .word  ENEMY_CONTROLLER_CID           @ 080361a4 81150000
 LAB_080361a8:
     movs r0,#0xbf    @ 080361a8 bf20
     lsls r0,r0,#0x5    @ 080361aa 4001
@@ -333,22 +331,22 @@ LAB_080361a8:
     beq LAB_0803621a                         @ 080361ae 34d0
     cmp r4,r0                                @ 080361b0 8442
     bgt LAB_080361c0                         @ 080361b2 05dc
-    ldr r0, DAT_080361bc                     @ 080361b4 0148
+    ldr r0, check_slot_equip_elig_cid_k      @ 080361b4 0148
 LAB_080361b6:
     cmp r4,r0                                @ 080361b6 8442
     beq LAB_0803621a                         @ 080361b8 2fd0
     b LAB_0803638e                           @ 080361ba e8e0
-DAT_080361bc:
-    .word  0x0000169a                     @ 080361bc 9a160000
+check_slot_equip_elig_cid_k:
+    .word  FALLING_DOWN_CID               @ 080361bc 9a160000
 LAB_080361c0:
-    ldr r0, DAT_080361c8                     @ 080361c0 0148
+    ldr r0, check_slot_equip_elig_cid_l      @ 080361c0 0148
     cmp r4,r0                                @ 080361c2 8442
     beq LAB_08036222                         @ 080361c4 2dd0
     b LAB_0803638e                           @ 080361c6 e2e0
-DAT_080361c8:
-    .word  0x00001857                     @ 080361c8 57180000
+check_slot_equip_elig_cid_l:
+    .word  OWNER_SEAL_CID                 @ 080361c8 57180000
 LAB_080361cc:
-    ldr r0, DAT_080361f4                     @ 080361cc 0948
+    ldr r0, check_slot_equip_elig_cid_m      @ 080361cc 0948
     cmp r4,r0                                @ 080361ce 8442
     beq LAB_0803621a                         @ 080361d0 23d0
     cmp r4,r0                                @ 080361d2 8442
@@ -372,10 +370,10 @@ LAB_080361ec:
     b LAB_0803638e                           @ 080361f0 cde0
 LAB_080361f2:
     b LAB_0803621a                           @ 080361f2 12e0
-DAT_080361f4:
-    .word  0x000018c6                     @ 080361f4 c6180000
+check_slot_equip_elig_cid_m:
+    .word  RESHEF_THE_DARK_BEING_CID      @ 080361f4 c6180000
 LAB_080361f8:
-    ldr r0, DAT_0803620c                     @ 080361f8 0448
+    ldr r0, check_slot_equip_elig_cid_n      @ 080361f8 0448
     cmp r4,r0                                @ 080361fa 8442
     beq LAB_0803621a                         @ 080361fc 0dd0
     cmp r4,r0                                @ 080361fe 8442
@@ -385,8 +383,8 @@ LAB_080361f8:
     beq LAB_08036226                         @ 08036206 0ed0
     b LAB_0803638e                           @ 08036208 c1e0
     .zero  0x2
-DAT_0803620c:
-    .word  0x0000195d                     @ 0803620c 5d190000
+check_slot_equip_elig_cid_n:
+    .word  CHTHONIAN_POLYMER_CID          @ 0803620c 5d190000
 LAB_08036210:
     movs r0,#0xce    @ 08036210 ce20
     lsls r0,r0,#0x5    @ 08036212 4001
@@ -421,11 +419,11 @@ LAB_08036236:
     lsls r4,r5,#0x2    @ 08036242 ac00
     adds r1,r4,r5    @ 08036244 6119
     lsls r1,r1,#0x2    @ 08036246 8900
-    ldr r0, DAT_08036288                     @ 08036248 0f48
+    ldr r0, check_slot_equip_elig_0a_stride  @ 08036248 0f48
     muls r0,r2    @ 0803624a 5043
     adds r1,r1,r0    @ 0803624c 0918
-    ldr r2, DAT_0803628c                     @ 0803624e 0f4a
-    ldr r0, DAT_08036290                     @ 08036250 0f48
+    ldr r2, check_slot_equip_elig_0a_pool    @ 0803624e 0f4a
+    ldr r0, check_slot_equip_elig_0a_neg_off @ 08036250 0f48
     adds r2,r2,r0    @ 08036252 1218
     adds r2,r1,r2    @ 08036254 8a18
     ldr r0,[r2,#0x0]                         @ 08036256 1068
@@ -439,8 +437,8 @@ LAB_08036260:
     bne LAB_08036268                         @ 08036264 00d1
     b LAB_0803638e                           @ 08036266 92e0
 LAB_08036268:
-    ldr r2, DAT_0803628c                     @ 08036268 084a
-    ldr r0, DAT_08036294                     @ 0803626a 0a48
+    ldr r2, check_slot_equip_elig_0a_pool    @ 08036268 084a
+    ldr r0, check_slot_equip_elig_0a_slotstate_off @ 0803626a 0a48
     adds r2,r2,r0    @ 0803626c 1218
     adds r0,r1,r2    @ 0803626e 8818
     ldr r0,[r0,#0x0]                         @ 08036270 0068
@@ -456,14 +454,14 @@ LAB_0803627c:
     .hword 0x4649    @ 08036282 4946
     ands r0,r1    @ 08036284 0840
     b LAB_0803629c                           @ 08036286 09e0
-DAT_08036288:
-    .word  0x00000868                     @ 08036288 68080000
-DAT_0803628c:
-    .word  0x0201d9c0                     @ 0803628c c0d90102
-DAT_08036290:
-    .word  0xffffeb50                     @ 08036290 50ebffff
-DAT_08036294:
-    .word  0xffffeb60                     @ 08036294 60ebffff
+check_slot_equip_elig_0a_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036288 68080000
+check_slot_equip_elig_0a_pool:
+    .word  gEquipNodePool                 @ 0803628c c0d90102
+check_slot_equip_elig_0a_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 08036290 50ebffff
+check_slot_equip_elig_0a_slotstate_off:
+    .word  NODE_POOL_TO_SLOT_STATE_OFF    @ 08036294 60ebffff
 LAB_08036298:
     .hword 0x4648    @ 08036298 4846
     ands r0,r3    @ 0803629a 1840
@@ -476,10 +474,10 @@ LAB_0803629c:
     lsls r4,r5,#0x2    @ 080362a6 ac00
     adds r0,r4,r5    @ 080362a8 6019
     lsls r0,r0,#0x2    @ 080362aa 8000
-    ldr r1, DAT_080362f8                     @ 080362ac 1249
+    ldr r1, check_slot_equip_elig_0a_stride_b @ 080362ac 1249
     muls r1,r2    @ 080362ae 5143
     adds r0,r0,r1    @ 080362b0 4018
-    ldr r1, DAT_080362fc                     @ 080362b2 1249
+    ldr r1, check_slot_equip_elig_0a_slots   @ 080362b2 1249
     adds r0,r0,r1    @ 080362b4 4018
     ldr r0,[r0,#0x0]                         @ 080362b6 0068
     lsls r0,r0,#0x13    @ 080362b8 c004
@@ -493,20 +491,20 @@ LAB_080362c4:
     ands r2,r0    @ 080362c8 0240
     adds r1,r4,r5    @ 080362ca 6119
     lsls r1,r1,#0x2    @ 080362cc 8900
-    ldr r0, DAT_080362f8                     @ 080362ce 0a48
+    ldr r0, check_slot_equip_elig_0a_stride_b @ 080362ce 0a48
     muls r0,r2    @ 080362d0 5043
     adds r1,r1,r0    @ 080362d2 0918
-    ldr r0, DAT_080362fc                     @ 080362d4 0948
+    ldr r0, check_slot_equip_elig_0a_slots   @ 080362d4 0948
     adds r1,r1,r0    @ 080362d6 0918
     ldr r0,[r1,#0x0]                         @ 080362d8 0868
     lsls r0,r0,#0x13    @ 080362da c004
     lsrs r3,r0,#0x13    @ 080362dc c30c
-    ldr r0, DAT_08036300                     @ 080362de 0848
+    ldr r0, check_slot_equip_elig_0a_cid_a   @ 080362de 0848
     cmp r3,r0                                @ 080362e0 8342
     beq LAB_08036314                         @ 080362e2 17d0
     cmp r3,r0                                @ 080362e4 8342
     bgt LAB_08036308                         @ 080362e6 0fdc
-    ldr r0, DAT_08036304                     @ 080362e8 0648
+    ldr r0, check_slot_equip_elig_0a_cid_b   @ 080362e8 0648
     cmp r3,r0                                @ 080362ea 8342
     beq LAB_08036314                         @ 080362ec 12d0
     adds r0,#0xc8    @ 080362ee c830
@@ -514,28 +512,28 @@ LAB_080362c4:
     beq LAB_08036320                         @ 080362f2 15d0
     b LAB_0803638e                           @ 080362f4 4be0
     .zero  0x2
-DAT_080362f8:
-    .word  0x00000868                     @ 080362f8 68080000
-DAT_080362fc:
-    .word  0x0201c510                     @ 080362fc 10c50102
-DAT_08036300:
-    .word  0x00001466                     @ 08036300 66140000
-DAT_08036304:
-    .word  0x00001322                     @ 08036304 22130000
+check_slot_equip_elig_0a_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080362f8 68080000
+check_slot_equip_elig_0a_slots:
+    .word  gDuelFieldSlots                @ 080362fc 10c50102
+check_slot_equip_elig_0a_cid_a:
+    .word  DARK_NECROFEAR_CID             @ 08036300 66140000
+check_slot_equip_elig_0a_cid_b:
+    .word  SNATCH_STEAL_CID               @ 08036304 22130000
 LAB_08036308:
-    ldr r0, DAT_08036318                     @ 08036308 0348
+    ldr r0, check_slot_equip_elig_0a_cid_c   @ 08036308 0348
     cmp r3,r0                                @ 0803630a 8342
     beq LAB_08036314                         @ 0803630c 02d0
-    ldr r0, DAT_0803631c                     @ 0803630e 0348
+    ldr r0, check_slot_equip_elig_0a_cid_d   @ 0803630e 0348
     cmp r3,r0                                @ 08036310 8342
     bne LAB_0803638e                         @ 08036312 3cd1
 LAB_08036314:
     adds r6,r7,#0x0    @ 08036314 3e1c
     b LAB_0803638c                           @ 08036316 39e0
-DAT_08036318:
-    .word  0x0000169a                     @ 08036318 9a160000
-DAT_0803631c:
-    .word  0x00001877                     @ 0803631c 77180000
+check_slot_equip_elig_0a_cid_c:
+    .word  FALLING_DOWN_CID               @ 08036318 9a160000
+check_slot_equip_elig_0a_cid_d:
+    .word  BRAIN_JACKER_CID               @ 0803631c 77180000
 LAB_08036320:
     ldr r6,[r1,#0xc]                         @ 08036320 ce68
     b LAB_0803638c                           @ 08036322 33e0
@@ -551,11 +549,11 @@ LAB_08036324:
     lsls r1,r0,#0x2    @ 08036334 8100
     adds r1,r1,r0    @ 08036336 0918
     lsls r1,r1,#0x2    @ 08036338 8900
-    ldr r0, DAT_080363a8                     @ 0803633a 1b48
+    ldr r0, check_slot_field_zone_stride     @ 0803633a 1b48
     muls r0,r2    @ 0803633c 5043
     adds r2,r1,r0    @ 0803633e 0a18
-    ldr r3, DAT_080363ac                     @ 08036340 1a4b
-    ldr r1, DAT_080363b0                     @ 08036342 1b49
+    ldr r3, check_slot_field_zone_pool       @ 08036340 1a4b
+    ldr r1, check_slot_field_zone_neg_off    @ 08036342 1b49
     adds r0,r3,r1    @ 08036344 5818
     adds r3,r2,r0    @ 08036346 1318
     ldr r0,[r3,#0x0]                         @ 08036348 1868
@@ -566,14 +564,14 @@ LAB_08036324:
     ldrh r0,[r3,#0x8]                        @ 08036352 1889
     cmp r0,#0x0                              @ 08036354 0028
     beq LAB_0803638e                         @ 08036356 1ad0
-    ldr r3, DAT_080363b4                     @ 08036358 164b
+    ldr r3, check_slot_field_zone_slot_state @ 08036358 164b
     adds r0,r3,r2    @ 0803635a 9818
     ldr r0,[r0,#0x0]                         @ 0803635c 0068
     lsrs r0,r0,#0x5    @ 0803635e 4009
     ands r0,r4    @ 08036360 2040
     cmp r0,#0x0                              @ 08036362 0028
     bne LAB_0803638e                         @ 08036364 13d1
-    ldr r0, DAT_080363b8                     @ 08036366 1448
+    ldr r0, check_slot_field_zone_charmer_range_max @ 08036366 1448
     cmp r1,r0                                @ 08036368 8142
     bgt LAB_0803638e                         @ 0803636a 10dc
     subs r0,#0x3    @ 0803636c 0338
@@ -607,18 +605,18 @@ LAB_08036396:
     pop {r4,r5,r6,r7}                        @ 080363a2 f0bc
     pop {r1}                                 @ 080363a4 02bc
     bx r1                                    @ 080363a6 0847
-DAT_080363a8:
-    .word  0x00000868                     @ 080363a8 68080000
-DAT_080363ac:
-    .word  0x0201d9c0                     @ 080363ac c0d90102
-DAT_080363b0:
-    .word  0xffffeb50                     @ 080363b0 50ebffff
-DAT_080363b4:
-    .word  0x0201c520                     @ 080363b4 20c50102
-DAT_080363b8:
-    .word  0x000018c2                     @ 080363b8 c2180000
+check_slot_field_zone_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080363a8 68080000
+check_slot_field_zone_pool:
+    .word  gEquipNodePool                 @ 080363ac c0d90102
+check_slot_field_zone_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 080363b0 50ebffff
+check_slot_field_zone_slot_state:
+    .word  gDuelFieldSlotState            @ 080363b4 20c50102
+check_slot_field_zone_charmer_range_max:
+    .word  CHARMER_RANGE_MAX_CID          @ 080363b8 c2180000
 
-@ Comprehensive field zone card eligibility check for slot (r0=player_id, r1=slot_idx). Reads slot at 0x0201c510+player*0x868+slot*0x14, checks bit12 activation and [slot+0x10] limit bits (bit5/bit1). Calls check_card_id_is_field_zone_special to filter special zone cards; then compares card_id against 0x1826/0x17e4/0x1860 etc. If conditions met, calls count_eligible_zone_slots_all_flags to verify opposite side has eligible slots. Returns 1 (eligible) or 0 (ineligible). Params: r0=u8 player_id [0..1], r1=u8 slot_idx [0..4]. Constants: CARD_ID_FIELD_A=0x1826, CARD_ID_FIELD_B=0x17e4, CARD_ID_FIELD_C=0x1860, gDuelFieldSlots=0x0201c510.
+@ check_slot_field_zone_card_eligible: Field zone card eligibility check for slot. r0=player_id [0..1], r1=slot_idx [0..4]. Reads slot at gDuelFieldSlots+player*0x868+slot*0x14; checks bit12 activation and [slot+0x10] limit bits (bit5/bit1). Calls check_card_id_is_field_zone_special to filter special zone cards. Compares card_id against ELEMENT_MAGICIAN_CID(0x1826) and related IDs. If conditions met, calls count_eligible_zone_slots_all_flags to verify opposite side has eligible slots. Uses equip node pool (gEquipNodePool=0x0201d9c0) + NODE_POOL_NEG_OFFSET(0xffffeb50) + gDuelFieldSlotState(0x0201c520) + CHARMER_RANGE_MAX_CID(0x18c2) range check. Returns 1 (eligible) or 0 (ineligible). Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, NODE_POOL_NEG_OFFSET=0xffffeb50, NODE_POOL_TO_SLOT_STATE_OFF=0xffffeb60, CHARMER_RANGE_MAX_CID=0x18c2, ELEMENT_MAGICIAN_CID=0x1826.
 check_slot_field_zone_card_eligible:
     push {r4,r5,r6,lr}                       @ 080363bc 70b5
     adds r6,r0,#0x0    @ 080363be 061c
@@ -628,10 +626,10 @@ check_slot_field_zone_card_eligible:
     lsls r2,r1,#0x2    @ 080363c6 8a00
     adds r2,r2,r1    @ 080363c8 5218
     lsls r2,r2,#0x2    @ 080363ca 9200
-    ldr r0, DAT_08036414                     @ 080363cc 1148
+    ldr r0, check_slot_field_zone_stride_b   @ 080363cc 1148
     muls r0,r3    @ 080363ce 5843
     adds r2,r2,r0    @ 080363d0 1218
-    ldr r1, DAT_08036418                     @ 080363d2 1149
+    ldr r1, check_slot_field_zone_slots      @ 080363d2 1149
     adds r3,r2,r1    @ 080363d4 5318
     ldr r0,[r3,#0x0]                         @ 080363d6 1868
     lsls r0,r0,#0x13    @ 080363d8 c004
@@ -654,7 +652,7 @@ check_slot_field_zone_card_eligible:
     bl check_card_id_is_field_zone_special   @ 080363fa 15f0a1fe
     cmp r0,#0x0                              @ 080363fe 0028
     bne LAB_08036442                         @ 08036400 1fd1
-    ldr r0, DAT_0803641c                     @ 08036402 0648
+    ldr r0, check_slot_field_zone_cid_a      @ 08036402 0648
     cmp r5,r0                                @ 08036404 8542
     beq LAB_08036428                         @ 08036406 0fd0
     cmp r5,r0                                @ 08036408 8542
@@ -663,12 +661,12 @@ check_slot_field_zone_card_eligible:
     cmp r5,r0                                @ 0803640e 8542
     beq LAB_08036428                         @ 08036410 0ad0
     b LAB_08036446                           @ 08036412 18e0
-DAT_08036414:
-    .word  0x00000868                     @ 08036414 68080000
-DAT_08036418:
-    .word  0x0201c510                     @ 08036418 10c50102
-DAT_0803641c:
-    .word  0x00001826                     @ 0803641c 26180000
+check_slot_field_zone_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036414 68080000
+check_slot_field_zone_slots:
+    .word  gDuelFieldSlots                @ 08036418 10c50102
+check_slot_field_zone_cid_a:
+    .word  ELEMENT_MAGICIAN_CID           @ 0803641c 26180000
 LAB_08036420:
     movs r0,#0xc3    @ 08036420 c320
     lsls r0,r0,#0x5    @ 08036422 4001
@@ -697,7 +695,7 @@ LAB_08036448:
     bx r1                                    @ 0803644c 0847
     .zero  0x2
 
-@ indeg=14, D_shared_mid. Checks slot meets equip activation conditions. Steps: (1) compute slot addr in gDuelFieldSlots(0x0201c510, stride=0x868, entry=0x14); (2) [slot+0] high 13 bits nonzero (has card); (3) [slot+0x8] halfword nonzero; (4) check_slot_field_zone_card_eligible; (5) check_slot_card_is_equip_whitelist; (6) find_first_available_monster_slot_for_player (opposite side has space). Returns 1 if all pass, 0 otherwise. Read-only. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..4]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.
+@ check_slot_equip_whitelist_with_monster_space: Checks slot meets equip activation conditions. indeg=14, D_shared_mid. Steps: (1) compute slot addr in gDuelFieldSlots(0x0201c510, stride=0x868, entry=0x14); (2) [slot+0] high 13 bits nonzero (has card); (3) [slot+0x8] halfword nonzero; (4) check_slot_field_zone_card_eligible; (5) check_slot_card_is_equip_whitelist; (6) find_first_available_monster_slot_for_player (opposite side has space). Returns 1 if all pass, 0 otherwise. Read-only. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..4]. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868.
 check_slot_equip_whitelist_with_monster_space:
     push {r4,r5,r6,lr}                       @ 08036450 70b5
     adds r5,r0,#0x0    @ 08036452 051c
@@ -708,10 +706,10 @@ check_slot_equip_whitelist_with_monster_space:
     lsls r0,r4,#0x2    @ 0803645c a000
     adds r0,r0,r4    @ 0803645e 0019
     lsls r0,r0,#0x2    @ 08036460 8000
-    ldr r1, DAT_080364a0                     @ 08036462 0f49
+    ldr r1, check_equip_whitelist_stride     @ 08036462 0f49
     muls r1,r2    @ 08036464 5143
     adds r0,r0,r1    @ 08036466 4018
-    ldr r1, DAT_080364a4                     @ 08036468 0e49
+    ldr r1, check_equip_whitelist_slots      @ 08036468 0e49
     adds r1,r0,r1    @ 0803646a 4118
     ldr r0,[r1,#0x0]                         @ 0803646c 0868
     lsls r0,r0,#0x13    @ 0803646e c004
@@ -737,10 +735,10 @@ check_slot_equip_whitelist_with_monster_space:
 LAB_0803649c:
     movs r0,#0x0    @ 0803649c 0020
     b LAB_080364aa                           @ 0803649e 04e0
-DAT_080364a0:
-    .word  0x00000868                     @ 080364a0 68080000
-DAT_080364a4:
-    .word  0x0201c510                     @ 080364a4 10c50102
+check_equip_whitelist_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080364a0 68080000
+check_equip_whitelist_slots:
+    .word  gDuelFieldSlots                @ 080364a4 10c50102
 LAB_080364a8:
     movs r0,#0x1    @ 080364a8 0120
 LAB_080364aa:
@@ -748,7 +746,7 @@ LAB_080364aa:
     pop {r1}                                 @ 080364ac 02bc
     bx r1                                    @ 080364ae 0847
 
-@ Checks whether the card in player_side:slot_idx qualifies for effect activation. Guards: card_id != 0, slot_idx <= 4, [0x0201B750]==0 (phase lock), [slot+0x8]!=0. If guards pass, compares card_id against ~10 specific magic/trap card ID whitelist, then calls check_card_matches_active_effect_slot / count_slot_equip_list_matches / check_slot_card_is_equip_type / FUN_0803279c / FUN_08032654; accumulates results into r7 via OR. Returns 0 (not eligible), 2 (equip chain hit), or 3 (special effect hit). Sibling FUN_08036674 handles a separate card ID whitelist; both share the same caller set. r0=u32 player_side, r1=u32 slot_idx [0..4]. Returns u32 eligibility_flags. Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, slot_entry=20 bytes, 0x0201b290=gDuelPhaseFlags base, 0x4C0=phase flag offset, 0x1709/0x13cd/0x12a8/0x164e/0x17d3/0x1814/0x181a=whitelist card IDs, 0x10f4=proxy card ID for check_card_matches_active_effect_slot, 0x1693=count_slot_equip_list_matches ref_card_id, 0x1667=FUN_0803279c param, 0x17a1=FUN_08032654 param.
+@ check_slot_card_effect_eligibility: Checks whether the card in player_side:slot_idx qualifies for effect activation. Guards: card_id != 0, slot_idx <= 4, [gDuelPhaseFlags+0x4c0]==0 (phase lock), [slot+0x8]!=0. If guards pass, compares card_id against ~10 specific magic/trap card ID whitelist (CANNONBALL_SPEAR_SHELLFISH_CID/LEGENDARY_FISHERMAN_CID/DEEPSEA_WARRIOR_CID/GUARDIAN_KAYEST_CID/HORUS_LV6_CID/SILENT_SWORDSMAN_LV5_CID plus computed 0x181a), then calls check_card_matches_active_effect_slot(UMI_CARD_ID=0x10f4) / count_slot_equip_list_matches(METALLIZING_PARASITE_CID=0x1693) / check_slot_card_is_equip_type / count_field_copies_of_card(NON_SPELLCASTING_AREA_CID=0x1667) / count_available_effect_zones(DUST_BARRIER_CID=0x17a1); accumulates results into r7 via OR. Returns 0 (not eligible), 2 (equip chain hit), or 3 (special effect hit). Sibling check_slot_card_fieldspell_eligibility(0x08036674) handles a separate card ID whitelist; both share the same caller set. r0=u32 player_side, r1=u32 slot_idx [0..4]. Returns u32 eligibility_flags. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, gDuelPhaseFlags=0x0201b290, phase_lock_offset=0x4c0.
 check_slot_card_effect_eligibility:
     push {r4,r5,r6,r7,lr}                    @ 080364b0 f0b5
     .hword 0x464f    @ 080364b2 4f46
@@ -762,11 +760,11 @@ check_slot_card_effect_eligibility:
     lsls r0,r5,#0x2    @ 080364c2 a800
     adds r0,r0,r5    @ 080364c4 4019
     lsls r0,r0,#0x2    @ 080364c6 8000
-    ldr r1, DAT_08036500                     @ 080364c8 0d49
+    ldr r1, check_effect_elig_stride         @ 080364c8 0d49
     muls r1,r2    @ 080364ca 5143
     adds r0,r0,r1    @ 080364cc 4018
     .hword 0x4681    @ 080364ce 8146
-    ldr r0, DAT_08036504                     @ 080364d0 0c48
+    ldr r0, check_effect_elig_slots          @ 080364d0 0c48
     .hword 0x4680    @ 080364d2 8046
     .hword 0x464a    @ 080364d4 4a46
     add r2,r8                                @ 080364d6 4244
@@ -778,7 +776,7 @@ check_slot_card_effect_eligibility:
     beq LAB_080364fc                         @ 080364e2 0bd0
     cmp r5,#0x4                              @ 080364e4 042d
     bgt LAB_080364fc                         @ 080364e6 09dc
-    ldr r0, DAT_08036508                     @ 080364e8 0748
+    ldr r0, check_effect_elig_phase_flags    @ 080364e8 0748
     movs r3,#0x98    @ 080364ea 9823
     lsls r3,r3,#0x3    @ 080364ec db00
     adds r0,r0,r3    @ 080364ee c018
@@ -791,12 +789,12 @@ check_slot_card_effect_eligibility:
 LAB_080364fc:
     movs r0,#0x0    @ 080364fc 0020
     b LAB_08036640                           @ 080364fe 9fe0
-DAT_08036500:
-    .word  0x00000868                     @ 08036500 68080000
-DAT_08036504:
-    .word  0x0201c510                     @ 08036504 10c50102
-DAT_08036508:
-    .word  0x0201b290                     @ 08036508 90b20102
+check_effect_elig_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036500 68080000
+check_effect_elig_slots:
+    .word  gDuelFieldSlots                @ 08036504 10c50102
+check_effect_elig_phase_flags:
+    .word  gDuelPhaseFlags                @ 08036508 90b20102
 LAB_0803650c:
     .hword 0x4640    @ 0803650c 4046
     adds r0,#0x10    @ 0803650e 1030
@@ -810,26 +808,26 @@ LAB_0803650c:
     ands r0,r4    @ 0803651e 2040
     cmp r0,#0x0                              @ 08036520 0028
     bne LAB_080365cc                         @ 08036522 53d1
-    ldr r0, DAT_0803653c                     @ 08036524 0548
+    ldr r0, check_effect_elig_cid_a          @ 08036524 0548
     cmp r1,r0                                @ 08036526 8142
     beq LAB_0803658c                         @ 08036528 30d0
     cmp r1,r0                                @ 0803652a 8142
     bgt LAB_0803655c                         @ 0803652c 16dc
-    ldr r0, DAT_08036540                     @ 0803652e 0448
+    ldr r0, check_effect_elig_cid_b          @ 0803652e 0448
     cmp r1,r0                                @ 08036530 8142
     beq LAB_0803658c                         @ 08036532 2bd0
     cmp r1,r0                                @ 08036534 8142
     bgt LAB_08036548                         @ 08036536 07dc
-    ldr r0, DAT_08036544                     @ 08036538 0248
+    ldr r0, check_effect_elig_cid_c          @ 08036538 0248
     b LAB_08036550                           @ 0803653a 09e0
-DAT_0803653c:
-    .word  0x00001709                     @ 0803653c 09170000
-DAT_08036540:
-    .word  0x000013cd                     @ 08036540 cd130000
-DAT_08036544:
-    .word  0x000012a8                     @ 08036544 a8120000
+check_effect_elig_cid_a:
+    .word  CANNONBALL_SPEAR_SHELLFISH_CID @ 0803653c 09170000
+check_effect_elig_cid_b:
+    .word  LEGENDARY_FISHERMAN_CID        @ 08036540 cd130000
+check_effect_elig_cid_c:
+    .word  DEEPSEA_WARRIOR_CID            @ 08036544 a8120000
 LAB_08036548:
-    ldr r0, DAT_08036558                     @ 08036548 0348
+    ldr r0, check_effect_elig_cid_d          @ 08036548 0348
     cmp r1,r0                                @ 0803654a 8142
     beq LAB_080365b8                         @ 0803654c 34d0
     adds r0,#0xb8    @ 0803654e b830
@@ -838,10 +836,10 @@ LAB_08036550:
     beq LAB_0803658c                         @ 08036552 1bd0
     b LAB_080365cc                           @ 08036554 3ae0
     .zero  0x2
-DAT_08036558:
-    .word  0x0000164e                     @ 08036558 4e160000
+check_effect_elig_cid_d:
+    .word  GUARDIAN_KAYEST_CID            @ 08036558 4e160000
 LAB_0803655c:
-    ldr r0, DAT_08036574                     @ 0803655c 0548
+    ldr r0, check_effect_elig_cid_e          @ 0803655c 0548
     cmp r1,r0                                @ 0803655e 8142
     beq LAB_080365b8                         @ 08036560 2ad0
     cmp r1,r0                                @ 08036562 8142
@@ -853,10 +851,10 @@ LAB_0803655c:
     cmp r1,r0                                @ 0803656e 8142
     beq LAB_080365b8                         @ 08036570 22d0
     b LAB_080365cc                           @ 08036572 2be0
-DAT_08036574:
-    .word  0x000017d3                     @ 08036574 d3170000
+check_effect_elig_cid_e:
+    .word  HORUS_LV6_CID                  @ 08036574 d3170000
 LAB_08036578:
-    ldr r0, DAT_08036588                     @ 08036578 0348
+    ldr r0, check_effect_elig_cid_f          @ 08036578 0348
     cmp r1,r0                                @ 0803657a 8142
     beq LAB_080365c8                         @ 0803657c 24d0
     adds r0,#0x6    @ 0803657e 0630
@@ -864,21 +862,21 @@ LAB_08036578:
     beq LAB_080365c8                         @ 08036582 21d0
     b LAB_080365cc                           @ 08036584 22e0
     .zero  0x2
-DAT_08036588:
-    .word  0x00001814                     @ 08036588 14180000
+check_effect_elig_cid_f:
+    .word  SILENT_SWORDSMAN_LV5_CID       @ 08036588 14180000
 LAB_0803658c:
-    ldr r0, DAT_080365bc                     @ 0803658c 0b48
+    ldr r0, check_effect_elig_umi_cid        @ 0803658c 0b48
     bl check_card_matches_active_effect_slot @ 0803658e fdf7cdfd
     cmp r0,#0x0                              @ 08036592 0028
     beq LAB_080365cc                         @ 08036594 1ad0
-    ldr r3, PTR_gP1LifePoints_080365c0       @ 08036596 0a4b
+    ldr r3, check_effect_elig_lp_ptr         @ 08036596 0a4b
     lsls r0,r5,#0x2    @ 08036598 a800
     adds r0,r0,r5    @ 0803659a 4019
     lsls r0,r0,#0x2    @ 0803659c 8000
     movs r4,#0x1    @ 0803659e 0124
     adds r1,r6,#0x0    @ 080365a0 311c
     ands r1,r4    @ 080365a2 2140
-    ldr r2, DAT_080365c4                     @ 080365a4 074a
+    ldr r2, check_effect_elig_stride_b       @ 080365a4 074a
     muls r1,r2    @ 080365a6 5143
     adds r0,r0,r1    @ 080365a8 4018
     adds r3,#0x40    @ 080365aa 4033
@@ -891,17 +889,17 @@ LAB_0803658c:
 LAB_080365b8:
     movs r0,#0x3    @ 080365b8 0320
     b LAB_08036640                           @ 080365ba 41e0
-DAT_080365bc:
-    .word  0x000010f4                     @ 080365bc f4100000
-PTR_gP1LifePoints_080365c0:
+check_effect_elig_umi_cid:
+    .word  UMI_CARD_ID                    @ 080365bc f4100000
+check_effect_elig_lp_ptr:
     .word  gP1LifePoints                  @ 080365c0 e0c40102
-DAT_080365c4:
-    .word  0x00000868                     @ 080365c4 68080000
+check_effect_elig_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080365c4 68080000
 LAB_080365c8:
     movs r0,#0x2    @ 080365c8 0220
     orrs r7,r0    @ 080365ca 0743
 LAB_080365cc:
-    ldr r4, DAT_0803664c                     @ 080365cc 1f4c
+    ldr r4, check_effect_elig_equip_ref_cid  @ 080365cc 1f4c
     adds r0,r6,#0x0    @ 080365ce 301c
     adds r1,r5,#0x0    @ 080365d0 291c
     adds r2,r4,#0x0    @ 080365d2 221c
@@ -931,11 +929,11 @@ LAB_080365fe:
     bl check_slot_card_is_equip_type         @ 08036602 faf74ffa
     cmp r0,#0x0                              @ 08036606 0028
     bne LAB_0803663e                         @ 08036608 19d1
-    ldr r0, DAT_08036650                     @ 0803660a 1148
+    ldr r0, check_effect_elig_copies_cid     @ 0803660a 1148
     bl count_field_copies_of_card            @ 0803660c fcf7c6f8
     cmp r0,#0x0                              @ 08036610 0028
     bne LAB_080365b8                         @ 08036612 d1d1
-    ldr r4, DAT_08036654                     @ 08036614 0f4c
+    ldr r4, check_effect_elig_zones_cid      @ 08036614 0f4c
     movs r5,#0x1    @ 08036616 0125
     rsbs r5,r5,#0    @ 08036618 6d42
     adds r0,r6,#0x0    @ 0803661a 301c
@@ -964,14 +962,14 @@ LAB_08036640:
     pop {r4,r5,r6,r7}                        @ 08036646 f0bc
     pop {r1}                                 @ 08036648 02bc
     bx r1                                    @ 0803664a 0847
-DAT_0803664c:
-    .word  0x00001693                     @ 0803664c 93160000
-DAT_08036650:
-    .word  0x00001667                     @ 08036650 67160000
-DAT_08036654:
-    .word  0x000017a1                     @ 08036654 a1170000
+check_effect_elig_equip_ref_cid:
+    .word  METALLIZING_PARASITE_CID       @ 0803664c 93160000
+check_effect_elig_copies_cid:
+    .word  NON_SPELLCASTING_AREA_CID      @ 08036650 67160000
+check_effect_elig_zones_cid:
+    .word  DUST_BARRIER_CID               @ 08036654 a1170000
 
-@ 9-instruction thin wrapper over check_slot_card_effect_eligibility. Calls check_slot_card_effect_eligibility(r0, r1, r2), then tests (result & (r2+1)) > 0: returns 1 if any masked bit is set, 0 otherwise. Normalizes the multi-value eligibility result to a bool using a caller-supplied mask. r2 is the mask-minus-1 value (0 -> mask=1 tests bit0; 1 -> mask=2 tests bit1). r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u32 result_mask_minus1. Returns u32 bool (0=mask not hit; 1=mask hit). Constants: all inherited from check_slot_card_effect_eligibility.
+@ query_slot_effect_eligibility_nonzero: 9-instruction thin wrapper over check_slot_card_effect_eligibility. Calls check_slot_card_effect_eligibility(r0, r1, r2), then tests (result & (r2+1)) > 0: returns 1 if any masked bit is set, 0 otherwise. Normalizes the multi-value eligibility result to a bool using a caller-supplied mask. r2 is the mask-minus-1 value (0 -> mask=1 tests bit0; 1 -> mask=2 tests bit1). r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u32 result_mask_minus1. Returns u32 bool (0=mask not hit; 1=mask hit). Constants: all inherited from check_slot_card_effect_eligibility.
 query_slot_effect_eligibility_nonzero:
     push {r4,lr}                             @ 08036658 10b5
     adds r4,r2,#0x0    @ 0803665a 141c
@@ -988,7 +986,7 @@ LAB_0803666c:
     pop {r1}                                 @ 08036670 02bc
     bx r1                                    @ 08036672 0847
 
-@ Sibling of check_slot_card_effect_eligibility sharing the same 4 callers. Checks player_side:slot_idx card effect eligibility for a smaller card ID whitelist (only 0x194e and 0x194e+0x75=0x19c3). Same entry guards: card_id!=0, slot_idx<=4, [0x0201B750]==0, [slot+0x8]!=0. Reads slot+0x10 equip word and checks bit5/bit1 both 0. Compares card_id against 0x194e/0x19c3; hit -> returns 3, no hit -> returns 0. Pure leaf function (no callees). Corresponds to field-spell type card effect check. r0=u32 player_side, r1=u32 slot_idx [0..4]. Returns u32 eligibility (0 or 3). Constants: 0x0201c510=gDuelFieldSlots, 0x868=player stride, 0x0201b290=gDuelPhaseFlags, 0x4C0=phase flag offset, 0x194e=field-spell card ID 1, 0x19c3=field-spell card ID 2 (=0x194e+0x75).
+@ check_slot_card_fieldspell_eligibility: Sibling of check_slot_card_effect_eligibility sharing the same 4 callers. Checks player_side:slot_idx card effect eligibility for a smaller card ID whitelist (EHERO_WILDHEART_CID=0x194e and 0x194e+0x75=0x19c3). Same entry guards: card_id!=0, slot_idx<=4, [gDuelPhaseFlags+0x4c0]==0, [slot+0x8]!=0. Reads slot+0x10 equip word and checks bit5/bit1 both 0. Compares card_id against 0x194e/0x19c3; hit -> returns 3, no hit -> returns 0. Pure leaf function (no callees). Corresponds to field-spell type card effect check. r0=u32 player_side, r1=u32 slot_idx [0..4]. Returns u32 eligibility (0 or 3). Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, gDuelPhaseFlags=0x0201b290, phase_lock_offset=0x4c0, EHERO_WILDHEART_CID=0x194e.
 check_slot_card_fieldspell_eligibility:
     push {r4,r5,r6,lr}                       @ 08036674 70b5
     adds r3,r1,#0x0    @ 08036676 0b1c
@@ -997,10 +995,10 @@ check_slot_card_fieldspell_eligibility:
     lsls r1,r3,#0x2    @ 0803667c 9900
     adds r1,r1,r3    @ 0803667e c918
     lsls r1,r1,#0x2    @ 08036680 8900
-    ldr r2, DAT_080366d8                     @ 08036682 154a
+    ldr r2, check_fieldspell_elig_stride     @ 08036682 154a
     muls r0,r2    @ 08036684 5043
     adds r4,r1,r0    @ 08036686 0c18
-    ldr r6, DAT_080366dc                     @ 08036688 144e
+    ldr r6, check_fieldspell_elig_slots      @ 08036688 144e
     adds r1,r4,r6    @ 0803668a a119
     ldr r0,[r1,#0x0]                         @ 0803668c 0868
     lsls r0,r0,#0x13    @ 0803668e c004
@@ -1009,7 +1007,7 @@ check_slot_card_fieldspell_eligibility:
     beq LAB_080366e8                         @ 08036694 28d0
     cmp r3,#0x4                              @ 08036696 042b
     bgt LAB_080366e8                         @ 08036698 26dc
-    ldr r0, DAT_080366e0                     @ 0803669a 1148
+    ldr r0, check_fieldspell_elig_phase_flags @ 0803669a 1148
     movs r3,#0x98    @ 0803669c 9823
     lsls r3,r3,#0x3    @ 0803669e db00
     adds r0,r0,r3    @ 080366a0 c018
@@ -1031,7 +1029,7 @@ check_slot_card_fieldspell_eligibility:
     ands r0,r5    @ 080366c0 2840
     cmp r0,#0x0                              @ 080366c2 0028
     bne LAB_080366e8                         @ 080366c4 10d1
-    ldr r0, DAT_080366e4                     @ 080366c6 0748
+    ldr r0, check_fieldspell_elig_cid_a      @ 080366c6 0748
     cmp r2,r0                                @ 080366c8 8242
     beq LAB_080366d2                         @ 080366ca 02d0
     adds r0,#0x75    @ 080366cc 7530
@@ -1041,14 +1039,14 @@ LAB_080366d2:
     movs r0,#0x3    @ 080366d2 0320
     b LAB_080366ea                           @ 080366d4 09e0
     .zero  0x2
-DAT_080366d8:
-    .word  0x00000868                     @ 080366d8 68080000
-DAT_080366dc:
-    .word  0x0201c510                     @ 080366dc 10c50102
-DAT_080366e0:
-    .word  0x0201b290                     @ 080366e0 90b20102
-DAT_080366e4:
-    .word  0x0000194e                     @ 080366e4 4e190000
+check_fieldspell_elig_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080366d8 68080000
+check_fieldspell_elig_slots:
+    .word  gDuelFieldSlots                @ 080366dc 10c50102
+check_fieldspell_elig_phase_flags:
+    .word  gDuelPhaseFlags                @ 080366e0 90b20102
+check_fieldspell_elig_cid_a:
+    .word  EHERO_WILDHEART_CID            @ 080366e4 4e190000
 LAB_080366e8:
     movs r0,#0x0    @ 080366e8 0020
 LAB_080366ea:
@@ -1056,7 +1054,7 @@ LAB_080366ea:
     pop {r1}                                 @ 080366ec 02bc
     bx r1                                    @ 080366ee 0847
 
-@ Small wrapper: takes (r0=player_side, r1=slot_idx, r2=target_player_side), calls check_slot_card_fieldspell_eligibility(r0, r1) for eligibility flags, then ANDs result with (r2+1) and checks > 0. Returns 1 if slot has fieldspell eligibility AND (eligibility_flags & (r2+1)) != 0. Compact selector used at multiple duel sites to check if specific side has field spell activation right. indeg=10. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; r2=u32 target_player_side [0..1]. Returns u32 0/1.
+@ check_slot_fieldspell_eligible_by_side: Small wrapper around check_slot_card_fieldspell_eligibility. Takes (r0=player_side, r1=slot_idx, r2=target_player_side), calls check_slot_card_fieldspell_eligibility(r0, r1) for eligibility flags, then ANDs result with (r2+1) and checks > 0. Returns 1 if slot has fieldspell eligibility AND (eligibility_flags & (r2+1)) != 0. Compact selector used at multiple duel sites to check if specific side has field spell activation right. indeg=10. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; r2=u32 target_player_side [0..1]. Returns u32 0/1.
 check_slot_fieldspell_eligible_by_side:
     push {r4,lr}                             @ 080366f0 10b5
     adds r4,r2,#0x0    @ 080366f2 141c
@@ -1073,7 +1071,7 @@ LAB_08036704:
     pop {r1}                                 @ 08036708 02bc
     bx r1                                    @ 0803670a 0847
 
-@ Routes eligibility check based on card field6 (get_card_extended_stat_field6): field6==0x17 (field spell) -> reads byte[+0x2] bit0 for side and calls check_slot_fieldspell_eligible_by_side; field6==0x16 (equip/continuous) -> calls query_slot_effect_eligibility_nonzero; other types in zone_col 5..9 -> check_card_field5_is_nonzero then same. r0=ptr card_slot_entry; r1=u8 player_id [0..1]; r2=u8 zone_col [0..9]. Returns u8 eligible_flag (1=eligible, 0=not). 74 callers (C_util_high). Constants: FIELD_SPELL=0x17, EQUIP_CONTINUOUS=0x16, zone_col_range=[5..9].
+@ query_slot_card_type_eligibility: Routes eligibility check based on card field6 (get_card_extended_stat_field6): field6==0x17 (field spell) -> reads byte[+0x2] bit0 for side and calls check_slot_fieldspell_eligible_by_side; field6==0x16 (equip/continuous) -> calls query_slot_effect_eligibility_nonzero; other types in zone_col 5..9 -> check_card_field5_is_nonzero then same. r0=ptr card_slot_entry; r1=u8 player_id [0..1]; r2=u8 zone_col [0..9]. Returns u8 eligible_flag (1=eligible, 0=not). 74 callers (C_util_high). Constants: FIELD_SPELL=0x17, EQUIP_CONTINUOUS=0x16, zone_col_range=[5..9].
 query_slot_card_type_eligibility:
     push {r4,r5,r6,lr}                       @ 0803670c 70b5
     adds r4,r0,#0x0    @ 0803670e 041c
@@ -1125,12 +1123,7 @@ LAB_0803676a:
     pop {r1}                                 @ 0803676c 02bc
     bx r1                                    @ 0803676e 0847
 
-@ Checks equip card activation prerequisites for the specified zone slot (player r1, slot_idx r2) before full check_card_equip_eligible_for_slot. Check chain: (1) slot card_id==0 -> return 0 (empty slot, eligible); (2) slot[+8] halfword==0 -> return 1 (no equip link, cannot activate); (3) global flag [0x0201b74c]!=0 -> return 1 (globally disabled); (4) slot_idx>4: skip level check; (5) slot_idx<=4: read slot[+0x10] bit5; if 0, check card_id in [0x1386..0x1388] -> return 0. Effect zone path: calls get_slot_card_state_code; state==1 -> calls count_field_copies_of_card(0x128b=Lord of D.) and count_field_copies_of_card(0x1879=King Dragun), then count_available_effect_zones; if 0 -> return 1. Final: card_id in [0x17d2..0x17d4] (Horus cluster) check with 0x17dc (Horus' Servant) as arg. Returns 0=prerequisites met, 1=failed. 92 callers.
-@ 
-@ Params: r0=ptr card_ptr ([+2] bit0=player side flag; saved to r8) [0..1]; r1=u8 player_id [0..1]; r2=u8 slot_idx [0..9]
-@ Returns: r0=u32 bool (0=prerequisites met; 1=prerequisites failed)
-@ Side effects: none (read-only)
-@ Constants: PLAYER_STRIDE=0x868; gDuelFieldSlots=0x0201c510; GLOBAL_FLAG_ADDR=0x0201b74c; LORD_OF_D_ID=0x128b; KING_DRAGUN_ID=0x1879; CARD_ID_RANGE=[0x1386..0x1388]; HORUS_LV8_ID=0x17d4; HORUS_SERVANT_ID=0x17dc
+@ check_zone_slot_equip_prerequisites: Checks equip card activation prerequisites for the specified zone slot before full check_card_equip_eligible_for_slot. Check chain: (1) slot card_id==0 -> return 0 (empty slot, eligible); (2) slot[+8] halfword==0 -> return 1 (no equip link, cannot activate); (3) global flag [0x0201b74c]!=0 -> return 1 (globally disabled); (4) slot_idx>4: skip level check; (5) slot_idx<=4: read slot[+0x10] bit5; if 0 check card_id in [0x1386..EQUIP_SLOT_CARD_ID_RANGE_MAX=0x1388] -> return 0; (6) calls get_slot_card_state_code; state==1 -> calls count_field_copies_of_card(LORD_OF_D_CID=0x128b) and count_field_copies_of_card(KING_DRAGUN_CID=0x1879), then count_available_effect_zones; if 0 -> return 1; (7) final: card_id in [0x17d2..HORUS_LV8_CID=0x17d4] (Horus cluster) check with HORUS_SERVANT_CID=0x17dc as arg. Returns 0=prerequisites met, 1=failed. 92 callers. Params: r0=ptr card_ptr, r1=u8 player_id [0..1], r2=u8 slot_idx [0..9]. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, gDuelPhaseFlags=0x0201b290, PHASE_LOCK_FLAG_OFF=0x4bc, EQUIP_SLOT_CARD_ID_RANGE_MAX=0x1388, LORD_OF_D_CID=0x128b, KING_DRAGUN_CID=0x1879, HORUS_SERVANT_CID=0x17dc, HORUS_LV8_CID=0x17d4.
 check_zone_slot_equip_prerequisites:
     push {r4,r5,r6,r7,lr}                    @ 08036770 f0b5
     .hword 0x4647    @ 08036772 4746
@@ -1144,10 +1137,10 @@ check_zone_slot_equip_prerequisites:
     lsls r0,r4,#0x2    @ 08036782 a000
     adds r0,r0,r4    @ 08036784 0019
     lsls r0,r0,#0x2    @ 08036786 8000
-    ldr r1, DAT_08036840                     @ 08036788 2d49
+    ldr r1, check_zone_prereq_stride         @ 08036788 2d49
     muls r1,r2    @ 0803678a 5143
     adds r3,r0,r1    @ 0803678c 4318
-    ldr r6, DAT_08036844                     @ 0803678e 2d4e
+    ldr r6, check_zone_prereq_slots          @ 0803678e 2d4e
     adds r1,r3,r6    @ 08036790 9919
     ldr r0,[r1,#0x0]                         @ 08036792 0868
     lsls r0,r0,#0x13    @ 08036794 c004
@@ -1157,8 +1150,8 @@ check_zone_slot_equip_prerequisites:
     ldrh r0,[r1,#0x8]                        @ 0803679c 0889
     cmp r0,#0x0                              @ 0803679e 0028
     beq LAB_08036864                         @ 080367a0 60d0
-    ldr r0, DAT_08036848                     @ 080367a2 2948
-    ldr r1, DAT_0803684c                     @ 080367a4 2949
+    ldr r0, check_zone_prereq_phase_flags    @ 080367a2 2948
+    ldr r1, check_zone_prereq_phase_lock_off @ 080367a4 2949
     adds r0,r0,r1    @ 080367a6 4018
     ldr r0,[r0,#0x0]                         @ 080367a8 0068
     cmp r0,#0x0                              @ 080367aa 0028
@@ -1173,7 +1166,7 @@ check_zone_slot_equip_prerequisites:
     ands r0,r7    @ 080367bc 3840
     cmp r0,#0x0                              @ 080367be 0028
     bne LAB_080367ce                         @ 080367c0 05d1
-    ldr r0, DAT_08036850                     @ 080367c2 2348
+    ldr r0, check_zone_prereq_cid_range_max  @ 080367c2 2348
     cmp r2,r0                                @ 080367c4 8242
     bgt LAB_080367ce                         @ 080367c6 02dc
     subs r0,#0x2    @ 080367c8 0238
@@ -1187,7 +1180,7 @@ LAB_080367ce:
     lsrs r0,r0,#0x10    @ 080367d8 000c
     cmp r0,#0x1                              @ 080367da 0128
     bne LAB_080367fe                         @ 080367dc 0fd1
-    ldr r0, DAT_08036854                     @ 080367de 1d48
+    ldr r0, check_zone_prereq_lord_of_d_cid  @ 080367de 1d48
     bl count_field_copies_of_card            @ 080367e0 fbf7dcff
     cmp r0,#0x0                              @ 080367e4 0028
     bne LAB_0803683c                         @ 080367e6 29d1
@@ -1197,7 +1190,7 @@ LAB_080367ce:
     lsrs r0,r0,#0x1f    @ 080367ee c00f
     cmp r0,r5                                @ 080367f0 a842
     beq LAB_080367fe                         @ 080367f2 04d0
-    ldr r0, DAT_08036858                     @ 080367f4 1848
+    ldr r0, check_zone_prereq_king_dragun_cid @ 080367f4 1848
     bl count_field_copies_of_card            @ 080367f6 fbf7d1ff
     cmp r0,#0x0                              @ 080367fa 0028
     bne LAB_0803683c                         @ 080367fc 1ed1
@@ -1208,7 +1201,7 @@ LAB_080367fe:
     lsrs r0,r0,#0x1f    @ 08036804 c00f
     movs r6,#0x1    @ 08036806 0126
     subs r0,r6,r0    @ 08036808 301a
-    ldr r1, DAT_0803685c                     @ 0803680a 1449
+    ldr r1, check_zone_prereq_horus_servant_cid @ 0803680a 1449
     movs r2,#0x1    @ 0803680c 0122
     rsbs r2,r2,#0    @ 0803680e 5242
     bl count_available_effect_zones          @ 08036810 fbf720ff
@@ -1218,15 +1211,15 @@ LAB_080367fe:
     lsls r0,r4,#0x2    @ 0803681a a000
     adds r0,r0,r4    @ 0803681c 0019
     lsls r0,r0,#0x2    @ 0803681e 8000
-    ldr r1, DAT_08036840                     @ 08036820 0749
+    ldr r1, check_zone_prereq_stride         @ 08036820 0749
     muls r1,r5    @ 08036822 6943
     adds r0,r0,r1    @ 08036824 4018
-    ldr r1, DAT_08036844                     @ 08036826 0749
+    ldr r1, check_zone_prereq_slots          @ 08036826 0749
     adds r0,r0,r1    @ 08036828 4018
     ldr r0,[r0,#0x0]                         @ 0803682a 0068
     lsls r0,r0,#0x13    @ 0803682c c004
     lsrs r1,r0,#0x13    @ 0803682e c10c
-    ldr r0, DAT_08036860                     @ 08036830 0b48
+    ldr r0, check_zone_prereq_horus_lv8_cid  @ 08036830 0b48
     cmp r1,r0                                @ 08036832 8142
     bgt LAB_08036864                         @ 08036834 16dc
     subs r0,#0x2    @ 08036836 0238
@@ -1235,24 +1228,24 @@ LAB_080367fe:
 LAB_0803683c:
     movs r0,#0x0    @ 0803683c 0020
     b LAB_08036866                           @ 0803683e 12e0
-DAT_08036840:
-    .word  0x00000868                     @ 08036840 68080000
-DAT_08036844:
-    .word  0x0201c510                     @ 08036844 10c50102
-DAT_08036848:
-    .word  0x0201b290                     @ 08036848 90b20102
-DAT_0803684c:
-    .word  0x000004bc                     @ 0803684c bc040000
-DAT_08036850:
-    .word  0x00001388                     @ 08036850 88130000
-DAT_08036854:
-    .word  0x0000128b                     @ 08036854 8b120000
-DAT_08036858:
-    .word  0x00001879                     @ 08036858 79180000
-DAT_0803685c:
-    .word  0x000017dc                     @ 0803685c dc170000
-DAT_08036860:
-    .word  0x000017d4                     @ 08036860 d4170000
+check_zone_prereq_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036840 68080000
+check_zone_prereq_slots:
+    .word  gDuelFieldSlots                @ 08036844 10c50102
+check_zone_prereq_phase_flags:
+    .word  gDuelPhaseFlags                @ 08036848 90b20102
+check_zone_prereq_phase_lock_off:
+    .word  PHASE_LOCK_FLAG_OFF            @ 0803684c bc040000
+check_zone_prereq_cid_range_max:
+    .word  EQUIP_SLOT_CARD_ID_RANGE_MAX   @ 08036850 88130000
+check_zone_prereq_lord_of_d_cid:
+    .word  LORD_OF_D_CID                  @ 08036854 8b120000
+check_zone_prereq_king_dragun_cid:
+    .word  KING_DRAGUN_CID                @ 08036858 79180000
+check_zone_prereq_horus_servant_cid:
+    .word  HORUS_SERVANT_CID              @ 0803685c dc170000
+check_zone_prereq_horus_lv8_cid:
+    .word  HORUS_LV8_CID                  @ 08036860 d4170000
 LAB_08036864:
     movs r0,#0x1    @ 08036864 0120
 LAB_08036866:
@@ -1262,7 +1255,7 @@ LAB_08036866:
     pop {r1}                                 @ 0803686c 02bc
     bx r1                                    @ 0803686e 0847
 
-@ Determines whether a given equip card is eligible to attach to a target field slot (indeg=37, C_util_high). r0=ptr card_ptr (r5); r1=ptr slot_ptr (r7); r2=u8 target_slot_idx [0..9] (r4); r3=u8 player_id [0..1] (r9, .hword 0x4699=mov r9,r3). Phase 1: extracts field5 from card_ptr[+2] (lsls #0x1a / lsrs #0x1b, bits[6:2]); subs 5 then truncates to u16; if >5 enters Phase 2. Phase 2: when field5 is in [0..5], stores a flag in r8 (.hword 0x4680=mov r8,r0). Reads halfword slot_ptr[+0x8] zone state; if 0 jumps to LAB_08036978 (special). Reads slot[+0] word (lsls/lsrs #0x13 strips active bit) as card_type, compares to DAT_080368dc=0x150c (TYPE_A) and DAT_080368e0=0x1645 (TYPE_B). TYPE_A path: validates equip chain via find_equip_chain_pair_across_field. TYPE_B path: similar but with player_id non-zero check. LAB_08036938: if r8!=0 AND slot_idx<=4 AND slot[+0x8]!=0 calls query_zone_chain_count_with_eligibility; if >0 calls map_card_id_to_anim_type and check_slot_card_is_equip_whitelist; combined result returns 0 (eligible) or 1 (not). Returns u32 bool (0=eligible, 1=not eligible). Pure query (callees all read-only). Callers: FUN_080369a4, FUN_0804640c, FUN_08047990, FUN_0804f440, FUN_0804f550. Constants: FIELD5_EQUIP_TYPE_MIN=5, TYPE_A=0x150c, TYPE_B=0x1645, slot_state_offset=0x8, EQUIP_SLOT_MAX=4.
+@ check_card_equip_eligible_for_slot: Determines whether a given equip card is eligible to attach to a target field slot. indeg=37, C_util_high. r0=ptr card_ptr (r5); r1=ptr slot_ptr (r7); r2=u8 target_slot_idx [0..9] (r4); r3=u8 player_id [0..1] (r9). Phase 1: extracts field5 from card_ptr[+2] (bits[6:2]); subs 5 then truncates to u16; if >5 enters Phase 2. Phase 2: when field5 is in [0..5], stores flag in r8. Reads halfword slot_ptr[+0x8] zone state; if 0 jumps to LAB_08036978 (special path). Reads slot[+0] word as card_type, compares to EQUIP_TYPE_A_CID=0x150c and EXODIA_NECROSS_CID=0x1645. TYPE_A path: validates equip chain via find_equip_chain_pair_across_field (sentinel 0xffff0000=check_equip_eligible_chain_sentinel). TYPE_B path: similar but with player_id non-zero check. LAB_08036938: if r8!=0 AND slot_idx<=4 AND slot[+0x8]!=0 calls query_zone_chain_count_with_eligibility(HEART_OF_CLEAR_WATER_CID=0x150a); if >0 calls map_card_id_to_anim_type and check_slot_card_is_equip_whitelist; combined result returns 0 (eligible) or 1 (not). Returns u32 bool (0=eligible, 1=not eligible). Pure query (callees all read-only). Callers: check_equip_eligibility_via_request_buf(0x080369a4) and 4 duel_field callers at 0x0804640c/0x08047990/0x0804f440/0x0804f550. Constants: EQUIP_TYPE_A_CID=0x150c, EXODIA_NECROSS_CID=0x1645, HEART_OF_CLEAR_WATER_CID=0x150a, TIMIDITY_CID=0x153c.
 check_card_equip_eligible_for_slot:
     push {r4,r5,r6,r7,lr}                    @ 08036870 f0b5
     .hword 0x464f    @ 08036872 4f46
@@ -1296,10 +1289,10 @@ LAB_080368a2:
     lsls r0,r4,#0x2    @ 080368a8 a000
     adds r0,r0,r4    @ 080368aa 0019
     lsls r0,r0,#0x2    @ 080368ac 8000
-    ldr r1, DAT_080368d4                     @ 080368ae 0949
+    ldr r1, check_equip_eligible_stride      @ 080368ae 0949
     muls r1,r2    @ 080368b0 5143
     adds r2,r0,r1    @ 080368b2 4218
-    ldr r3, DAT_080368d8                     @ 080368b4 084b
+    ldr r3, check_equip_eligible_slots       @ 080368b4 084b
     adds r1,r2,r3    @ 080368b6 d118
     ldrh r0,[r1,#0x8]                        @ 080368b8 0889
     cmp r0,#0x0                              @ 080368ba 0028
@@ -1307,22 +1300,22 @@ LAB_080368a2:
     ldr r0,[r1,#0x0]                         @ 080368be 0868
     lsls r0,r0,#0x13    @ 080368c0 c004
     lsrs r1,r0,#0x13    @ 080368c2 c10c
-    ldr r0, DAT_080368dc                     @ 080368c4 0548
+    ldr r0, check_equip_eligible_type_a_cid  @ 080368c4 0548
     cmp r1,r0                                @ 080368c6 8142
     beq LAB_080368e4                         @ 080368c8 0cd0
-    ldr r0, DAT_080368e0                     @ 080368ca 0548
+    ldr r0, check_equip_eligible_type_b_cid  @ 080368ca 0548
     cmp r1,r0                                @ 080368cc 8142
     beq LAB_08036918                         @ 080368ce 23d0
     b LAB_08036938                           @ 080368d0 32e0
     .zero  0x2
-DAT_080368d4:
-    .word  0x00000868                     @ 080368d4 68080000
-DAT_080368d8:
-    .word  0x0201c510                     @ 080368d8 10c50102
-DAT_080368dc:
-    .word  0x0000150c                     @ 080368dc 0c150000
-DAT_080368e0:
-    .word  0x00001645                     @ 080368e0 45160000
+check_equip_eligible_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080368d4 68080000
+check_equip_eligible_slots:
+    .word  gDuelFieldSlots                @ 080368d8 10c50102
+check_equip_eligible_type_a_cid:
+    .word  EQUIP_TYPE_A_CID               @ 080368dc 0c150000
+check_equip_eligible_type_b_cid:
+    .word  EXODIA_NECROSS_CID             @ 080368e0 45160000
 LAB_080368e4:
     adds r0,r3,#0x0    @ 080368e4 181c
     adds r0,#0x10    @ 080368e6 1030
@@ -1341,15 +1334,15 @@ LAB_080368e4:
     adds r1,r4,#0x0    @ 08036900 211c
     bl find_equip_chain_pair_across_field    @ 08036902 f8f7bdfe
     lsls r0,r0,#0x10    @ 08036906 0004
-    ldr r1, DAT_08036914                     @ 08036908 0249
+    ldr r1, check_equip_eligible_chain_sentinel @ 08036908 0249
     cmp r0,r1                                @ 0803690a 8842
     beq LAB_08036938                         @ 0803690c 14d0
 LAB_0803690e:
     movs r0,#0x0    @ 0803690e 0020
     b LAB_08036992                           @ 08036910 3fe0
     .zero  0x2
-DAT_08036914:
-    .word  0xffff0000                     @ 08036914 0000ffff
+check_equip_eligible_chain_sentinel:
+    .word  0xffff0000                     @ 08036914 0000ffff  0xffff0000: find_equip_chain_pair_across_field return<<16 == 0xffff0000 -> no valid pair found; 7587 raw refs (ROM-wide common pattern, not EQ)
 LAB_08036918:
     adds r0,r3,#0x0    @ 08036918 181c
     adds r0,#0x10    @ 0803691a 1030
@@ -1373,7 +1366,7 @@ LAB_08036938:
     beq LAB_08036990                         @ 0803693c 28d0
     cmp r4,#0x4                              @ 0803693e 042c
     bgt LAB_08036990                         @ 08036940 26dc
-    ldr r2, DAT_08036974                     @ 08036942 0c4a
+    ldr r2, check_equip_eligible_chain_param @ 08036942 0c4a
     adds r0,r7,#0x0    @ 08036944 381c
     adds r1,r4,#0x0    @ 08036946 211c
     bl query_zone_chain_count_with_eligibility @ 08036948 f8f72efd
@@ -1395,15 +1388,15 @@ LAB_08036938:
     beq LAB_08036990                         @ 0803696e 0fd0
     b LAB_0803690e                           @ 08036970 cde7
     .zero  0x2
-DAT_08036974:
-    .word  0x0000150a                     @ 08036974 0a150000
+check_equip_eligible_chain_param:
+    .word  HEART_OF_CLEAR_WATER_CID       @ 08036974 0a150000
 LAB_08036978:
     cmp r4,#0x4                              @ 08036978 042c
     ble LAB_08036990                         @ 0803697a 09dd
     ldrh r0,[r5,#0x0]                        @ 0803697c 2888
     cmp r0,#0x0                              @ 0803697e 0028
     beq LAB_08036990                         @ 08036980 06d0
-    ldr r2, DAT_080369a0                     @ 08036982 074a
+    ldr r2, check_equip_eligible_chain_alt_cid @ 08036982 074a
     movs r0,#0x0    @ 08036984 0020
     movs r1,#0xb    @ 08036986 0b21
     bl check_value_in_slot_chain             @ 08036988 f9f782f9
@@ -1419,10 +1412,10 @@ LAB_08036992:
     pop {r1}                                 @ 0803699a 02bc
     bx r1                                    @ 0803699c 0847
     .zero  0x2
-DAT_080369a0:
-    .word  0x0000153c                     @ 080369a0 3c150000
+check_equip_eligible_chain_alt_cid:
+    .word  TIMIDITY_CID                   @ 080369a0 3c150000
 
-@ Equip request constructor: builds 24-byte equip request record on stack, fills (player_id, card_id, zone_type, extra) triple plus extension bits, then forwards to check_card_equip_eligible_for_slot for actual eligibility test. r0=u32 player_id [0..1] (bit0 XOR 1 -> [buf+2] bit0); r1=u32 slot_idx [0..0x14] (equip_chain slot, forwarded to callee); r2=u16 card_id [0..0x172f] (strh [buf+0]); r3=u32 zone_type [0..0x1f] (low 5 bits lsls #1 -> [buf+2] bits[5..1]); sp[0x30]=u32 extra_param (forwarded to callee 4th arg). Returns u32 eligibility (0=not eligible, !=0=eligible). Callers: FUN_0804686e/FUN_08046974/FUN_08046e44/FUN_08046fe4 (FUN_08046bd0 cluster, duel_field), FUN_08068596 (effect trigger pre-filter), FUN_0809dde4 (card frame). No external side effects, only stack-local buffer. Constants: BUF_SIZE=0x18, EXTRA_PARAM_SP_OFFSET=0x30.
+@ check_equip_eligibility_via_request_buf: Equip request constructor. Builds 24-byte equip request record on stack, fills (player_id, card_id, zone_type, extra) triple plus extension bits, then forwards to check_card_equip_eligible_for_slot for actual eligibility test. r0=u32 player_id [0..1] (bit0 XOR 1 -> [buf+2] bit0); r1=u32 slot_idx [0..0x14] (equip_chain slot, forwarded to callee); r2=u16 card_id [0..0x172f] (strh [buf+0]); r3=u32 zone_type [0..0x1f] (low 5 bits lsls #1 -> [buf+2] bits[5..1]); sp[0x30]=u32 extra_param (forwarded to callee 4th arg). Returns u32 eligibility (0=not eligible, !=0=eligible). Callers in duel_field cluster at 0x08046bd0 (0x0804686e/0x08046974/0x08046e44/0x08046fe4) + effect trigger pre-filter at 0x08068596 + card frame at 0x0809dde4. No external side effects, only stack-local buffer. Constants: BUF_SIZE=0x18, EXTRA_PARAM_SP_OFFSET=0x30.
 check_equip_eligibility_via_request_buf:
     push {r4,r5,r6,r7,lr}                    @ 080369a4 f0b5
     .hword 0x4647    @ 080369a6 4746
@@ -1477,12 +1470,7 @@ check_equip_eligibility_via_request_buf:
     bx r1                                    @ 08036a0c 0847
     .zero  0x2
 
-@ Checks whether the card on the specified player (r0) slot (r1) is eligible to trigger special effect activation. Reads gDuelFieldSlots+player_bit*0x868+slot_idx*20 slot word, extracts bits[12:0] as card_icid; if card_id==0 returns 0 (empty slot). Special case card_id==0x16f8 (Dark Magician of Chaos): reads slot[+0x10] bits 5 and 1; if both are 0 returns 0 (activation blocked). For other cards: calls check_card_field8_is_9(card_id); if field8==9 (restricted type) returns 0; else returns 1 (eligible). 8 callers all in duel_field/effect mode. No external writes.
-@ 
-@ Params: r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]
-@ Returns: r0=u32 bool (0=ineligible; 1=eligible)
-@ Side effects: none (read-only)
-@ Constants: PLAYER_STRIDE=0x868; gDuelFieldSlots=0x0201c510; SLOT_ENTRY_SIZE=20; DARK_MAGICIAN_OF_CHAOS_ID=0x16f8; FIELD8_BLOCK_VALUE=9
+@ check_slot_card_special_activation_eligible: Checks if a zone slot card qualifies for a special activation rule (DARK_MAGICIAN_OF_CHAOS_CID=0x16f8 exception path). Reads slot card_id from gDuelFieldSlots+player*0x868+slot_idx*20; checks card_id against DARK_MAGICIAN_OF_CHAOS_CID(0x16f8); also checks slot[+0] field8 (bits[31:27]) == 9 block value. Returns 1 if eligible for special activation rule, 0 otherwise. Params: r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]. Returns: r0=u32 bool (0=ineligible; 1=eligible). Side effects: none (read-only). Constants: PLAYER_BLOCK_STRIDE=0x868, gDuelFieldSlots=0x0201c510, SLOT_ENTRY_SIZE=20, DARK_MAGICIAN_OF_CHAOS_CID=0x16f8, FIELD8_BLOCK_VALUE=9.
 check_slot_card_special_activation_eligible:
     push {r4,r5,lr}                          @ 08036a10 30b5
     movs r4,#0x1    @ 08036a12 0124
@@ -1490,17 +1478,17 @@ check_slot_card_special_activation_eligible:
     lsls r2,r1,#0x2    @ 08036a16 8a00
     adds r2,r2,r1    @ 08036a18 5218
     lsls r2,r2,#0x2    @ 08036a1a 9200
-    ldr r1, DAT_08036a64                     @ 08036a1c 1149
+    ldr r1, check_special_act_stride         @ 08036a1c 1149
     muls r0,r1    @ 08036a1e 4843
     adds r1,r2,r0    @ 08036a20 1118
-    ldr r5, DAT_08036a68                     @ 08036a22 114d
+    ldr r5, check_special_act_slots          @ 08036a22 114d
     adds r2,r1,r5    @ 08036a24 4a19
     ldr r0,[r2,#0x0]                         @ 08036a26 1068
     lsls r0,r0,#0x13    @ 08036a28 c004
     lsrs r3,r0,#0x13    @ 08036a2a c30c
     cmp r3,#0x0                              @ 08036a2c 002b
     beq LAB_08036a70                         @ 08036a2e 1fd0
-    ldr r0, DAT_08036a6c                     @ 08036a30 0e48
+    ldr r0, check_special_act_dmc_cid        @ 08036a30 0e48
     cmp r3,r0                                @ 08036a32 8342
     bne LAB_08036a54                         @ 08036a34 0ed1
     adds r0,r5,#0x0    @ 08036a36 281c
@@ -1526,12 +1514,12 @@ LAB_08036a54:
     movs r0,#0x1    @ 08036a5e 0120
     b LAB_08036a72                           @ 08036a60 07e0
     .zero  0x2
-DAT_08036a64:
-    .word  0x00000868                     @ 08036a64 68080000
-DAT_08036a68:
-    .word  0x0201c510                     @ 08036a68 10c50102
-DAT_08036a6c:
-    .word  0x000016f8                     @ 08036a6c f8160000
+check_special_act_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036a64 68080000
+check_special_act_slots:
+    .word  gDuelFieldSlots                @ 08036a68 10c50102
+check_special_act_dmc_cid:
+    .word  DARK_MAGICIAN_OF_CHAOS_CID     @ 08036a6c f8160000
 LAB_08036a70:
     movs r0,#0x0    @ 08036a70 0020
 LAB_08036a72:

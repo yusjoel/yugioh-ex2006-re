@@ -181,3 +181,10 @@
 @ =============================================================================
 .equ FIELD5_SCORE_ACTIVATION_THRESHOLD, 0x0000076b  @ get_slot_field5_score return > this -> not activatable in eval_slot_activation_eligibility_full; 8 raw refs
 .equ FIELD5_SCORE_FIELDSPELL_THRESHOLD, 0x0000063f  @ get_slot_field5_score return <= this -> not activatable in eval_slot_fieldspell_activation_full; 3 raw refs
+
+@ =============================================================================
+@ file 03 Seg-1 additions: equip slot / phase lock / node pool offset constants
+@ =============================================================================
+.equ PHASE_LOCK_FLAG_OFF,           0x000004bc  @ gDuelPhaseFlags+0x4bc = phase lock global inhibit byte; 11 raw refs; check_zone_slot_equip_prerequisites
+.equ EQUIP_SLOT_CARD_ID_RANGE_MAX,  0x00001388  @ upper bound for Horus-adjacent equip block card_id range [0x1386..0x1388]; not in card-stats.s; 28 raw refs
+.equ NODE_POOL_TO_SLOT_STATE_OFF,   0xffffeb60  @ gEquipNodePool+0xffffeb60 = gDuelFieldSlotState (= gDuelFieldSlots+0x10); distinct from NODE_POOL_NEG_OFFSET=0xffffeb50; 2 raw refs (both Seg-1)

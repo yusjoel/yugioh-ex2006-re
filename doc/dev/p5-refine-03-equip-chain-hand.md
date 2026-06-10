@@ -76,7 +76,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x35f54..0x36a78 | 13 | 82 | — | ⬜ | |
+| 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | (pending) |
 | 2 | 0x36a78..0x37128 | 13 | 29 | — | ⬜ | |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ⬜ | |
 | 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
@@ -96,6 +96,34 @@
 ## 四、逐段完成记录
 
 (各段落地后由 fixer 追加 4.0N 小节: 函数列表 / 符号化统计 / 新建 constants / carve / 踩坑 / commit)
+
+### 4.01 Seg-1 完成记录 [0x08035f54..0x08036a78)
+
+**函数列表 (13 fn)**:
+link_equip_node_by_card_type_check / check_slot_equip_eligibility_by_type /
+check_slot_field_zone_card_eligible / check_slot_equip_whitelist_with_monster_space /
+check_slot_card_effect_eligibility / query_slot_effect_eligibility_nonzero /
+check_slot_card_fieldspell_eligibility / check_slot_fieldspell_eligible_by_side /
+query_slot_card_type_eligibility / check_zone_slot_equip_prerequisites /
+check_card_equip_eligible_for_slot / check_equip_eligibility_via_request_buf /
+check_slot_card_special_activation_eligible
+
+**符号化统计**: EQ=81 (reuse 46 + new 35) / REF=0 / RENAME=3 / FUNC_RENAME=0 / PLATE=13
+
+**新建 constants**:
+- `card_info.inc` +35: EHERO_AVIAN_CID / CHAIN_THRASHER_CID / ROYAL_COMMAND_CID / FIEND_SKULL_DRAGON_CID / POSSESSED_DARK_SOUL_CID / SNATCH_STEAL_CID / MAGIC_ARM_SHIELD_CID / CHANGE_OF_HEART_CID / MYSTIC_BOX_CID / DARK_NECROFEAR_CID / BRAIN_JACKER_CID / ENEMY_CONTROLLER_CID / FALLING_DOWN_CID / OWNER_SEAL_CID / RESHEF_THE_DARK_BEING_CID / CHTHONIAN_POLYMER_CID / CHARMER_RANGE_MAX_CID / ELEMENT_MAGICIAN_CID / CANNONBALL_SPEAR_SHELLFISH_CID / DEEPSEA_WARRIOR_CID / HORUS_LV6_CID / HORUS_LV8_CID / HORUS_SERVANT_CID / SILENT_SWORDSMAN_LV5_CID / METALLIZING_PARASITE_CID / NON_SPELLCASTING_AREA_CID / DUST_BARRIER_CID / EHERO_WILDHEART_CID / LORD_OF_D_CID / KING_DRAGUN_CID / HEART_OF_CLEAR_WATER_CID / TIMIDITY_CID / EXODIA_NECROSS_CID / EQUIP_TYPE_A_CID / DARK_MAGICIAN_OF_CHAOS_CID
+- `ewram.inc` +1: gDuelPhaseFlags (0x0201b290)
+- `duel_field.inc` +3: PHASE_LOCK_FLAG_OFF / EQUIP_SLOT_CARD_ID_RANGE_MAX / NODE_POOL_TO_SLOT_STATE_OFF
+
+**carve**: 0 (no ROM_INCBIN in Seg-1)
+**disasm**: 0
+**§5.1**: 0
+
+**C8 验收**: Seg-1 范围内无 stale FUN_ (0x08036a78 后的 FUN_ 属 Seg-2+)
+**Non-ASCII**: Seg-1 范围内无新增 CJK (文件头行 2 为预存标题注释)
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

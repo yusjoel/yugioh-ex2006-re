@@ -337,3 +337,8 @@
 @ file 02 Seg-8 additions: field spell zone slot base
 @ =============================================================================
 .equ gDuelFieldSpellZoneBase, 0x0201c5ec  @ gDuelFieldSlots + 11*0x14 = P0 field-spell zone slot entry base; r10 base in check_slot_placement_blocked_by_field_effect; 6 raw refs
+
+@ =============================================================================
+@ file 03 Seg-1 additions: duel phase flags global
+@ =============================================================================
+.equ gDuelPhaseFlags,       0x0201b290  @ duel phase flags struct base; +0x4bc=phase lock byte, +0x594=effect entry count; 676 raw refs
