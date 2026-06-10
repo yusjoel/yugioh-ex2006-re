@@ -303,7 +303,9 @@
 @ =============================================================================
 @ file 02 Seg-2 additions: duel field equip chain globals
 @ =============================================================================
-.equ gDuelFieldSlots,     0x0201c510  @ duel field zone slot array; player*0x868 + slot*0x14; 1007 raw refs
-.equ gEquipNodePool,      0x0201d9c0  @ equip chain node pool; node_idx*8 stride; 55 raw refs
-.equ gEquipChainSlotRefs, 0x0201bb90  @ equip chain slot reference array (replace_slot_chain_ref_by_id); 260 raw refs
-.equ gDuelFieldSlotState, 0x0201c520  @ parallel slot state flags at gDuelFieldSlots+0x10; 51 raw refs
+.equ gDuelFieldSlots,        0x0201c510  @ duel field zone slot array; player*0x868 + slot*0x14; 1007 raw refs
+.equ gEquipNodePool,         0x0201d9c0  @ equip chain node pool; node_idx*8 stride; 55 raw refs
+.equ gEquipChainSlotRefs,    0x0201bb90  @ equip chain slot reference array (replace_slot_chain_ref_by_id); 260 raw refs
+.equ gDuelFieldSlotState,    0x0201c520  @ parallel slot state flags at gDuelFieldSlots+0x10; 51 raw refs
+.equ gDuelEffectChainSlots,  0x0201bc54  @ effect context chain slot array (2 entries, stride 20B); 17 raw refs
+                                         @ gEquipChainSlotRefs(0x0201bb90)+0xc4; distinct semantic domain (effect context chain)

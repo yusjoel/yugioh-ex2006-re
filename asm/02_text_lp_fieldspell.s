@@ -6866,7 +6866,7 @@ LAB_0802f42e:
     pop {r1}                                 @ 0802f430 02bc
     bx r1                                    @ 0802f432 0847
 
-@ Reads [slot+0xa] equip chain head from EWRAM slot (0x0201c510 + (r0 bit0)*0x868 + r1*20); returns 0 if chain is empty. Otherwise traverses 8-byte node list (base 0x0201d9c0) counting nodes matching r2/r9 (ref_card_id_a) and r3/r8 (ref_card_id_b) multi-field conditions. Non-APCS inputs: r8=ref_card_id_b, r9=ref_card_id_a (caller-set high registers). r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u16 ref_card_id_a, r3=u16 ref_card_id_b. Returns u32 match_count. Callers: FUN_0802f3e0 (direct upstream count-path selector), 0x080364b0/0x080352b0 (duel rule core). Constants: 0x0201c510=gDuelFieldSlots, 0x14b0=equip node pool offset (gDuelFieldSlots+0x14b0=0x0201D9C0), slot+0xa=u16 chain head, node_stride=8.
+@ Reads [slot+0xa] equip chain head from EWRAM slot (0x0201c510 + (r0 bit0)*0x868 + r1*20); returns 0 if chain is empty. Otherwise traverses 8-byte node list (base 0x0201d9c0) counting nodes matching r2/r9 (ref_card_id_a) and r3/r8 (ref_card_id_b) multi-field conditions. Non-APCS inputs: r8=ref_card_id_b, r9=ref_card_id_a (caller-set high registers). r0=u32 player_side, r1=u32 slot_idx [0..4], r2=u16 ref_card_id_a, r3=u16 ref_card_id_b. Returns u32 match_count. Callers: query_slot_effect_eligibility_with_equip_fallback (direct upstream count-path selector), 0x080364b0/0x080352b0 (duel rule core). Constants: 0x0201c510=gDuelFieldSlots, 0x14b0=equip node pool offset (gDuelFieldSlots+0x14b0=0x0201D9C0), slot+0xa=u16 chain head, node_stride=8.
 count_slot_equip_list_matches:
     push {r4,r5,r6,r7,lr}                    @ 0802f434 f0b5
     .hword 0x464f    @ 0802f436 4f46
@@ -6880,15 +6880,15 @@ count_slot_equip_list_matches:
     lsls r0,r1,#0x2    @ 0802f446 8800
     adds r0,r0,r1    @ 0802f448 4018
     lsls r0,r0,#0x2    @ 0802f44a 8000
-    ldr r1, DAT_0802f4cc                     @ 0802f44c 1f49
+    ldr r1, count_equip_list_player_stride   @ 0802f44c 1f49
     muls r1,r2    @ 0802f44e 5143
     adds r0,r0,r1    @ 0802f450 4018
-    ldr r1, DAT_0802f4d0                     @ 0802f452 1f49
+    ldr r1, count_equip_list_field_slots     @ 0802f452 1f49
     adds r0,r0,r1    @ 0802f454 4018
     ldrh r0,[r0,#0xa]                        @ 0802f456 4089
     cmp r0,#0x0                              @ 0802f458 0028
     beq LAB_0802f4be                         @ 0802f45a 30d0
-    ldr r2, DAT_0802f4d4                     @ 0802f45c 1d4a
+    ldr r2, count_equip_list_node_base_off   @ 0802f45c 1d4a
     adds r6,r1,r2    @ 0802f45e 8e18
     adds r1,#0x10    @ 0802f460 1031
     .hword 0x468c    @ 0802f462 8c46
@@ -6900,7 +6900,7 @@ LAB_0802f464:
     ldrb r0,[r0,#0x2]                        @ 0802f46c 8078
     lsls r0,r0,#0x1c    @ 0802f46e 0007
     lsrs r0,r0,#0xc    @ 0802f470 000b
-    ldr r3, DAT_0802f4d8                     @ 0802f472 194b
+    ldr r3, count_equip_list_zone_type_bias  @ 0802f472 194b
     adds r0,r0,r3    @ 0802f474 c018
     lsrs r0,r0,#0x10    @ 0802f476 000c
     cmp r0,#0x5                              @ 0802f478 0528
@@ -6914,10 +6914,10 @@ LAB_0802f464:
     lsls r1,r0,#0x2    @ 0802f488 8100
     adds r1,r1,r0    @ 0802f48a 0918
     lsls r1,r1,#0x2    @ 0802f48c 8900
-    ldr r0, DAT_0802f4cc                     @ 0802f48e 0f48
+    ldr r0, count_equip_list_player_stride   @ 0802f48e 0f48
     muls r0,r2    @ 0802f490 5043
     adds r1,r1,r0    @ 0802f492 0918
-    ldr r2, DAT_0802f4dc                     @ 0802f494 114a
+    ldr r2, count_equip_list_pool_neg_off    @ 0802f494 114a
     adds r0,r6,r2    @ 0802f496 b018
     adds r0,r1,r0    @ 0802f498 0818
     ldr r0,[r0,#0x0]                         @ 0802f49a 0068
@@ -6947,16 +6947,16 @@ LAB_0802f4be:
     pop {r4,r5,r6,r7}                        @ 0802f4c6 f0bc
     pop {r1}                                 @ 0802f4c8 02bc
     bx r1                                    @ 0802f4ca 0847
-DAT_0802f4cc:
-    .word  0x00000868                     @ 0802f4cc 68080000
-DAT_0802f4d0:
-    .word  0x0201c510                     @ 0802f4d0 10c50102
-DAT_0802f4d4:
-    .word  0x000014b0                     @ 0802f4d4 b0140000
-DAT_0802f4d8:
-    .word  0xfffa0000                     @ 0802f4d8 0000faff
-DAT_0802f4dc:
-    .word  0xffffeb50                     @ 0802f4dc 50ebffff
+count_equip_list_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f4cc 68080000
+count_equip_list_field_slots:
+    .word  gDuelFieldSlots                @ 0802f4d0 10c50102  duel field zone slot array base
+count_equip_list_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f4d4 b0140000
+count_equip_list_zone_type_bias:
+    .word  0xfffa0000                     @ 0802f4d8 0000faff  zone_type range bias: (type<<16 + 0xfffa0000)>>16 selects type [6..11]
+count_equip_list_pool_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 0802f4dc 50ebffff
 
 @ Read slot[+0xa] chain head from gDuelFieldSlots[player_side][slot_idx]; traverse gDuelNodePool. For each node: type=byte[2]&0xf; skip if type<=9. For type>9: extract player_side and slot_idx from node[0] (byte[0]=player bit0, byte[1]>>8=slot_idx); navigate to that slot in gDuelFieldSlots; check lsls*0x13 active bit; if nonzero r5++. Continue via node[+6] next. Returns r5=count of type>9 active chain nodes. r0: player_side [0..1]; r1: slot_idx [0..4]. indeg=3. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, node_type_threshold=9, node_next_offset=6, player_stride=0x868.
 count_active_extended_chain_nodes:
@@ -6967,15 +6967,15 @@ count_active_extended_chain_nodes:
     lsls r0,r1,#0x2    @ 0802f4e8 8800
     adds r0,r0,r1    @ 0802f4ea 4018
     lsls r0,r0,#0x2    @ 0802f4ec 8000
-    ldr r1, DAT_0802f544                     @ 0802f4ee 1549
+    ldr r1, count_ext_nodes_player_stride    @ 0802f4ee 1549
     muls r1,r2    @ 0802f4f0 5143
     adds r0,r0,r1    @ 0802f4f2 4018
-    ldr r1, DAT_0802f548                     @ 0802f4f4 1449
+    ldr r1, count_ext_nodes_field_slots      @ 0802f4f4 1449
     adds r0,r0,r1    @ 0802f4f6 4018
     ldrh r0,[r0,#0xa]                        @ 0802f4f8 4089
     cmp r0,#0x0                              @ 0802f4fa 0028
     beq LAB_0802f53c                         @ 0802f4fc 1ed0
-    ldr r2, DAT_0802f54c                     @ 0802f4fe 134a
+    ldr r2, count_ext_nodes_node_base_off    @ 0802f4fe 134a
     adds r7,r1,r2    @ 0802f500 8f18
     adds r6,r1,#0x0    @ 0802f502 0e1c
 LAB_0802f504:
@@ -6995,7 +6995,7 @@ LAB_0802f504:
     lsls r0,r1,#0x2    @ 0802f51e 8800
     adds r0,r0,r1    @ 0802f520 4018
     lsls r0,r0,#0x2    @ 0802f522 8000
-    ldr r1, DAT_0802f544                     @ 0802f524 0749
+    ldr r1, count_ext_nodes_player_stride    @ 0802f524 0749
     muls r1,r2    @ 0802f526 5143
     adds r0,r0,r1    @ 0802f528 4018
     adds r0,r0,r6    @ 0802f52a 8019
@@ -7013,12 +7013,12 @@ LAB_0802f53c:
     pop {r4,r5,r6,r7}                        @ 0802f53e f0bc
     pop {r1}                                 @ 0802f540 02bc
     bx r1                                    @ 0802f542 0847
-DAT_0802f544:
-    .word  0x00000868                     @ 0802f544 68080000
-DAT_0802f548:
-    .word  0x0201c510                     @ 0802f548 10c50102
-DAT_0802f54c:
-    .word  0x000014b0                     @ 0802f54c b0140000
+count_ext_nodes_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f544 68080000
+count_ext_nodes_field_slots:
+    .word  gDuelFieldSlots                @ 0802f548 10c50102
+count_ext_nodes_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f54c b0140000
 
 @ Slot chain node finder by card_id pair (zone_type>9 path): in gDuelFieldSlots[player_bit0][slot_idx]+0xa chain head, scans node pool @0x0201d9c0 (stride 8) for first node where [+2]&0xF>9 (zone_type out of range) AND [+0]==r0_low AND [+1]==r1_high. Returns 1 on hit, 0 on empty/miss. r0=u8 ref_id_lo [0..0xff]; r1=u8 ref_id_hi [0..0xff]; r2=u32 player_id [0..1] (bit0); r3=u32 slot_idx [0..0xb]. Returns u32 bool. 7 callers (FUN_0804888c/FUN_08051670/FUN_08052020/FUN_080521a0/FUN_08053af8 + 2 others, mostly duel_field). No side effects, pure read. Sibling 0x0802f5b0 find_equip_chain_node_by_slot_pair checks zone_type<=5 (in-range) - this checks zone_type>9 (out-of-range), forming dual. Constants: NODE_POOL=0x0201d9c0, slot_base=0x0201c510, ZONE_TYPE_MIN=10.
 find_zone_chain_node_by_card_id_pair:
@@ -7030,17 +7030,17 @@ find_zone_chain_node_by_card_id_pair:
     lsls r0,r3,#0x2    @ 0802f55a 9800
     adds r0,r0,r3    @ 0802f55c c018
     lsls r0,r0,#0x2    @ 0802f55e 8000
-    ldr r1, DAT_0802f594                     @ 0802f560 0c49
+    ldr r1, find_zone_node_player_stride     @ 0802f560 0c49
     muls r1,r4    @ 0802f562 6143
     adds r0,r0,r1    @ 0802f564 4018
-    ldr r1, DAT_0802f598                     @ 0802f566 0c49
+    ldr r1, find_zone_node_field_slots       @ 0802f566 0c49
     adds r0,r0,r1    @ 0802f568 4018
     ldrh r1,[r0,#0xa]                        @ 0802f56a 4189
     cmp r1,#0x0                              @ 0802f56c 0029
     beq LAB_0802f5a6                         @ 0802f56e 1ad0
 LAB_0802f570:
     lsls r1,r1,#0x3    @ 0802f570 c900
-    ldr r0, DAT_0802f59c                     @ 0802f572 0a48
+    ldr r0, find_zone_node_pool              @ 0802f572 0a48
     adds r1,r1,r0    @ 0802f574 0918
     ldrh r2,[r1,#0x6]                        @ 0802f576 ca88
     ldrb r3,[r1,#0x2]                        @ 0802f578 8b78
@@ -7057,12 +7057,12 @@ LAB_0802f570:
     bne LAB_0802f5a0                         @ 0802f58e 07d1
     movs r0,#0x1    @ 0802f590 0120
     b LAB_0802f5a8                           @ 0802f592 09e0
-DAT_0802f594:
-    .word  0x00000868                     @ 0802f594 68080000
-DAT_0802f598:
-    .word  0x0201c510                     @ 0802f598 10c50102
-DAT_0802f59c:
-    .word  0x0201d9c0                     @ 0802f59c c0d90102
+find_zone_node_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f594 68080000
+find_zone_node_field_slots:
+    .word  gDuelFieldSlots                @ 0802f598 10c50102
+find_zone_node_pool:
+    .word  gEquipNodePool                 @ 0802f59c c0d90102  equip chain node pool base
 LAB_0802f5a0:
     adds r1,r2,#0x0    @ 0802f5a0 111c
     cmp r1,#0x0                              @ 0802f5a2 0029
@@ -7075,7 +7075,7 @@ LAB_0802f5a8:
     bx r1                                    @ 0802f5ac 0847
     .zero  0x2
 
-@ In the equip chain of slot (r0 bit0=player_side, r1=slot_idx), find a node that matches r2=ref_player and r3=ref_slot. Flow: read gDuelFieldSlots[player][slot]+0xa = chain_head_index; return 0 if chain empty. Traverse gDuelNodePool (0x0201d9c0, stride 8): [node+0]=byte(ref_player), [node+0 high>>8]=byte(ref_slot), [node+2]&0xF=zone_type <= 5 (valid zone). Hit: return packed(zone_type<<28 | zone_idx<<16); end of chain: return 0. Caller FUN_0802f680 calls this for all 2x11 slots to find a paired node. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, player_stride=0x868, slot_entry_size=0x14, chain_head_offset=0xa, node_stride=8, zone_type_max=5.
+@ In the equip chain of slot (r0 bit0=player_side, r1=slot_idx), find a node that matches r2=ref_player and r3=ref_slot. Flow: read gDuelFieldSlots[player][slot]+0xa = chain_head_index; return 0 if chain empty. Traverse gDuelNodePool (0x0201d9c0, stride 8): [node+0]=byte(ref_player), [node+0 high>>8]=byte(ref_slot), [node+2]&0xF=zone_type <= 5 (valid zone). Hit: return packed(zone_type<<28 | zone_idx<<16); end of chain: return 0. Caller find_equip_chain_pair_across_field calls this for all 2x11 slots to find a paired node. Constants: gDuelFieldSlots=0x0201c510, gDuelNodePool=0x0201d9c0, player_stride=0x868, slot_entry_size=0x14, chain_head_offset=0xa, node_stride=8, zone_type_max=5.
 find_equip_chain_node_by_slot_pair:
     push {r4,r5,r6,lr}                       @ 0802f5b0 70b5
     adds r5,r2,#0x0    @ 0802f5b2 151c
@@ -7085,20 +7085,20 @@ find_equip_chain_node_by_slot_pair:
     lsls r0,r1,#0x2    @ 0802f5ba 8800
     adds r0,r0,r1    @ 0802f5bc 4018
     lsls r0,r0,#0x2    @ 0802f5be 8000
-    ldr r1, DAT_0802f5d4                     @ 0802f5c0 0449
+    ldr r1, find_equip_node_pair_player_stride @ 0802f5c0 0449
     muls r1,r2    @ 0802f5c2 5143
     adds r0,r0,r1    @ 0802f5c4 4018
-    ldr r2, DAT_0802f5d8                     @ 0802f5c6 044a
+    ldr r2, find_equip_node_pair_field_slots @ 0802f5c6 044a
     adds r1,r0,r2    @ 0802f5c8 8118
     ldr r0,[r1,#0x0]                         @ 0802f5ca 0868
     lsls r0,r0,#0x13    @ 0802f5cc c004
     cmp r0,#0x0                              @ 0802f5ce 0028
     bne LAB_0802f5e0                         @ 0802f5d0 06d1
     b LAB_0802f60e                           @ 0802f5d2 1ce0
-DAT_0802f5d4:
-    .word  0x00000868                     @ 0802f5d4 68080000
-DAT_0802f5d8:
-    .word  0x0201c510                     @ 0802f5d8 10c50102
+find_equip_node_pair_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f5d4 68080000
+find_equip_node_pair_field_slots:
+    .word  gDuelFieldSlots                @ 0802f5d8 10c50102
 LAB_0802f5dc:
     lsrs r0,r2,#0x1c    @ 0802f5dc 100f
     b LAB_0802f610                           @ 0802f5de 17e0
@@ -7106,7 +7106,7 @@ LAB_0802f5e0:
     ldrh r0,[r1,#0xa]                        @ 0802f5e0 4889
     cmp r0,#0x0                              @ 0802f5e2 0028
     beq LAB_0802f60e                         @ 0802f5e4 13d0
-    ldr r1, DAT_0802f618                     @ 0802f5e6 0c49
+    ldr r1, find_equip_node_pair_node_base_off @ 0802f5e6 0c49
     adds r6,r2,r1    @ 0802f5e8 5618
 LAB_0802f5ea:
     lsls r0,r0,#0x3    @ 0802f5ea c000
@@ -7135,8 +7135,8 @@ LAB_0802f610:
     pop {r1}                                 @ 0802f612 02bc
     bx r1                                    @ 0802f614 0847
     .zero  0x2
-DAT_0802f618:
-    .word  0x000014b0                     @ 0802f618 b0140000
+find_equip_node_pair_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f618 b0140000
 
 @ Counts slots in player (r0 bit0) where all three hold: (1) slot occupied (card_id bit9 != 0); (2) slot+0x8 (equip_chain_head) != 0; (3) count_equip_chain_default_flags(player, slot_idx, r1=chain_filter) nonzero. r1 saved to r9 at entry via .hword 0x4689 (mov r9,r1); restored to r2 at each callee call via .hword 0x464a (mov r2,r9). indeg=6. r0=u32 player_side [0..1]; r1=u32 chain_filter. Returns u32 count. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot_count=5 [0..4].
 count_equip_slots_with_active_chain:
@@ -7151,14 +7151,14 @@ count_equip_slots_with_active_chain:
     movs r0,#0x1    @ 0802f62c 0120
     ands r0,r6    @ 0802f62e 3040
     movs r5,#0x0    @ 0802f630 0025
-    ldr r1, DAT_0802f678                     @ 0802f632 1149
+    ldr r1, count_equip_slots_player_stride  @ 0802f632 1149
     adds r2,r0,#0x0    @ 0802f634 021c
     muls r2,r1    @ 0802f636 4a43
     .hword 0x4690    @ 0802f638 9046
 LAB_0802f63a:
     .hword 0x4640    @ 0802f63a 4046
     adds r1,r5,r0    @ 0802f63c 2918
-    ldr r0, DAT_0802f67c                     @ 0802f63e 0f48
+    ldr r0, count_equip_slots_field_slots    @ 0802f63e 0f48
     adds r1,r1,r0    @ 0802f640 0918
     ldr r0,[r1,#0x0]                         @ 0802f642 0868
     lsls r0,r0,#0x13    @ 0802f644 c004
@@ -7187,10 +7187,10 @@ LAB_0802f660:
     pop {r1}                                 @ 0802f672 02bc
     bx r1                                    @ 0802f674 0847
     .zero  0x2
-DAT_0802f678:
-    .word  0x00000868                     @ 0802f678 68080000
-DAT_0802f67c:
-    .word  0x0201c510                     @ 0802f67c 10c50102
+count_equip_slots_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f678 68080000
+count_equip_slots_field_slots:
+    .word  gDuelFieldSlots                @ 0802f67c 10c50102
 
 @ Search entire duel field (2 players x 10 slots) for a paired equip chain node matching (r0=player_side, r1=slot_idx). Flow: outer r5=0..1 (player), inner r4=0..10 (slot index); call find_equip_chain_node_by_slot_pair(r5, r4, r0, r1) for each slot; hit: return packed zone descriptor immediately. Not found after all slots: return DAT=0x0000ffff (sentinel). Purpose: check if given slot already has a paired node in another slot's equip chain. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_count_per_player=11, sentinel_not_found=0x0000ffff.
 find_equip_chain_pair_across_field:
@@ -7202,20 +7202,20 @@ find_equip_chain_pair_across_field:
     lsls r0,r6,#0x2    @ 0802f68a b000
     adds r0,r0,r6    @ 0802f68c 8019
     lsls r0,r0,#0x2    @ 0802f68e 8000
-    ldr r1, DAT_0802f6a4                     @ 0802f690 0449
+    ldr r1, find_equip_pair_player_stride    @ 0802f690 0449
     muls r1,r2    @ 0802f692 5143
     adds r0,r0,r1    @ 0802f694 4018
-    ldr r1, DAT_0802f6a8                     @ 0802f696 0449
+    ldr r1, find_equip_pair_field_slots      @ 0802f696 0449
     adds r0,r0,r1    @ 0802f698 4018
     ldr r0,[r0,#0x0]                         @ 0802f69a 0068
     lsls r0,r0,#0x13    @ 0802f69c c004
     cmp r0,#0x0                              @ 0802f69e 0028
     bne LAB_0802f6b8                         @ 0802f6a0 0ad1
     b LAB_0802f6d8                           @ 0802f6a2 19e0
-DAT_0802f6a4:
-    .word  0x00000868                     @ 0802f6a4 68080000
-DAT_0802f6a8:
-    .word  0x0201c510                     @ 0802f6a8 10c50102
+find_equip_pair_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f6a4 68080000
+find_equip_pair_field_slots:
+    .word  gDuelFieldSlots                @ 0802f6a8 10c50102
 LAB_0802f6ac:
     lsls r0,r5,#0x18    @ 0802f6ac 2806
     lsls r1,r4,#0x18    @ 0802f6ae 2106
@@ -7242,13 +7242,13 @@ LAB_0802f6bc:
     cmp r5,#0x1                              @ 0802f6d4 012d
     ble LAB_0802f6ba                         @ 0802f6d6 f0dd
 LAB_0802f6d8:
-    ldr r0, DAT_0802f6e0                     @ 0802f6d8 0148
+    ldr r0, find_equip_pair_not_found        @ 0802f6d8 0148
 LAB_0802f6da:
     pop {r4,r5,r6,r7}                        @ 0802f6da f0bc
     pop {r1}                                 @ 0802f6dc 02bc
     bx r1                                    @ 0802f6de 0847
-DAT_0802f6e0:
-    .word  0x0000ffff                     @ 0802f6e0 ffff0000
+find_equip_pair_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f6e0 ffff0000
 
 @ Dual-player chain scanner: in gDuelFieldSlots@0x0201c510 both player sides (i=[0..1]), scans node pool@0x0201d9c0 (stride 8) following chain head [+0xa], looking for first node where [+0]==r8_low AND [+1]==r5. On hit and r4==0 returns ([ctx+0x1c]<<8) | [ctx+0]; on hit and r4!=0 returns ([ctx+0x20]>>8 << 16) | [ctx+4]. No match returns 0xffff. r0=u8 ref_id_lo [0..0xff] -> r8 (callee-save alias); r1=u8 ref_id_hi [0..0xff] -> r5; r2=ptr<DuelStateExt> ctx_ptr -> r3 (sub #0xc4 then ldrb-indexed read). Returns u32 packed (combined fields on hit, 0xffff on miss). Single caller FUN_0804559c (duel_field, equip dispatcher). No side effects, reads gDuelFieldSlots/node_pool/ctx_ptr only. Constants: NODE_POOL=0x0201d9c0, slot_base=0x0201bc54, MISS_SENTINEL=0xffff.
 find_node_packed_by_card_id_in_dual_lists:
@@ -7258,7 +7258,7 @@ find_node_packed_by_card_id_in_dual_lists:
     .hword 0x4680    @ 0802f6ea 8046
     adds r5,r1,#0x0    @ 0802f6ec 0d1c
     movs r4,#0x0    @ 0802f6ee 0024
-    ldr r0, DAT_0802f734                     @ 0802f6f0 1048
+    ldr r0, find_packed_node_effect_slots    @ 0802f6f0 1048
     .hword 0x4684    @ 0802f6f2 8446
     movs r7,#0x0    @ 0802f6f4 0027
 LAB_0802f6f6:
@@ -7271,7 +7271,7 @@ LAB_0802f6f6:
     subs r3,#0xc4    @ 0802f702 c43b
 LAB_0802f704:
     lsls r1,r1,#0x3    @ 0802f704 c900
-    ldr r0, DAT_0802f738                     @ 0802f706 0c48
+    ldr r0, find_packed_node_pool            @ 0802f706 0c48
     adds r1,r1,r0    @ 0802f708 0918
     ldrh r2,[r1,#0x6]                        @ 0802f70a ca88
     ldrb r6,[r1,#0x2]                        @ 0802f70c 8e78
@@ -7294,10 +7294,10 @@ LAB_0802f704:
     orrs r0,r3    @ 0802f72e 1843
     b LAB_0802f758                           @ 0802f730 12e0
     .zero  0x2
-DAT_0802f734:
-    .word  0x0201bc54                     @ 0802f734 54bc0102
-DAT_0802f738:
-    .word  0x0201d9c0                     @ 0802f738 c0d90102
+find_packed_node_effect_slots:
+    .word  gDuelEffectChainSlots          @ 0802f734 54bc0102  effect context chain slot array; 2 entries stride 20B
+find_packed_node_pool:
+    .word  gEquipNodePool                 @ 0802f738 c0d90102
 LAB_0802f73c:
     ldr r0,[r3,#0x20]                        @ 0802f73c 186a
     lsls r0,r0,#0x18    @ 0802f73e 0006
@@ -7314,7 +7314,7 @@ LAB_0802f74e:
     adds r4,#0x1    @ 0802f750 0134
     cmp r4,#0x1                              @ 0802f752 012c
     ble LAB_0802f6f6                         @ 0802f754 cfdd
-    ldr r0, DAT_0802f764                     @ 0802f756 0348
+    ldr r0, find_packed_node_not_found       @ 0802f756 0348
 LAB_0802f758:
     pop {r3}                                 @ 0802f758 08bc
     .hword 0x4698    @ 0802f75a 9846
@@ -7322,8 +7322,8 @@ LAB_0802f758:
     pop {r1}                                 @ 0802f75e 02bc
     bx r1                                    @ 0802f760 0847
     .zero  0x2
-DAT_0802f764:
-    .word  0x0000ffff                     @ 0802f764 ffff0000
+find_packed_node_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f764 ffff0000
 
 @ Called exclusively by dispatch_equip_chain_slot_scan_by_player (0x08042bd0). Reads gDuelFieldSlots (0x0201c510) + player*0x868, checks chain head [+0xa]; traverses chain nodes (stride=8), filters card_type bits[3:0]<=5, extracts card_id (lsrs#0x10) and compares with r2 (target card_id). Returns found card_id or 0xffff (no match). Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9], r2=u32 card_id [0..0xffff]. Returns r0=u32 found_card_id (card_id if match, else 0xffff). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, no_result=0xffff.
 find_card_slot_by_zone_card_id:
@@ -7337,15 +7337,15 @@ find_card_slot_by_zone_card_id:
     lsls r0,r1,#0x2    @ 0802f776 8800
     adds r0,r0,r1    @ 0802f778 4018
     lsls r0,r0,#0x2    @ 0802f77a 8000
-    ldr r1, DAT_0802f7f4                     @ 0802f77c 1d49
+    ldr r1, find_card_slot_player_stride     @ 0802f77c 1d49
     muls r1,r2    @ 0802f77e 5143
     adds r0,r0,r1    @ 0802f780 4018
-    ldr r1, DAT_0802f7f8                     @ 0802f782 1d49
+    ldr r1, find_card_slot_field_slots       @ 0802f782 1d49
     adds r0,r0,r1    @ 0802f784 4018
     ldrh r0,[r0,#0xa]                        @ 0802f786 4089
     cmp r0,#0x0                              @ 0802f788 0028
     beq LAB_0802f80a                         @ 0802f78a 3ed0
-    ldr r2, DAT_0802f7fc                     @ 0802f78c 1b4a
+    ldr r2, find_card_slot_node_base_off     @ 0802f78c 1b4a
     adds r6,r1,r2    @ 0802f78e 8e18
     adds r7,r1,#0x0    @ 0802f790 0f1c
     adds r7,#0x10    @ 0802f792 1037
@@ -7369,10 +7369,10 @@ LAB_0802f794:
     lsls r1,r0,#0x2    @ 0802f7b4 8100
     adds r1,r1,r0    @ 0802f7b6 0918
     lsls r1,r1,#0x2    @ 0802f7b8 8900
-    ldr r0, DAT_0802f7f4                     @ 0802f7ba 0e48
+    ldr r0, find_card_slot_player_stride     @ 0802f7ba 0e48
     muls r0,r2    @ 0802f7bc 5043
     adds r1,r1,r0    @ 0802f7be 0918
-    ldr r2, DAT_0802f800                     @ 0802f7c0 0f4a
+    ldr r2, find_card_slot_pool_neg_off      @ 0802f7c0 0f4a
     adds r0,r6,r2    @ 0802f7c2 b018
     adds r2,r1,r0    @ 0802f7c4 0a18
     ldr r0,[r2,#0x0]                         @ 0802f7c6 1068
@@ -7399,20 +7399,20 @@ LAB_0802f794:
 LAB_0802f7f0:
     adds r0,r4,#0x0    @ 0802f7f0 201c
     b LAB_0802f80c                           @ 0802f7f2 0be0
-DAT_0802f7f4:
-    .word  0x00000868                     @ 0802f7f4 68080000
-DAT_0802f7f8:
-    .word  0x0201c510                     @ 0802f7f8 10c50102
-DAT_0802f7fc:
-    .word  0x000014b0                     @ 0802f7fc b0140000
-DAT_0802f800:
-    .word  0xffffeb50                     @ 0802f800 50ebffff
+find_card_slot_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f7f4 68080000
+find_card_slot_field_slots:
+    .word  gDuelFieldSlots                @ 0802f7f8 10c50102
+find_card_slot_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f7fc b0140000
+find_card_slot_pool_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 0802f800 50ebffff
 LAB_0802f804:
     adds r0,r5,#0x0    @ 0802f804 281c
     cmp r0,#0x0                              @ 0802f806 0028
     bne LAB_0802f794                         @ 0802f808 c4d1
 LAB_0802f80a:
-    ldr r0, DAT_0802f818                     @ 0802f80a 0348
+    ldr r0, find_card_slot_not_found         @ 0802f80a 0348
 LAB_0802f80c:
     pop {r3}                                 @ 0802f80c 08bc
     .hword 0x4698    @ 0802f80e 9846
@@ -7420,8 +7420,8 @@ LAB_0802f80c:
     pop {r1}                                 @ 0802f812 02bc
     bx r1                                    @ 0802f814 0847
     .zero  0x2
-DAT_0802f818:
-    .word  0x0000ffff                     @ 0802f818 ffff0000
+find_card_slot_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f818 ffff0000
 
 @ Called exclusively by dispatch_equip_chain_slot_scan_by_player (0x08042bd0). Symmetric to find_card_slot_by_zone_card_id (0x0802f768); adds bit4 flag filter. Reads gDuelFieldSlots (0x0201c510) + player*0x868, checks chain head [+0xa]; traverses nodes (stride=8), compares card_id (lsls#0x13/lsrs#0x13), then additionally checks lsrs#0x4 AND r4 vs r8 (flag_mask). Returns card_id low 16 on match, 0xffff otherwise. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9], r3=u32 flag_mask (bit4 filter). Returns r0=u32 found_card_id (or 0xffff). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, no_result=0xffff.
 find_equip_slot_by_zone_card_id_with_flag:
@@ -7436,15 +7436,15 @@ find_equip_slot_by_zone_card_id_with_flag:
     lsls r0,r1,#0x2    @ 0802f82c 8800
     adds r0,r0,r1    @ 0802f82e 4018
     lsls r0,r0,#0x2    @ 0802f830 8000
-    ldr r1, DAT_0802f8b0                     @ 0802f832 1f49
+    ldr r1, find_equip_slot_flag_player_stride @ 0802f832 1f49
     muls r1,r2    @ 0802f834 5143
     adds r0,r0,r1    @ 0802f836 4018
-    ldr r1, DAT_0802f8b4                     @ 0802f838 1e49
+    ldr r1, find_equip_slot_flag_field_slots @ 0802f838 1e49
     adds r0,r0,r1    @ 0802f83a 4018
     ldrh r0,[r0,#0xa]                        @ 0802f83c 4089
     cmp r0,#0x0                              @ 0802f83e 0028
     beq LAB_0802f8c6                         @ 0802f840 41d0
-    ldr r2, DAT_0802f8b8                     @ 0802f842 1d4a
+    ldr r2, find_equip_slot_flag_node_base_off @ 0802f842 1d4a
     adds r7,r1,r2    @ 0802f844 8f18
     adds r1,#0x10    @ 0802f846 1031
     .hword 0x468c    @ 0802f848 8c46
@@ -7468,10 +7468,10 @@ LAB_0802f84a:
     lsls r1,r0,#0x2    @ 0802f86a 8100
     adds r1,r1,r0    @ 0802f86c 0918
     lsls r1,r1,#0x2    @ 0802f86e 8900
-    ldr r0, DAT_0802f8b0                     @ 0802f870 0f48
+    ldr r0, find_equip_slot_flag_player_stride @ 0802f870 0f48
     muls r0,r2    @ 0802f872 5043
     adds r1,r1,r0    @ 0802f874 0918
-    ldr r2, DAT_0802f8bc                     @ 0802f876 114a
+    ldr r2, find_equip_slot_flag_pool_neg_off @ 0802f876 114a
     adds r0,r7,r2    @ 0802f878 b818
     adds r3,r1,r0    @ 0802f87a 0b18
     ldr r0,[r3,#0x0]                         @ 0802f87c 1868
@@ -7500,20 +7500,20 @@ LAB_0802f84a:
     adds r0,r5,#0x0    @ 0802f8aa 281c
     b LAB_0802f8c8                           @ 0802f8ac 0ce0
     .zero  0x2
-DAT_0802f8b0:
-    .word  0x00000868                     @ 0802f8b0 68080000
-DAT_0802f8b4:
-    .word  0x0201c510                     @ 0802f8b4 10c50102
-DAT_0802f8b8:
-    .word  0x000014b0                     @ 0802f8b8 b0140000
-DAT_0802f8bc:
-    .word  0xffffeb50                     @ 0802f8bc 50ebffff
+find_equip_slot_flag_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f8b0 68080000
+find_equip_slot_flag_field_slots:
+    .word  gDuelFieldSlots                @ 0802f8b4 10c50102
+find_equip_slot_flag_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f8b8 b0140000
+find_equip_slot_flag_pool_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 0802f8bc 50ebffff
 LAB_0802f8c0:
     adds r0,r6,#0x0    @ 0802f8c0 301c
     cmp r0,#0x0                              @ 0802f8c2 0028
     bne LAB_0802f84a                         @ 0802f8c4 c1d1
 LAB_0802f8c6:
-    ldr r0, DAT_0802f8d4                     @ 0802f8c6 0348
+    ldr r0, find_equip_slot_flag_not_found   @ 0802f8c6 0348
 LAB_0802f8c8:
     pop {r3,r4}                              @ 0802f8c8 18bc
     .hword 0x4698    @ 0802f8ca 9846
@@ -7521,8 +7521,8 @@ LAB_0802f8c8:
     pop {r4,r5,r6,r7}                        @ 0802f8ce f0bc
     pop {r1}                                 @ 0802f8d0 02bc
     bx r1                                    @ 0802f8d2 0847
-DAT_0802f8d4:
-    .word  0x0000ffff                     @ 0802f8d4 ffff0000
+find_equip_slot_flag_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f8d4 ffff0000
 
 @ Searches equip chain list of a player slot for a node with type nibble==0xd; returns entity_id or 0xffff. r0=player_key (bit0=player_id [0..1]); r1=slot_index [0..4]. Slot offset: slot_stride=0x14, player_stride=0x868, base=gDuelFieldSlots=0x0201c510. Reads [slot+0xa] halfword as chain head; if 0 returns 0xffff. Loop: sub-table base DAT_0802f918=0x14b0, node stride 8 (lsls #3); reads [node+0x2] byte low 4 bits (& 0xf); if ==0xd returns [node+0x0] halfword (entity_id); else reads [node+0x6] halfword (next ptr), if 0 exits with 0xffff. 4 callers: FUN_0804369c, FUN_0804888c, FUN_08050038, FUN_0805ca50 (all duel_field). Params: r0=u32 player_key (bit0=player_id [0..1]); r1=u32 slot_index [0..4]. Returns r0=u16 entity_id (found) / 0xffff (not found). Side effects: none (pure read, leaf loop).
 find_equip_chain_node_by_type_d:
@@ -7532,15 +7532,15 @@ find_equip_chain_node_by_type_d:
     lsls r0,r1,#0x2    @ 0802f8de 8800
     adds r0,r0,r1    @ 0802f8e0 4018
     lsls r0,r0,#0x2    @ 0802f8e2 8000
-    ldr r1, DAT_0802f910                     @ 0802f8e4 0a49
+    ldr r1, find_type_d_player_stride        @ 0802f8e4 0a49
     muls r1,r2    @ 0802f8e6 5143
     adds r0,r0,r1    @ 0802f8e8 4018
-    ldr r1, DAT_0802f914                     @ 0802f8ea 0a49
+    ldr r1, find_type_d_field_slots          @ 0802f8ea 0a49
     adds r0,r0,r1    @ 0802f8ec 4018
     ldrh r0,[r0,#0xa]                        @ 0802f8ee 4089
     cmp r0,#0x0                              @ 0802f8f0 0028
     beq LAB_0802f922                         @ 0802f8f2 16d0
-    ldr r2, DAT_0802f918                     @ 0802f8f4 084a
+    ldr r2, find_type_d_node_base_off        @ 0802f8f4 084a
     adds r3,r1,r2    @ 0802f8f6 8b18
     movs r4,#0xf    @ 0802f8f8 0f24
 LAB_0802f8fa:
@@ -7555,25 +7555,25 @@ LAB_0802f8fa:
     ldrh r0,[r1,#0x0]                        @ 0802f90a 0888
     b LAB_0802f924                           @ 0802f90c 0ae0
     .zero  0x2
-DAT_0802f910:
-    .word  0x00000868                     @ 0802f910 68080000
-DAT_0802f914:
-    .word  0x0201c510                     @ 0802f914 10c50102
-DAT_0802f918:
-    .word  0x000014b0                     @ 0802f918 b0140000
+find_type_d_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f910 68080000
+find_type_d_field_slots:
+    .word  gDuelFieldSlots                @ 0802f914 10c50102
+find_type_d_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f918 b0140000
 LAB_0802f91c:
     adds r0,r2,#0x0    @ 0802f91c 101c
     cmp r0,#0x0                              @ 0802f91e 0028
     bne LAB_0802f8fa                         @ 0802f920 ebd1
 LAB_0802f922:
-    ldr r0, DAT_0802f92c                     @ 0802f922 0248
+    ldr r0, find_type_d_not_found            @ 0802f922 0248
 LAB_0802f924:
     pop {r4,r5}                              @ 0802f924 30bc
     pop {r1}                                 @ 0802f926 02bc
     bx r1                                    @ 0802f928 0847
     .zero  0x2
-DAT_0802f92c:
-    .word  0x0000ffff                     @ 0802f92c ffff0000
+find_type_d_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f92c ffff0000
 
 @ Finds the equip-link target for a given card slot in gDuelFieldSlots. r0=u32 player_key (low bit0=player_id; ands r2,r0 masks to bit0; .hword 0x4692=mov r10,r2). r1=u8 slot_idx [0..4] (slot_stride 0x14 * slot_idx + player_id*0x868 + base). Reads [slot+0xa] (halfword, current card state); if 0 returns 0xffff (no target). Else extracts stat_field8 (lsls/lsrs 0x1c); only values 0xa or 0xb enter lookup flow. Computes equip card player+slot product, filters via check_card_stat_field8_is_8, confirms chain pair via find_equip_chain_pair_across_field. Final check: if lsrs[slot.field]+0x5 bit0==1 (equip_active) AND lsrs[target.field]+0x1 bit0==1 (not_reversed), returns target_slot_ptr; else 0xffff. Returns ptr target_slot or 0xffff (DAT_0x0002f9f8). Pure query. 7 callers including FUN_08047218, FUN_0804888c (duel_field). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, equip_field8_A=0xa, equip_field8_B=0xb, slot_state_offset=0xa, NO_TARGET=0xffff.
 find_equip_target_for_card_slot:
@@ -7589,15 +7589,15 @@ find_equip_target_for_card_slot:
     lsls r0,r1,#0x2    @ 0802f942 8800
     adds r0,r0,r1    @ 0802f944 4018
     lsls r0,r0,#0x2    @ 0802f946 8000
-    ldr r1, DAT_0802f9d0                     @ 0802f948 2149
+    ldr r1, find_equip_target_player_stride  @ 0802f948 2149
     muls r1,r2    @ 0802f94a 5143
     adds r0,r0,r1    @ 0802f94c 4018
-    ldr r1, DAT_0802f9d4                     @ 0802f94e 2149
+    ldr r1, find_equip_target_field_slots    @ 0802f94e 2149
     adds r0,r0,r1    @ 0802f950 4018
     ldrh r0,[r0,#0xa]                        @ 0802f952 4089
     cmp r0,#0x0                              @ 0802f954 0028
     beq LAB_0802f9e6                         @ 0802f956 46d0
-    ldr r2, DAT_0802f9d8                     @ 0802f958 1f4a
+    ldr r2, find_equip_target_node_base_off  @ 0802f958 1f4a
     adds r3,r1,r2    @ 0802f95a 8b18
     adds r1,#0x10    @ 0802f95c 1031
     .hword 0x4689    @ 0802f95e 8946
@@ -7624,10 +7624,10 @@ LAB_0802f960:
     lsls r1,r0,#0x2    @ 0802f986 8100
     adds r1,r1,r0    @ 0802f988 0918
     lsls r1,r1,#0x2    @ 0802f98a 8900
-    ldr r0, DAT_0802f9d0                     @ 0802f98c 1048
+    ldr r0, find_equip_target_player_stride  @ 0802f98c 1048
     muls r0,r2    @ 0802f98e 5043
     adds r5,r1,r0    @ 0802f990 0d18
-    ldr r1, DAT_0802f9dc                     @ 0802f992 1249
+    ldr r1, find_equip_target_pool_neg_off   @ 0802f992 1249
     adds r0,r3,r1    @ 0802f994 5818
     adds r4,r5,r0    @ 0802f996 2c18
     ldr r0,[r4,#0x0]                         @ 0802f998 2068
@@ -7658,20 +7658,20 @@ LAB_0802f960:
 LAB_0802f9cc:
     adds r0,r7,#0x0    @ 0802f9cc 381c
     b LAB_0802f9e8                           @ 0802f9ce 0be0
-DAT_0802f9d0:
-    .word  0x00000868                     @ 0802f9d0 68080000
-DAT_0802f9d4:
-    .word  0x0201c510                     @ 0802f9d4 10c50102
-DAT_0802f9d8:
-    .word  0x000014b0                     @ 0802f9d8 b0140000
-DAT_0802f9dc:
-    .word  0xffffeb50                     @ 0802f9dc 50ebffff
+find_equip_target_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802f9d0 68080000
+find_equip_target_field_slots:
+    .word  gDuelFieldSlots                @ 0802f9d4 10c50102
+find_equip_target_node_base_off:
+    .word  EQUIP_NODE_BASE_OFFSET         @ 0802f9d8 b0140000
+find_equip_target_pool_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 0802f9dc 50ebffff
 LAB_0802f9e0:
     .hword 0x4640    @ 0802f9e0 4046
     cmp r0,#0x0                              @ 0802f9e2 0028
     bne LAB_0802f960                         @ 0802f9e4 bcd1
 LAB_0802f9e6:
-    ldr r0, DAT_0802f9f8                     @ 0802f9e6 0448
+    ldr r0, find_equip_target_not_found      @ 0802f9e6 0448
 LAB_0802f9e8:
     add sp,#0x4                              @ 0802f9e8 01b0
     pop {r3,r4,r5}                           @ 0802f9ea 38bc
@@ -7681,8 +7681,8 @@ LAB_0802f9e8:
     pop {r4,r5,r6,r7}                        @ 0802f9f2 f0bc
     pop {r1}                                 @ 0802f9f4 02bc
     bx r1                                    @ 0802f9f6 0847
-DAT_0802f9f8:
-    .word  0x0000ffff                     @ 0802f9f8 ffff0000
+find_equip_target_not_found:
+    .word  OAM_ATTR0_HIDDEN               @ 0802f9f8 ffff0000
 
 @ Function: parse equip chain node and write to slot record. r0=packed_player_slot (bit0=side, bits[5:1]=source_slot), r1=u32 target_slot_index [0..11]. First calls find_equip_chain_pair_across_field(r0, r1) to get cross-field pairing result r7=result_halfword; in sp buffer (0x18 bytes, memset cleared) writes chain node fields: [buf+0] = card_data bits[12:0] (card_id) from gDuelFieldSlots+side*0x868+slot*20; [node+2] low bit = side, bits[5:1] = target_slot, clears other fields; [node+3] low bits = clear bits[5:4:2] (keeps bits[7:6] and [1:0]); [node+4] field bits[14:6] = combined card_data bit fields (bits[21:14] and bit[13] extracted then merged, mask=0xffff803f). Result check: if r7==0xffff (no pairing) -> calls check_slot_card_eligible_by_card_id(side, target_slot, card_id); if r7==0xc -> movs r0,#0 (return 0=ineligible); if r7==0xd -> calls check_equip_chain_type_d_node_exists(side, target_slot, source) and returns its result. Exit pop{r1};bx r1 (Sub-case E, preserves r0).
 @ 
@@ -7723,10 +7723,10 @@ build_equip_chain_slot_entry:
     lsls r3,r5,#0x2    @ 0802fa2a ab00
     adds r3,r3,r5    @ 0802fa2c 5b19
     lsls r3,r3,#0x2    @ 0802fa2e 9b00
-    ldr r0, DAT_0802fab0                     @ 0802fa30 1f48
+    ldr r0, build_equip_entry_player_stride  @ 0802fa30 1f48
     muls r0,r1    @ 0802fa32 4843
     adds r3,r3,r0    @ 0802fa34 1b18
-    ldr r0, DAT_0802fab4                     @ 0802fa36 1f48
+    ldr r0, build_equip_entry_field_slots    @ 0802fa36 1f48
     adds r3,r3,r0    @ 0802fa38 1b18
     ldr r0,[r3,#0x0]                         @ 0802fa3a 1868
     lsls r0,r0,#0x13    @ 0802fa3c c004
@@ -7765,12 +7765,12 @@ build_equip_chain_slot_entry:
     lsrs r0,r0,#0x1f    @ 0802fa7e c00f
     orrs r1,r0    @ 0802fa80 0143
     lsls r1,r1,#0x6    @ 0802fa82 8901
-    ldr r0, DAT_0802fab8                     @ 0802fa84 0c48
+    ldr r0, build_equip_entry_attr_mask      @ 0802fa84 0c48
     ldrh r3,[r2,#0x4]                        @ 0802fa86 9388
     ands r0,r3    @ 0802fa88 1840
     orrs r0,r1    @ 0802fa8a 0843
     strh r0,[r2,#0x4]                        @ 0802fa8c 9080
-    ldr r0, DAT_0802fabc                     @ 0802fa8e 0b48
+    ldr r0, build_equip_entry_no_pair_sentinel @ 0802fa8e 0b48
     cmp r7,r0                                @ 0802fa90 8742
     beq LAB_0802fad0                         @ 0802fa92 1dd0
     lsls r0,r7,#0x18    @ 0802fa94 3806
@@ -7786,14 +7786,14 @@ build_equip_chain_slot_entry:
     beq LAB_0802fac4                         @ 0802faaa 0bd0
     b LAB_0802fad0                           @ 0802faac 10e0
     .zero  0x2
-DAT_0802fab0:
-    .word  0x00000868                     @ 0802fab0 68080000
-DAT_0802fab4:
-    .word  0x0201c510                     @ 0802fab4 10c50102
-DAT_0802fab8:
-    .word  0xffff803f                     @ 0802fab8 3f80ffff
-DAT_0802fabc:
-    .word  0x0000ffff                     @ 0802fabc ffff0000
+build_equip_entry_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fab0 68080000
+build_equip_entry_field_slots:
+    .word  gDuelFieldSlots                @ 0802fab4 10c50102
+build_equip_entry_attr_mask:
+    .word  SCROLLBAR_CLEAR_BITS_14_6      @ 0802fab8 3f80ffff  clears bits[14:6] of node[+4] OAM attr word
+build_equip_entry_no_pair_sentinel:
+    .word  OAM_ATTR0_HIDDEN               @ 0802fabc ffff0000
 LAB_0802fac0:
     movs r0,#0x0    @ 0802fac0 0020
     b LAB_0802fae4                           @ 0802fac2 0fe0
@@ -7829,7 +7829,7 @@ find_node_by_value:
     push {r4,r5,lr}                          @ 0802faf4 30b5
     cmp r0,#0x0                              @ 0802faf6 0028
     beq LAB_0802fb22                         @ 0802faf8 13d0
-    ldr r4, DAT_0802fb18                     @ 0802fafa 074c
+    ldr r4, find_node_val_pool               @ 0802fafa 074c
 LAB_0802fafc:
     lsls r0,r0,#0x3    @ 0802fafc c000
     adds r2,r0,r4    @ 0802fafe 0219
@@ -7845,8 +7845,8 @@ LAB_0802fafc:
     adds r0,r2,#0x0    @ 0802fb12 101c
     b LAB_0802fb24                           @ 0802fb14 06e0
     .zero  0x2
-DAT_0802fb18:
-    .word  0x0201d9c0                     @ 0802fb18 c0d90102
+find_node_val_pool:
+    .word  gEquipNodePool                 @ 0802fb18 c0d90102
 LAB_0802fb1c:
     adds r0,r3,#0x0    @ 0802fb1c 181c
     cmp r0,#0x0                              @ 0802fb1e 0028
@@ -7859,14 +7859,14 @@ LAB_0802fb24:
     bx r1                                    @ 0802fb28 0847
     .zero  0x2
 
-@ Traverses EWRAM node pool (0x0201d9c0, stride 8 bytes) via linked list, returning first node ptr where [node+0]==value (r1) and [node+2]&0xF==zone_type (r2, [0..5]). r0=u32 head_index [1..139] (0=empty list -> return NULL). Node layout: [+0]=u16 value, [+2]=type_byte (low 4 bits=zone_type), [+6]=u16 next_index, stride 8. Returns u32* node pointer or NULL (0) if not found. Leaf function (no callees). Callers: check_node_in_slot_chain (FUN_0802fdc0), FUN_0802fe98, FUN_0802ff34, FUN_0802ff84. Constants: 0x0201d9c0=node pool base, NODE_STRIDE=8, ZONE_TYPE_MAX=5.
+@ Traverses EWRAM node pool (0x0201d9c0, stride 8 bytes) via linked list, returning first node ptr where [node+0]==value (r1) and [node+2]&0xF==zone_type (r2, [0..5]). r0=u32 head_index [1..139] (0=empty list -> return NULL). Node layout: [+0]=u16 value, [+2]=type_byte (low 4 bits=zone_type), [+6]=u16 next_index, stride 8. Returns u32* node pointer or NULL (0) if not found. Leaf function (no callees). Callers: check_node_in_slot_chain (check_node_in_slot_chain), get_zone_node_entity_hword_by_card_and_type, check_node_in_zone_idx_chain, get_entity_id_in_zone_idx_chain_by_type. Constants: 0x0201d9c0=node pool base, NODE_STRIDE=8, ZONE_TYPE_MAX=5.
 find_node_by_value_and_zone_type:
     push {r4,r5,r6,lr}                       @ 0802fb2c 70b5
     adds r5,r1,#0x0    @ 0802fb2e 0d1c
     adds r4,r2,#0x0    @ 0802fb30 141c
     cmp r0,#0x0                              @ 0802fb32 0028
     beq LAB_0802fb62                         @ 0802fb34 15d0
-    ldr r6, DAT_0802fb58                     @ 0802fb36 084e
+    ldr r6, find_node_val_type_pool          @ 0802fb36 084e
 LAB_0802fb38:
     lsls r0,r0,#0x3    @ 0802fb38 c000
     adds r3,r0,r6    @ 0802fb3a 8319
@@ -7884,8 +7884,8 @@ LAB_0802fb38:
     bne LAB_0802fb5c                         @ 0802fb52 03d1
     adds r0,r3,#0x0    @ 0802fb54 181c
     b LAB_0802fb64                           @ 0802fb56 05e0
-DAT_0802fb58:
-    .word  0x0201d9c0                     @ 0802fb58 c0d90102
+find_node_val_type_pool:
+    .word  gEquipNodePool                 @ 0802fb58 c0d90102
 LAB_0802fb5c:
     adds r0,r2,#0x0    @ 0802fb5c 101c
     cmp r0,#0x0                              @ 0802fb5e 0028
@@ -7907,7 +7907,7 @@ find_node_by_value_zone_entity:
     beq LAB_0802fbb2                         @ 0802fb74 1dd0
 LAB_0802fb76:
     lsls r0,r0,#0x3    @ 0802fb76 c000
-    ldr r1, DAT_0802fba8                     @ 0802fb78 0b49
+    ldr r1, find_node_val_zone_pool          @ 0802fb78 0b49
     adds r1,r0,r1    @ 0802fb7a 4118
     ldrh r2,[r1,#0x6]                        @ 0802fb7c ca88
     ldrb r3,[r1,#0x2]                        @ 0802fb7e 8b78
@@ -7932,8 +7932,8 @@ LAB_0802fb76:
 LAB_0802fba4:
     adds r0,r1,#0x0    @ 0802fba4 081c
     b LAB_0802fbb4                           @ 0802fba6 05e0
-DAT_0802fba8:
-    .word  0x0201d9c0                     @ 0802fba8 c0d90102
+find_node_val_zone_pool:
+    .word  gEquipNodePool                 @ 0802fba8 c0d90102
 LAB_0802fbac:
     adds r0,r2,#0x0    @ 0802fbac 101c
     cmp r0,#0x0                              @ 0802fbae 0028
@@ -7953,7 +7953,7 @@ count_chain_nodes_by_card_id:
     movs r1,#0x0    @ 0802fbc0 0021
     cmp r0,#0x0                              @ 0802fbc2 0028
     beq LAB_0802fbe6                         @ 0802fbc4 0fd0
-    ldr r5, DAT_0802fbf0                     @ 0802fbc6 0a4d
+    ldr r5, count_nodes_card_pool            @ 0802fbc6 0a4d
 LAB_0802fbc8:
     lsls r0,r0,#0x3    @ 0802fbc8 c000
     adds r2,r0,r5    @ 0802fbca 4219
@@ -7977,8 +7977,8 @@ LAB_0802fbe6:
     pop {r1}                                 @ 0802fbea 02bc
     bx r1                                    @ 0802fbec 0847
     .zero  0x2
-DAT_0802fbf0:
-    .word  0x0201d9c0                     @ 0802fbf0 c0d90102
+count_nodes_card_pool:
+    .word  gEquipNodePool                 @ 0802fbf0 c0d90102
 
 @ Chain node counter: counts nodes in chain head r0 with card_id==r1 AND type_lo4==r2. r4=hit counter init 0. Per node: lsls r0,r0,#0x3 -> address=0x0201d9c0+index*8; ldrb [+2] -> type byte, lsls/lsrs #0x1c -> type_lo4; if type_lo4>5 skip; ldrh [+0] -> card_id vs r6(target_card_id); lsrs r0,r1,#0x1c -> type_lo4 vs r5(target_type); triple match -> r4++. ldrh [+6] -> next; next==0 exits loop. Extends count_chain_nodes_by_card_id with type_lo4 third filter. Constants: NODE_BASE=0x0201d9c0, NODE_STRIDE=8, TYPE_MAX=5.
 count_chain_nodes_by_card_id_and_type:
@@ -7988,7 +7988,7 @@ count_chain_nodes_by_card_id_and_type:
     movs r4,#0x0    @ 0802fbfa 0024
     cmp r0,#0x0                              @ 0802fbfc 0028
     beq LAB_0802fc26                         @ 0802fbfe 12d0
-    ldr r7, DAT_0802fc30                     @ 0802fc00 0b4f
+    ldr r7, count_nodes_card_type_pool       @ 0802fc00 0b4f
 LAB_0802fc02:
     lsls r0,r0,#0x3    @ 0802fc02 c000
     adds r3,r0,r7    @ 0802fc04 c319
@@ -8015,8 +8015,8 @@ LAB_0802fc26:
     pop {r1}                                 @ 0802fc2a 02bc
     bx r1                                    @ 0802fc2c 0847
     .zero  0x2
-DAT_0802fc30:
-    .word  0x0201d9c0                     @ 0802fc30 c0d90102
+count_nodes_card_type_pool:
+    .word  gEquipNodePool                 @ 0802fc30 c0d90102
 
 @ Wrapper: read chain_head from gDuelFieldSlots[player_side][slot_idx]+0xa, call count_chain_nodes_by_card_id(head, r2). r0: packed_player_id (bit0=side); r1: slot_idx [0..11]; r2: target_card_id [0..0x19b7]. Returns u32 match_count (0=chain empty or no match). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa.
 count_slot_chain_nodes_by_card_id:
@@ -8026,10 +8026,10 @@ count_slot_chain_nodes_by_card_id:
     lsls r0,r1,#0x2    @ 0802fc3a 8800
     adds r0,r0,r1    @ 0802fc3c 4018
     lsls r0,r0,#0x2    @ 0802fc3e 8000
-    ldr r1, DAT_0802fc58                     @ 0802fc40 0549
+    ldr r1, count_slot_nodes_player_stride   @ 0802fc40 0549
     muls r1,r3    @ 0802fc42 5943
     adds r0,r0,r1    @ 0802fc44 4018
-    ldr r1, DAT_0802fc5c                     @ 0802fc46 0549
+    ldr r1, count_slot_nodes_field_slots     @ 0802fc46 0549
     adds r0,r0,r1    @ 0802fc48 4018
     ldrh r0,[r0,#0xa]                        @ 0802fc4a 4089
     adds r1,r2,#0x0    @ 0802fc4c 111c
@@ -8037,10 +8037,10 @@ count_slot_chain_nodes_by_card_id:
     pop {r1}                                 @ 0802fc52 02bc
     bx r1                                    @ 0802fc54 0847
     .zero  0x2
-DAT_0802fc58:
-    .word  0x00000868                     @ 0802fc58 68080000
-DAT_0802fc5c:
-    .word  0x0201c510                     @ 0802fc5c 10c50102
+count_slot_nodes_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fc58 68080000
+count_slot_nodes_field_slots:
+    .word  gDuelFieldSlots                @ 0802fc5c 10c50102
 
 @ Slot chain node counter with card_id+type dual filter, extends count_slot_chain_nodes_by_card_id(0x0802fc34). r0=packed_player_id(bit0=side), r1=slot_idx([0..11]), r2=target_card_id, r3=target_type. Extracts player_side=r0&1, reads gDuelFieldSlots[player_side][slot_idx]+0xa (chain head ldrh), calls count_chain_nodes_by_card_id_and_type(chain_head, r2, r3). Called twice by FUN_0809d374 with r3=1 and r3=2; results multiplied to test simultaneous presence of type1 and type2 nodes. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, chain_head_offset=0xa.
 count_slot_chain_nodes_by_card_id_and_type:
@@ -8050,10 +8050,10 @@ count_slot_chain_nodes_by_card_id_and_type:
     lsls r0,r1,#0x2    @ 0802fc66 8800
     adds r0,r0,r1    @ 0802fc68 4018
     lsls r0,r0,#0x2    @ 0802fc6a 8000
-    ldr r1, DAT_0802fc88                     @ 0802fc6c 0649
+    ldr r1, count_slot_nodes_type_player_stride @ 0802fc6c 0649
     muls r1,r4    @ 0802fc6e 6143
     adds r0,r0,r1    @ 0802fc70 4018
-    ldr r1, DAT_0802fc8c                     @ 0802fc72 0649
+    ldr r1, count_slot_nodes_type_field_slots @ 0802fc72 0649
     adds r0,r0,r1    @ 0802fc74 4018
     ldrh r0,[r0,#0xa]                        @ 0802fc76 4089
     adds r1,r2,#0x0    @ 0802fc78 111c
@@ -8063,10 +8063,10 @@ count_slot_chain_nodes_by_card_id_and_type:
     pop {r1}                                 @ 0802fc82 02bc
     bx r1                                    @ 0802fc84 0847
     .zero  0x2
-DAT_0802fc88:
-    .word  0x00000868                     @ 0802fc88 68080000
-DAT_0802fc8c:
-    .word  0x0201c510                     @ 0802fc8c 10c50102
+count_slot_nodes_type_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fc88 68080000
+count_slot_nodes_type_field_slots:
+    .word  gDuelFieldSlots                @ 0802fc8c 10c50102
 
 @ Checks whether value(r2) exists in the equip/effect node chain for slot (r0,r1). Reads chain_head_index from gDuelFieldSlots[side][slot]+0xa, calls find_node_by_value(head, value); returns 1 if found, 0 if not. Simplified variant of check_node_in_slot_chain (no zone_type equality param). indeg=107; core boolean query for duel field effect checking. r0=u32 packed_player_id (bit0=side), r1=u32 slot_index [0..11], r2=u16 value. Returns u32 bool (1=value node present in chain, 0=not). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20, chain_head_offset=0xa, gDuelNodePool=0x0201d9c0.
 check_value_in_slot_chain:
@@ -8076,10 +8076,10 @@ check_value_in_slot_chain:
     lsls r0,r1,#0x2    @ 0802fc96 8800
     adds r0,r0,r1    @ 0802fc98 4018
     lsls r0,r0,#0x2    @ 0802fc9a 8000
-    ldr r1, DAT_0802fcb8                     @ 0802fc9c 0649
+    ldr r1, check_slot_chain_player_stride   @ 0802fc9c 0649
     muls r1,r3    @ 0802fc9e 5943
     adds r0,r0,r1    @ 0802fca0 4018
-    ldr r1, DAT_0802fcbc                     @ 0802fca2 0649
+    ldr r1, check_slot_chain_field_slots     @ 0802fca2 0649
     adds r0,r0,r1    @ 0802fca4 4018
     ldrh r0,[r0,#0xa]                        @ 0802fca6 4089
     adds r1,r2,#0x0    @ 0802fca8 111c
@@ -8090,10 +8090,10 @@ check_value_in_slot_chain:
 LAB_0802fcb4:
     pop {r1}                                 @ 0802fcb4 02bc
     bx r1                                    @ 0802fcb6 0847
-DAT_0802fcb8:
-    .word  0x00000868                     @ 0802fcb8 68080000
-DAT_0802fcbc:
-    .word  0x0201c510                     @ 0802fcbc 10c50102
+check_slot_chain_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0802fcb8 68080000
+check_slot_chain_field_slots:
+    .word  gDuelFieldSlots                @ 0802fcbc 10c50102
 
 @ Checks whether value(r2) exists in the effect activation context chain for (r0,r1). Reads gDuelEffectCtx (0x0201bb90): compares r0 vs [+0x0](activation_player) and r1 vs [+0x1c](context_slot_ref); if both match uses side=0 chain, else side=1. Chain entry at 0x0201bc54 + side*20 + 0xa = chain_head_index. Calls find_node_by_value(head, r2); returns 1 if found, 0 if not. r0=u32 query_player, r1=u32 query_slot_ref [0..11], r2=u16 value. Returns u32 bool (1=value node present, 0=not present). Constants: gDuelEffectCtx=0x0201bb90, chain_array=0x0201bc54, activation_player_offset=0, context_slot_ref_offset=0x1c, chain_head_offset=0xa.
 check_value_in_effect_context_chain:
@@ -8101,7 +8101,7 @@ check_value_in_effect_context_chain:
     adds r4,r1,#0x0    @ 0802fcc2 0c1c
     adds r5,r2,#0x0    @ 0802fcc4 151c
     movs r3,#0x0    @ 0802fcc6 0023
-    ldr r2, DAT_0802fcf8                     @ 0802fcc8 0b4a
+    ldr r2, check_effect_chain_refs_base     @ 0802fcc8 0b4a
     ldr r1,[r2,#0x0]                         @ 0802fcca 1168
     cmp r0,r1                                @ 0802fccc 8842
     bne LAB_0802fcd6                         @ 0802fcce 02d1
@@ -8114,7 +8114,7 @@ LAB_0802fcd8:
     lsls r0,r3,#0x2    @ 0802fcd8 9800
     adds r0,r0,r3    @ 0802fcda c018
     lsls r0,r0,#0x2    @ 0802fcdc 8000
-    ldr r1, DAT_0802fcfc                     @ 0802fcde 0749
+    ldr r1, check_effect_chain_slots_base    @ 0802fcde 0749
     adds r0,r0,r1    @ 0802fce0 4018
     ldrh r0,[r0,#0xa]                        @ 0802fce2 4089
     adds r1,r5,#0x0    @ 0802fce4 291c
@@ -8127,10 +8127,10 @@ LAB_0802fcf0:
     pop {r1}                                 @ 0802fcf2 02bc
     bx r1                                    @ 0802fcf4 0847
     .zero  0x2
-DAT_0802fcf8:
-    .word  0x0201bb90                     @ 0802fcf8 90bb0102
-DAT_0802fcfc:
-    .word  0x0201bc54                     @ 0802fcfc 54bc0102
+check_effect_chain_refs_base:
+    .word  gEquipChainSlotRefs            @ 0802fcf8 90bb0102  equip chain slot ref array; [+0]=activation_player [+0x1c]=slot_ref
+check_effect_chain_slots_base:
+    .word  gDuelEffectChainSlots          @ 0802fcfc 54bc0102
 
 @ Slot chain node finder by dual halfword keys (zone_type<=5 path): in gDuelFieldSlots[player_bit0][slot_idx]+0xa chain head, scans node pool @0x0201d9c0 (stride 8) for first node where [+2]&0xF<=5 (zone_type in legal range) AND [+0]==r2 (halfword 1) AND [+4]==r3 (halfword 2). Returns chain index on hit, 0 on miss. r0=u32 player_id [0..1]; r1=u32 slot_idx [0..0xb]; r2=u16 ref_halfword_1; r3=u16 ref_halfword_2. Returns u32 chain_index (current idx on hit, 0 on miss). 2 callers: FUN_0802ecbc (equip main), FUN_08043240 (batch wrapper). No side effects, pure read. Near-identical structure to sibling 0x0802fd60 find_effect_node_in_zone (returns bool 1/0 vs idx). Constants: NODE_POOL=0x0201d9c0, slot_base=0x0201c510, ZONE_TYPE_MAX=5.
 find_chain_node_by_dual_halfword:

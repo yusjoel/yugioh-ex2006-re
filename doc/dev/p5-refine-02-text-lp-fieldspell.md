@@ -58,7 +58,7 @@
 |-----|------|-----|--------|------|--------|
 | 1 | 0x2c238..0x2e108 | 23 | 318 | ✅ | 4199405 |
 | 2 | 0x2e108..0x2f3a8 | 23 | 94 | ✅ | cd981d8 |
-| 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ⬜ | |
+| 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ✅ | (see §4.03) |
 | 4 | 0x2fd00..0x309b8 | 23 | 136 | ⬜ | |
 | 5 | 0x309b8..0x313dc | 23 | 60 | ⬜ | |
 | 6 | 0x313dc..0x3217c | 23 | 64 | ⬜ | |
@@ -202,6 +202,55 @@
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: cd981d8
+
+---
+
+### 4.03 Seg-3 完成记录 (0x0802f3a8..0x0802fd00, 23 fn)
+
+**函数列表**:
+| addr       | name                                              |
+|------------|---------------------------------------------------|
+| 0x0802f3a8 | query_zone_chain_count_with_eligibility           |
+| 0x0802f3e0 | query_slot_effect_eligibility_with_equip_fallback |
+| 0x0802f434 | count_slot_equip_list_matches                     |
+| 0x0802f4e0 | count_active_extended_chain_nodes                 |
+| 0x0802f550 | find_zone_chain_node_by_card_id_pair              |
+| 0x0802f5b0 | find_equip_chain_node_by_slot_pair                |
+| 0x0802f61c | count_equip_slots_with_active_chain               |
+| 0x0802f680 | find_equip_chain_pair_across_field                |
+| 0x0802f6e4 | find_node_packed_by_card_id_in_dual_lists         |
+| 0x0802f768 | find_card_slot_by_zone_card_id                    |
+| 0x0802f81c | find_equip_slot_by_zone_card_id_with_flag         |
+| 0x0802f8d8 | find_equip_chain_node_by_type_d                   |
+| 0x0802f930 | find_equip_target_for_card_slot                   |
+| 0x0802f9fc | build_equip_chain_slot_entry                      |
+| 0x0802faf4 | find_node_by_value                                |
+| 0x0802fb2c | find_node_by_value_and_zone_type                  |
+| 0x0802fb6c | find_node_by_value_zone_entity                    |
+| 0x0802fbbc | count_chain_nodes_by_card_id                      |
+| 0x0802fbf4 | count_chain_nodes_by_card_id_and_type             |
+| 0x0802fc34 | count_slot_chain_nodes_by_card_id                 |
+| 0x0802fc60 | count_slot_chain_nodes_by_card_id_and_type        |
+| 0x0802fc90 | check_value_in_slot_chain                         |
+| 0x0802fcc0 | check_value_in_effect_context_chain               |
+
+**符号化统计**:
+- EQ_SLOTS: 33 (全复用: PLAYER_BLOCK_STRIDE x14 ewram.inc, EQUIP_NODE_BASE_OFFSET x7 duel_field.inc, OAM_ATTR0_HIDDEN x7 oam_attr.inc, NODE_POOL_NEG_OFFSET x4 duel_field.inc, SCROLLBAR_CLEAR_BITS_14_6 x1 gl_scrollbar.inc)
+- REF_SLOTS: 24 (gDuelFieldSlots x14, gEquipNodePool x7, gDuelEffectChainSlots x2, gEquipChainSlotRefs x1)
+- RENAME_SLOTS: 1 (count_equip_list_zone_type_bias EOL zone_type range bias)
+- PLATE_REWRITES: 6 (FUN_0802f3e0, FUN_0802f680, FUN_0802fdc0, FUN_0802fe98, FUN_0802ff34, FUN_0802ff84)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants/全局** (1 项):
+- `ewram.inc`: gDuelEffectChainSlots=0x0201bc54 (17 raw refs; effect context chain slot array, 2 entries stride 20B)
+
+**落地踩坑记录**: 无 (first-shot PASS, dry run 0 FAIL, 实跑 0 SKIP)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg3Slots.py` (EQ33/REF24/RENAME1/PLATE6)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
 
 ---
 
