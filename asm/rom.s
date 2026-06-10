@@ -1218,7 +1218,20 @@ vija_bg_fs_path_pair:                              @ GBA 0x09e3da08 (ref: DAT_08
 vija_obj_slot_seq:                                 @ GBA 0x09e3da10 (ref: DAT_0801ce00)
 	.byte  0x01, 0x03, 0x00, 0x02, 0x04           @ OBJ slot index sequence [phase 0..4]
 	.byte  0x0, 0x0, 0x0                           @ 3B pad
-	.incbin "roms/2343.gba", 0x1E3DA18, 0xC2F4    @ remainder
+	.incbin "roms/2343.gba", 0x1E3DA18, 0x1534    @ remainder prefix [0x1e3da18..0x1e3ef4b]
+monster_slot_order_table:                        @ GBA 0x09e3ef4c, ref: find_first_placeable_monster_slot
+	.word 2                                      @ preferred slot idx [0]
+	.word 3                                      @ preferred slot idx [1]
+	.word 1                                      @ preferred slot idx [2]
+	.word 4                                      @ preferred slot idx [3]
+	.word 0                                      @ preferred slot idx [4]
+available_slot_order_table:                      @ GBA 0x09e3ef60, ref: find_first_available_monster_slot_for_player
+	.word 2                                      @ preferred slot idx [0]
+	.word 3                                      @ preferred slot idx [1]
+	.word 1                                      @ preferred slot idx [2]
+	.word 4                                      @ preferred slot idx [3]
+	.word 0                                      @ preferred slot idx [4]
+	.incbin "roms/2343.gba", 0x1E3EF74, 0xAD98  @ remainder suffix [0x1e3ef74..0x1e4a10b]
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

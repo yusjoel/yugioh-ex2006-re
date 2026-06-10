@@ -64,7 +64,7 @@
 | 6 | 0x313dc..0x3217c | 23 | 64 | ✅ | 8051a2e |
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ✅ | f12c5fe |
 | 8 | 0x32e80..0x33654 | 23 | 44 | ✅ | 9892a81 |
-| 9 | 0x33654..0x3407c | 23 | 63 | ⬜ | |
+| 9 | 0x33654..0x3407c | 23 | 63 | ✅ | f02seg9 |
 | 10 | 0x3407c..0x35f54 | 17 | 246 | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -543,6 +543,70 @@
 
 ---
 
+### 4.09 Seg-9 完成记录 (0x08033654..0x0803407c, 23 fn)
+
+**函数列表**:
+| addr       | name                                    |
+|------------|-----------------------------------------|
+| 0x08033654 | find_first_placeable_monster_slot       |
+| 0x08033688 | check_slot_equip_eligibility            |
+| 0x08033730 | check_slot_card_can_be_equipped         |
+| 0x080337f0 | check_equip_cards_share_field7          |
+| 0x080338b8 | count_equip_placements_with_chain_check |
+| 0x080339d8 | count_equippable_slots_for_card         |
+| 0x08033a6c | count_slots_equippable_by_state_code    |
+| 0x08033b08 | count_equip_slots_active_only           |
+| 0x08033b18 | count_equip_slots_matching_whitelist    |
+| 0x08033bb0 | check_slot_available_for_card           |
+| 0x08033bf4 | find_first_available_monster_slot_for_player |
+| 0x08033c44 | count_available_field_zones_for_player  |
+| 0x08033c9c | check_field_spell_placement_allowed     |
+| 0x08033cf8 | check_player_has_equip_type_in_slots    |
+| 0x08033d44 | check_any_slot_fieldspell_zone_eligible |
+| 0x08033d98 | count_hand_slots_with_field6_val_0x17   |
+| 0x08033de4 | count_hand_slots_with_field6_val_0x16   |
+| 0x08033e30 | count_spell_zone_slots_with_empty_chain |
+| 0x08033e70 | count_hand_cards_by_field6              |
+| 0x08033ecc | count_graveyard_cards_by_field7_value   |
+| 0x08033f28 | count_graveyard_equip_cards_by_field9   |
+| 0x08033fa4 | count_graveyard_fieldspell_cards_by_field9 |
+| 0x08034020 | count_hand_cards_by_field6_alt          |
+
+**符号化统计**:
+- EQ_SLOTS: 57 (39 EQ_REUSE + 18 EQ_NEW via new card_info.inc constants)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x20 + gDuelFieldSlots x13 + SPATIAL_COLLAPSE_CARD_ID x3 + gDuelFieldSlots_p2_base x1 + gP1HandSlotArray x2
+  - EQ_NEW: EQUIP_LOCKDOWN_CID x4 + EQUIP_ZONE_BLOCKER_CID x1 + EQUIP_LOCK_A_CID x1 + EQUIP_LOCK_B_CID x1 + EQUIP_ELIG_EXCL_A/B/C/D x4 + EQUIP_PAIR_EXCL_A/B/C x3 + EQUIP_PAIR_RANGE_MAX x1 + EQUIP_CHAIN_PAIR_CARD_MAX x1 + MONSTER_SLOT_ORDER_TABLE x1 + AVAIL_SLOT_ORDER_TABLE x1
+- REF_SLOTS: 0
+- RENAME_SLOTS: 6 (PTR_gP1LifePoints x6)
+- PLATE_FULL: 3 (CJK->ASCII 全段重写, Ghidra readback 3/3 无 FUN_ 残留)
+- carve: 2 (monster_slot_order_table @0x09e3ef4c/20B + available_slot_order_table @0x09e3ef60/20B)
+- disasm: 0 / §5.1: 0
+
+**新建 constants** (13 项, card_info.inc Seg-9 additions block):
+- EQUIP_LOCKDOWN_CID=0x13f2, EQUIP_ZONE_BLOCKER_CID=0x13eb
+- EQUIP_LOCK_A_CID=0x16a4, EQUIP_LOCK_B_CID=0x12d1
+- EQUIP_ELIG_EXCL_A=0x14f9, EQUIP_ELIG_EXCL_B=0x1836, EQUIP_ELIG_EXCL_C=0x1670, EQUIP_ELIG_EXCL_D=0x19ee
+- EQUIP_PAIR_EXCL_A=0x17e9, EQUIP_PAIR_EXCL_B=0x1521, EQUIP_PAIR_EXCL_C=0x1798
+- EQUIP_PAIR_RANGE_MAX=0x1874, EQUIP_CHAIN_PAIR_CARD_MAX=0x164f
+
+**carve 验证**: 0x1534+0x14+0x14+0xAD98=0xC2F4 (== host incbin size) ✅
+
+**C8 plate 验证**:
+- 3 个 plate 全用 setPlateComment 整段重写, 写入后 readback re 扫描确认 3/3 无 FUN_ 残留
+- Non-ASCII scan: 0 行 ✅
+- 段范围行中残余 FUN_: 4 处均在其他函数 plate 的跨模块 callee 上下文 (非 stale 主语, 属正常)
+
+**落地踩坑记录**:
+- MONSTER_SLOT_ORDER_TABLE/AVAIL_SLOT_ORDER_TABLE 是 rom.s carve label，不能作为 equate 导出到 asm (会产生 undefined reference); 修复: asm/02_text_lp_fieldspell.s 中两处 `.word MONSTER_SLOT_ORDER_TABLE/AVAIL_SLOT_ORDER_TABLE` 手改为 `.word monster_slot_order_table/available_slot_order_table` (carve label)。
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg9Slots.py` (EQ57/REF0/RENAME6/PLATE_FULL3)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 02 范围 `[0x0802c238, 0x08035f54)` (span 0x9D1C, 224 named fn [305 含 81 switchD 跳转表
@@ -559,7 +623,7 @@
 | Seg-6 | 0x313dc..0x3217c | 23 | 64 | — | equip card set-code / slot ref array |
 | Seg-7 | 0x3217c..0x32e80 | 23 | 67 | — | ✅ zone slot chain refs clear/dispatch + effect zone offset symbolization |
 | Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | ✅ monster slot count/state scan + field spell placement check |
-| Seg-9 | 0x33654..0x3407c | 23 | 63 | — | placeable monster slot find |
+| Seg-9 | 0x33654..0x3407c | 23 | 63 | — | ✅ equip slot eligibility/lock + monster slot find + carve 2 slot-order tables |
 | Seg-10 | 0x3407c..0x35f54 | 17 | 246 | — | slot target eligibility full + fieldspell zone (重) |
 
 执行约定同 file 00/01: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;

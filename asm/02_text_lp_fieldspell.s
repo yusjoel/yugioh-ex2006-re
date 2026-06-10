@@ -16412,7 +16412,7 @@ find_first_placeable_monster_slot:
     push {r4,r5,r6,r7,lr}                    @ 08033654 f0b5
     adds r7,r0,#0x0    @ 08033656 071c
     movs r6,#0x0    @ 08033658 0026
-    ldr r5, DAT_08033670                     @ 0803365a 054d
+    ldr r5, find_first_place_slot_order_tbl  @ 0803365a 054d
 LAB_0803365c:
     ldr r4,[r5,#0x0]                         @ 0803365c 2c68
     adds r0,r7,#0x0    @ 0803365e 381c
@@ -16423,8 +16423,8 @@ LAB_0803365c:
     adds r0,r4,#0x0    @ 0803366a 201c
     b LAB_08033680                           @ 0803366c 08e0
     .zero  0x2
-DAT_08033670:
-    .word  0x09e3ef4c                     @ 08033670 4cefe309
+find_first_place_slot_order_tbl:
+    .word  monster_slot_order_table       @ 08033670 4cefe309  slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef4c
 LAB_08033674:
     adds r5,#0x4    @ 08033674 0435
     adds r6,#0x1    @ 08033676 0136
@@ -16450,15 +16450,15 @@ check_slot_equip_eligibility:
     lsls r0,r5,#0x2    @ 08033696 a800
     adds r0,r0,r5    @ 08033698 4019
     lsls r0,r0,#0x2    @ 0803369a 8000
-    ldr r1, DAT_080336bc                     @ 0803369c 0749
+    ldr r1, check_slot_equip_elig_stride     @ 0803369c 0749
     muls r1,r2    @ 0803369e 5143
     adds r2,r0,r1    @ 080336a0 4218
-    ldr r4, DAT_080336c0                     @ 080336a2 074c
+    ldr r4, check_slot_equip_elig_slots      @ 080336a2 074c
     adds r3,r2,r4    @ 080336a4 1319
     ldr r0,[r3,#0x0]                         @ 080336a6 1868
     lsls r0,r0,#0x13    @ 080336a8 c004
     lsrs r1,r0,#0x13    @ 080336aa c10c
-    ldr r0, DAT_080336c4                     @ 080336ac 0548
+    ldr r0, check_slot_equip_elig_excl_a     @ 080336ac 0548
     cmp r1,r0                                @ 080336ae 8142
     bgt LAB_080336c8                         @ 080336b0 0adc
     subs r0,#0x1    @ 080336b2 0138
@@ -16466,30 +16466,30 @@ check_slot_equip_eligibility:
     bge LAB_0803371a                         @ 080336b6 30da
     subs r0,#0xd6    @ 080336b8 d638
     b LAB_080336d4                           @ 080336ba 0be0
-DAT_080336bc:
-    .word  0x00000868                     @ 080336bc 68080000
-DAT_080336c0:
-    .word  0x0201c510                     @ 080336c0 10c50102
-DAT_080336c4:
-    .word  0x000014f9                     @ 080336c4 f9140000
+check_slot_equip_elig_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080336bc 68080000
+check_slot_equip_elig_slots:
+    .word  gDuelFieldSlots                @ 080336c0 10c50102
+check_slot_equip_elig_excl_a:
+    .word  EQUIP_ELIG_EXCL_A              @ 080336c4 f9140000  equip elig exclusion id A (blocks equip, unoccupied check)
 LAB_080336c8:
-    ldr r0, DAT_080336dc                     @ 080336c8 0448
+    ldr r0, check_slot_equip_elig_excl_b     @ 080336c8 0448
     cmp r1,r0                                @ 080336ca 8142
     beq LAB_080336fc                         @ 080336cc 16d0
     cmp r1,r0                                @ 080336ce 8142
     bgt LAB_080336e4                         @ 080336d0 08dc
-    ldr r0, DAT_080336e0                     @ 080336d2 0348
+    ldr r0, check_slot_equip_elig_excl_c     @ 080336d2 0348
 LAB_080336d4:
     cmp r1,r0                                @ 080336d4 8142
     beq LAB_0803371a                         @ 080336d6 20d0
     b LAB_0803371e                           @ 080336d8 21e0
     .zero  0x2
-DAT_080336dc:
-    .word  0x00001836                     @ 080336dc 36180000
-DAT_080336e0:
-    .word  0x00001670                     @ 080336e0 70160000
+check_slot_equip_elig_excl_b:
+    .word  EQUIP_ELIG_EXCL_B              @ 080336dc 36180000  equip elig exclusion id B (blocks equip, bit-flag check)
+check_slot_equip_elig_excl_c:
+    .word  EQUIP_ELIG_EXCL_C              @ 080336e0 70160000  equip elig exclusion id C
 LAB_080336e4:
-    ldr r0, DAT_080336f8                     @ 080336e4 0448
+    ldr r0, check_slot_equip_elig_excl_d     @ 080336e4 0448
     cmp r1,r0                                @ 080336e6 8142
     bne LAB_0803371e                         @ 080336e8 19d1
     adds r0,r4,#0x0    @ 080336ea 201c
@@ -16499,8 +16499,8 @@ LAB_080336e4:
     lsrs r0,r0,#0x12    @ 080336f2 800c
     ands r0,r6    @ 080336f4 3040
     b LAB_08033716                           @ 080336f6 0ee0
-DAT_080336f8:
-    .word  0x000019ee                     @ 080336f8 ee190000
+check_slot_equip_elig_excl_d:
+    .word  EQUIP_ELIG_EXCL_D              @ 080336f8 ee190000  equip elig exclusion id D (bit18 check)
 LAB_080336fc:
     adds r0,r4,#0x0    @ 080336fc 201c
     adds r0,#0x10    @ 080336fe 1030
@@ -16543,10 +16543,10 @@ check_slot_card_can_be_equipped:
     lsls r0,r4,#0x2    @ 0803373c a000
     adds r0,r0,r4    @ 0803373e 0019
     lsls r0,r0,#0x2    @ 08033740 8000
-    ldr r1, DAT_080337d0                     @ 08033742 2349
+    ldr r1, check_slot_can_equip_stride      @ 08033742 2349
     muls r1,r2    @ 08033744 5143
     adds r0,r0,r1    @ 08033746 4018
-    ldr r1, DAT_080337d4                     @ 08033748 2249
+    ldr r1, check_slot_can_equip_slots       @ 08033748 2249
     adds r0,r0,r1    @ 0803374a 4018
     ldr r0,[r0,#0x0]                         @ 0803374c 0068
     lsls r0,r0,#0x13    @ 0803374e c004
@@ -16555,13 +16555,13 @@ check_slot_card_can_be_equipped:
     beq LAB_080337cc                         @ 08033754 3ad0
     cmp r4,#0x4                              @ 08033756 042c
     bgt LAB_080337cc                         @ 08033758 38dc
-    ldr r0, DAT_080337d8                     @ 0803375a 1f48
+    ldr r0, check_slot_can_equip_lockdown    @ 0803375a 1f48
     bl count_field_copies_of_card            @ 0803375c fff71ef8
     cmp r0,#0x0                              @ 08033760 0028
     bgt LAB_080337cc                         @ 08033762 33dc
     cmp r6,r5                                @ 08033764 ae42
     beq LAB_08033778                         @ 08033766 07d0
-    ldr r2, DAT_080337dc                     @ 08033768 1c4a
+    ldr r2, check_slot_can_equip_blocker     @ 08033768 1c4a
     adds r0,r5,#0x0    @ 0803376a 281c
     adds r1,r4,#0x0    @ 0803376c 211c
     adds r3,r6,#0x0    @ 0803376e 331c
@@ -16569,13 +16569,13 @@ check_slot_card_can_be_equipped:
     cmp r0,#0x0                              @ 08033774 0028
     beq LAB_080337cc                         @ 08033776 29d0
 LAB_08033778:
-    ldr r2, DAT_080337e0                     @ 08033778 194a
+    ldr r2, check_slot_can_equip_lock_a      @ 08033778 194a
     adds r0,r5,#0x0    @ 0803377a 281c
     adds r1,r4,#0x0    @ 0803377c 211c
     bl check_value_in_slot_chain             @ 0803377e fcf787fa
     cmp r0,#0x0                              @ 08033782 0028
     bne LAB_080337cc                         @ 08033784 22d1
-    ldr r2, DAT_080337e4                     @ 08033786 174a
+    ldr r2, check_slot_can_equip_lock_b      @ 08033786 174a
     adds r0,r5,#0x0    @ 08033788 281c
     adds r1,r4,#0x0    @ 0803378a 211c
     bl check_value_in_slot_chain             @ 0803378c fcf780fa
@@ -16590,10 +16590,10 @@ LAB_08033778:
     lsls r1,r4,#0x2    @ 080337a0 a100
     adds r1,r1,r4    @ 080337a2 0919
     lsls r1,r1,#0x2    @ 080337a4 8900
-    ldr r0, DAT_080337d0                     @ 080337a6 0a48
+    ldr r0, check_slot_can_equip_stride      @ 080337a6 0a48
     muls r0,r5    @ 080337a8 6843
     adds r1,r1,r0    @ 080337aa 0918
-    ldr r0, DAT_080337d4                     @ 080337ac 0948
+    ldr r0, check_slot_can_equip_slots       @ 080337ac 0948
     adds r3,r1,r0    @ 080337ae 0b18
     adds r0,#0x10    @ 080337b0 1030
     adds r1,r1,r0    @ 080337b2 0918
@@ -16612,18 +16612,18 @@ LAB_08033778:
 LAB_080337cc:
     movs r0,#0x0    @ 080337cc 0020
     b LAB_080337ea                           @ 080337ce 0ce0
-DAT_080337d0:
-    .word  0x00000868                     @ 080337d0 68080000
-DAT_080337d4:
-    .word  0x0201c510                     @ 080337d4 10c50102
-DAT_080337d8:
-    .word  0x000013f2                     @ 080337d8 f2130000
-DAT_080337dc:
-    .word  0x000013eb                     @ 080337dc eb130000
-DAT_080337e0:
-    .word  0x000016a4                     @ 080337e0 a4160000
-DAT_080337e4:
-    .word  0x000012d1                     @ 080337e4 d1120000
+check_slot_can_equip_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080337d0 68080000
+check_slot_can_equip_slots:
+    .word  gDuelFieldSlots                @ 080337d4 10c50102
+check_slot_can_equip_lockdown:
+    .word  EQUIP_LOCKDOWN_CID             @ 080337d8 f2130000  equip lockdown effect: count_field_copies>0 blocks all equip placement
+check_slot_can_equip_blocker:
+    .word  EQUIP_ZONE_BLOCKER_CID         @ 080337dc eb130000  cross-player equip blocker: absent -> return 0
+check_slot_can_equip_lock_a:
+    .word  EQUIP_LOCK_A_CID               @ 080337e0 a4160000  equip lock chain effect A (check_value_in_slot_chain)
+check_slot_can_equip_lock_b:
+    .word  EQUIP_LOCK_B_CID               @ 080337e4 d1120000  equip lock chain effect B (check_value_in_slot_chain)
 LAB_080337e8:
     movs r0,#0x1    @ 080337e8 0120
 LAB_080337ea:
@@ -16638,14 +16638,14 @@ check_equip_cards_share_field7:
     .hword 0x468c    @ 080337f4 8c46
     adds r6,r2,#0x0    @ 080337f6 161c
     adds r5,r3,#0x0    @ 080337f8 1d1c
-    ldr r7, PTR_gP1LifePoints_08033850       @ 080337fa 154f
+    ldr r7, check_equip_share_f7_gp1lp       @ 080337fa 154f
     lsls r2,r5,#0x2    @ 080337fc aa00
     adds r2,r2,r5    @ 080337fe 5219
     lsls r2,r2,#0x2    @ 08033800 9200
     movs r3,#0x1    @ 08033802 0123
     adds r0,r6,#0x0    @ 08033804 301c
     ands r0,r3    @ 08033806 1840
-    ldr r1, DAT_08033854                     @ 08033808 1249
+    ldr r1, check_equip_share_f7_stride      @ 08033808 1249
     muls r0,r1    @ 0803380a 4843
     adds r2,r2,r0    @ 0803380c 1218
     adds r0,r7,#0x0    @ 0803380e 381c
@@ -16669,31 +16669,31 @@ LAB_0803382e:
     ldr r0,[r0,#0x0]                         @ 08033830 0068
     lsls r0,r0,#0x13    @ 08033832 c004
     lsrs r2,r0,#0x13    @ 08033834 c20c
-    ldr r0, DAT_08033858                     @ 08033836 0848
+    ldr r0, check_equip_share_f7_excl_a      @ 08033836 0848
     cmp r2,r0                                @ 08033838 8242
     bgt LAB_08033864                         @ 0803383a 13dc
     subs r0,#0x1    @ 0803383c 0138
     cmp r2,r0                                @ 0803383e 8242
     bge LAB_08033870                         @ 08033840 16da
-    ldr r0, DAT_0803385c                     @ 08033842 0648
+    ldr r0, check_equip_share_f7_excl_b      @ 08033842 0648
     cmp r2,r0                                @ 08033844 8242
     beq LAB_08033870                         @ 08033846 13d0
-    ldr r0, DAT_08033860                     @ 08033848 0548
+    ldr r0, check_equip_share_f7_excl_c      @ 08033848 0548
     cmp r2,r0                                @ 0803384a 8242
     beq LAB_08033870                         @ 0803384c 10d0
     b LAB_080338b0                           @ 0803384e 2fe0
-PTR_gP1LifePoints_08033850:
-    .word  gP1LifePoints                  @ 08033850 e0c40102
-DAT_08033854:
-    .word  0x00000868                     @ 08033854 68080000
-DAT_08033858:
-    .word  0x000017e9                     @ 08033858 e9170000
-DAT_0803385c:
-    .word  0x00001521                     @ 0803385c 21150000
-DAT_08033860:
-    .word  0x00001798                     @ 08033860 98170000
+check_equip_share_f7_gp1lp:
+    .word  gP1LifePoints                  @ 08033850 e0c40102  gP1LifePoints: P1 life points base for field7 equip pair check
+check_equip_share_f7_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033854 68080000
+check_equip_share_f7_excl_a:
+    .word  EQUIP_PAIR_EXCL_A              @ 08033858 e9170000  field7-match pair exclusion id A (BST whitelist)
+check_equip_share_f7_excl_b:
+    .word  EQUIP_PAIR_EXCL_B              @ 0803385c 21150000  field7-match pair exclusion id B
+check_equip_share_f7_excl_c:
+    .word  EQUIP_PAIR_EXCL_C              @ 08033860 98170000  field7-match pair exclusion id C
 LAB_08033864:
-    ldr r0, DAT_080338a4                     @ 08033864 0f48
+    ldr r0, check_equip_share_f7_range_max   @ 08033864 0f48
     cmp r2,r0                                @ 08033866 8242
     bgt LAB_080338b0                         @ 08033868 22dc
     subs r0,#0x1    @ 0803386a 0138
@@ -16708,10 +16708,10 @@ LAB_08033870:
     lsls r0,r5,#0x2    @ 0803387c a800
     adds r0,r0,r5    @ 0803387e 4019
     lsls r0,r0,#0x2    @ 08033880 8000
-    ldr r1, DAT_080338a8                     @ 08033882 0949
+    ldr r1, check_equip_share_f7_stride_b    @ 08033882 0949
     muls r1,r2    @ 08033884 5143
     adds r0,r0,r1    @ 08033886 4018
-    ldr r1, DAT_080338ac                     @ 08033888 0849
+    ldr r1, check_equip_share_f7_slots       @ 08033888 0849
     adds r0,r0,r1    @ 0803388a 4018
     ldr r0,[r0,#0x0]                         @ 0803388c 0068
     lsls r0,r0,#0x13    @ 0803388e c004
@@ -16725,12 +16725,12 @@ LAB_0803389e:
     adds r0,r1,#0x0    @ 0803389e 081c
     b LAB_080338b2                           @ 080338a0 07e0
     .zero  0x2
-DAT_080338a4:
-    .word  0x00001874                     @ 080338a4 74180000
-DAT_080338a8:
-    .word  0x00000868                     @ 080338a8 68080000
-DAT_080338ac:
-    .word  0x0201c510                     @ 080338ac 10c50102
+check_equip_share_f7_range_max:
+    .word  EQUIP_PAIR_RANGE_MAX           @ 080338a4 74180000  BST range max for field7 pair check: IDs in [0x1873..0x1874] pass
+check_equip_share_f7_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080338a8 68080000
+check_equip_share_f7_slots:
+    .word  gDuelFieldSlots                @ 080338ac 10c50102
 LAB_080338b0:
     movs r0,#0x0    @ 080338b0 0020
 LAB_080338b2:
@@ -16751,14 +16751,14 @@ count_equip_placements_with_chain_check:
     str r2,[sp,#0x4]                         @ 080338c8 0192
     movs r0,#0x0    @ 080338ca 0020
     str r0,[sp,#0xc]                         @ 080338cc 0390
-    ldr r0, DAT_080338dc                     @ 080338ce 0348
+    ldr r0, count_equip_placements_lockdown  @ 080338ce 0348
     bl count_field_copies_of_card            @ 080338d0 fef764ff
     cmp r0,#0x0                              @ 080338d4 0028
     ble LAB_080338e0                         @ 080338d6 03dd
     movs r0,#0x0    @ 080338d8 0020
     b LAB_080339ba                           @ 080338da 6ee0
-DAT_080338dc:
-    .word  0x000013f2                     @ 080338dc f2130000
+count_equip_placements_lockdown:
+    .word  EQUIP_LOCKDOWN_CID             @ 080338dc f2130000  same lockdown cid as check_slot_can_equip_lockdown
 LAB_080338e0:
     movs r1,#0x0    @ 080338e0 0021
     str r1,[sp,#0x8]                         @ 080338e2 0291
@@ -16778,12 +16778,12 @@ LAB_080338f8:
     lsls r0,r1,#0x2    @ 080338fa 8800
     add r0,r8                                @ 080338fc 4044
     lsls r0,r0,#0x2    @ 080338fe 8000
-    ldr r4, DAT_080339cc                     @ 08033900 324c
+    ldr r4, count_equip_placements_stride    @ 08033900 324c
     ldr r2,[sp,#0x10]                        @ 08033902 049a
     adds r1,r2,#0x0    @ 08033904 111c
     muls r1,r4    @ 08033906 6143
     adds r0,r0,r1    @ 08033908 4018
-    ldr r1, DAT_080339d0                     @ 0803390a 3149
+    ldr r1, count_equip_placements_slots     @ 0803390a 3149
     adds r0,r0,r1    @ 0803390c 4018
     ldr r0,[r0,#0x0]                         @ 0803390e 0068
     lsls r0,r0,#0x13    @ 08033910 c004
@@ -16800,7 +16800,7 @@ LAB_080338f8:
     beq LAB_080339a8                         @ 08033928 3ed0
     movs r2,#0x1    @ 0803392a 0122
     str r2,[sp,#0x14]                        @ 0803392c 0592
-    ldr r0, DAT_080339d4                     @ 0803392e 2948
+    ldr r0, count_equip_placements_pair_max  @ 0803392e 2948
     cmp r10,r0                               @ 08033930 8245
     bgt LAB_0803398e                         @ 08033932 2cdc
     subs r0,#0x5    @ 08033934 0538
@@ -16822,7 +16822,7 @@ LAB_080338f8:
 LAB_08033954:
     .hword 0x464a    @ 08033954 4a46
     adds r1,r7,r2    @ 08033956 b918
-    ldr r0, DAT_080339d0                     @ 08033958 1d48
+    ldr r0, count_equip_placements_slots     @ 08033958 1d48
     adds r5,r1,r0    @ 0803395a 0d18
     ldr r4,[r5,#0x0]                         @ 0803395c 2c68
     lsls r4,r4,#0x13    @ 0803395e e404
@@ -16881,12 +16881,12 @@ LAB_080339ba:
     pop {r1}                                 @ 080339c6 02bc
     bx r1                                    @ 080339c8 0847
     .zero  0x2
-DAT_080339cc:
-    .word  0x00000868                     @ 080339cc 68080000
-DAT_080339d0:
-    .word  0x0201c510                     @ 080339d0 10c50102
-DAT_080339d4:
-    .word  0x0000164f                     @ 080339d4 4f160000
+count_equip_placements_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080339cc 68080000
+count_equip_placements_slots:
+    .word  gDuelFieldSlots                @ 080339d0 10c50102
+count_equip_placements_pair_max:
+    .word  EQUIP_CHAIN_PAIR_CARD_MAX      @ 080339d4 4f160000  max card_id threshold for chain pairing path in count_equip_placements_with_chain_check
 
 @ Count across both players' 5 monster slots satisfying check_slot_card_can_be_equipped for equip_card_id (r0). r10=slot_key non-APCS (encodes (player_byte<<8)|slot_byte, exclude self); result accumulated in r8. Pre-check: count_field_copies_of_card(0x13f2) > 0 -> return 0. r0=u32 equip_card_id [0..0x1fff]; r10 (non-APCS, caller-set)=u32 slot_key. Returns u32 count [0..10] via r8. Constants: lockdown_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868.
 count_equippable_slots_for_card:
@@ -16900,15 +16900,15 @@ count_equippable_slots_for_card:
     .hword 0x468a    @ 080339e6 8a46
     movs r0,#0x0    @ 080339e8 0020
     .hword 0x4680    @ 080339ea 8046
-    ldr r0, DAT_080339fc                     @ 080339ec 0348
+    ldr r0, count_equippable_slots_lockdown  @ 080339ec 0348
     bl count_field_copies_of_card            @ 080339ee fef7d5fe
     cmp r0,#0x0                              @ 080339f2 0028
     ble LAB_08033a00                         @ 080339f4 04dd
     movs r0,#0x0    @ 080339f6 0020
     b LAB_08033a52                           @ 080339f8 2be0
     .zero  0x2
-DAT_080339fc:
-    .word  0x000013f2                     @ 080339fc f2130000
+count_equippable_slots_lockdown:
+    .word  EQUIP_LOCKDOWN_CID             @ 080339fc f2130000  same lockdown cid
 LAB_08033a00:
     movs r6,#0x0    @ 08033a00 0026
 LAB_08033a02:
@@ -16921,12 +16921,12 @@ LAB_08033a02:
     lsls r0,r6,#0x18    @ 08033a0e 3006
     lsrs r3,r0,#0x18    @ 08033a10 030e
     movs r5,#0x0    @ 08033a12 0025
-    ldr r0, DAT_08033a64                     @ 08033a14 1348
+    ldr r0, count_equippable_slots_stride    @ 08033a14 1348
     adds r7,r1,#0x0    @ 08033a16 0f1c
     muls r7,r0    @ 08033a18 4743
 LAB_08033a1a:
     adds r0,r5,r7    @ 08033a1a e819
-    ldr r1, DAT_08033a68                     @ 08033a1c 1249
+    ldr r1, count_equippable_slots_slots     @ 08033a1c 1249
     adds r0,r0,r1    @ 08033a1e 4018
     ldr r0,[r0,#0x0]                         @ 08033a20 0068
     lsls r0,r0,#0x13    @ 08033a22 c004
@@ -16963,10 +16963,10 @@ LAB_08033a52:
     pop {r1}                                 @ 08033a5e 02bc
     bx r1                                    @ 08033a60 0847
     .zero  0x2
-DAT_08033a64:
-    .word  0x00000868                     @ 08033a64 68080000
-DAT_08033a68:
-    .word  0x0201c510                     @ 08033a68 10c50102
+count_equippable_slots_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033a64 68080000
+count_equippable_slots_slots:
+    .word  gDuelFieldSlots                @ 08033a68 10c50102
 
 @ Counts zone slots across both players that can accept an equip card with the given state_code. Guard: count_field_copies_of_card(0x13f2)>0 -> return 0 (card 0x13f2 on field blocks). Main loop: player=[0,1] x slot=[0..4] over gDuelFieldSlots (0x0201c510), tests bit19=occupied; if player==r8 (target side) or slot[+8]!=0, calls get_slot_card_state_code(player, slot_idx) and compares with sp[0]=r1; on match calls check_slot_card_can_be_equipped; increments r9. Returns r9 (count). Called only by check_zone_slot_equip_eligible (0x08037434) at card_id==0x15b4 path with state_code=1. Side effects: read-only. Constants: guard_card_id=0x13f2, gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot_count=5.
 count_slots_equippable_by_state_code:
@@ -16980,15 +16980,15 @@ count_slots_equippable_by_state_code:
     str r1,[sp,#0x0]                         @ 08033a7a 0091
     movs r0,#0x0    @ 08033a7c 0020
     .hword 0x4681    @ 08033a7e 8146
-    ldr r0, DAT_08033a90                     @ 08033a80 0348
+    ldr r0, count_slots_by_state_lockdown    @ 08033a80 0348
     bl count_field_copies_of_card            @ 08033a82 fef78bfe
     cmp r0,#0x0                              @ 08033a86 0028
     ble LAB_08033a94                         @ 08033a88 04dd
     movs r0,#0x0    @ 08033a8a 0020
     b LAB_08033af0                           @ 08033a8c 30e0
     .zero  0x2
-DAT_08033a90:
-    .word  0x000013f2                     @ 08033a90 f2130000
+count_slots_by_state_lockdown:
+    .word  EQUIP_LOCKDOWN_CID             @ 08033a90 f2130000  same lockdown cid
 LAB_08033a94:
     movs r5,#0x0    @ 08033a94 0025
 LAB_08033a96:
@@ -16999,12 +16999,12 @@ LAB_08033a96:
     movs r1,#0x1    @ 08033a9e 0121
     ands r0,r1    @ 08033aa0 0840
     movs r6,#0x0    @ 08033aa2 0026
-    ldr r1, DAT_08033b00                     @ 08033aa4 1649
+    ldr r1, count_slots_by_state_stride      @ 08033aa4 1649
     adds r7,r0,#0x0    @ 08033aa6 071c
     muls r7,r1    @ 08033aa8 4f43
 LAB_08033aaa:
     adds r1,r6,r7    @ 08033aaa f119
-    ldr r0, DAT_08033b04                     @ 08033aac 1548
+    ldr r0, count_slots_by_state_slots       @ 08033aac 1548
     adds r1,r1,r0    @ 08033aae 0918
     ldr r0,[r1,#0x0]                         @ 08033ab0 0868
     lsls r0,r0,#0x13    @ 08033ab2 c004
@@ -17047,10 +17047,10 @@ LAB_08033af0:
     pop {r4,r5,r6,r7}                        @ 08033afa f0bc
     pop {r1}                                 @ 08033afc 02bc
     bx r1                                    @ 08033afe 0847
-DAT_08033b00:
-    .word  0x00000868                     @ 08033b00 68080000
-DAT_08033b04:
-    .word  0x0201c510                     @ 08033b04 10c50102
+count_slots_by_state_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033b00 68080000
+count_slots_by_state_slots:
+    .word  gDuelFieldSlots                @ 08033b04 10c50102
 
 @ Wrapper that calls count_equip_slots_matching_whitelist (0x08033b18) with fixed args (r1=0 card_ptr null, r2=0 start_count, r3=1 allow_face_down=true). Forwards r0 (player_id_ptr) unchanged. Returns total active equip slot count for the player. Pure read-only forwarding. 12 callers including FUN_08030500 (batch-internal), FUN_08064880, FUN_0809bf60, FUN_080ad974 (duel_field).
 count_equip_slots_active_only:
@@ -17085,9 +17085,9 @@ LAB_08033b36:
     bge LAB_08033b9e                         @ 08033b3a 30da
     movs r0,#0x1    @ 08033b3c 0120
     ands r0,r7    @ 08033b3e 3840
-    ldr r1, DAT_08033b74                     @ 08033b40 0c49
+    ldr r1, count_equip_whitelist_stride     @ 08033b40 0c49
     muls r1,r0    @ 08033b42 4143
-    ldr r0, DAT_08033b78                     @ 08033b44 0c48
+    ldr r0, count_equip_whitelist_slots      @ 08033b44 0c48
     adds r4,r1,r0    @ 08033b46 0c18
 LAB_08033b48:
     ldr r0,[r4,#0x0]                         @ 08033b48 2068
@@ -17112,10 +17112,10 @@ LAB_08033b64:
     bne LAB_08033b88                         @ 08033b6e 0bd1
     b LAB_08033b82                           @ 08033b70 07e0
     .zero  0x2
-DAT_08033b74:
-    .word  0x00000868                     @ 08033b74 68080000
-DAT_08033b78:
-    .word  0x0201c510                     @ 08033b78 10c50102
+count_equip_whitelist_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033b74 68080000
+count_equip_whitelist_slots:
+    .word  gDuelFieldSlots                @ 08033b78 10c50102
 LAB_08033b7c:
     ldrh r0,[r4,#0x8]                        @ 08033b7c 2089
     cmp r0,#0x0                              @ 08033b7e 0028
@@ -17160,10 +17160,10 @@ check_slot_available_for_card:
     lsls r0,r3,#0x2    @ 08033bba 9800
     adds r0,r0,r3    @ 08033bbc c018
     lsls r0,r0,#0x2    @ 08033bbe 8000
-    ldr r1, DAT_08033be4                     @ 08033bc0 0849
+    ldr r1, check_slot_available_stride      @ 08033bc0 0849
     muls r1,r2    @ 08033bc2 5143
     adds r0,r0,r1    @ 08033bc4 4018
-    ldr r1, DAT_08033be8                     @ 08033bc6 0849
+    ldr r1, check_slot_available_slots       @ 08033bc6 0849
     adds r0,r0,r1    @ 08033bc8 4018
     ldr r0,[r0,#0x0]                         @ 08033bca 0068
     lsls r0,r0,#0x13    @ 08033bcc c004
@@ -17177,10 +17177,10 @@ check_slot_available_for_card:
     movs r0,#0x1    @ 08033bde 0120
     b LAB_08033bee                           @ 08033be0 05e0
     .zero  0x2
-DAT_08033be4:
-    .word  0x00000868                     @ 08033be4 68080000
-DAT_08033be8:
-    .word  0x0201c510                     @ 08033be8 10c50102
+check_slot_available_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033be4 68080000
+check_slot_available_slots:
+    .word  gDuelFieldSlots                @ 08033be8 10c50102
 LAB_08033bec:
     movs r0,#0x0    @ 08033bec 0020
 LAB_08033bee:
@@ -17192,7 +17192,7 @@ LAB_08033bee:
 find_first_available_monster_slot_for_player:
     push {r4,r5,r6,r7,lr}                    @ 08033bf4 f0b5
     adds r7,r0,#0x0    @ 08033bf6 071c
-    ldr r0, DAT_08033c10                     @ 08033bf8 0548
+    ldr r0, find_first_avail_slot_spatial_cid @ 08033bf8 0548
     bl count_field_copies_of_card            @ 08033bfa fef7cffd
     cmp r0,#0x0                              @ 08033bfe 0028
     beq LAB_08033c18                         @ 08033c00 0ad0
@@ -17202,14 +17202,14 @@ find_first_available_monster_slot_for_player:
     ble LAB_08033c18                         @ 08033c0a 05dd
     b LAB_08033c34                           @ 08033c0c 12e0
     .zero  0x2
-DAT_08033c10:
-    .word  0x000016df                     @ 08033c10 df160000
+find_first_avail_slot_spatial_cid:
+    .word  SPATIAL_COLLAPSE_CARD_ID       @ 08033c10 df160000  Spatial Collapse field spell; >4 occupied zones -> return -1
 LAB_08033c14:
     adds r0,r4,#0x0    @ 08033c14 201c
     b LAB_08033c38                           @ 08033c16 0fe0
 LAB_08033c18:
     movs r6,#0x0    @ 08033c18 0026
-    ldr r5, DAT_08033c40                     @ 08033c1a 094d
+    ldr r5, find_first_avail_slot_order_tbl  @ 08033c1a 094d
 LAB_08033c1c:
     ldr r0,[r5,#0x0]                         @ 08033c1c 2868
     adds r4,r0,#0x5    @ 08033c1e 441d
@@ -17230,8 +17230,8 @@ LAB_08033c38:
     pop {r1}                                 @ 08033c3a 02bc
     bx r1                                    @ 08033c3c 0847
     .zero  0x2
-DAT_08033c40:
-    .word  0x09e3ef60                     @ 08033c40 60efe309
+find_first_avail_slot_order_tbl:
+    .word  available_slot_order_table     @ 08033c40 60efe309  available slot priority order table ptr [2,3,1,4,0]; GBA 0x09e3ef60
 
 @ Called by eval_field_spell_equip_activation_candidate (0x080bb9b8, duel_field) and 0x08061e20 (indeg=2) with r0=player_id. Computes the number of available field zones for the player: scans slots 5..9 (5 magic/trap zones), calls check_slot_available_for_card for each and accumulates count in r5. Then if special card 0x16df exists (count_field_copies_of_card > 0), subtracts count_occupied_all_field_zones(player) from the count, clamped to 0 as lower bound. Returns final available zone count. Pure read-only query with no external side effects. Inputs: r0=player_id [0..1]. Returns: r0=u32 count (available field zones [0..5]). Side effects: none. Constants: special_field_card=0x16df (dual field-type special card icid), slot_range=[5..9] (5 magic/trap zone slots), max_zones=5.
 count_available_field_zones_for_player:
@@ -17250,7 +17250,7 @@ LAB_08033c5a:
     adds r4,#0x1    @ 08033c5a 0134
     cmp r4,#0x9                              @ 08033c5c 092c
     ble LAB_08033c4c                         @ 08033c5e f5dd
-    ldr r0, DAT_08033c84                     @ 08033c60 0848
+    ldr r0, count_avail_field_zones_spatial_cid @ 08033c60 0848
     bl count_field_copies_of_card            @ 08033c62 fef79bfd
     cmp r0,#0x0                              @ 08033c66 0028
     beq LAB_08033c92                         @ 08033c68 13d0
@@ -17265,8 +17265,8 @@ LAB_08033c5a:
     subs r0,r4,r0    @ 08033c7e 201a
     b LAB_08033c8a                           @ 08033c80 03e0
     .zero  0x2
-DAT_08033c84:
-    .word  0x000016df                     @ 08033c84 df160000
+count_avail_field_zones_spatial_cid:
+    .word  SPATIAL_COLLAPSE_CARD_ID       @ 08033c84 df160000  Spatial Collapse: count zone penalty
 LAB_08033c88:
     adds r0,r5,#0x0    @ 08033c88 281c
 LAB_08033c8a:
@@ -17289,15 +17289,15 @@ check_field_spell_placement_allowed:
     bl get_card_extended_stat_field9         @ 08033ca2 bbf0ebf8
     cmp r0,#0x2                              @ 08033ca6 0228
     bne LAB_08033ce0                         @ 08033ca8 1ad1
-    ldr r0, DAT_08033cd4                     @ 08033caa 0a48
+    ldr r0, check_field_spell_place_spatial_cid @ 08033caa 0a48
     bl count_field_copies_of_card            @ 08033cac fef776fd
     cmp r0,#0x0                              @ 08033cb0 0028
     beq LAB_08033cea                         @ 08033cb2 1ad0
     movs r0,#0x1    @ 08033cb4 0120
     ands r0,r4    @ 08033cb6 2040
-    ldr r1, DAT_08033cd8                     @ 08033cb8 0749
+    ldr r1, check_field_spell_place_stride   @ 08033cb8 0749
     muls r0,r1    @ 08033cba 4843
-    ldr r1, DAT_08033cdc                     @ 08033cbc 0749
+    ldr r1, check_field_spell_place_p2base   @ 08033cbc 0749
     adds r0,r0,r1    @ 08033cbe 4018
     ldr r0,[r0,#0x0]                         @ 08033cc0 0068
     lsls r0,r0,#0x13    @ 08033cc2 c004
@@ -17308,12 +17308,12 @@ check_field_spell_placement_allowed:
     cmp r0,#0x4                              @ 08033cce 0428
     bgt LAB_08033cee                         @ 08033cd0 0ddc
     b LAB_08033cea                           @ 08033cd2 0ae0
-DAT_08033cd4:
-    .word  0x000016df                     @ 08033cd4 df160000
-DAT_08033cd8:
-    .word  0x00000868                     @ 08033cd8 68080000
-DAT_08033cdc:
-    .word  0x0201c5d8                     @ 08033cdc d8c50102
+check_field_spell_place_spatial_cid:
+    .word  SPATIAL_COLLAPSE_CARD_ID       @ 08033cd4 df160000  Spatial Collapse: field spell placement block check
+check_field_spell_place_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033cd8 68080000
+check_field_spell_place_p2base:
+    .word  gDuelFieldSlots_p2_base        @ 08033cdc d8c50102
 LAB_08033ce0:
     adds r0,r4,#0x0    @ 08033ce0 201c
     bl find_first_available_monster_slot_for_player @ 08033ce2 fff787ff
@@ -17337,12 +17337,12 @@ check_player_has_equip_type_in_slots:
     movs r1,#0x1    @ 08033cfc 0121
     ands r1,r0    @ 08033cfe 0140
     movs r4,#0x0    @ 08033d00 0024
-    ldr r0, DAT_08033d2c                     @ 08033d02 0a48
+    ldr r0, check_has_equip_type_stride      @ 08033d02 0a48
     adds r6,r1,#0x0    @ 08033d04 0e1c
     muls r6,r0    @ 08033d06 4643
 LAB_08033d08:
     adds r1,r4,r6    @ 08033d08 a119
-    ldr r0, DAT_08033d30                     @ 08033d0a 0948
+    ldr r0, check_has_equip_type_slots       @ 08033d0a 0948
     adds r1,r1,r0    @ 08033d0c 0918
     ldr r0,[r1,#0x0]                         @ 08033d0e 0868
     lsls r0,r0,#0x13    @ 08033d10 c004
@@ -17358,10 +17358,10 @@ LAB_08033d08:
     beq LAB_08033d34                         @ 08033d26 05d0
     movs r0,#0x1    @ 08033d28 0120
     b LAB_08033d3e                           @ 08033d2a 08e0
-DAT_08033d2c:
-    .word  0x00000868                     @ 08033d2c 68080000
-DAT_08033d30:
-    .word  0x0201c510                     @ 08033d30 10c50102
+check_has_equip_type_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033d2c 68080000
+check_has_equip_type_slots:
+    .word  gDuelFieldSlots                @ 08033d30 10c50102
 LAB_08033d34:
     adds r4,#0x14    @ 08033d34 1434
     adds r5,#0x1    @ 08033d36 0135
@@ -17373,7 +17373,7 @@ LAB_08033d3e:
     pop {r1}                                 @ 08033d40 02bc
     bx r1                                    @ 08033d42 0847
 
-@ 当需要判断某一玩家侧 (r0 bit0) 是否存在至少一个合法的场地魔法区位时调用. 函数遍历 gDuelFieldSlots 5 个卡槽 (slot_idx 0..4), 对每槽: (1) 检查 [slot+0] bit9 是否置位 (槽有卡); (2) 检查 [slot+0x8] equip_chain_head 非零; (3) 调用 compute_slot_zone_eligibility_mask 取掩码并 AND 0x7, 非零即返回 0 (找到合法区位). 所有槽均不满足则返回 1. 纯读操作, 无副作用. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14 (20 bytes), slot_count=[0..4].
+@ Scans player (r0 bit0) 5 monster zone slots (idx 0..4). Per slot: (1) bit19 occupied; (2) ldrh [slot+8] equip_chain_head nonzero; (3) compute_slot_zone_eligibility_mask & 0x7 nonzero -> return 0 immediately (eligible slot found). All slots fail -> return 1. Read-only. r0=u32 player_side [0..1]. Returns u32 (0=eligible slot exists, 1=none). Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, slot_entry=0x14, slot_count=5.
 check_any_slot_fieldspell_zone_eligible:
     push {r4,r5,r6,r7,lr}                    @ 08033d44 f0b5
     adds r5,r0,#0x0    @ 08033d46 051c
@@ -17381,12 +17381,12 @@ check_any_slot_fieldspell_zone_eligible:
     movs r0,#0x1    @ 08033d4a 0120
     ands r0,r5    @ 08033d4c 2840
     movs r6,#0x0    @ 08033d4e 0026
-    ldr r1, DAT_08033d80                     @ 08033d50 0b49
+    ldr r1, check_fieldspell_zone_elig_stride @ 08033d50 0b49
     adds r7,r0,#0x0    @ 08033d52 071c
     muls r7,r1    @ 08033d54 4f43
 LAB_08033d56:
     adds r1,r6,r7    @ 08033d56 f119
-    ldr r0, DAT_08033d84                     @ 08033d58 0a48
+    ldr r0, check_fieldspell_zone_elig_slots @ 08033d58 0a48
     adds r1,r1,r0    @ 08033d5a 0918
     ldr r0,[r1,#0x0]                         @ 08033d5c 0868
     lsls r0,r0,#0x13    @ 08033d5e c004
@@ -17405,10 +17405,10 @@ LAB_08033d56:
     movs r0,#0x0    @ 08033d7a 0020
     b LAB_08033d92                           @ 08033d7c 09e0
     .zero  0x2
-DAT_08033d80:
-    .word  0x00000868                     @ 08033d80 68080000
-DAT_08033d84:
-    .word  0x0201c510                     @ 08033d84 10c50102
+check_fieldspell_zone_elig_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033d80 68080000
+check_fieldspell_zone_elig_slots:
+    .word  gDuelFieldSlots                @ 08033d84 10c50102
 LAB_08033d88:
     adds r6,#0x14    @ 08033d88 1436
     adds r4,#0x1    @ 08033d8a 0134
@@ -17427,13 +17427,13 @@ count_hand_slots_with_field6_val_0x17:
     movs r1,#0x1    @ 08033d9c 0121
     ands r1,r0    @ 08033d9e 0140
     movs r5,#0x64    @ 08033da0 6425
-    ldr r0, DWORD_08033ddc                   @ 08033da2 0e48
+    ldr r0, count_hand_slots_f6_17_stride    @ 08033da2 0e48
     adds r7,r1,#0x0    @ 08033da4 0f1c
     muls r7,r0    @ 08033da6 4743
     movs r4,#0x4    @ 08033da8 0424
 LAB_08033daa:
     adds r1,r5,r7    @ 08033daa e919
-    ldr r0, DWORD_08033de0                   @ 08033dac 0c48
+    ldr r0, count_hand_slots_f6_17_slots     @ 08033dac 0c48
     adds r1,r1,r0    @ 08033dae 0918
     ldr r0,[r1,#0x0]                         @ 08033db0 0868
     lsls r0,r0,#0x13    @ 08033db2 c004
@@ -17457,10 +17457,10 @@ LAB_08033dcc:
     pop {r4,r5,r6,r7}                        @ 08033dd6 f0bc
     pop {r1}                                 @ 08033dd8 02bc
     bx r1                                    @ 08033dda 0847
-DWORD_08033ddc:
-    .word  0x00000868                     @ 08033ddc 68080000
-DWORD_08033de0:
-    .word  0x0201c510                     @ 08033de0 10c50102
+count_hand_slots_f6_17_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033ddc 68080000
+count_hand_slots_f6_17_slots:
+    .word  gDuelFieldSlots                @ 08033de0 10c50102
 
 @ Structurally symmetric sibling of 0x08033d98 (count_hand_slots_with_field6_val_0x17), sole difference is field6 target value changed from 0x17 to 0x16. Traverses player-side field spell/trap zone 5 slots (stride 0x14), counting card_id!=0 && equip_chain_head!=0 && get_card_extended_stat_field6(card_id)==0x16. indeg=0. Constants: gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, FIELD6_TARGET=0x16.
 count_hand_slots_with_field6_val_0x16:
@@ -17469,13 +17469,13 @@ count_hand_slots_with_field6_val_0x16:
     movs r1,#0x1    @ 08033de8 0121
     ands r1,r0    @ 08033dea 0140
     movs r5,#0x64    @ 08033dec 6425
-    ldr r0, DWORD_08033e28                   @ 08033dee 0e48
+    ldr r0, count_hand_slots_f6_16_stride    @ 08033dee 0e48
     adds r7,r1,#0x0    @ 08033df0 0f1c
     muls r7,r0    @ 08033df2 4743
     movs r4,#0x4    @ 08033df4 0424
 LAB_08033df6:
     adds r1,r5,r7    @ 08033df6 e919
-    ldr r0, DWORD_08033e2c                   @ 08033df8 0c48
+    ldr r0, count_hand_slots_f6_16_slots     @ 08033df8 0c48
     adds r1,r1,r0    @ 08033dfa 0918
     ldr r0,[r1,#0x0]                         @ 08033dfc 0868
     lsls r0,r0,#0x13    @ 08033dfe c004
@@ -17499,22 +17499,22 @@ LAB_08033e18:
     pop {r4,r5,r6,r7}                        @ 08033e22 f0bc
     pop {r1}                                 @ 08033e24 02bc
     bx r1                                    @ 08033e26 0847
-DWORD_08033e28:
-    .word  0x00000868                     @ 08033e28 68080000
-DWORD_08033e2c:
-    .word  0x0201c510                     @ 08033e2c 10c50102
+count_hand_slots_f6_16_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033e28 68080000
+count_hand_slots_f6_16_slots:
+    .word  gDuelFieldSlots                @ 08033e2c 10c50102
 
-@ 遍历 gDuelFieldSlots 指定玩家侧魔法/陷阱区 5 个格子 (slot 5..9, 偏移 0x64), 统计同时满足: (1) slot[0] bit19 置位 (有卡); (2) slot[+8] (equip_chain_head) == 0 (无装备链) 的格子数. count_monster_slots_by_chain_head_id (0x08033334) 的魔法/陷阱区变体. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, spell_zone_offset=0x64.
+@ Count player-side spell/trap zone slots (idx 0..4, base_offset=0x64) satisfying: (1) slot[0] bit19 occupied; (2) slot[+8] equip_chain_head==0. Spell-zone variant of count_monster_slots_by_chain_head_id (0x08033334). r0=u32 player_side [0..1]. Returns u32 count [0..5]. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, spell_zone_offset=0x64.
 count_spell_zone_slots_with_empty_chain:
     push {r4,r5,lr}                          @ 08033e30 30b5
     movs r4,#0x0    @ 08033e32 0024
     movs r1,#0x1    @ 08033e34 0121
     ands r1,r0    @ 08033e36 0140
-    ldr r0, DAT_08033e68                     @ 08033e38 0b48
+    ldr r0, count_spell_zone_empty_stride    @ 08033e38 0b48
     muls r0,r1    @ 08033e3a 4843
     adds r2,r0,#0x0    @ 08033e3c 021c
     adds r2,#0x64    @ 08033e3e 6432
-    ldr r5, DAT_08033e6c                     @ 08033e40 0a4d
+    ldr r5, count_spell_zone_empty_slots     @ 08033e40 0a4d
     movs r3,#0x4    @ 08033e42 0423
 LAB_08033e44:
     adds r1,r2,r5    @ 08033e44 5119
@@ -17536,10 +17536,10 @@ LAB_08033e56:
     pop {r1}                                 @ 08033e62 02bc
     bx r1                                    @ 08033e64 0847
     .zero  0x2
-DAT_08033e68:
-    .word  0x00000868                     @ 08033e68 68080000
-DAT_08033e6c:
-    .word  0x0201c510                     @ 08033e6c 10c50102
+count_spell_zone_empty_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033e68 68080000
+count_spell_zone_empty_slots:
+    .word  gDuelFieldSlots                @ 08033e6c 10c50102
 
 @ Count hand cards where get_card_extended_stat_field6(card_id) equals r8. Flow: read gP1LifePoints+0x14+player_stride = hand count n; return 0 if n==0. Hand array base: gP1LifePoints+player*0x868+0x83*8 (=gP1LifePoints+player*0x868+0x418). For i=0..n-1: ldr [base+i*4]=card_word; card_id=bits[12:0]; call get_card_extended_stat_field6(card_id); compare to r8; hit -> r6++. Return r6=matching hand card count. Non-APCS input: r8=target_field6_value (caller-set, extended stat field6 value to match). Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, hand_count_offset=0x14, hand_base_offset=0x83*8=0x418.
 count_hand_cards_by_field6:
@@ -17549,10 +17549,10 @@ count_hand_cards_by_field6:
     .hword 0x4688    @ 08033e76 8846
     movs r6,#0x0    @ 08033e78 0026
     movs r5,#0x0    @ 08033e7a 0025
-    ldr r3, PTR_gP1LifePoints_08033ec4       @ 08033e7c 114b
+    ldr r3, count_hand_f6_gp1lp              @ 08033e7c 114b
     movs r1,#0x1    @ 08033e7e 0121
     ands r1,r0    @ 08033e80 0140
-    ldr r0, DAT_08033ec8                     @ 08033e82 1148
+    ldr r0, count_hand_f6_stride             @ 08033e82 1148
     muls r1,r0    @ 08033e84 4143
     adds r0,r3,#0x0    @ 08033e86 181c
     adds r0,#0x14    @ 08033e88 1430
@@ -17587,10 +17587,10 @@ LAB_08033eb6:
     pop {r1}                                 @ 08033ebe 02bc
     bx r1                                    @ 08033ec0 0847
     .zero  0x2
-PTR_gP1LifePoints_08033ec4:
-    .word  gP1LifePoints                  @ 08033ec4 e0c40102
-DAT_08033ec8:
-    .word  0x00000868                     @ 08033ec8 68080000
+count_hand_f6_gp1lp:
+    .word  gP1LifePoints                  @ 08033ec4 e0c40102  gP1LifePoints: player struct base for hand card field6 count
+count_hand_f6_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033ec8 68080000
 
 @ Count graveyard cards for the given player where field7 equals the target value.
 @ r0=player_side (bit0), r1=target_field7_val (saved to r8 via mov r8,r1).
@@ -17607,10 +17607,10 @@ count_graveyard_cards_by_field7_value:
     .hword 0x4688    @ 08033ed2 8846
     movs r6,#0x0    @ 08033ed4 0026
     movs r5,#0x0    @ 08033ed6 0025
-    ldr r3, PTR_gP1LifePoints_08033f20       @ 08033ed8 114b
+    ldr r3, count_gy_f7_gp1lp                @ 08033ed8 114b
     movs r1,#0x1    @ 08033eda 0121
     ands r1,r0    @ 08033edc 0140
-    ldr r0, DAT_08033f24                     @ 08033ede 1148
+    ldr r0, count_gy_f7_stride               @ 08033ede 1148
     muls r1,r0    @ 08033ee0 4143
     adds r0,r3,#0x0    @ 08033ee2 181c
     adds r0,#0x14    @ 08033ee4 1430
@@ -17645,12 +17645,12 @@ LAB_08033f12:
     pop {r1}                                 @ 08033f1a 02bc
     bx r1                                    @ 08033f1c 0847
     .zero  0x2
-PTR_gP1LifePoints_08033f20:
-    .word  gP1LifePoints                  @ 08033f20 e0c40102
-DAT_08033f24:
-    .word  0x00000868                     @ 08033f24 68080000
+count_gy_f7_gp1lp:
+    .word  gP1LifePoints                  @ 08033f20 e0c40102  gP1LifePoints: player struct base for graveyard field7 count
+count_gy_f7_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033f24 68080000
 
-@ 统计指定玩家墓地中 field6==0x16 (装备类) 且 field9==target_type 的卡牌数量. 入口 r0=player_id, r1=field9_target_type (caller 通过 .hword 0x4688=mov r8,r1 保存到 r8). 计算墓地基址 0x0201c8f8 + player*0x868 + 0x14 (count); 对每张墓地牌提取 bits[12:0] 得 card_icid; 调用 get_card_extended_stat_field6 判断是否为装备类 (==0x16); 再调用 get_card_extended_stat_field9 判断类型是否匹配 r8; 两者均满足则计数+1. 返回匹配数量. 无外部写入. Constants: GY_BASE=0x0201c8f8, PLAYER_STRIDE=0x868, COUNT_OFFSET=0x14, EQUIP_FIELD6=0x16.
+@ Count graveyard cards where field6==0x16 (equip type) AND field9==r8. r0=u32 player_side [0..1]; r1=u8 field9_target_value (saved to r8 at entry). Base: gP1HandSlotArray+player*0x868; count from +0x14. Calls get_card_extended_stat_field6 then get_card_extended_stat_field9. Returns u32 count. Read-only. Constants: gP1HandSlotArray=0x0201c8f8, PLAYER_BLOCK_STRIDE=0x868, EQUIP_FIELD6=0x16.
 count_graveyard_equip_cards_by_field9:
     push {r4,r5,r6,r7,lr}                    @ 08033f28 f0b5
     .hword 0x464f    @ 08033f2a 4f46
@@ -17660,10 +17660,10 @@ count_graveyard_equip_cards_by_field9:
     .hword 0x4688    @ 08033f32 8846
     movs r7,#0x0    @ 08033f34 0027
     movs r6,#0x0    @ 08033f36 0026
-    ldr r1, PTR_gP1LifePoints_08033f98       @ 08033f38 1749
+    ldr r1, count_gy_equip_gp1lp             @ 08033f38 1749
     movs r0,#0x1    @ 08033f3a 0120
     ands r2,r0    @ 08033f3c 0240
-    ldr r3, DAT_08033f9c                     @ 08033f3e 174b
+    ldr r3, count_gy_equip_stride            @ 08033f3e 174b
     adds r0,r2,#0x0    @ 08033f40 101c
     muls r0,r3    @ 08033f42 5843
     adds r1,#0x14    @ 08033f44 1431
@@ -17678,7 +17678,7 @@ LAB_08033f52:
     adds r0,r5,#0x0    @ 08033f54 281c
     muls r0,r3    @ 08033f56 5843
     adds r1,r1,r0    @ 08033f58 0918
-    ldr r0, DAT_08033fa0                     @ 08033f5a 1148
+    ldr r0, count_gy_equip_gy_base           @ 08033f5a 1148
     adds r1,r1,r0    @ 08033f5c 0918
     ldr r0,[r1,#0x0]                         @ 08033f5e 0868
     lsls r0,r0,#0x13    @ 08033f60 c004
@@ -17694,7 +17694,7 @@ LAB_08033f52:
     adds r7,#0x1    @ 08033f78 0137
 LAB_08033f7a:
     adds r6,#0x1    @ 08033f7a 0136
-    ldr r3, DAT_08033f9c                     @ 08033f7c 074b
+    ldr r3, count_gy_equip_stride            @ 08033f7c 074b
     adds r0,r5,#0x0    @ 08033f7e 281c
     muls r0,r3    @ 08033f80 5843
     add r0,r9                                @ 08033f82 4844
@@ -17709,12 +17709,12 @@ LAB_08033f8a:
     pop {r4,r5,r6,r7}                        @ 08033f92 f0bc
     pop {r1}                                 @ 08033f94 02bc
     bx r1                                    @ 08033f96 0847
-PTR_gP1LifePoints_08033f98:
-    .word  gP1LifePoints                  @ 08033f98 e0c40102
-DAT_08033f9c:
-    .word  0x00000868                     @ 08033f9c 68080000
-DAT_08033fa0:
-    .word  0x0201c8f8                     @ 08033fa0 f8c80102
+count_gy_equip_gp1lp:
+    .word  gP1LifePoints                  @ 08033f98 e0c40102  gP1LifePoints: player struct base for graveyard equip field9 count
+count_gy_equip_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033f9c 68080000
+count_gy_equip_gy_base:
+    .word  gP1HandSlotArray               @ 08033fa0 f8c80102  gP1HandSlotArray+player*0x868: graveyard scan base for equip cards
 
 @ Iterates graveyard card array for the specified player (base gP1LP+player*0x868+0x418, count from gP1LP+player*0x868+0x14). For each card, extracts bits[12:0] as card_icid, calls get_card_extended_stat_field6 to check field spell type (==0x17); if matched, calls get_card_extended_stat_field9 and compares against r8 (non-APCS, saved at entry via .hword 0x4688=mov r8,r1). Both conditions must match to increment counter. Called by eval_slot_score_entry_full (0x08037ec0) under card_id=0x19be branch with r1=4 (field9_target=4); result multiplied by 1000 for LP cost. Pure read-only.
 @ 
@@ -17731,10 +17731,10 @@ count_graveyard_fieldspell_cards_by_field9:
     .hword 0x4688    @ 08033fae 8846
     movs r7,#0x0    @ 08033fb0 0027
     movs r6,#0x0    @ 08033fb2 0026
-    ldr r1, PTR_gP1LifePoints_08034014       @ 08033fb4 1749
+    ldr r1, count_gy_fieldspell_gp1lp        @ 08033fb4 1749
     movs r0,#0x1    @ 08033fb6 0120
     ands r2,r0    @ 08033fb8 0240
-    ldr r3, DAT_08034018                     @ 08033fba 174b
+    ldr r3, count_gy_fieldspell_stride       @ 08033fba 174b
     adds r0,r2,#0x0    @ 08033fbc 101c
     muls r0,r3    @ 08033fbe 5843
     adds r1,#0x14    @ 08033fc0 1431
@@ -17749,7 +17749,7 @@ LAB_08033fce:
     adds r0,r5,#0x0    @ 08033fd0 281c
     muls r0,r3    @ 08033fd2 5843
     adds r1,r1,r0    @ 08033fd4 0918
-    ldr r0, DAT_0803401c                     @ 08033fd6 1148
+    ldr r0, count_gy_fieldspell_gy_base      @ 08033fd6 1148
     adds r1,r1,r0    @ 08033fd8 0918
     ldr r0,[r1,#0x0]                         @ 08033fda 0868
     lsls r0,r0,#0x13    @ 08033fdc c004
@@ -17765,7 +17765,7 @@ LAB_08033fce:
     adds r7,#0x1    @ 08033ff4 0137
 LAB_08033ff6:
     adds r6,#0x1    @ 08033ff6 0136
-    ldr r3, DAT_08034018                     @ 08033ff8 074b
+    ldr r3, count_gy_fieldspell_stride       @ 08033ff8 074b
     adds r0,r5,#0x0    @ 08033ffa 281c
     muls r0,r3    @ 08033ffc 5843
     add r0,r9                                @ 08033ffe 4844
@@ -17780,12 +17780,12 @@ LAB_08034006:
     pop {r4,r5,r6,r7}                        @ 0803400e f0bc
     pop {r1}                                 @ 08034010 02bc
     bx r1                                    @ 08034012 0847
-PTR_gP1LifePoints_08034014:
-    .word  gP1LifePoints                  @ 08034014 e0c40102
-DAT_08034018:
-    .word  0x00000868                     @ 08034018 68080000
-DAT_0803401c:
-    .word  0x0201c8f8                     @ 0803401c f8c80102
+count_gy_fieldspell_gp1lp:
+    .word  gP1LifePoints                  @ 08034014 e0c40102  gP1LifePoints: player struct base for graveyard fieldspell field9 count
+count_gy_fieldspell_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034018 68080000
+count_gy_fieldspell_gy_base:
+    .word  gP1HandSlotArray               @ 0803401c f8c80102  gP1HandSlotArray+player*0x868: graveyard scan base for field spell cards
 
 @ Count hand cards where get_card_extended_stat_field6(card_id)==r8 (non-APCS). Alt variant of count_hand_cards_by_field6 (0x08033e70): uses different EWRAM offsets (hand_count_offset=0x1c vs 0x14; hand_base_offset=0xba*8=0x5d0 vs 0x83*8=0x418). Flow: gP1LifePoints+0x1c+player*0x868=hand_count; iterate gP1LifePoints+player*0x868+0x5d0 (hand array, 4 bytes/entry); extract card_id bits[12:0]; bl get_card_extended_stat_field6; cmp r0,r8; match->counter++. r0: player_side [0..1]; r8 (non-APCS, caller-set): target_field6_value. Returns r0=count [0..hand_size]. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, hand_count_offset=0x1c, hand_base_offset=0xba*8=0x5d0, card_entry_size=4.
 count_hand_cards_by_field6_alt:
@@ -17795,10 +17795,10 @@ count_hand_cards_by_field6_alt:
     .hword 0x4688    @ 08034026 8846
     movs r6,#0x0    @ 08034028 0026
     movs r5,#0x0    @ 0803402a 0025
-    ldr r3, PTR_gP1LifePoints_08034074       @ 0803402c 114b
+    ldr r3, count_hand_f6_alt_gp1lp          @ 0803402c 114b
     movs r1,#0x1    @ 0803402e 0121
     ands r1,r0    @ 08034030 0140
-    ldr r0, DAT_08034078                     @ 08034032 1148
+    ldr r0, count_hand_f6_alt_stride         @ 08034032 1148
     muls r1,r0    @ 08034034 4143
     adds r0,r3,#0x0    @ 08034036 181c
     adds r0,#0x1c    @ 08034038 1c30
@@ -17833,10 +17833,10 @@ LAB_08034066:
     pop {r1}                                 @ 0803406e 02bc
     bx r1                                    @ 08034070 0847
     .zero  0x2
-PTR_gP1LifePoints_08034074:
-    .word  gP1LifePoints                  @ 08034074 e0c40102
-DAT_08034078:
-    .word  0x00000868                     @ 08034078 68080000
+count_hand_f6_alt_gp1lp:
+    .word  gP1LifePoints                  @ 08034074 e0c40102  gP1LifePoints: player struct base for hand field6 alt count
+count_hand_f6_alt_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08034078 68080000
 
 @ Comprehensive slot-target eligibility evaluator. Calls resolve_slot_card_id_for_pair then multiple query_zone_chain_count_with_eligibility and count_zones_by_card_and_mode calls using non-APCS r8/r9/r10 params. Large switch dispatches on card_id for zone count aggregation. r8 (non-APCS): player_side_or_mode; r9 (non-APCS): target_param; r10 (non-APCS): aux_param. Returns r0=eligibility_result (0=ineligible; >0=target count/score). indeg=2. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868.
 eval_slot_target_eligibility_full:
