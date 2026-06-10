@@ -77,7 +77,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
-| 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | (pending) |
+| 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ⬜ | |
 | 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
@@ -150,7 +150,7 @@ find_graveyard_entry_by_card_id / count_extra_deck_cards_by_player
 **Non-ASCII**: Seg-2 范围内 non-ASCII count=0 (CJK plate at find_deck_slot_by_card_pair_match line 2334 already replaced with pure-ASCII plate)
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: 6ec659f
 
 ---
 
