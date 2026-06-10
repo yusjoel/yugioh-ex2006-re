@@ -144,3 +144,12 @@
 .equ NODE_POOL_NEG_OFFSET,    0xffffeb50  @ neg offset (-0x14b0) from gEquipNodePool to gDuelFieldSlots base; 5 refs
 .equ EQUIP_CHAIN_LINK_OFFSET, 0xfffffc02  @ chain link sub-array base offset within node (-0x3fe); 1 ref (append_equip_chain_node_at_tail)
 .equ FIELD_SLOT_PHASE_MASK,   0xfffffc07  @ clears bits[9:3] of AOB state halfword (scene_ctx+0x60); 3 refs
+
+@ =============================================================================
+@ file 02 Seg-5 additions: duel field zone slot / player active index constants
+@ =============================================================================
+.equ FIELD_SLOT_COUNT_OFF,      0x00001cb4  @ gDuelFieldSlots+0x1cb4: total placed-card count (7 ROM refs; 2 Seg-5 slots)
+                                             @ incremented by place_card_into_monster_zone_slot / place_card_into_spelltrap_zone_slot
+.equ SLOT_FACE_STATUS_ARRAY_OFF, 0x000010b1 @ gDuelFieldSlots+0x10b1: equip_face_bits status byte array base (16 ROM refs; 2 slots)
+.equ FIELD_SPELL_CARD_REF_OFF,  0x00001390  @ card_id 0x1390 field-spell equip trigger guard (10 ROM refs; 1 slot)
+.equ DUEL_ACTIVE_PLAYER_OFF,    0x00001cb8  @ gP1LifePoints+0x1cb8: active turn player idx (15 ROM refs; 1 slot)

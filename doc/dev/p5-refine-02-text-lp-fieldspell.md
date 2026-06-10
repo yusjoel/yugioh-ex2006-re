@@ -60,7 +60,7 @@
 | 2 | 0x2e108..0x2f3a8 | 23 | 94 | ✅ | cd981d8 |
 | 3 | 0x2f3a8..0x2fd00 | 23 | 58 | ✅ | a78e8b1 |
 | 4 | 0x2fd00..0x309b8 | 23 | 136 | ✅ | f8cdb43 |
-| 5 | 0x309b8..0x313dc | 23 | 60 | ⬜ | |
+| 5 | 0x309b8..0x313dc | 23 | 60 | ✅ | (pending commit) |
 | 6 | 0x313dc..0x3217c | 23 | 64 | ⬜ | |
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ⬜ | |
 | 8 | 0x32e80..0x33654 | 23 | 44 | ⬜ | |
@@ -302,6 +302,70 @@
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: f8cdb43
+
+---
+
+### 4.05 Seg-5 完成记录 (0x080309b8..0x080313dc, 23 fn)
+
+**函数列表**:
+| addr       | name                                          |
+|------------|-----------------------------------------------|
+| 0x080309b8 | check_effect_slot_zone_equip_valid            |
+| 0x080309fc | check_field_spell_b_placeable                 |
+| 0x08030a30 | check_slot_card_is_equip_whitelist            |
+| 0x08030aa4 | check_slot_card_is_equip_type                 |
+| 0x08030b0c | check_slot_card_is_monster_type               |
+| 0x08030b70 | check_card_stat_field7_equals                 |
+| 0x08030b88 | write_word_from_deref_src                     |
+| 0x08030b90 | swap_deref_words                              |
+| 0x08030b9c | check_deref_words_equal                       |
+| 0x08030bac | increment_player_chain_counter                |
+| 0x08030be4 | place_card_into_monster_zone_slot             |
+| 0x08030cc0 | place_card_into_spelltrap_zone_slot           |
+| 0x08030de8 | find_zone_descriptor_by_slot_id               |
+| 0x080310d0 | find_slot_idx_in_dual_list_by_id              |
+| 0x08031118 | find_field_slot_by_set_code_global            |
+| 0x08031184 | find_slot_idx_by_set_code                     |
+| 0x080311e0 | find_slot_idx_by_zone_id_in_chain_list        |
+| 0x0803123c | find_hand_slot_idx_by_set_code                |
+| 0x08031294 | find_hand_slot_idx_by_set_code_alt            |
+| 0x080312ec | find_slot_idx_by_card_id_in_player_zones      |
+| 0x08031348 | find_lp_entry_by_flag_and_type                |
+| 0x08031390 | resolve_slot_id_to_zone_ptr                   |
+| 0x080313b8 | check_equip_placement_eligible_from_slot_record |
+
+**符号化统计**:
+- EQ_SLOTS: 39 (24 EQ_REUSE + 15 EQ_NEW)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x15 + gDuelFieldSlots x7 + gP1ZoneHandCount x1 + gDuelEffectChainSlots x1
+  - EQ_NEW: FIELD_SLOT_COUNT_OFF x2 + SLOT_FACE_STATUS_ARRAY_OFF x2 + FIELD_SPELL_CARD_REF_OFF x1 +
+    DUEL_ACTIVE_PLAYER_OFF x1 + gP1SlotCountBase x1 + gP1SlotSetCodeArray x1 + gP1HandCountBase x1 +
+    gP1HandSlotArray x1 + gP1ChainZoneCountBase x1 + gP1ChainZoneArray x1 + gP1AltHandCountBase x1 +
+    gP1AltHandSlotArray x1 + FIELD_SPELL_B_EFFECT_ID x1
+- REF_SLOTS: 0 (8 PTR_gP1LifePoints_* 已有 DATA refs)
+- RENAME_SLOTS: 21 (8 PTR_ label renames + 7 card_id BST + 5 neg_off + 1 zone mask)
+- PLATE_FULL: 10 (全段重写, C8 落地验证无残留 FUN_; 落地后 grep 验证 == 0)
+- carve: 0 / disasm: 0 / §5.1: 0 (本段无 ROM_INCBIN)
+
+**新建 constants** (3 文件, 13 项):
+- `duel_field.inc`: FIELD_SLOT_COUNT_OFF=0x1cb4, SLOT_FACE_STATUS_ARRAY_OFF=0x10b1,
+  FIELD_SPELL_CARD_REF_OFF=0x1390, DUEL_ACTIVE_PLAYER_OFF=0x1cb8
+- `ewram.inc`: gP1SlotCountBase=0x0201c4f0, gP1SlotSetCodeArray=0x0201c740,
+  gP1HandCountBase=0x0201c4f4, gP1HandSlotArray=0x0201c8f8,
+  gP1ChainZoneCountBase=0x0201c4f8, gP1ChainZoneArray=0x0201c880,
+  gP1AltHandCountBase=0x0201c4fc, gP1AltHandSlotArray=0x0201cab0
+- `card_info.inc`: FIELD_SPELL_B_EFFECT_ID=0x1407
+
+**C8 plate 验证**:
+- 10 个 plate 全用 setPlateComment 整段重写 (非 substring replace), 写入后读回 re 扫描确认无 FUN_ 残留
+- 导出后 grep asm/02_text_lp_fieldspell.s Seg-5 范围 (L10082..L11545) @ 行含 FUN_ = **0** (落地验收通过)
+
+**落地踩坑记录**: 无 (first-shot PASS, dry run 0 FAIL, 实跑 0 SKIP/FAIL)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg5Slots.py` (EQ39/REF0/RENAME21/PLATE_FULL10)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
 
 ---
 

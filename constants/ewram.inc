@@ -315,3 +315,15 @@
 @ =============================================================================
 .equ ZONE_CHAIN_CARD_ID_OFF, 0x000010e2  @ offset from gP1LifePoints to zone-chain card_id table base
                                           @ (0x0201c4e0 + 0x10e2 = 0x0201d5c2); 21 raw ROM refs; 6 Seg-4 uses
+
+@ =============================================================================
+@ file 02 Seg-5 additions: player zone/hand/chain sub-arrays (find_zone_descriptor_by_slot_id)
+@ =============================================================================
+.equ gP1SlotCountBase,     0x0201c4f0  @ gP1LifePoints+0x10: slot set_code search count P1 base (12 ROM refs)
+.equ gP1SlotSetCodeArray,  0x0201c740  @ gP1LifePoints+0x260: slot set_code data array P1 base (82 ROM refs)
+.equ gP1HandCountBase,     0x0201c4f4  @ gP1LifePoints+0x14: hand slot count P1 base (11 ROM refs)
+.equ gP1HandSlotArray,     0x0201c8f8  @ gP1LifePoints+0x418: hand slot data array P1 base (97 ROM refs)
+.equ gP1ChainZoneCountBase, 0x0201c4f8 @ gP1LifePoints+0x18: chain zone count P1 base (2 ROM refs)
+.equ gP1ChainZoneArray,    0x0201c880  @ gP1LifePoints+0x3a0: chain zone data array P1 base (21 ROM refs)
+.equ gP1AltHandCountBase,  0x0201c4fc  @ gP1LifePoints+0x1c: alt-hand slot count P1 base (7 ROM refs)
+.equ gP1AltHandSlotArray,  0x0201cab0  @ gP1LifePoints+0x5d0: alt-hand slot data array P1 base (15 ROM refs)
