@@ -1837,7 +1837,7 @@ LAB_08036caa:
 build_effect_zone_entry_mask:
     .word  SCROLLBAR_CLEAR_BITS_14_6      @ 08036cb4 3f80ffff
 
-@ place_card_into_graveyard_slot: Places a card into the player graveyard array (gP1HandSlotArray+0x418 path). r0=card_slot_ptr. Extracts player_id from card_slot_ptr[0].bit14. Graveyard count: [gP1HandCountBase + player*PLAYER_BLOCK_STRIDE]. Graveyard array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE. (HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc maps gP1HandSlotArray -> gP1HandCountBase.) If card_type(bits[18:0])!=0 and check_card_field8_is_9==0:   calls write_word_from_deref_src to write; increments count. Simpler variant (no sequence word); caller FUN_08032280 case 0xe (zone_type=14).
+@ place_card_into_graveyard_slot: Places a card into the player graveyard array (gP1HandSlotArray+0x418 path). r0=card_slot_ptr. Extracts player_id from card_slot_ptr[0].bit14. Graveyard count: [gP1HandCountBase + player*PLAYER_BLOCK_STRIDE]. Graveyard array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE. (HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc maps gP1HandSlotArray -> gP1HandCountBase.) If card_type(bits[18:0])!=0 and check_card_field8_is_9==0:   calls write_word_from_deref_src to write; increments count. Simpler variant (no sequence word); caller dispatch_card_placement_by_zone_type case 0xe (zone_type=14).
 place_card_into_graveyard_slot:
     push {r4,r5,r6,lr}                       @ 08036cb8 70b5
     adds r6,r0,#0x0    @ 08036cba 061c
@@ -1879,7 +1879,7 @@ place_card_graveyard_gy_base:
 place_card_graveyard_count_neg_off:
     .word  HAND_ARRAY_TO_COUNT_NEG_OFF    @ 08036d04 fcfbffff
 
-@ place_card_into_graveyard_slot_with_seq: Places a card into the player graveyard array with a sequence word. r0=card_slot_ptr (->r9 via 0x4681), r1=sequence_word (->r10 via 0x468a). Extracts player_id from card_slot_ptr[0].bit14. Count field: [gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x1c]. Array base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0xba*8 (=0x5d0). If card_type!=0 and check_card_field8_is_9==0:   write_word_from_deref_src(slot_ptr),   store sequence halfword at array+count*2+gP1LP+0xf1*8,   increment count. Caller FUN_08032280 case 0xf (zone_type=15).
+@ place_card_into_graveyard_slot_with_seq: Places a card into the player graveyard array with a sequence word. r0=card_slot_ptr (->r9 via 0x4681), r1=sequence_word (->r10 via 0x468a). Extracts player_id from card_slot_ptr[0].bit14. Count field: [gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x1c]. Array base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0xba*8 (=0x5d0). If card_type!=0 and check_card_field8_is_9==0:   write_word_from_deref_src(slot_ptr),   store sequence halfword at array+count*2+gP1LP+0xf1*8,   increment count. Caller dispatch_card_placement_by_zone_type case 0xf (zone_type=15).
 place_card_into_graveyard_slot_with_seq:
     push {r4,r5,r6,r7,lr}                    @ 08036d08 f0b5
     .hword 0x4657    @ 08036d0a 5746
@@ -1999,7 +1999,7 @@ LAB_08036dde:
     pop {r1}                                 @ 08036de4 02bc
     bx r1                                    @ 08036de6 0847
 
-@ erase_slot_from_equip_array_a_by_ptr: Searches equip array A for element matching card_ptr; deletes it. r0=player_id [0..1], r1=card_ptr (->r7). Array A base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). Count field offset: 0x14. Backward scan from count-1 to 0 via check_deref_words_equal. On match: calls remove_equip_slot_by_index_from_array_a; returns 1. Returns 0 if not found. Caller FUN_08032194 (duel_field) cleans up equip array A when card leaves field.
+@ erase_slot_from_equip_array_a_by_ptr: Searches equip array A for element matching card_ptr; deletes it. r0=player_id [0..1], r1=card_ptr (->r7). Array A base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). Count field offset: 0x14. Backward scan from count-1 to 0 via check_deref_words_equal. On match: calls remove_equip_slot_by_index_from_array_a; returns 1. Returns 0 if not found. Caller erase_slot_from_zone_array_by_type (duel_field) cleans up equip array A when a card leaves the field.
 erase_slot_from_equip_array_a_by_ptr:
     push {r4,r5,r6,r7,lr}                    @ 08036de8 f0b5
     adds r6,r0,#0x0    @ 08036dea 061c
@@ -2306,7 +2306,7 @@ LAB_08037020:
     pop {r0}                                 @ 0803702c 01bc
     bx r0                                    @ 0803702e 0047
 
-@ find_deck_slot_by_card_pair_match: Searches extra-deck array for a card_id passing check_card_pair_allowed(card_id, filter). r0=player_id, r1=card_id_filter (->r6, low 16 bits). Extra-deck count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE (0x83*8=0x418 offset). Backward scan from count-1 to 0; extracts card_id bits[12:0] from each word; calls check_card_pair_allowed(card_id, filter); on hit returns index. Returns -1 if no match (movs r0,#1; rsbs r0,r0,#0). indeg>=7; callers include FUN_080bb4c2 and duel_field at 0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0.
+@ find_deck_slot_by_card_pair_match: Searches extra-deck array for a card_id passing check_card_pair_allowed(card_id, filter). r0=player_id, r1=card_id_filter (->r6, low 16 bits). Extra-deck count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE (0x83*8=0x418 offset). Backward scan from count-1 to 0; extracts card_id bits[12:0] from each word; calls check_card_pair_allowed(card_id, filter); on hit returns index. Returns -1 if no match (movs r0,#1; rsbs r0,r0,#0). indeg>=7; callers include dispatch_equip_activation_full_sequence and duel_field at 0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0.
 find_deck_slot_by_card_pair_match:
     push {r4,r5,r6,lr}                       @ 08037030 70b5
     adds r6,r1,#0x0    @ 08037032 0e1c

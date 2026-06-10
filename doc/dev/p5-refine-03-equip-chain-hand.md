@@ -152,6 +152,14 @@ find_graveyard_entry_by_card_id / count_extra_deck_cards_by_player
 
 **commit**: 6ec659f
 
+**C8 plate fix-forward (独立审计补, 2026-06-11)**: 4 stale FUN_ 改现名
+- place_card_into_graveyard_slot (0x08036cb8): FUN_08032280 → dispatch_card_placement_by_zone_type
+- place_card_into_graveyard_slot_with_seq (0x08036d08): FUN_08032280 → dispatch_card_placement_by_zone_type
+- erase_slot_from_equip_array_a_by_ptr (0x08036de8): FUN_08032194 → erase_slot_from_zone_array_by_type
+- find_deck_slot_by_card_pair_match (0x08037030): FUN_080bb4c2 (bl-site) → dispatch_equip_activation_full_sequence (caller ref)
+脚本: tools/ghidra-labeling/RefineF03Seg2PlateFix.py
+C8 验收后: asm lines 1530-2449 FUN_=0 / Non-ASCII=0 / byte-identical SHA1 9689337d
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)

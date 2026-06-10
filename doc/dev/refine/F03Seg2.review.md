@@ -1,7 +1,166 @@
 # Review: F03Seg2  [0x08036a78..0x08037128)
+> 独立审计 iteration — fixer 自撰 proposal/review 后由独立 reviewer 复核，防 self-review 污染。
+> 审计时间: 2026-06-11
 
-**Iteration**: 1  
-**Verdict**: PASS
+**Iteration**: 独立审计
+**Verdict**: NEEDS_FIX (1 item, 4 sub-fixes)
+
+---
+
+## 核验矩阵 (C1-C13)
+
+| # | 检查 | 结果 | 备注 |
+|---|------|------|------|
+| C1 | 段范围与 §五 路线图一致 | ✅ | proposal [0x08036a78..0x08037128) 与 doc §五 Seg-2 一致，未跳号 |
+| C2 | 每个 ROM_INCBIN/.byte 块都有归宿 | ✅ | 本段无 ROM_INCBIN / .byte 块，N/A |
+| C3 | §5.1 块确 0 引用 | ✅ | 本段无 §5.1 登记，N/A |
+| C4 | EQ value == ROM 4 字节小端 | ✅ | 自主重跑：抽查 15 槽全部 OK (见下方验证表) |
+| C5 | 新建常量前无现有同值可复用 | ✅ | 7 条新建常量扫全 19 constants/*.inc 确认无同值冲突 |
+| C6 | 槽名 ^[a-z][a-z0-9_]+$，无碰撞 | ✅ | 所有 EQ slot 标签符合格式；Seg-2 范围内无重复标签 |
+| C7 | carve/全局槽有 USER-label + DATA-ref 计划 | ✅ | 本段无 carve；所有全局槽通过 EQ 接通 |
+| C8 | plate 引用全用现名，无残留 FUN_/DAT_/DWORD_ | **❌** | **4 处 stale FUN_ 残留于 plate 注释 (见修改清单 #1)** |
+| C9 | 所有 plate/EOL 纯 ASCII | ✅ | Python 字节扫描 lines 1530-2449：non-ASCII count=0 |
+| C10 | 指针表 +1 (THUMB) | ✅ | 本段无指针表 carve，N/A |
+| C11 | 函数体全局 vs 函数名矛盾 | ✅ | 抽查关键函数名与体一致 |
+| C12 | 关键槽语义有 file:line + 置信度证据 | ✅ | 新建卡牌 ID 均查 card-stats.s 坐实；全局变量有 ROM ref 证据 |
+| C13 | 段内所有残留自动名槽都被覆盖 | ✅ | Seg-2 range (lines 1530-2449) grep DAT_/DWORD_/UNK_ = 0 条 |
+
+---
+
+## C4 值核对 (自主重跑，抽查 15 槽)
+
+| ROM addr | 常量名 | proposal 值 | ROM 实际 | 状态 |
+|----------|--------|------------|---------|------|
+| 0x08036b2c | GAP_CID_13EA | 0x000013ea | 0x000013ea | OK |
+| 0x08036b30 | KUNAI_WITH_CHAIN_CID | 0x00001231 | 0x00001231 | OK |
+| 0x08036b74 | BLAST_WITH_CHAIN_CID | 0x00001514 | 0x00001514 | OK |
+| 0x08036bfc | EFFECT_ENTRY_COUNT_OFF | 0x00000594 | 0x00000594 | OK |
+| 0x08036c00 | gEffectEntryArray | 0x0201b590 | 0x0201b590 | OK |
+| 0x08036d04 | HAND_ARRAY_TO_COUNT_NEG_OFF | 0xfffffbfc | 0xfffffbfc | OK |
+| 0x08036eec | HAND_ARRAY_TO_COUNT_NEG_OFF (reuse) | 0xfffffbfc | 0xfffffbfc | OK |
+| 0x08037008 | ALT_HAND_ARRAY_TO_COUNT_NEG_OFF | 0xfffffa4c | 0xfffffa4c | OK |
+| 0x08036ab8 | PLAYER_BLOCK_STRIDE | 0x00000868 | 0x00000868 | OK |
+| 0x08036abc | gDuelFieldSlots | 0x0201c510 | 0x0201c510 | OK |
+| 0x08036bf8 | gDuelPhaseFlags | 0x0201b290 | 0x0201b290 | OK |
+| 0x08036cb4 | SCROLLBAR_CLEAR_BITS_14_6 | 0xffff803f | 0xffff803f | OK |
+| 0x08036d00 | gP1HandSlotArray | 0x0201c8f8 | 0x0201c8f8 | OK |
+| 0x08036d78 | gP1LifePoints | 0x0201c4e0 | 0x0201c4e0 | OK |
+| 0x08037004 | gP1AltHandSlotArray | 0x0201cab0 | 0x0201cab0 | OK |
+
+---
+
+## C5 新建常量去重核验
+
+7 条新建常量 (card_info.inc +3, ewram.inc +4)：
+
+- `GAP_CID_13EA=0x13ea`：card-stats.s 确认 0x13ea/0x13e9 为 gap (Nuvia=0x13e8, Soul Exchange=0x13eb)；全局唯一
+- `KUNAI_WITH_CHAIN_CID=0x1231`：card-stats.s card_0533 slot=0x1231 pw=37390589 坐实；全局唯一
+- `BLAST_WITH_CHAIN_CID=0x1514`：card-stats.s card_1086 slot=0x1514 pw=98239899 坐实；全局唯一
+- `gEffectEntryArray=0x0201b590`：仅 ewram.inc 定义；全局唯一
+- `EFFECT_ENTRY_COUNT_OFF=0x594`：仅 ewram.inc 定义；Seg-2 槽 0x08036bfc 实际引用 (line 1740)
+- `HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc`：仅 ewram.inc 定义；2 槽引用 (0x08036d04, 0x08036eec)
+- `ALT_HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffa4c`：仅 ewram.inc 定义；1 槽引用 (0x08037008)
+
+gEffectEntryArray 和 EFFECT_ENTRY_COUNT_OFF 均在 Seg-2 有实际槽引用，非孤儿常量 (C5 Seg-1 推来的孤儿已在本段被消费)。
+
+**附注 (非阻塞)：ewram.inc 注释中 raw_refs 计数有误**
+
+自主 ROM 扫描实际值 vs 注释声称值：
+
+| 常量 | 注释声称 | 实际 ROM 扫描 |
+|------|---------|------------|
+| gEffectEntryArray | 23 raw refs | 10 |
+| HAND_ARRAY_TO_COUNT_NEG_OFF | 5 raw refs | 25 |
+| ALT_HAND_ARRAY_TO_COUNT_NEG_OFF | 3 raw refs | 5 |
+| EFFECT_ENTRY_COUNT_OFF | 9 raw refs | 11 (含小值误命中可能) |
+
+以上仅影响注释元数据，不影响 value 正确性或 byte-identical。不列为 NEEDS_FIX。
+
+---
+
+## C8 详细核验 (stale FUN_ 残留)
+
+自主 `awk 'NR>=1530 && NR<=2449 && /FUN_[0-9A-Fa-f]+/'` 扫描，发现 4 处：
+
+| asm 行 | 所在函数 | stale FUN_ | 实际现名（已验证）|
+|--------|---------|-----------|-------------|
+| 1840 | `place_card_into_graveyard_slot` (0x08036cb8) plate | `FUN_08032280` | `dispatch_card_placement_by_zone_type` (asm/02 line 13617) |
+| 1882 | `place_card_into_graveyard_slot_with_seq` (0x08036d08) plate | `FUN_08032280` | `dispatch_card_placement_by_zone_type` (asm/02 line 13617) |
+| 2002 | `erase_slot_from_equip_array_a_by_ptr` (0x08036de8) plate | `FUN_08032194` | `erase_slot_from_zone_array_by_type` (asm/02 line 13499) |
+| 2309 | `find_deck_slot_by_card_pair_match` (0x08037030) plate | `FUN_080bb4c2` | 错误：0x080bb4c2 是 `dispatch_equip_activation_full_sequence` 内一条 bl 指令的地址，非函数入口 |
+
+FUN_08032280 和 FUN_08032194 已在 file 02 refine 中重命名（asm/02_text_lp_fieldspell.s 可见）。Seg-2 fixer 未更新其 plate 引用。fixer 自评"FUN_ stale label count=0; prose mentions in plates are informational caller references, not stale labels"不成立——C8 明文要求 plate 引用全用现名，无 prose/label 例外。
+
+---
+
+## 状态: RESOLVED (2026-06-11 plate fix-forward applied; C8 FUN_=0 verified post-build)
+
+---
+
+## 修改清单 (fix-forward，不回滚；均为 Ghidra plate 文本更新)
+
+### #1 — C8 — 4 处 stale FUN_ plate 引用须改为现名
+
+均为 Ghidra `setPlateComment` 重写，byte-identical 不受影响（plate 存 .rep，不入 ROM 字节）。
+
+**#1a** 函数 `place_card_into_graveyard_slot` addr=0x08036cb8
+
+plate 末尾句从：
+```
+caller FUN_08032280 case 0xe (zone_type=14).
+```
+改为：
+```
+caller dispatch_card_placement_by_zone_type case 0xe (zone_type=14).
+```
+
+**#1b** 函数 `place_card_into_graveyard_slot_with_seq` addr=0x08036d08
+
+plate 末尾句从：
+```
+Caller FUN_08032280 case 0xf (zone_type=15).
+```
+改为：
+```
+Caller dispatch_card_placement_by_zone_type case 0xf (zone_type=15).
+```
+
+**#1c** 函数 `erase_slot_from_equip_array_a_by_ptr` addr=0x08036de8
+
+plate 末尾句从：
+```
+Caller FUN_08032194 (duel_field) cleans up equip array A when a card leaves the field.
+```
+改为：
+```
+Caller erase_slot_from_zone_array_by_type (duel_field) cleans up equip array A when a card leaves the field.
+```
+
+**#1d** 函数 `find_deck_slot_by_card_pair_match` addr=0x08037030
+
+plate 末尾句从：
+```
+indeg>=7; callers: FUN_080bb4c2, duel_field at 0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0.
+```
+改为：
+```
+indeg>=7; callers include dispatch_equip_activation_full_sequence and duel_field at 0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0.
+```
+(0x080bb4c2 是该函数内 bl 调用点地址，非函数入口；改用函数名)
+
+---
+
+## 验收条件
+
+4 处 plate 修改后：Ghidra export -> split_all_s -> build -> SHA1 9689337d (byte-identical 不变)，再 `awk 'NR>=1530 && NR<=2449 && /FUN_[0-9A-Fa-f]+/' asm/03_equip_chain_hand.s` == 0 条。
+
+---
+
+## 方法论注记
+
+- C8 "informational caller reference" 不豁免：方法论要求 plate 引用全用现名，无 prose/label 例外
+- fixer 自评错误根因：仅检查了 label 定义行 `^FUN_...:`，未检查 plate 文本中的散文引用
+- 建议未来 fixer 验收命令：`awk 'NR>=START && NR<=END && /FUN_[0-9A-Fa-f]+/' asm/XX.s`（整行扫描，非仅标签行）
 
 ---
 
