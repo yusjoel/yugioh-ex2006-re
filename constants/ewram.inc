@@ -332,3 +332,8 @@
 @ file 02 Seg-7 additions: duel field slot P2 base
 @ =============================================================================
 .equ gDuelFieldSlots_p2_base, 0x0201c5d8  @ gDuelFieldSlots+0xc8 = slot[10] base for field9==2 single-slot path; 24 raw refs
+
+@ =============================================================================
+@ file 02 Seg-8 additions: field spell zone slot base
+@ =============================================================================
+.equ gDuelFieldSpellZoneBase, 0x0201c5ec  @ gDuelFieldSlots + 11*0x14 = P0 field-spell zone slot entry base; r10 base in check_slot_placement_blocked_by_field_effect; 6 raw refs

@@ -8,10 +8,10 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 7/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
-> **下一任务**: **file 02 Seg-8** (0x32e80..0x33654, 23fn 44槽, monster slot count/state scan)。
+> **当前文件**: `02_text_lp_fieldspell.s` (进行中, 8/10 段完成; 活动 doc `p5-refine-02-text-lp-fieldspell.md`)。
+> **下一任务**: **file 02 Seg-9** (0x33654..0x3407c, 23fn 63槽, placeable monster slot find)。
 
-上次更新: 2026-06-11 file 02 Seg-7 完成 (EQ48/RENAME19/PLATE_FULL5/新建 duel_field x2+ewram x1 3项, C8 plate 全重写 5/5 readback 无 FUN_, byte-identical 9689337d)。
+上次更新: 2026-06-11 file 02 Seg-8 完成 (EQ38/RENAME6/PLATE_FULL3/新建 card_info x4+ewram x1 5项, C8 plate 全重写 3/3 readback 无 FUN_, byte-identical 9689337d)。
 
 ---
 
@@ -21,7 +21,7 @@
 |---|------|----------|------|------|---------|
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
-| 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 已拆 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
+| 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 已拆 | 🟡 进行中 (8/10) | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | 未拆 | ⬜ | |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |

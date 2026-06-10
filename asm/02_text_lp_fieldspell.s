@@ -15293,7 +15293,7 @@ count_monster_slots_by_state:
     movs r0,#0x1    @ 08032e94 0120
     ands r0,r6    @ 08032e96 3040
     movs r5,#0x0    @ 08032e98 0025
-    ldr r1, DAT_08032ee8                     @ 08032e9a 1349
+    ldr r1, count_monster_slots_by_state_stride @ 08032e9a 1349
     adds r2,r0,#0x0    @ 08032e9c 021c
     muls r2,r1    @ 08032e9e 4a43
     .hword 0x4690    @ 08032ea0 9046
@@ -15302,7 +15302,7 @@ LAB_08032ea2:
     beq LAB_08032ece                         @ 08032ea4 13d0
     .hword 0x4640    @ 08032ea6 4046
     adds r1,r5,r0    @ 08032ea8 2918
-    ldr r0, DAT_08032eec                     @ 08032eaa 1048
+    ldr r0, count_monster_slots_by_state_base @ 08032eaa 1048
     adds r1,r1,r0    @ 08032eac 0918
     ldr r0,[r1,#0x0]                         @ 08032eae 0868
     lsls r0,r0,#0x13    @ 08032eb0 c004
@@ -15333,10 +15333,10 @@ LAB_08032ece:
     pop {r1}                                 @ 08032ee2 02bc
     bx r1                                    @ 08032ee4 0847
     .zero  0x2
-DAT_08032ee8:
-    .word  0x00000868                     @ 08032ee8 68080000
-DAT_08032eec:
-    .word  0x0201c510                     @ 08032eec 10c50102
+count_monster_slots_by_state_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08032ee8 68080000
+count_monster_slots_by_state_base:
+    .word  gDuelFieldSlots                @ 08032eec 10c50102
 
 @ Thin wrapper: sets r2=-1 (full-scan, no filter) then calls count_monster_slots_by_state(r0, r1, -1). r0: player_side [0..1]; r1: state_mask (e.g. 0xd=occupied, 0xf, 0x12). Returns r0=slot_count. indeg=8. Constants: r2=-1 fixed (movs r2,#1; rsbs r2,r2,#0).
 count_monster_slots_by_state_all:
@@ -15363,7 +15363,7 @@ count_eligible_zone_slots_for_player:
     movs r0,#0x1    @ 08032f14 0120
     ands r0,r6    @ 08032f16 3040
     movs r5,#0x0    @ 08032f18 0025
-    ldr r1, DAT_08032f64                     @ 08032f1a 1249
+    ldr r1, count_eligible_zone_slots_stride @ 08032f1a 1249
     adds r2,r0,#0x0    @ 08032f1c 021c
     muls r2,r1    @ 08032f1e 4a43
     .hword 0x4690    @ 08032f20 9046
@@ -15372,7 +15372,7 @@ LAB_08032f22:
     beq LAB_08032f4c                         @ 08032f24 12d0
     .hword 0x4640    @ 08032f26 4046
     adds r1,r5,r0    @ 08032f28 2918
-    ldr r0, DAT_08032f68                     @ 08032f2a 0f48
+    ldr r0, count_eligible_zone_slots_base   @ 08032f2a 0f48
     adds r1,r1,r0    @ 08032f2c 0918
     ldr r0,[r1,#0x0]                         @ 08032f2e 0868
     lsls r0,r0,#0x13    @ 08032f30 c004
@@ -15401,12 +15401,12 @@ LAB_08032f4c:
     pop {r4,r5,r6,r7}                        @ 08032f5e f0bc
     pop {r1}                                 @ 08032f60 02bc
     bx r1                                    @ 08032f62 0847
-DAT_08032f64:
-    .word  0x00000868                     @ 08032f64 68080000
-DAT_08032f68:
-    .word  0x0201c510                     @ 08032f68 10c50102
+count_eligible_zone_slots_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08032f64 68080000
+count_eligible_zone_slots_base:
+    .word  gDuelFieldSlots                @ 08032f68 10c50102
 
-@ Thin wrapper around count_eligible_zone_slots_for_player. Sets r2=-1 (movs r2,#1; rsbs r2,r2,#0 = all-flags) then tail-calls FUN_08032f00. Counts all eligible zone slots for given player side with all zone bits selected. Params: r0=u8 player_id [0..1]. Returns r0=u8 count [0..5]. Constants: ZONE_FLAG_ALL=-1.
+@ Thin wrapper around count_eligible_zone_slots_for_player. Sets r2=-1 (movs r2,#1; rsbs r2,r2,#0 = all-flags) then calls count_eligible_zone_slots_for_player. Counts all eligible zone slots for given player side with all zone bits selected. r0=u8 player_id [0..1]. Returns r0=u8 count [0..5]. Constants: ZONE_FLAG_ALL=-1.
 count_eligible_zone_slots_all_flags:
     push {lr}                                @ 08032f6c 00b5
     movs r2,#0x1    @ 08032f6e 0122
@@ -15493,12 +15493,12 @@ LAB_08032fee:
     adds r6,r1,#0x1    @ 08032fee 4e1c
     .hword 0x464c    @ 08032ff0 4c46
     ands r1,r4    @ 08032ff2 2140
-    ldr r0, DAT_0803307c                     @ 08032ff4 2148
+    ldr r0, count_field_cards_pair_stride    @ 08032ff4 2148
     adds r4,r1,#0x0    @ 08032ff6 0c1c
     muls r4,r0    @ 08032ff8 4443
     movs r5,#0xa    @ 08032ffa 0a25
 LAB_08032ffc:
-    ldr r0, DAT_08033080                     @ 08032ffc 2048
+    ldr r0, count_field_cards_pair_base      @ 08032ffc 2048
     adds r0,r4,r0    @ 08032ffe 2018
     ldr r1,[r0,#0x0]                         @ 08033000 0168
     lsls r0,r1,#0x12    @ 08033002 8804
@@ -15523,10 +15523,10 @@ LAB_0803301e:
     cmp r1,#0x1                              @ 08033028 0129
     ble LAB_08032fee                         @ 0803302a e0dd
     movs r5,#0x0    @ 0803302c 0025
-    ldr r3, PTR_gP1LifePoints_08033084       @ 0803302e 154b
+    ldr r3, count_field_cards_pair_lp_base   @ 0803302e 154b
     movs r0,#0x1    @ 08033030 0120
     ands r0,r2    @ 08033032 1040
-    ldr r1, DAT_0803307c                     @ 08033034 1149
+    ldr r1, count_field_cards_pair_stride    @ 08033034 1149
     adds r2,r0,#0x0    @ 08033036 021c
     muls r2,r1    @ 08033038 4a43
     adds r0,r3,#0x0    @ 0803303a 181c
@@ -15564,24 +15564,24 @@ LAB_0803306c:
     pop {r4,r5,r6,r7}                        @ 08033076 f0bc
     pop {r1}                                 @ 08033078 02bc
     bx r1                                    @ 0803307a 0847
-DAT_0803307c:
-    .word  0x00000868                     @ 0803307c 68080000
-DAT_08033080:
-    .word  0x0201c510                     @ 08033080 10c50102
-PTR_gP1LifePoints_08033084:
-    .word  gP1LifePoints                  @ 08033084 e0c40102
+count_field_cards_pair_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803307c 68080000
+count_field_cards_pair_base:
+    .word  gDuelFieldSlots                @ 08033080 10c50102
+count_field_cards_pair_lp_base:
+    .word  gP1LifePoints                  @ 08033084 e0c40102  gP1LifePoints: hand count[+0x14] + alt zone array 0x83<<3=0x418
 
 @ Check whether equip zone of player (r0) contains card_id=0x12be (Toon World). Calls find_equip_slot_by_card_id(player, 0x12be): found -> slot in [5..9] (positive); not found -> -1. mvns r0,r0: positive -> negative; -1 -> 0. lsrs r0,r0,#0x1f: negative -> 1; 0 -> 0. Result: found (Toon World present) -> 1; not found -> 0. r0=u32 player_side [0..1]. Returns u32 bool (1=Toon World equip present). Constants: target_card_id=0x12be (DAT_08033098).
 check_toon_world_equip_present:
     push {lr}                                @ 08033088 00b5
-    ldr r1, DAT_08033098                     @ 0803308a 0349
+    ldr r1, check_toon_world_card_id         @ 0803308a 0349
     bl find_equip_slot_by_card_id            @ 0803308c fff712fa
     mvns r0,r0    @ 08033090 c043
     lsrs r0,r0,#0x1f    @ 08033092 c00f
     pop {r1}                                 @ 08033094 02bc
     bx r1                                    @ 08033096 0847
-DAT_08033098:
-    .word  0x000012be                     @ 08033098 be120000
+check_toon_world_card_id:
+    .word  TOON_WORLD_CARD_ID             @ 08033098 be120000  0x12be (Toon World); presence check via equip-zone scan
 
 @ Iterate player (r0 bit0) monster zone slots 0..4; for each active slot (lsls valid bit), call test_slot_has_active_card(player, slot_idx, r10=effect_code); if true and slot[+6] halfword == r9 (target_field6_val), increment counter. r0: player_side [0..1]; r1: effect_code (-> r10 at entry); r2: target_field6_val [0..0xffff] (-> r9). Returns r0=count [0..5]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, monster_zone_count=5, slot_entry=0x14.
 count_active_slots_with_field6_value:
@@ -15599,14 +15599,14 @@ count_active_slots_with_field6_value:
     movs r0,#0x1    @ 080330b2 0120
     ands r0,r7    @ 080330b4 3840
     movs r6,#0x0    @ 080330b6 0026
-    ldr r1, DAT_08033104                     @ 080330b8 1249
+    ldr r1, count_active_field6_stride       @ 080330b8 1249
     adds r2,r0,#0x0    @ 080330ba 021c
     muls r2,r1    @ 080330bc 4a43
     .hword 0x4690    @ 080330be 9046
 LAB_080330c0:
     .hword 0x4640    @ 080330c0 4046
     adds r1,r6,r0    @ 080330c2 3118
-    ldr r0, DAT_08033108                     @ 080330c4 1048
+    ldr r0, count_active_field6_base         @ 080330c4 1048
     adds r4,r1,r0    @ 080330c6 0c18
     ldr r0,[r4,#0x0]                         @ 080330c8 2068
     lsls r0,r0,#0x13    @ 080330ca c004
@@ -15638,20 +15638,20 @@ LAB_080330ea:
     pop {r4,r5,r6,r7}                        @ 080330fe f0bc
     pop {r1}                                 @ 08033100 02bc
     bx r1                                    @ 08033102 0847
-DAT_08033104:
-    .word  0x00000868                     @ 08033104 68080000
-DAT_08033108:
-    .word  0x0201c510                     @ 08033108 10c50102
+count_active_field6_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033104 68080000
+count_active_field6_base:
+    .word  gDuelFieldSlots                @ 08033108 10c50102
 
 @ Count all occupied field zone slots (11 total: monster 5 + spell/trap 5 + field 1) for player. Iterates gDuelFieldSlots[player*0x868..+11*0x14] testing active bit (lsls #0x13) per slot; nonzero->count++. Also checks gP1LifePoints[+0x10d0] bonus flag and [0x0201bb90] turn data for +1/+2 bonus conditions. r0=u8 player_id [0..1]. Returns u32 count (0..13). Pure read-only. Constants: zone_count=11, active_bit_shift=0x13, player_stride=0x868, slot_entry=0x14.
 count_occupied_all_field_zones:
     push {r4,r5,r6,lr}                       @ 0803310c 70b5
     adds r4,r0,#0x0    @ 0803310e 041c
     movs r3,#0x0    @ 08033110 0023
-    ldr r6, PTR_gP1LifePoints_08033178       @ 08033112 194e
+    ldr r6, count_occupied_all_zones_lp_base @ 08033112 194e
     movs r0,#0x1    @ 08033114 0120
     ands r0,r4    @ 08033116 2040
-    ldr r1, DAT_0803317c                     @ 08033118 1849
+    ldr r1, count_occupied_all_zones_stride  @ 08033118 1849
     muls r1,r0    @ 0803311a 4143
     adds r5,r6,#0x0    @ 0803311c 351c
     adds r5,#0x30    @ 0803311e 3035
@@ -15668,14 +15668,14 @@ LAB_0803312e:
     subs r2,#0x1    @ 08033130 013a
     cmp r2,#0x0                              @ 08033132 002a
     bge LAB_08033122                         @ 08033134 f5da
-    ldr r1, DAT_08033180                     @ 08033136 1249
+    ldr r1, count_occupied_all_zones_bitmask_off @ 08033136 1249
     adds r0,r6,r1    @ 08033138 7018
     ldr r0,[r0,#0x0]                         @ 0803313a 0068
     movs r1,#0x1    @ 0803313c 0121
     ands r0,r1    @ 0803313e 0840
     cmp r0,#0x0                              @ 08033140 0028
     beq LAB_0803316e                         @ 08033142 14d0
-    ldr r0, DAT_08033184                     @ 08033144 0f48
+    ldr r0, count_occupied_all_zones_effect_ctx @ 08033144 0f48
     ldr r1,[r0,#0x0]                         @ 08033146 0168
     adds r2,r0,#0x0    @ 08033148 021c
     cmp r4,r1                                @ 0803314a 8c42
@@ -15703,14 +15703,14 @@ LAB_0803316e:
     pop {r1}                                 @ 08033172 02bc
     bx r1                                    @ 08033174 0847
     .zero  0x2
-PTR_gP1LifePoints_08033178:
-    .word  gP1LifePoints                  @ 08033178 e0c40102
-DAT_0803317c:
-    .word  0x00000868                     @ 0803317c 68080000
-DAT_08033180:
-    .word  0x000010d0                     @ 08033180 d0100000
-DAT_08033184:
-    .word  0x0201bb90                     @ 08033184 90bb0102
+count_occupied_all_zones_lp_base:
+    .word  gP1LifePoints                  @ 08033178 e0c40102  gP1LifePoints: +0x30=gDuelFieldSlots scan base; +0x10d0=EFFECT_ZONE_BITMASK_OFF
+count_occupied_all_zones_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803317c 68080000
+count_occupied_all_zones_bitmask_off:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 08033180 d0100000  gDuelFieldSlots+0x10d0 effect zone occupation bitmask word offset
+count_occupied_all_zones_effect_ctx:
+    .word  gEquipChainSlotRefs            @ 08033184 90bb0102
 
 @ Count monster zone slots (0..4) with active bit set (occupied). Flow: r1=(r0&1)*0x868; r4=gDuelFieldSlots; for r2=4..0 (5 slots): ldr [gDuelFieldSlots+player_stride+r2*0x14]; lsls*0x13 extracts active bit; nonzero -> r3++. Return r3=occupied monster slot count. Very high frequency (indeg=46); fundamental duel field slot count utility. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry_size=0x14, monster_zone_count=5 (r2=4..0), active_bit_shift=0x13.
 count_occupied_monster_zones:
@@ -15718,9 +15718,9 @@ count_occupied_monster_zones:
     movs r3,#0x0    @ 0803318a 0023
     movs r1,#0x1    @ 0803318c 0121
     ands r1,r0    @ 0803318e 0140
-    ldr r0, DAT_080331b4                     @ 08033190 0848
+    ldr r0, count_occupied_monster_zones_stride @ 08033190 0848
     muls r1,r0    @ 08033192 4143
-    ldr r4, DAT_080331b8                     @ 08033194 084c
+    ldr r4, count_occupied_monster_zones_base @ 08033194 084c
     movs r2,#0x4    @ 08033196 0422
 LAB_08033198:
     adds r0,r1,r4    @ 08033198 0819
@@ -15738,10 +15738,10 @@ LAB_080331a4:
     pop {r4}                                 @ 080331ae 10bc
     pop {r1}                                 @ 080331b0 02bc
     bx r1                                    @ 080331b2 0847
-DAT_080331b4:
-    .word  0x00000868                     @ 080331b4 68080000
-DAT_080331b8:
-    .word  0x0201c510                     @ 080331b8 10c50102
+count_occupied_monster_zones_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080331b4 68080000
+count_occupied_monster_zones_base:
+    .word  gDuelFieldSlots                @ 080331b8 10c50102
 
 @ Extend count_occupied_monster_zones by checking gDuelEffectCtx (0x0201bb90) for an active effect slot; if matching, add 1 to count. Flow: r4=r0 (player_id saved); bl count_occupied_monster_zones(r4) -> r2 (base count); read gDuelEffectCtx: [+0x0]=P0_id, [+0x4]=P1_id; if P0_id==r4, read [gDuelEffectCtx+0xc4] halfword, active bit set -> r2++; same check for P1_id==r4 at offset 0xd8. Return r2=bonus-adjusted occupied count. Constants: gDuelEffectCtx=0x0201bb90, ctx_P0_id_offset=0, ctx_P1_id_offset=4, ctx_slot_c4_offset=0xc4, ctx_slot_d8_offset=0xd8, active_bit_shift=0x13.
 count_occupied_monster_zones_with_effect_bonus:
@@ -15749,15 +15749,15 @@ count_occupied_monster_zones_with_effect_bonus:
     adds r4,r0,#0x0    @ 080331be 041c
     bl count_occupied_monster_zones          @ 080331c0 fff7e2ff
     adds r2,r0,#0x0    @ 080331c4 021c
-    ldr r0, PTR_gP1LifePoints_08033208       @ 080331c6 1048
-    ldr r1, DAT_0803320c                     @ 080331c8 1049
+    ldr r0, count_occ_monster_bonus_lp_base  @ 080331c6 1048
+    ldr r1, count_occ_monster_bonus_bitmask_off @ 080331c8 1049
     adds r0,r0,r1    @ 080331ca 4018
     ldr r0,[r0,#0x0]                         @ 080331cc 0068
     movs r1,#0x1    @ 080331ce 0121
     ands r0,r1    @ 080331d0 0840
     cmp r0,#0x0                              @ 080331d2 0028
     beq LAB_08033200                         @ 080331d4 14d0
-    ldr r0, DAT_08033210                     @ 080331d6 0e48
+    ldr r0, count_occ_monster_bonus_effect_ctx @ 080331d6 0e48
     ldr r1,[r0,#0x0]                         @ 080331d8 0168
     adds r3,r0,#0x0    @ 080331da 031c
     cmp r4,r1                                @ 080331dc 8c42
@@ -15784,12 +15784,12 @@ LAB_08033200:
     pop {r4}                                 @ 08033202 10bc
     pop {r1}                                 @ 08033204 02bc
     bx r1                                    @ 08033206 0847
-PTR_gP1LifePoints_08033208:
-    .word  gP1LifePoints                  @ 08033208 e0c40102
-DAT_0803320c:
-    .word  0x000010d0                     @ 0803320c d0100000
-DAT_08033210:
-    .word  0x0201bb90                     @ 08033210 90bb0102
+count_occ_monster_bonus_lp_base:
+    .word  gP1LifePoints                  @ 08033208 e0c40102  gP1LifePoints: +0x10d0=EFFECT_ZONE_BITMASK_OFF bitmask flag
+count_occ_monster_bonus_bitmask_off:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 0803320c d0100000  gDuelFieldSlots+0x10d0 effect zone occupation bitmask word offset
+count_occ_monster_bonus_effect_ctx:
+    .word  gEquipChainSlotRefs            @ 08033210 90bb0102
 
 @ Count monster zone slots (0..4) where r7 function pointer returns nonzero for card_id. Flow: r4=player_side*0x868+gDuelFieldSlots+0x8; r5=4 (descending 0..4); for each slot: ldrh [slot+0x8]=card_id; skip if 0; ldr [slot+0] extract card_id bits[12:0]; bl FUN_0810e5e4 (=bx r7, trampoline calling r7 fnptr, arg r0=card_id); nonzero -> r6++. Return r6=matching slot count. Non-APCS input: r7=function_ptr (caller-set, executed via FUN_0810e5e4=bx r7 trampoline). Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry_size=0x14, monster_zone_count=5 (r5=4..0), card_id_offset=0x8, FUN_0810e5e4_trampoline=bx r7.
 count_monster_slots_by_fnptr:
@@ -15798,12 +15798,12 @@ count_monster_slots_by_fnptr:
     movs r6,#0x0    @ 08033218 0026
     movs r1,#0x1    @ 0803321a 0121
     ands r1,r0    @ 0803321c 0140
-    ldr r0, DAT_08033250                     @ 0803321e 0c48
+    ldr r0, count_monster_by_fnptr_stride    @ 0803321e 0c48
     adds r4,r1,#0x0    @ 08033220 0c1c
     muls r4,r0    @ 08033222 4443
     movs r5,#0x4    @ 08033224 0425
 LAB_08033226:
-    ldr r0, DAT_08033254                     @ 08033226 0b48
+    ldr r0, count_monster_by_fnptr_base      @ 08033226 0b48
     adds r1,r4,r0    @ 08033228 2118
     ldrh r0,[r1,#0x8]                        @ 0803322a 0889
     cmp r0,#0x0                              @ 0803322c 0028
@@ -15824,10 +15824,10 @@ LAB_08033240:
     pop {r4,r5,r6,r7}                        @ 0803324a f0bc
     pop {r1}                                 @ 0803324c 02bc
     bx r1                                    @ 0803324e 0847
-DAT_08033250:
-    .word  0x00000868                     @ 08033250 68080000
-DAT_08033254:
-    .word  0x0201c510                     @ 08033254 10c50102
+count_monster_by_fnptr_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033250 68080000
+count_monster_by_fnptr_base:
+    .word  gDuelFieldSlots                @ 08033254 10c50102
 
 @ Count the number of field slots for the given player where the card's field8 equals 9.
 @ Iterates gDuelFieldSlots+player*0x868 over 11 slots (r5 from 0xa down to 0, slot_entry=0x14 bytes).
@@ -15841,12 +15841,12 @@ count_field_slots_with_field8_is_9:
     movs r6,#0x0    @ 0803325a 0026
     movs r1,#0x1    @ 0803325c 0121
     ands r1,r0    @ 0803325e 0140
-    ldr r0, DAT_0803328c                     @ 08033260 0a48
+    ldr r0, count_field8_is_9_stride         @ 08033260 0a48
     adds r4,r1,#0x0    @ 08033262 0c1c
     muls r4,r0    @ 08033264 4443
     movs r5,#0xa    @ 08033266 0a25
 LAB_08033268:
-    ldr r0, DAT_08033290                     @ 08033268 0948
+    ldr r0, count_field8_is_9_base           @ 08033268 0948
     adds r0,r4,r0    @ 0803326a 2018
     ldr r0,[r0,#0x0]                         @ 0803326c 0068
     lsls r0,r0,#0x13    @ 0803326e c004
@@ -15864,12 +15864,12 @@ LAB_0803327c:
     pop {r4,r5,r6}                           @ 08033286 70bc
     pop {r1}                                 @ 08033288 02bc
     bx r1                                    @ 0803328a 0847
-DAT_0803328c:
-    .word  0x00000868                     @ 0803328c 68080000
-DAT_08033290:
-    .word  0x0201c510                     @ 08033290 10c50102
+count_field8_is_9_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803328c 68080000
+count_field8_is_9_base:
+    .word  gDuelFieldSlots                @ 08033290 10c50102
 
-@ 当上层需要统计某玩家侧满足双条件的卡槽数量时调用: 条件 A (r1 非零时) 要求 [slot+0x8] equip_chain_head 非零; 条件 B (r2 非零时) 要求 [slot+0x6] chain_field 非零. 函数遍历 gDuelFieldSlots 中该玩家的 5 个卡槽 (slot_idx 0..4), 对每个有卡 ([slot+0] bit9 置位) 的槽: 若条件 A/B 均满足则计数 r5++. 返回命中计数. 纯叶子函数, 无副作用. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot+0x8=equip_chain_head, slot+0x6=chain_field.
+@ Counts player (r0 bit0) monster zone slots 0..4 satisfying: slot occupied (bit9 set); if cond_a(r1!=0): slot[+0x8](equip_chain_head)!=0; if cond_b(r2!=0): slot[+0x6](chain_field)!=0. Both conditions pass -> count++. Pure leaf, no side effects. r0=u32 player_side [0..1]; r1=u32 cond_a_flag; r2=u32 cond_b_flag. Returns u32 count [0..5]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot+0x8=equip_chain_head, slot+0x6=chain_field.
 count_slots_with_chain_field_match:
     push {r4,r5,r6,r7,lr}                    @ 08033294 f0b5
     adds r7,r1,#0x0    @ 08033296 0f1c
@@ -15877,8 +15877,8 @@ count_slots_with_chain_field_match:
     movs r5,#0x0    @ 0803329a 0025
     movs r1,#0x1    @ 0803329c 0121
     ands r1,r0    @ 0803329e 0140
-    ldr r2, DAT_080332e8                     @ 080332a0 114a
-    ldr r0, DAT_080332ec                     @ 080332a2 1248
+    ldr r2, count_chain_field_match_base     @ 080332a0 114a
+    ldr r0, count_chain_field_match_stride   @ 080332a2 1248
     muls r0,r1    @ 080332a4 4843
     adds r1,r0,r2    @ 080332a6 8118
     movs r4,#0x4    @ 080332a8 0424
@@ -15919,10 +15919,10 @@ LAB_080332d8:
     pop {r4,r5,r6,r7}                        @ 080332e2 f0bc
     pop {r1}                                 @ 080332e4 02bc
     bx r1                                    @ 080332e6 0847
-DAT_080332e8:
-    .word  0x0201c510                     @ 080332e8 10c50102
-DAT_080332ec:
-    .word  0x00000868                     @ 080332ec 68080000
+count_chain_field_match_base:
+    .word  gDuelFieldSlots                @ 080332e8 10c50102
+count_chain_field_match_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080332ec 68080000
 
 @ Counts player (r0 bit0) 5 slots (slot_idx 0..4) satisfying all: (1) slot occupied (card_id bit9 != 0); (2) slot+0x8 (equip_chain_head) == r1 (target_chain_head); (3) slot+0x6 (chain_field) == r2 (target_chain_field). All satisfied -> counter++. Returns hit count. Pure leaf scan function. indeg=3. r0=u32 player_side [0..1]; r1=u32 target_chain_head; r2=u32 target_chain_field. Returns u32 count. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14, slot_count=5 [0..4], slot+0x8=equip_chain_head, slot+0x6=chain_field.
 count_slots_matching_card_pair:
@@ -15932,9 +15932,9 @@ count_slots_matching_card_pair:
     movs r2,#0x0    @ 080332f6 0022
     movs r1,#0x1    @ 080332f8 0121
     ands r1,r0    @ 080332fa 0140
-    ldr r0, DAT_0803332c                     @ 080332fc 0b48
+    ldr r0, count_slots_card_pair_stride     @ 080332fc 0b48
     muls r1,r0    @ 080332fe 4143
-    ldr r0, DAT_08033330                     @ 08033300 0b48
+    ldr r0, count_slots_card_pair_base       @ 08033300 0b48
     movs r3,#0x4    @ 08033302 0423
     adds r1,r1,r0    @ 08033304 0918
 LAB_08033306:
@@ -15958,21 +15958,21 @@ LAB_0803331c:
     pop {r4,r5}                              @ 08033326 30bc
     pop {r1}                                 @ 08033328 02bc
     bx r1                                    @ 0803332a 0847
-DAT_0803332c:
-    .word  0x00000868                     @ 0803332c 68080000
-DAT_08033330:
-    .word  0x0201c510                     @ 08033330 10c50102
+count_slots_card_pair_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803332c 68080000
+count_slots_card_pair_base:
+    .word  gDuelFieldSlots                @ 08033330 10c50102
 
-@ 遍历 gDuelFieldSlots 指定玩家侧 5 个怪物区格子 (slot 0..4), 统计同时满足: (1) slot[0] bit19 置位 (格子有卡); (2) slot[+8] (equip_chain_head) 低 16 位等于 r1 (target_chain_head_id) 的格子数. 循环步长 0x14 字节, 返回命中数量. 用于检测某卡当前是否作为装备链头部挂接在怪物格上. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14.
+@ Counts player (r0 bit0) monster zone slots 0..4 where: slot occupied (bit19 set) AND slot[+8] low16 == r1 (target_chain_head_id). Loop stride 0x14, descending r3=4..0. Returns hit count. Used to detect if a card is currently mounted as equip chain head on a monster zone slot. r0=u32 player_side [0..1]; r1=u32 target_chain_head_id. Returns u32 count [0..5]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=0x14. Field-spell IDs checked in caller check_slot_placement_blocked_by_field_effect: Ground_Collapse_id=0x1432, OjamaKing_id=0x17ee.
 count_monster_slots_by_chain_head_id:
     push {r4,r5,r6,lr}                       @ 08033334 70b5
     adds r5,r1,#0x0    @ 08033336 0d1c
     movs r4,#0x0    @ 08033338 0024
     movs r1,#0x1    @ 0803333a 0121
     ands r1,r0    @ 0803333c 0140
-    ldr r0, DAT_08033368                     @ 0803333e 0a48
+    ldr r0, count_monster_chain_head_stride  @ 0803333e 0a48
     muls r1,r0    @ 08033340 4143
-    ldr r6, DAT_0803336c                     @ 08033342 0a4e
+    ldr r6, count_monster_chain_head_base    @ 08033342 0a4e
     movs r3,#0x4    @ 08033344 0423
 LAB_08033346:
     adds r2,r1,r6    @ 08033346 8a19
@@ -15993,10 +15993,10 @@ LAB_08033358:
     pop {r4,r5,r6}                           @ 08033362 70bc
     pop {r1}                                 @ 08033364 02bc
     bx r1                                    @ 08033366 0847
-DAT_08033368:
-    .word  0x00000868                     @ 08033368 68080000
-DAT_0803336c:
-    .word  0x0201c510                     @ 0803336c 10c50102
+count_monster_chain_head_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08033368 68080000
+count_monster_chain_head_base:
+    .word  gDuelFieldSlots                @ 0803336c 10c50102
 
 @ Iterates first 4 zone slots of gDuelFieldSlots for the given player_side, counts slots where bit9 is set (active) and slot[+6] card_id matches target_card_id. r0=u32 player_side [0..1]; r1=u16 target_card_id. Returns u32 count [0..4]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, active_bit=bit9, loop_count=4.
 count_active_cards_in_zone_by_player:
@@ -16005,9 +16005,9 @@ count_active_cards_in_zone_by_player:
     movs r4,#0x0    @ 08033374 0024
     movs r1,#0x1    @ 08033376 0121
     ands r1,r0    @ 08033378 0140
-    ldr r0, DAT_080333a4                     @ 0803337a 0a48
+    ldr r0, count_active_zone_card_stride    @ 0803337a 0a48
     muls r1,r0    @ 0803337c 4143
-    ldr r6, DAT_080333a8                     @ 0803337e 0a4e
+    ldr r6, count_active_zone_card_base      @ 0803337e 0a4e
     movs r3,#0x4    @ 08033380 0423
 LAB_08033382:
     adds r2,r1,r6    @ 08033382 8a19
@@ -16028,10 +16028,10 @@ LAB_08033394:
     pop {r4,r5,r6}                           @ 0803339e 70bc
     pop {r1}                                 @ 080333a0 02bc
     bx r1                                    @ 080333a2 0847
-DAT_080333a4:
-    .word  0x00000868                     @ 080333a4 68080000
-DAT_080333a8:
-    .word  0x0201c510                     @ 080333a8 10c50102
+count_active_zone_card_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080333a4 68080000
+count_active_zone_card_base:
+    .word  gDuelFieldSlots                @ 080333a8 10c50102
 
 @ Returns 0 if slot placement is blocked by active field effect node (indeg=40), 1 if allowed. Monster zone path (slot 0..4): traverses gDuelNodePool field-spell chain, checks field6 low bits, matches Yami(0x1432)/Sanctuary(0x17ee) IDs and direction/effect bits. Spell/trap path (slot 5..9): uses check_slot_card_is_equip_whitelist + get_node_entity_id_in_slot. r0=u8 player_id [0..1], r1=u8 slot_idx [0..9]. Returns u32 bool (0=blocked, 1=allowed). Constants: player_stride=0x868, slot_entry=0x14, Yami_id=0x1432, Sanctuary_id=0x17ee.
 check_slot_placement_blocked_by_field_effect:
@@ -16049,19 +16049,19 @@ check_slot_placement_blocked_by_field_effect:
 LAB_080333c2:
     movs r0,#0x0    @ 080333c2 0020
     .hword 0x4681    @ 080333c4 8146
-    ldr r1, DAT_080334bc                     @ 080333c6 3d49
+    ldr r1, check_slot_blocked_fz_base       @ 080333c6 3d49
     .hword 0x468a    @ 080333c8 8a46
 LAB_080333ca:
     movs r0,#0x1    @ 080333ca 0120
     .hword 0x464a    @ 080333cc 4a46
     ands r0,r2    @ 080333ce 1040
-    ldr r4, DAT_080334c0                     @ 080333d0 3b4c
+    ldr r4, check_slot_blocked_field_stride  @ 080333d0 3b4c
     muls r0,r4    @ 080333d2 6043
     add r0,r10                               @ 080333d4 5044
     ldrh r3,[r0,#0xa]                        @ 080333d6 4389
     cmp r3,#0x0                              @ 080333d8 002b
     beq LAB_08033460                         @ 080333da 41d0
-    ldr r6, DAT_080334c4                     @ 080333dc 394e
+    ldr r6, check_slot_blocked_node_pool_off @ 080333dc 394e
     add r6,r10                               @ 080333de 5644
     ldr r1,[sp,#0x0]                         @ 080333e0 0099
     lsls r0,r1,#0x3    @ 080333e2 c800
@@ -16089,19 +16089,19 @@ LAB_080333f0:
     lsls r0,r2,#0x2    @ 0803340c 9000
     adds r0,r0,r2    @ 0803340e 8018
     lsls r0,r0,#0x2    @ 08033410 8000
-    ldr r2, DAT_080334c0                     @ 08033412 2b4a
+    ldr r2, check_slot_blocked_field_stride  @ 08033412 2b4a
     muls r1,r2    @ 08033414 5143
     adds r3,r0,r1    @ 08033416 4318
-    ldr r1, DAT_080334c8                     @ 08033418 2b49
+    ldr r1, check_slot_blocked_node_neg_off  @ 08033418 2b49
     adds r0,r6,r1    @ 0803341a 7018
     adds r2,r3,r0    @ 0803341c 1a18
     ldr r0,[r2,#0x0]                         @ 0803341e 1068
     lsls r0,r0,#0x13    @ 08033420 c004
     lsrs r1,r0,#0x13    @ 08033422 c10c
-    ldr r0, DAT_080334cc                     @ 08033424 2948
+    ldr r0, check_slot_blocked_ground_collapse_id @ 08033424 2948
     cmp r1,r0                                @ 08033426 8142
     beq LAB_08033430                         @ 08033428 02d0
-    ldr r0, DAT_080334d0                     @ 0803342a 2948
+    ldr r0, check_slot_blocked_ojama_king_id @ 0803342a 2948
     cmp r1,r0                                @ 0803342c 8142
     bne LAB_0803345a                         @ 0803342e 14d1
 LAB_08033430:
@@ -16135,10 +16135,10 @@ LAB_08033460:
     movs r1,#0x1    @ 08033462 0121
     .hword 0x464a    @ 08033464 4a46
     ands r1,r2    @ 08033466 1140
-    ldr r4, DAT_080334c0                     @ 08033468 154c
+    ldr r4, check_slot_blocked_field_stride  @ 08033468 154c
     adds r0,r1,#0x0    @ 0803346a 081c
     muls r0,r4    @ 0803346c 6043
-    ldr r6, DAT_080334d4                     @ 0803346e 194e
+    ldr r6, check_slot_blocked_alt_hand_base @ 0803346e 194e
     adds r0,r0,r6    @ 08033470 8019
     ldr r0,[r0,#0x0]                         @ 08033472 0068
     cmp r3,r0                                @ 08033474 8342
@@ -16146,7 +16146,7 @@ LAB_08033460:
     movs r5,#0x1    @ 08033478 0125
     adds r0,r4,#0x0    @ 0803347a 201c
     muls r1,r0    @ 0803347c 4143
-    ldr r2, PTR_gP1LifePoints_080334d8       @ 0803347e 164a
+    ldr r2, check_slot_blocked_lp_base       @ 0803347e 164a
     subs r4,#0xe0    @ 08033480 e03c
     adds r0,r2,r4    @ 08033482 1019
     adds r4,r1,r0    @ 08033484 0c18
@@ -16180,22 +16180,22 @@ LAB_080334b0:
     cmp r1,#0x1                              @ 080334b6 0129
     ble LAB_080333ca                         @ 080334b8 87dd
     b LAB_08033516                           @ 080334ba 2ce0
-DAT_080334bc:
-    .word  0x0201c5ec                     @ 080334bc ecc50102
-DAT_080334c0:
-    .word  0x00000868                     @ 080334c0 68080000
-DAT_080334c4:
-    .word  0x000013d4                     @ 080334c4 d4130000
-DAT_080334c8:
-    .word  0xffffeb50                     @ 080334c8 50ebffff
-DAT_080334cc:
-    .word  0x00001432                     @ 080334cc 32140000
-DAT_080334d0:
-    .word  0x000017ee                     @ 080334d0 ee170000
-DAT_080334d4:
-    .word  0x0201c4fc                     @ 080334d4 fcc40102
-PTR_gP1LifePoints_080334d8:
-    .word  gP1LifePoints                  @ 080334d8 e0c40102
+check_slot_blocked_fz_base:
+    .word  gDuelFieldSpellZoneBase        @ 080334bc ecc50102  gDuelFieldSlots+11*0x14=P0 field-spell zone slot entry base; r10 scan base
+check_slot_blocked_field_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080334c0 68080000
+check_slot_blocked_node_pool_off:
+    .word  0x000013d4                     @ 080334c4 d4130000  0x13d4 = gEquipNodePool - gDuelFieldSpellZoneBase (1 raw ref; derived offset)
+check_slot_blocked_node_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 080334c8 50ebffff
+check_slot_blocked_ground_collapse_id:
+    .word  GROUND_COLLAPSE_FIELD_CARD_ID  @ 080334cc 32140000  Ground Collapse field spell id (data.md line 900); monster-zone placement block
+check_slot_blocked_ojama_king_id:
+    .word  OJAMA_KING_CARD_ID             @ 080334d0 ee170000  Ojama King id (data.md line 1639); monster-zone limit effect placement block
+check_slot_blocked_alt_hand_base:
+    .word  gP1AltHandCountBase            @ 080334d4 fcc40102
+check_slot_blocked_lp_base:
+    .word  gP1LifePoints                  @ 080334d8 e0c40102  gP1LifePoints: effect entity ctx slot+0x1c(P0_idx)/+0x20(P1_idx)
 LAB_080334dc:
     movs r0,#0x0    @ 080334dc 0020
     b LAB_08033518                           @ 080334de 1be0
@@ -16217,7 +16217,7 @@ LAB_080334f0:
     beq LAB_0803350a                         @ 080334fa 06d0
     adds r0,r5,#0x0    @ 080334fc 281c
     adds r1,r4,#0x0    @ 080334fe 211c
-    ldr r2, DAT_08033528                     @ 08033500 094a
+    ldr r2, check_slot_blocked_equip_key     @ 08033500 094a
     bl get_node_entity_id_in_slot            @ 08033502 fcf7adfc
     cmp r0,r6                                @ 08033506 b042
     beq LAB_080334dc                         @ 08033508 e8d0
@@ -16239,8 +16239,8 @@ LAB_08033518:
     pop {r4,r5,r6,r7}                        @ 08033522 f0bc
     pop {r1}                                 @ 08033524 02bc
     bx r1                                    @ 08033526 0847
-DAT_08033528:
-    .word  0x00001472                     @ 08033528 72140000
+check_slot_blocked_equip_key:
+    .word  0x00001472                     @ 08033528 72140000  0x1472: equip-whitelist chain key; spell/trap zone path; 31 raw refs
 
 @ Checks if gDuelFieldSlots[player_side][slot_idx] can accept a new card placement. Tests bit19 (lsls #0x13): occupied path checks entity state (0x0201bb90) and check_slot_placement_blocked_by_field_effect; if pass return 1. Empty slot path: checks gP1LifePoints+side*0x868+0x10a0 bit0 and check_slot_placement_blocked_by_field_effect; if pass return 1. Called by count_available_monster_slots (indeg=73) and find_first_placeable_monster_slot. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..4]. Returns u32 bool (1=accepts, 0=not). indeg=7, class D. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, entity_state=0x0201bb90, lp_flag_offset=0x10a0.
 check_monster_slot_accepts_card:
@@ -16253,10 +16253,10 @@ check_monster_slot_accepts_card:
     lsls r0,r3,#0x2    @ 08033538 9800
     adds r0,r0,r3    @ 0803353a c018
     lsls r0,r0,#0x2    @ 0803353c 8000
-    ldr r1, DAT_080335a4                     @ 0803353e 1949
+    ldr r1, check_monster_slot_accepts_stride @ 0803353e 1949
     muls r1,r2    @ 08033540 5143
     adds r0,r0,r1    @ 08033542 4018
-    ldr r1, DAT_080335a8                     @ 08033544 1849
+    ldr r1, check_monster_slot_accepts_base  @ 08033544 1849
     adds r0,r0,r1    @ 08033546 4018
     ldr r0,[r0,#0x0]                         @ 08033548 0068
     lsls r0,r0,#0x13    @ 0803354a c004
@@ -16269,7 +16269,7 @@ check_monster_slot_accepts_card:
     ands r0,r5    @ 08033558 2840
     cmp r0,#0x0                              @ 0803355a 0028
     beq LAB_08033592                         @ 0803355c 19d0
-    ldr r0, DAT_080335ac                     @ 0803355e 1348
+    ldr r0, check_monster_slot_effect_ctx    @ 0803355e 1348
     ldr r1,[r0,#0x0]                         @ 08033560 0168
     adds r2,r0,#0x0    @ 08033562 021c
     cmp r4,r1                                @ 08033564 8c42
@@ -16305,12 +16305,12 @@ LAB_08033592:
     movs r0,#0x1    @ 0803359e 0120
     b LAB_080335b2                           @ 080335a0 07e0
     .zero  0x2
-DAT_080335a4:
-    .word  0x00000868                     @ 080335a4 68080000
-DAT_080335a8:
-    .word  0x0201c510                     @ 080335a8 10c50102
-DAT_080335ac:
-    .word  0x0201bb90                     @ 080335ac 90bb0102
+check_monster_slot_accepts_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080335a4 68080000
+check_monster_slot_accepts_base:
+    .word  gDuelFieldSlots                @ 080335a8 10c50102
+check_monster_slot_effect_ctx:
+    .word  gEquipChainSlotRefs            @ 080335ac 90bb0102
 LAB_080335b0:
     movs r0,#0x0    @ 080335b0 0020
 LAB_080335b2:
@@ -16335,7 +16335,7 @@ LAB_080335ce:
     adds r4,#0x1    @ 080335ce 0134
     cmp r4,#0x4                              @ 080335d0 042c
     ble LAB_080335c0                         @ 080335d2 f5dd
-    ldr r0, DAT_080335f8                     @ 080335d4 0848
+    ldr r0, count_avail_monster_spatial_id   @ 080335d4 0848
     bl count_field_copies_of_card            @ 080335d6 fff7e1f8
     cmp r0,#0x0                              @ 080335da 0028
     beq LAB_08033606                         @ 080335dc 13d0
@@ -16350,8 +16350,8 @@ LAB_080335ce:
     subs r0,r4,r0    @ 080335f2 201a
     b LAB_080335fe                           @ 080335f4 03e0
     .zero  0x2
-DAT_080335f8:
-    .word  0x000016df                     @ 080335f8 df160000
+count_avail_monster_spatial_id:
+    .word  SPATIAL_COLLAPSE_CARD_ID       @ 080335f8 df160000  Spatial Collapse field spell id; monster zone clamp
 LAB_080335fc:
     adds r0,r5,#0x0    @ 080335fc 281c
 LAB_080335fe:

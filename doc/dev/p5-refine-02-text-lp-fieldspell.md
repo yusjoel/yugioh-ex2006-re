@@ -63,7 +63,7 @@
 | 5 | 0x309b8..0x313dc | 23 | 60 | ✅ | 1ad7df7 |
 | 6 | 0x313dc..0x3217c | 23 | 64 | ✅ | 8051a2e |
 | 7 | 0x3217c..0x32e80 | 23 | 67 | ✅ | f12c5fe |
-| 8 | 0x32e80..0x33654 | 23 | 44 | ⬜ | |
+| 8 | 0x32e80..0x33654 | 23 | 44 | ✅ | pending |
 | 9 | 0x33654..0x3407c | 23 | 63 | ⬜ | |
 | 10 | 0x3407c..0x35f54 | 17 | 246 | ⬜ | |
 
@@ -483,6 +483,66 @@
 
 ---
 
+### 4.08 Seg-8 完成记录 (0x08032e80..0x08033654, 23 fn)
+
+**函数列表**:
+| addr       | name                                              |
+|------------|---------------------------------------------------|
+| 0x08032e80 | count_monster_slots_by_state                      |
+| 0x08032ef0 | count_monster_slots_by_state_all                  |
+| 0x08032f00 | count_eligible_zone_slots_for_player              |
+| 0x08032f6c | count_eligible_zone_slots_all_flags               |
+| 0x08032f7c | count_slot_card_pair_allowed_for_card             |
+| 0x08032fa4 | count_unpaired_slots_for_card                     |
+| 0x08032fd8 | count_field_cards_pair_allowed_for_card           |
+| 0x08033088 | check_toon_world_equip_present                    |
+| 0x0803309c | count_active_slots_with_field6_value              |
+| 0x0803310c | count_occupied_all_field_zones                    |
+| 0x08033188 | count_occupied_monster_zones                      |
+| 0x080331bc | count_occupied_monster_zones_with_effect_bonus    |
+| 0x08033214 | count_monster_slots_by_fnptr                      |
+| 0x08033258 | count_field_slots_with_field8_is_9                |
+| 0x08033294 | count_slots_with_chain_field_match                |
+| 0x080332f0 | count_slots_matching_card_pair                    |
+| 0x08033334 | count_monster_slots_by_chain_head_id              |
+| 0x08033370 | count_active_cards_in_zone_by_player              |
+| 0x080333ac | check_slot_placement_blocked_by_field_effect      |
+| 0x0803352c | check_monster_slot_accepts_card                   |
+| 0x080335b8 | count_available_monster_slots                     |
+| 0x08033610 | count_monster_slots_accepting_card                |
+| 0x08033634 | get_first_placeable_monster_slot                  |
+
+**符号化统计**:
+- EQ_SLOTS: 38 (33 EQ_REUSE + 5 EQ_NEW)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x14 + gDuelFieldSlots x12 + EFFECT_ZONE_BITMASK_OFF x2 + gEquipChainSlotRefs x3 + NODE_POOL_NEG_OFFSET x1 + gP1AltHandCountBase x1
+  - EQ_NEW: gDuelFieldSpellZoneBase x1 (ewram.inc) + TOON_WORLD_CARD_ID x1 + GROUND_COLLAPSE_FIELD_CARD_ID x1 + OJAMA_KING_CARD_ID x1 + SPATIAL_COLLAPSE_CARD_ID x1 (card_info.inc)
+- REF_SLOTS: 0
+- RENAME_SLOTS: 6 (4 PTR_gP1LifePoints + 2 independent DAT)
+- PLATE_FULL: 3 (全段重写, C8 Ghidra readback 验证 3/3 无 FUN_ 残留)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants** (5 项):
+- `card_info.inc`: TOON_WORLD_CARD_ID=0x12be (Toon World field-magic card id; equip-zone scan; 9 raw refs)
+- `card_info.inc`: GROUND_COLLAPSE_FIELD_CARD_ID=0x1432 (data.md line 900, passcode 90502999; 18 raw refs)
+- `card_info.inc`: OJAMA_KING_CARD_ID=0x17ee (data.md line 1639, passcode 90140980; 13 raw refs)
+- `card_info.inc`: SPATIAL_COLLAPSE_CARD_ID=0x16df (Spatial Collapse field spell; monster zone clamp; 16 raw refs)
+- `ewram.inc`: gDuelFieldSpellZoneBase=0x0201c5ec (gDuelFieldSlots+11*0x14=P0 field-spell zone slot entry base; 6 raw refs)
+
+**C8 plate 验证**:
+- 3 个 plate 全用 setPlateComment 整段重写 (非 substring replace), 写入后读回 re 扫描确认无 FUN_ 残留
+- 导出后 grep asm/02_text_lp_fieldspell.s Seg-8 范围 (L15282..L16430) @ 行含 FUN_ = **0 stale subjects** (落地验收通过; 3 个 FUN_ 命中均为 P4/P5 外部未命名 caller 上下文说明, 非 stale 主语)
+- Non-ASCII scan: 0 行
+
+**落地踩坑记录**: 无 (iteration-2 PASS, dry run 0 FAIL, 实跑 EQ=38/RENAME=6/PLATE 3 PLF OK, 0 SKIP/FAIL)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg8Slots.py` (EQ38/REF0/RENAME6/PLATE_FULL3)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: pending
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 02 范围 `[0x0802c238, 0x08035f54)` (span 0x9D1C, 224 named fn [305 含 81 switchD 跳转表
@@ -498,7 +558,7 @@
 | Seg-5 | 0x309b8..0x313dc | 23 | 60 | — | effect slot zone equip valid 判定 |
 | Seg-6 | 0x313dc..0x3217c | 23 | 64 | — | equip card set-code / slot ref array |
 | Seg-7 | 0x3217c..0x32e80 | 23 | 67 | — | ✅ zone slot chain refs clear/dispatch + effect zone offset symbolization |
-| Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | monster slot count/state scan |
+| Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | ✅ monster slot count/state scan + field spell placement check |
 | Seg-9 | 0x33654..0x3407c | 23 | 63 | — | placeable monster slot find |
 | Seg-10 | 0x3407c..0x35f54 | 17 | 246 | — | slot target eligibility full + fieldspell zone (重) |
 
