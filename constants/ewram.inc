@@ -327,3 +327,8 @@
 .equ gP1ChainZoneArray,    0x0201c880  @ gP1LifePoints+0x3a0: chain zone data array P1 base (21 ROM refs)
 .equ gP1AltHandCountBase,  0x0201c4fc  @ gP1LifePoints+0x1c: alt-hand slot count P1 base (7 ROM refs)
 .equ gP1AltHandSlotArray,  0x0201cab0  @ gP1LifePoints+0x5d0: alt-hand slot data array P1 base (15 ROM refs)
+
+@ =============================================================================
+@ file 02 Seg-7 additions: duel field slot P2 base
+@ =============================================================================
+.equ gDuelFieldSlots_p2_base, 0x0201c5d8  @ gDuelFieldSlots+0xc8 = slot[10] base for field9==2 single-slot path; 24 raw refs

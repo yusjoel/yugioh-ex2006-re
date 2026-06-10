@@ -62,7 +62,7 @@
 | 4 | 0x2fd00..0x309b8 | 23 | 136 | ✅ | f8cdb43 |
 | 5 | 0x309b8..0x313dc | 23 | 60 | ✅ | 1ad7df7 |
 | 6 | 0x313dc..0x3217c | 23 | 64 | ✅ | 8051a2e |
-| 7 | 0x3217c..0x32e80 | 23 | 67 | ⬜ | |
+| 7 | 0x3217c..0x32e80 | 23 | 67 | ✅ | pending |
 | 8 | 0x32e80..0x33654 | 23 | 44 | ⬜ | |
 | 9 | 0x33654..0x3407c | 23 | 63 | ⬜ | |
 | 10 | 0x3407c..0x35f54 | 17 | 246 | ⬜ | |
@@ -426,6 +426,63 @@
 
 ---
 
+### 4.07 Seg-7 完成记录 (0x0803217c..0x08032e80, 23 fn)
+
+**函数列表**:
+| addr       | name                                         |
+|------------|----------------------------------------------|
+| 0x0803217c | clear_zone_slot_chain_refs                   |
+| 0x08032194 | erase_slot_from_zone_array_by_type           |
+| 0x08032280 | dispatch_card_placement_by_zone_type         |
+| 0x08032358 | classify_card_effect_category                |
+| 0x080324b4 | find_equip_slot_by_card_id                   |
+| 0x08032500 | find_field_slot_idx_by_card_id               |
+| 0x08032548 | test_slot_has_active_card                    |
+| 0x0803259c | check_slot_equip_eligible_by_type_and_id     |
+| 0x080325dc | check_card_equip_eligibility_in_field        |
+| 0x08032654 | count_available_effect_zones                 |
+| 0x0803279c | count_field_copies_of_card                   |
+| 0x08032904 | count_zones_by_card_and_mode                 |
+| 0x08032960 | count_equip_eligible_slots_for_player        |
+| 0x08032a6c | count_equip_eligible_slots_both_players      |
+| 0x08032a8c | find_best_slot_for_card_by_player            |
+| 0x08032b98 | find_best_slot_atk_across_players            |
+| 0x08032bc8 | count_paired_slots_with_field5               |
+| 0x08032c94 | count_paired_slots_with_field5_default       |
+| 0x08032ca4 | count_paired_slots_both_sides                |
+| 0x08032ccc | count_equipped_paired_slots_for_player       |
+| 0x08032d1c | count_equip_set_activatable_slots_for_player |
+| 0x08032dac | count_equip_zone_slots_matching_card         |
+| 0x08032e20 | count_equip_slots_meeting_atk_threshold      |
+
+**符号化统计**:
+- EQ_SLOTS: 48 (40 EQ_REUSE + 8 EQ_NEW)
+  - EQ_REUSE: PLAYER_BLOCK_STRIDE x20 + gDuelFieldSlots x18 + gDuelEffectChainSlots x1 + gEquipChainSlotRefs x1
+  - EQ_NEW: EFFECT_ZONE_PARTITION_OFF x5 (duel_field.inc) + gDuelFieldSlots_p2_base x2 (ewram.inc) + EFFECT_ZONE_BITMASK_OFF x1 (duel_field.inc)
+- REF_SLOTS: 0
+- RENAME_SLOTS: 19 (2 switchD ptr + 13 classify_cid + 4 equip_elig_cid)
+- PLATE_FULL: 5 (全段重写, C8 Ghidra readback 验证 5/5 无 FUN_ 残留)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建 constants** (3 项):
+- `duel_field.inc`: EFFECT_ZONE_PARTITION_OFF=0x000010a4 (gDuelFieldSlots+0x10a4=effect zone slot array base; 18 raw refs)
+- `duel_field.inc`: EFFECT_ZONE_BITMASK_OFF=0x000010d0 (gDuelFieldSlots+0x10a0=effect zone occupation bitmask; 45 raw refs)
+- `ewram.inc`: gDuelFieldSlots_p2_base=0x0201c5d8 (gDuelFieldSlots+0xc8=slot[10] for field9==2 path; 24 raw refs)
+
+**C8 plate 验证**:
+- 5 个 plate 全用 setPlateComment 整段重写 (非 substring replace), 写入后读回 re 扫描确认无 FUN_ 残留
+- 导出后 grep asm/02_text_lp_fieldspell.s Seg-7 范围 (L13475..L15283) @ 行含 FUN_ = **0** (落地验收通过)
+
+**落地踩坑记录**: 无 (first-shot PASS, dry run 0 FAIL, 实跑 EQ=48/RENAME=19/PLATE 5 PLF OK, 0 SKIP)
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg7Slots.py` (EQ48/REF0/RENAME19/PLATE_FULL5)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: pending
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 02 范围 `[0x0802c238, 0x08035f54)` (span 0x9D1C, 224 named fn [305 含 81 switchD 跳转表
@@ -440,7 +497,7 @@
 | Seg-4 | 0x2fd00..0x309b8 | 23 | 136 | — | equip chain node find/link/replace 簇 |
 | Seg-5 | 0x309b8..0x313dc | 23 | 60 | — | effect slot zone equip valid 判定 |
 | Seg-6 | 0x313dc..0x3217c | 23 | 64 | — | equip card set-code / slot ref array |
-| Seg-7 | 0x3217c..0x32e80 | 23 | 67 | — | zone slot chain refs clear/dispatch |
+| Seg-7 | 0x3217c..0x32e80 | 23 | 67 | — | ✅ zone slot chain refs clear/dispatch + effect zone offset symbolization |
 | Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | monster slot count/state scan |
 | Seg-9 | 0x33654..0x3407c | 23 | 63 | — | placeable monster slot find |
 | Seg-10 | 0x3407c..0x35f54 | 17 | 246 | — | slot target eligibility full + fieldspell zone (重) |

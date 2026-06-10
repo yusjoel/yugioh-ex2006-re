@@ -158,3 +158,10 @@
 @ file 02 Seg-6 additions: equip slot active-state tag
 @ =============================================================================
 .equ EQUIP_SLOT_ACTIVE_TAG,     0xa5600000  @ packed slot word tag: slot[0]<<19==this -> equip slot active/live; 5 raw refs; 1 Seg-6 slot
+
+@ =============================================================================
+@ file 02 Seg-7 additions: effect zone offset constants
+@ =============================================================================
+.equ EFFECT_ZONE_PARTITION_OFF, 0x000010a4  @ gDuelFieldSlots+0x10a4 = effect zone slot array base offset (0x0201d5b4); 18 raw refs
+.equ EFFECT_ZONE_BITMASK_OFF,   0x000010d0  @ gDuelFieldSlots+0x10a0 = effect zone occupation bitmask word offset; 45 raw refs
+                                             @ (used as: r10=gDuelFieldSlots-0x30; r10+0x10d0=gDuelFieldSlots+0x10a0=0x0201d5b0)
