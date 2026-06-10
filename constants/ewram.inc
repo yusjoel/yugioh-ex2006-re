@@ -342,3 +342,11 @@
 @ file 03 Seg-1 additions: duel phase flags global
 @ =============================================================================
 .equ gDuelPhaseFlags,       0x0201b290  @ duel phase flags struct base; +0x4bc=phase lock byte, +0x594=effect entry count; 676 raw refs
+
+@ =============================================================================
+@ file 03 Seg-2 additions: effect entry array globals and player-block neg offsets
+@ =============================================================================
+.equ gEffectEntryArray,           0x0201b590  @ effect entry array base (stride=0x18, count at gDuelPhaseFlags+EFFECT_ENTRY_COUNT_OFF); 23 raw refs
+.equ EFFECT_ENTRY_COUNT_OFF,      0x00000594  @ gDuelPhaseFlags+0x594 = effect entry count field; 9 raw refs
+.equ HAND_ARRAY_TO_COUNT_NEG_OFF, 0xfffffbfc  @ gP1HandSlotArray(0x0201c8f8)+0xfffffbfc=gP1HandCountBase(0x0201c4f4); neg delta=-0x404 from hand slot array to hand count base; 5 raw refs
+.equ ALT_HAND_ARRAY_TO_COUNT_NEG_OFF, 0xfffffa4c  @ gP1AltHandSlotArray(0x0201cab0)+0xfffffa4c=gP1AltHandCountBase(0x0201c4fc); neg delta=-0x5b4 from alt-hand slot array to alt-hand count base; 3 raw refs

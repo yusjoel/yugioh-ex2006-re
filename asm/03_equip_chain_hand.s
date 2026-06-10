@@ -1527,8 +1527,7 @@ LAB_08036a72:
     pop {r1}                                 @ 08036a74 02bc
     bx r1                                    @ 08036a76 0847
 
-@ Called by 5 callers (indeg=5, D_shared_mid), including FUN_0809f9cc (duel_field main AI, tags: card_frame/duel_field etc.) and FUN_0805d118/FUN_080608e0/FUN_08060908/FUN_08060974. r0=player_id [0..1]; extracts player_bit = r0 & 1, multiplies by player_stride=0x868. Iterates slots 0..10 (step 0x14, cmp r5,#0xa): per slot reads [gDuelFieldSlots+player*0x868+slot*0x14], tests bit 19 (lsls r0,r0,#0x13) for activation; checks [slot+0x8] card_id nonzero; if both satisfied calls get_slot_effect_card_value(player, slot_index) and accumulates into r7. Returns r7 = sum of effect values across all active equip slots. Used by AI to evaluate total equip field effect value.
-@ Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14 (20 bytes), slot_count=[0..10] (11 slots), activation_bit=19.
+@ sum_equip_slot_effect_values_for_player: Sums effect card values for all active equip slots of a player. r0=player_id [0..1]. Iterates slots 0..10 (gDuelFieldSlots stride=PLAYER_BLOCK_STRIDE=0x868, slot_stride=0x14). Per slot: tests bit19 of slot[0] (activation flag); if set, checks slot[+0x8] card_id nonzero; on both: calls get_slot_effect_card_value(player, slot_idx) and accumulates. Returns r7 = sum of effect values across all 11 active equip slots. 5 callers (duel_field AI + effect dispatch). Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868, activation_bit=19.
 sum_equip_slot_effect_values_for_player:
     push {r4,r5,r6,r7,lr}                    @ 08036a78 f0b5
     adds r6,r0,#0x0    @ 08036a7a 061c
@@ -1536,11 +1535,11 @@ sum_equip_slot_effect_values_for_player:
     movs r5,#0x0    @ 08036a7e 0025
     movs r0,#0x1    @ 08036a80 0120
     ands r0,r6    @ 08036a82 3040
-    ldr r1, DAT_08036ab8                     @ 08036a84 0c49
+    ldr r1, sum_equip_slot_values_stride     @ 08036a84 0c49
     adds r4,r0,#0x0    @ 08036a86 041c
     muls r4,r1    @ 08036a88 4c43
 LAB_08036a8a:
-    ldr r0, DAT_08036abc                     @ 08036a8a 0c48
+    ldr r0, sum_equip_slot_values_slots      @ 08036a8a 0c48
     adds r1,r4,r0    @ 08036a8c 2118
     ldr r0,[r1,#0x0]                         @ 08036a8e 0868
     lsls r0,r0,#0x13    @ 08036a90 c004
@@ -1563,12 +1562,12 @@ LAB_08036aa6:
     pop {r1}                                 @ 08036ab2 02bc
     bx r1                                    @ 08036ab4 0847
     .zero  0x2
-DAT_08036ab8:
-    .word  0x00000868                     @ 08036ab8 68080000
-DAT_08036abc:
-    .word  0x0201c510                     @ 08036abc 10c50102
+sum_equip_slot_values_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036ab8 68080000
+sum_equip_slot_values_slots:
+    .word  gDuelFieldSlots                @ 08036abc 10c50102
 
-@ Slot card eligibility check for special action: r0=player_id, r1=slot_idx, r2=card_id. Steps: (1) card_id==0 -> return 0; (2) slot in [5..9] -> check_card_field5_is_nonzero, hit -> SUCCESS; (3) get_card_extended_stat_field9==3 -> slot in [5..0xa] active_bit check at gDuelFieldSlots+8; (4) field9!=3 -> match against 5 special card_ids (0x13ea/0x1231/0x1238/0x1514/0x1980), on hit do active_bit + [+0x10] bit1 check. Returns u32 bool (1=eligible, 0=not). r0=u32 player_id [0..1]; r1=u32 slot_idx [0..0xb]; r2=u16 card_id [0..0x172f]. 5 callers all duel/effect (FUN_08051a08/FUN_0805b990/FUN_0805f088/FUN_0807076c/FUN_080acc30, mostly duel_field). No side effects, reads gDuelFieldSlots only. Constants: SLOT_RANGE_LO=5, SLOT_RANGE_HI=9, FIELD9_SPECIAL=3, SPECIAL_CARDS=[0x13ea,0x1231,0x1238,0x1514,0x1980].
+@ check_slot_card_eligible_for_special_action: Checks equip activation eligibility for 5 special card_ids. r0=player_id [0..1]; r1=slot_idx [0..0xb]; r2=card_id [0..0x172f]. Steps: (1) card_id==0 -> return 0; (2) slot in [5..9] -> check_card_field5_is_nonzero, hit->1; (3) get_card_extended_stat_field9==3 -> slot in [5..0xa] active_bit check at gDuelFieldSlots+8; (4) field9!=3 -> match against 5 special CIDs:   GAP_CID_13EA(0x13ea,gap), KUNAI_WITH_CHAIN_CID(0x1231), KUNAI+7=Metalmorph(0x1238),   BLAST_WITH_CHAIN_CID(0x1514), 0xcc<<5=Hero_Heyro(0x1980);   on match: slot in [0..4] and active_bit nonzero and [slot+0x10].bit1==0 -> return 1. Returns 1 if eligible, 0 if not. 5 callers (duel_field/effect). Read-only. Constants: gDuelFieldSlots=0x0201c510, PLAYER_BLOCK_STRIDE=0x868.
 check_slot_card_eligible_for_special_action:
     push {r4,r5,r6,r7,lr}                    @ 08036ac0 f0b5
     adds r6,r0,#0x0    @ 08036ac2 061c
@@ -1597,39 +1596,39 @@ LAB_08036adc:
     lsls r0,r5,#0x2    @ 08036af2 a800
     adds r0,r0,r5    @ 08036af4 4019
     lsls r0,r0,#0x2    @ 08036af6 8000
-    ldr r1, DAT_08036b0c                     @ 08036af8 0449
+    ldr r1, check_special_action_elig_stride @ 08036af8 0449
     muls r1,r2    @ 08036afa 5143
     adds r0,r0,r1    @ 08036afc 4018
-    ldr r1, DAT_08036b10                     @ 08036afe 0449
+    ldr r1, check_special_action_elig_slots  @ 08036afe 0449
     adds r0,r0,r1    @ 08036b00 4018
     ldrh r0,[r0,#0x8]                        @ 08036b02 0089
     cmp r0,#0x0                              @ 08036b04 0028
     bne LAB_08036b70                         @ 08036b06 33d1
     b LAB_08036b80                           @ 08036b08 3ae0
     .zero  0x2
-DAT_08036b0c:
-    .word  0x00000868                     @ 08036b0c 68080000
-DAT_08036b10:
-    .word  0x0201c510                     @ 08036b10 10c50102
+check_special_action_elig_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036b0c 68080000
+check_special_action_elig_slots:
+    .word  gDuelFieldSlots                @ 08036b10 10c50102
 LAB_08036b14:
-    ldr r0, DAT_08036b2c                     @ 08036b14 0548
+    ldr r0, check_special_action_elig_cid_13ea @ 08036b14 0548
     cmp r4,r0                                @ 08036b16 8442
     beq LAB_08036b42                         @ 08036b18 13d0
     cmp r4,r0                                @ 08036b1a 8442
     bgt LAB_08036b34                         @ 08036b1c 0adc
-    ldr r0, DAT_08036b30                     @ 08036b1e 0448
+    ldr r0, check_special_action_elig_kunai_cid @ 08036b1e 0448
     cmp r4,r0                                @ 08036b20 8442
     beq LAB_08036b42                         @ 08036b22 0ed0
     adds r0,#0x7    @ 08036b24 0730
     cmp r4,r0                                @ 08036b26 8442
     beq LAB_08036b42                         @ 08036b28 0bd0
     b LAB_08036b80                           @ 08036b2a 29e0
-DAT_08036b2c:
-    .word  0x000013ea                     @ 08036b2c ea130000
-DAT_08036b30:
-    .word  0x00001231                     @ 08036b30 31120000
+check_special_action_elig_cid_13ea:
+    .word  GAP_CID_13EA                   @ 08036b2c ea130000
+check_special_action_elig_kunai_cid:
+    .word  KUNAI_WITH_CHAIN_CID           @ 08036b30 31120000
 LAB_08036b34:
-    ldr r0, DAT_08036b74                     @ 08036b34 0f48
+    ldr r0, check_special_action_elig_blast_cid @ 08036b34 0f48
     cmp r4,r0                                @ 08036b36 8442
     beq LAB_08036b42                         @ 08036b38 03d0
     movs r0,#0xcc    @ 08036b3a cc20
@@ -1644,10 +1643,10 @@ LAB_08036b42:
     lsls r0,r5,#0x2    @ 08036b4a a800
     adds r0,r0,r5    @ 08036b4c 4019
     lsls r0,r0,#0x2    @ 08036b4e 8000
-    ldr r1, DAT_08036b78                     @ 08036b50 0949
+    ldr r1, check_special_action_elig_stride_b @ 08036b50 0949
     muls r1,r6    @ 08036b52 7143
     adds r1,r0,r1    @ 08036b54 4118
-    ldr r2, DAT_08036b7c                     @ 08036b56 094a
+    ldr r2, check_special_action_elig_slots_b @ 08036b56 094a
     adds r0,r1,r2    @ 08036b58 8818
     ldrh r0,[r0,#0x8]                        @ 08036b5a 0089
     cmp r0,#0x0                              @ 08036b5c 0028
@@ -1663,12 +1662,12 @@ LAB_08036b42:
 LAB_08036b70:
     movs r0,#0x1    @ 08036b70 0120
     b LAB_08036b82                           @ 08036b72 06e0
-DAT_08036b74:
-    .word  0x00001514                     @ 08036b74 14150000
-DAT_08036b78:
-    .word  0x00000868                     @ 08036b78 68080000
-DAT_08036b7c:
-    .word  0x0201c510                     @ 08036b7c 10c50102
+check_special_action_elig_blast_cid:
+    .word  BLAST_WITH_CHAIN_CID           @ 08036b74 14150000
+check_special_action_elig_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036b78 68080000
+check_special_action_elig_slots_b:
+    .word  gDuelFieldSlots                @ 08036b7c 10c50102
 LAB_08036b80:
     movs r0,#0x0    @ 08036b80 0020
 LAB_08036b82:
@@ -1676,7 +1675,7 @@ LAB_08036b82:
     pop {r1}                                 @ 08036b84 02bc
     bx r1                                    @ 08036b86 0847
 
-@ Reverse-scans effect entry array (0x0201b590, stride=0x18, count=[gDuelPhaseFlags+0x594]) for an entry matching player_side(r0/r2) and zone_type(r3). For each candidate entry: checks [+2].bit0==r10 (player_side) and [+2].bits[1..5]==r9 (zone_type). Inner loop: calls read_effect_slot_side_and_type(entry, r5) for each sub-slot, compares packed result against key (slot_idx<<8|player_side). Returns 1 on first full match, 0 if no match found. Read-only. r0=u32 player_side [0..1], r1=u32 slot_idx [0..4] (spill to stack), r2=u32 player_side_copy [0..1] -> r10, r3=u32 zone_type [0..0x1f] -> r9. Returns u32 bool (1=matching entry found, 0=not found). Constants: effect_entry_array=0x0201b590, effect_entry_stride=0x18, gDuelPhaseFlags=0x0201b290, effect_count_offset=0x594.
+@ find_effect_entry_by_player_zone: Reverse-scans effect entry array for an entry matching player_side and zone_type. gEffectEntryArray=0x0201b590, stride=0x18. count = [gDuelPhaseFlags + EFFECT_ENTRY_COUNT_OFF(0x594)]. Per candidate: [+2].bit0==r10(player_side) and [+2].bits[1..5]==r9(zone_type). Inner loop: calls read_effect_slot_side_and_type(entry, sub_slot_idx) for each sub-slot, compares packed result (slot_idx<<8|player_side) against key; returns 1 on first full match. r0=u32 player_side [0..1], r1=u32 slot_idx [0..4] (stacked), r2=player_side->r10, r3=zone_type->r9. Returns u32 bool (1=match found, 0=not found). Read-only.
 find_effect_entry_by_player_zone:
     push {r4,r5,r6,r7,lr}                    @ 08036b88 f0b5
     .hword 0x4657    @ 08036b8a 5746
@@ -1688,8 +1687,8 @@ find_effect_entry_by_player_zone:
     str r1,[sp,#0x0]                         @ 08036b96 0091
     .hword 0x4692    @ 08036b98 9246
     .hword 0x4699    @ 08036b9a 9946
-    ldr r0, DAT_08036bf8                     @ 08036b9c 1648
-    ldr r1, DAT_08036bfc                     @ 08036b9e 1749
+    ldr r0, find_effect_entry_phase_flags    @ 08036b9c 1648
+    ldr r1, find_effect_entry_count_off      @ 08036b9e 1749
     adds r0,r0,r1    @ 08036ba0 4018
     ldr r0,[r0,#0x0]                         @ 08036ba2 0068
     subs r7,r0,#0x1    @ 08036ba4 471e
@@ -1702,7 +1701,7 @@ find_effect_entry_by_player_zone:
     lsrs r0,r0,#0x18    @ 08036bb2 000e
     .hword 0x4680    @ 08036bb4 8046
 LAB_08036bb6:
-    ldr r0, DAT_08036c00                     @ 08036bb6 1248
+    ldr r0, find_effect_entry_array          @ 08036bb6 1248
     adds r6,r2,r0    @ 08036bb8 1618
     ldrb r1,[r6,#0x2]                        @ 08036bba b178
     lsls r0,r1,#0x1f    @ 08036bbc c807
@@ -1735,12 +1734,12 @@ LAB_08036be2:
     movs r0,#0x1    @ 08036bf2 0120
     b LAB_08036c1a                           @ 08036bf4 11e0
     .zero  0x2
-DAT_08036bf8:
-    .word  0x0201b290                     @ 08036bf8 90b20102
-DAT_08036bfc:
-    .word  0x00000594                     @ 08036bfc 94050000
-DAT_08036c00:
-    .word  0x0201b590                     @ 08036c00 90b50102
+find_effect_entry_phase_flags:
+    .word  gDuelPhaseFlags                @ 08036bf8 90b20102
+find_effect_entry_count_off:
+    .word  EFFECT_ENTRY_COUNT_OFF         @ 08036bfc 94050000
+find_effect_entry_array:
+    .word  gEffectEntryArray              @ 08036c00 90b50102
 LAB_08036c04:
     adds r5,#0x1    @ 08036c04 0135
     ldr r0,[r6,#0x4]                         @ 08036c06 7068
@@ -1766,7 +1765,7 @@ LAB_08036c1a:
     bx r1                                    @ 08036c28 0847
     .zero  0x2
 
-@ Builds and submits an effect zone entry for player_side(r0), zone_idx(r1) [>=5 only]. zone_idx<=4 returns 0 immediately (monster zone ignored). Flow: (1) get_zone_slot_ptr(player_side, zone_idx) -> slot_ptr r4; (2) alloca 0x18 bytes on stack, zero-fill; (3) write player_side&1 to buf[+2].bit0 and zone_idx&0x1f to buf[+2].bits[1..5]; (4) read card_id (bits[0..12]) from slot_ptr and write to buf[+0]; (5) pack card_id extra fields into buf[+4] (mask 0xffff803f); (6) clear buf[+3] bits 0x31; (7) call check_card_placement_rules(buf) and return result. r0=u32 player_side [0..1], r1=u32 zone_idx [5..10]. Returns u32 (0=zone_idx<=4 early exit; check_card_placement_rules result otherwise). Side-effects: stack buf written; check_card_placement_rules may write player state.
+@ build_effect_zone_entry: Builds and submits an effect zone entry for player_side(r0), zone_idx(r1 >=5). zone_idx<=4 returns 0 immediately (monster zone ignored). Steps: (1) get_zone_slot_ptr(player_side, zone_idx) -> slot_ptr r4; (2) alloca 0x18 bytes stack, zero-fill via memset; (3) write player_side&1 to buf[+2].bit0 and zone_idx&0x1f to buf[+2].bits[1..5]; (4) read card_id bits[12:0] from slot_ptr, write to buf[+0]; (5) pack extra fields into buf[+4] using mask SCROLLBAR_CLEAR_BITS_14_6(0xffff803f); (6) clear buf[+3] bits 0x31; (7) call check_card_placement_rules(buf) and return result. Returns 0 on early exit, else check_card_placement_rules result.
 build_effect_zone_entry:
     push {r4,r5,r6,lr}                       @ 08036c2c 70b5
     sub sp,#0x18                             @ 08036c2e 86b0
@@ -1817,7 +1816,7 @@ LAB_08036c3c:
     lsrs r0,r0,#0x1f    @ 08036c8a c00f
     orrs r1,r0    @ 08036c8c 0143
     lsls r1,r1,#0x6    @ 08036c8e 8901
-    ldr r0, DAT_08036cb4                     @ 08036c90 0848
+    ldr r0, build_effect_zone_entry_mask     @ 08036c90 0848
     ldrh r3,[r2,#0x4]                        @ 08036c92 9388
     ands r0,r3    @ 08036c94 1840
     orrs r0,r1    @ 08036c96 0843
@@ -1835,22 +1834,21 @@ LAB_08036caa:
     pop {r1}                                 @ 08036cae 02bc
     bx r1                                    @ 08036cb0 0847
     .zero  0x2
-DAT_08036cb4:
-    .word  0xffff803f                     @ 08036cb4 3f80ffff
+build_effect_zone_entry_mask:
+    .word  SCROLLBAR_CLEAR_BITS_14_6      @ 08036cb4 3f80ffff
 
-@ Places a card into the player's graveyard array. r0=card_slot_ptr (pointer to the field slot). Extracts player_id bit (bit14) from card_slot_ptr[0], reads graveyard count from [gP1LP+0x14+player*0x868], computes write address (gP1LP+0x418+player*0x868+count*4). If card_type (bits[18:0])!=0 and check_card_field8_is_9 returns 0, calls write_word_from_deref_src to write and increments count. No sequence parameter, simpler than place_card_into_graveyard_slot_with_seq. Caller FUN_08032280 case 0xe (zone_type=14).
-@ Constants: graveyard_array_base=0x0201c8f8 (gP1LP+0x418, 0x83<<3), graveyard_count_offset=0x14, player_stride=0x868.
+@ place_card_into_graveyard_slot: Places a card into the player graveyard array (gP1HandSlotArray+0x418 path). r0=card_slot_ptr. Extracts player_id from card_slot_ptr[0].bit14. Graveyard count: [gP1HandCountBase + player*PLAYER_BLOCK_STRIDE]. Graveyard array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE. (HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc maps gP1HandSlotArray -> gP1HandCountBase.) If card_type(bits[18:0])!=0 and check_card_field8_is_9==0:   calls write_word_from_deref_src to write; increments count. Simpler variant (no sequence word); caller FUN_08032280 case 0xe (zone_type=14).
 place_card_into_graveyard_slot:
     push {r4,r5,r6,lr}                       @ 08036cb8 70b5
     adds r6,r0,#0x0    @ 08036cba 061c
     ldr r2,[r6,#0x0]                         @ 08036cbc 3268
     lsls r0,r2,#0x12    @ 08036cbe 9004
     lsrs r0,r0,#0x1f    @ 08036cc0 c00f
-    ldr r1, DAT_08036cfc                     @ 08036cc2 0e49
+    ldr r1, place_card_graveyard_stride      @ 08036cc2 0e49
     muls r1,r0    @ 08036cc4 4143
-    ldr r0, DAT_08036d00                     @ 08036cc6 0e48
+    ldr r0, place_card_graveyard_gy_base     @ 08036cc6 0e48
     adds r3,r1,r0    @ 08036cc8 0b18
-    ldr r4, DAT_08036d04                     @ 08036cca 0e4c
+    ldr r4, place_card_graveyard_count_neg_off @ 08036cca 0e4c
     adds r0,r0,r4    @ 08036ccc 0019
     adds r4,r1,r0    @ 08036cce 0c18
     ldr r0,[r4,#0x0]                         @ 08036cd0 2068
@@ -1874,15 +1872,14 @@ LAB_08036cf4:
     pop {r0}                                 @ 08036cf6 01bc
     bx r0                                    @ 08036cf8 0047
     .zero  0x2
-DAT_08036cfc:
-    .word  0x00000868                     @ 08036cfc 68080000
-DAT_08036d00:
-    .word  0x0201c8f8                     @ 08036d00 f8c80102
-DAT_08036d04:
-    .word  0xfffffbfc                     @ 08036d04 fcfbffff
+place_card_graveyard_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036cfc 68080000
+place_card_graveyard_gy_base:
+    .word  gP1HandSlotArray               @ 08036d00 f8c80102
+place_card_graveyard_count_neg_off:
+    .word  HAND_ARRAY_TO_COUNT_NEG_OFF    @ 08036d04 fcfbffff
 
-@ Places a card into the player's graveyard array with an attached sequence word. r0=card_slot_ptr (r9, confirmed by 0x4681=mov r9,r0 at entry), r1=sequence_word (r10). Extracts player_id bit (bit14) from card_slot_ptr[0], reads graveyard count from [gP1LP+0x1c+player*0x868], computes write address (gP1LP+0x5d0+player*0x868+count*4). If card_type!=0 and check_card_field8_is_9 returns 0: calls write_word_from_deref_src to write slot_ptr, stores sequence halfword at offset, increments count. Caller FUN_08032280 case 0xf (zone_type=15).
-@ Constants: graveyard_seq_array_base=gP1LP+0x5d0 (0xba<<3=0x5d0), graveyard_seq_count_offset=0x1c, player_stride=0x868.
+@ place_card_into_graveyard_slot_with_seq: Places a card into the player graveyard array with a sequence word. r0=card_slot_ptr (->r9 via 0x4681), r1=sequence_word (->r10 via 0x468a). Extracts player_id from card_slot_ptr[0].bit14. Count field: [gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x1c]. Array base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0xba*8 (=0x5d0). If card_type!=0 and check_card_field8_is_9==0:   write_word_from_deref_src(slot_ptr),   store sequence halfword at array+count*2+gP1LP+0xf1*8,   increment count. Caller FUN_08032280 case 0xf (zone_type=15).
 place_card_into_graveyard_slot_with_seq:
     push {r4,r5,r6,r7,lr}                    @ 08036d08 f0b5
     .hword 0x4657    @ 08036d0a 5746
@@ -1893,10 +1890,10 @@ place_card_into_graveyard_slot_with_seq:
     .hword 0x468a    @ 08036d14 8a46
     ldr r2,[r0,#0x0]                         @ 08036d16 0268
     lsls r0,r2,#0x12    @ 08036d18 9004
-    ldr r1, PTR_gP1LifePoints_08036d78       @ 08036d1a 1749
+    ldr r1, place_card_graveyard_seq_lp_ptr  @ 08036d1a 1749
     .hword 0x4688    @ 08036d1c 8846
     lsrs r0,r0,#0x1f    @ 08036d1e c00f
-    ldr r1, DAT_08036d7c                     @ 08036d20 1649
+    ldr r1, place_card_graveyard_seq_stride  @ 08036d20 1649
     adds r4,r0,#0x0    @ 08036d22 041c
     muls r4,r1    @ 08036d24 4c43
     .hword 0x4640    @ 08036d26 4046
@@ -1939,22 +1936,21 @@ LAB_08036d68:
     pop {r0}                                 @ 08036d72 01bc
     bx r0                                    @ 08036d74 0047
     .zero  0x2
-PTR_gP1LifePoints_08036d78:
+place_card_graveyard_seq_lp_ptr:
     .word  gP1LifePoints                  @ 08036d78 e0c40102
-DAT_08036d7c:
-    .word  0x00000868                     @ 08036d7c 68080000
+place_card_graveyard_seq_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036d7c 68080000
 
-@ Removes one element by index from equip array A (base gP1LP+0x418, count at gP1LP+0x14) and left-shifts subsequent elements. r0=player_id [0..1], r1=slot_idx [0..count-1]. If slot_idx>=count returns 0; otherwise: decrements count; if slot_idx<new_count shifts elements [idx+1..new_count] left via write_word_from_deref_src loop; returns 1. Caller FUN_08036de8 calls this after finding the matching slot_ptr.
-@ Constants: equip_array_A_base=gP1LP+0x418 (0x83<<3=0x418), equip_A_count_offset=0x14, player_stride=0x868.
+@ remove_equip_slot_by_index_from_array_a: Removes element by index from equip array A and left-shifts remainder. r0=player_id [0..1], r1=slot_idx [0..count-1]. Array A base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). Count field: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. If slot_idx>=count returns 0; else: decrement count; if slot_idx<new_count shift elements [idx+1..new_count]   left via write_word_from_deref_src loop; return 1. Called by erase_slot_from_equip_array_a_by_ptr after ptr match.
 remove_equip_slot_by_index_from_array_a:
     push {r4,r5,r6,r7,lr}                    @ 08036d80 f0b5
     .hword 0x4647    @ 08036d82 4746
     push {r7}                                @ 08036d84 80b4
     adds r3,r1,#0x0    @ 08036d86 0b1c
-    ldr r6, PTR_gP1LifePoints_08036dd4       @ 08036d88 124e
+    ldr r6, remove_equip_slot_a_lp_ptr       @ 08036d88 124e
     movs r1,#0x1    @ 08036d8a 0121
     ands r1,r0    @ 08036d8c 0140
-    ldr r0, DAT_08036dd8                     @ 08036d8e 1248
+    ldr r0, remove_equip_slot_a_stride       @ 08036d8e 1248
     adds r5,r1,#0x0    @ 08036d90 0d1c
     muls r5,r0    @ 08036d92 4543
     adds r0,r6,#0x0    @ 08036d94 301c
@@ -1990,10 +1986,10 @@ LAB_08036dba:
 LAB_08036dd0:
     movs r0,#0x1    @ 08036dd0 0120
     b LAB_08036dde                           @ 08036dd2 04e0
-PTR_gP1LifePoints_08036dd4:
+remove_equip_slot_a_lp_ptr:
     .word  gP1LifePoints                  @ 08036dd4 e0c40102
-DAT_08036dd8:
-    .word  0x00000868                     @ 08036dd8 68080000
+remove_equip_slot_a_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036dd8 68080000
 LAB_08036ddc:
     movs r0,#0x0    @ 08036ddc 0020
 LAB_08036dde:
@@ -2003,16 +1999,15 @@ LAB_08036dde:
     pop {r1}                                 @ 08036de4 02bc
     bx r1                                    @ 08036de6 0847
 
-@ Searches equip array A (gP1LP+0x418, count at gP1LP+0x14) for the element matching r1(card_ptr), then calls remove_equip_slot_by_index_from_array_a to delete it; returns 1 on success, 0 if not found. r0=player_id [0..1], r1=card_ptr (r7). Backward scan from count-1 to 0, calling check_deref_words_equal each step. Caller FUN_08032194 (duel_field) invokes this to clean up equip array A when a card leaves the field.
-@ Constants: equip_array_A_base=gP1LP+0x418 (0x83<<3=0x418), equip_A_count_offset=0x14, player_stride=0x868.
+@ erase_slot_from_equip_array_a_by_ptr: Searches equip array A for element matching card_ptr; deletes it. r0=player_id [0..1], r1=card_ptr (->r7). Array A base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). Count field offset: 0x14. Backward scan from count-1 to 0 via check_deref_words_equal. On match: calls remove_equip_slot_by_index_from_array_a; returns 1. Returns 0 if not found. Caller FUN_08032194 (duel_field) cleans up equip array A when card leaves field.
 erase_slot_from_equip_array_a_by_ptr:
     push {r4,r5,r6,r7,lr}                    @ 08036de8 f0b5
     adds r6,r0,#0x0    @ 08036dea 061c
     adds r7,r1,#0x0    @ 08036dec 0f1c
-    ldr r2, PTR_gP1LifePoints_08036e28       @ 08036dee 0e4a
+    ldr r2, erase_equip_array_a_lp_ptr       @ 08036dee 0e4a
     movs r0,#0x1    @ 08036df0 0120
     ands r0,r6    @ 08036df2 3040
-    ldr r1, DAT_08036e2c                     @ 08036df4 0d49
+    ldr r1, erase_equip_array_a_stride       @ 08036df4 0d49
     muls r1,r0    @ 08036df6 4143
     adds r0,r2,#0x0    @ 08036df8 101c
     adds r0,#0x14    @ 08036dfa 1430
@@ -2037,10 +2032,10 @@ LAB_08036e12:
     adds r1,r4,#0x0    @ 08036e20 211c
     bl remove_equip_slot_by_index_from_array_a @ 08036e22 fff7adff
     b LAB_08036e3a                           @ 08036e26 08e0
-PTR_gP1LifePoints_08036e28:
+erase_equip_array_a_lp_ptr:
     .word  gP1LifePoints                  @ 08036e28 e0c40102
-DAT_08036e2c:
-    .word  0x00000868                     @ 08036e2c 68080000
+erase_equip_array_a_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036e2c 68080000
 LAB_08036e30:
     subs r5,#0x4    @ 08036e30 043d
     subs r4,#0x1    @ 08036e32 013c
@@ -2053,16 +2048,7 @@ LAB_08036e3a:
     pop {r1}                                 @ 08036e3c 02bc
     bx r1                                    @ 08036e3e 0847
 
-@ Searches player hand list for target card by zone descriptor, then shifts it to target position via swap_deref_words.
-@ r0=player_side (bit0), r1=target zone_desc (u16, [0..0xffff]).
-@ Reads gP1LP+player*0x868+0x14 for hand count; hand array base gP1LP+player*0x868+0x418 (0x83<<3).
-@ Inner loop: scans from count-1 down to 0 comparing each slot zone_desc field (bits[23:16] and bit[13]);
-@ on match calls swap_deref_words then write_word_from_deref_src to shift subsequent slots.
-@ Called by main state machines when moving a specific card to the front of the hand array.
-@ Params: r0=u8 player_side [0..1]; r1=u16 zone_desc [0..0xffff].
-@ Returns void (pop{r0};bx r0 tail return).
-@ Constants: player_stride=0x868; hand_count_offset=0x14; hand_array_a_offset=0x418 (=0x83<<3);
-@ list_b_base=0x0201c8f8; list_b_neg_offset=0xfffffbfc (-0x404).
+@ insert_card_into_hand_list_by_zone_desc: Searches player hand list for target card by zone_desc; shifts it to front. r0=player_side (bit0), r1=target zone_desc (u16 [0..0xffff]). Hand count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Hand array A: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). (HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc maps gP1HandSlotArray -> gP1HandCountBase.) Zone desc match: bits[23:16] and bit[13] of slot word. On match: swap_deref_words then write_word_from_deref_src to shift subsequent slots. Symmetric to insert_card_into_field_list_by_zone_desc (zone_type=0xe path).
 insert_card_into_hand_list_by_zone_desc:
     push {r4,r5,r6,r7,lr}                    @ 08036e40 f0b5
     .hword 0x464f    @ 08036e42 4f46
@@ -2073,11 +2059,11 @@ insert_card_into_hand_list_by_zone_desc:
     lsls r1,r1,#0x10    @ 08036e4c 0904
     lsrs r1,r1,#0x10    @ 08036e4e 090c
     .hword 0x4689    @ 08036e50 8946
-    ldr r5, PTR_gP1LifePoints_08036ee0       @ 08036e52 234d
+    ldr r5, insert_hand_list_lp_ptr          @ 08036e52 234d
     movs r0,#0x1    @ 08036e54 0120
     .hword 0x4641    @ 08036e56 4146
     ands r0,r1    @ 08036e58 0840
-    ldr r1, DAT_08036ee4                     @ 08036e5a 2249
+    ldr r1, insert_hand_list_stride          @ 08036e5a 2249
     muls r1,r0    @ 08036e5c 4143
     adds r0,r5,#0x0    @ 08036e5e 281c
     adds r0,#0x14    @ 08036e60 1430
@@ -2120,11 +2106,11 @@ LAB_08036e80:
     movs r0,#0x1    @ 08036eaa 0120
     .hword 0x4643    @ 08036eac 4346
     ands r0,r3    @ 08036eae 1840
-    ldr r1, DAT_08036ee4                     @ 08036eb0 0c49
+    ldr r1, insert_hand_list_stride          @ 08036eb0 0c49
     adds r2,r0,#0x0    @ 08036eb2 021c
     muls r2,r1    @ 08036eb4 4a43
-    ldr r1, DAT_08036ee8                     @ 08036eb6 0c49
-    ldr r3, DAT_08036eec                     @ 08036eb8 0c4b
+    ldr r1, insert_hand_list_gy_base         @ 08036eb6 0c49
+    ldr r3, insert_hand_list_count_neg_off   @ 08036eb8 0c4b
     adds r0,r1,r3    @ 08036eba c818
     adds r3,r2,r0    @ 08036ebc 1318
     adds r5,#0x4    @ 08036ebe 0435
@@ -2144,14 +2130,14 @@ LAB_08036ec6:
     cmp r6,r0                                @ 08036eda 8642
     bcc LAB_08036ec6                         @ 08036edc f3d3
     b LAB_08036efc                           @ 08036ede 0de0
-PTR_gP1LifePoints_08036ee0:
+insert_hand_list_lp_ptr:
     .word  gP1LifePoints                  @ 08036ee0 e0c40102
-DAT_08036ee4:
-    .word  0x00000868                     @ 08036ee4 68080000
-DAT_08036ee8:
-    .word  0x0201c8f8                     @ 08036ee8 f8c80102
-DAT_08036eec:
-    .word  0xfffffbfc                     @ 08036eec fcfbffff
+insert_hand_list_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08036ee4 68080000
+insert_hand_list_gy_base:
+    .word  gP1HandSlotArray               @ 08036ee8 f8c80102
+insert_hand_list_count_neg_off:
+    .word  HAND_ARRAY_TO_COUNT_NEG_OFF    @ 08036eec fcfbffff
 LAB_08036ef0:
     subs r3,#0x4    @ 08036ef0 043b
     subs r5,#0x4    @ 08036ef2 043d
@@ -2169,18 +2155,7 @@ LAB_08036efc:
     bx r0                                    @ 08036f08 0047
     .zero  0x2
 
-@ Searches player field slot list for target card by zone descriptor, inserts it via write_word_from_deref_src + strh.
-@ r0=player_side (bit0, u32), r1=target zone_desc (u16, [0..0xffff]).
-@ Reads gP1LP+player*0x868+0x1c for field slot count;
-@ field slot array A base gP1LP+player*0x868+0x5d0 (0xba<<3),
-@ aux array B base gP1LP+player*0x868+0x788 (0xf1<<3).
-@ Inner loop: scans from count-1 down to 0 comparing zone_desc (same bit-field extraction as 08036e40);
-@ on match calls write_word_from_deref_src + strh (dual array shift).
-@ Called by main state machines in zone_type=0xf branches (symmetric to 08036e40 zone_type=0xe).
-@ Params: r0=u32 player_side (bit0=[0..1]); r1=u16 zone_desc [0..0xffff].
-@ Returns void (pop{r0};bx r0 tail return).
-@ Constants: player_stride=0x868; field_count_offset=0x1c; field_array_a_offset=0x5d0 (=0xba<<3);
-@ field_array_b_offset=0x788 (=0xf1<<3); list_base=0x0201cab0; list_neg_offset=0xfffffa4c (-0x5b4).
+@ insert_card_into_field_list_by_zone_desc: Searches player field slot list for target by zone_desc; inserts via dual array shift. r0=player_side (bit0), r1=target zone_desc (u16 [0..0xffff]). Alt-hand count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x1c. Array A: gP1AltHandSlotArray + player*PLAYER_BLOCK_STRIDE (0xba*8=0x5d0 offset base). Array B: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0xf1*8 (=0x788). (ALT_HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffa4c maps gP1AltHandSlotArray -> gP1AltHandCountBase.) Zone desc match same as insert_card_into_hand_list_by_zone_desc. On match: dual array shift (write_word_from_deref_src + strh for arrays A and B). Symmetric to insert_card_into_hand_list (zone_type=0xf path).
 insert_card_into_field_list_by_zone_desc:
     push {r4,r5,r6,r7,lr}                    @ 08036f0c f0b5
     .hword 0x4657    @ 08036f0e 5746
@@ -2192,11 +2167,11 @@ insert_card_into_field_list_by_zone_desc:
     lsls r1,r1,#0x10    @ 08036f1a 0904
     lsrs r1,r1,#0x10    @ 08036f1c 090c
     str r1,[sp,#0x4]                         @ 08036f1e 0191
-    ldr r5, PTR_gP1LifePoints_08036ffc       @ 08036f20 364d
+    ldr r5, insert_field_list_lp_ptr         @ 08036f20 364d
     movs r0,#0x1    @ 08036f22 0120
     ldr r1,[sp,#0x0]                         @ 08036f24 0099
     ands r0,r1    @ 08036f26 0840
-    ldr r1, DAT_08037000                     @ 08036f28 3549
+    ldr r1, insert_field_list_stride         @ 08036f28 3549
     muls r1,r0    @ 08036f2a 4143
     adds r0,r5,#0x0    @ 08036f2c 281c
     adds r0,#0x1c    @ 08036f2e 1c30
@@ -2260,10 +2235,10 @@ LAB_08036f60:
     movs r0,#0x1    @ 08036fa2 0120
     ldr r7,[sp,#0x0]                         @ 08036fa4 009f
     ands r0,r7    @ 08036fa6 3840
-    ldr r1, DAT_08037000                     @ 08036fa8 1549
+    ldr r1, insert_field_list_stride         @ 08036fa8 1549
     muls r1,r0    @ 08036faa 4143
-    ldr r2, DAT_08037004                     @ 08036fac 154a
-    ldr r7, DAT_08037008                     @ 08036fae 164f
+    ldr r2, insert_field_list_althand_base   @ 08036fac 154a
+    ldr r7, insert_field_list_count_neg_off  @ 08036fae 164f
     adds r0,r2,r7    @ 08036fb0 d019
     adds r0,r0,r1    @ 08036fb2 4018
     .hword 0x4681    @ 08036fb4 8146
@@ -2302,14 +2277,14 @@ LAB_08036fce:
     cmp r3,r0                                @ 08036ff6 8342
     bcc LAB_08036fce                         @ 08036ff8 e9d3
     b LAB_08037020                           @ 08036ffa 11e0
-PTR_gP1LifePoints_08036ffc:
+insert_field_list_lp_ptr:
     .word  gP1LifePoints                  @ 08036ffc e0c40102
-DAT_08037000:
-    .word  0x00000868                     @ 08037000 68080000
-DAT_08037004:
-    .word  0x0201cab0                     @ 08037004 b0ca0102
-DAT_08037008:
-    .word  0xfffffa4c                     @ 08037008 4cfaffff
+insert_field_list_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037000 68080000
+insert_field_list_althand_base:
+    .word  gP1AltHandSlotArray            @ 08037004 b0ca0102
+insert_field_list_count_neg_off:
+    .word  ALT_HAND_ARRAY_TO_COUNT_NEG_OFF @ 08037008 4cfaffff
 LAB_0803700c:
     subs r5,#0x4    @ 0803700c 043d
     subs r6,#0x2    @ 0803700e 023e
@@ -2331,14 +2306,14 @@ LAB_08037020:
     pop {r0}                                 @ 0803702c 01bc
     bx r0                                    @ 0803702e 0047
 
-@ 被 FUN_080bb414 (0x080bb4c2) 及多个 duel_field 函数 (0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0/0x08084eb8/0x08096f54) 调用 (indeg>=7). 入口 r0=player_side, r6=r1=card_id_filter. 读 gP1LifePoints+player*0x868+0x14=hand_count. 读 extra_deck_base=gP1LifePoints+player*0x868+0x418. 从 deck_count-1 向下遍历: 读 extra_deck_base[i*4] card word; 提取 bits[12:0] (lsls/lsrs#0x13) = card_id; 调用 check_card_pair_allowed(card_id, card_filter); 若非 0 返回 r0=i (找到 index). 遍历完无匹配返回 r0=-1 (movs#1; rsbs). 纯查询, 无外部写. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, extra_deck_count_offset=0x14, extra_deck_base=gP1LifePoints+0x418, card_id_mask=bits[12:0].
+@ find_deck_slot_by_card_pair_match: Searches extra-deck array for a card_id passing check_card_pair_allowed(card_id, filter). r0=player_id, r1=card_id_filter (->r6, low 16 bits). Extra-deck count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Array: gP1HandSlotArray + player*PLAYER_BLOCK_STRIDE (0x83*8=0x418 offset). Backward scan from count-1 to 0; extracts card_id bits[12:0] from each word; calls check_card_pair_allowed(card_id, filter); on hit returns index. Returns -1 if no match (movs r0,#1; rsbs r0,r0,#0). indeg>=7; callers include FUN_080bb4c2 and duel_field at 0x080637a2/0x08063bd2/0x08066d74/0x0807ecbe/0x080833e0.
 find_deck_slot_by_card_pair_match:
     push {r4,r5,r6,lr}                       @ 08037030 70b5
     adds r6,r1,#0x0    @ 08037032 0e1c
-    ldr r2, PTR_gP1LifePoints_08037068       @ 08037034 0c4a
+    ldr r2, find_deck_slot_lp_ptr            @ 08037034 0c4a
     movs r1,#0x1    @ 08037036 0121
     ands r1,r0    @ 08037038 0140
-    ldr r0, DAT_0803706c                     @ 0803703a 0c48
+    ldr r0, find_deck_slot_stride            @ 0803703a 0c48
     muls r1,r0    @ 0803703c 4143
     adds r2,#0x14    @ 0803703e 1432
     adds r2,r1,r2    @ 08037040 8a18
@@ -2349,7 +2324,7 @@ find_deck_slot_by_card_pair_match:
     lsls r0,r4,#0x2    @ 0803704a a000
     adds r5,r0,r1    @ 0803704c 4518
 LAB_0803704e:
-    ldr r0, DAT_08037070                     @ 0803704e 0848
+    ldr r0, find_deck_slot_hand_base         @ 0803704e 0848
     adds r0,r5,r0    @ 08037050 2818
     ldr r0,[r0,#0x0]                         @ 08037052 0068
     lsls r0,r0,#0x13    @ 08037054 c004
@@ -2361,12 +2336,12 @@ LAB_0803704e:
     adds r0,r4,#0x0    @ 08037062 201c
     b LAB_08037080                           @ 08037064 0ce0
     .zero  0x2
-PTR_gP1LifePoints_08037068:
+find_deck_slot_lp_ptr:
     .word  gP1LifePoints                  @ 08037068 e0c40102
-DAT_0803706c:
-    .word  0x00000868                     @ 0803706c 68080000
-DAT_08037070:
-    .word  0x0201c8f8                     @ 08037070 f8c80102
+find_deck_slot_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803706c 68080000
+find_deck_slot_hand_base:
+    .word  gP1HandSlotArray               @ 08037070 f8c80102
 LAB_08037074:
     subs r5,#0x4    @ 08037074 043d
     subs r4,#0x1    @ 08037076 013c
@@ -2381,20 +2356,15 @@ LAB_08037080:
     bx r1                                    @ 08037084 0847
     .zero  0x2
 
-@ Searches the specified player graveyard array (base gP1LP+player*0x868+0x418, count from gP1LP+player*0x868+0x14) by pointer match, returns 1-based index of first matching entry. r0=player_id, r1=target_ptr (slot pointer, saved to r7). Computes graveyard base gP1LP+player*0x868+0x83*8, iterates each entry calling check_deref_words_equal(card_entry_ptr, target_ptr); on hit returns index+1 (1-based). Returns 0 if not found. 3 callers (0x08044674, 0x08044714, 0x080448a0) all in duel_field, used to confirm slot exists in graveyard.
-@ 
-@ Params: r0=u8 player_id [0..1]; r1=ptr target_ptr (slot pointer to match)
-@ Returns: r0=u32 1-based index if found; 0 if not found
-@ Side effects: none (read-only)
-@ Constants: GY_BASE_OFFSET=0x83<<3=0x418; GY_COUNT_OFFSET=0x14
+@ find_graveyard_entry_by_ptr: Searches player graveyard array for entry matching target_ptr; returns 1-based index. r0=player_id [0..1], r1=target_ptr (->r7). Graveyard base: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). Count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Forward scan; calls check_deref_words_equal each step; on match returns index+1 (1-based). Returns 0 if not found. Read-only. 3 callers: 0x08044674, 0x08044714, 0x080448a0 (duel_field).
 find_graveyard_entry_by_ptr:
     push {r4,r5,r6,r7,lr}                    @ 08037088 f0b5
     adds r7,r1,#0x0    @ 0803708a 0f1c
     movs r5,#0x0    @ 0803708c 0025
-    ldr r3, PTR_gP1LifePoints_080370c0       @ 0803708e 0c4b
+    ldr r3, find_graveyard_entry_lp_ptr      @ 0803708e 0c4b
     movs r1,#0x1    @ 08037090 0121
     ands r1,r0    @ 08037092 0140
-    ldr r0, DAT_080370c4                     @ 08037094 0b48
+    ldr r0, find_graveyard_entry_stride      @ 08037094 0b48
     muls r1,r0    @ 08037096 4143
     adds r0,r3,#0x0    @ 08037098 181c
     adds r0,#0x14    @ 0803709a 1430
@@ -2416,10 +2386,10 @@ LAB_080370ae:
     adds r0,r5,#0x1    @ 080370ba 681c
     b LAB_080370d4                           @ 080370bc 0ae0
     .zero  0x2
-PTR_gP1LifePoints_080370c0:
+find_graveyard_entry_lp_ptr:
     .word  gP1LifePoints                  @ 080370c0 e0c40102
-DAT_080370c4:
-    .word  0x00000868                     @ 080370c4 68080000
+find_graveyard_entry_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080370c4 68080000
 LAB_080370c8:
     adds r4,#0x4    @ 080370c8 0434
     adds r5,#0x1    @ 080370ca 0135
@@ -2434,17 +2404,17 @@ LAB_080370d4:
     bx r1                                    @ 080370d8 0847
     .zero  0x2
 
-@ Count Extra Deck cards for player_side where card_id equals r6 (=r1 low 16 bits). Flow: r6=r1&0xffff (card_id filter); read gP1LifePoints+player*0x868+0x14=hand_count; Extra Deck base: gP1LifePoints+player*0x868+0x83*8. For i=0..count-1: ldr card_word=[base+i*4]; card_id=bits[12:0]; cmp card_id,r6; hit -> r4++. Return r4=matching count. Non-APCS note: r1 low 16 bits extracted as card_id filter into r6 at entry (lsls r1,r1,0x10; lsrs r6,r1,0x10). Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, extra_deck_count_offset=0x14, extra_deck_base_offset=0x83*8=0x418.
+@ count_extra_deck_cards_by_id: Counts extra-deck entries matching target card_id. r0=player_id, r1=card_id filter (low 16 bits extracted to r6 via lsls/lsrs #0x10; non-APCS). Extra-deck count: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x14. Array: gP1LifePoints + player*PLAYER_BLOCK_STRIDE + 0x83*8 (=0x418). For i=0..count-1: extract card_id bits[12:0]; compare with r6; hit -> r4++. Returns r4 = total matching count. indeg=0; referenced by runtime fn-ptr or dead code.
 count_extra_deck_cards_by_id:
     push {r4,r5,r6,r7,lr}                    @ 080370dc f0b5
     lsls r1,r1,#0x10    @ 080370de 0904
     lsrs r6,r1,#0x10    @ 080370e0 0e0c
     movs r4,#0x0    @ 080370e2 0024
     movs r3,#0x0    @ 080370e4 0023
-    ldr r5, PTR_gP1LifePoints_08037120       @ 080370e6 0e4d
+    ldr r5, count_extra_deck_lp_ptr          @ 080370e6 0e4d
     movs r1,#0x1    @ 080370e8 0121
     ands r1,r0    @ 080370ea 0140
-    ldr r0, DAT_08037124                     @ 080370ec 0d48
+    ldr r0, count_extra_deck_stride          @ 080370ec 0d48
     muls r1,r0    @ 080370ee 4143
     adds r0,r5,#0x0    @ 080370f0 281c
     adds r0,#0x14    @ 080370f2 1430
@@ -2473,10 +2443,10 @@ LAB_08037118:
     pop {r4,r5,r6,r7}                        @ 0803711a f0bc
     pop {r1}                                 @ 0803711c 02bc
     bx r1                                    @ 0803711e 0847
-PTR_gP1LifePoints_08037120:
+count_extra_deck_lp_ptr:
     .word  gP1LifePoints                  @ 08037120 e0c40102
-DAT_08037124:
-    .word  0x00000868                     @ 08037124 68080000
+count_extra_deck_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037124 68080000
 
 @ Count entries in specified player-side graveyard array matching target card_id. Read gP1LifePoints+0x1c+player_id*0x868 for graveyard entry count, traverse graveyard word array at base offset 0x5d0 (=0xba<<3) with stride 4 bytes, extract low 13 bits of each word as card_id, compare with target r1 (16-bit truncated), accumulate counter r4 on match. Return total match count. indeg=0, referenced by runtime fn-ptr or dead code. Constants: gP1LifePoints, PLAYER_STRIDE=0x868, GRAVEYARD_COUNT_OFFSET=0x1c, GRAVEYARD_ARRAY_BASE=0x5d0 (=0xba<<3).
 count_graveyard_entries_by_card_id:

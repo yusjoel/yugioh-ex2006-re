@@ -245,3 +245,10 @@
 .equ EXODIA_NECROSS_CID,            0x00001645  @ Exodia Necross (pw=12600382); check_card_equip_eligible_for_slot TYPE_B; 21 raw refs; data.md=0x1645
 .equ EQUIP_TYPE_A_CID,              0x0000150c  @ Fusion Sword Murasame Blade (pw=37684215); check_card_equip_eligible_for_slot TYPE_A; 14 raw refs; data.md=0x150C
 .equ DARK_MAGICIAN_OF_CHAOS_CID,    0x000016f8  @ Dark Magician of Chaos (pw=40737112); check_slot_card_special_activation_eligible; 17 raw refs; data.md=0x16F8
+
+@ =============================================================================
+@ file 03 Seg-2 additions: special action eligibility card IDs
+@ =============================================================================
+.equ GAP_CID_13EA,              0x000013ea  @ gap slot (not in card-stats.s; range [0x13E8..0x13EB]: Nuvia the Wicked/Soul Exchange); check_slot_card_eligible_for_special_action
+.equ KUNAI_WITH_CHAIN_CID,      0x00001231  @ Kunai with Chain (pw=37390589; card_0533 slot=0x1231); check_slot_card_eligible_for_special_action; note: Metalmorph(0x1238=+7) computed inline
+.equ BLAST_WITH_CHAIN_CID,      0x00001514  @ Blast with Chain (pw=98239899; card_1086 slot=0x1514); check_slot_card_eligible_for_special_action; note: Hero_Heyro(0x1980=0xcc<<5) computed inline

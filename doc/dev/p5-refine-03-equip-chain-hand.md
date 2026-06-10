@@ -77,7 +77,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
-| 2 | 0x36a78..0x37128 | 13 | 29 | — | ⬜ | |
+| 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | (pending) |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ⬜ | |
 | 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
@@ -124,6 +124,33 @@ check_slot_card_special_activation_eligible
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: c410d1d
+
+### 4.02 Seg-2 完成记录 [0x08036a78..0x08037128)
+
+**函数列表 (13 fn)**:
+sum_equip_slot_values / check_slot_card_eligible_for_special_action /
+check_slot_card_eligible_for_special_action_b / find_effect_entry_by_card_id /
+build_effect_zone_entry / place_card_into_graveyard_slot /
+place_card_into_graveyard_slot_with_seq / remove_equip_slot_by_index_from_array_a /
+erase_slot_from_equip_array_a_by_ptr / insert_card_into_hand_list /
+insert_card_into_field_list / find_deck_slot_by_card_pair_match /
+find_graveyard_entry_by_card_id / count_extra_deck_cards_by_player
+
+**符号化统计**: EQ=37 (reuse 29 + new 8) / REF=0 / RENAME=0 / FUNC_RENAME=0 / PLATE=13
+
+**新建 constants**:
+- `card_info.inc` +3: GAP_CID_13EA=0x13ea (gap slot, low-conf) / KUNAI_WITH_CHAIN_CID=0x1231 / BLAST_WITH_CHAIN_CID=0x1514
+- `ewram.inc` +4: gEffectEntryArray=0x0201b590 / EFFECT_ENTRY_COUNT_OFF=0x594 / HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffbfc / ALT_HAND_ARRAY_TO_COUNT_NEG_OFF=0xfffffa4c
+
+**carve**: 0 (no ROM_INCBIN in Seg-2)
+**disasm**: 0
+**§5.1**: 0
+
+**C8 验收**: Seg-2 范围 (asm lines 1530-2482) FUN_ stale label count=0; prose mentions in plates are informational caller references, not stale labels.
+**Non-ASCII**: Seg-2 范围内 non-ASCII count=0 (CJK plate at find_deck_slot_by_card_pair_match line 2334 already replaced with pure-ASCII plate)
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 
