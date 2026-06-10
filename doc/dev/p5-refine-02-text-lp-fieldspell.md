@@ -66,7 +66,7 @@
 | 8 | 0x32e80..0x33654 | 23 | 44 | ✅ | 9892a81 |
 | 9 | 0x33654..0x3407c | 23 | 63 | ✅ | 77760ad |
 | 10a | 0x3407c..0x35280 | 10 | 148 | ✅ | dc67250 |
-| 10b | 0x35280..0x35f54 | 7 | 98 | ⬜ | |
+| 10b | 0x35280..0x35f54 | 7 | 98 | ✅ | (pending) |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 
@@ -659,6 +659,44 @@
 
 ---
 
+### 4.10b Seg-10b 完成记录 (0x08035280..0x08035f54, 7 fn) — file 02 最终段
+
+**函数列表**:
+| addr       | name                                              |
+|------------|---------------------------------------------------|
+| 0x08035280 | exit_slot_activation_with_state_write             |
+| 0x080352b0 | eval_slot_activation_eligibility_full             |
+| 0x0803594c | count_activatable_slots_for_player                |
+| 0x08035988 | check_slot_field_spell_chain_eligible             |
+| 0x08035b24 | check_field_spell_trap_chain_eligible             |
+| 0x08035ba4 | check_player_field_spell_chain_eligible           |
+| 0x08035bc8 | eval_slot_fieldspell_activation_full              |
+
+**符号化统计**:
+- EQ_SLOTS: 95 (28 EQ_REUSE + 67 EQ_NEW)
+  - EQ_REUSE (28): ACTIVATION_STATE_B_OFF x1 + PLAYER_BLOCK_STRIDE x14 + gDuelFieldSlots x11 + UMI_CARD_ID x3
+  - EQ_NEW card_info.inc (51): JINZO_7_CID..HAMON_LORD_CID + HAMON_LORD_CID_SHIFTED
+  - EQ_NEW duel_field.inc (2): FIELD5_SCORE_ACTIVATION_THRESHOLD + FIELD5_SCORE_FIELDSPELL_THRESHOLD
+- REF_SLOTS: 1 (gDuelCardCtxBase @ 0x080352a4)
+- RENAME_SLOTS: 2 (exit_slot_act_gp1lp + eval_fsact_unknown_cid_1221)
+- PLATE_FULL: 3 (eval_slot_activation_eligibility_full + eval_slot_fieldspell_activation_full + eval_slot_activation_guard_full Seg-10a CJK cleanup)
+- carve: 0 / disasm: 0 / §5.1: 0
+
+**新建常量**:
+- card_info.inc: 51 card ID equates (JINZO_7_CID 0x114c .. FEATHER_SHOT_CID 0x195b) + HAMON_LORD_CID=0x19a4 + HAMON_LORD_CID_SHIFTED=0xcd200000
+- duel_field.inc: FIELD5_SCORE_ACTIVATION_THRESHOLD=0x76b + FIELD5_SCORE_FIELDSPELL_THRESHOLD=0x63f
+
+**C8 plate 验证**: 3 个 plate 全用 setPlateComment 整段重写; Ghidra readback 确认 3/3 无 stale FUN_ 且无 non-ASCII.
+Non-ASCII scan (Seg-10 整段, lines 19024..21953): 0 行 ✅
+
+**脚本**: `tools/ghidra-labeling/RefineF02Seg10bSlots.py` (EQ95/REF1/RENAME2/PLATE_FULL3)
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+**commit**: (pending)
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 02 范围 `[0x0802c238, 0x08035f54)` (span 0x9D1C, 224 named fn [305 含 81 switchD 跳转表
@@ -677,7 +715,7 @@
 | Seg-8 | 0x32e80..0x33654 | 23 | 44 | — | ✅ monster slot count/state scan + field spell placement check |
 | Seg-9 | 0x33654..0x3407c | 23 | 63 | — | ✅ equip slot eligibility/lock + monster slot find + carve 2 slot-order tables |
 | Seg-10a | 0x3407c..0x35280 | 10 | 148 | — | ✅ slot activation eligibility full cluster |
-| Seg-10b | 0x35280..0x35f54 | 7 | 98 | — | exit_slot_activation_with_state_write + fieldspell zone (下一段) |
+| Seg-10b | 0x35280..0x35f54 | 7 | 98 | — | ✅ exit_slot_activation_with_state_write + fieldspell zone; file 02 全 10 段完成 |
 
 执行约定同 file 00/01: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;
 每完成一段更新 §三 + §四 + refine-progress。

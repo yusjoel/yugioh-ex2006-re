@@ -175,3 +175,9 @@
                                             @ written 0x13 on exit_slot_activation_with_state_write; 41 raw refs; 3 Seg-10a slots
 .equ ACTIVE_EFFECT_CATEGORY_OFF, 0x000010d8 @ gP1LifePoints+0x10d8=0x0201D5B8: active effect slot category word;
                                              @ read by check_card_matches_active_effect_slot; 16 raw refs; 1 Seg-10a slot
+
+@ =============================================================================
+@ file 02 Seg-10b additions: field5 score activation thresholds
+@ =============================================================================
+.equ FIELD5_SCORE_ACTIVATION_THRESHOLD, 0x0000076b  @ get_slot_field5_score return > this -> not activatable in eval_slot_activation_eligibility_full; 8 raw refs
+.equ FIELD5_SCORE_FIELDSPELL_THRESHOLD, 0x0000063f  @ get_slot_field5_score return <= this -> not activatable in eval_slot_fieldspell_activation_full; 3 raw refs
