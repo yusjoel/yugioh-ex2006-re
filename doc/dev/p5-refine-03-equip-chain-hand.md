@@ -79,7 +79,8 @@
 | 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
 | 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
-| 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
+| 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | (pending) |
+| 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ⬜ | |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
@@ -188,6 +189,33 @@ find_field_zone_slot_with_fieldspell
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: b90b81f
+
+### 4.04a Seg-4a 完成记录 [0x08037904..0x08037ec0)
+
+**函数列表 (12 fn)**:
+find_field_zone_slot_with_equip_type / count_field_zone_cards_by_field6 (renamed from count_gy_cards_by_field6) /
+count_field_zone_cards_by_field7 / count_valid_monster_pair_slots /
+find_zone_slot_idx_allowed_for_card / count_field_zone_cards_with_field5 /
+count_monster_slots_with_field5_ge_threshold / get_player_deck_flag_bit1 /
+check_field_effect_zone_activation_eligible / shuffle_hand_by_player_deck_flag /
+compute_zone_effect_atk_delta
+
+**符号化统计**: EQ=32 REF=11 RENAME=33 FUNC_RENAME=1 PLATE=11
+
+**新建 constants**:
+- `constants/field_spell_bonus.inc` (新建, 2 constants: FIELD_SPELL_TABLE_IDX_BIAS=0xffffef10 / ZONE_EFFECT_ATK_PENALTY_500=0xfffffe70)
+- `card_info.inc` +9 CID: EYE_OF_TRUTH_CID / MIND_ON_AIR_CID / RESPECT_PLAY_CID / YAMI_CID / MOLTEN_DESTRUCTION_CID / GAIA_POWER_CID / MYSTIC_PLASMA_ZONE_CID / NECROVALLEY_CID / HARPIES_HUNTING_GROUND_CID
+
+**carve-1**: field_spell_atk_bonus_table @ROM 0x1E3EF74 (0x120B): 6x24 s16 ATK bonus table for classic field spells (Forest/Wasteland/Mountain/Sogen/Umi/Yami). DAT_08037ddc改名 compute_zone_effect_atk_delta_table_base.
+
+**FUNC_RENAME**: count_gy_cards_by_field6 -> count_field_zone_cards_by_field6 (函数体读 gP1FieldArrayCBase+0x120, 非墓地+0x5d0; ExportFunctionInventory + CSV sync 完成)
+
+**fn-ptr +1 踩坑 (已知问题)**: Ghidra再导出后 0x08037884 (.word check_level_conv_lab_node_match) 变回偶地址; 已在 asm/03 手动补 +1 (THUMB fn-ptr). 源自 Seg-3 已知问题, 每次 re-export 后须重补.
+
+**C8 验收**: asm lines 3529..4335 (Seg-4a) FUN_=0; Non-ASCII=0
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

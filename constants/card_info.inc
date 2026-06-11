@@ -265,3 +265,38 @@
 .equ YZ_TANK_DRAGON_CID,         0x000015fa  @ YZ-Tank Dragon (pw=25119460; card-stats.s card_1254 slot=0x15FA); range_max in [XZ_TANK_CANNON 0x15f9, YZ_TANK_DRAGON 0x15fa] blacklist; 4 raw refs; 1 Seg-3 slot
 .equ LEVEL_CONVERSION_LAB_CID,   0x000018d9  @ Level Conversion Lab (pw=84397023; card-stats.s card_1865 slot=0x18D9); check_level_conv_lab_node_match predicate target; 4 raw refs; 1 Seg-3 slot
 .equ COST_DOWN_CID,              0x000015c7  @ Cost Down (pw=23265313; card-stats.s card_1213 slot=0x15C7); eval_equip_bonus_for_slot count_slot_chain_nodes_by_card_id arg; 4 raw refs; 1 Seg-3 slot
+
+@ =============================================================================
+@ file 03 Seg-4a additions (compute_zone_effect_atk_delta + check_field_effect_zone_activation_eligible)
+@ =============================================================================
+
+@ Field-effect zone activation eligibility guard cards
+.equ EYE_OF_TRUTH_CID,            0x0000137b  @ The Eye of Truth (pw=34694160; card-stats.s card_0791 slot=0x137b);
+                                               @ check_field_effect_zone_activation_eligible guard;
+                                               @ 2 ROM refs; data.md=0x137B
+.equ MIND_ON_AIR_CID,             0x000017e7  @ Mind on Air (pw=66690411; card-stats.s card_1652 slot=0x17e7 L21491);
+                                               @ check_field_effect_zone_activation_eligible guard;
+                                               @ 2 ROM refs; data.md=0x17E7
+.equ RESPECT_PLAY_CID,            0x0000135e  @ Respect Play (pw=08073514; card-stats.s card_0766 slot=0x135e);
+                                               @ check_field_effect_zone_activation_eligible gP1LP+0x1ce8 guard;
+                                               @ 2 ROM refs; data.md=0x135E
+
+@ ATK delta table card ID range bounds (compute_zone_effect_atk_delta)
+.equ YAMI_CID,                    0x000010f5  @ Yami (pw=59197169; card-stats.s card_0297 slot=0x10f5 L3876);
+                                               @ lower bound: card_id <= YAMI -> field-spell ATK bonus table path;
+                                               @ 2 ROM refs; data.md=0x10F5
+.equ MOLTEN_DESTRUCTION_CID,      0x00001346  @ Molten Destruction (pw=19384334; card-stats.s card_0747 slot=0x1346);
+                                               @ upper bound of card-dispatch binary-search; card_id > this -> separate branch;
+                                               @ 2 ROM refs; data.md=0x1346
+.equ GAIA_POWER_CID,              0x00001344  @ Gaia Power (pw=56594520; card-stats.s card_0745 slot=0x1344);
+                                               @ compute_zone_effect_atk_delta binary-search node;
+                                               @ 2 ROM refs; data.md=0x1344
+.equ MYSTIC_PLASMA_ZONE_CID,      0x00001349  @ Mystic Plasma Zone (pw=18161786; card-stats.s card_0750 slot=0x1349);
+                                               @ compute_zone_effect_atk_delta exact cmp;
+                                               @ 2 ROM refs; data.md=0x1349
+.equ NECROVALLEY_CID,             0x0000159d  @ Necrovalley (pw=47355498; card-stats.s card_1185 slot=0x159d);
+                                               @ compute_zone_effect_atk_delta gravekeeper-check branch;
+                                               @ 2 ROM refs; data.md=0x159D
+.equ HARPIES_HUNTING_GROUND_CID,  0x0000183f  @ Harpies' Hunting Ground (pw=75782277; card-stats.s card_1731 slot=0x183f);
+                                               @ compute_zone_effect_atk_delta exact cmp;
+                                               @ 2 ROM refs; data.md=0x183F

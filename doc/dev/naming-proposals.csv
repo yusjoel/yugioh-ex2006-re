@@ -699,7 +699,7 @@ address,name,proposed_name,score,tags
 0x080377b0,eval_equip_bonus_for_slot,,,
 0x08037894,find_field_zone_slot_with_fieldspell,,,
 0x08037904,find_field_zone_slot_with_equip_type,,,
-0x08037974,count_gy_cards_by_field6,,,duel_field
+0x08037974,count_field_zone_cards_by_field6,,,duel_field
 0x080379d0,count_field_zone_cards_by_field7,duel_field_080379d0,3,duel_field
 0x08037a2c,count_valid_monster_pair_slots,,,duel_field
 0x08037a8c,find_zone_slot_idx_allowed_for_card,,,duel_field

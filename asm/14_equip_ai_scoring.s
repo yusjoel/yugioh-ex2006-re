@@ -5433,7 +5433,7 @@ LAB_080ac15c:
     beq LAB_080ac182                         @ 080ac16e 08d0
     adds r0,r5,#0x0    @ 080ac170 281c
     movs r1,#0x16    @ 080ac172 1621
-    bl count_gy_cards_by_field6              @ 080ac174 8bf7fefb
+    bl count_field_zone_cards_by_field6      @ 080ac174 8bf7fefb
     cmp r0,#0x0                              @ 080ac178 0028
     beq LAB_080ac182                         @ 080ac17a 02d0
     movs r0,#0x96    @ 080ac17c 9620
@@ -6620,7 +6620,7 @@ DAT_080ac990:
 LAB_080ac994:
     .hword 0x4640    @ 080ac994 4046
     movs r1,#0x1    @ 080ac996 0121
-    bl count_gy_cards_by_field6              @ 080ac998 8af7ecff
+    bl count_field_zone_cards_by_field6      @ 080ac998 8af7ecff
     cmp r0,#0x1                              @ 080ac99c 0128
     bgt LAB_080ac9a2                         @ 080ac99e 00dc
     b LAB_080acba4                           @ 080ac9a0 00e1

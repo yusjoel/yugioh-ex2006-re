@@ -3454,7 +3454,7 @@ LAB_08037876:
     pop {r1}                                 @ 08037880 02bc
     bx r1                                    @ 08037882 0847
 eval_equip_bonus_for_slot_pred_fn:
-    .word  check_level_conv_lab_node_match+1 @ 08037884 7d770308 (THUMB odd)
+    .word  check_level_conv_lab_node_match+1 @ 08037884 7d770308  THUMB fn-ptr (+1 for THUMB dispatch)
 eval_equip_bonus_for_slot_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08037888 68080000
 eval_equip_bonus_for_slot_a_leg_ocean_cid:
@@ -3524,20 +3524,15 @@ LAB_080378f8:
 find_field_zone_slot_fieldspell_stride_b:
     .word  PLAYER_BLOCK_STRIDE            @ 08037900 68080000
 
-@ Scans the specified player field_array_C (gP1LP+player*0x868+0x120, count from gP1LP+player*0x868+0x0c) for the first card with field6==0x16 (equip/continuous type). Returns 0-based slot index; returns -1 (via rsbs r0,r0,#0) if no match. Skips card_id==0 slots. Symmetric sibling to find_field_zone_slot_with_fieldspell (0x08037894); only difference is field6 check value (0x16 vs 0x17). Caller FUN_0805e170 reads card byte[+2] bit0 as player param; result is bit-inverted (mvns+lsrs) before use as bool.
-@ 
-@ Params: r0=u8 player_id [0..1]
-@ Returns: r0=s32 slot index (0-based) if found; -1 if not found
-@ Side effects: none (read-only)
-@ Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c; EQUIP_FIELD6=0x16
+@ find_field_zone_slot_with_equip_type: Scan field array C (gP1FieldArrayCBase=gP1LP+0x120, count at gP1LP+0x0c) for first card with extended field6==0x16 (equip-type field spell). Returns 0-based slot index; returns -1 if not found. Skips card_id==0 slots. Symmetric sibling to find_field_zone_slot_with_fieldspell (0x08037894, Seg-3); only difference is field6 check value (0x16 vs 0x17). Pure read-only. r0=u8 player_id [0..1]. Returns s32 slot_index (>=0 if found, -1 if not). Constants: gP1LifePoints; gP1FieldArrayCBase=0x0201c600; PLAYER_BLOCK_STRIDE=0x868.
 find_field_zone_slot_with_equip_type:
     push {r4,r5,r6,lr}                       @ 08037904 70b5
     adds r2,r0,#0x0    @ 08037906 021c
     movs r4,#0x0    @ 08037908 0024
-    ldr r1, PTR_gP1LifePoints_08037948       @ 0803790a 0f49
+    ldr r1, find_field_zone_slot_with_equip_type_lp_ptr @ 0803790a 0f49
     movs r0,#0x1    @ 0803790c 0120
     ands r2,r0    @ 0803790e 0240
-    ldr r3, DAT_0803794c                     @ 08037910 0e4b
+    ldr r3, find_field_zone_slot_with_equip_type_stride @ 08037910 0e4b
     adds r0,r2,#0x0    @ 08037912 101c
     muls r0,r3    @ 08037914 5843
     adds r1,#0xc    @ 08037916 0c31
@@ -3552,7 +3547,7 @@ LAB_08037924:
     adds r0,r5,#0x0    @ 08037926 281c
     muls r0,r3    @ 08037928 5843
     adds r1,r1,r0    @ 0803792a 0918
-    ldr r0, DAT_08037950                     @ 0803792c 0848
+    ldr r0, find_field_zone_slot_with_equip_type_field_arr_c @ 0803792c 0848
     adds r1,r1,r0    @ 0803792e 0918
     ldr r0,[r1,#0x0]                         @ 08037930 0868
     lsls r0,r0,#0x13    @ 08037932 c004
@@ -3565,15 +3560,15 @@ LAB_08037924:
     adds r0,r4,#0x0    @ 08037942 201c
     b LAB_08037968                           @ 08037944 10e0
     .zero  0x2
-PTR_gP1LifePoints_08037948:
+find_field_zone_slot_with_equip_type_lp_ptr:
     .word  gP1LifePoints                  @ 08037948 e0c40102
-DAT_0803794c:
-    .word  0x00000868                     @ 0803794c 68080000
-DAT_08037950:
-    .word  0x0201c600                     @ 08037950 00c60102
+find_field_zone_slot_with_equip_type_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803794c 68080000
+find_field_zone_slot_with_equip_type_field_arr_c:
+    .word  gP1FieldArrayCBase             @ 08037950 00c60102
 LAB_08037954:
     adds r4,#0x1    @ 08037954 0134
-    ldr r3, DAT_08037970                     @ 08037956 064b
+    ldr r3, find_field_zone_slot_with_equip_type_stride_b @ 08037956 064b
     adds r0,r5,#0x0    @ 08037958 281c
     muls r0,r3    @ 0803795a 5843
     adds r0,r0,r6    @ 0803795c 8019
@@ -3588,21 +3583,21 @@ LAB_08037968:
     pop {r1}                                 @ 0803796a 02bc
     bx r1                                    @ 0803796c 0847
     .zero  0x2
-DAT_08037970:
-    .word  0x00000868                     @ 08037970 68080000
+find_field_zone_slot_with_equip_type_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037970 68080000
 
-@ 遍历指定玩家侧墓地卡牌数组 (gP1LifePoints+player*0x868+0x120, 数量读自 +0xc), 对每张卡提取低 13 位 card_id, 调用 get_card_extended_stat_field6, 与 non-APCS r8 (入口 .hword 0x4688=mov r8,r1) 比较; 命中则 r6 自增. 返回命中数量. 与 count_hand_cards_by_field6 结构对称 (基址 +0x120 vs +0x418). Constants: gP1LifePoints base, gy_base_offset=0x120, gy_count_offset=0xc, player_stride=0x868.
-count_gy_cards_by_field6:
+@ count_field_zone_cards_by_field6: Iterates field zone array C for player (gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x120, count at +0x0c). Extracts bits[12:0] as card_id per entry, calls get_card_extended_stat_field6; if field6==r8 (non-APCS, caller-set via mov r8,r1), increments counter. Returns match count. Symmetric to count_field_zone_cards_by_field7 (same gP1FieldArrayCBase base, different stat field). Pure read-only. r0=u8 player_id [0..1]; r1 (non-APCS saved r8)=u8 field6_target. Returns u32 count. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
+count_field_zone_cards_by_field6:
     push {r4,r5,r6,r7,lr}                    @ 08037974 f0b5
     .hword 0x4647    @ 08037976 4746
     push {r7}                                @ 08037978 80b4
     .hword 0x4688    @ 0803797a 8846
     movs r6,#0x0    @ 0803797c 0026
     movs r5,#0x0    @ 0803797e 0025
-    ldr r3, PTR_gP1LifePoints_080379c8       @ 08037980 114b
+    ldr r3, count_field_zone_cards_by_field6_lp_ptr @ 08037980 114b
     movs r1,#0x1    @ 08037982 0121
     ands r1,r0    @ 08037984 0140
-    ldr r0, DAT_080379cc                     @ 08037986 1148
+    ldr r0, count_field_zone_cards_by_field6_stride @ 08037986 1148
     muls r1,r0    @ 08037988 4143
     adds r0,r3,#0x0    @ 0803798a 181c
     adds r0,#0xc    @ 0803798c 0c30
@@ -3637,17 +3632,12 @@ LAB_080379ba:
     pop {r1}                                 @ 080379c2 02bc
     bx r1                                    @ 080379c4 0847
     .zero  0x2
-PTR_gP1LifePoints_080379c8:
+count_field_zone_cards_by_field6_lp_ptr:
     .word  gP1LifePoints                  @ 080379c8 e0c40102
-DAT_080379cc:
-    .word  0x00000868                     @ 080379cc 68080000
+count_field_zone_cards_by_field6_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080379cc 68080000
 
-@ Iterates all cards in the specified player field_array_C (gP1LifePoints+player*0x868+0x120, count from +0x0c). For each card, extracts bits[12:0] as card_icid and calls get_card_extended_stat_field7; if return value equals target r8 (saved at entry via mov r8,r1; non-APCS), increments counter. Returns total count. Symmetric to count_gy_cards_by_field6 (0x08037974); differs in stat field (field7 vs field6) and array region (field_zone vs graveyard). Pure read-only.
-@ 
-@ Params: r0=u8 player_id [0..1]; r1=u8 field7_target (saved to r8 via mov r8,r1) [0..255]
-@ Returns: r0=u32 count of field_zone cards where field7==r8
-@ Side effects: none (read-only)
-@ Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c
+@ count_field_zone_cards_by_field7: Iterates field zone array C for player (gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x120, count at +0x0c). Extracts bits[12:0] as card_id; calls get_card_extended_stat_field7; if field7==r8 (non-APCS, caller-set), increments counter. Returns match count. Symmetric to count_field_zone_cards_by_field6. Pure read-only. r0=u8 player_id [0..1]; r1 (non-APCS saved r8)=u8 field7_target. Returns u32 count. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
 count_field_zone_cards_by_field7:
     push {r4,r5,r6,r7,lr}                    @ 080379d0 f0b5
     .hword 0x4647    @ 080379d2 4746
@@ -3655,10 +3645,10 @@ count_field_zone_cards_by_field7:
     .hword 0x4688    @ 080379d6 8846
     movs r6,#0x0    @ 080379d8 0026
     movs r5,#0x0    @ 080379da 0025
-    ldr r3, PTR_gP1LifePoints_08037a24       @ 080379dc 114b
+    ldr r3, count_field_zone_cards_by_field7_lp_ptr @ 080379dc 114b
     movs r1,#0x1    @ 080379de 0121
     ands r1,r0    @ 080379e0 0140
-    ldr r0, DAT_08037a28                     @ 080379e2 1148
+    ldr r0, count_field_zone_cards_by_field7_stride @ 080379e2 1148
     muls r1,r0    @ 080379e4 4143
     adds r0,r3,#0x0    @ 080379e6 181c
     adds r0,#0xc    @ 080379e8 0c30
@@ -3693,12 +3683,12 @@ LAB_08037a16:
     pop {r1}                                 @ 08037a1e 02bc
     bx r1                                    @ 08037a20 0847
     .zero  0x2
-PTR_gP1LifePoints_08037a24:
+count_field_zone_cards_by_field7_lp_ptr:
     .word  gP1LifePoints                  @ 08037a24 e0c40102
-DAT_08037a28:
-    .word  0x00000868                     @ 08037a28 68080000
+count_field_zone_cards_by_field7_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037a28 68080000
 
-@ Count monster zone slots for player (r0) satisfying check_card_pair_allowed. r8=target_card_id is non-APCS caller-set implicit input. Iterates [gP1LifePoints+side*0x868+0xc] monster slots; lsls/lsrs #19 extracts card_id. r0=u32 player_side [0..1]; r8 (non-APCS, caller-set)=u16 target_card_id [0..0x1fff]. Returns u32 count [0..5]. Pure read-only. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, monster_count_offset=0xc, slot_entry=0x14.
+@ count_valid_monster_pair_slots: Count zone slots in field array C for player where check_card_id_is_normal_summon_type(card_id) is true (field1 bit check). Reads gP1LP+player*0x868+0x120 (gP1FieldArrayCBase), count at +0x0c. For each entry extracts card_id (bits[12:0]); calls check_card_id_is_normal_summon_type. Returns match count. Pure read-only. r0=u8 player_id [0..1]. Returns u32 count. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
 count_valid_monster_pair_slots:
     push {r4,r5,r6,r7,lr}                    @ 08037a2c f0b5
     .hword 0x4647    @ 08037a2e 4746
@@ -3708,10 +3698,10 @@ count_valid_monster_pair_slots:
     .hword 0x4688    @ 08037a36 8846
     movs r6,#0x0    @ 08037a38 0026
     movs r5,#0x0    @ 08037a3a 0025
-    ldr r3, PTR_gP1LifePoints_08037a84       @ 08037a3c 114b
+    ldr r3, count_valid_monster_pair_slots_lp_ptr @ 08037a3c 114b
     movs r1,#0x1    @ 08037a3e 0121
     ands r1,r0    @ 08037a40 0140
-    ldr r0, DAT_08037a88                     @ 08037a42 1148
+    ldr r0, count_valid_monster_pair_slots_stride @ 08037a42 1148
     muls r1,r0    @ 08037a44 4143
     adds r0,r3,#0x0    @ 08037a46 181c
     adds r0,#0xc    @ 08037a48 0c30
@@ -3746,20 +3736,20 @@ LAB_08037a78:
     pop {r4,r5,r6,r7}                        @ 08037a7e f0bc
     pop {r1}                                 @ 08037a80 02bc
     bx r1                                    @ 08037a82 0847
-PTR_gP1LifePoints_08037a84:
+count_valid_monster_pair_slots_lp_ptr:
     .word  gP1LifePoints                  @ 08037a84 e0c40102
-DAT_08037a88:
-    .word  0x00000868                     @ 08037a88 68080000
+count_valid_monster_pair_slots_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037a88 68080000
 
-@ Scans gDuelFieldSlots for player_side, returns first slot index where check_card_pair_allowed(slot_card_id, target_card_id) passes. Zone count upper bound from gP1LifePoints[side*0x868+0xc]. Slot card_id extracted as low 13 bits (lsls/lsrs #0x13). r0=u32 player_side [0..1]; r1=u16 target_card_id. Returns s32 slot_idx (>=0) or -1. indeg=8. Constants: player_stride=0x868, zone_count_offset=0xc, slot_pool_offset=0x120.
+@ find_zone_slot_idx_allowed_for_card: Find field zone slot index in field array C where check_card_is_equip_target_eligible(card_id) returns true for specified player. Reads gP1LP+player*0x868+0x120 (gP1FieldArrayCBase), count at +0x0c. Returns 0-based slot index; returns -1 if not found. Pure read-only. r0=u8 player_id [0..1]. Returns s32 slot_index. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
 find_zone_slot_idx_allowed_for_card:
     push {r4,r5,r6,r7,lr}                    @ 08037a8c f0b5
     adds r7,r1,#0x0    @ 08037a8e 0f1c
     movs r5,#0x0    @ 08037a90 0025
-    ldr r3, PTR_gP1LifePoints_08037ac8       @ 08037a92 0d4b
+    ldr r3, find_zone_slot_idx_allowed_for_card_lp_ptr @ 08037a92 0d4b
     movs r1,#0x1    @ 08037a94 0121
     ands r1,r0    @ 08037a96 0140
-    ldr r0, DAT_08037acc                     @ 08037a98 0c48
+    ldr r0, find_zone_slot_idx_allowed_for_card_stride @ 08037a98 0c48
     muls r1,r0    @ 08037a9a 4143
     adds r0,r3,#0x0    @ 08037a9c 181c
     adds r0,#0xc    @ 08037a9e 0c30
@@ -3783,10 +3773,10 @@ LAB_08037ab2:
     adds r0,r5,#0x0    @ 08037ac2 281c
     b LAB_08037ade                           @ 08037ac4 0be0
     .zero  0x2
-PTR_gP1LifePoints_08037ac8:
+find_zone_slot_idx_allowed_for_card_lp_ptr:
     .word  gP1LifePoints                  @ 08037ac8 e0c40102
-DAT_08037acc:
-    .word  0x00000868                     @ 08037acc 68080000
+find_zone_slot_idx_allowed_for_card_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037acc 68080000
 LAB_08037ad0:
     adds r4,#0x4    @ 08037ad0 0434
     adds r5,#0x1    @ 08037ad2 0135
@@ -3801,20 +3791,15 @@ LAB_08037ade:
     pop {r1}                                 @ 08037ae0 02bc
     bx r1                                    @ 08037ae2 0847
 
-@ Iterates all cards in the specified player field_array_C (gP1LifePoints+player*0x868+0x120, count from +0x0c). For each card, extracts bits[12:0] as card_icid and calls check_card_field5_is_nonzero; if field5 is nonzero, increments counter. Returns total count. No non-APCS params (prologue is only push {r4..r7,lr}, no .hword mov sequence); takes only r0=player_id. 4 callers all in duel_field, used to count field_zone cards with field5 attribute in duel state evaluation. Pure read-only.
-@ 
-@ Params: r0=u8 player_id [0..1]
-@ Returns: r0=u32 count of field_zone cards with nonzero field5
-@ Side effects: none (read-only)
-@ Constants: FIELD_ARRAY_C_BASE_OFFSET=0x90<<1=0x120; FIELD_ARRAY_C_COUNT_OFFSET=0x0c
+@ count_field_zone_cards_with_field5: Count cards in field zone array C for player where get_card_extended_stat_field5(card_id) is nonzero. Reads gP1LP+player*0x868+0x120 (gP1FieldArrayCBase), count at +0x0c. Returns match count. Pure read-only. r0=u8 player_id [0..1]. Returns u32 count. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
 count_field_zone_cards_with_field5:
     push {r4,r5,r6,r7,lr}                    @ 08037ae4 f0b5
     movs r5,#0x0    @ 08037ae6 0025
     movs r6,#0x0    @ 08037ae8 0026
-    ldr r3, PTR_gP1LifePoints_08037b2c       @ 08037aea 104b
+    ldr r3, count_field_zone_cards_with_field5_lp_ptr @ 08037aea 104b
     movs r1,#0x1    @ 08037aec 0121
     ands r1,r0    @ 08037aee 0140
-    ldr r0, DAT_08037b30                     @ 08037af0 0f48
+    ldr r0, count_field_zone_cards_with_field5_stride @ 08037af0 0f48
     muls r1,r0    @ 08037af2 4143
     adds r0,r3,#0x0    @ 08037af4 181c
     adds r0,#0xc    @ 08037af6 0c30
@@ -3846,12 +3831,12 @@ LAB_08037b24:
     pop {r4,r5,r6,r7}                        @ 08037b26 f0bc
     pop {r1}                                 @ 08037b28 02bc
     bx r1                                    @ 08037b2a 0847
-PTR_gP1LifePoints_08037b2c:
+count_field_zone_cards_with_field5_lp_ptr:
     .word  gP1LifePoints                  @ 08037b2c e0c40102
-DAT_08037b30:
-    .word  0x00000868                     @ 08037b30 68080000
+count_field_zone_cards_with_field5_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037b30 68080000
 
-@ Iterates all monster zone cards for player r0 (count at gP1LifePoints+player*0x868+0xc, entries at +0x120 subarray). For each card calls get_card_extended_stat_field5; if return >= threshold (r1, saved in r8) increments counter. Returns match_count. r0=u32 player_side [0..1]; r1=u32 field5_threshold [0..255] (known callsite: 7). Uses non-APCS r8 for threshold (mov r8,r1 via .hword 0x4688). Callers: FUN_080ae050 (with r1=7). Constants: player_stride=0x868, monsters_offset=0xc, subarray_offset=0x120 (=0x90<<1).
+@ count_monster_slots_with_field5_ge_threshold: Iterates monster zone cards for player (gP1LifePoints+player*PLAYER_BLOCK_STRIDE+0x120, count at +0x0c). Calls get_card_extended_stat_field5; if field5 >= threshold (r8 non-APCS, caller-set via mov r8,r1), increments counter. Returns match count. Caller: find_empty_slot_for_card_id_dispatch (with r1=7). Pure read-only. r0=u32 player_side [0..1]; r1=u32 field5_threshold [0..255] (non-APCS saved r8). Returns u32 count. Constants: gP1FieldArrayCBase; PLAYER_BLOCK_STRIDE.
 count_monster_slots_with_field5_ge_threshold:
     push {r4,r5,r6,r7,lr}                    @ 08037b34 f0b5
     .hword 0x4647    @ 08037b36 4746
@@ -3859,10 +3844,10 @@ count_monster_slots_with_field5_ge_threshold:
     .hword 0x4688    @ 08037b3a 8846
     movs r5,#0x0    @ 08037b3c 0025
     movs r6,#0x0    @ 08037b3e 0026
-    ldr r3, PTR_gP1LifePoints_08037b88       @ 08037b40 114b
+    ldr r3, count_monster_slots_field5_ge_threshold_lp_ptr @ 08037b40 114b
     movs r1,#0x1    @ 08037b42 0121
     ands r1,r0    @ 08037b44 0140
-    ldr r0, DAT_08037b8c                     @ 08037b46 1148
+    ldr r0, count_monster_slots_field5_ge_threshold_stride @ 08037b46 1148
     muls r1,r0    @ 08037b48 4143
     adds r0,r3,#0x0    @ 08037b4a 181c
     adds r0,#0xc    @ 08037b4c 0c30
@@ -3897,17 +3882,17 @@ LAB_08037b7a:
     pop {r1}                                 @ 08037b82 02bc
     bx r1                                    @ 08037b84 0847
     .zero  0x2
-PTR_gP1LifePoints_08037b88:
+count_monster_slots_field5_ge_threshold_lp_ptr:
     .word  gP1LifePoints                  @ 08037b88 e0c40102
-DAT_08037b8c:
-    .word  0x00000868                     @ 08037b8c 68080000
+count_monster_slots_field5_ge_threshold_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037b8c 68080000
 
-@ Returns bit1 of the deck status word for the specified player. r0 bit0 selects player index (0=P1, 1=P2); stride 0x868 locates player struct; offset +0x11c (=0x8e*2) reads 32-bit status word, lsrs #1 extracts bit1. r0=u32 packed_player_id (bit0=player index [0..1]). Returns u32 (0 or 1). Callers: FUN_08037c20 (duel_field, skip-deck-sort check); get_zone_card_attribute_by_type case_b (conditional return 0/1 based on entity match). Constants: 0x868=player struct stride, 0x11c=deck_status_word_offset.
+@ get_player_deck_flag_bit1: Returns bit1 of deck status word for specified player. Reads gP1LifePoints + (r0&1)*PLAYER_BLOCK_STRIDE + 0x11c (=0x8e*2), extracts bit1 via lsrs #1 & 1. Pure read-only. Callers: shuffle_hand_by_player_deck_flag (skip-deck-sort guard); get_zone_card_attribute_by_type case_b (conditional 0/1 return). r0=u32 packed_player_id (bit0=player index [0..1]). Returns u32 (0 or 1). Constants: gP1LifePoints; PLAYER_BLOCK_STRIDE; deck_status_word_offset=0x11c.
 get_player_deck_flag_bit1:
-    ldr r2, PTR_gP1LifePoints_08037bac       @ 08037b90 064a
+    ldr r2, get_player_deck_flag_bit1_lp_ptr @ 08037b90 064a
     movs r3,#0x1    @ 08037b92 0123
     ands r0,r3    @ 08037b94 1840
-    ldr r1, DAT_08037bb0                     @ 08037b96 0649
+    ldr r1, get_player_deck_flag_bit1_stride @ 08037b96 0649
     muls r0,r1    @ 08037b98 4843
     movs r1,#0x8e    @ 08037b9a 8e21
     lsls r1,r1,#0x1    @ 08037b9c 4900
@@ -3918,18 +3903,18 @@ get_player_deck_flag_bit1:
     ands r0,r3    @ 08037ba6 1840
     bx lr                                    @ 08037ba8 7047
     .zero  0x2
-PTR_gP1LifePoints_08037bac:
+get_player_deck_flag_bit1_lp_ptr:
     .word  gP1LifePoints                  @ 08037bac e0c40102
-DAT_08037bb0:
-    .word  0x00000868                     @ 08037bb0 68080000
+get_player_deck_flag_bit1_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037bb0 68080000
 
-@ Checks field effect zone activation eligibility for given player side (r0=player_id). Logic: (1) call count_available_effect_zones (card=0x137b) for opposite side - return 1 if nonzero; (2) call count_field_copies_of_card for own side - return 1 if nonzero; (3) call count_available_effect_zones (card=0x17e7) for opposite side; (4) if opposite player_id matches stored value at gP1LifePoints+0x1ce8, call count_field_copies_of_card (card=0x135e). Returns 1 if any condition met, 0 otherwise. Params: r0=u8 player_id [0..1]. Constants: CARD_ID_A=0x137b, CARD_ID_B=0x17e7, CARD_ID_C=0x135e, ZONE_FLAG_ALL=-1.
+@ check_field_effect_zone_activation_eligible: Check whether field-effect zone activation is eligible for player. Guards: (1) count_available_effect_zones(opposite, EYE_OF_TRUTH_CID=0x137b) == 0; (2) count_available_effect_zones(opposite, MIND_ON_AIR_CID=0x17e7) == 0; (3) gP1LifePoints+player*0x868+P1LP_BLOCK2_OFF_1CE8 check (activation state guard); (4) count_field_copies_of_card(player, RESPECT_PLAY_CID=0x135e) == 0. Returns 1 if all guards pass (eligible), 0 otherwise. r0=u8 player_id [0..1]. Returns bool. Constants: gP1LifePoints; PLAYER_BLOCK_STRIDE; P1LP_BLOCK2_OFF_1CE8=0x1ce8; EYE_OF_TRUTH_CID=0x137b; MIND_ON_AIR_CID=0x17e7; RESPECT_PLAY_CID=0x135e.
 check_field_effect_zone_activation_eligible:
     push {r4,r5,r6,lr}                       @ 08037bb4 70b5
     adds r5,r0,#0x0    @ 08037bb6 051c
     movs r0,#0x1    @ 08037bb8 0120
     subs r4,r0,r5    @ 08037bba 441b
-    ldr r1, DAT_08037c04                     @ 08037bbc 1149
+    ldr r1, check_field_effect_zone_elig_eye_of_truth_cid @ 08037bbc 1149
     movs r6,#0x1    @ 08037bbe 0126
     rsbs r6,r6,#0    @ 08037bc0 7642
     adds r0,r4,#0x0    @ 08037bc2 201c
@@ -3942,19 +3927,19 @@ check_field_effect_zone_activation_eligible:
     bl count_field_copies_of_card            @ 08037bd2 faf7e3fd
     cmp r0,#0x0                              @ 08037bd6 0028
     bne LAB_08037bfe                         @ 08037bd8 11d1
-    ldr r1, DAT_08037c08                     @ 08037bda 0b49
+    ldr r1, check_field_effect_zone_elig_mind_on_air_cid @ 08037bda 0b49
     adds r0,r4,#0x0    @ 08037bdc 201c
     adds r2,r6,#0x0    @ 08037bde 321c
     bl count_available_effect_zones          @ 08037be0 faf738fd
     cmp r0,#0x0                              @ 08037be4 0028
     bne LAB_08037bfe                         @ 08037be6 0ad1
-    ldr r0, PTR_gP1LifePoints_08037c0c       @ 08037be8 0848
-    ldr r1, DAT_08037c10                     @ 08037bea 0949
+    ldr r0, check_field_effect_zone_activation_eligible_lp_ptr @ 08037be8 0848
+    ldr r1, check_field_effect_zone_elig_lp_field_off @ 08037bea 0949
     adds r0,r0,r1    @ 08037bec 4018
     ldr r0,[r0,#0x0]                         @ 08037bee 0068
     cmp r5,r0                                @ 08037bf0 8542
     bne LAB_08037c18                         @ 08037bf2 11d1
-    ldr r0, DAT_08037c14                     @ 08037bf4 0748
+    ldr r0, check_field_effect_zone_elig_respect_play_cid @ 08037bf4 0748
     bl count_field_copies_of_card            @ 08037bf6 faf7d1fd
     cmp r0,#0x0                              @ 08037bfa 0028
     beq LAB_08037c18                         @ 08037bfc 0cd0
@@ -3962,16 +3947,16 @@ LAB_08037bfe:
     movs r0,#0x1    @ 08037bfe 0120
     b LAB_08037c1a                           @ 08037c00 0be0
     .zero  0x2
-DAT_08037c04:
-    .word  0x0000137b                     @ 08037c04 7b130000
-DAT_08037c08:
-    .word  0x000017e7                     @ 08037c08 e7170000
-PTR_gP1LifePoints_08037c0c:
+check_field_effect_zone_elig_eye_of_truth_cid:
+    .word  EYE_OF_TRUTH_CID               @ 08037c04 7b130000
+check_field_effect_zone_elig_mind_on_air_cid:
+    .word  MIND_ON_AIR_CID                @ 08037c08 e7170000
+check_field_effect_zone_activation_eligible_lp_ptr:
     .word  gP1LifePoints                  @ 08037c0c e0c40102
-DAT_08037c10:
-    .word  0x00001ce8                     @ 08037c10 e81c0000
-DAT_08037c14:
-    .word  0x0000135e                     @ 08037c14 5e130000
+check_field_effect_zone_elig_lp_field_off:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 08037c10 e81c0000
+check_field_effect_zone_elig_respect_play_cid:
+    .word  RESPECT_PLAY_CID               @ 08037c14 5e130000
 LAB_08037c18:
     movs r0,#0x0    @ 08037c18 0020
 LAB_08037c1a:
@@ -3979,19 +3964,7 @@ LAB_08037c1a:
     pop {r1}                                 @ 08037c1c 02bc
     bx r1                                    @ 08037c1e 0847
 
-@ Called by tick_player_hand_shuffle_display_seq (0x08040ebc) at step 0 to perform
-@ the actual hand randomization.
-@ r0=player_id: first calls get_player_deck_flag_bit1(player_id) to check deck flag bit1;
-@ if already set, returns 0 immediately (randomization prohibited).
-@ Otherwise computes hand card count = [gP1LifePoints + player_id*0x868 + 0x0c] - 1;
-@ if count<=0 returns 1 directly.
-@ Performs Fisher-Yates style randomization for count iterations: each round calls
-@ sample_prng_scaled(count+1) to get a random index, then swaps hand entries via
-@ write_word_from_deref_src three times.
-@ Returns r0=1 (randomization complete), r0=0 (deck_flag_bit1 set, prohibited).
-@ 
-@ r0: u8 player_id [0..1]
-@ Returns: u8, 1=randomization done/skipped(count<=0), 0=deck_flag_bit1 set
+@ shuffle_hand_by_player_deck_flag: Shuffle (randomize) hand cards for player if deck flag bit1 is clear (deck not sorted). Calls get_player_deck_flag_bit1(player_id); if nonzero (bit1 set) returns immediately. Otherwise performs Fisher-Yates shuffle on hand slot array (gDuelFieldSlots+player*0x868, count at gP1LP+0x868*player+0x0c). Uses prng for random index selection. r0=u8 player_id [0..1]. Returns void. Constants: gP1LifePoints; PLAYER_BLOCK_STRIDE; gDuelFieldSlots=0x0201c510.
 shuffle_hand_by_player_deck_flag:
     push {r4,r5,r6,r7,lr}                    @ 08037c20 f0b5
     sub sp,#0x4                              @ 08037c22 81b0
@@ -4002,10 +3975,10 @@ shuffle_hand_by_player_deck_flag:
     movs r0,#0x0    @ 08037c2e 0020
     b LAB_08037c8a                           @ 08037c30 2be0
 LAB_08037c32:
-    ldr r2, PTR_gP1LifePoints_08037c94       @ 08037c32 184a
+    ldr r2, shuffle_hand_by_player_deck_flag_lp_ptr @ 08037c32 184a
     movs r0,#0x1    @ 08037c34 0120
     ands r0,r4    @ 08037c36 2040
-    ldr r1, DAT_08037c98                     @ 08037c38 1749
+    ldr r1, shuffle_hand_by_player_deck_flag_stride @ 08037c38 1749
     adds r4,r0,#0x0    @ 08037c3a 041c
     muls r4,r1    @ 08037c3c 4c43
     adds r0,r2,#0x0    @ 08037c3e 101c
@@ -4050,12 +4023,12 @@ LAB_08037c8a:
     pop {r1}                                 @ 08037c8e 02bc
     bx r1                                    @ 08037c90 0847
     .zero  0x2
-PTR_gP1LifePoints_08037c94:
+shuffle_hand_by_player_deck_flag_lp_ptr:
     .word  gP1LifePoints                  @ 08037c94 e0c40102
-DAT_08037c98:
-    .word  0x00000868                     @ 08037c98 68080000
+shuffle_hand_by_player_deck_flag_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037c98 68080000
 
-@ Computes the ATK/DEF buff delta for a specific zone slot (r1=player_side, r2=slot_idx). Reads card_id from gDuelFieldSlots (0x0201c510) at player_side*0x868 + slot_idx*20; initialises r9=0(atk), r7=0(def). If query_slot_effect_eligibility_nonzero(r5,r8) != 0 returns 0 immediately. Performs large switch on card_id; each case checks [r6+0xc] flag bits, sets r7=ATK_buff (0x1f4=+500 or 0xc8=+200) and r9=DEF_buff. Returns packed u32: (s16 atk_delta << 16) | (s16 def_delta & 0xffff). r0=ptr stack_slot_ptr, r1=u32 player_side [0..1], r2=u32 slot_idx [0..0xa], r3=u32 player_flag_cmp [0..1], [sp+0]=u32 stack_arg5 [0..9]. Returns u32 packed (high=atk_delta, low=def_delta; 0=no effect). Constants: gDuelFieldSlots=0x0201c510, PLAYER_STRIDE=0x868, SLOT_ENTRY_SIZE=20, ATK_buff_500=0x1f4, ATK_buff_200=0xc8, card_atk_lookup_base=0x09e3ef74, card_id_range=[0x10f5..0x1346].
+@ compute_zone_effect_atk_delta: Compute ATK/DEF score delta for zone effect card. For field-spell cards (YAMI_CID=0x10f5..MOLTEN_DESTRUCTION_CID=0x1346 range):   looks up field_spell_atk_bonus_table[card_id+FIELD_SPELL_TABLE_IDX_BIAS][field_level]. Binary-search card dispatch within the range:   GAIA_POWER_CID=0x1344, MYSTIC_PLASMA_ZONE_CID=0x1349. For NECROVALLEY_CID=0x159d / HARPIES_HUNTING_GROUND_CID=0x183f zone effects:   applies ZONE_EFFECT_ATK_PENALTY_500=-500 as ATK/DEF delta for opponent gravekeeper check. r0=u8 player_id [0..1]; r1=u16 card_id; r2=u8 field_level [0..23]. Returns s32 score_delta. Constants: gP1LifePoints; gDuelFieldSlots=0x0201c510; PLAYER_BLOCK_STRIDE=0x868; field_spell_atk_bonus_table (ROM 0x09e3ef74); FIELD_SPELL_TABLE_IDX_BIAS=0xffffef10; YAMI_CID=0x10f5; MOLTEN_DESTRUCTION_CID=0x1346; GAIA_POWER_CID=0x1344; MYSTIC_PLASMA_ZONE_CID=0x1349; NECROVALLEY_CID=0x159d; HARPIES_HUNTING_GROUND_CID=0x183f; ZONE_EFFECT_ATK_PENALTY_500=0xfffffe70.
 compute_zone_effect_atk_delta:
     push {r4,r5,r6,r7,lr}                    @ 08037c9c f0b5
     .hword 0x4657    @ 08037c9e 5746
@@ -4073,11 +4046,11 @@ compute_zone_effect_atk_delta:
     lsls r0,r2,#0x2    @ 08037cb6 9000
     adds r0,r0,r2    @ 08037cb8 8018
     lsls r0,r0,#0x2    @ 08037cba 8000
-    ldr r4, DAT_08037cf0                     @ 08037cbc 0c4c
+    ldr r4, compute_zone_effect_atk_delta_stride @ 08037cbc 0c4c
     adds r2,r3,#0x0    @ 08037cbe 1a1c
     muls r2,r4    @ 08037cc0 6243
     adds r0,r0,r2    @ 08037cc2 8018
-    ldr r2, DAT_08037cf4                     @ 08037cc4 0b4a
+    ldr r2, compute_zone_effect_atk_delta_slots @ 08037cc4 0b4a
     adds r0,r0,r2    @ 08037cc6 8018
     ldr r0,[r0,#0x0]                         @ 08037cc8 0068
     lsls r0,r0,#0x13    @ 08037cca c004
@@ -4098,12 +4071,12 @@ compute_zone_effect_atk_delta:
     movs r0,#0x0    @ 08037cea 0020
     b LAB_08037ea8                           @ 08037cec dce0
     .zero  0x2
-DAT_08037cf0:
-    .word  0x00000868                     @ 08037cf0 68080000
-DAT_08037cf4:
-    .word  0x0201c510                     @ 08037cf4 10c50102
+compute_zone_effect_atk_delta_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037cf0 68080000
+compute_zone_effect_atk_delta_slots:
+    .word  gDuelFieldSlots                @ 08037cf4 10c50102
 LAB_08037cf8:
-    ldr r0, DAT_08037d30                     @ 08037cf8 0d48
+    ldr r0, compute_zone_effect_atk_delta_range_max_cid @ 08037cf8 0d48
     cmp r4,r0                                @ 08037cfa 8442
     bne LAB_08037d00                         @ 08037cfc 00d1
     b LAB_08037dfe                           @ 08037cfe 7ee0
@@ -4115,7 +4088,7 @@ LAB_08037d00:
     beq LAB_08037d90                         @ 08037d08 42d0
     cmp r4,r0                                @ 08037d0a 8442
     bgt LAB_08037d38                         @ 08037d0c 14dc
-    ldr r0, DAT_08037d34                     @ 08037d0e 0948
+    ldr r0, compute_zone_effect_atk_delta_range_min_cid @ 08037d0e 0948
     cmp r4,r0                                @ 08037d10 8442
     ble LAB_08037d16                         @ 08037d12 00dd
     b LAB_08037e9e                           @ 08037d14 c3e0
@@ -4136,12 +4109,12 @@ LAB_08037d26:
 LAB_08037d2c:
     b LAB_08037dc0                           @ 08037d2c 48e0
     .zero  0x2
-DAT_08037d30:
-    .word  0x00001346                     @ 08037d30 46130000
-DAT_08037d34:
-    .word  0x000010f5                     @ 08037d34 f5100000
+compute_zone_effect_atk_delta_range_max_cid:
+    .word  MOLTEN_DESTRUCTION_CID         @ 08037d30 46130000
+compute_zone_effect_atk_delta_range_min_cid:
+    .word  YAMI_CID                       @ 08037d34 f5100000
 LAB_08037d38:
-    ldr r0, DAT_08037d48                     @ 08037d38 0348
+    ldr r0, compute_zone_effect_atk_delta_gaia_power_cid @ 08037d38 0348
     cmp r4,r0                                @ 08037d3a 8442
     beq LAB_08037df2                         @ 08037d3c 59d0
     adds r0,#0x1    @ 08037d3e 0130
@@ -4149,10 +4122,10 @@ LAB_08037d38:
     beq LAB_08037df8                         @ 08037d42 59d0
     b LAB_08037e9e                           @ 08037d44 abe0
     .zero  0x2
-DAT_08037d48:
-    .word  0x00001344                     @ 08037d48 44130000
+compute_zone_effect_atk_delta_gaia_power_cid:
+    .word  GAIA_POWER_CID                 @ 08037d48 44130000
 LAB_08037d4c:
-    ldr r0, DAT_08037d68                     @ 08037d4c 0648
+    ldr r0, compute_zone_effect_atk_delta_mystic_plasma_cid @ 08037d4c 0648
     cmp r4,r0                                @ 08037d4e 8442
     bne LAB_08037d54                         @ 08037d50 00d1
     b LAB_08037e48                           @ 08037d52 79e0
@@ -4167,10 +4140,10 @@ LAB_08037d54:
     beq LAB_08037e30                         @ 08037d62 65d0
     b LAB_08037e9e                           @ 08037d64 9be0
     .zero  0x2
-DAT_08037d68:
-    .word  0x00001349                     @ 08037d68 49130000
+compute_zone_effect_atk_delta_mystic_plasma_cid:
+    .word  MYSTIC_PLASMA_ZONE_CID         @ 08037d68 49130000
 LAB_08037d6c:
-    ldr r0, DAT_08037d80                     @ 08037d6c 0448
+    ldr r0, compute_zone_effect_atk_delta_necrovalley_cid @ 08037d6c 0448
     cmp r4,r0                                @ 08037d6e 8442
     bne LAB_08037d74                         @ 08037d70 00d1
     b LAB_08037e72                           @ 08037d72 7ee0
@@ -4181,15 +4154,15 @@ LAB_08037d74:
     cmp r4,r0                                @ 08037d7a 8442
     beq LAB_08037e60                         @ 08037d7c 70d0
     b LAB_08037e9e                           @ 08037d7e 8ee0
-DAT_08037d80:
-    .word  0x0000159d                     @ 08037d80 9d150000
+compute_zone_effect_atk_delta_necrovalley_cid:
+    .word  NECROVALLEY_CID                @ 08037d80 9d150000
 LAB_08037d84:
-    ldr r0, DAT_08037d8c                     @ 08037d84 0148
+    ldr r0, compute_zone_effect_atk_delta_harpies_hunt_cid @ 08037d84 0148
     cmp r4,r0                                @ 08037d86 8442
     beq LAB_08037de4                         @ 08037d88 2cd0
     b LAB_08037e9e                           @ 08037d8a 88e0
-DAT_08037d8c:
-    .word  0x0000183f                     @ 08037d8c 3f180000
+compute_zone_effect_atk_delta_harpies_hunt_cid:
+    .word  HARPIES_HUNTING_GROUND_CID     @ 08037d8c 3f180000
 LAB_08037d90:
     .hword 0x4651    @ 08037d90 5146
     ands r5,r1    @ 08037d92 0d40
@@ -4197,11 +4170,11 @@ LAB_08037d90:
     lsls r0,r2,#0x2    @ 08037d96 9000
     add r0,r8                                @ 08037d98 4044
     lsls r0,r0,#0x2    @ 08037d9a 8000
-    ldr r4, DAT_08037db8                     @ 08037d9c 064c
+    ldr r4, compute_zone_effect_atk_delta_stride_b @ 08037d9c 064c
     adds r1,r5,#0x0    @ 08037d9e 291c
     muls r1,r4    @ 08037da0 6143
     adds r0,r0,r1    @ 08037da2 4018
-    ldr r1, DAT_08037dbc                     @ 08037da4 0549
+    ldr r1, compute_zone_effect_atk_delta_slots_b @ 08037da4 0549
     adds r0,r0,r1    @ 08037da6 4018
     ldrh r0,[r0,#0x6]                        @ 08037da8 c088
     cmp r0,#0x0                              @ 08037daa 0028
@@ -4212,14 +4185,14 @@ LAB_08037db0:
     lsls r7,r7,#0x1    @ 08037db2 7f00
     b LAB_08037e9e                           @ 08037db4 73e0
     .zero  0x2
-DAT_08037db8:
-    .word  0x00000868                     @ 08037db8 68080000
-DAT_08037dbc:
-    .word  0x0201c510                     @ 08037dbc 10c50102
+compute_zone_effect_atk_delta_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037db8 68080000
+compute_zone_effect_atk_delta_slots_b:
+    .word  gDuelFieldSlots                @ 08037dbc 10c50102
 LAB_08037dc0:
-    ldr r3, DAT_08037ddc                     @ 08037dc0 064b
+    ldr r3, compute_zone_effect_atk_delta_table_base @ 08037dc0 064b
     lsls r1,r0,#0x1    @ 08037dc2 4100
-    ldr r0, DAT_08037de0                     @ 08037dc4 0648
+    ldr r0, compute_zone_effect_atk_delta_table_idx_bias @ 08037dc4 0648
     adds r2,r4,r0    @ 08037dc6 2218
     lsls r0,r2,#0x1    @ 08037dc8 5000
     adds r0,r0,r2    @ 08037dca 8018
@@ -4231,10 +4204,10 @@ LAB_08037dc0:
     add r9,r0                                @ 08037dd6 8144
     adds r7,r7,r0    @ 08037dd8 3f18
     b LAB_08037e9e                           @ 08037dda 60e0
-DAT_08037ddc:
-    .word  0x09e3ef74                     @ 08037ddc 74efe309
-DAT_08037de0:
-    .word  0xffffef10                     @ 08037de0 10efffff
+compute_zone_effect_atk_delta_table_base:
+    .word  field_spell_atk_bonus_table    @ 08037ddc 74efe309
+compute_zone_effect_atk_delta_table_idx_bias:
+    .word  FIELD_SPELL_TABLE_IDX_BIAS     @ 08037de0 10efffff
 LAB_08037de4:
     ldr r0,[r6,#0x4]                         @ 08037de4 7068
     cmp r0,#0x10                             @ 08037de6 1028
@@ -4260,11 +4233,11 @@ LAB_08037dfe:
     movs r2,#0xfa    @ 08037e08 fa22
     lsls r2,r2,#0x1    @ 08037e0a 5200
     .hword 0x4691    @ 08037e0c 9146
-    ldr r7, DAT_08037e14                     @ 08037e0e 014f
+    ldr r7, compute_zone_effect_atk_delta_penalty_a @ 08037e0e 014f
     b LAB_08037e9e                           @ 08037e10 45e0
     .zero  0x2
-DAT_08037e14:
-    .word  0xfffffe70                     @ 08037e14 70feffff
+compute_zone_effect_atk_delta_penalty_a:
+    .word  ZONE_EFFECT_ATK_PENALTY_500    @ 08037e14 70feffff
 LAB_08037e18:
     ldr r0,[r6,#0xc]                         @ 08037e18 f068
     movs r1,#0x40    @ 08037e1a 4021
@@ -4274,10 +4247,10 @@ LAB_08037e18:
     movs r4,#0xfa    @ 08037e22 fa24
     lsls r4,r4,#0x1    @ 08037e24 6400
     .hword 0x46a1    @ 08037e26 a146
-    ldr r7, DAT_08037e2c                     @ 08037e28 004f
+    ldr r7, compute_zone_effect_atk_delta_penalty_b @ 08037e28 004f
     b LAB_08037e9e                           @ 08037e2a 38e0
-DAT_08037e2c:
-    .word  0xfffffe70                     @ 08037e2c 70feffff
+compute_zone_effect_atk_delta_penalty_b:
+    .word  ZONE_EFFECT_ATK_PENALTY_500    @ 08037e2c 70feffff
 LAB_08037e30:
     ldr r0,[r6,#0xc]                         @ 08037e30 f068
     movs r1,#0x2    @ 08037e32 0221
@@ -4288,10 +4261,10 @@ LAB_08037e34:
     movs r0,#0xfa    @ 08037e3a fa20
     lsls r0,r0,#0x1    @ 08037e3c 4000
     .hword 0x4681    @ 08037e3e 8146
-    ldr r7, DAT_08037e44                     @ 08037e40 004f
+    ldr r7, compute_zone_effect_atk_delta_penalty_c @ 08037e40 004f
     b LAB_08037e9e                           @ 08037e42 2ce0
-DAT_08037e44:
-    .word  0xfffffe70                     @ 08037e44 70feffff
+compute_zone_effect_atk_delta_penalty_c:
+    .word  ZONE_EFFECT_ATK_PENALTY_500    @ 08037e44 70feffff
 LAB_08037e48:
     ldr r0,[r6,#0xc]                         @ 08037e48 f068
     movs r1,#0x4    @ 08037e4a 0421
@@ -4302,10 +4275,10 @@ LAB_08037e4c:
     movs r1,#0xfa    @ 08037e52 fa21
     lsls r1,r1,#0x1    @ 08037e54 4900
     .hword 0x4689    @ 08037e56 8946
-    ldr r7, DAT_08037e5c                     @ 08037e58 004f
+    ldr r7, compute_zone_effect_atk_delta_penalty_d @ 08037e58 004f
     b LAB_08037e9e                           @ 08037e5a 20e0
-DAT_08037e5c:
-    .word  0xfffffe70                     @ 08037e5c 70feffff
+compute_zone_effect_atk_delta_penalty_d:
+    .word  ZONE_EFFECT_ATK_PENALTY_500    @ 08037e5c 70feffff
 LAB_08037e60:
     ldr r0,[r6,#0xc]                         @ 08037e60 f068
     movs r1,#0x8    @ 08037e62 0821
@@ -4323,11 +4296,11 @@ LAB_08037e72:
     lsls r0,r1,#0x2    @ 08037e78 8800
     add r0,r8                                @ 08037e7a 4044
     lsls r0,r0,#0x2    @ 08037e7c 8000
-    ldr r2, DAT_08037eb8                     @ 08037e7e 0e4a
+    ldr r2, compute_zone_effect_atk_delta_stride_c @ 08037e7e 0e4a
     adds r1,r5,#0x0    @ 08037e80 291c
     muls r1,r2    @ 08037e82 5143
     adds r0,r0,r1    @ 08037e84 4018
-    ldr r4, DAT_08037ebc                     @ 08037e86 0d4c
+    ldr r4, compute_zone_effect_atk_delta_slots_c @ 08037e86 0d4c
     adds r0,r0,r4    @ 08037e88 0019
     ldr r0,[r0,#0x0]                         @ 08037e8a 0068
     lsls r0,r0,#0x13    @ 08037e8c c004
@@ -4353,10 +4326,10 @@ LAB_08037ea8:
     pop {r1}                                 @ 08037eb2 02bc
     bx r1                                    @ 08037eb4 0847
     .zero  0x2
-DAT_08037eb8:
-    .word  0x00000868                     @ 08037eb8 68080000
-DAT_08037ebc:
-    .word  0x0201c510                     @ 08037ebc 10c50102
+compute_zone_effect_atk_delta_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08037eb8 68080000
+compute_zone_effect_atk_delta_slots_c:
+    .word  gDuelFieldSlots                @ 08037ebc 10c50102
 
 @ Full AI slot-score evaluator for one field slot (large function, indeg=3). r0: player_side [0..1] (-> r6); r1: slot_idx [0..4] (-> r5). Allocates 0x84 bytes stack; checks slot active, card_id, zone occupancy. Dispatches to compute_lp_cost_by_* case branches for various card and zone states. Falls through to adjust_slot_score_by_chain_and_zone then cleanup_slot_score_entry_epilogue. Side effects: writes r7[+0x14] (atk_score) and r7[+0x18] (def_score) via callees. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_entry=20 bytes.
 eval_slot_score_entry_full:

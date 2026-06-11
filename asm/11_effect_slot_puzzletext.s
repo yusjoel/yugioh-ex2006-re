@@ -12830,7 +12830,7 @@ LAB_08090d28:
     beq LAB_08090dd6                         @ 08090d2c 53d0
     .hword 0x4648    @ 08090d2e 4846
     movs r1,#0x1    @ 08090d30 0121
-    bl count_gy_cards_by_field6              @ 08090d32 a6f71ffe
+    bl count_field_zone_cards_by_field6      @ 08090d32 a6f71ffe
     lsls r1,r0,#0x5    @ 08090d36 4101
     subs r1,r1,r0    @ 08090d38 091a
     lsls r1,r1,#0x2    @ 08090d3a 8900

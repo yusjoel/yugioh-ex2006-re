@@ -48,6 +48,9 @@
 @ Card Info Page BG CNT init / OBJ pal slot / BG-VRAM 写入基址（0x1d448 card_info 簇用）
 	.include "constants/card_info.inc"
 
+@ Field spell ATK bonus table index bias + zone-effect ATK penalty (0x08037904 Seg-4a cluster)
+	.include "constants/field_spell_bonus.inc"
+
 @ Bit-manipulation algorithm constants (popcount parallel-reduction masks; 0x08030208 cluster)
 	.include "constants/bitops.inc"
 
@@ -1233,7 +1236,9 @@ AVAIL_SLOT_ORDER_TABLE = available_slot_order_table
 	.word 1                                      @ preferred slot idx [2]
 	.word 4                                      @ preferred slot idx [3]
 	.word 0                                      @ preferred slot idx [4]
-	.incbin "roms/2343.gba", 0x1E3EF74, 0xAD98  @ remainder suffix [0x1e3ef74..0x1e4a10b]
+field_spell_atk_bonus_table:                    @ GBA 0x09e3ef74; 6x24 s16 ATK bonus table (field spell cards Forest/Wasteland/Mountain/Sogen/Umi/Yami, row=card_id-0x10f0, col=field_level)
+	.incbin "roms/2343.gba", 0x1E3EF74, 0x120   @ table data (6 rows x 24 s16, stride=0x30)
+	.incbin "roms/2343.gba", 0x1E3F094, 0xAC78  @ remainder [0x1e3f094..0x1e4a10b]
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

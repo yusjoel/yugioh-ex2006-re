@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `03_equip_chain_hand.s` (0x08035f54..0x0804020c; 已拆 Seg-1..10; 活动 doc `p5-refine-03-equip-chain-hand.md`)。
-> **下一任务**: **file 03 Seg-4** (0x37904..0x3a7f0, 13fn 183槽, slot 链最优目标 + incbin 0x39350/0x10ce).
+> **下一任务**: **file 03 Seg-4b** (0x37ec0..0x3a7f0, 1fn+subs 140+槽, incbin @0x39350/0x10ce R4 disasm; 含 eval_slot_score_entry_full large fn + mov pc,r0 jump table 13 stubs).
 
-上次更新: 2026-06-11 file 03 Seg-3 完成 (EQ36/REF13/PLATE13/carve=0; 新建 card_info.inc x9 + ewram.inc x1 + duel_field.inc x1; fn-ptr +1; byte-identical 9689337d); file 03 进度 3/10。
+上次更新: 2026-06-11 file 03 Seg-4a 完成 (EQ32/REF11/RENAME33/FUNC_RENAME1/PLATE11/carve=1; 新建 field_spell_bonus.inc x2 + card_info.inc x9; FUNC_RENAME count_gy_cards_by_field6->count_field_zone_cards_by_field6; fn-ptr +1 再补; byte-identical 9689337d); file 03 进度 3.5/10。
 
 ---
 
