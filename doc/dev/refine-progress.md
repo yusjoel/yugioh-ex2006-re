@@ -8,10 +8,10 @@
 > `doc/dev/methodology/refine-loop.md`。这是 refine-loop 的**跨文件状态镜像** (类比 analysis-loop 的
 > `eval/PROGRESS.md`)。
 >
-> **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 未拆段; 下一步: 建活动 doc + 地址拆 ~10 段, 然后 Seg-1)。
-> **下一任务**: 建 `doc/dev/p5-refine-04-card-zone-sprite.md` (参照 file 03 doc 模板), 地址序拆 Seg-1..~10, 然后开始 Seg-1。
+> **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
+> **下一任务**: file 04 Seg-1 0x4020c..0x407fc (19 fn, 64 槽; 卡牌显示序列 tick op15/equip-preview/set-display + invoke_card_display_op_equip_mode 簇)。
 
-上次更新: 2026-06-12 file 03 Seg-10 完成 (EQ=63/REF=57/RENAME=1/FUNC_RENAME=0/PLATE=9/carve=0/disasm=0/§5.1=0; 新建 card_info.inc +1 (HELPOEMER_CID_SHIFTED), duel_field.inc +2 (SLOT_CHAIN_CTR_CLR/SLOT_BIT20_CLR); fn-ptr +1 x4 (37884/aa74/89dc/89f8) restored; byte-identical 9689337d); **file 03 全 10 段完成 ✅**。
+上次更新: 2026-06-12 file 04 活动 doc 建成 + 地址拆 10 段 (`doc/dev/p5-refine-04-card-zone-sprite.md`): 193 named fn (176 push-prologue + 17 leaf clear_display_step_lock 簇), 920 DAT_/DWORD_/PTR_ 槽, **0 ROM_INCBIN/inter-function 数据块** (全代码 + 函数内 literal pool); 10 段地址序均分 ~19 fn/段 (重段 Seg-8 275 槽 / Seg-4 159 槽 / Seg-10 112 槽); 待开始 Seg-1。**file 03 全 10 段完成 ✅** (Seg-10: EQ=63/REF=57/RENAME=1/PLATE=9; byte-identical 9689337d)。
 
 ---
 
@@ -23,7 +23,7 @@
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
-| 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | `doc/dev/p5-refine-04-card-zone-sprite.md` (待建) |
+| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (0/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |
