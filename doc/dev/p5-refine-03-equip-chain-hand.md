@@ -81,7 +81,7 @@
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
-| 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | (pending) |
+| 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
@@ -304,7 +304,7 @@ All 3 manually restored. byte-identical after fix.
 (naming-phase EOL comments on get_slot_field7_score/get_slot_field6_score) were already in HEAD.
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: 0cd58b4
 
 ---
 
