@@ -78,7 +78,7 @@
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
 | 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
-| 3 | 0x37128..0x37904 | 13 | 37 | — | ⬜ | |
+| 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | (pending) |
 | 4 | 0x37904..0x3a7f0 | 13 | 183 | **0x39350/0x10ce** | ⬜ | |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
@@ -159,6 +159,35 @@ find_graveyard_entry_by_card_id / count_extra_deck_cards_by_player
 - find_deck_slot_by_card_pair_match (0x08037030): FUN_080bb4c2 (bl-site) → dispatch_equip_activation_full_sequence (caller ref)
 脚本: tools/ghidra-labeling/RefineF03Seg2PlateFix.py
 C8 验收后: asm lines 1530-2449 FUN_=0 / Non-ASCII=0 / byte-identical SHA1 9689337d
+
+### 4.03 Seg-3 完成记录 [0x08037128..0x08037904)
+
+**函数列表 (13 fn + 1 unlabeled)**:
+count_graveyard_entries_by_card_id / remove_slot_by_index_from_graveyard_arrays /
+erase_slot_from_graveyard_arrays_by_ptr / remove_slot_from_field_array_by_player /
+count_hand_cards_with_field5 / count_graveyard_normal_summon_cards /
+count_zone_slots_with_card_field5 / check_zone_slot_equip_eligible /
+check_zone_slot_equip_eligible_alt / place_equip_card_if_type_matches /
+erase_slot_from_field_array_c_by_ptr / eval_equip_bonus_for_slot /
+find_field_zone_slot_with_fieldspell
++ unlabeled fn: check_level_conv_lab_node_match @ 0x0803777c (createLabel)
+
+**符号化统计**: EQ=36 (reuse 25 + new 11) / REF=13 (12 PTR_gP1LP + 1 fn-ptr) / RENAME=0 / FUNC_RENAME=0 / PLATE=13
+
+**新建 constants**:
+- `card_info.inc` +9: GRADIUS_OPTION_CID / GRADIUS_CID / ULTIMATE_OFFERING_CID / XYZ_DRAGON_CANNON_CID / HELPOEMER_CID / SPHINX_TELEIA_CID / YZ_TANK_DRAGON_CID / LEVEL_CONVERSION_LAB_CID / COST_DOWN_CID
+- `ewram.inc` +1: gP1FieldArrayCBase=0x0201c600
+- `duel_field.inc` +1: FIELD_ARRAY_C_TO_COUNT_NEG_OFF=0xfffffeec
+
+**carve**: 0 / **disasm**: 0 / **§5.1**: 0
+
+**fn-ptr +1 踩坑**: Ghidra DATA ref 指向偶地址 0x0803777c, 导出的 .word 为 even addr; build 后 diff 发现 0x37884 差 1 字节. 手动在 asm 中改为 `.word check_level_conv_lab_node_match+1` (THUMB odd = 0x0803777d), 重 build byte-identical.
+
+**C8 验收**: asm lines 2452-3526 FUN_=0 (line 3527 的 FUN_0805e170 属 Seg-4 函数 find_field_zone_slot_with_equip_type 的预存 plate, 非 Seg-3 引入)
+**Non-ASCII**: asm lines 2452-3526 non-ASCII=0
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

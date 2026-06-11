@@ -252,3 +252,16 @@
 .equ GAP_CID_13EA,              0x000013ea  @ gap slot (not in card-stats.s; range [0x13E8..0x13EB]: Nuvia the Wicked/Soul Exchange); check_slot_card_eligible_for_special_action
 .equ KUNAI_WITH_CHAIN_CID,      0x00001231  @ Kunai with Chain (pw=37390589; card_0533 slot=0x1231); check_slot_card_eligible_for_special_action; note: Metalmorph(0x1238=+7) computed inline
 .equ BLAST_WITH_CHAIN_CID,      0x00001514  @ Blast with Chain (pw=98239899; card_1086 slot=0x1514); check_slot_card_eligible_for_special_action; note: Hero_Heyro(0x1980=0xcc<<5) computed inline
+
+@ =============================================================================
+@ file 03 Seg-3 additions: equip eligibility / field array card IDs
+@ =============================================================================
+.equ GRADIUS_OPTION_CID,         0x000014fc  @ Gradius' Option (pw=14291024; card-stats.s card_1063 slot=0x14FC); check_zone_slot_equip_eligible special: count_paired_slots_with_field5_default(player,GRADIUS_CID); 8 raw refs; 2 Seg-3 slots
+.equ GRADIUS_CID,                0x00001414  @ Gradius (pw=10992251; card-stats.s card_0895 slot=0x1414); paired with GRADIUS_OPTION_CID in check_zone_slot_equip_eligible count_paired path; 6 raw refs; 2 Seg-3 slots
+.equ ULTIMATE_OFFERING_CID,      0x000012f3  @ Ultimate Offering (pw=80604091; card-stats.s card_0678 slot=0x12F3); check_value_in_slot_chain guard in check_zone_slot_equip_eligible; 6 raw refs; 2 Seg-3 slots
+.equ XYZ_DRAGON_CANNON_CID,      0x000015b4  @ XYZ-Dragon Cannon (pw=91998119; card-stats.s card_1203 slot=0x15B4); range_base in equip-eligible blacklist; 4 raw refs; 1 Seg-3 slot
+.equ HELPOEMER_CID,              0x00001571  @ Helpoemer (pw=76052811; card-stats.s card_1148 slot=0x1571); blacklist single-ID in check_zone_slot_equip_eligible; 4 raw refs; 1 Seg-3 slot
+.equ SPHINX_TELEIA_CID,          0x000017c8  @ Sphinx Teleia (pw=51402177; card-stats.s card_1623 slot=0x17C8); range_max in [ANDRO_SPHINX 0x17c7, SPHINX_TELEIA 0x17c8] blacklist; 4 raw refs; 1 Seg-3 slot
+.equ YZ_TANK_DRAGON_CID,         0x000015fa  @ YZ-Tank Dragon (pw=25119460; card-stats.s card_1254 slot=0x15FA); range_max in [XZ_TANK_CANNON 0x15f9, YZ_TANK_DRAGON 0x15fa] blacklist; 4 raw refs; 1 Seg-3 slot
+.equ LEVEL_CONVERSION_LAB_CID,   0x000018d9  @ Level Conversion Lab (pw=84397023; card-stats.s card_1865 slot=0x18D9); check_level_conv_lab_node_match predicate target; 4 raw refs; 1 Seg-3 slot
+.equ COST_DOWN_CID,              0x000015c7  @ Cost Down (pw=23265313; card-stats.s card_1213 slot=0x15C7); eval_equip_bonus_for_slot count_slot_chain_nodes_by_card_id arg; 4 raw refs; 1 Seg-3 slot

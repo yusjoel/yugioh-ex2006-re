@@ -350,3 +350,8 @@
 .equ EFFECT_ENTRY_COUNT_OFF,      0x00000594  @ gDuelPhaseFlags+0x594 = effect entry count field; 9 raw refs
 .equ HAND_ARRAY_TO_COUNT_NEG_OFF, 0xfffffbfc  @ gP1HandSlotArray(0x0201c8f8)+0xfffffbfc=gP1HandCountBase(0x0201c4f4); neg delta=-0x404 from hand slot array to hand count base; 5 raw refs
 .equ ALT_HAND_ARRAY_TO_COUNT_NEG_OFF, 0xfffffa4c  @ gP1AltHandSlotArray(0x0201cab0)+0xfffffa4c=gP1AltHandCountBase(0x0201c4fc); neg delta=-0x5b4 from alt-hand slot array to alt-hand count base; 3 raw refs
+
+@ =============================================================================
+@ file 03 Seg-3 additions: field array C base global
+@ =============================================================================
+.equ gP1FieldArrayCBase,    0x0201c600  @ gP1LifePoints+0x120 (0x90<<1): field array C base ptr (zone_type=0xb, place_equip_card_if_type_matches); count at gP1ZoneHandCount (gP1LP+0x0c); 115 raw refs; 2 Seg-3 slots
