@@ -300,3 +300,87 @@
 .equ HARPIES_HUNTING_GROUND_CID,  0x0000183f  @ Harpies' Hunting Ground (pw=75782277; card-stats.s card_1731 slot=0x183f);
                                                @ compute_zone_effect_atk_delta exact cmp;
                                                @ 2 ROM refs; data.md=0x183F
+
+@ =============================================================================
+@ file 03 Seg-4b additions: eval_slot_score_entry_full + dispatch_equip_node_by_type cluster
+@ =============================================================================
+
+@ Card IDs verified against data/card-stats.s slot= fields (all confidence high)
+.equ SKULL_SERVANT_CID,            0x00000fbe  @ Skull Servant (pw=32274490; card_0281 slot=0x0FBE); eval_skull_servant path
+.equ DARK_MAGICIAN_CID_0FC9,       0x00000fc9  @ Dark Magician alt print (card_0730 slot=0x0FC9; pw=46986414); distinct from 0x142d
+.equ HARPIE_LADY_CID,              0x00000fe4  @ Harpie Lady (pw=76812113; card_0301 slot=0x0FE4); count_paired_slots path
+.equ CASTLE_OF_DARK_ILLUSIONS_CID, 0x00000ff9  @ Castle of Dark Illusions (pw=00062986; card_0310 slot=0x0FF9); classify_equip_target_eligibility
+.equ PUMPKING_CID,                 0x00001009  @ Pumpking the King of Ghosts (pw=29155212; card_0315 slot=0x1009); eval path
+.equ MACHINE_KING_CID,             0x0000113d  @ Machine King (pw=46700124; card_0365 slot=0x113D); eval path
+.equ MUKA_MUKA_CID,                0x000011aa  @ Muka Muka (pw=46657337; card_0430 slot=0x11AA); eval path
+.equ MAHA_VAILO_CID,               0x00001193  @ Maha Vailo (pw=05798832; card_0420 slot=0x1193); eval path
+.equ REVERSE_TRAP_CID,             0x00001257  @ Reverse Trap (pw=77622396; card_0537 slot=0x1257); eval path
+.equ MAGICIAN_OF_BLACK_CHAOS_CID,  0x00001278  @ Magician of Black Chaos (pw=30208479; card_0560 slot=0x1278); Dark Magician path
+.equ DARK_MAGICIAN_GIRL_CID,       0x0000129e  @ Dark Magician Girl (pw=38033121; card_0584 slot=0x129E); eval path
+.equ SHIELD_AND_SWORD_CID,         0x000012cb  @ Shield & Sword (pw=73051941; card_0619 slot=0x12CB); eval path
+.equ MIRROR_WALL_CID,              0x00001381  @ Mirror Wall (pw=22359980; card_0704 slot=0x1381); check_slot_equip_chain_rule
+.equ AQUA_CHORUS_CID,              0x0000138e  @ Aqua Chorus (pw=95132338; card_0710 slot=0x138E); eval_aqua_chorus path
+.equ COMMAND_KNIGHT_CID,           0x00001399  @ Command Knight (pw=10375182; card_0724 slot=0x1399); eval + chain_rule
+.equ FLASH_ASSAILANT_CID,          0x00001336  @ Flash Assailant (pw=96890582; card_0648 slot=0x1336); eval path
+.equ SLATE_WARRIOR_CID,            0x000013ad  @ Slate Warrior (pw=78636495; card_0726 slot=0x13AD); eval path
+.equ NUVIA_THE_WICKED_CID,         0x000013e8  @ Nuvia the Wicked (pw=12953226; card_0745_nuvia slot=0x13E8); eval path
+.equ LIGHTNING_BLADE_CID,          0x000013f6  @ Lightning Blade (pw=55226821; card_0752 slot=0x13F6); eval_bonus_state
+.equ YELLOW_LUSTER_SHIELD_CID,     0x00001429  @ Yellow Luster Shield (pw=04811901; card_0778 slot=0x1429); eval_bonus_state
+.equ DARK_MAGICIAN_CID_142D,       0x0000142d  @ Dark Magician (card_3256 slot=0x142D; pw=46986414 dup); distinct from 0x0fc9
+.equ EMBODIMENT_OF_APOPHIS_CID,    0x00001472  @ Embodiment of Apophis (pw=28649820; card_0823 slot=0x1472); eval path
+.equ SOUL_OF_PURITY_CID,           0x00001483  @ Soul of Purity and Light (pw=77527210; card_0833 slot=0x1483); eval_bonus_state
+.equ ROCK_SPIRIT_CID,              0x00001486  @ The Rock Spirit (pw=04081094; card_0836 slot=0x1486); eval path
+.equ THE_A_FORCES_CID,             0x000014cf  @ The A. Forces (pw=00000000; card_0883 slot=0x14CF); eval_command_knight path
+.equ MUDORA_CID,                   0x000014ec  @ Mudora (pw=00000000; card_0897 slot=0x14EC); eval path
+.equ MASTER_OF_DRAGON_SOLDIER_CID, 0x0000157d  @ Master of Dragon Soldier (pw=00000000; card_1159 slot=0x157D); eval path
+.equ BANNER_OF_COURAGE_CID,        0x000015a2  @ Banner of Courage (pw=10012614; card_1185b slot=0x15A2); eval_bonus_state
+.equ DARK_PALADIN_CID,             0x000015fc  @ Dark Paladin (pw=98502113; card_1257 slot=0x15FC); eval_dark_paladin path
+.equ MAGICAL_MARIONETTE_CID,       0x00001615  @ Magical Marionette (pw=08034697; card_1280 slot=0x1615); eval path
+.equ METAL_REFLECT_SLIME_CID,      0x00001636  @ Metal Reflect Slime (pw=26905245; card_1304 slot=0x1636); eval path
+.equ GYAKU_GIRE_PANDA_CID,         0x00001651  @ Gyaku-Gire Panda (pw=00000000; card_1328 slot=0x1651); eval path
+.equ NIGHTMARE_PENGUIN_CID,        0x000016ab  @ Nightmare Penguin (pw=81306586; card_1400 slot=0x16AB); eval_bonus_state
+.equ PERFECT_MACHINE_KING_CID,     0x000016ac  @ Perfect Machine King (pw=00000000; card_1401 slot=0x16AC); eval path
+.equ SKULL_ZOMA_CID,               0x0000172f  @ Skull Zoma (pw=00000000; card_1472 slot=0x172F); eval path
+.equ AGENT_OF_FORCE_MARS_CID,      0x00001742  @ The Agent of Force - Mars (pw=91123920; card_1488 slot=0x1742); eval path
+.equ UNHAPPY_GIRL_CID,             0x00001743  @ The Unhappy Girl (pw=27618832; card_1489 slot=0x1743); classify_equip_target_eligibility
+.equ MOKEY_MOKEY_CID,              0x00001782  @ Mokey Mokey (pw=27973334; card_1540 slot=0x1782); eval_mokey_mokey path
+.equ THEBAN_NIGHTMARE_CID,         0x00001789  @ Theban Nightmare (pw=00000000; card_1548 slot=0x1789); eval path
+.equ ELEMENT_DRAGON_CID,           0x000017e3  @ Element Dragon (pw=00000000; card_1651 slot=0x17E3); eval path
+.equ ENRAGED_MUKA_MUKA_CID,        0x000017eb  @ Enraged Muka Muka (pw=01945754; card_1658 slot=0x17EB); eval path
+.equ GREEN_GADGET_CID,             0x00001807  @ Green Gadget (pw=67376548; card_1680 slot=0x1807); eval_gadget path
+.equ STRONGHOLD_CID,               0x00001809  @ Stronghold (pw=00000000; card_1682 slot=0x1809); eval path
+.equ RED_GADGET_CID,               0x0000180b  @ Red Gadget (pw=86445415; card_1684 slot=0x180B); eval_gadget path
+.equ YELLOW_GADGET_CID,            0x0000180c  @ Yellow Gadget (pw=13839120; card_1685 slot=0x180C); eval_gadget path
+.equ SILENT_MAGICIAN_LV4_CID,      0x00001817  @ Silent Magician LV4 (pw=73752131; card_1697 slot=0x1817); eval path
+.equ ULTIMATE_INSECT_LV3_CID,      0x00001822  @ Ultimate Insect LV3 (pw=00000000; card_1710 slot=0x1822); eval_bonus_state
+.equ ELEMENT_SAURUS_CID,           0x00001827  @ Element Saurus (pw=00000000; card_1716 slot=0x1827); eval path
+.equ MOKEY_MOKEY_SMACKDOWN_CID,    0x00001843  @ Mokey Mokey Smackdown (pw=01784618; card_1741 slot=0x1843); eval_mokey_mokey path
+.equ BEHEMOTH_KING_CID,            0x00001864  @ Behemoth the King of All Animals (pw=00000000; card_1764 slot=0x1864); eval path
+.equ ULTIMATE_INSECT_LV5_CID,      0x0000185e  @ Ultimate Insect LV5 (pw=00000000; card_1757 slot=0x185E); eval_bonus_state
+.equ RED_EYES_DARKNESS_DRAGON_CID, 0x00001894  @ Red-Eyes Darkness Dragon (pw=00000000; card_1801 slot=0x1894); eval path
+.equ KING_OF_SKULL_SERVANTS_CID,   0x000018c5  @ King of the Skull Servants (pw=00000000; card_1842 slot=0x18C5); eval path
+.equ DORIADO_CID,                  0x000018c7  @ Elemental Mistress Doriado (pw=00000000; card_1843 slot=0x18C7); eval path
+.equ BATTERYMAN_AA_CID,            0x000018c3  @ Batteryman AA (pw=63142001; card-stats.s card_1842b slot=0x18C3); shifted sentinel in eval_hand_field6
+.equ BATTERYMAN_AA_CID_SHIFTED,    0xc6180000  @ BATTERYMAN_AA_CID<<19 = 0x18c3<<19; slot_word<<19 sentinel; DAT_08038c84
+.equ BATTERYMAN_C_CID,             0x0000191c  @ Batteryman C (pw=00000000; card-stats.s card_1913 slot=0x191C); shifted sentinel
+.equ BATTERYMAN_C_CID_SHIFTED,     0xc8e00000  @ BATTERYMAN_C_CID<<19 = 0x191c<<19; slot_word<<19 sentinel; DAT_08039128
+.equ SANCTUARY_CID_SHIFTED,        0xbaf00000  @ SANCTUARY_IN_THE_SKY_CID(0x175e)<<19; slot_word<<19 sentinel; DAT_08038ae4
+.equ DARK_DREADROUTE_CID,          0x00001905  @ Dark Dreadroute (pw=00000000; card_1904 slot=0x1905); check_slot_equip_chain_rule
+.equ TADPOLE_CID,                  0x00001919  @ T.A.D.P.O.L.E. (pw=10012614; card_1912 slot=0x1919); eval_extra_deck path
+.equ TYRANNO_INFINITY_CID,         0x0000191b  @ Tyranno Infinity (pw=00000000; card_1914 slot=0x191B); eval path
+.equ EHERO_SHINING_FLARE_WINGMAN_CID, 0x00001943 @ Elemental Hero Shining Flare Wingman (pw=25366484; card_1939 slot=0x1943); eval path
+.equ WATER_DRAGON_CID,             0x00001951  @ Water Dragon (pw=85066822; card_1958 slot=0x1951); check_slot_equip_chain_rule
+.equ CYBER_BLADER_CID,             0x00001955  @ Cyber Blader (pw=00000000; card_1962 slot=0x1955); check_slot_equip_chain_rule
+.equ MACHINE_KING_PROTOTYPE_CID,   0x000019be  @ Machine King - 3000/8 (pw=00000000; card_1949 slot=0x19BE); eval path
+.equ ANCIENT_GEAR_CASTLE_CID,      0x000019b2  @ Ancient Gear Castle (pw=92001300; card_1933 slot=0x19B2); eval_bonus_state
+.equ PARASITIC_TICKY_CID,          0x000019c4  @ Parasitic Ticky (pw=00000000; card_1952 slot=0x19C4); eval path
+.equ TREEBORN_FROG_CID,            0x000019cb  @ Treeborn Frog (pw=00000000; card_1960 slot=0x19CB); eval_extra_deck path
+.equ BEELZE_FROG_CID,              0x000019cc  @ Beelze Frog (pw=00000000; card_1961 slot=0x19CC); eval path
+.equ SAND_MOTH_CID,                0x000019d2  @ Sand Moth (pw=00000000; card_1968 slot=0x19D2); eval path
+.equ D3S_FROG_CID,                 0x000019d6  @ D.3.S. Frog (pw=00000000; card_1972 slot=0x19D6); eval path
+.equ EHERO_ERIKSHIELER_CID,        0x000019ef  @ Elemental Hero Erikshieler (pw=00000000; card_1992 slot=0x19EF); eval path
+.equ GREAT_SPIRIT_CID,             0x000019f1  @ Great Spirit (pw=00000000; card_1994 slot=0x19F1); eval path
+.equ HELIOS_CID,                   0x000019f6  @ The Ancient Sun Helios (pw=00000000; card_1999 slot=0x19F6); eval_helios path
+.equ HELIOS_DUO_MEGISTE_CID,       0x000019f7  @ Helios Duo Megiste (pw=00000000; card_2000 slot=0x19F7); eval_helios path
+.equ GOBLIN_KING_CID,              0x00001755  @ Goblin King (pw=18590133; card_1536 slot=0x1755); eval path
+.equ SLOT_CARD_EMPTY,              0x0000ffff  @ empty slot sentinel: u16 card_id = 0xffff means no card; eval_slot_empty_sentinel

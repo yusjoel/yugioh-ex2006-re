@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `03_equip_chain_hand.s` (0x08035f54..0x0804020c; 已拆 Seg-1..10; 活动 doc `p5-refine-03-equip-chain-hand.md`)。
-> **下一任务**: **file 03 Seg-4b** (0x37ec0..0x3a7f0, 1fn+subs 140+槽, incbin @0x39350/0x10ce R4 disasm; 含 eval_slot_score_entry_full large fn + mov pc,r0 jump table 13 stubs).
+> **下一任务**: **file 03 Seg-5** (0x3a7f0..0x3b3a8, ~13fn ~79槽, incbin @0x3b24e/0x66).
 
-上次更新: 2026-06-11 file 03 Seg-4a 完成 (EQ32/REF11/RENAME33/FUNC_RENAME1/PLATE11/carve=1; 新建 field_spell_bonus.inc x2 + card_info.inc x9; FUNC_RENAME count_gy_cards_by_field6->count_field_zone_cards_by_field6; fn-ptr +1 再补; byte-identical 9689337d); file 03 进度 3.5/10。
+上次更新: 2026-06-11 file 03 Seg-4b 完成 (EQ=118/REF=21/RENAME=21/FUNC_RENAME=0/PLATE=18/carve=1/disasm=6stubs; 新建 card_info.inc +70 + duel_field.inc +7 + ewram.inc +2; fn-ptr +1 x3; 4 inner stale plates 补 RefineF03Seg4bFixStalePlates.py; byte-identical 9689337d); file 03 进度 4.5/10。
 
 ---
 
@@ -22,7 +22,7 @@
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
-| 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 已拆 | 🟡 进行中 (3/10) | `doc/dev/p5-refine-03-equip-chain-hand.md` |
+| 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 已拆 | 🟡 进行中 (4.5/10) | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |

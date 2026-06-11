@@ -355,3 +355,9 @@
 @ file 03 Seg-3 additions: field array C base global
 @ =============================================================================
 .equ gP1FieldArrayCBase,    0x0201c600  @ gP1LifePoints+0x120 (0x90<<1): field array C base ptr (zone_type=0xb, place_equip_card_if_type_matches); count at gP1ZoneHandCount (gP1LP+0x0c); 115 raw refs; 2 Seg-3 slots
+
+@ =============================================================================
+@ file 03 Seg-4b additions: hand slot offset + gP1FieldState direct address
+@ =============================================================================
+.equ HAND_COUNT_TO_SLOT_OFF,   0x00000404  @ positive offset from gP1HandCountBase(0x0201c4f4) to gP1HandSlotArray(0x0201c8f8); 1 Seg-4b slot (eval_hand_magicians path)
+.equ gP1FieldState,            0x0201e1d4  @ gP1LifePoints(0x0201c4e0) + FIELD_STATE_OFF(0x1cf4) = direct abs addr for field state; 1 ROM ref (DAT_08039198)

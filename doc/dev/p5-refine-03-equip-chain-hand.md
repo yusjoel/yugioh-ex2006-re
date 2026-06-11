@@ -80,7 +80,7 @@
 | 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
-| 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ⬜ | |
+| 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | TBD |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
@@ -216,6 +216,62 @@ compute_zone_effect_atk_delta
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: b56ee3e
+
+### 4.04b Seg-4b 完成记录 [0x08037ec0..0x0803a7f0)
+
+**函数列表 (15 fn)**:
+eval_slot_score_entry_full (0x08037ec0, 大型 LP-cost 分发) /
+compute_lp_cost_by_occupied_monster_zones (0x08038a1a) /
+compute_lp_cost_by_hand_field6 (0x08038c60) /
+compute_lp_cost_by_extra_deck_card_id (0x08038d34) /
+compute_lp_cost_by_zone_field5_x100 (0x08038e84) /
+compute_lp_cost_by_zone_field5_x200 (0x08038e90) /
+compute_lp_cost_by_zone_field5_both_players (0x08038e9c) /
+apply_slot_score_bonus_by_state (0x08038e34) /
+dispatch_equip_node_by_type (0x080392da) /
+eval_equip_node_type_1_to_4 (R4 disasm 0x08039350) /
+eval_equip_node_type_5 (R4 disasm 0x08039a62) /
+eval_equip_node_type_6_to_9 (R4 disasm 0x08039a7c) /
+eval_equip_node_type_10_to_11 (R4 disasm 0x08039c1c) /
+eval_equip_node_type_12 (R4 disasm 0x0803a3c4) /
+eval_equip_node_type_13 (R4 disasm 0x0803a2fc) /
+advance_equip_node_chain_step (0x0803a41e) /
+adjust_slot_score_by_chain_and_zone (0x0803a428) /
+cleanup_slot_score_entry_epilogue (0x0803a520) /
+check_slot_equip_chain_rule (0x0803a540) /
+classify_equip_target_eligibility (0x0803a658)
+
+**符号化统计**: EQ=118 / REF=21 / RENAME=21 / FUNC_RENAME=0 / PLATE=14+4(stale-fix)=18
+
+**R4 disasm**: 6 stubs (eval_equip_node_type_1_to_4/5/6_to_9/10_to_11/12/13) via mov pc,r0 jump table dispatch.
+Fix scripts: RefineF03Seg4bFixMcr2.py (4 ARM-decoded literal pools, value 0xfffffe0c),
+RefineF03Seg4bFixLiteralPools.py (52 missing pool labels).
+
+**新建 constants**:
+- `card_info.inc` +70: SKULL_SERVANT_CID / DARK_MAGICIAN_CID_0FC9 / HARPIE_LADY_CID / CASTLE_OF_DARK_ILLUSIONS_CID / PUMPKING_CID / MACHINE_KING_CID / MUKA_MUKA_CID / MAHA_VAILO_CID / REVERSE_TRAP_CID / MAGICIAN_OF_BLACK_CHAOS_CID / DARK_MAGICIAN_GIRL_CID / SHIELD_AND_SWORD_CID / MIRROR_WALL_CID / AQUA_CHORUS_CID / COMMAND_KNIGHT_CID / FLASH_ASSAILANT_CID / SLATE_WARRIOR_CID / NUVIA_THE_WICKED_CID / LIGHTNING_BLADE_CID / YELLOW_LUSTER_SHIELD_CID / DARK_MAGICIAN_CID_142D / EMBODIMENT_OF_APOPHIS_CID / SOUL_OF_PURITY_CID / ROCK_SPIRIT_CID / THE_A_FORCES_CID / MUDORA_CID / MASTER_OF_DRAGON_SOLDIER_CID / BANNER_OF_COURAGE_CID / DARK_PALADIN_CID / MAGICAL_MARIONETTE_CID / METAL_REFLECT_SLIME_CID / GYAKU_GIRE_PANDA_CID / NIGHTMARE_PENGUIN_CID / PERFECT_MACHINE_KING_CID / SKULL_ZOMA_CID / AGENT_OF_FORCE_MARS_CID / UNHAPPY_GIRL_CID / MOKEY_MOKEY_CID / THEBAN_NIGHTMARE_CID / ELEMENT_DRAGON_CID / ENRAGED_MUKA_MUKA_CID / GREEN_GADGET_CID / STRONGHOLD_CID / RED_GADGET_CID / YELLOW_GADGET_CID / SILENT_MAGICIAN_LV4_CID / ULTIMATE_INSECT_LV3_CID / ELEMENT_SAURUS_CID / MOKEY_MOKEY_SMACKDOWN_CID / BEHEMOTH_KING_CID / ULTIMATE_INSECT_LV5_CID / RED_EYES_DARKNESS_DRAGON_CID / KING_OF_SKULL_SERVANTS_CID / DORIADO_CID / BATTERYMAN_AA_CID=0x18c3 / BATTERYMAN_AA_CID_SHIFTED=0xc6180000 / BATTERYMAN_C_CID / BATTERYMAN_C_CID_SHIFTED / SANCTUARY_CID_SHIFTED / DARK_DREADROUTE_CID / TADPOLE_CID / TYRANNO_INFINITY_CID / EHERO_SHINING_FLARE_WINGMAN_CID / WATER_DRAGON_CID / CYBER_BLADER_CID / MACHINE_KING_PROTOTYPE_CID / ANCIENT_GEAR_CASTLE_CID / PARASITIC_TICKY_CID / TREEBORN_FROG_CID / BEELZE_FROG_CID / SAND_MOTH_CID / D3S_FROG_CID / EHERO_ERIKSHIELER_CID / GREAT_SPIRIT_CID / HELIOS_CID / HELIOS_DUO_MEGISTE_CID / GOBLIN_KING_CID=0x1755 / SLOT_CARD_EMPTY=0xffff
+- `duel_field.inc` +7: LP_COST_3000 / LP_COST_1500 / SCORE_DELTA_NEG_300 / SCORE_DELTA_NEG_500 / SCORE_DELTA_NEG_700 / FIELD_STATE_OFF / CHAIN_LINK_COUNTER_OFF / EQUIP_PHASE_STATE_OFF
+- `ewram.inc` +2: HAND_COUNT_TO_SLOT_OFF / gP1FieldState
+
+**carve-1**: zone_monster_field_bonus_table @ROM 0x1E3F094 (0x130B = 304B, 19 entries x 16B).
+Entries [0..6]=ATK bonuses, [7..12]=CID-encoded associated-card entries, [13]=sentinel 0xffff*8, [14..18]=trailing garbage.
+Structured as labeled .hword table in asm/rom.s; remainder incbin trimmed accordingly.
+
+**§5.1**: 0 (none in Seg-4b)
+
+**C8 验收**: asm lines 4335..7634 FUN_=0 (4 inner-block stale plates fixed by RefineF03Seg4bFixStalePlates.py)
+**Non-ASCII**: asm lines 4335..7634 non-ASCII=0
+
+**踩坑**:
+1. fn-ptr +1 (已知问题): 3 slots (0x08037884 check_level_conv_lab_node_match, 0x080389dc/0x080389f8 check_card_is_amazoness_type) 每次 re-export 变回偶地址，手动补 +1。
+2. mcr2 ARM 解码: 4 literal pool slots 含 0xfffffe0c (SCORE_DELTA_NEG_500), Ghidra R4 disasm 将其解为 ARM mcr2 指令 — clearListing+createDWord 修正 (RefineF03Seg4bFixMcr2.py)。
+3. 52 missing literal pool labels: R4 disasm 后 52 个 PC-relative ldr 目标缺 DAT_ 标签, 导出为 .byte 序列, 引发 GAS "value too big" 错误 — createDWord 修正 (RefineF03Seg4bFixLiteralPools.py)。
+4. carve 大小: 初始 14 entries (0xE0B) 漏掉 5 条 trailing garbage entries (0x50B), 补全后 total=0x130B。
+5. GOBLIN_KING_CID = 0x1755 (DAT_080384d0 slot=0x1755), NOT Solar Flare Dragon 0x1756 — card-stats.s 坐实。
+6. 4 inner-block stale FUN_ plates: PLATE_SLOTS 键为函数入口地址 (0x08038c60 etc.) 但 Ghidra 在内部 code block 地址 (0x08038c02 etc.) 也有旧 plate — 补跑 RefineF03Seg4bFixStalePlates.py 清除。
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: TBD
 
 ---
 

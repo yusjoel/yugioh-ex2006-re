@@ -1238,7 +1238,45 @@ AVAIL_SLOT_ORDER_TABLE = available_slot_order_table
 	.word 0                                      @ preferred slot idx [4]
 field_spell_atk_bonus_table:                    @ GBA 0x09e3ef74; 6x24 s16 ATK bonus table (field spell cards Forest/Wasteland/Mountain/Sogen/Umi/Yami, row=card_id-0x10f0, col=field_level)
 	.incbin "roms/2343.gba", 0x1E3EF74, 0x120   @ table data (6 rows x 24 s16, stride=0x30)
-	.incbin "roms/2343.gba", 0x1E3F094, 0xAC78  @ remainder [0x1e3f094..0x1e4a10b]
+zone_monster_field_bonus_table:                 @ GBA 0x09e3f094; 14 entries x 16B (13 valid + 1 sentinel)
+	@ Each entry: {card_id(s16), bonus_forest, bonus_wasteland, bonus_mountain, bonus_sogen, bonus_umi, bonus_yami, pad}
+	@ entries [0..6]: field-spell ATK bonuses; entries [7..12]: CID-encoded associated-card entries
+	@ [0] Hoshiningen: Forest+500, Wasteland-400
+	.hword  0x1192,  500, -400,    0,    0,    0,    0,    0
+	@ [1] Witch's Apprentice: Forest-400, Wasteland+500
+	.hword  0x121a, -400,  500,    0,    0,    0,    0,    0
+	@ [2] Star Boy: Mountain+500, Sogen-400
+	.hword  0x11b2,    0,    0,  500, -400,    0,    0,    0
+	@ [3] Little Chimera: Mountain-400, Sogen+500
+	.hword  0x11fc,    0,    0, -400,  500,    0,    0,    0
+	@ [4] Milus Radiant: Umi+500, Yami-400
+	.hword  0x11b5,    0,    0,    0,    0,  500, -400,    0
+	@ [5] Bladefly: Umi-400, Yami+500
+	.hword  0x1207,    0,    0,    0,    0, -400,  500,    0
+	@ [6] Harpie Lady 1: Yami+300
+	.hword  0x182a,    0,    0,    0,    0,    0,  300,    0
+	@ [7..12]: CID-encoded associated-card entries (Destiny Board + Spirit Messages cluster)
+	@ [7]
+	.hword  0x1468,    0, 0x1497,    0, 0x1498,    0, 0x1499,    0
+	@ [8]
+	.hword  0x149a,    0,    0xa,    0, 0x14f9,    0, 0x154f,    0
+	@ [9]
+	.hword  0x1550,    0, 0x1551,    0, 0x1730,    0, 0x1731,    0
+	@ [10]
+	.hword  0x1670,    0, 0x1671,    0, 0x1672,    0, 0x1288,    0
+	@ [11]
+	.hword  0x129b,    0, 0x12b8,    0,    0xa,    0, 0x15fb,    0
+	@ [12]
+	.hword  0x10ef,    0, 0x17a6,    0, 0x197b,    0, 0x1704,    0
+	@ [13] sentinel
+	.hword  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff
+	@ [14..18]: trailing padding / garbage bytes after sentinel (byte-identical padding)
+	.hword  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff
+	.hword  0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff
+	.hword  0xffff, 0xffff, 0xffff, 0xffff, 0x0fee, 0x0000, 0x4679, 0x0806
+	.hword  0x000d, 0x0805, 0xc395, 0x0805, 0x6559, 0x0805, 0x1c55, 0x0808
+	.hword  0x10d3, 0x0000, 0x4679, 0x0806, 0x000d, 0x0805, 0x0000, 0x0000
+	.incbin "roms/2343.gba", 0x1E3F1C4, 0xAB48  @ remainder [0x1e3f1c4..0x1e4a10b]
 assert_pdst_null:
 	.asciz "(pDst) != NULL"
 	.incbin "roms/2343.gba", 0x1E49D1B, 0x1

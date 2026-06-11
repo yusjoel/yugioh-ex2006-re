@@ -193,3 +193,17 @@
 @ file 03 Seg-3 additions: field array C to count neg offset
 @ =============================================================================
 .equ FIELD_ARRAY_C_TO_COUNT_NEG_OFF, 0xfffffeec  @ gP1FieldArrayCBase (0x0201c600) + 0xfffffeec = gP1ZoneHandCount (0x0201c4ec); neg delta -0x114 from field array C to count base; used per-player: (gP1FieldArrayCBase+player*0x868) + this = count_ptr; 10 raw refs; 1 Seg-3 slot
+
+@ =============================================================================
+@ file 03 Seg-4b additions: eval_slot_score_entry_full LP / score delta constants
+@ =============================================================================
+.equ LP_COST_3000,              0x00000bb8  @ 3000 LP cost threshold; used in eval_slot_score_entry_full LP-cost branch; 3 Seg-4b slots
+.equ LP_COST_1500,              0x000005dc  @ 1500 LP cost threshold; used in eval_slot_score_entry_full LP-cost branch; 1 Seg-4b slot
+.equ SCORE_DELTA_NEG_300,       0xfffffed4  @ -300 ATK/DEF score delta; apply_slot_score_bonus_by_state / adjust_slot_score_by_chain_and_zone; 2 Seg-4b slots
+.equ SCORE_DELTA_NEG_500,       0xfffffe0c  @ -500 ATK/DEF score delta; apply_slot_score_bonus_by_state; 1 Seg-4b slot
+.equ SCORE_DELTA_NEG_700,       0xfffffd44  @ -700 ATK/DEF score delta; adjust_slot_score_by_chain_and_zone; 1 Seg-4b slot
+.equ FIELD_STATE_OFF,           0x00001cf4  @ gDuelFieldSlots+0x1cf4: equip activation phase/field state code;
+                                            @ confirmed: asm/04 INIT_VAL_OFFSET=0x1cf4, asm/06 AUX_OFFSET_CF4, asm/07 STAGE_OFF/FIELD_STATE_OFFSET; 2 Seg-4b slots
+.equ CHAIN_LINK_COUNTER_OFF,    0x00001cbc  @ gDuelFieldSlots+0x1cbc: chain link counter in equip chain;
+                                            @ confirmed: asm/08 CHAIN_LINK_COUNTER_OFFSET=0x1cbc; 1 Seg-4b slot
+.equ EQUIP_PHASE_STATE_OFF,     0x00001cc4  @ gDuelFieldSlots+0x1cc4: equip activation sub-phase state (compared to 2/3/4 in asm/12); med-conf; 1 Seg-4b slot
