@@ -82,7 +82,7 @@
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
-| 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
+| 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
@@ -305,6 +305,42 @@ All 3 manually restored. byte-identical after fix.
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 0cd58b4
+
+### 4.06 Seg-6 完成记录 [0x0803b3a8..0x0803bba4)
+
+**函数列表 (15 fn)**:
+get_zone_slot_entity_ref_by_type / get_zone_slot_card_ref_by_type /
+get_zone_slot_field6_by_type / get_zone_card_attribute_by_type /
+read_player_field_slot_word_by_zone / write_slot_occupy_flag_bit /
+set_player_state_bit / write_field_slot_bit_by_player /
+check_lp_exceeds_spell_copy_threshold / check_zone_has_no_field_spell_node /
+check_field_spell_group_placeable / check_field_spell_card_placeable_strict /
+check_field_spell_last_warrior_placeable / check_field_spell_neo_daedalus_placeable /
+check_field_spell_neo_daedalus_group_placeable
+
+**符号化统计**: EQ=54 (reuse 32 + new 22 slots) / REF=37 / RENAME=4 / FUNC_RENAME=0 / PLATE=5 / carve=0 / disasm=0 / §5.1=0
+
+**新建 constants**:
+- `card_info.inc` +9: CHAIN_ENERGY_CID=0x132c / JUDGEMENT_OF_PHARAOH_CID=0x1679 / LIGHT_OF_INTERVENTION_CID=0x135d / NON_AGGRESSION_AREA_CID=0x15ad / LAVA_GOLEM_CID=0x1578 / BOSS_RUSH_CID=0x1972 / JAM_BREEDING_MACHINE_CID=0x13ff / LAST_WARRIOR_FROM_ANOTHER_PLANET_CID=0x12b1 / JOWGEN_THE_SPIRITUALIST_CID=0x147f
+
+**PLATE=5 breakdown**:
+1. get_zone_slot_card_ref_by_type: FUN_0803b5c0 -> get_zone_slot_field6_by_type (substring)
+2. write_slot_occupy_flag_bit: FUN_08040144 -> tick_hand_sort_display_init_seq (substring)
+3. check_lp_exceeds_spell_copy_threshold: scale=132 -> scale=500 (arithmetic correction)
+4. get_zone_slot_entity_ref_by_type: CJK -> ASCII full rewrite
+5. set_player_state_bit: CJK -> ASCII full rewrite
+
+**fn-ptr +1 踩坑 (已知, 每次 re-export 后手补)**:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (Seg-5 known)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known)
+All 4 slots manually restored +1 after re-export.
+
+**C8 验收**: asm lines 11741..12835 FUN_=0
+**Non-ASCII**: asm lines 11741..12835 non-ASCII=0 (2 CJK plates replaced with ASCII)
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

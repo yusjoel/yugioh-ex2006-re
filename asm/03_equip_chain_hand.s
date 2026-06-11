@@ -10512,7 +10512,7 @@ LAB_0803aa50:
     beq LAB_0803aa82                         @ 0803aa70 07d0
     b LAB_0803ab44                           @ 0803aa72 67e0
 eval_equip_chain_pred_fnptr:
-    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr)
+    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr); asm must have +1 after re-export
 eval_equip_chain_node_pool_a:
     .word  gEquipNodePool                 @ 0803aa78 c0d90102
 LAB_0803aa7c:
@@ -11738,7 +11738,7 @@ get_zone_slot_ptr_stride_f:
 get_zone_slot_ptr_field_slots_a:
     .word  gDuelFieldSlots                @ 0803b3a4 10c50102
 
-@ 根据 zone_type_code (r1) 通过 switch-dispatch 读取指定区域格的 entity_ref 字段, 并提取关键位段后返回. Switch 覆盖 type_code 0xb..0xf (5 cases) 和 default (r1+r2<=10 / >10 两路), 与已命名兄弟 get_zone_slot_card_ref_by_type (0x0803b4b0) 结构完全对称 -- 后者返回 [slot+0], 本函数同样返回 [slot+0] 但经 lsls/lsrs 提取 bits[22..16]<<1 | bit[13] (entity/player reference bits). 入口: r3=player_id (bit0), r4=zone_type_code, r2=slot_idx; 通过 gDuelFieldSlots 多基地址 (0x0201c510/0x0201c600/0x0201c740/0x0201c880/0x0201c8f8/0x0201cab0/0x0201bc54) 计算 slot 指针. 被 11 个高层牌局函数调用, 是 zone slot entity 读取的公共出口. Constants: player_stride=0x868, zone_0b=0x0201c600, zone_0c=0x0201c880, zone_0d=0x0201c740, zone_0e=0x0201c8f8, zone_0f=0x0201cab0, default_extended=0x0201bc54.
+@ Reads the entity_ref field from a zone slot selected by zone_type_code (r1) via switch-dispatch. Switch covers type_code 0xb..0xf (5 cases) plus default (two paths: r1+r2<=10 / >10). Symmetric sibling of get_zone_slot_card_ref_by_type (0x0803b4b0): both return [slot+0], but this function extracts bits[22..16]<<1 | bit[13] (entity/player reference bits) via lsls/lsrs. Params: r0=zone_idx, r1=zone_type_code, r2=slot_idx, r3=player_id (bit0). Bases: gDuelFieldSlots(0x0201c510)/gP1FieldArrayCBase(0x0201c600)/gP1ChainZoneArray(0x0201c880)/        gP1SlotSetCodeArray(0x0201c740)/gP1HandSlotArray(0x0201c8f8)/gP1AltHandSlotArray(0x0201cab0)/        gDuelEffectChainSlots(0x0201bc54). indeg=11. Constants: player_stride=0x868.
 get_zone_slot_entity_ref_by_type:
     push {r4,lr}                             @ 0803b3a8 10b5
     adds r3,r0,#0x0    @ 0803b3aa 031c
@@ -11748,13 +11748,13 @@ get_zone_slot_entity_ref_by_type:
     cmp r0,#0x4                              @ 0803b3b2 0428
     bhi switchD_0803b3be__default            @ 0803b3b4 56d8
     lsls r0,r0,#0x2    @ 0803b3b6 8000
-    ldr r1, DAT_0803b3c0                     @ 0803b3b8 0149
+    ldr r1, entity_ref_switch_table_ptr      @ 0803b3b8 0149
     adds r0,r0,r1    @ 0803b3ba 4018
     ldr r0,[r0,#0x0]                         @ 0803b3bc 0068
 switchD_0803b3be__switchD:
     .hword 0x4687    @ 0803b3be 8746
-DAT_0803b3c0:
-    .word  0x0803b3c4                     @ 0803b3c0 c4b30308
+entity_ref_switch_table_ptr:
+    .word  0x0803b3c4                     @ 0803b3c0 c4b30308  switch base ptr for get_zone_slot_entity_ref_by_type; points to 0x0803b3c4
 switchD_0803b3be__switchdataD_0803b3c4:
     .word  0x0803b448                     @ 0803b3c4 48b40308
     .word  0x0803b3d8                     @ 0803b3c8 d8b30308
@@ -11765,82 +11765,82 @@ switchD_0803b3be__caseD_c:
     movs r0,#0x1    @ 0803b3d8 0120
     ands r0,r3    @ 0803b3da 1840
     lsls r1,r2,#0x2    @ 0803b3dc 9100
-    ldr r2, DAT_0803b3ec                     @ 0803b3de 034a
+    ldr r2, entity_ref_stride_a              @ 0803b3de 034a
     muls r0,r2    @ 0803b3e0 5043
     adds r1,r1,r0    @ 0803b3e2 0918
-    ldr r0, DAT_0803b3f0                     @ 0803b3e4 0248
+    ldr r0, entity_ref_chain_zone_base_a     @ 0803b3e4 0248
     adds r1,r1,r0    @ 0803b3e6 0918
     ldr r0,[r1,#0x0]                         @ 0803b3e8 0868
     b LAB_0803b49e                           @ 0803b3ea 58e0
-DAT_0803b3ec:
-    .word  0x00000868                     @ 0803b3ec 68080000
-DAT_0803b3f0:
-    .word  0x0201c880                     @ 0803b3f0 80c80102
+entity_ref_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b3ec 68080000
+entity_ref_chain_zone_base_a:
+    .word  gP1ChainZoneArray              @ 0803b3f0 80c80102
 switchD_0803b3be__caseD_d:
     movs r0,#0x1    @ 0803b3f4 0120
     ands r0,r3    @ 0803b3f6 1840
     lsls r1,r2,#0x2    @ 0803b3f8 9100
-    ldr r2, DAT_0803b408                     @ 0803b3fa 034a
+    ldr r2, entity_ref_stride_b              @ 0803b3fa 034a
     muls r0,r2    @ 0803b3fc 5043
     adds r1,r1,r0    @ 0803b3fe 0918
-    ldr r0, DAT_0803b40c                     @ 0803b400 0248
+    ldr r0, entity_ref_slot_code_base_a      @ 0803b400 0248
     adds r1,r1,r0    @ 0803b402 0918
     ldr r0,[r1,#0x0]                         @ 0803b404 0868
     b LAB_0803b49e                           @ 0803b406 4ae0
-DAT_0803b408:
-    .word  0x00000868                     @ 0803b408 68080000
-DAT_0803b40c:
-    .word  0x0201c740                     @ 0803b40c 40c70102
+entity_ref_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b408 68080000
+entity_ref_slot_code_base_a:
+    .word  gP1SlotSetCodeArray            @ 0803b40c 40c70102
 switchD_0803b3be__caseD_e:
     movs r0,#0x1    @ 0803b410 0120
     ands r0,r3    @ 0803b412 1840
     lsls r1,r2,#0x2    @ 0803b414 9100
-    ldr r2, DAT_0803b424                     @ 0803b416 034a
+    ldr r2, entity_ref_stride_c              @ 0803b416 034a
     muls r0,r2    @ 0803b418 5043
     adds r1,r1,r0    @ 0803b41a 0918
-    ldr r0, DAT_0803b428                     @ 0803b41c 0248
+    ldr r0, entity_ref_hand_slot_base_a      @ 0803b41c 0248
     adds r1,r1,r0    @ 0803b41e 0918
     ldr r0,[r1,#0x0]                         @ 0803b420 0868
     b LAB_0803b49e                           @ 0803b422 3ce0
-DAT_0803b424:
-    .word  0x00000868                     @ 0803b424 68080000
-DAT_0803b428:
-    .word  0x0201c8f8                     @ 0803b428 f8c80102
+entity_ref_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b424 68080000
+entity_ref_hand_slot_base_a:
+    .word  gP1HandSlotArray               @ 0803b428 f8c80102
 switchD_0803b3be__caseD_f:
     movs r0,#0x1    @ 0803b42c 0120
     ands r0,r3    @ 0803b42e 1840
     lsls r1,r2,#0x2    @ 0803b430 9100
-    ldr r2, DAT_0803b440                     @ 0803b432 034a
+    ldr r2, entity_ref_stride_d              @ 0803b432 034a
     muls r0,r2    @ 0803b434 5043
     adds r1,r1,r0    @ 0803b436 0918
-    ldr r0, DAT_0803b444                     @ 0803b438 0248
+    ldr r0, entity_ref_alt_hand_base_a       @ 0803b438 0248
     adds r1,r1,r0    @ 0803b43a 0918
     ldr r0,[r1,#0x0]                         @ 0803b43c 0868
     b LAB_0803b49e                           @ 0803b43e 2ee0
-DAT_0803b440:
-    .word  0x00000868                     @ 0803b440 68080000
-DAT_0803b444:
-    .word  0x0201cab0                     @ 0803b444 b0ca0102
+entity_ref_stride_d:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b440 68080000
+entity_ref_alt_hand_base_a:
+    .word  gP1AltHandSlotArray            @ 0803b444 b0ca0102
 switchD_0803b3be__caseD_b:
     movs r0,#0x1    @ 0803b448 0120
     ands r0,r3    @ 0803b44a 1840
     lsls r1,r2,#0x2    @ 0803b44c 9100
-    ldr r2, DAT_0803b45c                     @ 0803b44e 034a
+    ldr r2, entity_ref_stride_e              @ 0803b44e 034a
     muls r0,r2    @ 0803b450 5043
     adds r1,r1,r0    @ 0803b452 0918
-    ldr r0, DAT_0803b460                     @ 0803b454 0248
+    ldr r0, entity_ref_field_c_base_a        @ 0803b454 0248
     adds r1,r1,r0    @ 0803b456 0918
     ldr r0,[r1,#0x0]                         @ 0803b458 0868
     b LAB_0803b49e                           @ 0803b45a 20e0
-DAT_0803b45c:
-    .word  0x00000868                     @ 0803b45c 68080000
-DAT_0803b460:
-    .word  0x0201c600                     @ 0803b460 00c60102
+entity_ref_stride_e:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b45c 68080000
+entity_ref_field_c_base_a:
+    .word  gP1FieldArrayCBase             @ 0803b460 00c60102
 switchD_0803b3be__default:
     adds r1,r4,r2    @ 0803b464 a118
     cmp r1,#0xa                              @ 0803b466 0a29
     ble LAB_0803b488                         @ 0803b468 0edd
-    ldr r1, DAT_0803b484                     @ 0803b46a 0649
+    ldr r1, entity_ref_effect_chain_base_a   @ 0803b46a 0649
     adds r2,r1,#0x0    @ 0803b46c 0a1c
     subs r2,#0xc4    @ 0803b46e c43a
     ldr r0,[r2,#0x0]                         @ 0803b470 1068
@@ -11855,18 +11855,18 @@ LAB_0803b47e:
     ldr r0,[r1,#0x0]                         @ 0803b47e 0868
     b LAB_0803b49e                           @ 0803b480 0de0
     .zero  0x2
-DAT_0803b484:
-    .word  0x0201bc54                     @ 0803b484 54bc0102
+entity_ref_effect_chain_base_a:
+    .word  gDuelEffectChainSlots          @ 0803b484 54bc0102
 LAB_0803b488:
     movs r2,#0x1    @ 0803b488 0122
     ands r2,r3    @ 0803b48a 1a40
     lsls r0,r1,#0x2    @ 0803b48c 8800
     adds r0,r0,r1    @ 0803b48e 4018
     lsls r0,r0,#0x2    @ 0803b490 8000
-    ldr r1, DAT_0803b4a8                     @ 0803b492 0549
+    ldr r1, entity_ref_stride_f              @ 0803b492 0549
     muls r1,r2    @ 0803b494 5143
     adds r0,r0,r1    @ 0803b496 4018
-    ldr r1, DAT_0803b4ac                     @ 0803b498 0449
+    ldr r1, entity_ref_field_slots_a         @ 0803b498 0449
     adds r0,r0,r1    @ 0803b49a 4018
     ldr r0,[r0,#0x0]                         @ 0803b49c 0068
 LAB_0803b49e:
@@ -11875,12 +11875,12 @@ LAB_0803b49e:
     pop {r4}                                 @ 0803b4a2 10bc
     pop {r1}                                 @ 0803b4a4 02bc
     bx r1                                    @ 0803b4a6 0847
-DAT_0803b4a8:
-    .word  0x00000868                     @ 0803b4a8 68080000
-DAT_0803b4ac:
-    .word  0x0201c510                     @ 0803b4ac 10c50102
+entity_ref_stride_f:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b4a8 68080000
+entity_ref_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803b4ac 10c50102
 
-@ Read zone slot card reference field by zone_type_code (r1) and return packed value. Switch dispatch (r1-0xb, 5 cases): 0xb: base=0x0201c600+player_side*0x868+r2*4 -> ldr [slot]; 0xc: base=0x0201c880+player_side*0x868+r2*4 -> ldr [slot]; 0xd: base=0x0201c740+player_side*0x868+r2*4 -> ldr [slot]; 0xe: base=0x0201c8f8+player_side*0x868+r2*4 -> ldr [slot]; 0xf: base=0x0201cab0+player_side*0x868+r2*4 -> ldr [slot]; default (r1+r2<=10): base=gDuelFieldSlots+player_side*0x868+(r1+r2)*20 -> ldr [slot]; default (r1+r2>10): base=0x0201bc54+player_side*20 -> ldr [slot]. Return: packed bits[22..16]<<1 | bit[13] (entity/player reference bits). Sibling FUN_0803b5c0 returns [slot+6] u16 for same switch. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_0b=0x0201c600, zone_0c=0x0201c880, zone_0d=0x0201c740, zone_0e=0x0201c8f8, zone_0f=0x0201cab0, default_extended=0x0201bc54.
+@ Read zone slot card reference field by zone_type_code (r1) and return packed value. Switch dispatch (r1-0xb, 5 cases): 0xb: base=0x0201c600+player_side*0x868+r2*4 -> ldr [slot]; 0xc: base=0x0201c880+player_side*0x868+r2*4 -> ldr [slot]; 0xd: base=0x0201c740+player_side*0x868+r2*4 -> ldr [slot]; 0xe: base=0x0201c8f8+player_side*0x868+r2*4 -> ldr [slot]; 0xf: base=0x0201cab0+player_side*0x868+r2*4 -> ldr [slot]; default (r1+r2<=10): base=gDuelFieldSlots+player_side*0x868+(r1+r2)*20 -> ldr [slot]; default (r1+r2>10): base=0x0201bc54+player_side*20 -> ldr [slot]. Return: packed bits[22..16]<<1 | bit[13] (entity/player reference bits). Sibling get_zone_slot_field6_by_type returns [slot+6] u16 for same switch. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_0b=0x0201c600, zone_0c=0x0201c880, zone_0d=0x0201c740, zone_0e=0x0201c8f8, zone_0f=0x0201cab0, default_extended=0x0201bc54.
 get_zone_slot_card_ref_by_type:
     push {r4,lr}                             @ 0803b4b0 10b5
     adds r3,r0,#0x0    @ 0803b4b2 031c
@@ -11890,13 +11890,13 @@ get_zone_slot_card_ref_by_type:
     cmp r0,#0x4                              @ 0803b4ba 0428
     bhi switchD_0803b4c6__default            @ 0803b4bc 56d8
     lsls r0,r0,#0x2    @ 0803b4be 8000
-    ldr r1, DAT_0803b4c8                     @ 0803b4c0 0149
+    ldr r1, card_ref_switch_table_ptr        @ 0803b4c0 0149
     adds r0,r0,r1    @ 0803b4c2 4018
     ldr r0,[r0,#0x0]                         @ 0803b4c4 0068
 switchD_0803b4c6__switchD:
     .hword 0x4687    @ 0803b4c6 8746
-DAT_0803b4c8:
-    .word  0x0803b4cc                     @ 0803b4c8 ccb40308
+card_ref_switch_table_ptr:
+    .word  0x0803b4cc                     @ 0803b4c8 ccb40308  switch base ptr for get_zone_slot_card_ref_by_type; points to 0x0803b4cc
 switchD_0803b4c6__switchdataD_0803b4cc:
     .word  0x0803b550                     @ 0803b4cc 50b50308
     .word  0x0803b4e0                     @ 0803b4d0 e0b40308
@@ -11907,82 +11907,82 @@ switchD_0803b4c6__caseD_c:
     movs r0,#0x1    @ 0803b4e0 0120
     ands r0,r3    @ 0803b4e2 1840
     lsls r1,r2,#0x2    @ 0803b4e4 9100
-    ldr r2, DAT_0803b4f4                     @ 0803b4e6 034a
+    ldr r2, card_ref_stride_a                @ 0803b4e6 034a
     muls r0,r2    @ 0803b4e8 5043
     adds r1,r1,r0    @ 0803b4ea 0918
-    ldr r0, DAT_0803b4f8                     @ 0803b4ec 0248
+    ldr r0, card_ref_chain_zone_base_a       @ 0803b4ec 0248
     adds r1,r1,r0    @ 0803b4ee 0918
     ldr r1,[r1,#0x0]                         @ 0803b4f0 0968
     b LAB_0803b5a6                           @ 0803b4f2 58e0
-DAT_0803b4f4:
-    .word  0x00000868                     @ 0803b4f4 68080000
-DAT_0803b4f8:
-    .word  0x0201c880                     @ 0803b4f8 80c80102
+card_ref_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b4f4 68080000
+card_ref_chain_zone_base_a:
+    .word  gP1ChainZoneArray              @ 0803b4f8 80c80102
 switchD_0803b4c6__caseD_d:
     movs r0,#0x1    @ 0803b4fc 0120
     ands r0,r3    @ 0803b4fe 1840
     lsls r1,r2,#0x2    @ 0803b500 9100
-    ldr r2, DAT_0803b510                     @ 0803b502 034a
+    ldr r2, card_ref_stride_b                @ 0803b502 034a
     muls r0,r2    @ 0803b504 5043
     adds r1,r1,r0    @ 0803b506 0918
-    ldr r0, DAT_0803b514                     @ 0803b508 0248
+    ldr r0, card_ref_slot_code_base_a        @ 0803b508 0248
     adds r1,r1,r0    @ 0803b50a 0918
     ldr r1,[r1,#0x0]                         @ 0803b50c 0968
     b LAB_0803b5a6                           @ 0803b50e 4ae0
-DAT_0803b510:
-    .word  0x00000868                     @ 0803b510 68080000
-DAT_0803b514:
-    .word  0x0201c740                     @ 0803b514 40c70102
+card_ref_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b510 68080000
+card_ref_slot_code_base_a:
+    .word  gP1SlotSetCodeArray            @ 0803b514 40c70102
 switchD_0803b4c6__caseD_e:
     movs r0,#0x1    @ 0803b518 0120
     ands r0,r3    @ 0803b51a 1840
     lsls r1,r2,#0x2    @ 0803b51c 9100
-    ldr r2, DAT_0803b52c                     @ 0803b51e 034a
+    ldr r2, card_ref_stride_c                @ 0803b51e 034a
     muls r0,r2    @ 0803b520 5043
     adds r1,r1,r0    @ 0803b522 0918
-    ldr r0, DAT_0803b530                     @ 0803b524 0248
+    ldr r0, card_ref_hand_slot_base_a        @ 0803b524 0248
     adds r1,r1,r0    @ 0803b526 0918
     ldr r1,[r1,#0x0]                         @ 0803b528 0968
     b LAB_0803b5a6                           @ 0803b52a 3ce0
-DAT_0803b52c:
-    .word  0x00000868                     @ 0803b52c 68080000
-DAT_0803b530:
-    .word  0x0201c8f8                     @ 0803b530 f8c80102
+card_ref_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b52c 68080000
+card_ref_hand_slot_base_a:
+    .word  gP1HandSlotArray               @ 0803b530 f8c80102
 switchD_0803b4c6__caseD_f:
     movs r0,#0x1    @ 0803b534 0120
     ands r0,r3    @ 0803b536 1840
     lsls r1,r2,#0x2    @ 0803b538 9100
-    ldr r2, DAT_0803b548                     @ 0803b53a 034a
+    ldr r2, card_ref_stride_d                @ 0803b53a 034a
     muls r0,r2    @ 0803b53c 5043
     adds r1,r1,r0    @ 0803b53e 0918
-    ldr r0, DAT_0803b54c                     @ 0803b540 0248
+    ldr r0, card_ref_alt_hand_base_a         @ 0803b540 0248
     adds r1,r1,r0    @ 0803b542 0918
     ldr r1,[r1,#0x0]                         @ 0803b544 0968
     b LAB_0803b5a6                           @ 0803b546 2ee0
-DAT_0803b548:
-    .word  0x00000868                     @ 0803b548 68080000
-DAT_0803b54c:
-    .word  0x0201cab0                     @ 0803b54c b0ca0102
+card_ref_stride_d:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b548 68080000
+card_ref_alt_hand_base_a:
+    .word  gP1AltHandSlotArray            @ 0803b54c b0ca0102
 switchD_0803b4c6__caseD_b:
     movs r0,#0x1    @ 0803b550 0120
     ands r0,r3    @ 0803b552 1840
     lsls r1,r2,#0x2    @ 0803b554 9100
-    ldr r2, DAT_0803b564                     @ 0803b556 034a
+    ldr r2, card_ref_stride_e                @ 0803b556 034a
     muls r0,r2    @ 0803b558 5043
     adds r1,r1,r0    @ 0803b55a 0918
-    ldr r0, DAT_0803b568                     @ 0803b55c 0248
+    ldr r0, card_ref_field_c_base_a          @ 0803b55c 0248
     adds r1,r1,r0    @ 0803b55e 0918
     ldr r1,[r1,#0x0]                         @ 0803b560 0968
     b LAB_0803b5a6                           @ 0803b562 20e0
-DAT_0803b564:
-    .word  0x00000868                     @ 0803b564 68080000
-DAT_0803b568:
-    .word  0x0201c600                     @ 0803b568 00c60102
+card_ref_stride_e:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b564 68080000
+card_ref_field_c_base_a:
+    .word  gP1FieldArrayCBase             @ 0803b568 00c60102
 switchD_0803b4c6__default:
     adds r1,r4,r2    @ 0803b56c a118
     cmp r1,#0xa                              @ 0803b56e 0a29
     ble LAB_0803b590                         @ 0803b570 0edd
-    ldr r1, DAT_0803b58c                     @ 0803b572 0649
+    ldr r1, card_ref_effect_chain_base_a     @ 0803b572 0649
     adds r2,r1,#0x0    @ 0803b574 0a1c
     subs r2,#0xc4    @ 0803b576 c43a
     ldr r0,[r2,#0x0]                         @ 0803b578 1068
@@ -11997,18 +11997,18 @@ LAB_0803b586:
     ldr r1,[r1,#0x0]                         @ 0803b586 0968
     b LAB_0803b5a6                           @ 0803b588 0de0
     .zero  0x2
-DAT_0803b58c:
-    .word  0x0201bc54                     @ 0803b58c 54bc0102
+card_ref_effect_chain_base_a:
+    .word  gDuelEffectChainSlots          @ 0803b58c 54bc0102
 LAB_0803b590:
     movs r2,#0x1    @ 0803b590 0122
     ands r2,r3    @ 0803b592 1a40
     lsls r0,r1,#0x2    @ 0803b594 8800
     adds r0,r0,r1    @ 0803b596 4018
     lsls r0,r0,#0x2    @ 0803b598 8000
-    ldr r1, DAT_0803b5b8                     @ 0803b59a 0749
+    ldr r1, card_ref_stride_f                @ 0803b59a 0749
     muls r1,r2    @ 0803b59c 5143
     adds r0,r0,r1    @ 0803b59e 4018
-    ldr r1, DAT_0803b5bc                     @ 0803b5a0 0649
+    ldr r1, card_ref_field_slots_a           @ 0803b5a0 0649
     adds r0,r0,r1    @ 0803b5a2 4018
     ldr r1,[r0,#0x0]                         @ 0803b5a4 0168
 LAB_0803b5a6:
@@ -12021,10 +12021,10 @@ LAB_0803b5a6:
     pop {r4}                                 @ 0803b5b2 10bc
     pop {r1}                                 @ 0803b5b4 02bc
     bx r1                                    @ 0803b5b6 0847
-DAT_0803b5b8:
-    .word  0x00000868                     @ 0803b5b8 68080000
-DAT_0803b5bc:
-    .word  0x0201c510                     @ 0803b5bc 10c50102
+card_ref_stride_f:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b5b8 68080000
+card_ref_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803b5bc 10c50102
 
 @ Read [slot+6] u16 field from EWRAM zone table by zone_type_code (r1) and slot_index (r2). Logic fully symmetric with get_zone_slot_card_ref_by_type but returns [slot+0x6] halfword. Switch dispatch (r1 [0xb..0xf]): r1 in [0xb..0xf] -> shared path; r1>0xf or <0xb -> return 0; r1+r2>10: read 0x0201bc54+player*20 -> ldrh [+6]; r1+r2<=10: gDuelFieldSlots+player*0x868+(r1+r2)*20 -> ldrh [+6]. Return: r0=u16 zone_slot_field6 (0=invalid zone_type or empty slot). Sibling get_zone_slot_card_ref_by_type reads [slot+0] and extracts packed bits. Constants: zone_0b=0x0201c600 (shared with get_zone_slot_card_ref_by_type), sentinel_zone_range=[0xb..0xf], field_offset=6.
 get_zone_slot_field6_by_type:
@@ -12040,7 +12040,7 @@ LAB_0803b5d0:
     adds r3,r1,r2    @ 0803b5d0 8b18
     cmp r3,#0xa                              @ 0803b5d2 0a2b
     ble LAB_0803b5f4                         @ 0803b5d4 0edd
-    ldr r2, DAT_0803b5f0                     @ 0803b5d6 064a
+    ldr r2, field6_effect_chain_base_a       @ 0803b5d6 064a
     adds r3,r2,#0x0    @ 0803b5d8 131c
     subs r3,#0xc4    @ 0803b5da c43b
     ldr r0,[r3,#0x0]                         @ 0803b5dc 1868
@@ -12055,28 +12055,28 @@ LAB_0803b5ea:
     ldrh r0,[r2,#0x6]                        @ 0803b5ea d088
     b LAB_0803b60a                           @ 0803b5ec 0de0
     .zero  0x2
-DAT_0803b5f0:
-    .word  0x0201bc54                     @ 0803b5f0 54bc0102
+field6_effect_chain_base_a:
+    .word  gDuelEffectChainSlots          @ 0803b5f0 54bc0102
 LAB_0803b5f4:
     movs r2,#0x1    @ 0803b5f4 0122
     ands r2,r4    @ 0803b5f6 2240
     lsls r0,r3,#0x2    @ 0803b5f8 9800
     adds r0,r0,r3    @ 0803b5fa c018
     lsls r0,r0,#0x2    @ 0803b5fc 8000
-    ldr r1, DAT_0803b610                     @ 0803b5fe 0449
+    ldr r1, field6_stride_a                  @ 0803b5fe 0449
     muls r1,r2    @ 0803b600 5143
     adds r0,r0,r1    @ 0803b602 4018
-    ldr r1, DAT_0803b614                     @ 0803b604 0349
+    ldr r1, field6_field_slots_a             @ 0803b604 0349
     adds r0,r0,r1    @ 0803b606 4018
     ldrh r0,[r0,#0x6]                        @ 0803b608 c088
 LAB_0803b60a:
     pop {r4}                                 @ 0803b60a 10bc
     pop {r1}                                 @ 0803b60c 02bc
     bx r1                                    @ 0803b60e 0847
-DAT_0803b610:
-    .word  0x00000868                     @ 0803b610 68080000
-DAT_0803b614:
-    .word  0x0201c510                     @ 0803b614 10c50102
+field6_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b610 68080000
+field6_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803b614 10c50102
 
 @ Dispatches on zone_type_code (r1, [0xb..0xf]) across 5 cases to read a card attribute for player r0. case_b (0xb): entity ID match check then get_player_deck_flag_bit1. case_c (0xc): returns 0 fixed. case_d (0xd): reads bit field from 0x0201c740 table then calls find_effect_node_in_zone. case_e (0xe): returns 1 fixed. case_f (0xf): reads [gP1LifePoints+0x788+slot*2] byte; ==0x40 -> return bit[9]; ==0x80 -> return 0; other -> return 1. default: reads u16 at [+8] from 0x0201bc54 or 0x0201c510 table. r0=u32 packed_player_id, r1=u32 zone_type_code [0xb..0xf], r2=u32 slot_or_card_index [0..9]. Returns u16 card attribute value. Constants: 0x868=player stride; 0x0201c740=gP1CardZone base; 0x12a1=case_d field offset; 0x788=case_f LifePoints offset; 0x0201bc54=default table base; 0x40=case_f threshold A (bit6); 0x80=case_f threshold B (bit7).
 get_zone_card_attribute_by_type:
@@ -12089,14 +12089,14 @@ get_zone_card_attribute_by_type:
     cmp r0,#0x4                              @ 0803b624 0428
     bhi switchD_0803b630__default            @ 0803b626 63d8
     lsls r0,r0,#0x2    @ 0803b628 8000
-    ldr r1, DAT_0803b634                     @ 0803b62a 0249
+    ldr r1, zone_attr_switch_table_ptr       @ 0803b62a 0249
     adds r0,r0,r1    @ 0803b62c 4018
     ldr r0,[r0,#0x0]                         @ 0803b62e 0068
 switchD_0803b630__switchD:
     .hword 0x4687    @ 0803b630 8746
     .zero  0x2
-DAT_0803b634:
-    .word  0x0803b638                     @ 0803b634 38b60308
+zone_attr_switch_table_ptr:
+    .word  0x0803b638                     @ 0803b634 38b60308  switch base ptr for get_zone_card_attribute_by_type; points to 0x0803b638
 switchD_0803b630__switchdataD_0803b638:
     .word  0x0803b6d0                     @ 0803b638 d0b60308
     .word  0x0803b6b6                     @ 0803b63c b6b60308
@@ -12104,15 +12104,15 @@ switchD_0803b630__switchdataD_0803b638:
     .word  0x0803b6cc                     @ 0803b644 ccb60308
     .word  0x0803b694                     @ 0803b648 94b60308
 switchD_0803b630__caseD_d:
-    ldr r2, DAT_0803b688                     @ 0803b64c 0e4a
+    ldr r2, zone_attr_paracide_cid           @ 0803b64c 0e4a
     movs r5,#0x1    @ 0803b64e 0125
     adds r0,r6,#0x0    @ 0803b650 301c
     ands r0,r5    @ 0803b652 2840
     lsls r1,r4,#0x2    @ 0803b654 a100
-    ldr r3, DAT_0803b68c                     @ 0803b656 0d4b
+    ldr r3, zone_attr_stride_a               @ 0803b656 0d4b
     muls r0,r3    @ 0803b658 5843
     adds r1,r1,r0    @ 0803b65a 0918
-    ldr r4, DAT_0803b690                     @ 0803b65c 0c4c
+    ldr r4, zone_attr_slot_code_base_a       @ 0803b65c 0c4c
     adds r1,r1,r4    @ 0803b65e 0919
     ldr r0,[r1,#0x0]                         @ 0803b660 0868
     lsls r3,r0,#0x2    @ 0803b662 8300
@@ -12133,18 +12133,18 @@ switchD_0803b630__caseD_d:
     ands r0,r5    @ 0803b682 2840
     eors r0,r1    @ 0803b684 4840
     b LAB_0803b72a                           @ 0803b686 50e0
-DAT_0803b688:
-    .word  0x000012a1                     @ 0803b688 a1120000
-DAT_0803b68c:
-    .word  0x00000868                     @ 0803b68c 68080000
-DAT_0803b690:
-    .word  0x0201c740                     @ 0803b690 40c70102
+zone_attr_paracide_cid:
+    .word  PARASITE_PARACIDE_CID          @ 0803b688 a1120000  Parasite Paracide (pw=27911549; card_0625 slot=0x12A1); zone case_f attr-select block
+zone_attr_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b68c 68080000
+zone_attr_slot_code_base_a:
+    .word  gP1SlotSetCodeArray            @ 0803b690 40c70102
 switchD_0803b630__caseD_f:
-    ldr r3, PTR_gP1LifePoints_0803b6bc       @ 0803b694 094b
+    ldr r3, zone_attr_lp_base_a              @ 0803b694 094b
     lsls r2,r4,#0x1    @ 0803b696 6200
     movs r0,#0x1    @ 0803b698 0120
     ands r0,r6    @ 0803b69a 3040
-    ldr r1, DAT_0803b6c0                     @ 0803b69c 0849
+    ldr r1, zone_attr_stride_b               @ 0803b69c 0849
     muls r0,r1    @ 0803b69e 4843
     adds r2,r2,r0    @ 0803b6a0 1218
     movs r0,#0xf1    @ 0803b6a2 f120
@@ -12161,10 +12161,10 @@ switchD_0803b630__caseD_c:
     movs r0,#0x0    @ 0803b6b6 0020
     b LAB_0803b72a                           @ 0803b6b8 37e0
     .zero  0x2
-PTR_gP1LifePoints_0803b6bc:
+zone_attr_lp_base_a:
     .word  gP1LifePoints                  @ 0803b6bc e0c40102
-DAT_0803b6c0:
-    .word  0x00000868                     @ 0803b6c0 68080000
+zone_attr_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b6c0 68080000
 LAB_0803b6c4:
     lsrs r0,r0,#0x9    @ 0803b6c4 400a
     movs r1,#0x1    @ 0803b6c6 0121
@@ -12175,7 +12175,7 @@ switchD_0803b630__caseD_e:
     b LAB_0803b72a                           @ 0803b6ce 2ce0
 switchD_0803b630__caseD_b:
     movs r4,#0x0    @ 0803b6d0 0024
-    ldr r0, DAT_0803b6ec                     @ 0803b6d2 0648
+    ldr r0, zone_attr_card_ctx_a             @ 0803b6d2 0648
     ldr r0,[r0,#0x4]                         @ 0803b6d4 4068
     cmp r6,r0                                @ 0803b6d6 8642
     beq LAB_0803b6e4                         @ 0803b6d8 04d0
@@ -12189,13 +12189,13 @@ LAB_0803b6e6:
     adds r0,r4,#0x0    @ 0803b6e6 201c
     b LAB_0803b72a                           @ 0803b6e8 1fe0
     .zero  0x2
-DAT_0803b6ec:
-    .word  0x0201e2a0                     @ 0803b6ec a0e20102
+zone_attr_card_ctx_a:
+    .word  gDuelCardCtxBase               @ 0803b6ec a0e20102
 switchD_0803b630__default:
     adds r1,r3,r4    @ 0803b6f0 1919
     cmp r1,#0xa                              @ 0803b6f2 0a29
     ble LAB_0803b714                         @ 0803b6f4 0edd
-    ldr r1, DAT_0803b710                     @ 0803b6f6 0649
+    ldr r1, zone_attr_effect_chain_a         @ 0803b6f6 0649
     adds r2,r1,#0x0    @ 0803b6f8 0a1c
     subs r2,#0xc4    @ 0803b6fa c43a
     ldr r0,[r2,#0x0]                         @ 0803b6fc 1068
@@ -12210,28 +12210,28 @@ LAB_0803b70a:
     ldrh r0,[r1,#0x8]                        @ 0803b70a 0889
     b LAB_0803b72a                           @ 0803b70c 0de0
     .zero  0x2
-DAT_0803b710:
-    .word  0x0201bc54                     @ 0803b710 54bc0102
+zone_attr_effect_chain_a:
+    .word  gDuelEffectChainSlots          @ 0803b710 54bc0102
 LAB_0803b714:
     movs r2,#0x1    @ 0803b714 0122
     ands r2,r6    @ 0803b716 3240
     lsls r0,r1,#0x2    @ 0803b718 8800
     adds r0,r0,r1    @ 0803b71a 4018
     lsls r0,r0,#0x2    @ 0803b71c 8000
-    ldr r1, DAT_0803b730                     @ 0803b71e 0449
+    ldr r1, zone_attr_stride_c               @ 0803b71e 0449
     muls r1,r2    @ 0803b720 5143
     adds r0,r0,r1    @ 0803b722 4018
-    ldr r1, DAT_0803b734                     @ 0803b724 0349
+    ldr r1, zone_attr_field_slots_a          @ 0803b724 0349
     adds r0,r0,r1    @ 0803b726 4018
     ldrh r0,[r0,#0x8]                        @ 0803b728 0089
 LAB_0803b72a:
     pop {r4,r5,r6}                           @ 0803b72a 70bc
     pop {r1}                                 @ 0803b72c 02bc
     bx r1                                    @ 0803b72e 0847
-DAT_0803b730:
-    .word  0x00000868                     @ 0803b730 68080000
-DAT_0803b734:
-    .word  0x0201c510                     @ 0803b734 10c50102
+zone_attr_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b730 68080000
+zone_attr_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803b734 10c50102
 
 @ Jump-table dispatch on zone_type [0xb..0xf]: returns gDuelFieldSlots[side*0x868+fixed_offset] word. zone 0xb->offset 0x18, 0xc->0x10, 0xd->0x14, 0xe->0x1c, 0xf->0x0c. Default path: zone_type*20 offset, extracts card_id low 13 bits, returns 1 if nonzero else 0. r0=u32 player_side [0..1]; r1=u32 zone_type [0xb..0xf]; r2=u32 slot_offset [0..4]. Returns u32 slot_word or 1/0. Read-only. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, zone_0xb_off=0x18, zone_0xc_off=0x10, zone_0xd_off=0x14, zone_0xe_off=0x1c, zone_0xf_off=0x0c.
 read_player_field_slot_word_by_zone:
@@ -12241,13 +12241,13 @@ read_player_field_slot_word_by_zone:
     cmp r0,#0x4                              @ 0803b73e 0428
     bhi switchD_0803b74a__default            @ 0803b740 56d8
     lsls r0,r0,#0x2    @ 0803b742 8000
-    ldr r1, DAT_0803b74c                     @ 0803b744 0149
+    ldr r1, field_word_switch_table_ptr      @ 0803b744 0149
     adds r0,r0,r1    @ 0803b746 4018
     ldr r0,[r0,#0x0]                         @ 0803b748 0068
 switchD_0803b74a__switchD:
     .hword 0x4687    @ 0803b74a 8746
-DAT_0803b74c:
-    .word  0x0803b750                     @ 0803b74c 50b70308
+field_word_switch_table_ptr:
+    .word  0x0803b750                     @ 0803b74c 50b70308  switch base ptr for read_player_field_slot_word_by_zone; points to 0x0803b750
 switchD_0803b74a__switchdataD_0803b750:
     .word  0x0803b7d4                     @ 0803b750 d4b70308
     .word  0x0803b764                     @ 0803b754 64b70308
@@ -12255,90 +12255,90 @@ switchD_0803b74a__switchdataD_0803b750:
     .word  0x0803b79c                     @ 0803b75c 9cb70308
     .word  0x0803b7b8                     @ 0803b760 b8b70308
 switchD_0803b74a__caseD_c:
-    ldr r2, PTR_gP1LifePoints_0803b778       @ 0803b764 044a
+    ldr r2, field_word_lp_base_c             @ 0803b764 044a
     movs r0,#0x1    @ 0803b766 0120
     ands r0,r3    @ 0803b768 1840
-    ldr r1, DAT_0803b77c                     @ 0803b76a 0449
+    ldr r1, field_word_stride_a              @ 0803b76a 0449
     muls r0,r1    @ 0803b76c 4843
     adds r2,#0x18    @ 0803b76e 1832
     adds r0,r0,r2    @ 0803b770 8018
     ldr r0,[r0,#0x0]                         @ 0803b772 0068
     b LAB_0803b810                           @ 0803b774 4ce0
     .zero  0x2
-PTR_gP1LifePoints_0803b778:
+field_word_lp_base_c:
     .word  gP1LifePoints                  @ 0803b778 e0c40102
-DAT_0803b77c:
-    .word  0x00000868                     @ 0803b77c 68080000
+field_word_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b77c 68080000
 switchD_0803b74a__caseD_d:
-    ldr r2, PTR_gP1LifePoints_0803b794       @ 0803b780 044a
+    ldr r2, field_word_lp_base_d             @ 0803b780 044a
     movs r0,#0x1    @ 0803b782 0120
     ands r0,r3    @ 0803b784 1840
-    ldr r1, DAT_0803b798                     @ 0803b786 0449
+    ldr r1, field_word_stride_b              @ 0803b786 0449
     muls r0,r1    @ 0803b788 4843
     adds r2,#0x10    @ 0803b78a 1032
     adds r0,r0,r2    @ 0803b78c 8018
     ldr r0,[r0,#0x0]                         @ 0803b78e 0068
     b LAB_0803b810                           @ 0803b790 3ee0
     .zero  0x2
-PTR_gP1LifePoints_0803b794:
+field_word_lp_base_d:
     .word  gP1LifePoints                  @ 0803b794 e0c40102
-DAT_0803b798:
-    .word  0x00000868                     @ 0803b798 68080000
+field_word_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b798 68080000
 switchD_0803b74a__caseD_e:
-    ldr r2, PTR_gP1LifePoints_0803b7b0       @ 0803b79c 044a
+    ldr r2, field_word_lp_base_e             @ 0803b79c 044a
     movs r0,#0x1    @ 0803b79e 0120
     ands r0,r3    @ 0803b7a0 1840
-    ldr r1, DAT_0803b7b4                     @ 0803b7a2 0449
+    ldr r1, field_word_stride_c              @ 0803b7a2 0449
     muls r0,r1    @ 0803b7a4 4843
     adds r2,#0x14    @ 0803b7a6 1432
     adds r0,r0,r2    @ 0803b7a8 8018
     ldr r0,[r0,#0x0]                         @ 0803b7aa 0068
     b LAB_0803b810                           @ 0803b7ac 30e0
     .zero  0x2
-PTR_gP1LifePoints_0803b7b0:
+field_word_lp_base_e:
     .word  gP1LifePoints                  @ 0803b7b0 e0c40102
-DAT_0803b7b4:
-    .word  0x00000868                     @ 0803b7b4 68080000
+field_word_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b7b4 68080000
 switchD_0803b74a__caseD_f:
-    ldr r2, PTR_gP1LifePoints_0803b7cc       @ 0803b7b8 044a
+    ldr r2, field_word_lp_base_f             @ 0803b7b8 044a
     movs r0,#0x1    @ 0803b7ba 0120
     ands r0,r3    @ 0803b7bc 1840
-    ldr r1, DAT_0803b7d0                     @ 0803b7be 0449
+    ldr r1, field_word_stride_d              @ 0803b7be 0449
     muls r0,r1    @ 0803b7c0 4843
     adds r2,#0x1c    @ 0803b7c2 1c32
     adds r0,r0,r2    @ 0803b7c4 8018
     ldr r0,[r0,#0x0]                         @ 0803b7c6 0068
     b LAB_0803b810                           @ 0803b7c8 22e0
     .zero  0x2
-PTR_gP1LifePoints_0803b7cc:
+field_word_lp_base_f:
     .word  gP1LifePoints                  @ 0803b7cc e0c40102
-DAT_0803b7d0:
-    .word  0x00000868                     @ 0803b7d0 68080000
+field_word_stride_d:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b7d0 68080000
 switchD_0803b74a__caseD_b:
-    ldr r2, PTR_gP1LifePoints_0803b7e8       @ 0803b7d4 044a
+    ldr r2, field_word_lp_base_b             @ 0803b7d4 044a
     movs r0,#0x1    @ 0803b7d6 0120
     ands r0,r3    @ 0803b7d8 1840
-    ldr r1, DAT_0803b7ec                     @ 0803b7da 0449
+    ldr r1, field_word_stride_e              @ 0803b7da 0449
     muls r0,r1    @ 0803b7dc 4843
     adds r2,#0xc    @ 0803b7de 0c32
     adds r0,r0,r2    @ 0803b7e0 8018
     ldr r0,[r0,#0x0]                         @ 0803b7e2 0068
     b LAB_0803b810                           @ 0803b7e4 14e0
     .zero  0x2
-PTR_gP1LifePoints_0803b7e8:
+field_word_lp_base_b:
     .word  gP1LifePoints                  @ 0803b7e8 e0c40102
-DAT_0803b7ec:
-    .word  0x00000868                     @ 0803b7ec 68080000
+field_word_stride_e:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b7ec 68080000
 switchD_0803b74a__default:
     movs r2,#0x1    @ 0803b7f0 0122
     ands r2,r3    @ 0803b7f2 1a40
     lsls r0,r1,#0x2    @ 0803b7f4 8800
     adds r0,r0,r1    @ 0803b7f6 4018
     lsls r0,r0,#0x2    @ 0803b7f8 8000
-    ldr r1, DAT_0803b814                     @ 0803b7fa 0649
+    ldr r1, field_word_stride_f              @ 0803b7fa 0649
     muls r1,r2    @ 0803b7fc 5143
     adds r0,r0,r1    @ 0803b7fe 4018
-    ldr r1, DAT_0803b818                     @ 0803b800 0549
+    ldr r1, field_word_field_slots_a         @ 0803b800 0549
     adds r0,r0,r1    @ 0803b802 4018
     ldr r0,[r0,#0x0]                         @ 0803b804 0068
     lsls r0,r0,#0x13    @ 0803b806 c004
@@ -12349,30 +12349,30 @@ switchD_0803b74a__default:
 LAB_0803b810:
     bx lr                                    @ 0803b810 7047
     .zero  0x2
-DAT_0803b814:
-    .word  0x00000868                     @ 0803b814 68080000
-DAT_0803b818:
-    .word  0x0201c510                     @ 0803b818 10c50102
+field_word_stride_f:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b814 68080000
+field_word_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803b818 10c50102
 
-@ Sets or clears bit r0 in [gP1LifePoints + player&1*0x868 + 0x10d0] slot occupy flags word. r1!=0: computes 1<<r0 then ORs into flags; r1==0: BIC clears bit. Sibling of set_player_state_bit (0x0803b854, operates on +0x11c). Called by set_player_state_bit_with_sprite_update (0x0804a8d8) and FUN_08040144. Params: r0=bit_pos [0..31], r1=set_flag (0=clear BIC, nonzero=set OR). Returns void (bx lr). Side effects: [gP1LifePoints+0x10d0] bit OR or BIC. Constants: flags_offset=0x10d0, player_stride=0x868.
+@ Sets or clears bit r0 in [gP1LifePoints + player&1*0x868 + 0x10d0] slot occupy flags word. r1!=0: computes 1<<r0 then ORs into flags; r1==0: BIC clears bit. Sibling of set_player_state_bit (0x0803b854, operates on +0x11c). Called by set_player_state_bit_with_sprite_update (0x0804a8d8) and tick_hand_sort_display_init_seq. Params: r0=bit_pos [0..31], r1=set_flag (0=clear BIC, nonzero=set OR). Returns void (bx lr). Side effects: [gP1LifePoints+0x10d0] bit OR or BIC. Constants: flags_offset=0x10d0, player_stride=0x868.
 write_slot_occupy_flag_bit:
     cmp r1,#0x0                              @ 0803b81c 0029
     beq LAB_0803b838                         @ 0803b81e 0bd0
-    ldr r2, PTR_gP1LifePoints_0803b830       @ 0803b820 034a
-    ldr r1, DAT_0803b834                     @ 0803b822 0449
+    ldr r2, occupy_flag_lp_base_a            @ 0803b820 034a
+    ldr r1, occupy_flag_bitmask_off_a        @ 0803b822 0449
     adds r2,r2,r1    @ 0803b824 5218
     movs r1,#0x1    @ 0803b826 0121
     lsls r1,r0    @ 0803b828 8140
     ldr r0,[r2,#0x0]                         @ 0803b82a 1068
     orrs r0,r1    @ 0803b82c 0843
     b LAB_0803b846                           @ 0803b82e 0ae0
-PTR_gP1LifePoints_0803b830:
+occupy_flag_lp_base_a:
     .word  gP1LifePoints                  @ 0803b830 e0c40102
-DAT_0803b834:
-    .word  0x000010d0                     @ 0803b834 d0100000
+occupy_flag_bitmask_off_a:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 0803b834 d0100000
 LAB_0803b838:
-    ldr r2, PTR_gP1LifePoints_0803b84c       @ 0803b838 044a
-    ldr r1, DAT_0803b850                     @ 0803b83a 0549
+    ldr r2, occupy_flag_lp_base_b            @ 0803b838 044a
+    ldr r1, occupy_flag_bitmask_off_b        @ 0803b83a 0549
     adds r2,r2,r1    @ 0803b83c 5218
     movs r1,#0x1    @ 0803b83e 0121
     lsls r1,r0    @ 0803b840 8140
@@ -12382,22 +12382,22 @@ LAB_0803b846:
     str r0,[r2,#0x0]                         @ 0803b846 1060
     bx lr                                    @ 0803b848 7047
     .zero  0x2
-PTR_gP1LifePoints_0803b84c:
+occupy_flag_lp_base_b:
     .word  gP1LifePoints                  @ 0803b84c e0c40102
-DAT_0803b850:
-    .word  0x000010d0                     @ 0803b850 d0100000
+occupy_flag_bitmask_off_b:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 0803b850 d0100000
 
-@ 对 [gP1LifePoints + player&1 * 0x868 + 0x11c] 执行单比特 OR (置位) 或 BIC (清位). 入口 r0=player_id, r1=bit_pos [0..31], r2=set_flag (0=clear, nonzero=set). r2!=0: 计算 1<<bit_pos 后 OR 到目标字; r2==0: BIC 清位. 写回后返回 void. 与 write_field_slot_bit_by_player (0x0803b8b0, 操作 slot-level +0x40) 构成 sibling. indeg=4; 被 set_player_state_bit_with_sprite_update 及 equip 激活路径直接调用. Side effects: [gP1LifePoints + player&1 * 0x868 + 0x11c]: bit_pos OR/BIC. Constants: flags_offset=0x11c (0x8e*2), player_stride=0x868.
+@ Single-bit OR (set) or BIC (clear) on [gP1LifePoints + player&1 * 0x868 + 0x11c]. Params: r0=player_id, r1=bit_pos [0..31], r2=set_flag (0=clear, nonzero=set). r2!=0: computes 1<<bit_pos then OR to target word; r2==0: BIC clears bit. Returns void. Sibling of write_field_slot_bit_by_player (0x0803b8b0, operates on slot-level +0x40). indeg=4; called by set_player_state_bit_with_sprite_update and equip activation path. Side effects: [gP1LifePoints + player&1 * 0x868 + 0x11c] bit_pos OR/BIC. Constants: flags_offset=0x11c (0x8e*2), player_stride=0x868.
 set_player_state_bit:
     push {r4,r5,lr}                          @ 0803b854 30b5
     adds r4,r0,#0x0    @ 0803b856 041c
     adds r5,r1,#0x0    @ 0803b858 0d1c
     cmp r2,#0x0                              @ 0803b85a 002a
     beq LAB_0803b884                         @ 0803b85c 12d0
-    ldr r3, PTR_gP1LifePoints_0803b87c       @ 0803b85e 074b
+    ldr r3, player_state_bit_lp_a            @ 0803b85e 074b
     movs r1,#0x1    @ 0803b860 0121
     ands r4,r1    @ 0803b862 0c40
-    ldr r0, DAT_0803b880                     @ 0803b864 0648
+    ldr r0, player_state_bit_stride_a        @ 0803b864 0648
     adds r2,r4,#0x0    @ 0803b866 221c
     muls r2,r0    @ 0803b868 4243
     movs r0,#0x8e    @ 0803b86a 8e20
@@ -12409,15 +12409,15 @@ set_player_state_bit:
     orrs r0,r1    @ 0803b876 0843
     b LAB_0803b89e                           @ 0803b878 11e0
     .zero  0x2
-PTR_gP1LifePoints_0803b87c:
+player_state_bit_lp_a:
     .word  gP1LifePoints                  @ 0803b87c e0c40102
-DAT_0803b880:
-    .word  0x00000868                     @ 0803b880 68080000
+player_state_bit_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b880 68080000
 LAB_0803b884:
-    ldr r3, PTR_gP1LifePoints_0803b8a8       @ 0803b884 084b
+    ldr r3, player_state_bit_lp_b            @ 0803b884 084b
     movs r1,#0x1    @ 0803b886 0121
     ands r4,r1    @ 0803b888 0c40
-    ldr r0, DAT_0803b8ac                     @ 0803b88a 0848
+    ldr r0, player_state_bit_stride_b        @ 0803b88a 0848
     adds r2,r4,#0x0    @ 0803b88c 221c
     muls r2,r0    @ 0803b88e 4243
     movs r0,#0x8e    @ 0803b890 8e20
@@ -12433,10 +12433,10 @@ LAB_0803b89e:
     pop {r0}                                 @ 0803b8a2 01bc
     bx r0                                    @ 0803b8a4 0047
     .zero  0x2
-PTR_gP1LifePoints_0803b8a8:
+player_state_bit_lp_b:
     .word  gP1LifePoints                  @ 0803b8a8 e0c40102
-DAT_0803b8ac:
-    .word  0x00000868                     @ 0803b8ac 68080000
+player_state_bit_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b8ac 68080000
 
 @ Performs a single bit set or clear on the slot flags word for a given player and slot. r0=u32 player_side [0..1]; r1=u32 slot_idx [0..9]; r2=u32 bit_pos [0..31]; r3=u32 set_flag (0=clear BIC, nonzero=set OR). Target address: gP1LifePoints + player_side*0x868 + slot_idx*0x14 + 0x40. Reads flags word, applies (1<<bit_pos) OR or BIC, writes back. indeg=11; called by duel_field and card_data callers. Returns void. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, slot_entry_size=0x14, flags_offset=0x40.
 write_field_slot_bit_by_player:
@@ -12446,13 +12446,13 @@ write_field_slot_bit_by_player:
     adds r5,r2,#0x0    @ 0803b8b6 151c
     cmp r3,#0x0                              @ 0803b8b8 002b
     beq LAB_0803b8e4                         @ 0803b8ba 13d0
-    ldr r3, PTR_gP1LifePoints_0803b8dc       @ 0803b8bc 074b
+    ldr r3, field_slot_bit_lp_a              @ 0803b8bc 074b
     lsls r1,r0,#0x2    @ 0803b8be 8100
     adds r1,r1,r0    @ 0803b8c0 0918
     lsls r1,r1,#0x2    @ 0803b8c2 8900
     movs r2,#0x1    @ 0803b8c4 0122
     ands r4,r2    @ 0803b8c6 1440
-    ldr r0, DAT_0803b8e0                     @ 0803b8c8 0548
+    ldr r0, field_slot_bit_stride_a          @ 0803b8c8 0548
     muls r0,r4    @ 0803b8ca 6043
     adds r1,r1,r0    @ 0803b8cc 0918
     adds r3,#0x40    @ 0803b8ce 4033
@@ -12462,18 +12462,18 @@ write_field_slot_bit_by_player:
     orrs r0,r2    @ 0803b8d6 1043
     b LAB_0803b900                           @ 0803b8d8 12e0
     .zero  0x2
-PTR_gP1LifePoints_0803b8dc:
+field_slot_bit_lp_a:
     .word  gP1LifePoints                  @ 0803b8dc e0c40102
-DAT_0803b8e0:
-    .word  0x00000868                     @ 0803b8e0 68080000
+field_slot_bit_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b8e0 68080000
 LAB_0803b8e4:
-    ldr r3, PTR_gP1LifePoints_0803b908       @ 0803b8e4 084b
+    ldr r3, field_slot_bit_lp_b              @ 0803b8e4 084b
     lsls r1,r0,#0x2    @ 0803b8e6 8100
     adds r1,r1,r0    @ 0803b8e8 0918
     lsls r1,r1,#0x2    @ 0803b8ea 8900
     movs r2,#0x1    @ 0803b8ec 0122
     ands r4,r2    @ 0803b8ee 1440
-    ldr r0, DAT_0803b90c                     @ 0803b8f0 0648
+    ldr r0, field_slot_bit_stride_b          @ 0803b8f0 0648
     muls r0,r4    @ 0803b8f2 6043
     adds r1,r1,r0    @ 0803b8f4 0918
     adds r3,#0x40    @ 0803b8f6 4033
@@ -12486,12 +12486,12 @@ LAB_0803b900:
     pop {r4,r5}                              @ 0803b902 30bc
     pop {r0}                                 @ 0803b904 01bc
     bx r0                                    @ 0803b906 0047
-PTR_gP1LifePoints_0803b908:
+field_slot_bit_lp_b:
     .word  gP1LifePoints                  @ 0803b908 e0c40102
-DAT_0803b90c:
-    .word  0x00000868                     @ 0803b90c 68080000
+field_slot_bit_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b90c 68080000
 
-@ Checks whether current player LP exceeds threshold set by copy count of card 0x132c on field. First calls check_card_targeted_by_spell_zone_effect(card_id, -1): if blocked return 0. Then count_field_copies_of_card(0x132c) -> copy_count; threshold = copy_count * 132 (via lsls/subs/lsls/adds/lsls shift sequence); reads gP1LifePoints + player_side*0x868 for current LP; LP>threshold -> return 1. r0=u16 card_id [0..0x1fff]; r1=u32 player_side [0..1]. Returns u32 bool (1=LP exceeds threshold and not blocked, 0=blocked or LP insufficient). indeg=4. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, copy_card=0x132c, scale=132.
+@ Checks whether current player LP exceeds threshold set by copy count of card 0x132c on field. First calls check_card_targeted_by_spell_zone_effect(card_id, -1): if blocked return 0. Then count_field_copies_of_card(0x132c) -> copy_count; threshold = copy_count * 132 (via lsls/subs/lsls/adds/lsls shift sequence); reads gP1LifePoints + player_side*0x868 for current LP; LP>threshold -> return 1. r0=u16 card_id [0..0x1fff]; r1=u32 player_side [0..1]. Returns u32 bool (1=LP exceeds threshold and not blocked, 0=blocked or LP insufficient). indeg=4. Constants: gP1LifePoints=0x0201c4e0, player_stride=0x868, copy_card=0x132c, scale=500.
 check_lp_exceeds_spell_copy_threshold:
     push {r4,r5,lr}                          @ 0803b910 30b5
     adds r4,r0,#0x0    @ 0803b912 041c
@@ -12504,13 +12504,13 @@ check_lp_exceeds_spell_copy_threshold:
     movs r0,#0x0    @ 0803b922 0020
     b LAB_0803b94e                           @ 0803b924 13e0
 LAB_0803b926:
-    ldr r0, DAT_0803b954                     @ 0803b926 0b48
+    ldr r0, lp_spell_threshold_chain_energy_cid @ 0803b926 0b48
     bl count_field_copies_of_card            @ 0803b928 f6f738ff
     movs r5,#0x0    @ 0803b92c 0025
-    ldr r3, PTR_gP1LifePoints_0803b958       @ 0803b92e 0a4b
+    ldr r3, lp_spell_threshold_lp_a          @ 0803b92e 0a4b
     movs r1,#0x1    @ 0803b930 0121
     ands r1,r4    @ 0803b932 2140
-    ldr r2, DAT_0803b95c                     @ 0803b934 094a
+    ldr r2, lp_spell_threshold_stride_a      @ 0803b934 094a
     muls r2,r1    @ 0803b936 4a43
     adds r2,r2,r3    @ 0803b938 d218
     lsls r1,r0,#0x5    @ 0803b93a 4101
@@ -12528,17 +12528,17 @@ LAB_0803b94e:
     pop {r4,r5}                              @ 0803b94e 30bc
     pop {r1}                                 @ 0803b950 02bc
     bx r1                                    @ 0803b952 0847
-DAT_0803b954:
-    .word  0x0000132c                     @ 0803b954 2c130000
-PTR_gP1LifePoints_0803b958:
+lp_spell_threshold_chain_energy_cid:
+    .word  CHAIN_ENERGY_CID               @ 0803b954 2c130000  Chain Energy (pw=79323590; card_0723 slot=0x132C); LP-threshold gate
+lp_spell_threshold_lp_a:
     .word  gP1LifePoints                  @ 0803b958 e0c40102
-DAT_0803b95c:
-    .word  0x00000868                     @ 0803b95c 68080000
+lp_spell_threshold_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803b95c 68080000
 
 @ Returns 1 if field spell zone has no effect node for card 0x1679 (zone type 0xb), 0 if blocked. Calls find_effect_node_in_zone(player_id, zone_type=0xb, card_id=0x1679, mode=2); inverts result: 0=node present (return 0), non-0=absent (return 1). Leaf function. r0=u8 player_id [0..1]. Returns u32 bool (1=no node/allowed, 0=node exists/blocked). Constants: zone_type=0xb, card_id=0x1679, search_mode=2.
 check_zone_has_no_field_spell_node:
     push {lr}                                @ 0803b960 00b5
-    ldr r2, DAT_0803b974                     @ 0803b962 044a
+    ldr r2, zone_no_field_spell_pharaoh_cid  @ 0803b962 044a
     movs r1,#0xb    @ 0803b964 0b21
     movs r3,#0x2    @ 0803b966 0223
     bl find_effect_node_in_zone              @ 0803b968 f4f7faf9
@@ -12546,8 +12546,8 @@ check_zone_has_no_field_spell_node:
     bne LAB_0803b978                         @ 0803b96e 03d1
     movs r0,#0x1    @ 0803b970 0120
     b LAB_0803b97a                           @ 0803b972 02e0
-DAT_0803b974:
-    .word  0x00001679                     @ 0803b974 79160000
+zone_no_field_spell_pharaoh_cid:
+    .word  JUDGEMENT_OF_PHARAOH_CID       @ 0803b974 79160000  Judgement of Pharaoh (pw=55948544; card_1350 slot=0x1679); zone-b effect node check
 LAB_0803b978:
     movs r0,#0x0    @ 0803b978 0020
 LAB_0803b97a:
@@ -12559,7 +12559,7 @@ LAB_0803b97a:
 check_field_spell_group_placeable:
     push {r4,lr}                             @ 0803b980 10b5
     adds r4,r0,#0x0    @ 0803b982 041c
-    ldr r0, DAT_0803b9d8                     @ 0803b984 1448
+    ldr r0, field_spell_group_intervention_cid @ 0803b984 1448
     bl count_field_copies_of_card            @ 0803b986 f6f709ff
     cmp r0,#0x0                              @ 0803b98a 0028
     beq LAB_0803b998                         @ 0803b98c 04d0
@@ -12568,26 +12568,26 @@ check_field_spell_group_placeable:
     cmp r0,#0x0                              @ 0803b994 0028
     beq LAB_0803b9ec                         @ 0803b996 29d0
 LAB_0803b998:
-    ldr r2, DAT_0803b9dc                     @ 0803b998 104a
+    ldr r2, field_spell_group_non_aggression_cid_a @ 0803b998 104a
     adds r0,r4,#0x0    @ 0803b99a 201c
     movs r1,#0xb    @ 0803b99c 0b21
     bl check_slot_has_node_by_card_id        @ 0803b99e f4f729fa
     cmp r0,#0x0                              @ 0803b9a2 0028
     bne LAB_0803b9ec                         @ 0803b9a4 22d1
-    ldr r2, DAT_0803b9e0                     @ 0803b9a6 0e4a
+    ldr r2, field_spell_group_pharaoh_cid_b  @ 0803b9a6 0e4a
     adds r0,r4,#0x0    @ 0803b9a8 201c
     movs r1,#0xb    @ 0803b9aa 0b21
     movs r3,#0x1    @ 0803b9ac 0123
     bl find_effect_node_in_zone              @ 0803b9ae f4f7d7f9
     cmp r0,#0x0                              @ 0803b9b2 0028
     bne LAB_0803b9ec                         @ 0803b9b4 1ad1
-    ldr r2, DAT_0803b9e4                     @ 0803b9b6 0b4a
+    ldr r2, field_spell_group_lava_golem_cid @ 0803b9b6 0b4a
     adds r0,r4,#0x0    @ 0803b9b8 201c
     movs r1,#0xb    @ 0803b9ba 0b21
     bl check_value_in_slot_chain             @ 0803b9bc f4f768f9
     cmp r0,#0x0                              @ 0803b9c0 0028
     bne LAB_0803b9ec                         @ 0803b9c2 13d1
-    ldr r1, DAT_0803b9e8                     @ 0803b9c4 0849
+    ldr r1, field_spell_group_boss_rush_cid  @ 0803b9c4 0849
     movs r2,#0x1    @ 0803b9c6 0122
     rsbs r2,r2,#0    @ 0803b9c8 5242
     adds r0,r4,#0x0    @ 0803b9ca 201c
@@ -12596,16 +12596,16 @@ LAB_0803b998:
     bne LAB_0803b9ec                         @ 0803b9d2 0bd1
     movs r0,#0x1    @ 0803b9d4 0120
     b LAB_0803b9ee                           @ 0803b9d6 0ae0
-DAT_0803b9d8:
-    .word  0x0000135d                     @ 0803b9d8 5d130000
-DAT_0803b9dc:
-    .word  0x000015ad                     @ 0803b9dc ad150000
-DAT_0803b9e0:
-    .word  0x00001679                     @ 0803b9e0 79160000
-DAT_0803b9e4:
-    .word  0x00001578                     @ 0803b9e4 78150000
-DAT_0803b9e8:
-    .word  0x00001972                     @ 0803b9e8 72190000
+field_spell_group_intervention_cid:
+    .word  LIGHT_OF_INTERVENTION_CID      @ 0803b9d8 5d130000  Light of Intervention (pw=62867251; card_0765 slot=0x135D); field-spell group gate
+field_spell_group_non_aggression_cid_a:
+    .word  NON_AGGRESSION_AREA_CID        @ 0803b9dc ad150000  Non Aggression Area (pw=76848240; card_1198 slot=0x15AD); zone-b node block check
+field_spell_group_pharaoh_cid_b:
+    .word  JUDGEMENT_OF_PHARAOH_CID       @ 0803b9e0 79160000  Judgement of Pharaoh; field-spell group placement gate
+field_spell_group_lava_golem_cid:
+    .word  LAVA_GOLEM_CID                 @ 0803b9e4 78150000  Lava Golem (pw=00102380; card_1152 slot=0x1578); slot-chain value check
+field_spell_group_boss_rush_cid:
+    .word  BOSS_RUSH_CID                  @ 0803b9e8 72190000  Boss Rush (pw=66947414; card_1983 slot=0x1972); effect zone count gate
 LAB_0803b9ec:
     movs r0,#0x0    @ 0803b9ec 0020
 LAB_0803b9ee:
@@ -12617,10 +12617,10 @@ LAB_0803b9ee:
 check_field_spell_card_placeable_strict:
     push {r4,r5,lr}                          @ 0803b9f4 30b5
     adds r4,r0,#0x0    @ 0803b9f6 041c
-    ldr r2, PTR_gP1LifePoints_0803ba70       @ 0803b9f8 1d4a
+    ldr r2, strict_placeable_lp_a            @ 0803b9f8 1d4a
     movs r3,#0x1    @ 0803b9fa 0123
     ands r0,r3    @ 0803b9fc 1840
-    ldr r1, DAT_0803ba74                     @ 0803b9fe 1d49
+    ldr r1, strict_placeable_stride_a        @ 0803b9fe 1d49
     muls r0,r1    @ 0803ba00 4843
     movs r1,#0x8e    @ 0803ba02 8e21
     lsls r1,r1,#0x1    @ 0803ba04 4900
@@ -12631,7 +12631,7 @@ check_field_spell_card_placeable_strict:
     ands r0,r3    @ 0803ba0e 1840
     cmp r0,#0x0                              @ 0803ba10 0028
     bne LAB_0803ba90                         @ 0803ba12 3dd1
-    ldr r1, DAT_0803ba78                     @ 0803ba14 1849
+    ldr r1, field_spell_strict_jam_breeding_cid @ 0803ba14 1849
     movs r5,#0x1    @ 0803ba16 0125
     rsbs r5,r5,#0    @ 0803ba18 6d42
     adds r0,r4,#0x0    @ 0803ba1a 201c
@@ -12639,30 +12639,30 @@ check_field_spell_card_placeable_strict:
     bl count_available_effect_zones          @ 0803ba1e f6f719fe
     cmp r0,#0x0                              @ 0803ba22 0028
     bne LAB_0803ba90                         @ 0803ba24 34d1
-    ldr r0, DAT_0803ba7c                     @ 0803ba26 1548
+    ldr r0, field_spell_strict_last_warrior_cid @ 0803ba26 1548
     bl count_field_copies_of_card            @ 0803ba28 f6f7b8fe
     cmp r0,#0x0                              @ 0803ba2c 0028
     bne LAB_0803ba90                         @ 0803ba2e 2fd1
-    ldr r2, DAT_0803ba80                     @ 0803ba30 134a
+    ldr r2, field_spell_strict_non_aggression_cid @ 0803ba30 134a
     adds r0,r4,#0x0    @ 0803ba32 201c
     movs r1,#0xb    @ 0803ba34 0b21
     bl check_slot_has_node_by_card_id        @ 0803ba36 f4f7ddf9
     cmp r0,#0x0                              @ 0803ba3a 0028
     bne LAB_0803ba90                         @ 0803ba3c 28d1
-    ldr r2, DAT_0803ba84                     @ 0803ba3e 114a
+    ldr r2, field_spell_strict_pharaoh_cid   @ 0803ba3e 114a
     adds r0,r4,#0x0    @ 0803ba40 201c
     movs r1,#0xb    @ 0803ba42 0b21
     movs r3,#0x1    @ 0803ba44 0123
     bl find_effect_node_in_zone              @ 0803ba46 f4f78bf9
     cmp r0,#0x0                              @ 0803ba4a 0028
     bne LAB_0803ba90                         @ 0803ba4c 20d1
-    ldr r2, DAT_0803ba88                     @ 0803ba4e 0e4a
+    ldr r2, field_spell_strict_lava_golem_cid @ 0803ba4e 0e4a
     adds r0,r4,#0x0    @ 0803ba50 201c
     movs r1,#0xb    @ 0803ba52 0b21
     bl check_value_in_slot_chain             @ 0803ba54 f4f71cf9
     cmp r0,#0x0                              @ 0803ba58 0028
     bne LAB_0803ba90                         @ 0803ba5a 19d1
-    ldr r1, DAT_0803ba8c                     @ 0803ba5c 0b49
+    ldr r1, field_spell_strict_boss_rush_cid @ 0803ba5c 0b49
     adds r0,r4,#0x0    @ 0803ba5e 201c
     adds r2,r5,#0x0    @ 0803ba60 2a1c
     bl count_available_effect_zones          @ 0803ba62 f6f7f7fd
@@ -12671,22 +12671,22 @@ check_field_spell_card_placeable_strict:
     movs r0,#0x1    @ 0803ba6a 0120
     b LAB_0803ba92                           @ 0803ba6c 11e0
     .zero  0x2
-PTR_gP1LifePoints_0803ba70:
+strict_placeable_lp_a:
     .word  gP1LifePoints                  @ 0803ba70 e0c40102
-DAT_0803ba74:
-    .word  0x00000868                     @ 0803ba74 68080000
-DAT_0803ba78:
-    .word  0x000013ff                     @ 0803ba78 ff130000
-DAT_0803ba7c:
-    .word  0x000012b1                     @ 0803ba7c b1120000
-DAT_0803ba80:
-    .word  0x000015ad                     @ 0803ba80 ad150000
-DAT_0803ba84:
-    .word  0x00001679                     @ 0803ba84 79160000
-DAT_0803ba88:
-    .word  0x00001578                     @ 0803ba88 78150000
-DAT_0803ba8c:
-    .word  0x00001972                     @ 0803ba8c 72190000
+strict_placeable_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803ba74 68080000
+field_spell_strict_jam_breeding_cid:
+    .word  JAM_BREEDING_MACHINE_CID       @ 0803ba78 ff130000  Jam Breeding Machine (pw=21770260; card_0874 slot=0x13FF); effect zone count gate
+field_spell_strict_last_warrior_cid:
+    .word  LAST_WARRIOR_FROM_ANOTHER_PLANET_CID @ 0803ba7c b1120000  The Last Warrior from Another Planet (pw=86099788; card_0634 slot=0x12B1); copy presence check
+field_spell_strict_non_aggression_cid:
+    .word  NON_AGGRESSION_AREA_CID        @ 0803ba80 ad150000  Non Aggression Area; strict placement gate
+field_spell_strict_pharaoh_cid:
+    .word  JUDGEMENT_OF_PHARAOH_CID       @ 0803ba84 79160000  Judgement of Pharaoh; strict placement gate
+field_spell_strict_lava_golem_cid:
+    .word  LAVA_GOLEM_CID                 @ 0803ba88 78150000  Lava Golem; strict placement block
+field_spell_strict_boss_rush_cid:
+    .word  BOSS_RUSH_CID                  @ 0803ba8c 72190000  Boss Rush; strict placement block
 LAB_0803ba90:
     movs r0,#0x0    @ 0803ba90 0020
 LAB_0803ba92:
@@ -12698,10 +12698,10 @@ LAB_0803ba92:
 check_field_spell_last_warrior_placeable:
     push {r4,lr}                             @ 0803ba98 10b5
     adds r4,r0,#0x0    @ 0803ba9a 041c
-    ldr r2, PTR_gP1LifePoints_0803bae8       @ 0803ba9c 124a
+    ldr r2, last_warrior_lp_a                @ 0803ba9c 124a
     movs r3,#0x1    @ 0803ba9e 0123
     ands r0,r3    @ 0803baa0 1840
-    ldr r1, DAT_0803baec                     @ 0803baa2 1249
+    ldr r1, last_warrior_stride_a            @ 0803baa2 1249
     muls r0,r1    @ 0803baa4 4843
     movs r1,#0x8e    @ 0803baa6 8e21
     lsls r1,r1,#0x1    @ 0803baa8 4900
@@ -12712,18 +12712,18 @@ check_field_spell_last_warrior_placeable:
     ands r0,r3    @ 0803bab2 1840
     cmp r0,#0x0                              @ 0803bab4 0028
     bne LAB_0803bafc                         @ 0803bab6 21d1
-    ldr r1, DAT_0803baf0                     @ 0803bab8 0d49
+    ldr r1, last_warrior_jam_breeding_cid    @ 0803bab8 0d49
     movs r2,#0x1    @ 0803baba 0122
     rsbs r2,r2,#0    @ 0803babc 5242
     adds r0,r4,#0x0    @ 0803babe 201c
     bl count_available_effect_zones          @ 0803bac0 f6f7c8fd
     cmp r0,#0x0                              @ 0803bac4 0028
     bne LAB_0803bafc                         @ 0803bac6 19d1
-    ldr r0, DAT_0803baf4                     @ 0803bac8 0a48
+    ldr r0, last_warrior_self_cid            @ 0803bac8 0a48
     bl count_field_copies_of_card            @ 0803baca f6f767fe
     cmp r0,#0x0                              @ 0803bace 0028
     bne LAB_0803bafc                         @ 0803bad0 14d1
-    ldr r2, DAT_0803baf8                     @ 0803bad2 094a
+    ldr r2, last_warrior_pharaoh_cid         @ 0803bad2 094a
     adds r0,r4,#0x0    @ 0803bad4 201c
     movs r1,#0xb    @ 0803bad6 0b21
     movs r3,#0x1    @ 0803bad8 0123
@@ -12733,16 +12733,16 @@ check_field_spell_last_warrior_placeable:
     movs r0,#0x1    @ 0803bae2 0120
     b LAB_0803bafe                           @ 0803bae4 0be0
     .zero  0x2
-PTR_gP1LifePoints_0803bae8:
+last_warrior_lp_a:
     .word  gP1LifePoints                  @ 0803bae8 e0c40102
-DAT_0803baec:
-    .word  0x00000868                     @ 0803baec 68080000
-DAT_0803baf0:
-    .word  0x000013ff                     @ 0803baf0 ff130000
-DAT_0803baf4:
-    .word  0x000012b1                     @ 0803baf4 b1120000
-DAT_0803baf8:
-    .word  0x00001679                     @ 0803baf8 79160000
+last_warrior_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803baec 68080000
+last_warrior_jam_breeding_cid:
+    .word  JAM_BREEDING_MACHINE_CID       @ 0803baf0 ff130000  Jam Breeding Machine; last warrior gate
+last_warrior_self_cid:
+    .word  LAST_WARRIOR_FROM_ANOTHER_PLANET_CID @ 0803baf4 b1120000  Last Warrior from Another Planet; self-check copy count
+last_warrior_pharaoh_cid:
+    .word  JUDGEMENT_OF_PHARAOH_CID       @ 0803baf8 79160000  Judgement of Pharaoh; last warrior gate
 LAB_0803bafc:
     movs r0,#0x0    @ 0803bafc 0020
 LAB_0803bafe:
@@ -12754,10 +12754,10 @@ LAB_0803bafe:
 check_field_spell_neo_daedalus_placeable:
     push {r4,lr}                             @ 0803bb04 10b5
     adds r4,r0,#0x0    @ 0803bb06 041c
-    ldr r2, PTR_gP1LifePoints_0803bb5c       @ 0803bb08 144a
+    ldr r2, neo_daedalus_lp_a                @ 0803bb08 144a
     movs r3,#0x1    @ 0803bb0a 0123
     ands r0,r3    @ 0803bb0c 1840
-    ldr r1, DAT_0803bb60                     @ 0803bb0e 1449
+    ldr r1, neo_daedalus_stride_a            @ 0803bb0e 1449
     muls r0,r1    @ 0803bb10 4843
     movs r1,#0x8e    @ 0803bb12 8e21
     lsls r1,r1,#0x1    @ 0803bb14 4900
@@ -12768,21 +12768,21 @@ check_field_spell_neo_daedalus_placeable:
     ands r0,r3    @ 0803bb1e 1840
     cmp r0,#0x0                              @ 0803bb20 0028
     bne LAB_0803bb74                         @ 0803bb22 27d1
-    ldr r0, DAT_0803bb64                     @ 0803bb24 0f48
+    ldr r0, neo_daedalus_jowgen_cid          @ 0803bb24 0f48
     bl count_field_copies_of_card            @ 0803bb26 f6f739fe
     cmp r0,#0x0                              @ 0803bb2a 0028
     bne LAB_0803bb74                         @ 0803bb2c 22d1
-    ldr r0, DAT_0803bb68                     @ 0803bb2e 0e48
+    ldr r0, neo_daedalus_last_warrior_cid    @ 0803bb2e 0e48
     bl count_field_copies_of_card            @ 0803bb30 f6f734fe
     cmp r0,#0x0                              @ 0803bb34 0028
     bne LAB_0803bb74                         @ 0803bb36 1dd1
-    ldr r2, DAT_0803bb6c                     @ 0803bb38 0c4a
+    ldr r2, neo_daedalus_non_aggression_cid  @ 0803bb38 0c4a
     adds r0,r4,#0x0    @ 0803bb3a 201c
     movs r1,#0xb    @ 0803bb3c 0b21
     bl check_slot_has_node_by_card_id        @ 0803bb3e f4f759f9
     cmp r0,#0x0                              @ 0803bb42 0028
     bne LAB_0803bb74                         @ 0803bb44 16d1
-    ldr r2, DAT_0803bb70                     @ 0803bb46 0a4a
+    ldr r2, neo_daedalus_pharaoh_cid         @ 0803bb46 0a4a
     adds r0,r4,#0x0    @ 0803bb48 201c
     movs r1,#0xb    @ 0803bb4a 0b21
     movs r3,#0x1    @ 0803bb4c 0123
@@ -12792,18 +12792,18 @@ check_field_spell_neo_daedalus_placeable:
     movs r0,#0x1    @ 0803bb56 0120
     b LAB_0803bb76                           @ 0803bb58 0de0
     .zero  0x2
-PTR_gP1LifePoints_0803bb5c:
+neo_daedalus_lp_a:
     .word  gP1LifePoints                  @ 0803bb5c e0c40102
-DAT_0803bb60:
-    .word  0x00000868                     @ 0803bb60 68080000
-DAT_0803bb64:
-    .word  0x0000147f                     @ 0803bb64 7f140000
-DAT_0803bb68:
-    .word  0x000012b1                     @ 0803bb68 b1120000
-DAT_0803bb6c:
-    .word  0x000015ad                     @ 0803bb6c ad150000
-DAT_0803bb70:
-    .word  0x00001679                     @ 0803bb70 79160000
+neo_daedalus_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803bb60 68080000
+neo_daedalus_jowgen_cid:
+    .word  JOWGEN_THE_SPIRITUALIST_CID    @ 0803bb64 7f140000  Jowgen the Spiritualist (pw=41855169; card_0957 slot=0x147F); Neo Daedalus placement gate
+neo_daedalus_last_warrior_cid:
+    .word  LAST_WARRIOR_FROM_ANOTHER_PLANET_CID @ 0803bb68 b1120000  Last Warrior from Another Planet; neo daedalus gate
+neo_daedalus_non_aggression_cid:
+    .word  NON_AGGRESSION_AREA_CID        @ 0803bb6c ad150000  Non Aggression Area; neo daedalus gate
+neo_daedalus_pharaoh_cid:
+    .word  JUDGEMENT_OF_PHARAOH_CID       @ 0803bb70 79160000  Judgement of Pharaoh; neo daedalus gate
 LAB_0803bb74:
     movs r0,#0x0    @ 0803bb74 0020
 LAB_0803bb76:
@@ -12815,7 +12815,7 @@ LAB_0803bb76:
 check_field_spell_neo_daedalus_group_placeable:
     push {r4,lr}                             @ 0803bb7c 10b5
     adds r4,r0,#0x0    @ 0803bb7e 041c
-    ldr r1, DAT_0803bb98                     @ 0803bb80 0549
+    ldr r1, neo_daedalus_group_jam_breeding_cid @ 0803bb80 0549
     movs r2,#0x1    @ 0803bb82 0122
     rsbs r2,r2,#0    @ 0803bb84 5242
     bl count_available_effect_zones          @ 0803bb86 f6f765fd
@@ -12825,8 +12825,8 @@ check_field_spell_neo_daedalus_group_placeable:
     bl check_field_spell_neo_daedalus_placeable @ 0803bb90 fff7b8ff
     b LAB_0803bb9e                           @ 0803bb94 03e0
     .zero  0x2
-DAT_0803bb98:
-    .word  0x000013ff                     @ 0803bb98 ff130000
+neo_daedalus_group_jam_breeding_cid:
+    .word  JAM_BREEDING_MACHINE_CID       @ 0803bb98 ff130000  Jam Breeding Machine; neo daedalus group gate
 LAB_0803bb9c:
     movs r0,#0x0    @ 0803bb9c 0020
 LAB_0803bb9e:

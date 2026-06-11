@@ -394,3 +394,14 @@
 .equ SCROLL_OF_BEWITCHMENT_CID,    0x0000145b  @ Scroll of Bewitchment (pw=10352095; card_0927 slot=0x145B); resolve_slot_chain_best_target
 .equ DNA_TRANSPLANT_CID,           0x0000171f  @ DNA Transplant (pw=56769674; card_1495 slot=0x171F); base value for shifted sentinel
 .equ DNA_TRANSPLANT_CID_SHIFTED,   0xb8f80000  @ DNA_TRANSPLANT_CID(0x171f)<<19; lsls r0,#0x13 then cmp sentinel; resolve_slot_chain_best_target
+
+@ --- file 03 Seg-6 additions (get_zone_slot_entity_ref_by_type .. check_field_spell_neo_daedalus_group_placeable) ---
+.equ CHAIN_ENERGY_CID,               0x0000132c  @ Chain Energy (pw=79323590; card_0723 slot=0x132C); LP-threshold gate in check_lp_exceeds_spell_copy_threshold; 1 slot
+.equ JUDGEMENT_OF_PHARAOH_CID,       0x00001679  @ Judgement of Pharaoh (pw=55948544; card_1350 slot=0x1679); zone effect node guard (x5 refs); field-spell placement gates
+.equ LIGHT_OF_INTERVENTION_CID,      0x0000135d  @ Light of Intervention (pw=62867251; card_0765 slot=0x135D); field-spell group gate in check_field_spell_group_placeable; 1 slot
+.equ NON_AGGRESSION_AREA_CID,        0x000015ad  @ Non Aggression Area (pw=76848240; card_1198 slot=0x15AD); zone node block check (x3 refs); placement gates
+.equ LAVA_GOLEM_CID,                 0x00001578  @ Lava Golem (pw=00102380; card_1152 slot=0x1578); field-spell placement block (x2 refs)
+.equ BOSS_RUSH_CID,                  0x00001972  @ Boss Rush (pw=66947414; card_1983 slot=0x1972); effect zone count gate (x2 refs)
+.equ JAM_BREEDING_MACHINE_CID,       0x000013ff  @ Jam Breeding Machine (pw=21770260; card_0874 slot=0x13FF); effect zone count gate (x3 refs)
+.equ LAST_WARRIOR_FROM_ANOTHER_PLANET_CID, 0x000012b1  @ The Last Warrior from Another Planet (pw=86099788; card_0634 slot=0x12B1); field-spell Last Warrior gate (x3 refs)
+.equ JOWGEN_THE_SPIRITUALIST_CID,    0x0000147f  @ Jowgen the Spiritualist (pw=41855169; card_0957 slot=0x147F); Neo Daedalus placement gate; 1 slot
