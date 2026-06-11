@@ -85,7 +85,7 @@
 | 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
 | 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | bbcbdd5 |
 | 8 | 0x3c774..0x3d91c | 13 | 136 | — | ✅ | b2c3ddd |
-| 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ✅ | (pending commit) |
+| 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ✅ | 6ba238d |
 | 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -474,7 +474,7 @@ All 4 slots manually restored +1 after re-export.
 **Non-ASCII**: asm lines 16728..19810 non-ASCII=0
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: 6ba238d
 
 ---
 
