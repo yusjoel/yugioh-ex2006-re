@@ -416,3 +416,11 @@
 .equ eval_gap_cid_0fa6,             0x00000fa6  @ gap slot (NOT in card-stats.s; between slot 0x0fa5 and card_0001=BEWD); setup_equip_chain_for_slot card_type lower bound; low confidence
 .equ A_DEAL_WITH_DARK_RULER_CID,    0x0000165a  @ A Deal with Dark Ruler (pw=06850209; card_1330 slot=0x165A); tick_normal_summon_zone_state link_equip_node_to_chain chain_type arg
 .equ eval_gap_cid_11ed,             0x000011ed  @ gap slot (NOT in card-stats.s; between 0x11eb=Takuhee and 0x11ee=Binding Chain); finalize_equip_chain_removal_state sentinel; low confidence
+
+@ =============================================================================
+@ file 03 Seg-9 additions: flip-summon / zone-slot display seq card IDs
+@ =============================================================================
+.equ UNHAPPY_GIRL_CID_SHIFTED,  0xba180000  @ UNHAPPY_GIRL_CID(0x1743)<<19; lsls r0,r0,#0x13; cmp sentinel in tick_flip_summon_state; 1 slot
+.equ BACKFIRE_CID,              0x00001762  @ Backfire (pw=82705573; card_1547 slot=0x1762); tick_zone_card_place_with_slot_resolve_seq + tick_equip_node_chain_link_display_seq; 2 slots
+.equ SOUL_ABSORPTION_CID,       0x000016da  @ Soul Absorption (pw=68073522; card_1435 slot=0x16DA); same 2 funcs; 2 slots
+.equ HUMAN_WAVE_TACTICS_CID,    0x000017b2  @ Human-Wave Tactics (pw=30353551; card_1606 slot=0x17B2); tick_equip_node_chain_link_display_seq; 1 slot

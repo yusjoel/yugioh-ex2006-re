@@ -85,7 +85,7 @@
 | 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
 | 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | bbcbdd5 |
 | 8 | 0x3c774..0x3d91c | 13 | 136 | — | ✅ | b2c3ddd |
-| 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
+| 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ✅ | (pending commit) |
 | 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -428,6 +428,53 @@ All 4 slots manually restored +1 after re-export.
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: b2c3ddd
+
+### 4.09 Seg-9 完成记录 [0x0803d91c..0x0803efcc)
+
+**函数列表 (13 fn)**:
+tick_zone_slot_transition_display_seq / tick_flip_summon_state /
+tick_zone_card_remove_display_seq / tick_equip_chain_node_link_seq /
+tick_zone_slot_ref_clear_display_seq / tick_zone_chain_node_ref_update_seq /
+commit_set_card_to_field_slot / write_zone_slot_display_args_by_state /
+tick_card_effect_index_display_seq / dispatch_op7_card_display /
+tick_hand_zone_insert_display_seq / tick_zone_card_place_with_slot_resolve_seq /
+tick_equip_node_chain_link_display_seq
+
+**符号化统计**: EQ=70 (65 reuse + 5 new) / REF=76 / RENAME=2 / FUNC_RENAME=0 / PLATE=10 / total=148 / carve=0 / disasm=0 / §5.1=0
+
+**新建 constants**:
+- `card_info.inc` +4: UNHAPPY_GIRL_CID_SHIFTED=0xba180000 / BACKFIRE_CID=0x1762 / SOUL_ABSORPTION_CID=0x16da / HUMAN_WAVE_TACTICS_CID=0x17b2
+- `duel_field.inc` +1: DISPLAY_CTX_SLOT_DATA_MASK=0x7fff
+
+**PLATE=10 breakdown (stale FUN_ substring replacements)**:
+1. tick_zone_slot_transition_display_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+2. tick_zone_card_remove_display_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+3. tick_equip_chain_node_link_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+4. tick_zone_slot_ref_clear_display_seq (x2): FUN_0803be4c -> dispatch_duel_event_display_seq; FUN_0802f0d8 -> clear_zone_slot_card_ref_bits
+5. tick_zone_chain_node_ref_update_seq (x2): FUN_0803be4c -> dispatch_duel_event_display_seq; FUN_0802ec3c -> replace_chain_node_ref_by_zone_match
+6. write_zone_slot_display_args_by_state: FUN_0803be4c -> dispatch_duel_event_display_seq
+7. tick_card_effect_index_display_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+8. tick_hand_zone_insert_display_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+9. tick_zone_card_place_with_slot_resolve_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+10. tick_equip_node_chain_link_display_seq: FUN_0803be4c -> dispatch_duel_event_display_seq
+
+**REF=76 breakdown**: gDuelDisplaySeqState=34 / gDuelFieldSlots=17 / gDuelChainStepCounter=2 / gDuelChainDescBase=7 / gDuelCardCtxBase=6 / gEquipChainSlotRefs=2 / gDuelEffectChainSlots=1 / gDuelFieldSlotState=2 / gP1LifePoints(PTR_)=5
+
+**fn-ptr +1 踩坑 (已知, 每次 re-export 后手补)**:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (Seg-5 known)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known)
+All 4 slots manually restored +1 after re-export.
+
+**N1 修正**: PLAYER_BLOCK_STRIDE (18 slots) + P1LP_BLOCK2_OFF_1CE8 (2 slots) 实际在 ewram.inc; SLOT_CARD_SET_CODE_MASK (1 slot) 实际在 card_info.inc. 提案"所在 inc"列已订正.
+**N2 修正**: 提案页眉从"146 DAT_ + 2 PTR_"更正为"143 DAT_ + 5 PTR_". 总量 148 不变.
+**N3 修正**: BACKFIRE_CID R6 证据 passcode 82705373 -> 82705573 (card_1547 pw 已订正).
+
+**C8 验收**: asm lines 16728..19810 FUN_=0
+**Non-ASCII**: asm lines 16728..19810 non-ASCII=0
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

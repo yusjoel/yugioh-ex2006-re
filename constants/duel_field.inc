@@ -233,3 +233,8 @@
 .equ DISP_SEQ_ALT_CTR_OFF,        0x0000080e  @ [gDuelDisplaySeqState+0x80e] step counter for alt zone-card-place and normal-summon sequences; 14 raw ROM refs
 .equ DISP_SEQ_CARD_SET_CTR_OFF,   0x00000818  @ [gDuelDisplaySeqState+0x818] step counter for card-set display sequence; tick_zone_slot_card_set_display_seq; 26 raw ROM refs
 .equ SLOT_BIT21_CLR,              0xffdfffff  @ AND mask clearing bit21 of zone slot word (equip-active bit); tick_zone_slot_card_set_display_seq asm 16670; 215 raw ROM refs
+
+@ =============================================================================
+@ file 03 Seg-9 additions: display context slot data mask
+@ =============================================================================
+.equ DISPLAY_CTX_SLOT_DATA_MASK,  0x00007fff  @ masks bit15 (player_id) from [gDuelDisplaySeqState+4] hword to extract slot_data field; write_zone_slot_display_args_by_state; 1 slot
