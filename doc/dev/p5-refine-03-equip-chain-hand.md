@@ -80,7 +80,7 @@
 | 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
-| 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | TBD |
+| 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
@@ -271,7 +271,7 @@ Structured as labeled .hword table in asm/rom.s; remainder incbin trimmed accord
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: TBD
+**commit**: c0cf7ca
 
 ---
 
