@@ -79,7 +79,7 @@
 | 1 | 0x35f54..0x36a78 | 13 | 82 | — | ✅ | c410d1d |
 | 2 | 0x36a78..0x37128 | 13 | 37 | — | ✅ | 6ec659f |
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
-| 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | (pending) |
+| 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ⬜ | |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
@@ -215,7 +215,7 @@ compute_zone_effect_atk_delta
 **C8 验收**: asm lines 3529..4335 (Seg-4a) FUN_=0; Non-ASCII=0
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: b56ee3e
 
 ---
 
