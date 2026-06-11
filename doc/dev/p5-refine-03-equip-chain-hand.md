@@ -86,7 +86,7 @@
 | 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | bbcbdd5 |
 | 8 | 0x3c774..0x3d91c | 13 | 136 | — | ✅ | b2c3ddd |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ✅ | 6ba238d |
-| 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
+| 10 | 0x3efcc..0x4020c | 13 | 109 | — | ✅ | (pending) |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 重段提示: Seg-4 (183 槽 + 大 incbin 0x10ce) / Seg-9 (143 槽) / Seg-8 (121) / Seg-10 (109) 较重,
@@ -475,6 +475,60 @@ All 4 slots manually restored +1 after re-export.
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 6ba238d
+
+### 4.10 Seg-10 完成记录 [0x0803efcc..0x0804020c) — FILE 03 FINAL
+
+**函数列表 (13 fn)**:
+tick_zone_desc_card_move_display_seq / tick_zone_card_insert_display_seq /
+tick_card_display_op41_multi_seq / tick_card_display_seq_op41 /
+tick_zone_slot_equip_detach_display_seq / tick_equip_link_display_seq /
+tick_dual_list_slot_find_display_seq / place_card_to_zone_with_display_state /
+tick_equip_detach_sequence / tick_set_card_placement_state /
+tick_hand_shuffle_display_seq / tick_hand_sort_display_init_seq /
+tick_hand_zone_swap_display_seq
+
+**符号化统计**: EQ=63 (60 reuse + 3 new) / REF=57 / RENAME=1 / FUNC_RENAME=0 / PLATE=9 (10 FUN_ occurrences)
+
+**新建 constants**:
+- `card_info.inc` +1: HELPOEMER_CID_SHIFTED=0xab880000 (HELPOEMER_CID(0x1571)<<19; shifted-CID compare in tick_zone_slot_equip_detach_display_seq)
+- `duel_field.inc` +2: SLOT_CHAIN_CTR_CLR=0xc03fffff (~0x3fc00000; clears bits[29:22] chain-counter field) / SLOT_BIT20_CLR=0xffefffff (~0x00100000; clears bit20 of spell-trap zone slot entry)
+
+**carve**: 0 / **disasm**: 0 / **§5.1**: 0
+
+**PLATE=9 breakdown (stale FUN_ substring replacements)**:
+1. tick_card_display_op41_multi_seq (0x0803f580): FUN_0803be4c -> dispatch_duel_event_display_seq
+2. tick_card_display_seq_op41 (0x0803f618): FUN_0803be4c -> dispatch_duel_event_display_seq
+3. tick_zone_slot_equip_detach_display_seq (0x0803f790): FUN_0803be4c -> dispatch_duel_event_display_seq
+4. tick_equip_link_display_seq (0x0803f89c): FUN_0803be4c -> dispatch_duel_event_display_seq
+5. tick_dual_list_slot_find_display_seq (0x0803f948): FUN_0803be4c -> dispatch_duel_event_display_seq
+6. tick_equip_detach_sequence (0x0803fc70): FUN_0803be4c -> dispatch_duel_event_display_seq
+7. tick_hand_shuffle_display_seq (0x080400a8): FUN_0803be4c -> dispatch_duel_event_display_seq + FUN_08031668 -> shuffle_player_hand_list
+8. tick_hand_sort_display_init_seq (0x08040144): FUN_0803be4c -> dispatch_duel_event_display_seq
+9. tick_hand_zone_swap_display_seq (0x08040194): FUN_0803be4c -> dispatch_duel_event_display_seq
+
+**REF=57 breakdown**: gDuelDisplaySeqState=26 / gP1LifePoints(PTR_)=12 / gDuelFieldSlots=6 / gDuelChainDescBase=5 / gDuelChainStepCounter=4 / gDuelCardCtxBase=2 / gP1SlotSetCodeArray=1 / gP1ZoneHandCount=1
+
+**fn-ptr +1 踩坑 (已知, 每次 re-export 后手补)**:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (Seg-5 known)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known)
+All 4 slots manually restored +1 after re-export.
+
+**C8 验收**: asm lines 19810..22296 FUN_=0
+**Non-ASCII**: asm lines 19810..22296 non-ASCII=0
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
+
+---
+
+## FILE 03 COMPLETE (10/10 Seg)
+
+所有 10 段细化完成。file 03 (`asm/03_equip_chain_hand.s`, 0x08035f54..0x0804020c) 全部 byte-identical。
+- 总计 EQ≈755 / REF≈569 / RENAME≈13 / PLATE≈104 / carve=3 ROM_INCBIN
+- 新 constants: card_info.inc +50+, duel_field.inc +20+, ewram.inc +10+
+- 改名: step_demo_scene_phase (Seg-1b, 误名订正)
+- fn-ptr +1 永久踩坑 (0x37884/0x3aa74/0x389dc/0x389f8): 每次 re-export 后手补
 
 ---
 

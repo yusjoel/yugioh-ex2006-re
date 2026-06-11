@@ -424,3 +424,8 @@
 .equ BACKFIRE_CID,              0x00001762  @ Backfire (pw=82705573; card_1547 slot=0x1762); tick_zone_card_place_with_slot_resolve_seq + tick_equip_node_chain_link_display_seq; 2 slots
 .equ SOUL_ABSORPTION_CID,       0x000016da  @ Soul Absorption (pw=68073522; card_1435 slot=0x16DA); same 2 funcs; 2 slots
 .equ HUMAN_WAVE_TACTICS_CID,    0x000017b2  @ Human-Wave Tactics (pw=30353551; card_1606 slot=0x17B2); tick_equip_node_chain_link_display_seq; 1 slot
+
+@ =============================================================================
+@ file 03 Seg-10 additions: equip detach / zone display seq shifted CID sentinel
+@ =============================================================================
+.equ HELPOEMER_CID_SHIFTED,     0xab880000  @ HELPOEMER_CID(0x1571)<<19; lsls r1,r0,#0x13; cmp sentinel in tick_zone_slot_equip_detach_display_seq state=0; 1 slot

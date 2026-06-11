@@ -238,3 +238,9 @@
 @ file 03 Seg-9 additions: display context slot data mask
 @ =============================================================================
 .equ DISPLAY_CTX_SLOT_DATA_MASK,  0x00007fff  @ masks bit15 (player_id) from [gDuelDisplaySeqState+4] hword to extract slot_data field; write_zone_slot_display_args_by_state; 1 slot
+
+@ =============================================================================
+@ file 03 Seg-10 additions: zone slot chain-counter and bit20 clear masks
+@ =============================================================================
+.equ SLOT_CHAIN_CTR_CLR,          0xc03fffff  @ ~0x3fc00000; clears bits[29:22] chain-counter field in slot display-args word; place_card_to_zone_with_display_state; 1 slot
+.equ SLOT_BIT20_CLR,              0xffefffff  @ ~0x00100000; clears bit20 of spell-trap zone slot entry word; place_card_to_zone_with_display_state; 1 slot
