@@ -361,3 +361,9 @@
 @ =============================================================================
 .equ HAND_COUNT_TO_SLOT_OFF,   0x00000404  @ positive offset from gP1HandCountBase(0x0201c4f4) to gP1HandSlotArray(0x0201c8f8); 1 Seg-4b slot (eval_hand_magicians path)
 .equ gP1FieldState,            0x0201e1d4  @ gP1LifePoints(0x0201c4e0) + FIELD_STATE_OFF(0x1cf4) = direct abs addr for field state; 1 ROM ref (DAT_08039198)
+
+@ =============================================================================
+@ file 03 Seg-7 additions: duel event display sequence state + sprite attr buffer
+@ =============================================================================
+.equ gDuelDisplaySeqState,  0x0201bcc0  @ duel field event display sequence state buffer base; +0=event_code hword; +0x808=write_slot_idx; +0x80c=step_lock; 178 raw ROM refs
+.equ gSpriteAttrBuf,        0x0201b870  @ sprite attribute buffer base (write_sprite_attr_record_entry); +0x300=filled_flags; +0x304/0x306/0x308/0x30a=attr0..3; 52 raw ROM refs

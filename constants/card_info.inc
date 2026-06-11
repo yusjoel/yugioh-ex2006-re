@@ -405,3 +405,6 @@
 .equ JAM_BREEDING_MACHINE_CID,       0x000013ff  @ Jam Breeding Machine (pw=21770260; card_0874 slot=0x13FF); effect zone count gate (x3 refs)
 .equ LAST_WARRIOR_FROM_ANOTHER_PLANET_CID, 0x000012b1  @ The Last Warrior from Another Planet (pw=86099788; card_0634 slot=0x12B1); field-spell Last Warrior gate (x3 refs)
 .equ JOWGEN_THE_SPIRITUALIST_CID,    0x0000147f  @ Jowgen the Spiritualist (pw=41855169; card_0957 slot=0x147F); Neo Daedalus placement gate; 1 slot
+
+@ --- file 03 Seg-7 additions (eval_equip_placement_full_check .. tick_equip_candidate_scan_with_display) ---
+.equ BALLISTA_OF_RAMPART_SMASHING_CID, 0x00001846  @ Ballista of Rampart Smashing (pw=00242146; card_4305 slot=0x1846); tick_equip_chain_link_display_seq chain pool index; 1 slot

@@ -3454,7 +3454,7 @@ LAB_08037876:
     pop {r1}                                 @ 08037880 02bc
     bx r1                                    @ 08037882 0847
 eval_equip_bonus_for_slot_pred_fn:
-    .word  check_level_conv_lab_node_match+1 @ 08037884 7d770308
+    .word  check_level_conv_lab_node_match @ 08037884 7d770308
 eval_equip_bonus_for_slot_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08037888 68080000
 eval_equip_bonus_for_slot_a_leg_ocean_cid:
@@ -5867,7 +5867,7 @@ LAB_080389ce:
     b LAB_08038a06                           @ 080389d8 15e0
     .zero  0x2
 eval_amazoness_fnptr_a:
-    .word  check_card_is_amazoness_type+1 @ 080389dc 49b00408
+    .word  check_card_is_amazoness_type   @ 080389dc 49b00408
 LAB_080389e0:
     ldr r1, eval_amazoness_fnptr_b           @ 080389e0 0549
     ldr r0,[sp,#0x3c]                        @ 080389e2 0f98
@@ -5881,7 +5881,7 @@ LAB_080389e0:
     b apply_slot_score_bonus_by_state        @ 080389f4 13e2
     .zero  0x2
 eval_amazoness_fnptr_b:
-    .word  check_card_is_amazoness_type+1 @ 080389f8 49b00408
+    .word  check_card_is_amazoness_type   @ 080389f8 49b00408
 LAB_080389fc:
     ldr r0,[sp,#0x3c]                        @ 080389fc 0f98
     ldr r1,[sp,#0x40]                        @ 080389fe 1099
@@ -10512,7 +10512,7 @@ LAB_0803aa50:
     beq LAB_0803aa82                         @ 0803aa70 07d0
     b LAB_0803ab44                           @ 0803aa72 67e0
 eval_equip_chain_pred_fnptr:
-    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr); asm must have +1 after re-export
+    .word  check_level_conv_lab_node_match @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr); asm must have +1 after re-export
 eval_equip_chain_node_pool_a:
     .word  gEquipNodePool                 @ 0803aa78 c0d90102
 LAB_0803aa7c:
@@ -12860,7 +12860,7 @@ eval_equip_placement_full_check:
     bne LAB_0803bc16                         @ 0803bbd6 1ed1
     b LAB_0803bbec                           @ 0803bbd8 08e0
 LAB_0803bbda:
-    ldr r0, DAT_0803bbf0                     @ 0803bbda 0548
+    ldr r0, equip_check_amazoness_tiger_cid  @ 0803bbda 0548
     cmp r4,r0                                @ 0803bbdc 8442
     bne LAB_0803bbf4                         @ 0803bbde 09d1
     adds r0,r5,#0x0    @ 0803bbe0 281c
@@ -12871,12 +12871,12 @@ LAB_0803bbda:
 LAB_0803bbec:
     movs r0,#0x0    @ 0803bbec 0020
     b LAB_0803bc18                           @ 0803bbee 13e0
-DAT_0803bbf0:
-    .word  0x0000160f                     @ 0803bbf0 0f160000
+equip_check_amazoness_tiger_cid:
+    .word  AMAZONESS_TIGER_CID            @ 0803bbf0 0f160000  Amazoness Tiger (card_1303 slot=0x160F); special equip placement path
 LAB_0803bbf4:
     cmp r4,r0                                @ 0803bbf4 8442
     blt LAB_0803bc16                         @ 0803bbf6 0edb
-    ldr r0, DAT_0803bc20                     @ 0803bbf8 0948
+    ldr r0, equip_check_chain_pair_max_cid   @ 0803bbf8 0948
     cmp r4,r0                                @ 0803bbfa 8442
     bgt LAB_0803bc16                         @ 0803bbfc 0bdc
     subs r0,#0x5    @ 0803bbfe 0538
@@ -12896,8 +12896,8 @@ LAB_0803bc18:
     pop {r1}                                 @ 0803bc1a 02bc
     bx r1                                    @ 0803bc1c 0847
     .zero  0x2
-DAT_0803bc20:
-    .word  0x0000164f                     @ 0803bc20 4f160000
+equip_check_chain_pair_max_cid:
+    .word  EQUIP_CHAIN_PAIR_CARD_MAX      @ 0803bc20 4f160000  EQUIP_CHAIN_PAIR_CARD_MAX=0x164f; upper bound for equip chain pair card range
 
 @ Comprehensive check: is the spell/trap zone available for placement for player (r0)? Phase 1: count_available_effect_zones(1-r0, 0xa4<<5=0x1480, -1); non-0 (opponent has available zones) -> skip to return 0 path. Phase 2: count_field_copies_of_card(0x159d); >0 -> return 0. Both guards pass -> return 1 (zone placeable). Side path: DAT_0203e2a0[+8]==r2 (slot context match): gP1LifePoints+0x1d4c state check + play_ui_effect(0x31) / play_ui_effect(0x32) UI triggers. Special path LAB_0803bd04: reads 0x0201b870+0x300 byte bit7, calls check_player_side_condition. indeg=29; used as gate in placement/equip activation chains. r0=u32 player_side [0..1]. Returns u32 bool (1=zone placeable, 0=blocked). Side-effects: play_ui_effect(0x31)/play_ui_effect(0x32) triggered conditionally. Constants: count_available_effect_zones_param=0x1480, guard_card_id=0x159d, gP1LifePoints=0x0201c4e0, ui_sfx_occupied=0x31, ui_sfx_blocked=0x32.
 check_spell_zone_slot_placeable:
@@ -12912,15 +12912,15 @@ check_spell_zone_slot_placeable:
     bl count_available_effect_zones          @ 0803bc34 f6f70efd
     cmp r0,#0x0                              @ 0803bc38 0028
     bne LAB_0803bc50                         @ 0803bc3a 09d1
-    ldr r0, DAT_0803bc4c                     @ 0803bc3c 0348
+    ldr r0, spell_zone_necrovalley_cid       @ 0803bc3c 0348
     bl count_field_copies_of_card            @ 0803bc3e f6f7adfd
     cmp r0,#0x0                              @ 0803bc42 0028
     bne LAB_0803bc50                         @ 0803bc44 04d1
     movs r0,#0x1    @ 0803bc46 0120
     b LAB_0803bc52                           @ 0803bc48 03e0
     .zero  0x2
-DAT_0803bc4c:
-    .word  0x0000159d                     @ 0803bc4c 9d150000
+spell_zone_necrovalley_cid:
+    .word  NECROVALLEY_CID                @ 0803bc4c 9d150000  Necrovalley (card_1185 slot=0x159D); blocks spell-zone placement
 LAB_0803bc50:
     movs r0,#0x0    @ 0803bc50 0020
 LAB_0803bc52:
@@ -12928,17 +12928,17 @@ LAB_0803bc52:
     bx r1                                    @ 0803bc54 0847
     .zero  0x2
 
-@ 检查给定卡牌播放/效果条件是否满足. r0 为来自调用方的索引 (从 FUN_080c9f50 传入 ldr r0,[r0,#0x4] 的值). 首先检查 gBannerState 相关结构体 (0x0201bcc0 + 0x80c/0x808 偏移) 是否均为 0; 若非 0 则直接返回 0 (不满足). 通过后检查 gP1LifePoints 结构中对应玩家的 LP 字段, 激活状态字段, 以及特定状态码; 还会调用 check_player_side_condition 判断玩家阵营条件. 最终返回 0 (不满足) 或 1 (满足). Constants: BASE=0x0201bcc0, OFFSET_STATE_A=0x80c, OFFSET_STATE_B=0x808, gP1LifePoints=0x0201c4e0, LP_OFFSET_PLAYER=0x1ce8, LP_OFFSET_ACTIVE=0x1d10, LP_OFFSET_TARGET=0x1d4c.
+@ Checks if the card play / effect condition is satisfied. r0 = context index (value from ldr r0,[r0,#0x4] at call site in render_card_view_scene_by_lp_time). Phase 1: checks [gDuelDisplaySeqState+0x80c] and [+0x808] both ==0; if either nonzero returns 0 (blocked). Phase 2: reads [gDuelCardCtxBase+0x8] as entry_type; if entry_type==1: reads gP1LifePoints+0x1ce8 (player LP field), compares with r0; if match checks gP1LifePoints+0x1d10 nonzero, then gP1LifePoints+0x1d40 (0x1ce8+0x30+0x18) for value==3. Returns 1 only if all conditions pass. Phase 3 (fallthrough): checks gDuelDisplaySeqState[+0x4]==r0 (slot context match); if match: reads gP1LifePoints+0x1d4c; if 0 calls play_ui_effect(0x31) and play_ui_effect(0x32); sets result. Side path LAB_0803bd04: reads [gSpriteAttrBuf+0x300] byte bit7; if 0 calls check_player_side_condition. Returns 0 (blocked) or 1 (condition satisfied). Side effects: play_ui_effect(0x31)/(0x32) conditionally. Constants: gDuelDisplaySeqState=0x0201bcc0, gP1LifePoints=0x0201c4e0, gSpriteAttrBuf=0x0201b870, step_lock_off=0x80c, slot_idx_off=0x808, lp_field_off=0x1ce8, active_field_off=0x1d10, target_field_off=0x1d4c, ui_sfx_occupied=0x31, ui_sfx_blocked=0x32. indeg=1.
 check_card_play_condition_eligible:
     push {r4,lr}                             @ 0803bc58 10b5
     adds r2,r0,#0x0    @ 0803bc5a 021c
-    ldr r1, DAT_0803bc78                     @ 0803bc5c 0649
-    ldr r3, DAT_0803bc7c                     @ 0803bc5e 074b
+    ldr r1, play_cond_display_state_a        @ 0803bc5c 0649
+    ldr r3, play_cond_step_lock_off_a        @ 0803bc5e 074b
     adds r0,r1,r3    @ 0803bc60 c818
     ldr r0,[r0,#0x0]                         @ 0803bc62 0068
     cmp r0,#0x0                              @ 0803bc64 0028
     bne LAB_0803bc72                         @ 0803bc66 04d1
-    ldr r4, DAT_0803bc80                     @ 0803bc68 054c
+    ldr r4, play_cond_slot_idx_off_a         @ 0803bc68 054c
     adds r0,r1,r4    @ 0803bc6a 0819
     ldr r0,[r0,#0x0]                         @ 0803bc6c 0068
     cmp r0,#0x0                              @ 0803bc6e 0028
@@ -12947,14 +12947,14 @@ LAB_0803bc72:
     movs r0,#0x0    @ 0803bc72 0020
     b LAB_0803bd22                           @ 0803bc74 55e0
     .zero  0x2
-DAT_0803bc78:
-    .word  0x0201bcc0                     @ 0803bc78 c0bc0102
-DAT_0803bc7c:
-    .word  0x0000080c                     @ 0803bc7c 0c080000
-DAT_0803bc80:
-    .word  0x00000808                     @ 0803bc80 08080000
+play_cond_display_state_a:
+    .word  gDuelDisplaySeqState           @ 0803bc78 c0bc0102
+play_cond_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803bc7c 0c080000  [gDuelDisplaySeqState+0x80c] step lock / state clear flag
+play_cond_slot_idx_off_a:
+    .word  DISPLAY_SEQ_SLOT_IDX_OFF       @ 0803bc80 08080000  [gDuelDisplaySeqState+0x808] sprite write slot index
 LAB_0803bc84:
-    ldr r3, DAT_0803bcbc                     @ 0803bc84 0d4b
+    ldr r3, play_cond_card_ctx_a             @ 0803bc84 0d4b
     lsls r0,r2,#0x2    @ 0803bc86 9000
     adds r1,r3,#0x0    @ 0803bc88 191c
     adds r1,#0x8    @ 0803bc8a 0831
@@ -12963,13 +12963,13 @@ LAB_0803bc84:
     cmp r0,#0x1                              @ 0803bc90 0128
     bne LAB_0803bccc                         @ 0803bc92 1bd1
     movs r3,#0x0    @ 0803bc94 0023
-    ldr r1, PTR_gP1LifePoints_0803bcc0       @ 0803bc96 0a49
-    ldr r4, DAT_0803bcc4                     @ 0803bc98 0a4c
+    ldr r1, play_cond_lp_base_a              @ 0803bc96 0a49
+    ldr r4, play_cond_lp_block2_1ce8_a       @ 0803bc98 0a4c
     adds r0,r1,r4    @ 0803bc9a 0819
     ldr r0,[r0,#0x0]                         @ 0803bc9c 0068
     cmp r0,r2                                @ 0803bc9e 9042
     bne LAB_0803bcb8                         @ 0803bca0 0ad1
-    ldr r2, DAT_0803bcc8                     @ 0803bca2 094a
+    ldr r2, play_cond_active_player_off_a    @ 0803bca2 094a
     adds r0,r1,r2    @ 0803bca4 8818
     ldr r0,[r0,#0x0]                         @ 0803bca6 0068
     cmp r0,#0x0                              @ 0803bca8 0028
@@ -12983,21 +12983,21 @@ LAB_0803bc84:
 LAB_0803bcb8:
     adds r0,r3,#0x0    @ 0803bcb8 181c
     b LAB_0803bd22                           @ 0803bcba 32e0
-DAT_0803bcbc:
-    .word  0x0201e2a0                     @ 0803bcbc a0e20102
-PTR_gP1LifePoints_0803bcc0:
+play_cond_card_ctx_a:
+    .word  gDuelCardCtxBase               @ 0803bcbc a0e20102
+play_cond_lp_base_a:
     .word  gP1LifePoints                  @ 0803bcc0 e0c40102
-DAT_0803bcc4:
-    .word  0x00001ce8                     @ 0803bcc4 e81c0000
-DAT_0803bcc8:
-    .word  0x00001d10                     @ 0803bcc8 101d0000
+play_cond_lp_block2_1ce8_a:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 0803bcc4 e81c0000  [gP1LifePoints+0x1ce8] LP display block2 field
+play_cond_active_player_off_a:
+    .word  DISPLAY_SEQ_ACTIVE_PLAYER_OFF  @ 0803bcc8 101d0000  [gP1LifePoints+0x1d10] active player field in display seq
 LAB_0803bccc:
     ldr r0,[r3,#0x4]                         @ 0803bccc 5868
     cmp r2,r0                                @ 0803bcce 8242
     bne LAB_0803bd04                         @ 0803bcd0 18d1
     movs r4,#0x0    @ 0803bcd2 0024
-    ldr r0, PTR_gP1LifePoints_0803bcfc       @ 0803bcd4 0948
-    ldr r1, DAT_0803bd00                     @ 0803bcd6 0a49
+    ldr r0, play_cond_lp_base_b              @ 0803bcd4 0948
+    ldr r1, play_cond_activation_c_off_a     @ 0803bcd6 0a49
     adds r0,r0,r1    @ 0803bcd8 4018
     ldr r0,[r0,#0x0]                         @ 0803bcda 0068
     cmp r0,#0x0                              @ 0803bcdc 0028
@@ -13016,13 +13016,13 @@ LAB_0803bcf6:
     adds r0,r4,#0x0    @ 0803bcf6 201c
     b LAB_0803bd22                           @ 0803bcf8 13e0
     .zero  0x2
-PTR_gP1LifePoints_0803bcfc:
+play_cond_lp_base_b:
     .word  gP1LifePoints                  @ 0803bcfc e0c40102
-DAT_0803bd00:
-    .word  0x00001d4c                     @ 0803bd00 4c1d0000
+play_cond_activation_c_off_a:
+    .word  ACTIVATION_STATE_C_OFF         @ 0803bd00 4c1d0000  [gP1LifePoints+0x1d4c] activation state C; checked ==0 before play_ui_effect(0x31/0x32)
 LAB_0803bd04:
     movs r1,#0x0    @ 0803bd04 0021
-    ldr r0, DAT_0803bd28                     @ 0803bd06 0848
+    ldr r0, sprite_record_buf_base_a         @ 0803bd06 0848
     movs r2,#0xc0    @ 0803bd08 c022
     lsls r2,r2,#0x2    @ 0803bd0a 9200
     adds r0,r0,r2    @ 0803bd0c 8018
@@ -13040,8 +13040,8 @@ LAB_0803bd22:
     pop {r4}                                 @ 0803bd22 10bc
     pop {r1}                                 @ 0803bd24 02bc
     bx r1                                    @ 0803bd26 0847
-DAT_0803bd28:
-    .word  0x0201b870                     @ 0803bd28 70b80102
+sprite_record_buf_base_a:
+    .word  gSpriteAttrBuf                 @ 0803bd28 70b80102
 
 @ Writes four halfword sprite attributes (x, y, w, h) to IWRAM sprite attr queue at current write slot and advances write pointer. Called from 135 callsites across card image/OAM/menu/number-OAM rendering. First checks [0x0201e2a0+8]==3 (scene-switching/paused) and exits if true. Then reads write_ptr=[0x0201bcc0+0x808]; if >0xff (queue full) exits. Writes: strh r5(x)->[entry+0x8]; strh r6(y)->[entry+0xa]; strh r2(w)->[entry+0xc]; strh r3(h)->[entry+0xe]. Calls return_void_noop_stub (0x0801f3d4) as 'entry committed' notification; then write_ptr += 1. All four params zero-extended via lsls/lsrs #0x10. Side effects: strh [queue_entry+0x8..0xe] four fields; [queue_write_ptr] += 1. Constants: state_base=0x0201e2a0, queue_base=0x0201bcc0, queue_offset=0x808, capacity_max=0xff, entry_stride=8, pause_state=3.
 enqueue_sprite_attr_record:
@@ -13054,12 +13054,12 @@ enqueue_sprite_attr_record:
     lsrs r2,r2,#0x10    @ 0803bd38 120c
     lsls r3,r3,#0x10    @ 0803bd3a 1b04
     lsrs r3,r3,#0x10    @ 0803bd3c 1b0c
-    ldr r0, DAT_0803bd88                     @ 0803bd3e 1248
+    ldr r0, enq_sprite_ctx_base_a            @ 0803bd3e 1248
     ldr r0,[r0,#0x8]                         @ 0803bd40 8068
     cmp r0,#0x3                              @ 0803bd42 0328
     beq LAB_0803bd82                         @ 0803bd44 1dd0
-    ldr r1, DAT_0803bd8c                     @ 0803bd46 1149
-    ldr r0, DAT_0803bd90                     @ 0803bd48 1148
+    ldr r1, enq_sprite_seq_state_a           @ 0803bd46 1149
+    ldr r0, enq_sprite_slot_idx_off_a        @ 0803bd48 1148
     adds r4,r1,r0    @ 0803bd4a 0c18
     ldr r0,[r4,#0x0]                         @ 0803bd4c 2068
     cmp r0,#0xff                             @ 0803bd4e ff28
@@ -13091,14 +13091,14 @@ LAB_0803bd82:
     pop {r4,r5,r6}                           @ 0803bd82 70bc
     pop {r0}                                 @ 0803bd84 01bc
     bx r0                                    @ 0803bd86 0047
-DAT_0803bd88:
-    .word  0x0201e2a0                     @ 0803bd88 a0e20102
-DAT_0803bd8c:
-    .word  0x0201bcc0                     @ 0803bd8c c0bc0102
-DAT_0803bd90:
-    .word  0x00000808                     @ 0803bd90 08080000
+enq_sprite_ctx_base_a:
+    .word  gDuelCardCtxBase               @ 0803bd88 a0e20102
+enq_sprite_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803bd8c c0bc0102
+enq_sprite_slot_idx_off_a:
+    .word  DISPLAY_SEQ_SLOT_IDX_OFF       @ 0803bd90 08080000  [gDuelDisplaySeqState+0x808] slot index in enqueue_sprite_attr_record
 
-@ Called by FUN_08094c10 in loop body each iteration. Writes four 16-bit sprite attribute fields directly into sprite attribute sequence buffer at 0x0201bcc0 base, then increments write counter. Reads [0x0201bcc0+0x808] as current slot index idx; if idx<=0xff writes r0/r1/r2/r3 (attr0..attr3) as strh at [base+idx*8+0x8/0xa/0xc/0xe]; then idx+1 stored back to [base+0x808]. Unlike enqueue_sprite_attr_record (0x0803bd2c), no pause-state check; direct write only.
+@ Called by poll_sprite_seq_until_done in loop body each iteration. Writes four 16-bit sprite attribute fields directly into sprite attribute sequence buffer at 0x0201bcc0 base, then increments write counter. Reads [0x0201bcc0+0x808] as current slot index idx; if idx<=0xff writes r0/r1/r2/r3 (attr0..attr3) as strh at [base+idx*8+0x8/0xa/0xc/0xe]; then idx+1 stored back to [base+0x808]. Unlike enqueue_sprite_attr_record (0x0803bd2c), no pause-state check; direct write only.
 @ Constants: SPRITE_ATTR_BASE=0x0201bcc0 (DAT_0803bddc); IDX_FIELD_OFFSET=0x00000808 (DAT_0803bde0); MAX_SLOT_IDX=0xff; SLOT_SIZE=8; ATTR_HALFWORD_OFFSETS=[+8,+0xa,+0xc,+0xe].
 write_sprite_attrs_to_seq_buf:
     push {r4,r5,r6,lr}                       @ 0803bd94 70b5
@@ -13110,8 +13110,8 @@ write_sprite_attrs_to_seq_buf:
     lsrs r6,r2,#0x10    @ 0803bda0 160c
     lsls r3,r3,#0x10    @ 0803bda2 1b04
     lsrs r3,r3,#0x10    @ 0803bda4 1b0c
-    ldr r2, DAT_0803bddc                     @ 0803bda6 0d4a
-    ldr r0, DAT_0803bde0                     @ 0803bda8 0d48
+    ldr r2, write_sprite_seq_state_a         @ 0803bda6 0d4a
+    ldr r0, write_sprite_slot_idx_off_a      @ 0803bda8 0d48
     adds r1,r2,r0    @ 0803bdaa 1118
     ldr r0,[r1,#0x0]                         @ 0803bdac 0868
     cmp r0,#0xff                             @ 0803bdae ff28
@@ -13138,29 +13138,29 @@ LAB_0803bdd6:
     pop {r4,r5,r6}                           @ 0803bdd6 70bc
     pop {r0}                                 @ 0803bdd8 01bc
     bx r0                                    @ 0803bdda 0047
-DAT_0803bddc:
-    .word  0x0201bcc0                     @ 0803bddc c0bc0102
-DAT_0803bde0:
-    .word  0x00000808                     @ 0803bde0 08080000
+write_sprite_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803bddc c0bc0102
+write_sprite_slot_idx_off_a:
+    .word  DISPLAY_SEQ_SLOT_IDX_OFF       @ 0803bde0 08080000  [gDuelDisplaySeqState+0x808] slot index in write_sprite_attrs_to_seq_buf
 
 @ Writes four halfword sprite attributes into fixed slots in gSpriteAttrBuf and marks the slot as filled. r0=u16 attr0, r1=u16 attr1, r2=u16 attr2, r3=u16 attr3. Loads gSpriteAttrBuf (0x0201b870) into r12; writes attr0 to [base+0x304] (0xc1*4), attr1 to [+0x306], attr2 to [+0x308] (0xc2*4), attr3 to [+0x30a]; ORs 0x4 into [base+0x300] (0xc0*4) to set filled bit; writes 0 to [base+0x30c] (0xc3*4) to clear attr3 pad byte. Calls return_void_noop_stub as commit callback. Returns void. Constants: gSpriteAttrBuf=0x0201b870, flags_offset=0x300, filled_bit=0x4, attr_offsets=[0x304,0x306,0x308,0x30a,0x30c].
 write_sprite_attr_record_entry:
     push {r4,r5,lr}                          @ 0803bde4 30b5
-    ldr r4, DAT_0803be2c                     @ 0803bde6 114c
+    ldr r4, write_attr_entry_buf_base_a      @ 0803bde6 114c
     .hword 0x46a4    @ 0803bde8 a446
     movs r4,#0xc1    @ 0803bdea c124
     lsls r4,r4,#0x2    @ 0803bdec a400
     add r4,r12                               @ 0803bdee 6444
     movs r5,#0x0    @ 0803bdf0 0025
     strh r0,[r4,#0x0]                        @ 0803bdf2 2080
-    ldr r0, DAT_0803be30                     @ 0803bdf4 0e48
+    ldr r0, write_attr_field1_off_a          @ 0803bdf4 0e48
     add r0,r12                               @ 0803bdf6 6044
     strh r1,[r0,#0x0]                        @ 0803bdf8 0180
     movs r0,#0xc2    @ 0803bdfa c220
     lsls r0,r0,#0x2    @ 0803bdfc 8000
     add r0,r12                               @ 0803bdfe 6044
     strh r2,[r0,#0x0]                        @ 0803be00 0280
-    ldr r0, DAT_0803be34                     @ 0803be02 0c48
+    ldr r0, write_attr_field3_off_a          @ 0803be02 0c48
     add r0,r12                               @ 0803be04 6044
     strh r3,[r0,#0x0]                        @ 0803be06 0380
     movs r1,#0xc0    @ 0803be08 c021
@@ -13180,25 +13180,25 @@ write_sprite_attr_record_entry:
     pop {r0}                                 @ 0803be26 01bc
     bx r0                                    @ 0803be28 0047
     .zero  0x2
-DAT_0803be2c:
-    .word  0x0201b870                     @ 0803be2c 70b80102
-DAT_0803be30:
-    .word  0x00000306                     @ 0803be30 06030000
-DAT_0803be34:
-    .word  0x0000030a                     @ 0803be34 0a030000
+write_attr_entry_buf_base_a:
+    .word  gSpriteAttrBuf                 @ 0803be2c 70b80102
+write_attr_field1_off_a:
+    .word  SPRITE_ATTR_FIELD1_OFF         @ 0803be30 06030000  [gSpriteAttrBuf+0x306] sprite attr halfword 1
+write_attr_field3_off_a:
+    .word  SPRITE_ATTR_FIELD3_OFF         @ 0803be34 0a030000  [gSpriteAttrBuf+0x30a] sprite attr halfword 3
     ROM_INCBIN 0x3be38, 0x14
 
-@ Called by FUN_0803c318 (main state machine loop driver) and FUN_0803c3b4. 115-case main event dispatcher for duel field display sequences. Writes [gP1LifePoints+0x1d38]:=1 (dispatch active flag), reads [0x0201bcc0] & 0x0fff (event_code), subtracts 1 and compares with 0x72: out of range (event_code=0 or >0x73) jumps to LAB_0803c306 writing [base+0x80c]:=0 then exits; valid range [0x01..0x73] dispatches via switch table (0x0803be88, 115 word pointers) to corresponding tick_*/invoke_*/reset_*/clear_* subfunctions. All cases jump to unified exit LAB_0803c30e (pop{r0}; bx r0).
+@ Called by dispatch_duel_anim_queue_step (main state machine loop driver) and tick_duel_anim_event_hub. 115-case main event dispatcher for duel field display sequences. Writes [gP1LifePoints+0x1d38]:=1 (dispatch active flag), reads [0x0201bcc0] & 0x0fff (event_code), subtracts 1 and compares with 0x72: out of range (event_code=0 or >0x73) jumps to LAB_0803c306 writing [base+0x80c]:=0 then exits; valid range [0x01..0x73] dispatches via switch table (0x0803be88, 115 word pointers) to corresponding tick_*/invoke_*/reset_*/clear_* subfunctions. All cases jump to unified exit LAB_0803c30e (pop{r0}; bx r0).
 @ Constants: LP_BASE=gP1LifePoints (PTR_0803be74); DISPATCH_FLAG_OFFSET=0x1d38 (DAT_0803be78); DISPLAY_STATE_BASE=0x0201bcc0 (DAT_0803be7c); EVENT_CODE_MASK=0x0fff (DAT_0803be80); SWITCH_TABLE=0x0803be88 (DAT_0803be84); MAX_EVENT_CODE=0x73 (115 cases); DEFAULT_CLEAR_OFFSET=0x80c (DAT_0803c314).
 dispatch_duel_event_display_seq:
     push {lr}                                @ 0803be4c 00b5
-    ldr r0, PTR_gP1LifePoints_0803be74       @ 0803be4e 0948
-    ldr r1, DAT_0803be78                     @ 0803be50 0949
+    ldr r0, dispatch_lp_base_a               @ 0803be4e 0948
+    ldr r1, dispatch_active_flag_off_a       @ 0803be50 0949
     adds r0,r0,r1    @ 0803be52 4018
     movs r1,#0x1    @ 0803be54 0121
     str r1,[r0,#0x0]                         @ 0803be56 0160
-    ldr r1, DAT_0803be7c                     @ 0803be58 0849
-    ldr r0, DAT_0803be80                     @ 0803be5a 0948
+    ldr r1, dispatch_seq_state_a             @ 0803be58 0849
+    ldr r0, dispatch_event_code_mask_a       @ 0803be5a 0948
     ldrh r2,[r1,#0x0]                        @ 0803be5c 0a88
     ands r0,r2    @ 0803be5e 1040
     subs r0,#0x1    @ 0803be60 0138
@@ -13208,22 +13208,22 @@ switchD_0803be70__default:
     b LAB_0803c306                           @ 0803be66 4ee2
 LAB_0803be68:
     lsls r0,r0,#0x2    @ 0803be68 8000
-    ldr r1, DAT_0803be84                     @ 0803be6a 0649
+    ldr r1, dispatch_event_switch_table_ptr  @ 0803be6a 0649
     adds r0,r0,r1    @ 0803be6c 4018
     ldr r0,[r0,#0x0]                         @ 0803be6e 0068
 switchD_0803be70__switchD:
     .hword 0x4687    @ 0803be70 8746
     .zero  0x2
-PTR_gP1LifePoints_0803be74:
+dispatch_lp_base_a:
     .word  gP1LifePoints                  @ 0803be74 e0c40102
-DAT_0803be78:
-    .word  0x00001d38                     @ 0803be78 381d0000
-DAT_0803be7c:
-    .word  0x0201bcc0                     @ 0803be7c c0bc0102
-DAT_0803be80:
-    .word  0x00000fff                     @ 0803be80 ff0f0000
-DAT_0803be84:
-    .word  0x0803be88                     @ 0803be84 88be0308
+dispatch_active_flag_off_a:
+    .word  DISPATCH_ACTIVE_FLAG_OFF       @ 0803be78 381d0000  [gP1LifePoints+0x1d38] display dispatch in-progress flag; set :=1 at dispatch_duel_event_display_seq entry
+dispatch_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803be7c c0bc0102
+dispatch_event_code_mask_a:
+    .word  SCENE_SLOT_MASK_LO             @ 0803be80 ff0f0000  SCENE_SLOT_MASK_LO=0xfff; extracts event_code bits[11:0] from hword[0]
+dispatch_event_switch_table_ptr:
+    .word  0x0803be88                     @ 0803be84 88be0308  ptr to switchD_0803be70__switchdataD_0803be88; 115-entry dispatch table for event codes 0x1..0x73
 switchD_0803be70__switchdataD_0803be88:
     .word  0x0803c054                     @ 0803be88 54c00308
     .word  0x0803c05a                     @ 0803be8c 5ac00308
@@ -13686,7 +13686,7 @@ switchD_0803be70__caseD_73:
     bl place_card_to_zone_with_display_state @ 0803c300 03f09afb
     b LAB_0803c30e                           @ 0803c304 03e0
 LAB_0803c306:
-    ldr r0, DAT_0803c314                     @ 0803c306 0348
+    ldr r0, anim_queue_step_lock_off_a       @ 0803c306 0348
     adds r1,r1,r0    @ 0803c308 0918
     movs r0,#0x0    @ 0803c30a 0020
     str r0,[r1,#0x0]                         @ 0803c30c 0860
@@ -13694,8 +13694,8 @@ LAB_0803c30e:
     pop {r0}                                 @ 0803c30e 01bc
     bx r0                                    @ 0803c310 0047
     .zero  0x2
-DAT_0803c314:
-    .word  0x0000080c                     @ 0803c314 0c080000
+anim_queue_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c314 0c080000  [gDuelDisplaySeqState+0x80c] step lock cleared at dispatch_duel_anim_queue_step exit
 
 @ Called only by tick_duel_anim_event_hub (0x0803c3b4). Reads byte r6 from DAT_0803c334=0x0201b870+0xc3*4=0x0201bb0c, branches on r6 (0/1/2): case 0 - copy_bytes_by_halfword copies 8 bytes from DAT_0803c3a8=0x0201bcc0+0x80c to base, writes r6+1 back to [0x0201bb0c], calls pack_sprite_row_attr_words; case 1 - calls dispatch_duel_event_display_seq then checks [base+0x80c]==0 before +1; case 2 - calls pack_sprite_row_attr_words, clears [0x0201b870+0xc0*4] bits[2..1]=0. Exit: movs r0,#1; pop {r4-r7}; pop {r1}; bx r1 = returns 1. Purpose: advance duel animation queue by current state byte (0/1/2).
 @ 
@@ -13708,7 +13708,7 @@ DAT_0803c314:
 @ - STATE_2: pack_sprite_row_attr_words + clear bit mask 0x5
 dispatch_duel_anim_queue_step:
     push {r4,r5,r6,r7,lr}                    @ 0803c318 f0b5
-    ldr r0, DAT_0803c334                     @ 0803c31a 0648
+    ldr r0, anim_queue_sprite_buf_a          @ 0803c31a 0648
     movs r1,#0xc3    @ 0803c31c c321
     lsls r1,r1,#0x2    @ 0803c31e 8900
     adds r7,r0,r1    @ 0803c320 4718
@@ -13721,15 +13721,15 @@ dispatch_duel_anim_queue_step:
     beq LAB_0803c33e                         @ 0803c32e 06d0
     b LAB_0803c3a0                           @ 0803c330 36e0
     .zero  0x2
-DAT_0803c334:
-    .word  0x0201b870                     @ 0803c334 70b80102
+anim_queue_sprite_buf_a:
+    .word  gSpriteAttrBuf                 @ 0803c334 70b80102
 LAB_0803c338:
     cmp r6,#0x2                              @ 0803c338 022e
     beq LAB_0803c382                         @ 0803c33a 22d0
     b LAB_0803c3a0                           @ 0803c33c 30e0
 LAB_0803c33e:
-    ldr r4, DAT_0803c3a8                     @ 0803c33e 1a4c
-    ldr r2, DAT_0803c3ac                     @ 0803c340 1a4a
+    ldr r4, anim_queue_seq_state_a           @ 0803c33e 1a4c
+    ldr r2, anim_queue_step_lock_off_b       @ 0803c340 1a4a
     adds r5,r4,r2    @ 0803c342 a518
     movs r2,#0xc1    @ 0803c344 c122
     lsls r2,r2,#0x2    @ 0803c346 9200
@@ -13748,13 +13748,13 @@ LAB_0803c33e:
     strb r0,[r7,#0x0]                        @ 0803c362 3870
 LAB_0803c364:
     bl dispatch_duel_event_display_seq       @ 0803c364 fff772fd
-    ldr r0, DAT_0803c3a8                     @ 0803c368 0f48
-    ldr r1, DAT_0803c3ac                     @ 0803c36a 1049
+    ldr r0, anim_queue_seq_state_a           @ 0803c368 0f48
+    ldr r1, anim_queue_step_lock_off_b       @ 0803c36a 1049
     adds r0,r0,r1    @ 0803c36c 4018
     ldr r0,[r0,#0x0]                         @ 0803c36e 0068
     cmp r0,#0x0                              @ 0803c370 0028
     bne LAB_0803c3a0                         @ 0803c372 15d1
-    ldr r0, DAT_0803c3b0                     @ 0803c374 0e48
+    ldr r0, anim_queue_sprite_buf_b          @ 0803c374 0e48
     movs r2,#0xc3    @ 0803c376 c322
     lsls r2,r2,#0x2    @ 0803c378 9200
     adds r0,r0,r2    @ 0803c37a 8018
@@ -13767,7 +13767,7 @@ LAB_0803c382:
     movs r2,#0x0    @ 0803c386 0022
     movs r3,#0x0    @ 0803c388 0023
     bl pack_sprite_row_attr_words            @ 0803c38a 58f0f9ff
-    ldr r1, DAT_0803c3b0                     @ 0803c38e 0849
+    ldr r1, anim_queue_sprite_buf_b          @ 0803c38e 0849
     movs r0,#0xc0    @ 0803c390 c020
     lsls r0,r0,#0x2    @ 0803c392 8000
     adds r1,r1,r0    @ 0803c394 0918
@@ -13781,14 +13781,14 @@ LAB_0803c3a0:
     pop {r4,r5,r6,r7}                        @ 0803c3a2 f0bc
     pop {r1}                                 @ 0803c3a4 02bc
     bx r1                                    @ 0803c3a6 0847
-DAT_0803c3a8:
-    .word  0x0201bcc0                     @ 0803c3a8 c0bc0102
-DAT_0803c3ac:
-    .word  0x0000080c                     @ 0803c3ac 0c080000
-DAT_0803c3b0:
-    .word  0x0201b870                     @ 0803c3b0 70b80102
+anim_queue_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c3a8 c0bc0102
+anim_queue_step_lock_off_b:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c3ac 0c080000  [gDuelDisplaySeqState+0x80c] step lock check in tick_duel_anim_event_hub
+anim_queue_sprite_buf_b:
+    .word  gSpriteAttrBuf                 @ 0803c3b0 70b80102
 
-@ Called only by advance_duel_turn_by_prng_anim (0x08094dac). Calls play_ui_effect(0) to check UI effect status: if nonzero (effect still running) jumps to tail returning 1. If 0 (effect done): reads gP1LifePoints+0x1d08 for duel state; if condition met calls dispatch_duel_anim_queue_step (FUN_0803c318); otherwise dispatches on gP1LifePoints+0xec*0x20 field value (0/1/2): handles duel field anim frame copy / sprite row attr write / OAM write. Multiple reads/writes to gP1LifePoints/0x0201bcc0/0x0201b870 regions. Exit: all paths via pop {r4-r7}; pop {r0}; bx r0 = void.
+@ Called only by advance_duel_turn_by_prng_anim (0x08094dac). Calls play_ui_effect(0) to check UI effect status: if nonzero (effect still running) jumps to tail returning 1. If 0 (effect done): reads gP1LifePoints+0x1d08 for duel state; if condition met calls dispatch_duel_anim_queue_step (dispatch_duel_anim_queue_step); otherwise dispatches on gP1LifePoints+0xec*0x20 field value (0/1/2): handles duel field anim frame copy / sprite row attr write / OAM write. Multiple reads/writes to gP1LifePoints/0x0201bcc0/0x0201b870 regions. Exit: all paths via pop {r4-r7}; pop {r0}; bx r0 = void.
 @ 
 @ Constants:
 @ - play_ui_effect_mode=0 (check effect complete)
@@ -13807,14 +13807,14 @@ tick_duel_anim_event_hub:
     beq LAB_0803c3c6                         @ 0803c3c2 00d0
     b LAB_0803c50a                           @ 0803c3c4 a1e0
 LAB_0803c3c6:
-    ldr r0, PTR_gP1LifePoints_0803c3ec       @ 0803c3c6 0948
-    ldr r2, DAT_0803c3f0                     @ 0803c3c8 094a
+    ldr r0, anim_event_lp_base_a             @ 0803c3c6 0948
+    ldr r2, anim_event_lp_block2_a           @ 0803c3c8 094a
     adds r1,r0,r2    @ 0803c3ca 8118
     ldr r1,[r1,#0x0]                         @ 0803c3cc 0968
     adds r2,r0,#0x0    @ 0803c3ce 021c
     cmp r1,#0x0                              @ 0803c3d0 0029
     beq LAB_0803c3f8                         @ 0803c3d2 11d0
-    ldr r0, DAT_0803c3f4                     @ 0803c3d4 0748
+    ldr r0, anim_event_sprite_buf_a          @ 0803c3d4 0748
     movs r1,#0xc0    @ 0803c3d6 c021
     lsls r1,r1,#0x2    @ 0803c3d8 8900
     adds r0,r0,r1    @ 0803c3da 4018
@@ -13825,12 +13825,12 @@ LAB_0803c3c6:
     bl dispatch_duel_anim_queue_step         @ 0803c3e4 fff798ff
     b LAB_0803c532                           @ 0803c3e8 a3e0
     .zero  0x2
-PTR_gP1LifePoints_0803c3ec:
+anim_event_lp_base_a:
     .word  gP1LifePoints                  @ 0803c3ec e0c40102
-DAT_0803c3f0:
-    .word  0x00001d08                     @ 0803c3f0 081d0000
-DAT_0803c3f4:
-    .word  0x0201b870                     @ 0803c3f4 70b80102
+anim_event_lp_block2_a:
+    .word  P1LP_BLOCK2_OFF                @ 0803c3f0 081d0000  [gP1LifePoints+0x1d08] LP display block2 field
+anim_event_sprite_buf_a:
+    .word  gSpriteAttrBuf                 @ 0803c3f4 70b80102
 LAB_0803c3f8:
     movs r1,#0xec    @ 0803c3f8 ec21
     lsls r1,r1,#0x5    @ 0803c3fa 4901
@@ -13844,8 +13844,8 @@ LAB_0803c3f8:
     beq LAB_0803c4cc                         @ 0803c40a 5fd0
     b LAB_0803c530                           @ 0803c40c 90e0
 LAB_0803c40e:
-    ldr r7, DAT_0803c510                     @ 0803c40e 404f
-    ldr r2, DAT_0803c514                     @ 0803c410 404a
+    ldr r7, anim_event_seq_state_a           @ 0803c40e 404f
+    ldr r2, op09_slot_idx_off_a              @ 0803c410 404a
     adds r5,r7,r2    @ 0803c412 bd18
     ldr r0,[r5,#0x0]                         @ 0803c414 2868
     cmp r0,#0x0                              @ 0803c416 0028
@@ -13880,7 +13880,7 @@ LAB_0803c43c:
     cmp r4,r0                                @ 0803c450 8442
     bcc LAB_0803c43c                         @ 0803c452 f3d3
 LAB_0803c454:
-    ldr r0, DAT_0803c518                     @ 0803c454 3048
+    ldr r0, anim_event_sprite_buf_b          @ 0803c454 3048
     movs r2,#0xc0    @ 0803c456 c022
     lsls r2,r2,#0x2    @ 0803c458 9200
     adds r4,r0,r2    @ 0803c45a 8418
@@ -13888,13 +13888,13 @@ LAB_0803c454:
     ldrb r1,[r4,#0x0]                        @ 0803c45e 2178
     orrs r0,r1    @ 0803c460 0843
     strb r0,[r4,#0x0]                        @ 0803c462 2070
-    ldr r5, DAT_0803c510                     @ 0803c464 2a4d
-    ldr r2, DAT_0803c51c                     @ 0803c466 2d4a
+    ldr r5, anim_event_seq_state_a           @ 0803c464 2a4d
+    ldr r2, op09_step_lock_off_a             @ 0803c466 2d4a
     adds r1,r5,r2    @ 0803c468 a918
     movs r0,#0x1    @ 0803c46a 0120
     str r0,[r1,#0x0]                         @ 0803c46c 0860
-    ldr r6, PTR_gP1LifePoints_0803c520       @ 0803c46e 2c4e
-    ldr r1, DAT_0803c524                     @ 0803c470 2c49
+    ldr r6, anim_event_lp_base_b             @ 0803c46e 2c4e
+    ldr r1, op09_lp_block2_a                 @ 0803c470 2c49
     adds r0,r6,r1    @ 0803c472 7018
     ldr r0,[r0,#0x0]                         @ 0803c474 0068
     cmp r0,#0x0                              @ 0803c476 0028
@@ -13916,7 +13916,7 @@ LAB_0803c492:
     adds r0,r5,r1    @ 0803c496 6818
     movs r1,#0x0    @ 0803c498 0021
     str r1,[r0,#0x0]                         @ 0803c49a 0160
-    ldr r2, DAT_0803c528                     @ 0803c49c 224a
+    ldr r2, op09_oam_tile_idx_a              @ 0803c49c 224a
     adds r0,r5,r2    @ 0803c49e a818
     str r1,[r0,#0x0]                         @ 0803c4a0 0160
     movs r0,#0xec    @ 0803c4a2 ec20
@@ -13927,13 +13927,13 @@ LAB_0803c492:
     str r0,[r1,#0x0]                         @ 0803c4ac 0860
 LAB_0803c4ae:
     bl dispatch_duel_event_display_seq       @ 0803c4ae fff7cdfc
-    ldr r0, DAT_0803c510                     @ 0803c4b2 1748
-    ldr r1, DAT_0803c51c                     @ 0803c4b4 1949
+    ldr r0, anim_event_seq_state_a           @ 0803c4b2 1748
+    ldr r1, op09_step_lock_off_a             @ 0803c4b4 1949
     adds r0,r0,r1    @ 0803c4b6 4018
     ldr r0,[r0,#0x0]                         @ 0803c4b8 0068
     cmp r0,#0x0                              @ 0803c4ba 0028
     bne LAB_0803c50a                         @ 0803c4bc 25d1
-    ldr r2, PTR_gP1LifePoints_0803c520       @ 0803c4be 184a
+    ldr r2, anim_event_lp_base_b             @ 0803c4be 184a
     movs r0,#0xec    @ 0803c4c0 ec20
     lsls r0,r0,#0x5    @ 0803c4c2 4001
     adds r1,r2,r0    @ 0803c4c4 1118
@@ -13941,7 +13941,7 @@ LAB_0803c4ae:
     adds r0,#0x1    @ 0803c4c8 0130
     str r0,[r1,#0x0]                         @ 0803c4ca 0860
 LAB_0803c4cc:
-    ldr r0, DAT_0803c518                     @ 0803c4cc 1248
+    ldr r0, anim_event_sprite_buf_b          @ 0803c4cc 1248
     movs r1,#0xc0    @ 0803c4ce c021
     lsls r1,r1,#0x2    @ 0803c4d0 8900
     adds r0,r0,r1    @ 0803c4d2 4018
@@ -13954,17 +13954,17 @@ LAB_0803c4cc:
     adds r1,r2,r0    @ 0803c4e0 1118
     movs r0,#0x0    @ 0803c4e2 0020
     str r0,[r1,#0x0]                         @ 0803c4e4 0860
-    ldr r1, DAT_0803c510                     @ 0803c4e6 0a49
-    ldr r2, DAT_0803c514                     @ 0803c4e8 0a4a
+    ldr r1, anim_event_seq_state_a           @ 0803c4e6 0a49
+    ldr r2, op09_slot_idx_off_a              @ 0803c4e8 0a4a
     adds r0,r1,r2    @ 0803c4ea 8818
     ldr r0,[r0,#0x0]                         @ 0803c4ec 0068
     cmp r0,#0x0                              @ 0803c4ee 0028
     bne LAB_0803c50a                         @ 0803c4f0 0bd1
-    ldr r0, DAT_0803c52c                     @ 0803c4f2 0e48
+    ldr r0, anim_event_ctx_base_a            @ 0803c4f2 0e48
     ldr r0,[r0,#0x8]                         @ 0803c4f4 8068
     cmp r0,#0x3                              @ 0803c4f6 0328
     bne LAB_0803c530                         @ 0803c4f8 1ad1
-    ldr r2, DAT_0803c51c                     @ 0803c4fa 084a
+    ldr r2, op09_step_lock_off_a             @ 0803c4fa 084a
     adds r0,r1,r2    @ 0803c4fc 8818
     ldr r0,[r0,#0x0]                         @ 0803c4fe 0068
     cmp r0,#0x0                              @ 0803c500 0028
@@ -13975,22 +13975,22 @@ LAB_0803c50a:
     movs r0,#0x1    @ 0803c50a 0120
     b LAB_0803c532                           @ 0803c50c 11e0
     .zero  0x2
-DAT_0803c510:
-    .word  0x0201bcc0                     @ 0803c510 c0bc0102
-DAT_0803c514:
-    .word  0x00000808                     @ 0803c514 08080000
-DAT_0803c518:
-    .word  0x0201b870                     @ 0803c518 70b80102
-DAT_0803c51c:
-    .word  0x0000080c                     @ 0803c51c 0c080000
-PTR_gP1LifePoints_0803c520:
+anim_event_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c510 c0bc0102
+op09_slot_idx_off_a:
+    .word  DISPLAY_SEQ_SLOT_IDX_OFF       @ 0803c514 08080000  [gDuelDisplaySeqState+0x808] slot index in tick_display_op09_seq
+anim_event_sprite_buf_b:
+    .word  gSpriteAttrBuf                 @ 0803c518 70b80102
+op09_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c51c 0c080000  [gDuelDisplaySeqState+0x80c] cleared at tick_display_op09_seq exit
+anim_event_lp_base_b:
     .word  gP1LifePoints                  @ 0803c520 e0c40102
-DAT_0803c524:
-    .word  0x00001d08                     @ 0803c524 081d0000
-DAT_0803c528:
-    .word  0x00000814                     @ 0803c528 14080000
-DAT_0803c52c:
-    .word  0x0201e2a0                     @ 0803c52c a0e20102
+op09_lp_block2_a:
+    .word  P1LP_BLOCK2_OFF                @ 0803c524 081d0000  [gP1LifePoints+0x1d08] LP display block2 field
+op09_oam_tile_idx_a:
+    .word  DUEL_FIELD_OAM_TILE_IDX_A      @ 0803c528 14080000  DUEL_FIELD_OAM_TILE_IDX_A=0x814; OAM tile index for duel field card sprite
+anim_event_ctx_base_a:
+    .word  gDuelCardCtxBase               @ 0803c52c a0e20102
 LAB_0803c530:
     movs r0,#0x0    @ 0803c530 0020
 LAB_0803c532:
@@ -14000,32 +14000,32 @@ LAB_0803c532:
     pop {r1}                                 @ 0803c538 02bc
     bx r1                                    @ 0803c53a 0847
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 0x15. Reads 0x0201bcc0 hword[0] bit15=player_id (r1). Directly calls dispatch_card_display_op(r0=0x9, r1=player_id, r2=0, r3=0) to trigger display op 0x9. Then clears [base+0x80c] and returns via pop {r0}; bx r0. Simplest case stub form: no step state machine, unconditional single-shot execution.
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 0x15. Reads 0x0201bcc0 hword[0] bit15=player_id (r1). Directly calls dispatch_card_display_op(r0=0x9, r1=player_id, r2=0, r3=0) to trigger display op 0x9. Then clears [base+0x80c] and returns via pop {r0}; bx r0. Simplest case stub form: no step state machine, unconditional single-shot execution.
 @ Side effects: [0x0201bcc0+0x80c]:=0 (resets state flag).
 @ 
 @ Constants: DISPLAY_OP=0x9, STATE_FLAG_OFFSET=0x80c.
 tick_display_op09_seq:
     push {r4,lr}                             @ 0803c53c 10b5
-    ldr r4, DAT_0803c55c                     @ 0803c53e 074c
+    ldr r4, op09_seq_state_a                 @ 0803c53e 074c
     ldrh r0,[r4,#0x0]                        @ 0803c540 2088
     lsrs r1,r0,#0xf    @ 0803c542 c10b
     movs r0,#0x9    @ 0803c544 0920
     movs r2,#0x0    @ 0803c546 0022
     movs r3,#0x0    @ 0803c548 0023
     bl dispatch_card_display_op              @ 0803c54a e2f7a7fb
-    ldr r0, DAT_0803c560                     @ 0803c54e 0448
+    ldr r0, chain_link_step_lock_off_a       @ 0803c54e 0448
     adds r4,r4,r0    @ 0803c550 2418
     movs r0,#0x0    @ 0803c552 0020
     str r0,[r4,#0x0]                         @ 0803c554 2060
     pop {r4}                                 @ 0803c556 10bc
     pop {r0}                                 @ 0803c558 01bc
     bx r0                                    @ 0803c55a 0047
-DAT_0803c55c:
-    .word  0x0201bcc0                     @ 0803c55c c0bc0102
-DAT_0803c560:
-    .word  0x0000080c                     @ 0803c560 0c080000
+op09_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c55c c0bc0102
+chain_link_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c560 0c080000  [gDuelDisplaySeqState+0x80c] cleared at tick_equip_chain_link_display_seq exit
 
-@ Called by FUN_0803be4c (duel event dispatcher) caseD_19 (op=0x19). Reads EWRAM 0x0201bcc0:
+@ Called by dispatch_duel_event_display_seq (duel event dispatcher) caseD_19 (op=0x19). Reads EWRAM 0x0201bcc0:
 @ player_id ([+0] bit15, r7), slot_idx ([+2], r6), secondary ([+4], r8), chain_val ([+6], r9).
 @ Checks step counter [+0x810]: if nonzero jumps to play_ui_effect path. If zero, initializes
 @ chain link info struct at DAT_0803c664 (writes r7/r2/base/r6/r8/r9/type fields), computes
@@ -14046,7 +14046,7 @@ tick_equip_chain_link_display_seq:
     .hword 0x4646    @ 0803c568 4646
     push {r6,r7}                             @ 0803c56a c0b4
     sub sp,#0x4                              @ 0803c56c 81b0
-    ldr r0, DAT_0803c660                     @ 0803c56e 3c48
+    ldr r0, chain_link_seq_state_a           @ 0803c56e 3c48
     ldrh r1,[r0,#0x0]                        @ 0803c570 0188
     lsrs r7,r1,#0xf    @ 0803c572 cf0b
     ldrh r6,[r0,#0x2]                        @ 0803c574 4688
@@ -14060,7 +14060,7 @@ tick_equip_chain_link_display_seq:
     ldr r2,[r0,#0x0]                         @ 0803c584 0268
     cmp r2,#0x0                              @ 0803c586 002a
     bne LAB_0803c63e                         @ 0803c588 59d1
-    ldr r3, DAT_0803c664                     @ 0803c58a 364b
+    ldr r3, chain_link_slot_refs_a           @ 0803c58a 364b
     str r2,[r3,#0x8]                         @ 0803c58c 9a60
     str r7,[r3,#0x0]                         @ 0803c58e 1f60
     .hword 0x4648    @ 0803c590 4846
@@ -14080,7 +14080,7 @@ tick_equip_chain_link_display_seq:
     muls r5,r1    @ 0803c5ac 4d43
     adds r1,r5,#0x0    @ 0803c5ae 291c
     adds r0,r0,r1    @ 0803c5b0 4018
-    ldr r5, DAT_0803c668                     @ 0803c5b2 2d4d
+    ldr r5, chain_link_field_slots_a         @ 0803c5b2 2d4d
     adds r0,r0,r5    @ 0803c5b4 4019
     ldr r1,[r0,#0x0]                         @ 0803c5b6 0168
     lsls r0,r1,#0x2    @ 0803c5b8 8800
@@ -14122,7 +14122,7 @@ tick_equip_chain_link_display_seq:
     ldrh r0,[r3,#0x6]                        @ 0803c600 d888
     cmp r0,#0x0                              @ 0803c602 0028
     beq LAB_0803c624                         @ 0803c604 0ed0
-    ldr r5, DAT_0803c66c                     @ 0803c606 194d
+    ldr r5, chain_link_ballista_cid          @ 0803c606 194d
     adds r0,r7,#0x0    @ 0803c608 381c
     adds r1,r6,#0x0    @ 0803c60a 311c
     adds r2,r5,#0x0    @ 0803c60c 2a1c
@@ -14141,7 +14141,7 @@ LAB_0803c624:
     .hword 0x464a    @ 0803c628 4a46
     .hword 0x4643    @ 0803c62a 4346
     bl dispatch_card_display_op              @ 0803c62c e2f736fb
-    ldr r1, DAT_0803c660                     @ 0803c630 0b49
+    ldr r1, chain_link_seq_state_a           @ 0803c630 0b49
     movs r5,#0x81    @ 0803c632 8125
     lsls r5,r5,#0x4    @ 0803c634 2d01
     adds r1,r1,r5    @ 0803c636 4919
@@ -14154,8 +14154,8 @@ LAB_0803c63e:
     adds r1,r0,#0x0    @ 0803c644 011c
     cmp r1,#0x0                              @ 0803c646 0029
     bne LAB_0803c652                         @ 0803c648 03d1
-    ldr r0, DAT_0803c660                     @ 0803c64a 0548
-    ldr r2, DAT_0803c670                     @ 0803c64c 084a
+    ldr r0, chain_link_seq_state_a           @ 0803c64a 0548
+    ldr r2, equip_set_step_lock_off_a        @ 0803c64c 084a
     adds r0,r0,r2    @ 0803c64e 8018
     str r1,[r0,#0x0]                         @ 0803c650 0160
 LAB_0803c652:
@@ -14166,16 +14166,16 @@ LAB_0803c652:
     pop {r4,r5,r6,r7}                        @ 0803c65a f0bc
     pop {r0}                                 @ 0803c65c 01bc
     bx r0                                    @ 0803c65e 0047
-DAT_0803c660:
-    .word  0x0201bcc0                     @ 0803c660 c0bc0102
-DAT_0803c664:
-    .word  0x0201bb90                     @ 0803c664 90bb0102
-DAT_0803c668:
-    .word  0x0201c510                     @ 0803c668 10c50102
-DAT_0803c66c:
-    .word  0x00001846                     @ 0803c66c 46180000
-DAT_0803c670:
-    .word  0x0000080c                     @ 0803c670 0c080000
+chain_link_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c660 c0bc0102
+chain_link_slot_refs_a:
+    .word  gEquipChainSlotRefs            @ 0803c664 90bb0102
+chain_link_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803c668 10c50102
+chain_link_ballista_cid:
+    .word  BALLISTA_OF_RAMPART_SMASHING_CID @ 0803c66c 46180000  Ballista of Rampart Smashing (pw=00242146; card_4305 slot=0x1846); chain pool index
+equip_set_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c670 0c080000  [gDuelDisplaySeqState+0x80c] cleared at tick_equip_set_display_sequence exit
 
 @ Frame-tick driver for the equip-set card display animation sequence.
 @ No APCS input params (r0 overwritten by ldr DAT_0803c6f4 at entry).
@@ -14185,7 +14185,7 @@ DAT_0803c670:
 @ slot_idx, display_type=5, step=0, card_type_bits); calls dispatch_card_display_op(op=0xb, slot_idx, ..., 5);
 @ increments step counter.
 @ Step !=0: polls play_ui_effect(0xb); on completion clears [base+0x80c]:=0 (step lock).
-@ Called by main state machine FUN_0803be4c during equip-set display phase.
+@ Called by main state machine dispatch_duel_event_display_seq during equip-set display phase.
 @ Constants: step_counter=[base+0x810]=0x0201c4d0; display_state_base=0x0201bb90;
 @ op_equip_set=0xb; effect_equip_set=0xb; player_stride=0x868; card_data_base=0x0201c510.
 @ Returns void (pop{r0};bx r0 tail-call).
@@ -14193,7 +14193,7 @@ tick_equip_set_display_sequence:
     push {r4,r5,r6,r7,lr}                    @ 0803c674 f0b5
     .hword 0x4647    @ 0803c676 4746
     push {r7}                                @ 0803c678 80b4
-    ldr r0, DAT_0803c6f4                     @ 0803c67a 1e48
+    ldr r0, equip_set_seq_state_a            @ 0803c67a 1e48
     .hword 0x4680    @ 0803c67c 8046
     ldrh r1,[r0,#0x0]                        @ 0803c67e 0188
     lsrs r4,r1,#0xf    @ 0803c680 cc0b
@@ -14204,7 +14204,7 @@ tick_equip_set_display_sequence:
     ldr r7,[r6,#0x0]                         @ 0803c68a 3768
     cmp r7,#0x0                              @ 0803c68c 002f
     bne LAB_0803c6d6                         @ 0803c68e 22d1
-    ldr r3, DAT_0803c6f8                     @ 0803c690 194b
+    ldr r3, equip_set_slot_refs_a            @ 0803c690 194b
     movs r1,#0x1    @ 0803c692 0121
     str r1,[r3,#0x8]                         @ 0803c694 9960
     str r4,[r3,#0x0]                         @ 0803c696 1c60
@@ -14217,10 +14217,10 @@ tick_equip_set_display_sequence:
     lsls r0,r5,#0x2    @ 0803c6a4 a800
     adds r0,r0,r5    @ 0803c6a6 4019
     lsls r0,r0,#0x2    @ 0803c6a8 8000
-    ldr r1, DAT_0803c6fc                     @ 0803c6aa 1449
+    ldr r1, equip_set_player_stride_a        @ 0803c6aa 1449
     muls r1,r4    @ 0803c6ac 6143
     adds r0,r0,r1    @ 0803c6ae 4018
-    ldr r1, DAT_0803c700                     @ 0803c6b0 1349
+    ldr r1, equip_set_field_slots_a          @ 0803c6b0 1349
     adds r0,r0,r1    @ 0803c6b2 4018
     ldr r1,[r0,#0x0]                         @ 0803c6b4 0168
     lsls r0,r1,#0x2    @ 0803c6b6 8800
@@ -14244,7 +14244,7 @@ LAB_0803c6d6:
     adds r1,r0,#0x0    @ 0803c6dc 011c
     cmp r1,#0x0                              @ 0803c6de 0029
     bne LAB_0803c6e8                         @ 0803c6e0 02d1
-    ldr r0, DAT_0803c704                     @ 0803c6e2 0848
+    ldr r0, cand_scan_step_lock_off_a        @ 0803c6e2 0848
     add r0,r8                                @ 0803c6e4 4044
     str r1,[r0,#0x0]                         @ 0803c6e6 0160
 LAB_0803c6e8:
@@ -14254,18 +14254,18 @@ LAB_0803c6e8:
     pop {r0}                                 @ 0803c6ee 01bc
     bx r0                                    @ 0803c6f0 0047
     .zero  0x2
-DAT_0803c6f4:
-    .word  0x0201bcc0                     @ 0803c6f4 c0bc0102
-DAT_0803c6f8:
-    .word  0x0201bb90                     @ 0803c6f8 90bb0102
-DAT_0803c6fc:
-    .word  0x00000868                     @ 0803c6fc 68080000
-DAT_0803c700:
-    .word  0x0201c510                     @ 0803c700 10c50102
-DAT_0803c704:
-    .word  0x0000080c                     @ 0803c704 0c080000
+equip_set_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c6f4 c0bc0102
+equip_set_slot_refs_a:
+    .word  gEquipChainSlotRefs            @ 0803c6f8 90bb0102
+equip_set_player_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0803c6fc 68080000  PLAYER_BLOCK_STRIDE=0x868; player data block stride
+equip_set_field_slots_a:
+    .word  gDuelFieldSlots                @ 0803c700 10c50102
+cand_scan_step_lock_off_a:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c704 0c080000  [gDuelDisplaySeqState+0x80c] cleared at tick_equip_candidate_scan_with_display
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 0x17. Reads 0x0201bcc0 context: hword[+2]->r8, hword[+4]->r9, ldrb/ldrh[+6]->r4/r7 composed.
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 0x17. Reads 0x0201bcc0 context: hword[+2]->r8, hword[+4]->r9, ldrb/ldrh[+6]->r4/r7 composed.
 @ Step 0 ([base+0x810]==0): calls invoke_build_equip_candidate_score_table(r0=0) to build equip candidate score table, then trigger_equip_activation_candidate_scan(r0=0) to start candidate scan, then dispatch_card_display_op(opcode=0x0c, r1=r8, r2=r9) with composed byte params; increments step counter.
 @ Step 1 ([+0x810]>=1): bne skip, exits immediately. Full sequence covers one equip candidate selection display sync.
 @ Side effects: [0x0201bcc0+0x810] step counter incremented; global equip candidate data updated via callees.
@@ -14276,7 +14276,7 @@ tick_equip_candidate_scan_with_display:
     .hword 0x464f    @ 0803c70a 4f46
     .hword 0x4646    @ 0803c70c 4646
     push {r6,r7}                             @ 0803c70e c0b4
-    ldr r6, DAT_0803c76c                     @ 0803c710 164e
+    ldr r6, cand_scan_seq_state_a            @ 0803c710 164e
     ldrh r0,[r6,#0x2]                        @ 0803c712 7088
     .hword 0x4680    @ 0803c714 8046
     ldrh r2,[r6,#0x4]                        @ 0803c716 b288
@@ -14310,7 +14310,7 @@ LAB_0803c74e:
     adds r1,r0,#0x0    @ 0803c754 011c
     cmp r1,#0x0                              @ 0803c756 0029
     bne LAB_0803c760                         @ 0803c758 02d1
-    ldr r2, DAT_0803c770                     @ 0803c75a 054a
+    ldr r2, cand_scan_step_lock_off_b        @ 0803c75a 054a
     adds r0,r6,r2    @ 0803c75c b018
     str r1,[r0,#0x0]                         @ 0803c75e 0160
 LAB_0803c760:
@@ -14320,10 +14320,10 @@ LAB_0803c760:
     pop {r4,r5,r6,r7}                        @ 0803c766 f0bc
     pop {r0}                                 @ 0803c768 01bc
     bx r0                                    @ 0803c76a 0047
-DAT_0803c76c:
-    .word  0x0201bcc0                     @ 0803c76c c0bc0102
-DAT_0803c770:
-    .word  0x0000080c                     @ 0803c770 0c080000
+cand_scan_seq_state_a:
+    .word  gDuelDisplaySeqState           @ 0803c76c c0bc0102
+cand_scan_step_lock_off_b:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0803c770 0c080000  [gDuelDisplaySeqState+0x80c] cleared at tick_equip_candidate_scan_with_display exit
 
 @ Called by FUN_0803be4c (duel event dispatcher) caseD_18 (op=0x18). Reads EWRAM 0x0201bcc0:
 @ player_id ([+0] bit15, r5). Uses player_id * 0x868 + gP1LifePoints + 0x30 to locate player

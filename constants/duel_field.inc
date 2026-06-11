@@ -207,3 +207,14 @@
 .equ CHAIN_LINK_COUNTER_OFF,    0x00001cbc  @ gDuelFieldSlots+0x1cbc: chain link counter in equip chain;
                                             @ confirmed: asm/08 CHAIN_LINK_COUNTER_OFFSET=0x1cbc; 1 Seg-4b slot
 .equ EQUIP_PHASE_STATE_OFF,     0x00001cc4  @ gDuelFieldSlots+0x1cc4: equip activation sub-phase state (compared to 2/3/4 in asm/12); med-conf; 1 Seg-4b slot
+
+@ =============================================================================
+@ file 03 Seg-7 additions: display sequence state offsets + sprite attr offsets
+@ =============================================================================
+.equ DISPLAY_SEQ_SLOT_IDX_OFF,      0x00000808  @ [gDuelDisplaySeqState+0x808] sprite write slot index; bounds-checked vs 0xff; 363 raw refs
+.equ DISPLAY_SEQ_STEP_LOCK_OFF,     0x0000080c  @ [gDuelDisplaySeqState+0x80c] step lock / state clear flag; written 0 at end of every display seq handler; 178 raw refs
+.equ DISPLAY_SEQ_ACTIVE_PLAYER_OFF, 0x00001d10  @ [gP1LifePoints+0x1d10] active player field in display seq; 25 raw refs
+.equ DISPATCH_ACTIVE_FLAG_OFF,      0x00001d38  @ [gP1LifePoints+0x1d38] display dispatch in-progress flag; set :=1 at dispatch_duel_event_display_seq entry; 4 raw refs
+.equ ACTIVATION_STATE_C_OFF,        0x00001d4c  @ [gP1LifePoints+0x1d4c] activation state field C; checked ==0 before play_ui_effect(0x31/0x32); distinct from A=0x1d48/B=0x1d78; 4 raw refs
+.equ SPRITE_ATTR_FIELD1_OFF,        0x00000306  @ [gSpriteAttrBuf+0x306] sprite attr halfword 1; strh write in write_sprite_attr_record_entry; 56 raw refs
+.equ SPRITE_ATTR_FIELD3_OFF,        0x0000030a  @ [gSpriteAttrBuf+0x30a] sprite attr halfword 3; strh write in write_sprite_attr_record_entry; 23 raw refs

@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `03_equip_chain_hand.s` (0x08035f54..0x0804020c; 已拆 Seg-1..10; 活动 doc `p5-refine-03-equip-chain-hand.md`)。
-> **下一任务**: **file 03 Seg-7** (0x3bba4..0x3c774, ~13fn ~51槽, incbin @0x3be38/0x14).
+> **下一任务**: **file 03 Seg-8** (0x3c774..0x3d91c, ~13fn ~121槽, no incbin).
 
-上次更新: 2026-06-12 file 03 Seg-6 完成 (EQ=54/REF=37/RENAME=4/FUNC_RENAME=0/PLATE=5(含2 CJK→ASCII)/carve=0/disasm=0/§5.1=0; 新建 card_info.inc +9 (CHAIN_ENERGY_CID/JUDGEMENT_OF_PHARAOH_CID/LIGHT_OF_INTERVENTION_CID/NON_AGGRESSION_AREA_CID/LAVA_GOLEM_CID/BOSS_RUSH_CID/JAM_BREEDING_MACHINE_CID/LAST_WARRIOR_FROM_ANOTHER_PLANET_CID/JOWGEN_THE_SPIRITUALIST_CID); fn-ptr +1 x4 (37884/aa74/89dc/89f8); byte-identical 9689337d); file 03 进度 6/10。
+上次更新: 2026-06-12 file 03 Seg-7 完成 (EQ=27/REF=28/RENAME=1/FUNC_RENAME=0/PLATE=8(含1 CJK→ASCII)/carve=0/disasm=0/§5.1=1(@0x3be38/0x14); 新建 ewram.inc +2 (gDuelDisplaySeqState/gSpriteAttrBuf), duel_field.inc +7 (DISPLAY_SEQ_SLOT_IDX_OFF/DISPLAY_SEQ_STEP_LOCK_OFF/DISPLAY_SEQ_ACTIVE_PLAYER_OFF/DISPATCH_ACTIVE_FLAG_OFF/ACTIVATION_STATE_C_OFF/SPRITE_ATTR_FIELD1_OFF/SPRITE_ATTR_FIELD3_OFF), card_info.inc +1 (BALLISTA_OF_RAMPART_SMASHING_CID); fn-ptr +1 x4 (37884/aa74/89dc/89f8) verified; byte-identical 9689337d); file 03 进度 7/10。
 
 ---
 
@@ -22,7 +22,7 @@
 | 00 | system_str_vija | 0x080000c0..0x0801cb00 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-00-system-str-vija.md` |
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
-| 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 已拆 | 🟡 进行中 (6/10) | `doc/dev/p5-refine-03-equip-chain-hand.md` |
+| 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 已拆 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-03-equip-chain-hand.md` |
 | 04 | card_zone_sprite | 0x0804020c..0x08049014 | 未拆 | ⬜ | |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |

@@ -83,7 +83,7 @@
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
 | 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
-| 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
+| 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | (pending) |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
 | 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
@@ -342,6 +342,48 @@ All 4 slots manually restored +1 after re-export.
 
 **commit**: f0bd1f1
 
+### 4.07 Seg-7 完成记录 [0x0803bba4..0x0803c774)
+
+**函数列表 (13 fn)**:
+eval_equip_placement_full_check / check_spell_zone_slot_placeable /
+check_card_play_condition_eligible / enqueue_sprite_attr_record /
+write_sprite_attrs_to_seq_buf / write_sprite_attr_record_entry /
+dispatch_duel_event_display_seq / dispatch_duel_anim_queue_step /
+tick_duel_anim_event_hub / tick_display_op09_seq /
+tick_equip_chain_link_display_seq / tick_equip_set_display_sequence /
+tick_equip_candidate_scan_with_display
+
+**符号化统计**: EQ=27 (reuse 9 + new 18) / REF=28 / RENAME=1 / FUNC_RENAME=0 / PLATE=8 / carve=0 / disasm=0 / §5.1=1
+
+**新建 constants**:
+- `ewram.inc` +2: gDuelDisplaySeqState=0x0201bcc0 / gSpriteAttrBuf=0x0201b870
+- `duel_field.inc` +7: DISPLAY_SEQ_SLOT_IDX_OFF=0x808 / DISPLAY_SEQ_STEP_LOCK_OFF=0x80c / DISPLAY_SEQ_ACTIVE_PLAYER_OFF=0x1d10 / DISPATCH_ACTIVE_FLAG_OFF=0x1d38 / ACTIVATION_STATE_C_OFF=0x1d4c / SPRITE_ATTR_FIELD1_OFF=0x306 / SPRITE_ATTR_FIELD3_OFF=0x30a
+- `card_info.inc` +1: BALLISTA_OF_RAMPART_SMASHING_CID=0x1846
+
+**PLATE=8 breakdown**:
+1. check_card_play_condition_eligible (0x0803bc58): CJK->ASCII full rewrite + FUN_080c9f50->render_card_view_scene_by_lp_time
+2. write_sprite_attrs_to_seq_buf (0x0803bd94): FUN_08094c10->poll_sprite_seq_until_done
+3. dispatch_duel_event_display_seq (0x0803be4c): FUN_0803c318->dispatch_duel_anim_queue_step + FUN_0803c3b4->tick_duel_anim_event_hub
+4. tick_duel_anim_event_hub (0x0803c3b4): FUN_0803c318->dispatch_duel_anim_queue_step
+5. tick_display_op09_seq (0x0803c53c): FUN_0803be4c->dispatch_duel_event_display_seq
+6. tick_equip_chain_link_display_seq (0x0803c564): FUN_0803be4c->dispatch_duel_event_display_seq
+7. tick_equip_set_display_sequence (0x0803c674): FUN_0803be4c->dispatch_duel_event_display_seq
+8. tick_equip_candidate_scan_with_display (0x0803c708): FUN_0803be4c->dispatch_duel_event_display_seq
+
+**§5.1 entry**: 0x0803be38 / 0x14 -- dead THUMB: inline step-lock-clear stub (ldr/ldr/adds/movs/str/bx + 8B literal pool). raw=0 THUMB=0.
+
+**fn-ptr +1 踩坑 (已知, 每次 re-export 后手补)**:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (Seg-5 known)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known)
+All 4 slots verified odd after build.
+
+**C8 验收**: asm lines 12838..14327 FUN_=0
+**Non-ASCII**: asm lines 12838..14327 non-ASCII=0 (1 CJK plate replaced with ASCII)
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (see below)
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -371,6 +413,7 @@ All 4 slots manually restored +1 after re-export.
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
 | 0x0803b24e | 0x66 | Seg-5 | dead THUMB code: 2-byte pad + 30B gDuelFieldSlots-ptr fn (x2 copies) + 38B variant fn. Orphaned slot-ptr inlines, superseded by get_zone_slot_ptr dispatch. raw=0 thumb=0. | §5.1 留待 |
+| 0x0803be38 | 0x14 | Seg-7 | dead THUMB: ldr r0,[gDuelDisplaySeqState]; ldr r1,[#0x80c]; adds; movs r1,#0; str r1,[r0]; bx lr + 8B literal pool. Clears gDuelDisplaySeqState+0x80c. No callers. raw=0 THUMB=0. | §5.1 留待 |
 
 ---
 
