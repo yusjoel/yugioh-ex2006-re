@@ -82,7 +82,7 @@
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
-| 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | |
+| 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
@@ -340,7 +340,7 @@ All 4 slots manually restored +1 after re-export.
 **Non-ASCII**: asm lines 11741..12835 non-ASCII=0 (2 CJK plates replaced with ASCII)
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: f0bd1f1
 
 ---
 
