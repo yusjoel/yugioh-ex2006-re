@@ -20,6 +20,11 @@ doc/temp/
 temp/
 __pycache__/
 
+# build 日志重定向 scratch (agent 临时捕获, 非源; ld_script.txt 是正式文件不在此列)
+/build_out*.txt
+/build_err*.txt
+/build_output.txt
+
 # asm/all.s 再生中间产物 (由 ghidra-export-range.bat → inject_modes.py 生成)
 # all.s 现为 split_all_s.py 的输入中间产物; 入库的是拆分后的 asm/all/*.s
 asm/all.s
