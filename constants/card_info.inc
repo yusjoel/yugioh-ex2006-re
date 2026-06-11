@@ -384,3 +384,13 @@
 .equ HELIOS_DUO_MEGISTE_CID,       0x000019f7  @ Helios Duo Megiste (pw=00000000; card_2000 slot=0x19F7); eval_helios path
 .equ GOBLIN_KING_CID,              0x00001755  @ Goblin King (pw=18590133; card_1536 slot=0x1755); eval path
 .equ SLOT_CARD_EMPTY,              0x0000ffff  @ empty slot sentinel: u16 card_id = 0xffff means no card; eval_slot_empty_sentinel
+
+@ --- file 03 Seg-5 additions (build_equip_target_eligibility_table .. get_zone_slot_ptr) ---
+.equ DEMOTION_CID,                 0x000015e3  @ Demotion (pw=72575145; card_1236 slot=0x15E3); eval_equip_chain_score_for_slot
+.equ PARASITE_PARACIDE_CID,        0x000012a1  @ Parasite Paracide (pw=27911549; card_0625 slot=0x12A1); query_slot_card_state_code
+.equ DNA_SURGERY_CID,              0x00001357  @ DNA Surgery (pw=74701381; card_0760 slot=0x1357); query_slot_card_state_code
+.equ D_TRIBE_CID,                  0x000015ae  @ D. Tribe (pw=02833249; card_1199 slot=0x15AE); query_slot_card_state_code
+.equ HOMUNCULUS_CID,               0x0000183b  @ Homunculus the Alchemic Being (pw=40410110; card_1727 slot=0x183B); resolve_slot_chain_best_target
+.equ SCROLL_OF_BEWITCHMENT_CID,    0x0000145b  @ Scroll of Bewitchment (pw=10352095; card_0927 slot=0x145B); resolve_slot_chain_best_target
+.equ DNA_TRANSPLANT_CID,           0x0000171f  @ DNA Transplant (pw=56769674; card_1495 slot=0x171F); base value for shifted sentinel
+.equ DNA_TRANSPLANT_CID_SHIFTED,   0xb8f80000  @ DNA_TRANSPLANT_CID(0x171f)<<19; lsls r0,#0x13 then cmp sentinel; resolve_slot_chain_best_target

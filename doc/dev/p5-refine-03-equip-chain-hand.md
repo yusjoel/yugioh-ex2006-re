@@ -81,7 +81,7 @@
 | 3 | 0x37128..0x37904 | 13 | 37 | — | ✅ | b90b81f |
 | 4a | 0x37904..0x37ec0 | 12 | 43 | — | ✅ | b56ee3e |
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
-| 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ⬜ | |
+| 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | (pending) |
 | 6 | 0x3b3a8..0x3bba4 | 13 | 79 | — | ⬜ | |
 | 7 | 0x3bba4..0x3c774 | 13 | 51 | **0x3be38/0x14** | ⬜ | |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
@@ -273,6 +273,39 @@ Structured as labeled .hword table in asm/rom.s; remainder incbin trimmed accord
 
 **commit**: c0cf7ca
 
+### 4.05 Seg-5 完成记录 [0x0803a7f0..0x0803b3a8)
+
+**函数列表 (13 fn)**:
+build_equip_target_eligibility_table / get_slot_field5_score / get_slot_field7_score /
+get_slot_field6_score / eval_slot_score_entry_full_with_sp_result /
+eval_equip_chain_score_for_slot / get_slot_card_state_code / query_slot_card_state_code /
+resolve_slot_chain_best_target / resolve_best_target_slot_for_equip /
+compute_slot_zone_eligibility_mask / check_slot_zone_bit_eligible / get_zone_slot_ptr
+
+**符号化统计**: EQ=45 (reuse 37 + new 8) / REF=31 / RENAME=3 / FUNC_RENAME=0 / PLATE=0
+
+**新建 constants**:
+- `card_info.inc` +8: DEMOTION_CID=0x15e3 / PARASITE_PARACIDE_CID=0x12a1 / DNA_SURGERY_CID=0x1357 /
+  D_TRIBE_CID=0x15ae / HOMUNCULUS_CID=0x183b / SCROLL_OF_BEWITCHMENT_CID=0x145b /
+  DNA_TRANSPLANT_CID=0x171f / DNA_TRANSPLANT_CID_SHIFTED=0xb8f80000
+
+**carve**: 0 (ROM_INCBIN 0x3b24e/0x66 is 0-ref dead code -> §5.1)
+**disasm**: 0
+**§5.1**: 1 (0x0803b24e / 0x66)
+
+**fn-ptr +1 踩坑 (已知问题)**: 3 slots reverted after re-export:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (new Seg-5 slot)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known, second slot 0x89f8 missed by replace_all due to different comment suffix)
+All 3 manually restored. byte-identical after fix.
+
+**C8 验收**: asm lines 10171..11740 FUN_=0
+**Non-ASCII (新增)**: Seg-5 Ghidra script introduces 0 new CJK. 2 pre-existing CJK lines at 10373/10385
+(naming-phase EOL comments on get_slot_field7_score/get_slot_field6_score) were already in HEAD.
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
@@ -301,6 +334,7 @@ Structured as labeled .hword table in asm/rom.s; remainder incbin trimmed accord
 | 地址 | 大小 | 所在 Seg | 初判内容 | 状态 |
 |---|---|---|---|---|
 | (各段 ref-scan 0 引用块由 executor/fixer 追加) | | | | |
+| 0x0803b24e | 0x66 | Seg-5 | dead THUMB code: 2-byte pad + 30B gDuelFieldSlots-ptr fn (x2 copies) + 38B variant fn. Orphaned slot-ptr inlines, superseded by get_zone_slot_ptr dispatch. raw=0 thumb=0. | §5.1 留待 |
 
 ---
 
