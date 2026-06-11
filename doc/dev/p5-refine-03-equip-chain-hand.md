@@ -83,7 +83,7 @@
 | 4b | 0x37ec0..0x3a7f0 | 1+subs | 140+ | **0x39350/0x10ce** | ✅ | c0cf7ca |
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
 | 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
-| 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | (pending) |
+| 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | bbcbdd5 |
 | 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
 | 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
@@ -382,7 +382,7 @@ All 4 slots verified odd after build.
 **Non-ASCII**: asm lines 12838..14327 non-ASCII=0 (1 CJK plate replaced with ASCII)
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (see below)
+**commit**: bbcbdd5
 
 ---
 
