@@ -84,7 +84,7 @@
 | 5 | 0x3a7f0..0x3b3a8 | 13 | 79 | **0x3b24e/0x66** | ✅ | 0cd58b4 |
 | 6 | 0x3b3a8..0x3bba4 | 15 | 95 | — | ✅ | f0bd1f1 |
 | 7 | 0x3bba4..0x3c774 | 13 | 56 | **0x3be38/0x14** | ✅ | bbcbdd5 |
-| 8 | 0x3c774..0x3d91c | 13 | 121 | — | ⬜ | |
+| 8 | 0x3c774..0x3d91c | 13 | 136 | — | ✅ | (pending) |
 | 9 | 0x3d91c..0x3efcc | 13 | 143 | — | ⬜ | |
 | 10 | 0x3efcc..0x4020c | 13 | 109 | — | ⬜ | |
 
@@ -383,6 +383,51 @@ All 4 slots verified odd after build.
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: bbcbdd5
+
+### 4.08 Seg-8 完成记录 [0x0803c774..0x0803d91c)
+
+**函数列表 (13 fn)**:
+tick_equip_chain_slot_ref_scan_seq / setup_equip_chain_for_slot /
+invoke_equip_candidate_scan_setup / finalize_equip_chain_removal_state /
+tick_equip_chain_activate_state_seq / clear_equip_chain_active_state /
+init_equip_ai_state / link_equip_node_by_slot_match /
+tick_zone_slot_removal_chain_repair_seq / tick_zone_card_place_alt_display_seq /
+tick_normal_summon_zone_state / tick_zone_card_place_display_seq /
+tick_zone_slot_card_set_display_seq
+
+**符号化统计**: EQ=82 (reuse 43 + new 39) / REF=53 / RENAME=1 / FUNC_RENAME=0 / PLATE=11 / total=136 / carve=0 / disasm=0 / §5.1=0
+
+**新建 constants**:
+- `ewram.inc` +3: gDuelChainStepCounter=0x0201c4d0 / gDuelChainDescBase=0x0201c4d8 / gDuelDisplaySeqStateAlt=0x0201bcc2
+- `duel_field.inc` +11: SLOT_ACTIVE_BIT22_CLR=0xffbfffff / SLOT_ACTIVE_BIT23_CLR=0xff7fffff / EQUIP_CHAIN_STEP_OFF=0x1d28 / EQUIP_CHAIN_ACTIVE_OFF=0x1d2c / SLOT_ACTIVE_BIT15_CLR=0xffff7fff / SLOT_ACTIVE_BIT14_CLR=0xffffbfff / SLOT_BITS14_15_CLR=0xfffe7fff / DISP_SEQ_STEP_LOCK_A_OFF=0x80a / DISP_SEQ_ALT_CTR_OFF=0x80e / DISP_SEQ_CARD_SET_CTR_OFF=0x818 / SLOT_BIT21_CLR=0xffdfffff
+- `card_info.inc` +4: BLUE_EYES_WHITE_DRAGON_CID=0x0fa7 / eval_gap_cid_0fa6=0x0fa6 (low-conf gap) / A_DEAL_WITH_DARK_RULER_CID=0x165a / eval_gap_cid_11ed=0x11ed (low-conf gap)
+
+**carve**: 0 / **disasm**: 0 / **§5.1**: 0
+
+**PLATE=11 breakdown**:
+1. tick_equip_chain_slot_ref_scan_seq (0x0803c774): FUN_0803be4c -> dispatch_duel_event_display_seq
+2. setup_equip_chain_for_slot (0x0803c814): FUN_0803be4c -> dispatch_duel_event_display_seq + FUN_08035f54 -> link_equip_node_by_card_type_check
+3. invoke_equip_candidate_scan_setup (0x0803c8e0): FUN_0803be4c -> dispatch_duel_event_display_seq
+4. finalize_equip_chain_removal_state (0x0803c904): FUN_0803be4c -> dispatch_duel_event_display_seq
+5. tick_equip_chain_activate_state_seq (0x0803c9ac): FUN_0803be4c -> dispatch_duel_event_display_seq
+6. clear_equip_chain_active_state (0x0803ca00): full rewrite (FUN_0802eeac -> rebuild_equip_chain_refs + wrong addr 0x0201b290 -> 0x0201c4e0)
+7. link_equip_node_by_slot_match (0x0803ca70): FUN_0803be4c -> dispatch_duel_event_display_seq
+8. tick_zone_slot_removal_chain_repair_seq (0x0803caec): FUN_0803be4c -> dispatch_duel_event_display_seq
+9. tick_zone_card_place_alt_display_seq (0x0803ccac): FUN_0803be4c -> dispatch_duel_event_display_seq
+10. tick_zone_card_place_display_seq (0x0803d478): FUN_0803be4c -> dispatch_duel_event_display_seq
+11. tick_zone_slot_card_set_display_seq (0x0803d6f4): full rewrite (FUN_0803be4c/FUN_0802f14c/FUN_0802ec80 + offset 0x810->0x818)
+
+**fn-ptr +1 踩坑 (已知, 每次 re-export 后手补)**:
+- 0x08037884 check_level_conv_lab_node_match+1 (Seg-3 known)
+- 0x0803aa74 check_level_conv_lab_node_match+1 (Seg-5 known)
+- 0x080389dc + 0x080389f8 check_card_is_amazoness_type+1 (Seg-4b known)
+All 4 slots manually restored +1 after re-export.
+
+**C8 验收**: asm lines 14327..16752 FUN_ stale labels=0 (one @ comment reference is informational only)
+**Non-ASCII**: asm lines 14327..16752 non-ASCII=0
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
 
 ---
 

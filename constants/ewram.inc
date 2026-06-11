@@ -367,3 +367,10 @@
 @ =============================================================================
 .equ gDuelDisplaySeqState,  0x0201bcc0  @ duel field event display sequence state buffer base; +0=event_code hword; +0x808=write_slot_idx; +0x80c=step_lock; 178 raw ROM refs
 .equ gSpriteAttrBuf,        0x0201b870  @ sprite attribute buffer base (write_sprite_attr_record_entry); +0x300=filled_flags; +0x304/0x306/0x308/0x30a=attr0..3; 52 raw ROM refs
+
+@ =============================================================================
+@ file 03 Seg-8 additions: duel chain step counter + chain desc base + alt display seq state
+@ =============================================================================
+.equ gDuelChainStepCounter,   0x0201c4d0  @ equip chain removal/placement step counter; 3-state machine (0/1/2+); 8 raw ROM refs
+.equ gDuelChainDescBase,      0x0201c4d8  @ equip chain zone slot descriptor / copy buffer base; zone placement and card-set display sequences; 22 raw ROM refs
+.equ gDuelDisplaySeqStateAlt, 0x0201bcc2  @ alternate duel display seq state base = gDuelDisplaySeqState+2; used by alt zone-card-place and normal-summon functions; 3 raw ROM refs

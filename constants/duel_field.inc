@@ -218,3 +218,18 @@
 .equ ACTIVATION_STATE_C_OFF,        0x00001d4c  @ [gP1LifePoints+0x1d4c] activation state field C; checked ==0 before play_ui_effect(0x31/0x32); distinct from A=0x1d48/B=0x1d78; 4 raw refs
 .equ SPRITE_ATTR_FIELD1_OFF,        0x00000306  @ [gSpriteAttrBuf+0x306] sprite attr halfword 1; strh write in write_sprite_attr_record_entry; 56 raw refs
 .equ SPRITE_ATTR_FIELD3_OFF,        0x0000030a  @ [gSpriteAttrBuf+0x30a] sprite attr halfword 3; strh write in write_sprite_attr_record_entry; 23 raw refs
+
+@ =============================================================================
+@ file 03 Seg-8 additions: slot active-bit masks + equip chain offsets + display seq offsets
+@ =============================================================================
+.equ SLOT_ACTIVE_BIT22_CLR,       0xffbfffff  @ AND mask clearing bit22 of zone slot word (chain-linked flag); tick_equip_chain_slot_ref_scan_seq asm 14365; 413 raw ROM refs
+.equ SLOT_ACTIVE_BIT23_CLR,       0xff7fffff  @ AND mask clearing bit23 of zone slot word (chain-type flag); tick_equip_chain_slot_ref_scan_seq asm 14367; 188 raw ROM refs
+.equ EQUIP_CHAIN_STEP_OFF,        0x00001d28  @ [gP1LifePoints+player*0x868+0x1d28] equip chain state step field; values: 0x6=activate, 0x9=ai_init, 0xb=ready, 0xc=finalize; 31 raw ROM refs
+.equ EQUIP_CHAIN_ACTIVE_OFF,      0x00001d2c  @ [gP1LifePoints+player*0x868+0x1d2c] equip chain active player side flag; 0/1; 95 raw ROM refs
+.equ SLOT_ACTIVE_BIT15_CLR,       0xffff7fff  @ AND mask clearing bit15 of zone slot display descriptor word; used in zone placement functions; 188 raw ROM refs
+.equ SLOT_ACTIVE_BIT14_CLR,       0xffffbfff  @ AND mask clearing bit14 of zone slot display descriptor word; used alongside SLOT_ACTIVE_BIT15_CLR; 413 raw ROM refs
+.equ SLOT_BITS14_15_CLR,          0xfffe7fff  @ AND mask clearing bits 14+15 simultaneously (=SLOT_ACTIVE_BIT14_CLR & SLOT_ACTIVE_BIT15_CLR); 6 raw ROM refs
+.equ DISP_SEQ_STEP_LOCK_A_OFF,    0x0000080a  @ [gDuelDisplaySeqState+0x80a] secondary step lock A; cleared at step 2 in tick_zone_card_place_display_seq; 9 raw ROM refs
+.equ DISP_SEQ_ALT_CTR_OFF,        0x0000080e  @ [gDuelDisplaySeqState+0x80e] step counter for alt zone-card-place and normal-summon sequences; 14 raw ROM refs
+.equ DISP_SEQ_CARD_SET_CTR_OFF,   0x00000818  @ [gDuelDisplaySeqState+0x818] step counter for card-set display sequence; tick_zone_slot_card_set_display_seq; 26 raw ROM refs
+.equ SLOT_BIT21_CLR,              0xffdfffff  @ AND mask clearing bit21 of zone slot word (equip-active bit); tick_zone_slot_card_set_display_seq asm 16670; 215 raw ROM refs

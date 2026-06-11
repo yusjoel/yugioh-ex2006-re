@@ -408,3 +408,11 @@
 
 @ --- file 03 Seg-7 additions (eval_equip_placement_full_check .. tick_equip_candidate_scan_with_display) ---
 .equ BALLISTA_OF_RAMPART_SMASHING_CID, 0x00001846  @ Ballista of Rampart Smashing (pw=00242146; card_4305 slot=0x1846); tick_equip_chain_link_display_seq chain pool index; 1 slot
+
+@ =============================================================================
+@ file 03 Seg-8 additions: equip chain display seq card IDs
+@ =============================================================================
+.equ BLUE_EYES_WHITE_DRAGON_CID,    0x00000fa7  @ Blue-Eyes White Dragon (pw=89631139; card_0001 slot=0x0FA7); setup_equip_chain_for_slot card_type upper bound
+.equ eval_gap_cid_0fa6,             0x00000fa6  @ gap slot (NOT in card-stats.s; between slot 0x0fa5 and card_0001=BEWD); setup_equip_chain_for_slot card_type lower bound; low confidence
+.equ A_DEAL_WITH_DARK_RULER_CID,    0x0000165a  @ A Deal with Dark Ruler (pw=06850209; card_1330 slot=0x165A); tick_normal_summon_zone_state link_equip_node_to_chain chain_type arg
+.equ eval_gap_cid_11ed,             0x000011ed  @ gap slot (NOT in card-stats.s; between 0x11eb=Takuhee and 0x11ee=Binding Chain); finalize_equip_chain_removal_state sentinel; low confidence
