@@ -243,6 +243,8 @@ Dry run found 2 address mismatches (0x08042e98/0x08042e9c swapped, 0x08042468 co
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
+**commit**: a62d2e2
+
 ---
 
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
