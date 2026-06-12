@@ -445,3 +445,30 @@
 @ =============================================================================
 .equ GEARFRIED_IRON_KNIGHT_CID,    0x000013c3  @ Gearfried the Iron Knight (pw=00423705; card_0839 slot=0x13C3); BST dispatch in enqueue_zone_slot_sprite_attr_by_card_type; 10 ROM refs
 .equ GEARFRIED_SWORDMASTER_CID,    0x0000186b  @ Gearfried the Swordmaster (pw=57046845; card_1772 slot=0x186B); BST dispatch; set_field_slot_bit_with_sprite_update path; 8 ROM refs
+
+@ =============================================================================
+@ file 04 Seg-6 additions: equip zone sprite / banisher cluster card IDs
+@ =============================================================================
+.equ BANISHER_OF_THE_LIGHT_CID,      0x00001332  @ Banisher of the Light (pw=61528025; card_0729 slot=0x1332); dispatch_equip_zone_sprite_banisher_* cluster; 6 Seg-6 slots
+.equ GRAVEROBBER_CID,                0x00001379  @ Graverobber (pw=61705417; card_0789 slot=0x1379); dispatch_equip_zone_sprite_and_activation + render_equip_zone_sprite_with_chain_lp; 2 Seg-6 slots
+.equ SUPER_REJUVENATION_CID,         0x000014e2  @ Super Rejuvenation (pw=27770341; card_1042 slot=0x14E2); dispatch_equip_zone_sprite_and_activation + dispatch_equip_zone_sprite_banisher_with_spell_check; 2 Seg-6 slots
+.equ SAMSARA_CID,                    0x000019da  @ Samsara (pw=44182827; card_2061 slot=0x19DA); dispatch_equip_zone_sprite_banisher_with_spell_check second-card check; 1 slot
+.equ CRASS_CLOWN_CID,                0x00001005  @ Crass Clown (pw=93889755; card_0101 slot=0x1005); apply_slot_equip_activation_with_sprite branch A; 1 slot
+.equ BLADE_RABBIT_CID,               0x00001868  @ Blade Rabbit (pw=58268433; card_1769 slot=0x1868); apply_slot_equip_activation_with_sprite branch D; 1 slot
+.equ AMEBA_CID,                      0x0000118a  @ Ameba (pw=95174353; card_0407 slot=0x118A); scan_equip_chain_list_for_activation_sprite equip activation range base (0x118a..0x11c9); 1 slot; 28 raw ROM refs
+.equ MANTICORE_OF_DARKNESS_CID,      0x000016f9  @ Manticore of Darkness (pw=77121851; card_1458 slot=0x16F9); dispatch_equip_zone_sprite_and_activation BST root; 1 slot
+.equ ARCHFIEND_OF_GILFER_CID,        0x000013e3  @ Archfiend of Gilfer (pw=50287060; card_0853 slot=0x13E3); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ MINAR_CID,                      0x000011bc  @ Minar (pw=32539892; card_0444 slot=0x11BC); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ SKULL_MARK_LADYBUG_CID,         0x000012a2  @ Skull-Mark Ladybug (pw=64306248; card_0626 slot=0x12A2); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ MAKYURA_THE_DESTRUCTOR_CID,     0x000014a5  @ Makyura the Destructor (pw=21593977; card_0991 slot=0x14A5); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ DESPAIR_FROM_THE_DARK_CID,      0x00001653  @ Despair from the Dark (pw=71200730; card_1323 slot=0x1653); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ FEAR_FROM_THE_DARK_CID,         0x00001655  @ Fear from the Dark (pw=34193084; card_1325 slot=0x1655); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ OUTSTANDING_DOG_MARRON_CID,     0x00001687  @ Outstanding Dog Marron (pw=11548522; card_1364 slot=0x1687); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ ROC_FROM_THE_VALLEY_OF_HAZE_CID, 0x00001828 @ Roc from the Valley of Haze (pw=28143906; card_1708 slot=0x1828); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ NIGHT_ASSAILANT_CID,            0x0000179a  @ Night Assailant (pw=16226786; card_1585 slot=0x179A); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ BROWW_HUNTSMAN_OF_DARK_WORLD_CID, 0x00001966 @ Broww, Huntsman of Dark World (pw=79126789; card_1972 slot=0x1966); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ SILLVA_WARLORD_OF_DARK_WORLD_CID, 0x00001968 @ Sillva, Warlord of Dark World (pw=32619583; card_1974 slot=0x1968); dispatch_equip_zone_sprite_and_activation BST; 1 slot
+.equ EKIBYO_DRAKMORD_CID_SHIFTED,    0xa4e80000  @ EKIBYO_DRAKMORD_CID(0x149d)<<19; scan_equip_chain_list_for_activation_sprite type-match sentinel; 1 raw ROM ref
+@ (card_0987: Ekibyo Drakmord pw=69954399; 0xa4e80000>>19=0x149d; card-stats.s verified)
+.equ act_cid_1048_08043b48,          0x00001048  @ card_id branch B in apply_slot_equip_activation_with_sprite; NOT in card-stats.s -> neutral name; 1 slot
+.equ act_cid_1197_08043be8,          0x00001197  @ card_id branch C in apply_slot_equip_activation_with_sprite; NOT in card-stats.s -> neutral name; 1 slot

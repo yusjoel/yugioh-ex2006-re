@@ -1357,7 +1357,7 @@ tick_equip_scan_state_base:
 tick_equip_scan_field_slots_base:
     .word  gDuelFieldSlots                @ 08040ab0 10c50102  gDuelFieldSlots
 tick_equip_scan_destiny_chain_table:
-    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  zone_monster_field_bonus_table+7*16: Destiny Board + Spirit Message I/N/A/L card_ids
+    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  Destiny Board + Spirit Message I/N/A/L card_ids (base+0x70)
 tick_equip_scan_player_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08040ab8 68080000  PLAYER_BLOCK_STRIDE (0x868)
 LAB_08040abc:
@@ -7933,10 +7933,10 @@ enqueue_zone_card_sprite_attr_by_slot:
     lsls r0,r3,#0x2    @ 08043956 9800
     adds r0,r0,r3    @ 08043958 c018
     lsls r0,r0,#0x2    @ 0804395a 8000
-    ldr r1, DAT_08043994                     @ 0804395c 0d49
+    ldr r1, zcsa_stride                      @ 0804395c 0d49
     muls r1,r2    @ 0804395e 5143
     adds r0,r0,r1    @ 08043960 4018
-    ldr r1, DAT_08043998                     @ 08043962 0d49
+    ldr r1, zcsa_gdfs                        @ 08043962 0d49
     adds r1,r0,r1    @ 08043964 4118
     ldr r0,[r1,#0x0]                         @ 08043966 0868
     lsls r0,r0,#0x13    @ 08043968 c004
@@ -7945,7 +7945,7 @@ enqueue_zone_card_sprite_attr_by_slot:
     movs r5,#0x35    @ 0804396e 3525
     cmp r4,#0x0                              @ 08043970 002c
     beq LAB_08043976                         @ 08043972 00d0
-    ldr r5, DAT_0804399c                     @ 08043974 094d
+    ldr r5, zcsa_pal_p1                      @ 08043974 094d
 LAB_08043976:
     lsls r0,r3,#0x10    @ 08043976 1804
     lsrs r3,r0,#0x10    @ 08043978 030c
@@ -7963,14 +7963,14 @@ LAB_0804398e:
     pop {r4,r5}                              @ 0804398e 30bc
     pop {r0}                                 @ 08043990 01bc
     bx r0                                    @ 08043992 0047
-DAT_08043994:
-    .word  0x00000868                     @ 08043994 68080000
-DAT_08043998:
-    .word  0x0201c510                     @ 08043998 10c50102
-DAT_0804399c:
-    .word  0x00008035                     @ 0804399c 35800000
+zcsa_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043994 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+zcsa_gdfs:
+    .word  gDuelFieldSlots                @ 08043998 10c50102  gDuelFieldSlots=0x0201c510: reuse
+zcsa_pal_p1:
+    .word  OAM_ZONE_CARD_SPRITE_P1        @ 0804399c 35800000  OAM_ZONE_CARD_SPRITE_P1=0x8035: reuse
 
-@ Wrapper: writes sp+0=0 then bl apply_slot_equip_activation_with_sprite. Equivalent to calling apply_slot_equip_activation_with_sprite with side_flag=0 without requiring caller to clear the stack param. Called by 5 duel_field callers (FUN_08043c18, FUN_0808df3c, FUN_0809b178, FUN_0809b7e0, FUN_0809eb54) in sprite refresh phase. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..4], r2=u32 card_info. Returns r0 passthrough from apply_slot_equip_activation_with_sprite.
+@ Wrapper: writes sp+0=0 then bl apply_slot_equip_activation_with_sprite. Equivalent to calling apply_slot_equip_activation_with_sprite with side_flag=0 without requiring caller to clear the stack param. Called by 5 duel_field callers (dispatch_slot_equip_sprite_by_field6_type, scan_all_slots_for_max_equip_match, update_equip_activation_display_state, update_equip_zone_sprite_by_state, scan_monster_zone_slots_for_equip_activation_reserved_icid_g) in sprite refresh phase. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..4], r2=u32 card_info. Returns r0 passthrough from apply_slot_equip_activation_with_sprite.
 invoke_equip_activation_with_zero_flag:
     push {r4,lr}                             @ 080439a0 10b5
     sub sp,#0x4                              @ 080439a2 81b0
@@ -8031,10 +8031,10 @@ apply_slot_equip_activation_with_sprite:
     lsls r0,r7,#0x2    @ 080439fc b800
     adds r0,r0,r7    @ 080439fe c019
     lsls r0,r0,#0x2    @ 08043a00 8000
-    ldr r1, DAT_08043ad4                     @ 08043a02 3449
+    ldr r1, aseas_stride                     @ 08043a02 3449
     muls r1,r3    @ 08043a04 5943
     adds r0,r0,r1    @ 08043a06 4018
-    ldr r1, DAT_08043ad8                     @ 08043a08 3349
+    ldr r1, aseas_gdfs                       @ 08043a08 3349
     adds r1,r0,r1    @ 08043a0a 4118
     ldr r4,[r1,#0x0]                         @ 08043a0c 0c68
     lsls r0,r4,#0x13    @ 08043a0e e004
@@ -8060,25 +8060,25 @@ LAB_08043a1e:
     str r1,[sp,#0x8]                         @ 08043a32 0291
 LAB_08043a34:
     lsls r1,r3,#0x9    @ 08043a34 5902
-    ldr r0, DAT_08043adc                     @ 08043a36 2948
+    ldr r0, aseas_clr_bit9                   @ 08043a36 2948
     ands r5,r0    @ 08043a38 0540
     orrs r5,r1    @ 08043a3a 0d43
     movs r0,#0xf    @ 08043a3c 0f20
     ands r0,r7    @ 08043a3e 3840
     lsls r0,r0,#0xa    @ 08043a40 8002
-    ldr r1, DAT_08043ae0                     @ 08043a42 2749
+    ldr r1, aseas_clr_bits13_10              @ 08043a42 2749
     ands r5,r1    @ 08043a44 0d40
     orrs r5,r0    @ 08043a46 0543
     ldr r0,[sp,#0x8]                         @ 08043a48 0298
     .hword 0x4663    @ 08043a4a 6346
     ands r0,r3    @ 08043a4c 1840
     lsls r0,r0,#0xe    @ 08043a4e 8003
-    ldr r1, DAT_08043ae4                     @ 08043a50 2449
+    ldr r1, aseas_clr_bit14                  @ 08043a50 2449
     ands r5,r1    @ 08043a52 0d40
     orrs r5,r0    @ 08043a54 0543
     ands r2,r3    @ 08043a56 1a40
     lsls r1,r2,#0xf    @ 08043a58 d103
-    ldr r0, DAT_08043ae8                     @ 08043a5a 2348
+    ldr r0, aseas_clr_bit15                  @ 08043a5a 2348
     ands r5,r0    @ 08043a5c 0540
     orrs r5,r1    @ 08043a5e 0d43
     lsls r1,r4,#0x2    @ 08043a60 a100
@@ -8087,12 +8087,12 @@ LAB_08043a34:
     lsls r0,r4,#0x12    @ 08043a66 a004
     lsrs r0,r0,#0x1f    @ 08043a68 c00f
     orrs r1,r0    @ 08043a6a 0143
-    ldr r0, DAT_08043aec                     @ 08043a6c 1f48
+    ldr r0, aseas_clr_bits8_0                @ 08043a6c 1f48
     ands r5,r0    @ 08043a6e 0540
     orrs r5,r1    @ 08043a70 0d43
-    ldr r0, DAT_08043af0                     @ 08043a72 1f48
+    ldr r0, aseas_clr_bit16                  @ 08043a72 1f48
     ands r5,r0    @ 08043a74 0540
-    ldr r0, DAT_08043af4                     @ 08043a76 1f48
+    ldr r0, aseas_clr_bit17                  @ 08043a76 1f48
     ands r5,r0    @ 08043a78 0540
     ldr r0,[sp,#0x4]                         @ 08043a7a 0198
     cmp r0,#0x0                              @ 08043a7c 0028
@@ -8111,7 +8111,7 @@ LAB_08043a92:
     .hword 0x4643    @ 08043a94 4346
     cmp r3,#0x0                              @ 08043a96 002b
     beq LAB_08043a9c                         @ 08043a98 00d0
-    ldr r0, DAT_08043af8                     @ 08043a9a 1748
+    ldr r0, aseas_equip_slot_pal_p1          @ 08043a9a 1748
 LAB_08043a9c:
     lsls r4,r7,#0x10    @ 08043a9c 3c04
     lsrs r1,r4,#0x10    @ 08043a9e 210c
@@ -8140,26 +8140,26 @@ LAB_08043ac6:
     cmp r2,#0x0                              @ 08043ace 002a
     bne LAB_08043b02                         @ 08043ad0 17d1
     b LAB_08043b78                           @ 08043ad2 51e0
-DAT_08043ad4:
-    .word  0x00000868                     @ 08043ad4 68080000
-DAT_08043ad8:
-    .word  0x0201c510                     @ 08043ad8 10c50102
-DAT_08043adc:
-    .word  0xfffffdff                     @ 08043adc fffdffff
-DAT_08043ae0:
-    .word  0xffffc3ff                     @ 08043ae0 ffc3ffff
-DAT_08043ae4:
-    .word  0xffffbfff                     @ 08043ae4 ffbfffff
-DAT_08043ae8:
-    .word  0xffff7fff                     @ 08043ae8 ff7fffff
-DAT_08043aec:
-    .word  0xfffffe00                     @ 08043aec 00feffff
-DAT_08043af0:
-    .word  0xfffeffff                     @ 08043af0 fffffeff
-DAT_08043af4:
-    .word  0xfffdffff                     @ 08043af4 fffffdff
-DAT_08043af8:
-    .word  0x00008034                     @ 08043af8 34800000
+aseas_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043ad4 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+aseas_gdfs:
+    .word  gDuelFieldSlots                @ 08043ad8 10c50102  gDuelFieldSlots=0x0201c510: reuse
+aseas_clr_bit9:
+    .word  OAM_SPRITE_ATTR_CLR_BIT9       @ 08043adc fffdffff  OAM_SPRITE_ATTR_CLR_BIT9=0xfffffdff: AND mask clears bit9 (player_side)
+aseas_clr_bits13_10:
+    .word  OAM_SPRITE_ATTR_CLR_BITS13_10  @ 08043ae0 ffc3ffff  OAM_SPRITE_ATTR_CLR_BITS13_10=0xffffc3ff: AND mask clears bits[13:10]
+aseas_clr_bit14:
+    .word  SLOT_ACTIVE_BIT14_CLR          @ 08043ae4 ffbfffff  SLOT_ACTIVE_BIT14_CLR=0xffffbfff: AND mask clears bit14
+aseas_clr_bit15:
+    .word  SLOT_ACTIVE_BIT15_CLR          @ 08043ae8 ff7fffff  SLOT_ACTIVE_BIT15_CLR=0xffff7fff: AND mask clears bit15
+aseas_clr_bits8_0:
+    .word  OAM_ATTR1_X_CLEAR              @ 08043aec 00feffff  OAM_ATTR1_X_CLEAR=0xfffffe00: AND mask clears attr1 bits[8:0]
+aseas_clr_bit16:
+    .word  OAM_SPRITE_ATTR_CLR_BIT16      @ 08043af0 fffffeff  OAM_SPRITE_ATTR_CLR_BIT16=0xfffeffff: AND mask clears bit16 (flip flag)
+aseas_clr_bit17:
+    .word  OAM_SPRITE_ATTR_CLR_BIT17      @ 08043af4 fffffdff  OAM_SPRITE_ATTR_CLR_BIT17=0xfffdffff: AND mask clears bit17 (composite sprite flag)
+aseas_equip_slot_pal_p1:
+    .word  OAM_EQUIP_SLOT_SPRITE_P1       @ 08043af8 34800000  OAM_EQUIP_SLOT_SPRITE_P1=0x8034: equip slot activation OAM attr0 P1 (bit15+0x34)
 LAB_08043afc:
     .hword 0x4653    @ 08043afc 5346
     cmp r3,#0x0                              @ 08043afe 002b
@@ -8168,7 +8168,7 @@ LAB_08043b02:
     ldr r0,[sp,#0x8]                         @ 08043b02 0298
     cmp r0,#0x0                              @ 08043b04 0028
     bne LAB_08043b34                         @ 08043b06 15d1
-    ldr r0, DAT_08043b30                     @ 08043b08 0948
+    ldr r0, aseas_cid_crass_clown            @ 08043b08 0948
     cmp r6,r0                                @ 08043b0a 8642
     bne LAB_08043b78                         @ 08043b0c 34d1
     .hword 0x4641    @ 08043b0e 4146
@@ -8187,10 +8187,10 @@ LAB_08043b02:
     adds r2,r5,#0x0    @ 08043b28 2a1c
     bl apply_equip_activation_with_id_lookup @ 08043b2a 08f0f1fe
     b LAB_08043b78                           @ 08043b2e 23e0
-DAT_08043b30:
-    .word  0x00001005                     @ 08043b30 05100000
+aseas_cid_crass_clown:
+    .word  CRASS_CLOWN_CID                @ 08043b30 05100000  CRASS_CLOWN_CID=0x1005: pw=93889755; card_0101; branch A
 LAB_08043b34:
-    ldr r0, DAT_08043b48                     @ 08043b34 0448
+    ldr r0, aseas_cid_1048                   @ 08043b34 0448
     cmp r6,r0                                @ 08043b36 8642
     beq LAB_08043b58                         @ 08043b38 0ed0
     cmp r6,r0                                @ 08043b3a 8642
@@ -8200,13 +8200,13 @@ LAB_08043b34:
     beq LAB_08043b58                         @ 08043b42 09d0
     b LAB_08043b78                           @ 08043b44 18e0
     .zero  0x2
-DAT_08043b48:
-    .word  0x00001048                     @ 08043b48 48100000
+aseas_cid_1048:
+    .word  act_cid_1048_08043b48          @ 08043b48 48100000  act_cid_1048_08043b48=0x1048: card_id branch B; NOT in card-stats.s; neutral name
 LAB_08043b4c:
-    ldr r0, DAT_08043be8                     @ 08043b4c 2648
+    ldr r0, aseas_cid_1197                   @ 08043b4c 2648
     cmp r6,r0                                @ 08043b4e 8642
     beq LAB_08043b58                         @ 08043b50 02d0
-    ldr r0, DAT_08043bec                     @ 08043b52 2648
+    ldr r0, aseas_cid_blade_rabbit           @ 08043b52 2648
     cmp r6,r0                                @ 08043b54 8642
     bne LAB_08043b78                         @ 08043b56 0fd1
 LAB_08043b58:
@@ -8245,10 +8245,10 @@ LAB_08043b78:
     lsls r4,r7,#0x2    @ 08043b9a bc00
     adds r4,r4,r7    @ 08043b9c e419
     lsls r4,r4,#0x2    @ 08043b9e a400
-    ldr r0, DAT_08043bf0                     @ 08043ba0 1348
+    ldr r0, aseas_stride_b                   @ 08043ba0 1348
     muls r0,r1    @ 08043ba2 4843
     adds r4,r4,r0    @ 08043ba4 2418
-    ldr r0, DAT_08043bf4                     @ 08043ba6 1348
+    ldr r0, aseas_gdfs_b                     @ 08043ba6 1348
     adds r4,r4,r0    @ 08043ba8 2418
     strh r2,[r4,#0x8]                        @ 08043baa 2281
     .hword 0x4642    @ 08043bac 4246
@@ -8280,14 +8280,14 @@ LAB_08043bd0:
     bl submit_lp_bar_sprite_row_by_type      @ 08043be0 41f09efb
     b LAB_08043c00                           @ 08043be4 0ce0
     .zero  0x2
-DAT_08043be8:
-    .word  0x00001197                     @ 08043be8 97110000
-DAT_08043bec:
-    .word  0x00001868                     @ 08043bec 68180000
-DAT_08043bf0:
-    .word  0x00000868                     @ 08043bf0 68080000
-DAT_08043bf4:
-    .word  0x0201c510                     @ 08043bf4 10c50102
+aseas_cid_1197:
+    .word  act_cid_1197_08043be8          @ 08043be8 97110000  act_cid_1197_08043be8=0x1197: card_id branch C; NOT in card-stats.s; neutral name
+aseas_cid_blade_rabbit:
+    .word  BLADE_RABBIT_CID               @ 08043bec 68180000  BLADE_RABBIT_CID=0x1868: pw=58268433; card_1769; branch D
+aseas_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043bf0 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+aseas_gdfs_b:
+    .word  gDuelFieldSlots                @ 08043bf4 10c50102  gDuelFieldSlots=0x0201c510: reuse
 LAB_08043bf8:
     movs r0,#0xb    @ 08043bf8 0b20
     adds r1,r5,#0x0    @ 08043bfa 291c
@@ -8328,10 +8328,10 @@ dispatch_slot_equip_sprite_by_field6_type:
     lsls r0,r4,#0x2    @ 08043c2c a000
     adds r0,r0,r4    @ 08043c2e 0019
     lsls r0,r0,#0x2    @ 08043c30 8000
-    ldr r1, DAT_08043c74                     @ 08043c32 1049
+    ldr r1, dses_stride                      @ 08043c32 1049
     muls r1,r2    @ 08043c34 5143
     adds r0,r0,r1    @ 08043c36 4018
-    ldr r1, DAT_08043c78                     @ 08043c38 0f49
+    ldr r1, dses_gdfs                        @ 08043c38 0f49
     adds r0,r0,r1    @ 08043c3a 4018
     ldr r0,[r0,#0x0]                         @ 08043c3c 0068
     lsls r0,r0,#0x13    @ 08043c3e c004
@@ -8344,7 +8344,7 @@ dispatch_slot_equip_sprite_by_field6_type:
     movs r2,#0x1    @ 08043c4e 0122
     .hword 0x4690    @ 08043c50 9046
 LAB_08043c52:
-    ldr r0, DAT_08043c7c                     @ 08043c52 0a48
+    ldr r0, dses_cid_light_of_intervention   @ 08043c52 0a48
     bl count_field_copies_of_card            @ 08043c54 eef7a2fd
     cmp r0,#0x0                              @ 08043c58 0028
     bne LAB_08043d10                         @ 08043c5a 59d1
@@ -8358,12 +8358,12 @@ LAB_08043c52:
     bl check_slot_fieldspell_eligible_by_side @ 08043c6c f2f740fd
     b LAB_08043c94                           @ 08043c70 10e0
     .zero  0x2
-DAT_08043c74:
-    .word  0x00000868                     @ 08043c74 68080000
-DAT_08043c78:
-    .word  0x0201c510                     @ 08043c78 10c50102
-DAT_08043c7c:
-    .word  0x0000135d                     @ 08043c7c 5d130000
+dses_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043c74 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+dses_gdfs:
+    .word  gDuelFieldSlots                @ 08043c78 10c50102  gDuelFieldSlots=0x0201c510: reuse
+dses_cid_light_of_intervention:
+    .word  LIGHT_OF_INTERVENTION_CID      @ 08043c7c 5d130000  LIGHT_OF_INTERVENTION_CID=0x135d: field_copies gate; reuse
 LAB_08043c80:
     adds r0,r6,#0x0    @ 08043c80 301c
     bl get_card_extended_stat_field6         @ 08043c82 abf0b9f8
@@ -8378,7 +8378,7 @@ LAB_08043c94:
     bne LAB_08043d10                         @ 08043c96 3bd1
 LAB_08043c98:
     lsls r3,r4,#0x2    @ 08043c98 a300
-    ldr r0, DAT_08043cd4                     @ 08043c9a 0e48
+    ldr r0, dses_gdfs_b                      @ 08043c9a 0e48
     .hword 0x4684    @ 08043c9c 8446
     .hword 0x4641    @ 08043c9e 4146
     cmp r1,#0x0                              @ 08043ca0 0029
@@ -8387,7 +8387,7 @@ LAB_08043c98:
     ands r2,r5    @ 08043ca6 2a40
     adds r0,r3,r4    @ 08043ca8 1819
     lsls r0,r0,#0x2    @ 08043caa 8000
-    ldr r1, DAT_08043cd8                     @ 08043cac 0a49
+    ldr r1, dses_stride_b                    @ 08043cac 0a49
     muls r1,r2    @ 08043cae 5143
     adds r0,r0,r1    @ 08043cb0 4018
     .hword 0x4662    @ 08043cb2 6246
@@ -8406,10 +8406,10 @@ LAB_08043c98:
     bl enqueue_slot_sprite_attr_by_card_type_and_state @ 08043ccc fff722fd
     b LAB_08043d10                           @ 08043cd0 1ee0
     .zero  0x2
-DAT_08043cd4:
-    .word  0x0201c510                     @ 08043cd4 10c50102
-DAT_08043cd8:
-    .word  0x00000868                     @ 08043cd8 68080000
+dses_gdfs_b:
+    .word  gDuelFieldSlots                @ 08043cd4 10c50102  gDuelFieldSlots=0x0201c510: reuse
+dses_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043cd8 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
 LAB_08043cdc:
     str r6,[sp,#0x0]                         @ 08043cdc 0096
     adds r0,r5,#0x0    @ 08043cde 281c
@@ -8423,7 +8423,7 @@ LAB_08043cec:
     ands r2,r5    @ 08043cee 2a40
     adds r0,r3,r4    @ 08043cf0 1819
     lsls r0,r0,#0x2    @ 08043cf2 8000
-    ldr r1, DAT_08043d1c                     @ 08043cf4 0949
+    ldr r1, dses_stride_c                    @ 08043cf4 0949
     muls r1,r2    @ 08043cf6 5143
     adds r0,r0,r1    @ 08043cf8 4018
     add r0,r12                               @ 08043cfa 6044
@@ -8443,10 +8443,10 @@ LAB_08043d10:
     pop {r4,r5,r6,r7}                        @ 08043d16 f0bc
     pop {r0}                                 @ 08043d18 01bc
     bx r0                                    @ 08043d1a 0047
-DAT_08043d1c:
-    .word  0x00000868                     @ 08043d1c 68080000
+dses_stride_c:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043d1c 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
 
-@ Called by FUN_08043ea4 and FUN_08043f44 (both duel_field). Receives encoded params: r0=src (bits[7:0]=src_player [0..1], bits[15:8]=src_slot [0..9]), r1=dst (bits[7:0]=dst_player [0..1], bits[15:8]=dst_slot [0..9]). If src_slot==dst_slot: returns immediately (self-reference invalid). Locates src slot in gDuelFieldSlots (0x0201c510, player*0x868+slot*0x14); checks [slot+0x8] valid flag (ldrh!=0). Reads slot[0] bits[12:0] for card_id, compares with 0xa5600000>>19 (=0x12ab type mask). If match: calls find_equip_chain_pair_across_field; if pair found (!=0xffff): extracts player/slot fields, calls enqueue_equip_chain_slot_sprite_attr to write equip-chain slot sprite. Returns void. r0=u16 src_encoded, r1=u16 dst_encoded. Constants: gDuelFieldSlots=0x0201c510, card_type_mask=0xa5600000 (0x12ab after shift), no_pair=0xffff. Callers: FUN_08043ea4, FUN_08043f44.
+@ Called by enqueue_equip_chain_pair_sprite_if_eligible and enqueue_equip_chain_dual_slot_sprite_with_activation_scan (both duel_field). Receives encoded params: r0=src (bits[7:0]=src_player [0..1], bits[15:8]=src_slot [0..9]), r1=dst (bits[7:0]=dst_player [0..1], bits[15:8]=dst_slot [0..9]). If src_slot==dst_slot: returns immediately (self-reference invalid). Locates src slot in gDuelFieldSlots (0x0201c510, player*0x868+slot*0x14); checks [slot+0x8] valid flag (ldrh!=0). Reads slot[0] bits[12:0] for card_id, compares with 0xa5600000>>19 (=0x12ab type mask). If match: calls find_equip_chain_pair_across_field; if pair found (!=0xffff): extracts player/slot fields, calls enqueue_equip_chain_slot_sprite_attr to write equip-chain slot sprite. Returns void. r0=u16 src_encoded, r1=u16 dst_encoded. Constants: gDuelFieldSlots=0x0201c510, card_type_mask=0xa5600000 (0x12ab after shift), no_pair=0xffff. Callers: enqueue_equip_chain_pair_sprite_if_eligible, enqueue_equip_chain_dual_slot_sprite_with_activation_scan.
 enqueue_equip_chain_pair_sprite_validated:
     push {r4,r5,lr}                          @ 08043d20 30b5
     lsls r0,r0,#0x10    @ 08043d22 0004
@@ -8461,17 +8461,17 @@ enqueue_equip_chain_pair_sprite_validated:
     lsls r0,r5,#0x2    @ 08043d34 a800
     adds r0,r0,r5    @ 08043d36 4019
     lsls r0,r0,#0x2    @ 08043d38 8000
-    ldr r1, DAT_08043d80                     @ 08043d3a 1149
+    ldr r1, ecpsv_stride                     @ 08043d3a 1149
     muls r1,r2    @ 08043d3c 5143
     adds r0,r0,r1    @ 08043d3e 4018
-    ldr r1, DAT_08043d84                     @ 08043d40 1049
+    ldr r1, ecpsv_gdfs                       @ 08043d40 1049
     adds r1,r0,r1    @ 08043d42 4118
     ldrh r0,[r1,#0x8]                        @ 08043d44 0889
     cmp r0,#0x0                              @ 08043d46 0028
     beq LAB_08043d78                         @ 08043d48 16d0
     ldr r0,[r1,#0x0]                         @ 08043d4a 0868
     lsls r0,r0,#0x13    @ 08043d4c c004
-    ldr r1, DAT_08043d88                     @ 08043d4e 0e49
+    ldr r1, ecpsv_equip_tag                  @ 08043d4e 0e49
     cmp r0,r1                                @ 08043d50 8842
     bne LAB_08043d78                         @ 08043d52 11d1
     adds r0,r4,#0x0    @ 08043d54 201c
@@ -8479,7 +8479,7 @@ enqueue_equip_chain_pair_sprite_validated:
     bl find_equip_chain_pair_across_field    @ 08043d58 ebf792fc
     lsls r0,r0,#0x10    @ 08043d5c 0004
     lsrs r1,r0,#0x10    @ 08043d5e 010c
-    ldr r0, DAT_08043d8c                     @ 08043d60 0a48
+    ldr r0, ecpsv_no_pair                    @ 08043d60 0a48
     cmp r1,r0                                @ 08043d62 8142
     beq LAB_08043d78                         @ 08043d64 08d0
     lsls r0,r1,#0x18    @ 08043d66 0806
@@ -8495,16 +8495,16 @@ LAB_08043d78:
     pop {r0}                                 @ 08043d7a 01bc
     bx r0                                    @ 08043d7c 0047
     .zero  0x2
-DAT_08043d80:
-    .word  0x00000868                     @ 08043d80 68080000
-DAT_08043d84:
-    .word  0x0201c510                     @ 08043d84 10c50102
-DAT_08043d88:
-    .word  0xa5600000                     @ 08043d88 000060a5
-DAT_08043d8c:
-    .word  0x0000ffff                     @ 08043d8c ffff0000
+ecpsv_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043d80 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+ecpsv_gdfs:
+    .word  gDuelFieldSlots                @ 08043d84 10c50102  gDuelFieldSlots=0x0201c510: reuse
+ecpsv_equip_tag:
+    .word  EQUIP_SLOT_ACTIVE_TAG          @ 08043d88 000060a5  EQUIP_SLOT_ACTIVE_TAG=0xa5600000: slot_word<<19 == this -> equip slot live; reuse
+ecpsv_no_pair:
+    .word  OAM_ATTR0_HIDDEN               @ 08043d8c ffff0000  OAM_ATTR0_HIDDEN=0xffff: no_pair sentinel from find_equip_chain_pair_across_field; C5 reuse
 
-@ Called by FUN_08043ea4 and FUN_08043f44 (both duel_field); sibling of enqueue_equip_chain_pair_sprite_validated (FUN_08043d20). Receives r0=src_encoded (bits[7:0]=src_player [0..1], bits[15:8]=src_slot [0..9]), r1=dst_encoded (.hword 0x4688=mov r8,r1), r9=r0 (.hword 0x4681=mov r9,r0). If src_slot==r9: returns immediately. Locates src slot in gDuelFieldSlots; checks [slot+0x8] valid and [slot+0xa] chain node ID. If [slot+0xa]!=0: traverses equip-chain list at 0x0201d9c0; reads [node+0x2] low 4 bits for card_type; type 0xa enters sprite-write path. Reads target slot card_id, compares with 0x118a / 0x118a+0x3f (equip activation range). If match: calls enqueue_equip_set_slot_sprite_by_zone_col (FUN_08045298). Then enters activation path: locates another slot, reads card_id; if card_id==0x118a..0x11c9 and [slot+0xc]==0 (no bound chain): calls apply_equip_activation_with_id_lookup, on success calls enqueue_sprite_attr_with_xy_split. r0=u16 src_encoded, r1=u16 dst_encoded. Returns void. Constants: gDuelFieldSlots=0x0201c510, chain_list=0x0201d9c0, card_id_range=0x118a..0x11c9, type_equip=0xa. Callers: FUN_08043ea4, FUN_08043f44.
+@ Called by enqueue_equip_chain_pair_sprite_if_eligible and enqueue_equip_chain_dual_slot_sprite_with_activation_scan (both duel_field); sibling of enqueue_equip_chain_pair_sprite_validated (enqueue_equip_chain_pair_sprite_validated). Receives r0=src_encoded (bits[7:0]=src_player [0..1], bits[15:8]=src_slot [0..9]), r1=dst_encoded (.hword 0x4688=mov r8,r1), r9=r0 (.hword 0x4681=mov r9,r0). If src_slot==r9: returns immediately. Locates src slot in gDuelFieldSlots; checks [slot+0x8] valid and [slot+0xa] chain node ID. If [slot+0xa]!=0: traverses equip-chain list at 0x0201d9c0; reads [node+0x2] low 4 bits for card_type; type 0xa enters sprite-write path. Reads target slot card_id, compares with 0x118a / 0x118a+0x3f (equip activation range). If match: calls enqueue_equip_set_slot_sprite_by_zone_col (enqueue_equip_set_slot_sprite_by_zone_col). Then enters activation path: locates another slot, reads card_id; if card_id==0x118a..0x11c9 and [slot+0xc]==0 (no bound chain): calls apply_equip_activation_with_id_lookup, on success calls enqueue_sprite_attr_with_xy_split. r0=u16 src_encoded, r1=u16 dst_encoded. Returns void. Constants: gDuelFieldSlots=0x0201c510, chain_list=0x0201d9c0, card_id_range=0x118a..0x11c9, type_equip=0xa. Callers: enqueue_equip_chain_pair_sprite_if_eligible, enqueue_equip_chain_dual_slot_sprite_with_activation_scan.
 scan_equip_chain_list_for_activation_sprite:
     push {r4,r5,r6,r7,lr}                    @ 08043d90 f0b5
     .hword 0x4657    @ 08043d92 5746
@@ -8528,10 +8528,10 @@ scan_equip_chain_list_for_activation_sprite:
     lsls r3,r6,#0x2    @ 08043db6 b300
     adds r0,r3,r6    @ 08043db8 9819
     lsls r0,r0,#0x2    @ 08043dba 8000
-    ldr r1, DAT_08043e90                     @ 08043dbc 3449
+    ldr r1, sclas_stride                     @ 08043dbc 3449
     muls r1,r2    @ 08043dbe 5143
     adds r0,r0,r1    @ 08043dc0 4018
-    ldr r2, DAT_08043e94                     @ 08043dc2 344a
+    ldr r2, sclas_gdfs                       @ 08043dc2 344a
     adds r1,r0,r2    @ 08043dc4 8118
     ldrh r0,[r1,#0x8]                        @ 08043dc6 0889
     .hword 0x469a    @ 08043dc8 9a46
@@ -8542,7 +8542,7 @@ scan_equip_chain_list_for_activation_sprite:
     beq LAB_08043e1a                         @ 08043dd2 22d0
 LAB_08043dd4:
     lsls r0,r0,#0x3    @ 08043dd4 c000
-    ldr r1, DAT_08043e98                     @ 08043dd6 3049
+    ldr r1, sclas_nodepool                   @ 08043dd6 3049
     adds r0,r0,r1    @ 08043dd8 4018
     ldrb r4,[r0,#0x0]                        @ 08043dda 0478
     ldrh r2,[r0,#0x0]                        @ 08043ddc 0288
@@ -8558,14 +8558,14 @@ LAB_08043dd4:
     lsls r0,r3,#0x2    @ 08043df0 9800
     adds r0,r0,r3    @ 08043df2 c018
     lsls r0,r0,#0x2    @ 08043df4 8000
-    ldr r1, DAT_08043e90                     @ 08043df6 2649
+    ldr r1, sclas_stride                     @ 08043df6 2649
     muls r1,r2    @ 08043df8 5143
     adds r0,r0,r1    @ 08043dfa 4018
-    ldr r1, DAT_08043e94                     @ 08043dfc 2549
+    ldr r1, sclas_gdfs                       @ 08043dfc 2549
     adds r0,r0,r1    @ 08043dfe 4018
     ldr r0,[r0,#0x0]                         @ 08043e00 0068
     lsls r0,r0,#0x13    @ 08043e02 c004
-    ldr r1, DAT_08043e9c                     @ 08043e04 2549
+    ldr r1, sclas_ekibyo_shifted             @ 08043e04 2549
     cmp r0,r1                                @ 08043e06 8842
     bne LAB_08043e14                         @ 08043e08 04d1
     adds r0,r4,#0x0    @ 08043e0a 201c
@@ -8582,15 +8582,15 @@ LAB_08043e1a:
     .hword 0x4651    @ 08043e1e 5146
     adds r0,r1,r6    @ 08043e20 8819
     lsls r0,r0,#0x2    @ 08043e22 8000
-    ldr r1, DAT_08043e90                     @ 08043e24 1a49
+    ldr r1, sclas_stride                     @ 08043e24 1a49
     muls r1,r2    @ 08043e26 5143
     adds r0,r0,r1    @ 08043e28 4018
-    ldr r1, DAT_08043e94                     @ 08043e2a 1a49
+    ldr r1, sclas_gdfs                       @ 08043e2a 1a49
     adds r1,r0,r1    @ 08043e2c 4118
     ldr r3,[r1,#0x0]                         @ 08043e2e 0b68
     lsls r0,r3,#0x13    @ 08043e30 d804
     lsrs r4,r0,#0x13    @ 08043e32 c40c
-    ldr r0, DAT_08043ea0                     @ 08043e34 1a48
+    ldr r0, sclas_ameba_range_base           @ 08043e34 1a48
     cmp r4,r0                                @ 08043e36 8442
     beq LAB_08043e40                         @ 08043e38 02d0
     adds r0,#0x3f    @ 08043e3a 3f30
@@ -8636,16 +8636,16 @@ LAB_08043e82:
     pop {r4,r5,r6,r7}                        @ 08043e8a f0bc
     pop {r0}                                 @ 08043e8c 01bc
     bx r0                                    @ 08043e8e 0047
-DAT_08043e90:
-    .word  0x00000868                     @ 08043e90 68080000
-DAT_08043e94:
-    .word  0x0201c510                     @ 08043e94 10c50102
-DAT_08043e98:
-    .word  0x0201d9c0                     @ 08043e98 c0d90102
-DAT_08043e9c:
-    .word  0xa4e80000                     @ 08043e9c 0000e8a4
-DAT_08043ea0:
-    .word  0x0000118a                     @ 08043ea0 8a110000
+sclas_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043e90 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+sclas_gdfs:
+    .word  gDuelFieldSlots                @ 08043e94 10c50102  gDuelFieldSlots=0x0201c510: reuse
+sclas_nodepool:
+    .word  gEquipNodePool                 @ 08043e98 c0d90102  gEquipNodePool=0x0201d9c0: equip chain node pool; reuse
+sclas_ekibyo_shifted:
+    .word  EKIBYO_DRAKMORD_CID_SHIFTED    @ 08043e9c 0000e8a4  EKIBYO_DRAKMORD_CID_SHIFTED=0xa4e80000: EKIBYO_DRAKMORD_CID(0x149d)<<19; type-match sentinel
+sclas_ameba_range_base:
+    .word  AMEBA_CID                      @ 08043ea0 8a110000  AMEBA_CID=0x118a: equip activation range base (0x118a..0x11c9); 28 raw ROM refs
 
 @ Check activation bit (bit12) of two equip slots (r0=player_a/r1=slot_a, r2=player_b/r3=slot_b); if both active, call enqueue_equip_chain_pair_sprite_validated to enqueue dual-slot sprite, write sprite attr to OAM buffer via enqueue_sprite_attr_record, then scan activation chain via scan_equip_chain_list_for_activation_sprite. Entry unpacks u8 player_id and u8 slot_idx via lsls/lsrs. Returns void. Params: r0=u8 player_id_a [0..1], r1=u8 slot_idx_a [0..4], r2=u8 player_id_b [0..1], r3=u8 slot_idx_b [0..4]. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14.
 enqueue_equip_chain_pair_sprite_if_eligible:
@@ -8674,11 +8674,11 @@ enqueue_equip_chain_pair_sprite_if_eligible:
     lsls r1,r0,#0x2    @ 08043ed0 8100
     adds r1,r1,r0    @ 08043ed2 0918
     lsls r1,r1,#0x2    @ 08043ed4 8900
-    ldr r7, DAT_08043f38                     @ 08043ed6 184f
+    ldr r7, ecpsie_stride                    @ 08043ed6 184f
     adds r0,r2,#0x0    @ 08043ed8 101c
     muls r0,r7    @ 08043eda 7843
     adds r1,r1,r0    @ 08043edc 0918
-    ldr r2, DAT_08043f3c                     @ 08043ede 174a
+    ldr r2, ecpsie_gdfs                      @ 08043ede 174a
     adds r1,r1,r2    @ 08043ee0 8918
     ldr r0,[r1,#0x0]                         @ 08043ee2 0868
     lsls r0,r0,#0x13    @ 08043ee4 c004
@@ -8704,7 +8704,7 @@ enqueue_equip_chain_pair_sprite_if_eligible:
     .hword 0x4641    @ 08043f0e 4146
     cmp r1,#0x0                              @ 08043f10 0029
     beq LAB_08043f16                         @ 08043f12 00d0
-    ldr r0, DAT_08043f40                     @ 08043f14 0a48
+    ldr r0, ecpsie_chain_pair_pal_p1         @ 08043f14 0a48
 LAB_08043f16:
     .hword 0x4651    @ 08043f16 5146
     .hword 0x464a    @ 08043f18 4a46
@@ -8722,12 +8722,12 @@ LAB_08043f28:
     pop {r0}                                 @ 08043f32 01bc
     bx r0                                    @ 08043f34 0047
     .zero  0x2
-DAT_08043f38:
-    .word  0x00000868                     @ 08043f38 68080000
-DAT_08043f3c:
-    .word  0x0201c510                     @ 08043f3c 10c50102
-DAT_08043f40:
-    .word  0x0000803d                     @ 08043f40 3d800000
+ecpsie_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043f38 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+ecpsie_gdfs:
+    .word  gDuelFieldSlots                @ 08043f3c 10c50102  gDuelFieldSlots=0x0201c510: reuse
+ecpsie_chain_pair_pal_p1:
+    .word  OAM_EQUIP_CHAIN_PAIR_SPRITE_P1 @ 08043f40 3d800000  OAM_EQUIP_CHAIN_PAIR_SPRITE_P1=0x0000803d: equip chain pair sprite OAM attr0 P1
 
 @ Equip chain dual-slot sprite enqueue with activation list scan. Receives player_side_a/packed_slot/packed_b, unpacks two player/slot field pairs. Checks that both corresponding gDuelFieldSlots slot card_ids are nonzero; if either is empty, returns. If both have cards, calls enqueue_equip_chain_pair_sprite_validated twice (for bidirectional relationship), selects OAM base (P0=0x3e, P1=0x803e), calls enqueue_sprite_attr_record for sprite attrs. Finally calls scan_equip_chain_list_for_activation_sprite once per slot. 2 duel_field callers in equip chain full sprite refresh.
 @ 
@@ -8762,11 +8762,11 @@ enqueue_equip_chain_dual_slot_sprite_with_activation_scan:
     lsls r0,r1,#0x2    @ 08043f72 8800
     adds r0,r0,r1    @ 08043f74 4018
     lsls r0,r0,#0x2    @ 08043f76 8000
-    ldr r6, DAT_08043fec                     @ 08043f78 1c4e
+    ldr r6, ecdssas_stride                   @ 08043f78 1c4e
     adds r1,r3,#0x0    @ 08043f7a 191c
     muls r1,r6    @ 08043f7c 7143
     adds r0,r0,r1    @ 08043f7e 4018
-    ldr r5, DAT_08043ff0                     @ 08043f80 1b4d
+    ldr r5, ecdssas_gdfs                     @ 08043f80 1b4d
     adds r0,r0,r5    @ 08043f82 4019
     ldr r3,[r0,#0x0]                         @ 08043f84 0368
     lsls r3,r3,#0x13    @ 08043f86 db04
@@ -8796,7 +8796,7 @@ enqueue_equip_chain_dual_slot_sprite_with_activation_scan:
     ldr r1,[sp,#0x0]                         @ 08043fba 0099
     cmp r1,#0x0                              @ 08043fbc 0029
     beq LAB_08043fc2                         @ 08043fbe 00d0
-    ldr r0, DAT_08043ff4                     @ 08043fc0 0c48
+    ldr r0, ecdssas_chain_dual_pal_p1        @ 08043fc0 0c48
 LAB_08043fc2:
     ldr r1,[sp,#0x4]                         @ 08043fc2 0199
     .hword 0x4652    @ 08043fc4 5246
@@ -8817,12 +8817,12 @@ LAB_08043fdc:
     pop {r4,r5,r6,r7}                        @ 08043fe6 f0bc
     pop {r0}                                 @ 08043fe8 01bc
     bx r0                                    @ 08043fea 0047
-DAT_08043fec:
-    .word  0x00000868                     @ 08043fec 68080000
-DAT_08043ff0:
-    .word  0x0201c510                     @ 08043ff0 10c50102
-DAT_08043ff4:
-    .word  0x0000803e                     @ 08043ff4 3e800000
+ecdssas_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043fec 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+ecdssas_gdfs:
+    .word  gDuelFieldSlots                @ 08043ff0 10c50102  gDuelFieldSlots=0x0201c510: reuse
+ecdssas_chain_dual_pal_p1:
+    .word  OAM_EQUIP_CHAIN_DUAL_SPRITE_P1 @ 08043ff4 3e800000  OAM_EQUIP_CHAIN_DUAL_SPRITE_P1=0x0000803e: equip chain dual-slot sprite OAM attr0 P1
 
 @ Face-down/flip-position card OAM sprite attribute enqueue. Receives player_side/slot_idx/flip_flag. Calls get_zone_slot_ptr(player_side, 0xb, slot_idx) to get slot ptr (zone_type=0xb fixed). Extracts from slot word: bit13 (flip state, lsls#0x12/lsrs#0x1f -> r5) and bits[21:14] (position sub-field, lsls#0x02/lsrs#0x18 -> r0). flip_flag==0: r7=1 (force flip); flip_flag!=0: r7=0. Assembles player_side|0x16 -> r6 (OAM attr0 low byte), flip_bit|0x1a -> r5 (attr1 low byte), position_subfield*2+r5 -> attr1. Calls enqueue_sprite_attr_record with tile=0x3f. 2 callers (card_frame+duel_field).
 @ 
@@ -8887,7 +8887,7 @@ enqueue_hand_card_sprite_by_spell_type:
     bl find_hand_slot_idx_by_set_code        @ 08044054 edf7f2f8
     cmp r0,#0x0                              @ 08044058 0028
     blt LAB_080440b0                         @ 0804405a 29db
-    ldr r1, PTR_gP1LifePoints_080440ac       @ 0804405c 1349
+    ldr r1, ptr_gp1lp_440ac                  @ 0804405c 1349
     lsls r0,r5,#0x2    @ 0804405e a800
     adds r0,r0,r1    @ 08044060 4018
     movs r1,#0x87    @ 08044062 8721
@@ -8927,8 +8927,8 @@ LAB_08044082:
     movs r0,#0x1    @ 080440a6 0120
     b LAB_080440b2                           @ 080440a8 03e0
     .zero  0x2
-PTR_gP1LifePoints_080440ac:
-    .word  gP1LifePoints                  @ 080440ac e0c40102
+ptr_gp1lp_440ac:
+    .word  gP1LifePoints                  @ 080440ac e0c40102  gP1LifePoints=0x0201c4e0: ewram.inc:79; read for hand slot array base
 LAB_080440b0:
     movs r0,#0x0    @ 080440b0 0020
 LAB_080440b2:
@@ -8936,7 +8936,7 @@ LAB_080440b2:
     pop {r1}                                 @ 080440b4 02bc
     bx r1                                    @ 080440b6 0847
 
-@ Core equip zone sprite dispatch and activation hub. Called by FUN_080443c4 and multiple equip zone scanners via sp[0x28]/sp[0x2c] flags. Entry saves r0..r3 to callee-save regs; sp[0x28]!=0 switches sp[0x4] to 0x1d/0x1e (LP row type). Reads zone slot word, extracts card_type_id (bits[18:0]), dispatches through ~20 card_id branch tree (0x16f9=Manticore of Darkness, 0x13e3=Archfiend of Gilfer, 0x11bc=Minar, 0x12a2=Skull-Mark Ladybug, etc.); on match: calls enqueue_sprite_attr_record or enqueue_sprite_attr_for_zone_card_id_lookup/ enqueue_sprite_attr_type11/apply_equip_activation_with_id_lookup. Tail: calls scan_field_slots_for_equip_sprite + submit_lp_bar_sprite_row_by_type; if sp[0x28]!=0 and zone_type==0xe: scan_trap_zone_slots_for_equip_shape_sprite; then scan_effect_zones_for_equip_activation_forced_requisition. If sp[0x2c]==1 and find_effect_node_in_zone hit: enqueue_equip_zone_sprite_by_side + submit_lp_change_indicator_with_chain_check. Side effects: OAM sprite attr buffer via enqueue_* callees; gP1LifePoints chain state via apply_equip_activation_with_id_lookup. Constants: OAM_ROW_TYPE_NORMAL=0x1e, OAM_ROW_TYPE_SPECIAL=0x1d, OAM_SHAPE=0x8045/0x45 (P2/P1), ZONE_11=0xb, card_id_tree_count~=20.
+@ Core equip zone sprite dispatch and activation hub. Called by dispatch_equip_zone_sprite_banisher_of_the_light and multiple equip zone scanners via sp[0x28]/sp[0x2c] flags. Entry saves r0..r3 to callee-save regs; sp[0x28]!=0 switches sp[0x4] to 0x1d/0x1e (LP row type). Reads zone slot word, extracts card_type_id (bits[18:0]), dispatches through ~20 card_id branch tree (0x16f9=Manticore of Darkness, 0x13e3=Archfiend of Gilfer, 0x11bc=Minar, 0x12a2=Skull-Mark Ladybug, etc.); on match: calls enqueue_sprite_attr_record or enqueue_sprite_attr_for_zone_card_id_lookup/ enqueue_sprite_attr_type11/apply_equip_activation_with_id_lookup. Tail: calls scan_field_slots_for_equip_sprite + submit_lp_bar_sprite_row_by_type; if sp[0x28]!=0 and zone_type==0xe: scan_trap_zone_slots_for_equip_shape_sprite; then scan_effect_zones_for_equip_activation_forced_requisition. If sp[0x2c]==1 and find_effect_node_in_zone hit: enqueue_equip_zone_sprite_by_side + submit_lp_change_indicator_with_chain_check. Side effects: OAM sprite attr buffer via enqueue_* callees; gP1LifePoints chain state via apply_equip_activation_with_id_lookup. Constants: OAM_ROW_TYPE_NORMAL=0x1e, OAM_ROW_TYPE_SPECIAL=0x1d, OAM_SHAPE=0x8045/0x45 (P2/P1), ZONE_11=0xb, card_id_tree_count~=20.
 dispatch_equip_zone_sprite_and_activation:
     push {r4,r5,r6,r7,lr}                    @ 080440b8 f0b5
     .hword 0x4657    @ 080440ba 5746
@@ -9002,7 +9002,7 @@ LAB_080440ec:
     .hword 0x4644    @ 0804412e 4446
     cmp r4,#0x0                              @ 08044130 002c
     beq LAB_08044136                         @ 08044132 00d0
-    ldr r0, DAT_08044148                     @ 08044134 0448
+    ldr r0, deza_zone_equip_pal_p1           @ 08044134 0448
 LAB_08044136:
     .hword 0x4651    @ 08044136 5146
     lsls r2,r1,#0x10    @ 08044138 0a04
@@ -9012,8 +9012,8 @@ LAB_08044136:
     movs r1,#0xb    @ 08044140 0b21
     bl enqueue_sprite_attr_record            @ 08044142 f7f7f3fd
     b LAB_08044198                           @ 08044146 27e0
-DAT_08044148:
-    .word  0x00008045                     @ 08044148 45800000
+deza_zone_equip_pal_p1:
+    .word  OAM_ZONE_EQUIP_SPRITE_P1       @ 08044148 45800000  OAM_ZONE_EQUIP_SPRITE_P1=0x8045: zone equip shape sprite OAM attr0 P1 (bit15+0x45)
 LAB_0804414c:
     .hword 0x4652    @ 0804414c 5246
     cmp r2,#0xf                              @ 0804414e 0f2a
@@ -9022,7 +9022,7 @@ LAB_0804414c:
     .hword 0x4641    @ 08044154 4146
     cmp r1,#0x0                              @ 08044156 0029
     beq LAB_0804415c                         @ 08044158 00d0
-    ldr r0, DAT_0804416c                     @ 0804415a 0448
+    ldr r0, deza_equip_zone_pal_p1           @ 0804415a 0448
 LAB_0804415c:
     lsls r2,r6,#0x10    @ 0804415c 3204
     lsrs r2,r2,#0x10    @ 0804415e 120c
@@ -9031,8 +9031,8 @@ LAB_0804415c:
     adds r3,r4,#0x0    @ 08044164 231c
     bl enqueue_sprite_attr_record            @ 08044166 f7f7e1fd
     b LAB_08044198                           @ 0804416a 15e0
-DAT_0804416c:
-    .word  0x00008033                     @ 0804416c 33800000
+deza_equip_zone_pal_p1:
+    .word  OAM_EQUIP_ZONE_SPRITE_P1       @ 0804416c 33800000  OAM_EQUIP_ZONE_SPRITE_P1=0x8033: equip zone sprite OAM attr0 P1 (bit15+0x33)
 LAB_08044170:
     movs r2,#0x1    @ 08044170 0122
     .hword 0x4641    @ 08044172 4146
@@ -9064,19 +9064,19 @@ LAB_080441a0:
     ldr r1,[r0,#0x0]                         @ 080441a4 0168
     lsls r0,r1,#0x13    @ 080441a6 c804
     lsrs r2,r0,#0x13    @ 080441a8 c20c
-    ldr r0, DAT_080441e0                     @ 080441aa 0d48
+    ldr r0, deza_cid_manticore               @ 080441aa 0d48
     cmp r2,r0                                @ 080441ac 8242
     beq LAB_08044290                         @ 080441ae 6fd0
     cmp r2,r0                                @ 080441b0 8242
     bgt LAB_08044230                         @ 080441b2 3ddc
-    ldr r0, DAT_080441e4                     @ 080441b4 0b48
+    ldr r0, deza_cid_archfiend_of_gilfer     @ 080441b4 0b48
     cmp r2,r0                                @ 080441b6 8242
     bne LAB_080441bc                         @ 080441b8 00d1
     b LAB_080442e6                           @ 080441ba 94e0
 LAB_080441bc:
     cmp r2,r0                                @ 080441bc 8242
     bgt LAB_080441fc                         @ 080441be 1ddc
-    ldr r0, DAT_080441e8                     @ 080441c0 0948
+    ldr r0, deza_cid_minar                   @ 080441c0 0948
     cmp r2,r0                                @ 080441c2 8242
     bne LAB_080441c8                         @ 080441c4 00d1
     b LAB_080442c2                           @ 080441c6 7ce0
@@ -9096,52 +9096,52 @@ LAB_080441d6:
 LAB_080441dc:
     b LAB_080442e2                           @ 080441dc 81e0
     .zero  0x2
-DAT_080441e0:
-    .word  0x000016f9                     @ 080441e0 f9160000
-DAT_080441e4:
-    .word  0x000013e3                     @ 080441e4 e3130000
-DAT_080441e8:
-    .word  0x000011bc                     @ 080441e8 bc110000
+deza_cid_manticore:
+    .word  MANTICORE_OF_DARKNESS_CID      @ 080441e0 f9160000  MANTICORE_OF_DARKNESS_CID=0x16f9: pw=77121851; card_1458; BST root
+deza_cid_archfiend_of_gilfer:
+    .word  ARCHFIEND_OF_GILFER_CID        @ 080441e4 e3130000  ARCHFIEND_OF_GILFER_CID=0x13e3: pw=50287060; card_0853; BST node
+deza_cid_minar:
+    .word  MINAR_CID                      @ 080441e8 bc110000  MINAR_CID=0x11bc: pw=32539892; card_0444; BST node
 LAB_080441ec:
-    ldr r0, DAT_080441f8                     @ 080441ec 0248
+    ldr r0, deza_cid_skull_mark_ladybug      @ 080441ec 0248
     cmp r2,r0                                @ 080441ee 8242
     bne LAB_080441f4                         @ 080441f0 00d1
     b LAB_080442e6                           @ 080441f2 78e0
 LAB_080441f4:
     adds r0,#0x67    @ 080441f4 6730
     b LAB_080441d6                           @ 080441f6 eee7
-DAT_080441f8:
-    .word  0x000012a2                     @ 080441f8 a2120000
+deza_cid_skull_mark_ladybug:
+    .word  SKULL_MARK_LADYBUG_CID         @ 080441f8 a2120000  SKULL_MARK_LADYBUG_CID=0x12a2: pw=64306248; card_0626; BST node
 LAB_080441fc:
-    ldr r0, DAT_08044214                     @ 080441fc 0548
+    ldr r0, deza_cid_fear                    @ 080441fc 0548
     cmp r2,r0                                @ 080441fe 8242
     beq LAB_080442c2                         @ 08044200 5fd0
     cmp r2,r0                                @ 08044202 8242
     bgt LAB_08044220                         @ 08044204 0cdc
-    ldr r0, DAT_08044218                     @ 08044206 0448
+    ldr r0, deza_cid_makyura                 @ 08044206 0448
     cmp r2,r0                                @ 08044208 8242
     beq LAB_08044290                         @ 0804420a 41d0
-    ldr r0, DAT_0804421c                     @ 0804420c 0348
+    ldr r0, deza_cid_despair                 @ 0804420c 0348
     cmp r2,r0                                @ 0804420e 8242
     beq LAB_080442c2                         @ 08044210 57d0
     b LAB_080442e2                           @ 08044212 66e0
-DAT_08044214:
-    .word  0x00001655                     @ 08044214 55160000
-DAT_08044218:
-    .word  0x000014a5                     @ 08044218 a5140000
-DAT_0804421c:
-    .word  0x00001653                     @ 0804421c 53160000
+deza_cid_fear:
+    .word  FEAR_FROM_THE_DARK_CID         @ 08044214 55160000  FEAR_FROM_THE_DARK_CID=0x1655: pw=34193084; card_1325; BST node
+deza_cid_makyura:
+    .word  MAKYURA_THE_DESTRUCTOR_CID     @ 08044218 a5140000  MAKYURA_THE_DESTRUCTOR_CID=0x14a5: pw=21593977; card_0991; BST node
+deza_cid_despair:
+    .word  DESPAIR_FROM_THE_DARK_CID      @ 0804421c 53160000  DESPAIR_FROM_THE_DARK_CID=0x1653: pw=71200730; card_1323; BST node
 LAB_08044220:
-    ldr r0, DAT_0804422c                     @ 08044220 0248
+    ldr r0, deza_cid_outstanding_dog_marron  @ 08044220 0248
     cmp r2,r0                                @ 08044222 8242
     beq LAB_080442e6                         @ 08044224 5fd0
     adds r0,#0x6e    @ 08044226 6e30
     b LAB_080441d6                           @ 08044228 d5e7
     .zero  0x2
-DAT_0804422c:
-    .word  0x00001687                     @ 0804422c 87160000
+deza_cid_outstanding_dog_marron:
+    .word  OUTSTANDING_DOG_MARRON_CID     @ 0804422c 87160000  OUTSTANDING_DOG_MARRON_CID=0x1687: pw=11548522; card_1364; BST node
 LAB_08044230:
-    ldr r0, DAT_08044254                     @ 08044230 0848
+    ldr r0, deza_cid_roc                     @ 08044230 0848
     cmp r2,r0                                @ 08044232 8242
     beq LAB_080442e6                         @ 08044234 57d0
     cmp r2,r0                                @ 08044236 8242
@@ -9159,19 +9159,19 @@ LAB_08044230:
     blt LAB_080442e2                         @ 0804424e 48db
     b LAB_080442c2                           @ 08044250 37e0
     .zero  0x2
-DAT_08044254:
-    .word  0x00001828                     @ 08044254 28180000
+deza_cid_roc:
+    .word  ROC_FROM_THE_VALLEY_OF_HAZE_CID @ 08044254 28180000  ROC_FROM_THE_VALLEY_OF_HAZE_CID=0x1828: pw=28143906; card_1708; BST node
 LAB_08044258:
-    ldr r0, DAT_08044264                     @ 08044258 0248
+    ldr r0, deza_cid_night_assailant         @ 08044258 0248
     cmp r2,r0                                @ 0804425a 8242
     beq LAB_080442e6                         @ 0804425c 43d0
     adds r0,#0x2b    @ 0804425e 2b30
     b LAB_080441d6                           @ 08044260 b9e7
     .zero  0x2
-DAT_08044264:
-    .word  0x0000179a                     @ 08044264 9a170000
+deza_cid_night_assailant:
+    .word  NIGHT_ASSAILANT_CID            @ 08044264 9a170000  NIGHT_ASSAILANT_CID=0x179a: pw=16226786; card_1585; BST node
 LAB_08044268:
-    ldr r0, DAT_08044278                     @ 08044268 0348
+    ldr r0, deza_cid_broww                   @ 08044268 0348
     cmp r2,r0                                @ 0804426a 8242
     bgt LAB_0804427c                         @ 0804426c 06dc
     subs r0,#0x1    @ 0804426e 0138
@@ -9179,10 +9179,10 @@ LAB_08044268:
     bge LAB_080442d2                         @ 08044272 2eda
     subs r0,#0x1f    @ 08044274 1f38
     b LAB_080441d6                           @ 08044276 aee7
-DAT_08044278:
-    .word  0x00001966                     @ 08044278 66190000
+deza_cid_broww:
+    .word  BROWW_HUNTSMAN_OF_DARK_WORLD_CID @ 08044278 66190000  BROWW_HUNTSMAN_OF_DARK_WORLD_CID=0x1966: pw=79126789; card_1972; BST node
 LAB_0804427c:
-    ldr r0, DAT_0804428c                     @ 0804427c 0348
+    ldr r0, deza_cid_sillva                  @ 0804427c 0348
     cmp r2,r0                                @ 0804427e 8242
     blt LAB_080442e2                         @ 08044280 2fdb
     adds r0,#0x1    @ 08044282 0130
@@ -9190,8 +9190,8 @@ LAB_0804427c:
     ble LAB_080442d2                         @ 08044286 24dd
     adds r0,#0x95    @ 08044288 9530
     b LAB_080441d6                           @ 0804428a a4e7
-DAT_0804428c:
-    .word  0x00001968                     @ 0804428c 68190000
+deza_cid_sillva:
+    .word  SILLVA_WARLORD_OF_DARK_WORLD_CID @ 0804428c 68190000  SILLVA_WARLORD_OF_DARK_WORLD_CID=0x1968: pw=32619583; card_1974; BST node
 LAB_08044290:
     .hword 0x4649    @ 08044290 4946
     ldr r2,[r1,#0x0]                         @ 08044292 0a68
@@ -9297,7 +9297,7 @@ LAB_08044346:
     bl get_card_extended_stat_field6         @ 0804435a aaf04dfd
     cmp r0,#0x1                              @ 0804435e 0128
     bne LAB_0804436e                         @ 08044360 05d1
-    ldr r1, DAT_080443bc                     @ 08044362 1649
+    ldr r1, deza_cid_super_rejuvenation      @ 08044362 1649
     .hword 0x4640    @ 08044364 4046
     movs r2,#0x2    @ 08044366 0222
     movs r3,#0x0    @ 08044368 0023
@@ -9306,7 +9306,7 @@ LAB_0804436e:
     ldr r4,[sp,#0x2c]                        @ 0804436e 0b9c
     cmp r4,#0x1                              @ 08044370 012c
     bne LAB_080443aa                         @ 08044372 1ad1
-    ldr r4, DAT_080443c0                     @ 08044374 124c
+    ldr r4, deza_cid_graverobber             @ 08044374 124c
     .hword 0x4649    @ 08044376 4946
     ldr r0,[r1,#0x0]                         @ 08044378 0868
     lsls r3,r0,#0x2    @ 0804437a 8300
@@ -9340,10 +9340,10 @@ LAB_080443aa:
     pop {r0}                                 @ 080443b6 01bc
     bx r0                                    @ 080443b8 0047
     .zero  0x2
-DAT_080443bc:
-    .word  0x000014e2                     @ 080443bc e2140000
-DAT_080443c0:
-    .word  0x00001379                     @ 080443c0 79130000
+deza_cid_super_rejuvenation:
+    .word  SUPER_REJUVENATION_CID         @ 080443bc e2140000  SUPER_REJUVENATION_CID=0x14e2: pw=27770341; card_1042; arg to enqueue_sprite_attr_type11
+deza_cid_graverobber:
+    .word  GRAVEROBBER_CID                @ 080443c0 79130000  GRAVEROBBER_CID=0x1379: pw=61705417; card_0789; arg to find_effect_node_in_zone
 
 @ Thin wrapper around dispatch_equip_zone_sprite_and_activation for Banisher of the Light (card_id=0x1332). r0=player_id, r1=slot_idx (s16; skips if < 0), r2=zone_col_flags. When r1>=0: calls get_zone_slot_ptr(r1, zone=0xb); calls count_field_copies_of_card(0x1332); sets r3=0xf if copies>0 (special OAM shape), else 0xe; sets sp[0x0]=1 (P2 H-flip), sp[0x4]=0; calls dispatch_equip_zone_sprite_and_activation(r0, zone_ptr, r2). Returns void. Side effects: OAM sprite attr buffer and equip activation state via dispatch_equip_zone_sprite_and_activation. Constants: card_id=0x1332 (Banisher of the Light), ZONE=0xb, OAM_WITH_COPY=0xf, OAM_WITHOUT_COPY=0xe.
 dispatch_equip_zone_sprite_banisher_of_the_light:
@@ -9358,7 +9358,7 @@ dispatch_equip_zone_sprite_banisher_of_the_light:
     adds r2,r3,#0x0    @ 080443d4 1a1c
     bl get_zone_slot_ptr                     @ 080443d6 f6f76dff
     adds r6,r0,#0x0    @ 080443da 061c
-    ldr r0, DAT_08044408                     @ 080443dc 0a48
+    ldr r0, botl_cid_banisher                @ 080443dc 0a48
     bl count_field_copies_of_card            @ 080443de eef7ddf9
     movs r3,#0xe    @ 080443e2 0e23
     cmp r0,#0x0                              @ 080443e4 0028
@@ -9380,8 +9380,8 @@ LAB_08044400:
     pop {r4,r5,r6}                           @ 08044402 70bc
     pop {r0}                                 @ 08044404 01bc
     bx r0                                    @ 08044406 0047
-DAT_08044408:
-    .word  0x00001332                     @ 08044408 32130000
+botl_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08044408 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: pw=61528025; card_0729; count_field_copies_of_card arg
 
 @ Banisher of the Light (card_id=0x1332) equip zone sprite dispatch wrapper with LP row type fixed to 2. r0=player_id [0..1], r1=slot_idx (s16; <0 -> skips). Symmetric to dispatch_equip_zone_sprite_banisher_of_the_light (0x080443c4): same calls to get_zone_slot_ptr(slot_idx, zone=0xb) and count_field_copies_of_card(0x1332) to determine zone_state (0xe/0xf). Difference: sp[0]=1 (P2 H-flip flag), sp[4]=2 (LP row type), r2=0. Named siblings: sp[4]=0 -> dispatch_equip_zone_sprite_banisher_of_the_light (0x080443c4); sp[4]=1 -> dispatch_equip_zone_sprite_banisher_lp_row1 (0x080445d8). void return (b LAB, no independent r0 write).
 @ 
@@ -9399,7 +9399,7 @@ dispatch_equip_zone_sprite_banisher_lp_row2:
     movs r1,#0xb    @ 08044418 0b21
     bl get_zone_slot_ptr                     @ 0804441a f6f74bff
     adds r5,r0,#0x0    @ 0804441e 051c
-    ldr r0, DAT_08044448                     @ 08044420 0948
+    ldr r0, botl_lp_row2_cid_banisher        @ 08044420 0948
     bl count_field_copies_of_card            @ 08044422 eef7bbf9
     movs r3,#0xe    @ 08044426 0e23
     cmp r0,#0x0                              @ 08044428 0028
@@ -9419,10 +9419,10 @@ LAB_08044440:
     pop {r4,r5}                              @ 08044442 30bc
     pop {r0}                                 @ 08044444 01bc
     bx r0                                    @ 08044446 0047
-DAT_08044448:
-    .word  0x00001332                     @ 08044448 32130000
+botl_lp_row2_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08044448 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: reuse; count_field_copies_of_card arg
 
-@ Called exclusively by FUN_080a70d8 (equip hub sub-path, LAB_080a71ba). Inputs: r0=player_id [0..1], r1=slot_idx [0..0xe]. When r1<0 branches to LAB_0804447e returning void. When r1>=0: calls get_zone_slot_ptr(player_id, zone_type=0xb, slot_idx) to get slot pointer; then calls count_field_copies_of_card(card_id=0x1332, Banisher of the Light). If copy_count==0 sets zone_state=0xe (inactive), else zone_state=0xf (active). Fixes sp[0]=1, sp[4]=1, r2=0, then calls dispatch_equip_zone_sprite_and_activation to commit sprite activation. Returns: void (pop{r0}; bx r0, no independent r0 write). Side effects: updates equip zone sprite state via dispatch_equip_zone_sprite_and_activation. Constants: CARD_ID_BANISHER=0x1332 (Banisher of the Light), ZONE_TYPE=0xb, ZONE_STATE_INACTIVE=0xe, ZONE_STATE_ACTIVE=0xf, COPY_FLAG=1, ENABLE_FLAG=1.
+@ Called exclusively by tick_equip_banisher_sprite_phase_by_combined_index (equip hub sub-path, LAB_080a71ba). Inputs: r0=player_id [0..1], r1=slot_idx [0..0xe]. When r1<0 branches to LAB_0804447e returning void. When r1>=0: calls get_zone_slot_ptr(player_id, zone_type=0xb, slot_idx) to get slot pointer; then calls count_field_copies_of_card(card_id=0x1332, Banisher of the Light). If copy_count==0 sets zone_state=0xe (inactive), else zone_state=0xf (active). Fixes sp[0]=1, sp[4]=1, r2=0, then calls dispatch_equip_zone_sprite_and_activation to commit sprite activation. Returns: void (pop{r0}; bx r0, no independent r0 write). Side effects: updates equip zone sprite state via dispatch_equip_zone_sprite_and_activation. Constants: CARD_ID_BANISHER=0x1332 (Banisher of the Light), ZONE_TYPE=0xb, ZONE_STATE_INACTIVE=0xe, ZONE_STATE_ACTIVE=0xf, COPY_FLAG=1, ENABLE_FLAG=1.
 dispatch_equip_zone_sprite_banisher_with_count_check:
     push {r4,r5,lr}                          @ 0804444c 30b5
     sub sp,#0x8                              @ 0804444e 82b0
@@ -9433,7 +9433,7 @@ dispatch_equip_zone_sprite_banisher_with_count_check:
     movs r1,#0xb    @ 08044458 0b21
     bl get_zone_slot_ptr                     @ 0804445a f6f72bff
     adds r5,r0,#0x0    @ 0804445e 051c
-    ldr r0, DAT_08044488                     @ 08044460 0948
+    ldr r0, botl_count_check_cid_banisher    @ 08044460 0948
     bl count_field_copies_of_card            @ 08044462 eef79bf9
     movs r3,#0xe    @ 08044466 0e23
     cmp r0,#0x0                              @ 08044468 0028
@@ -9453,10 +9453,10 @@ LAB_0804447e:
     pop {r0}                                 @ 08044482 01bc
     bx r0                                    @ 08044484 0047
     .zero  0x2
-DAT_08044488:
-    .word  0x00001332                     @ 08044488 32130000
+botl_count_check_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08044488 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: reuse; count_field_copies_of_card arg
 
-@ Called by FUN_08086cdc (card_frame/duel_field/font_jp tags) and FUN_080a6cc8 (equip phase function), indeg=2. Entry saves r8 (callee-save via .hword 0x4647 = mov r7,r8; push{r7}). Inputs: r0=player_id [0..1], r1=slot_idx (<0 skips all sprite updates), r2=sub_zone_flag [0..1]. First calls count_field_copies_of_card(0x1332, Banisher of the Light) to set initial zone_state (r8=0xe/0xf). If Banisher present and zone_slot_ptr non-null: calls count_field_copies_of_card(0x19da) for second card; if present: calls check_card_type_is_spell; if spell then r8=0xc (spell-only zone_state). Finally calls dispatch_equip_zone_sprite_and_activation with sp[0]=1, sp[4]=1. If no Banisher or slot=NULL calls dispatch_equip_zone_sprite and returns. Also: if get_card_extended_stat_field6 returns 1 calls enqueue_sprite_attr_type11(player_id, card_id=0x14e2, 2, 0). Returns: void (epilogue pop{r0} overwrites bl callee r0 with lr, then bx r0; all callers ignore return). Side effects: updates zone sprite activation field via dispatch_equip_zone_sprite_and_activation; writes card_id=0x14e2 to sprite attr queue if field6==1. Constants: CARD_ID_BANISHER=0x1332 (Banisher of the Light), CARD_ID_CHECK2=0x19da, CARD_ID_SPRITE=0x14e2, ZONE_STATE_INACTIVE=0xe, ZONE_STATE_ACTIVE=0xf, ZONE_STATE_SPELL=0xc, sp[0]=1, sp[4]=1.
+@ Called by dispatch_equip_zone_activation_state (card_frame/duel_field/font_jp tags) and tick_equip_multi_target_phase_with_slot_confirm (equip phase function), indeg=2. Entry saves r8 (callee-save via .hword 0x4647 = mov r7,r8; push{r7}). Inputs: r0=player_id [0..1], r1=slot_idx (<0 skips all sprite updates), r2=sub_zone_flag [0..1]. First calls count_field_copies_of_card(0x1332, Banisher of the Light) to set initial zone_state (r8=0xe/0xf). If Banisher present and zone_slot_ptr non-null: calls count_field_copies_of_card(0x19da) for second card; if present: calls check_card_type_is_spell; if spell then r8=0xc (spell-only zone_state). Finally calls dispatch_equip_zone_sprite_and_activation with sp[0]=1, sp[4]=1. If no Banisher or slot=NULL calls dispatch_equip_zone_sprite and returns. Also: if get_card_extended_stat_field6 returns 1 calls enqueue_sprite_attr_type11(player_id, card_id=0x14e2, 2, 0). Returns: void (epilogue pop{r0} overwrites bl callee r0 with lr, then bx r0; all callers ignore return). Side effects: updates zone sprite activation field via dispatch_equip_zone_sprite_and_activation; writes card_id=0x14e2 to sprite attr queue if field6==1. Constants: CARD_ID_BANISHER=0x1332 (Banisher of the Light), CARD_ID_CHECK2=0x19da, CARD_ID_SPRITE=0x14e2, ZONE_STATE_INACTIVE=0xe, ZONE_STATE_ACTIVE=0xf, ZONE_STATE_SPELL=0xc, sp[0]=1, sp[4]=1.
 dispatch_equip_zone_sprite_banisher_with_spell_check:
     push {r4,r5,r6,r7,lr}                    @ 0804448c f0b5
     .hword 0x4647    @ 0804448e 4746
@@ -9467,7 +9467,7 @@ dispatch_equip_zone_sprite_banisher_with_spell_check:
     adds r5,r2,#0x0    @ 08044498 151c
     movs r0,#0xe    @ 0804449a 0e20
     .hword 0x4680    @ 0804449c 8046
-    ldr r0, DAT_0804452c                     @ 0804449e 2348
+    ldr r0, botl_spell_check_cid_banisher    @ 0804449e 2348
     bl count_field_copies_of_card            @ 080444a0 eef77cf9
     cmp r0,#0x0                              @ 080444a4 0028
     beq LAB_080444ac                         @ 080444a6 01d0
@@ -9477,16 +9477,16 @@ LAB_080444ac:
     lsls r6,r4,#0x2    @ 080444ac a600
     cmp r5,#0x0                              @ 080444ae 002d
     beq LAB_080444e0                         @ 080444b0 16d0
-    ldr r0, DAT_08044530                     @ 080444b2 1f48
+    ldr r0, botl_spell_check_cid_samsara     @ 080444b2 1f48
     bl count_field_copies_of_card            @ 080444b4 eef772f9
     cmp r0,#0x0                              @ 080444b8 0028
     beq LAB_080444e0                         @ 080444ba 11d0
     movs r0,#0x1    @ 080444bc 0120
     ands r0,r7    @ 080444be 3840
-    ldr r1, DAT_08044534                     @ 080444c0 1c49
+    ldr r1, botl_spell_check_stride          @ 080444c0 1c49
     muls r0,r1    @ 080444c2 4843
     adds r0,r6,r0    @ 080444c4 3018
-    ldr r1, DAT_08044538                     @ 080444c6 1c49
+    ldr r1, botl_spell_check_field_c         @ 080444c6 1c49
     adds r0,r0,r1    @ 080444c8 4018
     ldr r0,[r0,#0x0]                         @ 080444ca 0068
     lsls r0,r0,#0x13    @ 080444cc c004
@@ -9501,10 +9501,10 @@ LAB_080444ac:
 LAB_080444e0:
     movs r0,#0x1    @ 080444e0 0120
     ands r0,r7    @ 080444e2 3840
-    ldr r1, DAT_08044534                     @ 080444e4 1349
+    ldr r1, botl_spell_check_stride          @ 080444e4 1349
     adds r4,r0,#0x0    @ 080444e6 041c
     muls r4,r1    @ 080444e8 4c43
-    ldr r5, DAT_08044538                     @ 080444ea 134d
+    ldr r5, botl_spell_check_field_c         @ 080444ea 134d
     adds r1,r4,r5    @ 080444ec 6119
     adds r1,r1,r6    @ 080444ee 8919
     movs r2,#0x80    @ 080444f0 8022
@@ -9523,7 +9523,7 @@ LAB_080444e0:
     bl get_card_extended_stat_field6         @ 0804450c aaf074fc
     cmp r0,#0x1                              @ 08044510 0128
     bne LAB_08044520                         @ 08044512 05d1
-    ldr r1, DAT_0804453c                     @ 08044514 0949
+    ldr r1, botl_spell_check_cid_super_rejuv @ 08044514 0949
     adds r0,r7,#0x0    @ 08044516 381c
     movs r2,#0x2    @ 08044518 0222
     movs r3,#0x0    @ 0804451a 0023
@@ -9535,18 +9535,18 @@ LAB_08044520:
     pop {r4,r5,r6,r7}                        @ 08044526 f0bc
     pop {r0}                                 @ 08044528 01bc
     bx r0                                    @ 0804452a 0047
-DAT_0804452c:
-    .word  0x00001332                     @ 0804452c 32130000
-DAT_08044530:
-    .word  0x000019da                     @ 08044530 da190000
-DAT_08044534:
-    .word  0x00000868                     @ 08044534 68080000
-DAT_08044538:
-    .word  0x0201c600                     @ 08044538 00c60102
-DAT_0804453c:
-    .word  0x000014e2                     @ 0804453c e2140000
+botl_spell_check_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 0804452c 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: reuse; count_field_copies_of_card arg
+botl_spell_check_cid_samsara:
+    .word  SAMSARA_CID                    @ 08044530 da190000  SAMSARA_CID=0x19da: pw=44182827; card_2061; second-card check
+botl_spell_check_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08044534 68080000  PLAYER_BLOCK_STRIDE=0x868: reuse
+botl_spell_check_field_c:
+    .word  gP1FieldArrayCBase             @ 08044538 00c60102  gP1FieldArrayCBase=0x0201c600: field array C base (zone=0xb); reuse
+botl_spell_check_cid_super_rejuv:
+    .word  SUPER_REJUVENATION_CID         @ 0804453c e2140000  SUPER_REJUVENATION_CID=0x14e2: reuse; second-card check
 
-@ Direct equip zone sprite enqueue without Banisher copy-count check. Reads slot fields directly from zone_slot_ptr. Called by FUN_08044618 and 6 rendering functions (card_frame/card_ids). r0=player_id [0..1], r1=zone_slot_ptr, r2=sub_zone_idx. Reads [r1,#0], extracts col_idx (bits[25:24]) and side_flag (bit[13]). attr_base: player_id==0 -> 0x33 (P1), else ldr 0x8033 (P2). sub_zone_idx XOR player_id bit0 -> H-flip bit (bit[11]). Calls enqueue_sprite_attr_record(attr_base, zone_type=0xb, sprite_attr, 0), then submit_lp_bar_sprite_row_by_type(0x1e, attr4). void return (pop{r0}; bx r0).
+@ Direct equip zone sprite enqueue without Banisher copy-count check. Reads slot fields directly from zone_slot_ptr. Called by render_equip_zone_sprite_with_chain_lp and 6 rendering functions (card_frame/card_ids). r0=player_id [0..1], r1=zone_slot_ptr, r2=sub_zone_idx. Reads [r1,#0], extracts col_idx (bits[25:24]) and side_flag (bit[13]). attr_base: player_id==0 -> 0x33 (P1), else ldr 0x8033 (P2). sub_zone_idx XOR player_id bit0 -> H-flip bit (bit[11]). Calls enqueue_sprite_attr_record(attr_base, zone_type=0xb, sprite_attr, 0), then submit_lp_bar_sprite_row_by_type(0x1e, attr4). void return (pop{r0}; bx r0).
 @ 
 @ Params: r0=u8 player_id [0..1]; r1=ptr zone_slot_ptr; r2=u8 sub_zone_idx
 @ Returns: void
@@ -9586,7 +9586,7 @@ LAB_08044554:
     movs r0,#0x33    @ 0804457a 3320
     cmp r5,#0x0                              @ 0804457c 002d
     beq LAB_08044582                         @ 0804457e 00d0
-    ldr r0, DAT_080445a0                     @ 08044580 0748
+    ldr r0, eezsd_equip_zone_pal_p1          @ 08044580 0748
 LAB_08044582:
     .hword 0x4661    @ 08044582 6146
     lsls r2,r1,#0x10    @ 08044584 0a04
@@ -9601,8 +9601,8 @@ LAB_08044582:
     pop {r0}                                 @ 0804459a 01bc
     bx r0                                    @ 0804459c 0047
     .zero  0x2
-DAT_080445a0:
-    .word  0x00008033                     @ 080445a0 33800000
+eezsd_equip_zone_pal_p1:
+    .word  OAM_EQUIP_ZONE_SPRITE_P1       @ 080445a0 33800000  OAM_EQUIP_ZONE_SPRITE_P1=0x8033: equip zone sprite OAM attr0 P1 (bit15+0x33); reuse
 
 @ Called by multiple equip activation flow functions (indeg=11). Determines zone_state_code passed to dispatch_equip_zone_sprite_and_activation based on count of Banisher of the Light (card_id=0x1332) on field. If at least 1 Banisher on field then r3=0xf (active state), else r3=0xe (inactive state). sp[0]=0, sp[4]=0 (both auxiliary flags zero). Inputs: r0=player_id [0..1], r1=slot_data_ptr (pre-computed by caller), r2=sub_slot_idx [0..0x20] (most callers pass 0 or 1 via lsrs #1f, max 0x20 seen at caller 0x08080182 via check_card_pair_allowed result). Returns: void (epilogue pop{r0} overwrites bl callee r0 with lr then bx r0; all callers ignore r0). Side effects: updates EWRAM equip zone sprite activation field via dispatch_equip_zone_sprite_and_activation. Constants: CARD_ID_BANISHER_OF_THE_LIGHT=0x1332 (Banisher of the Light), ZONE_STATE_INACTIVE=0xe, ZONE_STATE_ACTIVE=0xf, sp[0]=0, sp[4]=0.
 dispatch_equip_zone_sprite_banisher_by_field_count:
@@ -9611,7 +9611,7 @@ dispatch_equip_zone_sprite_banisher_by_field_count:
     adds r4,r0,#0x0    @ 080445a8 041c
     adds r5,r1,#0x0    @ 080445aa 0d1c
     adds r6,r2,#0x0    @ 080445ac 161c
-    ldr r0, DAT_080445d4                     @ 080445ae 0948
+    ldr r0, botl_field_count_cid_banisher    @ 080445ae 0948
     bl count_field_copies_of_card            @ 080445b0 eef7f4f8
     movs r3,#0xe    @ 080445b4 0e23
     cmp r0,#0x0                              @ 080445b6 0028
@@ -9629,8 +9629,8 @@ LAB_080445bc:
     pop {r4,r5,r6}                           @ 080445ce 70bc
     pop {r0}                                 @ 080445d0 01bc
     bx r0                                    @ 080445d2 0047
-DAT_080445d4:
-    .word  0x00001332                     @ 080445d4 32130000
+botl_field_count_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 080445d4 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: reuse; count_field_copies_of_card arg
 
 @ Banisher of the Light (card_id=0x1332) equip zone sprite dispatch wrapper with LP row type fixed to 1. Called by 4 duel_field rendering functions. r0=player_id [0..1], r1=slot_idx (s16; <0 -> skips). Symmetric to sibling family: calls get_zone_slot_ptr(slot_idx, zone=0xb) then count_field_copies_of_card(0x1332) to determine zone_state=0xe (0 copies) or 0xf (>=1 copy). Sets sp[0]=0 (no H-flip), sp[4]=1 (LP row type), r2=0, calls dispatch_equip_zone_sprite_and_activation. Named siblings: dispatch_equip_zone_sprite_banisher_of_the_light (sp[0]=1,sp[4]=0); dispatch_equip_zone_sprite_banisher_lp_row2 (sp[0]=1,sp[4]=2). void return.
 @ 
@@ -9648,7 +9648,7 @@ dispatch_equip_zone_sprite_banisher_lp_row1:
     movs r1,#0xb    @ 080445e4 0b21
     bl get_zone_slot_ptr                     @ 080445e6 f6f765fe
     adds r5,r0,#0x0    @ 080445ea 051c
-    ldr r0, DAT_08044614                     @ 080445ec 0948
+    ldr r0, botl_lp_row1_cid_banisher        @ 080445ec 0948
     bl count_field_copies_of_card            @ 080445ee eef7d5f8
     movs r3,#0xe    @ 080445f2 0e23
     cmp r0,#0x0                              @ 080445f4 0028
@@ -9668,10 +9668,10 @@ LAB_0804460c:
     pop {r4,r5}                              @ 0804460e 30bc
     pop {r0}                                 @ 08044610 01bc
     bx r0                                    @ 08044612 0047
-DAT_08044614:
-    .word  0x00001332                     @ 08044614 32130000
+botl_lp_row1_cid_banisher:
+    .word  BANISHER_OF_THE_LIGHT_CID      @ 08044614 32130000  BANISHER_OF_THE_LIGHT_CID=0x1332: reuse; count_field_copies_of_card arg
 
-@ Composite function to render equip zone OAM sprite and trigger LP chain indicator. When r1 >= 0: get zone slot ptr with zone=0xb, immediately call enqueue_equip_zone_sprite_direct (no chain); extract card_type_index (bits[25:24]<<1 | bit[13]) and side_flag (bit[14]) from slot[0], find effect node for DAT_08044670=0x1379 (icid=0x1379=Graverobber) via find_effect_node_in_zone; if found, call enqueue_equip_zone_sprite_by_side to append side sprite; finally submit_lp_change_indicator_with_chain_check(r0=player_id, r1=0x7d0, r2=0, r3=effect_ptr). pop{r0};bx r0 void exit. Called by FUN_080583bc (duel_field) in equip activation case=1. Function: (1) unconditionally enqueue direct sprite; (2) enqueue side sprite conditioned on effect_node presence; (3) submit LP chain indicator. Constants: ZONE_B=0xb (equip zone), icid=0x1379 (Graverobber), LP_VAL=0x7d0 (=0xfa<<3 = 2000).
+@ Composite function to render equip zone OAM sprite and trigger LP chain indicator. When r1 >= 0: get zone slot ptr with zone=0xb, immediately call enqueue_equip_zone_sprite_direct (no chain); extract card_type_index (bits[25:24]<<1 | bit[13]) and side_flag (bit[14]) from slot[0], find effect node for DAT_08044670=0x1379 (icid=0x1379=Graverobber) via find_effect_node_in_zone; if found, call enqueue_equip_zone_sprite_by_side to append side sprite; finally submit_lp_change_indicator_with_chain_check(r0=player_id, r1=0x7d0, r2=0, r3=effect_ptr). pop{r0};bx r0 void exit. Called by tick_equip_bitmap_and_lp_chain_sprite_seq (duel_field) in equip activation case=1. Function: (1) unconditionally enqueue direct sprite; (2) enqueue side sprite conditioned on effect_node presence; (3) submit LP chain indicator. Constants: ZONE_B=0xb (equip zone), icid=0x1379 (Graverobber), LP_VAL=0x7d0 (=0xfa<<3 = 2000).
 render_equip_zone_sprite_with_chain_lp:
     push {r4,r5,r6,lr}                       @ 08044618 70b5
     adds r5,r0,#0x0    @ 0804461a 051c
@@ -9685,7 +9685,7 @@ render_equip_zone_sprite_with_chain_lp:
     adds r1,r4,#0x0    @ 0804462c 211c
     movs r2,#0x0    @ 0804462e 0022
     bl enqueue_equip_zone_sprite_direct      @ 08044630 fff786ff
-    ldr r6, DAT_08044670                     @ 08044634 0e4e
+    ldr r6, rezslp_cid_graverobber           @ 08044634 0e4e
     ldr r0,[r4,#0x0]                         @ 08044636 2068
     lsls r3,r0,#0x2    @ 08044638 8300
     lsrs r3,r3,#0x18    @ 0804463a 1b0e
@@ -9713,8 +9713,8 @@ LAB_08044668:
     pop {r0}                                 @ 0804466a 01bc
     bx r0                                    @ 0804466c 0047
     .zero  0x2
-DAT_08044670:
-    .word  0x00001379                     @ 08044670 79130000
+rezslp_cid_graverobber:
+    .word  GRAVEROBBER_CID                @ 08044670 79130000  GRAVEROBBER_CID=0x1379: reuse; find_effect_node_in_zone arg
 
 @ Search graveyard for entry matching graveyard_ptr, if found construct OAM sprite attributes and enqueue, also enqueue LP bar sprite row. Flow: (1) find_graveyard_entry_by_ptr(r1=graveyard_ptr, r2=slot_ptr) locates graveyard entry, return 0 if result < 0; (2) extract col_side_packed and side_flag from slot[0], call check_card_type_is_spell to check if spell card; (3) set r1 (row_type: 0xc/0xb) based on spell/non-spell, compute LP base via gP1LP+0xc+player_id*0x868; (4) construct attr1/attr2 and call enqueue_sprite_attr_record(0x3f,...); (5) call enqueue_sprite_attr_with_type_select for non-spell path. Return 1. indeg=0. Constants: OAM_ATTR0=0x3f, PLAYER_STRIDE=0x868, LP_BASE_OFFSET=0xc, SPELL_ROW=0xc, NON_SPELL_ROW=0xb.
 enqueue_graveyard_spell_sprite_and_lp:

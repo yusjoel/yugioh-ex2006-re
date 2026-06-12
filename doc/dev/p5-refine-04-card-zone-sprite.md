@@ -98,7 +98,7 @@
 | 3 | 0x40c88..0x417f0 | 19 | 98 | — | ✅ | (see §四.4.03) |
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ✅ | (see §四.4.04) |
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ✅ | (see §四.4.05) |
-| 6 | 0x4394c..0x44674 | 20 | 69 | — | ⬜ | — |
+| 6 | 0x4394c..0x44674 | 20 | 69 | — | ✅ | (see §四.4.06) |
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ⬜ | — |
 | 8 | 0x44e30..0x47990 | 19 | 275 | — | ⬜ | — |
 | 9 | 0x47990..0x47ec0 | 20 | 14 | — | ⬜ | — |
@@ -289,6 +289,70 @@ enqueue_zone_slot_sprite_attr_if_occupied
 - plate FUN_ grep in Seg-5 [lines 6685..7928]: 0 hits ✅
 - non-ASCII grep in Seg-5 range: 0 hits ✅
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.06 Seg-6 完成记录 (0x0804394c..0x08044674)
+
+**函数列表 (20)**:
+enqueue_zone_card_sprite_attr_by_slot / invoke_equip_activation_with_zero_flag /
+apply_slot_equip_activation_with_eligibility_check / apply_slot_equip_activation_with_sprite /
+dispatch_slot_equip_sprite_by_field6_type / enqueue_equip_chain_pair_sprite_validated /
+scan_equip_chain_list_for_activation_sprite / enqueue_equip_chain_pair_sprite_if_eligible /
+enqueue_equip_chain_dual_slot_sprite_with_activation_scan / enqueue_face_down_slot_sprite_attr /
+enqueue_hand_card_sprite_by_spell_type / dispatch_equip_zone_sprite_and_activation /
+dispatch_equip_zone_sprite_banisher_of_the_light / dispatch_equip_zone_sprite_banisher_lp_row2 /
+dispatch_equip_zone_sprite_banisher_with_count_check / dispatch_equip_zone_sprite_banisher_with_spell_check /
+enqueue_equip_zone_sprite_direct / dispatch_equip_zone_sprite_banisher_by_field_count /
+dispatch_equip_zone_sprite_banisher_lp_row1 / render_equip_zone_sprite_with_chain_lp
+
+**符号化统计**: EQ=68 (reuse+new) / REF=1 / RENAME=0 / PLATE=8 fn (17 entries) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (27 项)**:
+- oam_attr.inc x5:
+  - OAM_EQUIP_SLOT_SPRITE_P1=0x8034 (equip slot activation; 19 ROM refs)
+  - OAM_EQUIP_ZONE_SPRITE_P1=0x8033 (equip zone sprite; 40 ROM refs)
+  - OAM_EQUIP_CHAIN_PAIR_SPRITE_P1=0x803d (equip chain pair; 76 ROM refs)
+  - OAM_EQUIP_CHAIN_DUAL_SPRITE_P1=0x803e (equip chain dual-slot; 121 ROM refs)
+  - OAM_ZONE_EQUIP_SPRITE_P1=0x8045 (zone equip shape; 166 ROM refs)
+- card_info.inc x22 (新建):
+  - BANISHER_OF_THE_LIGHT_CID=0x1332 (6 slots)
+  - GRAVEROBBER_CID=0x1379 (2 slots)
+  - SUPER_REJUVENATION_CID=0x14e2 (2 slots)
+  - SAMSARA_CID=0x19da / CRASS_CLOWN_CID=0x1005 / BLADE_RABBIT_CID=0x1868 / AMEBA_CID=0x118a /
+    MANTICORE_OF_DARKNESS_CID=0x16f9 / ARCHFIEND_OF_GILFER_CID=0x13e3 / MINAR_CID=0x11bc /
+    SKULL_MARK_LADYBUG_CID=0x12a2 / MAKYURA_THE_DESTRUCTOR_CID=0x14a5 / DESPAIR_FROM_THE_DARK_CID=0x1653 /
+    FEAR_FROM_THE_DARK_CID=0x1655 / OUTSTANDING_DOG_MARRON_CID=0x1687 / ROC_FROM_THE_VALLEY_OF_HAZE_CID=0x1828 /
+    NIGHT_ASSAILANT_CID=0x179a / BROWW_HUNTSMAN_OF_DARK_WORLD_CID=0x1966 /
+    SILLVA_WARLORD_OF_DARK_WORLD_CID=0x1968 / EKIBYO_DRAKMORD_CID_SHIFTED=0xa4e80000 /
+    act_cid_1048_08043b48=0x1048 (low conf) / act_cid_1197_08043be8=0x1197 (low conf)
+- card_info.inc x1 (复用): LIGHT_OF_INTERVENTION_CID=0x135d (card_info.inc:401)
+
+**REF**: PTR_gP1LifePoints_080440ac -> gP1LifePoints=0x0201c4e0 (ewram.inc:79)
+
+**PLATE**: 8 functions, 17 substr replacements (21 logical token replacements):
+- invoke_equip_activation_with_zero_flag: 5 FUN_ tokens
+- enqueue_equip_chain_pair_sprite_validated: 2 FUN_ tokens
+- scan_equip_chain_list_for_activation_sprite: 4 FUN_ tokens
+- dispatch_equip_zone_sprite_and_activation: 1 FUN_ token
+- dispatch_equip_zone_sprite_banisher_with_count_check: 1 FUN_ token
+- dispatch_equip_zone_sprite_banisher_with_spell_check: 2 FUN_ tokens
+- enqueue_equip_zone_sprite_direct: 1 FUN_ token
+- render_equip_zone_sprite_with_chain_lp: 1 FUN_ token
+
+**踩坑**: Proposal 中 5 处 DAT_ 地址错误 (ROM 验证发现):
+- OAM_EQUIP_SLOT_SPRITE_P1: proposal 0x08043b44 -> 正确 0x08043af8
+- CRASS_CLOWN_CID: proposal 0x08043b04 -> 正确 0x08043b30
+- BLADE_RABBIT_CID: proposal 0x08043c14 -> 正确 0x08043bec
+- OAM_ZONE_EQUIP_SPRITE_P1: proposal 0x0804416c -> 正确 0x08044148 (0x0804416c=OAM_EQUIP_ZONE_SPRITE_P1)
+- SAMSARA_CID: proposal 0x08044540 -> 正确 0x08044530 (0x08044540 是函数入口)
+- CID BST cluster: proposal 0x080440dc..0x08044108 -> 正确 0x080441e0..0x0804428c
+fn-ptr +1 再次补回 (0x37884/0x389dc/0x389f8/0x3aa74 in asm/03; 0x08040ab4 +7*16 in asm/04)
+
+**落地后验收**:
+- plate FUN_ grep in Seg-6 [lines 7927..9800]: 0 hits
+- non-ASCII grep in Seg-6 range: 0 hits
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 ---
 

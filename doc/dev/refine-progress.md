@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 04 Seg-6 0x4394c..0x44674 (20 fn, 69 槽; enqueue zone/equip slot sprite attr 簇 + scan_equip_chain_list + activation sprite render)。
+> **下一任务**: file 04 Seg-7 0x44674..0x44e30 (19 fn, 35 槽; graveyard spell sprite + hand-card sprite + equip-zone sprite dispatch banisher cluster)。
 
-上次更新: 2026-06-13 file 04 Seg-5 完成 (EQ=45/REF=0/RENAME=3/PLATE=9fn; 新建 oam_attr.inc x8 + card_info.inc x2; byte-identical 9689337d)。
+上次更新: 2026-06-13 file 04 Seg-6 完成 (EQ=68/REF=1/RENAME=0/PLATE=8fn 17 entries; 新建 oam_attr.inc x5 + card_info.inc x22; byte-identical 9689337d)。
 
 ---
 
@@ -23,7 +23,7 @@
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
-| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (4/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
+| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (6/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |
@@ -117,4 +117,4 @@
 | `tools/asm-regen/split_manifest.tsv` | 25 文件地址边界 (本表来源) |
 | `output/2343.gba` SHA1 == 9689337d… | byte-identical 红线 |
 
-**上次更新**: 2026-06-10 (02 文件 Seg-3 完成: zone chain count/eligibility query/equip find 23fn; EQ33/REF24/RENAME1/PLATE6; carve=0 disasm=0; 新建 ewram.inc gDuelEffectChainSlots=0x0201bc54; byte-identical 9689337d; 下一任务 file 02 Seg-4)。
+**上次更新**: 2026-06-13 (04 文件 Seg-6 完成: enqueue zone/equip slot sprite attr + banisher CID cluster 20fn; EQ=68/REF=1/RENAME=0/PLATE=8fn; 新建 oam_attr.inc x5 + card_info.inc x22; 地址修正 3 处 (OAM_EQUIP_SLOT_SPRITE_P1/CRASS_CLOWN_CID/BLADE_RABBIT_CID/SAMSARA_CID); byte-identical 9689337d; 下一任务 file 04 Seg-7)。

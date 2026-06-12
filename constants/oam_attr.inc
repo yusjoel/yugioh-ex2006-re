@@ -39,3 +39,12 @@
 .equ OAM_SPRITE_ATTR_CLR_BITS13_10, 0xffffc3ff  @ AND mask clears bits[13:10] (slot_idx 4-bit field); 27 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
 .equ OAM_SPRITE_ATTR_CLR_BIT16,     0xfffeffff  @ AND mask clears bit16 (flip flag) of OAM sprite attr word; 1475 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
 .equ OAM_SPRITE_ATTR_CLR_BIT17,     0xfffdffff  @ AND mask clears bit17 (composite sprite flag); 448 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
+
+@ =============================================================================
+@ file 04 Seg-6 additions: OAM equip/zone sprite palette selectors P1
+@ =============================================================================
+.equ OAM_EQUIP_SLOT_SPRITE_P1,      0x00008034  @ equip slot activation OAM attr0 P1 (bit15+0x34); apply_slot_equip_activation_with_sprite; P0 path=0x34; 19 raw ROM refs
+.equ OAM_EQUIP_ZONE_SPRITE_P1,      0x00008033  @ equip zone sprite OAM attr0 P1 (bit15+0x33); enqueue_equip_zone_sprite_direct + dispatch_equip_zone_sprite_and_activation; P0=0x33; 40 raw ROM refs
+.equ OAM_EQUIP_CHAIN_PAIR_SPRITE_P1, 0x0000803d @ equip chain pair sprite OAM attr0 P1 (bit15+0x3d); enqueue_equip_chain_pair_sprite_if_eligible; P0=0x3d; 76 raw ROM refs
+.equ OAM_EQUIP_CHAIN_DUAL_SPRITE_P1, 0x0000803e @ equip chain dual-slot sprite OAM attr0 P1 (bit15+0x3e); enqueue_equip_chain_dual_slot_sprite_with_activation_scan; P0=0x3e; 121 raw ROM refs
+.equ OAM_ZONE_EQUIP_SPRITE_P1,      0x00008045  @ zone equip shape sprite OAM attr0 P1 (bit15+0x45); dispatch_equip_zone_sprite_and_activation; P0=0x45; 166 raw ROM refs
