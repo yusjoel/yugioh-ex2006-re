@@ -67,3 +67,10 @@
 .equ OAM_EFFECT_CARD_SLOT_P1,       0x0000003c  @ effect-card slot sprite OAM attr1; player 1; inline imm
 .equ OAM_EFFECT_CARD_SLOT_P2,       0x0000803c  @ effect-card slot sprite OAM attr1; player 2; 4 pool refs in Seg-8a
 .equ EQUIP_PAIR_SPRITE_EXTRA,        0x00000101  @ equip pair sprite attr extra field: type=1, mode=1; r3 arg to enqueue_sprite_attr_record in enqueue_equip_card_sprite_attr_for_slot; 1 pool ref
+
+@ =============================================================================
+@ file 04 Seg-8b additions: zone effect / equip zone OAM clear masks + effect sprite attr
+@ =============================================================================
+.equ OAM_SPRITE_ATTR_CLR_BIT18,     0xfffbffff  @ AND mask clearing bit18 (zone effect flag) of OAM sprite attr word; 687 raw ROM refs; handle_card_effect_zone_eligibility_by_field6
+.equ OAM_SPRITE_ATTR_CLR_BITS22_19, 0xff87ffff  @ AND mask clearing OAM sprite attr bits[22:19] (equip zone shape field); 14 raw ROM refs
+.equ OAM_EFFECT_ZONE_SPRITE_P1,     0x00008031  @ OAM attr0 P1 for zone effect card sprite (bit15+0x31); handle_card_effect_zone_eligibility_by_field6 field8==9 path; 55 raw ROM refs

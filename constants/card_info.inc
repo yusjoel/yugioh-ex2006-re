@@ -555,3 +555,26 @@
 .equ ROYAL_KEEPER_CID,                 0x00001527  @ Royal Keeper (pw=16509093; card-stats.s slot=0x1527)
 .equ EXARION_UNIVERSE_CID,             0x0000154c  @ Exarion Universe (pw=63749102; card-stats.s slot=0x154c)
 .equ MAJI_GIRE_PANDA_CID,              0x00001862  @ Maji-Gire Panda (pw=60102563; card-stats.s slot=0x1862)
+
+@ =============================================================================
+@ file 04 Seg-8b additions: equip target eligibility / zone action CIDs
+@ =============================================================================
+.equ PANDEMONIUM_WATCHBEAR_CID,        0x00001683  @ Pandemonium Watchbear (pw=75375465; card-stats.s slot=0x1683)
+.equ HEAVY_MECH_SUPPORT_PLATFORM_CID, 0x00001825  @ Heavy Mech Support Platform (pw=23265594; card-stats.s slot=0x1825)
+.equ AUTONOMOUS_ACTION_UNIT_CID,      0x000015e6  @ Autonomous Action Unit (pw=71453557; card-stats.s slot=0x15e6)
+.equ CALL_OF_THE_HAUNTED_CID,         0x0000137d  @ Call of the Haunted (pw=97077563; card-stats.s slot=0x137d)
+.equ PREMATURE_BURIAL_CID,            0x00001366  @ Premature Burial (pw=70828912; card-stats.s slot=0x1366)
+.equ SPIRIT_MESSAGE_L_CID,            0x0000149a  @ Spirit Message L (pw=30170981; card-stats.s slot=0x149a)
+.equ SPIRITUAL_ENERGY_SETTLE_CID,     0x0000150e  @ Spiritual Energy Settle Machine (pw=99173029; card-stats.s slot=0x150e)
+.equ THE_FIRST_SARCOPHAGUS_CID,       0x000017af  @ The First Sarcophagus (pw=31076103; card-stats.s slot=0x17af)
+.equ THE_THIRD_SARCOPHAGUS_CID,       0x000017ad  @ The Third Sarcophagus (pw=78697395; card-stats.s slot=0x17ad)
+.equ BATTLE_SCARRED_CID,              0x000016a2  @ Battle-Scarred (pw=94463200; card-stats.s slot=0x16a2)
+.equ NINJITSU_ART_OF_TRANSFORMATION_CID, 0x00001768  @ Ninjitsu Art of Transformation (pw=70861343; card-stats.s slot=0x1768)
+.equ RE_FUSION_CID,                   0x00001881  @ Re-Fusion (pw=74694807; card-stats.s slot=0x1881)
+.equ SYMBOL_OF_HERITAGE_CID,          0x000019d7  @ Symbol of Heritage (pw=45305419; card-stats.s slot=0x19d7)
+.equ BIG_BANG_SHOT_CID,               0x00001625  @ Big Bang Shot (pw=61127349; card-stats.s slot=0x1625)
+.equ DESTINY_BOARD_CID,               0x00001468  @ Destiny Board (pw=94212438; card-stats.s slot=0x1468)
+.equ AMPLIFIER_CID,                   0x000012d3  @ Amplifier (pw=00303660; card-stats.s slot=0x12d3)
+.equ SOUL_RESURRECTION_CID,           0x000017b7  @ Soul Resurrection (pw=92924317; card-stats.s slot=0x17b7)
+.equ FIBER_JAR_CID,                   0x000014fb  @ Fiber Jar (pw=78706415; card-stats.s slot=0x14fb)
+.equ GOBLIN_OUT_OF_FRYING_PAN_CID,    0x000019e1  @ Goblin Out of the Frying Pan (pw=69632396; card-stats.s slot=0x19e1)

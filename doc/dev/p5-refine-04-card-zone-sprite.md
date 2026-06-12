@@ -101,7 +101,7 @@
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ✅ | (see §四.4.06) |
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ✅ | (see §四.4.07) |
 | 8a | 0x44e30..0x4640c | 9 | 143 | — | ✅ | (see §四.4.08a) |
-| 8b | 0x4640c..0x47990 | 10 | 132 | — | ⬜ | — |
+| 8b | 0x4640c..0x47990 | 10 | 132 | — | ✅ | (see §四.4.08b) |
 | 9 | 0x47990..0x47ec0 | 20 | 14 | — | ⬜ | — |
 | 10 | 0x47ec0..0x49014 | 19 | 112 | — | ⬜ | — |
 
@@ -422,6 +422,45 @@ dispatch_card_effect_sprite_render_by_card_id
 **落地后验收**:
 - plate FUN_ grep in Seg-8a [lines 10822..13947]: 0 hits
 - non-ASCII grep in Seg-8a range: 0 hits
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.08b Seg-8b 完成记录 (0x0804640c..0x08047990)
+
+**函数列表 (10)**:
+check_slot_equip_placement_valid / build_equip_placement_valid_bitmap /
+check_slot_equip_target_eligibility / dispatch_card_effect_zone_action_by_card_id /
+handle_card_effect_zone_eligibility_by_field6 / update_equip_target_bitmap_for_field /
+query_equip_target_bitmap_default / prepare_slot_ctx_for_equip_bitmap /
+enqueue_equip_slot_bitmap_update / test_equip_target_slot_in_bitmap
+
+**符号化统计**: EQ=117 (116 via equate + 1 EOL-only) / REF=6 / RENAME=23 / PLATE=4 fn (15 FUN_ tokens) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (23 项)**:
+- card_info.inc x19:
+  PANDEMONIUM_WATCHBEAR_CID(0x1683) / HEAVY_MECH_SUPPORT_PLATFORM_CID(0x1825) /
+  AUTONOMOUS_ACTION_UNIT_CID(0x15e6) / CALL_OF_THE_HAUNTED_CID(0x137d) /
+  PREMATURE_BURIAL_CID(0x1366) / SPIRIT_MESSAGE_L_CID(0x149a) /
+  SPIRITUAL_ENERGY_SETTLE_CID(0x150e) / THE_FIRST_SARCOPHAGUS_CID(0x17af) /
+  THE_THIRD_SARCOPHAGUS_CID(0x17ad) / BATTLE_SCARRED_CID(0x16a2) /
+  NINJITSU_ART_OF_TRANSFORMATION_CID(0x1768) / RE_FUSION_CID(0x1881) /
+  SYMBOL_OF_HERITAGE_CID(0x19d7) / BIG_BANG_SHOT_CID(0x1625) /
+  DESTINY_BOARD_CID(0x1468) / AMPLIFIER_CID(0x12d3) /
+  SOUL_RESURRECTION_CID(0x17b7) / FIBER_JAR_CID(0x14fb) /
+  GOBLIN_OUT_OF_FRYING_PAN_CID(0x19e1)
+- duel_field.inc x1: EQUIP_BITMAP_CTRL_OFF(0x10d4)
+- oam_attr.inc x3: OAM_SPRITE_ATTR_CLR_BIT18(0xfffbffff) / OAM_SPRITE_ATTR_CLR_BITS22_19(0xff87ffff) / OAM_EFFECT_ZONE_SPRITE_P1(0x8031)
+
+**REF**: 5x PTR_gP1LifePoints (0x0201c4e0) + 1x compound (.word gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF = 0x0201d5b4)
+
+**PLATE**: 4 functions, 15 FUN_ tokens total (2+8+4+1); 0 WARN (all patterns found)
+
+**踩坑**: compound REF 槽 0x080478f0 Ghidra 导出为 `.word gDuelFieldSlots` (平坦地址); 需手改为 `.word gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF`; build 验证发现 2 字节偏差 @ 0x080478f0 后手补修正。fn-ptr +1 再次需要补 (slots 0x37884/0x389dc/0x389f8/0x3aa74 in asm/03; zone_monster_field_bonus_table+7*16 @ 0x08040ab4 + apply_nitro_unit_equip_activation+1 @ 0x08045efc in asm/04)。
+
+**落地后验收**:
+- plate FUN_ grep in Seg-8b [lines 13947..16863]: 0 hits
+- non-ASCII grep in Seg-8b range: 0 hits
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 ---

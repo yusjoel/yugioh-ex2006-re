@@ -268,3 +268,8 @@
 @ file 04 Seg-8a additions: equip chain slot refs list terminator sentinel
 @ =============================================================================
 .equ EQUIP_CHAIN_SENTINEL,          0xffff0000  @ gEquipChainSlotRefs list terminator sentinel; cmp rval, EQUIP_CHAIN_SENTINEL; beq exit loop; 3 pool refs in Seg-8a
+
+@ =============================================================================
+@ file 04 Seg-8b additions: equip target bitmap control word offset
+@ =============================================================================
+.equ EQUIP_BITMAP_CTRL_OFF,         0x000010d4  @ [gP1LifePoints+0x10d4] equip target bitmap control word; update_equip_target_bitmap_for_field writes combined sprite flags; 12 ROM refs
