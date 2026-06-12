@@ -103,7 +103,7 @@
 | 8a | 0x44e30..0x4640c | 9 | 143 | — | ✅ | (see §四.4.08a) |
 | 8b | 0x4640c..0x47990 | 10 | 132 | — | ✅ | (see §四.4.08b) |
 | 9 | 0x47990..0x47ec0 | 20 | 14 | — | ✅ | (see §四.4.09) |
-| 10 | 0x47ec0..0x49014 | 19 | 112 | — | ⬜ | — |
+| 10 | 0x47ec0..0x49014 | 19 | 112 | — | ✅ | (see §四.4.10) |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 重段提示: Seg-8 (275 槽, dispatch_card_effect_sprite_render_by_card_id 等大型 card_id 分发 + equip
@@ -503,6 +503,61 @@ zone_monster_field_bonus_table+7*16 @ 0x08040ab4 in asm/04;
 apply_nitro_unit_equip_activation+1 @ 0x08045efc in asm/04;
 gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x080478f0 in asm/04).
 All 7 slots re-patched after re-export; SHA1 match restored.
+
+---
+
+### 4.10 Seg-10 完成记录 (0x08047ec0..0x08049014)
+
+**函数列表 (19)**:
+test_equip_target_zone14_with_ctx_clear / update_equip_target_bitmap_zone_e_no_flag /
+update_equip_bitmap_zone_e_with_slot_save / update_equip_bitmap_with_cross_side_flag /
+render_slot_card_sprite_from_descriptor / render_slot_card_sprite_and_effects /
+render_zone_sprite_with_effect_dispatch_by_slot / render_slot_card_sprite_with_chaos_equip_check /
+render_zone_sprite_with_effect_dispatch_alt / enqueue_sprite_attr_for_zone_card_id_lookup /
+enqueue_sprite_attr_by_sign / enqueue_equip_zone_sprite_by_side /
+enqueue_sprite_attr_for_slot_indicator / enqueue_sprite_attr_position_by_player /
+enqueue_sprite_attr_clamped / enqueue_sprite_attr_record_with_cap /
+submit_lp_indicator_with_slot_xor_flag / submit_lp_change_indicator_with_chain_check /
+setup_equip_slot_sprite_attr_by_card
+
+**符号化统计**: EQ=87 (49 reuse + 10 new oam_attr.inc + 26 new card_info.inc + 2 new duel_field.inc) / REF=25 / RENAME=0 / FUNC_RENAME=0 / PLATE=8 fn (16+2=18 FUN_ tokens + 5 C9 wrong-global corrections) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (38 项)**:
+- oam_attr.inc x10:
+  OAM_SLOT_SPRITE_P2(0x8032) / OAM_ZONE_CARD_ID_SPRITE_P2(0x802e) / OAM_SIGN_SPRITE_P2(0x8030) /
+  OAM_EQUIP_ZONE_SIDE_P2(0x802f) / OAM_SLOT_INDICATOR_P2(0x802b) / OAM_POSITION_ATTR_P2(0x8026) /
+  OAM_SPRITE_COUNT_P2(0x8025) / OAM_SPRITE_ATTR_CLR_BITS20_17(0xffe1ffff) /
+  OAM_SPRITE_ATTR_CLR_BITS25_22(0xfc3fffff) / OAM_SPRITE_ATTR_CLR_BIT26(0xfbffffff)
+- card_info.inc x26: WHITE_MAGICAL_HAT / MASKED_SORCERER / BISTRO_BUTCHER / RELINQUISHED /
+  DRILL_BUG / ROBBINS_GOBLIN / CESTUS_OF_DAGLA / SECRET_OF_THE_BANDIT / DON_ZALOOG /
+  TOON_MASKED_SORCERER / DARK_ROOM_OF_NIGHTMARE / FREEZING_BEAST / equip_cid_15de_08048a68(low-conf) /
+  MEFIST_THE_INFERNAL_GENERAL / SASUKE_SAMURAI_3 / VAMPIRE_LADY / DES_COUNTERBLOW /
+  HALLOWED_LIFE_BARRIER / DARK_BLADE_THE_DRAGON_KNIGHT / PIKERUS_CIRCLE_OF_ENCHANTMENT /
+  POISON_FANGS / SPIRAL_SPEAR_STRIKE / DES_WOMBAT / BRRON_MAD_KING_OF_DARK_WORLD /
+  DOOM_DOZER / BEGONE_KNAVE
+- duel_field.inc x2: FIELD_COPY_COUNT_FLAG(0x00010002) / EQUIP_ZONE_EFFECT_ATTR_OR(0x1e501511, low-conf)
+
+**PLATE 订正内容**:
+- update_equip_target_bitmap_zone_e_no_flag: FUN_080584cc/FUN_080777d8/FUN_0807c474 -> addr literals
+- update_equip_bitmap_zone_e_with_slot_save: FUN_08059068 -> addr literal
+- render_zone_sprite_with_effect_dispatch_alt: FUN_08048268 -> render_zone_sprite_with_effect_dispatch_by_slot
+- enqueue_sprite_attr_by_sign: FUN_08049014 -> addr, FUN_080490b4 -> duel_field_080490b4, FUN_0808e5c4 -> addr
+- enqueue_equip_zone_sprite_by_side: 5 FUN_ -> addr literals
+- enqueue_sprite_attr_clamped: FUN_0805635c -> addr, FUN_080572b8 -> duel_field_080572b8, FUN_0808e5c4 -> addr
+- enqueue_sprite_attr_record_with_cap: FUN_08098264 -> addr
+- submit_lp_change_indicator_with_chain_check: FUN_0808f938 -> refresh_opponent_field_slots_for_card_attached
+- C9 corrections: gDuelFieldSlots=0x0201bc54 -> gDuelEffectChainSlots + gDuelTurnStruct -> gEquipChainSlotRefs
+  (render_slot_card_sprite_from_descriptor + render_slot_card_sprite_and_effects)
+
+**落地后验收**:
+- plate FUN_ grep in Seg-10 [lines 17597..19930]: 0 hits
+- non-ASCII grep in Seg-10 range: 0 hits
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**踩坑**: fn-ptr +1 再次补回 (同 Seg-9 - 7 slots total: 4 in asm/03 + 3 in asm/04);
+RefineF04Seg10PlateFix.py 补修 FUN_0808e5c4 x2 (proposal PLATE 清单遗漏但 grep 发现)。
+
+**file 04 全 10 段完成!**
 
 ---
 

@@ -578,3 +578,33 @@
 .equ SOUL_RESURRECTION_CID,           0x000017b7  @ Soul Resurrection (pw=92924317; card-stats.s slot=0x17b7)
 .equ FIBER_JAR_CID,                   0x000014fb  @ Fiber Jar (pw=78706415; card-stats.s slot=0x14fb)
 .equ GOBLIN_OUT_OF_FRYING_PAN_CID,    0x000019e1  @ Goblin Out of the Frying Pan (pw=69632396; card-stats.s slot=0x19e1)
+
+@ =============================================================================
+@ file 04 Seg-10 additions: setup_equip_slot_sprite_attr_by_card + submit_lp_change_indicator dispatch
+@ =============================================================================
+.equ WHITE_MAGICAL_HAT_CID,          0x00001018  @ White Magical Hat (pw=15150365; card_0117); setup_equip_slot_sprite_attr_by_card dispatch
+.equ MASKED_SORCERER_CID,            0x00001082  @ Masked Sorcerer (pw=10189126; card_0208); setup_equip_slot_sprite_attr_by_card dispatch
+.equ BISTRO_BUTCHER_CID,             0x000011b1  @ The Bistro Butcher (pw=71107816; card_0436); setup_equip_slot_sprite_attr_by_card dispatch
+.equ RELINQUISHED_CID,               0x00001281  @ Relinquished (pw=64631466; card_0592); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DRILL_BUG_CID,                  0x000012a7  @ Drill Bug (pw=88733579; card_0631); setup_equip_slot_sprite_attr_by_card dispatch
+.equ ROBBINS_GOBLIN_CID,             0x0000130c  @ Robbin' Goblin (pw=88279736; card_0696); setup_equip_slot_sprite_attr_by_card dispatch
+.equ CESTUS_OF_DAGLA_CID,            0x000014ed  @ Cestus of Dagla (pw=28106077; card_1053); setup_equip_slot_sprite_attr_by_card dispatch
+.equ SECRET_OF_THE_BANDIT_CID,       0x00001511  @ The Secret of the Bandit (pw=99351431; card_1084); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DON_ZALOOG_CID,                 0x00001532  @ Don Zaloog (pw=76922029; card_1111); setup_equip_slot_sprite_attr_by_card dispatch
+.equ TOON_MASKED_SORCERER_CID,       0x00001563  @ Toon Masked Sorcerer (pw=16392422; card_1139); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DARK_ROOM_OF_NIGHTMARE_CID,     0x0000159b  @ Dark Room of Nightmare (pw=85562745; card_1183); submit_lp_change_indicator_with_chain_check LP display gate
+.equ FREEZING_BEAST_CID,             0x000015d7  @ Freezing Beast (pw=85359414; card_1227); setup_equip_slot_sprite_attr_by_card dispatch
+.equ equip_cid_15de_08048a68,        0x000015de  @ slot_id 0x15de: no match in card-stats.s; setup_equip_slot_sprite_attr_by_card dispatch; conf low
+.equ MEFIST_THE_INFERNAL_GENERAL_CID,0x0000168b  @ Mefist the Infernal General (pw=46820049; card_1367); setup_equip_slot_sprite_attr_by_card dispatch
+.equ SASUKE_SAMURAI_3_CID,           0x000016bd  @ Sasuke Samurai #3 (pw=77379481; card_1408); setup_equip_slot_sprite_attr_by_card dispatch
+.equ VAMPIRE_LADY_CID,               0x00001746  @ Vampire Lady (pw=26495087; card_1521); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DES_COUNTERBLOW_CID,            0x000017b5  @ Des Counterblow (pw=39131963; card_1609); setup_equip_slot_sprite_attr_by_card dispatch
+.equ HALLOWED_LIFE_BARRIER_CID,      0x00001805  @ Hallowed Life Barrier (pw=88789641; card_1681); submit_lp_change_indicator_with_chain_check chain check gate A
+.equ DARK_BLADE_THE_DRAGON_KNIGHT_CID,0x0000183c @ Dark Blade the Dragon Knight (pw=86805855; card_1728); setup_equip_slot_sprite_attr_by_card dispatch
+.equ PIKERUS_CIRCLE_OF_ENCHANTMENT_CID,0x00001850 @ Pikeru's Circle of Enchantment (pw=74270067; card_1747); submit_lp_change_indicator_with_chain_check chain check gate B
+.equ POISON_FANGS_CID,               0x0000187b  @ Poison Fangs (pw=76539047; card_1788); setup_equip_slot_sprite_attr_by_card dispatch
+.equ SPIRAL_SPEAR_STRIKE_CID,        0x0000187d  @ Spiral Spear Strike (pw=49328340; card_1790); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DES_WOMBAT_CID,                 0x000018c4  @ Des Wombat (pw=09637706; card_1844); submit_lp_change_indicator_with_chain_check effect zone key
+.equ BRRON_MAD_KING_OF_DARK_WORLD_CID,0x00001967 @ Brron, Mad King of Dark World (pw=06214884; card_1973); setup_equip_slot_sprite_attr_by_card dispatch
+.equ DOOM_DOZER_CID,                 0x000019ca  @ Doom Dozer (pw=76039636; card_2045); setup_equip_slot_sprite_attr_by_card dispatch
+.equ BEGONE_KNAVE_CID,               0x0000171e  @ Begone, Knave! (pw=20374520; card_1494); setup_equip_slot_sprite_attr_by_card dispatch

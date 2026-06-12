@@ -74,3 +74,17 @@
 .equ OAM_SPRITE_ATTR_CLR_BIT18,     0xfffbffff  @ AND mask clearing bit18 (zone effect flag) of OAM sprite attr word; 687 raw ROM refs; handle_card_effect_zone_eligibility_by_field6
 .equ OAM_SPRITE_ATTR_CLR_BITS22_19, 0xff87ffff  @ AND mask clearing OAM sprite attr bits[22:19] (equip zone shape field); 14 raw ROM refs
 .equ OAM_EFFECT_ZONE_SPRITE_P1,     0x00008031  @ OAM attr0 P1 for zone effect card sprite (bit15+0x31); handle_card_effect_zone_eligibility_by_field6 field8==9 path; 55 raw ROM refs
+
+@ =============================================================================
+@ file 04 Seg-10 additions: P2 OAM attr0 palette selectors + sprite-word clear masks
+@ =============================================================================
+.equ OAM_SLOT_SPRITE_P2,             0x00008032  @ P2 duel slot sprite attr0 (bit15+0x32; P1=0x32 inline); render_slot_card_sprite_from_descriptor; 42 raw refs
+.equ OAM_ZONE_CARD_ID_SPRITE_P2,     0x0000802e  @ P2 zone card-id sprite attr0 (bit15+0x2e; P1=0x2e inline); enqueue_sprite_attr_for_zone_card_id_lookup; 3 raw refs
+.equ OAM_SIGN_SPRITE_P2,             0x00008030  @ P2 sign/palette sprite attr0 (bit15+0x30; P1=0x30 inline); enqueue_sprite_attr_by_sign; 113 raw refs
+.equ OAM_EQUIP_ZONE_SIDE_P2,         0x0000802f  @ P2 equip zone side sprite attr0 (bit15+0x2f; P1=0x2f inline); enqueue_equip_zone_sprite_by_side; 142 raw refs
+.equ OAM_SLOT_INDICATOR_P2,          0x0000802b  @ P2 slot occupied-indicator sprite attr0 (bit15+0x2b; P1=0x2b inline); enqueue_sprite_attr_for_slot_indicator; 13 raw refs
+.equ OAM_POSITION_ATTR_P2,           0x00008026  @ P2 LP position sprite attr0 (bit15+0x26; P1=0x26 inline); enqueue_sprite_attr_position_by_player; 315 raw refs
+.equ OAM_SPRITE_COUNT_P2,            0x00008025  @ P2 sprite count extended mode attr0 (bit15+0x25); enqueue_sprite_attr_clamped + enqueue_sprite_attr_record_with_cap + submit_lp_change_indicator; 4 raw refs
+.equ OAM_SPRITE_ATTR_CLR_BITS20_17,  0xffe1ffff  @ AND mask clearing OAM attr bits[20:17] (equip_state 4-bit field); setup_equip_slot_sprite_attr_by_card; 5 raw refs
+.equ OAM_SPRITE_ATTR_CLR_BITS25_22,  0xfc3fffff  @ AND mask clearing OAM attr bits[25:22] (mode 4-bit field); setup_equip_slot_sprite_attr_by_card; 6 raw refs
+.equ OAM_SPRITE_ATTR_CLR_BIT26,      0xfbffffff  @ AND mask clearing OAM attr bit26; setup_equip_slot_sprite_attr_by_card; 1559 raw refs

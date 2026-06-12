@@ -273,3 +273,9 @@
 @ file 04 Seg-8b additions: equip target bitmap control word offset
 @ =============================================================================
 .equ EQUIP_BITMAP_CTRL_OFF,         0x000010d4  @ [gP1LifePoints+0x10d4] equip target bitmap control word; update_equip_target_bitmap_for_field writes combined sprite flags; 12 ROM refs
+
+@ =============================================================================
+@ file 04 Seg-10 additions: field copy count flag + equip zone effect attr OR mask
+@ =============================================================================
+.equ FIELD_COPY_COUNT_FLAG,          0x00010002  @ bit0=mode2,bit16=field_copy_exists; anded with count_field_copies_of_card return to detect duplicate presence; 740 raw refs
+.equ EQUIP_ZONE_EFFECT_ATTR_OR,      0x1e501511  @ packed OR mask for find_effect_node_in_zone hit path; low16=0x1511 type; high16=0x1e50 mode; 1 pool ref; conf LOW
