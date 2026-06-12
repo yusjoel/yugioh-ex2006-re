@@ -379,3 +379,9 @@
 .equ gDuelChainStepCounter,   0x0201c4d0  @ equip chain removal/placement step counter; 3-state machine (0/1/2+); 8 raw ROM refs
 .equ gDuelChainDescBase,      0x0201c4d8  @ equip chain zone slot descriptor / copy buffer base; zone placement and card-set display sequences; 22 raw ROM refs
 .equ gDuelDisplaySeqStateAlt, 0x0201bcc2  @ alternate duel display seq state base = gDuelDisplaySeqState+2; used by alt zone-card-place and normal-summon functions; 3 raw ROM refs
+
+@ =============================================================================
+@ file 04 Seg-4 additions: LP discard zone tracking + equip chain entry base
+@ =============================================================================
+.equ LP_DISCARD_ZONE_OFF,           0x000010dc  @ [gP1LifePoints+player*0x868+0x10dc] LP discard zone tracking field; tick_card_discard_display_seq stores zone_type here on seq completion; 11 ROM refs; 1 Seg-4 slot
+.equ gEquipChainEntryBase,          0x0201e288  @ EWRAM equip chain entry/depth base (3 ROM refs); tick_equip_attach_display_sequence iterates [0x0201e288+2*i] for chain node depth table

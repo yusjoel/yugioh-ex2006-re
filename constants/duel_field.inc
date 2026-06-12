@@ -253,3 +253,8 @@
 .equ EQUIP_MAIN_PHASE_OFF,        0x00001d18  @ [gP1LifePoints+0x1d18] equip activation main-phase dispatch index; tick_equip_activation_dispatch_hub; asm/12:1490 main_phase_offset; 17 raw refs
 .equ HAND_SLOT_FACE_ARRAY_OFF,    0x0000041a  @ gP1LifePoints+0x41a = gP1HandSlotArray+2 (0x0201c8fa): face-status byte-2 in hand slot entry (4B stride); tick_display_slot_flag_clear_seq ORs 0x10; 9 raw refs
 .equ ALT_HAND_SLOT_FACE_ARRAY_OFF,0x000005d2  @ gP1LifePoints+0x5d2 = gP1AltHandSlotArray+2 (0x0201cab2): face-status byte-2 in alt-hand slot entry; symmetric; 3 raw refs
+
+@ =============================================================================
+@ file 04 Seg-4 additions: equip chain step base offset
+@ =============================================================================
+.equ EQUIP_CHAIN_STEP_BASE_OFF,     0x00001130  @ [gEquipChainSlotRefs+0x1130] equip chain refs step array base; tick_equip_chain_count_check_sequence passes to replace_equip_chain_slot_refs_by_match; 9 ROM refs; 1 Seg-4 slot

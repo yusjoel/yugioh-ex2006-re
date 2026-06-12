@@ -22,3 +22,8 @@
 @ file 02 Seg-6 additions: OAM attr2 tile-field clear mask
 @ =============================================================================
 .equ OAM_ATTR2_TILE_CLEAR, 0xffffe000  @ AND mask clearing OAM attr2 bits[12:0] before inserting new tile/set_code; 31 raw refs; 3 Seg-6 slots
+
+@ =============================================================================
+@ file 04 Seg-4 additions: OAM sprite palette selector P1
+@ =============================================================================
+.equ OAM_SPRITE_PAL_P1,            0x00008036  @ OAM sprite attr0 palette selector for player 1 (bit15=1, group 0x36+bit15); enqueue_sprite_attr_with_mode + enqueue_slot_card_sprite_if_eligible; 258 ROM refs; 1 Seg-4 slot

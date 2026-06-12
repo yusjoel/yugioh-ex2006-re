@@ -96,7 +96,7 @@
 | 1 | 0x4020c..0x407fc | 19 | 64 | — | ✅ | (see §四.4.01) |
 | 2 | 0x407fc..0x40c88 | 20 | 46 | — | ✅ | (see §四.4.02) |
 | 3 | 0x40c88..0x417f0 | 19 | 98 | — | ✅ | (see §四.4.03) |
-| 4 | 0x417f0..0x4308c | 19 | 159 | — | ⬜ | — |
+| 4 | 0x417f0..0x4308c | 19 | 159 | — | ✅ | (see §四.4.04) |
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ⬜ | — |
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ⬜ | — |
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ⬜ | — |
@@ -203,6 +203,43 @@ Post-land grep: FUN_0803be4c=0, 0x0803be4c=0 in Seg-3 lines 1689-3366. Verified 
 **踩坑**: fn-ptr +1 再次需要补 (slots 0x37884/0x389dc/0x389f8/0x3aa74 in asm/03_*).
 Re-export also lost zone_monster_field_bonus_table+7*16 offset at 0x08040ab4 (became plain base label);
 補 +7*16 suffix 进 asm/04 line 1360.
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.04 Seg-4 完成记录 (0x080417f0..0x0804308c)
+
+**函数列表 (19)**:
+tick_zone_slot_ref_track_display_seq / tick_equip_attach_display_sequence /
+tick_card_display_op3e_seq / tick_equip_zone_shuffle_display_seq /
+tick_card_display_op43_seq / tick_zone_equip_link_placement_seq /
+tick_card_flip_reveal_display_seq / tick_zone_card_relocate_display_seq /
+tick_normal_summon_zone_placement_seq / tick_equip_chain_count_check_sequence /
+tick_card_discard_display_seq / tick_draw_card_display_seq /
+invoke_draw_display_seq_forward / invoke_draw_display_seq_reverse /
+tick_display_op0d_with_lp_update_seq / reset_equip_chain_entry_by_player /
+resolve_equip_target_slot_for_enqueue / dispatch_equip_chain_slot_scan_by_player /
+enqueue_sprite_attr_with_mode
+
+**符号化统计**: EQ=142 / REF=15 / RENAME=3 / PLATE=9 / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (10 项)**:
+- card_info.inc x6: POLYMERIZATION_CID(0x12e5) / RYU_SENSHI_CID(0x14c7) / FRONTIER_WISEMAN_CID(0x14ca) / VICTORY_D_CID(0x16ec) / BLUE_EYES_SHINING_DRAGON_CID(0x17c2) / RARE_METALMORPH_CID(0x184b)
+- duel_field.inc x1: EQUIP_CHAIN_STEP_BASE_OFF(0x1130)
+- ewram.inc x2: LP_DISCARD_ZONE_OFF(0x10dc) / gEquipChainEntryBase(0x0201e288)
+- oam_attr.inc x1: OAM_SPRITE_PAL_P1(0x8036)
+
+**复用 (无重建)**: TYRANT_DRAGON_CARD_ID / FIEND_SKULL_DRAGON_CID / SKULL_SERVANT_CID / SLOT_CARD_EMPTY / A_DEAL_WITH_DARK_RULER_CID / SOUL_ABSORPTION_CID / COST_DOWN_CID / EQUIP_SLOT_CARD_ID_RANGE_MAX / DISP_SET_VARIANT_OFF / SCROLLBAR_CLEAR_BITS_14_6 等
+
+**BLOCKED 标签 (3)**: nsummon_cid_1672_080423e0 / draw_seq_cid_1729_08042780 / draw_seq_cid_1986_08042794 (not in card-stats.s; 中性形式)
+
+**REF**: DAT_08042638 -> tick_draw_card_switch_table (0x0804263c, even addr, not THUMB+1); gEquipChainEntryBase NEW global; 12x PTR_gP1LifePoints
+
+**PLATE**: 9 functions FUN_0803be4c -> dispatch_duel_event_display_seq; all [PFX] (0 WARN)
+
+**踩坑**: fn-ptr +1 再次需要补 (slots 0x37884/0x389dc/0x389f8/0x3aa74 in asm/03, zone_monster_field_bonus_table+7*16 at 0x08040ab4 in asm/04); 补完后 SHA1 match.
+Dry run found 2 address mismatches (0x08042e98/0x08042e9c swapped, 0x08042468 code not data, 0x08042828 code not data, 0x08042864/68 ptr+stride -> fixed to 0x0804286c).
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 

@@ -429,3 +429,13 @@
 @ file 03 Seg-10 additions: equip detach / zone display seq shifted CID sentinel
 @ =============================================================================
 .equ HELPOEMER_CID_SHIFTED,     0xab880000  @ HELPOEMER_CID(0x1571)<<19; lsls r1,r0,#0x13; cmp sentinel in tick_zone_slot_equip_detach_display_seq state=0; 1 slot
+
+@ =============================================================================
+@ file 04 Seg-4 additions: equip-chain / draw-card display seq card IDs
+@ =============================================================================
+.equ POLYMERIZATION_CID,            0x000012e5  @ Polymerization (pw=24094653; card_0669 slot=0x12E5); tick_equip_attach_display_sequence equip chain depth table base offset; 1 Seg-4 slot; 27 ROM refs
+.equ RYU_SENSHI_CID,                0x000014c7  @ Ryu Senshi (pw=49868263; card_1016 slot=0x14C7); dispatch_equip_chain_slot_scan_by_player BST card_id gate (lower); 1 Seg-4 slot; 13 ROM refs
+.equ FRONTIER_WISEMAN_CID,          0x000014ca  @ Frontier Wiseman (pw=38742075; card_1018 slot=0x14CA); dispatch_equip_chain_slot_scan_by_player BST card_id gate + count_available_effect_zones; 2 Seg-4 slots; 8 ROM refs
+.equ VICTORY_D_CID,                 0x000016ec  @ Victory D. (pw=44910027; card_1446 slot=0x16EC); tick_draw_card_display_seq zone_ref == VICTORY_D_CID branch; 1 Seg-4 slot; 12 ROM refs
+.equ BLUE_EYES_SHINING_DRAGON_CID,  0x000017c2  @ Blue-Eyes Shining Dragon (pw=53347303; card_1617 slot=0x17C2); dispatch_equip_chain_slot_scan_by_player enqueue_field_slot path; 1 Seg-4 slot; 11 ROM refs
+.equ RARE_METALMORPH_CID,           0x0000184b  @ Rare Metalmorph (pw=12503902; card_1743 slot=0x184B); dispatch_equip_chain_slot_scan_by_player find_equip_slot + final BST; 2 Seg-4 slots; 17 ROM refs
