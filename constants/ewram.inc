@@ -243,6 +243,10 @@
 .equ P1LP_BLOCK2_OFF,               0x1d08  @ [gP1LifePoints+0x1d08] duel field LP display field (35 raw refs)
 .equ P1LP_TIMER_OFF,                0x1cec  @ [gP1LifePoints+0x1cec] duel field timer field (29 raw refs)
 .equ P1LP_BACKUP_DST_OFF,           0x1cf0  @ [gP1LifePoints+0x1cf0] LP timer backup destination field; tick_card_display_op0b_seq copies gP1LP+0x1cec here when slot_idx==0; 5 aligned ROM refs
+@ file 04 Seg-3: LP card-tracking array offsets (gP1LifePoints-relative)
+.equ LP_CARD_TRACK_BASE_OFF,  0x00001da8  @ [gP1LifePoints+0x1da8] LP card-ref tracking array base; written by get_zone_slot_card_ref_by_type; cleared by tick_card_display_op2b_lp_clear_seq; 109 raw ROM refs
+.equ LP_CARD_TRACK_NEXT_OFF,  0x00001daa  @ [gP1LifePoints+0x1daa] 5-entry hword clear loop base; tick_card_display_op2b_lp_clear_seq strh x5 starting here; 44 raw ROM refs
+.equ LP_CARD_TRACK_AUX_OFF,   0x00001db2  @ [gP1LifePoints+0x1db2] auxiliary LP track field cleared separately; 1 raw ROM ref
 .equ PLAYER_BLOCK_STRIDE,           0x868   @ player data block stride (0x868=2152 bytes; 2146 raw refs)
 .equ GAME_STR_RAW_ID_MASK,     0xfffe0000   @ raw game string ID mask: bits[31:17]==0 (485 raw refs)
 

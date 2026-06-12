@@ -95,7 +95,7 @@
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x4020c..0x407fc | 19 | 64 | — | ✅ | (see §四.4.01) |
 | 2 | 0x407fc..0x40c88 | 20 | 46 | — | ✅ | (see §四.4.02) |
-| 3 | 0x40c88..0x417f0 | 19 | 98 | — | ⬜ | — |
+| 3 | 0x40c88..0x417f0 | 19 | 98 | — | ✅ | (see §四.4.03) |
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ⬜ | — |
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ⬜ | — |
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ⬜ | — |
@@ -167,6 +167,42 @@ clear_display_step_counter_b / clear_display_step_lock_a
 **PLATE**: 15 函数 plate 中 FUN_0803be4c/(0x0803be4c) -> dispatch_duel_event_display_seq; 含 2 种变体 (FUN_xxx 和 (0xxx)); 0 WARN (全命中)
 
 **踩坑**: fn-ptr +1 槽 (0x37884/0x389dc/0x389f8/0x3aa74) 本次 re-export 后 SHA1 仍一致; GAS 已正确输出奇地址, 无需手补
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.03 Seg-3 完成记录 (0x08040c88..0x080417f0)
+
+**函数列表 (19)**:
+clear_display_step_lock_b/c/d/e/f/g/h (7) /
+clear_card_display_state_flag /
+tick_zone_slot_spell_remove_display_seq /
+tick_field_clear_display_sequence /
+tick_player_hand_shuffle_display_seq /
+tick_card_lp_change_cycle_display_seq /
+tick_find_slot_by_card_id_display_seq /
+tick_card_change_position_display_state /
+tick_zone_card_place_by_id_seq /
+tick_card_id_zone_find_display_seq /
+tick_spell_equip_zone_display_seq /
+tick_card_display_op28_clear_seq /
+tick_card_display_op2b_lp_clear_seq
+
+**符号化统计**: EQ=87 (84 reuse + 3 new) / REF=0 / RENAME=0 / PLATE=18 / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (3, constants/ewram.inc)** (inserted after P1LP_BACKUP_DST_OFF):
+- LP_CARD_TRACK_BASE_OFF=0x1da8: [gP1LifePoints+0x1da8] LP card-ref tracking array base; 109 raw ROM refs
+- LP_CARD_TRACK_NEXT_OFF=0x1daa: [gP1LifePoints+0x1daa] 5-entry hword clear loop base; 44 raw ROM refs
+- LP_CARD_TRACK_AUX_OFF=0x1db2: [gP1LifePoints+0x1db2] auxiliary LP track field; 1 raw ROM ref
+
+**PLATE**: 18 functions — 17x FUN_0803be4c -> dispatch_duel_event_display_seq;
+1x (0x0803be4c) -> (dispatch_duel_event_display_seq) at tick_card_change_position_display_state.
+Post-land grep: FUN_0803be4c=0, 0x0803be4c=0 in Seg-3 lines 1689-3366. Verified 0 WARNs.
+
+**踩坑**: fn-ptr +1 再次需要补 (slots 0x37884/0x389dc/0x389f8/0x3aa74 in asm/03_*).
+Re-export also lost zone_monster_field_bonus_table+7*16 offset at 0x08040ab4 (became plain base label);
+補 +7*16 suffix 进 asm/04 line 1360.
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
