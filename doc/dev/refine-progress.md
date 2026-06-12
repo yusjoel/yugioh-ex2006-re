@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 04 Seg-2 0x407fc..0x40c88 (20 fn, 46 槽; normal-summon/flip/random-draw/prng display tick + op3a/39/3b/3c/0b 簇)。
+> **下一任务**: file 04 Seg-3 0x40c88..0x417f0 (19 fn, 98 槽; clear_display_step_lock 叶簇尾 + zone-slot-spell-remove / field-clear / hand-shuffle / lp-change tick)。
 
-上次更新: 2026-06-13 file 04 Seg-1 完成 (EQ=33/REF=22/RENAME=9/PLATE=17; 新建 duel_field.inc x5; byte-identical 9689337d)。
+上次更新: 2026-06-13 file 04 Seg-2 完成 (EQ=44/REF=1/RENAME=1/PLATE=15; 新建 ewram.inc P1LP_BACKUP_DST_OFF; byte-identical 9689337d)。
 
 ---
 
@@ -23,7 +23,7 @@
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
-| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (0/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
+| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (2/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |

@@ -94,7 +94,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x4020c..0x407fc | 19 | 64 | — | ✅ | (see §四.4.01) |
-| 2 | 0x407fc..0x40c88 | 20 | 46 | — | ⬜ | — |
+| 2 | 0x407fc..0x40c88 | 20 | 46 | — | ✅ | (see §四.4.02) |
 | 3 | 0x40c88..0x417f0 | 19 | 98 | — | ⬜ | — |
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ⬜ | — |
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ⬜ | — |
@@ -138,6 +138,35 @@ tick_card_effect_category_display_seq / tick_display_op40_seq
 **踩坑**: file 03 fn-ptr +1 再次需要补 (4 槽: 0x37884/0x389dc/0x389f8/0x3aa74;
 check_level_conv_lab_node_match+1 x2, check_card_is_amazoness_type+1 x2)。
 每次 re-export 必补，已固化到 asm/03_equip_chain_hand.s。
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.02 Seg-2 完成记录 (0x080407fc..0x08040c88)
+
+**函数列表 (20)**:
+tick_card_normal_summon_display_state / tick_flip_attack_display_state /
+tick_random_draw_display_seq / tick_prng_advance_display_op38_seq /
+tick_card_display_op3a_seq / tick_display_op39_seq / tick_card_display_seq_op3b /
+tick_equip_slot_scan_display_sequence / tick_ui_effect_op3c_display_seq /
+tick_card_display_op0b_seq / trigger_display_op36_seq /
+clear_display_step_lock_i / clear_display_step_lock_j / clear_display_step_lock_k /
+reset_card_display_seq_state / clear_match_state_field_at_80c /
+clear_match_state_field_at_80c_alt / clear_display_step_counter_a /
+clear_display_step_counter_b / clear_display_step_lock_a
+
+**符号化统计**: EQ=44 (43 reuse + 1 new) / REF=1 / RENAME=1 / PLATE=15 / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (1, constants/ewram.inc)**:
+- P1LP_BACKUP_DST_OFF=0x1cf0 (after P1LP_TIMER_OFF line 244)
+
+**REF 槽**:
+- DAT_08040ab4 -> zone_monster_field_bonus_table+7*16 (0x09e3f104): Destiny Board + Spirit Message I/N/A/L card_id 表; 已 carved, 非新 carve
+
+**PLATE**: 15 函数 plate 中 FUN_0803be4c/(0x0803be4c) -> dispatch_duel_event_display_seq; 含 2 种变体 (FUN_xxx 和 (0xxx)); 0 WARN (全命中)
+
+**踩坑**: fn-ptr +1 槽 (0x37884/0x389dc/0x389f8/0x3aa74) 本次 re-export 后 SHA1 仍一致; GAS 已正确输出奇地址, 无需手补
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 

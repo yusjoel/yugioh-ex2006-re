@@ -932,7 +932,7 @@ LAB_080407f2:
 tick_disp_op40_step_lock_off:
     .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080407f8 0c080000
 
-@ Called by duel_field/card_data scene main (0x0803be4c) to drive the normal-summon card display
+@ Called by duel_field/card_data scene main (dispatch_duel_event_display_seq) to drive the normal-summon card display
 @ animation two-phase state machine. Reads 0x0201bcc0 context for player_bit/slot_idx/card_type.
 @ State 0 (first frame): calls dispatch_card_display_op(0x2e, player_bit, card_type_or_slot, r6),
 @ calls write_card_display_index_if_above_bit(0x25, slot_idx), sets [base+0x810] := 1.
@@ -942,7 +942,7 @@ tick_disp_op40_step_lock_off:
 @ Side effects: [base+0x810] state incremented; [base+0x80c] cleared on completion; op 0x2e triggered.
 tick_card_normal_summon_display_state:
     push {r4,r5,r6,lr}                       @ 080407fc 70b5
-    ldr r4, DAT_0804082c                     @ 080407fe 0b4c
+    ldr r4, tick_nsummon_display_state_base  @ 080407fe 0b4c
     ldrh r0,[r4,#0x0]                        @ 08040800 2088
     lsrs r1,r0,#0xf    @ 08040802 c10b
     ldrh r2,[r4,#0x2]                        @ 08040804 6288
@@ -963,25 +963,25 @@ tick_card_normal_summon_display_state:
     adds r0,#0x1    @ 08040826 0130
     str r0,[r5,#0x0]                         @ 08040828 2860
     b LAB_08040842                           @ 0804082a 0ae0
-DAT_0804082c:
-    .word  0x0201bcc0                     @ 0804082c c0bc0102
+tick_nsummon_display_state_base:
+    .word  gDuelDisplaySeqState           @ 0804082c c0bc0102  gDuelDisplaySeqState base ptr
 LAB_08040830:
     movs r0,#0x2e    @ 08040830 2e20
     bl play_ui_effect                        @ 08040832 def7affb
     adds r1,r0,#0x0    @ 08040836 011c
     cmp r1,#0x0                              @ 08040838 0029
     bne LAB_08040842                         @ 0804083a 02d1
-    ldr r2, DAT_08040848                     @ 0804083c 024a
+    ldr r2, tick_nsummon_display_step_lock_off @ 0804083c 024a
     adds r0,r4,r2    @ 0804083e a018
     str r1,[r0,#0x0]                         @ 08040840 0160
 LAB_08040842:
     pop {r4,r5,r6}                           @ 08040842 70bc
     pop {r0}                                 @ 08040844 01bc
     bx r0                                    @ 08040846 0047
-DAT_08040848:
-    .word  0x0000080c                     @ 08040848 0c080000
+tick_nsummon_display_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040848 0c080000  DISPLAY_SEQ_STEP_LOCK_OFF
 
-@ Called by duel_field/card_data scene main (0x0803be4c) to drive op=0x2f card display action
+@ Called by duel_field/card_data scene main (dispatch_duel_event_display_seq) to drive op=0x2f card display action
 @ two-phase state machine. Structurally symmetric to tick_card_normal_summon_display_state
 @ (0x080407fc), differing only in op number (0x2f vs 0x2e). Reads 0x0201bcc0 context for
 @ player/slot_type/slot_idx. State 0 (first frame): calls dispatch_card_display_op(0x2f, ...) and
@@ -990,7 +990,7 @@ DAT_08040848:
 @ Confidence: med. Side effects: [base+0x810] incremented; [base+0x80c] cleared on completion.
 tick_flip_attack_display_state:
     push {r4,r5,lr}                          @ 0804084c 30b5
-    ldr r5, DAT_08040874                     @ 0804084e 094d
+    ldr r5, tick_flip_atk_state_base         @ 0804084e 094d
     ldrh r0,[r5,#0x0]                        @ 08040850 2888
     lsrs r1,r0,#0xf    @ 08040852 c10b
     ldrh r2,[r5,#0x2]                        @ 08040854 6a88
@@ -1008,23 +1008,23 @@ tick_flip_attack_display_state:
     str r0,[r4,#0x0]                         @ 0804086e 2060
     b LAB_0804088a                           @ 08040870 0be0
     .zero  0x2
-DAT_08040874:
-    .word  0x0201bcc0                     @ 08040874 c0bc0102
+tick_flip_atk_state_base:
+    .word  gDuelDisplaySeqState           @ 08040874 c0bc0102
 LAB_08040878:
     movs r0,#0x2f    @ 08040878 2f20
     bl play_ui_effect                        @ 0804087a def78bfb
     adds r1,r0,#0x0    @ 0804087e 011c
     cmp r1,#0x0                              @ 08040880 0029
     bne LAB_0804088a                         @ 08040882 02d1
-    ldr r2, DAT_08040890                     @ 08040884 024a
+    ldr r2, tick_flip_atk_step_lock_off      @ 08040884 024a
     adds r0,r5,r2    @ 08040886 a818
     str r1,[r0,#0x0]                         @ 08040888 0160
 LAB_0804088a:
     pop {r4,r5}                              @ 0804088a 30bc
     pop {r0}                                 @ 0804088c 01bc
     bx r0                                    @ 0804088e 0047
-DAT_08040890:
-    .word  0x0000080c                     @ 08040890 0c080000
+tick_flip_atk_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040890 0c080000
 
 @ Frame driver for random draw display sequence.
 @ Reads player_id (r7=bit15), card_type (r2=ldrh[+2]),
@@ -1034,7 +1034,7 @@ DAT_08040890:
 @ reconstructs display_args from r2/r7; dispatches op=0x37 (random draw animation);
 @ writes [base+0x810]:=step+1.
 @ Step non-zero: polls play_ui_effect=0x37; on done clears [base+0x80c]:=0.
-@ Called by FUN_0803be4c (main state machine) each frame during random draw display phase.
+@ Called by dispatch_duel_event_display_seq (main state machine) each frame during random draw display phase.
 @ Returns void.
 @ Constants: state_base=0x0201bcc0; step_counter_offset=0x810; step_lock_offset=0x80c;
 @ op_random_draw=0x37; effect_random_draw=0x37.
@@ -1044,7 +1044,7 @@ tick_random_draw_display_seq:
     .hword 0x464e    @ 08040898 4e46
     .hword 0x4645    @ 0804089a 4546
     push {r5,r6,r7}                          @ 0804089c e0b4
-    ldr r4, DAT_080408e4                     @ 0804089e 114c
+    ldr r4, tick_rnd_draw_state_base         @ 0804089e 114c
     ldrh r0,[r4,#0x0]                        @ 080408a0 2088
     lsrs r7,r0,#0xf    @ 080408a2 c70b
     ldrh r2,[r4,#0x2]                        @ 080408a4 6288
@@ -1077,15 +1077,15 @@ tick_random_draw_display_seq:
     adds r0,#0x1    @ 080408de 0130
     str r0,[r6,#0x0]                         @ 080408e0 3060
     b LAB_080408fa                           @ 080408e2 0ae0
-DAT_080408e4:
-    .word  0x0201bcc0                     @ 080408e4 c0bc0102
+tick_rnd_draw_state_base:
+    .word  gDuelDisplaySeqState           @ 080408e4 c0bc0102
 LAB_080408e8:
     movs r0,#0x37    @ 080408e8 3720
     bl play_ui_effect                        @ 080408ea def753fb
     adds r1,r0,#0x0    @ 080408ee 011c
     cmp r1,#0x0                              @ 080408f0 0029
     bne LAB_080408fa                         @ 080408f2 02d1
-    ldr r2, DAT_08040908                     @ 080408f4 044a
+    ldr r2, tick_rnd_draw_step_lock_off      @ 080408f4 044a
     adds r0,r4,r2    @ 080408f6 a018
     str r1,[r0,#0x0]                         @ 080408f8 0160
 LAB_080408fa:
@@ -1096,10 +1096,10 @@ LAB_080408fa:
     pop {r4,r5,r6,r7}                        @ 08040902 f0bc
     pop {r0}                                 @ 08040904 01bc
     bx r0                                    @ 08040906 0047
-DAT_08040908:
-    .word  0x0000080c                     @ 08040908 0c080000
+tick_rnd_draw_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040908 0c080000
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 0x5c. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r6), hword[+2]=r7, hword[+4]->r8 (saved).
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 0x5c. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r6), hword[+2]=r7, hword[+4]->r8 (saved).
 @ Step 0 ([base+0x810]==0): calls advance_prng_state() to advance PRNG, then dispatch_card_display_op(r0=0x38, r1=player_id, r2=r7, r3=r8). Sets [base+0x810] from 0 to 1.
 @ Step 1: play_ui_effect(0x38) polls until done; on success clears [base+0x80c].
 @ Overall: one PRNG-rolling card display event-driven sequence.
@@ -1110,7 +1110,7 @@ tick_prng_advance_display_op38_seq:
     push {r4,r5,r6,r7,lr}                    @ 0804090c f0b5
     .hword 0x4647    @ 0804090e 4746
     push {r7}                                @ 08040910 80b4
-    ldr r5, DAT_08040944                     @ 08040912 0c4d
+    ldr r5, tick_prng_op38_state_base        @ 08040912 0c4d
     ldrh r0,[r5,#0x0]                        @ 08040914 2888
     lsrs r6,r0,#0xf    @ 08040916 c60b
     ldrh r7,[r5,#0x2]                        @ 08040918 6f88
@@ -1133,15 +1133,15 @@ tick_prng_advance_display_op38_seq:
     str r0,[r4,#0x0]                         @ 0804093e 2060
     b LAB_0804095a                           @ 08040940 0be0
     .zero  0x2
-DAT_08040944:
-    .word  0x0201bcc0                     @ 08040944 c0bc0102
+tick_prng_op38_state_base:
+    .word  gDuelDisplaySeqState           @ 08040944 c0bc0102
 LAB_08040948:
     movs r0,#0x38    @ 08040948 3820
     bl play_ui_effect                        @ 0804094a def723fb
     adds r1,r0,#0x0    @ 0804094e 011c
     cmp r1,#0x0                              @ 08040950 0029
     bne LAB_0804095a                         @ 08040952 02d1
-    ldr r2, DAT_08040964                     @ 08040954 034a
+    ldr r2, tick_prng_op38_step_lock_off     @ 08040954 034a
     adds r0,r5,r2    @ 08040956 a818
     str r1,[r0,#0x0]                         @ 08040958 0160
 LAB_0804095a:
@@ -1150,10 +1150,10 @@ LAB_0804095a:
     pop {r4,r5,r6,r7}                        @ 0804095e f0bc
     pop {r0}                                 @ 08040960 01bc
     bx r0                                    @ 08040962 0047
-DAT_08040964:
-    .word  0x0000080c                     @ 08040964 0c080000
+tick_prng_op38_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040964 0c080000
 
-@ Called by FUN_0803be4c (duel event dispatcher) caseD_6 (op=0x06). Reads EWRAM 0x0201bcc0:
+@ Called by dispatch_duel_event_display_seq (duel event dispatcher) caseD_6 (op=0x06). Reads EWRAM 0x0201bcc0:
 @ player_id ([+0] bit15 of halfword, r1). Checks step counter [+0x810]: if nonzero jumps
 @ to play_ui_effect(0x3a) path. If 0: calls dispatch_card_display_op with op_code=0x3a /
 @ player_id / 0 / 0, then increments step counter. play_ui_effect(0x3a) path: if returns 0
@@ -1165,7 +1165,7 @@ DAT_08040964:
 @   STATE_FIELD=0x0201bcc0+0x810
 tick_card_display_op3a_seq:
     push {r4,r5,lr}                          @ 08040968 30b5
-    ldr r5, DAT_08040990                     @ 0804096a 094d
+    ldr r5, tick_op3a_state_base             @ 0804096a 094d
     ldrh r0,[r5,#0x0]                        @ 0804096c 2888
     lsrs r1,r0,#0xf    @ 0804096e c10b
     movs r2,#0x81    @ 08040970 8122
@@ -1183,29 +1183,29 @@ tick_card_display_op3a_seq:
     str r0,[r4,#0x0]                         @ 0804098a 2060
     b LAB_080409a6                           @ 0804098c 0be0
     .zero  0x2
-DAT_08040990:
-    .word  0x0201bcc0                     @ 08040990 c0bc0102
+tick_op3a_state_base:
+    .word  gDuelDisplaySeqState           @ 08040990 c0bc0102
 LAB_08040994:
     movs r0,#0x3a    @ 08040994 3a20
     bl play_ui_effect                        @ 08040996 def7fdfa
     adds r1,r0,#0x0    @ 0804099a 011c
     cmp r1,#0x0                              @ 0804099c 0029
     bne LAB_080409a6                         @ 0804099e 02d1
-    ldr r2, DAT_080409ac                     @ 080409a0 024a
+    ldr r2, tick_op3a_step_lock_off          @ 080409a0 024a
     adds r0,r5,r2    @ 080409a2 a818
     str r1,[r0,#0x0]                         @ 080409a4 0160
 LAB_080409a6:
     pop {r4,r5}                              @ 080409a6 30bc
     pop {r0}                                 @ 080409a8 01bc
     bx r0                                    @ 080409aa 0047
-DAT_080409ac:
-    .word  0x0000080c                     @ 080409ac 0c080000
+tick_op3a_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080409ac 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x5d). Two-phase state machine for op=0x39 display sequence. Reads DISPLAY_STATE_BASE=0x0201bcc0: player_id (bit15 of [+0]), card_ref ([+2]=r6). Step counter at [base+0x810]. Step 0: calls dispatch_card_display_op(op=0x39, player_id, r6, 0), increments step. Step !=0: calls play_ui_effect(0x39); if done (returns 0) and r6!=0 calls write_card_display_index_entry(0x40, 1), then clears [base+0x80c]:=0.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_080409d8); STEP_COUNTER_OFFSET=0x810 (0x81<<4); STATE_FIELD_OFFSET=0x80c (DAT_08040a00); OP_CODE=0x39; AUX_OP=0x40.
 tick_display_op39_seq:
     push {r4,r5,r6,lr}                       @ 080409b0 70b5
-    ldr r5, DAT_080409d8                     @ 080409b2 094d
+    ldr r5, tick_op39_state_base             @ 080409b2 094d
     ldrh r0,[r5,#0x0]                        @ 080409b4 2888
     lsrs r1,r0,#0xf    @ 080409b6 c10b
     ldrh r6,[r5,#0x2]                        @ 080409b8 6e88
@@ -1223,8 +1223,8 @@ tick_display_op39_seq:
     adds r0,#0x1    @ 080409d2 0130
     str r0,[r4,#0x0]                         @ 080409d4 2060
     b LAB_080409fa                           @ 080409d6 10e0
-DAT_080409d8:
-    .word  0x0201bcc0                     @ 080409d8 c0bc0102
+tick_op39_state_base:
+    .word  gDuelDisplaySeqState           @ 080409d8 c0bc0102
 LAB_080409dc:
     movs r0,#0x39    @ 080409dc 3920
     bl play_ui_effect                        @ 080409de def7d9fa
@@ -1237,22 +1237,22 @@ LAB_080409dc:
     movs r1,#0x1    @ 080409ee 0121
     bl write_card_display_index_entry        @ 080409f0 54f060fa
 LAB_080409f4:
-    ldr r1, DAT_08040a00                     @ 080409f4 0249
+    ldr r1, tick_op39_step_lock_off          @ 080409f4 0249
     adds r0,r5,r1    @ 080409f6 6818
     str r4,[r0,#0x0]                         @ 080409f8 0460
 LAB_080409fa:
     pop {r4,r5,r6}                           @ 080409fa 70bc
     pop {r0}                                 @ 080409fc 01bc
     bx r0                                    @ 080409fe 0047
-DAT_08040a00:
-    .word  0x0000080c                     @ 08040a00 0c080000
+tick_op39_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040a00 0c080000
 
-@ Called by FUN_0803be4c (duel_field dispatcher). Reads EWRAM 0x0201bcc0 player_id (bit15 of [+0]) and related fields ([+2] r3, [+4] r2), plus state counter [+0x810] (r0). If counter=0: calls dispatch_card_display_op(0x3b, ...) to start display sequence, then increments counter. If counter!=0: calls play_ui_effect(0x3b); when returns 0 clears [+0x80c].
+@ Called by dispatch_duel_event_display_seq (duel_field dispatcher). Reads EWRAM 0x0201bcc0 player_id (bit15 of [+0]) and related fields ([+2] r3, [+4] r2), plus state counter [+0x810] (r0). If counter=0: calls dispatch_card_display_op(0x3b, ...) to start display sequence, then increments counter. If counter!=0: calls play_ui_effect(0x3b); when returns 0 clears [+0x80c].
 @ 
 @ Constants: card_display_state_base=0x0201bcc0 (DAT_08040a2c), counter_offset=0x810 (0x81*0x10), reset_offset=0x80c (DAT_08040a48=0x80c), op_code=0x3b.
 tick_card_display_seq_op3b:
     push {r4,r5,lr}                          @ 08040a04 30b5
-    ldr r5, DAT_08040a2c                     @ 08040a06 094d
+    ldr r5, tick_op3b_state_base             @ 08040a06 094d
     ldrh r0,[r5,#0x0]                        @ 08040a08 2888
     lsrs r1,r0,#0xf    @ 08040a0a c10b
     ldrh r3,[r5,#0x2]                        @ 08040a0c 6b88
@@ -1270,23 +1270,23 @@ tick_card_display_seq_op3b:
     str r0,[r4,#0x0]                         @ 08040a26 2060
     b LAB_08040a42                           @ 08040a28 0be0
     .zero  0x2
-DAT_08040a2c:
-    .word  0x0201bcc0                     @ 08040a2c c0bc0102
+tick_op3b_state_base:
+    .word  gDuelDisplaySeqState           @ 08040a2c c0bc0102
 LAB_08040a30:
     movs r0,#0x3b    @ 08040a30 3b20
     bl play_ui_effect                        @ 08040a32 def7affa
     adds r1,r0,#0x0    @ 08040a36 011c
     cmp r1,#0x0                              @ 08040a38 0029
     bne LAB_08040a42                         @ 08040a3a 02d1
-    ldr r2, DAT_08040a48                     @ 08040a3c 024a
+    ldr r2, tick_op3b_step_lock_off          @ 08040a3c 024a
     adds r0,r5,r2    @ 08040a3e a818
     str r1,[r0,#0x0]                         @ 08040a40 0160
 LAB_08040a42:
     pop {r4,r5}                              @ 08040a42 30bc
     pop {r0}                                 @ 08040a44 01bc
     bx r0                                    @ 08040a46 0047
-DAT_08040a48:
-    .word  0x0000080c                     @ 08040a48 0c080000
+tick_op3b_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040a48 0c080000
 
 @ Frame-tick driver for the equip slot scan highlight display animation.
 @ No APCS input params (r0 overwritten by ldr DAT_08040aac at entry).
@@ -1297,7 +1297,7 @@ DAT_08040a48:
 @ on match: dispatch_card_display_op(op=0x3b, player_id, card_id|0x100, slot_flag).
 @ After all slots: step counter +1.
 @ Step >=1: play_ui_effect(0x3b) polls; on completion: [base+0x80c]:=0 (step lock clear).
-@ Called by main state machine FUN_0803be4c during equip slot highlight scan phase.
+@ Called by main state machine dispatch_duel_event_display_seq during equip slot highlight scan phase.
 @ Constants: step_counter=0x0201c4d0=base+0x810; card_data_base=0x0201c510;
 @ equip_chain_pool=ROM lookup table; player_stride=0x868; slot_count=5; node_count=9;
 @ node_stride=0x14; op_highlight=0x3b; card_id_mask=0x1FFF (bits[12:0]).
@@ -1307,7 +1307,7 @@ tick_equip_slot_scan_display_sequence:
     .hword 0x464f    @ 08040a4e 4f46
     .hword 0x4646    @ 08040a50 4646
     push {r6,r7}                             @ 08040a52 c0b4
-    ldr r4, DAT_08040aac                     @ 08040a54 154c
+    ldr r4, tick_equip_scan_state_base       @ 08040a54 154c
     ldrh r0,[r4,#0x0]                        @ 08040a56 2088
     lsrs r6,r0,#0xf    @ 08040a58 c60b
     movs r1,#0x81    @ 08040a5a 8121
@@ -1317,9 +1317,9 @@ tick_equip_slot_scan_display_sequence:
     cmp r0,#0x0                              @ 08040a62 0028
     bne LAB_08040ae0                         @ 08040a64 3cd1
     movs r0,#0x0    @ 08040a66 0020
-    ldr r2, DAT_08040ab0                     @ 08040a68 114a
+    ldr r2, tick_equip_scan_field_slots_base @ 08040a68 114a
     .hword 0x4691    @ 08040a6a 9146
-    ldr r1, DAT_08040ab4                     @ 08040a6c 1149
+    ldr r1, tick_equip_scan_destiny_chain_table @ 08040a6c 1149
     .hword 0x4688    @ 08040a6e 8846
     adds r7,r6,#0x0    @ 08040a70 371c
 LAB_08040a72:
@@ -1330,7 +1330,7 @@ LAB_08040a72:
     lsrs r4,r0,#0x18    @ 08040a7a 040e
     add r1,r8                                @ 08040a7c 4144
     ldr r3,[r1,#0x0]                         @ 08040a7e 0b68
-    ldr r0, DAT_08040ab8                     @ 08040a80 0d48
+    ldr r0, tick_equip_scan_player_stride    @ 08040a80 0d48
     muls r0,r7    @ 08040a82 7843
     add r0,r9                                @ 08040a84 4844
     adds r1,r0,#0x0    @ 08040a86 011c
@@ -1352,14 +1352,14 @@ LAB_08040a8a:
     lsrs r3,r3,#0x10    @ 08040aa4 1b0c
     bl dispatch_card_display_op              @ 08040aa6 def7f9f8
     b LAB_08040ac4                           @ 08040aaa 0be0
-DAT_08040aac:
-    .word  0x0201bcc0                     @ 08040aac c0bc0102
-DAT_08040ab0:
-    .word  0x0201c510                     @ 08040ab0 10c50102
-DAT_08040ab4:
-    .word  0x09e3f104                     @ 08040ab4 04f1e309
-DAT_08040ab8:
-    .word  0x00000868                     @ 08040ab8 68080000
+tick_equip_scan_state_base:
+    .word  gDuelDisplaySeqState           @ 08040aac c0bc0102
+tick_equip_scan_field_slots_base:
+    .word  gDuelFieldSlots                @ 08040ab0 10c50102  gDuelFieldSlots
+tick_equip_scan_destiny_chain_table:
+    .word  zone_monster_field_bonus_table @ 08040ab4 04f1e309  zone_monster_field_bonus_table+7*16: Destiny Board + Spirit Message I/N/A/L card_ids
+tick_equip_scan_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08040ab8 68080000  PLAYER_BLOCK_STRIDE (0x868)
 LAB_08040abc:
     adds r1,#0x14    @ 08040abc 1431
     adds r2,#0x1    @ 08040abe 0132
@@ -1369,7 +1369,7 @@ LAB_08040ac4:
     adds r0,r5,#0x0    @ 08040ac4 281c
     cmp r0,#0x4                              @ 08040ac6 0428
     ble LAB_08040a72                         @ 08040ac8 d3dd
-    ldr r1, DAT_08040adc                     @ 08040aca 0449
+    ldr r1, tick_equip_scan_state_base_b     @ 08040aca 0449
     movs r2,#0x81    @ 08040acc 8122
     lsls r2,r2,#0x4    @ 08040ace 1201
     adds r1,r1,r2    @ 08040ad0 8918
@@ -1378,15 +1378,15 @@ LAB_08040ac4:
     str r0,[r1,#0x0]                         @ 08040ad6 0860
     b LAB_08040af2                           @ 08040ad8 0be0
     .zero  0x2
-DAT_08040adc:
-    .word  0x0201bcc0                     @ 08040adc c0bc0102
+tick_equip_scan_state_base_b:
+    .word  gDuelDisplaySeqState           @ 08040adc c0bc0102  gDuelDisplaySeqState base ptr (poll path)
 LAB_08040ae0:
     movs r0,#0x3b    @ 08040ae0 3b20
     bl play_ui_effect                        @ 08040ae2 def757fa
     adds r1,r0,#0x0    @ 08040ae6 011c
     cmp r1,#0x0                              @ 08040ae8 0029
     bne LAB_08040af2                         @ 08040aea 02d1
-    ldr r2, DAT_08040b00                     @ 08040aec 044a
+    ldr r2, tick_equip_scan_step_lock_off    @ 08040aec 044a
     adds r0,r4,r2    @ 08040aee a018
     str r1,[r0,#0x0]                         @ 08040af0 0160
 LAB_08040af2:
@@ -1397,10 +1397,10 @@ LAB_08040af2:
     pop {r0}                                 @ 08040afa 01bc
     bx r0                                    @ 08040afc 0047
     .zero  0x2
-DAT_08040b00:
-    .word  0x0000080c                     @ 08040b00 0c080000
+tick_equip_scan_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040b00 0c080000
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 8. Reads 0x0201bcc0 context: hword[0] player_bit (bit15). Computes step counter at [base + 0x81*0x10 = base+0x810].
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 8. Reads 0x0201bcc0 context: hword[0] player_bit (bit15). Computes step counter at [base + 0x81*0x10 = base+0x810].
 @ Step 0: if [+0x810]==0 calls dispatch_card_display_op(r0=0x3c, r1=player_bit, r2=0, r3=0), then sets [+0x810]=1.
 @ Step 1: calls play_ui_effect(0x3c); if returns 0 clears [base+0x80c] to end sequence; else waits.
 @ Side effects: [0x0201bcc0+0x810] step counter incremented; [0x0201bcc0+0x80c] cleared on effect completion.
@@ -1408,7 +1408,7 @@ DAT_08040b00:
 @ Constants: STEP_COUNTER_OFFSET=0x810 (0x81 lsl 4), STATE_FLAG_OFFSET=0x80c, UI_EFFECT_ID=0x3c.
 tick_ui_effect_op3c_display_seq:
     push {r4,r5,lr}                          @ 08040b04 30b5
-    ldr r5, DAT_08040b2c                     @ 08040b06 094d
+    ldr r5, tick_op3c_state_base             @ 08040b06 094d
     ldrh r0,[r5,#0x0]                        @ 08040b08 2888
     lsrs r1,r0,#0xf    @ 08040b0a c10b
     movs r2,#0x81    @ 08040b0c 8122
@@ -1426,25 +1426,25 @@ tick_ui_effect_op3c_display_seq:
     str r0,[r4,#0x0]                         @ 08040b26 2060
     b LAB_08040b42                           @ 08040b28 0be0
     .zero  0x2
-DAT_08040b2c:
-    .word  0x0201bcc0                     @ 08040b2c c0bc0102
+tick_op3c_state_base:
+    .word  gDuelDisplaySeqState           @ 08040b2c c0bc0102
 LAB_08040b30:
     movs r0,#0x3c    @ 08040b30 3c20
     bl play_ui_effect                        @ 08040b32 def72ffa
     adds r1,r0,#0x0    @ 08040b36 011c
     cmp r1,#0x0                              @ 08040b38 0029
     bne LAB_08040b42                         @ 08040b3a 02d1
-    ldr r2, DAT_08040b48                     @ 08040b3c 024a
+    ldr r2, tick_op3c_step_lock_off          @ 08040b3c 024a
     adds r0,r5,r2    @ 08040b3e a818
     str r1,[r0,#0x0]                         @ 08040b40 0160
 LAB_08040b42:
     pop {r4,r5}                              @ 08040b42 30bc
     pop {r0}                                 @ 08040b44 01bc
     bx r0                                    @ 08040b46 0047
-DAT_08040b48:
-    .word  0x0000080c                     @ 08040b48 0c080000
+tick_op3c_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040b48 0c080000
 
-@ Called by FUN_0803be4c (duel event dispatcher) caseD_b (op=0x0b). Reads EWRAM 0x0201bcc0:
+@ Called by dispatch_duel_event_display_seq (duel event dispatcher) caseD_b (op=0x0b). Reads EWRAM 0x0201bcc0:
 @ player_id ([+0] bit15, r4 base), slot_idx ([+2], r2). Checks step counter [+0x810]:
 @ If 0: if slot_idx=0 copies gP1LifePoints+0x1cec to gP1LifePoints+0x1cf0 (LP backup write);
 @   then calls dispatch_card_display_op with op_code=0x3d / slot_idx / 0 / 0 and increments
@@ -1458,7 +1458,7 @@ DAT_08040b48:
 @   LP_BACKUP_SRC=gP1LifePoints+0x1cec, LP_BACKUP_DST=gP1LifePoints+0x1cf0
 tick_card_display_op0b_seq:
     push {r4,r5,lr}                          @ 08040b4c 30b5
-    ldr r4, DAT_08040b84                     @ 08040b4e 0d4c
+    ldr r4, tick_op0b_state_base             @ 08040b4e 0d4c
     ldrh r2,[r4,#0x2]                        @ 08040b50 6288
     movs r0,#0x81    @ 08040b52 8120
     lsls r0,r0,#0x4    @ 08040b54 0001
@@ -1468,8 +1468,8 @@ tick_card_display_op0b_seq:
     bne LAB_08040b90                         @ 08040b5c 18d1
     cmp r2,#0x0                              @ 08040b5e 002a
     bne LAB_08040b70                         @ 08040b60 06d1
-    ldr r0, PTR_gP1LifePoints_08040b88       @ 08040b62 0948
-    ldr r3, DAT_08040b8c                     @ 08040b64 094b
+    ldr r0, tick_op0b_lp_base                @ 08040b62 0948
+    ldr r3, tick_op0b_lp_backup_dst_off      @ 08040b64 094b
     adds r1,r0,r3    @ 08040b66 c118
     subs r3,#0x4    @ 08040b68 043b
     adds r0,r0,r3    @ 08040b6a c018
@@ -1485,39 +1485,39 @@ LAB_08040b70:
     adds r0,#0x1    @ 08040b7e 0130
     str r0,[r5,#0x0]                         @ 08040b80 2860
     b LAB_08040ba2                           @ 08040b82 0ee0
-DAT_08040b84:
-    .word  0x0201bcc0                     @ 08040b84 c0bc0102
-PTR_gP1LifePoints_08040b88:
-    .word  gP1LifePoints                  @ 08040b88 e0c40102
-DAT_08040b8c:
-    .word  0x00001cf0                     @ 08040b8c f01c0000
+tick_op0b_state_base:
+    .word  gDuelDisplaySeqState           @ 08040b84 c0bc0102
+tick_op0b_lp_base:
+    .word  gP1LifePoints                  @ 08040b88 e0c40102  gP1LifePoints ptr
+tick_op0b_lp_backup_dst_off:
+    .word  P1LP_BACKUP_DST_OFF            @ 08040b8c f01c0000  gP1LifePoints+0x1cf0: LP timer backup destination field
 LAB_08040b90:
     movs r0,#0x3d    @ 08040b90 3d20
     bl play_ui_effect                        @ 08040b92 def7fff9
     adds r1,r0,#0x0    @ 08040b96 011c
     cmp r1,#0x0                              @ 08040b98 0029
     bne LAB_08040ba2                         @ 08040b9a 02d1
-    ldr r2, DAT_08040ba8                     @ 08040b9c 024a
+    ldr r2, tick_op0b_step_lock_off          @ 08040b9c 024a
     adds r0,r4,r2    @ 08040b9e a018
     str r1,[r0,#0x0]                         @ 08040ba0 0160
 LAB_08040ba2:
     pop {r4,r5}                              @ 08040ba2 30bc
     pop {r0}                                 @ 08040ba4 01bc
     bx r0                                    @ 08040ba6 0047
-DAT_08040ba8:
-    .word  0x0000080c                     @ 08040ba8 0c080000
+tick_op0b_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040ba8 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x2b). One-shot trigger: calls dispatch_card_display_op(op=0x36, player_id=[base+2], 0, 0), then clears [0x0201bcc0+0x80c]:=0 to signal sequence done. Does not read step counter; single dispatch then exit.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040bcc); STATE_FIELD_OFFSET=0x0000080c (DAT_08040bd0); OP_CODE=0x36.
 trigger_display_op36_seq:
     push {r4,lr}                             @ 08040bac 10b5
-    ldr r4, DAT_08040bcc                     @ 08040bae 074c
+    ldr r4, trigger_op36_state_base          @ 08040bae 074c
     ldrh r1,[r4,#0x2]                        @ 08040bb0 6188
     movs r0,#0x36    @ 08040bb2 3620
     movs r2,#0x0    @ 08040bb4 0022
     movs r3,#0x0    @ 08040bb6 0023
     bl dispatch_card_display_op              @ 08040bb8 def770f8
-    ldr r0, DAT_08040bd0                     @ 08040bbc 0448
+    ldr r0, trigger_op36_step_lock_off       @ 08040bbc 0448
     adds r4,r4,r0    @ 08040bbe 2418
     movs r0,#0x0    @ 08040bc0 0020
     str r0,[r4,#0x0]                         @ 08040bc2 2060
@@ -1525,159 +1525,159 @@ trigger_display_op36_seq:
     pop {r0}                                 @ 08040bc6 01bc
     bx r0                                    @ 08040bc8 0047
     .zero  0x2
-DAT_08040bcc:
-    .word  0x0201bcc0                     @ 08040bcc c0bc0102
-DAT_08040bd0:
-    .word  0x0000080c                     @ 08040bd0 0c080000
+trigger_op36_state_base:
+    .word  gDuelDisplaySeqState           @ 08040bcc c0bc0102
+trigger_op36_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040bd0 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x62). Clears display sequence state field [0x0201bcc0+0x80c]:=0. Identical structure to sibling clear_display_step_lock_a..h: ldr/ldr/adds/movs #0/str/bx lr, same DAT values. Single-shot state machine reset, no step logic.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040be0); STATE_FIELD_OFFSET=0x0000080c (DAT_08040be4).
 clear_display_step_lock_i:
-    ldr r0, DAT_08040be0                     @ 08040bd4 0248
-    ldr r1, DAT_08040be4                     @ 08040bd6 0349
+    ldr r0, clr_lock_i_state_base            @ 08040bd4 0248
+    ldr r1, clr_lock_i_step_lock_off         @ 08040bd6 0349
     adds r0,r0,r1    @ 08040bd8 4018
     movs r1,#0x0    @ 08040bda 0021
     str r1,[r0,#0x0]                         @ 08040bdc 0160
     bx lr                                    @ 08040bde 7047
-DAT_08040be0:
-    .word  0x0201bcc0                     @ 08040be0 c0bc0102
-DAT_08040be4:
-    .word  0x0000080c                     @ 08040be4 0c080000
+clr_lock_i_state_base:
+    .word  gDuelDisplaySeqState           @ 08040be0 c0bc0102
+clr_lock_i_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040be4 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x63). Clears display sequence state field [0x0201bcc0+0x80c]:=0. Identical byte structure to sibling clear_display_step_lock_i (0x08040bd4, case 0x62) and clear_display_step_lock_k (0x08040bfc, case 0x64). Single-shot state machine reset, no step logic.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040bf4); STATE_FIELD_OFFSET=0x0000080c (DAT_08040bf8).
 clear_display_step_lock_j:
-    ldr r0, DAT_08040bf4                     @ 08040be8 0248
-    ldr r1, DAT_08040bf8                     @ 08040bea 0349
+    ldr r0, clr_lock_j_state_base            @ 08040be8 0248
+    ldr r1, clr_lock_j_step_lock_off         @ 08040bea 0349
     adds r0,r0,r1    @ 08040bec 4018
     movs r1,#0x0    @ 08040bee 0021
     str r1,[r0,#0x0]                         @ 08040bf0 0160
     bx lr                                    @ 08040bf2 7047
-DAT_08040bf4:
-    .word  0x0201bcc0                     @ 08040bf4 c0bc0102
-DAT_08040bf8:
-    .word  0x0000080c                     @ 08040bf8 0c080000
+clr_lock_j_state_base:
+    .word  gDuelDisplaySeqState           @ 08040bf4 c0bc0102
+clr_lock_j_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040bf8 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x64). Clears display sequence state field [0x0201bcc0+0x80c]:=0. Identical byte structure to clear_display_step_lock_i (0x08040bd4, case 0x62) and clear_display_step_lock_j (0x08040be8, case 0x63). Single-shot state machine reset, no step logic.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_08040c08); STATE_FIELD_OFFSET=0x0000080c (DAT_08040c0c).
 clear_display_step_lock_k:
-    ldr r0, DAT_08040c08                     @ 08040bfc 0248
-    ldr r1, DAT_08040c0c                     @ 08040bfe 0349
+    ldr r0, clr_lock_k_state_base            @ 08040bfc 0248
+    ldr r1, clr_lock_k_step_lock_off         @ 08040bfe 0349
     adds r0,r0,r1    @ 08040c00 4018
     movs r1,#0x0    @ 08040c02 0021
     str r1,[r0,#0x0]                         @ 08040c04 0160
     bx lr                                    @ 08040c06 7047
-DAT_08040c08:
-    .word  0x0201bcc0                     @ 08040c08 c0bc0102
-DAT_08040c0c:
-    .word  0x0000080c                     @ 08040c0c 0c080000
+clr_lock_k_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c08 c0bc0102
+clr_lock_k_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c0c 0c080000
 
-@ Minimal reset function called by FUN_0803be4c (duel_field dispatcher). Only 3 effective instructions: loads address of 0x0201bcc0+0x80c, writes 0 to clear that field. Force-reset entry point for card display sequence state machine, called at sequence end or interrupt. No parameters, no return value.
+@ Minimal reset function called by dispatch_duel_event_display_seq (duel_field dispatcher). Only 3 effective instructions: loads address of 0x0201bcc0+0x80c, writes 0 to clear that field. Force-reset entry point for card display sequence state machine, called at sequence end or interrupt. No parameters, no return value.
 @ 
 @ Constants: card_display_state_base=0x0201bcc0 (DAT_08040c1c), reset_field_offset=0x80c (DAT_08040c20=0x80c).
 reset_card_display_seq_state:
-    ldr r0, DAT_08040c1c                     @ 08040c10 0248
-    ldr r1, DAT_08040c20                     @ 08040c12 0349
+    ldr r0, reset_cdseq_state_base           @ 08040c10 0248
+    ldr r1, reset_cdseq_step_lock_off        @ 08040c12 0349
     adds r0,r0,r1    @ 08040c14 4018
     movs r1,#0x0    @ 08040c16 0021
     str r1,[r0,#0x0]                         @ 08040c18 0160
     bx lr                                    @ 08040c1a 7047
-DAT_08040c1c:
-    .word  0x0201bcc0                     @ 08040c1c c0bc0102
-DAT_08040c20:
-    .word  0x0000080c                     @ 08040c20 0c080000
+reset_cdseq_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c1c c0bc0102
+reset_cdseq_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c20 0c080000
 
-@ Called by duel_field/card_data scene main (0x0803be4c) to reset the match context state word.
+@ Called by duel_field/card_data scene main (dispatch_duel_event_display_seq) to reset the match context state word.
 @ Loads base=0x0201bcc0 and offset=0x80c from literal pool, then stores 0 to [base+0x80c].
 @ No parameters. Returns void (bx lr direct return). Confidence: med.
 @ Sibling of clear_match_state_field_at_80c_alt (0x08040c38), which has identical behavior.
 @ Side effects: [0x0201bcc0 + 0x80c] := 0.
 clear_match_state_field_at_80c:
-    ldr r0, DAT_08040c30                     @ 08040c24 0248
-    ldr r1, DAT_08040c34                     @ 08040c26 0349
+    ldr r0, clr_match_80c_state_base         @ 08040c24 0248
+    ldr r1, clr_match_80c_step_lock_off      @ 08040c26 0349
     adds r0,r0,r1    @ 08040c28 4018
     movs r1,#0x0    @ 08040c2a 0021
     str r1,[r0,#0x0]                         @ 08040c2c 0160
     bx lr                                    @ 08040c2e 7047
-DAT_08040c30:
-    .word  0x0201bcc0                     @ 08040c30 c0bc0102
-DAT_08040c34:
-    .word  0x0000080c                     @ 08040c34 0c080000
+clr_match_80c_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c30 c0bc0102
+clr_match_80c_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c34 0c080000
 
-@ Called by duel_field/card_data scene main (0x0803be4c) on a different branch to reset the match
+@ Called by duel_field/card_data scene main (dispatch_duel_event_display_seq) on a different branch to reset the match
 @ context state word. Structurally identical to clear_match_state_field_at_80c (0x08040c24):
 @ loads 0x0201bcc0 and 0x80c from literal pool, stores 0 to [base+0x80c]. Leaf function (no bl).
 @ No parameters. Returns void (bx lr direct return). Confidence: med.
 @ Both functions share same base+offset; they are independent code copies called from separate branches.
 @ Side effects: [0x0201bcc0 + 0x80c] := 0.
 clear_match_state_field_at_80c_alt:
-    ldr r0, DAT_08040c44                     @ 08040c38 0248
-    ldr r1, DAT_08040c48                     @ 08040c3a 0349
+    ldr r0, clr_match_80c_alt_state_base     @ 08040c38 0248
+    ldr r1, clr_match_80c_alt_step_lock_off  @ 08040c3a 0349
     adds r0,r0,r1    @ 08040c3c 4018
     movs r1,#0x0    @ 08040c3e 0021
     str r1,[r0,#0x0]                         @ 08040c40 0160
     bx lr                                    @ 08040c42 7047
-DAT_08040c44:
-    .word  0x0201bcc0                     @ 08040c44 c0bc0102
-DAT_08040c48:
-    .word  0x0000080c                     @ 08040c48 0c080000
+clr_match_80c_alt_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c44 c0bc0102
+clr_match_80c_alt_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c48 0c080000
 
 @ Clear the display step counter field (instance A).
 @ Loads base 0x0201bcc0, adds offset 0x80c, writes 0 to [0x0201c4cc].
 @ This field controls the current step of frame-driven animation sequences.
-@ Called by main state machine FUN_0803be4c on state transitions to reset animation step.
+@ Called by main state machine dispatch_duel_event_display_seq on state transitions to reset animation step.
 @ Sibling of clear_display_step_counter_b (0x08040c60): identical code, separate call site.
 @ Constants: target=[0x0201bcc0+0x80c]=0x0201c4cc.
 @ Returns void (bx lr).
 clear_display_step_counter_a:
-    ldr r0, DAT_08040c58                     @ 08040c4c 0248
-    ldr r1, DAT_08040c5c                     @ 08040c4e 0349
+    ldr r0, clr_step_ctr_a_state_base        @ 08040c4c 0248
+    ldr r1, clr_step_ctr_a_step_lock_off     @ 08040c4e 0349
     adds r0,r0,r1    @ 08040c50 4018
     movs r1,#0x0    @ 08040c52 0021
     str r1,[r0,#0x0]                         @ 08040c54 0160
     bx lr                                    @ 08040c56 7047
-DAT_08040c58:
-    .word  0x0201bcc0                     @ 08040c58 c0bc0102
-DAT_08040c5c:
-    .word  0x0000080c                     @ 08040c5c 0c080000
+clr_step_ctr_a_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c58 c0bc0102
+clr_step_ctr_a_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c5c 0c080000
 
 @ Clear the display step counter field (instance B).
 @ Loads base 0x0201bcc0, adds offset 0x80c, writes 0 to [0x0201c4cc].
 @ Identical code to clear_display_step_counter_a (0x08040c4c); separate compiled copy
-@ called by main state machine FUN_0803be4c at a different state node.
+@ called by main state machine dispatch_duel_event_display_seq at a different state node.
 @ Constants: target=[0x0201bcc0+0x80c]=0x0201c4cc.
 @ Returns void (bx lr).
 clear_display_step_counter_b:
-    ldr r0, DAT_08040c6c                     @ 08040c60 0248
-    ldr r1, DAT_08040c70                     @ 08040c62 0349
+    ldr r0, clr_step_ctr_b_state_base        @ 08040c60 0248
+    ldr r1, clr_step_ctr_b_step_lock_off     @ 08040c62 0349
     adds r0,r0,r1    @ 08040c64 4018
     movs r1,#0x0    @ 08040c66 0021
     str r1,[r0,#0x0]                         @ 08040c68 0160
     bx lr                                    @ 08040c6a 7047
-DAT_08040c6c:
-    .word  0x0201bcc0                     @ 08040c6c c0bc0102
-DAT_08040c70:
-    .word  0x0000080c                     @ 08040c70 0c080000
+clr_step_ctr_b_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c6c c0bc0102
+clr_step_ctr_b_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c70 0c080000
 
 @ Clears step lock field [0x0201bcc0+0x80c] to zero, releasing the current frame-driven animation lock.
 @ Body: ldr r0,=0x0201bcc0; ldr r1,=0x80c; adds r0,r0,r1; movs r1,#0; str r1,[r0]; bx lr.
 @ 0x0201bcc0+0x80c = 0x0201c4cc = step_lock field; non-zero indicates animation sequence in progress.
 @ Clearing allows main state machine to advance to next operation.
 @ Sibling of clear_display_step_lock_b (0x08040c88) and clear_display_step_lock_c (0x08040c9c).
-@ Called by FUN_0803be4c (main state machine) at end of a specific display sequence.
+@ Called by dispatch_duel_event_display_seq (main state machine) at end of a specific display sequence.
 @ Returns void (bx lr).
 @ Constants: base=0x0201bcc0; step_lock_offset=0x80c; effective_addr=0x0201c4cc.
 clear_display_step_lock_a:
-    ldr r0, DAT_08040c80                     @ 08040c74 0248
-    ldr r1, DAT_08040c84                     @ 08040c76 0349
+    ldr r0, clr_lock_a_state_base            @ 08040c74 0248
+    ldr r1, clr_lock_a_step_lock_off         @ 08040c76 0349
     adds r0,r0,r1    @ 08040c78 4018
     movs r1,#0x0    @ 08040c7a 0021
     str r1,[r0,#0x0]                         @ 08040c7c 0160
     bx lr                                    @ 08040c7e 7047
-DAT_08040c80:
-    .word  0x0201bcc0                     @ 08040c80 c0bc0102
-DAT_08040c84:
-    .word  0x0000080c                     @ 08040c84 0c080000
+clr_lock_a_state_base:
+    .word  gDuelDisplaySeqState           @ 08040c80 c0bc0102
+clr_lock_a_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040c84 0c080000
 
 @ Clears step lock field [0x0201bcc0+0x80c] to zero, releasing the current frame-driven animation lock.
 @ Body: ldr r0,=0x0201bcc0; ldr r1,=0x80c; adds r0,r0,r1; movs r1,#0; str r1,[r0]; bx lr.
