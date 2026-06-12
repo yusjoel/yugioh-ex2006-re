@@ -99,7 +99,7 @@
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ✅ | (see §四.4.04) |
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ✅ | (see §四.4.05) |
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ✅ | (see §四.4.06) |
-| 7 | 0x44674..0x44e30 | 19 | 35 | — | ⬜ | — |
+| 7 | 0x44674..0x44e30 | 19 | 35 | — | ✅ | (see §四.4.07) |
 | 8 | 0x44e30..0x47990 | 19 | 275 | — | ⬜ | — |
 | 9 | 0x47990..0x47ec0 | 20 | 14 | — | ⬜ | — |
 | 10 | 0x47ec0..0x49014 | 19 | 112 | — | ⬜ | — |
@@ -353,6 +353,45 @@ fn-ptr +1 再次补回 (0x37884/0x389dc/0x389f8/0x3aa74 in asm/03; 0x08040ab4 +7
 - plate FUN_ grep in Seg-6 [lines 7927..9800]: 0 hits
 - non-ASCII grep in Seg-6 range: 0 hits
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+---
+
+### 4.07 Seg-7 完成记录 (0x08044674..0x08044e30)
+
+**函数列表 (19)**:
+enqueue_graveyard_spell_sprite_and_lp / enqueue_graveyard_spell_sprite_with_zone_ref /
+enqueue_hand_card_sprite_alt_by_zone_slot / enqueue_graveyard_spell_sprite_with_player_xor /
+enqueue_equip_zone_sprite_by_slot_ptr / enqueue_equip_zone_sprite_with_attr_u16 /
+enqueue_equip_zone_sprite_attr_shape_a / enqueue_equip_zone_sprite_attr_shape_b /
+enqueue_hand_sprite_with_flip_flag_set / enqueue_hand_sprite_by_zone_set_code /
+enqueue_sprite_attr_for_zone_slot_packed / enqueue_equip_chain_sprite_attrs_for_slot /
+enqueue_equip_slot_sprite_by_player / enqueue_sprite_attr_row_0x29_by_player /
+enqueue_sprite_attr_row_0x29_with_flag2 / enqueue_equip_slot_sprite_with_display_code /
+enqueue_equip_zone_sprite_for_player / enqueue_equip_multi_slot_marker_sprite /
+enqueue_field_slot_sprite_with_state_update
+
+**符号化统计**: EQ=35 (25 reuse + 10 new) / REF=0 / RENAME=0 / FUNC_RENAME=0 / PLATE=14 fn (26 token: 13 substr + 1 full-ASCII-rewrite) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (7 项)**:
+- card_info.inc x3:
+  - WATAPON_CID=0x17cc (pw=87774234; card_1626; enqueue_hand_sprite_by_zone_set_code Watapon-path; 10 raw refs)
+  - WATAPON_EQUIP_ACTIVATION_MASK=0x34500000 (activation flag mask ORed into attr2 arg for Watapon path; 24 raw refs)
+  - DARK_MIMIC_LV1_CID=0x17d5 (pw=74713516; card_1635; enqueue_equip_chain_sprite_attrs_for_slot card_type filter A; 16 raw refs)
+- oam_attr.inc x3:
+  - OAM_EQUIP_SLOT_SPRITE_P2=0x8029 (P2 equip slot sprite attr0; 5 slots; 121 raw refs)
+  - OAM_MULTI_SLOT_MARKER_P2=0x8048 (P2 multi-slot selection marker; 12 raw refs)
+  - OAM_FIELD_SLOT_SPRITE_P2=0x8043 (P2 duel field slot sprite attr0; 35 raw refs)
+- duel_field.inc x1:
+  - EQUIP_MULTI_SLOT_CTL_OFF=0x1ce0 ([gP1LifePoints+0x1ce0] equip multi-slot control word; 1 raw ref)
+
+**PLATE**: 14 functions total:
+- 13 substr replacements (26 FUN_ tokens total across 13 functions, 0 WARN)
+- 1 full ASCII rewrite: enqueue_sprite_attr_for_zone_slot_packed (0x08044b5c) — CJK plate replaced with ASCII (len=891)
+- Post-land Seg-7 lines [9720..10822]: FUN_ count = 0 (line 10822 is Seg-8 first function plate, excluded) / CJK = 0
+
+**踩坑**: fn-ptr +1 再次需要补 (4 slots in asm/03: 0x37884/0x389dc/0x389f8/0x3aa74; zone_monster_field_bonus_table+7*16 at 0x08040ab4 in asm/04); 补完后 SHA1 match.
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 ---
 

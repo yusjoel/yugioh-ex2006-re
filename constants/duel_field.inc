@@ -258,3 +258,8 @@
 @ file 04 Seg-4 additions: equip chain step base offset
 @ =============================================================================
 .equ EQUIP_CHAIN_STEP_BASE_OFF,     0x00001130  @ [gEquipChainSlotRefs+0x1130] equip chain refs step array base; tick_equip_chain_count_check_sequence passes to replace_equip_chain_slot_refs_by_match; 9 ROM refs; 1 Seg-4 slot
+
+@ =============================================================================
+@ file 04 Seg-7 additions: equip multi-slot control word offset
+@ =============================================================================
+.equ EQUIP_MULTI_SLOT_CTL_OFF,      0x00001ce0  @ [gP1LifePoints+0x1ce0] equip multi-slot selection control word; enqueue_equip_multi_slot_marker_sprite reads display flags r7; computed as 0xe7<<5; 1 raw ROM ref

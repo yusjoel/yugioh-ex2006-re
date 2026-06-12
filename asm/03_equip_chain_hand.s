@@ -3454,7 +3454,7 @@ LAB_08037876:
     pop {r1}                                 @ 08037880 02bc
     bx r1                                    @ 08037882 0847
 eval_equip_bonus_for_slot_pred_fn:
-    .word  check_level_conv_lab_node_match+1 @ 08037884 7d770308  THUMB fn-ptr: +1 for odd addr
+    .word  check_level_conv_lab_node_match+1 @ 08037884 7d770308
 eval_equip_bonus_for_slot_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08037888 68080000
 eval_equip_bonus_for_slot_a_leg_ocean_cid:
@@ -5867,7 +5867,7 @@ LAB_080389ce:
     b LAB_08038a06                           @ 080389d8 15e0
     .zero  0x2
 eval_amazoness_fnptr_a:
-    .word  check_card_is_amazoness_type+1 @ 080389dc 49b00408  THUMB fn-ptr: +1 for odd addr
+    .word  check_card_is_amazoness_type+1 @ 080389dc 49b00408
 LAB_080389e0:
     ldr r1, eval_amazoness_fnptr_b           @ 080389e0 0549
     ldr r0,[sp,#0x3c]                        @ 080389e2 0f98
@@ -5881,7 +5881,7 @@ LAB_080389e0:
     b apply_slot_score_bonus_by_state        @ 080389f4 13e2
     .zero  0x2
 eval_amazoness_fnptr_b:
-    .word  check_card_is_amazoness_type+1 @ 080389f8 49b00408  THUMB fn-ptr: +1 for odd addr
+    .word  check_card_is_amazoness_type+1 @ 080389f8 49b00408
 LAB_080389fc:
     ldr r0,[sp,#0x3c]                        @ 080389fc 0f98
     ldr r1,[sp,#0x40]                        @ 080389fe 1099
@@ -10512,7 +10512,7 @@ LAB_0803aa50:
     beq LAB_0803aa82                         @ 0803aa70 07d0
     b LAB_0803ab44                           @ 0803aa72 67e0
 eval_equip_chain_pred_fnptr:
-    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: +1 for odd addr
+    .word  check_level_conv_lab_node_match+1 @ 0803aa74 7d770308  THUMB fn-ptr: check_level_conv_lab_node_match+1 (odd addr); asm must have +1 after re-export
 eval_equip_chain_node_pool_a:
     .word  gEquipNodePool                 @ 0803aa78 c0d90102
 LAB_0803aa7c:

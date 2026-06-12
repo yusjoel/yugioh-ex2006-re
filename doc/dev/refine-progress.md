@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 04 Seg-7 0x44674..0x44e30 (19 fn, 35 槽; graveyard spell sprite + hand-card sprite + equip-zone sprite dispatch banisher cluster)。
+> **下一任务**: file 04 Seg-8 0x44e30..0x47990 (19 fn, 275 槽; update_duel_field_slot_sprite_state + dispatch_card_effect_sprite_render_by_card_id 大型 card_id 分发 + equip target bitmap 计算/查询簇)。
 
-上次更新: 2026-06-13 file 04 Seg-6 完成 (EQ=68/REF=1/RENAME=0/PLATE=8fn 17 entries; 新建 oam_attr.inc x5 + card_info.inc x22; byte-identical 9689337d)。
+上次更新: 2026-06-13 file 04 Seg-7 完成 (EQ=35/REF=0/RENAME=0/PLATE=14fn 26 tokens; 新建 card_info.inc x3 + oam_attr.inc x3 + duel_field.inc x1; byte-identical 9689337d)。
 
 ---
 
@@ -23,7 +23,7 @@
 | 01 | vija_scene_text | 0x0801cb00..0x0802c238 | Seg-1..10 已拆 | ✅ 全 10 段完成 | `doc/dev/p5-refine-01-vija-scene-text.md` |
 | 02 | text_lp_fieldspell | 0x0802c238..0x08035f54 | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-02-text-lp-fieldspell.md` |
 | 03 | equip_chain_hand | 0x08035f54..0x0804020c | Seg-1..10 全完成 | ✅ 全 10 段完成 | `doc/dev/p5-refine-03-equip-chain-hand.md` |
-| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (6/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
+| 04 | card_zone_sprite | 0x0804020c..0x08049014 | Seg-1..10 已拆 | 🟡 进行中 (7/10) | `doc/dev/p5-refine-04-card-zone-sprite.md` |
 | 05 | equip_eligibility_a | 0x08049014..0x080537c0 | 未拆 | ⬜ | |
 | 06 | equip_eligibility_b | 0x080537c0..0x0805c2f0 | 未拆 | ⬜ | |
 | 07 | equip_effect_chain | 0x0805c2f0..0x080643e0 | 未拆 | ⬜ | |

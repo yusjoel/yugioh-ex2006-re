@@ -472,3 +472,10 @@
 @ (card_0987: Ekibyo Drakmord pw=69954399; 0xa4e80000>>19=0x149d; card-stats.s verified)
 .equ act_cid_1048_08043b48,          0x00001048  @ card_id branch B in apply_slot_equip_activation_with_sprite; NOT in card-stats.s -> neutral name; 1 slot
 .equ act_cid_1197_08043be8,          0x00001197  @ card_id branch C in apply_slot_equip_activation_with_sprite; NOT in card-stats.s -> neutral name; 1 slot
+
+@ =============================================================================
+@ file 04 Seg-7 additions: Watapon / Dark Mimic LV1 card IDs
+@ =============================================================================
+.equ WATAPON_CID,                    0x000017cc  @ Watapon (pw=87774234; card-stats.s card_1626 slot=0x17CC); enqueue_hand_sprite_by_zone_set_code Watapon-path; 10 raw ROM refs
+.equ WATAPON_EQUIP_ACTIVATION_MASK,  0x34500000  @ activation flag mask ORed into attr2 arg of apply_equip_activation_with_id_lookup for Watapon path in enqueue_hand_sprite_by_zone_set_code; 24 raw ROM refs
+.equ DARK_MIMIC_LV1_CID,             0x000017d5  @ Dark Mimic LV1 (pw=74713516; card-stats.s card_1635 slot=0x17D5); enqueue_equip_chain_sprite_attrs_for_slot card_type filter A; 16 raw ROM refs

@@ -48,3 +48,10 @@
 .equ OAM_EQUIP_CHAIN_PAIR_SPRITE_P1, 0x0000803d @ equip chain pair sprite OAM attr0 P1 (bit15+0x3d); enqueue_equip_chain_pair_sprite_if_eligible; P0=0x3d; 76 raw ROM refs
 .equ OAM_EQUIP_CHAIN_DUAL_SPRITE_P1, 0x0000803e @ equip chain dual-slot sprite OAM attr0 P1 (bit15+0x3e); enqueue_equip_chain_dual_slot_sprite_with_activation_scan; P0=0x3e; 121 raw ROM refs
 .equ OAM_ZONE_EQUIP_SPRITE_P1,      0x00008045  @ zone equip shape sprite OAM attr0 P1 (bit15+0x45); dispatch_equip_zone_sprite_and_activation; P0=0x45; 166 raw ROM refs
+
+@ =============================================================================
+@ file 04 Seg-7 additions: P2 equip/zone sprite palette selectors
+@ =============================================================================
+.equ OAM_EQUIP_SLOT_SPRITE_P2,      0x00008029  @ OAM attr0 P2 for equip slot sprite (bit15+0x29; P1=0x8034); 5 slots in Seg-7; 121 raw ROM refs
+.equ OAM_MULTI_SLOT_MARKER_P2,      0x00008048  @ OAM attr0 P2 for multi-slot selection marker sprite (bit15+0x48; P1=0x48 inline); enqueue_equip_multi_slot_marker_sprite; 12 raw ROM refs
+.equ OAM_FIELD_SLOT_SPRITE_P2,      0x00008043  @ OAM attr0 P2 for duel field slot sprite (bit15+0x43; P1=0x43 inline); enqueue_field_slot_sprite_with_state_update; 35 raw ROM refs
