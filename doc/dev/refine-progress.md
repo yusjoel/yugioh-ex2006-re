@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 04 Seg-1 0x4020c..0x407fc (19 fn, 64 槽; 卡牌显示序列 tick op15/equip-preview/set-display + invoke_card_display_op_equip_mode 簇)。
+> **下一任务**: file 04 Seg-2 0x407fc..0x40c88 (20 fn, 46 槽; normal-summon/flip/random-draw/prng display tick + op3a/39/3b/3c/0b 簇)。
 
-上次更新: 2026-06-12 file 04 活动 doc 建成 + 地址拆 10 段 (`doc/dev/p5-refine-04-card-zone-sprite.md`): 193 named fn (176 push-prologue + 17 leaf clear_display_step_lock 簇), 920 DAT_/DWORD_/PTR_ 槽, **0 ROM_INCBIN/inter-function 数据块** (全代码 + 函数内 literal pool); 10 段地址序均分 ~19 fn/段 (重段 Seg-8 275 槽 / Seg-4 159 槽 / Seg-10 112 槽); 待开始 Seg-1。**file 03 全 10 段完成 ✅** (Seg-10: EQ=63/REF=57/RENAME=1/PLATE=9; byte-identical 9689337d)。
+上次更新: 2026-06-13 file 04 Seg-1 完成 (EQ=33/REF=22/RENAME=9/PLATE=17; 新建 duel_field.inc x5; byte-identical 9689337d)。
 
 ---
 

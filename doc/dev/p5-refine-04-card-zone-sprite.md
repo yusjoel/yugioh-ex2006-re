@@ -93,7 +93,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x4020c..0x407fc | 19 | 64 | — | ⬜ | — |
+| 1 | 0x4020c..0x407fc | 19 | 64 | — | ✅ | (see §四.4.01) |
 | 2 | 0x407fc..0x40c88 | 20 | 46 | — | ⬜ | — |
 | 3 | 0x40c88..0x417f0 | 19 | 98 | — | ⬜ | — |
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ⬜ | — |
@@ -114,6 +114,32 @@ render_slot_card_sprite_* 描述符渲染) 较重, 必要时拆 Seg-Na/Nb (地�
 ## 四、逐段完成记录
 
 (各段落地后由 fixer 追加 4.0N 小节: 函数列表 / 符号化统计 / 新建 constants / carve / 踩坑 / commit)
+
+### 4.01 Seg-1 完成记录 (0x0804020c..0x080407fc)
+
+**函数列表 (19)**:
+tick_card_display_seq_op15 / tick_equip_preview_display_sequence / tick_set_display_mode_seq /
+tick_lp_compare_init_display_seq / invoke_card_display_op_by_equip_mode /
+invoke_card_display_op_equip_mode0..5 (6fn) /
+commit_display_index_on_effect5 / tick_display_slot_flag_clear_seq /
+advance_card_display_seq_counter / set_slot_facedown_bit_by_flag /
+apply_card_flags_to_zone_bitmap / commit_field_slot_bit_with_display_op24 /
+tick_card_effect_category_display_seq / tick_display_op40_seq
+
+**符号化统计**: EQ=33 (28 reuse + 5 new) / REF=22 / RENAME=9 / PLATE=17 / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (5, constants/duel_field.inc)**:
+- DISP_SET_VARIANT_OFF=0x1cfc
+- SET_DISPLAY_STATE_SLOT_OFF=0x894
+- EQUIP_MAIN_PHASE_OFF=0x1d18
+- HAND_SLOT_FACE_ARRAY_OFF=0x41a
+- ALT_HAND_SLOT_FACE_ARRAY_OFF=0x5d2
+
+**踩坑**: file 03 fn-ptr +1 再次需要补 (4 槽: 0x37884/0x389dc/0x389f8/0x3aa74;
+check_level_conv_lab_node_match+1 x2, check_card_is_amazoness_type+1 x2)。
+每次 re-export 必补，已固化到 asm/03_equip_chain_hand.s。
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 ---
 

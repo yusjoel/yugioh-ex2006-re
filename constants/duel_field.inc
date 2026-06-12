@@ -244,3 +244,12 @@
 @ =============================================================================
 .equ SLOT_CHAIN_CTR_CLR,          0xc03fffff  @ ~0x3fc00000; clears bits[29:22] chain-counter field in slot display-args word; place_card_to_zone_with_display_state; 1 slot
 .equ SLOT_BIT20_CLR,              0xffefffff  @ ~0x00100000; clears bit20 of spell-trap zone slot entry word; place_card_to_zone_with_display_state; 1 slot
+
+@ =============================================================================
+@ file 04 Seg-1 additions: display mode variant / set-display state / equip main-phase / hand slot face-status
+@ =============================================================================
+.equ DISP_SET_VARIANT_OFF,        0x00001cfc  @ [gP1LifePoints+0x1cfc] display mode variant (1=A / 2=B); tick_set_display_mode_seq; asm/12:808 sprite_variant_offset; 19 raw refs
+.equ SET_DISPLAY_STATE_SLOT_OFF,  0x00000894  @ [gP1LifePoints+0x894] set-mode display state slot; tick_set_display_mode_seq writes hword[gDuelDisplaySeqState+6]; 7 raw refs
+.equ EQUIP_MAIN_PHASE_OFF,        0x00001d18  @ [gP1LifePoints+0x1d18] equip activation main-phase dispatch index; tick_equip_activation_dispatch_hub; asm/12:1490 main_phase_offset; 17 raw refs
+.equ HAND_SLOT_FACE_ARRAY_OFF,    0x0000041a  @ gP1LifePoints+0x41a = gP1HandSlotArray+2 (0x0201c8fa): face-status byte-2 in hand slot entry (4B stride); tick_display_slot_flag_clear_seq ORs 0x10; 9 raw refs
+.equ ALT_HAND_SLOT_FACE_ARRAY_OFF,0x000005d2  @ gP1LifePoints+0x5d2 = gP1AltHandSlotArray+2 (0x0201cab2): face-status byte-2 in alt-hand slot entry; symmetric; 3 raw refs

@@ -1,12 +1,12 @@
 @ ==== 04_card_zone_sprite.s ====
 @ 卡牌显示序列 + 区域卡 sprite attr + 装备 slot sprite
 .thumb
-@ Called by FUN_0803be4c (duel_field dispatcher). Symmetric structure with FUN_08040a04. Reads EWRAM 0x0201bcc0 player_id and fields; three-way dispatch by counter state (0/1/>1): state=0 -> dispatch_card_display_op(0x15, player_id, r3=0), increments counter; state=1 -> play_ui_effect(0x15), if returns 0 clears [+0x80c]; state>1 -> exits immediately.
+@ Called by dispatch_duel_event_display_seq (duel_field dispatcher). Symmetric structure with tick_card_display_seq_op3b. Reads EWRAM 0x0201bcc0 player_id and fields; three-way dispatch by counter state (0/1/>1): state=0 -> dispatch_card_display_op(0x15, player_id, r3=0), increments counter; state=1 -> play_ui_effect(0x15), if returns 0 clears [+0x80c]; state>1 -> exits immediately.
 @ 
 @ Constants: card_display_state_base=0x0201bcc0 (DAT_08040228), counter_offset=0x810 (0x81*0x10), reset_offset=0x80c (DAT_08040254=0x80c), op_code=0x15.
 tick_card_display_seq_op15:
     push {r4,r5,lr}                          @ 0804020c 30b5
-    ldr r5, DAT_08040228                     @ 0804020e 064d
+    ldr r5, tick_cdseq_op15_state_base       @ 0804020e 064d
     ldrh r0,[r5,#0x0]                        @ 08040210 2888
     lsrs r1,r0,#0xf    @ 08040212 c10b
     ldrh r2,[r5,#0x2]                        @ 08040214 6a88
@@ -19,8 +19,8 @@ tick_card_display_seq_op15:
     cmp r0,#0x1                              @ 08040222 0128
     beq LAB_0804023c                         @ 08040224 0ad0
     b LAB_0804024e                           @ 08040226 12e0
-DAT_08040228:
-    .word  0x0201bcc0                     @ 08040228 c0bc0102
+tick_cdseq_op15_state_base:
+    .word  gDuelDisplaySeqState           @ 08040228 c0bc0102  gDuelDisplaySeqState base ptr
 LAB_0804022c:
     movs r0,#0x15    @ 0804022c 1520
     movs r3,#0x0    @ 0804022e 0023
@@ -35,15 +35,15 @@ LAB_0804023c:
     adds r1,r0,#0x0    @ 08040242 011c
     cmp r1,#0x0                              @ 08040244 0029
     bne LAB_0804024e                         @ 08040246 02d1
-    ldr r2, DAT_08040254                     @ 08040248 024a
+    ldr r2, tick_cdseq_op15_step_lock_off    @ 08040248 024a
     adds r0,r5,r2    @ 0804024a a818
     str r1,[r0,#0x0]                         @ 0804024c 0160
 LAB_0804024e:
     pop {r4,r5}                              @ 0804024e 30bc
     pop {r0}                                 @ 08040250 01bc
     bx r0                                    @ 08040252 0047
-DAT_08040254:
-    .word  0x0000080c                     @ 08040254 0c080000
+tick_cdseq_op15_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040254 0c080000  step lock offset 0x80c in gDuelDisplaySeqState
 
 @ Frame-tick driver for the equip preview display animation sequence.
 @ No APCS input params (self-driven by step counter).
@@ -51,13 +51,13 @@ DAT_08040254:
 @ Step 0: dispatch_card_display_op(op=0x1, slot=0, 0, 0) triggers preview animation; step counter +1.
 @ Step !=0: play_ui_effect(0x1) polls animation frame; on completion (r0==0):
 @ writes [0x0201c4cc] (=0x0201bcc0+0x80c):=0 (step lock clear).
-@ Called by main state machine FUN_0803be4c during equip preview preparation phase.
+@ Called by main state machine dispatch_duel_event_display_seq during equip preview preparation phase.
 @ Constants: step_counter=0x0201c4d0=base+0x810; step_lock=0x0201c4cc=base+0x80c;
 @ op_preview=0x1; effect_preview=0x1.
 @ Returns void (pop{r0};bx r0 tail-call).
 tick_equip_preview_display_sequence:
     push {r4,r5,lr}                          @ 08040258 30b5
-    ldr r5, DAT_0804027c                     @ 0804025a 084d
+    ldr r5, tick_equip_preview_state_base    @ 0804025a 084d
     movs r0,#0x81    @ 0804025c 8120
     lsls r0,r0,#0x4    @ 0804025e 0001
     adds r4,r5,r0    @ 08040260 2c18
@@ -73,23 +73,23 @@ tick_equip_preview_display_sequence:
     adds r0,#0x1    @ 08040276 0130
     str r0,[r4,#0x0]                         @ 08040278 2060
     b LAB_08040292                           @ 0804027a 0ae0
-DAT_0804027c:
-    .word  0x0201bcc0                     @ 0804027c c0bc0102
+tick_equip_preview_state_base:
+    .word  gDuelDisplaySeqState           @ 0804027c c0bc0102
 LAB_08040280:
     movs r0,#0x1    @ 08040280 0120
     bl play_ui_effect                        @ 08040282 def787fe
     adds r1,r0,#0x0    @ 08040286 011c
     cmp r1,#0x0                              @ 08040288 0029
     bne LAB_08040292                         @ 0804028a 02d1
-    ldr r2, DAT_08040298                     @ 0804028c 024a
+    ldr r2, tick_equip_preview_step_lock_off @ 0804028c 024a
     adds r0,r5,r2    @ 0804028e a818
     str r1,[r0,#0x0]                         @ 08040290 0160
 LAB_08040292:
     pop {r4,r5}                              @ 08040292 30bc
     pop {r0}                                 @ 08040294 01bc
     bx r0                                    @ 08040296 0047
-DAT_08040298:
-    .word  0x0000080c                     @ 08040298 0c080000
+tick_equip_preview_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040298 0c080000
 
 @ Frame driver for card set display mode sequence.
 @ Reads player_id (r3=bit15), extra_flags (r2=hword[+2]) from [0x0201bcc0].
@@ -99,13 +99,13 @@ DAT_08040298:
 @ [gP1LP+0x2c]:=hword[state+4], [gP1LP+0x894]:=hword[state+6];
 @ dispatches op=0x2, step+1.
 @ Step non-zero: polls play_ui_effect=0x2; on done clears [base+0x80c]:=0.
-@ Called by FUN_0803be4c (main state machine) during card face-up/face-down display toggle phase.
+@ Called by dispatch_duel_event_display_seq (main state machine) during card face-up/face-down display toggle phase.
 @ Returns void.
 @ Constants: state_base=0x0201bcc0; player_ref=0x0201e2a0; step_lock_offset=0x80c;
 @ mode_field=gP1LP+0x1cfc=0x0201e1dc; op_set=0x2; effect_set=0x2.
 tick_set_display_mode_seq:
     push {r4,r5,lr}                          @ 0804029c 30b5
-    ldr r4, DAT_080402cc                     @ 0804029e 0b4c
+    ldr r4, tick_set_disp_mode_state_base    @ 0804029e 0b4c
     ldrh r0,[r4,#0x0]                        @ 080402a0 2088
     lsrs r3,r0,#0xf    @ 080402a2 c30b
     ldrh r2,[r4,#0x2]                        @ 080402a4 6288
@@ -116,7 +116,7 @@ tick_set_display_mode_seq:
     adds r5,r4,#0x0    @ 080402ae 251c
     cmp r0,#0x0                              @ 080402b0 0028
     bne LAB_0804031c                         @ 080402b2 33d1
-    ldr r0, DAT_080402d0                     @ 080402b4 0648
+    ldr r0, tick_set_disp_mode_card_ctx      @ 080402b4 0648
     ldr r0,[r0,#0x4]                         @ 080402b6 4068
     movs r1,#0x1    @ 080402b8 0121
     eors r0,r1    @ 080402ba 4840
@@ -128,23 +128,23 @@ tick_set_display_mode_seq:
     beq LAB_080402d8                         @ 080402c6 07d0
     b LAB_080402da                           @ 080402c8 07e0
     .zero  0x2
-DAT_080402cc:
-    .word  0x0201bcc0                     @ 080402cc c0bc0102
-DAT_080402d0:
-    .word  0x0201e2a0                     @ 080402d0 a0e20102
+tick_set_disp_mode_state_base:
+    .word  gDuelDisplaySeqState           @ 080402cc c0bc0102
+tick_set_disp_mode_card_ctx:
+    .word  gDuelCardCtxBase               @ 080402d0 a0e20102
 LAB_080402d4:
     movs r2,#0x2    @ 080402d4 0222
     b LAB_080402da                           @ 080402d6 00e0
 LAB_080402d8:
     movs r2,#0x1    @ 080402d8 0122
 LAB_080402da:
-    ldr r1, PTR_gP1LifePoints_0804030c       @ 080402da 0c49
-    ldr r3, DAT_08040310                     @ 080402dc 0c4b
+    ldr r1, tick_set_disp_mode_lp_base       @ 080402da 0c49
+    ldr r3, tick_set_disp_mode_variant_off   @ 080402dc 0c4b
     adds r0,r1,r3    @ 080402de c818
     str r2,[r0,#0x0]                         @ 080402e0 0260
     ldrh r0,[r5,#0x4]                        @ 080402e2 a888
     str r0,[r1,#0x2c]                        @ 080402e4 c862
-    ldr r0, DAT_08040314                     @ 080402e6 0b48
+    ldr r0, tick_set_disp_mode_state_slot_off @ 080402e6 0b48
     adds r1,r1,r0    @ 080402e8 0918
     ldrh r0,[r5,#0x6]                        @ 080402ea e888
     str r0,[r1,#0x0]                         @ 080402ec 0860
@@ -154,7 +154,7 @@ LAB_080402ee:
     movs r2,#0x0    @ 080402f2 0022
     movs r3,#0x0    @ 080402f4 0023
     bl dispatch_card_display_op              @ 080402f6 def7d1fc
-    ldr r1, DAT_08040318                     @ 080402fa 0749
+    ldr r1, tick_set_disp_mode_ctr_base      @ 080402fa 0749
     movs r2,#0x81    @ 080402fc 8122
     lsls r2,r2,#0x4    @ 080402fe 1201
     adds r1,r1,r2    @ 08040300 8918
@@ -163,31 +163,31 @@ LAB_080402ee:
     str r0,[r1,#0x0]                         @ 08040306 0860
     b LAB_0804032e                           @ 08040308 11e0
     .zero  0x2
-PTR_gP1LifePoints_0804030c:
-    .word  gP1LifePoints                  @ 0804030c e0c40102
-DAT_08040310:
-    .word  0x00001cfc                     @ 08040310 fc1c0000
-DAT_08040314:
-    .word  0x00000894                     @ 08040314 94080000
-DAT_08040318:
-    .word  0x0201bcc0                     @ 08040318 c0bc0102
+tick_set_disp_mode_lp_base:
+    .word  gP1LifePoints                  @ 0804030c e0c40102  gP1LifePoints base ptr for tick_set_display_mode_seq
+tick_set_disp_mode_variant_off:
+    .word  DISP_SET_VARIANT_OFF           @ 08040310 fc1c0000  gP1LifePoints+0x1cfc: display mode variant (1=A / 2=B)
+tick_set_disp_mode_state_slot_off:
+    .word  SET_DISPLAY_STATE_SLOT_OFF     @ 08040314 94080000  gP1LifePoints+0x894: set-mode display state slot index
+tick_set_disp_mode_ctr_base:
+    .word  gDuelDisplaySeqState           @ 08040318 c0bc0102
 LAB_0804031c:
     movs r0,#0x2    @ 0804031c 0220
     bl play_ui_effect                        @ 0804031e def739fe
     adds r1,r0,#0x0    @ 08040322 011c
     cmp r1,#0x0                              @ 08040324 0029
     bne LAB_0804032e                         @ 08040326 02d1
-    ldr r3, DAT_08040334                     @ 08040328 024b
+    ldr r3, tick_set_disp_mode_step_lock_off @ 08040328 024b
     adds r0,r4,r3    @ 0804032a e018
     str r1,[r0,#0x0]                         @ 0804032c 0160
 LAB_0804032e:
     pop {r4,r5}                              @ 0804032e 30bc
     pop {r0}                                 @ 08040330 01bc
     bx r0                                    @ 08040332 0047
-DAT_08040334:
-    .word  0x0000080c                     @ 08040334 0c080000
+tick_set_disp_mode_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040334 0c080000
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 4. Reads 0x0201bcc0 hword[0] bit15=player_id (r1->r8 saved), reads current active player from 0x0201e2a0.
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 4. Reads 0x0201bcc0 hword[0] bit15=player_id (r1->r8 saved), reads current active player from 0x0201e2a0.
 @ Initializes multiple battle state fields: [gP1LifePoints+0x1ce8] XOR 1 (toggle facing flag); [gP1LifePoints+0x1cec] +1 (increment counter); [gP1LifePoints+0x1d18]:=0 and [+0x1d1c]:=0 (clear two state words); [gP1LifePoints+0x1cf4]:=7 (init value).
 @ Compares both players LP from gP1LifePoints+player*0x868+LP_OFFSET: if player1 LP >= player2 LP r7=0; else r7=1.
 @ Calls write_card_display_index_entry(r0=0x38, r1=r7=lp_result), then dispatch_card_display_op(opcode=5, ...). Finally clears [base+0x80c].
@@ -199,40 +199,40 @@ tick_lp_compare_init_display_seq:
     .hword 0x464f    @ 0804033a 4f46
     .hword 0x4646    @ 0804033c 4646
     push {r6,r7}                             @ 0804033e c0b4
-    ldr r0, DAT_080403c4                     @ 08040340 2048
+    ldr r0, tick_lp_cmp_init_state_base      @ 08040340 2048
     .hword 0x4681    @ 08040342 8146
     ldrh r1,[r0,#0x0]                        @ 08040344 0188
     lsrs r1,r1,#0xf    @ 08040346 c90b
     .hword 0x4688    @ 08040348 8846
-    ldr r2, PTR_gP1LifePoints_080403c8       @ 0804034a 1f4a
-    ldr r0, DAT_080403cc                     @ 0804034c 1f48
+    ldr r2, tick_lp_cmp_init_lp_base         @ 0804034a 1f4a
+    ldr r0, tick_lp_cmp_init_lp_block2_off   @ 0804034c 1f48
     adds r1,r2,r0    @ 0804034e 1118
     ldr r0,[r1,#0x0]                         @ 08040350 0868
     movs r5,#0x1    @ 08040352 0125
     eors r0,r5    @ 08040354 6840
     str r0,[r1,#0x0]                         @ 08040356 0860
-    ldr r0, DAT_080403d0                     @ 08040358 1d48
+    ldr r0, tick_lp_cmp_init_lp_timer_off    @ 08040358 1d48
     adds r1,r2,r0    @ 0804035a 1118
     ldr r0,[r1,#0x0]                         @ 0804035c 0868
     adds r0,#0x1    @ 0804035e 0130
     str r0,[r1,#0x0]                         @ 08040360 0860
-    ldr r1, DAT_080403d4                     @ 08040362 1c49
+    ldr r1, tick_lp_cmp_init_equip_phase_off @ 08040362 1c49
     adds r0,r2,r1    @ 08040364 5018
     movs r6,#0x0    @ 08040366 0026
     str r6,[r0,#0x0]                         @ 08040368 0660
     adds r1,#0x4    @ 0804036a 0431
     adds r0,r2,r1    @ 0804036c 5018
     str r6,[r0,#0x0]                         @ 0804036e 0660
-    ldr r0, DAT_080403d8                     @ 08040370 1948
+    ldr r0, tick_lp_cmp_init_field_state_off @ 08040370 1948
     adds r1,r2,r0    @ 08040372 1118
     movs r0,#0x7    @ 08040374 0720
     str r0,[r1,#0x0]                         @ 08040376 0860
     movs r7,#0x0    @ 08040378 0027
-    ldr r0, DAT_080403dc                     @ 0804037a 1848
+    ldr r0, tick_lp_cmp_init_card_ctx        @ 0804037a 1848
     ldr r4,[r0,#0x4]                         @ 0804037c 4468
     adds r0,r4,#0x0    @ 0804037e 201c
     ands r0,r5    @ 08040380 2840
-    ldr r3, DAT_080403e0                     @ 08040382 174b
+    ldr r3, tick_lp_cmp_init_player_stride   @ 08040382 174b
     adds r1,r0,#0x0    @ 08040384 011c
     muls r1,r3    @ 08040386 5943
     adds r1,r1,r2    @ 08040388 8918
@@ -255,7 +255,7 @@ LAB_0804039c:
     movs r2,#0x0    @ 080403aa 0022
     movs r3,#0x0    @ 080403ac 0023
     bl dispatch_card_display_op              @ 080403ae def775fc
-    ldr r0, DAT_080403e4                     @ 080403b2 0c48
+    ldr r0, tick_lp_cmp_init_step_lock_off   @ 080403b2 0c48
     add r0,r9                                @ 080403b4 4844
     str r6,[r0,#0x0]                         @ 080403b6 0660
     pop {r3,r4}                              @ 080403b8 18bc
@@ -264,24 +264,24 @@ LAB_0804039c:
     pop {r4,r5,r6,r7}                        @ 080403be f0bc
     pop {r0}                                 @ 080403c0 01bc
     bx r0                                    @ 080403c2 0047
-DAT_080403c4:
-    .word  0x0201bcc0                     @ 080403c4 c0bc0102
-PTR_gP1LifePoints_080403c8:
-    .word  gP1LifePoints                  @ 080403c8 e0c40102
-DAT_080403cc:
-    .word  0x00001ce8                     @ 080403cc e81c0000
-DAT_080403d0:
-    .word  0x00001cec                     @ 080403d0 ec1c0000
-DAT_080403d4:
-    .word  0x00001d18                     @ 080403d4 181d0000
-DAT_080403d8:
-    .word  0x00001cf4                     @ 080403d8 f41c0000
-DAT_080403dc:
-    .word  0x0201e2a0                     @ 080403dc a0e20102
-DAT_080403e0:
-    .word  0x00000868                     @ 080403e0 68080000
-DAT_080403e4:
-    .word  0x0000080c                     @ 080403e4 0c080000
+tick_lp_cmp_init_state_base:
+    .word  gDuelDisplaySeqState           @ 080403c4 c0bc0102
+tick_lp_cmp_init_lp_base:
+    .word  gP1LifePoints                  @ 080403c8 e0c40102  gP1LifePoints base ptr for tick_lp_compare_init_display_seq
+tick_lp_cmp_init_lp_block2_off:
+    .word  P1LP_BLOCK2_OFF_1CE8           @ 080403cc e81c0000  gP1LifePoints+0x1ce8: XOR flag at LP compare init
+tick_lp_cmp_init_lp_timer_off:
+    .word  P1LP_TIMER_OFF                 @ 080403d0 ec1c0000  gP1LifePoints+0x1cec: timer field incremented at LP compare init
+tick_lp_cmp_init_equip_phase_off:
+    .word  EQUIP_MAIN_PHASE_OFF           @ 080403d4 181d0000  gP1LifePoints+0x1d18: equip main-phase dispatch index; cleared at LP-compare init
+tick_lp_cmp_init_field_state_off:
+    .word  FIELD_STATE_OFF                @ 080403d8 f41c0000  gP1LifePoints+0x1cf4: equip activation phase/field state code
+tick_lp_cmp_init_card_ctx:
+    .word  gDuelCardCtxBase               @ 080403dc a0e20102
+tick_lp_cmp_init_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080403e0 68080000  player block stride 0x868 (P2 offset from P1)
+tick_lp_cmp_init_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080403e4 0c080000
 
 @ Frame-tick driver for equip card display animation, parameterized by mode code.
 @ r0=equip_mode ([0..4]) -- selects card slot / display position.
@@ -298,7 +298,7 @@ DAT_080403e4:
 invoke_card_display_op_by_equip_mode:
     push {r4,r5,r6,lr}                       @ 080403e8 70b5
     adds r6,r0,#0x0    @ 080403ea 061c
-    ldr r5, DAT_0804041c                     @ 080403ec 0b4d
+    ldr r5, invoke_equip_mode_state_base     @ 080403ec 0b4d
     ldrh r0,[r5,#0x0]                        @ 080403ee 2888
     lsrs r1,r0,#0xf    @ 080403f0 c10b
     movs r0,#0x81    @ 080403f2 8120
@@ -311,8 +311,8 @@ invoke_card_display_op_by_equip_mode:
     adds r2,r6,#0x0    @ 08040400 321c
     movs r3,#0x0    @ 08040402 0023
     bl dispatch_card_display_op              @ 08040404 def74afc
-    ldr r0, PTR_gP1LifePoints_08040420       @ 08040408 0548
-    ldr r1, DAT_08040424                     @ 0804040a 0649
+    ldr r0, invoke_equip_mode_lp_base        @ 08040408 0548
+    ldr r1, invoke_equip_mode_field_state_off @ 0804040a 0649
     adds r0,r0,r1    @ 0804040c 4018
     str r6,[r0,#0x0]                         @ 0804040e 0660
     bl rebuild_equip_chain_refs              @ 08040410 eef74cfd
@@ -320,12 +320,12 @@ invoke_card_display_op_by_equip_mode:
     adds r0,#0x1    @ 08040416 0130
     str r0,[r4,#0x0]                         @ 08040418 2060
     b LAB_08040446                           @ 0804041a 14e0
-DAT_0804041c:
-    .word  0x0201bcc0                     @ 0804041c c0bc0102
-PTR_gP1LifePoints_08040420:
-    .word  gP1LifePoints                  @ 08040420 e0c40102
-DAT_08040424:
-    .word  0x00001cf4                     @ 08040424 f41c0000
+invoke_equip_mode_state_base:
+    .word  gDuelDisplaySeqState           @ 0804041c c0bc0102
+invoke_equip_mode_lp_base:
+    .word  gP1LifePoints                  @ 08040420 e0c40102  gP1LifePoints base ptr for invoke_card_display_op_by_equip_mode
+invoke_equip_mode_field_state_off:
+    .word  FIELD_STATE_OFF                @ 08040424 f41c0000
 LAB_08040428:
     movs r0,#0x4    @ 08040428 0420
     bl play_ui_effect                        @ 0804042a def7b3fd
@@ -337,19 +337,19 @@ LAB_08040428:
     movs r2,#0x0    @ 08040438 0022
     movs r3,#0x0    @ 0804043a 0023
     bl dispatch_card_display_op              @ 0804043c def72efc
-    ldr r1, DAT_0804044c                     @ 08040440 0249
+    ldr r1, invoke_equip_mode_step_lock_off  @ 08040440 0249
     adds r0,r5,r1    @ 08040442 6818
     str r4,[r0,#0x0]                         @ 08040444 0460
 LAB_08040446:
     pop {r4,r5,r6}                           @ 08040446 70bc
     pop {r0}                                 @ 08040448 01bc
     bx r0                                    @ 0804044a 0047
-DAT_0804044c:
-    .word  0x0000080c                     @ 0804044c 0c080000
+invoke_equip_mode_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 0804044c 0c080000
 
 @ Fixed-mode stub: invokes invoke_card_display_op_by_equip_mode with equip_mode=0.
 @ Body: push lr / movs r0,#0 / bl invoke_card_display_op_by_equip_mode / pop{r0};bx r0.
-@ Standard void tail-call wrapper. Called by main state machine FUN_0803be4c (mode-0 equip branch).
+@ Standard void tail-call wrapper. Called by main state machine dispatch_duel_event_display_seq (mode-0 equip branch).
 @ Constants: equip_mode=0.
 @ Returns void (pop{r0};bx r0 tail-call).
 invoke_card_display_op_equip_mode0:
@@ -361,7 +361,7 @@ invoke_card_display_op_equip_mode0:
 
 @ Fixed-mode stub: invokes invoke_card_display_op_by_equip_mode with equip_mode=1.
 @ Body: push lr / movs r0,#1 / bl invoke_card_display_op_by_equip_mode / pop{r0};bx r0.
-@ Standard void tail-call wrapper. Called by main state machine FUN_0803be4c (mode-1 equip branch).
+@ Standard void tail-call wrapper. Called by main state machine dispatch_duel_event_display_seq (mode-1 equip branch).
 @ Constants: equip_mode=1.
 @ Returns void (pop{r0};bx r0 tail-call).
 invoke_card_display_op_equip_mode1:
@@ -373,7 +373,7 @@ invoke_card_display_op_equip_mode1:
 
 @ Fixed-mode stub: invokes invoke_card_display_op_by_equip_mode with equip_mode=2.
 @ Body: push lr / movs r0,#2 / bl invoke_card_display_op_by_equip_mode / pop{r0};bx r0.
-@ Standard void tail-call wrapper. Called by main state machine FUN_0803be4c (mode-2 equip branch).
+@ Standard void tail-call wrapper. Called by main state machine dispatch_duel_event_display_seq (mode-2 equip branch).
 @ Constants: equip_mode=2.
 @ Returns void (pop{r0};bx r0 tail-call).
 invoke_card_display_op_equip_mode2:
@@ -388,7 +388,7 @@ invoke_card_display_op_equip_mode2:
 @ triggering the mode-3 equip card display animation sequence.
 @ Body: push lr / movs r0,#3 / bl hub / pop{r0};bx r0. Standard void tail call.
 @ One of 6 consecutive sibling stubs (0x08040450..0x0804048c), N=0..5.
-@ Called by FUN_0803be4c (main state machine) in equip mode3 branch.
+@ Called by dispatch_duel_event_display_seq (main state machine) in equip mode3 branch.
 @ Returns void. Constants: equip_mode=3.
 invoke_card_display_op_equip_mode3:
     push {lr}                                @ 08040474 00b5
@@ -402,7 +402,7 @@ invoke_card_display_op_equip_mode3:
 @ triggering the mode-4 equip card display animation sequence.
 @ Body: push lr / movs r0,#4 / bl hub / pop{r0};bx r0. Standard void tail call.
 @ One of 6 consecutive sibling stubs (0x08040450..0x0804048c), N=0..5.
-@ Called by FUN_0803be4c (main state machine) in equip mode4 branch.
+@ Called by dispatch_duel_event_display_seq (main state machine) in equip mode4 branch.
 @ Returns void. Constants: equip_mode=4.
 invoke_card_display_op_equip_mode4:
     push {lr}                                @ 08040480 00b5
@@ -416,7 +416,7 @@ invoke_card_display_op_equip_mode4:
 @ triggering the mode-5 equip card display animation sequence.
 @ Body: push lr / movs r0,#5 / bl hub / pop{r0};bx r0. Standard void tail call.
 @ One of 6 consecutive sibling stubs (0x08040450..0x0804048c), N=0..5.
-@ Called by FUN_0803be4c (main state machine) in equip mode5 branch.
+@ Called by dispatch_duel_event_display_seq (main state machine) in equip mode5 branch.
 @ Returns void. Constants: equip_mode=5.
 invoke_card_display_op_equip_mode5:
     push {lr}                                @ 0804048c 00b5
@@ -430,7 +430,7 @@ invoke_card_display_op_equip_mode5:
 @ calls write_card_display_index_entry(op=0xa, slot=0), then clears
 @ [0x0201bcc0+0x80c]:=0 (step_lock clear), signaling end of current frame-driven sequence.
 @ If play_ui_effect returns non-zero (animation pending), skips write and returns.
-@ Called by FUN_0803be4c (main state machine) after specific card display animation completes.
+@ Called by dispatch_duel_event_display_seq (main state machine) after specific card display animation completes.
 @ Returns void.
 @ Constants: effect_id=5; display_op=0xa; display_slot=0; step_lock=0x0201bcc0+0x80c=0x0201c4cc.
 commit_display_index_on_effect5:
@@ -443,20 +443,20 @@ commit_display_index_on_effect5:
     movs r0,#0xa    @ 080404a6 0a20
     movs r1,#0x0    @ 080404a8 0021
     bl write_card_display_index_entry        @ 080404aa 54f003fd
-    ldr r0, DAT_080404bc                     @ 080404ae 0348
-    ldr r1, DAT_080404c0                     @ 080404b0 0349
+    ldr r0, commit_disp_idx_e5_state_base    @ 080404ae 0348
+    ldr r1, commit_disp_idx_e5_step_lock_off @ 080404b0 0349
     adds r0,r0,r1    @ 080404b2 4018
     str r4,[r0,#0x0]                         @ 080404b4 0460
 LAB_080404b6:
     pop {r4}                                 @ 080404b6 10bc
     pop {r0}                                 @ 080404b8 01bc
     bx r0                                    @ 080404ba 0047
-DAT_080404bc:
-    .word  0x0201bcc0                     @ 080404bc c0bc0102
-DAT_080404c0:
-    .word  0x0000080c                     @ 080404c0 0c080000
+commit_disp_idx_e5_state_base:
+    .word  gDuelDisplaySeqState           @ 080404bc c0bc0102
+commit_disp_idx_e5_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080404c0 0c080000
 
-@ Located in switchD_0803be70__caseD_3, called by main state machine FUN_0803be4c
+@ Located in switchD_0803be70__caseD_3, called by main state machine dispatch_duel_event_display_seq
 @ during the display sequence initialization and clear phase.
 @ First calls dispatch_card_display_op(op=0x46, player_id, 0, 0) to broadcast clear operation.
 @ Then loops over both players x 12 slots (index [0..0xb]): reads
@@ -472,7 +472,7 @@ tick_display_slot_flag_clear_seq:
     .hword 0x4645    @ 080404ca 4546
     push {r5,r6,r7}                          @ 080404cc e0b4
     sub sp,#0x4                              @ 080404ce 81b0
-    ldr r0, DAT_080405cc                     @ 080404d0 3e48
+    ldr r0, tick_slot_flag_clear_state_base  @ 080404d0 3e48
     ldrh r0,[r0,#0x0]                        @ 080404d2 0088
     lsrs r1,r0,#0xf    @ 080404d4 c10b
     movs r0,#0x46    @ 080404d6 4620
@@ -480,13 +480,13 @@ tick_display_slot_flag_clear_seq:
     movs r3,#0x0    @ 080404da 0023
     bl dispatch_card_display_op              @ 080404dc def7defb
     movs r4,#0x0    @ 080404e0 0024
-    ldr r3, PTR_gP1LifePoints_080405d0       @ 080404e2 3b4b
+    ldr r3, tick_slot_flag_clear_lp_base     @ 080404e2 3b4b
     movs r0,#0x1    @ 080404e4 0120
     .hword 0x4680    @ 080404e6 8046
-    ldr r7, DAT_080405d4                     @ 080404e8 3a4f
+    ldr r7, tick_slot_flag_clear_player_stride @ 080404e8 3a4f
     adds r6,r3,#0x0    @ 080404ea 1e1c
     adds r6,#0x40    @ 080404ec 4036
-    ldr r5, DAT_080405d8                     @ 080404ee 3a4d
+    ldr r5, tick_slot_flag_clear_oam_attr0_hidden @ 080404ee 3a4d
 LAB_080404f0:
     adds r0,r4,#0x0    @ 080404f0 201c
     .hword 0x4641    @ 080404f2 4146
@@ -505,20 +505,20 @@ LAB_080404fc:
     adds r4,#0x1    @ 0804050a 0134
     cmp r4,#0x1                              @ 0804050c 012c
     ble LAB_080404f0                         @ 0804050e efdd
-    ldr r4, DAT_080405dc                     @ 08040510 324c
+    ldr r4, tick_slot_flag_clear_effect_zone_bitmask_off @ 08040510 324c
     adds r1,r3,r4    @ 08040512 1919
     ldrh r0,[r1,#0x0]                        @ 08040514 0888
     str r0,[r1,#0x0]                         @ 08040516 0860
     movs r4,#0x0    @ 08040518 0024
     movs r5,#0x1    @ 0804051a 0125
     .hword 0x46a9    @ 0804051c a946
-    ldr r7, DAT_080405d4                     @ 0804051e 2d4f
+    ldr r7, tick_slot_flag_clear_player_stride @ 0804051e 2d4f
     .hword 0x46a8    @ 08040520 a846
     .hword 0x46bc    @ 08040522 bc46
-    ldr r0, DAT_080405e0                     @ 08040524 2e48
+    ldr r0, tick_slot_flag_clear_hand_face_off @ 08040524 2e48
     adds r0,r3,r0    @ 08040526 1818
     str r0,[sp,#0x0]                         @ 08040528 0090
-    ldr r1, DAT_080405e4                     @ 0804052a 2e49
+    ldr r1, tick_slot_flag_clear_alth_face_off @ 0804052a 2e49
     adds r1,r1,r3    @ 0804052c c918
     .hword 0x468a    @ 0804052e 8a46
 LAB_08040530:
@@ -527,7 +527,7 @@ LAB_08040530:
     .hword 0x464b    @ 08040534 4b46
     ands r0,r3    @ 08040536 1840
     muls r0,r7    @ 08040538 7843
-    ldr r5, DAT_080405e8                     @ 0804053a 2b4d
+    ldr r5, tick_slot_flag_clear_hand_cnt    @ 0804053a 2b4d
     adds r0,r0,r5    @ 0804053c 4019
     ldr r0,[r0,#0x0]                         @ 0804053e 0068
     adds r6,r4,#0x1    @ 08040540 661c
@@ -538,8 +538,8 @@ LAB_08040530:
     ands r0,r1    @ 0804054a 0840
     .hword 0x4661    @ 0804054c 6146
     muls r1,r0    @ 0804054e 4143
-    ldr r3, DAT_080405ec                     @ 08040550 264b
-    ldr r5, DAT_080405f0                     @ 08040552 274d
+    ldr r3, tick_slot_flag_clear_hand_arr    @ 08040550 264b
+    ldr r5, tick_slot_flag_clear_hand_neg_off @ 08040552 274d
     adds r0,r3,r5    @ 08040554 5819
     adds r3,r0,r1    @ 08040556 4318
     ldr r0,[sp,#0x0]                         @ 08040558 0098
@@ -560,7 +560,7 @@ LAB_0804056e:
     .hword 0x4649    @ 08040572 4946
     ands r0,r1    @ 08040574 0840
     muls r0,r7    @ 08040576 7843
-    ldr r3, DAT_080405f4                     @ 08040578 1e4b
+    ldr r3, tick_slot_flag_clear_alth_cnt    @ 08040578 1e4b
     adds r0,r0,r3    @ 0804057a c018
     ldr r0,[r0,#0x0]                         @ 0804057c 0068
     cmp r2,r0                                @ 0804057e 8242
@@ -569,8 +569,8 @@ LAB_0804056e:
     ands r4,r5    @ 08040584 2c40
     .hword 0x4661    @ 08040586 6146
     muls r1,r4    @ 08040588 6143
-    ldr r3, DAT_080405f8                     @ 0804058a 1b4b
-    ldr r4, DAT_080405fc                     @ 0804058c 1b4c
+    ldr r3, tick_slot_flag_clear_alth_arr    @ 0804058a 1b4b
+    ldr r4, tick_slot_flag_clear_alth_neg_off @ 0804058c 1b4c
     adds r0,r3,r4    @ 0804058e 1819
     adds r3,r0,r1    @ 08040590 4318
     add r1,r10                               @ 08040592 5144
@@ -589,8 +589,8 @@ LAB_080405a6:
     cmp r4,#0x1                              @ 080405a8 012c
     ble LAB_08040530                         @ 080405aa c1dd
     bl repair_slot_equip_chain_node_refs     @ 080405ac eef720fc
-    ldr r0, DAT_080405cc                     @ 080405b0 0648
-    ldr r5, DAT_08040600                     @ 080405b2 134d
+    ldr r0, tick_slot_flag_clear_state_base  @ 080405b0 0648
+    ldr r5, tick_slot_flag_clear_step_lock_off @ 080405b2 134d
     adds r0,r0,r5    @ 080405b4 4019
     movs r1,#0x0    @ 080405b6 0021
     str r1,[r0,#0x0]                         @ 080405b8 0160
@@ -603,41 +603,41 @@ LAB_080405a6:
     pop {r0}                                 @ 080405c6 01bc
     bx r0                                    @ 080405c8 0047
     .zero  0x2
-DAT_080405cc:
-    .word  0x0201bcc0                     @ 080405cc c0bc0102
-PTR_gP1LifePoints_080405d0:
-    .word  gP1LifePoints                  @ 080405d0 e0c40102
-DAT_080405d4:
-    .word  0x00000868                     @ 080405d4 68080000
-DAT_080405d8:
-    .word  0x0000ffff                     @ 080405d8 ffff0000
-DAT_080405dc:
-    .word  0x000010d0                     @ 080405dc d0100000
-DAT_080405e0:
-    .word  0x0000041a                     @ 080405e0 1a040000
-DAT_080405e4:
-    .word  0x000005d2                     @ 080405e4 d2050000
-DAT_080405e8:
-    .word  0x0201c4f4                     @ 080405e8 f4c40102
-DAT_080405ec:
-    .word  0x0201c8f8                     @ 080405ec f8c80102
-DAT_080405f0:
-    .word  0xfffffbfc                     @ 080405f0 fcfbffff
-DAT_080405f4:
-    .word  0x0201c4fc                     @ 080405f4 fcc40102
-DAT_080405f8:
-    .word  0x0201cab0                     @ 080405f8 b0ca0102
-DAT_080405fc:
-    .word  0xfffffa4c                     @ 080405fc 4cfaffff
-DAT_08040600:
-    .word  0x0000080c                     @ 08040600 0c080000
+tick_slot_flag_clear_state_base:
+    .word  gDuelDisplaySeqState           @ 080405cc c0bc0102
+tick_slot_flag_clear_lp_base:
+    .word  gP1LifePoints                  @ 080405d0 e0c40102  gP1LifePoints base ptr for tick_display_slot_flag_clear_seq
+tick_slot_flag_clear_player_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080405d4 68080000
+tick_slot_flag_clear_oam_attr0_hidden:
+    .word  OAM_ATTR0_HIDDEN               @ 080405d8 ffff0000  AND mask clears low-16 bits (OAM attr0 hidden pattern)
+tick_slot_flag_clear_effect_zone_bitmask_off:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 080405dc d0100000  gP1LifePoints+0x10d0: effect zone bitmask field
+tick_slot_flag_clear_hand_face_off:
+    .word  HAND_SLOT_FACE_ARRAY_OFF       @ 080405e0 1a040000  gP1LifePoints+0x41a = gP1HandSlotArray+2: face-status byte-2
+tick_slot_flag_clear_alth_face_off:
+    .word  ALT_HAND_SLOT_FACE_ARRAY_OFF   @ 080405e4 d2050000  gP1LifePoints+0x5d2 = gP1AltHandSlotArray+2: face-status byte-2 (alt hand)
+tick_slot_flag_clear_hand_cnt:
+    .word  gP1HandCountBase               @ 080405e8 f4c40102
+tick_slot_flag_clear_hand_arr:
+    .word  gP1HandSlotArray               @ 080405ec f8c80102
+tick_slot_flag_clear_hand_neg_off:
+    .word  HAND_ARRAY_TO_COUNT_NEG_OFF    @ 080405f0 fcfbffff  negative offset: gP1HandSlotArray -> gP1HandCountBase
+tick_slot_flag_clear_alth_cnt:
+    .word  gP1AltHandCountBase            @ 080405f4 fcc40102
+tick_slot_flag_clear_alth_arr:
+    .word  gP1AltHandSlotArray            @ 080405f8 b0ca0102
+tick_slot_flag_clear_alth_neg_off:
+    .word  ALT_HAND_ARRAY_TO_COUNT_NEG_OFF @ 080405fc 4cfaffff  negative offset: gP1AltHandSlotArray -> gP1AltHandCountBase
+tick_slot_flag_clear_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040600 0c080000
 
-@ Called by FUN_0803be4c (main duel_field dispatcher). Reads current display sequence counter from EWRAM 0x0201bcc0+0x810 (r0), compares with limit at [0x0201bcc0+0x2] (r3): if below limit increments and writes back; if at or above limit clears 0x0201bcc0+0x80c (resets sequence). ~10 instructions; card display sequence state machine step function.
+@ Called by dispatch_duel_event_display_seq (main duel_field dispatcher). Reads current display sequence counter from EWRAM 0x0201bcc0+0x810 (r0), compares with limit at [0x0201bcc0+0x2] (r3): if below limit increments and writes back; if at or above limit clears 0x0201bcc0+0x80c (resets sequence). ~10 instructions; card display sequence state machine step function.
 @ 
 @ Constants: card_display_state_base=0x0201bcc0 (DAT_0804062c), counter_offset=0x810 (0x81*0x10=0x810), limit_offset=0x2, reset_offset=0x80c (DAT_08040630=0x80c).
 advance_card_display_seq_counter:
     push {r4,lr}                             @ 08040604 10b5
-    ldr r4, DAT_0804062c                     @ 08040606 094c
+    ldr r4, adv_cdseq_ctr_state_base         @ 08040606 094c
     movs r0,#0x81    @ 08040608 8120
     lsls r0,r0,#0x4    @ 0804060a 0001
     adds r2,r4,r0    @ 0804060c 2218
@@ -648,7 +648,7 @@ advance_card_display_seq_counter:
     str r0,[r2,#0x0]                         @ 08040616 1060
     cmp r1,r3                                @ 08040618 9942
     bcc LAB_08040624                         @ 0804061a 03d3
-    ldr r0, DAT_08040630                     @ 0804061c 0448
+    ldr r0, adv_cdseq_ctr_step_lock_off      @ 0804061c 0448
     adds r1,r4,r0    @ 0804061e 2118
     movs r0,#0x0    @ 08040620 0020
     str r0,[r1,#0x0]                         @ 08040622 0860
@@ -657,10 +657,10 @@ LAB_08040624:
     pop {r0}                                 @ 08040626 01bc
     bx r0                                    @ 08040628 0047
     .zero  0x2
-DAT_0804062c:
-    .word  0x0201bcc0                     @ 0804062c c0bc0102
-DAT_08040630:
-    .word  0x0000080c                     @ 08040630 0c080000
+adv_cdseq_ctr_state_base:
+    .word  gDuelDisplaySeqState           @ 0804062c c0bc0102
+adv_cdseq_ctr_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040630 0c080000
 
 @ Called by duel_field/card_frame scene main (0x0803be4c). Reads 0x0201bcc0 context:
 @ slot_type (halfword[2]), flag (halfword[4]).
@@ -671,28 +671,28 @@ DAT_08040630:
 @ Side effects: [gP1LifePoints+0x10d0] bit(slot_type) set or cleared; op 0x24 triggered; state reset.
 set_slot_facedown_bit_by_flag:
     push {lr}                                @ 08040634 00b5
-    ldr r0, DAT_08040650                     @ 08040636 0648
+    ldr r0, set_slot_fd_bit_state_base       @ 08040636 0648
     ldrh r3,[r0,#0x2]                        @ 08040638 4388
     ldrh r0,[r0,#0x4]                        @ 0804063a 8088
     cmp r0,#0x0                              @ 0804063c 0028
     beq LAB_0804065c                         @ 0804063e 0dd0
-    ldr r2, PTR_gP1LifePoints_08040654       @ 08040640 044a
-    ldr r0, DAT_08040658                     @ 08040642 0548
+    ldr r2, set_slot_fd_bit_lp_base          @ 08040640 044a
+    ldr r0, set_slot_fd_bit_effect_zone_bitmask_off @ 08040642 0548
     adds r2,r2,r0    @ 08040644 1218
     movs r1,#0x1    @ 08040646 0121
     lsls r1,r3    @ 08040648 9940
     ldr r0,[r2,#0x0]                         @ 0804064a 1068
     orrs r0,r1    @ 0804064c 0843
     b LAB_0804066a                           @ 0804064e 0ce0
-DAT_08040650:
-    .word  0x0201bcc0                     @ 08040650 c0bc0102
-PTR_gP1LifePoints_08040654:
-    .word  gP1LifePoints                  @ 08040654 e0c40102
-DAT_08040658:
-    .word  0x000010d0                     @ 08040658 d0100000
+set_slot_fd_bit_state_base:
+    .word  gDuelDisplaySeqState           @ 08040650 c0bc0102
+set_slot_fd_bit_lp_base:
+    .word  gP1LifePoints                  @ 08040654 e0c40102  gP1LifePoints base ptr for set_slot_facedown_bit_by_flag (pool a)
+set_slot_fd_bit_effect_zone_bitmask_off:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 08040658 d0100000
 LAB_0804065c:
-    ldr r2, PTR_gP1LifePoints_08040688       @ 0804065c 0a4a
-    ldr r1, DAT_0804068c                     @ 0804065e 0b49
+    ldr r2, set_slot_fd_bit_lp_base_b        @ 0804065c 0a4a
+    ldr r1, apply_card_flags_bitmap_effect_zone_bitmask_off @ 0804065e 0b49
     adds r2,r2,r1    @ 08040660 5218
     movs r1,#0x1    @ 08040662 0121
     lsls r1,r3    @ 08040664 9940
@@ -705,44 +705,44 @@ LAB_0804066a:
     movs r2,#0x0    @ 08040670 0022
     movs r3,#0x0    @ 08040672 0023
     bl dispatch_card_display_op              @ 08040674 def712fb
-    ldr r0, DAT_08040690                     @ 08040678 0548
-    ldr r1, DAT_08040694                     @ 0804067a 0649
+    ldr r0, set_slot_fd_bit_state_base_b     @ 08040678 0548
+    ldr r1, set_slot_fd_bit_step_lock_off    @ 0804067a 0649
     adds r0,r0,r1    @ 0804067c 4018
     movs r1,#0x0    @ 0804067e 0021
     str r1,[r0,#0x0]                         @ 08040680 0160
     pop {r0}                                 @ 08040682 01bc
     bx r0                                    @ 08040684 0047
     .zero  0x2
-PTR_gP1LifePoints_08040688:
-    .word  gP1LifePoints                  @ 08040688 e0c40102
-DAT_0804068c:
-    .word  0x000010d0                     @ 0804068c d0100000
-DAT_08040690:
-    .word  0x0201bcc0                     @ 08040690 c0bc0102
-DAT_08040694:
-    .word  0x0000080c                     @ 08040694 0c080000
+set_slot_fd_bit_lp_base_b:
+    .word  gP1LifePoints                  @ 08040688 e0c40102  gP1LifePoints base ptr for set_slot_facedown_bit_by_flag (pool b)
+apply_card_flags_bitmap_effect_zone_bitmask_off:
+    .word  EFFECT_ZONE_BITMASK_OFF        @ 0804068c d0100000
+set_slot_fd_bit_state_base_b:
+    .word  gDuelDisplaySeqState           @ 08040690 c0bc0102
+set_slot_fd_bit_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040694 0c080000
 
 @ Reads card flags from current state struct and OR-merges them into the player zone bitmap slot.
 @ Loads state base from DAT_080406c4; reads hword[+0] bit15 -> r2=player_id,
 @ hword[+2] -> r4=card_flags, hword[+4] -> extra_flags.
 @ If extra_flags == 0 skips. Otherwise: computes gP1LP + player_id*0x868 + 0x11c (=0x8e<<1)
 @ zone bitmap base; reads [bitmap_base + player_offset], ORs card_flags<<1, writes back.
-@ Called by FUN_0803be4c (main state machine) each frame to merge card flags into zone bitmap.
+@ Called by dispatch_duel_event_display_seq (main state machine) each frame to merge card flags into zone bitmap.
 @ Returns void (via b LAB_080406e8).
 @ Constants: player_stride=0x868; zone_bitmap_base_offset=0x11c (0x8e<<1).
 apply_card_flags_to_zone_bitmap:
     push {r4,lr}                             @ 08040698 10b5
-    ldr r0, DAT_080406c4                     @ 0804069a 0a48
+    ldr r0, apply_card_flags_bitmap_state_base @ 0804069a 0a48
     ldrh r1,[r0,#0x0]                        @ 0804069c 0188
     lsrs r2,r1,#0xf    @ 0804069e ca0b
     ldrh r4,[r0,#0x2]                        @ 080406a0 4488
     ldrh r0,[r0,#0x4]                        @ 080406a2 8088
     cmp r0,#0x0                              @ 080406a4 0028
     beq LAB_080406d0                         @ 080406a6 13d0
-    ldr r3, PTR_gP1LifePoints_080406c8       @ 080406a8 074b
+    ldr r3, apply_card_flags_bitmap_lp_base  @ 080406a8 074b
     movs r1,#0x1    @ 080406aa 0121
     ands r2,r1    @ 080406ac 0a40
-    ldr r0, DAT_080406cc                     @ 080406ae 0748
+    ldr r0, apply_card_flags_bitmap_player_stride_b @ 080406ae 0748
     muls r2,r0    @ 080406b0 4243
     movs r0,#0x8e    @ 080406b2 8e20
     lsls r0,r0,#0x1    @ 080406b4 4000
@@ -753,17 +753,17 @@ apply_card_flags_to_zone_bitmap:
     orrs r0,r1    @ 080406be 0843
     b LAB_080406e8                           @ 080406c0 12e0
     .zero  0x2
-DAT_080406c4:
-    .word  0x0201bcc0                     @ 080406c4 c0bc0102
-PTR_gP1LifePoints_080406c8:
-    .word  gP1LifePoints                  @ 080406c8 e0c40102
-DAT_080406cc:
-    .word  0x00000868                     @ 080406cc 68080000
+apply_card_flags_bitmap_state_base:
+    .word  gDuelDisplaySeqState           @ 080406c4 c0bc0102
+apply_card_flags_bitmap_lp_base:
+    .word  gP1LifePoints                  @ 080406c8 e0c40102  gP1LifePoints base ptr for apply_card_flags_to_zone_bitmap (pool a)
+apply_card_flags_bitmap_player_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 080406cc 68080000
 LAB_080406d0:
-    ldr r3, PTR_gP1LifePoints_08040708       @ 080406d0 0d4b
+    ldr r3, apply_card_flags_bitmap_lp_base_b @ 080406d0 0d4b
     movs r1,#0x1    @ 080406d2 0121
     ands r2,r1    @ 080406d4 0a40
-    ldr r0, DAT_0804070c                     @ 080406d6 0d48
+    ldr r0, apply_card_flags_bitmap_player_stride_a @ 080406d6 0d48
     muls r2,r0    @ 080406d8 4243
     movs r0,#0x8e    @ 080406da 8e20
     lsls r0,r0,#0x1    @ 080406dc 4000
@@ -779,8 +779,8 @@ LAB_080406e8:
     movs r2,#0x0    @ 080406ee 0022
     movs r3,#0x0    @ 080406f0 0023
     bl dispatch_card_display_op              @ 080406f2 def7d3fa
-    ldr r0, DAT_08040710                     @ 080406f6 0648
-    ldr r1, DAT_08040714                     @ 080406f8 0649
+    ldr r0, apply_card_flags_bitmap_state_base_b @ 080406f6 0648
+    ldr r1, apply_card_flags_bitmap_step_lock_off @ 080406f8 0649
     adds r0,r0,r1    @ 080406fa 4018
     movs r1,#0x0    @ 080406fc 0021
     str r1,[r0,#0x0]                         @ 080406fe 0160
@@ -788,23 +788,23 @@ LAB_080406e8:
     pop {r0}                                 @ 08040702 01bc
     bx r0                                    @ 08040704 0047
     .zero  0x2
-PTR_gP1LifePoints_08040708:
-    .word  gP1LifePoints                  @ 08040708 e0c40102
-DAT_0804070c:
-    .word  0x00000868                     @ 0804070c 68080000
-DAT_08040710:
-    .word  0x0201bcc0                     @ 08040710 c0bc0102
-DAT_08040714:
-    .word  0x0000080c                     @ 08040714 0c080000
+apply_card_flags_bitmap_lp_base_b:
+    .word  gP1LifePoints                  @ 08040708 e0c40102  gP1LifePoints base ptr for apply_card_flags_to_zone_bitmap (pool b)
+apply_card_flags_bitmap_player_stride_a:
+    .word  PLAYER_BLOCK_STRIDE            @ 0804070c 68080000
+apply_card_flags_bitmap_state_base_b:
+    .word  gDuelDisplaySeqState           @ 08040710 c0bc0102
+apply_card_flags_bitmap_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040714 0c080000
 
-@ Triggered by FUN_0803be4c (duel event display hub) at case 0x2a. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r0), hword[+2]=slot_type (r1), hword[+4]=slot_idx (r2), hword[+6]=flags (r3).
+@ Triggered by dispatch_duel_event_display_seq (duel event display hub) at case 0x2a. Reads 0x0201bcc0 context: hword[0] bit15=player_id (r0), hword[+2]=slot_type (r1), hword[+4]=slot_idx (r2), hword[+6]=flags (r3).
 @ Immediately calls write_field_slot_bit_by_player(r0=player_id, r1=slot_type, r2=slot_idx, r3=flags) to write field slot bit flags. Then calls dispatch_card_display_op(r0=0x24, r1=0, r2=0, r3=0) to notify display layer. Finally clears [base+0x80c] and returns via pop {r0}; bx r0. No step state machine; single-shot execution.
 @ Side effects: write_field_slot_bit_by_player writes field bitmap (slot bit); [0x0201bcc0+0x80c]:=0 (resets state flag).
 @ 
 @ Constants: DISPLAY_OP=0x24, STATE_FLAG_OFFSET=0x80c.
 commit_field_slot_bit_with_display_op24:
     push {r4,lr}                             @ 08040718 10b5
-    ldr r4, DAT_08040744                     @ 0804071a 0a4c
+    ldr r4, commit_fslot_bit_disp24_state_base @ 0804071a 0a4c
     ldrh r1,[r4,#0x0]                        @ 0804071c 2188
     lsrs r0,r1,#0xf    @ 0804071e c80b
     ldrh r1,[r4,#0x2]                        @ 08040720 6188
@@ -816,19 +816,19 @@ commit_field_slot_bit_with_display_op24:
     movs r2,#0x0    @ 0804072e 0022
     movs r3,#0x0    @ 08040730 0023
     bl dispatch_card_display_op              @ 08040732 def7b3fa
-    ldr r0, DAT_08040748                     @ 08040736 0448
+    ldr r0, commit_fslot_bit_disp24_step_lock_off @ 08040736 0448
     adds r4,r4,r0    @ 08040738 2418
     movs r0,#0x0    @ 0804073a 0020
     str r0,[r4,#0x0]                         @ 0804073c 2060
     pop {r4}                                 @ 0804073e 10bc
     pop {r0}                                 @ 08040740 01bc
     bx r0                                    @ 08040742 0047
-DAT_08040744:
-    .word  0x0201bcc0                     @ 08040744 c0bc0102
-DAT_08040748:
-    .word  0x0000080c                     @ 08040748 0c080000
+commit_fslot_bit_disp24_state_base:
+    .word  gDuelDisplaySeqState           @ 08040744 c0bc0102
+commit_fslot_bit_disp24_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 08040748 0c080000
 
-@ Called by FUN_0803be4c (duel event dispatcher) caseD_14 (op=0x14). Reads EWRAM 0x0201bcc0:
+@ Called by dispatch_duel_event_display_seq (duel event dispatcher) caseD_14 (op=0x14). Reads EWRAM 0x0201bcc0:
 @ player_id (halfword[+0] bit15), card_slot_idx ([+2]). Calls classify_card_effect_category
 @ to get current card effect category, writes result to gP1LifePoints+0x10d8 (effect category
 @ cache word near player LP). If step lock [0x0201bcc0+0x810]=0, calls dispatch_card_display_op
@@ -842,12 +842,12 @@ DAT_08040748:
 @   EFFECT_CATEGORY_CACHE=gP1LifePoints+0x10d8
 tick_card_effect_category_display_seq:
     push {r4,r5,lr}                          @ 0804074c 30b5
-    ldr r5, DAT_08040780                     @ 0804074e 0c4d
+    ldr r5, tick_card_effect_cat_state_base  @ 0804074e 0c4d
     ldrh r4,[r5,#0x2]                        @ 08040750 6c88
     adds r0,r4,#0x0    @ 08040752 201c
     bl classify_card_effect_category         @ 08040754 f1f700fe
-    ldr r1, PTR_gP1LifePoints_08040784       @ 08040758 0a49
-    ldr r2, DAT_08040788                     @ 0804075a 0b4a
+    ldr r1, tick_card_effect_cat_lp_base     @ 08040758 0a49
+    ldr r2, tick_card_effect_cat_active_cat_off @ 0804075a 0b4a
     adds r1,r1,r2    @ 0804075c 8918
     str r0,[r1,#0x0]                         @ 0804075e 0860
     movs r0,#0x81    @ 08040760 8120
@@ -865,12 +865,12 @@ tick_card_effect_category_display_seq:
     bl dispatch_card_display_op              @ 08040778 def790fa
     b LAB_080407aa                           @ 0804077c 15e0
     .zero  0x2
-DAT_08040780:
-    .word  0x0201bcc0                     @ 08040780 c0bc0102
-PTR_gP1LifePoints_08040784:
-    .word  gP1LifePoints                  @ 08040784 e0c40102
-DAT_08040788:
-    .word  0x000010d8                     @ 08040788 d8100000
+tick_card_effect_cat_state_base:
+    .word  gDuelDisplaySeqState           @ 08040780 c0bc0102
+tick_card_effect_cat_lp_base:
+    .word  gP1LifePoints                  @ 08040784 e0c40102  gP1LifePoints base ptr for tick_card_effect_category_display_seq
+tick_card_effect_cat_active_cat_off:
+    .word  ACTIVE_EFFECT_CATEGORY_OFF     @ 08040788 d8100000  gP1LifePoints+0x10d8: active effect category field
 LAB_0804078c:
     movs r0,#0x6    @ 0804078c 0620
     bl play_ui_effect                        @ 0804078e def701fc
@@ -882,21 +882,21 @@ LAB_0804078c:
     movs r2,#0x0    @ 0804079c 0022
     movs r3,#0x0    @ 0804079e 0023
     bl dispatch_card_display_op              @ 080407a0 def77cfa
-    ldr r1, DAT_080407b0                     @ 080407a4 0249
+    ldr r1, tick_card_effect_cat_step_lock_off @ 080407a4 0249
     adds r0,r5,r1    @ 080407a6 6818
     str r4,[r0,#0x0]                         @ 080407a8 0460
 LAB_080407aa:
     pop {r4,r5}                              @ 080407aa 30bc
     pop {r0}                                 @ 080407ac 01bc
     bx r0                                    @ 080407ae 0047
-DAT_080407b0:
-    .word  0x0000080c                     @ 080407b0 0c080000
+tick_card_effect_cat_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080407b0 0c080000
 
 @ Called by dispatch_duel_event_display_seq (event_code=0x61). Two-phase state machine for op=0x40 display sequence. Reads DISPLAY_STATE_BASE=0x0201bcc0: player_id (bit15), step counter at [base+0x810]. Step 0: calls dispatch_card_display_op(op=0x40, player_id, 0, 0), increments step. Step !=0: calls play_ui_effect(0x40); if done (returns 0) clears [base+0x80c]:=0. Standard dual-step tick pattern, no extra state writes.
 @ Constants: DISPLAY_STATE_BASE=0x0201bcc0 (DAT_080407dc); STEP_COUNTER_OFFSET=0x810 (0x81<<4); STATE_FIELD_OFFSET=0x80c (DAT_080407f8); OP_CODE=0x40.
 tick_display_op40_seq:
     push {r4,r5,lr}                          @ 080407b4 30b5
-    ldr r5, DAT_080407dc                     @ 080407b6 094d
+    ldr r5, tick_disp_op40_state_base        @ 080407b6 094d
     ldrh r0,[r5,#0x0]                        @ 080407b8 2888
     lsrs r1,r0,#0xf    @ 080407ba c10b
     movs r2,#0x81    @ 080407bc 8122
@@ -914,23 +914,23 @@ tick_display_op40_seq:
     str r0,[r4,#0x0]                         @ 080407d6 2060
     b LAB_080407f2                           @ 080407d8 0be0
     .zero  0x2
-DAT_080407dc:
-    .word  0x0201bcc0                     @ 080407dc c0bc0102
+tick_disp_op40_state_base:
+    .word  gDuelDisplaySeqState           @ 080407dc c0bc0102
 LAB_080407e0:
     movs r0,#0x40    @ 080407e0 4020
     bl play_ui_effect                        @ 080407e2 def7d7fb
     adds r1,r0,#0x0    @ 080407e6 011c
     cmp r1,#0x0                              @ 080407e8 0029
     bne LAB_080407f2                         @ 080407ea 02d1
-    ldr r2, DAT_080407f8                     @ 080407ec 024a
+    ldr r2, tick_disp_op40_step_lock_off     @ 080407ec 024a
     adds r0,r5,r2    @ 080407ee a818
     str r1,[r0,#0x0]                         @ 080407f0 0160
 LAB_080407f2:
     pop {r4,r5}                              @ 080407f2 30bc
     pop {r0}                                 @ 080407f4 01bc
     bx r0                                    @ 080407f6 0047
-DAT_080407f8:
-    .word  0x0000080c                     @ 080407f8 0c080000
+tick_disp_op40_step_lock_off:
+    .word  DISPLAY_SEQ_STEP_LOCK_OFF      @ 080407f8 0c080000
 
 @ Called by duel_field/card_data scene main (0x0803be4c) to drive the normal-summon card display
 @ animation two-phase state machine. Reads 0x0201bcc0 context for player_bit/slot_idx/card_type.
