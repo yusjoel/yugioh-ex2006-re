@@ -479,3 +479,79 @@
 .equ WATAPON_CID,                    0x000017cc  @ Watapon (pw=87774234; card-stats.s card_1626 slot=0x17CC); enqueue_hand_sprite_by_zone_set_code Watapon-path; 10 raw ROM refs
 .equ WATAPON_EQUIP_ACTIVATION_MASK,  0x34500000  @ activation flag mask ORed into attr2 arg of apply_equip_activation_with_id_lookup for Watapon path in enqueue_hand_sprite_by_zone_set_code; 24 raw ROM refs
 .equ DARK_MIMIC_LV1_CID,             0x000017d5  @ Dark Mimic LV1 (pw=74713516; card-stats.s card_1635 slot=0x17D5); enqueue_equip_chain_sprite_attrs_for_slot card_type filter A; 16 raw ROM refs
+
+@ =============================================================================
+@ file 04 Seg-8a additions: card IDs for dispatch_card_effect_sprite_render_by_card_id BST
+@   + equip chain activation eligibility cluster (update_duel_field_slot_sprite_state etc.)
+@ Values confirmed via data/card-stats.s slot=0xXXXX pattern; 4 gap stubs (*_cid_* names).
+@ =============================================================================
+.equ SANGAN_CID,                       0x00000fd6  @ Sangan (pw=26202165; card-stats.s slot=0x0fd6)
+.equ upd_cid_10c6,                     0x000010c6  @ card gap; no card-stats entry; neutral name
+.equ BLACK_PENDANT_CID,                0x000010dd  @ Black Pendant (pw=65169794; card-stats.s slot=0x10dd)
+@ UMI_CARD_ID = 0x000010f4 already in card_info.inc -- REUSE
+.equ GODDESS_OF_WHIM_CID,              0x00001153  @ Goddess of Whim (pw=67959180; card-stats.s slot=0x1153)
+.equ COCKROACH_KNIGHT_CID,             0x00001185  @ Cockroach Knight (pw=33413638; card-stats.s slot=0x1185)
+.equ WITCH_OF_THE_BLACK_FOREST_CID,    0x000011e4  @ Witch of the Black Forest (pw=78010363; card-stats.s slot=0x11e4)
+.equ upd_cid_120e,                     0x0000120e  @ card gap; no card-stats entry; neutral name
+.equ JINZO_CID,                        0x00001296  @ Jinzo (pw=77585513; card-stats.s slot=0x1296)
+.equ SATELLITE_CANNON_CID,             0x000012ac  @ Satellite Cannon (pw=50400231; card-stats.s slot=0x12ac)
+.equ COPYCAT_CID,                      0x000012bb  @ Copycat (pw=26376390; card-stats.s slot=0x12bb)
+.equ GIANT_RAT_CID,                    0x00001333  @ Giant Rat (pw=97017120; card-stats.s slot=0x1333)
+.equ KARATE_MAN_CID,                   0x00001337  @ Karate Man (pw=23289281; card-stats.s slot=0x1337)
+.equ NIMBLE_MOMONGA_CID,               0x0000133a  @ Nimble Momonga (pw=22567609; card-stats.s slot=0x133a)
+.equ SHINING_ANGEL_CID,                0x0000133c  @ Shining Angel (pw=95956346; card-stats.s slot=0x133c)
+.equ MYSTIC_TOMATO_CID,                0x00001342  @ Mystic Tomato (pw=83011277; card-stats.s slot=0x1342)
+@ SPELL_ZONE_TARGET_CARD_ID = 0x00001368 already in card_info.inc -- REUSE
+.equ MUCUS_YOLK_CID,                   0x000013b2  @ Mucus Yolk (pw=70307656; card-stats.s slot=0x13b2)
+.equ upd_cid_13e9,                     0x000013e9  @ card gap; no card-stats entry; neutral name
+.equ TORNADO_WALL_CID,                 0x000013f7  @ Tornado Wall (pw=18605135; card-stats.s slot=0x13f7)
+@ ZOMBYRA_THE_DARK_CID = 0x0000147d already in card_info.inc -- REUSE
+.equ THE_EMPERORS_HOLIDAY_CID,         0x00001495  @ The Emperor's Holiday (pw=68400115; card-stats.s slot=0x1495)
+.equ AMAZONESS_CHAIN_MASTER_CID,       0x000014ab  @ Amazoness Chain Master (pw=29654737; card-stats.s slot=0x14ab)
+.equ AGIDO_CID,                        0x000014f6  @ Agido (pw=16135253; card-stats.s slot=0x14f6)
+.equ DARK_COFFIN_CID,                  0x00001544  @ Dark Coffin (pw=01804528; card-stats.s slot=0x1544)
+.equ LORD_POISON_CID,                  0x0000156d  @ Lord Poison (pw=40320754; card-stats.s slot=0x156d)
+.equ YOMI_SHIP_CID,                    0x00001591  @ Yomi Ship (pw=51534754; card-stats.s slot=0x1591)
+.equ COBRA_JAR_CID,                    0x00001595  @ Cobra Jar (pw=86801871; card-stats.s slot=0x1595)
+.equ GRANADORA_CID,                    0x0000163f  @ Granadora (pw=13944422; card-stats.s slot=0x163f)
+.equ OJAMA_TRIO_CID,                   0x0000166a  @ Ojama Trio (pw=29843091; card-stats.s slot=0x166a)
+.equ upd_cid_1672,                     0x00001672  @ card gap; no card-stats entry; neutral name
+.equ GREAT_MAJU_GARZETT_CID,           0x00001688  @ Great Maju Garzett (pw=47942531; card-stats.s slot=0x1688)
+.equ PANDEMONIUM_CID,                  0x0000169f  @ Pandemonium (pw=94585852; card-stats.s slot=0x169f)
+.equ SILPHEED_CID,                     0x000016c8  @ Silpheed (pw=73001017; card-stats.s slot=0x16c8)
+.equ FUHMA_SHURIKEN_CID,               0x000016cc  @ Fuhma Shuriken (pw=09373534; card-stats.s slot=0x16cc)
+.equ TOWER_OF_BABEL_CID,               0x000016de  @ Tower of Babel (pw=94256039; card-stats.s slot=0x16de)
+.equ BURNING_ALGAE_CID,                0x000016f5  @ Burning Algae (pw=41859700; card-stats.s slot=0x16f5)
+.equ EMES_THE_INFINITY_CID,            0x0000172b  @ Emes the Infinity (pw=43580269; card-stats.s slot=0x172b)
+.equ EMISSARY_OF_THE_AFTERLIFE_CID,    0x00001796  @ Emissary of the Afterlife (pw=75043725; card-stats.s slot=0x1796)
+.equ FAMILIAR_KNIGHT_CID,              0x000017c3  @ Familiar Knight (pw=89731911; card-stats.s slot=0x17c3)
+.equ MASKED_DRAGON_CID,                0x000017e6  @ Masked Dragon (pw=39191307; card-stats.s slot=0x17e6)
+.equ NINJITSU_ART_OF_DECOY_CID,        0x000017ff  @ Ninjitsu Art of Decoy (pw=89628781; card-stats.s slot=0x17ff)
+.equ SILENT_MAGICIAN_LV8_CID,          0x0000181a  @ Silent Magician LV8 (pw=72443568; card-stats.s slot=0x181a)
+@ RAGING_FLAME_SPRITE_CID = 0x0000182d already in card_info.inc -- REUSE
+.equ GAIA_SOUL_CID,                    0x00001835  @ Gaia Soul the Combustible Collective (pw=51355346; card-stats.s slot=0x1835)
+.equ MOKEY_MOKEY_KING_CID,             0x0000183d  @ Mokey Mokey King (pw=13803864; card-stats.s slot=0x183d)
+.equ NECKLACE_OF_COMMAND_CID,          0x00001841  @ Necklace of Command (pw=48576971; card-stats.s slot=0x1841)
+.equ XING_ZHEN_HU_CID,                 0x0000184a  @ Xing Zhen Hu (pw=76515293; card-stats.s slot=0x184a)
+.equ SACRED_PHOENIX_CID,               0x0000185c  @ Sacred Phoenix of Nephthys (pw=61441708; card-stats.s slot=0x185c)
+.equ MECHA_DOG_MARRON_CID,             0x00001869  @ Mecha-Dog Marron (pw=94667532; card-stats.s slot=0x1869)
+.equ FIREBIRD_CID,                     0x00001875  @ Firebird (pw=87473172; card-stats.s slot=0x1875)
+.equ CENTRIFUGAL_FIELD_CID,            0x0000187f  @ Centrifugal Field (pw=01801154; card-stats.s slot=0x187f)
+.equ MILLENNIUM_SCORPION_CID,          0x000018ae  @ Millennium Scorpion (pw=82482194; card-stats.s slot=0x18ae)
+.equ CRIOSPHINX_CID,                   0x000018b2  @ Criosphinx (pw=18654201; card-stats.s slot=0x18b2)
+.equ MEGAROCK_DRAGON_CID,              0x000018b4  @ Megarock Dragon (pw=71544954; card-stats.s slot=0x18b4)
+.equ DD_SURVIVOR_CID,                  0x000018bc  @ D.D. Survivor (pw=48092532; card-stats.s slot=0x18bc)
+.equ NITRO_UNIT_CID,                   0x000018d1  @ Nitro Unit (pw=23842445; card-stats.s slot=0x18d1)
+.equ KOZAKYS_SELF_DESTRUCT_CID,        0x000018d7  @ Kozaky's Self-Destruct Button (pw=21908319; card-stats.s slot=0x18d7)
+.equ UFOROID_CID,                      0x000018f4  @ UFOroid (pw=07602840; card-stats.s slot=0x18f4)
+.equ UFOROID_FIGHTER_CID,              0x000018fb  @ UFOroid Fighter (pw=32752319; card-stats.s slot=0x18fb)
+.equ GIANT_KOZAKY_CID,                 0x00001914  @ Giant Kozaky (pw=58185394; card-stats.s slot=0x1914)
+.equ OJAMAGIC_CID,                     0x00001946  @ Ojamagic (pw=24643836; card-stats.s slot=0x1946)
+.equ WHITE_HORNS_DRAGON_CID,           0x00001996  @ White Horns Dragon (pw=73891874; card-stats.s slot=0x1996)
+.equ RAVIEL_LORD_CID,                  0x000019a5  @ Raviel, Lord of Phantasms (pw=69890967; card-stats.s slot=0x19a5)
+.equ GOKIPON_CID,                      0x000019c5  @ Gokipon (pw=14472500; card-stats.s slot=0x19c5)
+.equ HELIOS_TRIS_MEGISTE_CID,          0x000019f8  @ Helios Tris Megiste (pw=17286057; card-stats.s slot=0x19f8)
+.equ VAMPIRE_LORD_CID,                 0x00001522  @ Vampire Lord (pw=53839837; card-stats.s slot=0x1522)
+.equ ROYAL_KEEPER_CID,                 0x00001527  @ Royal Keeper (pw=16509093; card-stats.s slot=0x1527)
+.equ EXARION_UNIVERSE_CID,             0x0000154c  @ Exarion Universe (pw=63749102; card-stats.s slot=0x154c)
+.equ MAJI_GIRE_PANDA_CID,              0x00001862  @ Maji-Gire Panda (pw=60102563; card-stats.s slot=0x1862)

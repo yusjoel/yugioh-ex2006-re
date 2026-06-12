@@ -263,3 +263,8 @@
 @ file 04 Seg-7 additions: equip multi-slot control word offset
 @ =============================================================================
 .equ EQUIP_MULTI_SLOT_CTL_OFF,      0x00001ce0  @ [gP1LifePoints+0x1ce0] equip multi-slot selection control word; enqueue_equip_multi_slot_marker_sprite reads display flags r7; computed as 0xe7<<5; 1 raw ROM ref
+
+@ =============================================================================
+@ file 04 Seg-8a additions: equip chain slot refs list terminator sentinel
+@ =============================================================================
+.equ EQUIP_CHAIN_SENTINEL,          0xffff0000  @ gEquipChainSlotRefs list terminator sentinel; cmp rval, EQUIP_CHAIN_SENTINEL; beq exit loop; 3 pool refs in Seg-8a

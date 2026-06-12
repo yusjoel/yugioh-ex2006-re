@@ -55,3 +55,15 @@
 .equ OAM_EQUIP_SLOT_SPRITE_P2,      0x00008029  @ OAM attr0 P2 for equip slot sprite (bit15+0x29; P1=0x8034); 5 slots in Seg-7; 121 raw ROM refs
 .equ OAM_MULTI_SLOT_MARKER_P2,      0x00008048  @ OAM attr0 P2 for multi-slot selection marker sprite (bit15+0x48; P1=0x48 inline); enqueue_equip_multi_slot_marker_sprite; 12 raw ROM refs
 .equ OAM_FIELD_SLOT_SPRITE_P2,      0x00008043  @ OAM attr0 P2 for duel field slot sprite (bit15+0x43; P1=0x43 inline); enqueue_field_slot_sprite_with_state_update; 35 raw ROM refs
+
+@ =============================================================================
+@ file 04 Seg-8a additions: xy-split / equip-set-slot / effect-card-slot sprite attr1 pairs
+@ bit15=H-flip = player-2 indicator; P1 variants encoded inline as imm (0x3a/0x3b/0x3c)
+@ =============================================================================
+.equ OAM_XY_SPLIT_SPRITE_P1,        0x0000003a  @ xy-split sprite OAM attr1; player 1 (no H-flip); inline imm
+.equ OAM_XY_SPLIT_SPRITE_P2,        0x0000803a  @ xy-split sprite OAM attr1; player 2 (bit15=H-flip); 2 pool refs in Seg-8a
+.equ OAM_EQUIP_SET_SLOT_P1,         0x0000003b  @ equip-set slot sprite OAM attr1; player 1; inline imm
+.equ OAM_EQUIP_SET_SLOT_P2,         0x0000803b  @ equip-set slot sprite OAM attr1; player 2; 2 pool refs in Seg-8a
+.equ OAM_EFFECT_CARD_SLOT_P1,       0x0000003c  @ effect-card slot sprite OAM attr1; player 1; inline imm
+.equ OAM_EFFECT_CARD_SLOT_P2,       0x0000803c  @ effect-card slot sprite OAM attr1; player 2; 4 pool refs in Seg-8a
+.equ EQUIP_PAIR_SPRITE_EXTRA,        0x00000101  @ equip pair sprite attr extra field: type=1, mode=1; r3 arg to enqueue_sprite_attr_record in enqueue_equip_card_sprite_attr_for_slot; 1 pool ref

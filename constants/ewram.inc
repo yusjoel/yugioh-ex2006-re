@@ -385,3 +385,9 @@
 @ =============================================================================
 .equ LP_DISCARD_ZONE_OFF,           0x000010dc  @ [gP1LifePoints+player*0x868+0x10dc] LP discard zone tracking field; tick_card_discard_display_seq stores zone_type here on seq completion; 11 ROM refs; 1 Seg-4 slot
 .equ gEquipChainEntryBase,          0x0201e288  @ EWRAM equip chain entry/depth base (3 ROM refs); tick_equip_attach_display_sequence iterates [0x0201e288+2*i] for chain node depth table
+
+@ =============================================================================
+@ file 04 Seg-8a additions: equip bitmap counter offset + equip zone count table
+@ =============================================================================
+.equ P1LP_EQUIP_BITMAP_CTR_OFF,     0x00001d3c  @ [gP1LP+player*PLAYER_BLOCK_STRIDE+0x1d3c] modulo-10 equip-slot bitmap anim frame counter; 6 ROM refs; update_duel_field_slot_sprite_state
+.equ gEquipZoneCountTable,          0x0201e1c8  @ equip zone count tracking table base (EWRAM); 55 ROM refs; apply_nitro_unit_equip_activation loop

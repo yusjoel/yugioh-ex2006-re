@@ -100,7 +100,8 @@
 | 5 | 0x4308c..0x4394c | 19 | 48 | — | ✅ | (see §四.4.05) |
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ✅ | (see §四.4.06) |
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ✅ | (see §四.4.07) |
-| 8 | 0x44e30..0x47990 | 19 | 275 | — | ⬜ | — |
+| 8a | 0x44e30..0x4640c | 9 | 143 | — | ✅ | (see §四.4.08a) |
+| 8b | 0x4640c..0x47990 | 10 | 132 | — | ⬜ | — |
 | 9 | 0x47990..0x47ec0 | 20 | 14 | — | ⬜ | — |
 | 10 | 0x47ec0..0x49014 | 19 | 112 | — | ⬜ | — |
 
@@ -395,6 +396,36 @@ enqueue_field_slot_sprite_with_state_update
 
 ---
 
+### 4.08a Seg-8a 完成记录 (0x08044e30..0x0804640c)
+
+**函数列表 (9)**:
+update_duel_field_slot_sprite_state / enqueue_sprite_attr_with_xy_split /
+enqueue_sprite_attr_with_shape / enqueue_equip_set_slot_sprite_by_zone_col /
+enqueue_effect_card_slot_sprite_attr / enqueue_equip_card_sprite_attr_for_slot /
+enqueue_effect_zone_pair_sprite_scan / apply_nitro_unit_equip_activation /
+dispatch_card_effect_sprite_render_by_card_id
+
+**符号化统计**: EQ=116 / REF=18 / RENAME=9 / FUNC_RENAME=0 / PLATE=6 fn (20 FUN_ tokens) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量**:
+- oam_attr.inc x7: OAM_XY_SPLIT_SPRITE_P1/P2 (0x3a/0x803a) + OAM_EQUIP_SET_SLOT_P1/P2 (0x3b/0x803b) + OAM_EFFECT_CARD_SLOT_P1/P2 (0x3c/0x803c) + EQUIP_PAIR_SPRITE_EXTRA (0x101)
+- ewram.inc x2: P1LP_EQUIP_BITMAP_CTR_OFF=0x1d3c + gEquipZoneCountTable=0x0201e1c8
+- duel_field.inc x1: EQUIP_CHAIN_SENTINEL=0xffff0000
+- card_info.inc x62: 56 named CIDs + PANDEMONIUM_CID (0x169f) + CENTRIFUGAL_FIELD_CID (0x187f) + 4 gap stubs (upd_cid_10c6/120e/13e9/1672); 4 REUSEs (UMI_CARD_ID/ZOMBYRA_THE_DARK_CID/RAGING_FLAME_SPRITE_CID/SPELL_ZONE_TARGET_CARD_ID)
+
+**REF highlights**: gDuelFieldSlots x6 + gDuelFieldSlots_p2_base x2 + gEquipChainSlotRefs x7 + gEquipZoneCountTable x1 + gEquipNodePool x1 + apply_nitro_unit_equip_activation+1 (THUMB fn-ptr) x1
+
+**PLATE**: 6 functions, 20 FUN_ tokens total; 0 WARN (all patterns found); 0 FUN_ remaining in lines 10822..13947
+
+**踩坑**: fn-ptr +1 再次需要补 (4 slots in asm/03: 0x37884/0x389dc/0x389f8/0x3aa74; zone_monster_field_bonus_table+7*16 at 0x08040ab4 in asm/04); 新增 THUMB fn-ptr 0x08045efc -> apply_nitro_unit_equip_activation+1 (Ghidra 导出偶地址需手补 +1)。Dry run: A=116 B=18 C=9 D=6 fails=0 (0 WARN). 补完后 SHA1 match.
+
+**落地后验收**:
+- plate FUN_ grep in Seg-8a [lines 10822..13947]: 0 hits
+- non-ASCII grep in Seg-8a range: 0 hits
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
 ## 五、批次路线图 (地址序, Seg-1..Seg-10)
 
 > 按 file 04 范围 `[0x0804020c, 0x08049014)` (193 named fn = 176 push-prologue + 17 leaf
@@ -411,7 +442,8 @@ enqueue_field_slot_sprite_with_state_update
 | Seg-5 | 0x4308c..0x4394c | 19 | 48 | — | equip chain entry reset / target slot resolve / chain-slot-scan dispatch + enqueue_sprite_attr 簇头 |
 | Seg-6 | 0x4394c..0x44674 | 20 | 69 | — | enqueue zone/equip slot sprite attr 簇 + scan_equip_chain_list + activation sprite render |
 | Seg-7 | 0x44674..0x44e30 | 19 | 35 | — | graveyard spell sprite + hand-card sprite + equip-zone sprite dispatch (banisher 系列) |
-| Seg-8 | 0x44e30..0x47990 | 19 | 275 | — | 重: update_duel_field_slot_sprite_state + dispatch_card_effect_sprite_render_by_card_id (大型 card_id 分发) + equip target bitmap 计算/查询簇 |
+| Seg-8a | 0x44e30..0x4640c | 9 | 143 | — | update_duel_field_slot_sprite_state + enqueue_sprite_attr_* 簇 + dispatch_card_effect_sprite_render_by_card_id 前半 ✅ |
+| Seg-8b | 0x4640c..0x47990 | 10 | 132 | — | dispatch_card_effect_sprite_render_by_card_id 后半 + equip target bitmap 计算/查询簇 |
 | Seg-9 | 0x47990..0x47ec0 | 20 | 14 | — | equip target bitmap zone-test/update 谓词小簇 (zone11/13/14/15 + cross-side flag) |
 | Seg-10 | 0x47ec0..0x49014 | 19 | 112 | — | render_slot_card_sprite 描述符渲染 + zone sprite effect dispatch + lp indicator + setup_equip_slot_sprite_attr_by_card (文件末) |
 
