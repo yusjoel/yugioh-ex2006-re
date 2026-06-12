@@ -102,7 +102,7 @@
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ✅ | (see §四.4.07) |
 | 8a | 0x44e30..0x4640c | 9 | 143 | — | ✅ | (see §四.4.08a) |
 | 8b | 0x4640c..0x47990 | 10 | 132 | — | ✅ | (see §四.4.08b) |
-| 9 | 0x47990..0x47ec0 | 20 | 14 | — | ⬜ | — |
+| 9 | 0x47990..0x47ec0 | 20 | 14 | — | ✅ | (see §四.4.09) |
 | 10 | 0x47ec0..0x49014 | 19 | 112 | — | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -462,6 +462,47 @@ enqueue_equip_slot_bitmap_update / test_equip_target_slot_in_bitmap
 - plate FUN_ grep in Seg-8b [lines 13947..16863]: 0 hits
 - non-ASCII grep in Seg-8b range: 0 hits
 - byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
+
+---
+
+### 4.09 Seg-9 完成记录 (0x08047990..0x08047ec0)
+
+**函数列表 (20)**:
+check_equip_slot_eligible_in_target_bitmap / update_equip_target_bitmap_by_card_type /
+update_equip_target_bitmap_zone14 / query_equip_target_bitmap_with_zone_struct /
+update_equip_target_bitmap_zone15 / render_equip_zone_bitmap_sprite_by_chain /
+forward_equip_bitmap_update_with_full_mask / test_equip_target_slot_zone11 /
+query_equip_zone_slot_target_bit / forward_equip_bitmap_update_zone11 /
+test_equip_target_slot_zone13 / test_equip_target_slot_zone13_crossside /
+update_equip_target_bitmap_zone_d_no_flag / reset_equip_slot_ctx_with_bitmap_update_zone_d /
+test_equip_target_zone13_with_slot_parity_flag / submit_equip_sprite_if_slot_eligible /
+submit_equip_sprite_samsara_zone_select / prepare_equip_slot_ctx_for_bitmap_update /
+test_equip_target_slot_zone14 / test_equip_target_slot_zone14_with_flags
+
+**符号化统计**: EQ=14 (0 new, 全复用) / REF=0 / RENAME=0 / PLATE=6 fn / carve=0 / disasm=0 / §5.1=0
+
+**新建常量**: 0 (全 7 个唯一值复用 ewram.inc + card_info.inc 已建常量)
+
+**PLATE 订正内容**:
+- update_equip_target_bitmap_by_card_type: FUN_0807a9c8 -> dispatch_equip_banisher_activation_by_state
+- update_equip_target_bitmap_zone14: FUN_08065698/FUN_0806a334/FUN_0806ecb0 -> 现名 (3 tokens)
+- update_equip_target_bitmap_zone15: FUN_080576b0 -> tick_equip_chain_sprite_and_spell_zone_seq
+- render_equip_zone_bitmap_sprite_by_chain: gDuelFieldSlots_A->gDuelFieldSlots / gDuelFieldSlots_B->gEquipNodePool / "CARD_ID_B=0x1814 (The All-Seeing White Tiger)"->"SILENT_SWORDSMAN_LV5_CID=0x1814"
+- test_equip_target_zone13_with_slot_parity_flag: gDuelFieldSlots_A -> gDuelFieldSlots
+- submit_equip_sprite_if_slot_eligible: DAT_08047d8c=0x14e2 -> SUPER_REJUVENATION_CID=0x14e2
+
+**落地后验收**:
+- plate FUN_ grep in Seg-9 [lines 16862..17597]: 0 hits
+- non-ASCII (CJK) grep in Seg-9 range: 0 hits
+- "All-Seeing White Tiger" grep in Seg-9 range: 0 hits
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**踩坑**: fn-ptr +1 再次补回 (0x37884/0x3aa74 check_level_conv_lab_node_match+1 in asm/03;
+0x389dc/0x389f8 check_card_is_amazoness_type+1 in asm/03;
+zone_monster_field_bonus_table+7*16 @ 0x08040ab4 in asm/04;
+apply_nitro_unit_equip_activation+1 @ 0x08045efc in asm/04;
+gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x080478f0 in asm/04).
+All 7 slots re-patched after re-export; SHA1 match restored.
 
 ---
 

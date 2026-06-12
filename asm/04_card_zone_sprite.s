@@ -13237,7 +13237,7 @@ dat_08045ef4_ptr:
 dat_08045ef8_cid:
     .word  NITRO_UNIT_CID                 @ 08045ef8 d1180000
 dat_08045efc_fnptr:
-    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408  THUMB fn-ptr (+1)
+    .word  apply_nitro_unit_equip_activation+1 @ 08045efc 31550408
 dat_08045f00_cid:
     .word  upd_cid_1672                   @ 08045f00 72160000  card gap; no card-stats entry
 dat_08045f04_cid:
@@ -16764,7 +16764,7 @@ LAB_080478d4:
     pop {r1}                                 @ 080478ec 02bc
     bx r1                                    @ 080478ee 0847
 upd_equip_bitmap_effect_zone:
-    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102  0x0201c510+0x10a4=0x0201d5b4
+    .word  gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 080478f0 b4d50102
 PTR_gP1LifePoints_080478f4:
     .word  gP1LifePoints                  @ 080478f4 e0c40102
 upd_equip_bitmap_ctrl_off_b:
@@ -16887,7 +16887,7 @@ LAB_080479be:
     pop {r1}                                 @ 080479c0 02bc
     bx r1                                    @ 080479c2 0847
 
-@ Called by FUN_0807a9c8 (indeg=1). Updates equip target bitmap selecting zone_flags by card type (spell vs non-spell). Computes slot_bit=1<<(r1*0x10+r2). Reads gDuelFieldSlots[r2*20+player*0x868] card_word, extracts card_id (lsls/lsrs#0x13). Calls check_card_type_is_spell(card_id): if spell -> zone_flags=0xd, else zone_flags=0xc. Calls update_equip_target_bitmap_for_field(player_id, slot_bit, zone_flags, side_flags=2). Returns 1 if bitmap & slot_bit != 0, else 0.
+@ Called by dispatch_equip_banisher_activation_by_state (indeg=1). Updates equip target bitmap selecting zone_flags by card type (spell vs non-spell). Computes slot_bit=1<<(r1*0x10+r2). Reads gDuelFieldSlots[r2*20+player*0x868] card_word, extracts card_id (lsls/lsrs#0x13). Calls check_card_type_is_spell(card_id): if spell -> zone_flags=0xd, else zone_flags=0xc. Calls update_equip_target_bitmap_for_field(player_id, slot_bit, zone_flags, side_flags=2). Returns 1 if bitmap & slot_bit != 0, else 0.
 @ 
 @ Params: r0=u8 player_id [0..1]; r1=u8 player_ref [0..1]; r2=u8 slot_idx [0..9]
 @ Returns: r0=u32 bool (1 if slot_bit in bitmap; 0 otherwise)
@@ -16905,10 +16905,10 @@ update_equip_target_bitmap_by_card_type:
     lsls r0,r2,#0x2    @ 080479d4 9000
     adds r0,r0,r2    @ 080479d6 8018
     lsls r0,r0,#0x2    @ 080479d8 8000
-    ldr r2, DAT_08047a0c                     @ 080479da 0c4a
+    ldr r2, update_equip_bitmap_by_cardtype_stride @ 080479da 0c4a
     muls r1,r2    @ 080479dc 5143
     adds r0,r0,r1    @ 080479de 4018
-    ldr r1, DAT_08047a10                     @ 080479e0 0b49
+    ldr r1, update_equip_bitmap_by_cardtype_slots @ 080479e0 0b49
     adds r0,r0,r1    @ 080479e2 4018
     ldr r0,[r0,#0x0]                         @ 080479e4 0068
     lsls r0,r0,#0x13    @ 080479e6 c004
@@ -16930,12 +16930,12 @@ LAB_08047a06:
     pop {r4,r5}                              @ 08047a06 30bc
     pop {r1}                                 @ 08047a08 02bc
     bx r1                                    @ 08047a0a 0847
-DAT_08047a0c:
-    .word  0x00000868                     @ 08047a0c 68080000
-DAT_08047a10:
-    .word  0x0201c510                     @ 08047a10 10c50102
+update_equip_bitmap_by_cardtype_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08047a0c 68080000  PLAYER_BLOCK_STRIDE: 0x868 bytes per player block
+update_equip_bitmap_by_cardtype_slots:
+    .word  gDuelFieldSlots                @ 08047a10 10c50102
 
-@ Called by 5 duel_field paths (including FUN_08065698, FUN_0806a334, FUN_0806ecb0). Updates equip target bitmap with fixed zone_flags=0xe (14) and side_flags=0xa. Computes slot_bit=1<<(r1*0x10+r2). Calls update_equip_target_bitmap_for_field(player_id=r0, slot_bit, zone_flags=0xe, side_flags=0xa). Returns 1 if bitmap & slot_bit != 0, else 0. Sibling to update_equip_target_bitmap_zone15 (0x08047a80) which uses zone_flags=0xf.
+@ Called by 5 duel_field paths (including set_equip_partner_flags_with_bitmap_refresh, dispatch_equip_slot_sprite_by_field6_range_and_zone14, apply_equip_activation_if_zone_entry_vacant). Updates equip target bitmap with fixed zone_flags=0xe (14) and side_flags=0xa. Computes slot_bit=1<<(r1*0x10+r2). Calls update_equip_target_bitmap_for_field(player_id=r0, slot_bit, zone_flags=0xe, side_flags=0xa). Returns 1 if bitmap & slot_bit != 0, else 0. Sibling to update_equip_target_bitmap_zone15 (0x08047a80) which uses zone_flags=0xf.
 @ 
 @ Params: r0=u8 player_id [0..1]; r1=u8 player_ref [0..1]; r2=u8 slot_idx [0..9]
 @ Returns: r0=u32 bool (1 if slot_bit in bitmap; 0 otherwise)
@@ -16999,7 +16999,7 @@ LAB_08047a78:
     pop {r1}                                 @ 08047a7c 02bc
     bx r1                                    @ 08047a7e 0847
 
-@ Called by 8 duel_field paths (including FUN_080576b0: card_frame;card_ids;card_stats;duel_field). Updates equip target bitmap with fixed zone_flags=0xf (15, full zone coverage). Computes slot_bit=1<<(r1*0x10+r2). Calls update_equip_target_bitmap_for_field(player_id=r0, slot_bit, zone_flags=0xf, side_flags=caller_r3). r3 not set in function body; passed by caller (observed: 0x0805779e callsite movs r3,#0 -> side_flags=0). Returns 1 if bitmap & slot_bit != 0, else 0. Sibling to update_equip_target_bitmap_zone14 (0x08047a14, zone=0xe, side=0xa).
+@ Called by 8 duel_field paths (including tick_equip_chain_sprite_and_spell_zone_seq: card_frame;card_ids;card_stats;duel_field). Updates equip target bitmap with fixed zone_flags=0xf (15, full zone coverage). Computes slot_bit=1<<(r1*0x10+r2). Calls update_equip_target_bitmap_for_field(player_id=r0, slot_bit, zone_flags=0xf, side_flags=caller_r3). r3 not set in function body; passed by caller (observed: 0x0805779e callsite movs r3,#0 -> side_flags=0). Returns 1 if bitmap & slot_bit != 0, else 0. Sibling to update_equip_target_bitmap_zone14 (0x08047a14, zone=0xe, side=0xa).
 @ 
 @ Params: r0=u8 player_id [0..1]; r1=u8 player_ref [0..1]; r2=u8 slot_idx [0..9]; r3=u8 side_flags (caller-provided)
 @ Returns: r0=u32 bool (1 if slot_bit in bitmap; 0 otherwise)
@@ -17023,7 +17023,7 @@ LAB_08047a9a:
     pop {r1}                                 @ 08047a9c 02bc
     bx r1                                    @ 08047a9e 0847
 
-@ Equip zone bitmap scan and sprite enqueue. Called from duel_field frame loop at 0x0806ea72 and 0x0807456c. r0=player_id, r1=slot_idx, r2=zone_col, r3=state_flags (0x40). Calls update_equip_target_bitmap_for_field; if miss returns 0. On hit reads gP1LifePoints+player_stride+zone_col struct, checks [slot+0xa] chain head halfword; 0 -> clear path. Else traverses chain nodes, extracts byte+2 low nibble as zone_type; zone_type<=5 valid. Matches card_id in tree (0x17d5/0x1814 two nodes), on hit calls enqueue_sprite_attr_type11. Side effects: OAM sprite attr buffer via enqueue_sprite_attr_type11. Constants: CARD_ID_A=0x17d5 (Dark Mimic LV1), CARD_ID_B=0x1814 (The All-Seeing White Tiger), PLAYER_STRIDE=0x868, gDuelFieldSlots_A=0x0201c510, gDuelFieldSlots_B=0x0201d9c0, BITMAP_MASK=0xf.
+@ Equip zone bitmap scan and sprite enqueue. Called from duel_field frame loop at 0x0806ea72 and 0x0807456c. r0=player_id, r1=slot_idx, r2=zone_col, r3=state_flags (0x40). Calls update_equip_target_bitmap_for_field; if miss returns 0. On hit reads gP1LifePoints+player_stride+zone_col struct, checks [slot+0xa] chain head halfword; 0 -> clear path. Else traverses chain nodes, extracts byte+2 low nibble as zone_type; zone_type<=5 valid. Matches card_id in tree (0x17d5/0x1814 two nodes), on hit calls enqueue_sprite_attr_type11. Side effects: OAM sprite attr buffer via enqueue_sprite_attr_type11. Constants: CARD_ID_A=0x17d5 (Dark Mimic LV1), SILENT_SWORDSMAN_LV5_CID=0x1814, PLAYER_STRIDE=0x868, gDuelFieldSlots=0x0201c510, gEquipNodePool=0x0201d9c0, BITMAP_MASK=0xf.
 render_equip_zone_bitmap_sprite_by_chain:
     push {r4,r5,r6,r7,lr}                    @ 08047aa0 f0b5
     .hword 0x464f    @ 08047aa2 4f46
@@ -17047,10 +17047,10 @@ render_equip_zone_bitmap_sprite_by_chain:
     lsls r0,r5,#0x2    @ 08047ac8 a800
     adds r0,r0,r5    @ 08047aca 4019
     lsls r2,r0,#0x2    @ 08047acc 8200
-    ldr r0, DAT_08047b0c                     @ 08047ace 0f48
+    ldr r0, render_equip_zone_bmp_sprite_stride @ 08047ace 0f48
     muls r0,r3    @ 08047ad0 5843
     adds r0,r2,r0    @ 08047ad2 1018
-    ldr r1, DAT_08047b10                     @ 08047ad4 0e49
+    ldr r1, render_equip_zone_bmp_sprite_slots_a @ 08047ad4 0e49
     adds r0,r0,r1    @ 08047ad6 4018
     ldrh r1,[r0,#0xa]                        @ 08047ad8 4189
     cmp r1,#0x0                              @ 08047ada 0029
@@ -17060,7 +17060,7 @@ render_equip_zone_bitmap_sprite_by_chain:
     .hword 0x4690    @ 08047ae2 9046
 LAB_08047ae4:
     lsls r1,r1,#0x3    @ 08047ae4 c900
-    ldr r0, DAT_08047b14                     @ 08047ae6 0b48
+    ldr r0, render_equip_zone_bmp_sprite_node_pool @ 08047ae6 0b48
     adds r1,r1,r0    @ 08047ae8 0918
     ldrh r5,[r1,#0x6]                        @ 08047aea cd88
     ldrb r2,[r1,#0x2]                        @ 08047aec 8a78
@@ -17068,7 +17068,7 @@ LAB_08047ae4:
     lsrs r0,r0,#0x1c    @ 08047af0 000f
     cmp r0,#0x5                              @ 08047af2 0528
     bhi LAB_08047b5a                         @ 08047af4 31d8
-    ldr r0, DAT_08047b18                     @ 08047af6 0848
+    ldr r0, render_equip_zone_bmp_sprite_cid_a @ 08047af6 0848
     ldrh r4,[r1,#0x0]                        @ 08047af8 0c88
     cmp r4,r0                                @ 08047afa 8442
     beq LAB_08047b22                         @ 08047afc 11d0
@@ -17079,16 +17079,16 @@ LAB_08047ae4:
     beq LAB_08047b22                         @ 08047b06 0cd0
     b LAB_08047b5a                           @ 08047b08 27e0
     .zero  0x2
-DAT_08047b0c:
-    .word  0x00000868                     @ 08047b0c 68080000
-DAT_08047b10:
-    .word  0x0201c510                     @ 08047b10 10c50102
-DAT_08047b14:
-    .word  0x0201d9c0                     @ 08047b14 c0d90102
-DAT_08047b18:
-    .word  0x000017d5                     @ 08047b18 d5170000
+render_equip_zone_bmp_sprite_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08047b0c 68080000
+render_equip_zone_bmp_sprite_slots_a:
+    .word  gDuelFieldSlots                @ 08047b10 10c50102
+render_equip_zone_bmp_sprite_node_pool:
+    .word  gEquipNodePool                 @ 08047b14 c0d90102
+render_equip_zone_bmp_sprite_cid_a:
+    .word  DARK_MIMIC_LV1_CID             @ 08047b18 d5170000  Dark Mimic LV1 card id (0x17d5)
 LAB_08047b1c:
-    ldr r0, DAT_08047b64                     @ 08047b1c 1148
+    ldr r0, render_equip_zone_bmp_sprite_cid_b @ 08047b1c 1148
     cmp r4,r0                                @ 08047b1e 8442
     bne LAB_08047b5a                         @ 08047b20 1bd1
 LAB_08047b22:
@@ -17102,12 +17102,12 @@ LAB_08047b22:
     ands r0,r1    @ 08047b30 0840
     lsls r0,r0,#0x4    @ 08047b32 0001
     orrs r2,r0    @ 08047b34 0243
-    ldr r0, DAT_08047b68                     @ 08047b36 0c48
+    ldr r0, render_equip_zone_bmp_sprite_stride_b @ 08047b36 0c48
     .hword 0x4649    @ 08047b38 4946
     muls r1,r0    @ 08047b3a 4143
     adds r0,r1,#0x0    @ 08047b3c 081c
     add r0,r8                                @ 08047b3e 4044
-    ldr r1, DAT_08047b6c                     @ 08047b40 0a49
+    ldr r1, render_equip_zone_bmp_sprite_slots_b @ 08047b40 0a49
     adds r0,r0,r1    @ 08047b42 4018
     ldr r3,[r0,#0x0]                         @ 08047b44 0368
     lsls r0,r3,#0x2    @ 08047b46 9800
@@ -17126,12 +17126,12 @@ LAB_08047b5a:
 LAB_08047b60:
     movs r0,#0x1    @ 08047b60 0120
     b LAB_08047b72                           @ 08047b62 06e0
-DAT_08047b64:
-    .word  0x00001814                     @ 08047b64 14180000
-DAT_08047b68:
-    .word  0x00000868                     @ 08047b68 68080000
-DAT_08047b6c:
-    .word  0x0201c510                     @ 08047b6c 10c50102
+render_equip_zone_bmp_sprite_cid_b:
+    .word  SILENT_SWORDSMAN_LV5_CID       @ 08047b64 14180000  Silent Swordsman LV5 card id (0x1814)
+render_equip_zone_bmp_sprite_stride_b:
+    .word  PLAYER_BLOCK_STRIDE            @ 08047b68 68080000
+render_equip_zone_bmp_sprite_slots_b:
+    .word  gDuelFieldSlots                @ 08047b6c 10c50102
 LAB_08047b70:
     movs r0,#0x0    @ 08047b70 0020
 LAB_08047b72:
@@ -17332,7 +17332,7 @@ LAB_08047cc6:
     bx r1                                    @ 08047cd0 0847
     .zero  0x2
 
-@ Test zone=0xd slot equip target validity with slot-parity-derived side flag. r0=player_id, r1=slot_idx, r2=slot_col. Computes slot_mask=1<<(slot_idx*16+slot_col); extracts slot_idx bit0 (parity); reads gDuelFieldSlots_A+player_id*0x868+zone_col*20 field bit18; if bit18==slot_idx_parity injects r3=0x20000 (FIELD_PARITY_FLAG=0x80<<0xa); calls update_equip_target_bitmap_for_field(zone=0xd, r3=flag). Tests AND result, returns 1/0. Side effects: none. Constants: ZONE=0xd, PLAYER_STRIDE=0x868, gDuelFieldSlots_A=0x0201c510, ZONE_COL_STRIDE=0x14, FIELD_PARITY_FLAG=0x20000 (0x80<<0xa), BIT18_SHIFT=0x12.
+@ Test zone=0xd slot equip target validity with slot-parity-derived side flag. r0=player_id, r1=slot_idx, r2=slot_col. Computes slot_mask=1<<(slot_idx*16+slot_col); extracts slot_idx bit0 (parity); reads gDuelFieldSlots+player_id*0x868+zone_col*20 field bit18; if bit18==slot_idx_parity injects r3=0x20000 (FIELD_PARITY_FLAG=0x80<<0xa); calls update_equip_target_bitmap_for_field(zone=0xd, r3=flag). Tests AND result, returns 1/0. Side effects: none. Constants: ZONE=0xd, PLAYER_STRIDE=0x868, gDuelFieldSlots=0x0201c510, ZONE_COL_STRIDE=0x14, FIELD_PARITY_FLAG=0x20000 (0x80<<0xa), BIT18_SHIFT=0x12.
 test_equip_target_zone13_with_slot_parity_flag:
     push {r4,r5,r6,lr}                       @ 08047cd4 70b5
     adds r6,r0,#0x0    @ 08047cd6 061c
@@ -17346,10 +17346,10 @@ test_equip_target_zone13_with_slot_parity_flag:
     lsls r0,r2,#0x2    @ 08047ce6 9000
     adds r0,r0,r2    @ 08047ce8 8018
     lsls r0,r0,#0x2    @ 08047cea 8000
-    ldr r2, DAT_08047d20                     @ 08047cec 0c4a
+    ldr r2, test_zone13_parity_stride        @ 08047cec 0c4a
     muls r2,r3    @ 08047cee 5a43
     adds r0,r0,r2    @ 08047cf0 8018
-    ldr r2, DAT_08047d24                     @ 08047cf2 0c4a
+    ldr r2, test_zone13_parity_slots         @ 08047cf2 0c4a
     adds r0,r0,r2    @ 08047cf4 8018
     ldr r0,[r0,#0x0]                         @ 08047cf6 0068
     lsls r0,r0,#0x12    @ 08047cf8 8004
@@ -17373,12 +17373,12 @@ LAB_08047d18:
     pop {r1}                                 @ 08047d1a 02bc
     bx r1                                    @ 08047d1c 0847
     .zero  0x2
-DAT_08047d20:
-    .word  0x00000868                     @ 08047d20 68080000
-DAT_08047d24:
-    .word  0x0201c510                     @ 08047d24 10c50102
+test_zone13_parity_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08047d20 68080000
+test_zone13_parity_slots:
+    .word  gDuelFieldSlots                @ 08047d24 10c50102
 
-@ Checks if given player slot can equip a target; enqueues equip indicator sprite attr if eligible. r0=player_id, r1=slot_idx. Clears 0x18-byte stack struct via memset; reads slot card state bits; modifies equip activation flag (BIC+OR on slot_entry byte[2]); calls update_equip_target_bitmap_for_field with bit_mask=1<<(player*16+slot); if nonzero and slot card state_code==1, calls enqueue_sprite_attr_type11. Returns 1 (equip activatable) or 0 (not). Params: r0=player_id [0..1] -> r5, r1=slot_idx [0..10] -> r6. Side effects: slot_entry byte+2 flag BIC/OR; update_equip_target_bitmap_for_field; enqueue_sprite_attr_type11 writes OAM attr buffer (conditional). Constants: bit_mask=1<<(player*16+slot), equip_slot_stride=0xe, DAT_08047d8c=0x14e2.
+@ Checks if given player slot can equip a target; enqueues equip indicator sprite attr if eligible. r0=player_id, r1=slot_idx. Clears 0x18-byte stack struct via memset; reads slot card state bits; modifies equip activation flag (BIC+OR on slot_entry byte[2]); calls update_equip_target_bitmap_for_field with bit_mask=1<<(player*16+slot); if nonzero and slot card state_code==1, calls enqueue_sprite_attr_type11. Returns 1 (equip activatable) or 0 (not). Params: r0=player_id [0..1] -> r5, r1=slot_idx [0..10] -> r6. Side effects: slot_entry byte+2 flag BIC/OR; update_equip_target_bitmap_for_field; enqueue_sprite_attr_type11 writes OAM attr buffer (conditional). Constants: bit_mask=1<<(player*16+slot), equip_slot_stride=0xe, SUPER_REJUVENATION_CID=0x14e2.
 submit_equip_sprite_if_slot_eligible:
     push {r4,r5,r6,lr}                       @ 08047d28 70b5
     sub sp,#0x18                             @ 08047d2a 86b0
@@ -17418,7 +17418,7 @@ submit_equip_sprite_if_slot_eligible:
     lsrs r0,r0,#0x10    @ 08047d74 000c
     cmp r0,#0x1                              @ 08047d76 0128
     bne LAB_08047d86                         @ 08047d78 05d1
-    ldr r1, DAT_08047d8c                     @ 08047d7a 0449
+    ldr r1, submit_equip_sprite_if_eligible_cid @ 08047d7a 0449
     adds r0,r5,#0x0    @ 08047d7c 281c
     movs r2,#0x2    @ 08047d7e 0222
     movs r3,#0x0    @ 08047d80 0023
@@ -17427,8 +17427,8 @@ LAB_08047d86:
     movs r0,#0x1    @ 08047d86 0120
     b LAB_08047d92                           @ 08047d88 03e0
     .zero  0x2
-DAT_08047d8c:
-    .word  0x000014e2                     @ 08047d8c e2140000
+submit_equip_sprite_if_eligible_cid:
+    .word  SUPER_REJUVENATION_CID         @ 08047d8c e2140000  Super Rejuvenation card id (0x14e2)
 LAB_08047d90:
     movs r0,#0x0    @ 08047d90 0020
 LAB_08047d92:
@@ -17444,7 +17444,7 @@ submit_equip_sprite_samsara_zone_select:
     sub sp,#0x18                             @ 08047d9e 86b0
     adds r5,r0,#0x0    @ 08047da0 051c
     adds r6,r1,#0x0    @ 08047da2 0e1c
-    ldr r0, DAT_08047e0c                     @ 08047da4 1948
+    ldr r0, submit_equip_sprite_samsara_cid_a @ 08047da4 1948
     bl count_field_copies_of_card            @ 08047da6 eaf7f9fc
     movs r7,#0xe    @ 08047daa 0e27
     cmp r0,#0x0                              @ 08047dac 0028
@@ -17485,7 +17485,7 @@ LAB_08047db2:
     lsrs r0,r0,#0x10    @ 08047df6 000c
     cmp r0,#0x1                              @ 08047df8 0128
     bne LAB_08047e08                         @ 08047dfa 05d1
-    ldr r1, DAT_08047e10                     @ 08047dfc 0449
+    ldr r1, submit_equip_sprite_samsara_cid_b @ 08047dfc 0449
     adds r0,r5,#0x0    @ 08047dfe 281c
     movs r2,#0x2    @ 08047e00 0222
     movs r3,#0x0    @ 08047e02 0023
@@ -17493,10 +17493,10 @@ LAB_08047db2:
 LAB_08047e08:
     movs r0,#0x1    @ 08047e08 0120
     b LAB_08047e16                           @ 08047e0a 04e0
-DAT_08047e0c:
-    .word  0x000019da                     @ 08047e0c da190000
-DAT_08047e10:
-    .word  0x000014e2                     @ 08047e10 e2140000
+submit_equip_sprite_samsara_cid_a:
+    .word  SAMSARA_CID                    @ 08047e0c da190000  Samsara card id (0x19da)
+submit_equip_sprite_samsara_cid_b:
+    .word  SUPER_REJUVENATION_CID         @ 08047e10 e2140000
 LAB_08047e14:
     movs r0,#0x0    @ 08047e14 0020
 LAB_08047e16:
