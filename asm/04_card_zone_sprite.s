@@ -1357,7 +1357,7 @@ tick_equip_scan_state_base:
 tick_equip_scan_field_slots_base:
     .word  gDuelFieldSlots                @ 08040ab0 10c50102  gDuelFieldSlots
 tick_equip_scan_destiny_chain_table:
-    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  Destiny Board + Spirit Message I/N/A/L card_ids
+    .word  zone_monster_field_bonus_table+7*16 @ 08040ab4 04f1e309  zone_monster_field_bonus_table+7*16: Destiny Board + Spirit Message I/N/A/L card_ids
 tick_equip_scan_player_stride:
     .word  PLAYER_BLOCK_STRIDE            @ 08040ab8 68080000  PLAYER_BLOCK_STRIDE (0x868)
 LAB_08040abc:
@@ -6707,7 +6707,7 @@ LAB_080430b8:
     movs r2,#0x36    @ 080430b8 3622
     cmp r4,#0x0                              @ 080430ba 002c
     beq LAB_080430c0                         @ 080430bc 00d0
-    ldr r2, DAT_080430e0                     @ 080430be 084a
+    ldr r2, enqueue_slot_card_pal_p1         @ 080430be 084a
 LAB_080430c0:
     lsls r1,r5,#0x18    @ 080430c0 2906
     lsls r0,r6,#0x18    @ 080430c2 3006
@@ -6725,10 +6725,10 @@ LAB_080430d6:
     pop {r4,r5,r6,r7}                        @ 080430da f0bc
     pop {r1}                                 @ 080430dc 02bc
     bx r1                                    @ 080430de 0847
-DAT_080430e0:
-    .word  0x00008036                     @ 080430e0 36800000
+enqueue_slot_card_pal_p1:
+    .word  OAM_SPRITE_PAL_P1              @ 080430e0 36800000  OAM_SPRITE_PAL_P1=0x8036: P1 OAM attr0 (bit15=1, group 0x36); P0 uses bare 0x36
 
-@ Equip zone OAM sprite attribute enqueue. Receives player_side/slot_idx/attr_a/attr_b parameters. Selects OAM attr0 base by player_side bit0 (P0=0x36, P1=0x8036), merges slot_idx with 0x8000 high-bit flag as attr1 word, then calls enqueue_sprite_attr_record to write sprite attribute to OAM queue. Called by FUN_0806d4a4 (duel_field) in equip zone card sprite update path.
+@ Equip zone OAM sprite attribute enqueue. Receives player_side/slot_idx/attr_a/attr_b parameters. Selects OAM attr0 base by player_side bit0 (P0=0x36, P1=0x8036), merges slot_idx with 0x8000 high-bit flag as attr1 word, then calls enqueue_sprite_attr_record to write sprite attribute to OAM queue. Called by setup_equip_slot_oam_if_hand_slot_eligible (duel_field) in equip zone card sprite update path.
 @ 
 @ Params: r0=u8 player_side [0..1]; r1=u8 slot_idx; r2=u16 attr_a; r3=u16 attr_b
 @ Returns: void
@@ -6748,7 +6748,7 @@ enqueue_equip_zone_sprite_attr_by_player:
     movs r6,#0x36    @ 080430f8 3626
     cmp r0,#0x0                              @ 080430fa 0028
     beq LAB_08043100                         @ 080430fc 00d0
-    ldr r6, DAT_08043124                     @ 080430fe 094e
+    ldr r6, enqueue_equip_zone_pal_p1        @ 080430fe 094e
 LAB_08043100:
     asrs r1,r5,#0x1    @ 08043100 6910
     lsls r1,r1,#0x18    @ 08043102 0906
@@ -6767,8 +6767,8 @@ LAB_08043100:
     pop {r0}                                 @ 0804311e 01bc
     bx r0                                    @ 08043120 0047
     .zero  0x2
-DAT_08043124:
-    .word  0x00008036                     @ 08043124 36800000
+enqueue_equip_zone_pal_p1:
+    .word  OAM_SPRITE_PAL_P1              @ 08043124 36800000  OAM_SPRITE_PAL_P1=0x8036: P1 OAM attr0; enqueue_equip_zone_sprite_attr_with_select
 
 @ Finds equip chain node via find_equip_chain_node_by_slot_pair. If node exists, builds OAM attr1 (base 0x8037, high bits 0xa000) and calls enqueue_sprite_attr_record to enqueue equip chain slot sprite. r0=u8 player_id [0..1]; r1=u8 slot_a [0..9]; r2=u32 packed_slot_pair (hi byte=slot_b, lo byte=equip_ref); r3=u8 equip_type. Returns void. 7 callers, duel_field related. Constants: OAM_SPRITE_BASE=0x8037, OAM_ATTR_HIGH=0xa000.
 enqueue_equip_chain_slot_sprite_attr:
@@ -6793,7 +6793,7 @@ enqueue_equip_chain_slot_sprite_attr:
     movs r2,#0x37    @ 0804314e 3722
     cmp r5,#0x0                              @ 08043150 002d
     beq LAB_08043156                         @ 08043152 00d0
-    ldr r2, DAT_08043178                     @ 08043154 084a
+    ldr r2, enqueue_equip_chain_slot_pal_p1  @ 08043154 084a
 LAB_08043156:
     lsls r1,r6,#0x18    @ 08043156 3106
     lsrs r1,r1,#0x18    @ 08043158 090e
@@ -6812,10 +6812,10 @@ LAB_0804316e:
     pop {r4,r5,r6,r7}                        @ 08043172 f0bc
     pop {r0}                                 @ 08043174 01bc
     bx r0                                    @ 08043176 0047
-DAT_08043178:
-    .word  0x00008037                     @ 08043178 37800000
+enqueue_equip_chain_slot_pal_p1:
+    .word  OAM_EQUIP_CHAIN_SPRITE_P1      @ 08043178 37800000  OAM_EQUIP_CHAIN_SPRITE_P1=0x8037: equip chain node OAM attr0 P1 (bit15+0x37); 11 ROM refs
 
-@ Iterates all player (0..1) x slot (0..10) combinations and calls enqueue_equip_chain_slot_sprite_attr for each pair to refresh all equip chain slot OAM sprite attributes. r0=u8 side_a [0..1]; r1=u8 side_b [0..1]. Returns void. Called only by FUN_08044e30 (duel_field hub). Inner loop: slot [0..10]; outer loop: player [0..1].
+@ Iterates all player (0..1) x slot (0..10) combinations and calls enqueue_equip_chain_slot_sprite_attr for each pair to refresh all equip chain slot OAM sprite attributes. r0=u8 side_a [0..1]; r1=u8 side_b [0..1]. Returns void. Called only by update_duel_field_slot_sprite_state (duel_field hub). Inner loop: slot [0..10]; outer loop: player [0..1].
 enqueue_equip_chain_all_slots_for_pair:
     push {r4,r5,r6,r7,lr}                    @ 0804317c f0b5
     lsls r0,r0,#0x18    @ 0804317e 0006
@@ -6858,7 +6858,7 @@ enqueue_equip_slot_sprite_attr:
     movs r7,#0x37    @ 080431c2 3727
     cmp r4,#0x0                              @ 080431c4 002c
     beq LAB_080431ca                         @ 080431c6 00d0
-    ldr r7, DAT_080431f0                     @ 080431c8 094f
+    ldr r7, enqueue_equip_slot_pal_p1        @ 080431c8 094f
 LAB_080431ca:
     lsls r1,r5,#0x18    @ 080431ca 2906
     lsrs r1,r1,#0x18    @ 080431cc 090e
@@ -6879,10 +6879,17 @@ LAB_080431e6:
     pop {r4,r5,r6,r7}                        @ 080431ea f0bc
     pop {r0}                                 @ 080431ec 01bc
     bx r0                                    @ 080431ee 0047
-DAT_080431f0:
-    .word  0x00008037                     @ 080431f0 37800000
+enqueue_equip_slot_pal_p1:
+    .word  OAM_EQUIP_CHAIN_SPRITE_P1      @ 080431f0 37800000  OAM_EQUIP_CHAIN_SPRITE_P1=0x8037: reuse; enqueue_sprite_attr_for_chain_node_check P1 path
 
-@ 由 scan_equip_zone_for_super_rejuvenation_activation (0x0809d374) 在确认装备激活通过后调用. 入口保存 r0=player_id->r4, r1=slot_idx->r5, r2=idx->r7, r3=type_flag->r6. 调用 check_node_in_slot_chain(r4, r5, r7, r6); 若链中存在节点: 根据 r4(player) 选择 OAM attr 高位 (0x37/0x8037), 将 r5/r6 的 bit 域打包进 r1/r2/r3, 调用 enqueue_sprite_attr_record 将精灵属性提交到 OAM 缓冲. 若不存在直接跳过. 副作用: OAM 精灵属性缓冲 (via enqueue_sprite_attr_record). Constants: OAM_P0=0x37, OAM_P1=0x8037.
+@ Called by scan_equip_zone_for_super_rejuvenation_activation after confirming equip activation eligibility.
+@ Params: r0=player_id->r4, r1=slot_idx->r5, r2=chain_idx->r7, r3=type_flag->r6.
+@ Calls check_node_in_slot_chain(r4,r5,r7,r6). On hit: selects OAM attr0 by player_id
+@ (r4==0 -> 0x37, r4!=0 -> 0x8037=OAM_EQUIP_CHAIN_SPRITE_P1), packs r5/r6 bit-fields into
+@ r1/r2/r3, calls enqueue_sprite_attr_record to write sprite attr to OAM buffer.
+@ On miss: skips enqueue.
+@ Side effects: OAM sprite queue write via enqueue_sprite_attr_record.
+@ Constants: OAM_P0=0x37, OAM_P1=0x8037.
 enqueue_sprite_attr_for_chain_node_check:
     push {r4,r5,r6,r7,lr}                    @ 080431f4 f0b5
     adds r4,r0,#0x0    @ 080431f6 041c
@@ -6896,7 +6903,7 @@ enqueue_sprite_attr_for_chain_node_check:
     .hword 0x4684    @ 08043208 8446
     cmp r4,#0x0                              @ 0804320a 002c
     beq LAB_08043212                         @ 0804320c 01d0
-    ldr r4, DAT_0804323c                     @ 0804320e 0b4c
+    ldr r4, enqueue_sprite_for_chain_node_pal_p1 @ 0804320e 0b4c
     .hword 0x46a4    @ 08043210 a446
 LAB_08043212:
     lsls r1,r5,#0x18    @ 08043212 2906
@@ -6920,10 +6927,10 @@ LAB_08043234:
     pop {r0}                                 @ 08043236 01bc
     bx r0                                    @ 08043238 0047
     .zero  0x2
-DAT_0804323c:
-    .word  0x00008037                     @ 0804323c 37800000
+enqueue_sprite_for_chain_node_pal_p1:
+    .word  OAM_EQUIP_CHAIN_SPRITE_P1      @ 0804323c 37800000  OAM_EQUIP_CHAIN_SPRITE_P1=0x8037: reuse; enqueue_sprite_attr_for_chain_node_match P1 path
 
-@ Chain-node match + sprite attr enqueue wrapper: calls find_chain_node_by_dual_halfword (this batch 0x0802fd00). On hit (chain_idx!=0): selects attr1 by r4 (player_id): r4==0 -> 0x38, r4!=0 -> 0x8038 (DAT_08043270). Encodes r5 (slot_idx) + chain_idx into r1 via lsls/orrs/lsrs. Calls enqueue_sprite_attr_record(attr1, packed, 0, 0). On miss skips enqueue. r0=u32 player_id [0..1] -> r4 (selects attr1); r1=u32 slot_idx [0..0xb] -> r5; r2=u16 ref_halfword_1 (forwarded); r3=u16 ref_halfword_2 (forwarded). Returns void. 9 callers all duel-related (FUN_08044e30/FUN_080490b4/FUN_08057138/FUN_08067750/FUN_08076b1c+, mostly duel_field). Side effects: find_chain_node_by_dual_halfword (read), enqueue_sprite_attr_record (on hit). OAM attr1 sibling family 0x38/0x8038 vs 0x3a/0x803a (#681). Constants: ATTR1_PLAYER0=0x38, ATTR1_PLAYER1=0x8038.
+@ Chain-node match + sprite attr enqueue wrapper: calls find_chain_node_by_dual_halfword (this batch 0x0802fd00). On hit (chain_idx!=0): selects attr1 by r4 (player_id): r4==0 -> 0x38, r4!=0 -> 0x8038 (DAT_08043270). Encodes r5 (slot_idx) + chain_idx into r1 via lsls/orrs/lsrs. Calls enqueue_sprite_attr_record(attr1, packed, 0, 0). On miss skips enqueue. r0=u32 player_id [0..1] -> r4 (selects attr1); r1=u32 slot_idx [0..0xb] -> r5; r2=u16 ref_halfword_1 (forwarded); r3=u16 ref_halfword_2 (forwarded). Returns void. 9 callers all duel-related (update_duel_field_slot_sprite_state/tick_duel_field_zone_sprite_update_pipeline/enqueue_chain_node_sprite_for_equip_entry/tick_equip_chain_banisher_sprite_state/enqueue_equip_zone_sprite_with_neo_daedalus_and_chain+, mostly duel_field). Side effects: find_chain_node_by_dual_halfword (read), enqueue_sprite_attr_record (on hit). OAM attr1 sibling family 0x38/0x8038 vs 0x3a/0x803a (#681). Constants: ATTR1_PLAYER0=0x38, ATTR1_PLAYER1=0x8038.
 enqueue_sprite_attr_for_chain_node_match:
     push {r4,r5,lr}                          @ 08043240 30b5
     adds r4,r0,#0x0    @ 08043242 041c
@@ -6934,7 +6941,7 @@ enqueue_sprite_attr_for_chain_node_match:
     movs r2,#0x38    @ 0804324e 3822
     cmp r4,#0x0                              @ 08043250 002c
     beq LAB_08043256                         @ 08043252 00d0
-    ldr r2, DAT_08043270                     @ 08043254 064a
+    ldr r2, enqueue_sprite_chain_match_pal_p1 @ 08043254 064a
 LAB_08043256:
     lsls r1,r5,#0x18    @ 08043256 2906
     lsls r0,r0,#0x18    @ 08043258 0006
@@ -6949,10 +6956,10 @@ LAB_0804326a:
     pop {r4,r5}                              @ 0804326a 30bc
     pop {r0}                                 @ 0804326c 01bc
     bx r0                                    @ 0804326e 0047
-DAT_08043270:
-    .word  0x00008038                     @ 08043270 38800000
+enqueue_sprite_chain_match_pal_p1:
+    .word  OAM_CHAIN_MATCH_SPRITE_P1      @ 08043270 38800000  OAM_CHAIN_MATCH_SPRITE_P1=0x8038: chain match OAM attr0 P1 (bit15+0x38); 82 ROM refs
 
-@ Called by FUN_0804348c (equip-chain list scanner). Leaf function writing equip-chain sprite attr. Receives player_id (r0), row_byte (r1 via stack r[0x10]), col_byte (r3), plus two extra bytes r1/r2. Selects OAM base attr by player: 0x38 for P1 (no flip), 0x8038 for P2 (H-flip). Merges row/col bytes (lsls+orrs) then truncates to u16; combines with OAM base and slot_col, calls enqueue_sprite_attr_record to write to sprite attribute buffer. r0=u8 player_id [0..1], r1=u8 row_byte, r2=u8 col_byte, r3=u16 slot_col [0..9], [sp+0x10]=u16 extra_slot [0..9]. Returns void. Constants: OAM_P1=0x38, OAM_P2=0x8038 (bit15=H-flip). Callers: FUN_0804348c.
+@ Called by scan_equip_chain_list_for_sprite_update (equip-chain list scanner). Leaf function writing equip-chain sprite attr. Receives player_id (r0), row_byte (r1 via stack r[0x10]), col_byte (r3), plus two extra bytes r1/r2. Selects OAM base attr by player: 0x38 for P1 (no flip), 0x8038 for P2 (H-flip). Merges row/col bytes (lsls+orrs) then truncates to u16; combines with OAM base and slot_col, calls enqueue_sprite_attr_record to write to sprite attribute buffer. r0=u8 player_id [0..1], r1=u8 row_byte, r2=u8 col_byte, r3=u16 slot_col [0..9], [sp+0x10]=u16 extra_slot [0..9]. Returns void. Constants: OAM_P1=0x38, OAM_P2=0x8038 (bit15=H-flip). Callers: scan_equip_chain_list_for_sprite_update.
 enqueue_equip_chain_sprite_by_side:
     push {r4,r5,r6,lr}                       @ 08043274 70b5
     adds r4,r1,#0x0    @ 08043276 0c1c
@@ -6964,7 +6971,7 @@ enqueue_equip_chain_sprite_by_side:
     movs r5,#0x38    @ 08043282 3825
     cmp r0,#0x0                              @ 08043284 0028
     beq LAB_0804328a                         @ 08043286 00d0
-    ldr r5, DAT_080432a4                     @ 08043288 064d
+    ldr r5, enqueue_equip_chain_by_side_pal_p1 @ 08043288 064d
 LAB_0804328a:
     lsls r1,r4,#0x18    @ 0804328a 2106
     lsls r0,r2,#0x18    @ 0804328c 1006
@@ -6978,8 +6985,8 @@ LAB_0804328a:
     pop {r0}                                 @ 0804329e 01bc
     bx r0                                    @ 080432a0 0047
     .zero  0x2
-DAT_080432a4:
-    .word  0x00008038                     @ 080432a4 38800000
+enqueue_equip_chain_by_side_pal_p1:
+    .word  OAM_CHAIN_MATCH_SPRITE_P1      @ 080432a4 38800000  OAM_CHAIN_MATCH_SPRITE_P1=0x8038: reuse; enqueue_equip_chain_sprite_by_side P1 path
 
 @ Fixed-card_type wrapper for enqueue_zone_slot_sprite_attr_by_card_type with card_type=0xa. Receives player_side/slot_idx/attr_a, zero-extends r1/r2 to 16-bit, injects card_type=0xa (equip special type) as r3, then tail-calls enqueue_zone_slot_sprite_attr_by_card_type. Callers need not supply card_type. Used in zone sprite update paths for equip-card-only scenarios. indeg>=4.
 @ 
@@ -6998,7 +7005,22 @@ invoke_zone_slot_sprite_attr_for_equip_type:
     pop {r0}                                 @ 080432b8 01bc
     bx r0                                    @ 080432ba 0047
 
-@ 被 FUN_080432a8 (wrapper, 固定 r3=0xa), FUN_080433ec, FUN_0809b7e0 (case_3, r3=0xc) 等多处调用 (indeg>=8). 入口解包: r0=player_side->sp[0]; r1 packed(byte1=zone_row, byte0=player_bit); r2 packed(byte1=col, byte0=y_offset); r3=card_type->r10. 若 card_type==0xa: 读 gDuelFieldSlots[zone_row][player_bit] 槽字, 测试 lsls#0x13 后与 0x9f500000 比较; 命中则调用 enqueue_sprite_attr_with_xy_split; 始终调用 enqueue_equip_set_slot_sprite_by_zone_col(player, zone_row, 0). 退出 card_type==0xa 分支后: 按 sp[0] 选 attr0=0x42/0x8042; 调用 enqueue_sprite_attr_record. 后续读第二个槽字 lsrs#5/lsrs#1 做 bit-filter, 命中后 BST 分派 card_id: 0x13c3 -> apply_equip_activation_with_id_lookup; 0x186b -> set_field_slot_bit_with_sprite_update(r6,r7,4,1). 末尾无论路径均调用 submit_lp_bar_sprite_row_by_type(0x18, slot_packed). Side effects: enqueue_sprite_attr_record/enqueue_equip_set_slot_sprite_by_zone_col/enqueue_sprite_attr_with_xy_split/apply_equip_activation_with_id_lookup/set_field_slot_bit_with_sprite_update/submit_lp_bar_sprite_row_by_type 写 OAM 队列及场地状态. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, OAM_DEFAULT=0x42, OAM_ALT=0x8042, card_type_equip_special=0xa, card_id_bst_1=0x13c3, card_id_bst_2=0x186b, bit_mask=0x9f500000.
+@ Called by invoke_zone_slot_sprite_attr_for_equip_type (wrapper, fixed r3=0xa),
+@ enqueue_equip_chain_slot_sprite_with_pair_lookup, and update_equip_zone_sprite_by_state
+@ (case_3, r3=0xc); indeg>=8.
+@ Entry: unpacks r0=player_side->sp[0]; r1 packed(byte1=zone_row, byte0=player_bit);
+@ r2 packed(byte1=col, byte0=y_offset); r3=card_type->r10.
+@ card_type==0xa path: reads gDuelFieldSlots[zone_row][player_bit] slot word; tests
+@ lsls#0x13 vs 0x9f500000; on hit calls enqueue_sprite_attr_with_xy_split;
+@ always calls enqueue_equip_set_slot_sprite_by_zone_col(player,zone_row,0).
+@ After card_type==0xa: selects attr0=0x42/0x8042 by sp[0]; calls enqueue_sprite_attr_record.
+@ Reads second slot word lsrs#5/lsrs#1 for bit-filter; on hit BST dispatch card_id:
+@ 0x13c3(Gearfried Iron Knight)->apply_equip_activation_with_id_lookup;
+@ 0x186b(Gearfried Swordmaster)->set_field_slot_bit_with_sprite_update(r6,r7,4,1).
+@ Final: always calls submit_lp_bar_sprite_row_by_type(0x18,slot_packed).
+@ Side effects: OAM queue, equip set slot sprite, lp bar sprite row.
+@ Constants: gDuelFieldSlots=0x0201c510, OAM_DEFAULT=0x42, OAM_ALT=0x8042,
+@ card_type_equip_special=0xa, mask=0x9f500000, iron_knight=0x13c3, swordmaster=0x186b.
 enqueue_zone_slot_sprite_attr_by_card_type:
     push {r4,r5,r6,r7,lr}                    @ 080432bc f0b5
     .hword 0x4657    @ 080432be 5746
@@ -7029,14 +7051,14 @@ enqueue_zone_slot_sprite_attr_by_card_type:
     lsls r0,r4,#0x2    @ 080432f0 a000
     adds r0,r0,r4    @ 080432f2 0019
     lsls r0,r0,#0x2    @ 080432f4 8000
-    ldr r1, DAT_08043380                     @ 080432f6 2249
+    ldr r1, enqueue_zone_slot_type_stride    @ 080432f6 2249
     muls r1,r2    @ 080432f8 5143
     adds r0,r0,r1    @ 080432fa 4018
-    ldr r1, DAT_08043384                     @ 080432fc 2149
+    ldr r1, enqueue_zone_slot_type_slots     @ 080432fc 2149
     adds r0,r0,r1    @ 080432fe 4018
     ldr r0,[r0,#0x0]                         @ 08043300 0068
     lsls r0,r0,#0x13    @ 08043302 c004
-    ldr r1, DAT_08043388                     @ 08043304 2049
+    ldr r1, enqueue_zone_slot_sprite_mask_cid_13ea @ 08043304 2049
     cmp r0,r1                                @ 08043306 8842
     bne LAB_08043314                         @ 08043308 04d1
     subs r2,r3,r6    @ 0804330a 9a1b
@@ -7053,7 +7075,7 @@ LAB_0804331e:
     ldr r1,[sp,#0x0]                         @ 08043320 0099
     cmp r1,#0x0                              @ 08043322 0029
     beq LAB_08043328                         @ 08043324 00d0
-    ldr r0, DAT_0804338c                     @ 08043326 1948
+    ldr r0, enqueue_zone_slot_type_pal_p1    @ 08043326 1948
 LAB_08043328:
     .hword 0x4654    @ 08043328 5446
     lsls r3,r4,#0x10    @ 0804332a 2304
@@ -7067,10 +7089,10 @@ LAB_08043328:
     lsls r1,r7,#0x2    @ 0804333c b900
     adds r1,r1,r7    @ 0804333e c919
     lsls r1,r1,#0x2    @ 08043340 8900
-    ldr r0, DAT_08043380                     @ 08043342 0f48
+    ldr r0, enqueue_zone_slot_type_stride    @ 08043342 0f48
     muls r0,r2    @ 08043344 5043
     adds r1,r1,r0    @ 08043346 0918
-    ldr r0, DAT_08043384                     @ 08043348 0e48
+    ldr r0, enqueue_zone_slot_type_slots     @ 08043348 0e48
     adds r2,r1,r0    @ 0804334a 0a18
     adds r0,#0x10    @ 0804334c 1030
     adds r1,r1,r0    @ 0804334e 0918
@@ -7091,32 +7113,32 @@ LAB_08043328:
     ldr r4,[r2,#0x0]                         @ 0804336c 1468
     lsls r0,r4,#0x13    @ 0804336e e004
     lsrs r3,r0,#0x13    @ 08043370 c30c
-    ldr r0, DAT_08043390                     @ 08043372 0748
+    ldr r0, enqueue_zone_slot_type_cid_iron_knight @ 08043372 0748
     cmp r3,r0                                @ 08043374 8342
     beq LAB_08043398                         @ 08043376 0fd0
-    ldr r0, DAT_08043394                     @ 08043378 0648
+    ldr r0, enqueue_zone_slot_type_cid_swordmaster @ 08043378 0648
     cmp r3,r0                                @ 0804337a 8342
     beq LAB_080433c4                         @ 0804337c 22d0
     b LAB_080433d0                           @ 0804337e 27e0
-DAT_08043380:
-    .word  0x00000868                     @ 08043380 68080000
-DAT_08043384:
-    .word  0x0201c510                     @ 08043384 10c50102
-DAT_08043388:
-    .word  0x9f500000                     @ 08043388 0000509f
-DAT_0804338c:
-    .word  0x00008042                     @ 0804338c 42800000
-DAT_08043390:
-    .word  0x000013c3                     @ 08043390 c3130000
-DAT_08043394:
-    .word  0x0000186b                     @ 08043394 6b180000
+enqueue_zone_slot_type_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043380 68080000
+enqueue_zone_slot_type_slots:
+    .word  gDuelFieldSlots                @ 08043384 10c50102
+enqueue_zone_slot_sprite_mask_cid_13ea:
+    .word  0x9f500000                     @ 08043388 0000509f  slot_word<<19 test for card_id=0x13ea (unassigned slot gap); enqueue_zone_slot_sprite_attr_by_card_type
+enqueue_zone_slot_type_pal_p1:
+    .word  OAM_ZONE_TYPE_SPRITE_P1        @ 0804338c 42800000  OAM_ZONE_TYPE_SPRITE_P1=0x8042: zone card-type OAM attr0 P1 (bit15+0x42); 48 ROM refs
+enqueue_zone_slot_type_cid_iron_knight:
+    .word  GEARFRIED_IRON_KNIGHT_CID      @ 08043390 c3130000  GEARFRIED_IRON_KNIGHT_CID=0x13c3: BST dispatch card_id in enqueue_zone_slot_sprite_attr_by_card_type
+enqueue_zone_slot_type_cid_swordmaster:
+    .word  GEARFRIED_SWORDMASTER_CID      @ 08043394 6b180000  GEARFRIED_SWORDMASTER_CID=0x186b: BST dispatch card_id; Gearfried Swordmaster path
 LAB_08043398:
     lsls r0,r6,#0x1f    @ 08043398 f007
     lsls r1,r7,#0x10    @ 0804339a 3904
     movs r2,#0xf8    @ 0804339c f822
     lsls r2,r2,#0xd    @ 0804339e 5203
     ands r1,r2    @ 080433a0 1140
-    ldr r2, DAT_080433c0                     @ 080433a2 074a
+    ldr r2, enqueue_zone_slot_sprite_flags_gearfried @ 080433a2 074a
     orrs r1,r2    @ 080433a4 1143
     orrs r0,r1    @ 080433a6 0843
     orrs r0,r3    @ 080433a8 1843
@@ -7130,8 +7152,8 @@ LAB_08043398:
     orrs r2,r5    @ 080433b8 2a43
     bl apply_equip_activation_with_id_lookup @ 080433ba 09f0a9fa
     b LAB_080433d0                           @ 080433be 07e0
-DAT_080433c0:
-    .word  0x30200000                     @ 080433c0 00002030
+enqueue_zone_slot_sprite_flags_gearfried:
+    .word  0x30200000                     @ 080433c0 00002030  bits[29,28,21] activation flags; ORed into apply_equip_activation_with_id_lookup arg2 for Gearfried(0x13c3)
 LAB_080433c4:
     adds r0,r6,#0x0    @ 080433c4 301c
     adds r1,r7,#0x0    @ 080433c6 391c
@@ -7178,7 +7200,7 @@ enqueue_equip_chain_slot_sprite_with_pair_lookup:
     bl find_equip_chain_pair_across_field    @ 0804340a ecf739f9
     lsls r5,r0,#0x10    @ 0804340e 0504
     lsrs r4,r5,#0x10    @ 08043410 2c0c
-    ldr r0, DAT_0804343c                     @ 08043412 0a48
+    ldr r0, enqueue_equip_chain_pair_no_pair @ 08043412 0a48
     cmp r4,r0                                @ 08043414 8442
     beq LAB_08043440                         @ 08043416 13d0
     lsls r4,r4,#0x18    @ 08043418 2406
@@ -7197,8 +7219,8 @@ enqueue_equip_chain_slot_sprite_with_pair_lookup:
     bl enqueue_equip_chain_slot_sprite_attr  @ 08043434 fff778fe
     b LAB_08043442                           @ 08043438 03e0
     .zero  0x2
-DAT_0804343c:
-    .word  0x0000ffff                     @ 0804343c ffff0000
+enqueue_equip_chain_pair_no_pair:
+    .word  SLOT_CARD_EMPTY                @ 0804343c ffff0000  SLOT_CARD_EMPTY=0xffff: NO_PAIR sentinel (chain pair not found); same encoding as empty slot
 LAB_08043440:
     movs r6,#0xa    @ 08043440 0a26
 LAB_08043442:
@@ -7215,7 +7237,7 @@ LAB_08043442:
     bx r0                                    @ 08043458 0047
     .zero  0x2
 
-@ Called by scan_equip_chain_list_by_player_slot (FUN_080435c4) and FUN_0809bdfc. Unpacks r0=u8 player_a and r1=u8 player_b from bit-packed words. Double loop r5 [0..1] x r4 [0..4]: calls enqueue_equip_chain_slot_sprite_attr (r0=player_side, r1=slot_idx, r2=r7, r3=1) 10 times total (2 players x 5 slots). Returns void. Params: r0=u8 player_a [0..1], r1=u8 player_b [0..1].
+@ Called by scan_equip_chain_list_by_player_slot (scan_equip_chain_list_by_player_slot) and scan_equip_chain_slots_for_attr_enqueue. Unpacks r0=u8 player_a and r1=u8 player_b from bit-packed words. Double loop r5 [0..1] x r4 [0..4]: calls enqueue_equip_chain_slot_sprite_attr (r0=player_side, r1=slot_idx, r2=r7, r3=1) 10 times total (2 players x 5 slots). Returns void. Params: r0=u8 player_a [0..1], r1=u8 player_b [0..1].
 enqueue_equip_chain_attrs_for_slot_range:
     push {r4,r5,r6,r7,lr}                    @ 0804345c f0b5
     lsls r0,r0,#0x18    @ 0804345e 0006
@@ -7243,7 +7265,7 @@ LAB_0804346e:
     pop {r0}                                 @ 08043488 01bc
     bx r0                                    @ 0804348a 0047
 
-@ Called by FUN_08090218 (duel_field main control); key scanner for equip-chain sprite update. Traverses equip-chain linked list (base 0x0201d9c0), reads [node+0x6] as next-node ID. Extracts low 4 bits of [node+0x2] for card type: 0xa (equip) or 0x6 (spell) enters sprite path. Reads target slot card_id, locates in gDuelFieldSlots (0x0201c510); checks slot has valid card and activation flag ([slot+0x10] bit5) is clear. If conditions met: calls check_slot_zone_bit_eligible / get_card_extended_stat_field7 for extra validation, then calls enqueue_equip_chain_sprite_by_side (FUN_08043274) to write sprite. Terminates when [node+0x6]==0. r0=u8 player_id [0..1], r1=u8 slot_idx [0..10]. Returns void. Prologue: .hword 0x4682=mov r10,r0, .hword 0x4689=mov r9,r1. Constants: chain_list=0x0201d9c0, gDuelFieldSlots=0x0201c510, type_equip=0xa, type_spell=0x6. Callers: FUN_08090218.
+@ Called by dispatch_equip_field_scan_sequence (duel_field main control); key scanner for equip-chain sprite update. Traverses equip-chain linked list (base 0x0201d9c0), reads [node+0x6] as next-node ID. Extracts low 4 bits of [node+0x2] for card type: 0xa (equip) or 0x6 (spell) enters sprite path. Reads target slot card_id, locates in gDuelFieldSlots (0x0201c510); checks slot has valid card and activation flag ([slot+0x10] bit5) is clear. If conditions met: calls check_slot_zone_bit_eligible / get_card_extended_stat_field7 for extra validation, then calls enqueue_equip_chain_sprite_by_side (enqueue_equip_chain_sprite_by_side) to write sprite. Terminates when [node+0x6]==0. r0=u8 player_id [0..1], r1=u8 slot_idx [0..10]. Returns void. Prologue: .hword 0x4682=mov r10,r0, .hword 0x4689=mov r9,r1. Constants: chain_list=0x0201d9c0, gDuelFieldSlots=0x0201c510, type_equip=0xa, type_spell=0x6. Callers: dispatch_equip_field_scan_sequence.
 scan_equip_chain_list_for_sprite_update:
     push {r4,r5,r6,r7,lr}                    @ 0804348c f0b5
     .hword 0x4657    @ 0804348e 5746
@@ -7258,10 +7280,10 @@ scan_equip_chain_list_for_sprite_update:
     lsls r0,r1,#0x2    @ 080434a0 8800
     add r0,r9                                @ 080434a2 4844
     lsls r0,r0,#0x2    @ 080434a4 8000
-    ldr r1, DAT_08043530                     @ 080434a6 2249
+    ldr r1, scan_equip_chain_list_stride     @ 080434a6 2249
     muls r1,r2    @ 080434a8 5143
     adds r0,r0,r1    @ 080434aa 4018
-    ldr r1, DAT_08043534                     @ 080434ac 2149
+    ldr r1, scan_equip_chain_list_slots      @ 080434ac 2149
     adds r0,r0,r1    @ 080434ae 4018
     ldrh r6,[r0,#0xa]                        @ 080434b0 4689
     cmp r6,#0x0                              @ 080434b2 002e
@@ -7269,7 +7291,7 @@ scan_equip_chain_list_for_sprite_update:
     b LAB_080435b4                           @ 080434b6 7de0
 LAB_080434b8:
     lsls r0,r6,#0x3    @ 080434b8 f000
-    ldr r1, DAT_08043538                     @ 080434ba 1f49
+    ldr r1, scan_equip_chain_list_nodepool   @ 080434ba 1f49
     adds r5,r0,r1    @ 080434bc 4518
     ldrh r2,[r5,#0x6]                        @ 080434be ea88
     str r2,[sp,#0x4]                         @ 080434c0 0192
@@ -7291,11 +7313,11 @@ LAB_080434d0:
     lsls r1,r0,#0x2    @ 080434de 8100
     adds r1,r1,r0    @ 080434e0 0918
     lsls r1,r1,#0x2    @ 080434e2 8900
-    ldr r0, DAT_08043530                     @ 080434e4 1248
+    ldr r0, scan_equip_chain_list_stride     @ 080434e4 1248
     muls r0,r2    @ 080434e6 5043
     adds r1,r1,r0    @ 080434e8 0918
-    ldr r2, DAT_08043538                     @ 080434ea 134a
-    ldr r3, DAT_0804353c                     @ 080434ec 134b
+    ldr r2, scan_equip_chain_list_nodepool   @ 080434ea 134a
+    ldr r3, scan_equip_chain_list_neg_off    @ 080434ec 134b
     adds r0,r2,r3    @ 080434ee d018
     adds r3,r1,r0    @ 080434f0 0b18
     ldr r0,[r3,#0x0]                         @ 080434f2 1868
@@ -7306,7 +7328,7 @@ LAB_080434d0:
     ldrh r0,[r3,#0x8]                        @ 080434fc 1889
     cmp r0,#0x0                              @ 080434fe 0028
     beq LAB_080435ac                         @ 08043500 54d0
-    ldr r4, DAT_08043540                     @ 08043502 0f4c
+    ldr r4, scan_equip_chain_list_slotstate  @ 08043502 0f4c
     adds r0,r1,r4    @ 08043504 0819
     ldr r0,[r0,#0x0]                         @ 08043506 0068
     lsrs r0,r0,#0x5    @ 08043508 4009
@@ -7316,12 +7338,12 @@ LAB_080434d0:
     bne LAB_080435ac                         @ 08043510 4cd1
     movs r4,#0x1    @ 08043512 0124
     rsbs r4,r4,#0    @ 08043514 6442
-    ldr r0, DAT_08043544                     @ 08043516 0b48
+    ldr r0, scan_equip_chain_cid_falling_down @ 08043516 0b48
     cmp r2,r0                                @ 08043518 8242
     beq LAB_08043590                         @ 0804351a 39d0
     cmp r2,r0                                @ 0804351c 8242
     bgt LAB_08043558                         @ 0804351e 1bdc
-    ldr r0, DAT_08043548                     @ 08043520 0948
+    ldr r0, scan_equip_chain_cid_13ea        @ 08043520 0948
     cmp r2,r0                                @ 08043522 8242
     beq LAB_08043594                         @ 08043524 36d0
     cmp r2,r0                                @ 08043526 8242
@@ -7329,30 +7351,30 @@ LAB_080434d0:
     subs r0,#0xc8    @ 0804352a c838
     b LAB_0804354e                           @ 0804352c 0fe0
     .zero  0x2
-DAT_08043530:
-    .word  0x00000868                     @ 08043530 68080000
-DAT_08043534:
-    .word  0x0201c510                     @ 08043534 10c50102
-DAT_08043538:
-    .word  0x0201d9c0                     @ 08043538 c0d90102
-DAT_0804353c:
-    .word  0xffffeb50                     @ 0804353c 50ebffff
-DAT_08043540:
-    .word  0x0201c520                     @ 08043540 20c50102
-DAT_08043544:
-    .word  0x0000169a                     @ 08043544 9a160000
-DAT_08043548:
-    .word  0x000013ea                     @ 08043548 ea130000
+scan_equip_chain_list_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043530 68080000
+scan_equip_chain_list_slots:
+    .word  gDuelFieldSlots                @ 08043534 10c50102
+scan_equip_chain_list_nodepool:
+    .word  gEquipNodePool                 @ 08043538 c0d90102
+scan_equip_chain_list_neg_off:
+    .word  NODE_POOL_NEG_OFFSET           @ 0804353c 50ebffff
+scan_equip_chain_list_slotstate:
+    .word  gDuelFieldSlotState            @ 08043540 20c50102
+scan_equip_chain_cid_falling_down:
+    .word  FALLING_DOWN_CID               @ 08043544 9a160000  FALLING_DOWN_CID=0x169a: BST branch node in scan_equip_chain_list_for_sprite_update
+scan_equip_chain_cid_13ea:
+    .word  0x000013ea                     @ 08043548 ea130000  unassigned slot_id 0x13ea (gap between 0x13e8 Nuvia and 0x13eb Soul Exchange); BST branch only; med-conf
 LAB_0804354c:
-    ldr r0, DAT_08043554                     @ 0804354c 0148
+    ldr r0, scan_equip_chain_cid_dark_necrofear @ 0804354c 0148
 LAB_0804354e:
     cmp r2,r0                                @ 0804354e 8242
     beq LAB_08043590                         @ 08043550 1ed0
     b LAB_08043596                           @ 08043552 20e0
-DAT_08043554:
-    .word  0x00001466                     @ 08043554 66140000
+scan_equip_chain_cid_dark_necrofear:
+    .word  DARK_NECROFEAR_CID             @ 08043554 66140000  DARK_NECROFEAR_CID=0x1466: BST branch node; Dark Necrofear equip spell path
 LAB_08043558:
-    ldr r0, DAT_0804358c                     @ 08043558 0c48
+    ldr r0, scan_equip_chain_cid_brain_jacker @ 08043558 0c48
     cmp r2,r0                                @ 0804355a 8242
     beq LAB_08043590                         @ 0804355c 18d0
     cmp r2,r0                                @ 0804355e 8242
@@ -7376,8 +7398,8 @@ LAB_08043558:
     ands r4,r5    @ 08043586 2c40
     b LAB_08043596                           @ 08043588 05e0
     .zero  0x2
-DAT_0804358c:
-    .word  0x00001877                     @ 0804358c 77180000
+scan_equip_chain_cid_brain_jacker:
+    .word  BRAIN_JACKER_CID               @ 0804358c 77180000  BRAIN_JACKER_CID=0x1877: BST branch node; Brain Jacker equip spell path
 LAB_08043590:
     adds r4,r7,#0x0    @ 08043590 3c1c
     b LAB_08043596                           @ 08043592 00e0
@@ -7409,7 +7431,7 @@ LAB_080435b4:
     pop {r0}                                 @ 080435c0 01bc
     bx r0                                    @ 080435c2 0047
 
-@ Called exclusively by FUN_08042bd0 (duel_field). Locates slot in gDuelFieldSlots (0x0201c510, stride=0x868, entry_size=0x14). Reads [slot+0xa] halfword as equip chain head node ID. If head==0: if slot_idx<=4, calls enqueue_equip_chain_attrs_for_slot_range. Else traverses chain: reads [node+2] bits[3:0] card_type; if type in [0xa..0xd]: reads player/slot from [node+0]/[node+1], next_id from [node+6]; calls enqueue_equip_chain_slot_sprite_attr then enqueue_equip_slot_bitmap_update. Returns void. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9]. Constants: gDuelFieldSlots=0x0201c510, chain_table=0x0201d9c0, stride=0x868.
+@ Called exclusively by dispatch_equip_chain_slot_scan_by_player (duel_field). Locates slot in gDuelFieldSlots (0x0201c510, stride=0x868, entry_size=0x14). Reads [slot+0xa] halfword as equip chain head node ID. If head==0: if slot_idx<=4, calls enqueue_equip_chain_attrs_for_slot_range. Else traverses chain: reads [node+2] bits[3:0] card_type; if type in [0xa..0xd]: reads player/slot from [node+0]/[node+1], next_id from [node+6]; calls enqueue_equip_chain_slot_sprite_attr then enqueue_equip_slot_bitmap_update. Returns void. Params: r0=u32 player_side [0..1], r1=u32 slot_idx [0..9]. Constants: gDuelFieldSlots=0x0201c510, chain_table=0x0201d9c0, stride=0x868.
 scan_equip_chain_list_by_player_slot:
     push {r4,r5,r6,r7,lr}                    @ 080435c4 f0b5
     .hword 0x4647    @ 080435c6 4746
@@ -7421,17 +7443,17 @@ scan_equip_chain_list_by_player_slot:
     lsls r0,r7,#0x2    @ 080435d2 b800
     adds r0,r0,r7    @ 080435d4 c019
     lsls r0,r0,#0x2    @ 080435d6 8000
-    ldr r1, DAT_08043638                     @ 080435d8 1749
+    ldr r1, scan_equip_chain_by_slot_stride  @ 080435d8 1749
     muls r1,r2    @ 080435da 5143
     adds r0,r0,r1    @ 080435dc 4018
-    ldr r1, DAT_0804363c                     @ 080435de 1749
+    ldr r1, scan_equip_chain_by_slot_slots   @ 080435de 1749
     adds r0,r0,r1    @ 080435e0 4018
     ldrh r0,[r0,#0xa]                        @ 080435e2 4089
     cmp r0,#0x0                              @ 080435e4 0028
     beq LAB_08043620                         @ 080435e6 1bd0
 LAB_080435e8:
     lsls r0,r0,#0x3    @ 080435e8 c000
-    ldr r1, DAT_08043640                     @ 080435ea 1549
+    ldr r1, scan_equip_chain_by_slot_pool    @ 080435ea 1549
     adds r1,r0,r1    @ 080435ec 4118
     ldrh r6,[r1,#0x6]                        @ 080435ee ce88
     ldrb r2,[r1,#0x2]                        @ 080435f0 8a78
@@ -7470,14 +7492,14 @@ LAB_0804362c:
     pop {r0}                                 @ 08043632 01bc
     bx r0                                    @ 08043634 0047
     .zero  0x2
-DAT_08043638:
-    .word  0x00000868                     @ 08043638 68080000
-DAT_0804363c:
-    .word  0x0201c510                     @ 0804363c 10c50102
-DAT_08043640:
-    .word  0x0201d9c0                     @ 08043640 c0d90102
+scan_equip_chain_by_slot_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043638 68080000
+scan_equip_chain_by_slot_slots:
+    .word  gDuelFieldSlots                @ 0804363c 10c50102
+scan_equip_chain_by_slot_pool:
+    .word  gEquipNodePool                 @ 08043640 c0d90102
 
-@ Reads linked list head from slot [+0xa]; if non-zero, traverses chain. For each entry, reads byte[+0x2] bits[3:0] and compares with chain_type_filter. On match, calls enqueue_equip_slot_bitmap_update with [entry+0x0], [entry+0x1] and [entry+0x6] halfword. r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; r2=u8 chain_type_filter [0..15]. Returns void. Called only by FUN_08044e30 (duel_field hub). Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, chain_entry_base=0x0201d9c0, link_field_offset=0xa, entry_size=8.
+@ Reads linked list head from slot [+0xa]; if non-zero, traverses chain. For each entry, reads byte[+0x2] bits[3:0] and compares with chain_type_filter. On match, calls enqueue_equip_slot_bitmap_update with [entry+0x0], [entry+0x1] and [entry+0x6] halfword. r0=u8 player_id [0..1]; r1=u8 slot_idx [0..9]; r2=u8 chain_type_filter [0..15]. Returns void. Called only by update_duel_field_slot_sprite_state (duel_field hub). Constants: player_stride=0x868, gDuelFieldSlots=0x0201c510, chain_entry_base=0x0201d9c0, link_field_offset=0xa, entry_size=8.
 enqueue_sprite_attrs_for_card_chain_list:
     push {r4,r5,lr}                          @ 08043644 30b5
     adds r5,r2,#0x0    @ 08043646 151c
@@ -7486,17 +7508,17 @@ enqueue_sprite_attrs_for_card_chain_list:
     lsls r0,r1,#0x2    @ 0804364c 8800
     adds r0,r0,r1    @ 0804364e 4018
     lsls r0,r0,#0x2    @ 08043650 8000
-    ldr r1, DAT_08043690                     @ 08043652 0f49
+    ldr r1, enqueue_sprite_attrs_chain_stride @ 08043652 0f49
     muls r1,r2    @ 08043654 5143
     adds r0,r0,r1    @ 08043656 4018
-    ldr r1, DAT_08043694                     @ 08043658 0e49
+    ldr r1, enqueue_sprite_attrs_chain_slots @ 08043658 0e49
     adds r0,r0,r1    @ 0804365a 4018
     ldrh r1,[r0,#0xa]                        @ 0804365c 4189
     cmp r1,#0x0                              @ 0804365e 0029
     beq LAB_08043688                         @ 08043660 12d0
 LAB_08043662:
     lsls r1,r1,#0x3    @ 08043662 c900
-    ldr r0, DAT_08043698                     @ 08043664 0c48
+    ldr r0, enqueue_sprite_attrs_chain_pool  @ 08043664 0c48
     adds r1,r1,r0    @ 08043666 0918
     ldrh r4,[r1,#0x6]                        @ 08043668 cc88
     ldrb r2,[r1,#0x2]                        @ 0804366a 8a78
@@ -7519,12 +7541,12 @@ LAB_08043688:
     pop {r0}                                 @ 0804368a 01bc
     bx r0                                    @ 0804368c 0047
     .zero  0x2
-DAT_08043690:
-    .word  0x00000868                     @ 08043690 68080000
-DAT_08043694:
-    .word  0x0201c510                     @ 08043694 10c50102
-DAT_08043698:
-    .word  0x0201d9c0                     @ 08043698 c0d90102
+enqueue_sprite_attrs_chain_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043690 68080000
+enqueue_sprite_attrs_chain_slots:
+    .word  gDuelFieldSlots                @ 08043694 10c50102
+enqueue_sprite_attrs_chain_pool:
+    .word  gEquipNodePool                 @ 08043698 c0d90102
 
 @ Equip slot bitmap update function for type_d (chain node type 0xd). Receives player_side/slot_idx, calls find_equip_chain_node_by_type_d to find type-0xd node in the slot equip chain. If not found (returns 0xffff), returns immediately. If found, extracts entity_player/entity_slot fields from node info, reads corresponding slot card_id from gDuelFieldSlots (lsls#0x13, low 13 bits), then calls enqueue_equip_slot_bitmap_update(entity_player, entity_slot, card_id, 1). indeg=0 (isolated function, no bl callers, no pointer table refs).
 @ 
@@ -7539,7 +7561,7 @@ enqueue_equip_slot_bitmap_update_by_type_d:
     bl find_equip_chain_node_by_type_d       @ 080436a2 ecf719f9
     lsls r1,r0,#0x10    @ 080436a6 0104
     lsrs r2,r1,#0x10    @ 080436a8 0a0c
-    ldr r0, DAT_080436dc                     @ 080436aa 0c48
+    ldr r0, enqueue_equip_bitmap_type_d_no_node @ 080436aa 0c48
     cmp r2,r0                                @ 080436ac 8242
     beq LAB_080436d6                         @ 080436ae 12d0
     lsls r0,r2,#0x18    @ 080436b0 1006
@@ -7550,10 +7572,10 @@ enqueue_equip_slot_bitmap_update_by_type_d:
     lsls r2,r5,#0x2    @ 080436ba aa00
     adds r2,r2,r5    @ 080436bc 5219
     lsls r2,r2,#0x2    @ 080436be 9200
-    ldr r3, DAT_080436e0                     @ 080436c0 074b
+    ldr r3, enqueue_slot_bitmap_type_d_stride @ 080436c0 074b
     muls r3,r4    @ 080436c2 6343
     adds r2,r2,r3    @ 080436c4 d218
-    ldr r3, DAT_080436e4                     @ 080436c6 074b
+    ldr r3, enqueue_slot_bitmap_type_d_slots @ 080436c6 074b
     adds r2,r2,r3    @ 080436c8 d218
     ldr r3,[r2,#0x0]                         @ 080436ca 1368
     lsls r3,r3,#0x13    @ 080436cc db04
@@ -7564,12 +7586,12 @@ LAB_080436d6:
     pop {r4,r5,r6}                           @ 080436d6 70bc
     pop {r0}                                 @ 080436d8 01bc
     bx r0                                    @ 080436da 0047
-DAT_080436dc:
-    .word  0x0000ffff                     @ 080436dc ffff0000
-DAT_080436e0:
-    .word  0x00000868                     @ 080436e0 68080000
-DAT_080436e4:
-    .word  0x0201c510                     @ 080436e4 10c50102
+enqueue_equip_bitmap_type_d_no_node:
+    .word  SLOT_CARD_EMPTY                @ 080436dc ffff0000  SLOT_CARD_EMPTY=0xffff: NO_NODE sentinel (chain node not found); same encoding as empty slot
+enqueue_slot_bitmap_type_d_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080436e0 68080000
+enqueue_slot_bitmap_type_d_slots:
+    .word  gDuelFieldSlots                @ 080436e4 10c50102
 
 @ Field slot sprite attribute dispatch function, extracts equip_head flag from chain node struct then forwards. Receives chain node ptr r0; extracts data from [r0+0x0] halfword and [r0+0x2] byte. [r0+0x2] bit0 XOR player_side determines has_equip_head flag (XOR nonzero -> flag=1, else 0). Stores result into sp[0], then calls enqueue_slot_sprite_attr_by_card_type_and_state with (player_side, slot_idx, card_type, sp[0]=has_equip_head). Multiple duel_field callers in equip zone sprite update scan.
 @ 
@@ -7617,10 +7639,10 @@ enqueue_slot_sprite_attr_by_card_type_and_state:
     lsls r0,r4,#0x2    @ 0804372c a000
     adds r0,r0,r4    @ 0804372e 0019
     lsls r0,r0,#0x2    @ 08043730 8000
-    ldr r1, DAT_08043768                     @ 08043732 0d49
+    ldr r1, enqueue_slot_sprite_by_state_stride @ 08043732 0d49
     muls r1,r2    @ 08043734 5143
     adds r0,r0,r1    @ 08043736 4018
-    ldr r1, DAT_0804376c                     @ 08043738 0c49
+    ldr r1, enqueue_slot_sprite_by_state_slots @ 08043738 0c49
     adds r0,r0,r1    @ 0804373a 4018
     ldr r0,[r0,#0x0]                         @ 0804373c 0068
     lsls r0,r0,#0x13    @ 0804373e c004
@@ -7643,10 +7665,10 @@ LAB_08043750:
     bl check_slot_fieldspell_eligible_by_side @ 08043760 f2f7c6ff
     b LAB_08043784                           @ 08043764 0ee0
     .zero  0x2
-DAT_08043768:
-    .word  0x00000868                     @ 08043768 68080000
-DAT_0804376c:
-    .word  0x0201c510                     @ 0804376c 10c50102
+enqueue_slot_sprite_by_state_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043768 68080000
+enqueue_slot_sprite_by_state_slots:
+    .word  gDuelFieldSlots                @ 0804376c 10c50102
 LAB_08043770:
     adds r0,r5,#0x0    @ 08043770 281c
     bl get_card_extended_stat_field6         @ 08043772 abf041fb
@@ -7675,10 +7697,10 @@ LAB_08043792:
     lsls r2,r4,#0x2    @ 0804379e a200
     adds r0,r2,r4    @ 080437a0 1019
     lsls r0,r0,#0x2    @ 080437a2 8000
-    ldr r1, DAT_080438c0                     @ 080437a4 4649
+    ldr r1, enqueue_slot_sprite_attr_stride  @ 080437a4 4649
     muls r1,r3    @ 080437a6 5943
     adds r0,r0,r1    @ 080437a8 4018
-    ldr r1, DAT_080438c4                     @ 080437aa 4649
+    ldr r1, enqueue_slot_sprite_attr_slots   @ 080437aa 4649
     adds r5,r0,r1    @ 080437ac 4518
     ldrh r0,[r5,#0x8]                        @ 080437ae 2889
     str r2,[sp,#0xc]                         @ 080437b0 0392
@@ -7689,27 +7711,27 @@ LAB_08043792:
     str r1,[sp,#0x4]                         @ 080437ba 0191
 LAB_080437bc:
     lsls r1,r3,#0x9    @ 080437bc 5902
-    ldr r0, DAT_080438c8                     @ 080437be 4248
+    ldr r0, enqueue_slot_sprite_attr_clr_bit9 @ 080437be 4248
     ands r6,r0    @ 080437c0 0640
     orrs r6,r1    @ 080437c2 0e43
     movs r0,#0xf    @ 080437c4 0f20
     ands r0,r4    @ 080437c6 2040
     lsls r0,r0,#0xa    @ 080437c8 8002
-    ldr r1, DAT_080438cc                     @ 080437ca 4049
+    ldr r1, enqueue_slot_sprite_attr_clr_bits13_10 @ 080437ca 4049
     ands r6,r1    @ 080437cc 0e40
     orrs r6,r0    @ 080437ce 0643
     .hword 0x4660    @ 080437d0 6046
     ldrh r1,[r5,#0x6]                        @ 080437d2 e988
     ands r0,r1    @ 080437d4 0840
     lsls r0,r0,#0xe    @ 080437d6 8003
-    ldr r1, DAT_080438d0                     @ 080437d8 3d49
+    ldr r1, enqueue_slot_sprite_attr_clr_bit14 @ 080437d8 3d49
     ands r6,r1    @ 080437da 0e40
     orrs r6,r0    @ 080437dc 0643
     ldr r0,[sp,#0x4]                         @ 080437de 0198
     .hword 0x4661    @ 080437e0 6146
     ands r0,r1    @ 080437e2 0840
     lsls r0,r0,#0xf    @ 080437e4 c003
-    ldr r1, DAT_080438d4                     @ 080437e6 3b49
+    ldr r1, enqueue_slot_sprite_attr_clr_bit15 @ 080437e6 3b49
     ands r6,r1    @ 080437e8 0e40
     orrs r6,r0    @ 080437ea 0643
     ldr r1,[r5,#0x0]                         @ 080437ec 2968
@@ -7719,12 +7741,12 @@ LAB_080437bc:
     lsls r1,r1,#0x12    @ 080437f4 8904
     lsrs r1,r1,#0x1f    @ 080437f6 c90f
     orrs r0,r1    @ 080437f8 0843
-    ldr r1, DAT_080438d8                     @ 080437fa 3749
+    ldr r1, enqueue_slot_sprite_attr_clr_bits8_0 @ 080437fa 3749
     ands r6,r1    @ 080437fc 0e40
     orrs r6,r0    @ 080437fe 0643
-    ldr r0, DAT_080438dc                     @ 08043800 3648
+    ldr r0, enqueue_slot_sprite_attr_clr_bit16 @ 08043800 3648
     ands r6,r0    @ 08043802 0640
-    ldr r0, DAT_080438e0                     @ 08043804 3648
+    ldr r0, enqueue_slot_sprite_attr_clr_bit17 @ 08043804 3648
     ands r6,r0    @ 08043806 0640
     .hword 0x4640    @ 08043808 4046
     cmp r0,#0x0                              @ 0804380a 0028
@@ -7742,7 +7764,7 @@ LAB_0804381e:
     str r1,[sp,#0x8]                         @ 08043820 0291
     cmp r7,#0x0                              @ 08043822 002f
     beq LAB_0804382a                         @ 08043824 01d0
-    ldr r0, DAT_080438e4                     @ 08043826 2f48
+    ldr r0, enqueue_slot_sprite_by_state_pal_p1 @ 08043826 2f48
     str r0,[sp,#0x8]                         @ 08043828 0290
 LAB_0804382a:
     lsls r3,r4,#0x10    @ 0804382a 2304
@@ -7754,7 +7776,7 @@ LAB_0804382a:
     ldr r1,[sp,#0xc]                         @ 08043836 0399
     adds r0,r1,r4    @ 08043838 0819
     lsls r0,r0,#0x2    @ 0804383a 8000
-    ldr r1, DAT_080438c0                     @ 0804383c 2049
+    ldr r1, enqueue_slot_sprite_attr_stride  @ 0804383c 2049
     muls r1,r2    @ 0804383e 5143
     adds r0,r0,r1    @ 08043840 4018
     add r0,r9                                @ 08043842 4844
@@ -7791,10 +7813,10 @@ LAB_0804385e:
     ldr r0,[sp,#0xc]                         @ 0804387e 0398
     adds r4,r0,r4    @ 08043880 0419
     lsls r4,r4,#0x2    @ 08043882 a400
-    ldr r0, DAT_080438c0                     @ 08043884 0e48
+    ldr r0, enqueue_slot_sprite_attr_stride  @ 08043884 0e48
     muls r0,r1    @ 08043886 4843
     adds r4,r4,r0    @ 08043888 2418
-    ldr r0, DAT_080438c4                     @ 0804388a 0e48
+    ldr r0, enqueue_slot_sprite_attr_slots   @ 0804388a 0e48
     adds r4,r4,r0    @ 0804388c 2418
     movs r5,#0x0    @ 0804388e 0025
     strh r2,[r4,#0x8]                        @ 08043890 2281
@@ -7820,26 +7842,26 @@ LAB_080438b4:
     bl submit_lp_bar_sprite_row_by_type      @ 080438b8 41f032fd
     b LAB_080438f0                           @ 080438bc 18e0
     .zero  0x2
-DAT_080438c0:
-    .word  0x00000868                     @ 080438c0 68080000
-DAT_080438c4:
-    .word  0x0201c510                     @ 080438c4 10c50102
-DAT_080438c8:
-    .word  0xfffffdff                     @ 080438c8 fffdffff
-DAT_080438cc:
-    .word  0xffffc3ff                     @ 080438cc ffc3ffff
-DAT_080438d0:
-    .word  0xffffbfff                     @ 080438d0 ffbfffff
-DAT_080438d4:
-    .word  0xffff7fff                     @ 080438d4 ff7fffff
-DAT_080438d8:
-    .word  0xfffffe00                     @ 080438d8 00feffff
-DAT_080438dc:
-    .word  0xfffeffff                     @ 080438dc fffffeff
-DAT_080438e0:
-    .word  0xfffdffff                     @ 080438e0 fffffdff
-DAT_080438e4:
-    .word  0x00008035                     @ 080438e4 35800000
+enqueue_slot_sprite_attr_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 080438c0 68080000
+enqueue_slot_sprite_attr_slots:
+    .word  gDuelFieldSlots                @ 080438c4 10c50102
+enqueue_slot_sprite_attr_clr_bit9:
+    .word  OAM_SPRITE_ATTR_CLR_BIT9       @ 080438c8 fffdffff  OAM_SPRITE_ATTR_CLR_BIT9=0xfffffdff: AND mask clears bit9 (player_side) of OAM sprite attr word; 480 ROM refs
+enqueue_slot_sprite_attr_clr_bits13_10:
+    .word  OAM_SPRITE_ATTR_CLR_BITS13_10  @ 080438cc ffc3ffff  OAM_SPRITE_ATTR_CLR_BITS13_10=0xffffc3ff: AND mask clears bits[13:10] (slot_idx field); 27 ROM refs
+enqueue_slot_sprite_attr_clr_bit14:
+    .word  SLOT_ACTIVE_BIT14_CLR          @ 080438d0 ffbfffff  SLOT_ACTIVE_BIT14_CLR=0xffffbfff: AND mask clears bit14 (equip_head flag) of OAM sprite attr
+enqueue_slot_sprite_attr_clr_bit15:
+    .word  SLOT_ACTIVE_BIT15_CLR          @ 080438d4 ff7fffff  SLOT_ACTIVE_BIT15_CLR=0xffff7fff: AND mask clears bit15 (extra_flag) of OAM sprite attr
+enqueue_slot_sprite_attr_clr_bits8_0:
+    .word  OAM_ATTR1_X_CLEAR              @ 080438d8 00feffff  OAM_ATTR1_X_CLEAR=0xfffffe00: AND mask clears attr1 bits[8:0] (x-coordinate); oam_attr.inc:19
+enqueue_slot_sprite_attr_clr_bit16:
+    .word  OAM_SPRITE_ATTR_CLR_BIT16      @ 080438dc fffffeff  OAM_SPRITE_ATTR_CLR_BIT16=0xfffeffff: AND mask clears bit16 (flip flag) of OAM sprite attr; 1475 ROM refs
+enqueue_slot_sprite_attr_clr_bit17:
+    .word  OAM_SPRITE_ATTR_CLR_BIT17      @ 080438e0 fffffdff  OAM_SPRITE_ATTR_CLR_BIT17=0xfffdffff: AND mask clears bit17 (composite sprite flag); 448 ROM refs
+enqueue_slot_sprite_by_state_pal_p1:
+    .word  OAM_ZONE_CARD_SPRITE_P1        @ 080438e4 35800000  OAM_ZONE_CARD_SPRITE_P1=0x8035: zone occupied card OAM attr0 P1 (bit15+0x35); 8 ROM refs
 LAB_080438e8:
     movs r0,#0x9    @ 080438e8 0920
     adds r1,r6,#0x0    @ 080438ea 311c
@@ -7870,10 +7892,10 @@ enqueue_zone_slot_sprite_attr_if_occupied:
     lsls r0,r3,#0x2    @ 0804390c 9800
     adds r0,r0,r3    @ 0804390e c018
     lsls r0,r0,#0x2    @ 08043910 8000
-    ldr r1, DAT_08043940                     @ 08043912 0b49
+    ldr r1, enqueue_zone_slot_if_occ_stride  @ 08043912 0b49
     muls r1,r2    @ 08043914 5143
     adds r0,r0,r1    @ 08043916 4018
-    ldr r1, DAT_08043944                     @ 08043918 0a49
+    ldr r1, enqueue_zone_slot_if_occ_slots   @ 08043918 0a49
     adds r0,r0,r1    @ 0804391a 4018
     ldr r0,[r0,#0x0]                         @ 0804391c 0068
     lsls r0,r0,#0x13    @ 0804391e c004
@@ -7882,7 +7904,7 @@ enqueue_zone_slot_sprite_attr_if_occupied:
     movs r0,#0x35    @ 08043924 3520
     cmp r4,#0x0                              @ 08043926 002c
     beq LAB_0804392c                         @ 08043928 00d0
-    ldr r0, DAT_08043948                     @ 0804392a 0748
+    ldr r0, enqueue_zone_slot_if_occ_pal_p1  @ 0804392a 0748
 LAB_0804392c:
     lsls r1,r3,#0x10    @ 0804392c 1904
     lsrs r1,r1,#0x10    @ 0804392e 090c
@@ -7894,12 +7916,12 @@ LAB_0804393a:
     pop {r4,r5}                              @ 0804393a 30bc
     pop {r0}                                 @ 0804393c 01bc
     bx r0                                    @ 0804393e 0047
-DAT_08043940:
-    .word  0x00000868                     @ 08043940 68080000
-DAT_08043944:
-    .word  0x0201c510                     @ 08043944 10c50102
-DAT_08043948:
-    .word  0x00008035                     @ 08043948 35800000
+enqueue_zone_slot_if_occ_stride:
+    .word  PLAYER_BLOCK_STRIDE            @ 08043940 68080000
+enqueue_zone_slot_if_occ_slots:
+    .word  gDuelFieldSlots                @ 08043944 10c50102
+enqueue_zone_slot_if_occ_pal_p1:
+    .word  OAM_ZONE_CARD_SPRITE_P1        @ 08043948 35800000  OAM_ZONE_CARD_SPRITE_P1=0x8035: reuse; enqueue_zone_slot_sprite_attr_if_occupied P1 path
 
 @ Reads gDuelFieldSlots[player_side][slot_idx]; if bit9 set (slot occupied), builds OAM sprite attr and calls enqueue_sprite_attr_record. OAM_ATTR0_BASE=0x8035 (Y_pos[7:0]=0x35, bit15=1, 4bpp square shape). slot offset = slot_idx*0x14; player offset = (player_side&1)*0x868. slot[+8] halfword: 0 -> flip_flag=1, non-zero -> flip_flag=0. Calls enqueue_sprite_attr_record(0x8035, slot_idx_masked, flip_flag, 4). r0=u32 player_side [0..1]; r1=u32 slot_idx [0..10]. Returns void. Constants: gDuelFieldSlots=0x0201c510, player_stride=0x868, slot_stride=0x14, OAM_ATTR0_BASE=0x8035, OAM_count=4.
 enqueue_zone_card_sprite_attr_by_slot:

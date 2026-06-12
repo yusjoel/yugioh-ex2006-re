@@ -97,7 +97,7 @@
 | 2 | 0x407fc..0x40c88 | 20 | 46 | — | ✅ | (see §四.4.02) |
 | 3 | 0x40c88..0x417f0 | 19 | 98 | — | ✅ | (see §四.4.03) |
 | 4 | 0x417f0..0x4308c | 19 | 159 | — | ✅ | (see §四.4.04) |
-| 5 | 0x4308c..0x4394c | 19 | 48 | — | ⬜ | — |
+| 5 | 0x4308c..0x4394c | 19 | 48 | — | ✅ | (see §四.4.05) |
 | 6 | 0x4394c..0x44674 | 20 | 69 | — | ⬜ | — |
 | 7 | 0x44674..0x44e30 | 19 | 35 | — | ⬜ | — |
 | 8 | 0x44e30..0x47990 | 19 | 275 | — | ⬜ | — |
@@ -244,6 +244,51 @@ Dry run found 2 address mismatches (0x08042e98/0x08042e9c swapped, 0x08042468 co
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 **commit**: a62d2e2
+
+---
+
+### 4.05 Seg-5 完成记录 (0x0804308c..0x0804394c)
+
+**函数列表 (19)**:
+enqueue_slot_card_sprite_if_eligible / enqueue_equip_zone_sprite_attr_by_player /
+enqueue_equip_chain_slot_sprite_attr / enqueue_sprite_attr_for_chain_node_check /
+enqueue_equip_chain_all_slots_for_pair / enqueue_sprite_attr_for_chain_node_match /
+enqueue_equip_chain_sprite_by_side / enqueue_zone_slot_sprite_attr_by_card_type /
+enqueue_equip_set_slot_sprite_by_zone_col / enqueue_equip_slot_sprite_attr_by_state /
+scan_equip_chain_list_for_sprite_update / enqueue_equip_chain_attrs_for_slot_range /
+scan_equip_chain_list_by_player_slot / scan_equip_chain_by_slot_for_update /
+enqueue_sprite_attrs_for_card_chain_list / enqueue_slot_bitmap_type_d_for_equip /
+enqueue_slot_sprite_by_state_and_type / enqueue_slot_sprite_attr_by_card_type_and_state /
+enqueue_zone_slot_sprite_attr_if_occupied
+
+**符号化统计**: EQ=45 (31 reuse + 14 new) / REF=0 / RENAME=3 / PLATE=9 函数 (16 PLATE entries: 2 full ASCII rewrite + 14 substr) / carve=0 / disasm=0 / §5.1=0
+
+**新建常量 (10)**:
+- oam_attr.inc x8:
+  - OAM_EQUIP_CHAIN_SPRITE_P1=0x8037 (equip chain node OAM attr0 P1; 11 ROM refs)
+  - OAM_CHAIN_MATCH_SPRITE_P1=0x8038 (chain match OAM attr0 P1; 82 ROM refs)
+  - OAM_ZONE_TYPE_SPRITE_P1=0x8042 (zone card-type OAM attr0 P1; 48 ROM refs)
+  - OAM_ZONE_CARD_SPRITE_P1=0x8035 (zone occupied card OAM attr0 P1; 8 ROM refs)
+  - OAM_SPRITE_ATTR_CLR_BIT9=0xfffffdff (clears bit9 player_side; 480 ROM refs)
+  - OAM_SPRITE_ATTR_CLR_BITS13_10=0xffffc3ff (clears bits[13:10] slot_idx field; 27 ROM refs)
+  - OAM_SPRITE_ATTR_CLR_BIT16=0xfffeffff (clears bit16 flip flag; 1475 ROM refs)
+  - OAM_SPRITE_ATTR_CLR_BIT17=0xfffdffff (clears bit17 composite sprite flag; 448 ROM refs)
+- card_info.inc x2:
+  - GEARFRIED_IRON_KNIGHT_CID=0x13c3 (pw=00423705; card_0839; 10 ROM refs)
+  - GEARFRIED_SWORDMASTER_CID=0x186b (pw=57046845; card_1772; 8 ROM refs)
+
+**PLATE 关键**:
+- enqueue_sprite_attr_for_chain_node_check (0x080431f4): CJK plate → full ASCII rewrite via setComment(PLATE_COMMENT, ...)
+- enqueue_zone_slot_sprite_attr_by_card_type (0x080432bc): CJK plate → full ASCII rewrite (corrects 3 stale FUN_ refs)
+- 7 函数: FUN_ substring replace (16 total token replacements)
+- Proposal 地址 0x08043100/0x08043190 对应 LAB_/mid-code; 落地时自动校正为实际函数入口 0x080430e4/0x0804317c
+
+**踩坑**: fn-ptr +1 再次需要补 (0x37884/0x389dc/0x389f8/0x3aa74 in asm/03; zone_monster_field_bonus_table+7*16 at 0x08040ab4 in asm/04); 补完后 SHA1 match.
+
+**落地后验收**:
+- plate FUN_ grep in Seg-5 [lines 6685..7928]: 0 hits ✅
+- non-ASCII grep in Seg-5 range: 0 hits ✅
+- byte-identical: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b ✅
 
 ---
 

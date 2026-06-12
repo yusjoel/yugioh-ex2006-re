@@ -9,9 +9,9 @@
 > `eval/PROGRESS.md`)。
 >
 > **当前文件**: `04_card_zone_sprite.s` (0x0804020c..0x08049014; 已拆 Seg-1..10 (193 named fn / 920 槽 / 0 ROM_INCBIN), 见活动 doc §五)。
-> **下一任务**: file 04 Seg-5 0x4308c..0x4394c (19 fn, 48 槽; equip chain entry reset / target slot resolve / chain-slot-scan dispatch + enqueue_sprite_attr 簇头)。
+> **下一任务**: file 04 Seg-6 0x4394c..0x44674 (20 fn, 69 槽; enqueue zone/equip slot sprite attr 簇 + scan_equip_chain_list + activation sprite render)。
 
-上次更新: 2026-06-13 file 04 Seg-4 完成 (EQ=142/REF=15/RENAME=3/PLATE=9; 新建 card_info.inc x6 + duel_field.inc x1 + ewram.inc x2 + oam_attr.inc x1; byte-identical 9689337d)。
+上次更新: 2026-06-13 file 04 Seg-5 完成 (EQ=45/REF=0/RENAME=3/PLATE=9fn; 新建 oam_attr.inc x8 + card_info.inc x2; byte-identical 9689337d)。
 
 ---
 

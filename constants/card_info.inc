@@ -439,3 +439,9 @@
 .equ VICTORY_D_CID,                 0x000016ec  @ Victory D. (pw=44910027; card_1446 slot=0x16EC); tick_draw_card_display_seq zone_ref == VICTORY_D_CID branch; 1 Seg-4 slot; 12 ROM refs
 .equ BLUE_EYES_SHINING_DRAGON_CID,  0x000017c2  @ Blue-Eyes Shining Dragon (pw=53347303; card_1617 slot=0x17C2); dispatch_equip_chain_slot_scan_by_player enqueue_field_slot path; 1 Seg-4 slot; 11 ROM refs
 .equ RARE_METALMORPH_CID,           0x0000184b  @ Rare Metalmorph (pw=12503902; card_1743 slot=0x184B); dispatch_equip_chain_slot_scan_by_player find_equip_slot + final BST; 2 Seg-4 slots; 17 ROM refs
+
+@ =============================================================================
+@ file 04 Seg-5 additions: Gearfried card IDs (enqueue_zone_slot_sprite_attr_by_card_type BST)
+@ =============================================================================
+.equ GEARFRIED_IRON_KNIGHT_CID,    0x000013c3  @ Gearfried the Iron Knight (pw=00423705; card_0839 slot=0x13C3); BST dispatch in enqueue_zone_slot_sprite_attr_by_card_type; 10 ROM refs
+.equ GEARFRIED_SWORDMASTER_CID,    0x0000186b  @ Gearfried the Swordmaster (pw=57046845; card_1772 slot=0x186B); BST dispatch; set_field_slot_bit_with_sprite_update path; 8 ROM refs

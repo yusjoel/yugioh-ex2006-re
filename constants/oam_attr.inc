@@ -27,3 +27,15 @@
 @ file 04 Seg-4 additions: OAM sprite palette selector P1
 @ =============================================================================
 .equ OAM_SPRITE_PAL_P1,            0x00008036  @ OAM sprite attr0 palette selector for player 1 (bit15=1, group 0x36+bit15); enqueue_sprite_attr_with_mode + enqueue_slot_card_sprite_if_eligible; 258 ROM refs; 1 Seg-4 slot
+
+@ =============================================================================
+@ file 04 Seg-5 additions: OAM palette selectors + sprite attr-word clear masks
+@ =============================================================================
+.equ OAM_EQUIP_CHAIN_SPRITE_P1,     0x00008037  @ equip chain node OAM attr0 P1 (bit15+0x37); 11 raw ROM refs; enqueue_equip_chain_slot_sprite_attr
+.equ OAM_CHAIN_MATCH_SPRITE_P1,     0x00008038  @ chain match OAM attr0 P1 (bit15+0x38); 82 raw ROM refs; enqueue_equip_chain_sprite_by_side
+.equ OAM_ZONE_TYPE_SPRITE_P1,       0x00008042  @ zone card-type OAM attr0 P1 (bit15+0x42); 48 raw ROM refs; enqueue_zone_slot_sprite_attr_by_card_type
+.equ OAM_ZONE_CARD_SPRITE_P1,       0x00008035  @ zone occupied card OAM attr0 P1 (bit15+0x35); 8 raw ROM refs; enqueue_slot_sprite_by_state_and_type
+.equ OAM_SPRITE_ATTR_CLR_BIT9,      0xfffffdff  @ AND mask clears bit9 (player_side) of OAM sprite attr word; 480 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
+.equ OAM_SPRITE_ATTR_CLR_BITS13_10, 0xffffc3ff  @ AND mask clears bits[13:10] (slot_idx 4-bit field); 27 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
+.equ OAM_SPRITE_ATTR_CLR_BIT16,     0xfffeffff  @ AND mask clears bit16 (flip flag) of OAM sprite attr word; 1475 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
+.equ OAM_SPRITE_ATTR_CLR_BIT17,     0xfffdffff  @ AND mask clears bit17 (composite sprite flag); 448 raw ROM refs; enqueue_slot_sprite_attr_by_card_type_and_state
