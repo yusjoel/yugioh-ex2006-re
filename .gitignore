@@ -24,6 +24,7 @@ __pycache__/
 /build_out*.txt
 /build_err*.txt
 /build_output.txt
+/build_log*.txt
 
 # asm/all.s 再生中间产物 (由 ghidra-export-range.bat → inject_modes.py 生成)
 # all.s 现为 split_all_s.py 的输入中间产物; 入库的是拆分后的 asm/all/*.s
