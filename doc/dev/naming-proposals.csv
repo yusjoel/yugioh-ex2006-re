@@ -1236,6 +1236,7 @@ address,name,proposed_name,score,tags
 0x080544d4,check_equip_slot_eligible_by_icid_match,,,
 0x08054518,check_equip_slot_eligible_by_monster_and_chain_score,,,
 0x08054570,check_equip_slot_eligible_by_pair_count_triple,,,
+0x08054614,check_equip_slot_eligible_by_side_and_zone_for_desert_sunlight,,,card_info
 0x0805465c,check_equip_slot_type_and_score_match,,,
 0x080546bc,check_equip_slot_eligible_with_prereqs_and_score_guard,,,duel_field
 0x080546e0,check_equip_slot_eligible_with_score_guard,,,duel_field

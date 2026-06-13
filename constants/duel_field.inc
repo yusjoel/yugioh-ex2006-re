@@ -296,3 +296,9 @@
 .equ SLOT_CARD_TYPE_MASK,       0x00000fc0  @ bits[11:6] type field in card[+2] halfword; lsls r1,#0xfc<<4=0xfc0; check_equip_slot_eligible_by_card_id_score inner filter; med-conf; 1 Seg-8 slot
 .equ SLOT_CARD_TYPE_ELIGIBLE_A, 0x00000180  @ eligible slot type value A; lsls r0,#0xc0<<1=0x180; check_equip_slot_eligible_by_card_id_score; med-conf; 1 Seg-8 slot
 .equ SLOT_CARD_TYPE_ELIGIBLE_B, 0x000001c0  @ eligible slot type value B; ELIGIBLE_A+0x40=0x1c0; check_equip_slot_eligible_by_card_id_score; med-conf; 1 Seg-8 slot
+
+@ =============================================================================
+@ file 06 Seg-2 additions: equip flag target ICID table offset
+@ Source: asm/06_equip_eligibility_b.s, Seg-2 (check_equip_slot_eligible_by_card_specific_activation)
+@ =============================================================================
+.equ EQUIP_FLAG_TARGET_ICID_TABLE_OFF, 0x000010b0  @ gDuelFieldSlots+0x10b0: u16[] indexed by equip_slot[+0xa] (equip_flag); Roll Out! (0x1979) uses to resolve target card ICID; distinct from SLOT_FACE_STATUS_ARRAY_OFF=0x10b1 (byte array) by 1 byte; med-conf; 1 Seg-2 slot

@@ -977,3 +977,14 @@
 @ =============================================================================
 .equ BOTTOMLESS_TRAP_HOLE_CID,       0x00001518  @ Bottomless Trap Hole (pw=29401950; card-stats.s card_1088 slot=0x1518); check_equip_slot_eligible_by_field5_score_or_chain_type field5 score gate
 .equ FIELD5_SCORE_THRESHOLD_1499,    0x000005db  @ field5 score threshold (1499=0x5db); score<=0x5db -> ineligible (ble branch); score>0x5db -> eligible; distinct from THRESHOLD_1299(0x513)/1999(0x7cf)
+
+@ =============================================================================
+@ file 06 Seg-2 additions: equip BST dispatch CIDs + Tricky target slot pattern
+@ Source: asm/06_equip_eligibility_b.s, Seg-2 (0x080541cc..0x08054ba0)
+@ Values verified against data/card-stats.s slot= fields (confidence: high).
+@ =============================================================================
+.equ ULTIMATE_BASEBALL_KID_CID,      0x000017e1  @ Ultimate Baseball Kid (pw=67934141; card-stats.s card_1889 slot=0x17E1); equip BST dispatch computed at runtime (0x180e-0x2d); no literal pool slot in Seg-2
+.equ TRICKYS_MAGIC_4_CID,            0x0000180e  @ Tricky's Magic 4 (pw=75622824; card-stats.s card_1940 slot=0x180E); equip BST dispatch literal pool 0x08054948; high-conf
+.equ GILFORD_THE_LEGEND_CID,         0x00001938  @ Gilford the Legend (pw=69933858; card-stats.s card_2073 slot=0x1938); equip BST dispatch literal pool 0x0805495c; high-conf
+.equ SERIAL_SPELL_CID,               0x0000183e  @ Serial Spell (pw=49398568; card-stats.s card_1980 slot=0x183E); invoke_serial_spell_effect_node_handler literal pool 0x08054b9c; high-conf
+.equ THE_TRICKY_TARGET_SLOT_PATTERN, 0xc0300000  @ THE_TRICKY_CID(0x1806)<<19 == 0xc0300000; Tricky's Magic 4 target check: (slot_word<<19)==pattern iff slot_word bits[12:0]==THE_TRICKY_CID; python verified; high-conf

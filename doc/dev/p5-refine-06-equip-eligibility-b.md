@@ -76,7 +76,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN/switch | 状态 | commit |
 |-----|------|-----|--------|------------------------|------|--------|
 | 1 | 0x537c0..0x541cc | 22 | 47 | — | ✅ | f3bb6a9 |
-| 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ⬜ | — |
+| 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ✅ | pending |
 | 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ⬜ | — |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ⬜ | — |
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ⬜ | — |
@@ -110,6 +110,20 @@
 - **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 x2, check_card_is_amazoness_type+1 x2) + asm/04 x3 (zone_monster_field_bonus_table+7*16, apply_nitro_unit_equip_activation+1, gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF)
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **commit**: f3bb6a9
+
+### 4.02 Seg-2 完成记录 (2026-06-14, commit pending)
+
+- **段范围**: 0x080541cc..0x08054ba0, 23 fn (22 pre-existing + 1 new from disasm)
+- **disasm=1**: ROM_INCBIN 0x08054614/0x48 -> check_equip_slot_eligible_by_side_and_zone_for_desert_sunlight (Desert Sunlight CID 0x17B4 equip predicate #2; fn-ptr2 @ 0x09e421d4; leaf fn; clearListing->setTMode->DisassembleCommand->createFunction+setName+plate)
+- **EQ=52**: 21x PLAYER_BLOCK_STRIDE + 22x gDuelFieldSlots (ewram.inc 复用) + 2x SCROLLBAR_KEEP_BITS_8_0 + 2x SCROLLBAR_CLEAR_BITS_14_6 (gl_scrollbar.inc 复用) + 5 new (TRICKYS_MAGIC_4_CID/GILFORD_THE_LEGEND_CID/THE_TRICKY_TARGET_SLOT_PATTERN [card_info.inc] + EQUIP_FLAG_TARGET_ICID_TABLE_OFF [duel_field.inc] + SERIAL_SPELL_CID [card_info.inc])
+- **PLATE=1**: FUN_0809077c -> invoke_count_zone_pair_hits_full_range (0x0809077c, callback iterator) @ check_equip_slot_eligible_by_same_side_and_prereqs
+- **carve=0, §5.1=0**
+- **新建 constants**: card_info.inc +5 (ULTIMATE_BASEBALL_KID_CID=0x17e1 + TRICKYS_MAGIC_4_CID=0x180e + GILFORD_THE_LEGEND_CID=0x1938 + SERIAL_SPELL_CID=0x183e + THE_TRICKY_TARGET_SLOT_PATTERN=0xc0300000); duel_field.inc +1 (EQUIP_FLAG_TARGET_ICID_TABLE_OFF=0x10b0)
+- **CSV sync**: naming-proposals.csv +1 行 (0x08054614 check_equip_slot_eligible_by_side_and_zone_for_desert_sunlight)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 x2 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 x2 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0)
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **验收**: FUN_残留=0; CJK=0; ROM_INCBIN 0x54614 无残留; disasm fn check_equip_slot_eligible_by_side_and_zone_for_desert_sunlight @ line 2140 出现
+- **commit**: pending
 
 ---
 
