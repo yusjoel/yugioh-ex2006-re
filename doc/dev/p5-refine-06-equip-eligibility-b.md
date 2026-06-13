@@ -81,7 +81,7 @@
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ✅ | fd8e6b6 |
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ✅ | 3177750 |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | 51ebd37 |
-| 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | pending |
+| 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | 8fd1210 |
 | 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ⬜ | — |
 | 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x59cc8/0x28 + 0x59d14/0xcc + 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
 | 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ⬜ | — |
@@ -185,7 +185,7 @@
 - **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0)
 - **验收**: FUN_ 残留=0 (lines 12075-13320); CJK=0; 4 CJK plate 全覆盖; stale FUN_0805a1dc 已订正
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
-- **commit**: pending
+- **commit**: 8fd1210
 
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
