@@ -1053,3 +1053,16 @@
 .equ get_card_lp_cost_by_id_cid_1393, 0x00001393 @ unallocated slot_id; BST node in get_card_lp_cost_by_id
 .equ get_card_lp_cost_by_id_cid_169d, 0x0000169d @ unallocated slot_id; BST node in get_card_lp_cost_by_id
 .equ lookup_equip_card_score_cid_1388, 0x00001388 @ unallocated slot_id; BST node in lookup_equip_card_score; same value as LP_COST_5000/EQUIP_SLOT_CARD_ID_RANGE_MAX -- different domain
+
+@ =============================================================================
+@ file 06 Seg-5 additions: CID equates used in dispatch_equip_activation_score_by_card_id
+@ and related equip-activation sprite display functions
+@ Source: asm/06_equip_eligibility_b.s Seg-5 (0x080565e8..0x08057458)
+@ =============================================================================
+.equ POISON_OF_THE_OLD_MAN_CID,   0x000015e7  @ Poison of the Old Man (pw=08842266); slot=0x15E7 in card-stats.s line 16121; dispatch_equip_activation_score_by_card_id BST; conf: high
+.equ CYBER_RAIDER_CID,             0x00001298  @ Cyber Raider (pw=39978267); slot=0x1298 in card-stats.s line 7997; dispatch_equip_activation_score_by_card_id BST; conf: high
+.equ SPIRITUAL_FIRE_ART_CID,       0x00001929  @ Spiritual Fire Art - Kurenai (pw=42945701); slot=0x1929 in card-stats.s line 25052; distinct from SPIRITUAL_WIND_ART_MIYABI_CID=0x192a and SPIRITUAL_EARTH_ART_CID=0x1927; conf: high
+.equ FRIENDSHIP_CID,               0x0000167a  @ Friendship (pw=81332143); slot=0x167A in card-stats.s line 17577; adjacent to UNITY_CID=0x167b; pair-check in dispatch_equip_activation_score_by_card_id; conf: high
+.equ UNITY_CID,                    0x0000167b  @ Unity (pw=14731897); slot=0x167B in card-stats.s line 17590; adjacent to FRIENDSHIP_CID=0x167a; pair-check in dispatch_equip_activation_score_by_card_id; conf: high
+.equ ATTACK_REFLECTOR_UNIT_CID,    0x000019b5  @ Attack Reflector Unit (pw=91989718); slot=0x19B5 in card-stats.s line 26378; tick_equip_score_sprite_display_seq BST; conf: high
+.equ PITCH_BLACK_POWER_STONE_CID,  0x00001624  @ Pitch-Black Power Stone (pw=34029630); slot=0x1624 in card-stats.s line 16746; tick_equip_activation_state_by_phase phase=1 BST; conf: high

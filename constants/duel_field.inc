@@ -337,3 +337,11 @@
 .equ lookup_equip_score_b_0x1cb,          0x000001cb  @ BST branch score 0x1cb; 1 Seg-4 slot
 .equ lookup_equip_score_b_0x1cd,          0x000001cd  @ BST branch score 0x1cd; 1 Seg-4 slot
 .equ lookup_equip_score_b_0x1cf,          0x000001cf  @ BST branch score 0x1cf; 1 Seg-4 slot
+
+@ =============================================================================
+@ file 06 Seg-5 additions: equip sprite card-data constant and activation score mode codes
+@ Source: asm/06_equip_eligibility_b.s Seg-5 (0x080565e8..0x08057458)
+@ =============================================================================
+.equ EQUIP_SPRITE_CARD_DATA,    0x00001119  @ r2 arg to enqueue_sprite_attr_with_mode(mode=3) in enqueue_equip_card_sprite_mode3; fixed card-data field 0x1119; 1 Seg-5 slot; conf: high
+.equ EQUIP_ACT_SCORE_MODE_103,  0x00000103  @ set_equip_activation_state_by_mode mode code 0x103; loaded into r8 via mov r8,r0 (.hword 0x4680) in dispatch_equip_activation_score_by_card_id; 1 Seg-5 slot; conf: med
+.equ EQUIP_ACT_SCORE_MODE_117,  0x00000117  @ set_equip_activation_state_by_mode mode code 0x117; loaded into r8 via mov r8,r1 (.hword 0x4688) in dispatch_equip_activation_score_by_card_id 0x15cf/Second Goblin path; 1 Seg-5 slot; conf: med

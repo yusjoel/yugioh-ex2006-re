@@ -79,7 +79,7 @@
 | 2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | ✅ | 6c90482 |
 | 3 | 0x54ba0..0x55440 | 22 | 43 | ROM_INCBIN 0x55188/0x34 | ✅ | aee415f |
 | 4 | 0x55440..0x565e8 | 22 | 149 | — (重) | ✅ | fd8e6b6 |
-| 5 | 0x565e8..0x57458 | 22 | 101 | — | ⬜ | — |
+| 5 | 0x565e8..0x57458 | 22 | 101 | — | ✅ | (pending) |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ⬜ | — |
 | 7 | 0x58550..0x58cec | 22 | 54 | — | ⬜ | — |
 | 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ⬜ | — |
@@ -141,6 +141,20 @@
 - **验收**: FUN_残留=0; CJK=0; ROM_INCBIN 0x55188 无残留; disasm fn @ asm/06 line 3971
 - **commit**: aee415f
 
+### 4.05 Seg-5 完成记录 (2026-06-14, commit pending)
+
+- **段范围**: 0x080565e8..0x08057458, 23 fn
+- **EQ=94**: 11x PLAYER_BLOCK_STRIDE + 11x gDuelPhaseFlags + 12x EQUIP_ACTIVATION_STEP_OFF (ewram/duel_field.inc 复用) + 4x gDuelCardCtxBase + 3x gDuelFieldSlots + 2x ELIGIB_SPRITE_CTRL_OFF + 1x ELIGIB_ANIM_STATE_OFF + 2x FIELD_STATE_OFF + 3x SLOT_CARD_EMPTY + 1x SCENE_SLOT_MASK_LO + 1x get_card_lp_cost_by_id_cid_11cf + 1x OAM_ATTR1_X_CLEAR + 1x TRIGGER_OP_PARAM_107 + 29 slot CID refs (23 CID equates) + 3x RENAME_as_EQ (EQUIP_SPRITE_CARD_DATA/EQUIP_ACT_SCORE_MODE_103/EQUIP_ACT_SCORE_MODE_117 新建)
+- **REF=23**: 16x PTR_gP1LP + 4x DWORD_gP1LP (DWORD_ label 清除; asm 值已正确) + 3x fn-ptr (invoke_effect_node_handler_3arg+1 x2 / check_equip_slot_eligible_by_card_id_tree+1 x1)
+- **PLATE_SET=5**: P0 tick_equip_activation_with_lp_cost_sprite (CJK+stale FUN_08057430 双修); P1 tick_equip_activation_with_slot_sprite_mode4 (CJK); P2 tick_equip_activation_with_type11_sprite (CJK); P3 tick_equip_activation_if_neo_daedalus_eligible (CJK); P4 tick_equip_activation_lp_cost_sprite_by_type (CJK)
+- **PLATE_SUB=1**: P5 enqueue_equip_slot_sprite_mode4 (FUN_0805663c->tick_equip_activation_with_slot_sprite_mode4 + FUN_080563cc->tick_equip_activation_state_machine)
+- **新建 constants**: card_info.inc +7 CID (POISON_OF_THE_OLD_MAN/CYBER_RAIDER/SPIRITUAL_FIRE_ART/FRIENDSHIP/UNITY/ATTACK_REFLECTOR_UNIT/PITCH_BLACK_POWER_STONE); duel_field.inc +3 scalar (EQUIP_SPRITE_CARD_DATA=0x1119 / EQUIP_ACT_SCORE_MODE_103=0x103 / EQUIP_ACT_SCORE_MODE_117=0x117)
+- **carve=0, disasm=0, §5.1=0, FUNC_RENAME=0** (本段无改名 → 无需 CSV sync)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0)
+- **验收**: FUN_ 残留=0 (lines 7237-9445); CJK=0; 5 CJK plate 全覆盖
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **commit**: (pending)
+
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
 - **段范围**: 0x08055440..0x080565e8, 22 fn
@@ -169,7 +183,7 @@
 | Seg-2 | 0x541cc..0x54ba0 | 22 | 50 | ROM_INCBIN 0x54614/0x48 | side+setcode+prereqs+type 资格检查簇 |
 | Seg-3 | 0x54ba0..0x55440 | 22+1 | 43 | ROM_INCBIN 0x55188/0x34 | equip_type+occupied 资格检查簇 ✅ |
 | Seg-4 | 0x55440..0x565e8 | 22 | 149 | — | 重: same_player_type_mismatch + card_id BST/pairs 大型分发簇 ✅ |
-| Seg-5 | 0x565e8..0x57458 | 22 | 101 | — | tick_equip_activation_with_lp_cost_sprite + LP cost display 簇头 |
+| Seg-5 | 0x565e8..0x57458 | 22 | 101 | — | tick_equip_activation_with_lp_cost_sprite + LP cost display 簇头 ✅ |
 | Seg-6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | set_lp_row_type2 + equip activation LP display seq |
 | Seg-7 | 0x58550..0x58cec | 22 | 54 | — | tick_equip_activation_neo_daedalus_gate + Neo Daedalus 效果簇 |
 | Seg-8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | tick_equip_score_lp_display_seq + switch 派发 |
