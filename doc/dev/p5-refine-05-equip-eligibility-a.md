@@ -229,7 +229,7 @@ CARD_FIELD6_EQUIP_RITUAL @ 0x4bca4
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: 3155175
 
 ---
 
