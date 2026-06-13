@@ -1066,3 +1066,10 @@
 .equ UNITY_CID,                    0x0000167b  @ Unity (pw=14731897); slot=0x167B in card-stats.s line 17590; adjacent to FRIENDSHIP_CID=0x167a; pair-check in dispatch_equip_activation_score_by_card_id; conf: high
 .equ ATTACK_REFLECTOR_UNIT_CID,    0x000019b5  @ Attack Reflector Unit (pw=91989718); slot=0x19B5 in card-stats.s line 26378; tick_equip_score_sprite_display_seq BST; conf: high
 .equ PITCH_BLACK_POWER_STONE_CID,  0x00001624  @ Pitch-Black Power Stone (pw=34029630); slot=0x1624 in card-stats.s line 16746; tick_equip_activation_state_by_phase phase=1 BST; conf: high
+
+@ =============================================================================
+@ file 06 Seg-6 additions: CID equates for equip activation guard functions
+@ Source: asm/06_equip_eligibility_b.s Seg-6 (0x08057458..0x08058550)
+@ =============================================================================
+.equ CLIFF_THE_TRAP_REMOVER_CID,   0x0000161e  @ Cliff the Trap Remover (pw=06967870; card-stats.s card_1282 slot=0x161E); tick_equip_lp_score_and_card_id_seq LP-score dispatch; 2 Seg-6 slots; conf: high
+.equ OTOHIME_CID,                  0x00001503  @ Otohime (pw=39751093; card-stats.s card_1070 slot=0x1503); tick_equip_activation_if_not_otohime guard: CID filter to bypass equip activation state machine; 1 Seg-6 slot; conf: high

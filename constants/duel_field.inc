@@ -345,3 +345,10 @@
 .equ EQUIP_SPRITE_CARD_DATA,    0x00001119  @ r2 arg to enqueue_sprite_attr_with_mode(mode=3) in enqueue_equip_card_sprite_mode3; fixed card-data field 0x1119; 1 Seg-5 slot; conf: high
 .equ EQUIP_ACT_SCORE_MODE_103,  0x00000103  @ set_equip_activation_state_by_mode mode code 0x103; loaded into r8 via mov r8,r0 (.hword 0x4680) in dispatch_equip_activation_score_by_card_id; 1 Seg-5 slot; conf: med
 .equ EQUIP_ACT_SCORE_MODE_117,  0x00000117  @ set_equip_activation_state_by_mode mode code 0x117; loaded into r8 via mov r8,r1 (.hword 0x4688) in dispatch_equip_activation_score_by_card_id 0x15cf/Second Goblin path; 1 Seg-5 slot; conf: med
+
+@ =============================================================================
+@ file 06 Seg-6 additions: equip activation auxiliary offset + equip zone sprite attr mode1
+@ Source: asm/06_equip_eligibility_b.s Seg-6 (0x08057458..0x08058550)
+@ =============================================================================
+.equ EQUIP_ACTIVATION_AUX_OFF,      0x000004b4  @ [gDuelPhaseFlags+0x4b4] equip activation secondary counter; distinct from EQUIP_ACTIVATION_STEP_OFF=0x4ac; 8 Seg-6 slots in tick_equip_slot_score_fill_display_seq; conf: high
+.equ EQUIP_ZONE_SPRITE_ATTR_MODE1,  0x0000152a  @ enqueue_equip_zone_sprite_mode1 r2 arg to enqueue_sprite_attr_with_mode; mode=1 sprite attr code 0x152a; sibling of EQUIP_ZONE_SPRITE_ATTR=0x0fb6 (mode=2); distinct from Swarm of Scarabs CID=0x152a (different domain); 1 Seg-6 slot; conf: high
