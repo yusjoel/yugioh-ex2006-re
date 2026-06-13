@@ -102,7 +102,7 @@
 | 6 | 0x4d124..0x4ffba | 24 | 128 | 5 disasm blocks | ✅ | 5d95bfc |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ✅ | 6c92afe |
-| 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ✅ | pending |
+| 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ✅ | 0384db3 |
 | 10 | 0x52df8..0x537c0 | 23 | 51 | — | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
@@ -615,7 +615,7 @@ ELEMENTAL_HERO_TEMPEST_CID (0x1957) / HERO_HEART_CID (0x19ab) / PHOTON_GENERATOR
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: pending
+**commit**: 0384db3
 
 ---
 
