@@ -82,14 +82,14 @@
 | 5 | 0x565e8..0x57458 | 22 | 101 | — | ✅ | 3177750 |
 | 6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | ✅ | 51ebd37 |
 | 7 | 0x58550..0x58cec | 22 | 58 | — | ✅ | 8fd1210 |
-| 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ⬜ | — |
-| 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x59cc8/0x28 + 0x59d14/0xcc + 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
+| 8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | ✅ | TBD |
+| 9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | ⬜ | — |
 | 10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | ⬜ | — |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
-重段提示: Seg-4 (149 槽) / Seg-9 (146 槽, 4 ROM_INCBIN) / Seg-8 (107 槽, switch) 较重, 必要时拆 Seg-Na/Nb
-(地址序边界=函数结束处, 不回头)。3 switch 表 (0x80598fa Seg-8 / 0x805b498+0x805b54e Seg-10) 按 file 00 Seg-5c R4 范式处理。
-10 个 ROM_INCBIN 块须 ref-scan 分类 (被引用代码→R4 disasm / 被引用数据→carve / 全 ROM 0 引用→§5.1)。
+重段提示: Seg-4 (149 槽) / Seg-9 (146 槽, 2 ROM_INCBIN) 较重, 必要时拆 Seg-Na/Nb
+(地址序边界=函数结束处, 不回头)。3 switch 表 (0x80598fa Seg-8 已完成 / 0x805b498+0x805b54e Seg-10) 按 file 00 Seg-5c R4 范式处理。
+8 个 ROM_INCBIN 块须 ref-scan 分类 (被引用代码→R4 disasm / 被引用数据→carve / 全 ROM 0 引用→§5.1); Seg-8 4 块已完成。
 
 ---
 
@@ -187,6 +187,26 @@
 - **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 - **commit**: 8fd1210
 
+### 4.08 Seg-8 完成记录 (2026-06-14, commit TBD)
+
+- **段范围**: 0x08058cec..0x08059de0, 22 named fn + 13 new from 4 disasm blocks
+- **EQ=93**: gDuelPhaseFlags x17 + EQUIP_STEP_OFF x17 (EQUIP_ACTIVATION_STEP_OFF 复用) + gP1LifePoints x5 + gDuelCardCtxBase x4 + gDuelFieldSlots x4 + ELIGIB_SPRITE_CTRL_OFF x2 + ELIGIB_ANIM_STATE_OFF x1 + EQUIP_ACTIVE_CTX_OFF x1 + EFFECT_ZONE_PARTITION_OFF x1 + ABYSS_SOLDIER_CID x1 (card_info.inc 新建 0x1727) + OP31_EFFECT_NODE_COUNT_CODE x1 (duel_field.inc 新建 0x13d) + LP_ROW_OFF x1 + gEquipNodePool x1 + gFsDecompBuf? x1 ... (93 total per reviewer C13 count)
+- **REF=21**: 11x gP1LifePoints PTR_slots → PTR_gP1LP labels + 1x gDuelCardCtxBase ptr + 2x fn-ptr (set_equip_activation_state_by_mode+1 / set_equip_activation_state_by_mode_alt+1) + 2x dispatch table ptr (equip_type80 / equip_lp_spell_zone) + 5x Block2/4 sub-fn target labels + fn-ptr misc
+- **RENAME=17**: 5x DWORD_→PTR_gP1LP + 10x switchD_ rename (tick_equip_atk_zone_seq__default/dispatch/table_ptr/table + 6 caseD) + 2x PTR_DAT_ table ptr rename (equip_type80_dispatch_table_ptr / equip_lp_spell_zone_dispatch_table_ptr)
+- **PLATE=3**: P1 tick_equip_banisher_atk_activation_display_seq (0x08059110, CJK mojibake ASCII 全段重写 551chars); P2 tick_equip_activation_if_neo_daedalus_with_lp_row (0x08059448, CJK mojibake ASCII 全段重写 607chars); P3 tick_equip_banisher_atk_activation_display_seq (0x080592e4 substring FUN_0805934c→tick_equip_banisher_atk_activation_display_seq)
+- **disasm=4 blocks / 13 new fn**:
+  - Block1 (0x5953a/0x2a): dispatch_equip_activation_seq_by_type80 @ 0x0805953c (THUMB; type-0x80 handler; fn-ptr @ 0x09e46fac CID 0x183a; lit pool 0x5955c/60/64 DWORDs)
+  - Block2 (0x59588/0x164): 6 sub-fns (equip_type80_case0_and_1_init_sprite / equip_type80_case1_also / equip_type80_case2_and_5_no_op / equip_type80_case3_and_6_select_target / equip_type80_case4_enqueue / equip_type80_case7_and_return0; 18 lit pool DWORDs via FixF06Seg8LiteralPools.py)
+  - Block3 (0x59cc8/0x28): equip_lp_spell_zone_case_dispatch @ 0x08059cc8 (code re-disasm + lit pool 0x59ce8/ec/f0; NOT 0x59ce0/ce4 which are instr)
+  - Block4 (0x59d14/0xcc): 5 sub-fns (equip_lp_spell_zone_case_shared_abc / _case5_op31 / _case6_something / _case7_something / _case34_return1; 4 lit pool DWORDs)
+- **新建 constants**: card_info.inc +1 (ABYSS_SOLDIER_CID=0x1727); duel_field.inc +1 (OP31_EFFECT_NODE_COUNT_CODE=0x13d)
+- **CSV sync**: naming-proposals.csv +13 new disasm fn rows + 2 FUNC_RENAME divergence rows updated (set_equip_activation_state_by_mode @ 0x08050eac / set_equip_activation_state_by_mode_alt @ 0x080905e8)
+- **fn-ptr periodic fix**: asm/03 x4 (check_level_conv_lab_node_match+1 @ 0x37884/0x3aa74; check_card_is_amazoness_type+1 @ 0x389dc/0x389f8) + asm/04 x3 (zone_monster_field_bonus_table+7*16 @ 0x40ab4; apply_nitro_unit_equip_activation+1 @ 0x45efc; gDuelFieldSlots+EFFECT_ZONE_PARTITION_OFF @ 0x478f0) + asm/05 x6 (6 equip-tree fn-ptrs)
+- **§5.1**: 0 (all ROM_INCBIN blocks have references; disasm'd)
+- **验收**: FUN_ 残留=0 in Seg-8 range; CJK=0 in Seg-8 comments; 4 ROM_INCBIN blocks replaced; byte-identical SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+- **commit**: TBD
+
 ### 4.04 Seg-4 完成记录 (2026-06-14, commit pending)
 
 - **段范围**: 0x08055440..0x080565e8, 22 fn
@@ -218,8 +238,8 @@
 | Seg-5 | 0x565e8..0x57458 | 22 | 101 | — | tick_equip_activation_with_lp_cost_sprite + LP cost display 簇头 ✅ |
 | Seg-6 | 0x57458..0x58550 | 22 | 99 | ROM_INCBIN 0x57d0a/0x2a + 0x57d4c/0x15c | set_lp_row_type2 + equip activation LP display seq |
 | Seg-7 | 0x58550..0x58cec | 22 | 58 | — | tick_equip_activation_neo_daedalus_gate + Neo Daedalus 效果簇 ✅ |
-| Seg-8 | 0x58cec..0x59de0 | 22 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | tick_equip_score_lp_display_seq + switch 派发 |
-| Seg-9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x59cc8/0x28 + 0x59d14/0xcc + 0x5a0aa/0x36 + 0x5a0f8/0xe4 | 重: tick_equip_zone14_activation_display_seq + 4 ROM_INCBIN 数据块 |
+| Seg-8 | 0x58cec..0x59de0 | 22+13 | 107 | ROM_INCBIN 0x5953a/0x2a + 0x59588/0x164 + switchD_080598fa | tick_equip_score_lp_display_seq + switch 派发 ✅ |
+| Seg-9 | 0x59de0..0x5b480 | 22 | 146 | ROM_INCBIN 0x5a0aa/0x36 + 0x5a0f8/0xe4 (重) | tick_equip_zone14_activation_display_seq + 2 ROM_INCBIN 数据块 |
 | Seg-10 | 0x5b480..0x5c2f0 | 15 | 69 | switchD_0805b498 + switchD_0805b54e | find_zone_slot_match_by_type_in_node_list + switch 派发 (文件末) |
 
 执行约定同 file 00..05: 每段走 §二 pipeline; Seg 内可多次提交但地址序不回头; 已干净函数跳过只补 gap;

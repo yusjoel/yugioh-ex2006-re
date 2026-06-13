@@ -1133,7 +1133,7 @@ address,name,proposed_name,score,tags
 0x08050d78,check_equip_slot_eligible_with_whitelist_prereqs_0,,,
 0x08050de4,check_equip_slot_eligible_with_whitelist_prereqs_1,,,
 0x08050e40,check_equip_slot_eligible_with_whitelist_prereqs_2,,,
-0x08050eac,check_equip_slot_eligible_by_card_id_tree,,,duel_field
+0x08050eac,set_equip_activation_state_by_mode,,,duel_field
 0x080511b0,check_equip_slot_eligible_by_empty_equip_with_field6,,,
 0x08051200,check_equip_slot_eligible_by_field5_score_no_prereqs,,,
 0x08051274,check_equip_slot_eligible_by_prereqs_only,,,
@@ -1379,6 +1379,13 @@ address,name,proposed_name,score,tags
 0x08059448,tick_equip_activation_if_neo_daedalus_with_lp_row,,,
 0x080594f0,submit_equip_sprite_with_set_code_cache,,,
 0x0805951c,dispatch_equip_activation_seq_by_type80,,,
+0x0805953c,dispatch_equip_activation_seq_by_type80,,,
+0x08059588,equip_type80_case0_and_1_init_sprite,,,
+0x080595a8,equip_type80_case1_also,,,
+0x080595d4,equip_type80_case2_and_5_no_op,,,
+0x08059618,equip_type80_case3_and_6_select_target,,,
+0x08059670,equip_type80_case4_enqueue,,,
+0x080596d4,equip_type80_case7_and_return0,,,
 0x080596ec,tick_equip_banisher_lp_display_seq,,,duel_field
 0x08059760,tick_equip_banisher_slot_sprite_display_seq,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08059814,tick_equip_effect_node_count_display_seq,,,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
@@ -1387,6 +1394,12 @@ address,name,proposed_name,score,tags
 0x08059b4c,tick_equip_neo_daedalus_slot_display_seq,card_ids_08059b4c,2,card_frame;card_ids;card_stats;duel_field;font_jp;game_str;settings
 0x08059be0,enqueue_equip_zone_sprite_with_lp_tier,,,
 0x08059c08,tick_equip_lp_row_spell_zone_display_seq,,,
+0x08059cc8,equip_lp_spell_zone_case_dispatch,,,
+0x08059d14,equip_lp_spell_zone_case_shared_abc,,,
+0x08059d38,equip_lp_spell_zone_case5_op31,,,
+0x08059d54,equip_lp_spell_zone_case6_something,,,
+0x08059d90,equip_lp_spell_zone_case7_something,,,
+0x08059dd4,equip_lp_spell_zone_case34_return1,,,
 0x08059de0,tick_equip_zone14_activation_display_seq,,,
 0x08059e94,update_equip_slot_entity_id_cache,,,
 0x08059ec0,tick_equip_type_category_sprite_display_seq,,,
@@ -2461,7 +2474,7 @@ address,name,proposed_name,score,tags
 0x080904f4,find_card_effect_node_entry,,,
 0x0809058c,check_card_has_activatable_effect_node,,,
 0x080905c0,invoke_effect_node_handler_2arg,,,
-0x080905e8,invoke_effect_node_handler_3arg,,,
+0x080905e8,set_equip_activation_state_by_mode_alt,,,
 0x08090624,invoke_effect_node_with_active_flag_3arg,,,
 0x0809066c,query_equip_zone_bitmap_with_effect_guard,,,
 0x08090690,query_equip_zone_bitmap_with_active_flag,,,

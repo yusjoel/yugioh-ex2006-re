@@ -12175,7 +12175,7 @@ LAB_08069ad6:
     lsrs r0,r0,#0x1f    @ 08069ada c00f
     ldrh r1,[r6,#0x0]                        @ 08069adc 3188
     ldr r2, DWORD_08069ae8                   @ 08069ade 024a
-    bl set_equip_activation_state_by_mode    @ 08069ae0 2cf0b4ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 08069ae0 2cf0b4ff
     movs r0,#0x7e    @ 08069ae4 7e20
     b LAB_08069b4e                           @ 08069ae6 32e0
 DWORD_08069ae8:

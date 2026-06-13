@@ -3884,7 +3884,7 @@ LAB_0807c3f6:
     lsrs r0,r0,#0x1f    @ 0807c3fa c00f
     ldrh r1,[r4,#0x0]                        @ 0807c3fc 2188
     ldr r2, DWORD_0807c408                   @ 0807c3fe 024a
-    bl set_equip_activation_state_by_mode    @ 0807c400 1af024fb
+    bl set_equip_activation_state_by_mode__08096a4c @ 0807c400 1af024fb
     movs r0,#0x7d    @ 0807c404 7d20
     b LAB_0807c46c                           @ 0807c406 31e0
 DWORD_0807c408:
@@ -5575,7 +5575,7 @@ switchD_0807d126__caseD_7c:
     lsrs r0,r0,#0x1f    @ 0807d24e c00f
     ldrh r1,[r7,#0x0]                        @ 0807d250 3988
     ldr r2, DAT_0807d25c                     @ 0807d252 024a
-    bl set_equip_activation_state_by_mode    @ 0807d254 19f0fafb
+    bl set_equip_activation_state_by_mode__08096a4c @ 0807d254 19f0fafb
     movs r0,#0x7b    @ 0807d258 7b20
     b LAB_0807d2d6                           @ 0807d25a 3ce0
 DAT_0807d25c:
@@ -6773,7 +6773,7 @@ LAB_0807dbc0:
     lsrs r0,r0,#0x1f    @ 0807dbf2 c00f
     ldr r1, DAT_0807dc04                     @ 0807dbf4 0349
     ldr r2, DAT_0807dc08                     @ 0807dbf6 044a
-    bl set_equip_activation_state_by_mode    @ 0807dbf8 18f028ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 0807dbf8 18f028ff
     movs r0,#0x7e    @ 0807dbfc 7e20
     b LAB_0807dc8a                           @ 0807dbfe 44e0
 PTR_gP1LifePoints_0807dc00:
@@ -13426,7 +13426,7 @@ LAB_08081920:
     lsrs r0,r0,#0x1f    @ 08081936 c00f
     ldrh r1,[r4,#0x0]                        @ 08081938 2188
     ldr r2, DAT_08081948                     @ 0808193a 034a
-    bl set_equip_activation_state_by_mode    @ 0808193c 15f086f8
+    bl set_equip_activation_state_by_mode__08096a4c @ 0808193c 15f086f8
     ldr r0,[r5,#0x0]                         @ 08081940 2868
     adds r0,#0x1    @ 08081942 0130
     b LAB_08081980                           @ 08081944 1ce0
@@ -13917,7 +13917,7 @@ LAB_08081cac:
     lsrs r0,r0,#0x1f    @ 08081cbc c00f
     ldr r1, DAT_08081cd0                     @ 08081cbe 0449
     ldr r2, DAT_08081cd4                     @ 08081cc0 044a
-    bl set_equip_activation_state_by_mode    @ 08081cc2 14f0c3fe
+    bl set_equip_activation_state_by_mode__08096a4c @ 08081cc2 14f0c3fe
     ldr r0,[r5,#0x0]                         @ 08081cc6 2868
     adds r0,#0x1    @ 08081cc8 0130
     str r0,[r5,#0x0]                         @ 08081cca 2860
@@ -14086,7 +14086,7 @@ check_effect_node_handler_for_slot:
     adds r4,r0,#0x0    @ 08081de6 041c
     adds r5,r1,#0x0    @ 08081de8 0d1c
     adds r6,r2,#0x0    @ 08081dea 161c
-    bl invoke_effect_node_handler_3arg       @ 08081dec 0ef0fcfb
+    bl set_equip_activation_state_by_mode_alt @ 08081dec 0ef0fcfb
     cmp r0,#0x0                              @ 08081df0 0028
     beq LAB_08081e06                         @ 08081df2 08d0
     adds r0,r4,#0x0    @ 08081df4 201c
@@ -14166,7 +14166,7 @@ switchD_08081e2c__caseD_1:
     lsrs r0,r0,#0x1f    @ 08081e78 c00f
     ldrh r1,[r4,#0x0]                        @ 08081e7a 2188
     ldr r2, DAT_08081e90                     @ 08081e7c 044a
-    bl set_equip_activation_state_by_mode    @ 08081e7e 14f0e5fd
+    bl set_equip_activation_state_by_mode__08096a4c @ 08081e7e 14f0e5fd
     ldr r1, DAT_08081e94                     @ 08081e82 0449
     movs r2,#0x96    @ 08081e84 9622
     lsls r2,r2,#0x3    @ 08081e86 d200
@@ -14189,7 +14189,7 @@ switchD_08081e2c__caseD_3:
     lsrs r0,r0,#0x1f    @ 08081ea8 c00f
     ldrh r1,[r4,#0x0]                        @ 08081eaa 2188
     ldr r2, DAT_08081ec0                     @ 08081eac 044a
-    bl set_equip_activation_state_by_mode    @ 08081eae 14f0cdfd
+    bl set_equip_activation_state_by_mode__08096a4c @ 08081eae 14f0cdfd
     ldr r1, DAT_08081ec4                     @ 08081eb2 0449
     movs r2,#0x96    @ 08081eb4 9622
     lsls r2,r2,#0x3    @ 08081eb6 d200
@@ -14346,7 +14346,7 @@ LAB_08081fba:
     lsrs r0,r0,#0x1f    @ 08081fbe c00f
     ldrh r1,[r4,#0x0]                        @ 08081fc0 2188
     ldr r2, DAT_08081fd8                     @ 08081fc2 054a
-    bl set_equip_activation_state_by_mode_alt @ 08081fc4 14f074fd
+    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08081fc4 14f074fd
     ldr r1, DAT_08081fdc                     @ 08081fc8 0449
     movs r0,#0x96    @ 08081fca 9620
     lsls r0,r0,#0x3    @ 08081fcc c000
@@ -14673,7 +14673,7 @@ LAB_08082444:
     lsrs r0,r0,#0x1f    @ 08082450 c00f
     ldrh r1,[r4,#0x0]                        @ 08082452 2188
     ldr r2, DWORD_0808245c                   @ 08082454 014a
-    bl set_equip_activation_state_by_mode    @ 08082456 14f0f9fa
+    bl set_equip_activation_state_by_mode__08096a4c @ 08082456 14f0f9fa
     b LAB_0808240c                           @ 0808245a d7e7
 DWORD_0808245c:
     .word  0x080905e9                     @ 0808245c e9050908
@@ -14843,7 +14843,7 @@ LAB_08082572:
     lsrs r0,r0,#0x1f    @ 08082590 c00f
     ldrh r1,[r5,#0x0]                        @ 08082592 2988
     ldr r2, DWORD_080825a8                   @ 08082594 044a
-    bl set_equip_activation_state_by_mode    @ 08082596 14f059fa
+    bl set_equip_activation_state_by_mode__08096a4c @ 08082596 14f059fa
 LAB_0808259a:
     ldr r0,[r4,#0x0]                         @ 0808259a 2068
     adds r0,#0x1    @ 0808259c 0130
@@ -14997,7 +14997,7 @@ LAB_080826b0:
     lsrs r0,r0,#0x1f    @ 080826bc c00f
     ldrh r1,[r6,#0x0]                        @ 080826be 3188
     ldr r2, DWORD_080826cc                   @ 080826c0 024a
-    bl set_equip_activation_state_by_mode    @ 080826c2 14f0c3f9
+    bl set_equip_activation_state_by_mode__08096a4c @ 080826c2 14f0c3f9
     b LAB_080826fc                           @ 080826c6 19e0
 DWORD_080826c8:
     .word  0x0000010f                     @ 080826c8 0f010000
@@ -15011,7 +15011,7 @@ LAB_080826d4:
     adds r0,r6,#0x0    @ 080826d4 301c
     adds r1,r5,#0x0    @ 080826d6 291c
     adds r2,r4,#0x0    @ 080826d8 221c
-    bl invoke_effect_node_handler_3arg       @ 080826da 0df085ff
+    bl set_equip_activation_state_by_mode_alt @ 080826da 0df085ff
     cmp r0,#0x0                              @ 080826de 0028
     bne LAB_08082720                         @ 080826e0 1ed1
     adds r4,#0x1    @ 080826e2 0134
@@ -15104,7 +15104,7 @@ check_effect_slot_zone_field_by_type:
     adds r5,r0,#0x0    @ 08082772 051c
     adds r6,r1,#0x0    @ 08082774 0e1c
     adds r7,r2,#0x0    @ 08082776 171c
-    bl invoke_effect_node_handler_3arg       @ 08082778 0df036ff
+    bl set_equip_activation_state_by_mode_alt @ 08082778 0df036ff
     cmp r0,#0x0                              @ 0808277c 0028
     beq LAB_080827cc                         @ 0808277e 25d0
     ldrb r1,[r5,#0x6]                        @ 08082780 a979
@@ -15549,7 +15549,7 @@ LAB_08082bf2:
     lsrs r0,r0,#0x1f    @ 08082c1c c00f
     ldrh r1,[r5,#0x0]                        @ 08082c1e 2988
     adds r2,r7,#0x0    @ 08082c20 3a1c
-    bl set_equip_activation_state_by_mode    @ 08082c22 13f013ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 08082c22 13f013ff
 LAB_08082c26:
     ldr r0,[r4,#0x0]                         @ 08082c26 2068
     adds r0,#0x1    @ 08082c28 0130
@@ -15812,7 +15812,7 @@ LAB_08082dc4:
     ldrh r1,[r6,#0x0]                        @ 08082e0c 3188
     adds r2,r7,#0x0    @ 08082e0e 3a1c
 LAB_08082e10:
-    bl set_equip_activation_state_by_mode    @ 08082e10 13f01cfe
+    bl set_equip_activation_state_by_mode__08096a4c @ 08082e10 13f01cfe
     ldr r0,[r4,#0x0]                         @ 08082e14 2068
     adds r0,#0x1    @ 08082e16 0130
     str r0,[r4,#0x0]                         @ 08082e18 2060
@@ -16792,7 +16792,7 @@ LAB_080834d8:
 LAB_080834ea:
     ldrh r1,[r4,#0x0]                        @ 080834ea 2188
     ldr r2, DAT_080834fc                     @ 080834ec 034a
-    bl set_equip_activation_state_by_mode    @ 080834ee 13f0adfa
+    bl set_equip_activation_state_by_mode__08096a4c @ 080834ee 13f0adfa
     ldr r0,[r5,#0x0]                         @ 080834f2 2868
     adds r0,#0x1    @ 080834f4 0130
 LAB_080834f6:
@@ -17025,7 +17025,7 @@ LAB_0808368c:
     lsrs r0,r0,#0x1f    @ 0808369e c00f
     ldrh r1,[r4,#0x0]                        @ 080836a0 2188
     ldr r2, DAT_080836b4                     @ 080836a2 044a
-    bl set_equip_activation_state_by_mode    @ 080836a4 13f0d2f9
+    bl set_equip_activation_state_by_mode__08096a4c @ 080836a4 13f0d2f9
     ldr r0,[r7,#0x0]                         @ 080836a8 3868
     adds r0,#0x1    @ 080836aa 0130
     b LAB_080836f2                           @ 080836ac 21e0
@@ -17410,7 +17410,7 @@ check_effect_slot_zone_player_by_type:
     push {r4,r5,lr}                          @ 08083968 30b5
     adds r4,r0,#0x0    @ 0808396a 041c
     adds r5,r1,#0x0    @ 0808396c 0d1c
-    bl invoke_effect_node_handler_3arg       @ 0808396e 0cf03bfe
+    bl set_equip_activation_state_by_mode_alt @ 0808396e 0cf03bfe
     cmp r0,#0x0                              @ 08083972 0028
     bne LAB_0808397a                         @ 08083974 01d1
     movs r0,#0x0    @ 08083976 0020
@@ -17545,7 +17545,7 @@ LAB_08083a46:
     subs r1,r1,r0    @ 08083a52 091a
     adds r0,r5,#0x0    @ 08083a54 281c
     adds r2,r4,#0x0    @ 08083a56 221c
-    bl invoke_effect_node_handler_3arg       @ 08083a58 0cf0c6fd
+    bl set_equip_activation_state_by_mode_alt @ 08083a58 0cf0c6fd
     cmp r0,#0x0                              @ 08083a5c 0028
     beq LAB_08083a44                         @ 08083a5e f1d0
 LAB_08083a60:
@@ -17581,7 +17581,7 @@ LAB_08083a92:
     lsrs r1,r1,#0x1f    @ 08083a9a c90f
     adds r0,r5,#0x0    @ 08083a9c 281c
     adds r2,r4,#0x0    @ 08083a9e 221c
-    bl invoke_effect_node_handler_3arg       @ 08083aa0 0cf0a2fd
+    bl set_equip_activation_state_by_mode_alt @ 08083aa0 0cf0a2fd
     cmp r0,#0x0                              @ 08083aa4 0028
     beq LAB_08083a90                         @ 08083aa6 f3d0
 LAB_08083aa8:
@@ -17611,7 +17611,7 @@ LAB_08083ad6:
     lsrs r0,r0,#0x1f    @ 08083ad6 c00f
     ldrh r1,[r5,#0x0]                        @ 08083ad8 2988
     ldr r2, DWORD_08083aec                   @ 08083ada 044a
-    bl set_equip_activation_state_by_mode    @ 08083adc 12f0b6ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 08083adc 12f0b6ff
     ldr r0,[r4,#0x0]                         @ 08083ae0 2068
     adds r0,#0x1    @ 08083ae2 0130
     str r0,[r4,#0x0]                         @ 08083ae4 2060
@@ -17781,7 +17781,7 @@ LAB_08083bf6:
     lsrs r0,r0,#0x1f    @ 08083bfa c00f
     ldrh r1,[r6,#0x0]                        @ 08083bfc 3188
     ldr r2, DWORD_08083c18                   @ 08083bfe 064a
-    bl set_equip_activation_state_by_mode_alt @ 08083c00 12f056ff
+    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08083c00 12f056ff
     ldr r1, DWORD_08083c1c                   @ 08083c04 0549
     movs r0,#0x96    @ 08083c06 9620
     lsls r0,r0,#0x3    @ 08083c08 c000
@@ -18011,7 +18011,7 @@ LAB_08083d9e:
     lsrs r0,r0,#0x1f    @ 08083db4 c00f
     ldrh r1,[r4,#0x0]                        @ 08083db6 2188
     ldr r2, DWORD_08083dc4                   @ 08083db8 024a
-    bl set_equip_activation_state_by_mode    @ 08083dba 12f047fe
+    bl set_equip_activation_state_by_mode__08096a4c @ 08083dba 12f047fe
     ldr r0,[r5,#0x0]                         @ 08083dbe 2868
     adds r0,#0x1    @ 08083dc0 0130
     b LAB_08083e04                           @ 08083dc2 1fe0
@@ -18201,7 +18201,7 @@ LAB_08083ef8:
     lsrs r0,r0,#0x1f    @ 08083efc c00f
     ldrh r1,[r4,#0x0]                        @ 08083efe 2188
     ldr r2, DWORD_08083f08                   @ 08083f00 014a
-    bl set_equip_activation_state_by_mode    @ 08083f02 12f0a3fd
+    bl set_equip_activation_state_by_mode__08096a4c @ 08083f02 12f0a3fd
     b LAB_08083f30                           @ 08083f06 13e0
 DWORD_08083f08:
     .word  0x080905e9                     @ 08083f08 e9050908
@@ -18302,7 +18302,7 @@ LAB_08083fac:
     lsrs r0,r0,#0x1f    @ 08083fb0 c00f
     ldrh r1,[r4,#0x0]                        @ 08083fb2 2188
     ldr r2, DWORD_08083fcc                   @ 08083fb4 054a
-    bl set_equip_activation_state_by_mode_alt @ 08083fb6 12f07bfd
+    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 08083fb6 12f07bfd
     ldr r1, DWORD_08083fd0                   @ 08083fba 0549
     movs r2,#0x96    @ 08083fbc 9622
     lsls r2,r2,#0x3    @ 08083fbe d200
@@ -18409,7 +18409,7 @@ LAB_08084064:
     adds r0,r6,#0x0    @ 08084064 301c
     adds r1,r5,#0x0    @ 08084066 291c
     adds r2,r4,#0x0    @ 08084068 221c
-    bl invoke_effect_node_handler_3arg       @ 0808406a 0cf0bdfa
+    bl set_equip_activation_state_by_mode_alt @ 0808406a 0cf0bdfa
     cmp r0,#0x0                              @ 0808406e 0028
     bne LAB_08084120                         @ 08084070 56d1
     adds r4,#0x1    @ 08084072 0134
@@ -18621,7 +18621,7 @@ LAB_080841cc:
     adds r0,r5,#0x0    @ 080841cc 281c
     adds r1,r6,#0x0    @ 080841ce 311c
     adds r2,r4,#0x0    @ 080841d0 221c
-    bl invoke_effect_node_handler_3arg       @ 080841d2 0cf009fa
+    bl set_equip_activation_state_by_mode_alt @ 080841d2 0cf009fa
     cmp r0,#0x0                              @ 080841d6 0028
     beq LAB_080841f6                         @ 080841d8 0dd0
     ldrb r0,[r5,#0x2]                        @ 080841da a878
@@ -18943,7 +18943,7 @@ LAB_080844dc:
     lsrs r0,r0,#0x1f    @ 08084522 c00f
     ldrh r1,[r4,#0x0]                        @ 08084524 2188
     ldr r2, DAT_0808453c                     @ 08084526 054a
-    bl set_equip_activation_state_by_mode    @ 08084528 12f090fa
+    bl set_equip_activation_state_by_mode__08096a4c @ 08084528 12f090fa
     ldr r0,[r5,#0x0]                         @ 0808452c 2868
     adds r0,#0x1    @ 0808452e 0130
     b LAB_08084578                           @ 08084530 22e0
@@ -19548,7 +19548,7 @@ LAB_08084da4:
     ldrh r1,[r4,#0x0]                        @ 08084db6 2188
     ldr r2, DWORD_08084dc8                   @ 08084db8 034a
 LAB_08084dba:
-    bl set_equip_activation_state_by_mode    @ 08084dba 11f047fe
+    bl set_equip_activation_state_by_mode__08096a4c @ 08084dba 11f047fe
     ldr r0,[r5,#0x0]                         @ 08084dbe 2868
     adds r0,#0x1    @ 08084dc0 0130
     str r0,[r5,#0x0]                         @ 08084dc2 2860
@@ -19806,7 +19806,7 @@ LAB_08084f80:
     adds r0,r6,#0x0    @ 08084f80 301c
     adds r1,r5,#0x0    @ 08084f82 291c
     adds r2,r4,#0x0    @ 08084f84 221c
-    bl invoke_effect_node_handler_3arg       @ 08084f86 0bf02ffb
+    bl set_equip_activation_state_by_mode_alt @ 08084f86 0bf02ffb
     cmp r0,#0x0                              @ 08084f8a 0028
     bne LAB_0808500a                         @ 08084f8c 3dd1
     adds r4,#0x1    @ 08084f8e 0134
@@ -19833,7 +19833,7 @@ LAB_08084fb2:
     lsrs r0,r0,#0x1f    @ 08084fb6 c00f
     ldrh r1,[r6,#0x0]                        @ 08084fb8 3188
     ldr r2, DWORD_08084fc8                   @ 08084fba 034a
-    bl set_equip_activation_state_by_mode    @ 08084fbc 11f046fd
+    bl set_equip_activation_state_by_mode__08096a4c @ 08084fbc 11f046fd
     ldr r0,[r4,#0x0]                         @ 08084fc0 2068
     adds r0,#0x1    @ 08084fc2 0130
     b LAB_08085004                           @ 08084fc4 1ee0

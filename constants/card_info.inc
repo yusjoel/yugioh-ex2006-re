@@ -522,6 +522,7 @@
 .equ FUHMA_SHURIKEN_CID,               0x000016cc  @ Fuhma Shuriken (pw=09373534; card-stats.s slot=0x16cc)
 .equ TOWER_OF_BABEL_CID,               0x000016de  @ Tower of Babel (pw=94256039; card-stats.s slot=0x16de)
 .equ BURNING_ALGAE_CID,                0x000016f5  @ Burning Algae (pw=41859700; card-stats.s slot=0x16f5)
+.equ ABYSS_SOLDIER_CID,                0x00001727  @ Abyss Soldier (pw=18318842; card-stats.s slot=0x1727); check_field_sarcophagus_range_and_banisher_count CID filter; 1 Seg-8 slot; conf: high
 .equ EMES_THE_INFINITY_CID,            0x0000172b  @ Emes the Infinity (pw=43580269; card-stats.s slot=0x172b)
 .equ EMISSARY_OF_THE_AFTERLIFE_CID,    0x00001796  @ Emissary of the Afterlife (pw=75043725; card-stats.s slot=0x1796)
 .equ FAMILIAR_KNIGHT_CID,              0x000017c3  @ Familiar Knight (pw=89731911; card-stats.s slot=0x17c3)

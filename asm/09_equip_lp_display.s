@@ -2743,7 +2743,7 @@ LAB_0806ffc6:
     lsrs r0,r0,#0x1f    @ 0806ffd8 c00f
     ldrh r1,[r7,#0x0]                        @ 0806ffda 3988
     ldr r2, DWORD_0806ffec                   @ 0806ffdc 034a
-    bl set_equip_activation_state_by_mode_alt @ 0806ffde 26f067fd
+    bl set_equip_activation_state_by_mode_alt__08096ab0 @ 0806ffde 26f067fd
     movs r0,#0x7d    @ 0806ffe2 7d20
     b LAB_0807003e                           @ 0806ffe4 2be0
     .zero  0x2
@@ -4185,7 +4185,7 @@ LAB_08070a48:
     lsrs r0,r0,#0x1f    @ 08070a54 c00f
     ldrh r1,[r7,#0x0]                        @ 08070a56 3988
     ldr r2, DAT_08070a64                     @ 08070a58 024a
-    bl set_equip_activation_state_by_mode    @ 08070a5a 25f0f7ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 08070a5a 25f0f7ff
     movs r0,#0x7f    @ 08070a5e 7f20
     b LAB_08070a9c                           @ 08070a60 1ce0
     .zero  0x2
@@ -5914,7 +5914,7 @@ LAB_0807150c:
     lsrs r0,r0,#0x1f    @ 0807152a c00f
     ldrh r1,[r4,#0x0]                        @ 0807152c 2188
     ldr r2, DWORD_08071538                   @ 0807152e 024a
-    bl set_equip_activation_state_by_mode    @ 08071530 25f08cfa
+    bl set_equip_activation_state_by_mode__08096a4c @ 08071530 25f08cfa
     movs r0,#0x7f    @ 08071534 7f20
     b LAB_08071584                           @ 08071536 25e0
 DWORD_08071538:
@@ -11355,7 +11355,7 @@ LAB_08074a7a:
     lsrs r0,r0,#0x1f    @ 08074a9c c00f
     ldrh r1,[r4,#0x0]                        @ 08074a9e 2188
     adds r2,r5,#0x0    @ 08074aa0 2a1c
-    bl set_equip_activation_state_by_mode    @ 08074aa2 21f0d3ff
+    bl set_equip_activation_state_by_mode__08096a4c @ 08074aa2 21f0d3ff
     movs r0,#0x7d    @ 08074aa6 7d20
     b LAB_08074aee                           @ 08074aa8 21e0
     .zero  0x2
@@ -14365,7 +14365,7 @@ LAB_080763f8:
     lsrs r0,r0,#0x1f    @ 08076408 c00f
     ldrh r1,[r4,#0x0]                        @ 0807640a 2188
     ldr r2, DAT_08076418                     @ 0807640c 024a
-    bl set_equip_activation_state_by_mode    @ 0807640e 20f01dfb
+    bl set_equip_activation_state_by_mode__08096a4c @ 0807640e 20f01dfb
     movs r0,#0x7d    @ 08076412 7d20
     b LAB_08076442                           @ 08076414 15e0
     .zero  0x2

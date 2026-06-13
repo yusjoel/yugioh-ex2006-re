@@ -358,3 +358,9 @@
 @ Source: asm/06_equip_eligibility_b.s Seg-7 (0x08058550..0x08058cec)
 @ =============================================================================
 .equ EQUIP_ACTIVE_CTX_OFF,          0x00000484  @ [gDuelPhaseFlags+0x484] current equip activation context slot ptr; 46 ROM refs; asm/06 L12851 ACTIVATION_OFFSET=0x484; asm/09 L17878 ACTIVE_NODE_OFFSET=0x484; asm/10 L15465 SLOT_SNAPSHOT_OFFSET=0x484; conf: high
+
+@ =============================================================================
+@ file 06 Seg-8 additions: OP31 effect node count sub-op code
+@ Source: asm/06_equip_eligibility_b.s Seg-8 (0x08058cec..0x08059de0)
+@ =============================================================================
+.equ OP31_EFFECT_NODE_COUNT_CODE,   0x0000013d  @ invoke_card_display_op_0x31_sub10 first arg (sub-op code 0x13d); tick_equip_effect_node_count_display_seq L14826; distinct from LP_ROW_OFF=0x13e; conf: high

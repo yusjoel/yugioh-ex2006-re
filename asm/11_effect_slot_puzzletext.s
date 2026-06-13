@@ -11783,7 +11783,7 @@ LAB_080905e0:
 @ Constants:
 @ - NODE_TARGET_OFFSET=0x8 ([node+8] = target ptr; NULL = no valid target)
 @ - ACTIVE_FLAG_ADDR=0x0201b290+0x4bc
-invoke_effect_node_handler_3arg:
+set_equip_activation_state_by_mode_alt:
     push {r4,r5,r6,lr}                       @ 080905e8 70b5
     adds r4,r0,#0x0    @ 080905ea 041c
     adds r5,r1,#0x0    @ 080905ec 0d1c
