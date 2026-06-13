@@ -103,7 +103,7 @@
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ✅ | 69b408a |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ✅ | 6c92afe |
 | 9 | 0x51cc4..0x52df8 | 24 | 117 | — | ✅ | 0384db3 |
-| 10 | 0x52df8..0x537c0 | 23 | 51 | — | ✅ | (pending commit) |
+| 10 | 0x52df8..0x537c0 | 23 | 51 | — | ✅ | 10a9f7a |
 
 图例: ✅ 完成 / 🟡 进行中 / ⬜ 未开始。
 重段提示: Seg-4 (200 槽, switch 派发 + check_card_is_equip_set 簇) / Seg-1 (152 槽, sprite 提交簇) /
@@ -671,7 +671,7 @@ check_equip_slot_eligible_by_setcode_and_prereqs_no_whitelist
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (see below)
+**commit**: 10a9f7a
 
 **file 05 全 10 段完成** (Seg-1..Seg-10 全部 ✅; ROM 0x08049014..0x080537c0; 239 fn / 1010 slots fully symbolized)
 
