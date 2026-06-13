@@ -94,7 +94,7 @@
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
 | 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
-| 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | TBD |
+| 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | 68c1e28 |
 | 3 | 0x4ad48..0x4b4f4 | 24 | 73 | — | ⬜ | — |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
@@ -184,7 +184,7 @@ check_card_ids_banlist_compatible
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: TBD
+**commit**: 68c1e28
 
 ---
 
