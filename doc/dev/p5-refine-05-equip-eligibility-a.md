@@ -98,7 +98,7 @@
 | 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | bd9ce13 |
 | 4a | 0x4b4f4..0x4be38 | 10 | 101 | — | ✅ | — |
 | 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ✅ | 8a924b3 |
-| 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | (pending) |
+| 5 | 0x4c6e8..0x4d124 | 7 | 75 | 3 orphan | ✅ | 20cbc8b |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
 | 8 | 0x50e40..0x51cc4 | 24 | 83 | — | ⬜ | — |
@@ -314,7 +314,7 @@ Note: switchdataD_0804c6e8 (6-entry jump table for classify_card_id_summon_categ
 
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
-**commit**: (pending)
+**commit**: 20cbc8b
 
 ---
 
