@@ -96,7 +96,8 @@
 | 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ✅ | 68c1e28 |
 | 3 | 0x4ad48..0x4b4f4 | 24+5 | 73 | 3 disasm blocks | ✅ | bd9ce13 |
-| 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
+| 4a | 0x4b4f4..0x4be38 | 10 | 101 | — | ✅ | — |
+| 4b | 0x4be38..0x4c6e8 | ~14 | ~99 | — | ⬜ | — |
 | 5 | 0x4c6e8..0x4d124 | 24 | 65 | — | ⬜ | — |
 | 6 | 0x4d124..0x4ffba | 24 | 128 | — | ⬜ | — |
 | 7 | 0x4ffba..0x50e40 | 24 | 73 | — | ⬜ | — |
@@ -185,6 +186,52 @@ check_card_ids_banlist_compatible
 **byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
 
 **commit**: 68c1e28
+
+### 4.04a Seg-4a 完成记录 (0x0804b4f4..0x0804be38, 10 fn, 101 slots)
+
+**函数列表 (10)**:
+get_card_field_summon_restriction / get_card_special_group_code /
+check_card_has_equip_placement_type / check_card_not_equip_placement_type /
+check_card_id_is_special_tribute_group / check_card_is_equip_target_eligible /
+check_card_id_is_equip_excluded_range / get_card_equip_zone_rank /
+check_card_id_is_equip_set_a / (get_card_effect_category = Seg-4b start)
+
+**符号化统计**: EQ=95 / RENAME=6 / SCALAR_EQ=5 / FUNC_RENAME=0 / REF=0 / PLATE=0
+
+**新建 constants** (card_info.inc +68):
+- 63 B-class CID: HARPIE_LADY_SISTERS / PERFECTLY_ULTIMATE_GREAT_MOTH / MASK_OF_DARKNESS /
+  PRINCESS_OF_TSURUGI / WALL_SHADOW / SUIJIN / METALZOA / MAGICIAN_OF_FAITH / HANE_HANE /
+  NEEDLE_WORM / MORPHING_JAR / INVADER_OF_THE_THRONE / RED_EYES_BLACK_METAL_DRAGON /
+  THE_FIEND_MEGACYBER / GERM_INFECTION / STIM_PACK / BUBONIC_VERMIN /
+  VALKYRION_THE_MAGNA_WARRIOR / INJECTION_FAIRY_LILY / SONIC_JAMMER /
+  FOUR_STARRED_LADYBUG_OF_DOOM / SUMMONER_OF_ILLUSIONS / GILASAURUS / TORNADO_BIRD /
+  MARYOKUTAI / EKIBYO_DRAKMORD / DICE_JAR / FUSHIOH_RICHIE / A_CAT_OF_ILL_OMEN /
+  DIFFERENT_DIMENSION_CAPSULE / XY_DRAGON_CANNON / OLD_VINDICTIVE_MAGICIAN /
+  MAGICAL_PLANT_MANDRAGOLA / MAGICAL_MERCHANT / GUARDIAN_GRARL / IRON_BLACKSMITH_KOTETSU /
+  FINAL_COUNTDOWN / WITCH_DOCTOR_OF_CHAOS / CHAOS_SORCERER / BLACK_LUSTER_SOLDIER_ENVOY /
+  ARCHLORD_ZERATO / SKULL_DESCOVERY_KNIGHT / DESERTAPIR / RARE_METAL_DRAGON /
+  SORCERER_OF_DARK_MAGIC / NOBLEMAN_EATER_BUG / THE_TRICKY / THE_BLOCKMAN /
+  A_TEAM_TRAP_DISPOSAL_UNIT / SWORDS_OF_CONCEALING_LIGHT / VAMPIRE_GENESIS /
+  ANCIENT_GEAR_BEAST / DUMMY_GOLEM / MASTER_MONK / ELEMENTAL_HERO_THUNDER_GIANT /
+  CYBER_DRAGON / VWXYZ_DRAGON_CATAPULT_CANNON / FAMILIAR_POSSESSED_WYNN /
+  DARK_ERADICATOR_WARLOCK / ELEMENTAL_HERO_STEAM_HEALER / ANCIENT_GEAR / PRINCESS_PIKERU /
+  PRINCESS_CURRAN
+- 3 inline CID: KURIBOH_CID=0xfe0 / PENGUIN_SOLDIER_CID=0x1200 / DARK_SNAKE_SYNDROME_CID=0x15a0
+- 2 field6 type: CARD_FIELD6_EQUIP_CONTINUOUS=0x16 / CARD_FIELD6_EQUIP_RITUAL=0x17
+
+**carve**: 0 (no ROM_INCBIN / inter-function data in this segment)
+
+**scalar equate** (Ghidra inline operand): PENGUIN_SOLDIER_CID @ 0x4b5c0 / KURIBOH_CID @ 0x4bcd6 /
+DARK_SNAKE_SYNDROME_CID @ 0x4bdfc / CARD_FIELD6_EQUIP_CONTINUOUS @ 0x4bca0 /
+CARD_FIELD6_EQUIP_RITUAL @ 0x4bca4
+
+**CJK grep in Seg-4a range**: 0 non-ASCII lines confirmed
+
+**byte-identical**: SHA1 9689337d6aac1ce9699ab60aac73fc2cfdccad9b
+
+**commit**: (pending)
+
+---
 
 ### 4.03 Seg-3 完成记录 (0x0804ad48..0x0804b4f4, 24+5 fn, 73+20 slots, 3 disasm blocks)
 
