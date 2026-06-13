@@ -93,7 +93,7 @@
 
 | Seg | 范围 | ~fn | ~slots | 内含 ROM_INCBIN | 状态 | commit |
 |-----|------|-----|--------|-----------------|------|--------|
-| 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | (pending) |
+| 1 | 0x49014..0x4a5b8 | 24 | 152 | — | ✅ | 6dd6fec |
 | 2 | 0x4a5b8..0x4ad48 | 24 | 68 | — | ⬜ | — |
 | 3 | 0x4ad48..0x4b4f4 | 24 | 73 | — | ⬜ | — |
 | 4 | 0x4b4f4..0x4c6e8 | 24 | 200 | — | ⬜ | — |
@@ -150,7 +150,7 @@ enqueue_duel_field_card_slot_sprite / enqueue_sprite_attr_for_card_slot
 other segments (0x08073d84, 0x0806d960, 0x08049e44, 0x080718c4) not in Seg-1 mapping list;
 will be resolved when those segments are refined.
 
-**commit**: (pending)
+**commit**: 6dd6fec
 
 ---
 
